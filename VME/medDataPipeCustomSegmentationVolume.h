@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medDataPipeCustomSegmentationVolume.h,v $
 Language:  C++
-Date:      $Date: 2010-04-27 13:47:18 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2010-05-04 15:54:58 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -90,6 +90,36 @@ public:
   /** Return the vtkDataSet of the manual segmentation */
   vtkDataSet *GetManualOutput();
 
+  /** Return the vtkDataSet of the refinement segmentation */
+  vtkDataSet *GetRefinementOutput();
+
+  /** Return the vtkDataSet of the region growing segmentation */
+  vtkDataSet *GetRegionGrowingOutput();
+
+  /** Set the region growing upper threshold */
+  void SetRegionGrowingUpperThreshold(double value);
+
+  /** Set the region growing lower threshold */
+  void SetRegionGrowingLowerThreshold(double value);
+
+  /** Return the region growing upper threshold */
+  double GetRegionGrowingUpperThreshold(){return m_RegionGrowingUpperThreshold;};
+
+  /** Return the region growing lower threshold */
+  double GetRegionGrowingLowerThreshold(){return m_RegionGrowingLowerThreshold;};
+
+  /** Return the seed of the position index */
+  int GetSeed(int index,int seed[3]);
+
+  /** Add a new seed */
+  int AddSeed(int seed[3]);
+
+  /** Delete the seed of the position index */
+  int DeleteSeed(int index);
+
+  /** Return the number of seeds stored */
+  int GetNumberOfSeeds(){return m_RegionGrowingSeeds.size();};
+
 protected:
   medDataPipeCustomSegmentationVolume();
   virtual ~medDataPipeCustomSegmentationVolume();
@@ -109,6 +139,9 @@ protected:
   /** Apply the refinement segmentation */
   void ApplyRefinementSegmentation();
 
+  /** Apply the region growing segmentation */
+  void ApplyRegionGrowingSegmentation();
+
   /** function called to updated the data pipe output */
   /*virtual*/ void Execute();
 
@@ -119,12 +152,15 @@ protected:
   vtkStructuredPoints *m_AutomaticSP;
   vtkRectilinearGrid *m_ManualRG;
   vtkStructuredPoints *m_ManualSP;
-  vtkStructuredPoints *m_RefinementRG;
+  vtkRectilinearGrid *m_RefinementRG;
   vtkStructuredPoints *m_RefinementSP;
+  vtkRectilinearGrid *m_RegionGrowingRG;
+  vtkStructuredPoints *m_RegionGrowingSP;
 
   bool m_ChangedManualData;
   bool m_ChangedAutomaticData;
   bool m_ChangedRefinementData;
+  bool m_ChangedRegionGrowingData;
 
   mafNode *m_Volume;
   mafNode *m_ManualVolumeMask;
@@ -135,6 +171,12 @@ protected:
   double m_AutomaticSegmentationGlobalThreshold;
   std::vector<int*> m_AutomaticSegmentationRanges;
   std::vector<double> m_AutomaticSegmentationThresholds;
+  //////////////////////////////////////////////////////////////////////////
+
+  //Stuff for region growing
+  double m_RegionGrowingUpperThreshold;
+  double m_RegionGrowingLowerThreshold;
+  std::vector<int *> m_RegionGrowingSeeds;
   //////////////////////////////////////////////////////////////////////////
 
 

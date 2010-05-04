@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMESegmentationVolume.h,v $
 Language:  C++
-Date:      $Date: 2010-04-27 13:47:46 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2010-05-04 15:54:58 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -105,6 +105,12 @@ public:
   /** Return the vtkDataSet of the manual segmentation */
   vtkDataSet *GetManualOutput();
 
+  /** Return the vtkDataSet of the refinement segmentation */
+  vtkDataSet *GetRefinementOutput();
+
+  /** Return the vtkDataSet of the region growing segmentation */
+  vtkDataSet *GetRegionGrowingOutput();
+
   /** Set the volume mask for the manual segmentation */
   void SetManualVolumeMask(mafNode *volume);
 
@@ -149,6 +155,27 @@ public:
 
   /** Check if all thresholds exist */
   bool CheckNumberOfThresholds();
+
+  /** Set the region growing upper threshold */
+  void SetRegionGrowingUpperThreshold(double value);
+
+  /** Set the region growing lower threshold */
+  void SetRegionGrowingLowerThreshold(double value);
+
+  /** Return the region growing upper threshold */
+  double GetRegionGrowingUpperThreshold();
+
+  /** Return the region growing lower threshold */
+  double GetRegionGrowingLowerThreshold();
+
+  /** Add a new seed */
+  int AddSeed(int seed[3]);
+
+  /** Return the seed of the position index */
+  int GetSeed(int index,int seed[3]);
+
+  /** Delete the seed of the position index */
+  int DeleteSeed(int index);
 
   /** return the right type of output */  
   /*virtual*/ mafVMEOutput *GetOutput();

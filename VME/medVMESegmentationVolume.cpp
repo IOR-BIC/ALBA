@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMESegmentationVolume.cpp,v $
 Language:  C++
-Date:      $Date: 2010-04-27 13:47:46 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2010-05-04 15:54:58 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -340,6 +340,23 @@ int medVMESegmentationVolume::RemoveAllRanges()
   return MAF_ERROR;
 }
 //-----------------------------------------------------------------------
+int medVMESegmentationVolume::DeleteSeed(int index)
+//-----------------------------------------------------------------------
+{
+  int result = m_SegmentingDataPipe->DeleteRange(index);
+  if (result == MAF_OK)
+  {
+    result = m_VolumeAttribute->DeleteRange(index);
+    if (result == MAF_OK)
+    {
+      Modified();
+      return MAF_OK;
+    }
+  }
+
+  return MAF_ERROR;
+}
+//-----------------------------------------------------------------------
 int medVMESegmentationVolume::DeleteRange(int index)
 //-----------------------------------------------------------------------
 {
@@ -399,6 +416,18 @@ vtkDataSet *medVMESegmentationVolume::GetAutomaticOutput()
   return m_SegmentingDataPipe->GetAutomaticOutput();
 }
 //-----------------------------------------------------------------------
+vtkDataSet *medVMESegmentationVolume::GetRegionGrowingOutput()
+//-----------------------------------------------------------------------
+{
+  return m_SegmentingDataPipe->GetRegionGrowingOutput();
+}
+//-----------------------------------------------------------------------
+vtkDataSet *medVMESegmentationVolume::GetRefinementOutput()
+//-----------------------------------------------------------------------
+{
+  return m_SegmentingDataPipe->GetRefinementOutput();
+}
+//-----------------------------------------------------------------------
 vtkDataSet *medVMESegmentationVolume::GetManualOutput()
 //-----------------------------------------------------------------------
 {
@@ -410,11 +439,66 @@ mafNode *medVMESegmentationVolume::GetVolumeLink()
 {
   return GetLink("Volume");
 }
+//-----------------------------------------------------------------------
+int medVMESegmentationVolume::AddSeed(int seed[3])
+//-----------------------------------------------------------------------
+{
+  int result = m_SegmentingDataPipe->AddSeed(seed);
+  if (result == MAF_OK)
+  {
+    result = m_VolumeAttribute->AddSeed(seed);
+    if (result == MAF_OK)
+    {
+      Modified();
+      return MAF_OK;
+    }
+  }
+
+  return MAF_ERROR;
+}
+//-----------------------------------------------------------------------
+int medVMESegmentationVolume::GetSeed(int index,int seed[3])
+//-----------------------------------------------------------------------
+{
+  return m_VolumeAttribute->GetSeed(index,seed);
+}
+//-------------------------------------------------------------------------
+double medVMESegmentationVolume::GetRegionGrowingLowerThreshold()
+//-------------------------------------------------------------------------
+{
+  return m_VolumeAttribute->GetRegionGrowingLowerThreshold();
+}
+//-------------------------------------------------------------------------
+double medVMESegmentationVolume::GetRegionGrowingUpperThreshold()
+//-------------------------------------------------------------------------
+{
+  return m_VolumeAttribute->GetRegionGrowingUpperThreshold();
+}
 //-------------------------------------------------------------------------
 int medVMESegmentationVolume::GetNumberOfRanges()
 //-------------------------------------------------------------------------
 {
   return m_VolumeAttribute->GetNumberOfRanges();
+}
+//-------------------------------------------------------------------------
+void medVMESegmentationVolume::SetRegionGrowingLowerThreshold(double value)
+//-------------------------------------------------------------------------
+{
+  if (m_VolumeAttribute && m_SegmentingDataPipe)
+  {
+	  m_VolumeAttribute->SetRegionGrowingLowerThreshold(value);
+	  m_SegmentingDataPipe->SetRegionGrowingLowerThreshold(value);
+  }
+}
+//-------------------------------------------------------------------------
+void medVMESegmentationVolume::SetRegionGrowingUpperThreshold(double value)
+//-------------------------------------------------------------------------
+{
+  if (m_VolumeAttribute && m_SegmentingDataPipe)
+  {
+    m_VolumeAttribute->SetRegionGrowingUpperThreshold(value);
+    m_SegmentingDataPipe->SetRegionGrowingUpperThreshold(value);
+  }
 }
 //-----------------------------------------------------------------------
 void medVMESegmentationVolume::SetAutomaticSegmentationThresholdModality(int modality)

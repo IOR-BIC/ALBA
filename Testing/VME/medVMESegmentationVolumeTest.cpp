@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMESegmentationVolumeTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-04-19 15:26:12 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-05-04 15:55:10 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -29,6 +29,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkMAFSmartPointer.h"
 #include "vtkDataSetReader.h"
 #include "vtkStructuredPoints.h"
+#include "vtkRectilinearGrid.h"
+#include "vtkPointData.h"
 
 #define TEST_RESULT CPPUNIT_ASSERT(m_Result)
 
@@ -37,28 +39,50 @@ void medVMESegmentationVolumeTest::setUp()
 //----------------------------------------------------------------------------
 {
   m_Result = false;
-  mafNEW(m_VME);
 
   m_Storage = mafVMEStorage::New();
   m_Storage->GetRoot()->SetName("root");
   m_Storage->GetRoot()->Initialize();
 
+  m_Volume = NULL;
   mafNEW(m_Volume);
   m_Volume->ReparentTo(m_Storage->GetRoot());
   vtkMAFSmartPointer<vtkDataSetReader> r;
   mafString filename=MED_DATA_ROOT;
-  filename<<"/VTK_Volumes/volume.vtk";
+  filename<<"/VTK_Volumes/volumeRG.vtk";
   r->SetFileName(filename);
   r->Update();
-  m_Volume->SetData(vtkStructuredPoints::SafeDownCast(r->GetOutput()),0.0);
+  m_Volume->SetData(vtkRectilinearGrid::SafeDownCast(r->GetOutput()),0.0);
   m_Volume->Update();
+
+  m_VolumeManualMask = NULL;
+  mafNEW(m_VolumeManualMask);
+  m_VolumeManualMask->ReparentTo(m_Volume);
+  filename=MED_DATA_ROOT;
+  filename<<"/VTK_Volumes/manualMask.vtk";
+  r->SetFileName(filename);
+  r->Update();
+  m_VolumeManualMask->SetData(vtkRectilinearGrid::SafeDownCast(r->GetOutput()),0.0);
+  m_VolumeManualMask->Update();
+
+  m_VolumeRefinementMask = NULL;
+  mafNEW(m_VolumeRefinementMask);
+  m_VolumeRefinementMask->ReparentTo(m_Volume);
+  filename=MED_DATA_ROOT;
+  filename<<"/VTK_Volumes/refinementMask.vtk";
+  r->SetFileName(filename);
+  r->Update();
+  m_VolumeRefinementMask->SetData(vtkRectilinearGrid::SafeDownCast(r->GetOutput()),0.0);
+  m_VolumeRefinementMask->Update();
 }
 //----------------------------------------------------------------------------
 void medVMESegmentationVolumeTest::tearDown()
 //----------------------------------------------------------------------------
 {
-  mafDEL(m_VME);
+  mafDEL(m_VolumeRefinementMask);
+  mafDEL(m_VolumeManualMask);
   mafDEL(m_Volume);
+
   delete m_Storage;
   delete wxLog::SetActiveTarget(NULL);
 }
@@ -225,10 +249,171 @@ void medVMESegmentationVolumeTest::TestAutomaticSegmentation()
   //////////////////////////////////////////////////////////////////////////
   vme->GetOutput()->Update();
   vme->Update();
-  vtkStructuredPoints *sp = vtkStructuredPoints::SafeDownCast(vme->GetOutput()->GetVTKData());
-  sp->Update();
+  CPPUNIT_ASSERT( vme->GetAutomaticOutput()->GetNumberOfPoints() == m_Volume->GetOutput()->GetVTKData()->GetNumberOfPoints() );
+  vtkRectilinearGrid *rg = vtkRectilinearGrid::SafeDownCast(vme->GetOutput()->GetVTKData());
+  rg->Update();
   double sr[2];
-  sp->GetScalarRange(sr);
+  rg->GetScalarRange(sr);
   CPPUNIT_ASSERT( sr[0] == 0.0 && sr[1] == 255.0 );
+  CPPUNIT_ASSERT( rg->GetNumberOfPoints() == vme->GetAutomaticOutput()->GetNumberOfPoints() );
+  for (int i=0;i<rg->GetNumberOfPoints();i++)
+  {
+    CPPUNIT_ASSERT( rg->GetPointData()->GetScalars()->GetTuple1(i) == vme->GetAutomaticOutput()->GetPointData()->GetScalars()->GetTuple1(i) );
+  }
+  //////////////////////////////////////////////////////////////////////////
+}
+//---------------------------------------------------------
+void medVMESegmentationVolumeTest::TestManualSegmentation()
+//---------------------------------------------------------
+{
+  mafSmartPointer<medVMESegmentationVolume> vme;
+  vme->ReparentTo(m_Storage->GetRoot());
+  //////////////////////////////////////////////////////////////////////////
+  vme->SetVolumeLink(m_Volume);
+  CPPUNIT_ASSERT( vme->GetVolumeLink() == (mafNode*)m_Volume );
+  //////////////////////////////////////////////////////////////////////////
+  vme->SetAutomaticSegmentationThresholdModality(medVMESegmentationVolume::GLOBAL);
+  vme->SetAutomaticSegmentationGlobalThreshold(5.0);
+  CPPUNIT_ASSERT( vme->CheckNumberOfThresholds() == true );
+  int seed[3] = {0,0,0};
+  vme->AddSeed(seed);
+  vme->SetRegionGrowingLowerThreshold(0);
+  vme->SetRegionGrowingUpperThreshold(255);
+  //////////////////////////////////////////////////////////////////////////
+  vme->SetManualVolumeMask(m_VolumeManualMask);
+  //////////////////////////////////////////////////////////////////////////
+  vme->GetOutput()->Update();
+  vme->Update();
+  int n1 = vme->GetManualOutput()->GetNumberOfPoints();
+  int n2 = m_Volume->GetOutput()->GetVTKData()->GetNumberOfPoints();
+
+  CPPUNIT_ASSERT( vme->GetAutomaticOutput()->GetNumberOfPoints() == m_Volume->GetOutput()->GetVTKData()->GetNumberOfPoints() );
+  CPPUNIT_ASSERT( vme->GetManualOutput()->GetNumberOfPoints() == m_Volume->GetOutput()->GetVTKData()->GetNumberOfPoints() );
+  vtkRectilinearGrid *rg = vtkRectilinearGrid::SafeDownCast(vme->GetOutput()->GetVTKData());
+  rg->Update();
+  double sr[2];
+  rg->GetScalarRange(sr);
+  CPPUNIT_ASSERT( sr[0] == 0.0 && sr[1] == 255.0 );
+  CPPUNIT_ASSERT( rg->GetNumberOfPoints() == vme->GetManualOutput()->GetNumberOfPoints() );
+  for (int i=0;i<rg->GetNumberOfPoints();i++)
+  {
+    CPPUNIT_ASSERT( rg->GetPointData()->GetScalars()->GetTuple1(i) == vme->GetManualOutput()->GetPointData()->GetScalars()->GetTuple1(i) );
+  }
+  //////////////////////////////////////////////////////////////////////////
+}
+//---------------------------------------------------------
+void medVMESegmentationVolumeTest::TestRefinementSegmentation()
+//---------------------------------------------------------
+{
+  mafSmartPointer<medVMESegmentationVolume> vme;
+  vme->ReparentTo(m_Storage->GetRoot());
+  //////////////////////////////////////////////////////////////////////////
+  vme->SetVolumeLink(m_Volume);
+  CPPUNIT_ASSERT( vme->GetVolumeLink() == (mafNode*)m_Volume );
+  //////////////////////////////////////////////////////////////////////////
+  vme->SetAutomaticSegmentationThresholdModality(medVMESegmentationVolume::GLOBAL);
+  vme->SetAutomaticSegmentationGlobalThreshold(5.0);
+  CPPUNIT_ASSERT( vme->CheckNumberOfThresholds() == true );
+  //////////////////////////////////////////////////////////////////////////
+  vme->SetManualVolumeMask(m_VolumeManualMask);
+  //////////////////////////////////////////////////////////////////////////
+  vme->SetRefinementVolumeMask(m_VolumeRefinementMask);
+  //////////////////////////////////////////////////////////////////////////
+  vme->GetOutput()->Update();
+  vme->Update();
+  CPPUNIT_ASSERT( vme->GetAutomaticOutput()->GetNumberOfPoints() == m_Volume->GetOutput()->GetVTKData()->GetNumberOfPoints() );
+  CPPUNIT_ASSERT( vme->GetManualOutput()->GetNumberOfPoints() == m_Volume->GetOutput()->GetVTKData()->GetNumberOfPoints() );
+  CPPUNIT_ASSERT( vme->GetRefinementOutput()->GetNumberOfPoints() == m_Volume->GetOutput()->GetVTKData()->GetNumberOfPoints() );
+  vtkRectilinearGrid *rg = vtkRectilinearGrid::SafeDownCast(vme->GetOutput()->GetVTKData());
+  rg->Update();
+  double sr[2];
+  rg->GetScalarRange(sr);
+  CPPUNIT_ASSERT( sr[0] == 0.0 && sr[1] == 255.0 );
+  CPPUNIT_ASSERT( rg->GetNumberOfPoints() == vme->GetManualOutput()->GetNumberOfPoints() );
+  for (int i=0;i<rg->GetNumberOfPoints();i++)
+  {
+    CPPUNIT_ASSERT( rg->GetPointData()->GetScalars()->GetTuple1(i) == vme->GetRefinementOutput()->GetPointData()->GetScalars()->GetTuple1(i) );
+  }
+  //////////////////////////////////////////////////////////////////////////
+}
+//---------------------------------------------------------
+void medVMESegmentationVolumeTest::TestSetManualVolumeMask()
+//---------------------------------------------------------
+{
+  mafSmartPointer<medVMESegmentationVolume> vme;
+  vme->ReparentTo(m_Storage->GetRoot());
+  vme->SetVolumeLink(m_Volume);
+  //////////////////////////////////////////////////////////////////////////
+  vme->SetManualVolumeMask(m_VolumeManualMask);
+  CPPUNIT_ASSERT( vme->GetManualVolumeMask() == (mafNode*)m_VolumeManualMask );
+  //////////////////////////////////////////////////////////////////////////
+}
+//---------------------------------------------------------
+void medVMESegmentationVolumeTest::TestSetRefinementVolumeMask()
+//---------------------------------------------------------
+{
+  mafSmartPointer<medVMESegmentationVolume> vme;
+  vme->ReparentTo(m_Storage->GetRoot());
+  vme->SetVolumeLink(m_Volume);
+  //////////////////////////////////////////////////////////////////////////
+  vme->SetRefinementVolumeMask(m_VolumeRefinementMask);
+  CPPUNIT_ASSERT( vme->GetRefinementVolumeMask() == (mafNode*)m_VolumeRefinementMask );
+  //////////////////////////////////////////////////////////////////////////
+}
+//---------------------------------------------------------
+void medVMESegmentationVolumeTest::TestAddSeed()
+//---------------------------------------------------------
+{
+  int seed[3];
+
+  seed[0] = 0;
+  seed[1] = 1;
+  seed[2] = 2;
+
+  mafSmartPointer<medVMESegmentationVolume> vme;
+  vme->ReparentTo(m_Storage->GetRoot());
+  vme->AddSeed(seed);
+
+  seed[0] = 3;
+  seed[1] = 4;
+  seed[2] = 5;
+
+  vme->AddSeed(seed);
+  vme->Update();
+  
+  int result;
+  result = vme->GetSeed(0,seed);
+  CPPUNIT_ASSERT( result == MAF_OK && seed[0]==0 && seed[1]==1 && seed[2]==2 );
+  result = vme->GetSeed(1,seed);
+  CPPUNIT_ASSERT( result == MAF_OK && seed[0]==3 && seed[1]==4 && seed[2]==5 );
+  result = vme->GetSeed(2,seed);
+  CPPUNIT_ASSERT( result == MAF_ERROR );
+}
+//---------------------------------------------------------
+void medVMESegmentationVolumeTest::TestSetRegionGrowingUpperThreshold()
+//---------------------------------------------------------
+{
+  mafSmartPointer<medVMESegmentationVolume> vme;
+  vme->ReparentTo(m_Storage->GetRoot());
+  //////////////////////////////////////////////////////////////////////////
+  vme->SetRegionGrowingUpperThreshold(5.0);
+  CPPUNIT_ASSERT( vme->GetRegionGrowingUpperThreshold() == 5.0 );
+  //////////////////////////////////////////////////////////////////////////
+  vme->SetRegionGrowingUpperThreshold(20.5);
+  CPPUNIT_ASSERT( vme->GetRegionGrowingUpperThreshold() == 20.5 );
+  //////////////////////////////////////////////////////////////////////////
+}
+//---------------------------------------------------------
+void medVMESegmentationVolumeTest::TestSetRegionGrowingLowerThreshold()
+//---------------------------------------------------------
+{
+  mafSmartPointer<medVMESegmentationVolume> vme;
+  vme->ReparentTo(m_Storage->GetRoot());
+  //////////////////////////////////////////////////////////////////////////
+  vme->SetRegionGrowingLowerThreshold(5.0);
+  CPPUNIT_ASSERT( vme->GetRegionGrowingLowerThreshold() == 5.0 );
+  //////////////////////////////////////////////////////////////////////////
+  vme->SetRegionGrowingLowerThreshold(20.5);
+  CPPUNIT_ASSERT( vme->GetRegionGrowingLowerThreshold() == 20.5 );
   //////////////////////////////////////////////////////////////////////////
 }

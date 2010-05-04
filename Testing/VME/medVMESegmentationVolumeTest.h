@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMESegmentationVolumeTest.h,v $
 Language:  C++
-Date:      $Date: 2010-04-19 15:26:12 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-05-04 15:55:10 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -43,6 +43,13 @@ public:
   CPPUNIT_TEST( TestSetAutomaticSegmentationGlobalThreshold );
   CPPUNIT_TEST( TestSetVolumeLink );
   CPPUNIT_TEST( TestAutomaticSegmentation );
+  CPPUNIT_TEST( TestRefinementSegmentation );
+  CPPUNIT_TEST( TestManualSegmentation );
+  CPPUNIT_TEST( TestSetManualVolumeMask );
+  CPPUNIT_TEST( TestSetRefinementVolumeMask );
+  CPPUNIT_TEST( TestAddSeed );
+  CPPUNIT_TEST( TestSetRegionGrowingUpperThreshold );
+  CPPUNIT_TEST( TestSetRegionGrowingLowerThreshold );
   CPPUNIT_TEST_SUITE_END();
 
 protected:
@@ -54,11 +61,19 @@ protected:
   void TestSetAutomaticSegmentationGlobalThreshold();
   void TestSetVolumeLink();
   void TestAutomaticSegmentation();
+  void TestRefinementSegmentation();
+  void TestManualSegmentation();
+  void TestSetManualVolumeMask();
+  void TestSetRefinementVolumeMask();
+  void TestAddSeed();
+  void TestSetRegionGrowingUpperThreshold();
+  void TestSetRegionGrowingLowerThreshold();
 
   bool m_Result;
-  medVMESegmentationVolume *m_VME;
   mafVMEStorage *m_Storage;
   mafVMEVolumeGray *m_Volume;
+  mafVMEVolumeGray *m_VolumeManualMask;
+  mafVMEVolumeGray *m_VolumeRefinementMask;
 };
 
 

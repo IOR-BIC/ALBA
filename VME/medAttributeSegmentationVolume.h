@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medAttributeSegmentationVolume.h,v $
 Language:  C++
-Date:      $Date: 2010-04-20 16:02:27 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2010-05-04 15:54:58 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -74,6 +74,30 @@ public:
   /** Return the number of ranges stored */
   int GetNumberOfRanges(){return m_AutomaticSegmentationRanges.size();};
 
+  /** Return the region growing upper threshold */
+  double GetRegionGrowingUpperThreshold(){return m_RegionGrowingUpperThreshold;};
+
+  /** Return the region growing lower threshold */
+  double GetRegionGrowingLowerThreshold(){return m_RegionGrowingLowerThreshold;};
+
+  /** Set the region growing upper threshold */
+  void SetRegionGrowingUpperThreshold(double value){m_RegionGrowingUpperThreshold = value;};
+
+  /** Set the region growing lower threshold */
+  void SetRegionGrowingLowerThreshold(double value){m_RegionGrowingLowerThreshold = value;};
+
+  /** Return the seed of the position index */
+  int GetSeed(int index,int seed[3]);
+
+  /** Add a new seed */
+  int AddSeed(int seed[3]);
+
+  /** Delete the seed of the position index */
+  int DeleteSeed(int index);
+
+  /** Return the number of seeds stored */
+  int GetNumberOfSeeds(){return m_RegionGrowingSeeds.size();};
+
 protected:
   /*virtual*/ int InternalStore(mafStorageElement *parent);
   /*virtual*/ int InternalRestore(mafStorageElement *node);
@@ -83,6 +107,12 @@ protected:
   double m_AutomaticSegmentationGlobalThreshold;
   std::vector<int*> m_AutomaticSegmentationRanges;
   std::vector<double> m_AutomaticSegmentationThresholds;
+  //////////////////////////////////////////////////////////////////////////
+  
+  //Stuff for region growing
+  double m_RegionGrowingUpperThreshold;
+  double m_RegionGrowingLowerThreshold;
+  std::vector<int *> m_RegionGrowingSeeds;
   //////////////////////////////////////////////////////////////////////////
 
 };

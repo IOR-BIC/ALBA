@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medAttributeSegmentationVolume.cpp,v $
 Language:  C++
-Date:      $Date: 2010-04-20 16:02:27 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2010-05-04 15:54:58 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -40,6 +40,8 @@ medAttributeSegmentationVolume::medAttributeSegmentationVolume()
 
   m_AutomaticSegmentationThresholdModality = medVMESegmentationVolume::GLOBAL;
   m_AutomaticSegmentationGlobalThreshold = 0.0;
+
+  m_RegionGrowingLowerThreshold = m_RegionGrowingUpperThreshold = 0.0;
 }
 //----------------------------------------------------------------------------
 medAttributeSegmentationVolume::~medAttributeSegmentationVolume()
@@ -50,6 +52,12 @@ medAttributeSegmentationVolume::~medAttributeSegmentationVolume()
     delete []m_AutomaticSegmentationRanges[i];
   }
   m_AutomaticSegmentationRanges.clear();
+
+  for (int i=0;i<m_RegionGrowingSeeds.size();i++)
+  {
+    delete []m_RegionGrowingSeeds[i];
+  }
+  m_RegionGrowingSeeds.clear();
 }
 //-------------------------------------------------------------------------
 void medAttributeSegmentationVolume::DeepCopy(const mafAttribute *a)
@@ -72,6 +80,16 @@ void medAttributeSegmentationVolume::DeepCopy(const mafAttribute *a)
     ((medAttributeSegmentationVolume*)a)->GetRange(i,startSlice,endSlice,threshold);
     this->AddRange(startSlice,endSlice,threshold);
   }
+  //////////////////////////////////////////////////////////////////////////
+  m_RegionGrowingLowerThreshold = ((medAttributeSegmentationVolume*)a)->GetRegionGrowingLowerThreshold();
+  m_RegionGrowingUpperThreshold = ((medAttributeSegmentationVolume*)a)->GetRegionGrowingUpperThreshold();
+  for (int i=0;i<((medAttributeSegmentationVolume*)a)->GetNumberOfSeeds();i++)
+  {
+    int seed[3];
+    ((medAttributeSegmentationVolume*)a)->GetSeed(i,seed);
+    this->AddSeed(seed);
+  }
+  //////////////////////////////////////////////////////////////////////////
 }
 //----------------------------------------------------------------------------
 bool medAttributeSegmentationVolume::Equals(const mafAttribute *a)
@@ -101,6 +119,32 @@ bool medAttributeSegmentationVolume::Equals(const mafAttribute *a)
       ((medAttributeSegmentationVolume*)a)->GetRange(i,startSlice,endSlice,threshold);
       
       if (startSlice != m_AutomaticSegmentationRanges[i][0] || endSlice!= m_AutomaticSegmentationRanges[i][1] || threshold != m_AutomaticSegmentationThresholds[i])
+      {
+        return false;
+      }
+    }
+
+    if (m_RegionGrowingLowerThreshold != ((medAttributeSegmentationVolume*)a)->GetRegionGrowingLowerThreshold())
+    {
+      return false;
+    }
+
+    if (m_RegionGrowingUpperThreshold != ((medAttributeSegmentationVolume*)a)->GetRegionGrowingUpperThreshold())
+    {
+      return false;
+    }
+
+    if (m_RegionGrowingSeeds.size() != ((medAttributeSegmentationVolume*)a)->GetNumberOfSeeds())
+    {
+      return false;
+    }
+
+    for (int i=0;i<((medAttributeSegmentationVolume*)a)->GetNumberOfSeeds();i++)
+    {
+      int seed[3];
+      ((medAttributeSegmentationVolume*)a)->GetSeed(i,seed);
+
+      if (seed[0] != m_RegionGrowingSeeds[i][0] || seed[1]!= m_RegionGrowingSeeds[i][1] || seed[2] != m_RegionGrowingSeeds[i][2])
       {
         return false;
       }
@@ -136,6 +180,24 @@ int medAttributeSegmentationVolume::InternalStore(mafStorageElement *parent)
       value<<i;
       parent->StoreDouble(value,m_AutomaticSegmentationThresholds[i]);
     }
+    //////////////////////////////////////////////////////////////////////////
+    value = "REGION_GROWING_UPPER_THRESHOLD";
+    valueDouble = m_RegionGrowingUpperThreshold;
+    parent->StoreDouble(value,valueDouble);
+    //////////////////////////////////////////////////////////////////////////
+    value = "REGION_GROWING_LOWER_THRESHOLD";
+    valueDouble = m_RegionGrowingLowerThreshold;
+    parent->StoreDouble(value,valueDouble);
+    //////////////////////////////////////////////////////////////////////////
+    value = "NUM_OF_SEEDS";
+    parent->StoreInteger(value,m_RegionGrowingSeeds.size());
+    for (int i=0;i<m_RegionGrowingSeeds.size();i++)
+    {
+      value = "SEED_";
+      value<<i;
+      parent->StoreVectorN(value,m_RegionGrowingSeeds[i],3);
+    }
+    //////////////////////////////////////////////////////////////////////////
 
     return MAF_OK;
   }
@@ -170,6 +232,25 @@ int medAttributeSegmentationVolume::InternalRestore(mafStorageElement *node)
       node->RestoreDouble(value,threshold);
       m_AutomaticSegmentationThresholds.push_back(threshold);
     }
+    //////////////////////////////////////////////////////////////////////////
+    value = "REGION_GROWING_UPPER_THRESHOLD";
+    node->RestoreDouble(value,m_RegionGrowingUpperThreshold);
+    //////////////////////////////////////////////////////////////////////////
+    value = "REGION_GROWING_LOWER_THRESHOLD";
+    node->RestoreDouble(value,m_RegionGrowingLowerThreshold);
+    //////////////////////////////////////////////////////////////////////////
+    int numOfSeeds;
+    value = "NUM_OF_SEEDS";
+    node->RestoreInteger(value,numOfSeeds);
+    for (int i=0;i<numOfSeeds;i++)
+    {
+      int *seed = new int[3];
+      value = "SEED_";
+      value<<i;
+      node->RestoreVectorN(value,seed,3);
+      m_RegionGrowingSeeds.push_back(seed);
+    }
+    //////////////////////////////////////////////////////////////////////////
 
     return MAF_OK;
   }
@@ -230,6 +311,31 @@ int medAttributeSegmentationVolume::RemoveAllRanges()
   return MAF_OK;
 }
 //----------------------------------------------------------------------------
+int medAttributeSegmentationVolume::DeleteSeed(int index)
+//----------------------------------------------------------------------------
+{
+  if (index<0 || index>m_RegionGrowingSeeds.size()-1)
+  {
+    return MAF_ERROR;
+  }
+
+  for (int i=0,j=0;i<m_RegionGrowingSeeds.size();i++)
+  {
+    if (i != index)
+    {
+      j++;
+      m_RegionGrowingSeeds[j][0] = m_RegionGrowingSeeds[i][0];
+      m_RegionGrowingSeeds[j][1] = m_RegionGrowingSeeds[i][1];
+      m_RegionGrowingSeeds[j][2] = m_RegionGrowingSeeds[i][2];
+    }
+  }
+
+  delete []m_RegionGrowingSeeds[m_RegionGrowingSeeds.size()-1];
+  m_RegionGrowingSeeds.pop_back();
+
+  return MAF_OK;
+}
+//----------------------------------------------------------------------------
 int medAttributeSegmentationVolume::DeleteRange(int index)
 //----------------------------------------------------------------------------
 {
@@ -252,6 +358,32 @@ int medAttributeSegmentationVolume::DeleteRange(int index)
   delete []m_AutomaticSegmentationRanges[m_AutomaticSegmentationRanges.size()-1];
   m_AutomaticSegmentationRanges.pop_back();
   m_AutomaticSegmentationThresholds.pop_back();
+
+  return MAF_OK;
+}
+//----------------------------------------------------------------------------
+int medAttributeSegmentationVolume::AddSeed(int seed[3])
+//----------------------------------------------------------------------------
+{
+  int *newSeed = new int[3];
+  newSeed[0] = seed[0];
+  newSeed[1] = seed[1];
+  newSeed[2] = seed[2];
+  m_RegionGrowingSeeds.push_back(newSeed);
+
+  return MAF_OK;
+}
+//----------------------------------------------------------------------------
+int medAttributeSegmentationVolume::GetSeed(int index,int seed[3])
+//----------------------------------------------------------------------------
+{
+  if (index<0 || index>m_RegionGrowingSeeds.size()-1)
+  {
+    return MAF_ERROR;
+  }
+  seed[0] = m_RegionGrowingSeeds[index][0];
+  seed[1] = m_RegionGrowingSeeds[index][1];
+  seed[2] = m_RegionGrowingSeeds[index][2];
 
   return MAF_OK;
 }
@@ -281,6 +413,17 @@ void medAttributeSegmentationVolume::Print(std::ostream& os, const int tabs) con
     os << indent << indent << indent << "Start Slice " << m_AutomaticSegmentationRanges[i][0]<<std::endl;
     os << indent << indent << indent << "End Slice " << m_AutomaticSegmentationRanges[i][1]<<std::endl;
     os << indent << indent << indent << "Threshold " << m_AutomaticSegmentationThresholds[i]<<std::endl;
+  }
+  //////////////////////////////////////////////////////////////////////////
+  os << indent << indent << "Region Growing Upper Threshold: "<<m_RegionGrowingUpperThreshold<<std::endl;
+  os << indent << indent << "Region Growing Lower Threshold: "<<m_RegionGrowingLowerThreshold<<std::endl;
+  //////////////////////////////////////////////////////////////////////////
+  for (int i=0;i<m_RegionGrowingSeeds.size();i++)
+  {
+    os << indent << indent << "Seed " << i+1 << "°:";
+    os << indent << indent << indent << "x " << m_RegionGrowingSeeds[i][0]<<std::endl;
+    os << indent << indent << indent << "y " << m_RegionGrowingSeeds[i][1]<<std::endl;
+    os << indent << indent << indent << "z " << m_RegionGrowingSeeds[i][2]<<std::endl;
   }
   //////////////////////////////////////////////////////////////////////////
 }

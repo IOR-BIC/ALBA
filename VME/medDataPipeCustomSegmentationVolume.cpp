@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medDataPipeCustomSegmentationVolume.cpp,v $
 Language:  C++
-Date:      $Date: 2010-04-27 13:47:18 $
-Version:   $Revision: 1.1.2.5 $
+Date:      $Date: 2010-05-04 15:54:58 $
+Version:   $Revision: 1.1.2.6 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -34,15 +34,17 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkPointData.h"
 #include "vtkStructuredPoints.h"
 #include "vtkUnsignedCharArray.h"
+#include "vtkDataSetWriter.h"
 
 #include "itkImageToVTKImageFilter.h"
 #include "itkVTKImageToImageFilter.h"
 #include "itkBinaryThresholdImageFilter.h"
-
+#include "itkConnectedThresholdImageFilter.h"
 
 #define round(x) (x<0?ceil((x)-0.5):floor((x)+0.5))
 
 typedef  itk::Image< double, 3> RealImage;
+typedef  itk::Image< unsigned char, 3> UCharImage;
 
 //------------------------------------------------------------------------------
 mafCxxTypeMacro(medDataPipeCustomSegmentationVolume)
@@ -71,10 +73,15 @@ medDataPipeCustomSegmentationVolume::medDataPipeCustomSegmentationVolume()
   vtkNEW(m_RefinementRG);
   m_RefinementSP = NULL;
   vtkNEW(m_RefinementSP);
+  m_RegionGrowingRG = NULL;
+  vtkNEW(m_RegionGrowingRG);
+  m_RegionGrowingSP = NULL;
+  vtkNEW(m_RegionGrowingSP);
 
   m_ChangedAutomaticData = false;
   m_ChangedManualData = false;
   m_ChangedRefinementData = false;
+  m_ChangedRegionGrowingData = false;
 
   SetInput(NULL);
 }
@@ -91,12 +98,20 @@ medDataPipeCustomSegmentationVolume::~medDataPipeCustomSegmentationVolume()
   vtkDEL(m_ManualSP);
   vtkDEL(m_RefinementRG);
   vtkDEL(m_RefinementSP);
+  vtkDEL(m_RegionGrowingRG);
+  vtkDEL(m_RegionGrowingSP);
   //////////////////////////////////////////////////////////////////////////
   for (int i=0;i<m_AutomaticSegmentationRanges.size();i++)
   {
     delete []m_AutomaticSegmentationRanges[i];
   }
   m_AutomaticSegmentationRanges.clear();
+
+  for (int i=0;i<m_RegionGrowingSeeds.size();i++)
+  {
+    delete []m_RegionGrowingSeeds[i];
+  }
+  m_RegionGrowingSeeds.clear();
 }
 //------------------------------------------------------------------------------
 int medDataPipeCustomSegmentationVolume::DeepCopy(mafDataPipe *pipe)
@@ -119,6 +134,16 @@ int medDataPipeCustomSegmentationVolume::DeepCopy(mafDataPipe *pipe)
         double threshold;
         ((medDataPipeCustomSegmentationVolume*)pipe)->GetRange(i,startSlice,endSlice,threshold);
         this->AddRange(startSlice,endSlice,threshold);
+      }
+
+      m_RegionGrowingUpperThreshold = ((medDataPipeCustomSegmentationVolume*)pipe)->GetRegionGrowingUpperThreshold();
+      m_RegionGrowingLowerThreshold = ((medDataPipeCustomSegmentationVolume*)pipe)->GetRegionGrowingLowerThreshold();
+
+      for (int i=0;i<((medDataPipeCustomSegmentationVolume*)pipe)->GetNumberOfSeeds();i++)
+      {
+        int seed[3];
+        ((medDataPipeCustomSegmentationVolume*)pipe)->GetSeed(i,seed);
+        this->AddSeed(seed);
       }
 
       return MAF_OK;
@@ -151,35 +176,41 @@ void medDataPipeCustomSegmentationVolume::ApplyManualSegmentation()
 
   vtkDataSet *maskVolumeData = mafVME::SafeDownCast(m_ManualVolumeMask)->GetOutput()->GetVTKData();
   maskVolumeData->Update();
+
+  if (maskVolumeData==NULL || maskVolumeData->GetNumberOfPoints() != volumeData->GetNumberOfPoints() || maskVolumeData->GetPointData()->GetScalars()==NULL)
+  {
+    mafLogMessage("Error! Wrong manual volume mask");
+    return;
+  }
   
   vtkDataArray *maskScalar = maskVolumeData->GetPointData()->GetScalars();
-  vtkDataArray *automaticScalar;
+  vtkDataArray *regionGrowingScalar;
   
   if(maskVolumeData->IsA("vtkRectilinearGrid")) 
   {
-    m_AutomaticRG->Update();
-    if (m_AutomaticRG->GetPointData()->GetScalars() == NULL)
+    m_RegionGrowingRG->Update();
+    if (m_RegionGrowingRG->GetPointData()->GetScalars() == NULL)
     {
       return;
     }
-    if (m_AutomaticRG->GetPointData()->GetScalars()->GetNumberOfTuples() != maskScalar->GetNumberOfTuples())
+    if (m_RegionGrowingRG->GetPointData()->GetScalars()->GetNumberOfTuples() != maskScalar->GetNumberOfTuples())
     {
       return;
     }
-    automaticScalar = m_AutomaticRG->GetPointData()->GetScalars();
+    regionGrowingScalar = m_RegionGrowingRG->GetPointData()->GetScalars();
   }
   else if (maskVolumeData->IsA("vtkStructuredPoints"))
   {
-    m_AutomaticSP->Update();
-    if (m_AutomaticSP->GetPointData()->GetScalars() == NULL)
+    m_RegionGrowingSP->Update();
+    if (m_RegionGrowingSP->GetPointData()->GetScalars() == NULL)
     {
       return;
     }
-    if (m_AutomaticSP->GetPointData()->GetScalars()->GetNumberOfTuples() != maskScalar->GetNumberOfTuples())
+    if (m_RegionGrowingSP->GetPointData()->GetScalars()->GetNumberOfTuples() != maskScalar->GetNumberOfTuples())
     {
       return;
     }
-    automaticScalar = m_AutomaticSP->GetPointData()->GetScalars();
+    regionGrowingScalar = m_RegionGrowingSP->GetPointData()->GetScalars();
   }
 
   vtkMAFSmartPointer<vtkUnsignedCharArray> newScalars;
@@ -204,12 +235,12 @@ void medDataPipeCustomSegmentationVolume::ApplyManualSegmentation()
 
     if (maskScalar->GetTuple1(i) == 0)
     {
-      double value = automaticScalar->GetTuple1(i);
+      double value = regionGrowingScalar->GetTuple1(i);
       newScalars->SetTuple1(i,value);
     }
-    if (maskScalar->GetTuple1(i) == 255)
+    else if (maskScalar->GetTuple1(i) == 255)
     {
-      double value = automaticScalar->GetTuple1(i);
+      double value = regionGrowingScalar->GetTuple1(i);
       newScalars->SetTuple1(i,255-value);
     }
   }
@@ -240,6 +271,7 @@ void medDataPipeCustomSegmentationVolume::ApplyManualSegmentation()
 
     m_ManualRG->DeepCopy(newRG);
     m_ManualRG->Update();
+
     m_RG->DeepCopy(newRG);
     m_RG->Update();
   }
@@ -434,6 +466,12 @@ void medDataPipeCustomSegmentationVolume::ApplyAutomaticSegmentation()
     newRG->GetPointData()->SetActiveScalars("SCALARS");
     newRG->Update();
 
+    double sr[2];
+    int n;
+    vtkDataArray *x = newRG->GetXCoordinates();
+    x->GetRange(sr);
+    n = x->GetNumberOfTuples();
+
     m_AutomaticRG->DeepCopy(newRG);
     m_AutomaticRG->Update();
     m_RG->DeepCopy(newRG);
@@ -462,11 +500,22 @@ void medDataPipeCustomSegmentationVolume::ApplyRefinementSegmentation()
   vtkDataSet *maskVolumeData = mafVME::SafeDownCast(m_RefinementVolumeMask)->GetOutput()->GetVTKData();
   maskVolumeData->Update();
 
+  if (maskVolumeData==NULL || maskVolumeData->GetNumberOfPoints() != volumeData->GetNumberOfPoints() || maskVolumeData->GetPointData()->GetScalars()==NULL)
+  {
+    mafLogMessage("Error! Wrong refinement volume mask");
+    return;
+  }
+
   vtkDataArray *maskScalar = maskVolumeData->GetPointData()->GetScalars();
   vtkDataArray *manualScalar;
 
   if(maskVolumeData->IsA("vtkRectilinearGrid")) 
   {
+    if (m_ManualRG == NULL)
+    {
+      return;
+    }
+
     m_ManualRG->Update();
     if (m_ManualRG->GetPointData()->GetScalars() == NULL)
     {
@@ -480,6 +529,11 @@ void medDataPipeCustomSegmentationVolume::ApplyRefinementSegmentation()
   }
   else if (maskVolumeData->IsA("vtkStructuredPoints"))
   {
+    if (m_ManualSP == NULL)
+    {
+      return;
+    }
+
     m_ManualSP->Update();
     if (m_ManualSP->GetPointData()->GetScalars() == NULL)
     {
@@ -558,6 +612,172 @@ void medDataPipeCustomSegmentationVolume::ApplyRefinementSegmentation()
   this->GetVME()->ForwardUpEvent(&eHideProgress);  
 }
 //------------------------------------------------------------------------------
+void medDataPipeCustomSegmentationVolume::ApplyRegionGrowingSegmentation()
+//------------------------------------------------------------------------------
+{
+  typedef itk::ConnectedThresholdImageFilter<RealImage, RealImage> ITKConnectedThresholdFilter;
+  ITKConnectedThresholdFilter::Pointer connectedThreshold = ITKConnectedThresholdFilter::New();
+
+  vtkDataSet *dsInput;
+  mafVME *vol = mafVME::SafeDownCast(m_Volume);
+  vol->GetOutput()->Update();
+  vtkDataSet *volumeData = vol->GetOutput()->GetVTKData();
+  volumeData->Update();
+
+  if (m_RegionGrowingSeeds.size()==0)
+  {
+    if (volumeData->IsA("vtkStructuredPoints"))
+    {
+      m_RegionGrowingSP->DeepCopy(m_AutomaticSP);
+      m_RegionGrowingSP->Update();
+      m_SP->DeepCopy(m_RegionGrowingSP);
+      m_SP->Update();
+    }
+    else if (volumeData->IsA("vtkRectilinearGrid"))
+    {
+      m_RegionGrowingRG->DeepCopy(m_AutomaticRG);
+      m_RegionGrowingRG->Update();
+      m_RG->DeepCopy(m_RegionGrowingRG);
+      m_RG->Update();
+    }
+
+    return;
+  }
+
+  vtkMAFSmartPointer<vtkStructuredPoints> spInputOfRegionGrowing;
+  vtkDataSet *automaticData;
+  if (volumeData->IsA("vtkStructuredPoints"))
+  {
+    spInputOfRegionGrowing->DeepCopy(vtkStructuredPoints::SafeDownCast(volumeData));
+    spInputOfRegionGrowing->Update();
+
+    automaticData = m_AutomaticSP;
+  }
+  else if (volumeData->IsA("vtkRectilinearGrid"))
+  {
+    int dim[3];
+    vtkRectilinearGrid::SafeDownCast(volumeData)->GetDimensions(dim);
+    vtkMAFSmartPointer<vtkDoubleArray> oldScalars;
+    oldScalars->SetNumberOfTuples(volumeData->GetNumberOfPoints());
+    oldScalars->SetName("SCALARS");
+    for (int k=0;k<volumeData->GetNumberOfPoints();k++)
+    {
+      oldScalars->SetTuple1(k,volumeData->GetPointData()->GetScalars()->GetTuple1(k));
+    }
+
+    double sr[2];
+    oldScalars->GetRange(sr);
+
+    spInputOfRegionGrowing->SetDimensions(dim);
+    spInputOfRegionGrowing->SetSpacing(1.0,1.0,1.0);
+    spInputOfRegionGrowing->GetPointData()->AddArray(oldScalars);
+    spInputOfRegionGrowing->GetPointData()->SetActiveScalars("SCALARS");
+    spInputOfRegionGrowing->Update();
+
+    automaticData = m_AutomaticRG;
+    
+  }
+
+  vtkMAFSmartPointer<vtkImageCast> vtkImageToFloat;
+  vtkImageToFloat->SetOutputScalarTypeToDouble();
+  vtkImageToFloat->SetInput(spInputOfRegionGrowing);
+  vtkImageToFloat->Modified();
+  vtkImageToFloat->Update();
+
+  typedef itk::VTKImageToImageFilter< RealImage > ConvertervtkTOitk;
+  ConvertervtkTOitk::Pointer vtkTOitk = ConvertervtkTOitk::New();
+  vtkTOitk->SetInput( vtkImageToFloat->GetOutput() );
+  vtkTOitk->Update();
+
+  connectedThreshold->SetLower(m_RegionGrowingLowerThreshold);
+  connectedThreshold->SetUpper(m_RegionGrowingUpperThreshold);
+  connectedThreshold->SetReplaceValue(255);
+
+  RealImage::IndexType seed;
+  for (int iSeeds=0;iSeeds<m_RegionGrowingSeeds.size();iSeeds++)
+  {
+	  for (int i=0;i<3;i++)
+	  {
+	    seed[i]=m_RegionGrowingSeeds[iSeeds][i];
+	  }
+    connectedThreshold->AddSeed(seed);
+  }
+
+  connectedThreshold->SetInput( ((RealImage*)vtkTOitk->GetOutput()) );
+
+  try
+  {
+    connectedThreshold->Update();
+  }
+  catch ( itk::ExceptionObject &err )
+  {
+    std::cout << "ExceptionObject caught !" << std::endl; 
+    std::cout << err << std::endl; 
+  }
+
+  typedef itk::ImageToVTKImageFilter< RealImage > ConverteritkTOvtk;
+  ConverteritkTOvtk::Pointer itkTOvtk = ConverteritkTOvtk::New();
+  itkTOvtk->SetInput( connectedThreshold->GetOutput() );
+  itkTOvtk->Update();
+
+  vtkStructuredPoints *spOutputRegionGrowing = ((vtkStructuredPoints*)itkTOvtk->GetOutput());
+  spOutputRegionGrowing->Update();
+
+//   vtkMAFSmartPointer<vtkUnsignedCharArray> oldScalars;
+//   oldScalars->DeepCopy(vtkUnsignedCharArray::SafeDownCast(spOutputRegionGrowing->GetPointData()->GetScalars()));
+//   oldScalars->SetName("SCALARS");
+//   double sr[2];
+//   oldScalars->GetRange(sr);
+  /*oldScalars->SetNumberOfTuples(spOutputRegionGrowing->GetNumberOfPoints());
+  oldScalars->SetName("SCALARS");
+  for (int i=0;i<spOutputRegionGrowing->GetNumberOfPoints();i++)
+  {
+    oldScalars->SetTuple1(i,spOutputRegionGrowing->GetPointData()->GetScalars()->GetTuple1(i));
+  }*/
+
+  //////////////////////////////////////////////////////////////////////////
+  //Perform the OR operation between region growing and automatic output
+  //////////////////////////////////////////////////////////////////////////
+  vtkMAFSmartPointer<vtkUnsignedCharArray> newScalars;
+  newScalars->SetNumberOfTuples(volumeData->GetNumberOfPoints());
+  newScalars->SetName("SCALARS");
+  for (int i=0;i<volumeData->GetNumberOfPoints();i++)
+  {
+    if (automaticData->GetPointData()->GetScalars()->GetTuple1(i) == 255 || spOutputRegionGrowing->GetPointData()->GetScalars()->GetTuple1(i) == 255)
+    {
+      newScalars->SetTuple1(i,255);
+    }
+    else
+    {
+      newScalars->SetTuple1(i,0);
+    }
+  }
+  //////////////////////////////////////////////////////////////////////////
+
+  if (volumeData->IsA("vtkStructuredPoints"))
+  {
+    m_RegionGrowingSP->CopyStructure(vtkStructuredPoints::SafeDownCast(volumeData));
+    m_RegionGrowingSP->GetPointData()->AddArray(newScalars);
+    m_RegionGrowingSP->GetPointData()->SetActiveScalars("SCALARS");
+    m_RegionGrowingSP->SetScalarTypeToUnsignedChar();
+    m_RegionGrowingSP->Update();
+    
+    m_SP->DeepCopy(m_RegionGrowingSP);
+    m_SP->Update();
+  }
+  else if (volumeData->IsA("vtkRectilinearGrid"))
+  {
+    m_RegionGrowingRG->CopyStructure(vtkRectilinearGrid::SafeDownCast(volumeData));
+    m_RegionGrowingRG->GetPointData()->AddArray(newScalars);
+    m_RegionGrowingRG->GetPointData()->SetActiveScalars("SCALARS");
+    m_RegionGrowingRG->Update();
+
+    m_RG->DeepCopy(m_RegionGrowingRG);
+    m_RG->Update();
+  }
+
+}
+//------------------------------------------------------------------------------
 void medDataPipeCustomSegmentationVolume::PreExecute()
 //------------------------------------------------------------------------------
 {
@@ -569,15 +789,19 @@ void medDataPipeCustomSegmentationVolume::PreExecute()
     vtkDataSet *volumeData = vol->GetOutput()->GetVTKData();
     if(volumeData)
     {
-      if (CheckNumberOfThresholds() && m_ChangedAutomaticData)
+      if (m_ChangedAutomaticData && CheckNumberOfThresholds())
       {
         ApplyAutomaticSegmentation();
       }
-      if ((m_ChangedAutomaticData && CheckNumberOfThresholds()) || m_ChangedManualData)
+      if ((m_ChangedAutomaticData && CheckNumberOfThresholds()) || m_ChangedRegionGrowingData)
+      {
+        ApplyRegionGrowingSegmentation();
+      }
+      if ((m_ChangedAutomaticData && CheckNumberOfThresholds()) || m_ChangedRegionGrowingData || m_ChangedManualData)
       {
         ApplyManualSegmentation();
       }
-      if ((m_ChangedAutomaticData && CheckNumberOfThresholds()) || m_ChangedManualData || m_ChangedRefinementData)
+      if ((m_ChangedAutomaticData && CheckNumberOfThresholds()) || m_ChangedRegionGrowingData || m_ChangedManualData || m_ChangedRefinementData)
       {
         ApplyRefinementSegmentation();
       }
@@ -724,6 +948,52 @@ vtkDataSet *medDataPipeCustomSegmentationVolume::GetManualOutput()
     }
   }
 }
+//------------------------------------------------------------------------------
+vtkDataSet *medDataPipeCustomSegmentationVolume::GetRefinementOutput()
+//------------------------------------------------------------------------------
+{
+  mafVME *vol = mafVME::SafeDownCast(m_Volume);
+  if(vol)
+  {
+    vol->GetOutput()->Update();
+    vtkDataSet *volumeData = vol->GetOutput()->GetVTKData();
+    if(volumeData)
+    {
+      volumeData->Update();
+      if(volumeData->IsA("vtkRectilinearGrid"))
+      {
+        return m_RefinementRG;
+      }
+      else if (volumeData->IsA("vtkImageData"))
+      {
+        return m_RefinementSP;
+      }
+    }
+  }
+}
+//------------------------------------------------------------------------------
+vtkDataSet *medDataPipeCustomSegmentationVolume::GetRegionGrowingOutput()
+//------------------------------------------------------------------------------
+{
+  mafVME *vol = mafVME::SafeDownCast(m_Volume);
+  if(vol)
+  {
+    vol->GetOutput()->Update();
+    vtkDataSet *volumeData = vol->GetOutput()->GetVTKData();
+    if(volumeData)
+    {
+      volumeData->Update();
+      if(volumeData->IsA("vtkRectilinearGrid"))
+      {
+        return m_RegionGrowingRG;
+      }
+      else if (volumeData->IsA("vtkImageData"))
+      {
+        return m_RegionGrowingSP;
+      }
+    }
+  }
+}
 //----------------------------------------------------------------------------
 bool medDataPipeCustomSegmentationVolume::CheckNumberOfThresholds()
 //----------------------------------------------------------------------------
@@ -816,6 +1086,33 @@ int medDataPipeCustomSegmentationVolume::RemoveAllRanges()
   return MAF_OK;
 }
 //----------------------------------------------------------------------------
+int medDataPipeCustomSegmentationVolume::DeleteSeed(int index)
+//----------------------------------------------------------------------------
+{
+  if (m_RegionGrowingSeeds.size()==0 || index<0 || index>(m_RegionGrowingSeeds.size()-1))
+  {
+    return MAF_ERROR;
+  }
+
+  for (int i=0,j=0;i<m_RegionGrowingSeeds.size();i++)
+  {
+    if (i != index)
+    {
+      j++;
+      m_RegionGrowingSeeds[j][0] = m_RegionGrowingSeeds[i][0];
+      m_RegionGrowingSeeds[j][1] = m_RegionGrowingSeeds[i][1];
+      m_RegionGrowingSeeds[j][2] = m_RegionGrowingSeeds[i][2];
+    }
+  }
+
+  delete []m_RegionGrowingSeeds[m_RegionGrowingSeeds.size()-1];
+  m_RegionGrowingSeeds.pop_back();
+
+  m_ChangedAutomaticData = true;
+  Modified();
+  return MAF_OK;
+}
+//----------------------------------------------------------------------------
 int medDataPipeCustomSegmentationVolume::DeleteRange(int index)
 //----------------------------------------------------------------------------
 {
@@ -849,6 +1146,54 @@ void medDataPipeCustomSegmentationVolume::SetAutomaticSegmentationGlobalThreshol
 {
   m_AutomaticSegmentationGlobalThreshold = threshold;
   m_ChangedAutomaticData = true;
+  Modified();
+}
+//------------------------------------------------------------------------
+int medDataPipeCustomSegmentationVolume::AddSeed(int seed[3])
+//------------------------------------------------------------------------
+{
+  int *newSeed = new int[3];
+  newSeed[0] = seed[0];
+  newSeed[1] = seed[1];
+  newSeed[2] = seed[2];
+
+  m_RegionGrowingSeeds.push_back(newSeed);
+
+  m_ChangedRegionGrowingData = true;
+  Modified();
+
+  return MAF_OK;
+}
+//----------------------------------------------------------------------------
+int medDataPipeCustomSegmentationVolume::GetSeed(int index,int seed[3])
+//----------------------------------------------------------------------------
+{
+  if (index<0 || index>m_RegionGrowingSeeds.size()-1)
+  {
+    return MAF_ERROR;
+  }
+  seed[0] = m_RegionGrowingSeeds[index][0];
+  seed[1] = m_RegionGrowingSeeds[index][1];
+  seed[2] = m_RegionGrowingSeeds[index][2];
+
+  return MAF_OK;
+}
+//------------------------------------------------------------------------
+void medDataPipeCustomSegmentationVolume::SetRegionGrowingLowerThreshold(double value)
+//------------------------------------------------------------------------
+{
+  m_RegionGrowingLowerThreshold = value;
+
+  m_ChangedRegionGrowingData = true;
+  Modified();
+}
+//------------------------------------------------------------------------
+void medDataPipeCustomSegmentationVolume::SetRegionGrowingUpperThreshold(double value)
+//------------------------------------------------------------------------
+{
+  m_RegionGrowingUpperThreshold = value;
+
+  m_ChangedRegionGrowingData = true;
   Modified();
 }
 //------------------------------------------------------------------------
