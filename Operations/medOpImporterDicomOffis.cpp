@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-04-30 09:59:52 $
-Version:   $Revision: 1.1.2.93 $
+Date:      $Date: 2010-05-04 14:44:30 $
+Version:   $Revision: 1.1.2.94 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -1893,17 +1893,17 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
 					AutoPositionCropPlane();
 			}
 			break;
-    case ID_RANGE_MODIFIED:
-      {
-        //ZCrop slider
-        OnRangeModified();
+		case ID_RANGE_MODIFIED:
+			{
+				//ZCrop slider
+				OnRangeModified();
 
-      }
-      break;
+			}
+			break;
 		case medGUIWizard::MED_WIZARD_CHANGE_PAGE:
 			{
-        OnWizardChangePage(e);
-        return;
+				OnWizardChangePage(e);
+				return;
 
 			}
 			break;
@@ -1914,51 +1914,56 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
 			break;
 		case ID_STUDY_SELECT:
 			{
-        OnStudySelect();
+				OnStudySelect();
 
- 			}
+			}
 			break;
-    case ID_SERIES_SELECT:
-      {
-        OnSeriesSelect();
-      }
-      break;
-			case MOUSE_DOWN:
-        {
-          OnMouseDown(e);
-				}
-				break;
-			case MOUSE_MOVE:  //resize gizmo
-				{
-          OnMouseMove(e);
+		case ID_SERIES_SELECT:
+			{
+				OnSeriesSelect();
+			}
+			break;
+		case MOUSE_DOWN:
+			{
+				OnMouseDown(e);
+			}
+			break;
+		case MOUSE_MOVE:  //resize gizmo
+			{
+				OnMouseMove(e);
 
-				}
-				break;
-			case MOUSE_UP:  //block gizmo
-				{
-          OnMouseUp();
+			}
+			break;
+		case MOUSE_UP:  //block gizmo
+			{
+				OnMouseUp();
 
-				}
-				break; 
-			case ID_SCAN_SLICE:
-				{
-          OnScanSlice();
+			}
+			break; 
+		case ID_SCAN_SLICE:
+			{
+				OnScanSlice();
 
-				}
-				break;
-			case ID_SCAN_TIME:
-				{
-					// show the current slice
-          OnScanTime();
+			}
+			break;
+		case ID_SCAN_TIME:
+			{
+				// show the current slice
+				OnScanTime();
 
-				}
-				break;
-      case ID_CROP:
-        {     
-          Crop();
-        }
-        break;
-    }
+			}
+			break;
+		case ID_CROP:
+			{     
+				Crop();
+			}
+			break;
+
+		default:
+			{
+				mafEventMacro(*e);
+			}
+		}
 	}
 }
 //----------------------------------------------------------------------------
@@ -2826,11 +2831,14 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
               
               if (m_CardiacMRIHelper == NULL)
               { m_CardiacMRIHelper = new medDicomCardiacMRIHelper;
+				m_CardiacMRIHelper->SetListener(this);
                 mafString helperInputDir = mafString(dicomDirABSPath).Append("/");
 
                 m_CardiacMRIHelper->SetInputDicomDirectoryABSPath(helperInputDir);
                 m_CardiacMRIHelper->ParseDicomDirectory();
                 
+				// this is necessary since the helper hides the progress bar
+				mafEventMacro(mafEvent(this, PROGRESSBAR_SHOW));
               }
             }
             else if(m_DicomReaderModality!=medGUIDicomSettings::ID_CMRI_MODALITY)

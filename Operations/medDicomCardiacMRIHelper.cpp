@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medDicomCardiacMRIHelper.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-04-30 09:51:30 $
-  Version:   $Revision: 1.1.2.6 $
+  Date:      $Date: 2010-05-04 14:44:30 $
+  Version:   $Revision: 1.1.2.7 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -57,6 +57,7 @@ medDicomCardiacMRIHelper::medDicomCardiacMRIHelper()
 {
   m_InputDicomDirectoryABSPath = "UNDEFINED_m_InputDicomDirectoryABSPath";
   m_TestMode = false;
+  m_Listener = NULL;
 }
 
 medDicomCardiacMRIHelper::~medDicomCardiacMRIHelper()
@@ -163,11 +164,14 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
   if (!m_TestMode)
   {
     busyCursor = new wxBusyCursor();
+	mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
   }
 
+  long progress = 0;
+  
   for (int i = 0; i < timeFrames*planesPerFrame; i++) 
   {
-    time(&start);
+	time(&start);	
 
     if (!m_TestMode)
     {
@@ -178,6 +182,10 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
     }
   
     wxString currentDicomSliceFileName = dicomLocalFileNamesVector[i].c_str();
+
+	std::ostringstream stringStream;
+	stringStream << "Parsing " << currentDicomSliceFileName.c_str() << " file with Id " << i << " , number " << i+1 << " of " << timeFrames*planesPerFrame << std::endl;          
+	mafLogMessage(stringStream.str().c_str());
 
     wxString currentSliceABSFileName = dicomDir + currentDicomSliceFileName;
 
@@ -232,6 +240,9 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
       {
         cppDEL(busyInfo);
         busyInfo = new wxBusyInfo(busyMessage);
+
+		progress = i * 100 / (double) (timeFrames*planesPerFrame);
+		mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
       }
     }
   }
@@ -436,7 +447,7 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
   //     [dummy, idx_mode] = maxValue(proj);
   //
   
-  if (planesPerFrame == 1)
+  if (planesPerFrame != 1)
   {
     // just one timevarying plane: skip correction
   } 
@@ -1004,9 +1015,13 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
 
   vtkDEL(directoryReader);
 
-  cppDEL(busyCursor);
-  cppDEL(busyInfo);
+  if (!m_TestMode)
+  {
+	  mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
 
+	  cppDEL(busyCursor);
+	  cppDEL(busyInfo);
+  }
 }
 
 void medDicomCardiacMRIHelper::RemoveRows\

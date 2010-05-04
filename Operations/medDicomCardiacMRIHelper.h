@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medDicomCardiacMRIHelper.h,v $
   Language:  C++
-  Date:      $Date: 2010-04-28 12:23:03 $
-  Version:   $Revision: 1.1.2.4 $
+  Date:      $Date: 2010-05-04 14:44:30 $
+  Version:   $Revision: 1.1.2.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -17,6 +17,7 @@
 #include "vnl/vnl_vector.h"
 #include <vector>
 #include "mafString.h"
+#include "mafObserver.h"
 
 using namespace std;
 
@@ -56,6 +57,10 @@ public:
 
   ~medDicomCardiacMRIHelper();
   
+
+  /** Set the Listener that will receive event-notification. */
+  void SetListener(mafObserver *Listener) {m_Listener = Listener;};
+
   /** 
   Set dicom input dir: path must end with / or \ */
   void SetInputDicomDirectoryABSPath(mafString inputDicomDirectoryABSPath);
@@ -114,6 +119,8 @@ public:
   bool GetTestMode() { return m_TestMode; };
 
 private:
+
+  mafObserver *m_Listener;
 
   mafString m_InputDicomDirectoryABSPath;
 
