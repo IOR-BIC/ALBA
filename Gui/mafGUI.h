@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUI.h,v $
   Language:  C++
-  Date:      $Date: 2009-06-16 09:14:49 $
-  Version:   $Revision: 1.3.2.7 $
+  Date:      $Date: 2010-05-05 10:12:36 $
+  Version:   $Revision: 1.3.2.8 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2005
@@ -206,7 +206,7 @@ public:
   mafGUICrossIncremental *CrossIncremental(int id,const char* label, double *stepVariable, double *topBottomVariable, double *leftRightVariable, int modality ,wxString tooltip ="", bool boldLabel = true, bool comboStep = false, int digits = -1);
 
   /** two generic Buttons widget. */
-  void TwoButtons(int firstID, int secondID, const char* label1, const char* label2, int alignment = wxALL);
+  void TwoButtons(int firstID, int secondID, const char* label1, const char* label2, int alignment = wxALL, int width = -1);
 
   /** Multiple Generic Buttons widget. */
   void MultipleButtons(int numButtons, int numColumns, std::vector<int> &ids, std::vector<const char*> &labels, int alignment = wxALL );
