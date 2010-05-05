@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMESegmentationVolumeTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-05-04 15:55:10 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2010-05-05 08:09:22 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -365,6 +365,7 @@ void medVMESegmentationVolumeTest::TestAddSeed()
 //---------------------------------------------------------
 {
   int seed[3];
+  int result;
 
   seed[0] = 0;
   seed[1] = 1;
@@ -372,16 +373,17 @@ void medVMESegmentationVolumeTest::TestAddSeed()
 
   mafSmartPointer<medVMESegmentationVolume> vme;
   vme->ReparentTo(m_Storage->GetRoot());
-  vme->AddSeed(seed);
+  result = vme->AddSeed(seed);
+  CPPUNIT_ASSERT( result == MAF_OK );
 
   seed[0] = 3;
   seed[1] = 4;
   seed[2] = 5;
 
-  vme->AddSeed(seed);
+  result = vme->AddSeed(seed);
+  CPPUNIT_ASSERT( result == MAF_OK );
   vme->Update();
   
-  int result;
   result = vme->GetSeed(0,seed);
   CPPUNIT_ASSERT( result == MAF_OK && seed[0]==0 && seed[1]==1 && seed[2]==2 );
   result = vme->GetSeed(1,seed);
@@ -416,4 +418,32 @@ void medVMESegmentationVolumeTest::TestSetRegionGrowingLowerThreshold()
   vme->SetRegionGrowingLowerThreshold(20.5);
   CPPUNIT_ASSERT( vme->GetRegionGrowingLowerThreshold() == 20.5 );
   //////////////////////////////////////////////////////////////////////////
+}
+//---------------------------------------------------------
+void medVMESegmentationVolumeTest::TestRemoveAllSeeds()
+//---------------------------------------------------------
+{
+  int seed[3];
+
+  seed[0] = 0;
+  seed[1] = 1;
+  seed[2] = 2;
+
+  mafSmartPointer<medVMESegmentationVolume> vme;
+  vme->ReparentTo(m_Storage->GetRoot());
+  vme->AddSeed(seed);
+
+  seed[0] = 3;
+  seed[1] = 4;
+  seed[2] = 5;
+
+  vme->AddSeed(seed);
+  vme->Update();
+
+  CPPUNIT_ASSERT( vme->GetNumberOfSeeds() == 2 );
+
+  vme->RemoveAllSeeds();
+
+  CPPUNIT_ASSERT( vme->GetNumberOfSeeds() == 0 );
+
 }
