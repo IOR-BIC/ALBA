@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medDataPipeCustomSegmentationVolume.cpp,v $
 Language:  C++
-Date:      $Date: 2010-05-05 12:06:26 $
-Version:   $Revision: 1.1.2.8 $
+Date:      $Date: 2010-05-05 13:54:02 $
+Version:   $Revision: 1.1.2.9 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -615,6 +615,9 @@ void medDataPipeCustomSegmentationVolume::ApplyRefinementSegmentation()
 void medDataPipeCustomSegmentationVolume::ApplyRegionGrowingSegmentation()
 //------------------------------------------------------------------------------
 {
+  mafEvent e(this,PROGRESSBAR_SHOW);
+  this->GetVME()->ForwardUpEvent(&e);
+
   typedef itk::ConnectedThresholdImageFilter<RealImage, RealImage> ITKConnectedThresholdFilter;
   ITKConnectedThresholdFilter::Pointer connectedThreshold = ITKConnectedThresholdFilter::New();
 
@@ -640,8 +643,13 @@ void medDataPipeCustomSegmentationVolume::ApplyRegionGrowingSegmentation()
       m_RG->Update();
     }
 
+    mafEvent eHideProgress(this,PROGRESSBAR_HIDE);
+    this->GetVME()->ForwardUpEvent(&eHideProgress);  
     return;
   }
+
+  mafEvent eUpdate(this,PROGRESSBAR_SET_VALUE,(long)5);
+  this->GetVME()->ForwardUpEvent(&eUpdate);
 
   vtkMAFSmartPointer<vtkStructuredPoints> spInputOfRegionGrowing;
   vtkDataSet *automaticData;
@@ -674,6 +682,9 @@ void medDataPipeCustomSegmentationVolume::ApplyRegionGrowingSegmentation()
     
   }
 
+  eUpdate.SetArg(10);
+  this->GetVME()->ForwardUpEvent(&eUpdate);
+
   vtkMAFSmartPointer<vtkImageCast> vtkImageToFloat;
   vtkImageToFloat->SetOutputScalarTypeToDouble();
   vtkImageToFloat->SetInput(spInputOfRegionGrowing);
@@ -701,6 +712,9 @@ void medDataPipeCustomSegmentationVolume::ApplyRegionGrowingSegmentation()
 
   connectedThreshold->SetInput( ((RealImage*)vtkTOitk->GetOutput()) );
 
+  eUpdate.SetArg(15);
+  this->GetVME()->ForwardUpEvent(&eUpdate);
+
   try
   {
     connectedThreshold->Update();
@@ -718,6 +732,9 @@ void medDataPipeCustomSegmentationVolume::ApplyRegionGrowingSegmentation()
 
   vtkStructuredPoints *spOutputRegionGrowing = ((vtkStructuredPoints*)itkTOvtk->GetOutput());
   spOutputRegionGrowing->Update();
+
+  eUpdate.SetArg(65);
+  this->GetVME()->ForwardUpEvent(&eUpdate);
 
 //   vtkMAFSmartPointer<vtkUnsignedCharArray> oldScalars;
 //   oldScalars->DeepCopy(vtkUnsignedCharArray::SafeDownCast(spOutputRegionGrowing->GetPointData()->GetScalars()));
@@ -750,6 +767,9 @@ void medDataPipeCustomSegmentationVolume::ApplyRegionGrowingSegmentation()
   }
   //////////////////////////////////////////////////////////////////////////
 
+  eUpdate.SetArg(85);
+  this->GetVME()->ForwardUpEvent(&eUpdate);
+
   if (volumeData->IsA("vtkStructuredPoints"))
   {
     m_RegionGrowingSP->CopyStructure(vtkStructuredPoints::SafeDownCast(volumeData));
@@ -771,6 +791,12 @@ void medDataPipeCustomSegmentationVolume::ApplyRegionGrowingSegmentation()
     m_RG->DeepCopy(m_RegionGrowingRG);
     m_RG->Update();
   }
+
+  eUpdate.SetArg(100);
+  this->GetVME()->ForwardUpEvent(&eUpdate);
+
+  mafEvent eHideProgress(this,PROGRESSBAR_HIDE);
+  this->GetVME()->ForwardUpEvent(&eHideProgress);  
 
 }
 //------------------------------------------------------------------------------
