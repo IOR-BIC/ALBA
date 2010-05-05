@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMESegmentationVolume.cpp,v $
 Language:  C++
-Date:      $Date: 2010-05-05 08:09:02 $
-Version:   $Revision: 1.1.2.6 $
+Date:      $Date: 2010-05-05 12:06:26 $
+Version:   $Revision: 1.1.2.7 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -360,10 +360,10 @@ int medVMESegmentationVolume::RemoveAllSeeds()
 int medVMESegmentationVolume::DeleteSeed(int index)
 //-----------------------------------------------------------------------
 {
-  int result = m_SegmentingDataPipe->DeleteRange(index);
+  int result = m_SegmentingDataPipe->DeleteSeed(index);
   if (result == MAF_OK)
   {
-    result = m_VolumeAttribute->DeleteRange(index);
+    result = m_VolumeAttribute->DeleteSeed(index);
     if (result == MAF_OK)
     {
       Modified();

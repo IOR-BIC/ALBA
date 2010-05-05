@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medDataPipeCustomSegmentationVolume.cpp,v $
 Language:  C++
-Date:      $Date: 2010-05-05 08:09:02 $
-Version:   $Revision: 1.1.2.7 $
+Date:      $Date: 2010-05-05 12:06:26 $
+Version:   $Revision: 1.1.2.8 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -618,7 +618,6 @@ void medDataPipeCustomSegmentationVolume::ApplyRegionGrowingSegmentation()
   typedef itk::ConnectedThresholdImageFilter<RealImage, RealImage> ITKConnectedThresholdFilter;
   ITKConnectedThresholdFilter::Pointer connectedThreshold = ITKConnectedThresholdFilter::New();
 
-  vtkDataSet *dsInput;
   mafVME *vol = mafVME::SafeDownCast(m_Volume);
   vol->GetOutput()->Update();
   vtkDataSet *volumeData = vol->GetOutput()->GetVTKData();
@@ -664,9 +663,6 @@ void medDataPipeCustomSegmentationVolume::ApplyRegionGrowingSegmentation()
     {
       oldScalars->SetTuple1(k,volumeData->GetPointData()->GetScalars()->GetTuple1(k));
     }
-
-    double sr[2];
-    oldScalars->GetRange(sr);
 
     spInputOfRegionGrowing->SetDimensions(dim);
     spInputOfRegionGrowing->SetSpacing(1.0,1.0,1.0);
@@ -808,6 +804,8 @@ void medDataPipeCustomSegmentationVolume::PreExecute()
 
       m_ChangedAutomaticData = false;
       m_ChangedManualData = false;
+      m_ChangedRefinementData = false;
+      m_ChangedRegionGrowingData = false;
     }
   }
   else
@@ -1113,17 +1111,17 @@ int medDataPipeCustomSegmentationVolume::DeleteSeed(int index)
   {
     if (i != index)
     {
-      j++;
       m_RegionGrowingSeeds[j][0] = m_RegionGrowingSeeds[i][0];
       m_RegionGrowingSeeds[j][1] = m_RegionGrowingSeeds[i][1];
       m_RegionGrowingSeeds[j][2] = m_RegionGrowingSeeds[i][2];
+      j++;
     }
   }
 
   delete []m_RegionGrowingSeeds[m_RegionGrowingSeeds.size()-1];
   m_RegionGrowingSeeds.pop_back();
 
-  m_ChangedAutomaticData = true;
+  m_ChangedRegionGrowingData = true;
   Modified();
   return MAF_OK;
 }
@@ -1140,10 +1138,10 @@ int medDataPipeCustomSegmentationVolume::DeleteRange(int index)
   {
     if (i != index)
     {
-      j++;
       m_AutomaticSegmentationRanges[j][0] = m_AutomaticSegmentationRanges[i][0];
       m_AutomaticSegmentationRanges[j][1] = m_AutomaticSegmentationRanges[i][1];
       m_AutomaticSegmentationThresholds[j] = m_AutomaticSegmentationThresholds[i];
+      j++;
     }
   }
 

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medAttributeSegmentationVolume.cpp,v $
 Language:  C++
-Date:      $Date: 2010-05-05 08:09:02 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2010-05-05 12:06:26 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -335,10 +335,10 @@ int medAttributeSegmentationVolume::DeleteSeed(int index)
   {
     if (i != index)
     {
-      j++;
       m_RegionGrowingSeeds[j][0] = m_RegionGrowingSeeds[i][0];
       m_RegionGrowingSeeds[j][1] = m_RegionGrowingSeeds[i][1];
       m_RegionGrowingSeeds[j][2] = m_RegionGrowingSeeds[i][2];
+      j++;
     }
   }
 
@@ -360,10 +360,10 @@ int medAttributeSegmentationVolume::DeleteRange(int index)
   {
     if (i != index)
     {
-      j++;
       m_AutomaticSegmentationRanges[j][0] = m_AutomaticSegmentationRanges[i][0];
       m_AutomaticSegmentationRanges[j][1] = m_AutomaticSegmentationRanges[i][1];
       m_AutomaticSegmentationThresholds[j] = m_AutomaticSegmentationThresholds[i];
+      j++;
     }
   }
 
