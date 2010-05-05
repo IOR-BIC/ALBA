@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMESegmentationVolume.h,v $
 Language:  C++
-Date:      $Date: 2010-05-04 15:54:58 $
-Version:   $Revision: 1.1.2.5 $
+Date:      $Date: 2010-05-05 08:09:02 $
+Version:   $Revision: 1.1.2.6 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -176,6 +176,12 @@ public:
 
   /** Delete the seed of the position index */
   int DeleteSeed(int index);
+ 
+  /** Remove all seeds */
+  int RemoveAllSeeds();
+
+  /** Return the number of seeds */
+  int GetNumberOfSeeds();
 
   /** return the right type of output */  
   /*virtual*/ mafVMEOutput *GetOutput();

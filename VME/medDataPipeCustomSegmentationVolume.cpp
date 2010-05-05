@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medDataPipeCustomSegmentationVolume.cpp,v $
 Language:  C++
-Date:      $Date: 2010-05-04 15:54:58 $
-Version:   $Revision: 1.1.2.6 $
+Date:      $Date: 2010-05-05 08:09:02 $
+Version:   $Revision: 1.1.2.7 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -1081,6 +1081,21 @@ int medDataPipeCustomSegmentationVolume::RemoveAllRanges()
   m_AutomaticSegmentationThresholds.clear();
 
   m_ChangedAutomaticData = true;
+  Modified();
+
+  return MAF_OK;
+}
+//----------------------------------------------------------------------------
+int medDataPipeCustomSegmentationVolume::RemoveAllSeeds()
+//----------------------------------------------------------------------------
+{
+  for (int i=0;i<m_RegionGrowingSeeds.size();i++)
+  {
+    delete []m_RegionGrowingSeeds[i];
+  }
+  m_RegionGrowingSeeds.clear();
+
+  m_ChangedRegionGrowingData = true;
   Modified();
 
   return MAF_OK;

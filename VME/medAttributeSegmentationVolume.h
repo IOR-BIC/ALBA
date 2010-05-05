@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medAttributeSegmentationVolume.h,v $
 Language:  C++
-Date:      $Date: 2010-05-04 15:54:58 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2010-05-05 08:09:02 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -97,6 +97,9 @@ public:
 
   /** Return the number of seeds stored */
   int GetNumberOfSeeds(){return m_RegionGrowingSeeds.size();};
+
+  /** Remove all seeds */
+  int RemoveAllSeeds();
 
 protected:
   /*virtual*/ int InternalStore(mafStorageElement *parent);

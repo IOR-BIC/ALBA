@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMESegmentationVolume.cpp,v $
 Language:  C++
-Date:      $Date: 2010-05-04 15:54:58 $
-Version:   $Revision: 1.1.2.5 $
+Date:      $Date: 2010-05-05 08:09:02 $
+Version:   $Revision: 1.1.2.6 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -340,6 +340,23 @@ int medVMESegmentationVolume::RemoveAllRanges()
   return MAF_ERROR;
 }
 //-----------------------------------------------------------------------
+int medVMESegmentationVolume::RemoveAllSeeds()
+//-----------------------------------------------------------------------
+{
+  int result = m_SegmentingDataPipe->RemoveAllSeeds();
+  if (result == MAF_OK)
+  {
+    result = m_VolumeAttribute->RemoveAllSeeds();
+    if (result == MAF_OK)
+    {
+      Modified();
+      return MAF_OK;
+    }
+  }
+
+  return MAF_ERROR;
+}
+//-----------------------------------------------------------------------
 int medVMESegmentationVolume::DeleteSeed(int index)
 //-----------------------------------------------------------------------
 {
@@ -479,6 +496,12 @@ int medVMESegmentationVolume::GetNumberOfRanges()
 //-------------------------------------------------------------------------
 {
   return m_VolumeAttribute->GetNumberOfRanges();
+}
+//-------------------------------------------------------------------------
+int medVMESegmentationVolume::GetNumberOfSeeds()
+//-------------------------------------------------------------------------
+{
+  return m_VolumeAttribute->GetNumberOfSeeds();
 }
 //-------------------------------------------------------------------------
 void medVMESegmentationVolume::SetRegionGrowingLowerThreshold(double value)
