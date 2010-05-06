@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-05-04 14:44:30 $
-Version:   $Revision: 1.1.2.94 $
+Date:      $Date: 2010-05-06 15:02:21 $
+Version:   $Revision: 1.1.2.95 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -2512,8 +2512,10 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
       dicomDataset->findAndGetLongInt(DCM_SmallestImagePixelValue, dcmSmallestImagePixelValue);
       dicomDataset->findAndGetLongInt(DCM_LargestImagePixelValue, dcmLargestImagePixelValue);
 
-      if (dcmSmallestImagePixelValue == dcmLargestImagePixelValue)
-        dcmRescaleIntercept = 0;
+	  // These two lines were used for DP vertical app:
+	  // removed to fix bug http://bugzilla.hpc.cineca.it/show_bug.cgi?id=2079
+      //if (dcmSmallestImagePixelValue == dcmLargestImagePixelValue)
+      //  dcmRescaleIntercept = 0;
 
       if(val_long==16 && dcmPixelRepresentation == 0 )
       {
@@ -2588,6 +2590,8 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 
       if (dcmRescaleSlope != 1 || dcmRescaleIntercept != 0)
       {
+		int scalarType = dicomSliceVTKImageData->GetScalarType();
+
         if (dicomSliceVTKImageData->GetScalarType() == VTK_UNSIGNED_SHORT)
         {
           vtkUnsignedShortArray *scalars=vtkUnsignedShortArray::SafeDownCast(dicomSliceVTKImageData->GetPointData()->GetScalars());
@@ -2830,7 +2834,8 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
               m_DicomReaderModality=medGUIDicomSettings::ID_CMRI_MODALITY;
               
               if (m_CardiacMRIHelper == NULL)
-              { m_CardiacMRIHelper = new medDicomCardiacMRIHelper;
+              { 
+				m_CardiacMRIHelper = new medDicomCardiacMRIHelper;
 				m_CardiacMRIHelper->SetListener(this);
                 mafString helperInputDir = mafString(dicomDirABSPath).Append("/");
 
