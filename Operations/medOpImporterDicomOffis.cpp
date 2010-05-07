@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-05-06 15:02:21 $
-Version:   $Revision: 1.1.2.95 $
+Date:      $Date: 2010-05-07 14:59:02 $
+Version:   $Revision: 1.1.2.96 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -2459,7 +2459,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
         );
 
       double dcmPixelSpacing[3];
-      dcmPixelSpacing[2] = 0;
+      dcmPixelSpacing[2] = 1;
 
       if(dicomDataset->findAndGetFloat64(DCM_PixelSpacing,dcmPixelSpacing[0],0).bad())
       {
@@ -2566,27 +2566,36 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
       dicomSliceVTKImageData->GetPointData()->GetScalars()->SetName("Scalars");
       dicomSliceVTKImageData->Update();
 
-      const Uint16 *dicom_buf_short = NULL;
-      const Uint8* dicom_buf_char = NULL;
-      if (val_long==16)
-      {
-        dicomDataset->findAndGetUint16Array(DCM_PixelData, dicom_buf_short);
-      }
-      else
-      {
-        dicomDataset->findAndGetUint8Array(DCM_PixelData, dicom_buf_char);
-      }
+	  const Uint16 *dicom_buf_short = NULL; 
+	  const Uint8* dicom_buf_char = NULL; 
+	  if (val_long==16) 
+	  { 
+		  dicomDataset->findAndGetUint16Array(DCM_PixelData, dicom_buf_short); 
+		  int counter=0; 
+		  for(int y=0;y<dcmRows;y++) 
+		  { 
+			  for(int x=0;x<dcmColumns;x++) 
+			  { 
+				  dicomSliceVTKImageData->GetPointData()->GetScalars()->SetTuple1(counter, dicom_buf_short[dcmColumns*y+x]); 
+				  counter++; 
+			  } 
+		  } 
+	  } 
+	  else 
+	  { 
+		  dicomDataset->findAndGetUint8Array(DCM_PixelData, dicom_buf_char); 
+		  int counter=0; 
+		  for(int y=0;y<dcmRows;y++) 
+		  { 
+			  for(int x=0;x<dcmColumns;x++) 
+			  { 
+				  dicomSliceVTKImageData->GetPointData()->GetScalars()->SetTuple1(counter, dicom_buf_char[dcmColumns*y+x]); 
+				  counter++; 
+			  } 
+		  } 
+	  } 
 
-      int counter=0;
-      for(int y=0;y<dcmRows;y++)
-      {
-        for(int x=0;x<dcmColumns;x++)
-        {
-          dicomSliceVTKImageData->GetPointData()->GetScalars()->SetTuple1(counter, dicom_buf_short[dcmColumns*y+x]);
-          counter++;
-        }
-      }
-      dicomSliceVTKImageData->Update();
+	  dicomSliceVTKImageData->Update();
 
       if (dcmRescaleSlope != 1 || dcmRescaleIntercept != 0)
       {
