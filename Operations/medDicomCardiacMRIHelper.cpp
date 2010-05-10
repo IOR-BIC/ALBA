@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medDicomCardiacMRIHelper.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-05-04 14:54:50 $
-  Version:   $Revision: 1.1.2.8 $
+  Date:      $Date: 2010-05-10 15:52:09 $
+  Version:   $Revision: 1.1.2.9 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -766,13 +766,6 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
       Vidx=tmp;
     }
 
-     
-     
-
-
-     
-     
-
     //   V(id_theta,:)=[] (START);
     vnl_matrix<double> inputMatrix = V;
     vector<double> rowsToRemoveVector = id_theta;
@@ -802,14 +795,11 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
               v0.put(j-1, Vidx(Vidx.rows() - 1, j));
               v1.put(j-1, V(i, j));
             }
-
-              
-              
+   
             double dot = dot_product(v0,v1);
             theta.push_back(acos(dot_product(v0,v1)));
           }
            
-
           // id_theta = find(theta<1.1*(pi/planesPerFrame));         
           id_theta.clear();
 
@@ -931,6 +921,22 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
 
     vnl_vector<double> id_plane = Vidx.get_column(0);
 
+	// this happens with SE10 test data with orthogonal slices:
+	// i skip plane reordering and use default order instead
+	if (id_plane.size() != planesPerFrame)
+	{
+		assert(idx.size() == planesPerFrame);
+
+		vnl_vector<double> idx_vnl(planesPerFrame);
+
+		for (int i = 0; i < idx.size(); i++)
+		{
+		  idx_vnl.put(i, idx[i]);
+		}
+
+		id_plane = idx_vnl;
+	}
+
     vnl_matrix<double> fileNumberForPlaneIFrameJIdPlane;
 
     // order variables following planes order
@@ -987,7 +993,7 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
     m_YVersorsSingleFrameIdPlane = yVersorsSingleFrameIdPlane;
     m_ImageSizeSingleFrameIdPlane = imageSizeSingleFrameIdPlane;
 
-    m_NewPositionSingleFrameIdPlane = newImageSizeSingleFrameIdPlane;
+    m_NewPositionSingleFrameIdPlane = newPositionSingleFrameIdPlane;
     m_NewXVersorsSingleFrameIdPlane = newXVersorsSingleFrameIdPlane;
     m_NewYVersorsSingleFrameIdPlane = newYVersorsSingleFrameIdPlane;
     m_NewImageSizeSingleFrameIdPlane = newImageSizeSingleFrameIdPlane;

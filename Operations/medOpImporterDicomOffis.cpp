@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-05-07 14:59:02 $
-Version:   $Revision: 1.1.2.96 $
+Date:      $Date: 2010-05-10 15:52:09 $
+Version:   $Revision: 1.1.2.97 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -3068,8 +3068,8 @@ int medOpImporterDicomOffis::GetImageId(int timeId, int heigthId)
 //----------------------------------------------------------------------------
 {
 
-	if (m_DicomReaderModality != medGUIDicomSettings::ID_CMRI_MODALITY)
-		return heigthId;
+ if (m_DicomReaderModality != medGUIDicomSettings::ID_CMRI_MODALITY)
+	return heigthId;
 
   if (this->m_TestMode)
   {
@@ -3098,18 +3098,16 @@ int medOpImporterDicomOffis::GetImageId(int timeId, int heigthId)
     numSlicesPerTS = timeFrames / dicomFilesNumber;
   }
 
-	int maxHeigthId = numSlicesPerTS - 1; 
-	int maxTimeId = timeFrames - 1; 
+  int maxHeigthId = numSlicesPerTS - 1; 
+  int maxTimeId = timeFrames - 1; 
 
-	if (heigthId < 0 || heigthId > maxHeigthId || timeId < 0 || timeId > maxTimeId )
-	{
-		return -1;
-	}
+  if (heigthId < 0 || heigthId > maxHeigthId || timeId < 0 || timeId > maxTimeId )
+  {
+	  return -1;
+  }
 
-	//return (heigthId * timeFrames + timeId); 
   vnl_matrix<double> planeIFrameJFileNumberMatrix = m_CardiacMRIHelper->GetFileNumberForPlaneIFrameJMatrix();
-  vector<string> localFileNamesMatrix = m_CardiacMRIHelper->GetDicomLocalFileNamesVector();
-       
+     
   return (planeIFrameJFileNumberMatrix(heigthId, timeId)); 
 }
 //----------------------------------------------------------------------------
