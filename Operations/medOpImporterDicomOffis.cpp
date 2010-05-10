@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-05-10 15:52:09 $
-Version:   $Revision: 1.1.2.97 $
+Date:      $Date: 2010-05-10 16:07:40 $
+Version:   $Revision: 1.1.2.98 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -3106,7 +3106,7 @@ int medOpImporterDicomOffis::GetImageId(int timeId, int heigthId)
 	  return -1;
   }
 
-  vnl_matrix<double> planeIFrameJFileNumberMatrix = m_CardiacMRIHelper->GetFileNumberForPlaneIFrameJMatrix();
+  vnl_matrix<double> planeIFrameJFileNumberMatrix = m_CardiacMRIHelper->GetFileNumberForPlaneIFrameJIdPlaneMatrix();
      
   return (planeIFrameJFileNumberMatrix(heigthId, timeId)); 
 }
