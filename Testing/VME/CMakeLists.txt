@@ -101,6 +101,9 @@ ADD_TEST(medPipeCompoundVolumeFixedScalarsTest  ${EXECUTABLE_OUTPUT_PATH}/medPip
 ADD_EXECUTABLE(medVisualPipePolylineGraphTest medVisualPipePolylineGraphTest.h medVisualPipePolylineGraphTest.cpp)
 ADD_TEST(medVisualPipePolylineGraphTest  ${EXECUTABLE_OUTPUT_PATH}/medVisualPipePolylineGraphTest)
 
+ADD_EXECUTABLE(medPipeSurfaceEditorTest medPipeSurfaceEditorTest.h medPipeSurfaceEditorTest.cpp)
+ADD_TEST(medPipeSurfaceEditorTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeSurfaceEditorTest)
+
 
 #to be checked
 #ADD_EXECUTABLE(medPipeVolumeVRTest medPipeVolumeVRTest.h medPipeVolumeVRTest.cpp)
