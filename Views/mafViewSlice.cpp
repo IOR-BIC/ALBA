@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-04-20 09:47:31 $
-  Version:   $Revision: 1.51.2.13 $
+  Date:      $Date: 2010-05-11 15:05:49 $
+  Version:   $Revision: 1.51.2.14 $
   Authors:   Paolo Quadrani , Stefano Perticoni , Josef Kohout
 ==========================================================================
   Copyright (c) 2002/2004
@@ -993,8 +993,14 @@ void mafViewSlice::CameraUpdate()
     
     if (DEBUG_MODE == true)
       mafLogMessage(stringStream.str().c_str());
-   
-    if (m_NewABSPose.Equals(&m_OldABSPose))
+    
+    // Fix bug #2085: Added by Losi 05.11.2010
+    // Avoid pan & zoom reset while changing timestamp
+    mafMatrix oldABSPoseForEquals;
+    oldABSPoseForEquals.DeepCopy(&m_OldABSPose);
+    oldABSPoseForEquals.SetTimeStamp(m_NewABSPose.GetTimeStamp());
+
+    if (m_NewABSPose.Equals(&oldABSPoseForEquals))
     { 
       if (DEBUG_MODE == true)
         mafLogMessage("Calling Superclass Camera Update ");
