@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medDicomCardiacMRIHelper.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-05-10 15:52:09 $
-  Version:   $Revision: 1.1.2.9 $
+  Date:      $Date: 2010-05-11 15:47:07 $
+  Version:   $Revision: 1.1.2.10 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -58,6 +58,7 @@ medDicomCardiacMRIHelper::medDicomCardiacMRIHelper()
   m_InputDicomDirectoryABSPath = "UNDEFINED_m_InputDicomDirectoryABSPath";
   m_TestMode = false;
   m_Listener = NULL;
+  m_Mode = DICOM_DIRECTORY_ABS_PATH;
 }
 
 medDicomCardiacMRIHelper::~medDicomCardiacMRIHelper()
@@ -69,41 +70,54 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
 {
   // core parsing and transformation code: matlab pseudo code is used
   // in comments and identified by the matlab comment symbol (%)
-
-  wxString dicomDir = m_InputDicomDirectoryABSPath;
-
-  assert(wxDirExists(dicomDir));
-  vtkDirectory *directoryReader = vtkDirectory::New();
-  directoryReader->Open(dicomDir);
- 
-  wxString fileName = "UNSET";
-
-  vector<string> dicomLocalFileNamesVector;
-
-  int firstDicomSliceFileIndex = -1;
-
-  for (int i=0; i < directoryReader->GetNumberOfFiles(); i++)
-	{
-		if ((strcmp(directoryReader->GetFile(i),".") == 0) || \
-        (strcmp(directoryReader->GetFile(i),"..") == 0)) 
-		{
-			continue;
-		}
-		else
-		{
-      fileName = directoryReader->GetFile(i);
-      dicomLocalFileNamesVector.push_back(fileName.c_str());
-    }
-  }
-
-   
-
-  int numberOfFiles = directoryReader->GetNumberOfFiles();
   
-  DcmFileFormat dicomFileHandler;    
+  long int timeFrames = -1;
+  DcmDataset *dicomDataset = NULL;
+  wxString dicomDir = "UNDEFINED";
+  DcmFileFormat dicomFileHandler;
+  vector<string> dicomABSFileNamesVector;
+  vtkDirectory *directoryReader = NULL;
+  int planesPerFrame = -1;
 
-  wxString dicomFileName1 = dicomLocalFileNamesVector[0].c_str();
-  wxString file1ABSFileName = dicomDir + dicomFileName1; 
+  if (m_Mode == DICOM_DIRECTORY_ABS_PATH)
+  {
+	  dicomDir = m_InputDicomDirectoryABSPath;
+
+	  assert(wxDirExists(dicomDir));
+	  directoryReader = vtkDirectory::New();
+	  directoryReader->Open(dicomDir);
+
+	  wxString localFileName = "UNSET";
+
+	  int firstDicomSliceFileIndex = -1;
+
+	  for (int i=0; i < directoryReader->GetNumberOfFiles(); i++)
+	  {
+		  if ((strcmp(directoryReader->GetFile(i),".") == 0) || \
+			  (strcmp(directoryReader->GetFile(i),"..") == 0)) 
+		  {
+			  continue;
+		  }
+		  else
+		  {
+			  localFileName = directoryReader->GetFile(i);
+			  dicomABSFileNamesVector.push_back((dicomDir + localFileName).c_str());
+		  }
+	  }
+  }
+  else if (m_Mode == DICOM_SLICES_ABS_FILE_NAMES_VECTOR)
+  { 
+	assert(dicomABSFileNamesVector.size() != 0);
+  }
+  else
+  { 
+	std::ostringstream stringStream;
+	stringStream << "Unsupported mode: " << m_Mode << std::endl;          
+	mafLogMessage(stringStream.str().c_str());
+	return;
+  }
+  
+  wxString file1ABSFileName = dicomABSFileNamesVector[0].c_str();
 
   assert(wxFileExists(file1ABSFileName));
 
@@ -111,21 +125,17 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
 
   assert(status.good());
 
-  DcmDataset *dicomDataset = dicomFileHandler.getDataset();
+  dicomDataset = dicomFileHandler.getDataset();
 
   long int dcmCardiacNumberOfImages = -1;
   dicomDataset->findAndGetLongInt(DCM_CardiacNumberOfImages,dcmCardiacNumberOfImages);
 
-   
-
   // timeFrames
-  long int timeFrames = dcmCardiacNumberOfImages;
+  timeFrames = dcmCardiacNumberOfImages;
 
   // planesPerFrame
-  int planesPerFrame = directoryReader->GetNumberOfFiles() / timeFrames;
+  planesPerFrame = dicomABSFileNamesVector.size() / timeFrames;
 
-   
-  
   //   spacing = info.PixelSpacing;
   // 
 
@@ -181,13 +191,11 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
       }
     }
   
-    wxString currentDicomSliceFileName = dicomLocalFileNamesVector[i].c_str();
+    wxString currentSliceABSFileName = dicomABSFileNamesVector[i].c_str();
 
 	std::ostringstream stringStream;
-	stringStream << "Parsing " << currentDicomSliceFileName.c_str() << " file with Id " << i << " , number " << i+1 << " of " << timeFrames*planesPerFrame << std::endl;          
+	stringStream << "Parsing " << currentSliceABSFileName.c_str() << " file with Id " << i << " , number " << i+1 << " of " << timeFrames*planesPerFrame << std::endl;          
 	mafLogMessage(stringStream.str().c_str());
-
-    wxString currentSliceABSFileName = dicomDir + currentDicomSliceFileName;
 
     assert(wxFileExists(currentSliceABSFileName));
 
@@ -1004,7 +1012,7 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
 
   }
   
-  m_DicomLocalFileNamesVector = dicomLocalFileNamesVector;
+  m_DicomLocalFileNamesVector = dicomABSFileNamesVector;
   m_TimeFrames = timeFrames;
   m_PlanesPerFrame = planesPerFrame;
   

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2010-04-27 15:22:40 $
-Version:   $Revision: 1.1.2.34 $
+Date:      $Date: 2010-05-11 15:47:07 $
+Version:   $Revision: 1.1.2.35 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -53,7 +53,7 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class medDICOMListElement;
+class medDicomSlice;
 class mmiDICOMImporterInteractor;
 class medGUIWizard;
 class medGUIWizardPageNew;
@@ -74,8 +74,8 @@ class vtkPolyData;
 class vtkTextMapper;
 class mafVMEGroup;
 
-class medDICOMListElement;
-class medDicomList;
+class medDicomSlice;
+class medDicomSeries;
 
 //----------------------------------------------------------------------------
 // medOpImporterDicomOffis :
@@ -87,12 +87,12 @@ From a DICOM dataset return a VME Volume, a VME Image or a VME Mesh.
 class medOpImporterDicomOffis : public mafOp
 {
 public:
-  /** constructor */
+	/** constructor */
 	medOpImporterDicomOffis(wxString label = "Importer DICOM");
-  /** RTTI macro */
+	/** RTTI macro */
 	mafTypeMacro(medOpImporterDicomOffis, mafOp);
 
-  /** Copy. */
+	/** Copy. */
 	mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */
@@ -113,70 +113,70 @@ public:
 	/** Create the dialog interface for the importer. */
 	virtual void CreateGui();
 
-  /** Set the abs file name of the directory containing DICOM slices to import */
-  void SetDicomDirectoryABSFileName(const char *dirName){m_DicomDirectoryABSFileName = dirName;};
-  const char *GetDicomDirectoryABSFileName() const {return m_DicomDirectoryABSFileName.GetCStr();};
+	/** Set the abs file name of the directory containing DICOM slices to import */
+	void SetDicomDirectoryABSFileName(const char *dirName){m_DicomDirectoryABSFileName = dirName;};
+	const char *GetDicomDirectoryABSFileName() const {return m_DicomDirectoryABSFileName.GetCStr();};
 
-  /** Read Dicom file */
-  void ReadDicom();
+	/** Read Dicom file */
+	void ReadDicom();
 
-  /** Create the vtkTexture for slice_num dicom slice: this will be written to m_SliceTexture ivar*/
-  void GenerateSliceTexture(int imageID);
+	/** Create the vtkTexture for slice_num dicom slice: this will be written to m_SliceTexture ivar*/
+	void GenerateSliceTexture(int imageID);
 
-  /** Get dicom slice vtkImageData from its local file name */
-  vtkImageData* GetSliceImageDataFromLocalDicomFileName(mafString sliceName);
+	/** Get dicom slice vtkImageData from its local file name */
+	vtkImageData* GetSliceImageDataFromLocalDicomFileName(mafString sliceName);
 
-  /** Apply only to BuildVolume and BuildVolumeCineMRI: 
-  Set if output will be imagedata (by resampling) or original rectilinear grid (default) */
-  void SetResampleFlag(int enable){m_ResampleFlag = enable;}
-  int GetResampleFlag(){return m_ResampleFlag;};
+	/** Apply only to BuildVolume and BuildVolumeCineMRI: 
+	Set if output will be imagedata (by resampling) or original rectilinear grid (default) */
+	void SetResampleFlag(int enable){m_ResampleFlag = enable;}
+	int GetResampleFlag(){return m_ResampleFlag;};
 
-  /** Build a volume from the list of dicom files. */
-  int BuildOutputVMEGrayVolumeFromDicom();
+	/** Build a volume from the list of dicom files. */
+	int BuildOutputVMEGrayVolumeFromDicom();
 
-  /** Build a volume from the list of CineMRI files. */
-  int BuildOutputVMEGrayVolumeFromDicomCineMRI();
+	/** Build a volume from the list of CineMRI files. */
+	int BuildOutputVMEGrayVolumeFromDicomCineMRI();
 
-  /** Build a mesh from the list of dicom files. */
-  int BuildOutputVMEMeshFromDicom();
+	/** Build a mesh from the list of dicom files. */
+	int BuildOutputVMEMeshFromDicom();
 
-  /** Build a mesh from the list of CineMRI files. */
-  int BuildOutputVMEMeshFromDicomCineMRI();
+	/** Build a mesh from the list of CineMRI files. */
+	int BuildOutputVMEMeshFromDicomCineMRI();
 
-  /** Build images starting from the list of dicom files. */
-  int BuildOutputVMEImagesFromDicom();
+	/** Build images starting from the list of dicom files. */
+	int BuildOutputVMEImagesFromDicom();
 
-  /** Build images starting from the list of CineMRI files. */
-  int BuildOutputVMEImagesFromDicomCineMRI();
+	/** Build images starting from the list of CineMRI files. */
+	int BuildOutputVMEImagesFromDicomCineMRI();
 
-  /** Create the pipeline to read the images. */
+	/** Create the pipeline to read the images. */
 	virtual void CreateSliceVTKPipeline();
 
-  /** Open dir containing Dicom images. */
-  bool OpenDir();
+	/** Open dir containing Dicom images. */
+	bool OpenDir();
 
-  /** method allows to handle events from other objects*/
-  virtual void OnEvent(mafEventBase *maf_event);
+	/** method allows to handle events from other objects*/
+	virtual void OnEvent(mafEventBase *maf_event);
 
-  /** Print the dicom list to the log area */
-  void PrintDicomList(medDicomList *dicomList);
+	/** Print the dicom list to the log area */
+	void PrintDicomList(medDicomSeries *dicomList);
 
 protected:
 
-  /** OnEvent helper functions */
-  void OnScanTime();
-  void OnScanSlice();
-  void OnRangeModified();
-  void OnMouseDown( mafEvent * e );
-  void OnMouseMove( mafEvent * e );
-  void OnMouseUp();
-  void OnWizardChangePage( mafEvent * e );
-  void OnSeriesSelect();
-  void OnStudySelect();
+	/** OnEvent helper functions */
+	void OnScanTime();
+	void OnScanSlice();
+	void OnRangeModified();
+	void OnMouseDown( mafEvent * e );
+	void OnMouseMove( mafEvent * e );
+	void OnMouseUp();
+	void OnWizardChangePage( mafEvent * e );
+	void OnSeriesSelect();
+	void OnStudySelect();
 
 	/** Create load page and his GUI for the wizard. */
 	void CreateLoadPage();
-	
+
 	/** Create crop page and   his GUI for the wizard. */
 	void CreateCropPage();
 
@@ -198,59 +198,59 @@ protected:
 	/** Show the slice slice_num. */
 	void ShowSlice();
 
-  /** Fill Study listbox. */
-  void FillStudyListBox(mafString studyUID);
+	/** Fill Study listbox. */
+	void FillStudyListBox(mafString studyUID);
 
-  /** Update Study listbox. */
-  void UpdateStudyListBox();
+	/** Update Study listbox. */
+	void UpdateStudyListBox();
 
-  /** Fill Series listbox. */
-  void FillSeriesListBox();
+	/** Fill Series listbox. */
+	void FillSeriesListBox();
 
 	/** Import dicom tags into vme tags. */
 	void ImportDicomTags();
 
 	/** Perform gui update in several wizard pages */
 	void GuiUpdate();
-	
-  /** Enable slice slider. */
-  void EnableSliceSlider(bool enable);
 
-  /** Enable time slider. */
+	/** Enable slice slider. */
+	void EnableSliceSlider(bool enable);
+
+	/** Enable time slider. */
 	void EnableTimeSlider(bool enable);
 
-  /** Update camera. */
+	/** Update camera. */
 	void CameraUpdate();
 
-  /** reset camera. */
+	/** reset camera. */
 	void CameraReset();
 
-  /** On page changing. */
+	/** On page changing. */
 	void OnWizardPageChanging(){};
 
-  /** On wizard start. */
-  int RunWizard();
+	/** On wizard start. */
+	int RunWizard();
 
 	/** Auto position of the crop plane in way of Volume side. */
 	void AutoPositionCropPlane();
 
 	/** Performe crop of dicom data. */
 	void Crop();
-  
-  /** Performe Undo crop of dicom data. */
-  void OnUndoCrop();
 
-  /** Delete all istances of used objects. */
-  void Destroy();
+	/** Performe Undo crop of dicom data. */
+	void OnUndoCrop();
 
-  /** function that resample volume with rectilinear grid output. */
-  void ResampleVolume();
+	/** Delete all istances of used objects. */
+	void Destroy();
 
-  /** Extract a rotated polydata from original dicom image. */
-  vtkPolyData * ExtractPolyData(int ts, int silceId);
+	/** function that resample volume with rectilinear grid output. */
+	void ResampleVolume();
 
-  /** Rescale to 16 Bit */
-  void RescaleTo16Bit(vtkImageData *dataSet);
+	/** Extract a rotated polydata from original dicom image. */
+	vtkPolyData * ExtractPolyData(int ts, int silceId);
+
+	/** Rescale to 16 Bit */
+	void RescaleTo16Bit(vtkImageData *dataSet);
 
 	vtkDirectory			*m_DICOMDirectoryReader; 
 	vtkWindowLevelLookupTable	*m_SliceLookupTable;
@@ -262,10 +262,10 @@ protected:
 	vtkActor					*m_CropActor;
 	vtkActor					*m_SliceActorInCropPage;
 
-  // text stuff
-  vtkActor2D    *m_TextActor;
-  vtkTextMapper	*m_TextMapper;
-  wxString m_Text;
+	// text stuff
+	vtkActor2D    *m_TextActor;
+	vtkTextMapper	*m_TextMapper;
+	wxString m_Text;
 
 	mmiDICOMImporterInteractor *m_DicomInteractor;
 
@@ -273,49 +273,49 @@ protected:
 	medGUIWizardPageNew	*m_LoadPage;
 	medGUIWizardPageNew	*m_CropPage;
 	medGUIWizardPageNew	*m_BuildPage;
-  mafVMEMesh        *m_Mesh;
-  mafVMEGroup       *m_ImagesGroup;
+	mafVMEMesh        *m_Mesh;
+	mafVMEGroup       *m_ImagesGroup;
 
 	mafGUI	*m_LoadGuiLeft;
-  mafGUI	*m_LoadGuiUnderLeft;
+	mafGUI	*m_LoadGuiUnderLeft;
 	mafGUI	*m_CropGuiLeft;
-  mafGUI	*m_CropGuiCenter;
+	mafGUI	*m_CropGuiCenter;
 	mafGUI	*m_BuildGuiLeft;
-  mafGUI	*m_BuildGuiUnderLeft;
-  mafGUI	*m_BuildGuiCenter;
+	mafGUI	*m_BuildGuiUnderLeft;
+	mafGUI	*m_BuildGuiCenter;
 
-  mafGUI  *m_LoadGuiCenter;
+	mafGUI  *m_LoadGuiCenter;
 
-  int       m_OutputType;
+	int       m_OutputType;
 	mafString	m_DicomDirectoryABSFileName;
 	mafString m_PatientName;
 	mafString m_SurgeonName;
 	mafString	m_Identifier;
 
-  mafString m_PatientPosition;
+	mafString m_PatientPosition;
 
 	int				m_BuildStepValue;
 	int				m_DicomReaderModality; ///<Type DICOM Read from file
-  long		  m_HighBit; ///<High bit DICOM Read from file
-  double	  m_RescaleIntercept; ///<Rescale Intercept DICOM Read from file
+	long		  m_HighBit; ///<High bit DICOM Read from file
+	double	  m_RescaleIntercept; ///<Rescale Intercept DICOM Read from file
 	int				m_SortAxes;
 	int				m_NumberOfTimeFrames;
 
-	medDicomList	*m_SelectedStudyUIDSeriesUIDPairFilesList;
+	medDicomSeries	*m_SelectedStudyUIDSeriesUIDPairFilesList;
 
-  std::vector<mafString> m_SelectedStudyUIDSeriesUIDPair;
-  std::map<std::vector<mafString>,medDicomList*> m_StudyUIDSeriesUIDPairToDICOMListMap;
+	std::vector<mafString> m_SelectedStudyUIDSeriesUIDPair;
+	std::map<std::vector<mafString>,medDicomSeries*> m_StudyUIDSeriesUIDPairToDICOMListMap;
 
 	mafString	m_VolumeName;
-  wxString  m_CurrentSliceABSFileName;
+	wxString  m_CurrentSliceABSFileName;
 	int				m_VolumeSide;
 
 	int				 m_NumberOfStudies; ///<Number of study present in the DICOM directory
 	int				 m_NumberOfSlices;
-  wxListBox	*m_StudyListbox;
-  wxListBox	*m_SeriesListbox;
+	wxListBox	*m_StudyListbox;
+	wxListBox	*m_SeriesListbox;
 
-  int           m_ZCropBounds[2];
+	int           m_ZCropBounds[2];
 	int						m_CurrentSlice;
 	wxSlider		 *m_SliceScannerLoadPage;
 	wxSlider		 *m_SliceScannerCropPage;
@@ -329,86 +329,86 @@ protected:
 	mafTagArray	*m_TagArray;
 
 	double	m_SliceBounds[6];
-  
+
 	int	m_GizmoStatus;
 	int	m_SideToBeDragged;
 
 	bool	m_BoxCorrect;
 	bool	m_CropFlag;
 	bool	m_CroppedExetuted; //<<<To check if a crop as been executed
-  bool m_IsRotated;
-  bool m_ConstantRotation;
-  bool m_ZCrop;
+	bool m_IsRotated;
+	bool m_ConstantRotation;
+	bool m_ZCrop;
 
-  int m_ResampleFlag;
-  int m_DiscardPosition;
-  int m_RescaleTo16Bit;
+	int m_ResampleFlag;
+	int m_DiscardPosition;
+	int m_RescaleTo16Bit;
 
 	mafVMEImage				*m_Image;
 	mafVMEVolumeGray	*m_Volume;
 
-  medDicomCardiacMRIHelper *m_CardiacMRIHelper;
+	medDicomCardiacMRIHelper *m_CardiacMRIHelper;
 
 	mafGUICheckListBox *m_DicomModalityListBox;
 
-  /** destructor */
+	/** destructor */
 	~medOpImporterDicomOffis();
 
 };
 
 /**
-  class name: medDICOMListElement
-  It represents an element of the dicom list.
+class name: medDicomSlice
+Holds information on a single dicom slice
 */
-class medDICOMListElement
+class medDicomSlice
 {
 public:
-  /** constructor */
-	medDICOMListElement() 
+	/** constructor */
+	medDicomSlice() 
 	{
 		m_SliceABSFileName = "";
 		m_Pos[0] = -9999;
 		m_Pos[1] = -9999;
 		m_Pos[2] = -9999;
-    m_Orientation[0] = 0.0;
-    m_Orientation[1] = 0.0; 
-    m_Orientation[2] = 0.0; 
-    m_Orientation[3] = 0.0; 
-    m_Orientation[4] = 0.0; 
-    m_Orientation[5] = 0.0; 
-    m_Orientation[6] = 0.0; 
-    m_Orientation[7] = 0.0; 
-    m_Orientation[8] = 0.0; 
+		m_Orientation[0] = 0.0;
+		m_Orientation[1] = 0.0; 
+		m_Orientation[2] = 0.0; 
+		m_Orientation[3] = 0.0; 
+		m_Orientation[4] = 0.0; 
+		m_Orientation[5] = 0.0; 
+		m_Orientation[6] = 0.0; 
+		m_Orientation[7] = 0.0; 
+		m_Orientation[8] = 0.0; 
 		m_ImageNumber = -1;
 		m_TriggerTime = -1.0;
-		m_NumberOfImages = -1;
+		m_DcmCardiacNumberOfImages = -1;
 	};
-  /** overloaded constructor */
-	medDICOMListElement(mafString filename,double coord[3], double orientation[9],\
-    vtkImageData *data ,int imageNumber=-1, int numberOfImages=-1, double trigTime=-1.0)  
+	/** overloaded constructor */
+	medDicomSlice(mafString filename,double coord[3], double orientation[9],\
+		vtkImageData *data ,int imageNumber=-1, int dcmCardiacNumberOfImages=-1, double trigTime=-1.0)  
 	{
 		m_SliceABSFileName = filename;
 		m_Pos[0] = coord[0];
 		m_Pos[1] = coord[1];
 		m_Pos[2] = coord[2];
-    m_Orientation[0] = orientation[0];
-    m_Orientation[1] = orientation[1];
-    m_Orientation[2] = orientation[2];
-    m_Orientation[3] = orientation[3];
-    m_Orientation[4] = orientation[4];
-    m_Orientation[5] = orientation[5];
-    m_Orientation[6] = orientation[6];
-    m_Orientation[7] = orientation[7];
-    m_Orientation[8] = orientation[8];
+		m_Orientation[0] = orientation[0];
+		m_Orientation[1] = orientation[1];
+		m_Orientation[2] = orientation[2];
+		m_Orientation[3] = orientation[3];
+		m_Orientation[4] = orientation[4];
+		m_Orientation[5] = orientation[5];
+		m_Orientation[6] = orientation[6];
+		m_Orientation[7] = orientation[7];
+		m_Orientation[8] = orientation[8];
 		m_ImageNumber = imageNumber;
-		m_NumberOfImages = numberOfImages;
+		m_DcmCardiacNumberOfImages = dcmCardiacNumberOfImages;
 		m_TriggerTime = trigTime;
 		vtkNEW(m_Data);
 		m_Data->DeepCopy(data);
 	};
 
-  /** destructor */
-	~medDICOMListElement() {vtkDEL(m_Data);};
+	/** destructor */
+	~medDicomSlice() {vtkDEL(m_Data);};
 
 	/** Add the filename and the image coordinates to the list. */
 	void SetListElement(mafString filename,double coord[3], double orientation[9], int imageNumber=-1, int numberOfImages=-1, double trigTime=-1.0) 
@@ -417,61 +417,61 @@ public:
 		m_Pos[0] = coord[0];
 		m_Pos[1] = coord[1];
 		m_Pos[2] = coord[2];
-    m_Orientation[0] = orientation[0];
-    m_Orientation[1] = orientation[1];
-    m_Orientation[2] = orientation[2];
-    m_Orientation[3] = orientation[3];
-    m_Orientation[4] = orientation[4];
-    m_Orientation[5] = orientation[5];
-    m_Orientation[6] = orientation[6];
-    m_Orientation[7] = orientation[7];
-    m_Orientation[8] = orientation[8];
+		m_Orientation[0] = orientation[0];
+		m_Orientation[1] = orientation[1];
+		m_Orientation[2] = orientation[2];
+		m_Orientation[3] = orientation[3];
+		m_Orientation[4] = orientation[4];
+		m_Orientation[5] = orientation[5];
+		m_Orientation[6] = orientation[6];
+		m_Orientation[7] = orientation[7];
+		m_Orientation[8] = orientation[8];
 		m_ImageNumber = imageNumber;
-		m_NumberOfImages = numberOfImages;
+		m_DcmCardiacNumberOfImages = numberOfImages;
 		m_TriggerTime = trigTime;
 	};
 
 	/** Return the filename of the corresponding dicom slice. */
-	const char *GetFileName() const {return m_SliceABSFileName.GetCStr();};
+	const char *GetSliceABSFileName() const {return m_SliceABSFileName.GetCStr();};
 
 	/**	Return the Coordinate along a specified axes of the dicom slice	*/
 	double	GetCoordinate(int i) const {return m_Pos[i];};
-  
- 	/** Return the image number of the dicom slice*/
+
+	/** Return the image number of the dicom slice*/
 	int GetImageNumber() const {return m_ImageNumber;};
 
 	/** Return the image number of the dicom slice*/
-	int GetTimeFramesNumber() const {return m_NumberOfImages;};
+	int GetTimeFramesNumber() const {return m_DcmCardiacNumberOfImages;};
 
 	/** Return the trigger time of the dicom slice*/
 	int GetTriggerTime() const {return m_TriggerTime;};
 
-  /** Retrieve image data*/
+	/** Retrieve image data*/
 	vtkImageData* GetVTKImageData(){return m_Data;};
 
-  /** Return the position of a slice*/
+	/** Return the position of a slice*/
 	void GetSliceLocation(double pos[3]){pos[0]=m_Pos[0];pos[1]=m_Pos[1];pos[2]=m_Pos[2];};
 
-  /** Return the orientation patient of a slice*/
-  void GetSliceOrientation(double orientation[9]){
-    orientation[0]= m_Orientation[0];
-    orientation[1]= m_Orientation[1];
-    orientation[2]= m_Orientation[2];
-    orientation[3]= m_Orientation[3];
-    orientation[4]= m_Orientation[4];
-    orientation[5]= m_Orientation[5];
-    orientation[6]= m_Orientation[6];
-    orientation[7]= m_Orientation[7];
-    orientation[8]= m_Orientation[8];};
+	/** Return the orientation patient of a slice*/
+	void GetSliceOrientation(double orientation[9]){
+		orientation[0]= m_Orientation[0];
+		orientation[1]= m_Orientation[1];
+		orientation[2]= m_Orientation[2];
+		orientation[3]= m_Orientation[3];
+		orientation[4]= m_Orientation[4];
+		orientation[5]= m_Orientation[5];
+		orientation[6]= m_Orientation[6];
+		orientation[7]= m_Orientation[7];
+		orientation[8]= m_Orientation[8];};
 
 protected:
 	double m_Pos[3];
-  double m_Orientation[9];
+	double m_Orientation[9];
 	mafString m_SliceABSFileName;
 
 	double m_TriggerTime;
 	int m_ImageNumber;
-	int m_NumberOfImages;
+	int m_DcmCardiacNumberOfImages;
 
 	vtkImageData *m_Data;
 

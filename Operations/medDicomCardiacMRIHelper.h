@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medDicomCardiacMRIHelper.h,v $
   Language:  C++
-  Date:      $Date: 2010-05-04 14:44:30 $
-  Version:   $Revision: 1.1.2.5 $
+  Date:      $Date: 2010-05-11 15:47:07 $
+  Version:   $Revision: 1.1.2.6 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -60,14 +60,35 @@ public:
 
   /** Set the Listener that will receive event-notification. */
   void SetListener(mafObserver *Listener) {m_Listener = Listener;};
-
+ 
+  /**
+  Input modality enum */
+  enum INPUT_MODALITY { DICOM_DIRECTORY_ABS_PATH = 0, DICOM_SLICES_ABS_FILE_NAMES_VECTOR = 1, NUMBER_OF_MODALITIES = 2 };
+  
+  /**
+  Set input mode do dicom directory (default) */
+  void SetModeToInputDicomDirectoryABSPath();
+ 
+  /**
+  Set input mode to dicom slices vector */
+  void SetModeToInputDicomSlicesABSFileNamesVector();
+ 
+  /**
+  Get the input modality */
+  int GetMode() { return m_Mode; }; 
+  
   /** 
-  Set dicom input dir: path must end with / or \ */
+  Specify input as dicom dir: path must end with / or \ . The dir must contain a single dicom series */
   void SetInputDicomDirectoryABSPath(mafString inputDicomDirectoryABSPath);
   mafString GetInputDicomDirectoryABSPath();
   
   /** 
-  Perform dicom directory parsing*/
+  Specify input as dicom slices abs file names vector: they must be from a single dicom series */
+  void SetInputDicomSlicesABSFileNamesVector(vector<string> &inputDicomSlicesABSFileNamesVector) {m_InputDicomSlicesABSFileNamesVector = inputDicomSlicesABSFileNamesVector;};
+  vector<string> GetInputDicomSlicesABSFileNamesVector() {return m_InputDicomSlicesABSFileNamesVector;};
+
+  /** 
+  Perform dicom directory parsing: works on a single dicom series only*/
   void ParseDicomDirectory();
 
   /** 
@@ -147,6 +168,11 @@ private:
   vnl_matrix<double> m_FlipUpDownFlagIdPlane;
 
   bool m_TestMode;
+
+  vector<string> m_InputDicomSlicesABSFileNamesVector;
+  
+  
+  int m_Mode; ///< register the importer input modality
 };
  
 #endif
