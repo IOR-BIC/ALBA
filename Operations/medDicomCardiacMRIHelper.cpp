@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medDicomCardiacMRIHelper.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-05-11 15:47:07 $
-  Version:   $Revision: 1.1.2.10 $
+  Date:      $Date: 2010-05-14 09:38:48 $
+  Version:   $Revision: 1.1.2.11 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -403,6 +403,8 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
       }
     }
     fileNumberForPlaneIFrameJ = flag_img_transpose.transpose();
+
+    m_FileNumberForPlaneIFrameJ = fileNumberForPlaneIFrameJ;
   }
 
    
@@ -458,6 +460,7 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
   if (planesPerFrame == 1)
   {
     // just one timevarying plane: skip correction
+    m_FileNumberForPlaneIFrameJIdPlane = m_FileNumberForPlaneIFrameJ;
   } 
   else
   {
@@ -1024,8 +1027,6 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
   }
   
   m_Spacing = tmpSpacing;
-
-  m_FileNumberForPlaneIFrameJ = fileNumberForPlaneIFrameJ;
 
   vtkDEL(directoryReader);
 

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2010-05-11 15:47:07 $
-Version:   $Revision: 1.1.2.35 $
+Date:      $Date: 2010-05-14 09:38:48 $
+Version:   $Revision: 1.1.2.36 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -75,7 +75,7 @@ class vtkTextMapper;
 class mafVMEGroup;
 
 class medDicomSlice;
-class medDicomSeries;
+class medDicomSeriesSliceList;
 
 //----------------------------------------------------------------------------
 // medOpImporterDicomOffis :
@@ -159,7 +159,7 @@ public:
 	virtual void OnEvent(mafEventBase *maf_event);
 
 	/** Print the dicom list to the log area */
-	void PrintDicomList(medDicomSeries *dicomList);
+	void PrintDicomList(medDicomSeriesSliceList *dicomList);
 
 protected:
 
@@ -301,10 +301,10 @@ protected:
 	int				m_SortAxes;
 	int				m_NumberOfTimeFrames;
 
-	medDicomSeries	*m_SelectedStudyUIDSeriesUIDPairFilesList;
+	medDicomSeriesSliceList	*m_SelectedSeriesSlicesList; ///< Selected StudyUID-SeriesUID pair slices list
 
 	std::vector<mafString> m_SelectedStudyUIDSeriesUIDPair;
-	std::map<std::vector<mafString>,medDicomSeries*> m_StudyUIDSeriesUIDPairToDICOMListMap;
+	std::map<std::vector<mafString>,medDicomSeriesSliceList*> m_SeriesIDToSlicesListMap; ///< StudyUID-SeriesUID pair to slices list map 
 
 	mafString	m_VolumeName;
 	wxString  m_CurrentSliceABSFileName;
