@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2010-05-14 13:35:27 $
-Version:   $Revision: 1.1.2.37 $
+Date:      $Date: 2010-05-14 15:08:17 $
+Version:   $Revision: 1.1.2.38 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -192,7 +192,9 @@ protected:
 	/** Build the list of dicom filer recognized. */
 	bool BuildDicomFileList(const char *dicomDirABSPath);
 
-	/** Return the slice number from the heightId and sliceId*/
+  bool IsRotated( double dcmImageOrientationPatient[9] );
+	
+  /** Return the slice number from the heightId and sliceId*/
 	int GetImageId(int heightId, int timeId);
 
 	/** Show the slice slice_num. */

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-05-14 13:35:27 $
-Version:   $Revision: 1.1.2.101 $
+Date:      $Date: 2010-05-14 15:08:16 $
+Version:   $Revision: 1.1.2.102 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -684,6 +684,7 @@ int medOpImporterDicomOffis::BuildOutputVMEImagesFromDicom()
     image->SetData(im,0);
     image->GetTagArray()->DeepCopy(m_TagArray);
 
+
     mafTagItem tag_Nature;
     tag_Nature.SetName("VME_NATURE");
     tag_Nature.SetValue("NATURAL");
@@ -988,7 +989,6 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
   {
     double orientation[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
     m_SelectedSeriesSlicesList->Item(m_ZCropBounds[0])->GetData()->GetSliceOrientation(orientation);
-
 
     //transform direction cosines to be used to set vtkMatrix
     /* [ orientation[0]  orientation[1]  orientation[2]  -dst_pos_x ] 
@@ -2423,46 +2423,8 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
       dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient,dcmImageOrientationPatient[3],3);
       dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient,dcmImageOrientationPatient[4],4);
       dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient,dcmImageOrientationPatient[5],5);
-
-      /* if (sliceNum == 1)
-      {
-      for (int i = 0; i < 9; i++)
-      m_ImageOrientationPatient[i] = imageOrientationPatient[i];
-      }*/
-
-      // check if the dataset is rotated: => different from 1. 0. 0. 0. 1. 0.
-      /* FROM David Clunie's note
-      2.2.2 Orientation of DICOM images
-      Another question that is frequently asked in comp.protocols.dicom is how to determine which side of an image is which 
-      (e.g. left, right) and so on. The short answer is that for projection radiographs this is specified explicitly using 
-      the Patient Orientation attribute, and for cross-sectional images it needs to be derived from the Image Orientation (Patient)
-      direction cosines. In the standard these are explained as follows:
-
-      "C.7.6.1.1.1 Patient Orientation. The Patient Orientation (0020,0020) relative to the image plane shall be specified by two values 
-      that designate the anatomical direction of the positive row axis (left to right) and the positive column axis (top to bottom).
-      The first entry is the direction of the rows, given by the direction of the last pixel in the first row from the first pixel
-      in that row. The second entry is the direction of the columns, given by the direction of the last pixel in the first column from 
-      the first pixel in that column. Anatomical direction shall be designated by the capital letters: A (anterior), P (posterior),
-      R (right), L (left), H (head), F (foot). Each value of the orientation attribute shall contain at least one of these characters.
-      If refinements in the orientation descriptions are to be specified, then they shall be designated by one or two additional letters
-      in each value. Within each value, the letters shall be ordered with the principal orientation designated in the first character." 
-      "C.7.6.2.1.1 Image Position And Image Orientation. The Image Position (0020,0032) specifies the x, y, and z coordinates of the upper 
-      left hand corner of the image; it is the center of the first voxel transmitted. Image Orientation (0020,0037) specifies the direction 
-      cosines of the first row and the first column with respect to the patient. These Attributes shall be provide as a pair. Row value for 
-      the x, y, and z axes respectively followed by the Column value for the x, y, and z axes respectively. The direction of the axes is 
-      defined fully by the patient's orientation. The x-axis is increasing to the left hand side of the patient. The y-axis is increasing 
-      to the posterior side of the patient. The z-axis is increasing toward the head of the patient. The patient based coordinate system 
-      is a right handed system, i.e. the vector cross product of a unit vector along the positive x-axis and a unit vector along the 
-      positive y-axis is equal to a unit vector along the positive z-axis." */
-
-      m_IsRotated  =  m_IsRotated || !( \
-        fabs(dcmImageOrientationPatient[0] - 1.0) < 0.0001 && \
-        fabs(dcmImageOrientationPatient[4] - dcmImageOrientationPatient[0]) < 0.0001 &&\
-        fabs(dcmImageOrientationPatient[1] - 0.0) < 0.0001 &&\
-        fabs(dcmImageOrientationPatient[1] - dcmImageOrientationPatient[2]) < 0.0001 &&\
-        fabs(dcmImageOrientationPatient[1] - dcmImageOrientationPatient[3]) < 0.0001 &&\
-        fabs(dcmImageOrientationPatient[1] - dcmImageOrientationPatient[5]) < 0.0001 \
-        );
+      
+      m_IsRotated  =  m_IsRotated || IsRotated(dcmImageOrientationPatient);
 
       double dcmPixelSpacing[3];
       dcmPixelSpacing[2] = 1;
@@ -4065,4 +4027,41 @@ void medOpImporterDicomOffis::OnScanTime()
   m_TimeScannerBuildPage->Update();
 
   GuiUpdate();
+}
+
+bool medOpImporterDicomOffis::IsRotated( double dcmImageOrientationPatient[9] )
+{
+  // check if the dataset is rotated: => different from 1. 0. 0. 0. 1. 0.
+  /* FROM David Clunie's note
+  2.2.2 Orientation of DICOM images
+  Another question that is frequently asked in comp.protocols.dicom is how to determine which side of an image is which 
+  (e.g. left, right) and so on. The short answer is that for projection radiographs this is specified explicitly using 
+  the Patient Orientation attribute, and for cross-sectional images it needs to be derived from the Image Orientation (Patient)
+  direction cosines. In the standard these are explained as follows:
+
+  "C.7.6.1.1.1 Patient Orientation. The Patient Orientation (0020,0020) relative to the image plane shall be specified by two values 
+  that designate the anatomical direction of the positive row axis (left to right) and the positive column axis (top to bottom).
+  The first entry is the direction of the rows, given by the direction of the last pixel in the first row from the first pixel
+  in that row. The second entry is the direction of the columns, given by the direction of the last pixel in the first column from 
+  the first pixel in that column. Anatomical direction shall be designated by the capital letters: A (anterior), P (posterior),
+  R (right), L (left), H (head), F (foot). Each value of the orientation attribute shall contain at least one of these characters.
+  If refinements in the orientation descriptions are to be specified, then they shall be designated by one or two additional letters
+  in each value. Within each value, the letters shall be ordered with the principal orientation designated in the first character." 
+  "C.7.6.2.1.1 Image Position And Image Orientation. The Image Position (0020,0032) specifies the x, y, and z coordinates of the upper 
+  left hand corner of the image; it is the center of the first voxel transmitted. Image Orientation (0020,0037) specifies the direction 
+  cosines of the first row and the first column with respect to the patient. These Attributes shall be provide as a pair. Row value for 
+  the x, y, and z axes respectively followed by the Column value for the x, y, and z axes respectively. The direction of the axes is 
+  defined fully by the patient's orientation. The x-axis is increasing to the left hand side of the patient. The y-axis is increasing 
+  to the posterior side of the patient. The z-axis is increasing toward the head of the patient. The patient based coordinate system 
+  is a right handed system, i.e. the vector cross product of a unit vector along the positive x-axis and a unit vector along the 
+  positive y-axis is equal to a unit vector along the positive z-axis." */
+
+  return !( \
+    fabs(dcmImageOrientationPatient[0] - 1.0) < 0.0001 && \
+    fabs(dcmImageOrientationPatient[4] - dcmImageOrientationPatient[0]) < 0.0001 &&\
+    fabs(dcmImageOrientationPatient[1] - 0.0) < 0.0001 &&\
+    fabs(dcmImageOrientationPatient[1] - dcmImageOrientationPatient[2]) < 0.0001 &&\
+    fabs(dcmImageOrientationPatient[1] - dcmImageOrientationPatient[3]) < 0.0001 &&\
+    fabs(dcmImageOrientationPatient[1] - dcmImageOrientationPatient[5]) < 0.0001 \
+    );
 }
