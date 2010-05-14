@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medDicomCardiacMRIHelper.h,v $
   Language:  C++
-  Date:      $Date: 2010-05-11 15:47:07 $
-  Version:   $Revision: 1.1.2.6 $
+  Date:      $Date: 2010-05-14 13:35:27 $
+  Version:   $Revision: 1.1.2.7 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -67,11 +67,11 @@ public:
   
   /**
   Set input mode do dicom directory (default) */
-  void SetModeToInputDicomDirectoryABSPath();
+  void SetModeToInputDicomDirectoryABSPath() {m_Mode = DICOM_DIRECTORY_ABS_PATH;};
  
   /**
   Set input mode to dicom slices vector */
-  void SetModeToInputDicomSlicesABSFileNamesVector();
+  void SetModeToInputDicomSlicesABSFileNamesVector() {m_Mode = DICOM_SLICES_ABS_FILE_NAMES_VECTOR;};
  
   /**
   Get the input modality */

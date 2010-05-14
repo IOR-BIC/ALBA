@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2010-05-14 09:38:48 $
-Version:   $Revision: 1.1.2.36 $
+Date:      $Date: 2010-05-14 13:35:27 $
+Version:   $Revision: 1.1.2.37 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -301,10 +301,12 @@ protected:
 	int				m_SortAxes;
 	int				m_NumberOfTimeFrames;
 
-	medDicomSeriesSliceList	*m_SelectedSeriesSlicesList; ///< Selected StudyUID-SeriesUID pair slices list
+	medDicomSeriesSliceList	*m_SelectedSeriesSlicesList; ///< Selected study slices list
 
-	std::vector<mafString> m_SelectedStudyUIDSeriesUIDPair;
-	std::map<std::vector<mafString>,medDicomSeriesSliceList*> m_SeriesIDToSlicesListMap; ///< StudyUID-SeriesUID pair to slices list map 
+	std::vector<mafString> m_SelectedSeriesID; ///< Selected StudyUID-SeriesUIDWithPlanesNumber-SeriesUIDWithoutPlanesNumber vector
+	std::map<std::vector<mafString>,medDicomSeriesSliceList*> m_SeriesIDToSlicesListMap; ///< StudyUID-SeriesUIDWithPlanesNumber-SeriesUIDWithoutPlanesNumber vector to slices list map 
+
+  std::map<std::vector<mafString>,medDicomCardiacMRIHelper*> m_SeriesIDToCardiacMRIHelperMap; ///< StudyUID-SeriesUIDWithPlanesNumber-SeriesUIDWithoutPlanesNumber vector to slices list map 
 
 	mafString	m_VolumeName;
 	wxString  m_CurrentSliceABSFileName;
@@ -333,9 +335,9 @@ protected:
 	int	m_GizmoStatus;
 	int	m_SideToBeDragged;
 
-	bool	m_BoxCorrect;
-	bool	m_CropFlag;
-	bool	m_CroppedExetuted; //<<<To check if a crop as been executed
+	bool m_BoxCorrect;
+	bool m_CropFlag;
+	bool m_CropExecuted; //<<<To check if a crop as been executed
 	bool m_IsRotated;
 	bool m_ConstantRotation;
 	bool m_ZCrop;
@@ -346,8 +348,6 @@ protected:
 
 	mafVMEImage				*m_Image;
 	mafVMEVolumeGray	*m_Volume;
-
-	medDicomCardiacMRIHelper *m_CardiacMRIHelper;
 
 	mafGUICheckListBox *m_DicomModalityListBox;
 
@@ -379,13 +379,13 @@ public:
 		m_Orientation[6] = 0.0; 
 		m_Orientation[7] = 0.0; 
 		m_Orientation[8] = 0.0; 
-		m_ImageNumber = -1;
+		m_DcmInstanceNumber = -1;
 		m_TriggerTime = -1.0;
 		m_DcmCardiacNumberOfImages = -1;
 	};
 	/** overloaded constructor */
 	medDicomSlice(mafString filename,double coord[3], double orientation[9],\
-		vtkImageData *data ,int imageNumber=-1, int dcmCardiacNumberOfImages=-1, double trigTime=-1.0)  
+		vtkImageData *data ,int dcmInstanceNumber=-1, int dcmCardiacNumberOfImages=-1, double trigTime=-1.0)  
 	{
 		m_SliceABSFileName = filename;
 		m_Pos[0] = coord[0];
@@ -400,7 +400,7 @@ public:
 		m_Orientation[6] = orientation[6];
 		m_Orientation[7] = orientation[7];
 		m_Orientation[8] = orientation[8];
-		m_ImageNumber = imageNumber;
+		m_DcmInstanceNumber = dcmInstanceNumber;
 		m_DcmCardiacNumberOfImages = dcmCardiacNumberOfImages;
 		m_TriggerTime = trigTime;
 		vtkNEW(m_Data);
@@ -426,7 +426,7 @@ public:
 		m_Orientation[6] = orientation[6];
 		m_Orientation[7] = orientation[7];
 		m_Orientation[8] = orientation[8];
-		m_ImageNumber = imageNumber;
+		m_DcmInstanceNumber = imageNumber;
 		m_DcmCardiacNumberOfImages = numberOfImages;
 		m_TriggerTime = trigTime;
 	};
@@ -438,10 +438,10 @@ public:
 	double	GetCoordinate(int i) const {return m_Pos[i];};
 
 	/** Return the image number of the dicom slice*/
-	int GetImageNumber() const {return m_ImageNumber;};
+	int GetDcmInstanceNumber() const {return m_DcmInstanceNumber;};
 
-	/** Return the image number of the dicom slice*/
-	int GetTimeFramesNumber() const {return m_DcmCardiacNumberOfImages;};
+	/** Return the number of cardiac timeframes*/
+	int GetDcmCardiacNumberOfImages() const {return m_DcmCardiacNumberOfImages;};
 
 	/** Return the trigger time of the dicom slice*/
 	int GetTriggerTime() const {return m_TriggerTime;};
@@ -470,7 +470,7 @@ protected:
 	mafString m_SliceABSFileName;
 
 	double m_TriggerTime;
-	int m_ImageNumber;
+	int m_DcmInstanceNumber;
 	int m_DcmCardiacNumberOfImages;
 
 	vtkImageData *m_Data;
