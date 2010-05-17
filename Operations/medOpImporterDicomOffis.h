@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2010-05-14 15:11:00 $
-Version:   $Revision: 1.1.2.39 $
+Date:      $Date: 2010-05-17 07:17:53 $
+Version:   $Revision: 1.1.2.40 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -307,9 +307,12 @@ protected:
 	medDicomSeriesSliceList	*m_SelectedSeriesSlicesList; ///< Selected study slices list
 
 	std::vector<mafString> m_SelectedSeriesID; ///< Selected StudyUID-SeriesUIDWithPlanesNumber-SeriesUIDWithoutPlanesNumber vector
-	std::map<std::vector<mafString>,medDicomSeriesSliceList*> m_SeriesIDToSlicesListMap; ///< StudyUID-SeriesUIDWithPlanesNumber-SeriesUIDWithoutPlanesNumber vector to slices list map 
+	
+  std::map<std::vector<mafString>,medDicomSeriesSliceList*> m_SeriesIDToSlicesListMap; ///< StudyUID-SeriesUIDWithPlanesNumber-SeriesUIDWithoutPlanesNumber vector to slices list map 
 
   std::map<std::vector<mafString>,medDicomCardiacMRIHelper*> m_SeriesIDToCardiacMRIHelperMap; ///< StudyUID-SeriesUIDWithPlanesNumber-SeriesUIDWithoutPlanesNumber vector to slices list map 
+
+  std::map<std::vector<mafString>,bool> m_SeriesIDContainsRotationsMap; ///< StudyUID-SeriesUIDWithPlanesNumber-SeriesUIDWithoutPlanesNumber vector to boolean map 
 
 	mafString	m_VolumeName;
 	wxString  m_CurrentSliceABSFileName;
@@ -341,7 +344,7 @@ protected:
 	bool m_BoxCorrect;
 	bool m_CropFlag;
 	bool m_CropExecuted; //<<<To check if a crop as been executed
-	bool m_IsRotated;
+	bool m_ApplyRotation; //<<< true il current series contains rotated slices
 	bool m_ConstantRotation;
 	bool m_ZCrop;
 

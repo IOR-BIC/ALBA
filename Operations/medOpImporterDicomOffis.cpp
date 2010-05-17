@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-05-14 15:08:16 $
-Version:   $Revision: 1.1.2.102 $
+Date:      $Date: 2010-05-17 07:17:53 $
+Version:   $Revision: 1.1.2.103 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -303,7 +303,7 @@ mafOp(label)
 	m_BoxCorrect = false;
 	m_CropFlag = false;
   m_CropExecuted = false;
-  m_IsRotated = false;
+  
   m_ConstantRotation = true;
   m_ZCrop = true;
   m_SideToBeDragged = 0; 
@@ -330,6 +330,8 @@ mafOp(label)
   m_DiscardPosition = FALSE;
 
   m_RescaleTo16Bit = FALSE;
+
+  m_ApplyRotation = true;
 
 }
 //----------------------------------------------------------------------------
@@ -442,14 +444,14 @@ int medOpImporterDicomOffis::RunWizard()
     {
       case 0: 
 
-        if (m_IsRotated)
+        if (m_SeriesIDContainsRotationsMap[m_SelectedSeriesID])
         {
           if(!this->m_TestMode)
           {
             int answer = wxMessageBox( "Dicom dataset contains rotated images - Apply rotation?", "Warning", wxYES_NO, NULL);
             if (answer == wxNO)
             {
-              m_IsRotated = false;
+              m_ApplyRotation = false;
             }
           }
         }
@@ -984,8 +986,7 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
   }
   m_Volume->SetDataByDetaching(rg_out,0);
 
-
-  if (m_IsRotated)
+  if (m_SeriesIDContainsRotationsMap[m_SelectedSeriesID] && m_ApplyRotation)
   {
     double orientation[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
     m_SelectedSeriesSlicesList->Item(m_ZCropBounds[0])->GetData()->GetSliceOrientation(orientation);
@@ -1183,7 +1184,7 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
       ResampleVolume();
     }
 
-    if (m_IsRotated)
+    if (m_SeriesIDContainsRotationsMap[m_SelectedSeriesID] && m_ApplyRotation)
     {
       double orientation[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
       m_SelectedSeriesSlicesList->Item(m_ZCropBounds[0])->GetData()->GetSliceOrientation(orientation);
@@ -1532,10 +1533,11 @@ vtkPolyData* medOpImporterDicomOffis::ExtractPolyData(int ts, int silceId)
 
   vtkMatrix4x4 *mat = vtkMatrix4x4::New();
   mat->Identity();
-  if (m_IsRotated)
+
+  if (m_ApplyRotation)
   {
-  double orientation[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-  m_SelectedSeriesSlicesList->Item(currImageId)->GetData()->GetSliceOrientation(orientation);
+    double orientation[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+    m_SelectedSeriesSlicesList->Item(currImageId)->GetData()->GetSliceOrientation(orientation);
 
     //transform direction cosines to be used to set vtkMatrix
  /* [ orientation[0]  orientation[1]  orientation[2]  -dst_pos_x ] 
@@ -2217,9 +2219,7 @@ void medOpImporterDicomOffis::UpdateStudyListBox()
     mafString study = m_StudyListbox->GetString(n);
     mafString *st = (mafString *)m_StudyListbox->GetClientData(n);
     m_SelectedSeriesID.at(0) = st->GetCStr();
-    //wxString  studyName = st->GetCStr();
-    //m_VectorSelected.at(0) = studyName.SubString(0, studyName.find_last_of("_")-1);
-
+  
     std::map<std::vector<mafString>,medDicomSeriesSliceList*>::iterator it;
     for ( it=m_SeriesIDToSlicesListMap.begin() ; it != m_SeriesIDToSlicesListMap.end(); it++ )
     {
@@ -2424,7 +2424,8 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
       dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient,dcmImageOrientationPatient[4],4);
       dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient,dcmImageOrientationPatient[5],5);
       
-      m_IsRotated  =  m_IsRotated || IsRotated(dcmImageOrientationPatient);
+      bool currentSliceIsRotated = false;
+      currentSliceIsRotated = IsRotated(dcmImageOrientationPatient);
 
       double dcmPixelSpacing[3];
       dcmPixelSpacing[2] = 1;
@@ -2480,8 +2481,8 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
       dicomDataset->findAndGetLongInt(DCM_SmallestImagePixelValue, dcmSmallestImagePixelValue);
       dicomDataset->findAndGetLongInt(DCM_LargestImagePixelValue, dcmLargestImagePixelValue);
 
-	  // These two lines were used for DP vertical app:
-	  // removed to fix bug http://bugzilla.hpc.cineca.it/show_bug.cgi?id=2079
+	    // These two lines were used for DP vertical app:
+	    // removed to fix bug http://bugzilla.hpc.cineca.it/show_bug.cgi?id=2079
       //if (dcmSmallestImagePixelValue == dcmLargestImagePixelValue)
       //  dcmRescaleIntercept = 0;
 
@@ -2615,9 +2616,9 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
       //-studyUID
       //-seriesUID
       //-name to applied to the "series listbox"
-      std::vector<mafString> studyAndSeriesPair;
-      studyAndSeriesPair.push_back(dcmStudyInstanceUID);
-      studyAndSeriesPair.push_back(dcmSeriesInstanceUID);
+      std::vector<mafString> seriesId;
+      seriesId.push_back(dcmStudyInstanceUID);
+      seriesId.push_back(dcmSeriesInstanceUID);
       mafString seriesName = "series_";
       seriesName.Append(dcmModality);
       seriesName.Append("_");
@@ -2630,7 +2631,10 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
         enableToRead = ((medGUIDicomSettings*)GetSetting())->EnableToRead((char*)dcmModality);
       }
      
-      //If not MR
+      //------------------------
+      // (Start) Not MR handling
+      // REFACTORING TODO: Refactor toward strategy when regression will be available
+      //------------------------
       if (enableToRead && strcmp((char *)dcmModality, "MR" ) != 0)
       {
         wxString stringMode = dcmModality;
@@ -2643,20 +2647,24 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
         for ( it=m_SeriesIDToSlicesListMap.begin() ; \
           it != m_SeriesIDToSlicesListMap.end(); it++ )
         {
-          if(studyAndSeriesPair.at(0) == (*it).first.at(0))
+          if(seriesId.at(0) == (*it).first.at(0))
           {
             seriesCounter++;
-            if (studyAndSeriesPair.at(1) == (*it).first.at(1))
+            if (seriesId.at(1) == (*it).first.at(1))
             {
-              studyAndSeriesPair.push_back((*it).first.at(2));
+              seriesId.push_back((*it).first.at(2));
               seriesExist = true;
               break;
             }
           }
         }
 
+        // if the series does not exists already
         if (!seriesExist)
         {
+          bool containsRotations = currentSliceIsRotated;
+          m_SeriesIDContainsRotationsMap[seriesId] = containsRotations;
+
           m_NumberOfStudies++;
           // the study is not present into the listbox, so need to create new
           // list of files related to the new studyID
@@ -2682,7 +2690,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
           dicomSliceVTKImageData->Update();
 
           seriesName.Append(wxString::Format("%i_%ix%i",seriesCounter, dcmRows, dcmColumns));
-          studyAndSeriesPair.push_back(seriesName);
+          seriesId.push_back(seriesName);
 
           dicomSeries->Append(new medDicomSlice\
             (m_CurrentSliceABSFileName,dcmSliceLocation, dcmImageOrientationPatient, \
@@ -2690,15 +2698,24 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 
           m_SeriesIDToSlicesListMap.insert\
             (std::pair<std::vector<mafString>,medDicomSeriesSliceList*>\
-            (studyAndSeriesPair,dicomSeries));
+            (seriesId,dicomSeries));
 
           if (!this->m_TestMode)
           {
-            FillStudyListBox(studyAndSeriesPair.at(0));
+            FillStudyListBox(seriesId.at(0));
           }
         }
         else // series exists already
         {
+
+          bool currentSliceIsRotated = currentSliceIsRotated;
+          bool currentSeriesContainsRotations = m_SeriesIDContainsRotationsMap[seriesId];
+          
+          if (currentSliceIsRotated && !currentSeriesContainsRotations)
+          {
+            m_SeriesIDContainsRotationsMap[seriesId] = true;
+          }
+          
           if(dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[2]).bad())
           {
             //Unable to get element: DCM_SliceLocation;
@@ -2744,14 +2761,22 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
           lastZPos = dcmSliceLocation[2];
 
 
-          m_SeriesIDToSlicesListMap[studyAndSeriesPair]->Append(\
+          m_SeriesIDToSlicesListMap[seriesId]->Append(\
             new medDicomSlice(m_CurrentSliceABSFileName,dcmSliceLocation, \
             dcmImageOrientationPatient, dicomSliceVTKImageData));
 
                   
         }
       }
-      // else if MR or CineMRI
+      //------------------------
+      // (End) Not MR handling
+      // REFACTORING TODO: Refactor toward strategy when regression will be available
+      //------------------------
+
+      //------------------------
+      // (Start) Not MR handling
+      // REFACTORING TODO: Refactor toward strategy when regression will be available
+      //------------------------
       else if ( enableToRead && strcmp( (char *)dcmModality, "MR" ) == 0)
       {
         // MR and CineMRHandling
@@ -2760,22 +2785,26 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
         std::map<std::vector<mafString>,medDicomSeriesSliceList*>::iterator it;
         for ( it=m_SeriesIDToSlicesListMap.begin() ; it != m_SeriesIDToSlicesListMap.end(); it++ )
         {
-          if(studyAndSeriesPair.at(0) == (*it).first.at(0))
+          if(seriesId.at(0) == (*it).first.at(0))
           {
             seriesCounter++;
 
-            if (studyAndSeriesPair.at(1) == (*it).first.at(1))
+            if (seriesId.at(1) == (*it).first.at(1))
             {
-              studyAndSeriesPair.push_back((*it).first.at(2));
+              seriesId.push_back((*it).first.at(2));
               seriesExist = true;
               break;
             }
           }
         }
-
+        
+        // if series does not exists already
         if (!seriesExist)
         {
           m_NumberOfStudies++;
+
+          bool containsRotations = currentSliceIsRotated;
+          m_SeriesIDContainsRotationsMap[seriesId] = containsRotations;
 
           // the study is not present into the listbox, so need to create new
           // list of files related to the new studyID
@@ -2837,7 +2866,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
           }
 
           seriesName.Append(wxString::Format("%i_%ix%i",seriesCounter, dcmRows, dcmColumns));
-          studyAndSeriesPair.push_back(seriesName);
+          seriesId.push_back(seriesName);
 
           dicomSeries->Append(new medDicomSlice\
             (m_CurrentSliceABSFileName,dcmSliceLocation, dcmImageOrientationPatient, \
@@ -2845,14 +2874,22 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 
           m_SeriesIDToSlicesListMap.insert\
             (std::pair<std::vector<mafString>,medDicomSeriesSliceList*>\
-            (studyAndSeriesPair,dicomSeries));
+            (seriesId,dicomSeries));
           if (!this->m_TestMode)
           {
-            FillStudyListBox(studyAndSeriesPair.at(0));
+            FillStudyListBox(seriesId.at(0));
           }	
         }
-        else 
+        else // if series exists already
         {
+
+          bool currentSeriesContainsRotations = m_SeriesIDContainsRotationsMap[seriesId];
+
+          if (currentSliceIsRotated && !currentSeriesContainsRotations)
+          {
+            m_SeriesIDContainsRotationsMap[seriesId] = true;
+          }
+
           if(dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[2]).bad())
           {
             //Unable to get element: DCM_SliceLocation;
@@ -2874,12 +2911,17 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
           dicomDataset->findAndGetLongInt(DCM_CardiacNumberOfImages,dcmCardiacNumberOfImages);
           dicomDataset->findAndGetFloat64(DCM_TriggerTime,dcmTriggerTime);
 
-          m_SeriesIDToSlicesListMap[studyAndSeriesPair]->Append\
+          m_SeriesIDToSlicesListMap[seriesId]->Append\
             (new medDicomSlice(m_CurrentSliceABSFileName,dcmSliceLocation,dcmImageOrientationPatient ,\
             dicomSliceVTKImageData,dcmInstanceNumber,dcmCardiacNumberOfImages,dcmTriggerTime));
         }
       }
       
+      //------------------------
+      // (End) Not MR handling
+      // REFACTORING TODO: Refactor toward strategy when regression will be available
+      //------------------------
+
       if (!this->m_TestMode)
       {
         progress = i * 100 / m_DICOMDirectoryReader->GetNumberOfFiles();
@@ -2887,7 +2929,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
       }
 
       dicomImg.clear();
-      studyAndSeriesPair.clear();
+      seriesId.clear();
     }
 
     lastFileName = m_CurrentSliceABSFileName;
