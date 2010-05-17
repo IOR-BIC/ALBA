@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMESegmentationVolume.h,v $
 Language:  C++
-Date:      $Date: 2010-05-05 08:09:02 $
-Version:   $Revision: 1.1.2.6 $
+Date:      $Date: 2010-05-17 16:55:53 $
+Version:   $Revision: 1.1.2.7 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -94,7 +94,7 @@ public:
   static char** GetIcon();
 
   /** Set the link to the volume.*/
-  void SetVolumeLink(mafNode *volume);
+  int SetVolumeLink(mafNode *volume);
 
   /** Get the link to the volume.*/
   mafNode *GetVolumeLink();

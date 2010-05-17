@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMESegmentationVolume.cpp,v $
 Language:  C++
-Date:      $Date: 2010-05-05 12:06:26 $
-Version:   $Revision: 1.1.2.7 $
+Date:      $Date: 2010-05-17 16:55:53 $
+Version:   $Revision: 1.1.2.8 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -391,12 +391,20 @@ int medVMESegmentationVolume::DeleteRange(int index)
   return MAF_ERROR;
 }
 //-----------------------------------------------------------------------
-void medVMESegmentationVolume::SetVolumeLink(mafNode *volume)
+int medVMESegmentationVolume::SetVolumeLink(mafNode *volume)
 //-----------------------------------------------------------------------
 {
+  int result = m_SegmentingDataPipe->SetVolume(volume);
+
+  if (result == MAF_ERROR)
+  {
+    return MAF_ERROR;
+  }
+
   SetLink("Volume", volume);
-  m_SegmentingDataPipe->SetVolume(volume);
   Modified();
+
+  return MAF_OK;
 }
 //-----------------------------------------------------------------------
 void medVMESegmentationVolume::SetManualVolumeMask(mafNode *volume)

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medDataPipeCustomSegmentationVolume.h,v $
 Language:  C++
-Date:      $Date: 2010-05-05 08:09:02 $
-Version:   $Revision: 1.1.2.5 $
+Date:      $Date: 2010-05-17 16:55:53 $
+Version:   $Revision: 1.1.2.6 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -21,7 +21,6 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // forward declarations
 //----------------------------------------------------------------------------
-class vtkRectilinearGrid;
 class vtkStructuredPoints;
 
 /** */
@@ -34,7 +33,7 @@ public:
   int DeepCopy(mafDataPipe *pipe);
 
   /** Set the volume to segment*/
-  void SetVolume(mafNode *volume);
+  int SetVolume(mafNode *volume);
 
   /** Return the segmented volume*/
   mafNode *GetVolume() {return m_Volume;};
@@ -148,16 +147,11 @@ protected:
   /** function called to updated the data pipe output */
   /*virtual*/ void Execute();
 
-  vtkRectilinearGrid *m_RG;
   vtkStructuredPoints *m_SP;
 
-  vtkRectilinearGrid *m_AutomaticRG;
   vtkStructuredPoints *m_AutomaticSP;
-  vtkRectilinearGrid *m_ManualRG;
   vtkStructuredPoints *m_ManualSP;
-  vtkRectilinearGrid *m_RefinementRG;
   vtkStructuredPoints *m_RefinementSP;
-  vtkRectilinearGrid *m_RegionGrowingRG;
   vtkStructuredPoints *m_RegionGrowingSP;
 
   bool m_ChangedManualData;

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medDataPipeCustomSegmentationVolume.cpp,v $
 Language:  C++
-Date:      $Date: 2010-05-05 13:54:02 $
-Version:   $Revision: 1.1.2.9 $
+Date:      $Date: 2010-05-17 16:55:53 $
+Version:   $Revision: 1.1.2.10 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -27,14 +27,12 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkMath.h"
 #include "vtkDataSet.h"
 #include "vtkImageData.h"
-#include "vtkRectilinearGrid.h"
 #include "vtkShortArray.h"
 #include "vtkDoubleArray.h"
 #include "vtkImageCast.h"
 #include "vtkPointData.h"
 #include "vtkStructuredPoints.h"
 #include "vtkUnsignedCharArray.h"
-#include "vtkDataSetWriter.h"
 
 #include "itkImageToVTKImageFilter.h"
 #include "itkVTKImageToImageFilter.h"
@@ -57,24 +55,14 @@ medDataPipeCustomSegmentationVolume::medDataPipeCustomSegmentationVolume()
   m_Volume = NULL;
   m_ManualVolumeMask = NULL;
   m_RefinementVolumeMask = NULL;
-  m_RG = NULL;
-  vtkNEW(m_RG);
   m_SP = NULL;
   vtkNEW(m_SP);
-  m_AutomaticRG = NULL;
-  vtkNEW(m_AutomaticRG);
   m_AutomaticSP = NULL;
   vtkNEW(m_AutomaticSP);
-  m_ManualRG = NULL;
-  vtkNEW(m_ManualRG);
   m_ManualSP = NULL;
   vtkNEW(m_ManualSP);
-  m_RefinementRG = NULL;
-  vtkNEW(m_RefinementRG);
   m_RefinementSP = NULL;
   vtkNEW(m_RefinementSP);
-  m_RegionGrowingRG = NULL;
-  vtkNEW(m_RegionGrowingRG);
   m_RegionGrowingSP = NULL;
   vtkNEW(m_RegionGrowingSP);
 
@@ -90,15 +78,10 @@ medDataPipeCustomSegmentationVolume::medDataPipeCustomSegmentationVolume()
 medDataPipeCustomSegmentationVolume::~medDataPipeCustomSegmentationVolume()
 //------------------------------------------------------------------------------
 {
-  vtkDEL(m_RG);
   vtkDEL(m_SP);
-  vtkDEL(m_AutomaticRG);
   vtkDEL(m_AutomaticSP);
-  vtkDEL(m_ManualRG);
   vtkDEL(m_ManualSP);
-  vtkDEL(m_RefinementRG);
   vtkDEL(m_RefinementSP);
-  vtkDEL(m_RegionGrowingRG);
   vtkDEL(m_RegionGrowingSP);
   //////////////////////////////////////////////////////////////////////////
   for (int i=0;i<m_AutomaticSegmentationRanges.size();i++)
@@ -171,10 +154,10 @@ void medDataPipeCustomSegmentationVolume::ApplyManualSegmentation()
 
   mafVME *vol = mafVME::SafeDownCast(m_Volume);
   vol->GetOutput()->Update();
-  vtkDataSet *volumeData = vol->GetOutput()->GetVTKData();
+  vtkStructuredPoints *volumeData = vtkStructuredPoints::SafeDownCast(vol->GetOutput()->GetVTKData());
   volumeData->Update();
 
-  vtkDataSet *maskVolumeData = mafVME::SafeDownCast(m_ManualVolumeMask)->GetOutput()->GetVTKData();
+  vtkStructuredPoints *maskVolumeData = vtkStructuredPoints::SafeDownCast(mafVME::SafeDownCast(m_ManualVolumeMask)->GetOutput()->GetVTKData());
   maskVolumeData->Update();
 
   if (maskVolumeData==NULL || maskVolumeData->GetNumberOfPoints() != volumeData->GetNumberOfPoints() || maskVolumeData->GetPointData()->GetScalars()==NULL)
@@ -186,32 +169,16 @@ void medDataPipeCustomSegmentationVolume::ApplyManualSegmentation()
   vtkDataArray *maskScalar = maskVolumeData->GetPointData()->GetScalars();
   vtkDataArray *regionGrowingScalar;
   
-  if(maskVolumeData->IsA("vtkRectilinearGrid")) 
+  m_RegionGrowingSP->Update();
+  if (m_RegionGrowingSP->GetPointData()->GetScalars() == NULL)
   {
-    m_RegionGrowingRG->Update();
-    if (m_RegionGrowingRG->GetPointData()->GetScalars() == NULL)
-    {
-      return;
-    }
-    if (m_RegionGrowingRG->GetPointData()->GetScalars()->GetNumberOfTuples() != maskScalar->GetNumberOfTuples())
-    {
-      return;
-    }
-    regionGrowingScalar = m_RegionGrowingRG->GetPointData()->GetScalars();
+    return;
   }
-  else if (maskVolumeData->IsA("vtkStructuredPoints"))
+  if (m_RegionGrowingSP->GetPointData()->GetScalars()->GetNumberOfTuples() != maskScalar->GetNumberOfTuples())
   {
-    m_RegionGrowingSP->Update();
-    if (m_RegionGrowingSP->GetPointData()->GetScalars() == NULL)
-    {
-      return;
-    }
-    if (m_RegionGrowingSP->GetPointData()->GetScalars()->GetNumberOfTuples() != maskScalar->GetNumberOfTuples())
-    {
-      return;
-    }
-    regionGrowingScalar = m_RegionGrowingSP->GetPointData()->GetScalars();
+    return;
   }
+  regionGrowingScalar = m_RegionGrowingSP->GetPointData()->GetScalars();
 
   vtkMAFSmartPointer<vtkUnsignedCharArray> newScalars;
   newScalars->SetName("SCALARS");
@@ -245,36 +212,18 @@ void medDataPipeCustomSegmentationVolume::ApplyManualSegmentation()
     }
   }
 
-  if (volumeData->IsA("vtkStructuredPoints"))
-  {
-    vtkMAFSmartPointer<vtkStructuredPoints> newSP;
-    newSP->CopyStructure(vtkStructuredPoints::SafeDownCast(volumeData));
-    newSP->Update();
-    newSP->GetPointData()->AddArray(newScalars);
-    newSP->GetPointData()->SetActiveScalars("SCALARS");
-    newSP->SetScalarTypeToUnsignedChar();
-    newSP->Update();
+  vtkMAFSmartPointer<vtkStructuredPoints> newSP;
+  newSP->CopyStructure(vtkStructuredPoints::SafeDownCast(volumeData));
+  newSP->Update();
+  newSP->GetPointData()->AddArray(newScalars);
+  newSP->GetPointData()->SetActiveScalars("SCALARS");
+  newSP->SetScalarTypeToUnsignedChar();
+  newSP->Update();
 
-    m_ManualSP->DeepCopy(newSP);
-    m_ManualSP->Update();
-    m_SP->DeepCopy(newSP);
-    m_SP->Update();
-  }
-  else
-  {
-    vtkMAFSmartPointer<vtkRectilinearGrid> newRG;
-    newRG->CopyStructure(vtkRectilinearGrid::SafeDownCast(volumeData));
-    newRG->Update();
-    newRG->GetPointData()->AddArray(newScalars);
-    newRG->GetPointData()->SetActiveScalars("SCALARS");
-    newRG->Update();
-
-    m_ManualRG->DeepCopy(newRG);
-    m_ManualRG->Update();
-
-    m_RG->DeepCopy(newRG);
-    m_RG->Update();
-  }
+  m_ManualSP->DeepCopy(newSP);
+  m_ManualSP->Update();
+  m_SP->DeepCopy(newSP);
+  m_SP->Update();
 
   mafEvent eHideProgress(this,PROGRESSBAR_HIDE);
   this->GetVME()->ForwardUpEvent(&eHideProgress);  
@@ -286,21 +235,14 @@ void medDataPipeCustomSegmentationVolume::ApplyAutomaticSegmentation()
 {
   mafVME *vol = mafVME::SafeDownCast(m_Volume);
   vol->GetOutput()->Update();
-  vtkDataSet *volumeData = vol->GetOutput()->GetVTKData();
+  vtkStructuredPoints *volumeData = vtkStructuredPoints::SafeDownCast(vol->GetOutput()->GetVTKData());
   volumeData->Update();
 
   typedef itk::BinaryThresholdImageFilter<RealImage, RealImage> BinaryThresholdFilter;
   BinaryThresholdFilter::Pointer binaryThreshold = BinaryThresholdFilter::New();
 
   int volumeDimensions[3];
-  if(volumeData->IsA("vtkRectilinearGrid")) {
-    vtkRectilinearGrid *rectilinearGrid=vtkRectilinearGrid::SafeDownCast(volumeData);
-    rectilinearGrid->GetDimensions(volumeDimensions);
-  }
-  else if (volumeData->IsA("vtkStructuredPoints")) {
-    vtkStructuredPoints *imageData=vtkStructuredPoints::SafeDownCast(volumeData);
-    imageData->GetDimensions(volumeDimensions);
-  }
+  volumeData->GetDimensions(volumeDimensions);
 
   long progress = 0;
 
@@ -352,21 +294,7 @@ void medDataPipeCustomSegmentationVolume::ApplyAutomaticSegmentation()
     //Generate the slice image data for itk filters
     //////////////////////////////////////////////////////////////////////////
     double spacing[3];
-
-    if (volumeData->IsA("vtkStructuredPoints"))
-    {
-      vtkStructuredPoints::SafeDownCast(volumeData)->GetSpacing(spacing); 
-    }
-    else if (volumeData->IsA("vtkRectilinearGrid"))
-    {
-      vtkDataArray *x = vtkRectilinearGrid::SafeDownCast(volumeData)->GetXCoordinates();
-      vtkDataArray *y = vtkRectilinearGrid::SafeDownCast(volumeData)->GetYCoordinates();
-
-      //assumed that the slices are image data
-      spacing[0] = x->GetTuple1(1) - x->GetTuple1(0);
-      spacing[1] = y->GetTuple1(1) - y->GetTuple1(0);
-      spacing[2] = 0.0;
-    }
+    volumeData->GetSpacing(spacing); 
 
     vtkDataArray *inputScalars = volumeData->GetPointData()->GetScalars();
     vtkMAFSmartPointer<vtkDoubleArray> scalars;
@@ -385,12 +313,6 @@ void medDataPipeCustomSegmentationVolume::ApplyAutomaticSegmentation()
     im->GetPointData()->AddArray(scalars);
     im->GetPointData()->SetActiveScalars("SCALARS");
     im->Update();
-
-//     vtkMAFSmartPointer<vtkImageCast> vtkImageToFloat;
-//     vtkImageToFloat->SetOutputScalarTypeToFloat();
-//     vtkImageToFloat->SetInput(im);
-//     vtkImageToFloat->Modified();
-//     vtkImageToFloat->Update();
     //////////////////////////////////////////////////////////////////////////
 
     /////////////////////////////////////////////////////////////////////////
@@ -442,41 +364,18 @@ void medDataPipeCustomSegmentationVolume::ApplyAutomaticSegmentation()
 
   }
 
-  if (volumeData->IsA("vtkStructuredPoints"))
-  {
-    vtkMAFSmartPointer<vtkStructuredPoints> newSP;
-    newSP->CopyStructure(vtkStructuredPoints::SafeDownCast(volumeData));
-    newSP->Update();
-    newSP->GetPointData()->AddArray(newScalars);
-    newSP->GetPointData()->SetActiveScalars("SCALARS");
-    //newSP->SetScalarTypeToShort();
-    newSP->Update();
+  vtkMAFSmartPointer<vtkStructuredPoints> newSP;
+  newSP->CopyStructure(vtkStructuredPoints::SafeDownCast(volumeData));
+  newSP->Update();
+  newSP->SetScalarTypeToUnsignedChar();
+  newSP->GetPointData()->AddArray(newScalars);
+  newSP->GetPointData()->SetActiveScalars("SCALARS");
+  newSP->Update();
 
-    m_AutomaticSP->DeepCopy(newSP);
-    m_AutomaticSP->Update();
-    m_SP->DeepCopy(newSP);
-    m_SP->Update();
-  }
-  else
-  {
-    vtkMAFSmartPointer<vtkRectilinearGrid> newRG;
-    newRG->CopyStructure(vtkRectilinearGrid::SafeDownCast(volumeData));
-    newRG->Update();
-    newRG->GetPointData()->AddArray(newScalars);
-    newRG->GetPointData()->SetActiveScalars("SCALARS");
-    newRG->Update();
-
-    double sr[2];
-    int n;
-    vtkDataArray *x = newRG->GetXCoordinates();
-    x->GetRange(sr);
-    n = x->GetNumberOfTuples();
-
-    m_AutomaticRG->DeepCopy(newRG);
-    m_AutomaticRG->Update();
-    m_RG->DeepCopy(newRG);
-    m_RG->Update();
-  }
+  m_AutomaticSP->DeepCopy(newSP);
+  m_AutomaticSP->Update();
+  m_SP->DeepCopy(newSP);
+  m_SP->Update();
 
   mafEvent eHideProgress(this,PROGRESSBAR_HIDE);
   this->GetVME()->ForwardUpEvent(&eHideProgress);
@@ -509,42 +408,21 @@ void medDataPipeCustomSegmentationVolume::ApplyRefinementSegmentation()
   vtkDataArray *maskScalar = maskVolumeData->GetPointData()->GetScalars();
   vtkDataArray *manualScalar;
 
-  if(maskVolumeData->IsA("vtkRectilinearGrid")) 
+  if (m_ManualSP == NULL)
   {
-    if (m_ManualRG == NULL)
-    {
-      return;
-    }
-
-    m_ManualRG->Update();
-    if (m_ManualRG->GetPointData()->GetScalars() == NULL)
-    {
-      return;
-    }
-    if (m_ManualRG->GetPointData()->GetScalars()->GetNumberOfTuples() != maskScalar->GetNumberOfTuples())
-    {
-      return;
-    }
-    manualScalar = m_ManualRG->GetPointData()->GetScalars();
+    return;
   }
-  else if (maskVolumeData->IsA("vtkStructuredPoints"))
+
+  m_ManualSP->Update();
+  if (m_ManualSP->GetPointData()->GetScalars() == NULL)
   {
-    if (m_ManualSP == NULL)
-    {
-      return;
-    }
-
-    m_ManualSP->Update();
-    if (m_ManualSP->GetPointData()->GetScalars() == NULL)
-    {
-      return;
-    }
-    if (m_ManualSP->GetPointData()->GetScalars()->GetNumberOfTuples() != maskScalar->GetNumberOfTuples())
-    {
-      return;
-    }
-    manualScalar = m_ManualSP->GetPointData()->GetScalars();
+    return;
   }
+  if (m_ManualSP->GetPointData()->GetScalars()->GetNumberOfTuples() != maskScalar->GetNumberOfTuples())
+  {
+    return;
+  }
+  manualScalar = m_ManualSP->GetPointData()->GetScalars();
 
   vtkMAFSmartPointer<vtkUnsignedCharArray> newScalars;
   newScalars->SetName("SCALARS");
@@ -578,35 +456,18 @@ void medDataPipeCustomSegmentationVolume::ApplyRefinementSegmentation()
     }
   }
 
-  if (volumeData->IsA("vtkStructuredPoints"))
-  {
-    vtkMAFSmartPointer<vtkStructuredPoints> newSP;
-    newSP->CopyStructure(vtkStructuredPoints::SafeDownCast(volumeData));
-    newSP->Update();
-    newSP->GetPointData()->AddArray(newScalars);
-    newSP->GetPointData()->SetActiveScalars("SCALARS");
-    newSP->SetScalarTypeToUnsignedChar();
-    newSP->Update();
+  vtkMAFSmartPointer<vtkStructuredPoints> newSP;
+  newSP->CopyStructure(vtkStructuredPoints::SafeDownCast(volumeData));
+  newSP->Update();
+  newSP->GetPointData()->AddArray(newScalars);
+  newSP->GetPointData()->SetActiveScalars("SCALARS");
+  newSP->SetScalarTypeToUnsignedChar();
+  newSP->Update();
 
-    m_RefinementSP->DeepCopy(newSP);
-    m_RefinementSP->Update();
-    m_SP->DeepCopy(newSP);
-    m_SP->Update();
-  }
-  else
-  {
-    vtkMAFSmartPointer<vtkRectilinearGrid> newRG;
-    newRG->CopyStructure(vtkRectilinearGrid::SafeDownCast(volumeData));
-    newRG->Update();
-    newRG->GetPointData()->AddArray(newScalars);
-    newRG->GetPointData()->SetActiveScalars("SCALARS");
-    newRG->Update();
-
-    m_RefinementRG->DeepCopy(newRG);
-    m_RefinementRG->Update();
-    m_RG->DeepCopy(newRG);
-    m_RG->Update();
-  }
+  m_RefinementSP->DeepCopy(newSP);
+  m_RefinementSP->Update();
+  m_SP->DeepCopy(newSP);
+  m_SP->Update();
 
   mafEvent eHideProgress(this,PROGRESSBAR_HIDE);
   this->GetVME()->ForwardUpEvent(&eHideProgress);  
@@ -623,7 +484,7 @@ void medDataPipeCustomSegmentationVolume::ApplyRegionGrowingSegmentation()
 
   mafVME *vol = mafVME::SafeDownCast(m_Volume);
   vol->GetOutput()->Update();
-  vtkDataSet *volumeData = vol->GetOutput()->GetVTKData();
+  vtkStructuredPoints *volumeData = vtkStructuredPoints::SafeDownCast(vol->GetOutput()->GetVTKData());
   volumeData->Update();
 
   if (m_RegionGrowingSeeds.size()==0)
@@ -634,13 +495,6 @@ void medDataPipeCustomSegmentationVolume::ApplyRegionGrowingSegmentation()
       m_RegionGrowingSP->Update();
       m_SP->DeepCopy(m_RegionGrowingSP);
       m_SP->Update();
-    }
-    else if (volumeData->IsA("vtkRectilinearGrid"))
-    {
-      m_RegionGrowingRG->DeepCopy(m_AutomaticRG);
-      m_RegionGrowingRG->Update();
-      m_RG->DeepCopy(m_RegionGrowingRG);
-      m_RG->Update();
     }
 
     mafEvent eHideProgress(this,PROGRESSBAR_HIDE);
@@ -653,34 +507,11 @@ void medDataPipeCustomSegmentationVolume::ApplyRegionGrowingSegmentation()
 
   vtkMAFSmartPointer<vtkStructuredPoints> spInputOfRegionGrowing;
   vtkDataSet *automaticData;
-  if (volumeData->IsA("vtkStructuredPoints"))
-  {
-    spInputOfRegionGrowing->DeepCopy(vtkStructuredPoints::SafeDownCast(volumeData));
-    spInputOfRegionGrowing->Update();
 
-    automaticData = m_AutomaticSP;
-  }
-  else if (volumeData->IsA("vtkRectilinearGrid"))
-  {
-    int dim[3];
-    vtkRectilinearGrid::SafeDownCast(volumeData)->GetDimensions(dim);
-    vtkMAFSmartPointer<vtkDoubleArray> oldScalars;
-    oldScalars->SetNumberOfTuples(volumeData->GetNumberOfPoints());
-    oldScalars->SetName("SCALARS");
-    for (int k=0;k<volumeData->GetNumberOfPoints();k++)
-    {
-      oldScalars->SetTuple1(k,volumeData->GetPointData()->GetScalars()->GetTuple1(k));
-    }
+  spInputOfRegionGrowing->DeepCopy(vtkStructuredPoints::SafeDownCast(volumeData));
+  spInputOfRegionGrowing->Update();
 
-    spInputOfRegionGrowing->SetDimensions(dim);
-    spInputOfRegionGrowing->SetSpacing(1.0,1.0,1.0);
-    spInputOfRegionGrowing->GetPointData()->AddArray(oldScalars);
-    spInputOfRegionGrowing->GetPointData()->SetActiveScalars("SCALARS");
-    spInputOfRegionGrowing->Update();
-
-    automaticData = m_AutomaticRG;
-    
-  }
+  automaticData = m_AutomaticSP;
 
   eUpdate.SetArg(10);
   this->GetVME()->ForwardUpEvent(&eUpdate);
@@ -736,17 +567,6 @@ void medDataPipeCustomSegmentationVolume::ApplyRegionGrowingSegmentation()
   eUpdate.SetArg(65);
   this->GetVME()->ForwardUpEvent(&eUpdate);
 
-//   vtkMAFSmartPointer<vtkUnsignedCharArray> oldScalars;
-//   oldScalars->DeepCopy(vtkUnsignedCharArray::SafeDownCast(spOutputRegionGrowing->GetPointData()->GetScalars()));
-//   oldScalars->SetName("SCALARS");
-//   double sr[2];
-//   oldScalars->GetRange(sr);
-  /*oldScalars->SetNumberOfTuples(spOutputRegionGrowing->GetNumberOfPoints());
-  oldScalars->SetName("SCALARS");
-  for (int i=0;i<spOutputRegionGrowing->GetNumberOfPoints();i++)
-  {
-    oldScalars->SetTuple1(i,spOutputRegionGrowing->GetPointData()->GetScalars()->GetTuple1(i));
-  }*/
 
   //////////////////////////////////////////////////////////////////////////
   //Perform the OR operation between region growing and automatic output
@@ -770,27 +590,14 @@ void medDataPipeCustomSegmentationVolume::ApplyRegionGrowingSegmentation()
   eUpdate.SetArg(85);
   this->GetVME()->ForwardUpEvent(&eUpdate);
 
-  if (volumeData->IsA("vtkStructuredPoints"))
-  {
-    m_RegionGrowingSP->CopyStructure(vtkStructuredPoints::SafeDownCast(volumeData));
-    m_RegionGrowingSP->GetPointData()->AddArray(newScalars);
-    m_RegionGrowingSP->GetPointData()->SetActiveScalars("SCALARS");
-    m_RegionGrowingSP->SetScalarTypeToUnsignedChar();
-    m_RegionGrowingSP->Update();
-    
-    m_SP->DeepCopy(m_RegionGrowingSP);
-    m_SP->Update();
-  }
-  else if (volumeData->IsA("vtkRectilinearGrid"))
-  {
-    m_RegionGrowingRG->CopyStructure(vtkRectilinearGrid::SafeDownCast(volumeData));
-    m_RegionGrowingRG->GetPointData()->AddArray(newScalars);
-    m_RegionGrowingRG->GetPointData()->SetActiveScalars("SCALARS");
-    m_RegionGrowingRG->Update();
-
-    m_RG->DeepCopy(m_RegionGrowingRG);
-    m_RG->Update();
-  }
+  m_RegionGrowingSP->CopyStructure(vtkStructuredPoints::SafeDownCast(volumeData));
+  m_RegionGrowingSP->GetPointData()->AddArray(newScalars);
+  m_RegionGrowingSP->GetPointData()->SetActiveScalars("SCALARS");
+  m_RegionGrowingSP->SetScalarTypeToUnsignedChar();
+  m_RegionGrowingSP->Update();
+  
+  m_SP->DeepCopy(m_RegionGrowingSP);
+  m_SP->Update();
 
   eUpdate.SetArg(100);
   this->GetVME()->ForwardUpEvent(&eUpdate);
@@ -884,29 +691,22 @@ int medDataPipeCustomSegmentationVolume::GetRange(int index,int &startSlice, int
   return MAF_OK;
 }
 //------------------------------------------------------------------------------
-void medDataPipeCustomSegmentationVolume::SetVolume(mafNode *volume)
+int medDataPipeCustomSegmentationVolume::SetVolume(mafNode *volume)
 //------------------------------------------------------------------------------
 {
   m_Volume = volume;
   
-  if (m_Volume == NULL)
+  if (m_Volume == NULL || !mafVME::SafeDownCast(m_Volume)->GetOutput()->GetVTKData() || !mafVME::SafeDownCast(m_Volume)->GetOutput()->GetVTKData()->IsA("vtkStructuredPoints"))
   {
-    return;
+    return MAF_ERROR;
   }
 
-  if (mafVME::SafeDownCast(m_Volume)->GetOutput()->GetVTKData() && mafVME::SafeDownCast(m_Volume)->GetOutput()->GetVTKData()->IsA("vtkRectilinearGrid"))
-  {
-    SetInput(m_RG);
-    Modified();
-  }
-  else if (mafVME::SafeDownCast(m_Volume)->GetOutput()->GetVTKData() && mafVME::SafeDownCast(m_Volume)->GetOutput()->GetVTKData()->IsA("vtkStructuredPoints"))
-  {
-    SetInput(m_SP);
-    Modified();
-  }
+  SetInput(m_SP);
+  Modified();
 
   m_ChangedAutomaticData = true;
-  m_ChangedManualData = true;
+
+  return MAF_OK;
 }
 //------------------------------------------------------------------------------
 void medDataPipeCustomSegmentationVolume::SetManualVolumeMask(mafNode *volume)
@@ -933,21 +733,13 @@ vtkDataSet *medDataPipeCustomSegmentationVolume::GetAutomaticOutput()
   mafVME *vol = mafVME::SafeDownCast(m_Volume);
   if(vol)
   {
-    vol->GetOutput()->Update();
-    vtkDataSet *volumeData = vol->GetOutput()->GetVTKData();
-    if(volumeData)
+    if (m_AutomaticSP)
     {
-      volumeData->Update();
-      if(volumeData->IsA("vtkRectilinearGrid"))
-      {
-        return m_AutomaticRG;
-      }
-      else if (volumeData->IsA("vtkImageData"))
-      {
-        return m_AutomaticSP;
-      }
+      return m_AutomaticSP;
     }
   }
+
+  return NULL;
 }
 //------------------------------------------------------------------------------
 vtkDataSet *medDataPipeCustomSegmentationVolume::GetManualOutput()
@@ -956,21 +748,13 @@ vtkDataSet *medDataPipeCustomSegmentationVolume::GetManualOutput()
   mafVME *vol = mafVME::SafeDownCast(m_Volume);
   if(vol)
   {
-    vol->GetOutput()->Update();
-    vtkDataSet *volumeData = vol->GetOutput()->GetVTKData();
-    if(volumeData)
+    if (m_ManualSP)
     {
-      volumeData->Update();
-      if(volumeData->IsA("vtkRectilinearGrid"))
-      {
-        return m_ManualRG;
-      }
-      else if (volumeData->IsA("vtkImageData"))
-      {
-        return m_ManualSP;
-      }
+      return m_ManualSP;
     }
   }
+
+  return NULL;
 }
 //------------------------------------------------------------------------------
 vtkDataSet *medDataPipeCustomSegmentationVolume::GetRefinementOutput()
@@ -979,21 +763,13 @@ vtkDataSet *medDataPipeCustomSegmentationVolume::GetRefinementOutput()
   mafVME *vol = mafVME::SafeDownCast(m_Volume);
   if(vol)
   {
-    vol->GetOutput()->Update();
-    vtkDataSet *volumeData = vol->GetOutput()->GetVTKData();
-    if(volumeData)
+    if (m_RefinementSP)
     {
-      volumeData->Update();
-      if(volumeData->IsA("vtkRectilinearGrid"))
-      {
-        return m_RefinementRG;
-      }
-      else if (volumeData->IsA("vtkImageData"))
-      {
-        return m_RefinementSP;
-      }
+      return m_RefinementSP;
     }
   }
+
+  return NULL;
 }
 //------------------------------------------------------------------------------
 vtkDataSet *medDataPipeCustomSegmentationVolume::GetRegionGrowingOutput()
@@ -1002,21 +778,13 @@ vtkDataSet *medDataPipeCustomSegmentationVolume::GetRegionGrowingOutput()
   mafVME *vol = mafVME::SafeDownCast(m_Volume);
   if(vol)
   {
-    vol->GetOutput()->Update();
-    vtkDataSet *volumeData = vol->GetOutput()->GetVTKData();
-    if(volumeData)
+    if (m_RegionGrowingSP)
     {
-      volumeData->Update();
-      if(volumeData->IsA("vtkRectilinearGrid"))
-      {
-        return m_RegionGrowingRG;
-      }
-      else if (volumeData->IsA("vtkImageData"))
-      {
-        return m_RegionGrowingSP;
-      }
+      return m_RegionGrowingSP;
     }
   }
+
+  return NULL;
 }
 //----------------------------------------------------------------------------
 bool medDataPipeCustomSegmentationVolume::CheckNumberOfThresholds()
@@ -1035,20 +803,13 @@ bool medDataPipeCustomSegmentationVolume::CheckNumberOfThresholds()
   if(vol)
   {
     vol->GetOutput()->Update();
-    vtkDataSet *volumeData = vol->GetOutput()->GetVTKData();
+    vtkStructuredPoints *volumeData = vtkStructuredPoints::SafeDownCast(vol->GetOutput()->GetVTKData());
     if(volumeData)
     {
       volumeData->Update();
 
       int volumeDimensions[3];
-      if(volumeData->IsA("vtkRectilinearGrid")) {
-        vtkRectilinearGrid *rectilinearGrid=vtkRectilinearGrid::SafeDownCast(volumeData);
-        rectilinearGrid->GetDimensions(volumeDimensions);
-      }
-      else if (volumeData->IsA("vtkStructuredPoints")) {
-        vtkStructuredPoints *sp=vtkStructuredPoints::SafeDownCast(volumeData);
-        sp->GetDimensions(volumeDimensions);
-      }
+      volumeData->GetDimensions(volumeDimensions);
 
       for (int i=0;i<volumeDimensions[2];i++)
       {
