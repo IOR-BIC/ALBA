@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUISettingsAdvanced.cpp,v $
 Language:  C++
-Date:      $Date: 2009-02-25 16:43:09 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-05-17 13:20:51 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2009
@@ -93,6 +93,20 @@ void medGUISettingsAdvanced::OnEvent(mafEventBase *maf_event)
   }
 
   m_Config->Flush();
+}
+//----------------------------------------------------------------------------
+void medGUISettingsAdvanced::SetConversionType(int conversion)
+//----------------------------------------------------------------------------
+{
+  m_ConversionUnits = conversion;
+  if (m_Config)
+  {
+  	m_Config->Write("ConversionUnits",m_ConversionUnits);
+  }
+  if (m_Gui)
+  {
+  	m_Gui->Update();
+  }
 }
 //----------------------------------------------------------------------------
 void medGUISettingsAdvanced::InitializeSettings()

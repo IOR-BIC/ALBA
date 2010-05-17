@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUISettingsAdvanced.h,v $
 Language:  C++
-Date:      $Date: 2009-06-17 13:05:30 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2010-05-17 13:20:51 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2009
@@ -85,6 +85,9 @@ public:
 
   /** Retrieve conversion unit parameter */
   int GetConversionType(){return m_ConversionUnits;};
+
+  /** Set conversion unit parameter */
+  void SetConversionType(int conversion);
 
 protected:
   /** Create the GUI for the setting panel.*/
