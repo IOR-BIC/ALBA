@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-05-18 13:34:09 $
-Version:   $Revision: 1.1.2.105 $
+Date:      $Date: 2010-05-18 14:48:37 $
+Version:   $Revision: 1.1.2.106 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -3137,6 +3137,9 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 							{
 								flipLR = vtkImageFlip::New();
 								flipLR->SetInput(rs->GetOutput());
+
+								// validated against p20 regression test data
+								// (it's the same axis as the p09 test data but  it shouldn't since it's flip left to right...)
 								flipLR->SetFilteredAxes(1);
 								flipLR->Update();
 
@@ -3154,7 +3157,10 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 							{
 								flipUD = vtkImageFlip::New();
 								flipUD->SetInput(flipLROutput);
-								flipUD->SetFilteredAxes(0);
+
+								// validated against p09 regression test data
+								// (it's the same axis as the p20 test data bu  it shouldn't since it's flip up/down...)
+								flipUD->SetFilteredAxes(1);
 								flipUD->Update();
 								flipUDOutput = flipUD->GetOutput();
 							}
