@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMESegmentationVolumeTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-05-05 08:09:22 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2010-05-18 15:49:24 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -49,11 +49,21 @@ void medVMESegmentationVolumeTest::setUp()
   m_Volume->ReparentTo(m_Storage->GetRoot());
   vtkMAFSmartPointer<vtkDataSetReader> r;
   mafString filename=MED_DATA_ROOT;
+  filename<<"/VTK_Volumes/volumeSP.vtk";
+  r->SetFileName(filename);
+  r->Update();
+  m_Volume->SetData(vtkStructuredPoints::SafeDownCast(r->GetOutput()),0.0);
+  m_Volume->Update();
+
+  m_VolumeRG = NULL;
+  mafNEW(m_VolumeRG);
+  m_VolumeRG->ReparentTo(m_Storage->GetRoot());
+  filename=MED_DATA_ROOT;
   filename<<"/VTK_Volumes/volumeRG.vtk";
   r->SetFileName(filename);
   r->Update();
-  m_Volume->SetData(vtkRectilinearGrid::SafeDownCast(r->GetOutput()),0.0);
-  m_Volume->Update();
+  m_VolumeRG->SetData(vtkRectilinearGrid::SafeDownCast(r->GetOutput()),0.0);
+  m_VolumeRG->Update();
 
   m_VolumeManualMask = NULL;
   mafNEW(m_VolumeManualMask);
@@ -62,7 +72,7 @@ void medVMESegmentationVolumeTest::setUp()
   filename<<"/VTK_Volumes/manualMask.vtk";
   r->SetFileName(filename);
   r->Update();
-  m_VolumeManualMask->SetData(vtkRectilinearGrid::SafeDownCast(r->GetOutput()),0.0);
+  m_VolumeManualMask->SetData(vtkStructuredPoints::SafeDownCast(r->GetOutput()),0.0);
   m_VolumeManualMask->Update();
 
   m_VolumeRefinementMask = NULL;
@@ -72,7 +82,7 @@ void medVMESegmentationVolumeTest::setUp()
   filename<<"/VTK_Volumes/refinementMask.vtk";
   r->SetFileName(filename);
   r->Update();
-  m_VolumeRefinementMask->SetData(vtkRectilinearGrid::SafeDownCast(r->GetOutput()),0.0);
+  m_VolumeRefinementMask->SetData(vtkStructuredPoints::SafeDownCast(r->GetOutput()),0.0);
   m_VolumeRefinementMask->Update();
 }
 //----------------------------------------------------------------------------
@@ -228,8 +238,11 @@ void medVMESegmentationVolumeTest::TestSetVolumeLink()
   mafSmartPointer<medVMESegmentationVolume> vme;
   vme->ReparentTo(m_Storage->GetRoot());
   //////////////////////////////////////////////////////////////////////////
-  vme->SetVolumeLink((mafNode*)m_Volume);
-  CPPUNIT_ASSERT( vme->GetVolumeLink() == (mafNode*)m_Volume );
+  int result = vme->SetVolumeLink((mafNode*)m_VolumeRG);
+  CPPUNIT_ASSERT( result == MAF_ERROR );
+  //////////////////////////////////////////////////////////////////////////
+  result = vme->SetVolumeLink((mafNode*)m_Volume);
+  CPPUNIT_ASSERT( result == MAF_OK  && vme->GetVolumeLink() == (mafNode*)m_Volume );
   //////////////////////////////////////////////////////////////////////////
 }
 //---------------------------------------------------------
@@ -250,15 +263,15 @@ void medVMESegmentationVolumeTest::TestAutomaticSegmentation()
   vme->GetOutput()->Update();
   vme->Update();
   CPPUNIT_ASSERT( vme->GetAutomaticOutput()->GetNumberOfPoints() == m_Volume->GetOutput()->GetVTKData()->GetNumberOfPoints() );
-  vtkRectilinearGrid *rg = vtkRectilinearGrid::SafeDownCast(vme->GetOutput()->GetVTKData());
-  rg->Update();
+  vtkStructuredPoints *sp = vtkStructuredPoints::SafeDownCast(vme->GetOutput()->GetVTKData());
+  sp->Update();
   double sr[2];
-  rg->GetScalarRange(sr);
+  sp->GetScalarRange(sr);
   CPPUNIT_ASSERT( sr[0] == 0.0 && sr[1] == 255.0 );
-  CPPUNIT_ASSERT( rg->GetNumberOfPoints() == vme->GetAutomaticOutput()->GetNumberOfPoints() );
-  for (int i=0;i<rg->GetNumberOfPoints();i++)
+  CPPUNIT_ASSERT( sp->GetNumberOfPoints() == vme->GetAutomaticOutput()->GetNumberOfPoints() );
+  for (int i=0;i<sp->GetNumberOfPoints();i++)
   {
-    CPPUNIT_ASSERT( rg->GetPointData()->GetScalars()->GetTuple1(i) == vme->GetAutomaticOutput()->GetPointData()->GetScalars()->GetTuple1(i) );
+    CPPUNIT_ASSERT( sp->GetPointData()->GetScalars()->GetTuple1(i) == vme->GetAutomaticOutput()->GetPointData()->GetScalars()->GetTuple1(i) );
   }
   //////////////////////////////////////////////////////////////////////////
 }
@@ -289,15 +302,15 @@ void medVMESegmentationVolumeTest::TestManualSegmentation()
 
   CPPUNIT_ASSERT( vme->GetAutomaticOutput()->GetNumberOfPoints() == m_Volume->GetOutput()->GetVTKData()->GetNumberOfPoints() );
   CPPUNIT_ASSERT( vme->GetManualOutput()->GetNumberOfPoints() == m_Volume->GetOutput()->GetVTKData()->GetNumberOfPoints() );
-  vtkRectilinearGrid *rg = vtkRectilinearGrid::SafeDownCast(vme->GetOutput()->GetVTKData());
-  rg->Update();
+  vtkStructuredPoints *sp = vtkStructuredPoints::SafeDownCast(vme->GetOutput()->GetVTKData());
+  sp->Update();
   double sr[2];
-  rg->GetScalarRange(sr);
+  sp->GetScalarRange(sr);
   CPPUNIT_ASSERT( sr[0] == 0.0 && sr[1] == 255.0 );
-  CPPUNIT_ASSERT( rg->GetNumberOfPoints() == vme->GetManualOutput()->GetNumberOfPoints() );
-  for (int i=0;i<rg->GetNumberOfPoints();i++)
+  CPPUNIT_ASSERT( sp->GetNumberOfPoints() == vme->GetManualOutput()->GetNumberOfPoints() );
+  for (int i=0;i<sp->GetNumberOfPoints();i++)
   {
-    CPPUNIT_ASSERT( rg->GetPointData()->GetScalars()->GetTuple1(i) == vme->GetManualOutput()->GetPointData()->GetScalars()->GetTuple1(i) );
+    CPPUNIT_ASSERT( sp->GetPointData()->GetScalars()->GetTuple1(i) == vme->GetManualOutput()->GetPointData()->GetScalars()->GetTuple1(i) );
   }
   //////////////////////////////////////////////////////////////////////////
 }
@@ -324,15 +337,15 @@ void medVMESegmentationVolumeTest::TestRefinementSegmentation()
   CPPUNIT_ASSERT( vme->GetAutomaticOutput()->GetNumberOfPoints() == m_Volume->GetOutput()->GetVTKData()->GetNumberOfPoints() );
   CPPUNIT_ASSERT( vme->GetManualOutput()->GetNumberOfPoints() == m_Volume->GetOutput()->GetVTKData()->GetNumberOfPoints() );
   CPPUNIT_ASSERT( vme->GetRefinementOutput()->GetNumberOfPoints() == m_Volume->GetOutput()->GetVTKData()->GetNumberOfPoints() );
-  vtkRectilinearGrid *rg = vtkRectilinearGrid::SafeDownCast(vme->GetOutput()->GetVTKData());
-  rg->Update();
+  vtkStructuredPoints *sp = vtkStructuredPoints::SafeDownCast(vme->GetOutput()->GetVTKData());
+  sp->Update();
   double sr[2];
-  rg->GetScalarRange(sr);
+  sp->GetScalarRange(sr);
   CPPUNIT_ASSERT( sr[0] == 0.0 && sr[1] == 255.0 );
-  CPPUNIT_ASSERT( rg->GetNumberOfPoints() == vme->GetManualOutput()->GetNumberOfPoints() );
-  for (int i=0;i<rg->GetNumberOfPoints();i++)
+  CPPUNIT_ASSERT( sp->GetNumberOfPoints() == vme->GetManualOutput()->GetNumberOfPoints() );
+  for (int i=0;i<sp->GetNumberOfPoints();i++)
   {
-    CPPUNIT_ASSERT( rg->GetPointData()->GetScalars()->GetTuple1(i) == vme->GetRefinementOutput()->GetPointData()->GetScalars()->GetTuple1(i) );
+    CPPUNIT_ASSERT( sp->GetPointData()->GetScalars()->GetTuple1(i) == vme->GetRefinementOutput()->GetPointData()->GetScalars()->GetTuple1(i) );
   }
   //////////////////////////////////////////////////////////////////////////
 }
