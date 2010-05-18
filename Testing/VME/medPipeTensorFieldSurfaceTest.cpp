@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medPipeTensorFieldSurfaceTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-05-18 09:09:34 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-05-18 14:45:27 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -132,6 +132,7 @@ void medPipeTensorFieldSurfaceTest::TestCreate()
   delete pipe;
   sceneNode->m_RenFront = NULL;
   delete sceneNode;
+  delete(rootscenenode);
 
   vtkDEL(renderWindowInteractor);
   vtkDEL(renderWindow);
@@ -140,5 +141,7 @@ void medPipeTensorFieldSurfaceTest::TestCreate()
 
   volume->ReparentTo(NULL);
   mafDEL(volume);
+
+  mafDEL(storage);
 
 }
