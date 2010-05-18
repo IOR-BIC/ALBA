@@ -46,6 +46,8 @@ ADD_EXECUTABLE(vtkMAFDataArrayDescriptorTest vtkMAFDataArrayDescriptorTest.h vtk
 ADD_TEST(vtkMAFDataArrayDescriptorTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFDataArrayDescriptorTest)
 ADD_EXECUTABLE(vtkMEDErythrocyteSourceTest vtkMEDErythrocyteSourceTest.h vtkMEDErythrocyteSourceTest.cpp)
 ADD_TEST(vtkMEDErythrocyteSourceTest ${EXECUTABLE_OUTPUT_PATH}/vtkMEDErythrocyteSourceTest)
+ADD_EXECUTABLE(vtkMAFMeshCutter_BESTest vtkMAFMeshCutter_BESTest.h vtkMAFMeshCutter_BESTest.cpp)
+ADD_TEST(vtkMAFMeshCutter_BESTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFMeshCutter_BESTest)
 
 
 # wxWidgets specific classes
