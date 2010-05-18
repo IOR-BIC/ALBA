@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewSliceGlobal.h,v $
 Language:  C++
-Date:      $Date: 2010-03-22 09:48:42 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2010-05-18 15:48:01 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2002/2004
@@ -35,7 +35,7 @@ and visualization enabled.
 class medViewSliceGlobal: public mafViewSlice
 {
 public:
-  medViewSliceGlobal(wxString label = "Slice", int camera_position = CAMERA_CT, bool show_axes = false, bool show_grid = false, bool show_ruler = false, int stereo = 0,bool showTICKs=false);
+  medViewSliceGlobal(wxString label = "Slice", int camera_position = CAMERA_CT, bool show_axes = false, bool show_grid = false, bool show_ruler = false, int stereo = 0,bool showTICKs=false,bool textureInterpolate=true);
   virtual ~medViewSliceGlobal(); 
 
   mafTypeMacro(medViewSliceGlobal, mafViewSlice);
@@ -142,6 +142,8 @@ protected:
   int m_FrameIndex;
   int m_ShowText;
   int m_TextMode;
+
+  bool m_TextureInterpolate;
 
 };
 #endif

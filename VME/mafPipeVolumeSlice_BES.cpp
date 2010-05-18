@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice_BES.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-04-20 09:51:56 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2010-05-18 15:48:38 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -120,34 +120,38 @@ mafPipeVolumeSlice_BES::mafPipeVolumeSlice_BES()
 	m_ShowSlider = true;
 	m_ShowTICKs	 = false;
   m_EnableGPU = 1;
+  m_Interpolate = true;
 }
 //----------------------------------------------------------------------------
-void mafPipeVolumeSlice_BES::InitializeSliceParameters(int direction, bool show_vol_bbox, bool show_bounds)
+void mafPipeVolumeSlice_BES::InitializeSliceParameters(int direction, bool show_vol_bbox, bool show_bounds/* =false */, bool interpolate/* =true */)
 //----------------------------------------------------------------------------
 {
   m_SliceDirection= direction;
   m_ShowVolumeBox = show_vol_bbox;
 	m_ShowBounds = show_bounds;
+  m_Interpolate = interpolate;
 }
 //----------------------------------------------------------------------------
-void mafPipeVolumeSlice_BES::InitializeSliceParameters(int direction, double slice_origin[3], bool show_vol_bbox,bool show_bounds)
+void mafPipeVolumeSlice_BES::InitializeSliceParameters(int direction, double slice_origin[3], bool show_vol_bbox,bool show_bounds/* =false */, bool interpolate/* =true */)
 //----------------------------------------------------------------------------
 {
   m_SliceParametersInitialized = true;
   m_SliceDirection= direction;
   m_ShowVolumeBox = show_vol_bbox;
 	m_ShowBounds = show_bounds;
+  m_Interpolate = interpolate;
 
   m_Origin[0] = slice_origin[0];
   m_Origin[1] = slice_origin[1];
   m_Origin[2] = slice_origin[2];
 }
 //----------------------------------------------------------------------------
-void mafPipeVolumeSlice_BES::InitializeSliceParameters(int direction, double slice_origin[3], float slice_xVect[3], float slice_yVect[3], bool show_vol_bbox,bool show_bounds)
+void mafPipeVolumeSlice_BES::InitializeSliceParameters(int direction, double slice_origin[3], float slice_xVect[3], float slice_yVect[3], bool show_vol_bbox,bool show_bounds/* =false */, bool interpolate/* =true */)
 //----------------------------------------------------------------------------
 {
   m_SliceParametersInitialized = true;
 	m_ShowBounds = show_bounds;
+  m_Interpolate = interpolate;
   
   m_SliceDirection= direction;
 	if(m_SliceDirection == SLICE_ARB)
@@ -451,7 +455,14 @@ void mafPipeVolumeSlice_BES::CreateSlice(int direction)
 
 	vtkNEW(m_Texture[direction]);
 	m_Texture[direction]->RepeatOff();
-	m_Texture[direction]->InterpolateOn();
+	if (m_Interpolate)
+	{
+		m_Texture[direction]->InterpolateOn();
+	}
+  else
+  {
+    m_Texture[direction]->InterpolateOff();
+  }
 	m_Texture[direction]->SetQualityTo32Bit();
 	m_Texture[direction]->SetInput(m_Image[direction]);
   m_Texture[direction]->SetLookupTable(m_ColorLUT);

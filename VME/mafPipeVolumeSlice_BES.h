@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice_BES.h,v $
   Language:  C++
-  Date:      $Date: 2010-04-20 12:33:55 $
-  Version:   $Revision: 1.1.2.4 $
+  Date:      $Date: 2010-05-18 15:48:38 $
+  Version:   $Revision: 1.1.2.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -78,13 +78,13 @@ public:
     SLICE_ARB
   };
   /** Initialize the slicing parameter to show the volume box and cut direction.*/
-  void InitializeSliceParameters(int direction, bool show_vol_bbox, bool show_bounds=false);
+  void InitializeSliceParameters(int direction, bool show_vol_bbox, bool show_bounds=false, bool interpolate=true);
 
   /** Initialize the slicing parameter to show the volume box, cut direction and the cut origin.*/
-  void InitializeSliceParameters(int direction, double slice_origin[3], bool show_vol_bbox,bool show_bounds=false);
+  void InitializeSliceParameters(int direction, double slice_origin[3], bool show_vol_bbox,bool show_bounds=false, bool interpolate=true);
 
   /** Initialize the slicing parameter to show the volume box, cut origin and orientation.*/
-  void InitializeSliceParameters(int direction, double slice_origin[3], float slice_xVect[3], float slice_yVect[3], bool show_vol_bbox,bool show_bounds=false);
+  void InitializeSliceParameters(int direction, double slice_origin[3], float slice_xVect[3], float slice_yVect[3], bool show_vol_bbox,bool show_bounds=false, bool interpolate=true);
   
   /** Create the VTK rendering pipeline*/
   virtual void Create(mafSceneNode *n);
@@ -197,5 +197,6 @@ protected:
 	bool										m_ShowBounds;
 	bool										m_ShowSlider;
 	bool										m_ShowTICKs;
+  bool                    m_Interpolate;
 };
 #endif // __mafPipeVolumeSlice_H__B

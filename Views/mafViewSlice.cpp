@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-05-11 15:05:49 $
-  Version:   $Revision: 1.51.2.14 $
+  Date:      $Date: 2010-05-18 15:48:01 $
+  Version:   $Revision: 1.51.2.15 $
   Authors:   Paolo Quadrani , Stefano Perticoni , Josef Kohout
 ==========================================================================
   Copyright (c) 2002/2004
@@ -69,7 +69,7 @@ mafCxxTypeMacro(mafViewSlice);
 const int LAST_SLICE_ORIGIN_VALUE_NOT_INITIALIZED = 0;
 
 //----------------------------------------------------------------------------
-mafViewSlice::mafViewSlice(wxString label, int camera_position, bool show_axes, bool show_grid, bool show_ruler, int stereo,bool showTICKs)
+mafViewSlice::mafViewSlice(wxString label /* =  */, int camera_position /* = CAMERA_CT */, bool show_axes /* = false */, bool show_grid /* = false */, bool show_ruler /* = false */, int stereo /* = 0 */,bool showTICKs/* =false */,bool textureInterpolate/* =true */)
 :mafViewVTK(label,camera_position,show_axes,show_grid, show_ruler, stereo)
 //----------------------------------------------------------------------------
 {
@@ -99,6 +99,8 @@ mafViewSlice::mafViewSlice(wxString label, int camera_position, bool show_axes, 
   // Added by Losi 11.25.2009
   m_EnableGPU=1;
 
+  m_TextureInterpolate = textureInterpolate;
+
 }
 //----------------------------------------------------------------------------
 mafViewSlice::~mafViewSlice()
@@ -116,7 +118,7 @@ mafViewSlice::~mafViewSlice()
 mafView *mafViewSlice::Copy(mafObserver *Listener)
 //----------------------------------------------------------------------------
 {
-  mafViewSlice *v = new mafViewSlice(m_Label, m_CameraPositionId, m_ShowAxes,m_ShowGrid, m_ShowRuler, m_StereoType,m_ShowVolumeTICKs);
+  mafViewSlice *v = new mafViewSlice(m_Label, m_CameraPositionId, m_ShowAxes,m_ShowGrid, m_ShowRuler, m_StereoType,m_ShowVolumeTICKs,m_TextureInterpolate);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
   v->m_PipeMap = m_PipeMap;
@@ -312,12 +314,12 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
         }
         if (m_SliceInitialized)
         {
-          ((mafPipeVolumeSlice_BES *)pipe)->InitializeSliceParameters(slice_mode, m_Slice, false);
+          ((mafPipeVolumeSlice_BES *)pipe)->InitializeSliceParameters(slice_mode, m_Slice, false,false,m_TextureInterpolate);
           ((mafPipeVolumeSlice_BES *)pipe)->SetNormal(m_SliceNormal);
         }
         else
         {
-          ((mafPipeVolumeSlice_BES *)pipe)->InitializeSliceParameters(slice_mode,false);
+          ((mafPipeVolumeSlice_BES *)pipe)->InitializeSliceParameters(slice_mode,false,false,m_TextureInterpolate);
         }
 
         if(m_ShowVolumeTICKs)

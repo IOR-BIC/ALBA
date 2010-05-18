@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.h,v $
   Language:  C++
-  Date:      $Date: 2010-04-20 09:48:13 $
-  Version:   $Revision: 1.26.2.7 $
+  Date:      $Date: 2010-05-18 15:48:01 $
+  Version:   $Revision: 1.26.2.8 $
   Authors:   Paolo Quadrani,Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -49,7 +49,7 @@ and visualization enabled.
 class mafViewSlice: public mafViewVTK
 {
 public:
-  mafViewSlice(wxString label = "Slice", int camera_position = CAMERA_CT, bool show_axes = false, bool show_grid = false, bool show_ruler = false, int stereo = 0,bool showTICKs=false);
+  mafViewSlice(wxString label = "Slice", int camera_position = CAMERA_CT, bool show_axes = false, bool show_grid = false, bool show_ruler = false, int stereo = 0,bool showTICKs=false,bool textureInterpolate=true);
   virtual ~mafViewSlice(); 
 
   mafTypeMacro(mafViewSlice, mafViewVTK);
@@ -210,5 +210,7 @@ protected:
 
   // Added by Losi 11.25.2009
   int m_EnableGPU; ///<Non-zero, if the GPU support for slicing is used (default)
+
+  bool m_TextureInterpolate;
 };
 #endif

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewSliceGlobal.cpp,v $
 Language:  C++
-Date:      $Date: 2010-03-22 09:48:41 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2010-05-18 15:48:01 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2002/2004
@@ -68,8 +68,8 @@ enum TEXT_MODE
 };
 
 //----------------------------------------------------------------------------
-medViewSliceGlobal::medViewSliceGlobal(wxString label, int camera_position, bool show_axes, bool show_grid, bool show_ruler, int stereo,bool showTICKs)
-:mafViewSlice(label,camera_position,show_axes,show_grid, show_ruler, stereo)
+medViewSliceGlobal::medViewSliceGlobal(wxString label /* =  */, int camera_position /* = CAMERA_CT */, bool show_axes /* = false */, bool show_grid /* = false */, bool show_ruler /* = false */, int stereo /* = 0 */,bool showTICKs/* =false */,bool textureInterpolate/* =true */)
+:mafViewSlice(label,camera_position,show_axes,show_grid, show_ruler, stereo,showTICKs,textureInterpolate)
 //----------------------------------------------------------------------------
 {
   m_GlobalBounds[0] = m_GlobalBounds[2] = m_GlobalBounds[4] = -1000.0;
@@ -99,6 +99,8 @@ medViewSliceGlobal::medViewSliceGlobal(wxString label, int camera_position, bool
   m_TextMode = COORDS_LABEL;
   m_ShowText = 0;
 
+  m_TextureInterpolate = textureInterpolate;
+
 }
 //----------------------------------------------------------------------------
 medViewSliceGlobal::~medViewSliceGlobal()
@@ -116,7 +118,7 @@ medViewSliceGlobal::~medViewSliceGlobal()
 mafView *medViewSliceGlobal::Copy(mafObserver *Listener)
 //----------------------------------------------------------------------------
 {
-  medViewSliceGlobal *v = new medViewSliceGlobal(m_Label, m_CameraPositionId, m_ShowAxes,m_ShowGrid, m_ShowRuler, m_StereoType,m_ShowVolumeTICKs);
+  medViewSliceGlobal *v = new medViewSliceGlobal(m_Label, m_CameraPositionId, m_ShowAxes,m_ShowGrid, m_ShowRuler, m_StereoType,m_ShowVolumeTICKs,m_TextureInterpolate);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
   v->m_PipeMap = m_PipeMap;
