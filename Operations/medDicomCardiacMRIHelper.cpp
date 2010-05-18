@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medDicomCardiacMRIHelper.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-05-18 10:17:47 $
-  Version:   $Revision: 1.1.2.13 $
+  Date:      $Date: 2010-05-18 13:34:09 $
+  Version:   $Revision: 1.1.2.14 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-05-18 10:17:47 $
-Version:   $Revision: 1.1.2.104 $
+Date:      $Date: 2010-05-18 13:34:09 $
+Version:   $Revision: 1.1.2.105 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -114,6 +114,7 @@ MafMedical is partially based on OpenMAF.
 #include "vtkShortArray.h"
 #include "vtkUnsignedShortArray.h"
 #include "vtkCharArray.h"
+#include "vtkImageFlip.h"
 
 //BES: 4.7.2009 - VS 2008 cannot compile it due to the following error
 //C:\MAF\Medical\Libraries\Offis\Sources\dcmtk-3.5.4\config\include\dcmtk/config/cfwin32.h(362) : error C2371: 'ssize_t' : redefinition; different basic types
@@ -3044,18 +3045,15 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 
 				vnl_matrix<double> flipUpDownFlag = currentHelper->GetFlipUpDownFlagIdPlaneMatrix();
 
-				bool skipFlipUpDownFlag = false;
+				bool skipFlipUpDownFlagCorrection = false;
 				if (flipUpDownFlag.rows() == 0 && flipUpDownFlag.columns() == 0)
 				{
-					skipFlipUpDownFlag = true;
+					skipFlipUpDownFlagCorrection = true;
 				}
 
-				bool skipCorrection = skipRotateFlagCorrection && skipFlipLeftRightFlagCorrection && skipFlipUpDownFlag;
+				bool skipCorrection = skipRotateFlagCorrection && skipFlipLeftRightFlagCorrection && skipFlipUpDownFlagCorrection;
 
 				
-				// TODO
-				skipCorrection = true;
-
 				if (!skipCorrection)
 				{
 					vnl_matrix<double> FileNumberForPlaneIFrameJIdPlaneMatrix = currentHelper->GetFileNumberForPlaneIFrameJIdPlaneMatrix();
@@ -3078,10 +3076,25 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 					int planesPerFrame = -1;
 					planesPerFrame = numSlicesInSeries / cardiacTimeFrames;
 
+					wxBusyInfo *wait = NULL;
+					progress = 0;
+
+					if(!this->m_TestMode)
+					{
+						wait = new wxBusyInfo("Applying Cardiac MRI correction, please wait...");
+						mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
+					}
+
 					for (int timeID = 0; timeID < cardiacTimeFrames; timeID++)
 					{
 						for (int planeID = 0; planeID < planesPerFrame ; planeID++)
-						{
+						{						
+							if(!this->m_TestMode)
+							{
+								progress = (timeID) * 100 / ((double)(cardiacTimeFrames ));
+								mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
+							}
+
 							int itemID = FileNumberForPlaneIFrameJIdPlaneMatrix(planeID, timeID); 
 
 							medDicomSlice* currentSlice = NULL;
@@ -3099,7 +3112,10 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 							vtkTransform *tr = vtkTransform::New();
 							tr->PostMultiply();
 							tr->Translate(-center[0], -center[1], -center[2]);
+
 							tr->RotateZ(rotateFlag(planeID, 0));
+
+							
 							tr->Translate(center);
 
 							vtkImageReslice *rs = vtkImageReslice::New();
@@ -3107,19 +3123,64 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 							rs->SetResliceTransform(tr);
 							rs->SetInterpolationModeToLinear();
 							rs->Update();
+							
+							bool flipUpDownCurrent = (flipUpDownFlag(planeID,0) == 1 ? true : false);
+							bool flipLeftRightCurrent  = (flipLeftRightFlag(planeID,0) == 1 ? true : false);
 
+							vtkImageFlip *flipLR = NULL;
+						
+							vtkImageFlip *flipUD = NULL;
+							
+							vtkImageData *flipLROutput = NULL;
 
+							if (flipLeftRightCurrent)
+							{
+								flipLR = vtkImageFlip::New();
+								flipLR->SetInput(rs->GetOutput());
+								flipLR->SetFilteredAxes(1);
+								flipLR->Update();
+
+								flipLROutput = flipLR->GetOutput();
+
+							}
+							else
+							{
+								flipLROutput = rs->GetOutput();
+							}
+						
+							vtkImageData *flipUDOutput = NULL;
+
+							if (flipUpDownCurrent)
+							{
+								flipUD = vtkImageFlip::New();
+								flipUD->SetInput(flipLROutput);
+								flipUD->SetFilteredAxes(0);
+								flipUD->Update();
+								flipUDOutput = flipUD->GetOutput();
+							}
+							else
+							{
+								flipUDOutput = flipLROutput;
+							}
+							
 							vtkImageData *outputBuffer = vtkImageData::New();
-							outputBuffer->DeepCopy(rs->GetOutput());
+							outputBuffer->DeepCopy(flipUDOutput);
 
 							currentSlice->SetVTKImageData(outputBuffer);
+
+							vtkDEL(flipUD);
+							vtkDEL(flipLR);
 
 							tr->Delete();
 							rs->Delete();
 							outputBuffer->Delete();
 
 						}			
-					}		
+					}
+
+					mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
+					if(wait) delete wait;
+
 				}
 			}
 		}  
