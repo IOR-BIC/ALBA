@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2010-05-17 07:17:53 $
-Version:   $Revision: 1.1.2.40 $
+Date:      $Date: 2010-05-18 10:17:47 $
+Version:   $Revision: 1.1.2.41 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -195,8 +195,8 @@ protected:
   /** Check if dicom dataset contains rotations */
   bool IsRotated( double dcmImageOrientationPatient[9] );
 	
-  /** Return the slice number from the heightId and sliceId*/
-	int GetImageId(int heightId, int timeId);
+    /** Return the slice number from the heightId and sliceId*/
+	int GetSliceIDInSeries(int heightId, int timeId);
 
 	/** Show the slice slice_num. */
 	void ShowSlice();
@@ -454,6 +454,9 @@ public:
 
 	/** Retrieve image data*/
 	vtkImageData* GetVTKImageData(){return m_Data;};
+	
+	/** Set vtkImageData */
+	void SetVTKImageData(vtkImageData *data);
 
 	/** Return the position of a slice*/
 	void GetSliceLocation(double pos[3]){pos[0]=m_Pos[0];pos[1]=m_Pos[1];pos[2]=m_Pos[2];};

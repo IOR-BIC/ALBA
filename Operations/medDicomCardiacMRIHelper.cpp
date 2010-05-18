@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medDicomCardiacMRIHelper.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-05-14 13:35:27 $
-  Version:   $Revision: 1.1.2.12 $
+  Date:      $Date: 2010-05-18 10:17:47 $
+  Version:   $Revision: 1.1.2.13 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -715,9 +715,6 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
 
     V = tmp;
 
-     
-     
-     
 
     // % compute angle between plane 1 and other planes
     for (int i = 0; i < V.rows(); i++) 
@@ -755,17 +752,14 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
       }
     }
 
-    for (int i = 0; i < id_theta.size(); i++) 
-    {
-       
-    }
-
-    if (id_theta.size() == 1)
-    {
-      // Vidx = [Vidx; V(id_theta,:)];
-    } 
+    if (id_theta.size() == 0 || id_theta.size() == 1)
+	{    
+		// id_theta.size() == 0 happens with adaro62-20090715-15853 test data   
+	} 
     else
     {
+	  double tmpi = id_theta[0];
+
       vnl_vector<double> row0 = V.get_row(id_theta[0]);
       vnl_vector<double> row1 = Vidx.get_row(0);
       vnl_vector<double> row2 = V.get_row(id_theta[1]);
@@ -776,7 +770,8 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
       tmp.set_row(2, row2);
 
       Vidx=tmp;
-    }
+    }	
+
 
     //   V(id_theta,:)=[] (START);
     vnl_matrix<double> inputMatrix = V;
@@ -796,144 +791,157 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
   //         theta(i) = acos(dot(Vidx(end,2:4),V(i,2:4)));
   //       end
 
-    while (V.rows() != 0 && V.cols() != 0)
-    {
-          for (int i = 0; i < V.rows(); i++) 
-          {
-            vnl_vector<double> v0(3,0);
-            vnl_vector<double> v1(3,0);
-            for (int j = 1; j < 4; j++) 
-            {
-              v0.put(j-1, Vidx(Vidx.rows() - 1, j));
-              v1.put(j-1, V(i, j));
-            }
-   
-            double dot = dot_product(v0,v1);
-            theta.push_back(acos(dot_product(v0,v1)));
-          }
-           
-          // id_theta = find(theta<1.1*(pi/planesPerFrame));         
-          id_theta.clear();
+	// if id_theta.size() == (0,0) skip this reordering 
+	
+	bool skip = false;
 
-          for (int i = 0; i < theta.size(); i++) 
-          {
-            if (theta[i] < 1.1 * (vnl_math::pi/planesPerFrame))
-            {
-              id_theta.push_back(i);
-            }
-          }
+	if (id_theta.size() == 0)
+	{
+		// this happens with adaro62-20090715-15853 test data
+		skip = true;	
+	}
+	
+	if (!skip)
+	{
+		while (V.rows() != 0 && V.cols() != 0)
+		{
+			for (int i = 0; i < V.rows(); i++) 
+			{
+				vnl_vector<double> v0(3,0);
+				vnl_vector<double> v1(3,0);
+				for (int j = 1; j < 4; j++) 
+				{
+				v0.put(j-1, Vidx(Vidx.rows() - 1, j));
+				v1.put(j-1, V(i, j));
+				}
+	   
+				double dot = dot_product(v0,v1);
+				theta.push_back(acos(dot_product(v0,v1)));
+			}
+	           
+			// id_theta = find(theta<1.1*(pi/planesPerFrame));         
+			id_theta.clear();
 
-          if (id_theta.size() != 0) 
-          {
+			for (int i = 0; i < theta.size(); i++) 
+			{
+				if (theta[i] < 1.1 * (vnl_math::pi/planesPerFrame))
+				{
+				id_theta.push_back(i);
+				}
+			}
 
-            //  Vidx = [Vidx; V(id_theta,:)];
-            vnl_matrix<double> tmp3(Vidx.rows() + id_theta.size(), Vidx.cols());
-            for (int i = 0; i < Vidx.rows(); i++) 
-            {
-              tmp3.set_row(i, Vidx.get_row(i));
-            }
+			if (id_theta.size() != 0) 
+			{
 
-            for (int i = Vidx.rows(); i < Vidx.rows() + id_theta.size(); i++) 
-            {
-              tmp3.set_row(i, V.get_row(id_theta[i - Vidx.rows()]));
-            }
-             
-            Vidx = tmp3;
-             
-    
-            //   V(id_theta,:)=[];
-            inputMatrix = V;
-            rowsToRemoveVector = id_theta;
-             
-            RemoveRows(inputMatrix, rowsToRemoveVector, outputMatrix);
+				//  Vidx = [Vidx; V(id_theta,:)];
+				vnl_matrix<double> tmp3(Vidx.rows() + id_theta.size(), Vidx.cols());
+				for (int i = 0; i < Vidx.rows(); i++) 
+				{
+				tmp3.set_row(i, Vidx.get_row(i));
+				}
 
-            V = outputMatrix;
-              
+				for (int i = Vidx.rows(); i < Vidx.rows() + id_theta.size(); i++) 
+				{
+				tmp3.set_row(i, V.get_row(id_theta[i - Vidx.rows()]));
+				}
+	             
+				Vidx = tmp3;
+	             
+	    
+				//   V(id_theta,:)=[];
+				inputMatrix = V;
+				rowsToRemoveVector = id_theta;
+	             
+				RemoveRows(inputMatrix, rowsToRemoveVector, outputMatrix);
 
-              
-              
-              
+				V = outputMatrix;
+	              
 
-            theta.clear();
+	              
+	              
+	              
 
-          }
-           
-  //          % compute the angle between first indexed plane and the others
-  //            for i = 1:size(V,1)
-  //              theta(i) = acos(dot(Vidx(1,2:4),V(i,2:4)));
-  //            end
-           
-          theta.clear();
-          
-          for (int i = 0; i < V.rows(); i++) 
-          {
-            vnl_vector<double> v0(3,0);
-            vnl_vector<double> v1(3,0);
-             
-            for (int j = 1; j < 4; j++) 
-            {
-              v0.put(j-1, Vidx(0, j));
-              v1.put(j-1, V(i, j));
-            }
+				theta.clear();
 
-              
-              
-            double dot = dot_product(v0,v1);
-            theta.push_back(acos(dot_product(v0,v1)));
-          }
+			}
+	           
+	//          % compute the angle between first indexed plane and the others
+	//            for i = 1:size(V,1)
+	//              theta(i) = acos(dot(Vidx(1,2:4),V(i,2:4)));
+	//            end
+	           
+			theta.clear();
+	          
+			for (int i = 0; i < V.rows(); i++) 
+			{
+				vnl_vector<double> v0(3,0);
+				vnl_vector<double> v1(3,0);
+	             
+				for (int j = 1; j < 4; j++) 
+				{
+				v0.put(j-1, Vidx(0, j));
+				v1.put(j-1, V(i, j));
+				}
 
-          //  id_theta = find(theta<1.1*(pi/planesPerFrame));
+	              
+	              
+				double dot = dot_product(v0,v1);
+				theta.push_back(acos(dot_product(v0,v1)));
+			}
 
-          for (int i = 0; i < theta.size(); i++) 
-          {
-              
-          }
-           
-          id_theta.clear();
+			//  id_theta = find(theta<1.1*(pi/planesPerFrame));
 
-          for (int i = 0; i < theta.size(); i++) 
-          {
-            if (theta[i] < 1.1 * (vnl_math::pi/planesPerFrame))
-            {
-              id_theta.push_back(i);
-            }
-          }
+			for (int i = 0; i < theta.size(); i++) 
+			{
+	              
+			}
+	           
+			id_theta.clear();
+
+			for (int i = 0; i < theta.size(); i++) 
+			{
+				if (theta[i] < 1.1 * (vnl_math::pi/planesPerFrame))
+				{
+				id_theta.push_back(i);
+				}
+			}
 
 
-          if (id_theta.size() != 0) 
-          {
-            vnl_matrix<double> tmp3(Vidx.rows() + id_theta.size(), Vidx.cols());
-             
-            int size = id_theta.size();
+			if (id_theta.size() != 0) 
+			{
+				vnl_matrix<double> tmp3(Vidx.rows() + id_theta.size(), Vidx.cols());
+	             
+				int size = id_theta.size();
 
-            for (int i = 0; i < id_theta.size(); i++) 
-            {
-              int id_theta_i = id_theta[i];
-              tmp3.set_row(i, V.get_row(id_theta[i]));
-            }
+				for (int i = 0; i < id_theta.size(); i++) 
+				{
+				int id_theta_i = id_theta[i];
+				tmp3.set_row(i, V.get_row(id_theta[i]));
+				}
 
-            for (int i = id_theta.size(); i < id_theta.size() + Vidx.rows(); i++) 
-            {
-              tmp3.set_row(i, Vidx.get_row(i-id_theta.size()));
-            }
+				for (int i = id_theta.size(); i < id_theta.size() + Vidx.rows(); i++) 
+				{
+				tmp3.set_row(i, Vidx.get_row(i-id_theta.size()));
+				}
 
-            Vidx = tmp3;
+				Vidx = tmp3;
 
-            vnl_matrix<double> inputMatrix = V;
-            vector<double> rowsToRemoveVector = id_theta;
-            vnl_matrix<double> outputMatrix;
+				vnl_matrix<double> inputMatrix = V;
+				vector<double> rowsToRemoveVector = id_theta;
+				vnl_matrix<double> outputMatrix;
 
-            RemoveRows(inputMatrix, rowsToRemoveVector, outputMatrix);
+				RemoveRows(inputMatrix, rowsToRemoveVector, outputMatrix);
 
-            V = outputMatrix;
-              
-            theta.clear();
-          }
-    }
+				V = outputMatrix;
+	              
+				theta.clear();
+			}
+		}
+	}
 
     vnl_vector<double> id_plane = Vidx.get_column(0);
 
-	// this happens with SE10 test data with orthogonal slices:
+	// this happens with SE10 test data and adaro62-20090715-15853 test data with orthogonal slices:
 	// i skip plane reordering and use default order instead
 	if (id_plane.size() != planesPerFrame)
 	{
