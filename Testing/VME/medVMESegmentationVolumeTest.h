@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMESegmentationVolumeTest.h,v $
 Language:  C++
-Date:      $Date: 2010-05-18 15:49:24 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2010-05-19 08:48:40 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -36,7 +36,7 @@ public:
 
   CPPUNIT_TEST_SUITE( medVMESegmentationVolumeTest );
   CPPUNIT_TEST( TestDynamicAllocation );
-  /*CPPUNIT_TEST( TestSetAutomaticSegmentationThresholdModality );
+  CPPUNIT_TEST( TestSetAutomaticSegmentationThresholdModality );
   CPPUNIT_TEST( TestUpdateRange );
   CPPUNIT_TEST( TestAddRange );
   CPPUNIT_TEST( TestDeleteRange );
@@ -50,7 +50,7 @@ public:
   CPPUNIT_TEST( TestAddSeed );
   CPPUNIT_TEST( TestRemoveAllSeeds );
   CPPUNIT_TEST( TestSetRegionGrowingUpperThreshold );
-  CPPUNIT_TEST( TestSetRegionGrowingLowerThreshold );*/
+  CPPUNIT_TEST( TestSetRegionGrowingLowerThreshold );
   CPPUNIT_TEST_SUITE_END();
 
 protected:

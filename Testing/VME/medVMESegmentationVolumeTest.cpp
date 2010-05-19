@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMESegmentationVolumeTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-05-18 15:49:24 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2010-05-19 08:48:40 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -92,6 +92,7 @@ void medVMESegmentationVolumeTest::tearDown()
   mafDEL(m_VolumeRefinementMask);
   mafDEL(m_VolumeManualMask);
   mafDEL(m_Volume);
+  mafDEL(m_VolumeRG);
 
   delete m_Storage;
   delete wxLog::SetActiveTarget(NULL);
@@ -209,9 +210,9 @@ void medVMESegmentationVolumeTest::TestDeleteRange()
   CPPUNIT_ASSERT(  result == MAF_OK && vme->GetNumberOfRanges() ==  1 );
   //////////////////////////////////////////////////////////////////////////
   vme->GetRange(0,startSlice,endSlice,threshold);
-  CPPUNIT_ASSERT(  startSlice == 0 && endSlice == 20 && threshold == 20.5);
-  medAttributeSegmentationVolume::SafeDownCast(vme->GetAttribute("SegmentationVolumeData"))->GetRange(1,startSlice,endSlice,threshold);
-  CPPUNIT_ASSERT(  startSlice == 0 && endSlice == 20 && threshold == 20.5);
+  CPPUNIT_ASSERT(  startSlice == 21 && endSlice == 100 && threshold == 15.0);
+  medAttributeSegmentationVolume::SafeDownCast(vme->GetAttribute("SegmentationVolumeData"))->GetRange(0,startSlice,endSlice,threshold);
+  CPPUNIT_ASSERT(  startSlice == 21 && endSlice == 100 && threshold == 15.0);
   //////////////////////////////////////////////////////////////////////////
 }
 //---------------------------------------------------------
