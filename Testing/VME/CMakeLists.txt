@@ -105,7 +105,7 @@ ADD_EXECUTABLE(medPipeSurfaceEditorTest medPipeSurfaceEditorTest.h medPipeSurfac
 ADD_TEST(medPipeSurfaceEditorTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeSurfaceEditorTest)
 
 ADD_EXECUTABLE(medPipeTensorFieldSurfaceTest medPipeTensorFieldSurfaceTest.h medPipeTensorFieldSurfaceTest.cpp)
-ADD_TEST(medPipeTensorFieldSurfaceTest  ${EXECUTABLE_OUTPUT_PATH}/medTensorFieldSurfaceTest)
+ADD_TEST(medPipeTensorFieldSurfaceTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeTensorFieldSurfaceTest)
 
 
 #to be checked
