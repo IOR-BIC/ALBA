@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-05-20 14:43:24 $
-Version:   $Revision: 1.1.2.107 $
+Date:      $Date: 2010-05-20 15:00:03 $
+Version:   $Revision: 1.1.2.108 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -1196,7 +1196,14 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 									,0.0,0.0,0.0,\
 									 0.0,0.0,0.0};
 
-			m_SelectedSeriesSlicesList->Item(m_ZCropBounds[0])->GetData()->GetDcmImageOrientationPatient(orientation);
+			
+			medDicomSlice* slice = NULL;
+						
+			slice = m_SelectedSeriesSlicesList->Item(m_ZCropBounds[0])->GetData();
+			
+			assert(slice);
+
+			slice->GetDcmImageOrientationPatient(orientation);
 
 			//transform direction cosines to be used to set vtkMatrix
 			/* [ orientation[0]  orientation[1]  orientation[2]  -dst_pos_x ] 
