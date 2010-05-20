@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2010-05-18 10:17:47 $
-Version:   $Revision: 1.1.2.41 $
+Date:      $Date: 2010-05-20 14:43:24 $
+Version:   $Revision: 1.1.2.42 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -373,42 +373,42 @@ public:
 	medDicomSlice() 
 	{
 		m_SliceABSFileName = "";
-		m_Pos[0] = -9999;
-		m_Pos[1] = -9999;
-		m_Pos[2] = -9999;
-		m_Orientation[0] = 0.0;
-		m_Orientation[1] = 0.0; 
-		m_Orientation[2] = 0.0; 
-		m_Orientation[3] = 0.0; 
-		m_Orientation[4] = 0.0; 
-		m_Orientation[5] = 0.0; 
-		m_Orientation[6] = 0.0; 
-		m_Orientation[7] = 0.0; 
-		m_Orientation[8] = 0.0; 
+		m_DcmSliceLocation[0] = -9999;
+		m_DcmSliceLocation[1] = -9999;
+		m_DcmSliceLocation[2] = -9999;
+		m_DcmImageOrientationPatient[0] = 0.0;
+		m_DcmImageOrientationPatient[1] = 0.0; 
+		m_DcmImageOrientationPatient[2] = 0.0; 
+		m_DcmImageOrientationPatient[3] = 0.0; 
+		m_DcmImageOrientationPatient[4] = 0.0; 
+		m_DcmImageOrientationPatient[5] = 0.0; 
+		m_DcmImageOrientationPatient[6] = 0.0; 
+		m_DcmImageOrientationPatient[7] = 0.0; 
+		m_DcmImageOrientationPatient[8] = 0.0; 
 		m_DcmInstanceNumber = -1;
-		m_TriggerTime = -1.0;
+		m_DcmTriggerTime = -1.0;
 		m_DcmCardiacNumberOfImages = -1;
 	};
 	/** overloaded constructor */
-	medDicomSlice(mafString filename,double coord[3], double orientation[9],\
-		vtkImageData *data ,int dcmInstanceNumber=-1, int dcmCardiacNumberOfImages=-1, double trigTime=-1.0)  
+	medDicomSlice(mafString sliceABSFilename,double dcmSliceLocation[3], double dcmImageOrientationPatient[9],\
+		vtkImageData *data ,int dcmInstanceNumber=-1, int dcmCardiacNumberOfImages=-1, double dcmTtriggerTime=-1.0)  
 	{
-		m_SliceABSFileName = filename;
-		m_Pos[0] = coord[0];
-		m_Pos[1] = coord[1];
-		m_Pos[2] = coord[2];
-		m_Orientation[0] = orientation[0];
-		m_Orientation[1] = orientation[1];
-		m_Orientation[2] = orientation[2];
-		m_Orientation[3] = orientation[3];
-		m_Orientation[4] = orientation[4];
-		m_Orientation[5] = orientation[5];
-		m_Orientation[6] = orientation[6];
-		m_Orientation[7] = orientation[7];
-		m_Orientation[8] = orientation[8];
+		m_SliceABSFileName = sliceABSFilename;
+		m_DcmSliceLocation[0] = dcmSliceLocation[0];
+		m_DcmSliceLocation[1] = dcmSliceLocation[1];
+		m_DcmSliceLocation[2] = dcmSliceLocation[2];
+		m_DcmImageOrientationPatient[0] = dcmImageOrientationPatient[0];
+		m_DcmImageOrientationPatient[1] = dcmImageOrientationPatient[1];
+		m_DcmImageOrientationPatient[2] = dcmImageOrientationPatient[2];
+		m_DcmImageOrientationPatient[3] = dcmImageOrientationPatient[3];
+		m_DcmImageOrientationPatient[4] = dcmImageOrientationPatient[4];
+		m_DcmImageOrientationPatient[5] = dcmImageOrientationPatient[5];
+		m_DcmImageOrientationPatient[6] = dcmImageOrientationPatient[6];
+		m_DcmImageOrientationPatient[7] = dcmImageOrientationPatient[7];
+		m_DcmImageOrientationPatient[8] = dcmImageOrientationPatient[8];
 		m_DcmInstanceNumber = dcmInstanceNumber;
 		m_DcmCardiacNumberOfImages = dcmCardiacNumberOfImages;
-		m_TriggerTime = trigTime;
+		m_DcmTriggerTime = dcmTtriggerTime;
 		vtkNEW(m_Data);
 		m_Data->DeepCopy(data);
 	};
@@ -416,32 +416,8 @@ public:
 	/** destructor */
 	~medDicomSlice() {vtkDEL(m_Data);};
 
-	/** Add the filename and the image coordinates to the list. */
-	void SetListElement(mafString filename,double coord[3], double orientation[9], int imageNumber=-1, int numberOfImages=-1, double trigTime=-1.0) 
-	{
-		m_SliceABSFileName = filename; 
-		m_Pos[0] = coord[0];
-		m_Pos[1] = coord[1];
-		m_Pos[2] = coord[2];
-		m_Orientation[0] = orientation[0];
-		m_Orientation[1] = orientation[1];
-		m_Orientation[2] = orientation[2];
-		m_Orientation[3] = orientation[3];
-		m_Orientation[4] = orientation[4];
-		m_Orientation[5] = orientation[5];
-		m_Orientation[6] = orientation[6];
-		m_Orientation[7] = orientation[7];
-		m_Orientation[8] = orientation[8];
-		m_DcmInstanceNumber = imageNumber;
-		m_DcmCardiacNumberOfImages = numberOfImages;
-		m_TriggerTime = trigTime;
-	};
-
 	/** Return the filename of the corresponding dicom slice. */
 	const char *GetSliceABSFileName() const {return m_SliceABSFileName.GetCStr();};
-
-	/**	Return the Coordinate along a specified axes of the dicom slice	*/
-	double	GetCoordinate(int i) const {return m_Pos[i];};
 
 	/** Return the image number of the dicom slice*/
 	int GetDcmInstanceNumber() const {return m_DcmInstanceNumber;};
@@ -450,7 +426,7 @@ public:
 	int GetDcmCardiacNumberOfImages() const {return m_DcmCardiacNumberOfImages;};
 
 	/** Return the trigger time of the dicom slice*/
-	int GetTriggerTime() const {return m_TriggerTime;};
+	int GetDcmTriggerTime() const {return m_DcmTriggerTime;};
 
 	/** Retrieve image data*/
 	vtkImageData* GetVTKImageData(){return m_Data;};
@@ -459,26 +435,26 @@ public:
 	void SetVTKImageData(vtkImageData *data);
 
 	/** Return the position of a slice*/
-	void GetSliceLocation(double pos[3]){pos[0]=m_Pos[0];pos[1]=m_Pos[1];pos[2]=m_Pos[2];};
+	void GetDcmSliceLocation(double dcmSliceLocation[3]){dcmSliceLocation[0]=m_DcmSliceLocation[0];dcmSliceLocation[1]=m_DcmSliceLocation[1];dcmSliceLocation[2]=m_DcmSliceLocation[2];};
 
 	/** Return the orientation patient of a slice*/
-	void GetSliceOrientation(double orientation[9]){
-		orientation[0]= m_Orientation[0];
-		orientation[1]= m_Orientation[1];
-		orientation[2]= m_Orientation[2];
-		orientation[3]= m_Orientation[3];
-		orientation[4]= m_Orientation[4];
-		orientation[5]= m_Orientation[5];
-		orientation[6]= m_Orientation[6];
-		orientation[7]= m_Orientation[7];
-		orientation[8]= m_Orientation[8];};
+	void GetDcmImageOrientationPatient(double dcmImageOrientationPatient[9]){
+		dcmImageOrientationPatient[0]= m_DcmImageOrientationPatient[0];
+		dcmImageOrientationPatient[1]= m_DcmImageOrientationPatient[1];
+		dcmImageOrientationPatient[2]= m_DcmImageOrientationPatient[2];
+		dcmImageOrientationPatient[3]= m_DcmImageOrientationPatient[3];
+		dcmImageOrientationPatient[4]= m_DcmImageOrientationPatient[4];
+		dcmImageOrientationPatient[5]= m_DcmImageOrientationPatient[5];
+		dcmImageOrientationPatient[6]= m_DcmImageOrientationPatient[6];
+		dcmImageOrientationPatient[7]= m_DcmImageOrientationPatient[7];
+		dcmImageOrientationPatient[8]= m_DcmImageOrientationPatient[8];};
 
 protected:
-	double m_Pos[3];
-	double m_Orientation[9];
+	double m_DcmSliceLocation[3];
+	double m_DcmImageOrientationPatient[9];
 	mafString m_SliceABSFileName;
 
-	double m_TriggerTime;
+	double m_DcmTriggerTime;
 	int m_DcmInstanceNumber;
 	int m_DcmCardiacNumberOfImages;
 

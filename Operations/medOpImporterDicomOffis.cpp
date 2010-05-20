@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-05-18 14:48:37 $
-Version:   $Revision: 1.1.2.106 $
+Date:      $Date: 2010-05-20 14:43:24 $
+Version:   $Revision: 1.1.2.107 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -374,7 +374,7 @@ void medOpImporterDicomOffis::OpRun()
 	CreateGui();
 	CreateSliceVTKPipeline();
 
-	m_Wizard = new medGUIWizard(_("DICOM IMPORTER"));
+	m_Wizard = new medGUIWizard(_("DICOM Importer"));
 	m_Wizard->SetListener(this);
 
 	CreateLoadPage();
@@ -809,7 +809,7 @@ int medOpImporterDicomOffis::BuildOutputVMEImagesFromDicomCineMRI()
 		medDicomSlice *element0;
 		element0 = (medDicomSlice *)m_SelectedSeriesSlicesList->\
 			Item(tsImageId)->GetData();
-		mafTimeStamp tsDouble = (mafTimeStamp)(element0->GetTriggerTime());
+		mafTimeStamp tsDouble = (mafTimeStamp)(element0->GetDcmTriggerTime());
 
 		for (int sourceVolumeSliceId = m_ZCropBounds[0], targetVolumeSliceId = 0; sourceVolumeSliceId < m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
 		{
@@ -995,7 +995,7 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
 	if (m_SeriesIDContainsRotationsMap[m_SelectedSeriesID] == true && m_ApplyRotation)
 	{
 		double orientation[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-		m_SelectedSeriesSlicesList->Item(m_ZCropBounds[0])->GetData()->GetSliceOrientation(orientation);
+		m_SelectedSeriesSlicesList->Item(m_ZCropBounds[0])->GetData()->GetDcmImageOrientationPatient(orientation);
 
 		//transform direction cosines to be used to set vtkMatrix
 		/* [ orientation[0]  orientation[1]  orientation[2]  -dst_pos_x ] 
@@ -1125,7 +1125,7 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 		}
 		medDicomSlice *element0;
 		element0 = (medDicomSlice *)m_SelectedSeriesSlicesList->Item(tsImageId)->GetData();
-		mafTimeStamp tsDouble = (mafTimeStamp)(element0->GetTriggerTime());
+		mafTimeStamp tsDouble = (mafTimeStamp)(element0->GetDcmTriggerTime());
 
 		for (int sourceVolumeSliceId = m_ZCropBounds[0], targetVolumeSliceId = 0; sourceVolumeSliceId < m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
 		{
@@ -1192,8 +1192,11 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 
 		if (m_SeriesIDContainsRotationsMap[m_SelectedSeriesID] == true  && m_ApplyRotation)
 		{
-			double orientation[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-			m_SelectedSeriesSlicesList->Item(m_ZCropBounds[0])->GetData()->GetSliceOrientation(orientation);
+			double orientation[9] = {0.0,0.0,0.0 \
+									,0.0,0.0,0.0,\
+									 0.0,0.0,0.0};
+
+			m_SelectedSeriesSlicesList->Item(m_ZCropBounds[0])->GetData()->GetDcmImageOrientationPatient(orientation);
 
 			//transform direction cosines to be used to set vtkMatrix
 			/* [ orientation[0]  orientation[1]  orientation[2]  -dst_pos_x ] 
@@ -1382,7 +1385,7 @@ int medOpImporterDicomOffis::BuildOutputVMEMeshFromDicom()
 	int currImageId = GetSliceIDInSeries(0, sourceVolumeSliceId);
 	medDicomSlice *element0;
 	element0 = (medDicomSlice *)m_SelectedSeriesSlicesList->Item(currImageId)->GetData();
-	mafTimeStamp tsDouble = (mafTimeStamp)(element0->GetTriggerTime());
+	mafTimeStamp tsDouble = (mafTimeStamp)(element0->GetDcmTriggerTime());
 	m_Mesh->SetData(grid, 0);
 	points->Delete();
 	grid->Delete();
@@ -1501,7 +1504,7 @@ int medOpImporterDicomOffis::BuildOutputVMEMeshFromDicomCineMRI()
 		int currImageId = GetSliceIDInSeries(ts, sourceVolumeSliceId);
 		medDicomSlice *element0;
 		element0 = (medDicomSlice *)m_SelectedSeriesSlicesList->Item(currImageId)->GetData();
-		mafTimeStamp tsDouble = (mafTimeStamp)(element0->GetTriggerTime());
+		mafTimeStamp tsDouble = (mafTimeStamp)(element0->GetDcmTriggerTime());
 		m_Mesh->SetData(grid, tsDouble);
 		points->Delete();
 		grid->Delete();
@@ -1543,7 +1546,7 @@ vtkPolyData* medOpImporterDicomOffis::ExtractPolyData(int ts, int silceId)
 	if (m_ApplyRotation)
 	{
 		double orientation[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-		m_SelectedSeriesSlicesList->Item(currImageId)->GetData()->GetSliceOrientation(orientation);
+		m_SelectedSeriesSlicesList->Item(currImageId)->GetData()->GetDcmImageOrientationPatient(orientation);
 
 		//transform direction cosines to be used to set vtkMatrix
 		/* [ orientation[0]  orientation[1]  orientation[2]  -dst_pos_x ] 
@@ -1786,14 +1789,13 @@ void medOpImporterDicomOffis::ReadDicom()
 		double item1_pos[3],item2_pos[3],d[3];
 		medDicomSlice *element1;
 		medDicomSlice *element2;
+		
 		element1 = (medDicomSlice *)m_SelectedSeriesSlicesList->Item(0)->GetData();
 		element2 = (medDicomSlice *)m_SelectedSeriesSlicesList->Item(1)->GetData();
-		item1_pos[0] = element1->GetCoordinate(0);
-		item1_pos[1] = element1->GetCoordinate(1);
-		item1_pos[2] = element1->GetCoordinate(2);
-		item2_pos[0] = element2->GetCoordinate(0);
-		item2_pos[1] = element2->GetCoordinate(1);
-		item2_pos[2] = element2->GetCoordinate(2);
+		
+		element1->GetDcmSliceLocation(item1_pos);
+		element2->GetDcmSliceLocation(item2_pos);
+		
 		d[0] = fabs(item1_pos[0] - item2_pos[0]);
 		d[1] = fabs(item1_pos[1] - item2_pos[1]);
 		d[2] = fabs(item1_pos[2] - item2_pos[2]);
@@ -3343,7 +3345,7 @@ void medOpImporterDicomOffis::GenerateSliceTexture(int imageID)
 	medDicomSlice* slice = NULL;
 	slice = m_SelectedSeriesSlicesList->Item(imageID)->GetData();
 	assert(slice);
-	slice->GetSliceLocation(loc);
+	slice->GetDcmSliceLocation(loc);
 	slice->GetVTKImageData()->Update();
 	slice->GetVTKImageData()->GetBounds(m_SliceBounds);
 
@@ -3351,7 +3353,7 @@ void medOpImporterDicomOffis::GenerateSliceTexture(int imageID)
 	m_SelectedSeriesSlicesList->Item(imageID)->GetData()->GetVTKImageData()->GetOrigin(Origin);
 
 	double orientation[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-	m_SelectedSeriesSlicesList->Item(imageID)->GetData()->GetSliceOrientation(orientation);
+	m_SelectedSeriesSlicesList->Item(imageID)->GetData()->GetDcmImageOrientationPatient(orientation);
 	m_Text.append(wxString::Format("Orientaion: %f, %f, %f, %f, %f, %f \nPosition: %f, %f, %f",orientation[0], orientation[1], orientation[2], orientation[3], orientation[4], orientation[5], Origin[0], Origin[1], Origin[2]));
 	m_TextMapper->SetInput(m_Text.c_str());
 	m_TextMapper->Modified();
@@ -3723,8 +3725,15 @@ int CompareX(const medDicomSlice **arg1,const medDicomSlice **arg2)
 {
 	// compare the x coordinate of both arguments
 	// return:
-	double x1 = (*(medDicomSlice **)arg1)->GetCoordinate(0);
-	double x2 = (*(medDicomSlice **)arg2)->GetCoordinate(0);
+
+	double loc[3] = {-9999,-9999,-9999};
+
+	(*(medDicomSlice **)arg1)->GetDcmSliceLocation(loc);
+	double x1 = loc[0];
+
+	 (*(medDicomSlice **)arg2)->GetDcmSliceLocation(loc);
+	double x2 = loc[0];
+
 	if (x1 > x2)
 		return 1;
 	if (x1 < x2)
@@ -3738,8 +3747,15 @@ int CompareY(const medDicomSlice **arg1,const medDicomSlice **arg2)
 {
 	// compare the y coordinate of both arguments
 	// return:
-	double y1 = (*(medDicomSlice **)arg1)->GetCoordinate(1);
-	double y2 = (*(medDicomSlice **)arg2)->GetCoordinate(1);
+
+	double loc[3] = {-9999,-9999,-9999};
+
+	(*(medDicomSlice **)arg1)->GetDcmSliceLocation(loc);
+	double y1 = loc[1];
+
+	(*(medDicomSlice **)arg2)->GetDcmSliceLocation(loc);
+	double y2 = loc[1];
+
 	if (y1 > y2)
 		return 1;
 	if (y1 < y2)
@@ -3753,8 +3769,16 @@ int CompareZ(const medDicomSlice **arg1,const medDicomSlice **arg2)
 {
 	// compare the z coordinate of both arguments
 	// return:
-	double z1 = (*(medDicomSlice **)arg1)->GetCoordinate(2);
-	double z2 = (*(medDicomSlice **)arg2)->GetCoordinate(2);
+
+
+	double loc[3] = {-9999,-9999,-9999};
+
+	(*(medDicomSlice **)arg1)->GetDcmSliceLocation(loc);
+	double z1 = loc[2];
+
+	(*(medDicomSlice **)arg2)->GetDcmSliceLocation(loc);
+	double z2 = loc[2];
+
 	if (z1 > z2)
 		return 1;
 	if (z1 < z2)
@@ -3768,8 +3792,8 @@ int CompareTriggerTime(const medDicomSlice **arg1,const medDicomSlice **arg2)
 {
 	// compare the trigger time of both arguments
 	// return:
-	float t1 = (*(medDicomSlice **)arg1)->GetTriggerTime();
-	float t2 = (*(medDicomSlice **)arg2)->GetTriggerTime();;
+	float t1 = (*(medDicomSlice **)arg1)->GetDcmTriggerTime();
+	float t2 = (*(medDicomSlice **)arg2)->GetDcmTriggerTime();;
 	if (t1 > t2)
 		return 1;
 	if (t1 < t2)

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medDicomCardiacMRIHelper.h,v $
   Language:  C++
-  Date:      $Date: 2010-05-14 13:35:27 $
-  Version:   $Revision: 1.1.2.7 $
+  Date:      $Date: 2010-05-20 14:43:24 $
+  Version:   $Revision: 1.1.2.8 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -22,9 +22,11 @@
 using namespace std;
 
 /** 
-Helper class for dicom cardiac images transformations handling: 
+See medOpImporterDicomOffis for an example on how to use this helper component
 
-This class is the C++/vnl conversion of some matlab code used to handle transformations in 
+Helper class for dicom cardiac series handling.
+
+This class is the C++/vnl conversion/improvement of some matlab code used to handle dicom slices time/space sequence reordering and transformations in 
 some dicom cardiac mri images from General Electric and Siemens Machines.
 
 The original script filemapp.m is copied at the end of this file and has been used to validate
@@ -94,8 +96,7 @@ public:
   /** 
   Query for dicom dir parsing results: look at the matlab script for further informations.
   This section of the documentation is work in progress since I still have to understand 
-  some rotated dicom stuff. For the moment I can only guarantee that the output of this
-  component is the same as the matlab one... */
+  some rotated dicom stuff....
 
   /** DicomLocalFileNamesVector[FileNumberForPlaneIFrameJ] == fileName for plane I frame J*/
   vector<string> GetDicomLocalFileNamesVector() {return m_DicomLocalFileNamesVector;};
@@ -105,7 +106,16 @@ public:
 
   vnl_vector<double> GetSpacingVector() {return m_Spacing;};
 
+  /** 
+  Get the file id for cardiac plane I at frame J.  I:[0, m_PlanesPerFrame - 1]   J:[0, m_TimeFrames-1] without reordering:
+  this is the dicom study/series original time/plane sequence. */
   vnl_matrix<double> GetFileNumberForPlaneIFrameJMatrix() {return m_FileNumberForPlaneIFrameJ;};
+
+  //-------------------------------------------------- 
+  //If the cardiac planes from the dicom study have the wrong order this components try to find the correct one: the following accessors will 
+  //return position, orientation, etc for the correct plane ordering I:[0, m_PlanesPerFrame - 1]   J:[0, m_TimeFrames-1]*/
+  //--------------------------------------------------
+
   vnl_matrix<double> GetFileNumberForPlaneIFrameJIdPlaneMatrix() {return m_FileNumberForPlaneIFrameJIdPlane;};
  
   vnl_matrix<double> GetPositionSingleFrameIdPlaneMatrix() {return m_PositionSingleFrameIdPlane;};

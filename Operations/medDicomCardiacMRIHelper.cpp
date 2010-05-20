@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medDicomCardiacMRIHelper.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-05-18 13:34:09 $
-  Version:   $Revision: 1.1.2.14 $
+  Date:      $Date: 2010-05-20 14:43:24 $
+  Version:   $Revision: 1.1.2.15 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -939,6 +939,7 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
 		}
 	}
 
+	// id_plane contains the new plane ordering
     vnl_vector<double> id_plane = Vidx.get_column(0);
 
 	// this happens with SE10 test data and adaro62-20090715-15853 test data with orthogonal slices:
