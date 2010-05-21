@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2010-03-16 08:55:35 $
-Version:   $Revision: 1.7.2.10 $
+Date:      $Date: 2010-05-21 14:40:57 $
+Version:   $Revision: 1.7.2.11 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -35,17 +35,17 @@ mafGUISettings(Listener, label)
 	m_CheckOnOff[0] = m_CheckOnOff[1] = m_CheckOnOff[2] = m_CheckOnOff[3] = m_CheckOnOff[4] = m_CheckOnOff[5] = true;
 
 	m_AutoCropPos = FALSE;
-	m_EnableNumberOfSlice = true;
-	m_EnableNumberOfTime = true; 
+	m_EnableNumberOfSlice = TRUE;
+	m_EnableNumberOfTime = TRUE; 
   m_EnableChangeSide = FALSE;
   m_EnableDiscardPosition = FALSE;
   m_EnableResampleVolume = FALSE;
   m_EnableRescaleTo16Bit = FALSE;
-  m_VisualizePosition = false;
-  m_EnableZCrop =  true;
-  m_AutoVMEType = false;
-  m_PercentageTolerance = false;
-  m_ScalarTolerance = false;
+  m_VisualizePosition = FALSE;
+  m_EnableZCrop =  TRUE;
+  m_AutoVMEType = FALSE;
+  m_PercentageTolerance = FALSE;
+  m_ScalarTolerance = FALSE;
   m_OutputType = 0;
   m_ScalarDistanceTolerance = 0.3;
   m_PercentageDistanceTolerance = 88;
@@ -108,11 +108,14 @@ void medGUIDicomSettings::EnableItems()
 //----------------------------------------------------------------------------
 {
 	//m_Gui->Enable(ID_DICTONARY,true); Remove dictionary selection (Losi 25.11.2009)
-  m_Gui->Enable(ID_SETTING_VME_TYPE,m_AutoVMEType);
-
-   m_Gui->Enable(ID_SCALAR_TOLERANCE,m_ScalarTolerance);
-   m_Gui->Enable(ID_PERCENTAGE_TOLERANCE,m_PercentageTolerance);
-   m_Gui->Update();
+  if (m_Gui)
+  {
+	  m_Gui->Enable(ID_SETTING_VME_TYPE,m_AutoVMEType);
+	
+	  m_Gui->Enable(ID_SCALAR_TOLERANCE,m_ScalarTolerance);
+	  m_Gui->Enable(ID_PERCENTAGE_TOLERANCE,m_PercentageTolerance);
+	  m_Gui->Update();
+  }
 }
 //----------------------------------------------------------------------------
 void medGUIDicomSettings::OnEvent(mafEventBase *maf_event)
@@ -200,7 +203,8 @@ void medGUIDicomSettings::OnEvent(mafEventBase *maf_event)
   case ID_SCALAR_DISTANCE_TOLERANCE:
     {
       m_Config->Write("EnableScalarDistance",m_ScalarTolerance);
-      m_PercentageTolerance = false;
+      m_PercentageTolerance = FALSE;
+      m_Config->Write("EnablePercentageDistance",m_PercentageTolerance);
     }
     break;
   case ID_SCALAR_TOLERANCE:
@@ -211,7 +215,8 @@ void medGUIDicomSettings::OnEvent(mafEventBase *maf_event)
   case ID_PERCENTAGE_DISTANCE_TOLERANCE:
     {
       m_Config->Write("EnablePercentageDistance",m_PercentageTolerance);
-      m_ScalarTolerance = false;
+      m_ScalarTolerance = FALSE;
+      m_Config->Write("EnableScalarDistance",m_ScalarTolerance);
     }
     break;
   case ID_PERCENTAGE_TOLERANCE:
@@ -272,11 +277,11 @@ void medGUIDicomSettings::InitializeSettings()
 
   if(m_Config->Read("EnableVisualizationPosition", &long_item))
   {
-    m_EnableRescaleTo16Bit=long_item;
+    m_VisualizePosition=long_item;
   }
   else
   {
-    m_Config->Write("EnableVisualizationPosition",m_EnableRescaleTo16Bit);
+    m_Config->Write("EnableVisualizationPosition",m_VisualizePosition);
   }
 
   if(m_Config->Read("EnableZCrop", &long_item))
