@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettingsTest.h,v $
 Language:  C++
-Date:      $Date: 2010-05-21 14:41:38 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-05-24 09:48:02 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -51,6 +51,7 @@ public:
   CPPUNIT_TEST( TestGetPercentageTolerance );
   CPPUNIT_TEST( TestAutoVMEType );
   CPPUNIT_TEST( TestGetVMEType );
+  CPPUNIT_TEST( TestEnableToRead );
   CPPUNIT_TEST_SUITE_END();
 
 protected:
@@ -72,6 +73,7 @@ protected:
   void TestGetPercentageTolerance();
   void TestAutoVMEType();
   void TestGetVMEType();
+  void TestEnableToRead();
 
   bool m_Result;
 

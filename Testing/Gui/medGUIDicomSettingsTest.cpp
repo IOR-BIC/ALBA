@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettingsTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-05-21 14:41:38 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-05-24 09:48:02 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -971,6 +971,92 @@ void medGUIDicomSettingsTest::TestGetVMEType()
   config->Read("VMEType",&vmeType);
   m_Result = vmeType == 0;
 
+  TEST_RESULT;
+  //////////////////////////////////////////////////////////////////////////
+
+  cppDEL(config);
+  cppDEL(settings);
+}
+//---------------------------------------------------------
+void medGUIDicomSettingsTest::TestEnableToRead()
+//---------------------------------------------------------
+{
+  medGUIDicomSettings *settings = new medGUIDicomSettings(NULL,"test");
+  wxConfig *config = new wxConfig(wxEmptyString);
+  config->SetPath("Importer Dicom");
+
+  //////////////////////////////////////////////////////////////////////////
+  //Test default value
+  //////////////////////////////////////////////////////////////////////////
+  m_Result = settings->EnableToRead("CT");
+  TEST_RESULT;
+  m_Result = settings->EnableToRead("CR");
+  TEST_RESULT;
+  m_Result = settings->EnableToRead("OT");
+  TEST_RESULT;
+  m_Result = settings->EnableToRead("XA");
+  TEST_RESULT;
+  m_Result = settings->EnableToRead("MR");
+  TEST_RESULT;
+  m_Result = settings->EnableToRead("SC");
+  TEST_RESULT;
+  //////////////////////////////////////////////////////////////////////////
+  //Test read value
+  //////////////////////////////////////////////////////////////////////////
+  config->Write("EnableReadCT",FALSE);
+  settings->InitializeSettings();
+  m_Result = !settings->EnableToRead("CT");
+  TEST_RESULT;
+
+  config->Write("EnableReadCR",FALSE);
+  settings->InitializeSettings();
+  m_Result = !settings->EnableToRead("CR");
+  TEST_RESULT;
+
+  config->Write("EnableReadOT",FALSE);
+  settings->InitializeSettings();
+  m_Result = !settings->EnableToRead("OT");
+  TEST_RESULT;
+
+  config->Write("EnableReadXA",FALSE);
+  settings->InitializeSettings();
+  m_Result = !settings->EnableToRead("XA");
+  TEST_RESULT;
+
+  config->Write("EnableReadMI",FALSE);
+  settings->InitializeSettings();
+  m_Result = !settings->EnableToRead("MR");
+  TEST_RESULT;
+
+  config->Write("EnableReadSC",FALSE);
+  settings->InitializeSettings();
+  m_Result = !settings->EnableToRead("SC");
+  TEST_RESULT;
+  //////////////////////////////////////////////////////////////////////////
+  //Test write value
+  //////////////////////////////////////////////////////////////////////////
+  settings->SetEnableToRead("CT",true);
+  config->Read("EnableReadCT",&m_Result);
+  TEST_RESULT;
+
+  settings->SetEnableToRead("CR",true);
+  config->Read("EnableReadCR",&m_Result);
+  TEST_RESULT;
+
+  settings->SetEnableToRead("OT",true);
+  config->Read("EnableReadOT",&m_Result);
+  TEST_RESULT;
+
+  settings->SetEnableToRead("XA",true);
+  config->Read("EnableReadXA",&m_Result);
+  TEST_RESULT;
+
+  settings->SetEnableToRead("MR",true);
+  config->Read("EnableReadMI",&m_Result);
+  TEST_RESULT;
+
+  settings->SetEnableToRead("SC",true);
+  config->Read("EnableReadSC",&m_Result);
   TEST_RESULT;
   //////////////////////////////////////////////////////////////////////////
 
