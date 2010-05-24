@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.h,v $
 Language:  C++
-Date:      $Date: 2010-05-21 14:40:57 $
-Version:   $Revision: 1.5.2.11 $
+Date:      $Date: 2010-05-24 09:47:40 $
+Version:   $Revision: 1.5.2.12 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -142,6 +142,9 @@ public:
 
 	/** Return if a particular type of Dicom is Enabled to be read */
 	bool EnableToRead(char* type);
+
+  /** Enable/disable a particular type of Dicom to be read */
+  void SetEnableToRead(char *type,bool enable);
 
 protected:
 	/** Create the GUI for the setting panel.*/

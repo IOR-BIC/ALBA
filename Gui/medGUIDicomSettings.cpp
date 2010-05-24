@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2010-05-21 14:40:57 $
-Version:   $Revision: 1.7.2.11 $
+Date:      $Date: 2010-05-24 09:47:40 $
+Version:   $Revision: 1.7.2.12 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -131,11 +131,19 @@ void medGUIDicomSettings::OnEvent(mafEventBase *maf_event)
 // 		break;
 	case ID_TYPE_DICOM:
 		{
+      m_CheckOnOff[ID_CT_MODALITY] = m_DicomModalityListBox->IsItemChecked(ID_CT_MODALITY);
+      m_CheckOnOff[ID_SC_MODALITY] = m_DicomModalityListBox->IsItemChecked(ID_SC_MODALITY);
+      m_CheckOnOff[ID_MRI_MODALITY] = m_DicomModalityListBox->IsItemChecked(ID_MRI_MODALITY);
+      m_CheckOnOff[ID_XA_MODALITY] = m_DicomModalityListBox->IsItemChecked(ID_XA_MODALITY);
+      m_CheckOnOff[ID_CR_MODALITY] = m_DicomModalityListBox->IsItemChecked(ID_CR_MODALITY);
+      m_CheckOnOff[ID_OT_MODALITY] = m_DicomModalityListBox->IsItemChecked(ID_OT_MODALITY);
+
 			m_Config->Write("EnableReadCT",m_DicomModalityListBox->IsItemChecked(ID_CT_MODALITY));
 			m_Config->Write("EnableReadSC",m_DicomModalityListBox->IsItemChecked(ID_SC_MODALITY));
 			m_Config->Write("EnableReadMI",m_DicomModalityListBox->IsItemChecked(ID_MRI_MODALITY));
 			m_Config->Write("EnableReadXA",m_DicomModalityListBox->IsItemChecked(ID_XA_MODALITY));
       m_Config->Write("EnableReadCR",m_DicomModalityListBox->IsItemChecked(ID_CR_MODALITY));
+      m_Config->Write("EnableReadOT",m_DicomModalityListBox->IsItemChecked(ID_OT_MODALITY));
 		}
 		break;
 	case ID_AUTO_POS_CROP:
@@ -451,33 +459,102 @@ void medGUIDicomSettings::InitializeSettings()
 	m_Config->Flush();
 }
 //----------------------------------------------------------------------------
+void medGUIDicomSettings::SetEnableToRead(char* type,bool enable)
+//----------------------------------------------------------------------------
+{
+  if (strcmp( type, "SC" ) == 0)
+  {
+    m_CheckOnOff[ID_SC_MODALITY] = enable;
+    m_Config->Write("EnableReadSC",m_CheckOnOff[ID_SC_MODALITY]);
+  }
+  if (strcmp( type, "CT" ) == 0)
+  {
+    m_CheckOnOff[ID_CT_MODALITY] = enable;
+    m_Config->Write("EnableReadCT",m_CheckOnOff[ID_CT_MODALITY]);
+  }
+  if (strcmp( type, "XA" ) == 0)
+  {
+    m_CheckOnOff[ID_XA_MODALITY] = enable;
+    m_Config->Write("EnableReadXA",m_CheckOnOff[ID_XA_MODALITY]);
+  }
+  if (strcmp( type, "MR" ) == 0)
+  {
+    m_CheckOnOff[ID_MRI_MODALITY] = enable;
+    m_Config->Write("EnableReadMI",m_CheckOnOff[ID_MRI_MODALITY]);
+  }
+  if (strcmp( type, "OT" ) == 0)
+  {	
+    m_CheckOnOff[ID_OT_MODALITY] = enable;
+    m_Config->Write("EnableReadOT",m_CheckOnOff[ID_OT_MODALITY]);
+  }
+  if (strcmp( type, "CR" ) == 0)
+  {	
+    m_CheckOnOff[ID_CR_MODALITY] = enable;
+    m_Config->Write("EnableReadCR",m_CheckOnOff[ID_CR_MODALITY]);
+  }
+  
+  InitializeSettings();
+}
+//----------------------------------------------------------------------------
 bool medGUIDicomSettings::EnableToRead(char* type)
 //----------------------------------------------------------------------------
 {
-	if (strcmp( type, "SC" ) == 0 && m_DicomModalityListBox->IsItemChecked(ID_SC_MODALITY))
+	if (m_Gui)
 	{
-		return true;
+		if (strcmp( type, "SC" ) == 0 && m_DicomModalityListBox->IsItemChecked(ID_SC_MODALITY))
+		{
+			return true;
+		}
+		if (strcmp( type, "CT" ) == 0 && m_DicomModalityListBox->IsItemChecked(ID_CT_MODALITY))
+		{
+			return true;
+		}
+		if (strcmp( type, "XA" ) == 0 && m_DicomModalityListBox->IsItemChecked(ID_XA_MODALITY))
+		{
+			return true;
+		}
+		if (strcmp( type, "MR" ) == 0 && (m_DicomModalityListBox->IsItemChecked(ID_MRI_MODALITY)||m_DicomModalityListBox->IsItemChecked(ID_CMRI_MODALITY)))
+		{	
+			return true;
+		}
+	  if (strcmp( type, "OT" ) == 0 && (m_DicomModalityListBox->IsItemChecked(ID_OT_MODALITY)))
+	  {	
+	    return true;
+	  }
+	  if (strcmp( type, "CR" ) == 0 && (m_DicomModalityListBox->IsItemChecked(ID_CR_MODALITY)))
+	  {	
+	    return true;
+	  }
+	
+		return false;
 	}
-	if (strcmp( type, "CT" ) == 0 && m_DicomModalityListBox->IsItemChecked(ID_CT_MODALITY))
-	{
-		return true;
-	}
-	if (strcmp( type, "XA" ) == 0 && m_DicomModalityListBox->IsItemChecked(ID_XA_MODALITY))
-	{
-		return true;
-	}
-	if (strcmp( type, "MR" ) == 0 && (m_DicomModalityListBox->IsItemChecked(ID_MRI_MODALITY)||m_DicomModalityListBox->IsItemChecked(ID_CMRI_MODALITY)))
-	{	
-		return true;
-	}
-  if (strcmp( type, "OT" ) == 0 && (m_DicomModalityListBox->IsItemChecked(ID_OT_MODALITY)))
-  {	
-    return true;
-  }
-  if (strcmp( type, "CR" ) == 0 && (m_DicomModalityListBox->IsItemChecked(ID_CR_MODALITY)))
-  {	
-    return true;
-  }
+  else//For test mode
+  {
+    if (strcmp( type, "SC" ) == 0 && m_CheckOnOff[ID_SC_MODALITY])
+    {
+      return true;
+    }
+    if (strcmp( type, "CT" ) == 0 && m_CheckOnOff[ID_CT_MODALITY])
+    {
+      return true;
+    }
+    if (strcmp( type, "XA" ) == 0 && m_CheckOnOff[ID_XA_MODALITY])
+    {
+      return true;
+    }
+    if (strcmp( type, "MR" ) == 0 && m_CheckOnOff[ID_MRI_MODALITY])
+    {	
+      return true;
+    }
+    if (strcmp( type, "OT" ) == 0 && m_CheckOnOff[ID_OT_MODALITY])
+    {	
+      return true;
+    }
+    if (strcmp( type, "CR" ) == 0 && m_CheckOnOff[ID_CR_MODALITY])
+    {	
+      return true;
+    }
 
-	return false;
+    return false;
+  }
 }
