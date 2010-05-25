@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.h,v $
   Language:  C++
-  Date:      $Date: 2010-05-18 15:48:01 $
-  Version:   $Revision: 1.26.2.8 $
+  Date:      $Date: 2010-05-25 13:05:15 $
+  Version:   $Revision: 1.26.2.9 $
   Authors:   Paolo Quadrani,Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -177,6 +177,8 @@ public:
   virtual void CameraUpdate();
 
   void SetEnableGPU(int enable){m_EnableGPU = enable;};
+
+  void SetTextureInterpolate(bool interpolate) {m_TextureInterpolate = interpolate;};
 
 protected:
   virtual mafGUI *CreateGui();
