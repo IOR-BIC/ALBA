@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-05-20 15:00:03 $
-Version:   $Revision: 1.1.2.108 $
+Date:      $Date: 2010-05-25 13:17:53 $
+Version:   $Revision: 1.1.2.109 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -994,7 +994,7 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
 
 	if (m_SeriesIDContainsRotationsMap[m_SelectedSeriesID] == true && m_ApplyRotation)
 	{
-		double orientation[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+		double orientation[6] = {0.0,0.0,0.0,0.0,0.0,0.0};
 		m_SelectedSeriesSlicesList->Item(m_ZCropBounds[0])->GetData()->GetDcmImageOrientationPatient(orientation);
 
 		//transform direction cosines to be used to set vtkMatrix
@@ -1205,30 +1205,37 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 
 			slice->GetDcmImageOrientationPatient(orientation);
 
-			//transform direction cosines to be used to set vtkMatrix
-			/* [ orientation[0]  orientation[1]  orientation[2]  -dst_pos_x ] 
-			[ orientation[3]  orientation[4]  orientation[5]  -dst_pos_y ]
-			[ dst_nrm_dircos_x  dst_nrm_dircos_y  dst_nrm_dircos_z  -dst_pos_z ]
-			[ 0                 0                 0                 1          ]*/
+			double Vx0 = orientation[0];
+			double Vx1 = orientation[1];
+			double Vx2 = orientation[2];
 
-			double dst_nrm_dircos_x = orientation[1] * orientation[5] - orientation[2] * orientation[4]; 
-			double dst_nrm_dircos_y = orientation[2] * orientation[2] - orientation[0] * orientation[5]; 
-			double dst_nrm_dircos_z = orientation[0] * orientation[4] - orientation[1] * orientation[3]; 
+			double Vy0 = orientation[3];
+			double Vy1 = orientation[4];
+			double Vy2 = orientation[5];
+
+			double Vz0 = Vx1 * Vy2 - Vx2 * Vy1;
+			double Vz1 = Vx2 * Vy0 - Vx0 * Vy2;
+			double Vz2 = Vx0 * Vy1 - Vx1 * Vy0;
 
 			vtkMatrix4x4 *mat = vtkMatrix4x4::New();
 			mat->Identity();
-			mat->SetElement(0,0,orientation[0]);
-			mat->SetElement(1,0,orientation[3]);
-			mat->SetElement(2,0,dst_nrm_dircos_x);
+			
+			mat->SetElement(0,0,Vx0);
+			mat->SetElement(1,0,Vx1);
+			mat->SetElement(2,0,Vx2);
 			mat->SetElement(3,0,0);
-			mat->SetElement(0,1,orientation[1]);
-			mat->SetElement(1,1,orientation[4]);
-			mat->SetElement(2,1,dst_nrm_dircos_y);
+
+			mat->SetElement(0,1,Vy0);
+			mat->SetElement(1,1,Vy1);			
+			mat->SetElement(2,1,Vy2);
 			mat->SetElement(3,1,0);
-			mat->SetElement(0,2,orientation[2]);
-			mat->SetElement(1,2,orientation[5]);
-			mat->SetElement(2,2,dst_nrm_dircos_z);
+
+			mat->SetElement(0,2,Vz0);
+			mat->SetElement(1,2,Vz1);
+			mat->SetElement(2,2,Vz2);
 			mat->SetElement(3,2,0);
+
+			//slice->GetDcmSliceLocation()
 			mat->SetElement(3,3,1);
 
 			mafSmartPointer<mafTransform> boxPose;
@@ -1800,8 +1807,8 @@ void medOpImporterDicomOffis::ReadDicom()
 		element1 = (medDicomSlice *)m_SelectedSeriesSlicesList->Item(0)->GetData();
 		element2 = (medDicomSlice *)m_SelectedSeriesSlicesList->Item(1)->GetData();
 		
-		element1->GetDcmSliceLocation(item1_pos);
-		element2->GetDcmSliceLocation(item2_pos);
+		element1->GetDcmImagePositionPatient(item1_pos);
+		element2->GetDcmImagePositionPatient(item2_pos);
 		
 		d[0] = fabs(item1_pos[0] - item2_pos[0]);
 		d[1] = fabs(item1_pos[1] - item2_pos[1]);
@@ -1879,8 +1886,9 @@ void medOpImporterDicomOffis::ReadDicom()
 	const char* p_name;
 	double p_id = 0;
 
-	bool position = m_TagArray->IsTagPresent("PatientsName");
-	if (position)
+	bool PatientsNameTagIsPresent = false;
+	PatientsNameTagIsPresent = m_TagArray->IsTagPresent("PatientsName");
+	if (PatientsNameTagIsPresent)
 	{
 		patient_name = m_TagArray->GetTag("PatientsName");
 		p_name = patient_name->GetValue();
@@ -1888,8 +1896,9 @@ void medOpImporterDicomOffis::ReadDicom()
 	else 
 		p_name = NULL;
 
-	position = m_TagArray->IsTagPresent("PatientID");
-	if (position)
+	bool PatientIDTagIsPresent = false;
+	PatientIDTagIsPresent = m_TagArray->IsTagPresent("PatientID");
+	if (PatientIDTagIsPresent)
 	{
 		patient_id = m_TagArray->GetTag("PatientID");
 		p_id = patient_id->GetValueAsDouble();
@@ -2293,12 +2302,11 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 
 	long progress;
 	int sliceNum = -1;
-	double dcmSliceLocation[3];
 	double lastZPos = 0;
 	long int dcmInstanceNumber = -1;
 	long int dcmCardiacNumberOfImages = -1;
 	double dcmTriggerTime = -1.0;
-	double dcmImageOrientationPatient[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+	double dcmImageOrientationPatient[6] = {0.0,0.0,0.0,0.0,0.0,0.0};
 	double dcmImagePositionPatient[3] = {0.0,0.0,0.0};
 	bool enableToRead = true; //true for test mode
 	bool errorOccurred = false;
@@ -2686,29 +2694,29 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 					medDicomSeriesSliceList *dicomSeries = new medDicomSeriesSliceList;
 					m_DicomReaderModality=-1;
 
-					if(dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[2]).bad())
+					if(dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[2]).bad())
 					{
-						//Unable to get element: DCM_SliceLocation;
-						dcmSliceLocation[0] = dcmImagePositionPatient[0];
-						dcmSliceLocation[1] = dcmImagePositionPatient[1];
-						dcmSliceLocation[2] = dcmImagePositionPatient[2];
+						std::ostringstream stringStream;
+						stringStream << "Cannot read dicom tag DCM_ImagePositionPatient. Exiting"<< std::endl;          
+						mafLogMessage(stringStream.str().c_str());
+						return false;
 					} 
 					else
 					{
-						dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[2],0);
-						dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[1],1);
-						dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[0],2);
+						dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[0],0);
+						dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[1],1);
+						dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[2],2);
 					}
 
-					lastZPos = dcmSliceLocation[2];
-					dicomSliceVTKImageData->SetOrigin(dcmSliceLocation);
+					lastZPos = dcmImagePositionPatient[2];
+					dicomSliceVTKImageData->SetOrigin(dcmImagePositionPatient);
 					dicomSliceVTKImageData->Update();
 
 					seriesName.Append(wxString::Format("%i_%ix%i",seriesCounter, dcmRows, dcmColumns));
 					seriesId.push_back(seriesName);
 
 					dicomSeries->Append(new medDicomSlice\
-						(m_CurrentSliceABSFileName,dcmSliceLocation, dcmImageOrientationPatient, \
+						(m_CurrentSliceABSFileName,dcmImagePositionPatient, dcmImageOrientationPatient, \
 						dicomSliceVTKImageData));
 
 					m_SeriesIDToSlicesListMap.insert\
@@ -2729,29 +2737,29 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 						m_SeriesIDContainsRotationsMap[seriesId] = true;
 					}
 
-					if(dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[2]).bad())
+					if(dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[2]).bad())
 					{
-						//Unable to get element: DCM_SliceLocation;
-						dcmSliceLocation[0] = dcmImagePositionPatient[0];
-						dcmSliceLocation[1] = dcmImagePositionPatient[1];
-						dcmSliceLocation[2] = dcmImagePositionPatient[2];
+						std::ostringstream stringStream;
+						stringStream << "Cannot read dicom tag DCM_ImagePositionPatient. Exiting"<< std::endl;          
+						mafLogMessage(stringStream.str().c_str());
+						return false;
 					} 
 					else
 					{
-						dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[2],0);
-						dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[1],1);
-						dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[0],2);
+						dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[0],0);
+						dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[1],1);
+						dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[2],2);
 					}
 
-					dicomSliceVTKImageData->SetOrigin(dcmSliceLocation);
+					dicomSliceVTKImageData->SetOrigin(dcmImagePositionPatient);
 					dicomSliceVTKImageData->Update();
 
 					if  (sliceNum > 1)
 					{
-						double distancePercentage = ((lastDistance - (fabs(lastZPos - dcmSliceLocation[2])))*100)/lastDistance;
+						double distancePercentage = ((lastDistance - (fabs(lastZPos - dcmImagePositionPatient[2])))*100)/lastDistance;
 
 						// Check if slices are under tolerance distance
-						if ((enableScalarTolerance && (fabs(lastZPos - dcmSliceLocation[2]) < scalarTolerance)) || (enablePercentageTolerance) && (distancePercentage > percentageTolerance))
+						if ((enableScalarTolerance && (fabs(lastZPos - dcmImagePositionPatient[2]) < scalarTolerance)) || (enablePercentageTolerance) && (distancePercentage > percentageTolerance))
 						{
 							wxLogMessage(wxString::Format("Warning: file <%s> and <%s> are under distance tolerance.",currentSliceABSFileName.GetCStr(),lastFileName.GetCStr()));
 							int answer = wxMessageBox(wxString::Format("Found 2 slices under distance tolerance. Please check the log area for details. Continue?"),"Warning!!", wxYES_NO, NULL);
@@ -2767,15 +2775,15 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 						}
 						else
 						{
-							lastDistance = fabs(lastZPos - dcmSliceLocation[2]);
+							lastDistance = fabs(lastZPos - dcmImagePositionPatient[2]);
 						}           
 					}
 
-					lastZPos = dcmSliceLocation[2];
+					lastZPos = dcmImagePositionPatient[2];
 
 
 					m_SeriesIDToSlicesListMap[seriesId]->Append(\
-						new medDicomSlice(m_CurrentSliceABSFileName,dcmSliceLocation, \
+						new medDicomSlice(m_CurrentSliceABSFileName,dcmImagePositionPatient, \
 						dcmImageOrientationPatient, dicomSliceVTKImageData));
 
 
@@ -2825,27 +2833,27 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 
 					m_DicomReaderModality=-1;
 
-					if(dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[2]).bad())
+					if(dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[2]).bad())
 					{
-						//Unable to get element: DCM_SliceLocation;
-						dcmSliceLocation[0] = dcmImagePositionPatient[0];
-						dcmSliceLocation[1] = dcmImagePositionPatient[1];
-						dcmSliceLocation[2] = dcmImagePositionPatient[2];
+						std::ostringstream stringStream;
+						stringStream << "Cannot read dicom tag DCM_ImagePositionPatient. Exiting"<< std::endl;          
+						mafLogMessage(stringStream.str().c_str());
+						return false;
 					} 
 					else
 					{
-						dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[2],0);
-						dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[1],1);
-						dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[0],2);
+						dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[0],0);
+						dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[1],1);
+						dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[2],2);
 					}
 
-					dicomSliceVTKImageData->SetOrigin(dcmSliceLocation);
+					dicomSliceVTKImageData->SetOrigin(dcmImagePositionPatient);
 					dicomSliceVTKImageData->Update();
 
 					dicomDataset->findAndGetLongInt(DCM_InstanceNumber,dcmInstanceNumber);
 					dicomDataset->findAndGetLongInt(DCM_CardiacNumberOfImages,dcmCardiacNumberOfImages);
 					dicomDataset->findAndGetFloat64(DCM_TriggerTime,dcmTriggerTime);
-					lastZPos = dcmSliceLocation[2];
+					lastZPos = dcmImagePositionPatient[2];
 
 					if(dcmCardiacNumberOfImages>1)
 					{
@@ -2882,7 +2890,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 					seriesId.push_back(seriesName);
 
 					dicomSeries->Append(new medDicomSlice\
-						(m_CurrentSliceABSFileName,dcmSliceLocation, dcmImageOrientationPatient, \
+						(m_CurrentSliceABSFileName,dcmImagePositionPatient, dcmImageOrientationPatient, \
 						dicomSliceVTKImageData, dcmInstanceNumber, dcmCardiacNumberOfImages, dcmTriggerTime));
 
 					m_SeriesIDToSlicesListMap.insert\
@@ -2903,21 +2911,21 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 						m_SeriesIDContainsRotationsMap[seriesId] = true;
 					}
 
-					if(dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[2]).bad())
+					if(dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[2]).bad())
 					{
-						//Unable to get element: DCM_SliceLocation;
-						dcmSliceLocation[0] = dcmImagePositionPatient[0];
-						dcmSliceLocation[1] = dcmImagePositionPatient[1];
-						dcmSliceLocation[2] = dcmImagePositionPatient[2];
+						std::ostringstream stringStream;
+						stringStream << "Cannot read dicom tag DCM_ImagePositionPatient. Exiting"<< std::endl;          
+						mafLogMessage(stringStream.str().c_str());
+						return false;
 					} 
 					else
 					{
-						dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[2],0);
-						dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[1],1);
-						dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[0],2);
+						dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[0],0);
+						dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[1],1);
+						dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[2],2);
 					}
 
-					dicomSliceVTKImageData->SetOrigin(dcmSliceLocation);
+					dicomSliceVTKImageData->SetOrigin(dcmImagePositionPatient);
 					dicomSliceVTKImageData->Update();
 
 					dicomDataset->findAndGetLongInt(DCM_InstanceNumber,dcmInstanceNumber);
@@ -2925,7 +2933,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 					dicomDataset->findAndGetFloat64(DCM_TriggerTime,dcmTriggerTime);
 
 					m_SeriesIDToSlicesListMap[seriesId]->Append\
-						(new medDicomSlice(m_CurrentSliceABSFileName,dcmSliceLocation,dcmImageOrientationPatient ,\
+						(new medDicomSlice(m_CurrentSliceABSFileName,dcmImagePositionPatient,dcmImageOrientationPatient ,\
 						dicomSliceVTKImageData,dcmInstanceNumber,dcmCardiacNumberOfImages,dcmTriggerTime));
 				}
 			}
@@ -3352,14 +3360,14 @@ void medOpImporterDicomOffis::GenerateSliceTexture(int imageID)
 	medDicomSlice* slice = NULL;
 	slice = m_SelectedSeriesSlicesList->Item(imageID)->GetData();
 	assert(slice);
-	slice->GetDcmSliceLocation(loc);
+	slice->GetDcmImagePositionPatient(loc);
 	slice->GetVTKImageData()->Update();
 	slice->GetVTKImageData()->GetBounds(m_SliceBounds);
 
 	double Origin[3];
 	m_SelectedSeriesSlicesList->Item(imageID)->GetData()->GetVTKImageData()->GetOrigin(Origin);
 
-	double orientation[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+	double orientation[6] = {0.0,0.0,0.0,0.0,0.0,0.0};
 	m_SelectedSeriesSlicesList->Item(imageID)->GetData()->GetDcmImageOrientationPatient(orientation);
 	m_Text.append(wxString::Format("Orientaion: %f, %f, %f, %f, %f, %f \nPosition: %f, %f, %f",orientation[0], orientation[1], orientation[2], orientation[3], orientation[4], orientation[5], Origin[0], Origin[1], Origin[2]));
 	m_TextMapper->SetInput(m_Text.c_str());
@@ -3367,6 +3375,7 @@ void medOpImporterDicomOffis::GenerateSliceTexture(int imageID)
 
 	if (m_CropFlag) 
 	{
+		// this condition is entered even if no crop is performed (?)
 		m_SelectedSeriesSlicesList->Item(imageID)->GetData()->GetVTKImageData()->GetSpacing(spacing);
 
 		m_CropPlane->Update();
@@ -3384,27 +3393,15 @@ void medOpImporterDicomOffis::GenerateSliceTexture(int imageID)
 			crop_bounds[1] = m_SliceBounds[1];
 		if(crop_bounds[3] > m_SliceBounds[3]) 
 			crop_bounds[3] = m_SliceBounds[3];
-
-		/*int k = 0;
-		while(k * spacing[0] +Origin[0]<crop_bounds[0])
-		{
-		k++;
-		}
-		crop_bounds[0] = (k-1) * spacing[0] +Origin[0];
-
-		k=0;
-		while(k * spacing[1] +Origin[1]<crop_bounds[2])
-		{
-		k++;
-		}
-		crop_bounds[2] = (k-1) * spacing[1] +Origin[1];
-		*/
+		
+		if(crop_bounds[5] > m_SliceBounds[5]) 
+			crop_bounds[5] = m_SliceBounds[5];
 
 		double dim_x_clip = ceil((double)(((crop_bounds[1] - crop_bounds[0]) / spacing[0]) + 1));
 		double dim_y_clip = ceil((double)(((crop_bounds[3] - crop_bounds[2]) / spacing[1]) + 1));
 
 		vtkMAFSmartPointer<vtkStructuredPoints> clip;
-		clip->SetOrigin(crop_bounds[0], crop_bounds[2], loc[m_SortAxes]);// Origin[m_SortAxes]);	
+		clip->SetOrigin(crop_bounds[0], crop_bounds[2], crop_bounds[4]);// Origin[m_SortAxes]);	
 		clip->SetSpacing(spacing[0], spacing[1], 0);
 		clip->SetDimensions(dim_x_clip, dim_y_clip, 1);
 		clip->Update();
@@ -3735,10 +3732,10 @@ int CompareX(const medDicomSlice **arg1,const medDicomSlice **arg2)
 
 	double loc[3] = {-9999,-9999,-9999};
 
-	(*(medDicomSlice **)arg1)->GetDcmSliceLocation(loc);
+	(*(medDicomSlice **)arg1)->GetDcmImagePositionPatient(loc);
 	double x1 = loc[0];
 
-	 (*(medDicomSlice **)arg2)->GetDcmSliceLocation(loc);
+	 (*(medDicomSlice **)arg2)->GetDcmImagePositionPatient(loc);
 	double x2 = loc[0];
 
 	if (x1 > x2)
@@ -3757,10 +3754,10 @@ int CompareY(const medDicomSlice **arg1,const medDicomSlice **arg2)
 
 	double loc[3] = {-9999,-9999,-9999};
 
-	(*(medDicomSlice **)arg1)->GetDcmSliceLocation(loc);
+	(*(medDicomSlice **)arg1)->GetDcmImagePositionPatient(loc);
 	double y1 = loc[1];
 
-	(*(medDicomSlice **)arg2)->GetDcmSliceLocation(loc);
+	(*(medDicomSlice **)arg2)->GetDcmImagePositionPatient(loc);
 	double y2 = loc[1];
 
 	if (y1 > y2)
@@ -3780,10 +3777,10 @@ int CompareZ(const medDicomSlice **arg1,const medDicomSlice **arg2)
 
 	double loc[3] = {-9999,-9999,-9999};
 
-	(*(medDicomSlice **)arg1)->GetDcmSliceLocation(loc);
+	(*(medDicomSlice **)arg1)->GetDcmImagePositionPatient(loc);
 	double z1 = loc[2];
 
-	(*(medDicomSlice **)arg2)->GetDcmSliceLocation(loc);
+	(*(medDicomSlice **)arg2)->GetDcmImagePositionPatient(loc);
 	double z2 = loc[2];
 
 	if (z1 > z2)
@@ -4272,7 +4269,7 @@ void medOpImporterDicomOffis::OnScanTime()
 	GuiUpdate();
 }
 
-bool medOpImporterDicomOffis::IsRotated( double dcmImageOrientationPatient[9] )
+bool medOpImporterDicomOffis::IsRotated( double dcmImageOrientationPatient[6] )
 {
 	// check if the dataset is rotated: => different from 1. 0. 0. 0. 1. 0.
 	/* FROM David Clunie's note
