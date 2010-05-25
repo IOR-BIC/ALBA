@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpSelect.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:48:14 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2010-05-25 15:21:46 $
+  Version:   $Revision: 1.11.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,6 +29,7 @@
 #endif
 //#include "vtkMatrix4x4.h"
 //#include "vtkMath.h"
+#include "vtkDataSet.h"
 
 //initialize the Clipboard
 mafAutoPointer<mafNode>  mafOpEdit::m_Clipboard(NULL); 
@@ -178,6 +179,27 @@ Select the vme parent
   ClipboardBackup();
   m_SelectionParent = m_Selection->GetParent(); 
   m_Clipboard = m_Selection;
+
+  //////////////////////////////////////////////////////////////////////////
+  //It is necessary load all vtk data of the vme time varying otherwise paste or undo cause an application crash
+  //////////////////////////////////////////////////////////////////////////
+  if (mafVME::SafeDownCast(m_Selection))
+  {
+	  mafTimeStamp oldTime = mafVME::SafeDownCast(m_Selection)->GetTimeStamp();
+	  if (mafVME::SafeDownCast(m_Selection)->GetNumberOfTimeStamps()>1)
+	  {
+	    std::vector<mafTimeStamp> subKFrames;
+	    mafVME::SafeDownCast(m_Selection)->GetTimeStamps(subKFrames);
+	    for (int i=0;i<subKFrames.size();i++)
+	    {
+	      mafVME::SafeDownCast(m_Selection)->SetTimeStamp(subKFrames[i]);
+        mafVME::SafeDownCast(m_Selection)->GetOutput()->GetVTKData();
+	    }
+	  }
+	  mafVME::SafeDownCast(m_Selection)->SetTimeStamp(oldTime);
+  }
+  //////////////////////////////////////////////////////////////////////////
+
   mafEventMacro(mafEvent(this,VME_REMOVE,m_Selection));
   mafEventMacro(mafEvent(this,VME_SELECTED,m_SelectionParent));
   if (mafVME::SafeDownCast(m_SelectionParent.GetPointer()))
