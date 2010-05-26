@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medDicomCardiacMRIHelper.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-05-20 14:43:24 $
-  Version:   $Revision: 1.1.2.15 $
+  Date:      $Date: 2010-05-26 16:01:53 $
+  Version:   $Revision: 1.1.2.16 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -795,6 +795,8 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
 	
 	bool skip = false;
 
+	int size = id_theta.size();
+
 	if (id_theta.size() == 0)
 	{
 		// this happens with adaro62-20090715-15853 test data
@@ -942,20 +944,40 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
 	// id_plane contains the new plane ordering
     vnl_vector<double> id_plane = Vidx.get_column(0);
 
+	int size1 = id_plane.size();
 	// this happens with SE10 test data and adaro62-20090715-15853 test data with orthogonal slices:
 	// i skip plane reordering and use default order instead
 	if (id_plane.size() != planesPerFrame)
 	{
-		assert(idx.size() == planesPerFrame);
+		int size = idx.size();
 
-		vnl_vector<double> idx_vnl(planesPerFrame);
-
-		for (int i = 0; i < idx.size(); i++)
+		// this happens with SE10 test data and adaro62-20090715-15853 test data with orthogonal slices:
+		// i skip plane reordering and use default order instead
+		if (idx.size() == planesPerFrame)
 		{
-		  idx_vnl.put(i, idx[i]);
+			vnl_vector<double> idx_vnl(planesPerFrame);
+
+			for (int i = 0; i < idx.size(); i++)
+			{
+				idx_vnl.put(i, idx[i]);
+			}
+
+			id_plane = idx_vnl;
+		}
+		// this happens with SA test data with (? to check) orthogonal slices:
+		// i skip plane reordering and use increasing order from 0 to [planesPerFrame - 1] instead
+		else if (idx.size() == 0)
+		{
+			vnl_vector<double> idx_vnl(planesPerFrame);
+
+			for (int i = 0; i < planesPerFrame; i++)
+			{
+				idx_vnl.put(i, i);
+			}
+
+			id_plane = idx_vnl;
 		}
 
-		id_plane = idx_vnl;
 	}
 
     vnl_matrix<double> fileNumberForPlaneIFrameJIdPlane;

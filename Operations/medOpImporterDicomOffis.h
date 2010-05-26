@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2010-05-25 13:17:53 $
-Version:   $Revision: 1.1.2.43 $
+Date:      $Date: 2010-05-26 16:01:53 $
+Version:   $Revision: 1.1.2.44 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -48,6 +48,7 @@ MafMedical is partially based on OpenMAF.
 #include "vtkImageData.h"
 #include <map>
 #include "medDicomCardiacMRIHelper.h"
+#include "vtkMatrix4x4.h"
 
 
 //----------------------------------------------------------------------------
@@ -136,6 +137,8 @@ public:
 
 	/** Build a volume from the list of CineMRI files. */
 	int BuildOutputVMEGrayVolumeFromDicomCineMRI();
+
+	
 
 	/** Build a mesh from the list of dicom files. */
 	int BuildOutputVMEMeshFromDicom();
@@ -426,9 +429,17 @@ public:
 	vtkImageData* GetVTKImageData(){return m_Data;};
 	
 	/** Set vtkImageData */
-	void SetVTKImageData(vtkImageData *data);
+		void SetVTKImageData(vtkImageData *data);
 
-	/** Return the position of a slice*/
+	/** Set the DcmImagePositionPatient tag for the slice */
+	void SetDcmImagePositionPatient(double dcmImagePositionPatient[3])
+	{
+		m_DcmImagePositionPatient[0]=dcmImagePositionPatient[0];
+		m_DcmImagePositionPatient[1]=dcmImagePositionPatient[1];
+		m_DcmImagePositionPatient[2]=dcmImagePositionPatient[2];
+	};
+
+	/** Get the DcmImagePositionPatient tag for the slice */
 	void GetDcmImagePositionPatient(double dcmImagePositionPatient[3])
 	{
 		dcmImagePositionPatient[0]=m_DcmImagePositionPatient[0];
@@ -436,7 +447,19 @@ public:
 		dcmImagePositionPatient[2]=m_DcmImagePositionPatient[2];
 	};
 
-	/** Return the orientation patient of a slice*/
+
+	/** Set the DcmImageOrientationPatient tag for the slice*/
+	void SetDcmImageOrientationPatient(double dcmImageOrientationPatient[6])
+	{
+		m_DcmImageOrientationPatient[0]=dcmImageOrientationPatient[0];
+		m_DcmImageOrientationPatient[1]=dcmImageOrientationPatient[1]; 
+		m_DcmImageOrientationPatient[2]=dcmImageOrientationPatient[2]; 
+		m_DcmImageOrientationPatient[3]=dcmImageOrientationPatient[3]; 
+		m_DcmImageOrientationPatient[4]=dcmImageOrientationPatient[4]; 
+		m_DcmImageOrientationPatient[5]=dcmImageOrientationPatient[5]; 
+	};
+
+	/** Get the DcmImageOrientationPatient tag for the slice*/
 	void GetDcmImageOrientationPatient(double dcmImageOrientationPatient[6])
 	{
 		dcmImageOrientationPatient[0]= m_DcmImageOrientationPatient[0];
@@ -446,6 +469,10 @@ public:
 		dcmImageOrientationPatient[4]= m_DcmImageOrientationPatient[4];
 		dcmImageOrientationPatient[5]= m_DcmImageOrientationPatient[5];
 	};
+
+	/** 
+	Write dicom slice orientation on matrix*/
+	void GetOrientation( vtkMatrix4x4 * matrix );
 
 protected:
 	double m_DcmImagePositionPatient[3];

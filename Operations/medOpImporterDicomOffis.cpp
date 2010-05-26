@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-05-25 13:17:53 $
-Version:   $Revision: 1.1.2.109 $
+Date:      $Date: 2010-05-26 16:01:53 $
+Version:   $Revision: 1.1.2.110 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -853,8 +853,34 @@ int medOpImporterDicomOffis::BuildOutputVMEImagesFromDicomCineMRI()
 				im->Update();
 			}
 
-			((mafVMEImage*)m_ImagesGroup->GetChild(targetVolumeSliceId))->SetData(im,ts);
+			mafVMEImage *image = NULL;
+			image = mafVMEImage::SafeDownCast(m_ImagesGroup->GetChild(targetVolumeSliceId));
+			assert(image);	
 
+			image->SetData(im,ts);
+
+//			TODO: fix this to set correct roto/translation matrix
+// 			if (m_SeriesIDContainsRotationsMap[m_SelectedSeriesID] == true  && m_ApplyRotation)
+// 			{
+// 				medDicomSlice* slice = NULL;
+// 
+// 				slice = m_SelectedSeriesSlicesList->Item(m_ZCropBounds[0])->GetData();
+// 
+// 				assert(slice);
+// 
+// 				vtkMatrix4x4 *mat = vtkMatrix4x4::New();
+// 
+// 				slice->GetOrientation(mat);
+// 
+// 				mafSmartPointer<mafTransform> boxPose;
+// 				boxPose->SetMatrix(mat);     
+// 				boxPose->Update();
+// 
+// 				image->SetAbsMatrix(boxPose->GetMatrix(),tsDouble);
+// 
+// 				mat->Delete();
+// 			}
+// 
 			m_ImagesGroup->GetChild(targetVolumeSliceId)->GetTagArray()->DeepCopy(m_TagArray);
 
 			mafTagItem tag_Nature;
@@ -951,11 +977,6 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
 	}
 
 	mafNEW(m_Volume);
-
-	//   ImportDicomTags(); 
-	//   //Copy inside the first VME item of m_Volume the CT volume and Dicom's tags
-	//   m_Volume->GetTagArray()->DeepCopy(m_TagArray);
-	//   mafDEL(m_TagArray);
 
 	accumulate->Update();
 
@@ -1109,11 +1130,11 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 	for (int ts = 0; ts < m_NumberOfTimeFrames; ts++)
 	{
 		// Build item at timestamp ts    
-		vtkMAFSmartPointer<vtkMAFRGSliceAccumulate> accumulate;
-		accumulate->SetNumberOfSlices(n_slices);
+		vtkMAFSmartPointer<vtkMAFRGSliceAccumulate> accumulator;
+		accumulator->SetNumberOfSlices(n_slices);
 
 		// always build the volume on z-axis
-		accumulate->BuildVolumeOnAxes(m_SortAxes);
+		accumulator->BuildVolumeOnAxes(m_SortAxes);
 
 		// get the time stamp from the dicom tag;
 		// timestamp is in ms
@@ -1143,14 +1164,39 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 				// update v_texture ivar
 				GenerateSliceTexture(currImageId);
 			}
-			accumulate->SetSlice(targetVolumeSliceId, m_SliceTexture->GetInput());
+
+			vtkImageData *imageData = NULL;
+			imageData = m_SliceTexture->GetInput();
+			assert(imageData);
+
+			accumulator->SetSlice(targetVolumeSliceId, imageData);
+			
+			std::ostringstream stringStream;
+			
+			double spacing[3] = {0,0,0};
+			imageData->GetSpacing(spacing);
+
+			int dim[3] = {0,0,0};
+			imageData->GetDimensions(dim);
+			
+			double origin[3] =  {0,0,0};
+			imageData->GetOrigin(origin);
+
+			stringStream <<  "slice: " << targetVolumeSliceId << \
+				"  origin: " << origin[0] << " " << origin[1] << " " << origin[2] << " " <<\
+				"  spacing: " << spacing[0]<< " " << spacing[1] << " " << spacing[2]<< " "
+				"  dimensions: " << dim[0]<< " " << dim[1] << " " << dim[2]<< " " << std::endl;          
+
+			// mafLogMessage(stringStream.str().c_str());
+			
 			targetVolumeSliceId++;
 			progressCounter++;
 		}
-		accumulate->Update();
+
+		accumulator->Update();
 
 		vtkMAFSmartPointer<vtkRectilinearGrid> rg_out;
-		rg_out->DeepCopy(accumulate->GetOutput());
+		rg_out->DeepCopy(accumulator->GetOutput());
 		rg_out->Update();
 
 		if(!this->m_TestMode)
@@ -1192,57 +1238,29 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 
 		if (m_SeriesIDContainsRotationsMap[m_SelectedSeriesID] == true  && m_ApplyRotation)
 		{
-			double orientation[9] = {0.0,0.0,0.0 \
-									,0.0,0.0,0.0,\
-									 0.0,0.0,0.0};
-
 			
 			medDicomSlice* slice = NULL;
 						
 			slice = m_SelectedSeriesSlicesList->Item(m_ZCropBounds[0])->GetData();
 			
 			assert(slice);
-
-			slice->GetDcmImageOrientationPatient(orientation);
-
-			double Vx0 = orientation[0];
-			double Vx1 = orientation[1];
-			double Vx2 = orientation[2];
-
-			double Vy0 = orientation[3];
-			double Vy1 = orientation[4];
-			double Vy2 = orientation[5];
-
-			double Vz0 = Vx1 * Vy2 - Vx2 * Vy1;
-			double Vz1 = Vx2 * Vy0 - Vx0 * Vy2;
-			double Vz2 = Vx0 * Vy1 - Vx1 * Vy0;
-
-			vtkMatrix4x4 *mat = vtkMatrix4x4::New();
-			mat->Identity();
 			
-			mat->SetElement(0,0,Vx0);
-			mat->SetElement(1,0,Vx1);
-			mat->SetElement(2,0,Vx2);
-			mat->SetElement(3,0,0);
-
-			mat->SetElement(0,1,Vy0);
-			mat->SetElement(1,1,Vy1);			
-			mat->SetElement(2,1,Vy2);
-			mat->SetElement(3,1,0);
-
-			mat->SetElement(0,2,Vz0);
-			mat->SetElement(1,2,Vz1);
-			mat->SetElement(2,2,Vz2);
-			mat->SetElement(3,2,0);
-
-			//slice->GetDcmSliceLocation()
-			mat->SetElement(3,3,1);
+			vtkMatrix4x4 *mat = vtkMatrix4x4::New();
+			
+			slice->GetOrientation(mat);
 
 			mafSmartPointer<mafTransform> boxPose;
-			boxPose->SetMatrix(mat);     
-			boxPose->Update();
+			boxPose->SetMatrix(mat);
+			
+			double pos[3];
+			slice->GetDcmImagePositionPatient(pos);
 
+			boxPose->SetPosition(pos);
+			boxPose->Update();
+			
 			m_Volume->SetAbsMatrix(boxPose->GetMatrix(),tsDouble);
+
+			mat->Delete();
 		}
 	}
 	if(!this->m_TestMode)
@@ -3073,7 +3091,11 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 				
 				if (!skipCorrection)
 				{
-					vnl_matrix<double> FileNumberForPlaneIFrameJIdPlaneMatrix = currentHelper->GetFileNumberForPlaneIFrameJIdPlaneMatrix();
+					vnl_matrix<double> fileNumberForPlaneIFrameJIdPlaneMatrix = currentHelper->GetFileNumberForPlaneIFrameJIdPlaneMatrix();
+
+					vnl_matrix<double> newPositionSingleFrameIdPlaneMatrix = currentHelper->GetNewPositionSingleFrameIdPlaneMatrix();
+					vnl_matrix<double> newXVersorsSingleFrameIdPlaneMatrix = currentHelper->GetNewXVersorsSingleFrameIdPlaneMatrix();
+					vnl_matrix<double> newYVersorsSingleFrameIdPlaneMatrix = currentHelper->GetNewYVersorsSingleFrameIdPlaneMatrix();
 
 					// for the current series
 					assert(currentSeries);
@@ -3112,7 +3134,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 								mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
 							}
 
-							int itemID = FileNumberForPlaneIFrameJIdPlaneMatrix(planeID, timeID); 
+							int itemID = fileNumberForPlaneIFrameJIdPlaneMatrix(planeID, timeID); 
 
 							medDicomSlice* currentSlice = NULL;
 							currentSlice = currentSeries->Item(itemID)->GetData();
@@ -3198,6 +3220,19 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 							rs->Delete();
 							outputBuffer->Delete();
 
+							vnl_vector<double> p = newPositionSingleFrameIdPlaneMatrix.get_row(planeID);
+							assert(p.size() == 3);
+							double p3[3] = {p(0),p(1),p(2)};
+							currentSlice->SetDcmImagePositionPatient(p3);
+							
+							vnl_vector<double> xv = newXVersorsSingleFrameIdPlaneMatrix.get_row(planeID);
+							assert(xv.size() == 3);
+							
+							vnl_vector<double> yv = newYVersorsSingleFrameIdPlaneMatrix.get_row(planeID);
+							assert(yv.size() == 3);
+							
+							double orientation[6] = {xv(0),xv(1),xv(2),yv(0),yv(1),yv(2)};
+							currentSlice->SetDcmImageOrientationPatient(orientation);
 						}			
 					}
 
@@ -3354,13 +3389,13 @@ void medOpImporterDicomOffis::GenerateSliceTexture(int imageID)
 {
 	// Description:
 	// read the slice number 'slice_num' and generate the texture
-	double spacing[3], crop_bounds[6], range[2], loc[3];
+	double spacing[3], crop_bounds[6], range[2];
 	m_Text = "";
 
 	medDicomSlice* slice = NULL;
 	slice = m_SelectedSeriesSlicesList->Item(imageID)->GetData();
 	assert(slice);
-	slice->GetDcmImagePositionPatient(loc);
+	
 	slice->GetVTKImageData()->Update();
 	slice->GetVTKImageData()->GetBounds(m_SliceBounds);
 
@@ -3401,17 +3436,41 @@ void medOpImporterDicomOffis::GenerateSliceTexture(int imageID)
 		double dim_y_clip = ceil((double)(((crop_bounds[3] - crop_bounds[2]) / spacing[1]) + 1));
 
 		vtkMAFSmartPointer<vtkStructuredPoints> clip;
-		clip->SetOrigin(crop_bounds[0], crop_bounds[2], crop_bounds[4]);// Origin[m_SortAxes]);	
-		clip->SetSpacing(spacing[0], spacing[1], 0);
-		clip->SetDimensions(dim_x_clip, dim_y_clip, 1);
+
+		double origin[3] = {crop_bounds[0], crop_bounds[2], crop_bounds[4]};
+
+		clip->SetOrigin(origin[0], origin[1], origin[2]);// Origin[m_SortAxes]);	
+		clip->SetSpacing(spacing);
+
+		int dimension[3] = {dim_x_clip, dim_y_clip, 1};
+		clip->SetDimensions(dimension);
+
+		std::ostringstream stringStream;
+		stringStream << "**clip** origin: " << origin[0] << " " << origin[1] << " " << origin[2] << " " << std::endl;          
+		stringStream << "**clip** dimension: " << dimension[0] << " " << dimension[1] << " " << dimension[2] << " " << std::endl;          
+		// mafLogMessage(stringStream.str().c_str());
+
 		clip->Update();
 
 		vtkMAFSmartPointer<vtkProbeFilter> probe;
 		probe->SetInput(clip);
-		probe->SetSource(m_SelectedSeriesSlicesList->Item(imageID)->GetData()->GetVTKImageData());
+
+		vtkImageData *imageData = NULL;
+		imageData = m_SelectedSeriesSlicesList->Item(imageID)->GetData()->GetVTKImageData();
+		assert(imageData != NULL);
+
+		imageData->GetOrigin(origin);
+		imageData->GetDimensions(dimension);
+
+		stringStream.clear();
+		stringStream << "**inputImageData** origin: " << origin[0] << " " << origin[1] << " " << origin[2] << " " << std::endl;          
+		stringStream << "**inputImageData** dimension: " << dimension[0] << " " << dimension[1] << " " << dimension[2] << " " << std::endl;          
+		// mafLogMessage(stringStream.str().c_str());
+
+		probe->SetSource(imageData);
 		probe->Update();
 		probe->GetOutput()->GetBounds(m_SliceBounds);
-
+	
 		//rescale to 16 bit
 		if(m_RescaleTo16Bit == TRUE && m_HighBit == 11)
 		{
@@ -4311,4 +4370,43 @@ void medDicomSlice::SetVTKImageData( vtkImageData *data )
 	vtkDEL(m_Data);
 	m_Data = vtkImageData::New();
 	m_Data->DeepCopy(data);
+}
+
+void medDicomSlice::GetOrientation( vtkMatrix4x4 * matrix )
+{
+	assert(matrix);
+
+	double orientation[6] = {0,0,0,0,0,0};
+
+	this->GetDcmImageOrientationPatient(orientation);
+
+	double Vx0 = orientation[0];
+	double Vx1 = orientation[1];
+	double Vx2 = orientation[2];
+
+	double Vy0 = orientation[3];
+	double Vy1 = orientation[4];
+	double Vy2 = orientation[5];
+
+	double Vz0 = Vx1 * Vy2 - Vx2 * Vy1;
+	double Vz1 = Vx2 * Vy0 - Vx0 * Vy2;
+	double Vz2 = Vx0 * Vy1 - Vx1 * Vy0;
+
+	matrix->Identity();
+
+	matrix->SetElement(0,0,Vx0);
+	matrix->SetElement(1,0,Vx1);
+	matrix->SetElement(2,0,Vx2);
+	matrix->SetElement(3,0,0);
+
+	matrix->SetElement(0,1,Vy0);
+	matrix->SetElement(1,1,Vy1);			
+	matrix->SetElement(2,1,Vy2);
+	matrix->SetElement(3,1,0);
+
+	matrix->SetElement(0,2,Vz0);
+	matrix->SetElement(1,2,Vz1);
+	matrix->SetElement(2,2,Vz2);
+	matrix->SetElement(3,2,0);
+	matrix->SetElement(3,3,1);
 }
