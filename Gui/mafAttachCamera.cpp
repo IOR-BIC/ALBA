@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAttachCamera.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-03-10 14:55:25 $
-  Version:   $Revision: 1.20.2.1 $
+  Date:      $Date: 2010-05-27 09:55:44 $
+  Version:   $Revision: 1.20.2.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -123,7 +123,10 @@ void mafAttachCamera::OnEvent(mafEventBase *maf_event)
       case NODE_DESTROYED:
         // the VME observed will be removed on the destructor.
         m_EnableAttachCamera = 0;
-        m_Gui->Update();
+        if (m_Gui)
+        {
+        	m_Gui->Update();
+        }
       break;
       case VME_TIME_SET:
         UpdateCameraMatrix();
