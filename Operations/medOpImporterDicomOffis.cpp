@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-05-26 16:01:53 $
-Version:   $Revision: 1.1.2.110 $
+Date:      $Date: 2010-05-27 14:23:35 $
+Version:   $Revision: 1.1.2.111 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -1127,14 +1127,10 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 	int totalNumberOfImages = (m_ZCropBounds[1]+1)*m_NumberOfTimeFrames;
 	int progressCounter = 0;
 	// for every timestamp
+
 	for (int ts = 0; ts < m_NumberOfTimeFrames; ts++)
 	{
-		// Build item at timestamp ts    
-		vtkMAFSmartPointer<vtkMAFRGSliceAccumulate> accumulator;
-		accumulator->SetNumberOfSlices(n_slices);
-
-		// always build the volume on z-axis
-		accumulator->BuildVolumeOnAxes(m_SortAxes);
+		std::vector<vtkImageData *> imageDataVector;
 
 		// get the time stamp from the dicom tag;
 		// timestamp is in ms
@@ -1158,7 +1154,8 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 			if (targetVolumeSliceId == n_slices) {break;}
 
 			// show the current slice
-			currImageId = GetSliceIDInSeries(ts, sourceVolumeSliceId);
+			currImageId = GetSliceIDInSeries(ts, probeHeigthId);
+		
 			if (currImageId != -1) 
 			{
 				// update v_texture ivar
@@ -1169,8 +1166,12 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 			imageData = m_SliceTexture->GetInput();
 			assert(imageData);
 
-			accumulator->SetSlice(targetVolumeSliceId, imageData);
-			
+			vtkImageData *bufferImageData = vtkImageData::New();
+			bufferImageData->DeepCopy(imageData);
+			imageDataVector.push_back(bufferImageData);
+
+			// accumulator->SetSlice(probeHeigthId, imageData);
+		
 			std::ostringstream stringStream;
 			
 			double spacing[3] = {0,0,0};
@@ -1182,15 +1183,51 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 			double origin[3] =  {0,0,0};
 			imageData->GetOrigin(origin);
 
-			stringStream <<  "slice: " << targetVolumeSliceId << \
+			stringStream <<  "ts: " << ts << \
+				"  probeHeightId: " << probeHeigthId<< \
+				"  currImageId: " << currImageId << \
 				"  origin: " << origin[0] << " " << origin[1] << " " << origin[2] << " " <<\
 				"  spacing: " << spacing[0]<< " " << spacing[1] << " " << spacing[2]<< " "
 				"  dimensions: " << dim[0]<< " " << dim[1] << " " << dim[2]<< " " << std::endl;          
-
-			// mafLogMessage(stringStream.str().c_str());
+				
+			mafLogMessage(stringStream.str().c_str());
 			
 			targetVolumeSliceId++;
 			progressCounter++;
+			probeHeigthId++;
+
+		}
+
+		std::map<double , int> zToIDMap;
+
+		for (int i = 0 ; i < imageDataVector.size() ; i++)
+		{
+			double origin[3] = {-999,-999,-999};
+			imageDataVector[i]->GetOrigin(origin);
+
+			double zOrigin = origin[2];
+			zToIDMap[zOrigin] = i;
+		}
+
+		// Build item at timestamp ts    
+		vtkMAFSmartPointer<vtkMAFRGSliceAccumulate> accumulator;
+
+		// always build the volume on z-axis
+		accumulator->BuildVolumeOnAxes(m_SortAxes);
+		accumulator->SetNumberOfSlices(m_NumberOfSlices);
+
+		// 		accumulator->SetOrigin(0,0,104.826);
+		// 		accumulator->SetSpacing(1.5625 , 1.5625 , 1);
+		// 		accumulator->SetDimensions(256,256,1);
+		
+		int i = 0;
+
+		for( map<double,int>::iterator currentMapElement=zToIDMap.begin(); currentMapElement!=zToIDMap.end(); ++currentMapElement)
+		{
+			double id = currentMapElement->second;
+			double z = currentMapElement->first;
+			accumulator->SetSlice(i, imageDataVector[currentMapElement->second]);
+			i++;
 		}
 
 		accumulator->Update();
@@ -1262,7 +1299,17 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 
 			mat->Delete();
 		}
+
+
+		for (int i = 0; i < imageDataVector.size(); i++)
+		{
+			imageDataVector[i]->Delete;
+		}
+
+		imageDataVector.clear();
+
 	}
+
 	if(!this->m_TestMode)
 	{
 		mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
@@ -3148,14 +3195,18 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 							double center[3] = {-9999,-9999,-9999};
 							imageData->GetCenter(center);
 
+							double bounds[6] = {-9999,-9999,-9999};
+							imageData->GetBounds(bounds);
+
 							vtkTransform *tr = vtkTransform::New();
 							tr->PostMultiply();
 							tr->Translate(-center[0], -center[1], -center[2]);
 
 							tr->RotateZ(rotateFlag(planeID, 0));
-
 							
 							tr->Translate(center);
+
+							//tr->Translate(-bounds[0],-bounds[2], 0);
 
 							vtkImageReslice *rs = vtkImageReslice::New();
 							rs->SetInput(imageData);
@@ -3208,9 +3259,10 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 								flipUDOutput = flipLROutput;
 							}
 							
+
 							vtkImageData *outputBuffer = vtkImageData::New();
 							outputBuffer->DeepCopy(flipUDOutput);
-
+							
 							currentSlice->SetVTKImageData(outputBuffer);
 
 							vtkDEL(flipUD);
@@ -3233,6 +3285,9 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 							
 							double orientation[6] = {xv(0),xv(1),xv(2),yv(0),yv(1),yv(2)};
 							currentSlice->SetDcmImageOrientationPatient(orientation);
+
+							currentSlice->GetVTKImageData()->SetOrigin(0,0,bounds[4]);
+							
 						}			
 					}
 
