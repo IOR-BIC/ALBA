@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-03-09 15:37:03 $
-  Version:   $Revision: 1.37.2.2 $
+  Date:      $Date: 2010-05-28 14:30:12 $
+  Version:   $Revision: 1.37.2.3 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -546,7 +546,8 @@ mafGUI* medPipeGraph::CreateGui()
   wxString name;
   bool checked = FALSE;
 
-  m_CheckBox = m_Gui->CheckList(ID_CHECK_BOX,_("Item"),150,_("Chose item to plot"));
+  m_Gui->Label("Item");
+	m_CheckBox = m_Gui->CheckList(ID_CHECK_BOX,_(""),200,_("Choose item to plot"));
   m_Gui->Button(ID_DRAW,_("Plot"), "",_("Draw selected items"));
   m_Gui->Divider();
 
