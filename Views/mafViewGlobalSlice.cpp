@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-05-27 07:11:55 $
-  Version:   $Revision: 1.29.2.4 $
+  Date:      $Date: 2010-05-28 07:03:25 $
+  Version:   $Revision: 1.29.2.5 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -774,7 +774,7 @@ void mafViewGlobalSlice::VmeShow(mafNode *node, bool show)
     }
     m_Gui->Update();
   }
-  else
+  else if (sceneNode == m_SelectedVolume)
   {
     m_Gui->Enable(ID_POS_SLIDER,false);
     m_Gui->Update();
