@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-05-27 14:23:35 $
-Version:   $Revision: 1.1.2.111 $
+Date:      $Date: 2010-05-28 12:46:18 $
+Version:   $Revision: 1.1.2.112 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -1130,6 +1130,23 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 
 	for (int ts = 0; ts < m_NumberOfTimeFrames; ts++)
 	{
+    // BEWARE:
+    // the following data structure was added in order to fix bug :
+    // http://bugzilla.hpc.cineca.it/show_bug.cgi?id=2088
+    //
+    // Regression test data for this bug is POLITECNICO and SA Cardiac MRI Dicom
+    //
+    // There is a nasty bug in some of our pipes that is preventing volumes with 
+    // Z axis order different from increasing to work while standard vtk filters have
+    // no problems at all with this issue: we successfully visualized this kind of
+    // volumes with ParaView.
+    //
+    // For example if you have Z axes coordinate in your rectilinear grid like:
+    // 8  5  3  1
+    // some pipes will fail (for sure the mafPipeVolumeSlice_BES ).
+    // This data structure is used to feed the slice accumulator with the right increasing 
+    // z ordering ie:
+    // 1 3 5 8
 		std::vector<vtkImageData *> imageDataVector;
 
 		// get the time stamp from the dicom tag;
@@ -1169,8 +1186,6 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 			vtkImageData *bufferImageData = vtkImageData::New();
 			bufferImageData->DeepCopy(imageData);
 			imageDataVector.push_back(bufferImageData);
-
-			// accumulator->SetSlice(probeHeigthId, imageData);
 		
 			std::ostringstream stringStream;
 			
@@ -1215,10 +1230,6 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 		// always build the volume on z-axis
 		accumulator->BuildVolumeOnAxes(m_SortAxes);
 		accumulator->SetNumberOfSlices(m_NumberOfSlices);
-
-		// 		accumulator->SetOrigin(0,0,104.826);
-		// 		accumulator->SetSpacing(1.5625 , 1.5625 , 1);
-		// 		accumulator->SetDimensions(256,256,1);
 		
 		int i = 0;
 
