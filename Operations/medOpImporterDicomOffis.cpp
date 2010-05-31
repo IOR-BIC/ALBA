@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-05-28 12:46:18 $
-Version:   $Revision: 1.1.2.112 $
+Date:      $Date: 2010-05-31 10:08:55 $
+Version:   $Revision: 1.1.2.113 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -439,79 +439,107 @@ void medOpImporterDicomOffis::OpRun()
 int medOpImporterDicomOffis::RunWizard()
 //----------------------------------------------------------------------------
 {
+	enum
+	{
+		VOLUME = 0,
+		MESH = 1,
+		IMAGE = 2,
+		NUMBER_OF_OUTPUTS,
+	};
+
 	if(m_Wizard->Run())
 	{
 		int result;
 		switch (m_OutputType)
 		{
-		case 0: 
-
-			if (m_SeriesIDContainsRotationsMap[m_SelectedSeriesID])
+		case VOLUME: 
 			{
-				if(!this->m_TestMode)
-				{
-					int answer = wxMessageBox( "Dicom dataset contains rotated images - Apply rotation?", "Warning", wxYES_NO, NULL);
-					if (answer == wxNO)
-					{
-						m_ApplyRotation = false;
-					}
-					else if (answer == wxYES)
-					{
-						m_ApplyRotation = true;
-					}
-				}
-			}
 
-			//rescale to 16 bit all the rest of the dataset
-			if(m_RescaleTo16Bit == TRUE && m_HighBit == 11)
-			{
-				int i=0, size = m_SelectedSeriesSlicesList->size();
-
-				wxBusyInfo *wait = NULL;
-				if(!this->m_TestMode)
+				if (m_SeriesIDContainsRotationsMap[m_SelectedSeriesID])
 				{
-					wait = new wxBusyInfo("Conversion to Unsigned Short: please wait...");
-					mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
-				}
-
-				long progress = 0;
-				for(int slice_num=0;slice_num<size;slice_num++)
-				{
-					RescaleTo16Bit(m_SelectedSeriesSlicesList->Item(slice_num)->GetData()\
-						->GetVTKImageData());
 					if(!this->m_TestMode)
 					{
-						progress = slice_num * 100 / (double)size;
-						mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
+						int answer = wxMessageBox( "Dicom dataset contains rotated images - Apply rotation?", "Warning", wxYES_NO, NULL);
+						if (answer == wxNO)
+						{
+							m_ApplyRotation = false;
+						}
+						else if (answer == wxYES)
+						{
+							m_ApplyRotation = true;
+						}
 					}
 				}
-				mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
-				if(wait) delete wait;
+
+				//rescale to 16 bit all the rest of the dataset
+				if(m_RescaleTo16Bit == TRUE && m_HighBit == 11)
+				{
+					int i=0, size = m_SelectedSeriesSlicesList->size();
+
+					wxBusyInfo *wait = NULL;
+					if(!this->m_TestMode)
+					{
+						wait = new wxBusyInfo("Conversion to Unsigned Short: please wait...");
+						mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
+					}
+
+					long progress = 0;
+					for(int slice_num=0;slice_num<size;slice_num++)
+					{
+						RescaleTo16Bit(m_SelectedSeriesSlicesList->Item(slice_num)->GetData()\
+							->GetVTKImageData());
+						if(!this->m_TestMode)
+						{
+							progress = slice_num * 100 / (double)size;
+							mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
+						}
+					}
+					mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
+					if(wait) delete wait;
+				}
+
+				if(m_DicomReaderModality != medGUIDicomSettings::ID_CMRI_MODALITY)
+					result = BuildOutputVMEGrayVolumeFromDicom();
+				else
+					result = BuildOutputVMEGrayVolumeFromDicomCineMRI();
+
+				break;
 			}
+		case MESH:
+			{
 
-			if(m_DicomReaderModality != medGUIDicomSettings::ID_CMRI_MODALITY)
-				result = BuildOutputVMEGrayVolumeFromDicom();
-			else
-				result = BuildOutputVMEGrayVolumeFromDicomCineMRI();
 
-			break;
+				if(m_DicomReaderModality != medGUIDicomSettings::ID_CMRI_MODALITY)
+					result = BuildOutputVMEMeshFromDicom();
+				else
+					result = BuildOutputVMEMeshFromDicomCineMRI();
+				break;
+			}
+		case IMAGE:
+			{
+				if (m_SeriesIDContainsRotationsMap[m_SelectedSeriesID])
+				{
+					if(!this->m_TestMode)
+					{
+						int answer = wxMessageBox( "Dicom dataset contains rotated images - Apply rotation?", "Warning", wxYES_NO, NULL);
+						if (answer == wxNO)
+						{
+							m_ApplyRotation = false;
+						}
+						else if (answer == wxYES)
+						{
+							m_ApplyRotation = true;
+						}
+					}
+				}
 
-		case 1:
 
-			if(m_DicomReaderModality != medGUIDicomSettings::ID_CMRI_MODALITY)
-				result = BuildOutputVMEMeshFromDicom();
-			else
-				result = BuildOutputVMEMeshFromDicomCineMRI();
-			break;
-
-		case 2:
-
-			if(m_DicomReaderModality != medGUIDicomSettings::ID_CMRI_MODALITY)
-				result = BuildOutputVMEImagesFromDicom();
-			else
-				result = BuildOutputVMEImagesFromDicomCineMRI();
-			break;
-
+				if(m_DicomReaderModality != medGUIDicomSettings::ID_CMRI_MODALITY)
+					result = BuildOutputVMEImagesFromDicom();
+				else
+					result = BuildOutputVMEImagesFromDicomCineMRI();
+				break;
+			}
 		}
 		return result;
 	}
@@ -859,28 +887,42 @@ int medOpImporterDicomOffis::BuildOutputVMEImagesFromDicomCineMRI()
 
 			image->SetData(im,ts);
 
-//			TODO: fix this to set correct roto/translation matrix
-// 			if (m_SeriesIDContainsRotationsMap[m_SelectedSeriesID] == true  && m_ApplyRotation)
-// 			{
-// 				medDicomSlice* slice = NULL;
-// 
-// 				slice = m_SelectedSeriesSlicesList->Item(m_ZCropBounds[0])->GetData();
-// 
-// 				assert(slice);
-// 
-// 				vtkMatrix4x4 *mat = vtkMatrix4x4::New();
-// 
-// 				slice->GetOrientation(mat);
-// 
-// 				mafSmartPointer<mafTransform> boxPose;
-// 				boxPose->SetMatrix(mat);     
-// 				boxPose->Update();
-// 
-// 				image->SetAbsMatrix(boxPose->GetMatrix(),tsDouble);
-// 
-// 				mat->Delete();
-// 			}
-// 
+			if (m_SeriesIDContainsRotationsMap[m_SelectedSeriesID] == true  && m_ApplyRotation)
+			{
+				medDicomSlice* slice = NULL;
+
+				slice = m_SelectedSeriesSlicesList->Item(currImageId)->GetData();
+
+				assert(slice);
+
+				vtkMatrix4x4 *sliceOrientationMatrix = vtkMatrix4x4::New();
+
+				slice->GetOrientation(sliceOrientationMatrix);
+
+				double slicePosition[3] = {-999, -999, -999};
+
+				slice->GetDcmImagePositionPatient(slicePosition);
+				
+				double sliceVtkDataCenter[3] = {-999, -999, -999};
+
+				slice->GetVTKImageData()->GetCenter(sliceVtkDataCenter);
+
+				vtkTransform *tr = vtkTransform::New();
+				tr->PostMultiply();
+				tr->Translate(-sliceVtkDataCenter[0], -sliceVtkDataCenter[1],-sliceVtkDataCenter[2]);
+				tr->Concatenate(sliceOrientationMatrix);
+				\
+				mafSmartPointer<mafTransform> boxPose;
+				boxPose->SetMatrix(tr->GetMatrix());
+				boxPose->Update();
+
+				image->SetAbsMatrix(boxPose->GetMatrix(),tsDouble);
+
+				sliceOrientationMatrix->Delete();
+				tr->Delete();
+
+			}
+
 			m_ImagesGroup->GetChild(targetVolumeSliceId)->GetTagArray()->DeepCopy(m_TagArray);
 
 			mafTagItem tag_Nature;
@@ -3216,8 +3258,6 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 							tr->RotateZ(rotateFlag(planeID, 0));
 							
 							tr->Translate(center);
-
-							//tr->Translate(-bounds[0],-bounds[2], 0);
 
 							vtkImageReslice *rs = vtkImageReslice::New();
 							rs->SetInput(imageData);
