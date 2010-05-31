@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPolyline.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-02 11:16:12 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2010-05-31 10:35:13 $
+  Version:   $Revision: 1.7.4.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -55,6 +55,13 @@ mafVMEOutput *mafVMEPolyline::GetOutput()
     SetOutput(mafVMEOutputPolyline::New()); // create the output
   }
   return m_Output;
+}
+//-------------------------------------------------------------------------
+char** mafVMEPolyline::GetIcon() 
+//-------------------------------------------------------------------------
+{
+  #include "mafVMEFem.xpm"
+	return mafVMEFem_xpm;
 }
 //-------------------------------------------------------------------------
 int mafVMEPolyline::InternalInitialize()

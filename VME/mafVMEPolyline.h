@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPolyline.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-19 14:57:20 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2010-05-31 10:35:13 $
+  Version:   $Revision: 1.4.22.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -56,6 +56,9 @@ public:
 
     /** Return the suggested pipe-typename for the visualization of this vme */
     virtual mafString GetVisualPipe() {return mafString("mafPipePolyline");};
+
+		/** return an xpm-icon that can be used to represent this node */
+		static char ** GetIcon();
 
 protected:
   mafVMEPolyline();
