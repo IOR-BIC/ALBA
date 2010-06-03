@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.h,v $
 Language:  C++
-Date:      $Date: 2010-05-24 09:47:40 $
-Version:   $Revision: 1.5.2.12 $
+Date:      $Date: 2010-06-03 08:01:52 $
+Version:   $Revision: 1.5.2.13 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -19,7 +19,6 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // forward reference
 //----------------------------------------------------------------------------
 class mafGUICheckListBox;
-class medGUIDicomSettingsTest;
 
 /**
   Class Name : medGUIDicomSettings.
@@ -180,6 +179,6 @@ protected:
   double m_ScalarDistanceTolerance;
   double m_PercentageDistanceTolerance;
 
-  friend medGUIDicomSettingsTest;
+  friend class medGUIDicomSettingsTest;
 };
 #endif
