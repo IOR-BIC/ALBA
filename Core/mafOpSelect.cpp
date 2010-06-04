@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpSelect.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-05-25 15:21:46 $
-  Version:   $Revision: 1.11.2.1 $
+  Date:      $Date: 2010-06-04 14:23:07 $
+  Version:   $Revision: 1.11.2.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -181,22 +181,23 @@ Select the vme parent
   m_Clipboard = m_Selection;
 
   //////////////////////////////////////////////////////////////////////////
-  //It is necessary load all vtk data of the vme time varying otherwise paste or undo cause an application crash
+  // It is necessary load all vtk data of the vme time varying otherwise paste or undo cause an application crash
   //////////////////////////////////////////////////////////////////////////
-  if (mafVME::SafeDownCast(m_Selection))
+  LoadVTKData(m_Selection);
+
+  //////////////////////////////////////////////////////////////////////////
+  // Added by Losi on 03.06.2010
+  // It is necessary to load all vtk data of children vme otherwise paste or undo cause an application crash
+  //////////////////////////////////////////////////////////////////////////
+  mafVME *m_SelectionVme = mafVME::SafeDownCast(m_Selection);
+  if(m_SelectionVme)
   {
-	  mafTimeStamp oldTime = mafVME::SafeDownCast(m_Selection)->GetTimeStamp();
-	  if (mafVME::SafeDownCast(m_Selection)->GetNumberOfTimeStamps()>1)
-	  {
-	    std::vector<mafTimeStamp> subKFrames;
-	    mafVME::SafeDownCast(m_Selection)->GetTimeStamps(subKFrames);
-	    for (int i=0;i<subKFrames.size();i++)
-	    {
-	      mafVME::SafeDownCast(m_Selection)->SetTimeStamp(subKFrames[i]);
-        mafVME::SafeDownCast(m_Selection)->GetOutput()->GetVTKData();
-	    }
-	  }
-	  mafVME::SafeDownCast(m_Selection)->SetTimeStamp(oldTime);
+    const mafNode::mafChildrenVector *children = m_SelectionVme->GetChildren();
+    for(int c = 0; c < children->size(); c++)
+    {
+      mafNode *child = children->at(c);
+      LoadVTKData(child);
+    }
   }
   //////////////////////////////////////////////////////////////////////////
 
@@ -205,6 +206,26 @@ Select the vme parent
   if (mafVME::SafeDownCast(m_SelectionParent.GetPointer()))
   {
     ((mafVME *)m_SelectionParent.GetPointer())->GetOutput()->Update();
+  }
+}
+//----------------------------------------------------------------------------
+void mafOpCut::LoadVTKData(mafNode *vme)
+//----------------------------------------------------------------------------
+{
+  // Added by Losi on 03.06.2010
+  if (mafVME::SafeDownCast(vme))
+  {
+    mafTimeStamp oldTime = mafVME::SafeDownCast(vme)->GetTimeStamp();
+
+    std::vector<mafTimeStamp> subKFrames;
+    mafVME::SafeDownCast(vme)->GetTimeStamps(subKFrames);
+    for (int i=0;i<subKFrames.size();i++)
+    {
+      mafVME::SafeDownCast(vme)->SetTimeStamp(subKFrames[i]);
+      mafVME::SafeDownCast(vme)->GetOutput()->GetVTKData();
+    }
+
+    mafVME::SafeDownCast(vme)->SetTimeStamp(oldTime);
   }
 }
 //----------------------------------------------------------------------------

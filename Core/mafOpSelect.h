@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpSelect.h,v $
   Language:  C++
-  Date:      $Date: 2010-04-21 09:49:57 $
-  Version:   $Revision: 1.7.2.1 $
+  Date:      $Date: 2010-06-04 14:23:07 $
+  Version:   $Revision: 1.7.2.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -102,6 +102,9 @@ public:
     void OpUndo();
     /** return a instance of current object. */
     mafOp* Copy(); 
+    /** Load VTK data for the specified VME (Added by Losi on 03.06.2010) */
+    void LoadVTKData(mafNode *vme);
+
 protected:
     mafAutoPointer<mafNode> m_SelectionParent;
 };
