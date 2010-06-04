@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpVolumeResample.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-03-05 12:25:52 $
-  Version:   $Revision: 1.12.2.9 $
+  Date:      $Date: 2010-06-04 08:56:22 $
+  Version:   $Revision: 1.12.2.10 $
   Authors:   Marco Petrone
 ==========================================================================
 Copyright (c) 2002/2004
@@ -118,6 +118,13 @@ medOpVolumeResample::medOpVolumeResample(const wxString &label /* =  */,bool sho
 medOpVolumeResample::~medOpVolumeResample()
 //----------------------------------------------------------------------------
 {
+  GizmoDelete();
+
+  if (m_VMEDummy)
+  {
+  	m_VMEDummy->ReparentTo(NULL);
+  }
+  mafDEL(m_VMEDummy);
   mafDEL(m_CenterVolumeRefSysMatrix);
 	mafDEL(m_ResampledVme);
 }
@@ -269,19 +276,6 @@ void medOpVolumeResample::AutoSpacing()
         m_VolumeSpacing[2] = spcz;
     }
   }
-
-  // project spacing on new axes.
-  // Note: TransformVector ignores the translation column!
-  /*mafSmartPointer<mafTransformFrame> input_to_output;
-  input_to_output->SetInputFrame(m_GizmoTranslate->GetAbsPose());
-  input_to_output->SetTargetFrame(((mafVME *)m_Input)->GetOutput()->GetAbsMatrix());
-  input_to_output->Update();
-  input_to_output->TransformPoint(m_VolumeSpacing,m_VolumeSpacing);
-
-  for(int i = 0; i < 3; i++)
-  {
-    m_VolumeSpacing[i] = fabs(m_VolumeSpacing[i]);
-  }*/
 }
 //----------------------------------------------------------------------------
 void medOpVolumeResample::UpdateGui()
@@ -1161,9 +1155,10 @@ void medOpVolumeResample::ShiftCenterResampled()
 void medOpVolumeResample::OpStop(int result)
 //----------------------------------------------------------------------------
 {
-	HideGui();
-  m_VMEDummy->ReparentTo(NULL);
-	mafDEL(m_VMEDummy);
+	if (!m_TestMode)
+	{
+		HideGui();
+	}
 	mafEventMacro(mafEvent(this,result));
 }
 
