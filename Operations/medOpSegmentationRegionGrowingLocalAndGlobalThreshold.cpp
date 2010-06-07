@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSegmentationRegionGrowingLocalAndGlobalThreshold.cpp,v $
 Language:  C++
-Date:      $Date: 2010-01-26 16:38:28 $
-Version:   $Revision: 1.1.2.15 $
+Date:      $Date: 2010-06-07 07:56:18 $
+Version:   $Revision: 1.1.2.16 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2009
@@ -889,7 +889,10 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpStop(int result)
     mafEventMacro(mafEvent(this,CAMERA_UPDATE));
   }
 
-  HideGui();
+  if (m_Gui)
+  {
+  	HideGui();
+  }
   mafEventMacro(mafEvent(this,result));        
 }
 //----------------------------------------------------------------------------
