@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medAttributeSegmentationVolume.cpp,v $
 Language:  C++
-Date:      $Date: 2010-06-07 13:23:40 $
-Version:   $Revision: 1.1.2.6 $
+Date:      $Date: 2010-06-07 14:31:09 $
+Version:   $Revision: 1.1.2.7 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -328,7 +328,8 @@ int medAttributeSegmentationVolume::RemoveAllSeeds()
 int medAttributeSegmentationVolume::DeleteSeed(int index)
 //----------------------------------------------------------------------------
 {
-  if (index<0 || index>m_RegionGrowingSeeds.size()-1)
+  int nSeeds = m_RegionGrowingSeeds.size();
+  if (index<0 || index>(nSeeds-1))
   {
     return MAF_ERROR;
   }
@@ -392,7 +393,8 @@ int medAttributeSegmentationVolume::AddSeed(int seed[3])
 int medAttributeSegmentationVolume::GetSeed(int index,int seed[3])
 //----------------------------------------------------------------------------
 {
-  if (index<0 || index>m_RegionGrowingSeeds.size()-1)
+  int nSeeds = m_RegionGrowingSeeds.size();
+  if (index<0 || index>(nSeeds-1))
   {
     return MAF_ERROR;
   }
