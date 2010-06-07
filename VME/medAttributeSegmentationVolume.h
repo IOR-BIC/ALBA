@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medAttributeSegmentationVolume.h,v $
 Language:  C++
-Date:      $Date: 2010-05-05 08:09:02 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2010-06-07 13:23:40 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -63,7 +63,7 @@ public:
   int GetRange(int index,int &startSlice, int &endSlice, double &threshold);
 
   /** Update the value of the range of the position index - return MAF_ERROR if the index isn't correct*/
-  int UpdateRange(int index,int &startSlice, int &endSlice, double &threshold);
+  int UpdateRange(int index,int startSlice, int endSlice, double threshold);
 
   /** Delete the range of the position index */
   int DeleteRange(int index);

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medAttributeSegmentationVolume.cpp,v $
 Language:  C++
-Date:      $Date: 2010-05-05 12:06:26 $
-Version:   $Revision: 1.1.2.5 $
+Date:      $Date: 2010-06-07 13:23:40 $
+Version:   $Revision: 1.1.2.6 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -272,7 +272,8 @@ int medAttributeSegmentationVolume::AddRange(int startSlice,int endSlice,double 
 int medAttributeSegmentationVolume::GetRange(int index,int &startSlice, int &endSlice, double &threshold)
 //----------------------------------------------------------------------------
 {
-  if (index<0 || index>m_AutomaticSegmentationRanges.size()-1)
+  int nRanges = m_AutomaticSegmentationRanges.size();
+  if (index<0 || index>(nRanges-1))
   {
     return MAF_ERROR;
   }
@@ -284,10 +285,11 @@ int medAttributeSegmentationVolume::GetRange(int index,int &startSlice, int &end
   return MAF_OK;
 }
 //----------------------------------------------------------------------------
-int medAttributeSegmentationVolume::UpdateRange(int index,int &startSlice, int &endSlice, double &threshold)
+int medAttributeSegmentationVolume::UpdateRange(int index,int startSlice, int endSlice, double threshold)
 //----------------------------------------------------------------------------
 {
-  if (index<0 || index>m_AutomaticSegmentationRanges.size()-1)
+  int nRanges = m_AutomaticSegmentationRanges.size();
+  if (index<0 || index>(nRanges-1))
   {
     return MAF_ERROR;
   }
@@ -351,7 +353,8 @@ int medAttributeSegmentationVolume::DeleteSeed(int index)
 int medAttributeSegmentationVolume::DeleteRange(int index)
 //----------------------------------------------------------------------------
 {
-  if (index<0 || index>m_AutomaticSegmentationRanges.size()-1)
+  int nRanges = m_AutomaticSegmentationRanges.size();
+  if (index<0 || index>(nRanges-1))
   {
     return MAF_ERROR;
   }
