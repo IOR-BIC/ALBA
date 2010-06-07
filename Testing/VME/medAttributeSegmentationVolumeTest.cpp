@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medAttributeSegmentationVolumeTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-06-07 13:30:10 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-06-07 14:29:51 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2009
@@ -345,7 +345,6 @@ void medAttributeSegmentationVolumeTest::TestGetNumberOfRanges()
   storage->SetURL(fileName);
   //////////////////////////////////////////////////////////////////////////
   //Test SET
-  int resultDelete;
   int startSlice,endSlice;
   double threshold;
   attribute->AddRange(0,10,5.0);
@@ -365,6 +364,300 @@ void medAttributeSegmentationVolumeTest::TestGetNumberOfRanges()
   medAttributeSegmentationVolume *restoredAttribute = medAttributeSegmentationVolume::SafeDownCast(storage->GetRoot()->GetFirstChild()->GetAttribute("SegmentationVolumeData"));
   CPPUNIT_ASSERT( restoredAttribute );
   CPPUNIT_ASSERT( restoredAttribute->GetNumberOfRanges() == 0 );
+  //////////////////////////////////////////////////////////////////////////
+  mafDEL(storage);
+}
+//---------------------------------------------------------
+void medAttributeSegmentationVolumeTest::TestSetRegionGrowingUpperThreshold()
+//---------------------------------------------------------
+{
+  medVMEFactory::Initialize();
+  mafVMEStorage *storage = mafVMEStorage::New();
+  storage->GetRoot()->SetName("root");
+  storage->GetRoot()->Initialize();
+  mafSmartPointer<medVMESegmentationVolume> volume;
+  storage->GetRoot()->AddChild(volume);
+  volume->SetParent(storage->GetRoot());
+  mafSmartPointer<medAttributeSegmentationVolume> attribute;
+  volume->SetAttribute("SegmentationVolumeData",attribute);
+  mafString fileName = MED_DATA_ROOT;
+  fileName << "/Test_AttributeSegmentationVolume/SavedMSF.msf";
+  storage->SetURL(fileName);
+  //////////////////////////////////////////////////////////////////////////
+  //Default value
+  CPPUNIT_ASSERT( attribute->GetRegionGrowingUpperThreshold() ==  0.0);
+  //////////////////////////////////////////////////////////////////////////
+
+  //////////////////////////////////////////////////////////////////////////
+  //Test SET
+  attribute->SetRegionGrowingUpperThreshold(10.0);
+  CPPUNIT_ASSERT( attribute->GetRegionGrowingUpperThreshold() == 10.0 );
+  attribute->SetRegionGrowingUpperThreshold(-10.0);
+  CPPUNIT_ASSERT( attribute->GetRegionGrowingUpperThreshold() == -10.0 );
+  //////////////////////////////////////////////////////////////////////////
+
+  //////////////////////////////////////////////////////////////////////////
+  //Check store in the msf
+  int resultStoreRestore;
+  resultStoreRestore = storage->Store();
+  CPPUNIT_ASSERT( resultStoreRestore == MAF_OK );
+  resultStoreRestore = storage->Restore();
+  CPPUNIT_ASSERT( resultStoreRestore == MAF_OK );
+  medAttributeSegmentationVolume *restoredAttribute = medAttributeSegmentationVolume::SafeDownCast(storage->GetRoot()->GetFirstChild()->GetAttribute("SegmentationVolumeData"));
+  CPPUNIT_ASSERT( restoredAttribute );
+  CPPUNIT_ASSERT( attribute->GetRegionGrowingUpperThreshold() == -10.0 );
+  //////////////////////////////////////////////////////////////////////////
+  mafDEL(storage);
+}
+//---------------------------------------------------------
+void medAttributeSegmentationVolumeTest::TestSetRegionGrowingLowerThreshold()
+//---------------------------------------------------------
+{
+  medVMEFactory::Initialize();
+  mafVMEStorage *storage = mafVMEStorage::New();
+  storage->GetRoot()->SetName("root");
+  storage->GetRoot()->Initialize();
+  mafSmartPointer<medVMESegmentationVolume> volume;
+  storage->GetRoot()->AddChild(volume);
+  volume->SetParent(storage->GetRoot());
+  mafSmartPointer<medAttributeSegmentationVolume> attribute;
+  volume->SetAttribute("SegmentationVolumeData",attribute);
+  mafString fileName = MED_DATA_ROOT;
+  fileName << "/Test_AttributeSegmentationVolume/SavedMSF.msf";
+  storage->SetURL(fileName);
+  //////////////////////////////////////////////////////////////////////////
+  //Default value
+  CPPUNIT_ASSERT( attribute->GetRegionGrowingLowerThreshold() ==  0.0);
+  //////////////////////////////////////////////////////////////////////////
+
+  //////////////////////////////////////////////////////////////////////////
+  //Test SET
+  attribute->SetRegionGrowingLowerThreshold(10.0);
+  CPPUNIT_ASSERT( attribute->GetRegionGrowingLowerThreshold() == 10.0 );
+  attribute->SetRegionGrowingLowerThreshold(-10.0);
+  CPPUNIT_ASSERT( attribute->GetRegionGrowingLowerThreshold() == -10.0 );
+  //////////////////////////////////////////////////////////////////////////
+
+  //////////////////////////////////////////////////////////////////////////
+  //Check store in the msf
+  int resultStoreRestore;
+  resultStoreRestore = storage->Store();
+  CPPUNIT_ASSERT( resultStoreRestore == MAF_OK );
+  resultStoreRestore = storage->Restore();
+  CPPUNIT_ASSERT( resultStoreRestore == MAF_OK );
+  medAttributeSegmentationVolume *restoredAttribute = medAttributeSegmentationVolume::SafeDownCast(storage->GetRoot()->GetFirstChild()->GetAttribute("SegmentationVolumeData"));
+  CPPUNIT_ASSERT( restoredAttribute );
+  CPPUNIT_ASSERT( attribute->GetRegionGrowingLowerThreshold() == -10.0 );
+  //////////////////////////////////////////////////////////////////////////
+  mafDEL(storage);
+}
+//---------------------------------------------------------
+void medAttributeSegmentationVolumeTest::TestAddSeed()
+//---------------------------------------------------------
+{
+  medVMEFactory::Initialize();
+  mafVMEStorage *storage = mafVMEStorage::New();
+  storage->GetRoot()->SetName("root");
+  storage->GetRoot()->Initialize();
+  mafSmartPointer<medVMESegmentationVolume> volume;
+  storage->GetRoot()->AddChild(volume);
+  volume->SetParent(storage->GetRoot());
+  mafSmartPointer<medAttributeSegmentationVolume> attribute;
+  volume->SetAttribute("SegmentationVolumeData",attribute);
+  mafString fileName = MED_DATA_ROOT;
+  fileName << "/Test_AttributeSegmentationVolume/SavedMSF.msf";
+  storage->SetURL(fileName);
+  //////////////////////////////////////////////////////////////////////////
+  //Test SET
+  int resultAddGet;
+  int seed[3];
+  seed[0] = 0;
+  seed[1] = 1;
+  seed[2] = 2;
+  resultAddGet = attribute->AddSeed(seed);
+  CPPUNIT_ASSERT( resultAddGet == MAF_OK );
+  seed[0] = 3;
+  seed[1] = 4;
+  seed[2] = 5;
+  resultAddGet = attribute->AddSeed(seed);
+  CPPUNIT_ASSERT( resultAddGet == MAF_OK );
+  resultAddGet = attribute->GetSeed(0,seed);
+  CPPUNIT_ASSERT( resultAddGet == MAF_OK );
+  CPPUNIT_ASSERT( seed[0] == 0 && seed[1] == 1 && seed[2] == 2 );
+  resultAddGet = attribute->GetSeed(1,seed);
+  CPPUNIT_ASSERT( resultAddGet == MAF_OK );
+  CPPUNIT_ASSERT( seed[0] == 3 && seed[1] == 4 && seed[2] == 5 );
+  resultAddGet = attribute->GetSeed(2,seed);
+  CPPUNIT_ASSERT( resultAddGet == MAF_ERROR );
+  //////////////////////////////////////////////////////////////////////////
+
+  //////////////////////////////////////////////////////////////////////////
+  //Check store in the msf
+  int resultStoreRestore;
+  resultStoreRestore = storage->Store();
+  CPPUNIT_ASSERT( resultStoreRestore == MAF_OK );
+  resultStoreRestore = storage->Restore();
+  CPPUNIT_ASSERT( resultStoreRestore == MAF_OK );
+  medAttributeSegmentationVolume *restoredAttribute = medAttributeSegmentationVolume::SafeDownCast(storage->GetRoot()->GetFirstChild()->GetAttribute("SegmentationVolumeData"));
+  CPPUNIT_ASSERT( restoredAttribute );
+  resultAddGet = restoredAttribute->GetSeed(0,seed);
+  CPPUNIT_ASSERT( resultAddGet == MAF_OK );
+  CPPUNIT_ASSERT( seed[0] == 0 && seed[1] == 1 && seed[2] == 2 );
+  resultAddGet = restoredAttribute->GetSeed(1,seed);
+  CPPUNIT_ASSERT( resultAddGet == MAF_OK );
+  CPPUNIT_ASSERT( seed[0] == 3 && seed[1] == 4 && seed[2] == 5 );
+  //////////////////////////////////////////////////////////////////////////
+  mafDEL(storage);
+}
+
+//---------------------------------------------------------
+void medAttributeSegmentationVolumeTest::TestDeleteSeed()
+//---------------------------------------------------------
+{
+  medVMEFactory::Initialize();
+  mafVMEStorage *storage = mafVMEStorage::New();
+  storage->GetRoot()->SetName("root");
+  storage->GetRoot()->Initialize();
+  mafSmartPointer<medVMESegmentationVolume> volume;
+  storage->GetRoot()->AddChild(volume);
+  volume->SetParent(storage->GetRoot());
+  mafSmartPointer<medAttributeSegmentationVolume> attribute;
+  volume->SetAttribute("SegmentationVolumeData",attribute);
+  mafString fileName = MED_DATA_ROOT;
+  fileName << "/Test_AttributeSegmentationVolume/SavedMSF.msf";
+  storage->SetURL(fileName);
+  //////////////////////////////////////////////////////////////////////////
+  //Test SET
+  int resultDelete;
+  int seed[3];
+  seed[0] = 0;
+  seed[1] = 1;
+  seed[2] = 2;
+  resultDelete = attribute->AddSeed(seed);
+  CPPUNIT_ASSERT( resultDelete == MAF_OK );
+  seed[0] = 3;
+  seed[1] = 4;
+  seed[2] = 5;
+  resultDelete = attribute->AddSeed(seed);
+  resultDelete = attribute->DeleteSeed(0);
+  CPPUNIT_ASSERT( resultDelete == MAF_OK );
+  resultDelete = attribute->GetSeed(0,seed);
+  CPPUNIT_ASSERT( resultDelete == MAF_OK );
+  CPPUNIT_ASSERT( seed[0] == 3 && seed[1] == 4 && seed[2] == 5 );
+  resultDelete = attribute->GetSeed(1,seed);
+  CPPUNIT_ASSERT( resultDelete == MAF_ERROR );
+  //////////////////////////////////////////////////////////////////////////
+
+  //////////////////////////////////////////////////////////////////////////
+  //Check store in the msf
+  int resultStoreRestore;
+  resultStoreRestore = storage->Store();
+  CPPUNIT_ASSERT( resultStoreRestore == MAF_OK );
+  resultStoreRestore = storage->Restore();
+  CPPUNIT_ASSERT( resultStoreRestore == MAF_OK );
+  medAttributeSegmentationVolume *restoredAttribute = medAttributeSegmentationVolume::SafeDownCast(storage->GetRoot()->GetFirstChild()->GetAttribute("SegmentationVolumeData"));
+  CPPUNIT_ASSERT( restoredAttribute );
+  resultDelete = attribute->GetSeed(0,seed);
+  CPPUNIT_ASSERT( resultDelete == MAF_OK );
+  CPPUNIT_ASSERT( seed[0] == 3 && seed[1] == 4 && seed[2] == 5 );
+  resultDelete = attribute->GetSeed(1,seed);
+  CPPUNIT_ASSERT( resultDelete == MAF_ERROR );
+  //////////////////////////////////////////////////////////////////////////
+  mafDEL(storage);
+}
+//---------------------------------------------------------
+void medAttributeSegmentationVolumeTest::TestGetNumberOfSeeds()
+//---------------------------------------------------------
+{
+  medVMEFactory::Initialize();
+  mafVMEStorage *storage = mafVMEStorage::New();
+  storage->GetRoot()->SetName("root");
+  storage->GetRoot()->Initialize();
+  mafSmartPointer<medVMESegmentationVolume> volume;
+  storage->GetRoot()->AddChild(volume);
+  volume->SetParent(storage->GetRoot());
+  mafSmartPointer<medAttributeSegmentationVolume> attribute;
+  volume->SetAttribute("SegmentationVolumeData",attribute);
+  mafString fileName = MED_DATA_ROOT;
+  fileName << "/Test_AttributeSegmentationVolume/SavedMSF.msf";
+  storage->SetURL(fileName);
+  //////////////////////////////////////////////////////////////////////////
+  //Test SET
+  int seed[3];
+  seed[0] = 0;
+  seed[1] = 1;
+  seed[2] = 2;
+  attribute->AddSeed(seed);
+  seed[0] = 3;
+  seed[1] = 4;
+  seed[2] = 5;
+  attribute->AddSeed(seed);
+  CPPUNIT_ASSERT( attribute->GetNumberOfSeeds() == 2 );
+  attribute->RemoveAllSeeds();
+  CPPUNIT_ASSERT( attribute->GetNumberOfSeeds() == 0 );
+  //////////////////////////////////////////////////////////////////////////
+
+  //////////////////////////////////////////////////////////////////////////
+  //Check store in the msf
+  int resultStoreRestore;
+  resultStoreRestore = storage->Store();
+  CPPUNIT_ASSERT( resultStoreRestore == MAF_OK );
+  resultStoreRestore = storage->Restore();
+  CPPUNIT_ASSERT( resultStoreRestore == MAF_OK );
+  medAttributeSegmentationVolume *restoredAttribute = medAttributeSegmentationVolume::SafeDownCast(storage->GetRoot()->GetFirstChild()->GetAttribute("SegmentationVolumeData"));
+  CPPUNIT_ASSERT( restoredAttribute );
+  CPPUNIT_ASSERT( restoredAttribute->GetNumberOfSeeds() == 0 );
+  //////////////////////////////////////////////////////////////////////////
+  mafDEL(storage);
+}
+//---------------------------------------------------------
+void medAttributeSegmentationVolumeTest::TestRemoveAllSeeds()
+//---------------------------------------------------------
+{
+  medVMEFactory::Initialize();
+  mafVMEStorage *storage = mafVMEStorage::New();
+  storage->GetRoot()->SetName("root");
+  storage->GetRoot()->Initialize();
+  mafSmartPointer<medVMESegmentationVolume> volume;
+  storage->GetRoot()->AddChild(volume);
+  volume->SetParent(storage->GetRoot());
+  mafSmartPointer<medAttributeSegmentationVolume> attribute;
+  volume->SetAttribute("SegmentationVolumeData",attribute);
+  mafString fileName = MED_DATA_ROOT;
+  fileName << "/Test_AttributeSegmentationVolume/SavedMSF.msf";
+  storage->SetURL(fileName);
+  //////////////////////////////////////////////////////////////////////////
+  //Test SET
+  int seed[3];
+  int resultDelete;
+  seed[0] = 0;
+  seed[1] = 1;
+  seed[2] = 2;
+  attribute->AddSeed(seed);
+  seed[0] = 3;
+  seed[1] = 4;
+  seed[2] = 5;
+  attribute->AddSeed(seed);
+  attribute->RemoveAllSeeds();
+  resultDelete = attribute->GetSeed(0,seed);
+  CPPUNIT_ASSERT( resultDelete == MAF_ERROR );
+  resultDelete = attribute->GetSeed(1,seed);
+  CPPUNIT_ASSERT( resultDelete == MAF_ERROR );
+  //////////////////////////////////////////////////////////////////////////
+
+  //////////////////////////////////////////////////////////////////////////
+  //Check store in the msf
+  int resultStoreRestore;
+  resultStoreRestore = storage->Store();
+  CPPUNIT_ASSERT( resultStoreRestore == MAF_OK );
+  resultStoreRestore = storage->Restore();
+  CPPUNIT_ASSERT( resultStoreRestore == MAF_OK );
+  medAttributeSegmentationVolume *restoredAttribute = medAttributeSegmentationVolume::SafeDownCast(storage->GetRoot()->GetFirstChild()->GetAttribute("SegmentationVolumeData"));
+  CPPUNIT_ASSERT( restoredAttribute );
+  resultDelete = restoredAttribute->GetSeed(0,seed);
+  CPPUNIT_ASSERT( resultDelete == MAF_ERROR );
+  resultDelete = restoredAttribute->GetSeed(1,seed);
+  CPPUNIT_ASSERT( resultDelete == MAF_ERROR );
   //////////////////////////////////////////////////////////////////////////
   mafDEL(storage);
 }

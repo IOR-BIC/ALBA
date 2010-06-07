@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medAttributeSegmentationVolumeTest.h,v $
 Language:  C++
-Date:      $Date: 2010-06-07 13:30:10 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-06-07 14:29:51 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2009
@@ -40,7 +40,13 @@ public:
   CPPUNIT_TEST( TestUpdateRange );
   CPPUNIT_TEST( TestDeleteRange );
   CPPUNIT_TEST( TestRemoveAllRanges );
-  CPPUNIT_TEST( TestRemoveAllRanges );
+  CPPUNIT_TEST( TestGetNumberOfRanges );
+  CPPUNIT_TEST( TestSetRegionGrowingUpperThreshold );
+  CPPUNIT_TEST( TestSetRegionGrowingLowerThreshold );
+  CPPUNIT_TEST( TestAddSeed );
+  CPPUNIT_TEST( TestDeleteSeed );
+  CPPUNIT_TEST( TestGetNumberOfSeeds );
+  CPPUNIT_TEST( TestRemoveAllSeeds );
   CPPUNIT_TEST_SUITE_END();
 
 protected:
@@ -52,6 +58,12 @@ protected:
   void TestDeleteRange();
   void TestRemoveAllRanges();
   void TestGetNumberOfRanges();
+  void TestSetRegionGrowingUpperThreshold();
+  void TestSetRegionGrowingLowerThreshold();
+  void TestAddSeed();
+  void TestDeleteSeed();
+  void TestGetNumberOfSeeds();
+  void TestRemoveAllSeeds();
 };
 
 
