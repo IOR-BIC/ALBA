@@ -113,6 +113,8 @@ ADD_TEST(medPipeVectorFieldSurfaceTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeVectorF
 ADD_EXECUTABLE(medPipeVectorFieldGlyphsTest medPipeVectorFieldGlyphsTest.h medPipeVectorFieldGlyphsTest.cpp)
 ADD_TEST(medPipeVectorFieldGlyphsTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeVectorFieldGlyphsTest)
 
+ADD_EXECUTABLE(medAttributeSegmentationVolumeTest medAttributeSegmentationVolumeTest.h medAttributeSegmentationVolumeTest.cpp)
+ADD_TEST(medAttributeSegmentationVolumeTest  ${EXECUTABLE_OUTPUT_PATH}/medAttributeSegmentationVolumeTest)
 
 #to be checked
 #ADD_EXECUTABLE(medPipeVolumeVRTest medPipeVolumeVRTest.h medPipeVolumeVRTest.cpp)
