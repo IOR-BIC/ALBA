@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMEDPolyDataDeformation.h,v $ 
   Language: C++ 
-  Date: $Date: 2010-03-24 10:33:14 $ 
-  Version: $Revision: 1.1.2.5 $ 
+  Date: $Date: 2010-06-07 11:30:41 $ 
+  Version: $Revision: 1.1.2.6 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -118,14 +118,17 @@ protected:
   public:
     CSkeletonVertex() 
     {
-      memset(this, 0, sizeof(CSkeletonVertex));
-      Id = -1;
+			Id = -1;
+      memset(Coords, 0, sizeof(Coords));
+			memset(&LF, 0, sizeof(LF));
+			PMatch = NULL;      
     }
 
     CSkeletonVertex(double coords[3]) 
     {      
-      memset(this, 0, sizeof(CSkeletonVertex));
-      Id = -1;
+      Id = -1;      
+			memset(&LF, 0, sizeof(LF));
+			PMatch = NULL;
 
       Coords[0] = coords[0];
       Coords[1] = coords[1];
