@@ -2,8 +2,8 @@
 Program: Multimod Application Framework RELOADED 
 Module: $RCSfile: vtkMEDPolyDataDeformation.cpp,v $ 
 Language: C++ 
-Date: $Date: 2010-03-24 10:33:14 $ 
-Version: $Revision: 1.1.2.5 $ 
+Date: $Date: 2010-06-08 08:23:57 $ 
+Version: $Revision: 1.1.2.6 $ 
 Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
 ========================================================================== 
 Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -35,7 +35,7 @@ See the COPYINGS file for license details
 
 
 
-vtkCxxRevisionMacro(vtkMEDPolyDataDeformation, "$Revision: 1.1.2.5 $");
+vtkCxxRevisionMacro(vtkMEDPolyDataDeformation, "$Revision: 1.1.2.6 $");
 vtkStandardNewMacro(vtkMEDPolyDataDeformation);
 
 #include "mafMemDbg.h"
@@ -1529,7 +1529,7 @@ void vtkMEDPolyDataDeformation::AddCurveToSuperSkeleton(CSkeletonVertex* pOCCurv
     CSkeletonVertex* pDCCurve = pOCCurve->PMatch;
     pDCCurve->Id = pOCCurve->Id = nNextPtId;
     SuperSkeleton->POCSkel->Vertices.push_back(pOCCurve);    
-    SuperSkeleton->POCSkel->Vertices.push_back(pDCCurve);    
+    SuperSkeleton->PDCSkel->Vertices.push_back(pDCCurve);
     nNextPtId++;
 
     //insert the next edge; if we are in the last vertex, 
