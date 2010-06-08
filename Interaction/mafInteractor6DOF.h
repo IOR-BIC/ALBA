@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractor6DOF.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:46:39 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2010-06-08 07:29:49 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -61,7 +61,7 @@ public:
     this flag makes the interactor to ingore these events and to be continuously active.
     Default is false. */
   void SetIgnoreTriggerEvents(int flag) {m_IgnoreTriggerEvents=flag;}
-  int GetIgnoreTriggerEvents(int flag) {return m_IgnoreTriggerEvents;}
+  int GetIgnoreTriggerEvents() {return m_IgnoreTriggerEvents;}
   void IgnoreTriggerEventsOn() {SetIgnoreTriggerEvents(true);}
   void IgnoreTriggerEventsOff() {SetIgnoreTriggerEvents(false);}
 
