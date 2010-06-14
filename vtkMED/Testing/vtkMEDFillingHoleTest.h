@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDFillingHoleTest.h,v $
 Language:  C++
-Date:      $Date: 2010-06-14 12:25:05 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-06-14 12:39:04 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -29,12 +29,14 @@ class vtkMEDFillingHoleTest : public CPPUNIT_NS::TestFixture
   CPPUNIT_TEST( TestDynamicAllocation );
   CPPUNIT_TEST( TestSetFillAHole );
   CPPUNIT_TEST( TestSetFillAllHole );
+  CPPUNIT_TEST( TestGetLastPatch );
   CPPUNIT_TEST_SUITE_END();
 
 protected:
   void TestDynamicAllocation();
   void TestSetFillAHole();
   void TestSetFillAllHole();
+  void TestGetLastPatch();
 };
 
 
