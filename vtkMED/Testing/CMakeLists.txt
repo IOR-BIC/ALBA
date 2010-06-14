@@ -48,6 +48,8 @@ ADD_EXECUTABLE(vtkMEDErythrocyteSourceTest vtkMEDErythrocyteSourceTest.h vtkMEDE
 ADD_TEST(vtkMEDErythrocyteSourceTest ${EXECUTABLE_OUTPUT_PATH}/vtkMEDErythrocyteSourceTest)
 ADD_EXECUTABLE(vtkMAFMeshCutter_BESTest vtkMAFMeshCutter_BESTest.h vtkMAFMeshCutter_BESTest.cpp)
 ADD_TEST(vtkMAFMeshCutter_BESTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFMeshCutter_BESTest)
+ADD_EXECUTABLE(vtkMEDFillingHoleTest vtkMEDFillingHoleTest.h vtkMEDFillingHoleTest.cpp)
+ADD_TEST(vtkMEDFillingHoleTest ${EXECUTABLE_OUTPUT_PATH}/vtkMEDFillingHoleTest)
 
 
 # wxWidgets specific classes
