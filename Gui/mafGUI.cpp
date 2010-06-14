@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUI.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-05-05 10:12:36 $
-  Version:   $Revision: 1.2.2.7 $
+  Date:      $Date: 2010-06-14 13:41:53 $
+  Version:   $Revision: 1.2.2.8 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -1528,7 +1528,7 @@ mafGUIRollOut *mafGUI::RollOut(int id, mafString title, mafGUI *roll_gui, bool r
 {
   int w_id = GetWidgetId(id);
   mafGUIRollOut *roll = new mafGUIRollOut(this, title, roll_gui, w_id, rollOutOpen);
-  roll->SetListener(m_Listener);
+  roll->SetListener(this);
   return roll;
 }
 //----------------------------------------------------------------------------
