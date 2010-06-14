@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDFillingHole.cxx,v $
 Language:  C++
-Date:      $Date: 2010-02-01 17:37:16 $
-Version:   $Revision: 1.1.2.5 $
+Date:      $Date: 2010-06-14 12:46:21 $
+Version:   $Revision: 1.1.2.6 $
 Authors:   Fuli Wu, Josef Kohout
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -33,7 +33,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <float.h>
 
 
-vtkCxxRevisionMacro(vtkMEDFillingHole, "$Revision: 1.1.2.5 $");
+vtkCxxRevisionMacro(vtkMEDFillingHole, "$Revision: 1.1.2.6 $");
 vtkStandardNewMacro(vtkMEDFillingHole);
 
 #include "mafMemDbg.h"
@@ -2695,6 +2695,8 @@ void vtkMEDFillingHole::SetFillAHole(int id)
   //filling a hole
   FillingHoles = 1;  
   BorderPointID = id;
+
+  Modified();
 }
 
 //----------------------------------------------------------------------------
