@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2010-05-26 16:01:53 $
-Version:   $Revision: 1.1.2.44 $
+Date:      $Date: 2010-06-15 13:06:07 $
+Version:   $Revision: 1.1.2.45 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -368,6 +368,10 @@ protected:
 /**
 class name: medDicomSlice
 Holds information on a single dicom slice
+
+We are using Image Position (Patient) (0020,0032) dicom tag to set dicom slice position. 
+See here for the motivation behind this decision:
+http://www.cmake.org/pipermail/insight-users/2005-September/014711.html
 */
 class medDicomSlice
 {
@@ -390,7 +394,8 @@ public:
 		m_DcmCardiacNumberOfImages = -1;
 	};
 	/** overloaded constructor */
-	medDicomSlice(mafString sliceABSFilename,double dcmImagePositionPatient[3], double dcmImageOrientationPatient[6],\
+	
+	(mafString sliceABSFilename,double dcmImagePositionPatient[3], double dcmImageOrientationPatient[6],\
 		vtkImageData *data ,int dcmInstanceNumber=-1, int dcmCardiacNumberOfImages=-1, double dcmTtriggerTime=-1.0)  
 	{
 		m_SliceABSFileName = sliceABSFilename;
