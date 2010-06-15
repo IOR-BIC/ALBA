@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2010-06-15 13:06:07 $
-Version:   $Revision: 1.1.2.45 $
+Date:      $Date: 2010-06-15 14:49:31 $
+Version:   $Revision: 1.1.2.46 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -393,9 +393,9 @@ public:
 		m_DcmTriggerTime = -1.0;
 		m_DcmCardiacNumberOfImages = -1;
 	};
+
 	/** overloaded constructor */
-	
-	(mafString sliceABSFilename,double dcmImagePositionPatient[3], double dcmImageOrientationPatient[6],\
+	medDicomSlice(mafString sliceABSFilename,double dcmImagePositionPatient[3], double dcmImageOrientationPatient[6],\
 		vtkImageData *data ,int dcmInstanceNumber=-1, int dcmCardiacNumberOfImages=-1, double dcmTtriggerTime=-1.0)  
 	{
 		m_SliceABSFileName = sliceABSFilename;
