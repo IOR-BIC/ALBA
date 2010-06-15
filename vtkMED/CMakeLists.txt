@@ -36,6 +36,10 @@ SET(vtkMED_SRCS
   vtkMEDFillingHole.h
   vtkMEDRegionGrowingLocalGlobalThreshold.cxx
   vtkMEDRegionGrowingLocalGlobalThreshold.h
+  vtkMEDFixTopology.cxx
+  vtkMEDFixTopology.h
+	vtkMEDPoissonSurfaceReconstruction.cxx
+  vtkMEDPoissonSurfaceReconstruction.h
   
   ########## Should be committed down ###########
   vtkMAFVolumeRayCastMapper.cxx
