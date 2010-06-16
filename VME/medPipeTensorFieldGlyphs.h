@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeTensorFieldGlyphs.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-11-04 16:16:13 $ 
-  Version: $Revision: 1.1.2.4 $ 
+  Date: $Date: 2010-06-16 07:04:40 $ 
+  Version: $Revision: 1.1.2.5 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -35,10 +35,14 @@ class mafGUIButton;
 class mafGUIDialog;
 class vtkFloatArray;
 
-/** General class for Volumes with compound pipes */
+/** 
+class name: medPipeTensorFieldGlyphs
+Class for Volumes with compound pipes which show tensor field using glyphs.
+ */
 class medPipeTensorFieldGlyphs : public medPipeTensorField
 {
 public:
+  /** RTTI macro*/
   mafTypeMacro(medPipeTensorFieldGlyphs, medPipeTensorField);
 
 protected:
@@ -143,8 +147,10 @@ protected:
   wxStaticText* m_GlyphMaterialLabel;      ///<glyph material label
 #pragma endregion GUI controls
 
-public:	
+public:
+  /** constrouctor */
   medPipeTensorFieldGlyphs();
+  /** destructor */
   virtual ~medPipeTensorFieldGlyphs();
 
 public:  
@@ -165,6 +171,7 @@ protected:
   The default implementation is to update VME*/
   /*virtual*/ void ComputeDefaultParameters();
 
+  /** gui creation*/
   /*virtual*/ mafGUI  *CreateGui();
 
   /** Constructs VTK pipeline. */
@@ -179,16 +186,19 @@ protected:
   void CreateAddItemDlg(int idx);
   /** insert an item into list if values are valid */
   bool AddItem();
+  /** insert an item into list if values are valid */
   bool AddItem2();
   /** update data structure and update view */	
   void OnShowFilter(int mode);
   /** remove an item from range list */
   void OnRemoveItem();
+  /** remove an item from range list */
   void OnRemoveItem2();
   /** use filter */
   void DoFilter(int mode ,double *rangeValue,double *rangeValue2);
   /** store filter data */
   void StoreFilterLinks();
+  /** store filter data */
   void StoreFilterLinks2();
   /** init filter list  */
   void InitFilterList(int nScalars);

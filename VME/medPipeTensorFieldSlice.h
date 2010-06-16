@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeTensorFieldSlice.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-06-12 16:34:48 $ 
-  Version: $Revision: 1.1.2.1 $ 
+  Date: $Date: 2010-06-16 07:04:40 $ 
+  Version: $Revision: 1.1.2.2 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -21,13 +21,16 @@ class mafGUIFloatSlider;
 
 class vtkPlane;
 
-/** Displays slice of input VME colored according to X,Y,Z component 
+/** 
+class name: medPipeTensorFieldSlice
+Displays slice of input VME colored according to X,Y,Z component 
 or magnitude of the associated tensor field. 
 Note: this class should be derived from mafPipeSlice, but
 it would lead into multiple inheritance, which causes lot of troubles*/
 class medPipeTensorFieldSlice : public medPipeTensorFieldSurface
 {
 public:
+  /** RTTI macro */
   mafTypeMacro(medPipeTensorFieldSlice, medPipeTensorFieldSurface);
 
 protected:
@@ -55,8 +58,10 @@ protected:
   mafGUIFloatSlider* m_SliderSlice; ///<widget for m_SlicePos
   wxTextCtrl* m_TextSlice;          ///<widget for m_SlicePos
 
-public:	
+public:
+  /** constructor */
   medPipeTensorFieldSlice();
+  /** destructor */
   virtual ~medPipeTensorFieldSlice();
 
 public:  
@@ -64,6 +69,7 @@ public:
   /*virtual*/ void OnEvent(mafEventBase *maf_event);
 
 protected:
+  /** gui creation */
   /*virtual*/ mafGUI  *CreateGui();
 
   /** Constructs VTK pipeline. */
