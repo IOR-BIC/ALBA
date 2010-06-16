@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: vtkMAFAssembly.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-31 15:58:06 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2010-06-16 08:25:46 $
+  Version:   $Revision: 1.5.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,7 +29,7 @@
 #include "vtkActor.h"
 #include "vtkVolume.h"
 
-vtkCxxRevisionMacro(vtkMAFAssembly, "$Revision: 1.5 $");
+vtkCxxRevisionMacro(vtkMAFAssembly, "$Revision: 1.5.2.1 $");
 vtkStandardNewMacro(vtkMAFAssembly);
 
 // Construct object with no children.
@@ -82,7 +82,7 @@ void vtkMAFAssembly::ShallowCopy(vtkProp *prop)
   {
     this->Parts->RemoveAllItems();
     a->Parts->InitTraversal();
-    for (int i=0; i<0; i++)
+    for (int i=0; i<a->Parts->GetNumberOfItems(); i++) // change by Losi on 06/15/2010 in order to iterate over props (before the conditions was i<0)
     {
       this->Parts->AddItem(a->Parts->GetNextProp3D());
     }
