@@ -127,6 +127,9 @@ ADD_TEST(mafOpImporterBBFTest ${EXECUTABLE_OUTPUT_PATH}/mafOpImporterBBFTest)
 ADD_EXECUTABLE(medOpCropDeformableROITest medOpCropDeformableROITest.h medOpCropDeformableROITest.cpp)
 ADD_TEST(medOpCropDeformableROITest ${EXECUTABLE_OUTPUT_PATH}/medOpCropDeformableROITest)
 
+ADD_EXECUTABLE(mafOpImporterRAWVolume_BESTest mafOpImporterRAWVolume_BESTest.h mafOpImporterRAWVolume_BESTest.cpp)
+ADD_TEST(mafOpImporterRAWVolume_BESTest ${EXECUTABLE_OUTPUT_PATH}/mafOpImporterRAWVolume_BESTest)
+
 
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
