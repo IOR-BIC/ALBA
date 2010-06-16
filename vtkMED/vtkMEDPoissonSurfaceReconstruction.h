@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDPoissonSurfaceReconstruction.h,v $
 Language:  C++
-Date:      $Date: 2010-06-15 13:56:34 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-06-16 08:16:02 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Fuli Wu
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -31,14 +31,20 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 using stdext::hash_map;
 
-//----------------------------------------------------------------------------
-// vtkMEDPoissonSurfaceReconstruction class 
-//----------------------------------------------------------------------------
+/**
+class name: vtkMEDPoissonSurfaceReconstruction
+
+This class implement Poisson Surface Reconstruction method.
+A paper can be viewed here: research.microsoft.com/en-us/um/people/hoppe/poissonrecon.pdf
+*/
 class VTK_GRAPHICS_EXPORT vtkMEDPoissonSurfaceReconstruction : public vtkDataSetToPolyDataFilter
 {
 public:
+  /** create instance of the object */
   static vtkMEDPoissonSurfaceReconstruction *New();
+  /** RTTI macro */
   vtkTypeRevisionMacro(vtkMEDPoissonSurfaceReconstruction,vtkDataSetToPolyDataFilter);
+  /** print object information */
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -47,19 +53,25 @@ public:
   void Error(const char *message);
 
 protected:
+  /** constructor */
   vtkMEDPoissonSurfaceReconstruction();
+  /** destructor */
   ~vtkMEDPoissonSurfaceReconstruction();
 
   // Description:
   // the main function that does the work
   void Execute();
 
+  /** computation of extents and update values*/
   void ComputeInputUpdateExtents(vtkDataObject *output);
+  /** only check if input is not null */
   void ExecuteInformation(); 
   
 private:
-  vtkMEDPoissonSurfaceReconstruction(const vtkMEDPoissonSurfaceReconstruction&);  // Not implemented.
-  void operator=(const vtkMEDPoissonSurfaceReconstruction&);  // Not implemented.
+  /** copy constructor not implemented */
+  vtkMEDPoissonSurfaceReconstruction(const vtkMEDPoissonSurfaceReconstruction&);
+  /** operator= non implemented */
+  void operator=(const vtkMEDPoissonSurfaceReconstruction&);
 };
 
 
@@ -131,27 +143,38 @@ Here, for header file definition
 /*=========================================================================
 Allocate.h
 =========================================================================*/
+
+/** 
+      class name: AllocatorState
+     This templated class assists in memory allocation and is well suited for instances
+      when it is known that the sequence of memory allocations is performed in a stack-based
+      manner, so that memory allocated last is released first. It also preallocates memory
+      in chunks so that multiple requests for small chunks of memory do not require separate
+      system calls to the memory manager.
+      The allocator is templated off of the class of objects that we would like it to allocate,
+      ensuring that appropriate constructors and destructors are called as necessary.
+  */
+
 class AllocatorState{
 public:
 	int index,remains;
 };
-/** This templated class assists in memory allocation and is well suited for instances
-  * when it is known that the sequence of memory allocations is performed in a stack-based
-  * manner, so that memory allocated last is released first. It also preallocates memory
-  * in chunks so that multiple requests for small chunks of memory do not require separate
-  * system calls to the memory manager.
-  * The allocator is templated off of the class of objects that we would like it to allocate,
-  * ensuring that appropriate constructors and destructors are called as necessary.
-  */
+
 template<class T>
+/**
+class name: Allocator
+memory handler
+*/
 class Allocator{
 	int blockSize;
 	int index,remains;
 	std::vector<T*> memory;
 public:
+  /** constructor */
 	Allocator(void){
 		blockSize=index=remains=0;
 	}
+  /** destructor */
 	~Allocator(void){
 		reset();
 	}
@@ -261,29 +284,43 @@ public:
 /*=========================================================================
 BindaryNode.h
 =========================================================================*/
+/**
+class name: BinaryNode
+template class which represent a binary node of a binary tree, infact  the topology of the octree (used inside poisson surface reconstruction) 
+defines a set of binary trees.
+*/
 template<class Real>
 class BinaryNode{
 public:
+  /**  return double depth, not used in the filter */
 	static inline int CenterCount(int depth){return 1<<depth;}
+  /** return  maxdepth after increment, double and decrement, used for calculate number of base functions of polyomial*/
 	static inline int CumulativeCenterCount(int maxDepth){return (1<<(maxDepth+1))-1;}
+  /** retrieve index giving tree depth and an offset*/
 	static inline int Index(int depth, int offSet){return (1<<depth)+offSet-1;}
+  /** retrieve index  of the node in the corner*/
 	static inline int CornerIndex(int maxDepth,int depth,int offSet,int forwardCorner)
 	  {return (offSet+forwardCorner)<<(maxDepth-depth);}
+  /** retrieve position  of the node in the corner*/
 	static inline Real CornerIndexPosition(int index,int maxDepth)
 	  {return Real(index)/(1<<maxDepth);}
+  /**retrieve the width of the node */
 	static inline Real Width(int depth)
 	  {return Real(1.0/(1<<depth));}
+  /**retrieve the width and the center  of the node */
 	static inline void CenterAndWidth(int depth,int offset,Real& center,Real& width)
 	  {
 	    width=Real(1.0/(1<<depth));
 	    center=Real((0.5+offset)*width);
 	  }
+  /**retrieve the width and the center  of the node */
 	static inline void CenterAndWidth(int idx,Real& center,Real& width)
 	  {
 	    int depth,offset;
 	    DepthAndOffset(idx,depth,offset);
 	    CenterAndWidth(depth,offset,center,width);
 	  }
+  /**retrieve the depth and the offset  of the node */
 	static inline void DepthAndOffset(int idx, int& depth,int& offset)
 	  {
 	    int i=idx+1;
@@ -299,64 +336,108 @@ public:
 /*=========================================================================
 Polynomial.h
 =========================================================================*/
+/**
+class name: Polynomial
+Template class that represents a polynomial with a specific degree.
+*/
 template<int Degree>
 class Polynomial{
 public:
 	double coefficients[Degree+1];
 
+  /** constructor */
 	Polynomial(void);
+  /** copy constructor */
 	template<int Degree2>
 	Polynomial(const Polynomial<Degree2>& P);
+  /** overload operator () which retrieves  the sum of the product of the coefficients*/
 	double operator()(const double& t) const;
+  /** calculate integral */
 	double integral(const double& tMin,const double& tMax) const;
 
+  /** operator== overload , checking coefficients */
 	int operator == (const Polynomial& p) const;
+  /** operator!= overload, checking coefficients */
 	int operator != (const Polynomial& p) const;
+  /** check if all coefficients are zero*/
 	int isZero(void) const;
+  /** set  all coefficients as zero*/
 	void setZero(void);
 
+  /** overload operator, according to the operation over coefficients */
 	template<int Degree2>
 	Polynomial& operator  = (const Polynomial<Degree2> &p);
+  /** overload operator, according to the operation over coefficients */
 	Polynomial& operator += (const Polynomial& p);
+  /** overload operator, according to the operation over coefficients */
 	Polynomial& operator -= (const Polynomial& p);
+  /** overload operator, according to the operation over coefficients */
 	Polynomial  operator -  (void) const;
+  /** overload operator, according to the operation over coefficients */
 	Polynomial  operator +  (const Polynomial& p) const;
+  /** overload operator, according to the operation over coefficients */
 	Polynomial  operator -  (const Polynomial& p) const;
+  /** overload operator, according to the operation over coefficients */
 	template<int Degree2>
 	Polynomial<Degree+Degree2>  operator *  (const Polynomial<Degree2>& p) const;
 
+  /** overload operator, according to the operation over coefficients */
 	Polynomial& operator += (const double& s);
+  /** overload operator, according to the operation over coefficients */
 	Polynomial& operator -= (const double& s);
+  /** overload operator, according to the operation over coefficients */
 	Polynomial& operator *= (const double& s);
+  /** overload operator, according to the operation over coefficients */
 	Polynomial& operator /= (const double& s);
+  /** overload operator, according to the operation over coefficients */
 	Polynomial  operator +  (const double& s) const;
+  /** overload operator, according to the operation over coefficients */
 	Polynomial  operator -  (const double& s) const;
+  /** overload operator, according to the operation over coefficients */
 	Polynomial  operator *  (const double& s) const;
+  /** overload operator, according to the operation over coefficients */
 	Polynomial  operator /  (const double& s) const;
 
+  /** overload operator, according to the operation over coefficients */
 	Polynomial scale(const double& s) const;
+  /** overload operator, according to the operation over coefficients */
 	Polynomial shift(const double& t) const;
 
+  /** calculate derivative */
 	Polynomial<Degree-1> derivative(void) const;
+  /** calculate integral */
 	Polynomial<Degree+1> integral(void) const;
 
+  /** print representation of polynomial */
 	void printnl(void) const;
 
+  /** overload operator, according to the operation over coefficients */
 	Polynomial& addScaled(const Polynomial& p,const double& scale);
 
+  /** overload operator, according to the operation over coefficients */
 	static void Negate(const Polynomial& in,Polynomial& out);
+  /** overload operator, according to the operation over coefficients */
 	static void Subtract(const Polynomial& p1,const Polynomial& p2,Polynomial& q);
+  /** overload operator, according to the operation over coefficients */
 	static void Scale(const Polynomial& p,const double& w,Polynomial& q);
+  /** overload operator, according to the operation over coefficients */
 	static void AddScaled(const Polynomial& p1,const double& w1,const Polynomial& p2,const double& w2,Polynomial& q);
+  /** overload operator, according to the operation over coefficients */
 	static void AddScaled(const Polynomial& p1,const Polynomial& p2,const double& w2,Polynomial& q);
+  /** overload operator, according to the operation over coefficients */
 	static void AddScaled(const Polynomial& p1,const double& w1,const Polynomial& p2,Polynomial& q);
 
+  /** calculate roots */
 	void getSolutions(const double& c,std::vector<double>& roots,const double& EPS) const;
 };
 
 /*=========================================================================
 PPolynomial.h
 =========================================================================*/
+/**
+class name: StartingPolynomial
+//CONTINUE FROM HERE
+*/
 template<int Degree>
 class StartingPolynomial{
 public:
