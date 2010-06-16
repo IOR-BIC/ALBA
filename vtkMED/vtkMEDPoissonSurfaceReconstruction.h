@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDPoissonSurfaceReconstruction.h,v $
 Language:  C++
-Date:      $Date: 2010-06-16 08:16:02 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2010-06-16 14:41:54 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Fuli Wu
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -446,9 +446,13 @@ public:
 
 	template<int Degree2>
 	StartingPolynomial<Degree+Degree2>  operator * (const StartingPolynomial<Degree2>& p) const;
+  /** Scale polynomial coefficients according to dividing factor s.*/
 	StartingPolynomial scale(const double& s) const;
+  /** Right shifting polynomial coefficients, usign multiplicative factor t. */
 	StartingPolynomial shift(const double& t) const;
+  /** Overload operator, according to the operation over coefficients. */
 	int operator < (const StartingPolynomial& sp) const;
+  /** Method to compare polynomials, according to the operation over coefficients. */
 	static int Compare(const void* v1,const void* v2);
 };
 
@@ -458,61 +462,96 @@ public:
 	size_t polyCount;
 	StartingPolynomial<Degree>* polys;
 
+  /** Constructor. */
 	PPolynomial(void);
+  /** Constructor. */
 	PPolynomial(const PPolynomial<Degree>& p);
+  /** Destructor. */
 	~PPolynomial(void);
 
+  /** Overload operator, according to the operation over coefficients. */
 	PPolynomial& operator = (const PPolynomial& p);
 
+  /** Return the size of polynomial object. */
 	int size(void) const;
 
+  /** Free polynomials, allocate memory and set size starting polynomial.*/ 
 	void set(const size_t& size);
-	// Note: this method will sort the elements in sps
+	/** Set sps as polynomials: this method will sort the elements in sps. */
 	void set(StartingPolynomial<Degree>* sps,const int& count);
+  /** Reallocate memory for newsize polys. */
 	void reset(const size_t& newSize);
 
 
+  /** Overload operator, return the sum of polys coefficients with index t.*/
 	double operator()(const double& t) const;
+  /** Compute integral within integration range tMin and tMax, return the sum of integrals of polynomials. */
 	double integral(const double& tMin,const double& tMax) const;
+  /** Compute integral */
 	double Integral(void) const;
 
+  /** Overload operator, according to the operation over polys. */
 	template<int Degree2>
 	PPolynomial<Degree>& operator = (const PPolynomial<Degree2>& p);
 
+  /** Combinate polynomials (sorting according to start value).*/
 	PPolynomial  operator + (const PPolynomial& p) const;
+  /** Combinate polynomials (sorting according to start value). p polys with negative sign.*/
 	PPolynomial  operator - (const PPolynomial& p) const;
 
+  /** Combinate polys according to multiplicative operation. */
 	template<int Degree2>
 	PPolynomial<Degree+Degree2> operator * (const Polynomial<Degree2>& p) const;
 
+  /** Combinate polys according to multiplicative operation. 
+  A new polynomial is computed with the multiplication beetwen original polys member 
+  and each member of the poly parameter./ */
 	template<int Degree2>
 	PPolynomial<Degree+Degree2> operator * (const PPolynomial<Degree2>& p) const;
 
 
+  /** Overload operator, according to the operation over polys. */
 	PPolynomial& operator += (const double& s);
+  /** Overload operator, according to the operation over polys. */
 	PPolynomial& operator -= (const double& s);
+  /** Overload operator, according to the operation over polys. */
 	PPolynomial& operator *= (const double& s);
+  /** Overload operator, according to the operation over polys. */
 	PPolynomial& operator /= (const double& s);
+  /** Overload operator, according to the operation over polys. */
 	PPolynomial  operator +  (const double& s) const;
+  /** Overload operator, according to the operation over polys. */
 	PPolynomial  operator -  (const double& s) const;
-	PPolynomial  operator *  (const double& s) const;
+  /** Overload operator, according to the operation over polys. */
+	PPolynomial  operator *  (const double& s) const
+  /** Overload operator, according to the operation over polys. */;
 	PPolynomial  operator /  (const double& s) const;
 
+  /** Add operation with scaled polynomials. */
 	PPolynomial& addScaled(const PPolynomial& poly,const double& scale);
 
+  /** Scale operation on every polynomial. */
 	PPolynomial scale(const double& s) const;
+  /** Shift operation on every polynomial. */
 	PPolynomial shift(const double& t) const;
 
+   /** calculate derivative on polys. */
 	PPolynomial<Degree-1> derivative(void) const;
+   /** calculate integral on polys.  */
 	PPolynomial<Degree+1> integral(void) const;
 
+  /** solve polynomials. */
 	void getSolutions(const double& c,std::vector<double>& roots,const double& EPS,const double& min=-DBL_MAX,const double& max=DBL_MAX) const;
 
+  /** print method. */
 	void printnl(void) const;
 
+  /** Compute moving average. */
 	PPolynomial<Degree+1> MovingAverage(const double& radius);
 
+  /** Return two polynomials forming a constant function with width as constanct value. */
 	static PPolynomial ConstantFunction(const double& width=0.5);
+  /** Compute gaussian approximation. */
 	static PPolynomial GaussianApproximation(const double& width=0.5);
 //	void write(FILE* fp,const int& samples,const double& min,const double& max) const;
 };
@@ -539,20 +578,29 @@ public:
 	PPolynomial<Degree-1> dBaseFunction;
 	PPolynomial<Degree+1>* baseFunctions;
 
+  /** Constructor. */
 	FunctionData(void);
+  /** Destructor. */
 	~FunctionData(void);
 
+  /** Set dot tables. */
 	virtual void   setDotTables(const int& flags);
+  /** Clear dot tables.*/
 	virtual void clearDotTables(const int& flags);
 
+  /** Set value tables. */
 	virtual void   setValueTables(const int& flags,const double& smooth=0);
+  /** Set value tables. valueSmooth parameter used for value tables, normalSmoot for dot tables.*/
 	virtual void   setValueTables(const int& flags,const double& valueSmooth,const double& normalSmooth);
+  /** Clear value tables. */
 	virtual void clearValueTables(void);
 
 	void set(const int& maxDepth,const PPolynomial<Degree>& F,const int& normalize,const int& useDotRatios=1);
 
 	Real   dotProduct(const double& center1,const double& width1,const double& center2,const double& width2) const;
+
 	Real  dDotProduct(const double& center1,const double& width1,const double& center2,const double& width2) const;
+
 	Real d2DotProduct(const double& center1,const double& width1,const double& center2,const double& width2) const;
 
 	static inline int SymmetricIndex(const int& i1,const int& i2);
@@ -562,36 +610,45 @@ public:
 /*=========================================================================
 Geometry.h
 =========================================================================*/
+/** Return a Real random value. */
 template<class Real>
 Real Random(void);
 
 template<class Real>
 struct Point3D{Real coords[3];};
 
+/** Return a 3d point with random real coordinates. */
 template<class Real>
 Point3D<Real> RandomBallPoint(void);
 
+/**Return a 3d point with random real coordinates as a center of a sphere.*/
 template<class Real>
 Point3D<Real> RandomSpherePoint(void);
 
+/** Return distance beetwen origin and a 3d point. */
 template<class Real>
 double Length(const Point3D<Real>& p);
 
+/** Return square distance beetwen origin and a 3d point. */
 template<class Real>
 double SquareLength(const Point3D<Real>& p);
 
+/** Return distance beetwen two 3d points. */
 template<class Real>
 double Distance(const Point3D<Real>& p1,const Point3D<Real>& p2);
 
+/** Return square distance beetwen two 3d points. */
 template<class Real>
 double SquareDistance(const Point3D<Real>& p1,const Point3D<Real>& p2);
 
+/** Cross product beetwen two 3d points: thrid input parameter will save resulting point. */
 template <class Real>
 void CrossProduct(const Point3D<Real>& p1,const Point3D<Real>& p2,Point3D<Real>& p);
 
 class Edge{
 public:
 	double p[2][2];
+  /** return lenght of the edge. */
 	double Length(void) const{
 		double d[2];
 		d[0]=p[0][0]-p[1][0];
@@ -603,6 +660,7 @@ public:
 class Triangle{
 public:
 	double p[3][3];
+  /** return the area value of triangle. */
 	double Area(void) const{
 		double v1[3],v2[3],v[3];
 		for(int d=0;d<3;d++){
@@ -614,6 +672,7 @@ public:
 		v[2]= v1[0]*v2[1]-v1[1]*v2[0];
 		return sqrt(v[0]*v[0]+v[1]*v[1]+v[2]*v[2])/2;
 	}
+  /** return the width/height value */
 	double AspectRatio(void) const{
 		double d=0;
 		int i,j;
@@ -630,7 +689,9 @@ public:
 	int index;
 	char inCore;
 
+  /** overload operator */
 	int operator == (const CoredPointIndex& cpi) const {return (index==cpi.index) && (inCore==cpi.inCore);};
+  /** overload operator */
 	int operator != (const CoredPointIndex& cpi) const {return (index!=cpi.index) || (inCore!=cpi.inCore);};
 };
 class EdgeIndex{
@@ -649,6 +710,7 @@ public:
 class TriangulationEdge
 {
 public:
+  /** Constructor. */
 	TriangulationEdge(void);
 	int pIndex[2];
 	int tIndex[2];
@@ -657,6 +719,7 @@ public:
 class TriangulationTriangle
 {
 public:
+  /** Constructor. */
 	TriangulationTriangle(void);
 	int eIndex[3];
 };
@@ -684,8 +747,10 @@ protected:
 };
 
 
+/** simplify mesh with edge collapse. */
 template<class Real>
 void EdgeCollapse(const Real& edgeRatio,std::vector<TriangleIndex>& triangles,std::vector< Point3D<Real> >& positions,std::vector<Point3D<Real> >* normals);
+/** simplify mesh with triangle collapse. */
 template<class Real>
 void TriangleCollapse(const Real& edgeRatio,std::vector<TriangleIndex>& triangles,std::vector<Point3D<Real> >& positions,std::vector<Point3D<Real> >* normals);
 
@@ -710,17 +775,25 @@ class CoredVectorMeshData : public CoredMeshData{
 	std::vector<TriangleIndex> triangles;
 	int oocPointIndex,triangleIndex;
 public:
+  /** constructor */
 	CoredVectorMeshData::CoredVectorMeshData(void);
 
+  /** reset point and triangle index. */
 	void resetIterator(void);
 
+  /** Add a 3d point. */
 	int addOutOfCorePoint(const Point3D<float>& p);
+  /** add a triangle*/
 	int addTriangle(const TriangleIndex& t,const int& inCoreFlag=(CoredMeshData::IN_CORE_FLAG[0] | CoredMeshData::IN_CORE_FLAG[1] | CoredMeshData::IN_CORE_FLAG[2]));
 
+  /** retrieve next point, return 0 if current is the last point. */
 	int nextOutOfCorePoint(Point3D<float>& p);
+  /** retrieve next triangle, return 0 if current is the last triangle. */
 	int nextTriangle(TriangleIndex& t,int& inCoreFlag);
 
+  /** return size of oocPoints vector. */
 	int outOfCorePointCount(void);
+  /** return size of triangles vector. */
 	int triangleCount(void);
 };
 
