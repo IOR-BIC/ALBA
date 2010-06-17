@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDPoissonSurfaceReconstruction.h,v $
 Language:  C++
-Date:      $Date: 2010-06-17 09:49:38 $
-Version:   $Revision: 1.1.2.6 $
+Date:      $Date: 2010-06-17 10:27:43 $
+Version:   $Revision: 1.1.2.7 $
 Authors:   Fuli Wu
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -708,6 +708,10 @@ public:
 	}
 	
 };
+/**
+class name: CoredPointIndex
+Index of a point located in the core
+*/
 class CoredPointIndex{
 public:
 	int index;
@@ -718,19 +722,35 @@ public:
   /** overload operator */
 	int operator != (const CoredPointIndex& cpi) const {return (index!=cpi.index) || (inCore!=cpi.inCore);};
 };
+/**
+class name: EdgeIndex
+Indexes of the points inside the edge
+*/
 class EdgeIndex{
 public:
 	int idx[2];
 };
+/**
+class name: EdgeIndex
+Indexes of the cored points inside the edge
+*/
 class CoredEdgeIndex{
 public:
 	CoredPointIndex idx[2];
 };
+/**
+class name: TriangleIndex
+Indexes of the points inside the triangle
+*/
 class TriangleIndex{
 public:
 	int idx[3];
 };
 
+/**
+class name: TriangulationEdge
+Edge created by triangulation
+*/
 class TriangulationEdge
 {
 public:
@@ -740,6 +760,10 @@ public:
 	int tIndex[2];
 };
 
+/**
+class name: TriangulationTriangle
+Triangle created by triangulation
+*/
 class TriangulationTriangle
 {
 public:
@@ -748,6 +772,10 @@ public:
 	int eIndex[3];
 };
 
+/**
+  class name: Triangulation
+Handle the triangulation process
+*/
 template<class Real>
 class Triangulation
 {
@@ -757,11 +785,18 @@ public:
 	std::vector<TriangulationEdge>				edges;
 	std::vector<TriangulationTriangle>			triangles;
 
+  /** return 0 or 1 , modifying triangle points coordinate */
 	int factor(const int& tIndex,int& p1,int& p2,int& p3);
+  
+  /** calculate total area of triangles*/
 	double area(void);
+  /** calculate area  of the triangle*/
 	double area(const int& tIndex);
+  /** calculate area with cross product */
 	double area(const int& p1,const int& p2,const int& p3);
+  /** flip edges in order to minimize the area of the triangle */
 	int flipMinimize(const int& eIndex);
+  /** insert new triangle in the structure */
 	int addTriangle(const int& p1,const int& p2,const int& p3);
 
 protected:
@@ -778,22 +813,36 @@ void EdgeCollapse(const Real& edgeRatio,std::vector<TriangleIndex>& triangles,st
 template<class Real>
 void TriangleCollapse(const Real& edgeRatio,std::vector<TriangleIndex>& triangles,std::vector<Point3D<Real> >& positions,std::vector<Point3D<Real> >* normals);
 
+/**
+class name: CoredMeshData
+interface class that handle mesh in the core
+*/
 class CoredMeshData{
 public:
 	std::vector<Point3D<float> > inCorePoints;
 	const static int IN_CORE_FLAG[3];
+  /** reset Iterator */
 	virtual void resetIterator(void)=0;
 
+  /** add  a point out of core */
 	virtual int addOutOfCorePoint(const Point3D<float>& p)=0;
+  /** insert new triangle */
 	virtual int addTriangle(const TriangleIndex& t,const int& icFlag=(IN_CORE_FLAG[0] | IN_CORE_FLAG[1] | IN_CORE_FLAG[2]))=0;
 
+  /** iterate on  next out of core point  */
 	virtual int nextOutOfCorePoint(Point3D<float>& p)=0;
+  /** iterate on next triangle */
 	virtual int nextTriangle(TriangleIndex& t,int& inCoreFlag)=0;
 
+  /** number of out of core points */
 	virtual int outOfCorePointCount(void)=0;
+  /** number of triangles */
 	virtual int triangleCount(void)=0;
 };
-
+/**
+class name: CoredVectorMeshData
+  represents data meshes inside the core as vector
+*/
 class CoredVectorMeshData : public CoredMeshData{
 	std::vector<Point3D<float> > oocPoints;
 	std::vector<TriangleIndex> triangles;
@@ -805,7 +854,38 @@ public:
   /** reset point and triangle index. */
 	void resetIterator(void);
 
-  /** Add a 3d point. */
+  /** Add a 3d point which is out of core*/
+	int addOutOfCorePoint(const Point3D<float>& p);
+  /** add a triangle*/
+	int addTriangle(const TriangleIndex& t,const int& inCoreFlag=(CoredMeshData::IN_CORE_FLAG[0] | CoredMeshData::IN_CORE_FLAG[1] | CoredMeshData::IN_CORE_FLAG[2]));
+
+  /** retrieve next point, return 0 if current is the last point. */
+	int nextOutOfCorePoint(Point3D<float>& p);
+  /** retrieve next triangle, return 0 if current is the last triangle. */
+	int nextTriangle(TriangleIndex& t,int& inCoreFlag);
+
+  /** return size of oocPoints vector. */
+	int outOfCorePointCount(void);
+  /** return size of triangles vector. */
+	int triangleCount(void);
+};
+/**
+class name: CoredVectorMeshData
+  represents data meshes inside the core as file descriptors
+*/
+class CoredFileMeshData : public CoredMeshData{
+	FILE *oocPointFile,*triangleFile;
+	int oocPoints,triangles;
+public:
+  /** object constructor */
+	CoredFileMeshData(void);
+  /** object destructor */
+	~CoredFileMeshData(void);
+
+  /** reset iterator */
+	void resetIterator(void);
+
+  /** Add a 3d point which is out of core*/
 	int addOutOfCorePoint(const Point3D<float>& p);
   /** add a triangle*/
 	int addTriangle(const TriangleIndex& t,const int& inCoreFlag=(CoredMeshData::IN_CORE_FLAG[0] | CoredMeshData::IN_CORE_FLAG[1] | CoredMeshData::IN_CORE_FLAG[2]));
@@ -821,72 +901,91 @@ public:
 	int triangleCount(void);
 };
 
-class CoredFileMeshData : public CoredMeshData{
-	FILE *oocPointFile,*triangleFile;
-	int oocPoints,triangles;
-public:
-	CoredFileMeshData(void);
-	~CoredFileMeshData(void);
-
-	void resetIterator(void);
-
-	int addOutOfCorePoint(const Point3D<float>& p);
-	int addTriangle(const TriangleIndex& t,const int& inCoreFlag=(CoredMeshData::IN_CORE_FLAG[0] | CoredMeshData::IN_CORE_FLAG[1] | CoredMeshData::IN_CORE_FLAG[2]));
-
-	int nextOutOfCorePoint(Point3D<float>& p);
-	int nextTriangle(TriangleIndex& t,int& inCoreFlag);
-
-	int outOfCorePointCount(void);
-	int triangleCount(void);
-};
-
 
 /*=========================================================================
 MarchingCubes.h
 =========================================================================*/
+/**
+class name: Square
+Represent a square in a marching square algorithms
+*/
 class Square{
 public:
 	const static int CORNERS=4,EDGES=4,NEIGHBORS=4;
+  /** return corner index */
 	static int  CornerIndex			(const int& x,const int& y);
+  /**  calculate corner with 0,1 notation */
 	static void FactorCornerIndex	(const int& idx,int& x,int& y);
+  /** return edge index, depending by orientation */
 	static int  EdgeIndex			(const int& orientation,const int& i);
+  /** retrieve in i  new index, depending by orientation */
 	static void FactorEdgeIndex		(const int& idx,int& orientation,int& i);
 
+  /** calculating orientation, retrieve index of the corner which can be reflected*/
 	static int  ReflectCornerIndex	(const int& idx,const int& edgeIndex);
+  /** calculating orientation, retrieve index of the edge which can be reflected*/
 	static int  ReflectEdgeIndex	(const int& idx,const int& edgeIndex);
 
+  /** calculate corner indexes */
 	static void EdgeCorners(const int& idx,int& c1,int &c2);
 };
-
+/**
+class name: Cube
+Represent a cube in a marching cube algorithms
+*/
 class Cube{
 public:
 	const static int CORNERS=8,EDGES=12,NEIGHBORS=6;
 
+  /** retrieve corner index */
 	static int  CornerIndex			(const int& x,const int& y,const int& z);
+  /**  calculate corner with 0,1 notation */
 	static void FactorCornerIndex	(const int& idx,int& x,int& y,int& z);
+  /** retrieve edge indexes */
 	static int  EdgeIndex			(const int& orientation,const int& i,const int& j);
+  /**  calculate edge index */
 	static void FactorEdgeIndex		(const int& idx,int& orientation,int& i,int &j);
+  /** retrieve face index */
 	static int  FaceIndex			(const int& dir,const int& offSet);
+  /** retrieve face index */
 	static int  FaceIndex			(const int& x,const int& y,const int& z);
+  /**  calculate face index */
 	static void FactorFaceIndex		(const int& idx,int& x,int &y,int& z);
+  /**  calculate face index */
 	static void FactorFaceIndex		(const int& idx,int& dir,int& offSet);
 
+  /** retrieve antipodal corner index */
 	static int  AntipodalCornerIndex	(const int& idx);
+  /** retrieve face corner index (can be face-reflected)  depending by orientation */
 	static int  FaceReflectCornerIndex	(const int& idx,const int& faceIndex);
+  /** retrieve face edge  index (can be face-reflected )  depending by orientation */
 	static int  FaceReflectEdgeIndex	(const int& idx,const int& faceIndex);
+  /** retrieve face face index (can be face-reflected)  depending by orientation */
 	static int	FaceReflectFaceIndex	(const int& idx,const int& faceIndex);
+  /** retrieve face corner index (can be edge-reflected)  depending by orientation */
 	static int	EdgeReflectCornerIndex	(const int& idx,const int& edgeIndex);
+  /** retrieve edge corner index (can be edge-reflected)  depending by orientation */
 	static int	EdgeReflectEdgeIndex	(const int& edgeIndex);
 
+  /** check face adjacent to given edge */
 	static int  FaceAdjacentToEdges	(const int& eIndex1,const int& eIndex2);
+  /** check faces adjacent to given edge */
 	static void FacesAdjacentToEdge	(const int& eIndex,int& f1Index,int& f2Index);
 
+  /** retrieve edge corners */
 	static void EdgeCorners(const int& idx,int& c1,int &c2);
+  /** retrieve face corners */
 	static void FaceCorners(const int& idx,int& c1,int &c2,int& c3,int& c4);
 };
 
+/**
+class name: MarchingSquares
+Computer graphics algorithm  that generates contour lines for a two-dimensional scalar field
+*/
 class MarchingSquares{
+  /**  return a simple interpolation  v1/(v1-v2)*/
 	static double Interpolate(const double& v1,const double& v2);
+  /**  calculate vertex using also interpolation */
 	static void SetVertex(const int& e,const double values[Square::CORNERS],const double& iso);
 public:
 	const static int MAX_EDGES=2;
@@ -894,21 +993,36 @@ public:
 	static const int edges[1<<Square::CORNERS][2*MAX_EDGES+1];
 	static double vertexList[Square::EDGES][2];
 
+  /** return index of  points translating from 0,1 notation*/
 	static int GetIndex(const double values[Square::CORNERS],const double& iso);
+  /** check if there is ambiguity  checking if index is 5 or 10*/
 	static int IsAmbiguous(const double v[Square::CORNERS],const double& isoValue);
+  /** add new edges */
 	static int AddEdges(const double v[Square::CORNERS],const double& isoValue,Edge* edges);
+  /** add edges indexes without calculate positions*/
 	static int AddEdgeIndices(const double v[Square::CORNERS],const double& isoValue,int* edges);
 };
 
+/**
+class name: MarchingSquares
+Computer graphics algorithm  that extracts a polygonal mesh of an isosurface  from a three-dimensional scalar field
+*/
 class MarchingCubes{
+   /**  return a simple interpolation  v1/(v1-v2)*/
 	static double Interpolate(const double& v1,const double& v2);
+  /**  calculate vertex using also interpolation */
 	static void SetVertex(const int& e,const double values[Cube::CORNERS],const double& iso);
-	static int GetFaceIndex(const double values[Cube::CORNERS],const double& iso,const int& faceIndex);
+	/** Return face index */
+  static int GetFaceIndex(const double values[Cube::CORNERS],const double& iso,const int& faceIndex);
 
+  /**  return a simple interpolation  v1/(v1-v2) (float version)*/
 	static float Interpolate(const float& v1,const float& v2);
+  /**  calculate vertex using also interpolation (float version)*/
 	static void SetVertex(const int& e,const float values[Cube::CORNERS],const float& iso);
-	static int GetFaceIndex(const float values[Cube::CORNERS],const float& iso,const int& faceIndex);
+	/** Return face index (float version) */
+  static int GetFaceIndex(const float values[Cube::CORNERS],const float& iso,const int& faceIndex);
 
+  /** Return face index (using marching cube index) */
 	static int GetFaceIndex(const int& mcIndex,const int& faceIndex);
 public:
 	const static int MAX_TRIANGLES=5;
@@ -917,25 +1031,41 @@ public:
 	static const int cornerMap[Cube::CORNERS];
 	static double vertexList[Cube::EDGES][3];
 
+  /** Add triangle indexes without calculating position */
 	static int AddTriangleIndices(const int& mcIndex,int* triangles);
-
+  /** return index of  points translating from 0,1 notation*/
 	static int GetIndex(const double values[Cube::CORNERS],const double& iso);
+  /** check if there is ambiguity  checking if index is 5 or 10*/
 	static int IsAmbiguous(const double v[Cube::CORNERS],const double& isoValue,const int& faceIndex);
+  /** check if there are roots controlling if retrieving index is different from 0 and 15  for the face */
 	static int HasRoots(const double v[Cube::CORNERS],const double& isoValue);
+  /** check if there are roots controlling if retrieving index is different from 0 and 255 */
 	static int HasRoots(const double v[Cube::CORNERS],const double& isoValue,const int& faceIndex);
+  /** Add triangle */
 	static int AddTriangles(const double v[Cube::CORNERS],const double& isoValue,Triangle* triangles);
+  /** Add triangle indexes without calculating position */
 	static int AddTriangleIndices(const double v[Cube::CORNERS],const double& isoValue,int* triangles);
 
+  /** return index of  points translating from 0,1 notation (float version)*/
 	static int GetIndex(const float values[Cube::CORNERS],const float& iso);
+  /** check if there is ambiguity  checking if index is 5 or 10 (float version)*/
 	static int IsAmbiguous(const float v[Cube::CORNERS],const float& isoValue,const int& faceIndex);
+  /** check if there are roots controlling if retrieving index is different from 0 and 15  for the face (float version)*/
 	static int HasRoots(const float v[Cube::CORNERS],const float& isoValue);
+  /** check if there are roots controlling if retrieving index is different from 0 and 255  (float version)*/
 	static int HasRoots(const float v[Cube::CORNERS],const float& isoValue,const int& faceIndex);
+  /** Add triangle (float version)*/
 	static int AddTriangles(const float v[Cube::CORNERS],const float& isoValue,Triangle* triangles);
+  /** Add triangle indexes without calculating position (float version)*/
 	static int AddTriangleIndices(const float v[Cube::CORNERS],const float& isoValue,int* triangles);
 
+  /** check if there is ambiguity  checking if index is 5 or 10 (using marching cube index)*/
 	static int IsAmbiguous(const int& mcIndex,const int& faceIndex);
+  /** check if there are roots controlling if retrieving index is different from 0 and 255 (using marching cube index)*/
 	static int HasRoots(const int& mcIndex);
+  /** check if there are roots in selected face */
 	static int HasFaceRoots(const int& mcIndex,const int& faceIndex);
+  /** check if there are roots in selected edge */
 	static int HasEdgeRoots(const int& mcIndex,const int& edgeIndex);
 };
 
@@ -953,6 +1083,7 @@ public:
 	size_t FreeVirtualAddressSpace;
 	size_t PageSize;
 
+  /** set memory variables, retrieving information from the system*/
 	void set(void){
 		MEMORYSTATUSEX Mem;
 		SYSTEM_INFO Info;
@@ -970,8 +1101,10 @@ public:
 		FreeVirtualAddressSpace = (size_t)Mem.ullAvailVirtual;
 		PageSize = (size_t)Info.dwPageSize;
 	}
+  /** return virtual memory used calculating throung base addresses and regions size*/
 	size_t usage(void) const {return TotalVirtualAddressSpace-FreeVirtualAddressSpace;}
 
+  /** retrieve used memory*/
 	static size_t Usage(void){
 		MEMORY_BASIC_INFORMATION mbi; 
 		size_t      dwMemUsed = 0; 
@@ -990,50 +1123,84 @@ public:
 /*=========================================================================
 Vector.h
 =========================================================================*/
+/**
+class name: Vector
+Define mathematical entity vector, overloading operators.
+*/
 template<class T>
 class Vector
 {
 public:
+  /** constructor */
 	Vector();
+  /** overloaded constructor */
 	Vector( const Vector<T>& V );
+  /** overloaded constructor */
 	Vector( size_t N );
+  /** overloaded constructor */
 	Vector( size_t N, T* pV );
+  /** destructor */
 	~Vector();
 
+  /** overload operator ()*/
 	const T& operator () (size_t i) const;
+  /** overload operator ()*/
 	T& operator () (size_t i);
+  /** overload operator []*/
 	const T& operator [] (size_t i) const;
+  /** overload operator []*/
 	T& operator [] (size_t i);
 
+  /** set elements to zero */
 	void SetZero();
 
+  /** return dimension of vector */
 	size_t Dimensions() const;
+  /** resize vector */
 	void Resize( size_t N );
 
+  /** operload operator for math operations */
 	Vector operator * (const T& A) const;
+  /** operload operator for math operations */
 	Vector operator / (const T& A) const;
+  /** operload operator for math operations */
 	Vector operator - (const Vector& V) const;
+  /** operload operator for math operations */
 	Vector operator + (const Vector& V) const;
 
+  /** operload operator for math operations */
 	Vector& operator *= (const T& A);
+  /** operload operator for math operations */
 	Vector& operator /= (const T& A);
+  /** operload operator for math operations */
 	Vector& operator += (const Vector& V);
+  /** operload operator for math operations */
 	Vector& operator -= (const Vector& V);
 
+  /** add a scaled vector */
 	Vector& AddScaled(const Vector& V,const T& scale);
+  /** subtract a scaled vector*/
 	Vector& SubtractScaled(const Vector& V,const T& scale);
+  /** return the result of a sum of scaled vectors */
 	static void Add(const Vector& V1,const T& scale1,const Vector& V2,const T& scale2,Vector& Out);
+  /** return the result of a sum of a non-scaled vector  and a scaled one*/
 	static void Add(const Vector& V1,const T& scale1,const Vector& V2,Vector& Out);
 
+  /** operload operator for math operations */
 	Vector operator - () const;
 
+  /** operload operator for assignment */
 	Vector& operator = (const Vector& V);
 
+  /** define dot product */
 	T Dot( const Vector& V ) const;
-
+ 
+  /** define lenght of a vector */
 	T Length() const;
 
+  /** calculate norm */
 	T Norm( size_t Ln ) const;
+  /** normalize the vector*/
 	void Normalize();
 
 	T* m_pV;
@@ -1041,51 +1208,84 @@ protected:
 	size_t m_N;
 
 };
-
+/**
+class Name: NVector
+template class that introduce Dimensionality
+*/
 template<class T,int Dim>
 class NVector
 {
 public:
+  /** constructor */
 	NVector();
+  /** overloaded constructor */
 	NVector( const NVector& V );
+  /** overloaded constructor */
 	NVector( size_t N );
+  /** overloaded constructor */
 	NVector( size_t N, T* pV );
+  /** destructor */
 	~NVector();
 
+  /** overload operator ()*/
 	const T* operator () (size_t i) const;
+  /** overload operator ()*/
 	T* operator () (size_t i);
+  /** overload operator []*/
 	const T* operator [] (size_t i) const;
+  /** overload operator []*/
 	T* operator [] (size_t i);
 
+  /** set elements to zero */
 	void SetZero();
-
+  
+  /** retrieve dimensions*/
 	size_t Dimensions() const;
+  /** resize vector */
 	void Resize( size_t N );
 
+  /** operload operator for math operations */
 	NVector operator * (const T& A) const;
+  /** operload operator for math operations */
 	NVector operator / (const T& A) const;
+  /** operload operator for math operations */
 	NVector operator - (const NVector& V) const;
+  /** operload operator for math operations */
 	NVector operator + (const NVector& V) const;
 
+  /** operload operator for math operations */
 	NVector& operator *= (const T& A);
+  /** operload operator for math operations */
 	NVector& operator /= (const T& A);
+  /** operload operator for math operations */
 	NVector& operator += (const NVector& V);
+  /** operload operator for math operations */
 	NVector& operator -= (const NVector& V);
 
+  /** add a scaled vector */
 	NVector& AddScaled(const NVector& V,const T& scale);
+  /** subtract a scaled vector*/
 	NVector& SubtractScaled(const NVector& V,const T& scale);
+  /** return the result of a sum of scaled vectors */
 	static void Add(const NVector& V1,const T& scale1,const NVector& V2,const T& scale2,NVector& Out);
+  /** return the result of a sum of a non-scaled vector  and a scaled one*/
 	static void Add(const NVector& V1,const T& scale1,const NVector& V2,				NVector& Out);
 
+  /** operload operator for math operations */
 	NVector operator - () const;
 
+  /** operload operator for assignment */
 	NVector& operator = (const NVector& V);
 
+  /** define dot product */
 	T Dot( const NVector& V ) const;
 
+  /** define lenght of a vector */
 	T Length() const;
 
+  /** calculate norm */
 	T Norm( size_t Ln ) const;
+  /** normalize the n-vector*/
 	void Normalize();
 
 	T* m_pV;
@@ -1098,123 +1298,182 @@ protected:
 /*=========================================================================
 SparseMatrix.h
 =========================================================================*/
+/**
+class name:  MatrixEntry
+*/
 template <class T>
 struct MatrixEntry
 {
+  /** constructor */
 	MatrixEntry( void )		{ N =-1; Value = 0; }
+  /** overloaded  constructor */
 	MatrixEntry( int i )	{ N = i; Value = 0; }
 	int N;
 	T Value;
 };
+/**
+class name:  NMatrixEntry
+*/
 template <class T,int Dim>
 struct NMatrixEntry
 {
+  /** constructor */
 	NMatrixEntry( void )		{ N =-1; memset(Value,0,sizeof(T)*Dim); }
+  /** overloaded  constructor */
 	NMatrixEntry( int i )	{ N = i; memset(Value,0,sizeof(T)*Dim); }
 	int N;
 	T Value[Dim];
 };
-
+/**
+class name:  SparseMatrix
+sparse matrix is a matrix populated primarily with zeros
+*/
 template<class T> class SparseMatrix
 {
 private:
 	static int UseAlloc;
 public:
 	static Allocator<MatrixEntry<T> > Allocator;
+  /** return  allocator for sparse matrix  */
 	static int UseAllocator(void);
+  /**  use allocator , allocating block size */
 	static void SetAllocator(const int& blockSize);
 
 	int rows;
 	int* rowSizes;
 	MatrixEntry<T>** m_ppElements;
 
+  /** constructor */
 	SparseMatrix();
+  /** overloaded constructor */
 	SparseMatrix( int rows );
+  /** resize the matrix*/
 	void Resize( int rows );
+  /** change row size */
 	void SetRowSize( int row , int count );
+  /** retrieve total number of entries summing each rowsize*/
 	int Entries(void);
 
+  /** overloaded constructor */
 	SparseMatrix( const SparseMatrix& M );
+  /** destructor */
 	~SparseMatrix();
 
+  /** set elements to zero */
 	void SetZero();
+  /** set matrix as identity */
 	void SetIdentity();
 
+  /** operload operator for math operations */
 	SparseMatrix<T>& operator = (const SparseMatrix<T>& M);
 
+  /** operload operator for math operations */
 	SparseMatrix<T> operator * (const T& V) const;
+  /** operload operator for math operations */
 	SparseMatrix<T>& operator *= (const T& V);
 
-
+  /** operload operator for math operations */
 	SparseMatrix<T> operator * (const SparseMatrix<T>& M) const;
+  /** multiplication with another sparse matrix */
 	SparseMatrix<T> Multiply( const SparseMatrix<T>& M ) const;
+  /** multiplication with another transpose sparse matrix */
 	SparseMatrix<T> MultiplyTranspose( const SparseMatrix<T>& Mt ) const;
 
+  /** operload operator for math operations */
 	template<class T2>
 	Vector<T2> operator * (const Vector<T2>& V) const;
+  /** Multiply with a vector and return the result */
 	template<class T2>
 	Vector<T2> Multiply( const Vector<T2>& V ) const;
 	template<class T2>
+  /** Multiply sparse matrix and vector and retrieve result */
 	void Multiply( const Vector<T2>& In, Vector<T2>& Out ) const;
 
-
+  /** transpose sparse matrix*/
 	SparseMatrix<T> Transpose() const;
-
+  /** Solve for x s.t. M(x)=b by solving for x s.t. M^tM(x)=M^t(b) */
 	static int Solve			(const SparseMatrix<T>& M,const Vector<T>& b,const int& iters,Vector<T>& solution,const T eps=1e-8);
 
+  /** reduced as symmetric sparse matrix and solve*/
 	template<class T2>
 	static int SolveSymmetric	(const SparseMatrix<T>& M,const Vector<T2>& b,const int& iters,Vector<T2>& solution,const T2 eps=1e-8,const int& reset=1);
 
 };
+/**
+class name:  SparseNMatrix
+template class that introduce (from SparseMAtrix) dimensionality
+*/
 template<class T,int Dim> class SparseNMatrix
 {
 private:
 	static int UseAlloc;
 public:
 	static Allocator<NMatrixEntry<T,Dim> > Allocator;
+  /** return  allocator for sparse matrix  */
 	static int UseAllocator(void);
+  /**  use allocator , allocating block size */
 	static void SetAllocator(const int& blockSize);
 
 	int rows;
 	int* rowSizes;
 	NMatrixEntry<T,Dim>** m_ppElements;
 
+  /** constructor */
 	SparseNMatrix();
+  /** overloaded constructor */
 	SparseNMatrix( int rows );
+  /** resize the matrix*/
 	void Resize( int rows );
+  /** change row size */
 	void SetRowSize( int row , int count );
+  /** retrieve total number of entries summing each rowsize*/
 	int Entries(void);
 
+  /** overloaded constructor */
 	SparseNMatrix( const SparseNMatrix& M );
+  /** destructor */
 	~SparseNMatrix();
 
+  /** operload operator for math operations */
 	SparseNMatrix& operator = (const SparseNMatrix& M);
-
+  
+  /** operload operator for math operations */
 	SparseNMatrix  operator *  (const T& V) const;
+  /** operload operator for math operations */
 	SparseNMatrix& operator *= (const T& V);
 
+  /** operload operator for math operations */
 	template<class T2>
 	NVector<T2,Dim> operator * (const Vector<T2>& V) const;
+  /** operload operator for math operations */
 	template<class T2>
 	Vector<T2> operator * (const NVector<T2,Dim>& V) const;
 };
 
 
-
+/**
+class name: SparseSymmetricMatrix
+Symmetric version of SparseMatrix (simpler the solutionof the system)
+*/
 template <class T>
 class SparseSymmetricMatrix : public SparseMatrix<T>{
 public:
 
+  /** operload operator for math operations */
   template<class T2>
 	Vector<T2> operator * (const Vector<T2>& V) const;
+  /** Multiply with a vector and return the result */
 	template<class T2>
 	Vector<T2> Multiply( const Vector<T2>& V ) const;
+  /** Multiply with a vector and return the result in the last parameter*/
 	template<class T2>
 	void Multiply( const Vector<T2>& In, Vector<T2>& Out ) const;
 
+  /** solve the sytem with symmetric sparse matrix */
 	template<class T2>
 	static int Solve(const SparseSymmetricMatrix<T>& M,const Vector<T2>& b,const int& iters,Vector<T2>& solution,const T2 eps=1e-8,const int& reset=1);
 
+  /** solve the sytem with symmetric sparse matrix */
 	template<class T2>
 	static int Solve(const SparseSymmetricMatrix<T>& M,const Vector<T>& diagonal,const Vector<T2>& b,const int& iters,Vector<T2>& solution,const T2 eps=1e-8,const int& reset=1);
 };
@@ -1223,48 +1482,75 @@ public:
 /*=========================================================================
 Octree.h
 =========================================================================*/
+/**
+class name: OctNode
+It represents a node of an octree. An octree is a tree data structure in which each internal node has exactly eight children. 
+Octrees are most often used to partition a three dimensional space by recursively subdividing it into eight octants. 
+Octrees are the three-dimensional analog of quadtrees.
+*/
 template<class NodeData,class Real=float>
 class OctNode
 {
 private:
 	static int UseAlloc;
 
+  /**
+      class name: AdjacencyCountFunction
+     This is like a functor which count the adjacencies giving 2 nodes.
+      */
 	class AdjacencyCountFunction{
 	public:
 		int count;
+    /** calculate number of adjacencies */
 		void Function(const OctNode<NodeData,Real>* node1,const OctNode<NodeData,Real>* node2);
 	};
+  /**  process Node faces */
 	template<class NodeAdjacencyFunction>
 	void __processNodeFaces(OctNode* node,NodeAdjacencyFunction* F,const int& cIndex1,const int& cIndex2,const int& cIndex3,const int& cIndex4);
+  /**  process Node edges */
 	template<class NodeAdjacencyFunction>
 	void __processNodeEdges(OctNode* node,NodeAdjacencyFunction* F,const int& cIndex1,const int& cIndex2);
+  /**  process nodes */
 	template<class NodeAdjacencyFunction>
 	void __processNodeNodes(OctNode* node,NodeAdjacencyFunction* F);
+  /** process node adjacencencies of the  node */
 	template<class NodeAdjacencyFunction>
 	static void __ProcessNodeAdjacentNodes(const int& dx,const int& dy,const int& dz,OctNode* node1,const int& radius1,OctNode* node2,const int& radius2,const int& cWidth2,NodeAdjacencyFunction* F);
-	template<class TerminatingNodeAdjacencyFunction>
+	/** process terminating node of the adjacentNode node */
+  template<class TerminatingNodeAdjacencyFunction>
 	static void __ProcessTerminatingNodeAdjacentNodes(const int& dx,const int& dy,const int& dz,OctNode* node1,const int& radius1,OctNode* node2,const int& radius2,const int& cWidth2,TerminatingNodeAdjacencyFunction* F);
-	template<class PointAdjacencyFunction>
+	/** process point  of adjacencent  nodes */
+  template<class PointAdjacencyFunction>
 	static void __ProcessPointAdjacentNodes(const int& dx,const int& dy,const int& dz,OctNode* node2,const int& radius2,const int& cWidth2,PointAdjacencyFunction* F);
-	template<class NodeAdjacencyFunction>
+	/** process fixed depth  of adjacencent  nodes */
+  template<class NodeAdjacencyFunction>
 	static void __ProcessFixedDepthNodeAdjacentNodes(const int& dx,const int& dy,const int& dz,OctNode* node1,const int& radius1,OctNode* node2,const int& radius2,const int& cWidth2,const int& depth,NodeAdjacencyFunction* F);
-	template<class NodeAdjacencyFunction>
+	/** process max depth  of adjacencent  nodes */
+  template<class NodeAdjacencyFunction>
 	static void __ProcessMaxDepthNodeAdjacentNodes(const int& dx,const int& dy,const int& dz,OctNode* node1,const int& radius1,OctNode* node2,const int& radius2,const int& cWidth2,const int& depth,NodeAdjacencyFunction* F);
 
 	// This is made private because the division by two has been pulled out.
+  /** check if nodes overlaps  */
 	static inline int Overlap(const int& c1,const int& c2,const int& c3,const int& dWidth);
+  /** check if node child overlaps  */
 	inline static int ChildOverlap(const int& dx,const int& dy,const int& dz,const int& d,const int& cRadius2);
 
+  /** return neighbor with the same face*/
 	const OctNode* __faceNeighbor(const int& dir,const int& off) const;
+  /** return neighbor with the same edge*/
 	const OctNode* __edgeNeighbor(const int& o,const int i[2],const int idx[2]) const;
+  /** return neighbor with the same face*/
 	OctNode* __faceNeighbor(const int& dir,const int& off,const int& forceChildren);
+  /** return neighbor with the same edge*/
 	OctNode* __edgeNeighbor(const int& o,const int i[2],const int idx[2],const int& forceChildren);
 public:
 	static const int DepthShift,OffsetShift,OffsetShift1,OffsetShift2,OffsetShift3;
 	static const int DepthMask,OffsetMask;
 
 	static Allocator<OctNode> Allocator;
+  /** return allocator */
 	static int UseAllocator(void);
+  /** allocate blocksize with allocator */
 	static void SetAllocator(int blockSize);
 
 	OctNode* parent;
@@ -1272,90 +1558,141 @@ public:
 	short d,off[3];
 	NodeData nodeData;
 
-
+  /** constructor */
 	OctNode(void);
+  /** destructor*/
 	~OctNode(void);
+  /** initialize children list */
 	int initChildren(void);
 
+  /** calculate depth and offset */
 	void depthAndOffset(int& depth,int offset[3]) const; 
+  /** return depth */
 	int depth(void) const;
+  /** calculate depth and offset */
 	static inline void DepthAndOffset(const long long& index,int& depth,int offset[3]);
+  /** calculate center and width*/
 	static inline void CenterAndWidth(const long long& index,Point3D<Real>& center,Real& width);
+  /** return depth using index and depthmask*/
 	static inline int Depth(const long long& index);
+  /** calculate depth and return offset*/
 	static inline void Index(const int& depth,const int offset[3],short& d,short off[3]);
-	void centerAndWidth(Point3D<Real>& center,Real& width) const;
+	/** calculate center and width*/
+  void centerAndWidth(Point3D<Real>& center,Real& width) const;
 
+  /** return number of leaves*/
 	int leaves(void) const;
-	int maxDepthLeaves(const int& maxDepth) const;
+ 	/** return max depth of leaves */
+  int maxDepthLeaves(const int& maxDepth) const;
+  /** return number of nodes*/
 	int nodes(void) const;
+  /** return max depth */
 	int maxDepth(void) const;
 
+  /** return root node */
 	const OctNode* root(void) const;
 
+  /** return next leaf*/
 	const OctNode* nextLeaf(const OctNode* currentLeaf=NULL) const;
+  /** return next leaf*/
 	OctNode* nextLeaf(OctNode* currentLeaf=NULL);
+  /** return next node*/
 	const OctNode* nextNode(const OctNode* currentNode=NULL) const;
-	OctNode* nextNode(OctNode* currentNode=NULL);
+	/** return next node*/
+  OctNode* nextNode(OctNode* currentNode=NULL);
+  /**return next Branch*/
 	const OctNode* nextBranch(const OctNode* current) const;
+  /**return next Branch*/
 	OctNode* nextBranch(OctNode* current);
 
+  /**create tree recursively until its max depth is equal to the parameter*/
 	void setFullDepth(const int& maxDepth);
 
+  /** print leaves */
 	void printLeaves(void) const;
+  /** print range */
 	void printRange(void) const;
-
+  /** process Node Faces */
 	template<class NodeAdjacencyFunction>
 	void processNodeFaces(OctNode* node,NodeAdjacencyFunction* F,const int& fIndex,const int& processCurrent=1);
-	template<class NodeAdjacencyFunction>
+	/** process Node Edges */
+  template<class NodeAdjacencyFunction>
 	void processNodeEdges(OctNode* node,NodeAdjacencyFunction* F,const int& eIndex,const int& processCurrent=1);
-	template<class NodeAdjacencyFunction>
+	/** process Node Corners */
+  template<class NodeAdjacencyFunction>
 	void processNodeCorners(OctNode* node,NodeAdjacencyFunction* F,const int& cIndex,const int& processCurrent=1);
-	template<class NodeAdjacencyFunction>
+	/** process nodes */
+  template<class NodeAdjacencyFunction>
 	void processNodeNodes(OctNode* node,NodeAdjacencyFunction* F,const int& processCurrent=1);
 	
+  /** Process Node Adjacent Nodes */
 	template<class NodeAdjacencyFunction>
 	static void ProcessNodeAdjacentNodes(const int& maxDepth,OctNode* node1,const int& width1,OctNode* node2,const int& width2,NodeAdjacencyFunction* F,const int& processCurrent=1);
-	template<class NodeAdjacencyFunction>
+	/** process node adjacencencies of the  node */
+  template<class NodeAdjacencyFunction>
 	static void ProcessNodeAdjacentNodes(const int& dx,const int& dy,const int& dz,OctNode* node1,const int& radius1,OctNode* node2,const int& radius2,const int& width2,NodeAdjacencyFunction* F,const int& processCurrent=1);
-	template<class TerminatingNodeAdjacencyFunction>
+	/** process terminating node of the adjacentNode node */
+  template<class TerminatingNodeAdjacencyFunction>
 	static void ProcessTerminatingNodeAdjacentNodes(const int& maxDepth,OctNode* node1,const int& width1,OctNode* node2,const int& width2,TerminatingNodeAdjacencyFunction* F,const int& processCurrent=1);
-	template<class TerminatingNodeAdjacencyFunction>
+	/** process terminating node of the adjacentNode node */
+  template<class TerminatingNodeAdjacencyFunction>
 	static void ProcessTerminatingNodeAdjacentNodes(const int& dx,const int& dy,const int& dz,OctNode* node1,const int& radius1,OctNode* node2,const int& radius2,const int& width2,TerminatingNodeAdjacencyFunction* F,const int& processCurrent=1);
-	template<class PointAdjacencyFunction>
+	/** process point  of adjacencent  nodes */
+  template<class PointAdjacencyFunction>
 	static void ProcessPointAdjacentNodes(const int& maxDepth,const int center1[3],OctNode* node2,const int& width2,PointAdjacencyFunction* F,const int& processCurrent=1);
-	template<class PointAdjacencyFunction>
+	/** process point  of adjacencent  nodes */
+  template<class PointAdjacencyFunction>
 	static void ProcessPointAdjacentNodes(const int& dx,const int& dy,const int& dz,OctNode* node2,const int& radius2,const int& width2,PointAdjacencyFunction* F,const int& processCurrent=1);
-	template<class NodeAdjacencyFunction>
+	/** process fixed depth  of adjacencent  nodes */
+  template<class NodeAdjacencyFunction>
 	static void ProcessFixedDepthNodeAdjacentNodes(const int& maxDepth,OctNode* node1,const int& width1,OctNode* node2,const int& width2,const int& depth,NodeAdjacencyFunction* F,const int& processCurrent=1);
-	template<class NodeAdjacencyFunction>
+	/** process fixed depth  of adjacencent  nodes */
+  template<class NodeAdjacencyFunction>
 	static void ProcessFixedDepthNodeAdjacentNodes(const int& dx,const int& dy,const int& dz,OctNode* node1,const int& radius1,OctNode* node2,const int& radius2,const int& width2,const int& depth,NodeAdjacencyFunction* F,const int& processCurrent=1);
-	template<class NodeAdjacencyFunction>
+	/** process max depth  of adjacencent  nodes */
+  template<class NodeAdjacencyFunction>
 	static void ProcessMaxDepthNodeAdjacentNodes(const int& maxDepth,OctNode* node1,const int& width1,OctNode* node2,const int& width2,const int& depth,NodeAdjacencyFunction* F,const int& processCurrent=1);
-	template<class NodeAdjacencyFunction>
+	/** process max depth  of adjacencent  nodes */
+  template<class NodeAdjacencyFunction>
 	static void ProcessMaxDepthNodeAdjacentNodes(const int& dx,const int& dy,const int& dz,OctNode* node1,const int& radius1,OctNode* node2,const int& radius2,const int& width2,const int& depth,NodeAdjacencyFunction* F,const int& processCurrent=1);
-
+  /** return corner index */
 	static int CornerIndex(const Point3D<Real>& center,const Point3D<Real> &p);
 
+  /** return neighbor with the same face*/
 	OctNode* faceNeighbor(const int& faceIndex,const int& forceChildren=0);
-	const OctNode* faceNeighbor(const int& faceIndex) const;
-	OctNode* edgeNeighbor(const int& edgeIndex,const int& forceChildren=0);
+	/** return neighbor with the same face*/
+  const OctNode* faceNeighbor(const int& faceIndex) const;
+	/** return neighbor with the same edge*/
+  OctNode* edgeNeighbor(const int& edgeIndex,const int& forceChildren=0);
+  /** return neighbor with the same edge*/
 	const OctNode* edgeNeighbor(const int& edgeIndex) const;
+  /** return neighbor with the same corner*/
 	OctNode* cornerNeighbor(const int& cornerIndex,const int& forceChildren=0);
+  /** return neighbor with the same corner*/
 	const OctNode* cornerNeighbor(const int& cornerIndex) const;
 
+  /** retrieve the nearest leaf to Point3D argument*/
 	OctNode* getNearestLeaf(const Point3D<Real>& p);
+  /** retrieve the nearest leaf to Point3D argument*/
 	const OctNode* getNearestLeaf(const Point3D<Real>& p) const;
 
+  /** find the common edge betwee the nodes v1-v2*/
 	static int CommonEdge(const OctNode* node1,const int& eIndex1,const OctNode* node2,const int& eIndex2);
+  /** compare depths of octree nodes  v1-v2*/
 	static int CompareForwardDepths(const void* v1,const void* v2);
+  /** compare depths of octree nodes, using pointers */
 	static int CompareForwardPointerDepths(const void* v1,const void* v2);
+  /** compare depths of octree nodes v2-v1 */
 	static int CompareBackwardDepths(const void* v1,const void* v2);
+   /** compare depths of octree nodes, using pointers v2-v1 */
 	static int CompareBackwardPointerDepths(const void* v1,const void* v2);
 
 
+  /** overload operator assignment */
 	template<class NodeData2>
 	OctNode& operator = (const OctNode<NodeData2,Real>& node);
 
+  /** function which calculate if nodes overlap*/
 	static inline int Overlap2(const int &depth1,const int offSet1[DIMENSION],const Real& multiplier1,const int &depth2,const int offSet2[DIMENSION],const Real& multiplier2);
 
 /*
@@ -1364,41 +1701,66 @@ public:
 	int read(const char* fileName);
 	int read(FILE* fp);
 */
+  /**
+     class name: Neighbors
+     contains a 3x3x3 structure in which store pointers of the neighbor
+     */
 	class Neighbors{
 	public:
 		OctNode* neighbors[3][3][3];
 		Neighbors(void);
 		void clear(void);
 	};
+
+  /**
+      class name:NeighborKey
+      Handler of octnode neighbors.
+     */
 	class NeighborKey{
 	public:
 		Neighbors* neighbors;
-
+    /** constructor */
 		NeighborKey(void);
+    /** destructor */
 		~NeighborKey(void);
-
+    /** initialize variables */
 		void set(const int& depth);
+    /** insert neighbors */
 		Neighbors& setNeighbors(OctNode* node);
+    /** retrieve neighbors */
 		Neighbors& getNeighbors(OctNode* node);
 	};
+  /**
+      class name:Neighbors2
+      Handler of octnode neighbors. Implement clear method.
+     */
 	class Neighbors2{
 	public:
 		const OctNode* neighbors[3][3][3];
+    /** constructor */
 		Neighbors2(void);
+    /** clean the structure */
 		void clear(void);
 	};
+  /**
+      class name:NeighborKey2
+      Handler of octnode neighbors2.
+     */
 	class NeighborKey2{
 	public:
 		Neighbors2* neighbors;
-
+    /** constructor */
 		NeighborKey2(void);
+    /** destructor */
 		~NeighborKey2(void);
-
+    /** initialize variables */
 		void set(const int& depth);
+    /** retrieve neighbors */
 		Neighbors2& getNeighbors(const OctNode* node);
 	};
-
+  /** index variable is fill with center indexes*/
 	void centerIndex(const int& maxDepth,int index[DIMENSION]) const;
+  /** return width of the node */
 	int width(const int& maxDepth) const;
 };
 
