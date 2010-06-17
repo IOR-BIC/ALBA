@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDPoissonSurfaceReconstruction.h,v $
 Language:  C++
-Date:      $Date: 2010-06-16 14:41:54 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2010-06-17 06:57:41 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Fuli Wu
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -436,7 +436,6 @@ PPolynomial.h
 =========================================================================*/
 /**
 class name: StartingPolynomial
-//CONTINUE FROM HERE
 */
 template<int Degree>
 class StartingPolynomial{
@@ -445,6 +444,7 @@ public:
 	double start;
 
 	template<int Degree2>
+  /** overload *, multiplying polynomial member variable with parameter one*/
 	StartingPolynomial<Degree+Degree2>  operator * (const StartingPolynomial<Degree2>& p) const;
   /** Scale polynomial coefficients according to dividing factor s.*/
 	StartingPolynomial scale(const double& s) const;
@@ -457,6 +457,9 @@ public:
 };
 
 template<int Degree>
+/**
+class name: PPolynomial
+*/
 class PPolynomial{
 public:
 	size_t polyCount;
@@ -561,6 +564,9 @@ public:
 FunctionData.h
 =========================================================================*/
 template<int Degree,class Real>
+/**
+class name: FunctionData
+*/
 class FunctionData{
 	int useDotRatios;
 	int normalize;
@@ -595,15 +601,21 @@ public:
   /** Clear value tables. */
 	virtual void clearValueTables(void);
 
+  /** create base functions from parameters*/
 	void set(const int& maxDepth,const PPolynomial<Degree>& F,const int& normalize,const int& useDotRatios=1);
 
+  /** compute dot product */
 	Real   dotProduct(const double& center1,const double& width1,const double& center2,const double& width2) const;
 
+  /** compute dot product with derivative base functions  */
 	Real  dDotProduct(const double& center1,const double& width1,const double& center2,const double& width2) const;
 
+  /** compute dot product with derivative base functions  like previous except for width2 division*/
 	Real d2DotProduct(const double& center1,const double& width1,const double& center2,const double& width2) const;
 
+  /** retrieve symmetric index */
 	static inline int SymmetricIndex(const int& i1,const int& i2);
+  /** retrieve symmetric index */
 	static inline int SymmetricIndex(const int& i1,const int& i2,int& index);
 };
 
