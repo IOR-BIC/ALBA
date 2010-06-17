@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDPoissonSurfaceReconstruction.h,v $
 Language:  C++
-Date:      $Date: 2010-06-17 06:57:41 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2010-06-17 07:02:20 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Fuli Wu
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -627,6 +627,10 @@ template<class Real>
 Real Random(void);
 
 template<class Real>
+/** 
+struct name: Point3D
+Represents a Point with 3d coordinates in the space.
+*/
 struct Point3D{Real coords[3];};
 
 /** Return a 3d point with random real coordinates. */
@@ -657,6 +661,10 @@ double SquareDistance(const Point3D<Real>& p1,const Point3D<Real>& p2);
 template <class Real>
 void CrossProduct(const Point3D<Real>& p1,const Point3D<Real>& p2,Point3D<Real>& p);
 
+/**
+class name: Edge
+Represents an edge of a triangle.
+*/
 class Edge{
 public:
 	double p[2][2];
@@ -669,6 +677,10 @@ public:
 		return sqrt(d[0]*d[0]+d[1]*d[1]);
 	}
 };
+/**
+class name: Triangle
+Represents a triangle.
+*/
 class Triangle{
 public:
 	double p[3][3];
