@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-05-31 10:08:55 $
-Version:   $Revision: 1.1.2.113 $
+Date:      $Date: 2010-06-23 12:15:01 $
+Version:   $Revision: 1.1.2.114 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -2218,9 +2218,9 @@ void medOpImporterDicomOffis::AutoPositionCropPlane()
 	}
 	else if(m_VolumeSide==LEFT_SIDE)
 	{
-		m_CropPlane->SetOrigin(m_SliceBounds[1]-diffX/2,diffY/4,0.0);
-		m_CropPlane->SetPoint1(m_SliceBounds[1],diffY/4,0.0);
-		m_CropPlane->SetPoint2(m_SliceBounds[1]-diffX/2,(diffY/4)*3,0.0);
+		m_CropPlane->SetOrigin(diffX/2,diffY/4,0.0);
+		m_CropPlane->SetPoint1(diffX,diffY/4,0.0);
+		m_CropPlane->SetPoint2(diffX/2,(diffY/4)*3,0.0);
 		m_CropPlane->Update();
 	}
 	else if (m_VolumeSide==NON_VALID_SIDE)
