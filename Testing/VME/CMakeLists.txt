@@ -119,6 +119,11 @@ ADD_TEST(medAttributeSegmentationVolumeTest  ${EXECUTABLE_OUTPUT_PATH}/medAttrib
 ADD_EXECUTABLE(medPipeTensorFieldSliceTest medPipeTensorFieldSliceTest.h medPipeTensorFieldSliceTest.cpp)
 ADD_TEST(medPipeTensorFieldSliceTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeTensorFieldSliceTest)
 
+ADD_EXECUTABLE(medPipeVectorFieldSliceTest medPipeVectorFieldSliceTest.h medPipeVectorFieldSliceTest.cpp)
+ADD_TEST(medPipeVectorFieldSliceTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeVectorFieldSliceTest)
+
+ADD_EXECUTABLE(medPipeTensorFieldGlyphsTest medPipeTensorFieldGlyphsTest.h medPipeTensorFieldGlyphsTest.cpp)
+ADD_TEST(medPipeTensorFieldGlyphsTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeTensorFieldGlyphsTest)
 
 #to be checked
 #ADD_EXECUTABLE(medPipeVolumeVRTest medPipeVolumeVRTest.h medPipeVolumeVRTest.cpp)
