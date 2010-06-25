@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeTensorFieldGlyphs.cpp,v $ 
   Language: C++ 
-  Date: $Date: 2009-11-04 16:16:13 $ 
-  Version: $Revision: 1.1.2.5 $ 
+  Date: $Date: 2010-06-25 15:01:02 $ 
+  Version: $Revision: 1.1.2.6 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   modify: Hui Wei (beds.ac.uk)
   ========================================================================== 
@@ -118,7 +118,9 @@ medPipeTensorFieldGlyphs::~medPipeTensorFieldGlyphs()
   vtkDEL(m_GlyphAxes);
   
   vtkDEL(m_ColorMappingLUT);
-  mafDEL(m_GlyphMaterial);    
+  mafDEL(m_GlyphMaterial);   
+
+  vtkDEL(m_DataScale_Copy);
 }
 
 
