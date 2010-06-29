@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-04-20 08:00:37 $
-  Version:   $Revision: 1.26.2.2 $
+  Date:      $Date: 2010-06-29 06:35:53 $
+  Version:   $Revision: 1.26.2.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -273,7 +273,7 @@ void mafSceneGraph::VmeShow(mafNode *vme, bool show)
 		      mafVME *in_vme = mafVME::SafeDownCast(vme);
 		      mafVME *current_vme = mafVME::SafeDownCast(n->m_Vme);
           bool vme_type_check = in_vme != NULL && current_vme != NULL;
-          if(n->m_Pipe != NULL && n->m_Vme != vme && vme_type_check && in_vme->GetOutput()->GetTypeId() == current_vme->GetOutput()->GetTypeId())
+          if(n->m_Pipe != NULL && n->m_Vme != vme && vme_type_check && !current_vme->IsA("mafVMEGizmo") && in_vme->GetOutput()->GetTypeId() == current_vme->GetOutput()->GetTypeId())
           {
             mafEventMacro(mafEvent(this,VME_SHOW,n->m_Vme,false));
           }
