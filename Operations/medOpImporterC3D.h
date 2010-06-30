@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterC3D.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-28 08:38:31 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2010-06-30 06:48:51 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Paolo Quadrani - porting Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -29,12 +29,18 @@ class mafEventListener;
 // medOpImporterC3D :
 //----------------------------------------------------------------------------
 /**
+class name: medOpImporterC3D
+Import C3D file inside a landmark cloud. C3D is a standard format file
+for movement analysis data. http://www.c3d.org/
 */
 class medOpImporterC3D: public mafOp
 {
 public:
+  /** constructor */
   medOpImporterC3D(wxString label);
- ~medOpImporterC3D(); 
+  /** destructor */
+ ~medOpImporterC3D();
+  /** retrieve the copy of the object */
   mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */

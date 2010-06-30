@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpSurfaceMirror.h,v $
   Language:  C++
-  Date:      $Date: 2007-12-28 12:55:08 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2010-06-30 06:48:51 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Paolo Quadrani - porting  Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -29,20 +29,27 @@ class vtkMEDPolyDataMirror;
 //----------------------------------------------------------------------------
 // medOpSurfaceMirror :
 //----------------------------------------------------------------------------
-/** */
+/** 
+class name: medOpSurfaceMirror
+Operation which permits to create a copy of the surface which is "mirrored" respect  xy,yz or xz plane.
+*/
 class medOpSurfaceMirror: public mafOp
 {
 public:
+  /** constructor */
 	medOpSurfaceMirror(wxString label = "Surface Mirror");
-	~medOpSurfaceMirror(); 
+  /** destructor */
+	~medOpSurfaceMirror();
+  /** handle events which becomes from other classes */
 	virtual void OnEvent(mafEventBase *maf_event);
+  /** return the copy of the object */
 	mafOp* Copy();
 
+  /** RTTI Macro */
 	mafTypeMacro(medOpSurfaceMirror, mafOp);
 
 	/** Return true for the acceptable vme type. */
 	bool Accept(mafNode* node);   
-
 
 	/** Builds operation's interface. */
   void OpRun();
