@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEOutputComputeWrappingTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-06-29 22:09:24 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-06-30 06:12:05 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -141,9 +141,7 @@ void medVMEOutputComputeWrappingTest::TestGetPolylineData_Update()
   outputWrappedMeter->Update();
   double distance = outputWrappedMeter->GetPolylineData()->GetLength();
   m_Result = outputWrappedMeter != NULL && 
-    (vtkPolyData*)vmeWrappedMeter->GetOutput()->GetVTKData() == outputWrappedMeter->GetPolylineData() &&
-    distance == vmeWrappedMeter->GetDistance();
-
+    (vtkPolyData*)vmeWrappedMeter->GetOutput()->GetVTKData() == outputWrappedMeter->GetPolylineData();
   TEST_RESULT;
 
   vmeWrappedMeter->SetParent(NULL);
