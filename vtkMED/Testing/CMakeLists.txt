@@ -50,6 +50,8 @@ ADD_EXECUTABLE(vtkMAFMeshCutter_BESTest vtkMAFMeshCutter_BESTest.h vtkMAFMeshCut
 ADD_TEST(vtkMAFMeshCutter_BESTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFMeshCutter_BESTest)
 ADD_EXECUTABLE(vtkMEDFillingHoleTest vtkMEDFillingHoleTest.h vtkMEDFillingHoleTest.cpp)
 ADD_TEST(vtkMEDFillingHoleTest ${EXECUTABLE_OUTPUT_PATH}/vtkMEDFillingHoleTest)
+ADD_EXECUTABLE(vtkMEDFixTopologyTest vtkMEDFixTopologyTest.h vtkMEDFixTopologyTest.cpp)
+ADD_TEST(vtkMEDFixTopologyTest ${EXECUTABLE_OUTPUT_PATH}/vtkMEDFixTopologyTest)
 
 
 # wxWidgets specific classes
