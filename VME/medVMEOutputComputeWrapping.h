@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEOutputComputeWrapping.h,v $
   Language:  C++
-  Date:      $Date: 2008-12-02 11:57:18 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2010-06-30 06:30:59 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,30 +20,38 @@
 //----------------------------------------------------------------------------
 class mafGUI;
 
-/** NULL output for VME node with a VTK image output data.
+/** 
+  class name: medVMEOutputComputeWrapping
+  NULL output for VME node with a VTK image output data.
   medVMEOutputComputeWrapping is the output produced by a node generating an output
   with a VTK dataset.
 */
 class MAF_EXPORT medVMEOutputComputeWrapping : public mafVMEOutputPolyline
 {
 public:
+  /** constructor */
   medVMEOutputComputeWrapping();
+  /** destructor */
   virtual ~medVMEOutputComputeWrapping();
 
+  /** RTTI macro*/
   mafTypeMacro(medVMEOutputComputeWrapping,mafVMEOutputPolyline);
 
   /** Update all the output data structures (data, bounds, matrix and abs matrix).*/
   virtual void Update();
 
 protected:
+  /** create the gui of the output panel for this vme output type*/
   mafGUI *CreateGui();
 
   mafString m_Distance;
   mafString m_Angle;
-	std::vector<mafString> m_MiddlePoints;
+  std::vector<mafString> m_MiddlePoints;
 
 private:
-  medVMEOutputComputeWrapping(const medVMEOutputComputeWrapping&); // Not implemented
+  /** copy constructor not implemented */
+  medVMEOutputComputeWrapping(const medVMEOutputComputeWrapping&);
+  /** operator = not implemented */
   void operator=(const medVMEOutputComputeWrapping&); // Not implemented
 };
 
