@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceTextured.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-10-21 12:59:39 $
-  Version:   $Revision: 1.11.2.3 $
+  Date:      $Date: 2010-06-30 06:53:17 $
+  Version:   $Revision: 1.11.2.4 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -46,6 +46,7 @@
 #include "mafLODActor.h"
 #include "vtkRenderer.h"
 #include "vtkLookupTable.h"
+#include "vtkActor.h"
 
 #include <vector>
 
@@ -227,6 +228,18 @@ void mafPipeSurfaceTextured::Create(mafSceneNode *n/*, bool use_axes*/)
       m_Axes = new mafAxes(m_RenFront, m_Vme);
       m_Axes->SetVisibility(0);
 	}
+
+  m_GhostActor = NULL;
+  if(m_AssemblyBack != NULL)
+  {
+    vtkNEW(m_GhostActor);
+    m_GhostActor->SetMapper(m_Mapper);
+    m_GhostActor->PickableOff();
+    m_GhostActor->GetProperty()->SetOpacity(0);
+    m_GhostActor->GetProperty()->SetRepresentationToPoints();
+    m_GhostActor->GetProperty()->SetInterpolationToFlat();
+    m_AssemblyFront->AddPart(m_GhostActor);
+  }
 }
 //----------------------------------------------------------------------------
 mafPipeSurfaceTextured::~mafPipeSurfaceTextured()
@@ -252,6 +265,12 @@ mafPipeSurfaceTextured::~mafPipeSurfaceTextured()
   vtkDEL(m_OutlineActor);
   cppDEL(m_Axes);
   cppDEL(m_MaterialButton);
+
+  if(m_GhostActor) 
+  {
+    m_AssemblyFront->RemovePart(m_GhostActor);
+  }
+  vtkDEL(m_GhostActor);
 }
 //----------------------------------------------------------------------------
 void mafPipeSurfaceTextured::Select(bool sel)

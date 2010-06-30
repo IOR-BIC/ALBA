@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceTextured.h,v $
   Language:  C++
-  Date:      $Date: 2008-10-20 15:23:24 $
-  Version:   $Revision: 1.7.2.1 $
+  Date:      $Date: 2010-06-30 06:53:17 $
+  Version:   $Revision: 1.7.2.2 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,6 +29,7 @@ class vtkPolyData;
 class mafLODActor;
 class mafGUIMaterialButton;
 class mmaMaterial;
+class vtkActor;
 
 //----------------------------------------------------------------------------
 // mafPipeSurfaceTextured :
@@ -104,6 +105,7 @@ protected:
   mafLODActor             *m_Actor;
   mafLODActor             *m_OutlineActor;
   mafAxes                 *m_Axes;
+  vtkActor               *m_GhostActor;
 
   int m_UseVTKProperty;
   int m_UseTexture;
