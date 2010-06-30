@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDPoissonSurfaceReconstruction.cxx,v $
 Language:  C++
-Date:      $Date: 2010-06-15 13:56:33 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-06-30 15:07:10 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Fuli Wu
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -21,7 +21,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "float.h"
 
 
-vtkCxxRevisionMacro(vtkMEDPoissonSurfaceReconstruction, "$Revision: 1.1.2.1 $");
+vtkCxxRevisionMacro(vtkMEDPoissonSurfaceReconstruction, "$Revision: 1.1.2.2 $");
 vtkStandardNewMacro(vtkMEDPoissonSurfaceReconstruction);
 
 vtkDataSet* vtk_psr_input;
@@ -173,6 +173,7 @@ FunctionData<Degree,Real>::~FunctionData(void){
 		if(d2DotTable){delete[] d2DotTable;}
 		if( valueTables){delete[]  valueTables;}
 		if(dValueTables){delete[] dValueTables;}
+    if(baseFunctions){delete[] baseFunctions;}
 	}
 	dotTable=dDotTable=d2DotTable=NULL;
 	valueTables=dValueTables=NULL;
@@ -7221,6 +7222,8 @@ float MarchingCubes::Interpolate(const float& v1,const float& v2){return v1/(v1-
 template<int Degree>
 int Execute()
 {
+  TreeNodeData::UseIndex = 1;
+
 	int i=0;
 
   int Binary=0,Verbose=0,NoResetSamples=0,NoClipTree=0,Confidence=0;
