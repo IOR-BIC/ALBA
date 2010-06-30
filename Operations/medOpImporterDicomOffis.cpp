@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-06-23 12:15:01 $
-Version:   $Revision: 1.1.2.114 $
+Date:      $Date: 2010-06-30 10:17:45 $
+Version:   $Revision: 1.1.2.115 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -319,7 +319,7 @@ mafOp(label)
 
 	m_VolumeName = "";
 
-	m_VolumeSide=NON_VALID_SIDE;
+	m_VolumeSide=LEFT_SIDE;
 
 	m_DicomModalityListBox = NULL;
 
