@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIGizmoInterface.h,v $
   Language:  C++
-  Date:      $Date: 2009-07-15 14:26:41 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2010-07-05 12:04:14 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -31,7 +31,11 @@ class mafGUI;
   @sa
  
   @todo
+  - add an ivar to register widgets enabling status: should also refactor dependencies to use this flag.
+  - provide a barebone implementation for functions doing nothing
+  - enforce superclass implementation by using pure virtuals
 */
+
 class mafGUIGizmoInterface : public mafObserver
 {
 public:
@@ -65,5 +69,7 @@ protected:
   mafGUI      *m_Gui;    
   bool m_TestMode;
 
+  /** Test friend */
+  friend class mafGUIGizmoInterfaceTest;
 };
 #endif
