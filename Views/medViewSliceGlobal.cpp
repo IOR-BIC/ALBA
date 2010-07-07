@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewSliceGlobal.cpp,v $
 Language:  C++
-Date:      $Date: 2010-05-18 15:48:01 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2010-07-07 08:33:32 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2002/2004
@@ -597,10 +597,13 @@ void medViewSliceGlobal::CameraUpdate()
 
     m_NewABSPose = volume->GetAbsMatrixPipe()->GetMatrix();
 
-    if (DEBUG_MODE == true)
-      mafLogMessage(stringStream.str().c_str());
+    // Fix bug #2192: Added by Losi 07/07/2010
+    // Avoid pan & zoom reset while changing timestamp
+    mafMatrix oldABSPoseForEquals;
+    oldABSPoseForEquals.DeepCopy(&m_OldABSPose);
+    oldABSPoseForEquals.SetTimeStamp(m_NewABSPose.GetTimeStamp());
 
-    if (m_NewABSPose.Equals(&m_OldABSPose))
+    if (m_NewABSPose.Equals(&oldABSPoseForEquals))
     { 
       if (DEBUG_MODE == true)
         mafLogMessage("Calling Superclass Camera Update ");
