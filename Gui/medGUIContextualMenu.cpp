@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUIContextualMenu.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 10:27:22 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2010-07-07 06:49:11 $
+  Version:   $Revision: 1.4.2.1 $
   Authors:   Daniele Giunchi    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,6 +21,7 @@
 
 
 #include "medGUIContextualMenu.h"
+#include "medViewVTKCompound.h"
 #include "wx/utils.h"
 #include <wx/laywin.h>
 #include <wx/mdi.h>
@@ -160,7 +161,7 @@ void medGUIContextualMenu::OnContextualViewMenu(wxCommandEvent& event)
 	{
 		case CONTEXTUAL_MENU_HIDE_VME:
 		{
-      if (mafViewVTK::SafeDownCast(m_ViewActive))
+      if (mafViewVTK::SafeDownCast(m_ViewActive) || medViewVTKCompound::SafeDownCast(m_ViewActive)) // added  || medViewVTKCompound::SafeDownCast(m_ViewActive) by Losi 07/07/2010 fix bug #2190
       {
         bool pipe_created = false;
         bool mutex = false;
