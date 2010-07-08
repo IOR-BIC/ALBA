@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransform.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:44:00 $
-  Version:   $Revision: 1.9.2.2 $
+  Date:      $Date: 2010-07-08 15:40:18 $
+  Version:   $Revision: 1.9.2.3 $
   Authors:   Marco Petrone, Stefano Perticoni,Stefania Paperini
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -1232,7 +1232,7 @@ int mafTransform::MatrixTommuQuaternion(const mafMatrix &matrix,
 }
 
 //----------------------------------------------------------------------------
-int mafTransform::mmuQuaternionToMatrix(double quaternion[4],
+int mafTransform::QuaternionToMatrix(double quaternion[4],
 										  mafMatrix &matrix)
 //----------------------------------------------------------------------------
 {

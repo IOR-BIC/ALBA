@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDeviceTrackerWIIMote.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-17 16:01:04 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2010-07-08 15:40:58 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -53,15 +53,15 @@ mafDeviceTrackerWIIMote::~mafDeviceTrackerWIIMote()
 int mafDeviceTrackerWIIMote::InternalInitialize()
 //------------------------------------------------------------------------------
 {
-  wiimotes = HIDDevice::ConnectToHIDDevices<Wiimote>();
+  m_Wiimotes = HIDDevice::ConnectToHIDDevices<Wiimote>();
 
-	if (wiimotes.size() <= 0) // Need to add a user fri
+	if (m_Wiimotes.size() <= 0) // Need to add a user fri
 		return 1;
 
 
-	wiimotes[0].SetLEDs(0, 1, 1, 0);
-	wiimotes[0].StartListening();
-	wiimotes[0].RequestMotionData();
+	m_Wiimotes[0].SetLEDs(0, 1, 1, 0);
+	m_Wiimotes[0].StartListening();
+	m_Wiimotes[0].RequestMotionData();
 
   return (this->Superclass::InternalInitialize());
 	
@@ -71,12 +71,12 @@ int mafDeviceTrackerWIIMote::InternalInitialize()
 void mafDeviceTrackerWIIMote::InternalShutdown()
 //------------------------------------------------------------------------------
 {
-	if(wiimotes.size() > 0)
+	if(m_Wiimotes.size() > 0)
 	{
-		wiimotes[0].StopListening();
-		wiimotes[0].Disconnect();
+		m_Wiimotes[0].StopListening();
+		m_Wiimotes[0].Disconnect();
 
-		wiimotes.clear();
+		m_Wiimotes.clear();
 	}
 
   Superclass::InternalShutdown(); // stop thread
@@ -93,13 +93,13 @@ int mafDeviceTrackerWIIMote::InternalUpdate()
 //------------------------------------------------------------------------------
 { 
 
-	if(wiimotes.size() > 0)
+	if(m_Wiimotes.size() > 0)
 	{
-		MotionData p = wiimotes[0].GetLastMotionData();
-		Button & buttonA = wiimotes[0].GetButton("A");
-		Button & buttonB = wiimotes[0].GetButton("B");
-		//Button & buttonC = wiimotes[0].GetButton("C");
-		//Button & buttonZ = wiimotes[0].GetButton("Z");
+		MotionData p = m_Wiimotes[0].GetLastMotionData();
+		Button & buttonA = m_Wiimotes[0].GetButton("A");
+		Button & buttonB = m_Wiimotes[0].GetButton("B");
+		//Button & buttonC = m_Wiimotes[0].GetButton("C");
+		//Button & buttonZ = m_Wiimotes[0].GetButton("Z");
 		
 
 		mafLogMessage("%d %d %d - button : %s %s" , p.x, p.y, p.z, \
@@ -146,24 +146,24 @@ int mafDeviceTrackerWIIMote::InternalUpdate()
 void mafDeviceTrackerWIIMote::SetTranlationAndRotation(MotionData p)
 //------------------------------------------------------------------------------
 {
-	if (last_positions.size() <= 2)
+	if (m_LastPositions.size() <= 2)
 	{	
-		last_positions.push_back(p);
+		m_LastPositions.push_back(p);
 		return;
 	}
 
-	last_positions.erase(last_positions.begin());
+	m_LastPositions.erase(m_LastPositions.begin());
 
 	/*if (p.y > 30) p.y = 30; // Restrict the values to -30 to 30
 	if (p.y < -30) p.y = -30;*/
 
-	last_positions.push_back(p);
+	m_LastPositions.push_back(p);
 
-	m_XTranslation = (last_positions[1].x - last_positions[0].x) * m_TranslationCalibration;
-	m_YTranslation = (last_positions[1].y - last_positions[0].y) * m_TranslationCalibration;
-	m_ZTranslation = (last_positions[1].z - last_positions[0].z) * m_TranslationCalibration;
+	m_XTranslation = (m_LastPositions[1].x - m_LastPositions[0].x) * m_TranslationCalibration;
+	m_YTranslation = (m_LastPositions[1].y - m_LastPositions[0].y) * m_TranslationCalibration;
+	m_ZTranslation = (m_LastPositions[1].z - m_LastPositions[0].z) * m_TranslationCalibration;
 
-	m_Angle = m_TranslationCalibration * (last_positions[0].x + last_positions[1].x + last_positions[2].x) / 3.0;
+	m_Angle = m_TranslationCalibration * (m_LastPositions[0].x + m_LastPositions[1].x + m_LastPositions[2].x) / 3.0;
 }
 //------------------------------------------------------------------------------
 void mafDeviceTrackerWIIMote::Calibration()

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDeviceTrackerWIIMote.h,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 14:49:03 $
-  Version:   $Revision: 1.2.2.1 $
+  Date:      $Date: 2010-07-08 15:40:58 $
+  Version:   $Revision: 1.2.2.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -52,7 +52,7 @@ protected:
 	void SetTranlationAndRotation(MotionData p);
   
   mafMatrix  *m_TmpPose;
-	vector<Wiimote> wiimotes;
+	vector<Wiimote> m_Wiimotes;
 
 	
 	double m_XTranslation, m_YTranslation, m_ZTranslation;
@@ -60,8 +60,7 @@ protected:
 
 	double m_Angle;
 
-	MotionData p;
-	vector<MotionData> last_positions;
+	vector<MotionData> m_LastPositions;
 
 
 private:

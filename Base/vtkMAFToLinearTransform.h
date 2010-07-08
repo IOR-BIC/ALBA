@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkMAFToLinearTransform.h,v $
   Language:  C++
-  Date:      $Date: 2005-03-10 12:21:39 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2010-07-08 15:40:18 $
+  Version:   $Revision: 1.2.22.1 $
 
   Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen 
   All rights reserved.
@@ -45,7 +45,7 @@ class MAF_EXPORT vtkMAFToLinearTransform : public vtkLinearTransform
   virtual void SetInputMatrix(mafMatrix *);
 
   /** return connected matrix if exists. */
-  mafMatrix *GetInputMatrix() {return InputMatrix;}
+  mafMatrix *GetInputMatrix() {return m_InputMatrix;}
   
   /** 
     Set the input transform.  Any modifications to the MAF transform will be
@@ -53,7 +53,7 @@ class MAF_EXPORT vtkMAFToLinearTransform : public vtkLinearTransform
   virtual void SetInputTransform(mafTransformBase *);
 
   /** return connected matrix if exists. */
-  mafTransformBase *GetInputTransform() {return InputTransform;}
+  mafTransformBase *GetInputTransform() {return m_InputTransform;}
  
   /**
     The input matrix is left as-is, but the transformation matrix
@@ -73,10 +73,10 @@ protected:
   void InternalUpdate();
   void InternalDeepCopy(vtkAbstractTransform *transform);
 
-  int               InverseFlag;
+  int               m_InverseFlag;
 
-  mafMatrix         *InputMatrix;
-  mafTransformBase  *InputTransform;
+  mafMatrix         *m_InputMatrix;
+  mafTransformBase  *m_InputTransform;
   
 private:
   vtkMAFToLinearTransform(const vtkMAFToLinearTransform&);  // Not implemented.

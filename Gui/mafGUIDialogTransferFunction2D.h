@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIDialogTransferFunction2D.h,v $
   Language:  C++
-  Date:      $Date: 2009-04-22 09:43:04 $
-  Version:   $Revision: 1.4.2.1 $
+  Date:      $Date: 2010-07-08 15:40:49 $
+  Version:   $Revision: 1.4.2.2 $
   Authors:   Alexander Savenko
 ==========================================================================
   Copyright (c) 2002/2004
@@ -246,7 +246,7 @@ public:
   void OnLeftButtonDown();
 
 protected:
-  int SelectedPoint;
+  int m_SelectedPoint;
 
   vtkInteractorStyleWidget(const vtkInteractorStyleWidget&);
   void operator=(const vtkInteractorStyleWidget&);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVTKLog.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-08-31 09:08:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2010-07-08 15:40:49 $
+  Version:   $Revision: 1.1.22.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -34,7 +34,7 @@ mafVTKLog *mafVTKLog::New()
 mafVTKLog::mafVTKLog() 
 //----------------------------------------------------------------------------
 {
-  this->Enabled=1;
+  this->m_Enabled=1;
 }
 //----------------------------------------------------------------------------
 mafVTKLog::~mafVTKLog() 
@@ -50,7 +50,7 @@ void mafVTKLog::DisplayText(const char* text)
     return;
   }
 
-  if (this->Enabled)
+  if (this->m_Enabled)
   {
     wxString message="[VTK]";
 		message += text;

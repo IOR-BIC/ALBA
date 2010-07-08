@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: vtkMAFAssembly.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-06-16 08:25:46 $
-  Version:   $Revision: 1.5.2.1 $
+  Date:      $Date: 2010-07-08 15:40:35 $
+  Version:   $Revision: 1.5.2.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,7 +29,7 @@
 #include "vtkActor.h"
 #include "vtkVolume.h"
 
-vtkCxxRevisionMacro(vtkMAFAssembly, "$Revision: 1.5.2.1 $");
+vtkCxxRevisionMacro(vtkMAFAssembly, "$Revision: 1.5.2.2 $");
 vtkStandardNewMacro(vtkMAFAssembly);
 
 // Construct object with no children.
@@ -37,15 +37,15 @@ vtkStandardNewMacro(vtkMAFAssembly);
 vtkMAFAssembly::vtkMAFAssembly()
 //----------------------------------------------------------------------------
 {
-  this->Parts = vtkProp3DCollection::New();
+  this->m_Parts = vtkProp3DCollection::New();
 }
 
 //----------------------------------------------------------------------------
 vtkMAFAssembly::~vtkMAFAssembly()
 //----------------------------------------------------------------------------
 {
-  this->Parts->Delete();
-  this->Parts = NULL;
+  this->m_Parts->Delete();
+  this->m_Parts = NULL;
 }
 
 // Add a part to the list of Parts.
@@ -53,9 +53,9 @@ vtkMAFAssembly::~vtkMAFAssembly()
 void vtkMAFAssembly::AddPart(vtkProp3D *prop)
 //----------------------------------------------------------------------------
 {
-  if ( ! this->Parts->IsItemPresent(prop) )
+  if ( ! this->m_Parts->IsItemPresent(prop) )
   {
-    this->Parts->AddItem(prop);
+    this->m_Parts->AddItem(prop);
     this->Modified();
   } 
 }
@@ -65,9 +65,9 @@ void vtkMAFAssembly::AddPart(vtkProp3D *prop)
 void vtkMAFAssembly::RemovePart(vtkProp3D *prop)
 //----------------------------------------------------------------------------
 {
-  if ( this->Parts->IsItemPresent(prop) )
+  if ( this->m_Parts->IsItemPresent(prop) )
   {
-    this->Parts->RemoveItem(prop);
+    this->m_Parts->RemoveItem(prop);
     this->Modified();
   } 
 }
@@ -80,11 +80,11 @@ void vtkMAFAssembly::ShallowCopy(vtkProp *prop)
   vtkMAFAssembly *a = vtkMAFAssembly::SafeDownCast(prop);
   if ( a != NULL )
   {
-    this->Parts->RemoveAllItems();
-    a->Parts->InitTraversal();
-    for (int i=0; i<a->Parts->GetNumberOfItems(); i++) // change by Losi on 06/15/2010 in order to iterate over props (before the conditions was i<0)
+    this->m_Parts->RemoveAllItems();
+    a->m_Parts->InitTraversal();
+    for (int i=0; i<a->m_Parts->GetNumberOfItems(); i++) // change by Losi on 06/15/2010 in order to iterate over props (before the conditions was i<0)
     {
-      this->Parts->AddItem(a->Parts->GetNextProp3D());
+      this->m_Parts->AddItem(a->m_Parts->GetNextProp3D());
     }
   }
 
@@ -175,7 +175,7 @@ void vtkMAFAssembly::ReleaseGraphicsResources(vtkWindow *renWin)
 //----------------------------------------------------------------------------
 {
   vtkProp3D *prop3D;
-  for ( this->Parts->InitTraversal(); prop3D = this->Parts->GetNextProp3D(); )
+  for ( this->m_Parts->InitTraversal(); prop3D = this->m_Parts->GetNextProp3D(); )
   {
     prop3D->ReleaseGraphicsResources(renWin);
   }
@@ -395,7 +395,7 @@ unsigned long int vtkMAFAssembly::GetMTime()
   unsigned long time;
   vtkProp3D *prop;
 
-  for (this->Parts->InitTraversal(); (prop = this->Parts->GetNextProp3D()); )
+  for (this->m_Parts->InitTraversal(); (prop = this->m_Parts->GetNextProp3D()); )
   {
     time = prop->GetMTime();
     mTime = ( time > mTime ? time : mTime );
@@ -410,7 +410,7 @@ void vtkMAFAssembly::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
-  os << indent << "There are: " << this->Parts->GetNumberOfItems()
+  os << indent << "There are: " << this->m_Parts->GetNumberOfItems()
      << " parts in this assembly\n";
 }
 
@@ -515,8 +515,8 @@ void vtkMAFAssembly::UpdatePaths()
     vtkProp3D *prop3D;
     if (this->GetVisibility())
     {
-      for ( this->Parts->InitTraversal(); 
-            (prop3D = this->Parts->GetNextProp3D()); )
+      for ( this->m_Parts->InitTraversal(); 
+            (prop3D = this->m_Parts->GetNextProp3D()); )
       {
         if (prop3D->GetVisibility())
         {
@@ -546,8 +546,8 @@ void vtkMAFAssembly::BuildPaths(vtkAssemblyPaths *paths, vtkAssemblyPath *path)
 {
   vtkProp3D *prop3D;
 
-  for ( this->Parts->InitTraversal(); 
-        (prop3D = this->Parts->GetNextProp3D()); )
+  for ( this->m_Parts->InitTraversal(); 
+        (prop3D = this->m_Parts->GetNextProp3D()); )
   {
     if (prop3D->GetVisibility())
     {

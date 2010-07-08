@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLODActor.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-27 10:07:22 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2010-07-08 15:40:35 $
+  Version:   $Revision: 1.2.10.1 $
   Authors:   Paolo Quadrani & Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -31,34 +31,64 @@ public:
   void Render(vtkRenderer *ren, vtkMapper *mapper);
 
   /** Set the dimension in pixels of the FlagActor representing the actor when its dimensions are too small to be rendered.*/
-  vtkSetClampMacro(FlagDimension, int, 1, VTK_INT_MAX);
+  void SetFlagDimension(int flagDimension);
+
+  /** Return the min value of FlagDimension */
+  int GetFlagDimensionMinValue(){return 1;};
+
+  /** Return the max value of FlagDimension */
+  int GetFlagDimensionMaxValue(){return VTK_INT_MAX;};
   
   /** Get the dimension in pixels of the FlagActor.*/
-  vtkGetMacro(FlagDimension, double);
+  int GetFlagDimension(){return m_FlagDimension;};
 
   /** Set the threshold in pixels to switch the actor's shape to the FlagActor representation. Accepted values are > 1*/
-  vtkSetClampMacro(PixelThreshold, int, 1, VTK_INT_MAX);
+  void SetPixelThreshold(int pixelThreshold);
+
+  /** Return the min value of PixelThreshold */
+  int GetPixelThresholdMinValue(){return 1;};
+
+  /** Return the max value of PixelThreshold */
+  int GetPixelThresholdMaxValue(){return VTK_INT_MAX;};
   
   /** Get the threshold in pixels*/
-  vtkGetMacro(PixelThreshold, int);
+  int GetPixelThreshold(){return m_PixelThreshold;};
 
   /** Enable/Disable fade out and fade in for the actor when it switch between one LOD to another.*/
-  vtkSetClampMacro(EnableFading, int, 0, 1);
+  void SetEnableFading(int enableFading);
 
-  /** Enable/Disable fade out and fade in for the actor when it switch between one LOD to another.*/
-  vtkBooleanMacro(EnableFading,int);
+  /** Return the min value of EnableFading */
+  int GetEnableFadingMinValue(){return 0;};
+
+  /** Return the max value of EnableFading */
+  int GetEnableFadingMaxValue(){return 1;};
+
+  /** Enable fade out and fade in for the actor when it switch between one LOD to another.*/
+  void EnableFadingOn(){this->SetEnableFading(TRUE);};
+
+  /** Disable fade out and fade in for the actor when it switch between one LOD to another.*/
+  void EnableFadingOff(){this->SetEnableFading(FALSE);};
 
   /** Return the status of the fading flag.*/
-  vtkGetMacro(EnableFading, int);
+  int GetEnableFading(){return m_EnableFading;};
   
   /** Enable/Disable high threshold LOD.*/
-  vtkSetClampMacro(EnableHighThreshold, int, 0, 1);
+  void SetEnableHighThreshold(int enableHighThreshold);
 
-  /** Enable/Disable high threshold LOD.*/
-  vtkBooleanMacro(EnableHighThreshold,int);
+  /** Return the min value of EnableHighThreshold */
+  int GetEnableHighThresholdMinValue(){return 0;};
+
+  /** Return the max value of EnableHighThreshold */
+  int GetEnableHighThresholdMaxValue(){return 1;};
+
+  /** Enable high threshold LOD.*/
+  void EnableHighThresholdOn(){this->SetEnableHighThreshold(TRUE);};
+
+  /** Disable high threshold LOD.*/
+  void EnableHighThresholdOff(){this->SetEnableHighThreshold(FALSE);};
 
   /** Return the status of the high threshold LOD flag.*/
-  vtkGetMacro(EnableHighThreshold, int);
+  int GetEnableHighThreshold(){return m_EnableHighThreshold;};
 
 protected:
   mafLODActor();
@@ -68,13 +98,13 @@ private:
   mafLODActor(const mafLODActor&);  // Not implemented.
   void operator=(const mafLODActor&);  // Not implemented.
 
-  vtkPointSource    *FlagShape;
-  vtkPolyDataMapper *FlagMapper;
-  vtkActor          *FlagActor;
+  vtkPointSource    *m_FlagShape;
+  vtkPolyDataMapper *m_FlagMapper;
+  vtkActor          *m_FlagActor;
 
-  int PixelThreshold;
-  int FlagDimension;
-  int EnableFading;
-  int EnableHighThreshold;
+  int m_PixelThreshold;
+  int m_FlagDimension;
+  int m_EnableFading;
+  int m_EnableHighThreshold;
 };
 #endif

@@ -3,8 +3,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransferFunction2DInteractors.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:30:13 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2010-07-08 15:40:49 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Alexander Savenko
 ==========================================================================
   Copyright (c) 2002/2004
@@ -213,40 +213,40 @@ void vtkInteractorStyleWidget::OnMouseMove()
     memcpy(drange, this->m_Widget.Range[0], sizeof(drange));
     memcpy(grange, this->m_Widget.Range[1], sizeof(grange));
 
-    if (this->SelectedPoint != -1) 
+    if (this->m_SelectedPoint != -1) 
     {
       const double fx = x / sx * (viewportRange[1] - viewportRange[0]) + viewportRange[0];
       const double fy = y / sy * (viewportRange[3] - viewportRange[2]) + viewportRange[2];
       
-      if (this->SelectedPoint == 0) 
+      if (this->m_SelectedPoint == 0) 
       {
         drange[0] = clip(fx, viewportRange[0], drange[2]);
         m_Dialog->m_TransferFunction->SetWidgetValueRange(m_Dialog->m_CurrentWidget, drange);
         grange[1] = clip(fy, grange[2], viewportRange[3]);
         m_Dialog->m_TransferFunction->SetWidgetGradientRange(m_Dialog->m_CurrentWidget, grange);
       }
-      else if (this->SelectedPoint == 1) 
+      else if (this->m_SelectedPoint == 1) 
       {
         drange[1] = clip(fx, drange[2], viewportRange[1]);
         m_Dialog->m_TransferFunction->SetWidgetValueRange(m_Dialog->m_CurrentWidget, drange);
         grange[1] = clip(fy, grange[2], viewportRange[3]);
         m_Dialog->m_TransferFunction->SetWidgetGradientRange(m_Dialog->m_CurrentWidget, grange);
       }
-      else if (this->SelectedPoint == 2) 
+      else if (this->m_SelectedPoint == 2) 
       {
         double ratio = clip((fx - drange[2]) / (drange[1] - drange[2]), (double)0.f, (double)1.f);
         m_Dialog->m_TransferFunction->SetWidgetValueRatio(m_Dialog->m_CurrentWidget, ratio);
         grange[0] = clip(fy, (double)0.0, grange[2]);
         m_Dialog->m_TransferFunction->SetWidgetGradientRange(m_Dialog->m_CurrentWidget, grange);
       }
-      else if (this->SelectedPoint == 3) 
+      else if (this->m_SelectedPoint == 3) 
       {
         double ratio = clip((fx - drange[2]) / (drange[0] - drange[2]), (double)0.f, (double)1.f);
         m_Dialog->m_TransferFunction->SetWidgetValueRatio(m_Dialog->m_CurrentWidget, ratio);
         grange[0] = clip(fy, (double)0.f, grange[2]);
         m_Dialog->m_TransferFunction->SetWidgetGradientRange(m_Dialog->m_CurrentWidget, grange);
       }
-      else if (this->SelectedPoint == 4) 
+      else if (this->m_SelectedPoint == 4) 
       { // center
         drange[2] = clip(fx, drange[0], drange[1]);
         m_Dialog->m_TransferFunction->SetWidgetValueRange(m_Dialog->m_CurrentWidget, drange);
@@ -284,7 +284,7 @@ void vtkInteractorStyleWidget::OnLeftButtonDown()
     return;
 
   int x = this->Interactor->GetEventPosition()[0], y = this->Interactor->GetEventPosition()[1];
-  int widgetIndex = this->m_Dialog->m_WidgetActor->Pick(this->m_Dialog->m_GraphRenderer, x, y, this->SelectedPoint);
+  int widgetIndex = this->m_Dialog->m_WidgetActor->Pick(this->m_Dialog->m_GraphRenderer, x, y, this->m_SelectedPoint);
   if (widgetIndex >= 0) 
   {
     if (widgetIndex != m_Dialog->m_CurrentWidget && widgetIndex < m_Dialog->m_TransferFunction->GetNumberOfWidgets()) 

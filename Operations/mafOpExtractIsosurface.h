@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpExtractIsosurface.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:45:06 $
-  Version:   $Revision: 1.5.2.4 $
+  Date:      $Date: 2010-07-08 15:41:06 $
+  Version:   $Revision: 1.5.2.5 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -118,8 +118,6 @@ protected:
   int m_NumberOfContours;
   double m_MinRange;
   double m_MaxRange;
-
-  mafVMESurface *vme_surf;
 
   mafGUIFloatSlider *m_IsoSlider;
   mafGUIFloatSlider *m_SliceSlider;

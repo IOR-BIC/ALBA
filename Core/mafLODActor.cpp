@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLODActor.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-27 10:07:22 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2010-07-08 15:40:35 $
+  Version:   $Revision: 1.3.10.1 $
   Authors:   Paolo Quadrani & Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -36,46 +36,46 @@
 #include "vtkMath.h"
 #include "vtkCamera.h"
 
-vtkCxxRevisionMacro(mafLODActor, "$Revision: 1.3 $");
+vtkCxxRevisionMacro(mafLODActor, "$Revision: 1.3.10.1 $");
 vtkStandardNewMacro(mafLODActor);
 
 //------------------------------------------------------------------------
 mafLODActor::mafLODActor()
 //------------------------------------------------------------------------
 {
-  EnableFading = 1;
-  EnableHighThreshold = 1;
-  FlagDimension = 10;
-  PixelThreshold = 20;
+  m_EnableFading = 1;
+  m_EnableHighThreshold = 1;
+  m_FlagDimension = 10;
+  m_PixelThreshold = 20;
 
-  FlagShape = vtkPointSource::New();
-  FlagShape->SetCenter(0 , 0 , 0);
-  FlagShape->SetNumberOfPoints(1);
-  FlagShape->SetRadius(0.000000001);
-  FlagShape->SetDistribution(1);
+  m_FlagShape = vtkPointSource::New();
+  m_FlagShape->SetCenter(0 , 0 , 0);
+  m_FlagShape->SetNumberOfPoints(1);
+  m_FlagShape->SetRadius(0.000000001);
+  m_FlagShape->SetDistribution(1);
 
-  FlagMapper = vtkPolyDataMapper::New();
-  FlagMapper->SetInput(FlagShape->GetOutput());
-  FlagMapper->SetScalarVisibility(0);
+  m_FlagMapper = vtkPolyDataMapper::New();
+  m_FlagMapper->SetInput(m_FlagShape->GetOutput());
+  m_FlagMapper->SetScalarVisibility(0);
 
-  FlagActor = vtkActor::New();
-  FlagActor->SetMapper(FlagMapper);
-  FlagActor->GetProperty()->SetAmbient(1);
-  FlagActor->GetProperty()->SetAmbientColor(1 , 0 , 0);
-  FlagActor->GetProperty()->SetDiffuse(1);
-  FlagActor->GetProperty()->SetDiffuseColor(1 , 0 , 0);
-  FlagActor->GetProperty()->SetPointSize(10);  //SIL. 17-jul-2006 : not working ? - we call glPointSize directly
-  FlagActor->GetProperty()->SetInterpolation(0);
-  FlagActor->GetProperty()->SetRepresentationToPoints();
-  FlagActor->SetVisibility(1);
+  m_FlagActor = vtkActor::New();
+  m_FlagActor->SetMapper(m_FlagMapper);
+  m_FlagActor->GetProperty()->SetAmbient(1);
+  m_FlagActor->GetProperty()->SetAmbientColor(1 , 0 , 0);
+  m_FlagActor->GetProperty()->SetDiffuse(1);
+  m_FlagActor->GetProperty()->SetDiffuseColor(1 , 0 , 0);
+  m_FlagActor->GetProperty()->SetPointSize(10);  //SIL. 17-jul-2006 : not working ? - we call glPointSize directly
+  m_FlagActor->GetProperty()->SetInterpolation(0);
+  m_FlagActor->GetProperty()->SetRepresentationToPoints();
+  m_FlagActor->SetVisibility(1);
 }
 //------------------------------------------------------------------------
 mafLODActor::~mafLODActor()
 //------------------------------------------------------------------------
 {
-  FlagShape->Delete();
-  FlagMapper->Delete();
-  FlagActor->Delete();
+  m_FlagShape->Delete();
+  m_FlagMapper->Delete();
+  m_FlagActor->Delete();
 }
 // Actual actor render method.
 //------------------------------------------------------------------------
@@ -248,10 +248,10 @@ void mafLODActor::Render(vtkRenderer *ren, vtkMapper *mapper)
 
   sz = sqrt( vtkMath::Distance2BetweenPoints(d1,d2) );
 
-  if (EnableFading)
+  if (m_EnableFading)
   {
     // fade the actor by changing its opacity
-    if (sz >= mindim && sz <= maxdim && EnableHighThreshold)
+    if (sz >= mindim && sz <= maxdim && m_EnableHighThreshold)
     {
       double opacity = 1 - (sz - mindim) / (double)(maxdim - mindim);
       opacity = (opacity < 0 ) ? 0.0 : opacity;
@@ -274,17 +274,17 @@ void mafLODActor::Render(vtkRenderer *ren, vtkMapper *mapper)
       glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specularColor4);
     }
   }
-  if( sz < PixelThreshold)
+  if( sz < m_PixelThreshold)
   {
-    // Assign the actor's transformation matrix to the FlagActor 
+    // Assign the actor's transformation matrix to the m_FlagActor 
     // to put this one at the same position of the actor
-    FlagActor->PokeMatrix(GetMatrix());
+    m_FlagActor->PokeMatrix(GetMatrix());
 
-    glPointSize( FlagDimension );
-    FlagActor->Render(ren,FlagMapper); 
+    glPointSize( m_FlagDimension );
+    m_FlagActor->Render(ren,m_FlagMapper); 
     glPointSize( 1 );
   }
-  else if (sz > maxdim && EnableHighThreshold)
+  else if (sz > maxdim && m_EnableHighThreshold)
   {
     // no draw at all
   }
@@ -293,4 +293,52 @@ void mafLODActor::Render(vtkRenderer *ren, vtkMapper *mapper)
     vtkOpenGLActor::Render(ren, mapper);
   }
   glPopAttrib();
+}
+//------------------------------------------------------------------------
+void mafLODActor::SetPixelThreshold(int pixelThreshold)
+//------------------------------------------------------------------------
+{
+  int min = 1;
+  int max = VTK_INT_MAX;
+  if (this->m_PixelThreshold != (pixelThreshold<min?min:(pixelThreshold>max?max:pixelThreshold)))
+  {
+    this->m_PixelThreshold = (pixelThreshold<min?min:(pixelThreshold>max?max:pixelThreshold));
+    this->Modified();
+  }
+}
+//------------------------------------------------------------------------
+void mafLODActor::SetFlagDimension(int flagDimension)
+//------------------------------------------------------------------------
+{
+  int min = 1;
+  int max = VTK_INT_MAX;
+  if (this->m_FlagDimension != (flagDimension<min?min:(flagDimension>max?max:flagDimension)))
+  {
+    this->m_FlagDimension = (flagDimension<min?min:(flagDimension>max?max:flagDimension));
+    this->Modified();
+  }
+}
+//------------------------------------------------------------------------
+void mafLODActor::SetEnableFading(int enableFading)
+//------------------------------------------------------------------------
+{
+  int min = 0;
+  int max = 1;
+  if (this->m_EnableFading != (enableFading<min?min:(enableFading>max?max:enableFading)))
+  {
+    this->m_EnableFading = (enableFading<min?min:(enableFading>max?max:enableFading));
+    this->Modified();
+  }
+}
+//------------------------------------------------------------------------
+void mafLODActor::SetEnableHighThreshold(int enableHighThreshold)
+//------------------------------------------------------------------------
+{
+  int min = 0;
+  int max = 1;
+  if (this->m_EnableHighThreshold != (enableHighThreshold<min?min:(enableHighThreshold>max?max:enableHighThreshold)))
+  {
+    this->m_EnableHighThreshold = (enableHighThreshold<min?min:(enableHighThreshold>max?max:enableHighThreshold));
+    this->Modified();
+  }
 }

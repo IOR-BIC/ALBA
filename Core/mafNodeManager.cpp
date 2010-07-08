@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-04-22 09:42:51 $
-  Version:   $Revision: 1.7.22.1 $
+  Date:      $Date: 2010-07-08 15:40:35 $
+  Version:   $Revision: 1.7.22.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -40,7 +40,7 @@
 mafNodeManager::mafNodeManager()
 //----------------------------------------------------------------------------
 {
-  m_modified      = false;
+  m_Modified      = false;
 	m_MakeBakFile = true;
 	m_Listener      = NULL;
 //@@	m_storage   = NULL;
@@ -75,7 +75,7 @@ void mafNodeManager::OnEvent(mafEventBase *maf_event)
 void mafNodeManager::MSFNew(bool notify_root_creation)   
 //----------------------------------------------------------------------------
 {
-  m_modified = false;
+  m_Modified = false;
   if(m_Root) NotifyRemove( (mafNode*) m_Root);  //SIL. 11-4-2005: cast root to node - maybe to be removed
   mafDEL(m_Root);
   mafNEW(m_Root);
@@ -360,7 +360,7 @@ void mafNodeManager::VmeAdd(mafNode *n)
     if(vp == NULL) 
 			n->ReparentTo(m_Root);
     NotifyAdd(n);
-    m_modified = true;
+    m_Modified = true;
   }
 }
 //----------------------------------------------------------------------------
@@ -371,7 +371,7 @@ void mafNodeManager::VmeRemove(mafNode *n)
   {
     NotifyRemove(n);
     n->ReparentTo(NULL); // may kill the vme
-    m_modified = true;
+    m_Modified = true;
   }
 }
 //----------------------------------------------------------------------------
@@ -430,7 +430,7 @@ bool mafNodeManager::AskConfirmAndSave()
 //----------------------------------------------------------------------------
 {
   bool go = true;
-	if (m_modified)
+	if (m_Modified)
 	{
 		int answer = wxMessageBox("your work is modified, would you like to save it?","Confirm",
 			                     wxYES_NO|wxCANCEL|wxICON_QUESTION , mafGetFrame());

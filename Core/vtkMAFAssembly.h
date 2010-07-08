@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: vtkMAFAssembly.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-18 14:51:26 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2010-07-08 15:40:35 $
+  Version:   $Revision: 1.4.22.1 $
   Authors:   Sivano Imboden 
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -39,11 +39,11 @@ public:
 
   /**
   Get the VME associated to this Assembly */
-  mafNode *  GetVme() 							    {return m_vme;};
+  mafNode *  GetVme(){return m_Vme;};
 
   /**
   Set the VME associated to this Assembly */
-  void      SetVme(mafNode *vme)       {m_vme=vme;};
+  void      SetVme(mafNode *vme){m_Vme=vme;};
 
   /**
   Add a part to the list of parts.*/
@@ -123,10 +123,10 @@ protected:
   ~vtkMAFAssembly();
 
   // pointer to the VME that is represented by this Assembly
-  mafNode      *m_vme;
+  mafNode      *m_Vme;
 
   // Keep a list of direct descendants of the assembly hierarchy
-  vtkProp3DCollection *Parts;
+  vtkProp3DCollection *m_Parts;
 
   // Support the BuildPaths() method. Caches last paths built for
   // performance.
@@ -140,7 +140,7 @@ private:
 
 /**
 Get the list of parts for this assembly.*/
-inline vtkProp3DCollection *vtkMAFAssembly::GetParts() {return this->Parts;}
+inline vtkProp3DCollection *vtkMAFAssembly::GetParts() {return this->m_Parts;}
 
 #endif
 

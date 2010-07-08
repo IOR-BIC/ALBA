@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransform.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:44:00 $
-  Version:   $Revision: 1.12.2.2 $
+  Date:      $Date: 2010-07-08 15:40:18 $
+  Version:   $Revision: 1.12.2.3 $
   Authors:   Marco Petrone, Stefano Perticoni,Stefania Paperini
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -265,7 +265,7 @@ class MAF_EXPORT mafTransform : public mafTransformBase
 	int MatrixTommuQuaternion(const mafMatrix &matrix, double quaternion[4]);
 
   /** rotation representation conversion */
-	int mmuQuaternionToMatrix(double quaternion[4],	mafMatrix &matrix);
+	int QuaternionToMatrix(double quaternion[4],	mafMatrix &matrix);
 
   /** rotation + translation representation conversion */
 	int HelicalAxisToMatrix(double helical_axis[3],double angle, mafMatrix &matrix);

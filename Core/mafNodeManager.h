@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeManager.h,v $
   Language:  C++
-  Date:      $Date: 2009-04-22 09:42:51 $
-  Version:   $Revision: 1.6.2.1 $
+  Date:      $Date: 2010-07-08 15:40:35 $
+  Version:   $Revision: 1.6.2.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -59,10 +59,10 @@ public:
   void MSFSaveAs();
   
 	/** Return true if the tree has been modifyed. */
-  bool MSFIsModified() {return m_modified;};
+  bool MSFIsModified() {return m_Modified;};
   
 	/** Set the modify flag. */
-  void MSFModified(bool modified) {m_modified = modified;};
+  void MSFModified(bool modified) {m_Modified = modified;};
 
 	/** Add the vme to the tree. */
   void VmeAdd(mafNode *n);
@@ -107,7 +107,7 @@ public:
   void UpdateFromTag(mafNode *n = NULL);
 
 protected:
-  bool m_modified;
+  bool m_Modified;
 
   mafVMERoot      *m_Root;
   mafObserver     *m_Listener;
