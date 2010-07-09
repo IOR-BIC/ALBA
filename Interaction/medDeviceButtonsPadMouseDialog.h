@@ -2,8 +2,8 @@
 Program:   VPH2
 Module:    $RCSfile: medDeviceButtonsPadMouseDialog.h,v $
 Language:  C++
-Date:      $Date: 2009-11-04 16:07:43 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2010-07-09 08:16:10 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Alberto Losi
 ==========================================================================
 Copyright (c) 2008
@@ -38,9 +38,10 @@ set the desired view.
 class medDeviceButtonsPadMouseDialog : public  mafDeviceButtonsPadMouse
 //----------------------------------------------------------------------------
 {
+public:
   /** RTTI macro */
   mafTypeMacro(medDeviceButtonsPadMouseDialog,mafDeviceButtonsPadMouse); 
-public:
+
   /** Set the selected view. */
   void SetView(mafView *view);
 
