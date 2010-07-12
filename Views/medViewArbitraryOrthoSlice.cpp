@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2010-07-09 15:02:30 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-07-12 10:01:22 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -678,22 +678,64 @@ void medViewArbitraryOrthoSlice::EnableWidgets(bool enable)
 
 void medViewArbitraryOrthoSlice::UpdateSlicerZBehavior()
 
-{
+{	
 	if(m_CurrentVolume->GetBehavior())
 	{
+		m_SlicerX->SetBehavior(m_CurrentVolume->GetBehavior());
+		m_SlicerY->SetBehavior(m_CurrentVolume->GetBehavior());
 		m_SlicerZ->SetBehavior(m_CurrentVolume->GetBehavior());
-		mafPipeSurfaceTextured *pArb=(mafPipeSurfaceTextured *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_SlicerZ);
-		pArb->SetActorPicking(true);
-		mafPipeSurfaceTextured *pSli=(mafPipeSurfaceTextured *)(m_ChildViewList[Z_VIEW])->GetNodePipe(m_SlicerZ);
-		pSli->SetActorPicking(true);
+		
+		// perspective view
+		mafPipeSurfaceTextured *pipePerspectiveViewSlicerX=(mafPipeSurfaceTextured *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_SlicerX);
+		pipePerspectiveViewSlicerX->SetActorPicking(true);
+
+		mafPipeSurfaceTextured *pipePerspectiveViewSlicerY=(mafPipeSurfaceTextured *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_SlicerY);
+		pipePerspectiveViewSlicerY->SetActorPicking(true);
+
+		mafPipeSurfaceTextured *pipePerspectiveViewSlicerZ=(mafPipeSurfaceTextured *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_SlicerZ);
+		pipePerspectiveViewSlicerZ->SetActorPicking(true);
+		
+		// x view
+		mafPipeSurfaceTextured *pipeXViewSlicerX=(mafPipeSurfaceTextured *)(m_ChildViewList[X_VIEW])->GetNodePipe(m_SlicerX);
+		pipeXViewSlicerX->SetActorPicking(true);
+		
+		// y view
+		mafPipeSurfaceTextured *pipeYViewSlicerY=(mafPipeSurfaceTextured *)(m_ChildViewList[Y_VIEW])->GetNodePipe(m_SlicerY);
+		pipeYViewSlicerY->SetActorPicking(true);
+
+		// z view
+		mafPipeSurfaceTextured *pipeZViewSlicerZ=(mafPipeSurfaceTextured *)(m_ChildViewList[Z_VIEW])->GetNodePipe(m_SlicerZ);
+		pipeZViewSlicerZ->SetActorPicking(true);
 	}
 	else
 	{
 		m_SlicerZ->SetBehavior(NULL);
-		mafPipeSurfaceTextured *pArb=(mafPipeSurfaceTextured *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_SlicerZ);
-		pArb->SetActorPicking(false);
-		mafPipeSurfaceTextured *pSli=(mafPipeSurfaceTextured *)(m_ChildViewList[Z_VIEW])->GetNodePipe(m_SlicerZ);
-		pSli->SetActorPicking(false);
+		m_SlicerZ->SetBehavior(NULL);
+		m_SlicerZ->SetBehavior(NULL);
+		
+		// perspective view
+		mafPipeSurfaceTextured *pipePerspectiveViewSlicerX=(mafPipeSurfaceTextured *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_SlicerX);
+		pipePerspectiveViewSlicerX->SetActorPicking(false);
+
+		mafPipeSurfaceTextured *pipePerspectiveViewSlicerY=(mafPipeSurfaceTextured *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_SlicerY);
+		pipePerspectiveViewSlicerY->SetActorPicking(false);
+
+		mafPipeSurfaceTextured *pipePerspectiveViewSlicerZ=(mafPipeSurfaceTextured *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_SlicerZ);
+		pipePerspectiveViewSlicerZ->SetActorPicking(false);
+
+		// x view
+		mafPipeSurfaceTextured *pipeXViewSlicerX=(mafPipeSurfaceTextured *)(m_ChildViewList[X_VIEW])->GetNodePipe(m_SlicerX);
+		pipeXViewSlicerX->SetActorPicking(false);
+
+		// y view
+		mafPipeSurfaceTextured *pipeYViewSlicerY=(mafPipeSurfaceTextured *)(m_ChildViewList[Y_VIEW])->GetNodePipe(m_SlicerY);
+		pipeYViewSlicerY->SetActorPicking(false);
+
+		// z view
+		mafPipeSurfaceTextured *pipeZViewSlicerZ=(mafPipeSurfaceTextured *)(m_ChildViewList[Z_VIEW])->GetNodePipe(m_SlicerZ);
+		pipeZViewSlicerZ->SetActorPicking(false);
+
+
 	}
 };
 
@@ -1185,7 +1227,7 @@ void medViewArbitraryOrthoSlice::ShowSlicers( mafVME * vmeVolume, bool show )
 	m_AttachCameraToSlicerZInZView->EnableAttachCamera();
 	((mafViewVTK*)m_ChildViewList[Z_VIEW])->CameraReset(m_SlicerZ);
 
-	// TODO: mmmhhh should create three different translation gizmos, one for each plane.
+	// TODO: should create three different translation gizmos, one for each plane.
 	m_GizmoTranslate = new mafGizmoTranslate(m_SlicerZ, this);
 	m_GizmoTranslate->SetInput(m_SlicerZ);
 	m_GizmoTranslate->SetRefSys(m_SlicerZ);
