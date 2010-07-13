@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-05-18 15:48:01 $
-  Version:   $Revision: 1.51.2.15 $
+  Date:      $Date: 2010-07-13 14:07:06 $
+  Version:   $Revision: 1.51.2.16 $
   Authors:   Paolo Quadrani , Stefano Perticoni , Josef Kohout
 ==========================================================================
   Copyright (c) 2002/2004
@@ -97,7 +97,7 @@ mafViewSlice::mafViewSlice(wxString label /* =  */, int camera_position /* = CAM
   m_LastSliceNormal[0] = m_LastSliceNormal[1] = m_LastSliceNormal[2] = 0.0;
 
   // Added by Losi 11.25.2009
-  m_EnableGPU=1;
+  m_EnableGPU=FALSE;
 
   m_TextureInterpolate = textureInterpolate;
 
@@ -580,7 +580,7 @@ mafGUI *mafViewSlice::CreateGui()
     }
   };
    m_Gui->Divider(1);
-  m_Gui->Bool(ID_ENABLE_GPU,"Enable GPU",&m_EnableGPU,1);
+  //m_Gui->Bool(ID_ENABLE_GPU,"Enable GPU",&m_EnableGPU,1);
 
 	m_Gui->Divider();
   return m_Gui;

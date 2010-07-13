@@ -2,8 +2,8 @@
 Program: Multimod Application Framework RELOADED 
 Module: $RCSfile: medViewSliceOnCurveCompound.cpp,v $ 
 Language: C++ 
-Date: $Date: 2009-12-02 09:18:45 $ 
-Version: $Revision: 1.1.2.3 $ 
+Date: $Date: 2010-07-13 14:07:06 $ 
+Version: $Revision: 1.1.2.4 $ 
 Authors: Eleonora Mambrini
 ========================================================================== 
 Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -118,7 +118,7 @@ medViewSliceOnCurveCompound::medViewSliceOnCurveCompound(wxString label) : medVi
   m_OldPos[0] = m_OldPos[1] = m_OldPos[2] = 0.;
 
   // Added by Losi 11.25.2009
-  m_EnableGPU=1;
+  m_EnableGPU=FALSE;
 }
 
 #include "mafVMERoot.h"
@@ -403,8 +403,8 @@ mafGUI* medViewSliceOnCurveCompound::CreateGui()
     }
   };
   m_Gui->Divider(1);
-  m_Gui->Bool(ID_ENABLE_GPU,"Enable GPU",&m_EnableGPU,1);
-  m_Gui->Divider();
+  //m_Gui->Bool(ID_ENABLE_GPU,"Enable GPU",&m_EnableGPU,1);
+  //m_Gui->Divider();
 
   return m_Gui;
 }

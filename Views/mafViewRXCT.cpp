@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-04-20 09:46:08 $
-  Version:   $Revision: 1.45.2.10 $
+  Date:      $Date: 2010-07-13 14:07:06 $
+  Version:   $Revision: 1.45.2.11 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -100,7 +100,7 @@ mafViewRXCT::mafViewRXCT(wxString label)
   m_Border=1;
 
   // Added by Losi 11.25.2009
-  m_EnableGPU=1;
+  m_EnableGPU=FALSE;
 }
 //----------------------------------------------------------------------------
 mafViewRXCT::~mafViewRXCT()
@@ -742,7 +742,7 @@ mafGUI* mafViewRXCT::CreateGui()
     }
   }
   m_Gui->Divider(1);
-  m_Gui->Bool(ID_ENABLE_GPU,"Enable GPU",&m_EnableGPU,1);
+  //m_Gui->Bool(ID_ENABLE_GPU,"Enable GPU",&m_EnableGPU,1);
 
   EnableWidgets(m_CurrentVolume != NULL);
 

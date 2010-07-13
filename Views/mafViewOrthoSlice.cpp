@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-04-20 09:44:41 $
-  Version:   $Revision: 1.61.2.14 $
+  Date:      $Date: 2010-07-13 14:07:06 $
+  Version:   $Revision: 1.61.2.15 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -110,7 +110,7 @@ mafViewOrthoSlice::mafViewOrthoSlice(wxString label)
 	m_Border=1;
 
   // Added by Losi 11.25.2009
-  m_EnableGPU=1;
+  m_EnableGPU=FALSE;
 }
 //----------------------------------------------------------------------------
 mafViewOrthoSlice::~mafViewOrthoSlice()
@@ -443,7 +443,7 @@ mafGUI* mafViewOrthoSlice::CreateGui()
     }
   }
   m_Gui->Divider(1);
-  m_Gui->Bool(ID_ENABLE_GPU,"Enable GPU",&m_EnableGPU,1);
+  //m_Gui->Bool(ID_ENABLE_GPU,"Enable GPU",&m_EnableGPU,1);
 
   m_Gui->Divider();
   return m_Gui;
