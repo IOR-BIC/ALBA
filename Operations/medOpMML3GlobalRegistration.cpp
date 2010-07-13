@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML3GlobalRegistration.cpp,v $
 Language:  C++
-Date:      $Date: 2009-09-18 08:10:33 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-07-13 12:07:46 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -49,10 +49,11 @@ medOpMML3GlobalRegistration::~medOpMML3GlobalRegistration()
 
 
 //------------------------------------------------------------------------------
-// Transform point from atlas to patient
 void medOpMML3GlobalRegistration::TransformPoint(double point_atlas[3], double point_patient[3])
 //------------------------------------------------------------------------------
 {
+  // Transform point from atlas to patient
+
   if (m_Modified){
     CalculateTransformMatrix() ;
     m_Modified = false ;
@@ -67,10 +68,11 @@ void medOpMML3GlobalRegistration::TransformPoint(double point_atlas[3], double p
 
 
 //------------------------------------------------------------------------------
-// Transform polydata from atlas to patient
 vtkPolyData* medOpMML3GlobalRegistration::TransformPolydata(vtkPolyData* polydata_atlas)
 //------------------------------------------------------------------------------
 {
+  // Transform polydata from atlas to patient
+
   if (m_Modified){
     CalculateTransformMatrix() ;
     m_Modified = false ;
@@ -83,10 +85,11 @@ vtkPolyData* medOpMML3GlobalRegistration::TransformPolydata(vtkPolyData* polydat
 
 
 //------------------------------------------------------------------------------
-// Update
 void medOpMML3GlobalRegistration::Update()
 //------------------------------------------------------------------------------
 {
+  // Update
+
   if (m_Modified){
     CalculateTransformMatrix() ;
     m_Modified = false ;
@@ -97,10 +100,11 @@ void medOpMML3GlobalRegistration::Update()
 
 
 //------------------------------------------------------------------------------
-// Calculate transform matrix
 void medOpMML3GlobalRegistration::CalculateTransformMatrix()
 //------------------------------------------------------------------------------
 {
+  // Calculate transform matrix
+
   if(m_AtlasLandmark1Defined && m_AtlasLandmark2Defined && m_AtlasLandmark3Defined
     && m_PatientLandmark1Defined && m_PatientLandmark2Defined && m_PatientLandmark3Defined){
 
@@ -170,7 +174,6 @@ void medOpMML3GlobalRegistration::CalculateTransformMatrix()
         transm2->SetElement(2, 2, pt4[2] - pt1[2]);
       else
         transm2->SetElement(2, 2, (pt2[0]-pt1[0])*(pt3[1]-pt1[1])-(pt2[1]-pt1[1])*(pt3[0]-pt1[0]));
-
 
 
       // create transformation matrix 3

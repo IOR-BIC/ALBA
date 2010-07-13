@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: mmiVTKPicker.cpp,v $ 
   Language: C++ 
-  Date: $Date: 2009-05-05 11:56:41 $ 
-  Version: $Revision: 1.1.2.2 $ 
+  Date: $Date: 2010-07-13 12:07:53 $ 
+  Version: $Revision: 1.1.2.3 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -56,7 +56,7 @@ void mmiVTKPicker::OnLeftButtonDown(mafEventInteraction *e)
     vtkDEL(m_Picker);
   }
 
-  if (e->GetModifier(MAF_CTRL_KEY)) 
+  if (e->GetModifier(MAF_CTRL_KEY)) // Check if CTRL modifier is pressed
   {    
     // perform picking
     int x = m_LastMousePose[0];

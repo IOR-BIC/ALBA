@@ -2,8 +2,8 @@
 Program: Multimod Application Framework RELOADED 
 Module: $RCSfile: vtkMAFVolumeTextureMapper2D.cxx,v $ 
 Language: C++ 
-Date: $Date: 2009-05-12 16:22:27 $ 
-Version: $Revision: 1.1.2.1 $ 
+Date: $Date: 2010-07-13 12:08:02 $ 
+Version: $Revision: 1.1.2.2 $ 
 Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
 ========================================================================== 
 Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -22,7 +22,7 @@ See the COPYINGS file for license details
 #include "vtkVolumeProperty.h"
 #include "gl/gl.h"
 
-vtkCxxRevisionMacro(vtkMAFVolumeTextureMapper2D, "$Revision: 1.1.2.1 $");
+vtkCxxRevisionMacro(vtkMAFVolumeTextureMapper2D, "$Revision: 1.1.2.2 $");
 vtkStandardNewMacro(vtkMAFVolumeTextureMapper2D);
 
 #include "mafMemDbg.h"
@@ -35,13 +35,14 @@ vtkStandardNewMacro(vtkMAFVolumeTextureMapper2D);
 
 
 //------------------------------------------------------------------------
-// WARNING: INTERNAL METHOD - NOT INTENDED FOR GENERAL USE
-// Initialize rendering for this volume.
-// N.B. Code mostly adopted from vtkVolumeRayCastMapper::Render
-// See the description of class in .H file for details
 /*virtual*/ void vtkMAFVolumeTextureMapper2D::Render( vtkRenderer *ren, vtkVolume *vol )
 //------------------------------------------------------------------------
 {  
+  // WARNING: INTERNAL METHOD - NOT INTENDED FOR GENERAL USE
+  // Initialize rendering for this volume.
+  // N.B. Code mostly adopted from vtkVolumeRayCastMapper::Render
+  // See the description of class in .H file for details
+
   //Luigi Calori (CINECA) disabled blending for opaque objects in 
   //vtkOpenGLProperty.cxx (line 83), which unfortunately corrupts 
   //the correct visualization with MIP if some opaque model (e.g., 
