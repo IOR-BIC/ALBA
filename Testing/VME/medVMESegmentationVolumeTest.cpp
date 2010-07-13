@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMESegmentationVolumeTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-05-19 08:48:40 $
-Version:   $Revision: 1.1.2.5 $
+Date:      $Date: 2010-07-13 07:35:52 $
+Version:   $Revision: 1.1.2.6 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -240,7 +240,7 @@ void medVMESegmentationVolumeTest::TestSetVolumeLink()
   vme->ReparentTo(m_Storage->GetRoot());
   //////////////////////////////////////////////////////////////////////////
   int result = vme->SetVolumeLink((mafNode*)m_VolumeRG);
-  CPPUNIT_ASSERT( result == MAF_ERROR );
+  CPPUNIT_ASSERT( result == MAF_OK && vme->GetVolumeLink() == (mafNode*)m_VolumeRG );
   //////////////////////////////////////////////////////////////////////////
   result = vme->SetVolumeLink((mafNode*)m_Volume);
   CPPUNIT_ASSERT( result == MAF_OK  && vme->GetVolumeLink() == (mafNode*)m_Volume );
