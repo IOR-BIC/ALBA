@@ -129,6 +129,10 @@ ADD_EXECUTABLE(medVMEOutputComputeWrappingTest medVMEOutputComputeWrappingTest.h
 ADD_TEST(medVMEOutputComputeWrappingTest  ${EXECUTABLE_OUTPUT_PATH}/medVMEOutputComputeWrappingTest)
 
 
+ADD_EXECUTABLE(medPipeTensorFieldTest medPipeTensorFieldTest.h medPipeTensorFieldTest.cpp)
+ADD_TEST(medPipeTensorFieldTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeTensorFieldTest)
+
+
 
 #to be checked
 #ADD_EXECUTABLE(medPipeVolumeVRTest medPipeVolumeVRTest.h medPipeVolumeVRTest.cpp)
