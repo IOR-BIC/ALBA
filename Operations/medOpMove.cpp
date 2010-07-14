@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpMove.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 12:30:11 $
-  Version:   $Revision: 1.6.2.2 $
+  Date:      $Date: 2010-07-14 12:18:17 $
+  Version:   $Revision: 1.6.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -120,7 +120,10 @@ void medOpMove::OpRun()
 //----------------------------------------------------------------------------
 {
   // progress bar stuff
-  wxBusyInfo wait("creating gui...");
+  if (!m_TestMode)
+  {
+    wxBusyInfo wait("creating gui...");
+  }
 
   assert(m_Input);
   m_CurrentTime = ((mafVME *)m_Input)->GetTimeStamp();
@@ -128,8 +131,11 @@ void medOpMove::OpRun()
   m_NewAbsMatrix = *((mafVME *)m_Input)->GetOutput()->GetAbsMatrix();
   m_OldAbsMatrix = *((mafVME *)m_Input)->GetOutput()->GetAbsMatrix();
 
-  CreateGui();
-  ShowGui();
+  if (!m_TestMode)
+  {
+    CreateGui();
+    ShowGui();
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -195,22 +201,25 @@ void medOpMove::OpUndo()
 void medOpMove::OpStop(int result)
 //----------------------------------------------------------------------------
 {  
-  // progress bar stuff
-  wxBusyInfo wait("destroying gui...");
+  if (!m_TestMode)
+  {
+    // progress bar stuff
+    wxBusyInfo wait("destroying gui...");
+  
+    m_GizmoTranslate->Show(false);
+    cppDEL(m_GizmoTranslate);
 
-  m_GizmoTranslate->Show(false);
-  cppDEL(m_GizmoTranslate);
+    m_GizmoRotate->Show(false);
+    cppDEL(m_GizmoRotate);
 
-  m_GizmoRotate->Show(false);
-  cppDEL(m_GizmoRotate);
+    m_GuiTransformMouse->DetachInteractorFromVme();
 
-  m_GuiTransformMouse->DetachInteractorFromVme();
+	  mafEventMacro(mafEvent(this,CAMERA_UPDATE)); 
 
-	mafEventMacro(mafEvent(this,CAMERA_UPDATE)); 
-
-  // HideGui seems not to work  with plugged guis :(; using it generate a SetFocusToChild
-  // error when operation tab is selected after the operation has ended
-  mafEventMacro(mafEvent(this,OP_HIDE_GUI,(wxWindow *)m_Gui->GetParent()));
+    // HideGui seems not to work  with plugged guis :(; using it generate a SetFocusToChild
+    // error when operation tab is selected after the operation has ended
+    mafEventMacro(mafEvent(this,OP_HIDE_GUI,(wxWindow *)m_Gui->GetParent()));
+  }
   mafEventMacro(mafEvent(this,result));  
 }
 
@@ -599,9 +608,12 @@ void medOpMove::Reset()
 //----------------------------------------------------------------------------
 {
   ((mafVME *)m_Input)->SetAbsMatrix(m_OldAbsMatrix);  
-  m_GuiTransformTextEntries->Reset();
-  SetRefSysVME(mafVME::SafeDownCast(m_Input)); 
-  mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+  if (!m_TestMode)
+  {
+    m_GuiTransformTextEntries->Reset();
+    SetRefSysVME(mafVME::SafeDownCast(m_Input)); 
+    mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+  }
 }
 
 //----------------------------------------------------------------------------
