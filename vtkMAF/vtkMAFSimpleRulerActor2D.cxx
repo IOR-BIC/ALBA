@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFSimpleRulerActor2D.cxx,v $
   Language:  C++
-  Date:      $Date: 2009-03-11 11:40:06 $
-  Version:   $Revision: 1.3.2.1 $
+  Date:      $Date: 2010-07-14 09:02:29 $
+  Version:   $Revision: 1.3.2.2 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -34,7 +34,7 @@
 #include "vtkProperty2D.h"
 #include "vtkPolyDataMapper2D.h"
 
-vtkCxxRevisionMacro(vtkMAFSimpleRulerActor2D, "$Revision: 1.3.2.1 $");
+vtkCxxRevisionMacro(vtkMAFSimpleRulerActor2D, "$Revision: 1.3.2.2 $");
 vtkStandardNewMacro(vtkMAFSimpleRulerActor2D);
 //------------------------------------------------------------------------------
 vtkMAFSimpleRulerActor2D::vtkMAFSimpleRulerActor2D()
@@ -367,7 +367,7 @@ double vtkMAFSimpleRulerActor2D::RicomposeValue(int sign, double mantissa, int e
   return sign*mantissa*pow(10.0f,exponent); // base in pow must be float
 }
 //----------------------------------------------------------------------------
-int vtkMAFSimpleRulerActor2D::round(double val)
+int vtkMAFSimpleRulerActor2D::Round(double val)
 //----------------------------------------------------------------------------
 {
   int sign = ( val >= 0 ) ? 1 : -1 ;
@@ -392,7 +392,7 @@ double vtkMAFSimpleRulerActor2D::NearestTick(double val, double TickSpacing)
   // return the first multiple of tickSpacing  that is smaller than val
 
   val = val + TickSpacing / 2.0f; 
-  return  TickSpacing * round( val / TickSpacing );
+  return  TickSpacing * Round( val / TickSpacing );
 }
 //----------------------------------------------------------------------------
 void vtkMAFSimpleRulerActor2D::DecomposeValue(double val, int *sign, double *mantissa, int *exponent)

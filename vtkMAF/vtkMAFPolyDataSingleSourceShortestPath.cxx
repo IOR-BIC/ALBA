@@ -3,8 +3,8 @@
   Program:	 Visualization Toolkit
   Module:	 $RCSfile: vtkMAFPolyDataSingleSourceShortestPath.cxx,v $
   Language:  C++
-  Date: 	 $Date: 2009-01-29 11:17:14 $
-  Version:	 $Revision: 1.1.2.2 $
+  Date: 	 $Date: 2010-07-14 09:02:29 $
+  Version:	 $Revision: 1.1.2.3 $
 
   This class is not mature enough to enter the official VTK release.
 =========================================================================*/
@@ -21,7 +21,7 @@
 #include "vtkPointData.h"
 #include "vtkCellArray.h"
 
-vtkCxxRevisionMacro(vtkMAFPolyDataSingleSourceShortestPath, "$Revision: 1.1.2.2 $");
+vtkCxxRevisionMacro(vtkMAFPolyDataSingleSourceShortestPath, "$Revision: 1.1.2.3 $");
 vtkStandardNewMacro(vtkMAFPolyDataSingleSourceShortestPath);
 
 //----------------------------------------------------------------------------
@@ -79,7 +79,7 @@ void vtkMAFPolyDataSingleSourceShortestPath::Execute()
 	
 	vtkDebugMacro(<< "vtkMAFPolyDataSingleSourceShortestPath finding shortest path");
 	
-	init();
+	Init();
 	
 	ShortestPath(this->StartVertex, this->EndVertex);
 	
@@ -87,7 +87,7 @@ void vtkMAFPolyDataSingleSourceShortestPath::Execute()
 	
 }
 
-void vtkMAFPolyDataSingleSourceShortestPath::init()
+void vtkMAFPolyDataSingleSourceShortestPath::Init()
 {
 	BuildAdjacency(this->GetInput());
 	

@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFRulerActor2D.cxx,v $
   Language:  C++
-  Date:      $Date: 2009-10-19 14:33:02 $
-  Version:   $Revision: 1.5.2.2 $
+  Date:      $Date: 2010-07-14 09:02:29 $
+  Version:   $Revision: 1.5.2.3 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -34,7 +34,7 @@
 #include "vtkProperty2D.h"
 #include "vtkPolyDataMapper2D.h"
 
-vtkCxxRevisionMacro(vtkMAFRulerActor2D, "$Revision: 1.5.2.2 $");
+vtkCxxRevisionMacro(vtkMAFRulerActor2D, "$Revision: 1.5.2.3 $");
 vtkStandardNewMacro(vtkMAFRulerActor2D);
 //------------------------------------------------------------------------------
 vtkMAFRulerActor2D::vtkMAFRulerActor2D()
@@ -514,7 +514,7 @@ double vtkMAFRulerActor2D::GetLongTickSpacing(double val)
   return RicomposeValue(sign,mantissa,exponent);
 }
 //----------------------------------------------------------------------------
-int vtkMAFRulerActor2D::round(double val)
+int vtkMAFRulerActor2D::Round(double val)
 //----------------------------------------------------------------------------
 {
   int sign = ( val >= 0 ) ? 1 : -1 ;
@@ -539,7 +539,7 @@ double vtkMAFRulerActor2D::NearestTick(double val, double TickSpacing)
   // return the first multiple of tickSpacing  that is smaller than val
 
   val = val + TickSpacing / 2.0f; 
-  return  TickSpacing * round( val / TickSpacing );
+  return  TickSpacing * Round( val / TickSpacing );
 }
 //----------------------------------------------------------------------------
 void vtkMAFRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)

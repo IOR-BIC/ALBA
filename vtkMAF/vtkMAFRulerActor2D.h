@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFRulerActor2D.h,v $
   Language:  C++
-  Date:      $Date: 2009-02-26 11:33:37 $
-  Version:   $Revision: 1.3.2.1 $
+  Date:      $Date: 2010-07-14 09:02:29 $
+  Version:   $Revision: 1.3.2.2 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -85,7 +85,7 @@ protected:
 
 					 void			RulerCreate();
            void			RulerUpdate(vtkCamera *camera, vtkRenderer *ren);
-             int		round(double val);
+             int		Round(double val);
           double		GetTickSpacing(double val);
           double    GetMidTickSpacing(double val);
           double    GetLongTickSpacing(double val);

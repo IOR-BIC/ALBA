@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkMAFPolyDataSingleSourceShortestPath.h,v $
   Language:  C++
-  Date:      $Date: 2009-01-29 11:17:14 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2010-07-14 09:02:29 $
+  Version:   $Revision: 1.1.2.3 $
 
   This class is not mature enough to enter the official VTK release.
 =========================================================================*/
@@ -102,7 +102,7 @@ protected:
 	// callback function
 	double EdgeCost(vtkPolyData *pd, vtkIdType u, vtkIdType v);
 	
-	void init();
+	void Init();
 	
 	// structure the heap
 	void Heapify(int i);

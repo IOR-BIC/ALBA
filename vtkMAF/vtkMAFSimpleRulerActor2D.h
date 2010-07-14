@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFSimpleRulerActor2D.h,v $
   Language:  C++
-  Date:      $Date: 2009-03-11 11:40:06 $
-  Version:   $Revision: 1.3.2.1 $
+  Date:      $Date: 2010-07-14 09:02:29 $
+  Version:   $Revision: 1.3.2.2 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -80,7 +80,7 @@ protected:
 
 					 void			RulerCreate();
            void			RulerUpdate(vtkCamera *camera, vtkRenderer *ren);
-             int		round(double val);
+             int		Round(double val);
           double		GetTickSpacing(double val);
           double    GetLongTickSpacing(double val);
             bool    CheckProjectionPlane(vtkCamera *cam);
