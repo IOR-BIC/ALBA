@@ -2,8 +2,8 @@
 Program:   @neufuse
 Module:    $RCSfile: medOpSegmentationRegionGrowingConnectedThreshold.cpp,v $
 Language:  C++
-Date:      $Date: 2009-12-17 15:13:15 $
-Version:   $Revision: 1.1.2.5 $
+Date:      $Date: 2010-07-15 07:43:11 $
+Version:   $Revision: 1.1.2.6 $
 Authors:   Matteo Giacomoni, Alessandro Chiarini
 ==========================================================================
 Copyright (c) 2008
@@ -138,8 +138,8 @@ void medOpSegmentationRegionGrowingConnectedThreshold::CreateGui()
   m_Gui = new mafGUI(this);
 
   m_Gui->Label(_("Parameters"));
-  m_Gui->Integer(ID_LOWER,_("lower"),&m_Lower,0,MAXLONG,_("minimum intensity value to be included in segmentation"));
-  m_Gui->Integer(ID_UPPER,_("upper"),&m_Upper,0,MAXLONG,_("maximum intensity value to be included in segmentation"));
+  m_Gui->Integer(ID_LOWER,_("lower"),&m_Lower,MINLONG,MAXLONG,_("minimum intensity value to be included in segmentation"));
+  m_Gui->Integer(ID_UPPER,_("upper"),&m_Upper,MINLONG,MAXLONG,_("maximum intensity value to be included in segmentation"));
   m_Gui->Integer(ID_REPLACE,_("replace"),&m_Replace,0,MAXINT,_("segmented region value"));
   m_Gui->Label(_("Voxel val:"),&m_SeedScalarValue);
   m_Gui->VectorN(ID_SEED,_("seed"),m_Seed,m_ImageDim,MININT,MAXINT,"seed point to start growing, in image coordinates");
