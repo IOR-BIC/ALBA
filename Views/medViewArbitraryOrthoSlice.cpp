@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2010-07-19 15:57:35 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2010-07-19 16:08:35 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -551,19 +551,19 @@ mafGUI* medViewArbitraryOrthoSlice::CreateGui()
 	m_Gui->Divider(2);
 
 	//button to reset at the start position
-	m_Gui->Label("Reset slicers", true);
-	m_Gui->Button(ID_RESET,_("Reset"),"");
+	m_Gui->Label("reset slices", true);
+	m_Gui->Button(ID_RESET,_("reset"),"");
 
     m_Gui->Divider(2);
 
-    m_Gui->Label("Show gizmo", true);
+    m_Gui->Label("show gizmo", true);
     m_Gui->Bool(ID_SHOW_GIZMO, "",&m_ShowGizmo);
 
 	m_Gui->Divider(2);
 
 	//combo box to choose the type of gizmo
-	m_Gui->Label("Choose gizmo", true);
-  	wxString Text[2]={_("Gizmo Translation"),_("Gizmo Rotation")};
+	m_Gui->Label("choose gizmo", true);
+  	wxString Text[2]={_("translation gizmo"),_("rotation gizmo")};
     m_Gui->Combo(ID_COMBO_CHOOSE_ACTIVE_GIZMO,"",&m_ComboChooseActiveGizmo,2,Text);
 	
     
