@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2010-07-12 10:01:22 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2010-07-19 15:57:35 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -138,7 +138,7 @@ medViewArbitraryOrthoSlice::medViewArbitraryOrthoSlice(wxString label, bool show
 	m_VolumeVTKDataCenterABSCoordinatesReset[1] = 0.0;
 	m_VolumeVTKDataCenterABSCoordinatesReset[2] = 0.0;
 
-	m_TypeGizmo = GIZMO_TRANSLATE;
+	m_ComboChooseActiveGizmo = GIZMO_ROTATE;
 
 }
 
@@ -510,7 +510,9 @@ void medViewArbitraryOrthoSlice::OnEventThis(mafEventBase *maf_event)
 
     case ID_SHOW_GIZMO:
       {
-        m_GizmoRotate->Show(m_ShowGizmo==1 ? true : false);
+        m_GizmoRotate->Show(m_ShowGizmo==1 && m_ComboChooseActiveGizmo == GIZMO_ROTATE? true : false);
+		m_GizmoTranslate->Show(m_ShowGizmo==1 && m_ComboChooseActiveGizmo == GIZMO_TRANSLATE? true : false);
+		m_Gui->Enable(ID_COMBO_CHOOSE_ACTIVE_GIZMO, m_ShowGizmo == 1 ? true : false);		
         CameraUpdate();
       }
       break;
@@ -546,22 +548,33 @@ mafGUI* medViewArbitraryOrthoSlice::CreateGui()
 	assert(m_Gui == NULL);
 	m_Gui = new mafGUI(this);
 
-  m_Gui->Divider(2);
+	m_Gui->Divider(2);
+
+	//button to reset at the start position
+	m_Gui->Label("Reset slicers", true);
+	m_Gui->Button(ID_RESET,_("Reset"),"");
+
+    m_Gui->Divider(2);
+
+    m_Gui->Label("Show gizmo", true);
+    m_Gui->Bool(ID_SHOW_GIZMO, "",&m_ShowGizmo);
+
+	m_Gui->Divider(2);
 
 	//combo box to choose the type of gizmo
-  // 	wxString Text[2]={_("Gizmo Translation"),_("Gizmo Rotation")};
-// 	m_Gui->Combo(ID_COMBO_CHOOSE_ACTIVE_GIZMO,"Gizmo",&m_TypeGizmo,2,Text);
-
-  
-	//button to reset at the start position
-	m_Gui->Button(ID_RESET,_("Reset"),"");
+	m_Gui->Label("Choose gizmo", true);
+  	wxString Text[2]={_("Gizmo Translation"),_("Gizmo Rotation")};
+    m_Gui->Combo(ID_COMBO_CHOOSE_ACTIVE_GIZMO,"",&m_ComboChooseActiveGizmo,2,Text);
+	
+    
 	m_Gui->Divider(2);
-  m_Gui->Label("Show gizmo:");
-  m_Gui->Bool(ID_SHOW_GIZMO, "",&m_ShowGizmo);
+  
 
 	// m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
 
 	m_Gui->Divider();
+
+
 	m_Gui->Update();
 
 	EnableWidgets( (m_CurrentVolume != NULL) );
@@ -1014,9 +1027,8 @@ void medViewArbitraryOrthoSlice::OnChooseActiveGizmo()
 	{
 		if(m_CurrentVolume)
 		{
-			if(m_TypeGizmo == GIZMO_TRANSLATE)
+			if(m_ComboChooseActiveGizmo == GIZMO_TRANSLATE)
 			{
-				
 				// DEBUG && WORKAROUND:
 				// this workaround code (querying for vtk matrix) is needed to update the slicer output matrix
 				vtkMatrix4x4 *mat = m_SlicerZ->GetOutput()->GetAbsMatrix()->GetVTKMatrix();
@@ -1028,8 +1040,9 @@ void medViewArbitraryOrthoSlice::OnChooseActiveGizmo()
 				m_GizmoTranslate->Show(true);
 				m_GizmoTranslate->SetAbsPose(m_SlicerZ->GetOutput()->GetAbsMatrix(),0);
 				m_GizmoRotate->Show(false);
+				this->CameraUpdate();
 			}
-			else if(m_TypeGizmo == GIZMO_ROTATE)
+			else if(m_ComboChooseActiveGizmo == GIZMO_ROTATE)
 			{
 				// DEBUG && WORKAROUND:
 				// this workaround code (querying for vtk matrix) is needed to update the slicer output matrix
@@ -1042,6 +1055,7 @@ void medViewArbitraryOrthoSlice::OnChooseActiveGizmo()
 				m_GizmoTranslate->Show(false);
 				m_GizmoRotate->Show(true);
 				m_GizmoRotate->SetAbsPose(m_SlicerZ->GetOutput()->GetAbsMatrix(),0);
+				this->CameraUpdate();
 			}
 		}
 		CameraUpdate();
@@ -1244,20 +1258,21 @@ void medViewArbitraryOrthoSlice::ShowSlicers( mafVME * vmeVolume, bool show )
 	m_GizmoRotate->SetAbsPose(m_SlicerZResetMatrix);
 	m_GizmoRotate->Show(true);
 
-	m_TypeGizmo = GIZMO_TRANSLATE;
+	m_ComboChooseActiveGizmo = GIZMO_ROTATE;
 
 	//Create the Gizmos' Gui
 	if(!m_GuiGizmos)
 		m_GuiGizmos = new mafGUI(this);
-	//m_GuiGizmos->AddGui(m_GizmoTranslate->GetGui());
+	
+	m_GuiGizmos->AddGui(m_GizmoTranslate->GetGui());
 	m_GuiGizmos->AddGui(m_GizmoRotate->GetGui());
 	m_GuiGizmos->Update();
 	m_Gui->AddGui(m_GuiGizmos);
 	m_Gui->FitGui();
 	m_Gui->Update();
 
-  m_SlicerX->SetVisibleToTraverse(false);
-  m_SlicerY->SetVisibleToTraverse(false);
+	m_SlicerX->SetVisibleToTraverse(false);
+	m_SlicerY->SetVisibleToTraverse(false);
 	m_SlicerZ->SetVisibleToTraverse(false);
 
 	CameraUpdate();

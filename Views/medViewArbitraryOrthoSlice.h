@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.h,v $
 Language:  C++
-Date:      $Date: 2010-07-09 15:02:30 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-07-19 15:57:35 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -164,7 +164,7 @@ protected:
 	double	m_VolumeVTKDataCenterABSCoords[3];
 	double	m_VolumeVTKDataCenterABSCoordinatesReset[3];
 	double	m_VolumeVTKDataABSOrientation[3];
-	int			m_TypeGizmo;
+	int			m_ComboChooseActiveGizmo;
 
   int m_ShowGizmo;
 	mafGUI				*m_GuiGizmos;
