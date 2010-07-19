@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-06-30 10:17:45 $
-Version:   $Revision: 1.1.2.115 $
+Date:      $Date: 2010-07-19 09:51:49 $
+Version:   $Revision: 1.1.2.116 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -837,7 +837,7 @@ int medOpImporterDicomOffis::BuildOutputVMEImagesFromDicomCineMRI()
 		medDicomSlice *element0;
 		element0 = (medDicomSlice *)m_SelectedSeriesSlicesList->\
 			Item(tsImageId)->GetData();
-		mafTimeStamp tsDouble = (mafTimeStamp)(element0->GetDcmTriggerTime());
+		mafTimeStamp dcmTriggerTime = (mafTimeStamp)(element0->GetDcmTriggerTime());
 
 		for (int sourceVolumeSliceId = m_ZCropBounds[0], targetVolumeSliceId = 0; sourceVolumeSliceId < m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
 		{
@@ -885,7 +885,7 @@ int medOpImporterDicomOffis::BuildOutputVMEImagesFromDicomCineMRI()
 			image = mafVMEImage::SafeDownCast(m_ImagesGroup->GetChild(targetVolumeSliceId));
 			assert(image);	
 
-			image->SetData(im,ts);
+			image->SetData(im,dcmTriggerTime);
 
 			if (m_SeriesIDContainsRotationsMap[m_SelectedSeriesID] == true  && m_ApplyRotation)
 			{
@@ -916,7 +916,7 @@ int medOpImporterDicomOffis::BuildOutputVMEImagesFromDicomCineMRI()
 				boxPose->SetMatrix(tr->GetMatrix());
 				boxPose->Update();
 
-				image->SetAbsMatrix(boxPose->GetMatrix(),tsDouble);
+				image->SetAbsMatrix(boxPose->GetMatrix(),dcmTriggerTime);
 
 				sliceOrientationMatrix->Delete();
 				tr->Delete();
