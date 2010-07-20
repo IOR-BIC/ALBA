@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVisualPipePolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-25 11:19:42 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2010-07-20 08:24:52 $
+Version:   $Revision: 1.3.2.1 $
 Authors:   DMatteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -40,7 +40,7 @@ MafMedical is partially based on OpenMAF.
 =========================================================================*/
 
 
-#include "mafDefines.h" 
+#include "medDefines.h" 
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
