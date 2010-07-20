@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVisualPipePolylineGraph.h,v $
 Language:  C++
-Date:      $Date: 2008-07-25 11:19:42 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2010-07-20 09:54:25 $
+Version:   $Revision: 1.2.2.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -61,6 +61,7 @@ class vtkColorTransferFunction;
 class vtkSphereSource;
 class vtkTubeFilter;
 class vtkGlyph3D;
+class vtkActor2D;
 
 //----------------------------------------------------------------------------
 // medVisualPipePolylineGraph :
@@ -94,6 +95,7 @@ public:
     ID_SCALAR_DIMENSION,
     ID_SCALAR,
     ID_POLYLINE_REPRESENTATION,
+    ID_SHOW_BRANCH_ID,
     ID_LAST
   };
 
@@ -169,6 +171,11 @@ protected:
   int                      m_ScalarIndex;
   int                      m_NumberOfArrays;
   int                      m_ActiveScalarType;
+
+  //Branch id stuff
+  int m_ShowBranchId;
+  vtkActor2D *m_ActorBranchId;
+  //////////////////////////////////////////////////////////////////////////
 
   int m_Capping;
   int m_Representation;

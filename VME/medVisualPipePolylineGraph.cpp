@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVisualPipePolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2010-07-20 08:24:52 $
-Version:   $Revision: 1.3.2.1 $
+Date:      $Date: 2010-07-20 09:54:25 $
+Version:   $Revision: 1.3.2.2 $
 Authors:   DMatteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -64,6 +64,9 @@ MafMedical is partially based on OpenMAF.
 
 #include "vtkMAFAssembly.h"
 
+#include "vtkMAFSmartPointer.h"
+#include "vtkLabeledDataMapper.h"
+#include "vtkCellCenters.h"
 #include "vtkPointData.h"
 #include "vtkOutlineCornerFilter.h"
 #include "vtkPolyDataMapper.h"
@@ -78,6 +81,7 @@ MafMedical is partially based on OpenMAF.
 #include "vtkGlyph3D.h"
 #include "vtkTubeFilter.h"
 #include "vtkAppendPolyData.h"
+#include "vtkActor2D.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(medVisualPipePolylineGraph);
@@ -112,6 +116,8 @@ medVisualPipePolylineGraph::medVisualPipePolylineGraph()
 
   m_Representation = TUBE;
 
+  m_ShowBranchId = FALSE;
+
 }
 //----------------------------------------------------------------------------
 void medVisualPipePolylineGraph::Create(mafSceneNode *n)
@@ -127,6 +133,7 @@ void medVisualPipePolylineGraph::Create(mafSceneNode *n)
   m_OutlineProperty = NULL;
   m_OutlineActor    = NULL;
   m_Axes            = NULL;
+  m_ActorBranchId   = NULL;
 
   m_Vme->GetEventSource()->AddObserver(this);
 
@@ -281,6 +288,21 @@ void medVisualPipePolylineGraph::ExecutePipe()
   m_OutlineActor->PickableOff();
   m_OutlineActor->SetProperty(m_OutlineProperty);
 
+
+  vtkMAFSmartPointer<vtkCellCenters> centers;
+  centers->SetInput(data);
+  centers->Update();
+  vtkMAFSmartPointer<vtkLabeledDataMapper> mapperLabel;
+  mapperLabel->SetInput(centers->GetOutput());
+  
+
+  vtkNEW(m_ActorBranchId);
+  m_ActorBranchId->SetMapper(mapperLabel);
+  m_ActorBranchId->SetVisibility(m_ShowBranchId==TRUE);
+
+  m_RenFront->AddActor2D(m_ActorBranchId);
+
+
 }
 //----------------------------------------------------------------------------
 void medVisualPipePolylineGraph::InitializeFromTag()
@@ -375,6 +397,9 @@ medVisualPipePolylineGraph::~medVisualPipePolylineGraph()
 
   m_Vme->GetEventSource()->RemoveObserver(this);
 
+  m_RenFront->RemoveActor2D(m_ActorBranchId);
+
+  vtkDEL(m_ActorBranchId);
   vtkDEL(m_Sphere);
   vtkDEL(m_Glyph);
   vtkDEL(m_Tube);
@@ -464,6 +489,8 @@ mafGUI *medVisualPipePolylineGraph::CreateGui()
   assert(m_Gui == NULL);
   m_Gui = new mafGUI(this);
 
+  m_Gui->Bool(ID_SHOW_BRANCH_ID,_("show branch id"),&m_ShowBranchId,1);
+  m_Gui->Divider(2);
   const wxString representation_string[] = {_("line"), _("tube"), _("sphere"), _("unconnected sphere")};
   int num_choices = 4;
   m_Gui->Combo(ID_POLYLINE_REPRESENTATION,"",&m_Representation,num_choices,representation_string);
@@ -529,6 +556,12 @@ void medVisualPipePolylineGraph::OnEvent(mafEventBase *maf_event)
   {
     switch(e->GetId()) 
     {
+    case ID_SHOW_BRANCH_ID:
+      {
+        m_ActorBranchId->SetVisibility(m_ShowBranchId==TRUE);
+        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+      }
+      break;
     case ID_TUBE_RADIUS:
       {
         m_Tube->SetRadius(m_TubeRadius);
