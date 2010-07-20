@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-06 14:22:15 $
-Version:   $Revision: 1.10.2.3 $
+Date:      $Date: 2010-07-20 11:14:40 $
+Version:   $Revision: 1.10.2.4 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -2707,21 +2707,17 @@ double mafPolylineGraph::GetBranchIntervalLength(vtkIdType b, vtkIdType startVer
     startId = tmp;
   }
 
-  for (int k = startId ;  k <= endId ;  k++)
+  for (int k = startId ;  k < endId ;  k++)
   { 
-    if (k > 0)
-    {
-      double pos1[3], pos2[3];
+    double pos1[3], pos2[3];
 
-      const mafPolylineGraph::Vertex *vertex1 = GetConstVertexPtr(verticesIdList->GetId(k));
-      vertex1->GetCoords(pos1);
+    const mafPolylineGraph::Vertex *vertex1 = GetConstVertexPtr(verticesIdList->GetId(k));
+    vertex1->GetCoords(pos1);
 
-      const mafPolylineGraph::Vertex *vertex2 = GetConstVertexPtr(verticesIdList->GetId(k-1));
-      vertex2->GetCoords(pos2);
+    const mafPolylineGraph::Vertex *vertex2 = GetConstVertexPtr(verticesIdList->GetId(k+1));
+    vertex2->GetCoords(pos2);
 
-      sum += sqrt(vtkMath::Distance2BetweenPoints(pos1, pos2));
-
-    }
+    sum += sqrt(vtkMath::Distance2BetweenPoints(pos1, pos2));
   }
 
   // clean up
