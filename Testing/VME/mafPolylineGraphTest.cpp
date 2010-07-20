@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPolylineGraphTest.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-06 10:47:35 $
-Version:   $Revision: 1.3.2.3 $
+Date:      $Date: 2010-07-20 09:15:34 $
+Version:   $Revision: 1.3.2.4 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -810,7 +810,20 @@ void mafPolylineGraphTest::TestReverseBranch()
 
   delete Graph ;
 }
+//------------------------------------------------------------------------------
+void mafPolylineGraphTest::TestGetBranchIntervalLength() 
+//------------------------------------------------------------------------------
+{
+  mafPolylineGraph *Graph = new mafPolylineGraph ;
+  CPPUNIT_ASSERT(Graph->CopyFromPolydata(m_Polydata)) ;
+  CPPUNIT_ASSERT(Graph->SelfCheck()) ;
 
+  CPPUNIT_ASSERT(Graph->GetBranchIntervalLength(0,0,1) == sqrt(5.0));
+  CPPUNIT_ASSERT(Graph->GetBranchIntervalLength(0,0,0) == 0.0);
+  CPPUNIT_ASSERT(Graph->GetBranchIntervalLength(0,1,1) == 0.0);
+
+  delete Graph;
+}
 
 
 //------------------------------------------------------------------------------

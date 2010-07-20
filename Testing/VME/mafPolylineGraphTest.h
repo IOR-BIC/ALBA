@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPolylineGraphTest.h,v $
 Language:  C++
-Date:      $Date: 2007-07-03 15:38:01 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2010-07-20 09:15:34 $
+Version:   $Revision: 1.2.2.1 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -56,6 +56,7 @@ class mafPolylineGraphTest : public CPPUNIT_NS::TestFixture
     CPPUNIT_TEST( TestAddExistingEdgeToBranch);
     CPPUNIT_TEST( TestBranchName );
     CPPUNIT_TEST( TestReverseBranch );
+    CPPUNIT_TEST( TestGetBranchIntervalLength );
     CPPUNIT_TEST_SUITE_END();
 
   protected:
@@ -79,6 +80,7 @@ class mafPolylineGraphTest : public CPPUNIT_NS::TestFixture
     void TestAddExistingEdgeToBranch() ;
     void TestBranchName() ;
     void TestReverseBranch() ;
+    void TestGetBranchIntervalLength() ;
 		void CreateExamplePolydata();
     vtkPolyData *m_Polydata ;
 };
