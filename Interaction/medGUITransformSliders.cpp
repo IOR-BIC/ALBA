@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUITransformSliders.cpp,v $
 Language:  C++
-Date:      $Date: 2009-12-17 12:27:54 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2010-07-21 13:04:14 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2002/2004
@@ -40,7 +40,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkMatrix4x4.h"
 
 //----------------------------------------------------------------------------
-medGUITransformSliders::medGUITransformSliders(mafVME *input, double translationRange[6], mafObserver *listener, bool enableScaling)
+medGUITransformSliders::medGUITransformSliders(mafVME *input, double translationRange[6], mafObserver *listener /* = NULL */, bool enableScaling /* = true */,bool testMode /* = false */)
 //----------------------------------------------------------------------------
 {
   assert(input);
@@ -50,6 +50,7 @@ medGUITransformSliders::medGUITransformSliders(mafVME *input, double translation
   m_Listener = listener;
   m_InputVME = input;
   m_Gui = NULL;
+  m_TestMode = testMode;
 
   m_RefSysVME = m_InputVME;
 
@@ -62,7 +63,10 @@ medGUITransformSliders::medGUITransformSliders(mafVME *input, double translation
 
   m_CurrentTime = m_InputVME->GetTimeStamp();
 
-  CreateGui();
+  if (!m_TestMode)
+  {
+  	CreateGui();
+  }
   SetAbsPose(m_InputVME->GetOutput()->GetAbsMatrix());
 
   mafNEW(m_OldAbsMatrix);
@@ -168,7 +172,10 @@ void medGUITransformSliders::Reset()
   m_InputVME->SetAbsMatrix(*m_OldAbsMatrix);
   SetAbsPose(m_InputVME->GetOutput()->GetAbsMatrix());
   m_Scaling[0] = m_Scaling[1] = m_Scaling[2] = 1;
-  m_Gui->Update();
+  if (!m_TestMode)
+  {
+  	m_Gui->Update();
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -210,7 +217,6 @@ void medGUITransformSliders::SlidersValuesChanged()
   e2s.SetId(ID_TRANSFORM);
   mafEventMacro(e2s);
 }
-
 //----------------------------------------------------------------------------
 void medGUITransformSliders::SetAbsPose(mafMatrix* absPose, mafTimeStamp timeStamp)
 //----------------------------------------------------------------------------
@@ -227,5 +233,34 @@ void medGUITransformSliders::SetAbsPose(mafMatrix* absPose, mafTimeStamp timeSta
   mafTransform::GetOrientation(mflTr->GetMatrix(), m_Orientation);
   mafTransform::GetScale(mflTr->GetMatrix(), m_Scaling);
 
-  m_Gui->Update();
+  if (!m_TestMode)
+  {
+  	m_Gui->Update();
+  }
+
+  mafDEL(mflTr);
+}
+//----------------------------------------------------------------------------
+void medGUITransformSliders::GetPosition(double pos[3])
+//----------------------------------------------------------------------------
+{
+  pos[0] = m_Position[0];
+  pos[1] = m_Position[1];
+  pos[2] = m_Position[2];
+}
+//----------------------------------------------------------------------------
+void medGUITransformSliders::GetOrientation(double orientation[3])
+//----------------------------------------------------------------------------
+{
+  orientation[0] = m_Orientation[0];
+  orientation[1] = m_Orientation[1];
+  orientation[2] = m_Orientation[2];
+}
+//----------------------------------------------------------------------------
+void medGUITransformSliders::GetScaling(double scaling[3])
+//----------------------------------------------------------------------------
+{
+  scaling[0] = m_Scaling[0];
+  scaling[1] = m_Scaling[1];
+  scaling[2] = m_Scaling[2];
 }

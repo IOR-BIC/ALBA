@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUITransformSliders.h,v $
 Language:  C++
-Date:      $Date: 2009-09-14 07:03:53 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-07-21 13:04:14 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2002/2004
@@ -41,7 +41,7 @@ class medGUITransformSliders : public mafGUITransformInterface
 public:
 
   /** Constructor. */
-  medGUITransformSliders(mafVME *input, double translationRange[6], mafObserver *listener = NULL, bool enableScaling = true);
+  medGUITransformSliders(mafVME *input, double translationRange[6], mafObserver *listener = NULL, bool enableScaling = true,bool testMode = false);
 
   /** Destructor */
   ~medGUITransformSliders(); 
@@ -76,6 +76,15 @@ public:
 
   /** Set abs pose and update position, orientation and scale text entries according to current reference system. */
   void SetAbsPose(mafMatrix *absPose, mafTimeStamp timeStamp = -1);
+
+  /** Return the current position */
+  void GetPosition(double pos[3]);
+
+  /** Return the current orientation */
+  void GetOrientation(double orientation[3]);
+
+  /** Return the current scaling */
+  void GetScaling(double scaling[3]);
 
 protected:
 
