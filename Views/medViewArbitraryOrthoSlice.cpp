@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2010-07-19 16:08:35 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2010-07-21 09:48:59 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -80,9 +80,9 @@ mafCxxTypeMacro(medViewArbitraryOrthoSlice);
 enum ARBITRARY_SUBVIEW_ID
 {
 	PERSPECTIVE_VIEW = 0,
-	X_VIEW = 1,
-	Y_VIEW = 2,
-	Z_VIEW = 3,
+	Z_VIEW = 1,
+	X_VIEW = 2,
+	Y_VIEW = 3,
 };
 enum GIZMO_TYPE_ID
 {
@@ -187,9 +187,9 @@ void medViewArbitraryOrthoSlice::PackageView()
 // 	m_ViewSliceZ->PlugVisualPipe("mafVMELandmarkCloud", "mafPipeSurfaceSlice", NON_VISIBLE);
 
 	PlugChildView(m_ViewArbitrary);
+	PlugChildView(m_ViewSliceZ);
 	PlugChildView(m_ViewSliceX);
 	PlugChildView(m_ViewSliceY);
-	PlugChildView(m_ViewSliceZ);
 
 }
 
