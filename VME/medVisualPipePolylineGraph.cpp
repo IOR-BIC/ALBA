@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVisualPipePolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2010-07-20 09:54:25 $
-Version:   $Revision: 1.3.2.2 $
+Date:      $Date: 2010-07-22 07:53:25 $
+Version:   $Revision: 1.3.2.3 $
 Authors:   DMatteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -299,10 +299,6 @@ void medVisualPipePolylineGraph::ExecutePipe()
   vtkNEW(m_ActorBranchId);
   m_ActorBranchId->SetMapper(mapperLabel);
   m_ActorBranchId->SetVisibility(m_ShowBranchId==TRUE);
-
-  m_RenFront->AddActor2D(m_ActorBranchId);
-
-
 }
 //----------------------------------------------------------------------------
 void medVisualPipePolylineGraph::InitializeFromTag()
@@ -380,7 +376,16 @@ void medVisualPipePolylineGraph::AddActorsToAssembly(vtkMAFAssembly *assembly)
 //----------------------------------------------------------------------------
 {
   assembly->AddPart(m_Actor);
-  assembly->AddPart(m_OutlineActor);	
+  assembly->AddPart(m_OutlineActor);
+ 
+  if (m_RenFront)
+  {
+    m_RenFront->AddActor2D(m_ActorBranchId);
+  }
+  else if (m_RenBack)
+  {
+    m_RenBack->AddActor2D(m_ActorBranchId);
+  }
 }
 //----------------------------------------------------------------------------
 void medVisualPipePolylineGraph::RemoveActorsFromAssembly(vtkMAFAssembly *assembly)
@@ -388,6 +393,14 @@ void medVisualPipePolylineGraph::RemoveActorsFromAssembly(vtkMAFAssembly *assemb
 {
   assembly->RemovePart(m_Actor);
   assembly->RemovePart(m_OutlineActor);
+  if (m_RenFront)
+  {
+    m_RenFront->RemoveActor2D(m_ActorBranchId);
+  }
+  else if (m_RenBack)
+  {
+    m_RenBack->RemoveActor2D(m_ActorBranchId);
+  }
 }
 //----------------------------------------------------------------------------
 medVisualPipePolylineGraph::~medVisualPipePolylineGraph()
@@ -396,8 +409,6 @@ medVisualPipePolylineGraph::~medVisualPipePolylineGraph()
   RemoveActorsFromAssembly(m_AssemblyFront);
 
   m_Vme->GetEventSource()->RemoveObserver(this);
-
-  m_RenFront->RemoveActor2D(m_ActorBranchId);
 
   vtkDEL(m_ActorBranchId);
   vtkDEL(m_Sphere);
