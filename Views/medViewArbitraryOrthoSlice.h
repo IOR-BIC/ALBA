@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.h,v $
 Language:  C++
-Date:      $Date: 2010-07-19 15:57:35 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2010-07-22 09:41:50 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -17,6 +17,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // Include:
 //----------------------------------------------------------------------------
 #include "medViewCompoundWindowing.h"
+#include "mafVMESurface.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -95,6 +96,12 @@ protected:
 
 	void ShowSlicers( mafVME * vmeVolume, bool show );
 
+	/** 
+	Create the helper cone giving feedback for camera direction*/
+	void BuildXCameraConeVME();
+	void BuildYCameraConeVME();
+	void BuildZCameraConeVME();
+	
 	void HideMafVMEVolume();
 
 	void ShowMafVMEMesh( mafNode * node );
@@ -170,7 +177,8 @@ protected:
 	mafGUI				*m_GuiGizmos;
 
 	medVMEPolylineEditor *m_CurrentPolylineGraphEditor;
-
-
+	mafVMESurface *m_XCameraConeVME;
+	mafVMESurface *m_YCameraConeVME;
+	mafVMESurface *m_ZCameraConeVME;
 };
 #endif

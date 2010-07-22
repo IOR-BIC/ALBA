@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2010-07-21 09:48:59 $
-Version:   $Revision: 1.1.2.5 $
+Date:      $Date: 2010-07-22 09:41:50 $
+Version:   $Revision: 1.1.2.6 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -68,7 +68,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkPolyDataNormals.h"
 #include "vtkCamera.h"
 #include "vtkImageData.h"
-
+#include "vtkConeSource.h"
+#include "vtkProperty.h"
 
 mafCxxTypeMacro(medViewArbitraryOrthoSlice);
 
@@ -95,7 +96,6 @@ enum AXIS_ID
 	Y_AXIS,
 	Z_AXIS,
 };
-
 
 medViewArbitraryOrthoSlice::medViewArbitraryOrthoSlice(wxString label, bool show_ruler)
 : medViewCompoundWindowing(label, 2, 2)
@@ -139,7 +139,10 @@ medViewArbitraryOrthoSlice::medViewArbitraryOrthoSlice(wxString label, bool show
 	m_VolumeVTKDataCenterABSCoordinatesReset[2] = 0.0;
 
 	m_ComboChooseActiveGizmo = GIZMO_ROTATE;
-
+	
+	m_XCameraConeVME = NULL;
+	m_YCameraConeVME = NULL;
+	m_ZCameraConeVME = NULL;
 }
 
 medViewArbitraryOrthoSlice::~medViewArbitraryOrthoSlice()
@@ -771,69 +774,66 @@ void medViewArbitraryOrthoSlice::VolumeWindowing(mafVME *volume)
 
 void medViewArbitraryOrthoSlice::ShowMafVMEVolume( mafVME * vme, bool show )
 {
-	{
-		double sr[2],volumeVTKDataCenterLocalCoords[3];
-		mafVME *vmeVolume=mafVME::SafeDownCast(vme);
-		m_CurrentVolume = vmeVolume;
+	double sr[2],volumeVTKDataCenterLocalCoords[3];
+	mafVME *vmeVolume=mafVME::SafeDownCast(vme);
+	m_CurrentVolume = vmeVolume;
 
-    EnableWidgets(true);
+	EnableWidgets(true);
 
-		vtkDataSet *volumeVTKData = vmeVolume->GetOutput()->GetVTKData();
-		volumeVTKData->Update();
+	vtkDataSet *volumeVTKData = vmeVolume->GetOutput()->GetVTKData();
+	volumeVTKData->Update();
 
-		volumeVTKData->GetCenter(volumeVTKDataCenterLocalCoords);
+	volumeVTKData->GetCenter(volumeVTKDataCenterLocalCoords);
 
-		volumeVTKData->GetScalarRange(sr);
-		volumeVTKData=NULL;
+	volumeVTKData->GetScalarRange(sr);
+	volumeVTKData=NULL;
 
-		mafTransform::GetOrientation(vmeVolume->GetAbsMatrixPipe()->GetMatrix(),m_VolumeVTKDataABSOrientation);
+	mafTransform::GetOrientation(vmeVolume->GetAbsMatrixPipe()->GetMatrix(),m_VolumeVTKDataABSOrientation);
 
-		// Compute the center of Volume in absolute coordinates
-		// Needed to position the surface and the gizmo
-		vtkPoints *points;
-		vtkNEW(points);
-		points->InsertNextPoint(volumeVTKDataCenterLocalCoords);
+	// Compute the center of Volume in absolute coordinates
+	// Needed to position the surface and the gizmo
+	vtkPoints *points;
+	vtkNEW(points);
+	points->InsertNextPoint(volumeVTKDataCenterLocalCoords);
 
-		vtkPolyData *sliceCenterLocalCoordsPolydata=vtkPolyData::New();
-		sliceCenterLocalCoordsPolydata->SetPoints(points);
+	vtkPolyData *sliceCenterLocalCoordsPolydata=vtkPolyData::New();
+	sliceCenterLocalCoordsPolydata->SetPoints(points);
 
-		vtkTransform *sliceCenterLocalCoordsToABSCoordsTransform;
-		vtkNEW(sliceCenterLocalCoordsToABSCoordsTransform);
-		sliceCenterLocalCoordsToABSCoordsTransform->Identity();
-		sliceCenterLocalCoordsToABSCoordsTransform->SetMatrix(vmeVolume->GetOutput()->GetMatrix()->GetVTKMatrix());
-		sliceCenterLocalCoordsToABSCoordsTransform->Update();
+	vtkTransform *sliceCenterLocalCoordsToABSCoordsTransform;
+	vtkNEW(sliceCenterLocalCoordsToABSCoordsTransform);
+	sliceCenterLocalCoordsToABSCoordsTransform->Identity();
+	sliceCenterLocalCoordsToABSCoordsTransform->SetMatrix(vmeVolume->GetOutput()->GetMatrix()->GetVTKMatrix());
+	sliceCenterLocalCoordsToABSCoordsTransform->Update();
 
-		vtkTransformPolyDataFilter *localToABSTPDF;
-		vtkNEW(localToABSTPDF);
-		localToABSTPDF->SetInput(sliceCenterLocalCoordsPolydata);
-		localToABSTPDF->SetTransform(sliceCenterLocalCoordsToABSCoordsTransform);
-		localToABSTPDF->Update();
-		localToABSTPDF->GetOutput()->GetCenter(m_VolumeVTKDataCenterABSCoords);
-		localToABSTPDF->GetOutput()->GetCenter(m_VolumeVTKDataCenterABSCoordinatesReset);
-	
-		vtkTransform *transformReset;
-		vtkNEW(transformReset);
-		transformReset->Identity();
-		transformReset->Translate(m_VolumeVTKDataCenterABSCoordinatesReset);
-		transformReset->RotateZ(m_VolumeVTKDataABSOrientation[2]);
-		transformReset->RotateX(m_VolumeVTKDataABSOrientation[0]);
-		transformReset->RotateY(m_VolumeVTKDataABSOrientation[1]);
-		transformReset->Update();
+	vtkTransformPolyDataFilter *localToABSTPDF;
+	vtkNEW(localToABSTPDF);
+	localToABSTPDF->SetInput(sliceCenterLocalCoordsPolydata);
+	localToABSTPDF->SetTransform(sliceCenterLocalCoordsToABSCoordsTransform);
+	localToABSTPDF->Update();
+	localToABSTPDF->GetOutput()->GetCenter(m_VolumeVTKDataCenterABSCoords);
+	localToABSTPDF->GetOutput()->GetCenter(m_VolumeVTKDataCenterABSCoordinatesReset);
 
-    mafNEW(m_SlicerZResetMatrix);
-    m_SlicerZResetMatrix->Identity();
-    m_SlicerZResetMatrix->SetVTKMatrix(transformReset->GetMatrix());
+	vtkTransform *transformReset;
+	vtkNEW(transformReset);
+	transformReset->Identity();
+	transformReset->Translate(m_VolumeVTKDataCenterABSCoordinatesReset);
+	transformReset->RotateZ(m_VolumeVTKDataABSOrientation[2]);
+	transformReset->RotateX(m_VolumeVTKDataABSOrientation[0]);
+	transformReset->RotateY(m_VolumeVTKDataABSOrientation[1]);
+	transformReset->Update();
 
-		ShowSlicers(vmeVolume, show);
+	mafNEW(m_SlicerZResetMatrix);
+	m_SlicerZResetMatrix->Identity();
+	m_SlicerZResetMatrix->SetVTKMatrix(transformReset->GetMatrix());
 
-		vtkDEL(points);
-		vtkDEL(sliceCenterLocalCoordsPolydata);
-		vtkDEL(sliceCenterLocalCoordsToABSCoordsTransform);
-		vtkDEL(localToABSTPDF);
-		vtkDEL(transformReset);
+	ShowSlicers(vmeVolume, show);
 
-   
-	}
+	vtkDEL(points);
+	vtkDEL(sliceCenterLocalCoordsPolydata);
+	vtkDEL(sliceCenterLocalCoordsToABSCoordsTransform);
+	vtkDEL(localToABSTPDF);
+	vtkDEL(transformReset);
+
 }
 
 void medViewArbitraryOrthoSlice::ShowMedVMEPolylineEditor( mafNode * node )
@@ -897,17 +897,29 @@ void medViewArbitraryOrthoSlice::HideMafVMEVolume()
 
   EnableWidgets(false);
 
+	m_XCameraConeVME->ReparentTo(NULL);
+    mafDEL(m_XCameraConeVME);
+
 	m_AttachCameraToSlicerXInXView->SetVme(NULL);
 	m_SlicerX->SetBehavior(NULL);
 	m_SlicerX->ReparentTo(NULL);
+	mafDEL(m_SlicerX);
+
+	m_YCameraConeVME->ReparentTo(NULL);
+	mafDEL(m_YCameraConeVME);
 
 	m_AttachCameraToSlicerYInYView->SetVme(NULL);
 	m_SlicerY->SetBehavior(NULL);
 	m_SlicerY->ReparentTo(NULL);
+	mafDEL(m_SlicerY);
+
+	m_ZCameraConeVME->ReparentTo(NULL);
+	mafDEL(m_ZCameraConeVME);
 
 	m_AttachCameraToSlicerZInZView->SetVme(NULL);
 	m_SlicerZ->SetBehavior(NULL);
 	m_SlicerZ->ReparentTo(NULL);
+	mafDEL(m_SlicerZ);
 
 	//remove gizmos
 	m_Gui->Remove(m_GuiGizmos);
@@ -915,17 +927,14 @@ void medViewArbitraryOrthoSlice::HideMafVMEVolume()
 	m_GizmoTranslate->Show(false);
 	m_GizmoRotate->Show(false);
 
-	mafDEL(m_SlicerX);
-	mafDEL(m_SlicerY);
-	mafDEL(m_SlicerZ);
-
+	
 	cppDEL(m_GizmoTranslate);
 	cppDEL(m_GizmoRotate);
 	cppDEL(m_GuiGizmos);
 	
-  mafDEL(m_SlicerXResetMatrix);
-  mafDEL(m_SlicerYResetMatrix);
-  mafDEL(m_SlicerZResetMatrix);
+	mafDEL(m_SlicerXResetMatrix);
+	mafDEL(m_SlicerYResetMatrix);
+	mafDEL(m_SlicerZResetMatrix);
 
 	m_CurrentVolume = NULL;
 	m_ColorLUT = NULL;
@@ -1131,9 +1140,9 @@ void medViewArbitraryOrthoSlice::ShowSlicers( mafVME * vmeVolume, bool show )
 	slicerXTransform->RotateY(89.999);
 	slicerXTransform->Update();
 
-  mafNEW(m_SlicerXResetMatrix);
-  m_SlicerXResetMatrix->Identity();
-  m_SlicerXResetMatrix->DeepCopy(slicerXTransform->GetMatrix());
+	mafNEW(m_SlicerXResetMatrix);
+	m_SlicerXResetMatrix->Identity();
+	m_SlicerXResetMatrix->DeepCopy(slicerXTransform->GetMatrix());
 
 	mafNEW(m_SlicerX);
 	m_SlicerX->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 0.0));
@@ -1147,14 +1156,16 @@ void medViewArbitraryOrthoSlice::ShowSlicers( mafVME * vmeVolume, bool show )
 	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_SlicerX, show);
 	m_ChildViewList[X_VIEW]->VmeShow(m_SlicerX, show);
 
+	BuildXCameraConeVME();
+
 	vtkMAFSmartPointer<vtkTransform> slicerYTransform;
 	slicerYTransform->SetMatrix(m_SlicerZResetMatrix->GetVTKMatrix());
 	slicerYTransform->RotateX(90);
 	slicerYTransform->Update();
 
-  mafNEW(m_SlicerYResetMatrix);
-  m_SlicerYResetMatrix->Identity();
-  m_SlicerYResetMatrix->DeepCopy(slicerYTransform->GetMatrix());
+	mafNEW(m_SlicerYResetMatrix);
+	m_SlicerYResetMatrix->Identity();
+	m_SlicerYResetMatrix->DeepCopy(slicerYTransform->GetMatrix());
 
 	mafNEW(m_SlicerY);
 	m_SlicerY->SetName("m_SlicerY");
@@ -1168,6 +1179,8 @@ void medViewArbitraryOrthoSlice::ShowSlicers( mafVME * vmeVolume, bool show )
 	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_SlicerY, show);
 	m_ChildViewList[Y_VIEW]->VmeShow(m_SlicerY, show);
 
+	BuildYCameraConeVME();
+
 	mafNEW(m_SlicerZ);
 	m_SlicerZ->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 0.0));
 	m_SlicerZ->SetName("m_SlicerZ");
@@ -1179,6 +1192,8 @@ void medViewArbitraryOrthoSlice::ShowSlicers( mafVME * vmeVolume, bool show )
 
 	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_SlicerZ, show);
 	m_ChildViewList[Z_VIEW]->VmeShow(m_SlicerZ, show);
+
+	BuildZCameraConeVME();
 
 	mafPipeSurfaceTextured *pipePerspectiveViewZ=(mafPipeSurfaceTextured *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_SlicerZ);
 	pipePerspectiveViewZ->SetActorPicking(false);
@@ -1276,4 +1291,188 @@ void medViewArbitraryOrthoSlice::ShowSlicers( mafVME * vmeVolume, bool show )
 	m_SlicerZ->SetVisibleToTraverse(false);
 
 	CameraUpdate();
+}
+
+void medViewArbitraryOrthoSlice::BuildXCameraConeVME()
+{
+	double b[6] = {0,0,0,0,0,0};
+	assert(m_CurrentVolume);
+	m_CurrentVolume->GetOutput()->GetBounds(b);
+
+	double p1[3] = {0,0,0};
+	double p2[3] = {0,0,0};
+
+	p1[0] = b[0];
+	p1[1] = b[2];
+	p1[2] = b[4];
+	p2[0] = b[1];
+	p2[1] = b[3];
+	p2[2] = b[5];
+
+	double d = sqrt(vtkMath::Distance2BetweenPoints(p1,p2));
+
+	vtkConeSource *coneSource = vtkConeSource::New();
+	coneSource->SetCenter(0,0,d/2);
+	coneSource->SetResolution(20);
+	coneSource->SetDirection(0,0,-1);
+
+	coneSource->SetRadius(d / 3);
+	coneSource->SetHeight(d / 3);
+
+	coneSource->CappingOn();
+	coneSource->Update();
+
+	mafNEW(m_XCameraConeVME);
+	// DEBUG
+	m_XCameraConeVME->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 0.0));
+	m_XCameraConeVME->SetName("Cone X Camera");
+	m_XCameraConeVME->SetData(coneSource->GetOutput(), m_CurrentVolume->GetTimeStamp());
+	m_XCameraConeVME->SetVisibleToTraverse(false);
+
+	m_XCameraConeVME->GetMaterial()->m_Prop->SetColor(1,0,0);
+	m_XCameraConeVME->GetMaterial()->m_Prop->SetAmbient(1);
+	m_XCameraConeVME->GetMaterial()->m_Prop->SetDiffuse(0);
+	m_XCameraConeVME->GetMaterial()->m_Prop->SetSpecular(0);
+	m_XCameraConeVME->GetMaterial()->m_Prop->SetOpacity(0.3);
+
+	assert(m_SlicerX);
+	m_XCameraConeVME->ReparentTo(m_SlicerX);
+
+	// DEBUG
+	//m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_XCameraConeVME, true);
+	m_ChildViewList[Y_VIEW]->VmeShow(m_XCameraConeVME, true);
+	m_ChildViewList[Z_VIEW]->VmeShow(m_XCameraConeVME, true);
+	//m_ChildViewList[Z_VIEW]->VmeShow(m_ConeVME, true);
+
+	//mafPipeSurface *pipe=(mafPipeSurface *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_XCameraConeVME);
+	//pipe->SetActorPicking(false);
+
+	mafPipeSurface *pipeY=(mafPipeSurface *)(m_ChildViewList[Y_VIEW])->GetNodePipe(m_XCameraConeVME);
+	pipeY->SetActorPicking(false);
+
+	mafPipeSurface *pipeZ=(mafPipeSurface *)(m_ChildViewList[Z_VIEW])->GetNodePipe(m_XCameraConeVME);
+	pipeZ->SetActorPicking(false);
+
+	coneSource->Delete();
+}
+
+void medViewArbitraryOrthoSlice::BuildYCameraConeVME()
+{
+	double b[6] = {0,0,0,0,0,0};
+	assert(m_CurrentVolume);
+	m_CurrentVolume->GetOutput()->GetBounds(b);
+
+	double p1[3] = {0,0,0};
+	double p2[3] = {0,0,0};
+
+	p1[0] = b[0];
+	p1[1] = b[2];
+	p1[2] = b[4];
+	p2[0] = b[1];
+	p2[1] = b[3];
+	p2[2] = b[5];
+
+	double d = sqrt(vtkMath::Distance2BetweenPoints(p1,p2));
+
+	vtkConeSource *coneSource = vtkConeSource::New();
+	coneSource->SetCenter(0,0,d/2);
+	coneSource->SetResolution(20);
+	coneSource->SetDirection(0,0,-1);
+	
+	coneSource->SetRadius(d / 3);
+	coneSource->SetHeight(d / 3);
+
+	coneSource->CappingOn();
+	coneSource->Update();
+
+	mafNEW(m_YCameraConeVME);
+	// DEBUG
+	m_YCameraConeVME->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 0.0));
+	m_YCameraConeVME->SetName("m_YCameraConeVME");
+	m_YCameraConeVME->SetData(coneSource->GetOutput(), m_CurrentVolume->GetTimeStamp());
+	m_YCameraConeVME->SetVisibleToTraverse(false);
+
+	m_YCameraConeVME->GetMaterial()->m_Prop->SetColor(0,1,0);
+	m_YCameraConeVME->GetMaterial()->m_Prop->SetAmbient(1);
+	m_YCameraConeVME->GetMaterial()->m_Prop->SetDiffuse(0);
+	m_YCameraConeVME->GetMaterial()->m_Prop->SetSpecular(0);
+	m_YCameraConeVME->GetMaterial()->m_Prop->SetOpacity(0.3);
+
+	assert(m_SlicerY);
+	m_YCameraConeVME->ReparentTo(m_SlicerY);
+
+	// DEBUG
+	//m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_YCameraConeVME, true);
+	m_ChildViewList[X_VIEW]->VmeShow(m_YCameraConeVME, true);
+	//m_ChildViewList[Y_VIEW]->VmeShow(m_YCameraConeVME, true);
+	m_ChildViewList[Z_VIEW]->VmeShow(m_YCameraConeVME, true);
+	
+	mafPipeSurface *pipeX=(mafPipeSurface *)(m_ChildViewList[X_VIEW])->GetNodePipe(m_YCameraConeVME);
+	pipeX->SetActorPicking(false);
+
+	mafPipeSurface *pipeZ=(mafPipeSurface *)(m_ChildViewList[Z_VIEW])->GetNodePipe(m_YCameraConeVME);
+	pipeZ->SetActorPicking(false);
+
+	coneSource->Delete();
+}
+
+void medViewArbitraryOrthoSlice::BuildZCameraConeVME()
+{
+	double b[6] = {0,0,0,0,0,0};
+	assert(m_CurrentVolume);
+	m_CurrentVolume->GetOutput()->GetBounds(b);
+
+	double p1[3] = {0,0,0};
+	double p2[3] = {0,0,0};
+
+	p1[0] = b[0];
+	p1[1] = b[2];
+	p1[2] = b[4];
+	p2[0] = b[1];
+	p2[1] = b[3];
+	p2[2] = b[5];
+
+	double d = sqrt(vtkMath::Distance2BetweenPoints(p1,p2));
+
+	vtkConeSource *coneSource = vtkConeSource::New();
+	coneSource->SetCenter(0,0,d/2);
+	coneSource->SetResolution(20);
+	coneSource->SetDirection(0,0,-1);
+
+	coneSource->SetRadius(d / 3);
+	coneSource->SetHeight(d / 3);
+
+	coneSource->CappingOn();
+	coneSource->Update();
+
+	mafNEW(m_ZCameraConeVME);
+	// DEBUG
+	m_ZCameraConeVME->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 0.0));
+	m_ZCameraConeVME->SetName("m_ZCameraConeVME");
+	m_ZCameraConeVME->SetData(coneSource->GetOutput(), m_CurrentVolume->GetTimeStamp());
+	m_ZCameraConeVME->SetVisibleToTraverse(false);
+
+	m_ZCameraConeVME->GetMaterial()->m_Prop->SetColor(0,0,1);
+	m_ZCameraConeVME->GetMaterial()->m_Prop->SetAmbient(1);
+	m_ZCameraConeVME->GetMaterial()->m_Prop->SetDiffuse(0);
+	m_ZCameraConeVME->GetMaterial()->m_Prop->SetSpecular(0);
+	m_ZCameraConeVME->GetMaterial()->m_Prop->SetOpacity(0.3);
+
+	assert(m_SlicerY);
+	m_ZCameraConeVME->ReparentTo(m_SlicerZ);
+
+	// DEBUG
+	//m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_ZCameraConeVME, true);
+	m_ChildViewList[X_VIEW]->VmeShow(m_ZCameraConeVME, true);
+	//m_ChildViewList[Y_VIEW]->VmeShow(m_ZCameraConeVME, true);
+	m_ChildViewList[Y_VIEW]->VmeShow(m_ZCameraConeVME, true);
+
+	mafPipeSurface *pipeX=(mafPipeSurface *)(m_ChildViewList[X_VIEW])->GetNodePipe(m_ZCameraConeVME);
+	pipeX->SetActorPicking(false);
+
+	mafPipeSurface *pipeY=(mafPipeSurface *)(m_ChildViewList[Y_VIEW])->GetNodePipe(m_ZCameraConeVME);
+	pipeY->SetActorPicking(false);
+
+	coneSource->Delete();
+	CameraReset();
 }
