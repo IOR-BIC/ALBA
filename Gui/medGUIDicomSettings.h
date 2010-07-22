@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.h,v $
 Language:  C++
-Date:      $Date: 2010-06-03 08:01:52 $
-Version:   $Revision: 1.5.2.13 $
+Date:      $Date: 2010-07-22 14:55:04 $
+Version:   $Revision: 1.5.2.14 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -145,6 +145,10 @@ public:
   /** Enable/disable a particular type of Dicom to be read */
   void SetEnableToRead(char *type,bool enable);
 
+  /** Helper function to store and retrieve the last dicom dir opened */
+  void SetLastDicomDir(wxString lastDicomDir) {m_LastDicomDir = lastDicomDir;};
+  wxString GetLastDicomDir() {return m_LastDicomDir;};
+
 protected:
 	/** Create the GUI for the setting panel.*/
 	void CreateGui();
@@ -175,7 +179,7 @@ protected:
   int m_PercentageTolerance;
   int m_AutoVMEType;
   int m_VisualizePosition;
-
+  wxString m_LastDicomDir;
   double m_ScalarDistanceTolerance;
   double m_PercentageDistanceTolerance;
 

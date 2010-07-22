@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2010-05-24 09:47:40 $
-Version:   $Revision: 1.7.2.12 $
+Date:      $Date: 2010-07-22 14:55:04 $
+Version:   $Revision: 1.7.2.13 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -49,7 +49,7 @@ mafGUISettings(Listener, label)
   m_OutputType = 0;
   m_ScalarDistanceTolerance = 0.3;
   m_PercentageDistanceTolerance = 88;
-
+  m_LastDicomDir = "UNEDFINED_m_LastDicomDir";
   m_Step = ID_1X;
 
   m_Config->SetPath("Importer Dicom"); // Regiser key path Added by Losi 15.11.2009
@@ -245,80 +245,80 @@ void medGUIDicomSettings::InitializeSettings()
 {
 	wxString string_item;
 	long long_item;
-  double double_item;
+	double double_item;
 
-  if(m_Config->Read("EnableSide", &long_item))
-  {
-    m_EnableChangeSide=long_item;
-  }
-  else
-  {
-    m_Config->Write("EnableSide",m_EnableChangeSide);
-  }
+	if(m_Config->Read("EnableSide", &long_item))
+	{
+		m_EnableChangeSide=long_item;
+	}
+	else
+	{
+		m_Config->Write("EnableSide",m_EnableChangeSide);
+	}
 
-  if(m_Config->Read("EnableDiscardPosition", &long_item))
-  {
-    m_EnableDiscardPosition=long_item;
-  }
-  else
-  {
-    m_Config->Write("EnableDiscardPosition",m_EnableDiscardPosition);
-  }
+	if(m_Config->Read("EnableDiscardPosition", &long_item))
+	{
+		m_EnableDiscardPosition=long_item;
+	}
+	else
+	{
+		m_Config->Write("EnableDiscardPosition",m_EnableDiscardPosition);
+	}
 
-  if(m_Config->Read("EnableResampleVolume", &long_item))
-  {
-    m_EnableResampleVolume=long_item;
-  }
-  else
-  {
-    m_Config->Write("EnableResampleVolume",m_EnableResampleVolume);
-  }
+	if(m_Config->Read("EnableResampleVolume", &long_item))
+	{
+		m_EnableResampleVolume=long_item;
+	}
+	else
+	{
+		m_Config->Write("EnableResampleVolume",m_EnableResampleVolume);
+	}
 
-  if(m_Config->Read("EnableRescaleTo16Bit", &long_item))
-  {
-    m_EnableRescaleTo16Bit=long_item;
-  }
-  else
-  {
-    m_Config->Write("EnableRescaleTo16Bit",m_EnableRescaleTo16Bit);
-  }
+	if(m_Config->Read("EnableRescaleTo16Bit", &long_item))
+	{
+		m_EnableRescaleTo16Bit=long_item;
+	}
+	else
+	{
+		m_Config->Write("EnableRescaleTo16Bit",m_EnableRescaleTo16Bit);
+	}
 
-  if(m_Config->Read("EnableVisualizationPosition", &long_item))
-  {
-    m_VisualizePosition=long_item;
-  }
-  else
-  {
-    m_Config->Write("EnableVisualizationPosition",m_VisualizePosition);
-  }
+	if(m_Config->Read("EnableVisualizationPosition", &long_item))
+	{
+		m_VisualizePosition=long_item;
+	}
+	else
+	{
+		m_Config->Write("EnableVisualizationPosition",m_VisualizePosition);
+	}
 
-  if(m_Config->Read("EnableZCrop", &long_item))
-  {
-    m_EnableZCrop=long_item;
-  }
-  else
-  {
-    m_Config->Write("EnableZCrop",m_EnableZCrop);
-  }
+	if(m_Config->Read("EnableZCrop", &long_item))
+	{
+		m_EnableZCrop=long_item;
+	}
+	else
+	{
+		m_Config->Write("EnableZCrop",m_EnableZCrop);
+	}
 
 
-  if(m_Config->Read("StepOfBuild", &long_item))
-  {
-    m_Step=long_item;
-  }
-  else
-  {
-    m_Config->Write("StepOfBuild",m_Step);
-  }
+	if(m_Config->Read("StepOfBuild", &long_item))
+	{
+		m_Step=long_item;
+	}
+	else
+	{
+		m_Config->Write("StepOfBuild",m_Step);
+	}
 
-// 	if(m_Config->Read("DicomDictionary", &string_item))
-// 	{
-// 		m_Dictionary=string_item.c_str();
-// 	}
-// 	else
-// 	{
-// 		m_Config->Write("DicomDictionary",m_Dictionary.GetCStr());
-// 	}
+	if(m_Config->Read("LastDicomDir", &string_item))
+	{
+		m_LastDicomDir=string_item.c_str();
+	}
+	else
+	{
+		m_Config->Write("LastDicomDir",m_LastDicomDir.c_str());
+	}
 
 	if(m_Config->Read("EnableReadCT", &long_item))
 	{
@@ -356,23 +356,23 @@ void medGUIDicomSettings::InitializeSettings()
 		m_Config->Write("EnableReadXA",m_CheckOnOff[3]);
 	}
 
-  if(m_Config->Read("EnableReadOT", &long_item))
-  {
-    m_CheckOnOff[4]=long_item;
-  }
-  else
-  {
-    m_Config->Write("EnableReadOT",m_CheckOnOff[4]);
-  }
+	if(m_Config->Read("EnableReadOT", &long_item))
+	{
+		m_CheckOnOff[4]=long_item;
+	}
+	else
+	{
+		m_Config->Write("EnableReadOT",m_CheckOnOff[4]);
+	}
 
-  if(m_Config->Read("EnableReadCR", &long_item))
-  {
-    m_CheckOnOff[5]=long_item;
-  }
-  else
-  {
-    m_Config->Write("EnableReadCR",m_CheckOnOff[5]);
-  }
+	if(m_Config->Read("EnableReadCR", &long_item))
+	{
+		m_CheckOnOff[5]=long_item;
+	}
+	else
+	{
+		m_Config->Write("EnableReadCR",m_CheckOnOff[5]);
+	}
 
 	if(m_Config->Read("AutoCropPos", &long_item))
 	{
@@ -383,23 +383,23 @@ void medGUIDicomSettings::InitializeSettings()
 		m_Config->Write("AutoCropPos",m_AutoCropPos);
 	}
 
-  if(m_Config->Read("AutoVMEType", &long_item))
-  {
-    m_AutoVMEType=long_item;
-  }
-  else
-  {
-    m_Config->Write("AutoVMEType",m_AutoVMEType);
-  }
+	if(m_Config->Read("AutoVMEType", &long_item))
+	{
+		m_AutoVMEType=long_item;
+	}
+	else
+	{
+		m_Config->Write("AutoVMEType",m_AutoVMEType);
+	}
 
-  if(m_Config->Read("VMEType", &long_item))
-  {
-    m_OutputType=long_item;
-  }
-  else
-  {
-    m_Config->Write("VMEType",m_OutputType);
-  }
+	if(m_Config->Read("VMEType", &long_item))
+	{
+		m_OutputType=long_item;
+	}
+	else
+	{
+		m_Config->Write("VMEType",m_OutputType);
+	}
 
 	if(m_Config->Read("EnableTimeBar", &long_item))
 	{
@@ -419,41 +419,41 @@ void medGUIDicomSettings::InitializeSettings()
 		m_Config->Write("EnableNumberOfSlice",m_EnableNumberOfSlice);
 	}
 
-  if(m_Config->Read("EnableScalarDistance", &long_item))
-  {
-    m_ScalarTolerance=long_item;
-  }
-  else
-  {
-    m_Config->Write("EnableScalarDistance",m_ScalarTolerance);
-  }
+	if(m_Config->Read("EnableScalarDistance", &long_item))
+	{
+		m_ScalarTolerance=long_item;
+	}
+	else
+	{
+		m_Config->Write("EnableScalarDistance",m_ScalarTolerance);
+	}
 
-  if(m_Config->Read("ScalarDistance", &double_item))
-  {
-    m_ScalarDistanceTolerance=double_item;
-  }
-  else
-  {
-    m_Config->Write("ScalarDistance",m_ScalarDistanceTolerance);
-  }
+	if(m_Config->Read("ScalarDistance", &double_item))
+	{
+		m_ScalarDistanceTolerance=double_item;
+	}
+	else
+	{
+		m_Config->Write("ScalarDistance",m_ScalarDistanceTolerance);
+	}
 
-  if(m_Config->Read("EnablePercentageDistance", &long_item))
-  {
-    m_PercentageTolerance=long_item;
-  }
-  else
-  {
-    m_Config->Write("EnablePercentageDistance",m_PercentageTolerance);
-  }
+	if(m_Config->Read("EnablePercentageDistance", &long_item))
+	{
+		m_PercentageTolerance=long_item;
+	}
+	else
+	{
+		m_Config->Write("EnablePercentageDistance",m_PercentageTolerance);
+	}
 
-  if(m_Config->Read("PercentageDistance", &double_item))
-  {
-    m_PercentageDistanceTolerance=double_item;
-  }
-  else
-  {
-    m_Config->Write("PercentageDistance",m_PercentageDistanceTolerance);
-  }
+	if(m_Config->Read("PercentageDistance", &double_item))
+	{
+		m_PercentageDistanceTolerance=double_item;
+	}
+	else
+	{
+		m_Config->Write("PercentageDistance",m_PercentageDistanceTolerance);
+	}
 
 
 	m_Config->Flush();

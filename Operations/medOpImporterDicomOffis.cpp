@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-07-19 09:51:49 $
-Version:   $Revision: 1.1.2.116 $
+Date:      $Date: 2010-07-22 14:55:24 $
+Version:   $Revision: 1.1.2.117 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -394,16 +394,25 @@ void medOpImporterDicomOffis::OpRun()
 	do 
 	{
 		if (m_DicomDirectoryABSFileName == "")
-		{
-			wxString path = (mafGetApplicationDirectory()+"/data/external/").c_str();
-			wxDirDialog dialog(m_Wizard->GetParent(),"", path,wxRESIZE_BORDER, m_Wizard->GetPosition());
+		{	
+			wxString lastDicomDir = ((medGUIDicomSettings*)GetSetting())->GetLastDicomDir();
+			
+			if (lastDicomDir == "UNEDFINED_m_LastDicomDir")
+			{
+				wxString defaultPath = (mafGetApplicationDirectory()+"/data/external/").c_str();
+				lastDicomDir = defaultPath;		
+			};
 
+			wxDirDialog dialog(m_Wizard->GetParent(),"", lastDicomDir,wxRESIZE_BORDER, m_Wizard->GetPosition());
 			dialog.SetReturnCode(wxID_OK);
 			int ret_code = dialog.ShowModal();
 
+			
+
 			if (ret_code == wxID_OK)
 			{
-				path = dialog.GetPath();
+				wxString path = dialog.GetPath();
+				((medGUIDicomSettings*)GetSetting())->SetLastDicomDir(path);
 				m_DicomDirectoryABSFileName = path.c_str();
 				GuiUpdate();
 				result = OpenDir();
