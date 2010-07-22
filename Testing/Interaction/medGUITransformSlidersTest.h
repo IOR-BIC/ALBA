@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUITransformSlidersTest.h,v $
 Language:  C++
-Date:      $Date: 2010-07-21 13:04:47 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-07-22 08:55:13 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -68,6 +68,7 @@ public:
   CPPUNIT_TEST( TestSetAbsPose2 );
   CPPUNIT_TEST( TestSetAbsPose3 );
   CPPUNIT_TEST( TestReset );
+  CPPUNIT_TEST( TestOnEvent );
   CPPUNIT_TEST_SUITE_END();
 
 protected:
@@ -79,6 +80,7 @@ protected:
   void TestSetAbsPose2();
   void TestSetAbsPose3();
   void TestReset();
+  void TestOnEvent();
 
 };
 

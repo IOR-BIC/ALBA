@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUITransformSlidersTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-07-21 13:04:47 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-07-22 08:55:13 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -63,16 +63,25 @@ public:
 
   DummyObserver() 
   {
+    m_LastReceivedEventID = -1;
   };
   ~DummyObserver()
   {
   };
 
-  virtual void OnEvent(mafEventBase *maf_event)
+  void	DummyObserver::OnEvent(mafEventBase *maf_event)
   {
+    m_LastReceivedEventID =  maf_event->GetId();
+  }
+
+  int DummyObserver::GetLastReceivedEventID()
+  {
+    return m_LastReceivedEventID;
   }
 
 protected:
+
+  int m_LastReceivedEventID;
 };
 //-----------------------------------------------------------
 void medGUITransformSlidersTest::setUp()
@@ -94,12 +103,10 @@ void medGUITransformSlidersTest::TestFixture()
 void medGUITransformSlidersTest::TestDynamicAllocation() 
 //-----------------------------------------------------------
 {
-  DummyObserver *observer = new DummyObserver();
   mafSmartPointer<mafVMEGroup> group;
   double range[6] = {0,0,0,0,0,0};
   medGUITransformSliders *transform = new medGUITransformSliders(group,range,NULL,true,true);
   delete transform;
-  delete observer;
 }
 //-----------------------------------------------------------
 void medGUITransformSlidersTest::TestStaticAllocation() 
@@ -110,7 +117,6 @@ void medGUITransformSlidersTest::TestStaticAllocation()
 void medGUITransformSlidersTest::TestSetAbsPose1() 
 //-----------------------------------------------------------
 {
-  DummyObserver *observer = new DummyObserver();
   mafSmartPointer<mafVMEGroup> group;
   double range[6] = {0,0,0,0,0,0};
   medGUITransformSliders *transform = new medGUITransformSliders(group,range,NULL,true,true);
@@ -137,13 +143,11 @@ void medGUITransformSlidersTest::TestSetAbsPose1()
 
   delete matrix;
   delete transform;
-  delete observer;
 }
 //-----------------------------------------------------------
 void medGUITransformSlidersTest::TestSetAbsPose2() 
 //-----------------------------------------------------------
 {
-  DummyObserver *observer = new DummyObserver();
   mafSmartPointer<mafVMEGroup> group;
   group->SetAbsPose(15,-10,20,0.0,0.0,0.0);
   group->Update();
@@ -155,20 +159,18 @@ void medGUITransformSlidersTest::TestSetAbsPose2()
 
   transform->SetAbsPose(matrix);
 
-  double pos[3],orientation[3],scaling[3];
+  double pos[3];
   transform->GetPosition(pos);
 
   CPPUNIT_ASSERT(pos[0] == -5 && pos[1] == 30 && pos[2] == 10);
 
   delete matrix;
   delete transform;
-  delete observer;
 }
 //-----------------------------------------------------------
 void medGUITransformSlidersTest::TestSetAbsPose3() 
 //-----------------------------------------------------------
 {
-  DummyObserver *observer = new DummyObserver();
   mafSmartPointer<mafVMEGroup> group;
   group->SetAbsPose(0,0,0,15.0,0.0,0.0);
   group->Update();
@@ -189,13 +191,11 @@ void medGUITransformSlidersTest::TestSetAbsPose3()
 
   delete matrix;
   delete transform;
-  delete observer;
 }
 //-----------------------------------------------------------
 void medGUITransformSlidersTest::TestReset()
 //-----------------------------------------------------------
 {
-  DummyObserver *observer = new DummyObserver();
   mafSmartPointer<mafVMEGroup> group;
   double range[6] = {0,0,0,0,0,0};
   medGUITransformSliders *transform = new medGUITransformSliders(group,range,NULL,true,true);
@@ -236,5 +236,29 @@ void medGUITransformSlidersTest::TestReset()
 
   delete matrix;
   delete transform;
-  delete observer;
+}
+//-----------------------------------------------------------
+void medGUITransformSlidersTest::TestOnEvent() 
+//-----------------------------------------------------------
+{
+  DummyObserver *dummyObserver = new DummyObserver();
+
+  mafSmartPointer<mafVMEGroup> group;
+  double range[6] = {0,0,0,0,0,0};
+  medGUITransformSliders *transform = new medGUITransformSliders(group,range,dummyObserver,true,true);
+
+  //  in response to an ID_TRANSLATE_X event from GUI...(*)
+  mafEvent eventSent(this, medGUITransformSliders::ID_TRANSLATE_X);
+  transform->OnEvent(&eventSent);
+
+  int dummyReceivedEventID = dummyObserver->GetLastReceivedEventID();
+
+  // (*)... the observer is notified with a ID_TRANSFORM event 
+  // containing the already set VME ABS matrix
+  CPPUNIT_ASSERT(dummyReceivedEventID == ID_TRANSFORM);
+
+  cppDEL(transform);
+
+  cppDEL(dummyObserver);
+  delete transform;
 }
