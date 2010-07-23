@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-07-23 10:20:30 $
-Version:   $Revision: 1.1.2.118 $
+Date:      $Date: 2010-07-23 14:30:37 $
+Version:   $Revision: 1.1.2.119 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -4270,7 +4270,18 @@ void medOpImporterDicomOffis::OnMouseDown( mafEvent * e )
 			m_CropPage->UpdateActor();
 			m_CropPage->GetRWI()->CameraUpdate();
 		}
-	}
+  }
+  
+  if (m_Wizard->GetCurrentPage()==m_LoadPage)
+  {
+    m_LoadPage->UpdateActor();
+    m_LoadPage->GetRWI()->CameraUpdate();
+  }
+  else if (m_Wizard->GetCurrentPage()==m_BuildPage)
+  {
+    m_BuildPage->UpdateActor();
+    m_BuildPage->GetRWI()->CameraUpdate();
+  }
 }
 
 void medOpImporterDicomOffis::OnMouseMove( mafEvent * e )
