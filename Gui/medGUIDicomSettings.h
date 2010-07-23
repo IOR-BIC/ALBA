@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.h,v $
 Language:  C++
-Date:      $Date: 2010-07-22 14:55:04 $
-Version:   $Revision: 1.5.2.14 $
+Date:      $Date: 2010-07-23 08:51:32 $
+Version:   $Revision: 1.5.2.15 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -146,7 +146,7 @@ public:
   void SetEnableToRead(char *type,bool enable);
 
   /** Helper function to store and retrieve the last dicom dir opened */
-  void SetLastDicomDir(wxString lastDicomDir) {m_LastDicomDir = lastDicomDir;};
+  void SetLastDicomDir(wxString lastDicomDir);;
   wxString GetLastDicomDir() {return m_LastDicomDir;};
 
 protected:

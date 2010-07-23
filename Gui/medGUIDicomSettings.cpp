@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2010-07-22 14:55:04 $
-Version:   $Revision: 1.7.2.13 $
+Date:      $Date: 2010-07-23 08:51:32 $
+Version:   $Revision: 1.7.2.14 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -557,4 +557,12 @@ bool medGUIDicomSettings::EnableToRead(char* type)
 
     return false;
   }
+}
+
+void medGUIDicomSettings::SetLastDicomDir( wxString lastDicomDir )
+{
+  m_LastDicomDir = lastDicomDir;
+  assert(m_Config);
+  m_Config->Write("LastDicomDir",m_LastDicomDir.c_str());
+
 }
