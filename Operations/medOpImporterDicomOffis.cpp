@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-07-22 14:55:24 $
-Version:   $Revision: 1.1.2.117 $
+Date:      $Date: 2010-07-23 10:20:30 $
+Version:   $Revision: 1.1.2.118 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -3410,7 +3410,7 @@ void medOpImporterDicomOffis::ResetSliders()
 		m_SliceScannerLoadPage->SetPageSize(1);
 		if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
 		{
-			m_TimeScannerLoadPage=m_LoadGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,m_NumberOfTimeFrames);
+			m_TimeScannerLoadPage=m_LoadGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,m_NumberOfTimeFrames - 1);
 			m_TimeScannerLoadPage->SetPageSize(1);
 		}
 		m_LoadPage->AddGuiLowerLeft(m_LoadGuiLeft);
@@ -3425,7 +3425,7 @@ void medOpImporterDicomOffis::ResetSliders()
 		m_SliceScannerCropPage->SetPageSize(1);
 		if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
 		{
-			m_TimeScannerCropPage=m_CropGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,m_NumberOfTimeFrames);
+			m_TimeScannerCropPage=m_CropGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,m_NumberOfTimeFrames - 1);
 			m_TimeScannerCropPage->SetPageSize(1);
 		}
 		m_CropPage->AddGuiLowerLeft(m_CropGuiLeft);
@@ -3441,7 +3441,7 @@ void medOpImporterDicomOffis::ResetSliders()
 		m_SliceScannerBuildPage->SetPageSize(1);
 		if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
 		{
-			m_TimeScannerBuildPage=m_BuildGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,m_NumberOfTimeFrames);
+			m_TimeScannerBuildPage=m_BuildGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,m_NumberOfTimeFrames - 1);
 			m_TimeScannerBuildPage->SetPageSize(1);
 		}
 		m_BuildPage->AddGuiLowerLeft(m_BuildGuiLeft);
