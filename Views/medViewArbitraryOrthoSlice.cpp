@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2010-07-22 09:41:50 $
-Version:   $Revision: 1.1.2.6 $
+Date:      $Date: 2010-07-23 13:01:24 $
+Version:   $Revision: 1.1.2.7 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -124,6 +124,7 @@ medViewArbitraryOrthoSlice::medViewArbitraryOrthoSlice(wxString label, bool show
 	m_SlicerZ          = NULL;
 	m_GuiGizmos       = NULL;
   m_ShowGizmo = 1;
+  m_ShowCameras = 1;
 	m_AttachCameraToSlicerXInXView    = NULL;
 	m_AttachCameraToSlicerYInYView    = NULL;
 	m_AttachCameraToSlicerZInZView    = NULL;
@@ -491,43 +492,61 @@ void medViewArbitraryOrthoSlice::OnEventGizmoRotate(mafEventBase *maf_event)
 void medViewArbitraryOrthoSlice::OnEventThis(mafEventBase *maf_event)
 
 {
-	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
-	{
-		switch(e->GetId()) 
-		{
-		case ID_COMBO_CHOOSE_ACTIVE_GIZMO:
-			OnChooseActiveGizmo();
+  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
+  {
+    switch(e->GetId()) 
+    {
+    case ID_COMBO_CHOOSE_ACTIVE_GIZMO:
+      OnChooseActiveGizmo();
 
-			break;
-		case ID_RANGE_MODIFIED:
-			{
-				OnRangeModified();
-			}
-			break;
-		case ID_LUT_CHOOSER:
-			{
-				OnLUTChooser();
+      break;
+    case ID_RANGE_MODIFIED:
+      {
+        OnRangeModified();
+      }
+      break;
+    case ID_LUT_CHOOSER:
+      {
+        OnLUTChooser();
 
-			}
-			break;
+      }
+      break;
 
     case ID_SHOW_GIZMO:
       {
         m_GizmoRotate->Show(m_ShowGizmo==1 && m_ComboChooseActiveGizmo == GIZMO_ROTATE? true : false);
-		m_GizmoTranslate->Show(m_ShowGizmo==1 && m_ComboChooseActiveGizmo == GIZMO_TRANSLATE? true : false);
-		m_Gui->Enable(ID_COMBO_CHOOSE_ACTIVE_GIZMO, m_ShowGizmo == 1 ? true : false);		
+        m_GizmoTranslate->Show(m_ShowGizmo==1 && m_ComboChooseActiveGizmo == GIZMO_TRANSLATE? true : false);
+        m_Gui->Enable(ID_COMBO_CHOOSE_ACTIVE_GIZMO, m_ShowGizmo == 1 ? true : false);		
         CameraUpdate();
       }
       break;
-		case ID_RESET:
-			{
-				OnReset();
-			}
-			break;
-		default:
-			mafViewCompound::OnEvent(maf_event);
-		}
-	}
+
+    case ID_SHOW_CAMERAS:
+      {
+        bool show = m_ShowCameras == 1 ? true : false;
+
+        m_ChildViewList[Y_VIEW]->VmeShow(m_XCameraConeVME, show);
+        m_ChildViewList[Z_VIEW]->VmeShow(m_XCameraConeVME, show);
+
+        m_ChildViewList[X_VIEW]->VmeShow(m_YCameraConeVME, show);
+        m_ChildViewList[Z_VIEW]->VmeShow(m_YCameraConeVME, show);
+
+        m_ChildViewList[X_VIEW]->VmeShow(m_ZCameraConeVME, show);
+        m_ChildViewList[Y_VIEW]->VmeShow(m_ZCameraConeVME, show);
+
+        CameraUpdate();
+      }
+      break;
+
+    case ID_RESET:
+      {
+        OnReset();
+      }
+      break;
+    default:
+      mafViewCompound::OnEvent(maf_event);
+    }
+  }
 }
 
 mafView *medViewArbitraryOrthoSlice::Copy(mafObserver *Listener)
@@ -546,42 +565,46 @@ mafView *medViewArbitraryOrthoSlice::Copy(mafObserver *Listener)
 }
 
 mafGUI* medViewArbitraryOrthoSlice::CreateGui()
-
 {
-	assert(m_Gui == NULL);
-	m_Gui = new mafGUI(this);
+  assert(m_Gui == NULL);
+  m_Gui = new mafGUI(this);
 
-	m_Gui->Divider(2);
+  m_Gui->Divider(2);
 
-	//button to reset at the start position
-	m_Gui->Label("reset slices", true);
-	m_Gui->Button(ID_RESET,_("reset"),"");
+  //button to reset at the start position
+  m_Gui->Label("reset slices", true);
+  m_Gui->Button(ID_RESET,_("reset"),"");
 
-    m_Gui->Divider(2);
+  m_Gui->Divider(2);
 
-    m_Gui->Label("show gizmo", true);
-    m_Gui->Bool(ID_SHOW_GIZMO, "",&m_ShowGizmo);
+  m_Gui->Label("show cameras", true);
+  m_Gui->Bool(ID_SHOW_CAMERAS, "",&m_ShowCameras);
 
-	m_Gui->Divider(2);
+  m_Gui->Divider(2);
 
-	//combo box to choose the type of gizmo
-	m_Gui->Label("choose gizmo", true);
-  	wxString Text[2]={_("translation gizmo"),_("rotation gizmo")};
-    m_Gui->Combo(ID_COMBO_CHOOSE_ACTIVE_GIZMO,"",&m_ComboChooseActiveGizmo,2,Text);
-	
-    
-	m_Gui->Divider(2);
-  
+  m_Gui->Label("show gizmo", true);
+  m_Gui->Bool(ID_SHOW_GIZMO, "",&m_ShowGizmo);
 
-	// m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
+  m_Gui->Divider(2);
 
-	m_Gui->Divider();
+  //combo box to choose the type of gizmo
+  m_Gui->Label("choose gizmo", true);
+  wxString Text[2]={_("translation gizmo"),_("rotation gizmo")};
+  m_Gui->Combo(ID_COMBO_CHOOSE_ACTIVE_GIZMO,"",&m_ComboChooseActiveGizmo,2,Text);
 
 
-	m_Gui->Update();
+  m_Gui->Divider(2);
 
-	EnableWidgets( (m_CurrentVolume != NULL) );
-	return m_Gui;
+
+  // m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
+
+  m_Gui->Divider();
+
+
+  m_Gui->Update();
+
+  EnableWidgets( (m_CurrentVolume != NULL) );
+  return m_Gui;
 }
 
 void medViewArbitraryOrthoSlice::VmeRemove(mafNode *node)
@@ -685,6 +708,7 @@ void medViewArbitraryOrthoSlice::EnableWidgets(bool enable)
 		m_Gui->Enable(ID_COMBO_CHOOSE_ACTIVE_GIZMO, enable);
 		m_Gui->Enable(ID_LUT_CHOOSER, enable);
     m_Gui->Enable(ID_SHOW_GIZMO, enable);
+    m_Gui->Enable(ID_SHOW_CAMERAS, enable);
 		m_Gui->FitGui();
 		m_Gui->Update();
 	}

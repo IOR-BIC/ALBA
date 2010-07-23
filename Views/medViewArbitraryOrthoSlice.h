@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.h,v $
 Language:  C++
-Date:      $Date: 2010-07-22 09:41:50 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2010-07-23 13:01:24 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -61,6 +61,7 @@ public:
 		ID_COMBO_CHOOSE_ACTIVE_GIZMO = Superclass::ID_LAST,
 		ID_RESET,
     ID_SHOW_GIZMO,
+    ID_SHOW_CAMERAS,
 		ID_LAST,
 	};
 
@@ -174,6 +175,7 @@ protected:
 	int			m_ComboChooseActiveGizmo;
 
   int m_ShowGizmo;
+  int m_ShowCameras;
 	mafGUI				*m_GuiGizmos;
 
 	medVMEPolylineEditor *m_CurrentPolylineGraphEditor;
