@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-05-28 07:03:25 $
-  Version:   $Revision: 1.29.2.5 $
-  Authors:   Matteo Giacomoni
+  Date:      $Date: 2010-07-26 15:57:14 $
+  Version:   $Revision: 1.29.2.6 $
+  Authors:   Matteo Giacomoni, Simone Brazzale
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -116,11 +116,14 @@ mafViewGlobalSlice::mafViewGlobalSlice(wxString label, int camera_position, bool
 
 	m_Dn = 0.0;
 
-	m_BoundsPlane = NULL;
-	m_BoundsOutlineBox = NULL;
-	m_BoundsOutlineProperty = NULL;
-	m_BoundsOutlineActor = NULL;
-	m_BoundsOutlineMapper = NULL;
+  m_numberOfVmeInstantiated = 0;
+  m_mapID.clear();
+
+	m_BoundsPlane.clear();
+	m_BoundsOutlineBox.clear();
+	m_BoundsOutlineProperty.clear();
+	m_BoundsOutlineActor.clear();
+	m_BoundsOutlineMapper.clear();
 }
 //----------------------------------------------------------------------------
 mafViewGlobalSlice::~mafViewGlobalSlice()
@@ -128,15 +131,49 @@ mafViewGlobalSlice::~mafViewGlobalSlice()
 {
 	if(m_Rwi && m_TextActor)
 		m_Rwi->m_RenFront->RemoveActor2D(m_TextActor);
-	if(m_Rwi && m_BoundsOutlineActor)
-		m_Rwi->m_RenFront->RemoveActor2D(m_BoundsOutlineActor);
+	if(m_Rwi && (m_BoundsOutlineActor.size()>0))
+  {
+    for (int i = 0; i < m_BoundsOutlineActor.size(); i++)
+    {
+      if (m_BoundsOutlineActor.at(i))
+      {
+		    m_Rwi->m_RenFront->RemoveActor2D(m_BoundsOutlineActor.at(i));
+      }
+    }
+  }
 
+  for (int i = 0; i < m_BoundsPlane.size(); i++)
+  {
+    vtkDEL(m_BoundsPlane.at(i));
+    m_BoundsPlane.at(i) = NULL;
+  }
+  for (int i = 0; i < m_BoundsOutlineBox.size(); i++)
+  {
+    vtkDEL(m_BoundsOutlineBox.at(i));
+    m_BoundsOutlineBox.at(i) = NULL;
+  }
+  for (int i = 0; i < m_BoundsOutlineProperty.size(); i++)
+  {
+    vtkDEL(m_BoundsOutlineProperty.at(i));
+    m_BoundsOutlineProperty.at(i) = NULL;
+  }
+  for (int i = 0; i < m_BoundsOutlineMapper.size(); i++)
+  {
+    vtkDEL(m_BoundsOutlineMapper.at(i));
+    m_BoundsOutlineMapper.at(i) = NULL;
+  }
+  for (int i = 0; i < m_BoundsOutlineActor.size(); i++)
+  {
+    vtkDEL(m_BoundsOutlineActor.at(i));
+    m_BoundsOutlineActor.at(i) = NULL;
+  }
+  m_BoundsPlane.clear();
+  m_BoundsOutlineBox.clear();
+  m_BoundsOutlineProperty.clear();
+  m_BoundsOutlineMapper.clear();
+  m_BoundsOutlineActor.clear();
 
-	vtkDEL(m_BoundsOutlineActor);
-	vtkDEL(m_BoundsOutlineMapper);
-	vtkDEL(m_BoundsOutlineProperty);
-	vtkDEL(m_BoundsOutlineBox);
-	vtkDEL(m_BoundsPlane);
+  m_mapID.clear();
 
 	vtkDEL(m_TextActor);
 	vtkDEL(m_TextMapper);
@@ -188,32 +225,44 @@ void mafViewGlobalSlice::Create()
 void mafViewGlobalSlice::InizializePlane()
 //----------------------------------------------------------------------------
 {
-	vtkNEW(m_BoundsPlane);
-	m_BoundsPlane->SetOrigin(m_GlobalBounds[0],m_GlobalBounds[2],m_SliceOrigin[2]);
-	m_BoundsPlane->SetPoint1(m_GlobalBounds[1],m_GlobalBounds[2],m_SliceOrigin[2]);
-	m_BoundsPlane->SetPoint2(m_GlobalBounds[0],m_GlobalBounds[3],m_SliceOrigin[2]);
+  vtkPlaneSource* boundsPlane;
+	vtkNEW(boundsPlane);
+	boundsPlane->SetOrigin(m_GlobalBounds[0],m_GlobalBounds[2],m_SliceOrigin[2]);
+	boundsPlane->SetPoint1(m_GlobalBounds[1],m_GlobalBounds[2],m_SliceOrigin[2]);
+	boundsPlane->SetPoint2(m_GlobalBounds[0],m_GlobalBounds[3],m_SliceOrigin[2]);
 
-	m_BoundsPlane->Update();
+	boundsPlane->Update();
 
-	vtkNEW(m_BoundsOutlineBox);
-	m_BoundsOutlineBox->SetInput(m_BoundsPlane->GetOutput());  
+	vtkOutlineCornerFilter* boundsOutlineBox;
+  vtkNEW(boundsOutlineBox);
+	boundsOutlineBox->SetInput(boundsPlane->GetOutput());  
 
-	vtkNEW(m_BoundsOutlineMapper);
-	m_BoundsOutlineMapper->SetInput(m_BoundsOutlineBox->GetOutput());
+	vtkPolyDataMapper* boundsOutlineMapper;
+  vtkNEW(boundsOutlineMapper);
+	boundsOutlineMapper->SetInput(boundsOutlineBox->GetOutput());
 
-	vtkNEW(m_BoundsOutlineProperty);
-	m_BoundsOutlineProperty->SetColor(1,1,1);
-	m_BoundsOutlineProperty->SetAmbient(1);
-	m_BoundsOutlineProperty->SetRepresentationToWireframe();
-	m_BoundsOutlineProperty->SetInterpolationToFlat();
+	vtkProperty* boundsOutlineProperty;
+  vtkNEW(boundsOutlineProperty);
+	boundsOutlineProperty->SetColor(1,1,1);
+	boundsOutlineProperty->SetAmbient(1);
+	boundsOutlineProperty->SetRepresentationToWireframe();
+	boundsOutlineProperty->SetInterpolationToFlat();
 
-	vtkNEW(m_BoundsOutlineActor);
-	m_BoundsOutlineActor->SetMapper(m_BoundsOutlineMapper);
-	m_BoundsOutlineActor->VisibilityOn();
-	m_BoundsOutlineActor->PickableOff();
-	m_BoundsOutlineActor->SetProperty(m_BoundsOutlineProperty);
+  vtkActor* boundsOutlineActor;
+  vtkNEW(boundsOutlineActor);
+	boundsOutlineActor->SetMapper(boundsOutlineMapper);
+	boundsOutlineActor->VisibilityOn();
+	boundsOutlineActor->PickableOff();
+	boundsOutlineActor->SetProperty(boundsOutlineProperty);
 
-	m_Rwi->m_RenFront->AddActor(m_BoundsOutlineActor);
+	m_Rwi->m_RenFront->AddActor(boundsOutlineActor);
+
+  m_BoundsPlane.push_back(boundsPlane);
+  m_BoundsOutlineBox.push_back(boundsOutlineBox);
+  m_BoundsOutlineProperty.push_back(boundsOutlineProperty);
+  m_BoundsOutlineMapper.push_back(boundsOutlineMapper);
+  m_BoundsOutlineActor.push_back(boundsOutlineActor);
+
 }
 //----------------------------------------------------------------------------
 void mafViewGlobalSlice::VmeSelect(mafNode *node,bool select)
@@ -260,6 +309,11 @@ void mafViewGlobalSlice::VmeCreatePipe(mafNode *node)
 {
   mafString pipe_name = "";
   GetVisualPipeName(node, pipe_name);
+
+  std::pair<mafID,int> pair(node->GetId(),m_numberOfVmeInstantiated);
+  m_mapID.insert(pair);
+  
+  m_numberOfVmeInstantiated++;
 
   mafSceneNode *n = m_Sg->Vme2Node(node);
   assert(n && !n->m_Pipe);
@@ -393,6 +447,15 @@ void mafViewGlobalSlice::VmeDeletePipe(mafNode *vme)
     //m_Gui->Enable(ID_LUT,false);
     m_Gui->Enable(ID_OPACITY_SLIDER,false);
     m_Gui->Update();
+  }
+  if (m_Rwi && m_BoundsOutlineActor.size()>0)
+  {
+    int j = m_mapID[vme->GetId()];
+    if (j!=-1 && j<m_BoundsOutlineActor.size() && m_BoundsOutlineActor.at(j))
+    {
+      m_Rwi->m_RenFront->RemoveActor2D(m_BoundsOutlineActor.at(j));
+      m_mapID.erase(vme->GetId());
+    }
   }
   assert(n && n->m_Pipe);
   cppDEL(n->m_Pipe);
@@ -628,27 +691,45 @@ void mafViewGlobalSlice::UpdateSlice()
 void mafViewGlobalSlice::UpdatePlane()
 //----------------------------------------------------------------------------
 {
-	if(m_BoundsPlane &&  m_BoundsOutlineActor && m_Rwi)
+  vtkPlaneSource* boundsPlane;
+  if (m_BoundsPlane.size()!=0)
+  {
+    boundsPlane = m_BoundsPlane.at(m_BoundsPlane.size()-1);
+  }
+  else
+  {
+    boundsPlane = NULL;
+  }
+  vtkActor* boundsOutlineActor;
+  if (m_BoundsOutlineActor.size()!=0)
+  {
+    boundsOutlineActor = m_BoundsOutlineActor.at(m_BoundsOutlineActor.size()-1);
+  }
+  else
+  {
+    boundsOutlineActor = NULL;
+  }
+  if(boundsPlane &&  boundsOutlineActor && m_Rwi)
 	{
 		switch(m_ViewIndex)
 		{
 		  case ID_XY:
-			  m_BoundsPlane->SetOrigin(m_GlobalBounds[0],m_GlobalBounds[2],m_SliceOrigin[2]);
-			  m_BoundsPlane->SetPoint1(m_GlobalBounds[1],m_GlobalBounds[2],m_SliceOrigin[2]);
-			  m_BoundsPlane->SetPoint2(m_GlobalBounds[0],m_GlobalBounds[3],m_SliceOrigin[2]);
-			  m_BoundsPlane->Update();
+			  boundsPlane->SetOrigin(m_GlobalBounds[0],m_GlobalBounds[2],m_SliceOrigin[2]);
+			  boundsPlane->SetPoint1(m_GlobalBounds[1],m_GlobalBounds[2],m_SliceOrigin[2]);
+			  boundsPlane->SetPoint2(m_GlobalBounds[0],m_GlobalBounds[3],m_SliceOrigin[2]);
+			  boundsPlane->Update();
 			break;
 		  case ID_XZ:
-			  m_BoundsPlane->SetOrigin(m_GlobalBounds[0],m_SliceOrigin[1],m_GlobalBounds[4]);
-			  m_BoundsPlane->SetPoint1(m_GlobalBounds[1],m_SliceOrigin[1],m_GlobalBounds[4]);
-			  m_BoundsPlane->SetPoint2(m_GlobalBounds[0],m_SliceOrigin[1],m_GlobalBounds[5]);
-			  m_BoundsPlane->Update();
+			  boundsPlane->SetOrigin(m_GlobalBounds[0],m_SliceOrigin[1],m_GlobalBounds[4]);
+			  boundsPlane->SetPoint1(m_GlobalBounds[1],m_SliceOrigin[1],m_GlobalBounds[4]);
+			  boundsPlane->SetPoint2(m_GlobalBounds[0],m_SliceOrigin[1],m_GlobalBounds[5]);
+			  boundsPlane->Update();
 			break;
 		  case ID_YZ:
-			  m_BoundsPlane->SetOrigin(m_SliceOrigin[0],m_GlobalBounds[2],m_GlobalBounds[4]);
-			  m_BoundsPlane->SetPoint1(m_SliceOrigin[0],m_GlobalBounds[3],m_GlobalBounds[4]);
-			  m_BoundsPlane->SetPoint2(m_SliceOrigin[0],m_GlobalBounds[2],m_GlobalBounds[5]);
-			  m_BoundsPlane->Update();
+			  boundsPlane->SetOrigin(m_SliceOrigin[0],m_GlobalBounds[2],m_GlobalBounds[4]);
+			  boundsPlane->SetPoint1(m_SliceOrigin[0],m_GlobalBounds[3],m_GlobalBounds[4]);
+			  boundsPlane->SetPoint2(m_SliceOrigin[0],m_GlobalBounds[2],m_GlobalBounds[5]);
+			  boundsPlane->Update();
 			break;
 		}
 	}
