@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.h,v $
 Language:  C++
-Date:      $Date: 2010-07-23 08:51:32 $
-Version:   $Revision: 1.5.2.15 $
-Authors:   Matteo Giacomoni
+Date:      $Date: 2010-07-27 13:37:47 $
+Version:   $Revision: 1.5.2.16 $
+Authors:   Matteo Giacomoni, Simone Brazzale
 ==========================================================================
 Copyright (c) 2001/2005 
 CINECA - Interuniversity Consortium (www.cineca.it)
@@ -48,6 +48,7 @@ public:
 	{
 		ID_DICTONARY = MINID,
 		ID_TYPE_DICOM,
+    ID_VME_TYPE,
 		ID_AUTO_POS_CROP,
 		ID_ENALBLE_TIME_BAR,
 		ID_ENALBLE_NUMBER_OF_SLICE,
@@ -66,6 +67,14 @@ public:
     ID_PERCENTAGE_DISTANCE_TOLERANCE,
     ID_PERCENTAGE_TOLERANCE,
 	};
+  
+  /** Type VMEs*/
+	enum VME_TYPE
+	{
+		ID_VOLUME = 0,
+		ID_MESH,
+		ID_IMAGE,
+	};
 
   /** Modality IDs*/
 	enum DICOM_MODALITY
@@ -76,8 +85,7 @@ public:
 		ID_XA_MODALITY,
     ID_OT_MODALITY,
     ID_CR_MODALITY,
-		ID_CMRI_MODALITY,
-    
+		ID_CMRI_MODALITY,  
 	};
 
   /** Step IDs*/
@@ -139,10 +147,10 @@ public:
   int GetVMEType(){return m_OutputType;};
 
 
-	/** Return if a particular type of Dicom is Enabled to be read */
+	/** Return if a particular type of Dicom or Vme is Enabled to be read */
 	bool EnableToRead(char* type);
 
-  /** Enable/disable a particular type of Dicom to be read */
+  /** Enable/disable a particular type of Dicom or Vme to be read */
   void SetEnableToRead(char *type,bool enable);
 
   /** Helper function to store and retrieve the last dicom dir opened */
@@ -161,8 +169,10 @@ protected:
 
 	// mafString m_Dictionary;
 	mafGUICheckListBox *m_DicomModalityListBox;
+  mafGUICheckListBox *m_DicomVmeTypeListBox;
 
 	int m_CheckOnOff[6];
+  int m_CheckOnOffVmeType[3];
 
   int m_OutputType;
 

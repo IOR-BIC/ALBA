@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2010-07-23 08:51:32 $
-Version:   $Revision: 1.7.2.14 $
-Authors:   Matteo Giacomoni
+Date:      $Date: 2010-07-27 13:37:47 $
+Version:   $Revision: 1.7.2.15 $
+Authors:   Matteo Giacomoni, Simone Brazzale
 ==========================================================================
 Copyright (c) 2001/2005 
 CINECA - Interuniversity Consortium (www.cineca.it)
@@ -33,6 +33,9 @@ mafGUISettings(Listener, label)
 	// m_Dictionary = "";
 
 	m_CheckOnOff[0] = m_CheckOnOff[1] = m_CheckOnOff[2] = m_CheckOnOff[3] = m_CheckOnOff[4] = m_CheckOnOff[5] = true;
+
+  m_CheckOnOffVmeType[0] = m_CheckOnOffVmeType[2] = true;
+  m_CheckOnOffVmeType[1] = false;
 
 	m_AutoCropPos = FALSE;
 	m_EnableNumberOfSlice = TRUE;
@@ -82,11 +85,25 @@ void medGUIDicomSettings::CreateGui()
   m_Gui->Bool(ID_PERCENTAGE_DISTANCE_TOLERANCE,_("Percentage distance tolerance"),&m_PercentageTolerance,1);
   m_Gui->Double(ID_PERCENTAGE_TOLERANCE,_("Value"),&m_PercentageDistanceTolerance,0,MAXDOUBLE,2,"Value in percentage");
 
+  m_Gui->Divider();
+  m_Gui->Divider(1);
+  m_Gui->Divider();
+  
   m_Gui->Bool(ID_AUTO_VME_TYPE,_("Auto VME Type"),&m_AutoVMEType,1);
   wxString typeArray[3] = {_("Volume"),_("Mesh"),_("Image")};
   m_Gui->Radio(ID_SETTING_VME_TYPE, "VME output", &m_OutputType, 3, typeArray, 1, ""/*, wxRA_SPECIFY_ROWS*/);
 
   m_Gui->Divider();
+
+  m_DicomVmeTypeListBox=m_Gui->CheckList(ID_VME_TYPE,_("VME Type"));
+	m_DicomVmeTypeListBox->AddItem(ID_VOLUME,_("Volume"),m_CheckOnOffVmeType[0] != 0);
+	m_DicomVmeTypeListBox->AddItem(ID_MESH,_("Mesh"),m_CheckOnOffVmeType[1] != 0);
+	m_DicomVmeTypeListBox->AddItem(ID_IMAGE,_("Image"),m_CheckOnOffVmeType[2] != 0);
+
+  m_Gui->Divider();
+  m_Gui->Divider(1);
+  m_Gui->Divider();
+
 	wxString choices[4]={_("1x"),_("2x"),_("3x"),_("4x")};
 	m_Gui->Combo(ID_STEP,_("Build Step"),&m_Step,4,choices);
 	m_DicomModalityListBox=m_Gui->CheckList(ID_TYPE_DICOM,_("Modality"));
@@ -99,6 +116,7 @@ void medGUIDicomSettings::CreateGui()
 	m_Gui->Divider(1);
 
 	m_Gui->Update();
+  m_Gui->Enable(ID_VME_TYPE,!m_AutoVMEType);
   m_Gui->Enable(ID_SETTING_VME_TYPE,m_AutoVMEType);
   m_Gui->Enable(ID_SCALAR_TOLERANCE,m_ScalarTolerance);
   m_Gui->Enable(ID_PERCENTAGE_TOLERANCE,m_PercentageTolerance);
@@ -110,8 +128,8 @@ void medGUIDicomSettings::EnableItems()
 	//m_Gui->Enable(ID_DICTONARY,true); Remove dictionary selection (Losi 25.11.2009)
   if (m_Gui)
   {
-	  m_Gui->Enable(ID_SETTING_VME_TYPE,m_AutoVMEType);
-	
+	  m_Gui->Enable(ID_VME_TYPE,!m_AutoVMEType);
+    m_Gui->Enable(ID_SETTING_VME_TYPE,m_AutoVMEType);
 	  m_Gui->Enable(ID_SCALAR_TOLERANCE,m_ScalarTolerance);
 	  m_Gui->Enable(ID_PERCENTAGE_TOLERANCE,m_PercentageTolerance);
 	  m_Gui->Update();
@@ -146,6 +164,17 @@ void medGUIDicomSettings::OnEvent(mafEventBase *maf_event)
       m_Config->Write("EnableReadOT",m_DicomModalityListBox->IsItemChecked(ID_OT_MODALITY));
 		}
 		break;
+  case ID_VME_TYPE:
+		{
+      m_CheckOnOffVmeType[ID_VOLUME] = m_DicomVmeTypeListBox->IsItemChecked(ID_VOLUME);
+      m_CheckOnOffVmeType[ID_MESH] = m_DicomVmeTypeListBox->IsItemChecked(ID_MESH);
+      m_CheckOnOffVmeType[ID_IMAGE] = m_DicomVmeTypeListBox->IsItemChecked(ID_IMAGE);
+
+      m_Config->Write("EnableTypeVolume",m_DicomVmeTypeListBox->IsItemChecked(ID_VOLUME));
+			m_Config->Write("EnableTypeMesh",m_DicomVmeTypeListBox->IsItemChecked(ID_MESH));
+			m_Config->Write("EnableTypeImage",m_DicomVmeTypeListBox->IsItemChecked(ID_IMAGE));
+		}
+		break;
 	case ID_AUTO_POS_CROP:
 		{
 			m_Config->Write("AutoCropPos",m_AutoCropPos);
@@ -155,7 +184,6 @@ void medGUIDicomSettings::OnEvent(mafEventBase *maf_event)
   case ID_AUTO_VME_TYPE:
     {
       m_Config->Write("AutoVMEType",m_AutoVMEType);
-
     }
     break;
 	case ID_ENALBLE_NUMBER_OF_SLICE:
@@ -374,6 +402,33 @@ void medGUIDicomSettings::InitializeSettings()
 		m_Config->Write("EnableReadCR",m_CheckOnOff[5]);
 	}
 
+  if(m_Config->Read("EnableTypeVolume", &long_item))
+	{
+		m_CheckOnOffVmeType[0]=long_item;
+	}
+	else
+	{
+		m_Config->Write("EnableTypeVolume",m_CheckOnOffVmeType[0]);
+	}
+
+  if(m_Config->Read("EnableTypeMesh", &long_item))
+	{
+		m_CheckOnOffVmeType[1]=long_item;
+	}
+	else
+	{
+		m_Config->Write("EnableTypeMesh",m_CheckOnOffVmeType[1]);
+	}
+
+  if(m_Config->Read("EnableTypeImage", &long_item))
+	{
+		m_CheckOnOffVmeType[2]=long_item;
+	}
+	else
+	{
+		m_Config->Write("EnableTypeImage",m_CheckOnOffVmeType[2]);
+	}
+
 	if(m_Config->Read("AutoCropPos", &long_item))
 	{
 		m_AutoCropPos=long_item;
@@ -492,6 +547,22 @@ void medGUIDicomSettings::SetEnableToRead(char* type,bool enable)
     m_CheckOnOff[ID_CR_MODALITY] = enable;
     m_Config->Write("EnableReadCR",m_CheckOnOff[ID_CR_MODALITY]);
   }
+
+  if (strcmp( type, "VOLUME" ) == 0)
+  {	
+    m_CheckOnOffVmeType[ID_VOLUME] = enable;
+    m_Config->Write("EnableTypeVolume",m_CheckOnOffVmeType[ID_VOLUME]);
+  }
+  if (strcmp( type, "MESH" ) == 0)
+  {	
+    m_CheckOnOffVmeType[ID_MESH] = enable;
+    m_Config->Write("EnableTypeMesh",m_CheckOnOffVmeType[ID_MESH]);
+  }
+  if (strcmp( type, "IMAGE" ) == 0)
+  {	
+    m_CheckOnOffVmeType[ID_IMAGE] = enable;
+    m_Config->Write("EnableTypeImage",m_CheckOnOffVmeType[ID_IMAGE]);
+  }
   
   InitializeSettings();
 }
@@ -525,6 +596,19 @@ bool medGUIDicomSettings::EnableToRead(char* type)
 	  {	
 	    return true;
 	  }
+
+    if (strcmp( type, "VOLUME" ) == 0 && (m_DicomVmeTypeListBox->IsItemChecked(ID_VOLUME)))
+	  {	
+	    return true;
+	  }
+    if (strcmp( type, "MESH" ) == 0 && (m_DicomVmeTypeListBox->IsItemChecked(ID_MESH)))
+	  {	
+	    return true;
+	  }
+    if (strcmp( type, "IMAGE" ) == 0 && (m_DicomVmeTypeListBox->IsItemChecked(ID_IMAGE)))
+	  {	
+	    return true;
+	  }
 	
 		return false;
 	}
@@ -551,6 +635,19 @@ bool medGUIDicomSettings::EnableToRead(char* type)
       return true;
     }
     if (strcmp( type, "CR" ) == 0 && m_CheckOnOff[ID_CR_MODALITY])
+    {	
+      return true;
+    }
+    
+    if (strcmp( type, "VOLUME" ) == 0 && m_CheckOnOffVmeType[ID_VOLUME])
+    {	
+      return true;
+    }
+    if (strcmp( type, "MESH" ) == 0 && m_CheckOnOffVmeType[ID_MESH])
+    {	
+      return true;
+    }
+    if (strcmp( type, "IMAGE" ) == 0 && m_CheckOnOffVmeType[ID_IMAGE])
     {	
       return true;
     }
