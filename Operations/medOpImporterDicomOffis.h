@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2010-06-15 14:49:31 $
-Version:   $Revision: 1.1.2.46 $
-Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
+Date:      $Date: 2010-07-27 13:39:34 $
+Version:   $Revision: 1.1.2.47 $
+Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni, Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2007
 SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
@@ -176,6 +176,7 @@ protected:
 	void OnWizardChangePage( mafEvent * e );
 	void OnSeriesSelect();
 	void OnStudySelect();
+  void OnVmeTypeSelected();
 
 	/** Create load page and his GUI for the wizard. */
 	void CreateLoadPage();
@@ -292,7 +293,8 @@ protected:
 
 	mafGUI  *m_LoadGuiCenter;
 
-	int       m_OutputType;
+	int       m_RadioButton;
+  int       m_OutputType;
 	mafString	m_DicomDirectoryABSFileName;
 	mafString m_PatientName;
 	mafString m_SurgeonName;

@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-07-23 14:30:37 $
-Version:   $Revision: 1.1.2.119 $
-Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
+Date:      $Date: 2010-07-27 13:39:34 $
+Version:   $Revision: 1.1.2.120 $
+Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni, Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2007
 SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
@@ -295,6 +295,7 @@ mafOp(label)
 
 	m_BuildStepValue = 0;
 	m_OutputType = 0;
+  m_RadioButton = 0;
 
 	m_SliceScannerBuildPage = NULL;
 	m_SliceScannerCropPage = NULL;
@@ -1825,8 +1826,51 @@ void medOpImporterDicomOffis::CreateBuildPage()
 		m_OutputType = ((medGUIDicomSettings*)GetSetting())->GetVMEType(); 
 	else
 	{
-		wxString typeArray[3] = {_("Volume"),_("Mesh"),_("Image")};
-		m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_OutputType, 3, typeArray, 1, ""/*, wxRA_SPECIFY_ROWS*/);
+    // Handles various types of Vme selected in the DICOM Advanced Settings:
+    // If the user launch an event by changing the radio button the right value is adjusted later on. (Brazzale, 27.07.2010)
+    bool type_volume = ((medGUIDicomSettings*)GetSetting())->EnableToRead("VOLUME");
+    bool type_mesh = ((medGUIDicomSettings*)GetSetting())->EnableToRead("MESH");
+    bool type_image = ((medGUIDicomSettings*)GetSetting())->EnableToRead("IMAGE");
+		wxString typeArray[3] = {_("Volume"),_("Mesh"),_("Image")};    
+    wxString typeArray2[2] = {_("Image"),_("Volume")};
+    wxString typeArray3[2] = {_("Mesh"),_("Image")};
+    if ((type_volume && type_mesh && type_image) || (!type_volume && !type_mesh && !type_image))
+    {
+		  m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_OutputType, 3, typeArray, 1, ""/*, wxRA_SPECIFY_ROWS*/);
+    }
+    else if (type_volume && !type_mesh && !type_image)
+    {
+		  m_OutputType = 0;
+      m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_OutputType, 1, typeArray, 1, ""/*, wxRA_SPECIFY_ROWS*/);
+      m_BuildGuiCenter->Enable(ID_VME_TYPE,0);
+    }
+    else if (!type_volume && type_mesh && !type_image)
+    {
+      m_OutputType = 1;
+      m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_RadioButton, 1, typeArray3, 1, ""/*, wxRA_SPECIFY_ROWS*/);
+      m_BuildGuiCenter->Enable(ID_VME_TYPE,0);
+    } 
+    else if (!type_volume && !type_mesh && type_image)
+    {
+      m_OutputType = 2;
+      m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_RadioButton, 1, typeArray2, 1, ""/*, wxRA_SPECIFY_ROWS*/);
+      m_BuildGuiCenter->Enable(ID_VME_TYPE,0);
+    }
+    else if (type_volume && type_mesh && !type_image)
+    {
+		  m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_OutputType, 2, typeArray, 1, ""/*, wxRA_SPECIFY_ROWS*/);
+    }    
+    else if (type_volume && !type_mesh && type_image)
+    {
+      m_OutputType = 2;
+		  m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_RadioButton, 2, typeArray2, 1, ""/*, wxRA_SPECIFY_ROWS*/);
+    }             
+    else if (!type_volume && type_mesh && type_image)
+    {
+      m_OutputType = 1;
+		  m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_RadioButton, 2, typeArray3, 1, ""/*, wxRA_SPECIFY_ROWS*/);
+    }
+
 	}
 
 	m_BuildGuiUnderLeft->String(ID_VOLUME_NAME," VME name",&m_VolumeName);
@@ -2057,14 +2101,12 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
 			{
 				//ZCrop slider
 				OnRangeModified();
-
 			}
 			break;
 		case medGUIWizard::MED_WIZARD_CHANGE_PAGE:
 			{
 				OnWizardChangePage(e);
 				return;
-
 			}
 			break;
 		case ID_UNDO_CROP:
@@ -2075,7 +2117,6 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
 		case ID_STUDY_SELECT:
 			{
 				OnStudySelect();
-
 			}
 			break;
 		case ID_SERIES_SELECT:
@@ -2103,14 +2144,12 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
 		case ID_SCAN_SLICE:
 			{
 				OnScanSlice();
-
 			}
 			break;
 		case ID_SCAN_TIME:
 			{
 				// show the current slice
 				OnScanTime();
-
 			}
 			break;
 		case ID_CROP:
@@ -2118,6 +2157,10 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
 				Crop();
 			}
 			break;
+    case ID_VME_TYPE:
+      {
+        OnVmeTypeSelected();
+      }
 
 		default:
 			{
@@ -3994,6 +4037,25 @@ int CompareImageNumber(const medDicomSlice **arg1,const medDicomSlice **arg2)
 		return -1;
 	else
 		return 0;
+}
+
+void medOpImporterDicomOffis::OnVmeTypeSelected()
+{
+  // Adjust radio button value to match the right case. (Brazzale, 27.07.2010)
+  bool type_volume = ((medGUIDicomSettings*)GetSetting())->EnableToRead("VOLUME");
+  bool type_mesh = ((medGUIDicomSettings*)GetSetting())->EnableToRead("MESH");
+  bool type_image = ((medGUIDicomSettings*)GetSetting())->EnableToRead("IMAGE");
+  if (type_volume && !type_mesh && type_image)
+  {
+    if (m_RadioButton==0)
+      m_OutputType = 2;
+    else
+      m_OutputType = 0;
+  }
+  else if (!type_volume && type_mesh && type_image)
+  {
+    m_OutputType = m_RadioButton+1;
+  }
 }
 
 void medOpImporterDicomOffis::OnStudySelect()
