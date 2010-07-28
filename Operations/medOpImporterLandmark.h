@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterLandmark.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-28 08:39:36 $
-  Version:   $Revision: 1.1 $
-  Authors:   Daniele Giunchi
+  Date:      $Date: 2010-07-28 13:35:58 $
+  Version:   $Revision: 1.3.2.1 $
+  Authors:   Daniele Giunchi, Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -61,7 +61,8 @@ public:
   /** Read the file.
   the format of the file admits some speficics.
   1) the line with landmark data are:
-     nameOfLandmark x y z
+     x y z
+     x,y,z
   */
   void ReadWithoutTag();
 
@@ -73,6 +74,16 @@ public:
 	//void OpUndo();                       // gia' implementata in mafOp
 
 protected:
+  
+  enum ID_LANDMARK_IMPORTER
+  {
+    ID_TYPE_FILE = MINID,
+    ID_TYPE_SEPARATION,
+    MINID,
+  };
+
+  int m_TypeSeparation;
+
   wxString m_FileDir;
 	wxString m_File;
 	mafVMELandmarkCloud  *m_VmeCloud;

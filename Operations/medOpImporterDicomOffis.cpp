@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-07-27 13:39:34 $
-Version:   $Revision: 1.1.2.120 $
-Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni, Simone Brazzale
+Date:      $Date: 2010-07-28 13:35:58 $
+Version:   $Revision: 1.1.2.121 $
+Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
 SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)

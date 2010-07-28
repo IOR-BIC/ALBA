@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterLandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-11-04 16:45:35 $
-  Version:   $Revision: 1.7.2.1 $
-  Authors:   Daniele Giunchi
+  Date:      $Date: 2010-07-28 13:35:58 $
+  Version:   $Revision: 1.7.2.2 $
+  Authors:   Daniele Giunchi, Simone Brazzale
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
@@ -36,15 +36,6 @@
 const bool DEBUG_MODE = true;
 
 //----------------------------------------------------------------------------
-// Constants :
-//----------------------------------------------------------------------------
-enum ID_LANDMARK_IMPORTER
-{
-  ID_TYPE_FILE = MINID,
-};
-//----------------------------------------------------------------------------
-
-//----------------------------------------------------------------------------
 medOpImporterLandmark::medOpImporterLandmark(wxString label) :
 mafOp(label)
 //----------------------------------------------------------------------------
@@ -53,6 +44,7 @@ mafOp(label)
 	m_Canundo	= false;
 	m_File		= "";
 	m_FileDir = (mafGetApplicationDirectory() + "/Data/External/").c_str();
+  m_TypeSeparation = 0;
 	
 	m_VmeCloud		= NULL;
 	m_TagFileFlag = false;
@@ -77,6 +69,7 @@ mafOp* medOpImporterLandmark::Copy()
 
 	cp->m_File = m_File;
 	cp->m_VmeCloud = m_VmeCloud;
+  cp->m_TypeSeparation = m_TypeSeparation;
 	return cp;
 }
 //----------------------------------------------------------------------------
@@ -97,8 +90,13 @@ void medOpImporterLandmark::OpRun()
     if (!m_TestMode)
     {
       m_Gui = new mafGUI(this);
+      wxString choices[2] =  {_("Space"),_("Comma")};
+      m_Gui->Radio(ID_TYPE_SEPARATION,"Separation",&m_TypeSeparation,2,choices,1,"");      
+      m_Gui->Divider();
       m_Gui->Bool(ID_TYPE_FILE,"Tagged file",&m_TagFileFlag,0,"Check if the format is NAME x y z");
+      m_Gui->Divider();
       m_Gui->OkCancel();
+      m_Gui->Enable(ID_TYPE_SEPARATION,!m_TagFileFlag);
 	    m_Gui->Update();
       ShowGui();
     }
@@ -123,6 +121,18 @@ void medOpImporterLandmark::	OnEvent(mafEventBase *maf_event)
       case wxCANCEL:
         OpStop(OP_RUN_CANCEL);
       break;
+      case ID_TYPE_FILE:
+        {  
+          if (m_TagFileFlag)
+          {
+            m_TypeSeparation = 0;
+          }
+          if (!m_TestMode)
+          {
+            m_Gui->Enable(ID_TYPE_SEPARATION,!m_TagFileFlag);
+	          m_Gui->Update();
+          }
+        }
       default:
         mafEventMacro(*e);
     }
@@ -200,12 +210,14 @@ void medOpImporterLandmark::Read()
   std::ifstream  landmarkFileStream(m_File);
   char name[20];
   char time[6] = "0";
+  char tx[20];
+  char ty[20];
+  char tz[20];
 
-  // Alberto Losi 11.4.2009
-  // Increase size of x,y and z array in order to avoid "Run-Time Check Failure #2 - Stack around the variable was corrupted" error.
-  char x[20];
-  char y[20];
-  char z[20];
+  double x = 0;
+  double y = 0;
+  double z = 0;
+  int t = 0;
 
   if (!m_TestMode)
   {
@@ -234,24 +246,18 @@ void medOpImporterLandmark::Read()
     }
     else
     {
-      landmarkFileStream >> x;
-      landmarkFileStream >> y;
-      landmarkFileStream >> z;
-      /*mafString t;
-      t << name;
-      t << " ";
-      t << x;
-      t << " ";
-      t << y;
-      t << " ";
-      t << z;
-      mafLogMessage(t);*/
+      landmarkFileStream >> tx;
+      landmarkFileStream >> ty;
+      landmarkFileStream >> tz;
+      x = atof(tx);
+      y = atof(ty);
+      z = atof(tz);
+      t = atoi(time);
       if(mafString(time) == "0")
         m_VmeCloud->AppendLandmark(name, false);
-      m_VmeCloud->SetLandmark(counter, atof(x) ,atof(y) ,atof(z),atoi(time));
-      //m_VmeCloud->GetLandmark(counter)->SetRadius(5);
-      if(atof(x) == -9999 && atof(y) == -9999 && atof(z) == -9999 )
-        m_VmeCloud->SetLandmarkVisibility(counter, 0, atof(time));
+      m_VmeCloud->SetLandmark(counter,x,y,z,t);
+      if(x == -9999 && y == -9999 && z == -9999 )
+        m_VmeCloud->SetLandmarkVisibility(counter, 0, t);
       counter++;
 
       progress = counter * 100 / numberOfLines;
@@ -298,14 +304,19 @@ void medOpImporterLandmark::ReadWithoutTag()
 
   std::ifstream  landmarkFileStream(m_File);
 
-  // Alberto Losi 11.4.2009
-  // Increase size of x,y and z array in order to avoid "Run-Time Check Failure #2 - Stack around the variable was corrupted" error.
-  char x[20]; 
-  char y[20];
-  char z[20];
+  double x = 0;
+  double y = 0;
+  double z = 0;
+
+  char tx[20];
+  char ty[20];
+  char tz[20];
   
   long counter = 0; 
   long progress = 0;
+
+  bool exception = FALSE;
+  const wxChar comma = ',';
 
   if (!m_TestMode)
   {
@@ -316,32 +327,77 @@ void medOpImporterLandmark::ReadWithoutTag()
 
   while(!landmarkFileStream.fail())
   {
-
-    landmarkFileStream >> x;
-    
-    if(mafString(x) == "") 
+    switch (m_TypeSeparation)
     {
-      //jump the comment or the blank line
-      landmarkFileStream.getline(x,20);
-      continue;
+    case 0:
+      { 
+        landmarkFileStream >> tx;    
+        if(mafString(tx) == "") 
+        {
+          //jump the the blank line
+          landmarkFileStream.getline(tx,20);
+          continue;
+        }
+        landmarkFileStream >> ty;
+        landmarkFileStream >> tz;
+
+        try {
+          x = atof(tx);
+          // workaround to see if the input format was wrong
+          if (x<-10000 || x>10000)
+            throw "Input file invalid!";
+        }
+        catch (char * err) {
+          wxMessageBox(err,_("Warning"),wxOK | wxICON_ERROR);
+          exception = TRUE;
+          break;
+        }
+        y = atof(ty);
+        z = atof(tz);
+      }
+      break;
+    case 1:
+      {
+        landmarkFileStream.getline(tmp,200);
+        if(mafString(tmp) == "") 
+        {
+          // jump the blank line
+          landmarkFileStream.getline(tmp,200);
+          continue;
+        }
+        wxString s = wxString(tmp);
+        wxString t1 = s.BeforeFirst(comma);
+        wxString t2 = s.AfterFirst(comma);
+        wxString t3 = t2.BeforeFirst(comma);
+        wxString t4 = t2.AfterFirst(comma);
+
+        t1.ToDouble(&x);
+        t3.ToDouble(&y);
+        t4.ToDouble(&z);
+      }
+      break;
     }
-
-
-    landmarkFileStream >> y;
-    landmarkFileStream >> z;
     
-    // todo: optimize this append
-    m_VmeCloud->AppendLandmark(mafString(counter), false);
-    m_VmeCloud->SetLandmark(counter, atof(x) ,atof(y) ,atof(z),0);
-    //m_VmeCloud->GetLandmark(counter)->SetRadius(5);
-    if(atof(x) == -9999 && atof(y) == -9999 && atof(z) == -9999 )
-      m_VmeCloud->SetLandmarkVisibility(counter, 0, 0);
+    if (!exception)
+    {
+      // todo: optimize this append
+      m_VmeCloud->AppendLandmark(mafString(counter), false);
+      m_VmeCloud->SetLandmark(counter,x,y,z,0);
+      if(x == -9999 && y == -9999 && z == -9999 )
+        m_VmeCloud->SetLandmarkVisibility(counter, 0, 0);
+    }
+    else
+    {
+      break;
+    }
+    
     counter++;
 
     progress = counter * 100 / numberOfLines;
     mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE, progress));
 
   }
+
   m_VmeCloud->Close();
   m_VmeCloud->Modified();
   m_VmeCloud->ReparentTo(m_Input);
