@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterLandmark.h,v $
   Language:  C++
-  Date:      $Date: 2010-07-28 13:35:58 $
-  Version:   $Revision: 1.3.2.1 $
+  Date:      $Date: 2010-07-29 15:27:21 $
+  Version:   $Revision: 1.3.2.2 $
   Authors:   Daniele Giunchi, Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2004
@@ -60,9 +60,7 @@ public:
 
   /** Read the file.
   the format of the file admits some speficics.
-  1) the line with landmark data are:
-     x y z
-     x,y,z
+  The line with landmark pose can be with any type of char separation (provided it has been selected by the user)
   */
   void ReadWithoutTag();
 
@@ -79,10 +77,14 @@ protected:
   {
     ID_TYPE_FILE = MINID,
     ID_TYPE_SEPARATION,
+    ID_ENABLE_STRING,
+    ID_STRING_SEPARATION,
     MINID,
   };
 
   int m_TypeSeparation;
+  int m_EnableString;
+  mafString m_StringSeparation;
 
   wxString m_FileDir;
 	wxString m_File;

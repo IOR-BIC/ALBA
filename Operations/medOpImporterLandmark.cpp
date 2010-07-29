@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterLandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-07-28 13:35:58 $
-  Version:   $Revision: 1.7.2.2 $
+  Date:      $Date: 2010-07-29 15:27:21 $
+  Version:   $Revision: 1.7.2.3 $
   Authors:   Daniele Giunchi, Simone Brazzale
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -45,6 +45,8 @@ mafOp(label)
 	m_File		= "";
 	m_FileDir = (mafGetApplicationDirectory() + "/Data/External/").c_str();
   m_TypeSeparation = 0;
+  m_EnableString = 0;
+  m_StringSeparation = mafString("");
 	
 	m_VmeCloud		= NULL;
 	m_TagFileFlag = false;
@@ -70,6 +72,8 @@ mafOp* medOpImporterLandmark::Copy()
 	cp->m_File = m_File;
 	cp->m_VmeCloud = m_VmeCloud;
   cp->m_TypeSeparation = m_TypeSeparation;
+  cp->m_EnableString = m_EnableString;
+  cp->m_StringSeparation = m_StringSeparation;
 	return cp;
 }
 //----------------------------------------------------------------------------
@@ -91,12 +95,17 @@ void medOpImporterLandmark::OpRun()
     {
       m_Gui = new mafGUI(this);
       wxString choices[2] =  {_("Space"),_("Comma")};
-      m_Gui->Radio(ID_TYPE_SEPARATION,"Separation",&m_TypeSeparation,2,choices,1,"");      
+      m_Gui->Radio(ID_TYPE_SEPARATION,"Separation",&m_TypeSeparation,2,choices,1,"");   
+      m_Gui->Bool(ID_ENABLE_STRING,"Other chars",&m_EnableString,1);
+      m_Gui->Divider();
+      m_Gui->String(ID_STRING_SEPARATION,"",&m_StringSeparation,"Insert here the right char for separation");
       m_Gui->Divider();
       m_Gui->Bool(ID_TYPE_FILE,"Tagged file",&m_TagFileFlag,0,"Check if the format is NAME x y z");
       m_Gui->Divider();
       m_Gui->OkCancel();
-      m_Gui->Enable(ID_TYPE_SEPARATION,!m_TagFileFlag);
+      m_Gui->Enable(ID_ENABLE_STRING,!m_TagFileFlag);
+      m_Gui->Enable(ID_TYPE_SEPARATION,!m_TagFileFlag && !m_EnableString);
+      m_Gui->Enable(ID_STRING_SEPARATION,!m_TagFileFlag && m_EnableString);
 	    m_Gui->Update();
       ShowGui();
     }
@@ -126,13 +135,27 @@ void medOpImporterLandmark::	OnEvent(mafEventBase *maf_event)
           if (m_TagFileFlag)
           {
             m_TypeSeparation = 0;
+            m_EnableString = 0;
           }
           if (!m_TestMode)
           {
-            m_Gui->Enable(ID_TYPE_SEPARATION,!m_TagFileFlag);
+            m_Gui->Enable(ID_ENABLE_STRING,!m_TagFileFlag);
+            m_Gui->Enable(ID_TYPE_SEPARATION,!m_TagFileFlag && !m_EnableString);
+            m_Gui->Enable(ID_STRING_SEPARATION,!m_TagFileFlag && m_EnableString);
 	          m_Gui->Update();
           }
         }
+      break;
+      case ID_ENABLE_STRING:
+        {
+          if (!m_TestMode)
+          {
+            m_Gui->Enable(ID_STRING_SEPARATION,!m_TagFileFlag && m_EnableString);
+            m_Gui->Enable(ID_TYPE_SEPARATION,!m_TagFileFlag && !m_EnableString);
+	          m_Gui->Update();
+          }
+        }
+      break;
       default:
         mafEventMacro(*e);
     }
@@ -316,7 +339,25 @@ void medOpImporterLandmark::ReadWithoutTag()
   long progress = 0;
 
   bool exception = FALSE;
-  const wxChar comma = ',';
+  
+  // select right type of character separation
+  wxChar separation_char;
+  if (!m_EnableString)
+  {
+    switch (m_TypeSeparation)
+    {
+    case 0:
+        separation_char = ' ';
+        break;
+    case 1:
+        separation_char = ',';
+        break;
+    }
+  }
+  else
+  {
+    separation_char = m_StringSeparation[0];
+  }
 
   if (!m_TestMode)
   {
@@ -327,69 +368,28 @@ void medOpImporterLandmark::ReadWithoutTag()
 
   while(!landmarkFileStream.fail())
   {
-    switch (m_TypeSeparation)
+    landmarkFileStream.getline(tmp,200);
+    if(mafString(tmp) == "") 
     {
-    case 0:
-      { 
-        landmarkFileStream >> tx;    
-        if(mafString(tx) == "") 
-        {
-          //jump the the blank line
-          landmarkFileStream.getline(tx,20);
-          continue;
-        }
-        landmarkFileStream >> ty;
-        landmarkFileStream >> tz;
+      // jump the blank line
+      landmarkFileStream.getline(tmp,200);
+      continue;
+    }
+    wxString s = wxString(tmp);
+    wxString t1 = s.BeforeFirst(separation_char);
+    wxString t2 = s.AfterFirst(separation_char);
+    wxString t3 = t2.BeforeFirst(separation_char);
+    wxString t4 = t2.AfterFirst(separation_char);
 
-        try {
-          x = atof(tx);
-          // workaround to see if the input format was wrong
-          if (x<-10000 || x>10000)
-            throw "Input file invalid!";
-        }
-        catch (char * err) {
-          wxMessageBox(err,_("Warning"),wxOK | wxICON_ERROR);
-          exception = TRUE;
-          break;
-        }
-        y = atof(ty);
-        z = atof(tz);
-      }
-      break;
-    case 1:
-      {
-        landmarkFileStream.getline(tmp,200);
-        if(mafString(tmp) == "") 
-        {
-          // jump the blank line
-          landmarkFileStream.getline(tmp,200);
-          continue;
-        }
-        wxString s = wxString(tmp);
-        wxString t1 = s.BeforeFirst(comma);
-        wxString t2 = s.AfterFirst(comma);
-        wxString t3 = t2.BeforeFirst(comma);
-        wxString t4 = t2.AfterFirst(comma);
+    t1.ToDouble(&x);
+    t3.ToDouble(&y);
+    t4.ToDouble(&z);
 
-        t1.ToDouble(&x);
-        t3.ToDouble(&y);
-        t4.ToDouble(&z);
-      }
-      break;
-    }
-    
-    if (!exception)
-    {
-      // todo: optimize this append
-      m_VmeCloud->AppendLandmark(mafString(counter), false);
-      m_VmeCloud->SetLandmark(counter,x,y,z,0);
-      if(x == -9999 && y == -9999 && z == -9999 )
-        m_VmeCloud->SetLandmarkVisibility(counter, 0, 0);
-    }
-    else
-    {
-      break;
-    }
+    // todo: optimize this append
+    m_VmeCloud->AppendLandmark(mafString(counter), false);
+    m_VmeCloud->SetLandmark(counter,x,y,z,0);
+    if(x == -9999 && y == -9999 && z == -9999 )
+      m_VmeCloud->SetLandmarkVisibility(counter, 0, 0);
     
     counter++;
 
