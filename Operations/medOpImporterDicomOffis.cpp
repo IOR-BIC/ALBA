@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-07-28 13:35:58 $
-Version:   $Revision: 1.1.2.121 $
+Date:      $Date: 2010-07-30 13:14:57 $
+Version:   $Revision: 1.1.2.122 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -1366,7 +1366,7 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 
 		for (int i = 0; i < imageDataVector.size(); i++)
 		{
-			imageDataVector[i]->Delete;
+			imageDataVector[i]->Delete();
 		}
 
 		imageDataVector.clear();
@@ -3698,6 +3698,8 @@ vtkImageData* medOpImporterDicomOffis::GetSliceImageDataFromLocalDicomFileName(m
 			}
 		}
 	}
+
+	return NULL;
 }
 
 //----------------------------------------------------------------------------
