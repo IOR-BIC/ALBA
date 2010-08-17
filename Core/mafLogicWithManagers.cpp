@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:44:31 $
-  Version:   $Revision: 1.139.2.2 $
+  Date:      $Date: 2010-08-17 08:05:05 $
+  Version:   $Revision: 1.139.2.3 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -925,6 +925,9 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
         if(m_ViewManager) m_ViewManager->CameraUpdate();
 // currently mafInteraction is strictly dependent on VTK (marco)
 #ifdef MAF_USE_VTK
+		//PERFORMANCE WARNING : if view manager exist this will cause another camera update!!
+		// An else could be added to reduce CAMERA_UPDATE by a 2 factor. This has been done for the HipOp vertical App showing
+		// big performance improvement in composite views creation.
         if(m_InteractionManager) m_InteractionManager->CameraUpdate(e->GetView());
 #endif
       break;
