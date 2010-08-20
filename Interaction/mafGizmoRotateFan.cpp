@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotateFan.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:47:18 $
-  Version:   $Revision: 1.11.2.1 $
+  Date:      $Date: 2010-08-20 16:11:50 $
+  Version:   $Revision: 1.11.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -222,6 +222,23 @@ void mafGizmoRotateFan::OnEvent(mafEventBase *maf_event)
     {
       case ID_TRANSFORM:
       {
+        mafString activeAxisStringToSend;
+        if (m_ActiveAxis == X)
+        {
+          activeAxisStringToSend = "X";
+        }
+        else if (m_ActiveAxis == Y)
+        {
+          activeAxisStringToSend = "Y";
+        } 
+        else if (m_ActiveAxis == Z)
+        {
+          activeAxisStringToSend = "Z";
+        }
+
+        assert(e->GetString() == NULL);
+        e->SetString(&activeAxisStringToSend);
+
         if (e->GetArg() == mafInteractorGenericMouse::MOUSE_DOWN)
         {
           //----------------------------------------
@@ -257,6 +274,7 @@ void mafGizmoRotateFan::OnEvent(mafEventBase *maf_event)
         else if (e->GetArg() == mafInteractorGenericMouse::MOUSE_MOVE)
         {
           double dTheta = e->GetDouble();
+        
           if (m_MirrorStatus == ON)
           {
             m_EndTheta -= dTheta;     
@@ -293,6 +311,7 @@ void mafGizmoRotateFan::OnEvent(mafEventBase *maf_event)
 
           // change the sender and forward the event
           e->SetSender(this);
+          
           mafEventMacro(*e);
         }
         else if (e->GetArg() == mafInteractorGenericMouse::MOUSE_UP)

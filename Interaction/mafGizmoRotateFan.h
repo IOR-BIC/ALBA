@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotateFan.h,v $
   Language:  C++
-  Date:      $Date: 2008-06-12 11:15:42 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2010-08-20 16:11:50 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -43,6 +43,12 @@ class mafRefSys;
   
           X               Y            Z
   
+  This component notifies the listener with the activeGizmoAxis  
+  and the localRotationAngle around the activGizmoAxis
+
+  mafString activeGizmoAxis = *(event->GetString()); // "X", "Y" or "Z" string
+  double localRotationAngle = event->GetDouble();
+
   @sa mafGizmoRotate 
 */
 class mafGizmoRotateFan: public mafObserver 
