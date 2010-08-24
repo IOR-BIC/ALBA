@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medDicomCardiacMRIHelper.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-05-26 16:01:53 $
-  Version:   $Revision: 1.1.2.16 $
+  Date:      $Date: 2010-08-24 14:12:12 $
+  Version:   $Revision: 1.1.2.17 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -805,8 +805,13 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
 	
 	if (!skip)
 	{
+		// while ~isempty(V)
+		
+		int counter = 0;
+		
 		while (V.rows() != 0 && V.cols() != 0)
 		{
+			
 			for (int i = 0; i < V.rows(); i++) 
 			{
 				vnl_vector<double> v0(3,0);
@@ -844,9 +849,11 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
 
 				for (int i = Vidx.rows(); i < Vidx.rows() + id_theta.size(); i++) 
 				{
-				tmp3.set_row(i, V.get_row(id_theta[i - Vidx.rows()]));
+				int row = id_theta[i - Vidx.rows()];
+
+				tmp3.set_row(i, V.get_row(row));
 				}
-	             
+
 				Vidx = tmp3;
 	             
 	    
@@ -857,12 +864,7 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
 				RemoveRows(inputMatrix, rowsToRemoveVector, outputMatrix);
 
 				V = outputMatrix;
-	              
-
-	              
-	              
-	              
-
+	         
 				theta.clear();
 
 			}
@@ -917,13 +919,13 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
 
 				for (int i = 0; i < id_theta.size(); i++) 
 				{
-				int id_theta_i = id_theta[i];
-				tmp3.set_row(i, V.get_row(id_theta[i]));
+					int id_theta_i = id_theta[i];
+					tmp3.set_row(i, V.get_row(id_theta[i]));
 				}
 
 				for (int i = id_theta.size(); i < id_theta.size() + Vidx.rows(); i++) 
 				{
-				tmp3.set_row(i, Vidx.get_row(i-id_theta.size()));
+					tmp3.set_row(i, Vidx.get_row(i-id_theta.size()));
 				}
 
 				Vidx = tmp3;
@@ -938,6 +940,10 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
 	              
 				theta.clear();
 			}
+
+			theta.clear();
+
+			counter = counter + 1;
 		}
 	}
 
