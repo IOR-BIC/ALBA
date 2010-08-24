@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medDicomCardiacMRIHelper.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-08-24 14:12:12 $
-  Version:   $Revision: 1.1.2.17 $
+  Date:      $Date: 2010-08-24 14:55:29 $
+  Version:   $Revision: 1.1.2.18 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -807,8 +807,6 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
 	{
 		// while ~isempty(V)
 		
-		int counter = 0;
-		
 		while (V.rows() != 0 && V.cols() != 0)
 		{
 			
@@ -943,7 +941,6 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
 
 			theta.clear();
 
-			counter = counter + 1;
 		}
 	}
 
