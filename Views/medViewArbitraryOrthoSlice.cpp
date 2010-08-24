@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2010-08-20 16:12:48 $
-Version:   $Revision: 1.1.2.8 $
+Date:      $Date: 2010-08-24 16:24:51 $
+Version:   $Revision: 1.1.2.9 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -146,6 +146,9 @@ medViewArbitraryOrthoSlice::medViewArbitraryOrthoSlice(wxString label, bool show
 	m_YCameraConeVME = NULL;
 	m_ZCameraConeVME = NULL;
 
+	m_XCameraRollForReset = 0;
+	m_YCameraRollForReset = 0;
+	m_ZCameraRollForReset = 0;
 }
 
 medViewArbitraryOrthoSlice::~medViewArbitraryOrthoSlice()
@@ -453,6 +456,8 @@ void medViewArbitraryOrthoSlice::OnEventGizmoRotate(mafEventBase *maf_event)
 
         double zAngle = event->GetDouble();
         m_ChildViewList[Z_VIEW]->GetRWI()->GetCamera()->Roll(-zAngle);
+
+
       }
       else if (activeGizmoAxis.Equals("Y"))
       {		    
@@ -977,6 +982,9 @@ void medViewArbitraryOrthoSlice::ShowMafVMEVolume( mafVME * vme, bool show )
 	vtkDEL(localToABSTPDF);
 	vtkDEL(transformReset);
 
+	m_XCameraRollForReset = ((mafViewSlice*)m_ChildViewList[X_VIEW])->GetRWI()->GetCamera()->GetRoll();
+	m_YCameraRollForReset = ((mafViewSlice*)m_ChildViewList[Y_VIEW])->GetRWI()->GetCamera()->GetRoll();
+	m_ZCameraRollForReset = ((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetRoll();
 }
 
 void medViewArbitraryOrthoSlice::ShowMedVMEPolylineEditor( mafNode * node )
@@ -1123,8 +1131,17 @@ void medViewArbitraryOrthoSlice::OnReset()
 		m_SlicerX->SetAbsMatrix(*m_SlicerXResetMatrix);
 		m_SlicerY->SetAbsMatrix(*m_SlicerYResetMatrix);
 		m_SlicerZ->SetAbsMatrix(*m_SlicerZResetMatrix);
-
+		
 		//update because I need to refresh the normal of the camera
+		mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+
+
+		((mafViewSlice*)m_ChildViewList[X_VIEW])->GetRWI()->GetCamera()->SetRoll(m_XCameraRollForReset);
+
+		((mafViewSlice*)m_ChildViewList[Y_VIEW])->GetRWI()->GetCamera()->SetRoll(m_YCameraRollForReset);
+
+		((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->SetRoll(m_ZCameraRollForReset);
+
 		mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 
 		//update the normal of the cutter plane of the surface
