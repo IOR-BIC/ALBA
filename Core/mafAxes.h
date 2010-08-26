@@ -1,13 +1,13 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: mafAxes.h,v $
-  Language:  C++
-  Date:      $Date: 2009-02-17 15:28:15 $
-  Version:   $Revision: 1.1.22.1 $
-  Authors:   Silvano Imboden
+Program:   Multimod Application Framework
+Module:    $RCSfile: mafAxes.h,v $
+Language:  C++
+Date:      $Date: 2010-08-26 15:02:00 $
+Version:   $Revision: 1.1.22.2 $
+Authors:   Silvano Imboden , Stefano perticoni
 ==========================================================================
-  Copyright (c) 2002/2004
-  CINECA - Interuniversity Consortium (www.cineca.it) 
+Copyright (c) 2002/2004
+CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
 #ifndef __mafAxes_h
@@ -24,48 +24,68 @@ class vtkCoordinate;
 class vtkActor2D;
 class vtkLookupTable;
 class vtkMatrix4x4;
+class vtkPolyData;
+class vtkMAFAnnotatedCubeActor;
+class vtkMAFOrientationMarkerWidget;
+
 //----------------------------------------------------------------------------
 class mafAxes
-//----------------------------------------------------------------------------
-/**
-create a vtkAxes and insert it in the passed renderer
-as a vtkActor2D
+	//----------------------------------------------------------------------------
+	/**
+	create a vtkAxes and insert it in the passed renderer
+	as a vtkActor2D 
 
-If a vme is provided, the axes will represent 
-the local vme-reference system.
+	mafAxes(renderer, NULL, TRIAD); => Create a global axis triad 2D actor in the passed renderer
+	mafAxes(renderer, vme, TRIAD); => Create a vme local axis triad 2D actor in the passed renderer
+	
+	mafAxes(renderer, NULL, CUBE); => Create a 3D global axes cube on a new renderer and on a superimposed layer
+	//mafAxes(renderer, vme, CUBE); => BEWARE !!! NOT SUPPORTED !!! (TODO...)
+	
+	If a vme is provided, the axes will represent 
+	the local vme-reference system.
 
-If vme is NULL, the axes will represent the global
-reference system
+	If vme is NULL, the axes will represent the global
+	reference system
 
-@sa mafAxesTest for example usage
+	@sa mafAxesTest for example usage
 
-@todo API improvements needed, see mafAxesTest for api improvement use cases
-*/
+	@todo API improvements needed, see mafAxesTest for api improvement use cases
+	*/
 {
 public:
 
-  /** Constructor note: given renderer ren cannot be NULL */
-           mafAxes(vtkRenderer *ren, mafVME* vme = NULL);
-  virtual ~mafAxes();
-	
-	/** Set the axes visibility. */
-  void     SetVisibility(bool show);
+	enum AXIS_TYPE_ENUM
+	{
+		TRIAD = 0, // default: 2D actor representing 3 small axes attached to the main render window camera
+		CUBE, // 3D actor representing a rotating cube attached to the main render window camera
+		NUMBER_OF_AXES_TYPES,
+	};
 
-  /** Force the position of the Axes, if omitted the ABS vme matrix is used instead. 
-  Works only if a vme was specified in the constructor*/
-  void     SetPose( vtkMatrix4x4 *abs_pose_matrix = NULL);
+	/** Constructor note: given renderer ren cannot be NULL */
+	mafAxes(vtkRenderer *ren, mafVME* vme = NULL, int axesType = TRIAD);
+	virtual ~mafAxes();
+
+	/** Set the axes visibility. */
+	void     SetVisibility(bool show);
+
+	/** Force the position of the Axes, if omitted the ABS vme matrix is used instead. 
+	Works only if a vme was specified in the constructor*/
+	void     SetPose( vtkMatrix4x4 *abs_pose_matrix = NULL);
 
 protected:
-  mafVME      *m_Vme;
-  vtkRenderer *m_Renderer;
-	
-	vtkAxes                *m_Axes;
-	vtkPolyDataMapper2D		 *m_AxesMapper;
+
+	mafVME      *m_Vme;
+	vtkRenderer *m_Renderer;
+	vtkAxes                *m_TriadAxes;
+	vtkPolyDataMapper2D		 *m_AxesMapper2D;
 	vtkCoordinate 				 *m_Coord;
-	vtkActor2D						 *m_AxesActor;
+	vtkActor2D						 *m_AxesActor2D;
 	vtkLookupTable				 *m_AxesLUT;
-  
-  /** friend test class */
-  friend class mafAxesTest;
+	int m_AxesType;
+	vtkMAFOrientationMarkerWidget* m_OrientationMarkerWidget ;
+	vtkMAFAnnotatedCubeActor* m_AnnotatedCubeActor;
+
+	/** friend test class */
+	friend class mafAxesTest;
 };
 #endif

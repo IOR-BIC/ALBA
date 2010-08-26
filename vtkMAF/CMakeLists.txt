@@ -8,6 +8,13 @@ PROJECT(vtkMAF)
 # Set your list of sources here.  Do not change the name of the
 # vtkMAF_SRCS variable.
 SET(vtkMAF_SRCS
+
+  vtkMAFOrientationMarkerWidget.h
+  vtkMAFOrientationMarkerWidget.cpp
+  
+  vtkMAFAnnotatedCubeActor.h
+  vtkMAFAnnotatedCubeActor.cpp
+  
   vtkMAFCellsFilter.cxx
   vtkMAFCellsFilter.h  
   vtkMAFRemoveCellsFilter.cxx
