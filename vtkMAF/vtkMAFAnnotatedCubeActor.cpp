@@ -12,7 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkAnnotatedCubeActor.h"
+
+#include "vtkMAFAnnotatedCubeActor.h"
 
 #include "vtkActor.h"
 #include "vtkAppendPolyData.h"
@@ -32,7 +33,7 @@
 #include "vtkVectorText.h"
 #include "vcl_cassert.h"
 
-vtkCxxRevisionMacro(vtkMAFAnnotatedCubeActor, "$Revision: 1.1.2.1 $");
+vtkCxxRevisionMacro(vtkMAFAnnotatedCubeActor, "$Revision: 1.1.2.2 $");
 vtkStandardNewMacro(vtkMAFAnnotatedCubeActor);
 
 //-------------------------------------------------------------------------

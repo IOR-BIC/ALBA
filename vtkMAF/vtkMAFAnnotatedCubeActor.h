@@ -38,8 +38,8 @@
 // .SECTION See Also
 // vtkAxesActor vtkMAFOrientationMarkerWidget vtkVectorText mafAxes 
 
-#ifndef __vtkAnnotatedCubeActor_h
-#define __vtkAnnotatedCubeActor_h
+#ifndef __vtkMAFAnnotatedCubeActor_h
+#define __vtkMAFAnnotatedCubeActor_h
 
 #include "vtkProp3D.h"
 

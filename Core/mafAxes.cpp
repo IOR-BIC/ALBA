@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafAxes.cpp,v $
 Language:  C++
-Date:      $Date: 2010-08-26 15:02:00 $
-Version:   $Revision: 1.2.2.2 $
+Date:      $Date: 2010-08-27 12:32:17 $
+Version:   $Revision: 1.2.2.3 $
 Authors:   Silvano Imboden , Stefano perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -35,8 +35,6 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkMAFLocalAxisCoordinate.h"
 #include "vtkMAFGlobalAxisCoordinate.h"
 #include "vtkRenderWindow.h"
-#include "vtkAnnotatedCubeActor.h"
-#include "vtkOrientationMarkerWidget.h"
 #include "vtkMAFOrientationMarkerWidget.h"
 #include "vtkMAFAnnotatedCubeActor.h"
 
