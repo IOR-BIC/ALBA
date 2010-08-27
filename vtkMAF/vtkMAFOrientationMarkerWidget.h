@@ -69,15 +69,15 @@
 // vtkInteractorObserver vtkXYPlotWidget vtkScalarBarWidget vtkAxesActor
 // vtkAnnotatedCubeActor
 
-#ifndef __vtkOrientationMarkerWidget_h
-#define __vtkOrientationMarkerWidget_h
+#ifndef __vtkMAFOrientationMarkerWidget_h
+#define __vtkMAFOrientationMarkerWidget_h
 
 #include "vtkInteractorObserver.h"
 
 class vtkActor2D;
 class vtkPolyData;
 class vtkProp;
-class vtkOrientationMarkerWidgetObserver;
+class vtkMAFOrientationMarkerWidgetObserver;
 class vtkRenderer;
 
 class vtkMAFOrientationMarkerWidget : public vtkInteractorObserver
@@ -148,7 +148,7 @@ protected:
   void OnMouseMove();
 
   // observer to update the renderer's camera
-  vtkOrientationMarkerWidgetObserver *Observer;
+  vtkMAFOrientationMarkerWidgetObserver *Observer;
 
   int Interactive;
   int Tolerance;

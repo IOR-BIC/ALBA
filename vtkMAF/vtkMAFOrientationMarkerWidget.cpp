@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkOrientationMarkerWidget.h"
+#include "vtkMAFOrientationMarkerWidget.h"
 
 #include "vtkActor2D.h"
 #include "vtkCallbackCommand.h"
@@ -28,17 +28,17 @@
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 
-vtkCxxRevisionMacro(vtkMAFOrientationMarkerWidget, "$Revision: 1.1.2.1 $");
+vtkCxxRevisionMacro(vtkMAFOrientationMarkerWidget, "$Revision: 1.1.2.2 $");
 vtkStandardNewMacro(vtkMAFOrientationMarkerWidget);
 vtkCxxSetObjectMacro(vtkMAFOrientationMarkerWidget, OrientationMarker, vtkProp);
 
-class vtkOrientationMarkerWidgetObserver : public vtkCommand
+class vtkMAFOrientationMarkerWidgetObserver : public vtkCommand
 {
 public:
-  static vtkOrientationMarkerWidgetObserver *New()
-    {return new vtkOrientationMarkerWidgetObserver;};
+  static vtkMAFOrientationMarkerWidgetObserver *New()
+    {return new vtkMAFOrientationMarkerWidgetObserver;};
 
-  vtkOrientationMarkerWidgetObserver()
+  vtkMAFOrientationMarkerWidgetObserver()
     {
     this->OrientationMarkerWidget = 0;
     }
@@ -60,7 +60,7 @@ vtkMAFOrientationMarkerWidget::vtkMAFOrientationMarkerWidget()
   this->StartEventObserverId = 0;
   this->EventCallbackCommand->SetCallback( vtkMAFOrientationMarkerWidget::ProcessEvents );
 
-  this->Observer = vtkOrientationMarkerWidgetObserver::New();
+  this->Observer = vtkMAFOrientationMarkerWidgetObserver::New();
   this->Observer->OrientationMarkerWidget = this;
 
   this->Tolerance = 7;
