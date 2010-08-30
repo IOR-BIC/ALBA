@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-07-26 15:57:14 $
-  Version:   $Revision: 1.29.2.6 $
+  Date:      $Date: 2010-08-30 15:35:25 $
+  Version:   $Revision: 1.29.2.7 $
   Authors:   Matteo Giacomoni, Simone Brazzale
 ==========================================================================
   Copyright (c) 2002/2004
@@ -193,7 +193,7 @@ mafView *mafViewGlobalSlice::Copy(mafObserver *Listener)
 void mafViewGlobalSlice::Create()
 //----------------------------------------------------------------------------
 {
-  RWI_LAYERS num_layers = m_CameraPositionId != CAMERA_OS_P ? TWO_LAYER : ONE_LAYER;
+  RWI_LAYERS num_layers = TWO_LAYER;
   
   m_Rwi = new mafRWI(mafGetFrame(), num_layers, m_ShowGrid, m_ShowAxes, m_ShowRuler, m_StereoType);
   m_Rwi->SetListener(this);
