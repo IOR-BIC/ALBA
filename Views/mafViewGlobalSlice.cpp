@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-08-30 16:32:43 $
-  Version:   $Revision: 1.29.2.9 $
+  Date:      $Date: 2010-08-30 16:34:32 $
+  Version:   $Revision: 1.29.2.10 $
   Authors:   Matteo Giacomoni, Simone Brazzale
 ==========================================================================
   Copyright (c) 2002/2004
@@ -173,7 +173,7 @@ mafViewGlobalSlice::~mafViewGlobalSlice()
   m_BoundsOutlineMapper.clear();
   m_BoundsOutlineActor.clear();
 
-  m_mapID.clear();
+  m_MapID.clear();
 
 	vtkDEL(m_TextActor);
 	vtkDEL(m_TextMapper);
@@ -310,10 +310,10 @@ void mafViewGlobalSlice::VmeCreatePipe(mafNode *node)
   mafString pipe_name = "";
   GetVisualPipeName(node, pipe_name);
 
-  std::pair<mafID,int> pair(node->GetId(),m_numberOfVmeInstantiated);
-  m_mapID.insert(pair);
+  std::pair<mafID,int> pair(node->GetId(),m_NumberOfVmeInstantiated);
+  m_MapID.insert(pair);
   
-  m_numberOfVmeInstantiated++;
+  m_NumberOfVmeInstantiated++;
 
   mafSceneNode *n = m_Sg->Vme2Node(node);
   assert(n && !n->m_Pipe);
@@ -450,11 +450,11 @@ void mafViewGlobalSlice::VmeDeletePipe(mafNode *vme)
   }
   if (m_Rwi && m_BoundsOutlineActor.size()>0)
   {
-    int j = m_mapID[vme->GetId()];
+    int j = m_MapID[vme->GetId()];
     if (j!=-1 && j<m_BoundsOutlineActor.size() && m_BoundsOutlineActor.at(j))
     {
       m_Rwi->m_RenFront->RemoveActor2D(m_BoundsOutlineActor.at(j));
-      m_mapID.erase(vme->GetId());
+      m_MapID.erase(vme->GetId());
     }
   }
   assert(n && n->m_Pipe);
