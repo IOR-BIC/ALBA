@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafAxes.cpp,v $
 Language:  C++
-Date:      $Date: 2010-08-27 12:32:17 $
-Version:   $Revision: 1.2.2.3 $
+Date:      $Date: 2010-08-30 15:33:43 $
+Version:   $Revision: 1.2.2.4 $
 Authors:   Silvano Imboden , Stefano perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -42,6 +42,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 mafAxes::mafAxes(vtkRenderer *ren, mafVME* vme, int axesType)
 //----------------------------------------------------------------------------
 {
+	m_AxesType = axesType;
 	m_OrientationMarkerWidget = NULL;
 	m_AnnotatedCubeActor = NULL;
 	m_Coord = NULL;
@@ -56,7 +57,6 @@ mafAxes::mafAxes(vtkRenderer *ren, mafVME* vme, int axesType)
 	m_TriadAxes = NULL;
 	
 	assert(m_Renderer);
-
 
 	if (m_AxesType == TRIAD)
 	{
@@ -117,6 +117,8 @@ mafAxes::~mafAxes()
 //----------------------------------------------------------------------------
 {
 	vtkDEL(m_AnnotatedCubeActor);
+	
+	if (m_OrientationMarkerWidget != NULL) m_OrientationMarkerWidget->SetInteractor(NULL);
 	vtkDEL(m_OrientationMarkerWidget);
 
 	m_Renderer->RemoveActor2D(m_AxesActor2D);

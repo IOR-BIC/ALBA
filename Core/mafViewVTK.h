@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-16 09:52:51 $
-  Version:   $Revision: 1.55.2.2 $
+  Date:      $Date: 2010-08-30 15:33:43 $
+  Version:   $Revision: 1.55.2.3 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,7 +21,7 @@
 #include "mafSceneGraph.h"
 #include "mafSceneNode.h" //used in subclasses
 #include <map>
-
+#include "mafAxes.h"
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
@@ -44,7 +44,8 @@ mafViewVTK is a View that got a RenderWindow and a SceneGraph
 class mafViewVTK: public mafView
 {
 public:
-  mafViewVTK(const wxString &label = "vtkView", int camera_position = CAMERA_PERSPECTIVE, bool show_axes = true, bool show_grid = false, bool show_ruler = false, int stereo = 0, bool show_orientator = false);
+
+  mafViewVTK(const wxString &label = "vtkView", int camera_position = CAMERA_PERSPECTIVE, bool show_axes = true, bool show_grid = false, bool show_ruler = false, int stereo = 0, bool show_orientator = false, int axesType = mafAxes::TRIAD);
   virtual ~mafViewVTK(); 
 
   mafTypeMacro(mafViewVTK, mafView);
@@ -158,6 +159,7 @@ public:
   virtual void Print(std::ostream& os, const int tabs=0);// const;
 
 protected:
+
   mafSceneGraph *m_Sg;
   mafLightKit		*m_LightKit;
   mafTextKit    *m_TextKit;
@@ -169,7 +171,8 @@ protected:
   int   m_StereoType; ///< Indicate the stereo type to use with the view
   bool  m_ShowRuler;
   bool  m_ShowGrid;
-	bool m_ShowOrientator;
+  bool m_ShowOrientator;
+  int  m_AxesType;
 
   virtual mafGUI *CreateGui();
 

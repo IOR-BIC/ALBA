@@ -1,10 +1,10 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: mafRWI.h,v $
-  Language:  C++
-  Date:      $Date: 2008-09-18 10:25:53 $
-  Version:   $Revision: 1.25 $
-  Authors:   Silvano Imboden
+Program:   Multimod Application Framework
+Module:    $RCSfile: mafRWI.h,v $
+Language:  C++
+Date:      $Date: 2010-08-30 15:33:43 $
+Version:   $Revision: 1.25.2.1 $
+Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -16,6 +16,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 #include "mafRWIBase.h"
 #include "mafObserver.h"
+#include "mafAxes.h"
 
 //----------------------------------------------------------------------------
 // Forward References :
@@ -41,7 +42,7 @@ class vtkMAFProfilingActor;
 enum RWI_LAYERS
 {
 	ONE_LAYER = 0,
-  TWO_LAYER
+	TWO_LAYER
 };
 //----------------------------------------------------------------------------
 // mafRWI :
@@ -49,23 +50,23 @@ enum RWI_LAYERS
 class mafRWI : public mafObserver
 {
 public:
-  				 mafRWI();
-           mafRWI(wxWindow *parent, RWI_LAYERS layers = ONE_LAYER, bool use_grid = false, bool show_axes = false, bool show_ruler = false, int stereo = 0, bool show_orientator = false);
+	mafRWI();
+	mafRWI(wxWindow *parent, RWI_LAYERS layers = TWO_LAYER, bool use_grid = false, bool show_axes = false, bool show_ruler = false, int stereo = 0, bool show_orientator = false, int axesType = mafAxes::TRIAD) ;
 	virtual	~mafRWI();
 
-  virtual void SetListener(mafObserver *Listener) {m_Listener = Listener;};
+	virtual void SetListener(mafObserver *Listener) {m_Listener = Listener;};
 
-  virtual void OnEvent(mafEventBase *maf_event);
+	virtual void OnEvent(mafEventBase *maf_event);
 
 	/** Create all the elements necessary to build the rendering scene.*/
-  void CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers = ONE_LAYER, bool use_grid = false, bool show_axes = false, bool show_ruler = false, int stereo = 0, bool show_orientator = false);
+	void CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers = TWO_LAYER, bool use_grid = false, bool show_axes = false, bool show_ruler = false, int stereo = 0, bool show_orientator = false, int axesType = mafAxes::TRIAD);
 
-  /** Reset the camera position. If vme is passed as parameter, the camera is resetted to fill the vme into the view. */
+	/** Reset the camera position. If vme is passed as parameter, the camera is resetted to fill the vme into the view. */
 	void CameraReset(mafNode *vme = NULL, double zoom = 1);
 
 	/** Reset the camera position according to the bounds. */
 	void CameraReset(double bounds[6], double zoom = 1);
-  
+
 	/** Update the renderwindow. */
 	void CameraUpdate();
 
@@ -73,8 +74,8 @@ public:
 	void CameraSet(int cam_position, double zoom = 1);
 
 
-  /** Set the camera position, set custom pos , custom viewUp , zoom and if projection is parallel */
-  void CameraSet(double pos[3],double viewUp[3], double zoom = 1., bool parallelProjection = false);
+	/** Set the camera position, set custom pos , custom viewUp , zoom and if projection is parallel */
+	void CameraSet(double pos[3],double viewUp[3], double zoom = 1., bool parallelProjection = false);
 
 	/** Set the render window's size. */
 	void SetSize(int x, int y, int w,int h);
@@ -103,24 +104,24 @@ public:
 	/** Set the visibility for the axes actor. */
 	void SetAxesVisibility(bool show);
 
-  /** Set the visibility for the rule actor. */
-  void SetRuleVisibility(bool show = true);
+	/** Set the visibility for the rule actor. */
+	void SetRuleVisibility(bool show = true);
 
 	/** Set the visibility for the rule actor. */
 	void SetOrientatorVisibility(bool show = true);
 
-  /** Set the visibility for the rule actor. */
-  void SetOrientatorSingleActorVisibility(bool showLeft = true, bool showDown = true, bool showRight = true, bool showUp = true);
-  
-  /** Set the text for the rule actor. */
-  void SetOrientatorSingleActorText(const char* textLeft, const char* textDown, const char* textRight, const char* textUp);
+	/** Set the visibility for the rule actor. */
+	void SetOrientatorSingleActorVisibility(bool showLeft = true, bool showDown = true, bool showRight = true, bool showUp = true);
 
-  /** Set the scale factor to convert the data scale to the visualized scale of the rule. 
-      By default the ruler shows the same scale of the data. */
-  void SetRulerScaleFactor(const double &scale_factor);
+	/** Set the text for the rule actor. */
+	void SetOrientatorSingleActorText(const char* textLeft, const char* textDown, const char* textRight, const char* textUp);
 
-  /** Set the label of the ruler. Example the unit measure of the data. */
-  void SetRulerLegend(const mafString &ruler_legend);
+	/** Set the scale factor to convert the data scale to the visualized scale of the rule. 
+	By default the ruler shows the same scale of the data. */
+	void SetRulerScaleFactor(const double &scale_factor);
+
+	/** Set the label of the ruler. Example the unit measure of the data. */
+	void SetRulerLegend(const mafString &ruler_legend);
 
 	/** Set Orientator Text Properties */
 	void SetOrientatorProperties(double rgbText[3], double rgbBackground[3], double scale = 1);
@@ -128,73 +129,74 @@ public:
 	/** Set Profiling Information Text Visibility*/
 	void SetProfilingActorVisibility(bool show);
 
-  /** Update scale factor and legend.
-  This method is called from logic to update measure unit according to the application settings.*/
-  void UpdateRulerUnit();
+	/** Update scale factor and legend.
+	This method is called from logic to update measure unit according to the application settings.*/
+	void UpdateRulerUnit();
 
-  virtual mafGUI *GetGui();
+	virtual mafGUI *GetGui();
 
-  /** Update member variables and GUI elements according to vtkCamera position, focal point, view up, ...*/
-  void UpdateCameraParameters();
+	/** Update member variables and GUI elements according to vtkCamera position, focal point, view up, ...*/
+	void UpdateCameraParameters();
 
-  /** Allow to add/remove current vtkCamera to the list of vtkCamera linked together*/
-  void LinkCamera(bool linc_camera = true);
+	/** Allow to add/remove current vtkCamera to the list of vtkCamera linked together*/
+	void LinkCamera(bool linc_camera = true);
 
-  /*Return active ruler for using its methods*/
+	/*Return active ruler for using its methods*/
 	vtkMAFSimpleRulerActor2D *GetRuler(){return m_Ruler;};
 
-  mafSceneGraph    *m_Sg; 
-  mafRWIBase			 *m_RwiBase;
-  vtkRenderer      *m_RenFront; ///< Renderer used to show actors on the first layer
-  vtkRenderer      *m_RenBack; ///< Renderer used to show actors on the second layer
-  vtkRenderWindow  *m_RenderWindow;
-  vtkLight         *m_Light;
-  vtkCamera				 *m_Camera;
-  int               m_CameraPositionId; ///< Integer representing a preset for camera position, focal point and view up
-  double            m_CameraPosition[3]; ///< Vector representing the camera position
-  double            m_FocalPoint[3]; ///< Vector representing the camera focal point
+	mafSceneGraph    *m_Sg; 
+	mafRWIBase			 *m_RwiBase;
+	vtkRenderer      *m_RenFront; ///< Renderer used to show actors on the first layer
+	vtkRenderer      *m_RenBack; ///< Renderer used to show actors on the second layer
+	vtkRenderWindow  *m_RenderWindow;
+	vtkLight         *m_Light;
+	vtkCamera				 *m_Camera;
+	int               m_CameraPositionId; ///< Integer representing a preset for camera position, focal point and view up
+	double            m_CameraPosition[3]; ///< Vector representing the camera position
+	double            m_FocalPoint[3]; ///< Vector representing the camera focal point
 
-  double            m_CameraViewUp[3]; ///< Vector representing the camera view-up
-  double            m_CameraOrientation[3]; ///< Vector representing the camera orientation
+	double            m_CameraViewUp[3]; ///< Vector representing the camera view-up
+	double            m_CameraOrientation[3]; ///< Vector representing the camera orientation
 
-  double            m_StepCameraOrientation; ///< Step with which rotate the camera around its focal point.
-  double            m_TopBottomAccumulation;
-  double            m_LeftRigthAccumulation; 
-  double            m_TopBottomAccumulationLast;
-  double            m_LeftRigthAccumulationLast; 
+	double            m_StepCameraOrientation; ///< Step with which rotate the camera around its focal point.
+	double            m_TopBottomAccumulation;
+	double            m_LeftRigthAccumulation; 
+	double            m_TopBottomAccumulationLast;
+	double            m_LeftRigthAccumulationLast; 
 protected:
 	/** Compute the bounds for the visible actors; if vme is passed, the bounds of vme are calculated. */
 	double *ComputeVisibleBounds(mafNode *node = NULL);
-  mafGUI *CreateGui();
+	mafGUI *CreateGui();
 
-  mafGUI       *m_Gui;
-  wxColour	    m_BGColour;
-  wxColour	    m_GridColour;
-  double        m_GridPosition;
-  mafGUIPicButton *m_CameraButtons[6];
-  wxBoxSizer	 *m_Sizer;
-	
-  mafAxes          *m_Axes; ///< Actor representing a global reference system.
-  vtkMAFGridActor     *m_Grid; ///< Actor representing a grid showed into the render window.
-  int               m_ShowGrid; ///< Flag used to show/hide the grid.
-  int               m_GridNormal;
-  int               m_ShowAxes;  ///< Flag used to show/hide axes in low left corner of the view
-  int               m_LinkCamera;///< Flag that enable to synchronize camera interaction to other camera
+	mafGUI       *m_Gui;
+	wxColour	    m_BGColour;
+	wxColour	    m_GridColour;
+	double        m_GridPosition;
+	mafGUIPicButton *m_CameraButtons[6];
+	wxBoxSizer	 *m_Sizer;
 
-  double        m_RulerScaleFactor;
-  mafString     m_RulerLegend;
-  vtkMAFSimpleRulerActor2D *m_Ruler;
-  int           m_ShowRuler; ///< Flag used to show/hide ruler actor into a parallel view
-  int           m_StereoType;
+	mafAxes          *m_Axes; ///< Actor representing a global reference system.
+	vtkMAFGridActor     *m_Grid; ///< Actor representing a grid showed into the render window.
+	int               m_ShowGrid; ///< Flag used to show/hide the grid.
+	int               m_GridNormal;
+	int               m_ShowAxes;  ///< Flag used to show/hide axes in low left corner of the view
+	int               m_LinkCamera;///< Flag that enable to synchronize camera interaction to other camera
+
+	double        m_RulerScaleFactor;
+	mafString     m_RulerLegend;
+	vtkMAFSimpleRulerActor2D *m_Ruler;
+	int           m_ShowRuler; ///< Flag used to show/hide ruler actor into a parallel view
+	int           m_StereoType;
 	vtkMAFTextOrientator     *m_Orientator;
 	int          m_ShowProfilingInformation;
 	int          m_ShowOrientator;
-  mafObserver  *m_Listener;
+	mafObserver  *m_Listener;
 
-	
+
 	vtkMAFProfilingActor *m_ProfilingActor;
 
-  mafString m_StereoMovieDir;
-  int       m_StereoMovieEnable;
+	mafString m_StereoMovieDir;
+	int       m_StereoMovieEnable;
+	int       m_AxesType;
 };
 #endif

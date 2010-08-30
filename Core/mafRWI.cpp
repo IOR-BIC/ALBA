@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-11-07 15:14:08 $
-  Version:   $Revision: 1.49.2.1 $
+  Date:      $Date: 2010-08-30 15:33:43 $
+  Version:   $Revision: 1.49.2.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -94,7 +94,7 @@ mafRWI::mafRWI()
 
 }
 //----------------------------------------------------------------------------
-mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axes, bool show_ruler, int stereo, bool show_orientator)
+mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axes, bool show_ruler, int stereo, bool show_orientator, int axesType)
 //----------------------------------------------------------------------------
 {
   m_Listener= NULL;
@@ -109,7 +109,10 @@ mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axe
   m_Ruler   = NULL;
   m_Grid    = NULL;
   m_Axes    = NULL;
-	m_ProfilingActor = NULL;
+  m_AxesType = axesType;
+
+  m_ProfilingActor = NULL;
+  
   for (int b=0; b<6; b++)
   {
     m_CameraButtons[b] = NULL;
@@ -123,7 +126,7 @@ mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axe
 
   m_StereoMovieDir    = "";
   m_StereoMovieEnable = 0;
-	m_ShowProfilingInformation = 0;
+  m_ShowProfilingInformation = 0;
 
   m_StepCameraOrientation = 10.0;
   m_TopBottomAccumulation = 0.0;
@@ -131,17 +134,19 @@ mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axe
   m_TopBottomAccumulation = m_TopBottomAccumulationLast = 0.0;
   m_LeftRigthAccumulation = m_LeftRigthAccumulationLast = 0.0;
 
-  CreateRenderingScene(parent, layers, use_grid, show_axes, show_ruler, stereo, show_orientator);
+  CreateRenderingScene(parent, layers, use_grid, show_axes, show_ruler, stereo, show_orientator, m_AxesType);
 	
 }
 //----------------------------------------------------------------------------
-void mafRWI::CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axes, bool show_ruler, int stereo, bool show_orientator)
+void mafRWI::CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axes, bool show_ruler, int stereo, bool show_orientator, int axesType)
 //----------------------------------------------------------------------------
 {
   if (m_Light != NULL)
   {
     return;
   }
+
+  m_AxesType = axesType;
 
   m_StereoType = stereo;
 
@@ -153,7 +158,7 @@ void mafRWI::CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers, bool use_
   m_Camera->ParallelProjectionOn(); 
   UpdateCameraParameters();
 
-	m_RenFront = vtkRenderer::New();
+  m_RenFront = vtkRenderer::New();
   m_RenFront->SetBackground(DEFAULT_BG_COLOR,DEFAULT_BG_COLOR,DEFAULT_BG_COLOR);
   m_RenFront->SetActiveCamera(m_Camera);
   m_RenFront->AddLight(m_Light);
@@ -163,16 +168,16 @@ void mafRWI::CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers, bool use_
   m_RwiBase = new mafRWIBase(parent, -1);
   m_RenderWindow = vtkRenderWindow::New();
   m_RenderWindow->GlobalWarningDisplayOff();
+ 
   if(stereo)
   {
     SetStereo(stereo);
   }
+
   m_RenderWindow->AddRenderer(m_RenFront);
 
   m_RwiBase->SetRenderWindow(m_RenderWindow);
-//#ifdef WIN32
   m_RwiBase->Initialize();
-//#endif
   
   if(layers == TWO_LAYER)
   {
@@ -191,7 +196,7 @@ void mafRWI::CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers, bool use_
   }
 
   m_ShowRuler = show_ruler;
-	m_ShowOrientator = show_orientator;
+  m_ShowOrientator = show_orientator;
 
   mafGUIMeasureUnitSettings *unit_settings = new mafGUIMeasureUnitSettings(this);
   m_RulerScaleFactor = unit_settings->GetScaleFactor();
@@ -237,7 +242,7 @@ void mafRWI::CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers, bool use_
   SetGridVisibility(m_ShowGrid != 0);
 
   m_ShowAxes = show_axes;
-  m_Axes = new mafAxes(m_RenFront);
+  m_Axes = new mafAxes(m_RenFront,NULL,m_AxesType);
   m_Axes->SetVisibility(show_axes);
 }
 //----------------------------------------------------------------------------
