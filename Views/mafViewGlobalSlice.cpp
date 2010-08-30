@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-08-30 16:31:07 $
-  Version:   $Revision: 1.29.2.8 $
+  Date:      $Date: 2010-08-30 16:32:43 $
+  Version:   $Revision: 1.29.2.9 $
   Authors:   Matteo Giacomoni, Simone Brazzale
 ==========================================================================
   Copyright (c) 2002/2004
@@ -116,8 +116,8 @@ mafViewGlobalSlice::mafViewGlobalSlice(wxString label, int camera_position, bool
 
 	m_Dn = 0.0;
 
-	m_numberOfVmeInstantiated = 0;
-	m_mapID.clear();
+	m_NumberOfVmeInstantiated = 0;
+	m_MapID.clear();
 
 	m_BoundsPlane.clear();
 	m_BoundsOutlineBox.clear();

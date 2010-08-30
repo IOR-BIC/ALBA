@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.h,v $
   Language:  C++
-  Date:      $Date: 2010-07-26 15:57:14 $
-  Version:   $Revision: 1.9.2.5 $
+  Date:      $Date: 2010-08-30 16:32:43 $
+  Version:   $Revision: 1.9.2.6 $
   Authors:   Matteo Giacomoni, Simone Brazzale
 ==========================================================================
   Copyright (c) 2002/2004
@@ -133,8 +133,8 @@ protected:
 	mafString						 m_Text;
 	double							 m_TextColor[3];
 
-  int m_numberOfVmeInstantiated;
-  std::map<mafID,int> m_mapID;
+  int m_NumberOfVmeInstantiated;
+  std::map<mafID,int> m_MapID;
 
   std::vector<vtkPlaneSource*>					m_BoundsPlane;
   std::vector<vtkOutlineCornerFilter*>	m_BoundsOutlineBox;
