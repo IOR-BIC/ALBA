@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUITransformSliders.cpp,v $
 Language:  C++
-Date:      $Date: 2010-07-21 13:04:14 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2010-08-31 07:25:06 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2002/2004
@@ -263,4 +263,28 @@ void medGUITransformSliders::GetScaling(double scaling[3])
   scaling[0] = m_Scaling[0];
   scaling[1] = m_Scaling[1];
   scaling[2] = m_Scaling[2];
+}
+//----------------------------------------------------------------------------
+void medGUITransformSliders::SetPosition(double pos[3])
+//----------------------------------------------------------------------------
+{
+  m_Position[0] = pos[0];
+  m_Position[1] = pos[1];
+  m_Position[2] = pos[2];
+}
+//----------------------------------------------------------------------------
+void medGUITransformSliders::SetOrientation(double orientation[3])
+//----------------------------------------------------------------------------
+{
+  m_Orientation[0] = orientation[0];
+  m_Orientation[1] = orientation[1];
+  m_Orientation[2] = orientation[2];
+}
+//----------------------------------------------------------------------------
+void medGUITransformSliders::SetScaling(double scaling[3])
+//----------------------------------------------------------------------------
+{
+  m_Scaling[0] = scaling[0];
+  m_Scaling[1] = scaling[1];
+  m_Scaling[2] = scaling[2];
 }

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUITransformSliders.h,v $
 Language:  C++
-Date:      $Date: 2010-07-21 13:04:14 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2010-08-31 07:25:06 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2002/2004
@@ -85,6 +85,16 @@ public:
 
   /** Return the current scaling */
   void GetScaling(double scaling[3]);
+
+  /** Set the current position */
+  void SetPosition(double pos[3]);
+
+  /** Set the current orientation */
+  void SetOrientation(double orientation[3]);
+
+  /** Set the current scaling */
+  void SetScaling(double scaling[3]);
+
 
 protected:
 
