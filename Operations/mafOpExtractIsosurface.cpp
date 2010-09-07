@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafOpExtractIsosurface.cpp,v $
 Language:  C++
-Date:      $Date: 2009-12-17 11:45:06 $
-Version:   $Revision: 1.5.2.7 $
+Date:      $Date: 2010-09-07 09:10:43 $
+Version:   $Revision: 1.5.2.8 $
 Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -243,13 +243,14 @@ void mafOpExtractIsosurface::CreateOpDialog()
   m_Rwi->CameraSet(CAMERA_PERSPECTIVE);
   //m_Rwi->SetAxesVisibility(true);
   //m_Rwi->SetGridVisibility(false);
-  m_Rwi->m_RenderWindow->SetDesiredUpdateRate(0.0001f);
+  
   m_Rwi->SetSize(0,0,500,500);
   m_Rwi->m_RenderWindow->AddRenderer(m_PIPRen);
+  m_Rwi->m_RenderWindow->SetDesiredUpdateRate(0.0001f);
   m_Rwi->Show(true);
   m_Rwi->m_RwiBase->SetMouse(m_Mouse);
   mafNEW(m_DensityPicker);
-  m_DensityPicker->SetListener(this);
+  m_DensityPicker->SetListener(this);	
   m_Mouse->AddObserver(m_DensityPicker, MCH_INPUT);
   m_PIPRen->SetViewport(.6, .01, .99, .4);
   m_PIPRen->GetActiveCamera()->SetFocalPoint(0,0,0);

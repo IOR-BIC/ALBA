@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-08-30 15:33:43 $
-  Version:   $Revision: 1.79.2.3 $
+  Date:      $Date: 2010-09-07 09:11:03 $
+  Version:   $Revision: 1.79.2.4 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -114,7 +114,7 @@ mafView *mafViewVTK::Copy(mafObserver *Listener)
 void mafViewVTK::Create()
 //----------------------------------------------------------------------------
 {
-  m_Rwi = new mafRWI(mafGetFrame(), TWO_LAYER, m_ShowGrid, m_ShowAxes, m_ShowRuler, m_StereoType, m_ShowOrientator, m_AxesType);
+  m_Rwi = new mafRWI(mafGetFrame(), ONE_LAYER, m_ShowGrid, m_ShowAxes, m_ShowRuler, m_StereoType, m_ShowOrientator, m_AxesType);
   m_Rwi->SetListener(this);
   m_Rwi->CameraSet(m_CameraPositionId);
   m_Win = m_Rwi->m_RwiBase;
@@ -224,11 +224,6 @@ void mafViewVTK::CameraSet(int camera_position)
 void mafViewVTK::CameraReset(mafNode *node)
 //----------------------------------------------------------------------------
 {
-  if (node = NULL)
-  {
-	return;
-  }
-
   assert(m_Rwi); 
   m_Rwi->CameraReset(node);
 }

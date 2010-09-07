@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpExtractIsosurface.h,v $
   Language:  C++
-  Date:      $Date: 2010-07-08 15:41:06 $
-  Version:   $Revision: 1.5.2.5 $
+  Date:      $Date: 2010-09-07 09:10:43 $
+  Version:   $Revision: 1.5.2.6 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -54,7 +54,8 @@ corresponding iso-density-surface.*/
 class mafOpExtractIsosurface: public mafOp
 {
 public:
-	mafOpExtractIsosurface(const wxString &label = "Extract Isosurface");
+
+  mafOpExtractIsosurface(const wxString &label = "Extract Isosurface");
  ~mafOpExtractIsosurface(); 
 	
   mafTypeMacro(mafOpExtractIsosurface, mafOp);
