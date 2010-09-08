@@ -132,6 +132,9 @@ SET(PROJECT_SRCS
   medOpEqualizeHistogram.cpp
   medOpEqualizeHistogram.h
   
+  medOpExporterAnalogWS.cpp
+  medOpExporterAnalogWS.h
+  
 )
   
 IF (MED_USE_Offis)

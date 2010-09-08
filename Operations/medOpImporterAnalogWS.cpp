@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterAnalogWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-09-08 16:21:42 $
-  Version:   $Revision: 1.6.2.1 $
+  Date:      $Date: 2010-09-08 11:42:39 $
+  Version:   $Revision: 1.6.2.2 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -80,7 +80,10 @@ void medOpImporterAnalogWS::Read()
 //----------------------------------------------------------------------------
 {
   if (!m_TestMode)
-    wxBusyInfo wait("Please wait, working...");
+  {
+    wxSetCursor(wxCursor(wxCURSOR_WAIT));
+	  mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
+  }
   
   mafNEW(m_EmgScalar);
   wxString path, name, ext;
@@ -129,7 +132,6 @@ void medOpImporterAnalogWS::Read()
   }
 
   line = text.ReadLine();
-  line = text.ReadLine();
 
   int space;
   unsigned i;
@@ -141,17 +143,10 @@ void medOpImporterAnalogWS::Read()
   {
     line = text.ReadLine();
     rowNumber++;
-
-    /*if (rowNumber == 10)
-    {
-      line.Replace(","," ");
-      wxStringTokenizer tkzCols(line,wxT(' '),wxTOKEN_RET_EMPTY_ALL);
-      num_tk = tkzCols.CountTokens();  
-    }*/
   } while (!inputFile.Eof());
 
   vnl_matrix<double> emgMatrix;
-  emgMatrix.set_size(rowNumber-1 , num_tk);
+  emgMatrix.set_size(rowNumber , num_tk);
 
   wxFileInputStream inputFile1( m_File );
   wxTextInputStream text1( inputFile1 );
@@ -162,8 +157,8 @@ void medOpImporterAnalogWS::Read()
   line = text1.ReadLine();
   line = text1.ReadLine();
   line.Replace(","," ");
-  
-  for (int n = 0; n < rowNumber-1; n++)
+    
+  for (int n = 0; n < rowNumber; n++)
   {
     i = 0;
     space = line.Find(' ');
@@ -184,7 +179,11 @@ void medOpImporterAnalogWS::Read()
     }
     line = text1.ReadLine();
     line.Replace(","," ");
-  }
+    if (!m_TestMode)
+    {
+      mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)(((double) n)/((double) rowNumber-1)*100.)));
+    }
+  } 
 
   vnl_matrix<double> emgMatrixTranspose = emgMatrix.transpose();
 
@@ -199,6 +198,12 @@ void medOpImporterAnalogWS::Read()
   for (int n = 0; n < stringVec.size(); n++)
   {
     tag_Signals->SetValue(stringVec[n], n);
+  }
+  
+  if (!m_TestMode)
+  {
+    mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
+    wxSetCursor(wxCursor(wxCURSOR_DEFAULT));
   }
 
   m_Output = m_EmgScalar;
