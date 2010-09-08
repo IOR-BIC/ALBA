@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterAnalogWSTest.cpp,v $
 Language:  C++
-Date:      $Date: 2009-09-08 16:20:02 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-09-08 14:57:46 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -62,11 +62,11 @@ void medOpImporterAnalogWSTest::TestRead()
 
   //check time vector
   vnl_vector<double> timeVector = analogScalar->GetScalarOutput()->GetScalarData().get_row(0);
-  CPPUNIT_ASSERT( fabs(timeVector[0] - 0.0005) < 0.01 && fabs(timeVector[timeVector.size()-1] - 0.097) < 0.01);
+  CPPUNIT_ASSERT( fabs(timeVector[0] - 0.0005) < 0.01 && fabs(timeVector[timeVector.size()-1] - 0.098) < 0.01);
 
   //check scalar values
   vnl_vector<double> scalarVector = analogScalar->GetScalarOutput()->GetScalarData().get_row(1);
-  CPPUNIT_ASSERT( fabs(scalarVector[0] - 0.07795) < 0.01 && fabs(scalarVector[scalarVector.size()-1] - 0.0194879) < 0.01);
+  CPPUNIT_ASSERT( fabs(scalarVector[0] - 0.07795) < 0.01 && fabs(scalarVector[scalarVector.size()-1] - 0.175388) < 0.01);
 
   //check last scalar values
   int num = analogScalar->GetScalarOutput()->GetScalarData().rows();
@@ -75,6 +75,6 @@ void medOpImporterAnalogWSTest::TestRead()
   double n = scalarVectorEnd[0];
   double n1 = scalarVectorEnd[scalarVectorEnd.size()-1];
 
-  CPPUNIT_ASSERT( fabs(scalarVectorEnd[0] - 237) < 0.01 && fabs(scalarVectorEnd[scalarVectorEnd.size()-1] - 248) < 0.01);
+  CPPUNIT_ASSERT( fabs(scalarVectorEnd[0] - 237) < 0.01 && fabs(scalarVectorEnd[scalarVectorEnd.size()-1] - 247) < 0.01);
   cppDEL(importer);
 }
