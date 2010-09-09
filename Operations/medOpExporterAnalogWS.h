@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterAnalogWS.h,v $
   Language:  C++
-  Date:      $Date: 2010-09-08 11:42:39 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2010-09-09 15:19:21 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2004
@@ -65,13 +65,13 @@ public:
   this operation does as follows:
   1) Checks for the tag ANALOG in the first line
   2) Sets Frequency to 1 --> This is done since the exporter puts time instead of sample in the file.
-  3) Reads the signal names
+  3) Writes the signal names
   4) Jump a line
-  5) Read time and values 
+  5) Writes time and values 
   */
   void Write();
 
-  /** Set the filename for the file to import */
+  /** Set the filename for the file to export */
   void SetFileName(const char *file_name){m_File = file_name;};
 
 protected:

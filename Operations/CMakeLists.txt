@@ -134,6 +134,8 @@ SET(PROJECT_SRCS
   
   medOpExporterAnalogWS.cpp
   medOpExporterAnalogWS.h
+  medOpExporterGRFWS.cpp
+  medOpExporterGRFWS.h
   
 )
   

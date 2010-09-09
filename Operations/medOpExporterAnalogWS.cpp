@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterAnalogWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-09-08 11:42:39 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2010-09-09 15:19:21 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Simone Brazzale
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -33,7 +33,7 @@
 using namespace std;
 
 #define TAG_FORMAT "ANALOG"
-#define FREQ 1
+#define FREQ 1.00
 
 //----------------------------------------------------------------------------
 medOpExporterAnalogWS::medOpExporterAnalogWS(const wxString &label) :
@@ -108,7 +108,7 @@ void medOpExporterAnalogWS::Write()
     f_Out << TAG_FORMAT << "\n";
 
     // Add the first row containing the frequency
-    f_Out << FREQ << ",\n";
+    f_Out << FREQ << ",Hz\n";
 
     //Add the third line containing the signal names
     f_Out << "TIME,";

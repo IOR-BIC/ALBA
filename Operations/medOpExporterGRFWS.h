@@ -1,22 +1,25 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: medOpImporterGRFWS.h,v $
+  Module:    $RCSfile: medOpExporterGRFWS.h,v $
   Language:  C++
   Date:      $Date: 2010-09-09 15:19:21 $
-  Version:   $Revision: 1.3.2.2 $
-  Authors:   Roberto Mucci, Simone Brazzale
+  Version:   $Revision: 1.1.2.1 $
+  Authors:   Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
-#ifndef __medOpImporterGRFWS_H__
-#define __medOpImporterGRFWS_H__
+#ifndef __medOpExporterGRFWS_H__
+#define __medOpExporterGRFWS_H__
 
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
 #include "mafOp.h"
+#include "mafVMEVector.h"
+#include "mafVMESurface.h"
+#include "mafVMEGroup.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -26,27 +29,27 @@ class mafVMESurface;
 class mafVMEGroup;
 
 //----------------------------------------------------------------------------
-// medOpImporterGRFWS :
+// medOpExporterGRFWS :
 //----------------------------------------------------------------------------
 /** */
-class medOpImporterGRFWS : public mafOp
+class medOpExporterGRFWS : public mafOp
 {
 public:
-	medOpImporterGRFWS(const wxString &label = "GRF Importer");
-	~medOpImporterGRFWS(); 
-
-  void medOpImporterGRFWS::OpUndo();
-
+	medOpExporterGRFWS(const wxString &label = "GRF Exporter");
+	~medOpExporterGRFWS(); 
+	
   /** Copy the operation. */
-	mafOp* Copy();
+  mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */
-	bool Accept(mafNode* node) {return true;};
+	bool Accept(mafNode* node);
 
 	/** Builds operation's interface. */
 	void OpRun();
 
-  /** Read the file.  
+  /** Read the file.
+  File format:
+
   the format of the file admits some specifics.
   1) The first line contains the tag FORCE PLATES
   2) The second line contains the Frequency
@@ -57,14 +60,26 @@ public:
   7) The eighth line contains the tag for COP,REF,FORCE,MOMENT
   8) The ninth line contains the units
   5) The first element of each line is the sample, then 24 values
-  */
-  void Read();
 
-  /** Set the filename for the file to import */
+  this operation does as follows:
+  1) Checks for the tag FORCE PLATES in the first line
+  2) Sets Frequency to 1 --> This is done since the exporter puts time instead of sample in the file.
+  3) Jump line
+  3) Writes the corner values
+  4) Jump lines
+  5) Writes time and COP/REF/FORCE/MOMENT values 
+  */
+  void Write();
+
+  /** Set the filename for the file to export */
   void SetFileName(const char *file_name){m_File = file_name;};
 
-protected:
+private:
 
+  /** Merge time stamps of platforms */
+  std::vector<mafTimeStamp> mergeTimeStamps(std::vector<mafTimeStamp> kframes1,std::vector<mafTimeStamp> kframes2);
+
+protected:
   mafVMESurface       *m_PlatformLeft;
   mafVMESurface       *m_PlatformRight;
   mafVMEVector        *m_ForceLeft;
@@ -73,8 +88,6 @@ protected:
   mafVMEVector        *m_MomentRight;
   mafVMEGroup         *m_Group;
 
-  wxString             m_FileDir;
-	wxString             m_File;
-
+	wxString m_File;
 };
 #endif

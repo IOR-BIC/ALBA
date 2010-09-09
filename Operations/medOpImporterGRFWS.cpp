@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterGRFWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-08-21 12:56:13 $
-  Version:   $Revision: 1.4.2.1 $
-  Authors:   Roberto Mucci
+  Date:      $Date: 2010-09-09 15:19:21 $
+  Version:   $Revision: 1.4.2.2 $
+  Authors:   Roberto Mucci, Simone Brazzale
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
@@ -55,8 +55,10 @@ mafOp(label)
   m_Output        = NULL;
   m_PlatformLeft  = NULL;
   m_PlatformRight = NULL;
-  m_VectorLeft    = NULL;
-  m_VectorRight   = NULL;
+  m_ForceLeft    = NULL;
+  m_ForceRight   = NULL;
+  m_MomentLeft    = NULL;
+  m_MomentRight   = NULL;
   m_Group         = NULL;
 }
 //----------------------------------------------------------------------------
@@ -65,8 +67,10 @@ medOpImporterGRFWS::~medOpImporterGRFWS()
 {
   mafDEL(m_PlatformLeft);
   mafDEL(m_PlatformRight);
-  mafDEL(m_VectorLeft);
-  mafDEL(m_VectorRight);
+  mafDEL(m_ForceLeft);
+  mafDEL(m_ForceRight);
+  mafDEL(m_MomentLeft);
+  mafDEL(m_MomentRight);
   mafDEL(m_Group);
 }
 
@@ -113,7 +117,10 @@ void medOpImporterGRFWS::Read()
 //----------------------------------------------------------------------------
 {
   if (!m_TestMode)
-    wxBusyInfo wait("Please wait, working...");
+  {
+    wxSetCursor(wxCursor(wxCURSOR_WAIT));
+	  mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
+  }
 
   wxString path, name, ext;
   wxSplitPath(m_File.c_str(),&path,&name,&ext);
@@ -121,6 +128,18 @@ void medOpImporterGRFWS::Read()
   mafTagItem tag_Nature;
   tag_Nature.SetName("VME_NATURE");
   tag_Nature.SetValue("NATURAL");
+
+  wxFileInputStream inputCountFile( m_File );
+  wxTextInputStream textCount( inputCountFile );
+
+  wxString line_count;
+
+  int totlines = 0;
+  do {
+    line_count = textCount.ReadLine();
+    totlines++;
+  } while (!inputCountFile.Eof());
+  totlines = totlines - 10;
 
   wxFileInputStream inputFile( m_File );
   wxTextInputStream text( inputFile );
@@ -200,26 +219,43 @@ void medOpImporterGRFWS::Read()
   mafString cop1StX,cop1StY,cop1StZ,ref1StX,ref1StY,ref1StZ,force1StX,force1StY,force1StZ,moment1StX,moment1StY,moment1StZ;
   mafString cop2StX,cop2StY,cop2StZ,ref2StX,ref2StY,ref2StZ,force2StX,force2StY,force2StZ,moment2StX,moment2StY,moment2StZ;
 
-  vtkMAFSmartPointer<vtkPolyData> vector1;
-  vtkMAFSmartPointer<vtkPolyData> vector2;
-  vtkMAFSmartPointer<vtkPoints> points1;
-  vtkMAFSmartPointer<vtkPoints> points2;
-  vtkMAFSmartPointer<vtkCellArray> cellArray1;
-  vtkMAFSmartPointer<vtkCellArray> cellArray2;
+  vtkMAFSmartPointer<vtkPolyData> force1;
+  vtkMAFSmartPointer<vtkPolyData> force2;
+  vtkMAFSmartPointer<vtkPolyData> moment1;
+  vtkMAFSmartPointer<vtkPolyData> moment2;
+  vtkMAFSmartPointer<vtkPoints> pointsf1;
+  vtkMAFSmartPointer<vtkPoints> pointsf2;
+  vtkMAFSmartPointer<vtkCellArray> cellArrayf1;
+  vtkMAFSmartPointer<vtkCellArray> cellArrayf2;
+  vtkMAFSmartPointer<vtkPoints> pointsm1;
+  vtkMAFSmartPointer<vtkPoints> pointsm2;
+  vtkMAFSmartPointer<vtkCellArray> cellArraym1;
+  vtkMAFSmartPointer<vtkCellArray> cellArraym2;
   int pointId1[2];
   int pointId2[2];
 
-  mafNEW(m_VectorLeft);
-  mafNEW(m_VectorRight);
+  mafNEW(m_ForceLeft);
+  mafNEW(m_ForceRight);
+  mafNEW(m_MomentLeft);
+  mafNEW(m_MomentRight);
 
   mafString alLeft = name;
   mafString alRight = name;
   alLeft << "_GRF_1";
   alRight << "_GRF_2";
   
-  m_VectorLeft->SetName(alLeft);
-  m_VectorRight->SetName(alRight);
+  m_ForceLeft->SetName(alLeft);
+  m_ForceRight->SetName(alRight);
 
+  mafString almLeft = name;
+  mafString almRight = name;
+  almLeft << "_MOMENT_1";
+  almRight << "_MOMENT_2";
+  
+  m_MomentLeft->SetName(almLeft);
+  m_MomentRight->SetName(almRight);
+
+  int count = 0;
   do 
   {
     line = text.ReadLine();
@@ -259,29 +295,51 @@ void medOpImporterGRFWS::Read()
 
     if (cop1X != NULL || cop1Y != NULL || cop1Z != NULL)
     {
-      points1->InsertPoint(0, 0, 0, 0);
-      points1->InsertPoint(1, force1X, force1Y, force1Z);
+      // FORCE
+      pointsf1->InsertPoint(0, 0, 0, 0);
+      pointsf1->InsertPoint(1, force1X, force1Y, force1Z);
       pointId1[0] = 0;
       pointId1[1] = 1;
-      cellArray1->InsertNextCell(2, pointId1);  
-      vector1->SetPoints(points1);
-      vector1->SetLines(cellArray1);
-      vector1->Update();
+      cellArrayf1->InsertNextCell(2, pointId1);  
+      force1->SetPoints(pointsf1);
+      force1->SetLines(cellArrayf1);
+      force1->Update();
 
-      vtkMAFSmartPointer<vtkTransformPolyDataFilter> transfVecL;
-      vtkMAFSmartPointer<vtkTransform> transf;
+      vtkMAFSmartPointer<vtkTransformPolyDataFilter> transfForL;
+      vtkMAFSmartPointer<vtkTransform> transff;
      
-      transf->Translate(cop1X, cop1Y, cop1Z);
-      transfVecL->SetTransform(transf);
-      transfVecL->SetInput(vector1);
-      transfVecL->Update();
+      transff->Translate(cop1X, cop1Y, cop1Z);
+      transfForL->SetTransform(transff);
+      transfForL->SetInput(force1);
+      transfForL->Update();
 
+      m_ForceLeft->SetData(transfForL->GetOutput(), time);
+      m_ForceLeft->Modified();
+      m_ForceLeft->Update();
+      m_ForceLeft->GetOutput()->GetVTKData()->Update();
 
-      m_VectorLeft->SetData(transfVecL->GetOutput(), time);
+      // MOMENT
+      pointsm1->InsertPoint(0, 0, 0, 0);
+      pointsm1->InsertPoint(1, moment1X, moment1Y, moment1Z);
+      pointId1[0] = 0;
+      pointId1[1] = 1;
+      cellArraym1->InsertNextCell(2, pointId1);  
+      moment1->SetPoints(pointsm1);
+      moment1->SetLines(cellArraym1);
+      moment1->Update();
 
-      m_VectorLeft->Modified();
-      m_VectorLeft->Update();
-      m_VectorLeft->GetOutput()->GetVTKData()->Update();
+      vtkMAFSmartPointer<vtkTransformPolyDataFilter> transfMomL;
+      vtkMAFSmartPointer<vtkTransform> transfm;
+     
+      transfm->Translate(cop1X, cop1Y, cop1Z);
+      transfMomL->SetTransform(transfm);
+      transfMomL->SetInput(moment1);
+      transfMomL->Update();
+
+      m_MomentLeft->SetData(transfMomL->GetOutput(), time);
+      m_MomentLeft->Modified();
+      m_MomentLeft->Update();
+      m_MomentLeft->GetOutput()->GetVTKData()->Update();
     }
 
     //Values of the second platform
@@ -316,28 +374,57 @@ void medOpImporterGRFWS::Read()
 
     if (cop2X != NULL || cop2Y != NULL || cop2Z != NULL)
     {
-      points2->InsertPoint(0, 0, 0, 0);
-      points2->InsertPoint(1, force2X, force2Y, force2Z);
+      // FORCE
+      pointsf2->InsertPoint(0, 0, 0, 0);
+      pointsf2->InsertPoint(1, force2X, force2Y, force2Z);
       pointId2[0] = 0;
       pointId2[1] = 1;
-      cellArray2->InsertNextCell(2, pointId2);  
-      vector2->SetPoints(points2);
-      vector2->SetLines(cellArray2);
-      vector2->Update();
+      cellArrayf2->InsertNextCell(2, pointId2);  
+      force2->SetPoints(pointsf2);
+      force2->SetLines(cellArrayf2);
+      force2->Update();
 
-      vtkMAFSmartPointer<vtkTransformPolyDataFilter> transfVecR;
-      vtkMAFSmartPointer<vtkTransform> transf;
+      vtkMAFSmartPointer<vtkTransformPolyDataFilter> transfForR;
+      vtkMAFSmartPointer<vtkTransform> transffr;
       
-      transf->Translate(cop2X, cop2Y, cop2Z);
-      transfVecR->SetTransform(transf);
-      transfVecR->SetInput(vector2);
-      transfVecR->Update();
+      transffr->Translate(cop2X, cop2Y, cop2Z);
+      transfForR->SetTransform(transffr);
+      transfForR->SetInput(force2);
+      transfForR->Update();
  
-      m_VectorRight->SetData(transfVecR->GetOutput(), time);
+      m_ForceRight->SetData(transfForR->GetOutput(), time);
+      m_ForceRight->Modified();
+      m_ForceRight->Update();
+      m_ForceRight->GetOutput()->GetVTKData()->Update();
 
-      m_VectorRight->Modified();
-      m_VectorRight->Update();
-      m_VectorRight->GetOutput()->GetVTKData()->Update();
+      // MOMENT
+      pointsm2->InsertPoint(0, 0, 0, 0);
+      pointsm2->InsertPoint(1, moment2X, moment2Y, moment2Z);
+      pointId2[0] = 0;
+      pointId2[1] = 1;
+      cellArraym2->InsertNextCell(2, pointId2);  
+      moment2->SetPoints(pointsm2);
+      moment2->SetLines(cellArraym2);
+      moment2->Update();
+
+      vtkMAFSmartPointer<vtkTransformPolyDataFilter> transfMomR;
+      vtkMAFSmartPointer<vtkTransform> transfmr;
+      
+      transfmr->Translate(cop2X, cop2Y, cop2Z);
+      transfMomR->SetTransform(transfmr);
+      transfMomR->SetInput(moment2);
+      transfMomR->Update();
+ 
+      m_MomentRight->SetData(transfMomR->GetOutput(), time);
+      m_MomentRight->Modified();
+      m_MomentRight->Update();
+      m_MomentRight->GetOutput()->GetVTKData()->Update();
+    }
+
+    count++;
+    if (!m_TestMode)
+    {
+      mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)(((double) count)/((double) totlines)*100.)));
     }
 
   }while (!inputFile.Eof());
@@ -349,14 +436,23 @@ void medOpImporterGRFWS::Read()
   if(m_PlatformLeft != NULL)
   {
     m_PlatformLeft->ReparentTo(m_Group);
-    m_VectorLeft->ReparentTo(m_PlatformLeft);
+    m_ForceLeft->ReparentTo(m_PlatformLeft);
+    m_MomentLeft->ReparentTo(m_PlatformLeft);
   }
 
   if(m_PlatformRight != NULL)
   {
     m_PlatformRight->ReparentTo(m_Group);
-    m_VectorRight->ReparentTo(m_PlatformRight);
+    m_ForceRight->ReparentTo(m_PlatformRight);
+    m_MomentRight->ReparentTo(m_PlatformRight);
   }
+
+  if (!m_TestMode)
+  {
+    mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
+    wxSetCursor(wxCursor(wxCURSOR_DEFAULT));
+  }
+
   m_Output = m_Group;
   m_Output->ReparentTo(m_Input);
 }
