@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMatrixVectorMath.h,v $
 Language:  C++
-Date:      $Date: 2009-10-22 08:07:08 $
-Version:   $Revision: 1.1.2.5 $
+Date:      $Date: 2010-09-10 14:02:09 $
+Version:   $Revision: 1.1.2.6 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -139,6 +139,18 @@ public:
 
   /// Set matrix to identity
   void SetMatrixToIdentity(double *A) const ;
+
+  /// Set matrix row to vector
+  void SetMatrixRowToVector(double *A, int rowId, double *u) ;
+
+  /// Set matrix column to vector
+  void SetMatrixColumnToVector(double *A, int colId, double *u) ;
+
+  /// Set matrix rows to vectors
+  void SetMatrixRowsToVectors(double *A, double *u, double *v, double *w) ;
+
+  /// Set matrix columns to vectors
+  void SetMatrixColumnsToVectors(double *A, double *u, double *v, double *w) ;
 
   /// Multiply matrix by scalar
   void MultiplyMatrixByScalar(double s, const double *A, double *B) const ;   

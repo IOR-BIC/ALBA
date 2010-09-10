@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMatrixVectorMath.cpp,v $
 Language:  C++
-Date:      $Date: 2009-12-17 12:31:15 $
-Version:   $Revision: 1.1.2.7 $
+Date:      $Date: 2010-09-10 14:02:09 $
+Version:   $Revision: 1.1.2.8 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -511,6 +511,65 @@ void medOpMatrixVectorMath::SetMatrixToIdentity(double *A) const
   }
 }
 
+
+
+//------------------------------------------------------------------------------
+// Set matrix row to vector
+void medOpMatrixVectorMath::SetMatrixRowToVector(double *A, int rowId, double *u)
+//------------------------------------------------------------------------------
+{
+  int k, ii ;
+
+  if (m_Homogeneous){
+    for (ii = 0, k = 4*rowId ;  ii < 3 ;  ii++, k++)
+      A[k] = u[ii] ;
+  }
+  else{
+    for (ii = 0, k = 3*rowId ;  ii < 3 ;  ii++, k++)
+      A[k] = u[ii] ;
+  }
+}
+
+
+//------------------------------------------------------------------------------
+// Set matrix column to vector
+void medOpMatrixVectorMath::SetMatrixColumnToVector(double *A, int colId, double *u)
+//------------------------------------------------------------------------------
+{
+  int k, ii ;
+
+  if (m_Homogeneous){
+    for (ii = 0, k = colId ;  ii < 3 ;  ii++, k+=3)
+      A[k] = u[ii] ;
+  }
+  else{
+    for (ii = 0, k = colId ;  ii < 3 ;  ii++, k+=4)
+      A[k] = u[ii] ;
+  }
+}
+
+
+
+//------------------------------------------------------------------------------
+// Set matrix rows to vectors
+void medOpMatrixVectorMath::SetMatrixRowsToVectors(double *A, double *u, double *v, double *w)
+//------------------------------------------------------------------------------
+{
+  SetMatrixRowToVector(A, 0, u) ;
+  SetMatrixRowToVector(A, 1, v) ;
+  SetMatrixRowToVector(A, 2, w) ;
+}
+
+
+//------------------------------------------------------------------------------
+// Set matrix columns to vectors
+void medOpMatrixVectorMath::SetMatrixColumnsToVectors(double *A, double *u, double *v, double *w)
+//------------------------------------------------------------------------------
+{
+  SetMatrixColumnToVector(A, 0, u) ;
+  SetMatrixColumnToVector(A, 1, v) ;
+  SetMatrixColumnToVector(A, 2, w) ;
+}
 
 
 //------------------------------------------------------------------------------
