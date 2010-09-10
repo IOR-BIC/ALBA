@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-05-28 14:30:12 $
-  Version:   $Revision: 1.37.2.3 $
+  Date:      $Date: 2010-09-10 15:44:11 $
+  Version:   $Revision: 1.37.2.4 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -91,6 +91,7 @@ medPipeGraph::~medPipeGraph()
   m_RenFront->RemoveActor2D(m_PlotActor);
   m_RenFront->RemoveActor2D(m_PlotTimeLineActor);
   m_RenFront->SetBackground(m_OldColour);
+  m_AlwaysVisibleRenderer->SetBackground(m_OldColour);
 
   for(int i=0;i<m_VtkData.size();i++)
   {
@@ -263,7 +264,7 @@ void medPipeGraph::Create(mafSceneNode *n)
 
   m_RenFront->GetBackground(m_OldColour); // Save the old Color so we can restore it
   m_RenFront->SetBackground(1,1,1);  
-
+  m_AlwaysVisibleRenderer->SetBackground(1,1,1);
 }
 
 //----------------------------------------------------------------------------
