@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipe.h,v $
   Language:  C++
-  Date:      $Date: 2008-11-03 13:58:31 $
-  Version:   $Revision: 1.18.2.1 $
+  Date:      $Date: 2010-09-10 15:42:40 $
+  Version:   $Revision: 1.18.2.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -95,6 +95,7 @@ public:
   bool            m_Selected; ///< Flag used to say if the rendered VME is selected.
   vtkRenderer    *m_RenFront; ///< Renderer associated to the front layer
   vtkRenderer    *m_RenBack;  ///< Renderer associated to the background layer
+  vtkRenderer		 *m_AlwaysVisibleRenderer; /// < Renderer used to superimpose utility stuff to main render window
 
 protected:
   /**

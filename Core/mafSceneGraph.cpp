@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-06-29 06:35:53 $
-  Version:   $Revision: 1.26.2.3 $
+  Date:      $Date: 2010-09-10 15:42:40 $
+  Version:   $Revision: 1.26.2.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -38,11 +38,12 @@
 #include "vtkCamera.h"
 
 //----------------------------------------------------------------------------
-mafSceneGraph::mafSceneGraph(mafView *view, vtkRenderer *ren1, vtkRenderer *ren2)
+mafSceneGraph::mafSceneGraph(mafView *view, vtkRenderer *ren1, vtkRenderer *ren2, vtkRenderer *ren3)
 //----------------------------------------------------------------------------
 {
 	m_RenFront  = ren1;
 	m_RenBack   = ren2;
+  m_AlwaysVisibleRenderer = ren3;
 	m_View      = view;
 
   m_Gui          = NULL;
@@ -158,7 +159,7 @@ mafSceneNode *mafSceneGraph::NodeAdd(mafNode *vme)
     assert(parent);
   }
   // create node
-  mafSceneNode *node = new mafSceneNode(this,parent,vme,m_RenFront,m_RenBack) ;
+  mafSceneNode *node = new mafSceneNode(this,parent,vme,m_RenFront,m_RenBack,m_AlwaysVisibleRenderer) ;
 
 	// insert node in the list
 	if(!m_List)

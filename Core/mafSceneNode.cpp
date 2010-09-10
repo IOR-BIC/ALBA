@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-16 08:15:04 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2010-09-10 15:42:40 $
+  Version:   $Revision: 1.7.6.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -37,7 +37,7 @@
 //@@@ #include "mflAgent.h"
 
 //----------------------------------------------------------------------------
-mafSceneNode::mafSceneNode(mafSceneGraph *sg,mafSceneNode *parent, const mafNode* vme, vtkRenderer *ren, vtkRenderer *ren2)
+mafSceneNode::mafSceneNode(mafSceneGraph *sg,mafSceneNode *parent, const mafNode* vme, vtkRenderer *ren, vtkRenderer *ren2, vtkRenderer *ren3)
 //----------------------------------------------------------------------------
 {
 	m_Sg            = sg;
@@ -45,6 +45,7 @@ mafSceneNode::mafSceneNode(mafSceneGraph *sg,mafSceneNode *parent, const mafNode
 	m_Vme						= (mafNode *)vme;
 	m_RenFront			= ren;
 	m_RenBack				= ren2;
+  m_AlwaysVisibleRenderer = ren3;
   m_Next					= NULL;
   m_Pipe					= NULL;
   m_PipeCreatable = true;
@@ -266,5 +267,6 @@ void mafSceneNode::Print(std::ostream& os, const int tabs)// const
   os << indent << "Visual Pipe" << '\t' << m_Pipe << '\t' <<  (m_Pipe ? m_Pipe->GetTypeName() : "")  << std::endl;  
   os << indent << "Front Renderer" << '\t' << m_RenFront << std::endl;
   os <<  indent << "Back Renderer" << '\t' << m_RenBack << std::endl;
+  os <<  indent << "Always Visible Renderer" << '\t' << m_AlwaysVisibleRenderer << std::endl;
   os << std::endl;
 }

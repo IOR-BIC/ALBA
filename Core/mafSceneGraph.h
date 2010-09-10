@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneGraph.h,v $
   Language:  C++
-  Date:      $Date: 2009-05-29 12:06:50 $
-  Version:   $Revision: 1.15.2.1 $
+  Date:      $Date: 2010-09-10 15:42:40 $
+  Version:   $Revision: 1.15.2.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -33,7 +33,7 @@ class vtkRenderer;
 class mafSceneGraph  /*: public mafObserver*/
 {
 public:
-								mafSceneGraph(mafView	*view, vtkRenderer *ren1, vtkRenderer *ren2=NULL);
+								mafSceneGraph(mafView	*view, vtkRenderer *ren1, vtkRenderer *ren2=NULL, vtkRenderer *ren3 = NULL);
 	virtual			 ~mafSceneGraph();
   virtual void	SetListener(mafObserver *Listener) {m_Listener = Listener;};
 	//virtual void	OnEvent(mafEvent& e);
@@ -71,6 +71,8 @@ public:
 
   vtkRenderer   *m_RenFront;  ///< pointer to the front renderer
   vtkRenderer   *m_RenBack;   ///< pointer to the back renderer
+  vtkRenderer		*m_AlwaysVisibleRenderer; /// < Renderer used to superimpose utility stuff to main render window
+
   mafView		    *m_View;      ///< pointer to the view
 
   // Set the flags for creatable vmes type.

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-09-07 09:11:03 $
-  Version:   $Revision: 1.79.2.4 $
+  Date:      $Date: 2010-09-10 15:42:40 $
+  Version:   $Revision: 1.79.2.5 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -119,7 +119,7 @@ void mafViewVTK::Create()
   m_Rwi->CameraSet(m_CameraPositionId);
   m_Win = m_Rwi->m_RwiBase;
 
-  m_Sg  = new mafSceneGraph(this,m_Rwi->m_RenFront,m_Rwi->m_RenBack);
+  m_Sg  = new mafSceneGraph(this,m_Rwi->m_RenFront,m_Rwi->m_RenBack,m_Rwi->m_AlwaysVisibleRenderer);
   m_Sg->SetListener(this);
   m_Rwi->m_Sg = m_Sg;
 

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafRWI.cpp,v $
 Language:  C++
-Date:      $Date: 2010-09-07 09:11:03 $
-Version:   $Revision: 1.49.2.3 $
+Date:      $Date: 2010-09-10 15:42:40 $
+Version:   $Revision: 1.49.2.4 $
 Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -613,8 +613,11 @@ void mafRWI::SetBackgroundColor(const wxColor &col)
 		m_Gui->Update();
 	}
 	m_RenFront->SetBackground(col.Red()/255.0,col.Green()/255.0,col.Blue()/255.0);
-	if(m_RenBack) 
+	m_AlwaysVisibleRenderer->SetBackground(col.Red()/255.0,col.Green()/255.0,col.Blue()/255.0);
+  if(m_RenBack) 
 		m_RenBack->SetBackground(col.Red()/255.0,col.Green()/255.0,col.Blue()/255.0);
+
+  
 }
 //----------------------------------------------------------------------------
 void mafRWI::SetStereo(int stereo_type)
