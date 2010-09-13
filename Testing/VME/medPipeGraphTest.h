@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medPipeGraphTest.h,v $
 Language:  C++
-Date:      $Date: 2010-03-09 15:38:48 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-09-13 12:04:50 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Robero Mucci
 ==========================================================================
 Copyright (c) 2002/2008
@@ -51,6 +51,7 @@ protected:
   vtkPolyData *m_Polydata;
 
   vtkRenderer *m_Renderer;
+  vtkRenderer *m_AlwaysVisibleRenderer;
   vtkRenderWindow *m_RenderWindow;
   vtkRenderWindowInteractor *m_RenderWindowInteractor;
 

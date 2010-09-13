@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medPipeGraphTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-03-09 15:38:48 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-09-13 12:04:50 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2008
@@ -77,6 +77,7 @@ void medPipeGraphTest::setUp()
 //----------------------------------------------------------------------------
 {
   vtkNEW(m_Renderer);
+  vtkNEW(m_AlwaysVisibleRenderer);
   vtkNEW(m_RenderWindow);
   vtkNEW(m_RenderWindowInteractor);
 }
@@ -85,6 +86,7 @@ void medPipeGraphTest::tearDown()
 //----------------------------------------------------------------------------
 {
   vtkDEL(m_Renderer);
+  vtkDEL(m_AlwaysVisibleRenderer);
   vtkDEL(m_RenderWindow);
   vtkDEL(m_RenderWindowInteractor);
 }
@@ -95,7 +97,10 @@ void medPipeGraphTest::TestPipeExecution()
   ///////////////// render stuff /////////////////////////
 
   m_Renderer->SetBackground(0.1, 0.1, 0.1);
+  m_AlwaysVisibleRenderer->SetBackground(0.1, 0.1, 0.1);
+
   m_RenderWindow->AddRenderer(m_Renderer);
+
   m_RenderWindow->SetSize(320, 240);
   m_RenderWindow->SetPosition(600,0);
 
@@ -129,6 +134,7 @@ void medPipeGraphTest::TestPipeExecution()
   mafSceneNode *sceneNode;
   sceneNode = new mafSceneNode(NULL,NULL,analog, NULL);
   sceneNode->m_RenFront = m_Renderer;
+  sceneNode->m_AlwaysVisibleRenderer = m_AlwaysVisibleRenderer;
 
   /////////// Pipe Instance and Creation ///////////
   medPipeGraph *pipe = new medPipeGraph;
