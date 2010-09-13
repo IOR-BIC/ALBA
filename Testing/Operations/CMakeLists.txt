@@ -137,6 +137,12 @@ ADD_TEST(mafOpImporterRAWVolume_BESTest ${EXECUTABLE_OUTPUT_PATH}/mafOpImporterR
 ADD_EXECUTABLE(medOpMoveTest medOpMoveTest.h medOpMoveTest.cpp)
 ADD_TEST(medOpMoveTest ${EXECUTABLE_OUTPUT_PATH}/medOpMoveTest)
 
+ADD_EXECUTABLE(medOpExporterAnalogWSTest medOpExporterAnalogWSTest.h medOpExporterAnalogWSTest.cpp)
+ADD_TEST(medOpExporterAnalogWSTest ${EXECUTABLE_OUTPUT_PATH}/medOpExporterAnalogWSTest)
+
+ADD_EXECUTABLE(medOpExporterGRFWSTest medOpExporterGRFWSTest.h medOpExporterGRFWSTest.cpp)
+ADD_TEST(medOpExporterGRFWSTest ${EXECUTABLE_OUTPUT_PATH}/medOpExporterGRFWSTest)
+
 
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
