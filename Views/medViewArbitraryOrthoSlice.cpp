@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2010-08-30 15:35:25 $
-Version:   $Revision: 1.1.2.10 $
+Date:      $Date: 2010-09-15 16:11:53 $
+Version:   $Revision: 1.1.2.11 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -33,8 +33,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafPipeSurfaceTextured.h"
 #include "mafVMEVolumeGray.h"
 #include "mafVMESurface.h"
-#include "mafGizmoTranslate.h"
-#include "mafGizmoRotate.h"
+#include "medGizmoCrossTranslate.h"
+#include "medGizmoCrossRotate.h"
 #include "mafSceneGraph.h"
 #include "mafEvent.h"
 #include "mafAbsMatrixPipe.h"
@@ -72,6 +72,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkProperty.h"
 #include "medOpMatrixVectorMath.h"
 #include "mafTransformFrame.h"
+#include "mafVMEGizmo.h"
 
 mafCxxTypeMacro(medViewArbitraryOrthoSlice);
 
@@ -109,8 +110,14 @@ medViewArbitraryOrthoSlice::medViewArbitraryOrthoSlice(wxString label, bool show
 	m_ViewSliceY       = NULL;
 	m_ViewSliceZ       = NULL;
 
-	m_GizmoTranslate  = NULL;
-	m_GizmoRotate     = NULL;
+	m_GizmoCrossTranslateYNormal  = NULL;
+	m_GizmoCrossRotateYNormal     = NULL;
+
+	m_GizmoCrossTranslateYNormal  = NULL;
+	m_GizmoCrossRotateYNormal     = NULL;
+
+	m_GizmoCrossTranslateZNormal  = NULL;
+	m_GizmoCrossRotateZNormal     = NULL;
 
 	m_SlicerXResetMatrix     = NULL;
 	m_SlicerYResetMatrix     = NULL;
@@ -168,11 +175,13 @@ void medViewArbitraryOrthoSlice::PackageView()
 	m_ViewArbitrary->PlugVisualPipe("mafVMEVolumeGray", "mafPipeBox", MUTEX);
 	//	m_ViewArbitrary->PlugVisualPipe("mafVMELabeledVolume", "mafPipeBox", MUTEX);
 
+	m_ViewArbitrary->PlugVisualPipe("mafVMEGizmo", "mafPipeGizmo", NON_VISIBLE);
+
 	m_ViewSliceX = new mafViewVTK("",CAMERA_OS_X,true,false,false,0,false,mafAxes::CUBE);
 	// 	m_ViewSliceX->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice", NON_VISIBLE);
 	// 	m_ViewSliceX->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice", NON_VISIBLE);
 	// 	m_ViewSliceX->PlugVisualPipe("mafVMEMesh", "mafPipeMeshSlice", NON_VISIBLE);
-	m_ViewSliceX->PlugVisualPipe("mafVMEGizmo", "mafPipeGizmo");
+
 	m_ViewSliceX->PlugVisualPipe("mafVMEVolumeGray", "mafPipeBox", NON_VISIBLE);
 	// 	m_ViewSliceX->PlugVisualPipe("mafVMELandmark", "mafPipeSurfaceSlice", NON_VISIBLE);
 	// 	m_ViewSliceX->PlugVisualPipe("mafVMELandmarkCloud", "mafPipeSurfaceSlice", NON_VISIBLE);
@@ -181,7 +190,7 @@ void medViewArbitraryOrthoSlice::PackageView()
 	// 	m_ViewSliceY->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice", NON_VISIBLE);
 	// 	m_ViewSliceY->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice", NON_VISIBLE);
 	// 	m_ViewSliceY->PlugVisualPipe("mafVMEMesh", "mafPipeMeshSlice", NON_VISIBLE);
-	m_ViewSliceY->PlugVisualPipe("mafVMEGizmo", "mafPipeGizmo");
+	//m_ViewSliceY->PlugVisualPipe("mafVMEGizmo", "mafPipeGizmo");
 	m_ViewSliceY->PlugVisualPipe("mafVMEVolumeGray", "mafPipeBox", NON_VISIBLE);
 	// 	m_ViewSliceY->PlugVisualPipe("mafVMELandmark", "mafPipeSurfaceSlice", NON_VISIBLE);
 	// 	m_ViewSliceY->PlugVisualPipe("mafVMELandmarkCloud", "mafPipeSurfaceSlice", NON_VISIBLE);
@@ -190,7 +199,7 @@ void medViewArbitraryOrthoSlice::PackageView()
 	// 	m_ViewSliceZ->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice", NON_VISIBLE);
 	// 	m_ViewSliceZ->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice", NON_VISIBLE);
 	// 	m_ViewSliceZ->PlugVisualPipe("mafVMEMesh", "mafPipeMeshSlice", NON_VISIBLE);
-	m_ViewSliceZ->PlugVisualPipe("mafVMEGizmo", "mafPipeGizmo");
+	//m_ViewSliceZ->PlugVisualPipe("mafVMEGizmo", "mafPipeGizmo");
 	m_ViewSliceZ->PlugVisualPipe("mafVMEVolumeGray", "mafPipeBox", NON_VISIBLE);
 	// 	m_ViewSliceZ->PlugVisualPipe("mafVMELandmark", "mafPipeSurfaceSlice", NON_VISIBLE);
 	// 	m_ViewSliceZ->PlugVisualPipe("mafVMELandmarkCloud", "mafPipeSurfaceSlice", NON_VISIBLE);
@@ -205,13 +214,36 @@ void medViewArbitraryOrthoSlice::PackageView()
 void medViewArbitraryOrthoSlice::VmeShow(mafNode *node, bool show)
 
 {
-	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(node, show);
+    mafVME *vme=mafVME::SafeDownCast(node);
+	
+	if (vme->IsA("mafVMEGizmo"))
+	{
+		if (IsZNormalGizmoComponent(vme))
+		{
+			m_ChildViewList[Z_VIEW]->VmeShow(node, show);
+		}
+		else if (IsXNormalGizmoComponent(vme))
+		{
+			m_ChildViewList[X_VIEW]->VmeShow(node, show);
+		}
+		else if (IsYNormalGizmoComponent(vme))
+		{
+			m_ChildViewList[Y_VIEW]->VmeShow(node, show);
+		}
+		else
+		{
+			return;
+		}
+	}
 
-	m_ChildViewList[X_VIEW]->VmeShow(node, show);
-	m_ChildViewList[Y_VIEW]->VmeShow(node, show);
-	m_ChildViewList[Z_VIEW]->VmeShow(node, show);
+	else
+	{
+		m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(node, show);
+		m_ChildViewList[Z_VIEW]->VmeShow(node, show);
+		m_ChildViewList[X_VIEW]->VmeShow(node, show);
+		m_ChildViewList[Y_VIEW]->VmeShow(node, show);
+	}
 
-	mafVME *vme=mafVME::SafeDownCast(node);
 	vme->Update();
 	if (show)
 	{
@@ -268,11 +300,11 @@ void medViewArbitraryOrthoSlice::OnEvent(mafEventBase *maf_event)
 	{
 		OnEventThis(maf_event); 
 	}
-	else if (maf_event->GetSender() == m_GizmoTranslate) // from translation gizmo
+	else if (maf_event->GetSender() == m_GizmoCrossTranslateZNormal) // from translation gizmo
 	{
 		OnEventGizmoTranslate(maf_event);
 	}
-	else if (maf_event->GetSender() == m_GizmoRotate) // from rotation gizmo
+	else if (maf_event->GetSender() == m_GizmoCrossRotateZNormal) // from rotation gizmo
 	{
 		OnEventGizmoRotate(maf_event);
 	}
@@ -291,11 +323,15 @@ void medViewArbitraryOrthoSlice::OnEventGizmoTranslate(mafEventBase *maf_event)
 	case ID_TRANSFORM:
 		{    
 
+			m_GizmoCrossRotateZNormal->SetAbsPose(m_GizmoCrossTranslateZNormal->GetAbsPose());
+			
+			
+			mafEvent *e = mafEvent::SafeDownCast(maf_event);
+			
 			// post multiplying matrices coming from the gizmo to the vme
 			PostMultiplyEventMatrix(maf_event);
 
-			mafEvent *e = mafEvent::SafeDownCast(maf_event);
-
+			
 			//compute the incremental translation
 			vtkTransform *tr;
 			vtkNEW(tr);
@@ -385,6 +421,7 @@ void medViewArbitraryOrthoSlice::OnEventGizmoTranslate(mafEventBase *maf_event)
 					PipeSliceViewPolylineEditor->SetSlice(surfaceOriginTranslated, normal);          
 				}
 			}
+			
 			CameraUpdate();
 			vtkDEL(tr);
 			vtkDEL(TransformReset);
@@ -405,7 +442,9 @@ void medViewArbitraryOrthoSlice::OnEventGizmoRotate(mafEventBase *maf_event)
 	switch(maf_event->GetId())
 	{
 		case ID_TRANSFORM:
-		{    
+		{
+			m_GizmoCrossTranslateZNormal->SetAbsPose(m_GizmoCrossRotateZNormal->GetAbsPose(),0);
+
 			// post multiplying matrixes coming from the gizmo to the vme
 			// gizmo does not set vme pose  since they cannot scale
 			PostMultiplyEventMatrix(maf_event);
@@ -422,7 +461,7 @@ void medViewArbitraryOrthoSlice::OnEventGizmoRotate(mafEventBase *maf_event)
       vtkMAFSmartPointer<vtkTransform> tr;
       tr->SetMatrix(mat);
 
-      mafMatrix *gizmoABSPose = m_GizmoRotate->GetAbsPose();
+      mafMatrix *gizmoABSPose = m_GizmoCrossRotateZNormal->GetAbsPose();
 
       double gizmoABSCenter[3];
       mafTransform::GetPosition(*gizmoABSPose , gizmoABSCenter);
@@ -625,6 +664,7 @@ void medViewArbitraryOrthoSlice::OnEventGizmoRotate(mafEventBase *maf_event)
 					//mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 				}
 			}
+
 			CameraUpdate();
 		}
 		break;
@@ -661,8 +701,8 @@ void medViewArbitraryOrthoSlice::OnEventThis(mafEventBase *maf_event)
 
 		case ID_SHOW_GIZMO:
 			{
-				m_GizmoRotate->Show(m_ShowGizmo==1 && m_ComboChooseActiveGizmo == GIZMO_ROTATE? true : false);
-				m_GizmoTranslate->Show(m_ShowGizmo==1 && m_ComboChooseActiveGizmo == GIZMO_TRANSLATE? true : false);
+				m_GizmoCrossRotateZNormal->Show(m_ShowGizmo==1 && m_ComboChooseActiveGizmo == GIZMO_ROTATE? true : false);
+				m_GizmoCrossTranslateZNormal->Show(m_ShowGizmo==1 && m_ComboChooseActiveGizmo == GIZMO_TRANSLATE? true : false);
 				m_Gui->Enable(ID_COMBO_CHOOSE_ACTIVE_GIZMO, m_ShowGizmo == 1 ? true : false);		
 				CameraUpdate();
 			}
@@ -707,13 +747,13 @@ mafGUI* medViewArbitraryOrthoSlice::CreateGui()
 
 	m_Gui->Divider(2);
 
-	m_Gui->Label("show gizmo", true);
-	m_Gui->Bool(ID_SHOW_GIZMO, "",&m_ShowGizmo);
+	//m_Gui->Label("show gizmo", true);
+	//m_Gui->Bool(ID_SHOW_GIZMO, "",&m_ShowGizmo);
 
 	m_Gui->Divider(2);
 
 	//combo box to choose the type of gizmo
-	m_Gui->Label("choose gizmo", true);
+	//m_Gui->Label("choose gizmo", true);
 	wxString Text[2]={_("translation gizmo"),_("rotation gizmo")};
 	m_Gui->Combo(ID_COMBO_CHOOSE_ACTIVE_GIZMO,"",&m_ComboChooseActiveGizmo,2,Text);
 
@@ -739,10 +779,10 @@ void medViewArbitraryOrthoSlice::VmeRemove(mafNode *node)
 	{
 		m_AttachCameraToSlicerZInZView->SetVme(NULL);
 		m_CurrentVolume = NULL;
-		m_GizmoTranslate->Show(false);
-		cppDEL(m_GizmoTranslate);
-		m_GizmoRotate->Show(false);
-		cppDEL(m_GizmoRotate);
+		m_GizmoCrossTranslateZNormal->Show(false);
+		cppDEL(m_GizmoCrossTranslateZNormal);
+		m_GizmoCrossRotateZNormal->Show(false);
+		cppDEL(m_GizmoCrossRotateZNormal);
 	}
 
 	if (m_CurrentImage && node == m_CurrentImage){
@@ -1075,12 +1115,12 @@ void medViewArbitraryOrthoSlice::HideMafVMEVolume()
 	//remove gizmos
 	m_Gui->Remove(m_GuiGizmos);
 	m_Gui->Update();
-	m_GizmoTranslate->Show(false);
-	m_GizmoRotate->Show(false);
+	m_GizmoCrossTranslateZNormal->Show(false);
+	m_GizmoCrossRotateZNormal->Show(false);
 
 
-	cppDEL(m_GizmoTranslate);
-	cppDEL(m_GizmoRotate);
+	cppDEL(m_GizmoCrossTranslateZNormal);
+	cppDEL(m_GizmoCrossRotateZNormal);
 	cppDEL(m_GuiGizmos);
 
 	mafDEL(m_SlicerXResetMatrix);
@@ -1125,8 +1165,8 @@ void medViewArbitraryOrthoSlice::ShowVMESurfacesAndLandmarks( mafNode * node )
 void medViewArbitraryOrthoSlice::OnReset()
 {
 	{
-		m_GizmoRotate->SetAbsPose(m_SlicerZResetMatrix);
-		m_GizmoTranslate->SetAbsPose(m_SlicerZResetMatrix);
+		m_GizmoCrossRotateZNormal->SetAbsPose(m_SlicerZResetMatrix);
+		m_GizmoCrossTranslateZNormal->SetAbsPose(m_SlicerZResetMatrix);
 
 		m_SlicerX->SetAbsMatrix(*m_SlicerXResetMatrix);
 		m_SlicerY->SetAbsMatrix(*m_SlicerYResetMatrix);
@@ -1206,9 +1246,9 @@ void medViewArbitraryOrthoSlice::OnChooseActiveGizmo()
 				mat->PrintSelf(stringStream, NULL);
 				mafLogMessage(stringStream.str().c_str());
 
-				m_GizmoTranslate->Show(true);
-				m_GizmoTranslate->SetAbsPose(m_SlicerZ->GetOutput()->GetAbsMatrix(),0);
-				m_GizmoRotate->Show(false);
+				m_GizmoCrossTranslateZNormal->Show(true);
+				m_GizmoCrossTranslateZNormal->SetAbsPose(m_SlicerZ->GetOutput()->GetAbsMatrix(),0);
+				m_GizmoCrossRotateZNormal->Show(true);
 				this->CameraUpdate();
 			}
 			else if(m_ComboChooseActiveGizmo == GIZMO_ROTATE)
@@ -1221,9 +1261,9 @@ void medViewArbitraryOrthoSlice::OnChooseActiveGizmo()
 				mat->PrintSelf(stringStream,NULL);          
 				mafLogMessage(stringStream.str().c_str());
 
-				m_GizmoTranslate->Show(false);
-				m_GizmoRotate->Show(true);
-				m_GizmoRotate->SetAbsPose(m_SlicerZ->GetOutput()->GetAbsMatrix(),0);
+				m_GizmoCrossTranslateZNormal->Show(false);
+				m_GizmoCrossRotateZNormal->Show(true);
+				m_GizmoCrossRotateZNormal->SetAbsPose(m_SlicerZ->GetOutput()->GetAbsMatrix(),0);
 				this->CameraUpdate();
 			}
 		}
@@ -1416,22 +1456,57 @@ void medViewArbitraryOrthoSlice::ShowSlicers( mafVME * vmeVolume, bool show )
 	m_AttachCameraToSlicerZInZView->EnableAttachCamera();
 	((mafViewVTK*)m_ChildViewList[Z_VIEW])->CameraReset(m_SlicerZ);
 
-	// TODO: should create three different translation gizmos, one for each plane.
-	m_GizmoTranslate = new mafGizmoTranslate(m_SlicerZ, this);
-	m_GizmoTranslate->SetInput(m_SlicerZ);
-	m_GizmoTranslate->SetRefSys(m_SlicerZ);
-	m_GizmoTranslate->SetAbsPose(m_SlicerZResetMatrix);
-	m_GizmoTranslate->SetStep(X_AXIS,1.0);
-	m_GizmoTranslate->SetStep(Y_AXIS,1.0);
-	m_GizmoTranslate->SetStep(Z_AXIS,1.0);
-	m_GizmoTranslate->Show(false);
+	m_GizmoCrossTranslateZNormal = new medGizmoCrossTranslate(m_SlicerZ, this, true, medGizmoCrossTranslate::Z);
+	m_GizmoCrossTranslateZNormal->SetName("m_GizmoCrossTranslateZNormal");
+	m_GizmoCrossTranslateZNormal->SetInput(m_SlicerZ);
+	m_GizmoCrossTranslateZNormal->SetRefSys(m_SlicerZ);
+	m_GizmoCrossTranslateZNormal->SetAbsPose(m_SlicerZResetMatrix);
+	m_GizmoCrossTranslateZNormal->SetStep(1.0);
+	m_GizmoCrossTranslateZNormal->SetStep(1.0);
+	m_GizmoCrossTranslateZNormal->SetStep(1.0);
+	m_GizmoCrossTranslateZNormal->Show(true);
 
-	// 1 rotation gizmo for the triad
-	m_GizmoRotate = new mafGizmoRotate(m_SlicerZ, this);
-	m_GizmoRotate->SetInput(m_SlicerZ);
-	m_GizmoRotate->SetRefSys(m_SlicerZ);
-	m_GizmoRotate->SetAbsPose(m_SlicerZResetMatrix);
-	m_GizmoRotate->Show(true);
+	m_GizmoCrossRotateZNormal = new medGizmoCrossRotate(m_SlicerZ, this, true, medGizmoCrossTranslate::Z);
+	m_GizmoCrossRotateZNormal->SetName("m_GizmoCrossRotateZNormal");
+	m_GizmoCrossRotateZNormal->SetInput(m_SlicerZ);
+	m_GizmoCrossRotateZNormal->SetRefSys(m_SlicerZ);
+	m_GizmoCrossRotateZNormal->SetAbsPose(m_SlicerZResetMatrix);
+	m_GizmoCrossRotateZNormal->Show(true);
+
+
+	m_GizmoCrossTranslateYNormal = new medGizmoCrossTranslate(m_SlicerY, this, true, medGizmoCrossTranslate::Y);
+	m_GizmoCrossTranslateYNormal->SetName("m_GizmoCrossTranslateYNormal");
+	m_GizmoCrossTranslateYNormal->SetInput(m_SlicerY);
+	m_GizmoCrossTranslateYNormal->SetRefSys(m_SlicerY);
+	m_GizmoCrossTranslateYNormal->SetAbsPose(m_SlicerYResetMatrix);
+	m_GizmoCrossTranslateYNormal->SetStep(1.0);
+	m_GizmoCrossTranslateYNormal->SetStep(1.0);
+	m_GizmoCrossTranslateYNormal->SetStep(1.0);
+	m_GizmoCrossTranslateYNormal->Show(true);
+
+	m_GizmoCrossRotateYNormal = new medGizmoCrossRotate(m_SlicerY, this, true, medGizmoCrossTranslate::Y);
+	m_GizmoCrossRotateYNormal->SetName("m_GizmoCrossRotateYNormal");
+	m_GizmoCrossRotateYNormal->SetInput(m_SlicerY);
+	m_GizmoCrossRotateYNormal->SetRefSys(m_SlicerY);
+	m_GizmoCrossRotateYNormal->SetAbsPose(m_SlicerYResetMatrix);
+	m_GizmoCrossRotateYNormal->Show(true);
+
+	m_GizmoCrossTranslateXNormal = new medGizmoCrossTranslate(m_SlicerX, this, true, medGizmoCrossTranslate::X);
+	m_GizmoCrossTranslateXNormal->SetName("m_GizmoCrossTranslateXNormal");
+	m_GizmoCrossTranslateXNormal->SetInput(m_SlicerX);
+	m_GizmoCrossTranslateXNormal->SetRefSys(m_SlicerX);
+	m_GizmoCrossTranslateXNormal->SetAbsPose(m_SlicerXResetMatrix);
+	m_GizmoCrossTranslateXNormal->SetStep(1.0);
+	m_GizmoCrossTranslateXNormal->SetStep(1.0);
+	m_GizmoCrossTranslateXNormal->SetStep(1.0);
+	m_GizmoCrossTranslateXNormal->Show(true);
+
+	m_GizmoCrossRotateXNormal = new medGizmoCrossRotate(m_SlicerX, this, true, medGizmoCrossTranslate::X);
+	m_GizmoCrossRotateXNormal->SetName("m_GizmoCrossRotateXNormal");
+	m_GizmoCrossRotateXNormal->SetInput(m_SlicerX);
+	m_GizmoCrossRotateXNormal->SetRefSys(m_SlicerX);
+	m_GizmoCrossRotateXNormal->SetAbsPose(m_SlicerXResetMatrix);
+	m_GizmoCrossRotateXNormal->Show(true);
 
 	m_ComboChooseActiveGizmo = GIZMO_ROTATE;
 
@@ -1439,8 +1514,8 @@ void medViewArbitraryOrthoSlice::ShowSlicers( mafVME * vmeVolume, bool show )
 	if(!m_GuiGizmos)
 		m_GuiGizmos = new mafGUI(this);
 
-	m_GuiGizmos->AddGui(m_GizmoTranslate->GetGui());
-	m_GuiGizmos->AddGui(m_GizmoRotate->GetGui());
+	m_GuiGizmos->AddGui(m_GizmoCrossTranslateZNormal->GetGui());
+	m_GuiGizmos->AddGui(m_GizmoCrossRotateZNormal->GetGui());
 	m_GuiGizmos->Update();
 	m_Gui->AddGui(m_GuiGizmos);
 	m_Gui->FitGui();
@@ -1635,4 +1710,115 @@ void medViewArbitraryOrthoSlice::BuildZCameraConeVME()
 
 	coneSource->Delete();
 	CameraReset();
+}
+
+bool medViewArbitraryOrthoSlice::IsZNormalGizmoComponent( mafVME * vme )
+{
+	mafVMEGizmo *gizmo = mafVMEGizmo::SafeDownCast(vme);
+
+	mafObserver *mediator = NULL;
+	mediator = gizmo->GetMediator();
+
+	medGizmoCrossTranslate *translate = NULL;
+	translate = dynamic_cast<medGizmoCrossTranslate *>(mediator);
+
+	std::ostringstream stringStream;
+	stringStream << "Gizmo name: " << vme->GetName() << std::endl;        
+
+	if (translate && translate->GetName().Equals("m_GizmoCrossTranslateZNormal"))
+	{
+		stringStream << "Gizmo master: " << translate->GetName() << std::endl;       
+		mafLogMessage(stringStream.str().c_str());
+		return true;
+	}
+
+	medGizmoCrossRotate *rotate = NULL;
+	rotate = dynamic_cast<medGizmoCrossRotate *>(mediator);
+
+	if (rotate && rotate->GetName().Equals("m_GizmoCrossRotateZNormal"))
+	{
+		stringStream << "Gizmo master: " << rotate->GetName() << std::endl;       
+		mafLogMessage(stringStream.str().c_str());
+		return true;
+	}
+
+	return false;
+	
+
+
+}
+
+
+bool medViewArbitraryOrthoSlice::IsXNormalGizmoComponent( mafVME * vme )
+{
+	return false;
+	mafVMEGizmo *gizmo = mafVMEGizmo::SafeDownCast(vme);
+
+	mafObserver *mediator = NULL;
+	mediator = gizmo->GetMediator();
+
+	medGizmoCrossTranslate *translate = NULL;
+	translate = dynamic_cast<medGizmoCrossTranslate *>(mediator);
+
+	std::ostringstream stringStream;
+	stringStream << "Gizmo name: " << vme->GetName() << std::endl;        
+
+	if (translate && translate->GetName().Equals("m_GizmoCrossTranslateXNormal"))
+	{
+		stringStream << "Gizmo master: " << translate->GetName() << std::endl;       
+		mafLogMessage(stringStream.str().c_str());
+		return true;
+	}
+
+	medGizmoCrossRotate *rotate = NULL;
+	rotate = dynamic_cast<medGizmoCrossRotate *>(mediator);
+
+	if (rotate && rotate->GetName().Equals("m_GizmoCrossRotateXNormal"))
+	{
+		stringStream << "Gizmo master: " << rotate->GetName() << std::endl;       
+		mafLogMessage(stringStream.str().c_str());
+		return true;
+	}
+
+	return false;
+
+
+
+}
+
+bool medViewArbitraryOrthoSlice::IsYNormalGizmoComponent( mafVME * vme )
+{
+	return false;
+	mafVMEGizmo *gizmo = mafVMEGizmo::SafeDownCast(vme);
+
+	mafObserver *mediator = NULL;
+	mediator = gizmo->GetMediator();
+
+	medGizmoCrossTranslate *translate = NULL;
+	translate = dynamic_cast<medGizmoCrossTranslate *>(mediator);
+
+	std::ostringstream stringStream;
+	stringStream << "Gizmo name: " << vme->GetName() << std::endl;        
+
+	if (translate && translate->GetName().Equals("m_GizmoCrossTranslateYNormal"))
+	{
+		stringStream << "Gizmo master: " << translate->GetName() << std::endl;       
+		mafLogMessage(stringStream.str().c_str());
+		return true;
+	}
+
+	medGizmoCrossRotate *rotate = NULL;
+	rotate = dynamic_cast<medGizmoCrossRotate *>(mediator);
+
+	if (rotate && rotate->GetName().Equals("m_GizmoCrossRotateYNormal"))
+	{
+		stringStream << "Gizmo master: " << rotate->GetName() << std::endl;       
+		mafLogMessage(stringStream.str().c_str());
+		return true;
+	}
+
+	return false;
+
+
+
 }

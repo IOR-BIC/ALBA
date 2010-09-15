@@ -27,6 +27,21 @@ SET(PROJECT_SRCS
   mafGizmoROI_BES.cpp
   mafGizmoROI_BES.h  
   ############################################################
+  
+  medGizmoCrossRotate.cpp
+  medGizmoCrossRotate.h
+  medGizmoCrossRotateAxis.cpp
+  medGizmoCrossRotateAxis.h
+  medGizmoCrossRotateFan.cpp
+  medGizmoCrossRotateFan.h
+
+  medGizmoCrossTranslate.cpp
+  medGizmoCrossTranslate.h
+  medGizmoCrossTranslateAxis.cpp
+  medGizmoCrossTranslateAxis.h
+  medGizmoCrossTranslatePlane.cpp
+  medGizmoCrossTranslatePlane.h
+
 )
 
 

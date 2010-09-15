@@ -2,13 +2,24 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.h,v $
 Language:  C++
-Date:      $Date: 2010-08-24 16:24:51 $
-Version:   $Revision: 1.1.2.6 $
+Date:      $Date: 2010-09-15 16:11:53 $
+Version:   $Revision: 1.1.2.7 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
+
+
+//======================== WORK IN PROGRESS !!!!! ======================== 
+//======================== WORK IN PROGRESS !!!!! ======================== 
+//======================== WORK IN PROGRESS !!!!! ======================== 
+//======================== WORK IN PROGRESS !!!!! ======================== 
+//======================== WORK IN PROGRESS !!!!! ======================== 
+//======================== WORK IN PROGRESS !!!!! ======================== 
+//======================== WORK IN PROGRESS !!!!! ======================== 
+//======================== WORK IN PROGRESS !!!!! ======================== 
+//======================== WORK IN PROGRESS !!!!! ======================== 
 
 #ifndef __medViewArbitraryOrthoSlice_H__
 #define __medViewArbitraryOrthoSlice_H__
@@ -24,8 +35,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 
 class mafViewVTK;
-class mafGizmoTranslate;
-class mafGizmoRotate;
+class medGizmoCrossTranslate;
+class medGizmoCrossRotate;
 class mafVMEVolumeGray;
 class mafVMESlicer;
 class mafMatrix;
@@ -70,6 +81,7 @@ public:
 	/** Show/Hide VMEs into plugged sub-views*/
 	virtual void VmeShow(mafNode *node, bool show);
 
+	
 	/** Remove VME into plugged sub-views*/
 	virtual void VmeRemove(mafNode *node);
 
@@ -86,6 +98,19 @@ public:
 	virtual void CameraUpdate();
 
 protected:
+
+	bool IsXNormalGizmoComponent( mafVME * vme );
+	bool IsYNormalGizmoComponent( mafVME * vme );
+	bool IsZNormalGizmoComponent( mafVME * vme );
+
+	medGizmoCrossTranslate *m_GizmoCrossTranslateXNormal;
+	medGizmoCrossRotate		*m_GizmoCrossRotateXNormal;
+
+	medGizmoCrossTranslate *m_GizmoCrossTranslateYNormal;
+	medGizmoCrossRotate		*m_GizmoCrossRotateYNormal;
+
+	medGizmoCrossTranslate *m_GizmoCrossTranslateZNormal;
+	medGizmoCrossRotate		*m_GizmoCrossRotateZNormal;
 
 	void ShowVMESurfacesAndLandmarks( mafNode * node );
 
@@ -151,8 +176,8 @@ protected:
 
 	mafViewVTK *m_ViewArbitrary;
 
-	mafGizmoTranslate *m_GizmoTranslate;
-	mafGizmoRotate		*m_GizmoRotate;
+	
+	
 	mafVME          	*m_CurrentVolume;
 	mafVME				    *m_CurrentImage;
 	
