@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoInterface.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-12-02 15:58:35 $
-  Version:   $Revision: 1.3.2.2 $
+  Date:      $Date: 2010-09-15 16:10:05 $
+  Version:   $Revision: 1.3.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,6 +34,8 @@ mafGizmoInterface::mafGizmoInterface()
   m_Modality = G_LOCAL;
   m_RefSysVME = NULL;
   m_Visibility = false;
+  m_Name = "UNDEFINED_GIZMO_NAME";
+  m_Mediator = NULL;
 }
 //----------------------------------------------------------------------------
 mafGizmoInterface::~mafGizmoInterface() 

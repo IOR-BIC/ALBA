@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGizmo.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-04-16 12:49:21 $
-  Version:   $Revision: 1.8.2.1 $
+  Date:      $Date: 2010-09-15 16:10:24 $
+  Version:   $Revision: 1.8.2.2 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -39,6 +39,7 @@ mafCxxTypeMacro(mafVMEGizmo)
 mafVMEGizmo::mafVMEGizmo()
 //-------------------------------------------------------------------------
 {
+  m_Mediator = NULL;
   m_GizmoData = NULL;
   mafNEW(m_Transform);
   mafVMEOutputSurface *output=mafVMEOutputSurface::New(); // an output with no data

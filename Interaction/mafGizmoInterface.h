@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoInterface.h,v $
   Language:  C++
-  Date:      $Date: 2008-12-02 15:58:35 $
-  Version:   $Revision: 1.4.2.2 $
+  Date:      $Date: 2010-09-15 16:10:05 $
+  Version:   $Revision: 1.4.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -40,10 +40,22 @@ class mafGizmoInterface : public mafObserver
 {
 public:
 
+  void SetName(mafString name) {m_Name = name;};
+  mafString GetName() {return m_Name;}
+  
   /** 
   Set input vme for the gizmo*/
   virtual void SetInput(mafVME *vme);
   mafVME *GetInput();
+  
+  /** 
+  Set the orchestrator object: mafGizmo's are used togetheter in more complex objects 
+  like mafGizmoRotate, mafGizmoTranslate ,... The master gizmo act as mediator between
+  single mafVMEGizmos.
+  The optional mediator ivar holds a reference to the orchestrator if needed by the client.
+  */
+  void SetMediator(mafObserver *mediator) {m_Mediator = mediator;};
+  mafObserver *GetMediator() {return m_Mediator;};
 
   //----------------------------------------------------------------------------
   // events handling 
@@ -99,9 +111,14 @@ public:
   virtual mafGUI *GetGui();
   
 protected:
+
            mafGizmoInterface();
   virtual ~mafGizmoInterface(); 
-  
+
+  mafObserver *m_Mediator;
+
+  mafString m_Name;
+
   /** 
   The input vme*/
   mafVME *m_InputVME;

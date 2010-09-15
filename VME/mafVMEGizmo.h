@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGizmo.h,v $
   Language:  C++
-  Date:      $Date: 2009-04-16 12:49:21 $
-  Version:   $Revision: 1.6.2.1 $
+  Date:      $Date: 2010-09-15 16:10:25 $
+  Version:   $Revision: 1.6.2.2 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -17,6 +17,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // Include:
 //----------------------------------------------------------------------------
 #include "mafVME.h"
+#include "mafObserver.h";
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
@@ -50,6 +51,15 @@ public:
   
   /** Copy the contents of another VME-Gizmo into this one. */
   virtual int DeepCopy(mafNode *a);
+  
+  /** 
+  Set the orchestrator object: mafVMEGizmo's are used togetheter in more complex objects 
+  like mafGizmoRotate, mafGizmoTranslate ,... The master gizmo act as mediator between
+  single mafVMEGizmos.
+  The optional mediator ivar holds a reference to the orchestrator.
+  */
+  void SetMediator(mafObserver *mediator) {m_Mediator = mediator;};
+  mafObserver *GetMediator() {return m_Mediator;};
 
   /** Compare with another VME-Gizmo. */
   virtual bool Equals(mafVME *vme);
@@ -116,6 +126,8 @@ protected:
   double m_TextPosition[3];
   double m_TextColour[3];
   int    m_TextVisibility;
+	
+  mafObserver *m_Mediator;
 
 private:
   mafVMEGizmo(const mafVMEGizmo&); // Not implemented
