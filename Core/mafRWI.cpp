@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafRWI.cpp,v $
 Language:  C++
-Date:      $Date: 2010-09-10 15:42:40 $
-Version:   $Revision: 1.49.2.4 $
+Date:      $Date: 2010-09-17 16:26:03 $
+Version:   $Revision: 1.49.2.5 $
 Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -176,11 +176,6 @@ void mafRWI::CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers, bool use_
 		SetStereo(stereo);
 	}
 
-	m_RenderWindow->AddRenderer(m_RenFront);
-
-	m_RwiBase->SetRenderWindow(m_RenderWindow);
-	m_RwiBase->Initialize();
-
 	// create gizmo layer
 	m_AlwaysVisibleRenderer = vtkRenderer::New();
 	m_AlwaysVisibleRenderer->SetBackground(DEFAULT_BG_COLOR,DEFAULT_BG_COLOR,DEFAULT_BG_COLOR);
@@ -188,8 +183,7 @@ void mafRWI::CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers, bool use_
 	m_AlwaysVisibleRenderer->AddLight(m_Light);
 	m_AlwaysVisibleRenderer->BackingStoreOff();
 	m_AlwaysVisibleRenderer->LightFollowCameraOn(); 
-	m_AlwaysVisibleRenderer->SetInteractive(0); 
-
+  
 	if(layers == TWO_LAYER)
 	{
 		m_RenBack = vtkRenderer::New();
@@ -198,24 +192,33 @@ void mafRWI::CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers, bool use_
 		m_RenBack->AddLight(m_Light);
 		m_RenBack->BackingStoreOff();
 		m_RenBack->LightFollowCameraOn(); 
-		m_RenBack->SetInteractive(0); 
 
-		m_RenFront->SetLayer(0); 
-		m_RenBack->SetLayer(1); 
+		m_RenFront->SetLayer(1); 
+		m_RenBack->SetLayer(0); 
 		m_AlwaysVisibleRenderer->SetLayer(2);
 		m_RenderWindow->SetNumberOfLayers(3);
-		m_RenderWindow->AddRenderer(m_RenBack);
-		m_RenderWindow->AddRenderer(m_AlwaysVisibleRenderer);
+    m_RenderWindow->AddRenderer(m_AlwaysVisibleRenderer);
+    m_RenderWindow->AddRenderer(m_RenFront);
+    m_RenderWindow->AddRenderer(m_RenBack);
+
 	}
 	else
 	{
-		m_RenFront->SetLayer(0); 
+		m_RenFront->SetLayer(1); 
 		assert(m_RenBack == NULL);
-		m_AlwaysVisibleRenderer->SetLayer(1);
+		m_AlwaysVisibleRenderer->SetLayer(0);
 
 		m_RenderWindow->SetNumberOfLayers(2);
-		m_RenderWindow->AddRenderer(m_AlwaysVisibleRenderer);
+    m_RenderWindow->AddRenderer(m_AlwaysVisibleRenderer);
+    m_RenderWindow->AddRenderer(m_RenFront);
+
 	}
+
+  m_RwiBase->SetRenderWindow(m_RenderWindow);
+  m_RwiBase->Initialize();
+
+  assert(m_AlwaysVisibleRenderer->Transparent()	== true);
+
 	m_ShowRuler = show_ruler;
 	m_ShowOrientator = show_orientator;
 
