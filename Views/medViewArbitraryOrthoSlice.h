@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.h,v $
 Language:  C++
-Date:      $Date: 2010-09-15 16:11:53 $
-Version:   $Revision: 1.1.2.7 $
+Date:      $Date: 2010-09-21 14:50:51 $
+Version:   $Revision: 1.1.2.8 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -29,6 +29,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 #include "medViewCompoundWindowing.h"
 #include "mafVMESurface.h"
+#include "mafGizmoInterface.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -45,6 +46,7 @@ class mafGUI;
 class mafGUILutSlider;
 class mafGUILutSwatch;
 class medVMEPolylineEditor;
+class medGizmoCrossRotateTranslate;
 
 /**
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -91,6 +93,9 @@ public:
 	/** Function that handles events sent from other objects. */
 	virtual void OnEvent(mafEventBase *maf_event);
 
+	void OnEventGizmoCrossZNormal( mafEventBase * maf_event );
+	void OnEventGizmoCrossYNormal( mafEventBase * maf_event );
+
 	/** Function that clones instance of the object. */
 	virtual mafView* Copy(mafObserver *Listener);
 
@@ -106,12 +111,6 @@ protected:
 	medGizmoCrossTranslate *m_GizmoCrossTranslateXNormal;
 	medGizmoCrossRotate		*m_GizmoCrossRotateXNormal;
 
-	medGizmoCrossTranslate *m_GizmoCrossTranslateYNormal;
-	medGizmoCrossRotate		*m_GizmoCrossRotateYNormal;
-
-	medGizmoCrossTranslate *m_GizmoCrossTranslateZNormal;
-	medGizmoCrossRotate		*m_GizmoCrossRotateZNormal;
-
 	void ShowVMESurfacesAndLandmarks( mafNode * node );
 
 	void ShowMafVMEImage( mafVME * vme );
@@ -121,6 +120,7 @@ protected:
 
 	void ShowSlicers( mafVME * vmeVolume, bool show );
 
+	
 	/** 
 	Create the helper cone giving feedback for camera direction*/
 	void BuildXCameraConeVME();
@@ -159,17 +159,27 @@ protected:
 	void OnResetSurfaceAndLandmark( mafNode * node );
 	
 	/** This function is called when a rotate gizmo is moved*/
-	void OnEventGizmoRotate(mafEventBase *maf_event);
+	void OnEventGizmoCrossRotateZNormal(mafEventBase *maf_event);
+
+	void UpdateCameraXViewOnEventGizmoCrossRotateZNormal( mafEvent * event );
+	void UpdateCameraYViewOnEventGizmoCrossRotateZNormal( mafEvent * event );
+	void UpdateCameraZViewOnEventGizmoCrossRotateZNormal( mafEvent * event );
 
 	/**	This function is called when a translate gizmo is moved*/
-	void OnEventGizmoTranslate(mafEventBase *maf_event);
+	void OnEventGizmoCrossTranslateZNormal(mafEventBase *maf_event);
+
+	void PostMultiplyEventMatrix( mafEventBase * maf_event  , medGizmoCrossRotateTranslate *target);
 
 	/** Post multiply matrix for incoming transform events */
-	void PostMultiplyEventMatrix(mafEventBase *maf_event);
+	void PostMultiplyEventMatrixToSlicers(mafEventBase *maf_event);
 
 	/** Windowing for volumes data. This function overrides superclass method.*/
 	void VolumeWindowing(mafVME *volume);
-
+	void OnEventGizmoCrossRotateYNormal(mafEventBase *maf_event);
+	void OnEventGizmoCrossXNormal( mafEventBase * maf_event );
+	void OnEventGizmoCrossRotateXNormal(mafEventBase *maf_event);
+	void OnEventGizmoCrossTranslateXNormal(mafEventBase *maf_event);
+	void OnEventGizmoCrossTranslateYNormal(mafEventBase *maf_event);
 	mafViewVTK *m_ViewSliceX;
 	mafViewVTK *m_ViewSliceY;
 	mafViewVTK *m_ViewSliceZ;
@@ -209,5 +219,10 @@ protected:
 	int m_XCameraRollForReset;
 	int m_YCameraRollForReset;
 	int m_ZCameraRollForReset;
+
+	medGizmoCrossRotateTranslate *m_GizmoZView;
+	medGizmoCrossRotateTranslate *m_GizmoYView;
+	medGizmoCrossRotateTranslate *m_GizmoXView;
 };
+
 #endif

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoCrossTranslate.h,v $
   Language:  C++
-  Date:      $Date: 2010-09-15 16:11:32 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2010-09-21 14:50:29 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -105,7 +105,7 @@ public:
   void OnEvent(mafEventBase *maf_event);
  
   //----------------------------------------------------------------------------
-  // show 
+  // show	
   //----------------------------------------------------------------------------
   
   /**

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2010-09-15 16:11:53 $
-Version:   $Revision: 1.1.2.11 $
+Date:      $Date: 2010-09-21 14:50:51 $
+Version:   $Revision: 1.1.2.12 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -19,6 +19,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
+#include "medGizmoCrossRotateTranslate.h"
 #include "medDecl.h"
 #include "medViewArbitraryOrthoSlice.h"
 #include "mafViewSlice.h"
@@ -73,6 +74,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "medOpMatrixVectorMath.h"
 #include "mafTransformFrame.h"
 #include "mafVMEGizmo.h"
+#include "mafGizmoInterface.h"
 
 mafCxxTypeMacro(medViewArbitraryOrthoSlice);
 
@@ -104,20 +106,15 @@ medViewArbitraryOrthoSlice::medViewArbitraryOrthoSlice(wxString label, bool show
 : medViewCompoundWindowing(label, 2, 2)
 
 {
+	m_GizmoZView = NULL;
+	m_GizmoYView = NULL;
+	m_GizmoXView = NULL;
+
 	m_ViewArbitrary   = NULL;
 
 	m_ViewSliceX       = NULL;
 	m_ViewSliceY       = NULL;
 	m_ViewSliceZ       = NULL;
-
-	m_GizmoCrossTranslateYNormal  = NULL;
-	m_GizmoCrossRotateYNormal     = NULL;
-
-	m_GizmoCrossTranslateYNormal  = NULL;
-	m_GizmoCrossRotateYNormal     = NULL;
-
-	m_GizmoCrossTranslateZNormal  = NULL;
-	m_GizmoCrossRotateZNormal     = NULL;
 
 	m_SlicerXResetMatrix     = NULL;
 	m_SlicerYResetMatrix     = NULL;
@@ -156,6 +153,7 @@ medViewArbitraryOrthoSlice::medViewArbitraryOrthoSlice(wxString label, bool show
 	m_XCameraRollForReset = 0;
 	m_YCameraRollForReset = 0;
 	m_ZCameraRollForReset = 0;
+
 }
 
 medViewArbitraryOrthoSlice::~medViewArbitraryOrthoSlice()
@@ -166,10 +164,10 @@ medViewArbitraryOrthoSlice::~medViewArbitraryOrthoSlice()
 	m_CurrentImage  = NULL;
 	m_ColorLUT      = NULL;
 
+	cppDEL(m_GizmoZView);
 }
 
 void medViewArbitraryOrthoSlice::PackageView()
-
 {
 	m_ViewArbitrary = new mafViewVTK("",CAMERA_PERSPECTIVE,true,false,false,0,false,mafAxes::CUBE);
 	m_ViewArbitrary->PlugVisualPipe("mafVMEVolumeGray", "mafPipeBox", MUTEX);
@@ -214,21 +212,24 @@ void medViewArbitraryOrthoSlice::PackageView()
 void medViewArbitraryOrthoSlice::VmeShow(mafNode *node, bool show)
 
 {
-    mafVME *vme=mafVME::SafeDownCast(node);
-	
+	mafVME *vme=mafVME::SafeDownCast(node);
+
 	if (vme->IsA("mafVMEGizmo"))
 	{
 		if (IsZNormalGizmoComponent(vme))
 		{
 			m_ChildViewList[Z_VIEW]->VmeShow(node, show);
+			m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(node, show);
 		}
 		else if (IsXNormalGizmoComponent(vme))
 		{
 			m_ChildViewList[X_VIEW]->VmeShow(node, show);
+			m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(node, show);
 		}
 		else if (IsYNormalGizmoComponent(vme))
 		{
 			m_ChildViewList[Y_VIEW]->VmeShow(node, show);
+			m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(node, show);
 		}
 		else
 		{
@@ -300,38 +301,47 @@ void medViewArbitraryOrthoSlice::OnEvent(mafEventBase *maf_event)
 	{
 		OnEventThis(maf_event); 
 	}
-	else if (maf_event->GetSender() == m_GizmoCrossTranslateZNormal) // from translation gizmo
-	{
-		OnEventGizmoTranslate(maf_event);
-	}
-	else if (maf_event->GetSender() == m_GizmoCrossRotateZNormal) // from rotation gizmo
-	{
-		OnEventGizmoRotate(maf_event);
+	else if (maf_event->GetId() == ID_TRANSFORM)
+	{	
+		if (maf_event->GetSender() == m_GizmoZView->m_GizmoCrossRotate || maf_event->GetSender() == m_GizmoZView->m_GizmoCrossTranslate)
+		{	
+			OnEventGizmoCrossZNormal(maf_event);
+		}		
+		else if (maf_event->GetSender() == m_GizmoYView->m_GizmoCrossRotate || maf_event->GetSender() == m_GizmoYView->m_GizmoCrossTranslate)
+		{
+			OnEventGizmoCrossYNormal(maf_event);
+		}
+		else if (maf_event->GetSender() == m_GizmoXView->m_GizmoCrossRotate || maf_event->GetSender() == m_GizmoXView->m_GizmoCrossTranslate)
+		{
+			OnEventGizmoCrossXNormal(maf_event);
+		}
+		else
+		{
+			// if no one can handle this event send it to the operation listener
+			mafEventMacro(*maf_event); 
+		}	
 	}
 	else
 	{
-		// if no one can handle this event send it to the operation listener
-		mafEventMacro(*maf_event); 
-	}	
+		mafEventMacro(*maf_event);
+	}
 }
 
-void medViewArbitraryOrthoSlice::OnEventGizmoTranslate(mafEventBase *maf_event)
-
+void medViewArbitraryOrthoSlice::OnEventGizmoCrossTranslateZNormal(mafEventBase *maf_event)
 {
 	switch(maf_event->GetId())
 	{
-	case ID_TRANSFORM:
+		case ID_TRANSFORM:
 		{    
 
-			m_GizmoCrossRotateZNormal->SetAbsPose(m_GizmoCrossTranslateZNormal->GetAbsPose());
-			
-			
-			mafEvent *e = mafEvent::SafeDownCast(maf_event);
-			
-			// post multiplying matrices coming from the gizmo to the vme
-			PostMultiplyEventMatrix(maf_event);
+			PostMultiplyEventMatrix(maf_event, m_GizmoYView);
+			PostMultiplyEventMatrix(maf_event, m_GizmoXView);
 
-			
+			// post multiplying matrices coming from the gizmo to the slicers
+			PostMultiplyEventMatrixToSlicers(maf_event);
+
+			mafEvent *e = mafEvent::SafeDownCast(maf_event);
+
 			//compute the incremental translation
 			vtkTransform *tr;
 			vtkNEW(tr);
@@ -346,19 +356,6 @@ void medViewArbitraryOrthoSlice::OnEventGizmoTranslate(mafEventBase *maf_event)
 			m_VolumeVTKDataCenterABSCoords[1]+=translation[1];
 			m_VolumeVTKDataCenterABSCoords[2]+=translation[2];
 
-			//change the position of rotation gizmos
-			vtkTransform *TransformReset;
-			vtkNEW(TransformReset);
-			TransformReset->Identity();
-			TransformReset->Translate(m_VolumeVTKDataCenterABSCoords);
-			TransformReset->RotateX(m_VolumeVTKDataABSOrientation[0]);
-			TransformReset->RotateY(m_VolumeVTKDataABSOrientation[1]);
-			TransformReset->RotateZ(m_VolumeVTKDataABSOrientation[2]);
-			TransformReset->Update();
-			mafMatrix *matrix;
-			mafNEW(matrix);
-			matrix->Identity();
-			matrix->SetVTKMatrix(TransformReset->GetMatrix());
 
 			//for each surface visualized change the center of the cut plane
 			assert(m_CurrentVolume);
@@ -421,11 +418,9 @@ void medViewArbitraryOrthoSlice::OnEventGizmoTranslate(mafEventBase *maf_event)
 					PipeSliceViewPolylineEditor->SetSlice(surfaceOriginTranslated, normal);          
 				}
 			}
-			
+
 			CameraUpdate();
 			vtkDEL(tr);
-			vtkDEL(TransformReset);
-			vtkDEL(matrix);
 		}
 		break;
 
@@ -436,161 +431,42 @@ void medViewArbitraryOrthoSlice::OnEventGizmoTranslate(mafEventBase *maf_event)
 	}
 }
 
-void medViewArbitraryOrthoSlice::OnEventGizmoRotate(mafEventBase *maf_event)
-
+void medViewArbitraryOrthoSlice::OnEventGizmoCrossRotateZNormal(mafEventBase *maf_event)
 {
 	switch(maf_event->GetId())
 	{
-		case ID_TRANSFORM:
+	case ID_TRANSFORM:
 		{
-			m_GizmoCrossTranslateZNormal->SetAbsPose(m_GizmoCrossRotateZNormal->GetAbsPose(),0);
+			PostMultiplyEventMatrix(maf_event, m_GizmoYView);
+			PostMultiplyEventMatrix(maf_event, m_GizmoXView);
 
-			// post multiplying matrixes coming from the gizmo to the vme
-			// gizmo does not set vme pose  since they cannot scale
-			PostMultiplyEventMatrix(maf_event);
+			PostMultiplyEventMatrixToSlicers(maf_event);
 
 			// roll the camera based on gizmo
 
 			mafEvent *event = mafEvent::SafeDownCast(maf_event);
 			assert(event);
 
-      mafString activeGizmoAxis = *(event->GetString());
+			mafString activeGizmoAxis = *(event->GetString());
 
-      vtkMatrix4x4 *mat = event->GetMatrix()->GetVTKMatrix();
+			vtkMatrix4x4 *mat = event->GetMatrix()->GetVTKMatrix();
 
-      vtkMAFSmartPointer<vtkTransform> tr;
-      tr->SetMatrix(mat);
-
-      mafMatrix *gizmoABSPose = m_GizmoCrossRotateZNormal->GetAbsPose();
-
-      double gizmoABSCenter[3];
-      mafTransform::GetPosition(*gizmoABSPose , gizmoABSCenter);
-
-      if (activeGizmoAxis.Equals("Z"))
-      {		    
-		    double oldZViewCameraFocalPoint[3];
-
-		    vtkCamera *zViewCamera = NULL;
-
-		    zViewCamera = m_ChildViewList[Z_VIEW]->GetRWI()->GetCamera();
-		    assert(zViewCamera);
-
-		    zViewCamera->GetFocalPoint(oldZViewCameraFocalPoint);
-    		
-		    double oldZViewCameraPosition[3];
-		    zViewCamera->GetPosition(oldZViewCameraPosition);
-
-		    double newZViewCameraPosition[3];
-		    double newZViewCameraFocalPoint[3];
-    		
-		    double GOminusFPVector[3];
-		    GOminusFPVector[0] = gizmoABSCenter[0] - oldZViewCameraFocalPoint[0];
-		    GOminusFPVector[1] = gizmoABSCenter[1] - oldZViewCameraFocalPoint[1];
-		    GOminusFPVector[2] = gizmoABSCenter[2] - oldZViewCameraFocalPoint[2];
-
-		    mafTransform::AddVectors(oldZViewCameraPosition, GOminusFPVector, newZViewCameraPosition);
-
-		    zViewCamera->SetFocalPoint(gizmoABSCenter);
-		    zViewCamera->SetPosition(newZViewCameraPosition);
-
-        double zAngle = event->GetDouble();
-        m_ChildViewList[Z_VIEW]->GetRWI()->GetCamera()->Roll(-zAngle);
-
-
-      }
-      else if (activeGizmoAxis.Equals("Y"))
-      {		    
-        double oldYViewCameraFocalPoint[3];
-
-        vtkCamera *yViewCamera = NULL;
-
-        yViewCamera = m_ChildViewList[Y_VIEW]->GetRWI()->GetCamera();
-        assert(yViewCamera);
-
-        yViewCamera->GetFocalPoint(oldYViewCameraFocalPoint);
-
-        double oldYViewCameraPosition[3];
-        yViewCamera->GetPosition(oldYViewCameraPosition);
-
-        double newYViewCameraPosition[3];
-        double newYViewCameraFocalPoint[3];
-
-        double GOminusFPVector[3];
-        GOminusFPVector[0] = gizmoABSCenter[0] - oldYViewCameraFocalPoint[0];
-        GOminusFPVector[1] = gizmoABSCenter[1] - oldYViewCameraFocalPoint[1];
-        GOminusFPVector[2] = gizmoABSCenter[2] - oldYViewCameraFocalPoint[2];
-
-        mafTransform::AddVectors(oldYViewCameraPosition, GOminusFPVector, newYViewCameraPosition);
-
-        yViewCamera->SetFocalPoint(gizmoABSCenter);
-        yViewCamera->SetPosition(newYViewCameraPosition);
-
-        double yAngle = event->GetDouble();
-        m_ChildViewList[Y_VIEW]->GetRWI()->GetCamera()->Roll(-yAngle);
-      }
-      else if (activeGizmoAxis.Equals("X"))
-      {		    
-        double oldXViewCameraFocalPoint[3];
-
-        vtkCamera *xViewCamera = NULL;
-
-        xViewCamera = m_ChildViewList[X_VIEW]->GetRWI()->GetCamera();
-        assert(xViewCamera);
-
-        xViewCamera->GetFocalPoint(oldXViewCameraFocalPoint);
-
-        double oldXViewCameraPosition[3];
-        xViewCamera->GetPosition(oldXViewCameraPosition);
-
-        double newXViewCameraPosition[3];
-        double newXViewCameraFocalPoint[3];
-
-        double GOminusFPVector[3];
-        GOminusFPVector[0] = gizmoABSCenter[0] - oldXViewCameraFocalPoint[0];
-        GOminusFPVector[1] = gizmoABSCenter[1] - oldXViewCameraFocalPoint[1];
-        GOminusFPVector[2] = gizmoABSCenter[2] - oldXViewCameraFocalPoint[2];
-
-        mafTransform::AddVectors(oldXViewCameraPosition, GOminusFPVector, newXViewCameraPosition);
-
-        xViewCamera->SetFocalPoint(gizmoABSCenter);
-        xViewCamera->SetPosition(newXViewCameraPosition);
-
-        double xAngle = event->GetDouble();
-        m_ChildViewList[X_VIEW]->GetRWI()->GetCamera()->Roll(xAngle);
-      }
-
-			// Y View camera update
-
-// 			double oldYViewCameraFocalPoint[3];
-// 
-// 			vtkCamera *yViewCamera = NULL;
-// 
-// 			yViewCamera = m_ChildViewList[Y_VIEW]->GetRWI()->GetCamera();
-// 			assert(yViewCamera);
-// 
-// 			yViewCamera->GetFocalPoint(oldYViewCameraFocalPoint);
-// 
-// 			double oldYViewCameraPosition[3];
-// 			yViewCamera->GetPosition(oldYViewCameraPosition);
-// 
-// 			double newYViewCameraPosition[3];
-// 			double newYViewCameraFocalPoint[3];
-// 
-// 			GOminusFPVector[0] = gizmoABSCenter[0] - oldYViewCameraFocalPoint[0];
-// 			GOminusFPVector[1] = gizmoABSCenter[1] - oldYViewCameraFocalPoint[1];
-// 			GOminusFPVector[2] = gizmoABSCenter[2] - oldYViewCameraFocalPoint[2];
-// 
-// 			mafTransform::AddVectors(oldYViewCameraPosition, GOminusFPVector, newYViewCameraPosition);
-// 
-// 			yViewCamera->SetFocalPoint(gizmoABSCenter);
-// 			yViewCamera->SetPosition(newYViewCameraPosition);
-// 
-// //			m_ChildViewList[Y_VIEW]->GetRWI()->GetCamera()->Roll(-orientationFromEvent[1]);
-
-			/////
-
-
+			vtkMAFSmartPointer<vtkTransform> tr;
+			tr->SetMatrix(mat);
 			
+			UpdateCameraZViewOnEventGizmoCrossRotateZNormal(event);
+
+// 			}
+// 			else if (activeGizmoAxis.Equals("Y"))
+// 			{
+// 				UpdateCameraYViewOnEventGizmoCrossRotateZNormal(event);
+// 			}
+// 			else if (activeGizmoAxis.Equals("X"))
+// 			{
+// 				UpdateCameraXViewOnEventGizmoCrossRotateZNormal(event);
+// 			}
+
+
 			mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 
 			//update the normal of the cutter plane of the surface
@@ -676,8 +552,457 @@ void medViewArbitraryOrthoSlice::OnEventGizmoRotate(mafEventBase *maf_event)
 	}
 }
 
-void medViewArbitraryOrthoSlice::OnEventThis(mafEventBase *maf_event)
+void medViewArbitraryOrthoSlice::OnEventGizmoCrossRotateYNormal(mafEventBase *maf_event)
+{
+	switch(maf_event->GetId())
+	{
+	case ID_TRANSFORM:
+		{
+			PostMultiplyEventMatrix(maf_event, m_GizmoZView);
+			PostMultiplyEventMatrix(maf_event, m_GizmoXView);
 
+			PostMultiplyEventMatrixToSlicers(maf_event);
+
+			// roll the camera based on gizmo
+
+			mafEvent *event = mafEvent::SafeDownCast(maf_event);
+			assert(event);
+
+			mafString activeGizmoAxis = *(event->GetString());
+
+			vtkMatrix4x4 *mat = event->GetMatrix()->GetVTKMatrix();
+
+			vtkMAFSmartPointer<vtkTransform> tr;
+			tr->SetMatrix(mat);
+
+			UpdateCameraYViewOnEventGizmoCrossRotateZNormal(event);
+
+			// 			}
+			// 			else if (activeGizmoAxis.Equals("Y"))
+			// 			{
+			// 				UpdateCameraYViewOnEventGizmoCrossRotateZNormal(event);
+			// 			}
+			// 			else if (activeGizmoAxis.Equals("X"))
+			// 			{
+			// 				UpdateCameraXViewOnEventGizmoCrossRotateZNormal(event);
+			// 			}
+
+			mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+
+			//update the normal of the cutter plane of the surface
+			mafNode *root=m_CurrentVolume->GetRoot();
+			mafNodeIterator *iter = root->NewIterator();
+			for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+			{
+				if(node->IsA("mafVMESurface") || node->IsA("mafVMESurfaceParametric") || node->IsA("mafVMELandmark") || node->IsA("mafVMELandmarkCloud"))
+				{
+					double surfaceOriginTranslated[3];
+					double normal[3];
+					((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+					surfaceOriginTranslated[0] = m_VolumeVTKDataCenterABSCoords[0] + normal[0] * 0.1;
+					surfaceOriginTranslated[1] = m_VolumeVTKDataCenterABSCoords[1] + normal[1] * 0.1;
+					surfaceOriginTranslated[2] = m_VolumeVTKDataCenterABSCoords[2] + normal[2] * 0.1;
+
+					mafPipeSurface *PipeArbitraryViewSurface = mafPipeSurface::SafeDownCast(((mafViewSlice *)m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(node));
+					mafPipeSurfaceSlice *PipeSliceViewSurface = mafPipeSurfaceSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe(node));
+					if(PipeSliceViewSurface)
+					{
+
+						//PipeArbitraryViewSurface->SetNormal(normal);
+						PipeSliceViewSurface->SetNormal(normal);
+
+						//PipeArbitraryViewSurface->SetSlice(m_SliceCenterSurface);
+						PipeSliceViewSurface->SetSlice(surfaceOriginTranslated);
+					}
+				}
+				if(node->IsA("mafVMEMesh"))
+				{
+					double surfaceOriginTranslated[3];
+					double normal[3];
+					((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+					surfaceOriginTranslated[0] = m_VolumeVTKDataCenterABSCoords[0] + normal[0] * 0.1;
+					surfaceOriginTranslated[1] = m_VolumeVTKDataCenterABSCoords[1] + normal[1] * 0.1;
+					surfaceOriginTranslated[2] = m_VolumeVTKDataCenterABSCoords[2] + normal[2] * 0.1;
+
+					mafPipeMesh *PipeArbitraryViewMesh = mafPipeMesh::SafeDownCast(((mafViewSlice *)m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(node));
+					mafPipeMeshSlice *PipeSliceViewMesh = mafPipeMeshSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe(node));
+					if(PipeSliceViewMesh)
+					{
+
+						//PipeArbitraryViewSurface->SetNormal(normal);
+						PipeSliceViewMesh->SetNormal(normal);
+
+						//PipeArbitraryViewSurface->SetSlice(m_SliceCenterSurface);
+						PipeSliceViewMesh->SetSlice(surfaceOriginTranslated);
+					}
+				}
+			}
+			iter->Delete();
+			if(m_CurrentPolylineGraphEditor)
+			{
+				//a surface is visible only if there is a volume in the view
+				if(m_CurrentVolume)
+				{
+
+					double normal[3];
+					((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+
+					medPipePolylineGraphEditor *PipeSliceViewPolylineEditor = medPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe((mafNode*)m_CurrentPolylineGraphEditor));
+					PipeSliceViewPolylineEditor->SetModalitySlice();
+
+					double surfaceOriginTranslated[3];
+
+					surfaceOriginTranslated[0] = m_VolumeVTKDataCenterABSCoords[0] + normal[0] * 0.1;
+					surfaceOriginTranslated[1] = m_VolumeVTKDataCenterABSCoords[1] + normal[1] * 0.1;
+					surfaceOriginTranslated[2] = m_VolumeVTKDataCenterABSCoords[2] + normal[2] * 0.1;
+
+					PipeSliceViewPolylineEditor->SetSlice(surfaceOriginTranslated, normal);          
+					//mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				}
+			}
+
+			CameraUpdate();
+		}
+		break;
+
+	default:
+		{
+			mafEventMacro(*maf_event);
+		}
+	}
+}
+
+
+void medViewArbitraryOrthoSlice::OnEventGizmoCrossTranslateYNormal(mafEventBase *maf_event)
+{
+	switch(maf_event->GetId())
+	{
+	case ID_TRANSFORM:
+		{    
+
+			PostMultiplyEventMatrix(maf_event, m_GizmoZView);
+			PostMultiplyEventMatrix(maf_event, m_GizmoXView);
+
+			// post multiplying matrices coming from the gizmo to the slicers
+			PostMultiplyEventMatrixToSlicers(maf_event);
+
+			mafEvent *e = mafEvent::SafeDownCast(maf_event);
+
+			//compute the incremental translation
+			vtkTransform *tr;
+			vtkNEW(tr);
+			tr->PostMultiply();
+			tr->SetMatrix(e->GetMatrix()->GetVTKMatrix());
+			tr->Update();
+			double translation[3];
+			tr->GetPosition(translation);
+
+			//increase the translation
+			m_VolumeVTKDataCenterABSCoords[0]+=translation[0];
+			m_VolumeVTKDataCenterABSCoords[1]+=translation[1];
+			m_VolumeVTKDataCenterABSCoords[2]+=translation[2];
+
+
+			//for each surface visualized change the center of the cut plane
+			assert(m_CurrentVolume);
+			mafNode *root=m_CurrentVolume->GetRoot();
+			mafNodeIterator *iter = root->NewIterator();
+			for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+			{
+				if(node->IsA("mafVMESurface") || node->IsA("mafVMESurfaceParametric") || node->IsA("mafVMELandmark") || node->IsA("mafVMELandmarkCloud"))
+				{
+					double surfaceOriginTranslated[3];
+					double normal[3];
+					((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+					surfaceOriginTranslated[0] = m_VolumeVTKDataCenterABSCoords[0] + normal[0] * 0.1;
+					surfaceOriginTranslated[1] = m_VolumeVTKDataCenterABSCoords[1] + normal[1] * 0.1;
+					surfaceOriginTranslated[2] = m_VolumeVTKDataCenterABSCoords[2] + normal[2] * 0.1;
+
+					mafPipeSurface *PipeArbitraryViewSurface = mafPipeSurface::SafeDownCast(((mafViewSlice *)m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(node));
+					mafPipeSurfaceSlice *PipeSliceViewSurface = mafPipeSurfaceSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe(node));
+					if(PipeSliceViewSurface)
+					{
+						PipeSliceViewSurface->SetSlice(surfaceOriginTranslated);
+					}
+				}
+				if(node->IsA("mafVMEMesh"))
+				{
+					double surfaceOriginTranslated[3];
+					double normal[3];
+					((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+					surfaceOriginTranslated[0] = m_VolumeVTKDataCenterABSCoords[0] + normal[0] * 0.1;
+					surfaceOriginTranslated[1] = m_VolumeVTKDataCenterABSCoords[1] + normal[1] * 0.1;
+					surfaceOriginTranslated[2] = m_VolumeVTKDataCenterABSCoords[2] + normal[2] * 0.1;
+
+					mafPipeMesh *PipeArbitraryViewMesh = mafPipeMesh::SafeDownCast(((mafViewSlice *)m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(node));
+					mafPipeMeshSlice *PipeSliceViewMesh = mafPipeMeshSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe(node));
+					if(PipeArbitraryViewMesh && PipeSliceViewMesh)
+					{
+						PipeSliceViewMesh->SetSlice(surfaceOriginTranslated);
+					}
+				}
+			}
+			iter->Delete();
+			if(m_CurrentPolylineGraphEditor)
+			{
+				//a surface is visible only if there is a volume in the view
+				if(m_CurrentVolume)
+				{
+
+					double normal[3];
+					((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+
+					medPipePolylineGraphEditor *PipeSliceViewPolylineEditor = medPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe((mafNode*)m_CurrentPolylineGraphEditor));
+					PipeSliceViewPolylineEditor->SetModalitySlice();
+
+					double surfaceOriginTranslated[3];
+
+					surfaceOriginTranslated[0] = m_VolumeVTKDataCenterABSCoords[0] + normal[0] * 0.1;
+					surfaceOriginTranslated[1] = m_VolumeVTKDataCenterABSCoords[1] + normal[1] * 0.1;
+					surfaceOriginTranslated[2] = m_VolumeVTKDataCenterABSCoords[2] + normal[2] * 0.1;
+
+					PipeSliceViewPolylineEditor->SetSlice(surfaceOriginTranslated, normal);          
+				}
+			}
+
+			CameraUpdate();
+			vtkDEL(tr);
+		}
+		break;
+
+	default:
+		{
+			mafEventMacro(*maf_event);
+		}
+	}
+}
+
+void medViewArbitraryOrthoSlice::OnEventGizmoCrossRotateXNormal(mafEventBase *maf_event)
+{
+	switch(maf_event->GetId())
+	{
+	case ID_TRANSFORM:
+		{
+			PostMultiplyEventMatrix(maf_event, m_GizmoYView);
+			PostMultiplyEventMatrix(maf_event, m_GizmoZView);
+
+			PostMultiplyEventMatrixToSlicers(maf_event);
+
+			// roll the camera based on gizmo
+
+			mafEvent *event = mafEvent::SafeDownCast(maf_event);
+			assert(event);
+
+			mafString activeGizmoAxis = *(event->GetString());
+
+			vtkMatrix4x4 *mat = event->GetMatrix()->GetVTKMatrix();
+
+			vtkMAFSmartPointer<vtkTransform> tr;
+			tr->SetMatrix(mat);
+
+			UpdateCameraXViewOnEventGizmoCrossRotateZNormal(event);
+
+			// 			}
+			// 			else if (activeGizmoAxis.Equals("Y"))
+			// 			{
+			// 				UpdateCameraYViewOnEventGizmoCrossRotateZNormal(event);
+			// 			}
+			// 			else if (activeGizmoAxis.Equals("X"))
+			// 			{
+			// 				UpdateCameraXViewOnEventGizmoCrossRotateZNormal(event);
+			// 			}
+
+			mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+
+			//update the normal of the cutter plane of the surface
+			mafNode *root=m_CurrentVolume->GetRoot();
+			mafNodeIterator *iter = root->NewIterator();
+			for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+			{
+				if(node->IsA("mafVMESurface") || node->IsA("mafVMESurfaceParametric") || node->IsA("mafVMELandmark") || node->IsA("mafVMELandmarkCloud"))
+				{
+					double surfaceOriginTranslated[3];
+					double normal[3];
+					((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+					surfaceOriginTranslated[0] = m_VolumeVTKDataCenterABSCoords[0] + normal[0] * 0.1;
+					surfaceOriginTranslated[1] = m_VolumeVTKDataCenterABSCoords[1] + normal[1] * 0.1;
+					surfaceOriginTranslated[2] = m_VolumeVTKDataCenterABSCoords[2] + normal[2] * 0.1;
+
+					mafPipeSurface *PipeArbitraryViewSurface = mafPipeSurface::SafeDownCast(((mafViewSlice *)m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(node));
+					mafPipeSurfaceSlice *PipeSliceViewSurface = mafPipeSurfaceSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe(node));
+					if(PipeSliceViewSurface)
+					{
+
+						//PipeArbitraryViewSurface->SetNormal(normal);
+						PipeSliceViewSurface->SetNormal(normal);
+
+						//PipeArbitraryViewSurface->SetSlice(m_SliceCenterSurface);
+						PipeSliceViewSurface->SetSlice(surfaceOriginTranslated);
+					}
+				}
+				if(node->IsA("mafVMEMesh"))
+				{
+					double surfaceOriginTranslated[3];
+					double normal[3];
+					((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+					surfaceOriginTranslated[0] = m_VolumeVTKDataCenterABSCoords[0] + normal[0] * 0.1;
+					surfaceOriginTranslated[1] = m_VolumeVTKDataCenterABSCoords[1] + normal[1] * 0.1;
+					surfaceOriginTranslated[2] = m_VolumeVTKDataCenterABSCoords[2] + normal[2] * 0.1;
+
+					mafPipeMesh *PipeArbitraryViewMesh = mafPipeMesh::SafeDownCast(((mafViewSlice *)m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(node));
+					mafPipeMeshSlice *PipeSliceViewMesh = mafPipeMeshSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe(node));
+					if(PipeSliceViewMesh)
+					{
+
+						//PipeArbitraryViewSurface->SetNormal(normal);
+						PipeSliceViewMesh->SetNormal(normal);
+
+						//PipeArbitraryViewSurface->SetSlice(m_SliceCenterSurface);
+						PipeSliceViewMesh->SetSlice(surfaceOriginTranslated);
+					}
+				}
+			}
+			iter->Delete();
+			if(m_CurrentPolylineGraphEditor)
+			{
+				//a surface is visible only if there is a volume in the view
+				if(m_CurrentVolume)
+				{
+
+					double normal[3];
+					((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+
+					medPipePolylineGraphEditor *PipeSliceViewPolylineEditor = medPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe((mafNode*)m_CurrentPolylineGraphEditor));
+					PipeSliceViewPolylineEditor->SetModalitySlice();
+
+					double surfaceOriginTranslated[3];
+
+					surfaceOriginTranslated[0] = m_VolumeVTKDataCenterABSCoords[0] + normal[0] * 0.1;
+					surfaceOriginTranslated[1] = m_VolumeVTKDataCenterABSCoords[1] + normal[1] * 0.1;
+					surfaceOriginTranslated[2] = m_VolumeVTKDataCenterABSCoords[2] + normal[2] * 0.1;
+
+					PipeSliceViewPolylineEditor->SetSlice(surfaceOriginTranslated, normal);          
+					//mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				}
+			}
+
+			CameraUpdate();
+		}
+		break;
+
+	default:
+		{
+			mafEventMacro(*maf_event);
+		}
+	}
+}
+
+
+void medViewArbitraryOrthoSlice::OnEventGizmoCrossTranslateXNormal(mafEventBase *maf_event)
+{
+	switch(maf_event->GetId())
+	{
+	case ID_TRANSFORM:
+		{    
+
+			PostMultiplyEventMatrix(maf_event, m_GizmoYView);
+			PostMultiplyEventMatrix(maf_event, m_GizmoZView);
+
+			// post multiplying matrices coming from the gizmo to the slicers
+			PostMultiplyEventMatrixToSlicers(maf_event);
+
+			mafEvent *e = mafEvent::SafeDownCast(maf_event);
+
+			//compute the incremental translation
+			vtkTransform *tr;
+			vtkNEW(tr);
+			tr->PostMultiply();
+			tr->SetMatrix(e->GetMatrix()->GetVTKMatrix());
+			tr->Update();
+			double translation[3];
+			tr->GetPosition(translation);
+
+			//increase the translation
+			m_VolumeVTKDataCenterABSCoords[0]+=translation[0];
+			m_VolumeVTKDataCenterABSCoords[1]+=translation[1];
+			m_VolumeVTKDataCenterABSCoords[2]+=translation[2];
+
+
+			//for each surface visualized change the center of the cut plane
+			assert(m_CurrentVolume);
+			mafNode *root=m_CurrentVolume->GetRoot();
+			mafNodeIterator *iter = root->NewIterator();
+			for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+			{
+				if(node->IsA("mafVMESurface") || node->IsA("mafVMESurfaceParametric") || node->IsA("mafVMELandmark") || node->IsA("mafVMELandmarkCloud"))
+				{
+					double surfaceOriginTranslated[3];
+					double normal[3];
+					((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+					surfaceOriginTranslated[0] = m_VolumeVTKDataCenterABSCoords[0] + normal[0] * 0.1;
+					surfaceOriginTranslated[1] = m_VolumeVTKDataCenterABSCoords[1] + normal[1] * 0.1;
+					surfaceOriginTranslated[2] = m_VolumeVTKDataCenterABSCoords[2] + normal[2] * 0.1;
+
+					mafPipeSurface *PipeArbitraryViewSurface = mafPipeSurface::SafeDownCast(((mafViewSlice *)m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(node));
+					mafPipeSurfaceSlice *PipeSliceViewSurface = mafPipeSurfaceSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe(node));
+					if(PipeSliceViewSurface)
+					{
+						PipeSliceViewSurface->SetSlice(surfaceOriginTranslated);
+					}
+				}
+				if(node->IsA("mafVMEMesh"))
+				{
+					double surfaceOriginTranslated[3];
+					double normal[3];
+					((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+					surfaceOriginTranslated[0] = m_VolumeVTKDataCenterABSCoords[0] + normal[0] * 0.1;
+					surfaceOriginTranslated[1] = m_VolumeVTKDataCenterABSCoords[1] + normal[1] * 0.1;
+					surfaceOriginTranslated[2] = m_VolumeVTKDataCenterABSCoords[2] + normal[2] * 0.1;
+
+					mafPipeMesh *PipeArbitraryViewMesh = mafPipeMesh::SafeDownCast(((mafViewSlice *)m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(node));
+					mafPipeMeshSlice *PipeSliceViewMesh = mafPipeMeshSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe(node));
+					if(PipeArbitraryViewMesh && PipeSliceViewMesh)
+					{
+						PipeSliceViewMesh->SetSlice(surfaceOriginTranslated);
+					}
+				}
+			}
+			iter->Delete();
+			if(m_CurrentPolylineGraphEditor)
+			{
+				//a surface is visible only if there is a volume in the view
+				if(m_CurrentVolume)
+				{
+
+					double normal[3];
+					((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+
+					medPipePolylineGraphEditor *PipeSliceViewPolylineEditor = medPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe((mafNode*)m_CurrentPolylineGraphEditor));
+					PipeSliceViewPolylineEditor->SetModalitySlice();
+
+					double surfaceOriginTranslated[3];
+
+					surfaceOriginTranslated[0] = m_VolumeVTKDataCenterABSCoords[0] + normal[0] * 0.1;
+					surfaceOriginTranslated[1] = m_VolumeVTKDataCenterABSCoords[1] + normal[1] * 0.1;
+					surfaceOriginTranslated[2] = m_VolumeVTKDataCenterABSCoords[2] + normal[2] * 0.1;
+
+					PipeSliceViewPolylineEditor->SetSlice(surfaceOriginTranslated, normal);          
+				}
+			}
+
+			CameraUpdate();
+			vtkDEL(tr);
+		}
+		break;
+
+	default:
+		{
+			mafEventMacro(*maf_event);
+		}
+	}
+}
+
+void medViewArbitraryOrthoSlice::OnEventThis(mafEventBase *maf_event)
 {
 	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
 	{
@@ -701,8 +1026,8 @@ void medViewArbitraryOrthoSlice::OnEventThis(mafEventBase *maf_event)
 
 		case ID_SHOW_GIZMO:
 			{
-				m_GizmoCrossRotateZNormal->Show(m_ShowGizmo==1 && m_ComboChooseActiveGizmo == GIZMO_ROTATE? true : false);
-				m_GizmoCrossTranslateZNormal->Show(m_ShowGizmo==1 && m_ComboChooseActiveGizmo == GIZMO_TRANSLATE? true : false);
+				m_GizmoZView->m_GizmoCrossRotate->Show(m_ShowGizmo==1 && m_ComboChooseActiveGizmo == GIZMO_ROTATE? true : false);
+				m_GizmoZView->m_GizmoCrossTranslate->Show(m_ShowGizmo==1 && m_ComboChooseActiveGizmo == GIZMO_TRANSLATE? true : false);
 				m_Gui->Enable(ID_COMBO_CHOOSE_ACTIVE_GIZMO, m_ShowGizmo == 1 ? true : false);		
 				CameraUpdate();
 			}
@@ -739,32 +1064,31 @@ mafGUI* medViewArbitraryOrthoSlice::CreateGui()
 	assert(m_Gui == NULL);
 	m_Gui = new mafGUI(this);
 
-	m_Gui->Divider(2);
+	//	m_Gui->Divider(2);
 
 	//button to reset at the start position
 	m_Gui->Label("reset slices", true);
 	m_Gui->Button(ID_RESET,_("reset"),"");
 
-	m_Gui->Divider(2);
+	//m_Gui->Divider(2);
 
 	//m_Gui->Label("show gizmo", true);
 	//m_Gui->Bool(ID_SHOW_GIZMO, "",&m_ShowGizmo);
 
-	m_Gui->Divider(2);
+	// m_Gui->Divider(2);
 
 	//combo box to choose the type of gizmo
 	//m_Gui->Label("choose gizmo", true);
-	wxString Text[2]={_("translation gizmo"),_("rotation gizmo")};
-	m_Gui->Combo(ID_COMBO_CHOOSE_ACTIVE_GIZMO,"",&m_ComboChooseActiveGizmo,2,Text);
+// 	wxString Text[2]={_("translation gizmo"),_("rotation gizmo")};
+// 	m_Gui->Combo(ID_COMBO_CHOOSE_ACTIVE_GIZMO,"",&m_ComboChooseActiveGizmo,2,Text);
 
 
-	m_Gui->Divider(2);
+	// m_Gui->Divider(2);
 
 
 	// m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
 
-	m_Gui->Divider();
-
+	// m_Gui->Divider();
 
 	m_Gui->Update();
 
@@ -779,10 +1103,15 @@ void medViewArbitraryOrthoSlice::VmeRemove(mafNode *node)
 	{
 		m_AttachCameraToSlicerZInZView->SetVme(NULL);
 		m_CurrentVolume = NULL;
-		m_GizmoCrossTranslateZNormal->Show(false);
-		cppDEL(m_GizmoCrossTranslateZNormal);
-		m_GizmoCrossRotateZNormal->Show(false);
-		cppDEL(m_GizmoCrossRotateZNormal);
+		
+		m_GizmoZView->Show(false);
+		cppDEL(m_GizmoZView);
+
+		m_GizmoYView->Show(false);
+		cppDEL(m_GizmoYView);
+
+		m_GizmoXView->Show(false);
+		cppDEL(m_GizmoXView);
 	}
 
 	if (m_CurrentImage && node == m_CurrentImage){
@@ -792,7 +1121,7 @@ void medViewArbitraryOrthoSlice::VmeRemove(mafNode *node)
 	Superclass::VmeRemove(node);
 }
 
-void medViewArbitraryOrthoSlice::PostMultiplyEventMatrix(mafEventBase *maf_event)
+void medViewArbitraryOrthoSlice::PostMultiplyEventMatrixToSlicers(mafEventBase *maf_event)
 
 {  
 	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
@@ -1115,12 +1444,10 @@ void medViewArbitraryOrthoSlice::HideMafVMEVolume()
 	//remove gizmos
 	m_Gui->Remove(m_GuiGizmos);
 	m_Gui->Update();
-	m_GizmoCrossTranslateZNormal->Show(false);
-	m_GizmoCrossRotateZNormal->Show(false);
 
+	m_GizmoZView->Show(false);
+	m_GizmoYView->Show(false);
 
-	cppDEL(m_GizmoCrossTranslateZNormal);
-	cppDEL(m_GizmoCrossRotateZNormal);
 	cppDEL(m_GuiGizmos);
 
 	mafDEL(m_SlicerXResetMatrix);
@@ -1165,13 +1492,14 @@ void medViewArbitraryOrthoSlice::ShowVMESurfacesAndLandmarks( mafNode * node )
 void medViewArbitraryOrthoSlice::OnReset()
 {
 	{
-		m_GizmoCrossRotateZNormal->SetAbsPose(m_SlicerZResetMatrix);
-		m_GizmoCrossTranslateZNormal->SetAbsPose(m_SlicerZResetMatrix);
+		m_GizmoZView->SetAbsPose(m_SlicerZResetMatrix);
+		m_GizmoYView->SetAbsPose(m_SlicerYResetMatrix);
+		m_GizmoXView->SetAbsPose(m_SlicerXResetMatrix);
 
 		m_SlicerX->SetAbsMatrix(*m_SlicerXResetMatrix);
 		m_SlicerY->SetAbsMatrix(*m_SlicerYResetMatrix);
 		m_SlicerZ->SetAbsMatrix(*m_SlicerZResetMatrix);
-		
+
 		//update because I need to refresh the normal of the camera
 		mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 
@@ -1246,9 +1574,9 @@ void medViewArbitraryOrthoSlice::OnChooseActiveGizmo()
 				mat->PrintSelf(stringStream, NULL);
 				mafLogMessage(stringStream.str().c_str());
 
-				m_GizmoCrossTranslateZNormal->Show(true);
-				m_GizmoCrossTranslateZNormal->SetAbsPose(m_SlicerZ->GetOutput()->GetAbsMatrix(),0);
-				m_GizmoCrossRotateZNormal->Show(true);
+				m_GizmoZView->m_GizmoCrossTranslate->Show(true);
+			    m_GizmoZView->m_GizmoCrossTranslate->SetAbsPose(m_SlicerZ->GetOutput()->GetAbsMatrix(),0);
+				m_GizmoZView->m_GizmoCrossRotate->Show(true);
 				this->CameraUpdate();
 			}
 			else if(m_ComboChooseActiveGizmo == GIZMO_ROTATE)
@@ -1261,9 +1589,9 @@ void medViewArbitraryOrthoSlice::OnChooseActiveGizmo()
 				mat->PrintSelf(stringStream,NULL);          
 				mafLogMessage(stringStream.str().c_str());
 
-				m_GizmoCrossTranslateZNormal->Show(false);
-				m_GizmoCrossRotateZNormal->Show(true);
-				m_GizmoCrossRotateZNormal->SetAbsPose(m_SlicerZ->GetOutput()->GetAbsMatrix(),0);
+				m_GizmoZView->m_GizmoCrossTranslate->Show(false);
+				m_GizmoZView->m_GizmoCrossRotate->Show(true);
+				m_GizmoZView->m_GizmoCrossRotate->SetAbsPose(m_SlicerZ->GetOutput()->GetAbsMatrix(),0);
 				this->CameraUpdate();
 			}
 		}
@@ -1456,57 +1784,29 @@ void medViewArbitraryOrthoSlice::ShowSlicers( mafVME * vmeVolume, bool show )
 	m_AttachCameraToSlicerZInZView->EnableAttachCamera();
 	((mafViewVTK*)m_ChildViewList[Z_VIEW])->CameraReset(m_SlicerZ);
 
-	m_GizmoCrossTranslateZNormal = new medGizmoCrossTranslate(m_SlicerZ, this, true, medGizmoCrossTranslate::Z);
-	m_GizmoCrossTranslateZNormal->SetName("m_GizmoCrossTranslateZNormal");
-	m_GizmoCrossTranslateZNormal->SetInput(m_SlicerZ);
-	m_GizmoCrossTranslateZNormal->SetRefSys(m_SlicerZ);
-	m_GizmoCrossTranslateZNormal->SetAbsPose(m_SlicerZResetMatrix);
-	m_GizmoCrossTranslateZNormal->SetStep(1.0);
-	m_GizmoCrossTranslateZNormal->SetStep(1.0);
-	m_GizmoCrossTranslateZNormal->SetStep(1.0);
-	m_GizmoCrossTranslateZNormal->Show(true);
+	m_GizmoZView = new medGizmoCrossRotateTranslate();
+	m_GizmoZView->Create(m_SlicerZ, this, true, medGizmoCrossTranslate::Z);
+	m_GizmoZView->SetName("m_GizmoZView");
+	m_GizmoZView->SetInput(m_SlicerZ);
+	m_GizmoZView->SetRefSys(m_SlicerZ);
+	m_GizmoZView->SetAbsPose(m_SlicerZResetMatrix);
+	m_GizmoZView->Show(true);
 
-	m_GizmoCrossRotateZNormal = new medGizmoCrossRotate(m_SlicerZ, this, true, medGizmoCrossTranslate::Z);
-	m_GizmoCrossRotateZNormal->SetName("m_GizmoCrossRotateZNormal");
-	m_GizmoCrossRotateZNormal->SetInput(m_SlicerZ);
-	m_GizmoCrossRotateZNormal->SetRefSys(m_SlicerZ);
-	m_GizmoCrossRotateZNormal->SetAbsPose(m_SlicerZResetMatrix);
-	m_GizmoCrossRotateZNormal->Show(true);
+	m_GizmoYView = new medGizmoCrossRotateTranslate();
+	m_GizmoYView->Create(m_SlicerY, this, true, medGizmoCrossTranslate::Y);
+	m_GizmoYView->SetName("m_GizmoYView");
+	m_GizmoYView->SetInput(m_SlicerY);
+	m_GizmoYView->SetRefSys(m_SlicerY);
+	m_GizmoYView->SetAbsPose(m_SlicerYResetMatrix);
+	m_GizmoYView->Show(true);
 
-
-	m_GizmoCrossTranslateYNormal = new medGizmoCrossTranslate(m_SlicerY, this, true, medGizmoCrossTranslate::Y);
-	m_GizmoCrossTranslateYNormal->SetName("m_GizmoCrossTranslateYNormal");
-	m_GizmoCrossTranslateYNormal->SetInput(m_SlicerY);
-	m_GizmoCrossTranslateYNormal->SetRefSys(m_SlicerY);
-	m_GizmoCrossTranslateYNormal->SetAbsPose(m_SlicerYResetMatrix);
-	m_GizmoCrossTranslateYNormal->SetStep(1.0);
-	m_GizmoCrossTranslateYNormal->SetStep(1.0);
-	m_GizmoCrossTranslateYNormal->SetStep(1.0);
-	m_GizmoCrossTranslateYNormal->Show(true);
-
-	m_GizmoCrossRotateYNormal = new medGizmoCrossRotate(m_SlicerY, this, true, medGizmoCrossTranslate::Y);
-	m_GizmoCrossRotateYNormal->SetName("m_GizmoCrossRotateYNormal");
-	m_GizmoCrossRotateYNormal->SetInput(m_SlicerY);
-	m_GizmoCrossRotateYNormal->SetRefSys(m_SlicerY);
-	m_GizmoCrossRotateYNormal->SetAbsPose(m_SlicerYResetMatrix);
-	m_GizmoCrossRotateYNormal->Show(true);
-
-	m_GizmoCrossTranslateXNormal = new medGizmoCrossTranslate(m_SlicerX, this, true, medGizmoCrossTranslate::X);
-	m_GizmoCrossTranslateXNormal->SetName("m_GizmoCrossTranslateXNormal");
-	m_GizmoCrossTranslateXNormal->SetInput(m_SlicerX);
-	m_GizmoCrossTranslateXNormal->SetRefSys(m_SlicerX);
-	m_GizmoCrossTranslateXNormal->SetAbsPose(m_SlicerXResetMatrix);
-	m_GizmoCrossTranslateXNormal->SetStep(1.0);
-	m_GizmoCrossTranslateXNormal->SetStep(1.0);
-	m_GizmoCrossTranslateXNormal->SetStep(1.0);
-	m_GizmoCrossTranslateXNormal->Show(true);
-
-	m_GizmoCrossRotateXNormal = new medGizmoCrossRotate(m_SlicerX, this, true, medGizmoCrossTranslate::X);
-	m_GizmoCrossRotateXNormal->SetName("m_GizmoCrossRotateXNormal");
-	m_GizmoCrossRotateXNormal->SetInput(m_SlicerX);
-	m_GizmoCrossRotateXNormal->SetRefSys(m_SlicerX);
-	m_GizmoCrossRotateXNormal->SetAbsPose(m_SlicerXResetMatrix);
-	m_GizmoCrossRotateXNormal->Show(true);
+	m_GizmoXView = new medGizmoCrossRotateTranslate();
+	m_GizmoXView->Create(m_SlicerX, this, true, medGizmoCrossTranslate::X);
+	m_GizmoXView->SetName("m_GizmoXView");
+	m_GizmoXView->SetInput(m_SlicerX);
+	m_GizmoXView->SetRefSys(m_SlicerX);
+	m_GizmoXView->SetAbsPose(m_SlicerXResetMatrix);
+	m_GizmoXView->Show(true);
 
 	m_ComboChooseActiveGizmo = GIZMO_ROTATE;
 
@@ -1514,8 +1814,8 @@ void medViewArbitraryOrthoSlice::ShowSlicers( mafVME * vmeVolume, bool show )
 	if(!m_GuiGizmos)
 		m_GuiGizmos = new mafGUI(this);
 
-	m_GuiGizmos->AddGui(m_GizmoCrossTranslateZNormal->GetGui());
-	m_GuiGizmos->AddGui(m_GizmoCrossRotateZNormal->GetGui());
+	m_GuiGizmos->AddGui(m_GizmoZView->m_GizmoCrossTranslate->GetGui());
+	m_GuiGizmos->AddGui(m_GizmoZView->m_GizmoCrossRotate->GetGui());
 	m_GuiGizmos->Update();
 	m_Gui->AddGui(m_GuiGizmos);
 	m_Gui->FitGui();
@@ -1714,6 +2014,7 @@ void medViewArbitraryOrthoSlice::BuildZCameraConeVME()
 
 bool medViewArbitraryOrthoSlice::IsZNormalGizmoComponent( mafVME * vme )
 {
+
 	mafVMEGizmo *gizmo = mafVMEGizmo::SafeDownCast(vme);
 
 	mafObserver *mediator = NULL;
@@ -1725,7 +2026,7 @@ bool medViewArbitraryOrthoSlice::IsZNormalGizmoComponent( mafVME * vme )
 	std::ostringstream stringStream;
 	stringStream << "Gizmo name: " << vme->GetName() << std::endl;        
 
-	if (translate && translate->GetName().Equals("m_GizmoCrossTranslateZNormal"))
+	if (translate && translate->GetName().Equals("m_GizmoZView"))
 	{
 		stringStream << "Gizmo master: " << translate->GetName() << std::endl;       
 		mafLogMessage(stringStream.str().c_str());
@@ -1735,7 +2036,7 @@ bool medViewArbitraryOrthoSlice::IsZNormalGizmoComponent( mafVME * vme )
 	medGizmoCrossRotate *rotate = NULL;
 	rotate = dynamic_cast<medGizmoCrossRotate *>(mediator);
 
-	if (rotate && rotate->GetName().Equals("m_GizmoCrossRotateZNormal"))
+	if (rotate && rotate->GetName().Equals("m_GizmoZView"))
 	{
 		stringStream << "Gizmo master: " << rotate->GetName() << std::endl;       
 		mafLogMessage(stringStream.str().c_str());
@@ -1743,7 +2044,7 @@ bool medViewArbitraryOrthoSlice::IsZNormalGizmoComponent( mafVME * vme )
 	}
 
 	return false;
-	
+
 
 
 }
@@ -1751,7 +2052,6 @@ bool medViewArbitraryOrthoSlice::IsZNormalGizmoComponent( mafVME * vme )
 
 bool medViewArbitraryOrthoSlice::IsXNormalGizmoComponent( mafVME * vme )
 {
-	return false;
 	mafVMEGizmo *gizmo = mafVMEGizmo::SafeDownCast(vme);
 
 	mafObserver *mediator = NULL;
@@ -1763,7 +2063,7 @@ bool medViewArbitraryOrthoSlice::IsXNormalGizmoComponent( mafVME * vme )
 	std::ostringstream stringStream;
 	stringStream << "Gizmo name: " << vme->GetName() << std::endl;        
 
-	if (translate && translate->GetName().Equals("m_GizmoCrossTranslateXNormal"))
+	if (translate && translate->GetName().Equals("m_GizmoXView"))
 	{
 		stringStream << "Gizmo master: " << translate->GetName() << std::endl;       
 		mafLogMessage(stringStream.str().c_str());
@@ -1773,7 +2073,7 @@ bool medViewArbitraryOrthoSlice::IsXNormalGizmoComponent( mafVME * vme )
 	medGizmoCrossRotate *rotate = NULL;
 	rotate = dynamic_cast<medGizmoCrossRotate *>(mediator);
 
-	if (rotate && rotate->GetName().Equals("m_GizmoCrossRotateXNormal"))
+	if (rotate && rotate->GetName().Equals("m_GizmoXView"))
 	{
 		stringStream << "Gizmo master: " << rotate->GetName() << std::endl;       
 		mafLogMessage(stringStream.str().c_str());
@@ -1781,14 +2081,10 @@ bool medViewArbitraryOrthoSlice::IsXNormalGizmoComponent( mafVME * vme )
 	}
 
 	return false;
-
-
-
 }
 
 bool medViewArbitraryOrthoSlice::IsYNormalGizmoComponent( mafVME * vme )
 {
-	return false;
 	mafVMEGizmo *gizmo = mafVMEGizmo::SafeDownCast(vme);
 
 	mafObserver *mediator = NULL;
@@ -1800,7 +2096,7 @@ bool medViewArbitraryOrthoSlice::IsYNormalGizmoComponent( mafVME * vme )
 	std::ostringstream stringStream;
 	stringStream << "Gizmo name: " << vme->GetName() << std::endl;        
 
-	if (translate && translate->GetName().Equals("m_GizmoCrossTranslateYNormal"))
+	if (translate && translate->GetName().Equals("m_GizmoYView"))
 	{
 		stringStream << "Gizmo master: " << translate->GetName() << std::endl;       
 		mafLogMessage(stringStream.str().c_str());
@@ -1810,7 +2106,7 @@ bool medViewArbitraryOrthoSlice::IsYNormalGizmoComponent( mafVME * vme )
 	medGizmoCrossRotate *rotate = NULL;
 	rotate = dynamic_cast<medGizmoCrossRotate *>(mediator);
 
-	if (rotate && rotate->GetName().Equals("m_GizmoCrossRotateYNormal"))
+	if (rotate && rotate->GetName().Equals("m_GizmoYView"))
 	{
 		stringStream << "Gizmo master: " << rotate->GetName() << std::endl;       
 		mafLogMessage(stringStream.str().c_str());
@@ -1818,7 +2114,171 @@ bool medViewArbitraryOrthoSlice::IsYNormalGizmoComponent( mafVME * vme )
 	}
 
 	return false;
-
-
-
 }
+
+
+void medViewArbitraryOrthoSlice::OnEventGizmoCrossZNormal( mafEventBase * maf_event )
+{
+	if (maf_event->GetSender() == m_GizmoZView->m_GizmoCrossTranslate)
+	{
+		OnEventGizmoCrossTranslateZNormal(maf_event);
+	}
+	else if (maf_event->GetSender() == m_GizmoZView->m_GizmoCrossRotate) // from rotation gizmo
+	{
+		OnEventGizmoCrossRotateZNormal(maf_event);
+	}
+}
+
+void medViewArbitraryOrthoSlice::OnEventGizmoCrossYNormal( mafEventBase * maf_event )
+{
+	if (maf_event->GetSender() == m_GizmoYView->m_GizmoCrossTranslate)
+	{
+		OnEventGizmoCrossTranslateYNormal(maf_event);
+	}
+	else if (maf_event->GetSender() == m_GizmoYView->m_GizmoCrossRotate) // from rotation gizmo
+	{
+		OnEventGizmoCrossRotateYNormal(maf_event);
+	}
+}
+
+void medViewArbitraryOrthoSlice::OnEventGizmoCrossXNormal( mafEventBase * maf_event )
+{
+	if (maf_event->GetSender() == m_GizmoXView->m_GizmoCrossTranslate)
+	{
+		OnEventGizmoCrossTranslateXNormal(maf_event);
+	}
+	else if (maf_event->GetSender() == m_GizmoXView->m_GizmoCrossRotate) // from rotation gizmo
+	{
+		OnEventGizmoCrossRotateXNormal(maf_event);
+	}
+}
+
+
+void medViewArbitraryOrthoSlice::UpdateCameraZViewOnEventGizmoCrossRotateZNormal( mafEvent * event )
+{
+	mafMatrix *gizmoABSPose = m_GizmoZView->m_GizmoCrossRotate->GetAbsPose();
+
+	double gizmoABSCenter[3];
+	mafTransform::GetPosition(*gizmoABSPose , gizmoABSCenter);
+
+	double oldZViewCameraFocalPoint[3];
+
+	vtkCamera *zViewCamera = NULL;
+
+	zViewCamera = m_ChildViewList[Z_VIEW]->GetRWI()->GetCamera();
+	assert(zViewCamera);
+
+	zViewCamera->GetFocalPoint(oldZViewCameraFocalPoint);
+
+	double oldZViewCameraPosition[3];
+	zViewCamera->GetPosition(oldZViewCameraPosition);
+
+	double newZViewCameraPosition[3];
+	double newZViewCameraFocalPoint[3];
+
+	double GOminusFPVector[3];
+	GOminusFPVector[0] = gizmoABSCenter[0] - oldZViewCameraFocalPoint[0];
+	GOminusFPVector[1] = gizmoABSCenter[1] - oldZViewCameraFocalPoint[1];
+	GOminusFPVector[2] = gizmoABSCenter[2] - oldZViewCameraFocalPoint[2];
+
+	mafTransform::AddVectors(oldZViewCameraPosition, GOminusFPVector, newZViewCameraPosition);
+
+	zViewCamera->SetFocalPoint(gizmoABSCenter);
+	zViewCamera->SetPosition(newZViewCameraPosition);
+
+	double zAngle = event->GetDouble();
+	m_ChildViewList[Z_VIEW]->GetRWI()->GetCamera()->Roll(-zAngle);
+}
+
+void medViewArbitraryOrthoSlice::UpdateCameraYViewOnEventGizmoCrossRotateZNormal( mafEvent * event )
+{
+	mafMatrix *gizmoABSPose = m_GizmoYView->m_GizmoCrossRotate->GetAbsPose();
+
+	double gizmoABSCenter[3];
+	mafTransform::GetPosition(*gizmoABSPose , gizmoABSCenter);
+
+	double oldYViewCameraFocalPoint[3];
+
+	vtkCamera *yViewCamera = NULL;
+
+	yViewCamera = m_ChildViewList[Y_VIEW]->GetRWI()->GetCamera();
+	assert(yViewCamera);
+
+	yViewCamera->GetFocalPoint(oldYViewCameraFocalPoint);
+
+	double oldYViewCameraPosition[3];
+	yViewCamera->GetPosition(oldYViewCameraPosition);
+
+	double newYViewCameraPosition[3];
+	double newYViewCameraFocalPoint[3];
+
+	double GOminusFPVector[3];
+	GOminusFPVector[0] = gizmoABSCenter[0] - oldYViewCameraFocalPoint[0];
+	GOminusFPVector[1] = gizmoABSCenter[1] - oldYViewCameraFocalPoint[1];
+	GOminusFPVector[2] = gizmoABSCenter[2] - oldYViewCameraFocalPoint[2];
+
+	mafTransform::AddVectors(oldYViewCameraPosition, GOminusFPVector, newYViewCameraPosition);
+
+	yViewCamera->SetFocalPoint(gizmoABSCenter);
+	yViewCamera->SetPosition(newYViewCameraPosition);
+
+	double yAngle = event->GetDouble();
+	m_ChildViewList[Y_VIEW]->GetRWI()->GetCamera()->Roll(yAngle);
+}
+
+void medViewArbitraryOrthoSlice::UpdateCameraXViewOnEventGizmoCrossRotateZNormal( mafEvent * event )
+{
+	mafMatrix *gizmoABSPose = m_GizmoZView->m_GizmoCrossRotate->GetAbsPose();
+
+	double gizmoABSCenter[3];
+	mafTransform::GetPosition(*gizmoABSPose , gizmoABSCenter);
+
+	double oldXViewCameraFocalPoint[3];
+
+	vtkCamera *xViewCamera = NULL;
+
+	xViewCamera = m_ChildViewList[X_VIEW]->GetRWI()->GetCamera();
+	assert(xViewCamera);
+
+	xViewCamera->GetFocalPoint(oldXViewCameraFocalPoint);
+
+	double oldXViewCameraPosition[3];
+	xViewCamera->GetPosition(oldXViewCameraPosition);
+
+	double newXViewCameraPosition[3];
+	double newXViewCameraFocalPoint[3];
+
+	double GOminusFPVector[3];
+	GOminusFPVector[0] = gizmoABSCenter[0] - oldXViewCameraFocalPoint[0];
+	GOminusFPVector[1] = gizmoABSCenter[1] - oldXViewCameraFocalPoint[1];
+	GOminusFPVector[2] = gizmoABSCenter[2] - oldXViewCameraFocalPoint[2];
+
+	mafTransform::AddVectors(oldXViewCameraPosition, GOminusFPVector, newXViewCameraPosition);
+
+	xViewCamera->SetFocalPoint(gizmoABSCenter);
+	xViewCamera->SetPosition(newXViewCameraPosition);
+
+	double xAngle = event->GetDouble();
+	m_ChildViewList[X_VIEW]->GetRWI()->GetCamera()->Roll(xAngle);
+}
+
+void medViewArbitraryOrthoSlice::PostMultiplyEventMatrix( mafEventBase *maf_event , medGizmoCrossRotateTranslate *target)
+{
+	mafEvent *e = mafEvent::SafeDownCast(maf_event);
+
+	vtkTransform *tr1 = vtkTransform::New();
+	tr1->PostMultiply();
+	tr1->SetMatrix(target->GetAbsPose()->GetVTKMatrix());
+	tr1->Concatenate(e->GetMatrix()->GetVTKMatrix());
+	tr1->Update();
+
+	mafMatrix absPose;
+	absPose.DeepCopy(tr1->GetMatrix());
+	absPose.SetTimeStamp(m_GizmoYView->GetAbsPose()->GetTimeStamp());
+
+	target->SetAbsPose(&absPose);
+
+	vtkDEL(tr1);
+}
+
+
