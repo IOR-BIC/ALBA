@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterGRFWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-09-13 09:07:40 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2010-09-22 08:30:10 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Simone Brazzale
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -237,7 +237,7 @@ void medOpExporterGRFWS::Write()
     std::vector<mafTimeStamp> kframes2;
     m_ForceLeft->GetTimeStamps(kframes1);
     m_ForceRight->GetTimeStamps(kframes2);
-    std::vector<mafTimeStamp> kframes = mergeTimeStamps(kframes1,kframes2);
+    std::vector<mafTimeStamp> kframes = MergeTimeStamps(kframes1,kframes2);
     int size = kframes.size();
     for (int i=0;i<size;i++)
     {
@@ -334,7 +334,7 @@ void medOpExporterGRFWS::Write()
   }
 }
 //----------------------------------------------------------------------------
-std::vector<mafTimeStamp> medOpExporterGRFWS::mergeTimeStamps(std::vector<mafTimeStamp> kframes1,std::vector<mafTimeStamp> kframes2)   
+std::vector<mafTimeStamp> medOpExporterGRFWS::MergeTimeStamps(std::vector<mafTimeStamp> kframes1,std::vector<mafTimeStamp> kframes2)   
 //----------------------------------------------------------------------------
 {
   std::vector<mafTimeStamp> kframes;

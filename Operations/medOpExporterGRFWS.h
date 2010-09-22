@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterGRFWS.h,v $
   Language:  C++
-  Date:      $Date: 2010-09-13 09:07:40 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2010-09-22 08:30:10 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2004
@@ -89,7 +89,7 @@ public:
 private:
 
   /** Merge time stamps of platforms */
-  std::vector<mafTimeStamp> mergeTimeStamps(std::vector<mafTimeStamp> kframes1,std::vector<mafTimeStamp> kframes2);
+  std::vector<mafTimeStamp> MergeTimeStamps(std::vector<mafTimeStamp> kframes1,std::vector<mafTimeStamp> kframes2);
 
 protected:
   mafVMESurface       *m_PlatformLeft;
