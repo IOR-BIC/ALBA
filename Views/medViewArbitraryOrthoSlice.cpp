@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2010-09-23 10:20:56 $
-Version:   $Revision: 1.1.2.13 $
+Date:      $Date: 2010-09-23 15:10:12 $
+Version:   $Revision: 1.1.2.14 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -995,7 +995,6 @@ void medViewArbitraryOrthoSlice::OnEventGizmoCrossTranslateXNormal(mafEventBase 
 			}
 
 			ChildViewsCameraUpdate();
-
 			vtkDEL(tr);
 		}
 		break;
@@ -1508,7 +1507,7 @@ void medViewArbitraryOrthoSlice::OnReset()
 		//update because I need to refresh the normal of the camera
 		mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 
-
+		
 		((mafViewSlice*)m_ChildViewList[X_VIEW])->GetRWI()->GetCamera()->SetRoll(m_XCameraRollForReset);
 
 		((mafViewSlice*)m_ChildViewList[Y_VIEW])->GetRWI()->GetCamera()->SetRoll(m_YCameraRollForReset);
@@ -1819,8 +1818,8 @@ void medViewArbitraryOrthoSlice::ShowSlicers( mafVME * vmeVolume, bool show )
 	if(!m_GuiGizmos)
 		m_GuiGizmos = new mafGUI(this);
 
-	m_GuiGizmos->AddGui(m_GizmoZView->m_GizmoCrossTranslate->GetGui());
-	m_GuiGizmos->AddGui(m_GizmoZView->m_GizmoCrossRotate->GetGui());
+	// m_GuiGizmos->AddGui(m_GizmoZView->m_GizmoCrossTranslate->GetGui());
+	// m_GuiGizmos->AddGui(m_GizmoZView->m_GizmoCrossRotate->GetGui());
 	m_GuiGizmos->Update();
 	m_Gui->AddGui(m_GuiGizmos);
 	m_Gui->FitGui();
