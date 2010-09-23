@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.h,v $
 Language:  C++
-Date:      $Date: 2010-09-21 14:50:51 $
-Version:   $Revision: 1.1.2.8 $
+Date:      $Date: 2010-09-23 10:20:56 $
+Version:   $Revision: 1.1.2.9 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -178,6 +178,9 @@ protected:
 	void OnEventGizmoCrossRotateYNormal(mafEventBase *maf_event);
 	void OnEventGizmoCrossXNormal( mafEventBase * maf_event );
 	void OnEventGizmoCrossRotateXNormal(mafEventBase *maf_event);
+
+	void ChildViewsCameraUpdate();
+
 	void OnEventGizmoCrossTranslateXNormal(mafEventBase *maf_event);
 	void OnEventGizmoCrossTranslateYNormal(mafEventBase *maf_event);
 	mafViewVTK *m_ViewSliceX;

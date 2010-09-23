@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2010-09-21 14:50:51 $
-Version:   $Revision: 1.1.2.12 $
+Date:      $Date: 2010-09-23 10:20:56 $
+Version:   $Revision: 1.1.2.13 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -419,8 +419,9 @@ void medViewArbitraryOrthoSlice::OnEventGizmoCrossTranslateZNormal(mafEventBase 
 				}
 			}
 
-			CameraUpdate();
+			ChildViewsCameraUpdate();
 			vtkDEL(tr);
+
 		}
 		break;
 
@@ -541,7 +542,8 @@ void medViewArbitraryOrthoSlice::OnEventGizmoCrossRotateZNormal(mafEventBase *ma
 				}
 			}
 
-			CameraUpdate();
+			ChildViewsCameraUpdate();
+
 		}
 		break;
 
@@ -661,7 +663,8 @@ void medViewArbitraryOrthoSlice::OnEventGizmoCrossRotateYNormal(mafEventBase *ma
 				}
 			}
 
-			CameraUpdate();
+			ChildViewsCameraUpdate();
+
 		}
 		break;
 
@@ -765,7 +768,7 @@ void medViewArbitraryOrthoSlice::OnEventGizmoCrossTranslateYNormal(mafEventBase 
 				}
 			}
 
-			CameraUpdate();
+			ChildViewsCameraUpdate();
 			vtkDEL(tr);
 		}
 		break;
@@ -886,7 +889,8 @@ void medViewArbitraryOrthoSlice::OnEventGizmoCrossRotateXNormal(mafEventBase *ma
 				}
 			}
 
-			CameraUpdate();
+			ChildViewsCameraUpdate();
+
 		}
 		break;
 
@@ -990,7 +994,8 @@ void medViewArbitraryOrthoSlice::OnEventGizmoCrossTranslateXNormal(mafEventBase 
 				}
 			}
 
-			CameraUpdate();
+			ChildViewsCameraUpdate();
+
 			vtkDEL(tr);
 		}
 		break;
@@ -2279,6 +2284,14 @@ void medViewArbitraryOrthoSlice::PostMultiplyEventMatrix( mafEventBase *maf_even
 	target->SetAbsPose(&absPose);
 
 	vtkDEL(tr1);
+}
+
+void medViewArbitraryOrthoSlice::ChildViewsCameraUpdate()
+{
+	for(int i=0; i<m_NumOfChildView; i++)
+	{
+		m_ChildViewList[i]->CameraUpdate();
+	}
 }
 
 
