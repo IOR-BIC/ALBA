@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2010-09-23 15:10:12 $
-Version:   $Revision: 1.1.2.14 $
+Date:      $Date: 2010-09-24 15:28:52 $
+Version:   $Revision: 1.1.2.15 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -150,9 +150,17 @@ medViewArbitraryOrthoSlice::medViewArbitraryOrthoSlice(wxString label, bool show
 	m_YCameraConeVME = NULL;
 	m_ZCameraConeVME = NULL;
 
-	m_XCameraRollForReset = 0;
-	m_YCameraRollForReset = 0;
-	m_ZCameraRollForReset = 0;
+	m_XCameraPositionForReset[0] = 0;
+	m_XCameraPositionForReset[1] = 0;
+	m_XCameraPositionForReset[2] = 0;
+
+	m_YCameraPositionForReset[0] = 0;
+	m_YCameraPositionForReset[1] = 0;
+	m_YCameraPositionForReset[2] = 0;
+
+	m_ZCameraPositionForReset[0] = 0;
+	m_ZCameraPositionForReset[1] = 0;
+	m_ZCameraPositionForReset[2] = 0;
 
 }
 
@@ -331,11 +339,11 @@ void medViewArbitraryOrthoSlice::OnEventGizmoCrossTranslateZNormal(mafEventBase 
 {
 	switch(maf_event->GetId())
 	{
-		case ID_TRANSFORM:
+	case ID_TRANSFORM:
 		{    
 
-			PostMultiplyEventMatrix(maf_event, m_GizmoYView);
-			PostMultiplyEventMatrix(maf_event, m_GizmoXView);
+			PostMultiplyEventMatrixToGizmoCrossRT(maf_event, m_GizmoYView);
+			PostMultiplyEventMatrixToGizmoCrossRT(maf_event, m_GizmoXView);
 
 			// post multiplying matrices coming from the gizmo to the slicers
 			PostMultiplyEventMatrixToSlicers(maf_event);
@@ -438,10 +446,11 @@ void medViewArbitraryOrthoSlice::OnEventGizmoCrossRotateZNormal(mafEventBase *ma
 	{
 	case ID_TRANSFORM:
 		{
-			PostMultiplyEventMatrix(maf_event, m_GizmoYView);
-			PostMultiplyEventMatrix(maf_event, m_GizmoXView);
+			PostMultiplyEventMatrixToGizmoCrossRT(maf_event, m_GizmoXView);
+			PostMultiplyEventMatrixToGizmoCrossRT(maf_event, m_GizmoYView);
 
-			PostMultiplyEventMatrixToSlicers(maf_event);
+			PostMultiplyEventMatrixToSlicer(maf_event, medGizmoCrossRotateTranslate::X);
+			PostMultiplyEventMatrixToSlicer(maf_event, medGizmoCrossRotateTranslate::Y);
 
 			// roll the camera based on gizmo
 
@@ -454,18 +463,20 @@ void medViewArbitraryOrthoSlice::OnEventGizmoCrossRotateZNormal(mafEventBase *ma
 
 			vtkMAFSmartPointer<vtkTransform> tr;
 			tr->SetMatrix(mat);
-			
-			UpdateCameraZViewOnEventGizmoCrossRotateZNormal(event);
 
-// 			}
-// 			else if (activeGizmoAxis.Equals("Y"))
-// 			{
-// 				UpdateCameraYViewOnEventGizmoCrossRotateZNormal(event);
-// 			}
-// 			else if (activeGizmoAxis.Equals("X"))
-// 			{
-// 				UpdateCameraXViewOnEventGizmoCrossRotateZNormal(event);
-// 			}
+			m_ChildViewList[X_VIEW]->GetRWI()->GetCamera()->ApplyTransform(tr);
+			m_ChildViewList[Y_VIEW]->GetRWI()->GetCamera()->ApplyTransform(tr);
+
+     
+			// 			}
+			// 			else if (activeGizmoAxis.Equals("Y"))
+			// 			{
+			// 				UpdateCameraYViewOnEventGizmoCrossRotateZNormal(event);
+			// 			}
+			// 			else if (activeGizmoAxis.Equals("X"))
+			// 			{
+			// 				UpdateCameraXViewOnEventGizmoCrossRotateZNormal(event);
+			// 			}
 
 
 			mafEventMacro(mafEvent(this,CAMERA_UPDATE));
@@ -560,10 +571,11 @@ void medViewArbitraryOrthoSlice::OnEventGizmoCrossRotateYNormal(mafEventBase *ma
 	{
 	case ID_TRANSFORM:
 		{
-			PostMultiplyEventMatrix(maf_event, m_GizmoZView);
-			PostMultiplyEventMatrix(maf_event, m_GizmoXView);
+			PostMultiplyEventMatrixToGizmoCrossRT(maf_event, m_GizmoZView);
+			PostMultiplyEventMatrixToGizmoCrossRT(maf_event, m_GizmoXView);
 
-			PostMultiplyEventMatrixToSlicers(maf_event);
+			PostMultiplyEventMatrixToSlicer(maf_event, medGizmoCrossRotateTranslate::X);
+			PostMultiplyEventMatrixToSlicer(maf_event, medGizmoCrossRotateTranslate::Z);
 
 			// roll the camera based on gizmo
 
@@ -577,7 +589,8 @@ void medViewArbitraryOrthoSlice::OnEventGizmoCrossRotateYNormal(mafEventBase *ma
 			vtkMAFSmartPointer<vtkTransform> tr;
 			tr->SetMatrix(mat);
 
-			UpdateCameraYViewOnEventGizmoCrossRotateZNormal(event);
+			m_ChildViewList[Z_VIEW]->GetRWI()->GetCamera()->ApplyTransform(tr);
+			m_ChildViewList[X_VIEW]->GetRWI()->GetCamera()->ApplyTransform(tr);
 
 			// 			}
 			// 			else if (activeGizmoAxis.Equals("Y"))
@@ -683,8 +696,8 @@ void medViewArbitraryOrthoSlice::OnEventGizmoCrossTranslateYNormal(mafEventBase 
 	case ID_TRANSFORM:
 		{    
 
-			PostMultiplyEventMatrix(maf_event, m_GizmoZView);
-			PostMultiplyEventMatrix(maf_event, m_GizmoXView);
+			PostMultiplyEventMatrixToGizmoCrossRT(maf_event, m_GizmoZView);
+			PostMultiplyEventMatrixToGizmoCrossRT(maf_event, m_GizmoXView);
 
 			// post multiplying matrices coming from the gizmo to the slicers
 			PostMultiplyEventMatrixToSlicers(maf_event);
@@ -786,10 +799,11 @@ void medViewArbitraryOrthoSlice::OnEventGizmoCrossRotateXNormal(mafEventBase *ma
 	{
 	case ID_TRANSFORM:
 		{
-			PostMultiplyEventMatrix(maf_event, m_GizmoYView);
-			PostMultiplyEventMatrix(maf_event, m_GizmoZView);
+			PostMultiplyEventMatrixToGizmoCrossRT(maf_event, m_GizmoYView);
+			PostMultiplyEventMatrixToGizmoCrossRT(maf_event, m_GizmoZView);
 
-			PostMultiplyEventMatrixToSlicers(maf_event);
+			PostMultiplyEventMatrixToSlicer(maf_event, medGizmoCrossRotateTranslate::Y);
+			PostMultiplyEventMatrixToSlicer(maf_event, medGizmoCrossRotateTranslate::Z);
 
 			// roll the camera based on gizmo
 
@@ -803,7 +817,8 @@ void medViewArbitraryOrthoSlice::OnEventGizmoCrossRotateXNormal(mafEventBase *ma
 			vtkMAFSmartPointer<vtkTransform> tr;
 			tr->SetMatrix(mat);
 
-			UpdateCameraXViewOnEventGizmoCrossRotateZNormal(event);
+			m_ChildViewList[Y_VIEW]->GetRWI()->GetCamera()->ApplyTransform(tr);
+			m_ChildViewList[Z_VIEW]->GetRWI()->GetCamera()->ApplyTransform(tr);
 
 			// 			}
 			// 			else if (activeGizmoAxis.Equals("Y"))
@@ -909,8 +924,8 @@ void medViewArbitraryOrthoSlice::OnEventGizmoCrossTranslateXNormal(mafEventBase 
 	case ID_TRANSFORM:
 		{    
 
-			PostMultiplyEventMatrix(maf_event, m_GizmoYView);
-			PostMultiplyEventMatrix(maf_event, m_GizmoZView);
+			PostMultiplyEventMatrixToGizmoCrossRT(maf_event, m_GizmoYView);
+			PostMultiplyEventMatrixToGizmoCrossRT(maf_event, m_GizmoZView);
 
 			// post multiplying matrices coming from the gizmo to the slicers
 			PostMultiplyEventMatrixToSlicers(maf_event);
@@ -1033,7 +1048,7 @@ void medViewArbitraryOrthoSlice::OnEventThis(mafEventBase *maf_event)
 				m_GizmoZView->m_GizmoCrossRotate->Show(m_ShowGizmo==1 && m_ComboChooseActiveGizmo == GIZMO_ROTATE? true : false);
 				m_GizmoZView->m_GizmoCrossTranslate->Show(m_ShowGizmo==1 && m_ComboChooseActiveGizmo == GIZMO_TRANSLATE? true : false);
 				m_Gui->Enable(ID_COMBO_CHOOSE_ACTIVE_GIZMO, m_ShowGizmo == 1 ? true : false);		
-				CameraUpdate();
+				CameraUpdateWACU();
 			}
 			break;
 		case ID_RESET:
@@ -1083,8 +1098,8 @@ mafGUI* medViewArbitraryOrthoSlice::CreateGui()
 
 	//combo box to choose the type of gizmo
 	//m_Gui->Label("choose gizmo", true);
-// 	wxString Text[2]={_("translation gizmo"),_("rotation gizmo")};
-// 	m_Gui->Combo(ID_COMBO_CHOOSE_ACTIVE_GIZMO,"",&m_ComboChooseActiveGizmo,2,Text);
+	// 	wxString Text[2]={_("translation gizmo"),_("rotation gizmo")};
+	// 	m_Gui->Combo(ID_COMBO_CHOOSE_ACTIVE_GIZMO,"",&m_ComboChooseActiveGizmo,2,Text);
 
 
 	// m_Gui->Divider(2);
@@ -1107,7 +1122,7 @@ void medViewArbitraryOrthoSlice::VmeRemove(mafNode *node)
 	{
 		m_AttachCameraToSlicerZInZView->SetVme(NULL);
 		m_CurrentVolume = NULL;
-		
+
 		m_GizmoZView->Show(false);
 		cppDEL(m_GizmoZView);
 
@@ -1126,7 +1141,6 @@ void medViewArbitraryOrthoSlice::VmeRemove(mafNode *node)
 }
 
 void medViewArbitraryOrthoSlice::PostMultiplyEventMatrixToSlicers(mafEventBase *maf_event)
-
 {  
 	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
 	{
@@ -1162,7 +1176,53 @@ void medViewArbitraryOrthoSlice::PostMultiplyEventMatrixToSlicers(mafEventBase *
 	}
 }
 
-void medViewArbitraryOrthoSlice::CameraUpdate()
+void medViewArbitraryOrthoSlice::PostMultiplyEventMatrixToSlicer(mafEventBase *maf_event, int slicerAxis)
+{  
+	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
+	{
+		// for every slicer:
+
+		mafVMESlicer *currentSlicer = NULL;
+
+		if (slicerAxis == medGizmoCrossRotateTranslate::X)
+		{
+			currentSlicer = m_SlicerX;
+		}
+		else if (slicerAxis == medGizmoCrossRotateTranslate::Y)
+		{
+			currentSlicer = m_SlicerY;
+		}
+		else if (slicerAxis == medGizmoCrossRotateTranslate::Z)
+		{
+			currentSlicer = m_SlicerZ;
+		}
+
+		assert(currentSlicer != NULL);
+
+		// handle incoming transform events
+		vtkTransform *tr = vtkTransform::New();
+		tr->PostMultiply();
+		tr->SetMatrix(currentSlicer->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
+		tr->Concatenate(e->GetMatrix()->GetVTKMatrix());
+		tr->Update();
+
+		mafMatrix absPose;
+		absPose.DeepCopy(tr->GetMatrix());
+		absPose.SetTimeStamp(currentSlicer->GetTimeStamp());
+
+		if (e->GetArg() == mafInteractorGenericMouse::MOUSE_MOVE)
+		{
+			// move vme
+			currentSlicer->SetAbsMatrix(absPose);
+		} 
+
+		// clean up
+		tr->Delete();
+	}
+}
+
+
+void medViewArbitraryOrthoSlice::CameraUpdateWACU()
 
 {
 	const int numCameras = 3;
@@ -1355,9 +1415,13 @@ void medViewArbitraryOrthoSlice::ShowMafVMEVolume( mafVME * vme, bool show )
 	vtkDEL(localToABSTPDF);
 	vtkDEL(transformReset);
 
-	m_XCameraRollForReset = ((mafViewSlice*)m_ChildViewList[X_VIEW])->GetRWI()->GetCamera()->GetRoll();
-	m_YCameraRollForReset = ((mafViewSlice*)m_ChildViewList[Y_VIEW])->GetRWI()->GetCamera()->GetRoll();
-	m_ZCameraRollForReset = ((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetRoll();
+	((mafViewSlice*)m_ChildViewList[X_VIEW])->GetRWI()->GetCamera()->GetPosition(m_XCameraPositionForReset);
+	((mafViewSlice*)m_ChildViewList[Y_VIEW])->GetRWI()->GetCamera()->GetPosition(m_YCameraPositionForReset);
+	((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetPosition(m_ZCameraPositionForReset);
+
+	((mafViewSlice*)m_ChildViewList[X_VIEW])->GetRWI()->GetCamera()->GetFocalPoint(m_XCameraFocalPointForReset);
+	((mafViewSlice*)m_ChildViewList[Y_VIEW])->GetRWI()->GetCamera()->GetFocalPoint(m_YCameraFocalPointForReset);
+	((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetFocalPoint(m_ZCameraFocalPointForReset);
 }
 
 void medViewArbitraryOrthoSlice::ShowMedVMEPolylineEditor( mafNode * node )
@@ -1507,12 +1571,15 @@ void medViewArbitraryOrthoSlice::OnReset()
 		//update because I need to refresh the normal of the camera
 		mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 
-		
-		((mafViewSlice*)m_ChildViewList[X_VIEW])->GetRWI()->GetCamera()->SetRoll(m_XCameraRollForReset);
 
-		((mafViewSlice*)m_ChildViewList[Y_VIEW])->GetRWI()->GetCamera()->SetRoll(m_YCameraRollForReset);
+		((mafViewSlice*)m_ChildViewList[X_VIEW])->GetRWI()->GetCamera()->SetPosition(m_XCameraPositionForReset);
+		((mafViewSlice*)m_ChildViewList[X_VIEW])->GetRWI()->GetCamera()->SetFocalPoint(m_XCameraFocalPointForReset);
 
-		((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->SetRoll(m_ZCameraRollForReset);
+		((mafViewSlice*)m_ChildViewList[Y_VIEW])->GetRWI()->GetCamera()->SetPosition(m_YCameraPositionForReset);
+		((mafViewSlice*)m_ChildViewList[Y_VIEW])->GetRWI()->GetCamera()->SetFocalPoint(m_YCameraFocalPointForReset);
+
+		((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->SetPosition(m_ZCameraPositionForReset);
+		((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->SetFocalPoint(m_ZCameraFocalPointForReset);
 
 		mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 
@@ -1548,7 +1615,7 @@ void medViewArbitraryOrthoSlice::OnRangeModified()
 	{
 		double low, hi;
 		m_LutSlider->GetSubRange(&low,&hi);
-		m_ColorLUT->SetTableRange(low,hi);
+		//m_ColorLUT->SetTableRange(low,hi);
 		mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 	}
 }
@@ -1579,9 +1646,9 @@ void medViewArbitraryOrthoSlice::OnChooseActiveGizmo()
 				mafLogMessage(stringStream.str().c_str());
 
 				m_GizmoZView->m_GizmoCrossTranslate->Show(true);
-			    m_GizmoZView->m_GizmoCrossTranslate->SetAbsPose(m_SlicerZ->GetOutput()->GetAbsMatrix(),0);
+				m_GizmoZView->m_GizmoCrossTranslate->SetAbsPose(m_SlicerZ->GetOutput()->GetAbsMatrix(),0);
 				m_GizmoZView->m_GizmoCrossRotate->Show(true);
-				this->CameraUpdate();
+				this->CameraUpdateWACU();
 			}
 			else if(m_ComboChooseActiveGizmo == GIZMO_ROTATE)
 			{
@@ -1596,10 +1663,10 @@ void medViewArbitraryOrthoSlice::OnChooseActiveGizmo()
 				m_GizmoZView->m_GizmoCrossTranslate->Show(false);
 				m_GizmoZView->m_GizmoCrossRotate->Show(true);
 				m_GizmoZView->m_GizmoCrossRotate->SetAbsPose(m_SlicerZ->GetOutput()->GetAbsMatrix(),0);
-				this->CameraUpdate();
+				this->CameraUpdateWACU();
 			}
 		}
-		CameraUpdate();
+		CameraUpdateWACU();
 	}
 }
 
@@ -1829,7 +1896,7 @@ void medViewArbitraryOrthoSlice::ShowSlicers( mafVME * vmeVolume, bool show )
 	m_SlicerY->SetVisibleToTraverse(false);
 	m_SlicerZ->SetVisibleToTraverse(false);
 
-	CameraUpdate();
+	CameraUpdateWACU();
 }
 
 void medViewArbitraryOrthoSlice::BuildXCameraConeVME()
@@ -2249,6 +2316,7 @@ void medViewArbitraryOrthoSlice::UpdateCameraXViewOnEventGizmoCrossRotateZNormal
 	double oldXViewCameraPosition[3];
 	xViewCamera->GetPosition(oldXViewCameraPosition);
 
+
 	double newXViewCameraPosition[3];
 	double newXViewCameraFocalPoint[3];
 
@@ -2266,7 +2334,7 @@ void medViewArbitraryOrthoSlice::UpdateCameraXViewOnEventGizmoCrossRotateZNormal
 	m_ChildViewList[X_VIEW]->GetRWI()->GetCamera()->Roll(xAngle);
 }
 
-void medViewArbitraryOrthoSlice::PostMultiplyEventMatrix( mafEventBase *maf_event , medGizmoCrossRotateTranslate *target)
+void medViewArbitraryOrthoSlice::PostMultiplyEventMatrixToGizmoCrossRT( mafEventBase *maf_event , medGizmoCrossRotateTranslate *target)
 {
 	mafEvent *e = mafEvent::SafeDownCast(maf_event);
 

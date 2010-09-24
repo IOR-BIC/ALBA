@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.h,v $
 Language:  C++
-Date:      $Date: 2010-09-23 10:20:56 $
-Version:   $Revision: 1.1.2.9 $
+Date:      $Date: 2010-09-24 15:28:52 $
+Version:   $Revision: 1.1.2.10 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -100,7 +100,7 @@ public:
 	virtual mafView* Copy(mafObserver *Listener);
 
 	/** Force the updating of the camera. */
-	virtual void CameraUpdate();
+	virtual void CameraUpdateWACU();
 
 protected:
 
@@ -168,10 +168,11 @@ protected:
 	/**	This function is called when a translate gizmo is moved*/
 	void OnEventGizmoCrossTranslateZNormal(mafEventBase *maf_event);
 
-	void PostMultiplyEventMatrix( mafEventBase * maf_event  , medGizmoCrossRotateTranslate *target);
+	void PostMultiplyEventMatrixToGizmoCrossRT( mafEventBase * maf_event  , medGizmoCrossRotateTranslate *target);
 
 	/** Post multiply matrix for incoming transform events */
 	void PostMultiplyEventMatrixToSlicers(mafEventBase *maf_event);
+	void PostMultiplyEventMatrixToSlicer(mafEventBase *maf_event, int slicerAxis);
 
 	/** Windowing for volumes data. This function overrides superclass method.*/
 	void VolumeWindowing(mafVME *volume);
@@ -219,9 +220,14 @@ protected:
 	mafVMESurface *m_YCameraConeVME;
 	mafVMESurface *m_ZCameraConeVME;
 
-	int m_XCameraRollForReset;
-	int m_YCameraRollForReset;
-	int m_ZCameraRollForReset;
+	double m_XCameraPositionForReset[3];
+	double m_YCameraPositionForReset[3];
+	double m_ZCameraPositionForReset[3];
+
+	double m_XCameraFocalPointForReset[3];
+	double m_YCameraFocalPointForReset[3];
+	double m_ZCameraFocalPointForReset[3];
+
 
 	medGizmoCrossRotateTranslate *m_GizmoZView;
 	medGizmoCrossRotateTranslate *m_GizmoYView;
