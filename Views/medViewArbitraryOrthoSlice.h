@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.h,v $
 Language:  C++
-Date:      $Date: 2010-09-24 15:28:52 $
-Version:   $Revision: 1.1.2.10 $
+Date:      $Date: 2010-09-27 07:56:30 $
+Version:   $Revision: 1.1.2.11 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -20,6 +20,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //======================== WORK IN PROGRESS !!!!! ======================== 
 //======================== WORK IN PROGRESS !!!!! ======================== 
 //======================== WORK IN PROGRESS !!!!! ======================== 
+//======================== WORK IN PROGRESS !!!!! ======================== 
+
 
 #ifndef __medViewArbitraryOrthoSlice_H__
 #define __medViewArbitraryOrthoSlice_H__
@@ -149,7 +151,6 @@ protected:
 	void EnableWidgets(bool enable = true);
 
 	void OnEventThis(mafEventBase *maf_event);  
-	void OnChooseActiveGizmo();
 	void OnLUTChooser();
 	void OnRangeModified();
 	
