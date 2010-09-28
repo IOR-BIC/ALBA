@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewSliceGlobal.cpp,v $
 Language:  C++
-Date:      $Date: 2010-07-07 08:33:32 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2010-09-28 15:18:37 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2002/2004
@@ -482,35 +482,36 @@ void medViewSliceGlobal::ShowText(bool show)
 void medViewSliceGlobal::VmeSelect(mafNode *node,bool select)
 //----------------------------------------------------------------------------
 {
-  assert(m_Sg); 
-  m_Sg->VmeSelect(node,select);
-  if(select && m_Gui)
-  {
-    m_CurrentVolume = m_Sg->Vme2Node(node);
-    if (m_CurrentVolume->m_Pipe)
-    {
-      m_Gui->Enable(ID_POS_SLIDER,true);
-      if (mafVME::SafeDownCast(node)->GetOutput()->IsA("mafVMEOutputVolume"))
-      {
-        if(mafPipeVolumeSlice::SafeDownCast(m_CurrentVolume->m_Pipe))
-        {
-          m_Opacity = ((mafPipeVolumeSlice *)m_CurrentVolume->m_Pipe)->GetSliceOpacity();
-          m_Gui->Enable(ID_OPACITY_SLIDER,true);
-        }
-        else if(mafPipeVolumeSlice_BES::SafeDownCast(m_CurrentVolume->m_Pipe))
-        {
-          m_Opacity = mafPipeVolumeSlice_BES::SafeDownCast(m_CurrentVolume->m_Pipe)->GetSliceOpacity();
-          m_Gui->Enable(ID_OPACITY_SLIDER, true);
-        }
-      }
-      m_Gui->Update();
-    }
-    else
-    {
-      m_Gui->Enable(ID_POS_SLIDER,false);
-      m_Gui->Update();
-    }
-  }
+  // Commented by Losi on 28/09/2010 to avoid wrong slice pose
+//   assert(m_Sg); 
+//   m_Sg->VmeSelect(node,select);
+//   if(select && m_Gui)
+//   {
+//     m_CurrentVolume = m_Sg->Vme2Node(node);
+//     if (m_CurrentVolume->m_Pipe)
+//     {
+//       m_Gui->Enable(ID_POS_SLIDER,true);
+//       if (mafVME::SafeDownCast(node)->GetOutput()->IsA("mafVMEOutputVolume"))
+//       {
+//         if(mafPipeVolumeSlice::SafeDownCast(m_CurrentVolume->m_Pipe))
+//         {
+//           m_Opacity = ((mafPipeVolumeSlice *)m_CurrentVolume->m_Pipe)->GetSliceOpacity();
+//           m_Gui->Enable(ID_OPACITY_SLIDER,true);
+//         }
+//         else if(mafPipeVolumeSlice_BES::SafeDownCast(m_CurrentVolume->m_Pipe))
+//         {
+//           m_Opacity = mafPipeVolumeSlice_BES::SafeDownCast(m_CurrentVolume->m_Pipe)->GetSliceOpacity();
+//           m_Gui->Enable(ID_OPACITY_SLIDER, true);
+//         }
+//       }
+//       m_Gui->Update();
+//     }
+//     else
+//     {
+//       m_Gui->Enable(ID_POS_SLIDER,false);
+//       m_Gui->Update();
+//     }
+//   }
 }
 
 //----------------------------------------------------------------------------
