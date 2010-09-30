@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterGRFWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-09-22 08:30:10 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2010-09-30 07:42:50 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Simone Brazzale
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -57,7 +57,6 @@ mafOp(label)
   m_MomentLeft = NULL;
   m_MomentRight = NULL;
   m_Group = NULL;
-
 }
 //----------------------------------------------------------------------------
 medOpExporterGRFWS::~medOpExporterGRFWS()
@@ -65,37 +64,22 @@ medOpExporterGRFWS::~medOpExporterGRFWS()
 {
 }
 //----------------------------------------------------------------------------
+void medOpExporterGRFWS::Clear()
+//----------------------------------------------------------------------------
+{
+  m_PlatformLeft = NULL;
+  m_PlatformRight = NULL;
+  m_ForceLeft = NULL;
+  m_ForceRight = NULL;
+  m_MomentLeft = NULL;
+  m_MomentRight = NULL;
+}
+//----------------------------------------------------------------------------
 bool medOpExporterGRFWS::Accept(mafNode *node)
 //----------------------------------------------------------------------------
 {
-  bool is_group = (node && node->IsA("mafVMEGroup"));
-  if (!is_group)
-  {
-    return false;
-  }
-  int n_of_platforms = 0;
-  int n_of_vectors = 0;
-  const mafNode::mafChildrenVector* children = node->GetChildren();
-  for(int i = 0; i < children->size(); i++)
-  {
-    mafNode *child = children->at(i);
-    if (child->IsA("mafVMESurface"))
-    {
-      n_of_platforms++;
-      if (child->GetNumberOfChildren()==2)
-      {
-        if (child->GetChild(0)->IsA("mafVMEVector"))
-        {
-          n_of_vectors++;
-        }
-        if (child->GetChild(1)->IsA("mafVMEVector"))
-        {
-          n_of_vectors++;
-        }
-      }
-    }
-  }
-  return (is_group && n_of_platforms==2 && (n_of_vectors==4));
+  Clear();
+  return (node && LoadVMEs(node));
 }
 //----------------------------------------------------------------------------
 mafOp* medOpExporterGRFWS::Copy()   
@@ -109,53 +93,10 @@ mafOp* medOpExporterGRFWS::Copy()
 void medOpExporterGRFWS::OpRun()   
 //----------------------------------------------------------------------------
 {
-  // Get input
-  const mafNode::mafChildrenVector* children = m_Input->GetChildren();
-  for(int i = 0; i < children->size(); i++)
-  {
-    mafNode *child = children->at(i);
-    if (child->IsA("mafVMESurface"))
-    {
-      if (m_PlatformLeft==NULL)
-      {
-        m_PlatformLeft = mafVMESurface::SafeDownCast(child);
-      }
-      else
-      {
-        m_PlatformRight = mafVMESurface::SafeDownCast(child);
-      }
-      if (child->GetNumberOfChildren()==2)
-      {
-        if (child->GetChild(0)->IsA("mafVMEVector"))
-        {
-          if (m_ForceLeft==NULL)
-          {
-            m_ForceLeft = mafVMEVector::SafeDownCast(child->GetChild(0));
-          }
-          else
-          {
-            m_ForceRight = mafVMEVector::SafeDownCast(child->GetChild(0));
-          }
-        }
-        if (child->GetChild(1)->IsA("mafVMEVector"))
-        {
-          if (m_MomentLeft==NULL)
-          {
-            m_MomentLeft = mafVMEVector::SafeDownCast(child->GetChild(1));
-          }
-          else
-          {
-            m_MomentRight = mafVMEVector::SafeDownCast(child->GetChild(1));
-          }
-        }
-      }
-    }
-  }
-
   int result = OP_RUN_CANCEL;
 
-  // Execute
-  if (m_PlatformLeft && m_PlatformRight && m_ForceLeft && m_ForceRight && m_ForceRight && m_MomentRight)
+  // Load and Execute
+  if (LoadVMEs(m_Input))
   {
     wxString proposed = mafGetApplicationDirectory().c_str();
     proposed += "/Data/External/";
@@ -175,22 +116,90 @@ void medOpExporterGRFWS::OpRun()
   }
   else
   {
-    wxMessageBox("Need 2 PLATFORMS, each with a FORCE vector and a MOMENT vector!","Warning",wxOK | wxICON_ERROR);
+    wxMessageBox("Need 2 PLATFORMS, each with a FORCE vector and a MOMENT vector!","GRF Exporter Warning",wxOK | wxICON_ERROR);
   }
 
 	mafEventMacro(mafEvent(this,result));
 }
-
+//----------------------------------------------------------------------------
+int medOpExporterGRFWS::LoadVMEs(mafNode* node)   
+//----------------------------------------------------------------------------
+{
+  int result = 0;
+  // Get input
+  const mafNode::mafChildrenVector* children = node->GetChildren();
+  for(int i = 0; i < children->size(); i++)
+  {
+    mafNode *child = children->at(i);
+    if (child->IsA("mafVMESurface"))
+    {
+      if (m_PlatformLeft==NULL)
+      {
+        m_PlatformLeft = mafVMESurface::SafeDownCast(child);
+      }
+      else if (m_PlatformRight==NULL)
+      {
+        m_PlatformRight = mafVMESurface::SafeDownCast(child);
+      }
+    }
+    if (child->IsA("mafVMEVector"))
+    {
+      if (m_ForceLeft==NULL)
+      {
+        m_ForceLeft = mafVMEVector::SafeDownCast(child);
+      }
+      else if (m_MomentLeft==NULL)
+      {
+        m_MomentLeft = mafVMEVector::SafeDownCast(child);
+      }
+      else if (m_ForceRight==NULL)
+      {
+        m_ForceRight = mafVMEVector::SafeDownCast(child);
+      }
+      else if (m_MomentRight==NULL)
+      {
+        m_MomentRight = mafVMEVector::SafeDownCast(child);
+      }
+    }
+    if (m_PlatformLeft==NULL || m_PlatformRight==NULL || m_ForceLeft==NULL || m_ForceRight==NULL || m_MomentLeft==NULL || m_MomentRight==NULL)
+    {
+      result =  LoadVMEs(child);
+    }
+    else
+    {
+      return 1;
+    }
+  }
+  return result;
+}
 //----------------------------------------------------------------------------
 void medOpExporterGRFWS::Write()   
 //----------------------------------------------------------------------------
 {
+  wxBusyInfo *wait = NULL;
+  mafString info = "Loading data from files";
   if (!m_TestMode)
   {
     wxSetCursor(wxCursor(wxCURSOR_WAIT));
+    mafEventMacro(mafEvent(this,PROGRESSBAR_SET_TEXT,&info));
 	  mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
+    wait = new wxBusyInfo("This may take several minutes, please be patient...");
   }
-  
+
+  // Must update VTK!
+  m_PlatformLeft->Update();
+  m_PlatformLeft->GetVTKOutput()->Update();
+  m_PlatformRight->Update();
+  m_PlatformRight->GetVTKOutput()->Update();
+  m_ForceLeft->Update();
+  m_ForceLeft->GetVTKOutput()->Update();
+  m_MomentLeft->Update();
+  m_MomentLeft->GetVTKOutput()->Update();
+  m_ForceRight->Update();
+  m_ForceRight->GetVTKOutput()->Update();
+  m_MomentRight->Update();
+  m_MomentRight->GetVTKOutput()->Update();
+
   std::ofstream f_Out(m_File);
   if (!f_Out.bad())
   {
@@ -227,34 +236,35 @@ void medOpExporterGRFWS::Write()
     f_Out << "--- FORCES VECTOR SECTION (1=PLATE1,2=PLATE2) ---\n";
 
     // Add a line containing the forces tag
-    f_Out << "TIME,COP1:X,COP1:Y,COP1:Z,Ref1:X,Ref1:Y,Ref1:Z,Force1:X,Force1:Y,Force1:Z,Moment1:X,Moment1:Y,Moment1:Z,COP2:X,COP2:Y,COP2:Z,Ref2:X,Ref2:Y,Ref2:Z,Force2:X,Force2:Y,Force2:Z,Moment2:X,Moment2:Y,Moment2:Z\n";
+    f_Out << "FRAME,COP1:X,COP1:Y,COP1:Z,Ref1:X,Ref1:Y,Ref1:Z,Force1:X,Force1:Y,Force1:Z,Moment1:X,Moment1:Y,Moment1:Z,COP2:X,COP2:Y,COP2:Z,Ref2:X,Ref2:Y,Ref2:Z,Force2:X,Force2:Y,Force2:Z,Moment2:X,Moment2:Y,Moment2:Z\n";
 
     //Add a blank line 
     f_Out << "\n";
 
-    //Add times and values; time is always the first row
     std::vector<mafTimeStamp> kframes1;
     std::vector<mafTimeStamp> kframes2;
     m_ForceLeft->GetTimeStamps(kframes1);
     m_ForceRight->GetTimeStamps(kframes2);
     std::vector<mafTimeStamp> kframes = MergeTimeStamps(kframes1,kframes2);
     int size = kframes.size();
+
+    //Add times and values; time is always the first row
     for (int i=0;i<size;i++)
     {
       double time = kframes.at(i);
 
-      m_PlatformLeft->SetTimeStamp(time);
-      m_PlatformLeft->GetOutput()->GetVTKData()->Update();
       m_ForceLeft->SetTimeStamp(time);
-      m_ForceLeft->GetOutput()->GetVTKData()->Update();
+      m_ForceLeft->Update();
+      m_ForceLeft->GetVTKOutput()->Update();
       m_MomentLeft->SetTimeStamp(time);
-      m_MomentLeft->GetOutput()->GetVTKData()->Update();
-      m_PlatformRight->SetTimeStamp(time);
-      m_PlatformRight->GetOutput()->GetVTKData()->Update();
+      m_MomentLeft->Update();
+      m_MomentLeft->GetVTKOutput()->Update();
       m_ForceRight->SetTimeStamp(time);
-      m_ForceRight->GetOutput()->GetVTKData()->Update();
+      m_ForceRight->Update();
+      m_ForceRight->GetVTKOutput()->Update();
       m_MomentRight->SetTimeStamp(time);
-      m_MomentRight->GetOutput()->GetVTKData()->Update();
+      m_MomentRight->Update();
+      m_MomentRight->GetVTKOutput()->Update();
 
       vtkPolyData* polyFL = (vtkPolyData*)m_ForceLeft->GetOutput()->GetVTKData();
       vtkPolyData* polyML = (vtkPolyData*)m_MomentLeft->GetOutput()->GetVTKData();
@@ -327,10 +337,13 @@ void medOpExporterGRFWS::Write()
     f_Out.close();
   }  
 
+  info = "";
   if (!m_TestMode)
   {
+    mafEventMacro(mafEvent(this,PROGRESSBAR_SET_TEXT,&info));
     mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
     wxSetCursor(wxCursor(wxCURSOR_DEFAULT));
+    cppDEL(wait);
   }
 }
 //----------------------------------------------------------------------------
@@ -364,7 +377,7 @@ std::vector<mafTimeStamp> medOpExporterGRFWS::MergeTimeStamps(std::vector<mafTim
       kframes.push_back(kframes2.at(j));
       j++;
     }
-  } while (i<(kframes1.size()-1) && j<(kframes2.size()-1));
+  } while (i<(kframes1.size()) && j<(kframes2.size()));
 
   return kframes;
 }

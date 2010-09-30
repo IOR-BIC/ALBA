@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterAnalogWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-09-09 15:19:21 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2010-09-30 07:42:49 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Simone Brazzale
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -101,6 +101,8 @@ void medOpExporterAnalogWS::Write()
   mafTagItem *tag_sig = m_Analog->GetTagArray()->GetTag("SIGNALS_NAME");
   int n_sig = tag_sig->GetComponents()->size();
 
+  mafString empty("");
+
   std::ofstream f_Out(m_File);
   if (!f_Out.bad())
   {
@@ -111,16 +113,17 @@ void medOpExporterAnalogWS::Write()
     f_Out << FREQ << ",Hz\n";
 
     //Add the third line containing the signal names
-    f_Out << "TIME,";
-    for (int i=0;i<n_sig-1;i++)
+    f_Out << "FRAME,";
+    f_Out << tag_sig->GetValue(0);
+    for (int i=1;i<n_sig;i++)
     {
-      f_Out << tag_sig->GetValue(i) << ",";
+      if (!empty.Equals(tag_sig->GetValue(i)))
+      {
+        f_Out << "," << tag_sig->GetValue(i);
+      }
     }
-    if (n_sig>1)
-    {
-      f_Out << tag_sig->GetValue(n_sig-1) << "\n";
-    }
-
+    f_Out << "\n";
+    
     //Add a blank line 
     f_Out << "\n";
 
@@ -129,7 +132,8 @@ void medOpExporterAnalogWS::Write()
     for (int i=0;i<emgMatrix.columns();i++)
     {
       // Add time
-      f_Out << emgMatrix.get(0,i) << ",";
+      double time = emgMatrix.get(0,i);
+      f_Out << time << ",";
       for (int j=1;j<emgMatrix.rows()-1;j++)
       {
         // Add all values but last one

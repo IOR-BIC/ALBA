@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterGRFWS.h,v $
   Language:  C++
-  Date:      $Date: 2010-09-22 08:30:10 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2010-09-30 07:42:50 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2004
@@ -41,11 +41,17 @@ public:
   /** Copy the operation. */
   mafOp* Copy();
 
+  /** Clear */
+  void Clear();
+
 	/** Return true for the acceptable vme type. */
 	bool Accept(mafNode* node);
 
 	/** Builds operation's interface. */
 	void OpRun();
+
+  /** Load VMEs. */
+	int LoadVMEs(mafNode* node);
 
   /** Read the file.
   File format:
