@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterGRFWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-10-01 08:27:12 $
-  Version:   $Revision: 1.1.2.5 $
+  Date:      $Date: 2010-10-01 19:08:22 $
+  Version:   $Revision: 1.1.2.6 $
   Authors:   Simone Brazzale
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -26,6 +26,7 @@
 
 #include "mafTagArray.h"
 
+#include <cstdio>
 #include <fstream>
 #include <iostream>
 
@@ -36,8 +37,6 @@
 
 #include <mafTransformBase.h>
 #include <mafMatrix.h>
-
-using namespace std;
 
 #define TAG_FORMAT "FORCE PLATES"
 #define FREQ 1.00
@@ -112,7 +111,18 @@ void medOpExporterGRFWS::OpRun()
 	  if(!f.IsEmpty())
 	  {
 		  m_File = f;
+      m_File_temp1 = m_File + "_tmp1";
+      m_File_temp2 = m_File + "_tmp2";
+      m_File_temp3 = m_File + "_tmp3";
+      m_File_temp4 = m_File + "_tmp4";
+
 		  Write();
+
+      remove(m_File_temp1);
+      remove(m_File_temp2);
+      remove(m_File_temp3);
+      remove(m_File_temp4);
+
 		  result = OP_RUN_OK;
 	  }
   }
@@ -211,16 +221,11 @@ void medOpExporterGRFWS::Write()
   m_PlatformRight->GetOutput()->GetVTKData()->GetBounds(bounds2);
   bounds2[4] = bounds2[4] + DELTA;
 
-  wxString file1 = m_File + "_tmp1";
-  wxString file2 = m_File + "_tmp2";
-  wxString file3 = m_File + "_tmp3";
-  wxString file4 = m_File + "_tmp4";
-
   std::ofstream f_Out(m_File);
-  std::ofstream f_Out1(file1);
-  std::ofstream f_Out2(file2);
-  std::ofstream f_Out3(file3);
-  std::ofstream f_Out4(file4);
+  std::ofstream f_Out1(m_File_temp1);
+  std::ofstream f_Out2(m_File_temp2);
+  std::ofstream f_Out3(m_File_temp3);
+  std::ofstream f_Out4(m_File_temp4);
 
   std::vector<mafTimeStamp> kframes1;
   std::vector<mafTimeStamp> kframes2;
@@ -229,7 +234,8 @@ void medOpExporterGRFWS::Write()
   std::vector<mafTimeStamp> kframes = MergeTimeStamps(kframes1,kframes2);
   int size = kframes.size();
 
-  //Add times and values; time is always the first row
+  // Pre-calculate values and save them in temp files.
+  // THIS SHOULD SPEED UP THE PROCESS!! That otherwise is infinite in case the user has just opened a MSF file.
   double copL[3];   
   double copR[3];
   for (int i=0;i<size;i++)
@@ -338,13 +344,13 @@ void medOpExporterGRFWS::Write()
   f_Out3.close();
   f_Out4.close();
 
-  wxFileInputStream inputFile1( file1 );
+  wxFileInputStream inputFile1( m_File_temp1 );
   wxTextInputStream text1( inputFile1 );
-  wxFileInputStream inputFile2( file2 );
+  wxFileInputStream inputFile2( m_File_temp2 );
   wxTextInputStream text2( inputFile2 );
-  wxFileInputStream inputFile3( file3 );
+  wxFileInputStream inputFile3( m_File_temp3 );
   wxTextInputStream text3( inputFile3 );
-  wxFileInputStream inputFile4( file4 );
+  wxFileInputStream inputFile4( m_File_temp4 );
   wxTextInputStream text4( inputFile4 );
 
   wxString line;
@@ -390,6 +396,7 @@ void medOpExporterGRFWS::Write()
     //Add a blank line 
     f_Out << "\n";
 
+    // Add time and values. Time is always the first row.
     for (int i=0;i<size;i++)
     {
       double time = kframes.at(i);
@@ -436,7 +443,7 @@ void medOpExporterGRFWS::Write()
     
     f_Out.close();
   }  
-
+  
   info = "";
   if (!m_TestMode)
   {
