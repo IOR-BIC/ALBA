@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterGRFWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-09-30 07:42:50 $
-  Version:   $Revision: 1.1.2.4 $
+  Date:      $Date: 2010-10-01 08:27:12 $
+  Version:   $Revision: 1.1.2.5 $
   Authors:   Simone Brazzale
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,6 +20,8 @@
 #include "medOpExporterGRFWS.h"
 
 #include <wx/busyinfo.h>
+#include <wx/txtstrm.h>
+#include <wx/wfstream.h>
 #include "mafGUI.h"
 
 #include "mafTagArray.h"
@@ -200,7 +202,158 @@ void medOpExporterGRFWS::Write()
   m_MomentRight->Update();
   m_MomentRight->GetVTKOutput()->Update();
 
+  double bounds1[6];
+  bounds1[0] = 0;
+  m_PlatformLeft->GetOutput()->GetVTKData()->GetBounds(bounds1);
+  bounds1[4] = bounds1[4] + DELTA;
+  double bounds2[6];
+  bounds2[0] = 0;
+  m_PlatformRight->GetOutput()->GetVTKData()->GetBounds(bounds2);
+  bounds2[4] = bounds2[4] + DELTA;
+
+  wxString file1 = m_File + "_tmp1";
+  wxString file2 = m_File + "_tmp2";
+  wxString file3 = m_File + "_tmp3";
+  wxString file4 = m_File + "_tmp4";
+
   std::ofstream f_Out(m_File);
+  std::ofstream f_Out1(file1);
+  std::ofstream f_Out2(file2);
+  std::ofstream f_Out3(file3);
+  std::ofstream f_Out4(file4);
+
+  std::vector<mafTimeStamp> kframes1;
+  std::vector<mafTimeStamp> kframes2;
+  m_ForceLeft->GetTimeStamps(kframes1);
+  m_ForceRight->GetTimeStamps(kframes2);
+  std::vector<mafTimeStamp> kframes = MergeTimeStamps(kframes1,kframes2);
+  int size = kframes.size();
+
+  //Add times and values; time is always the first row
+  double copL[3];   
+  double copR[3];
+  for (int i=0;i<size;i++)
+  {
+    double time = kframes.at(i);
+
+    m_ForceLeft->SetTimeStamp(time);
+    m_ForceLeft->Update();
+    m_ForceLeft->GetVTKOutput()->Update();
+      
+    vtkPolyData* polyFL = (vtkPolyData*)m_ForceLeft->GetOutput()->GetVTKData();
+     
+    double* p = polyFL->GetPoint(0);
+    copL[0] = p[0];
+    copL[1] = p[1];
+    copL[2] = p[2];
+    f_Out1 << copL[0] << "," << copL[1] << "," << copL[2] << "\n";
+
+    p = polyFL->GetPoint(1);
+    double fL[3];
+    fL[0] = p[0];
+    fL[1] = p[1];
+    fL[2] = p[2];
+    f_Out1 << fL[0]-copL[0] << "," << fL[1]-copL[1] << "," << fL[2]-copL[2] << "\n";
+
+    if (!m_TestMode)
+    {
+      mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)(((double) i)/((double) size)*25.)));
+    }
+  }
+  for (int i=0;i<size;i++)
+  {
+    double time = kframes.at(i);
+
+    m_MomentLeft->SetTimeStamp(time);
+    m_MomentLeft->Update();
+    m_MomentLeft->GetVTKOutput()->Update();
+      
+    vtkPolyData* polyML = (vtkPolyData*)m_MomentLeft->GetOutput()->GetVTKData();
+      
+    double* p = polyML->GetPoint(1);
+    double mL[3];
+    mL[0] = p[0];
+    mL[1] = p[1];
+    mL[2] = p[2];
+    f_Out2 << mL[0]-copL[0] << "," << mL[1]-copL[1] << "," << mL[2]-copL[2] << "\n";
+
+    if (!m_TestMode)
+    {
+      mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)(25+((double) i)/((double) size)*25.)));
+    }
+  }
+  for (int i=0;i<size;i++)
+  {
+    double time = kframes.at(i);
+
+    m_ForceRight->SetTimeStamp(time);
+    m_ForceRight->Update();
+    m_ForceRight->GetVTKOutput()->Update();
+     
+    vtkPolyData* polyFR = (vtkPolyData*)m_ForceRight->GetOutput()->GetVTKData();
+      
+    double* p = polyFR->GetPoint(0);
+    copR[0] = p[0];
+    copR[1] = p[1];
+    copR[2] = p[2];
+    f_Out3 << copR[0] << "," << copR[1] << "," << copR[2] << "\n";
+      
+    p = polyFR->GetPoint(1);
+    double fR[3];
+    fR[0] = p[0];
+    fR[1] = p[1];
+    fR[2] = p[2];
+    f_Out3 << fR[0]-copR[0] << "," << fR[1]-copR[1] << "," << fR[2]-copR[2] << "\n";
+      
+    if (!m_TestMode)
+    {
+      mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)(50+((double) i)/((double) size)*25.)));
+    }
+  }
+  for (int i=0;i<size;i++)
+  {
+    double time = kframes.at(i);
+
+    m_MomentRight->SetTimeStamp(time);
+    m_MomentRight->Update();
+    m_MomentRight->GetVTKOutput()->Update();
+
+    vtkPolyData* polyMR = (vtkPolyData*)m_MomentRight->GetOutput()->GetVTKData();
+      
+    double* p = polyMR->GetPoint(1);
+    double mR[3];
+    mR[0] = p[0];
+    mR[1] = p[1];
+    mR[2] = p[2];
+    f_Out4 << mR[0]-copR[0] << "," << mR[1]-copR[1] << "," << mR[2]-copR[2] << "\n";
+
+    if (!m_TestMode)
+    {
+      mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)(75+((double) i)/((double) size)*25.)));
+    }
+  }  
+
+  f_Out1.close();
+  f_Out2.close();
+  f_Out3.close();
+  f_Out4.close();
+
+  wxFileInputStream inputFile1( file1 );
+  wxTextInputStream text1( inputFile1 );
+  wxFileInputStream inputFile2( file2 );
+  wxTextInputStream text2( inputFile2 );
+  wxFileInputStream inputFile3( file3 );
+  wxTextInputStream text3( inputFile3 );
+  wxFileInputStream inputFile4( file4 );
+  wxTextInputStream text4( inputFile4 );
+
+  wxString line;
+
+  if (!m_TestMode)
+  {
+    mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)0.0));
+  }
+
   if (!f_Out.bad())
   {
     // Add TAG
@@ -217,17 +370,13 @@ void medOpExporterGRFWS::Write()
 
     // Add the fifth and sixth line containing the corner values
     f_Out << "1,";
-    double bounds[6];
-    bounds[0] = 0;
-    m_PlatformLeft->GetOutput()->GetVTKData()->GetBounds(bounds);
-    bounds[4] = bounds[4] + DELTA;
-    f_Out << bounds[0] << "," << bounds[3] << "," << bounds[4] << "," << bounds[1] << "," << bounds[3] << "," << bounds[4] << ","
-        << bounds[1] << "," << bounds[2] << "," << bounds[4] << "," << bounds[0] << "," << bounds[2] << "," << bounds[4] << "\n";
+    
+    f_Out << bounds1[0] << "," << bounds1[3] << "," << bounds1[4] << "," << bounds1[1] << "," << bounds1[3] << "," << bounds1[4] << ","
+        << bounds1[1] << "," << bounds1[2] << "," << bounds1[4] << "," << bounds1[0] << "," << bounds1[2] << "," << bounds1[4] << "\n";
     f_Out << "2,";
-    m_PlatformRight->GetOutput()->GetVTKData()->GetBounds(bounds);
-    bounds[4] = bounds[4] + DELTA;
-    f_Out << bounds[0] << "," << bounds[3] << "," << bounds[4] << "," << bounds[1] << "," << bounds[3] << "," << bounds[4] << ","
-        << bounds[1] << "," << bounds[2] << "," << bounds[4] << "," << bounds[0] << "," << bounds[2] << "," << bounds[4] << "\n";
+
+    f_Out << bounds2[0] << "," << bounds2[3] << "," << bounds2[4] << "," << bounds2[1] << "," << bounds2[3] << "," << bounds2[4] << ","
+        << bounds2[1] << "," << bounds2[2] << "," << bounds2[4] << "," << bounds2[0] << "," << bounds2[2] << "," << bounds2[4] << "\n";
 
     //Add a blank line 
     f_Out << "\n";
@@ -241,97 +390,48 @@ void medOpExporterGRFWS::Write()
     //Add a blank line 
     f_Out << "\n";
 
-    std::vector<mafTimeStamp> kframes1;
-    std::vector<mafTimeStamp> kframes2;
-    m_ForceLeft->GetTimeStamps(kframes1);
-    m_ForceRight->GetTimeStamps(kframes2);
-    std::vector<mafTimeStamp> kframes = MergeTimeStamps(kframes1,kframes2);
-    int size = kframes.size();
-
-    //Add times and values; time is always the first row
     for (int i=0;i<size;i++)
     {
       double time = kframes.at(i);
 
-      m_ForceLeft->SetTimeStamp(time);
-      m_ForceLeft->Update();
-      m_ForceLeft->GetVTKOutput()->Update();
-      m_MomentLeft->SetTimeStamp(time);
-      m_MomentLeft->Update();
-      m_MomentLeft->GetVTKOutput()->Update();
-      m_ForceRight->SetTimeStamp(time);
-      m_ForceRight->Update();
-      m_ForceRight->GetVTKOutput()->Update();
-      m_MomentRight->SetTimeStamp(time);
-      m_MomentRight->Update();
-      m_MomentRight->GetVTKOutput()->Update();
-
-      vtkPolyData* polyFL = (vtkPolyData*)m_ForceLeft->GetOutput()->GetVTKData();
-      vtkPolyData* polyML = (vtkPolyData*)m_MomentLeft->GetOutput()->GetVTKData();
-      vtkPolyData* polyFR = (vtkPolyData*)m_ForceRight->GetOutput()->GetVTKData();
-      vtkPolyData* polyMR = (vtkPolyData*)m_MomentRight->GetOutput()->GetVTKData();
-
       // TIME
       f_Out << time << ",";
-      
+        
       // COP L
-      double* p = polyFL->GetPoint(0);
-      double copL[3];
-      copL[0] = p[0];
-      copL[1] = p[1];
-      copL[2] = p[2];
-      f_Out << copL[0] << "," << copL[1] << "," << copL[2] << ",";
-      
+      line = text1.ReadLine();
+      f_Out << line << ",";
+        
       // REF L
       f_Out << 0 << "," << 0 << "," << 0 << ",";
-      
+        
       // FORCE L
-      p = polyFL->GetPoint(1);
-      double fL[3];
-      fL[0] = p[0];
-      fL[1] = p[1];
-      fL[2] = p[2];
-      f_Out << fL[0]-copL[0] << "," << fL[1]-copL[1] << "," << fL[2]-copL[2] << ",";
+      line = text1.ReadLine();
+      f_Out << line << ",";
 
       // MOMENT L
-      p = polyML->GetPoint(1);
-      double mL[3];
-      mL[0] = p[0];
-      mL[1] = p[1];
-      mL[2] = p[2];
-      f_Out << mL[0]-copL[0] << "," << mL[1]-copL[1] << "," << mL[2]-copL[2] << ",";
-
+      line = text2.ReadLine();
+      f_Out << line << ",";
+              
       // COP R
-      p = polyFR->GetPoint(0);
-      double copR[3];
-      copR[0] = p[0];
-      copR[1] = p[1];
-      copR[2] = p[2];
-      f_Out << copR[0] << "," << copR[1] << "," << copR[2] << ",";
-      
+      line = text3.ReadLine();
+      f_Out << line << ",";
+        
       // REF R
       f_Out << 0 << "," << 0 << "," << 0 << ",";
-      
+        
       // FORCE R
-      p = polyFR->GetPoint(1);
-      double fR[3];
-      fR[0] = p[0];
-      fR[1] = p[1];
-      fR[2] = p[2];
-      f_Out << fR[0]-copR[0] << "," << fR[1]-copR[1] << "," << fR[2]-copR[2] << ",";
-
+      line = text3.ReadLine();
+      f_Out << line << ",";
+      
       // MOMENT R
-      p = polyMR->GetPoint(1);
-      double mR[3];
-      mR[0] = p[0];
-      mR[1] = p[1];
-      mR[2] = p[2];
-      f_Out << mR[0]-copR[0] << "," << mR[1]-copR[1] << "," << mR[2]-copR[2] << "\n";
+      line = text4.ReadLine();
+      f_Out << line << "\n";
 
       if (!m_TestMode)
       {
         mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)(((double) i)/((double) size)*100.)));
       }
+
     }
     
     f_Out.close();
