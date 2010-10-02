@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpExporterGRFWSTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-09-13 09:09:33 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-10-02 09:35:01 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -149,6 +149,7 @@ void medOpExporterGRFWSTest::TestWrite()
   Exporter->SetForces(forceL,forceR);
   Exporter->SetMoments(momentL,momentR);
   Exporter->Write();
+  Exporter->RemoveTempFiles();
 
   wxString file;
   file.append(filename.GetCStr());

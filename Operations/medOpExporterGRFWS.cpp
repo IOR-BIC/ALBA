@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterGRFWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-10-01 19:08:22 $
-  Version:   $Revision: 1.1.2.6 $
+  Date:      $Date: 2010-10-02 09:33:52 $
+  Version:   $Revision: 1.1.2.7 $
   Authors:   Simone Brazzale
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -110,18 +110,9 @@ void medOpExporterGRFWS::OpRun()
 
 	  if(!f.IsEmpty())
 	  {
-		  m_File = f;
-      m_File_temp1 = m_File + "_tmp1";
-      m_File_temp2 = m_File + "_tmp2";
-      m_File_temp3 = m_File + "_tmp3";
-      m_File_temp4 = m_File + "_tmp4";
-
+		  SetFileName(f);
 		  Write();
-
-      remove(m_File_temp1);
-      remove(m_File_temp2);
-      remove(m_File_temp3);
-      remove(m_File_temp4);
+      RemoveTempFiles();
 
 		  result = OP_RUN_OK;
 	  }
@@ -487,4 +478,24 @@ std::vector<mafTimeStamp> medOpExporterGRFWS::MergeTimeStamps(std::vector<mafTim
   } while (i<(kframes1.size()) && j<(kframes2.size()));
 
   return kframes;
+}
+//----------------------------------------------------------------------------
+void medOpExporterGRFWS::SetFileName(const char *file_name)   
+//----------------------------------------------------------------------------
+{
+  m_File = file_name;
+     
+  m_File_temp1 = m_File + "_tmp1";
+  m_File_temp2 = m_File + "_tmp2";
+  m_File_temp3 = m_File + "_tmp3";
+  m_File_temp4 = m_File + "_tmp4";
+}
+//----------------------------------------------------------------------------
+void medOpExporterGRFWS::RemoveTempFiles()   
+//----------------------------------------------------------------------------
+{
+  remove(m_File_temp1);
+  remove(m_File_temp2);
+  remove(m_File_temp3);
+  remove(m_File_temp4);
 }

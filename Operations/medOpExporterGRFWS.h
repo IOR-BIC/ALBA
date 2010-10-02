@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterGRFWS.h,v $
   Language:  C++
-  Date:      $Date: 2010-10-01 19:08:22 $
-  Version:   $Revision: 1.1.2.5 $
+  Date:      $Date: 2010-10-02 09:33:52 $
+  Version:   $Revision: 1.1.2.6 $
   Authors:   Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2004
@@ -78,7 +78,7 @@ public:
   void Write();
 
   /** Set the filename for the file to export */
-  void SetFileName(const char *file_name){m_File = file_name;};
+  void SetFileName(const char *file_name);
 
   /** Set Platforms */
   void SetPlatforms(mafVMESurface* p1,mafVMESurface* p2)
@@ -91,6 +91,9 @@ public:
   /** Set Moments */
   void SetMoments(mafVMEVector* m1,mafVMEVector* m2)
     {m_MomentLeft = m1; m_MomentRight = m2;};
+  
+  /** Remove the temp files */
+  void RemoveTempFiles();
 
 private:
 
