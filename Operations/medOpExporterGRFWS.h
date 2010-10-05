@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterGRFWS.h,v $
   Language:  C++
-  Date:      $Date: 2010-10-02 09:33:52 $
-  Version:   $Revision: 1.1.2.6 $
+  Date:      $Date: 2010-10-05 21:52:30 $
+  Version:   $Revision: 1.1.2.7 $
   Authors:   Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2004
@@ -27,6 +27,21 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 class mafVMEVector;
 class mafVMESurface;
 class mafVMEGroup;
+
+//----------------------------------------------------------------------------
+// typedef declarations :
+//----------------------------------------------------------------------------
+
+const double MAX_DOUBLE = 1.e30;
+typedef struct {
+  int m_SwitchX;
+  int m_SwitchY;
+  int m_SwitchZ;
+  double m_Bounds[6];
+  double m_OldDistance[3];
+  int m_WasDecreasing[3];
+  int m_IsDecreasing[3];
+  } medGRFVector;
 
 //----------------------------------------------------------------------------
 // medOpExporterGRFWS :
@@ -66,19 +81,12 @@ public:
   7) The eighth line contains the tag for COP,REF,FORCE,MOMENT
   8) The ninth line contains the units
   5) The first element of each line is the sample, then 24 values
-
-  this operation does as follows:
-  1) Checks for the tag FORCE PLATES in the first line
-  2) Sets Frequency to 1 --> This is done since the exporter puts time instead of sample in the file.
-  3) Jump line
-  3) Writes the corner values
-  4) Jump lines
-  5) Writes time and COP/REF/FORCE/MOMENT values 
   */
   void Write();
 
   /** Set the filename for the file to export */
-  void SetFileName(const char *file_name);
+  void SetFileName(const char *file_name)
+    {m_File = file_name; };
 
   /** Set Platforms */
   void SetPlatforms(mafVMESurface* p1,mafVMESurface* p2)
@@ -91,16 +99,30 @@ public:
   /** Set Moments */
   void SetMoments(mafVMEVector* m1,mafVMEVector* m2)
     {m_MomentLeft = m1; m_MomentRight = m2;};
-  
-  /** Remove the temp files */
-  void RemoveTempFiles();
 
-private:
-
+protected:
+ 
   /** Merge time stamps of platforms */
   std::vector<mafTimeStamp> MergeTimeStamps(std::vector<mafTimeStamp> kframes1,std::vector<mafTimeStamp> kframes2);
 
-protected:
+  /** Check consistency with vector direction:
+  In order to avoid loading all VTK data for all frames, which should drastically increase the time required by the operation,
+  the Write method retrieves the Vector bounds and guesses the position of the vector by using its bounds.
+  To check if the guessed position and the real one are effectively the same, this method adjust manually the first frame and then
+  switch the axis of the vector if the bounds coordinates are going to change direction (this means the vector is passing through
+  its origin respect to that axis).
+  CheckVectorToSwitch(  frame = number of frame
+                        coor1_ID = index of the first point coordinate to check consistency
+                        coor2_ID = index of the second point coordinate to check consistency
+                        coor3_ID = index of the third point coordinate to check consistency
+                        v = vector structure with all its information
+                        original_pos = position of the real point (at frame 0)
+                        vVME = VME associated with the vector
+                        pointID = id of the original point in the VTK data with which we must compare the guessed value
+                        time = timestamp 
+  */
+  void CheckVectorToSwitch(int frame, int coor1_ID, int coor2_ID, int coor3_ID, medGRFVector* v, double* original_pos, mafVMEVector* vVME = NULL, int pointID = 0, mafTimeStamp time = 0);
+
   mafVMESurface       *m_PlatformLeft;
   mafVMESurface       *m_PlatformRight;
   mafVMEVector        *m_ForceLeft;
@@ -110,9 +132,5 @@ protected:
   mafVMEGroup         *m_Group;
 
 	wxString m_File;
-  wxString m_File_temp1;
-  wxString m_File_temp2;
-  wxString m_File_temp3;
-  wxString m_File_temp4;
 };
 #endif
