@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpExporterGRFWSTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-10-02 09:35:01 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2010-10-05 21:52:50 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -21,8 +21,6 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 #include "medOpExporterGRFWSTest.h"
 #include "medOpExporterGRFWS.h"
-#include <vnl/vnl_vector.h>
-#include <vnl/vnl_matrix.h>
 
 #include <wx/txtstrm.h>
 #include <wx/tokenzr.h>
@@ -30,7 +28,6 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 #include <vtkMAFSmartPointer.h>
 #include <vtkCubeSource.h>
-#include "vtkMAFSmartPointer.h"
 #include <vtkCellArray.h>
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
@@ -67,8 +64,8 @@ void medOpExporterGRFWSTest::TestWrite()
 	medOpExporterGRFWS *Exporter = new medOpExporterGRFWS("Exporter");
 	Exporter->TestModeOn();
 	mafString filename=MED_DATA_ROOT;
-  filename<<"/Test_ExporterGRFWS/test_GRF.csv";
-	Exporter->SetFileName(filename.GetCStr());
+  filename << "/Test_ExporterGRFWS/test_GRF.csv";
+  Exporter->SetFileName(filename.GetCStr());
   
   mafVMEGroup* group;
   mafVMESurface* platform1;
@@ -149,7 +146,6 @@ void medOpExporterGRFWSTest::TestWrite()
   Exporter->SetForces(forceL,forceR);
   Exporter->SetMoments(momentL,momentR);
   Exporter->Write();
-  Exporter->RemoveTempFiles();
 
   wxString file;
   file.append(filename.GetCStr());
