@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.h,v $
 Language:  C++
-Date:      $Date: 2010-09-27 07:56:30 $
-Version:   $Revision: 1.1.2.11 $
+Date:      $Date: 2010-10-06 15:24:17 $
+Version:   $Revision: 1.1.2.12 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -32,6 +32,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "medViewCompoundWindowing.h"
 #include "mafVMESurface.h"
 #include "mafGizmoInterface.h"
+#include "vtkActor2D.h"
+#include "vtkTextMapper.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -104,11 +106,33 @@ public:
 	/** Force the updating of the camera. */
 	virtual void CameraUpdateWACU();
 
+	virtual void OnLayout();
+
+	void OnLayoutInternal( wxSize &size );
+
 protected:
 
-	bool IsXNormalGizmoComponent( mafVME * vme );
-	bool IsYNormalGizmoComponent( mafVME * vme );
-	bool IsZNormalGizmoComponent( mafVME * vme );
+	vtkActor2D *m_TextActorLeftXView;
+	vtkTextMapper *m_TextMapperLeftXView;
+
+	vtkActor2D *m_TextActorRightXView;
+	vtkTextMapper *m_TextMapperRightXView;
+
+	vtkActor2D *m_TextActorLeftYView;
+	vtkTextMapper *m_TextMapperLeftYView;
+
+	vtkActor2D *m_TextActorRightYView;
+	vtkTextMapper *m_TextMapperRightYView;
+
+	vtkActor2D *m_TextActorLeftZView;
+	vtkTextMapper *m_TextMapperLeftZView;
+
+	vtkActor2D *m_TextActorRightZView;
+	vtkTextMapper *m_TextMapperRightZView;
+
+	bool BelongsToXNormalGizmo( mafVME * vme );
+	bool BelongsToYNormalGizmo( mafVME * vme );
+	bool BelongsToZNormalGizmo( mafVME * vme );
 
 	medGizmoCrossTranslate *m_GizmoCrossTranslateXNormal;
 	medGizmoCrossRotate		*m_GizmoCrossRotateXNormal;
@@ -119,6 +143,8 @@ protected:
 	void HideMafVmeImage();
 
 	void ShowMafVMEVolume( mafVME * vme, bool show );
+
+	void Update2DActors();
 
 	void ShowSlicers( mafVME * vmeVolume, bool show );
 
@@ -162,6 +188,10 @@ protected:
 	/** This function is called when a rotate gizmo is moved*/
 	void OnEventGizmoCrossRotateZNormal(mafEventBase *maf_event);
 
+	void UpdateXView2DActors();
+	void UpdateYView2DActors();
+	void UpdateZView2DActors();
+
 	void UpdateCameraXViewOnEventGizmoCrossRotateZNormal( mafEvent * event );
 	void UpdateCameraYViewOnEventGizmoCrossRotateZNormal( mafEvent * event );
 	void UpdateCameraZViewOnEventGizmoCrossRotateZNormal( mafEvent * event );
@@ -178,8 +208,13 @@ protected:
 	/** Windowing for volumes data. This function overrides superclass method.*/
 	void VolumeWindowing(mafVME *volume);
 	void OnEventGizmoCrossRotateYNormal(mafEventBase *maf_event);
+
+	void MyMethod( double viewUp[3], double viewPlaneNormal[3], wxString &leftLetter, wxString &rightLetter);
+
 	void OnEventGizmoCrossXNormal( mafEventBase * maf_event );
 	void OnEventGizmoCrossRotateXNormal(mafEventBase *maf_event);
+
+	
 
 	void ChildViewsCameraUpdate();
 
