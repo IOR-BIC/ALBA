@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterGRFWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-10-05 21:52:29 $
-  Version:   $Revision: 1.1.2.8 $
+  Date:      $Date: 2010-10-06 09:39:38 $
+  Version:   $Revision: 1.1.2.9 $
   Authors:   Simone Brazzale
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -529,7 +529,7 @@ void medOpExporterGRFWS::CheckVectorToSwitch(int frame, int coor1_ID, int coor2_
     distance[2] = abs((v->m_Bounds[coor3_ID])-(v->m_Bounds[9-coor3_ID]));
     for (int j=0;j<3;j++)
     {
-      if (distance[j]<=v->m_OldDistance[j])
+      if ( (distance[j]<10.0) && (distance[j]<=v->m_OldDistance[j]) )
       {
         v->m_IsDecreasing[j] = 1;
       }
@@ -551,7 +551,7 @@ void medOpExporterGRFWS::CheckVectorToSwitch(int frame, int coor1_ID, int coor2_
     bool switched = 0;
     for (int j=0;j<3;j++)
     {
-      if (distance[j]<=v->m_OldDistance[j])
+      if ( (distance[j]<10.0) && (distance[j]<=v->m_OldDistance[j]) )
       {
         v->m_IsDecreasing[j] = 1;
       }
