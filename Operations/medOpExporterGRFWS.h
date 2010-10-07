@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterGRFWS.h,v $
   Language:  C++
-  Date:      $Date: 2010-10-05 21:52:30 $
-  Version:   $Revision: 1.1.2.7 $
+  Date:      $Date: 2010-10-07 10:02:42 $
+  Version:   $Revision: 1.1.2.8 $
   Authors:   Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2004
@@ -65,6 +65,18 @@ public:
 	/** Builds operation's interface. */
 	void OpRun();
 
+  /** Execute the operation. */
+  void OpDo();
+
+  /** Stop the operation. */
+  void OpStop(int result);
+
+  /** Wait for events */
+  void OnEvent(mafEventBase *maf_event);
+
+  /** Create GUI. */
+  void CreateGui();
+
   /** Load VMEs. */
 	int LoadVMEs(mafNode* node);
 
@@ -83,10 +95,19 @@ public:
   5) The first element of each line is the sample, then 24 values
   */
   void Write();
+  
+  /*Try a method to run the Operation faster.
+    In order to avoid loading all VTK data for all frames, which should drastically increase the time required by the operation,
+    the WriteFast method retrieves the Vector bounds and guesses the position of the vector by using its bounds.
+    To check if the guessed position and the real one are effectively the same, this method adjust manually the first frame and then
+    switch the axis of the vector if the bounds coordinates are going to change direction (this means the vector is passing through
+    its origin respect to that axis).
+    THIS METHOD IS NOT SURED TO WORK WITH ALL INPUTS, BUT JUST WHICH THAT ONES WHICH VECTORS DO NOT CHANGE DIRECTIONS TOO QUICKLY!
+    */
+  void WriteFast();
 
   /** Set the filename for the file to export */
-  void SetFileName(const char *file_name)
-    {m_File = file_name; };
+  void SetFileName(const char *file_name);
 
   /** Set Platforms */
   void SetPlatforms(mafVMESurface* p1,mafVMESurface* p2)
@@ -100,18 +121,16 @@ public:
   void SetMoments(mafVMEVector* m1,mafVMEVector* m2)
     {m_MomentLeft = m1; m_MomentRight = m2;};
 
+  /* Remove temp files */
+  void RemoveTempFiles();
+
 protected:
  
   /** Merge time stamps of platforms */
   std::vector<mafTimeStamp> MergeTimeStamps(std::vector<mafTimeStamp> kframes1,std::vector<mafTimeStamp> kframes2);
 
   /** Check consistency with vector direction:
-  In order to avoid loading all VTK data for all frames, which should drastically increase the time required by the operation,
-  the Write method retrieves the Vector bounds and guesses the position of the vector by using its bounds.
-  To check if the guessed position and the real one are effectively the same, this method adjust manually the first frame and then
-  switch the axis of the vector if the bounds coordinates are going to change direction (this means the vector is passing through
-  its origin respect to that axis).
-  CheckVectorToSwitch(  frame = number of frame
+      CheckVectorToSwitch(  frame = number of frame
                         coor1_ID = index of the first point coordinate to check consistency
                         coor2_ID = index of the second point coordinate to check consistency
                         coor3_ID = index of the third point coordinate to check consistency
@@ -131,6 +150,13 @@ protected:
   mafVMEVector        *m_MomentRight;
   mafVMEGroup         *m_Group;
 
+  double m_Treshold;
+  int m_FastMethod;
+
 	wxString m_File;
+  wxString m_File_temp1;
+  wxString m_File_temp2;
+  wxString m_File_temp3;
+  wxString m_File_temp4;
 };
 #endif
