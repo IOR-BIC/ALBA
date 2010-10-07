@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpExporterGRFWSTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-10-05 21:52:50 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2010-10-07 10:03:03 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -146,6 +146,7 @@ void medOpExporterGRFWSTest::TestWrite()
   Exporter->SetForces(forceL,forceR);
   Exporter->SetMoments(momentL,momentR);
   Exporter->Write();
+  Exporter->RemoveTempFiles();
 
   wxString file;
   file.append(filename.GetCStr());
@@ -213,6 +214,199 @@ void medOpExporterGRFWSTest::TestWrite()
     st4 = tkzName4.GetNextToken();
   }
   CPPUNIT_ASSERT( st4.Cmp("209") == 0);
+
+  mafDEL(group);
+  mafDEL(platform1);
+  mafDEL(platform2);
+  mafDEL(forceL);
+  mafDEL(forceR);
+  mafDEL(momentL);
+  mafDEL(momentR);
+  cppDEL(Exporter);
+}
+//-----------------------------------------------------------
+void medOpExporterGRFWSTest::TestWriteFast() 
+//-----------------------------------------------------------
+{
+  medOpExporterGRFWS *Exporter = new medOpExporterGRFWS("Exporter");
+  Exporter->TestModeOn();
+  mafString filename=MED_DATA_ROOT;
+  filename << "/Test_ExporterGRFWS/test_GRF_Fast.csv";
+  Exporter->SetFileName(filename.GetCStr());
+
+  mafVMEGroup* group;
+  mafVMESurface* platform1;
+  mafVMESurface* platform2;
+  mafVMEVector* forceL;
+  mafVMEVector* forceR;
+  mafVMEVector* momentL;
+  mafVMEVector* momentR;
+  mafNEW(group);
+  mafNEW(platform1);
+  mafNEW(platform2);
+  mafNEW(forceL);
+  mafNEW(forceR);
+  mafNEW(momentL);
+  mafNEW(momentR);
+
+  forceL->ReparentTo(platform1);
+  momentL->ReparentTo(platform1);
+  forceR->ReparentTo(platform2);
+  momentR->ReparentTo(platform2);
+  platform1->ReparentTo(group);
+  platform2->ReparentTo(group);
+
+  // Fill platforms
+  vtkMAFSmartPointer<vtkCubeSource> platformLeft;
+  vtkMAFSmartPointer<vtkCubeSource> platformRight;
+  platformLeft->SetBounds(0,10,0,50,0,5);
+  platformRight->SetBounds(0,10,0,50,0,5);
+  platform1->SetData(platformLeft->GetOutput(), 0);
+  platform2->SetData(platformRight->GetOutput(), 0);
+
+  vtkMAFSmartPointer<vtkPoints> points;
+  vtkMAFSmartPointer<vtkCellArray> cellArray;
+  vtkMAFSmartPointer<vtkPolyData> force;
+  int pointId[2];
+
+  // Fill vectors
+  for (int i=0;i<3;i++)
+  {
+    points->InsertPoint(0, 0, 0, 0);
+    points->InsertPoint(1, 5-(5*i), 10, 10);
+    pointId[0] = 0;
+    pointId[1] = 1;
+    cellArray->InsertNextCell(2, pointId);  
+    force->SetPoints(points);
+    force->SetLines(cellArray);
+    force->Update();
+
+    forceL->SetData(force, i);
+    forceL->Update();
+    forceL->GetOutput()->GetVTKData()->Update();
+
+    points->InsertPoint(1, 10, 5-(5*i), 10);
+    force->Update();
+
+    forceR->SetData(force, i);
+    forceR->Update();
+    forceR->GetOutput()->GetVTKData()->Update();
+
+    points->InsertPoint(1, 10, 10, 5-(5*i));
+    force->Update();
+
+    momentL->SetData(force, i);
+    momentL->Update();
+    momentL->GetOutput()->GetVTKData()->Update();
+
+    points->InsertPoint(1, 200+i, 200+i, 200+i);
+    force->Update();
+
+    momentR->SetData(force, i);
+    momentR->Update();
+    momentR->GetOutput()->GetVTKData()->Update();
+
+  }  
+
+  // Execute Exporter
+  Exporter->SetInput(group);
+  Exporter->SetPlatforms(platform1,platform2);
+  Exporter->SetForces(forceL,forceR);
+  Exporter->SetMoments(momentL,momentR);
+  Exporter->WriteFast();
+
+  wxString file;
+  file.append(filename.GetCStr());
+  wxFileInputStream inputFile( file );
+  wxTextInputStream text( inputFile );
+  wxString line;
+
+  // Check TAG
+  line = text.ReadLine();
+  CPPUNIT_ASSERT( line.Cmp("FORCE PLATES")==0);
+
+  line = text.ReadLine();
+  line = text.ReadLine();
+  line = text.ReadLine();
+
+  // Check CORNERS
+  line = text.ReadLine();
+  int num_tk;
+  wxStringTokenizer tkzName(line,wxT(','),wxTOKEN_RET_EMPTY_ALL);
+  num_tk = tkzName.CountTokens();
+  tkzName.GetNextToken(); 
+  tkzName.GetNextToken();
+  wxString st = tkzName.GetNextToken();
+  CPPUNIT_ASSERT( (num_tk == 13) && (st.Cmp("50") == 0));
+
+  line = text.ReadLine();
+  line = text.ReadLine();
+  line = text.ReadLine();
+  line = text.ReadLine();
+  line = text.ReadLine();
+
+  // Check first row
+  line = text.ReadLine();
+  wxStringTokenizer tkzName2(line,wxT(','),wxTOKEN_RET_EMPTY_ALL);
+  wxString st2 = tkzName2.GetNextToken();
+  CPPUNIT_ASSERT( st2.Cmp("0") == 0);
+  for (int k=0;k<7;k++)
+  {
+    st2 = tkzName2.GetNextToken();
+  }
+  CPPUNIT_ASSERT( st2.Cmp("5") == 0);
+  for (int k=0;k<5;k++)
+  {
+    st2 = tkzName2.GetNextToken();
+  }
+  CPPUNIT_ASSERT( st2.Cmp("5") == 0);
+  for (int k=0;k<8;k++)
+  {
+    st2 = tkzName2.GetNextToken();
+  }
+  CPPUNIT_ASSERT( st2.Cmp("5") == 0);
+
+  // Check second row
+  line = text.ReadLine();
+  wxStringTokenizer tkzName3(line,wxT(','),wxTOKEN_RET_EMPTY_ALL);
+  wxString st3 = tkzName3.GetNextToken();
+  CPPUNIT_ASSERT( st3.Cmp("1") == 0);
+  for (int k=0;k<7;k++)
+  {
+    st3 = tkzName3.GetNextToken();
+  }
+  CPPUNIT_ASSERT( st3.Cmp("0") == 0);
+  for (int k=0;k<5;k++)
+  {
+    st3 = tkzName3.GetNextToken();
+  }
+  CPPUNIT_ASSERT( st3.Cmp("0") == 0);
+  for (int k=0;k<8;k++)
+  {
+    st3 = tkzName3.GetNextToken();
+  }
+  CPPUNIT_ASSERT( st3.Cmp("0") == 0);
+
+  // Check third row
+  line = text.ReadLine();
+  wxStringTokenizer tkzName4(line,wxT(','),wxTOKEN_RET_EMPTY_ALL);
+  wxString st4 = tkzName4.GetNextToken();
+  CPPUNIT_ASSERT( st4.Cmp("2") == 0);
+  for (int k=0;k<7;k++)
+  {
+    st4 = tkzName4.GetNextToken();
+  }
+  CPPUNIT_ASSERT( st4.Cmp("-5") == 0);
+  for (int k=0;k<5;k++)
+  {
+    st4 = tkzName4.GetNextToken();
+  }
+  CPPUNIT_ASSERT( st4.Cmp("-5") == 0);
+  for (int k=0;k<8;k++)
+  {
+    st4 = tkzName4.GetNextToken();
+  }
+  CPPUNIT_ASSERT( st4.Cmp("-5") == 0);
 
   mafDEL(group);
   mafDEL(platform1);
