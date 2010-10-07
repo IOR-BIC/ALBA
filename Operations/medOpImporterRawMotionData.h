@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterRawMotionData.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-28 08:47:16 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2010-10-07 06:54:49 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -26,12 +26,18 @@ class mafEvent;
 //----------------------------------------------------------------------------
 // medOpImporterRawMotionData :
 //----------------------------------------------------------------------------
-/** */
+/** 
+class name: medOpImporterRawMotionData
+raw motion data are represented from landmark cloud, and this importer will create a landmark cloud with childs.
+*/
 class medOpImporterRawMotionData : public mafOp
 {
 public:
+  /** constructor */
 	medOpImporterRawMotionData(wxString label);
-	~medOpImporterRawMotionData(); 
+  /** destructor */
+	~medOpImporterRawMotionData();
+  /** clone the current object */
 	mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */

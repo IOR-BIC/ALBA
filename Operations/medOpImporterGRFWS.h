@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterGRFWS.h,v $
   Language:  C++
-  Date:      $Date: 2010-09-09 15:19:21 $
-  Version:   $Revision: 1.3.2.2 $
+  Date:      $Date: 2010-10-07 06:54:49 $
+  Version:   $Revision: 1.3.2.3 $
   Authors:   Roberto Mucci, Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2004
@@ -25,16 +25,20 @@ class mafVMEVector;
 class mafVMESurface;
 class mafVMEGroup;
 
-//----------------------------------------------------------------------------
-// medOpImporterGRFWS :
-//----------------------------------------------------------------------------
-/** */
+
+/** 
+class name: medOpImporterGRFWS
+Importer for ground reactions force, used in motion analysis
+*/
 class medOpImporterGRFWS : public mafOp
 {
 public:
+  /** constructor */
 	medOpImporterGRFWS(const wxString &label = "GRF Importer");
+  /** destructor */
 	~medOpImporterGRFWS(); 
 
+  /** apply the undo pattern to the operation, retrieving the previous state*/
   void medOpImporterGRFWS::OpUndo();
 
   /** Copy the operation. */

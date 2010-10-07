@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterEmgWS.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 12:03:55 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2010-10-07 06:54:49 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Roberto Mucci - Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -23,15 +23,18 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 class mafVMEGroup;
 
-//----------------------------------------------------------------------------
-// medOpImporterEmgWS :
-//----------------------------------------------------------------------------
-/** */
+/** 
+class name: medOpImporterEmgWS
+importer for elettromiography signals
+*/
 class medOpImporterEmgWS : public mafOp
 {
 public:
+  /** constructor */
 	medOpImporterEmgWS(wxString label);
+  /** destructor */
 	~medOpImporterEmgWS(); 
+  /** clone the current object */
 	mafOp* Copy();
 
 
