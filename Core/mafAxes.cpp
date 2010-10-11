@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafAxes.cpp,v $
 Language:  C++
-Date:      $Date: 2010-08-30 15:33:43 $
-Version:   $Revision: 1.2.2.4 $
+Date:      $Date: 2010-10-11 15:24:06 $
+Version:   $Revision: 1.2.2.5 $
 Authors:   Silvano Imboden , Stefano perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -99,7 +99,7 @@ mafAxes::mafAxes(vtkRenderer *ren, mafVME* vme, int axesType)
 		m_AxesActor2D->PickableOff();
 		m_Renderer->AddActor2D(m_AxesActor2D);
 	}
-	else if (m_AxesType = CUBE)
+	else if (m_AxesType == CUBE)
 	{
 		m_OrientationMarkerWidget = vtkMAFOrientationMarkerWidget::New();
 		m_AnnotatedCubeActor = vtkMAFAnnotatedCubeActor::New();
