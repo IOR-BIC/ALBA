@@ -33,7 +33,7 @@
 #include "vtkVectorText.h"
 #include "vcl_cassert.h"
 
-vtkCxxRevisionMacro(vtkMAFAnnotatedCubeActor, "$Revision: 1.1.2.2 $");
+vtkCxxRevisionMacro(vtkMAFAnnotatedCubeActor, "$Revision: 1.1.2.3 $");
 vtkStandardNewMacro(vtkMAFAnnotatedCubeActor);
 
 //-------------------------------------------------------------------------
@@ -68,8 +68,8 @@ vtkMAFAnnotatedCubeActor::vtkMAFAnnotatedCubeActor()
 
   this->SetXPlusFaceText ( "L" );
   this->SetXMinusFaceText( "R" );
-  this->SetYPlusFaceText ( "A" );
-  this->SetYMinusFaceText( "P" );
+  this->SetYPlusFaceText ( "P" );
+  this->SetYMinusFaceText( "A" );
   this->SetZPlusFaceText ( "S" );
   this->SetZMinusFaceText( "I" );
 
