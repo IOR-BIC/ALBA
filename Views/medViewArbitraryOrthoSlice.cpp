@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2010-10-06 15:24:17 $
-Version:   $Revision: 1.1.2.17 $
+Date:      $Date: 2010-10-11 11:54:16 $
+Version:   $Revision: 1.1.2.18 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -2459,15 +2459,15 @@ void medViewArbitraryOrthoSlice::MyMethod( double viewUp[3], double viewPlaneNor
 		maxIndex = 1;
 		if (yDot >= 0)
 		{
-			leftRight = "P--A";
-			leftLetter = "P";
-			rightLetter = "A";
-		}
-		else
-		{
 			leftRight = "A--P";
 			leftLetter = "A";
 			rightLetter = "P";
+		}
+		else
+		{
+			leftRight = "P--A";
+			leftLetter = "P";
+			rightLetter = "A";
 		}
 		
 	}
