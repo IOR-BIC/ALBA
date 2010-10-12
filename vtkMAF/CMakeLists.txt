@@ -15,6 +15,9 @@ SET(vtkMAF_SRCS
   vtkMAFAnnotatedCubeActor.h
   vtkMAFAnnotatedCubeActor.cpp
   
+  vtkMAFGlobalAxesHeadActor.h
+  vtkMAFGlobalAxesHeadActor.cpp
+  
   vtkMAFCellsFilter.cxx
   vtkMAFCellsFilter.h  
   vtkMAFRemoveCellsFilter.cxx

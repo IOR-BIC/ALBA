@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafAxes.h,v $
 Language:  C++
-Date:      $Date: 2010-08-26 15:02:00 $
-Version:   $Revision: 1.1.22.2 $
+Date:      $Date: 2010-10-12 15:25:52 $
+Version:   $Revision: 1.1.22.3 $
 Authors:   Silvano Imboden , Stefano perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -27,6 +27,7 @@ class vtkMatrix4x4;
 class vtkPolyData;
 class vtkMAFAnnotatedCubeActor;
 class vtkMAFOrientationMarkerWidget;
+class vtkMAFGlobalAxesHeadActor;
 
 //----------------------------------------------------------------------------
 class mafAxes
@@ -39,7 +40,10 @@ class mafAxes
 	mafAxes(renderer, vme, TRIAD); => Create a vme local axis triad 2D actor in the passed renderer
 	
 	mafAxes(renderer, NULL, CUBE); => Create a 3D global axes cube on a new renderer and on a superimposed layer
-	//mafAxes(renderer, vme, CUBE); => BEWARE !!! NOT SUPPORTED !!! (TODO...)
+	//mafAxes(renderer, vme, CUBE); => BEWARE !!! NOT SUPPORTED !!!
+	
+	mafAxes(renderer, NULL, HEAD); => Create a 3D global axes head on a new renderer and on a superimposed layer
+	//mafAxes(renderer, vme, HEAD); => BEWARE !!! NOT SUPPORTED !!!
 	
 	If a vme is provided, the axes will represent 
 	the local vme-reference system.
@@ -57,7 +61,8 @@ public:
 	enum AXIS_TYPE_ENUM
 	{
 		TRIAD = 0, // default: 2D actor representing 3 small axes attached to the main render window camera
-		CUBE, // 3D actor representing a rotating cube attached to the main render window camera
+		CUBE, // 3D actor representing a rotating cube with anatomical directions annotations attached to the main render window camera
+		HEAD, // 3D actor representing a rotating head attached to the main render window camera
 		NUMBER_OF_AXES_TYPES,
 	};
 
@@ -84,6 +89,7 @@ protected:
 	int m_AxesType;
 	vtkMAFOrientationMarkerWidget* m_OrientationMarkerWidget ;
 	vtkMAFAnnotatedCubeActor* m_AnnotatedCubeActor;
+	vtkMAFGlobalAxesHeadActor *m_GlobalAxesHeadActor ;
 
 	/** friend test class */
 	friend class mafAxesTest;

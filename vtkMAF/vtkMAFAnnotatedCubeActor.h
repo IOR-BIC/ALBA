@@ -14,8 +14,7 @@
 =========================================================================*/
 // Ported from VTK 5 to MAF by Stefano Perticoni
 // This class is used along with vtkMAFOrientationMarkerWidget to build a render window superimposed rotating cube with
-// anatomical markers and it's working in a two layer maf render window ie the following render window should be created: 
-// m_Rwi = new mafRWI(mafGetFrame(), TWO_LAYER , ...);
+// anatomical markers. 
 
 // .NAME vtkAnnotatedCubeActor - a 3D cube with face labels
 // .SECTION Description

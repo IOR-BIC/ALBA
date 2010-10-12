@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafAxes.cpp,v $
 Language:  C++
-Date:      $Date: 2010-10-11 15:24:06 $
-Version:   $Revision: 1.2.2.5 $
+Date:      $Date: 2010-10-12 15:25:52 $
+Version:   $Revision: 1.2.2.6 $
 Authors:   Silvano Imboden , Stefano perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -37,6 +37,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkRenderWindow.h"
 #include "vtkMAFOrientationMarkerWidget.h"
 #include "vtkMAFAnnotatedCubeActor.h"
+#include "vtkMAFGlobalAxesHeadActor.h"
 
 //----------------------------------------------------------------------------
 mafAxes::mafAxes(vtkRenderer *ren, mafVME* vme, int axesType)
@@ -45,6 +46,7 @@ mafAxes::mafAxes(vtkRenderer *ren, mafVME* vme, int axesType)
 	m_AxesType = axesType;
 	m_OrientationMarkerWidget = NULL;
 	m_AnnotatedCubeActor = NULL;
+	m_GlobalAxesHeadActor = NULL;
 	m_Coord = NULL;
 	m_AxesLUT = NULL;
 
@@ -111,13 +113,47 @@ mafAxes::mafAxes(vtkRenderer *ren, mafVME* vme, int axesType)
 		m_OrientationMarkerWidget->SetInteractive(0);
 		m_OrientationMarkerWidget->SetViewport(0., 0., 0.4, 0.4);
 	}
+	else if (m_AxesType == HEAD)
+	{
+		m_OrientationMarkerWidget = vtkMAFOrientationMarkerWidget::New();
+		m_GlobalAxesHeadActor = vtkMAFGlobalAxesHeadActor::New();	
+		
+		wxString headABSFileName = m_GlobalAxesHeadActor->GetHeadABSFileName().c_str();
+
+		wxString cwd = wxGetCwd().c_str();
+		std::ostringstream stringStream;
+		stringStream << "Head ABS file name: " << headABSFileName.c_str() << std::endl;          
+		
+		mafLogMessage(stringStream.str().c_str());
+		bool exists = wxFileExists(headABSFileName.c_str());
+		assert(exists);
+
+		if (exists)
+		{
+			// continue
+		}
+		else
+		{
+			mafLogMessage("Head VTK file not found: cannot create 3d head marker");
+			return;
+		}
+
+
+		m_OrientationMarkerWidget->SetOrientationMarker(m_GlobalAxesHeadActor);
+		m_OrientationMarkerWidget->SetInteractor(m_Renderer->GetRenderWindow()->GetInteractor());
+		m_OrientationMarkerWidget->SetEnabled(1);
+		m_OrientationMarkerWidget->SetInteractive(0);
+		m_OrientationMarkerWidget->SetViewport(0., 0., 0.4, 0.4);
+	}
+
 }
 //----------------------------------------------------------------------------
 mafAxes::~mafAxes()
 //----------------------------------------------------------------------------
 {
 	vtkDEL(m_AnnotatedCubeActor);
-	
+	vtkDEL(m_GlobalAxesHeadActor);
+
 	if (m_OrientationMarkerWidget != NULL) m_OrientationMarkerWidget->SetInteractor(NULL);
 	vtkDEL(m_OrientationMarkerWidget);
 
