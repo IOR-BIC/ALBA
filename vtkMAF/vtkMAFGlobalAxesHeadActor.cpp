@@ -35,7 +35,7 @@
 #include "vtkPolyDataReader.h"
 #include "vtkDirectory.h"
 
-vtkCxxRevisionMacro(vtkMAFGlobalAxesHeadActor, "$Revision: 1.1.2.1 $");
+vtkCxxRevisionMacro(vtkMAFGlobalAxesHeadActor, "$Revision: 1.1.2.2 $");
 vtkStandardNewMacro(vtkMAFGlobalAxesHeadActor);
 
 //-------------------------------------------------------------------------
@@ -48,9 +48,11 @@ vtkMAFGlobalAxesHeadActor::vtkMAFGlobalAxesHeadActor()
   this->HeadReader = vtkPolyDataReader::New();
   this->HeadFileName = "3dHead.vtk";
 
-  HeadReader->SetFileName(HeadFileName.c_str());
-
   assert(FileExists(GetHeadABSFileName().c_str()));
+
+  HeadReader->SetFileName(GetHeadABSFileName().c_str());
+
+  
 
   HeadReader->Update();
 
@@ -190,10 +192,9 @@ void vtkMAFGlobalAxesHeadActor::PrintSelf(ostream& os, vtkIndent indent)
 std::string vtkMAFGlobalAxesHeadActor::GetHeadABSFileName()
 {
 	char buf[256];
-	if ( vtkDirectory::GetCurrentWorkingDirectory(buf, 256) );
-
+	vtkDirectory::GetCurrentWorkingDirectory(buf, 256);
 	std::string path = buf;
-	path.append("\\Config\\HelperData\\");
+	path.append("\\..\\Config\\HelperData\\");
 	path.append(HeadFileName);
 	return path;
 }

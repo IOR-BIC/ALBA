@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafAxes.cpp,v $
 Language:  C++
-Date:      $Date: 2010-10-12 15:25:52 $
-Version:   $Revision: 1.2.2.6 $
+Date:      $Date: 2010-10-13 08:15:00 $
+Version:   $Revision: 1.2.2.7 $
 Authors:   Silvano Imboden , Stefano perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -134,7 +134,10 @@ mafAxes::mafAxes(vtkRenderer *ren, mafVME* vme, int axesType)
 		}
 		else
 		{
-			mafLogMessage("Head VTK file not found: cannot create 3d head marker");
+			wxString tmp = "Head VTK file not found: ";
+			tmp.Append(headABSFileName.c_str());
+			tmp.Append(" cannot create 3d head marker");
+			wxMessageBox(tmp);
 			return;
 		}
 
