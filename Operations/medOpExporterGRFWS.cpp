@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterGRFWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-10-07 10:02:41 $
-  Version:   $Revision: 1.1.2.10 $
+  Date:      $Date: 2010-10-13 08:46:42 $
+  Version:   $Revision: 1.1.2.11 $
   Authors:   Simone Brazzale
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -41,6 +41,7 @@
 using namespace std;
 
 #define TAG_FORMAT "FORCE PLATES"
+#define TAG_FORMAT_V "VECTOR"
 #define FREQ 1.00
 #define DELTA 5.0
 
@@ -53,6 +54,7 @@ mafOp(label)
 	m_Canundo	= true;
 	m_File		= "";
 
+  m_AdvanceSettings = NULL;
   m_PlatformLeft = NULL;
   m_PlatformRight = NULL;
   m_ForceLeft = NULL;
@@ -61,7 +63,12 @@ mafOp(label)
   m_MomentRight = NULL;
   m_Group = NULL;
   m_FastMethod = 0;
-  m_Treshold = 10.0;
+  m_Resolution = 100;
+  m_Treshold.clear();
+  m_Treshold.push_back(10);
+  m_Treshold.push_back(10);
+  m_Treshold.push_back(10);
+  m_Treshold.push_back(10);
 }
 //----------------------------------------------------------------------------
 medOpExporterGRFWS::~medOpExporterGRFWS()
@@ -78,13 +85,15 @@ void medOpExporterGRFWS::Clear()
   m_ForceRight = NULL;
   m_MomentLeft = NULL;
   m_MomentRight = NULL;
+  m_AdvanceSettings = NULL;
+  m_Treshold.clear();
 }
 //----------------------------------------------------------------------------
 bool medOpExporterGRFWS::Accept(mafNode *node)
 //----------------------------------------------------------------------------
 {
   Clear();
-  return (node && LoadVMEs(node));
+  return (node && ( node->IsA("mafVMEVector") || LoadVMEs(node) ) );
 }
 //----------------------------------------------------------------------------
 mafOp* medOpExporterGRFWS::Copy()   
@@ -92,17 +101,34 @@ mafOp* medOpExporterGRFWS::Copy()
 {
 	medOpExporterGRFWS *cp = new medOpExporterGRFWS(m_Label);
 	cp->m_File = m_File;
+  cp->m_Resolution = m_Resolution;
+  cp->m_FastMethod = m_FastMethod;
+  for (int i=0;i<m_Treshold.size();i++)
+  {
+    (cp->m_Treshold).push_back(m_Treshold.at(i));
+  }
 	return cp;
 }
 //----------------------------------------------------------------------------
 void medOpExporterGRFWS::OpRun()   
 //----------------------------------------------------------------------------
 {
+  // Load inputs
+  if (m_Input->IsA("mafVMEVector"))
+  {
+    m_ForceLeft = mafVMEVector::SafeDownCast(m_Input); 
+  }
+  else
+  {
+    LoadVMEs(m_Input);
+  }
+  // Create GUI
   if (!m_TestMode)
   {
     CreateGui();
     ShowGui();
   }
+  CalculateTresholds();
 }
 //----------------------------------------------------------------------------
 void medOpExporterGRFWS::OpStop(int result)
@@ -117,39 +143,78 @@ void medOpExporterGRFWS::CreateGui()
 {
   m_Gui = new mafGUI(this);
   m_Gui->SetOwnForegroundColour(wxColour(255,0,0));
-  m_Gui->Label("This Operation takes seconds to hours to run", false);
-  m_Gui->Label("depending on your input MSF file size. Running", false);
-  m_Gui->Label("this Op after an Importer (C3D or Force Plates)", false);
-  m_Gui->Label("will always take just few seconds!", false);
+  m_Gui->Label("This Operation may take seconds or hours,", false);
+  m_Gui->Label("depending on your input MSF file size.", false);
+  m_Gui->Label("Consider running this Op after an Importer", false);
+  m_Gui->Label("(C3D or Force Plates); it will always take", false);
+  m_Gui->Label("just few seconds!", false);
   m_Gui->Divider(0);
   m_Gui->Label("In any case, you can try the fast method which", false);
-  m_Gui->Label("will guess the vector position time by time.", false);
-  m_Gui->Label("This will reduce the time required but works", false);
-  m_Gui->Label("only in case the input vectors", false);
+  m_Gui->Label("guesses the vector position time by time.", false);
+  m_Gui->Label("This will reduce the time required by the Op,", false);
+  m_Gui->Label("but works well only if the input vectors", false);
   m_Gui->Label("DO NOT FLIP DIRECTIONS TOO", true);
   m_Gui->Label("QUICKLY!", true);
 
   m_Gui->Divider(0);
-  m_Gui->Bool(-1,"Try fast method",&m_FastMethod,1,"Fast method");
-  m_Gui->Divider(0);
-
-  m_Gui->OkCancel();
-
+  m_Gui->Bool(ID_FAST,"Try fast method",&m_FastMethod,1,"Fast method");
   m_Gui->Divider(0);
   m_Gui->Divider(1);
   m_Gui->Divider(0);
 
-  mafGUI* advanceSettings = new mafGUI(this);
-  advanceSettings->Double(-1,"Treshold",&m_Treshold,0,10000,2,"Treshold");
-  mafGUIRollOut* roll = new mafGUIRollOut(m_Gui,"Advance Settings",advanceSettings,-1,false); // set an id
+  m_AdvanceSettings = new mafGUI(this);
+  m_AdvanceSettings->Divider(0);
+  m_AdvanceSettings->Integer(ID_RES,"Resolution",&m_Resolution,0,1000,2,"Resolution");
+  m_AdvanceSettings->Divider(0);
+  m_AdvanceSettings->Label(" Tresholds");
+  m_AdvanceSettings->Double(ID_FL,"Tr. FL",&(m_Treshold.at(0)),0,1.0e10,2,"Treshold");
+  m_AdvanceSettings->Double(ID_ML,"Tr. ML",&(m_Treshold.at(1)),0,1.0e10,2,"Treshold");
+  m_AdvanceSettings->Double(ID_FR,"Tr. FR",&(m_Treshold.at(2)),0,1.0e10,2,"Treshold");
+  m_AdvanceSettings->Double(ID_MR,"Tr. MR",&(m_Treshold.at(3)),0,1.0e10,2,"Treshold");
+  m_AdvanceSettings->Enable(ID_RES,false);
+  m_AdvanceSettings->Enable(ID_FL,false);
+  m_AdvanceSettings->Enable(ID_ML,false);
+  m_AdvanceSettings->Enable(ID_FR,false);
+  m_AdvanceSettings->Enable(ID_MR,false);
+  m_AdvanceSettings->Update();
+  mafGUIRollOut* roll = new mafGUIRollOut(m_Gui,"Advance Settings",m_AdvanceSettings,-1,false); // set an id
+
+  m_Gui->Divider(0);
+  m_Gui->OkCancel();
 }
 
 //----------------------------------------------------------------------------
 void medOpExporterGRFWS::OpDo()   
 //----------------------------------------------------------------------------
 {
-  // Load and Execute
-  if (LoadVMEs(m_Input))
+  // INPUT is a VECTOR:
+  if (m_Input->IsA("mafVMEVector"))
+  {
+    wxString proposed = mafGetApplicationDirectory().c_str();
+    proposed += "/Data/External/";
+    proposed += m_Input->GetName();
+    proposed += "_VECTOR";
+    proposed += ".csv";
+
+    wxString wildc = "ASCII CSV file (*.csv)|*.csv";
+    wxString f = mafGetSaveFile(proposed,wildc).c_str(); 
+
+    if(!f.IsEmpty())
+    {
+      SetFileName(f.c_str());
+      if (!m_FastMethod)
+      {
+        WriteSingleVector();
+      }
+      else
+      {
+        WriteSingleVectorFast();
+      }
+    }
+
+  }
+  // INPUT is a FORCE PLATE: Load and Execute 
+  else if (m_ForceLeft && m_ForceRight && m_MomentLeft && m_MomentRight)
   {
     wxString proposed = mafGetApplicationDirectory().c_str();
     proposed += "/Data/External/";
@@ -194,6 +259,47 @@ void medOpExporterGRFWS::OnEvent(mafEventBase *maf_event)
       break;
     case wxCANCEL:
       OpStop(OP_RUN_CANCEL);
+      break;
+    case ID_FAST:
+      {
+        if (!m_TestMode)
+        {
+          if (m_FastMethod)
+          {
+            m_AdvanceSettings->Enable(ID_RES,true);
+            if (m_ForceLeft)
+            {
+              m_AdvanceSettings->Enable(ID_FL,true);
+            }
+            if (m_MomentLeft)
+            {
+              m_AdvanceSettings->Enable(ID_ML,true);
+            }
+            if (m_ForceRight)
+            {
+              m_AdvanceSettings->Enable(ID_FR,true);
+            }
+            if (m_MomentRight)
+            {
+              m_AdvanceSettings->Enable(ID_MR,true);
+            }
+          }
+          else
+          {
+            m_AdvanceSettings->Enable(ID_RES,false);
+            m_AdvanceSettings->Enable(ID_FL,false);
+            m_AdvanceSettings->Enable(ID_ML,false);
+            m_AdvanceSettings->Enable(ID_FR,false);
+            m_AdvanceSettings->Enable(ID_MR,false);
+          }
+          m_AdvanceSettings->Update();
+        }
+      }
+      break;
+    case ID_RES:
+      {
+        CalculateTresholds();
+      }
       break;
     default:
       mafEventMacro(*e);
@@ -307,8 +413,11 @@ void medOpExporterGRFWS::Write()
   int size = kframes.size();
 
   //Add times and values; time is always the first row
-  double copL[3];   
-  double copR[3];
+  double copL[3][100000];   
+  double copR[3][100000];
+  // ---------------------
+  // FORCE LEFT ----------
+  // ---------------------
   for (int i=0;i<size;i++)
   {
     double time = kframes.at(i);
@@ -320,23 +429,26 @@ void medOpExporterGRFWS::Write()
     vtkPolyData* polyFL = (vtkPolyData*)m_ForceLeft->GetOutput()->GetVTKData();
      
     double* p = polyFL->GetPoint(0);
-    copL[0] = p[0];
-    copL[1] = p[1];
-    copL[2] = p[2];
-    f_Out1 << copL[0] << "," << copL[1] << "," << copL[2] << "\n";
+    copL[0][i] = p[0];
+    copL[1][i] = p[1];
+    copL[2][i] = p[2];
+    f_Out1 << copL[0][i] << "," << copL[1][i] << "," << copL[2][i] << "\n";
 
     p = polyFL->GetPoint(1);
     double fL[3];
     fL[0] = p[0];
     fL[1] = p[1];
     fL[2] = p[2];
-    f_Out1 << fL[0]-copL[0] << "," << fL[1]-copL[1] << "," << fL[2]-copL[2] << "\n";
+    f_Out1 << fL[0]-copL[0][i] << "," << fL[1]-copL[1][i] << "," << fL[2]-copL[2][i] << "\n";
 
     if (!m_TestMode)
     {
       mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)(((double) i)/((double) size)*25.)));
     }
   }
+  // ---------------------
+  // MOMENT LEFT ---------
+  // ---------------------
   for (int i=0;i<size;i++)
   {
     double time = kframes.at(i);
@@ -352,13 +464,16 @@ void medOpExporterGRFWS::Write()
     mL[0] = p[0];
     mL[1] = p[1];
     mL[2] = p[2];
-    f_Out2 << mL[0]-copL[0] << "," << mL[1]-copL[1] << "," << mL[2]-copL[2] << "\n";
+    f_Out2 << mL[0]-copL[0][i] << "," << mL[1]-copL[1][i] << "," << mL[2]-copL[2][i] << "\n";
 
     if (!m_TestMode)
     {
       mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)(25+((double) i)/((double) size)*25.)));
     }
-  }
+  }  
+  // ---------------------
+  // FORCE RIGHT ---------
+  // ---------------------
   for (int i=0;i<size;i++)
   {
     double time = kframes.at(i);
@@ -370,23 +485,26 @@ void medOpExporterGRFWS::Write()
     vtkPolyData* polyFR = (vtkPolyData*)m_ForceRight->GetOutput()->GetVTKData();
       
     double* p = polyFR->GetPoint(0);
-    copR[0] = p[0];
-    copR[1] = p[1];
-    copR[2] = p[2];
-    f_Out3 << copR[0] << "," << copR[1] << "," << copR[2] << "\n";
+    copR[0][i] = p[0];
+    copR[1][i] = p[1];
+    copR[2][i] = p[2];
+    f_Out3 << copR[0][i] << "," << copR[1][i] << "," << copR[2][i] << "\n";
       
     p = polyFR->GetPoint(1);
     double fR[3];
     fR[0] = p[0];
     fR[1] = p[1];
     fR[2] = p[2];
-    f_Out3 << fR[0]-copR[0] << "," << fR[1]-copR[1] << "," << fR[2]-copR[2] << "\n";
+    f_Out3 << fR[0]-copR[0][i] << "," << fR[1]-copR[1][i] << "," << fR[2]-copR[2][i] << "\n";
       
     if (!m_TestMode)
     {
       mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)(50+((double) i)/((double) size)*25.)));
     }
   }
+  // ---------------------
+  // MOMENT RIGHT --------
+  // ---------------------
   for (int i=0;i<size;i++)
   {
     double time = kframes.at(i);
@@ -402,7 +520,7 @@ void medOpExporterGRFWS::Write()
     mR[0] = p[0];
     mR[1] = p[1];
     mR[2] = p[2];
-    f_Out4 << mR[0]-copR[0] << "," << mR[1]-copR[1] << "," << mR[2]-copR[2] << "\n";
+    f_Out4 << mR[0]-copR[0][i] << "," << mR[1]-copR[1][i] << "," << mR[2]-copR[2][i] << "\n";
 
     if (!m_TestMode)
     {
@@ -431,6 +549,7 @@ void medOpExporterGRFWS::Write()
     mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)0.0));
   }
 
+  // Write to final file
   if (!f_Out.bad())
   {
     // Add TAG
@@ -541,7 +660,264 @@ void medOpExporterGRFWS::WriteFast()
   m_PlatformRight->Update();
   m_PlatformRight->GetVTKOutput()->Update();
 
+  double bounds1[6];
+  bounds1[0] = 0;
+  m_PlatformLeft->GetOutput()->GetVTKData()->GetBounds(bounds1);
+  bounds1[4] = bounds1[4] + DELTA;
+  double bounds2[6];
+  bounds2[0] = 0;
+  m_PlatformRight->GetOutput()->GetVTKData()->GetBounds(bounds2);
+  bounds2[4] = bounds2[4] + DELTA;
+
+  wxString file1 = m_File + "_tmp1";
+  wxString file2 = m_File + "_tmp2";
+  wxString file3 = m_File + "_tmp3";
+  wxString file4 = m_File + "_tmp4";
+
   std::ofstream f_Out(m_File);
+  std::ofstream f_Out1(file1);
+  std::ofstream f_Out2(file2);
+  std::ofstream f_Out3(file3);
+  std::ofstream f_Out4(file4);
+
+  std::vector<mafTimeStamp> kframes1;
+  std::vector<mafTimeStamp> kframes2;
+  m_ForceLeft->GetTimeStamps(kframes1);
+  m_ForceRight->GetTimeStamps(kframes2);
+  std::vector<mafTimeStamp> kframes = MergeTimeStamps(kframes1,kframes2);
+  int size = kframes.size();
+
+  // Get first data to set right input position
+  m_ForceLeft->SetTimeStamp(kframes.at(0));
+  m_ForceLeft->Update();
+  m_ForceLeft->GetOutput()->GetVTKData()->Update();
+  m_MomentLeft->SetTimeStamp(kframes.at(0));
+  m_MomentLeft->Update();
+  m_MomentLeft->GetOutput()->GetVTKData()->Update();
+  m_ForceRight->SetTimeStamp(kframes.at(0));
+  m_ForceRight->Update();
+  m_ForceRight->GetOutput()->GetVTKData()->Update();
+  m_MomentRight->SetTimeStamp(kframes.at(0));
+  m_MomentRight->Update();
+  m_MomentRight->GetOutput()->GetVTKData()->Update();
+
+  double* init_posCOPL = m_ForceLeft->GetOutput()->GetVTKData()->GetPoint(0);
+  double* init_posCOPR = m_ForceRight->GetOutput()->GetVTKData()->GetPoint(0);
+  double* init_posML = m_MomentLeft->GetOutput()->GetVTKData()->GetPoint(1);
+  double* init_posMR = m_MomentRight->GetOutput()->GetVTKData()->GetPoint(1);
+
+  medGRFVector* vFL = new medGRFVector;
+  medGRFVector* vFR = new medGRFVector;
+  medGRFVector* vML = new medGRFVector;
+  medGRFVector* vMR = new medGRFVector;
+  for (int i=0;i<6;i++)
+  {
+    vFL->m_Bounds[i]=0;
+    vFR->m_Bounds[i]=0;
+    vML->m_Bounds[i]=0;
+    vMR->m_Bounds[i]=0;
+  }
+  vFL->m_SwitchX = vFL->m_SwitchY = vFL->m_SwitchZ = 0;
+  vFR->m_SwitchX = vFR->m_SwitchY = vFR->m_SwitchZ = 0;
+  vML->m_SwitchX = vML->m_SwitchY = vML->m_SwitchZ = 0;
+  vMR->m_SwitchX = vMR->m_SwitchY = vMR->m_SwitchZ = 0;
+
+  // Generate values and store them in temp files
+  double copL[3][100000];   
+  double copR[3][100000];
+  // ---------------------
+  // FORCE LEFT ----------
+  // ---------------------
+  for (int i=0;i<size;i++)
+  {
+    double time = kframes.at(i);
+
+    // Get bounds
+    mafOBB obb;
+    m_ForceLeft->GetOutput()->GetBounds(obb,time);
+    vFL->m_Bounds[0] = (obb.m_Bounds)[0];
+    vFL->m_Bounds[1] = (obb.m_Bounds)[1];
+    vFL->m_Bounds[2] = (obb.m_Bounds)[2];
+    vFL->m_Bounds[3] = (obb.m_Bounds)[3];
+    vFL->m_Bounds[4] = (obb.m_Bounds)[4];
+    vFL->m_Bounds[5] = (obb.m_Bounds)[5];
+
+    // Switch direction if case
+    int ind1 = ((vFL->m_SwitchX==0) ? 1 : 0);
+    int ind2 = ((vFL->m_SwitchY==0) ? 2 : 3);
+    int ind3 = ((vFL->m_SwitchZ==0) ? 4 : 5);
+    CheckVectorToSwitch(i,ind1,ind2,ind3,vFL,init_posCOPL,0,m_ForceLeft,0,time);
+    ind1 = ((vFL->m_SwitchX==0) ? 1 : 0);
+    ind2 = ((vFL->m_SwitchY==0) ? 2 : 3);
+    ind3 = ((vFL->m_SwitchZ==0) ? 4 : 5);
+          
+    // COP L
+    copL[0][i] = vFL->m_Bounds[ind1];
+    copL[1][i] = vFL->m_Bounds[ind2];
+    copL[2][i] = vFL->m_Bounds[ind3];
+    f_Out1 << copL[0][i] << "," << copL[1][i] << "," << copL[2][i] << "\n";
+
+    // FORCE L
+    ind1 = ((vFL->m_SwitchX==0) ? 0 : 1);
+    ind2 = ((vFL->m_SwitchY==0) ? 3 : 2);
+    ind3 = ((vFL->m_SwitchZ==0) ? 5 : 4);
+    double fL[3];
+    fL[0] =  vFL->m_Bounds[ind1];
+    fL[1] =  vFL->m_Bounds[ind2];
+    fL[2] =  vFL->m_Bounds[ind3];
+    f_Out1 << fL[0]-copL[0][i] << "," << fL[1]-copL[1][i] << "," << fL[2]-copL[2][i] << "\n";
+
+    if (!m_TestMode)
+    {
+      mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)(((double) i)/((double) size)*25.)));
+    }
+  }  
+  // ---------------------
+  // MOMENT LEFT ---------
+  // ---------------------
+  for (int i=0;i<size;i++)
+  {
+    double time = kframes.at(i);
+
+    // Get bounds
+    mafOBB obb;
+    m_MomentLeft->GetOutput()->GetBounds(obb,time);
+    vML->m_Bounds[0] = (obb.m_Bounds)[0];
+    vML->m_Bounds[1] = (obb.m_Bounds)[1];
+    vML->m_Bounds[2] = (obb.m_Bounds)[2];
+    vML->m_Bounds[3] = (obb.m_Bounds)[3];
+    vML->m_Bounds[4] = (obb.m_Bounds)[4];
+    vML->m_Bounds[5] = (obb.m_Bounds)[5];
+
+    // Switch direction if case
+    int ind1 = ((vML->m_SwitchX==0) ? 1 : 0);
+    int ind2 = ((vML->m_SwitchY==0) ? 3 : 2);
+    int ind3 = ((vML->m_SwitchZ==0) ? 5 : 4);
+    CheckVectorToSwitch(i,ind1,ind2,ind3,vML,init_posML,1,m_MomentLeft,1,time);
+    ind1 = ((vML->m_SwitchX==0) ? 1 : 0);
+    ind2 = ((vML->m_SwitchY==0) ? 3 : 2);
+    ind3 = ((vML->m_SwitchZ==0) ? 5 : 4);
+
+    // MOMENT L
+    double mL[3];
+    mL[0] = vML->m_Bounds[ind1];
+    mL[1] = vML->m_Bounds[ind2];
+    mL[2] = vML->m_Bounds[ind3];
+    f_Out2 << mL[0]-copL[0][i] << "," << mL[1]-copL[1][i] << "," << mL[2]-copL[2][i] << "\n";
+
+    if (!m_TestMode)
+    {
+      mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)(25+((double) i)/((double) size)*25.)));
+    }
+  }  
+  // ---------------------
+  // FORCE RIGHT ---------
+  // ---------------------
+  for (int i=0;i<size;i++)
+  {
+    double time = kframes.at(i);
+
+    // Get bounds
+    mafOBB obb;
+    m_ForceRight->GetOutput()->GetBounds(obb,time);
+    vFR->m_Bounds[0] = (obb.m_Bounds)[0];
+    vFR->m_Bounds[1] = (obb.m_Bounds)[1];
+    vFR->m_Bounds[2] = (obb.m_Bounds)[2];
+    vFR->m_Bounds[3] = (obb.m_Bounds)[3];
+    vFR->m_Bounds[4] = (obb.m_Bounds)[4];
+    vFR->m_Bounds[5] = (obb.m_Bounds)[5];
+
+    // Switch direction if case
+    int ind1 = ((vFR->m_SwitchX==0) ? 0 : 1);
+    int ind2 = ((vFR->m_SwitchY==0) ? 3 : 2);
+    int ind3 = ((vFR->m_SwitchZ==0) ? 4 : 5);
+    CheckVectorToSwitch(i,ind1,ind2,ind3,vFR,init_posCOPR,2,m_ForceRight,0,time);
+    ind1 = ((vFR->m_SwitchX==0) ? 0 : 1);
+    ind2 = ((vFR->m_SwitchY==0) ? 3 : 2);
+    ind3 = ((vFR->m_SwitchZ==0) ? 4 : 5);
+
+    // COP R
+    copR[0][i] = vFR->m_Bounds[ind1];
+    copR[1][i] = vFR->m_Bounds[ind2];
+    copR[2][i] = vFR->m_Bounds[ind3];
+    f_Out3 << copR[0][i] << "," << copR[1][i] << "," << copR[2][i] << "\n";
+      
+    // FORCE R
+    ind1 = (vFR->m_SwitchX==0) ? 1 : 0;
+    ind2 = (vFR->m_SwitchY==0) ? 2 : 3;
+    ind3 = (vFR->m_SwitchZ==0) ? 5 : 4;
+    double fR[3];
+    fR[0] = vFR->m_Bounds[ind1];
+    fR[1] = vFR->m_Bounds[ind2];
+    fR[2] = vFR->m_Bounds[ind3];
+    f_Out3 << fR[0]-copR[0][i] << "," << fR[1]-copR[1][i] << "," << fR[2]-copR[2][i] << "\n";
+      
+    if (!m_TestMode)
+    {
+      mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)(50+((double) i)/((double) size)*25.)));
+    }
+  }  
+  // ---------------------
+  // MOMENT RIGHT --------
+  // ---------------------
+  for (int i=0;i<size;i++)
+  {
+    double time = kframes.at(i);
+
+    // Get bounds
+    mafOBB obb;
+    m_MomentRight->GetOutput()->GetBounds(obb,time);
+    vMR->m_Bounds[0] = (obb.m_Bounds)[0];
+    vMR->m_Bounds[1] = (obb.m_Bounds)[1];
+    vMR->m_Bounds[2] = (obb.m_Bounds)[2];
+    vMR->m_Bounds[3] = (obb.m_Bounds)[3];
+    vMR->m_Bounds[4] = (obb.m_Bounds)[4];
+    vMR->m_Bounds[5] = (obb.m_Bounds)[5];
+
+    // Switch direction if case
+    int ind1 = ((vMR->m_SwitchX==0) ? 0 : 1);
+    int ind2 = ((vMR->m_SwitchY==0) ? 3 : 2);
+    int ind3 = ((vMR->m_SwitchZ==0) ? 5 : 4);
+    CheckVectorToSwitch(i,ind1,ind2,ind3,vMR,init_posMR,3,m_MomentRight,1,time);
+    ind1 = ((vMR->m_SwitchX==0) ? 0 : 1);
+    ind2 = ((vMR->m_SwitchY==0) ? 3 : 2);
+    ind3 = ((vMR->m_SwitchZ==0) ? 5 : 4);
+
+    // MOMENT R
+    double mR[3];
+    mR[0] = vMR->m_Bounds[ind1];
+    mR[1] = vMR->m_Bounds[ind2];
+    mR[2] = vMR->m_Bounds[ind3];
+    f_Out4 << mR[0]-copR[0][i] << "," << mR[1]-copR[1][i] << "," << mR[2]-copR[2][i] << "\n";
+
+    if (!m_TestMode)
+    {
+      mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)(75+((double) i)/((double) size)*25.)));
+    }
+  }  
+
+  f_Out1.close();
+  f_Out2.close();
+  f_Out3.close();
+  f_Out4.close();
+
+  wxFileInputStream inputFile1( file1 );
+  wxTextInputStream text1( inputFile1 );
+  wxFileInputStream inputFile2( file2 );
+  wxTextInputStream text2( inputFile2 );
+  wxFileInputStream inputFile3( file3 );
+  wxTextInputStream text3( inputFile3 );
+  wxFileInputStream inputFile4( file4 );
+  wxTextInputStream text4( inputFile4 );
+
+  wxString line;
+
+  if (!m_TestMode)
+  {
+    mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)0.0));
+  }
+
+  // Write to final file
   if (!f_Out.bad())
   {
     // Add TAG
@@ -558,17 +934,13 @@ void medOpExporterGRFWS::WriteFast()
 
     // Add the fifth and sixth line containing the corner values
     f_Out << "1,";
-    double bounds[6];
-    bounds[0] = 0;
-    m_PlatformLeft->GetOutput()->GetVTKData()->GetBounds(bounds);
-    bounds[4] = bounds[4] + DELTA;
-    f_Out << bounds[0] << "," << bounds[3] << "," << bounds[4] << "," << bounds[1] << "," << bounds[3] << "," << bounds[4] << ","
-        << bounds[1] << "," << bounds[2] << "," << bounds[4] << "," << bounds[0] << "," << bounds[2] << "," << bounds[4] << "\n";
+    
+    f_Out << bounds1[0] << "," << bounds1[3] << "," << bounds1[4] << "," << bounds1[1] << "," << bounds1[3] << "," << bounds1[4] << ","
+        << bounds1[1] << "," << bounds1[2] << "," << bounds1[4] << "," << bounds1[0] << "," << bounds1[2] << "," << bounds1[4] << "\n";
     f_Out << "2,";
-    m_PlatformRight->GetOutput()->GetVTKData()->GetBounds(bounds);
-    bounds[4] = bounds[4] + DELTA;
-    f_Out << bounds[0] << "," << bounds[3] << "," << bounds[4] << "," << bounds[1] << "," << bounds[3] << "," << bounds[4] << ","
-        << bounds[1] << "," << bounds[2] << "," << bounds[4] << "," << bounds[0] << "," << bounds[2] << "," << bounds[4] << "\n";
+
+    f_Out << bounds2[0] << "," << bounds2[3] << "," << bounds2[4] << "," << bounds2[1] << "," << bounds2[3] << "," << bounds2[4] << ","
+        << bounds2[1] << "," << bounds2[2] << "," << bounds2[4] << "," << bounds2[0] << "," << bounds2[2] << "," << bounds2[4] << "\n";
 
     //Add a blank line 
     f_Out << "\n";
@@ -582,56 +954,204 @@ void medOpExporterGRFWS::WriteFast()
     //Add a blank line 
     f_Out << "\n";
 
-    std::vector<mafTimeStamp> kframes1;
-    std::vector<mafTimeStamp> kframes2;
-    m_ForceLeft->GetTimeStamps(kframes1);
-    m_ForceRight->GetTimeStamps(kframes2);
-    std::vector<mafTimeStamp> kframes = MergeTimeStamps(kframes1,kframes2);
-    int size = kframes.size();
-
-    // Get first data to set right input position
-    m_ForceLeft->SetTimeStamp(kframes.at(0));
-    m_ForceLeft->Update();
-    m_ForceLeft->GetOutput()->GetVTKData()->Update();
-    m_MomentLeft->SetTimeStamp(kframes.at(0));
-    m_MomentLeft->Update();
-    m_MomentLeft->GetOutput()->GetVTKData()->Update();
-    m_ForceRight->SetTimeStamp(kframes.at(0));
-    m_ForceRight->Update();
-    m_ForceRight->GetOutput()->GetVTKData()->Update();
-    m_MomentRight->SetTimeStamp(kframes.at(0));
-    m_MomentRight->Update();
-    m_MomentRight->GetOutput()->GetVTKData()->Update();
-
-    double* init_posCOPL = m_ForceLeft->GetOutput()->GetVTKData()->GetPoint(0);
-    double* init_posCOPR = m_ForceRight->GetOutput()->GetVTKData()->GetPoint(0);
-    double* init_posML = m_MomentLeft->GetOutput()->GetVTKData()->GetPoint(1);
-    double* init_posMR = m_MomentRight->GetOutput()->GetVTKData()->GetPoint(1);
-
-    medGRFVector* vFL = new medGRFVector;
-    medGRFVector* vFR = new medGRFVector;
-    medGRFVector* vML = new medGRFVector;
-    medGRFVector* vMR = new medGRFVector;
-    for (int i=0;i<6;i++)
-    {
-      vFL->m_Bounds[i]=0;
-      vFR->m_Bounds[i]=0;
-      vML->m_Bounds[i]=0;
-      vMR->m_Bounds[i]=0;
-    }
-    vFL->m_SwitchX = vFL->m_SwitchY = vFL->m_SwitchZ = 0;
-    vFR->m_SwitchX = vFR->m_SwitchY = vFR->m_SwitchZ = 0;
-    vML->m_SwitchX = vML->m_SwitchY = vML->m_SwitchZ = 0;
-    vMR->m_SwitchX = vMR->m_SwitchY = vMR->m_SwitchZ = 0;
-
-    //Add times and values; time is always the first row
     for (int i=0;i<size;i++)
     {
       double time = kframes.at(i);
 
-      // ---------------------
-      // FORCE LEFT ----------
-      // ---------------------
+      // TIME
+      f_Out << time << ",";
+        
+      // COP L
+      line = text1.ReadLine();
+      f_Out << line << ",";
+        
+      // REF L
+      f_Out << 0 << "," << 0 << "," << 0 << ",";
+        
+      // FORCE L
+      line = text1.ReadLine();
+      f_Out << line << ",";
+
+      // MOMENT L
+      line = text2.ReadLine();
+      f_Out << line << ",";
+              
+      // COP R
+      line = text3.ReadLine();
+      f_Out << line << ",";
+        
+      // REF R
+      f_Out << 0 << "," << 0 << "," << 0 << ",";
+        
+      // FORCE R
+      line = text3.ReadLine();
+      f_Out << line << ",";
+      
+      // MOMENT R
+      line = text4.ReadLine();
+      f_Out << line << "\n";
+
+      if (!m_TestMode)
+      {
+        mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)(((double) i)/((double) size)*100.)));
+      }
+
+    }
+
+    f_Out.close();
+  } 
+
+  delete vFL;
+  delete vFR;
+  delete vML;
+  delete vMR;
+
+  if (!m_TestMode)
+  {
+    mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
+    wxSetCursor(wxCursor(wxCURSOR_DEFAULT));
+    cppDEL(wait);
+  }
+}
+//----------------------------------------------------------------------------
+void medOpExporterGRFWS::WriteSingleVector()   
+//----------------------------------------------------------------------------
+{
+  wxBusyInfo *wait = NULL;
+  mafString info = "Loading data from files";
+  if (!m_TestMode)
+  {
+    wxSetCursor(wxCursor(wxCURSOR_WAIT));
+    mafEventMacro(mafEvent(this,PROGRESSBAR_SET_TEXT,&info));
+	  mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
+    wait = new wxBusyInfo("This may take several minutes, please be patient...");
+  }
+  
+  std::ofstream f_Out(m_File);
+
+  std::vector<mafTimeStamp> kframes;
+  int size = kframes.size();
+
+  if (!f_Out.bad())
+  {
+    // Add TAG
+    f_Out << TAG_FORMAT_V << "\n";
+
+    // Add the first row containing the frequency
+    f_Out << FREQ << ",Hz\n";
+
+    // Add a dummy line
+    f_Out << "--- VECTOR SECTION ---\n";
+    
+    // Add a line containing the forces tag
+    f_Out << "FRAME,COP1:X,COP1:Y,COP1:Z,Ref1:X,Ref1:Y,Ref1:Z,Force1:X,Force1:Y,Force1:Z\n";
+
+    //Add a blank line 
+    f_Out << "\n";
+
+    double copL[3]; 
+    // ---------------------
+    // SINGLE VECTOR -------
+    // ---------------------
+    for (int i=0;i<size;i++)
+    {
+      double time = kframes.at(i);
+
+      // TIME
+      f_Out << time << ",";
+
+      m_ForceLeft->SetTimeStamp(time);
+      m_ForceLeft->Update();
+      m_ForceLeft->GetOutput()->GetVTKData()->Update();
+        
+      vtkPolyData* polyFL = (vtkPolyData*)m_ForceLeft->GetOutput()->GetVTKData();
+       
+      double* p = polyFL->GetPoint(0);
+      copL[0] = p[0];
+      copL[1] = p[1];
+      copL[2] = p[2];
+
+      // COP 
+      f_Out << copL[0] << "," << copL[1] << "," << copL[2] << "\n";
+
+      p = polyFL->GetPoint(1);
+      double fL[3];
+      fL[0] = p[0];
+      fL[1] = p[1];
+      fL[2] = p[2];
+
+      // REF 
+      f_Out << 0 << "," << 0 << "," << 0 << ",";
+
+      // FORCE
+      f_Out << fL[0]-copL[0] << "," << fL[1]-copL[1] << "," << fL[2]-copL[2] << "\n";
+
+      if (!m_TestMode)
+      {
+        mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)(((double) i)/((double) size)*100.)));
+      }
+    }
+
+    f_Out.close();
+  }
+}
+//----------------------------------------------------------------------------
+void medOpExporterGRFWS::WriteSingleVectorFast()   
+//----------------------------------------------------------------------------
+{  
+  wxBusyInfo *wait = NULL;
+  mafString info = "Loading data from files";
+  if (!m_TestMode)
+  {
+    wxSetCursor(wxCursor(wxCURSOR_WAIT));
+    mafEventMacro(mafEvent(this,PROGRESSBAR_SET_TEXT,&info));
+	  mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
+    wait = new wxBusyInfo("This may take several minutes, please be patient...");
+  }
+
+  std::ofstream f_Out(m_File);
+
+  std::vector<mafTimeStamp> kframes;
+  int size = kframes.size();
+
+  // Get first data to set right input position
+  m_ForceLeft->SetTimeStamp(kframes.at(0));
+  m_ForceLeft->Update();
+  m_ForceLeft->GetOutput()->GetVTKData()->Update();
+  double* init_posCOPL = m_ForceLeft->GetOutput()->GetVTKData()->GetPoint(0);
+  medGRFVector* vFL = new medGRFVector;
+  for (int i=0;i<6;i++)
+  {
+    vFL->m_Bounds[i]=0;
+  }
+  vFL->m_SwitchX = vFL->m_SwitchY = vFL->m_SwitchZ = 0;
+
+  if (!f_Out.bad())
+  {
+    // Add TAG
+    f_Out << TAG_FORMAT_V << "\n";
+
+    // Add the first row containing the frequency
+    f_Out << FREQ << ",Hz\n";
+
+    // Add a dummy line
+    f_Out << "--- VECTOR SECTION ---\n";
+    
+    // Add a line containing the forces tag
+    f_Out << "FRAME,COP1:X,COP1:Y,COP1:Z,Ref1:X,Ref1:Y,Ref1:Z,Force1:X,Force1:Y,Force1:Z\n";
+
+    //Add a blank line 
+    f_Out << "\n";
+
+    // ---------------------
+    // SINGLE VECTOR -------
+    // ---------------------
+    for (int i=0;i<size;i++)
+    {
+      double time = kframes.at(i);
+
+      // TIME
+      f_Out << time << ",";
 
       // Get bounds
       mafOBB obb;
@@ -647,25 +1167,22 @@ void medOpExporterGRFWS::WriteFast()
       int ind1 = ((vFL->m_SwitchX==0) ? 1 : 0);
       int ind2 = ((vFL->m_SwitchY==0) ? 2 : 3);
       int ind3 = ((vFL->m_SwitchZ==0) ? 4 : 5);
-      CheckVectorToSwitch(i,ind1,ind2,ind3,vFL,init_posCOPL,m_ForceLeft,0,time);
+      CheckVectorToSwitch(i,ind1,ind2,ind3,vFL,init_posCOPL,0,m_ForceLeft,0,time);
       ind1 = ((vFL->m_SwitchX==0) ? 1 : 0);
       ind2 = ((vFL->m_SwitchY==0) ? 2 : 3);
       ind3 = ((vFL->m_SwitchZ==0) ? 4 : 5);
-
-      // TIME
-      f_Out << time << ",";
-            
-      // COP L
+          
+      // COP 
       double copL[3];
       copL[0] = vFL->m_Bounds[ind1];
       copL[1] = vFL->m_Bounds[ind2];
       copL[2] = vFL->m_Bounds[ind3];
-      f_Out << copL[0] << "," << copL[1] << "," << copL[2] << ",";
-      
-      // REF L
+      f_Out << copL[0] << "," << copL[1] << "," << copL[2] << "\n";
+
+      // REF 
       f_Out << 0 << "," << 0 << "," << 0 << ",";
 
-      // FORCE L
+      // FORCE 
       ind1 = ((vFL->m_SwitchX==0) ? 0 : 1);
       ind2 = ((vFL->m_SwitchY==0) ? 3 : 2);
       ind3 = ((vFL->m_SwitchZ==0) ? 5 : 4);
@@ -673,107 +1190,7 @@ void medOpExporterGRFWS::WriteFast()
       fL[0] =  vFL->m_Bounds[ind1];
       fL[1] =  vFL->m_Bounds[ind2];
       fL[2] =  vFL->m_Bounds[ind3];
-      f_Out << fL[0]-copL[0] << "," << fL[1]-copL[1] << "," << fL[2]-copL[2] << ",";
-
-      // ---------------------
-      // MOMENT LEFT ---------
-      // ---------------------
-
-      // Get bounds
-      m_MomentLeft->GetOutput()->GetBounds(obb,time);
-      vML->m_Bounds[0] = (obb.m_Bounds)[0];
-      vML->m_Bounds[1] = (obb.m_Bounds)[1];
-      vML->m_Bounds[2] = (obb.m_Bounds)[2];
-      vML->m_Bounds[3] = (obb.m_Bounds)[3];
-      vML->m_Bounds[4] = (obb.m_Bounds)[4];
-      vML->m_Bounds[5] = (obb.m_Bounds)[5];
-
-      // Switch direction if case
-      ind1 = ((vML->m_SwitchX==0) ? 1 : 0);
-      ind2 = ((vML->m_SwitchY==0) ? 3 : 2);
-      ind3 = ((vML->m_SwitchZ==0) ? 5 : 4);
-      CheckVectorToSwitch(i,ind1,ind2,ind3,vML,init_posML,m_MomentLeft,1,time);
-      ind1 = ((vML->m_SwitchX==0) ? 1 : 0);
-      ind2 = ((vML->m_SwitchY==0) ? 3 : 2);
-      ind3 = ((vML->m_SwitchZ==0) ? 5 : 4);
-
-      // MOMENT L
-      double mL[3];
-      mL[0] = vML->m_Bounds[ind1];
-      mL[1] = vML->m_Bounds[ind2];
-      mL[2] = vML->m_Bounds[ind3];
-      f_Out << mL[0]-copL[0] << "," << mL[1]-copL[1] << "," << mL[2]-copL[2] << ",";
-
-      // ---------------------
-      // FORCE RIGHT ---------
-      // ---------------------
-
-      // Get bounds
-      m_ForceRight->GetOutput()->GetBounds(obb,time);
-      vFR->m_Bounds[0] = (obb.m_Bounds)[0];
-      vFR->m_Bounds[1] = (obb.m_Bounds)[1];
-      vFR->m_Bounds[2] = (obb.m_Bounds)[2];
-      vFR->m_Bounds[3] = (obb.m_Bounds)[3];
-      vFR->m_Bounds[4] = (obb.m_Bounds)[4];
-      vFR->m_Bounds[5] = (obb.m_Bounds)[5];
-
-      // Switch direction if case
-      ind1 = ((vFR->m_SwitchX==0) ? 0 : 1);
-      ind2 = ((vFR->m_SwitchY==0) ? 3 : 2);
-      ind3 = ((vFR->m_SwitchZ==0) ? 4 : 5);
-      CheckVectorToSwitch(i,ind1,ind2,ind3,vFR,init_posCOPR,m_ForceRight,0,time);
-      ind1 = ((vFR->m_SwitchX==0) ? 0 : 1);
-      ind2 = ((vFR->m_SwitchY==0) ? 3 : 2);
-      ind3 = ((vFR->m_SwitchZ==0) ? 4 : 5);
-
-      // COP R
-      double copR[3];
-      copR[0] = vFR->m_Bounds[ind1];
-      copR[1] = vFR->m_Bounds[ind2];
-      copR[2] = vFR->m_Bounds[ind3];
-      f_Out << copR[0] << "," << copR[1] << "," << copR[2] << ",";
-      
-      // REF R
-      f_Out << 0 << "," << 0 << "," << 0 << ",";
-      
-      // FORCE R
-      ind1 = (vFR->m_SwitchX==0) ? 1 : 0;
-      ind2 = (vFR->m_SwitchY==0) ? 2 : 3;
-      ind3 = (vFR->m_SwitchZ==0) ? 5 : 4;
-      double fR[3];
-      fR[0] = vFR->m_Bounds[ind1];
-      fR[1] = vFR->m_Bounds[ind2];
-      fR[2] = vFR->m_Bounds[ind3];
-      f_Out << fR[0]-copR[0] << "," << fR[1]-copR[1] << "," << fR[2]-copR[2] << ",";
-
-      // ---------------------
-      // MOMENT RIGHT --------
-      // ---------------------
-      
-      // Get bounds
-      m_MomentRight->GetOutput()->GetBounds(obb,time);
-      vMR->m_Bounds[0] = (obb.m_Bounds)[0];
-      vMR->m_Bounds[1] = (obb.m_Bounds)[1];
-      vMR->m_Bounds[2] = (obb.m_Bounds)[2];
-      vMR->m_Bounds[3] = (obb.m_Bounds)[3];
-      vMR->m_Bounds[4] = (obb.m_Bounds)[4];
-      vMR->m_Bounds[5] = (obb.m_Bounds)[5];
-
-      // Switch direction if case
-      ind1 = ((vMR->m_SwitchX==0) ? 0 : 1);
-      ind2 = ((vMR->m_SwitchY==0) ? 3 : 2);
-      ind3 = ((vMR->m_SwitchZ==0) ? 5 : 4);
-      CheckVectorToSwitch(i,ind1,ind2,ind3,vMR,init_posMR,m_MomentRight,1,time);
-      ind1 = ((vMR->m_SwitchX==0) ? 0 : 1);
-      ind2 = ((vMR->m_SwitchY==0) ? 3 : 2);
-      ind3 = ((vMR->m_SwitchZ==0) ? 5 : 4);
-
-      // MOMENT R
-      double mR[3];
-      mR[0] = vMR->m_Bounds[ind1];
-      mR[1] = vMR->m_Bounds[ind2];
-      mR[2] = vMR->m_Bounds[ind3];
-      f_Out << mR[0]-copR[0] << "," << mR[1]-copR[1] << "," << mR[2]-copR[2] << "\n";
+      f_Out << fL[0]-copL[0] << "," << fL[1]-copL[1] << "," << fL[2]-copL[2] << "\n";
 
       if (!m_TestMode)
       {
@@ -781,24 +1198,118 @@ void medOpExporterGRFWS::WriteFast()
       }
     }
 
-    delete vFL;
-    delete vFR;
-    delete vML;
-    delete vMR;
-    
     f_Out.close();
-  }  
+  }
+
+  delete vFL;
+}
+//----------------------------------------------------------------------------
+void medOpExporterGRFWS::CalculateTresholds()
+//----------------------------------------------------------------------------
+{
+  wxBusyInfo *wait = NULL;
+  if (!m_TestMode)
+  {
+    wxSetCursor(wxCursor(wxCURSOR_WAIT));
+    wait = new wxBusyInfo("Calculating tresholds...");
+  }
+  // Calculate tresholds
+  if (m_ForceLeft)
+  {
+    m_Treshold.at(0) = CalculateTreshold(m_ForceLeft);
+  }
+  if (m_MomentLeft)
+  {
+    m_Treshold.at(1) = CalculateTreshold(m_MomentLeft);
+  }
+  if (m_ForceRight)
+  {
+    m_Treshold.at(2) = CalculateTreshold(m_ForceRight);
+  }
+  if (m_MomentRight)
+  {
+    m_Treshold.at(3) = CalculateTreshold(m_MomentRight);
+  }
 
   if (!m_TestMode)
   {
-    wxMessageBox("THE FAST METHOD ENDED SUCCESSFULLY!\nPlease import the output and compare the result with the original!","GRF EXPORTER FAST",wxOK);
-    mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
+    m_AdvanceSettings->Update();  
     wxSetCursor(wxCursor(wxCURSOR_DEFAULT));
     cppDEL(wait);
   }
 }
 //----------------------------------------------------------------------------
-void medOpExporterGRFWS::CheckVectorToSwitch(int frame, int coor1_ID, int coor2_ID, int coor3_ID, medGRFVector* v, double* original_pos, mafVMEVector* vVME, int pointID, mafTimeStamp time)
+double medOpExporterGRFWS::CalculateTreshold(mafVMEVector* v)
+//----------------------------------------------------------------------------
+{
+  std::vector<double*> new_value;
+  std::vector<double*> old_value;
+  double max[3];
+  max[0] = max[1] = max[2] = 0;
+  if (v)
+  {
+    std::vector<mafTimeStamp> kframes;
+    std::vector<mafTimeStamp> sframes;
+    v->GetTimeStamps(kframes);
+    int mod = (int)(kframes.size()/m_Resolution);
+    for (int i=0;i<m_Resolution;i++)
+    {
+      if ((i*mod)<(kframes.size()))
+      {
+        sframes.push_back(kframes.at(i*mod));
+      }
+    }
+    for (int i=0;i<sframes.size();i++)
+    {
+      mafTimeStamp t = sframes.at(i);
+      
+      mafOBB obb;
+      v->GetOutput()->GetBounds(obb,t);
+      double* p = new double[3];
+      p[0] = (obb.m_Bounds)[1]-(obb.m_Bounds)[0];
+      p[1] = (obb.m_Bounds)[3]-(obb.m_Bounds)[2];
+      p[2] = (obb.m_Bounds)[5]-(obb.m_Bounds)[4];
+      new_value.push_back(p);
+      double maxx = 0;
+      double maxy = 0; 
+      double maxz = 0; 
+      int s1 = old_value.size();
+      int s2 = new_value.size();
+      if (s1>0)
+      {
+        maxx = abs( (old_value.at(s1-1))[0] - (new_value.at(s2-1))[0] );
+        maxy = abs( (old_value.at(s1-1))[1] - (new_value.at(s2-1))[1] );
+        maxz = abs( (old_value.at(s1-1))[2] - (new_value.at(s2-1))[2] );
+      }
+      old_value.push_back(p);
+      if (maxx > max[0])
+      {
+        max[0] = maxx;
+      }
+      if (maxy > max[1])
+      {
+        max[1] = maxy;
+      }
+      if (maxz > max[2])
+      {
+        max[2] = maxz;
+      }
+    }
+  }
+  double r = ((max[0]>max[1])?max[0]:max[1]);
+  r = ((r>max[2])?r:max[2]);
+
+  for (int i=0;i<new_value.size();i++)
+  {
+    cppDEL(new_value.at(i));
+  }
+  new_value.clear();
+  old_value.clear();
+
+  return r;
+}
+//----------------------------------------------------------------------------
+void medOpExporterGRFWS::CheckVectorToSwitch(int frame, int coor1_ID, int coor2_ID, int coor3_ID, medGRFVector* v, double* original_pos, int tr, mafVMEVector* vVME, int pointID, mafTimeStamp time)
 //----------------------------------------------------------------------------
 {
   /* Check right input position:
@@ -894,7 +1405,7 @@ void medOpExporterGRFWS::CheckVectorToSwitch(int frame, int coor1_ID, int coor2_
       {
         v->m_IsDecreasing[j] = 0;
       }
-      if (!switched && (distance[j]<m_Treshold && v->m_OldDistance[j]<m_Treshold) && (v->m_WasDecreasing[j] && !v->m_IsDecreasing[j]) )
+      if (!switched && (distance[j]<m_Treshold[tr] && v->m_OldDistance[j]<m_Treshold[tr]) && (v->m_WasDecreasing[j] && !v->m_IsDecreasing[j]) )
       {
         vVME->SetTimeStamp(time);
         vVME->Update();

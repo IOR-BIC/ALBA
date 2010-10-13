@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterGRFWS.h,v $
   Language:  C++
-  Date:      $Date: 2010-10-07 10:02:42 $
-  Version:   $Revision: 1.1.2.8 $
+  Date:      $Date: 2010-10-13 08:46:42 $
+  Version:   $Revision: 1.1.2.9 $
   Authors:   Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2004
@@ -106,6 +106,10 @@ public:
     */
   void WriteFast();
 
+  /* Write single vector */ 
+  void WriteSingleVector();
+  void WriteSingleVectorFast();
+
   /** Set the filename for the file to export */
   void SetFileName(const char *file_name);
 
@@ -125,7 +129,24 @@ public:
   void RemoveTempFiles();
 
 protected:
+
+  enum ID_TRESHOLDS
+	{
+		ID_FL = MINID,
+		ID_ML,
+		ID_FR,
+    ID_MR,
+    ID_RES,
+    ID_FAST,
+    MINID
+	};
  
+  /* Calculate proposed tresholds */
+  void CalculateTresholds();
+
+  /* Calculate a single treshold for a single vector */
+  double CalculateTreshold(mafVMEVector* v);
+  
   /** Merge time stamps of platforms */
   std::vector<mafTimeStamp> MergeTimeStamps(std::vector<mafTimeStamp> kframes1,std::vector<mafTimeStamp> kframes2);
 
@@ -136,11 +157,12 @@ protected:
                         coor3_ID = index of the third point coordinate to check consistency
                         v = vector structure with all its information
                         original_pos = position of the real point (at frame 0)
+                        tr = treshold value id
                         vVME = VME associated with the vector
                         pointID = id of the original point in the VTK data with which we must compare the guessed value
                         time = timestamp 
   */
-  void CheckVectorToSwitch(int frame, int coor1_ID, int coor2_ID, int coor3_ID, medGRFVector* v, double* original_pos, mafVMEVector* vVME = NULL, int pointID = 0, mafTimeStamp time = 0);
+  void CheckVectorToSwitch(int frame, int coor1_ID, int coor2_ID, int coor3_ID, medGRFVector* v, double* original_pos, int tr = -1, mafVMEVector* vVME = NULL, int pointID = 0, mafTimeStamp time = 0);
 
   mafVMESurface       *m_PlatformLeft;
   mafVMESurface       *m_PlatformRight;
@@ -150,8 +172,11 @@ protected:
   mafVMEVector        *m_MomentRight;
   mafVMEGroup         *m_Group;
 
-  double m_Treshold;
+  std::vector<double> m_Treshold;
   int m_FastMethod;
+  int m_Resolution;
+
+  mafGUI* m_AdvanceSettings;
 
 	wxString m_File;
   wxString m_File_temp1;
