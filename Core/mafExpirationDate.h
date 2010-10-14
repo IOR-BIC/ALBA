@@ -1,13 +1,13 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: mafExpirationDate.h,v $
-  Language:  C++
-  Date:      $Date: 2010-10-14 10:08:03 $
-  Version:   $Revision: 1.1.2.5 $
-  Authors:   Daniele Giunchi
+Program:   Multimod Application Framework
+Module:    $RCSfile: mafExpirationDate.h,v $
+Language:  C++
+Date:      $Date: 2010-10-14 13:40:30 $
+Version:   $Revision: 1.1.2.6 $
+Authors:   Daniele Giunchi
 ==========================================================================
-  Copyright (c) 2002/2004
-  CINECA - Interuniversity Consortium (www.cineca.it) 
+Copyright (c) 2002/2004
+CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
 #ifndef __mafExpirationDate_H__
@@ -27,74 +27,80 @@ class wxDateTime;
 
 /**
 Class Name: mafExpirationDate.
-  Class that supplies API for handling expiration based on simple control of local date
-  in the machine in which the application is installed.
+Class that supplies API for handling expiration based on simple control of local date
+in the machine in which the application is installed.
 */
 class mafExpirationDate : public mafExpiration
 {
 public:
-  /** Control trial period is over */
+	/** Control trial period is over */
 	/*virtual*/ bool HasExpired();
-  /** Retrieve information */
-  /*virtual*/ const char* GetInformation(){return m_Information.c_str();};
 
-  /** constructor, with numerOfDays after the first access of free trial period */
+	/** Retrieve expiration information */
+	/*virtual*/ const char* GetInformation(){return m_Information.c_str();};
+
+	/** constructor, with numerOfDays after the first access of free trial period */
 	mafExpirationDate(int trialNumberOfDays);
-  /** constructor, with expiration date after the first access of free trial period */
-  mafExpirationDate(int year, unsigned short month, unsigned short day);
-  /** constructor, that accept a string formatted as YYYY-MM-DD */ 
-  mafExpirationDate(const char *dateString);
 
-  /** set version of application*/
-  void SetApplicationVersion(const char* version){m_ApplicationVersion = version;}
+	/** constructor, with expiration date after the first access of free trial period */
+	mafExpirationDate(int year, unsigned short month, unsigned short day);
 
-  /** set demo version flag*/
-  void SetDemoVersion(bool enable){m_DemoVersionFlag = enable;}
+	/** constructor, that accept a string formatted as YYYY-MM-DD or the string NEVER. 
+	If the constructor mafExpirationDate("NEVER") is used the HasExpired() method will
+	always return false */ 
+	mafExpirationDate(const char *dateString);
 
-  /** destructor. */
+	/** set version of application*/
+	void SetApplicationVersion(const char* version){m_ApplicationVersion = version;}
+
+	/** set demo version flag*/
+	void SetDemoVersion(bool enable){m_DemoVersionFlag = enable;}
+
+	/** destructor. */
 	virtual ~mafExpirationDate();
 
 private:
 
-  /** Get expiration date ticks from permanent expiration file */
-  long GetExpirationDateTicksFromPermanentExpirationFile();
-  /** Create filename absolute path of the file to check. */
-  void InitializePathFileName();
-  /** check if file exists and update with last information*/
-  void CheckFile();
-  /** check if locally the expiration date is reached. Locally means the local machine.*/
-  bool CheckLocalTimeExpiration();
-  /** check if permanent expiration is reached. */
-  bool CheckPermanentExpiration();
-  /** activate permanent expiration. */
-  void ActivatePermanentExpiration();
+	/** Get expiration date ticks from permanent expiration file */
+	long GetExpirationDateTicksFromPermanentExpirationFile();
+	/** Create filename absolute path of the file to check. */
+	void InitializePathFileName();
+	/** check if file exists and update with last information*/
+	void CheckFile();
+	/** check if locally the expiration date is reached. Locally means the local machine.*/
+	bool CheckLocalTimeExpiration();
+	/** check if permanent expiration is reached. */
+	bool CheckPermanentExpiration();
+	/** activate permanent expiration. */
+	void ActivatePermanentExpiration();
 	/** Simple Obfuscator for filename*/
-  void Obfuscate(std::string &toObfuscate);
-  /** Check version application, if different remove all time check  files */
-  void CheckApplicationVersion();
-  /** Check if application is a demo */
-  bool CheckDemoVersion();
-  /** Giving a string as parameter and a vector of strings, it clean the vector and fill it with splitted substring controlling the separator.
-  It returns the number of elements*/
-  static int SplitString(std::string input, const char separator, std::vector<std::string> &outputSubStrings);
+	void Obfuscate(std::string &toObfuscate);
+	/** Check version application, if different remove all time check  files */
+	void CheckApplicationVersion();
+	/** Check if application is a demo */
+	bool CheckDemoVersion();
+	/** Giving a string as parameter and a vector of strings, it clean the vector and fill it with splitted substring controlling the separator.
+	It returns the number of elements*/
+	static int SplitString(std::string input, const char separator, std::vector<std::string> &outputSubStrings);
 
-  
-  wxDateTime *m_CurrentDateTime;
-  wxDateTime *m_LastDateTime;
-  wxDateTime *m_FirstAccessDateTime;
 
-  int m_TrialNumberOfDays;
-  wxDateTime *m_ExpirationDate;
+	wxDateTime *m_CurrentDateTime;
+	wxDateTime *m_LastDateTime;
+	wxDateTime *m_FirstAccessDateTime;
 
-  std::string m_ControlFileName;
-  std::string m_Information;
+	int m_TrialNumberOfDays;
+	wxDateTime *m_ExpirationDate;
 
-  std::string m_ApplicationVersion;
-  std::string m_ApplicationVersionFileName;
+	std::string m_ControlFileName;
+	std::string m_Information;
 
-  std::string m_PermanentExpirationFileName;
+	std::string m_ApplicationVersion;
+	std::string m_ApplicationVersionFileName;
 
-  bool m_DemoVersionFlag;
-	
+	std::string m_PermanentExpirationFileName;
+
+	bool m_DemoVersionFlag;
+	bool m_NeverExpires;
+
 };
 #endif // mafExpirationDate
