@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeManager.h,v $
   Language:  C++
-  Date:      $Date: 2010-07-08 15:40:35 $
-  Version:   $Revision: 1.6.2.2 $
+  Date:      $Date: 2010-10-14 16:08:18 $
+  Version:   $Revision: 1.6.2.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -97,8 +97,9 @@ public:
 	/** Return the tree's root. */
   mafVMERoot *GetRoot() { return m_Root;};		
 
-	/** Set the application stamp; this is the mark of the specific vertical application (must be equal to the application name). */
-  void SetApplicationStamp(wxString appstamp) {m_AppStamp = appstamp;};
+  /** Set the application stamp; this is the mark of the specific vertical application (is often equal to the application name). */
+  void SetApplicationStamp(wxString appstamp);
+  void SetApplicationStamp(std::vector<wxString> appstamp);
 
 	/** Set the flag for .bak file generation on saving .msf file. */
 	void MakeBakFileOnSave(bool bakfile = true) {m_MakeBakFile = bakfile;}
@@ -117,7 +118,7 @@ protected:
   bool      m_MakeBakFile;
   wxString  m_MsfDir;
   wxString  m_Wildc;
-  wxString  m_AppStamp;
+  std::vector<wxString>  m_AppStamp;
   wxString  m_MsfFile;
   wxString  m_ZipFile;
   wxString  m_MergeFile;

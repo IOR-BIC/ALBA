@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.h,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 14:51:13 $
-  Version:   $Revision: 1.46.2.1 $
+  Date:      $Date: 2010-10-14 16:08:18 $
+  Version:   $Revision: 1.46.2.2 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -128,6 +128,7 @@ public:
   if set to OPEN_ALL_DATA let's the application to open all msf file. 
   As default the application stamp is the name of the application and it is set into the Show() method. */
   void SetApplicationStamp(mafString &app_stamp);
+  void SetApplicationStamp(std::vector<mafString> app_stamp);
 
   /** Allow to set the flag for views to by External to the main frame or to by child of parent frame. */
   void SetExternalViewFlag(bool external = false);

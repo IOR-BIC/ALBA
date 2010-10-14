@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-07-08 15:40:35 $
-  Version:   $Revision: 1.7.22.2 $
+  Date:      $Date: 2010-10-14 16:08:18 $
+  Version:   $Revision: 1.7.22.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -61,6 +61,8 @@ mafNodeManager::~mafNodeManager()
 {
   if(m_Root) NotifyRemove( (mafNode*)m_Root ); // //SIL. 11-4-2005:  - cast root to node -- maybe to be removed
   mafDEL(m_Root);
+
+  m_AppStamp.clear();
 
   //@@ if(m_storage)	m_storage->Delete();
   delete m_Config;  
@@ -438,6 +440,21 @@ bool mafNodeManager::AskConfirmAndSave()
 		if(answer == wxYES)    MSFSave();
 	}
 	return go;
+}
+//----------------------------------------------------------------------------
+void mafNodeManager::SetApplicationStamp(wxString appstamp)
+//----------------------------------------------------------------------------
+{
+  m_AppStamp.push_back(appstamp);
+}
+//----------------------------------------------------------------------------
+void mafNodeManager::SetApplicationStamp(std::vector<wxString> appstamp)
+//----------------------------------------------------------------------------
+{
+  for (int i=0; i<appstamp.size();i++)
+  {
+    m_AppStamp.push_back(appstamp.at(i));
+  }
 }
 //----------------------------------------------------------------------------
 void mafNodeManager::UpdateFromTag(mafNode *n)

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.h,v $
   Language:  C++
-  Date:      $Date: 2010-03-04 15:58:59 $
-  Version:   $Revision: 1.20.2.2 $
+  Date:      $Date: 2010-10-14 16:08:17 $
+  Version:   $Revision: 1.20.2.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -120,8 +120,9 @@ public:
   /** Return the storage associated to the current tree.*/
   mafVMEStorage *GetStorage();
 
-	/** Set the application stamp; this is the mark of the specific vertical application (must be equal to the application name). */
-  void SetApplicationStamp(mafString &appstamp) {m_AppStamp = appstamp;};
+	/** Set the application stamp; this is the mark of the specific vertical application (is often equal to the application name). */
+  void SetApplicationStamp(mafString &appstamp);
+  void SetApplicationStamp(std::vector<mafString> appstamp);
 
 	/** Set the flag for bak file generation on saving MSF file. */
 	void MakeBakFileOnSave(bool bakfile = true) {m_MakeBakFile = bakfile;}
@@ -171,7 +172,7 @@ protected:
 
   bool                m_MakeBakFile;      ///< Flag used to create or not the backup file of the saved msf.
   mafString           m_MSFDir;           ///< Directory name in which is present the msf file.
-  mafString           m_AppStamp;         ///< Application stamp for our application.
+  std::vector<mafString> m_AppStamp;      ///< Application stamps for our application.
   mafString           m_MSFFile;          ///< File name of the data associated to the tree.
   mafString           m_ZipFile;          ///< File name of compressed archive in which save the data associated to the tree.
   mafString           m_TmpDir;           ///< Temporary directory for zmsf extraction

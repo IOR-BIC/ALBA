@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-08-17 08:05:05 $
-  Version:   $Revision: 1.139.2.3 $
+  Date:      $Date: 2010-10-14 16:08:18 $
+  Version:   $Revision: 1.139.2.4 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -306,6 +306,15 @@ void mafLogicWithManagers::Show()
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::SetApplicationStamp(mafString &app_stamp)
+//----------------------------------------------------------------------------
+{
+  if (m_VMEManager)
+  {
+    m_VMEManager->SetApplicationStamp(app_stamp);
+  }
+}
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::SetApplicationStamp(std::vector<mafString> app_stamp)
 //----------------------------------------------------------------------------
 {
   if (m_VMEManager)

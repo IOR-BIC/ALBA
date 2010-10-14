@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-03-04 15:59:41 $
-  Version:   $Revision: 1.43.2.3 $
+  Date:      $Date: 2010-10-14 16:08:18 $
+  Version:   $Revision: 1.43.2.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -78,6 +78,7 @@ mafVMEManager::~mafVMEManager()
   if(m_Storage) 
     NotifyRemove( m_Storage->GetRoot() ); // //SIL. 11-4-2005:  - cast root to node -- maybe to be removed
 
+  m_AppStamp.clear();
   m_Listener = NULL;
   m_FileSystem->CleanUpHandlers(); // Handlers are shared trough file systems.
   cppDEL(m_FileSystem);
@@ -142,6 +143,21 @@ mafVMEStorage *mafVMEManager::GetStorage()
   return m_Storage;
 }
 //----------------------------------------------------------------------------
+void mafVMEManager::SetApplicationStamp(mafString &appstamp)
+//----------------------------------------------------------------------------
+{
+  m_AppStamp.push_back(appstamp);
+}
+//----------------------------------------------------------------------------
+void mafVMEManager::SetApplicationStamp(std::vector<mafString> appstamp)
+//----------------------------------------------------------------------------
+{
+  for (int i=0; i<appstamp.size();i++)
+  {
+    m_AppStamp.push_back(appstamp.at(i));
+  }
+}
+//----------------------------------------------------------------------------
 void mafVMEManager::SetLocalCacheFolder(mafString cache_folder)
 //----------------------------------------------------------------------------
 {
@@ -201,7 +217,7 @@ void mafVMEManager::MSFNew(bool notify_root_creation)
 		//Add the application stamps
 		mafTagItem tag_appstamp;
 		tag_appstamp.SetName("APP_STAMP");
-		tag_appstamp.SetValue(this->m_AppStamp.GetCStr());
+		tag_appstamp.SetValue(this->m_AppStamp.at(0).GetCStr());
 		m_Storage->GetRoot()->GetTagArray()->SetTag(tag_appstamp); // set the appstamp tag for the root
     AddCreationDate(m_Storage->GetRoot());
 		mafEventMacro(mafEvent(this,VME_ADDED,m_Storage->GetRoot())); // raise notification events
@@ -357,13 +373,32 @@ void mafVMEManager::MSFOpen(mafString filename)
 		//update the old data files to support Application Stamp
 		mafTagItem tag_appstamp;
 		tag_appstamp.SetName("APP_STAMP");
-		tag_appstamp.SetValue(this->m_AppStamp.GetCStr());
+		tag_appstamp.SetValue(this->m_AppStamp.at(0).GetCStr());
 		root_node->GetTagArray()->SetTag(tag_appstamp); // set appstamp tag of the root
 	}
 	
 	mafString app_stamp;
   app_stamp << root_node->GetTagArray()->GetTag("APP_STAMP")->GetValue();
-	if(app_stamp.Equals("INVALID") || ((!app_stamp.Equals(m_AppStamp.GetCStr())) && (!m_AppStamp.Equals("DataManager")) && (!m_AppStamp.Equals("OPEN_ALL_DATA")))) // Check on file app_stamp
+  // First check for compatibility with all stored App stamps
+  bool stamp_found = false;
+  bool stamp_data_manager_found = false;
+  bool stamp_open_all_found = false;
+  for (int k=0; k<m_AppStamp.size(); k++)
+  {
+    if (app_stamp.Equals(m_AppStamp.at(k).GetCStr()))
+    {
+      stamp_found = true;
+    }
+    if (m_AppStamp.at(k).Equals("DataManager"))
+    {
+      stamp_data_manager_found = true;
+    }
+    if (m_AppStamp.at(k).Equals("OPEN_ALL_DATA"))
+    {
+      stamp_open_all_found = true;
+    }
+  }
+	if(app_stamp.Equals("INVALID") || ((!stamp_found) && (!stamp_data_manager_found) && (!stamp_open_all_found))) // Check on file app_stamp
 	{
 		//Application stamp not valid
 		mafMessage(_("File not valid for this application!"), _("Warning"));
