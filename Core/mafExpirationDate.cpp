@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafExpirationDate.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-04-02 12:57:22 $
-  Version:   $Revision: 1.1.2.9 $
+  Date:      $Date: 2010-10-14 10:08:03 $
+  Version:   $Revision: 1.1.2.10 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -204,6 +204,8 @@ void mafExpirationDate::CheckFile()
   std::ofstream os;
 
   m_CurrentDateTime = new wxDateTime(wxDateTime::UNow());
+
+  // to solve a wxDateTime bug now then 0
   m_CurrentDateTime->SetHour(0);
   m_CurrentDateTime->SetMinute(0);
   m_CurrentDateTime->SetSecond(0);
@@ -253,10 +255,9 @@ void mafExpirationDate::CheckFile()
   toEncrypt.append(tmp);
   toEncrypt.append("\n");
   toEncrypt.append(tempCurrentDateTime);
+  toEncrypt.append("\n");
 
   mafEncryptFileFromMemory(toEncrypt.c_str(),toEncrypt.length(),m_ControlFileName.c_str(), "fattinonfostepervivercomebruti");
-  
-
   
   //debug file
   /*std::ofstream os2;
@@ -303,7 +304,7 @@ void mafExpirationDate::CheckApplicationVersion()
     //create it
     std::string toEncrypt;
     toEncrypt.append(m_ApplicationVersion);
-
+	
     mafEncryptFileFromMemory(toEncrypt.c_str(),toEncrypt.length(),m_ApplicationVersionFileName.c_str(), "fattinonfostepervivercomebruti");
   }
 
@@ -316,7 +317,7 @@ void mafExpirationDate::CheckApplicationVersion()
 
   std::string oldApplicationVersion;
   ss >> oldApplicationVersion;
-  
+
   // the string for version is ${APP_MAJOR_VERSION}_${APP_MINOR_VERSION}_TS_${APP_BUILD_TIMESTAMP}_BUILD_${APP_BUILD_NUMBER}
   // generated during cmake script
   
@@ -411,7 +412,7 @@ bool mafExpirationDate::CheckLocalTimeExpiration()
 //----------------------------------------------------------------------------
 {
   m_Information.clear();
-
+  
   //permanent expiration
   if(CheckPermanentExpiration() == true)
   {
@@ -498,7 +499,16 @@ bool mafExpirationDate::CheckPermanentExpiration()
 {
   if(::wxFileExists(m_PermanentExpirationFileName.c_str()))
   {
-    return true;
+    // get the old expiration date from m_PermanentExpirationFileName
+    long ticksFromFile = GetExpirationDateTicksFromPermanentExpirationFile();
+    long ticksFromExpirationDate = m_ExpirationDate->GetTicks();
+	if (ticksFromExpirationDate >ticksFromFile)
+	{
+		// remove file
+		::wxRemoveFile(m_PermanentExpirationFileName.c_str());
+		return false;
+	}
+	return true;
   }
   else
   {
@@ -509,9 +519,15 @@ bool mafExpirationDate::CheckPermanentExpiration()
 void mafExpirationDate::ActivatePermanentExpiration()
 //----------------------------------------------------------------------------
 {
-  std::ofstream os;
-  os.open(m_PermanentExpirationFileName.c_str());
-  os.close();
+  std::stringstream stringStream;
+  stringStream << m_ExpirationDate->GetTicks();
+
+  std::string tmpExpirationDateTicksString = stringStream.str().c_str();
+ 
+  std::string toEncrypt;
+  toEncrypt.append(tmpExpirationDateTicksString);
+
+  mafEncryptFileFromMemory(toEncrypt.c_str(),toEncrypt.length(),m_PermanentExpirationFileName.c_str(), "fattinonfostepervivercomebruti");
 }
 //----------------------------------------------------------------------------
 void mafExpirationDate::Obfuscate(std::string &toObfuscate) 
@@ -543,4 +559,19 @@ void mafExpirationDate::Obfuscate(std::string &toObfuscate)
 	char num[10];
 	sprintf(num,"%d",number);
 	toObfuscate.append(num);
+}
+
+long mafExpirationDate::GetExpirationDateTicksFromPermanentExpirationFile()
+{
+	// read the v file
+	std::string toDecrypt;
+	mafDecryptFileInMemory(m_PermanentExpirationFileName.c_str(), toDecrypt, "fattinonfostepervivercomebruti");
+
+	std::stringstream ss;
+	ss << toDecrypt;
+
+	long tmpExpirationDateTicks;
+	ss >> tmpExpirationDateTicks;
+
+	return tmpExpirationDateTicks;
 }

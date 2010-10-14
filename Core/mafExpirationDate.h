@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafExpirationDate.h,v $
   Language:  C++
-  Date:      $Date: 2009-10-23 16:33:39 $
-  Version:   $Revision: 1.1.2.4 $
+  Date:      $Date: 2010-10-14 10:08:03 $
+  Version:   $Revision: 1.1.2.5 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -55,11 +55,14 @@ public:
 	virtual ~mafExpirationDate();
 
 private:
+
+  /** Get expiration date ticks from permanent expiration file */
+  long GetExpirationDateTicksFromPermanentExpirationFile();
   /** Create filename absolute path of the file to check. */
   void InitializePathFileName();
   /** check if file exists and update with last information*/
   void CheckFile();
-  /** check if locally the expiration date is reached. */
+  /** check if locally the expiration date is reached. Locally means the local machine.*/
   bool CheckLocalTimeExpiration();
   /** check if permanent expiration is reached. */
   bool CheckPermanentExpiration();
