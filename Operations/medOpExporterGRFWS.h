@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterGRFWS.h,v $
   Language:  C++
-  Date:      $Date: 2010-10-13 08:46:42 $
-  Version:   $Revision: 1.1.2.9 $
+  Date:      $Date: 2010-10-14 10:43:39 $
+  Version:   $Revision: 1.1.2.10 $
   Authors:   Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2004

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterGRFWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-10-13 08:46:42 $
-  Version:   $Revision: 1.1.2.11 $
+  Date:      $Date: 2010-10-14 10:43:39 $
+  Version:   $Revision: 1.1.2.12 $
   Authors:   Simone Brazzale
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -1018,11 +1018,9 @@ void medOpExporterGRFWS::WriteSingleVector()
 //----------------------------------------------------------------------------
 {
   wxBusyInfo *wait = NULL;
-  mafString info = "Loading data from files";
   if (!m_TestMode)
   {
     wxSetCursor(wxCursor(wxCURSOR_WAIT));
-    mafEventMacro(mafEvent(this,PROGRESSBAR_SET_TEXT,&info));
 	  mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
     wait = new wxBusyInfo("This may take several minutes, please be patient...");
   }
@@ -1030,6 +1028,7 @@ void medOpExporterGRFWS::WriteSingleVector()
   std::ofstream f_Out(m_File);
 
   std::vector<mafTimeStamp> kframes;
+  m_ForceLeft->GetTimeStamps(kframes);
   int size = kframes.size();
 
   if (!f_Out.bad())
@@ -1094,24 +1093,30 @@ void medOpExporterGRFWS::WriteSingleVector()
 
     f_Out.close();
   }
+
+  if (!m_TestMode)
+  {
+    mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
+    wxSetCursor(wxCursor(wxCURSOR_DEFAULT));
+    cppDEL(wait);
+  }
 }
 //----------------------------------------------------------------------------
 void medOpExporterGRFWS::WriteSingleVectorFast()   
 //----------------------------------------------------------------------------
 {  
   wxBusyInfo *wait = NULL;
-  mafString info = "Loading data from files";
   if (!m_TestMode)
   {
     wxSetCursor(wxCursor(wxCURSOR_WAIT));
-    mafEventMacro(mafEvent(this,PROGRESSBAR_SET_TEXT,&info));
-	  mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
+    mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
     wait = new wxBusyInfo("This may take several minutes, please be patient...");
   }
 
   std::ofstream f_Out(m_File);
 
   std::vector<mafTimeStamp> kframes;
+  m_ForceLeft->GetTimeStamps(kframes);
   int size = kframes.size();
 
   // Get first data to set right input position
@@ -1202,6 +1207,13 @@ void medOpExporterGRFWS::WriteSingleVectorFast()
   }
 
   delete vFL;
+
+  if (!m_TestMode)
+  {
+    mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
+    wxSetCursor(wxCursor(wxCURSOR_DEFAULT));
+    cppDEL(wait);
+  }
 }
 //----------------------------------------------------------------------------
 void medOpExporterGRFWS::CalculateTresholds()
