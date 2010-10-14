@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medDataPipeCustomSegmentationVolume.cpp,v $
 Language:  C++
-Date:      $Date: 2010-07-12 14:46:34 $
-Version:   $Revision: 1.1.2.11 $
+Date:      $Date: 2010-10-14 09:02:43 $
+Version:   $Revision: 1.1.2.12 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -323,6 +323,7 @@ void medDataPipeCustomSegmentationVolume::ApplyAutomaticSegmentation()
     }
 
     double localThreshold;
+    bool inRange = false;
     if(m_AutomaticSegmentationThresholdModality == medVMESegmentationVolume::RANGE)
     {
       //Find the correct threshold for the slice
@@ -333,105 +334,117 @@ void medDataPipeCustomSegmentationVolume::ApplyAutomaticSegmentation()
         {
           rangeIndex = j;
           localThreshold = m_AutomaticSegmentationThresholds[j];
+          inRange = true;
         }
-      }
-
-      if (rangeIndex == -1)
-      {
-        return;
       }
     }
     else
     {
+      inRange = true;
       localThreshold = m_AutomaticSegmentationGlobalThreshold;
     }
     //////////////////////////////////////////////////////////////////////////
 
-    //////////////////////////////////////////////////////////////////////////
-    //Generate the slice image data for itk filters
-    //////////////////////////////////////////////////////////////////////////
-    double spacing[3];
-
-    if (volumeData->IsA("vtkStructuredPoints"))
+    if(!inRange)
+    // range not specified
     {
-      vtkStructuredPoints::SafeDownCast(volumeData)->GetSpacing(spacing); 
-    }
-    else if (volumeData->IsA("vtkRectilinearGrid"))
-    {
-      vtkDataArray *x = vtkRectilinearGrid::SafeDownCast(volumeData)->GetXCoordinates();
-      vtkDataArray *y = vtkRectilinearGrid::SafeDownCast(volumeData)->GetYCoordinates();
-
-      //assumed that the slices are image data
-      spacing[0] = x->GetTuple1(1) - x->GetTuple1(0);
-      spacing[1] = y->GetTuple1(1) - y->GetTuple1(0);
-      spacing[2] = 0.0;
+      int numberOfPoints = volumeDimensions[0] * volumeDimensions[1];
+      for (int k=0;k<numberOfPoints;k++)
+      {
+        char value = 0;
+        newScalars->SetTuple1(k+i*(volumeDimensions[0]*volumeDimensions[1]),value);
+      }
     }
 
-    vtkDataArray *inputScalars = volumeData->GetPointData()->GetScalars();
-    vtkMAFSmartPointer<vtkDoubleArray> scalars;
-    scalars->SetName("SCALARS");
-    scalars->SetNumberOfTuples(volumeDimensions[0]*volumeDimensions[1]);
-    for (int k=0;k<(volumeDimensions[0]*volumeDimensions[1]);k++)
+    else
     {
-      double value = inputScalars->GetTuple1(k+i*(volumeDimensions[0]*volumeDimensions[1]));
-      scalars->SetTuple1(k,value);
+      //////////////////////////////////////////////////////////////////////////
+      //Generate the slice image data for itk filters
+      //////////////////////////////////////////////////////////////////////////
+      double spacing[3];
+
+      if (volumeData->IsA("vtkStructuredPoints"))
+      {
+        vtkStructuredPoints::SafeDownCast(volumeData)->GetSpacing(spacing); 
+      }
+      else if (volumeData->IsA("vtkRectilinearGrid"))
+      {
+        vtkDataArray *x = vtkRectilinearGrid::SafeDownCast(volumeData)->GetXCoordinates();
+        vtkDataArray *y = vtkRectilinearGrid::SafeDownCast(volumeData)->GetYCoordinates();
+
+        //assumed that the slices are image data
+        spacing[0] = x->GetTuple1(1) - x->GetTuple1(0);
+        spacing[1] = y->GetTuple1(1) - y->GetTuple1(0);
+        spacing[2] = 0.0;
+      }
+
+      vtkDataArray *inputScalars = volumeData->GetPointData()->GetScalars();
+      vtkMAFSmartPointer<vtkDoubleArray> scalars;
+      scalars->SetName("SCALARS");
+      scalars->SetNumberOfTuples(volumeDimensions[0]*volumeDimensions[1]);
+      for (int k=0;k<(volumeDimensions[0]*volumeDimensions[1]);k++)
+      {
+        double value = inputScalars->GetTuple1(k+i*(volumeDimensions[0]*volumeDimensions[1]));
+        scalars->SetTuple1(k,value);
+      }
+
+      vtkMAFSmartPointer<vtkImageData> im;
+      im->SetDimensions(volumeDimensions[0],volumeDimensions[1],1);
+      im->SetSpacing(spacing[0],spacing[1],0.0);
+      im->SetScalarTypeToDouble();
+      im->GetPointData()->AddArray(scalars);
+      im->GetPointData()->SetActiveScalars("SCALARS");
+      im->Update();
+      //////////////////////////////////////////////////////////////////////////
+
+      /////////////////////////////////////////////////////////////////////////
+      //ITK pipeline to binarize
+      //////////////////////////////////////////////////////////////////////////
+      typedef itk::VTKImageToImageFilter< RealImage > ConvertervtkTOitk;
+      ConvertervtkTOitk::Pointer vtkTOitk = ConvertervtkTOitk::New();
+      vtkTOitk->SetInput( im );
+      vtkTOitk->Update();
+
+      double range[2];
+      volumeData->GetScalarRange(range);
+
+      binaryThreshold->SetInput( ((RealImage*)vtkTOitk->GetOutput()) );
+      binaryThreshold->SetInsideValue(255);
+      binaryThreshold->SetOutsideValue(0);
+      binaryThreshold->SetLowerThreshold(localThreshold);
+      binaryThreshold->SetUpperThreshold(range[1]);
+
+      try
+      {
+        binaryThreshold->Update();
+      }
+      catch ( itk::ExceptionObject &err )
+      {
+        std::cout << "ExceptionObject caught !" << std::endl; 
+        std::cout << err << std::endl; 
+      }
+
+      typedef itk::ImageToVTKImageFilter< RealImage > ConverteritkTOvtk;
+      ConverteritkTOvtk::Pointer itkTOvtk = ConverteritkTOvtk::New();
+      itkTOvtk->SetInput( binaryThreshold->GetOutput() );
+      itkTOvtk->Update();
+      //////////////////////////////////////////////////////////////////////////
+
+      //////////////////////////////////////////////////////////////////////////
+      //Copy the new scalars
+      //////////////////////////////////////////////////////////////////////////
+      vtkImageData *imageBinary = ((vtkImageData*)itkTOvtk->GetOutput());
+      imageBinary->Update();
+
+      vtkDataArray *binaryScalars = imageBinary->GetPointData()->GetScalars();
+      for (int k=0;k<imageBinary->GetNumberOfPoints();k++)
+      {
+        char value = binaryScalars->GetTuple1(k);
+        newScalars->SetTuple1(k+i*(volumeDimensions[0]*volumeDimensions[1]),value);
+      }
+      //////////////////////////////////////////////////////////////////////////
+      
     }
-
-    vtkMAFSmartPointer<vtkImageData> im;
-    im->SetDimensions(volumeDimensions[0],volumeDimensions[1],1);
-    im->SetSpacing(spacing[0],spacing[1],0.0);
-    im->SetScalarTypeToDouble();
-    im->GetPointData()->AddArray(scalars);
-    im->GetPointData()->SetActiveScalars("SCALARS");
-    im->Update();
-    //////////////////////////////////////////////////////////////////////////
-
-    /////////////////////////////////////////////////////////////////////////
-    //ITK pipeline to binarize
-    //////////////////////////////////////////////////////////////////////////
-    typedef itk::VTKImageToImageFilter< RealImage > ConvertervtkTOitk;
-    ConvertervtkTOitk::Pointer vtkTOitk = ConvertervtkTOitk::New();
-    vtkTOitk->SetInput( im );
-    vtkTOitk->Update();
-
-    double range[2];
-    volumeData->GetScalarRange(range);
-
-    binaryThreshold->SetInput( ((RealImage*)vtkTOitk->GetOutput()) );
-    binaryThreshold->SetInsideValue(255);
-    binaryThreshold->SetOutsideValue(0);
-    binaryThreshold->SetLowerThreshold(localThreshold);
-    binaryThreshold->SetUpperThreshold(range[1]);
-
-    try
-    {
-      binaryThreshold->Update();
-    }
-    catch ( itk::ExceptionObject &err )
-    {
-      std::cout << "ExceptionObject caught !" << std::endl; 
-      std::cout << err << std::endl; 
-    }
-
-    typedef itk::ImageToVTKImageFilter< RealImage > ConverteritkTOvtk;
-    ConverteritkTOvtk::Pointer itkTOvtk = ConverteritkTOvtk::New();
-    itkTOvtk->SetInput( binaryThreshold->GetOutput() );
-    itkTOvtk->Update();
-    //////////////////////////////////////////////////////////////////////////
-
-    //////////////////////////////////////////////////////////////////////////
-    //Copy the new scalars
-    //////////////////////////////////////////////////////////////////////////
-    vtkImageData *imageBinary = ((vtkImageData*)itkTOvtk->GetOutput());
-    imageBinary->Update();
-
-    vtkDataArray *binaryScalars = imageBinary->GetPointData()->GetScalars();
-    for (int k=0;k<imageBinary->GetNumberOfPoints();k++)
-    {
-      char value = binaryScalars->GetTuple1(k);
-      newScalars->SetTuple1(k+i*(volumeDimensions[0]*volumeDimensions[1]),value);
-    }
-    //////////////////////////////////////////////////////////////////////////
 
   }
 
