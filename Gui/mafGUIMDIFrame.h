@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIMDIFrame.h,v $
   Language:  C++
-  Date:      $Date: 2009-06-17 13:24:52 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2010-10-15 14:30:38 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -87,6 +87,9 @@ class mafGUIMDIFrame: public wxMDIParentFrame
 	/** Set the progress value for the progress bar. */
   void ProgressBarSetVal(int progress);
 
+  /** Get the progress bar status. */
+  int ProgressBarGetStatus();
+
 	/** Set the progress text for the progress bar. */
   void ProgressBarSetText(wxString *msg);
 
@@ -165,6 +168,8 @@ protected:
   wxPanel      *m_BusyPanel;
   wxStaticText *m_BusyLabel;
   wxGauge      *m_Gauge;
+  std::vector<int>    m_PBCalls;
+  int  m_ID_PBCall;
 
   int  m_MemoryLimitAlert; ///< Used to alert the user when memory decrease under this limit value.
   bool m_UserAlerted;

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIMDIFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-12-18 08:58:32 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2010-10-15 14:30:38 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -120,6 +120,8 @@ mafGUIMDIFrame::mafGUIMDIFrame(const wxString& title, const wxPoint& pos, const 
   m_DockManager.Update();
   m_DockSettings = new mafGUIDockSettings(m_DockManager);
 
+  m_ID_PBCall = 0;
+  m_PBCalls.clear();
   m_MemoryLimitAlert = 50; // 50 MB is the default low limit to alert the user.
   m_UserAlerted = false;
 
@@ -159,6 +161,7 @@ mafGUIMDIFrame::~mafGUIMDIFrame()
   vtkDEL(m_EndCallback); 
 #endif 
 
+  m_PBCalls.clear();
   //m_DockManager.UnInit(); - must be done in OnQuit
   cppDEL(m_DockSettings);
 
@@ -410,22 +413,47 @@ void mafGUIMDIFrame::Ready()
 void mafGUIMDIFrame::ProgressBarShow()
 //-----------------------------------------------------------
 {
-  SetStatusText("",0);
-  Busy();
+  if (m_PBCalls.size()==0)
+  {
+    SetStatusText("",0);
+    Busy();
+    m_PBCalls.push_back(m_ID_PBCall);
+  }
+  else
+  {
+    m_ID_PBCall++;
+  }
 }
 //-----------------------------------------------------------
 void mafGUIMDIFrame::ProgressBarHide()
 //-----------------------------------------------------------
 {
-  SetStatusText("",0);
-  Ready();
+  if (m_PBCalls.size()>0 && (m_PBCalls.at((m_PBCalls.size()-1)) == m_ID_PBCall) )
+  {
+    SetStatusText("",0);
+    Ready();
+    m_PBCalls.pop_back();
+  }
+  else
+  {
+    m_ID_PBCall--;
+  }
+}
+//-----------------------------------------------------------
+int mafGUIMDIFrame::ProgressBarGetStatus()
+//-----------------------------------------------------------
+{
+  return m_Gauge->GetValue();
 }
 //-----------------------------------------------------------
 void mafGUIMDIFrame::ProgressBarSetVal(int progress)
 //-----------------------------------------------------------
 {
-  m_Gauge->SetValue(progress);
-  SetStatusText(wxString::Format(" %d%% ",progress),3);
+  if (m_PBCalls.size()>0 && (m_PBCalls.at((m_PBCalls.size()-1)) == m_ID_PBCall) )
+  {
+    m_Gauge->SetValue(progress);
+    SetStatusText(wxString::Format(" %d%% ",progress),3);
+  }
 }
 //-----------------------------------------------------------
 void mafGUIMDIFrame::ProgressBarSetText(wxString *msg)
