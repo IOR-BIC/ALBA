@@ -13,26 +13,6 @@
 
 =========================================================================*/
 
-// .NAME vtkMAFGlobalAxesHeadActor - a 3D head used to give camera orientation feedback.
-// This class is used along with vtkMAFOrientationMarkerWidget to build a render window superimposed rotating head.
-// A file ..\Config\HelperData\3dHead.vtk containing the 3d head polydata must exists in the current working directory (to be improved)
-// This is based on MAF vertical apps dir structure template which is as follows:
-// mafVerticalAppDir\bin\mafApp.exe (current working directory)
-// mafVerticalAppDir\Config\HelperData\3dHead.vtk
-// The 3d head should be contained in [-0.5 , 0.5, -0.5, 0.5, -0.5 , 0.5] (approx head dim should be 1)
-
-// .SECTION Description
-// vtkMAFGlobalAxesHeadActor is an hybrid 3D actor used to represent an anatomical
-// orientation marker in a scene.  The class consists of a 3D head centered
-// on the world origin.
-
-// .SECTION Caveats
-// vtkMAFGlobalAxesHeadActor is primarily intended for use with
-// vtkOrientationMarkerWidget. 
-
-// .SECTION See Also
-// vtkMAFOrientationMarkerWidget mafAxes 
-
 #ifndef __vtkMAFGlobalAxesHeadActor_h
 #define __vtkMAFGlobalAxesHeadActor_h
 
@@ -50,6 +30,31 @@ class vtkTransform;
 class vtkTransformFilter;
 
 class vtkVectorText;
+
+/**
+Classname: vtkMAFGlobalAxesHeadActor
+
+vtkMAFGlobalAxesHeadActor - a 3D head used to give camera orientation feedback.
+This class is used along with vtkMAFOrientationMarkerWidget to build a render window superimposed rotating head.
+A file ..\Config\HelperData\3dHead.vtk containing the 3d head polydata must exists in the current working directory (to be improved)
+This is based on MAF vertical apps dir structure template which is as follows:
+mafVerticalAppDir\bin\mafApp.exe (current working directory)
+mafVerticalAppDir\Config\HelperData\3dHead.vtk
+The 3d head should be contained in [-0.5 , 0.5, -0.5, 0.5, -0.5 , 0.5] (approx head dim should be 1)
+
+Description:
+vtkMAFGlobalAxesHeadActor is an hybrid 3D actor used to represent an anatomical
+orientation marker in a scene.  The class consists of a 3D head centered
+on the world origin.
+
+Caveats:
+vtkMAFGlobalAxesHeadActor is primarily intended for use with
+vtkOrientationMarkerWidget. 
+
+See Also:
+vtkMAFOrientationMarkerWidget mafAxes 
+
+*/
 
 class vtkMAFGlobalAxesHeadActor : public vtkProp3D
 {
