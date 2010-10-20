@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2008-10-15 08:35:44 $
-# Version:   $Revision: 1.12.2.1 $
+# Date:      $Date: 2010-10-20 14:02:50 $
+# Version:   $Revision: 1.12.2.2 $
 #
 # Description:
 # CMake Project file for the Medical Library.
@@ -52,6 +52,7 @@ ENDIF(WIN32)
 OPTION(BUILD_SHARED_LIBS "Build with shared libraries." OFF )
 OPTION(BUILD_EXAMPLES "Build examples." ON )
 OPTION(BUILD_TESTING "Build the testing tree." OFF)
+OPTION(BUILD_IPOSE "Build iPose application." ON)
 
 MARK_AS_ADVANCED (
   BUILD_SHARED_LIBS 
@@ -146,6 +147,11 @@ IF(MAF_FOUND)
     SUBDIRS(Examples)
   ENDIF (BUILD_EXAMPLES)
   
+  if (BUILD_IPOSE)
+    LINK_DIRECTORIES(${MED_BINARY_DIR}/bin)
+    SUBDIRS(iPose)
+  ENDIF (BUILD_IPOSE)
+  
   #-----------------------------------------------------------------------------
   # Testing stuff
   #-----------------------------------------------------------------------------
@@ -187,3 +193,43 @@ SET(MEDICAL_PARABUILD_BUILD_NUMBER $ENV{PARABUILD_BUILD_NUMBER} CACHE INTERNAL "
 
 # create the main version variable:
 SET(MEDICAL_PARABUILD_VERSION "${MEDICAL_PARABUILD_MAJOR_VERSION}_${MEDICAL_PARABUILD_MINOR_VERSION}_TS_${MEDICAL_PARABUILD_BUILD_TIMESTAMP}_BUILD_${MEDICAL_PARABUILD_BUILD_NUMBER}" CACHE INTERNAL "big version identifier concatenating other identifier")
+
+#-----------------------------------------------------------------------------
+# IPOSE_PARABUILD deploy stuff.  
+#-----------------------------------------------------------------------------
+
+# This is specific for NSIS Nullsoft Installer that runs currently under Windows only and Parabuild.
+# An IPOSE_VERSION variable is created to gather versioning information
+IF (WIN32)
+  
+  SET(IPOSE_EXECUTABLE_OUTPUT_PATH "${EXECUTABLE_OUTPUT_PATH}/Debug/" CACHE PATH "Source directory for iPose executable. This is used by the installer to find the executable.")
+  
+  SET(IPOSE_MAJOR_VERSION 0 CACHE INTERNAL "major version")
+  SET(IPOSE_MINOR_VERSION 1 CACHE INTERNAL "minor version")
+  
+  SET(IPOSE_BUILD_TIMESTAMP $ENV{PARABUILD_BUILD_TIMESTAMP} CACHE INTERNAL "build timestamp")
+  SET(IPOSE_BUILD_NUMBER $ENV{PARABUILD_BUILD_NUMBER} CACHE INTERNAL "build number")
+  
+  # create the main version variable:
+  SET(IPOSE_VERSION "${IPOSE_MAJOR_VERSION}_${IPOSE_MINOR_VERSION}_TS_${IPOSE_BUILD_TIMESTAMP}_BUILD_${IPOSE_BUILD_NUMBER}" CACHE INTERNAL "big version identifier concatenating other identifier")
+    
+  # config installer file
+  # set the installer directory variable
+  SET(IPOSE_INSTALLER_DIR ${PROJECT_SOURCE_DIR}/iPose/Installer)
+  # convert it to Windows format
+  STRING (REPLACE "/" "\\" IPOSE_INSTALLER_DIR_WIN ${IPOSE_INSTALLER_DIR} )
+  
+  # installer executable will be written to this directory
+  SET(IPOSE_INSTALLER_EXECUTABLE_OUTPUT_DIR ${IPOSE_EXECUTABLE_OUTPUT_PATH} CACHE PATH "the installer executable will be written to this directory ")
+  # convert it to Windows format  
+  STRING(REPLACE "/" "\\" IPOSE_INSTALLER_EXECUTABLE_OUTPUT_DIR_WIN ${IPOSE_INSTALLER_EXECUTABLE_OUTPUT_DIR})
+  SET(IPOSE_INSTALLER_EXECUTABLE_OUTPUT_DIR_WIN ${IPOSE_INSTALLER_EXECUTABLE_OUTPUT_DIR_WIN} CACHE INTERNAL "get the executable  from this directory")
+    
+  # IPOSE
+  IF (BUILD_IPOSE)
+  CONFIGURE_FILE(${IPOSE_INSTALLER_DIR}/iposeInstallerScript.nsi.in  ${IPOSE_EXECUTABLE_OUTPUT_PATH}/iposeInstallerScript.nsi @ONLY)
+  ENDIF (BUILD_IPOSE)
+  
+  SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /LARGEADDRESSAWARE " )
+  
+ENDIF (WIN32)               
