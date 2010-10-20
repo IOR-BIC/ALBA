@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2010-10-20 14:02:50 $
-# Version:   $Revision: 1.12.2.2 $
+# Date:      $Date: 2010-10-20 14:04:47 $
+# Version:   $Revision: 1.12.2.3 $
 #
 # Description:
 # CMake Project file for the Medical Library.
@@ -52,7 +52,7 @@ ENDIF(WIN32)
 OPTION(BUILD_SHARED_LIBS "Build with shared libraries." OFF )
 OPTION(BUILD_EXAMPLES "Build examples." ON )
 OPTION(BUILD_TESTING "Build the testing tree." OFF)
-OPTION(BUILD_IPOSE "Build iPose application." ON)
+OPTION(BUILD_IPOSE "Build iPose application." OFF)
 
 MARK_AS_ADVANCED (
   BUILD_SHARED_LIBS 
