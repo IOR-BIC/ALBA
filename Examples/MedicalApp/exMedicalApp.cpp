@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: exMedicalApp.cpp,v $
 Language:  C++
-Date:      $Date: 2008-12-18 11:22:38 $
-Version:   $Revision: 1.15.2.1 $
+Date:      $Date: 2010-10-20 15:28:12 $
+Version:   $Revision: 1.15.2.2 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -78,9 +78,8 @@ MafMedical is partially based on OpenMAF.
 		#include "medOpImporterAnalogWS.h"
 		#include "medOpImporterGRFWS.h"
 	#endif
-	#include "mmoDICOMImporter.h"
-	#include "medOpImporterCTA.h"
-	#include "medOpImporterCTMRI.h"
+  #include "medGUIDicomSettings.h"
+	#include "medOpImporterDicomOffis.h"
 	#include "medOpImporterLandmark.h"
 	#include "medOpImporterLandmarkTXT.h"
 	#include "medOpImporterLandmarkWS.h"
@@ -197,10 +196,8 @@ bool exMedicalApp::OnInit()
 #ifdef MAF_USE_ITK
 		m_Logic->Plug(new mafOpImporterASCII("ASCII"));
 #endif
-	m_Logic->Plug(new mmoDICOMImporter("DICOM"),"DICOM Suite");
-	m_Logic->Plug(new medOpImporterCTA("CTA-DSA"),"DICOM Suite");
-	m_Logic->Plug(new medOpImporterCTMRI("CT"),"DICOM Suite");
-	m_Logic->Plug(new medOpImporterCTMRI("MRI"),"DICOM Suite");
+  medGUIDicomSettings *dicomSettings=new medGUIDicomSettings(NULL,"DICOM");
+	m_Logic->Plug(new medOpImporterDicomOffis("DICOM"),"DICOM Suite",true,dicomSettings);
 	m_Logic->Plug(new medOpImporterLandmark("Landmark"),"Landmark Suite");
 	m_Logic->Plug(new medOpImporterLandmarkTXT("Landmark TXT"),"Landmark Suite");
 	m_Logic->Plug(new medOpImporterLandmarkWS("Landmark WS"),"Landmark Suite");
