@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterAnalogWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-09-30 07:42:49 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2010-10-20 13:11:05 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Simone Brazzale
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -110,7 +110,7 @@ void medOpExporterAnalogWS::Write()
     f_Out << TAG_FORMAT << "\n";
 
     // Add the first row containing the frequency
-    f_Out << FREQ << ",Hz\n";
+    f_Out << FREQ << ",\n";
 
     //Add the third line containing the signal names
     f_Out << "FRAME,";

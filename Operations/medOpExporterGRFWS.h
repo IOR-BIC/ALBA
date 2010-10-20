@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterGRFWS.h,v $
   Language:  C++
-  Date:      $Date: 2010-10-14 10:43:39 $
-  Version:   $Revision: 1.1.2.10 $
+  Date:      $Date: 2010-10-20 13:11:05 $
+  Version:   $Revision: 1.1.2.11 $
   Authors:   Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2004
@@ -43,10 +43,10 @@ typedef struct {
   int m_IsDecreasing[3];
   } medGRFVector;
 
-//----------------------------------------------------------------------------
-// medOpExporterGRFWS :
-//----------------------------------------------------------------------------
-/** */
+/** 
+class name: medOpExporterGRFWS
+Exporterr for ground reactions force, used in motion analysis
+*/
 class medOpExporterGRFWS : public mafOp
 {
 public:

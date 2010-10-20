@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterGRFWS.h,v $
   Language:  C++
-  Date:      $Date: 2010-10-07 06:54:49 $
-  Version:   $Revision: 1.3.2.3 $
+  Date:      $Date: 2010-10-20 13:11:05 $
+  Version:   $Revision: 1.3.2.4 $
   Authors:   Roberto Mucci, Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2004
@@ -68,6 +68,12 @@ public:
   void SetFileName(const char *file_name){m_File = file_name;};
 
 protected:
+
+  /* Read force plate */ 
+  void ReadForcePlates();
+
+  /* Read a single vector */
+  void ReadSingleVector();
 
   mafVMESurface       *m_PlatformLeft;
   mafVMESurface       *m_PlatformRight;

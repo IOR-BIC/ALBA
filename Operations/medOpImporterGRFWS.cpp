@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterGRFWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-09-09 15:19:21 $
-  Version:   $Revision: 1.4.2.2 $
+  Date:      $Date: 2010-10-20 13:11:05 $
+  Version:   $Revision: 1.4.2.3 $
   Authors:   Roberto Mucci, Simone Brazzale
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -111,9 +111,32 @@ void medOpImporterGRFWS::OpRun()
   }
   mafEventMacro(mafEvent(this,result));
 }
-
 //----------------------------------------------------------------------------
 void medOpImporterGRFWS::Read()   
+//----------------------------------------------------------------------------
+{
+  wxFileInputStream inputFile( m_File );
+  wxTextInputStream text( inputFile );
+
+  wxString line;
+  line = text.ReadLine(); 
+
+  if (line.CompareTo("FORCE PLATES")== 0)
+  {
+    ReadForcePlates();
+  }
+  else if (line.CompareTo("VECTOR")== 0)
+  {
+    ReadSingleVector();
+  }
+  else
+  {
+    mafErrorMessage("Invalid file format!");
+    return;
+  }
+}
+//----------------------------------------------------------------------------
+void medOpImporterGRFWS::ReadForcePlates()   
 //----------------------------------------------------------------------------
 {
   if (!m_TestMode)
@@ -454,5 +477,142 @@ void medOpImporterGRFWS::Read()
   }
 
   m_Output = m_Group;
+  m_Output->ReparentTo(m_Input);
+}
+//----------------------------------------------------------------------------
+void medOpImporterGRFWS::ReadSingleVector()   
+//----------------------------------------------------------------------------
+{
+  if (!m_TestMode)
+  {
+    wxSetCursor(wxCursor(wxCURSOR_WAIT));
+	  mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
+  }
+
+  wxString path, name, ext;
+  wxSplitPath(m_File.c_str(),&path,&name,&ext);
+
+  mafTagItem tag_Nature;
+  tag_Nature.SetName("VME_NATURE");
+  tag_Nature.SetValue("NATURAL");
+
+  wxFileInputStream inputCountFile( m_File );
+  wxTextInputStream textCount( inputCountFile );
+
+  wxString line_count;
+
+  int totlines = 0;
+  do {
+    line_count = textCount.ReadLine();
+    totlines++;
+  } while (!inputCountFile.Eof());
+  totlines = totlines - 5;
+
+  wxFileInputStream inputFile( m_File );
+  wxTextInputStream text( inputFile );
+
+  wxString line;
+
+  line = text.ReadLine(); 
+  line = text.ReadLine();
+  int comma = line.Find(',');
+  wxString freq = line.SubString(0,comma - 1); //Read frequency 
+  double freq_val;
+  freq_val = atof(freq.c_str());
+
+  line = text.ReadLine(); 
+  line = text.ReadLine();
+  line = text.ReadLine(); 
+
+  //Read vector data
+  mafString timeSt;
+  mafTimeStamp time;
+
+  mafString cop1StX,cop1StY,cop1StZ,ref1StX,ref1StY,ref1StZ,force1StX,force1StY,force1StZ;
+
+  vtkMAFSmartPointer<vtkPolyData> force1;
+  vtkMAFSmartPointer<vtkPoints> pointsf1;
+  vtkMAFSmartPointer<vtkCellArray> cellArrayf1;
+  int pointId1[2];
+
+  mafNEW(m_ForceLeft);
+
+  mafString alLeft = name;
+  alLeft << "_VECTOR";
+  
+  m_ForceLeft->SetName(alLeft);
+
+  int count = 0;
+  do 
+  {
+    line = text.ReadLine();
+    wxStringTokenizer tkz(line,wxT(','),wxTOKEN_RET_EMPTY_ALL);
+    timeSt = tkz.GetNextToken().c_str();
+    time = atof(timeSt)/freq_val; 
+   
+    //Values of the first platform
+    cop1StX = tkz.GetNextToken().c_str();
+    cop1StY = tkz.GetNextToken().c_str();
+    cop1StZ = tkz.GetNextToken().c_str();
+    ref1StX = tkz.GetNextToken().c_str();
+    ref1StY = tkz.GetNextToken().c_str();
+    ref1StZ = tkz.GetNextToken().c_str();
+    force1StX = tkz.GetNextToken().c_str();
+    force1StY = tkz.GetNextToken().c_str();
+    force1StZ = tkz.GetNextToken().c_str();
+
+    double cop1X = atof(cop1StX);
+    double cop1Y = atof(cop1StY);
+    double cop1Z = atof(cop1StZ);
+
+    double ref1X = atof(ref1StX);
+    double ref1Y = atof(ref1StY);
+    double ref1Z = atof(ref1StZ);
+   
+    double force1X = atof(force1StX);
+    double force1Y = atof(force1StY);
+    double force1Z = atof(force1StZ);
+
+    if (cop1X != NULL || cop1Y != NULL || cop1Z != NULL)
+    {
+      // FORCE
+      pointsf1->InsertPoint(0, 0, 0, 0);
+      pointsf1->InsertPoint(1, force1X, force1Y, force1Z);
+      pointId1[0] = 0;
+      pointId1[1] = 1;
+      cellArrayf1->InsertNextCell(2, pointId1);  
+      force1->SetPoints(pointsf1);
+      force1->SetLines(cellArrayf1);
+      force1->Update();
+
+      vtkMAFSmartPointer<vtkTransformPolyDataFilter> transfForL;
+      vtkMAFSmartPointer<vtkTransform> transff;
+     
+      transff->Translate(cop1X, cop1Y, cop1Z);
+      transfForL->SetTransform(transff);
+      transfForL->SetInput(force1);
+      transfForL->Update();
+
+      m_ForceLeft->SetData(transfForL->GetOutput(), time);
+      m_ForceLeft->Modified();
+      m_ForceLeft->Update();
+      m_ForceLeft->GetOutput()->GetVTKData()->Update();
+    }
+
+    count++;
+    if (!m_TestMode)
+    {
+      mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)(((double) count)/((double) totlines)*100.)));
+    }
+
+  }while (!inputFile.Eof());
+
+  if (!m_TestMode)
+  {
+    mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
+    wxSetCursor(wxCursor(wxCURSOR_DEFAULT));
+  }
+
+  m_Output = m_ForceLeft;
   m_Output->ReparentTo(m_Input);
 }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterGRFWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-10-14 10:43:39 $
-  Version:   $Revision: 1.1.2.12 $
+  Date:      $Date: 2010-10-20 13:11:05 $
+  Version:   $Revision: 1.1.2.13 $
   Authors:   Simone Brazzale
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -556,7 +556,7 @@ void medOpExporterGRFWS::Write()
     f_Out << TAG_FORMAT << "\n";
 
     // Add the first row containing the frequency
-    f_Out << FREQ << ",Hz\n";
+    f_Out << FREQ << ",\n";
 
     // Add a dummy line
     f_Out << "--- PLATES CORNERS SECTION ---\n";
@@ -924,7 +924,7 @@ void medOpExporterGRFWS::WriteFast()
     f_Out << TAG_FORMAT << "\n";
 
     // Add the first row containing the frequency
-    f_Out << FREQ << ",Hz\n";
+    f_Out << FREQ << ",\n";
 
     // Add a dummy line
     f_Out << "--- PLATES CORNERS SECTION ---\n";
@@ -1037,7 +1037,7 @@ void medOpExporterGRFWS::WriteSingleVector()
     f_Out << TAG_FORMAT_V << "\n";
 
     // Add the first row containing the frequency
-    f_Out << FREQ << ",Hz\n";
+    f_Out << FREQ << ",\n";
 
     // Add a dummy line
     f_Out << "--- VECTOR SECTION ---\n";
@@ -1071,7 +1071,7 @@ void medOpExporterGRFWS::WriteSingleVector()
       copL[2] = p[2];
 
       // COP 
-      f_Out << copL[0] << "," << copL[1] << "," << copL[2] << "\n";
+      f_Out << copL[0] << "," << copL[1] << "," << copL[2] << ",";
 
       p = polyFL->GetPoint(1);
       double fL[3];
@@ -1137,7 +1137,7 @@ void medOpExporterGRFWS::WriteSingleVectorFast()
     f_Out << TAG_FORMAT_V << "\n";
 
     // Add the first row containing the frequency
-    f_Out << FREQ << ",Hz\n";
+    f_Out << FREQ << ",\n";
 
     // Add a dummy line
     f_Out << "--- VECTOR SECTION ---\n";
@@ -1182,7 +1182,7 @@ void medOpExporterGRFWS::WriteSingleVectorFast()
       copL[0] = vFL->m_Bounds[ind1];
       copL[1] = vFL->m_Bounds[ind2];
       copL[2] = vFL->m_Bounds[ind3];
-      f_Out << copL[0] << "," << copL[1] << "," << copL[2] << "\n";
+      f_Out << copL[0] << "," << copL[1] << "," << copL[2] << ",";
 
       // REF 
       f_Out << 0 << "," << 0 << "," << 0 << ",";
