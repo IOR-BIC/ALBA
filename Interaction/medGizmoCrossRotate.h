@@ -2,14 +2,26 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoCrossRotate.h,v $
   Language:  C++
-  Date:      $Date: 2010-10-20 15:28:03 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2010-10-20 15:34:57 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
  
+
+//======================== WORK IN PROGRESS !!!!! ======================== 
+//======================== WORK IN PROGRESS !!!!! ======================== 
+//======================== WORK IN PROGRESS !!!!! ======================== 
+//======================== WORK IN PROGRESS !!!!! ======================== 
+//======================== WORK IN PROGRESS !!!!! ======================== 
+//======================== WORK IN PROGRESS !!!!! ======================== 
+//======================== WORK IN PROGRESS !!!!! ======================== 
+//======================== WORK IN PROGRESS !!!!! ======================== 
+//======================== WORK IN PROGRESS !!!!! ======================== 
+
+
 #ifndef __medGizmoCrossRotate_H__
 #define __medGizmoCrossRotate_H__
 
