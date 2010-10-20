@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2010-10-12 15:26:53 $
-Version:   $Revision: 1.1.2.19 $
+Date:      $Date: 2010-10-20 15:28:30 $
+Version:   $Revision: 1.1.2.20 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -491,8 +491,8 @@ void medViewArbitraryOrthoSlice::OnEventGizmoCrossRotateZNormal(mafEventBase *ma
 			PostMultiplyEventMatrixToGizmoCrossRT(maf_event, m_GizmoXView);
 			PostMultiplyEventMatrixToGizmoCrossRT(maf_event, m_GizmoYView);
 
-			PostMultiplyEventMatrixToSlicer(maf_event, medGizmoCrossRotateTranslate::X);
-			PostMultiplyEventMatrixToSlicer(maf_event, medGizmoCrossRotateTranslate::Y);
+			PostMultiplyEventMatrixToSlicer(maf_event, X);
+			PostMultiplyEventMatrixToSlicer(maf_event, Y);
 
 			// roll the camera based on gizmo
 
@@ -619,8 +619,8 @@ void medViewArbitraryOrthoSlice::OnEventGizmoCrossRotateYNormal(mafEventBase *ma
 			PostMultiplyEventMatrixToGizmoCrossRT(maf_event, m_GizmoZView);
 			PostMultiplyEventMatrixToGizmoCrossRT(maf_event, m_GizmoXView);
 
-			PostMultiplyEventMatrixToSlicer(maf_event, medGizmoCrossRotateTranslate::X);
-			PostMultiplyEventMatrixToSlicer(maf_event, medGizmoCrossRotateTranslate::Z);
+			PostMultiplyEventMatrixToSlicer(maf_event, X);
+			PostMultiplyEventMatrixToSlicer(maf_event, Z);
 
 			// roll the camera based on gizmo
 
@@ -850,8 +850,8 @@ void medViewArbitraryOrthoSlice::OnEventGizmoCrossRotateXNormal(mafEventBase *ma
 			PostMultiplyEventMatrixToGizmoCrossRT(maf_event, m_GizmoYView);
 			PostMultiplyEventMatrixToGizmoCrossRT(maf_event, m_GizmoZView);
 
-			PostMultiplyEventMatrixToSlicer(maf_event, medGizmoCrossRotateTranslate::Y);
-			PostMultiplyEventMatrixToSlicer(maf_event, medGizmoCrossRotateTranslate::Z);
+			PostMultiplyEventMatrixToSlicer(maf_event, Y);
+			PostMultiplyEventMatrixToSlicer(maf_event, Z);
 
 			// roll the camera based on gizmo
 
@@ -1223,15 +1223,15 @@ void medViewArbitraryOrthoSlice::PostMultiplyEventMatrixToSlicer(mafEventBase *m
 
 		mafVMESlicer *currentSlicer = NULL;
 
-		if (slicerAxis == medGizmoCrossRotateTranslate::X)
+		if (slicerAxis == X)
 		{
 			currentSlicer = m_SlicerX;
 		}
-		else if (slicerAxis == medGizmoCrossRotateTranslate::Y)
+		else if (slicerAxis == Y)
 		{
 			currentSlicer = m_SlicerY;
 		}
-		else if (slicerAxis == medGizmoCrossRotateTranslate::Z)
+		else if (slicerAxis == Z)
 		{
 			currentSlicer = m_SlicerZ;
 		}
@@ -1901,7 +1901,7 @@ void medViewArbitraryOrthoSlice::ShowSlicers( mafVME * vmeVolume, bool show )
 	((mafViewVTK*)m_ChildViewList[Z_VIEW])->CameraReset(m_SlicerZ);
 
 	m_GizmoZView = new medGizmoCrossRotateTranslate();
-	m_GizmoZView->Create(m_SlicerZ, this, true, medGizmoCrossTranslate::Z);
+	m_GizmoZView->Create(m_SlicerZ, this, true, medGizmoCrossRotateTranslate::Z);
 	m_GizmoZView->SetName("m_GizmoZView");
 	m_GizmoZView->SetInput(m_SlicerZ);
 	m_GizmoZView->SetRefSys(m_SlicerZ);
@@ -1909,7 +1909,7 @@ void medViewArbitraryOrthoSlice::ShowSlicers( mafVME * vmeVolume, bool show )
 	m_GizmoZView->Show(true);
 
 	m_GizmoYView = new medGizmoCrossRotateTranslate();
-	m_GizmoYView->Create(m_SlicerY, this, true, medGizmoCrossTranslate::Y);
+	m_GizmoYView->Create(m_SlicerY, this, true, medGizmoCrossRotateTranslate::Y);
 	m_GizmoYView->SetName("m_GizmoYView");
 	m_GizmoYView->SetInput(m_SlicerY);
 	m_GizmoYView->SetRefSys(m_SlicerY);
@@ -1917,7 +1917,7 @@ void medViewArbitraryOrthoSlice::ShowSlicers( mafVME * vmeVolume, bool show )
 	m_GizmoYView->Show(true);
 
 	m_GizmoXView = new medGizmoCrossRotateTranslate();
-	m_GizmoXView->Create(m_SlicerX, this, true, medGizmoCrossTranslate::X);
+	m_GizmoXView->Create(m_SlicerX, this, true, medGizmoCrossRotateTranslate::X);
 	m_GizmoXView->SetName("m_GizmoXView");
 	m_GizmoXView->SetInput(m_SlicerX);
 	m_GizmoXView->SetRefSys(m_SlicerX);

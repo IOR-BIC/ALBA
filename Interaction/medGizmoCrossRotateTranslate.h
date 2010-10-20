@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGizmoCrossRotateTranslate.h,v $
 Language:  C++
-Date:      $Date: 2010-09-21 14:50:29 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-10-20 15:28:03 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -39,6 +39,12 @@ class mafViewVTK;
 class medGizmoCrossTranslate;
 class medGizmoCrossRotate;
 
+
+/** 
+
+ Gizmo used to perform constrained roto-translation on a given plane
+
+*/
 class medGizmoCrossRotateTranslate : mafGizmoInterface
 {
 public:
@@ -46,7 +52,9 @@ public:
 	medGizmoCrossRotateTranslate();
 	~medGizmoCrossRotateTranslate();
 
-	void Create(mafVME *input, mafObserver* listener = NULL, bool BuildGUI = true, int axis = X);
+	enum NORMAL {X = 0, Y = 1, Z = 2};
+
+	void Create(mafVME *input, mafObserver* listener = NULL, bool BuildGUI = true, int normal = X);
 	void SetInput(mafVME *vme);
 	void SetRefSys(mafVME *refSys);
 	
@@ -60,7 +68,6 @@ public:
 	void SetName(mafString name);
 	mafString GetName() {return m_NameRTG;}
 	void OnEvent(mafEventBase *maf_event);
-	enum AXIS {X = 0, Y, Z};
 	
 	mafString m_NameRTG;
 

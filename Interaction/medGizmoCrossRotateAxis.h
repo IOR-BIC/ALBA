@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoCrossRotateAxis.h,v $
   Language:  C++
-  Date:      $Date: 2010-09-15 16:11:32 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2010-10-20 15:28:03 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -47,10 +47,8 @@ class vtkTransformPolyDataFilter;
 class vtkTransform;
 class vtkAppendPolyData;
 
-//----------------------------------------------------------------------------
-/** Basic gizmo component used to perform constrained rotation around an axis.
-  
-  @sa mafGizmoRotate
+/** 
+	Basic gizmo component used to perform constrained rotation around an axis.
 */
 class medGizmoCrossRotateAxis: public mafGizmoInterface
 {
@@ -58,7 +56,7 @@ public:
            medGizmoCrossRotateAxis(mafVME *input, mafObserver *listener = NULL);
   virtual ~medGizmoCrossRotateAxis(); 
   
-   /** 
+  /** 
   Set the gizmo generating vme; the gizmo will be centered on this vme*/
   void SetInput(mafVME *vme); 
   mafVME *GetInput();
@@ -80,10 +78,10 @@ public:
   /** axis enum*/
   enum AXIS {X = 0, Y, Z};
   
-  /** Set/Get gizmo axis, default axis is X*/        
+  /** Set/Get the gizmo axis, default axis is X*/        
   void SetAxis(int axis); 
   
-  /** Get egizmo axis*/
+  /** Get the gizmo axis*/
   int  GetAxis(); 
   
   //----------------------------------------------------------------------------
@@ -110,7 +108,7 @@ public:
 
   /** Set/Get the activation status of the gizmo, When the gizmo is active
   it is sending pose matrices to the listener */
-  void SetIsActive(bool highlight);
+  void SetIsActive(bool isActive);
   bool GetIsActive();
  
   /** 

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGizmoCrossRotateTranslate.cpp,v $
 Language:  C++
-Date:      $Date: 2010-09-21 14:50:29 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-10-20 15:28:03 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -39,10 +39,10 @@ medGizmoCrossRotateTranslate::~medGizmoCrossRotateTranslate()
 
 }
 
-void medGizmoCrossRotateTranslate::Create(mafVME *input, mafObserver* listener, bool BuildGUI, int axis)
+void medGizmoCrossRotateTranslate::Create(mafVME *input, mafObserver* listener, bool BuildGUI, int normal)
 {
-	m_GizmoCrossTranslate = new medGizmoCrossTranslate(input, this, BuildGUI, axis);
-	m_GizmoCrossRotate = new medGizmoCrossRotate(input, this, BuildGUI, axis);
+	m_GizmoCrossTranslate = new medGizmoCrossTranslate(input, this, BuildGUI, normal);
+	m_GizmoCrossRotate = new medGizmoCrossRotate(input, this, BuildGUI, normal);
 	m_Listener = listener;
 }
 

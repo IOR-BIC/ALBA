@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoCrossRotateFan.h,v $
   Language:  C++
-  Date:      $Date: 2010-09-15 16:11:32 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2010-10-20 15:28:03 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -41,7 +41,9 @@ class mafVMEGizmo;
 class mafMatrix;
 class mafRefSys;
 
-/** Basic gizmo component used to give rotation angle feedback.
+/** 
+  
+  Basic gizmo component used to give rotation angle feedback.
   This gizmo draws a fan centered at rotation origin giving visual feedback
   for rotation angle value.
 
@@ -60,7 +62,6 @@ class mafRefSys;
   mafString activeGizmoAxis = *(event->GetString()); // "X", "Y" or "Z" string
   double localRotationAngle = event->GetDouble();
 
-  @sa mafGizmoRotate 
 */
 class medGizmoCrossRotateFan: public mafGizmoInterface
 {

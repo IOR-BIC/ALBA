@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoCrossRotateAxis.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-09-15 16:11:32 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2010-10-20 15:28:03 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -391,9 +391,9 @@ void medGizmoCrossRotateAxis::SetListener( mafObserver *Listener )
   m_Listener = Listener;
 }
 
-void medGizmoCrossRotateAxis::SetIsActive( bool highlight )
+void medGizmoCrossRotateAxis::SetIsActive( bool isActive )
 {
-  m_IsActive = highlight;
+  m_IsActive = isActive;
 }
 
 bool medGizmoCrossRotateAxis::GetIsActive()

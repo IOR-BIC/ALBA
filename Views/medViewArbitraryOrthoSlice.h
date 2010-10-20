@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.h,v $
 Language:  C++
-Date:      $Date: 2010-10-06 15:24:17 $
-Version:   $Revision: 1.1.2.12 $
+Date:      $Date: 2010-10-20 15:28:30 $
+Version:   $Revision: 1.1.2.13 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -40,8 +40,6 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 
 class mafViewVTK;
-class medGizmoCrossTranslate;
-class medGizmoCrossRotate;
 class mafVMEVolumeGray;
 class mafVMESlicer;
 class mafMatrix;
@@ -133,9 +131,6 @@ protected:
 	bool BelongsToXNormalGizmo( mafVME * vme );
 	bool BelongsToYNormalGizmo( mafVME * vme );
 	bool BelongsToZNormalGizmo( mafVME * vme );
-
-	medGizmoCrossTranslate *m_GizmoCrossTranslateXNormal;
-	medGizmoCrossRotate		*m_GizmoCrossRotateXNormal;
 
 	void ShowVMESurfacesAndLandmarks( mafNode * node );
 
@@ -268,6 +263,8 @@ protected:
 	medGizmoCrossRotateTranslate *m_GizmoZView;
 	medGizmoCrossRotateTranslate *m_GizmoYView;
 	medGizmoCrossRotateTranslate *m_GizmoXView;
+
+	enum AXIS {X = 0, Y = 1, Z = 2};
 };
 
 #endif

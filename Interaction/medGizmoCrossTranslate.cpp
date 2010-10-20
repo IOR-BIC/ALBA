@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoCrossTranslate.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-09-15 16:11:32 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2010-10-20 15:28:03 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -39,7 +39,7 @@
 #include "vtkMatrix4x4.h"
 
 //----------------------------------------------------------------------------
-medGizmoCrossTranslate::medGizmoCrossTranslate(mafVME* input, mafObserver *listener, bool buildGUI, int axis)
+medGizmoCrossTranslate::medGizmoCrossTranslate(mafVME* input, mafObserver *listener, bool buildGUI, int normal)
 //----------------------------------------------------------------------------
 {
   assert(input);
@@ -51,13 +51,12 @@ medGizmoCrossTranslate::medGizmoCrossTranslate(mafVME* input, mafObserver *liste
   m_GTPlane = NULL;
   m_GuiGizmoTranslate = NULL;
 
-  m_Axis = axis;
+  m_Normal = normal;
 
   m_ConstraintModality = mafInteractorConstraint::FREE;
 
   m_Step = 1;
   
-  //no gizmo component is active at construction
   this->m_ActiveGizmoComponent = -1;
   this->SetModalityToLocal();
 
@@ -76,32 +75,12 @@ medGizmoCrossTranslate::medGizmoCrossTranslate(mafVME* input, mafObserver *liste
 
   int plane = -1;
 
-  if (m_Axis == X)
-  {
-	axis0 = X;
-	axis1 = Y;
-	plane = medGizmoCrossTranslatePlane::XY;
-  }
+  axis0 = X;
+  axis1 = Y;
+  plane = medGizmoCrossTranslatePlane::XY;
 
-  // td
-  else if (m_Axis == Y)
-  {
-	  axis0 = X;
-	  axis1 = Y;
-	  plane = medGizmoCrossTranslatePlane::XY;
-  }
-  else if (m_Axis == Z)
-  {
-	  axis0 = X;
-	  axis1 = Y;
-	  plane = medGizmoCrossTranslatePlane::XY;
-  }
-
-  m_GTAxis0->SetAxis(axis0);
-  //m_GTAxis0->SetColor(0, 0, 1, 0, 0, 1);
-
+  m_GTAxis0->SetAxis(axis0);  
   m_GTAxis1->SetAxis(axis1);
-  //m_GTAxis1->SetColor(0, 0, 1, 0, 0, 1);
   
   // Create mafGTranslateAPlane 
   m_GTPlane = new medGizmoCrossTranslatePlane(input, this);
@@ -474,23 +453,23 @@ void medGizmoCrossTranslate::SetConstraintModality(int constrainModality)
 //----------------------------------------------------------------------------
 {
 	
-  if (m_Axis == X)
+  if (m_Normal == X)
   {
 	  m_GTAxis0->SetConstraintModality(Y,constrainModality);
 	  m_GTAxis1->SetConstraintModality(Z, constrainModality);
-	  m_GTPlane->SetConstraintModality(m_Axis,constrainModality);
+	  m_GTPlane->SetConstraintModality(m_Normal,constrainModality);
   }
-  else if (m_Axis == Y)
+  else if (m_Normal == Y)
   {
 	  m_GTAxis0->SetConstraintModality(X,constrainModality);
 	  m_GTAxis1->SetConstraintModality(Z, constrainModality);
-	  m_GTPlane->SetConstraintModality(m_Axis,constrainModality);
+	  m_GTPlane->SetConstraintModality(m_Normal,constrainModality);
   }
-  else if (m_Axis == Z)
+  else if (m_Normal == Z)
   {
 	  m_GTAxis0->SetConstraintModality(X,constrainModality);
 	  m_GTAxis1->SetConstraintModality(Y, constrainModality);
-	  m_GTPlane->SetConstraintModality(m_Axis,constrainModality);
+	  m_GTPlane->SetConstraintModality(m_Normal,constrainModality);
   }
 
   m_ConstraintModality = constrainModality;
@@ -499,23 +478,23 @@ void medGizmoCrossTranslate::SetConstraintModality(int constrainModality)
 void medGizmoCrossTranslate::SetStep(double step)
 //----------------------------------------------------------------------------
 {
-  if (m_Axis == X)
+  if (m_Normal == X)
   {
 	  m_GTAxis0->SetStep(Y,step);
 	  m_GTAxis1->SetStep(Z,step);
-	  m_GTPlane->SetStep(m_Axis,step);
+	  m_GTPlane->SetStep(m_Normal,step);
   }
-  else if (m_Axis == Y)
+  else if (m_Normal == Y)
   {
 	  m_GTAxis0->SetStep(X,step);
 	  m_GTAxis1->SetStep(Z,step);
-	  m_GTPlane->SetStep(m_Axis,step);
+	  m_GTPlane->SetStep(m_Normal,step);
   }
-  else if (m_Axis == Z)
+  else if (m_Normal == Z)
   {
 	  m_GTAxis0->SetStep(X,step);
 	  m_GTAxis1->SetStep(Y,step);
-	  m_GTPlane->SetStep(m_Axis,step);
+	  m_GTPlane->SetStep(m_Normal,step);
   }
 
   m_Step = step;

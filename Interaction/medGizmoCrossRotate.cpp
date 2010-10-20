@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoCrossRotate.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-09-15 16:11:32 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2010-10-20 15:28:03 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -140,7 +140,7 @@ void medGizmoCrossRotate::OnEventGizmoComponents(mafEventBase *maf_event)
             currTr->SetMatrix(GetAbsPose()->GetVTKMatrix());
             currTr->Concatenate(e->GetMatrix()->GetVTKMatrix());
             currTr->Update();
-
+	
             mafMatrix newAbsMatr;
             newAbsMatr.DeepCopy(currTr->GetMatrix());
             newAbsMatr.SetTimeStamp(GetAbsPose()->GetTimeStamp());

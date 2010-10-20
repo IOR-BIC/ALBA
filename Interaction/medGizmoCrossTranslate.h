@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoCrossTranslate.h,v $
   Language:  C++
-  Date:      $Date: 2010-09-21 14:50:29 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2010-10-20 15:28:03 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -39,62 +39,25 @@ class medGizmoCrossTranslateAxis;
 class medGizmoCrossTranslatePlane;
 class mafMatrix;
 
-/** Gizmo used to perform constrained translation along the x, yz axis
- or the xy, xz, yz plane.
+/** 
 
- This class create a translation gizmo composed of:
-  
- 3 mafGizmoTranslateAxis
- 3 mafGizmoTranslatePlane
+ Gizmo used to perform constrained translation 
 
- 
-      z
-      ^                                 S2
-      |                                -----
-      |                                     |         
-      |                     +           SQ  |S1            =      
-      |                                     |         
-      x--------> y   
-        
-  3 x mafGizmoTranslateAxis          3 x mafGizmoTranslatePlane
-  (single axis translation       (single plane translation constrain) 
-   constrain)
-
-  
-      
-      ^  
-      |-----
-      |     |         
-  =   |     |          
-      |     |         
-       -------->    
-  
-   1 x mafGizmoTranslate
-     
-
- and forward pose matrixes to the 
- listener operation. 
-
- This object works by creating smaller components that are parented to the
- vme tree root ie works in global coordinates.
- in order to use it in your client create an instance of it and concatenate
- in post multiply modality matrix that this object is sending to the the
- vme you want to move.
-
-
- @sa mafGizmoTranslateAxis, mafGizmoTranslatePlane
 */
 
 class medGizmoCrossTranslate : public mafGizmoInterface 
 {
 public:
-           medGizmoCrossTranslate(mafVME *input, mafObserver* listener = NULL, bool BuildGUI = true, int axis = X);
+
+
+  enum NORMAL {X = 0, Y, Z};
+
+           medGizmoCrossTranslate(mafVME *input, mafObserver* listener = NULL, bool BuildGUI = true, int normal = X);
   virtual ~medGizmoCrossTranslate(); 
 
   /** 
   Set input vme for the gizmo*/
   void SetInput(mafVME *vme); 
-
 
   //----------------------------------------------------------------------------
   // events handling 
@@ -137,11 +100,9 @@ public:
   void SetStep(double step);
   int GetStep();
 
-  enum AXIS {X = 0, Y, Z};
-
 protected:
 
-  int m_Axis;
+  int m_Normal;
 
   mafGUIGizmoTranslate *m_GuiGizmoTranslate;
 

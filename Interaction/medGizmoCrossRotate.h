@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoCrossRotate.h,v $
   Language:  C++
-  Date:      $Date: 2010-09-15 16:11:32 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2010-10-20 15:28:03 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -29,44 +29,11 @@ class mafInteractorGenericInterface;
 class mafMatrix;
 
 //----------------------------------------------------------------------------
-/** Gizmo used to perform constrained rotation around an axis.
- This class create a rotation gizmo composed of:
-  
- 3 mafGizmoRotateCircle
- 3 mafGizmoRotateFan
- 
-      y                             y
-      ^                             ^  
-      |                             |  
-      | ___                         |     /|
-      |     \              +        |   /  |
-      |      |                      | /    | 
-      z--------> x                  z--------->x
-        
-  3 x mafGizmoRotateCircle          3 x mafGizmoRotateFan
-  (single axis rotation       (visual feedback for rotation angle on one axis) 
-   constrain)
+/** 
 
-      
-      ^  
-      |-----
-      |     /\
-  =   |   /    \         
-      | /       |         
-       ---------->    
-  
-   1 x mafGizmoRotate
-     
-
-  and forward pose matrixes to the listener operation. 
-  This object works by creating smaller components that are parented to the
-  vme tree root ie works in global coordinates.
-  in order to use it in your client create an instance of it and concatenate
-  in post multiply modality matrix that this object is sending to the the
-  vme you want to move.
+  Gizmo used to perform constrained rotation around an axis.
 
 */
-
 class medGizmoCrossRotate : public mafGizmoInterface 
 {
 public:
