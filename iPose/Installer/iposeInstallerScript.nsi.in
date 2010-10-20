@@ -126,7 +126,6 @@ Section "create product directory structure" SEC01
   CreateDirectory "$INSTDIR\data\msf"
   CreateDirectory "$INSTDIR\Layout"
   SetOutPath "$INSTDIR\Layout"
-  File "@IPOSE_INSTALLER_DIR_WIN@\layout.mly"
              
   SetOutPath "$INSTDIR\bin"
 SectionEnd
@@ -187,7 +186,6 @@ Section Uninstall
   Delete "$INSTDIR\Bin\${PRODUCT_EXE_NAME}.manifest"
   Delete "$INSTDIR\Bin\${PRODUCT_EXE_NAME}"
 
-  Delete "$INSTDIR\Layout\layout.mly"
   Delete "$INSTDIR\Splash\iposeSplash.bmp"
 
   Delete "$SMPROGRAMS\b3c_software\XML\Uninstall.lnk"
