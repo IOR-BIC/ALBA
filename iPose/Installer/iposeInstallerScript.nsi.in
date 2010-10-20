@@ -34,9 +34,9 @@ pop $R1
 
 ; HM NIS Edit Wizard helper defines
 
-!define PRODUCT_NAME "MXL"
+!define PRODUCT_NAME "iPose"
 !define PRODUCT_EXE_NAME "${PRODUCT_NAME}.exe"
-!define PRODUCT_VERSION "@MXL_VERSION@"
+!define PRODUCT_VERSION "@IPOSE_VERSION@"
 !define PRODUCT_PUBLISHER "B3C"
 !define PRODUCT_WEB_SITE "http://www.biomedtown.org"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\${PRODUCT_EXE_NAME}"
@@ -48,13 +48,13 @@ pop $R1
 
 ; MUI Settings
 !define MUI_ABORTWARNING
-!define MUI_ICON "@IPOSE_INSTALLER_DIR_WIN@\mxl.ico"
-!define MUI_UNICON "@IPOSE_INSTALLER_DIR_WIN@\mxlUninstall.ico"
+!define MUI_ICON "@IPOSE_INSTALLER_DIR_WIN@\ipose.ico"
+!define MUI_UNICON "@IPOSE_INSTALLER_DIR_WIN@\iposeUninstall.ico"
 
 ; Welcome page
 !insertmacro MUI_PAGE_WELCOME
 ; License page
-!insertmacro MUI_PAGE_LICENSE "@IPOSE_INSTALLER_DIR_WIN@\mxlLicence.txt"
+!insertmacro MUI_PAGE_LICENSE "@IPOSE_INSTALLER_DIR_WIN@\iposeLicence.txt"
 ; Directory page
 !insertmacro MUI_PAGE_DIRECTORY
 ; Instfiles page
@@ -72,9 +72,9 @@ pop $R1
 ; MUI end ------
 
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
-OutFile "@IPOSE_INSTALLER_EXECUTABLE_OUTPUT_DIR_WIN@\Setup_${PRODUCT_NAME}_@MXL_VERSION@.exe"
+OutFile "@IPOSE_INSTALLER_EXECUTABLE_OUTPUT_DIR_WIN@\Setup_${PRODUCT_NAME}_@IPOSE_VERSION@.exe"
 
-InstallDir "C:\b3c_software\MXL"
+InstallDir "C:\b3c_software\iPose"
 InstallDirRegKey HKCU "${PRODUCT_DIR_REGKEY}" ""
 
 ShowInstDetails show
@@ -92,12 +92,12 @@ Section "create product directory structure" SEC01
 
   Delete "$INSTDIR\Config\Dictionary\dictionary.dic"
   Delete "$INSTDIR\Config\Dictionary\dicom3.dic"
-  Delete "$INSTDIR\Splash\mxlSplash.bmp"
+  Delete "$INSTDIR\Splash\iposeSplash.bmp"
  
-  Delete "$SMPROGRAMS\b3c_software\MXL\Uninstall.lnk"
-  Delete "$SMPROGRAMS\b3c_software\MXL\Website.lnk"
-  Delete "$DESKTOP\MXL.lnk"
-  Delete "$SMPROGRAMS\b3c_software\MXL\MXL.lnk"
+  Delete "$SMPROGRAMS\b3c_software\iPose\Uninstall.lnk"
+  Delete "$SMPROGRAMS\b3c_software\iPose\Website.lnk"
+  Delete "$DESKTOP\iPose.lnk"
+  Delete "$SMPROGRAMS\b3c_software\iPose\iPose.lnk"
 
   RMDir "$INSTDIR\Splash"
   RMDir "$INSTDIR\Layout"
@@ -105,7 +105,7 @@ Section "create product directory structure" SEC01
   RMDir /R "$INSTDIR\bin"
   RMDir /R "$INSTDIR\Config"
 
-  RMDir "$SMPROGRAMS\b3c_software\MXL"
+  RMDir "$SMPROGRAMS\b3c_software\iPose"
   RMDir "$INSTDIR"
   ;end remove old file and directories but not the data folder
   
@@ -114,14 +114,14 @@ Section "create product directory structure" SEC01
   CreateDirectory "$INSTDIR\bin"
   SetOutPath "$INSTDIR\bin"
   File "@IPOSE_EXECUTABLE_OUTPUT_PATH@\${PRODUCT_EXE_NAME}"
-  CreateDirectory "$SMPROGRAMS\b3c_software\MXL"
-  CreateShortCut "$SMPROGRAMS\b3c_software\MXL\MXL.lnk" "$INSTDIR\Bin\${PRODUCT_EXE_NAME}"
-  CreateShortCut "$SMPROGRAMS\b3c_software\MXL\uninstall.lnk" "$INSTDIR\uninst.exe"
-  CreateShortCut "$DESKTOP\MXL.lnk" "$INSTDIR\Bin\${PRODUCT_EXE_NAME}"
+  CreateDirectory "$SMPROGRAMS\b3c_software\iPose"
+  CreateShortCut "$SMPROGRAMS\b3c_software\iPose\iPose.lnk" "$INSTDIR\Bin\${PRODUCT_EXE_NAME}"
+  CreateShortCut "$SMPROGRAMS\b3c_software\iPose\uninstall.lnk" "$INSTDIR\uninst.exe"
+  CreateShortCut "$DESKTOP\iPose.lnk" "$INSTDIR\Bin\${PRODUCT_EXE_NAME}"
 
   CreateDirectory "$INSTDIR\Splash"
   SetOutPath "$INSTDIR\Splash"
-  File "@IPOSE_INSTALLER_DIR_WIN@\mxlSplash.bmp"
+  File "@IPOSE_INSTALLER_DIR_WIN@\iposeSplash.bmp"
   CreateDirectory "$INSTDIR\Config"
   CreateDirectory "$INSTDIR\data"
   CreateDirectory "$INSTDIR\data\external"
@@ -140,7 +140,7 @@ SectionEnd
 Function CheckIfApplicationIsAlreadyInstalled
 ; check if the program already exist
 
-!insertmacro IfKeyExists HKEY_CURRENT_USER "Software" "MXL"
+!insertmacro IfKeyExists HKEY_CURRENT_USER "Software" "iPose"
 Pop $R0
 IntCmp $R0 1 registry_key_present registry_key_not_found
 registry_key_present:
@@ -161,8 +161,8 @@ FunctionEnd
 
 Section -AdditionalIcons
   WriteIniStr "$INSTDIR\${PRODUCT_NAME}.url" "InternetShortcut" "URL" "${PRODUCT_WEB_SITE}"
-  CreateShortCut "$SMPROGRAMS\b3c_software\MXL\Website.lnk" "$INSTDIR\${PRODUCT_NAME}.url"
-  CreateShortCut "$SMPROGRAMS\b3c_software\MXL\Uninstall.lnk" "$INSTDIR\uninst.exe"
+  CreateShortCut "$SMPROGRAMS\b3c_software\iPose\Website.lnk" "$INSTDIR\${PRODUCT_NAME}.url"
+  CreateShortCut "$SMPROGRAMS\b3c_software\iPose\Uninstall.lnk" "$INSTDIR\uninst.exe"
 SectionEnd
 
 Section -Post
@@ -196,12 +196,12 @@ Section Uninstall
   Delete "$INSTDIR\Layout\layout.mly"
   Delete "$INSTDIR\Config\Dictionary\dictionary.dic"
   Delete "$INSTDIR\Config\Dictionary\dicom3.dic"
-  Delete "$INSTDIR\Splash\mxlSplash.bmp"
+  Delete "$INSTDIR\Splash\iposeSplash.bmp"
 
   Delete "$SMPROGRAMS\b3c_software\XML\Uninstall.lnk"
-  Delete "$SMPROGRAMS\b3c_software\MXL\Website.lnk"
-  Delete "$DESKTOP\MXL.lnk"
-  Delete "$SMPROGRAMS\b3c_software\MXL\MXL.lnk"
+  Delete "$SMPROGRAMS\b3c_software\iPose\Website.lnk"
+  Delete "$DESKTOP\iPose.lnk"
+  Delete "$SMPROGRAMS\b3c_software\iPose\iPose.lnk"
 
   RMDir "$INSTDIR\Splash"
   RMDir "$INSTDIR\Layout"
@@ -212,12 +212,12 @@ Section Uninstall
   RMDir /R "$INSTDIR\Config"
   RMDir /R "$INSTDIR\bin"
  	
-  RMDir "$SMPROGRAMS\b3c_software\MXL"
+  RMDir "$SMPROGRAMS\b3c_software\iPose"
   RMDir "$INSTDIR"
 
   DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
   DeleteRegKey HKCU "${PRODUCT_DIR_REGKEY}"
-  DeleteRegKey HKCU "Software\MXL"
+  DeleteRegKey HKCU "Software\iPose"
   DeleteRegKey /ifempty HKCU "Software\B3C\${PRODUCT_NAME}"
   
   SetAutoClose true
