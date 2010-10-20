@@ -1,6 +1,6 @@
-MXL use license agreement
+iPose use license agreement
 
-The software named MXL and any accompanying documentation, 
+The software named iPose and any accompanying documentation, 
 manuals or data (hereafter collectively "SOFTWARE") is property of the SCS s.r.l.
 This is an open-source copyright as follows:
 Redistribution and use in source and binary forms, with or without modification, 
@@ -24,4 +24,4 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-MXL is partially based on OpenMAF.
+iPose is partially based on OpenMAF.
