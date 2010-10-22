@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2009-05-29 12:07:47 $
-  Version:   $Revision: 1.23.2.2 $
+  Date:      $Date: 2010-10-22 15:55:38 $
+  Version:   $Revision: 1.23.2.3 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -169,6 +169,9 @@ public:
   /** Retrieve html information */
   virtual const char *GetHTMLText(){return m_HTMLText.GetCStr();};
 
+  /** Return the picker used to pick the in the render window */
+  vtkCellPicker *GetPicker2D() {return m_Picker2D;};
+
 protected:
   mafObserver   *m_Listener;
   wxString       m_Label;
@@ -207,6 +210,7 @@ public:
   virtual double *GetNormal();
   virtual void    SetNormal(double normal[3]);
 
+  
 protected:
   /**
   Internally used to create a new instance of the GUI. This function should be
