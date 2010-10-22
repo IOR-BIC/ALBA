@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: exMedicalApp.cpp,v $
 Language:  C++
-Date:      $Date: 2010-10-22 09:28:09 $
-Version:   $Revision: 1.15.2.3 $
+Date:      $Date: 2010-10-22 09:29:52 $
+Version:   $Revision: 1.15.2.4 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -177,6 +177,7 @@ MafMedical is partially based on OpenMAF.
 	#include "mafViewImageCompound.h"
 	#include "mafView3D.h"
   #include "medViewArbitraryOrthoSlice.h"
+  #include "medViewSliceOnCurveCompound.h"
 #endif
 //--------------------------------------------------------------------------------
 // Create the Application
@@ -374,6 +375,10 @@ bool exMedicalApp::OnInit()
   medViewArbitraryOrthoSlice *varbitraryortho=new medViewArbitraryOrthoSlice("Arbitrary Orthoslice");
   varbitraryortho->PackageView();
   m_Logic->Plug(varbitraryortho);
+  //View Slice On Curve
+  medViewSliceOnCurveCompound vsliceoncurve=new medViewSliceOnCurveCompound("Slice On Curve");
+  vsliceoncurve->PackageView();
+  m_Logic->Plug(vsliceoncurve);
 #endif
 	//------------------------------------------------------------
 
