@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoCrossRotateAxis.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-10-20 15:28:03 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2010-10-22 15:56:33 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -288,14 +288,7 @@ void medGizmoCrossRotateAxis::Highlight(bool highlight)
    } 
   }
 }
-//----------------------------------------------------------------------------
-void  medGizmoCrossRotateAxis::SetRadius(double radius)
-//----------------------------------------------------------------------------
-{
-  m_Radius = radius;
-  m_LineSourceEast->SetPoint1(radius,0,0);
-  m_LineSourceEast->SetPoint2(3*radius, 0,0);
-}
+
 //----------------------------------------------------------------------------
 void medGizmoCrossRotateAxis::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------

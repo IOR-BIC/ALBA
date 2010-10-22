@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2010-10-20 15:28:30 $
-Version:   $Revision: 1.1.2.20 $
+Date:      $Date: 2010-10-22 15:56:50 $
+Version:   $Revision: 1.1.2.21 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -73,6 +73,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkProperty.h"
 #include "vtkTextProperty.h"
 #include "vtkRenderer.h"
+#include "vtkCellPicker.h"
 #include "medOpMatrixVectorMath.h"
 #include "mafTransformFrame.h"
 #include "mafVMEGizmo.h"
@@ -226,6 +227,8 @@ void medViewArbitraryOrthoSlice::PackageView()
 	m_ViewArbitrary->PlugVisualPipe("mafVMEGizmo", "mafPipeGizmo", NON_VISIBLE);
 
 	m_ViewSliceX = new mafViewVTK("",CAMERA_OS_X,true,false,false,0,false,mafAxes::HEAD);
+  
+  
 	// 	m_ViewSliceX->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice", NON_VISIBLE);
 	// 	m_ViewSliceX->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice", NON_VISIBLE);
 	// 	m_ViewSliceX->PlugVisualPipe("mafVMEMesh", "mafPipeMeshSlice", NON_VISIBLE);
@@ -235,7 +238,9 @@ void medViewArbitraryOrthoSlice::PackageView()
 	// 	m_ViewSliceX->PlugVisualPipe("mafVMELandmarkCloud", "mafPipeSurfaceSlice", NON_VISIBLE);
 
 	m_ViewSliceY = new mafViewVTK("",CAMERA_OS_Y,true,false,false,0,false,mafAxes::HEAD);
-	// 	m_ViewSliceY->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice", NON_VISIBLE);
+	
+  
+  // 	m_ViewSliceY->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice", NON_VISIBLE);
 	// 	m_ViewSliceY->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice", NON_VISIBLE);
 	// 	m_ViewSliceY->PlugVisualPipe("mafVMEMesh", "mafPipeMeshSlice", NON_VISIBLE);
 	//m_ViewSliceY->PlugVisualPipe("mafVMEGizmo", "mafPipeGizmo");
@@ -244,7 +249,9 @@ void medViewArbitraryOrthoSlice::PackageView()
 	// 	m_ViewSliceY->PlugVisualPipe("mafVMELandmarkCloud", "mafPipeSurfaceSlice", NON_VISIBLE);
 
 	m_ViewSliceZ = new mafViewVTK("",CAMERA_OS_Z,true,false,false,0,false,mafAxes::HEAD);
-	// 	m_ViewSliceZ->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice", NON_VISIBLE);
+	
+  
+  // 	m_ViewSliceZ->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice", NON_VISIBLE);
 	// 	m_ViewSliceZ->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice", NON_VISIBLE);
 	// 	m_ViewSliceZ->PlugVisualPipe("mafVMEMesh", "mafPipeMeshSlice", NON_VISIBLE);
 	//m_ViewSliceZ->PlugVisualPipe("mafVMEGizmo", "mafPipeGizmo");
@@ -1119,6 +1126,7 @@ mafView *medViewArbitraryOrthoSlice::Copy(mafObserver *Listener)
 mafGUI* medViewArbitraryOrthoSlice::CreateGui()
 
 {
+  
 	assert(m_Gui == NULL);
 	m_Gui = new mafGUI(this);
 
@@ -1399,17 +1407,26 @@ void medViewArbitraryOrthoSlice::ShowMafVMEVolume( mafVME * vme, bool show )
 	mafViewVTK *xView = ((mafViewVTK *)(m_ChildViewList[X_VIEW])) ;
 	assert(xView);
 
+  // fuzzy picking
+  xView->GetPicker2D()->SetTolerance(0.05);
+
 	xView->GetSceneGraph()->m_AlwaysVisibleRenderer->AddActor2D(m_TextActorLeftXView);
 	xView->GetSceneGraph()->m_AlwaysVisibleRenderer->AddActor2D(m_TextActorRightXView);
 
 	mafViewVTK *yView = ((mafViewVTK *)(m_ChildViewList[Y_VIEW])) ;
 	assert(yView);
 
+  // fuzzy picking
+  yView->GetPicker2D()->SetTolerance(0.05);
+
 	yView->GetSceneGraph()->m_AlwaysVisibleRenderer->AddActor2D(m_TextActorLeftYView);
 	yView->GetSceneGraph()->m_AlwaysVisibleRenderer->AddActor2D(m_TextActorRightYView);
 
 	mafViewVTK *zView = ((mafViewVTK *)(m_ChildViewList[Z_VIEW])) ;
 	assert(zView);
+
+  // fuzzy picking
+  zView->GetPicker2D()->SetTolerance(0.05);
 
 	zView->GetSceneGraph()->m_AlwaysVisibleRenderer->AddActor2D(m_TextActorLeftZView);
 	zView->GetSceneGraph()->m_AlwaysVisibleRenderer->AddActor2D(m_TextActorRightZView);

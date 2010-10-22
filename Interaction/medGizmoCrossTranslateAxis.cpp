@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGizmoCrossTranslateAxis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-10-20 15:28:03 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2010-10-22 15:56:33 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -42,6 +42,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkPolyData.h"
 #include "vtkMath.h"
 #include "vtkProperty.h"
+#include "vtkAppendPolyData.h"
 
 //----------------------------------------------------------------------------
 medGizmoCrossTranslateAxis::medGizmoCrossTranslateAxis(mafVME *input, mafObserver *listener)
@@ -73,7 +74,7 @@ medGizmoCrossTranslateAxis::medGizmoCrossTranslateAxis(mafVME *input, mafObserve
 	// cylinder gizmo
 	m_CylGizmo = mafVMEGizmo::New();
 	m_CylGizmo->SetName("CylGizmo");
-	m_CylGizmo->SetData(m_RotatePDF->GetOutput());
+	m_CylGizmo->SetData(m_Append->GetOutput());
 	m_CylGizmo->SetMediator(m_Listener);
 	// cone gizmo
 
@@ -96,14 +97,23 @@ medGizmoCrossTranslateAxis::~medGizmoCrossTranslateAxis()
 {
 	m_CylGizmo->SetBehavior(NULL);
 
-	vtkDEL(m_Cylinder);
+	vtkDEL(m_RightCylinder);
 
 	// clean up
-	vtkDEL(m_TranslateTr);
-	vtkDEL(m_TranslatePDF);
-	vtkDEL(m_RotationTr);
-	vtkDEL(m_RotatePDF);
-	//----------------------
+	vtkDEL(m_RightTranslateTr);
+	vtkDEL(m_RightTranslatePDF);
+	vtkDEL(m_RightCylinderRotationTr);
+	vtkDEL(m_RightCylinderRotatePDF);
+
+  // clean up
+  vtkDEL(m_LeftTranslateTr);
+  vtkDEL(m_LeftTranslatePDF);
+  vtkDEL(m_LeftCylinderRotationTr);
+  vtkDEL(m_LeftCylinderRotatePDF);
+
+  vtkDEL(m_Append);
+
+  //----------------------
 	// No leaks so somebody is performing this...
 	// wxDEL(GizmoData);
 	//----------------------
@@ -131,62 +141,99 @@ void medGizmoCrossTranslateAxis::CreatePipeline()
 	p2[2] = b[5];
 	d = sqrt(vtkMath::Distance2BetweenPoints(p1,p2));
 
-	// create the cylinder
-	m_Cylinder = vtkCylinderSource::New();
-	m_Cylinder->SetRadius(d / 200);
+	// create the right cylinder
+	m_RightCylinder = vtkCylinderSource::New();
+	m_RightCylinder->SetRadius(d / 190);
 
 	//-----------------
 	// rotate the cylinder on the X axis (default axis is Z)
 	//-----------------
-	vtkTransform *cylInitTr = vtkTransform::New();
-	cylInitTr->RotateZ(-90);	
+	vtkTransform *rightCylinderInitialTr = vtkTransform::New();
+	rightCylinderInitialTr->RotateZ(-90);	
 
-	vtkTransformPolyDataFilter *cylInitTrPDF = vtkTransformPolyDataFilter::New();
-	cylInitTrPDF->SetInput(m_Cylinder->GetOutput());
-	cylInitTrPDF->SetTransform(cylInitTr);
-
-	/*
-	vtk coord
-	y
-	^
-	|
-	__
-	|| |
-	|z-|-------> x
-	|  |
-	--
-	*/
+	vtkTransformPolyDataFilter *rightCylinderInitialTrPDF = vtkTransformPolyDataFilter::New();
+	rightCylinderInitialTrPDF->SetInput(m_RightCylinder->GetOutput());
+	rightCylinderInitialTrPDF->SetTransform(rightCylinderInitialTr);
 
 	// create the translation transform
-	m_TranslateTr = vtkTransform::New();
+	m_RightTranslateTr = vtkTransform::New();
+  m_RightTranslateTr->Translate(3* d / 8, 0, 0);
 
 	// create cylinder translation transform
-	m_TranslatePDF = vtkTransformPolyDataFilter::New();
-	m_TranslatePDF->SetInput(cylInitTrPDF->GetOutput());
-
-	// place the cylinder before the cone; default cylinder length is 1/4 of vme bb diagonal
-	this->SetCylinderLength(d / 4);
+	m_RightTranslatePDF = vtkTransformPolyDataFilter::New();
+	m_RightTranslatePDF->SetInput(rightCylinderInitialTrPDF->GetOutput());
 
 	//-----------------
 	// translate transform setting
-	m_TranslatePDF->SetTransform(m_TranslateTr);
-
+	m_RightTranslatePDF->SetTransform(m_RightTranslateTr);
 
 	// create rotation transform and rotation TPDF 
-	m_RotatePDF = vtkTransformPolyDataFilter::New();
-	m_RotationTr = vtkTransform::New();
-	m_RotationTr->Identity(); 
+	m_RightCylinderRotatePDF = vtkTransformPolyDataFilter::New();
+	m_RightCylinderRotationTr = vtkTransform::New();
+	m_RightCylinderRotationTr->Identity(); 
 
-	m_RotatePDF->SetTransform(m_RotationTr);
+	m_RightCylinderRotatePDF->SetTransform(m_RightCylinderRotationTr);
 
-	m_RotatePDF->SetInput(m_TranslatePDF->GetOutput());
+	m_RightCylinderRotatePDF->SetInput(m_RightTranslatePDF->GetOutput());
 
-	m_RotatePDF->Update();
-	m_RotatePDF->Update();
+	m_RightCylinderRotatePDF->Update();
+	m_RightCylinderRotatePDF->Update();
+
+
+
+  // create the left cylinder
+  m_LeftCylinder = vtkCylinderSource::New();
+  m_LeftCylinder->SetRadius(d / 190);
+
+  //-----------------
+  // rotate the cylinder on the X axis (default axis is Z)
+  //-----------------
+  vtkTransform *LeftCylinderInitialTr = vtkTransform::New();
+  LeftCylinderInitialTr->RotateZ(-90);	
+
+  vtkTransformPolyDataFilter *LeftCylinderInitialTrPDF = vtkTransformPolyDataFilter::New();
+  LeftCylinderInitialTrPDF->SetInput(m_LeftCylinder->GetOutput());
+  LeftCylinderInitialTrPDF->SetTransform(LeftCylinderInitialTr);
+
+  // create the translation transform
+  m_LeftTranslateTr = vtkTransform::New();
+  m_LeftTranslateTr->Translate( - 3* d / 8, 0, 0);
+
+  // create cylinder translation transform
+  m_LeftTranslatePDF = vtkTransformPolyDataFilter::New();
+  m_LeftTranslatePDF->SetInput(LeftCylinderInitialTrPDF->GetOutput());
+
+  // place the cylinder before the cone; default cylinder length is 1/4 of vme bb diagonal
+  this->SetCylinderLength(d / 16);
+
+  //-----------------
+  // translate transform setting
+  m_LeftTranslatePDF->SetTransform(m_LeftTranslateTr);
+
+
+  // create rotation transform and rotation TPDF 
+  m_LeftCylinderRotatePDF = vtkTransformPolyDataFilter::New();
+  m_LeftCylinderRotationTr = vtkTransform::New();
+  m_LeftCylinderRotationTr->Identity(); 
+
+  m_LeftCylinderRotatePDF->SetTransform(m_LeftCylinderRotationTr);
+
+  m_LeftCylinderRotatePDF->SetInput(m_LeftTranslatePDF->GetOutput());
+
+  m_LeftCylinderRotatePDF->Update();
+  m_LeftCylinderRotatePDF->Update();
+
+  // place the cylinder before the cone; default cylinder length is 1/4 of vme bb diagonal
+  this->SetCylinderLength(d / 16);
+
+  m_Append = vtkAppendPolyData::New();
+  m_Append->SetInput(m_RightCylinderRotatePDF->GetOutput());
+  m_Append->AddInput(m_LeftCylinderRotatePDF->GetOutput());
+  m_Append->Update();
 
 	//clean up
-	cylInitTr->Delete();
-	cylInitTrPDF->Delete();
+	rightCylinderInitialTr->Delete();
+	rightCylinderInitialTrPDF->Delete();
 }
 //----------------------------------------------------------------------------
 void medGizmoCrossTranslateAxis::CreateISA()
@@ -215,7 +262,7 @@ void medGizmoCrossTranslateAxis::SetAxis(int axis)
 	if (m_Axis == X)
 	{
 		// reset cyl and cone rotation
-		m_RotationTr->Identity();
+		m_RightCylinderRotationTr->Identity();
 
 		// set cyl and cone color to red
 		this->SetColor(m_LastColor);
@@ -226,8 +273,11 @@ void medGizmoCrossTranslateAxis::SetAxis(int axis)
 	else if (axis == Y)
 	{
 		// set rotation to move con and cyl on Y 
-		m_RotationTr->Identity();
-		m_RotationTr->RotateZ(90);
+		m_RightCylinderRotationTr->Identity();
+		m_RightCylinderRotationTr->RotateZ(90);
+
+    m_LeftCylinderRotationTr->Identity();
+    m_LeftCylinderRotationTr->RotateZ(90);
 
 		// set cyl and cone color to green
 		this->SetColor(m_LastColor);
@@ -238,8 +288,11 @@ void medGizmoCrossTranslateAxis::SetAxis(int axis)
 	else if (axis == Z)
 	{
 		// set rotation to move con and cyl on Z
-		m_RotationTr->Identity();
-		m_RotationTr->RotateY(-90);
+		m_RightCylinderRotationTr->Identity();
+		m_RightCylinderRotationTr->RotateY(-90);
+
+    m_LeftCylinderRotationTr->Identity();
+    m_LeftCylinderRotationTr->RotateY(-90);
 
 		// set cyl and cone color to blue
 		this->SetColor(m_LastColor);
@@ -275,7 +328,8 @@ void medGizmoCrossTranslateAxis::SetCylinderLength(double length)
 {
 	// set cylLen to length
 	m_CylinderLength = length;
-	m_Cylinder->SetHeight(4 * length);
+	m_RightCylinder->SetHeight(4 * length);
+  m_LeftCylinder->SetHeight(4 * length);
 }
 //----------------------------------------------------------------------------
 void medGizmoCrossTranslateAxis::OnEvent(mafEventBase *maf_event)

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoCrossRotateAxis.h,v $
   Language:  C++
-  Date:      $Date: 2010-10-20 15:28:03 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2010-10-22 15:56:33 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -98,8 +98,7 @@ public:
   // radius setting 
   //----------------------------------------------------------------------------
   
-  /** Set/Get the radius of the gizmo*/
-  void   SetRadius(double radius);
+  /** Get the radius of the gizmo*/
   double GetRadius();
 
   //----------------------------------------------------------------------------

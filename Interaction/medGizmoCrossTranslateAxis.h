@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoCrossTranslateAxis.h,v $
   Language:  C++
-  Date:      $Date: 2010-10-20 15:28:03 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2010-10-22 15:56:33 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -41,6 +41,7 @@ class vtkConeSource;
 class vtkCylinderSource;
 class vtkTransformPolyDataFilter;
 class vtkTransform;
+class vtkAppendPolyData;
 
 /** Basic gizmo component used to perform constrained translation on one axis.
   
@@ -132,7 +133,7 @@ protected:
   int m_Axis;
  
   /** Cylinder source*/
-  vtkCylinderSource *m_Cylinder;
+  vtkCylinderSource *m_RightCylinder;
   
   /** Cylinder length*/
   double m_CylinderLength;
@@ -141,17 +142,35 @@ protected:
   //mafVmeData *GizmoData[2];
 
   /** translate PDF for cylinder and cone*/
-  vtkTransformPolyDataFilter *m_TranslatePDF;
+  vtkTransformPolyDataFilter *m_RightTranslatePDF;
   
   /** translation transform for cylinder and cone*/
-  vtkTransform *m_TranslateTr;
+  vtkTransform *m_RightTranslateTr;
  
   /** rotate PDF for cylinder and cone*/
-  vtkTransformPolyDataFilter *m_RotatePDF;
+  vtkTransformPolyDataFilter *m_RightCylinderRotatePDF;
 
   /** rotation transform for cylinder and cone*/
-  vtkTransform *m_RotationTr;
+  vtkTransform *m_RightCylinderRotationTr;
   
+  /** Cylinder source*/
+  vtkCylinderSource *m_LeftCylinder;
+
+  /** translate PDF for cylinder and cone*/
+  vtkTransformPolyDataFilter *m_LeftTranslatePDF;
+
+  /** translation transform for cylinder and cone*/
+  vtkTransform *m_LeftTranslateTr;
+
+  /** rotate PDF for cylinder and cone*/
+  vtkTransformPolyDataFilter *m_LeftCylinderRotatePDF;
+
+  /** rotation transform for cylinder and cone*/
+  vtkTransform *m_LeftCylinderRotationTr;
+
+  /** append two cylinders */
+  vtkAppendPolyData *m_Append;
+
   /** Create vtk objects needed*/
   void CreatePipeline();
 
