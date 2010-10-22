@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: exMedicalApp.cpp,v $
 Language:  C++
-Date:      $Date: 2010-10-20 15:28:12 $
-Version:   $Revision: 1.15.2.2 $
+Date:      $Date: 2010-10-22 09:28:09 $
+Version:   $Revision: 1.15.2.3 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -40,7 +40,7 @@ MafMedical is partially based on OpenMAF.
 =========================================================================*/
 
 
-#include "mafDefines.h" 
+#include "medDefines.h" 
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
@@ -49,7 +49,7 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 
 #include "exMedicalApp.h"
-#include "mafDecl.h"
+#include "medDecl.h"
 
 #include "mafVMEFactory.h"
 #include "medVMEFactory.h"
@@ -85,6 +85,9 @@ MafMedical is partially based on OpenMAF.
 	#include "medOpImporterLandmarkWS.h"
 	#include "medOpImporterRAWImages.h"
 	#include "medOpImporterC3D.h"
+  #include "mafOpImporterBBF.h"
+  #include "mafOpImporterRAWVolume_BES.h"
+  #include "medOpImporterVTK.h"
 #endif
 #ifndef _DEBUG
 	//EXPORTERS
@@ -93,6 +96,9 @@ MafMedical is partially based on OpenMAF.
 	#include "mafOpExporterSTL.h"
 	#include "mafOpExporterVTK.h"
 	#include "medOpExporterLandmark.h"
+  #include "medOpExporterWrappedMeter.h"
+  #include "medOpExporterGRFWS.h"
+  #include "medOpExporterMeters.h"
 #endif
 #ifndef _DEBUG
 	//OPERATIONS
@@ -133,6 +139,29 @@ MafMedical is partially based on OpenMAF.
 	#include "mafOpCreateSpline.h"
 	#include "mafOpRemoveCells.h"
 	#include "medOpExtrusionHoles.h"
+  #include "medOpCreateLabeledVolume.h"
+  #include "medOpSplitSurface.h"
+  #include "medOpInteractiveClipSurface.h"
+  #include "medOpCreateEditSkeleton.h"
+  #include "medOpCreateSurface.h"
+  #include "medOpCreateWrappedMeter.h"
+  #include "medOpComputeWrapping.h"
+  #include "medOpLabelizeSurface.h"
+  #include "medOpFreezeVME.h"
+  #include "medOpIterativeRegistration.h"
+  #include "medOpCleanSurface.h"
+  #include "medOpSmoothSurface.h"
+  #include "medOpTriangulateSurface.h"
+  #include "medOpSurfaceMirror.h"
+  #include "medOpSubdivide.h"
+  #include "medOpFillHoles.h"
+  #include "medOpMeshDeformation.h"
+  #include "medOpMakeVMETimevarying.h"
+  #include "medOpSmoothSurfaceCells.h"
+  #include "medOpEqualizeHistogram.h"
+  #include "medOpMML3.h"
+  #include "medOpSegmentationRegionGrowingConnectedThreshold.h"
+  #include "medOpSegmentationRegionGrowingLocalAndGlobalThreshold.h"
 #endif
 
 #ifndef _DEBUG
@@ -147,6 +176,7 @@ MafMedical is partially based on OpenMAF.
 	#include "mafViewSingleSliceCompound.h"
 	#include "mafViewImageCompound.h"
 	#include "mafView3D.h"
+  #include "medViewArbitraryOrthoSlice.h"
 #endif
 //--------------------------------------------------------------------------------
 // Create the Application
@@ -191,6 +221,7 @@ bool exMedicalApp::OnInit()
 	m_Logic->Plug(new mafOpImporterSTL("STL"));
 	m_Logic->Plug(new mafOpImporterVRML("VRML"));
 	m_Logic->Plug(new mafOpImporterVTK("VTK"));
+  m_Logic->Plug(new medOpImporterVTK("VTK (MED)"));
 	m_Logic->Plug(new mafOpImporterMSF1x("MSF 1.x"));
 	m_Logic->Plug(new mafOpImporterMesh("Mesh"));
 #ifdef MAF_USE_ITK
@@ -207,6 +238,8 @@ bool exMedicalApp::OnInit()
 		m_Logic->Plug(new medOpImporterGRFWS("GRF"));
 #endif
 	m_Logic->Plug(new medOpImporterRAWImages("RAW Images"));
+  m_Logic->Plug(new mafOpImporterBBF());
+  m_Logic->Plug(new mafOpImporterRAWVolume_BES());
 #endif
 	//------------------------------------------------------------
 
@@ -219,6 +252,9 @@ bool exMedicalApp::OnInit()
 	m_Logic->Plug(new mafOpExporterVTK("VTK"));
 	m_Logic->Plug(new mafOpExporterRAW("Raw"));
 	m_Logic->Plug(new medOpExporterLandmark("Landmark"));
+  m_Logic->Plug(new medOpExporterWrappedMeter());
+  m_Logic->Plug(new medOpExporterGRFWS());
+  m_Logic->Plug(new medOpExporterMeters());
 #endif
 	//------------------------------------------------------------
 
@@ -231,39 +267,63 @@ bool exMedicalApp::OnInit()
 	m_Logic->Plug(new medOpVolumeMeasure("Volume"),"Measure");
 	m_Logic->Plug(new medOpMeshQuality("Mesh Quality"),"Measure");
 
-	m_Logic->Plug(new mafOpAddLandmark("Add Landmark"),"Create");
-	m_Logic->Plug(new mafOpCreateGroup("Group"),"Create");
-	m_Logic->Plug(new mafOpCreateMeter("Meter"),"Create");
-	m_Logic->Plug(new mafOpCreateRefSys("RefSys"),"Create");
-	m_Logic->Plug(new mafOpCreateProber("Prober"),"Create");
-	m_Logic->Plug(new mafOpCreateSlicer("Slicer"),"Create");
-	m_Logic->Plug(new mafOpExtractIsosurface("Extract Isosurface"),"Create");
-	m_Logic->Plug(new mafOpCreateSurfaceParametric("Parametric Surface"),"Create");
-	m_Logic->Plug(new mafOpCreateSpline("Spline"),"Create");
+	m_Logic->Plug(new mafOpAddLandmark("Add Landmark"),_("Create"));
+	m_Logic->Plug(new mafOpCreateGroup("Group"),_("Create"));
+	m_Logic->Plug(new mafOpCreateMeter("Meter"),_("Create"));
+	m_Logic->Plug(new mafOpCreateRefSys("RefSys"),_("Create"));
+	m_Logic->Plug(new mafOpCreateProber("Prober"),_("Create"));
+	m_Logic->Plug(new mafOpCreateSlicer("Slicer"),_("Create"));
+	m_Logic->Plug(new mafOpExtractIsosurface("Extract Isosurface"),_("Create"));
+	m_Logic->Plug(new mafOpCreateSurfaceParametric("Parametric Surface"),_("Create"));
+	m_Logic->Plug(new mafOpCreateSpline("Spline"),_("Create"));
+  m_Logic->Plug(new medOpCreateLabeledVolume(),_("Create"));
+  m_Logic->Plug(new medOpCreateEditSkeleton(),_("Create"));
+  m_Logic->Plug(new medOpCreateSurface(),_("Create"));
+  m_Logic->Plug(new medOpCreateWrappedMeter(),_("Create"));
+  m_Logic->Plug(new medOpComputeWrapping("Computing Wrapping"),_("Create"));
+  m_Logic->Plug(new medOpFreezeVME(),_("Create"));
+  m_Logic->Plug(new medOpSegmentationRegionGrowingConnectedThreshold(),_("Create"));
+  m_Logic->Plug(new medOpSegmentationRegionGrowingLocalAndGlobalThreshold(),_("Create"));
 
-	m_Logic->Plug(new mafOpClipSurface("Clip Surface"),"Modify");
-	m_Logic->Plug(new mafOpFilterSurface("Filter Surface"),"Modify");
-	m_Logic->Plug(new mafOpFilterVolume("Filter Volume"),"Modify");
-	m_Logic->Plug(new mafOpDecimateSurface("Decimate Surface"),"Modify");
-	m_Logic->Plug(new mafOpConnectivitySurface("Connectivity Surface"),"Modify");
-	m_Logic->Plug(new mafOpEditNormals("Edit Normals"),"Modify");
-	m_Logic->Plug(new mafOpEditMetadata("Metadata Editor"),"Modify");
-	m_Logic->Plug(new mafOpExplodeCollapse("Explode/Collapse cloud"),"Modify");
-	m_Logic->Plug(new mafOpMAFTransform("Transform"),"Modify");
-	m_Logic->Plug(new mafOpReparentTo("Reparent to..."),"Modify");
-	m_Logic->Plug(new mafOpVolumeResample("Resample Volume"),"Modify");
-	m_Logic->Plug(new mafOpCrop("Crop Volume"),"Modify");
-	m_Logic->Plug(new mafOpBooleanSurface("Boolean Surface"),"Modify");
-	m_Logic->Plug(new medOpMML("MML"),"Modify");
-	m_Logic->Plug(new medOpCropDeformableROI("Crop ROI"),"Modify");
-	m_Logic->Plug(new medOpFlipNormals("Flip Normals"),"Modify");
-	m_Logic->Plug(new mafOpRemoveCells("Remove Cells"),"Modify");
-	m_Logic->Plug(new medOpExtrusionHoles(),"Modify");
-  m_Logic->Plug(new medOpScaleDataset("Scale Dataset"),"Modify");
-  m_Logic->Plug(new medOpMove("Move"),"Modify");    
-	m_Logic->Plug(new medOpRegisterClusters("Clusters"),"Register");
+	m_Logic->Plug(new mafOpClipSurface("Clip Surface"),_("Modify"));
+	m_Logic->Plug(new mafOpFilterSurface("Filter Surface"),_("Modify"));
+	m_Logic->Plug(new mafOpFilterVolume("Filter Volume"),_("Modify"));
+	m_Logic->Plug(new mafOpDecimateSurface("Decimate Surface"),_("Modify"));
+	m_Logic->Plug(new mafOpConnectivitySurface("Connectivity Surface"),_("Modify"));
+	m_Logic->Plug(new mafOpEditNormals("Edit Normals"),_("Modify"));
+	m_Logic->Plug(new mafOpEditMetadata("Metadata Editor"),_("Modify"));
+	m_Logic->Plug(new mafOpExplodeCollapse("Explode/Collapse cloud"),_("Modify"));
+	m_Logic->Plug(new mafOpMAFTransform("Transform"),_("Modify"));
+	m_Logic->Plug(new mafOpReparentTo("Reparent to..."),_("Modify"));
+	m_Logic->Plug(new mafOpVolumeResample("Resample Volume"),_("Modify"));
+	m_Logic->Plug(new mafOpCrop("Crop Volume"),_("Modify"));
+	m_Logic->Plug(new mafOpBooleanSurface("Boolean Surface"),_("Modify"));
+	m_Logic->Plug(new medOpMML("MML"),_("Modify"));
+  m_Logic->Plug(new medOpMML3("MML 3"),_("Modify"));
+	m_Logic->Plug(new medOpCropDeformableROI("Crop ROI"),_("Modify"));
+	m_Logic->Plug(new medOpFlipNormals("Flip Normals"),_("Modify"));
+	m_Logic->Plug(new mafOpRemoveCells("Remove Cells"),_("Modify"));
+	m_Logic->Plug(new medOpExtrusionHoles(),_("Modify"));
+  m_Logic->Plug(new medOpScaleDataset("Scale Dataset"),_("Modify"));
+  m_Logic->Plug(new medOpMove("Move"),_("Modify"));    
+  m_Logic->Plug(new medOpSplitSurface(),_("Modify"));
+  m_Logic->Plug(new medOpInteractiveClipSurface(),_("Modify"));
+  m_Logic->Plug(new medOpLabelizeSurface(),_("Modify"));
+  m_Logic->Plug(new medOpSmoothSurface(),_("Modify"));
+  m_Logic->Plug(new medOpCleanSurface(),_("Modify"));
+  m_Logic->Plug(new medOpTriangulateSurface(),_("Modify"));
+  m_Logic->Plug(new medOpSurfaceMirror(),_("Modify"));
+  m_Logic->Plug(new medOpSubdivide(),_("Modify"));
+  m_Logic->Plug(new medOpFillHoles(),_("Modify"));
+  m_Logic->Plug(new medOpMeshDeformation(),_("Modify"));
+  m_Logic->Plug(new medOpMakeVMETimevarying(),_("Modify"));
+  m_Logic->Plug(new medOpEqualizeHistogram(),_("Modify"));
+  m_Logic->Plug(new medOpSmoothSurfaceCells(),_("Modify"));
+
+  m_Logic->Plug(new medOpIterativeRegistration(),_("Register"));
+	m_Logic->Plug(new medOpRegisterClusters("Clusters"),_("Register"));
 #ifdef MAF_USE_ITK
-		m_Logic->Plug(new medOpClassicICPRegistration("Surface"),"Register");
+		m_Logic->Plug(new medOpClassicICPRegistration("Surface"),_("Register"));
 #endif
 #endif
 	//------------------------------------------------------------
@@ -310,6 +370,10 @@ bool exMedicalApp::OnInit()
 	//View 3D
 	mafView3D *v3d=new mafView3D("3D");
 	m_Logic->Plug(v3d);
+  //View Arbitrary Orthoslice
+  medViewArbitraryOrthoSlice *varbitraryortho=new medViewArbitraryOrthoSlice("Arbitrary Orthoslice");
+  varbitraryortho->PackageView();
+  m_Logic->Plug(varbitraryortho);
 #endif
 	//------------------------------------------------------------
 
