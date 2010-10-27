@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.h,v $
 Language:  C++
-Date:      $Date: 2010-10-20 15:28:30 $
-Version:   $Revision: 1.1.2.13 $
-Authors:   Stefano Perticoni
+Date:      $Date: 2010-10-27 13:15:49 $
+Version:   $Revision: 1.1.2.14 $
+Authors:   Stefano Perticoni	
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -75,7 +75,7 @@ public:
 	{
 		ID_COMBO_CHOOSE_ACTIVE_GIZMO = Superclass::ID_LAST,
 		ID_RESET,
-    ID_SHOW_GIZMO,
+		ID_SHOW_GIZMO,
 		ID_LAST,
 	};
 
@@ -85,12 +85,15 @@ public:
 	/** Show/Hide VMEs into plugged sub-views*/
 	virtual void VmeShow(mafNode *node, bool show);
 
-	
+
 	/** Remove VME into plugged sub-views*/
 	virtual void VmeRemove(mafNode *node);
 
 	/** Create the GUI at the bottom of the compounded view. */
 	virtual void CreateGuiView();
+
+	/** Camera update */
+	void CameraUpdate();
 
 	/** Function that handles events sent from other objects. */
 	virtual void OnEvent(mafEventBase *maf_event);
@@ -102,7 +105,7 @@ public:
 	virtual mafView* Copy(mafObserver *Listener);
 
 	/** Force the updating of the camera. */
-	virtual void CameraUpdateWACU();
+	virtual void UpdateSubviewsCamerasToFaceSlices();
 
 	virtual void OnLayout();
 
@@ -139,17 +142,21 @@ protected:
 
 	void ShowMafVMEVolume( mafVME * vme, bool show );
 
+	void StoreCameraParameters();
+
 	void Update2DActors();
 
 	void ShowSlicers( mafVME * vmeVolume, bool show );
 
-	
+	void ResetCameraToSlices();
+
+
 	/** 
 	Create the helper cone giving feedback for camera direction*/
 	void BuildXCameraConeVME();
 	void BuildYCameraConeVME();
 	void BuildZCameraConeVME();
-	
+
 	void HideMafVMEVolume();
 
 	void ShowMafVMEMesh( mafNode * node );
@@ -174,12 +181,15 @@ protected:
 	void OnEventThis(mafEventBase *maf_event);  
 	void OnLUTChooser();
 	void OnRangeModified();
-	
+
 	void OnReset();
+
+	void RestoreCamera();
+
 	void OnResetMedVMEPolylineEditor();
 	void OnResetMafVMEMesh( mafNode * node );
 	void OnResetSurfaceAndLandmark( mafNode * node );
-	
+
 	/** This function is called when a rotate gizmo is moved*/
 	void OnEventGizmoCrossRotateZNormal(mafEventBase *maf_event);
 
@@ -194,7 +204,7 @@ protected:
 	/**	This function is called when a translate gizmo is moved*/
 	void OnEventGizmoCrossTranslateZNormal(mafEventBase *maf_event);
 
-	void PostMultiplyEventMatrixToGizmoCrossRT( mafEventBase * maf_event  , medGizmoCrossRotateTranslate *target);
+	void PostMultiplyEventMatrixToGizmoCross( mafEventBase * inputEvent , medGizmoCrossRotateTranslate *targetGizmo);
 
 	/** Post multiply matrix for incoming transform events */
 	void PostMultiplyEventMatrixToSlicers(mafEventBase *maf_event);
@@ -209,29 +219,26 @@ protected:
 	void OnEventGizmoCrossXNormal( mafEventBase * maf_event );
 	void OnEventGizmoCrossRotateXNormal(mafEventBase *maf_event);
 
-	
-
 	void ChildViewsCameraUpdate();
 
 	void OnEventGizmoCrossTranslateXNormal(mafEventBase *maf_event);
 	void OnEventGizmoCrossTranslateYNormal(mafEventBase *maf_event);
+
 	mafViewVTK *m_ViewSliceX;
 	mafViewVTK *m_ViewSliceY;
 	mafViewVTK *m_ViewSliceZ;
 
 	mafViewVTK *m_ViewArbitrary;
 
-	
-	
 	mafVME          	*m_CurrentVolume;
 	mafVME				    *m_CurrentImage;
-	
+
 	mafVMESlicer			*m_SlicerX;
 	mafVMESlicer			*m_SlicerY;
 	mafVMESlicer			*m_SlicerZ;
-	
-  mafMatrix					*m_SlicerXResetMatrix;
-  mafMatrix					*m_SlicerYResetMatrix;
+
+	mafMatrix					*m_SlicerXResetMatrix;
+	mafMatrix					*m_SlicerYResetMatrix;
 	mafMatrix					*m_SlicerZResetMatrix;
 
 	mafAttachCamera		*m_AttachCameraToSlicerXInXView;
@@ -243,7 +250,7 @@ protected:
 	double	m_VolumeVTKDataABSOrientation[3];
 	int			m_ComboChooseActiveGizmo;
 
-  int m_ShowGizmo;
+	int m_ShowGizmo;
 	mafGUI				*m_GuiGizmos;
 
 	medVMEPolylineEditor *m_CurrentPolylineGraphEditor;
@@ -258,6 +265,10 @@ protected:
 	double m_XCameraFocalPointForReset[3];
 	double m_YCameraFocalPointForReset[3];
 	double m_ZCameraFocalPointForReset[3];
+
+	double m_XCameraViewUpForReset[3];
+	double m_YCameraViewUpForReset[3];
+	double m_ZCameraViewUpForReset[3];
 
 
 	medGizmoCrossRotateTranslate *m_GizmoZView;
