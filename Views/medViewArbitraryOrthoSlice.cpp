@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2010-10-27 13:15:49 $
-Version:   $Revision: 1.1.2.22 $
+Date:      $Date: 2010-10-27 13:20:14 $
+Version:   $Revision: 1.1.2.23 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -320,7 +320,7 @@ void medViewArbitraryOrthoSlice::VmeShow(mafNode *node, bool show)
 		if(((mafVME *)vme)->GetOutput()->IsA("mafVMEOutputVolume"))
 		{
 			ShowMafVMEVolume(vme, show);
-			StoreCameraParameters();
+			StoreCameraParametersForAllSubviews();
 		}
 
 		else if(vme->IsA("mafVMESurface") || vme->IsA("mafVMESurfaceParametric") || vme->IsA("mafVMELandmark") || vme->IsA("mafVMELandmarkCloud"))
@@ -1648,7 +1648,7 @@ void medViewArbitraryOrthoSlice::OnReset()
 		//update because I need to refresh the normal of the camera
 		//mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 
-		RestoreCamera();
+		RestoreCameraParametersForAllSubviews();
 
 		mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 
@@ -2639,7 +2639,7 @@ void medViewArbitraryOrthoSlice::ResetCameraToSlices()
 	((mafViewVTK*)m_ChildViewList[Z_VIEW])->CameraReset(m_SlicerZ);
 }
 
-void medViewArbitraryOrthoSlice::StoreCameraParameters()
+void medViewArbitraryOrthoSlice::StoreCameraParametersForAllSubviews()
 {
 	((mafViewSlice*)m_ChildViewList[X_VIEW])->GetRWI()->GetCamera()->GetPosition(m_XCameraPositionForReset);
 	((mafViewSlice*)m_ChildViewList[Y_VIEW])->GetRWI()->GetCamera()->GetPosition(m_YCameraPositionForReset);
@@ -2654,7 +2654,7 @@ void medViewArbitraryOrthoSlice::StoreCameraParameters()
 	((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetViewUp(m_ZCameraViewUpForReset);
 }
 
-void medViewArbitraryOrthoSlice::RestoreCamera()
+void medViewArbitraryOrthoSlice::RestoreCameraParametersForAllSubviews()
 {
 	vtkCamera *xViewCamera = ((mafViewSlice*)m_ChildViewList[X_VIEW])->GetRWI()->GetCamera();
 	xViewCamera->SetPosition(m_XCameraPositionForReset);

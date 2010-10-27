@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.h,v $
 Language:  C++
-Date:      $Date: 2010-10-27 13:15:49 $
-Version:   $Revision: 1.1.2.14 $
+Date:      $Date: 2010-10-27 13:20:14 $
+Version:   $Revision: 1.1.2.15 $
 Authors:   Stefano Perticoni	
 ==========================================================================
 Copyright (c) 2002/2004
@@ -142,7 +142,7 @@ protected:
 
 	void ShowMafVMEVolume( mafVME * vme, bool show );
 
-	void StoreCameraParameters();
+	void StoreCameraParametersForAllSubviews();
 
 	void Update2DActors();
 
@@ -184,7 +184,7 @@ protected:
 
 	void OnReset();
 
-	void RestoreCamera();
+	void RestoreCameraParametersForAllSubviews();
 
 	void OnResetMedVMEPolylineEditor();
 	void OnResetMafVMEMesh( mafNode * node );
