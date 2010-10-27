@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-07-30 13:14:57 $
-Version:   $Revision: 1.1.2.122 $
+Date:      $Date: 2010-10-27 15:48:20 $
+Version:   $Revision: 1.1.2.123 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -3565,6 +3565,10 @@ void medOpImporterDicomOffis::GenerateSliceTexture(int imageID)
 	m_Text.append(wxString::Format("Orientaion: %f, %f, %f, %f, %f, %f \nPosition: %f, %f, %f",orientation[0], orientation[1], orientation[2], orientation[3], orientation[4], orientation[5], Origin[0], Origin[1], Origin[2]));
 	m_TextMapper->SetInput(m_Text.c_str());
 	m_TextMapper->Modified();
+
+  // AACC 26-10-2010: Hack to make it work with ATI RADEON Driver
+  m_CropActor->GetMapper()->Modified();
+  // End of hack
 
 	if (m_CropFlag) 
 	{
