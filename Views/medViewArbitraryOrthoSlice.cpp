@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2010-10-27 13:20:14 $
-Version:   $Revision: 1.1.2.23 $
+Date:      $Date: 2010-10-27 15:21:19 $
+Version:   $Revision: 1.1.2.24 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -1137,12 +1137,12 @@ mafGUI* medViewArbitraryOrthoSlice::CreateGui()
 	// 	m_Gui->Combo(ID_COMBO_CHOOSE_ACTIVE_GIZMO,"",&m_ComboChooseActiveGizmo,2,Text);
 
 
-	// m_Gui->Divider(2);
+	m_Gui->Divider();
 
 
-	// m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
+	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
 
-	// m_Gui->Divider();
+	m_Gui->Divider();
 
 	m_Gui->Update();
 
@@ -1382,9 +1382,9 @@ void medViewArbitraryOrthoSlice::VolumeWindowing(mafVME *volume)
 
 	mmaMaterial *currentSurfaceMaterial = m_SlicerZ->GetMaterial();
 	m_ColorLUT = m_SlicerZ->GetMaterial()->m_ColorLut;
-	// m_LutWidget->SetLut(m_ColorLUT);
+	m_LutWidget->SetLut(m_ColorLUT);
 	m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
-	//m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
+	m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
 	m_LutSlider->SetSubRange((long)currentSurfaceMaterial->m_TableRange[0],(long)currentSurfaceMaterial->m_TableRange[1]);
 }
 
@@ -1479,7 +1479,7 @@ void medViewArbitraryOrthoSlice::ShowMafVMEVolume( mafVME * vme, bool show )
 	vtkDEL(localToABSTPDF);
 	vtkDEL(transformReset);
 
-
+	VolumeWindowing(vmeVolume);
 }
 
 void medViewArbitraryOrthoSlice::ShowMedVMEPolylineEditor( mafNode * node )
@@ -1559,7 +1559,6 @@ void medViewArbitraryOrthoSlice::HideMafVMEVolume()
 	zView->GetSceneGraph()->m_AlwaysVisibleRenderer->RemoveActor2D(m_TextActorLeftZView);
 	zView->GetSceneGraph()->m_AlwaysVisibleRenderer->RemoveActor2D(m_TextActorRightZView);
 
-
 	EnableWidgets(false);
 
 	m_XCameraConeVME->ReparentTo(NULL);
@@ -1590,8 +1589,10 @@ void medViewArbitraryOrthoSlice::HideMafVMEVolume()
 	m_Gui->Remove(m_GuiGizmos);
 	m_Gui->Update();
 
-	m_GizmoZView->Show(false);
+	m_GizmoXView->Show(false);
 	m_GizmoYView->Show(false);
+	m_GizmoZView->Show(false);
+
 
 	cppDEL(m_GuiGizmos);
 
@@ -1601,14 +1602,14 @@ void medViewArbitraryOrthoSlice::HideMafVMEVolume()
 
 	m_CurrentVolume = NULL;
 	m_ColorLUT = NULL;
-	// m_LutWidget->SetLut(m_ColorLUT);
+	m_LutWidget->SetLut(m_ColorLUT);
 }
 
 void medViewArbitraryOrthoSlice::HideMafVmeImage()
 {
 	m_CurrentImage = NULL;
 	m_ColorLUT = NULL;
-	// m_LutWidget->SetLut(m_ColorLUT);
+	m_LutWidget->SetLut(m_ColorLUT);
 }
 
 void medViewArbitraryOrthoSlice::ShowVMESurfacesAndLandmarks( mafNode * node )
@@ -1684,7 +1685,14 @@ void medViewArbitraryOrthoSlice::OnRangeModified()
 	{
 		double low, hi;
 		m_LutSlider->GetSubRange(&low,&hi);
-		//m_ColorLUT->SetTableRange(low,hi);
+		m_ColorLUT->SetTableRange(low,hi);
+		
+		m_SlicerX->GetMaterial()->m_ColorLut->DeepCopy(m_ColorLUT);
+		m_SlicerX->GetMaterial()->m_ColorLut->Modified();
+
+		m_SlicerY->GetMaterial()->m_ColorLut->DeepCopy(m_ColorLUT);
+		m_SlicerY->GetMaterial()->m_ColorLut->Modified();
+
 		mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 	}
 }
@@ -1696,6 +1704,15 @@ void medViewArbitraryOrthoSlice::OnLUTChooser()
 	if(m_CurrentVolume || m_CurrentImage) {
 		sr = m_ColorLUT->GetRange();
 		m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
+
+		m_SlicerX->GetMaterial()->m_ColorLut->DeepCopy(m_ColorLUT);
+		m_SlicerX->GetMaterial()->m_ColorLut->Modified();
+
+		m_SlicerY->GetMaterial()->m_ColorLut->DeepCopy(m_ColorLUT);
+		m_SlicerY->GetMaterial()->m_ColorLut->Modified();
+
+		mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+
 	}
 }
 
