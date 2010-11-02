@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFHistogram.h,v $
   Language:  C++
-  Date:      $Date: 2010-02-23 14:13:54 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2010-11-02 13:49:12 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Paolo Quadrani
   Project:   MultiMod Project
 
@@ -58,9 +58,10 @@ class VTK_vtkMAF_EXPORT vtkMAFHistogram : public vtkActor2D
     BAR_REPRESENTATION
   };
 
-	/** Set/Get the vtkImageData on which make the histogram. */
+	/** Set the vtkImageData on which make the histogram. */
   void SetInputData(vtkDataArray* inputData);
   //vtkSetObjectMacro(InputData, vtkDataArray);
+  /** Get the vtkImageData on which make the histogram. */
   vtkGetObjectMacro(InputData, vtkDataArray);
   
   /** Set/Get the scale factor for scaling the histogram */
@@ -181,7 +182,7 @@ protected:
   vtkImageData              *ImageData;
 
 private:
-  // hide the two parameter Render() method from the user and the compiler.
+  /** hide the two parameter Render() method from the user and the compiler. */
   virtual void Render(vtkRenderer *, vtkMapper *) {};
 private:
   /** copy constructor, not implemented */
