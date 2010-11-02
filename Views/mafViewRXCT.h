@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-21 15:12:32 $
-  Version:   $Revision: 1.17.2.3 $
+  Date:      $Date: 2010-11-02 13:08:58 $
+  Version:   $Revision: 1.17.2.4 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -39,12 +39,17 @@ and visualization enabled.*/
 class mafViewRXCT : public mafViewCompound
 {
 public:
+  /** constructor */
   mafViewRXCT(wxString label = "View RXCT Rotated Volumes Debugger");
+  /** destructor*/
   virtual ~mafViewRXCT(); 
-
+  
+  /** RTTI macro*/
   mafTypeMacro(mafViewRXCT, mafViewCompound);
 
+  /** clone an instance of the object*/
   virtual mafView *Copy(mafObserver *Listener);
+  /** Precess events coming from other objects */
   virtual void OnEvent(mafEventBase *maf_event);
   
   /** Show/Hide VMEs into plugged sub-views */
@@ -80,6 +85,7 @@ public:
   /* Method for determine if the pick is over a Slice view or not*/
   bool IsPickedSliceView();
 
+  /** catch on size event and modify layout*/
   virtual void			OnSize(wxSizeEvent &size_event);
 
 protected:
@@ -111,6 +117,7 @@ protected:
 
   double m_BorderColor[6][3];
 
+  /** set thickness value for all the pipes*/
   void SetThicknessForAllSurfaceSlices(mafNode *root);
 
   /**
@@ -124,10 +131,15 @@ protected:
 	Check if the gizmo posiztion is inside the bounding box*/
 	void BoundsValidate(double *pos);
 
+  /** Precess events coming from other objects */
   void OnEventSnapModality();
+  /** Precess events coming from other objects */
 	void OnEventRangeModified(mafEventBase *maf_event);
+  /** Precess events coming from other objects */
 	void OnEventSortSlices();
+  /** Precess events coming from other objects */
 	void OnEventSetThickness();
+  /** Precess events coming from other objects */
   void OnEventMouseMove(mafEvent *e);
   int			m_Sort[6];
   double	m_Pos[6];

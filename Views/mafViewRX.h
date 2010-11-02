@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRX.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-21 15:12:32 $
-  Version:   $Revision: 1.7.2.1 $
+  Date:      $Date: 2010-11-02 13:08:58 $
+  Version:   $Revision: 1.7.2.2 $
   Authors:   Paolo Quadrani , Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,14 +36,21 @@ initialize the visual pipe according to the camera position that is passed throu
 class mafViewRX: public mafViewVTK
 {
 public:
+  /** constructor */
   mafViewRX(wxString label = "RX", int camera_position = CAMERA_RX_FRONT, bool show_axes = false, bool show_grid = false, bool show_ruler = false, int stereo = 0);
+  /** destructor*/
   virtual ~mafViewRX(); 
 
+  /** RTTI macro*/
   mafTypeMacro(mafViewRX, mafViewVTK);
 
+  /** clone an instance of the object*/
   virtual mafView*  Copy(mafObserver *Listener);
+
+  /** Precess events coming from other objects */
   virtual void			OnEvent(mafEventBase *maf_event);
 
+  /** create render window interactor, picker and scenegraph */
   void Create();
 
   /** 
@@ -71,22 +78,28 @@ public:
   virtual void VmeDeletePipe(mafNode *vme);
 
   /** 
-  Set/Get the WindowLevel Lookup table values.*/
+  Set the WindowLevel Lookup table values.*/
   void SetLutRange(double low_val, double high_val);
+  /** 
+  Get the WindowLevel Lookup table values.*/
   void GetLutRange(double minMax[2]);
 
   /** 
   Return true if a there is a volume inside the view.*/
   bool VolumeIsVisible() {return m_CurrentVolume != NULL;};
 
+  /** Update camera view*/
   void CameraUpdate();
 
 protected:
 
+  /** update camera view for volume with a specific rotation*/
   void CameraUpdateForRotatedVolumes();
   
+  /** set camera direction parallel to one of the axis of the dataset */
   void SetCameraParallelToDataSetLocalAxis( int axis );
 
+  /** create gui widgets */
   virtual mafGUI *CreateGui();  
   mafSceneNode *m_CurrentVolume; ///< Current visualized volume
   

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-21 15:12:32 $
-  Version:   $Revision: 1.23.2.2 $
+  Date:      $Date: 2010-11-02 13:08:58 $
+  Version:   $Revision: 1.23.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,17 +36,23 @@ class vtkPoints;
 /** 
 This compound view is made of four child views used to analyze different orthogonal 
 slices of the volume. This is an experimental component with rotated volumes interaction
-and visualization enabled.*/
-
+and visualization enabled.
+*/
 class mafViewOrthoSlice: public mafViewCompound
 {
 public:
+  /** constructor */
   mafViewOrthoSlice(wxString label = "View OrthoSlice");
+  /** destructor */
   virtual ~mafViewOrthoSlice(); 
 
+  /** RTTI macro*/
   mafTypeMacro(mafViewOrthoSlice, mafViewCompound);
 
+  /** clone an instance of the object*/
   virtual mafView *Copy(mafObserver *Listener);
+
+  /** Precess events coming from other objects */
   virtual void OnEvent(mafEventBase *maf_event);
   
   /** 
@@ -57,8 +63,12 @@ public:
   Show/Hide VMEs into plugged sub-views*/
   virtual void VmeShow(mafNode *node, bool show);
 
-void DestroyOrthoSlicesAndGizmos();
-void CreateOrthoslicesAndGizmos( mafNode * node );
+  /** Remove Gizmos, Observers from the volume */
+  void DestroyOrthoSlicesAndGizmos();
+
+  /** generate gizmos and pose them in the right position*/
+  void CreateOrthoslicesAndGizmos( mafNode * node );
+
   /** Remove VME into plugged sub-views*/
   virtual void VmeRemove(mafNode *node);
 
@@ -77,6 +87,33 @@ void CreateOrthoslicesAndGizmos( mafNode * node );
 		ID_BORDER_CHANGE,
     ID_ENABLE_GPU,
     ID_LAST
+  };
+
+  enum ORTHOSLICE_SUBVIEW_ID
+  {
+    PERSPECTIVE_VIEW = 0,
+    XN_VIEW,
+    YN_VIEW,
+    ZN_VIEW,
+    VIEWS_NUMBER,
+  };
+
+
+  enum CHILD_VIEW_ID
+  {
+    CHILD_PERSPECTIVE_VIEW = 0,
+    CHILD_ZN_VIEW,
+    CHILD_XN_VIEW,
+    CHILD_YN_VIEW,
+    CHILD_VIEWS_NUMBER,
+  };
+
+  enum GIZMO_ID
+  {
+    GIZMO_XN = 0,
+    GIZMO_YN,
+    GIZMO_ZN,
+    GIZMOS_NUMBER,
   };
 
   /** print a dump of this object */
@@ -110,7 +147,10 @@ protected:
   /** Reset slice positions  */
   void ResetSlicesPosition(mafNode *node);
 
+  /** process events regarding border thickness in the pipes*/
 	void OnEventSetThickness();
+
+  /** set thickness value for all the pipes*/
 	void SetThicknessForAllSurfaceSlices(mafNode *root);
 
 	int m_AllSurface;
