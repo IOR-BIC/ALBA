@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-10-27 15:48:20 $
-Version:   $Revision: 1.1.2.123 $
+Date:      $Date: 2010-11-03 19:14:39 $
+Version:   $Revision: 1.1.2.124 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -1031,9 +1031,11 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
 	mafNEW(m_Volume);
 
 	accumulate->Update();
-
-	vtkMAFSmartPointer<vtkRectilinearGrid> rg_out;
-	rg_out->DeepCopy(accumulate->GetOutput());
+	
+	//to reduce the use of memory bug #2305
+	//vtkMAFSmartPointer<vtkRectilinearGrid> rg_out;
+	vtkRectilinearGrid *rg_out;
+	rg_out=accumulate->GetOutput();
 	rg_out->Update();
 
 	if(!this->m_TestMode)
