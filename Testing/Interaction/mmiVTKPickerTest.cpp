@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmiVTKPickerTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-11-03 16:32:01 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-11-03 16:37:24 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -62,7 +62,7 @@ void mmiVTKPickerTest::TestSetGetContinuousPicking()
 	picker->Delete();
 }
 
-void mmiVTKPickerTest::OnMouseMoveTest()
+void mmiVTKPickerTest::TestOnMouseMove()
 {
 	mmiVTKPicker *picker = mmiVTKPicker::New();
 	// smoke test
@@ -70,7 +70,7 @@ void mmiVTKPickerTest::OnMouseMoveTest()
 	picker->Delete();
 }
 
-void mmiVTKPickerTest::OnLeftButtonDownTest()
+void mmiVTKPickerTest::TestOnLeftButtonDown()
 {
 	mmiVTKPicker *picker = mmiVTKPicker::New();
 	// smoke test
@@ -78,7 +78,7 @@ void mmiVTKPickerTest::OnLeftButtonDownTest()
 	picker->Delete();
 }
 
-void mmiVTKPickerTest::OnLeftButtonUpTest()
+void mmiVTKPickerTest::TestOnLeftButtonUp()
 {
 	mmiVTKPicker *picker = mmiVTKPicker::New();
 	// smoke test

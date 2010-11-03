@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmiVTKPickerTest.h,v $
 Language:  C++
-Date:      $Date: 2010-11-03 16:32:01 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-11-03 16:37:24 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -21,14 +21,6 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <cppunit/TestResultCollector.h>
 #include <cppunit/TestRunner.h>
 
-#include "medGizmoPolylineGraph.h"
-#include "mafVMESurface.h"
-#include "mafVMERoot.h"
-
-#include "vtkRenderer.h"
-#include "vtkRenderWindow.h"
-#include "vtkRenderWindowInteractor.h"
-
 class mmiVTKPickerTest : public CPPUNIT_NS::TestFixture
 {
   public:
@@ -43,9 +35,9 @@ class mmiVTKPickerTest : public CPPUNIT_NS::TestFixture
   CPPUNIT_TEST( TestFixture );
   CPPUNIT_TEST( TestConstructorDestructor );
   CPPUNIT_TEST( TestSetGetContinuousPicking );
-  CPPUNIT_TEST( OnMouseMoveTest );
-  CPPUNIT_TEST( OnLeftButtonDownTest );
-  CPPUNIT_TEST( OnLeftButtonUpTest );
+  CPPUNIT_TEST( TestOnMouseMove );
+  CPPUNIT_TEST( TestOnLeftButtonDown );
+  CPPUNIT_TEST( TestOnLeftButtonUp );
 
 
   CPPUNIT_TEST_SUITE_END();
@@ -55,9 +47,9 @@ class mmiVTKPickerTest : public CPPUNIT_NS::TestFixture
     void TestFixture();
     void TestConstructorDestructor();
 	void TestSetGetContinuousPicking();
-	void OnMouseMoveTest();
-    void OnLeftButtonDownTest();
-	void OnLeftButtonUpTest();
+	void TestOnMouseMove();
+    void TestOnLeftButtonDown();
+	void TestOnLeftButtonUp();
 
 };
 
