@@ -52,7 +52,8 @@ ADD_EXECUTABLE(vtkMEDFillingHoleTest vtkMEDFillingHoleTest.h vtkMEDFillingHoleTe
 ADD_TEST(vtkMEDFillingHoleTest ${EXECUTABLE_OUTPUT_PATH}/vtkMEDFillingHoleTest)
 ADD_EXECUTABLE(vtkMEDFixTopologyTest vtkMEDFixTopologyTest.h vtkMEDFixTopologyTest.cpp)
 ADD_TEST(vtkMEDFixTopologyTest ${EXECUTABLE_OUTPUT_PATH}/vtkMEDFixTopologyTest)
-
+ADD_EXECUTABLE(vtkWeightedLandmarkTransformTest vtkWeightedLandmarkTransformTest.h vtkWeightedLandmarkTransformTest.cpp)
+ADD_TEST(vtkWeightedLandmarkTransformTest ${EXECUTABLE_OUTPUT_PATH}/vtkWeightedLandmarkTransformTest)
 
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
