@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: mmiVTKPicker.cpp,v $ 
   Language: C++ 
-  Date: $Date: 2010-07-13 12:07:53 $ 
-  Version: $Revision: 1.1.2.3 $ 
+  Date: $Date: 2010-11-03 16:30:01 $ 
+  Version: $Revision: 1.1.2.4 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -47,6 +47,10 @@ mmiVTKPicker::~mmiVTKPicker()
 void mmiVTKPicker::OnLeftButtonDown(mafEventInteraction *e) 
 //----------------------------------------------------------------------------
 {
+  if (e == NULL)
+  {
+	  return;
+  }
   //if we debug OnLeftButtonDown, it happens usually that OnLeftButtonUp
   //is not executed and, therefore, we have still some picker
   //we will fix it here
