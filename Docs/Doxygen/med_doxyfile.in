@@ -69,6 +69,8 @@ INPUT                  = "@MED_SOURCE_DIR@/Common/" \
                          "@MED_SOURCE_DIR@/VME/" \
                          "@MED_SOURCE_DIR@/Views/" \
                          "@MED_SOURCE_DIR@/vtkMED/"
+                         "@MED_SOURCE_DIR@/Interaction/"
+			 		     "@MED_SOURCE_DIR@/Gui/"
 FILE_PATTERNS          = *.h
 RECURSIVE              = NO
 EXCLUDE                = 
