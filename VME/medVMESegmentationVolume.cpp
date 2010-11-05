@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMESegmentationVolume.cpp,v $
 Language:  C++
-Date:      $Date: 2010-05-17 16:55:53 $
-Version:   $Revision: 1.1.2.8 $
+Date:      $Date: 2010-11-05 11:13:41 $
+Version:   $Revision: 1.1.2.9 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -569,6 +569,21 @@ double medVMESegmentationVolume::GetAutomaticSegmentationGlobalThreshold()
 {
   return m_VolumeAttribute->GetAutomaticSegmentationGlobalThreshold();
 }
+
+//------------------------------------------------------------------------
+void medVMESegmentationVolume::SetRegionGrowingSliceRange(int startSlice, int endSlice)
+//------------------------------------------------------------------------
+{
+  m_SegmentingDataPipe->SetRegionGrowingSliceRange(startSlice, endSlice);
+}
+
+//------------------------------------------------------------------------
+int medVMESegmentationVolume::GetRegionGrowingSliceRange(int &startSlice, int &endSlice)
+//------------------------------------------------------------------------
+{
+  return m_SegmentingDataPipe->GetRegionGrowingSliceRange(startSlice, endSlice);
+}
+
 //-------------------------------------------------------------------------
 mafVMEOutput *medVMESegmentationVolume::GetOutput()
 //-------------------------------------------------------------------------

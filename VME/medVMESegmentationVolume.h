@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMESegmentationVolume.h,v $
 Language:  C++
-Date:      $Date: 2010-05-17 16:55:53 $
-Version:   $Revision: 1.1.2.7 $
+Date:      $Date: 2010-11-05 11:13:41 $
+Version:   $Revision: 1.1.2.8 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -182,6 +182,10 @@ public:
 
   /** Return the number of seeds */
   int GetNumberOfSeeds();
+
+  void SetRegionGrowingSliceRange(int startSlice, int endSlice);
+
+  int GetRegionGrowingSliceRange(int &startSlice, int &endSlice);
 
   /** return the right type of output */  
   /*virtual*/ mafVMEOutput *GetOutput();
