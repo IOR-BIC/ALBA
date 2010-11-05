@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medDataPipeCustomSegmentationVolume.h,v $
 Language:  C++
-Date:      $Date: 2010-07-12 14:46:34 $
-Version:   $Revision: 1.1.2.7 $
+Date:      $Date: 2010-11-05 11:16:34 $
+Version:   $Revision: 1.1.2.8 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -108,6 +108,10 @@ public:
   /** Return the region growing lower threshold */
   double GetRegionGrowingLowerThreshold(){return m_RegionGrowingLowerThreshold;};
 
+  void SetRegionGrowingSliceRange(int startSlice, int endSlice);
+
+  int GetRegionGrowingSliceRange(int &startSlice, int &endSlice);
+
   /** Return the seed of the position index */
   int GetSeed(int index,int seed[3]);
 
@@ -180,6 +184,8 @@ protected:
   double m_RegionGrowingUpperThreshold;
   double m_RegionGrowingLowerThreshold;
   std::vector<int *> m_RegionGrowingSeeds;
+  int m_RegionGrowingStartSlice;
+  int m_RegionGrowingEndSlice;
   //////////////////////////////////////////////////////////////////////////
 
 

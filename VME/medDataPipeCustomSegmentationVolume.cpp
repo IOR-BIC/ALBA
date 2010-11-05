@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medDataPipeCustomSegmentationVolume.cpp,v $
 Language:  C++
-Date:      $Date: 2010-10-14 09:02:43 $
-Version:   $Revision: 1.1.2.12 $
+Date:      $Date: 2010-11-05 11:16:34 $
+Version:   $Revision: 1.1.2.13 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -448,6 +448,7 @@ void medDataPipeCustomSegmentationVolume::ApplyAutomaticSegmentation()
 
   }
 
+
   if (volumeData->IsA("vtkStructuredPoints"))
   {
     vtkMAFSmartPointer<vtkStructuredPoints> newSP;
@@ -746,10 +747,58 @@ void medDataPipeCustomSegmentationVolume::ApplyRegionGrowingSegmentation()
   //////////////////////////////////////////////////////////////////////////
   //Perform the OR operation between region growing and automatic output
   //////////////////////////////////////////////////////////////////////////
+
+
+  int volumeDimensions[3];
+  if(volumeData->IsA("vtkRectilinearGrid")) {
+    vtkRectilinearGrid *rectilinearGrid=vtkRectilinearGrid::SafeDownCast(volumeData);
+    rectilinearGrid->GetDimensions(volumeDimensions);
+  }
+  else if (volumeData->IsA("vtkStructuredPoints")) {
+    vtkStructuredPoints *imageData=vtkStructuredPoints::SafeDownCast(volumeData);
+    imageData->GetDimensions(volumeDimensions);
+  }
+
   vtkMAFSmartPointer<vtkUnsignedCharArray> newScalars;
   newScalars->SetNumberOfTuples(volumeData->GetNumberOfPoints());
   newScalars->SetName("SCALARS");
-  for (int i=0;i<volumeData->GetNumberOfPoints();i++)
+  newScalars->SetNumberOfTuples(volumeDimensions[0]*volumeDimensions[1]*volumeDimensions[2]);
+
+  int numberOfPoints = volumeDimensions[0] * volumeDimensions[1];
+  
+  for (int i=0;i<volumeDimensions[2];i++)
+  {
+
+    for (int k=0;k<numberOfPoints;k++)
+    {
+      int index = k+i*(volumeDimensions[0]*volumeDimensions[1]);
+      double automaticValue = automaticData->GetPointData()->GetScalars()->GetTuple1(index);
+      double regionGrowingValue = spOutputRegionGrowing->GetPointData()->GetScalars()->GetTuple1(index);
+
+      if(i>m_RegionGrowingEndSlice || i<m_RegionGrowingStartSlice)
+      {
+        newScalars->SetTuple1(k+i*(volumeDimensions[0]*volumeDimensions[1]),automaticValue);
+      }
+      else
+      {
+        if (automaticValue == 255 || regionGrowingValue == 255)
+        {
+          newScalars->SetTuple1(index,255);
+        }
+        else
+        {
+          newScalars->SetTuple1(index,0);
+        }
+
+      }
+      
+    }
+  }
+
+
+
+
+ /* for (int i=0;i<volumeData->GetNumberOfPoints();i++)
   {
     if (automaticData->GetPointData()->GetScalars()->GetTuple1(i) == 255 || spOutputRegionGrowing->GetPointData()->GetScalars()->GetTuple1(i) == 255)
     {
@@ -759,7 +808,7 @@ void medDataPipeCustomSegmentationVolume::ApplyRegionGrowingSegmentation()
     {
       newScalars->SetTuple1(i,0);
     }
-  }
+  }*/
   //////////////////////////////////////////////////////////////////////////
 
   eUpdate.SetArg(85);
@@ -1280,6 +1329,24 @@ int medDataPipeCustomSegmentationVolume::AutomaticCheckRange(int startSlice,int 
 	    }
     }
   }
+
+  return MAF_OK;
+}
+
+//------------------------------------------------------------------------
+void medDataPipeCustomSegmentationVolume::SetRegionGrowingSliceRange(int startSlice, int endSlice)
+//------------------------------------------------------------------------
+{
+  m_RegionGrowingStartSlice = startSlice;
+  m_RegionGrowingEndSlice = endSlice;
+}
+
+//------------------------------------------------------------------------
+int medDataPipeCustomSegmentationVolume::GetRegionGrowingSliceRange(int &startSlice, int &endSlice)
+//------------------------------------------------------------------------
+{
+  startSlice = m_RegionGrowingStartSlice;
+  endSlice = m_RegionGrowingEndSlice;
 
   return MAF_OK;
 }
