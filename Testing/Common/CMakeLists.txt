@@ -15,9 +15,13 @@ ADD_TEST(mafDataChecksumTest  ${EXECUTABLE_OUTPUT_PATH}/mafDataChecksumTest)
 ADD_EXECUTABLE(medQueryObjectTest medQueryObjectTest.h medQueryObjectTest.cpp)
 ADD_TEST(medQueryObjectTest  ${EXECUTABLE_OUTPUT_PATH}/medQueryObjectTest)
 
-
 ADD_EXECUTABLE(medResultQueryAbstractHandlerTest medResultQueryAbstractHandlerTest.h medResultQueryAbstractHandlerTest.cpp)
 ADD_TEST(medResultQueryAbstractHandlerTest  ${EXECUTABLE_OUTPUT_PATH}/medResultQueryAbstractHandlerTest)
+
+ADD_EXECUTABLE(medRelationalDatabaseAbstractConnectorTest medRelationalDatabaseAbstractConnectorTest.h medRelationalDatabaseAbstractConnectorTest.cpp)
+ADD_TEST(medRelationalDatabaseAbstractConnectorTest  ${EXECUTABLE_OUTPUT_PATH}/medRelationalDatabaseAbstractConnectorTest)
+
+
 
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
