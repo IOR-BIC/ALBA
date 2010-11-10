@@ -128,9 +128,11 @@ ADD_TEST(medPipeTensorFieldGlyphsTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeTensorFi
 ADD_EXECUTABLE(medVMEOutputComputeWrappingTest medVMEOutputComputeWrappingTest.h medVMEOutputComputeWrappingTest.cpp)
 ADD_TEST(medVMEOutputComputeWrappingTest  ${EXECUTABLE_OUTPUT_PATH}/medVMEOutputComputeWrappingTest)
 
-
 ADD_EXECUTABLE(medPipeTensorFieldTest medPipeTensorFieldTest.h medPipeTensorFieldTest.cpp)
 ADD_TEST(medPipeTensorFieldTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeTensorFieldTest)
+
+ADD_EXECUTABLE(medPipeVectorFieldTest medPipeVectorFieldTest.h medPipeVectorFieldTest.cpp)
+ADD_TEST(medPipeVectorFieldTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeVectorFieldTest)
 
 
 
