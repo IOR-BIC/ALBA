@@ -92,6 +92,9 @@ ADD_TEST(medOpComputeWrappingTest ${EXECUTABLE_OUTPUT_PATH}/medOpComputeWrapping
 ADD_EXECUTABLE(medOpSplitSurfaceTest medOpSplitSurfaceTest.h medOpSplitSurfaceTest.cpp)
 ADD_TEST(medOpSplitSurfaceTest ${EXECUTABLE_OUTPUT_PATH}/medOpSplitSurfaceTest)
 
+ADD_EXECUTABLE(medOpMML3Test medOpMML3Test.h medOpMML3Test.cpp)
+ADD_TEST(medOpMML3Test ${EXECUTABLE_OUTPUT_PATH}/medOpMML3Test)
+
 
 IF (MED_USE_Offis)
 
