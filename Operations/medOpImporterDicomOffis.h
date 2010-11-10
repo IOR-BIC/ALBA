@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2010-11-10 12:45:13 $
-Version:   $Revision: 1.1.2.49 $
+Date:      $Date: 2010-11-10 14:10:40 $
+Version:   $Revision: 1.1.2.50 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -394,7 +394,7 @@ public:
 		m_DcmInstanceNumber = -1;
 		m_DcmTriggerTime = -1.0;
 		m_DcmCardiacNumberOfImages = -1;
-    	m_Data = NULL;
+    m_Data = NULL;
 	};
 
 	/** overloaded constructor */
@@ -414,8 +414,15 @@ public:
 		m_DcmInstanceNumber = dcmInstanceNumber;
 		m_DcmCardiacNumberOfImages = dcmCardiacNumberOfImages;
 		m_DcmTriggerTime = dcmTtriggerTime;
-		vtkNEW(m_Data);
-		m_Data->DeepCopy(data);
+		if (data != NULL)
+		{
+			vtkNEW(m_Data);
+			m_Data->DeepCopy(data);
+		}
+    else
+    {
+      m_Data = NULL;
+    }
 	};
 
 	/** destructor */
@@ -424,20 +431,32 @@ public:
 	/** Return the filename of the corresponding dicom slice. */
 	const char *GetSliceABSFileName() const {return m_SliceABSFileName.GetCStr();};
 
+  /** Set the filename of the corresponding dicom slice. */
+  void SetSliceABSFileName(char *fileName){m_SliceABSFileName = fileName;};
+
 	/** Return the image number of the dicom slice*/
 	int GetDcmInstanceNumber() const {return m_DcmInstanceNumber;};
+
+  /** Set the image number of the dicom slice*/
+  void SetDcmInstanceNumber(int number){m_DcmInstanceNumber = number;};
 
 	/** Return the number of cardiac timeframes*/
 	int GetDcmCardiacNumberOfImages() const {return m_DcmCardiacNumberOfImages;};
 
+  /** Set the number of cardiac timeframes*/
+  void SetDcmCardiacNumberOfImages(int number){m_DcmCardiacNumberOfImages = number;};
+
 	/** Return the trigger time of the dicom slice*/
-	int GetDcmTriggerTime() const {return m_DcmTriggerTime;};
+	double GetDcmTriggerTime() const {return m_DcmTriggerTime;};
+
+  /** Set the trigger time of the dicom slice*/
+  void SetDcmTriggerTime(double time){m_DcmTriggerTime = time;};
 
 	/** Retrieve image data*/
 	vtkImageData* GetVTKImageData(){return m_Data;};
 	
 	/** Set vtkImageData */
-		void SetVTKImageData(vtkImageData *data);
+	void SetVTKImageData(vtkImageData *data);
 
 	/** Set the DcmImagePositionPatient tag for the slice */
 	void SetDcmImagePositionPatient(double dcmImagePositionPatient[3])
