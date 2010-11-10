@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoAutoscaleHelper.h,v $
   Language:  C++
-  Date:      $Date: 2010-11-10 16:51:28 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2010-11-10 18:52:35 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -27,38 +27,12 @@ class vtkObject;
 class vtkActor;
 class mafVME;
 
-/** Implement transform between view coordinates to world coordinates
+/** 
 
-  mafGizmoAutoscaleHelper is a class implementing transform between view coordinate system
-  to world coordinate system. The renderer storing the coordinate system must be
-  provided as input. This transforms maps points from the view coordinate system
-  to a specified coordinate system. By default (TargetFrame=I) to the World coordinate
-  system. In general the view coordinate system has the following spawning: 
-  X [-1,1] , where -1 is left frustum plane
-  Y [-1,1] , where -1 is the bottom frustum plane
-  Z [-1,1] , for Z there can be different mapping strategies:
-  
-    -# Z = 0 corresponds to the Camera position. Z = 1, depends on Y scale
-    -# Z = 0  corresponds to the Focal point, Z = -1 and Z = 1 depends on Y Scale
-    -# Z = -1 corresponds to the Near plane, Z = 1 to the Far plane
+Helper object for gizmo autoscaling ie actor2D-like behavior
 
-  You can enable single features:
-  - camera orientation
-  - camera position
-  - camera scaling
+*/
 
-  With orientation enabled the transform will always try to take the input matrix and 
-  rotate it such that it points to the camera (supposed 0,0,0 means orientated
-  toward the camera). The original orientation is cumulated.
-  With position enabled the transform will try to translate the matrix to be in the
-  same position when the camera moves. 0,0,0 means in the focus point.
-
-
-  @sa mafTransform
-
-  @todo:
-  - implement issuing of MATRIX_UPDATE (to be done in mafTranformBase)
-  */
 class mafGizmoAutoscaleHelper:public mafTransformBase
 {
 public:
@@ -152,3 +126,4 @@ private:
 
 #endif /* __mafGizmoAutoscaleHelper_h */
  
+s
