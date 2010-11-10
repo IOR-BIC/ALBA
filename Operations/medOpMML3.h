@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML3.h,v $
 Language:  C++
-Date:      $Date: 2009-10-07 11:36:49 $
-Version:   $Revision: 1.1.2.14 $
+Date:      $Date: 2010-11-10 14:53:23 $
+Version:   $Revision: 1.1.2.15 $
 Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -13,6 +13,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #ifndef __medOpMML3_H__
 #define __medOpMML3_H__
 
+#include "mafOp.h"
 #include "mafDefines.h"
 
 #include "vtkPolyData.h"
