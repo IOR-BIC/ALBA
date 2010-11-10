@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoAutoscaleHelper.h,v $
   Language:  C++
-  Date:      $Date: 2010-11-10 18:52:35 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2010-11-10 20:40:41 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -125,5 +125,3 @@ private:
 };
 
 #endif /* __mafGizmoAutoscaleHelper_h */
- 
-s
