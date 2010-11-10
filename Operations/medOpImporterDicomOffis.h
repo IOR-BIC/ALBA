@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2010-07-28 13:35:58 $
-Version:   $Revision: 1.1.2.48 $
+Date:      $Date: 2010-11-10 12:45:13 $
+Version:   $Revision: 1.1.2.49 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -394,6 +394,7 @@ public:
 		m_DcmInstanceNumber = -1;
 		m_DcmTriggerTime = -1.0;
 		m_DcmCardiacNumberOfImages = -1;
+    	m_Data = NULL;
 	};
 
 	/** overloaded constructor */
