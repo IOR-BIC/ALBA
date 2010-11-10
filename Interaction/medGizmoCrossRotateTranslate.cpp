@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGizmoCrossRotateTranslate.cpp,v $
 Language:  C++
-Date:      $Date: 2010-10-20 15:28:03 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2010-11-10 16:53:03 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -44,6 +44,10 @@ void medGizmoCrossRotateTranslate::Create(mafVME *input, mafObserver* listener, 
 	m_GizmoCrossTranslate = new medGizmoCrossTranslate(input, this, BuildGUI, normal);
 	m_GizmoCrossRotate = new medGizmoCrossRotate(input, this, BuildGUI, normal);
 	m_Listener = listener;
+
+	SetAutoscale(true);
+	SetAlwaysVisible(true);
+	SetRenderWindowHeightPercentage(0.8);
 }
 
 /** 
@@ -111,4 +115,28 @@ void medGizmoCrossRotateTranslate::OnEvent(mafEventBase *maf_event)
 			}
 		}
 	}
+}
+
+void medGizmoCrossRotateTranslate::SetAutoscale( bool autoscale )
+{
+	mafGizmoInterface::SetAutoscale(autoscale);
+
+	m_GizmoCrossRotate->SetAutoscale(autoscale);
+	m_GizmoCrossTranslate->SetAutoscale(autoscale);
+}
+
+void medGizmoCrossRotateTranslate::SetAlwaysVisible( bool alwaysVisible )
+{
+	mafGizmoInterface::SetAlwaysVisible(alwaysVisible);
+
+	m_GizmoCrossRotate->SetAlwaysVisible(alwaysVisible);
+	m_GizmoCrossTranslate->SetAlwaysVisible(alwaysVisible);
+}
+
+void medGizmoCrossRotateTranslate::SetRenderWindowHeightPercentage(double percentage)
+{
+	mafGizmoInterface::SetRenderWindowHeightPercentage(percentage);
+
+	m_GizmoCrossRotate->SetRenderWindowHeightPercentage(percentage);
+	m_GizmoCrossTranslate->SetRenderWindowHeightPercentage(percentage);
 }

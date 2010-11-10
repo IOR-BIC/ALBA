@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGizmoCrossRotateTranslate.h,v $
 Language:  C++
-Date:      $Date: 2010-10-20 15:28:03 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2010-11-10 16:53:03 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -56,6 +56,16 @@ public:
 
 	void Create(mafVME *input, mafObserver* listener = NULL, bool BuildGUI = true, int normal = X);
 	void SetInput(mafVME *vme);
+
+	/** Superclass override */
+	void SetRenderWindowHeightPercentage(double percentage);
+
+	/** Superclass override */
+	void SetAutoscale(bool autoscale);
+
+	/** Superclass override */
+	void SetAlwaysVisible(bool alwaysVisible);
+
 	void SetRefSys(mafVME *refSys);
 	
 	/**

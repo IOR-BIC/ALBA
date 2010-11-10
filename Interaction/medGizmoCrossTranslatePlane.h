@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoCrossTranslatePlane.h,v $
   Language:  C++
-  Date:      $Date: 2010-09-15 16:11:32 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2010-11-10 16:53:03 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -28,7 +28,7 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "mafEvent.h"
-#include "mafObserver.h"
+#include "mafGizmoInterface.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -49,7 +49,7 @@ class vtkTubeFilter;
   
   @sa mafGizmoTranslate 
 */
-class medGizmoCrossTranslatePlane: public mafObserver 
+class medGizmoCrossTranslatePlane: public mafGizmoInterface 
 {
 public:
            medGizmoCrossTranslatePlane(mafVME *input, mafObserver *listener = NULL);
@@ -59,7 +59,7 @@ public:
   Set the gizmo generating vme; the gizmo will be centered on this vme*/
   void SetInput(mafVME *vme); 
   mafVME *GetInput() {return this->m_InputVme;};
-  
+
   //----------------------------------------------------------------------------
   // events handling 
   //----------------------------------------------------------------------------

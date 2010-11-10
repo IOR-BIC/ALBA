@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoCrossTranslate.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-10-20 15:28:03 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2010-11-10 16:53:03 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -513,4 +513,31 @@ int medGizmoCrossTranslate::GetStep()
 mafVME* medGizmoCrossTranslate::GetRefSys()
 {
   return m_RefSysVME;
+}
+
+void medGizmoCrossTranslate::SetAutoscale( bool autoscale )
+{
+	mafGizmoInterface::SetAutoscale(autoscale);
+
+	m_GTAxis0->SetAutoscale(autoscale);
+	m_GTAxis1->SetAutoscale(autoscale);
+	m_GTPlane->SetAutoscale(autoscale);	
+}
+
+void medGizmoCrossTranslate::SetAlwaysVisible( bool alwaysVisible )
+{
+	mafGizmoInterface::SetAlwaysVisible(alwaysVisible);
+
+	m_GTAxis0->SetAutoscale(alwaysVisible);
+	m_GTAxis1->SetAutoscale(alwaysVisible);
+	m_GTPlane->SetAutoscale(alwaysVisible);	
+}
+
+void medGizmoCrossTranslate::SetRenderWindowHeightPercentage(double percentage)
+{
+	mafGizmoInterface::SetRenderWindowHeightPercentage(percentage);
+	
+	m_GTAxis0->SetAutoscale(percentage);
+	m_GTAxis1->SetAutoscale(percentage);
+	m_GTPlane->SetAutoscale(percentage);		
 }

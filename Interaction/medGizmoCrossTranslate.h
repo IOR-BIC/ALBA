@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoCrossTranslate.h,v $
   Language:  C++
-  Date:      $Date: 2010-10-20 15:28:03 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2010-11-10 16:53:03 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -58,6 +58,15 @@ public:
   /** 
   Set input vme for the gizmo*/
   void SetInput(mafVME *vme); 
+
+  /** Superclass override */
+  void SetRenderWindowHeightPercentage(double percentage);
+
+  /** Superclass override */
+  void SetAutoscale(bool autoscale);
+
+  /** Superclass override */
+  void SetAlwaysVisible(bool alwaysVisible);
 
   //----------------------------------------------------------------------------
   // events handling 

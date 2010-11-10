@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoCrossTranslatePlane.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-10-22 15:56:33 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2010-11-10 16:53:03 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -499,3 +499,4 @@ void medGizmoCrossTranslatePlane::SetStep(int axis, double step)
     m_IsaGen[i]->GetTranslationConstraint()->SetStep(axis,step);
   }
 }
+

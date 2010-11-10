@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoCrossTranslateAxis.h,v $
   Language:  C++
-  Date:      $Date: 2010-10-22 15:56:33 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2010-11-10 16:53:03 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -27,7 +27,7 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "mafEvent.h"
-#include "mafObserver.h"
+#include "mafGizmoInterface.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -47,7 +47,7 @@ class vtkAppendPolyData;
   
   @sa medGizmoCrossTranslate 
 */
-class medGizmoCrossTranslateAxis: public mafObserver 
+class medGizmoCrossTranslateAxis: public mafGizmoInterface 
 {
 public:
            medGizmoCrossTranslateAxis(mafVME *input, mafObserver *listener = NULL);
