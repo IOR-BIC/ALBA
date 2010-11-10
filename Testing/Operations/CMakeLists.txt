@@ -143,6 +143,9 @@ ADD_TEST(medOpExporterAnalogWSTest ${EXECUTABLE_OUTPUT_PATH}/medOpExporterAnalog
 ADD_EXECUTABLE(medOpExporterGRFWSTest medOpExporterGRFWSTest.h medOpExporterGRFWSTest.cpp)
 ADD_TEST(medOpExporterGRFWSTest ${EXECUTABLE_OUTPUT_PATH}/medOpExporterGRFWSTest)
 
+ADD_EXECUTABLE(medDicomSliceTest  medDicomSliceTest.h medDicomSliceTest.cpp)
+ADD_TEST(medDicomSliceTest ${EXECUTABLE_OUTPUT_PATH}/medDicomSliceTest)
+
 
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
