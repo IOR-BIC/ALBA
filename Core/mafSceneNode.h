@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneNode.h,v $
   Language:  C++
-  Date:      $Date: 2010-09-10 15:42:40 $
-  Version:   $Revision: 1.8.6.1 $
+  Date:      $Date: 2010-11-10 16:52:01 $
+  Version:   $Revision: 1.8.6.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -56,8 +56,10 @@ public:
   vtkRenderer       *m_RenBack;
   vtkMAFAssembly    *m_AssemblyBack;
   vtkRenderer       *m_AlwaysVisibleRenderer;
+  vtkMAFAssembly    *m_AlwaysVisibleAssembly;
   mafSceneNode      *m_Next;
-	mafSceneGraph     *m_Sg;
+  mafSceneGraph     *m_Sg;
+
 
   //observer to Listen to Clouds Open/CloseEvent
 	//@@@ mafNodeLandmarkCloud	*m_cloud;

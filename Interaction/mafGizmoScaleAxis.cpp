@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScaleAxis.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-02-10 16:52:48 $
-  Version:   $Revision: 1.7.4.3 $
+  Date:      $Date: 2010-11-10 16:51:28 $
+  Version:   $Revision: 1.7.4.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -69,11 +69,13 @@ mafGizmoScaleAxis::mafGizmoScaleAxis(mafVME *input, mafObserver *listener)
   m_CylGizmo = mafVMEGizmo::New();
   m_CylGizmo->SetName("CylGizmo");
   m_CylGizmo->SetData(m_RotatePDF[CYLINDER]->GetOutput());
-  
+  m_CylGizmo->SetMediator(m_Listener);
+
   // cube gizmo
   m_CubeGizmo = mafVMEGizmo::New();  
   m_CubeGizmo->SetName("CubeGizmo");
   m_CubeGizmo->SetData(m_RotatePDF[CUBE]->GetOutput());
+  m_CubeGizmo->SetMediator(m_Listener);
 
   // assign isa to cylinder and cube
   m_CylGizmo->SetBehavior(m_IsaComp[0]);

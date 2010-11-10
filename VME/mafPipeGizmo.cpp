@@ -1,13 +1,13 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: mafPipeGizmo.cpp,v $
-  Language:  C++
-  Date:      $Date: 2009-04-16 12:49:21 $
-  Version:   $Revision: 1.4.2.4 $
-  Authors:   Paolo Quadrani
+Program:   Multimod Application Framework
+Module:    $RCSfile: mafPipeGizmo.cpp,v $
+Language:  C++
+Date:      $Date: 2010-11-10 16:51:44 $
+Version:   $Revision: 1.4.2.5 $
+Authors:   Paolo Quadrani
 ==========================================================================
-  Copyright (c) 2002/2004
-  CINECA - Interuniversity Consortium (www.cineca.it) 
+Copyright (c) 2002/2004
+CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
 
@@ -38,6 +38,8 @@
 #include "vtkProperty.h"
 #include "vtkTextProperty.h"
 #include "vtkCaptionActor2D.h"
+#include "mafGizmoAutoscaleHelper.h"
+#include "mafGizmoInterface.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafPipeGizmo);
@@ -48,52 +50,86 @@ mafPipeGizmo::mafPipeGizmo()
 :mafPipe()
 //----------------------------------------------------------------------------
 {
-  m_Mapper          = NULL;
-  m_Actor           = NULL;
-  m_OutlineActor    = NULL;
-  m_CaptionActor    = NULL;
+	m_Mapper          = NULL;
+	m_GizmoActor           = NULL;
+	m_OutlineActor    = NULL;
+	m_CaptionActor    = NULL;
+	m_GizmoAutoscaleHelper = NULL;
+	m_Mediator = NULL;
+	m_Caption = "";
 
-  m_Caption = "";
 }
 //----------------------------------------------------------------------------
 void mafPipeGizmo::Create(mafSceneNode *n)
 //----------------------------------------------------------------------------
 {
-  Superclass::Create(n);
-  
-  m_Selected = false;
-  m_Actor           = NULL;
-  m_OutlineActor    = NULL;
+	Superclass::Create(n);
 
-  assert(m_Vme->IsMAFType(mafVMEGizmo));
-  mafVMEGizmo *gizmo = mafVMEGizmo::SafeDownCast(m_Vme);
-  assert(gizmo);
-  gizmo->Update();
-  vtkPolyData *data = gizmo->GetData();
-  assert(data);
+	m_Selected = false;
+	m_GizmoActor           = NULL;
+	m_OutlineActor    = NULL;
+	m_Mediator = NULL;
 
-  m_Vme->GetEventSource()->AddObserver(this);
+	assert(m_Vme->IsMAFType(mafVMEGizmo));
+	mafVMEGizmo *inputVMEGizmo = NULL;
+	inputVMEGizmo = mafVMEGizmo::SafeDownCast(m_Vme);
+	assert(inputVMEGizmo);
+	inputVMEGizmo->Update();
+	vtkPolyData *data = inputVMEGizmo->GetData();
+	assert(data);
 
-  m_Mapper = vtkPolyDataMapper::New();
+	m_Vme->GetEventSource()->AddObserver(this);
+
+	m_Mapper = vtkPolyDataMapper::New();
 	m_Mapper->SetInput(data);
 	m_Mapper->ImmediateModeRenderingOff();
 
-  m_Actor = vtkActor::New();
-	m_Actor->SetMapper(m_Mapper);
-  mmaMaterial *material = gizmo->GetMaterial();
-  if (material)
-    m_Actor->SetProperty(material->m_Prop);
+	m_GizmoActor = vtkActor::New();
+	m_GizmoActor->SetMapper(m_Mapper);
+	mmaMaterial *material = inputVMEGizmo->GetMaterial();
+	if (material)
+		m_GizmoActor->SetProperty(material->m_Prop);
 
-  m_AssemblyFront->AddPart(m_Actor);
+	mafGizmoInterface *mediator = NULL;
+	mediator = dynamic_cast<mafGizmoInterface *> (inputVMEGizmo->GetMediator());
+	
+	m_Mediator = mediator;
 
-  // selection highlight
-  vtkMAFSmartPointer<vtkOutlineCornerFilter> corner;
+	if (m_Mediator && m_Mediator->GetAlwaysVisible())
+	{
+		m_AlwaysVisibleAssembly->AddPart(m_GizmoActor);
+	}
+	else
+	{
+		m_AssemblyFront->AddPart(m_GizmoActor);
+	}
+
+	if (m_Mediator && m_Mediator->GetAutoscale() == true)
+	{
+		mafNEW(m_GizmoAutoscaleHelper);
+		m_GizmoAutoscaleHelper->FollowScaleOn();
+
+		if (mediator->GetAlwaysVisible() == true)
+		{
+			m_GizmoAutoscaleHelper->SetRenderer(m_AlwaysVisibleRenderer);
+		}
+		else
+		{
+			m_GizmoAutoscaleHelper->SetRenderer(m_RenFront);
+		}
+		
+		m_GizmoAutoscaleHelper->SetActor(m_GizmoActor);
+		m_GizmoAutoscaleHelper->SetVME(m_Vme);
+	}
+
+	// selection highlight
+	vtkMAFSmartPointer<vtkOutlineCornerFilter> corner;
 	corner->SetInput(data);  
 
-  vtkMAFSmartPointer<vtkPolyDataMapper> corner_mapper;
+	vtkMAFSmartPointer<vtkPolyDataMapper> corner_mapper;
 	corner_mapper->SetInput(corner->GetOutput());
 
-  vtkMAFSmartPointer<vtkProperty> corner_props;
+	vtkMAFSmartPointer<vtkProperty> corner_props;
 	corner_props->SetColor(1,1,1);
 	corner_props->SetAmbient(1);
 	corner_props->SetRepresentationToWireframe();
@@ -105,155 +141,168 @@ void mafPipeGizmo::Create(mafSceneNode *n)
 	m_OutlineActor->PickableOff();
 	m_OutlineActor->SetProperty(corner_props);
 
-  m_AssemblyFront->AddPart(m_OutlineActor);
+	m_AssemblyFront->AddPart(m_OutlineActor);
 
-  //caption
-  vtkNEW(m_CaptionActor);
-  m_CaptionActor->SetPosition(0,0);
-  //m_CaptionActor->GetCaptionTextProperty()->SetFontFamilyToTimes();
-  m_CaptionActor->GetCaptionTextProperty()->SetFontFamilyToArial();
-  m_CaptionActor->GetCaptionTextProperty()->BoldOn();
-  m_CaptionActor->GetCaptionTextProperty()->AntiAliasingOn();
-  m_CaptionActor->GetCaptionTextProperty()->ItalicOff();
-  m_CaptionActor->GetCaptionTextProperty()->ShadowOn();
-  m_CaptionActor->SetPadding(0);
-  
-  m_CaptionActor->ThreeDimensionalLeaderOff();
-  m_CaptionActor->SetCaption(m_Caption);
+	//caption
+	vtkNEW(m_CaptionActor);
+	m_CaptionActor->SetPosition(0,0);
+	//m_CaptionActor->GetCaptionTextProperty()->SetFontFamilyToTimes();
+	m_CaptionActor->GetCaptionTextProperty()->SetFontFamilyToArial();
+	m_CaptionActor->GetCaptionTextProperty()->BoldOn();
+	m_CaptionActor->GetCaptionTextProperty()->AntiAliasingOn();
+	m_CaptionActor->GetCaptionTextProperty()->ItalicOff();
+	m_CaptionActor->GetCaptionTextProperty()->ShadowOn();
+	m_CaptionActor->SetPadding(0);
 
-  m_CaptionActor->SetHeight(0.03);
-  //m_CaptionActor->SetWidth(0.05);
-  m_CaptionActor->BorderOff();
-  
-  m_CaptionActor->GetCaptionTextProperty()->ShadowOn();
-  m_CaptionActor->SetVisibility(gizmo->GetTextVisibility());
+	m_CaptionActor->ThreeDimensionalLeaderOff();
+	m_CaptionActor->SetCaption(m_Caption);
 
-  double *colour;
-  colour = gizmo->GetTextColour();
-  m_CaptionActor->GetCaptionTextProperty()->SetColor(colour);
-  m_CaptionActor->SetCaption(gizmo->GetTextValue());
-  m_CaptionActor->SetAttachmentPoint(gizmo->GetTextPosition());
+	m_CaptionActor->SetHeight(0.03);
+	//m_CaptionActor->SetWidth(0.05);
+	m_CaptionActor->BorderOff();
+
+	m_CaptionActor->GetCaptionTextProperty()->ShadowOn();
+	m_CaptionActor->SetVisibility(inputVMEGizmo->GetTextVisibility());
+
+	double *colour;
+	colour = inputVMEGizmo->GetTextColour();
+	m_CaptionActor->GetCaptionTextProperty()->SetColor(colour);
+	m_CaptionActor->SetCaption(inputVMEGizmo->GetTextValue());
+	m_CaptionActor->SetAttachmentPoint(inputVMEGizmo->GetTextPosition());
 
 
-  if (m_RenFront != NULL)
-  {
-	  double h,w;
-	  int *size = m_RenFront->GetSize();
-	  h = m_CaptionActor->GetHeight();
-	  w = m_CaptionActor->GetWidth();
-	
-	  if(w < h)
-	  {
-	    w *= size[0];
-	    h = w*size[1];
-	  }
-	  else
-	  {
-	    w = h*size[0];
-	    h *= size[1];
-	  }
-	
-	
-	  double newPosition[2];
-	  newPosition[0] =  - w/2.;
-	  newPosition[1] =  - h/2.;
-	
-	  m_CaptionActor->SetPosition(newPosition);
-	
-	  m_CaptionActor->LeaderOff();
-  }
+	if (m_RenFront != NULL)
+	{
+		double h,w;
+		int *size = m_RenFront->GetSize();
+		h = m_CaptionActor->GetHeight();
+		w = m_CaptionActor->GetWidth();
 
-  if(NULL != m_RenFront)
-    m_RenFront->AddActor2D(m_CaptionActor);
+		if(w < h)
+		{
+			w *= size[0];
+			h = w*size[1];
+		}
+		else
+		{
+			w = h*size[0];
+			h *= size[1];
+		}
+
+
+		double newPosition[2];
+		newPosition[0] =  - w/2.;
+		newPosition[1] =  - h/2.;
+
+		m_CaptionActor->SetPosition(newPosition);
+
+		m_CaptionActor->LeaderOff();
+	}
+
+	if(NULL != m_RenFront)
+		m_RenFront->AddActor2D(m_CaptionActor);
 
 }
+
 //----------------------------------------------------------------------------
 mafPipeGizmo::~mafPipeGizmo()
 //----------------------------------------------------------------------------
 {
-  m_Vme->GetEventSource()->RemoveObserver(this);
-  m_AssemblyFront->RemovePart(m_Actor);
-  m_AssemblyFront->RemovePart(m_OutlineActor);
-  if(NULL != m_RenFront)
-    m_RenFront->RemoveActor2D(m_CaptionActor);
+	m_Vme->GetEventSource()->RemoveObserver(this);
 
-  vtkDEL(m_Mapper);
-  vtkDEL(m_Actor);
-  vtkDEL(m_OutlineActor);
-  vtkDEL(m_CaptionActor);
+	if (m_Mediator && m_Mediator->GetAlwaysVisible())
+	{
+		m_AlwaysVisibleAssembly->RemovePart(m_GizmoActor);
+	} 
+	else
+	{
+		m_AssemblyFront->RemovePart(m_GizmoActor);
+	}
+	
+
+	m_AssemblyFront->RemovePart(m_OutlineActor);
+	if(NULL != m_RenFront)
+		m_RenFront->RemoveActor2D(m_CaptionActor);
+
+	mafDEL(m_GizmoAutoscaleHelper);
+	vtkDEL(m_Mapper);
+	vtkDEL(m_GizmoActor);
+	vtkDEL(m_OutlineActor);
+	vtkDEL(m_CaptionActor);
 }
 //----------------------------------------------------------------------------
 void mafPipeGizmo::Select(bool sel)
 //----------------------------------------------------------------------------
 {
 	m_Selected = sel;
-	if(m_Actor->GetVisibility()) 
+	if(m_GizmoActor->GetVisibility()) 
 	{
-			m_OutlineActor->SetVisibility(sel);
+		m_OutlineActor->SetVisibility(sel);
 	}
 }
 //----------------------------------------------------------------------------
 void mafPipeGizmo::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
-  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
-  {
-    switch(e->GetId()) 
-    {
-    default:
-      mafEventMacro(*e);
-      break;
-    }
-  }
-  else if(maf_event->GetSender() == m_Vme && maf_event->GetId() == VME_OUTPUT_DATA_UPDATE)
-  {
-    UpdatePipe();
-  }
+	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
+	{
+		switch(e->GetId()) 
+		{
+		default:
+			mafEventMacro(*e);
+			break;
+		}
+	}
+	else if(maf_event->GetSender() == m_Vme && maf_event->GetId() == VME_OUTPUT_DATA_UPDATE)
+	{
+		UpdatePipe();
+	}
 }
 //----------------------------------------------------------------------------
 void mafPipeGizmo::UpdatePipe()
 //----------------------------------------------------------------------------
 {
-  assert(m_Vme->IsMAFType(mafVMEGizmo));
-  mafVMEGizmo *gizmo = mafVMEGizmo::SafeDownCast(m_Vme);
-  assert(gizmo);
-  gizmo->Update();
-  vtkPolyData *data = gizmo->GetData();
-  assert(data);
+	assert(m_Vme->IsMAFType(mafVMEGizmo));
+	mafVMEGizmo *gizmo = mafVMEGizmo::SafeDownCast(m_Vme);
+	assert(gizmo);
+	gizmo->Update();
+	vtkPolyData *data = gizmo->GetData();
+	assert(data);
 
-  if(m_CaptionActor != NULL)
-  {
-    double *colour;
-    colour = gizmo->GetTextColour();
-    m_CaptionActor->GetCaptionTextProperty()->SetColor(colour);
-    m_CaptionActor->SetVisibility(gizmo->GetTextVisibility());
-    m_CaptionActor->SetCaption(gizmo->GetTextValue());
-    m_CaptionActor->SetAttachmentPoint(gizmo->GetTextPosition());
-    
+	if(m_CaptionActor != NULL)
+	{
+		double *colour;
+		colour = gizmo->GetTextColour();
+		m_CaptionActor->GetCaptionTextProperty()->SetColor(colour);
+		m_CaptionActor->SetVisibility(gizmo->GetTextVisibility());
+		m_CaptionActor->SetCaption(gizmo->GetTextValue());
+		m_CaptionActor->SetAttachmentPoint(gizmo->GetTextPosition());
 
-    double h,w;
-    int *size = m_RenFront->GetSize();
-    h = m_CaptionActor->GetHeight();
-    w = m_CaptionActor->GetWidth();
 
-    if(w < h)
-    {
-      w *= size[0];
-      h = w*size[1];
-    }
-    else
-    {
-      w = h*size[0];
-      h *= size[1];
-    }
-    
-    
-    double newPosition[2];
-    newPosition[0] =  - w/2.;
-    newPosition[1] =  - h/2.;
+		double h,w;
+		int *size = m_RenFront->GetSize();
+		h = m_CaptionActor->GetHeight();
+		w = m_CaptionActor->GetWidth();
 
-    m_CaptionActor->SetPosition(newPosition);
-    
-    
-  }
+		if(w < h)
+		{
+			w *= size[0];
+			h = w*size[1];
+		}
+		else
+		{
+			w = h*size[0];
+			h *= size[1];
+		}
+
+		double newPosition[2];
+		newPosition[0] =  - w/2.;
+		newPosition[1] =  - h/2.;
+
+		m_CaptionActor->SetPosition(newPosition);
+
+
+	}
 }
+
+

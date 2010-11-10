@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipe.h,v $
   Language:  C++
-  Date:      $Date: 2010-09-10 15:42:40 $
-  Version:   $Revision: 1.18.2.2 $
+  Date:      $Date: 2010-11-10 16:52:01 $
+  Version:   $Revision: 1.18.2.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -91,6 +91,7 @@ public:
   mafVME         *m_Vme;      ///< VME used as input for the visual pipe
 	vtkMAFAssembly *m_AssemblyFront; ///< Assembly used to contain the actor in the front layer
 	vtkMAFAssembly *m_AssemblyBack;  ///< Assembly used to contain the actor in the background layer
+	vtkMAFAssembly *m_AlwaysVisibleAssembly;
 	mafSceneGraph  *m_Sg;       ///< Pointer to the SceneGraph
   bool            m_Selected; ///< Flag used to say if the rendered VME is selected.
   vtkRenderer    *m_RenFront; ///< Renderer associated to the front layer

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslate.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:47:18 $
-  Version:   $Revision: 1.8.2.2 $
+  Date:      $Date: 2010-11-10 16:51:28 $
+  Version:   $Revision: 1.8.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -72,10 +72,14 @@ mafGizmoTranslate::mafGizmoTranslate(mafVME* input, mafObserver *listener, bool 
     // Create mafGizmoTranslateAxis and send events to this
     m_GTAxis[i] = new mafGizmoTranslateAxis(input, this);
 	  m_GTAxis[i]->SetAxis(i);
+
     // Create mafGTranslateAPlane 
     m_GTPlane[i] = new mafGizmoTranslatePlane(input, this);
     m_GTPlane[i]->SetPlane(i);
   }
+
+  SetAlwaysVisible(true);
+  SetAutoscale(true);
 
   if (m_BuildGUI)
   {
@@ -484,4 +488,35 @@ int mafGizmoTranslate::GetStep( int axis )
 mafVME* mafGizmoTranslate::GetRefSys()
 {
   return m_RefSysVME;
+}
+
+void mafGizmoTranslate::SetAutoscale( bool autoscale )
+{
+	mafGizmoInterface::SetAutoscale(autoscale);
+
+	for (int i = 0; i < 3; i++)
+	{
+		m_GTAxis[i]->SetAutoscale(autoscale);
+		m_GTPlane[i]->SetAutoscale(autoscale);
+	}
+}
+
+void mafGizmoTranslate::SetAlwaysVisible( bool alwaysVisible )
+{
+	mafGizmoInterface::SetAlwaysVisible(alwaysVisible);
+
+	for (int i = 0; i < 3; i++)
+	{
+		m_GTAxis[i]->SetAlwaysVisible(alwaysVisible);
+		m_GTPlane[i]->SetAlwaysVisible(alwaysVisible);
+	}
+}
+
+void mafGizmoTranslate::SetRenderWindowHeightPercentage(double percentage)
+{
+	for (int i = 0; i < 3; i++)
+	{
+		m_GTAxis[i]->SetRenderWindowHeightPercentage(percentage);
+		m_GTPlane[i]->SetRenderWindowHeightPercentage(percentage);
+	}
 }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotateFan.h,v $
   Language:  C++
-  Date:      $Date: 2010-08-20 16:11:50 $
-  Version:   $Revision: 1.3.2.1 $
+  Date:      $Date: 2010-11-10 16:51:28 $
+  Version:   $Revision: 1.3.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -17,7 +17,7 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "mafEvent.h"
-#include "mafObserver.h"
+#include "mafGizmoInterface.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -36,7 +36,7 @@ class mafRefSys;
 
       z               x              y
       ^               ^              ^
-      |               |              |
+      |               |              |p
       |   /|          |  /|          |   /|
       | /  |          |/  |          | /  |
       x-------> y     y-------> z    z-------> x
@@ -51,7 +51,7 @@ class mafRefSys;
 
   @sa mafGizmoRotate 
 */
-class mafGizmoRotateFan: public mafObserver 
+class mafGizmoRotateFan : public mafGizmoInterface 
 {
 public:
            mafGizmoRotateFan(mafVME *input, mafObserver *listener = NULL);
@@ -104,6 +104,9 @@ public:
   Set the abs pose */
   void SetAbsPose(mafMatrix *absPose);
   
+  /** Superclass override */
+  void SetMediator(mafObserver *mediator);
+
 protected:
   
  
@@ -133,7 +136,7 @@ protected:
   vtkTransformPolyDataFilter *m_ChangeFanAxisTPDF;
   
    /** Fan gizmo */
-  mafVMEGizmo *m_Gizmo;
+  mafVMEGizmo *m_GizmoFan;
 
   /** gizmo data */
   //mafVmeData *GizmoData;

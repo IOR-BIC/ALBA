@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotate.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:47:18 $
-  Version:   $Revision: 1.7.2.2 $
+  Date:      $Date: 2010-11-10 16:51:28 $
+  Version:   $Revision: 1.7.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -55,13 +55,18 @@ mafGizmoRotate::mafGizmoRotate(mafVME* input, mafObserver *listener, bool buildG
     // create the fan and send events to this
     m_GRFan[i] = new mafGizmoRotateFan(input, this);
     m_GRFan[i]->SetAxis(i);
+	m_GRFan[i]->SetMediator(this);
 
     // Create mafGizmoRotateCircle and send events to the corresponding fan
     m_GRCircle[i] = new mafGizmoRotateCircle(input, m_GRFan[i]);
-	  m_GRCircle[i]->SetAxis(i);
+	m_GRCircle[i]->SetAxis(i);
+	m_GRCircle[i]->SetMediator(this);
 
   }
-  
+
+  SetAlwaysVisible(true);
+  SetAutoscale(true);
+
   if (m_BuildGUI)
   {
     // create the gizmo gui
@@ -410,4 +415,35 @@ mafVME* mafGizmoRotate::GetRefSys()
 double mafGizmoRotate::GetCircleFanRadius()
 {
   return m_CircleFanRadius;
+}
+
+void mafGizmoRotate::SetAutoscale( bool autoscale )
+{
+	mafGizmoInterface::SetAutoscale(autoscale);
+
+	for (int i = 0; i < 3; i++)
+	{
+		m_GRFan[i]->SetAutoscale(autoscale);
+		m_GRCircle[i]->SetAutoscale(autoscale);
+	}
+}
+
+void mafGizmoRotate::SetAlwaysVisible( bool alwaysVisible )
+{
+	mafGizmoInterface::SetAlwaysVisible(alwaysVisible);
+
+	for (int i = 0; i < 3; i++)
+	{
+		m_GRFan[i]->SetAlwaysVisible(alwaysVisible);
+		m_GRCircle[i]->SetAlwaysVisible(alwaysVisible);
+	}
+}
+
+void mafGizmoRotate::SetRenderWindowHeightPercentage(double percentage)
+{
+	for (int i = 0; i < 3; i++)
+	{
+		m_GRFan[i]->SetRenderWindowHeightPercentage(percentage);
+		m_GRCircle[i]->SetRenderWindowHeightPercentage(percentage);
+	}
 }

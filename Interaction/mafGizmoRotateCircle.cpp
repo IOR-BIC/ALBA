@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotateCircle.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:47:18 $
-  Version:   $Revision: 1.8.4.3 $
+  Date:      $Date: 2010-11-10 16:51:28 $
+  Version:   $Revision: 1.8.4.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -73,12 +73,13 @@ mafGizmoRotateCircle::mafGizmoRotateCircle(mafVME *input, mafObserver *listener)
   //-----------------
   
   // the circle gizmo
-  m_Gizmo = mafVMEGizmo::New();
-  m_Gizmo->SetName("circle");
-  m_Gizmo->SetData(m_RotatePDF->GetOutput());
+  m_GizmoCircle = mafVMEGizmo::New();
+  m_GizmoCircle->SetName("circle");
+  m_GizmoCircle->SetData(m_RotatePDF->GetOutput());
+  m_GizmoCircle->SetMediator(m_Listener);
 
   // assign isa to S1 and S2;
-  m_Gizmo->SetBehavior(m_IsaComp);
+  m_GizmoCircle->SetBehavior(m_IsaComp);
   
   // set the axis to X axis
   this->SetAxis(m_ActiveAxis);
@@ -89,14 +90,14 @@ mafGizmoRotateCircle::mafGizmoRotateCircle(mafVME *input, mafObserver *listener)
   SetRefSysMatrix(m_AbsInputMatrix);
 
   // add the gizmo to the tree, this should increase reference count  
-  m_Gizmo->ReparentTo(mafVME::SafeDownCast(m_InputVme->GetRoot()));
+  m_GizmoCircle->ReparentTo(mafVME::SafeDownCast(m_InputVme->GetRoot()));
 
 }
 //----------------------------------------------------------------------------
 mafGizmoRotateCircle::~mafGizmoRotateCircle() 
 //----------------------------------------------------------------------------
 {
-  m_Gizmo->SetBehavior(NULL);
+  m_GizmoCircle->SetBehavior(NULL);
   
   vtkDEL(m_Circle);
   vtkDEL(m_CleanCircle);
@@ -108,7 +109,7 @@ mafGizmoRotateCircle::~mafGizmoRotateCircle()
 	//----------------------
   vtkDEL(m_IsaComp); 
   
-	m_Gizmo->ReparentTo(NULL);
+	m_GizmoCircle->ReparentTo(NULL);
 }
 //----------------------------------------------------------------------------
 void mafGizmoRotateCircle::CreatePipeline() 
@@ -287,10 +288,10 @@ void mafGizmoRotateCircle::OnEvent(mafEventBase *maf_event)
 void mafGizmoRotateCircle::SetColor(double col[3])
 //----------------------------------------------------------------------------
 {
-  m_Gizmo->GetMaterial()->m_Prop->SetColor(col);
-	m_Gizmo->GetMaterial()->m_Prop->SetAmbient(0);
-	m_Gizmo->GetMaterial()->m_Prop->SetDiffuse(1);
-	m_Gizmo->GetMaterial()->m_Prop->SetSpecular(0);
+  m_GizmoCircle->GetMaterial()->m_Prop->SetColor(col);
+	m_GizmoCircle->GetMaterial()->m_Prop->SetAmbient(0);
+	m_GizmoCircle->GetMaterial()->m_Prop->SetDiffuse(1);
+	m_GizmoCircle->GetMaterial()->m_Prop->SetSpecular(0);
 }
 //----------------------------------------------------------------------------
 void mafGizmoRotateCircle::SetColor(double colR, double colG, double colB)
@@ -303,13 +304,13 @@ void mafGizmoRotateCircle::SetColor(double colR, double colG, double colB)
 void mafGizmoRotateCircle::Show(bool show)
 //----------------------------------------------------------------------------
 {
-  mafEventMacro(mafEvent(this,VME_SHOW,m_Gizmo,show));
+  mafEventMacro(mafEvent(this,VME_SHOW,m_GizmoCircle,show));
 }
 //----------------------------------------------------------------------------
 void mafGizmoRotateCircle::SetAbsPose(mafMatrix *absPose)
 //----------------------------------------------------------------------------
 {
-  m_Gizmo->SetAbsMatrix(*absPose);
+  m_GizmoCircle->SetAbsMatrix(*absPose);
   SetRefSysMatrix(absPose);
 }
 //----------------------------------------------------------------------------
@@ -323,7 +324,7 @@ void mafGizmoRotateCircle::SetRefSysMatrix(mafMatrix *matrix)
 mafMatrix *mafGizmoRotateCircle::GetAbsPose()
 //----------------------------------------------------------------------------
 {
-  return m_Gizmo->GetOutput()->GetAbsMatrix();
+  return m_GizmoCircle->GetOutput()->GetAbsMatrix();
 }
 //----------------------------------------------------------------------------
 void mafGizmoRotateCircle::SetInput(mafVME *vme)
@@ -367,4 +368,10 @@ bool mafGizmoRotateCircle::GetIsActive()
 mafVME * mafGizmoRotateCircle::GetInput()
 {
   return this->m_InputVme;
+}
+
+void mafGizmoRotateCircle::SetMediator(mafObserver *mediator)
+{
+	mafGizmoInterface::SetMediator(mediator);
+	m_GizmoCircle->SetMediator(mediator);
 }

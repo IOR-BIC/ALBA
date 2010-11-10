@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScale.h,v $
   Language:  C++
-  Date:      $Date: 2010-02-17 09:35:47 $
-  Version:   $Revision: 1.5.2.2 $
+  Date:      $Date: 2010-11-10 16:51:28 $
+  Version:   $Revision: 1.5.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -70,6 +70,14 @@ public:
   Set input vme for the gizmo*/
   void SetInput(mafVME *vme); 
 
+  /** Superclass override */
+  void SetRenderWindowHeightPercentage(double percentage);
+
+  /** Superclass override */
+  void SetAutoscale(bool autoscale);
+
+  /** Superclass override */
+  void SetAlwaysVisible(bool alwaysVisible);
 
   //----------------------------------------------------------------------------
   // events handling 
@@ -172,7 +180,7 @@ private:
         vec[2] = p2[2] - p1[2];
     }
   }
-
+ 
   /**
   test friend*/
   friend class mafGizmoScaleTest;

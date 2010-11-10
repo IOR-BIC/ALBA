@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotateFan.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-08-20 16:11:50 $
-  Version:   $Revision: 1.11.2.2 $
+  Date:      $Date: 2010-11-10 16:51:28 $
+  Version:   $Revision: 1.11.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -68,10 +68,10 @@ mafGizmoRotateFan::mafGizmoRotateFan(mafVME *input, mafObserver *listener)
   // create vme gizmo stuff
   //-----------------
   // the circle gizmo
-  m_Gizmo = mafVMEGizmo::New();
-  m_Gizmo->SetName("fan");
-  m_Gizmo->SetData(m_ChangeFanAxisTPDF->GetOutput());
-
+  m_GizmoFan = mafVMEGizmo::New();
+  m_GizmoFan->SetName("fan");
+  m_GizmoFan->SetData(m_ChangeFanAxisTPDF->GetOutput());
+  
   // set the default axis to X axis
   this->SetAxis(m_ActiveAxis);
 
@@ -81,7 +81,7 @@ mafGizmoRotateFan::mafGizmoRotateFan(mafVME *input, mafObserver *listener)
   SetAbsPose(absInputMatrix);
 
   // add the gizmo to the tree, this should increase reference count  
-  m_Gizmo->ReparentTo(mafVME::SafeDownCast(m_InputVme->GetRoot()));
+  m_GizmoFan->ReparentTo(mafVME::SafeDownCast(m_InputVme->GetRoot()));
 }
 //----------------------------------------------------------------------------
 mafGizmoRotateFan::~mafGizmoRotateFan() 
@@ -101,7 +101,7 @@ mafGizmoRotateFan::~mafGizmoRotateFan()
 	//----------------------
 	// No leaks so somebody is performing this...
 	//----------------------
-	m_Gizmo->ReparentTo(NULL);
+	m_GizmoFan->ReparentTo(NULL);
 }
 //----------------------------------------------------------------------------
 void mafGizmoRotateFan::CreatePipeline() 
@@ -342,10 +342,10 @@ void mafGizmoRotateFan::OnEvent(mafEventBase *maf_event)
 void mafGizmoRotateFan::SetColor(double col[3])
 //----------------------------------------------------------------------------
 {
-  m_Gizmo->GetMaterial()->m_Prop->SetColor(col);
-	m_Gizmo->GetMaterial()->m_Prop->SetAmbient(0);
-	m_Gizmo->GetMaterial()->m_Prop->SetDiffuse(1);
-	m_Gizmo->GetMaterial()->m_Prop->SetSpecular(0);
+  m_GizmoFan->GetMaterial()->m_Prop->SetColor(col);
+	m_GizmoFan->GetMaterial()->m_Prop->SetAmbient(0);
+	m_GizmoFan->GetMaterial()->m_Prop->SetDiffuse(1);
+	m_GizmoFan->GetMaterial()->m_Prop->SetSpecular(0);
 }
 //----------------------------------------------------------------------------
 void mafGizmoRotateFan::SetColor(double colR, double colG, double colB)
@@ -358,7 +358,7 @@ void mafGizmoRotateFan::SetColor(double colR, double colG, double colB)
 void mafGizmoRotateFan::Show(bool show)
 //----------------------------------------------------------------------------
 {
-  mafEventMacro(mafEvent(this,VME_SHOW,m_Gizmo,show));
+  mafEventMacro(mafEvent(this,VME_SHOW,m_GizmoFan,show));
 }
 //----------------------------------------------------------------------------
 double mafGizmoRotateFan::PointPickedToStartTheta(double xp, double yp, double zp)
@@ -407,7 +407,7 @@ double mafGizmoRotateFan::PointPickedToStartTheta(double xp, double yp, double z
 void mafGizmoRotateFan::SetAbsPose(mafMatrix *absPose )
 //----------------------------------------------------------------------------
 {
-  m_Gizmo->SetAbsMatrix(*absPose);
+  m_GizmoFan->SetAbsMatrix(*absPose);
   SetRefSysMatrix(absPose);
 }
 //----------------------------------------------------------------------------
@@ -422,4 +422,11 @@ void mafGizmoRotateFan::SetRefSysMatrix(mafMatrix *matrix)
 //----------------------------------------------------------------------------
 {  
   m_RefSys->SetTypeToCustom(matrix);
+}
+
+
+void mafGizmoRotateFan::SetMediator(mafObserver *mediator)
+{
+	mafGizmoInterface::SetMediator(mediator);
+	m_GizmoFan->SetMediator(mediator);
 }

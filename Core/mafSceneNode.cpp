@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-09-10 15:42:40 $
-  Version:   $Revision: 1.7.6.1 $
+  Date:      $Date: 2010-11-10 16:52:01 $
+  Version:   $Revision: 1.7.6.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -31,6 +31,7 @@
 #include "vtkRenderer.h"
 //#include "vtkTransform.h"
 #include "vtkLinearTransform.h"
+#include "vtkCommand.h"
 //@@@ #include "mafNodeLandmarkCloud.h"
 //@@@ #include "mafNodeScalar.h"
 //@@@ #include "mflMatrixPipe.h"
@@ -46,6 +47,7 @@ mafSceneNode::mafSceneNode(mafSceneGraph *sg,mafSceneNode *parent, const mafNode
 	m_RenFront			= ren;
 	m_RenBack				= ren2;
   m_AlwaysVisibleRenderer = ren3;
+  
   m_Next					= NULL;
   m_Pipe					= NULL;
   m_PipeCreatable = true;
@@ -53,7 +55,8 @@ mafSceneNode::mafSceneNode(mafSceneGraph *sg,mafSceneNode *parent, const mafNode
   //m_visible      = false;
   m_AssemblyFront = NULL;
   m_AssemblyBack  = NULL;
-  
+  m_AlwaysVisibleAssembly = NULL;
+
   assert(m_Vme);
   vtkLinearTransform *transform = NULL;
   if(m_Vme->IsA("mafVME"))
@@ -86,6 +89,19 @@ mafSceneNode::mafSceneNode(mafSceneGraph *sg,mafSceneNode *parent, const mafNode
 			m_RenBack->AddActor(m_AssemblyBack); 
 		else
 			m_Parent->m_AssemblyBack->AddPart(m_AssemblyBack);
+	}
+
+	m_AlwaysVisibleAssembly = vtkMAFAssembly::New();
+	m_AlwaysVisibleAssembly->SetVme(m_Vme);
+	m_AlwaysVisibleAssembly->SetUserTransform(transform);
+
+	if(m_AlwaysVisibleRenderer != NULL)
+	{
+		if(m_Vme->IsA("mafNodeRoot") || m_Vme->IsA("mafVMERoot")) 
+			m_AlwaysVisibleRenderer->AddActor(m_AlwaysVisibleAssembly); 
+		else
+			m_Parent->m_AlwaysVisibleAssembly->AddPart(m_AlwaysVisibleAssembly);
+
 	}
 
 
@@ -142,6 +158,19 @@ mafSceneNode::~mafSceneNode()
 
     vtkDEL(m_AssemblyBack);  
 	}
+
+	if(m_AlwaysVisibleRenderer != NULL)
+	{
+		if(m_Vme->IsA("mafNodeRoot") || m_Vme->IsA("mafVMERoot")) 
+			m_AlwaysVisibleRenderer->RemoveActor(m_AlwaysVisibleAssembly);
+		else
+			m_Parent->m_AlwaysVisibleAssembly->RemovePart(m_AlwaysVisibleAssembly); 
+
+		vtkDEL(m_AlwaysVisibleAssembly);  
+	}
+
+	
+
  /* @@@
 	if (m_cloud && m_CloudOpenClose_observer > 0 )
 	{
@@ -270,3 +299,5 @@ void mafSceneNode::Print(std::ostream& os, const int tabs)// const
   os <<  indent << "Always Visible Renderer" << '\t' << m_AlwaysVisibleRenderer << std::endl;
   os << std::endl;
 }
+
+

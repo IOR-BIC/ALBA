@@ -32,6 +32,8 @@ SET(PROJECT_SRCS
   mafAvatar3DCone.h
   mafCameraTransform.cpp
   mafCameraTransform.h
+  mafGizmoAutoscaleHelper.cpp
+  mafGizmoAutoscaleHelper.h
   mafDevice.cpp
   mafDevice.h
   mafDeviceManager.cpp

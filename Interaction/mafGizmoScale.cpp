@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScale.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-02-17 09:35:47 $
-  Version:   $Revision: 1.9.2.3 $
+  Date:      $Date: 2010-11-10 16:51:28 $
+  Version:   $Revision: 1.9.2.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -83,6 +83,8 @@ mafGizmoScale::mafGizmoScale(mafVME* input, mafObserver *listener , bool buildGU
     m_GuiGizmoScale->EnableWidgets(true);
   }
 
+  this->SetAutoscale(true);
+  this->SetAlwaysVisible(true);
 }
 //----------------------------------------------------------------------------
 mafGizmoScale::~mafGizmoScale() 
@@ -643,3 +645,42 @@ mafVME* mafGizmoScale::GetRefSys()
 {
   return m_RefSysVME;
 }
+
+void mafGizmoScale::SetRenderWindowHeightPercentage(double percentage)
+{
+	mafGizmoInterface::SetRenderWindowHeightPercentage(percentage);
+
+	for (int i = 0; i < 3; i++)
+	{
+		m_GSAxis[i]->SetRenderWindowHeightPercentage(percentage);
+	}
+
+	m_GSIsotropic->SetRenderWindowHeightPercentage(percentage);
+
+}
+
+void mafGizmoScale::SetAutoscale( bool autoscale )
+{
+	mafGizmoInterface::SetAutoscale(autoscale);
+
+	for (int i = 0; i < 3; i++)
+	{
+		m_GSAxis[i]->SetAutoscale(autoscale);
+	}
+
+	m_GSIsotropic->SetAutoscale(autoscale);
+
+}
+
+void mafGizmoScale::SetAlwaysVisible( bool alwaysVisible )
+{
+	mafGizmoInterface::SetAlwaysVisible(alwaysVisible);
+
+	for (int i = 0; i < 3; i++)
+	{
+		m_GSAxis[i]->SetAlwaysVisible(alwaysVisible);
+	}
+
+	m_GSIsotropic->SetAlwaysVisible(alwaysVisible);
+}
+

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotateCircle.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:47:18 $
-  Version:   $Revision: 1.2.22.3 $
+  Date:      $Date: 2010-11-10 16:51:28 $
+  Version:   $Revision: 1.2.22.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -17,7 +17,7 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "mafEvent.h"
-#include "mafObserver.h"
+#include "mafGizmoInterface.h"
 #include "mafSmartPointer.h"
 
 //----------------------------------------------------------------------------
@@ -40,7 +40,7 @@ class vtkTransform;
   
   @sa mafGizmoRotate
 */
-class mafGizmoRotateCircle: public mafObserver
+class mafGizmoRotateCircle: public mafGizmoInterface
 {
 public:
            mafGizmoRotateCircle(mafVME *input, mafObserver *listener = NULL);
@@ -110,6 +110,9 @@ public:
   Get the gizmo interactor*/
   mafInteractorGenericInterface *GetInteractor();
 
+  /** Superclass override */
+  void SetMediator(mafObserver *mediator);
+
 protected:
 
   /**
@@ -120,7 +123,7 @@ protected:
   mafAutoPointer<mafMatrix> m_AbsInputMatrix;
   
   /** Circle gizmo */
-  mafVMEGizmo *m_Gizmo;
+  mafVMEGizmo *m_GizmoCircle;
 
   /** Register input vme*/
   mafVME *m_InputVme;
@@ -186,4 +189,5 @@ protected:
   /** friend test */
   friend class mafGizmoRotateCircleTest;
 };
+
 #endif

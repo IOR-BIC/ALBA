@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoInterface.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-09-15 16:10:05 $
-  Version:   $Revision: 1.3.2.3 $
+  Date:      $Date: 2010-11-10 16:51:28 $
+  Version:   $Revision: 1.3.2.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,11 +36,15 @@ mafGizmoInterface::mafGizmoInterface()
   m_Visibility = false;
   m_Name = "UNDEFINED_GIZMO_NAME";
   m_Mediator = NULL;
+  m_Autoscale = false;
+  m_RenderWindowHeightPercentage = 0.20;
+  m_AlwaysVisible = false;
 }
 //----------------------------------------------------------------------------
 mafGizmoInterface::~mafGizmoInterface() 
 //----------------------------------------------------------------------------
 {
+
 }
 
 //----------------------------------------------------------------------------  
@@ -63,8 +67,6 @@ mafObserver * mafGizmoInterface::GetListener()
 
 void mafGizmoInterface::SetListener( mafObserver *listener )
 {
-
-
   m_Listener = listener;
 }
 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslatePlane.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:47:19 $
-  Version:   $Revision: 1.3.2.2 $
+  Date:      $Date: 2010-11-10 16:51:28 $
+  Version:   $Revision: 1.3.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -17,7 +17,7 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "mafEvent.h"
-#include "mafObserver.h"
+#include "mafGizmoInterface.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -38,7 +38,7 @@ class vtkTubeFilter;
   
   @sa mafGizmoTranslate 
 */
-class mafGizmoTranslatePlane: public mafObserver 
+class mafGizmoTranslatePlane: public mafGizmoInterface 
 {
 public:
            mafGizmoTranslatePlane(mafVME *input, mafObserver *listener = NULL);

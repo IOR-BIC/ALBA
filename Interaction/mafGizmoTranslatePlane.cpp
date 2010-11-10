@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslatePlane.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:47:19 $
-  Version:   $Revision: 1.12.2.2 $
+  Date:      $Date: 2010-11-10 16:51:28 $
+  Version:   $Revision: 1.12.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -82,7 +82,9 @@ mafGizmoTranslatePlane::mafGizmoTranslatePlane(mafVME *input, mafObserver *liste
     vmeName << i;
     m_Gizmo[i]->SetName(vmeName.GetCStr());
     m_Gizmo[i]->SetData(m_RotatePDF[i]->GetOutput());
+	m_Gizmo[i]->SetMediator(m_Listener);
   }
+
   // assign isa to S1 and S2;
   m_Gizmo[S1]->SetBehavior(m_IsaComp[S1]);
   m_Gizmo[S2]->SetBehavior(m_IsaComp[S2]);

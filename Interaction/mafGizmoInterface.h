@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoInterface.h,v $
   Language:  C++
-  Date:      $Date: 2010-09-15 16:10:05 $
-  Version:   $Revision: 1.4.2.3 $
+  Date:      $Date: 2010-11-10 16:51:28 $
+  Version:   $Revision: 1.4.2.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -39,24 +39,50 @@ class mafMatrix;
 class mafGizmoInterface : public mafObserver 
 {
 public:
-
+	
+  /** 
+  Set the gizmo name */
   void SetName(mafString name) {m_Name = name;};
+
+  /** 
+  Get the gizmo name */
   mafString GetName() {return m_Name;}
   
   /** 
-  Set input vme for the gizmo*/
+  Set input vme for the gizmo: gizmo are tools used to manipulate VMEs and this variable holds a reference to the controlled VME.
+  Can be used also to initialize gizmo dimensions and position*/
   virtual void SetInput(mafVME *vme);
   mafVME *GetInput();
   
   /** 
   Set the orchestrator object: mafGizmo's are used togetheter in more complex objects 
-  like mafGizmoRotate, mafGizmoTranslate ,... The master gizmo act as mediator between
-  single mafVMEGizmos.
+  like mafGizmoRotate, mafGizmoTranslate ,... The master gizmo act as mediator (see GOF mediator pattern)
+  between single mafVMEGizmos.
   The optional mediator ivar holds a reference to the orchestrator if needed by the client.
+  For example see mafGizmoTranslate which act as mediator between 3 mafGizmoTranslateAxis and 3 mafGizmoTranslatePlane
+  each one wrapping several mafVMEGizmo's
   */
   void SetMediator(mafObserver *mediator) {m_Mediator = mediator;};
+  
+  /** Return the meditor object */
   mafObserver *GetMediator() {return m_Mediator;};
 
+  /** Enable/Disable gizmo autoscaling (default is false ie no autoscaling): if autoscale is enabled the gizmo will maintain a fixed dimension
+  trying to follow camera zoom. Use SetRenderWindowHeightPercentage to set gizmo / renderWindowHeight fixed ratio*/
+  void SetAutoscale(bool autoscale) {m_Autoscale = autoscale;};
+
+  /** Get if gizmo autoscaling is enabled*/
+  bool GetAutoscale() {return m_Autoscale;};
+
+  /** Set the size of the gizmo when autoscale is enabled. The size is expressed as gizmoHeight / renderWindowHeight.
+  Max size is 1 (gizmo height equal to the render window one). This setting has no effect when autoscale is off*/
+  void SetRenderWindowHeightPercentage(double percentage) {m_RenderWindowHeightPercentage = percentage;};
+  double GetRenderWindowHeightPercentage() {return m_RenderWindowHeightPercentage;};
+
+  /** Put the gizmo on the superimposed layer ie make it always visible (default to false)*/
+  void SetAlwaysVisible(bool alwaysVisible) {m_AlwaysVisible = alwaysVisible;};
+  bool GetAlwaysVisible() {return m_AlwaysVisible;};
+  
   //----------------------------------------------------------------------------
   // events handling 
   //----------------------------------------------------------------------------
@@ -85,7 +111,9 @@ public:
   Set the gizmo working modality */
   enum MODALITY {G_LOCAL = 0, G_GLOBAL};
 
-  /** (default) Modality to be used when gizmo reference frame is the input vme abs pose */
+  /** (default) Modality to be used when gizmo reference frame is the input vme abs pose: using this modality
+  gizmo abs pose will change during the interaction. See mafGizmoTranslate behavior with local (default) vs a different (global) refsys 
+  in mafOpMAFTransform for a Local vs Global use case*/
   void SetModalityToLocal();
 
   /** Modality to be used when gizmo reference frame is different from input vme abs pose */
@@ -137,6 +165,15 @@ protected:
 
   /** */
   bool m_Visibility;
+  
+  /** gizmoHeight / RenderWindowHeight in autoscale mode */
+  double m_RenderWindowHeightPercentage;
+
+  /** Gimzo always visible ie on the superimposed layer */
+  bool m_AlwaysVisible;
+
+  /** Gizmo autoscale */
+  bool m_Autoscale;
 
   void SendTransformMatrix(mafMatrix* matrix, int eventId, long arg);
 

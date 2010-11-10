@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslate.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:47:19 $
-  Version:   $Revision: 1.5.2.2 $
+  Date:      $Date: 2010-11-10 16:51:28 $
+  Version:   $Revision: 1.5.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -83,6 +83,14 @@ public:
   Set input vme for the gizmo*/
   void SetInput(mafVME *vme); 
 
+  /** Superclass override */
+  void SetRenderWindowHeightPercentage(double percentage);
+
+  /** Superclass override */
+  void SetAutoscale(bool autoscale);
+
+  /** Superclass override */
+  void SetAlwaysVisible(bool alwaysVisible);
 
   //----------------------------------------------------------------------------
   // events handling 

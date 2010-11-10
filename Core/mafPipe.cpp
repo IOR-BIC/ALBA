@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipe.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-09-10 15:42:40 $
-  Version:   $Revision: 1.16.2.1 $
+  Date:      $Date: 2010-11-10 16:52:01 $
+  Version:   $Revision: 1.16.2.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -39,8 +39,10 @@ mafPipe::mafPipe()
   m_Vme			      = NULL;
 	m_AssemblyFront	= NULL;
 	m_AssemblyBack	= NULL;
+	m_AlwaysVisibleAssembly = NULL;
 	m_RenFront      = NULL;
 	m_RenBack       = NULL;
+	m_AlwaysVisibleRenderer = NULL;
   m_Gui           = NULL;
   m_Listener      = NULL;
 	m_Selected = false;
@@ -54,6 +56,7 @@ void mafPipe::Create(mafSceneNode *n)
   
   m_AssemblyFront = n->m_AssemblyFront;
   m_AssemblyBack	= n->m_AssemblyBack;
+  m_AlwaysVisibleAssembly = n->m_AlwaysVisibleAssembly;
   m_RenFront      = n->m_RenFront;
   m_RenBack       = n->m_RenBack;
   m_AlwaysVisibleRenderer = n->m_AlwaysVisibleRenderer;

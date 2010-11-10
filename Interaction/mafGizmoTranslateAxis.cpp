@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslateAxis.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:47:19 $
-  Version:   $Revision: 1.11.2.2 $
+  Date:      $Date: 2010-11-10 16:51:28 $
+  Version:   $Revision: 1.11.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -71,11 +71,13 @@ mafGizmoTranslateAxis::mafGizmoTranslateAxis(mafVME *input, mafObserver *listene
   m_CylGizmo = mafVMEGizmo::New();
   m_CylGizmo->SetName("CylGizmo");
   m_CylGizmo->SetData(m_RotatePDF[CYLINDER]->GetOutput());
-  
+  m_CylGizmo->SetMediator(m_Listener);
+
   // cone gizmo
   m_ConeGizmo = mafVMEGizmo::New();  
   m_ConeGizmo->SetName("ConeGizmo");
   m_ConeGizmo->SetData(m_RotatePDF[CONE]->GetOutput());
+  m_ConeGizmo->SetMediator(m_Listener);
 
   // assign isa to cylinder and cone
   m_CylGizmo->SetBehavior(m_IsaComp[CYLINDER]);

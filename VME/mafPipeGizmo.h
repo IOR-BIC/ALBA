@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeGizmo.h,v $
   Language:  C++
-  Date:      $Date: 2008-10-08 14:28:59 $
-  Version:   $Revision: 1.4.2.1 $
+  Date:      $Date: 2010-11-10 16:51:44 $
+  Version:   $Revision: 1.4.2.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -14,12 +14,16 @@
 #define __mafPipeGizmo_H__
 
 #include "mafPipe.h"
+#include "mafOBB.h";
+
 //----------------------------------------------------------------------------
 // forward refs :
 //----------------------------------------------------------------------------
 class vtkActor;
 class vtkCaptionActor2D;
 class vtkPolyDataMapper;
+class mafGizmoAutoscaleHelper;
+class mafGizmoInterface;
 
 //----------------------------------------------------------------------------
 // mafPipeGizmo :
@@ -46,13 +50,22 @@ public:
   virtual vtkMAFAssembly *GetAssemblyFront(){return m_AssemblyFront;};
   virtual vtkMAFAssembly *GetAssemblyBack(){return m_AssemblyBack;};
 
+
 protected:
+
+  mafGizmoAutoscaleHelper *m_GizmoAutoscaleHelper;
+
+  /** the master gizmo acting as mediator between its parts : see mafGizmoInterface*/
+  mafGizmoInterface *m_Mediator;
+
+  mafOBB m_OBB;
+
   void UpdatePipe();
 
   mafString m_Caption;
 
   vtkPolyDataMapper *m_Mapper;
-  vtkActor *m_Actor;
+  vtkActor *m_GizmoActor;
   vtkActor *m_OutlineActor;
   vtkCaptionActor2D *m_CaptionActor;
 };  

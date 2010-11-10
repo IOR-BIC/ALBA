@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScaleIsotropic.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:47:18 $
-  Version:   $Revision: 1.7.4.2 $
+  Date:      $Date: 2010-11-10 16:51:28 $
+  Version:   $Revision: 1.7.4.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -67,10 +67,12 @@ mafGizmoScaleIsotropic::mafGizmoScaleIsotropic(mafVME *input, mafObserver *liste
   m_CubeGizmo = mafVMEGizmo::New();  
   m_CubeGizmo->SetName("CubeGizmo");
   m_CubeGizmo->SetData(m_Cube->GetOutput());
-  
+  m_CubeGizmo->SetMediator(m_Listener);
+
   // assign isa to cube
   m_CubeGizmo->SetBehavior(m_IsaComp); 
-  
+
+
   SetAbsPose(m_InputVme->GetOutput()->GetAbsMatrix());
   
   // set cube gizmo material property and initial color to light blue
