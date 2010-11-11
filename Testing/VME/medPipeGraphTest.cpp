@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medPipeGraphTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-09-13 12:04:50 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2010-11-11 09:31:05 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2008
@@ -169,6 +169,7 @@ void medPipeGraphTest::TestPipeExecution()
   delete pipe;
   
   sceneNode->m_RenFront = NULL;
+  sceneNode->m_AlwaysVisibleRenderer = NULL;
   delete sceneNode;
   mafDEL(analog);
 
