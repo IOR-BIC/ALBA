@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-10-14 16:08:18 $
-  Version:   $Revision: 1.43.2.4 $
+  Date:      $Date: 2010-11-11 16:14:58 $
+  Version:   $Revision: 1.43.2.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -146,12 +146,15 @@ mafVMEStorage *mafVMEManager::GetStorage()
 void mafVMEManager::SetApplicationStamp(mafString &appstamp)
 //----------------------------------------------------------------------------
 {
+  // Add a single application stamp; this is done automatically while creating the application with the application name
   m_AppStamp.push_back(appstamp);
 }
 //----------------------------------------------------------------------------
 void mafVMEManager::SetApplicationStamp(std::vector<mafString> appstamp)
 //----------------------------------------------------------------------------
 {
+  // Add a vector of time stamps; this can be done manually for adding compatibility with other applications. 
+  // The application name itself must not be included since it was already added with the other call (see function above).
   for (int i=0; i<appstamp.size();i++)
   {
     m_AppStamp.push_back(appstamp.at(i));
@@ -385,20 +388,23 @@ void mafVMEManager::MSFOpen(mafString filename)
   bool stamp_open_all_found = false;
   for (int k=0; k<m_AppStamp.size(); k++)
   {
+    // Check with the Application name
     if (app_stamp.Equals(m_AppStamp.at(k).GetCStr()))
     {
       stamp_found = true;
     }
+    // Check with the "Data Manager" tag
     if (m_AppStamp.at(k).Equals("DataManager"))
     {
       stamp_data_manager_found = true;
     }
+    // Check with the "OPEN_ALL_DATA" tag
     if (m_AppStamp.at(k).Equals("OPEN_ALL_DATA"))
     {
       stamp_open_all_found = true;
     }
   }
-	if(app_stamp.Equals("INVALID") || ((!stamp_found) && (!stamp_data_manager_found) && (!stamp_open_all_found))) // Check on file app_stamp
+	if(app_stamp.Equals("INVALID") || ((!stamp_found) && (!stamp_data_manager_found) && (!stamp_open_all_found))) 
 	{
 		//Application stamp not valid
 		mafMessage(_("File not valid for this application!"), _("Warning"));

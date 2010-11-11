@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.h,v $
   Language:  C++
-  Date:      $Date: 2010-10-14 16:08:17 $
-  Version:   $Revision: 1.20.2.3 $
+  Date:      $Date: 2010-11-11 16:14:58 $
+  Version:   $Revision: 1.20.2.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -120,8 +120,10 @@ public:
   /** Return the storage associated to the current tree.*/
   mafVMEStorage *GetStorage();
 
-	/** Set the application stamp; this is the mark of the specific vertical application (is often equal to the application name). */
+	/** Set the application stamp; this is the mark of the specific vertical application (is always equal to the application name). */
   void SetApplicationStamp(mafString &appstamp);
+
+  /** Set other application stamps for compatibility with similar applications (the application stamp itself is already present). */
   void SetApplicationStamp(std::vector<mafString> appstamp);
 
 	/** Set the flag for bak file generation on saving MSF file. */
