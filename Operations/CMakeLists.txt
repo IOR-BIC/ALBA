@@ -127,6 +127,8 @@ IF (MAF_USE_ITK)
     mafParabolicMeshToLinearMeshFilter.h
     mafOpImporterMesh.cpp
     mafOpImporterMesh.h
+    mafOpExporterMesh.cpp
+    mafOpExporterMesh.h
     mafOpScalarToSurface.cpp
     mafOpScalarToSurface.h
     mafOpImporterVMEDataSetAttributes.cpp
