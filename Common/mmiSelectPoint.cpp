@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmiSelectPoint.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-25 15:41:18 $
-Version:   $Revision: 1.2.2.2 $
-Authors:   Matteo Giacomoni	
+Date:      $Date: 2010-11-12 17:17:35 $
+Version:   $Revision: 1.2.2.3 $
+Authors:   Matteo Giacomoni , Stefano Perticoni	
 ==========================================================================
 Copyright (c) 2002/2004 
 CINECA - Interuniversity Consortium (www.cineca.it)
@@ -14,7 +14,6 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 #include "mmiSelectPoint.h"
 #include "mafDeviceButtonsPadMouse.h"
-#include "mafAvatar3D.h"
 #include "mafInteractor.h"
 #include "mafRWIBase.h"
 #include "mafEventInteraction.h"
@@ -23,12 +22,11 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkAbstractPicker.h"
 #include "vtkPointPicker.h"
 #include "vtkPoints.h"
-#include "vtkMath.h"
+
 #include "vtkRendererCollection.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkCamera.h"
-#include "vtkTransform.h"
 
 #include <assert.h>
 
@@ -66,7 +64,11 @@ void mmiSelectPoint::OnMouseMove()
 void mmiSelectPoint::OnLeftButtonDown(mafEventInteraction *e) 
 //----------------------------------------------------------------------------
 {
-	if (e->GetModifier(MAF_CTRL_KEY) && m_UseCtrlModifier) 
+  if (e == NULL)
+  {
+    return;
+  }
+	else if (e->GetModifier(MAF_CTRL_KEY) && m_UseCtrlModifier) 
 	{
 		// picking mode on
 		m_IsPicking = true;
@@ -92,6 +94,11 @@ void mmiSelectPoint::OnLeftButtonDown(mafEventInteraction *e)
 void mmiSelectPoint::OnButtonUp(mafEventInteraction *e)
 //----------------------------------------------------------------------------
 {
+  if (e == NULL)
+  {
+    return;
+  }
+
 	// reset
 	m_IsPicking = false;
 
@@ -134,29 +141,6 @@ void mmiSelectPoint::PickCell( mafDevice *device )
 void mmiSelectPoint::OnEvent(mafEventBase *event)
 //------------------------------------------------------------------------------
 {
-	// if we are in pick modality...
-	/*if (m_IsPicking)
-	{
-		// is this an interaction event?
-		mafEventInteraction* eventInteraction = NULL;
-		eventInteraction = mafEventInteraction::SafeDownCast(event);
-
-		// if yes handle the picking
-		if (eventInteraction != NULL)
-		{
-			// is it coming from the mouse?
-			if (mafDeviceButtonsPadMouse *mouse=mafDeviceButtonsPadMouse::SafeDownCast((mafDevice *)eventInteraction->GetSender()))
-			{ 
-				PickCell(mouse);
-			}
-			else
-			{
-				mafLogMessage("only handling events from the mouse!more code is required in order to handle this device!");
-				assert(false);
-			} 
-		}
-	} */
-
 	Superclass::OnEvent(event);
 }
 

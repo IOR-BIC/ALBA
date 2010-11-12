@@ -29,6 +29,10 @@ ADD_TEST(medGUITransformSlidersTest ${EXECUTABLE_OUTPUT_PATH}/medGUITransformSli
 ADD_EXECUTABLE(mmiVTKPickerTest mmiVTKPickerTest.h mmiVTKPickerTest.cpp)
 ADD_TEST(mmiVTKPickerTest ${EXECUTABLE_OUTPUT_PATH}/mmiVTKPickerTest)
 
+############ mmiSelectPointTest
+ADD_EXECUTABLE(mmiSelectPointTest mmiSelectPointTest.h mmiSelectPointTest.cpp)
+ADD_TEST(mmiSelectPointTest ${EXECUTABLE_OUTPUT_PATH}/mmiSelectPointTest)
+
 IF (WIN32)
   SET_TARGET_PROPERTIES(mafGizmoROI_BESTest PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)

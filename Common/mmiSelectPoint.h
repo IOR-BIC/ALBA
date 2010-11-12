@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmiSelectPoint.h,v $
 Language:  C++
-Date:      $Date: 2009-12-17 12:24:38 $
-Version:   $Revision: 1.1.2.2 $
-Authors:   Matteo Giacomoni
+Date:      $Date: 2010-11-12 17:17:36 $
+Version:   $Revision: 1.1.2.3 $
+Authors:   Matteo Giacomoni , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
 CINECA - Interuniversity Consortium (www.cineca.it)
@@ -22,16 +22,22 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 class vtkCellPicker;
 class vtkCamera;
 
-/** implements mouse move of camera in the scene or perform continuous cell picking
-when using CTRL modifier.
+/** Perform continuous cell picking with or without the CTRL modifier or move the camera
+in the scene (when not picking)
+
 This class implements a mouse move of the renderer camera in the scene. The interaction
 modality is a mouse manipulation, where movements of the mouse are mapped
 into movements of the camera. 
-If CTRL modifier is pressed a pick is performed and a 
+
+A pick can be set to happen with LeftMouseButton + CTRL or LeftMouseButton only
+
+When the pick is performed a:
+
 mafEvent(this,VME_PICKED,pickedPoint,pickedCellId);
+
 is issued.
 
-to retrieve picking information client should use some code like this:
+To retrieve picking information client should use some code like this:
 
 pointFromEvent = (vtkPoints *)e->GetVtkObj();
 pointFromEvent->GetPoint(0,pointCoordinates);
@@ -52,8 +58,19 @@ public:
 	/** redefined to end pick modality */
 	virtual void OnButtonUp(mafEventInteraction *e);
 
+  /** Set the CTRL modifier to On => picking performed on LeftButtonDown + CTRL */
   void SetCtrlModifierOn(){m_UseCtrlModifier = true;};
+
+  /** Set the CTRL modifier to Off => pick performed on Left button down*/
   void SetCtrlModifierOff(){m_UseCtrlModifier = false;};
+
+  /** Set the CTRL modifier: 
+  true => pick on Ctrl + LeftButtonDown
+  false => pick on LeftButtonDown only */
+  void SetCtrlModifier(bool useCtrlModifier) {m_UseCtrlModifier = useCtrlModifier;};
+  
+  /** Get the CTRL modifier */
+  bool GetCtrlModifier() {return m_UseCtrlModifier;};
 
 protected:
 	mmiSelectPoint();
