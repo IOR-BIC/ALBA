@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmiSelectPointTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-11-12 17:17:20 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-11-12 17:27:35 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -18,11 +18,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mmiVTKPickerTest.h"
+#include "mmiSelectPointTest.h"
 
 #include <cppunit/config/SourcePrefix.h>
 #include <iostream>
-#include "mmiVTKPickerTest.h"
 #include "mmiSelectPoint.h"
 #include "mafEventInteraction.h"
 
