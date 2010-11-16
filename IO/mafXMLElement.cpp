@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLElement.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2010-11-16 15:59:44 $
+  Version:   $Revision: 1.16.10.1 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -182,12 +182,15 @@ mafStorageElement::ChildrenVector &mafXMLElement::GetChildren()
     // create and fill in new children list with element nodes
     m_Children = new ChildrenVector;
     XERCES_CPP_NAMESPACE_QUALIFIER DOMNodeList *children=m_DOMElement->m_XMLElement->getChildNodes();
-    for (unsigned int i = 0; i<children->getLength();i++)
+    
+	int length = children->getLength();
+	for (unsigned int i = 0; i<length;i++)
     {
       XERCES_CPP_NAMESPACE_QUALIFIER DOMNode *child_element=children->item(i);
       if (children->item(i)->getNodeType()==XERCES_CPP_NAMESPACE_QUALIFIER DOMNode::ELEMENT_NODE)
       {
-        mafXMLElement *child=new mafXMLElement(new mmuXMLDOMElement((XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *)child_element),this,GetXMLStorage());
+        mafXMLElement *child=new mafXMLElement(
+			new mmuXMLDOMElement((XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *)child_element),this,GetXMLStorage());
         m_Children->push_back(child);
       }      
     }
