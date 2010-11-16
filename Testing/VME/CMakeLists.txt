@@ -134,7 +134,8 @@ ADD_TEST(medPipeTensorFieldTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeTensorFieldTes
 ADD_EXECUTABLE(medPipeVectorFieldTest medPipeVectorFieldTest.h medPipeVectorFieldTest.cpp)
 ADD_TEST(medPipeVectorFieldTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeVectorFieldTest)
 
-
+ADD_EXECUTABLE(medVisualPipeSlicerSliceTest  medVisualPipeSlicerSliceTest.h medVisualPipeSlicerSliceTest.cpp)
+ADD_TEST(medVisualPipeSlicerSliceTest ${EXECUTABLE_OUTPUT_PATH}/medVisualPipeSlicerSliceTest)
 
 #to be checked
 #ADD_EXECUTABLE(medPipeVolumeVRTest medPipeVolumeVRTest.h medPipeVolumeVRTest.cpp)
