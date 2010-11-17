@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScale.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-11-10 16:51:28 $
-  Version:   $Revision: 1.9.2.4 $
+  Date:      $Date: 2010-11-17 16:13:07 $
+  Version:   $Revision: 1.9.2.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -19,22 +19,21 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-
-#include "mafGizmoScale.h"
-#include "mafDecl.h"
-#include "mafGizmoScaleAxis.h"
-#include "mafGizmoScaleIsotropic.h"
-#include "mafSmartPointer.h"
-#include "vtkMAFSmartPointer.h"
-
-#include "mafInteractorGenericMouse.h"
-
+// maf includes
 #include "mafMatrix.h"
 #include "mafTransform.h"
 #include "mafTransformFrame.h"
 #include "mafVME.h"
 #include "mafVMEOutput.h"
+#include "mafGizmoScale.h"
+#include "mafDecl.h"
+#include "mafGizmoScaleAxis.h"
+#include "mafGizmoScaleIsotropic.h"
+#include "mafSmartPointer.h"
+#include "mafInteractorGenericMouse.h"
 
+// vtk includes
+#include "vtkMAFSmartPointer.h"
 #include "vtkTransform.h"
 #include "vtkMath.h"
 
@@ -51,16 +50,21 @@ mafGizmoScale::mafGizmoScale(mafVME* input, mafObserver *listener , bool buildGU
   m_GSAxis[X] = m_GSAxis[Y] = m_GSAxis[Z] = NULL;
   m_GSIsotropic = NULL;
   
-  //no gizmo component is active at construction
+  //no gizmo component is active at construction ie no yellow or highlighted component at startup
   this->m_ActiveGizmoComponent = NONE;
+
+  // default modality to local ie the gizmo is moving along with the input vme
   this->SetModalityToLocal();
 
   mafNEW(m_InitialGizmoPose);
+
+  // initial gizmo pose is the input vme abs matrix
   m_InitialGizmoPose->DeepCopy(m_InputVME->GetOutput()->GetAbsMatrix());
 
   mafNEW(m_VmeMatrixRelativeToRefSysVME);
   mafNEW(m_RefSysVMEAbsMatrixAtMouseDown);
 
+  // build the three scale gizmos, one for each axis
   for (int i = 0; i < 3; i++)
   {
     // Create mafGizmoScaleAxis and send events to this
@@ -68,10 +72,12 @@ mafGizmoScale::mafGizmoScale(mafVME* input, mafObserver *listener , bool buildGU
 	  m_GSAxis[i]->SetAxis(i);
   }
   
+  // build the anisotropic scale gizmo
   m_GSIsotropic = new mafGizmoScaleIsotropic(input, this);
 
   m_GuiGizmoScale = NULL;
 
+  // should we build the gui?
   if (m_BuildGUI)
   {
     // create the gizmo gui
@@ -83,7 +89,10 @@ mafGizmoScale::mafGizmoScale(mafVME* input, mafObserver *listener , bool buildGU
     m_GuiGizmoScale->EnableWidgets(true);
   }
 
+  // this gizmo will autoscale by default
   this->SetAutoscale(true);
+
+  // and will be on the superimposed layer
   this->SetAlwaysVisible(true);
 }
 //----------------------------------------------------------------------------
@@ -91,12 +100,14 @@ mafGizmoScale::~mafGizmoScale()
 //----------------------------------------------------------------------------
 {
   //Destroy:
-  //3 mafGizmoScaleAxis 
+  //3 gizmo scale axis 
   for (int i = 0; i < 3; i++)
   {
     cppDEL(m_GSAxis[i]);
   }
+  // and 1 gizmo scale isotropic
   cppDEL(m_GSIsotropic);
+  
   mafDEL(m_InitialGizmoPose);
   mafDEL(m_VmeMatrixRelativeToRefSysVME);
   mafDEL(m_RefSysVMEAbsMatrixAtMouseDown);
@@ -106,18 +117,22 @@ mafGizmoScale::~mafGizmoScale()
 void mafGizmoScale::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
+  // get the event sender
   void *sender = maf_event->GetSender();
 
   if (sender == m_GSAxis[X] || sender == m_GSAxis[Y] || sender == m_GSAxis[Z] || sender == m_GSIsotropic)
   {
-    OnEventGizmoComponents(maf_event); // process events from gizmo components
+    // process events from gizmo components
+    OnEventGizmoComponents(maf_event); 
   }
   else if (sender == m_GuiGizmoScale)
   {
-    OnEventGizmoGui(maf_event); // process events from the gui
+    // process events from the gui
+    OnEventGizmoGui(maf_event); 
   }
   else
   {
+    // otherwise send to the listener
     mafEventMacro(*maf_event);
   }
 }
@@ -141,28 +156,35 @@ void mafGizmoScale::OnEventGizmoComponents(mafEventBase *maf_event)
         {
           if (sender == m_GSAxis[X])
           {
+		    // highlight the gizmo ie make it yellow 
             this->Highlight(X);
+			// register the active gizmo component
             m_ActiveGizmoComponent = X_AXIS;
           }
           else if (sender == m_GSAxis[Y])
           {
+		    // highlight the gizmo ie make it yellow 
             this->Highlight(Y);
+			// register the active gizmo component
             m_ActiveGizmoComponent = Y_AXIS;
           }
           else if (sender == m_GSAxis[Z])
           {
+		    // highlight the gizmo ie make it yellow 
             this->Highlight(Z);
+			// register the active gizmo component
             m_ActiveGizmoComponent = Z_AXIS;
           }
           else if (sender == m_GSIsotropic)
           {
+		    // highlight the gizmo ie make it yellow 
             this->Highlight(ISOTROPIC);
+			// register the active gizmo component
             m_ActiveGizmoComponent = ISOTROPIC;
           }
 
           // Store initial gizmo pose
           m_InitialGizmoPose->DeepCopy(m_GSIsotropic->GetAbsPose());
-
 
           /* At MOUSE_DOWN
           1) Express VME matrix in RS refsys via mafTransform
