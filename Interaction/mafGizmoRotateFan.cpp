@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotateFan.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-11-10 16:51:28 $
-  Version:   $Revision: 1.11.2.3 $
+  Date:      $Date: 2010-11-17 16:02:42 $
+  Version:   $Revision: 1.11.2.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -58,8 +58,14 @@ mafGizmoRotateFan::mafGizmoRotateFan(mafVME *input, mafObserver *listener)
   m_Listener  = listener;
   m_InputVme    = input;
 
+  // get the input vme abs matrix
   mafMatrix *absInputMatrix = m_InputVme->GetOutput()->GetAbsMatrix();
+  
+  // create refsys from abs input matrix
   m_RefSys = new mafRefSys(absInputMatrix->GetVTKMatrix());
+
+  // the gizmo initial pose is the input vme one
+  SetAbsPose(absInputMatrix);
 
   // create pipeline stuff
   CreatePipeline();
@@ -78,8 +84,6 @@ mafGizmoRotateFan::mafGizmoRotateFan(mafVME *input, mafObserver *listener)
   // set gizmo color to yellow
   this->SetColor(1, 1, 0);
 
-  SetAbsPose(absInputMatrix);
-
   // add the gizmo to the tree, this should increase reference count  
   m_GizmoFan->ReparentTo(mafVME::SafeDownCast(m_InputVme->GetRoot()));
 }
@@ -87,6 +91,7 @@ mafGizmoRotateFan::mafGizmoRotateFan(mafVME *input, mafObserver *listener)
 mafGizmoRotateFan::~mafGizmoRotateFan() 
 //----------------------------------------------------------------------------
 {   
+  // clean up
   cppDEL(m_RefSys);
 
   vtkDEL(m_Sphere);
@@ -98,10 +103,7 @@ mafGizmoRotateFan::~mafGizmoRotateFan()
   vtkDEL(m_ChangeFanAxisTransform);
   vtkDEL(m_ChangeFanAxisTPDF);
   
-	//----------------------
-	// No leaks so somebody is performing this...
-	//----------------------
-	m_GizmoFan->ReparentTo(NULL);
+  m_GizmoFan->ReparentTo(NULL);
 }
 //----------------------------------------------------------------------------
 void mafGizmoRotateFan::CreatePipeline() 
@@ -112,7 +114,8 @@ void mafGizmoRotateFan::CreatePipeline()
   m_BufferTr->PostMultiply();
 
   m_InputVme->Update();
-  // calculate diagonal of m_InputVme space bounds 
+  
+  // calculate diagonal of m_InputVme bounding box 
   double b[6],p1[3],p2[3],d;
 	if(m_InputVme->IsA("mafVMEGizmo"))
 		m_InputVme->GetOutput()->GetVTKData()->GetBounds(b);
@@ -153,10 +156,10 @@ void mafGizmoRotateFan::CreatePipeline()
   // update transform to set the gizmo normal to X
   this->SetAxis(X);
 
-	// transform the sphere
+  // transform the sphere
   m_ChangeFanAxisTPDF = vtkTransformPolyDataFilter::New();
   m_ChangeFanAxisTPDF->SetInput(m_MirrorTPDF->GetOutput());
-	m_ChangeFanAxisTPDF->SetTransform(m_ChangeFanAxisTransform);
+  m_ChangeFanAxisTPDF->SetTransform(m_ChangeFanAxisTransform);
 }
 //----------------------------------------------------------------------------
 void mafGizmoRotateFan::SetAxis(int axis) 
@@ -165,7 +168,7 @@ void mafGizmoRotateFan::SetAxis(int axis)
   // this should be called when the gizmo
   // is created; gizmos are not highlighted
   
-  // register the axis
+  // register the active axis
   m_ActiveAxis = axis;
   
   // rotate the gizmo components to match the specified axis
@@ -222,17 +225,21 @@ void mafGizmoRotateFan::OnEvent(mafEventBase *maf_event)
     {
       case ID_TRANSFORM:
       {
+	    // build string to notify the listener about the active gizmo component:
         mafString activeAxisStringToSend;
         if (m_ActiveAxis == X)
         {
+		  // gizmo X is sending events
           activeAxisStringToSend = "X";
         }
         else if (m_ActiveAxis == Y)
         {
+		  // gizmo Y is sending events
           activeAxisStringToSend = "Y";
         } 
         else if (m_ActiveAxis == Z)
         {
+		  // gizmo Z is sending events
           activeAxisStringToSend = "Z";
         }
 
