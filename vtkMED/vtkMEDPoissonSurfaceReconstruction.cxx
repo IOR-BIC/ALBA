@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDPoissonSurfaceReconstruction.cxx,v $
 Language:  C++
-Date:      $Date: 2010-06-30 15:07:10 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2010-11-17 15:59:27 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Fuli Wu
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -21,7 +21,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "float.h"
 
 
-vtkCxxRevisionMacro(vtkMEDPoissonSurfaceReconstruction, "$Revision: 1.1.2.2 $");
+vtkCxxRevisionMacro(vtkMEDPoissonSurfaceReconstruction, "$Revision: 1.1.2.3 $");
 vtkStandardNewMacro(vtkMEDPoissonSurfaceReconstruction);
 
 vtkDataSet* vtk_psr_input;
@@ -181,7 +181,7 @@ FunctionData<Degree,Real>::~FunctionData(void){
 }
 
 template<int Degree,class Real>
-void FunctionData<Degree,Real>::set(const int& maxDepth,const PPolynomial<Degree>& F,const int& normalize,const int& useDotRatios){
+void FunctionData<Degree,Real>::Set(const int& maxDepth,const PPolynomial<Degree>& F,const int& normalize,const int& useDotRatios){
 	this->normalize=normalize;
 	this->useDotRatios=useDotRatios;
 
@@ -220,8 +220,8 @@ void FunctionData<Degree,Real>::set(const int& maxDepth,const PPolynomial<Degree
 	}
 }
 template<int Degree,class Real>
-void FunctionData<Degree,Real>::setDotTables(const int& flags){
-	clearDotTables(flags);
+void FunctionData<Degree,Real>::SetDotTables(const int& flags){
+	ClearDotTables(flags);
 	int size;
 	size=(res*res+res)>>1;
 	if(flags & DOT_FLAG){
@@ -275,7 +275,7 @@ void FunctionData<Degree,Real>::setDotTables(const int& flags){
 	}
 }
 template<int Degree,class Real>
-void FunctionData<Degree,Real>::clearDotTables(const int& flags){
+void FunctionData<Degree,Real>::ClearDotTables(const int& flags){
 	if((flags & DOT_FLAG) && dotTable){
 		delete[] dotTable;
 		dotTable=NULL;
@@ -290,8 +290,8 @@ void FunctionData<Degree,Real>::clearDotTables(const int& flags){
 	}
 }
 template<int Degree,class Real>
-void FunctionData<Degree,Real>::setValueTables(const int& flags,const double& smooth){
-	clearValueTables();
+void FunctionData<Degree,Real>::SetValueTables(const int& flags,const double& smooth){
+	ClearValueTables();
 	if(flags &   VALUE_FLAG){ valueTables=new Real[res*res2];}
 	if(flags & D_VALUE_FLAG){dValueTables=new Real[res*res2];}
 	PPolynomial<Degree+1> function;
@@ -313,8 +313,8 @@ void FunctionData<Degree,Real>::setValueTables(const int& flags,const double& sm
 	}
 }
 template<int Degree,class Real>
-void FunctionData<Degree,Real>::setValueTables(const int& flags,const double& valueSmooth,const double& normalSmooth){
-	clearValueTables();
+void FunctionData<Degree,Real>::SetValueTables(const int& flags,const double& valueSmooth,const double& normalSmooth){
+	ClearValueTables();
 	if(flags &   VALUE_FLAG){ valueTables=new Real[res*res2];}
 	if(flags & D_VALUE_FLAG){dValueTables=new Real[res*res2];}
 	PPolynomial<Degree+1> function;
@@ -335,7 +335,7 @@ void FunctionData<Degree,Real>::setValueTables(const int& flags,const double& va
 
 
 template<int Degree,class Real>
-void FunctionData<Degree,Real>::clearValueTables(void){
+void FunctionData<Degree,Real>::ClearValueTables(void){
 	if( valueTables){delete[]  valueTables;}
 	if(dValueTables){delete[] dValueTables;}
 	valueTables=dValueTables=NULL;
@@ -811,7 +811,7 @@ void OctNode<NodeData,Real>::SetAllocator(int blockSize)
 	if(blockSize>0)
 	{
 		UseAlloc=1;
-		Allocator.set(blockSize);
+		Allocator.Set(blockSize);
 	}
 	else{UseAlloc=0;}
 }
@@ -841,7 +841,7 @@ template <class NodeData,class Real>
 int OctNode<NodeData,Real>::initChildren(void){
 	int i,j,k;
 
-	if(UseAlloc){children=Allocator.newElements(8);}
+	if(UseAlloc){children=Allocator.NewElements(8);}
 	else{
 		if(children){delete[] children;}
 		children=NULL;
@@ -2714,7 +2714,7 @@ template<class T>
 void SparseMatrix<T>::SetAllocator(const int& blockSize){
 	if(blockSize>0){
 		UseAlloc=1;
-		Allocator.set(blockSize);
+		Allocator.Set(blockSize);
 	}
 	else{UseAlloc=0;}
 }
@@ -2782,7 +2782,7 @@ void SparseMatrix<T>::Resize( int r )
 template<class T>
 void SparseMatrix<T>::SetRowSize(int row,int count){
 	if(row>=0 && row<rows){
-		if(UseAlloc){m_ppElements[row]=Allocator.newElements(count);}
+		if(UseAlloc){m_ppElements[row]=Allocator.NewElements(count);}
 		else{
 			if(rowSizes[row]){free(m_ppElements[row]);}
 			if(count>0){m_ppElements[row]=(MatrixEntry<T>*)malloc(sizeof(MatrixEntry<T>)*count);}
@@ -3636,7 +3636,7 @@ SortedTreeNodes::~SortedTreeNodes(void){
 	nodeCount=NULL;
 	treeNodes=NULL;
 }
-void SortedTreeNodes::set(TreeOctNode& root,const int& setIndex){
+void SortedTreeNodes::Set(TreeOctNode& root,const int& setIndex){
 	if(nodeCount){delete[] nodeCount;}
 	if(treeNodes){delete[] treeNodes;}
 	maxDepth=root.maxDepth()+1;
@@ -4052,7 +4052,7 @@ void Octree<Degree>::setFunctionData(const PPolynomial<Degree>& ReconstructionFu
 	radius=Real(fabs(ReconstructionFunction.polys[0].start));
 	width=int(double(radius+0.5-EPSILON)*2);
 	if(normalSmooth>0){postNormalSmooth=normalSmooth;}
-	fData.set(maxDepth,ReconstructionFunction,normalize,1);
+	fData.Set(maxDepth,ReconstructionFunction,normalize,1);
 }
 
 template<int Degree>
@@ -4170,8 +4170,8 @@ int Octree<Degree>::LaplacianMatrixIteration(const int& subdivideDepth){
 	int i,iter=0;
 	SortedTreeNodes sNodes;
 
-	fData.setDotTables(fData.D2_DOT_FLAG);
-	sNodes.set(tree,1);
+	fData.SetDotTables(fData.D2_DOT_FLAG);
+	sNodes.Set(tree,1);
 
 	SparseMatrix<float>::SetAllocator(MEMORY_ALLOCATOR_BLOCK_SIZE);
 
@@ -4180,8 +4180,8 @@ int Octree<Degree>::LaplacianMatrixIteration(const int& subdivideDepth){
 		if(subdivideDepth>0){iter+=SolveFixedDepthMatrix(i,subdivideDepth,sNodes);}
 		else{iter+=SolveFixedDepthMatrix(i,sNodes);}
 	}
-	SparseMatrix<float>::Allocator.reset();
-	fData.clearDotTables(fData.DOT_FLAG | fData.D_DOT_FLAG | fData.D2_DOT_FLAG);
+	SparseMatrix<float>::Allocator.Reset();
+	fData.ClearDotTables(fData.DOT_FLAG | fData.D_DOT_FLAG | fData.D2_DOT_FLAG);
 	return iter;
 }
 
@@ -4197,7 +4197,7 @@ int Octree<Degree>::SolveFixedDepthMatrix(const int& depth,const SortedTreeNodes
 
 	V.Resize(sNodes.nodeCount[depth+1]-sNodes.nodeCount[depth]);
 	for(i=sNodes.nodeCount[depth];i<sNodes.nodeCount[depth+1];i++){V[i-sNodes.nodeCount[depth]]=sNodes.treeNodes[i]->nodeData.value;}
-	SparseSymmetricMatrix<float>::Allocator.rollBack();
+	SparseSymmetricMatrix<float>::Allocator.RollBack();
 	GetFixedDepthLaplacian(matrix,depth,sNodes);
 
   iter+=SparseSymmetricMatrix<Real>::Solve(matrix,V,int(pow((double)matrix.rows,ITERATION_POWER)),Solution,double(EPSILON),1);
@@ -4330,7 +4330,7 @@ int Octree<Degree>::SolveFixedDepthMatrix(const int& depth,const int& startingDe
 		SubSolution.Resize(asf.adjacencyCount);
 		for(j=0;j<asf.adjacencyCount;j++){SubSolution[j]=sNodes.treeNodes[asf.adjacencies[j]]->nodeData.value;}
 		// Get the associated matrix
-		SparseSymmetricMatrix<float>::Allocator.rollBack();
+		SparseSymmetricMatrix<float>::Allocator.RollBack();
 		GetRestrictedFixedDepthLaplacian(matrix,depth,asf.adjacencies,asf.adjacencyCount,sNodes.treeNodes[i],myRadius,sNodes);
 
 		// Solve the matrix
@@ -4443,7 +4443,7 @@ template<int Degree>
 void Octree<Degree>::SetLaplacianWeights(void){
 	TreeOctNode* temp;
 
-	fData.setDotTables(fData.DOT_FLAG | fData.D_DOT_FLAG);
+	fData.SetDotTables(fData.DOT_FLAG | fData.D_DOT_FLAG);
 	DivergenceFunction df;
 	df.ot=this;
 	temp=tree.nextNode();
@@ -4460,7 +4460,7 @@ void Octree<Degree>::SetLaplacianWeights(void){
 		TreeOctNode::ProcessNodeAdjacentNodes(fData.depth,temp,width,&tree,width,&df);
 		temp=tree.nextNode(temp);
 	}
-	fData.clearDotTables(fData.D_DOT_FLAG);
+	fData.ClearDotTables(fData.D_DOT_FLAG);
 	temp=tree.nextNode();
 	while(temp){
 		if(temp->nodeData.nodeIndex<0){temp->nodeData.centerWeightContribution=0;}
@@ -4672,8 +4672,8 @@ void Octree<Degree>::GetMCIsoTriangles(const Real& isoValue,const int& subdivide
 	boundaryNormalHash=new hash_map<long long,std::pair<Real,Point3D<Real> > >();
 	int offSet=0;
 	SortedTreeNodes sNodes;
-	sNodes.set(tree,0);
-	fData.setValueTables(fData.VALUE_FLAG | fData.D_VALUE_FLAG,0,postNormalSmooth);
+	sNodes.Set(tree,0);
+	fData.SetValueTables(fData.VALUE_FLAG | fData.D_VALUE_FLAG,0,postNormalSmooth);
 
 	// Set the root positions for all leaf nodes below the subdivide threshold
 	SetBoundaryMCRootPositions(sDepth,isoValue,boundaryRoots,*boundaryNormalHash,mesh,nonLinearFit);
@@ -4699,7 +4699,7 @@ void Octree<Degree>::GetMCIsoTriangles(const Real& isoValue,const int& subdivide
 		}
 		delete interiorRoots;
 		delete interiorPoints;
-		offSet=mesh->outOfCorePointCount();
+		offSet=mesh->OutOfCorePointCount();
 	}
 	delete boundaryNormalHash;
 
@@ -4858,7 +4858,7 @@ Real Octree<Degree>::GetIsoValue(void){
 		Real isoValue,weightSum,w;
 
 		neighborKey2.set(fData.depth);
-		fData.setValueTables(fData.VALUE_FLAG,0);
+		fData.SetValueTables(fData.VALUE_FLAG,0);
 
 		isoValue=weightSum=0;
 		temp=tree.nextNode();
@@ -4878,7 +4878,7 @@ Real Octree<Degree>::GetIsoValue(void){
 		Real myRadius;
 		PointIndexValueFunction cf;
 
-		fData.setValueTables(fData.VALUE_FLAG,0);
+		fData.SetValueTables(fData.VALUE_FLAG,0);
 		cf.valueTables=fData.valueTables;
 		cf.res2=fData.res2;
 		myRadius=radius;
@@ -4912,7 +4912,7 @@ void Octree<Degree>::SetIsoSurfaceCorners(const Real& isoValue,const int& subdiv
 	int leafCount=tree.leaves();
 	long long key;
 	SortedTreeNodes *sNodes=new SortedTreeNodes();
-	sNodes->set(tree,0);
+	sNodes->Set(tree,0);
 	temp=tree.nextNode();
 	while(temp){
 		temp->nodeData.mcIndex=0;
@@ -5626,7 +5626,7 @@ int Octree<Degree>::SetMCRootPositions(TreeOctNode* node,const int& sDepth,const
 					else{
 						if(interiorRoots->find(key)==interiorRoots->end()){
 							GetRoot(ri,isoValue,fData.depth,position,*interiorNormalHash,NULL,nonLinearFit);
-							(*interiorRoots)[key]=mesh->addOutOfCorePoint(position);
+							(*interiorRoots)[key]=mesh->AddOutOfCorePoint(position);
 							interiorPositions->push_back(position);
 							count++;
 						}
@@ -5858,7 +5858,7 @@ int Octree<Degree>::AddTriangles(CoredMeshData* mesh,std::vector<CoredPointIndex
 				tri.idx[j]=edges[idx[j]].index;
 				if(edges[idx[j]].inCore){inCoreFlag|=CoredMeshData::IN_CORE_FLAG[j];}
 			}
-			mesh->addTriangle(tri,inCoreFlag);
+			mesh->AddTriangle(tri,inCoreFlag);
 		}
 	}
 	else if(edges.size()==3){
@@ -5868,7 +5868,7 @@ int Octree<Degree>::AddTriangles(CoredMeshData* mesh,std::vector<CoredPointIndex
 			tri.idx[i]=edges[i].index;
 			if(edges[i].inCore){inCoreFlag|=CoredMeshData::IN_CORE_FLAG[i];}
 		}
-		mesh->addTriangle(tri,inCoreFlag);
+		mesh->AddTriangle(tri,inCoreFlag);
 	}
 	return int(edges.size())-2;
 }
@@ -6202,12 +6202,12 @@ TriangulationTriangle::TriangulationTriangle(void){eIndex[0]=eIndex[1]=eIndex[2]
 // CoredVectorMeshData //
 /////////////////////////
 CoredVectorMeshData::CoredVectorMeshData(void){oocPointIndex=triangleIndex=0;}
-void CoredVectorMeshData::resetIterator(void){oocPointIndex=triangleIndex=0;}
-int CoredVectorMeshData::addOutOfCorePoint(const Point3D<float>& p){
+void CoredVectorMeshData::ResetIterator(void){oocPointIndex=triangleIndex=0;}
+int CoredVectorMeshData::AddOutOfCorePoint(const Point3D<float>& p){
 	oocPoints.push_back(p);
 	return int(oocPoints.size())-1;
 }
-int CoredVectorMeshData::addTriangle(const TriangleIndex& t,const int& coreFlag){
+int CoredVectorMeshData::AddTriangle(const TriangleIndex& t,const int& coreFlag){
 	TriangleIndex tt;
 	if(coreFlag & CoredMeshData::IN_CORE_FLAG[0])	{tt.idx[0]= t.idx[0];}
 	else											{tt.idx[0]=-t.idx[0]-1;}
@@ -6218,14 +6218,14 @@ int CoredVectorMeshData::addTriangle(const TriangleIndex& t,const int& coreFlag)
 	triangles.push_back(tt);
 	return int(triangles.size())-1;
 }
-int CoredVectorMeshData::nextOutOfCorePoint(Point3D<float>& p){
+int CoredVectorMeshData::NextOutOfCorePoint(Point3D<float>& p){
 	if(oocPointIndex<int(oocPoints.size())){
 		p=oocPoints[oocPointIndex++];
 		return 1;
 	}
 	else{return 0;}
 }
-int CoredVectorMeshData::nextTriangle(TriangleIndex& t,int& inCoreFlag){
+int CoredVectorMeshData::NextTriangle(TriangleIndex& t,int& inCoreFlag){
 	inCoreFlag=0;
 	if(triangleIndex<int(triangles.size())){
 		t=triangles[triangleIndex++];
@@ -6239,8 +6239,8 @@ int CoredVectorMeshData::nextTriangle(TriangleIndex& t,int& inCoreFlag){
 	}
 	else{return 0;}
 }
-int CoredVectorMeshData::outOfCorePointCount(void){return int(oocPoints.size());}
-int CoredVectorMeshData::triangleCount(void){return int(triangles.size());}
+int CoredVectorMeshData::OutOfCorePointCount(void){return int(oocPoints.size());}
+int CoredVectorMeshData::TriangleCount(void){return int(triangles.size());}
 
 
 ////////////
@@ -7266,10 +7266,10 @@ int Execute()
 
   //////////////////////////////////////////////////////////////////////////////////////
   //output the reconstructed mesh.
-  int nr_vertices=int(mesh.outOfCorePointCount()+mesh.inCorePoints.size());
-  int nr_faces=mesh.triangleCount();
+  int nr_vertices=int(mesh.OutOfCorePointCount()+mesh.inCorePoints.size());
+  int nr_faces=mesh.TriangleCount();
 
-  mesh.resetIterator();
+  mesh.ResetIterator();
 	Point3D<float> p;
 	float ply_vertex[3];
 	for (i=0; i < (int)(mesh.inCorePoints.size()); i++){
@@ -7279,8 +7279,8 @@ int Execute()
 		ply_vertex[2] = p.coords[2]*scale+center.coords[2];
     vtk_psr_output->GetPoints()->InsertNextPoint(ply_vertex);
 	}
-	for (i=0; i < mesh.outOfCorePointCount(); i++){
-		mesh.nextOutOfCorePoint(p);
+	for (i=0; i < mesh.OutOfCorePointCount(); i++){
+		mesh.NextOutOfCorePoint(p);
 		ply_vertex[0] = p.coords[0]*scale+center.coords[0];
 		ply_vertex[1] = p.coords[1]*scale+center.coords[1];
 		ply_vertex[2] = p.coords[2]*scale+center.coords[2];
@@ -7297,7 +7297,7 @@ int Execute()
 		//
 		// create and fill a struct that the ply code can handle
 		//
-    mesh.nextTriangle(tIndex,inCoreFlag);
+    mesh.NextTriangle(tIndex,inCoreFlag);
 		if(!(inCoreFlag & CoredMeshData::IN_CORE_FLAG[0])){tIndex.idx[0]+=int(mesh.inCorePoints.size());}
 		if(!(inCoreFlag & CoredMeshData::IN_CORE_FLAG[1])){tIndex.idx[1]+=int(mesh.inCorePoints.size());}
 		if(!(inCoreFlag & CoredMeshData::IN_CORE_FLAG[2])){tIndex.idx[2]+=int(mesh.inCorePoints.size());}

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDPoissonSurfaceReconstruction.h,v $
 Language:  C++
-Date:      $Date: 2010-06-17 10:27:43 $
-Version:   $Revision: 1.1.2.7 $
+Date:      $Date: 2010-11-17 15:59:27 $
+Version:   $Revision: 1.1.2.8 $
 Authors:   Fuli Wu
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -176,12 +176,12 @@ public:
 	}
   /** destructor */
 	~Allocator(void){
-		reset();
+		Reset();
 	}
 
 	/** This method is the allocators destructor. It frees up any of the memory that
 	  * it has allocated. */
-	void reset(void){
+	void Reset(void){
 		for(size_t i=0;i<memory.size();i++){delete[] memory[i];}
 		memory.clear();
 		blockSize=index=remains=0;
@@ -199,7 +199,7 @@ public:
 	  * allocated available for re-allocation. Note that it does it not call the constructor
 	  * again, so after this method has been called, assumptions about the state of the values
 	  * in memory are no longer valid. */
-	void rollBack(void){
+	void RollBack(void){
 		if(memory.size()){
 			for(size_t i=0;i<memory.size();i++){
 				for(int j=0;j<blockSize;j++){
@@ -215,7 +215,7 @@ public:
 	  * allocated available for re-allocation. Note that it does it not call the constructor
 	  * again, so after this method has been called, assumptions about the state of the values
 	  * in memory are no longer valid. */
-	void rollBack(const AllocatorState& state){
+	void RollBack(const AllocatorState& state){
 		if(state.index<index || (state.index==index && state.remains<remains)){
 			if(state.index<index){
 				for(int j=state.remains;j<blockSize;j++){
@@ -247,8 +247,8 @@ public:
 
 	/** This method initiallizes the constructor and the blockSize variable specifies the
 	  * the number of objects that should be pre-allocated at a time. */
-	void set(const int& blockSize){
-		reset();
+	void Set(const int& blockSize){
+		Reset();
 		this->blockSize=blockSize;
 		index=-1;
 		remains=0;
@@ -259,7 +259,7 @@ public:
 	  * more memory. Note that if the number of objects requested is larger than the value blockSize with which
 	  * the allocator was initialized, the request for memory will fail.
 	  */
-	T* newElements(const int& elements=1){
+	T* NewElements(const int& elements=1){
 		T* mem;
 		if(!elements){return NULL;}
 		if(elements>blockSize){
@@ -590,19 +590,19 @@ public:
 	~FunctionData(void);
 
   /** Set dot tables. */
-	virtual void   setDotTables(const int& flags);
+	virtual void   SetDotTables(const int& flags);
   /** Clear dot tables.*/
-	virtual void clearDotTables(const int& flags);
+	virtual void ClearDotTables(const int& flags);
 
   /** Set value tables. */
-	virtual void   setValueTables(const int& flags,const double& smooth=0);
+	virtual void   SetValueTables(const int& flags,const double& smooth=0);
   /** Set value tables. valueSmooth parameter used for value tables, normalSmoot for dot tables.*/
-	virtual void   setValueTables(const int& flags,const double& valueSmooth,const double& normalSmooth);
+	virtual void   SetValueTables(const int& flags,const double& valueSmooth,const double& normalSmooth);
   /** Clear value tables. */
-	virtual void clearValueTables(void);
+	virtual void ClearValueTables(void);
 
   /** create base functions from parameters*/
-	void set(const int& maxDepth,const PPolynomial<Degree>& F,const int& normalize,const int& useDotRatios=1);
+	void Set(const int& maxDepth,const PPolynomial<Degree>& F,const int& normalize,const int& useDotRatios=1);
 
   /** compute dot product */
 	Real   dotProduct(const double& center1,const double& width1,const double& center2,const double& width2) const;
@@ -822,22 +822,22 @@ public:
 	std::vector<Point3D<float> > inCorePoints;
 	const static int IN_CORE_FLAG[3];
   /** reset Iterator */
-	virtual void resetIterator(void)=0;
+	virtual void ResetIterator(void)=0;
 
   /** add  a point out of core */
-	virtual int addOutOfCorePoint(const Point3D<float>& p)=0;
+	virtual int AddOutOfCorePoint(const Point3D<float>& p)=0;
   /** insert new triangle */
-	virtual int addTriangle(const TriangleIndex& t,const int& icFlag=(IN_CORE_FLAG[0] | IN_CORE_FLAG[1] | IN_CORE_FLAG[2]))=0;
+	virtual int AddTriangle(const TriangleIndex& t,const int& icFlag=(IN_CORE_FLAG[0] | IN_CORE_FLAG[1] | IN_CORE_FLAG[2]))=0;
 
   /** iterate on  next out of core point  */
-	virtual int nextOutOfCorePoint(Point3D<float>& p)=0;
+	virtual int NextOutOfCorePoint(Point3D<float>& p)=0;
   /** iterate on next triangle */
-	virtual int nextTriangle(TriangleIndex& t,int& inCoreFlag)=0;
+	virtual int NextTriangle(TriangleIndex& t,int& inCoreFlag)=0;
 
   /** number of out of core points */
-	virtual int outOfCorePointCount(void)=0;
+	virtual int OutOfCorePointCount(void)=0;
   /** number of triangles */
-	virtual int triangleCount(void)=0;
+	virtual int TriangleCount(void)=0;
 };
 /**
 class name: CoredVectorMeshData
@@ -852,22 +852,22 @@ public:
 	CoredVectorMeshData::CoredVectorMeshData(void);
 
   /** reset point and triangle index. */
-	void resetIterator(void);
+	void ResetIterator(void);
 
   /** Add a 3d point which is out of core*/
-	int addOutOfCorePoint(const Point3D<float>& p);
+	int AddOutOfCorePoint(const Point3D<float>& p);
   /** add a triangle*/
-	int addTriangle(const TriangleIndex& t,const int& inCoreFlag=(CoredMeshData::IN_CORE_FLAG[0] | CoredMeshData::IN_CORE_FLAG[1] | CoredMeshData::IN_CORE_FLAG[2]));
+	int AddTriangle(const TriangleIndex& t,const int& inCoreFlag=(CoredMeshData::IN_CORE_FLAG[0] | CoredMeshData::IN_CORE_FLAG[1] | CoredMeshData::IN_CORE_FLAG[2]));
 
   /** retrieve next point, return 0 if current is the last point. */
-	int nextOutOfCorePoint(Point3D<float>& p);
+	int NextOutOfCorePoint(Point3D<float>& p);
   /** retrieve next triangle, return 0 if current is the last triangle. */
-	int nextTriangle(TriangleIndex& t,int& inCoreFlag);
+	int NextTriangle(TriangleIndex& t,int& inCoreFlag);
 
   /** return size of oocPoints vector. */
-	int outOfCorePointCount(void);
+	int OutOfCorePointCount(void);
   /** return size of triangles vector. */
-	int triangleCount(void);
+	int TriangleCount(void);
 };
 /**
 class name: CoredVectorMeshData
@@ -883,22 +883,22 @@ public:
 	~CoredFileMeshData(void);
 
   /** reset iterator */
-	void resetIterator(void);
+	void ResetIterator(void);
 
   /** Add a 3d point which is out of core*/
-	int addOutOfCorePoint(const Point3D<float>& p);
+	int AddOutOfCorePoint(const Point3D<float>& p);
   /** add a triangle*/
-	int addTriangle(const TriangleIndex& t,const int& inCoreFlag=(CoredMeshData::IN_CORE_FLAG[0] | CoredMeshData::IN_CORE_FLAG[1] | CoredMeshData::IN_CORE_FLAG[2]));
+	int AddTriangle(const TriangleIndex& t,const int& inCoreFlag=(CoredMeshData::IN_CORE_FLAG[0] | CoredMeshData::IN_CORE_FLAG[1] | CoredMeshData::IN_CORE_FLAG[2]));
 
   /** retrieve next point, return 0 if current is the last point. */
-	int nextOutOfCorePoint(Point3D<float>& p);
+	int NextOutOfCorePoint(Point3D<float>& p);
   /** retrieve next triangle, return 0 if current is the last triangle. */
-	int nextTriangle(TriangleIndex& t,int& inCoreFlag);
+	int NextTriangle(TriangleIndex& t,int& inCoreFlag);
 
   /** return size of oocPoints vector. */
-	int outOfCorePointCount(void);
+	int OutOfCorePointCount(void);
   /** return size of triangles vector. */
-	int triangleCount(void);
+	int TriangleCount(void);
 };
 
 
@@ -1816,7 +1816,7 @@ public:
 	/** Destructor */
 	~SortedTreeNodes(void);
 	/** initialize and sort tree nodes, if set index > 0 assign index to nodes. */ 
-	void set(TreeOctNode& root,const int& setIndex);
+	void Set(TreeOctNode& root,const int& setIndex);
 };
 /** class name: TreeNodeData
     index, weight and values associated with every tree node
