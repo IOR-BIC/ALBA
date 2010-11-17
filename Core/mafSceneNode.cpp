@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-11-10 16:52:01 $
-  Version:   $Revision: 1.7.6.2 $
+  Date:      $Date: 2010-11-17 15:07:01 $
+  Version:   $Revision: 1.7.6.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -166,9 +166,9 @@ mafSceneNode::~mafSceneNode()
 		else
 			m_Parent->m_AlwaysVisibleAssembly->RemovePart(m_AlwaysVisibleAssembly); 
 
-		vtkDEL(m_AlwaysVisibleAssembly);  
 	}
 
+	vtkDEL(m_AlwaysVisibleAssembly);  
 	
 
  /* @@@
