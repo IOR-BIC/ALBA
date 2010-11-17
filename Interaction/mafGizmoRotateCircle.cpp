@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotateCircle.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-11-10 16:51:28 $
-  Version:   $Revision: 1.8.4.4 $
+  Date:      $Date: 2010-11-17 15:25:04 $
+  Version:   $Revision: 1.8.4.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -19,11 +19,10 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-
 #include "mafGizmoRotateCircle.h"
+
 // wxwin stuff
 #include "wx/string.h"
-
 #include "mafDecl.h"
 
 // isa stuff
@@ -63,16 +62,18 @@ mafGizmoRotateCircle::mafGizmoRotateCircle(mafVME *input, mafObserver *listener)
 
   //-----------------
   // create pipeline stuff
+  //-----------------
   CreatePipeline();
 
+  //-----------------
   // create isa stuff
+  //-----------------
   CreateISA();
 
   //-----------------
   // create vme gizmo stuff
   //-----------------
-  
-  // the circle gizmo
+  // build the circle gizmo
   m_GizmoCircle = mafVMEGizmo::New();
   m_GizmoCircle->SetName("circle");
   m_GizmoCircle->SetData(m_RotatePDF->GetOutput());
@@ -84,9 +85,14 @@ mafGizmoRotateCircle::mafGizmoRotateCircle(mafVME *input, mafObserver *listener)
   // set the axis to X axis
   this->SetAxis(m_ActiveAxis);
 
+  // get the abs matrix from the input vme
   m_AbsInputMatrix = m_InputVme->GetOutput()->GetAbsMatrix();
   m_InputVme->GetOutput()->Update();
+  
+  // and set it as gizmo pose
   SetAbsPose(m_AbsInputMatrix);
+  
+  // and gizmo refsys
   SetRefSysMatrix(m_AbsInputMatrix);
 
   // add the gizmo to the tree, this should increase reference count  
@@ -288,7 +294,7 @@ void mafGizmoRotateCircle::OnEvent(mafEventBase *maf_event)
 void mafGizmoRotateCircle::SetColor(double col[3])
 //----------------------------------------------------------------------------
 {
-  m_GizmoCircle->GetMaterial()->m_Prop->SetColor(col);
+    m_GizmoCircle->GetMaterial()->m_Prop->SetColor(col);
 	m_GizmoCircle->GetMaterial()->m_Prop->SetAmbient(0);
 	m_GizmoCircle->GetMaterial()->m_Prop->SetDiffuse(1);
 	m_GizmoCircle->GetMaterial()->m_Prop->SetSpecular(0);
@@ -330,7 +336,10 @@ mafMatrix *mafGizmoRotateCircle::GetAbsPose()
 void mafGizmoRotateCircle::SetInput(mafVME *vme)
 //----------------------------------------------------------------------------
 {
+  // register the input vme
   this->m_InputVme = vme; 
+
+  // set the pose and the refsys
   SetAbsPose(vme->GetOutput()->GetAbsMatrix()); 
 }
 //---------------------------------------------------------------------------
@@ -357,6 +366,7 @@ void mafGizmoRotateCircle::SetListener( mafObserver *Listener )
 
 void mafGizmoRotateCircle::SetIsActive( bool highlight )
 {
+  // Yellow (highlighted) gizmo is the active one 
   m_IsActive = highlight;
 }
 
@@ -372,6 +382,7 @@ mafVME * mafGizmoRotateCircle::GetInput()
 
 void mafGizmoRotateCircle::SetMediator(mafObserver *mediator)
 {
-	mafGizmoInterface::SetMediator(mediator);
+	// superclass call
+	mafGizmoInterface::SetMediator(mediator);	
 	m_GizmoCircle->SetMediator(mediator);
 }
