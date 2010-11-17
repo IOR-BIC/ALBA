@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: mmiVTKPicker.cpp,v $ 
   Language: C++ 
-  Date: $Date: 2010-11-03 16:30:01 $ 
-  Version: $Revision: 1.1.2.4 $ 
+  Date: $Date: 2010-11-17 16:19:42 $ 
+  Version: $Revision: 1.1.2.5 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -47,10 +47,12 @@ mmiVTKPicker::~mmiVTKPicker()
 void mmiVTKPicker::OnLeftButtonDown(mafEventInteraction *e) 
 //----------------------------------------------------------------------------
 {
+  // if the event is NULL return
   if (e == NULL)
   {
 	  return;
   }
+
   //if we debug OnLeftButtonDown, it happens usually that OnLeftButtonUp
   //is not executed and, therefore, we have still some picker
   //we will fix it here
@@ -60,7 +62,8 @@ void mmiVTKPicker::OnLeftButtonDown(mafEventInteraction *e)
     vtkDEL(m_Picker);
   }
 
-  if (e->GetModifier(MAF_CTRL_KEY)) // Check if CTRL modifier is pressed
+  // Check if CTRL modifier is pressed
+  if (e->GetModifier(MAF_CTRL_KEY)) 
   {    
     // perform picking
     int x = m_LastMousePose[0];
@@ -71,8 +74,10 @@ void mmiVTKPicker::OnLeftButtonDown(mafEventInteraction *e)
       vtkNEW(m_Picker);
       m_Picker->SetTolerance(0.001); 
 
-      if (m_Picker->Pick(x,y,0,m_Renderer) == 0) {
-        vtkDEL(m_Picker);   //nothing was picked
+      if (m_Picker->Pick(x,y,0,m_Renderer) == 0) 
+	  {
+	    //nothing was picked
+        vtkDEL(m_Picker); 
       }
       else
       {   
@@ -85,6 +90,7 @@ void mmiVTKPicker::OnLeftButtonDown(mafEventInteraction *e)
   }
   else
   {   
+    // call superclass
     Superclass::OnLeftButtonDown(e);
   }
 }
@@ -160,6 +166,7 @@ void mmiVTKPicker::OnMouseMove()
   }
   else
   {
+    // call superclass
     Superclass::OnMouseMove();
   }
 }
