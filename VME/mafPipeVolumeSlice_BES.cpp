@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice_BES.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-07-13 14:08:07 $
-  Version:   $Revision: 1.1.2.5 $
+  Date:      $Date: 2010-11-18 13:53:49 $
+  Version:   $Revision: 1.1.2.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,6 +25,7 @@
 #include "mafSceneNode.h"
 #include "mafTransform.h"
 #include "mmaVolumeMaterial.h"
+#include "mafEventSource.h"
 
 #include "mafVME.h"
 #include "mafVMEOutputVolume.h"
@@ -185,6 +186,8 @@ void mafPipeVolumeSlice_BES::Create(mafSceneNode *n)
 //----------------------------------------------------------------------------
 {
   Superclass::Create(n); // Always call this to initialize m_Vme, m_AssemblyFront, ... vars
+
+  m_Vme->GetEventSource()->AddObserver(this);
 
   m_AssemblyUsed = m_AssemblyBack ? m_AssemblyBack : m_AssemblyFront;
 
@@ -491,7 +494,9 @@ void mafPipeVolumeSlice_BES::CreateSlice(int direction)
 mafPipeVolumeSlice_BES::~mafPipeVolumeSlice_BES()
 //----------------------------------------------------------------------------
 {
-	if(m_VolumeBoxActor)
+  m_Vme->GetEventSource()->RemoveObserver(this);
+	
+  if(m_VolumeBoxActor)
     m_AssemblyFront->RemovePart(m_VolumeBoxActor);
 	if(m_Actor)
 		m_AssemblyUsed->RemovePart(m_Actor);
@@ -715,7 +720,7 @@ mafGUI *mafPipeVolumeSlice_BES::CreateGui()
 //----------------------------------------------------------------------------
 void mafPipeVolumeSlice_BES::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
-{
+ {
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
     switch(e->GetId()) 
@@ -744,6 +749,13 @@ void mafPipeVolumeSlice_BES::OnEvent(mafEventBase *maf_event)
         break;
       default:
       break;
+    }
+  }
+  else if (maf_event->GetSender() == m_Vme)
+  {
+    if(maf_event->GetId() == VME_OUTPUT_DATA_UPDATE)
+    {
+      UpdateSlice();
     }
   }
   else
