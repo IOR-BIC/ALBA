@@ -2,8 +2,8 @@
 Program: Multimod Application Framework RELOADED 
 Module: $RCSfile: vtkMEDPolyDataDeformation_M1.cpp,v $ 
 Language: C++ 
-Date: $Date: 2010-11-18 07:57:20 $ 
-Version: $Revision: 1.1.2.3 $ 
+Date: $Date: 2010-11-18 08:19:20 $ 
+Version: $Revision: 1.1.2.4 $ 
 Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
 ========================================================================== 
 Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -20,7 +20,7 @@ See the COPYINGS file for license details
 #include "vtkCellLocator.h"
 #include "vtkGenericCell.h"
 
-vtkCxxRevisionMacro(vtkMEDPolyDataDeformation_M1, "$Revision: 1.1.2.3 $");
+vtkCxxRevisionMacro(vtkMEDPolyDataDeformation_M1, "$Revision: 1.1.2.4 $");
 vtkStandardNewMacro(vtkMEDPolyDataDeformation_M1);
 
 #include "mafMemDbg.h"
@@ -40,20 +40,20 @@ double vtkMEDPolyDataDeformation_M1::CSkeletonEdge::GetLength()
 
 vtkMEDPolyDataDeformation_M1::CSkeleton::~CSkeleton()
 {
-  int nCount = (int)m_Vertices.size();
+  int nCount = (int)this->Vertices.size();
   for (int i = 0; i < nCount; i++)
   {
-    delete m_Vertices[i];
+    delete this->Vertices[i];
   }
 
-  nCount = (int)m_Edges.size();
+  nCount = (int)this->Edges.size();
   for (int i = 0; i < nCount; i++)
   {
-    delete m_Edges[i];
+    delete this->Edges[i];
   }
 
-  m_Vertices.clear();
-  m_Edges.clear();
+  this->Vertices.clear();
+  this->Edges.clear();
 }
 
 //------------------------------------------------------------------------
@@ -61,13 +61,13 @@ vtkMEDPolyDataDeformation_M1::CSkeleton::~CSkeleton()
 void vtkMEDPolyDataDeformation_M1::CSkeleton::ComputeTW()
 //------------------------------------------------------------------------
 {     
-  int nVertices = (int)m_Vertices.size();
-  int nEdges = (int)m_Edges.size();
+  int nVertices = (int)this->Vertices.size();
+  int nEdges = (int)this->Edges.size();
 
   //process every vertex 
   for (int i = 0; i < nVertices; i++)
   {
-    CSkeletonVertex* pVertex = m_Vertices[i];    
+    CSkeletonVertex* pVertex = this->Vertices[i];    
     int nVertEdges = pVertex->GetDegree();    
     if (nVertEdges == 2)
       pVertex->m_WT = 0;    //invalid point, to be reduced
@@ -125,11 +125,11 @@ void vtkMEDPolyDataDeformation_M1::CSkeleton::GetBoundingBox(double bnds[6])
   bnds[0] = bnds[2] = bnds[4] = 0xFFFFFFFF;
   bnds[1] = bnds[3] = bnds[5] = -bnds[0];
 
-  int nCount = (int)m_Vertices.size();
+  int nCount = (int)this->Vertices.size();
 
   for (int i = 0; i < nCount; i++)
   {
-    double* pcoods = m_Vertices[i]->m_Coords;
+    double* pcoods = this->Vertices[i]->m_Coords;
 
     if (pcoods[0] < bnds[0])
       bnds[0] = pcoods[0];
@@ -667,10 +667,10 @@ void vtkMEDPolyDataDeformation_M1::PrintSelf(ostream& os, vtkIndent indent)
   input->BuildCells(); input->BuildLinks();
   
   //for every curve, we need to compute its ROI, i.e., vertices that are mapped for this curve 
-  int nCount = (int)m_SuperSkeleton->m_pOC_Skel->m_Vertices.size();
+  int nCount = (int)m_SuperSkeleton->m_pOC_Skel->Vertices.size();
   for (int iStartPos = 0; iStartPos < nCount; )
   {
-    CSkeletonVertex* pOC_Curve = m_SuperSkeleton->m_pOC_Skel->m_Vertices[iStartPos];
+    CSkeletonVertex* pOC_Curve = m_SuperSkeleton->m_pOC_Skel->Vertices[iStartPos];
     iStartPos += GetNumberOfCurveVertices(pOC_Curve);
 
     //compute local frames for both curves, original and deformed one
@@ -685,11 +685,11 @@ void vtkMEDPolyDataDeformation_M1::PrintSelf(ostream& os, vtkIndent indent)
   cellLocator->SetDataSet(GetInput());
   cellLocator->Update();
 
-  nCount = (int)m_SuperSkeleton->m_pOC_Skel->m_Edges.size();
+  nCount = (int)m_SuperSkeleton->m_pOC_Skel->Edges.size();
   do 
   {
     for (int i = 0; i < nCount; i++) {
-      ComputeROI(m_SuperSkeleton->m_pOC_Skel->m_Edges[i] );
+      ComputeROI(m_SuperSkeleton->m_pOC_Skel->Edges[i] );
     }
 
     //refine ROIs so every vertex is influenced just by one curve
@@ -784,7 +784,7 @@ bool vtkMEDPolyDataDeformation_M1::CreateSuperSkeleton()
   if (m_SuperSkeleton == NULL)
     return false;
 
-  int nCount = (int)m_SuperSkeleton->m_pOC_Skel->m_Vertices.size();
+  int nCount = (int)m_SuperSkeleton->m_pOC_Skel->Vertices.size();
   if (nCount == 0)
   {
     DestroySuperSkeleton();
@@ -798,10 +798,10 @@ bool vtkMEDPolyDataDeformation_M1::CreateSuperSkeleton()
 
   //now we will extend the superskeleton by adding infinite
   //edges connected to end-points of the skeleton
-  int nEdgeId = (int)m_SuperSkeleton->m_pOC_Skel->m_Edges.size();
+  int nEdgeId = (int)m_SuperSkeleton->m_pOC_Skel->Edges.size();
   for (int i = 0; i < nCount; i++)
   {
-    CSkeletonVertex* pVertex = m_SuperSkeleton->m_pOC_Skel->m_Vertices[i];
+    CSkeletonVertex* pVertex = m_SuperSkeleton->m_pOC_Skel->Vertices[i];
     if (pVertex->m_WT != 1)//== 0)
     {
       CSkeletonEdge *pNewEdge, *pDNewEdge;
@@ -833,8 +833,8 @@ bool vtkMEDPolyDataDeformation_M1::CreateSuperSkeleton()
       pNewEdge->m_pMatch = pDNewEdge;
       pDNewEdge->m_pMatch = pNewEdge;
 
-      m_SuperSkeleton->m_pOC_Skel->m_Edges.push_back(pNewEdge);
-      m_SuperSkeleton->m_pDC_Skel->m_Edges.push_back(pDNewEdge);      
+      m_SuperSkeleton->m_pOC_Skel->Edges.push_back(pNewEdge);
+      m_SuperSkeleton->m_pDC_Skel->Edges.push_back(pDNewEdge);      
     } //end if (pVertex->m_WT == 0)
   }
 
@@ -868,14 +868,14 @@ void vtkMEDPolyDataDeformation_M1::CreateSuperSkeleton(
     m_SuperSkeleton = new CSuperSkeleton;
 
   //reset mark flag for vertices of both curves
-  int nOCVerts = (int)pOC_Skel->m_Vertices.size();  
+  int nOCVerts = (int)pOC_Skel->Vertices.size();  
   for (int i = 0; i < nOCVerts; i++) {
-    pOC_Skel->m_Vertices[i]->m_nMark = -1;    
+    pOC_Skel->Vertices[i]->m_nMark = -1;    
   }
 
-  int nDCVerts = (int)pDC_Skel->m_Vertices.size();
+  int nDCVerts = (int)pDC_Skel->Vertices.size();
   for (int i = 0; i < nDCVerts; i++) {
-    pDC_Skel->m_Vertices[i]->m_nMark = -1;    
+    pDC_Skel->Vertices[i]->m_nMark = -1;    
   }
 
   //set match marks
@@ -883,12 +883,12 @@ void vtkMEDPolyDataDeformation_M1::CreateSuperSkeleton(
   vtkIdType* pIds = pFullCC->GetPointer(0);
   for (int i = 0; i < nCount; i += 2)
   {
-    pOC_Skel->m_Vertices[pIds[i]]->m_nMark = pIds[i + 1];
-    pDC_Skel->m_Vertices[pIds[i + 1]]->m_nMark = pIds[i];
+    pOC_Skel->Vertices[pIds[i]]->m_nMark = pIds[i + 1];
+    pDC_Skel->Vertices[pIds[i + 1]]->m_nMark = pIds[i];
   }
 
   //marks for every edge should be zeros as they are not used in MatchSkeletons
-  _ASSERT(pOC_Skel->m_Edges[0]->m_nMark == 0);  
+  _ASSERT(pOC_Skel->Edges[0]->m_nMark == 0);  
    
   //detect every matched curve  
   CSkeletonVertex** pOC_Curve = new CSkeletonVertex*[nOCVerts + nDCVerts];
@@ -896,7 +896,7 @@ void vtkMEDPolyDataDeformation_M1::CreateSuperSkeleton(
 
   for (int i = 0; i < nOCVerts; i++)
   {
-    CSkeletonVertex* pVert1 = pOC_Skel->m_Vertices[i];
+    CSkeletonVertex* pVert1 = pOC_Skel->Vertices[i];
     if (pVert1->m_nMark < 0)
       continue; //this is inner vertex
 
@@ -912,8 +912,8 @@ void vtkMEDPolyDataDeformation_M1::CreateSuperSkeleton(
         continue; //this curve is invalid and will be ignored
 
       //now find the matching curve in the deformed      
-      CSkeletonVertex* pDVert1 = pDC_Skel->m_Vertices[pVert1->m_nMark];
-      CSkeletonVertex* pDVert2 = pDC_Skel->m_Vertices[pVert2->m_nMark];
+      CSkeletonVertex* pDVert1 = pDC_Skel->Vertices[pVert1->m_nMark];
+      CSkeletonVertex* pDVert2 = pDC_Skel->Vertices[pVert2->m_nMark];
                   
       int nDCCurveVerts;
       int nDEdges = (int)pDVert1->m_OneRingEdges.size();
@@ -971,22 +971,22 @@ vtkIdList* vtkMEDPolyDataDeformation_M1::MatchSkeletons(CSkeleton* pOC,
 //------------------------------------------------------------------------
 {  
   //first, determine, which points are going to be matched 
-  int nOCVerts = (int)pOC->m_Vertices.size(); 
+  int nOCVerts = (int)pOC->Vertices.size(); 
   for (int i = 0; i < nOCVerts; i++)
   {
     //mark the point, if it is not simple joined
-    CSkeletonVertex* pVertex = pOC->m_Vertices[i];
+    CSkeletonVertex* pVertex = pOC->Vertices[i];
     if (pVertex->GetDegree() == 2)
       pVertex->m_nMark = -1;
     else
       pVertex->m_nMark = 0;
   }
 
-  int nDCVerts = (int)pDC->m_Vertices.size();
+  int nDCVerts = (int)pDC->Vertices.size();
   for (int i = 0; i < nDCVerts; i++)
   {
     //mark the point, if it is not simple joined
-    CSkeletonVertex* pVertex = pDC->m_Vertices[i];
+    CSkeletonVertex* pVertex = pDC->Vertices[i];
     if (pVertex->GetDegree() == 2)
       pVertex->m_nMark = -1;
     else
@@ -1002,8 +1002,8 @@ vtkIdList* vtkMEDPolyDataDeformation_M1::MatchSkeletons(CSkeleton* pOC,
     {
       if (pIds[i - 1] < nOCVerts && pIds[i] < nDCVerts)
       {
-        pOC->m_Vertices[pIds[i - 1]]->m_nMark = 1;
-        pDC->m_Vertices[pIds[i]]->m_nMark = 1;
+        pOC->Vertices[pIds[i - 1]]->m_nMark = 1;
+        pDC->Vertices[pIds[i]]->m_nMark = 1;
       }
     }
   }
@@ -1014,7 +1014,7 @@ vtkIdList* vtkMEDPolyDataDeformation_M1::MatchSkeletons(CSkeleton* pOC,
   int nCount = nOCVerts; nOCVerts = 0;
   for (int i = 0; i < nCount; i++)
   {    
-    pOCVerts[nOCVerts] = pOC->m_Vertices[i];
+    pOCVerts[nOCVerts] = pOC->Vertices[i];
     if (pOCVerts[nOCVerts]->m_nMark == 0)
       nOCVerts++; //this is end-point or junction
   }
@@ -1023,7 +1023,7 @@ vtkIdList* vtkMEDPolyDataDeformation_M1::MatchSkeletons(CSkeleton* pOC,
   nCount = nDCVerts; nDCVerts = 0;
   for (int i = 0; i < nCount; i++)
   {    
-    pDCVerts[nDCVerts] = pDC->m_Vertices[i];
+    pDCVerts[nDCVerts] = pDC->Vertices[i];
     if (pDCVerts[nDCVerts]->m_nMark == 0)
       nDCVerts++; //this is end-point or junction
   }  
@@ -1478,22 +1478,22 @@ void vtkMEDPolyDataDeformation_M1::AddCurveToSuperSkeleton(CSkeletonVertex* pCur
   CSkeleton* pSkel = bOriginal ? m_SuperSkeleton->m_pOC_Skel :
     m_SuperSkeleton->m_pDC_Skel;
 
-  int nNextId = (int)pSkel->m_Vertices.size();
-  int nNextEdgeId = (int)pSkel->m_Edges.size();
+  int nNextId = (int)pSkel->Vertices.size();
+  int nNextEdgeId = (int)pSkel->Edges.size();
 
   while (pCurve != NULL)
   {
     if (pCurve->m_Id < 0)
     {
       pCurve->m_Id = nNextId++;
-      pSkel->m_Vertices.push_back(pCurve);
+      pSkel->Vertices.push_back(pCurve);
     }
 
     CSkeletonEdge* pEdge = pCurve->m_OneRingEdges[0];
     if (pEdge->m_Id < 0)
     {
       pEdge->m_Id = nNextEdgeId++;
-      pSkel->m_Edges.push_back(pEdge);
+      pSkel->Edges.push_back(pEdge);
     }
 
     pCurve = GetNextCurveVertex(pCurve);
@@ -1698,10 +1698,10 @@ void vtkMEDPolyDataDeformation_M1::RefineCurveROIs(vtkCellLocator* locator)
   int* pPtMapCounts = new int[nPoints];
   memset(pPtMapCounts, 0, nPoints*sizeof(int));  
 
-  int nEdges = (int)m_SuperSkeleton->m_pOC_Skel->m_Edges.size();
+  int nEdges = (int)m_SuperSkeleton->m_pOC_Skel->Edges.size();
   for (int i = 0; i < nEdges; i++)
   {
-    CSkeletonEdge* pEdge = m_SuperSkeleton->m_pOC_Skel->m_Edges[i];
+    CSkeletonEdge* pEdge = m_SuperSkeleton->m_pOC_Skel->Edges[i];
     int nCount = (int)pEdge->m_ROI.size();
 
     for (int j = 0; j < nCount; j++) {
@@ -1746,7 +1746,7 @@ void vtkMEDPolyDataDeformation_M1::RefineCurveROIs(vtkCellLocator* locator)
   //compute best distance map for every point   
   for (int i = 0; i < nEdges; i++)
   {
-    CSkeletonEdge* pEdge = m_SuperSkeleton->m_pOC_Skel->m_Edges[i];
+    CSkeletonEdge* pEdge = m_SuperSkeleton->m_pOC_Skel->Edges[i];
     int nCount = (int)pEdge->m_ROI.size();
     
     CSkeletonVertex* pSkelVert1 = pEdge->m_Verts[0]; 
@@ -1844,7 +1844,7 @@ void vtkMEDPolyDataDeformation_M1::RefineCurveROIs(vtkCellLocator* locator)
   //last step is to update ROIs of edges
   for (int i = 0; i < nEdges; i++)
   {
-    CSkeletonEdge* pEdge = m_SuperSkeleton->m_pOC_Skel->m_Edges[i];
+    CSkeletonEdge* pEdge = m_SuperSkeleton->m_pOC_Skel->Edges[i];
     int nCount = (int)pEdge->m_ROI.size();
 
     vtkstd::vector< vtkIdType > newROI;
@@ -1875,10 +1875,10 @@ void vtkMEDPolyDataDeformation_M1::RefineCurveROIs(vtkCellLocator* locator)
 bool vtkMEDPolyDataDeformation_M1::ValidateCurveROIs()
 //------------------------------------------------------------------------
 {
-  int nCount = (int)m_SuperSkeleton->m_pOC_Skel->m_Vertices.size();
+  int nCount = (int)m_SuperSkeleton->m_pOC_Skel->Vertices.size();
   for (int iStartPos = 0; iStartPos < nCount; )
   {
-    CSkeletonVertex* pCurve = m_SuperSkeleton->m_pOC_Skel->m_Vertices[iStartPos];
+    CSkeletonVertex* pCurve = m_SuperSkeleton->m_pOC_Skel->Vertices[iStartPos];
     iStartPos += GetNumberOfCurveVertices(pCurve);
 
     CSkeletonEdge* pPrevEdge = NULL;  
@@ -2384,10 +2384,10 @@ void vtkMEDPolyDataDeformation_M1::ComputeMeshParametrization()
   //so first, we need to find connection points for all curves
   vtkstd::vector< JOIN_VERTEX* > joints;
 
-  int nSkelPoints = (int)m_SuperSkeleton->m_pDC_Skel->m_Vertices.size();
+  int nSkelPoints = (int)m_SuperSkeleton->m_pDC_Skel->Vertices.size();
   for (int i = 0; i < nSkelPoints; i++)
   {
-    CSkeletonVertex* pSkelVertex = m_SuperSkeleton->m_pOC_Skel->m_Vertices[i];
+    CSkeletonVertex* pSkelVertex = m_SuperSkeleton->m_pOC_Skel->Vertices[i];
     if (pSkelVertex->m_WT <= 1)
       pSkelVertex->m_nMark = -1;    //mark vertex to be without list
     else
@@ -2448,10 +2448,10 @@ void vtkMEDPolyDataDeformation_M1::ComputeMeshParametrization()
   }
 
   //now compute parametrization for every edge
-  int nCount = (int)m_SuperSkeleton->m_pOC_Skel->m_Edges.size();
+  int nCount = (int)m_SuperSkeleton->m_pOC_Skel->Edges.size();
   for (int i = 0; i < nCount; i++)
   {
-    CSkeletonEdge* pEdge = m_SuperSkeleton->m_pOC_Skel->m_Edges[i];
+    CSkeletonEdge* pEdge = m_SuperSkeleton->m_pOC_Skel->Edges[i];
 
     //parametrization for the current edge
     ComputeParametrization(pEdge->m_ROI, pEdge, -1, 0.0);
@@ -2461,7 +2461,7 @@ void vtkMEDPolyDataDeformation_M1::ComputeMeshParametrization()
   //and include blending edges
   for (int i = 0; i < nCount; i++)
   {
-    CSkeletonEdge* pEdge = m_SuperSkeleton->m_pOC_Skel->m_Edges[i];
+    CSkeletonEdge* pEdge = m_SuperSkeleton->m_pOC_Skel->Edges[i];
     if (pEdge->m_Verts[0] == NULL || pEdge->m_Verts[1] == NULL)
       continue; //cannot be a joint, continue
 
@@ -2513,16 +2513,16 @@ void vtkMEDPolyDataDeformation_M1::DeformMesh(vtkPolyData* output)
 {  
   vtkPoints* points = output->GetPoints();
   int nPoints = output->GetNumberOfPoints();
-  int nCount = (int)m_SuperSkeleton->m_pDC_Skel->m_Edges.size();
+  int nCount = (int)m_SuperSkeleton->m_pDC_Skel->Edges.size();
   
   double* EdgeLengths = new double[nCount];
   double* EdgeElongations = new double[nCount];
   for (int i = 0; i < nCount; i++)
   {
-    EdgeLengths[i] = m_SuperSkeleton->m_pDC_Skel->m_Edges[i]->GetLength();
+    EdgeLengths[i] = m_SuperSkeleton->m_pDC_Skel->Edges[i]->GetLength();
     if (this->PreserveVolume)
     {
-      EdgeElongations[i] = m_SuperSkeleton->m_pOC_Skel->m_Edges[i]->GetLength();
+      EdgeElongations[i] = m_SuperSkeleton->m_pOC_Skel->Edges[i]->GetLength();
       if (EdgeElongations[i] == 0.0)
         EdgeElongations[i] = 1.0;
       else
@@ -2669,7 +2669,7 @@ vtkMEDPolyDataDeformation_M1::CreateSkeleton(vtkPolyData* pPoly)
   int nVerts = pPoly->GetNumberOfPoints();  
 
   CSkeleton* pSkel = new CSkeleton();
-  pSkel->m_Vertices.reserve(nVerts);
+  pSkel->Vertices.reserve(nVerts);
 
   //load points
   for (int i = 0; i < nVerts; i++)
@@ -2677,13 +2677,13 @@ vtkMEDPolyDataDeformation_M1::CreateSkeleton(vtkPolyData* pPoly)
     CSkeletonVertex* pVertex = new CSkeletonVertex();
 
     pPoly->GetPoint(pVertex->m_Id = i, pVertex->m_Coords);
-    pSkel->m_Vertices.push_back(pVertex);
+    pSkel->Vertices.push_back(pVertex);
   }
 
   //ensure that we have cells
   pPoly->BuildCells();
   int nCells = pPoly->GetNumberOfCells();
-  pSkel->m_Edges.reserve(nVerts - 1);
+  pSkel->Edges.reserve(nVerts - 1);
 
   int nEdgeId = 0;
   for (int i = 0; i < nCells; i++)
@@ -2698,12 +2698,12 @@ vtkMEDPolyDataDeformation_M1::CreateSkeleton(vtkPolyData* pPoly)
       //get the next edge
       CSkeletonEdge* pEdge = new CSkeletonEdge();
       pEdge->m_Id = nEdgeId++;
-      pEdge->m_Verts[0] = pSkel->m_Vertices[pIds[j - 1]];
-      pEdge->m_Verts[1] = pSkel->m_Vertices[pIds[j]];
+      pEdge->m_Verts[0] = pSkel->Vertices[pIds[j - 1]];
+      pEdge->m_Verts[1] = pSkel->Vertices[pIds[j]];
 
       pEdge->m_Verts[0]->m_OneRingEdges.push_back(pEdge);
       pEdge->m_Verts[1]->m_OneRingEdges.push_back(pEdge);
-      pSkel->m_Edges.push_back(pEdge);
+      pSkel->Edges.push_back(pEdge);
     }
   }
 
