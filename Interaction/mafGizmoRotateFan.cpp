@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotateFan.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-11-17 16:02:42 $
-  Version:   $Revision: 1.11.2.4 $
+  Date:      $Date: 2010-11-18 15:00:48 $
+  Version:   $Revision: 1.11.2.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -64,9 +64,6 @@ mafGizmoRotateFan::mafGizmoRotateFan(mafVME *input, mafObserver *listener)
   // create refsys from abs input matrix
   m_RefSys = new mafRefSys(absInputMatrix->GetVTKMatrix());
 
-  // the gizmo initial pose is the input vme one
-  SetAbsPose(absInputMatrix);
-
   // create pipeline stuff
   CreatePipeline();
 
@@ -83,6 +80,9 @@ mafGizmoRotateFan::mafGizmoRotateFan(mafVME *input, mafObserver *listener)
 
   // set gizmo color to yellow
   this->SetColor(1, 1, 0);
+
+  // the gizmo initial pose is the input vme one
+  SetAbsPose(absInputMatrix);
 
   // add the gizmo to the tree, this should increase reference count  
   m_GizmoFan->ReparentTo(mafVME::SafeDownCast(m_InputVme->GetRoot()));
