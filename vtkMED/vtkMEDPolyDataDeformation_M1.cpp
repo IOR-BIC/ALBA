@@ -2,8 +2,8 @@
 Program: Multimod Application Framework RELOADED 
 Module: $RCSfile: vtkMEDPolyDataDeformation_M1.cpp,v $ 
 Language: C++ 
-Date: $Date: 2009-11-19 11:16:49 $ 
-Version: $Revision: 1.1.2.2 $ 
+Date: $Date: 2010-11-18 07:57:20 $ 
+Version: $Revision: 1.1.2.3 $ 
 Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
 ========================================================================== 
 Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -20,7 +20,7 @@ See the COPYINGS file for license details
 #include "vtkCellLocator.h"
 #include "vtkGenericCell.h"
 
-vtkCxxRevisionMacro(vtkMEDPolyDataDeformation_M1, "$Revision: 1.1.2.2 $");
+vtkCxxRevisionMacro(vtkMEDPolyDataDeformation_M1, "$Revision: 1.1.2.3 $");
 vtkStandardNewMacro(vtkMEDPolyDataDeformation_M1);
 
 #include "mafMemDbg.h"
@@ -155,29 +155,29 @@ template <class T>
 vtkMEDPolyDataDeformation_M1::CMatrix<T>::CMatrix(int rows, int columns) 
 {  
   // alloc arrays
-  m_Matrix = new T*[rows]; // rows
+  this->Matrix = new T*[rows]; // rows
   for ( int i = 0 ; i < rows ; i++ )
   {
-    m_Matrix[i] = new T[columns]; // columns
-    memset(m_Matrix[i], 0, sizeof(T)*columns);
+    this->Matrix[i] = new T[columns]; // columns
+    memset(this->Matrix[i], 0, sizeof(T)*columns);
   }
 
-  m_NumOfRows = rows;
-  m_nNumOfCols = columns;
+  this->NumOfRows = rows;
+  this->NumOfCols = columns;
 }
 
 template <class T>
 vtkMEDPolyDataDeformation_M1::CMatrix<T>::~CMatrix() 
 {
-  if ( m_Matrix != NULL ) 
+  if ( this->Matrix != NULL ) 
   {
     // free arrays
-    for ( int i = 0 ; i < m_NumOfRows ; i++ )
-      delete [] m_Matrix[i];
+    for ( int i = 0 ; i < this->NumOfRows ; i++ )
+      delete [] this->Matrix[i];
 
-    delete [] m_Matrix;
+    delete [] this->Matrix;
   }
-  m_Matrix = NULL;
+  this->Matrix = NULL;
 }
 
 #pragma region CMunkres algorithm

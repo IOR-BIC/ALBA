@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMEDPolyDataDeformation_M1.h,v $ 
   Language: C++ 
-  Date: $Date: 2010-06-08 08:22:42 $ 
-  Version: $Revision: 1.1.2.3 $ 
+  Date: $Date: 2010-11-18 07:57:20 $ 
+  Version: $Revision: 1.1.2.4 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -245,25 +245,25 @@ protected:
     ~CMatrix();
         
     inline int GetMinSize() {
-      return ((m_NumOfRows < m_nNumOfCols) ? m_NumOfRows : m_nNumOfCols);
+      return ((NumOfRows < NumOfCols) ? NumOfRows : NumOfCols);
     }
 
     inline int GetNumberOfColumns() {
-      return m_nNumOfCols;
+      return NumOfCols;
     }
 
     inline int GetNumberOfRows() {
-      return m_NumOfRows;
+      return NumOfRows;
     }
     
     inline T& operator ()(int x, int y) {  
-        return m_Matrix[x][y];
+        return Matrix[x][y];
     }
 
   private:
-    T** m_Matrix;
-    int m_NumOfRows;
-    int m_nNumOfCols;
+    T** Matrix;
+    int NumOfRows;
+    int NumOfCols;
   };
 
   /*
