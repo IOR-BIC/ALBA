@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterLandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-07-29 15:27:21 $
-  Version:   $Revision: 1.7.2.3 $
+  Date:      $Date: 2010-11-18 16:51:31 $
+  Version:   $Revision: 1.7.2.4 $
   Authors:   Daniele Giunchi, Simone Brazzale
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -240,7 +240,7 @@ void medOpImporterLandmark::Read()
   double x = 0;
   double y = 0;
   double z = 0;
-  int t = 0;
+  double t = 0;
 
   if (!m_TestMode)
   {
@@ -275,7 +275,7 @@ void medOpImporterLandmark::Read()
       x = atof(tx);
       y = atof(ty);
       z = atof(tz);
-      t = atoi(time);
+      t = atof(time);
       if(mafString(time) == "0")
         m_VmeCloud->AppendLandmark(name, false);
       m_VmeCloud->SetLandmark(counter,x,y,z,t);
