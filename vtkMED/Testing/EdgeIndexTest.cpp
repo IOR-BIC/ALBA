@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: EdgeIndexTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-11-19 09:51:55 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-11-19 10:01:46 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -27,13 +27,13 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 void EdgeIndexTest::TestDynamicAllocation()
 //-------------------------------------------------------------------------
 {
-  CoredPointIndex *coredPointIndex = new CoredPointIndex();
+  EdgeIndex *var = new EdgeIndex();
 
-  delete coredPointIndex;
+  delete var;
 }
 //-------------------------------------------------------------------------
 void EdgeIndexTest::TestStaticAllocation()
 //-------------------------------------------------------------------------
 {
-  CoredPointIndex coredPointIndex;
+  EdgeIndex var;
 }
