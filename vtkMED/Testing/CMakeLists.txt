@@ -56,6 +56,8 @@ ADD_EXECUTABLE(vtkWeightedLandmarkTransformTest vtkWeightedLandmarkTransformTest
 ADD_TEST(vtkWeightedLandmarkTransformTest ${EXECUTABLE_OUTPUT_PATH}/vtkWeightedLandmarkTransformTest)
 ADD_EXECUTABLE(EdgeTest EdgeTest.h EdgeTest.cpp)
 ADD_TEST(EdgeTest ${EXECUTABLE_OUTPUT_PATH}/EdgeTest)
+ADD_EXECUTABLE(TriangleTest TriangleTest.h TriangleTest.cpp)
+ADD_TEST(TriangleTest ${EXECUTABLE_OUTPUT_PATH}/TriangleTest)
 
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
