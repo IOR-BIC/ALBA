@@ -76,6 +76,9 @@ ADD_TEST(TriangleIndexTest ${EXECUTABLE_OUTPUT_PATH}/TriangleIndexTest)
 ADD_EXECUTABLE(TriangulationEdgeTest TriangulationEdgeTest.h TriangulationEdgeTest.cpp)
 ADD_TEST(TriangulationEdgeTest ${EXECUTABLE_OUTPUT_PATH}/TriangulationEdgeTest)
 
+ADD_EXECUTABLE(TriangulationTriangleTest TriangulationTriangleTest.h TriangulationTriangleTest.cpp)
+ADD_TEST(TriangulationTriangleTest ${EXECUTABLE_OUTPUT_PATH}/TriangulationTriangleTest)
+
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
 #ENDIF (MAF_USE_WX)
