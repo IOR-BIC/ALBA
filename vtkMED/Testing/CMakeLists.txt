@@ -54,10 +54,15 @@ ADD_EXECUTABLE(vtkMEDFixTopologyTest vtkMEDFixTopologyTest.h vtkMEDFixTopologyTe
 ADD_TEST(vtkMEDFixTopologyTest ${EXECUTABLE_OUTPUT_PATH}/vtkMEDFixTopologyTest)
 ADD_EXECUTABLE(vtkWeightedLandmarkTransformTest vtkWeightedLandmarkTransformTest.h vtkWeightedLandmarkTransformTest.cpp)
 ADD_TEST(vtkWeightedLandmarkTransformTest ${EXECUTABLE_OUTPUT_PATH}/vtkWeightedLandmarkTransformTest)
+
 ADD_EXECUTABLE(EdgeTest EdgeTest.h EdgeTest.cpp)
 ADD_TEST(EdgeTest ${EXECUTABLE_OUTPUT_PATH}/EdgeTest)
+
 ADD_EXECUTABLE(TriangleTest TriangleTest.h TriangleTest.cpp)
 ADD_TEST(TriangleTest ${EXECUTABLE_OUTPUT_PATH}/TriangleTest)
+
+ADD_EXECUTABLE(CoredPointIndexTest CoredPointIndexTest.h CoredPointIndexTest.cpp)
+ADD_TEST(CoredPointIndexTest ${EXECUTABLE_OUTPUT_PATH}/CoredPointIndexTest)
 
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
