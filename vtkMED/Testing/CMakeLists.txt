@@ -67,6 +67,9 @@ ADD_TEST(CoredPointIndexTest ${EXECUTABLE_OUTPUT_PATH}/CoredPointIndexTest)
 ADD_EXECUTABLE(EdgeIndexTest EdgeIndexTest.h EdgeIndexTest.cpp)
 ADD_TEST(EdgeIndexTest ${EXECUTABLE_OUTPUT_PATH}/EdgeIndexTest)
 
+ADD_EXECUTABLE(CoredEdgeIndexTest CoredEdgeIndexTest.h CoredEdgeIndexTest.cpp)
+ADD_TEST(CoredEdgeIndexTest ${EXECUTABLE_OUTPUT_PATH}/CoredEdgeIndexTest)
+
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
 #ENDIF (MAF_USE_WX)
