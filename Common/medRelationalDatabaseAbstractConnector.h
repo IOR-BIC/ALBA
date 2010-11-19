@@ -2,8 +2,8 @@
 Program:   @neufuse
 Module:    $RCSfile: medRelationalDatabaseAbstractConnector.h,v $
 Language:  C++
-Date:      $Date: 2009-09-28 05:44:24 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2010-11-19 16:24:27 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2008
@@ -51,8 +51,9 @@ public:
   /** RTTI macro */
   mafAbstractTypeMacro(medRelationalDatabaseAbstractConnector, mafObject);
 
-  /** Set Get information for connection to database */
+  /** Set information for connection to database */
   void SetRelationalDatabaseInformation(medRelationalDatabaseInformation info);
+  /** Get information for connection to database */
   const medRelationalDatabaseInformation &GetRelationalDatabaseInformation() const;
 
   /** Set the current query that will be used */
