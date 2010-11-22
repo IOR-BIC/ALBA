@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewPlot.h,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 14:51:14 $
-  Version:   $Revision: 1.3.2.1 $
+  Date:      $Date: 2010-11-22 11:04:03 $
+  Version:   $Revision: 1.3.2.2 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -40,7 +40,7 @@ public:
 
   mafTypeMacro(mafViewPlot, mafView);
 
-  virtual mafView*  Copy(mafObserver *Listener);
+  virtual mafView*  Copy(mafObserver *Listener, bool lightCopyEnabled = false);
   virtual void      Create();
   virtual void			OnEvent(mafEventBase *maf_event);
 

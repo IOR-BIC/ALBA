@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.h,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 14:51:14 $
-  Version:   $Revision: 1.27.2.1 $
+  Date:      $Date: 2010-11-22 11:04:02 $
+  Version:   $Revision: 1.27.2.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -64,7 +64,7 @@ public:
   Redefine this method to package the compounded view */
   virtual void PackageView() {};
 
-  virtual mafView *Copy(mafObserver *Listener);
+  virtual mafView *Copy(mafObserver *Listener, bool lightCopyEnabled = false);
   
   /** 
   Create the plugged sub-view and call virtual method CreateGuiView() */

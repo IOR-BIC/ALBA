@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-09-10 15:42:40 $
-  Version:   $Revision: 1.79.2.5 $
+  Date:      $Date: 2010-11-22 11:04:03 $
+  Version:   $Revision: 1.79.2.6 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -100,9 +100,10 @@ void mafViewVTK::PlugVisualPipe(mafString vme_type, mafString pipe_type, long vi
   m_PipeMap[vme_type] = plugged_pipe;
 }
 //----------------------------------------------------------------------------
-mafView *mafViewVTK::Copy(mafObserver *Listener)
+mafView *mafViewVTK::Copy(mafObserver *Listener, bool lightCopyEnabled)
 //----------------------------------------------------------------------------
 {
+  m_LightCopyEnabled = lightCopyEnabled;
   mafViewVTK *v = new mafViewVTK(m_Label, m_CameraPositionId, m_ShowAxes, m_ShowGrid, m_ShowRuler, m_StereoType, m_ShowOrientator, m_AxesType);
   v->m_Listener = Listener;
   v->m_Id = m_Id;

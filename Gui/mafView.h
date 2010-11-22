@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2010-10-22 15:55:38 $
-  Version:   $Revision: 1.23.2.3 $
+  Date:      $Date: 2010-11-22 11:04:20 $
+  Version:   $Revision: 1.23.2.4 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -81,7 +81,7 @@ public:
 
   virtual void			SetListener(mafObserver *Listener) {m_Listener = Listener;};
   virtual void			OnEvent(mafEventBase *maf_event);
-  virtual mafView*  Copy(mafObserver *Listener) {return NULL;};
+  virtual mafView*  Copy(mafObserver *Listener, bool lightCopyEnabled = false) {m_LightCopyEnabled = lightCopyEnabled; return NULL;};
   virtual void      Create() {};
 
   virtual void			VmeAdd(mafNode *vme)															{};
@@ -223,5 +223,7 @@ protected:
 
   double m_Slice[3];
   double m_Normal[3];
+
+  bool m_LightCopyEnabled;
 };
 #endif

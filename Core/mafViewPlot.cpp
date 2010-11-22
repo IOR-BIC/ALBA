@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewPlot.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 14:51:14 $
-  Version:   $Revision: 1.6.2.1 $
+  Date:      $Date: 2010-11-22 11:04:03 $
+  Version:   $Revision: 1.6.2.2 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -56,9 +56,10 @@ void mafViewPlot::PlugVisualPipe(mafString vme_type, mafString pipe_type, long v
   m_PipeMap[vme_type] = plugged_pipe;
 }
 //----------------------------------------------------------------------------
-mafView *mafViewPlot::Copy(mafObserver *Listener)
+mafView *mafViewPlot::Copy(mafObserver *Listener, bool lightCopyEnabled)
 //----------------------------------------------------------------------------
 {
+  m_LightCopyEnabled = lightCopyEnabled;
   mafViewPlot *v = new mafViewPlot(m_Label);
   v->m_Listener = Listener;
   v->m_Id = m_Id;

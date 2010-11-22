@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-10-29 14:12:07 $
-  Version:   $Revision: 1.32.2.2 $
+  Date:      $Date: 2010-11-22 11:04:02 $
+  Version:   $Revision: 1.32.2.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -71,17 +71,19 @@ mafViewCompound::~mafViewCompound()
   m_ChildViewList.clear();
 }
 //----------------------------------------------------------------------------
-mafView *mafViewCompound::Copy(mafObserver *Listener)
+mafView *mafViewCompound::Copy(mafObserver *Listener, bool lightCopyEnabled)
 //----------------------------------------------------------------------------
 {
+  m_LightCopyEnabled = lightCopyEnabled;
   mafViewCompound *v = new mafViewCompound(m_Label, m_ViewRowNum, m_ViewColNum);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
   for (int i=0;i<m_PluggedChildViewList.size();i++)
   {
-    v->m_PluggedChildViewList.push_back(m_PluggedChildViewList[i]->Copy(this));
+    v->m_PluggedChildViewList.push_back(m_PluggedChildViewList[i]->Copy(this,m_LightCopyEnabled));
   }
   v->m_NumOfPluggedChildren = m_NumOfPluggedChildren;
+  v->m_LightCopyEnabled = lightCopyEnabled;
   v->Create();
   return v;
 }
@@ -107,15 +109,19 @@ void mafViewCompound::Create()
 
   for(int i=0; i<m_NumOfPluggedChildren; i++)
   {
-    m_ChildViewList.push_back(m_PluggedChildViewList[i]->Copy(this));
-    m_ChildViewList[i]->GetWindow()->Reparent(m_Win);
-    m_ChildViewList[i]->GetWindow()->Show(true);
+    m_ChildViewList.push_back(m_PluggedChildViewList[i]->Copy(this, m_LightCopyEnabled));
+    if(m_ChildViewList[i]->GetWindow()) {//MOD_DAN_LIGHT
+      m_ChildViewList[i]->GetWindow()->Reparent(m_Win);
+      m_ChildViewList[i]->GetWindow()->Show(true);
+    }
   }
   for (int f=m_NumOfPluggedChildren; f < m_ViewColNum * m_ViewRowNum; f++)
   {
-    m_ChildViewList.push_back(m_PluggedChildViewList[m_NumOfPluggedChildren-1]->Copy(this));
-    m_ChildViewList[f]->GetWindow()->Reparent(m_Win);
-    m_ChildViewList[f]->GetWindow()->Show(true);
+    m_ChildViewList.push_back(m_PluggedChildViewList[m_NumOfPluggedChildren-1]->Copy(this, m_LightCopyEnabled));
+    if(m_ChildViewList[i]->GetWindow()) {//MOD_DAN_LIGHT
+        m_ChildViewList[f]->GetWindow()->Reparent(m_Win);
+        m_ChildViewList[f]->GetWindow()->Show(true);
+    }
   }
   m_NumOfChildView = m_ChildViewList.size();
 

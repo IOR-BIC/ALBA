@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewHTML.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:56:04 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2010-11-22 11:04:03 $
+  Version:   $Revision: 1.5.2.1 $
   Authors:   Paolo Quadrani    Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,7 +36,7 @@ public:
 
   mafTypeMacro(mafViewHTML, mafView);
 
-	mafView				*Copy(mafObserver *Listener = NULL);
+	mafView				*Copy(mafObserver *Listener = NULL, bool lightCopyEnabled = false);
   void           Create();
 	mafSceneGraph *GetSceneGraph();
   mafRWIBase    *GetDefaultRWI();

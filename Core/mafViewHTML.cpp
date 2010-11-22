@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewHTML.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:56:04 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2010-11-22 11:04:03 $
+  Version:   $Revision: 1.6.2.1 $
   Authors:   Paolo Quadrani    Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -63,9 +63,10 @@ mafViewHTML::~mafViewHTML()
   */
 }
 //----------------------------------------------------------------------------
-mafView *mafViewHTML::Copy(mafObserver *Listener)
+mafView *mafViewHTML::Copy(mafObserver *Listener, bool lightCopyEnabled)
 //----------------------------------------------------------------------------
 {
+   m_LightCopyEnabled = lightCopyEnabled;
    mafViewHTML *v = new mafViewHTML(m_Label);
    v->m_Listener = Listener;
    v->m_Id = m_Id;
