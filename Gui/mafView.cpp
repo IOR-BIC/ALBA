@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-05-29 12:07:47 $
-  Version:   $Revision: 1.17.2.1 $
+  Date:      $Date: 2010-11-22 14:32:39 $
+  Version:   $Revision: 1.17.2.2 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -69,6 +69,7 @@ mafView::mafView(const wxString &label)
   m_Normal[0] = m_Normal[1] = m_Normal[2] =  0.;
 
   m_HTMLText = "";
+  m_LightCopyEnabled = false;
 }
 //----------------------------------------------------------------------------
 mafView::~mafView()
@@ -250,4 +251,4 @@ void mafView::SetNormal(double normal[3])// const
   m_Normal[0] = normal[0];
   m_Normal[1] = normal[1];
   m_Normal[2] = normal[2];
-}
+}
