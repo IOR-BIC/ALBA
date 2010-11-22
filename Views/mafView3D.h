@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView3D.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:25:10 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2010-11-22 11:04:57 $
+  Version:   $Revision: 1.10.2.1 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -42,7 +42,7 @@ public:
 
   mafTypeMacro(mafView3D, mafViewVTK);
 
-  virtual mafView*  Copy(mafObserver *Listener);
+  virtual mafView*  Copy(mafObserver *Listener, bool lightCopyEnabled = false);
 	virtual void			OnEvent(mafEventBase *maf_event);
 
 	void Create();

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCT.h,v $
 Language:  C++
-Date:      $Date: 2008-07-25 11:25:10 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2010-11-22 11:04:58 $
+Version:   $Revision: 1.2.2.1 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -38,7 +38,7 @@ public:
 
 	mafTypeMacro(mafViewCT, mafViewCompound);
 
-	virtual mafView *Copy(mafObserver *Listener);
+	virtual mafView *Copy(mafObserver *Listener, bool lightCopyEnabled = false);
 	virtual void OnEvent(mafEventBase *maf_event);
 
 	/** Show/Hide VMEs into plugged sub-views */

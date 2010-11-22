@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.h,v $
   Language:  C++
-  Date:      $Date: 2010-11-02 13:08:58 $
-  Version:   $Revision: 1.17.2.4 $
+  Date:      $Date: 2010-11-22 11:04:58 $
+  Version:   $Revision: 1.17.2.5 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -48,7 +48,7 @@ public:
   mafTypeMacro(mafViewRXCT, mafViewCompound);
 
   /** clone an instance of the object*/
-  virtual mafView *Copy(mafObserver *Listener);
+  virtual mafView *Copy(mafObserver *Listener, bool lightCopyEnabled = false);
   /** Precess events coming from other objects */
   virtual void OnEvent(mafEventBase *maf_event);
   

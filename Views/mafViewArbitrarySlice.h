@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.h,v $
   Language:  C++
-  Date:      $Date: 2009-07-23 07:06:44 $
-  Version:   $Revision: 1.8.2.3 $
+  Date:      $Date: 2010-11-22 11:04:58 $
+  Version:   $Revision: 1.8.2.4 $
   Authors:   Eleonora Mambrini
 ==========================================================================
   Copyright (c) 2002/2004
@@ -74,7 +74,7 @@ public:
 	virtual void OnEvent(mafEventBase *maf_event);
 
   /** Function that clones instance of the object. */
-	virtual mafView* Copy(mafObserver *Listener);
+	virtual mafView* Copy(mafObserver *Listener, bool lightCopyEnabled = false);
 
   /** Force the updating of the camera. */
 	virtual void CameraUpdate();

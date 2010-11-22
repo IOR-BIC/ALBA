@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSliceCompound.h,v $
   Language:  C++
-  Date:      $Date: 2009-07-16 09:34:24 $
-  Version:   $Revision: 1.3.2.2 $
+  Date:      $Date: 2010-11-22 11:04:58 $
+  Version:   $Revision: 1.3.2.3 $
   Authors:   Eleonora Mambrini
 ==========================================================================
   Copyright (c) 2002/2004
@@ -50,7 +50,7 @@ public:
   virtual void PackageView();
 
   /** Function that clones instance of the object. */
-  virtual mafView *Copy(mafObserver *Listener);
+  virtual mafView *Copy(mafObserver *Listener, bool lightCopyEnabled = false);
  
 
   /** Function called when select a vme different from selected one.*/

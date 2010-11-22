@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.h,v $
   Language:  C++
-  Date:      $Date: 2010-08-30 16:32:43 $
-  Version:   $Revision: 1.9.2.6 $
+  Date:      $Date: 2010-11-22 11:04:58 $
+  Version:   $Revision: 1.9.2.7 $
   Authors:   Matteo Giacomoni, Simone Brazzale
 ==========================================================================
   Copyright (c) 2002/2004
@@ -62,7 +62,7 @@ public:
   };
   
   /** Function that clones instance of the object. */
-	virtual mafView *Copy(mafObserver *Listener);
+	virtual mafView *Copy(mafObserver *Listener, bool lightCopyEnabled = false);
 
   /** Function that creates renderwindow, scenegraph, specific actors and interactors. */
 	virtual void Create();

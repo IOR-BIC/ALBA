@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-11-02 13:08:58 $
-  Version:   $Revision: 1.61.2.16 $
+  Date:      $Date: 2010-11-22 11:04:58 $
+  Version:   $Revision: 1.61.2.17 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -94,9 +94,10 @@ mafViewOrthoSlice::~mafViewOrthoSlice()
 
 }
 //----------------------------------------------------------------------------
-mafView *mafViewOrthoSlice::Copy(mafObserver *Listener)
+mafView *mafViewOrthoSlice::Copy(mafObserver *Listener, bool lightCopyEnabled)
 //----------------------------------------------------------------------------
 {
+  m_LightCopyEnabled = lightCopyEnabled;
   mafViewOrthoSlice *v = new mafViewOrthoSlice(m_Label);
   v->m_Listener = Listener;
   v->m_Id = m_Id;

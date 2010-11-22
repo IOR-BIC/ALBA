@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 12:31:02 $
-  Version:   $Revision: 1.38.2.7 $
+  Date:      $Date: 2010-11-22 11:04:57 $
+  Version:   $Revision: 1.38.2.8 $
   Authors:   Eleonora Mambrini
 ==========================================================================
   Copyright (c) 2002/2004
@@ -791,9 +791,10 @@ void mafViewArbitrarySlice::OnEventThis(mafEventBase *maf_event)
 	}
 }
 //----------------------------------------------------------------------------
-mafView *mafViewArbitrarySlice::Copy(mafObserver *Listener)
+mafView *mafViewArbitrarySlice::Copy(mafObserver *Listener, bool lightCopyEnabled)
 //----------------------------------------------------------------------------
 {
+  m_LightCopyEnabled = lightCopyEnabled;
   mafViewArbitrarySlice *v = new mafViewArbitrarySlice(m_Label);
   v->m_Listener = Listener;
   v->m_Id = m_Id;

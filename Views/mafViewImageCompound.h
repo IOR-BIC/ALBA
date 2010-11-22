@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewImageCompound.h,v $
   Language:  C++
-  Date:      $Date: 2009-06-03 15:59:26 $
-  Version:   $Revision: 1.2.2.1 $
+  Date:      $Date: 2010-11-22 11:04:58 $
+  Version:   $Revision: 1.2.2.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -57,7 +57,7 @@ public:
   virtual void PackageView();
 
   /** Function that clones instance of the object. */
-  virtual mafView *Copy(mafObserver *Listener);
+  virtual mafView *Copy(mafObserver *Listener, bool lightCopyEnabled = false);
   
   /**  Create the GUI on the bottom of the compounded view. */
   virtual void     CreateGuiView();

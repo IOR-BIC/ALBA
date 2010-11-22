@@ -2,8 +2,8 @@
 Program: Multimod Application Framework RELOADED 
 Module: $RCSfile: medViewSliceOnCurveCompound.cpp,v $ 
 Language: C++ 
-Date: $Date: 2010-07-13 14:07:06 $ 
-Version: $Revision: 1.1.2.4 $ 
+Date: $Date: 2010-11-22 11:04:58 $ 
+Version: $Revision: 1.1.2.5 $ 
 Authors: Eleonora Mambrini
 ========================================================================== 
 Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -157,9 +157,10 @@ medViewSliceOnCurveCompound::~medViewSliceOnCurveCompound()
 }
 
 //----------------------------------------------------------------------------
-mafView *medViewSliceOnCurveCompound::Copy(mafObserver *Listener)
+mafView *medViewSliceOnCurveCompound::Copy(mafObserver *Listener, bool lightCopyEnabled)
 //----------------------------------------------------------------------------
-{  
+{
+  m_LightCopyEnabled = lightCopyEnabled;
   medViewSliceOnCurveCompound *v = this->NewInstance(); 
   v->m_Label = m_Label;
   v->m_Listener = Listener;

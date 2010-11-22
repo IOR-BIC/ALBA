@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSliceCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-07-16 09:34:24 $
-  Version:   $Revision: 1.16.2.1 $
+  Date:      $Date: 2010-11-22 11:04:58 $
+  Version:   $Revision: 1.16.2.2 $
   Authors:   Eleonora Mambrini
 ==========================================================================
   Copyright (c) 2002/2004
@@ -73,9 +73,10 @@ mafViewSingleSliceCompound::~mafViewSingleSliceCompound()
 	cppDEL(m_LutSlider);
 }
 //----------------------------------------------------------------------------
-mafView *mafViewSingleSliceCompound::Copy(mafObserver *Listener)
+mafView *mafViewSingleSliceCompound::Copy(mafObserver *Listener, bool lightCopyEnabled)
 //----------------------------------------------------------------------------
 {
+  m_LightCopyEnabled = lightCopyEnabled;
   mafViewSingleSliceCompound *v = new mafViewSingleSliceCompound(m_Label, m_ViewRowNum, m_ViewColNum);
   v->m_Listener = Listener;
   v->m_Id = m_Id;

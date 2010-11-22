@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewVTKCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-11-09 08:39:36 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2010-11-22 11:04:58 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Eleonora Mambrini
 ==========================================================================
   Copyright (c) 2002/2004
@@ -75,9 +75,10 @@ medViewVTKCompound::~medViewVTKCompound()
 	cppDEL(m_LutSlider);*/
 }
 //----------------------------------------------------------------------------
-mafView *medViewVTKCompound::Copy(mafObserver *Listener)
+mafView *medViewVTKCompound::Copy(mafObserver *Listener, bool lightCopyEnabled)
 //----------------------------------------------------------------------------
 {
+  m_LightCopyEnabled = lightCopyEnabled;
   medViewVTKCompound *v = new medViewVTKCompound(m_Label, m_ViewRowNum, m_ViewColNum);
   v->m_Listener = Listener;
   v->m_Id = m_Id;

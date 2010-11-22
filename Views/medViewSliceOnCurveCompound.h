@@ -2,8 +2,8 @@
 Program: Multimod Application Framework RELOADED 
 Module: $RCSfile: medViewSliceOnCurveCompound.h,v $ 
 Language: C++ 
-Date: $Date: 2009-12-02 09:18:45 $ 
-Version: $Revision: 1.1.2.2 $ 
+Date: $Date: 2010-11-22 11:04:58 $ 
+Version: $Revision: 1.1.2.3 $ 
 Authors: Eleonora Mambrini
 ========================================================================== 
 Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -135,7 +135,7 @@ protected:
   int m_EnableGPU; ///<Non-zero, if the GPU support for slicing is used (default)
 
 public:
-  /*virtual*/ mafView *Copy(mafObserver *Listener);
+  /*virtual*/ mafView *Copy(mafObserver *Listener, bool lightCopyEnabled = false);
   /*virtual*/ void OnEvent(mafEventBase *maf_event);	
 
   /** 

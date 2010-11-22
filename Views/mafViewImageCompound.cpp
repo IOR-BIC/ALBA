@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewImageCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:25:10 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2010-11-22 11:04:58 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -73,9 +73,10 @@ mafViewImageCompound::~mafViewImageCompound()
 	cppDEL(m_LutSlider);
 }
 //----------------------------------------------------------------------------
-mafView *mafViewImageCompound::Copy(mafObserver *Listener)
+mafView *mafViewImageCompound::Copy(mafObserver *Listener, bool lightCopyEnabled)
 //----------------------------------------------------------------------------
 {
+  m_LightCopyEnabled = lightCopyEnabled;
   mafViewImageCompound *v = new mafViewImageCompound(m_Label, m_ViewRowNum, m_ViewColNum);
   v->m_Listener = Listener;
   v->m_Id = m_Id;

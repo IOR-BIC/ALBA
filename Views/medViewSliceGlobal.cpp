@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewSliceGlobal.cpp,v $
 Language:  C++
-Date:      $Date: 2010-09-28 15:18:37 $
-Version:   $Revision: 1.1.2.5 $
+Date:      $Date: 2010-11-22 11:04:58 $
+Version:   $Revision: 1.1.2.6 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2002/2004
@@ -115,9 +115,10 @@ medViewSliceGlobal::~medViewSliceGlobal()
   m_CurrentMesh.clear();
 }
 //----------------------------------------------------------------------------
-mafView *medViewSliceGlobal::Copy(mafObserver *Listener)
+mafView *medViewSliceGlobal::Copy(mafObserver *Listener, bool lightCopyEnabled)
 //----------------------------------------------------------------------------
 {
+  m_LightCopyEnabled = lightCopyEnabled;
   medViewSliceGlobal *v = new medViewSliceGlobal(m_Label, m_CameraPositionId, m_ShowAxes,m_ShowGrid, m_ShowRuler, m_StereoType,m_ShowVolumeTICKs,m_TextureInterpolate);
   v->m_Listener = Listener;
   v->m_Id = m_Id;

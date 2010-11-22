@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.h,v $
   Language:  C++
-  Date:      $Date: 2010-05-25 13:05:15 $
-  Version:   $Revision: 1.26.2.9 $
+  Date:      $Date: 2010-11-22 11:04:58 $
+  Version:   $Revision: 1.26.2.10 $
   Authors:   Paolo Quadrani,Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -54,7 +54,7 @@ public:
 
   mafTypeMacro(mafViewSlice, mafViewVTK);
 
-  virtual mafView*  Copy(mafObserver *Listener);
+  virtual mafView*  Copy(mafObserver *Listener, bool lightCopyEnabled = false);
   virtual void			OnEvent(mafEventBase *maf_event);
 
   void Create();

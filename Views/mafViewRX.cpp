@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRX.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-04-20 09:47:57 $
-  Version:   $Revision: 1.19.2.2 $
+  Date:      $Date: 2010-11-22 11:04:58 $
+  Version:   $Revision: 1.19.2.3 $
   Authors:   Paolo Quadrani , Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -61,13 +61,15 @@ mafViewRX::~mafViewRX()
 {
 }
 //----------------------------------------------------------------------------
-mafView *mafViewRX::Copy(mafObserver *Listener)
+mafView *mafViewRX::Copy(mafObserver *Listener, bool lightCopyEnabled)
 //----------------------------------------------------------------------------
 {
+  m_LightCopyEnabled = lightCopyEnabled;
   mafViewRX *v = new mafViewRX(m_Label, m_CameraPositionId, m_ShowAxes,m_ShowGrid, m_ShowRuler, m_StereoType);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
   v->m_PipeMap = m_PipeMap;
+  v->m_LightCopyEnabled = lightCopyEnabled;
   v->Create();
   return v;
 }
@@ -75,6 +77,8 @@ mafView *mafViewRX::Copy(mafObserver *Listener)
 void mafViewRX::Create()
 //----------------------------------------------------------------------------
 {
+  if(m_LightCopyEnabled) return; //COPY_LIGHT
+
   m_Rwi = new mafRWI(mafGetFrame(), TWO_LAYER, m_ShowGrid, m_ShowAxes, m_ShowRuler, m_StereoType);
   m_Rwi->SetListener(this);
   m_Rwi->CameraSet(m_CameraPositionId);

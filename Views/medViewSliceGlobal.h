@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewSliceGlobal.h,v $
 Language:  C++
-Date:      $Date: 2010-05-18 15:48:01 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2010-11-22 11:04:58 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2002/2004
@@ -40,7 +40,7 @@ public:
 
   mafTypeMacro(medViewSliceGlobal, mafViewSlice);
 
-  virtual mafView*  Copy(mafObserver *Listener);
+  virtual mafView*  Copy(mafObserver *Listener, bool lightCopyEnabled = false);
   virtual void			OnEvent(mafEventBase *maf_event);
 
   //void Create();

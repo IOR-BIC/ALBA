@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewVTKCompound.h,v $
   Language:  C++
-  Date:      $Date: 2009-07-20 11:30:45 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2010-11-22 11:04:58 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Eleonora Mambrini
 ==========================================================================
   Copyright (c) 2002/2004
@@ -59,7 +59,7 @@ public:
   virtual void SetExternalView(mafViewVTK *childView);
 
   /** Function that clones instance of the object. */
-  virtual mafView *Copy(mafObserver *Listener);
+  virtual mafView *Copy(mafObserver *Listener, bool lightCopyEnabled = false);
 
 protected:
   /**

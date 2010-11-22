@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-08-30 15:35:25 $
-  Version:   $Revision: 1.31.2.1 $
+  Date:      $Date: 2010-11-22 11:04:58 $
+  Version:   $Revision: 1.31.2.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -97,13 +97,15 @@ mafViewSingleSlice::~mafViewSingleSlice()
 	m_CurrentPolyline.clear();
 }
 //----------------------------------------------------------------------------
-mafView *mafViewSingleSlice::Copy(mafObserver *Listener)
+mafView *mafViewSingleSlice::Copy(mafObserver *Listener, bool lightCopyEnabled)
 //----------------------------------------------------------------------------
 {
+  m_LightCopyEnabled = lightCopyEnabled;
   mafViewSingleSlice *v = new mafViewSingleSlice(m_Label, m_CameraPositionId, m_ShowAxes,m_ShowGrid, m_ShowRuler, m_StereoType,m_ShowOrientator);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
   v->m_PipeMap = m_PipeMap;
+  v->m_LightCopyEnabled = lightCopyEnabled;
   v->Create();
   return v;
 }
@@ -111,6 +113,8 @@ mafView *mafViewSingleSlice::Copy(mafObserver *Listener)
 void mafViewSingleSlice::Create()
 //----------------------------------------------------------------------------
 {
+  if(m_LightCopyEnabled) return;
+
   RWI_LAYERS num_layers = TWO_LAYER;
   
   m_Rwi = new mafRWI(mafGetFrame(), num_layers, m_ShowGrid, m_ShowAxes, m_ShowRuler, m_StereoType, m_ShowOrientator);

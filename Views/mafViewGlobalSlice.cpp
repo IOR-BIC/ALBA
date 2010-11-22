@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-08-30 16:34:32 $
-  Version:   $Revision: 1.29.2.10 $
+  Date:      $Date: 2010-11-22 11:04:58 $
+  Version:   $Revision: 1.29.2.11 $
   Authors:   Matteo Giacomoni, Simone Brazzale
 ==========================================================================
   Copyright (c) 2002/2004
@@ -179,13 +179,15 @@ mafViewGlobalSlice::~mafViewGlobalSlice()
 	vtkDEL(m_TextMapper);
 }
 //----------------------------------------------------------------------------
-mafView *mafViewGlobalSlice::Copy(mafObserver *Listener)
+mafView *mafViewGlobalSlice::Copy(mafObserver *Listener, bool lightCopyEnabled)
 //----------------------------------------------------------------------------
 {
+  m_LightCopyEnabled = lightCopyEnabled;
   mafViewGlobalSlice *v = new mafViewGlobalSlice(m_Label, m_CameraPositionId, m_ShowAxes,m_ShowGrid, m_ShowRuler, m_StereoType);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
   v->m_PipeMap = m_PipeMap;
+  v->m_LightCopyEnabled = lightCopyEnabled;
   v->Create();
   return v;
 }
@@ -193,6 +195,8 @@ mafView *mafViewGlobalSlice::Copy(mafObserver *Listener)
 void mafViewGlobalSlice::Create()
 //----------------------------------------------------------------------------
 {
+  if(m_LightCopyEnabled) return; //COPY_LIGHT
+
   RWI_LAYERS num_layers = TWO_LAYER;
   
   m_Rwi = new mafRWI(mafGetFrame(), num_layers, m_ShowGrid, m_ShowAxes, m_ShowRuler, m_StereoType);

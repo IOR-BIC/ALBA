@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCT.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-25 11:25:10 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2010-11-22 11:04:58 $
+Version:   $Revision: 1.5.2.1 $
 Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -88,9 +88,10 @@ mafViewCT::~mafViewCT()
 	m_ViewCTCompound = NULL;
 }
 //----------------------------------------------------------------------------
-mafView *mafViewCT::Copy(mafObserver *Listener)
+mafView *mafViewCT::Copy(mafObserver *Listener, bool lightCopyEnabled)
 //----------------------------------------------------------------------------
 {
+  m_LightCopyEnabled = lightCopyEnabled;
 	mafViewCT *v = new mafViewCT(m_Label);
 	v->m_Listener = Listener;
 	v->m_Id = m_Id;

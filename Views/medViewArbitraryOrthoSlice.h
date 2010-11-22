@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.h,v $
 Language:  C++
-Date:      $Date: 2010-10-27 13:20:14 $
-Version:   $Revision: 1.1.2.15 $
+Date:      $Date: 2010-11-22 11:04:58 $
+Version:   $Revision: 1.1.2.16 $
 Authors:   Stefano Perticoni	
 ==========================================================================
 Copyright (c) 2002/2004
@@ -102,7 +102,7 @@ public:
 	void OnEventGizmoCrossYNormal( mafEventBase * maf_event );
 
 	/** Function that clones instance of the object. */
-	virtual mafView* Copy(mafObserver *Listener);
+	virtual mafView* Copy(mafObserver *Listener, bool lightCopyEnabled = false);
 
 	/** Force the updating of the camera. */
 	virtual void UpdateSubviewsCamerasToFaceSlices();

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-07-13 14:07:06 $
-  Version:   $Revision: 1.45.2.11 $
+  Date:      $Date: 2010-11-22 11:04:58 $
+  Version:   $Revision: 1.45.2.12 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -117,9 +117,10 @@ mafViewRXCT::~mafViewRXCT()
   }
 }
 //----------------------------------------------------------------------------
-mafView *mafViewRXCT::Copy(mafObserver *Listener)
+mafView *mafViewRXCT::Copy(mafObserver *Listener, bool lightCopyEnabled)
 //----------------------------------------------------------------------------
 {
+  m_LightCopyEnabled = lightCopyEnabled;
   mafViewRXCT *v = new mafViewRXCT(m_Label);
   v->m_Listener = Listener;
   v->m_Id = m_Id;

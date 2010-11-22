@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2010-10-27 15:21:19 $
-Version:   $Revision: 1.1.2.24 $
+Date:      $Date: 2010-11-22 11:04:58 $
+Version:   $Revision: 1.1.2.25 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -1095,9 +1095,9 @@ void medViewArbitraryOrthoSlice::OnEventThis(mafEventBase *maf_event)
 	}
 }
 
-mafView *medViewArbitraryOrthoSlice::Copy(mafObserver *Listener)
-
+mafView *medViewArbitraryOrthoSlice::Copy(mafObserver *Listener, bool lightCopyEnabled)
 {
+  m_LightCopyEnabled = lightCopyEnabled;
 	medViewArbitraryOrthoSlice *v = new medViewArbitraryOrthoSlice(m_Label);
 	v->m_Listener = Listener;
 	v->m_Id = m_Id;

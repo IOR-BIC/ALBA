@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-07-13 14:07:06 $
-  Version:   $Revision: 1.51.2.16 $
+  Date:      $Date: 2010-11-22 11:04:58 $
+  Version:   $Revision: 1.51.2.17 $
   Authors:   Paolo Quadrani , Stefano Perticoni , Josef Kohout
 ==========================================================================
   Copyright (c) 2002/2004
@@ -115,13 +115,15 @@ mafViewSlice::~mafViewSlice()
   m_CurrentMesh.clear();
 }
 //----------------------------------------------------------------------------
-mafView *mafViewSlice::Copy(mafObserver *Listener)
+mafView *mafViewSlice::Copy(mafObserver *Listener, bool lightCopyEnabled)
 //----------------------------------------------------------------------------
 {
+  m_LightCopyEnabled = lightCopyEnabled;
   mafViewSlice *v = new mafViewSlice(m_Label, m_CameraPositionId, m_ShowAxes,m_ShowGrid, m_ShowRuler, m_StereoType,m_ShowVolumeTICKs,m_TextureInterpolate);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
   v->m_PipeMap = m_PipeMap;
+  v->m_LightCopyEnabled = lightCopyEnabled;
   v->Create();
   return v;
 }
@@ -129,6 +131,8 @@ mafView *mafViewSlice::Copy(mafObserver *Listener)
 void mafViewSlice::Create()
 //----------------------------------------------------------------------------
 {
+  if(m_LightCopyEnabled) return; //COPY_LIGHT
+
   RWI_LAYERS num_layers = m_CameraPositionId != CAMERA_OS_P ? TWO_LAYER : ONE_LAYER;
   
   m_Rwi = new mafRWI(mafGetFrame(), num_layers, m_ShowGrid, m_ShowAxes, m_ShowRuler, m_StereoType);

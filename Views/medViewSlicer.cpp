@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewSlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 12:31:02 $
-  Version:   $Revision: 1.14.2.3 $
+  Date:      $Date: 2010-11-22 11:04:58 $
+  Version:   $Revision: 1.14.2.4 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -276,9 +276,10 @@ void medViewSlicer::OnEventThis(mafEventBase *maf_event)
 	}
 }
 //----------------------------------------------------------------------------
-mafView *medViewSlicer::Copy(mafObserver *Listener)
+mafView *medViewSlicer::Copy(mafObserver *Listener, bool lightCopyEnabled)
 //----------------------------------------------------------------------------
 {
+  m_LightCopyEnabled = lightCopyEnabled;
   medViewSlicer *v = new medViewSlicer(m_Label);
   v->m_Listener = Listener;
   v->m_Id = m_Id;

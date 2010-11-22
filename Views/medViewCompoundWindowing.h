@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewCompoundWindowing.h,v $
   Language:  C++
-  Date:      $Date: 2009-09-04 10:35:55 $
-  Version:   $Revision: 1.1.2.4 $
+  Date:      $Date: 2010-11-22 11:04:58 $
+  Version:   $Revision: 1.1.2.5 $
   Authors:   Eleonora Mambrini
 ==========================================================================
   Copyright (c) 2002/2004
@@ -54,7 +54,7 @@ public:
   virtual void PackageView()=0;
 
   /** Function that clones instance of the object. */
-  virtual mafView *Copy(mafObserver *Listener)=0;
+  virtual mafView *Copy(mafObserver *Listener, bool lightCopyEnabled = false)=0;
   
   /** 
   Create the GUI on the bottom of the compounded view. */
