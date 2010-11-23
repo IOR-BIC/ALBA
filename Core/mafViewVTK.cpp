@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-11-22 14:33:00 $
-  Version:   $Revision: 1.79.2.7 $
+  Date:      $Date: 2010-11-23 11:17:33 $
+  Version:   $Revision: 1.79.2.8 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -115,7 +115,7 @@ mafView *mafViewVTK::Copy(mafObserver *Listener, bool lightCopyEnabled)
 void mafViewVTK::Create()
 //----------------------------------------------------------------------------
 {
-  if(m_LightCopyEnabled = true) return;
+  if(m_LightCopyEnabled == true) return;
   m_Rwi = new mafRWI(mafGetFrame(), ONE_LAYER, m_ShowGrid, m_ShowAxes, m_ShowRuler, m_StereoType, m_ShowOrientator, m_AxesType);
   m_Rwi->SetListener(this);
   m_Rwi->CameraSet(m_CameraPositionId);
