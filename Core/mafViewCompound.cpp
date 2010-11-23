@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-11-22 11:04:02 $
-  Version:   $Revision: 1.32.2.3 $
+  Date:      $Date: 2010-11-23 09:53:02 $
+  Version:   $Revision: 1.32.2.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -118,7 +118,7 @@ void mafViewCompound::Create()
   for (int f=m_NumOfPluggedChildren; f < m_ViewColNum * m_ViewRowNum; f++)
   {
     m_ChildViewList.push_back(m_PluggedChildViewList[m_NumOfPluggedChildren-1]->Copy(this, m_LightCopyEnabled));
-    if(m_ChildViewList[i]->GetWindow()) {//MOD_DAN_LIGHT
+    if(m_ChildViewList[f]->GetWindow()) {//MOD_DAN_LIGHT
         m_ChildViewList[f]->GetWindow()->Reparent(m_Win);
         m_ChildViewList[f]->GetWindow()->Show(true);
     }
