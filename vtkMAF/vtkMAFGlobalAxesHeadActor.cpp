@@ -35,9 +35,10 @@
 #include "vtkPolyDataReader.h"
 #include "vtkDirectory.h"
 
-vtkCxxRevisionMacro(vtkMAFGlobalAxesHeadActor, "$Revision: 1.1.2.3 $");
+vtkCxxRevisionMacro(vtkMAFGlobalAxesHeadActor, "$Revision: 1.1.2.4 $");
 vtkStandardNewMacro(vtkMAFGlobalAxesHeadActor);
 
+#include "mafConfigure.h"
 //-------------------------------------------------------------------------
 vtkMAFGlobalAxesHeadActor::vtkMAFGlobalAxesHeadActor()
 {
@@ -50,16 +51,18 @@ vtkMAFGlobalAxesHeadActor::vtkMAFGlobalAxesHeadActor()
 
   std::string headABSFileName = GetHeadABSFileName();
 
-  // A file ..\Config\HelperData\3dHead.vtk containing the 3d head polydata must exists in the current working directory (to be improved)
+  // DEVELOPER MODE:
+  // 3dHead.vtk is available in MAF_DATA_ROOT\\VTK_Surfaces\\3dHead.vtk");
+
+  // DEPLOY MODE:
+  // The file ..\Config\HelperData\3dHead.vtk containing the 3d head polydata must exists in the current working directory (to be improved)
   // This is based on MAF vertical apps dir structure template which is as follows:
   // mafVerticalAppDir\bin\mafApp.exe (current working directory)
   // mafVerticalAppDir\Config\HelperData\3dHead.vtk
-  // The 3d head should be contained in [-0.5 , 0.5, -0.5, 0.5, -0.5 , 0.5] (approx head dim should be 1)
+  // The 3d head should be contained in [-0.5 , 0.5, -0.5, 0.5, -0.5 , 0.5] (approx head dim should be 1)  
   assert(FileExists(headABSFileName.c_str()));
 
-  HeadReader->SetFileName(GetHeadABSFileName().c_str());
-
-  
+  HeadReader->SetFileName(headABSFileName.c_str());
 
   HeadReader->Update();
 
@@ -198,12 +201,36 @@ void vtkMAFGlobalAxesHeadActor::PrintSelf(ostream& os, vtkIndent indent)
 
 std::string vtkMAFGlobalAxesHeadActor::GetHeadABSFileName()
 {
+
+	// search the 3dHead.vtk
+
+	// search in deploy dir (deploy scenario)
 	char buf[256];
 	vtkDirectory::GetCurrentWorkingDirectory(buf, 256);
 	std::string path = buf;
 	path.append("\\..\\Config\\HelperData\\");
 	path.append(HeadFileName);
-	return path;
+
+	bool exists = FileExists(path.c_str());
+
+	if (exists == true)
+	{
+		return path;
+	}
+	
+	// else search in MAF testing dir (developer scenario)
+	path.clear();
+	path.append(MAF_DATA_ROOT);
+	path.append("\\VTK_Surfaces\\3dHead.vtk");
+
+	exists = FileExists(path.c_str());
+
+	if (exists == true)
+	{
+		return path;
+	}
+
+	return "3dHead.vtk NOT FOUND!";
 }
 
 using namespace std;
@@ -219,7 +246,6 @@ bool vtkMAFGlobalAxesHeadActor::FileExists(const char* filename)
 		fclose(fp);
 		return true;
 	}
-	fclose(fp);
 
 	return false;
 }
