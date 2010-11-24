@@ -21,7 +21,8 @@ ADD_TEST(medResultQueryAbstractHandlerTest  ${EXECUTABLE_OUTPUT_PATH}/medResultQ
 ADD_EXECUTABLE(medRelationalDatabaseAbstractConnectorTest medRelationalDatabaseAbstractConnectorTest.h medRelationalDatabaseAbstractConnectorTest.cpp)
 ADD_TEST(medRelationalDatabaseAbstractConnectorTest  ${EXECUTABLE_OUTPUT_PATH}/medRelationalDatabaseAbstractConnectorTest)
 
-
+ADD_EXECUTABLE(medCurvilinearAbscissaOnSkeletonHelperTest medCurvilinearAbscissaOnSkeletonHelperTest.h medCurvilinearAbscissaOnSkeletonHelperTest.cpp)
+ADD_TEST(medCurvilinearAbscissaOnSkeletonHelperTest  ${EXECUTABLE_OUTPUT_PATH}/medCurvilinearAbscissaOnSkeletonHelperTest)
 
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
