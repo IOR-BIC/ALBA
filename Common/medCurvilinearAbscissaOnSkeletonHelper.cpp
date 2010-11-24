@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medCurvilinearAbscissaOnSkeletonHelper.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-03-17 15:43:16 $
-  Version:   $Revision: 1.9.2.2 $
+  Date:      $Date: 2010-11-24 14:03:01 $
+  Version:   $Revision: 1.9.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -458,10 +458,13 @@ int medCurvilinearAbscissaOnSkeletonHelper::SetCurvilinearAbscissa( vtkIdType br
   GetAbsPose(m_ConstraintVMEPolylineGraph, branchId, s, outputGizmoAbsMatrix);
   m_InputVME->SetAbsMatrix(outputGizmoAbsMatrix, -1);
   
-  // gui update
-  m_GUIActiveBranchId = branchId;
-  m_GUICurvilinearAbscissa = s;
-  m_Gui->Update();
+  if(!m_TestMode)
+  {
+    // gui update
+    m_GUIActiveBranchId = branchId;
+    m_GUICurvilinearAbscissa = s;
+    m_Gui->Update();
+  }
 
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
   return MAF_OK;
