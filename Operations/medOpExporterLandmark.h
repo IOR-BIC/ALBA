@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterLandmark.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-28 08:37:17 $
-  Version:   $Revision: 1.1 $
-  Authors:   Paolo Quadrani, Daniele Giunchi (porting MAf 2.0)
+  Date:      $Date: 2010-11-25 16:39:22 $
+  Version:   $Revision: 1.1.2.1 $
+  Authors:   Paolo Quadrani, Daniele Giunchi, Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -17,6 +17,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // Include :
 //----------------------------------------------------------------------------
 #include "mafOp.h"
+#include "mafVMELandmarkCloud.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -26,7 +27,9 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // medOpExporterLandmark :
 //----------------------------------------------------------------------------
 /** Exporter for the landmark coordinates: the data are exported in ASCII format. 
-Each raw represents a landmark and contains the (x,y,z) coordinate.*/
+Each raw represents a landmark and contains the (x,y,z) coordinate.
+The exporter can be performed on a single Landmark Cloud or on a tree containing many of them.
+In the latter case the operation exports all the LCs in the input VME sub-tree. */
 class medOpExporterLandmark: public mafOp
 {
 public:
@@ -40,8 +43,11 @@ public:
 	/** Build the interface of the operation, i.e the dialog that let choose the name of the output file. */
 	void OpRun();
 
+  /** Look for landmarks in the sub-tree */
+  int FindLandmarkClouds(mafNode* node);  
+
   /** Export landmarks contained into a mafVMELandmarkCloud.*/
-  void ExportLandmark();
+  void ExportLandmark(mafVMELandmarkCloud* cloud = NULL);
 
   /** Set the filename for the .stl to export */
   void SetFileName(const char *file_name) {m_File = file_name;};
@@ -49,5 +55,7 @@ public:
 protected:
 	wxString	m_File;
 	wxString	m_FileDir;
+
+  std::vector<mafVMELandmarkCloud*> m_LC_vector;
 };
 #endif
