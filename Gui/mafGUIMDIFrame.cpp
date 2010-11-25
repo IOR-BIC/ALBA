@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIMDIFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-11-08 09:33:04 $
-  Version:   $Revision: 1.1.2.4 $
+  Date:      $Date: 2010-11-25 13:27:57 $
+  Version:   $Revision: 1.1.2.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -54,7 +54,7 @@ class mafGUIMDIFrameCallback : public vtkCommand
 
         if(m_mode==0) // ProgressEvent-Callback
         {
-          ::wxSafeYield(); //fix on bug #2082 
+          ::wxSafeYield(NULL,true); //fix on bug #2082 
           m_Frame->ProgressBarSetVal(po->GetProgress()*100);
           //mafLogMessage("progress = %g", po->GetProgress()*100);
         }
@@ -454,7 +454,7 @@ void mafGUIMDIFrame::ProgressBarSetVal(int progress)
   {
     m_Gauge->SetValue(progress);
     SetStatusText(wxString::Format(" %d%% ",progress),3);
-    ::wxSafeYield(); //fix on bug #2082
+    ::wxSafeYield(NULL,true); //fix on bug #2082
   }
 }
 //-----------------------------------------------------------
