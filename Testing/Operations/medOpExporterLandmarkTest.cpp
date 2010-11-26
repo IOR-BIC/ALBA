@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpExporterLandmarkTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-11-26 14:32:45 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-11-26 16:27:00 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Daniele Giunchi, Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -33,6 +33,16 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <string>
 #include <assert.h>
 
+//-----------------------------------------------------------
+void medOpExporterLandmarkTest::setUp() 
+//-----------------------------------------------------------
+{
+}
+//-----------------------------------------------------------
+void medOpExporterLandmarkTest::tearDown() 
+//-----------------------------------------------------------
+{
+}
 //-----------------------------------------------------------
 void medOpExporterLandmarkTest::TestOnVmeRawMotionData() 
 //-----------------------------------------------------------
@@ -222,7 +232,6 @@ void medOpExporterLandmarkTest::TestOnLandmarkImporter()
 
 	control.close();
 	coord.clear();
-
 
 	delete exporter;
 	delete importer;

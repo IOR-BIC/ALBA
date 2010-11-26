@@ -1,17 +1,17 @@
 /*=========================================================================
 Program:   Multimod Application Framework
-Module:    $RCSfile: medOpExporterLandmarkTest.h,v $
+Module:    $RCSfile: medOpExporterLandmarkWSTest.h,v $
 Language:  C++
 Date:      $Date: 2010-11-26 16:27:00 $
-Version:   $Revision: 1.1.2.2 $
-Authors:   Daniele Giunchi, Simone Brazzale
+Version:   $Revision: 1.1.2.1 $
+Authors:   Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2004 
 CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#ifndef CPP_UNIT_medOpExporterLandmarkTEST_H
-#define CPP_UNIT_medOpExporterLandmarkTEST_H
+#ifndef CPP_UNIT_medOpExporterLandmarkWSTEST_H
+#define CPP_UNIT_medOpExporterLandmarkWSTEST_H
 
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/BriefTestProgressListener.h>
@@ -21,8 +21,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <cppunit/TestResultCollector.h>
 #include <cppunit/TestRunner.h>
 
-
-class medOpExporterLandmarkTest : public CPPUNIT_NS::TestFixture
+class medOpExporterLandmarkWSTest : public CPPUNIT_NS::TestFixture
 {
 
 public:
@@ -32,16 +31,12 @@ public:
   // CPPUNIT fixture: executed after each test
   void tearDown();
 
-  CPPUNIT_TEST_SUITE( medOpExporterLandmarkTest );
-  //CPPUNIT_TEST( TestOnVmeRawMotionData ); ///< this test is leaked for vmerawmotiondata
+  CPPUNIT_TEST_SUITE( medOpExporterLandmarkWSTest );
 	CPPUNIT_TEST( TestOnLandmarkImporter );
-  CPPUNIT_TEST( TestMultipleExports );
   CPPUNIT_TEST_SUITE_END();
 
   protected:
-    void TestOnVmeRawMotionData();
 		void TestOnLandmarkImporter();
-    void TestMultipleExports();
 };
 
 
@@ -61,7 +56,7 @@ main( int argc, char* argv[] )
 
   // Add the top suite to the test runner
   CPPUNIT_NS::TestRunner runner;
-  runner.addTest( medOpExporterLandmarkTest::suite());
+  runner.addTest( medOpExporterLandmarkWSTest::suite());
   runner.run( controller );
 
   // Print test in a compiler compatible format.

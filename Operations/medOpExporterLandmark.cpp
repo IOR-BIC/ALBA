@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterLandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-11-26 14:32:31 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2010-11-26 16:26:30 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Stefania Paperini , Daniele Giunchi, Simone Brazzale
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -26,7 +26,6 @@
 #include "mafVMELandmark.h"
 
 #include <fstream>
-#include <sstream>
 
 //----------------------------------------------------------------------------
 medOpExporterLandmark::medOpExporterLandmark(const wxString &label) :
@@ -37,6 +36,7 @@ mafOp(label)
   m_Canundo = true;
   m_File = "";
   m_FileDir = "";
+  m_LC_names.clear();
   m_LC_vector.clear();
 }
 //----------------------------------------------------------------------------
@@ -44,18 +44,21 @@ medOpExporterLandmark::~medOpExporterLandmark()
 //----------------------------------------------------------------------------
 {
   m_LC_vector.clear();
+  m_LC_names.clear();
 }
 //----------------------------------------------------------------------------
 bool medOpExporterLandmark::Accept(mafNode *node)   
 //----------------------------------------------------------------------------
 { 
   m_LC_vector.clear();
+  m_LC_names.clear();
   bool result = node && node->IsMAFType(mafVMELandmarkCloud);
   
   // Accept a Landmark Cloud ..
   if (result==true)
   {
     m_LC_vector.push_back((mafVMELandmarkCloud*)node);
+    m_LC_names.push_back(node->GetName());
     return true;
   }
   // .. or a vme with many landmark clouds as children
@@ -77,6 +80,7 @@ int medOpExporterLandmark::FindLandmarkClouds(mafNode* node)
     if (child->IsA("mafVMELandmarkCloud"))
     {
       m_LC_vector.push_back((mafVMELandmarkCloud*)child);
+      m_LC_names.push_back(child->GetName());
       result = (FindLandmarkClouds(child) || 1);
     }
     else
@@ -94,6 +98,7 @@ mafOp* medOpExporterLandmark::Copy()
   cp->m_File = m_File;
   cp->m_FileDir = m_FileDir;
   cp->m_LC_vector = m_LC_vector;
+  cp->m_LC_names = m_LC_names;
   return cp;
 }
 //----------------------------------------------------------------------------
@@ -143,12 +148,17 @@ void medOpExporterLandmark::OpRun()
     }
 
     // manage case where there are more files with the same name
-    while (true)
+    int count = 0;
+    for (std::vector<mafString>::iterator it = m_LC_names.begin(); it<m_LC_names.end(); it++)
     {
-      std::ifstream f_In(f);
-      if (!f_In)
-        break;
-
+      mafString s(cloud->GetName());
+        if (s.Compare(*it)==0)
+        {
+          count++;
+        }
+    }
+    if (count>1)
+    {
       std::stringstream out;
       out << copies;
       f = f.BeforeFirst('.');
@@ -157,7 +167,7 @@ void medOpExporterLandmark::OpRun()
       f += ".txt";
       copies++;
     }
-
+    
 	  if(!f.IsEmpty())
 	  {
 		  m_File = f;

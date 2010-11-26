@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterLandmark.h,v $
   Language:  C++
-  Date:      $Date: 2010-11-26 14:32:31 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2010-11-26 16:26:30 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Paolo Quadrani, Daniele Giunchi, Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2004
@@ -60,5 +60,6 @@ protected:
 	wxString	m_FileDir;
 
   std::vector<mafVMELandmarkCloud*> m_LC_vector;
+  std::vector<mafString> m_LC_names;
 };
 #endif
