@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpExporterLandmarkTest.h,v $
 Language:  C++
-Date:      $Date: 2008-04-28 08:59:56 $
-Version:   $Revision: 1.1 $
-Authors:   Daniele Giunchi
+Date:      $Date: 2010-11-26 14:32:45 $
+Version:   $Revision: 1.1.2.1 $
+Authors:   Daniele Giunchi, Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2004 
 CINECA - Interuniversity Consortium (www.cineca.it)
@@ -26,12 +26,14 @@ class medOpExporterLandmarkTest : public CPPUNIT_NS::TestFixture
 {
   CPPUNIT_TEST_SUITE( medOpExporterLandmarkTest );
   //CPPUNIT_TEST( TestOnVmeRawMotionData ); ///< this test is leaked for vmerawmotiondata
-	CPPUNIT_TEST( TestOnLandmarkImporter);
+	CPPUNIT_TEST( TestOnLandmarkImporter );
+  CPPUNIT_TEST( TestMultipleExports );
   CPPUNIT_TEST_SUITE_END();
 
   protected:
     void TestOnVmeRawMotionData();
 		void TestOnLandmarkImporter();
+    void TestMultipleExports();
 };
 
 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterLandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-11-26 13:17:28 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2010-11-26 14:32:31 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Stefania Paperini , Daniele Giunchi, Simone Brazzale
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -36,6 +36,7 @@ mafOp(label)
   m_OpType = OPTYPE_EXPORTER;
   m_Canundo = true;
   m_File = "";
+  m_FileDir = "";
   m_LC_vector.clear();
 }
 //----------------------------------------------------------------------------
@@ -91,6 +92,7 @@ mafOp* medOpExporterLandmark::Copy()
 {
   medOpExporterLandmark *cp = new medOpExporterLandmark(m_Label);
   cp->m_File = m_File;
+  cp->m_FileDir = m_FileDir;
   cp->m_LC_vector = m_LC_vector;
   return cp;
 }
@@ -124,17 +126,17 @@ void medOpExporterLandmark::OpRun()
     // SECOND CASE: Many LC to export
     else
     {
-      if (i==0)
+      if (m_FileDir.length()==0)
       {
         wxDirDialog dialog(NULL, "Choose directory where to save files:", proposed.c_str(), wxRESIZE_BORDER);
 			  dialog.SetReturnCode(wxID_OK);
 			  int ret_code = dialog.ShowModal();
 			  if (ret_code == wxID_OK)
 			  {
-				  proposed = dialog.GetPath();
+				  m_FileDir = dialog.GetPath();
         }
       }
-      f = proposed;
+      f = m_FileDir;
       f += "/LC_SET_";
       f += cloud->GetName();
       f += ".txt";

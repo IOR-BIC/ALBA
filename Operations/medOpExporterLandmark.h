@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterLandmark.h,v $
   Language:  C++
-  Date:      $Date: 2010-11-25 16:39:22 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2010-11-26 14:32:31 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Paolo Quadrani, Daniele Giunchi, Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2004
@@ -49,8 +49,11 @@ public:
   /** Export landmarks contained into a mafVMELandmarkCloud.*/
   void ExportLandmark(mafVMELandmarkCloud* cloud = NULL);
 
-  /** Set the filename for the .stl to export */
+  /** Set the filename for the file to export */
   void SetFileName(const char *file_name) {m_File = file_name;};
+
+  /** Set the filename for the directory where to export */
+  void SetDirName(const char *file_name) {m_FileDir = file_name;};
 
 protected:
 	wxString	m_File;
