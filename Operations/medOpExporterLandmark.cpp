@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterLandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-11-25 16:39:22 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2010-11-26 13:17:28 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Stefania Paperini , Daniele Giunchi, Simone Brazzale
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -26,6 +26,7 @@
 #include "mafVMELandmark.h"
 
 #include <fstream>
+#include <sstream>
 
 //----------------------------------------------------------------------------
 medOpExporterLandmark::medOpExporterLandmark(const wxString &label) :
@@ -105,6 +106,7 @@ void medOpExporterLandmark::OpRun()
 
   mafString info;
   info = "Exporting LC ";
+  int copies = 1;
 
   // For every LC stored in the vector execute the exporter
   for (int i=0; i<m_LC_vector.size();i++)
@@ -136,6 +138,22 @@ void medOpExporterLandmark::OpRun()
       f += "/LC_SET_";
       f += cloud->GetName();
       f += ".txt";
+    }
+
+    // manage case where there are more files with the same name
+    while (true)
+    {
+      std::ifstream f_In(f);
+      if (!f_In)
+        break;
+
+      std::stringstream out;
+      out << copies;
+      f = f.BeforeFirst('.');
+      f += "_renamed_";
+      f += out.str().c_str();
+      f += ".txt";
+      copies++;
     }
 
 	  if(!f.IsEmpty())
