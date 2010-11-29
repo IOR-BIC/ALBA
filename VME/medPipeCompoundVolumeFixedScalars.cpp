@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeCompoundVolumeFixedScalars.cpp,v $ 
   Language: C++ 
-  Date: $Date: 2009-06-08 15:10:54 $ 
-  Version: $Revision: 1.1.2.1 $ 
+  Date: $Date: 2010-11-29 13:18:46 $ 
+  Version: $Revision: 1.1.2.2 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -97,7 +97,7 @@ mafCxxTypeMacro(medPipeCompoundVolumeVR);
   medGUIDynamicVP* page = NULL;
   if (m_FirstPage != NULL)
     page = m_FirstPage;
-  else if (m_Notebook->GetPageCount() > 0)
+  else if (m_Notebook && m_Notebook->GetPageCount() > 0)
     page = (medGUIDynamicVP*)m_Notebook->GetPage(0);
     
   mafPipe* pipe;
