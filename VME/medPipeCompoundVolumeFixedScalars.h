@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeCompoundVolumeFixedScalars.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-06-09 16:04:32 $ 
-  Version: $Revision: 1.1.2.2 $ 
+  Date: $Date: 2010-11-29 13:18:12 $ 
+  Version: $Revision: 1.1.2.3 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -21,12 +21,15 @@ This class serves for a backward compatibility. */
 class medPipeCompoundVolumeFixedScalars : public medPipeCompoundVolume
 {
 public:
+  /** RTTI macro */
   mafTypeMacro(medPipeCompoundVolumeFixedScalars, medPipeCompoundVolume);
 
-public:	
+public:
+  /** constructor */
   medPipeCompoundVolumeFixedScalars() {
   }
 
+  /** destructor */
   virtual ~medPipeCompoundVolumeFixedScalars () {
   }
 
@@ -64,6 +67,7 @@ protected:
 class medPipeCompoundVolumeIsosurface : public medPipeCompoundVolumeFixedScalars
 {
 public:
+  /** RTTI macro */
   mafTypeMacro(medPipeCompoundVolumeIsosurface, medPipeCompoundVolumeFixedScalars);
 
 protected:  
@@ -77,6 +81,7 @@ protected:
 class medPipeCompoundVolumeDRR : public medPipeCompoundVolumeFixedScalars
 {
 public:
+  /** RTTI macro */
   mafTypeMacro(medPipeCompoundVolumeDRR, medPipeCompoundVolumeFixedScalars);
 
 protected:  
@@ -90,6 +95,7 @@ protected:
 class medPipeCompoundVolumeMIP : public medPipeCompoundVolumeFixedScalars
 {
 public:
+  /** RTTI macro */
   mafTypeMacro(medPipeCompoundVolumeMIP, medPipeCompoundVolumeFixedScalars);
 
 protected:  
@@ -103,6 +109,7 @@ protected:
 class medPipeCompoundVolumeVR : public medPipeCompoundVolumeFixedScalars
 {
 public:
+  /** RTTI macro */
   mafTypeMacro(medPipeCompoundVolumeVR, medPipeCompoundVolumeFixedScalars);
 
 protected:  
