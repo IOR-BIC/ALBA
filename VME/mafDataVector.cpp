@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataVector.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-09-24 11:32:13 $
-  Version:   $Revision: 1.19.2.2 $
+  Date:      $Date: 2010-11-29 16:53:20 $
+  Version:   $Revision: 1.19.2.3 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -27,6 +27,7 @@
 #include <wx/wfstream.h>
 #include <wx/fs_zip.h>
 
+#include "mafZipUtility.h"
 #include "mmuTimeSet.h"
 #include "mafStorageElement.h"
 #include "mafStorage.h"
@@ -36,6 +37,8 @@
 #include "mafAttribute.h"
 
 #include <fstream>
+
+#define round(x) (x<0?ceil((x)-0.5):floor((x)+0.5))
 
 //------------------------------------------------------------------------------
 // Events
@@ -241,10 +244,56 @@ int mafDataVector::InternalStore(mafStorageElement *parent)
       // check if there is at least one item
       if (it != End())
       {
+        //////////////////////////////////////////////////////////////////////////
+        int resolvedURL = MAF_OK;
+        mafString filename;
+        resolvedURL = storage->ResolveInputURL(m_ArchiveName, filename);
+
+        if (resolvedURL == MAF_OK && wxFileExists(filename.GetCStr()))//Only if exist an archive where it is possible read the vtk data
+        {
+          mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
+          long progress = 0;
+
+          std::vector<mafString> filesExtracted = ZIPOpen(filename);
+
+          DataMap::iterator itTmp;
+          mafVMEItem *itemTmp = NULL;
+          itTmp = Begin();
+          int dataIndex = 0;
+          int step = round(this->GetNumberOfItems() / 100) + 1;
+          for (itTmp = Begin(); itTmp != End(); itTmp++)
+          {
+            if ((dataIndex % step == 0))
+            {
+              progress++;
+              mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
+            }
+            itemTmp = itTmp->second;
+            int IOmode = itemTmp->GetIOMode();
+            itemTmp->SetIOModeToDefault();
+            itemTmp->UpdateData();
+            itemTmp->SetIOMode(IOmode);
+
+            dataIndex++;
+          }
+          
+          mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)100));
+          mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
+
+          for (int i=0;i<filesExtracted.size();i++)
+          {
+            remove(filesExtracted[i]);
+          }
+        }
+
+        //////////////////////////////////////////////////////////////////////////
+
         m_ArchiveName = base_name;
         m_ArchiveName << ".";
         m_ArchiveName << m_VectorID;
         m_ArchiveName << ".z";
+
+        it = Begin();
         item = it->second;
         item->UpdateData();
         m_ArchiveName << item->GetDataFileExtension();

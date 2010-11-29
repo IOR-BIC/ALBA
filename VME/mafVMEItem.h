@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItem.h,v $
   Language:  C++
-  Date:      $Date: 2009-01-14 17:08:45 $
-  Version:   $Revision: 1.20.2.1 $
+  Date:      $Date: 2010-11-29 16:53:20 $
+  Version:   $Revision: 1.20.2.2 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -130,7 +130,7 @@ public:
     - MEMORY store into memory
   */
   virtual void SetIOMode(const int mode) {m_IOMode = mode;}
-  int GetIOMode();
+  int GetIOMode(){return m_IOMode;};
 
   void SetIOModeToDefault() {SetIOMode(DEFAULT);}
   void SetIOModeToTmpFile() {SetIOMode(TMP_FILE);}

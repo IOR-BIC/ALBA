@@ -70,6 +70,8 @@ mmuIdFactory.h
 mmuUtility.h
 vtkMAFSmartPointer.h
 vtkMAFToLinearTransform.h
+mafZipUtility.cpp
+mafZipUtility.h
 
 )
 
