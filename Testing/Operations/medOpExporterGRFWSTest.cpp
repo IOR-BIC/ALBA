@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpExporterGRFWSTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-10-07 10:03:03 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2010-11-30 10:44:45 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -56,7 +56,6 @@ void medOpExporterGRFWSTest::TestStaticAllocation()
 {
   medOpExporterGRFWS Exporter; 
 }
-
 //-----------------------------------------------------------
 void medOpExporterGRFWSTest::TestWrite() 
 //-----------------------------------------------------------
@@ -314,6 +313,7 @@ void medOpExporterGRFWSTest::TestWriteFast()
   Exporter->SetForces(forceL,forceR);
   Exporter->SetMoments(momentL,momentR);
   Exporter->WriteFast();
+  Exporter->RemoveTempFiles();
 
   wxString file;
   file.append(filename.GetCStr());
@@ -415,5 +415,185 @@ void medOpExporterGRFWSTest::TestWriteFast()
   mafDEL(forceR);
   mafDEL(momentL);
   mafDEL(momentR);
+  cppDEL(Exporter);
+}
+//-----------------------------------------------------------
+void medOpExporterGRFWSTest::TestWriteSingleVector() 
+//-----------------------------------------------------------
+{
+	medOpExporterGRFWS *Exporter = new medOpExporterGRFWS("Exporter");
+	Exporter->TestModeOn();
+	mafString filename=MED_DATA_ROOT;
+  filename << "/Test_ExporterGRFWS/test_GRF_Single.csv";
+  Exporter->SetFileName(filename.GetCStr());
+  
+  mafVMEVector* vector;
+  mafNEW(vector);
+
+  vtkMAFSmartPointer<vtkPoints> points;
+  vtkMAFSmartPointer<vtkCellArray> cellArray;
+  vtkMAFSmartPointer<vtkPolyData> force;
+  int pointId[2];
+
+  // Fill vector
+  for (int i=0; i<=10; i++)
+  {
+    points->InsertPoint(0, 0, 0, 0);
+    points->InsertPoint(1, 10+i, 10+i, 10+i);
+    pointId[0] = 0;
+    pointId[1] = 1;
+    cellArray->InsertNextCell(2, pointId);  
+    force->SetPoints(points);
+    force->SetLines(cellArray);
+    force->Update();
+
+    vector->SetData(force, i);
+    vector->Update();
+    vector->GetOutput()->GetVTKData()->Update();
+  }
+
+  // Execute Exporter
+  Exporter->SetInput(vector);
+  Exporter->SetForces(vector,NULL);
+  Exporter->WriteSingleVector();
+
+  wxString file;
+  file.append(filename.GetCStr());
+  wxFileInputStream inputFile( file );
+  wxTextInputStream text( inputFile );
+  wxString line;
+
+  // Check TAG
+  line = text.ReadLine();
+  CPPUNIT_ASSERT( line.Cmp("VECTOR")==0);
+
+  line = text.ReadLine();
+  line = text.ReadLine();
+  line = text.ReadLine();
+  line = text.ReadLine();
+
+  // Check first row
+  line = text.ReadLine();
+  wxStringTokenizer tkzName2(line,wxT(','),wxTOKEN_RET_EMPTY_ALL);
+  int num_tk = tkzName2.CountTokens();
+  CPPUNIT_ASSERT( (num_tk == 10) );
+
+  // Check fifth row
+  line = text.ReadLine();
+  line = text.ReadLine();
+  line = text.ReadLine();
+  line = text.ReadLine();
+  wxStringTokenizer tkzName3(line,wxT(','),wxTOKEN_RET_EMPTY_ALL);
+  wxString st3 = tkzName3.GetNextToken();
+  CPPUNIT_ASSERT( st3.Cmp("4") == 0);
+  st3 = tkzName3.GetNextToken();
+  CPPUNIT_ASSERT( st3.Cmp("0") == 0);
+
+  // Check last row
+  line = text.ReadLine();
+  line = text.ReadLine();
+  line = text.ReadLine();
+  line = text.ReadLine();
+  line = text.ReadLine();
+  wxStringTokenizer tkzName4(line,wxT(','),wxTOKEN_RET_EMPTY_ALL);
+  wxString st4 = tkzName4.GetNextToken();
+  CPPUNIT_ASSERT( st4.Cmp("9") == 0);
+  for (int k=0;k<7;k++)
+  {
+    st4 = tkzName4.GetNextToken();
+  }
+  CPPUNIT_ASSERT( st4.Cmp("19") == 0);
+
+  mafDEL(vector);
+  cppDEL(Exporter);
+}
+//-----------------------------------------------------------
+void medOpExporterGRFWSTest::TestWriteSingleVectorFast() 
+//-----------------------------------------------------------
+{
+  medOpExporterGRFWS *Exporter = new medOpExporterGRFWS("Exporter");
+	Exporter->TestModeOn();
+	mafString filename=MED_DATA_ROOT;
+  filename << "/Test_ExporterGRFWS/test_GRF_Single_Fast.csv";
+  Exporter->SetFileName(filename.GetCStr());
+  
+  mafVMEVector* vector;
+  mafNEW(vector);
+
+  vtkMAFSmartPointer<vtkPoints> points;
+  vtkMAFSmartPointer<vtkCellArray> cellArray;
+  vtkMAFSmartPointer<vtkPolyData> force;
+  int pointId[2];
+
+  // Fill vector
+  for (int i=0; i<=10; i++)
+  {
+    points->InsertPoint(0, 0, 0, 0);
+    points->InsertPoint(1, 10+i, 10+i, 10+i);
+    pointId[0] = 0;
+    pointId[1] = 1;
+    cellArray->InsertNextCell(2, pointId);  
+    force->SetPoints(points);
+    force->SetLines(cellArray);
+    force->Update();
+
+    vector->SetData(force, i);
+    vector->Update();
+    vector->GetOutput()->GetVTKData()->Update();
+  }
+
+  // Execute Exporter
+  Exporter->SetInput(vector);
+  Exporter->SetForces(vector,NULL);
+  Exporter->WriteSingleVector();
+
+  wxString file;
+  file.append(filename.GetCStr());
+  wxFileInputStream inputFile( file );
+  wxTextInputStream text( inputFile );
+  wxString line;
+
+  // Check TAG
+  line = text.ReadLine();
+  CPPUNIT_ASSERT( line.Cmp("VECTOR")==0);
+
+  line = text.ReadLine();
+  line = text.ReadLine();
+  line = text.ReadLine();
+  line = text.ReadLine();
+
+  // Check first row
+  line = text.ReadLine();
+  wxStringTokenizer tkzName2(line,wxT(','),wxTOKEN_RET_EMPTY_ALL);
+  int num_tk = tkzName2.CountTokens();
+  CPPUNIT_ASSERT( (num_tk == 10) );
+
+  // Check fifth row
+  line = text.ReadLine();
+  line = text.ReadLine();
+  line = text.ReadLine();
+  line = text.ReadLine();
+  wxStringTokenizer tkzName3(line,wxT(','),wxTOKEN_RET_EMPTY_ALL);
+  wxString st3 = tkzName3.GetNextToken();
+  CPPUNIT_ASSERT( st3.Cmp("4") == 0);
+  st3 = tkzName3.GetNextToken();
+  CPPUNIT_ASSERT( st3.Cmp("0") == 0);
+
+  // Check last row
+  line = text.ReadLine();
+  line = text.ReadLine();
+  line = text.ReadLine();
+  line = text.ReadLine();
+  line = text.ReadLine();
+  wxStringTokenizer tkzName4(line,wxT(','),wxTOKEN_RET_EMPTY_ALL);
+  wxString st4 = tkzName4.GetNextToken();
+  CPPUNIT_ASSERT( st4.Cmp("9") == 0);
+  for (int k=0;k<7;k++)
+  {
+    st4 = tkzName4.GetNextToken();
+  }
+  CPPUNIT_ASSERT( st4.Cmp("19") == 0);
+
+  mafDEL(vector);
   cppDEL(Exporter);
 }

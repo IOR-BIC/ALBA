@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpExporterGRFWSTest.h,v $
 Language:  C++
-Date:      $Date: 2010-10-07 10:03:03 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2010-11-30 10:44:45 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -29,6 +29,8 @@ class medOpExporterGRFWSTest : public CPPUNIT_NS::TestFixture
   CPPUNIT_TEST( TestStaticAllocation );
   CPPUNIT_TEST( TestWrite );
   CPPUNIT_TEST( TestWriteFast );
+  CPPUNIT_TEST( TestWriteSingleVector );
+  CPPUNIT_TEST( TestWriteSingleVectorFast );
   CPPUNIT_TEST_SUITE_END();
 
   protected:
@@ -36,6 +38,8 @@ class medOpExporterGRFWSTest : public CPPUNIT_NS::TestFixture
     void TestStaticAllocation();
     void TestWrite();
     void TestWriteFast();
+    void TestWriteSingleVector();
+    void TestWriteSingleVectorFast();
 };
 
 
