@@ -152,6 +152,9 @@ ADD_TEST(medOpExporterLandmarkWSTest ${EXECUTABLE_OUTPUT_PATH}/medOpExporterLand
 ADD_EXECUTABLE(medDicomSliceTest  medDicomSliceTest.h medDicomSliceTest.cpp)
 ADD_TEST(medDicomSliceTest ${EXECUTABLE_OUTPUT_PATH}/medDicomSliceTest)
 
+ADD_EXECUTABLE(medOpImporterC3DTest  medOpImporterC3DTest.h medOpImporterC3DTest.cpp)
+ADD_TEST(medOpImporterC3DTest ${EXECUTABLE_OUTPUT_PATH}/medOpImporterC3DTest)
+
 
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
