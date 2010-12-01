@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoInteractionDebugger.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 12:24:37 $
-  Version:   $Revision: 1.3.2.1 $
+  Date:      $Date: 2010-12-01 17:09:39 $
+  Version:   $Revision: 1.3.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -46,7 +46,8 @@ class medGizmoInteractionDebugger : public mafGizmoInterface
 {
 public:
 
-	medGizmoInteractionDebugger(mafNode* inputVme, mafObserver *Listener = NULL, const char *name = "GizmoPath");
+  /** inputVME is used just to put the gizmo on the vme tree: this gizmo is not moving anything but itself */
+  medGizmoInteractionDebugger(mafNode* inputVme, mafObserver *Listener = NULL, const char *name = "GizmoPath", bool testMode = false);
 
   virtual	~medGizmoInteractionDebugger();
 
@@ -85,7 +86,7 @@ protected:
 
   
 
-  void Constructor(mafNode *imputVme, mafObserver *listener, const char *name);
+  void Constructor(mafNode *imputVme, mafObserver *listener, const char *name, bool testMode = false);
   void Destructor();
 
   void CreateVMEGizmo();

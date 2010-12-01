@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoInteractionDebugger.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 12:24:37 $
-  Version:   $Revision: 1.6.2.1 $
+  Date:      $Date: 2010-12-01 17:09:39 $
+  Version:   $Revision: 1.6.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -54,9 +54,9 @@ const bool DEBUG_MODE = true;
 const double defaultLineLength = 50;
  
 
-medGizmoInteractionDebugger::medGizmoInteractionDebugger(mafNode* imputVme, mafObserver *listener, const char* name) 
+medGizmoInteractionDebugger::medGizmoInteractionDebugger(mafNode* imputVme, mafObserver *listener, const char* name, bool testMode) 
 {
-  Constructor(imputVme, listener, name);
+  Constructor(imputVme, listener, name, testMode);
 }
 
 void medGizmoInteractionDebugger::CreateInteractor()
@@ -80,7 +80,7 @@ void medGizmoInteractionDebugger::CreateInteractor()
   m_VmeGizmo->SetBehavior(m_GizmoInteractor);
 }
 
-void medGizmoInteractionDebugger::Constructor(mafNode *imputVme, mafObserver *listener, const char* name)
+void medGizmoInteractionDebugger::Constructor(mafNode *imputVme, mafObserver *listener, const char* name, bool testMode)
 {
   m_CurvilinearAbscissaHelper = NULL;
   m_VmeGizmo = NULL;
@@ -92,7 +92,7 @@ void medGizmoInteractionDebugger::Constructor(mafNode *imputVme, mafObserver *li
 
   CreateVMEGizmo();
 
-  m_CurvilinearAbscissaHelper = new medCurvilinearAbscissaOnSkeletonHelper( m_VmeGizmo, this );
+  m_CurvilinearAbscissaHelper = new medCurvilinearAbscissaOnSkeletonHelper( m_VmeGizmo, this , testMode);
 }
 //----------------------------------------------------------------------------
 void medGizmoInteractionDebugger::Destructor()
