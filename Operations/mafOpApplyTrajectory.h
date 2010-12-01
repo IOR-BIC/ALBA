@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpApplyTrajectory.h,v $
   Language:  C++
-  Date:      $Date: 2009-05-18 14:49:32 $
-  Version:   $Revision: 1.1.2.1 $
-  Authors:   Roberto Mucci
+  Date:      $Date: 2010-12-01 14:04:23 $
+  Version:   $Revision: 1.1.2.2 $
+  Authors:   Roberto Mucci, Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -17,6 +17,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // Include :
 //----------------------------------------------------------------------------
 #include "mafOp.h"
+#include "mafVME.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -26,10 +27,22 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // mafOpApplyTrajectory :
 //----------------------------------------------------------------------------
-/** Import an ACII file containig roto-tranlation information and apply a trajectory to a static VME. */
+/** Import an ACII file containig roto-tranlation information and apply a trajectory to a static VME. 
+    Modified 30/11/2010 by Simone Brazzale:
+    Added possibility to apply roto-translation from a time-varying VME to a static VME */
+
 class mafOpApplyTrajectory : public mafOp
 {
 public:
+  //----------------------------------------------------------------------------
+  // Constants:
+  //----------------------------------------------------------------------------
+  enum GUI_IDS
+  {
+    ID_OPEN_FILE = MINID,
+    ID_SELECT_VME,
+  };
+
   /** Contructor. */
 	mafOpApplyTrajectory(const wxString &label = "Apply trajectory");
 
@@ -42,14 +55,29 @@ public:
   /** Copy the operation. */
 	mafOp* Copy();
 
-  /** Return true for the acceptable vme type. */
+  /** Return true for the vme to which the trajectories should be applied. */
   bool Accept(mafNode* vme);
+
+  /** Returns true for the vme from which the trajectories should be red. (Callback function) */
+  static bool AcceptInputVME(mafNode* node);
 
 	/** Builds operation's interface. */
 	void OpRun();
 
+  /** Execute the operation. */
+  void OpDo();
+
   /** Undo operation. */
   void OpUndo(); 
+
+  /** Stop the operation. */
+  void OpStop(int result);
+
+  /** Wait for events */
+  void OnEvent(mafEventBase *maf_event);
+
+  /** Create GUI. */
+  void CreateGui();
 
   /** Read the file.
   the format of the file admits some specifics.
@@ -59,13 +87,20 @@ public:
   */
   int Read();
 
+  /** Apply transform from a time-varying VME */
+  int ApplyTrajectoriesFromVME();
+
   /** Set the filename for the file to import */
   void SetFileName(const char *file_name){m_File = file_name;};
+
+  /** Set the VME from which apply the transformation */
+  void SetVME(mafVME* vme){m_VME = vme;};
 
 protected:
 
   mafMatrix *m_OriginalMatrix;
-  wxString m_FileDir;
-	wxString m_File;
+  mafString m_FileDir;
+	mafString m_File;
+  mafVME* m_VME;
 };
 #endif
