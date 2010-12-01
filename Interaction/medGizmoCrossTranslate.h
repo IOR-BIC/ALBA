@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoCrossTranslate.h,v $
   Language:  C++
-  Date:      $Date: 2010-11-10 16:53:03 $
-  Version:   $Revision: 1.1.2.4 $
+  Date:      $Date: 2010-12-01 13:52:01 $
+  Version:   $Revision: 1.1.2.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -150,9 +150,6 @@ protected:
   
   /** Build Gizmo GUI */
   bool m_BuildGUI;
-
-  /** test friend */
-  friend class mafGizmoTranslateTest;
 
   /** register axis constraint modality */
   int m_ConstraintModality;
