@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDPoissonSurfaceReconstruction.cxx,v $
 Language:  C++
-Date:      $Date: 2010-11-17 15:59:27 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2010-12-02 11:09:31 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Fuli Wu
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -21,7 +21,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "float.h"
 
 
-vtkCxxRevisionMacro(vtkMEDPoissonSurfaceReconstruction, "$Revision: 1.1.2.3 $");
+vtkCxxRevisionMacro(vtkMEDPoissonSurfaceReconstruction, "$Revision: 1.1.2.4 $");
 vtkStandardNewMacro(vtkMEDPoissonSurfaceReconstruction);
 
 vtkDataSet* vtk_psr_input;
@@ -657,7 +657,7 @@ long long Triangulation<Real>::EdgeIndex(const int& p1,const int& p2){
 }
 
 template<class Real>
-int Triangulation<Real>::factor(const int& tIndex,int& p1,int& p2,int & p3){
+int Triangulation<Real>::Factor(const int& tIndex,int& p1,int& p2,int & p3){
 	if(triangles[tIndex].eIndex[0]<0 || triangles[tIndex].eIndex[1]<0 || triangles[tIndex].eIndex[2]<0){return 0;}
 	if(edges[triangles[tIndex].eIndex[0]].tIndex[0]==tIndex){p1=edges[triangles[tIndex].eIndex[0]].pIndex[0];}
 	else													{p1=edges[triangles[tIndex].eIndex[0]].pIndex[1];}
@@ -668,7 +668,7 @@ int Triangulation<Real>::factor(const int& tIndex,int& p1,int& p2,int & p3){
 	return 1;
 }
 template<class Real>
-double Triangulation<Real>::area(const int& p1,const int& p2,const int& p3){
+double Triangulation<Real>::Area(const int& p1,const int& p2,const int& p3){
 	Point3D<Real> q1,q2,q;
 	for(int i=0;i<3;i++){
 		q1.coords[i]=points[p2].coords[i]-points[p1].coords[i];
@@ -678,19 +678,19 @@ double Triangulation<Real>::area(const int& p1,const int& p2,const int& p3){
 	return Length(q);
 }
 template<class Real>
-double Triangulation<Real>::area(const int& tIndex){
+double Triangulation<Real>::Area(const int& tIndex){
 	int p1,p2,p3;
 	factor(tIndex,p1,p2,p3);
 	return area(p1,p2,p3);
 }
 template<class Real>
-double Triangulation<Real>::area(void){
+double Triangulation<Real>::Area(void){
 	double a=0;
 	for(int i=0;i<int(triangles.size());i++){a+=area(i);}
 	return a;
 }
 template<class Real>
-int Triangulation<Real>::addTriangle(const int& p1,const int& p2,const int& p3){
+int Triangulation<Real>::AddTriangle(const int& p1,const int& p2,const int& p3){
 	hash_map<long long,int>::iterator iter;
 	int tIdx,eIdx,p[3];
 	p[0]=p1;
@@ -730,17 +730,17 @@ int Triangulation<Real>::addTriangle(const int& p1,const int& p2,const int& p3){
 	return tIdx;
 }
 template<class Real>
-int Triangulation<Real>::flipMinimize(const int& eIndex){
+int Triangulation<Real>::FlipMinimize(const int& eIndex){
 	double oldArea,newArea;
 	int oldP[3],oldQ[3],newP[3],newQ[3];
 	TriangulationEdge newEdge;
 
 	if(edges[eIndex].tIndex[0]<0 || edges[eIndex].tIndex[1]<0){return 0;}
 
-	if(!factor(edges[eIndex].tIndex[0],oldP[0],oldP[1],oldP[2])){return 0;}
-	if(!factor(edges[eIndex].tIndex[1],oldQ[0],oldQ[1],oldQ[2])){return 0;}
+	if(!this->Factor(edges[eIndex].tIndex[0],oldP[0],oldP[1],oldP[2])){return 0;}
+	if(!this->Factor(edges[eIndex].tIndex[1],oldQ[0],oldQ[1],oldQ[2])){return 0;}
 
-	oldArea=area(oldP[0],oldP[1],oldP[2])+area(oldQ[0],oldQ[1],oldQ[2]);
+	oldArea=this->Area(oldP[0],oldP[1],oldP[2])+this->Area(oldQ[0],oldQ[1],oldQ[2]);
 	int idxP,idxQ;
 	for(idxP=0;idxP<3;idxP++){
 		int i;
@@ -760,7 +760,7 @@ int Triangulation<Real>::flipMinimize(const int& eIndex){
 	newQ[1]=oldP[(idxP+2)%3];
 	newQ[2]=oldP[idxP];
 
-	newArea=area(newP[0],newP[1],newP[2])+area(newQ[0],newQ[1],newQ[2]);
+	newArea=this->Area(newP[0],newP[1],newP[2])+this->Area(newQ[0],newQ[1],newQ[2]);
 	if(oldArea<=newArea){return 0;}
 
 	// Remove the entry in the hash_table for the old edge
@@ -5840,12 +5840,12 @@ int Octree<Degree>::AddTriangles(CoredMeshData* mesh,std::vector<CoredPointIndex
 		}
 
 		// Create a fan triangulation
-		for(int i=1;i<int(edges.size())-1;i++){t.addTriangle(0,i,i+1);}
+		for(int i=1;i<int(edges.size())-1;i++){t.AddTriangle(0,i,i+1);}
 
 		// Minimize
 		while(1){
 			int i;
-			for(i=0;i<int(t.edges.size());i++){if(t.flipMinimize(i)){break;}}
+			for(i=0;i<int(t.edges.size());i++){if(t.FlipMinimize(i)){break;}}
 			if(i==t.edges.size()){break;}
 		}
 		// Add the triangles to the mesh
@@ -5853,7 +5853,7 @@ int Octree<Degree>::AddTriangles(CoredMeshData* mesh,std::vector<CoredPointIndex
 			TriangleIndex tri;
 			int idx[3];
 			int inCoreFlag=0;
-			t.factor(i,idx[0],idx[1],idx[2]);
+			t.Factor(i,idx[0],idx[1],idx[2]);
 			for(int j=0;j<3;j++){
 				tri.idx[j]=edges[idx[j]].index;
 				if(edges[idx[j]].inCore){inCoreFlag|=CoredMeshData::IN_CORE_FLAG[j];}

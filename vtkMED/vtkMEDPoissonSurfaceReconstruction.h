@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDPoissonSurfaceReconstruction.h,v $
 Language:  C++
-Date:      $Date: 2010-11-17 15:59:27 $
-Version:   $Revision: 1.1.2.8 $
+Date:      $Date: 2010-12-02 11:09:31 $
+Version:   $Revision: 1.1.2.9 $
 Authors:   Fuli Wu
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -786,23 +786,23 @@ public:
 	std::vector<TriangulationTriangle>			triangles;
 
   /** return 0 or 1 , modifying triangle points coordinate */
-	int factor(const int& tIndex,int& p1,int& p2,int& p3);
+	int Factor(const int& tIndex,int& p1,int& p2,int& p3);
   
   /** calculate total area of triangles*/
-	double area(void);
+	double Area(void);
   /** calculate area  of the triangle*/
-	double area(const int& tIndex);
+	double Area(const int& tIndex);
   /** calculate area with cross product */
-	double area(const int& p1,const int& p2,const int& p3);
+	double Area(const int& p1,const int& p2,const int& p3);
   /** flip edges in order to minimize the area of the triangle */
-	int flipMinimize(const int& eIndex);
+	int FlipMinimize(const int& eIndex);
   /** insert new triangle in the structure */
-	int addTriangle(const int& p1,const int& p2,const int& p3);
+	int AddTriangle(const int& p1,const int& p2,const int& p3);
 
 protected:
 	hash_map<long long,int> edgeMap;
 	static long long EdgeIndex(const int& p1,const int& p2);
-	double area(const Triangle& t);
+	double Area(const Triangle& t);
 };
 
 
