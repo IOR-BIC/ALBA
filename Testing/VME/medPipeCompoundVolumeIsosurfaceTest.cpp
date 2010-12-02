@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medPipeCompoundVolumeIsosurfaceTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-11-29 15:34:30 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-12-02 10:37:58 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2008
@@ -29,11 +29,11 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 #include <iostream>
 
-class DummyPipeCompoundVolumeDRR : public medPipeCompoundVolumeIsosurface
+class DummyPipeCompoundVolumeIsosurface : public medPipeCompoundVolumeIsosurface
 {
 public:
-  mafTypeMacro(DummyPipeCompoundVolumeDRR,medPipeCompoundVolumeIsosurface);
-  DummyPipeCompoundVolumeDRR(){}
+  mafTypeMacro(DummyPipeCompoundVolumeIsosurface,medPipeCompoundVolumeIsosurface);
+  DummyPipeCompoundVolumeIsosurface(){}
   void Create(mafSceneNode *n);
 protected:
   // redefinition for avoiding gui components
@@ -43,7 +43,7 @@ protected:
 };
 
 //----------------------------------------------------------------------------
-void DummyPipeCompoundVolumeDRR::Create(mafSceneNode *n)
+void DummyPipeCompoundVolumeIsosurface::Create(mafSceneNode *n)
 //----------------------------------------------------------------------------
 {
   //remove wxCursor busy;
@@ -61,7 +61,7 @@ void DummyPipeCompoundVolumeDRR::Create(mafSceneNode *n)
 }
 
 //----------------------------------------------------------------------------
-mafCxxTypeMacro(DummyPipeCompoundVolumeDRR);
+mafCxxTypeMacro(DummyPipeCompoundVolumeIsosurface);
 //----------------------------------------------------------------------------
 
 
@@ -87,7 +87,7 @@ void medPipeCompoundVolumeIsosurfaceTest::tearDown()
 void medPipeCompoundVolumeIsosurfaceTest::TestAllocation()
 //----------------------------------------------------------------------------
 {
-  DummyPipeCompoundVolumeDRR *pipe = new DummyPipeCompoundVolumeDRR;
+  DummyPipeCompoundVolumeIsosurface *pipe = new DummyPipeCompoundVolumeIsosurface;
   mafDEL(pipe);
 }
 //----------------------------------------------------------------------------
@@ -102,7 +102,7 @@ void medPipeCompoundVolumeIsosurfaceTest::TestCreateSceneNode()
   sceneNode = new mafSceneNode(NULL,NULL,volume, NULL);
 
   /////////// Pipe Instance and Creation ///////////
-  DummyPipeCompoundVolumeDRR *pipe = new DummyPipeCompoundVolumeDRR;
+  DummyPipeCompoundVolumeIsosurface *pipe = new DummyPipeCompoundVolumeIsosurface;
   pipe->Create(sceneNode);
 
   delete pipe;
@@ -124,7 +124,7 @@ void medPipeCompoundVolumeIsosurfaceTest::TestGetCurrentScalarVisualPipe()
   sceneNode = new mafSceneNode(NULL,NULL,volume, NULL);
 
   /////////// Pipe Instance and Creation ///////////
-  DummyPipeCompoundVolumeDRR *pipe = new DummyPipeCompoundVolumeDRR;
+  DummyPipeCompoundVolumeIsosurface *pipe = new DummyPipeCompoundVolumeIsosurface;
   pipe->Create(sceneNode);
 
   //smoke test
