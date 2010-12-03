@@ -150,6 +150,9 @@ ADD_TEST(medPipeCompoundVolumeDRRTest ${EXECUTABLE_OUTPUT_PATH}/medPipeCompoundV
 ADD_EXECUTABLE(medPipeCompoundVolumeIsosurfaceTest  medPipeCompoundVolumeIsosurfaceTest.h medPipeCompoundVolumeIsosurfaceTest.cpp)
 ADD_TEST(medPipeCompoundVolumeIsosurfaceTest ${EXECUTABLE_OUTPUT_PATH}/medPipeCompoundVolumeIsosurfaceTest)
 
+ADD_EXECUTABLE(mafVMEVolumeLargeUtilsTest  mafVMEVolumeLargeUtilsTest.h mafVMEVolumeLargeUtilsTest.cpp)
+ADD_TEST(mafVMEVolumeLargeUtilsTest ${EXECUTABLE_OUTPUT_PATH}/mafVMEVolumeLargeUtilsTest)
+
 #to be checked
 #ADD_EXECUTABLE(medPipeVolumeVRTest medPipeVolumeVRTest.h medPipeVolumeVRTest.cpp)
 #ADD_TEST(medPipeVolumeVRTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeVolumeVRTest)
