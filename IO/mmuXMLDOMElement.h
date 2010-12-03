@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmuXMLDOMElement.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-29 14:14:02 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2010-12-03 12:24:31 $
+  Version:   $Revision: 1.4.4.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -39,6 +39,7 @@
 class MAF_EXPORT mmuXMLDOMElement: public mmuUtility
 {
 public:
+  /** constructor */
   mmuXMLDOMElement( XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *element=NULL): m_XMLElement(element) {}
 
   XERCES_CPP_NAMESPACE_QUALIFIER DOMElement *m_XMLElement; ///< XML element wrapped by this object 

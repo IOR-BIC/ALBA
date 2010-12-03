@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmuXMLDOM.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-29 14:14:02 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2010-12-03 12:24:31 $
+  Version:   $Revision: 1.5.4.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -39,6 +39,7 @@
 class MAF_EXPORT mmuXMLDOM: public mmuUtility
 {
 public:
+  /** constructor */
   mmuXMLDOM(): m_XMLDoctype(NULL),m_XMLDoc(NULL),m_XMLNode(NULL), \
     m_XMLImplement(NULL),m_XMLSerializer(NULL), \
     m_XMLTarget(NULL),m_XMLParser(NULL) {}
