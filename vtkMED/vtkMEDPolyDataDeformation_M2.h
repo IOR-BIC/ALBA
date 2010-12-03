@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMEDPolyDataDeformation_M2.h,v $ 
   Language: C++ 
-  Date: $Date: 2010-06-08 08:22:42 $ 
-  Version: $Revision: 1.1.2.3 $ 
+  Date: $Date: 2010-12-03 12:05:56 $ 
+  Version: $Revision: 1.1.2.4 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -66,6 +66,8 @@ public:
 
   vtkTypeRevisionMacro(vtkMEDPolyDataDeformation_M2, vtkPolyDataToPolyDataFilter);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  friend class CMatrixTestM2;
 
 protected:
   vtkMEDPolyDataDeformation_M2();           
@@ -258,22 +260,30 @@ protected:
   template <class T>
   class CMatrix 
   {
-  public:    
-    CMatrix(int rows, int columns);    
+  public:
+    
+    /** Constructor. */
+    CMatrix(int rows, int columns);
+
+    /** Destructor. */
     ~CMatrix();
-        
+    
+    /** Get min size between num of columns and num of rows */
     inline int GetMinSize() {
       return ((m_NumOfRows < m_nNumOfCols) ? m_NumOfRows : m_nNumOfCols);
     }
 
+    /** Return the number of  columns */
     inline int GetNumberOfColumns() {
       return m_nNumOfCols;
     }
 
+    /** Return the number of rows */
     inline int GetNumberOfRows() {
       return m_NumOfRows;
     }
     
+    /** Return the control of the element (x,y) */
     inline T& operator ()(int x, int y) {  
         return m_Matrix[x][y];
     }
