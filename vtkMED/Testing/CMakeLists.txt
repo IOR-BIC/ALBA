@@ -82,6 +82,13 @@ ADD_TEST(TriangulationTriangleTest ${EXECUTABLE_OUTPUT_PATH}/TriangulationTriang
 ADD_EXECUTABLE(CMatrixTest CMatrixTest.h CMatrixTest.cpp)
 ADD_TEST(CMatrixTest ${EXECUTABLE_OUTPUT_PATH}/CMatrixTest)
 
+ADD_EXECUTABLE(CMatrixTestM1 CMatrixTestM1.h CMatrixTestM1.cpp)
+ADD_TEST(CMatrixTestM1 ${EXECUTABLE_OUTPUT_PATH}/CMatrixTestM1)
+
+ADD_EXECUTABLE(CMatrixTestM2 CMatrixTestM2.h CMatrixTestM2.cpp)
+ADD_TEST(CMatrixTestM2 ${EXECUTABLE_OUTPUT_PATH}/CMatrixTestM2)
+
+
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
 #ENDIF (MAF_USE_WX)
