@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGizmoCrossTranslateAxis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-10-22 15:56:33 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2010-12-06 17:23:19 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -143,7 +143,7 @@ void medGizmoCrossTranslateAxis::CreatePipeline()
 
 	// create the right cylinder
 	m_RightCylinder = vtkCylinderSource::New();
-	m_RightCylinder->SetRadius(d / 190);
+	m_RightCylinder->SetRadius(d / 400);
 
 	//-----------------
 	// rotate the cylinder on the X axis (default axis is Z)
@@ -183,7 +183,7 @@ void medGizmoCrossTranslateAxis::CreatePipeline()
 
   // create the left cylinder
   m_LeftCylinder = vtkCylinderSource::New();
-  m_LeftCylinder->SetRadius(d / 190);
+  m_LeftCylinder->SetRadius(d / 400);
 
   //-----------------
   // rotate the cylinder on the X axis (default axis is Z)

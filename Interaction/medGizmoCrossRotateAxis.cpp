@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoCrossRotateAxis.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-10-22 15:56:33 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2010-12-06 17:23:19 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -180,7 +180,7 @@ void medGizmoCrossRotateAxis::CreatePipeline()
   // tube filter the circle 
   m_CircleTF = vtkTubeFilter::New();
   m_CircleTF->SetInput(m_CleanCircle->GetOutput());
-  m_CircleTF->SetRadius(d / 200);
+  m_CircleTF->SetRadius(d / 400);
   m_CircleTF->SetNumberOfSides(20);
   
   // create rotation transform and rotation TPDF
