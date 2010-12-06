@@ -2,8 +2,8 @@
 Program:   @neufuse
 Module:    $RCSfile: medOpFillHoles.h,v $
 Language:  C++
-Date:      $Date: 2010-02-24 11:12:17 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2010-12-06 14:12:40 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Matteo Giacomoni, Josef Kohout
 ==========================================================================
 Copyright (c) 2007
@@ -32,6 +32,23 @@ class vtkFillingHole;
 class vtkSphereSource;
 class vtkPolyData;
 class vtkGlyph3D;
+
+//----------------------------------------------------------------------------
+// Constants:
+//----------------------------------------------------------------------------
+enum FILTER_SURFACE_ID
+{
+	ID_OK = MINID,
+	ID_CANCEL,
+	ID_FILL,
+	ID_ALL,
+	ID_SMOOTH,
+  ID_SMOOTH_TYPE,
+  ID_SMOOTH_STEPS,
+  ID_DIAMETER_LABEL,
+	ID_DIAMETER,
+  ID_UNDO,
+};
 
 /**
    class name: medOpFillHoles
@@ -65,6 +82,15 @@ public:
 
 	/** Makes the undo for the operation. */
 	/*virtual*/ void OpUndo();
+
+	/** Set manually the variable. Implemented for testing */
+  void SetFillAllHoles(int value) {if (value>1) {return;} m_AllHoles = value;};
+
+  /** Set manually the variable. Implemented for testing */
+  void SetFillAHole(int value) {if (value>1) {return;} m_SelectedPoint = value;};
+
+  /** Set manually the variable. Implemented for testing */
+  void SetDirectlyIDHole(int value) {m_PointID = value;};
 
 protected:
 	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
@@ -107,6 +133,7 @@ protected:
 	int			m_Smooth;
   int     m_SmoothType;
   int     m_ThinPlateSmoothingSteps;
+  int     m_PointID;
 
 	double	m_Diameter;
 

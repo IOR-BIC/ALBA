@@ -2,8 +2,8 @@
 Program:   @neufuse
 Module:    $RCSfile: medOpFillHoles.cpp,v $
 Language:  C++
-Date:      $Date: 2009-07-02 08:15:31 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2010-12-06 14:12:40 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Matteo Giacomoni, Josef Kohout
 ==========================================================================
 Copyright (c) 2007
@@ -81,6 +81,7 @@ mafOp(label)
 	m_AllHoles	= 0;
 	m_Smooth		= 0;
 	m_Diameter	= 100.0;
+  m_PointID = -1;
 
   m_SmoothType = 1;
   m_ThinPlateSmoothingSteps = 500;
@@ -96,6 +97,11 @@ medOpFillHoles::~medOpFillHoles()
   m_VTKResult.clear();
 
 	vtkDEL(m_OriginalPolydata);
+
+  if (m_ExctractHole)
+  {
+    vtkDEL(m_ExctractHole);
+  }
 }
 //----------------------------------------------------------------------------
 bool medOpFillHoles::Accept(mafNode *node)
@@ -109,22 +115,6 @@ mafOp *medOpFillHoles::Copy()
 {
 	return (new medOpFillHoles(m_Label));
 }
-//----------------------------------------------------------------------------
-// Constants:
-//----------------------------------------------------------------------------
-enum FILTER_SURFACE_ID
-{
-	ID_OK = MINID,
-	ID_CANCEL,
-	ID_FILL,
-	ID_ALL,
-	ID_SMOOTH,
-  ID_SMOOTH_TYPE,
-  ID_SMOOTH_STEPS,
-  ID_DIAMETER_LABEL,
-	ID_DIAMETER,
-  ID_UNDO,
-};
 //----------------------------------------------------------------------------
 void medOpFillHoles::OpRun()   
 //----------------------------------------------------------------------------
@@ -144,13 +134,16 @@ void medOpFillHoles::OpRun()
 
 	// interface:
 	int result = OP_RUN_CANCEL;
-	CreateOpDialog();
-	int ret_dlg = m_Dialog->ShowModal();
-	if( ret_dlg == wxID_OK )
-	{
-		result = OP_RUN_OK;
-	}
-	DeleteOpDialog();
+  if (!m_TestMode)
+  {
+	  CreateOpDialog();
+	  int ret_dlg = m_Dialog->ShowModal();
+	  if( ret_dlg == wxID_OK )
+	  {
+		  result = OP_RUN_OK;
+	  }
+	  DeleteOpDialog();
+  }
 
 	mafEventMacro(mafEvent(this,result));
 }
@@ -387,7 +380,10 @@ void medOpFillHoles::CreateOpDialog()
 void medOpFillHoles::Fill()
 //----------------------------------------------------------------------------
 {
-  wxBusyCursor busy;
+  if (!m_TestMode)
+  {
+    wxBusyCursor busy;
+  }
 
 	//fill the boundary polydata
 	vtkMEDFillingHole *fillingHoleFilter;
@@ -405,14 +401,21 @@ void medOpFillHoles::Fill()
     //there might be points lying outside the 3D grid => their 
     //grid cell index might be invalid and the application might crash
 
-    vtkUnstructuredGrid* pTmp = vtkUnstructuredGrid::New();
-    pTmp->SetPoints(m_VTKResult[m_VTKResult.size()-1]->GetPoints());
-    int pointID = pTmp->FindPoint(m_ExctractHole->GetOutput()->GetPoint(0));
-    pTmp->Delete();
-  
-    /*int pointID = m_VTKResult[m_VTKResult.size()-1]
-      ->FindPoint(m_ExctractHole->GetOutput()->GetPoint(0));*/
-		fillingHoleFilter->SetFillAHole(pointID);  
+    //Simone Brazzale: 06/12/2010 - Implemented test case
+    if (m_PointID==-1)
+    {
+      // Real case
+      vtkUnstructuredGrid* pTmp = vtkUnstructuredGrid::New();
+      pTmp->SetPoints(m_VTKResult[m_VTKResult.size()-1]->GetPoints());
+      int pointID = pTmp->FindPoint(m_ExctractHole->GetOutput()->GetPoint(0));
+      pTmp->Delete();
+		  fillingHoleFilter->SetFillAHole(pointID);  
+    }
+    else
+    {
+      // Test case
+      fillingHoleFilter->SetFillAHole(m_PointID);  
+    }
 	}
 	
 	if (!m_Smooth)
@@ -435,24 +438,27 @@ void medOpFillHoles::Fill()
   newPoly->Update();
   m_VTKResult.push_back(newPoly);
 
-  m_ButtonUndo->Enable(m_VTKResult.size()>1);
+  if (!m_TestMode)
+  {
+    m_ButtonUndo->Enable(m_VTKResult.size()>1);
 
-  m_MapperSurface->SetInput(m_VTKResult[m_VTKResult.size()-1]);
-  m_MapperSurface->Update();
+    m_MapperSurface->SetInput(m_VTKResult[m_VTKResult.size()-1]);
+    m_MapperSurface->Update();
 
-  m_ExctractFreeEdges->SetInput(m_VTKResult[m_VTKResult.size()-1]);
-  m_ExctractFreeEdges->Update();
+    m_ExctractFreeEdges->SetInput(m_VTKResult[m_VTKResult.size()-1]);
+    m_ExctractFreeEdges->Update();
 
-	m_Rwi->m_RenFront->RemoveActor(m_ActorSelectedHole);
-	m_SelectedPoint = false;
+	  m_Rwi->m_RenFront->RemoveActor(m_ActorSelectedHole);
 
-	this->m_Rwi->CameraUpdate();
+	  this->m_Rwi->CameraUpdate();
 
-	m_ButtonOk->Enable(true);
-	m_ButtonFill->Enable(m_SelectedPoint);
+	  m_ButtonOk->Enable(true);
+	  m_ButtonFill->Enable(m_SelectedPoint);
+  }
+  m_SelectedPoint = false;
+  m_PointID = -1;
 
 	vtkDEL(fillingHoleFilter);
-	
 }
 //----------------------------------------------------------------------------
 void medOpFillHoles::SelectHole(int pointID)
