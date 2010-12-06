@@ -158,6 +158,9 @@ ADD_TEST(medOpImporterC3DTest ${EXECUTABLE_OUTPUT_PATH}/medOpImporterC3DTest)
 ADD_EXECUTABLE(medOpImporterMotionDataTest  medOpImporterMotionDataTest.h medOpImporterMotionDataTest.cpp)
 ADD_TEST(medOpImporterMotionDataTest ${EXECUTABLE_OUTPUT_PATH}/medOpImporterMotionDataTest)
 
+ADD_EXECUTABLE(medOpFillHolesTest  medOpFillHolesTest.h medOpFillHolesTest.cpp)
+ADD_TEST(medOpFillHolesTest ${EXECUTABLE_OUTPUT_PATH}/medOpFillHolesTest)
+
 
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
