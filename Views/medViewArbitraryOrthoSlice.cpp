@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2010-11-22 11:04:58 $
-Version:   $Revision: 1.1.2.25 $
+Date:      $Date: 2010-12-06 16:58:06 $
+Version:   $Revision: 1.1.2.26 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -1651,6 +1651,10 @@ void medViewArbitraryOrthoSlice::OnReset()
 
 		RestoreCameraParametersForAllSubviews();
 
+		UpdateXView2DActors();
+		UpdateYView2DActors();
+		UpdateZView2DActors();
+
 		mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 
 		//update the normal of the cutter plane of the surface
@@ -2507,40 +2511,44 @@ void medViewArbitraryOrthoSlice::OnLayout()
 
 }
 
-void medViewArbitraryOrthoSlice::OnLayoutInternal( wxSize &size )
+void medViewArbitraryOrthoSlice::OnLayoutInternal( wxSize &windowSize )
 {
+	int		defaultTextWidth		= 127;
+	int		defaultTextShiftX		= 20;
+	int		defaultTextFontSize	= 4;
+	double	numCharsInWindowLength				= 1.0;
 
-	int		iDefaultWidth		= 127;
-	int		iDefaultShiftX		= 20;
-	int		iDefaultFontSize	= 12;
-	double	dRatio				= 1.0;
+	int textFontSize				= 4;
+	int textShiftXLeft					= 10;
 
-	int iFontSize				= 12;
-	int iShiftX					= 20;
+	double textHeigth = 0.70 * windowSize.GetHeight();
 
-	dRatio =  (double)(size.GetWidth()) / (double)(iDefaultWidth);
-	iFontSize = (int)(iDefaultFontSize * dRatio +0.5);
 
-	if (iFontSize < iDefaultFontSize )
-		iFontSize = iDefaultFontSize;
+	numCharsInWindowLength =  (double)(windowSize.GetWidth()) / (double)(defaultTextWidth);
+	textFontSize = (int)(defaultTextFontSize * numCharsInWindowLength +0.5);
 
-	m_TextMapperLeftXView->GetTextProperty()->SetFontSize(iFontSize);
-	m_TextActorLeftXView->SetPosition(iShiftX, size.GetHeight() / 2);
+	if (textFontSize < defaultTextFontSize )
+		textFontSize = defaultTextFontSize;
 
-	m_TextMapperRightXView->GetTextProperty()->SetFontSize(iFontSize);
-	m_TextActorRightXView->SetPosition(size.GetWidth() - iFontSize -iShiftX, size.GetHeight() / 2);
+	double textShiftXRight = windowSize.GetWidth() - textFontSize -textShiftXLeft;
 
-	m_TextMapperLeftYView->GetTextProperty()->SetFontSize(iFontSize);
-	m_TextActorLeftYView->SetPosition(iShiftX, size.GetHeight() / 2);
+	m_TextMapperLeftXView->GetTextProperty()->SetFontSize(textFontSize);
+	m_TextActorLeftXView->SetPosition(textShiftXLeft, textHeigth);
 
-	m_TextMapperRightYView->GetTextProperty()->SetFontSize(iFontSize);
-	m_TextActorRightYView->SetPosition(size.GetWidth() - iFontSize -iShiftX, size.GetHeight() / 2);
+	m_TextMapperRightXView->GetTextProperty()->SetFontSize(textFontSize);
+	m_TextActorRightXView->SetPosition(textShiftXRight, textHeigth);
 
-	m_TextMapperLeftZView->GetTextProperty()->SetFontSize(iFontSize);
-	m_TextActorLeftZView->SetPosition(iShiftX, size.GetHeight() / 2);
+	m_TextMapperLeftYView->GetTextProperty()->SetFontSize(textFontSize);
+	m_TextActorLeftYView->SetPosition(textShiftXLeft, textHeigth);
 
-	m_TextMapperRightZView->GetTextProperty()->SetFontSize(iFontSize);
-	m_TextActorRightZView->SetPosition(size.GetWidth() - iFontSize -iShiftX, size.GetHeight() / 2);
+	m_TextMapperRightYView->GetTextProperty()->SetFontSize(textFontSize);
+	m_TextActorRightYView->SetPosition(textShiftXRight, textHeigth);
+
+	m_TextMapperLeftZView->GetTextProperty()->SetFontSize(textFontSize);
+	m_TextActorLeftZView->SetPosition(textShiftXLeft, textHeigth);
+
+	m_TextMapperRightZView->GetTextProperty()->SetFontSize(textFontSize);
+	m_TextActorRightZView->SetPosition(textShiftXRight, textHeigth);
 
 }
 

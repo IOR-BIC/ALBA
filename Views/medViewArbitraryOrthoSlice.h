@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.h,v $
 Language:  C++
-Date:      $Date: 2010-11-22 11:04:58 $
-Version:   $Revision: 1.1.2.16 $
+Date:      $Date: 2010-12-06 16:58:06 $
+Version:   $Revision: 1.1.2.17 $
 Authors:   Stefano Perticoni	
 ==========================================================================
 Copyright (c) 2002/2004
@@ -109,7 +109,7 @@ public:
 
 	virtual void OnLayout();
 
-	void OnLayoutInternal( wxSize &size );
+	void OnLayoutInternal( wxSize &windowSize );
 
 protected:
 
