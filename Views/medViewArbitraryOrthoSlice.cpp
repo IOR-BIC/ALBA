@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2010-12-06 16:58:06 $
-Version:   $Revision: 1.1.2.26 $
+Date:      $Date: 2010-12-07 09:14:35 $
+Version:   $Revision: 1.1.2.27 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -1395,8 +1395,10 @@ void medViewArbitraryOrthoSlice::ShowMafVMEVolume( mafVME * vme, bool show )
 	mafViewVTK *xView = ((mafViewVTK *)(m_ChildViewList[X_VIEW])) ;
 	assert(xView);
 
-  // fuzzy picking
-  xView->GetPicker2D()->SetTolerance(0.05);
+	double pickerTolerance = 0.02;
+
+	// fuzzy picking
+	xView->GetPicker2D()->SetTolerance(pickerTolerance);
 
 	xView->GetSceneGraph()->m_AlwaysVisibleRenderer->AddActor2D(m_TextActorLeftXView);
 	xView->GetSceneGraph()->m_AlwaysVisibleRenderer->AddActor2D(m_TextActorRightXView);
@@ -1404,8 +1406,8 @@ void medViewArbitraryOrthoSlice::ShowMafVMEVolume( mafVME * vme, bool show )
 	mafViewVTK *yView = ((mafViewVTK *)(m_ChildViewList[Y_VIEW])) ;
 	assert(yView);
 
-  // fuzzy picking
-  yView->GetPicker2D()->SetTolerance(0.05);
+	// fuzzy picking
+	yView->GetPicker2D()->SetTolerance(pickerTolerance);
 
 	yView->GetSceneGraph()->m_AlwaysVisibleRenderer->AddActor2D(m_TextActorLeftYView);
 	yView->GetSceneGraph()->m_AlwaysVisibleRenderer->AddActor2D(m_TextActorRightYView);
@@ -1413,8 +1415,8 @@ void medViewArbitraryOrthoSlice::ShowMafVMEVolume( mafVME * vme, bool show )
 	mafViewVTK *zView = ((mafViewVTK *)(m_ChildViewList[Z_VIEW])) ;
 	assert(zView);
 
-  // fuzzy picking
-  zView->GetPicker2D()->SetTolerance(0.05);
+	// fuzzy picking
+	zView->GetPicker2D()->SetTolerance(pickerTolerance);
 
 	zView->GetSceneGraph()->m_AlwaysVisibleRenderer->AddActor2D(m_TextActorLeftZView);
 	zView->GetSceneGraph()->m_AlwaysVisibleRenderer->AddActor2D(m_TextActorRightZView);
