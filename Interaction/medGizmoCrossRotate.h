@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoCrossRotate.h,v $
   Language:  C++
-  Date:      $Date: 2010-11-10 16:53:03 $
-  Version:   $Revision: 1.1.2.4 $
+  Date:      $Date: 2010-12-07 10:45:06 $
+  Version:   $Revision: 1.1.2.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -129,17 +129,15 @@ protected:
   void Highlight(bool highlight); 
   
   /** Array holding the three gizmo that performs rotation*/  
-  medGizmoCrossRotateAxis *m_GRCircle;
+  medGizmoCrossRotateAxis *m_GizmoCrossRotateAxis;
 
   /** The rotating fan gizmo*/
-  medGizmoCrossRotateFan *m_GRFan;
+  medGizmoCrossRotateFan *m_GizmoCrossRotateFan;
 
   /** Build Gizmo GUI */
   bool m_BuildGUI;
 
-  /** test friend */
-  friend class mafGizmoRotateTest;
-  
+
   double m_CircleFanRadius;
 
 };

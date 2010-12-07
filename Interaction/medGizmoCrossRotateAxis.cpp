@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoCrossRotateAxis.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-12-06 17:23:19 $
-  Version:   $Revision: 1.1.2.4 $
+  Date:      $Date: 2010-12-07 10:45:06 $
+  Version:   $Revision: 1.1.2.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -135,7 +135,7 @@ void medGizmoCrossRotateAxis::CreatePipeline()
 //----------------------------------------------------------------------------
 {
   // calculate diagonal of InputVme space bounds 
-  double b[6],p1[3],p2[3],d;
+  double b[6],p1[3],p2[3],boundingBoxDiagonal;
 	if(m_InputVme->IsA("mafVMEGizmo"))
 		m_InputVme->GetOutput()->GetVTKData()->GetBounds(b);
 	else
@@ -146,26 +146,29 @@ void medGizmoCrossRotateAxis::CreatePipeline()
   p2[0] = b[1];
   p2[1] = b[3];
   p2[2] = b[5];
-  d = sqrt(vtkMath::Distance2BetweenPoints(p1,p2));
+  
+  boundingBoxDiagonal = sqrt(vtkMath::Distance2BetweenPoints(p1,p2));
     
+  double min = boundingBoxDiagonal/2;
+  double max = boundingBoxDiagonal * 3;
   // create line
   m_LineSourceEast = vtkLineSource::New();
-  m_LineSourceEast->SetPoint1(d/2,0,0);
-  m_LineSourceEast->SetPoint2(d/2 * 3,0,0);
+  m_LineSourceEast->SetPoint1(min,0,0);
+  m_LineSourceEast->SetPoint2(max,0,0);
 
   m_LineSourceWest = vtkLineSource::New();
-  m_LineSourceWest->SetPoint1(-d/2,0,0);
-  m_LineSourceWest->SetPoint2(-d/2 * 3,0,0);
+  m_LineSourceWest->SetPoint1(-min,0,0);
+  m_LineSourceWest->SetPoint2(-max,0,0);
 
   m_LineSourceNorth = vtkLineSource::New();
-  m_LineSourceNorth->SetPoint1(0,d/2,0);
-  m_LineSourceNorth->SetPoint2(0,d/2 * 3,0);
+  m_LineSourceNorth->SetPoint1(0,min,0);
+  m_LineSourceNorth->SetPoint2(0,max,0);
   
   m_LineSourceSouth = vtkLineSource::New();
-  m_LineSourceSouth->SetPoint1(0,-d/2,0);
-  m_LineSourceSouth->SetPoint2(0,-d/2 * 3,0);
+  m_LineSourceSouth->SetPoint1(0,-min,0);
+  m_LineSourceSouth->SetPoint2(0,-max,0);
 
-  m_Radius = d / 2;
+  m_Radius = boundingBoxDiagonal / 2;
 
   m_AppendPolyData = vtkAppendPolyData::New();
   m_AppendPolyData->AddInput(m_LineSourceEast->GetOutput());
@@ -180,7 +183,10 @@ void medGizmoCrossRotateAxis::CreatePipeline()
   // tube filter the circle 
   m_CircleTF = vtkTubeFilter::New();
   m_CircleTF->SetInput(m_CleanCircle->GetOutput());
-  m_CircleTF->SetRadius(d / 400);
+
+  double tubeRadius = boundingBoxDiagonal / 350;
+
+  m_CircleTF->SetRadius(tubeRadius);
   m_CircleTF->SetNumberOfSides(20);
   
   // create rotation transform and rotation TPDF

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoCrossTranslatePlane.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-12-06 17:23:19 $
-  Version:   $Revision: 1.1.2.4 $
+  Date:      $Date: 2010-12-07 10:45:06 $
+  Version:   $Revision: 1.1.2.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -153,7 +153,7 @@ void medGizmoCrossTranslatePlane::CreatePipeline()
 //----------------------------------------------------------------------------
 {
   // calculate diagonal of InputVme space bounds 
-  double b[6],p1[3],p2[3],d;
+  double b[6],p1[3],p2[3],boundingBoxDiagonal;
 	if(m_InputVme->IsA("mafVMEGizmo"))
 		m_InputVme->GetOutput()->GetVTKData()->GetBounds(b);
 	else
@@ -164,7 +164,7 @@ void medGizmoCrossTranslatePlane::CreatePipeline()
   p2[0] = b[1];
   p2[1] = b[3];
   p2[2] = b[5];
-  d = sqrt(vtkMath::Distance2BetweenPoints(p1,p2));
+  boundingBoxDiagonal = sqrt(vtkMath::Distance2BetweenPoints(p1,p2));
 
   /*
         z
@@ -203,14 +203,16 @@ void medGizmoCrossTranslatePlane::CreatePipeline()
   {
     m_LineTF[i] = vtkTubeFilter::New();
     m_LineTF[i]->SetInput(m_Line[i]->GetOutput());
-    m_LineTF[i]->SetRadius(d / 400);
+    
+	double tubeRadius = boundingBoxDiagonal/350;
+	m_LineTF[i]->SetRadius(tubeRadius);
     m_LineTF[i]->SetNumberOfSides(20);
   }
 
   //-----------------
   // update segments and square dimension based on vme bb diagonal
   //-----------------
-  this->SetSizeLength(d / 4);
+  this->SetSizeLength(boundingBoxDiagonal / 4);
 
   //-----------------
   m_RotationTr = vtkTransform::New();

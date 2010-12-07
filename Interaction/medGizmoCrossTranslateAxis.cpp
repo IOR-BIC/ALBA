@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGizmoCrossTranslateAxis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-12-06 17:23:19 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2010-12-07 10:45:06 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -128,7 +128,7 @@ void medGizmoCrossTranslateAxis::CreatePipeline()
 {
 	// create pipeline for cone-cylinder gizmo along global X axis
 	// calculate diagonal of m_InputVme space bounds 
-	double b[6],p1[3],p2[3],d;
+	double b[6],p1[3],p2[3],boundingBoxDiagonal;
 	if(m_InputVme->IsA("mafVMEGizmo"))
 		m_InputVme->GetOutput()->GetVTKData()->GetBounds(b);
 	else
@@ -139,11 +139,13 @@ void medGizmoCrossTranslateAxis::CreatePipeline()
 	p2[0] = b[1];
 	p2[1] = b[3];
 	p2[2] = b[5];
-	d = sqrt(vtkMath::Distance2BetweenPoints(p1,p2));
+	boundingBoxDiagonal = sqrt(vtkMath::Distance2BetweenPoints(p1,p2));
 
 	// create the right cylinder
 	m_RightCylinder = vtkCylinderSource::New();
-	m_RightCylinder->SetRadius(d / 400);
+
+	double tubeRadius = boundingBoxDiagonal / 350;
+	m_RightCylinder->SetRadius(tubeRadius);
 
 	//-----------------
 	// rotate the cylinder on the X axis (default axis is Z)
@@ -157,7 +159,7 @@ void medGizmoCrossTranslateAxis::CreatePipeline()
 
 	// create the translation transform
 	m_RightTranslateTr = vtkTransform::New();
-  m_RightTranslateTr->Translate(3* d / 8, 0, 0);
+  m_RightTranslateTr->Translate(3* boundingBoxDiagonal / 8, 0, 0);
 
 	// create cylinder translation transform
 	m_RightTranslatePDF = vtkTransformPolyDataFilter::New();
@@ -183,7 +185,8 @@ void medGizmoCrossTranslateAxis::CreatePipeline()
 
   // create the left cylinder
   m_LeftCylinder = vtkCylinderSource::New();
-  m_LeftCylinder->SetRadius(d / 400);
+
+  m_LeftCylinder->SetRadius(tubeRadius);
 
   //-----------------
   // rotate the cylinder on the X axis (default axis is Z)
@@ -197,14 +200,14 @@ void medGizmoCrossTranslateAxis::CreatePipeline()
 
   // create the translation transform
   m_LeftTranslateTr = vtkTransform::New();
-  m_LeftTranslateTr->Translate( - 3* d / 8, 0, 0);
+  m_LeftTranslateTr->Translate( - 3* boundingBoxDiagonal / 8, 0, 0);
 
   // create cylinder translation transform
   m_LeftTranslatePDF = vtkTransformPolyDataFilter::New();
   m_LeftTranslatePDF->SetInput(LeftCylinderInitialTrPDF->GetOutput());
 
   // place the cylinder before the cone; default cylinder length is 1/4 of vme bb diagonal
-  this->SetCylinderLength(d / 16);
+  this->SetCylinderLength(boundingBoxDiagonal / 16);
 
   //-----------------
   // translate transform setting
@@ -224,7 +227,7 @@ void medGizmoCrossTranslateAxis::CreatePipeline()
   m_LeftCylinderRotatePDF->Update();
 
   // place the cylinder before the cone; default cylinder length is 1/4 of vme bb diagonal
-  this->SetCylinderLength(d / 16);
+  this->SetCylinderLength(boundingBoxDiagonal / 16);
 
   m_Append = vtkAppendPolyData::New();
   m_Append->SetInput(m_RightCylinderRotatePDF->GetOutput());

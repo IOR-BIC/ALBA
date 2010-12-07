@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGizmoCrossRotate.cpp,v $
 Language:  C++
-Date:      $Date: 2010-11-10 16:53:03 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2010-12-07 10:45:06 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -46,19 +46,19 @@ medGizmoCrossRotate::medGizmoCrossRotate(mafVME* input, mafObserver *listener, b
 	m_InputVME    = input;
 	m_Listener  = listener;
 
-	m_GRFan = NULL;
-	m_GRCircle = NULL;
+	m_GizmoCrossRotateFan = NULL;
+	m_GizmoCrossRotateAxis = NULL;
 	m_GuiGizmoRotate = NULL;
 	m_CircleFanRadius = -1;
 
 	// create the fan and send events to this
-	m_GRFan = new medGizmoCrossRotateFan(input, this);
-	m_GRFan->SetAxis(axis);
+	m_GizmoCrossRotateFan = new medGizmoCrossRotateFan(input, this);
+	m_GizmoCrossRotateFan->SetAxis(axis);
 
 	// Create mafGizmoRotateCircle and send events to the corresponding fan
-	m_GRCircle = new medGizmoCrossRotateAxis(input, m_GRFan);
-	m_GRCircle->SetAxis(axis);
-	m_GRCircle->SetMediator(this);
+	m_GizmoCrossRotateAxis = new medGizmoCrossRotateAxis(input, m_GizmoCrossRotateFan);
+	m_GizmoCrossRotateAxis->SetAxis(axis);
+	m_GizmoCrossRotateAxis->SetMediator(this);
 
 	if (m_BuildGUI)
 	{
@@ -78,8 +78,8 @@ medGizmoCrossRotate::~medGizmoCrossRotate()
 	//1 mafGizmoRotateCircle 
 	//1 mafGizmoRotateFan
 
-	cppDEL(m_GRCircle);
-	cppDEL(m_GRFan);
+	cppDEL(m_GizmoCrossRotateAxis);
+	cppDEL(m_GizmoCrossRotateFan);
 	cppDEL(m_GuiGizmoRotate);
 }
 
@@ -90,7 +90,7 @@ void medGizmoCrossRotate::OnEvent(mafEventBase *maf_event)
 	// get the sender
 	void *sender = maf_event->GetSender();
 
-	if (sender == m_GRFan)
+	if (sender == m_GizmoCrossRotateFan)
 	{
 		OnEventGizmoComponents(maf_event); // process events from fans
 	}
@@ -122,7 +122,7 @@ void medGizmoCrossRotate::OnEventGizmoComponents(mafEventBase *maf_event)
 				// if a gizmo circle has been picked
 				if (arg == mafInteractorGenericMouse::MOUSE_DOWN)
 				{
-					if (sender == m_GRFan)
+					if (sender == m_GizmoCrossRotateFan)
 					{
 						this->Highlight(true);
 					}
@@ -209,8 +209,8 @@ void medGizmoCrossRotate::OnEventGizmoGui(mafEventBase *maf_event)
 void medGizmoCrossRotate::Highlight (bool highlight) 
 //----------------------------------------------------------------------------
 {
-	m_GRCircle->Highlight(highlight);
-	m_GRFan->Show(highlight);
+	m_GizmoCrossRotateAxis->Highlight(highlight);
+	m_GizmoCrossRotateFan->Show(highlight);
 }
 
 //----------------------------------------------------------------------------  
@@ -220,8 +220,8 @@ void medGizmoCrossRotate::Show(bool show)
 	// set visibility ivar
 	m_Visibility = show;
 
-	m_GRCircle->Show(show);
-	m_GRFan->Show(show);
+	m_GizmoCrossRotateAxis->Show(show);
+	m_GizmoCrossRotateFan->Show(show);
 
 	// if auxiliary ref sys is different from vme its orientation cannot be changed
 	// so gui must not be keyable. Otherwise set gui keyability to show.
@@ -256,10 +256,10 @@ void medGizmoCrossRotate::SetAbsPose(mafMatrix *absPose, bool applyPoseToFans)
 
 	for (int i = 0; i < 3; i++)
 	{
-		m_GRCircle->SetAbsPose(tmpMatr);
+		m_GizmoCrossRotateAxis->SetAbsPose(tmpMatr);
 		if (applyPoseToFans == true)
 		{
-			m_GRFan->SetAbsPose(tmpMatr);
+			m_GizmoCrossRotateFan->SetAbsPose(tmpMatr);
 		}
 	}
 	if (m_BuildGUI) m_GuiGizmoRotate->SetAbsOrientation(tmpMatr);
@@ -269,7 +269,7 @@ void medGizmoCrossRotate::SetAbsPose(mafMatrix *absPose, bool applyPoseToFans)
 mafMatrix *medGizmoCrossRotate::GetAbsPose()
 //----------------------------------------------------------------------------
 {
-	return m_GRCircle->GetAbsPose();
+	return m_GizmoCrossRotateAxis->GetAbsPose();
 }
 
 //----------------------------------------------------------------------------  
@@ -278,8 +278,8 @@ void medGizmoCrossRotate::SetInput(mafVME *input)
 {
 	m_InputVME = input;
 
-	m_GRCircle->SetInput(input);
-	m_GRFan->SetInput(input);
+	m_GizmoCrossRotateAxis->SetInput(input);
+	m_GizmoCrossRotateFan->SetInput(input);
 
 }
 
@@ -287,7 +287,7 @@ void medGizmoCrossRotate::SetInput(mafVME *input)
 mafInteractorGenericInterface *medGizmoCrossRotate::GetInteractor(int axis)
 //----------------------------------------------------------------------------  
 {
-	return m_GRCircle->GetInteractor();
+	return m_GizmoCrossRotateAxis->GetInteractor();
 }
 
 //----------------------------------------------------------------------------
@@ -362,7 +362,7 @@ void medGizmoCrossRotate::SetCircleFanRadius(double radius)
 	short circleNumber;
 
 	//  if(m_GRCircle) m_GRCircle->SetRadius(radius);
-	if(m_GRFan) m_GRFan->SetRadius(radius);
+	if(m_GizmoCrossRotateFan) m_GizmoCrossRotateFan->SetRadius(radius);
 
 	m_CircleFanRadius = radius;
 }
@@ -381,22 +381,22 @@ void medGizmoCrossRotate::SetAutoscale( bool autoscale )
 {
 	mafGizmoInterface::SetAutoscale(autoscale);
 
-	m_GRFan->SetAutoscale(autoscale);
-	m_GRCircle->SetAutoscale(autoscale);
+	m_GizmoCrossRotateFan->SetAutoscale(autoscale);
+	m_GizmoCrossRotateAxis->SetAutoscale(autoscale);
 }
 
 void medGizmoCrossRotate::SetAlwaysVisible( bool alwaysVisible )
 {
 	mafGizmoInterface::SetAlwaysVisible(alwaysVisible);
 
-	m_GRFan->SetAlwaysVisible(alwaysVisible);
-	m_GRCircle->SetAlwaysVisible(alwaysVisible);
+	m_GizmoCrossRotateFan->SetAlwaysVisible(alwaysVisible);
+	m_GizmoCrossRotateAxis->SetAlwaysVisible(alwaysVisible);
 }
 
 void medGizmoCrossRotate::SetRenderWindowHeightPercentage(double percentage)
 {
 	mafGizmoInterface::SetRenderWindowHeightPercentage(percentage);
 
-	m_GRFan->SetRenderWindowHeightPercentage(percentage);
-	m_GRCircle->SetRenderWindowHeightPercentage(percentage);
+	m_GizmoCrossRotateFan->SetRenderWindowHeightPercentage(percentage);
+	m_GizmoCrossRotateAxis->SetRenderWindowHeightPercentage(percentage);
 }

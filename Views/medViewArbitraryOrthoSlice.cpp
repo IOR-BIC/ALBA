@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2010-12-07 09:14:35 $
-Version:   $Revision: 1.1.2.27 $
+Date:      $Date: 2010-12-07 10:45:16 $
+Version:   $Revision: 1.1.2.28 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -1395,7 +1395,7 @@ void medViewArbitraryOrthoSlice::ShowMafVMEVolume( mafVME * vme, bool show )
 	mafViewVTK *xView = ((mafViewVTK *)(m_ChildViewList[X_VIEW])) ;
 	assert(xView);
 
-	double pickerTolerance = 0.02;
+	double pickerTolerance = 0.03;
 
 	// fuzzy picking
 	xView->GetPicker2D()->SetTolerance(pickerTolerance);
