@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeFactoryVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-06-12 16:34:48 $
-  Version:   $Revision: 1.13.2.6 $
+  Date:      $Date: 2010-12-09 16:43:01 $
+  Version:   $Revision: 1.13.2.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -56,6 +56,7 @@
 #include "medPipeCompoundVolumeFixedScalars.h"
 #include "medPipeVectorFieldGlyphs.h"
 #include "medPipeVectorFieldSurface.h"
+#include "medPipeVectorFieldMapWithArrows.h"
 #include "medPipeVectorFieldSlice.h"
 #include "medPipeTensorFieldGlyphs.h"
 #include "medPipeTensorFieldSurface.h"
@@ -131,6 +132,7 @@ medPipeFactoryVME::medPipeFactoryVME()
   mafPlugPipeMacro(medPipeCompoundVolumeVR, "Compound pipe for render vtk volumes with Volume Rendere cast method.");
   mafPlugPipeMacro(medPipeVectorFieldGlyphs, "Pipe for rendering of vector fields using various glyphs.");
   mafPlugPipeMacro(medPipeVectorFieldSurface, "Pipe for rendering of vector fields using color mapping on the object surface.");
+  mafPlugPipeMacro(medPipeVectorFieldMapWithArrows, "Pipe for rendering of vector and scalar fields using colored arrows mapping on the object surface.");
   mafPlugPipeMacro(medPipeVectorFieldSlice, "Pipe for rendering of vector fields using color mapping on the slice of the object.");
   mafPlugPipeMacro(medPipeTensorFieldGlyphs, "Pipe for rendering of tensor fields using glyphs.");
   mafPlugPipeMacro(medPipeTensorFieldSurface, "Pipe for rendering of tensor fields using color mapping on the object surface.");

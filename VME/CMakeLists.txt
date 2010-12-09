@@ -66,6 +66,8 @@ SET(PROJECT_SRCS
   
   medPipeVectorField.cpp
   medPipeVectorField.h
+  medPipeVectorFieldMapWithArrows.cpp
+  medPipeVectorFieldMapWithArrows.h
   medPipeVectorFieldGlyphs.cpp
   medPipeVectorFieldGlyphs.h
   medPipeVectorFieldSurface.cpp
