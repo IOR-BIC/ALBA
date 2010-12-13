@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGizmo.h,v $
   Language:  C++
-  Date:      $Date: 2010-09-15 16:10:25 $
-  Version:   $Revision: 1.6.2.2 $
+  Date:      $Date: 2010-12-13 13:50:38 $
+  Version:   $Revision: 1.6.2.3 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -17,7 +17,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // Include:
 //----------------------------------------------------------------------------
 #include "mafVME.h"
-#include "mafObserver.h";
+#include "mafObserver.h"
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
