@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeGizmo.h,v $
   Language:  C++
-  Date:      $Date: 2010-11-10 16:51:44 $
-  Version:   $Revision: 1.4.2.2 $
+  Date:      $Date: 2010-12-13 14:26:05 $
+  Version:   $Revision: 1.4.2.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -14,7 +14,7 @@
 #define __mafPipeGizmo_H__
 
 #include "mafPipe.h"
-#include "mafOBB.h";
+#include "mafOBB.h"
 
 //----------------------------------------------------------------------------
 // forward refs :
