@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVectorFieldMapWithArrows.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-12-09 16:43:02 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2010-12-13 13:51:29 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Simone Brazzale
 ==========================================================================
   Copyright (c) 2001/2005
@@ -66,6 +66,11 @@ medPipeVectorFieldMapWithArrows::medPipeVectorFieldMapWithArrows() : medPipeVect
   m_ShowSurface = 1;
   m_ShowGlyphs = 1;
   m_ScalingValue = 1;
+  m_EnableMap = 1;
+
+  m_GlyphRes = 6;
+  m_GlyphLength = 0.175;
+  m_GlyphRadius = 0.05;
     
   m_MappingActor = NULL;
   m_ScalarColorMappingMode = 0;
@@ -95,6 +100,8 @@ medPipeVectorFieldMapWithArrows::~medPipeVectorFieldMapWithArrows()
   m_RenFront->RemoveActor2D(m_MappingActor);  
   
   vtkDEL(m_MappingActor);
+
+  vtkDEL(m_Arrow);
   
   vtkDEL(m_Glyph);
   vtkDEL(m_GlyphActor);
@@ -121,20 +128,29 @@ mafGUI *medPipeVectorFieldMapWithArrows::CreateGui()
   
   m_Gui = new mafGUI(this);
 
+  if (nVectors==0 && nScalars==0)
+  {
+    m_Gui->Label("No vector or scalar fields to visualize.", false);
+    return m_Gui;
+  }
+
   wxBoxSizer* bSizerMain = new wxBoxSizer( wxVERTICAL );
      
   m_Gui->Divider();
-  m_Gui->Label("Vector field mapping properties:", false);
-  m_Gui->Divider();
-
+  
+  // -------------
+  // SCALAR FIELDS
+  // -------------
   if (nScalars>0)
   {
+    wxStaticBoxSizer* bSizerScalar = new wxStaticBoxSizer(new wxStaticBox( m_Gui, wxID_ANY, wxT("Scalar fields") ), wxVERTICAL );
+
     wxCheckBox* ckScalars = new wxCheckBox( m_Gui, ID_ACTIVATE_SCALARS, _("Activate scalar fields"), wxDefaultPosition, wxDefaultSize, 0 );
     ckScalars->SetToolTip( _("If checked, scalar fields are displayed.") );
-    bSizerMain->Add( ckScalars, 0, wxALL|wxEXPAND, 5 );
-
-    //add validator
     ckScalars->SetValidator(mafGUIValidator(this, ID_ACTIVATE_SCALARS, ckScalars, &m_ActivateScalars));
+
+    bSizerScalar->Add( ckScalars, 0, wxALL|wxEXPAND, 1 );
+
     if (nScalars > 1)      
     {
       wxBoxSizer* bSizer_s1 = new wxBoxSizer( wxHORIZONTAL );
@@ -143,12 +159,11 @@ mafGUI *medPipeVectorFieldMapWithArrows::CreateGui()
       m_ComboField_s = new wxComboBox( m_Gui, ID_SCALARFIELD, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY ); 
       m_ComboField_s->SetToolTip( _("Selects the scalar field to be visualized.") );
       PopulateCombo(m_ComboField_s, false);  //at least one scalar is available
-      bSizer_s1->Add( m_ComboField_s, 1, wxALL, 1 );
-      bSizerMain->Add( bSizer_s1, 0, wxEXPAND, 0 );
-
-      //and validator
       m_ComboField_s->SetValidator(mafGUIValidator(this, ID_SCALARFIELD, m_ComboField_s, &m_ScalarFieldIndex));
       m_ComboField_s->Enable(false);
+
+      bSizer_s1->Add( m_ComboField_s, 1, wxALL, 1 );
+      bSizerScalar->Add( bSizer_s1, 0, wxEXPAND, 1 );
     }
     
     wxBoxSizer* bSizer_s2 = new wxBoxSizer( wxHORIZONTAL );
@@ -157,22 +172,28 @@ mafGUI *medPipeVectorFieldMapWithArrows::CreateGui()
     m_ComboColorBy_s = new wxComboBox( m_Gui, ID_SCALAR_COLOR_MAPPING_MODE, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY );
     m_ComboColorBy_s->Append( _("Scalar value") );
     m_ComboColorBy_s->SetToolTip(_("Specifies how the specified scalar field should be mapped on to the surface.") );
-    bSizer_s2->Add( m_ComboColorBy_s, 1, wxALL, 0 );
-    bSizerMain->Add( bSizer_s2, 0, wxEXPAND, 5 );
-
-    //and validator
     m_ComboColorBy_s->SetValidator(mafGUIValidator(this, ID_SCALAR_COLOR_MAPPING_MODE, m_ComboColorBy_s, &m_ScalarColorMappingMode));
     m_ComboColorBy_s->Enable(false);
+
+    bSizer_s2->Add( m_ComboColorBy_s, 1, wxALL, 0 );
+
+    bSizerScalar->Add(bSizer_s2, 0, wxEXPAND, 1);
+    bSizerMain->Add( bSizerScalar, 0, wxEXPAND, 5 );
   }
+  // -------------
+  
+  // -------------
+  // VECTOR FIELDS
+  // -------------
   if (nVectors>0)
   {
+    wxStaticBoxSizer* bSizerVector = new wxStaticBoxSizer( new wxStaticBox( m_Gui, wxID_ANY, wxT("Vector fields") ), wxVERTICAL );
+    
     wxCheckBox* ckVectors = new wxCheckBox( m_Gui, ID_ACTIVATE_VECTORS, _("Activate vector fields"), wxDefaultPosition, wxDefaultSize, 0 );
     ckVectors->SetToolTip( _("If checked, vector fields are displayed.") );
-    bSizerMain->Add( ckVectors, 0, wxALL|wxEXPAND, 5 );
+    ckVectors->SetValidator(mafGUIValidator(this, ID_ACTIVATE_VECTORS, ckVectors, &m_ActivateVectors));
 
-    //add validator
-    ckVectors->SetValidator(mafGUIValidator(this, ID_ACTIVATE_VECTORS,       
-        ckVectors, &m_ActivateVectors));
+    bSizerVector->Add( ckVectors, 0, wxALL|wxEXPAND, 1 );
 
     if (nVectors > 1)      
     {
@@ -182,11 +203,10 @@ mafGUI *medPipeVectorFieldMapWithArrows::CreateGui()
       m_ComboField_v = new wxComboBox( m_Gui, ID_VECTORFIELD, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY ); 
       m_ComboField_v->SetToolTip( _("Selects the vector field to be visualized.") );
       PopulateCombo(m_ComboField_v, true);  //at least one vector is available
-      bSizer1->Add( m_ComboField_v, 1, wxALL, 1 );
-      bSizerMain->Add( bSizer1, 0, wxEXPAND, 0 );
-
-      //add validator
       m_ComboField_v->SetValidator(mafGUIValidator(this, ID_VECTORFIELD, m_ComboField_v, &m_VectorFieldIndex));
+
+      bSizer1->Add( m_ComboField_v, 1, wxALL, 1 );
+      bSizerVector->Add( bSizer1, 0, wxEXPAND, 1 );
     }
     
     wxBoxSizer* bSizer2 = new wxBoxSizer( wxHORIZONTAL );
@@ -198,58 +218,101 @@ mafGUI *medPipeVectorFieldMapWithArrows::CreateGui()
     m_ComboColorBy_v->Append( _("Y component") );
     m_ComboColorBy_v->Append( _("Z component") );
     m_ComboColorBy_v->SetToolTip(_("Specifies how the specified vector field should be mapped on to the surface.") );
-    bSizer2->Add( m_ComboColorBy_v, 1, wxALL, 0 );
-    bSizerMain->Add( bSizer2, 0, wxEXPAND, 5 );
-
-    //add validator
     m_ComboColorBy_v->SetValidator(mafGUIValidator(this, ID_VECTOR_COLOR_MAPPING_MODE, m_ComboColorBy_v, &m_VectorColorMappingMode));
+
+    bSizer2->Add( m_ComboColorBy_v, 1, wxALL, 0 );
+    bSizerVector->Add( bSizer2, 1, wxEXPAND, 0);
+    bSizerMain->Add( bSizerVector, 0, wxEXPAND, 5 );
   }
-  if (nVectors>0 || nScalars>0)
-  {
-    wxBoxSizer* bSizer3 = new wxBoxSizer( wxHORIZONTAL );    
-    bSizer3->Add( new wxStaticText( m_Gui, wxID_ANY, _("LUT:")), 0, wxALL, 5 );
-    mafGUILutSwatch* luts2 = new mafGUILutSwatch(m_Gui, ID_COLOR_MAPPING_LUT, wxDefaultPosition, wxSize(140, 18), wxTAB_TRAVERSAL | wxSIMPLE_BORDER );
-    luts2->SetLut(m_ColorMappingLUT);
-    luts2->SetEditable(true);
-    luts2->SetListener(this);
-    bSizer3->Add(luts2, 0, 0, 5 );
-    bSizerMain->Add( bSizer3, 1, wxEXPAND, 5 );
-  }
+  // ---------------
+
+  // ---------------
+  // VIEW PROPERTIES
+  // ---------------
+  wxStaticBoxSizer* bSizerProperties = new wxStaticBoxSizer( new wxStaticBox( m_Gui, wxID_ANY, wxT("View properties") ), wxVERTICAL );
+
+  wxCheckBox* ckEnableMap = new wxCheckBox( m_Gui, ID_ENABLE_MAP,_("Enable color mapping"), wxDefaultPosition, wxDefaultSize, 0 );
+  ckEnableMap->SetToolTip( _("If checked, glyphs and surface are colored using a mapping of the specified LUT") );
+  ckEnableMap->SetValidator(mafGUIValidator(this, ID_ENABLE_MAP, ckEnableMap, &m_EnableMap));
+
+  bSizerProperties->Add( ckEnableMap, 0, wxALL|wxEXPAND, 3 );
+
+  wxBoxSizer* bSizer3 = new wxBoxSizer( wxHORIZONTAL );    
+  bSizer3->Add( new wxStaticText( m_Gui, wxID_ANY, _("LUT:")), 0, wxALL, 5 );
+  mafGUILutSwatch* luts2 = new mafGUILutSwatch(m_Gui, ID_COLOR_MAPPING_LUT, wxDefaultPosition, wxSize(140, 18), wxTAB_TRAVERSAL | wxSIMPLE_BORDER );
+  luts2->SetLut(m_ColorMappingLUT);
+  luts2->SetEditable(true);
+  luts2->SetListener(this);
+  bSizer3->Add(luts2, 0, 0, 5 );
+  bSizerProperties->Add( bSizer3, 0, wxEXPAND, 1 );
 
   wxCheckBox* chckShowSFLegend1 = new wxCheckBox( m_Gui, ID_SHOW_COLOR_MAPPING, _("Show Color Mapping"), wxDefaultPosition, wxDefaultSize, 0 );
   chckShowSFLegend1->SetToolTip( _("If checked, mapping is displayed as a colored bar in the main view.") );
-  bSizerMain->Add( chckShowSFLegend1, 0, wxALL|wxEXPAND, 5 );
-
-  //add validator
   chckShowSFLegend1->SetValidator(mafGUIValidator(this, ID_SHOW_COLOR_MAPPING, chckShowSFLegend1, &m_ShowMapping));
+
+  bSizerProperties->Add( chckShowSFLegend1, 0, wxALL|wxEXPAND, 3 );
 
   wxCheckBox* ckShowSurface = new wxCheckBox( m_Gui, ID_SHOW_SURFACE,_("Show Surface"), wxDefaultPosition, wxDefaultSize, 0 );
   ckShowSurface->SetToolTip( _("If checked, surface is displayed in the view") );
-  bSizerMain->Add( ckShowSurface, 0, wxALL|wxEXPAND, 5 );
-
-  //add validator
   ckShowSurface->SetValidator(mafGUIValidator(this, ID_SHOW_SURFACE, ckShowSurface, &m_ShowSurface));
+
+  bSizerProperties->Add( ckShowSurface, 0, wxALL|wxEXPAND, 3 );
 
   wxCheckBox* ckShowGlyphs = new wxCheckBox( m_Gui, ID_SHOW_GLYPHS,_("Show Glyphs"), wxDefaultPosition, wxDefaultSize, 0 );
   ckShowGlyphs->SetToolTip( _("If checked, glyphs are displayed in the view") );
-  bSizerMain->Add( ckShowGlyphs, 0, wxALL|wxEXPAND, 5 );
-
-  //add validator
   ckShowGlyphs->SetValidator(mafGUIValidator(this, ID_SHOW_GLYPHS, ckShowGlyphs, &m_ShowGlyphs));
 
-  bSizerMain->Add( new wxStaticText( m_Gui, wxID_ANY, _("Scale glyphs: "), wxDefaultPosition, wxDefaultSize, 0 ), 0, wxALL, 5 );
+  bSizerProperties->Add( ckShowGlyphs, 0, wxALL|wxEXPAND, 3 );
+
+  // -----------
+  // GLYPH SHAPE
+  // -----------
+  wxStaticBoxSizer* sbSizer = new wxStaticBoxSizer( new wxStaticBox( m_Gui, wxID_ANY, _("Glyph shape") ), wxVERTICAL );
+
+  sbSizer->Add( new wxStaticText( m_Gui, wxID_ANY, _("Dimension"), wxDefaultPosition, wxDefaultSize, 0 ), 0, wxALL, 5 );
   wxBoxSizer* bSizer4 = new wxBoxSizer( wxHORIZONTAL );
   wxTextCtrl *scale_text = new wxTextCtrl(m_Gui, wxID_ANY, "", wxDefaultPosition, wxSize(30,18), wxALL);
   mafGUIFloatSlider* slider = new mafGUIFloatSlider(m_Gui,ID_SCALESLIDER,0,1,10);
   slider->SetValidator(mafGUIValidator(this, ID_SCALESLIDER, slider, &m_ScalingValue, scale_text));
-  slider->SetToolTip(_("Scale glyphs.") );
+  slider->SetToolTip(_("Change the glyphs dimensions, which will be anyway scaled by the selected scaling component.") );
   slider->SetNumberOfSteps(10);
   bSizer4->Add(scale_text, 0, wxALL, 5);
   bSizer4->Add(slider, 1, wxALL, 0);
-  bSizerMain->Add( bSizer4, 0, wxEXPAND, 0);
+  sbSizer->Add( bSizer4, 0, wxEXPAND, 3);
+
+  wxBoxSizer* bSizer5 = new wxBoxSizer( wxHORIZONTAL );
+  
+  bSizer5->Add( new wxStaticText( m_Gui, wxID_ANY, _("Radius:"), wxDefaultPosition, wxSize( 60,-1 ), 0 ), 0, wxALL, 5 );
+  wxTextCtrl* edRadius = new wxTextCtrl( m_Gui, ID_GLYPH_RADIUS);
+  edRadius->SetToolTip( _("Specifies the radius of glyph, i.e., the thickness of lines, radius of cones and arrows. ") );
+  bSizer5->Add( edRadius, 1, wxALL, 1 );
+  edRadius->SetValidator(mafGUIValidator(this, ID_GLYPH_RADIUS, edRadius, &m_GlyphRadius, 1e-8, 1000));
+
+  wxBoxSizer* bSizer51 = new wxBoxSizer( wxHORIZONTAL );
+  bSizer51->Add( new wxStaticText( m_Gui, wxID_ANY, _("Res:"), wxDefaultPosition, wxSize( 60,-1 ), 0 ), 0, wxALL, 5 );
+  wxTextCtrl* edRes = new wxTextCtrl( m_Gui, ID_GLYPH_RESOLUTION);
+  edRes->SetToolTip( _("Specifies the resolution of glyphs, i.e., number of sides of cones, etc.") );
+  bSizer51->Add( edRes, 1, wxALL, 1 );
+  edRes->SetValidator(mafGUIValidator(this, ID_GLYPH_RESOLUTION, edRes, &m_GlyphRes, 3, 100));
+
+  wxBoxSizer* bSizer52 = new wxBoxSizer( wxHORIZONTAL );
+  bSizer52->Add( new wxStaticText( m_Gui, wxID_ANY, _("Length:"), wxDefaultPosition, wxSize( 60,-1 ), 0 ), 0, wxALL, 5 );
+  wxTextCtrl* edLength = new wxTextCtrl( m_Gui, ID_GLYPH_LENGTH);
+  edLength->SetToolTip( _("Specifies the length of glyph, which will be scaled by the selected scaling component.") );
+  bSizer52->Add( edLength, 1, wxALL, 1 );
+  edLength->SetValidator(mafGUIValidator(this, ID_GLYPH_LENGTH, edLength, &m_GlyphLength, 1e-8, 1000));  
+    
+  sbSizer->Add( bSizer5, 0, wxALL, 1 );
+  sbSizer->Add( bSizer51, 0, wxALL, 1);
+  sbSizer->Add( bSizer52, 0, wxALL, 1);
+  
+  bSizerProperties->Add(sbSizer, 0, wxEXPAND, 5);
+  // ---------
+  // ---------
+  
+  bSizerMain->Add(bSizerProperties, 0, wxALL|wxEXPAND, 1);
   
   m_Gui->Add(bSizerMain);
-
   m_Gui->Update();
 
   return m_Gui;
@@ -268,6 +331,13 @@ void medPipeVectorFieldMapWithArrows::OnEvent(mafEventBase *maf_event)
       {
       case ID_ACTIVATE_SCALARS:
         {
+          if (m_ActivateVectors==0 && m_ActivateScalars==0)
+          {
+            m_ActivateScalars = !m_ActivateScalars;
+            m_Gui->Update();
+            return;
+          }
+
           m_ActivateVectors = 0;
 
           m_ComboField_s->Enable(true);
@@ -283,6 +353,13 @@ void medPipeVectorFieldMapWithArrows::OnEvent(mafEventBase *maf_event)
       break;
       case ID_ACTIVATE_VECTORS:
         {
+          if (m_ActivateVectors==0 && m_ActivateScalars==0)
+          {
+            m_ActivateVectors = !m_ActivateVectors;
+            m_Gui->Update();
+            return;
+          }
+
           m_ActivateScalars = 0;
 
           m_ComboField_s->Enable(false);
@@ -399,16 +476,16 @@ void medPipeVectorFieldMapWithArrows::CreateVTKPipe()
   float max_norm = da->GetMaxNorm();
   float scale_factor = distance/max_norm;
   
-  vtkArrowSource *arrow = vtkArrowSource::New();
-  arrow->SetTipResolution(6);
-  arrow->SetTipRadius(.1);
-  arrow->SetTipLength(.35);
-  arrow->SetShaftResolution(6);
-  arrow->SetShaftRadius(.03);
+  m_Arrow = vtkArrowSource::New();
+  m_Arrow->SetTipResolution(m_GlyphRes);
+  m_Arrow->SetTipRadius(m_GlyphRadius);
+  m_Arrow->SetTipLength(m_GlyphLength);
+  m_Arrow->SetShaftResolution(m_GlyphRes);
+  m_Arrow->SetShaftRadius(m_GlyphRadius*0.3);
 
   m_Glyph = vtkGlyph3D::New();
   m_Glyph->SetInput(m_Vme->GetOutput()->GetVTKData());        
-  m_Glyph->SetSource(arrow->GetOutput());
+  m_Glyph->SetSource(m_Arrow->GetOutput());
 
   m_Glyph->SetScaleFactor(scale_factor);
   m_Glyph->SetRange(m_SurfaceMapper->GetLookupTable()->GetRange());
@@ -434,7 +511,6 @@ void medPipeVectorFieldMapWithArrows::CreateVTKPipe()
 
   m_AssemblyFront->AddPart(m_GlyphActor); 
   
-  arrow->Delete(); 
   filter->Delete();
 }
 
@@ -488,6 +564,7 @@ void medPipeVectorFieldMapWithArrows::UpdateVTKPipe()
    
   m_ColorMappingLUT->SetTableRange(sr);
   m_SurfaceMapper->SetScalarRange(sr);
+  m_SurfaceMapper->SetScalarVisibility(m_EnableMap);
   m_SurfaceMapper->Update();  
   
   m_SurfaceActor->SetVisibility(m_ShowSurface);
@@ -501,6 +578,13 @@ void medPipeVectorFieldMapWithArrows::UpdateVTKPipe()
   nOfComponents = da->GetNumberOfComponents();
   if (nOfComponents!=1 && nOfComponents!=3)
     return;
+
+  m_Arrow->SetTipResolution(m_GlyphRes);
+  m_Arrow->SetTipRadius(m_GlyphRadius);
+  m_Arrow->SetTipLength(m_GlyphLength);
+  m_Arrow->SetShaftResolution(m_GlyphRes);
+  m_Arrow->SetShaftRadius(m_GlyphRadius*0.3);
+  m_Arrow->Update();
  
   float distance = 0;
   for (int i=0;i<ds->GetNumberOfPoints()-2;i++)
@@ -545,6 +629,7 @@ void medPipeVectorFieldMapWithArrows::UpdateVTKPipe()
 
   m_GlyphMapper->SetScalarRange(m_SurfaceMapper->GetLookupTable()->GetRange());
   m_GlyphMapper->SetLookupTable(m_ColorMappingLUT);
+  m_GlyphMapper->SetScalarVisibility(m_EnableMap);
 
   m_GlyphActor->SetVisibility(m_ShowGlyphs);
 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVectorFieldMapWithArrows.h,v $
   Language:  C++
-  Date:      $Date: 2010-12-09 16:43:02 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2010-12-13 13:51:29 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Simone Brazzale
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -17,6 +17,7 @@
 
 class mafGUI;
 
+class vtkArrowSource;
 class vtkGlyph3D;
 class vtkPolyDataMapper;
 class vtkDataSet;
@@ -50,6 +51,10 @@ protected:
     ID_ACTIVATE_SCALARS,
     ID_ACTIVATE_VECTORS,
     ID_SCALESLIDER,
+    ID_ENABLE_MAP,
+    ID_GLYPH_RADIUS,
+    ID_GLYPH_RESOLUTION,
+    ID_GLYPH_LENGTH,
     ID_LAST,
   };   
 
@@ -70,12 +75,18 @@ protected:
   int m_ShowMapping;                  ///< Non-zero, if the mapping should be displayed in the main view
   int m_ShowSurface;                  ///< Non-zero, if the surface should be displayed in the main view
   int m_ShowGlyphs;                   ///< Non-zero, if the glyphs should be displayed in the main view
+  int m_EnableMap;                    ///< Non-zero, if surface and glyphs should be colored in the main view
   int m_ScalingValue;                 ///< Scaling value for glyphs
+  float m_GlyphRadius;                ///< Glyph radius
+  int m_GlyphRes;                     ///< Glyph resolution
+  float m_GlyphLength;                ///< Glyph tip length
   
-  vtkScalarBarActor* m_MappingActor;  ///<actor that displays the mapping bar*/
+  vtkScalarBarActor* m_MappingActor;  ///< Actor that displays the mapping bar
 
-  vtkPolyDataMapper* m_SurfaceMapper;  ///< Mapper for surface
-  vtkActor* m_SurfaceActor;            ///< Actor for surface  
+  vtkPolyDataMapper* m_SurfaceMapper; ///< Mapper for surface
+  vtkActor* m_SurfaceActor;           ///< Actor for surface  
+
+  vtkArrowSource *m_Arrow;            ///< Source object for glyph
 
   vtkGlyph3D* m_Glyph;                ///< Glyph3D filter
   vtkPolyDataMapper* m_GlyphMapper;   ///< Mapper for glyphs
