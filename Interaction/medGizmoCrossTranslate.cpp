@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoCrossTranslate.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-11-10 16:53:03 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2010-12-14 17:24:37 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -37,12 +37,16 @@
 
 #include "vtkTransform.h"
 #include "vtkMatrix4x4.h"
+#include "vtkDataSet.h"
+#include "mafVMESlicer.h"
+#include "mafVMEVolumeGray.h"
 
 //----------------------------------------------------------------------------
 medGizmoCrossTranslate::medGizmoCrossTranslate(mafVME* input, mafObserver *listener, bool buildGUI, int normal)
 //----------------------------------------------------------------------------
 {
   assert(input);
+  
   m_InputVME = input;
   m_Listener = listener;
   m_BuildGUI = buildGUI;
@@ -50,6 +54,8 @@ medGizmoCrossTranslate::medGizmoCrossTranslate(mafVME* input, mafObserver *liste
   m_GTAxis1 = NULL;
   m_GTPlane = NULL;
   m_GuiGizmoTranslate = NULL;
+
+  m_ConstrainTranslationToInputVMEBounds = true;
 
   m_Normal = normal;
 
@@ -184,6 +190,59 @@ void medGizmoCrossTranslate::OnEventGizmoComponents(mafEventBase *maf_event)
             newAbsMatr->DeepCopy(currTr->GetMatrix());
             newAbsMatr->SetTimeStamp(GetAbsPose()->GetTimeStamp());
 
+			if (m_ConstrainTranslationToInputVMEBounds)
+			{
+				double slicedVolumeBounds[6];
+				
+				mafVMESlicer *slicer = NULL;
+				slicer = mafVMESlicer::SafeDownCast(m_InputVME);
+
+				assert(slicer);
+
+				mafVMEVolumeGray *slicedVolume = NULL;
+
+				slicedVolume = mafVMEVolumeGray::SafeDownCast(slicer->GetSlicedVMELink());
+				assert(slicedVolume);
+
+				slicedVolume->GetOutput()->GetVTKData()->GetBounds(slicedVolumeBounds);
+
+				double gizmoCrossCenter[3] = {0,0,0};
+				mafTransform::GetPosition(currTr->GetMatrix(), gizmoCrossCenter);
+
+				enum 
+				{
+					X,
+					Y,
+					Z,
+				};
+
+
+				enum 
+				{
+					XMIN,
+					XMAX,
+					YMIN,
+					YMAX,
+					ZMIN,
+					ZMAX,
+				};
+
+				bool outOfX = (gizmoCrossCenter[X] < slicedVolumeBounds[XMIN] ||
+					gizmoCrossCenter[X] > slicedVolumeBounds[XMAX] );
+
+				bool outOfY = (gizmoCrossCenter[Y] < slicedVolumeBounds[YMIN] ||
+					gizmoCrossCenter[Y] > slicedVolumeBounds[YMAX] );
+
+				bool outOfZ = (gizmoCrossCenter[Z] < slicedVolumeBounds[ZMIN] ||
+					gizmoCrossCenter[Z] > slicedVolumeBounds[ZMAX] );
+
+				bool outOfInputVME = outOfX || outOfY || outOfZ;
+
+				if (outOfInputVME)
+				{
+					return;
+				}
+			}
             // set the new pose to the gizmo
             SetAbsPose(newAbsMatr);
             currTr->Delete();

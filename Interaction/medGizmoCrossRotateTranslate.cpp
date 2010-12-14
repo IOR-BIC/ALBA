@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGizmoCrossRotateTranslate.cpp,v $
 Language:  C++
-Date:      $Date: 2010-12-07 10:45:06 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2010-12-14 17:24:37 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -25,6 +25,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "medGizmoCrossTranslate.h"
 #include "medGizmoCrossRotate.h"
 #include "mafEvent.h"
+#include "mafVMESlicer.h"
+#include "mafVMEVolumeGray.h"
 
 medGizmoCrossRotateTranslate::medGizmoCrossRotateTranslate()
 {
@@ -41,6 +43,18 @@ medGizmoCrossRotateTranslate::~medGizmoCrossRotateTranslate()
 
 void medGizmoCrossRotateTranslate::Create(mafVME *input, mafObserver* listener, bool BuildGUI, int normal)
 {
+	// input should be a mafVMESlicer slicing a mafVMEVolumeGray
+	mafVMESlicer *slicer = NULL;
+	slicer = mafVMESlicer::SafeDownCast(input);
+
+	assert(slicer);
+
+	mafVMEVolumeGray *slicedVolume = NULL;
+
+	slicedVolume = mafVMEVolumeGray::SafeDownCast(slicer->GetSlicedVMELink());
+	assert(slicedVolume);
+
+	
 	m_GizmoCrossTranslate = new medGizmoCrossTranslate(input, this, BuildGUI, normal);
 	m_GizmoCrossRotate = new medGizmoCrossRotate(input, this, BuildGUI, normal);
 	m_Listener = listener;

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGizmoCrossRotateTranslate.h,v $
 Language:  C++
-Date:      $Date: 2010-11-10 16:53:03 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2010-12-14 17:24:37 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -42,8 +42,9 @@ class medGizmoCrossRotate;
 
 /** 
 
- Gizmo used to perform constrained roto-translation on a given plane
-
+ Gizmo used to perform constrained roto-translation on a given plane.
+ Input must be a mafVMESlicer slicing a mafVMEVolumeGray (TO IMPROVE)
+ Movement is costrained inside the sliced volume.
 */
 class medGizmoCrossRotateTranslate : mafGizmoInterface
 {
