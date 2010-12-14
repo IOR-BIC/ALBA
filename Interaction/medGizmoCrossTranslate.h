@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoCrossTranslate.h,v $
   Language:  C++
-  Date:      $Date: 2010-12-14 17:24:37 $
-  Version:   $Revision: 1.1.2.6 $
+  Date:      $Date: 2010-12-14 17:33:06 $
+  Version:   $Revision: 1.1.2.7 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -68,7 +68,7 @@ public:
   /** Superclass override */
   void SetAlwaysVisible(bool alwaysVisible);
 
-  /** Constrain translation to Input VME bounds (default to false): the gizmo will move inside the input volume only  */
+  /** Constrain translation to Input VME bounds (default to true): the gizmo will move inside the input volume only  */
   void ConstrainTranslationToInputVMEBoundsOn() {m_ConstrainTranslationToInputVMEBounds = true;};
   void ConstrainTranslationToInputVMEBoundsOff() {m_ConstrainTranslationToInputVMEBounds = false;};
 
