@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDExtrudeToCircle.h,v $
 Language:  C++
-Date:      $Date: 2009-11-04 10:46:59 $
-Version:   $Revision: 1.4.2.4 $
+Date:      $Date: 2010-12-14 09:42:57 $
+Version:   $Revision: 1.4.2.5 $
 Authors:   Nigel McFarlane
 
 ================================================================================
@@ -208,6 +208,10 @@ protected:
 
   MeshData* m_Mesh ; // mesh structure consisting of rings of vertices
 
+  //Test classes of subclasses
+  friend class RingDataTest;
+  friend class MeshDataTest;
+
 } ;
 
 
@@ -273,5 +277,7 @@ public:
   int NumRings ;              ///< no. of rings in mesh
   RingData *Ring ;            ///< array of rings
 } ;
+
+
 
 #endif
