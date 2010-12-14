@@ -88,6 +88,12 @@ ADD_TEST(CMatrixTestM1 ${EXECUTABLE_OUTPUT_PATH}/CMatrixTestM1)
 ADD_EXECUTABLE(CMatrixTestM2 CMatrixTestM2.h CMatrixTestM2.cpp)
 ADD_TEST(CMatrixTestM2 ${EXECUTABLE_OUTPUT_PATH}/CMatrixTestM2)
 
+ADD_EXECUTABLE(RingDataTest RingDataTest.h RingDataTest.cpp)
+ADD_TEST(RingDataTest ${EXECUTABLE_OUTPUT_PATH}/RingDataTest)
+
+ADD_EXECUTABLE(MeshDataTest MeshDataTest.h MeshDataTest.cpp)
+ADD_TEST(MeshDataTest ${EXECUTABLE_OUTPUT_PATH}/MeshDataTest)
+
 
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
