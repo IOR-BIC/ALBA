@@ -94,6 +94,8 @@ ADD_TEST(RingDataTest ${EXECUTABLE_OUTPUT_PATH}/RingDataTest)
 ADD_EXECUTABLE(MeshDataTest MeshDataTest.h MeshDataTest.cpp)
 ADD_TEST(MeshDataTest ${EXECUTABLE_OUTPUT_PATH}/MeshDataTest)
 
+ADD_EXECUTABLE(vtkMEDExtrudeToCircleVertexDataTest vtkMEDExtrudeToCircleVertexDataTest.h vtkMEDExtrudeToCircleVertexDataTest.cpp)
+ADD_TEST(vtkMEDExtrudeToCircleVertexDataTest ${EXECUTABLE_OUTPUT_PATH}/vtkMEDExtrudeToCircleVertexDataTest)
 
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
