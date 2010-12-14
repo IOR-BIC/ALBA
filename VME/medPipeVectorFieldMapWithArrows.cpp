@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVectorFieldMapWithArrows.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-12-13 13:51:29 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2010-12-14 13:24:38 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Simone Brazzale
 ==========================================================================
   Copyright (c) 2001/2005
@@ -32,6 +32,7 @@
 
 #include "vtkArrowSource.h"
 #include "vtkConeSource.h"
+#include "vtkLineSource.h"
 #include "vtkGlyph3D.h"
 
 #include "vtkMAFAssembly.h"
@@ -85,10 +86,18 @@ medPipeVectorFieldMapWithArrows::medPipeVectorFieldMapWithArrows() : medPipeVect
   m_GlyphMapper = NULL;
   m_GlyphActor = NULL;
 
+  m_Arrow = NULL;
+  m_Line = NULL;
+
+  m_GlyphType = GLYPH_ARROWS;
+
   m_ComboField_s = NULL;
   m_ComboField_v = NULL;
   m_ComboColorBy_s = NULL;
   m_ComboColorBy_v = NULL;
+  m_EdRadius = NULL;
+  m_EdRes = NULL;
+  m_EdLength = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -102,6 +111,7 @@ medPipeVectorFieldMapWithArrows::~medPipeVectorFieldMapWithArrows()
   vtkDEL(m_MappingActor);
 
   vtkDEL(m_Arrow);
+  vtkDEL(m_Line);
   
   vtkDEL(m_Glyph);
   vtkDEL(m_GlyphActor);
@@ -116,6 +126,9 @@ medPipeVectorFieldMapWithArrows::~medPipeVectorFieldMapWithArrows()
   cppDEL(m_ComboField_v);
   cppDEL(m_ComboColorBy_s);
   cppDEL(m_ComboColorBy_v);
+  cppDEL(m_EdRadius);
+  cppDEL(m_EdRes);
+  cppDEL(m_EdLength);
 }
 
 
@@ -167,7 +180,7 @@ mafGUI *medPipeVectorFieldMapWithArrows::CreateGui()
     }
     
     wxBoxSizer* bSizer_s2 = new wxBoxSizer( wxHORIZONTAL );
-    bSizer_s2->Add( new wxStaticText( m_Gui, wxID_ANY, _("Map by:"), wxDefaultPosition, wxSize( 60,-1 ), 0 ), 0, wxALL, 5 );
+    bSizer_s2->Add( new wxStaticText( m_Gui, wxID_ANY, _("Color by:"), wxDefaultPosition, wxSize( 60,-1 ), 0 ), 0, wxALL, 5 );
 
     m_ComboColorBy_s = new wxComboBox( m_Gui, ID_SCALAR_COLOR_MAPPING_MODE, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY );
     m_ComboColorBy_s->Append( _("Scalar value") );
@@ -210,7 +223,7 @@ mafGUI *medPipeVectorFieldMapWithArrows::CreateGui()
     }
     
     wxBoxSizer* bSizer2 = new wxBoxSizer( wxHORIZONTAL );
-    bSizer2->Add( new wxStaticText( m_Gui, wxID_ANY, _("Map by:"), wxDefaultPosition, wxSize( 60,-1 ), 0 ), 0, wxALL, 5 );
+    bSizer2->Add( new wxStaticText( m_Gui, wxID_ANY, _("Color by:"), wxDefaultPosition, wxSize( 60,-1 ), 0 ), 0, wxALL, 5 );
 
     m_ComboColorBy_v = new wxComboBox( m_Gui, ID_VECTOR_COLOR_MAPPING_MODE,wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY );
     m_ComboColorBy_v->Append( _("Magnitude") );
@@ -231,7 +244,7 @@ mafGUI *medPipeVectorFieldMapWithArrows::CreateGui()
   // ---------------
   wxStaticBoxSizer* bSizerProperties = new wxStaticBoxSizer( new wxStaticBox( m_Gui, wxID_ANY, wxT("View properties") ), wxVERTICAL );
 
-  wxCheckBox* ckEnableMap = new wxCheckBox( m_Gui, ID_ENABLE_MAP,_("Enable color mapping"), wxDefaultPosition, wxDefaultSize, 0 );
+  wxCheckBox* ckEnableMap = new wxCheckBox( m_Gui, ID_ENABLE_MAP,_("Enable Color Mapping"), wxDefaultPosition, wxDefaultSize, 0 );
   ckEnableMap->SetToolTip( _("If checked, glyphs and surface are colored using a mapping of the specified LUT") );
   ckEnableMap->SetValidator(mafGUIValidator(this, ID_ENABLE_MAP, ckEnableMap, &m_EnableMap));
 
@@ -274,7 +287,7 @@ mafGUI *medPipeVectorFieldMapWithArrows::CreateGui()
   wxTextCtrl *scale_text = new wxTextCtrl(m_Gui, wxID_ANY, "", wxDefaultPosition, wxSize(30,18), wxALL);
   mafGUIFloatSlider* slider = new mafGUIFloatSlider(m_Gui,ID_SCALESLIDER,0,1,10);
   slider->SetValidator(mafGUIValidator(this, ID_SCALESLIDER, slider, &m_ScalingValue, scale_text));
-  slider->SetToolTip(_("Change the glyphs dimensions, which will be anyway scaled by the selected scaling component.") );
+  slider->SetToolTip(_("Change the glyphs dimensions, also scaled by the selected scaling component.") );
   slider->SetNumberOfSteps(10);
   bSizer4->Add(scale_text, 0, wxALL, 5);
   bSizer4->Add(slider, 1, wxALL, 0);
@@ -283,29 +296,39 @@ mafGUI *medPipeVectorFieldMapWithArrows::CreateGui()
   wxBoxSizer* bSizer5 = new wxBoxSizer( wxHORIZONTAL );
   
   bSizer5->Add( new wxStaticText( m_Gui, wxID_ANY, _("Radius:"), wxDefaultPosition, wxSize( 60,-1 ), 0 ), 0, wxALL, 5 );
-  wxTextCtrl* edRadius = new wxTextCtrl( m_Gui, ID_GLYPH_RADIUS);
-  edRadius->SetToolTip( _("Specifies the radius of glyph, i.e., the thickness of lines, radius of cones and arrows. ") );
-  bSizer5->Add( edRadius, 1, wxALL, 1 );
-  edRadius->SetValidator(mafGUIValidator(this, ID_GLYPH_RADIUS, edRadius, &m_GlyphRadius, 1e-8, 1000));
+  m_EdRadius = new wxTextCtrl( m_Gui, ID_GLYPH_RADIUS);
+  m_EdRadius->SetToolTip( _("Specifies the radius of glyph, i.e., the radius of arrows. ") );
+  bSizer5->Add( m_EdRadius, 1, wxALL, 1 );
+  m_EdRadius->SetValidator(mafGUIValidator(this, ID_GLYPH_RADIUS, m_EdRadius, &m_GlyphRadius, 1e-8, 1000));
 
   wxBoxSizer* bSizer51 = new wxBoxSizer( wxHORIZONTAL );
-  bSizer51->Add( new wxStaticText( m_Gui, wxID_ANY, _("Res:"), wxDefaultPosition, wxSize( 60,-1 ), 0 ), 0, wxALL, 5 );
-  wxTextCtrl* edRes = new wxTextCtrl( m_Gui, ID_GLYPH_RESOLUTION);
-  edRes->SetToolTip( _("Specifies the resolution of glyphs, i.e., number of sides of cones, etc.") );
-  bSizer51->Add( edRes, 1, wxALL, 1 );
-  edRes->SetValidator(mafGUIValidator(this, ID_GLYPH_RESOLUTION, edRes, &m_GlyphRes, 3, 100));
+  bSizer51->Add( new wxStaticText( m_Gui, wxID_ANY, _("Resolution:"), wxDefaultPosition, wxSize( 60,-1 ), 0 ), 0, wxALL, 5 );
+  m_EdRes = new wxTextCtrl( m_Gui, ID_GLYPH_RESOLUTION);
+  m_EdRes->SetToolTip( _("Specifies the resolution of glyphs, i.e., number of sides of cones, etc.") );
+  bSizer51->Add( m_EdRes, 1, wxALL, 1 );
+  m_EdRes->SetValidator(mafGUIValidator(this, ID_GLYPH_RESOLUTION, m_EdRes, &m_GlyphRes, 3, 100));
 
   wxBoxSizer* bSizer52 = new wxBoxSizer( wxHORIZONTAL );
   bSizer52->Add( new wxStaticText( m_Gui, wxID_ANY, _("Length:"), wxDefaultPosition, wxSize( 60,-1 ), 0 ), 0, wxALL, 5 );
-  wxTextCtrl* edLength = new wxTextCtrl( m_Gui, ID_GLYPH_LENGTH);
-  edLength->SetToolTip( _("Specifies the length of glyph, which will be scaled by the selected scaling component.") );
-  bSizer52->Add( edLength, 1, wxALL, 1 );
-  edLength->SetValidator(mafGUIValidator(this, ID_GLYPH_LENGTH, edLength, &m_GlyphLength, 1e-8, 1000));  
+  m_EdLength = new wxTextCtrl( m_Gui, ID_GLYPH_LENGTH);
+  m_EdLength->SetToolTip( _("Specifies the length of glyph, which will be scaled by the selected scaling component.") );
+  bSizer52->Add( m_EdLength, 1, wxALL, 1 );
+  m_EdLength->SetValidator(mafGUIValidator(this, ID_GLYPH_LENGTH, m_EdLength, &m_GlyphLength, 1e-8, 1000));  
+
+  wxBoxSizer* bSizer53 = new wxBoxSizer( wxHORIZONTAL );
+  bSizer53->Add( new wxStaticText( m_Gui, wxID_ANY, _("Glyph Type:"), wxDefaultPosition, wxSize( 60,-1 ), 0 ), 0, wxALL, 5 );
+  wxComboBox* comboGlyphs = new wxComboBox( m_Gui, ID_GLYPH_TYPE, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), 0, NULL, wxCB_READONLY );
+  comboGlyphs->Append( _("Lines") );
+  comboGlyphs->Append( _("Arrows") );
+  comboGlyphs->SetToolTip( _("Specifies glyph type which should be used for the visualization of the selected vector field.") );
+  comboGlyphs->SetValidator(mafGUIValidator(this, ID_GLYPH_TYPE, comboGlyphs, &m_GlyphType));
+  bSizer53->Add( comboGlyphs, 1, wxALL, 1 );
     
   sbSizer->Add( bSizer5, 0, wxALL, 1 );
-  sbSizer->Add( bSizer51, 0, wxALL, 1);
   sbSizer->Add( bSizer52, 0, wxALL, 1);
-  
+  sbSizer->Add( bSizer51, 0, wxALL, 1);
+  sbSizer->Add( bSizer53, 0, wxALL, 1 );
+ 
   bSizerProperties->Add(sbSizer, 0, wxEXPAND, 5);
   // ---------
   // ---------
@@ -368,6 +391,25 @@ void medPipeVectorFieldMapWithArrows::OnEvent(mafEventBase *maf_event)
           m_ComboColorBy_v->Enable(true);
 
           m_Gui->Update();
+          UpdateVTKPipe(); 
+          mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+          return;
+        }
+      break;
+      case ID_GLYPH_TYPE:
+        {
+          if (m_GlyphType==GLYPH_LINES)
+          {
+            m_EdRadius->Enable(false);
+            m_EdRes->Enable(false);
+            m_EdLength->Enable(false);
+          }
+          else
+          {
+            m_EdRadius->Enable(true);
+            m_EdRes->Enable(true);
+            m_EdLength->Enable(true);
+          }
           UpdateVTKPipe(); 
           mafEventMacro(mafEvent(this,CAMERA_UPDATE));
           return;
@@ -441,6 +483,7 @@ void medPipeVectorFieldMapWithArrows::CreateVTKPipe()
   if (pd == NULL)
     return;
 
+  // Build normals if they do not exist
   vtkDataArray* da_normals = pd->GetNormals();
   if (!da_normals)
   {
@@ -462,6 +505,7 @@ void medPipeVectorFieldMapWithArrows::CreateVTKPipe()
   if (nOfComponents!=1 && nOfComponents!=3)
     return;
 
+  // Scale absolut value of scalar components to view dimensions
   float distance = 0;
   for (int i=0;i<ds->GetNumberOfPoints()-2;i++)
   {
@@ -476,6 +520,7 @@ void medPipeVectorFieldMapWithArrows::CreateVTKPipe()
   float max_norm = da->GetMaxNorm();
   float scale_factor = distance/max_norm;
   
+  // Arrow glyph
   m_Arrow = vtkArrowSource::New();
   m_Arrow->SetTipResolution(m_GlyphRes);
   m_Arrow->SetTipRadius(m_GlyphRadius);
@@ -483,6 +528,13 @@ void medPipeVectorFieldMapWithArrows::CreateVTKPipe()
   m_Arrow->SetShaftResolution(m_GlyphRes);
   m_Arrow->SetShaftRadius(m_GlyphRadius*0.3);
 
+  // Line glyph
+  m_Line = vtkLineSource::New(); 
+  m_Line->SetPoint1(0.0, 0.0, 0.0);
+  m_Line->SetPoint2(1.0, 0.0, 0.0);
+  m_Line->SetResolution(m_GlyphRes);
+
+  // Build glyph
   m_Glyph = vtkGlyph3D::New();
   m_Glyph->SetInput(m_Vme->GetOutput()->GetVTKData());        
   m_Glyph->SetSource(m_Arrow->GetOutput());
@@ -499,12 +551,14 @@ void medPipeVectorFieldMapWithArrows::CreateVTKPipe()
   m_Glyph->SetColorModeToColorByVector();
   m_Glyph->Update();
 
+  // Build mapper  
   m_GlyphMapper = vtkPolyDataMapper::New();
   m_GlyphMapper->SetInput(m_Glyph->GetOutput());
   m_GlyphMapper->ImmediateModeRenderingOn();
   m_GlyphMapper->SetScalarRange(m_SurfaceMapper->GetLookupTable()->GetRange());
   m_GlyphMapper->SetLookupTable(m_ColorMappingLUT);
 
+  // Build actor
   m_GlyphActor = vtkActor::New();
   m_GlyphActor->SetMapper(m_GlyphMapper);
   m_GlyphActor->SetPickable(0);   //make it faster
@@ -579,13 +633,23 @@ void medPipeVectorFieldMapWithArrows::UpdateVTKPipe()
   if (nOfComponents!=1 && nOfComponents!=3)
     return;
 
-  m_Arrow->SetTipResolution(m_GlyphRes);
-  m_Arrow->SetTipRadius(m_GlyphRadius);
-  m_Arrow->SetTipLength(m_GlyphLength);
-  m_Arrow->SetShaftResolution(m_GlyphRes);
-  m_Arrow->SetShaftRadius(m_GlyphRadius*0.3);
-  m_Arrow->Update();
+  // Select arrows or lines for glyphs
+  if (m_GlyphType == GLYPH_LINES)
+  {
+    m_Glyph->SetSource(m_Line->GetOutput());
+  }
+  else if (m_GlyphType == GLYPH_ARROWS)
+  {
+    m_Arrow->SetTipResolution(m_GlyphRes);
+    m_Arrow->SetTipRadius(m_GlyphRadius);
+    m_Arrow->SetTipLength(m_GlyphLength);
+    m_Arrow->SetShaftResolution(m_GlyphRes);
+    m_Arrow->SetShaftRadius(m_GlyphRadius*0.3);
+    m_Arrow->Update();
+    m_Glyph->SetSource(m_Arrow->GetOutput());
+  }
  
+  // Compute new scaling value to view dimensions
   float distance = 0;
   for (int i=0;i<ds->GetNumberOfPoints()-2;i++)
   {
@@ -612,6 +676,7 @@ void medPipeVectorFieldMapWithArrows::UpdateVTKPipe()
   m_Glyph->SetScaleFactor(m_ScalingValue*scale_factor);
   m_Glyph->SetRange(range);
     
+  // Change visualization type
   if (nOfComponents==3)
   {
     m_Glyph->SelectInputVectors(GetVectorFieldName(m_VectorFieldIndex));
@@ -627,6 +692,7 @@ void medPipeVectorFieldMapWithArrows::UpdateVTKPipe()
     m_Glyph->SetColorModeToColorByScalar();
   }
 
+  // Update mapper
   m_GlyphMapper->SetScalarRange(m_SurfaceMapper->GetLookupTable()->GetRange());
   m_GlyphMapper->SetLookupTable(m_ColorMappingLUT);
   m_GlyphMapper->SetScalarVisibility(m_EnableMap);

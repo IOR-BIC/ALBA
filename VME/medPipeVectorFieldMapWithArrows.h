@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVectorFieldMapWithArrows.h,v $
   Language:  C++
-  Date:      $Date: 2010-12-13 13:51:29 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2010-12-14 13:24:38 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Simone Brazzale
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -18,6 +18,8 @@
 class mafGUI;
 
 class vtkArrowSource;
+class vtkLineSource;
+class vtkConeSource;
 class vtkGlyph3D;
 class vtkPolyDataMapper;
 class vtkDataSet;
@@ -55,6 +57,7 @@ protected:
     ID_GLYPH_RADIUS,
     ID_GLYPH_RESOLUTION,
     ID_GLYPH_LENGTH,
+    ID_GLYPH_TYPE,
     ID_LAST,
   };   
 
@@ -66,7 +69,14 @@ protected:
     CMM_Z, 
     CMM_LAST,
   };
-  
+
+    enum GLYPH_TYPES
+  {
+    GLYPH_LINES,
+    GLYPH_ARROWS,
+  };
+
+  int m_GlyphType;                    ///< Type of glyph (one of GLYPH_TYPES)
   int m_ScalarColorMappingMode;       ///< Color mapping mode for scalars (dummy)
   int m_VectorColorMappingMode;       ///< Color mapping mode for vectors
   int m_ActivateScalars;              ///< Activate scalar fields list
@@ -86,7 +96,8 @@ protected:
   vtkPolyDataMapper* m_SurfaceMapper; ///< Mapper for surface
   vtkActor* m_SurfaceActor;           ///< Actor for surface  
 
-  vtkArrowSource *m_Arrow;            ///< Source object for glyph
+  vtkLineSource* m_Line;              ///< Line glyph representing a vector
+  vtkArrowSource *m_Arrow;            ///< Arrow glyph representing a vector
 
   vtkGlyph3D* m_Glyph;                ///< Glyph3D filter
   vtkPolyDataMapper* m_GlyphMapper;   ///< Mapper for glyphs
@@ -96,6 +107,10 @@ protected:
   wxComboBox* m_ComboField_v;         ///< Combo box for vector fields GUI
   wxComboBox* m_ComboColorBy_s;       ///< Combo box for scalar fields mapping criteria
   wxComboBox* m_ComboColorBy_v;       ///< Combo box for vector fields mapping criteria
+
+  wxTextCtrl* m_EdLength;             ///< Editor for tip length
+  wxTextCtrl* m_EdRes;                ///< Editor for tip resolution
+  wxTextCtrl* m_EdRadius;             ///< Editor for tip radius
 
 public:	
   medPipeVectorFieldMapWithArrows();
