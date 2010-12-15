@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2010-12-07 10:45:16 $
-Version:   $Revision: 1.1.2.28 $
+Date:      $Date: 2010-12-15 10:32:08 $
+Version:   $Revision: 1.1.2.29 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -1972,8 +1972,8 @@ void medViewArbitraryOrthoSlice::BuildXCameraConeVME()
 	coneSource->SetResolution(20);
 	coneSource->SetDirection(0,0,-1);
 
-	coneSource->SetRadius(d / 3);
-	coneSource->SetHeight(d / 3);
+	coneSource->SetRadius(d / 8);
+	coneSource->SetHeight(d / 8);
 
 	coneSource->CappingOn();
 	coneSource->Update();
@@ -2035,8 +2035,8 @@ void medViewArbitraryOrthoSlice::BuildYCameraConeVME()
 	coneSource->SetResolution(20);
 	coneSource->SetDirection(0,0,-1);
 
-	coneSource->SetRadius(d / 3);
-	coneSource->SetHeight(d / 3);
+	coneSource->SetRadius(d / 8);
+	coneSource->SetHeight(d / 8);
 
 	coneSource->CappingOn();
 	coneSource->Update();
@@ -2095,8 +2095,8 @@ void medViewArbitraryOrthoSlice::BuildZCameraConeVME()
 	coneSource->SetResolution(20);
 	coneSource->SetDirection(0,0,-1);
 
-	coneSource->SetRadius(d / 3);
-	coneSource->SetHeight(d / 3);
+	coneSource->SetRadius(d / 8);
+	coneSource->SetHeight(d / 8);
 
 	coneSource->CappingOn();
 	coneSource->Update();
