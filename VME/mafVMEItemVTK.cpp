@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-12-15 10:00:02 $
-  Version:   $Revision: 1.28.2.2 $
+  Date:      $Date: 2010-12-15 15:34:23 $
+  Version:   $Revision: 1.28.2.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005
@@ -90,6 +90,44 @@ void mafVMEItemVTK::DeepCopy(mafVMEItem *a)
   }
   
 }
+
+//-------------------------------------------------------------------------
+void mafVMEItemVTK::DeepCopyVmeLarge(mafVMEItem *a)
+//-------------------------------------------------------------------------
+{
+  mafVMEItemVTK *vtk_item=mafVMEItemVTK::SafeDownCast(a);
+  assert(vtk_item);
+  Superclass::DeepCopy(vtk_item);
+  if (vtk_item->GetData())
+  {
+      vtkDataSetWriter *w;
+      vtkNEW(w);
+      w->SetFileName("TMP.vtk");
+      w->SetInput(vtk_item->GetData());
+      w->SetFileTypeToBinary();
+      w->Write();
+      vtkDEL(w);
+
+      m_Data = vtk_item->GetData()->NewInstance();
+      m_Data->Delete(); // decrease reference count since VTK set it to 1 by default
+
+      vtk_item->ReleaseData();
+
+      mafString filename = wxGetCwd();
+      filename<<"/TMP.vtk";
+      mafLogMessage("<<<<<Creating temp file : %s",filename);
+      this->ReadData(filename);
+      mafLogMessage("<<<<<Read temp file : %s",filename);
+
+      remove(filename);
+  }
+  else
+  {
+    m_Data = NULL;
+  }
+
+}
+
 
 //-------------------------------------------------------------------------
 void mafVMEItemVTK::ShallowCopy(mafVMEItem *a)

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGenericAbstract.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:05:59 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2010-12-15 15:34:23 $
+  Version:   $Revision: 1.25.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -24,14 +24,23 @@
 #include "mafVMEGenericAbstract.h"
 #include "mafGUI.h"
 
+#include "mafDataPipe.h"
 #include "mafDataVector.h"
 #include "mafMatrixVector.h"
 #include "mafMatrixInterpolator.h"
 #include "mmuTimeSet.h"
 #include "mafNodeIterator.h"
 #include "mafVMEStorage.h"
+#include "mafVTKInterpolator.h"
+#include "mafVMEItemVTK.h"
 
 #include <assert.h>
+
+#include "vtkMAFSmartPointer.h"
+#include "vtkMAFDataPipe.h"
+#include "vtkDataSet.h"
+#include "vtkDataSetWriter.h"
+#include "vtkDataSetReader.h"
 
 //-------------------------------------------------------------------------
 mafCxxTypeMacro(mafVMEGenericAbstract)
@@ -69,6 +78,32 @@ int mafVMEGenericAbstract::DeepCopy(mafNode *a)
       if(m_DataVector == NULL)
         m_DataVector=vme->GetDataVector()->NewInstance(); // create a new instance of the same type
       m_DataVector->DeepCopy(vme->GetDataVector()); // copy data
+      m_DataVector->SetListener(this);
+    }
+    return MAF_OK;
+  }
+  return MAF_ERROR;
+}
+//-------------------------------------------------------------------------
+int mafVMEGenericAbstract::DeepCopyVmeLarge(mafNode *a)
+//-------------------------------------------------------------------------
+{ 
+  if (Superclass::DeepCopy(a)==MAF_OK)
+  {
+    mafVMEGenericAbstract *vme=(mafVMEGenericAbstract *)a;
+    m_MatrixVector->DeepCopy(vme->GetMatrixVector());
+
+    if (vme->GetDataVector())
+    {
+      //////////////////////////////////////////////////////////////////////////
+      mafVTKInterpolator::SafeDownCast(vme->GetDataPipe())->GetVTKDataPipe()->RemoveAllInputs();
+      mafVTKInterpolator::SafeDownCast(vme->GetDataPipe())->GetVTKDataPipe()->UnRegisterAllOutputs();
+      //////////////////////////////////////////////////////////////////////////
+
+      if(m_DataVector == NULL)
+        m_DataVector=vme->GetDataVector()->NewInstance(); // create a new instance of the same type
+
+      m_DataVector->DeepCopyVmeLarge(vme->GetDataVector()); // copy data
       m_DataVector->SetListener(this);
     }
     return MAF_OK;

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGenericAbstract.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:05:59 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2010-12-15 15:34:23 $
+  Version:   $Revision: 1.10.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -52,6 +52,11 @@ public:
     Concrete class should reimplement this function to verify admitted
     conversion. */
   virtual int DeepCopy(mafNode *a);
+
+  /**
+    Allow to perform a DeepCopy with data very large.
+    Release memory of the input mafNode. */
+  virtual int DeepCopyVmeLarge(mafNode *a);
 
   /** 
     perform a copy by simply referencing the copied VME's data array. 

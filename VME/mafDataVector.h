@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataVector.h,v $
   Language:  C++
-  Date:      $Date: 2009-01-14 17:09:10 $
-  Version:   $Revision: 1.8.2.1 $
+  Date:      $Date: 2010-12-15 15:34:23 $
+  Version:   $Revision: 1.8.2.2 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -97,6 +97,11 @@ public:
   
   /** internally used by mafMSFWriter/Reader to remember this is a encrypted data */
   void SetCrypting(bool flag);
+
+  /**
+  Allow to perform a DeepCopy with data very large.
+  Release memory of the input mafNode. */
+  void DeepCopyVmeLarge(mafDataVector *o);
 
 protected:
  

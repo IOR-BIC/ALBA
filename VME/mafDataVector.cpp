@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataVector.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-11-29 16:53:20 $
-  Version:   $Revision: 1.19.2.3 $
+  Date:      $Date: 2010-12-15 15:34:23 $
+  Version:   $Revision: 1.19.2.4 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -134,6 +134,22 @@ void mafDataVector::ShallowCopy(mafDataVector *array)
                       //  Before was AppendItem(item) this generated leaks because copy was unreferenced
   }
 
+  Modified();
+}
+
+//-------------------------------------------------------------------------
+void mafDataVector::DeepCopyVmeLarge(mafDataVector *o)
+//-------------------------------------------------------------------------
+{
+  RemoveAllItems();
+  Iterator it;
+  for (it=o->Begin();it!=o->End();it++)
+  {
+    mafVMEItem *m=it->second;
+    mafVMEItem *new_item=m->NewInstance();
+    new_item->DeepCopyVmeLarge(m);
+    AppendItem(new_item);
+  }
   Modified();
 }
 

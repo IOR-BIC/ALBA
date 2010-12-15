@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItem.h,v $
   Language:  C++
-  Date:      $Date: 2010-11-29 16:53:20 $
-  Version:   $Revision: 1.20.2.2 $
+  Date:      $Date: 2010-12-15 15:34:23 $
+  Version:   $Revision: 1.20.2.3 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -84,6 +84,9 @@ public:
   virtual void DeepCopy(mafVMEItem *a);
   /** reference another dataset's internal data */ 
   virtual void ShallowCopy(mafVMEItem *a);
+
+  /** copy large data from another dataset and release it (for mafVMEItem is equals to DeepCopy()).*/
+  virtual void DeepCopyVmeLarge(mafVMEItem *a){DeepCopy(a);};
 
   /** release data from memory */
   virtual void ReleaseData()=0;
