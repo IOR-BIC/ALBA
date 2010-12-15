@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewCompoundWindowingTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-11-03 22:37:50 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-12-15 15:26:47 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -35,7 +35,7 @@ public:
 	mafTypeMacro(dummyView, medViewCompoundWindowing);
 
 	void PackageView(){};
-	mafView* Copy(mafObserver *Listener){return NULL;};
+	mafView* Copy(mafObserver *Listener,bool lightCopyEnabled = false){return NULL;};
 
 protected:
 	mafGUI* CreateGui(){return NULL;};
