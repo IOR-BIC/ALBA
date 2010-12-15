@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDExtrudeToCircle.h,v $
 Language:  C++
-Date:      $Date: 2010-12-14 09:42:57 $
-Version:   $Revision: 1.4.2.5 $
+Date:      $Date: 2010-12-15 08:29:55 $
+Version:   $Revision: 1.4.2.6 $
 Authors:   Nigel McFarlane
 
 ================================================================================
@@ -212,8 +212,10 @@ protected:
   friend class RingDataTest;
   friend class MeshDataTest;
 
-} ;
+  // Private subclass test friend
+  friend class vtkMEDExtrudeToCircleVertexDataTest;
 
+} ;
 
 
 //------------------------------------------------------------------------------
