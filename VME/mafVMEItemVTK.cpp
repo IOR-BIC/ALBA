@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-09-24 11:31:08 $
-  Version:   $Revision: 1.28.2.1 $
+  Date:      $Date: 2010-12-15 10:00:02 $
+  Version:   $Revision: 1.28.2.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005
@@ -414,8 +414,9 @@ int mafVMEItemVTK::ReadData(mafString &filename, int resolvedURL)
 int mafVMEItemVTK::UpdateReader(vtkDataReader *reader, mafString &filename)
 //-------------------------------------------------------------------------
 {
-  reader->SetProgressText("Loading data...");
-  mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,reader));
+  // Progressbar removed to improve vector data loading speed
+  // reader->SetProgressText("Loading data...");
+  // mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,reader));
   if (m_IOMode != MEMORY)
   {
     if (GetCrypting())
@@ -539,8 +540,9 @@ int mafVMEItemVTK::InternalStoreData(const char *url)
       ReleaseOutputMemory();
 
       vtkMAFSmartPointer<vtkDataSetWriter> writer;
-      writer->SetProgressText("Storing data...");
-      mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,writer));
+      // Progressbar removed to improve vector data storage speed
+      // writer->SetProgressText("Storing data...");
+      // mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,writer));
 
       // this is to catch possible I/O errors
       //unsigned long tag=mflAgent::PlugEventSource(writer,mflMSFWriter::ErrorHandler,this,vtkCommand::ErrorEvent);
