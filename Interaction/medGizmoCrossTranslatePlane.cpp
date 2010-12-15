@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoCrossTranslatePlane.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-12-07 10:45:06 $
-  Version:   $Revision: 1.1.2.5 $
+  Date:      $Date: 2010-12-15 11:09:58 $
+  Version:   $Revision: 1.1.2.6 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -61,8 +61,8 @@ medGizmoCrossTranslatePlane::medGizmoCrossTranslatePlane(mafVME *input, mafObser
   this->SetIsActive(false);
   
   m_LastColor[0] = 0;
-  m_LastColor[1] = 0;
-  m_LastColor[2] = 1;
+  m_LastColor[1] = 1;
+  m_LastColor[2] = 0;
 
   m_IsaComp[0]  = m_IsaComp[1] =  NULL;
   m_Listener  = listener;
@@ -109,8 +109,7 @@ medGizmoCrossTranslatePlane::medGizmoCrossTranslatePlane(mafVME *input, mafObser
 
   // set come gizmo material property and initial color 
   this->SetColor(S1, 0, 1, 0);
-  this->SetColor(S2, 0, 0, 1);
-  this->SetColor(SQ, 1, 1, 0);
+  this->SetColor(S2, 0, 1, 0);
   
   // add the gizmo to the tree, this should increase reference count 
   for (i = 0; i < 3; i++)

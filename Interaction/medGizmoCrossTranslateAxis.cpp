@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGizmoCrossTranslateAxis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-12-07 10:45:06 $
-Version:   $Revision: 1.1.2.5 $
+Date:      $Date: 2010-12-15 11:09:58 $
+Version:   $Revision: 1.1.2.6 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -48,9 +48,9 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 medGizmoCrossTranslateAxis::medGizmoCrossTranslateAxis(mafVME *input, mafObserver *listener)
 //----------------------------------------------------------------------------
 {
-	m_LastColor[0] = 0;
-	m_LastColor[1] = 0.7;
-	m_LastColor[2] = 1;
+	m_LastColor[0] = 1;
+	m_LastColor[1] = 0;
+	m_LastColor[2] = 0;
 
 	m_CylinderLength = 0.5;
 
@@ -144,7 +144,7 @@ void medGizmoCrossTranslateAxis::CreatePipeline()
 	// create the right cylinder
 	m_RightCylinder = vtkCylinderSource::New();
 
-	double tubeRadius = boundingBoxDiagonal / 350;
+	double tubeRadius = boundingBoxDiagonal / 100;
 	m_RightCylinder->SetRadius(tubeRadius);
 
 	//-----------------
