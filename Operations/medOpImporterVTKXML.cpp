@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterVTKXML.cpp,v $
 Language:  C++
-Date:      $Date: 2010-12-21 16:35:59 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2010-12-21 16:55:01 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -59,10 +59,17 @@ MafMedical is partially based on OpenMAF.
 #include "mafVMEVolumeGray.h"
 #include "mafVMEVolumeRGB.h"
 #include "mafVMEMesh.h"
+#include "mafTagArray.h"
 
 #include "vtkDataSet.h"
+#include "vtkPolyData.h"
 #include "vtkImageData.h"
+#include "vtkRectilinearGrid.h"
+#include "vtkUnstructuredGrid.h"
+#include "vtkXMLPolyDataReader.h"
 #include "vtkXMLImageDataReader.h"
+#include "vtkXMLRectilinearGridReader.h"
+#include "vtkXMLUnstructuredGridReader.h"
 #include "vtkCallbackCommand.h"
 #include "vtkMAFSmartPointer.h"
 
@@ -144,6 +151,15 @@ void medOpImporterVTKXML::OpRun()
   {
     if (ImportVTKXML() == MAF_OK)
     {
+      wxString path, name, ext;
+      wxSplitPath(m_File.GetCStr(),&path,&name,&ext);
+      mafTagItem tag_Nature;
+      tag_Nature.SetName("VME_NATURE");
+      tag_Nature.SetValue("NATURAL");
+      m_Output->GetTagArray()->SetTag(tag_Nature);
+      m_Output->ReparentTo(m_Input);
+      m_Output->SetName(name.c_str());
+
       result = OP_RUN_OK;
     }
     else
@@ -170,15 +186,124 @@ void medOpImporterVTKXML::ResetErrorCount()
 int medOpImporterVTKXML::ImportVTKXML()
 //----------------------------------------------------------------------------
 {
-  vtkXMLImageDataReader *imageReader;
-  vtkNEW(imageReader);
+  vtkDataSet *data = NULL;
+
+  mafNEW(m_VmePointSet);
+  mafNEW(m_VmePolyLine);
+  mafNEW(m_VmeSurface);
+  mafNEW(m_VmeGrayVol);
+  mafNEW(m_VmeRGBVol);
+  mafNEW(m_VmeMesh);
+  mafNEW(m_VmeGeneric);
+
+  vtkMAFSmartPointer<vtkXMLImageDataReader> imageReader;
   imageReader->AddObserver(vtkCommand::ErrorEvent,m_EventRouter);
   imageReader->SetFileName(m_File.GetCStr());
   imageReader->Update();
 
   if (m_ErrorCount == 0)
   {
+    data = imageReader->GetOutput();
+
+    if (m_VmeGrayVol->SetDataByDetaching(data,0) == MAF_OK)
+    {
+      m_Output = m_VmeGrayVol;
+    }
+    else if (m_VmeRGBVol->SetDataByDetaching(data,0) == MAF_OK)
+    {
+      m_Output = m_VmeRGBVol;
+    }
+    else
+    {
+      m_VmeGeneric->SetDataByDetaching(data,0);
+      m_Output = m_VmeGeneric;
+    }
+
+    return MAF_OK;   
+  }
+
+  ResetErrorCount();
+
+	vtkMAFSmartPointer<vtkXMLPolyDataReader> polydataReader;
+	polydataReader->AddObserver(vtkCommand::ErrorEvent,m_EventRouter);
+	polydataReader->SetFileName(m_File.GetCStr());
+	polydataReader->Update();
+
+	if (m_ErrorCount == 0)
+	{
+	  data = polydataReader->GetOutput();
+
+    if (m_VmePointSet->SetDataByDetaching(data,0) == MAF_OK)
+    {
+      m_Output = m_VmePointSet;
+    }
+    else if (m_VmePolyLine->SetDataByDetaching(data,0) == MAF_OK)
+    {
+      m_Output = m_VmePolyLine;
+    }
+    else if (m_VmeSurface->SetDataByDetaching(data,0) == MAF_OK)
+    {
+      m_Output = m_VmeSurface;
+    }
+    else
+    {
+      m_VmeGeneric->SetDataByDetaching(data,0);
+      m_Output = m_VmeGeneric;
+    }
+
     return MAF_OK;
+	}
+
+	ResetErrorCount();
+
+  vtkMAFSmartPointer<vtkXMLRectilinearGridReader> rgReader;
+  rgReader->AddObserver(vtkCommand::ErrorEvent,m_EventRouter);
+  rgReader->SetFileName(m_File.GetCStr());
+  rgReader->Update();
+
+  if (m_ErrorCount == 0)
+  {
+    data = rgReader->GetOutput();
+
+    if (m_VmeGrayVol->SetDataByDetaching(data,0) == MAF_OK)
+    {
+      m_Output = m_VmeGrayVol;
+    }
+    else if (m_VmeRGBVol->SetDataByDetaching(data,0) == MAF_OK)
+    {
+      m_Output = m_VmeRGBVol;
+    }
+    else
+    {
+      m_VmeGeneric->SetDataByDetaching(data,0);
+      m_Output = m_VmeGeneric;
+    }
+
+    return MAF_OK;   
+  }
+
+  ResetErrorCount();
+
+  vtkMAFSmartPointer<vtkXMLUnstructuredGridReader> ugReader;
+  ugReader->AddObserver(vtkCommand::ErrorEvent,m_EventRouter);
+  ugReader->SetFileName(m_File.GetCStr());
+  ugReader->Update();
+
+  if (m_ErrorCount == 0)
+  {
+    data = ugReader->GetOutput();
+
+    if (m_VmeMesh->SetDataByDetaching(data,0) == MAF_OK)
+    {
+      m_Output = m_VmeMesh;
+    }
+    else
+    {
+      m_VmeGeneric->SetDataByDetaching(data,0);
+      m_Output = m_VmeGeneric;
+    }
+
+    return MAF_OK;   
   }
 
   ResetErrorCount();
