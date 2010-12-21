@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterVTK.cpp,v $
 Language:  C++
-Date:      $Date: 2008-03-06 12:03:55 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2010-12-21 14:37:00 $
+Version:   $Revision: 1.3.2.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 MafMedical is partially based on OpenMAF.
 =========================================================================*/
 
-#include "mafDefines.h" 
+#include "medDefines.h" 
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
