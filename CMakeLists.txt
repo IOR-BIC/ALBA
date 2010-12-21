@@ -2,15 +2,19 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2010-12-20 14:22:58 $
-# Version:   $Revision: 1.44.2.5 $
+# Date:      $Date: 2010-12-21 08:41:03 $
+# Version:   $Revision: 1.44.2.6 $
 #
 # Description:
 # CMake Project file for the MAF.
 
+CMAKE_MINIMUM_REQUIRED(VERSION 2.4) 
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8 FATAL_ERROR) 
-SET (CMAKE_BACKWARDS_COMPATIBILITY 2.8)
+PROJECT (MAF)
+
+IF(CMAKE_VERSION VERSION_LESS 2.8)
+MESSAGE (FATAL_ERROR "CMAKE version must be greater than 2.8")
+ENDIF (CMAKE_VERSION VERSION_LESS 2.8)
 
 PROJECT (MAF)
 
