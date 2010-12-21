@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMELabeledVolume.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 12:31:39 $
-  Version:   $Revision: 1.13.2.1 $
+  Date:      $Date: 2010-12-21 14:36:29 $
+  Version:   $Revision: 1.13.2.2 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -109,6 +109,7 @@ public:
   /** Return the suggested pipe-typename for the visualization of this vme */
   virtual mafString GetVisualPipe() {return mafString("mafPipeBox");};
 
+protected:
   //----------------------------------------------------------------------------
   // widget ID's
   //----------------------------------------------------------------------------
@@ -134,7 +135,6 @@ public:
     ID_LAST,
   };
 
-protected:
   medVMELabeledVolume();
   virtual ~medVMELabeledVolume(); 
 

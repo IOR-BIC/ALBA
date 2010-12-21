@@ -2,8 +2,8 @@
 Program:   @neufuse
 Module:    $RCSfile: medOpFillHoles.h,v $
 Language:  C++
-Date:      $Date: 2010-12-06 14:12:40 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2010-12-21 14:32:47 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Matteo Giacomoni, Josef Kohout
 ==========================================================================
 Copyright (c) 2007
@@ -32,23 +32,6 @@ class vtkFillingHole;
 class vtkSphereSource;
 class vtkPolyData;
 class vtkGlyph3D;
-
-//----------------------------------------------------------------------------
-// Constants:
-//----------------------------------------------------------------------------
-enum FILTER_SURFACE_ID
-{
-	ID_OK = MINID,
-	ID_CANCEL,
-	ID_FILL,
-	ID_ALL,
-	ID_SMOOTH,
-  ID_SMOOTH_TYPE,
-  ID_SMOOTH_STEPS,
-  ID_DIAMETER_LABEL,
-	ID_DIAMETER,
-  ID_UNDO,
-};
 
 /**
    class name: medOpFillHoles
@@ -93,6 +76,23 @@ public:
   void SetDirectlyIDHole(int value) {m_PointID = value;};
 
 protected:
+  //----------------------------------------------------------------------------
+  // Constants:
+  //----------------------------------------------------------------------------
+  enum FILTER_SURFACE_ID
+  {
+    ID_OK = MINID,
+    ID_CANCEL,
+    ID_FILL,
+    ID_ALL,
+    ID_SMOOTH,
+    ID_SMOOTH_TYPE,
+    ID_SMOOTH_STEPS,
+    ID_DIAMETER_LABEL,
+    ID_DIAMETER,
+    ID_UNDO,
+  };
+
 	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
 	/*virtual*/ void OpStop(int result);
 
