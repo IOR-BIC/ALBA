@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterVTKXML.h,v $
 Language:  C++
-Date:      $Date: 2010-12-21 15:59:19 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-12-21 16:35:59 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -59,6 +59,8 @@ class mafVMEVolumeRGB;
 class mafVMEMesh;
 class mafVMEGeneric;
 
+class vtkCallbackCommand;
+
 /**
 class name: medOpImporterVTKXMLXML
 Operation to importer VTK XML format (.vtp extension)*/
@@ -90,6 +92,12 @@ public:
 
 protected:
 
+  /** Function to trace error events from the vtk readers.*/
+  static void ErrorProcessEvents(vtkObject* sender, unsigned long channel, void* clientdata, void* calldata);
+
+  /** Set m_ErrorCount to 0.*/
+  static void ResetErrorCount();
+
   mafString m_File;
   mafString m_FileDir;
 
@@ -100,6 +108,8 @@ protected:
   mafVMEVolumeRGB *m_VmeRGBVol;
   mafVMEMesh *m_VmeMesh;  
   mafVMEGeneric *m_VmeGeneric;
+
+  vtkCallbackCommand *m_EventRouter;
 
 };
 #endif

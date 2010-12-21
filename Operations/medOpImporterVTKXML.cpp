@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterVTKXML.cpp,v $
 Language:  C++
-Date:      $Date: 2010-12-21 15:59:19 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-12-21 16:35:59 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -63,11 +63,14 @@ MafMedical is partially based on OpenMAF.
 #include "vtkDataSet.h"
 #include "vtkImageData.h"
 #include "vtkXMLImageDataReader.h"
+#include "vtkCallbackCommand.h"
 #include "vtkMAFSmartPointer.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(medOpImporterVTKXML);
 //----------------------------------------------------------------------------
+
+static int m_ErrorCount = 0;
 
 //----------------------------------------------------------------------------
 medOpImporterVTKXML::medOpImporterVTKXML(const wxString &label) :
@@ -86,8 +89,15 @@ mafOp(label)
   m_VmeMesh     = NULL;
   m_VmeGeneric  = NULL;
 
+  m_EventRouter = NULL;
+  vtkNEW(m_EventRouter);
+  m_EventRouter->SetCallback(ErrorProcessEvents);
+  m_EventRouter->SetClientData(this);
+
   m_File    = "";
   m_FileDir = "";
+
+  ResetErrorCount();
 }
 //----------------------------------------------------------------------------
 medOpImporterVTKXML::~medOpImporterVTKXML()
@@ -100,6 +110,8 @@ medOpImporterVTKXML::~medOpImporterVTKXML()
   mafDEL(m_VmeRGBVol);
   mafDEL(m_VmeMesh);
   mafDEL(m_VmeGeneric);
+
+  vtkDEL(m_EventRouter);
 }
 //----------------------------------------------------------------------------
 bool medOpImporterVTKXML::Accept(mafNode* node)   
@@ -143,18 +155,33 @@ void medOpImporterVTKXML::OpRun()
   mafEventMacro(mafEvent(this,result));
 }
 //----------------------------------------------------------------------------
+void medOpImporterVTKXML::ErrorProcessEvents(vtkObject* sender, unsigned long channel, void* clientdata, void* calldata)
+//----------------------------------------------------------------------------
+{
+  m_ErrorCount++;
+}
+//----------------------------------------------------------------------------
+void medOpImporterVTKXML::ResetErrorCount()
+//----------------------------------------------------------------------------
+{
+  m_ErrorCount = 0;
+}
+//----------------------------------------------------------------------------
 int medOpImporterVTKXML::ImportVTKXML()
 //----------------------------------------------------------------------------
 {
   vtkXMLImageDataReader *imageReader;
   vtkNEW(imageReader);
+  imageReader->AddObserver(vtkCommand::ErrorEvent,m_EventRouter);
   imageReader->SetFileName(m_File.GetCStr());
   imageReader->Update();
 
-  if (imageReader->GetOutput()->IsTypeOf("vtkPolyData"))
+  if (m_ErrorCount == 0)
   {
     return MAF_OK;
   }
+
+  ResetErrorCount();
 
 
   return MAF_ERROR;
