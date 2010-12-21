@@ -1,7 +1,7 @@
 #
 # Copyright and description to be placed here
 #
-
+#
 PROJECT(mafDoxygen)
 DBG_MESSAGE("Configuring project mafDoxygen")
 
