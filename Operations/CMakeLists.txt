@@ -107,6 +107,12 @@ SET(PROJECT_SRCS
   
   medOpImporterVTK.cpp
   medOpImporterVTK.h
+  
+  medOpImporterVTKXML.cpp
+  medOpImporterVTKXML.h
+  
+  medOpExporterVTKXML.cpp
+  medOpExporterVTKXML.h
 
   medOpSubdivide.cpp
   medOpSubdivide.h
