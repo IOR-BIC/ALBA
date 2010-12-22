@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpFillHolesTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-12-22 10:15:51 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2010-12-22 10:22:40 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Simone Brazzale
 ==========================================================================
 Copyright (c) 2007
@@ -121,7 +121,6 @@ void medOpFillHolesTest::TestOpRun()
   fEdge->SetFeatureEdges(FALSE);
   fEdge->Update();
 
-  // No operation has been performed (all functions are protected)
   // Testing data has 2 holes with 16 boundary lines and 16 boundary points
   CPPUNIT_ASSERT( fEdge->GetOutput()->GetNumberOfLines() == 16 );
   CPPUNIT_ASSERT( fEdge->GetOutput()->GetNumberOfPoints() == 16 );
@@ -130,13 +129,15 @@ void medOpFillHolesTest::TestOpRun()
   fillOp->SetInput(surface);
   fillOp->TestModeOn();
   fillOp->OpRun();
+  fillOp->OpDo();
 
   ((mafVMESurface*)fillOp->GetInput())->GetOutput()->GetVTKData()->Update();
 
   fEdge->SetInput((vtkPolyData*)((mafVMESurface*)fillOp->GetInput())->GetOutput()->GetVTKData());
   fEdge->Update();
 
-  //The Id of the boundary point set in the filter method isn't an Id of a boundary point of an edge
+  // No operation has been performed (all functions are protected)
+  // Testing data has 2 holes with 16 boundary lines and 16 boundary points
   CPPUNIT_ASSERT( fEdge->GetOutput()->GetNumberOfLines() == 16 );
   CPPUNIT_ASSERT( fEdge->GetOutput()->GetNumberOfPoints() == 16 );
 
