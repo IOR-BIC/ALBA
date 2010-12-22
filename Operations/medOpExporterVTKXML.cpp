@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterVTKXML.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-12-22 10:04:01 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2010-12-22 20:24:08 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -96,7 +96,27 @@ void medOpExporterVTKXML::OpRun()
 
   bool isStructuredPoints = inputData->IsA("vtkStructuredPoints");
 
-  mafString wildc = "vtk xml Data (*.vtp;*vti;*vtu;*vtr)|*.vtp;*vti;*vtu;*vtr";
+  mafString wildc;
+  if(inputData->IsA("vtkRectilinearGrid"))
+  {
+    wildc = "vtk xml Data (*.vtr)|*.vtr";
+  }
+  if(inputData->IsA("vtkPolydata"))
+  {
+    wildc = "vtk xml Data (*.vtp)|*.vtp";
+  }
+  if(inputData->IsA("vtkImageData"))
+  {
+    wildc = "vtk xml Data (*.vti)|*.vti";
+  }
+  if(inputData->IsA("vtkUnstructuredGrid"))
+  {
+    wildc = "vtk xml Data (*.vtu)|*.vtu";
+  }
+  if(inputData->IsA("vtkStructuredGrid"))
+  {
+    wildc = "vtk xml Data (*.vts)|*.vts";
+  }
 
   m_Gui = new mafGUI(this);
   m_Gui->FileSave(ID_CHOOSE_FILENAME, _("vtk xml file"), &m_File, wildc);
