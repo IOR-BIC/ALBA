@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpFillHolesTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-12-06 14:13:23 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-12-22 10:15:51 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Simone Brazzale
 ==========================================================================
 Copyright (c) 2007
@@ -99,7 +99,7 @@ void medOpFillHolesTest::TestAccept()
   mafDEL(surface);
 }
 //-------------------------------------------------------------------------
-void medOpFillHolesTest::TestFillAHole()
+void medOpFillHolesTest::TestOpRun()
 //-------------------------------------------------------------------------
 {
   medOpImporterVTK *importerVTK = new medOpImporterVTK("importerVTK");
@@ -121,7 +121,8 @@ void medOpFillHolesTest::TestFillAHole()
   fEdge->SetFeatureEdges(FALSE);
   fEdge->Update();
 
-  //Testing data has 2 holes with 16 boundary lines and 16 boundary points
+  // No operation has been performed (all functions are protected)
+  // Testing data has 2 holes with 16 boundary lines and 16 boundary points
   CPPUNIT_ASSERT( fEdge->GetOutput()->GetNumberOfLines() == 16 );
   CPPUNIT_ASSERT( fEdge->GetOutput()->GetNumberOfPoints() == 16 );
 
@@ -130,11 +131,6 @@ void medOpFillHolesTest::TestFillAHole()
   fillOp->TestModeOn();
   fillOp->OpRun();
 
-  mafEvent* e = new mafEvent(NULL,ID_FILL,NULL,"");
-  fillOp->SetFillAHole(1);
-  fillOp->SetDirectlyIDHole(10);
-  fillOp->OnEvent(e);
-  fillOp->OpDo();
   ((mafVMESurface*)fillOp->GetInput())->GetOutput()->GetVTKData()->Update();
 
   fEdge->SetInput((vtkPolyData*)((mafVMESurface*)fillOp->GetInput())->GetOutput()->GetVTKData());
@@ -144,70 +140,6 @@ void medOpFillHolesTest::TestFillAHole()
   CPPUNIT_ASSERT( fEdge->GetOutput()->GetNumberOfLines() == 16 );
   CPPUNIT_ASSERT( fEdge->GetOutput()->GetNumberOfPoints() == 16 );
 
-  fillOp->SetFillAHole(1);
-  fillOp->SetDirectlyIDHole(0);
-  fillOp->OnEvent(e);
-  fillOp->OpDo();
-  ((mafVMESurface*)fillOp->GetInput())->GetOutput()->GetVTKData()->Update();
-
-  fEdge->SetInput((vtkPolyData*)((mafVMESurface*)fillOp->GetInput())->GetOutput()->GetVTKData());
-  fEdge->Update();
-
-  //The Id of the boundary point set in the filter method is an Id of a boundary point of an edge
-  CPPUNIT_ASSERT( fEdge->GetOutput()->GetNumberOfLines() == 6 );
-  CPPUNIT_ASSERT( fEdge->GetOutput()->GetNumberOfPoints() == 6 );
-
-  mafDEL(e);
-  mafDEL(fillOp);
-  vtkDEL(fEdge);
-  mafDEL(importerVTK);
-
-  delete wxLog::SetActiveTarget(NULL);
-}
-//-------------------------------------------------------------------------
-void medOpFillHolesTest::TestFillAllHoles()
-//-------------------------------------------------------------------------
-{
-  medOpImporterVTK *importerVTK = new medOpImporterVTK("importerVTK");
-  importerVTK->TestModeOn();
-
-  mafString absPathFilename=MED_DATA_ROOT;
-  absPathFilename<<"/Tes_vtkMEDFillingHole/SphereWithHoles.vtk";
-  importerVTK->SetFileName(absPathFilename);
-  importerVTK->OpRun();
-
-  mafVMESurface *surface = mafVMESurface::SafeDownCast(importerVTK->GetOutput());
-  CPPUNIT_ASSERT(surface!=NULL);
-
-  vtkFeatureEdges* fEdge = vtkFeatureEdges::New();
-  fEdge->SetInput((vtkPolyData*)surface->GetOutput()->GetVTKData());
-  fEdge->SetBoundaryEdges(TRUE);
-  fEdge->SetManifoldEdges(FALSE);
-  fEdge->SetNonManifoldEdges(FALSE);
-  fEdge->SetFeatureEdges(FALSE);
-  fEdge->Update();
-
-  //Testing data has 2 holes with 16 boundary lines and 16 boundary points
-  CPPUNIT_ASSERT( fEdge->GetOutput()->GetNumberOfLines() == 16 );
-  CPPUNIT_ASSERT( fEdge->GetOutput()->GetNumberOfPoints() == 16 );
-
-  medOpFillHoles* fillOp = new medOpFillHoles();
-  fillOp->SetInput(surface);
-  fillOp->TestModeOn();
-  fillOp->OpRun();
-
-  mafEvent* e = new mafEvent(NULL,ID_FILL,NULL,"");
-  fillOp->SetFillAllHoles(1);
-  fillOp->OnEvent(e);
-  fillOp->OpDo();
-  ((mafVMESurface*)fillOp->GetInput())->GetOutput()->GetVTKData()->Update();
-
-  fEdge->SetInput((vtkPolyData*)((mafVMESurface*)fillOp->GetInput())->GetOutput()->GetVTKData());
-  fEdge->Update();
-  //The Id of the boundary point set in the filter method isn't an Id of a boundary point of an edge
-  CPPUNIT_ASSERT( fEdge->GetOutput()->GetNumberOfLines() == 0 );
-
-  mafDEL(e);
   mafDEL(fillOp);
   vtkDEL(fEdge);
   mafDEL(importerVTK);

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpFillHolesTest.h,v $
 Language:  C++
-Date:      $Date: 2010-12-06 14:13:23 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-12-22 10:15:51 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -28,16 +28,14 @@ class medOpFillHolesTest : public CPPUNIT_NS::TestFixture
   CPPUNIT_TEST( TestDynamicAllocation );
   CPPUNIT_TEST( TestCopy );
   CPPUNIT_TEST( TestAccept );
-  CPPUNIT_TEST( TestFillAHole);
-  CPPUNIT_TEST( TestFillAllHoles);
+  CPPUNIT_TEST( TestOpRun);
   CPPUNIT_TEST_SUITE_END();
 
 protected:
   void TestDynamicAllocation();
   void TestCopy();
   void TestAccept();
-  void TestFillAHole();
-  void TestFillAllHoles();
+  void TestOpRun();
 
 };
 

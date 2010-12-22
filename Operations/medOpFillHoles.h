@@ -2,8 +2,8 @@
 Program:   @neufuse
 Module:    $RCSfile: medOpFillHoles.h,v $
 Language:  C++
-Date:      $Date: 2010-12-21 14:32:47 $
-Version:   $Revision: 1.1.2.5 $
+Date:      $Date: 2010-12-22 10:15:43 $
+Version:   $Revision: 1.1.2.6 $
 Authors:   Matteo Giacomoni, Josef Kohout
 ==========================================================================
 Copyright (c) 2007
@@ -65,15 +65,6 @@ public:
 
 	/** Makes the undo for the operation. */
 	/*virtual*/ void OpUndo();
-
-	/** Set manually the variable. Implemented for testing */
-  void SetFillAllHoles(int value) {if (value>1) {return;} m_AllHoles = value;};
-
-  /** Set manually the variable. Implemented for testing */
-  void SetFillAHole(int value) {if (value>1) {return;} m_SelectedPoint = value;};
-
-  /** Set manually the variable. Implemented for testing */
-  void SetDirectlyIDHole(int value) {m_PointID = value;};
 
 protected:
   //----------------------------------------------------------------------------
