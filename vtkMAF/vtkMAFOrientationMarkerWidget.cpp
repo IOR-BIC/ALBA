@@ -28,7 +28,7 @@
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 
-vtkCxxRevisionMacro(vtkMAFOrientationMarkerWidget, "$Revision: 1.1.2.2 $");
+vtkCxxRevisionMacro(vtkMAFOrientationMarkerWidget, "$Revision: 1.1.2.3 $");
 vtkStandardNewMacro(vtkMAFOrientationMarkerWidget);
 vtkCxxSetObjectMacro(vtkMAFOrientationMarkerWidget, OrientationMarker, vtkProp);
 
@@ -152,10 +152,13 @@ void vtkMAFOrientationMarkerWidget::SetEnabled(int enabling)
 
     vtkRenderWindow* renwin = this->CurrentRenderer->GetRenderWindow();
     renwin->AddRenderer( this->Renderer );
-    if (renwin->GetNumberOfLayers() < 2)
+    // 21.12.2010: Modified by Simone Brazzale
+    // The number of layers is no more incremented, so that the mafInteractorCameraMove
+    // can understand where are the FRONT and BACK renderers.
+    /*if (renwin->GetNumberOfLayers() < 2)
       {
       renwin->SetNumberOfLayers( 2 );
-      }
+      }*/
 
     this->CurrentRenderer->AddProp( this->OutlineActor );
     this->OutlineActor->VisibilityOff();

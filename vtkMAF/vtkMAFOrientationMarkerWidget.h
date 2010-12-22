@@ -76,8 +76,7 @@ implement the camera synchronization between the ivar renderer and the
 renderer associated with the set interactor.  Importantly, the InteractorStyle
 associated with the interactor must be of the type vtkInteractorStyle*Camera.
 Where desirable, the parent renderer should be set by the SetDefaultRenderer
-method.  The parent renderer's number of layers is modified to 2 where
-required.
+method.  The parent renderer's number of layers is modified if required.
 
 See Also:
 vtkInteractorObserver vtkXYPlotWidget vtkScalarBarWidget vtkAxesActor

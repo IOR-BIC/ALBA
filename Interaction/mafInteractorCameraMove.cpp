@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractorCameraMove.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-11-03 16:28:59 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2010-12-22 16:39:00 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Paolo Quadrani & Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -503,48 +503,102 @@ void mafInteractorCameraMove::LinkedRotate()
 void mafInteractorCameraMove::ResetClippingRange()
 //----------------------------------------------------------------------------
 {
+  // 20.12.2010: Modified by Simone Brazzale:
+  // Added patch in the presence of the third layer.
+
   vtkRendererCollection *rc = m_Renderer->GetRenderWindow()->GetRenderers();
   rc->InitTraversal();
-	vtkRenderer *r1 = rc->GetNextItem(); 	 
-	vtkRenderer *r2 = rc->GetNextItem(); 	 
 
-	if(r1==NULL)
+  // Layers can be ONE or TWO; the third layer ALWAYS_VISIBLE doesn't count, as implemented in mafRWI.
+  int numberOfLayers = m_Renderer->GetRenderWindow()->GetNumberOfLayers();
+
+  // The order of the renderers has been set in mafRWI.
+  // This is ALWAYS VISIBLE RENDERER 
+	vtkRenderer *rAV = rc->GetNextItem(); 	 
+  // This is FRONT RENDERER
+	vtkRenderer *rFR = rc->GetNextItem(); 	 
+  // This can be BACK RENDERER or a renderer added by vtkMAFOrientationWidget.
+  // It is BACK RENDERER only if  numberOfLayers==3.
+  vtkRenderer *rBR = NULL;
+  if (numberOfLayers==3)
+  {
+	  rBR = rc->GetNextItem(); 	 
+  }
+
+	double b1[6],b2[6],b3[6],b[6];
+  if(rFR==NULL)
 	{
 	} 
-	else if (r2==NULL)
+	else if (rAV==NULL && rBR==NULL)
 	{
-     r1->ResetCameraClippingRange(); 
+     rFR->ResetCameraClippingRange(); 
 	}
-  else 
-	{
-     // abbiamo anche il background renderer 
-		double b1[6],b2[6];
-		r1->ComputeVisiblePropBounds(b1);
-		r2->ComputeVisiblePropBounds(b2);
+  else if (rAV)
+  {
+    // We have the tird layer (always visible), with default bounds (-1,1,-1,1,-1,1).
+    // The clipping range must be computed with the bounds of the front renderer!
+		rFR->ComputeVisiblePropBounds(b1);
+		rAV->ComputeVisiblePropBounds(b2);
 
 		if(b1[0] == VTK_LARGE_FLOAT && b2[0] == VTK_LARGE_FLOAT)
 		{
-			r1->ResetCameraClippingRange();
+			rFR->ResetCameraClippingRange();
 		} 
 		else if (b1[0] == VTK_LARGE_FLOAT )
 		{
-			r1->ResetCameraClippingRange(b2);
-		}
-		else if (b2[0] == VTK_LARGE_FLOAT )
-		{
-			r1->ResetCameraClippingRange(b1);
+			rFR->ResetCameraClippingRange(b2);
 		}
 		else
 		{
-			b1[0] = (b1[0]<b2[0]) ?	b1[0] : b2[0];    
-			b1[2] = (b1[2]<b2[2]) ?	b1[2] : b2[2];    
-			b1[4] = (b1[4]<b2[4]) ?	b1[4] : b2[4];    
-			b1[1] = (b1[1]>b2[1]) ?	b1[1] : b2[1];    
-			b1[3] = (b1[3]>b2[3]) ?	b1[3] : b2[3];    
-			b1[5] = (b1[5]>b2[5]) ?	b1[5] : b2[5];    
-			r1->ResetCameraClippingRange(b1);
+      // WORKAROUND 
+      // The only actor shown is the Axis actor in the bottom left angle:
+      // it must not be taken into account.
+      if (b2[0]==-1 && b2[1]==1 && b2[2]==-1 && b2[3]==1 && b2[4]==-1 && b2[5]==1)
+      {
+        b[0] = b1[0];
+			  b[2] = b1[2];
+        b[4] = b1[4];
+        b[1] = b1[1];
+			  b[3] = b1[3];
+			  b[5] = b1[5];
+      }
+      // WORKAROUND 
+      // There are other actors (like the GIZMO): 
+      // we must take them into account.
+      else
+      {
+        b[0] = (b1[0]<b2[0]) ?	b1[0] : b2[0];    
+			  b[2] = (b1[2]<b2[2]) ?	b1[2] : b2[2];    
+			  b[4] = (b1[4]<b2[4]) ?	b1[4] : b2[4];    
+			  b[1] = (b1[1]>b2[1]) ?	b1[1] : b2[1];    
+			  b[3] = (b1[3]>b2[3]) ?	b1[3] : b2[3];    
+			  b[5] = (b1[5]>b2[5]) ?	b1[5] : b2[5];  
+      }
+			rFR->ResetCameraClippingRange(b);
 		}
-	}
+
+    // We have also the back renderer.
+    // The clipping range must be matched between the back renderer bounds and the already calculated one.	
+    if (rBR)
+  	{
+	  	rBR->ComputeVisiblePropBounds(b3);
+
+		  if (b3[0] == VTK_LARGE_FLOAT )
+		  {
+        // do nothing
+			}
+		  else
+		  {
+			  b[0] = (b[0]<b3[0]) ?	b[0] : b3[0];    
+			  b[2] = (b[2]<b3[2]) ?	b[2] : b3[2];    
+			  b[4] = (b[4]<b3[4]) ?	b[4] : b3[4];    
+			  b[1] = (b[1]>b3[1]) ?	b[1] : b3[1];    
+			  b[3] = (b[3]>b3[3]) ?	b[3] : b3[3];    
+			  b[5] = (b[5]>b3[5]) ?	b[5] : b3[5];    
+			  rFR->ResetCameraClippingRange(b);
+		  }
+	  }
+  }
 }
 
 
