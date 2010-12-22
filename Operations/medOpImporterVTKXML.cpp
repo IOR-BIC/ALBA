@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterVTKXML.cpp,v $
 Language:  C++
-Date:      $Date: 2010-12-21 16:55:01 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2010-12-22 20:24:26 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -66,11 +66,13 @@ MafMedical is partially based on OpenMAF.
 #include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkUnstructuredGrid.h"
+#include "vtkStructuredGrid.h"
 #include "vtkXMLPolyDataReader.h"
 #include "vtkXMLImageDataReader.h"
 #include "vtkXMLRectilinearGridReader.h"
 #include "vtkXMLUnstructuredGridReader.h"
 #include "vtkCallbackCommand.h"
+#include "vtkXMLStructuredGridReader.h"
 #include "vtkMAFSmartPointer.h"
 
 //----------------------------------------------------------------------------
@@ -302,6 +304,23 @@ int medOpImporterVTKXML::ImportVTKXML()
       m_VmeGeneric->SetDataByDetaching(data,0);
       m_Output = m_VmeGeneric;
     }
+
+    return MAF_OK;   
+  }
+
+  ResetErrorCount();
+
+  vtkMAFSmartPointer<vtkXMLStructuredGridReader> sgReader;
+  sgReader->AddObserver(vtkCommand::ErrorEvent,m_EventRouter);
+  sgReader->SetFileName(m_File.GetCStr());
+  sgReader->Update();
+
+  if (m_ErrorCount == 0)
+  {
+    data = sgReader->GetOutput();
+
+    m_VmeGeneric->SetDataByDetaching(data,0);
+    m_Output = m_VmeGeneric;
 
     return MAF_OK;   
   }
