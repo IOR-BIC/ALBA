@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<VTKFile type="UnstructuredGrid" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+  <UnstructuredGrid>
+    <FieldData>
+      <DataArray type="Float64" Name="material_id" NumberOfTuples="2" format="binary" RangeMin="2" RangeMax="3">
+        AQAAAACAAAAQAAAAEAAAAA==eJxjYAADBwjF4QAAAqAAiQ==
+      </DataArray>
+      <DataArray type="Float64" Name="EX" NumberOfTuples="2" format="binary" RangeMin="1000" RangeMax="200000">
+        AQAAAACAAAAQAAAAFAAAAA==eJxjYAACh34HEMWQxeEIAAw1AcM=
+      </DataArray>
+      <DataArray type="Float64" Name="NUXY" NumberOfTuples="2" format="binary" RangeMin="0.3" RangeMax="0.33">
+        AQAAAACAAAAQAAAAFgAAAA==eJwzNgaBy/byra8Dd8hdtQcAK30GDw==
+      </DataArray>
+      <DataArray type="Float64" Name="DENS" NumberOfTuples="2" format="binary" RangeMin="0.107" RangeMax="1.07">
+        AQAAAACAAAAQAAAAGAAAAA==eJwz5FgjE5Wy216+9XXgDrmP9gAxggag
+      </DataArray>
+    </FieldData>
+    <Piece NumberOfPoints="5" NumberOfCells="2">
+      <PointData Scalars="id">
+        <DataArray type="Int32" Name="id" format="binary" RangeMin="7" RangeMax="24">
+          AQAAAACAAAAUAAAAFgAAAA==eJxjZ2Bg4ABiTiAWB2IJIAYAAqQASA==
+        </DataArray>
+      </PointData>
+      <CellData Scalars="material">
+        <DataArray type="Int32" Name="material" format="binary" RangeMin="2" RangeMax="3">
+          AQAAAACAAAAIAAAADgAAAA==eJxjYmBgYAZiAAAkAAY=
+        </DataArray>
+        <DataArray type="Float64" Name="EX" format="binary" RangeMin="1000" RangeMax="200000">
+          AQAAAACAAAAQAAAAFAAAAA==eJxjYAACh34HEMWQxeEIAAw1AcM=
+        </DataArray>
+        <DataArray type="Float64" Name="NUXY" format="binary" RangeMin="0.3" RangeMax="0.33">
+          AQAAAACAAAAQAAAAFgAAAA==eJwzNgaBy/byra8Dd8hdtQcAK30GDw==
+        </DataArray>
+        <DataArray type="Float64" Name="DENS" format="binary" RangeMin="0.107" RangeMax="1.07">
+          AQAAAACAAAAQAAAAGAAAAA==eJwz5FgjE5Wy216+9XXgDrmP9gAxggag
+        </DataArray>
+      </CellData>
+      <Points>
+        <DataArray type="Float32" Name="Points" NumberOfComponents="3" format="binary" RangeMin="0" RangeMax="1.7320508076">
+          AQAAAACAAAA8AAAAFQAAAA==eJxjYEAHDfaYfGQxGL/BHgBPVgR7
+        </DataArray>
+      </Points>
+      <Cells>
+        <DataArray type="Int32" Name="connectivity" format="binary" RangeMin="0" RangeMax="4">
+          AQAAAACAAAAgAAAAFgAAAA==eJxjYGBgYARiJiBmRmOzADEAAPgAEQ==
+        </DataArray>
+        <DataArray type="Int32" Name="offsets" format="binary" RangeMin="4" RangeMax="8">
+          AQAAAACAAAAIAAAADgAAAA==eJxjYWBg4ABiAABIAA0=
+        </DataArray>
+        <DataArray type="UInt8" Name="types" format="binary" RangeMin="10" RangeMax="10">
+          AQAAAACAAAACAAAACgAAAA==eJzj4gIAACAAFQ==
+        </DataArray>
+      </Cells>
+    </Piece>
+  </UnstructuredGrid>
+</VTKFile>
