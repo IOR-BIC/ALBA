@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterVTKXML.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-12-22 20:24:08 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2010-12-23 11:28:48 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -101,7 +101,7 @@ void medOpExporterVTKXML::OpRun()
   {
     wildc = "vtk xml Data (*.vtr)|*.vtr";
   }
-  if(inputData->IsA("vtkPolydata"))
+  if(inputData->IsA("vtkPolyData"))
   {
     wildc = "vtk xml Data (*.vtp)|*.vtp";
   }
