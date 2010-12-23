@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafRWI.cpp,v $
 Language:  C++
-Date:      $Date: 2010-09-17 16:48:21 $
-Version:   $Revision: 1.49.2.6 $
+Date:      $Date: 2010-12-23 10:38:37 $
+Version:   $Revision: 1.49.2.7 $
 Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -43,6 +43,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkRenderer.h"
 #include "vtkLinearTransform.h"
 #include "vtkRenderWindow.h"
+#include "vtkRendererCollection.h"
 #include "vtkMath.h"
 #include "vtkActor.h"
 #include "vtkActor2D.h"
@@ -658,13 +659,99 @@ void mafRWI::CameraUpdate()
 	if (m_RenderWindow->GetGenericWindowId() == 0) 
 		return;
 
-	m_RenFront->ResetCameraClippingRange(); 
+  // 23.12.2010: Added patch by Simone Brazzale
+  // The Clipping range is now calculated considering all layers
+  this->ResetCameraClippingRange(); 
+
 	m_RenderWindow->Render();
 	if (m_StereoMovieEnable!=0)
 	{
 		m_RwiBase->GenerateStereoFrames();
 	}
 	UpdateCameraParameters();
+}
+//----------------------------------------------------------------------------
+void mafRWI::ResetCameraClippingRange()
+//----------------------------------------------------------------------------
+{
+	vtkRenderer *rAV = m_AlwaysVisibleRenderer; 	 
+	vtkRenderer *rFR = m_RenFront;	 
+  vtkRenderer *rBR = m_RenBack;
+
+	double b1[6],b2[6],b3[6],b[6];
+  if(rFR==NULL)
+	{
+	} 
+	else if (rAV==NULL && rBR==NULL)
+	{
+     rFR->ResetCameraClippingRange(); 
+	}
+  else if (rAV)
+  {
+    // We have the tird layer (always visible), with default bounds (-1,1,-1,1,-1,1).
+    // The clipping range must be computed with the bounds of the front renderer!
+		rFR->ComputeVisiblePropBounds(b1);
+		rAV->ComputeVisiblePropBounds(b2);
+
+		if(b1[0] == VTK_LARGE_FLOAT && b2[0] == VTK_LARGE_FLOAT)
+		{
+			rFR->ResetCameraClippingRange();
+		} 
+		else if (b1[0] == VTK_LARGE_FLOAT )
+		{
+			rFR->ResetCameraClippingRange(b2);
+		}
+		else
+		{
+      // WORKAROUND 
+      // The only actor shown is the Axis actor in the bottom left angle:
+      // it must not be taken into account.
+      if (b2[0]==-1 && b2[1]==1 && b2[2]==-1 && b2[3]==1 && b2[4]==-1 && b2[5]==1)
+      {
+        b[0] = b1[0];
+			  b[2] = b1[2];
+        b[4] = b1[4];
+        b[1] = b1[1];
+			  b[3] = b1[3];
+			  b[5] = b1[5];
+      }
+      // WORKAROUND 
+      // There are other actors (like the GIZMO): 
+      // we must take them into account.
+      else
+      {
+        b[0] = (b1[0]<b2[0]) ?	b1[0] : b2[0];    
+			  b[2] = (b1[2]<b2[2]) ?	b1[2] : b2[2];    
+			  b[4] = (b1[4]<b2[4]) ?	b1[4] : b2[4];    
+			  b[1] = (b1[1]>b2[1]) ?	b1[1] : b2[1];    
+			  b[3] = (b1[3]>b2[3]) ?	b1[3] : b2[3];    
+			  b[5] = (b1[5]>b2[5]) ?	b1[5] : b2[5];  
+      }
+			rFR->ResetCameraClippingRange(b);
+		}
+
+    // We have also the back renderer.
+    // The clipping range must be matched between the back renderer bounds and the already calculated one.	
+    if (rBR)
+  	{
+	  	rBR->ComputeVisiblePropBounds(b3);
+
+		  if (b3[0] == VTK_LARGE_FLOAT )
+		  {
+        // do nothing
+			}
+		  else
+		  {
+			  b[0] = (b[0]<b3[0]) ?	b[0] : b3[0];    
+			  b[2] = (b[2]<b3[2]) ?	b[2] : b3[2];    
+			  b[4] = (b[4]<b3[4]) ?	b[4] : b3[4];    
+			  b[1] = (b[1]>b3[1]) ?	b[1] : b3[1];    
+			  b[3] = (b[3]>b3[3]) ?	b[3] : b3[3];    
+			  b[5] = (b[5]>b3[5]) ?	b[5] : b3[5];    
+			  rFR->ResetCameraClippingRange(b);
+		  }
+	  }
+  }
 }
 //----------------------------------------------------------------------------
 void mafRWI::UpdateCameraParameters()

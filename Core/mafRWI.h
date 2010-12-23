@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafRWI.h,v $
 Language:  C++
-Date:      $Date: 2010-09-07 09:11:03 $
-Version:   $Revision: 1.25.2.2 $
+Date:      $Date: 2010-12-23 10:38:37 $
+Version:   $Revision: 1.25.2.3 $
 Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -141,8 +141,11 @@ public:
 	/** Allow to add/remove current vtkCamera to the list of vtkCamera linked together*/
 	void LinkCamera(bool linc_camera = true);
 
-	/*Return active ruler for using its methods*/
+	/* Return active ruler for using its methods*/
 	vtkMAFSimpleRulerActor2D *GetRuler(){return m_Ruler;};
+
+  /* Reset camera clipping range using visualized actors */
+  void ResetCameraClippingRange();
 
 	mafSceneGraph    *m_Sg; 
 	mafRWIBase			 *m_RwiBase;
@@ -164,6 +167,7 @@ public:
 	double            m_LeftRigthAccumulation; 
 	double            m_TopBottomAccumulationLast;
 	double            m_LeftRigthAccumulationLast; 
+
 protected:
 	/** Compute the bounds for the visible actors; if vme is passed, the bounds of vme are calculated. */
 	double *ComputeVisibleBounds(mafNode *node = NULL);
