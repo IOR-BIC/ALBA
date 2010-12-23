@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterVTKXML.h,v $
 Language:  C++
-Date:      $Date: 2010-12-21 16:35:59 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2010-12-23 11:31:50 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -88,7 +88,10 @@ public:
   virtual int ImportVTKXML();
 
   /** retrieve the file name*/
-  wxString GetFileName(){return m_File;};
+  mafString GetFileName(){return m_File;};
+
+  /** Set the file name*/
+  void SetFileName(mafString filename);
 
 protected:
 

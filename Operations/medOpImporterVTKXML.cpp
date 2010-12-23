@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterVTKXML.cpp,v $
 Language:  C++
-Date:      $Date: 2010-12-22 20:24:26 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2010-12-23 11:31:50 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -171,6 +171,12 @@ void medOpImporterVTKXML::OpRun()
     }
   }
   mafEventMacro(mafEvent(this,result));
+}
+//----------------------------------------------------------------------------
+void medOpImporterVTKXML::SetFileName(mafString filename)
+//----------------------------------------------------------------------------
+{
+  m_File = filename;
 }
 //----------------------------------------------------------------------------
 void medOpImporterVTKXML::ErrorProcessEvents(vtkObject* sender, unsigned long channel, void* clientdata, void* calldata)
