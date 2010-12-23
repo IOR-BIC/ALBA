@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterVTKTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-01-31 16:43:57 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2010-12-23 12:21:37 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -135,8 +135,8 @@ void medOpImporterVTKTest::TestImportVTKPolylineGraph()
   polyData->Modified();
   polyData->Update();
 
-  CPPUNIT_ASSERT(polyData->GetNumberOfPoints()==468);
-  CPPUNIT_ASSERT(polyData->GetNumberOfLines()==94);
+  CPPUNIT_ASSERT(polyData->GetNumberOfPoints()==5);
+  CPPUNIT_ASSERT(polyData->GetNumberOfLines()==4);
 
   mafDEL(importer);
 
