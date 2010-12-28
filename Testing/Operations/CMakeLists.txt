@@ -161,8 +161,8 @@ ADD_TEST(medOpImporterMotionDataTest ${EXECUTABLE_OUTPUT_PATH}/medOpImporterMoti
 ADD_EXECUTABLE(medOpFillHolesTest  medOpFillHolesTest.h medOpFillHolesTest.cpp)
 ADD_TEST(medOpFillHolesTest ${EXECUTABLE_OUTPUT_PATH}/medOpFillHolesTest)
 
-ADD_EXECUTABLE(medOpImporterVTKXMLTest  medOpImporterVTKXMLTest.h medOpImporterVTKXMLTest.cpp)
-ADD_TEST(medOpImporterVTKXMLTest ${EXECUTABLE_OUTPUT_PATH}/medOpImporterVTKXMLTest)
+#ADD_EXECUTABLE(medOpImporterVTKXMLTest  medOpImporterVTKXMLTest.h medOpImporterVTKXMLTest.cpp)
+#ADD_TEST(medOpImporterVTKXMLTest ${EXECUTABLE_OUTPUT_PATH}/medOpImporterVTKXMLTest)
 
 ADD_EXECUTABLE(medOpInteractiveClipSurfaceTest  medOpInteractiveClipSurfaceTest.h medOpInteractiveClipSurfaceTest.cpp)
 ADD_TEST(medOpInteractiveClipSurfaceTest ${EXECUTABLE_OUTPUT_PATH}/medOpInteractiveClipSurfaceTest)

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpInteractiveClipSurfaceTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-12-23 13:43:42 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-12-28 15:52:25 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Simone Brazzale
 ==========================================================================
 Copyright (c) 2007
@@ -94,7 +94,8 @@ void medOpInteractiveClipSurfaceTest::TestOpRun()
   clip->SurfaceAccept(surfaceInput);
   clip->SetInput(surfaceInput);
   clip->OpRun();
-  clip->Clip();
+  int result = clip->Clip();
+  CPPUNIT_ASSERT(result==MAF_OK);
 
   surfaceInput->GetOutput()->GetVTKData()->Update();
   surfaceInput->GetOutput()->Update();
