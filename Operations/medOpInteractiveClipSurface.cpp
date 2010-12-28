@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpInteractiveClipSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 12:30:11 $
-  Version:   $Revision: 1.13.2.1 $
+  Date:      $Date: 2010-12-28 15:51:57 $
+  Version:   $Revision: 1.13.2.2 $
   Authors:   Paolo Quadrani, Stefano Perticoni , Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -199,7 +199,11 @@ void medOpInteractiveClipSurface::OpRun()
     ShowGui();
 
     mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-  
+  }
+  // Added facility for test case
+  else
+  {
+    ShowClipPlane(m_ClipModality != medOpInteractiveClipSurface::MODE_SURFACE);
   }
 }
 //----------------------------------------------------------------------------
@@ -442,8 +446,11 @@ void medOpInteractiveClipSurface::ClipBoundingBox()
 	if(result==MAF_OK)
 		m_ResultPolyData.push_back(newPolyData);
 
-	m_Gui->Enable(ID_UNDO,m_ResultPolyData.size()>1);
-	m_Gui->Enable(wxOK,m_ResultPolyData.size()>1);
+	if (!m_TestMode)
+  {
+    m_Gui->Enable(ID_UNDO,m_ResultPolyData.size()>1);
+	  m_Gui->Enable(wxOK,m_ResultPolyData.size()>1);
+  }
 }
 //----------------------------------------------------------------------------
 void medOpInteractiveClipSurface::OnEventGizmoTranslate(mafEventBase *maf_event)
@@ -661,7 +668,11 @@ void medOpInteractiveClipSurface::OpStop(int result)
   vtkDEL(m_ClipperPlane);
   vtkDEL(m_PlaneSource);
 
-  HideGui();
+  if (!m_TestMode)
+  {
+    HideGui();
+  }
+
   mafEventMacro(mafEvent(this,result));
 }
 //----------------------------------------------------------------------------
@@ -732,6 +743,13 @@ int medOpInteractiveClipSurface::Clip()
 		if(m_ClipBoundBox)
 		{
 			ClipBoundingBox();
+ 
+      // Only TEST case!
+      if (m_TestMode)
+      {
+        OpStop(OP_RUN_OK);
+      }
+ 
 			return MAF_OK;
 		}
 		else
@@ -771,8 +789,11 @@ int medOpInteractiveClipSurface::Clip()
 	if(result==MAF_OK)
 		m_ResultPolyData.push_back(newPolyData);
 
-	m_Gui->Enable(ID_UNDO,m_ResultPolyData.size()>1);
-	m_Gui->Enable(wxOK,m_ResultPolyData.size()>1);
+	if (!m_TestMode)
+  {
+    m_Gui->Enable(ID_UNDO,m_ResultPolyData.size()>1);
+	  m_Gui->Enable(wxOK,m_ResultPolyData.size()>1);
+  }
   return MAF_OK;
 }
 //----------------------------------------------------------------------------
