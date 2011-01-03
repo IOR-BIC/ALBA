@@ -97,6 +97,12 @@ ADD_TEST(MeshDataTest ${EXECUTABLE_OUTPUT_PATH}/MeshDataTest)
 ADD_EXECUTABLE(vtkMEDExtrudeToCircleVertexDataTest vtkMEDExtrudeToCircleVertexDataTest.h vtkMEDExtrudeToCircleVertexDataTest.cpp)
 ADD_TEST(vtkMEDExtrudeToCircleVertexDataTest ${EXECUTABLE_OUTPUT_PATH}/vtkMEDExtrudeToCircleVertexDataTest)
 
+ADD_EXECUTABLE(vtkMEDFillingHoleCTriangleTest vtkMEDFillingHoleCTriangleTest.h vtkMEDFillingHoleCTriangleTest.cpp)
+ADD_TEST(vtkMEDFillingHoleCTriangleTest ${EXECUTABLE_OUTPUT_PATH}/vtkMEDFillingHoleCTriangleTest)
+
+ADD_EXECUTABLE(vtkMEDFillingHoleCEdgeTest vtkMEDFillingHoleCEdgeTest.h vtkMEDFillingHoleCEdgeTest.cpp)
+ADD_TEST(vtkMEDFillingHoleCEdgeTest ${EXECUTABLE_OUTPUT_PATH}/vtkMEDFillingHoleCEdgeTest)
+
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
 #ENDIF (MAF_USE_WX)
