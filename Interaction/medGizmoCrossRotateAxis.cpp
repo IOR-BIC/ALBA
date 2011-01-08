@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoCrossRotateAxis.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-12-07 10:45:06 $
-  Version:   $Revision: 1.1.2.5 $
+  Date:      $Date: 2011-01-08 17:06:37 $
+  Version:   $Revision: 1.1.2.6 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -36,6 +36,7 @@
 #include "mafVMEOutput.h"
 #include "mafVMEGizmo.h"
 #include "mafMatrix.h"
+#include "mafTagArray.h"
 
 // vtk stuff
 #include "vtkDiskSource.h"
@@ -54,12 +55,36 @@
 medGizmoCrossRotateAxis::medGizmoCrossRotateAxis(mafVME *input, mafObserver *listener)
 //----------------------------------------------------------------------------
 {
+  m_FGCircle = NULL;
+  m_FGCleanCircle = NULL;
+  m_FGCircleTubeFilter = NULL;
+  m_FGRotationTransform = NULL;
+  m_FGRotatePDF = NULL;
+  m_FGCircleTF = NULL;
+  m_FGRotationTr = NULL;
+
+  m_FeedbackConeSource = NULL;
+
+  m_LeftUpFeedbackConeTransform = NULL;
+  m_LeftDownFeedbackConeTransform = NULL;
+  m_RightDownFeedbackConeTransform = NULL;
+  m_RightUpFeedbackConeTransform = NULL;
+
+  m_LeftUpFeedbackConeTransformPDF = NULL;
+  m_LeftDownFeedbackConeTransformPDF = NULL;
+  m_RightUpFeedbackConeTransformPDF = NULL;
+  m_RightDownFeedbackConeTransformPDF = NULL;
+
 	m_LineSourceEast = NULL;
 	m_LineSourceWest = NULL;
 	m_LineSourceNorth = NULL;
 	m_LineSourceSouth = NULL;
 
-	m_AppendPolyData = NULL;
+	m_LinesAppendPolyData = NULL;
+
+  m_LinesCleanCircle = NULL;
+  m_LinesRotationTransform = NULL; 
+  m_LinesRotatePDF = NULL; 
 
   this->SetIsActive(false);
   
@@ -85,12 +110,14 @@ medGizmoCrossRotateAxis::medGizmoCrossRotateAxis(mafVME *input, mafObserver *lis
   // the circle gizmo
   m_GizmoCross = mafVMEGizmo::New();
   m_GizmoCross->SetName("rotate cross");
-  m_GizmoCross->SetData(m_RotatePDF->GetOutput());
+  m_GizmoCross->SetData(m_LinesRotatePDF->GetOutput());
   
   medGizmoCrossRotateFan *rotateFan = NULL;
   rotateFan = dynamic_cast<medGizmoCrossRotateFan *>(m_Listener);
 
   m_GizmoCross->SetMediator(rotateFan->GetMediator());
+
+ // m_GizmoCross->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 1));
 
   // assign isa to S1 and S2;
   m_GizmoCross->SetBehavior(m_IsaComp);
@@ -106,6 +133,7 @@ medGizmoCrossRotateAxis::medGizmoCrossRotateAxis(mafVME *input, mafObserver *lis
   // add the gizmo to the tree, this should increase reference count  
   m_GizmoCross->ReparentTo(mafVME::SafeDownCast(m_InputVme->GetRoot()));
 
+  CreateFeedbackGizmoPipeline();
 }
 //----------------------------------------------------------------------------
 medGizmoCrossRotateAxis::~medGizmoCrossRotateAxis() 
@@ -118,17 +146,36 @@ medGizmoCrossRotateAxis::~medGizmoCrossRotateAxis()
   vtkDEL(m_LineSourceNorth);
   vtkDEL(m_LineSourceSouth);
 
-  vtkDEL(m_AppendPolyData);
-  vtkDEL(m_CleanCircle);
-  vtkDEL(m_CircleTF);
-  vtkDEL(m_RotationTr); 
-  vtkDEL(m_RotatePDF); 
+  vtkDEL(m_LinesAppendPolyData);
+  vtkDEL(m_LinesCleanCircle);
+  vtkDEL(m_LinesRotationTransform); 
+  vtkDEL(m_LinesRotatePDF); 
 	//----------------------
 	// No leaks so somebody is performing this...
 	//----------------------
   vtkDEL(m_IsaComp); 
   
 	m_GizmoCross->ReparentTo(NULL);
+
+  vtkDEL(m_FGCircle);
+  vtkDEL(m_FGCleanCircle);
+  vtkDEL(m_FGCircleTubeFilter);
+  vtkDEL(m_FGRotationTransform);
+  vtkDEL(m_FGRotatePDF);
+  vtkDEL(m_FGCircleTF);
+  vtkDEL(m_FGRotationTr);
+
+  vtkDEL(m_FeedbackConeSource);
+
+  vtkDEL(m_LeftUpFeedbackConeTransform);
+  vtkDEL(m_LeftDownFeedbackConeTransform);
+  vtkDEL(m_RightDownFeedbackConeTransform);
+  vtkDEL(m_RightUpFeedbackConeTransform);
+
+  vtkDEL(m_LeftUpFeedbackConeTransformPDF);
+  vtkDEL(m_LeftDownFeedbackConeTransformPDF);
+  vtkDEL(m_RightUpFeedbackConeTransformPDF);
+  vtkDEL(m_RightDownFeedbackConeTransformPDF);
 }
 //----------------------------------------------------------------------------
 void medGizmoCrossRotateAxis::CreatePipeline() 
@@ -170,32 +217,32 @@ void medGizmoCrossRotateAxis::CreatePipeline()
 
   m_Radius = boundingBoxDiagonal / 2;
 
-  m_AppendPolyData = vtkAppendPolyData::New();
-  m_AppendPolyData->AddInput(m_LineSourceEast->GetOutput());
-  m_AppendPolyData->AddInput(m_LineSourceWest->GetOutput());
-  m_AppendPolyData->AddInput(m_LineSourceNorth->GetOutput());
-  m_AppendPolyData->AddInput(m_LineSourceSouth->GetOutput());
+  m_LinesAppendPolyData = vtkAppendPolyData::New();
+  m_LinesAppendPolyData->AddInput(m_LineSourceEast->GetOutput());
+  m_LinesAppendPolyData->AddInput(m_LineSourceWest->GetOutput());
+  m_LinesAppendPolyData->AddInput(m_LineSourceNorth->GetOutput());
+  m_LinesAppendPolyData->AddInput(m_LineSourceSouth->GetOutput());
 
   // clean the circle polydata
-  m_CleanCircle = vtkCleanPolyData::New();
-  m_CleanCircle->SetInput(m_AppendPolyData->GetOutput());
+  m_LinesCleanCircle = vtkCleanPolyData::New();
+  m_LinesCleanCircle->SetInput(m_LinesAppendPolyData->GetOutput());
 
   // tube filter the circle 
-  m_CircleTF = vtkTubeFilter::New();
-  m_CircleTF->SetInput(m_CleanCircle->GetOutput());
+  m_LinesTubeFilter = vtkTubeFilter::New();
+  m_LinesTubeFilter->SetInput(m_LinesCleanCircle->GetOutput());
 
   double tubeRadius = boundingBoxDiagonal / 350;
 
-  m_CircleTF->SetRadius(tubeRadius);
-  m_CircleTF->SetNumberOfSides(20);
+  m_LinesTubeFilter->SetRadius(tubeRadius);
+  m_LinesTubeFilter->SetNumberOfSides(20);
   
   // create rotation transform and rotation TPDF
-  m_RotationTr = vtkTransform::New();
-  m_RotationTr->Identity();
+  m_LinesRotationTransform = vtkTransform::New();
+  m_LinesRotationTransform->Identity();
 
-  m_RotatePDF = vtkTransformPolyDataFilter::New();
-  m_RotatePDF->SetTransform(m_RotationTr);
-  m_RotatePDF->SetInput(m_CircleTF->GetOutput());
+  m_LinesRotatePDF = vtkTransformPolyDataFilter::New();
+  m_LinesRotatePDF->SetTransform(m_LinesRotationTransform);
+  m_LinesRotatePDF->SetInput(m_LinesTubeFilter->GetOutput());
 
 }
 //----------------------------------------------------------------------------
@@ -232,8 +279,8 @@ void medGizmoCrossRotateAxis::SetAxis(int axis)
   if (m_ActiveAxis == X)
   {
     // set rotation to move gizmo normal to X
-    m_RotationTr->Identity();
-    m_RotationTr->RotateY(90);
+    m_LinesRotationTransform->Identity();
+    m_LinesRotationTransform->RotateY(90);
     
     // set the color to red
     this->SetColor(1, 0, 0);
@@ -244,8 +291,8 @@ void medGizmoCrossRotateAxis::SetAxis(int axis)
   else if (m_ActiveAxis == Y)
   {
     // set rotation to move gizmo normal to Y 
-    m_RotationTr->Identity();
-    m_RotationTr->RotateX(90);
+    m_LinesRotationTransform->Identity();
+    m_LinesRotationTransform->RotateX(90);
  
     // set the color to green
     this->SetColor(0, 1, 0);
@@ -256,7 +303,7 @@ void medGizmoCrossRotateAxis::SetAxis(int axis)
   else if (m_ActiveAxis == Z)
   {
     // reset circle orientation to move gizmo normal to Z
-    m_RotationTr->Identity();
+    m_LinesRotationTransform->Identity();
   
     // set the color to blue
     this->SetColor(0, 0, 1);
@@ -273,6 +320,8 @@ void medGizmoCrossRotateAxis::Highlight(bool highlight)
   {
    // Highlight the circle by setting its color to yellow 
    this->SetColor(1, 1, 0);
+   ShowTranslationFeedbackArrows(true);
+
   } 
   else
   {
@@ -292,6 +341,8 @@ void medGizmoCrossRotateAxis::Highlight(bool highlight)
     // Z circle to blue
     this->SetColor(0, 0, 1);
    } 
+
+   ShowTranslationFeedbackArrows(false);
   }
 }
 
@@ -403,4 +454,125 @@ bool medGizmoCrossRotateAxis::GetIsActive()
 mafVME * medGizmoCrossRotateAxis::GetInput()
 {
   return this->m_InputVme;
+}
+
+
+void medGizmoCrossRotateAxis::CreateFeedbackGizmoPipeline()
+{
+  assert(m_InputVme);
+
+  double bbDiagonal = m_InputVme->GetOutput()->GetVTKData()->GetLength();
+
+  // cone origin in height / 2
+  double coneHeight = bbDiagonal / 4;
+  double coneRadius = bbDiagonal /7;
+  double coneResolution = 40;
+  double y = coneHeight;
+  double x = bbDiagonal / 2;
+
+  m_FeedbackConeSource = vtkConeSource::New();
+
+  m_LeftUpFeedbackConeTransformPDF = vtkTransformPolyDataFilter::New();
+  m_LeftDownFeedbackConeTransformPDF = vtkTransformPolyDataFilter::New();
+  m_RightUpFeedbackConeTransformPDF = vtkTransformPolyDataFilter::New();
+  m_RightDownFeedbackConeTransformPDF = vtkTransformPolyDataFilter::New();
+
+  m_LeftUpFeedbackConeTransform = vtkTransform::New();
+  m_LeftUpFeedbackConeTransform->PostMultiply();
+  m_LeftUpFeedbackConeTransform->RotateZ(90);
+  m_LeftUpFeedbackConeTransform->Translate(0,y, 0);
+  m_LeftUpFeedbackConeTransform->Translate(- x, 0,0);
+
+  m_LeftDownFeedbackConeTransform = vtkTransform::New();
+  m_LeftDownFeedbackConeTransform->PostMultiply();
+  m_LeftDownFeedbackConeTransform->RotateZ(-90);
+  m_LeftDownFeedbackConeTransform->Translate(0, - y, 0);
+  m_LeftDownFeedbackConeTransform->Translate(- x, 0,0);
+
+  m_RightDownFeedbackConeTransform = vtkTransform::New();
+  m_RightDownFeedbackConeTransform->PostMultiply();
+  m_RightDownFeedbackConeTransform->RotateZ(-90);
+  m_RightDownFeedbackConeTransform->Translate(0, -y, 0);
+  m_RightDownFeedbackConeTransform->Translate(x, 0,0);
+
+  m_RightUpFeedbackConeTransform = vtkTransform::New();
+  m_RightUpFeedbackConeTransform->PostMultiply();
+  m_RightUpFeedbackConeTransform->RotateZ(90);
+  m_RightUpFeedbackConeTransform->Translate(0, y, 0);
+  m_RightUpFeedbackConeTransform->Translate(x, 0,0);
+
+  m_FeedbackConeSource->SetResolution(coneResolution);
+  m_FeedbackConeSource->SetHeight(coneHeight);
+  m_FeedbackConeSource->SetRadius(coneRadius);
+  m_FeedbackConeSource->Update();
+
+  m_LeftUpFeedbackConeTransformPDF->SetInput(m_FeedbackConeSource->GetOutput());
+  m_LeftUpFeedbackConeTransformPDF->SetTransform(m_LeftUpFeedbackConeTransform);
+
+  m_LeftDownFeedbackConeTransformPDF->SetInput(m_FeedbackConeSource->GetOutput());
+  m_LeftDownFeedbackConeTransformPDF->SetTransform(m_LeftDownFeedbackConeTransform);
+
+  m_RightUpFeedbackConeTransformPDF->SetInput(m_FeedbackConeSource->GetOutput());
+  m_RightUpFeedbackConeTransformPDF->SetTransform(m_RightUpFeedbackConeTransform);
+
+  m_RightDownFeedbackConeTransformPDF->SetInput(m_FeedbackConeSource->GetOutput());
+  m_RightDownFeedbackConeTransformPDF->SetTransform(m_RightDownFeedbackConeTransform);
+
+  // create circle
+  m_FGCircle = vtkDiskSource::New();
+  m_FGCircle->SetCircumferentialResolution(200);
+  m_FGCircle->SetInnerRadius(x);
+  m_FGCircle->SetOuterRadius(x);
+
+  // clean the circle polydata
+  m_FGCleanCircle = vtkCleanPolyData::New();
+  m_FGCleanCircle->SetInput(m_FGCircle->GetOutput());
+
+  // tube filter the circle 
+  m_FGCircleTF = vtkTubeFilter::New();
+  m_FGCircleTF->SetInput(m_FGCleanCircle->GetOutput());
+  m_FGCircleTF->SetRadius(x / 8);
+  m_FGCircleTF->SetNumberOfSides(20);
+
+  // create rotation transform and rotation TPDF
+  m_FGRotationTr = vtkTransform::New();
+  m_FGRotationTr->Identity();
+
+  m_FGRotatePDF = vtkTransformPolyDataFilter::New();
+  m_FGRotatePDF->SetTransform(m_FGRotationTr);
+  m_FGRotatePDF->SetInput(m_FGCircleTF->GetOutput());
+
+  m_FeedbackStuffAppendPolydata = vtkAppendPolyData::New();
+//   m_FeedbackStuffAppendPolydata->AddInput(m_LeftUpFeedbackConeTransformPDF->GetOutput());
+//   m_FeedbackStuffAppendPolydata->AddInput(m_LeftDownFeedbackConeTransformPDF->GetOutput());
+//   m_FeedbackStuffAppendPolydata->AddInput(m_RightUpFeedbackConeTransformPDF->GetOutput());
+//   m_FeedbackStuffAppendPolydata->AddInput(m_RightDownFeedbackConeTransformPDF->GetOutput());
+  m_FeedbackStuffAppendPolydata->AddInput(m_FGRotatePDF->GetOutput());
+  m_FeedbackStuffAppendPolydata->Update();
+
+  m_RotationFeedbackGizmo = mafVMEGizmo::New();
+  m_RotationFeedbackGizmo->SetName("AxisRotationFeedbackGizmo");
+
+  medGizmoCrossRotateFan *rotateFan = NULL;
+  rotateFan = dynamic_cast<medGizmoCrossRotateFan *>(m_Listener);
+
+  m_RotationFeedbackGizmo->SetMediator(rotateFan->GetMediator());
+  m_RotationFeedbackGizmo->SetData(m_FeedbackStuffAppendPolydata->GetOutput());
+//  m_RotationFeedbackGizmo->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 1));
+  assert(m_InputVme);
+
+  m_RotationFeedbackGizmo->GetMaterial()->m_Prop->SetColor(1,1,0);
+  m_RotationFeedbackGizmo->GetMaterial()->m_Prop->SetAmbient(0);
+  m_RotationFeedbackGizmo->GetMaterial()->m_Prop->SetDiffuse(1);
+  m_RotationFeedbackGizmo->GetMaterial()->m_Prop->SetSpecular(0);
+  m_RotationFeedbackGizmo->GetMaterial()->m_Prop->SetOpacity(0.1);
+ 
+  // ReparentTo will add also the gizmos to the tree
+  m_RotationFeedbackGizmo->ReparentTo(m_GizmoCross);
+
+}
+
+void medGizmoCrossRotateAxis::ShowTranslationFeedbackArrows(bool show)
+{
+  mafEventMacro(mafEvent(this,VME_SHOW,m_RotationFeedbackGizmo,show));
 }

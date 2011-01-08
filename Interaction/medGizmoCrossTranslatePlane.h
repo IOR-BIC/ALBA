@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoCrossTranslatePlane.h,v $
   Language:  C++
-  Date:      $Date: 2010-11-10 16:53:03 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2011-01-08 17:06:37 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -29,6 +29,11 @@
 //----------------------------------------------------------------------------
 #include "mafEvent.h"
 #include "mafGizmoInterface.h"
+#include "vtkConeSource.h"
+#include "vtkTransform.h"
+#include "vtkTransformPolyDataFilter.h"
+#include "vtkCylinderSource.h"
+#include "vtkAppendPolyData.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -90,9 +95,11 @@ public:
   /** Highlight gizmo*/
   void Highlight(bool highlight);
     
-  /** Show gizmo */
+  /** Show plane translation gizmo */
   void Show(bool show);
-  
+
+  /** Show the translation feedback arrows  */
+  void ShowTranslationFeedbackArrows(bool show);
   
   //----------------------------------------------------------------------------
   // size setting 
@@ -192,8 +199,11 @@ protected:
   /** rotation transform for cylinder and cone*/
   vtkTransform *m_RotationTr;
   
-  /** Create vtk objects needed*/
+  /** Create vtk objects needed */
   void CreatePipeline();
+
+  /** Create feedback gizmo vtk objects */
+  void CreateFeedbackGizmoPipeline();
 
   /** Create isa stuff */
   void CreateISA();
@@ -213,9 +223,33 @@ protected:
 
   /** Hide/show the square */
   void ShowSquare(bool show);
-
   /** Register Gizmo status*/
   bool m_IsActive;
+
+  /** Translation feedback arrows gizmo*/
+  mafVMEGizmo *m_TranslationFeedbackGizmo;
+
+  vtkConeSource *m_FeedbackConeSource;
+
+  vtkTransform *m_LeftFeedbackConeTransform;
+  vtkTransform *m_RightFeedbackConeTransform;
+  vtkTransform *m_UpFeedbackConeTransform;
+  vtkTransform *m_DownFeedbackConeTransform;
+
+  vtkTransformPolyDataFilter *m_LeftFeedbackConeTransformPDF;
+  vtkTransformPolyDataFilter *m_RightFeedbackConeTransformPDF;
+  vtkTransformPolyDataFilter *m_UpFeedbackConeTransformPDF;
+  vtkTransformPolyDataFilter *m_DownFeedbackConeTransformPDF;
+
+  vtkCylinderSource *m_FeedbackCylinderSource;
+
+  vtkTransform *m_HorizontalFeedbackCylinderTransform;
+  vtkTransform *m_VerticalFeedbackCylinderTransform;
+
+  vtkTransformPolyDataFilter *m_VerticalFeedbackCylinderTransformPDF;
+  vtkTransformPolyDataFilter *m_HorizontalFeedbackCylinderTransformPDF;
+  
+  vtkAppendPolyData *m_FeedbackStuffAppendPolydata;
 
   friend class mafGizmoTranslatePlaneTest;
 };

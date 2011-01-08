@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGizmoCrossRotate.cpp,v $
 Language:  C++
-Date:      $Date: 2010-12-07 10:45:06 $
-Version:   $Revision: 1.1.2.5 $
+Date:      $Date: 2011-01-08 17:06:37 $
+Version:   $Revision: 1.1.2.6 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -151,7 +151,6 @@ void medGizmoCrossRotate::OnEventGizmoComponents(mafEventBase *maf_event)
 				else if (arg == mafInteractorGenericMouse::MOUSE_UP)
 				{
 					this->Highlight(false);
-
 					// gizmo mode == local
 					if (m_Modality == G_LOCAL)
 					{
@@ -211,6 +210,7 @@ void medGizmoCrossRotate::Highlight (bool highlight)
 {
 	m_GizmoCrossRotateAxis->Highlight(highlight);
 	m_GizmoCrossRotateFan->Show(highlight);
+
 }
 
 //----------------------------------------------------------------------------  

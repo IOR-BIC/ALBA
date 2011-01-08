@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoCrossRotateAxis.h,v $
   Language:  C++
-  Date:      $Date: 2010-10-22 15:56:33 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2011-01-08 17:06:37 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -30,6 +30,12 @@
 #include "mafEvent.h"
 #include "mafGizmoInterface.h"
 #include "mafSmartPointer.h"
+#include "vtkConeSource.h"
+#include "vtkTransform.h"
+#include "vtkTransformPolyDataFilter.h"
+#include "vtkDiskSource.h"
+#include "vtkCleanPolyData.h"
+#include "vtkTubeFilter.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -91,9 +97,12 @@ public:
   /** Highlight gizmo*/
   void Highlight(bool highlight);
     
-  /** Show gizmo */
+  /** Show the translation gizmo */
   void Show(bool show);
-  
+
+  /** Show the translation feedback arrows  */
+  void ShowTranslationFeedbackArrows(bool show);
+
   //----------------------------------------------------------------------------
   // radius setting 
   //----------------------------------------------------------------------------
@@ -157,22 +166,22 @@ protected:
   vtkLineSource *m_LineSourceNorth;
   vtkLineSource *m_LineSourceSouth;
 
-  /** Clean the circle polydata */
-  vtkCleanPolyData *m_CleanCircle;
-    
-  /** Tube filter for circle */
-  vtkTubeFilter *m_CircleTF;
+  vtkCleanPolyData *m_LinesCleanCircle; 
 
-  vtkAppendPolyData *m_AppendPolyData;
+  vtkTubeFilter *m_LinesTubeFilter;
+  vtkAppendPolyData *m_LinesAppendPolyData;
 
   /** rotate PDF for gizmo */
-  vtkTransformPolyDataFilter *m_RotatePDF;
+  vtkTransformPolyDataFilter *m_LinesRotatePDF;
 
   /** rotation transform */
-  vtkTransform *m_RotationTr;
+  vtkTransform *m_LinesRotationTransform;
   
-  /** Create vtk objects needed*/
+  /** Create moving gizmo vtk objects*/
   void CreatePipeline();
+
+  /** Create motion feedback gizmo vtk objects*/
+  void CreateFeedbackGizmoPipeline();
 
   /** Create isa stuff */
   void CreateISA();
@@ -197,7 +206,28 @@ protected:
   /** Register gizmo radius */
   double m_Radius;
 
-  /** friend test */
-  friend class mafGizmoRotateCircleTest;
+  vtkConeSource *m_FeedbackConeSource;
+
+  vtkTransform *m_LeftUpFeedbackConeTransform;
+  vtkTransform *m_LeftDownFeedbackConeTransform;
+  vtkTransform *m_RightDownFeedbackConeTransform;
+  vtkTransform *m_RightUpFeedbackConeTransform;
+
+  vtkTransformPolyDataFilter *m_LeftUpFeedbackConeTransformPDF;
+  vtkTransformPolyDataFilter *m_LeftDownFeedbackConeTransformPDF;
+  vtkTransformPolyDataFilter *m_RightUpFeedbackConeTransformPDF;
+  vtkTransformPolyDataFilter *m_RightDownFeedbackConeTransformPDF;
+
+  vtkDiskSource *m_FGCircle;
+  vtkCleanPolyData *m_FGCleanCircle;
+  vtkTubeFilter *m_FGCircleTubeFilter;
+  vtkTransform *m_FGRotationTransform;
+  vtkTransformPolyDataFilter *m_FGRotatePDF;
+  vtkTubeFilter *m_FGCircleTF;
+  vtkTransform *m_FGRotationTr;
+
+  vtkAppendPolyData *m_FeedbackStuffAppendPolydata;
+  mafVMEGizmo *m_RotationFeedbackGizmo;
+
 };
 #endif

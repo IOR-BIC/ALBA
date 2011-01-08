@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoCrossTranslateAxis.h,v $
   Language:  C++
-  Date:      $Date: 2010-11-10 16:53:03 $
-  Version:   $Revision: 1.1.2.4 $
+  Date:      $Date: 2011-01-08 17:06:37 $
+  Version:   $Revision: 1.1.2.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -28,6 +28,7 @@
 //----------------------------------------------------------------------------
 #include "mafEvent.h"
 #include "mafGizmoInterface.h"
+#include "vtkConeSource.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -89,6 +90,8 @@ public:
   /** Show the gizmo */
   void Show(bool show);
  
+  /** Show the translation feedback arrows  */
+  void ShowTranslationFeedbackArrows(bool show);
   //----------------------------------------------------------------------------
   // cylinder stuff
   //----------------------------------------------------------------------------
@@ -116,16 +119,42 @@ public:
 
 protected:
 
+  /** Pickable translation cylinder gizmo*/
+  mafVMEGizmo *m_TranslationCylinderGizmo;
+
+  
   double m_Color[3];
   double m_LastColor[3];
+
+  /** Translation feedback arrows gizmo*/
+  mafVMEGizmo *m_TranslationFeedbackGizmo;
+
+  vtkConeSource *m_FeedbackConeSource;
+
+  vtkTransform *m_LeftUpFeedbackConeTransform;
+  vtkTransform *m_LeftDownFeedbackConeTransform;
+  vtkTransform *m_RightDownFeedbackConeTransform;
+  vtkTransform *m_RightUpFeedbackConeTransform;
+
+  vtkCylinderSource *m_FeedbackCylinderSource;
+
+  vtkTransform *m_LeftFeedbackCylinderTransform;
+  vtkTransform *m_RightFeedbackCylinderTransform;
+
+  vtkTransformPolyDataFilter *m_LeftUpFeedbackConeTransformPDF;
+  vtkTransformPolyDataFilter *m_LeftDownFeedbackConeTransformPDF;
+  vtkTransformPolyDataFilter *m_RightUpFeedbackConeTransformPDF;
+  vtkTransformPolyDataFilter *m_RightDownFeedbackConeTransformPDF;
+  
+  vtkTransformPolyDataFilter *m_LeftFeedbackCylinderTransformPDF;
+  vtkTransformPolyDataFilter *m_RightFeedbackCylinderTransformPDF;
+
+  vtkAppendPolyData *m_FeedbackStuffAppendPolydata;
 
   /** 
   Set the constrain ref sys */
   void SetRefSysMatrix(mafMatrix *constrain);
   
-  /** cylinder gizmo*/
-  mafVMEGizmo *m_CylGizmo;
-
   /** Register input vme*/
   mafVME *m_InputVme;
 
@@ -172,11 +201,14 @@ protected:
   vtkAppendPolyData *m_Append;
 
   /** Create vtk objects needed*/
-  void CreatePipeline();
+  void CreateTranslationGizmoPipeline();
 
   /** Create isa stuff */
   void CreateISA();
 
+  /** Create translation feedback arrows stuff */
+  void CreateFeedbackGizmoPipeline();
+  
   /** isa compositor*/
   mafInteractorCompositorMouse *m_IsaComp;
 

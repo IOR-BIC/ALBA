@@ -1,13 +1,13 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: medGizmoCrossTranslate.cpp,v $
-  Language:  C++
-  Date:      $Date: 2010-12-15 11:09:58 $
-  Version:   $Revision: 1.1.2.5 $
-  Authors:   Stefano Perticoni
+Program:   Multimod Application Framework
+Module:    $RCSfile: medGizmoCrossTranslate.cpp,v $
+Language:  C++
+Date:      $Date: 2011-01-08 17:06:37 $
+Version:   $Revision: 1.1.2.6 $
+Authors:   Stefano Perticoni
 ==========================================================================
-  Copyright (c) 2002/2004 
-  CINECA - Interuniversity Consortium (www.cineca.it)
+Copyright (c) 2002/2004 
+CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
 
@@ -46,12 +46,12 @@ medGizmoCrossTranslate::medGizmoCrossTranslate(mafVME* input, mafObserver *liste
 //----------------------------------------------------------------------------
 {
   assert(input);
-  
+
   m_InputVME = input;
   m_Listener = listener;
   m_BuildGUI = buildGUI;
-  m_GTAxis0 = NULL;
-  m_GTAxis1 = NULL;
+  m_GTUpDown = NULL;
+  m_GTLeftRight = NULL;
   m_GTPlane = NULL;
   m_GuiGizmoTranslate = NULL;
 
@@ -62,7 +62,7 @@ medGizmoCrossTranslate::medGizmoCrossTranslate(mafVME* input, mafObserver *liste
   m_ConstraintModality = mafInteractorConstraint::FREE;
 
   m_Step = 1;
-  
+
   this->m_ActiveGizmoComponent = -1;
   this->SetModalityToLocal();
 
@@ -73,8 +73,8 @@ medGizmoCrossTranslate::medGizmoCrossTranslate(mafVME* input, mafObserver *liste
 
   // Create mafGizmoTranslateAxis and send events to this
 
-  m_GTAxis0 = new medGizmoCrossTranslateAxis(input, this);
-  m_GTAxis1 = new medGizmoCrossTranslateAxis(input, this);
+  m_GTUpDown = new medGizmoCrossTranslateAxis(input, this);
+  m_GTLeftRight = new medGizmoCrossTranslateAxis(input, this);
 
   int axis0 = -1;
   int axis1 = -1;
@@ -85,9 +85,9 @@ medGizmoCrossTranslate::medGizmoCrossTranslate(mafVME* input, mafObserver *liste
   axis1 = Y;
   plane = medGizmoCrossTranslatePlane::XY;
 
-  m_GTAxis0->SetAxis(axis0);  
-  m_GTAxis1->SetAxis(axis1);
-  
+  m_GTUpDown->SetAxis(axis0);  
+  m_GTLeftRight->SetAxis(axis1);
+
   // Create mafGTranslateAPlane 
   m_GTPlane = new medGizmoCrossTranslatePlane(input, this);
   m_GTPlane->SetPlane(plane);
@@ -110,9 +110,9 @@ medGizmoCrossTranslate::~medGizmoCrossTranslate()
   //Destroy:
   //3 mafGizmoTranslateAxis 
   //3 mafGizmoTranslatePlane
-  
-  cppDEL(m_GTAxis0);
-  cppDEL(m_GTAxis1);
+
+  cppDEL(m_GTUpDown);
+  cppDEL(m_GTLeftRight);
   cppDEL(m_GTPlane);
 
   mafDEL(m_PivotPose);
@@ -124,7 +124,7 @@ void medGizmoCrossTranslate::OnEvent(mafEventBase *maf_event)
 {
   void *sender = maf_event->GetSender();
 
-  if (sender == m_GTAxis0 || sender == m_GTAxis1 || sender == m_GTPlane )
+  if (sender == m_GTUpDown || sender == m_GTLeftRight || sender == m_GTPlane )
   {
     OnEventGizmoComponents(maf_event); // process events from gizmo components
   }
@@ -148,36 +148,46 @@ void medGizmoCrossTranslate::OnEventGizmoComponents(mafEventBase *maf_event)
 
     switch (e->GetId())
     {
-      case ID_TRANSFORM:
+    case ID_TRANSFORM:
       {
         // if a gizmo has been picked register the active component; the sender is the component
         // to be activated
         if (arg == mafInteractorGenericMouse::MOUSE_DOWN)
         {
-          if (sender == m_GTAxis0)
+          if (sender == m_GTUpDown)
           {
-            this->Highlight(AXIS_0);
-            m_ActiveGizmoComponent = AXIS_0;
+            this->Highlight(TRANSLATE_UP_DOWN);
+            m_ActiveGizmoComponent = TRANSLATE_UP_DOWN;
+
+            // show arrow source up down 
+            m_GTUpDown->ShowTranslationFeedbackArrows(true);
           }
-		  else if (sender == m_GTAxis1)
-		  {
-			  this->Highlight(AXIS_1);
-			  m_ActiveGizmoComponent = AXIS_1;
-		  }
+          else if (sender == m_GTLeftRight)
+          {
+            this->Highlight(TRANSLATE_LEFT_RIGHT);
+            m_ActiveGizmoComponent = TRANSLATE_LEFT_RIGHT;
+            
+            // show arrow source left right
+            m_GTLeftRight->ShowTranslationFeedbackArrows(true);
+          }
           else if (sender == m_GTPlane)
           {
-            this->Highlight(PLANE);
-            m_ActiveGizmoComponent = PLANE;
+            this->Highlight(TRANSLATE_ON_PLANE);
+            m_ActiveGizmoComponent = TRANSLATE_ON_PLANE;
+
+            // show arrow source plane
+            m_GTPlane->ShowTranslationFeedbackArrows(true);
           }
+
           // Store pivot position
-          m_PivotPose->DeepCopy(m_GTAxis0->GetAbsPose());
+          m_PivotPose->DeepCopy(m_GTUpDown->GetAbsPose());
         }
         else if (arg == mafInteractorGenericMouse::MOUSE_MOVE)
         {     
           // matrix holding abs pose after mouse move event
           mafSmartPointer<mafMatrix> newAbsMatr;
           if (this->m_Modality == G_LOCAL) // gizmo working in local mode; all its components are moving
-                                         // in a single mouse move event
+            // in a single mouse move event
           {
             // local mode
             // forward to all gizmo
@@ -190,59 +200,59 @@ void medGizmoCrossTranslate::OnEventGizmoComponents(mafEventBase *maf_event)
             newAbsMatr->DeepCopy(currTr->GetMatrix());
             newAbsMatr->SetTimeStamp(GetAbsPose()->GetTimeStamp());
 
-			if (m_ConstrainTranslationToInputVMEBounds)
-			{
-				double slicedVolumeBounds[6];
-				
-				mafVMESlicer *slicer = NULL;
-				slicer = mafVMESlicer::SafeDownCast(m_InputVME);
+            if (m_ConstrainTranslationToInputVMEBounds)
+            {
+              double slicedVolumeBounds[6];
 
-				assert(slicer);
+              mafVMESlicer *slicer = NULL;
+              slicer = mafVMESlicer::SafeDownCast(m_InputVME);
 
-				mafVMEVolumeGray *slicedVolume = NULL;
+              assert(slicer);
 
-				slicedVolume = mafVMEVolumeGray::SafeDownCast(slicer->GetSlicedVMELink());
-				assert(slicedVolume);
+              mafVMEVolumeGray *slicedVolume = NULL;
 
-				slicedVolume->GetOutput()->GetVTKData()->GetBounds(slicedVolumeBounds);
+              slicedVolume = mafVMEVolumeGray::SafeDownCast(slicer->GetSlicedVMELink());
+              assert(slicedVolume);
 
-				double gizmoCrossCenter[3] = {0,0,0};
-				mafTransform::GetPosition(currTr->GetMatrix(), gizmoCrossCenter);
+              slicedVolume->GetOutput()->GetVTKData()->GetBounds(slicedVolumeBounds);
 
-				enum 
-				{
-					X,
-					Y,
-					Z,
-				};
+              double gizmoCrossCenter[3] = {0,0,0};
+              mafTransform::GetPosition(currTr->GetMatrix(), gizmoCrossCenter);
+
+              enum 
+              {
+                X,
+                Y,
+                Z,
+              };
 
 
-				enum 
-				{
-					XMIN,
-					XMAX,
-					YMIN,
-					YMAX,
-					ZMIN,
-					ZMAX,
-				};
+              enum 
+              {
+                XMIN,
+                XMAX,
+                YMIN,
+                YMAX,
+                ZMIN,
+                ZMAX,
+              };
 
-				bool outOfX = (gizmoCrossCenter[X] < slicedVolumeBounds[XMIN] ||
-					gizmoCrossCenter[X] > slicedVolumeBounds[XMAX] );
+              bool outOfX = (gizmoCrossCenter[X] < slicedVolumeBounds[XMIN] ||
+                gizmoCrossCenter[X] > slicedVolumeBounds[XMAX] );
 
-				bool outOfY = (gizmoCrossCenter[Y] < slicedVolumeBounds[YMIN] ||
-					gizmoCrossCenter[Y] > slicedVolumeBounds[YMAX] );
+              bool outOfY = (gizmoCrossCenter[Y] < slicedVolumeBounds[YMIN] ||
+                gizmoCrossCenter[Y] > slicedVolumeBounds[YMAX] );
 
-				bool outOfZ = (gizmoCrossCenter[Z] < slicedVolumeBounds[ZMIN] ||
-					gizmoCrossCenter[Z] > slicedVolumeBounds[ZMAX] );
+              bool outOfZ = (gizmoCrossCenter[Z] < slicedVolumeBounds[ZMIN] ||
+                gizmoCrossCenter[Z] > slicedVolumeBounds[ZMAX] );
 
-				bool outOfInputVME = outOfX || outOfY || outOfZ;
+              bool outOfInputVME = outOfX || outOfY || outOfZ;
 
-				if (outOfInputVME)
-				{
-					return;
-				}
-			}
+              if (outOfInputVME)
+              {
+                return;
+              }
+            }
             // set the new pose to the gizmo
             SetAbsPose(newAbsMatr);
             currTr->Delete();
@@ -250,12 +260,12 @@ void medGizmoCrossTranslate::OnEventGizmoComponents(mafEventBase *maf_event)
           else
           {
             // gizmo working in global mode; only one axis/plane is moving in a single mouse move event
-            if (m_ActiveGizmoComponent == AXIS_0)
+            if (m_ActiveGizmoComponent == TRANSLATE_UP_DOWN)
             {
               // forward to active axis gizmo              
               vtkTransform *currTr = vtkTransform::New();
               currTr->PostMultiply();
-              currTr->SetMatrix(m_GTAxis0->GetAbsPose()->GetVTKMatrix());
+              currTr->SetMatrix(m_GTUpDown->GetAbsPose()->GetVTKMatrix());
               currTr->Concatenate(e->GetMatrix()->GetVTKMatrix());
               currTr->Update();
 
@@ -263,26 +273,26 @@ void medGizmoCrossTranslate::OnEventGizmoComponents(mafEventBase *maf_event)
               newAbsMatr->SetTimeStamp(GetAbsPose()->GetTimeStamp());
 
               // set the new pose to the gizmo
-              m_GTAxis0->SetAbsPose(newAbsMatr);
+              m_GTUpDown->SetAbsPose(newAbsMatr);
               currTr->Delete();
             }
-			else if (m_ActiveGizmoComponent == AXIS_1)
-			{
-				// forward to active axis gizmo              
-				vtkTransform *currTr = vtkTransform::New();
-				currTr->PostMultiply();
-				currTr->SetMatrix(m_GTAxis1->GetAbsPose()->GetVTKMatrix());
-				currTr->Concatenate(e->GetMatrix()->GetVTKMatrix());
-				currTr->Update();
+            else if (m_ActiveGizmoComponent == TRANSLATE_LEFT_RIGHT)
+            {
+              // forward to active axis gizmo              
+              vtkTransform *currTr = vtkTransform::New();
+              currTr->PostMultiply();
+              currTr->SetMatrix(m_GTLeftRight->GetAbsPose()->GetVTKMatrix());
+              currTr->Concatenate(e->GetMatrix()->GetVTKMatrix());
+              currTr->Update();
 
-				newAbsMatr->DeepCopy(currTr->GetMatrix());
-				newAbsMatr->SetTimeStamp(GetAbsPose()->GetTimeStamp());
+              newAbsMatr->DeepCopy(currTr->GetMatrix());
+              newAbsMatr->SetTimeStamp(GetAbsPose()->GetTimeStamp());
 
-				// set the new pose to the gizmo
-				m_GTAxis1->SetAbsPose(newAbsMatr);
-				currTr->Delete();
-			}
-            else if (m_ActiveGizmoComponent == PLANE)
+              // set the new pose to the gizmo
+              m_GTLeftRight->SetAbsPose(newAbsMatr);
+              currTr->Delete();
+            }
+            else if (m_ActiveGizmoComponent == TRANSLATE_ON_PLANE)
             {
               // forward to active plane gizmo
               vtkTransform *currTr = vtkTransform::New();
@@ -304,16 +314,19 @@ void medGizmoCrossTranslate::OnEventGizmoComponents(mafEventBase *maf_event)
         }
         else if (arg == mafInteractorGenericMouse::MOUSE_UP)
         {
-			if (sender == m_GTAxis0 || sender == m_GTAxis1 || sender == m_GTPlane)
-			{
-				this->Highlight(NONE);
-			}
+          if (sender == m_GTUpDown || sender == m_GTLeftRight || sender == m_GTPlane)
+          {
+            this->Highlight(NONE);
+            m_GTUpDown->ShowTranslationFeedbackArrows(false);
+            m_GTLeftRight->ShowTranslationFeedbackArrows(false);
+            m_GTPlane->ShowTranslationFeedbackArrows(false);
+          }
 
-			if (this->m_Modality == G_GLOBAL)
-			{
-				// put the gizmo back in the start position       
-				SetAbsPose(m_PivotPose);
-			}
+          if (this->m_Modality == G_GLOBAL)
+          {
+            // put the gizmo back in the start position       
+            SetAbsPose(m_PivotPose);
+          }
         }
         // forward event to the listener ie the operation
         // instanciating the gizmo; the sender is changed to "this" so that the operation can check for
@@ -323,7 +336,7 @@ void medGizmoCrossTranslate::OnEventGizmoComponents(mafEventBase *maf_event)
       }
       break;
 
-      default:
+    default:
       {
         mafEventMacro(*e);
       }
@@ -338,23 +351,23 @@ void medGizmoCrossTranslate::OnEventGizmoGui(mafEventBase *maf_event)
   switch(maf_event->GetId())
   {
     // process events from the gui   
-    case (mafGUIGizmoTranslate::ID_TRANSLATE_X):
+  case (mafGUIGizmoTranslate::ID_TRANSLATE_X):
     {
       // receiving abs position from gui
       SendTransformMatrixFromGui(maf_event);     
     }
     break;
-    case (mafGUIGizmoTranslate::ID_TRANSLATE_Y):
+  case (mafGUIGizmoTranslate::ID_TRANSLATE_Y):
     {
       SendTransformMatrixFromGui(maf_event);     
     }
     break;
-    case (mafGUIGizmoTranslate::ID_TRANSLATE_Z):
+  case (mafGUIGizmoTranslate::ID_TRANSLATE_Z):
     {
       SendTransformMatrixFromGui(maf_event);     
     }
     break;
-    default:
+  default:
     {
       mafEventMacro(*maf_event);
     }
@@ -365,31 +378,31 @@ void medGizmoCrossTranslate::OnEventGizmoGui(mafEventBase *maf_event)
 void medGizmoCrossTranslate::Highlight (int component) 
 //----------------------------------------------------------------------------
 {
-	if (component == AXIS_0)
-	{
-		m_GTAxis0->Highlight(true);
-		m_GTAxis1->Highlight(false);
-		m_GTPlane->Highlight(false);
-	} 
-	else if (component == AXIS_1)
-	{
-		m_GTAxis0->Highlight(false);
-		m_GTAxis1->Highlight(true);
-		m_GTPlane->Highlight(false);
-	}
-	else if (component == PLANE)
-	{
-		m_GTAxis0->Highlight(false);
-		m_GTAxis1->Highlight(false);
-		m_GTPlane->Highlight(true);
-	}
-	else if (component == NONE)
-	{
-		// DeHighlight everything;
-		m_GTAxis0->Highlight(false);
-		m_GTAxis1->Highlight(false);
-		m_GTPlane->Highlight(false);
-	}
+  if (component == TRANSLATE_UP_DOWN)
+  {
+    m_GTUpDown->Highlight(true);
+    m_GTLeftRight->Highlight(false);
+    m_GTPlane->Highlight(false);
+  } 
+  else if (component == TRANSLATE_LEFT_RIGHT)
+  {
+    m_GTUpDown->Highlight(false);
+    m_GTLeftRight->Highlight(true);
+    m_GTPlane->Highlight(false);
+  }
+  else if (component == TRANSLATE_ON_PLANE)
+  {
+    m_GTUpDown->Highlight(false);
+    m_GTLeftRight->Highlight(false);
+    m_GTPlane->Highlight(true);
+  }
+  else if (component == NONE)
+  {
+    // DeHighlight everything;
+    m_GTUpDown->Highlight(false);
+    m_GTLeftRight->Highlight(false);
+    m_GTPlane->Highlight(false);
+  }
 }
 //----------------------------------------------------------------------------  
 void medGizmoCrossTranslate::Show(bool show)
@@ -398,8 +411,8 @@ void medGizmoCrossTranslate::Show(bool show)
   // set visibility ivar
   m_Visibility = show;
 
-  m_GTAxis0->Show(show);
-  m_GTAxis1->Show(show);
+  m_GTUpDown->Show(show);
+  m_GTLeftRight->Show(show);
   m_GTPlane->Show(show);
 
   if (m_BuildGUI)
@@ -420,7 +433,7 @@ void medGizmoCrossTranslate::Show(bool show)
 mafMatrix *medGizmoCrossTranslate::GetAbsPose()
 //----------------------------------------------------------------------------
 {
-  return m_GTAxis0->GetAbsPose();
+  return m_GTUpDown->GetAbsPose();
 }
 
 //----------------------------------------------------------------------------  
@@ -428,9 +441,9 @@ void medGizmoCrossTranslate::SetInput(mafVME *input)
 //----------------------------------------------------------------------------
 {
   this->m_InputVME = input;
-  
-  m_GTAxis0->SetInput(input);
-  m_GTAxis1->SetInput(input);
+
+  m_GTUpDown->SetInput(input);
+  m_GTLeftRight->SetInput(input);
   m_GTPlane->SetInput(input);
 
 }
@@ -468,10 +481,10 @@ void medGizmoCrossTranslate::SetAbsPose(mafMatrix *absPose, mafTimeStamp ts)
   mafSmartPointer<mafMatrix> tmpMatr;
   tmpMatr->DeepCopy(absPose);
   tmpMatr->SetTimeStamp(ts);
-  
+
   m_GTPlane->SetAbsPose(tmpMatr);
-  m_GTAxis0->SetAbsPose(tmpMatr);
-  m_GTAxis1->SetAbsPose(tmpMatr);
+  m_GTUpDown->SetAbsPose(tmpMatr);
+  m_GTLeftRight->SetAbsPose(tmpMatr);
 
   if (m_BuildGUI) m_GuiGizmoTranslate->SetAbsPosition(tmpMatr);
 
@@ -511,24 +524,24 @@ void medGizmoCrossTranslate::SetRefSys(mafVME *refSys)
 void medGizmoCrossTranslate::SetConstraintModality(int constrainModality)
 //----------------------------------------------------------------------------
 {
-	
+
   if (m_Normal == X)
   {
-	  m_GTAxis0->SetConstraintModality(Y,constrainModality);
-	  m_GTAxis1->SetConstraintModality(Z, constrainModality);
-	  m_GTPlane->SetConstraintModality(m_Normal,constrainModality);
+    m_GTUpDown->SetConstraintModality(Y,constrainModality);
+    m_GTLeftRight->SetConstraintModality(Z, constrainModality);
+    m_GTPlane->SetConstraintModality(m_Normal,constrainModality);
   }
   else if (m_Normal == Y)
   {
-	  m_GTAxis0->SetConstraintModality(X,constrainModality);
-	  m_GTAxis1->SetConstraintModality(Z, constrainModality);
-	  m_GTPlane->SetConstraintModality(m_Normal,constrainModality);
+    m_GTUpDown->SetConstraintModality(X,constrainModality);
+    m_GTLeftRight->SetConstraintModality(Z, constrainModality);
+    m_GTPlane->SetConstraintModality(m_Normal,constrainModality);
   }
   else if (m_Normal == Z)
   {
-	  m_GTAxis0->SetConstraintModality(X,constrainModality);
-	  m_GTAxis1->SetConstraintModality(Y, constrainModality);
-	  m_GTPlane->SetConstraintModality(m_Normal,constrainModality);
+    m_GTUpDown->SetConstraintModality(X,constrainModality);
+    m_GTLeftRight->SetConstraintModality(Y, constrainModality);
+    m_GTPlane->SetConstraintModality(m_Normal,constrainModality);
   }
 
   m_ConstraintModality = constrainModality;
@@ -539,21 +552,21 @@ void medGizmoCrossTranslate::SetStep(double step)
 {
   if (m_Normal == X)
   {
-	  m_GTAxis0->SetStep(Y,step);
-	  m_GTAxis1->SetStep(Z,step);
-	  m_GTPlane->SetStep(m_Normal,step);
+    m_GTUpDown->SetStep(Y,step);
+    m_GTLeftRight->SetStep(Z,step);
+    m_GTPlane->SetStep(m_Normal,step);
   }
   else if (m_Normal == Y)
   {
-	  m_GTAxis0->SetStep(X,step);
-	  m_GTAxis1->SetStep(Z,step);
-	  m_GTPlane->SetStep(m_Normal,step);
+    m_GTUpDown->SetStep(X,step);
+    m_GTLeftRight->SetStep(Z,step);
+    m_GTPlane->SetStep(m_Normal,step);
   }
   else if (m_Normal == Z)
   {
-	  m_GTAxis0->SetStep(X,step);
-	  m_GTAxis1->SetStep(Y,step);
-	  m_GTPlane->SetStep(m_Normal,step);
+    m_GTUpDown->SetStep(X,step);
+    m_GTLeftRight->SetStep(Y,step);
+    m_GTPlane->SetStep(m_Normal,step);
   }
 
   m_Step = step;
@@ -576,27 +589,27 @@ mafVME* medGizmoCrossTranslate::GetRefSys()
 
 void medGizmoCrossTranslate::SetAutoscale( bool autoscale )
 {
-	mafGizmoInterface::SetAutoscale(autoscale);
+  mafGizmoInterface::SetAutoscale(autoscale);
 
-	m_GTAxis0->SetAutoscale(autoscale);
-	m_GTAxis1->SetAutoscale(autoscale);
-	m_GTPlane->SetAutoscale(autoscale);	
+  m_GTUpDown->SetAutoscale(autoscale);
+  m_GTLeftRight->SetAutoscale(autoscale);
+  m_GTPlane->SetAutoscale(autoscale);	
 }
 
 void medGizmoCrossTranslate::SetAlwaysVisible( bool alwaysVisible )
 {
-	mafGizmoInterface::SetAlwaysVisible(alwaysVisible);
+  mafGizmoInterface::SetAlwaysVisible(alwaysVisible);
 
-	m_GTAxis0->SetAutoscale(alwaysVisible);
-	m_GTAxis1->SetAutoscale(alwaysVisible);
-	m_GTPlane->SetAutoscale(alwaysVisible);	
+  m_GTUpDown->SetAutoscale(alwaysVisible);
+  m_GTLeftRight->SetAutoscale(alwaysVisible);
+  m_GTPlane->SetAutoscale(alwaysVisible);	
 }
 
 void medGizmoCrossTranslate::SetRenderWindowHeightPercentage(double percentage)
 {
-	mafGizmoInterface::SetRenderWindowHeightPercentage(percentage);
-	
-	m_GTAxis0->SetAutoscale(percentage);
-	m_GTAxis1->SetAutoscale(percentage);
-	m_GTPlane->SetAutoscale(percentage);		
+  mafGizmoInterface::SetRenderWindowHeightPercentage(percentage);
+
+  m_GTUpDown->SetAutoscale(percentage);
+  m_GTLeftRight->SetAutoscale(percentage);
+  m_GTPlane->SetAutoscale(percentage);		
 }

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGizmoCrossTranslateAxis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-12-15 11:09:58 $
-Version:   $Revision: 1.1.2.6 $
+Date:      $Date: 2011-01-08 17:06:37 $
+Version:   $Revision: 1.1.2.7 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -43,11 +43,36 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkMath.h"
 #include "vtkProperty.h"
 #include "vtkAppendPolyData.h"
+#include "mafTagArray.h"
 
 //----------------------------------------------------------------------------
 medGizmoCrossTranslateAxis::medGizmoCrossTranslateAxis(mafVME *input, mafObserver *listener)
 //----------------------------------------------------------------------------
 {
+
+  m_TranslationFeedbackGizmo = NULL;
+
+  m_FeedbackConeSource = NULL;
+  m_FeedbackCylinderSource = NULL;
+
+  m_LeftUpFeedbackConeTransform = NULL;
+  m_LeftDownFeedbackConeTransform = NULL;
+  m_RightDownFeedbackConeTransform = NULL;
+  m_RightUpFeedbackConeTransform = NULL;
+
+  m_LeftUpFeedbackConeTransformPDF = NULL;
+  m_LeftDownFeedbackConeTransformPDF = NULL;
+  m_RightUpFeedbackConeTransformPDF = NULL;
+  m_RightDownFeedbackConeTransformPDF = NULL;
+
+  m_LeftFeedbackCylinderTransform = NULL;
+  m_RightFeedbackCylinderTransform = NULL;
+
+  m_LeftFeedbackCylinderTransformPDF = NULL;
+  m_RightFeedbackCylinderTransformPDF = NULL;
+
+  m_FeedbackStuffAppendPolydata = NULL;
+
 	m_LastColor[0] = 1;
 	m_LastColor[1] = 0;
 	m_LastColor[2] = 0;
@@ -63,7 +88,7 @@ medGizmoCrossTranslateAxis::medGizmoCrossTranslateAxis(mafVME *input, mafObserve
 	m_Axis = X;
 
 	// create pipeline stuff
-	CreatePipeline();
+	CreateTranslationGizmoPipeline();
 
 	// create isa stuff
 	CreateISA();
@@ -72,14 +97,15 @@ medGizmoCrossTranslateAxis::medGizmoCrossTranslateAxis(mafVME *input, mafObserve
 	// create vme gizmos stuff
 	//-----------------
 	// cylinder gizmo
-	m_CylGizmo = mafVMEGizmo::New();
-	m_CylGizmo->SetName("CylGizmo");
-	m_CylGizmo->SetData(m_Append->GetOutput());
-	m_CylGizmo->SetMediator(m_Listener);
+	m_TranslationCylinderGizmo = mafVMEGizmo::New();
+//  m_TranslationCylinderGizmo->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 1));
+	m_TranslationCylinderGizmo->SetName("AxisTranslationGizmo");
+	m_TranslationCylinderGizmo->SetData(m_Append->GetOutput());
+	m_TranslationCylinderGizmo->SetMediator(m_Listener);
 	// cone gizmo
 
 	// assign isa to cylinder and cone
-	m_CylGizmo->SetBehavior(m_IsaComp);
+	m_TranslationCylinderGizmo->SetBehavior(m_IsaComp);
 
 	SetAbsPose(m_InputVme->GetOutput()->GetAbsMatrix());
 
@@ -89,13 +115,15 @@ medGizmoCrossTranslateAxis::medGizmoCrossTranslateAxis(mafVME *input, mafObserve
 	//-----------------
 	// ReparentTo will add also the gizmos to the tree!!
 	// add the gizmo to the tree, this should increase reference count 
-	m_CylGizmo->ReparentTo(mafVME::SafeDownCast(m_InputVme->GetRoot()));
+	m_TranslationCylinderGizmo->ReparentTo(mafVME::SafeDownCast(m_InputVme->GetRoot()));
+
+  CreateFeedbackGizmoPipeline();
 }
 //----------------------------------------------------------------------------
 medGizmoCrossTranslateAxis::~medGizmoCrossTranslateAxis() 
 //----------------------------------------------------------------------------
 {
-	m_CylGizmo->SetBehavior(NULL);
+	m_TranslationCylinderGizmo->SetBehavior(NULL);
 
 	vtkDEL(m_RightCylinder);
 
@@ -119,11 +147,38 @@ medGizmoCrossTranslateAxis::~medGizmoCrossTranslateAxis()
 	//----------------------
 	vtkDEL(m_IsaComp); 
 
-	m_CylGizmo->ReparentTo(NULL);
+	m_TranslationCylinderGizmo->ReparentTo(NULL);
+
+  //
+
+  vtkDEL(m_TranslationFeedbackGizmo);
+
+  vtkDEL(m_FeedbackConeSource);
+
+  vtkDEL(m_LeftUpFeedbackConeTransform);
+  vtkDEL(m_LeftDownFeedbackConeTransform);
+  vtkDEL(m_RightUpFeedbackConeTransform);
+  vtkDEL(m_RightDownFeedbackConeTransform);
+
+  vtkDEL(m_LeftUpFeedbackConeTransformPDF);
+  vtkDEL(m_LeftDownFeedbackConeTransformPDF);
+  vtkDEL(m_RightUpFeedbackConeTransformPDF);
+  vtkDEL(m_RightDownFeedbackConeTransformPDF);
+
+  vtkDEL(m_FeedbackCylinderSource);
+
+  vtkDEL(m_LeftFeedbackCylinderTransform);
+  vtkDEL(m_LeftFeedbackCylinderTransformPDF);
+ 
+  vtkDEL(m_RightFeedbackCylinderTransform);
+  vtkDEL(m_RightFeedbackCylinderTransformPDF);
+  
+  vtkDEL(m_FeedbackStuffAppendPolydata);
+
 }
 
 //----------------------------------------------------------------------------
-void medGizmoCrossTranslateAxis::CreatePipeline() 
+void medGizmoCrossTranslateAxis::CreateTranslationGizmoPipeline() 
 //----------------------------------------------------------------------------
 {
 	// create pipeline for cone-cylinder gizmo along global X axis
@@ -285,6 +340,14 @@ void medGizmoCrossTranslateAxis::SetAxis(int axis)
 		// set cyl and cone color to green
 		this->SetColor(m_LastColor);
 
+    m_LeftFeedbackCylinderTransform->RotateZ(90);
+    m_RightFeedbackCylinderTransform->RotateZ(90);
+    
+    m_LeftDownFeedbackConeTransform->RotateZ(90);
+    m_LeftUpFeedbackConeTransform->RotateZ(90);
+    m_RightDownFeedbackConeTransform->RotateZ(90);
+    m_RightUpFeedbackConeTransform->RotateZ(90);
+
 		// change the axis constrain
 		m_IsaGen->GetTranslationConstraint()->SetConstraintModality(mafInteractorConstraint::FREE, mafInteractorConstraint::LOCK, mafInteractorConstraint::LOCK);
 	}  
@@ -351,10 +414,10 @@ void medGizmoCrossTranslateAxis::SetColor(double col[3])
 	m_Color[1] = col[1];
 	m_Color[2] = col[2];
 
-	m_CylGizmo->GetMaterial()->m_Prop->SetColor(col);
-	m_CylGizmo->GetMaterial()->m_Prop->SetAmbient(0);
-	m_CylGizmo->GetMaterial()->m_Prop->SetDiffuse(1);
-	m_CylGizmo->GetMaterial()->m_Prop->SetSpecular(0);
+	m_TranslationCylinderGizmo->GetMaterial()->m_Prop->SetColor(col);
+	m_TranslationCylinderGizmo->GetMaterial()->m_Prop->SetAmbient(0);
+	m_TranslationCylinderGizmo->GetMaterial()->m_Prop->SetDiffuse(1);
+	m_TranslationCylinderGizmo->GetMaterial()->m_Prop->SetSpecular(0);
 }
 
 //----------------------------------------------------------------------------
@@ -368,13 +431,21 @@ void medGizmoCrossTranslateAxis::SetColor(double cylR, double cylG, double cylB)
 void medGizmoCrossTranslateAxis::Show(bool show)
 //----------------------------------------------------------------------------
 {
-	mafEventMacro(mafEvent(this,VME_SHOW,m_CylGizmo,show));
+	mafEventMacro(mafEvent(this,VME_SHOW,m_TranslationCylinderGizmo,show));
 }
+
+//----------------------------------------------------------------------------
+void medGizmoCrossTranslateAxis::ShowTranslationFeedbackArrows(bool show)
+//----------------------------------------------------------------------------
+{
+  mafEventMacro(mafEvent(this,VME_SHOW,m_TranslationFeedbackGizmo,show));
+}
+
 //----------------------------------------------------------------------------
 void medGizmoCrossTranslateAxis::SetAbsPose(mafMatrix *absPose)
 //----------------------------------------------------------------------------
 {
-	m_CylGizmo->SetAbsMatrix(*absPose); 
+	m_TranslationCylinderGizmo->SetAbsMatrix(*absPose); 
 	SetRefSysMatrix(absPose);
 }
 //----------------------------------------------------------------------------
@@ -388,7 +459,7 @@ void medGizmoCrossTranslateAxis::SetRefSysMatrix(mafMatrix *matrix)
 mafMatrix *medGizmoCrossTranslateAxis::GetAbsPose()
 //----------------------------------------------------------------------------
 {
-	return m_CylGizmo->GetOutput()->GetAbsMatrix();
+	return m_TranslationCylinderGizmo->GetOutput()->GetAbsMatrix();
 }
 //----------------------------------------------------------------------------
 void medGizmoCrossTranslateAxis::SetInput(mafVME *vme)
@@ -409,4 +480,121 @@ void medGizmoCrossTranslateAxis::SetStep(int axis, double step)
 //----------------------------------------------------------------------------
 {
 	m_IsaGen->GetTranslationConstraint()->SetStep(axis,step);
+}
+
+void medGizmoCrossTranslateAxis::CreateFeedbackGizmoPipeline()
+{
+  assert(m_InputVme);
+
+  double bbDiagonal = m_InputVme->GetOutput()->GetVTKData()->GetLength();
+
+  // cone origin in height / 2
+  double coneHeight = bbDiagonal / 4;
+  double coneRadius = bbDiagonal /7;
+  double coneResolution = 40;
+  double y = coneHeight;
+  double x = bbDiagonal / 2;
+
+  m_FeedbackCylinderSource = vtkCylinderSource::New();
+
+  m_LeftFeedbackCylinderTransformPDF = vtkTransformPolyDataFilter::New();
+  m_RightFeedbackCylinderTransformPDF = vtkTransformPolyDataFilter::New();
+
+  m_FeedbackConeSource = vtkConeSource::New();
+
+  m_LeftUpFeedbackConeTransformPDF = vtkTransformPolyDataFilter::New();
+  m_LeftDownFeedbackConeTransformPDF = vtkTransformPolyDataFilter::New();
+  m_RightUpFeedbackConeTransformPDF = vtkTransformPolyDataFilter::New();
+  m_RightDownFeedbackConeTransformPDF = vtkTransformPolyDataFilter::New();
+
+  // left stuff transform
+  m_LeftFeedbackCylinderTransform = vtkTransform::New();
+  m_LeftFeedbackCylinderTransform->PostMultiply();
+  m_LeftFeedbackCylinderTransform->Translate(- x, 0,0);
+
+  m_LeftUpFeedbackConeTransform = vtkTransform::New();
+  m_LeftUpFeedbackConeTransform->PostMultiply();
+  m_LeftUpFeedbackConeTransform->RotateZ(90);
+  m_LeftUpFeedbackConeTransform->Translate(0,y, 0);
+  m_LeftUpFeedbackConeTransform->Translate(- x, 0,0);
+
+  m_LeftDownFeedbackConeTransform = vtkTransform::New();
+  m_LeftDownFeedbackConeTransform->PostMultiply();
+  m_LeftDownFeedbackConeTransform->RotateZ(-90);
+  m_LeftDownFeedbackConeTransform->Translate(0, - y, 0);
+  m_LeftDownFeedbackConeTransform->Translate(- x, 0,0);
+
+  // right stuff transform
+  m_RightFeedbackCylinderTransform = vtkTransform::New();
+  m_RightFeedbackCylinderTransform->PostMultiply();
+  m_RightFeedbackCylinderTransform->Translate(x, 0,0);
+  
+  m_RightDownFeedbackConeTransform = vtkTransform::New();
+  m_RightDownFeedbackConeTransform->PostMultiply();
+  m_RightDownFeedbackConeTransform->RotateZ(-90);
+  m_RightDownFeedbackConeTransform->Translate(0, -y, 0);
+  m_RightDownFeedbackConeTransform->Translate(x, 0,0);
+
+  m_RightUpFeedbackConeTransform = vtkTransform::New();
+  m_RightUpFeedbackConeTransform->PostMultiply();
+  m_RightUpFeedbackConeTransform->RotateZ(90);
+  m_RightUpFeedbackConeTransform->Translate(0, y, 0);
+  m_RightUpFeedbackConeTransform->Translate(x, 0,0);
+
+
+  m_TranslationFeedbackGizmo = mafVMEGizmo::New();
+
+  m_FeedbackConeSource->SetResolution(coneResolution);
+  m_FeedbackConeSource->SetHeight(coneHeight);
+  m_FeedbackConeSource->SetRadius(coneRadius);
+  m_FeedbackConeSource->Update();
+
+  m_FeedbackCylinderSource->SetResolution(coneResolution);
+  m_FeedbackCylinderSource->SetHeight(coneHeight);
+  m_FeedbackCylinderSource->SetRadius(coneRadius / 2);
+  m_FeedbackCylinderSource->Update();
+  
+  m_LeftFeedbackCylinderTransformPDF->SetInput(m_FeedbackCylinderSource->GetOutput());
+  m_LeftFeedbackCylinderTransformPDF->SetTransform(m_LeftFeedbackCylinderTransform);
+  
+  m_RightFeedbackCylinderTransformPDF->SetInput(m_FeedbackCylinderSource->GetOutput());
+  m_RightFeedbackCylinderTransformPDF->SetTransform(m_RightFeedbackCylinderTransform);
+
+  m_LeftUpFeedbackConeTransformPDF->SetInput(m_FeedbackConeSource->GetOutput());
+  m_LeftUpFeedbackConeTransformPDF->SetTransform(m_LeftUpFeedbackConeTransform);
+
+  m_LeftDownFeedbackConeTransformPDF->SetInput(m_FeedbackConeSource->GetOutput());
+  m_LeftDownFeedbackConeTransformPDF->SetTransform(m_LeftDownFeedbackConeTransform);
+  
+  m_RightUpFeedbackConeTransformPDF->SetInput(m_FeedbackConeSource->GetOutput());
+  m_RightUpFeedbackConeTransformPDF->SetTransform(m_RightUpFeedbackConeTransform);
+
+  m_RightDownFeedbackConeTransformPDF->SetInput(m_FeedbackConeSource->GetOutput());
+  m_RightDownFeedbackConeTransformPDF->SetTransform(m_RightDownFeedbackConeTransform);
+
+  m_FeedbackStuffAppendPolydata = vtkAppendPolyData::New();
+  m_FeedbackStuffAppendPolydata->AddInput(m_LeftUpFeedbackConeTransformPDF->GetOutput());
+  m_FeedbackStuffAppendPolydata->AddInput(m_LeftDownFeedbackConeTransformPDF->GetOutput());
+  m_FeedbackStuffAppendPolydata->AddInput(m_RightUpFeedbackConeTransformPDF->GetOutput());
+  m_FeedbackStuffAppendPolydata->AddInput(m_RightDownFeedbackConeTransformPDF->GetOutput());
+  m_FeedbackStuffAppendPolydata->AddInput(m_LeftFeedbackCylinderTransformPDF->GetOutput());
+  m_FeedbackStuffAppendPolydata->AddInput(m_RightFeedbackCylinderTransformPDF->GetOutput());
+  m_FeedbackStuffAppendPolydata->Update();
+
+  m_TranslationFeedbackGizmo->SetName("AxisTranslationFeedbackGizmo");
+  m_TranslationFeedbackGizmo->SetMediator(m_Listener);
+  m_TranslationFeedbackGizmo->SetData(m_FeedbackStuffAppendPolydata->GetOutput());
+//  m_TranslationFeedbackGizmo->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 1));
+  assert(m_InputVme);
+
+  this->SetColor(m_LastColor);
+
+  m_TranslationFeedbackGizmo->GetMaterial()->m_Prop->SetColor(1,1,0);
+  m_TranslationFeedbackGizmo->GetMaterial()->m_Prop->SetAmbient(0);
+  m_TranslationFeedbackGizmo->GetMaterial()->m_Prop->SetDiffuse(1);
+  m_TranslationFeedbackGizmo->GetMaterial()->m_Prop->SetSpecular(0);
+  m_TranslationFeedbackGizmo->GetMaterial()->m_Prop->SetOpacity(0.1);
+  // ReparentTo will add also the gizmos to the tree
+  m_TranslationFeedbackGizmo->ReparentTo(m_TranslationCylinderGizmo);
+  // m_TranslationFeedbackArrowGizmo->ReparentTo(m_TranslationCylinderGizmo->GetRoot());
 }

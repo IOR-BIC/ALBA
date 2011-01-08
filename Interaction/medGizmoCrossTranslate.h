@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoCrossTranslate.h,v $
   Language:  C++
-  Date:      $Date: 2010-12-14 17:33:06 $
-  Version:   $Revision: 1.1.2.7 $
+  Date:      $Date: 2011-01-08 17:06:37 $
+  Version:   $Revision: 1.1.2.8 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -132,16 +132,41 @@ protected:
 
   /** 
   gizmo components enum*/
-  enum PLANE {XNORMAL = 0, YNORMAL, ZNORMAL};
-  enum ACTIVE_COMPONENT {NONE = -1, AXIS_0 = 0 , AXIS_1 = 1,PLANE = 3};
+  enum TRANSLATE_ON_PLANE {XNORMAL = 0, YNORMAL, ZNORMAL};
+
+  /** 
+  gizmo components enum
+  
+       up
+       
+       o o
+        O
+       \_/
+  
+  left     right
+      
+      down
+
+  World Coordinates
+
+   Z
+   .
+  / \
+   |
+   .---> X
+   Y
+
+  */
+  
+  enum ACTIVE_COMPONENT {NONE = -1, TRANSLATE_UP_DOWN = 0 , TRANSLATE_LEFT_RIGHT = 1,TRANSLATE_ON_PLANE = 3};
  
   /**
   Highlight one component and dehighlight other components*/
   void Highlight(int component); 
   
   /** Array holding the three gizmo that performs translation on a vector*/  
-  medGizmoCrossTranslateAxis *m_GTAxis0;
-  medGizmoCrossTranslateAxis *m_GTAxis1;
+  medGizmoCrossTranslateAxis *m_GTUpDown;
+  medGizmoCrossTranslateAxis *m_GTLeftRight;
 
   /** Array holding the three gizmo that performs translation on a plane*/  
   medGizmoCrossTranslatePlane *m_GTPlane;
