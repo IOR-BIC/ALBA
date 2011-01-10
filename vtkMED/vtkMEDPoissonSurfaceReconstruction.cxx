@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDPoissonSurfaceReconstruction.cxx,v $
 Language:  C++
-Date:      $Date: 2010-12-02 11:09:31 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2011-01-10 12:05:51 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Fuli Wu
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -21,7 +21,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "float.h"
 
 
-vtkCxxRevisionMacro(vtkMEDPoissonSurfaceReconstruction, "$Revision: 1.1.2.4 $");
+vtkCxxRevisionMacro(vtkMEDPoissonSurfaceReconstruction, "$Revision: 1.1.2.5 $");
 vtkStandardNewMacro(vtkMEDPoissonSurfaceReconstruction);
 
 vtkDataSet* vtk_psr_input;
@@ -3259,7 +3259,7 @@ void Vector<T>::SetZero(void){for (size_t i=0; i<m_N; i++){m_pV[i] = T(0);}}
 template<class T>
 const T& Vector<T>::operator () (size_t i) const
 {
-	Assert( i < m_N );
+	assert( i < m_N );
 	return m_pV[i];
 }
 template<class T>
@@ -3469,7 +3469,7 @@ void NVector<T,Dim>::SetZero(void){for (size_t i=0; i<m_N*Dim; i++){m_pV[i] = T(
 template<class T,int Dim>
 const T* NVector<T,Dim>::operator () (size_t i) const
 {
-	Assert( i < m_N );
+	assert( i < m_N );
 	return &m_pV[i*Dim];
 }
 template<class T,int Dim>
