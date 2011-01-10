@@ -103,6 +103,12 @@ ADD_TEST(vtkMEDFillingHoleCTriangleTest ${EXECUTABLE_OUTPUT_PATH}/vtkMEDFillingH
 ADD_EXECUTABLE(vtkMEDFillingHoleCEdgeTest vtkMEDFillingHoleCEdgeTest.h vtkMEDFillingHoleCEdgeTest.cpp)
 ADD_TEST(vtkMEDFillingHoleCEdgeTest ${EXECUTABLE_OUTPUT_PATH}/vtkMEDFillingHoleCEdgeTest)
 
+ADD_EXECUTABLE(MemoryInfoTest MemoryInfoTest.h MemoryInfoTest.cpp)
+ADD_TEST(MemoryInfoTest ${EXECUTABLE_OUTPUT_PATH}/MemoryInfoTest)
+
+ADD_EXECUTABLE(VectorTest VectorTest.h VectorTest.cpp)
+ADD_TEST(VectorTest ${EXECUTABLE_OUTPUT_PATH}/VectorTest)
+
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
 #ENDIF (MAF_USE_WX)
