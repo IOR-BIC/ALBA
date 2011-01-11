@@ -38,6 +38,10 @@ ADD_TEST(mmiSelectPointTest ${EXECUTABLE_OUTPUT_PATH}/mmiSelectPointTest)
 ADD_EXECUTABLE(mmiInfoImageTest mmiInfoImageTest.h mmiInfoImageTest.cpp)
 ADD_TEST(mmiInfoImageTest ${EXECUTABLE_OUTPUT_PATH}/mmiInfoImageTest)
 
+############ mmiDICOMImporterInteractorTest
+ADD_EXECUTABLE(mmiDICOMImporterInteractorTest mmiDICOMImporterInteractorTest.h mmiDICOMImporterInteractorTest.cpp)
+ADD_TEST(mmiDICOMImporterInteractorTest ${EXECUTABLE_OUTPUT_PATH}/mmiDICOMImporterInteractorTest)
+
 IF (WIN32)
   SET_TARGET_PROPERTIES(mafGizmoROI_BESTest PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)
