@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiDICOMImporterInteractor.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 15:41:18 $
-  Version:   $Revision: 1.1.1.1.8.1 $
+  Date:      $Date: 2011-01-12 08:47:10 $
+  Version:   $Revision: 1.1.1.1.8.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -34,12 +34,14 @@ mafCxxTypeMacro(mmiDICOMImporterInteractor)
 mmiDICOMImporterInteractor::mmiDICOMImporterInteractor()
 //------------------------------------------------------------------------------
 {
+
 }
 
 //------------------------------------------------------------------------------
 mmiDICOMImporterInteractor::~mmiDICOMImporterInteractor()
 //------------------------------------------------------------------------------
 {
+
 }
 //------------------------------------------------------------------------------
 int mmiDICOMImporterInteractor::StartInteraction(mafDeviceButtonsPadMouse *mouse)
@@ -58,6 +60,11 @@ void mmiDICOMImporterInteractor::OnMouseMove()
 void mmiDICOMImporterInteractor::OnLeftButtonDown(mafEventInteraction *e)
 //----------------------------------------------------------------------------
 {
+  if (e == NULL)
+  {
+	  return;
+  }
+
   SendCropPosition(MOUSE_DOWN);
   Superclass::OnLeftButtonDown(e);
 }
