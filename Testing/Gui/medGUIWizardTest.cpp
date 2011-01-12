@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizardTest.cpp,v $
 Language:  C++
-Date:      $Date: 2011-01-12 08:53:09 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-01-12 15:49:13 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -141,7 +141,7 @@ void medGUIWizardTest::TestEnableChangePageOff()
 void medGUIWizardTest::TestRun()
 //----------------------------------------------------------------------------
 {
-  medGUIWizard *wizard = new medGUIWizard(_("TEST"),false);
+  medGUIWizard *wizard = new medGUIWizard(_("TEST"),true);
 
   medGUIWizardPage *page = new medGUIWizardPage(wizard,medUSEGUI);
 
