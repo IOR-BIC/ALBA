@@ -6,8 +6,6 @@ PROJECT(medCommon)
 
 # Set your list of sources here.
 SET(PROJECT_SRCS
-  mmiDICOMImporterInteractor.cpp
-  mmiDICOMImporterInteractor.h
   mafGizmoSlice.cpp
   mafGizmoSlice.h
   mmiInfoImage.cpp

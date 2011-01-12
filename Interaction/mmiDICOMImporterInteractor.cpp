@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiDICOMImporterInteractor.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-01-12 08:47:10 $
-  Version:   $Revision: 1.1.1.1.8.2 $
-  Authors:   Paolo Quadrani
+  Date:      $Date: 2011-01-12 14:54:42 $
+  Version:   $Revision: 1.1.2.1 $
+  Authors:   Paolo Quadrani , Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)

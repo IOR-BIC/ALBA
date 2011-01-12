@@ -1,0 +1,76 @@
+/*=========================================================================
+  Program:   Multimod Application Framework
+  Module:    $RCSfile: mmiDICOMImporterInteractor.h,v $
+  Language:  C++
+  Date:      $Date: 2011-01-12 14:54:42 $
+  Version:   $Revision: 1.1.2.1 $
+  Authors:   Paolo Quadrani , Stefano Perticoni
+==========================================================================
+  Copyright (c) 2002/2004 
+  CINECA - Interuniversity Consortium (www.cineca.it)
+=========================================================================*/
+
+#ifndef __mmiDICOMImporterInteractor_h
+#define __mmiDICOMImporterInteractor_h
+
+#include "mafInteractorCameraMove.h"
+#include "mafMTime.h"
+
+//----------------------------------------------------------------------------
+// forward declarations :
+//----------------------------------------------------------------------------
+class vtkCamera;
+
+/** Implements mouse move of the camera in the scene and notify the listener with world coordinates
+on left mouse pick , left mouse move and left mouse up.
+
+This class implements a mouse move of the renderer camera in the scene. The interaction
+modality is a mouse manipulation, where movements of the mouse are mapped
+into movements of the camera. 
+
+On left button down: Send pick position in world coordinates to the listener
+On mouse move: Send cursor position in world coordinates to the listener
+On left button up: Send cursor position in world coordinates to the listener
+
+Picked World Coordinates position is sent as single vtkPoint to the listener
+in the following way:
+-----------------
+vtkMAFSmartPointer<vtkPoints> position_point; 
+position_point->SetNumberOfPoints(1);
+position_point->SetPoint(0,wp[0],wp[1],wp[2]);
+
+mafEventMacro(mafEvent(this, event_id, position_point.GetPointer()));
+-----------------
+
+@sa medOpImporterDicomOffis where this class is used in the Dicom importer wizard dialog
+
+*/
+class mmiDICOMImporterInteractor : public mafInteractorCameraMove
+{
+public:
+  mafTypeMacro(mmiDICOMImporterInteractor,mafInteractorCameraMove);
+
+  /** Start the interaction with the given device*/
+  virtual int StartInteraction(mafDeviceButtonsPadMouse *mouse);
+
+  /** redefined to send the picking world coordinates also */
+  virtual void OnMouseMove();
+
+  /** redefined to send the picking world coordinates also */
+  virtual void OnLeftButtonDown(mafEventInteraction *e);
+
+  /** redefined to send the picking world coordinates also */
+  virtual void OnLeftButtonUp();
+
+protected:
+  mmiDICOMImporterInteractor();
+  virtual ~mmiDICOMImporterInteractor();
+
+  /** Compute the world point corresponding to the mouse position and send it to the listener */
+  void SendCropPosition(int event_id);
+  
+private:
+  mmiDICOMImporterInteractor(const mmiDICOMImporterInteractor&);  // Not implemented.
+  void operator=(const mmiDICOMImporterInteractor&);  // Not implemented.
+};
+#endif 
