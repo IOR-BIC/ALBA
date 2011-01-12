@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-11-03 19:14:39 $
-Version:   $Revision: 1.1.2.124 $
+Date:      $Date: 2011-01-12 14:55:59 $
+Version:   $Revision: 1.1.2.125 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -295,7 +295,7 @@ mafOp(label)
 
 	m_BuildStepValue = 0;
 	m_OutputType = 0;
-  m_RadioButton = 0;
+	m_RadioButton = 0;
 
 	m_SliceScannerBuildPage = NULL;
 	m_SliceScannerCropPage = NULL;
@@ -397,7 +397,7 @@ void medOpImporterDicomOffis::OpRun()
 		if (m_DicomDirectoryABSFileName == "")
 		{	
 			wxString lastDicomDir = ((medGUIDicomSettings*)GetSetting())->GetLastDicomDir();
-			
+
 			if (lastDicomDir == "UNEDFINED_m_LastDicomDir")
 			{
 				wxString defaultPath = (mafGetApplicationDirectory()+"/data/external/").c_str();
@@ -408,7 +408,7 @@ void medOpImporterDicomOffis::OpRun()
 			dialog.SetReturnCode(wxID_OK);
 			int ret_code = dialog.ShowModal();
 
-			
+
 
 			if (ret_code == wxID_OK)
 			{
@@ -912,7 +912,7 @@ int medOpImporterDicomOffis::BuildOutputVMEImagesFromDicomCineMRI()
 				double slicePosition[3] = {-999, -999, -999};
 
 				slice->GetDcmImagePositionPatient(slicePosition);
-				
+
 				double sliceVtkDataCenter[3] = {-999, -999, -999};
 
 				slice->GetVTKImageData()->GetCenter(sliceVtkDataCenter);
@@ -922,7 +922,7 @@ int medOpImporterDicomOffis::BuildOutputVMEImagesFromDicomCineMRI()
 				tr->Translate(-sliceVtkDataCenter[0], -sliceVtkDataCenter[1],-sliceVtkDataCenter[2]);
 				tr->Concatenate(sliceOrientationMatrix);
 				\
-				mafSmartPointer<mafTransform> boxPose;
+					mafSmartPointer<mafTransform> boxPose;
 				boxPose->SetMatrix(tr->GetMatrix());
 				boxPose->Update();
 
@@ -1031,7 +1031,7 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
 	mafNEW(m_Volume);
 
 	accumulate->Update();
-	
+
 	//to reduce the use of memory bug #2305
 	//vtkMAFSmartPointer<vtkRectilinearGrid> rg_out;
 	vtkRectilinearGrid *rg_out;
@@ -1184,23 +1184,23 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 
 	for (int ts = 0; ts < m_NumberOfTimeFrames; ts++)
 	{
-    // BEWARE:
-    // the following data structure was added in order to fix bug :
-    // http://bugzilla.hpc.cineca.it/show_bug.cgi?id=2088
-    //
-    // Regression test data for this bug is POLITECNICO and SA Cardiac MRI Dicom
-    //
-    // There is a nasty bug in some of our pipes that is preventing volumes with 
-    // Z axis order different from increasing to work while standard vtk filters have
-    // no problems at all with this issue: we successfully visualized this kind of
-    // volumes with ParaView.
-    //
-    // For example if you have Z axes coordinate in your rectilinear grid like:
-    // 8  5  3  1
-    // some pipes will fail (for sure the mafPipeVolumeSlice_BES ).
-    // This data structure is used to feed the slice accumulator with the right increasing 
-    // z ordering ie:
-    // 1 3 5 8
+		// BEWARE:
+		// the following data structure was added in order to fix bug :
+		// http://bugzilla.hpc.cineca.it/show_bug.cgi?id=2088
+		//
+		// Regression test data for this bug is POLITECNICO and SA Cardiac MRI Dicom
+		//
+		// There is a nasty bug in some of our pipes that is preventing volumes with 
+		// Z axis order different from increasing to work while standard vtk filters have
+		// no problems at all with this issue: we successfully visualized this kind of
+		// volumes with ParaView.
+		//
+		// For example if you have Z axes coordinate in your rectilinear grid like:
+		// 8  5  3  1
+		// some pipes will fail (for sure the mafPipeVolumeSlice_BES ).
+		// This data structure is used to feed the slice accumulator with the right increasing 
+		// z ordering ie:
+		// 1 3 5 8
 		std::vector<vtkImageData *> imageDataVector;
 
 		// get the time stamp from the dicom tag;
@@ -1226,7 +1226,7 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 
 			// show the current slice
 			currImageId = GetSliceIDInSeries(ts, probeHeigthId);
-		
+
 			if (currImageId != -1) 
 			{
 				// update v_texture ivar
@@ -1240,15 +1240,15 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 			vtkImageData *bufferImageData = vtkImageData::New();
 			bufferImageData->DeepCopy(imageData);
 			imageDataVector.push_back(bufferImageData);
-		
+
 			std::ostringstream stringStream;
-			
+
 			double spacing[3] = {0,0,0};
 			imageData->GetSpacing(spacing);
 
 			int dim[3] = {0,0,0};
 			imageData->GetDimensions(dim);
-			
+
 			double origin[3] =  {0,0,0};
 			imageData->GetOrigin(origin);
 
@@ -1258,9 +1258,9 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 				"  origin: " << origin[0] << " " << origin[1] << " " << origin[2] << " " <<\
 				"  spacing: " << spacing[0]<< " " << spacing[1] << " " << spacing[2]<< " "
 				"  dimensions: " << dim[0]<< " " << dim[1] << " " << dim[2]<< " " << std::endl;          
-				
+
 			mafLogMessage(stringStream.str().c_str());
-			
+
 			targetVolumeSliceId++;
 			progressCounter++;
 			probeHeigthId++;
@@ -1284,7 +1284,7 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 		// always build the volume on z-axis
 		accumulator->BuildVolumeOnAxes(m_SortAxes);
 		accumulator->SetNumberOfSlices(m_NumberOfSlices);
-		
+
 		int i = 0;
 
 		for( map<double,int>::iterator currentMapElement=zToIDMap.begin(); currentMapElement!=zToIDMap.end(); ++currentMapElement)
@@ -1340,26 +1340,26 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 
 		if (m_SeriesIDContainsRotationsMap[m_SelectedSeriesID] == true  && m_ApplyRotation)
 		{
-			
+
 			medDicomSlice* slice = NULL;
-						
+
 			slice = m_SelectedSeriesSlicesList->Item(m_ZCropBounds[0])->GetData();
-			
+
 			assert(slice);
-			
+
 			vtkMatrix4x4 *mat = vtkMatrix4x4::New();
-			
+
 			slice->GetOrientation(mat);
 
 			mafSmartPointer<mafTransform> boxPose;
 			boxPose->SetMatrix(mat);
-			
+
 			double pos[3];
 			slice->GetDcmImagePositionPatient(pos);
 
 			boxPose->SetPosition(pos);
 			boxPose->Update();
-			
+
 			m_Volume->SetAbsMatrix(boxPose->GetMatrix(),tsDouble);
 
 			mat->Delete();
@@ -1828,50 +1828,50 @@ void medOpImporterDicomOffis::CreateBuildPage()
 		m_OutputType = ((medGUIDicomSettings*)GetSetting())->GetVMEType(); 
 	else
 	{
-    // Handles various types of Vme selected in the DICOM Advanced Settings:
-    // If the user launch an event by changing the radio button the right value is adjusted later on. (Brazzale, 27.07.2010)
-    bool type_volume = ((medGUIDicomSettings*)GetSetting())->EnableToRead("VOLUME");
-    bool type_mesh = ((medGUIDicomSettings*)GetSetting())->EnableToRead("MESH");
-    bool type_image = ((medGUIDicomSettings*)GetSetting())->EnableToRead("IMAGE");
+		// Handles various types of Vme selected in the DICOM Advanced Settings:
+		// If the user launch an event by changing the radio button the right value is adjusted later on. (Brazzale, 27.07.2010)
+		bool type_volume = ((medGUIDicomSettings*)GetSetting())->EnableToRead("VOLUME");
+		bool type_mesh = ((medGUIDicomSettings*)GetSetting())->EnableToRead("MESH");
+		bool type_image = ((medGUIDicomSettings*)GetSetting())->EnableToRead("IMAGE");
 		wxString typeArray[3] = {_("Volume"),_("Mesh"),_("Image")};    
-    wxString typeArray2[2] = {_("Image"),_("Volume")};
-    wxString typeArray3[2] = {_("Mesh"),_("Image")};
-    if ((type_volume && type_mesh && type_image) || (!type_volume && !type_mesh && !type_image))
-    {
-		  m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_OutputType, 3, typeArray, 1, ""/*, wxRA_SPECIFY_ROWS*/);
-    }
-    else if (type_volume && !type_mesh && !type_image)
-    {
-		  m_OutputType = 0;
-      m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_OutputType, 1, typeArray, 1, ""/*, wxRA_SPECIFY_ROWS*/);
-      m_BuildGuiCenter->Enable(ID_VME_TYPE,0);
-    }
-    else if (!type_volume && type_mesh && !type_image)
-    {
-      m_OutputType = 1;
-      m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_RadioButton, 1, typeArray3, 1, ""/*, wxRA_SPECIFY_ROWS*/);
-      m_BuildGuiCenter->Enable(ID_VME_TYPE,0);
-    } 
-    else if (!type_volume && !type_mesh && type_image)
-    {
-      m_OutputType = 2;
-      m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_RadioButton, 1, typeArray2, 1, ""/*, wxRA_SPECIFY_ROWS*/);
-      m_BuildGuiCenter->Enable(ID_VME_TYPE,0);
-    }
-    else if (type_volume && type_mesh && !type_image)
-    {
-		  m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_OutputType, 2, typeArray, 1, ""/*, wxRA_SPECIFY_ROWS*/);
-    }    
-    else if (type_volume && !type_mesh && type_image)
-    {
-      m_OutputType = 2;
-		  m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_RadioButton, 2, typeArray2, 1, ""/*, wxRA_SPECIFY_ROWS*/);
-    }             
-    else if (!type_volume && type_mesh && type_image)
-    {
-      m_OutputType = 1;
-		  m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_RadioButton, 2, typeArray3, 1, ""/*, wxRA_SPECIFY_ROWS*/);
-    }
+		wxString typeArray2[2] = {_("Image"),_("Volume")};
+		wxString typeArray3[2] = {_("Mesh"),_("Image")};
+		if ((type_volume && type_mesh && type_image) || (!type_volume && !type_mesh && !type_image))
+		{
+			m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_OutputType, 3, typeArray, 1, ""/*, wxRA_SPECIFY_ROWS*/);
+		}
+		else if (type_volume && !type_mesh && !type_image)
+		{
+			m_OutputType = 0;
+			m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_OutputType, 1, typeArray, 1, ""/*, wxRA_SPECIFY_ROWS*/);
+			m_BuildGuiCenter->Enable(ID_VME_TYPE,0);
+		}
+		else if (!type_volume && type_mesh && !type_image)
+		{
+			m_OutputType = 1;
+			m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_RadioButton, 1, typeArray3, 1, ""/*, wxRA_SPECIFY_ROWS*/);
+			m_BuildGuiCenter->Enable(ID_VME_TYPE,0);
+		} 
+		else if (!type_volume && !type_mesh && type_image)
+		{
+			m_OutputType = 2;
+			m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_RadioButton, 1, typeArray2, 1, ""/*, wxRA_SPECIFY_ROWS*/);
+			m_BuildGuiCenter->Enable(ID_VME_TYPE,0);
+		}
+		else if (type_volume && type_mesh && !type_image)
+		{
+			m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_OutputType, 2, typeArray, 1, ""/*, wxRA_SPECIFY_ROWS*/);
+		}    
+		else if (type_volume && !type_mesh && type_image)
+		{
+			m_OutputType = 2;
+			m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_RadioButton, 2, typeArray2, 1, ""/*, wxRA_SPECIFY_ROWS*/);
+		}             
+		else if (!type_volume && type_mesh && type_image)
+		{
+			m_OutputType = 1;
+			m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_RadioButton, 2, typeArray3, 1, ""/*, wxRA_SPECIFY_ROWS*/);
+		}
 
 	}
 
@@ -1976,13 +1976,13 @@ void medOpImporterDicomOffis::ReadDicom()
 		double item1_pos[3],item2_pos[3],d[3];
 		medDicomSlice *element1;
 		medDicomSlice *element2;
-		
+
 		element1 = (medDicomSlice *)m_SelectedSeriesSlicesList->Item(0)->GetData();
 		element2 = (medDicomSlice *)m_SelectedSeriesSlicesList->Item(1)->GetData();
-		
+
 		element1->GetDcmImagePositionPatient(item1_pos);
 		element2->GetDcmImagePositionPatient(item2_pos);
-		
+
 		d[0] = fabs(item1_pos[0] - item2_pos[0]);
 		d[1] = fabs(item1_pos[1] - item2_pos[1]);
 		d[2] = fabs(item1_pos[2] - item2_pos[2]);
@@ -2159,10 +2159,10 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
 				Crop();
 			}
 			break;
-    case ID_VME_TYPE:
-      {
-        OnVmeTypeSelected();
-      }
+		case ID_VME_TYPE:
+			{
+				OnVmeTypeSelected();
+			}
 
 		default:
 			{
@@ -3242,7 +3242,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 
 				bool skipCorrection = skipRotateFlagCorrection && skipFlipLeftRightFlagCorrection && skipFlipUpDownFlagCorrection;
 
-				
+
 				if (!skipCorrection)
 				{
 					vnl_matrix<double> fileNumberForPlaneIFrameJIdPlaneMatrix = currentHelper->GetFileNumberForPlaneIFrameJIdPlaneMatrix();
@@ -3310,7 +3310,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 							tr->Translate(-center[0], -center[1], -center[2]);
 
 							tr->RotateZ(rotateFlag(planeID, 0));
-							
+
 							tr->Translate(center);
 
 							vtkImageReslice *rs = vtkImageReslice::New();
@@ -3318,14 +3318,14 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 							rs->SetResliceTransform(tr);
 							rs->SetInterpolationModeToLinear();
 							rs->Update();
-							
+
 							bool flipUpDownCurrent = (flipUpDownFlag(planeID,0) == 1 ? true : false);
 							bool flipLeftRightCurrent  = (flipLeftRightFlag(planeID,0) == 1 ? true : false);
 
 							vtkImageFlip *flipLR = NULL;
-						
+
 							vtkImageFlip *flipUD = NULL;
-							
+
 							vtkImageData *flipLROutput = NULL;
 
 							if (flipLeftRightCurrent)
@@ -3345,7 +3345,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 							{
 								flipLROutput = rs->GetOutput();
 							}
-						
+
 							vtkImageData *flipUDOutput = NULL;
 
 							if (flipUpDownCurrent)
@@ -3363,11 +3363,11 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 							{
 								flipUDOutput = flipLROutput;
 							}
-							
+
 
 							vtkImageData *outputBuffer = vtkImageData::New();
 							outputBuffer->DeepCopy(flipUDOutput);
-							
+
 							currentSlice->SetVTKImageData(outputBuffer);
 
 							vtkDEL(flipUD);
@@ -3381,18 +3381,18 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 							assert(p.size() == 3);
 							double p3[3] = {p(0),p(1),p(2)};
 							currentSlice->SetDcmImagePositionPatient(p3);
-							
+
 							vnl_vector<double> xv = newXVersorsSingleFrameIdPlaneMatrix.get_row(planeID);
 							assert(xv.size() == 3);
-							
+
 							vnl_vector<double> yv = newYVersorsSingleFrameIdPlaneMatrix.get_row(planeID);
 							assert(yv.size() == 3);
-							
+
 							double orientation[6] = {xv(0),xv(1),xv(2),yv(0),yv(1),yv(2)};
 							currentSlice->SetDcmImageOrientationPatient(orientation);
 
 							currentSlice->GetVTKImageData()->SetOrigin(0,0,bounds[4]);
-							
+
 						}			
 					}
 
@@ -3555,7 +3555,7 @@ void medOpImporterDicomOffis::GenerateSliceTexture(int imageID)
 	medDicomSlice* slice = NULL;
 	slice = m_SelectedSeriesSlicesList->Item(imageID)->GetData();
 	assert(slice);
-	
+
 	slice->GetVTKImageData()->Update();
 	slice->GetVTKImageData()->GetBounds(m_SliceBounds);
 
@@ -3568,9 +3568,9 @@ void medOpImporterDicomOffis::GenerateSliceTexture(int imageID)
 	m_TextMapper->SetInput(m_Text.c_str());
 	m_TextMapper->Modified();
 
-  // AACC 26-10-2010: Hack to make it work with ATI RADEON Driver
-  m_CropActor->GetMapper()->Modified();
-  // End of hack
+	// AACC 26-10-2010: Hack to make it work with ATI RADEON Driver
+	m_CropActor->GetMapper()->Modified();
+	// End of hack
 
 	if (m_CropFlag) 
 	{
@@ -3592,7 +3592,7 @@ void medOpImporterDicomOffis::GenerateSliceTexture(int imageID)
 			crop_bounds[1] = m_SliceBounds[1];
 		if(crop_bounds[3] > m_SliceBounds[3]) 
 			crop_bounds[3] = m_SliceBounds[3];
-		
+
 		if(crop_bounds[5] > m_SliceBounds[5]) 
 			crop_bounds[5] = m_SliceBounds[5];
 
@@ -3634,7 +3634,7 @@ void medOpImporterDicomOffis::GenerateSliceTexture(int imageID)
 		probe->SetSource(imageData);
 		probe->Update();
 		probe->GetOutput()->GetBounds(m_SliceBounds);
-	
+
 		//rescale to 16 bit
 		if(m_RescaleTo16Bit == TRUE && m_HighBit == 11)
 		{
@@ -3960,7 +3960,7 @@ int CompareX(const medDicomSlice **arg1,const medDicomSlice **arg2)
 	(*(medDicomSlice **)arg1)->GetDcmImagePositionPatient(loc);
 	double x1 = loc[0];
 
-	 (*(medDicomSlice **)arg2)->GetDcmImagePositionPatient(loc);
+	(*(medDicomSlice **)arg2)->GetDcmImagePositionPatient(loc);
 	double x2 = loc[0];
 
 	if (x1 > x2)
@@ -4049,21 +4049,21 @@ int CompareImageNumber(const medDicomSlice **arg1,const medDicomSlice **arg2)
 
 void medOpImporterDicomOffis::OnVmeTypeSelected()
 {
-  // Adjust radio button value to match the right case. (Brazzale, 27.07.2010)
-  bool type_volume = ((medGUIDicomSettings*)GetSetting())->EnableToRead("VOLUME");
-  bool type_mesh = ((medGUIDicomSettings*)GetSetting())->EnableToRead("MESH");
-  bool type_image = ((medGUIDicomSettings*)GetSetting())->EnableToRead("IMAGE");
-  if (type_volume && !type_mesh && type_image)
-  {
-    if (m_RadioButton==0)
-      m_OutputType = 2;
-    else
-      m_OutputType = 0;
-  }
-  else if (!type_volume && type_mesh && type_image)
-  {
-    m_OutputType = m_RadioButton+1;
-  }
+	// Adjust radio button value to match the right case. (Brazzale, 27.07.2010)
+	bool type_volume = ((medGUIDicomSettings*)GetSetting())->EnableToRead("VOLUME");
+	bool type_mesh = ((medGUIDicomSettings*)GetSetting())->EnableToRead("MESH");
+	bool type_image = ((medGUIDicomSettings*)GetSetting())->EnableToRead("IMAGE");
+	if (type_volume && !type_mesh && type_image)
+	{
+		if (m_RadioButton==0)
+			m_OutputType = 2;
+		else
+			m_OutputType = 0;
+	}
+	else if (!type_volume && type_mesh && type_image)
+	{
+		m_OutputType = m_RadioButton+1;
+	}
 }
 
 void medOpImporterDicomOffis::OnStudySelect()
@@ -4340,18 +4340,18 @@ void medOpImporterDicomOffis::OnMouseDown( mafEvent * e )
 			m_CropPage->UpdateActor();
 			m_CropPage->GetRWI()->CameraUpdate();
 		}
-  }
-  
-  if (m_Wizard->GetCurrentPage()==m_LoadPage)
-  {
-    m_LoadPage->UpdateActor();
-    m_LoadPage->GetRWI()->CameraUpdate();
-  }
-  else if (m_Wizard->GetCurrentPage()==m_BuildPage)
-  {
-    m_BuildPage->UpdateActor();
-    m_BuildPage->GetRWI()->CameraUpdate();
-  }
+	}
+
+	if (m_Wizard->GetCurrentPage()==m_LoadPage)
+	{
+		m_LoadPage->UpdateActor();
+		m_LoadPage->GetRWI()->CameraUpdate();
+	}
+	else if (m_Wizard->GetCurrentPage()==m_BuildPage)
+	{
+		m_BuildPage->UpdateActor();
+		m_BuildPage->GetRWI()->CameraUpdate();
+	}
 }
 
 void medOpImporterDicomOffis::OnMouseMove( mafEvent * e )

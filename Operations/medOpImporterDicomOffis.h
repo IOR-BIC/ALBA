@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2010-11-10 14:10:40 $
-Version:   $Revision: 1.1.2.50 $
+Date:      $Date: 2011-01-12 14:55:59 $
+Version:   $Revision: 1.1.2.51 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -138,7 +138,7 @@ public:
 	/** Build a volume from the list of CineMRI files. */
 	int BuildOutputVMEGrayVolumeFromDicomCineMRI();
 
-	
+
 
 	/** Build a mesh from the list of dicom files. */
 	int BuildOutputVMEMeshFromDicom();
@@ -176,7 +176,7 @@ protected:
 	void OnWizardChangePage( mafEvent * e );
 	void OnSeriesSelect();
 	void OnStudySelect();
-  void OnVmeTypeSelected();
+	void OnVmeTypeSelected();
 
 	/** Create load page and his GUI for the wizard. */
 	void CreateLoadPage();
@@ -196,10 +196,10 @@ protected:
 	/** Build the list of dicom filer recognized. */
 	bool BuildDicomFileList(const char *dicomDirABSPath);
 
-  /** Check if dicom dataset contains rotations */
-  bool IsRotated( double dcmImageOrientationPatient[6] );
-	
-    /** Return the slice number from the heightId and sliceId*/
+	/** Check if dicom dataset contains rotations */
+	bool IsRotated( double dcmImageOrientationPatient[6] );
+
+	/** Return the slice number from the heightId and sliceId*/
 	int GetSliceIDInSeries(int heightId, int timeId);
 
 	/** Show the slice slice_num. */
@@ -294,7 +294,7 @@ protected:
 	mafGUI  *m_LoadGuiCenter;
 
 	int       m_RadioButton;
-  int       m_OutputType;
+	int       m_OutputType;
 	mafString	m_DicomDirectoryABSFileName;
 	mafString m_PatientName;
 	mafString m_SurgeonName;
@@ -312,12 +312,12 @@ protected:
 	medDicomSeriesSliceList	*m_SelectedSeriesSlicesList; ///< Selected study slices list
 
 	std::vector<mafString> m_SelectedSeriesID; ///< Selected StudyUID-SeriesUIDWithPlanesNumber-SeriesUIDWithoutPlanesNumber vector
-	
-  std::map<std::vector<mafString>,medDicomSeriesSliceList*> m_SeriesIDToSlicesListMap; ///< StudyUID-SeriesUIDWithPlanesNumber-SeriesUIDWithoutPlanesNumber vector to slices list map 
 
-  std::map<std::vector<mafString>,medDicomCardiacMRIHelper*> m_SeriesIDToCardiacMRIHelperMap; ///< StudyUID-SeriesUIDWithPlanesNumber-SeriesUIDWithoutPlanesNumber vector to slices list map 
+	std::map<std::vector<mafString>,medDicomSeriesSliceList*> m_SeriesIDToSlicesListMap; ///< StudyUID-SeriesUIDWithPlanesNumber-SeriesUIDWithoutPlanesNumber vector to slices list map 
 
-  std::map<std::vector<mafString>,bool> m_SeriesIDContainsRotationsMap; ///< StudyUID-SeriesUIDWithPlanesNumber-SeriesUIDWithoutPlanesNumber vector to boolean map 
+	std::map<std::vector<mafString>,medDicomCardiacMRIHelper*> m_SeriesIDToCardiacMRIHelperMap; ///< StudyUID-SeriesUIDWithPlanesNumber-SeriesUIDWithoutPlanesNumber vector to slices list map 
+
+	std::map<std::vector<mafString>,bool> m_SeriesIDContainsRotationsMap; ///< StudyUID-SeriesUIDWithPlanesNumber-SeriesUIDWithoutPlanesNumber vector to boolean map 
 
 	mafString	m_VolumeName;
 	wxString  m_CurrentSliceABSFileName;
@@ -394,7 +394,7 @@ public:
 		m_DcmInstanceNumber = -1;
 		m_DcmTriggerTime = -1.0;
 		m_DcmCardiacNumberOfImages = -1;
-    m_Data = NULL;
+		m_Data = NULL;
 	};
 
 	/** overloaded constructor */
@@ -419,10 +419,10 @@ public:
 			vtkNEW(m_Data);
 			m_Data->DeepCopy(data);
 		}
-    else
-    {
-      m_Data = NULL;
-    }
+		else
+		{
+			m_Data = NULL;
+		}
 	};
 
 	/** destructor */
@@ -431,30 +431,30 @@ public:
 	/** Return the filename of the corresponding dicom slice. */
 	const char *GetSliceABSFileName() const {return m_SliceABSFileName.GetCStr();};
 
-  /** Set the filename of the corresponding dicom slice. */
-  void SetSliceABSFileName(char *fileName){m_SliceABSFileName = fileName;};
+	/** Set the filename of the corresponding dicom slice. */
+	void SetSliceABSFileName(char *fileName){m_SliceABSFileName = fileName;};
 
 	/** Return the image number of the dicom slice*/
 	int GetDcmInstanceNumber() const {return m_DcmInstanceNumber;};
 
-  /** Set the image number of the dicom slice*/
-  void SetDcmInstanceNumber(int number){m_DcmInstanceNumber = number;};
+	/** Set the image number of the dicom slice*/
+	void SetDcmInstanceNumber(int number){m_DcmInstanceNumber = number;};
 
 	/** Return the number of cardiac timeframes*/
 	int GetDcmCardiacNumberOfImages() const {return m_DcmCardiacNumberOfImages;};
 
-  /** Set the number of cardiac timeframes*/
-  void SetDcmCardiacNumberOfImages(int number){m_DcmCardiacNumberOfImages = number;};
+	/** Set the number of cardiac timeframes*/
+	void SetDcmCardiacNumberOfImages(int number){m_DcmCardiacNumberOfImages = number;};
 
 	/** Return the trigger time of the dicom slice*/
 	double GetDcmTriggerTime() const {return m_DcmTriggerTime;};
 
-  /** Set the trigger time of the dicom slice*/
-  void SetDcmTriggerTime(double time){m_DcmTriggerTime = time;};
+	/** Set the trigger time of the dicom slice*/
+	void SetDcmTriggerTime(double time){m_DcmTriggerTime = time;};
 
 	/** Retrieve image data*/
 	vtkImageData* GetVTKImageData(){return m_Data;};
-	
+
 	/** Set vtkImageData */
 	void SetVTKImageData(vtkImageData *data);
 
