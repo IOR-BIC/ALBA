@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizard.h,v $
 Language:  C++
-Date:      $Date: 2009-11-19 09:18:09 $
-Version:   $Revision: 1.4.2.2 $
+Date:      $Date: 2011-01-12 08:25:11 $
+Version:   $Revision: 1.4.2.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -67,7 +67,7 @@ class medGUIWizard : public wxWizard, public mafObserver
 {
 public:
   /** constructor. */
-	medGUIWizard (const wxString& title);
+	medGUIWizard (const wxString& title, bool testMode = false);
   /** destructor. */
 	virtual ~medGUIWizard (); 
   /** Set the Listener that will receive event-notification. */
@@ -81,10 +81,16 @@ public:
   /** Set the first page of the wizard. */
 	void SetFirstPage(wxWizardPageSimple *firstPage);
 
+  /** Return the first page of the wizard. */
+  wxWizardPageSimple* GetFirstPage(){return m_FirstPage;};
+
   /** Enable the changing of the page. */
 	void EnableChangePageOn(){m_EnableChangePage=true;};
   /** Disable the changing of the page. */
 	void EnableChangePageOff(){m_EnableChangePage=false;};
+
+  /** Return the enable changing of the page. */
+  bool GetEnableChangePage(){return m_EnableChangePage;};
 
   /** Message Ids */
 	enum ID_MESSAGES
@@ -100,6 +106,8 @@ private:
 	wxWizardPageSimple *m_FirstPage;
 
 	bool m_EnableChangePage;
+
+  bool m_TestMode;
 
   /** event handler function for closing the window. */
 	void OnCloseWindow(wxCloseEvent &event) {OnCloseWindow(event);};

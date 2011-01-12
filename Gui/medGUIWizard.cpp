@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizard.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-04 13:02:48 $
-Version:   $Revision: 1.5.2.1 $
+Date:      $Date: 2011-01-12 08:25:11 $
+Version:   $Revision: 1.5.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -59,7 +59,7 @@ BEGIN_EVENT_TABLE(medGUIWizard, wxWizard)
 END_EVENT_TABLE()
 
 //----------------------------------------------------------------------------
-medGUIWizard::medGUIWizard(const wxString& title)
+medGUIWizard::medGUIWizard(const wxString& title, bool testMode /* = false */)
 : wxWizard()
 //----------------------------------------------------------------------------
 {
@@ -69,7 +69,12 @@ medGUIWizard::medGUIWizard(const wxString& title)
 
 	m_EnableChangePage = true;
 
-	Create(mafGetFrame(),-1,title,wxNullBitmap,wxDefaultPosition, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER ); 
+  m_TestMode = testMode;
+
+  if (!m_TestMode)
+  {
+    Create(mafGetFrame(),-1,title,wxNullBitmap,wxDefaultPosition, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER ); 
+  }
 }
 //----------------------------------------------------------------------------
 medGUIWizard::~medGUIWizard()
@@ -108,5 +113,9 @@ void medGUIWizard::SetFirstPage(wxWizardPageSimple *firstPage)
 //--------------------------------------------------------------------------------
 {
 	m_FirstPage=firstPage;
-	GetPageAreaSizer()->Add(m_FirstPage);
+
+  if (GetPageAreaSizer() != NULL)
+  {
+    GetPageAreaSizer()->Add(m_FirstPage);
+  }
 }
