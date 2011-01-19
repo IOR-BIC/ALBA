@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVectorFieldMapWithArrows.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-12-14 13:24:38 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2011-01-19 13:17:28 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Simone Brazzale
 ==========================================================================
   Copyright (c) 2001/2005
@@ -98,6 +98,8 @@ medPipeVectorFieldMapWithArrows::medPipeVectorFieldMapWithArrows() : medPipeVect
   m_EdRadius = NULL;
   m_EdRes = NULL;
   m_EdLength = NULL;
+
+  Superclass::SetCreateVTKPipeAlways(true);
 }
 
 //----------------------------------------------------------------------------
@@ -130,8 +132,6 @@ medPipeVectorFieldMapWithArrows::~medPipeVectorFieldMapWithArrows()
   cppDEL(m_EdRes);
   cppDEL(m_EdLength);
 }
-
-
 //----------------------------------------------------------------------------
 mafGUI *medPipeVectorFieldMapWithArrows::CreateGui()
 //----------------------------------------------------------------------------
@@ -145,6 +145,12 @@ mafGUI *medPipeVectorFieldMapWithArrows::CreateGui()
   {
     m_Gui->Label("No vector or scalar fields to visualize.", false);
     return m_Gui;
+  }
+
+  if (nVectors==0 && nScalars>0)
+  {
+    m_ActivateVectors = 0;
+    m_ActivateScalars = 1;
   }
 
   wxBoxSizer* bSizerMain = new wxBoxSizer( wxVERTICAL );
@@ -164,20 +170,17 @@ mafGUI *medPipeVectorFieldMapWithArrows::CreateGui()
 
     bSizerScalar->Add( ckScalars, 0, wxALL|wxEXPAND, 1 );
 
-    if (nScalars > 1)      
-    {
-      wxBoxSizer* bSizer_s1 = new wxBoxSizer( wxHORIZONTAL );
-      bSizer_s1->Add( new wxStaticText( m_Gui, wxID_ANY, _("Scalar Field:"), wxDefaultPosition, wxSize( 60,-1 ), 0 ), 0, wxALL, 5 );
+    wxBoxSizer* bSizer_s1 = new wxBoxSizer( wxHORIZONTAL );
+    bSizer_s1->Add( new wxStaticText( m_Gui, wxID_ANY, _("Scalar Field:"), wxDefaultPosition, wxSize( 60,-1 ), 0 ), 0, wxALL, 5 );
 
-      m_ComboField_s = new wxComboBox( m_Gui, ID_SCALARFIELD, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY ); 
-      m_ComboField_s->SetToolTip( _("Selects the scalar field to be visualized.") );
-      PopulateCombo(m_ComboField_s, false);  //at least one scalar is available
-      m_ComboField_s->SetValidator(mafGUIValidator(this, ID_SCALARFIELD, m_ComboField_s, &m_ScalarFieldIndex));
-      m_ComboField_s->Enable(false);
+    m_ComboField_s = new wxComboBox( m_Gui, ID_SCALARFIELD, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY ); 
+    m_ComboField_s->SetToolTip( _("Selects the scalar field to be visualized.") );
+    PopulateCombo(m_ComboField_s, false);  //at least one scalar is available
+    m_ComboField_s->SetValidator(mafGUIValidator(this, ID_SCALARFIELD, m_ComboField_s, &m_ScalarFieldIndex));
+    m_ComboField_s->Enable(false);
 
-      bSizer_s1->Add( m_ComboField_s, 1, wxALL, 1 );
-      bSizerScalar->Add( bSizer_s1, 0, wxEXPAND, 1 );
-    }
+    bSizer_s1->Add( m_ComboField_s, 1, wxALL, 1 );
+    bSizerScalar->Add( bSizer_s1, 0, wxEXPAND, 1 );
     
     wxBoxSizer* bSizer_s2 = new wxBoxSizer( wxHORIZONTAL );
     bSizer_s2->Add( new wxStaticText( m_Gui, wxID_ANY, _("Color by:"), wxDefaultPosition, wxSize( 60,-1 ), 0 ), 0, wxALL, 5 );
@@ -208,19 +211,16 @@ mafGUI *medPipeVectorFieldMapWithArrows::CreateGui()
 
     bSizerVector->Add( ckVectors, 0, wxALL|wxEXPAND, 1 );
 
-    if (nVectors > 1)      
-    {
-      wxBoxSizer* bSizer1 = new wxBoxSizer( wxHORIZONTAL );
-      bSizer1->Add( new wxStaticText( m_Gui, wxID_ANY, _("Vector Field:"), wxDefaultPosition, wxSize( 60,-1 ), 0 ), 0, wxALL, 5 );
+    wxBoxSizer* bSizer1 = new wxBoxSizer( wxHORIZONTAL );
+    bSizer1->Add( new wxStaticText( m_Gui, wxID_ANY, _("Vector Field:"), wxDefaultPosition, wxSize( 60,-1 ), 0 ), 0, wxALL, 5 );
 
-      m_ComboField_v = new wxComboBox( m_Gui, ID_VECTORFIELD, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY ); 
-      m_ComboField_v->SetToolTip( _("Selects the vector field to be visualized.") );
-      PopulateCombo(m_ComboField_v, true);  //at least one vector is available
-      m_ComboField_v->SetValidator(mafGUIValidator(this, ID_VECTORFIELD, m_ComboField_v, &m_VectorFieldIndex));
+    m_ComboField_v = new wxComboBox( m_Gui, ID_VECTORFIELD, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY ); 
+    m_ComboField_v->SetToolTip( _("Selects the vector field to be visualized.") );
+    PopulateCombo(m_ComboField_v, true);  //at least one vector is available
+    m_ComboField_v->SetValidator(mafGUIValidator(this, ID_VECTORFIELD, m_ComboField_v, &m_VectorFieldIndex));
 
-      bSizer1->Add( m_ComboField_v, 1, wxALL, 1 );
-      bSizerVector->Add( bSizer1, 0, wxEXPAND, 1 );
-    }
+    bSizer1->Add( m_ComboField_v, 1, wxALL, 1 );
+    bSizerVector->Add( bSizer1, 0, wxEXPAND, 1 );
     
     wxBoxSizer* bSizer2 = new wxBoxSizer( wxHORIZONTAL );
     bSizer2->Add( new wxStaticText( m_Gui, wxID_ANY, _("Color by:"), wxDefaultPosition, wxSize( 60,-1 ), 0 ), 0, wxALL, 5 );
@@ -363,10 +363,18 @@ void medPipeVectorFieldMapWithArrows::OnEvent(mafEventBase *maf_event)
 
           m_ActivateVectors = 0;
 
-          m_ComboField_s->Enable(true);
-          m_ComboField_v->Enable(false);
-          m_ComboColorBy_s->Enable(true);
-          m_ComboColorBy_v->Enable(false);
+          if (m_ComboField_s!=NULL) {
+            m_ComboField_s->Enable(true);
+          }
+          if (m_ComboField_v!=NULL) {
+            m_ComboField_v->Enable(false);
+          }
+          if (m_ComboColorBy_s!=NULL) {
+            m_ComboColorBy_s->Enable(true);
+          }
+          if (m_ComboColorBy_v!=NULL) {
+            m_ComboColorBy_v->Enable(false);
+          }
           
           m_Gui->Update();
           UpdateVTKPipe(); 
@@ -385,10 +393,18 @@ void medPipeVectorFieldMapWithArrows::OnEvent(mafEventBase *maf_event)
 
           m_ActivateScalars = 0;
 
-          m_ComboField_s->Enable(false);
-          m_ComboField_v->Enable(true);
-          m_ComboColorBy_s->Enable(false);
-          m_ComboColorBy_v->Enable(true);
+          if (m_ComboField_s!=NULL) {
+            m_ComboField_s->Enable(false);
+          }
+          if (m_ComboField_v!=NULL) {
+            m_ComboField_v->Enable(true);
+          }
+          if (m_ComboColorBy_s!=NULL) {
+            m_ComboColorBy_s->Enable(false);
+          }
+          if (m_ComboColorBy_v!=NULL) {
+            m_ComboColorBy_v->Enable(true);
+          }
 
           m_Gui->Update();
           UpdateVTKPipe(); 
@@ -495,7 +511,8 @@ void medPipeVectorFieldMapWithArrows::CreateVTKPipe()
     f_normals->Update();
     da_normals= f_normals->GetOutput()->GetPointData()->GetNormals();
     da_normals->SetName("Normals");
-    pd->AddArray(da_normals);
+    pd->SetNormals(da_normals);
+    pd->Update();
     vtkDEL(f_normals);
   }
   
@@ -567,7 +584,6 @@ void medPipeVectorFieldMapWithArrows::CreateVTKPipe()
   
   filter->Delete();
 }
-
 //------------------------------------------------------------------------
 //Updates VTK pipeline (setting radius, etc.). 
 void medPipeVectorFieldMapWithArrows::UpdateVTKPipe()
@@ -577,15 +593,41 @@ void medPipeVectorFieldMapWithArrows::UpdateVTKPipe()
   vtkPointData* pd = ds->GetPointData();
   if (pd == NULL)
     return;
-  
+
   const char* field_name;
   vtkDataArray* da;
   double sr[2];
 
   // -----------------------
+  // PHASE 1: UPDATE NORMALS
+  // -----------------------
+
+  vtkGeometryFilter* filter = vtkGeometryFilter::New();
+  filter->SetInput(ds);
+  vtkDataArray* da_normals = pd->GetNormals();
+  if (!da_normals)
+  {
+    vtkPolyDataNormals* f_normals;
+    vtkNEW(f_normals);
+    f_normals->SetInput(filter->GetOutput());
+    f_normals->ComputeCellNormalsOff();
+    f_normals->ComputePointNormalsOn();
+    f_normals->Update();
+    da_normals= f_normals->GetOutput()->GetPointData()->GetNormals();
+    da_normals->SetName("Normals");
+    pd->SetNormals(da_normals);
+    pd->Update();
+    vtkDEL(f_normals);
+  }
+  if (filter)
+  {
+    filter->Delete();
+  }
+
+  // -----------------------
   // PHASE 1: UPDATE SURFACE
   // -----------------------
-  
+
   if (m_ActivateVectors)
   {
     field_name = GetVectorFieldName(m_VectorFieldIndex);
