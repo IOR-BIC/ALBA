@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exOperationApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 14:50:58 $
-  Version:   $Revision: 1.46.2.1 $
+  Date:      $Date: 2011-01-19 10:55:44 $
+  Version:   $Revision: 1.46.2.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -92,6 +92,13 @@ bool exOperationApp::OnInit()
 //--------------------------------------------------------------------------------
 {
   mafPics.Initialize();	
+
+#include "Examples/exOperations/MAFIcons/FRAME_ICON16x16.xpm"
+  mafADDPIC(FRAME_ICON16x16);
+#include "Examples/exOperations/MAFIcons/FRAME_ICON32x32.xpm"
+  mafADDPIC(FRAME_ICON32x32);
+#include "Examples/exOperations/MAFIcons/MDICHILD_ICON.xpm"
+  mafADDPIC(MDICHILD_ICON);
 
   int result = mafVMEFactory::Initialize();
   assert(result==MAF_OK);
@@ -208,7 +215,7 @@ bool exOperationApp::OnInit()
   //mafUser *user = m_Logic->GetUser();
   //user->ShowLoginDialog();
 
-  m_Logic->Init(0,NULL); // calls FileNew - which create the root
+  m_Logic->Init(argc,argv); // calls FileNew - which create the root
   return TRUE;
 }
 //--------------------------------------------------------------------------------
