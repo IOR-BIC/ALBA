@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewVTKCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-11-22 11:04:58 $
-  Version:   $Revision: 1.1.2.4 $
+  Date:      $Date: 2011-01-21 15:27:38 $
+  Version:   $Revision: 1.1.2.5 $
   Authors:   Eleonora Mambrini
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,12 +36,15 @@
 #include "mafVMEOutputVolume.h"
 #include "mafGUIFloatSlider.h"
 #include "mafVMEOutputImage.h"
-#include "vtkImageData.h"
-#include "vtkTexture.h"
+#include "mafVME.h"
+
+#include "medPipeVectorFieldMapWithArrows.h"
 
 #include "vtkLookupTable.h"
 #include "vtkWindowLevelLookupTable.h"
 #include "vtkDataSet.h"
+#include "vtkImageData.h"
+#include "vtkTexture.h"
 
 #include "mmaVolumeMaterial.h"
 
@@ -144,4 +147,33 @@ void medViewVTKCompound::SetExternalView(mafViewVTK *childView)
   if(m_ViewVTK == NULL) {
     m_ViewVTK = childView;
   }
+}
+//-------------------------------------------------------------------------
+void medViewVTKCompound::CameraUpdate()
+//-------------------------------------------------------------------------
+{
+  // Added patch to show right scalar and vector attributes in the VectorFieldMapWithArrows pipe while changing 
+  // timeframe with the timebar (otherwise attributes are not updated and updateVTKpipe is not called)
+  mafSceneGraph* sg = GetSceneGraph();
+
+  // Do it for each node attached to the view
+  for(mafSceneNode *node = sg->GetNodeList(); node; node=node->m_Next)
+	{ 
+    if (node->m_Vme)
+    {
+  
+      mafVME* vme = (mafVME*) node->m_Vme;
+
+      assert(vme);
+      if (strcmp(vme->GetVisualPipe().GetCStr(),"medPipeVectorFieldMapWithArrows"))
+      {
+        medPipeVectorFieldMapWithArrows* pipe = (medPipeVectorFieldMapWithArrows*)GetNodePipe(vme);
+        if (pipe) {
+          pipe->UpdateVTKPipe();
+        }
+      }
+    }
+  }
+
+  Superclass::CameraUpdate();
 }

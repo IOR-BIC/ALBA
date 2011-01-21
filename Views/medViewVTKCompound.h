@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewVTKCompound.h,v $
   Language:  C++
-  Date:      $Date: 2010-11-22 11:04:58 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2011-01-21 15:27:38 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Eleonora Mambrini
 ==========================================================================
   Copyright (c) 2002/2004
@@ -60,6 +60,9 @@ public:
 
   /** Function that clones instance of the object. */
   virtual mafView *Copy(mafObserver *Listener, bool lightCopyEnabled = false);
+
+  /** Update camera */
+  virtual void CameraUpdate();
 
 protected:
   /**
