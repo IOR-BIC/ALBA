@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVectorFieldMapWithArrows.h,v $
   Language:  C++
-  Date:      $Date: 2010-12-14 13:24:38 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2011-01-23 21:00:00 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Simone Brazzale
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -120,13 +120,14 @@ public:
   /** Processes events coming from GUI */
   /*virtual*/ void OnEvent(mafEventBase *maf_event);
 
+  /** Updates VTK pipeline (setting radius, etc.). 
+  NB: This function needs to be declared public in order to update correctly views during timebar shifts. */
+  virtual void UpdateVTKPipe();  
+
 protected:
   /*virtual*/ mafGUI  *CreateGui();
 
   /** Constructs VTK pipeline. */
   virtual void CreateVTKPipe();
-
-  /** Updates VTK pipeline (setting radius, etc.). */
-  virtual void UpdateVTKPipe();  
 };
 #endif // medPipeVectorFieldSurface_h__
