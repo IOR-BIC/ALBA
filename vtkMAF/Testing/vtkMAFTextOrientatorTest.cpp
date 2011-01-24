@@ -3,8 +3,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFTextOrientatorTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-11-26 12:53:07 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2011-01-24 13:33:11 $
+Version:   $Revision: 1.1.4.1 $
 Authors:   Daniele Giunchi
 
 ================================================================================
@@ -257,6 +257,8 @@ void vtkMAFTextOrientatorTest::CompareImages(vtkRenderWindow * renwin)
   if(!controlStream)
   {
     controlStream.close();
+    vtkDEL(w);
+    vtkDEL(w2i);
     return;
   }
   controlStream.close();
