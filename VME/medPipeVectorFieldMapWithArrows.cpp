@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVectorFieldMapWithArrows.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-01-19 13:17:28 $
-  Version:   $Revision: 1.1.2.4 $
+  Date:      $Date: 2011-01-24 09:25:45 $
+  Version:   $Revision: 1.1.2.5 $
   Authors:   Simone Brazzale
 ==========================================================================
   Copyright (c) 2001/2005
@@ -450,6 +450,14 @@ void medPipeVectorFieldMapWithArrows::OnEvent(mafEventBase *maf_event)
 void medPipeVectorFieldMapWithArrows::CreateVTKPipe()
 //------------------------------------------------------------------------
 { 
+  if (!m_Vme->GetOutput()->GetVTKData()) {
+    return;
+  }
+
+  m_Vme->Update();
+  m_Vme->GetOutput()->Update();
+  m_Vme->GetOutput()->GetVTKData()->Update();
+
   // ----------------------
   // PHASE 1: BUILD SURFACE  
   // ----------------------
@@ -589,6 +597,14 @@ void medPipeVectorFieldMapWithArrows::CreateVTKPipe()
 void medPipeVectorFieldMapWithArrows::UpdateVTKPipe()
 //------------------------------------------------------------------------
 {
+  if (!m_Vme->GetOutput()->GetVTKData()) {
+    return;
+  }
+
+  m_Vme->Update();
+  m_Vme->GetOutput()->Update();
+  m_Vme->GetOutput()->GetVTKData()->Update();
+
   vtkDataSet* ds = m_Vme->GetOutput()->GetVTKData();
   vtkPointData* pd = ds->GetPointData();
   if (pd == NULL)
