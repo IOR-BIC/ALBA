@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpTransformInterface.h,v $
   Language:  C++
-  Date:      $Date: 2010-02-10 14:24:34 $
-  Version:   $Revision: 1.2.2.2 $
+  Date:      $Date: 2011-01-24 13:32:21 $
+  Version:   $Revision: 1.2.2.3 $
   Authors:   Stefano Perticoni        
 ==========================================================================
   Copyright (c) 2002/2004
@@ -113,5 +113,9 @@ protected:
 
   mafMatrix m_OldAbsMatrix; // used by Undo()
   mafMatrix m_NewAbsMatrix; // used by Do()
+
+  friend class mafOpTransformInterfaceTest;
 };
 #endif
+
+
