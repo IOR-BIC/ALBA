@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVectorFieldMapWithArrows.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-01-24 09:25:45 $
-  Version:   $Revision: 1.1.2.5 $
+  Date:      $Date: 2011-01-24 21:23:20 $
+  Version:   $Revision: 1.1.2.6 $
   Authors:   Simone Brazzale
 ==========================================================================
   Copyright (c) 2001/2005
@@ -519,7 +519,7 @@ void medPipeVectorFieldMapWithArrows::CreateVTKPipe()
     f_normals->Update();
     da_normals= f_normals->GetOutput()->GetPointData()->GetNormals();
     da_normals->SetName("Normals");
-    pd->SetNormals(da_normals);
+    pd->AddArray(da_normals);
     pd->Update();
     vtkDEL(f_normals);
   }
@@ -631,7 +631,7 @@ void medPipeVectorFieldMapWithArrows::UpdateVTKPipe()
     f_normals->Update();
     da_normals= f_normals->GetOutput()->GetPointData()->GetNormals();
     da_normals->SetName("Normals");
-    pd->SetNormals(da_normals);
+    pd->AddArray(da_normals);
     pd->Update();
     vtkDEL(f_normals);
   }
