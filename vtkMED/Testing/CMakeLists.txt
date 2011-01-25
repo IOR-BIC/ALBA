@@ -109,6 +109,9 @@ ADD_TEST(MemoryInfoTest ${EXECUTABLE_OUTPUT_PATH}/MemoryInfoTest)
 ADD_EXECUTABLE(VectorTest VectorTest.h VectorTest.cpp)
 ADD_TEST(VectorTest ${EXECUTABLE_OUTPUT_PATH}/VectorTest)
 
+ADD_EXECUTABLE(TreeNodeDataTest TreeNodeDataTest.h TreeNodeDataTest.cpp)
+ADD_TEST(TreeNodeDataTest ${EXECUTABLE_OUTPUT_PATH}/TreeNodeDataTest)
+
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
 #ENDIF (MAF_USE_WX)
