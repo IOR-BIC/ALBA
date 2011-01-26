@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVectorFieldMapWithArrows.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-01-24 21:23:20 $
-  Version:   $Revision: 1.1.2.6 $
+  Date:      $Date: 2011-01-26 14:23:02 $
+  Version:   $Revision: 1.1.2.7 $
   Authors:   Simone Brazzale
 ==========================================================================
   Copyright (c) 2001/2005
@@ -21,6 +21,7 @@
 #include "mafDecl.h"
 #include "medPipeVectorFieldMapWithArrows.h"
 
+/* MAF */
 #include "mafSceneNode.h"
 #include "mafPipeFactory.h"
 #include "mafGUI.h"
@@ -30,6 +31,7 @@
 #include "mafGUIFloatSlider.h"
 #include "mafVME.h"
 
+/* VTK */
 #include "vtkArrowSource.h"
 #include "vtkConeSource.h"
 #include "vtkLineSource.h"
@@ -50,6 +52,10 @@
 #include "vtkPolyDataMapper.h"
 #include "vtkScalarBarActor.h"
 #include "vtkGeometryFilter.h"
+
+#include "vtkPointData.h"
+#include "vtkCellData.h"
+#include "vtkFieldData.h"
 
 #include "wx/busyinfo.h"
 #include <float.h>
@@ -98,6 +104,8 @@ medPipeVectorFieldMapWithArrows::medPipeVectorFieldMapWithArrows() : medPipeVect
   m_EdRadius = NULL;
   m_EdRes = NULL;
   m_EdLength = NULL;
+
+  m_DataType = POINT_DATA;
 
   Superclass::SetCreateVTKPipeAlways(true);
 }
@@ -354,6 +362,7 @@ void medPipeVectorFieldMapWithArrows::OnEvent(mafEventBase *maf_event)
       {
       case ID_ACTIVATE_SCALARS:
         {
+          // activate scalars and update gui
           if (m_ActivateVectors==0 && m_ActivateScalars==0)
           {
             m_ActivateScalars = !m_ActivateScalars;
@@ -384,6 +393,7 @@ void medPipeVectorFieldMapWithArrows::OnEvent(mafEventBase *maf_event)
       break;
       case ID_ACTIVATE_VECTORS:
         {
+          // activate vectors and update gui
           if (m_ActivateVectors==0 && m_ActivateScalars==0)
           {
             m_ActivateVectors = !m_ActivateVectors;
@@ -414,6 +424,7 @@ void medPipeVectorFieldMapWithArrows::OnEvent(mafEventBase *maf_event)
       break;
       case ID_GLYPH_TYPE:
         {
+          // change glyph type
           if (m_GlyphType==GLYPH_LINES)
           {
             m_EdRadius->Enable(false);
@@ -446,7 +457,6 @@ void medPipeVectorFieldMapWithArrows::OnEvent(mafEventBase *maf_event)
 }
 
 //------------------------------------------------------------------------
-//Constructs VTK pipeline.
 void medPipeVectorFieldMapWithArrows::CreateVTKPipe()
 //------------------------------------------------------------------------
 { 
@@ -458,30 +468,47 @@ void medPipeVectorFieldMapWithArrows::CreateVTKPipe()
   m_Vme->GetOutput()->Update();
   m_Vme->GetOutput()->GetVTKData()->Update();
 
+  int nScalars = GetNumberOfScalars();
+  int nVectors = GetNumberOfVectors();
+
+  if (nScalars==0 && nVectors==0) {
+    return;
+  }
+
   // ----------------------
   // PHASE 1: BUILD SURFACE  
   // ----------------------
 
-  // Build LUT
+  // build LUT
   m_ColorMappingLUT = vtkLookupTable::New();
-  lutPreset(12, m_ColorMappingLUT); //initialize LUT to SAR (it has index 12)  
+  lutPreset(12, m_ColorMappingLUT); 
   m_ColorMappingLUT->Build(); 
 
+  // transform dataset to polydata
   vtkGeometryFilter* filter = vtkGeometryFilter::New();
   filter->SetInput(m_Vme->GetOutput()->GetVTKData());
 
+  // build surface mapper
   m_SurfaceMapper = vtkPolyDataMapper::New();
   m_SurfaceMapper->SetInput(filter->GetOutput());
   m_SurfaceMapper->ImmediateModeRenderingOn();
-  m_SurfaceMapper->SetScalarModeToUsePointFieldData();
+
+  // assign right mapping mode
+  if (m_DataType==POINT_DATA) {
+    m_SurfaceMapper->SetScalarModeToUsePointFieldData();
+  }
+  else if (m_DataType==CELL_DATA)  {
+    m_SurfaceMapper->SetScalarModeToUseCellFieldData();
+  }
+
+  // initializa mapper
   m_SurfaceMapper->SetColorModeToMapScalars();
   m_SurfaceMapper->SetLookupTable(m_ColorMappingLUT);
-
   m_SurfaceActor = vtkActor::New();
   m_SurfaceActor->SetMapper(m_SurfaceMapper);
   m_SurfaceActor->SetPickable(0);   //make it faster
 
-  // Build scalar field map
+  // build scalar field map
   m_MappingActor = vtkScalarBarActor::New();
   m_MappingActor->SetLookupTable(m_SurfaceMapper->GetLookupTable());
   ((vtkActor2D*)m_MappingActor)->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
@@ -500,37 +527,70 @@ void medPipeVectorFieldMapWithArrows::CreateVTKPipe()
   // PHASE 2: BUILD GLYPHS
   // ---------------------
 
-  int nVectors = GetNumberOfVectors();
-
   vtkDataSet* ds = m_Vme->GetOutput()->GetVTKData();
   vtkPointData* pd = ds->GetPointData();
-  if (pd == NULL)
+  vtkCellData* cd = ds->GetCellData();
+  if ( pd == NULL || cd==NULL )
     return;
 
-  // Build normals if they do not exist
-  vtkDataArray* da_normals = pd->GetNormals();
+  // get normals from points or cells
+  vtkDataArray* da_normals;
+  if (m_DataType==POINT_DATA) {
+    da_normals = pd->GetNormals();
+  }
+  else if (m_DataType==CELL_DATA)
+  {
+    da_normals = cd->GetNormals();
+  }
+
+  // build normals if they do not exist
   if (!da_normals)
   {
     vtkPolyDataNormals* f_normals;
     vtkNEW(f_normals);
     f_normals->SetInput(filter->GetOutput());
-    f_normals->ComputeCellNormalsOff();
-    f_normals->ComputePointNormalsOn();
-    f_normals->Update();
-    da_normals= f_normals->GetOutput()->GetPointData()->GetNormals();
-    da_normals->SetName("Normals");
-    pd->AddArray(da_normals);
-    pd->Update();
+
+    // set normals to points or cells
+    if (m_DataType==POINT_DATA)
+    {
+      f_normals->ComputeCellNormalsOff();
+      f_normals->ComputePointNormalsOn();
+      f_normals->Update();
+      da_normals= f_normals->GetOutput()->GetPointData()->GetNormals();
+      da_normals->SetName("Normals");
+      pd->AddArray(da_normals);
+      pd->Update();
+    }
+    else if (m_DataType==CELL_DATA)
+    {
+      f_normals->ComputeCellNormalsOn();
+      f_normals->ComputePointNormalsOff();
+      f_normals->Update();
+      da_normals= f_normals->GetOutput()->GetCellData()->GetNormals();
+      da_normals->SetName("Normals");
+      cd->AddArray(da_normals);
+      cd->Update();
+    }
+    
     vtkDEL(f_normals);
   }
   
+  // get data array from points or cells
   int nOfComponents = -1;
-  vtkDataArray* da = pd->GetArray(m_VectorFieldIndex);
+  vtkDataArray* da;
+  if (m_DataType==POINT_DATA)
+  {
+    da = pd->GetArray(m_VectorFieldIndex);
+  }
+  else if (m_DataType==CELL_DATA)
+  {
+    da = cd->GetArray(m_VectorFieldIndex);
+  }
   nOfComponents = da->GetNumberOfComponents();
   if (nOfComponents!=1 && nOfComponents!=3)
     return;
 
-  // Scale absolut value of scalar components to view dimensions
+  // scale absolut value of scalar components to view dimensions
   float distance = 0;
   for (int i=0;i<ds->GetNumberOfPoints()-2;i++)
   {
@@ -545,7 +605,7 @@ void medPipeVectorFieldMapWithArrows::CreateVTKPipe()
   float max_norm = da->GetMaxNorm();
   float scale_factor = distance/max_norm;
   
-  // Arrow glyph
+  // arrow glyph
   m_Arrow = vtkArrowSource::New();
   m_Arrow->SetTipResolution(m_GlyphRes);
   m_Arrow->SetTipRadius(m_GlyphRadius);
@@ -553,13 +613,13 @@ void medPipeVectorFieldMapWithArrows::CreateVTKPipe()
   m_Arrow->SetShaftResolution(m_GlyphRes);
   m_Arrow->SetShaftRadius(m_GlyphRadius*0.3);
 
-  // Line glyph
+  // line glyph
   m_Line = vtkLineSource::New(); 
   m_Line->SetPoint1(0.0, 0.0, 0.0);
   m_Line->SetPoint2(1.0, 0.0, 0.0);
   m_Line->SetResolution(m_GlyphRes);
 
-  // Build glyph
+  // build glyph
   m_Glyph = vtkGlyph3D::New();
   m_Glyph->SetInput(m_Vme->GetOutput()->GetVTKData());        
   m_Glyph->SetSource(m_Arrow->GetOutput());
@@ -576,14 +636,14 @@ void medPipeVectorFieldMapWithArrows::CreateVTKPipe()
   m_Glyph->SetColorModeToColorByVector();
   m_Glyph->Update();
 
-  // Build mapper  
+  // build mapper  
   m_GlyphMapper = vtkPolyDataMapper::New();
   m_GlyphMapper->SetInput(m_Glyph->GetOutput());
   m_GlyphMapper->ImmediateModeRenderingOn();
   m_GlyphMapper->SetScalarRange(m_SurfaceMapper->GetLookupTable()->GetRange());
   m_GlyphMapper->SetLookupTable(m_ColorMappingLUT);
 
-  // Build actor
+  // build actor
   m_GlyphActor = vtkActor::New();
   m_GlyphActor->SetMapper(m_GlyphMapper);
   m_GlyphActor->SetPickable(0);   //make it faster
@@ -607,7 +667,8 @@ void medPipeVectorFieldMapWithArrows::UpdateVTKPipe()
 
   vtkDataSet* ds = m_Vme->GetOutput()->GetVTKData();
   vtkPointData* pd = ds->GetPointData();
-  if (pd == NULL)
+  vtkCellData* cd = ds->GetCellData();
+  if (pd == NULL || cd == NULL)
     return;
 
   const char* field_name;
@@ -618,21 +679,49 @@ void medPipeVectorFieldMapWithArrows::UpdateVTKPipe()
   // PHASE 1: UPDATE NORMALS
   // -----------------------
 
+  // transform dataset to polydata
   vtkGeometryFilter* filter = vtkGeometryFilter::New();
   filter->SetInput(ds);
-  vtkDataArray* da_normals = pd->GetNormals();
+  
+  // get normals from cells or points
+  vtkDataArray* da_normals;
+  if (m_DataType==POINT_DATA) {
+    da_normals = pd->GetNormals();
+  }
+  else if (m_DataType==CELL_DATA)
+  {
+    da_normals = cd->GetNormals();
+  }
+
+  // build them if they do not exist
   if (!da_normals)
   {
     vtkPolyDataNormals* f_normals;
     vtkNEW(f_normals);
     f_normals->SetInput(filter->GetOutput());
-    f_normals->ComputeCellNormalsOff();
-    f_normals->ComputePointNormalsOn();
-    f_normals->Update();
-    da_normals= f_normals->GetOutput()->GetPointData()->GetNormals();
-    da_normals->SetName("Normals");
-    pd->AddArray(da_normals);
-    pd->Update();
+
+    // set them to points or cells
+    if (m_DataType==POINT_DATA)
+    {
+      f_normals->ComputeCellNormalsOff();
+      f_normals->ComputePointNormalsOn();
+      f_normals->Update();
+      da_normals= f_normals->GetOutput()->GetPointData()->GetNormals();
+      da_normals->SetName("Normals");
+      pd->AddArray(da_normals);
+      pd->Update();
+    }
+    else if (m_DataType==CELL_DATA)
+    {
+      f_normals->ComputeCellNormalsOn();
+      f_normals->ComputePointNormalsOff();
+      f_normals->Update();
+      da_normals= f_normals->GetOutput()->GetCellData()->GetNormals();
+      da_normals->SetName("Normals");
+      cd->AddArray(da_normals);
+      cd->Update();
+    }
+
     vtkDEL(f_normals);
   }
   if (filter)
@@ -644,29 +733,51 @@ void medPipeVectorFieldMapWithArrows::UpdateVTKPipe()
   // PHASE 1: UPDATE SURFACE
   // -----------------------
 
+  // case 1: vectors are activated
   if (m_ActivateVectors)
   {
+    // get field from cells or points
     field_name = GetVectorFieldName(m_VectorFieldIndex);
     m_SurfaceMapper->SelectColorArray(field_name);
-    da = pd->GetVectors(field_name);
+    if (m_DataType==POINT_DATA)
+    {
+      da = pd->GetVectors(field_name);
+    }
+    else if (m_DataType==CELL_DATA)
+    {
+      da = cd->GetVectors(field_name);
+    }
+    
+    // get range
     da->GetRange(sr, m_VectorColorMappingMode - CMM_X);
     if (m_VectorColorMappingMode == CMM_MAGNITUDE)    
     {
-      // Magnitude
+      // set magnitude
       m_ColorMappingLUT->SetVectorModeToMagnitude();    
     }
     else
     {
-      // X, Y or Z component
+      // set X, Y or Z component
       m_ColorMappingLUT->SetVectorModeToComponent();
       m_ColorMappingLUT->SetVectorComponent(m_VectorColorMappingMode - CMM_X);    
     }
   }
+  // case 2: Scalars are activated
   else if (m_ActivateScalars)
   {
+    // get field from points or cells
     field_name = GetScalarFieldName(m_ScalarFieldIndex);
     m_SurfaceMapper->SelectColorArray(field_name);
-    da = pd->GetScalars(field_name);
+    if (m_DataType==POINT_DATA)
+    {
+      da = pd->GetScalars(field_name);
+    }
+    else if (m_DataType==CELL_DATA)
+    {
+      da = cd->GetScalars(field_name);
+    }
+
+    // get range
     da->GetRange(sr);
   }
   else
@@ -674,6 +785,7 @@ void medPipeVectorFieldMapWithArrows::UpdateVTKPipe()
     return;
   }   
    
+  // set range
   m_ColorMappingLUT->SetTableRange(sr);
   m_SurfaceMapper->SetScalarRange(sr);
   m_SurfaceMapper->SetScalarVisibility(m_EnableMap);
@@ -691,7 +803,7 @@ void medPipeVectorFieldMapWithArrows::UpdateVTKPipe()
   if (nOfComponents!=1 && nOfComponents!=3)
     return;
 
-  // Select arrows or lines for glyphs
+  // select arrows or lines for glyphs
   if (m_GlyphType == GLYPH_LINES)
   {
     m_Glyph->SetSource(m_Line->GetOutput());
@@ -707,7 +819,7 @@ void medPipeVectorFieldMapWithArrows::UpdateVTKPipe()
     m_Glyph->SetSource(m_Arrow->GetOutput());
   }
  
-  // Compute new scaling value to view dimensions
+  // compute new scaling value to view dimensions
   float distance = 0;
   for (int i=0;i<ds->GetNumberOfPoints()-2;i++)
   {
@@ -734,7 +846,7 @@ void medPipeVectorFieldMapWithArrows::UpdateVTKPipe()
   m_Glyph->SetScaleFactor(m_ScalingValue*scale_factor);
   m_Glyph->SetRange(range);
     
-  // Change visualization type
+  // change visualization type
   if (nOfComponents==3)
   {
     m_Glyph->SelectInputVectors(GetVectorFieldName(m_VectorFieldIndex));
@@ -750,7 +862,7 @@ void medPipeVectorFieldMapWithArrows::UpdateVTKPipe()
     m_Glyph->SetColorModeToColorByScalar();
   }
 
-  // Update mapper
+  // update mapper
   m_GlyphMapper->SetScalarRange(m_SurfaceMapper->GetLookupTable()->GetRange());
   m_GlyphMapper->SetLookupTable(m_ColorMappingLUT);
   m_GlyphMapper->SetScalarVisibility(m_EnableMap);
@@ -758,4 +870,241 @@ void medPipeVectorFieldMapWithArrows::UpdateVTKPipe()
   m_GlyphActor->SetVisibility(m_ShowGlyphs);
 
   m_Glyph->Update();
+}
+//------------------------------------------------------------------------
+int medPipeVectorFieldMapWithArrows::GetNumberOfFields(bool bVectors)
+//------------------------------------------------------------------------
+{
+  vtkPointData* pd = m_Vme->GetOutput()->GetVTKData()->GetPointData();
+  vtkCellData* cd = m_Vme->GetOutput()->GetVTKData()->GetCellData();
+
+  int nRet = -1;
+  int nCount = 0;
+
+  // get number of fields from points. If found, exit. (NB: only points data fields will be displayed)
+  if (pd != NULL) 
+  {
+    int nQueryComps = bVectors ? 3 : 1;
+    nRet = 0;
+    nCount = pd->GetNumberOfArrays();
+    for (int i = 0; i < nCount; i++)
+    {
+      vtkDataArray* da = pd->GetArray(i);
+      if (da->GetNumberOfComponents() == nQueryComps)
+        nRet++; 
+    }
+    if (nRet>0) {
+      // set here global data type flag
+      m_DataType = POINT_DATA;
+      return nRet;
+    }
+  }
+  // if not found, get it from cells. (NB: only cell data fields will be displayed)
+  if (cd != NULL)  
+  {
+    int nQueryComps = bVectors ? 3 : 1;
+    nRet = 0;
+    nCount = cd->GetNumberOfArrays();
+    for (int i = 0; i < nCount; i++)
+    {
+      vtkDataArray* da = cd->GetArray(i);
+      if (da->GetNumberOfComponents() == nQueryComps)
+        nRet++;
+    }
+    if (nRet>0) {
+      // set here global data type flag
+      m_DataType = CELL_DATA;
+      return nRet;
+    }
+  }
+
+  return nRet;
+}
+//------------------------------------------------------------------------
+const char* medPipeVectorFieldMapWithArrows::GetFieldName(int nIndex, bool bVectors)
+//------------------------------------------------------------------------
+{
+  vtkPointData* pd = m_Vme->GetOutput()->GetVTKData()->GetPointData();
+  vtkCellData* cd = m_Vme->GetOutput()->GetVTKData()->GetCellData();
+  
+  switch (m_DataType)
+  {
+  // get field name from points
+  case POINT_DATA:
+    {
+      if (pd == NULL)
+        return NULL;
+
+      int nQueryComps = bVectors ? 3 : 1;
+      int nCount = pd->GetNumberOfArrays();
+      for (int i = 0; i < nCount; i++)
+      {
+        vtkDataArray* da = pd->GetArray(i);
+        if (da->GetNumberOfComponents() == nQueryComps)
+        {
+          if (nIndex == 0)
+            return da->GetName();
+          
+          nIndex--;
+        }
+      }
+    }
+  break;
+  // get field name form cells
+  case CELL_DATA:
+    {
+      if (cd == NULL)
+        return NULL;
+
+      int nQueryComps = bVectors ? 3 : 1;
+      int nCount = cd->GetNumberOfArrays();
+      for (int i = 0; i < nCount; i++)
+      {
+        vtkDataArray* da = cd->GetArray(i);
+        if (da->GetNumberOfComponents() == nQueryComps)
+        {
+          if (nIndex == 0)
+            return da->GetName();
+          
+          nIndex--;
+        }
+      }
+    }
+  break;
+  }
+  
+  return NULL;
+}
+
+//------------------------------------------------------------------------
+int medPipeVectorFieldMapWithArrows::GetFieldIndex(const char* szName, bool bVectors)
+//------------------------------------------------------------------------
+{
+  vtkPointData* pd = m_Vme->GetOutput()->GetVTKData()->GetPointData();
+  vtkCellData* cd = m_Vme->GetOutput()->GetVTKData()->GetCellData();
+  
+  int nIndex = 0;
+  
+  switch (m_DataType)
+  {
+  // get field index from points
+  case POINT_DATA:
+    {
+      if (pd == NULL)
+        return -1;
+
+      int nQueryComps;
+      vtkDataArray* pQueryDA;
+
+      if (!bVectors)
+      {
+        nQueryComps = 1;
+        pQueryDA = pd->GetScalars(szName);
+      }
+      else
+      {
+        nQueryComps = 3;
+        pQueryDA = pd->GetVectors(szName);
+      }
+       
+      if (pQueryDA == NULL)
+        return -1;
+
+      int nCount = pd->GetNumberOfArrays();
+      for (int i = 0; i < nCount; i++)
+      {
+        vtkDataArray* da = pd->GetArray(i);
+        if (da == pQueryDA)
+          break; 
+        
+        if (da->GetNumberOfComponents() == nQueryComps)
+          nIndex++;
+      }
+    }
+  break;
+  // get field index from cells
+  case CELL_DATA:
+    {
+      if (cd == NULL)
+        return -1;
+
+      int nQueryComps;
+      vtkDataArray* pQueryDA;
+
+      if (!bVectors)
+      {
+        nQueryComps = 1;
+        pQueryDA = cd->GetScalars(szName);
+      }
+      else
+      {
+        nQueryComps = 3;
+        pQueryDA = cd->GetVectors(szName);
+      }
+       
+      if (pQueryDA == NULL)
+        return -1;
+
+      int nCount = cd->GetNumberOfArrays();
+      for (int i = 0; i < nCount; i++)
+      {
+        vtkDataArray* da = cd->GetArray(i);
+        if (da == pQueryDA)
+          break;  
+        
+        if (da->GetNumberOfComponents() == nQueryComps)
+          nIndex++; 
+      }
+    }
+  break;
+  }
+  
+  return nIndex;
+}
+
+
+//------------------------------------------------------------------------
+void medPipeVectorFieldMapWithArrows::PopulateCombo(wxComboBox* combo, bool bVectors)
+//------------------------------------------------------------------------
+{
+  vtkPointData* pd = m_Vme->GetOutput()->GetVTKData()->GetPointData();
+  vtkCellData* cd = m_Vme->GetOutput()->GetVTKData()->GetCellData();
+  
+  switch (m_DataType)
+  {
+  // populate combo with point field data
+  case POINT_DATA:
+    {
+      if (pd != NULL)
+      {
+        int nQueryComps = bVectors ? 3 : 1;
+        int nCount = pd->GetNumberOfArrays();
+        for (int i = 0; i < nCount; i++)
+        {
+          vtkDataArray* da = pd->GetArray(i);
+          if (da->GetNumberOfComponents() == nQueryComps){
+            combo->Append(da->GetName());
+          }
+        }
+      }
+    }
+    break;
+  // populate combo with cell field data
+  case CELL_DATA:
+    {
+      if (pd != NULL)
+      {
+        int nQueryComps = bVectors ? 3 : 1;
+        int nCount = cd->GetNumberOfArrays();
+        for (int i = 0; i < nCount; i++)
+        {
+          vtkDataArray* da = cd->GetArray(i);
+          if (da->GetNumberOfComponents() == nQueryComps){
+            combo->Append(da->GetName());
+          }
+        }
+      }
+    }
+    break;
+  }
 }

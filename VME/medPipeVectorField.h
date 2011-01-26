@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeVectorField.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-07-02 08:58:02 $ 
-  Version: $Revision: 1.1.2.3 $ 
+  Date: $Date: 2011-01-26 14:23:02 $ 
+  Version: $Revision: 1.1.2.4 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -78,7 +78,7 @@ protected:
   Returns the name of field (scalar or vectors depending on
   bVectors parameter) at the specified index. 
   The routine returns NULL, if it cannot find appropriate field. */
-  const char* GetFieldName(int nIndex, bool bVectors = true);
+  virtual const char* GetFieldName(int nIndex, bool bVectors = true);
 
   /** Returns index of vector field with the specified name.  
   Returns -1, if it fails to find the appropriate field.*/
@@ -97,7 +97,7 @@ protected:
   bVectors parameter). If it cannot be found, the index of currently active
   (scalar or vector) field is returned.
   The routine returns -1, if it cannot find appropriate field. */
-  int GetFieldIndex(const char* szName = NULL, bool bVectors = true);
+  virtual int GetFieldIndex(const char* szName = NULL, bool bVectors = true);
   
   /** Returns the number of available vectors. */
   inline int GetNumberOfVectors() {
@@ -110,9 +110,9 @@ protected:
   }
 
   /** Returns the number of available scalars/vectors. */
-  int GetNumberOfFields(bool bVectors = true);  
+  virtual int GetNumberOfFields(bool bVectors = true);  
 
   /** Populates the combo box by names of scalar/vector fields */
-  void PopulateCombo(wxComboBox* combo, bool bVectors);
+  virtual void PopulateCombo(wxComboBox* combo, bool bVectors);
 };
 #endif // medPipeVectorField_h__

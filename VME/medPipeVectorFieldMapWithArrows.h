@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVectorFieldMapWithArrows.h,v $
   Language:  C++
-  Date:      $Date: 2011-01-23 21:00:00 $
-  Version:   $Revision: 1.1.2.4 $
+  Date:      $Date: 2011-01-26 14:23:02 $
+  Version:   $Revision: 1.1.2.5 $
   Authors:   Simone Brazzale
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -27,11 +27,12 @@ class vtkLookupTable;
 class vtkActor;
 class vtkScalarBarActor;
 
-/** Displays the surface of input VME (even, if it is volume),
-using 
-1) color mapping according to X,Y,Z or magnitude of associated
-vector field (selected in the gui)
-2) vector mappins accordinf to the vector field (selected in the gui)
+/** Displays the surface of input VME using vector or scalar fields.
+- SCALARS: surface color is mapped according to the scalar value (selected in the gui); arrows length and color are mapped according to scalar value; arrows direction is normal to the point or cell.
+- VECTORS: surface and arrows color are mapped according to X,Y,Z or magnitude of associated vector value (selected in the gui); arrows are mapped according to the vector (magnitude and direction).
+NB: The pipe supports time-varying VME, but to update correctly scalars and vectors one must call the UpdateVTKPipe method IN THE ASSOCIATED VIEW!
+NB: The pipe looks for scalar and vectors in the point data; if it finds them, only point data fields are displayed! If they are not found, the pipe looks to the cell data.
+TO DO: Implement a way to display both cell data and point data.
 */
 class medPipeVectorFieldMapWithArrows : public medPipeVectorField
 {
@@ -70,11 +71,19 @@ protected:
     CMM_LAST,
   };
 
-    enum GLYPH_TYPES
+  enum GLYPH_TYPES
   {
     GLYPH_LINES,
     GLYPH_ARROWS,
   };
+
+  enum DATA_TYPES
+  {
+    POINT_DATA,
+    CELL_DATA,
+  };
+
+  int m_DataType;                     ///< Type of data to which map are associated (points, cells, fields)  
 
   int m_GlyphType;                    ///< Type of glyph (one of GLYPH_TYPES)
   int m_ScalarColorMappingMode;       ///< Color mapping mode for scalars (dummy)
@@ -129,5 +138,25 @@ protected:
 
   /** Constructs VTK pipeline. */
   virtual void CreateVTKPipe();
+
+  /** Populates the combo box by names of scalar/vector fields */
+  virtual void PopulateCombo(wxComboBox* combo, bool bVectors);
+
+  /** Returns the number of available scalars/vectors. */
+  virtual int GetNumberOfFields(bool bVectors = true); 
+
+  /** 
+  Returns the name of field (scalar or vectors depending on
+  bVectors parameter) at the specified index. 
+  The routine returns NULL, if it cannot find appropriate field. */
+  virtual const char* GetFieldName(int nIndex, bool bVectors = true);
+
+  /** 
+  Returns the index of specified field (scalar or vectors depending on
+  bVectors parameter). If it cannot be found, the index of currently active
+  (scalar or vector) field is returned.
+  The routine returns -1, if it cannot find appropriate field. */
+  virtual int GetFieldIndex(const char* szName = NULL, bool bVectors = true);
+
 };
 #endif // medPipeVectorFieldSurface_h__
