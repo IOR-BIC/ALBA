@@ -115,6 +115,9 @@ ADD_TEST(NVectorTest ${EXECUTABLE_OUTPUT_PATH}/NVectorTest)
 ADD_EXECUTABLE(TreeNodeDataTest TreeNodeDataTest.h TreeNodeDataTest.cpp)
 ADD_TEST(TreeNodeDataTest ${EXECUTABLE_OUTPUT_PATH}/TreeNodeDataTest)
 
+ADD_EXECUTABLE(SortedTreeNodesTest SortedTreeNodesTest.h SortedTreeNodesTest.cpp)
+ADD_TEST(SortedTreeNodesTest ${EXECUTABLE_OUTPUT_PATH}/SortedTreeNodesTest)
+
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
 #ENDIF (MAF_USE_WX)
