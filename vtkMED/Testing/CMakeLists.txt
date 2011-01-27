@@ -28,8 +28,8 @@ ADD_EXECUTABLE(vtkMEDPastValuesListTest vtkMEDPastValuesListTest.h vtkMEDPastVal
 ADD_TEST(vtkMEDPastValuesListTest ${EXECUTABLE_OUTPUT_PATH}/vtkMEDPastValuesListTest)
 ADD_EXECUTABLE(vtkMEDPolyDataMirrorTest vtkMEDPolyDataMirrorTest.h vtkMEDPolyDataMirrorTest.cpp)
 ADD_TEST(vtkMEDPolyDataMirrorTest ${EXECUTABLE_OUTPUT_PATH}/vtkMEDPolyDataMirrorTest)
-#ADD_EXECUTABLE(vtkMEDImageUnsharpFilterTest vtkMEDImageUnsharpFilterTest.h vtkMEDImageUnsharpFilterTest.cpp)
-#ADD_TEST(vtkMEDImageUnsharpFilterTest ${EXECUTABLE_OUTPUT_PATH}/vtkMEDImageUnsharpFilterTest)
+# ADD_EXECUTABLE(vtkMEDImageUnsharpFilterTest vtkMEDImageUnsharpFilterTest.h vtkMEDImageUnsharpFilterTest.cpp)
+# ADD_TEST(vtkMEDImageUnsharpFilterTest ${EXECUTABLE_OUTPUT_PATH}/vtkMEDImageUnsharpFilterTest)
 ADD_EXECUTABLE(vtkMEDRegionGrowingLocalGlobalThresholdTest vtkMEDRegionGrowingLocalGlobalThresholdTest.h vtkMEDRegionGrowingLocalGlobalThresholdTest.cpp)
 ADD_TEST(vtkMEDRegionGrowingLocalGlobalThresholdTest ${EXECUTABLE_OUTPUT_PATH}/vtkMEDRegionGrowingLocalGlobalThresholdTest)
 ADD_EXECUTABLE(vtkImageUnPackerTest vtkImageUnPackerTest.h vtkImageUnPackerTest.cpp)
@@ -108,6 +108,9 @@ ADD_TEST(MemoryInfoTest ${EXECUTABLE_OUTPUT_PATH}/MemoryInfoTest)
 
 ADD_EXECUTABLE(VectorTest VectorTest.h VectorTest.cpp)
 ADD_TEST(VectorTest ${EXECUTABLE_OUTPUT_PATH}/VectorTest)
+
+ADD_EXECUTABLE(NVectorTest NVectorTest.h NVectorTest.cpp)
+ADD_TEST(NVectorTest ${EXECUTABLE_OUTPUT_PATH}/NVectorTest)
 
 ADD_EXECUTABLE(TreeNodeDataTest TreeNodeDataTest.h TreeNodeDataTest.cpp)
 ADD_TEST(TreeNodeDataTest ${EXECUTABLE_OUTPUT_PATH}/TreeNodeDataTest)
