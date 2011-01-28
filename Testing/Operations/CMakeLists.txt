@@ -167,6 +167,9 @@ ADD_TEST(medOpImporterVTKXMLTest ${EXECUTABLE_OUTPUT_PATH}/medOpImporterVTKXMLTe
 ADD_EXECUTABLE(medOpInteractiveClipSurfaceTest  medOpInteractiveClipSurfaceTest.h medOpInteractiveClipSurfaceTest.cpp)
 ADD_TEST(medOpInteractiveClipSurfaceTest ${EXECUTABLE_OUTPUT_PATH}/medOpInteractiveClipSurfaceTest)
 
+ADD_EXECUTABLE(medOpCreateEditSkeletonTest  medOpCreateEditSkeletonTest.h medOpCreateEditSkeletonTest.cpp)
+ADD_TEST(medOpCreateEditSkeletonTest ${EXECUTABLE_OUTPUT_PATH}/medOpCreateEditSkeletonTest)
+
 
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
