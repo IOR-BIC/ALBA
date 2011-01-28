@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpCreateEditSkeleton.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-25 10:31:18 $
-Version:   $Revision: 1.8 $
+Date:      $Date: 2011-01-28 12:04:00 $
+Version:   $Revision: 1.8.2.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -104,16 +104,26 @@ void medOpCreateEditSkeleton::OpRun()
 	mafNEW(m_Skeleton);
 
 	if(m_Input->IsMAFType(mafVMEVolumeGray))
-		m_Editor = new medGeometryEditorPolylineGraph(mafVME::SafeDownCast(m_Input), this);
+    m_Editor = new medGeometryEditorPolylineGraph(mafVME::SafeDownCast(m_Input), this, 0, this->m_TestMode);
 	else if(m_Input->IsMAFType(medVMEPolylineGraph) && m_Input->GetParent()->IsMAFType(mafVMEVolumeGray))
-		m_Editor = new medGeometryEditorPolylineGraph(mafVME::SafeDownCast(m_Input->GetParent()), this,medVMEPolylineGraph::SafeDownCast(m_Input));
+    m_Editor = new medGeometryEditorPolylineGraph(mafVME::SafeDownCast(m_Input->GetParent()), this,medVMEPolylineGraph::SafeDownCast(m_Input),this->m_TestMode);
 	else
     OpStop(OP_RUN_CANCEL);
 
   m_Editor->Show(true);
 
-	CreateGui();
-	ShowGui();
+	// Added test compatibility
+  if (!m_TestMode)
+  {
+    // no test case
+    CreateGui();
+	  ShowGui();
+  }
+  else
+  {
+    // test case
+    OpStop(OP_RUN_OK);
+  }
 }
 //----------------------------------------------------------------------------
 void medOpCreateEditSkeleton::OpDo()
@@ -189,6 +199,9 @@ void medOpCreateEditSkeleton::OpStop(int result)
 
 	cppDEL(m_Editor);
 
-	HideGui();
+	if (!m_TestMode)
+  {
+    HideGui();
+  }
 	mafEventMacro(mafEvent(this,result));
 }
