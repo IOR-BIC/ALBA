@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDPoissonSurfaceReconstruction.cxx,v $
 Language:  C++
-Date:      $Date: 2011-01-10 12:05:51 $
-Version:   $Revision: 1.1.2.5 $
+Date:      $Date: 2011-01-28 12:36:21 $
+Version:   $Revision: 1.1.2.6 $
 Authors:   Fuli Wu
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -21,7 +21,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "float.h"
 
 
-vtkCxxRevisionMacro(vtkMEDPoissonSurfaceReconstruction, "$Revision: 1.1.2.5 $");
+vtkCxxRevisionMacro(vtkMEDPoissonSurfaceReconstruction, "$Revision: 1.1.2.6 $");
 vtkStandardNewMacro(vtkMEDPoissonSurfaceReconstruction);
 
 vtkDataSet* vtk_psr_input;
@@ -2817,9 +2817,12 @@ SparseMatrix<T> SparseMatrix<T>::operator * (const T& V) const
 template<class T>
 SparseMatrix<T>& SparseMatrix<T>::operator *= (const T& V)
 {
-	for (int i=0; i<this->Rows(); i++)
+	for (int i=0; i<this->rows; i++)
 	{
-		for(int ii=0;ii<m_ppElements[i].size();i++){m_ppElements[i][ii].Value*=V;}
+		for(int ii=0;ii<rowSizes[i];ii++)
+    {
+      m_ppElements[i][ii].Value*=V;
+    }
 	}
 	return *this;
 }
