@@ -109,6 +109,9 @@ ADD_TEST(MemoryInfoTest ${EXECUTABLE_OUTPUT_PATH}/MemoryInfoTest)
 ADD_EXECUTABLE(VectorTest VectorTest.h VectorTest.cpp)
 ADD_TEST(VectorTest ${EXECUTABLE_OUTPUT_PATH}/VectorTest)
 
+ADD_EXECUTABLE(SparseMatrixTest SparseMatrixTest.h SparseMatrixTest.cpp)
+ADD_TEST(SparseMatrixTest ${EXECUTABLE_OUTPUT_PATH}/SparseMatrixTest)
+
 ADD_EXECUTABLE(NVectorTest NVectorTest.h NVectorTest.cpp)
 ADD_TEST(NVectorTest ${EXECUTABLE_OUTPUT_PATH}/NVectorTest)
 
