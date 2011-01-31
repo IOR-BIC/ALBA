@@ -170,6 +170,8 @@ ADD_TEST(medOpInteractiveClipSurfaceTest ${EXECUTABLE_OUTPUT_PATH}/medOpInteract
 ADD_EXECUTABLE(medOpCreateEditSkeletonTest  medOpCreateEditSkeletonTest.h medOpCreateEditSkeletonTest.cpp)
 ADD_TEST(medOpCreateEditSkeletonTest ${EXECUTABLE_OUTPUT_PATH}/medOpCreateEditSkeletonTest)
 
+ADD_EXECUTABLE(medOpRegisterClustersTest  medOpRegisterClustersTest.h medOpRegisterClustersTest.cpp)
+ADD_TEST(medOpRegisterClustersTest ${EXECUTABLE_OUTPUT_PATH}/medOpRegisterClustersTest)
 
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
