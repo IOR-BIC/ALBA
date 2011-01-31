@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2011-01-31 18:08:05 $
-Version:   $Revision: 1.1.2.30 $
+Date:      $Date: 2011-01-31 18:14:31 $
+Version:   $Revision: 1.1.2.31 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -3696,6 +3696,7 @@ void medViewArbitraryOrthoSlice::BuildSliceHeightFeedbackLinesVMEs()
 
 void medViewArbitraryOrthoSlice::UpdateCutPlanes()
 {
+	// prevent cpu time waste :P
 	if (!m_EnableThickness && !m_EnableExportImages)
 	{
 		return;
