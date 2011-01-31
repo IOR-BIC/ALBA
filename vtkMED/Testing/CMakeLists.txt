@@ -124,6 +124,8 @@ ADD_TEST(SortedTreeNodesTest ${EXECUTABLE_OUTPUT_PATH}/SortedTreeNodesTest)
 ADD_EXECUTABLE(CubeTest CubeTest.h CubeTest.cpp)
 ADD_TEST(CubeTest ${EXECUTABLE_OUTPUT_PATH}/CubeTest)
 
+ADD_EXECUTABLE(SquareTest SquareTest.h SquareTest.cpp)
+ADD_TEST(SquareTest ${EXECUTABLE_OUTPUT_PATH}/SquareTest)
 
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
