@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: SquareTest.cpp,v $
 Language:  C++
-Date:      $Date: 2011-01-31 15:11:43 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-01-31 17:14:42 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -35,16 +35,16 @@ void SquareTest::TestCornerIndex()
 			switch(counter)
 			{
 			case 0:
-				CPPUNIT_ASSERT(i == 0, idx == 0, j == 0);
+				CPPUNIT_ASSERT(idx == 0);
 				break;
 			case 1:
-				CPPUNIT_ASSERT(i == 0, idx == 4, j == 0);
+				CPPUNIT_ASSERT(idx == 2);
 				break;
 			case 2:
-				CPPUNIT_ASSERT(i == 1, idx == 1, j == 0);
+				CPPUNIT_ASSERT(idx == 1);
 				break;
 			case 3:
-				CPPUNIT_ASSERT(i == 1, idx == 3, j == 1);
+				CPPUNIT_ASSERT(idx == 3);
 				break;
 			}
 			counter++;
