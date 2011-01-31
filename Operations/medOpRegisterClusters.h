@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpRegisterClusters.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:14:48 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2011-01-31 10:32:51 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Paolo Quadrani      - porting Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -60,6 +60,11 @@ public:
 	static bool ClosedCloudAccept(mafNode* node) {return (node != NULL && node->IsA("mafVMELandmarkCloud") && !((mafVMELandmarkCloud*)node)->IsOpen());};
 
 	static bool SurfaceAccept(mafNode* node) {return (node != NULL && node->IsMAFType(mafVMESurface));};
+
+  // added by Losi on 31/01/2011 to allow test OpDo method
+  void SetTarget(mafVMELandmarkCloud *target);
+  void SetFollower(mafVMESurface *follower);
+  inline mafVMEGroup *GetResult(){return m_Result;};
 
 protected:
   /** Method called to extract matching point between source and target.*/

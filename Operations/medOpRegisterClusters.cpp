@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpRegisterClusters.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:14:48 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2011-01-31 10:32:51 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Paolo Quadrani - porting Daniele Giunchi  
 ==========================================================================
   Copyright (c) 2002/2004
@@ -146,42 +146,45 @@ void medOpRegisterClusters::OpRun()
   m_Source = (mafVMELandmarkCloud*)m_Input;
   m_SourceName = m_Input->GetName();
 	
-	int num_choices = 3;
-	const wxString choices_string[] = {_("rigid"), _("similarity"), _("affine")}; 
-	mafString wildcard = "Dictionary (*.txt)|*.txt|All Files (*.*)|*.*";
+  if(!m_TestMode)
+  {
+    int num_choices = 3;
+    const wxString choices_string[] = {_("rigid"), _("similarity"), _("affine")}; 
+    mafString wildcard = "Dictionary (*.txt)|*.txt|All Files (*.*)|*.*";
 
-  m_Gui = new mafGUI(this);
-  m_Gui->SetListener(this);
-	
-	m_Gui->Label(_("source :"),true);
-	m_Gui->Label(&m_SourceName);
-  
-	m_Gui->Label(_("target :"),true);
-	m_Gui->Label(&m_TargetName);
-	
-	m_Gui->Label(_("follower surface:"),true);
-	m_Gui->Label(&m_FollowerName);
-	
-	m_Gui->Button(ID_CHOOSE,_("target "));
-	m_Gui->Button(ID_CHOOSE_SURFACE,_("follower surface"));
-	
-	m_Gui->Button(ID_WEIGHT,_("weighted registration"));
-  m_Gui->Enable(ID_WEIGHT,false);
-	
-	m_Gui->Combo(ID_REGTYPE, _("reg. type"), &m_RegistrationMode, num_choices, choices_string); 
-	
-	m_Gui->Bool(ID_MULTIPLE_TIME_REGISTRATION,_("multi-time"),&m_MultiTime,1);
-	m_Gui->Enable(ID_MULTIPLE_TIME_REGISTRATION,false);
-	
-	m_Gui->Label(_("Apply registration matrix to landmarks"));
-	m_Gui->Bool(ID_APPLY_REGISTRATION,_("Apply"),&m_Apply,1);
-	m_Gui->Enable(ID_APPLY_REGISTRATION,false);
-	
-  m_Gui->OkCancel();
+    m_Gui = new mafGUI(this);
+    m_Gui->SetListener(this);
 
-  m_Gui->Enable(wxOK,false);
-	m_Gui->Divider();
-  ShowGui();
+    m_Gui->Label(_("source :"),true);
+    m_Gui->Label(&m_SourceName);
+
+    m_Gui->Label(_("target :"),true);
+    m_Gui->Label(&m_TargetName);
+
+    m_Gui->Label(_("follower surface:"),true);
+    m_Gui->Label(&m_FollowerName);
+
+    m_Gui->Button(ID_CHOOSE,_("target "));
+    m_Gui->Button(ID_CHOOSE_SURFACE,_("follower surface"));
+
+    m_Gui->Button(ID_WEIGHT,_("weighted registration"));
+    m_Gui->Enable(ID_WEIGHT,false);
+
+    m_Gui->Combo(ID_REGTYPE, _("reg. type"), &m_RegistrationMode, num_choices, choices_string); 
+
+    m_Gui->Bool(ID_MULTIPLE_TIME_REGISTRATION,_("multi-time"),&m_MultiTime,1);
+    m_Gui->Enable(ID_MULTIPLE_TIME_REGISTRATION,false);
+
+    m_Gui->Label(_("Apply registration matrix to landmarks"));
+    m_Gui->Bool(ID_APPLY_REGISTRATION,_("Apply"),&m_Apply,1);
+    m_Gui->Enable(ID_APPLY_REGISTRATION,false);
+
+    m_Gui->OkCancel();
+
+    m_Gui->Enable(wxOK,false);
+    m_Gui->Divider();
+    ShowGui();
+  }
 
   assert(!m_PointsSource && !m_PointsTarget);
   m_PointsSource = vtkPoints::New();
@@ -307,7 +310,8 @@ void medOpRegisterClusters::OnEvent(mafEventBase *maf_event)
 void medOpRegisterClusters::OpDo()
 //----------------------------------------------------------------------------
 {
-	wxBusyInfo wait(_("Please wait, working..."));
+  if(!m_TestMode)
+	  wxBusyInfo wait(_("Please wait, working..."));
 
   mafNEW(m_Info);
   wxString name = wxString::Format("Info for registration %s into %s",m_Source->GetName(), m_Target->GetName());
@@ -324,7 +328,8 @@ void medOpRegisterClusters::OpDo()
 		int numTimeStamps = m_Target->GetNumberOfTimeStamps();
 
 		//mafProgressBarShowMacro();
-    mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
+    if(!m_TestMode)
+      mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
     
 		//mafProgressBarSetTextMacro("Multi time registration...");
 		
@@ -333,7 +338,8 @@ void medOpRegisterClusters::OpDo()
 			double currTime = timeStamps[t];
 			long p = t * 100 / numTimeStamps;
 		//	mafProgressBarSetValueMacro(p);
-      mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,p));
+      if(!m_TestMode)
+        mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,p));
 			//Set the new time for the vme used to register the one frame source 
       m_Target->SetTimeStamp(currTime); //set current time
       m_Target->Update(); //>UpdateAllData();
@@ -345,7 +351,8 @@ void medOpRegisterClusters::OpDo()
 		}
     timeStamps.clear();
 
-    mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
+    if(!m_TestMode)
+      mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
 	}
 	else
 	{
@@ -830,4 +837,36 @@ void medOpRegisterClusters::OnChooseVme(mafNode *vme)
 		return;
 	}
 	m_Gui->Update();
+}
+
+
+//----------------------------------------------------------------------------
+void medOpRegisterClusters::SetTarget(mafVMELandmarkCloud *target)
+//----------------------------------------------------------------------------
+{
+  // added by Losi on 31/01/2011 to allow test OpDo method
+  if(ClosedCloudAccept(target))
+  {
+    m_Target = target;
+    m_TargetName = m_Target->GetName();
+    ExtractMatchingPoints(); 
+  }
+}
+
+//----------------------------------------------------------------------------
+void medOpRegisterClusters::SetFollower(mafVMESurface *follower)
+//----------------------------------------------------------------------------
+{
+  // added by Losi on 31/01/2011 to allow test OpDo method
+  if(SurfaceAccept(follower))
+  {
+    if(m_Follower == NULL)
+    {
+      m_Follower = mafVMESurface::New();
+      m_Follower->Register(this); 
+    }
+    if(m_Follower->CanCopy(follower))
+      m_Follower->DeepCopy(follower);
+    m_FollowerName = m_Follower->GetName();
+  }
 }
