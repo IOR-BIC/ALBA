@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2011-01-31 18:14:31 $
-Version:   $Revision: 1.1.2.31 $
+Date:      $Date: 2011-02-01 17:31:16 $
+Version:   $Revision: 1.1.2.32 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -653,8 +653,6 @@ void medViewArbitraryOrthoSlice::OnEventGizmoCrossRotateZNormal(mafEventBase *ma
 			UpdateXView2DActors();
 			UpdateYView2DActors();
 
-			UpdateCutPlanes();
-
 			ChildViewsCameraUpdate();
 
 		}
@@ -1185,6 +1183,7 @@ void medViewArbitraryOrthoSlice::OnEventThis(mafEventBase *maf_event)
 			{
 				OnEventID_EXPORT_PLANES_HEIGHT();
 			}
+			break;
 
 		case ID_RESET:
 			{
@@ -1443,6 +1442,8 @@ void medViewArbitraryOrthoSlice::EnableWidgets(bool enable)
 		m_Gui->Enable(ID_LUT_CHOOSER, enable);
 		m_Gui->Enable(ID_SHOW_GIZMO, enable);
 		m_Gui->FitGui();
+		m_Gui->Enable(ID_ENABLE_THICKNESS, enable);
+		m_Gui->Enable(ID_ENABLE_EXPORT_IMAGES, enable);
 		m_Gui->Update();
 
 		if (m_EnableExportImages)
@@ -1947,7 +1948,6 @@ void medViewArbitraryOrthoSlice::OnResetMedVMEPolylineEditor()
 void medViewArbitraryOrthoSlice::ShowSlicers( mafVME * vmeVolume, bool show )
 {
 	EnableWidgets( (m_CurrentVolume != NULL) );
-
 	// register sliced volume
 	m_InputVolume = mafVMEVolumeGray::SafeDownCast(vmeVolume);
 	assert(m_InputVolume);
@@ -4044,6 +4044,5 @@ void medViewArbitraryOrthoSlice::EnableThickness(bool enable)
 void medViewArbitraryOrthoSlice::OnEventID_EXPORT_PLANES_HEIGHT()
 {
 	m_FeedbackLineHeight = m_ExportPlanesHeight;
-	UpdateCutPlanes();
 	ChildViewsCameraUpdate();
 }
