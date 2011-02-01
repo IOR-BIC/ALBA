@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2011-02-01 17:31:16 $
-Version:   $Revision: 1.1.2.32 $
+Date:      $Date: 2011-02-01 17:58:51 $
+Version:   $Revision: 1.1.2.33 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -1260,9 +1260,9 @@ mafGUI* medViewArbitraryOrthoSlice::CreateGui()
 	m_Gui->Combo(ID_COMBO_CHOOSE_CUTTING_AXIS,"",&m_ComboChooseAxisDirection,3,Text2);
 	
 	m_Gui->Label("Export planes height:");
-	m_Gui->Integer(ID_EXPORT_PLANES_HEIGHT,_(""),&m_ExportPlanesHeight,0, 10);
+	m_Gui->Integer(ID_EXPORT_PLANES_HEIGHT,_(""),&m_ExportPlanesHeight,0, 50);
 	m_Gui->Label("Axial sections:");
-	m_Gui->Integer(ID_NUMBER_OF_AXIAL_SECTIONS,_(""),&m_NumberOfAxialSections,0, 10);
+	m_Gui->Integer(ID_NUMBER_OF_AXIAL_SECTIONS,_(""),&m_NumberOfAxialSections,0, 20);
 	
 	m_Gui->Button(ID_CHOOSE_DIR,"Choose export dir");
 	m_Gui->Button(ID_EXPORT,"Write images");
