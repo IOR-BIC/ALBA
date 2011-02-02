@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2011-01-12 14:55:59 $
-Version:   $Revision: 1.1.2.125 $
+Date:      $Date: 2011-02-02 09:47:42 $
+Version:   $Revision: 1.1.2.126 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -4502,6 +4502,26 @@ void medOpImporterDicomOffis::OnScanSlice()
 	m_SliceScannerBuildPage->SetValue(m_CurrentSlice);
 	m_SliceScannerBuildPage->Update();
 
+	// windows 7 64 bit / nvidia graphic card patch: otherwise scan slice will not work
+	// as expected and slices will be black while scanning until mouse dowin
+	// is performed in view
+	//<patch>
+	if (m_Wizard->GetCurrentPage()==m_LoadPage)
+	{
+		m_LoadPage->UpdateActor();
+		m_LoadPage->GetRWI()->CameraUpdate();
+	}
+	else if (m_Wizard->GetCurrentPage()==m_CropPage)
+	{
+		m_CropPage->UpdateActor();
+		m_CropPage->GetRWI()->CameraUpdate();
+	}
+	else if (m_Wizard->GetCurrentPage()==m_BuildPage)
+	{
+		m_BuildPage->UpdateActor();
+		m_BuildPage->GetRWI()->CameraUpdate();
+	}
+	//</patch>
 	GuiUpdate();
 }
 
@@ -4522,6 +4542,29 @@ void medOpImporterDicomOffis::OnScanTime()
 	m_TimeScannerBuildPage->Update();
 
 	GuiUpdate();
+
+	// windows 7 64 bit / nvidia graphic card patch: otherwise scan time will not work
+	// as expected and slices will be black while scanning until mouse dowin
+	// is performed in view
+	// </patch>
+	if (m_Wizard->GetCurrentPage()==m_LoadPage)
+	{
+		m_LoadPage->UpdateActor();
+		m_LoadPage->GetRWI()->CameraUpdate();
+	}
+	else if (m_Wizard->GetCurrentPage()==m_CropPage)
+	{
+		m_CropPage->UpdateActor();
+		m_CropPage->GetRWI()->CameraUpdate();
+	}
+	else if (m_Wizard->GetCurrentPage()==m_BuildPage)
+	{
+		m_BuildPage->UpdateActor();
+		m_BuildPage->GetRWI()->CameraUpdate();
+	}
+
+	// </patch>
+
 }
 
 bool medOpImporterDicomOffis::IsRotated( double dcmImageOrientationPatient[6] )
