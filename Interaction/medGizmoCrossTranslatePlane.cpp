@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoCrossTranslatePlane.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-01-08 17:06:37 $
-  Version:   $Revision: 1.1.2.7 $
+  Date:      $Date: 2011-02-02 17:33:55 $
+  Version:   $Revision: 1.1.2.8 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -63,11 +63,13 @@ medGizmoCrossTranslatePlane::medGizmoCrossTranslatePlane(mafVME *input, mafObser
 
   m_FeedbackConeSource = NULL;
 
+  // feedback cone transform stuff
   m_LeftFeedbackConeTransform = NULL;
   m_RightFeedbackConeTransform = NULL;
   m_UpFeedbackConeTransform = NULL;
   m_DownFeedbackConeTransform = NULL;
 
+  // feedback cone transform PDF
   m_LeftFeedbackConeTransformPDF = NULL;
   m_RightFeedbackConeTransformPDF = NULL;
   m_UpFeedbackConeTransformPDF = NULL;
@@ -95,8 +97,12 @@ medGizmoCrossTranslatePlane::medGizmoCrossTranslatePlane(mafVME *input, mafObser
   m_Length = 1;
   
   // default plane is YZ
-  m_ActivePlane = YZ;
+  m_ActivePlane = X_NORMAL;
   
+  // TODO REFACTOR THIS: Isa Generic API cleanup 
+  // pivot transform stuff in isa generic probably could be deleted.
+  // 
+
   //-----------------
   // pivot stuff
   //-----------------
@@ -114,7 +120,7 @@ medGizmoCrossTranslatePlane::medGizmoCrossTranslatePlane(mafVME *input, mafObser
   //-----------------
   mafString vmeName;
   int i;
-  for (i = 0; i < 3; i++)
+  for (i = 0; i < NUM_GIZMO_PARTS; i++)
   {
     // the ith gizmo
     m_Gizmo[i] = mafVMEGizmo::New();
@@ -125,19 +131,19 @@ medGizmoCrossTranslatePlane::medGizmoCrossTranslatePlane(mafVME *input, mafObser
 	m_Gizmo[i]->SetMediator(m_Listener);
   }
   // assign isa to S1 and S2;
+  m_Gizmo[S0]->SetBehavior(m_IsaComp[S0]);
   m_Gizmo[S1]->SetBehavior(m_IsaComp[S1]);
-  m_Gizmo[S2]->SetBehavior(m_IsaComp[S2]);
 
   mafMatrix *absInputMatrix = m_InputVme->GetOutput()->GetAbsMatrix();
   SetAbsPose(absInputMatrix);
   SetConstrainRefSys(absInputMatrix);
 
   // set come gizmo material property and initial color 
+  this->SetColor(S0, 0, 1, 0);
   this->SetColor(S1, 0, 1, 0);
-  this->SetColor(S2, 0, 1, 0);
   
   // add the gizmo to the tree, this should increase reference count 
-  for (i = 0; i < 3; i++)
+  for (i = 0; i < NUM_GIZMO_PARTS; i++)
   {
     m_Gizmo[i]->ReparentTo(mafVME::SafeDownCast(m_InputVme->GetRoot()));
   }
@@ -148,18 +154,18 @@ medGizmoCrossTranslatePlane::medGizmoCrossTranslatePlane(mafVME *input, mafObser
 medGizmoCrossTranslatePlane::~medGizmoCrossTranslatePlane() 
 //----------------------------------------------------------------------------
 {
+  // set gizmo behavior to NULL
+  m_Gizmo[S0]->SetBehavior(NULL);
   m_Gizmo[S1]->SetBehavior(NULL);
-  m_Gizmo[S2]->SetBehavior(NULL);
-  m_Gizmo[SQ]->SetBehavior(NULL);
+  m_Gizmo[NUM_GIZMO_PARTS]->SetBehavior(NULL);
   
+  vtkDEL(m_Line[S0]);
   vtkDEL(m_Line[S1]);
-  vtkDEL(m_Line[S2]);
-  vtkDEL(m_Plane);
   vtkDEL(m_RotationTr);
 
   // clean up
   int i;
-  for (i = 0; i < SQ; i++)
+  for (i = 0; i < NUM_GIZMO_PARTS; i++)
   {
     vtkDEL(m_LineTF[i]);
     vtkDEL(m_IsaComp[i]); 
@@ -167,7 +173,7 @@ medGizmoCrossTranslatePlane::~medGizmoCrossTranslatePlane()
 
   m_PivotTransform->Delete();
 
-  for (i = 0; i < 3; i++)
+  for (i = 0; i < NUM_GIZMO_PARTS; i++)
   {
     vtkDEL(m_RotatePDF[i]);
 		m_Gizmo[i]->ReparentTo(NULL);
@@ -234,24 +240,18 @@ void medGizmoCrossTranslatePlane::CreatePipeline()
   // create pipeline for cone-cylinder gizmo along global X axis
   
   // create S1
-  m_Line[S1] = vtkLineSource::New();  
-  m_Line[S1]->SetPoint1(0, 1, -1);
-  m_Line[S1]->SetPoint2(0, 1, 1);
+  m_Line[S0] = vtkLineSource::New();  
+  m_Line[S0]->SetPoint1(0, 1, -1);
+  m_Line[S0]->SetPoint2(0, 1, 1);
 
   // create S2
-  m_Line[S2] = vtkLineSource::New();
-  m_Line[S2]->SetPoint1(0, -1, 1);
-  m_Line[S2]->SetPoint2(0, 1, 1);
-
-  // create SQ
-  m_Plane = vtkPlaneSource::New();
-  m_Plane->SetOrigin(0, 0, 0);
-  m_Plane->SetPoint1(0, 1, 0);
-  m_Plane->SetPoint2(0, 0, 1);
+  m_Line[S1] = vtkLineSource::New();
+  m_Line[S1]->SetPoint1(0, -1, 1);
+  m_Line[S1]->SetPoint2(0, 1, 1);
 
   // create tube filter for the segments
   int i;
-  for (i = 0; i < SQ; i++)
+  for (i = 0; i < NUM_GIZMO_PARTS; i++)
   {
     m_LineTF[i] = vtkTubeFilter::New();
     m_LineTF[i]->SetInput(m_Line[i]->GetOutput());
@@ -271,15 +271,12 @@ void medGizmoCrossTranslatePlane::CreatePipeline()
   m_RotationTr->Identity();
 
   // create rotation transform and rotation TPDF 
-  for (i = 0; i < SQ; i++)
+  for (i = 0; i < NUM_GIZMO_PARTS; i++)
   {
     m_RotatePDF[i] = vtkTransformPolyDataFilter::New();
     m_RotatePDF[i]->SetTransform(m_RotationTr);
     m_RotatePDF[i]->SetInput(m_LineTF[i]->GetOutput());
   }
-  m_RotatePDF[SQ] = vtkTransformPolyDataFilter::New();
-  m_RotatePDF[SQ]->SetTransform(m_RotationTr);
-  m_RotatePDF[SQ]->SetInput(m_Plane->GetOutput());
 }
 
 //----------------------------------------------------------------------------
@@ -288,7 +285,7 @@ void medGizmoCrossTranslatePlane::CreateISA()
 {
   // Create isa compositor and assign behaviors to IsaGen ivar.
   // Default isa is constrained to plane XZ.
-  for (int i = 0; i < SQ; i++)
+  for (int i = 0; i < NUM_GIZMO_PARTS; i++)
   {
     m_IsaComp[i] = mafInteractorCompositorMouse::New();
 
@@ -296,6 +293,8 @@ void medGizmoCrossTranslatePlane::CreateISA()
     // default ref sys is input vme abs matrix
     m_IsaGen[i] = m_IsaComp[i]->CreateBehavior(MOUSE_LEFT);
     m_IsaGen[i]->SetVME(m_InputVme);
+
+	// default movement is constrained to plane XZ 
     m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mafInteractorConstraint::FREE, mafInteractorConstraint::LOCK, mafInteractorConstraint::FREE);     
     
     //isa will send events to this
@@ -314,50 +313,53 @@ void medGizmoCrossTranslatePlane::SetPlane(int plane)
   m_ActivePlane = plane;
   
   // rotate the gizmo components to match the specified plane
-  if (m_ActivePlane == YZ)
+  if (m_ActivePlane == X_NORMAL)
   {
     // reset cyl and cone rotation
     m_RotationTr->Identity();
   
     // set S1 and S2 color
-    this->SetColor(S1, 0, 1, 0);
-    this->SetColor(S2, 0, 0, 1);
+    this->SetColor(S0, 0, 1, 0);
+    this->SetColor(S1, 0, 0, 1);
 
     // change the axis constrain
-    for (int i = 0; i < 2; i++)
+    for (int i = 0; i < NUM_GIZMO_PARTS; i++)
     {
+      // move on X_NORMAL plane
       m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mafInteractorConstraint::LOCK, mafInteractorConstraint::FREE, mafInteractorConstraint::FREE);
     }
   }
-  else if (m_ActivePlane == XZ)
+  else if (m_ActivePlane == Y_NORMAL)
   {
     // set rotation to move con and cyl on Y 
     m_RotationTr->Identity();
     m_RotationTr->RotateZ(-90);
    
     // set S1 and S2 color
-    this->SetColor(S1, 1, 0, 0);
-    this->SetColor(S2, 0, 0, 1);
+    this->SetColor(S0, 1, 0, 0);
+    this->SetColor(S1, 0, 0, 1);
 
     // change the axis constrain
-    for (int i = 0; i < 2; i++)
+    for (int i = 0; i < NUM_GIZMO_PARTS; i++)
     {
+      // move on Y_NORMAL plane
       m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mafInteractorConstraint::FREE, mafInteractorConstraint::LOCK, mafInteractorConstraint::FREE);
     }
   }  
-  else if (m_ActivePlane == XY)
+  else if (m_ActivePlane == Z_NORMAL)
   {
     // set rotation to move con and cyl on Z
     m_RotationTr->Identity();
     m_RotationTr->RotateY(90);
     
     // set S1 and S2 color
-    this->SetColor(S1, 0, 1, 0);
-    this->SetColor(S2, 1, 0, 0);
+    this->SetColor(S0, 0, 1, 0);
+    this->SetColor(S1, 1, 0, 0);
 
      // change the axis constrain
-    for (int i = 0; i < 2; i++)
+    for (int i = 0; i < NUM_GIZMO_PARTS; i++)
     {
+      // move on Z_NORMAL plane
       m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mafInteractorConstraint::FREE, mafInteractorConstraint::FREE, mafInteractorConstraint::LOCK);
     }
   }  
@@ -370,42 +372,35 @@ void medGizmoCrossTranslatePlane::Highlight(bool highlight)
   if (highlight == true)
   {
    // Highlight the S1 and S2  by setting its color to yellow 
-
    m_LastColor[0] = m_Color[0];
    m_LastColor[1] = m_Color[1];
    m_LastColor[2] = m_Color[2];
 
+   this->SetColor(S0, 1, 1, 0);
    this->SetColor(S1, 1, 1, 0);
-   this->SetColor(S2, 1, 1, 0);
-
-   // Show the square
-   //ShowSquare(true);
-
   } 
   else
   {
    // restore original color 
-   if (m_ActivePlane == YZ)
+   if (m_ActivePlane == X_NORMAL)
    {
     // set S1 and S2 color
-    this->SetColor(S1, 0, 1, 0);
-    this->SetColor(S2, 0, 0, 1);
+    this->SetColor(S0, 0, 1, 0);
+    this->SetColor(S1, 0, 0, 1);
    } 
-   else if (m_ActivePlane == XZ)
+   else if (m_ActivePlane == Y_NORMAL)
    {
      // set S1 and S2 color
-    this->SetColor(S1, 1, 0, 0);
-    this->SetColor(S2, 0, 0, 1);
+    this->SetColor(S0, 1, 0, 0);
+    this->SetColor(S1, 0, 0, 1);
    }
-   else if (m_ActivePlane == XY)
+   else if (m_ActivePlane == Z_NORMAL)
    {     
     // set S1 and S2 color
+    this->SetColor(S0, m_LastColor);
     this->SetColor(S1, m_LastColor);
-    this->SetColor(S2, m_LastColor);
    } 
 
-   // Hide the square
-   ShowSquare(false);
   }
 }
 
@@ -413,12 +408,13 @@ void medGizmoCrossTranslatePlane::Highlight(bool highlight)
 void  medGizmoCrossTranslatePlane::SetSizeLength(double length)
 //----------------------------------------------------------------------------
 {
+
   /*
           z
           ^  S2
   (0,0,L) |----- (0,L,L)
           |     |         
-          | SQ  |S1          
+          |     |S1          
           |     |         
           x--------> y    
 
@@ -429,17 +425,13 @@ void  medGizmoCrossTranslatePlane::SetSizeLength(double length)
   m_Length = length;
   double L = length;
   // update S1
-  m_Line[S1]->SetPoint1(0, 0, -L);
-  m_Line[S1]->SetPoint2(0, 0, L);
+  m_Line[S0]->SetPoint1(0, 0, -L);
+  m_Line[S0]->SetPoint2(0, 0, L);
 
   // update S2
-  m_Line[S2]->SetPoint1(0, -L, 0);
-  m_Line[S2]->SetPoint2(0, L, 0);
+  m_Line[S1]->SetPoint1(0, -L, 0);
+  m_Line[S1]->SetPoint2(0, L, 0);
 
-  // update SQ
-  m_Plane->SetOrigin(0, 0, 0);
-  m_Plane->SetPoint1(0, L, 0);
-  m_Plane->SetPoint2(0, 0, L);
 }
 //----------------------------------------------------------------------------
 void medGizmoCrossTranslatePlane::OnEvent(mafEventBase *maf_event)
@@ -460,19 +452,20 @@ void medGizmoCrossTranslatePlane::OnEvent(mafEventBase *maf_event)
     mafEventMacro(*e);
   }
 }
-/** Gizmo color */
 //----------------------------------------------------------------------------
 void medGizmoCrossTranslatePlane::SetColor(int part, double col[3])
 //----------------------------------------------------------------------------
 {
+  // set the color for a gizmo component
+  // ie for S0 or S1 segment
 
   m_Color[0] = col[0];
   m_Color[1] = col[1];
   m_Color[2] = col[2];
 
-  if (part == S1 || part == S2) //|| part == SQ)
+  if (part == S0 || part == S1)
   {
-    m_Gizmo[part]->GetMaterial()->m_Prop->SetColor(col);
+      m_Gizmo[part]->GetMaterial()->m_Prop->SetColor(col);
 	  m_Gizmo[part]->GetMaterial()->m_Prop->SetAmbient(0);
 	  m_Gizmo[part]->GetMaterial()->m_Prop->SetDiffuse(1);
 	  m_Gizmo[part]->GetMaterial()->m_Prop->SetSpecular(0);
@@ -489,34 +482,29 @@ void medGizmoCrossTranslatePlane::SetColor(int part, double colR, double colG, d
 void medGizmoCrossTranslatePlane::Show(bool show)
 //----------------------------------------------------------------------------
 {
-  for (int i = 0; i < 2; i++)
+  // show gizmo components by issuing events
+  for (int i = 0; i < NUM_GIZMO_PARTS; i++)
 		mafEventMacro(mafEvent(this,VME_SHOW,m_Gizmo[i],show));
 }
-//----------------------------------------------------------------------------
-void medGizmoCrossTranslatePlane::ShowSquare(bool show)
-//----------------------------------------------------------------------------
-{
-  double opacity = ((show == TRUE) ? 0.5 : 0);
-  
-  double invisibleOpacity = 0;
-  m_Gizmo[SQ]->GetMaterial()->m_Prop->SetOpacity(invisibleOpacity);
-}
+
 //----------------------------------------------------------------------------
 void medGizmoCrossTranslatePlane::SetAbsPose(mafMatrix *absPose)
 //----------------------------------------------------------------------------
 {
-  for (int i = 0; i < 3; i++)
+  // set the abs pose to al gizmo components
+  for (int i = 0; i < NUM_GIZMO_PARTS; i++)
   {  
     m_Gizmo[i]->SetAbsMatrix(*absPose);
   }
   
+  // set the constrain ref sys for all gizmo components
   SetConstrainRefSys(absPose);
 }
 //----------------------------------------------------------------------------
 void medGizmoCrossTranslatePlane::SetConstrainRefSys(mafMatrix *constrain)
 //----------------------------------------------------------------------------
 {  
-  for (int i = 0; i < SQ; i++)
+  for (int i = 0; i < NUM_GIZMO_PARTS; i++)
   {
     m_IsaGen[i]->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(constrain);
   }
@@ -525,12 +513,14 @@ void medGizmoCrossTranslatePlane::SetConstrainRefSys(mafMatrix *constrain)
 mafMatrix *medGizmoCrossTranslatePlane::GetAbsPose()
 //----------------------------------------------------------------------------
 {
-  return m_Gizmo[S1]->GetOutput()->GetAbsMatrix();
+  // get the abs pose from a gizmo component
+  return m_Gizmo[S0]->GetOutput()->GetAbsMatrix();
 }
 //----------------------------------------------------------------------------
 void medGizmoCrossTranslatePlane::SetInput(mafVME *vme)
 //----------------------------------------------------------------------------
 {
+  // set gizmo pose and refsys from an input vme
   this->m_InputVme = vme; 
   SetAbsPose(vme->GetOutput()->GetAbsMatrix()); 
   SetConstrainRefSys(vme->GetOutput()->GetAbsMatrix());
@@ -539,7 +529,8 @@ void medGizmoCrossTranslatePlane::SetInput(mafVME *vme)
 void medGizmoCrossTranslatePlane::SetConstraintModality(int axis, int constrainModality)
 //----------------------------------------------------------------------------
 {
-  for (int i = 0; i < SQ; i++)
+  
+  for (int i = 0; i < NUM_GIZMO_PARTS; i++)
   {
     m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(axis,constrainModality);
   }
@@ -548,14 +539,18 @@ void medGizmoCrossTranslatePlane::SetConstraintModality(int axis, int constrainM
 void medGizmoCrossTranslatePlane::SetStep(int axis, double step)
 //----------------------------------------------------------------------------
 {
-  for (int i = 0; i < SQ; i++)
+  // set the translation constraint step
+  for (int i = 0; i < NUM_GIZMO_PARTS; i++)
   {
     m_IsaGen[i]->GetTranslationConstraint()->SetStep(axis,step);
   }
 }
 
+//----------------------------------------------------------------------------
 void medGizmoCrossTranslatePlane::CreateFeedbackGizmoPipeline()
+//----------------------------------------------------------------------------
 {
+  // build the vtk pipeline for feedback gizmo
   assert(m_InputVme);
 
   double bbDiagonal = m_InputVme->GetOutput()->GetVTKData()->GetLength();
@@ -640,14 +635,11 @@ void medGizmoCrossTranslatePlane::CreateFeedbackGizmoPipeline()
   m_FeedbackStuffAppendPolydata->AddInput(m_RightFeedbackConeTransformPDF->GetOutput());
   m_FeedbackStuffAppendPolydata->AddInput(m_UpFeedbackConeTransformPDF->GetOutput());
   m_FeedbackStuffAppendPolydata->AddInput(m_DownFeedbackConeTransformPDF->GetOutput());
-  //m_FeedbackStuffAppendPolydata->AddInput(m_VerticalFeedbackCylinderTransformPDF->GetOutput());
-  //m_FeedbackStuffAppendPolydata->AddInput(m_HorizontalFeedbackCylinderTransformPDF->GetOutput());
   m_FeedbackStuffAppendPolydata->Update();
 
   m_TranslationFeedbackGizmo->SetName("PlaneTranslationFeedbackGizmo");
   m_TranslationFeedbackGizmo->SetMediator(m_Listener);
   m_TranslationFeedbackGizmo->SetData(m_FeedbackStuffAppendPolydata->GetOutput());
-//  m_TranslationFeedbackGizmo->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 1));
   assert(m_InputVme);
 
   
@@ -656,12 +648,14 @@ void medGizmoCrossTranslatePlane::CreateFeedbackGizmoPipeline()
   m_TranslationFeedbackGizmo->GetMaterial()->m_Prop->SetDiffuse(1);
   m_TranslationFeedbackGizmo->GetMaterial()->m_Prop->SetSpecular(0);
   m_TranslationFeedbackGizmo->GetMaterial()->m_Prop->SetOpacity(0.1);
+
   // ReparentTo will add also the gizmos to the tree
   m_TranslationFeedbackGizmo->ReparentTo(m_Gizmo[0]);
-  // m_TranslationFeedbackArrowGizmo->ReparentTo(m_TranslationCylinderGizmo->GetRoot());
 }
 
+//----------------------------------------------------------------------------
 void medGizmoCrossTranslatePlane::ShowTranslationFeedbackArrows(bool show)
+//----------------------------------------------------------------------------
 {
   mafEventMacro(mafEvent(this,VME_SHOW,m_TranslationFeedbackGizmo,show));
 }

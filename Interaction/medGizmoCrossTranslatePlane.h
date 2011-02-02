@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoCrossTranslatePlane.h,v $
   Language:  C++
-  Date:      $Date: 2011-01-08 17:06:37 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2011-02-02 17:33:55 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -80,9 +80,9 @@ public:
   //----------------------------------------------------------------------------
 
   /** Plane enum*/
-  enum PLANE {YZ = 0, XZ, XY};
+  enum PLANE {X_NORMAL = 0, Y_NORMAL, Z_NORMAL};
   
-  /** Set/Get gizmo plane, default plane is YZ*/        
+  /** Set/Get gizmo plane, default plane is X_NORMAL*/        
   void SetPlane(int axis); 
   
   /** Get gizmo Plane*/
@@ -100,15 +100,6 @@ public:
 
   /** Show the translation feedback arrows  */
   void ShowTranslationFeedbackArrows(bool show);
-  
-  //----------------------------------------------------------------------------
-  // size setting 
-  //----------------------------------------------------------------------------
-  
-  /** Set/Get the side length of the gizmo*/
-  void   SetSizeLength(double length);
-  double GetSizeLength() {return m_Length;};
-
   
   //----------------------------------------------------------------------------
   // activation status 
@@ -160,10 +151,14 @@ public:
        --------> y    
   */
 
-  enum GIZMOPARTS {S1 = 0, S2, SQ};
+  enum GIZMOPARTS {S0 = 0, S1, NUM_GIZMO_PARTS};
   enum GIZMO_STATUS {SELECTED = 0, NOT_SELECTED};
 
 protected:
+
+  /** Set/Get the side length of the gizmo*/
+  void   SetSizeLength(double length);
+  double GetSizeLength() {return m_Length;};
 
   double m_Color[3];
   double m_LastColor[3];
@@ -187,12 +182,6 @@ protected:
   /** Tube filter for lines */
   vtkTubeFilter *m_LineTF[2];
 
-  /** Plane source*/
-  vtkPlaneSource *m_Plane;
-  
-  /** S1, S2 and SQ gizmo data*/
-  //mafVmeData *GizmoData[3];
- 
   /** rotate PDF for gizmo parts */
   vtkTransformPolyDataFilter *m_RotatePDF[3];
 
@@ -221,8 +210,6 @@ protected:
   Register the event receiver object*/
   mafObserver *m_Listener;
 
-  /** Hide/show the square */
-  void ShowSquare(bool show);
   /** Register Gizmo status*/
   bool m_IsActive;
 

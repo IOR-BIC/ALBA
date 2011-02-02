@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGizmoCrossTranslate.cpp,v $
 Language:  C++
-Date:      $Date: 2011-01-08 17:06:37 $
-Version:   $Revision: 1.1.2.6 $
+Date:      $Date: 2011-02-02 17:33:55 $
+Version:   $Revision: 1.1.2.7 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -83,7 +83,7 @@ medGizmoCrossTranslate::medGizmoCrossTranslate(mafVME* input, mafObserver *liste
 
   axis0 = X;
   axis1 = Y;
-  plane = medGizmoCrossTranslatePlane::XY;
+  plane = medGizmoCrossTranslatePlane::Z_NORMAL;
 
   m_GTUpDown->SetAxis(axis0);  
   m_GTLeftRight->SetAxis(axis1);
@@ -91,8 +91,8 @@ medGizmoCrossTranslate::medGizmoCrossTranslate(mafVME* input, mafObserver *liste
   // Create mafGTranslateAPlane 
   m_GTPlane = new medGizmoCrossTranslatePlane(input, this);
   m_GTPlane->SetPlane(plane);
+  m_GTPlane->SetColor(medGizmoCrossTranslatePlane::S0, 0,1,0 );
   m_GTPlane->SetColor(medGizmoCrossTranslatePlane::S1, 0,1,0 );
-  m_GTPlane->SetColor(medGizmoCrossTranslatePlane::S2, 0,1,0 );
 
   if (m_BuildGUI)
   {
@@ -510,7 +510,9 @@ void medGizmoCrossTranslate::SetRefSys(mafVME *refSys)
   }
   else
   {
-    SetModalityToGlobal();
+	// TODO REFACTOR THIS:
+	// SetModalityToGlobal and SetModalityToLocal API should be renamed to something more meaningful
+	SetModalityToGlobal();
 
     // if the gizmo is visible set the widgets visibility to false
     // if the ref-sys is global since this ref-sys cannot be changed
