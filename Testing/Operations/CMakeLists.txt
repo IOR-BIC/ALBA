@@ -173,6 +173,9 @@ ADD_TEST(medOpCreateEditSkeletonTest ${EXECUTABLE_OUTPUT_PATH}/medOpCreateEditSk
 ADD_EXECUTABLE(medOpRegisterClustersTest  medOpRegisterClustersTest.h medOpRegisterClustersTest.cpp)
 ADD_TEST(medOpRegisterClustersTest ${EXECUTABLE_OUTPUT_PATH}/medOpRegisterClustersTest)
 
+ADD_EXECUTABLE(medOpMML3ParameterViewTest  medOpMML3ParameterViewTest.h medOpMML3ParameterViewTest.cpp)
+ADD_TEST(medOpMML3ParameterViewTest ${EXECUTABLE_OUTPUT_PATH}/medOpMML3ParameterViewTest)
+
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
 #ENDIF (MAF_USE_WX)
