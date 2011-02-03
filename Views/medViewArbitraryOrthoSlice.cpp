@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2011-02-01 17:58:51 $
-Version:   $Revision: 1.1.2.33 $
+Date:      $Date: 2011-02-03 16:07:28 $
+Version:   $Revision: 1.1.2.34 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -1390,6 +1390,7 @@ void medViewArbitraryOrthoSlice::PostMultiplyEventMatrixToSlicer(mafEventBase *m
 		{
 			// move vme
 			currentSlicer->SetAbsMatrix(absPose);
+			UpdateThicknessStuff();			
 		} 
 
 		// clean up
