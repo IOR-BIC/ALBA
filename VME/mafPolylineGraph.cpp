@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2010-07-20 11:14:40 $
-Version:   $Revision: 1.10.2.4 $
+Date:      $Date: 2011-02-03 11:46:10 $
+Version:   $Revision: 1.10.2.5 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -412,7 +412,9 @@ bool mafPolylineGraph::Vertex::SelfCheck() const
 {
   // arrays should be of the same length
   if (m_EdgeId.size() != m_VertexId.size()){
-    LogMessage("mismatched list sizes in vertex %d %d", m_EdgeId.size(), m_VertexId.size()) ;
+#ifndef _DEBUG
+      LogMessage("mismatched list sizes in vertex %d %d", m_EdgeId.size(), m_VertexId.size()) ;
+#endif
     return false ;
   }
 
@@ -420,7 +422,9 @@ bool mafPolylineGraph::Vertex::SelfCheck() const
   for (int i = 0 ;  i < GetDegree()-1 ;  i++){
     for (int j = i+1 ;  j < GetDegree() ;  j++){
       if (GetEdgeId(i) == GetEdgeId(j)){
+#ifndef _DEBUG
         LogMessage("repeated edge %d at %d and %d on vertex", GetEdgeId(i), i, j) ;
+#endif
         return false ;
       }
     }
@@ -430,7 +434,9 @@ bool mafPolylineGraph::Vertex::SelfCheck() const
   for (int i = 0 ;  i < GetDegree()-1 ;  i++){
     for (int j = i+1 ;  j < GetDegree() ;  j++){
       if (GetVertexId(i) == GetVertexId(j)){
+#ifndef _DEBUG
         LogMessage("repeated vertex %d at %d and %d on vertex", GetVertexId(i), i, j) ;
+#endif
         return false ;
       }
     }
