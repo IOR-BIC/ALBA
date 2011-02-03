@@ -2,13 +2,23 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGizmoCrossTranslateAxis.cpp,v $
 Language:  C++
-Date:      $Date: 2011-02-02 17:50:39 $
-Version:   $Revision: 1.1.2.8 $
+Date:      $Date: 2011-02-03 13:45:01 $
+Version:   $Revision: 1.1.2.9 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
 CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
+
+//======================== WORK IN PROGRESS !!!!! ======================== 
+//======================== WORK IN PROGRESS !!!!! ======================== 
+//======================== WORK IN PROGRESS !!!!! ======================== 
+//======================== WORK IN PROGRESS !!!!! ======================== 
+//======================== WORK IN PROGRESS !!!!! ======================== 
+//======================== WORK IN PROGRESS !!!!! ======================== 
+//======================== WORK IN PROGRESS !!!!! ======================== 
+//======================== WORK IN PROGRESS !!!!! ======================== 
+//======================== WORK IN PROGRESS !!!!! ======================== 
 
 
 #include "mafDefines.h" 
@@ -49,6 +59,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 medGizmoCrossTranslateAxis::medGizmoCrossTranslateAxis(mafVME *input, mafObserver *listener)
 //----------------------------------------------------------------------------
 {
+
+
 	// translation feedback stuff
 	m_TranslationFeedbackGizmo = NULL;
 	m_FeedbackConeSource = NULL;
@@ -119,6 +131,28 @@ medGizmoCrossTranslateAxis::medGizmoCrossTranslateAxis(mafVME *input, mafObserve
 
 	// build translation feedback gizmo stuff
 	CreateFeedbackGizmoPipeline();
+
+	//======================== WORK IN PROGRESS !!!!! ======================== 
+	//======================== WORK IN PROGRESS !!!!! ======================== 
+	//======================== WORK IN PROGRESS !!!!! ======================== 
+	//======================== WORK IN PROGRESS !!!!! ======================== 
+	//======================== WORK IN PROGRESS !!!!! ======================== 
+	//======================== WORK IN PROGRESS !!!!! ======================== 
+	//======================== WORK IN PROGRESS !!!!! ======================== 
+	//======================== WORK IN PROGRESS !!!!! ======================== 
+	//======================== WORK IN PROGRESS !!!!! ======================== 
+	//======================== WORK IN PROGRESS !!!!! ======================== 
+	//======================== WORK IN PROGRESS !!!!! ======================== 
+	//======================== WORK IN PROGRESS !!!!! ======================== 
+	//======================== WORK IN PROGRESS !!!!! ======================== 
+	//======================== WORK IN PROGRESS !!!!! ======================== 
+	//======================== WORK IN PROGRESS !!!!! ======================== 
+	//======================== WORK IN PROGRESS !!!!! ======================== 
+	//======================== WORK IN PROGRESS !!!!! ======================== 
+	//======================== WORK IN PROGRESS !!!!! ======================== 
+	//======================== WORK IN PROGRESS !!!!! ======================== 
+	//======================== WORK IN PROGRESS !!!!! ======================== 
+	//======================== WORK IN PROGRESS !!!!! ======================== 
 }
 //----------------------------------------------------------------------------
 medGizmoCrossTranslateAxis::~medGizmoCrossTranslateAxis() 
