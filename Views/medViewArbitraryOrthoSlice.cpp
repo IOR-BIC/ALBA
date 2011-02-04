@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2011-02-03 16:07:28 $
-Version:   $Revision: 1.1.2.34 $
+Date:      $Date: 2011-02-04 13:33:31 $
+Version:   $Revision: 1.1.2.35 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -3143,6 +3143,10 @@ void medViewArbitraryOrthoSlice::AccumulateNTextureFromThickness(mafVMESlicer *i
 	// additionalProfileNumber = 1;
 	// profileDistance = 20;
 
+  const int numberOfTuples = targetScalars->GetNumberOfTuples();
+
+  std::vector<double> scalarsAccumulatorVector(numberOfTuples);
+
 	// for each profile
 	for(int profileId = -additionalProfileNumber; profileId <= additionalProfileNumber; profileId++)
 	{
@@ -3190,21 +3194,32 @@ void medViewArbitraryOrthoSlice::AccumulateNTextureFromThickness(mafVMESlicer *i
 		}
 		// get the current slice profile texture
 
-
 		vtkImageData *currentTexture = inputSlicer->GetSurfaceOutput()->GetMaterial()->GetMaterialTexture();
 		assert(currentTexture);
 
 		vtkUnsignedShortArray *currentSliceScalars = vtkUnsignedShortArray::SafeDownCast(currentTexture->GetPointData()->GetScalars());
 
+
 		// add the scalars to the target texture
 		for (int scalarId = 0; scalarId < targetScalars->GetNumberOfTuples(); scalarId++)
 		{
-			unsigned short oldValue = targetScalars->GetValue(scalarId);
+
 			unsigned short valueToAdd = currentSliceScalars->GetValue(scalarId);
-			unsigned short newValue = (oldValue + valueToAdd) / 2;
-			targetScalars->SetValue(scalarId, newValue);
+      scalarsAccumulatorVector[scalarId] += valueToAdd;
 		}
-	}
+
+  } // for each slice
+
+  // total number of slices I'm accumulating
+  int numberOfSlicesToAccumulate = additionalProfileNumber * 2 + 1;
+
+  for (int scalarId = 0; scalarId < numberOfTuples; scalarId++)
+  {
+    double oldValue = scalarsAccumulatorVector[scalarId];
+    unsigned short newValue = oldValue / numberOfSlicesToAccumulate;
+    targetScalars->SetValue(scalarId, newValue);
+  }
+
 
 	// original texture 
 	inputSlicer->SetAbsMatrix(originalABSTransform->GetMatrix());
