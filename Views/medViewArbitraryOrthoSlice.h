@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.h,v $
 Language:  C++
-Date:      $Date: 2011-01-31 18:08:05 $
-Version:   $Revision: 1.1.2.18 $
+Date:      $Date: 2011-02-04 15:40:40 $
+Version:   $Revision: 1.1.2.19 $
 Authors:   Stefano Perticoni	
 ==========================================================================
 Copyright (c) 2002/2004
@@ -273,6 +273,7 @@ protected:
 	/** Post multiply matrix for incoming transform events */
 	void PostMultiplyEventMatrixToSlicers(mafEventBase *maf_event);
 
+  /** Update the active RX slice by performing scalars value accumulation*/
 	void UpdateThicknessStuff();
 
 	/** structured points only */
@@ -323,7 +324,10 @@ protected:
 
   void OnEventID_COMBO_THICKNESS_AXIS();
   void EnableThicknessGUI( bool enable );
+  
+  /** Recompute all slicers output */
   void UpdateSlicers();
+
   void OnEventID_THICKNESS();
   void OnEventID_EXPORT_PLANES_HEIGHT();
   
