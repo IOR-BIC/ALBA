@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.h,v $
 Language:  C++
-Date:      $Date: 2011-02-04 15:40:40 $
-Version:   $Revision: 1.1.2.19 $
+Date:      $Date: 2011-02-07 18:09:58 $
+Version:   $Revision: 1.1.2.20 $
 Authors:   Stefano Perticoni	
 ==========================================================================
 Copyright (c) 2002/2004
@@ -40,6 +40,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkTubeFilter.h"
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkLineSource.h"
+#include "mafPipeSurface.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -113,7 +114,7 @@ public:
 
 	enum ID_GUI
 	{
-		ID_COMBO_CHOOSE_CUTTING_AXIS = Superclass::ID_LAST,
+		ID_COMBO_CHOOSE_EXPORT_AXIS = Superclass::ID_LAST,
 		ID_RESET,
 		ID_SHOW_GIZMO,
     ID_ENABLE_EXPORT_IMAGES,
@@ -121,8 +122,8 @@ public:
     ID_EXPORT,
 
 	ID_ENABLE_THICKNESS,
-	ID_COMBO_CHOOSE_THICKNESS_AXIS,
-	ID_THICKNESS,
+	ID_ENABLE_THICKNESS_ACTORS,
+	ID_THICKNESS_VALUE_CHANGED,
 	ID_NUMBER_OF_AXIAL_SECTIONS,
 	ID_EXPORT_PLANES_HEIGHT,
 		ID_LAST,
@@ -147,8 +148,8 @@ public:
 	/** Function that handles events sent from other objects. */
 	virtual void OnEvent(mafEventBase *maf_event);
 
-	void OnEventGizmoCrossZNormal( mafEventBase * maf_event );
-	void OnEventGizmoCrossYNormal( mafEventBase * maf_event );
+	void OnEventGizmoCrossRTZNormalView( mafEventBase * maf_event );
+	void OnEventGizmoCrossRTYNormalView( mafEventBase * maf_event );
 
 	/** Function that clones instance of the object. */
 	virtual mafView* Copy(mafObserver *Listener, bool lightCopyEnabled = false);
@@ -252,10 +253,12 @@ protected:
 	void OnResetSurfaceAndLandmark( mafNode * node );
 
 	/** This function is called when a rotate gizmo is moved*/
-	void OnEventGizmoCrossRotateZNormal(mafEventBase *maf_event);
+	void OnEventGizmoCrossRotateZNormalView(mafEventBase *maf_event);
 
-  void UpdateCutPlanes();
-	void UpdateXView2DActors();
+	/** Update cut planes only if needed*/
+    void UpdateCutPlanes();
+
+    void UpdateXView2DActors();
 	void UpdateYView2DActors();
 
   void UpdateYnViewZPlanes();
@@ -266,14 +269,14 @@ protected:
 	void UpdateCameraZViewOnEventGizmoCrossRotateZNormal( mafEvent * event );
 
 	/**	This function is called when a translate gizmo is moved*/
-	void OnEventGizmoCrossTranslateZNormal(mafEventBase *maf_event);
+	void OnEventGizmoCrossTranslateZNormalView(mafEventBase *maf_event);
 
 	void PostMultiplyEventMatrixToGizmoCross( mafEventBase * inputEvent , medGizmoCrossRotateTranslate *targetGizmo);
 
 	/** Post multiply matrix for incoming transform events */
 	void PostMultiplyEventMatrixToSlicers(mafEventBase *maf_event);
 
-  /** Update the active RX slice by performing scalars value accumulation*/
+	/** Recalculate the RX projection for the thee slicers and display it */
 	void UpdateThicknessStuff();
 
 	/** structured points only */
@@ -286,17 +289,17 @@ protected:
 
 	/** Windowing for volumes data. This function overrides superclass method.*/
 	void VolumeWindowing(mafVME *volume);
-	void OnEventGizmoCrossRotateYNormal(mafEventBase *maf_event);
+	void OnEventGizmoCrossRotateYNormalView(mafEventBase *maf_event);
 
 	void GetLeftRightLettersFromCamera( double viewUp[3], double viewPlaneNormal[3], wxString &leftLetter, wxString &rightLetter);
 
-	void OnEventGizmoCrossXNormal( mafEventBase * maf_event );
-	void OnEventGizmoCrossRotateXNormal(mafEventBase *maf_event);
+	void OnEventGizmoCrossRTXNormalView( mafEventBase * maf_event );
+	void OnEventGizmoCrossRotateXNormalView(mafEventBase *maf_event);
 
 	void ChildViewsCameraUpdate();
 
-	void OnEventGizmoCrossTranslateXNormal(mafEventBase *maf_event);
-	void OnEventGizmoCrossTranslateYNormal(mafEventBase *maf_event);
+	void OnEventGizmoCrossTranslateXNormalView(mafEventBase *maf_event);
+	void OnEventGizmoCrossTranslateYNormalView(mafEventBase *maf_event);
   
   void UpdateXnViewZPlanes();
   void UpdateYnViewXPlanes();
@@ -312,7 +315,10 @@ protected:
 
   void UpdateYCutPlanes();
   void ShowYCutPlanes( bool show );
-  void OnEventID_COMBO_CHOOSE_CUTTING_AXIS();
+
+  mafPipeSurface * GetPipe(int inView, mafVMESurface *inSurface);
+
+  void OnEventID_COMBO_CHOOSE_EXPORT_AXIS();
 
   void HideCutPlanes();
   void OnID_CHOOSE_DIR();
@@ -322,13 +328,12 @@ protected:
 
   void EnableThickness(bool enable);
 
-  void OnEventID_COMBO_THICKNESS_AXIS();
   void EnableThicknessGUI( bool enable );
   
   /** Recompute all slicers output */
   void UpdateSlicers();
 
-  void OnEventID_THICKNESS();
+  void OnEventID_THICKNESS_VALUE_CHANGED();
   void OnEventID_EXPORT_PLANES_HEIGHT();
   
   mafViewVTK *m_ViewSliceX;
@@ -386,38 +391,42 @@ protected:
 	mafVMEVolumeGray *m_InputVolume;
 
 
-  // Xn view images export gizmos
-	mafVMESurface *m_ViewXnSliceYpVME;
+  // Xn view cut feedback gizmos
+  mafVMESurface *m_ViewXnSliceYpVME;
   mafVMESurface *m_ViewXnSliceYmVME;
   
   mafVMESurface *m_ViewXnSliceZpVME;
   mafVMESurface *m_ViewXnSliceZmVME;
 
-  // Yn view images export gizmos
+  // Yn view cut feedback gizmos
   mafVMESurface *m_ViewYnSliceZpVME;
   mafVMESurface *m_ViewYnSliceZmVME;
 
   mafVMESurface *m_ViewYnSliceXpVME;
   mafVMESurface *m_ViewYnSliceXmVME;
 
+  // Zn view cut feedback gizmos
   mafVMESurface *m_ViewZnSliceXpVME;
   mafVMESurface *m_ViewZnSliceXmVME;
 
   mafVMESurface *m_ViewZnSliceYpVME;
   mafVMESurface *m_ViewZnSliceYmVME;
 
+
   int m_FeedbackLineHeight;
   int m_NumberOfAxialSections;
   int m_ExportPlanesHeight;
 
   int m_EnableExportImages;
-  int m_ComboChooseAxisDirection;
-  int m_ComboThicknessAxis;
+  int m_ComboChooseExportAxis;
   int m_EnableThickness;
-
-  double m_Thickness;
+  
+  double m_ThicknessValueChanged;
 	
   wxString m_PathFromDialog;
+
+  /** Enable debug facilities */
+  bool m_DebugMode;
 };
 
 #endif
