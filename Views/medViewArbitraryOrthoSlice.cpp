@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2011-02-08 14:42:34 $
-Version:   $Revision: 1.1.2.40 $
+Date:      $Date: 2011-02-08 18:21:15 $
+Version:   $Revision: 1.1.2.41 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -1326,7 +1326,7 @@ void medViewArbitraryOrthoSlice::PostMultiplyEventMatrixToSlicers(mafEventBase *
 			} 
 
 
-		
+
 			// clean up
 			tr->Delete();
 		}
@@ -3095,7 +3095,7 @@ void medViewArbitraryOrthoSlice::AccumulateTextures( mafVMESlicer *inSlicer, dou
 		mafEvent e(this,PROGRESSBAR_SHOW);
 		mafEventMacro(e);
 	}
-	
+
 	// prevent wasted cpu time :P
 	if (m_EnableThickness == 0)
 	{
@@ -3153,15 +3153,15 @@ void medViewArbitraryOrthoSlice::AccumulateTextures( mafVMESlicer *inSlicer, dou
 	mafVMEOutputSurface *outputSurface = mafVMEOutputSurface::SafeDownCast(inSlicer->GetSurfaceOutput());
 	assert(outputSurface);
 
-	vtkImageData *texture = outputSurface->GetMaterial()->GetMaterialTexture();
-	assert(texture);
+	vtkImageData *slicerTexture = outputSurface->GetMaterial()->GetMaterialTexture();
+	assert(slicerTexture);
 
 	inSlicer->GetSurfaceOutput()->GetVTKData()->Modified();
 	inSlicer->GetSurfaceOutput()->GetVTKData()->Update();
 
 	// sum the texture scalars in a new image: built from original default texture
 	vtkMAFSmartPointer<vtkImageData> scalarsAccumulationTargetTexture;
-	scalarsAccumulationTargetTexture->DeepCopy(texture);	
+	scalarsAccumulationTargetTexture->DeepCopy(slicerTexture);	
 
 	// add the texture up scalars
 	vtkUnsignedShortArray *targetScalars = vtkUnsignedShortArray::SafeDownCast( scalarsAccumulationTargetTexture->GetPointData()->GetScalars());
@@ -3182,7 +3182,7 @@ void medViewArbitraryOrthoSlice::AccumulateTextures( mafVMESlicer *inSlicer, dou
 	for(int profileId = -additionalProfileNumber; profileId <= additionalProfileNumber; profileId++)
 	{
 		progress = (100 * ((double )slicesAlreadyProcessed) / ((double) numberOfSlicesToAccumulate));
-		
+
 		if (showProgressBar)
 		{
 			mafEvent eUpdate(this,PROGRESSBAR_SET_VALUE,progress);
@@ -3257,7 +3257,7 @@ void medViewArbitraryOrthoSlice::AccumulateTextures( mafVMESlicer *inSlicer, dou
 		mafEvent eHideProgress(this,PROGRESSBAR_HIDE);
 		mafEventMacro(eHideProgress);
 	}
-	
+
 	for (int scalarId = 0; scalarId < numberOfTuples; scalarId++)
 	{
 		double oldValue = scalarsAccumulatorVector[scalarId];
@@ -3273,7 +3273,13 @@ void medViewArbitraryOrthoSlice::AccumulateTextures( mafVMESlicer *inSlicer, dou
 	inSlicer->GetSurfaceOutput()->GetVTKData()->Update(); 
 
 	// test set accumulated image to slicer 
-	texture->DeepCopy(scalarsAccumulationTargetTexture);
+	slicerTexture->DeepCopy(scalarsAccumulationTargetTexture);
+
+	// if the output image data is provided deepcopy the rx texture to it
+	if (outRXTexture)
+	{
+		outRXTexture->DeepCopy(scalarsAccumulationTargetTexture);
+	}
 }
 
 void medViewArbitraryOrthoSlice::ShowPlaneFeedbackLine( int fromDirection , 
@@ -3882,171 +3888,144 @@ void medViewArbitraryOrthoSlice::OnEventID_ENABLE_EXPORT_IMAGES()
 		m_FeedbackLineHeight = m_ExportPlanesHeight;
 		UpdateExportImagesBoundsLineActors();
 	}
-	
+
 	ChildViewsCameraUpdate();
 }
 
 void medViewArbitraryOrthoSlice::OnEventID_EXPORT()
 {
+	wxBusyInfo wait("please wait");
+
+	mafEvent e(this,PROGRESSBAR_SHOW);
+	mafEventMacro(e);
+
+	mafVMESlicer *currentSlicer = NULL;
+
 	if (m_ComboChooseExportAxis == X)
 	{
-		// export X slices BMP
-		double thickness = m_FeedbackLineHeight * 2;
-		double step = thickness / (m_NumberOfAxialSections - 1);
-
-		vtkMAFSmartPointer<vtkMatrix4x4> originalMatrix;
-
-		vtkMatrix4x4 *slicerMatrix = m_SlicerX->GetAbsMatrixPipe()->GetMatrix().GetVTKMatrix();
-		originalMatrix->DeepCopy(slicerMatrix);
-
-		double height = -m_FeedbackLineHeight;
-
-		for (int i = 0; i < m_NumberOfAxialSections; i++)
-		{          
-			vtkMAFSmartPointer<vtkTransform> tr;
-			tr->PostMultiply();
-			tr->SetMatrix(originalMatrix);
-			tr->Translate(height,0,0);
-			tr->Update();
-
-			m_SlicerX->SetAbsMatrix(tr->GetMatrix());
-
-			m_SlicerX->GetSurfaceOutput()->GetVTKData()->Modified();
-			m_SlicerX->GetSurfaceOutput()->GetVTKData()->Update();
-
-			mafVMEOutputSurface *outputSurface = mafVMEOutputSurface::SafeDownCast(m_SlicerX->GetSurfaceOutput());
-			assert(outputSurface);
-
-			vtkImageData *texture = outputSurface->GetMaterial()->GetMaterialTexture();
-			assert(texture);
-
-
-			vtkMAFSmartPointer<vtkPNGWriter> bmpWriter;
-			bmpWriter->SetInput(texture);
-
-			wxString fileName = m_PathFromDialog.c_str();
-			fileName.append("/SlicerX_");
-			fileName << i;
-			fileName << ".png";
-			//fileName.append("vtk");
-
-			bmpWriter->SetFileName(fileName);
-			bmpWriter->Write();
-
-			height = height + step;
-		}
-
-		m_SlicerX->SetAbsMatrix(mafMatrix(originalMatrix));
-
-		m_SlicerX->GetSurfaceOutput()->GetVTKData()->Modified();
-		m_SlicerX->GetSurfaceOutput()->GetVTKData()->Update();
-
+		currentSlicer = m_SlicerX;
 	}
 	else if (m_ComboChooseExportAxis == Y)
 	{
-		// export Y slices BMP
-		double thickness = m_FeedbackLineHeight * 2;
-		double step = thickness / (m_NumberOfAxialSections - 1);
-
-		vtkMAFSmartPointer<vtkMatrix4x4> originalMatrix;
-
-		vtkMatrix4x4 *slicerMatrix = m_SlicerY->GetAbsMatrixPipe()->GetMatrix().GetVTKMatrix();
-		originalMatrix->DeepCopy(slicerMatrix);
-
-		double height = -m_FeedbackLineHeight;
-
-		for (int i = 0; i < m_NumberOfAxialSections; i++)
-		{          
-			vtkMAFSmartPointer<vtkTransform> tr;
-			tr->PostMultiply();
-			tr->SetMatrix(originalMatrix);
-			tr->Translate(0,height,0);
-			tr->Update();
-
-			m_SlicerY->SetAbsMatrix(tr->GetMatrix());
-
-			m_SlicerY->GetSurfaceOutput()->GetVTKData()->Modified();
-			m_SlicerY->GetSurfaceOutput()->GetVTKData()->Update();
-
-			mafVMEOutputSurface *outputSurface = mafVMEOutputSurface::SafeDownCast(m_SlicerY->GetSurfaceOutput());
-			assert(outputSurface);
-
-			vtkImageData *texture = outputSurface->GetMaterial()->GetMaterialTexture();
-			assert(texture);
-
-
-			vtkMAFSmartPointer<vtkPNGWriter> bmpWriter;
-			bmpWriter->SetInput(texture);
-
-			wxString fileName = m_PathFromDialog.c_str();
-			fileName.append("/SlicerY_");
-			fileName << i;
-			fileName << ".png";
-			//fileName.append("vtk");
-
-			bmpWriter->SetFileName(fileName);
-			bmpWriter->Write();
-
-			height = height + step;
-		}
-
-		m_SlicerY->SetAbsMatrix(mafMatrix(originalMatrix));
-
-		m_SlicerY->GetSurfaceOutput()->GetVTKData()->Modified();
-		m_SlicerY->GetSurfaceOutput()->GetVTKData()->Update();
-
+		currentSlicer = m_SlicerY;
 	}
 	else if (m_ComboChooseExportAxis == Z)
 	{
-		// export Z slices BMP
-		double thickness = m_FeedbackLineHeight * 2;
-		double step = thickness / (m_NumberOfAxialSections - 1);
+		currentSlicer = m_SlicerZ;
+	}
 
-		vtkMAFSmartPointer<vtkMatrix4x4> originalMatrix;
+	// export X slices BMP
+	double thickness = m_FeedbackLineHeight * 2;
+	double step = thickness / (m_NumberOfAxialSections - 1);
 
-		vtkMatrix4x4 *slicerMatrix = m_SlicerZ->GetAbsMatrixPipe()->GetMatrix().GetVTKMatrix();
-		originalMatrix->DeepCopy(slicerMatrix);
+	vtkMAFSmartPointer<vtkMatrix4x4> originalMatrix;
 
-		double height = -m_FeedbackLineHeight;
+	vtkMatrix4x4 *slicerMatrix = currentSlicer->GetAbsMatrixPipe()->GetMatrix().GetVTKMatrix();
+	originalMatrix->DeepCopy(slicerMatrix);
 
-		for (int i = 0; i < m_NumberOfAxialSections; i++)
-		{          
-			vtkMAFSmartPointer<vtkTransform> tr;
-			tr->PostMultiply();
-			tr->SetMatrix(originalMatrix);
+	double height = -m_FeedbackLineHeight;
+
+	double v3[3] = {height,0,0};
+
+	for (int i = 0; i < m_NumberOfAxialSections; i++)
+	{          
+		long progress = (100 * ((double )i) / ((double) m_NumberOfAxialSections));
+
+		mafEvent eUpdate(this,PROGRESSBAR_SET_VALUE,progress);
+		mafEventMacro(eUpdate);
+
+		// move the slicer in the target abs pose
+		vtkMAFSmartPointer<vtkTransform> tr;
+		tr->PostMultiply();
+		tr->SetMatrix(originalMatrix);
+
+		if (currentSlicer == m_SlicerX)
+		{
+			tr->Translate(height,0,0);
+		}
+		else if (currentSlicer == m_SlicerY)
+		{
+			tr->Translate(0,height,0);
+		}
+		else if (currentSlicer == m_SlicerZ)
+		{
 			tr->Translate(0,0,height);
-			tr->Update();
-
-			m_SlicerZ->SetAbsMatrix(tr->GetMatrix());
-
-			m_SlicerZ->GetSurfaceOutput()->GetVTKData()->Modified();
-			m_SlicerZ->GetSurfaceOutput()->GetVTKData()->Update();
-
-			mafVMEOutputSurface *outputSurface = mafVMEOutputSurface::SafeDownCast(m_SlicerZ->GetSurfaceOutput());
-			assert(outputSurface);
-
-			vtkImageData *texture = outputSurface->GetMaterial()->GetMaterialTexture();
-			assert(texture);
-
-			vtkMAFSmartPointer<vtkPNGWriter> bmpWriter;
-			bmpWriter->SetInput(texture);
-
-			wxString fileName = m_PathFromDialog.c_str();
-			fileName.append("/SlicerZ_");
-			fileName << i;
-			fileName << ".png";
-
-			bmpWriter->SetFileName(fileName);
-			bmpWriter->Write();
-
-			height = height + step;
 		}
 
-		m_SlicerZ->SetAbsMatrix(mafMatrix(originalMatrix));
+		tr->Update();
 
-		m_SlicerZ->GetSurfaceOutput()->GetVTKData()->Modified();
-		m_SlicerZ->GetSurfaceOutput()->GetVTKData()->Update();
+		currentSlicer->SetAbsMatrix(tr->GetMatrix());
+
+		vtkMAFSmartPointer<vtkPNGWriter> writer;
+
+		vtkImageData *textureToWriteOnDisk = NULL;
+
+		if (m_EnableThickness == false)  // use the slicer output
+		{
+			// update the slicer
+			currentSlicer->GetSurfaceOutput()->GetVTKData()->Modified();
+			currentSlicer->GetSurfaceOutput()->GetVTKData()->Update();
+
+			mafVMEOutputSurface *outputSurface = mafVMEOutputSurface::SafeDownCast(currentSlicer->GetSurfaceOutput());
+			assert(outputSurface);
+
+			// get the slicer texture for exporting purposes
+			textureToWriteOnDisk = outputSurface->GetMaterial()->GetMaterialTexture();
+			assert(textureToWriteOnDisk);
+			writer->SetInput(textureToWriteOnDisk);
+
+			mafEventMacro(mafEvent(this,CAMERA_UPDATE));				
+		}
+		else if (m_EnableThickness == true) // use rx projection
+		{
+			textureToWriteOnDisk = vtkImageData::New();
+			AccumulateTextures(currentSlicer, m_ThicknessValue, textureToWriteOnDisk, false );
+			writer->SetInput(textureToWriteOnDisk);
+			textureToWriteOnDisk->Delete();
+
+			mafEventMacro(mafEvent(this,CAMERA_UPDATE));				
+		}
+
+		// write it
+
+		wxString fileName = m_PathFromDialog.c_str();
+
+		if (currentSlicer == m_SlicerX)
+		{
+			fileName.append("/SlicerX_");
+		}
+		else if (currentSlicer == m_SlicerY)
+		{
+			fileName.append("/SlicerY_");
+		}
+		else if (currentSlicer == m_SlicerZ)
+		{
+			fileName.append("/SlicerZ_");
+		}
+
+		fileName << i;
+		fileName << ".png";
+		//fileName.append("vtk");
+
+		writer->SetFileName(fileName);
+		writer->Write();
+
+		height = height + step;
 	}
+
+	currentSlicer->SetAbsMatrix(mafMatrix(originalMatrix));
+
+	if (m_EnableThickness == true)
+	{
+		AccumulateTextures(currentSlicer, m_ThicknessValue, NULL, true);
+	}
+
+	currentSlicer->GetSurfaceOutput()->GetVTKData()->Modified();
+	currentSlicer->GetSurfaceOutput()->GetVTKData()->Update();
+
+
+	mafEvent eHide(this,PROGRESSBAR_HIDE);
+	mafEventMacro(eHide);
 }
 
 void medViewArbitraryOrthoSlice::OnEventID_ENABLE_THICKNESS()
@@ -4061,7 +4040,7 @@ void medViewArbitraryOrthoSlice::OnEventID_ENABLE_THICKNESS()
 	if (structuredPoints == NULL)
 	{
 		EnableThickness(false);
-		
+
 		wxMessageBox(wxString::Format(
 			_("The RX accumulation works for structured points only, \n" 
 			"in current release.\n", )));    
