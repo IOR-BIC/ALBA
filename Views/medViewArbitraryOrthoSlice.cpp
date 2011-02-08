@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2011-02-08 09:56:07 $
-Version:   $Revision: 1.1.2.38 $
+Date:      $Date: 2011-02-08 10:59:03 $
+Version:   $Revision: 1.1.2.39 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -127,7 +127,7 @@ medViewArbitraryOrthoSlice::medViewArbitraryOrthoSlice(wxString label, bool show
 	m_FeedbackLineHeight = 20;
 
 	m_ExportPlanesHeight = 20;
-	m_ThicknessValueChanged = 2;
+	m_ThicknessValue = 2;
 
 	m_ViewXnSliceYpVME = NULL;
 	m_ViewXnSliceYmVME = NULL;
@@ -1228,7 +1228,7 @@ mafGUI* medViewArbitraryOrthoSlice::CreateGui()
 	m_Gui->Bool(ID_ENABLE_THICKNESS, "",&m_EnableThickness);
 
 	m_Gui->Label("Thickness value:");
-	m_Gui->Double(ID_THICKNESS_VALUE_CHANGED,_(""),&m_ThicknessValueChanged,0, 100);
+	m_Gui->Double(ID_THICKNESS_VALUE_CHANGED,_(""),&m_ThicknessValue,0, 100);
 
 
 	m_Gui->Label("");
@@ -3078,7 +3078,7 @@ void medViewArbitraryOrthoSlice::Accumulate3TexturePlayGround()
 
 }
 
-void medViewArbitraryOrthoSlice::AccumulateNTextureFromThickness(mafVMESlicer *inputSlicer, bool showProgressBar)
+void medViewArbitraryOrthoSlice::AccumulateTextures( mafVMESlicer *inputSlicer, double accumulationThickness , bool showProgressBar /*= false*/ )
 {	
 	if (showProgressBar)
 	{
@@ -3113,6 +3113,8 @@ void medViewArbitraryOrthoSlice::AccumulateNTextureFromThickness(mafVMESlicer *i
 	vtkStructuredPoints *structuredPoints = vtkStructuredPoints::SafeDownCast(m_InputVolume->GetDataPipe()->GetVTKData());
 
 	// BEWARE: working for structured points only
+	// TODO REFACTOR THIS:
+	// can be easyly extended to rectilinear grid
 	assert(structuredPoints);
 
 	double spacing[3];
@@ -3124,7 +3126,7 @@ void medViewArbitraryOrthoSlice::AccumulateNTextureFromThickness(mafVMESlicer *i
 	double minSpacing = min(minSpacingXY, minSpacingYZ);
 
 	double profileDistance = minSpacing;
-	int additionalProfileNumber = m_ThicknessValueChanged / profileDistance + 1;
+	int additionalProfileNumber = accumulationThickness / profileDistance + 1;
 	additionalProfileNumber  /= 2;
 
 	std::ostringstream stringStream;
@@ -4039,6 +4041,24 @@ void medViewArbitraryOrthoSlice::OnEventID_EXPORT()
 
 void medViewArbitraryOrthoSlice::OnEventID_ENABLE_THICKNESS()
 {
+	assert(m_InputVolume);
+
+	vtkStructuredPoints *structuredPoints = vtkStructuredPoints::SafeDownCast(m_InputVolume->GetDataPipe()->GetVTKData());
+
+	// BEWARE: working for structured points only
+	// TODO REFACTOR THIS:
+	// can be easyly extended to rectilinear grid
+	if (structuredPoints == NULL)
+	{
+		EnableThickness(false);
+		
+		wxMessageBox(wxString::Format(
+			_("The RX accumulation works for structured points only, \n" 
+			"in current release.\n", )));    
+
+		return;
+	}
+
 	EnableThickness(m_EnableThickness);
 }
 
@@ -4046,9 +4066,9 @@ void medViewArbitraryOrthoSlice::OnEventID_ENABLE_THICKNESS()
 void medViewArbitraryOrthoSlice::UpdateThicknessStuff()
 {
 	wxBusyInfo wait_info("please wait");
-	AccumulateNTextureFromThickness(m_SlicerX, true);
-	AccumulateNTextureFromThickness(m_SlicerY, true);
-	AccumulateNTextureFromThickness(m_SlicerZ, true);
+	AccumulateTextures(m_SlicerX, m_ThicknessValue, true);
+	AccumulateTextures(m_SlicerY, m_ThicknessValue,  true);
+	AccumulateTextures(m_SlicerZ, m_ThicknessValue, true);
 }
 
 

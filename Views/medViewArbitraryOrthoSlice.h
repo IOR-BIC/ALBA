@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.h,v $
 Language:  C++
-Date:      $Date: 2011-02-08 09:56:07 $
-Version:   $Revision: 1.1.2.21 $
+Date:      $Date: 2011-02-08 10:59:03 $
+Version:   $Revision: 1.1.2.22 $
 Authors:   Stefano Perticoni	
 ==========================================================================
 Copyright (c) 2002/2004
@@ -280,7 +280,7 @@ protected:
 	void Accumulate3TexturePlayGround();
 
 	/** structured points only */
-	void AccumulateNTextureFromThickness(mafVMESlicer *inputSlicer, bool showProgressBar = false);
+	void AccumulateTextures(mafVMESlicer *inputSlicer, double rxThickness , bool showProgressBar = false);
 
 	/** Post multiply maf_event matrix to given slicer */
 	void PostMultiplyEventMatrixToSlicer(mafEventBase *maf_event, int slicerAxis);
@@ -423,7 +423,7 @@ protected:
   int m_ComboChooseExportAxis;
   int m_EnableThickness;
   
-  double m_ThicknessValueChanged;
+  double m_ThicknessValue;
 	
   wxString m_PathFromDialog;
 
