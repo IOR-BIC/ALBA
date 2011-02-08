@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.h,v $
 Language:  C++
-Date:      $Date: 2011-02-07 18:09:58 $
-Version:   $Revision: 1.1.2.20 $
+Date:      $Date: 2011-02-08 09:56:07 $
+Version:   $Revision: 1.1.2.21 $
 Authors:   Stefano Perticoni	
 ==========================================================================
 Copyright (c) 2002/2004
@@ -261,7 +261,7 @@ protected:
     void UpdateXView2DActors();
 	void UpdateYView2DActors();
 
-  void UpdateYnViewZPlanes();
+    void UpdateYnViewZPlanes();
 	void UpdateZView2DActors();
 
 	void UpdateCameraXViewOnEventGizmoCrossRotateZNormal( mafEvent * event );
@@ -273,9 +273,6 @@ protected:
 
 	void PostMultiplyEventMatrixToGizmoCross( mafEventBase * inputEvent , medGizmoCrossRotateTranslate *targetGizmo);
 
-	/** Post multiply matrix for incoming transform events */
-	void PostMultiplyEventMatrixToSlicers(mafEventBase *maf_event);
-
 	/** Recalculate the RX projection for the thee slicers and display it */
 	void UpdateThicknessStuff();
 
@@ -283,9 +280,13 @@ protected:
 	void Accumulate3TexturePlayGround();
 
 	/** structured points only */
-	void AccumulateNTextureFromThickness(mafVMESlicer *inputSlicer);
+	void AccumulateNTextureFromThickness(mafVMESlicer *inputSlicer, bool showProgressBar = false);
 
+	/** Post multiply maf_event matrix to given slicer */
 	void PostMultiplyEventMatrixToSlicer(mafEventBase *maf_event, int slicerAxis);
+
+	/** Post multiply maf_event matrix to the 3 slicers */
+	void PostMultiplyEventMatrixToSlicers(mafEventBase *maf_event);
 
 	/** Windowing for volumes data. This function overrides superclass method.*/
 	void VolumeWindowing(mafVME *volume);
@@ -294,6 +295,7 @@ protected:
 	void GetLeftRightLettersFromCamera( double viewUp[3], double viewPlaneNormal[3], wxString &leftLetter, wxString &rightLetter);
 
 	void OnEventGizmoCrossRTXNormalView( mafEventBase * maf_event );
+
 	void OnEventGizmoCrossRotateXNormalView(mafEventBase *maf_event);
 
 	void ChildViewsCameraUpdate();

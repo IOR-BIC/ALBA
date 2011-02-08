@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2011-02-07 18:09:58 $
-Version:   $Revision: 1.1.2.37 $
+Date:      $Date: 2011-02-08 09:56:07 $
+Version:   $Revision: 1.1.2.38 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -1326,21 +1326,25 @@ void medViewArbitraryOrthoSlice::PostMultiplyEventMatrixToSlicers(mafEventBase *
 			} 
 
 
-			UpdateCutPlanes();
-
-			if (e->GetArg() == mafInteractorGenericMouse::MOUSE_UP)
-			{
-				if (m_EnableThickness)
-				{
-					// update thickness stuff on MOUSE_UP only
-					UpdateThicknessStuff();
-
-				}
-			}
-
+		
 			// clean up
 			tr->Delete();
 		}
+
+		UpdateCutPlanes();
+
+		if (e->GetArg() == mafInteractorGenericMouse::MOUSE_UP)
+		{
+			if (m_EnableThickness)
+			{
+				// update thickness stuff on MOUSE_UP only
+
+				// called 3 times (WRONG!)
+				UpdateThicknessStuff();
+
+			}
+		}
+
 	}
 }
 
@@ -3074,8 +3078,14 @@ void medViewArbitraryOrthoSlice::Accumulate3TexturePlayGround()
 
 }
 
-void medViewArbitraryOrthoSlice::AccumulateNTextureFromThickness(mafVMESlicer *inputSlicer)
+void medViewArbitraryOrthoSlice::AccumulateNTextureFromThickness(mafVMESlicer *inputSlicer, bool showProgressBar)
 {	
+	if (showProgressBar)
+	{
+		mafEvent e(this,PROGRESSBAR_SHOW);
+		mafEventMacro(e);
+	}
+	
 	// prevent wasted cpu time :P
 	if (m_EnableThickness == 0)
 	{
@@ -3147,17 +3157,26 @@ void medViewArbitraryOrthoSlice::AccumulateNTextureFromThickness(mafVMESlicer *i
 
 	assert(targetScalars->GetNumberOfComponents() == 1);
 
-	// debug with three profiles: -20 , 0 , 20
-	// additionalProfileNumber = 1;
-	// profileDistance = 20;
-
 	const int numberOfTuples = targetScalars->GetNumberOfTuples();
 
 	std::vector<double> scalarsAccumulatorVector(numberOfTuples);
 
+	// total number of slices I'm accumulating
+	int numberOfSlicesToAccumulate = additionalProfileNumber * 2 + 1;
+	int slicesAlreadyProcessed = 0;
+	long progress = -1;
+
 	// for each profile
 	for(int profileId = -additionalProfileNumber; profileId <= additionalProfileNumber; profileId++)
 	{
+		progress = (100 * ((double )slicesAlreadyProcessed) / ((double) numberOfSlicesToAccumulate));
+		
+		if (showProgressBar)
+		{
+			mafEvent eUpdate(this,PROGRESSBAR_SET_VALUE,progress);
+			mafEventMacro(eUpdate);
+		}
+
 		if (profileId == 0)
 		{
 			// this is the default deepcopied texture so it is taken into account already
@@ -3216,11 +3235,17 @@ void medViewArbitraryOrthoSlice::AccumulateNTextureFromThickness(mafVMESlicer *i
 			scalarsAccumulatorVector[scalarId] += valueToAdd;
 		}
 
+		slicesAlreadyProcessed += 1;
+		assert(slicesAlreadyProcessed <= numberOfSlicesToAccumulate);
+
 	} // for each slice
 
-	// total number of slices I'm accumulating
-	int numberOfSlicesToAccumulate = additionalProfileNumber * 2 + 1;
-
+	if (showProgressBar)
+	{
+		mafEvent eHideProgress(this,PROGRESSBAR_HIDE);
+		mafEventMacro(eHideProgress);
+	}
+	
 	for (int scalarId = 0; scalarId < numberOfTuples; scalarId++)
 	{
 		double oldValue = scalarsAccumulatorVector[scalarId];
@@ -4021,9 +4046,9 @@ void medViewArbitraryOrthoSlice::OnEventID_ENABLE_THICKNESS()
 void medViewArbitraryOrthoSlice::UpdateThicknessStuff()
 {
 	wxBusyInfo wait_info("please wait");
-	AccumulateNTextureFromThickness(m_SlicerX);
-	AccumulateNTextureFromThickness(m_SlicerY);
-	AccumulateNTextureFromThickness(m_SlicerZ);
+	AccumulateNTextureFromThickness(m_SlicerX, true);
+	AccumulateNTextureFromThickness(m_SlicerY, true);
+	AccumulateNTextureFromThickness(m_SlicerZ, true);
 }
 
 
