@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.h,v $
 Language:  C++
-Date:      $Date: 2011-02-08 10:59:03 $
-Version:   $Revision: 1.1.2.22 $
+Date:      $Date: 2011-02-08 14:42:34 $
+Version:   $Revision: 1.1.2.23 $
 Authors:   Stefano Perticoni	
 ==========================================================================
 Copyright (c) 2002/2004
@@ -224,7 +224,6 @@ protected:
 
 	void ShowMedVMEPolylineEditor( mafNode * node );
 
-
 	/* Update slicer settings according to m_CurrentVolume*/
 	void UpdateSlicerZBehavior();
 
@@ -255,8 +254,8 @@ protected:
 	/** This function is called when a rotate gizmo is moved*/
 	void OnEventGizmoCrossRotateZNormalView(mafEventBase *maf_event);
 
-	/** Update cut planes only if needed*/
-    void UpdateCutPlanes();
+	/** Update export images bounds lines actors only if needed*/
+    void UpdateExportImagesBoundsLineActors();
 
     void UpdateXView2DActors();
 	void UpdateYView2DActors();
@@ -272,15 +271,16 @@ protected:
 	void OnEventGizmoCrossTranslateZNormalView(mafEventBase *maf_event);
 
 	void PostMultiplyEventMatrixToGizmoCross( mafEventBase * inputEvent , medGizmoCrossRotateTranslate *targetGizmo);
-
-	/** Recalculate the RX projection for the thee slicers and display it */
+	
+	/** Recalculate the RX projection for the three slicers and display it */
 	void UpdateThicknessStuff();
 
 	/** structured points only */
 	void Accumulate3TexturePlayGround();
 
-	/** structured points only */
-	void AccumulateTextures(mafVMESlicer *inputSlicer, double rxThickness , bool showProgressBar = false);
+	/** structured points only: create rx projection for the given slicer normal and set it as slicer texture.	
+	If rxTexture is provided result of the accumulation will be deepcopied to it */
+	void AccumulateTextures(mafVMESlicer *inSlicer, double inRXThickness , vtkImageData *outRXTexture = NULL , bool showProgressBar = false);
 
 	/** Post multiply maf_event matrix to given slicer */
 	void PostMultiplyEventMatrixToSlicer(mafEventBase *maf_event, int slicerAxis);

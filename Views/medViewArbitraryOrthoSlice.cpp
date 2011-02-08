@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2011-02-08 10:59:03 $
-Version:   $Revision: 1.1.2.39 $
+Date:      $Date: 2011-02-08 14:42:34 $
+Version:   $Revision: 1.1.2.40 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -1331,7 +1331,7 @@ void medViewArbitraryOrthoSlice::PostMultiplyEventMatrixToSlicers(mafEventBase *
 			tr->Delete();
 		}
 
-		UpdateCutPlanes();
+		UpdateExportImagesBoundsLineActors();
 
 		if (e->GetArg() == mafInteractorGenericMouse::MOUSE_UP)
 		{
@@ -1371,7 +1371,7 @@ void medViewArbitraryOrthoSlice::PostMultiplyEventMatrixToSlicer(mafEventBase *m
 
 		assert(currentSlicer != NULL);
 
-		// handle incoming transform events
+		// handle incoming transform event...
 		vtkTransform *tr = vtkTransform::New();
 		tr->PostMultiply();
 		tr->SetMatrix(currentSlicer->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
@@ -1384,19 +1384,29 @@ void medViewArbitraryOrthoSlice::PostMultiplyEventMatrixToSlicer(mafEventBase *m
 
 		if (e->GetArg() == mafInteractorGenericMouse::MOUSE_MOVE)
 		{
-			// move vme
+			// ... and update the slicer with the new abs pose
 			currentSlicer->SetAbsMatrix(absPose);
 		} 
 
-
-		UpdateCutPlanes();
+		UpdateExportImagesBoundsLineActors();
 
 		if (e->GetArg() == mafInteractorGenericMouse::MOUSE_UP)
 		{
 			if (m_EnableThickness)
 			{
 				// update thickness stuff on MOUSE_UP only
-				UpdateThicknessStuff();
+				if (slicerAxis == X)
+				{
+					AccumulateTextures(m_SlicerX, m_ThicknessValue, NULL, true);
+				}
+				else if (slicerAxis == Y)
+				{
+					AccumulateTextures(m_SlicerY, m_ThicknessValue, NULL, true);
+				}
+				else if (slicerAxis == Z)
+				{
+					AccumulateTextures(m_SlicerZ, m_ThicknessValue, NULL, true);
+				}
 			}
 		}
 
@@ -1830,7 +1840,7 @@ void medViewArbitraryOrthoSlice::OnReset()
 			UpdateThicknessStuff();
 		}
 
-		UpdateCutPlanes();
+		UpdateExportImagesBoundsLineActors();
 
 		mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 
@@ -3078,7 +3088,7 @@ void medViewArbitraryOrthoSlice::Accumulate3TexturePlayGround()
 
 }
 
-void medViewArbitraryOrthoSlice::AccumulateTextures( mafVMESlicer *inputSlicer, double accumulationThickness , bool showProgressBar /*= false*/ )
+void medViewArbitraryOrthoSlice::AccumulateTextures( mafVMESlicer *inSlicer, double inRXThickness , vtkImageData *outRXTexture /*= NULL */, bool showProgressBar /*= false*/ )
 {	
 	if (showProgressBar)
 	{
@@ -3094,15 +3104,15 @@ void medViewArbitraryOrthoSlice::AccumulateTextures( mafVMESlicer *inputSlicer, 
 
 	int direction = -1;
 
-	if (inputSlicer == m_SlicerX)
+	if (inSlicer == m_SlicerX)
 	{
 		direction = X;
 	}
-	else if (inputSlicer == m_SlicerY)
+	else if (inSlicer == m_SlicerY)
 	{
 		direction = Y;
 	}
-	else if (inputSlicer == m_SlicerZ)
+	else if (inSlicer == m_SlicerZ)
 	{
 		direction = Z;
 	}
@@ -3126,28 +3136,28 @@ void medViewArbitraryOrthoSlice::AccumulateTextures( mafVMESlicer *inputSlicer, 
 	double minSpacing = min(minSpacingXY, minSpacingYZ);
 
 	double profileDistance = minSpacing;
-	int additionalProfileNumber = accumulationThickness / profileDistance + 1;
+	int additionalProfileNumber = inRXThickness / profileDistance + 1;
 	additionalProfileNumber  /= 2;
 
 	std::ostringstream stringStream;
 	stringStream << "additional profiles number: " << additionalProfileNumber << std::endl;          
 	mafLogMessage(stringStream.str().c_str());
 
-	vtkMatrix4x4 *slicerAbsMatrix = inputSlicer->GetAbsMatrixPipe()->GetMatrix().GetVTKMatrix();
+	vtkMatrix4x4 *slicerAbsMatrix = inSlicer->GetAbsMatrixPipe()->GetMatrix().GetVTKMatrix();
 	assert(slicerAbsMatrix);
 
 	// copy the middle image to get original scalars
 	vtkMAFSmartPointer<vtkTransform> originalABSTransform;
 	originalABSTransform->SetMatrix(slicerAbsMatrix);
 
-	mafVMEOutputSurface *outputSurface = mafVMEOutputSurface::SafeDownCast(inputSlicer->GetSurfaceOutput());
+	mafVMEOutputSurface *outputSurface = mafVMEOutputSurface::SafeDownCast(inSlicer->GetSurfaceOutput());
 	assert(outputSurface);
 
 	vtkImageData *texture = outputSurface->GetMaterial()->GetMaterialTexture();
 	assert(texture);
 
-	inputSlicer->GetSurfaceOutput()->GetVTKData()->Modified();
-	inputSlicer->GetSurfaceOutput()->GetVTKData()->Update();
+	inSlicer->GetSurfaceOutput()->GetVTKData()->Modified();
+	inSlicer->GetSurfaceOutput()->GetVTKData()->Update();
 
 	// sum the texture scalars in a new image: built from original default texture
 	vtkMAFSmartPointer<vtkImageData> scalarsAccumulationTargetTexture;
@@ -3209,21 +3219,21 @@ void medViewArbitraryOrthoSlice::AccumulateTextures( mafVMESlicer *inputSlicer, 
 		mafMatrix currentProfileMafMatrix;
 		currentProfileMafMatrix.SetVTKMatrix(currentSliceMatrix->GetMatrix());
 
-		inputSlicer->SetAbsMatrix(currentProfileMafMatrix);
+		inSlicer->SetAbsMatrix(currentProfileMafMatrix);
 
-		inputSlicer->GetSurfaceOutput()->GetVTKData()->Modified();
-		inputSlicer->GetSurfaceOutput()->GetVTKData()->Update();
+		inSlicer->GetSurfaceOutput()->GetVTKData()->Modified();
+		inSlicer->GetSurfaceOutput()->GetVTKData()->Update();
 
 		if (false)
 		{
 			std::ostringstream stringStream;
 			stringStream << "Slicer number: " << profileId  << " matrix" << std::endl;          
-			inputSlicer->GetAbsMatrixPipe()->GetMatrix().GetVTKMatrix()->PrintSelf(stringStream, NULL);
+			inSlicer->GetAbsMatrixPipe()->GetMatrix().GetVTKMatrix()->PrintSelf(stringStream, NULL);
 			mafLogMessage(stringStream.str().c_str());
 		}
 		// get the current slice profile texture
 
-		vtkImageData *currentTexture = inputSlicer->GetSurfaceOutput()->GetMaterial()->GetMaterialTexture();
+		vtkImageData *currentTexture = inSlicer->GetSurfaceOutput()->GetMaterial()->GetMaterialTexture();
 		assert(currentTexture);
 
 		vtkUnsignedShortArray *currentSliceScalars = vtkUnsignedShortArray::SafeDownCast(currentTexture->GetPointData()->GetScalars());
@@ -3257,10 +3267,10 @@ void medViewArbitraryOrthoSlice::AccumulateTextures( mafVMESlicer *inputSlicer, 
 
 
 	// original texture 
-	inputSlicer->SetAbsMatrix(originalABSTransform->GetMatrix());
+	inSlicer->SetAbsMatrix(originalABSTransform->GetMatrix());
 
-	inputSlicer->GetSurfaceOutput()->GetVTKData()->Modified();
-	inputSlicer->GetSurfaceOutput()->GetVTKData()->Update(); 
+	inSlicer->GetSurfaceOutput()->GetVTKData()->Modified();
+	inSlicer->GetSurfaceOutput()->GetVTKData()->Update(); 
 
 	// test set accumulated image to slicer 
 	texture->DeepCopy(scalarsAccumulationTargetTexture);
@@ -3785,7 +3795,7 @@ void medViewArbitraryOrthoSlice::BuildSliceHeightFeedbackLinesVMEs()
 	AddVMEToMSFTree(m_ViewZnSliceYmVME);
 }
 
-void medViewArbitraryOrthoSlice::UpdateCutPlanes()
+void medViewArbitraryOrthoSlice::UpdateExportImagesBoundsLineActors()
 {
 	// prevent cpu time waste :P
 	bool exportingImages = false;
@@ -3870,7 +3880,7 @@ void medViewArbitraryOrthoSlice::OnEventID_ENABLE_EXPORT_IMAGES()
 	else // enable
 	{
 		m_FeedbackLineHeight = m_ExportPlanesHeight;
-		UpdateCutPlanes();
+		UpdateExportImagesBoundsLineActors();
 	}
 	
 	ChildViewsCameraUpdate();
@@ -4066,9 +4076,9 @@ void medViewArbitraryOrthoSlice::OnEventID_ENABLE_THICKNESS()
 void medViewArbitraryOrthoSlice::UpdateThicknessStuff()
 {
 	wxBusyInfo wait_info("please wait");
-	AccumulateTextures(m_SlicerX, m_ThicknessValue, true);
-	AccumulateTextures(m_SlicerY, m_ThicknessValue,  true);
-	AccumulateTextures(m_SlicerZ, m_ThicknessValue, true);
+	AccumulateTextures(m_SlicerX, m_ThicknessValue, NULL, true);
+	AccumulateTextures(m_SlicerY, m_ThicknessValue, NULL, true);
+	AccumulateTextures(m_SlicerZ, m_ThicknessValue, NULL, true);
 }
 
 
@@ -4087,7 +4097,7 @@ void medViewArbitraryOrthoSlice::UpdateSlicers()
 
 void medViewArbitraryOrthoSlice::OnEventID_THICKNESS_VALUE_CHANGED()
 {
-	UpdateCutPlanes();
+	UpdateExportImagesBoundsLineActors();
 	UpdateThicknessStuff();
 	ChildViewsCameraUpdate();
 }
@@ -4112,7 +4122,7 @@ void medViewArbitraryOrthoSlice::EnableThickness(bool enable)
 void medViewArbitraryOrthoSlice::OnEventID_EXPORT_PLANES_HEIGHT()
 {
 	m_FeedbackLineHeight = m_ExportPlanesHeight;
-	UpdateCutPlanes();
+	UpdateExportImagesBoundsLineActors();
 	ChildViewsCameraUpdate();
 }
 
