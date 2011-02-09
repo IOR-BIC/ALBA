@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoCrossTranslate.h,v $
   Language:  C++
-  Date:      $Date: 2011-01-08 17:06:37 $
-  Version:   $Revision: 1.1.2.8 $
+  Date:      $Date: 2011-02-09 15:06:37 $
+  Version:   $Revision: 1.1.2.9 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -89,7 +89,7 @@ public:
   void Show(bool show);
 
   /**
-  Set/Get the gizmo pose*/
+  Set/Get the gizmo pose: works by setting the pose to all gizmo subcomponents */
   void SetAbsPose(mafMatrix *absPose, mafTimeStamp ts = -1);
   mafMatrix *GetAbsPose();
   

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoCrossTranslatePlane.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-02-02 17:33:55 $
-  Version:   $Revision: 1.1.2.8 $
+  Date:      $Date: 2011-02-09 15:06:37 $
+  Version:   $Revision: 1.1.2.9 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -100,7 +100,7 @@ medGizmoCrossTranslatePlane::medGizmoCrossTranslatePlane(mafVME *input, mafObser
   m_ActivePlane = X_NORMAL;
   
   // TODO REFACTOR THIS: Isa Generic API cleanup 
-  // pivot transform stuff in isa generic probably could be deleted.
+  // pivot transform stuff in isa generic probably could be deleted with a minor refactor
   // 
 
   //-----------------
@@ -465,6 +465,7 @@ void medGizmoCrossTranslatePlane::SetColor(int part, double col[3])
 
   if (part == S0 || part == S1)
   {
+	  // TODO: add api to set single translation gizmos axis colors    
       m_Gizmo[part]->GetMaterial()->m_Prop->SetColor(col);
 	  m_Gizmo[part]->GetMaterial()->m_Prop->SetAmbient(0);
 	  m_Gizmo[part]->GetMaterial()->m_Prop->SetDiffuse(1);

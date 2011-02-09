@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2011-02-09 09:42:48 $
-Version:   $Revision: 1.1.2.42 $
+Date:      $Date: 2011-02-09 15:06:54 $
+Version:   $Revision: 1.1.2.43 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -3391,6 +3391,12 @@ void medViewArbitraryOrthoSlice::ShowZCutPlanes( bool show )
 	m_ChildViewList[X_VIEW]->VmeShow(m_ViewXnSliceZmVME, show);
 	m_ChildViewList[Y_VIEW]->VmeShow(m_ViewYnSliceZpVME, show);
 	m_ChildViewList[Y_VIEW]->VmeShow(m_ViewYnSliceZmVME, show);
+	
+	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_ViewXnSliceZpVME, show);
+	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_ViewXnSliceZmVME, show);
+	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_ViewYnSliceZpVME, show);
+	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_ViewYnSliceZmVME, show);
+
 
 	mafPipeSurface *pipe = NULL;
 
@@ -3405,6 +3411,19 @@ void medViewArbitraryOrthoSlice::ShowZCutPlanes( bool show )
 
 	pipe = GetPipe(Y_VIEW, m_ViewYnSliceZmVME);
 	if (pipe) pipe->SetActorPicking(false);
+
+	pipe = GetPipe(PERSPECTIVE_VIEW, m_ViewXnSliceZpVME);
+	if (pipe) pipe->SetActorPicking(false);
+
+	pipe = GetPipe(PERSPECTIVE_VIEW, m_ViewXnSliceZmVME);
+	if (pipe) pipe->SetActorPicking(false);
+
+	pipe = GetPipe(PERSPECTIVE_VIEW, m_ViewYnSliceZpVME);
+	if (pipe) pipe->SetActorPicking(false);
+
+	pipe = GetPipe(PERSPECTIVE_VIEW, m_ViewYnSliceZmVME);
+	if (pipe) pipe->SetActorPicking(false);
+
 
 }
 
@@ -3445,6 +3464,11 @@ void medViewArbitraryOrthoSlice::ShowXCutPlanes( bool show )
 	m_ChildViewList[Z_VIEW]->VmeShow(m_ViewZnSliceXpVME, show);
 	m_ChildViewList[Z_VIEW]->VmeShow(m_ViewZnSliceXmVME, show);
 
+	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_ViewYnSliceXpVME, show);
+	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_ViewYnSliceXmVME, show);
+	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_ViewZnSliceXpVME, show);
+	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_ViewZnSliceXmVME, show);
+
 	mafPipeSurface *pipe = NULL;
 
 	pipe = GetPipe(Y_VIEW, m_ViewYnSliceXpVME);
@@ -3458,6 +3482,19 @@ void medViewArbitraryOrthoSlice::ShowXCutPlanes( bool show )
 
 	pipe = GetPipe(Z_VIEW, m_ViewZnSliceXmVME);
 	if (pipe) pipe->SetActorPicking(false);
+
+	pipe = GetPipe(PERSPECTIVE_VIEW, m_ViewYnSliceXpVME);
+	if (pipe) pipe->SetActorPicking(false);
+
+	pipe = GetPipe(PERSPECTIVE_VIEW, m_ViewYnSliceXmVME);
+	if (pipe) pipe->SetActorPicking(false);
+
+	pipe = GetPipe(PERSPECTIVE_VIEW, m_ViewZnSliceXpVME);
+	if (pipe) pipe->SetActorPicking(false);
+
+	pipe = GetPipe(PERSPECTIVE_VIEW, m_ViewZnSliceXmVME);
+	if (pipe) pipe->SetActorPicking(false);
+
 
 }
 
@@ -3496,6 +3533,11 @@ void medViewArbitraryOrthoSlice::ShowYCutPlanes( bool show )
 	m_ChildViewList[Z_VIEW]->VmeShow(m_ViewZnSliceYpVME, show);
 	m_ChildViewList[Z_VIEW]->VmeShow(m_ViewZnSliceYmVME, show);
 
+	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_ViewXnSliceYpVME, show);
+	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_ViewXnSliceYmVME, show);
+	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_ViewZnSliceYpVME, show);
+	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_ViewZnSliceYmVME, show);
+
 	mafPipeSurface *pipe = NULL;
 
 	pipe = GetPipe(X_VIEW, m_ViewXnSliceYpVME);
@@ -3509,6 +3551,19 @@ void medViewArbitraryOrthoSlice::ShowYCutPlanes( bool show )
 
 	pipe = GetPipe(Z_VIEW, m_ViewZnSliceYmVME);
 	if (pipe) pipe->SetActorPicking(false);
+
+	pipe = GetPipe(PERSPECTIVE_VIEW, m_ViewXnSliceYpVME);
+	if (pipe) pipe->SetActorPicking(false);
+
+	pipe = GetPipe(PERSPECTIVE_VIEW, m_ViewXnSliceYmVME);
+	if (pipe) pipe->SetActorPicking(false);
+
+	pipe = GetPipe(PERSPECTIVE_VIEW, m_ViewZnSliceYpVME);
+	if (pipe) pipe->SetActorPicking(false);
+
+	pipe = GetPipe(PERSPECTIVE_VIEW, m_ViewZnSliceYmVME);
+	if (pipe) pipe->SetActorPicking(false);
+
 }
 
 void medViewArbitraryOrthoSlice::BuildSliceHeightFeedbackLinesVMEs()
