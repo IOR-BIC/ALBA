@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.h,v $
 Language:  C++
-Date:      $Date: 2011-02-08 14:42:34 $
-Version:   $Revision: 1.1.2.23 $
+Date:      $Date: 2011-02-09 09:42:48 $
+Version:   $Revision: 1.1.2.24 $
 Authors:   Stefano Perticoni	
 ==========================================================================
 Copyright (c) 2002/2004
@@ -263,10 +263,6 @@ protected:
     void UpdateYnViewZPlanes();
 	void UpdateZView2DActors();
 
-	void UpdateCameraXViewOnEventGizmoCrossRotateZNormal( mafEvent * event );
-	void UpdateCameraYViewOnEventGizmoCrossRotateZNormal( mafEvent * event );
-	void UpdateCameraZViewOnEventGizmoCrossRotateZNormal( mafEvent * event );
-
 	/**	This function is called when a translate gizmo is moved*/
 	void OnEventGizmoCrossTranslateZNormalView(mafEventBase *maf_event);
 
@@ -274,9 +270,6 @@ protected:
 	
 	/** Recalculate the RX projection for the three slicers and display it */
 	void UpdateThicknessStuff();
-
-	/** structured points only */
-	void Accumulate3TexturePlayGround();
 
 	/** structured points only: create rx projection for the given slicer normal and set it as slicer texture.	
 	If rxTexture is provided result of the accumulation will be deepcopied to it */
