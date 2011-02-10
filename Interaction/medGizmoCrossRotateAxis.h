@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoCrossRotateAxis.h,v $
   Language:  C++
-  Date:      $Date: 2011-01-08 17:06:37 $
-  Version:   $Revision: 1.1.2.4 $
+  Date:      $Date: 2011-02-10 14:35:33 $
+  Version:   $Revision: 1.1.2.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -85,11 +85,28 @@ public:
   enum AXIS {X = 0, Y, Z};
   
   /** Set/Get the gizmo axis, default axis is X*/        
-  void SetAxis(int axis); 
+  void SetRotationAxis(int axis); 
   
   /** Get the gizmo axis*/
   int  GetAxis(); 
+
+  enum GIZMO_DIRECTION {EW = 0, NS = 1 };
+
   
+  /** Set the gizmo visual representation: NS vs EW
+  
+    N
+    |
+    x      E---x---W
+	|
+	S
+
+	x is the normal axis ie the gizmo is constraining rotation around it. Default is NS
+  
+  */
+  void SetGizmoDirection(int direction);
+  int GetGizmoDirection() {return m_GizmoDirection;};
+
   //----------------------------------------------------------------------------
   // highlight and show 
   //----------------------------------------------------------------------------
@@ -128,7 +145,14 @@ public:
   Get the gizmo interactor*/
   mafInteractorGenericInterface *GetInteractor();
 
+  /** Gizmo color setting facilities for gizmo segments;*/
+  void SetColor(double col[3]);
+  void SetColor(double colR, double colG, double colB);
+
 protected:
+
+  double m_Color[3];
+  double m_LastColor[3];
 
   /**
   Set the reference system matrix and the Pivot ref sys matrix.
@@ -157,8 +181,11 @@ protected:
 
   enum GIZMO_STATUS {SELECTED = 0, NOT_SELECTED};
   
+
+  int m_GizmoDirection;
+
   /** Register the gizmo axis */
-  int m_ActiveAxis;
+  int m_RotationAxis;
   
   /** Create the circle polydata*/
   vtkLineSource *m_LineSourceEast;
@@ -191,10 +218,6 @@ protected:
 
   /** isa generic*/
   mafInteractorGenericMouse *m_IsaGen;
-
-  /** Gizmo color setting facilities for gizmo segments;*/
-  void SetColor(double col[3]);
-  void SetColor(double colR, double colG, double colB);
   
   /**
   Register the event receiver object*/

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoCrossRotate.h,v $
   Language:  C++
-  Date:      $Date: 2010-12-07 10:45:06 $
-  Version:   $Revision: 1.1.2.5 $
+  Date:      $Date: 2011-02-10 14:35:33 $
+  Version:   $Revision: 1.1.2.6 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -106,6 +106,9 @@ public:
   void SetCircleFanRadius(double radius);
   double GetCircleFanRadius();
 
+  medGizmoCrossRotateAxis * GetGizmoCrossRotateAxisNS() { return m_GizmoCrossRotateAxisNS; }
+  medGizmoCrossRotateAxis * GetGizmoCrossRotateAxisEW() { return m_GizmoCrossRotateAxisEW; }
+  
 protected:
   mafGUIGizmoRotate *m_GuiGizmoRotate;
 
@@ -129,7 +132,8 @@ protected:
   void Highlight(bool highlight); 
   
   /** Array holding the three gizmo that performs rotation*/  
-  medGizmoCrossRotateAxis *m_GizmoCrossRotateAxis;
+  medGizmoCrossRotateAxis *m_GizmoCrossRotateAxisNS;
+  medGizmoCrossRotateAxis *m_GizmoCrossRotateAxisEW;
 
   /** The rotating fan gizmo*/
   medGizmoCrossRotateFan *m_GizmoCrossRotateFan;

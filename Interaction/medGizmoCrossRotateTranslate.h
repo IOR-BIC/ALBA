@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGizmoCrossRotateTranslate.h,v $
 Language:  C++
-Date:      $Date: 2010-12-14 17:24:37 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2011-02-10 14:35:33 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -55,6 +55,11 @@ public:
 
 	enum NORMAL {X = 0, Y = 1, Z = 2};
 
+	
+	enum COMPONENT {GREW = 0, GTAEW, GTPEW, GRNS , GTANS , GTPNS };
+	enum COLOR {RED = 0, GREEN , BLUE };
+	void SetColor(int component, int color);
+
 	void Create(mafVME *input, mafObserver* listener = NULL, bool BuildGUI = true, int normal = X);
 	void SetInput(mafVME *vme);
 
@@ -87,4 +92,6 @@ public:
 
 	mafObserver *m_Listener;
 };
+
+
 #endif

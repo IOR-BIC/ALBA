@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGizmoCrossTranslate.cpp,v $
 Language:  C++
-Date:      $Date: 2011-02-02 17:33:55 $
-Version:   $Revision: 1.1.2.7 $
+Date:      $Date: 2011-02-10 14:35:33 $
+Version:   $Revision: 1.1.2.8 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -91,9 +91,7 @@ medGizmoCrossTranslate::medGizmoCrossTranslate(mafVME* input, mafObserver *liste
   // Create mafGTranslateAPlane 
   m_GTPlane = new medGizmoCrossTranslatePlane(input, this);
   m_GTPlane->SetPlane(plane);
-  m_GTPlane->SetColor(medGizmoCrossTranslatePlane::S0, 0,1,0 );
-  m_GTPlane->SetColor(medGizmoCrossTranslatePlane::S1, 0,1,0 );
-
+  
   if (m_BuildGUI)
   {
     // create the gizmo gui

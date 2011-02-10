@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoCrossTranslatePlane.h,v $
   Language:  C++
-  Date:      $Date: 2011-02-02 17:33:55 $
-  Version:   $Revision: 1.1.2.4 $
+  Date:      $Date: 2011-02-10 14:35:33 $
+  Version:   $Revision: 1.1.2.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -160,8 +160,8 @@ protected:
   void   SetSizeLength(double length);
   double GetSizeLength() {return m_Length;};
 
-  double m_Color[3];
-  double m_LastColor[3];
+  double m_Color[3][2];
+  double m_LastColor[3][2];
 
   /** Segments gizmo */
   mafVMEGizmo *m_Gizmo[3];

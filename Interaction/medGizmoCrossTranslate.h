@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoCrossTranslate.h,v $
   Language:  C++
-  Date:      $Date: 2011-02-09 15:06:37 $
-  Version:   $Revision: 1.1.2.9 $
+  Date:      $Date: 2011-02-10 14:35:33 $
+  Version:   $Revision: 1.1.2.10 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -113,6 +113,10 @@ public:
   void SetStep(double step);
   int GetStep();
 
+  medGizmoCrossTranslateAxis * GetGTUpDown() { return m_GTUpDown; }
+  medGizmoCrossTranslateAxis * GetGTLeftRight() { return m_GTLeftRight; }
+  medGizmoCrossTranslatePlane * GetGTPlane() const{ return m_GTPlane; }
+
 protected:
 
   /** Normal to the cross gizmo */
@@ -165,12 +169,11 @@ protected:
   void Highlight(int component); 
   
   /** Array holding the three gizmo that performs translation on a vector*/  
-  medGizmoCrossTranslateAxis *m_GTUpDown;
+  medGizmoCrossTranslateAxis *m_GTUpDown;  
   medGizmoCrossTranslateAxis *m_GTLeftRight;
-
   /** Array holding the three gizmo that performs translation on a plane*/  
   medGizmoCrossTranslatePlane *m_GTPlane;
-
+  
   /** 
   Register the active gizmo component at MOUSE_DOWN*/
   int m_ActiveGizmoComponent;

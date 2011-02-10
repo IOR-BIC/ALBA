@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGizmoCrossTranslateAxis.cpp,v $
 Language:  C++
-Date:      $Date: 2011-02-03 13:45:01 $
-Version:   $Revision: 1.1.2.9 $
+Date:      $Date: 2011-02-10 14:35:33 $
+Version:   $Revision: 1.1.2.10 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -85,9 +85,9 @@ medGizmoCrossTranslateAxis::medGizmoCrossTranslateAxis(mafVME *input, mafObserve
 	m_FeedbackStuffAppendPolydata = NULL;
 
 	// default last color is red
-	m_LastColor[0] = 1;
-	m_LastColor[1] = 0;
-	m_LastColor[2] = 0;
+	m_LastColor[0] = -1;
+	m_LastColor[1] = -1;
+	m_LastColor[2] = -1;
 
 	m_CylinderLength = 0.5;
 
@@ -121,9 +121,6 @@ medGizmoCrossTranslateAxis::medGizmoCrossTranslateAxis(mafVME *input, mafObserve
 
 	// default gizmo abs pose is the input vme one
 	SetAbsPose(m_InputVme->GetOutput()->GetAbsMatrix());
-
-	// set come gizmo material property and initial color to red
-	this->SetColor(m_LastColor);
 
 	// ReparentTo will add the gizmos to the tree
 	// and increse reference count
@@ -333,9 +330,6 @@ void medGizmoCrossTranslateAxis::SetAxis(int axis)
 		// reset cyl and cone rotation
 		m_RightCylinderRotationTr->Identity();
 
-		// set cyl and cone color to red
-		this->SetColor(m_LastColor);
-
 		// change the axis constrain
 		m_IsaGen->GetTranslationConstraint()->SetConstraintModality(mafInteractorConstraint::LOCK, mafInteractorConstraint::FREE, mafInteractorConstraint::LOCK);
 	}
@@ -347,9 +341,6 @@ void medGizmoCrossTranslateAxis::SetAxis(int axis)
 
 		m_LeftCylinderRotationTr->Identity();
 		m_LeftCylinderRotationTr->RotateZ(90);
-
-		// set cyl and cone color to green
-		this->SetColor(m_LastColor);
 
 		m_LeftFeedbackCylinderTransform->RotateZ(90);
 		m_RightFeedbackCylinderTransform->RotateZ(90);
@@ -370,9 +361,6 @@ void medGizmoCrossTranslateAxis::SetAxis(int axis)
 
 		m_LeftCylinderRotationTr->Identity();
 		m_LeftCylinderRotationTr->RotateY(-90);
-
-		// set cyl and cone color to blue
-		this->SetColor(m_LastColor);
 
 		// change the axis constrain
 		m_IsaGen->GetTranslationConstraint()->SetConstraintModality(mafInteractorConstraint::LOCK, mafInteractorConstraint::LOCK, mafInteractorConstraint::FREE);
@@ -424,6 +412,13 @@ void medGizmoCrossTranslateAxis::SetColor(double col[3])
 	m_Color[0] = col[0];
 	m_Color[1] = col[1];
 	m_Color[2] = col[2];
+
+	if (m_LastColor[0] == -1)
+	{
+		m_LastColor[0] = m_Color[0];
+		m_LastColor[1] = m_Color[1];
+		m_LastColor[2] = m_Color[2];
+	}
 
 	m_TranslationCylinderGizmo->GetMaterial()->m_Prop->SetColor(col);
 	m_TranslationCylinderGizmo->GetMaterial()->m_Prop->SetAmbient(0);
@@ -599,8 +594,6 @@ void medGizmoCrossTranslateAxis::CreateFeedbackGizmoPipeline()
 	m_TranslationFeedbackGizmo->SetData(m_FeedbackStuffAppendPolydata->GetOutput());
 	//  m_TranslationFeedbackGizmo->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 1));
 	assert(m_InputVme);
-
-	this->SetColor(m_LastColor);
 
 	m_TranslationFeedbackGizmo->GetMaterial()->m_Prop->SetColor(1,1,0);
 	m_TranslationFeedbackGizmo->GetMaterial()->m_Prop->SetAmbient(0);

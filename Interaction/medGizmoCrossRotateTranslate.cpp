@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGizmoCrossRotateTranslate.cpp,v $
 Language:  C++
-Date:      $Date: 2011-02-04 10:51:36 $
-Version:   $Revision: 1.1.2.6 $
+Date:      $Date: 2011-02-10 14:35:33 $
+Version:   $Revision: 1.1.2.7 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -27,6 +27,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafEvent.h"
 #include "mafVMESlicer.h"
 #include "mafVMEVolumeGray.h"
+
+#include "medGizmoCrossRotateAxis.h"
+#include "medGizmoCrossTranslateAxis.h"
+#include "medGizmoCrossTranslatePlane.h"
 
 medGizmoCrossRotateTranslate::medGizmoCrossRotateTranslate()
 {
@@ -53,7 +57,6 @@ void medGizmoCrossRotateTranslate::Create(mafVME *input, mafObserver* listener, 
 
 	slicedVolume = mafVMEVolumeGray::SafeDownCast(slicer->GetSlicedVMELink());
 	assert(slicedVolume);
-
 	
 	m_GizmoCrossTranslate = new medGizmoCrossTranslate(input, this, BuildGUI, normal);
 	m_GizmoCrossRotate = new medGizmoCrossRotate(input, this, BuildGUI, normal);
@@ -153,4 +156,47 @@ void medGizmoCrossRotateTranslate::SetRenderWindowHeightPercentage(double percen
 
 	m_GizmoCrossRotate->SetRenderWindowHeightPercentage(percentage);
 	m_GizmoCrossTranslate->SetRenderWindowHeightPercentage(percentage);
+}
+
+void medGizmoCrossRotateTranslate::SetColor(int component, int color)
+{
+	double colorToSet[3] = {0,0,0};
+
+	if (color == RED)
+	{
+		colorToSet[0] = 1.0;
+	}
+	else if (color == GREEN)
+	{
+		colorToSet[1] = 1.0;
+	}
+	else if (color == BLUE)
+	{
+		colorToSet[2] = 1.0;
+	}
+	
+	if (component == GREW)
+	{
+		m_GizmoCrossRotate->GetGizmoCrossRotateAxisEW()->SetColor(colorToSet);	
+	}
+	else if (component == GTAEW)
+	{
+		m_GizmoCrossTranslate->GetGTUpDown()->SetColor(colorToSet);
+	}
+	else if (component == GTPEW)
+	{
+		m_GizmoCrossTranslate->GetGTPlane()->SetColor(medGizmoCrossTranslatePlane::S0, colorToSet);
+	}
+	else if (component == GRNS)
+	{
+		m_GizmoCrossRotate->GetGizmoCrossRotateAxisNS()->SetColor(colorToSet);	
+	}
+	else if (component == GTANS)
+	{
+	    m_GizmoCrossTranslate->GetGTLeftRight()->SetColor(colorToSet);
+	}
+	else if (component == GTPNS)
+	{
+		m_GizmoCrossTranslate->GetGTPlane()->SetColor(medGizmoCrossTranslatePlane::S1,colorToSet);
+	}
 }

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2011-02-09 15:06:54 $
-Version:   $Revision: 1.1.2.43 $
+Date:      $Date: 2011-02-10 14:35:59 $
+Version:   $Revision: 1.1.2.44 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -2101,6 +2101,14 @@ void medViewArbitraryOrthoSlice::ShowSlicers( mafVME * vmeVolume, bool show )
 	m_GizmoZView->SetInput(m_SlicerZ);
 	m_GizmoZView->SetRefSys(m_SlicerZ);
 	m_GizmoZView->SetAbsPose(m_SlicerZResetMatrix);
+	
+	m_GizmoZView->SetColor(medGizmoCrossRotateTranslate::GREW, medGizmoCrossRotateTranslate::GREEN);
+	m_GizmoZView->SetColor(medGizmoCrossRotateTranslate::GTAEW, medGizmoCrossRotateTranslate::GREEN);
+	m_GizmoZView->SetColor(medGizmoCrossRotateTranslate::GTPEW, medGizmoCrossRotateTranslate::GREEN);
+	m_GizmoZView->SetColor(medGizmoCrossRotateTranslate::GRNS, medGizmoCrossRotateTranslate::RED);
+	m_GizmoZView->SetColor(medGizmoCrossRotateTranslate::GTANS, medGizmoCrossRotateTranslate::RED);
+	m_GizmoZView->SetColor(medGizmoCrossRotateTranslate::GTPNS, medGizmoCrossRotateTranslate::RED);
+
 	m_GizmoZView->Show(true);
 
 	m_GizmoYView = new medGizmoCrossRotateTranslate();
@@ -2109,6 +2117,14 @@ void medViewArbitraryOrthoSlice::ShowSlicers( mafVME * vmeVolume, bool show )
 	m_GizmoYView->SetInput(m_SlicerY);
 	m_GizmoYView->SetRefSys(m_SlicerY);
 	m_GizmoYView->SetAbsPose(m_SlicerYResetMatrix);
+
+	m_GizmoYView->SetColor(medGizmoCrossRotateTranslate::GREW, medGizmoCrossRotateTranslate::BLUE);
+	m_GizmoYView->SetColor(medGizmoCrossRotateTranslate::GTAEW, medGizmoCrossRotateTranslate::BLUE);
+	m_GizmoYView->SetColor(medGizmoCrossRotateTranslate::GTPEW, medGizmoCrossRotateTranslate::BLUE);
+	m_GizmoYView->SetColor(medGizmoCrossRotateTranslate::GRNS, medGizmoCrossRotateTranslate::RED);
+	m_GizmoYView->SetColor(medGizmoCrossRotateTranslate::GTANS, medGizmoCrossRotateTranslate::RED);
+	m_GizmoYView->SetColor(medGizmoCrossRotateTranslate::GTPNS, medGizmoCrossRotateTranslate::RED);
+
 	m_GizmoYView->Show(true);
 
 	m_GizmoXView = new medGizmoCrossRotateTranslate();
@@ -2117,6 +2133,14 @@ void medViewArbitraryOrthoSlice::ShowSlicers( mafVME * vmeVolume, bool show )
 	m_GizmoXView->SetInput(m_SlicerX);
 	m_GizmoXView->SetRefSys(m_SlicerX);
 	m_GizmoXView->SetAbsPose(m_SlicerXResetMatrix);
+
+	m_GizmoXView->SetColor(medGizmoCrossRotateTranslate::GREW, medGizmoCrossRotateTranslate::GREEN);
+	m_GizmoXView->SetColor(medGizmoCrossRotateTranslate::GTAEW, medGizmoCrossRotateTranslate::GREEN);
+	m_GizmoXView->SetColor(medGizmoCrossRotateTranslate::GTPEW, medGizmoCrossRotateTranslate::GREEN);
+	m_GizmoXView->SetColor(medGizmoCrossRotateTranslate::GRNS, medGizmoCrossRotateTranslate::BLUE);
+	m_GizmoXView->SetColor(medGizmoCrossRotateTranslate::GTANS, medGizmoCrossRotateTranslate::BLUE);
+	m_GizmoXView->SetColor(medGizmoCrossRotateTranslate::GTPNS, medGizmoCrossRotateTranslate::BLUE);
+
 	m_GizmoXView->Show(true);
 
 	//Create the Gizmos' Gui
@@ -2240,16 +2264,16 @@ void medViewArbitraryOrthoSlice::BuildXCameraConeVME()
 
 
 	// DEBUG
-	//m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_XCameraConeVME, true);
-	m_ChildViewList[Y_VIEW]->VmeShow(m_XCameraConeVME, true);
-	m_ChildViewList[Z_VIEW]->VmeShow(m_XCameraConeVME, true);
+	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_XCameraConeVME, true);
+	//m_ChildViewList[Y_VIEW]->VmeShow(m_XCameraConeVME, true);
+	//m_ChildViewList[Z_VIEW]->VmeShow(m_XCameraConeVME, true);
 	//m_ChildViewList[Z_VIEW]->VmeShow(m_ConeVME, true);
 
-	mafPipeSurface *pipeY=(mafPipeSurface *)(m_ChildViewList[Y_VIEW])->GetNodePipe(m_XCameraConeVME);
+	mafPipeSurface *pipeY=(mafPipeSurface *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_XCameraConeVME);
 	pipeY->SetActorPicking(false);
 
-	mafPipeSurface *pipeZ=(mafPipeSurface *)(m_ChildViewList[Z_VIEW])->GetNodePipe(m_XCameraConeVME);
-	pipeZ->SetActorPicking(false);
+	//mafPipeSurface *pipeZ=(mafPipeSurface *)(m_ChildViewList[Z_VIEW])->GetNodePipe(m_XCameraConeVME);
+	//pipeZ->SetActorPicking(false);
 
 	XCameraConeSource->Delete();
 }
@@ -2310,16 +2334,16 @@ void medViewArbitraryOrthoSlice::BuildYCameraConeVME()
 	m_YCameraConeVME->ReparentTo(m_SlicerY);
 
 	// DEBUG
-	//m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_YCameraConeVME, true);
-	m_ChildViewList[X_VIEW]->VmeShow(m_YCameraConeVME, true);
+	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_YCameraConeVME, true);
+	//m_ChildViewList[X_VIEW]->VmeShow(m_YCameraConeVME, true);
 	//m_ChildViewList[Y_VIEW]->VmeShow(m_YCameraConeVME, true);
-	m_ChildViewList[Z_VIEW]->VmeShow(m_YCameraConeVME, true);
+	//m_ChildViewList[Z_VIEW]->VmeShow(m_YCameraConeVME, true);
 
-	mafPipeSurface *pipeX=(mafPipeSurface *)(m_ChildViewList[X_VIEW])->GetNodePipe(m_YCameraConeVME);
+	mafPipeSurface *pipeX=(mafPipeSurface *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_YCameraConeVME);
 	pipeX->SetActorPicking(false);
 
-	mafPipeSurface *pipeZ=(mafPipeSurface *)(m_ChildViewList[Z_VIEW])->GetNodePipe(m_YCameraConeVME);
-	pipeZ->SetActorPicking(false);
+	//mafPipeSurface *pipeZ=(mafPipeSurface *)(m_ChildViewList[Z_VIEW])->GetNodePipe(m_YCameraConeVME);
+	//pipeZ->SetActorPicking(false);
 
 	YCameraConeSource->Delete();
 }
@@ -2370,16 +2394,16 @@ void medViewArbitraryOrthoSlice::BuildZCameraConeVME()
 	m_ZCameraConeVME->ReparentTo(m_SlicerZ);
 
 	// DEBUG
-	//m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_ZCameraConeVME, true);
-	m_ChildViewList[X_VIEW]->VmeShow(m_ZCameraConeVME, true);
+	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_ZCameraConeVME, true);
+	//m_ChildViewList[X_VIEW]->VmeShow(m_ZCameraConeVME, true);
 	//m_ChildViewList[Y_VIEW]->VmeShow(m_ZCameraConeVME, true);
-	m_ChildViewList[Y_VIEW]->VmeShow(m_ZCameraConeVME, true);
+	//m_ChildViewList[Y_VIEW]->VmeShow(m_ZCameraConeVME, true);
 
-	mafPipeSurface *pipeX=(mafPipeSurface *)(m_ChildViewList[X_VIEW])->GetNodePipe(m_ZCameraConeVME);
+	mafPipeSurface *pipeX=(mafPipeSurface *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_ZCameraConeVME);
 	pipeX->SetActorPicking(false);
 
-	mafPipeSurface *pipeY=(mafPipeSurface *)(m_ChildViewList[Y_VIEW])->GetNodePipe(m_ZCameraConeVME);
-	pipeY->SetActorPicking(false);
+// 	mafPipeSurface *pipeY=(mafPipeSurface *)(m_ChildViewList[Y_VIEW])->GetNodePipe(m_ZCameraConeVME);
+// 	pipeY->SetActorPicking(false);
 
 	ZCameraConeSource->Delete();
 	CameraReset();
