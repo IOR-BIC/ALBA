@@ -79,6 +79,9 @@ SET(PROJECT_SRCS
   medOpComputeWrapping.h
   medOpComputeWrapping.cpp  
   
+  medOpComputeInertialTensor.h
+  medOpComputeInertialTensor.cpp  
+  
   medOpExporterWrappedMeter.cpp
   medOpExporterWrappedMeter.h
 
