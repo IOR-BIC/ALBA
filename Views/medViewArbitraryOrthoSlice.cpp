@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2011-02-11 13:01:35 $
-Version:   $Revision: 1.1.2.45 $
+Date:      $Date: 2011-02-11 14:36:51 $
+Version:   $Revision: 1.1.2.46 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -1571,6 +1571,8 @@ void medViewArbitraryOrthoSlice::VolumeWindowing(mafVME *volume)
 
 void medViewArbitraryOrthoSlice::ShowMafVMEVolume( mafVME * vme, bool show )
 {
+  wxBusyInfo wait("please wait");
+
 	Update2DActors();
 
 	mafViewVTK *xView = ((mafViewVTK *)(m_ChildViewList[X_VIEW])) ;
