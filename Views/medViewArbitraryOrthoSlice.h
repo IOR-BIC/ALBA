@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.h,v $
 Language:  C++
-Date:      $Date: 2011-02-09 09:42:48 $
-Version:   $Revision: 1.1.2.24 $
+Date:      $Date: 2011-02-11 13:01:35 $
+Version:   $Revision: 1.1.2.25 $
 Authors:   Stefano Perticoni	
 ==========================================================================
 Copyright (c) 2002/2004
@@ -330,6 +330,9 @@ protected:
 
   void OnEventID_THICKNESS_VALUE_CHANGED();
   void OnEventID_EXPORT_PLANES_HEIGHT();
+ 
+  void CreateViewCameraNormalFeedbackActor(double col[3], int view);
+  void DestroyViewCameraNormalFeedbackActor(int view);
   
   mafViewVTK *m_ViewSliceX;
 	mafViewVTK *m_ViewSliceY;

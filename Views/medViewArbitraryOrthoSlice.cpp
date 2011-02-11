@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2011-02-10 14:35:59 $
-Version:   $Revision: 1.1.2.44 $
+Date:      $Date: 2011-02-11 13:01:35 $
+Version:   $Revision: 1.1.2.45 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -89,6 +89,11 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafRWIBase.h"
 #include "vtkPNGWriter.h"
 #include "wx\busyinfo.h"
+#include "vtkPlaneSource.h"
+#include "vtkPolyDataMapper2D.h"
+#include "vtkProperty2D.h"
+#include "vtkOutlineFilter.h"
+#include "vtkSphereSource.h"
 
 mafCxxTypeMacro(medViewArbitraryOrthoSlice);
 
@@ -2162,12 +2167,6 @@ void medViewArbitraryOrthoSlice::ShowSlicers( mafVME * vmeVolume, bool show )
 
 	BuildSliceHeightFeedbackLinesVMEs();
 
-	//   mafNEW(m_ViewZnSliceYpVME);
-	//   AddVMEToMSFTree(m_ViewYnSliceXpVME);
-	// 
-	//   mafNEW(m_ViewYnSliceXmVME);
-	//   AddVMEToMSFTree(m_ViewYnSliceXmVME);
-
 	UpdateXnViewZPlanes();
 	UpdateYnViewZPlanes();
 
@@ -2185,34 +2184,18 @@ void medViewArbitraryOrthoSlice::ShowSlicers( mafVME * vmeVolume, bool show )
 	// out: slicer abs matrix for volume cut
 	vtkMatrix4x4 *outputMatrix = vtkMatrix4x4::New();
 
-	//   // build Xn view images export gizmos
-	//   BuildSlicingPlane(m_ViewXnSliceYpVME, 
-	//     FROM_Y, X_VIEW,  20, targetSlicer, outputMatrix);
-	// 
-	//   BuildSlicingPlane(m_ViewXnSliceYmVME, 
-	//     FROM_Y, X_VIEW,  -20, targetSlicer, outputMatrix);
-
-	//   BuildSlicingPlane(m_ViewXnSliceZpVME, 
-	//     FROM_Z, X_VIEW,  m_ZCutHeight, targetSlicer, outputMatrix);
-	// 
-	//   BuildSlicingPlane(m_ViewXnSliceZmVME, 
-	//     FROM_Z, X_VIEW,  -m_ZCutHeight, targetSlicer, outputMatrix);
-	// 
-	// 
-	//   // build Yn view images export gizmos
-	//   BuildSlicingPlane(m_ViewYnSliceZpVME, 
-	//     FROM_Z, Y_VIEW,  20, targetSlicer, outputMatrix);
-	// 
-	//   BuildSlicingPlane(m_ViewYnSliceZmVME, 
-	//     FROM_Z, Y_VIEW,  -20, targetSlicer, outputMatrix);
-	// // 
-	//   BuildSlicingPlane(m_ViewYnSliceXpVME, 
-	//     FROM_X, Y_VIEW,  20, targetSlicer, outputMatrix);
-	// 
-	//   BuildSlicingPlane(m_ViewYnSliceXmVME, 
-	//     FROM_X, Y_VIEW,  -20, targetSlicer, outputMatrix);
-
 	vtkDEL(outputMatrix);
+
+  double red[3] = {1,0,0};
+  CreateViewCameraNormalFeedbackActor(red, X_VIEW);
+
+  double green[3] = {0,1,0};
+  CreateViewCameraNormalFeedbackActor(green, Y_VIEW);
+
+  double blue[3] = {0,0,1};
+  CreateViewCameraNormalFeedbackActor(blue, Z_VIEW);
+
+
 }
 
 void medViewArbitraryOrthoSlice::BuildXCameraConeVME()
@@ -2234,7 +2217,7 @@ void medViewArbitraryOrthoSlice::BuildXCameraConeVME()
 	double d = sqrt(vtkMath::Distance2BetweenPoints(p1,p2));
 
 	vtkConeSource *XCameraConeSource = vtkConeSource::New();
-	XCameraConeSource->SetCenter(0,0,d/2);
+	XCameraConeSource->SetCenter(0,0,d/3);
 	XCameraConeSource->SetResolution(20);
 	XCameraConeSource->SetDirection(0,0,-1);
 
@@ -2297,7 +2280,7 @@ void medViewArbitraryOrthoSlice::BuildYCameraConeVME()
 	double d = sqrt(vtkMath::Distance2BetweenPoints(p1,p2));
 
 	vtkConeSource *YCameraConeSource = vtkConeSource::New();
-	YCameraConeSource->SetCenter(0,0,d/2);
+	YCameraConeSource->SetCenter(0,0,d/3);
 	YCameraConeSource->SetResolution(20);
 	YCameraConeSource->SetDirection(0,0,-1);
 
@@ -2367,7 +2350,7 @@ void medViewArbitraryOrthoSlice::BuildZCameraConeVME()
 	double d = sqrt(vtkMath::Distance2BetweenPoints(p1,p2));
 
 	vtkConeSource *ZCameraConeSource = vtkConeSource::New();
-	ZCameraConeSource->SetCenter(0,0,d/2);
+	ZCameraConeSource->SetCenter(0,0,d/3);
 	ZCameraConeSource->SetResolution(20);
 	ZCameraConeSource->SetDirection(0,0,-1);
 
@@ -3707,7 +3690,7 @@ void medViewArbitraryOrthoSlice::EnableThicknessGUI( bool enable )
 
 void medViewArbitraryOrthoSlice::OnEventID_ENABLE_EXPORT_IMAGES()
 {
-	EnableExportImages(m_EnableExportImages);
+  EnableExportImages(m_EnableExportImages);
 	OnEventID_COMBO_CHOOSE_EXPORT_AXIS();
 
 	if (m_EnableExportImages == 0)  // disable export images
@@ -3940,4 +3923,60 @@ mafPipeSurface * medViewArbitraryOrthoSlice::GetPipe(int inView, mafVMESurface *
 {
 	mafPipeSurface *pipe = (mafPipeSurface *)((m_ChildViewList[inView])->GetNodePipe(inSurface));
 	return pipe;
+}
+
+void medViewArbitraryOrthoSlice::CreateViewCameraNormalFeedbackActor(double col[3], int view)
+{
+  double m_BorderColor[3];
+//  bool m_Border = false;
+
+  m_BorderColor[0] = col[0];
+  m_BorderColor[1] = col[1];
+  m_BorderColor[2] = col[2];
+
+  //if(m_Border) BorderDelete();
+  int size[2];
+  this->GetWindow()->GetSize(&size[0],&size[1]);
+  vtkSphereSource *ss = vtkSphereSource::New();
+  
+  ss->SetRadius(size[0] / 20.0);
+  ss->SetCenter(0,0,0);
+  ss->SetThetaResolution(1);
+  ss->Update();
+
+  vtkCoordinate *coord = vtkCoordinate::New();
+  coord->SetCoordinateSystemToDisplay();
+  coord->SetValue(size[0]-1, size[1]-1, 0);
+
+  vtkPolyDataMapper2D *pdmd = vtkPolyDataMapper2D::New();
+  pdmd->SetInput(ss->GetOutput());
+  pdmd->SetTransformCoordinate(coord);
+
+  vtkProperty2D *pd = vtkProperty2D::New();
+  pd->SetDisplayLocationToForeground();
+  pd->SetLineWidth(4);
+  pd->SetColor(col[0],col[1],col[2]);
+  pd->SetOpacity(0.2);
+
+  vtkActor2D *m_Border = vtkActor2D::New();
+  m_Border->SetMapper(pdmd);
+  m_Border->SetProperty(pd);
+  m_Border->SetPosition(1,1);
+
+  ((mafViewVTK*)(m_ChildViewList[view]))->m_Rwi->m_RenFront->AddActor2D(m_Border);
+
+  vtkDEL(ss);
+  vtkDEL(coord);
+  vtkDEL(pdmd);
+  vtkDEL(pd);
+  vtkDEL(m_Border);
+}
+
+void medViewArbitraryOrthoSlice::DestroyViewCameraNormalFeedbackActor(int view)
+{
+  
+  //if(m_Border)
+  {
+    //((mafViewVTK*)(m_ChildViewList[view]))->m_Rwi->m_RenFront->RemoveActor(m_Border);
+  }  
 }
