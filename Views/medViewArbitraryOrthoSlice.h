@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.h,v $
 Language:  C++
-Date:      $Date: 2011-02-11 13:01:35 $
-Version:   $Revision: 1.1.2.25 $
+Date:      $Date: 2011-02-11 15:47:25 $
+Version:   $Revision: 1.1.2.26 $
 Authors:   Stefano Perticoni	
 ==========================================================================
 Copyright (c) 2002/2004
@@ -64,6 +64,17 @@ class medGizmoCrossRotateTranslate;
 Class Name: medViewArbitraryOrthoSlice.
 
 OrthoSlice-ArbitrarySlice mix early prototype.
+
+This compound view features three volume slice planes that can be controlled
+by using three roto translation gizmos.
+
+An RX projection can be performed on each axis (currently available for structured points only)
+
+It is possible to export arbitrary volume slices as image files.
+
+@sa medGizmoCrossRotateTranslate , mafVMESlicer
+
+
 */
 
 class medViewArbitraryOrthoSlice: public medViewCompoundWindowing
@@ -104,7 +115,7 @@ Y>              <X
 */
 public:
 	/** constructor*/
-	medViewArbitraryOrthoSlice(wxString label = "View Arbitrary Slice with Windowing", bool show_ruler = false);
+	medViewArbitraryOrthoSlice(wxString label = "View Arbitrary OrthoSlice with Windowing", bool show_ruler = false);
 
 	/** destructor*/
 	virtual ~medViewArbitraryOrthoSlice(); 

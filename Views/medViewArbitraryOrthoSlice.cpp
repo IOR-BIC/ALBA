@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2011-02-11 14:36:51 $
-Version:   $Revision: 1.1.2.46 $
+Date:      $Date: 2011-02-11 15:47:25 $
+Version:   $Revision: 1.1.2.47 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -3692,6 +3692,8 @@ void medViewArbitraryOrthoSlice::EnableThicknessGUI( bool enable )
 
 void medViewArbitraryOrthoSlice::OnEventID_ENABLE_EXPORT_IMAGES()
 {
+  wxBusyInfo wait("please wait");
+
   EnableExportImages(m_EnableExportImages);
 	OnEventID_COMBO_CHOOSE_EXPORT_AXIS();
 
