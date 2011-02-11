@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpComputeInertialTensor.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-02-10 14:26:59 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-02-11 11:26:23 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Simone Brazzale
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -33,6 +33,7 @@
 #include "mafDecl.h"
 #include "mafEvent.h"
 #include "mafGUI.h"
+#include "mafVMEGroup.h"
 #include "mafVMESurface.h"
 #include "mafVMEOutput.h"
 #include "mafTagArray.h"
@@ -55,6 +56,12 @@ mafOp(label)
 
   m_Density = 1.0;
   m_Mass = 0.0;
+  m_T11 = 0.0;
+  m_T12 = 0.0;
+  m_T13 = 0.0;
+  m_T22 = 0.0;
+  m_T23 = 0.0;
+  m_T33 = 0.0;
 }
 //----------------------------------------------------------------------------
 medOpComputeInertialTensor::~medOpComputeInertialTensor( ) 
@@ -65,13 +72,16 @@ medOpComputeInertialTensor::~medOpComputeInertialTensor( )
 mafOp* medOpComputeInertialTensor::Copy()   
 //----------------------------------------------------------------------------
 {
-	return new medOpComputeInertialTensor(m_Label);
+	 medOpComputeInertialTensor* op_copy = new medOpComputeInertialTensor(m_Label);
+   op_copy->m_Density = this->m_Density;
+
+   return op_copy;
 }
 //----------------------------------------------------------------------------
 bool medOpComputeInertialTensor::Accept(mafNode *node)
 //----------------------------------------------------------------------------
 {
-  return (node && node->IsMAFType(mafVMESurface));
+  return ( (node && node->IsMAFType(mafVMESurface)) || (node && node->IsMAFType(mafVMEGroup)) );
 }
 //----------------------------------------------------------------------------
 void medOpComputeInertialTensor::OpRun()   
@@ -84,25 +94,31 @@ void medOpComputeInertialTensor::OpRun()
 void medOpComputeInertialTensor::OpDo()
 //----------------------------------------------------------------------------
 {
-  mafVMESurface* surf = (mafVMESurface*) m_Input;
-  if (!surf->GetTagArray()->IsTagPresent("INERTIAL_TENSOR_COMPONENTS_[t11,t12,t13,t22,t23,t33]"))
+  mafVME* vme = (mafVME*) m_Input;
+  if (!vme->GetTagArray()->IsTagPresent("INERTIAL_TENSOR_COMPONENTS_[t11,t12,t13,t22,t23,t33]"))
   {
-    surf->GetTagArray()->SetTag(m_TagTensor);
+    if (m_TagTensor.GetNumberOfComponents()>0)
+    {
+      vme->GetTagArray()->SetTag(m_TagTensor);
+    }
   }
-  if (!surf->GetTagArray()->IsTagPresent("SURFACE_MASS"))
+  if (!vme->GetTagArray()->IsTagPresent("SURFACE_MASS"))
   {
-    surf->GetTagArray()->SetTag(m_TagMass);
+    if (m_TagMass.GetNumberOfComponents()>0)
+    {
+      vme->GetTagArray()->SetTag(m_TagMass);
+    }
   }
 }
 //----------------------------------------------------------------------------
 void medOpComputeInertialTensor::OpUndo()
 //----------------------------------------------------------------------------
 {
-  mafVMESurface* surf = (mafVMESurface*) m_Input;
-  surf->GetTagArray()->GetTag("INERTIAL_TENSOR_COMPONENTS_[t11,t12,t13,t22,t23,t33]",m_TagTensor);
-  surf->GetTagArray()->GetTag("SURFACE_MASS",m_TagMass);
-  surf->GetTagArray()->DeleteTag("INERTIAL_TENSOR_COMPONENTS_[t11,t12,t13,t22,t23,t33]");
-  surf->GetTagArray()->DeleteTag("SURFACE_MASS");
+  mafVME* vme = (mafVME*) m_Input;
+  vme->GetTagArray()->GetTag("INERTIAL_TENSOR_COMPONENTS_[t11,t12,t13,t22,t23,t33]",m_TagTensor);
+  vme->GetTagArray()->GetTag("SURFACE_MASS",m_TagMass);
+  vme->GetTagArray()->DeleteTag("INERTIAL_TENSOR_COMPONENTS_[t11,t12,t13,t22,t23,t33]");
+  vme->GetTagArray()->DeleteTag("SURFACE_MASS");
 }
 //----------------------------------------------------------------------------
 void medOpComputeInertialTensor::OnEvent(mafEventBase *maf_event)
@@ -114,7 +130,41 @@ void medOpComputeInertialTensor::OnEvent(mafEventBase *maf_event)
 		{
 		case wxOK:
       {
-        int result = ComputeInertialTensor();
+        int result = OP_RUN_CANCEL;
+
+        if (m_Input->IsMAFType(mafVMESurface))
+        {
+          result = ComputeInertialTensor(m_Input);
+        }
+        else if (m_Input->IsMAFType(mafVMEGroup))
+        {
+          result = ComputeInertialTensorFromGroup();
+        }
+
+        if (result==OP_RUN_CANCEL)
+        {
+          OpStop(result);
+        }
+
+        //save results in vme attributes
+        std::vector<double> vec_comp;
+        vec_comp.push_back(m_T11);
+        vec_comp.push_back(m_T12);
+        vec_comp.push_back(m_T13);
+        vec_comp.push_back(m_T22);
+        vec_comp.push_back(m_T23);
+        vec_comp.push_back(m_T33);
+
+	      mafTagItem tag;
+	      tag.SetName("INERTIAL_TENSOR_COMPONENTS_[t11,t12,t13,t22,t23,t33]");
+        tag.SetNumberOfComponents(6);
+        tag.SetComponents(vec_comp);
+        m_Input->GetTagArray()->SetTag(tag);
+
+        mafTagItem tagm;
+	      tagm.SetName("SURFACE_MASS");
+        tagm.SetValue(m_Mass);
+        m_Input->GetTagArray()->SetTag(tagm);
 
         OpStop(result);
       }
@@ -222,22 +272,9 @@ double medOpComputeInertialTensor::GetSurfaceMass()
   return mass;
 }
 //----------------------------------------------------------------------------
-int medOpComputeInertialTensor::ComputeInertialTensor()
+int medOpComputeInertialTensor::ComputeInertialTensor(mafNode* node, int current_node, int n_of_nodes)
 //----------------------------------------------------------------------------
 {
-  int result = OP_RUN_CANCEL;
-
-  wxBusyInfo *wait;
-  if(!m_TestMode)
-  {
-    wxSetCursor(wxCursor(wxCURSOR_WAIT));
-    wait = new wxBusyInfo("Computing inertial tensor components...");
-    mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
-  }
-  
-  long current_progress = 0;
-  long current_percentage = 0;
-
   //tensor components
   /* 
             | (y^2+z^2)    -x*y      -x*z     |
@@ -251,17 +288,19 @@ int medOpComputeInertialTensor::ComputeInertialTensor()
       the tensor of a system with n points each of mass m_i is the sum of the components over the n points.
 
   */
-  double t11,t12,t13,t22,t23,t33;
-  t11 = 0;
-  t12 = 0;
-  t13 = 0;
-  t22 = 0;
-  t23 = 0;
-  t33 = 0;
 
-  mafVMESurface* surf = (mafVMESurface*) m_Input;
+  int result = OP_RUN_CANCEL;
+
+  if (!node->IsMAFType(mafVMESurface))
+  {
+    return result;
+  }
+  
+  mafVMESurface* surf = (mafVMESurface*) node;
   if (surf->GetOutput() == NULL || surf->GetOutput()->GetVTKData() == NULL)
     return result;
+  surf->GetOutput()->Update();
+  surf->GetOutput()->GetVTKData()->Update();
 
   vtkDataSet* ds = surf->GetOutput()->GetVTKData();
   int npoints = ds->GetNumberOfPoints();
@@ -271,6 +310,21 @@ int medOpComputeInertialTensor::ComputeInertialTensor()
   {
     return result;
   }
+
+  wxBusyInfo *wait;
+  wxString str("Computing inertial tensor: surface ");
+  str << current_node << "/" << n_of_nodes;
+  mafString s(str.c_str());
+  if(!m_TestMode)
+  {
+    wxSetCursor(wxCursor(wxCURSOR_WAIT));
+    wait = new wxBusyInfo("Computing inertial tensor components...");
+    mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
+    mafEventMacro(mafEvent(this,PROGRESSBAR_SET_TEXT,&s));
+  }
+  
+  long current_progress = 0;
+  long current_percentage = 0;
 
   //get points
   /*
@@ -325,41 +379,24 @@ int medOpComputeInertialTensor::ComputeInertialTensor()
     double temp_t33 = cell_mass*((xyz[0]*xyz[0])+(xyz[1]*xyz[1]));
 
     //sum over points
-    t11 += temp_t11;
-    t12 += temp_t12;
-    t13 += temp_t13;
-    t22 += temp_t22;
-    t23 += temp_t23;
-    t33 += temp_t33;
+    m_T11 += temp_t11;
+    m_T12 += temp_t12;
+    m_T13 += temp_t13;
+    m_T22 += temp_t22;
+    m_T23 += temp_t23;
+    m_T33 += temp_t33;
 
     m_Mass += cell_mass;
 
     current_progress++;
     current_percentage = current_progress*100 / ncells;
-    mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,current_percentage));
+    if (!m_TestMode)
+    {
+      mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,current_percentage));
+    }
   
     delete[] w;
   }
-
-  std::vector<double> vec_comp;
-  vec_comp.push_back(t11);
-  vec_comp.push_back(t12);
-  vec_comp.push_back(t13);
-  vec_comp.push_back(t22);
-  vec_comp.push_back(t23);
-  vec_comp.push_back(t33);
-
-  //save results in surface attributes
-	mafTagItem tag;
-	tag.SetName("INERTIAL_TENSOR_COMPONENTS_[t11,t12,t13,t22,t23,t33]");
-  tag.SetNumberOfComponents(6);
-  tag.SetComponents(vec_comp);
-  surf->GetTagArray()->SetTag(tag);
-
-  mafTagItem tagm;
-	tagm.SetName("SURFACE_MASS");
-  tagm.SetValue(m_Mass);
-  surf->GetTagArray()->SetTag(tagm);
 
   if(!m_TestMode)
   {
@@ -377,6 +414,48 @@ double vnl_dot(vnl_vector<double> v1,vnl_vector<double> v2)
   assert (v1.size()==3 && v2.size()==3);
 
   return (v1[0]*v2[0] + v1[1]*v2[1] + v1[2]*v2[2]);
+}
+//----------------------------------------------------------------------------
+int medOpComputeInertialTensor::ComputeInertialTensorFromGroup()
+//----------------------------------------------------------------------------
+{
+  mafVMEGroup* group = (mafVMEGroup*) m_Input;
+
+  int result = OP_RUN_CANCEL;
+
+  int n_of_children = group->GetNumberOfChildren();
+  int n_of_surfaces = 0;
+  for (int i=0;i<n_of_children;i++)
+  {
+    if (group->GetChild(i)->IsMAFType(mafVMESurface))
+    {
+      n_of_surfaces++;
+    }
+  }
+
+  if (n_of_surfaces>0) 
+  {
+    wxString s;
+    s << "Found " << n_of_surfaces << " surfaces: applying operation on all of them ..";
+    mafLogMessage(s.c_str());
+  }
+  else
+  {
+    mafLogMessage("no surfaces found in the group. Quit!");
+    return result;
+  }
+
+  for (int i=0;i<n_of_children;i++)
+  {
+    if (group->GetChild(i)->IsMAFType(mafVMESurface))
+    {
+      ComputeInertialTensor(group->GetChild(i),i+1,n_of_children);
+    }
+  }
+
+  result = OP_RUN_OK;
+
+  return result;
 }
 //----------------------------------------------------------------------------
 double medOpComputeInertialTensor::TriangleArea( vtkCell* cell )
