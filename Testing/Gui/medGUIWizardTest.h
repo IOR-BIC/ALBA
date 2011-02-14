@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizardTest.h,v $
 Language:  C++
-Date:      $Date: 2011-01-12 08:53:09 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-02-14 08:47:30 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -23,7 +23,6 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 class TestApp;
 class mafGUIFrame;
-class testGuiApp;
 
 class medGUIWizardTest : public CPPUNIT_NS::TestFixture
 {
@@ -52,7 +51,6 @@ protected:
 
   bool m_Result;
 
-  TestApp *m_App;
   mafGUIFrame *m_Win;
 };
 

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizardTest.cpp,v $
 Language:  C++
-Date:      $Date: 2011-01-12 15:49:13 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2011-02-14 08:47:30 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -11,7 +11,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
 #include "medDefines.h"
-#include "mafDecl.h"
+#include "medDecl.h"
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
@@ -19,15 +19,12 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mafDecl.h"
 #include <cppunit/config/SourcePrefix.h>
 #include "medGUIWizardTest.h"
 #include "medGUIWizard.h"
 #include "mafGUIFrame.h"
 #include "medGUIWizardPage.h"
 #include "wx/module.h"
-// #include "testGui.h"
-// #include "testGuiApp.h"
 
 // ===============================================================================
 // Helper class used to build a fake application needed by the wxConfig
