@@ -89,6 +89,9 @@ ADD_TEST(medOpCreateLabeledVolumeTest ${EXECUTABLE_OUTPUT_PATH}/medOpCreateLabel
 ADD_EXECUTABLE(medOpComputeWrappingTest medOpComputeWrappingTest.h medOpComputeWrappingTest.cpp)
 ADD_TEST(medOpComputeWrappingTest ${EXECUTABLE_OUTPUT_PATH}/medOpComputeWrappingTest)
 
+ADD_EXECUTABLE(medOpComputeInertialTensorTest medOpComputeInertialTensorTest.h medOpComputeInertialTensorTest.cpp)
+ADD_TEST(medOpComputeInertialTensorTest ${EXECUTABLE_OUTPUT_PATH}/medOpComputeInertialTensorTest)
+
 ADD_EXECUTABLE(medOpSplitSurfaceTest medOpSplitSurfaceTest.h medOpSplitSurfaceTest.cpp)
 ADD_TEST(medOpSplitSurfaceTest ${EXECUTABLE_OUTPUT_PATH}/medOpSplitSurfaceTest)
 
