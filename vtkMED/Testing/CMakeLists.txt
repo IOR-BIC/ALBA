@@ -127,6 +127,9 @@ ADD_TEST(CubeTest ${EXECUTABLE_OUTPUT_PATH}/CubeTest)
 ADD_EXECUTABLE(SquareTest SquareTest.h SquareTest.cpp)
 ADD_TEST(SquareTest ${EXECUTABLE_OUTPUT_PATH}/SquareTest)
 
+ADD_EXECUTABLE(SparseNMatrixTest SparseNMatrixTest.h SparseNMatrixTest.cpp)
+ADD_TEST(SparseNMatrixTest ${EXECUTABLE_OUTPUT_PATH}/SparseNMatrixTest)
+
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
 #ENDIF (MAF_USE_WX)
