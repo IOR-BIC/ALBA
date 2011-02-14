@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizardPage.h,v $
 Language:  C++
-Date:      $Date: 2009-09-15 07:39:56 $
-Version:   $Revision: 1.4.2.6 $
+Date:      $Date: 2011-02-14 13:38:16 $
+Version:   $Revision: 1.4.2.7 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -106,7 +106,7 @@ public:
   /** Retrieve the current Render Window. */
 	mafRWI* GetRWI(){return m_Rwi;};
 
-private:
+protected:
 
 	wxWizardPageSimple *m_FirstPage;
 
@@ -123,5 +123,7 @@ private:
   long m_Style;
 
 	//DECLARE_EVENT_TABLE()
+
+  friend class medGUIWizardPageTest;
 };
 #endif
