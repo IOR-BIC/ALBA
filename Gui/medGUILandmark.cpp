@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUILandmark.cpp,v $
 Language:  C++
-Date:      $Date: 2009-12-17 12:25:30 $
-Version:   $Revision: 1.4.2.3 $
+Date:      $Date: 2011-02-14 13:46:57 $
+Version:   $Revision: 1.4.2.4 $
 Authors:   Stefano Perticoni - porting Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -49,7 +49,7 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #include "vtkMath.h"
 
 //----------------------------------------------------------------------------
-medGUILandmark::medGUILandmark(mafNode *inputVME, mafObserver *listener)
+medGUILandmark::medGUILandmark(mafNode *inputVME, mafObserver *listener, bool testMode /* = false */)
 //----------------------------------------------------------------------------
 {
   m_Listener = listener;
@@ -83,8 +83,13 @@ medGUILandmark::medGUILandmark(mafNode *inputVME, mafObserver *listener)
   m_BoundsFraction = 60;
 
   SpawnLMOff();
+
+  m_TestMode = testMode;
  
-  CreateGui();
+  if (!m_TestMode)
+  {
+    CreateGui();
+  }
 
 
   if (m_InputVME == NULL)
@@ -100,8 +105,10 @@ medGUILandmark::medGUILandmark(mafNode *inputVME, mafObserver *listener)
     AttachInteractor(m_InputVME, m_PickerInteractor, m_OldInputVMEBehavior);        
     SetGUIStatusToPick();
   }  
-  
-  m_Gui->Update(); 
+  if (!m_TestMode)
+  {
+    m_Gui->Update(); 
+  }
 }
 //----------------------------------------------------------------------------
 medGUILandmark::~medGUILandmark() 
@@ -406,8 +413,11 @@ void medGUILandmark::SetGUIStatusToDisabled()
   
   if (GetSpawnLM() == 0)
   { 
-    m_GUIStatus = PICK;    
-    this->UpdateGuiInternal(); 
+    m_GUIStatus = PICK; 
+    if (m_Gui)
+    {
+      this->UpdateGuiInternal(); 
+    }
   }
   else
   {
@@ -420,7 +430,10 @@ void medGUILandmark::SetGUIStatusToDisabled()
 void medGUILandmark::SetGUIStatusToEnabled() 
 {
   m_GUIStatus = ENABLED;
-  this->UpdateGuiInternal();
+  if (m_Gui)
+  {
+    this->UpdateGuiInternal();
+  }
 }
 
 void medGUILandmark::UpdateGuiInternal()

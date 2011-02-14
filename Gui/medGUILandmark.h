@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILandmark.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 12:25:30 $
-  Version:   $Revision: 1.4.2.2 $
+  Date:      $Date: 2011-02-14 13:46:57 $
+  Version:   $Revision: 1.4.2.3 $
   Authors:   Stefano Perticoni - porting Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -45,7 +45,7 @@ class medGUILandmark : public mafObserver
 {
 public:
 
-  medGUILandmark(mafNode *InputVME, mafObserver *listener = NULL);
+  medGUILandmark(mafNode *InputVME, mafObserver *listener = NULL, bool testMode  = false);
 	~medGUILandmark(); 
 
   /** Set the event receiver object*/
@@ -131,6 +131,8 @@ protected:
   double m_CurrentTime;
   double m_Position[3];
 //  double m_LMPosition[3];
+
+  bool m_TestMode;
   
   mafInteractor* m_OldInteractor;
   mafInteractorPicker *m_PickerInteractor;
