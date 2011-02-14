@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medInteractorDICOMImporterTest.cpp,v $
 Language:  C++
-Date:      $Date: 2011-02-14 16:58:37 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2011-02-14 16:56:16 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -18,7 +18,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "medInteractorDICOMImporterTest.h"
+#include "mmiDICOMImporterInteractorTest.h"
 
 #include <cppunit/config/SourcePrefix.h>
 #include <iostream>
