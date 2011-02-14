@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpComputeInertialTensor.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-02-11 11:26:23 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2011-02-14 11:36:49 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Simone Brazzale
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -146,26 +146,7 @@ void medOpComputeInertialTensor::OnEvent(mafEventBase *maf_event)
           OpStop(result);
         }
 
-        //save results in vme attributes
-        std::vector<double> vec_comp;
-        vec_comp.push_back(m_T11);
-        vec_comp.push_back(m_T12);
-        vec_comp.push_back(m_T13);
-        vec_comp.push_back(m_T22);
-        vec_comp.push_back(m_T23);
-        vec_comp.push_back(m_T33);
-
-	      mafTagItem tag;
-	      tag.SetName("INERTIAL_TENSOR_COMPONENTS_[t11,t12,t13,t22,t23,t33]");
-        tag.SetNumberOfComponents(6);
-        tag.SetComponents(vec_comp);
-        m_Input->GetTagArray()->SetTag(tag);
-
-        mafTagItem tagm;
-	      tagm.SetName("SURFACE_MASS");
-        tagm.SetValue(m_Mass);
-        m_Input->GetTagArray()->SetTag(tagm);
-
+        AddAttributes();
         OpStop(result);
       }
 			break;
@@ -179,6 +160,30 @@ void medOpComputeInertialTensor::OnEvent(mafEventBase *maf_event)
       break;
 		}
 	}
+}
+//----------------------------------------------------------------------------
+void medOpComputeInertialTensor::AddAttributes()
+//----------------------------------------------------------------------------
+{
+  //save results in vme attributes
+  std::vector<double> vec_comp;
+  vec_comp.push_back(m_T11);
+  vec_comp.push_back(m_T12);
+  vec_comp.push_back(m_T13);
+  vec_comp.push_back(m_T22);
+  vec_comp.push_back(m_T23);
+  vec_comp.push_back(m_T33);
+
+	mafTagItem tag;
+	tag.SetName("INERTIAL_TENSOR_COMPONENTS_[t11,t12,t13,t22,t23,t33]");
+  tag.SetNumberOfComponents(6);
+  tag.SetComponents(vec_comp);
+  m_Input->GetTagArray()->SetTag(tag);
+
+  mafTagItem tagm;
+	tagm.SetName("SURFACE_MASS");
+  tagm.SetValue(m_Mass);
+  m_Input->GetTagArray()->SetTag(tagm);
 }
 //----------------------------------------------------------------------------
 void medOpComputeInertialTensor::OpStop(int result)

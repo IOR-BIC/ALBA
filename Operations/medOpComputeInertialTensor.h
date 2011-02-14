@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpComputeInertialTensor.h,v $
   Language:  C++
-  Date:      $Date: 2011-02-11 11:26:23 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2011-02-14 11:36:49 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2004
@@ -67,6 +67,9 @@ public:
 
   /** Calculate inertial tensor components from a group of surfaces and store them in the input vme. */
   int ComputeInertialTensorFromGroup();
+
+   /** Add results to the vme in the attributes section. */
+  void AddAttributes();
 
 protected: 
 
