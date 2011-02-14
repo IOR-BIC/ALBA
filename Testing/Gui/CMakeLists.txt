@@ -14,3 +14,6 @@ ADD_TEST(medGUIDicomSettingsTest ${EXECUTABLE_OUTPUT_PATH}/medGUIDicomSettingsTe
 
 ADD_EXECUTABLE(medGUIWizardTest medGUIWizardTest.h medGUIWizardTest.cpp)
 ADD_TEST(medGUIWizardTest ${EXECUTABLE_OUTPUT_PATH}/medGUIWizardTest)
+
+ADD_EXECUTABLE(medGUIWizardPageTest medGUIWizardPageTest.h medGUIWizardPageTest.cpp)
+ADD_TEST(medGUIWizardPageTest ${EXECUTABLE_OUTPUT_PATH}/medGUIWizardPageTest)
