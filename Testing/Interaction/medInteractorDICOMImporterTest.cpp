@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medInteractorDICOMImporterTest.cpp,v $
 Language:  C++
-Date:      $Date: 2011-02-14 16:56:16 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-02-14 17:01:40 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -18,7 +18,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mmiDICOMImporterInteractorTest.h"
+#include "medInteractorDICOMImporterTest.h"
 
 #include <cppunit/config/SourcePrefix.h>
 #include <iostream>
@@ -26,29 +26,29 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafEventInteraction.h"
 #include "mafDeviceButtonsPadMouse.h"
 
-void mmiDICOMImporterInteractorTest::setUp()
+void medInteractorDICOMImporterTest::setUp()
 {
   
 }
 
-void mmiDICOMImporterInteractorTest::tearDown()
+void medInteractorDICOMImporterTest::tearDown()
 {
 
 }
 
-void mmiDICOMImporterInteractorTest::TestFixture()
+void medInteractorDICOMImporterTest::TestFixture()
 {
 	
 }
 
 
-void mmiDICOMImporterInteractorTest::TestConstructorDestructor()
+void medInteractorDICOMImporterTest::TestConstructorDestructor()
 {
 	medInteractorDICOMImporter *dicomImporterInteractor = medInteractorDICOMImporter::New();
 	dicomImporterInteractor->Delete();
 }
 
-void mmiDICOMImporterInteractorTest::TestStartInteraction()
+void medInteractorDICOMImporterTest::TestStartInteraction()
 {
 	mafDeviceButtonsPadMouse *buttonsPadMouse = mafDeviceButtonsPadMouse::New();
 	CPPUNIT_ASSERT(buttonsPadMouse);
@@ -62,7 +62,7 @@ void mmiDICOMImporterInteractorTest::TestStartInteraction()
 }
 
 
-void mmiDICOMImporterInteractorTest::TestOnMouseMove()
+void medInteractorDICOMImporterTest::TestOnMouseMove()
 {
   medInteractorDICOMImporter *dicomImporterInteractor = medInteractorDICOMImporter::New();
   
@@ -72,7 +72,7 @@ void mmiDICOMImporterInteractorTest::TestOnMouseMove()
 }
 
 
-void mmiDICOMImporterInteractorTest::TestOnLeftButtonDown()
+void medInteractorDICOMImporterTest::TestOnLeftButtonDown()
 {
   medInteractorDICOMImporter *dicomImporterInteractor = medInteractorDICOMImporter::New();
   
@@ -81,7 +81,7 @@ void mmiDICOMImporterInteractorTest::TestOnLeftButtonDown()
   dicomImporterInteractor->Delete();
 }
 
-void mmiDICOMImporterInteractorTest::TestOnLeftButtonUp()
+void medInteractorDICOMImporterTest::TestOnLeftButtonUp()
 {
 	medInteractorDICOMImporter *dicomImporterInteractor = medInteractorDICOMImporter::New();
 
