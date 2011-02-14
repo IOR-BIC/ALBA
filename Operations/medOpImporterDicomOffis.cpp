@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2011-02-02 09:47:42 $
-Version:   $Revision: 1.1.2.126 $
+Date:      $Date: 2011-02-14 16:55:33 $
+Version:   $Revision: 1.1.2.127 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -55,7 +55,7 @@ MafMedical is partially based on OpenMAF.
 #include "medGUIWizardPageNew.h"
 #include "mafGUIValidator.h"
 #include "mafDeviceButtonsPadMouse.h"
-#include "mmiDICOMImporterInteractor.h"
+#include "medInteractorDICOMImporter.h"
 #include "mafTagArray.h"
 #include "mafRWI.h"
 #include "mafVMEImage.h"

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterRAWImages.h,v $
 Language:  C++
-Date:      $Date: 2009-05-14 16:46:51 $
-Version:   $Revision: 1.2.2.1 $
+Date:      $Date: 2011-02-14 16:55:34 $
+Version:   $Revision: 1.2.2.2 $
 Authors:   Stefania Paperini porting Matteo Giacomoni
 Modified by Josef Kohout to support large volumes	
 ==========================================================================
@@ -45,7 +45,7 @@ class mafRWI;
 class vtkWindowLevelLookupTable;
 class mafGUIDialogPreview;
 class vtkTexture;
-class mmiDICOMImporterInteractor;
+class medInteractorDICOMImporter;
 class mafString;
 class mafVMEVolumeGray;
 class mafVMEVolumeRGB;
@@ -211,7 +211,7 @@ protected:
   mafGUIDialogPreview	*m_Dialog;
   mafGUI* m_GuiSlider;
 
-  mmiDICOMImporterInteractor *m_DicomInteractor;
+  medInteractorDICOMImporter *m_DicomInteractor;
 
   mafVMEVolumeGray  *m_VolumeGray;
   mafVMEVolumeRGB   *m_VolumeRGB;

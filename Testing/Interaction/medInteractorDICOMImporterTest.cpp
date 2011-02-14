@@ -1,9 +1,9 @@
 /*=========================================================================
 Program:   Multimod Application Framework
-Module:    $RCSfile: mmiDICOMImporterInteractorTest.cpp,v $
+Module:    $RCSfile: medInteractorDICOMImporterTest.cpp,v $
 Language:  C++
-Date:      $Date: 2011-01-11 15:57:39 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-02-14 16:58:37 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -18,11 +18,11 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mmiDICOMImporterInteractorTest.h"
+#include "medInteractorDICOMImporterTest.h"
 
 #include <cppunit/config/SourcePrefix.h>
 #include <iostream>
-#include "mmiDICOMImporterInteractor.h"
+#include "medInteractorDICOMImporter.h"
 #include "mafEventInteraction.h"
 #include "mafDeviceButtonsPadMouse.h"
 
@@ -44,7 +44,7 @@ void mmiDICOMImporterInteractorTest::TestFixture()
 
 void mmiDICOMImporterInteractorTest::TestConstructorDestructor()
 {
-	mmiDICOMImporterInteractor *dicomImporterInteractor = mmiDICOMImporterInteractor::New();
+	medInteractorDICOMImporter *dicomImporterInteractor = medInteractorDICOMImporter::New();
 	dicomImporterInteractor->Delete();
 }
 
@@ -54,7 +54,7 @@ void mmiDICOMImporterInteractorTest::TestStartInteraction()
 	CPPUNIT_ASSERT(buttonsPadMouse);
 
 	// smoke test (should not crash)
-	mmiDICOMImporterInteractor *dicomImporterInteractor = mmiDICOMImporterInteractor::New();
+	medInteractorDICOMImporter *dicomImporterInteractor = medInteractorDICOMImporter::New();
 	dicomImporterInteractor->StartInteraction(buttonsPadMouse);
 	dicomImporterInteractor->Delete();
 
@@ -64,7 +64,7 @@ void mmiDICOMImporterInteractorTest::TestStartInteraction()
 
 void mmiDICOMImporterInteractorTest::TestOnMouseMove()
 {
-  mmiDICOMImporterInteractor *dicomImporterInteractor = mmiDICOMImporterInteractor::New();
+  medInteractorDICOMImporter *dicomImporterInteractor = medInteractorDICOMImporter::New();
   
   // smoke test (should not crash)
   dicomImporterInteractor->OnMouseMove();
@@ -74,7 +74,7 @@ void mmiDICOMImporterInteractorTest::TestOnMouseMove()
 
 void mmiDICOMImporterInteractorTest::TestOnLeftButtonDown()
 {
-  mmiDICOMImporterInteractor *dicomImporterInteractor = mmiDICOMImporterInteractor::New();
+  medInteractorDICOMImporter *dicomImporterInteractor = medInteractorDICOMImporter::New();
   
   // smoke test (should not crash)
   dicomImporterInteractor->OnLeftButtonDown(NULL);
@@ -83,7 +83,7 @@ void mmiDICOMImporterInteractorTest::TestOnLeftButtonDown()
 
 void mmiDICOMImporterInteractorTest::TestOnLeftButtonUp()
 {
-	mmiDICOMImporterInteractor *dicomImporterInteractor = mmiDICOMImporterInteractor::New();
+	medInteractorDICOMImporter *dicomImporterInteractor = medInteractorDICOMImporter::New();
 
 	// smoke test (should not crash)
 	dicomImporterInteractor->OnLeftButtonUp();

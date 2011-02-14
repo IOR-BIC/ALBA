@@ -1,8 +1,8 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mmiDICOMImporterInteractor.h,v $
+  Module:    $RCSfile: medInteractorDICOMImporter.h,v $
   Language:  C++
-  Date:      $Date: 2011-01-12 14:54:42 $
+  Date:      $Date: 2011-02-14 16:55:07 $
   Version:   $Revision: 1.1.2.1 $
   Authors:   Paolo Quadrani , Stefano Perticoni
 ==========================================================================
@@ -10,8 +10,8 @@
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#ifndef __mmiDICOMImporterInteractor_h
-#define __mmiDICOMImporterInteractor_h
+#ifndef __medInteractorDICOMImporter_h
+#define __medInteractorDICOMImporter_h
 
 #include "mafInteractorCameraMove.h"
 #include "mafMTime.h"
@@ -45,10 +45,10 @@ mafEventMacro(mafEvent(this, event_id, position_point.GetPointer()));
 @sa medOpImporterDicomOffis where this class is used in the Dicom importer wizard dialog
 
 */
-class mmiDICOMImporterInteractor : public mafInteractorCameraMove
+class medInteractorDICOMImporter : public mafInteractorCameraMove
 {
 public:
-  mafTypeMacro(mmiDICOMImporterInteractor,mafInteractorCameraMove);
+  mafTypeMacro(medInteractorDICOMImporter,mafInteractorCameraMove);
 
   /** Start the interaction with the given device*/
   virtual int StartInteraction(mafDeviceButtonsPadMouse *mouse);
@@ -63,14 +63,14 @@ public:
   virtual void OnLeftButtonUp();
 
 protected:
-  mmiDICOMImporterInteractor();
-  virtual ~mmiDICOMImporterInteractor();
+  medInteractorDICOMImporter();
+  virtual ~medInteractorDICOMImporter();
 
   /** Compute the world point corresponding to the mouse position and send it to the listener */
   void SendCropPosition(int event_id);
   
 private:
-  mmiDICOMImporterInteractor(const mmiDICOMImporterInteractor&);  // Not implemented.
-  void operator=(const mmiDICOMImporterInteractor&);  // Not implemented.
+  medInteractorDICOMImporter(const medInteractorDICOMImporter&);  // Not implemented.
+  void operator=(const medInteractorDICOMImporter&);  // Not implemented.
 };
 #endif 

@@ -1,8 +1,8 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mmiDICOMImporterInteractor.cpp,v $
+  Module:    $RCSfile: medInteractorDICOMImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-01-12 14:54:42 $
+  Date:      $Date: 2011-02-14 16:55:07 $
   Version:   $Revision: 1.1.2.1 $
   Authors:   Paolo Quadrani , Stefano Perticoni
 ==========================================================================
@@ -12,7 +12,7 @@
 
 #include "mafDefines.h"
 
-#include "mmiDICOMImporterInteractor.h"
+#include "medInteractorDICOMImporter.h"
 #include "mafDeviceButtonsPadMouse.h"
 #include "mafInteractor.h"
 
@@ -27,37 +27,37 @@
 #include <assert.h>
 
 //------------------------------------------------------------------------------
-mafCxxTypeMacro(mmiDICOMImporterInteractor)
+mafCxxTypeMacro(medInteractorDICOMImporter)
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
-mmiDICOMImporterInteractor::mmiDICOMImporterInteractor()
+medInteractorDICOMImporter::medInteractorDICOMImporter()
 //------------------------------------------------------------------------------
 {
 
 }
 
 //------------------------------------------------------------------------------
-mmiDICOMImporterInteractor::~mmiDICOMImporterInteractor()
+medInteractorDICOMImporter::~medInteractorDICOMImporter()
 //------------------------------------------------------------------------------
 {
 
 }
 //------------------------------------------------------------------------------
-int mmiDICOMImporterInteractor::StartInteraction(mafDeviceButtonsPadMouse *mouse)
+int medInteractorDICOMImporter::StartInteraction(mafDeviceButtonsPadMouse *mouse)
 //------------------------------------------------------------------------------
 {
   return Superclass::StartInteraction(mouse);
 }
 //----------------------------------------------------------------------------
-void mmiDICOMImporterInteractor::OnMouseMove() 
+void medInteractorDICOMImporter::OnMouseMove() 
 //----------------------------------------------------------------------------
 {
   SendCropPosition(MOUSE_MOVE);
   Superclass::OnMouseMove();
 }
 //----------------------------------------------------------------------------
-void mmiDICOMImporterInteractor::OnLeftButtonDown(mafEventInteraction *e)
+void medInteractorDICOMImporter::OnLeftButtonDown(mafEventInteraction *e)
 //----------------------------------------------------------------------------
 {
   if (e == NULL)
@@ -69,14 +69,14 @@ void mmiDICOMImporterInteractor::OnLeftButtonDown(mafEventInteraction *e)
   Superclass::OnLeftButtonDown(e);
 }
 //----------------------------------------------------------------------------
-void mmiDICOMImporterInteractor::OnLeftButtonUp()
+void medInteractorDICOMImporter::OnLeftButtonUp()
 //----------------------------------------------------------------------------
 {
   SendCropPosition(MOUSE_UP);
   Superclass::OnLeftButtonUp();
 }
 //----------------------------------------------------------------------------
-void mmiDICOMImporterInteractor::SendCropPosition(int event_id)
+void medInteractorDICOMImporter::SendCropPosition(int event_id)
 //----------------------------------------------------------------------------
 {
   double wp[4];
