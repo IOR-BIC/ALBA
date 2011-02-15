@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpClassicICPRegistration.h,v $
   Language:  C++
-  Date:      $Date: 2010-01-08 13:57:39 $
-  Version:   $Revision: 1.3.2.1 $
+  Date:      $Date: 2011-02-15 10:49:03 $
+  Version:   $Revision: 1.3.2.2 $
   Authors:   Stefania Paperini, Stefano Perticoni, porting Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -52,6 +52,9 @@ public:
 
 	/** Execute the operation. */
 	void OpDo();
+
+	/** Set target. */
+	void SetTarget(mafNode* node);
 
 protected:
 	/** Create the gui */

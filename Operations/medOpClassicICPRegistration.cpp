@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpClassicICPRegistration.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 10:29:46 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2011-02-15 10:49:03 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Stefania Paperini, Stefano Perticoni, porting Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -157,8 +157,12 @@ void medOpClassicICPRegistration::OpStop(int result)
 void medOpClassicICPRegistration::OpDo()
 //----------------------------------------------------------------------------
 {
-	wxBusyCursor wait;
-	assert( m_Target);
+  if (!m_TestMode)
+  {
+	  wxBusyCursor wait;
+  }
+	
+  assert( m_Target);
 	assert(!m_Registered);
 
 	((mafVME*)m_Input)->GetOutput()->Update();
@@ -231,7 +235,10 @@ void medOpClassicICPRegistration::OpDo()
   regString << '\n';
   regString << _("ICP registration error: ");
   regString << error;
-  wxMessageBox(regString);
+  if (!m_TestMode)
+  {
+    wxMessageBox(regString);
+  }
 }
 //----------------------------------------------------------------------------
 void medOpClassicICPRegistration::OnChooseTarget()   
@@ -252,9 +259,15 @@ void medOpClassicICPRegistration::OnChooseTarget()
 		m_Gui->Update();
 		return;
 	}
-	m_Target			= mafVME::SafeDownCast(vme);
-	m_TargetName = m_Target->GetName();
+  SetTarget(vme);
 
 	m_Gui->Enable(wxOK,true);
 	m_Gui->Update();
+}
+//----------------------------------------------------------------------------
+void medOpClassicICPRegistration::SetTarget(mafNode* node)   
+//----------------------------------------------------------------------------
+{
+  m_Target			= mafVME::SafeDownCast(node);
+	m_TargetName = m_Target->GetName();
 }
