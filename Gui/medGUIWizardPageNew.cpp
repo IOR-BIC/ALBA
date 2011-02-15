@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizardPageNew.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-19 08:39:37 $
-Version:   $Revision: 1.1.2.6 $
+Date:      $Date: 2011-02-15 09:41:57 $
+Version:   $Revision: 1.1.2.7 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -83,6 +83,7 @@ medGUIWizardPageNew::medGUIWizardPageNew(medGUIWizard *wizardParent,long style, 
 {
 	m_Listener = NULL;
   m_ColorLUT = NULL;
+  m_ZCropSlider = NULL;
   m_ZCropOn = false;
 
   m_GUISizer = new wxBoxSizer( wxHORIZONTAL );
@@ -190,6 +191,8 @@ void medGUIWizardPageNew::UpdateWindowing()
   double tableRange[2];
   double scalarRange[2];
 
+  if(m_Rwi == NULL) return;
+
   vtkActorCollection *actorCollection = m_Rwi->m_RenFront->GetActors();
   actorCollection->InitTraversal();
   actorCollection->GetNextItem();
@@ -206,6 +209,9 @@ void medGUIWizardPageNew::UpdateWindowing()
 void medGUIWizardPageNew::UpdateActor()
 //----------------------------------------------------------------------------
 {
+
+  if(m_Rwi == NULL) return;
+
   double low, hi;
   m_LutSlider->GetSubRange(&low,&hi);
   vtkActorCollection *actorCollection = m_Rwi->m_RenFront->GetActors();
@@ -278,6 +284,7 @@ void medGUIWizardPageNew::SetNextPage(medGUIWizardPageNew *nextPage)
 void medGUIWizardPageNew::SetZCropBounds(double ZMin, double ZMax)
 //--------------------------------------------------------------------------------
 { 
+  if(m_ZCropSlider == NULL) return;
   if (ZMax <= ZMin && m_ZCropOn)
   {
     m_GuiView->Remove(m_ZCropSlider);
@@ -299,6 +306,7 @@ void medGUIWizardPageNew::SetZCropBounds(double ZMin, double ZMax)
 void medGUIWizardPageNew::GetZCropBounds(double ZCropBounds[2])
 //--------------------------------------------------------------------------------
 { 
+  if(m_ZCropSlider == NULL) return;
   m_ZCropSlider->GetSubRange(&ZCropBounds[0],&ZCropBounds[1]);
 
 }
