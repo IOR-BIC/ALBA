@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDPoissonSurfaceReconstruction.cxx,v $
 Language:  C++
-Date:      $Date: 2011-01-28 12:36:21 $
-Version:   $Revision: 1.1.2.6 $
+Date:      $Date: 2011-02-15 08:12:30 $
+Version:   $Revision: 1.1.2.7 $
 Authors:   Fuli Wu
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -21,7 +21,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "float.h"
 
 
-vtkCxxRevisionMacro(vtkMEDPoissonSurfaceReconstruction, "$Revision: 1.1.2.6 $");
+vtkCxxRevisionMacro(vtkMEDPoissonSurfaceReconstruction, "$Revision: 1.1.2.7 $");
 vtkStandardNewMacro(vtkMEDPoissonSurfaceReconstruction);
 
 vtkDataSet* vtk_psr_input;
@@ -2975,7 +2975,7 @@ template<class T,int Dim>
 void SparseNMatrix<T,Dim>::SetAllocator(const int& blockSize){
 	if(blockSize>0){
 		UseAlloc=1;
-		Allocator.set(blockSize);
+		Allocator.Set(blockSize);
 	}
 	else{UseAlloc=0;}
 }
@@ -3043,7 +3043,7 @@ void SparseNMatrix<T,Dim>::Resize( int r )
 template<class T,int Dim>
 void SparseNMatrix<T,Dim>::SetRowSize(int row,int count){
 	if(row>=0 && row<rows){
-		if(UseAlloc){m_ppElements[row]=Allocator.newElements(count);}
+		if(UseAlloc){m_ppElements[row]=Allocator.NewElements(count);}
 		else{
 			if(rowSizes[row]){free(m_ppElements[row]);}
 			if(count>0){m_ppElements[row]=(NMatrixEntry<T,Dim>*)malloc(sizeof(NMatrixEntry<T,Dim>)*count);}
@@ -3063,9 +3063,9 @@ SparseNMatrix<T,Dim> SparseNMatrix<T,Dim>::operator * (const T& V) const
 template<class T,int Dim>
 SparseNMatrix<T,Dim>& SparseNMatrix<T,Dim>::operator *= (const T& V)
 {
-	for (int i=0; i<Rows(); i++)
+	for (int i=0; i<rows(); i++)
 	{
-		for(int ii=0;ii<m_ppElements[i].size();i++){
+		for(int ii=0;ii<m_ppElements[i];i++){
 			for(int jj=0;jj<Dim;jj++){
 				m_ppElements[i][ii].Value[jj]*=V;
 			}
