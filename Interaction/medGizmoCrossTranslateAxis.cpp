@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGizmoCrossTranslateAxis.cpp,v $
 Language:  C++
-Date:      $Date: 2011-02-10 14:35:33 $
-Version:   $Revision: 1.1.2.10 $
+Date:      $Date: 2011-02-15 14:02:36 $
+Version:   $Revision: 1.1.2.11 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -218,7 +218,7 @@ void medGizmoCrossTranslateAxis::CreateTranslationGizmoPipeline()
 	// create the right cylinder
 	m_RightCylinder = vtkCylinderSource::New();
 
-	double tubeRadius = boundingBoxDiagonal / 100;
+	double tubeRadius = boundingBoxDiagonal / 75;
 	m_RightCylinder->SetRadius(tubeRadius);
 
 	//-----------------

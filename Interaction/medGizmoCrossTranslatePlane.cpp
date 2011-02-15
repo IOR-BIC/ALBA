@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGizmoCrossTranslatePlane.cpp,v $
 Language:  C++
-Date:      $Date: 2011-02-10 14:35:33 $
-Version:   $Revision: 1.1.2.10 $
+Date:      $Date: 2011-02-15 14:02:36 $
+Version:   $Revision: 1.1.2.11 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -256,7 +256,7 @@ void medGizmoCrossTranslatePlane::CreatePipeline()
 		m_LineTF[i] = vtkTubeFilter::New();
 		m_LineTF[i]->SetInput(m_Line[i]->GetOutput());
 
-		double tubeRadius = boundingBoxDiagonal/350;
+		double tubeRadius = boundingBoxDiagonal/250;
 		m_LineTF[i]->SetRadius(tubeRadius);
 		m_LineTF[i]->SetNumberOfSides(20);
 	}
