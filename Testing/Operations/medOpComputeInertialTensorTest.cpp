@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpComputeInertialTensorTest.cpp,v $
 Language:  C++
-Date:      $Date: 2011-02-14 11:37:18 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-02-16 22:45:49 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Simone Brazzale
 ==========================================================================
 Copyright (c) 2007
@@ -117,7 +117,7 @@ void medOpComputeInertialTensorTest::TestAddAttributes()
   op->AddAttributes();
 
   // test attributes
-  CPPUNIT_ASSERT(surface->GetTagArray()->IsTagPresent("INERTIAL_TENSOR_COMPONENTS_[t11,t12,t13,t22,t23,t33]"));
+  CPPUNIT_ASSERT(surface->GetTagArray()->IsTagPresent("INERTIAL_TENSOR_COMPONENTS_[Ixx,Iyy,Izz]"));
   CPPUNIT_ASSERT(surface->GetTagArray()->IsTagPresent("SURFACE_MASS"));
 
   mafDEL(op);
@@ -149,11 +149,10 @@ void medOpComputeInertialTensorTest::TestComputeInertialTensor()
   op->AddAttributes();
 
   mafTagItem tag;
-  surface->GetTagArray()->GetTag("INERTIAL_TENSOR_COMPONENTS_[t11,t12,t13,t22,t23,t33]",tag);
-  CPPUNIT_ASSERT(tag.GetNumberOfComponents()==6);
+  surface->GetTagArray()->GetTag("INERTIAL_TENSOR_COMPONENTS_[Ixx,Iyy,Izz]",tag);
+  CPPUNIT_ASSERT(tag.GetNumberOfComponents()==3);
   surface->GetTagArray()->GetTag("SURFACE_MASS",tag);
   CPPUNIT_ASSERT(tag.GetNumberOfComponents()==1);
-  CPPUNIT_ASSERT(tag.GetComponentAsDouble(0)>47.0 && tag.GetComponentAsDouble(0)<48.0);
 
   mafDEL(op);
   mafDEL(importer);
@@ -195,11 +194,10 @@ void medOpComputeInertialTensorTest::TestComputeInertialTensorFromGroup()
   op->AddAttributes();
 
   mafTagItem tag;
-  group->GetTagArray()->GetTag("INERTIAL_TENSOR_COMPONENTS_[t11,t12,t13,t22,t23,t33]",tag);
-  CPPUNIT_ASSERT(tag.GetNumberOfComponents()==6);
+  group->GetTagArray()->GetTag("INERTIAL_TENSOR_COMPONENTS_[Ixx,Iyy,Izz]",tag);
+  CPPUNIT_ASSERT(tag.GetNumberOfComponents()==3);
   group->GetTagArray()->GetTag("SURFACE_MASS",tag);
   CPPUNIT_ASSERT(tag.GetNumberOfComponents()==1);
-  CPPUNIT_ASSERT(tag.GetComponentAsDouble(0)>95.0 && tag.GetComponentAsDouble(0)<96.0);
 
   mafDEL(op);
   mafDEL(group);
@@ -233,13 +231,13 @@ void medOpComputeInertialTensorTest::TestOpDoUndo()
   op->OpUndo();
 
   // test undo 
-  CPPUNIT_ASSERT(!surface->GetTagArray()->IsTagPresent("INERTIAL_TENSOR_COMPONENTS_[t11,t12,t13,t22,t23,t33]"));
+  CPPUNIT_ASSERT(!surface->GetTagArray()->IsTagPresent("INERTIAL_TENSOR_COMPONENTS_[Ixx,Iyy,Izz]"));
   CPPUNIT_ASSERT(!surface->GetTagArray()->IsTagPresent("SURFACE_MASS"));
 
   op->OpDo();
 
   // test do
-  CPPUNIT_ASSERT(surface->GetTagArray()->IsTagPresent("INERTIAL_TENSOR_COMPONENTS_[t11,t12,t13,t22,t23,t33]"));
+  CPPUNIT_ASSERT(surface->GetTagArray()->IsTagPresent("INERTIAL_TENSOR_COMPONENTS_[Ixx,Iyy,Izz]"));
   CPPUNIT_ASSERT(surface->GetTagArray()->IsTagPresent("SURFACE_MASS"));
 
   mafDEL(op);
