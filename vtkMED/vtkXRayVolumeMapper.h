@@ -67,7 +67,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define MaxNumberOfMipmapLevels 3
 #define MaxNumberOfRenderings   360
-
+/**
+    class name: vtkXRayVolumeMapper
+    Optimized Mapper which is able to visualize data like x-ray.
+    It can enable LOD, corrects resolution, handles with colors and gamma correction.
+    
+*/
 class VTK_vtkMAF_EXPORT vtkXRayVolumeMapper : public vtkVolumeMapper {
   public:
     static vtkXRayVolumeMapper *New();

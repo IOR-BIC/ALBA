@@ -24,23 +24,30 @@
 
 
 #define VTK_IMG_PACK_NONE 0
-  
+/**
+    class name: vtkPackedImage
+    vtkPackedImage is a class derived from vtkUnsignedCharArray, thought to contain data of
+    packed images. The only extra field in this class refers to the type of packaging.
+*/
 class VTK_vtkMAF_EXPORT vtkPackedImage : public vtkUnsignedCharArray
 {
 public:
+  /** construct the object*/
   static vtkPackedImage *New();
+  /** RTTI macro */
   vtkTypeRevisionMacro(vtkPackedImage, vtkUnsignedCharArray);
 
+  /** print object information */
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  /**
-  Set/Get the type of packaging used for this image.*/
+  /** Set the type of packaging used for this image.*/
   vtkSetMacro(PackType,int);
+  /** Get the type of packaging used for this image.*/
   vtkGetMacro(PackType,int);
 
-  /**
-  Set/Get the real size of the packed image.*/
+  /** Set the real size of the packed image.*/
   void SetImageSize(unsigned long imgsize);
+  /** Get the real size of the packed image.*/
   int GetImageSize() {return this->GetSize();};
 
   /**
@@ -53,7 +60,9 @@ public:
   unsigned char *GetImagePointer() {return (unsigned char *)GetPointer(0);};
  
 protected:
+  /** constructor */
   vtkPackedImage();
+  /** destructor */
   ~vtkPackedImage();
 
   int PackType;
