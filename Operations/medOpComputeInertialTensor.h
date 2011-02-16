@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpComputeInertialTensor.h,v $
   Language:  C++
-  Date:      $Date: 2011-02-14 11:36:49 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2011-02-16 22:45:20 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2004
@@ -17,6 +17,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafVME.h"
 #include "mafTagItem.h"
 #include "vtkCell.h"
+#include "vtkPolyData.h"
 #include "vnl/vnl_vector.h"
 
 //----------------------------------------------------------------------------
@@ -24,7 +25,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 class mafVMESurface;
 class mafGUI;
-class ctkCell;
+class vtkCell;
 
 /** 
   class name: medOpComputeInertialTensor
@@ -85,31 +86,49 @@ protected:
   /** Get surface area. */
   double GetSurfaceArea();
 
+  /** Get surface mass using volume. */
+  double GetSurfaceMassFromVolume();
+
+  /** Get surface mass using area. */
+  double GetSurfaceMassFromArea();
+
   /** Get surface mass. */
   double GetSurfaceMass();
 
-  /** Compute area of a triangular cell */
-  double medOpComputeInertialTensor::TriangleArea( vtkCell* cell );
+  /** Get if a point is inside or outside a surface */
+  int IsInsideSurface(vtkPolyData* surface, double x[3]);
 
-  /** Compute area of a quadratic cell */
-  double medOpComputeInertialTensor::QuadArea( vtkCell* cell );
+  /** Calculate inertial tensor using Monte Carlo approach.
+      This algorithm requires time and resources but is efficient for complex surfaces.
+  */
+  int ComputeInertialTensorUsingMonteCarlo(mafNode* node, int current_node = 1, int n_of_nodes = 1);
 
-  /** Compute area of a tetrahedric cell */
-  double medOpComputeInertialTensor::TetVolume( vtkCell* cell );
+  /** Calculate inertial tensor using geometry.
+      This algorithm is fast but 
+  */
+  int ComputeInertialTensorUsingGeometry(mafNode* node, int current_node = 1, int n_of_nodes = 1);
 
-  /** Compute area of a hexaedric cell */
-  double medOpComputeInertialTensor::HexVolume( vtkCell* cell );
+  enum GUI_METHOD_ID
+  {
+    ID_COMBO = MINID,
+    MINID,
+  };	
 
-  /** Fill vnl vector */
-  void medOpComputeInertialTensor::FillVnlVector(vnl_vector<double> &v, double coords[3]);
-
+  enum COMPUTATION_METHOD
+  {
+    MONTE_CARLO = 0,
+    GEOMETRY,
+  };	
   
   double  m_Density;                            // Material density
   double  m_Mass;                               // Material mass
-  double  m_T11,m_T12,m_T13,m_T22,m_T23,m_T33;  // Tensor components.
+  double  m_Ixx,m_Iyy,m_Izz;                    // Tensor components.
 
   mafTagItem m_TagTensor;
   mafTagItem m_TagMass;
+
+  int m_MethodToUse;
+  int m_Accuracy;
 
 };
 #endif
