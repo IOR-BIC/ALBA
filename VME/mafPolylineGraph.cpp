@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2011-02-03 11:46:10 $
-Version:   $Revision: 1.10.2.5 $
+Date:      $Date: 2011-02-21 15:32:35 $
+Version:   $Revision: 1.10.2.6 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -695,7 +695,9 @@ bool mafPolylineGraph::Edge::SelfCheck() const
 {
   // edge must not be empty
   if ((m_VertexId[0] == UndefinedId) || (m_VertexId[1] == UndefinedId)){
+    #ifndef _DEBUG
     LogMessage("undefined vertex or vertices %d %d on edge", m_VertexId[0], m_VertexId[1]) ;
+#endif
     return false ;
   }
 
