@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2011-02-11 15:47:25 $
-Version:   $Revision: 1.1.2.47 $
+Date:      $Date: 2011-02-22 17:35:16 $
+Version:   $Revision: 1.1.2.48 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -122,8 +122,12 @@ medViewArbitraryOrthoSlice::medViewArbitraryOrthoSlice(wxString label, bool show
 : medViewCompoundWindowing(label, 2, 2)
 
 {
+	m_ThicknessText = "UNDEFINED_THICKNESS_TEXT";
+	m_XSlicerPicker = NULL;
+
 	m_DebugMode = false;
 
+	m_ThicknessComboAssignment = 3; //this means 1.0, the final value after initialization
 	m_EnableThickness = 0;
 	m_PathFromDialog = "";
 	m_EnableExportImages = 0;
@@ -242,10 +246,26 @@ medViewArbitraryOrthoSlice::medViewArbitraryOrthoSlice(wxString label, bool show
 	m_TextActorRightZView = vtkActor2D::New();
 	m_TextMapperRightZView = vtkTextMapper::New();
 	m_TextActorRightZView->SetMapper(m_TextMapperRightZView);
+
+	m_XnThicknessTextActor = vtkActor2D::New();
+	m_XnThicknessTextMapper = vtkTextMapper::New();
+	m_XnThicknessTextActor->SetMapper(m_XnThicknessTextMapper);
+
+	m_YnThicknessTextActor = vtkActor2D::New();
+	m_YnThicknessTextMapper = vtkTextMapper::New();
+	m_YnThicknessTextActor->SetMapper(m_YnThicknessTextMapper);
+
+	m_ZnThicknessTextActor = vtkActor2D::New();
+	m_ZnThicknessTextMapper = vtkTextMapper::New();
+	m_ZnThicknessTextActor->SetMapper(m_ZnThicknessTextMapper);
+
+
 }
 
 medViewArbitraryOrthoSlice::~medViewArbitraryOrthoSlice()
 {
+	mafDEL(m_XSlicerPicker);
+
 	m_SlicerZResetMatrix   = NULL;
 	m_CurrentVolume = NULL;
 	m_CurrentImage  = NULL;
@@ -253,24 +273,35 @@ medViewArbitraryOrthoSlice::~medViewArbitraryOrthoSlice()
 
 	cppDEL(m_GizmoZView);
 
+	// Xn 2d actors
 	vtkDEL(m_TextActorLeftXView);
 	vtkDEL(m_TextMapperLeftXView);
 
 	vtkDEL(m_TextActorRightXView);
 	vtkDEL(m_TextMapperRightXView);
 
+	vtkDEL(m_XnThicknessTextActor);
+	vtkDEL(m_XnThicknessTextMapper);
+
+	// Yn 2d actors
 	vtkDEL(m_TextActorLeftYView);
 	vtkDEL(m_TextMapperLeftYView);
 
 	vtkDEL(m_TextActorRightYView);
 	vtkDEL(m_TextMapperRightYView);
 
-	vtkDEL(m_TextActorLeftZView);
-	vtkDEL(m_TextMapperLeftZView);
+	vtkDEL(m_YnThicknessTextActor);
+	vtkDEL(m_YnThicknessTextMapper);
 
+	// Zn 2d actors
 	vtkDEL(m_TextActorRightZView);
 	vtkDEL(m_TextMapperRightZView);
 
+	vtkDEL(m_TextActorLeftZView);
+	vtkDEL(m_TextMapperLeftZView);
+
+	vtkDEL(m_ZnThicknessTextActor);
+	vtkDEL(m_ZnThicknessTextMapper);
 }
 
 void medViewArbitraryOrthoSlice::PackageView()
@@ -408,8 +439,9 @@ void medViewArbitraryOrthoSlice::VmeShow(mafNode *node, bool show)
 }
 
 void medViewArbitraryOrthoSlice::OnEvent(mafEventBase *maf_event)
-
 {
+	assert(maf_event);
+
 	if (maf_event->GetSender() == this->m_Gui || maf_event->GetSender() == this->m_LutSlider) // from this view gui
 	{
 		OnEventThis(maf_event); 
@@ -431,8 +463,13 @@ void medViewArbitraryOrthoSlice::OnEvent(mafEventBase *maf_event)
 		else
 		{
 			// if no one can handle this event send it to the operation listener
+
 			mafEventMacro(*maf_event); 
 		}	
+	}
+	else if (maf_event->GetId() == VME_PICKED)
+	{
+		wxMessageBox("Hello!");
 	}
 	else
 	{
@@ -1119,9 +1156,15 @@ void medViewArbitraryOrthoSlice::OnEventThis(mafEventBase *maf_event)
 	{
 		switch(e->GetId()) 
 		{
+		case VME_PICKED:
+			{
+				wxMessageBox("pick!");		
+			}
+			break;
+
 		case ID_RANGE_MODIFIED:
 			{
-				OnRangeModified();
+				OnLUTRangeModified();
 			}
 			break;
 		case ID_LUT_CHOOSER:
@@ -1181,6 +1224,12 @@ void medViewArbitraryOrthoSlice::OnEventThis(mafEventBase *maf_event)
 			}
 			break;
 
+		case ID_UPDATE_LUT:
+			{
+				UpdateSlicersLUT();
+			}
+			break;
+
 		default:
 			mafViewCompound::OnEvent(maf_event);
 		}
@@ -1232,9 +1281,16 @@ mafGUI* medViewArbitraryOrthoSlice::CreateGui()
 	m_Gui->Label("Thickness", true);
 	m_Gui->Bool(ID_ENABLE_THICKNESS, "",&m_EnableThickness);
 
-	m_Gui->Label("Thickness value:");
-	m_Gui->Double(ID_THICKNESS_VALUE_CHANGED,_(""),&m_ThicknessValue,0, 100);
+	wxString thicknessChoices[22] = {"0.5", "1.0", "1.5",\
+		"2.0", "2.5", "3.0",\
+		"3.5", "4.0", "4.5",\
+		"5.0", "5.5", "6.0",\
+		"6.5", "7.0", "7.5",\
+		"8.0", "8.5", "9.0",\
+		"9.5", "10.0","20.0","40.0"};
 
+	m_Gui->Label("Thickness value:");
+	m_Gui->Combo(ID_THICKNESS_VALUE_CHANGED, _(""), &m_ThicknessComboAssignment, 22, thicknessChoices);
 
 	m_Gui->Label("");
 
@@ -1244,7 +1300,7 @@ mafGUI* medViewArbitraryOrthoSlice::CreateGui()
 	//  m_Gui->Label("");
 
 	m_ComboChooseExportAxis = 0;
-	wxString Text2[3]={_("X AXIS"),_("Y AXIS"),_("Z AXIS")};
+	wxString Text2[3]={_("RED"),_("GREEN"),_("BLUE")};
 	m_Gui->Combo(ID_COMBO_CHOOSE_EXPORT_AXIS,"",&m_ComboChooseExportAxis,3,Text2);
 
 	m_Gui->Label("Export planes height:");
@@ -1254,6 +1310,9 @@ mafGUI* medViewArbitraryOrthoSlice::CreateGui()
 
 	m_Gui->Button(ID_CHOOSE_DIR,"Choose export dir");
 	m_Gui->Button(ID_EXPORT,"Write images");
+
+	// vme lut update test
+	// m_Gui->Button(ID_UPDATE_LUT, "update lut");
 
 	EnableWidgets( (m_CurrentVolume != NULL) );
 	return m_Gui;
@@ -1330,8 +1389,6 @@ void medViewArbitraryOrthoSlice::PostMultiplyEventMatrixToSlicers(mafEventBase *
 				slicers[i]->SetAbsMatrix(absPose);
 			} 
 
-
-
 			// clean up
 			tr->Delete();
 		}
@@ -1348,6 +1405,8 @@ void medViewArbitraryOrthoSlice::PostMultiplyEventMatrixToSlicers(mafEventBase *
 				UpdateThicknessStuff();
 
 			}
+
+			UpdateSlicersLUT();
 		}
 
 	}
@@ -1391,7 +1450,7 @@ void medViewArbitraryOrthoSlice::PostMultiplyEventMatrixToSlicer(mafEventBase *m
 		{
 			// ... and update the slicer with the new abs pose
 			currentSlicer->SetAbsMatrix(absPose);
-		} 
+        } 
 
 		UpdateExportImagesBoundsLineActors();
 
@@ -1413,6 +1472,8 @@ void medViewArbitraryOrthoSlice::PostMultiplyEventMatrixToSlicer(mafEventBase *m
 					AccumulateTextures(m_SlicerZ, m_ThicknessValue, NULL, true);
 				}
 			}
+
+			UpdateSlicersLUT();
 		}
 
 		// clean up
@@ -1510,17 +1571,7 @@ void medViewArbitraryOrthoSlice::UpdateSlicerZBehavior()
 		mafPipeSurfaceTextured *pipePerspectiveViewSlicerZ=(mafPipeSurfaceTextured *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_SlicerZ);
 		pipePerspectiveViewSlicerZ->SetActorPicking(true);
 
-		// x view
-		mafPipeSurfaceTextured *pipeXViewSlicerX=(mafPipeSurfaceTextured *)(m_ChildViewList[X_VIEW])->GetNodePipe(m_SlicerX);
-		pipeXViewSlicerX->SetActorPicking(true);
-
-		// y view
-		mafPipeSurfaceTextured *pipeYViewSlicerY=(mafPipeSurfaceTextured *)(m_ChildViewList[Y_VIEW])->GetNodePipe(m_SlicerY);
-		pipeYViewSlicerY->SetActorPicking(true);
-
-		// z view
-		mafPipeSurfaceTextured *pipeZViewSlicerZ=(mafPipeSurfaceTextured *)(m_ChildViewList[Z_VIEW])->GetNodePipe(m_SlicerZ);
-		pipeZViewSlicerZ->SetActorPicking(true);
+		EnableSlicersPicking(true);
 	}
 	else
 	{
@@ -1567,11 +1618,14 @@ void medViewArbitraryOrthoSlice::VolumeWindowing(mafVME *volume)
 	m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
 	m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
 	m_LutSlider->SetSubRange((long)currentSurfaceMaterial->m_TableRange[0],(long)currentSurfaceMaterial->m_TableRange[1]);
+
+	m_SlicerY->GetMaterial()->m_ColorLut->SetRange((long)sr[0],(long)sr[1]);
+	m_SlicerZ->GetMaterial()->m_ColorLut->SetRange((long)sr[0],(long)sr[1]);
 }
 
 void medViewArbitraryOrthoSlice::ShowMafVMEVolume( mafVME * vme, bool show )
 {
-  wxBusyInfo wait("please wait");
+	wxBusyInfo wait("please wait");
 
 	Update2DActors();
 
@@ -1585,6 +1639,7 @@ void medViewArbitraryOrthoSlice::ShowMafVMEVolume( mafVME * vme, bool show )
 
 	xView->GetSceneGraph()->m_AlwaysVisibleRenderer->AddActor2D(m_TextActorLeftXView);
 	xView->GetSceneGraph()->m_AlwaysVisibleRenderer->AddActor2D(m_TextActorRightXView);
+	xView->GetSceneGraph()->m_AlwaysVisibleRenderer->AddActor2D(m_XnThicknessTextActor);
 
 	mafViewVTK *yView = ((mafViewVTK *)(m_ChildViewList[Y_VIEW])) ;
 	assert(yView);
@@ -1594,6 +1649,7 @@ void medViewArbitraryOrthoSlice::ShowMafVMEVolume( mafVME * vme, bool show )
 
 	yView->GetSceneGraph()->m_AlwaysVisibleRenderer->AddActor2D(m_TextActorLeftYView);
 	yView->GetSceneGraph()->m_AlwaysVisibleRenderer->AddActor2D(m_TextActorRightYView);
+	yView->GetSceneGraph()->m_AlwaysVisibleRenderer->AddActor2D(m_YnThicknessTextActor);
 
 	mafViewVTK *zView = ((mafViewVTK *)(m_ChildViewList[Z_VIEW])) ;
 	assert(zView);
@@ -1601,9 +1657,14 @@ void medViewArbitraryOrthoSlice::ShowMafVMEVolume( mafVME * vme, bool show )
 	// fuzzy picking
 	zView->GetPicker2D()->SetTolerance(pickerTolerance);
 
+	ShowThickness2DTextActors(false);
+
 	zView->GetSceneGraph()->m_AlwaysVisibleRenderer->AddActor2D(m_TextActorLeftZView);
 	zView->GetSceneGraph()->m_AlwaysVisibleRenderer->AddActor2D(m_TextActorRightZView);
+	zView->GetSceneGraph()->m_AlwaysVisibleRenderer->AddActor2D(m_ZnThicknessTextActor);
 
+	
+	
 	double sr[2],volumeVTKDataCenterLocalCoords[3];
 	mafVME *vmeVolume=mafVME::SafeDownCast(vme);
 	m_CurrentVolume = vmeVolume;
@@ -1849,6 +1910,8 @@ void medViewArbitraryOrthoSlice::OnReset()
 
 		UpdateExportImagesBoundsLineActors();
 
+		UpdateSlicersLUT();
+
 		mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 
 		//update the normal of the cutter plane of the surface
@@ -1875,23 +1938,13 @@ void medViewArbitraryOrthoSlice::OnReset()
 	}
 }
 
-void medViewArbitraryOrthoSlice::OnRangeModified()
+void medViewArbitraryOrthoSlice::OnLUTRangeModified()
 {
 	mafVME *node = mafVME::SafeDownCast(GetSceneGraph()->GetSelectedVme());
 
 	if( (m_CurrentVolume || m_CurrentImage) && node)
 	{
-		double low, hi;
-		m_LutSlider->GetSubRange(&low,&hi);
-		m_ColorLUT->SetTableRange(low,hi);
-
-		m_SlicerX->GetMaterial()->m_ColorLut->DeepCopy(m_ColorLUT);
-		m_SlicerX->GetMaterial()->m_ColorLut->Modified();
-
-		m_SlicerY->GetMaterial()->m_ColorLut->DeepCopy(m_ColorLUT);
-		m_SlicerY->GetMaterial()->m_ColorLut->Modified();
-
-		mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+		UpdateSlicersLUT();
 	}
 }
 
@@ -2108,7 +2161,7 @@ void medViewArbitraryOrthoSlice::ShowSlicers( mafVME * vmeVolume, bool show )
 	m_GizmoZView->SetInput(m_SlicerZ);
 	m_GizmoZView->SetRefSys(m_SlicerZ);
 	m_GizmoZView->SetAbsPose(m_SlicerZResetMatrix);
-	
+
 	m_GizmoZView->SetColor(medGizmoCrossRotateTranslate::GREW, medGizmoCrossRotateTranslate::GREEN);
 	m_GizmoZView->SetColor(medGizmoCrossRotateTranslate::GTAEW, medGizmoCrossRotateTranslate::GREEN);
 	m_GizmoZView->SetColor(medGizmoCrossRotateTranslate::GTPEW, medGizmoCrossRotateTranslate::GREEN);
@@ -2188,16 +2241,22 @@ void medViewArbitraryOrthoSlice::ShowSlicers( mafVME * vmeVolume, bool show )
 
 	vtkDEL(outputMatrix);
 
-  double red[3] = {1,0,0};
-  CreateViewCameraNormalFeedbackActor(red, X_VIEW);
+	double red[3] = {1,0,0};
+	CreateViewCameraNormalFeedbackActor(red, X_VIEW);
 
-  double green[3] = {0,1,0};
-  CreateViewCameraNormalFeedbackActor(green, Y_VIEW);
+	double green[3] = {0,1,0};
+	CreateViewCameraNormalFeedbackActor(green, Y_VIEW);
 
-  double blue[3] = {0,0,1};
-  CreateViewCameraNormalFeedbackActor(blue, Z_VIEW);
+	double blue[3] = {0,0,1};
+	CreateViewCameraNormalFeedbackActor(blue, Z_VIEW);
 
+	// create the pick interactor for slicer X
+	m_XSlicerPicker = mafInteractorPicker::New();
+	m_XSlicerPicker->SetListener(this);
 
+	m_SlicerX->SetBehavior(m_XSlicerPicker);
+
+	EnableSlicersPicking(false);
 }
 
 void medViewArbitraryOrthoSlice::BuildXCameraConeVME()
@@ -2219,12 +2278,12 @@ void medViewArbitraryOrthoSlice::BuildXCameraConeVME()
 	double d = sqrt(vtkMath::Distance2BetweenPoints(p1,p2));
 
 	vtkConeSource *XCameraConeSource = vtkConeSource::New();
-	XCameraConeSource->SetCenter(0,0,d/3);
+	XCameraConeSource->SetCenter(0,0,d/2);
 	XCameraConeSource->SetResolution(20);
 	XCameraConeSource->SetDirection(0,0,-1);
 
-	XCameraConeSource->SetRadius(d / 8);
-	XCameraConeSource->SetHeight(d / 8);
+	XCameraConeSource->SetRadius(d / 10);
+	XCameraConeSource->SetHeight(d / 10);
 
 	XCameraConeSource->CappingOn();
 	XCameraConeSource->Update();
@@ -2282,12 +2341,12 @@ void medViewArbitraryOrthoSlice::BuildYCameraConeVME()
 	double d = sqrt(vtkMath::Distance2BetweenPoints(p1,p2));
 
 	vtkConeSource *YCameraConeSource = vtkConeSource::New();
-	YCameraConeSource->SetCenter(0,0,d/3);
+	YCameraConeSource->SetCenter(0,0,d/2);
 	YCameraConeSource->SetResolution(20);
 	YCameraConeSource->SetDirection(0,0,-1);
 
-	YCameraConeSource->SetRadius(d / 8);
-	YCameraConeSource->SetHeight(d / 8);
+	YCameraConeSource->SetRadius(d / 10);
+	YCameraConeSource->SetHeight(d / 10);
 
 	YCameraConeSource->CappingOn();
 	YCameraConeSource->Update();
@@ -2352,12 +2411,12 @@ void medViewArbitraryOrthoSlice::BuildZCameraConeVME()
 	double d = sqrt(vtkMath::Distance2BetweenPoints(p1,p2));
 
 	vtkConeSource *ZCameraConeSource = vtkConeSource::New();
-	ZCameraConeSource->SetCenter(0,0,d/3);
+	ZCameraConeSource->SetCenter(0,0,d/2);
 	ZCameraConeSource->SetResolution(20);
 	ZCameraConeSource->SetDirection(0,0,-1);
 
-	ZCameraConeSource->SetRadius(d / 8);
-	ZCameraConeSource->SetHeight(d / 8);
+	ZCameraConeSource->SetRadius(d / 10);
+	ZCameraConeSource->SetHeight(d / 10);
 
 	ZCameraConeSource->CappingOn();
 	ZCameraConeSource->Update();
@@ -2387,8 +2446,8 @@ void medViewArbitraryOrthoSlice::BuildZCameraConeVME()
 	mafPipeSurface *pipeX=(mafPipeSurface *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_ZCameraConeVME);
 	pipeX->SetActorPicking(false);
 
-// 	mafPipeSurface *pipeY=(mafPipeSurface *)(m_ChildViewList[Y_VIEW])->GetNodePipe(m_ZCameraConeVME);
-// 	pipeY->SetActorPicking(false);
+	// 	mafPipeSurface *pipeY=(mafPipeSurface *)(m_ChildViewList[Y_VIEW])->GetNodePipe(m_ZCameraConeVME);
+	// 	pipeY->SetActorPicking(false);
 
 	ZCameraConeSource->Delete();
 	CameraReset();
@@ -2555,6 +2614,8 @@ void medViewArbitraryOrthoSlice::PostMultiplyEventMatrixToGizmoCross( mafEventBa
 
 void medViewArbitraryOrthoSlice::ChildViewsCameraUpdate()
 {
+	//UpdateSlicersLUT();
+
 	for(int i=0; i<m_NumOfChildView; i++)
 	{
 		m_ChildViewList[i]->CameraUpdate();
@@ -2683,23 +2744,35 @@ void medViewArbitraryOrthoSlice::OnLayoutInternal( wxSize &windowSize )
 
 	double textShiftXRight = windowSize.GetWidth() - textFontSize -textShiftXLeft;
 
+	// x view
 	m_TextMapperLeftXView->GetTextProperty()->SetFontSize(textFontSize);
 	m_TextActorLeftXView->SetPosition(textShiftXLeft, textHeigth);
 
 	m_TextMapperRightXView->GetTextProperty()->SetFontSize(textFontSize);
 	m_TextActorRightXView->SetPosition(textShiftXRight, textHeigth);
 
+	m_XnThicknessTextMapper->GetTextProperty()->SetFontSize(textFontSize);
+	m_XnThicknessTextActor->SetPosition(textShiftXLeft, textHeigth - textFontSize * 2);
+
+	// y view
 	m_TextMapperLeftYView->GetTextProperty()->SetFontSize(textFontSize);
 	m_TextActorLeftYView->SetPosition(textShiftXLeft, textHeigth);
 
 	m_TextMapperRightYView->GetTextProperty()->SetFontSize(textFontSize);
 	m_TextActorRightYView->SetPosition(textShiftXRight, textHeigth);
 
+	m_YnThicknessTextMapper->GetTextProperty()->SetFontSize(textFontSize);
+	m_YnThicknessTextActor->SetPosition(textShiftXLeft, textHeigth  - textFontSize * 2);
+
+	// z view
 	m_TextMapperLeftZView->GetTextProperty()->SetFontSize(textFontSize);
 	m_TextActorLeftZView->SetPosition(textShiftXLeft, textHeigth);
 
 	m_TextMapperRightZView->GetTextProperty()->SetFontSize(textFontSize);
 	m_TextActorRightZView->SetPosition(textShiftXRight, textHeigth);
+
+	m_ZnThicknessTextMapper->GetTextProperty()->SetFontSize(textFontSize);
+	m_ZnThicknessTextActor->SetPosition(textShiftXLeft, textHeigth - textFontSize * 2);
 
 }
 
@@ -2731,6 +2804,11 @@ void medViewArbitraryOrthoSlice::UpdateZView2DActors()
 
 	m_TextMapperLeftZView->SetInput(leftLetter.c_str());
 	m_TextMapperRightZView->SetInput(rightLetter.c_str());
+
+	std::ostringstream thicknessStringStream;
+	thicknessStringStream << "T: " << m_ThicknessValue;
+	m_ZnThicknessTextMapper->SetInput(thicknessStringStream.str().c_str());
+		
 }
 
 void medViewArbitraryOrthoSlice::UpdateXView2DActors()
@@ -2759,6 +2837,13 @@ void medViewArbitraryOrthoSlice::UpdateXView2DActors()
 
 	m_TextMapperLeftXView->SetInput(leftLetter.c_str());
 	m_TextMapperRightXView->SetInput(rightLetter.c_str());
+
+	m_XnThicknessTextMapper->SetInput(m_ThicknessText.GetCStr());
+
+	std::ostringstream thicknessStringStream;
+	thicknessStringStream << "T: " << m_ThicknessValue;
+	m_XnThicknessTextMapper->SetInput(thicknessStringStream.str().c_str());
+
 }
 
 void medViewArbitraryOrthoSlice::UpdateYView2DActors()
@@ -2789,6 +2874,12 @@ void medViewArbitraryOrthoSlice::UpdateYView2DActors()
 
 	m_TextMapperLeftYView->SetInput(leftLetter.c_str());
 	m_TextMapperRightYView->SetInput(rightLetter.c_str());
+
+	m_YnThicknessTextMapper->SetInput(m_ThicknessText.GetCStr());
+
+	std::ostringstream thicknessStringStream;
+	thicknessStringStream << "T: " << m_ThicknessValue;
+	m_YnThicknessTextMapper->SetInput(thicknessStringStream.str().c_str());
 
 }
 
@@ -2851,16 +2942,17 @@ void medViewArbitraryOrthoSlice::RestoreCameraParametersForAllSubviews()
 
 void medViewArbitraryOrthoSlice::AccumulateTextures( mafVMESlicer *inSlicer, double inRXThickness , vtkImageData *outRXTexture /*= NULL */, bool showProgressBar /*= false*/ )
 {	
-	if (showProgressBar)
-	{
-		mafEvent e(this,PROGRESSBAR_SHOW);
-		mafEventMacro(e);
-	}
 
 	// prevent wasted cpu time :P
 	if (m_EnableThickness == 0)
 	{
 		return;
+	}
+
+	if (showProgressBar)
+	{
+		mafEvent e(this,PROGRESSBAR_SHOW);
+		mafEventMacro(e);
 	}
 
 	int direction = -1;
@@ -3400,7 +3492,7 @@ void medViewArbitraryOrthoSlice::ShowZCutPlanes( bool show )
 	m_ChildViewList[X_VIEW]->VmeShow(m_ViewXnSliceZmVME, show);
 	m_ChildViewList[Y_VIEW]->VmeShow(m_ViewYnSliceZpVME, show);
 	m_ChildViewList[Y_VIEW]->VmeShow(m_ViewYnSliceZmVME, show);
-	
+
 	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_ViewXnSliceZpVME, show);
 	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_ViewXnSliceZmVME, show);
 	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_ViewYnSliceZpVME, show);
@@ -3692,9 +3784,9 @@ void medViewArbitraryOrthoSlice::EnableThicknessGUI( bool enable )
 
 void medViewArbitraryOrthoSlice::OnEventID_ENABLE_EXPORT_IMAGES()
 {
-  wxBusyInfo wait("please wait");
+	wxBusyInfo wait("please wait");
 
-  EnableExportImages(m_EnableExportImages);
+	EnableExportImages(m_EnableExportImages);
 	OnEventID_COMBO_CHOOSE_EXPORT_AXIS();
 
 	if (m_EnableExportImages == 0)  // disable export images
@@ -3844,6 +3936,8 @@ void medViewArbitraryOrthoSlice::OnEventID_EXPORT()
 
 	mafEvent eHide(this,PROGRESSBAR_HIDE);
 	mafEventMacro(eHide);
+
+	UpdateSlicersLUT();
 }
 
 void medViewArbitraryOrthoSlice::OnEventID_ENABLE_THICKNESS()
@@ -3867,6 +3961,8 @@ void medViewArbitraryOrthoSlice::OnEventID_ENABLE_THICKNESS()
 	}
 
 	EnableThickness(m_EnableThickness);
+	ShowThickness2DTextActors(m_EnableThickness);
+	UpdateSlicersLUT();
 }
 
 
@@ -3889,13 +3985,17 @@ void medViewArbitraryOrthoSlice::UpdateSlicers()
 		slicers[i]->SetAbsMatrix(slicers[i]->GetAbsMatrixPipe()->GetMatrix());
 		slicers[i]->GetSurfaceOutput()->GetVTKData()->Modified();
 		slicers[i]->GetSurfaceOutput()->GetVTKData()->Update();
+
 	}
 }
 
 void medViewArbitraryOrthoSlice::OnEventID_THICKNESS_VALUE_CHANGED()
 {
+	ThicknessComboAssignment();
 	UpdateExportImagesBoundsLineActors();
+	Update2DActors();
 	UpdateThicknessStuff();
+	UpdateSlicersLUT();
 	ChildViewsCameraUpdate();
 }
 
@@ -3931,56 +4031,170 @@ mafPipeSurface * medViewArbitraryOrthoSlice::GetPipe(int inView, mafVMESurface *
 
 void medViewArbitraryOrthoSlice::CreateViewCameraNormalFeedbackActor(double col[3], int view)
 {
-  double m_BorderColor[3];
-//  bool m_Border = false;
+	double m_BorderColor[3];
+	//  bool m_Border = false;
 
-  m_BorderColor[0] = col[0];
-  m_BorderColor[1] = col[1];
-  m_BorderColor[2] = col[2];
+	m_BorderColor[0] = col[0];
+	m_BorderColor[1] = col[1];
+	m_BorderColor[2] = col[2];
 
-  //if(m_Border) BorderDelete();
-  int size[2];
-  this->GetWindow()->GetSize(&size[0],&size[1]);
-  vtkSphereSource *ss = vtkSphereSource::New();
-  
-  ss->SetRadius(size[0] / 20.0);
-  ss->SetCenter(0,0,0);
-  ss->SetThetaResolution(1);
-  ss->Update();
+	//if(m_Border) BorderDelete();
+	int size[2];
+	this->GetWindow()->GetSize(&size[0],&size[1]);
+	vtkSphereSource *ss = vtkSphereSource::New();
 
-  vtkCoordinate *coord = vtkCoordinate::New();
-  coord->SetCoordinateSystemToDisplay();
-  coord->SetValue(size[0]-1, size[1]-1, 0);
+	ss->SetRadius(size[0] / 20.0);
+	ss->SetCenter(0,0,0);
+	ss->SetThetaResolution(1);
+	ss->Update();
 
-  vtkPolyDataMapper2D *pdmd = vtkPolyDataMapper2D::New();
-  pdmd->SetInput(ss->GetOutput());
-  pdmd->SetTransformCoordinate(coord);
+	vtkCoordinate *coord = vtkCoordinate::New();
+	coord->SetCoordinateSystemToDisplay();
+	coord->SetValue(size[0]-1, size[1]-1, 0);
 
-  vtkProperty2D *pd = vtkProperty2D::New();
-  pd->SetDisplayLocationToForeground();
-  pd->SetLineWidth(4);
-  pd->SetColor(col[0],col[1],col[2]);
-  pd->SetOpacity(0.2);
+	vtkPolyDataMapper2D *pdmd = vtkPolyDataMapper2D::New();
+	pdmd->SetInput(ss->GetOutput());
+	pdmd->SetTransformCoordinate(coord);
 
-  vtkActor2D *m_Border = vtkActor2D::New();
-  m_Border->SetMapper(pdmd);
-  m_Border->SetProperty(pd);
-  m_Border->SetPosition(1,1);
+	vtkProperty2D *pd = vtkProperty2D::New();
+	pd->SetDisplayLocationToForeground();
+	pd->SetLineWidth(4);
+	pd->SetColor(col[0],col[1],col[2]);
+	pd->SetOpacity(0.2);
 
-  ((mafViewVTK*)(m_ChildViewList[view]))->m_Rwi->m_RenFront->AddActor2D(m_Border);
+	vtkActor2D *m_Border = vtkActor2D::New();
+	m_Border->SetMapper(pdmd);
+	m_Border->SetProperty(pd);
+	m_Border->SetPosition(1,1);
 
-  vtkDEL(ss);
-  vtkDEL(coord);
-  vtkDEL(pdmd);
-  vtkDEL(pd);
-  vtkDEL(m_Border);
+	((mafViewVTK*)(m_ChildViewList[view]))->m_Rwi->m_RenFront->AddActor2D(m_Border);
+
+	vtkDEL(ss);
+	vtkDEL(coord);
+	vtkDEL(pdmd);
+	vtkDEL(pd);
+	vtkDEL(m_Border);
 }
 
 void medViewArbitraryOrthoSlice::DestroyViewCameraNormalFeedbackActor(int view)
 {
-  
-  //if(m_Border)
-  {
-    //((mafViewVTK*)(m_ChildViewList[view]))->m_Rwi->m_RenFront->RemoveActor(m_Border);
-  }  
+
+	//if(m_Border)
+	{
+		//((mafViewVTK*)(m_ChildViewList[view]))->m_Rwi->m_RenFront->RemoveActor(m_Border);
+	} 
+}
+
+void medViewArbitraryOrthoSlice::EnableSlicersPicking(bool enable)
+{
+	// x view
+	mafPipeSurfaceTextured *pipeXViewSlicerX=(mafPipeSurfaceTextured *)(m_ChildViewList[X_VIEW])->GetNodePipe(m_SlicerX);
+	pipeXViewSlicerX->SetActorPicking(enable);
+
+	// y view
+	mafPipeSurfaceTextured *pipeYViewSlicerY=(mafPipeSurfaceTextured *)(m_ChildViewList[Y_VIEW])->GetNodePipe(m_SlicerY);
+	pipeYViewSlicerY->SetActorPicking(enable);
+
+	// z view
+	mafPipeSurfaceTextured *pipeZViewSlicerZ=(mafPipeSurfaceTextured *)(m_ChildViewList[Z_VIEW])->GetNodePipe(m_SlicerZ);
+	pipeZViewSlicerZ->SetActorPicking(enable);
+}
+
+void medViewArbitraryOrthoSlice::ShowThickness2DTextActors( bool show )
+{
+	m_XnThicknessTextActor->SetVisibility(show);
+	m_YnThicknessTextActor->SetVisibility(show);
+	m_ZnThicknessTextActor->SetVisibility(show);
+
+	ChildViewsCameraUpdate();
+}
+
+
+void medViewArbitraryOrthoSlice::UpdateSlicersLUT()
+{
+	double low, hi;
+	m_LutSlider->GetSubRange(&low,&hi);
+	m_ColorLUT->SetTableRange(low,hi);
+
+	m_SlicerX->GetMaterial()->m_ColorLut->SetTableRange(low,hi);
+	m_SlicerY->GetMaterial()->m_ColorLut->SetTableRange(low,hi);
+	m_SlicerZ->GetMaterial()->m_ColorLut->SetTableRange(low,hi);
+
+	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+}
+
+//----------------------------------------------------------------------------
+void medViewArbitraryOrthoSlice::ThicknessComboAssignment()
+//----------------------------------------------------------------------------
+{
+	switch(m_ThicknessComboAssignment)
+	{
+	case 0:
+		m_ThicknessValue = 0.5;
+		break;
+	case 1:
+		m_ThicknessValue = 1.0;
+		break;
+	case 2:
+		m_ThicknessValue = 1.5;
+		break;
+	case 3:
+		m_ThicknessValue = 2.0;
+		break;
+	case 4:
+		m_ThicknessValue = 2.5;
+		break;
+	case 5:
+		m_ThicknessValue = 3.0;
+		break;
+	case 6:
+		m_ThicknessValue = 3.5;
+		break;
+	case 7:
+		m_ThicknessValue = 4.0;
+		break;
+	case 8:
+		m_ThicknessValue = 4.5;
+		break;
+	case 9:
+		m_ThicknessValue = 5.0;
+		break;
+	case 10:
+		m_ThicknessValue = 5.5;
+		break;
+	case 11:
+		m_ThicknessValue = 6.0;
+		break;
+	case 12:
+		m_ThicknessValue = 6.5;
+		break;
+	case 13:
+		m_ThicknessValue = 7.0;
+		break;
+	case 14:
+		m_ThicknessValue = 7.5;
+		break;
+	case 15:
+		m_ThicknessValue = 8.0;
+		break;
+	case 16:
+		m_ThicknessValue = 8.5;
+		break;
+	case 17:
+		m_ThicknessValue = 9.0;
+		break;
+	case 18:
+		m_ThicknessValue = 9.5;
+		break;
+	case 19:
+		m_ThicknessValue = 10.0;
+		break;
+	case 20:
+		m_ThicknessValue = 20.0;
+		break;
+	case 21:
+		m_ThicknessValue = 40.0;
+		break;
+
+	}
 }
