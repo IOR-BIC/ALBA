@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2011-02-22 17:35:16 $
-Version:   $Revision: 1.1.2.48 $
+Date:      $Date: 2011-02-22 17:39:34 $
+Version:   $Revision: 1.1.2.49 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -2411,7 +2411,7 @@ void medViewArbitraryOrthoSlice::BuildZCameraConeVME()
 	double d = sqrt(vtkMath::Distance2BetweenPoints(p1,p2));
 
 	vtkConeSource *ZCameraConeSource = vtkConeSource::New();
-	ZCameraConeSource->SetCenter(0,0,d/2);
+	ZCameraConeSource->SetCenter(0,0,d/3);
 	ZCameraConeSource->SetResolution(20);
 	ZCameraConeSource->SetDirection(0,0,-1);
 

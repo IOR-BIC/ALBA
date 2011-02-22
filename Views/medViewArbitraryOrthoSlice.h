@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.h,v $
 Language:  C++
-Date:      $Date: 2011-02-11 15:47:25 $
-Version:   $Revision: 1.1.2.26 $
+Date:      $Date: 2011-02-22 17:35:17 $
+Version:   $Revision: 1.1.2.27 $
 Authors:   Stefano Perticoni	
 ==========================================================================
 Copyright (c) 2002/2004
@@ -41,6 +41,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkLineSource.h"
 #include "mafPipeSurface.h"
+#include "mafInteractorPicker.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -132,6 +133,8 @@ public:
     ID_CHOOSE_DIR,
     ID_EXPORT,
 
+	ID_UPDATE_LUT, 
+
 	ID_ENABLE_THICKNESS,
 	ID_ENABLE_THICKNESS_ACTORS,
 	ID_THICKNESS_VALUE_CHANGED,
@@ -174,6 +177,15 @@ public:
 
 protected:
 
+	vtkActor2D *m_XnThicknessTextActor;
+	vtkTextMapper *m_XnThicknessTextMapper;
+
+	vtkActor2D *m_YnThicknessTextActor;
+	vtkTextMapper *m_YnThicknessTextMapper;
+
+	vtkActor2D *m_ZnThicknessTextActor;
+	vtkTextMapper *m_ZnThicknessTextMapper;
+
 	vtkActor2D *m_TextActorLeftXView;
 	vtkTextMapper *m_TextMapperLeftXView;
 
@@ -202,6 +214,8 @@ protected:
 	void HideMafVmeImage();
 
 	void ShowMafVMEVolume( mafVME * vme, bool show );
+
+	void ShowThickness2DTextActors( bool show );
 
 	void StoreCameraParametersForAllSubviews();
 
@@ -238,6 +252,9 @@ protected:
 	/* Update slicer settings according to m_CurrentVolume*/
 	void UpdateSlicerZBehavior();
 
+	/** Enable picking on slicers */
+	void EnableSlicersPicking(bool enable);
+
 	/** Internally used to create a new instance of the GUI. 
 	This function should be overridden by subclasses to create specialized GUIs. 
 	Each subclass should append its own widgets and define the enum of IDs for the widgets as 
@@ -252,7 +269,9 @@ protected:
   void EnableExportImages( bool enable );
 	void OnEventThis(mafEventBase *maf_event);  
 	void OnLUTChooser();
-	void OnRangeModified();
+	void OnLUTRangeModified();
+
+	void UpdateSlicersLUT();
 
 	void OnReset();
 
@@ -344,6 +363,7 @@ protected:
  
   void CreateViewCameraNormalFeedbackActor(double col[3], int view);
   void DestroyViewCameraNormalFeedbackActor(int view);
+  void ThicknessComboAssignment();
   
   mafViewVTK *m_ViewSliceX;
 	mafViewVTK *m_ViewSliceY;
@@ -431,11 +451,16 @@ protected:
   int m_EnableThickness;
   
   double m_ThicknessValue;
-	
+  int m_ThicknessComboAssignment;
+
   wxString m_PathFromDialog;
 
   /** Enable debug facilities */
   bool m_DebugMode;
+
+  mafInteractorPicker *m_XSlicerPicker;
+
+  mafString m_ThicknessText;
 };
 
 #endif
