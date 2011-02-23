@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2011-02-22 17:39:34 $
-Version:   $Revision: 1.1.2.49 $
+Date:      $Date: 2011-02-23 11:02:23 $
+Version:   $Revision: 1.1.2.50 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -1912,29 +1912,8 @@ void medViewArbitraryOrthoSlice::OnReset()
 
 		UpdateSlicersLUT();
 
-		mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+		// mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 
-		//update the normal of the cutter plane of the surface
-		mafNode *root=m_CurrentVolume->GetRoot();
-		mafNodeIterator *iter = root->NewIterator();
-		for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
-		{
-			if(node->IsA("mafVMESurface") || node->IsA("mafVMESurfaceParametric") || node->IsA("mafVMELandmark") || node->IsA("mafVMELandmarkCloud"))
-			{
-				//				OnResetSurfaceAndLandmark(node);
-
-			}
-			if(node->IsA("mafVMEMesh"))
-			{
-				//				OnResetMafVMEMesh(node);
-			}
-		}
-		iter->Delete();
-		if(m_CurrentPolylineGraphEditor)
-		{
-			//			OnResetMedVMEPolylineEditor();
-
-		}
 	}
 }
 
@@ -2277,13 +2256,15 @@ void medViewArbitraryOrthoSlice::BuildXCameraConeVME()
 
 	double d = sqrt(vtkMath::Distance2BetweenPoints(p1,p2));
 
+	double coneRadius = d / 10;
+
 	vtkConeSource *XCameraConeSource = vtkConeSource::New();
-	XCameraConeSource->SetCenter(0,0,d/2);
+	XCameraConeSource->SetCenter(0,0,b[1]/2 + coneRadius / 2);
 	XCameraConeSource->SetResolution(20);
 	XCameraConeSource->SetDirection(0,0,-1);
 
-	XCameraConeSource->SetRadius(d / 10);
-	XCameraConeSource->SetHeight(d / 10);
+	XCameraConeSource->SetRadius(coneRadius);
+	XCameraConeSource->SetHeight(coneRadius);
 
 	XCameraConeSource->CappingOn();
 	XCameraConeSource->Update();
@@ -2340,13 +2321,15 @@ void medViewArbitraryOrthoSlice::BuildYCameraConeVME()
 
 	double d = sqrt(vtkMath::Distance2BetweenPoints(p1,p2));
 
+	double coneRadius = d / 10;
+
 	vtkConeSource *YCameraConeSource = vtkConeSource::New();
-	YCameraConeSource->SetCenter(0,0,d/2);
+	YCameraConeSource->SetCenter(0,0,b[3]/2 + coneRadius / 2);
 	YCameraConeSource->SetResolution(20);
 	YCameraConeSource->SetDirection(0,0,-1);
 
-	YCameraConeSource->SetRadius(d / 10);
-	YCameraConeSource->SetHeight(d / 10);
+	YCameraConeSource->SetRadius(coneRadius);
+	YCameraConeSource->SetHeight(coneRadius);
 
 	YCameraConeSource->CappingOn();
 	YCameraConeSource->Update();
@@ -2410,13 +2393,15 @@ void medViewArbitraryOrthoSlice::BuildZCameraConeVME()
 
 	double d = sqrt(vtkMath::Distance2BetweenPoints(p1,p2));
 
+	double coneRadius = d/10;
+
 	vtkConeSource *ZCameraConeSource = vtkConeSource::New();
-	ZCameraConeSource->SetCenter(0,0,d/3);
+	ZCameraConeSource->SetCenter(0,0,b[5]/2 + coneRadius / 2);
 	ZCameraConeSource->SetResolution(20);
 	ZCameraConeSource->SetDirection(0,0,-1);
 
-	ZCameraConeSource->SetRadius(d / 10);
-	ZCameraConeSource->SetHeight(d / 10);
+	ZCameraConeSource->SetRadius(coneRadius);
+	ZCameraConeSource->SetHeight(coneRadius);
 
 	ZCameraConeSource->CappingOn();
 	ZCameraConeSource->Update();
