@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2011-02-23 11:02:23 $
-Version:   $Revision: 1.1.2.50 $
+Date:      $Date: 2011-02-23 13:58:49 $
+Version:   $Revision: 1.1.2.51 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -2242,7 +2242,7 @@ void medViewArbitraryOrthoSlice::BuildXCameraConeVME()
 {
 	double b[6] = {0,0,0,0,0,0};
 	assert(m_CurrentVolume);
-	m_CurrentVolume->GetOutput()->GetBounds(b);
+	m_CurrentVolume->GetOutput()->GetVMELocalBounds(b);
 
 	double p1[3] = {0,0,0};
 	double p2[3] = {0,0,0};
@@ -2307,7 +2307,7 @@ void medViewArbitraryOrthoSlice::BuildYCameraConeVME()
 {
 	double b[6] = {0,0,0,0,0,0};
 	assert(m_CurrentVolume);
-	m_CurrentVolume->GetOutput()->GetBounds(b);
+	m_CurrentVolume->GetOutput()->GetVMELocalBounds(b);
 
 	double p1[3] = {0,0,0};
 	double p2[3] = {0,0,0};
@@ -2379,7 +2379,7 @@ void medViewArbitraryOrthoSlice::BuildZCameraConeVME()
 {
 	double b[6] = {0,0,0,0,0,0};
 	assert(m_CurrentVolume);
-	m_CurrentVolume->GetOutput()->GetBounds(b);
+	m_CurrentVolume->GetOutput()->GetVMELocalBounds(b);
 
 	double p1[3] = {0,0,0};
 	double p2[3] = {0,0,0};
