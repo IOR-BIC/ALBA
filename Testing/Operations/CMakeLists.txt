@@ -182,6 +182,9 @@ ADD_TEST(medOpClassicICPRegistrationTest ${EXECUTABLE_OUTPUT_PATH}/medOpClassicI
 ADD_EXECUTABLE(medOpMML3ParameterViewTest  medOpMML3ParameterViewTest.h medOpMML3ParameterViewTest.cpp)
 ADD_TEST(medOpMML3ParameterViewTest ${EXECUTABLE_OUTPUT_PATH}/medOpMML3ParameterViewTest)
 
+ADD_EXECUTABLE(medOpInteractionDebuggerTest  medOpInteractionDebuggerTest.h medOpInteractionDebuggerTest.cpp)
+ADD_TEST(medOpInteractionDebuggerTest ${EXECUTABLE_OUTPUT_PATH}/medOpInteractionDebuggerTest)
+
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
 #ENDIF (MAF_USE_WX)
