@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2011-02-23 13:58:49 $
-Version:   $Revision: 1.1.2.51 $
+Date:      $Date: 2011-02-26 17:36:51 $
+Version:   $Revision: 1.1.2.52 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -94,6 +94,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkProperty2D.h"
 #include "vtkOutlineFilter.h"
 #include "vtkSphereSource.h"
+#include "vtkMAFSmartPointer.h"
 
 mafCxxTypeMacro(medViewArbitraryOrthoSlice);
 
@@ -124,6 +125,8 @@ medViewArbitraryOrthoSlice::medViewArbitraryOrthoSlice(wxString label, bool show
 {
 	m_ThicknessText = "UNDEFINED_THICKNESS_TEXT";
 	m_XSlicerPicker = NULL;
+  m_YSlicerPicker = NULL;
+  m_ZSlicerPicker = NULL;
 
 	m_DebugMode = false;
 
@@ -265,6 +268,10 @@ medViewArbitraryOrthoSlice::medViewArbitraryOrthoSlice(wxString label, bool show
 medViewArbitraryOrthoSlice::~medViewArbitraryOrthoSlice()
 {
 	mafDEL(m_XSlicerPicker);
+mafDEL(m_XSlicerPicker);
+
+
+
 
 	m_SlicerZResetMatrix   = NULL;
 	m_CurrentVolume = NULL;
@@ -433,7 +440,7 @@ void medViewArbitraryOrthoSlice::VmeShow(mafNode *node, bool show)
 	}
 
 	if(GetSceneGraph()->GetSelectedVme()==node) {
-		UpdateWindowing( show && this->ActivateWindowing(node), node);
+		UpdateWindowing(show , node);
 	}
 
 }
@@ -469,7 +476,51 @@ void medViewArbitraryOrthoSlice::OnEvent(mafEventBase *maf_event)
 	}
 	else if (maf_event->GetId() == VME_PICKED)
 	{
-		wxMessageBox("Hello!");
+		// wxMessageBox("Hello!");
+
+    mafEvent *event = mafEvent::SafeDownCast(maf_event);
+    assert(event);
+
+    double pickedPointCoordinates[3];  
+    vtkPoints *pickedPoint = NULL; 
+    pickedPoint = (vtkPoints *)event->GetVtkObj();
+    pickedPoint->GetPoint(0,pickedPointCoordinates);
+
+    using namespace::std;
+    
+    string pickedSliceName;
+    if (event->GetSender() == m_XSlicerPicker)
+    {
+      pickedSliceName = m_XSlicerPicker->GetName();
+
+      medInteractorPicker *picker = m_XSlicerPicker;
+      MyMethod(picker, pickedPointCoordinates);
+
+    }
+    else if (event->GetSender() == m_YSlicerPicker)
+    {
+      pickedSliceName = m_YSlicerPicker->GetName();
+
+      medInteractorPicker *picker = m_YSlicerPicker;
+      MyMethod(picker, pickedPointCoordinates);
+
+    }
+    else if (event->GetSender() == m_ZSlicerPicker)
+    {
+      pickedSliceName = m_ZSlicerPicker->GetName();
+
+      medInteractorPicker *picker = m_ZSlicerPicker;
+      MyMethod(picker, pickedPointCoordinates);
+    }
+
+    UpdateSlicersLUT();
+
+    // DEBUG
+    std::ostringstream stringStream;
+    stringStream << "picked: " << pickedSliceName << std::endl;
+    stringStream << "on position: " << pickedPointCoordinates[0] << " " << pickedPointCoordinates[1] << " " << pickedPointCoordinates[2] << std::endl;
+    mafLogMessage(stringStream.str().c_str());
+    
 	}
 	else
 	{
@@ -1259,8 +1310,12 @@ mafGUI* medViewArbitraryOrthoSlice::CreateGui()
 
 	//	m_Gui->Divider(2);
 
-	//button to reset at the start position
-	m_Gui->Label("");
+	//button to reset at the sta
+  m_Gui->Label("");
+  m_Gui->Label(_("CTRL + MOUSE LEFT click"),true);
+  m_Gui->Label("moves the cross on picked point");
+m_Gui->Divider(2);
+	
 	//m_Gui->Label("reset slices", true);
 	m_Gui->Button(ID_RESET,_("reset slices"),"");
 
@@ -1373,10 +1428,10 @@ void medViewArbitraryOrthoSlice::PostMultiplyEventMatrixToSlicers(mafEventBase *
 			// _DEBUG_
 			if (i == 0) // Xn slicer
 			{
-				// 					std::ostringstream stringStream;
-				// 					stringStream << "Concatenating to slicer: " << std::endl;          
-				// 					tr->GetMatrix()->PrintSelf(stringStream, NULL);
-				// 					mafLogMessage(stringStream.str().c_str());
+// 				 					std::ostringstream stringStream;
+// 				 					stringStream << "Concatenating to slicer: " << std::endl;          
+// 				 					e->GetMatrix()->GetVTKMatrix()->PrintSelf(stringStream, NULL);
+// 				 					mafLogMessage(stringStream.str().c_str());
 			}
 
 			mafMatrix absPose;
@@ -1613,7 +1668,8 @@ void medViewArbitraryOrthoSlice::VolumeWindowing(mafVME *volume)
 	data->GetScalarRange(sr);
 
 	mmaMaterial *currentSurfaceMaterial = m_SlicerZ->GetMaterial();
-	m_ColorLUT = m_SlicerZ->GetMaterial()->m_ColorLut;
+	m_ColorLUT = currentSurfaceMaterial->m_ColorLut;
+  assert(m_ColorLUT);
 	m_LutWidget->SetLut(m_ColorLUT);
 	m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
 	m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
@@ -2230,12 +2286,24 @@ void medViewArbitraryOrthoSlice::ShowSlicers( mafVME * vmeVolume, bool show )
 	CreateViewCameraNormalFeedbackActor(blue, Z_VIEW);
 
 	// create the pick interactor for slicer X
-	m_XSlicerPicker = mafInteractorPicker::New();
+	m_XSlicerPicker = medInteractorPicker::New();
 	m_XSlicerPicker->SetListener(this);
-
+  m_XSlicerPicker->SetName("m_XSlicerPicker");
 	m_SlicerX->SetBehavior(m_XSlicerPicker);
 
-	EnableSlicersPicking(false);
+  // create the pick interactor for slicer X
+  m_YSlicerPicker = medInteractorPicker::New();
+  m_YSlicerPicker->SetListener(this);
+  m_YSlicerPicker->SetName("m_YSlicerPicker");
+  m_SlicerY->SetBehavior(m_YSlicerPicker);
+
+  // create the pick interactor for slicer X
+  m_ZSlicerPicker = medInteractorPicker::New();
+  m_ZSlicerPicker->SetListener(this);
+  m_ZSlicerPicker->SetName("m_ZSlicerPicker");
+  m_SlicerZ->SetBehavior(m_ZSlicerPicker);
+
+	EnableSlicersPicking(true);
 }
 
 void medViewArbitraryOrthoSlice::BuildXCameraConeVME()
@@ -3953,10 +4021,13 @@ void medViewArbitraryOrthoSlice::OnEventID_ENABLE_THICKNESS()
 
 void medViewArbitraryOrthoSlice::UpdateThicknessStuff()
 {
-	wxBusyInfo wait_info("please wait");
-	AccumulateTextures(m_SlicerX, m_ThicknessValue, NULL, true);
-	AccumulateTextures(m_SlicerY, m_ThicknessValue, NULL, true);
-	AccumulateTextures(m_SlicerZ, m_ThicknessValue, NULL, true);
+  if (m_EnableThickness == true) // prevent cpu waste
+  {
+    wxBusyInfo wait_info("please wait");
+    AccumulateTextures(m_SlicerX, m_ThicknessValue, NULL, true);
+    AccumulateTextures(m_SlicerY, m_ThicknessValue, NULL, true);
+    AccumulateTextures(m_SlicerZ, m_ThicknessValue, NULL, true);
+  }
 }
 
 
@@ -4075,14 +4146,39 @@ void medViewArbitraryOrthoSlice::EnableSlicersPicking(bool enable)
 	// x view
 	mafPipeSurfaceTextured *pipeXViewSlicerX=(mafPipeSurfaceTextured *)(m_ChildViewList[X_VIEW])->GetNodePipe(m_SlicerX);
 	pipeXViewSlicerX->SetActorPicking(enable);
+  pipeXViewSlicerX->ShowAxisOff();
+  pipeXViewSlicerX->SelectionActorOff();
 
 	// y view
 	mafPipeSurfaceTextured *pipeYViewSlicerY=(mafPipeSurfaceTextured *)(m_ChildViewList[Y_VIEW])->GetNodePipe(m_SlicerY);
 	pipeYViewSlicerY->SetActorPicking(enable);
+  pipeYViewSlicerY->ShowAxisOff();
+  pipeYViewSlicerY->SelectionActorOff();
 
 	// z view
 	mafPipeSurfaceTextured *pipeZViewSlicerZ=(mafPipeSurfaceTextured *)(m_ChildViewList[Z_VIEW])->GetNodePipe(m_SlicerZ);
 	pipeZViewSlicerZ->SetActorPicking(enable);
+  pipeZViewSlicerZ->ShowAxisOff();
+  pipeZViewSlicerZ->SelectionActorOff();
+
+  // perspective X slicer
+  mafPipeSurfaceTextured *pipePerspectiveViewSlicerX=(mafPipeSurfaceTextured *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_SlicerX);
+  pipePerspectiveViewSlicerX->SetActorPicking(false);
+  pipePerspectiveViewSlicerX->ShowAxisOff();
+  pipePerspectiveViewSlicerX->SelectionActorOff();
+
+  // perspective Y slicer
+  mafPipeSurfaceTextured *pipePerspectiveViewSlicerY=(mafPipeSurfaceTextured *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_SlicerY);
+  pipePerspectiveViewSlicerY->SetActorPicking(false);
+  pipePerspectiveViewSlicerY->ShowAxisOff();
+  pipePerspectiveViewSlicerY->SelectionActorOff();
+
+  // perspective Z slicer
+  mafPipeSurfaceTextured *pipePerspectiveViewSlicerZ=(mafPipeSurfaceTextured *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_SlicerZ);
+  pipePerspectiveViewSlicerZ->SetActorPicking(false);
+  pipePerspectiveViewSlicerZ->ShowAxisOff();
+  pipePerspectiveViewSlicerZ->SelectionActorOff();
+
 }
 
 void medViewArbitraryOrthoSlice::ShowThickness2DTextActors( bool show )
@@ -4182,4 +4278,97 @@ void medViewArbitraryOrthoSlice::ThicknessComboAssignment()
 		break;
 
 	}
+}
+
+void medViewArbitraryOrthoSlice::VmeSelect(mafNode *node, bool select)
+{
+  for(int i=0; i<m_NumOfChildView; i++)
+    m_ChildViewList[i]->VmeSelect(node, select);
+
+  UpdateWindowing( select && ActivateWindowing(GetSceneGraph()->GetSelectedVme()), GetSceneGraph()->GetSelectedVme());
+
+}
+
+void medViewArbitraryOrthoSlice::UpdateWindowing(bool enable,mafNode *node)
+{
+  mafVME      *Volume		= NULL;
+  
+  mafVME *Vme = mafVME::SafeDownCast(node);
+
+  if((mafVME *)(Vme->GetOutput()->IsA("mafVMEOutputVolume"))) {
+    Volume = mafVME::SafeDownCast(node);
+  }
+  
+  if(Volume) {
+    if(enable && (mafVMEOutputVolume::SafeDownCast(Volume->GetOutput())))
+    {
+      VolumeWindowing(Volume);
+    }
+  }
+}
+
+void medViewArbitraryOrthoSlice::MyMethod( medInteractorPicker * picker, double * pickedPointCoordinates )
+{
+  medGizmoCrossRotateTranslate *gizmo = NULL;
+
+  if (picker == m_XSlicerPicker)
+  {
+    gizmo = m_GizmoXView;
+  }
+  else if (picker == m_YSlicerPicker)
+  {
+    gizmo = m_GizmoYView;
+  }
+  else if (picker == m_ZSlicerPicker)
+  {
+    gizmo = m_GizmoZView;
+  }
+
+  vtkMatrix4x4 *gizmoStartMatrix = gizmo->GetAbsPose()->GetVTKMatrix();
+
+  double startPosition[3]; 
+  double endPosition[3];
+  double delta[3];
+
+  mafMatrix mat;
+  mat.DeepCopy(gizmoStartMatrix);     
+  mafTransform::GetPosition(gizmoStartMatrix, startPosition);
+
+  mafMatrix ngm;
+  ngm.DeepCopy(gizmoStartMatrix);
+
+  endPosition[0] = pickedPointCoordinates[0];
+  endPosition[1] = pickedPointCoordinates[1];
+  endPosition[2] = pickedPointCoordinates[2];
+
+  delta[0] = endPosition[0] - startPosition[0];
+  delta[1] = endPosition[1] - startPosition[1];
+  delta[2] = endPosition[2] - startPosition[2];
+
+  mafTransform::SetPosition(ngm, endPosition);
+
+  mafMatrix matrixToSend;
+  mafTransform::SetPosition(matrixToSend, delta);
+
+  mafEvent fakeEvent;
+  fakeEvent.SetId(ID_TRANSFORM);
+  fakeEvent.SetMatrix(&matrixToSend);
+  fakeEvent.SetArg(mafInteractorGenericMouse::MOUSE_MOVE);
+
+  if (picker == m_XSlicerPicker)
+  {
+    OnEventGizmoCrossTranslateXNormalView(&fakeEvent);
+  }
+  else if (picker == m_YSlicerPicker)
+  {
+    OnEventGizmoCrossTranslateYNormalView(&fakeEvent);
+  }
+  else if (picker == m_ZSlicerPicker)
+  {
+    OnEventGizmoCrossTranslateZNormalView(&fakeEvent);
+  }
+
+  gizmo->SetAbsPose(&ngm);
+
+  UpdateThicknessStuff();
 }

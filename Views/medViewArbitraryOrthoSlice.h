@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.h,v $
 Language:  C++
-Date:      $Date: 2011-02-22 17:35:17 $
-Version:   $Revision: 1.1.2.27 $
+Date:      $Date: 2011-02-26 17:36:51 $
+Version:   $Revision: 1.1.2.28 $
 Authors:   Stefano Perticoni	
 ==========================================================================
 Copyright (c) 2002/2004
@@ -42,6 +42,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkLineSource.h"
 #include "mafPipeSurface.h"
 #include "mafInteractorPicker.h"
+#include "medInteractorPicker.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -162,6 +163,7 @@ public:
 	/** Function that handles events sent from other objects. */
 	virtual void OnEvent(mafEventBase *maf_event);
 
+  void MyMethod( medInteractorPicker * picker, double * pickedPointCoordinates );
 	void OnEventGizmoCrossRTZNormalView( mafEventBase * maf_event );
 	void OnEventGizmoCrossRTYNormalView( mafEventBase * maf_event );
 
@@ -174,6 +176,8 @@ public:
 	virtual void OnLayout();
 
 	void OnLayoutInternal( wxSize &windowSize );
+
+  void VmeSelect(mafNode *node, bool select);
 
 protected:
 
@@ -364,6 +368,7 @@ protected:
   void CreateViewCameraNormalFeedbackActor(double col[3], int view);
   void DestroyViewCameraNormalFeedbackActor(int view);
   void ThicknessComboAssignment();
+  void UpdateWindowing(bool enable,mafNode *node);
   
   mafViewVTK *m_ViewSliceX;
 	mafViewVTK *m_ViewSliceY;
@@ -458,7 +463,9 @@ protected:
   /** Enable debug facilities */
   bool m_DebugMode;
 
-  mafInteractorPicker *m_XSlicerPicker;
+  medInteractorPicker *m_XSlicerPicker;
+  medInteractorPicker *m_YSlicerPicker;
+  medInteractorPicker *m_ZSlicerPicker;
 
   mafString m_ThicknessText;
 };
