@@ -130,6 +130,9 @@ ADD_TEST(SquareTest ${EXECUTABLE_OUTPUT_PATH}/SquareTest)
 ADD_EXECUTABLE(SparseNMatrixTest SparseNMatrixTest.h SparseNMatrixTest.cpp)
 ADD_TEST(SparseNMatrixTest ${EXECUTABLE_OUTPUT_PATH}/SparseNMatrixTest)
 
+ADD_EXECUTABLE(VertexDataTest VertexDataTest.h VertexDataTest.cpp)
+ADD_TEST(VertexDataTest ${EXECUTABLE_OUTPUT_PATH}/VertexDataTest)
+
 ADD_EXECUTABLE(TriangulationTest TriangulationTest.h TriangulationTest.cpp)
 ADD_TEST(TriangulationTest ${EXECUTABLE_OUTPUT_PATH}/TriangulationTest)
 
