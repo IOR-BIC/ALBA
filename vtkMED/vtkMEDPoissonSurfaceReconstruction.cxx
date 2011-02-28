@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDPoissonSurfaceReconstruction.cxx,v $
 Language:  C++
-Date:      $Date: 2011-02-15 08:12:30 $
-Version:   $Revision: 1.1.2.7 $
+Date:      $Date: 2011-02-28 11:07:49 $
+Version:   $Revision: 1.1.2.8 $
 Authors:   Fuli Wu
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -21,7 +21,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "float.h"
 
 
-vtkCxxRevisionMacro(vtkMEDPoissonSurfaceReconstruction, "$Revision: 1.1.2.7 $");
+vtkCxxRevisionMacro(vtkMEDPoissonSurfaceReconstruction, "$Revision: 1.1.2.8 $");
 vtkStandardNewMacro(vtkMEDPoissonSurfaceReconstruction);
 
 vtkDataSet* vtk_psr_input;
@@ -680,13 +680,13 @@ double Triangulation<Real>::Area(const int& p1,const int& p2,const int& p3){
 template<class Real>
 double Triangulation<Real>::Area(const int& tIndex){
 	int p1,p2,p3;
-	factor(tIndex,p1,p2,p3);
-	return area(p1,p2,p3);
+	Factor(tIndex,p1,p2,p3);
+	return Area(p1,p2,p3);
 }
 template<class Real>
 double Triangulation<Real>::Area(void){
 	double a=0;
-	for(int i=0;i<int(triangles.size());i++){a+=area(i);}
+	for(int i=0;i<int(triangles.size());i++){a+=Area(i);}
 	return a;
 }
 template<class Real>
