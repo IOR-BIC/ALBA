@@ -2,16 +2,16 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: VertexDataTest.h,v $
 Language:  C++
-Date:      $Date: 2011-02-28 11:20:45 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-02-28 13:21:43 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004 
 CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#ifndef __CPP_UNIT_RingDataTest_H__
-#define __CPP_UNIT_RingDataTest_H__
+#ifndef __CPP_UNIT_VertexDataTest_H__
+#define __CPP_UNIT_VertexDataTest_H__
 
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/BriefTestProgressListener.h>
