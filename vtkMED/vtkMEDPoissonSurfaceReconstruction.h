@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDPoissonSurfaceReconstruction.h,v $
 Language:  C++
-Date:      $Date: 2010-12-02 11:09:31 $
-Version:   $Revision: 1.1.2.9 $
+Date:      $Date: 2011-03-01 11:05:33 $
+Version:   $Revision: 1.1.2.10 $
 Authors:   Fuli Wu
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -215,7 +215,8 @@ public:
 	  * allocated available for re-allocation. Note that it does it not call the constructor
 	  * again, so after this method has been called, assumptions about the state of the values
 	  * in memory are no longer valid. */
-	void RollBack(const AllocatorState& state){
+    /// IT DOESN'T WORK! bugged unused code :(
+	/*void RollBack(const AllocatorState& state){
 		if(state.index<index || (state.index==index && state.remains<remains)){
 			if(state.index<index){
 				for(int j=state.remains;j<blockSize;j++){
@@ -243,9 +244,9 @@ public:
 				remains=state.remains;
 			}
 		}
-	}
+        }*/ /// IT DOESN'T WORK! bugged unused code :(
 
-	/** This method initiallizes the constructor and the blockSize variable specifies the
+	/** This method initializes the constructor and the blockSize variable specifies the
 	  * the number of objects that should be pre-allocated at a time. */
 	void Set(const int& blockSize){
 		Reset();
