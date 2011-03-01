@@ -136,6 +136,10 @@ ADD_TEST(VertexDataTest ${EXECUTABLE_OUTPUT_PATH}/VertexDataTest)
 ADD_EXECUTABLE(TriangulationTest TriangulationTest.h TriangulationTest.cpp)
 ADD_TEST(TriangulationTest ${EXECUTABLE_OUTPUT_PATH}/TriangulationTest)
 
+ADD_EXECUTABLE(AllocatorTest AllocatorTest.h AllocatorTest.cpp)
+ADD_TEST(AllocatorTest ${EXECUTABLE_OUTPUT_PATH}/AllocatorTest)
+
+
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
 #ENDIF (MAF_USE_WX)
