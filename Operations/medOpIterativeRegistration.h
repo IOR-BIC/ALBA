@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpIterativeRegistration.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:12:22 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2011-03-07 14:39:20 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -104,6 +104,9 @@ class medOpIterativeRegistration : public mafOp
     mafString m_TargetVmeName;
 
     vtkMatrix4x4* m_RegistrationMatrix;
-    vtkMatrix4x4* m_UndoSourceAbsPose;  
+    vtkMatrix4x4* m_UndoSourceAbsPose;
+
+    /** Test Friend */
+    friend class medOpIterativeRegistrationTest;
 };
 #endif
