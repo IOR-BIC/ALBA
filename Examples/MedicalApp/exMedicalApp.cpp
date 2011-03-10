@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: exMedicalApp.cpp,v $
 Language:  C++
-Date:      $Date: 2011-01-19 10:45:09 $
-Version:   $Revision: 1.15.2.5 $
+Date:      $Date: 2011-03-10 08:36:39 $
+Version:   $Revision: 1.15.2.6 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -388,7 +388,7 @@ bool exMedicalApp::OnInit()
 	varbitraryortho->PackageView();
 	m_Logic->Plug(varbitraryortho);
 	//View Slice On Curve
-	medViewSliceOnCurveCompound vsliceoncurve=new medViewSliceOnCurveCompound("Slice On Curve");
+	medViewSliceOnCurveCompound *vsliceoncurve=new medViewSliceOnCurveCompound("Slice On Curve");
 	vsliceoncurve->PackageView();
 	m_Logic->Plug(vsliceoncurve);
 #endif
