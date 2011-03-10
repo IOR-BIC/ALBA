@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoSlice.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 12:24:37 $
-  Version:   $Revision: 1.11.2.4 $
+  Date:      $Date: 2011-03-10 08:20:00 $
+  Version:   $Revision: 1.11.2.5 $
   Authors:   Paolo Quadrani, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -79,6 +79,9 @@ public:
 
   void  SetPosition(mafMatrix *matrix);
   mafMatrix *GetPosition(){return m_GizmoHandleCenterMatrix;};
+
+  /** Set matrix of the handle */
+  void SetHandleCenterMatrix(mafMatrix *m);
 
 	void SetEnableCustomizedSnapArray(bool enable){m_CustomizedSnapArrayFlag = enable;};
 	void SetCustomizedSnapArrayStep(double step){m_CustomizedArrayStep = step;};

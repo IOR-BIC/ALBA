@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 12:24:37 $
-  Version:   $Revision: 1.21.2.5 $
+  Date:      $Date: 2011-03-10 08:20:01 $
+  Version:   $Revision: 1.21.2.6 $
   Authors:   Paolo Quadrani, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -401,6 +401,12 @@ void mafGizmoSlice::InitSnapArray(mafVME *vol, int axis)
 		}
 	}
   }
+}
+//----------------------------------------------------------------------------
+void mafGizmoSlice::SetHandleCenterMatrix(mafMatrix *m)
+//----------------------------------------------------------------------------
+{
+  m_GizmoHandleCenterMatrix->DeepCopy(m);
 }
 //----------------------------------------------------------------------------
 void mafGizmoSlice::OnEvent(mafEventBase *maf_event)
