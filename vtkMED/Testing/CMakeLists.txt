@@ -139,6 +139,9 @@ ADD_TEST(TriangulationTest ${EXECUTABLE_OUTPUT_PATH}/TriangulationTest)
 ADD_EXECUTABLE(AllocatorTest AllocatorTest.h AllocatorTest.cpp)
 ADD_TEST(AllocatorTest ${EXECUTABLE_OUTPUT_PATH}/AllocatorTest)
 
+ADD_EXECUTABLE(SparseSymmetricMatrixTest SparseSymmetricMatrixTest.h SparseSymmetricMatrixTest.cpp)
+ADD_TEST(SparseSymmetricMatrixTest ${EXECUTABLE_OUTPUT_PATH}/SparseSymmetricMatrixTest)
+
 
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
