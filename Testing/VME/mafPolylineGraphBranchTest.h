@@ -1,0 +1,115 @@
+/*=========================================================================
+Program:   Multimod Application Framework
+Module:    $RCSfile: mafPolylineGraphBranchTest.h,v $
+Language:  C++
+Date:      $Date: 2011-03-14 16:11:23 $
+Version:   $Revision: 1.1.2.1 $
+Authors:   Eleonora Mambrini
+==========================================================================
+Copyright (c) 2002/2004 
+CINECA - Interuniversity Consortium (www.cineca.it)
+=========================================================================*/
+
+#ifndef __CPP_UNIT_MAFPOLYLINEGRAPHBranchTEST_H__
+#define __CPP_UNIT_MAFPOLYLINEGRAPHBranchTEST_H__
+
+#include <cppunit/extensions/HelperMacros.h>
+#include <cppunit/BriefTestProgressListener.h>
+#include <cppunit/CompilerOutputter.h>
+#include <cppunit/extensions/TestFactoryRegistry.h>
+#include <cppunit/TestResult.h>
+#include <cppunit/TestResultCollector.h>
+#include <cppunit/TestRunner.h>
+#include <cppunit/TestFixture.h>
+#include "vtkPolyData.h"
+
+
+//------------------------------------------------------------------------------
+// Test class for mafPolylineGraph
+//------------------------------------------------------------------------------
+class mafPolylineGraphBranchTest : public CPPUNIT_NS::TestFixture
+{
+public:
+
+  // CPPUNIT fixture: executed before each test
+  void setUp();
+
+  // CPPUNIT fixture: executed after each test
+  void tearDown();
+
+  CPPUNIT_TEST_SUITE( mafPolylineGraphBranchTest );
+  CPPUNIT_TEST( TestDynamicAllocation );
+  CPPUNIT_TEST( TestGetNumberOfVertices ); 
+  CPPUNIT_TEST( TestGetNumberOfEdges ); 
+  CPPUNIT_TEST( TestGetSetName );
+  CPPUNIT_TEST( TestUnsetName );
+  CPPUNIT_TEST( TestGetSetEdgeId );
+  CPPUNIT_TEST( TestAddEdgeId );
+  CPPUNIT_TEST( TestFindEdgeId );
+  CPPUNIT_TEST( TestGetLastEdgeId );
+  CPPUNIT_TEST( TestGetSetVertexId );
+  CPPUNIT_TEST( TestAddVertexId );
+  CPPUNIT_TEST( TestFindVertexId );
+  CPPUNIT_TEST( TestGetLastVertexId );
+  CPPUNIT_TEST( TestDeleteLastVertex );
+  CPPUNIT_TEST( TestGetVerticesIdList );
+  CPPUNIT_TEST( TestReverseDirection );
+  CPPUNIT_TEST( TestGetSetMappingToOutputPolydata );
+  CPPUNIT_TEST(TestSelfCheck );
+  CPPUNIT_TEST_SUITE_END();
+
+protected:
+
+  void Test();
+  void TestDynamicAllocation();
+  void TestGetNumberOfVertices(); 
+  void TestGetNumberOfEdges(); 
+  void TestGetSetName();
+  void TestUnsetName();
+  void TestGetSetEdgeId();
+  void TestAddEdgeId();
+  void TestFindEdgeId();
+  //void TestInsertEdgeId();
+  void TestGetLastEdgeId();
+  void TestGetSetVertexId();
+  void TestAddVertexId();
+  void TestFindVertexId();
+  //void TestInsertVertexId();
+  void TestGetLastVertexId();
+  void TestDeleteLastVertex();
+  void TestGetVerticesIdList();
+  void TestReverseDirection();
+  void TestGetSetMappingToOutputPolydata();  
+  void TestSelfCheck(); 
+
+};
+
+
+int 
+main( int argc, char* argv[] )
+{
+
+  // Create the event manager and test controller
+  CPPUNIT_NS::TestResult controller;
+
+  // Add a listener that colllects test result
+  CPPUNIT_NS::TestResultCollector result;
+  controller.addListener( &result );        
+
+  // Add a listener that print dots as test run.
+  CPPUNIT_NS::BriefTestProgressListener progress;
+  controller.addListener( &progress );      
+
+  // Add the top suite to the test runner
+  CPPUNIT_NS::TestRunner runner;
+  runner.addTest( mafPolylineGraphBranchTest::suite());
+  runner.run( controller );
+
+  // Print test in a compiler compatible format.
+  CPPUNIT_NS::CompilerOutputter outputter( &result, CPPUNIT_NS::stdCOut() );
+  outputter.write(); 
+
+  return result.wasSuccessful() ? 0 : 1;
+}
+
+#endif
