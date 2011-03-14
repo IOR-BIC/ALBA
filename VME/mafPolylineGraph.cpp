@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2011-02-21 15:32:35 $
-Version:   $Revision: 1.10.2.6 $
+Date:      $Date: 2011-03-14 16:10:09 $
+Version:   $Revision: 1.10.2.7 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -741,6 +741,9 @@ mafPolylineGraph::Branch::Branch(const char *name) : m_OutputPolydataCell(Undefi
   m_Name = new char[nLen + 1];
   strcpy(m_Name, name);
 #endif  
+
+  m_EdgeId.clear() ;
+  m_VertexId.clear() ;
 }
 
 
@@ -844,7 +847,9 @@ void mafPolylineGraph::Branch::SetName(const char *name)
   
   if (name == NULL)
   {
+    #ifndef _DEBUG
     LogMessage("SetName() called with NULL argument") ;  
+#endif
     assert(false) ;
 
     m_Name = NULL;
@@ -1078,13 +1083,17 @@ bool mafPolylineGraph::Branch::SelfCheck() const
   // n.b this assumes that an empty branch is ok.
   if (GetNumberOfVertices() == 0){
     if (GetNumberOfEdges() != 0){
+      #ifndef _DEBUG
       LogMessage("empty branch contains %d edges", GetNumberOfEdges()) ;
+      #endif
       return false ;
     }
   }
   else{
     if (GetNumberOfEdges() != GetNumberOfVertices()-1){
+      #ifndef _DEBUG
       LogMessage("mismatched list lengths in branch: %d vertices %d edges", GetNumberOfVertices(), GetNumberOfEdges()) ;
+#endif
       return false ;
     }
   }
@@ -1093,7 +1102,9 @@ bool mafPolylineGraph::Branch::SelfCheck() const
   for (int i = 0 ;  i < GetNumberOfEdges()-1 ;  i++){
     for (int j = i+1 ;  j < GetNumberOfEdges() ;  j++){
       if (GetEdgeId(i) == GetEdgeId(j)){
+        #ifndef _DEBUG
         LogMessage("duplicate edge %d found in branch at %d and %d", GetEdgeId(i), i, j) ;
+        #endif
         return false ;
       }
     }
