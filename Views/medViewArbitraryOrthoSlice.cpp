@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2011-02-26 17:36:51 $
-Version:   $Revision: 1.1.2.52 $
+Date:      $Date: 2011-03-14 15:11:10 $
+Version:   $Revision: 1.1.2.53 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -1245,7 +1245,8 @@ void medViewArbitraryOrthoSlice::OnEventThis(mafEventBase *maf_event)
 
 		case ID_EXPORT:
 			{
-				OnEventID_EXPORT();
+				//SaveSliceTextureToFile();
+				SaveRenderWindowToFile();
 			}
 			break;
 
@@ -3855,7 +3856,7 @@ void medViewArbitraryOrthoSlice::OnEventID_ENABLE_EXPORT_IMAGES()
 	ChildViewsCameraUpdate();
 }
 
-void medViewArbitraryOrthoSlice::OnEventID_EXPORT()
+void medViewArbitraryOrthoSlice::SaveSliceTextureToFile()
 {
 	wxBusyInfo wait("please wait");
 
@@ -4371,4 +4372,152 @@ void medViewArbitraryOrthoSlice::MyMethod( medInteractorPicker * picker, double 
   gizmo->SetAbsPose(&ngm);
 
   UpdateThicknessStuff();
+}
+
+void medViewArbitraryOrthoSlice::SaveRenderWindowToFile()
+{
+	wxBusyInfo wait("please wait");
+
+	mafEvent e(this,PROGRESSBAR_SHOW);
+	mafEventMacro(e);
+
+	int viewToExport = -1;
+
+	mafVMESlicer *currentSlicer = NULL;
+
+	medGizmoCrossRotateTranslate *crossGizmo[3] = {m_GizmoXView, m_GizmoYView, m_GizmoZView};
+
+	// hide the cross before exporting
+	crossGizmo[m_ComboChooseExportAxis]->Show(false);
+
+	if (m_ComboChooseExportAxis == X)
+	{
+		currentSlicer = m_SlicerX;
+		viewToExport = X_VIEW;
+	}
+	else if (m_ComboChooseExportAxis == Y)
+	{
+		currentSlicer = m_SlicerY;
+		viewToExport = Y_VIEW;
+	}
+	else if (m_ComboChooseExportAxis == Z)
+	{
+		currentSlicer = m_SlicerZ;
+		viewToExport = Z_VIEW;
+	}
+
+	// export X slices BMP
+	double thickness = m_FeedbackLineHeight * 2;
+	double step = thickness / (m_NumberOfAxialSections - 1);
+
+	vtkMAFSmartPointer<vtkMatrix4x4> originalMatrix;
+
+	vtkMatrix4x4 *slicerMatrix = currentSlicer->GetAbsMatrixPipe()->GetMatrix().GetVTKMatrix();
+	originalMatrix->DeepCopy(slicerMatrix);
+
+	double height = -m_FeedbackLineHeight;
+
+	double v3[3] = {height,0,0};
+
+	for (int i = 0; i < m_NumberOfAxialSections; i++)
+	{          
+		long progress = (100 * ((double )i) / ((double) m_NumberOfAxialSections));
+
+		mafEvent eUpdate(this,PROGRESSBAR_SET_VALUE,progress);
+		mafEventMacro(eUpdate);
+
+		// move the slicer in the target abs pose
+		vtkMAFSmartPointer<vtkTransform> tr;
+		tr->PostMultiply();
+		tr->SetMatrix(originalMatrix);
+
+		if (currentSlicer == m_SlicerX)
+		{
+			tr->Translate(height,0,0);
+		}
+		else if (currentSlicer == m_SlicerY)
+		{
+			tr->Translate(0,height,0);
+		}
+		else if (currentSlicer == m_SlicerZ)
+		{
+			tr->Translate(0,0,height);
+		}
+
+		tr->Update();
+
+		currentSlicer->SetAbsMatrix(tr->GetMatrix());
+
+		vtkMAFSmartPointer<vtkPNGWriter> writer;
+
+		vtkImageData *textureToWriteOnDisk = NULL;
+
+		if (m_EnableThickness == false)
+		{
+			// update the slicer
+			currentSlicer->GetSurfaceOutput()->GetVTKData()->Modified();
+			currentSlicer->GetSurfaceOutput()->GetVTKData()->Update();
+
+			mafVMEOutputSurface *outputSurface = mafVMEOutputSurface::SafeDownCast(currentSlicer->GetSurfaceOutput());
+			assert(outputSurface);
+
+			// get the slicer texture for exporting purposes
+			textureToWriteOnDisk = outputSurface->GetMaterial()->GetMaterialTexture();
+			assert(textureToWriteOnDisk);
+			writer->SetInput(textureToWriteOnDisk);
+
+			mafEventMacro(mafEvent(this,CAMERA_UPDATE));				
+		}
+		else if (m_EnableThickness == true)
+		{
+			textureToWriteOnDisk = vtkImageData::New();
+			AccumulateTextures(currentSlicer, m_ThicknessValue, textureToWriteOnDisk, false );
+			writer->SetInput(textureToWriteOnDisk);
+			textureToWriteOnDisk->Delete();
+
+			mafEventMacro(mafEvent(this,CAMERA_UPDATE));				
+		}
+
+		// write it
+
+		wxString fileName = m_PathFromDialog.c_str();
+
+		if (currentSlicer == m_SlicerX)
+		{
+			fileName.append("/SlicerX_");
+		}
+		else if (currentSlicer == m_SlicerY)
+		{
+			fileName.append("/SlicerY_");
+		}
+		else if (currentSlicer == m_SlicerZ)
+		{
+			fileName.append("/SlicerZ_");
+		}
+
+		fileName << i;
+		fileName << ".png";
+	
+		((mafViewSlice*)m_ChildViewList[viewToExport])->GetRWI()->SaveImage(fileName.c_str());
+
+		height = height + step;
+	}
+
+	currentSlicer->SetAbsMatrix(mafMatrix(originalMatrix));
+
+	if (m_EnableThickness == true)
+	{
+		AccumulateTextures(currentSlicer, m_ThicknessValue, NULL, true);
+	}
+
+	currentSlicer->GetSurfaceOutput()->GetVTKData()->Modified();
+	currentSlicer->GetSurfaceOutput()->GetVTKData()->Update();
+
+	mafEvent eHide(this,PROGRESSBAR_HIDE);
+	mafEventMacro(eHide);
+
+	// reshow the cross after exporting
+	crossGizmo[m_ComboChooseExportAxis]->Show(true);
+
+	UpdateSlicersLUT();
 }

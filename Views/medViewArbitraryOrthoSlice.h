@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.h,v $
 Language:  C++
-Date:      $Date: 2011-02-26 17:36:51 $
-Version:   $Revision: 1.1.2.28 $
+Date:      $Date: 2011-03-14 15:11:10 $
+Version:   $Revision: 1.1.2.29 $
 Authors:   Stefano Perticoni	
 ==========================================================================
 Copyright (c) 2002/2004
@@ -352,7 +352,13 @@ protected:
   void HideCutPlanes();
   void OnID_CHOOSE_DIR();
   void OnEventID_ENABLE_EXPORT_IMAGES();
-  void OnEventID_EXPORT();
+
+  /** Write on file the texture slice from the selected view */
+  void SaveSliceTextureToFile();
+  
+  /** Write on file the full render window from the selected view */
+  void SaveRenderWindowToFile();
+
   void OnEventID_ENABLE_THICKNESS();
 
   void EnableThickness(bool enable);
@@ -453,7 +459,10 @@ protected:
 
   int m_EnableExportImages;
   int m_ComboChooseExportAxis;
-  int m_EnableThickness;
+  
+  // Enable RX like accumulation: corresponding point scalar values are added and the resulting number is divided
+  // by the number of slices 
+  int m_EnableThickness; 
   
   double m_ThicknessValue;
   int m_ThicknessComboAssignment;
