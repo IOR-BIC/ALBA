@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medInteractor2DDistanceTest.h,v $
 Language:  C++
-Date:      $Date: 2011-03-14 16:29:57 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-03-15 10:19:24 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -71,6 +71,8 @@ public:
   CPPUNIT_TEST( TestSetManualDistance1  );
   CPPUNIT_TEST( TestSetManualDistance2  );
   CPPUNIT_TEST( TestIsDisableUndoAndOkCancel  );
+  CPPUNIT_TEST( TestGetLastDistance  );
+  CPPUNIT_TEST( TestSetLabel  );
   CPPUNIT_TEST_SUITE_END();
 
 protected:
@@ -83,6 +85,8 @@ protected:
   void TestSetManualDistance1();
   void TestSetManualDistance2();
   void TestIsDisableUndoAndOkCancel();
+  void TestGetLastDistance();
+  void TestSetLabel();
 
   mafGUIFrame *m_Win;
 };

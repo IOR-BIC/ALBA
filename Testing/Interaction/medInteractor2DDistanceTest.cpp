@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medInteractor2DDistanceTest.cpp,v $
 Language:  C++
-Date:      $Date: 2011-03-14 16:29:57 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-03-15 10:19:24 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -228,5 +228,40 @@ void medInteractor2DDistanceTest::TestIsDisableUndoAndOkCancel()
 
   CPPUNIT_ASSERT( interactor->IsDisableUndoAndOkCancel() == false );//Default value
 
+  interactor->Delete();
+}
+//-----------------------------------------------------------
+void medInteractor2DDistanceTest::TestGetLastDistance() 
+//-----------------------------------------------------------
+{
+  medInteractor2DDistance *interactor = medInteractor2DDistance::NewTest();
+
+  CPPUNIT_ASSERT( interactor->GetLastDistance() == 0 );
+
+  interactor->m_Measure.push_back(3.0);
+  interactor->m_Measure.push_back(5.0);
+
+  CPPUNIT_ASSERT( interactor->GetLastDistance() == 5.0 );
+
+  interactor->Delete();
+}
+//-----------------------------------------------------------
+void medInteractor2DDistanceTest::TestSetLabel() 
+//-----------------------------------------------------------
+{
+  medInteractor2DDistance *interactor = medInteractor2DDistance::NewTest();
+
+  vtkMAFTextActorMeter *textActor = vtkMAFTextActorMeter::New();
+  interactor->m_MeterVector.push_back(textActor);
+
+  CPPUNIT_ASSERT( interactor->GetLabel() == "" );
+  //////////////////////////////////////////////////////////////////////////
+  interactor->SetLabel("TEST1");
+  CPPUNIT_ASSERT( interactor->GetLabel() == "TEST1" );
+  //////////////////////////////////////////////////////////////////////////
+  interactor->SetLabel("TEST2");
+  CPPUNIT_ASSERT( interactor->GetLabel() == "TEST2" );
+
+  textActor->Delete();
   interactor->Delete();
 }
