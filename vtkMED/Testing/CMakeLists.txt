@@ -142,6 +142,8 @@ ADD_TEST(AllocatorTest ${EXECUTABLE_OUTPUT_PATH}/AllocatorTest)
 ADD_EXECUTABLE(BinaryNodeTest BinaryNodeTest.h BinaryNodeTest.cpp)
 ADD_TEST(BinaryNodeTest ${EXECUTABLE_OUTPUT_PATH}/BinaryNodeTest)
 
+ADD_EXECUTABLE(PolynomialTest PolynomialTest.h PolynomialTest.cpp)
+ADD_TEST(PolynomialTest ${EXECUTABLE_OUTPUT_PATH}/PolynomialTest)
 
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
