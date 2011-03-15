@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractor.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 14:49:03 $
-  Version:   $Revision: 1.14.2.1 $
+  Date:      $Date: 2011-03-15 08:43:41 $
+  Version:   $Revision: 1.14.2.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -58,6 +58,7 @@ mafInteractor::mafInteractor()
   m_Device              = NULL;
   m_VME                 = NULL;
   m_Prop                = NULL;
+  m_TestMode = false;
   
   m_LockDevice            = true;
   m_DeviceIsSet           = false;

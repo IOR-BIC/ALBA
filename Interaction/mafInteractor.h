@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractor.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-18 10:54:20 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2011-03-15 08:43:41 $
+  Version:   $Revision: 1.4.22.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -153,6 +153,15 @@ public:
   /**  Process events coming from input device */
   virtual void OnEvent(mafEventBase *event);
 
+  /** Turn On m_TestMode flag.*/
+  void TestModeOn() {m_TestMode = true;};
+
+  /** Used to turn off m_TestMode flag.*/
+  void TestModeOff() {m_TestMode = false;};
+
+  /** Get TestMode*/
+  bool GetTestMode(){return m_TestMode;};
+
 protected:
 
   /** 
@@ -203,6 +212,8 @@ protected:
 
   vtkMAFSmartPointer<vtkRenderer> m_Renderer; ///< the renderer this interactor is working on
   vtkMAFSmartPointer<vtkProp3D>   m_Prop;     ///< the prop being interacted (optional)
+
+  int m_TestMode;///< Flag used with cppunitTest
 
 private:
   mafInteractor(const mafInteractor&);  // Not implemented.
