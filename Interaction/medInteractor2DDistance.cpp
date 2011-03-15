@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medInteractor2DDistance.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 15:41:38 $
-  Version:   $Revision: 1.2.2.1 $
+  Date:      $Date: 2011-03-15 10:16:03 $
+  Version:   $Revision: 1.2.2.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -52,9 +52,14 @@ mafCxxTypeMacro(medInteractor2DDistance)
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-medInteractor2DDistance::medInteractor2DDistance() 
+medInteractor2DDistance::medInteractor2DDistance(bool testMode /* = false */) 
 //----------------------------------------------------------------------------
 {
+  m_TestMode = testMode;
+
+  m_HistogramRWI = NULL;
+  m_HistogramDialog = NULL;
+
   m_Coordinate = vtkCoordinate::New();
   m_Coordinate->SetCoordinateSystemToWorld();
 
@@ -97,29 +102,32 @@ medInteractor2DDistance::medInteractor2DDistance()
   tprop->SetFontSize(12);
   m_PlotActor->SetPlotColor(0,.8,.3,.3);
 
-  // Histogram dialog
-  int width = 400;
-  int height = 300;
-  int x_init,y_init;
-  x_init = mafGetFrame()->GetPosition().x;
-  y_init = mafGetFrame()->GetPosition().y;
-  m_HistogramDialog = new wxDialog(mafGetFrame(),-1,_("Histogram"),wxDefaultPosition,wxDefaultSize,wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP);
-  m_HistogramRWI = new mafRWI(mafGetFrame());
-  m_HistogramRWI->SetListener(this);
-  m_HistogramRWI->m_RenFront->AddActor2D(m_PlotActor);
-  m_HistogramRWI->m_RenFront->SetBackground(1,1,1);
-  m_HistogramRWI->SetSize(0,0,width,height);
-  m_HistogramRWI->m_RwiBase->Reparent(m_HistogramDialog);
-  m_HistogramRWI->m_RwiBase->Show(true);
-
-  wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
-  sizer->Add(m_HistogramRWI->m_RwiBase,1, wxEXPAND);
-  m_HistogramDialog->SetSizer(sizer);
-  m_HistogramDialog->SetAutoLayout(TRUE);
-  sizer->Fit(m_HistogramDialog);
-  
-  m_HistogramDialog->SetSize(x_init,y_init,width,height);
-	m_HistogramDialog->Show(FALSE);
+  if (!m_TestMode)
+  {
+	  // Histogram dialog
+	  int width = 400;
+	  int height = 300;
+	  int x_init,y_init;
+	  x_init = mafGetFrame()->GetPosition().x;
+	  y_init = mafGetFrame()->GetPosition().y;
+	  m_HistogramDialog = new wxDialog(mafGetFrame(),-1,_("Histogram"),wxDefaultPosition,wxDefaultSize,wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP);
+	  m_HistogramRWI = new mafRWI(mafGetFrame());
+	  m_HistogramRWI->SetListener(this);
+	  m_HistogramRWI->m_RenFront->AddActor2D(m_PlotActor);
+	  m_HistogramRWI->m_RenFront->SetBackground(1,1,1);
+	  m_HistogramRWI->SetSize(0,0,width,height);
+	  m_HistogramRWI->m_RwiBase->Reparent(m_HistogramDialog);
+	  m_HistogramRWI->m_RwiBase->Show(true);
+	
+	  wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
+	  sizer->Add(m_HistogramRWI->m_RwiBase,1, wxEXPAND);
+	  m_HistogramDialog->SetSizer(sizer);
+	  m_HistogramDialog->SetAutoLayout(TRUE);
+	  sizer->Fit(m_HistogramDialog);
+	  
+	  m_HistogramDialog->SetSize(x_init,y_init,width,height);
+		m_HistogramDialog->Show(FALSE);
+  }
 
   m_CurrentRenderer  = NULL;
   m_LastRenderer     = NULL;
@@ -159,7 +167,10 @@ medInteractor2DDistance::~medInteractor2DDistance()
 //----------------------------------------------------------------------------
 {
   RemoveMeter();
-  m_HistogramRWI->m_RenFront->RemoveActor(m_PlotActor);
+  if (m_HistogramRWI)
+  {
+  	m_HistogramRWI->m_RenFront->RemoveActor(m_PlotActor);
+  }
   vtkDEL(m_PlotActor);
   vtkDEL(m_ProbingLine);
   vtkDEL(m_Line);
@@ -785,12 +796,19 @@ void medInteractor2DDistance::GenerateHistogram(bool generate)
   if (m_GenerateHistogram)
   {
     m_PlotActor->RemoveAllInputs();
-    m_HistogramRWI->m_RwiBase->Render();
+    if (m_HistogramRWI)
+    {
+    	m_HistogramRWI->m_RwiBase->Render();
+    }
     RemoveMeter();
     SetMeasureTypeToDistanceBetweenPoints();
    
   }
-  m_HistogramDialog->Show(m_GenerateHistogram);
+
+  if (m_HistogramDialog)
+  {
+  	m_HistogramDialog->Show(m_GenerateHistogram);
+  }
 }
 //----------------------------------------------------------------------------
 void medInteractor2DDistance::UndoMeasure()
@@ -926,7 +944,10 @@ void medInteractor2DDistance::SetManualDistance(double manualDistance)
 
     mafString ds;
     ds = wxString::Format(_("%.2f") , manualDistance);
-    m_MeterVector[m_MeterVector.size()-1]->SetText(ds);
+    if (!m_TestMode)
+    {
+    	m_MeterVector[m_MeterVector.size()-1]->SetText(ds);
+    }
 
     m_Measure[m_Measure.size()-1] = manualDistance;
   }
@@ -967,17 +988,35 @@ void medInteractor2DDistance::SetManualDistance(double manualDistance)
 
     mafString ds;
     ds = wxString::Format(_("%.2f") , manualDistance);
-    m_MeterVector[m_MeterVector.size()-1]->SetText(ds);
+    if (!m_TestMode)
+    {
+    	m_MeterVector[m_MeterVector.size()-1]->SetText(ds);
+    }
 
     m_Measure[m_Measure.size()-1] = manualDistance;
   }
 
-  m_CurrentRenderer->GetRenderWindow()->Render();
+  if (m_CurrentRenderer)
+  {
+  	m_CurrentRenderer->GetRenderWindow()->Render();
+  }
 }
 //----------------------------------------------------------------------------
 void medInteractor2DDistance::SetLabel(mafString label)
 //----------------------------------------------------------------------------
 {
 	m_MeterVector[m_MeterVector.size()-1]->SetText(label);
-	m_CurrentRenderer->GetRenderWindow()->Render();
+	if (m_CurrentRenderer)
+	{
+		m_CurrentRenderer->GetRenderWindow()->Render();
+	}
+}
+//----------------------------------------------------------------------------
+medInteractor2DDistance* medInteractor2DDistance::NewTest()
+//----------------------------------------------------------------------------
+{
+  medInteractor2DDistance *obj = new medInteractor2DDistance(true); \
+  if (obj) 
+    obj->m_HeapFlag=true;
+  return obj;
 }

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medInteractor2DDistance.h,v $
 Language:  C++
-Date:      $Date: 2009-12-17 12:27:54 $
-Version:   $Revision: 1.2.2.2 $
+Date:      $Date: 2011-03-15 10:16:03 $
+Version:   $Revision: 1.2.2.3 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -129,7 +129,10 @@ public:
   */
   int SizeMeasureVector(){ return m_Measure.size(); }
 protected:
-	medInteractor2DDistance();
+	/** Implemented a New() function for testing mode. */
+  	MAF_EXPORT static medInteractor2DDistance *medInteractor2DDistance::NewTest();
+
+	medInteractor2DDistance(bool testMode = false);
 	virtual ~medInteractor2DDistance();
 
 	virtual void OnLeftButtonDown   (mafEventInteraction *e);
@@ -218,6 +221,8 @@ protected:
 private:
 	medInteractor2DDistance(const medInteractor2DDistance&);   // Not implemented.
 	void operator=(const medInteractor2DDistance&);  // Not implemented.
+
+  friend class medInteractor2DDistanceTest;
 };
 #endif
 
