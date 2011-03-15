@@ -42,6 +42,10 @@ ADD_TEST(mmiInfoImageTest ${EXECUTABLE_OUTPUT_PATH}/mmiInfoImageTest)
 ADD_EXECUTABLE(medInteractorDICOMImporterTest medInteractorDICOMImporterTest.h medInteractorDICOMImporterTest.cpp)
 ADD_TEST(medInteractorDICOMImporterTest ${EXECUTABLE_OUTPUT_PATH}/medInteractorDICOMImporterTest)
 
+############ medInteractor2DDistanceTest
+ADD_EXECUTABLE(medInteractor2DDistanceTest medInteractor2DDistanceTest.h medInteractor2DDistanceTest.cpp)
+ADD_TEST(medInteractor2DDistanceTest ${EXECUTABLE_OUTPUT_PATH}/medInteractor2DDistanceTest) 
+
 IF (WIN32)
   SET_TARGET_PROPERTIES(mafGizmoROI_BESTest PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)
