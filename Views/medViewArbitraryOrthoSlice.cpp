@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2011-03-14 15:11:10 $
-Version:   $Revision: 1.1.2.53 $
+Date:      $Date: 2011-03-18 11:12:59 $
+Version:   $Revision: 1.1.2.54 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -1337,16 +1337,16 @@ m_Gui->Divider(2);
 	m_Gui->Label("Thickness", true);
 	m_Gui->Bool(ID_ENABLE_THICKNESS, "",&m_EnableThickness);
 
-	wxString thicknessChoices[22] = {"0.5", "1.0", "1.5",\
+	wxString thicknessChoices[25] = {"0.5", "1.0", "1.5",\
 		"2.0", "2.5", "3.0",\
 		"3.5", "4.0", "4.5",\
 		"5.0", "5.5", "6.0",\
 		"6.5", "7.0", "7.5",\
 		"8.0", "8.5", "9.0",\
-		"9.5", "10.0","20.0","40.0"};
+		"9.5", "10.0","20.0","40.0", "80.0" , "100.0" , "130.0"};
 
 	m_Gui->Label("Thickness value:");
-	m_Gui->Combo(ID_THICKNESS_VALUE_CHANGED, _(""), &m_ThicknessComboAssignment, 22, thicknessChoices);
+	m_Gui->Combo(ID_THICKNESS_VALUE_CHANGED, _(""), &m_ThicknessComboAssignment, 25, thicknessChoices);
 
 	m_Gui->Label("");
 
@@ -4277,6 +4277,15 @@ void medViewArbitraryOrthoSlice::ThicknessComboAssignment()
 	case 21:
 		m_ThicknessValue = 40.0;
 		break;
+  case 22:
+    m_ThicknessValue = 80.0;
+    break;
+  case 23:
+    m_ThicknessValue = 100.0;
+    break;
+  case 24:
+    m_ThicknessValue = 130.0;
+    break;
 
 	}
 }
