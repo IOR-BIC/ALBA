@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceTextured.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-06-30 06:53:17 $
-  Version:   $Revision: 1.11.2.4 $
+  Date:      $Date: 2011-03-21 11:22:03 $
+  Version:   $Revision: 1.11.2.5 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -237,7 +237,10 @@ void mafPipeSurfaceTextured::Create(mafSceneNode *n/*, bool use_axes*/)
     m_GhostActor->PickableOff();
     m_GhostActor->GetProperty()->SetOpacity(0);
     m_GhostActor->GetProperty()->SetRepresentationToPoints();
-    m_GhostActor->GetProperty()->SetInterpolationToFlat();
+
+	// Set to gouraud shading instead of flat to solve pixellation 
+	// look and feel in vertical application (medViewCrossCT in DP app) 
+    m_GhostActor->GetProperty()->SetInterpolationToGouraud();
     m_AssemblyFront->AddPart(m_GhostActor);
   }
 }
