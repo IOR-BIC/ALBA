@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2011-03-18 11:12:59 $
-Version:   $Revision: 1.1.2.54 $
+Date:      $Date: 2011-03-21 09:54:54 $
+Version:   $Revision: 1.1.2.55 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -1462,9 +1462,9 @@ void medViewArbitraryOrthoSlice::PostMultiplyEventMatrixToSlicers(mafEventBase *
 
 			}
 
-			UpdateSlicersLUT();
 		}
-
+		
+		UpdateSlicersLUT();
 	}
 }
 
@@ -1528,9 +1528,9 @@ void medViewArbitraryOrthoSlice::PostMultiplyEventMatrixToSlicer(mafEventBase *m
 					AccumulateTextures(m_SlicerZ, m_ThicknessValue, NULL, true);
 				}
 			}
-
-			UpdateSlicersLUT();
 		}
+
+		UpdateSlicersLUT();
 
 		// clean up
 		tr->Delete();
@@ -1981,6 +1981,7 @@ void medViewArbitraryOrthoSlice::OnLUTRangeModified()
 	if( (m_CurrentVolume || m_CurrentImage) && node)
 	{
 		UpdateSlicersLUT();
+		
 	}
 }
 
@@ -4198,10 +4199,21 @@ void medViewArbitraryOrthoSlice::UpdateSlicersLUT()
 	m_LutSlider->GetSubRange(&low,&hi);
 	m_ColorLUT->SetTableRange(low,hi);
 
-	m_SlicerX->GetMaterial()->m_ColorLut->SetTableRange(low,hi);
-	m_SlicerY->GetMaterial()->m_ColorLut->SetTableRange(low,hi);
-	m_SlicerZ->GetMaterial()->m_ColorLut->SetTableRange(low,hi);
+	mafVMEOutputSurface *surfaceOutputSlicerX = mafVMEOutputSurface::SafeDownCast(m_SlicerX->GetOutput());
+	assert(surfaceOutputSlicerX);
+	surfaceOutputSlicerX->Update();
+	surfaceOutputSlicerX->GetMaterial()->m_ColorLut->SetTableRange(low,hi);
 
+	mafVMEOutputSurface *surfaceOutputSlicerY = mafVMEOutputSurface::SafeDownCast(m_SlicerY->GetOutput());
+	assert(surfaceOutputSlicerY);
+	surfaceOutputSlicerY->Update();
+	surfaceOutputSlicerY->GetMaterial()->m_ColorLut->SetTableRange(low,hi);
+
+	mafVMEOutputSurface *surfaceOutputSlicerZ = mafVMEOutputSurface::SafeDownCast(m_SlicerZ->GetOutput());
+	assert(surfaceOutputSlicerZ);
+	surfaceOutputSlicerZ->Update();
+	surfaceOutputSlicerZ->GetMaterial()->m_ColorLut->SetTableRange(low,hi);
+	
 	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 
