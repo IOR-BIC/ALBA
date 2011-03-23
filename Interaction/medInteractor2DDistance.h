@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medInteractor2DDistance.h,v $
 Language:  C++
-Date:      $Date: 2011-03-15 10:16:03 $
-Version:   $Revision: 1.2.2.3 $
+Date:      $Date: 2011-03-23 14:23:21 $
+Version:   $Revision: 1.2.2.4 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -221,6 +221,7 @@ protected:
 private:
 	medInteractor2DDistance(const medInteractor2DDistance&);   // Not implemented.
 	void operator=(const medInteractor2DDistance&);  // Not implemented.
+  bool m_TestMode;
 
   friend class medInteractor2DDistanceTest;
 };

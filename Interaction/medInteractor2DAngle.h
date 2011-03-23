@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medInteractor2DAngle.h,v $
 Language:  C++
-Date:      $Date: 2009-12-17 12:27:54 $
-Version:   $Revision: 1.2.2.2 $
+Date:      $Date: 2011-03-23 14:23:21 $
+Version:   $Revision: 1.2.2.3 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -117,7 +117,10 @@ public:
   */
   int SizeMeasureVector(){ return m_Measure.size(); }
 protected:
-	medInteractor2DAngle();
+  /** Implemented a New() function for testing mode. */
+  MAF_EXPORT static medInteractor2DAngle *medInteractor2DAngle::NewTest();
+
+	medInteractor2DAngle(bool testMode = false);
 	virtual ~medInteractor2DAngle();
 
 	virtual void OnLeftButtonDown   (mafEventInteraction *e);
@@ -194,6 +197,9 @@ protected:
 private:
 	medInteractor2DAngle(const medInteractor2DAngle&);   // Not implemented.
 	void operator=(const medInteractor2DAngle&);  // Not implemented.
+  bool m_TestMode;
+
+  friend class medInteractor2DAngleTest;
 };
 #endif
 

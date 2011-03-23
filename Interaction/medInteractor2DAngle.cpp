@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medInteractor2DAngle.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 15:41:38 $
-  Version:   $Revision: 1.3.2.1 $
+  Date:      $Date: 2011-03-23 14:23:21 $
+  Version:   $Revision: 1.3.2.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -52,9 +52,10 @@ mafCxxTypeMacro(medInteractor2DAngle)
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-medInteractor2DAngle::medInteractor2DAngle() 
+medInteractor2DAngle::medInteractor2DAngle(bool testMode /* = false */) 
 //----------------------------------------------------------------------------
 {
+  m_TestMode = testMode;
   m_Coordinate = vtkCoordinate::New();
   m_Coordinate->SetCoordinateSystemToWorld();
 
@@ -640,7 +641,9 @@ void medInteractor2DAngle::SetManualAngle(double manualAngle)
 
     double dirProj[3]; // opposite direction of view plane normal
 		double viewUp[3]; // camera view UP
-		m_RendererVector[m_RendererVector.size()-1]->GetActiveCamera()->GetViewPlaneNormal(dirProj);
+    if (!m_RendererVector.empty()) {
+		  m_RendererVector[m_RendererVector.size()-1]->GetActiveCamera()->GetViewPlaneNormal(dirProj);
+    }
 /*
 		dirProj[0] = -dirProj[0];
 		dirProj[1] = -dirProj[1];
@@ -648,7 +651,9 @@ void medInteractor2DAngle::SetManualAngle(double manualAngle)
 */
 		//mafString s = wxString::Format(L"dirProjOpp: %f , %f , %f" , dirProj[0],dirProj[1],dirProj[2]);
 		//mafLogMessage(s);
-		m_RendererVector[m_RendererVector.size()-1]->GetActiveCamera()->GetViewUp(viewUp);
+    if (!m_RendererVector.empty()) {
+		  m_RendererVector[m_RendererVector.size()-1]->GetActiveCamera()->GetViewUp(viewUp);
+    }
 		//s = wxString::Format(L"ViewUp:%f , %f , %f" , viewUp[0],viewUp[1],viewUp[2]);
 		//mafLogMessage(s);
 
@@ -1335,16 +1340,24 @@ s = wxString::Format(L"tmp4OLD:%f , %f , %f" , tmp4[0],tmp4[1],tmp4[2]);
     mafString ds;
     ds = wxString::Format(_("%.2f") , manualAngle);
     ds.Append("°");
-    m_MeterVector[m_MeterVector.size()-1]->SetText(ds);
+    if (!m_TestMode)
+    {
+      m_MeterVector[m_MeterVector.size()-1]->SetText(ds);
+    }
     
     double tmp_pos[3];
     m_LineSourceVector2[m_LineSourceVector2.size()-1]->GetPoint2(tmp_pos);
-    m_MeterVector[m_MeterVector.size()-1]->SetTextPosition(tmp_pos);
+    if (!m_TestMode)
+    {
+      m_MeterVector[m_MeterVector.size()-1]->SetTextPosition(tmp_pos);
+    }
     
     m_Measure[m_Measure.size()-1] = manualAngle;   
   }
-  m_RendererVector[m_RendererVector.size()-1]->GetRenderWindow()->Render();
-  m_RendererVector[m_RendererVector.size()-1]->GetRenderWindow()->Render();
+  if (!m_RendererVector.empty()) {
+    m_RendererVector[m_RendererVector.size()-1]->GetRenderWindow()->Render();
+    m_RendererVector[m_RendererVector.size()-1]->GetRenderWindow()->Render();
+  }
 }
 //----------------------------------------------------------------------------
 void medInteractor2DAngle::SetLabel(mafString label)
@@ -1352,4 +1365,14 @@ void medInteractor2DAngle::SetLabel(mafString label)
 {
 	m_MeterVector[m_MeterVector.size()-1]->SetText(label);
 	m_CurrentRenderer->GetRenderWindow()->Render();
+}
+
+//----------------------------------------------------------------------------
+medInteractor2DAngle* medInteractor2DAngle::NewTest()
+//----------------------------------------------------------------------------
+{
+  medInteractor2DAngle *obj = new medInteractor2DAngle(true); \
+    if (obj) 
+      obj->m_HeapFlag=true;
+  return obj;
 }
