@@ -145,6 +145,10 @@ ADD_TEST(BinaryNodeTest ${EXECUTABLE_OUTPUT_PATH}/BinaryNodeTest)
 ADD_EXECUTABLE(PolynomialTest PolynomialTest.h PolynomialTest.cpp)
 ADD_TEST(PolynomialTest ${EXECUTABLE_OUTPUT_PATH}/PolynomialTest)
 
+ADD_EXECUTABLE(StartingPolynomialTest StartingPolynomialTest.h StartingPolynomialTest.cpp)
+ADD_TEST(StartingPolynomialTest ${EXECUTABLE_OUTPUT_PATH}/StartingPolynomialTest)
+
+
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
 #ENDIF (MAF_USE_WX)
