@@ -165,6 +165,8 @@ ADD_TEST(mafPolylineGraphEdgeTest ${EXECUTABLE_OUTPUT_PATH}/mafPolylineGraphEdge
 ADD_EXECUTABLE(mafPolylineGraphBranchTest  mafPolylineGraphBranchTest.h mafPolylineGraphBranchTest.cpp)
 ADD_TEST(mafPolylineGraphBranchTest ${EXECUTABLE_OUTPUT_PATH}/mafPolylineGraphBranchTest)
 
+ADD_EXECUTABLE(mafVMEVolumeLargeTest  mafVMEVolumeLargeTest.h mafVMEVolumeLargeTest.cpp)
+ADD_TEST(mafVMEVolumeLargeTest ${EXECUTABLE_OUTPUT_PATH}/mafVMEVolumeLargeTest)
 
 #to be checked
 #ADD_EXECUTABLE(medPipeVolumeVRTest medPipeVolumeVRTest.h medPipeVolumeVRTest.cpp)
