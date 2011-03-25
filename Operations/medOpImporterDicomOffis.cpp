@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2011-02-14 16:55:33 $
-Version:   $Revision: 1.1.2.127 $
+Date:      $Date: 2011-03-25 13:40:03 $
+Version:   $Revision: 1.1.2.128 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -2871,7 +2871,20 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 						std::ostringstream stringStream;
 						stringStream << "Cannot read dicom tag DCM_ImagePositionPatient. Exiting"<< std::endl;          
 						mafLogMessage(stringStream.str().c_str());
-						return false;
+
+            int result = wxMessageBox(_("Cannot read dicom tag DCM_ImagePositionPatient. Would you like to use default position"), "", wxYES_NO);
+
+            if (result == wxNO)
+            {
+              delete busyInfo;
+              return false;
+            }
+            else
+            {
+              dcmImagePositionPatient[0] = 0.0;
+              dcmImagePositionPatient[1] = 0.0;
+              dcmImagePositionPatient[2] = 0.0;
+            }
 					} 
 					else
 					{
