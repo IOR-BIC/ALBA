@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:05:59 $
-  Version:   $Revision: 1.35 $
+  Date:      $Date: 2011-03-25 13:34:27 $
+  Version:   $Revision: 1.35.2.1 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -155,41 +155,23 @@ mafVMEMeter::~mafVMEMeter()
 //-------------------------------------------------------------------------
 int mafVMEMeter::DeepCopy(mafNode *a)
 //-------------------------------------------------------------------------
-{ 
-  if (Superclass::DeepCopy(a)==MAF_OK)
-  {
-    mafVMEMeter *meter = mafVMEMeter::SafeDownCast(a);
-    mafNode *linked_node = meter->GetLink("StartVME");
-    if (linked_node)
-    {
-      this->SetLink("StartVME", linked_node);
-    }
-    linked_node = meter->GetLink("EndVME1");
-    if (linked_node)
-    {
-      this->SetLink("EndVME1", linked_node);
-    }
-    linked_node = meter->GetLink("EndVME2");
-    if (linked_node)
-    {
-      this->SetLink("EndVME2", linked_node);
-    }
-    if (linked_node)
-    {
-      this->SetLink("PlottedVME", linked_node);
-    }
-    m_Transform->SetMatrix(meter->m_Transform->GetMatrix());
+{
+	if (Superclass::DeepCopy(a)==MAF_OK)
+	{
+		mafVMEMeter *meter = mafVMEMeter::SafeDownCast(a);
+		m_Transform->SetMatrix(meter->m_Transform->GetMatrix());
 
-    mafDataPipeCustom *dpipe = mafDataPipeCustom::SafeDownCast(GetDataPipe());
-    if (dpipe)
-    {
-      dpipe->SetInput(m_Goniometer->GetOutput());
-      m_Goniometer->Update();
-    }
-    return MAF_OK;
-  }  
-  return MAF_ERROR;
+		mafDataPipeCustom *dpipe = mafDataPipeCustom::SafeDownCast(GetDataPipe());
+		if (dpipe)
+		{
+			dpipe->SetInput(m_Goniometer->GetOutput());
+			m_Goniometer->Update();
+		}
+		return MAF_OK;
+	}
+	return MAF_ERROR;
 }
+
 //-------------------------------------------------------------------------
 bool mafVMEMeter::Equals(mafVME *vme)
 //-------------------------------------------------------------------------
