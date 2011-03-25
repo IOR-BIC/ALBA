@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-05-11 15:31:49 $
-  Version:   $Revision: 1.33.2.1 $
+  Date:      $Date: 2011-03-25 13:35:48 $
+  Version:   $Revision: 1.33.2.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -135,39 +135,27 @@ medVMEWrappedMeter::~medVMEWrappedMeter()
 
   SetOutput(NULL);
 }
+
+
 //-------------------------------------------------------------------------
 int medVMEWrappedMeter::DeepCopy(mafNode *a)
 //-------------------------------------------------------------------------
-{ 
-  if (Superclass::DeepCopy(a)==MAF_OK)
-  {
-    medVMEWrappedMeter *meter = medVMEWrappedMeter::SafeDownCast(a);
-    mafNode *linked_node = meter->GetLink("StartVME");
-    if (linked_node)
-    {
-      this->SetLink("StartVME", linked_node);
-    }
-    linked_node = meter->GetLink("EndVME1");
-    if (linked_node)
-    {
-      this->SetLink("EndVME1", linked_node);
-    }
-    linked_node = meter->GetLink("EndVME2");
-    if (linked_node)
-    {
-      this->SetLink("EndVME2", linked_node);
-    }
-    m_Transform->SetMatrix(meter->m_Transform->GetMatrix());
+{
+	if (Superclass::DeepCopy(a)==MAF_OK)
+	{
+		medVMEWrappedMeter *meter = medVMEWrappedMeter::SafeDownCast(a);
+		m_Transform->SetMatrix(meter->m_Transform->GetMatrix());
 
-    mafDataPipeCustom *dpipe = mafDataPipeCustom::SafeDownCast(GetDataPipe());
-    if (dpipe)
-    {
-      dpipe->SetInput(m_Goniometer->GetOutput());
-    }
-    return MAF_OK;
-  }  
-  return MAF_ERROR;
+		mafDataPipeCustom *dpipe = mafDataPipeCustom::SafeDownCast(GetDataPipe());
+		if (dpipe)
+		{
+			dpipe->SetInput(m_Goniometer->GetOutput());
+		}
+		return MAF_OK;
+	}
+	return MAF_ERROR;
 }
+
 //-------------------------------------------------------------------------
 bool medVMEWrappedMeter::Equals(mafVME *vme)
 //-------------------------------------------------------------------------

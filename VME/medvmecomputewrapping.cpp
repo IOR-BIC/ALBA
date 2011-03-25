@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medvmecomputewrapping.cpp,v $
 Language:  C++
-Date:      $Date: 2009-11-23 14:26:16 $
-Version:   $Revision: 1.1.2.26 $
+Date:      $Date: 2011-03-25 13:35:48 $
+Version:   $Revision: 1.1.2.27 $
 Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -156,39 +156,27 @@ medVMEComputeWrapping::~medVMEComputeWrapping()
 
 	SetOutput(NULL);
 }
+
 //-------------------------------------------------------------------------
 int medVMEComputeWrapping::DeepCopy(mafNode *a)
 //-------------------------------------------------------------------------
-{ 
+{
 	if (Superclass::DeepCopy(a)==MAF_OK)
 	{
 		medVMEComputeWrapping *meter = medVMEComputeWrapping::SafeDownCast(a);
-		mafNode *linked_node = meter->GetLink("StartVME");
-		if (linked_node)
-		{
-			this->SetLink("StartVME", linked_node);
-		}
-		linked_node = meter->GetLink("EndVME1");
-		if (linked_node)
-		{
-			this->SetLink("EndVME1", linked_node);
-		}
-		linked_node = meter->GetLink("EndVME2");
-		if (linked_node)
-		{
-			this->SetLink("EndVME2", linked_node);
-		}
 		m_Transform->SetMatrix(meter->m_Transform->GetMatrix());
 
-		mafDataPipeCustom *dpipe = mafDataPipeCustom::SafeDownCast(GetDataPipe());
+		mafDataPipeCustom *dpipe =
+			mafDataPipeCustom::SafeDownCast(GetDataPipe());
 		if (dpipe)
 		{
 			dpipe->SetInput(m_Goniometer->GetOutput());
 		}
 		return MAF_OK;
-	}  
+	}
 	return MAF_ERROR;
 }
+
 //-------------------------------------------------------------------------
 bool medVMEComputeWrapping::Equals(mafVME *vme)
 //-------------------------------------------------------------------------
