@@ -127,8 +127,8 @@ ADD_TEST(CubeTest ${EXECUTABLE_OUTPUT_PATH}/CubeTest)
 ADD_EXECUTABLE(SquareTest SquareTest.h SquareTest.cpp)
 ADD_TEST(SquareTest ${EXECUTABLE_OUTPUT_PATH}/SquareTest)
 
-ADD_EXECUTABLE(SparseNMatrixTest SparseNMatrixTest.h SparseNMatrixTest.cpp)
-ADD_TEST(SparseNMatrixTest ${EXECUTABLE_OUTPUT_PATH}/SparseNMatrixTest)
+ADD_EXECUTABLE(CSkeletonEdgeTest CSkeletonEdgeTest.h CSkeletonEdgeTest.cpp)
+ADD_TEST(CSkeletonEdgeTest ${EXECUTABLE_OUTPUT_PATH}/CSkeletonEdgeTest)
 
 ADD_EXECUTABLE(VertexDataTest VertexDataTest.h VertexDataTest.cpp)
 ADD_TEST(VertexDataTest ${EXECUTABLE_OUTPUT_PATH}/VertexDataTest)
