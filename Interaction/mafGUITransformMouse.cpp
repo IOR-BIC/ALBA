@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUITransformMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:47:19 $
-  Version:   $Revision: 1.1.2.5 $
+  Date:      $Date: 2011-03-29 10:00:01 $
+  Version:   $Revision: 1.1.2.6 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -38,13 +38,14 @@
 #include "vtkRenderer.h"
 
 //----------------------------------------------------------------------------
-mafGUITransformMouse::mafGUITransformMouse(mafVME *input, mafObserver *listener)
+mafGUITransformMouse::mafGUITransformMouse(mafVME *input, mafObserver *listener /* = NULL */, bool testMode /* = false */)
 //----------------------------------------------------------------------------
 {
   assert(input);
 
   m_Listener = listener;
   m_InputVME = input;
+  m_TestMode = testMode;
   m_Gui = NULL;
   
   m_IsaRotate = NULL;
@@ -58,7 +59,11 @@ mafGUITransformMouse::mafGUITransformMouse(mafVME *input, mafObserver *listener)
   m_OldInteractor = NULL;
 
   CreateISA();
-  CreateGui();
+
+  if (!m_TestMode)
+  {
+  	CreateGui();
+  }
   
   AttachInteractorToVme();
 }
@@ -334,8 +339,11 @@ void mafGUITransformMouse::CreateISA()
 void mafGUITransformMouse::EnableWidgets(bool enable)
 //----------------------------------------------------------------------------
 {
-  m_Gui->Enable(ID_ROTATION_AXES, enable);
-  m_Gui->Enable(ID_TRASLATION_AXES, enable);
+  if (!m_TestMode)
+  {
+	  m_Gui->Enable(ID_ROTATION_AXES, enable);
+	  m_Gui->Enable(ID_TRASLATION_AXES, enable);
+  }
 
   if (enable == true)
   {
