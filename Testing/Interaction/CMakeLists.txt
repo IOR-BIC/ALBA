@@ -50,6 +50,10 @@ ADD_TEST(medInteractor2DDistanceTest ${EXECUTABLE_OUTPUT_PATH}/medInteractor2DDi
 ADD_EXECUTABLE(medInteractor2DAngleTest medInteractor2DAngleTest.h medInteractor2DAngleTest.cpp)
 ADD_TEST(medInteractor2DAngleTest ${EXECUTABLE_OUTPUT_PATH}/medInteractor2DAngleTest) 
 
+############ medInteractor2DIndicatorTest
+ADD_EXECUTABLE(medInteractor2DIndicatorTest medInteractor2DIndicatorTest.h medInteractor2DIndicatorTest.cpp)
+ADD_TEST(medInteractor2DIndicatorTest ${EXECUTABLE_OUTPUT_PATH}/medInteractor2DIndicatorTest) 
+
 
 IF (WIN32)
   SET_TARGET_PROPERTIES(mafGizmoROI_BESTest PROPERTIES LINK_FLAGS "/MANIFEST")
