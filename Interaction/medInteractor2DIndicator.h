@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medInteractor2DIndicator.h,v $
 Language:  C++
-Date:      $Date: 2009-12-17 12:27:54 $
-Version:   $Revision: 1.2.2.2 $
+Date:      $Date: 2011-03-30 14:43:21 $
+Version:   $Revision: 1.2.2.3 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -63,10 +63,8 @@ public:
 	/**
 	Remove the meters from the render window*/
 	void RemoveMeter();
-
 	
-	
-  /** 
+    /** 
 	Undo the last measure*/
 	void UndoMeasure();
 
@@ -147,9 +145,6 @@ protected:
 	vtkRenderer         *m_CurrentRenderer;
   vtkRenderer         *m_PreviousRenderer;
 
-	
-
-	
 	bool m_DraggingLine;
 	bool m_DraggingLeft;
 	bool m_DraggingMouse;
@@ -169,6 +164,9 @@ protected:
 private:
 	medInteractor2DIndicator(const medInteractor2DIndicator&);   // Not implemented.
 	void operator=(const medInteractor2DIndicator&);  // Not implemented.
+
+	/** Test friend */
+	friend class medInteractor2DIndicatorTest;
 };
 #endif
 

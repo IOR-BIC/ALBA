@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medInteractor2DIndicator.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 15:41:38 $
-  Version:   $Revision: 1.2.2.1 $
+  Date:      $Date: 2011-03-30 14:43:21 $
+  Version:   $Revision: 1.2.2.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -548,3 +548,4 @@ void medInteractor2DIndicator::SetLabel(mafString label)
 	m_MeterVector[m_MeterVector.size()-1]->SetText(label);
 	m_CurrentRenderer->GetRenderWindow()->Render();
 }
+
