@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpRegisterClusters.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-01-31 10:32:51 $
-  Version:   $Revision: 1.2.2.1 $
+  Date:      $Date: 2011-03-31 13:35:21 $
+  Version:   $Revision: 1.2.2.2 $
   Authors:   Paolo Quadrani - porting Daniele Giunchi  
 ==========================================================================
   Copyright (c) 2002/2004
@@ -513,6 +513,8 @@ void medOpRegisterClusters::OpDo()
             mafEventMacro(mafEvent(this, VME_ADD,landmark));
             landmark->SetName(m_Registered->GetLandmark(i)->GetName());
             landmark->ReparentTo(landmarkCloudWithTimeVariantLandmarks);
+						//BES: 30.3.2011 - now landmark can be released, since it is already ReparentTo => memory leak fix
+						landmark->UnRegister(this);
           }
 
           double pos[3], rot[3];
