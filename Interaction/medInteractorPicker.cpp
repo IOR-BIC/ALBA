@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medInteractorPicker.cpp,v $
 Language:  C++
-Date:      $Date: 2011-02-26 17:36:30 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-04-04 12:59:45 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2010 
@@ -126,6 +126,7 @@ void medInteractorPicker::OnButtonUp(mafEventInteraction *e)
 void medInteractorPicker::SendPickingInformation(mafView *v, double *mouse_pos, int msg_id, mafMatrix *tracker_pos, bool mouse_flag)
 //----------------------------------------------------------------------------
 {
+  // Send to the listener picked point coordinate through vtkPoint and the corresponding scalar value found in that position
   bool picked_something = false;
 
   vtkCellPicker *cellPicker;
@@ -186,6 +187,7 @@ void medInteractorPicker::SendPickingInformation(mafView *v, double *mouse_pos, 
 void medInteractorPicker::EnableContinuousPicking(bool enable)
 //----------------------------------------------------------------------------
 {
+  // Enable/disable continuous picking in OnEvent
   m_ContinuousPickingFlag = enable;
 }
 
@@ -194,6 +196,8 @@ void medInteractorPicker::OnEvent(mafEventBase *event)
 //------------------------------------------------------------------------------
 {
   Superclass::OnEvent(event);
+  
+  // Redefined to send picking events if continuous picking is enabled
   mafEventInteraction *e = (mafEventInteraction *)event;
 
   if ( m_ContinuousPickingFlag && (e->GetModifier(MAF_CTRL_KEY)) && e->GetButton() == MAF_LEFT_BUTTON)
