@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.h,v $
   Language:  C++
-  Date:      $Date: 2008-10-06 10:24:07 $
-  Version:   $Revision: 1.29.2.1 $
+  Date:      $Date: 2011-04-15 09:58:45 $
+  Version:   $Revision: 1.29.2.2 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,12 +35,18 @@ class vtkLineSource;
 class vtkCellCenters;
 class vtkArrowSource;
 class vtkFeatureEdges;
+class vtkDataSetAttributes;
 
 //----------------------------------------------------------------------------
 // mafPipeSurface :
 //----------------------------------------------------------------------------
 /** Visual pipe used to render VTK polydata and allowing to manage scalar visibility,
-lookup table and some polygonal features like edges and normals.*/
+lookup table and some polygonal features like edges and normals.
+
+Shared documentation:
+https://docs.google.com/a/scsitaly.com/document/d/1j_AtB2aB3cwph6Tpi4QzjQYysOxPMbXBCgE3ZyLiS3M/edit?hl=en#
+
+*/
 class mafPipeSurface : public mafPipe
 {
 public:
@@ -72,6 +78,8 @@ public:
     ID_ENABLE_LOD,
 		ID_NORMAL_VISIBILITY,
 		ID_EDGE_VISIBILITY,
+    ID_SCALARS_DATA_TYPE_SELECTION, // (added by Losi 2011/04/08 to allow scalars array selection)
+    ID_SCALARS_ARRAY_SELECTION,     // (added by Losi 2011/04/08 to allow scalars array selection)
     ID_LAST
   };
 
@@ -115,12 +123,16 @@ protected:
   int m_UseLookupTable; ///< Flag to switch On/Off the lookup table usage to color the surface
   int m_EnableActorLOD; ///< Flag to switch On/Off the usage of the Level Of Detail
 
-  int m_ScalarVisibility; ///< Flag to switch On/Off the scalar visibility
-	int m_NormalVisibility; ///< Flag to switch On/Off the visibility of normals on the surface
-	int m_EdgeVisibility; ///< Flag to switch On/Off the visibility of edge feature on the surface
+  int m_ScalarVisibility;         ///< Flag to switch On/Off the scalar visibility
+	int m_NormalVisibility;         ///< Flag to switch On/Off the visibility of normals on the surface
+	int m_EdgeVisibility;           ///< Flag to switch On/Off the visibility of edge feature on the surface
   int m_RenderingDisplayListFlag; ///< Flag to switch On/Off the 
   mmaMaterial *m_SurfaceMaterial;
   mafGUIMaterialButton *m_MaterialButton;
+
+  int m_SelectedScalarsArray;           ///< Contains the index of the visivle scalars array of the input surface (added by Losi 2011/04/08 to allow scalars array selection)
+  int m_SelectedDataAttribute;          ///< Determine the visible scalars data type (0 for point data, 1 for cell data) (added by Losi 2011/04/08 to allow scalars array selection)
+  wxComboBox *m_ScalarsArraySelection ; ///< GUI element for selecting the active scalars array (added by Losi 2011/04/08 to allow scalars array selection)
 
   //void UpdateProperty(bool fromTag = false);
 
@@ -132,5 +144,11 @@ protected:
 
   /** Create the Gui for the visual pipe that allow the user to change the pipe's parameters.*/
   virtual mafGUI  *CreateGui();
+
+  /** Update the scalars array visualization (added by Losi 2011/04/08 to allow scalars array selection) */
+  void UpdateScalarsArrayVisualization(vtkDataSetAttributes *dataAttribute);
+
+  /** Return the selected data attribute (point or cell data) (added by Losi 2011/04/08 to allow scalars array selection) */
+  vtkDataSetAttributes *GetSelectedDataAttribute();
 };  
 #endif // __mafPipeSurface_H__
