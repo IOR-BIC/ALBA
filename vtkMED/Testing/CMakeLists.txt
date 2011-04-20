@@ -151,6 +151,10 @@ ADD_TEST(StartingPolynomialTest ${EXECUTABLE_OUTPUT_PATH}/StartingPolynomialTest
 ADD_EXECUTABLE(CSkeletonVertexTest CSkeletonVertexTest.h CSkeletonVertexTest.cpp)
 ADD_TEST(CSkeletonVertexTest ${EXECUTABLE_OUTPUT_PATH}/CSkeletonVertexTest)
 
+ADD_EXECUTABLE(PPolynomialTest PPolynomialTest.h PPolynomialTest.cpp)
+ADD_TEST(PPolynomialTest ${EXECUTABLE_OUTPUT_PATH}/PPolynomialTest)
+
+
 
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
