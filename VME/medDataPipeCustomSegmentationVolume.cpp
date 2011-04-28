@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medDataPipeCustomSegmentationVolume.cpp,v $
 Language:  C++
-Date:      $Date: 2010-11-05 11:16:34 $
-Version:   $Revision: 1.1.2.13 $
-Authors:   Matteo Giacomoni
+Date:      $Date: 2011-04-28 14:45:38 $
+Version:   $Revision: 1.1.2.14 $
+Authors:   Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2010
 CINECA - Interuniversity Consortium (www.cineca.it)
@@ -916,7 +916,11 @@ int medDataPipeCustomSegmentationVolume::AddRange(int startSlice,int endSlice,do
 int medDataPipeCustomSegmentationVolume::GetRange(int index,int &startSlice, int &endSlice, double &threshold)
 //----------------------------------------------------------------------------
 {
-  if (index<0 || index>m_AutomaticSegmentationRanges.size()-1)
+  //was (index<0 || index>m_AutomaticSegmentationRanges.size()-1)
+  //but m_AutomaticSegmentationRanges.size() is unsiged, if you remove 1 when it is 0
+  //you get 4294967295 and the control fails
+  //The same update was done in the similar check in this file
+  if (index<0 || index+1>m_AutomaticSegmentationRanges.size())
   {
     return MAF_ERROR;
   }
@@ -1137,7 +1141,7 @@ bool medDataPipeCustomSegmentationVolume::CheckNumberOfThresholds()
 int medDataPipeCustomSegmentationVolume::UpdateRange(int index,int &startSlice, int &endSlice, double &threshold)
 //----------------------------------------------------------------------------
 {
-  if (m_AutomaticSegmentationRanges.size()==0 || index<0 || index>(m_AutomaticSegmentationRanges.size()-1) || AutomaticCheckRange(startSlice,endSlice,index) == MAF_ERROR)
+  if (m_AutomaticSegmentationRanges.size()==0 || index<0 || index+1>m_AutomaticSegmentationRanges.size() || AutomaticCheckRange(startSlice,endSlice,index) == MAF_ERROR)
   {
     return MAF_ERROR;
   }
@@ -1184,7 +1188,7 @@ int medDataPipeCustomSegmentationVolume::RemoveAllSeeds()
 int medDataPipeCustomSegmentationVolume::DeleteSeed(int index)
 //----------------------------------------------------------------------------
 {
-  if (m_RegionGrowingSeeds.size()==0 || index<0 || index>(m_RegionGrowingSeeds.size()-1))
+  if (m_RegionGrowingSeeds.size()==0 || index<0 || index+1>(m_RegionGrowingSeeds.size()))
   {
     return MAF_ERROR;
   }
@@ -1211,7 +1215,7 @@ int medDataPipeCustomSegmentationVolume::DeleteSeed(int index)
 int medDataPipeCustomSegmentationVolume::DeleteRange(int index)
 //----------------------------------------------------------------------------
 {
-  if (m_AutomaticSegmentationRanges.size()==0 || index<0 || index>(m_AutomaticSegmentationRanges.size()-1))
+  if (m_AutomaticSegmentationRanges.size()==0 || index<0 || index+1>m_AutomaticSegmentationRanges.size())
   {
     return MAF_ERROR;
   }
@@ -1263,7 +1267,8 @@ int medDataPipeCustomSegmentationVolume::AddSeed(int seed[3])
 int medDataPipeCustomSegmentationVolume::GetSeed(int index,int seed[3])
 //----------------------------------------------------------------------------
 {
-  if (index<0 || index>m_RegionGrowingSeeds.size()-1)
+ 
+  if (index<0 || index+1>m_RegionGrowingSeeds.size())
   {
     return MAF_ERROR;
   }
