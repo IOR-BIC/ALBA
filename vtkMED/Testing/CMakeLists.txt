@@ -154,7 +154,8 @@ ADD_TEST(CSkeletonVertexTest ${EXECUTABLE_OUTPUT_PATH}/CSkeletonVertexTest)
 ADD_EXECUTABLE(PPolynomialTest PPolynomialTest.h PPolynomialTest.cpp)
 ADD_TEST(PPolynomialTest ${EXECUTABLE_OUTPUT_PATH}/PPolynomialTest)
 
-
+ADD_EXECUTABLE(CSkeletonEdgeM1Test CSkeletonEdgeM1Test.h CSkeletonEdgeM1Test.cpp)
+ADD_TEST(CSkeletonEdgeM1Test ${EXECUTABLE_OUTPUT_PATH}/CSkeletonEdgeM1Test)
 
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
