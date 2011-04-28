@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medDicomCardiacMRIHelper.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-08-24 14:55:29 $
-  Version:   $Revision: 1.1.2.18 $
+  Date:      $Date: 2011-04-28 09:15:57 $
+  Version:   $Revision: 1.1.2.19 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -458,6 +458,8 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
   //     [dummy, idx_mode] = maxValue(proj);
   //
   
+  m_FileNumberForPlaneIFrameJ = fileNumberForPlaneIFrameJ; // Added by Losi
+
   if (planesPerFrame == 1)
   {
     // just one timevarying plane: skip correction
