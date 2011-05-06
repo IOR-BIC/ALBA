@@ -148,6 +148,9 @@ SET(PROJECT_SRCS
   medOpExporterLandmarkWS.cpp
   medOpExporterLandmarkWS.h
   
+  medOpMergeDicomSeries.cpp
+  medOpMergeDicomSeries.h
+  
 )
   
 IF (MED_USE_Offis)

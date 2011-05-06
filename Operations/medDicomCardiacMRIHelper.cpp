@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medDicomCardiacMRIHelper.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-04-28 09:45:34 $
-  Version:   $Revision: 1.1.2.20 $
+  Date:      $Date: 2011-05-06 10:12:48 $
+  Version:   $Revision: 1.1.2.21 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -78,6 +78,8 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
   vector<string> dicomABSFileNamesVector;
   vtkDirectory *directoryReader = NULL;
   int planesPerFrame = -1;
+  vector<int> seriesNumbers;
+  int minSeriesNumber = 999;
 
   if (m_Mode == DICOM_DIRECTORY_ABS_PATH)
   {
@@ -182,7 +184,7 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
   
   for (int i = 0; i < timeFrames*planesPerFrame; i++) 
   {
-	time(&start);	
+	  time(&start);	
 
     if (!m_TestMode)
     {
@@ -194,9 +196,9 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
   
     wxString currentSliceABSFileName = dicomABSFileNamesVector[i].c_str();
 
-	std::ostringstream stringStream;
-	stringStream << "Parsing " << currentSliceABSFileName.c_str() << " file with Id " << i << " , number " << i+1 << " of " << timeFrames*planesPerFrame << std::endl;          
-	mafLogMessage(stringStream.str().c_str());
+	  std::ostringstream stringStream;
+	  stringStream << "Parsing " << currentSliceABSFileName.c_str() << " file with Id " << i << " , number " << i+1 << " of " << timeFrames*planesPerFrame << std::endl;          
+	  mafLogMessage(stringStream.str().c_str());
 
     assert(wxFileExists(currentSliceABSFileName));
 
@@ -216,6 +218,14 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
     dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient,dcmImageOrientationPatient[3],3);
     dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient,dcmImageOrientationPatient[4],4);
     dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient,dcmImageOrientationPatient[5],5);
+
+    long int dcmSeriesNumber;
+    dicomDataset->findAndGetLongInt(DCM_SeriesNumber, dcmSeriesNumber);
+    if(dcmSeriesNumber < minSeriesNumber)
+    {
+      minSeriesNumber = dcmSeriesNumber;
+    }
+    seriesNumbers.push_back(dcmSeriesNumber);
 
     long int dcmColumns;
     dicomDataset->findAndGetLongInt(DCM_Columns, dcmColumns);
@@ -249,9 +259,8 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
       {
         cppDEL(busyInfo);
         busyInfo = new wxBusyInfo(busyMessage);
-
-		progress = i * 100 / (double) (timeFrames*planesPerFrame);
-		mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
+		    progress = i * 100 / (double) (timeFrames*planesPerFrame);
+		    mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
       }
     }
   }
@@ -290,17 +299,11 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
         id_frame.push_back(i);
       }
     }
-    
-     
-     
 
     for (int i = 0; i < fileNumberForPlaneIFrameJ.rows(); i++) 
     {
       fileNumberForPlaneIFrameJ(i,0) = id_frame[i];
     }
-
-     
-     
 
     // 
     //   & find by comparison all images on ith plane
@@ -366,7 +369,7 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
       assert(true);
     } //end for (int i = 0; i < planesPerFrame; i++) 
   } //end if SIEMENS
-  else
+  else if (strcmp(dcmManufacturer, "INVALID")!=0) // Losi patch
   {
 
     //   %GE MEDICAL SYSTEMS - PISA    
@@ -407,8 +410,6 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
 
     m_FileNumberForPlaneIFrameJ = fileNumberForPlaneIFrameJ;
   }
-
-   
   assert(true);
 //   %GE MEDICAL SYSTEMS - PISA    
 //   else 
@@ -457,11 +458,26 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
   //     proj = abs([dot(xVersors(1,:),xVersors(2,:)); dot(xVersors(1,:),yVersors(2,:)); dot(yVersors(1,:),xVersors(2,:)); dot(yVersors(1,:),yVersors(2,:))]);
   //     [dummy, idx_mode] = maxValue(proj);
   //
-  
-  m_FileNumberForPlaneIFrameJ = fileNumberForPlaneIFrameJ; // Added by Losi
-  // fix to open data:
+
+  // Workaround Added by Losi on 5/5/2011
+  // Patch to correctly visualize and import data
   // \\HD01\Public\Dati\Dicom Regression\NIG004_MAGLU_SA
   // \\HD01\Public\Dati\Dicom Regression\NIG009-PAVVI_SA
+  if (strcmp(dcmManufacturer, "INVALID")==0)
+  {
+    const double inv = -1;
+    fileNumberForPlaneIFrameJ.set(&inv); // laminate with invalid value
+
+    for (int i = 0; i < timeFrames * planesPerFrame; i++) 
+    {
+      int col = int(frame(i,0)-1);
+      int row = seriesNumbers[i] - minSeriesNumber;
+
+      fileNumberForPlaneIFrameJ.put(row,col,i);
+    }
+  }
+  m_FileNumberForPlaneIFrameJ = fileNumberForPlaneIFrameJ;
+  ////
 
   if (planesPerFrame == 1)
   {
