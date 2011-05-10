@@ -74,6 +74,12 @@ SET(PROJECT_SRCS
   medOpScaleDataset.h
 
   medOpCreateWrappedMeter.cpp
+  medOpSegmentation.cpp
+  medOpSegmentation.h
+  medOpExtractGeometry.cpp
+  medOpExtractGeometry.h
+  
+  medOpCreateWrappedMeter.cpp
   medOpCreateWrappedMeter.h
   
   medOpComputeWrapping.h
