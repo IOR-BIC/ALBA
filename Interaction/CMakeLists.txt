@@ -18,6 +18,12 @@ SET(PROJECT_SRCS
   medInteractor2DDistance.h
   medInteractor2DIndicator.cpp
   medInteractor2DIndicator.h
+	medInteractorSegmentationPicker.cpp
+	medInteractorSegmentationPicker.h
+	medInteractorPERScalarInformation.cpp
+	medInteractorPERScalarInformation.h
+	medInteractorPERBrushFeedback.cpp
+	medInteractorPERBrushFeedback.h
   mmiVTKPicker.cpp
   mmiVTKPicker.h
   medGizmoPolylineGraph.cpp
