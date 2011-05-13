@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.h,v $
 Language:  C++
-Date:      $Date: 2011-03-14 15:11:10 $
-Version:   $Revision: 1.1.2.29 $
+Date:      $Date: 2011-05-13 16:26:01 $
+Version:   $Revision: 1.1.2.30 $
 Authors:   Stefano Perticoni	
 ==========================================================================
 Copyright (c) 2002/2004
@@ -43,6 +43,9 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafPipeSurface.h"
 #include "mafInteractorPicker.h"
 #include "medInteractorPicker.h"
+#include "vtkCaptionActor2D.h"
+
+using namespace std;
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -82,39 +85,39 @@ It is possible to export arbitrary volume slices as image files.
 class medViewArbitraryOrthoSlice: public medViewCompoundWindowing
 {
 
-/*
-  GC : Gizmo Cross
+	/*
+	GC : Gizmo Cross
 
-  P      |   Zn
-         |   GC_Zn
---------------------
-  Xn     |   Yn
-  GC_Xn  |   GC_Yn
+	P      |   Zn
+	|   GC_Zn
+	--------------------
+	Xn     |   Yn
+	GC_Xn  |   GC_Yn
 
-           
-		     Y
-             V
-         |      <X
-----------------------
-    Z    |   Z 
+
+	Y
+	V
+	|      <X
+	----------------------
+	Z    |   Z 
 	V        V
-Y>              <X
+	Y>              <X
 
 
 
 	P        ->x
-   			|	
-			Vy
-        |
--------------
-        |   
-/\Z        /\Z 
-|	       |
--->y       --->X
+	|	
+	Vy
+	|
+	-------------
+	|   
+	/\Z        /\Z 
+	|	       |
+	-->y       --->X
 
 
 
-*/
+	*/
 public:
 	/** constructor*/
 	medViewArbitraryOrthoSlice(wxString label = "View Arbitrary OrthoSlice with Windowing", bool show_ruler = false);
@@ -130,17 +133,19 @@ public:
 		ID_COMBO_CHOOSE_EXPORT_AXIS = Superclass::ID_LAST,
 		ID_RESET,
 		ID_SHOW_GIZMO,
-    ID_ENABLE_EXPORT_IMAGES,
-    ID_CHOOSE_DIR,
-    ID_EXPORT,
+		ID_ENABLE_EXPORT_IMAGES,
+		ID_CHOOSE_DIR,
+		ID_EXPORT,
 
-	ID_UPDATE_LUT, 
+		ID_UPDATE_LUT, 
 
-	ID_ENABLE_THICKNESS,
-	ID_ENABLE_THICKNESS_ACTORS,
-	ID_THICKNESS_VALUE_CHANGED,
-	ID_NUMBER_OF_AXIAL_SECTIONS,
-	ID_EXPORT_PLANES_HEIGHT,
+		ID_ENABLE_THICKNESS,
+		ID_ENABLE_THICKNESS_ACTORS,
+		ID_THICKNESS_VALUE_CHANGED,
+		ID_NUMBER_OF_AXIAL_SECTIONS,
+		ID_EXPORT_PLANES_HEIGHT,
+		ID_SHOW_RULER,
+		ID_HIDE_RULER,
 		ID_LAST,
 	};
 
@@ -163,7 +168,7 @@ public:
 	/** Function that handles events sent from other objects. */
 	virtual void OnEvent(mafEventBase *maf_event);
 
-  void MyMethod( medInteractorPicker * picker, double * pickedPointCoordinates );
+	void MyMethod( medInteractorPicker * picker, double * pickedPointCoordinates );
 	void OnEventGizmoCrossRTZNormalView( mafEventBase * maf_event );
 	void OnEventGizmoCrossRTYNormalView( mafEventBase * maf_event );
 
@@ -177,7 +182,7 @@ public:
 
 	void OnLayoutInternal( wxSize &windowSize );
 
-  void VmeSelect(mafNode *node, bool select);
+	void VmeSelect(mafNode *node, bool select);
 
 protected:
 
@@ -227,18 +232,22 @@ protected:
 
 	void ShowSlicers( mafVME * vmeVolume, bool show );
 
-  void BuildSliceHeightFeedbackLinesVMEs();
-  void AddVMEToMSFTree(mafVMESurface *vme);
+	void BuildSliceHeightFeedbackLinesVMEs();
+	void AddVMEToMSFTree(mafVMESurface *vme);
 
 	enum VIEW_DIRECTION {FROM_X = 0, FROM_Y = 1, FROM_Z = 2};
 	void ShowPlaneFeedbackLine(int viewDirection, vtkMatrix4x4 *outputMatrix);
 
-  void BuildSlicingPlane( mafVMESurface *inVME, int fromDirection, int guestView,  
-    double sliceHeight, mafVMESlicer* targetSlicer = NULL, vtkMatrix4x4 * outputMatrix = NULL );
-  
+	void BuildSlicingPlane( mafVMESurface *inVME, int fromDirection, int guestView,  
+		double sliceHeight, mafVMESlicer* targetSlicer = NULL,
+    vtkMatrix4x4 * outputMatrix = NULL , bool showHeightText = false, vtkCaptionActor2D *captionActor = NULL);
+
+  void ShowCaptionActorVector( vector<vtkCaptionActor2D *> textActorsVector , int view );
+  void ShowCaptionActor(vtkCaptionActor2D *actor, int guestView, wxString text, double x, double y ,double z);
+
   void ShowVTKDataAsVMESurface( vtkPolyData *vmeVTKData, 
-                                mafVMESurface *vmeSurface, vtkMatrix4x4 *inputABSMatrix);
-     
+		mafVMESurface *vmeSurface, vtkMatrix4x4 *inputABSMatrix);
+
 	void ResetCameraToSlices();
 
 	/** 
@@ -270,8 +279,17 @@ protected:
 	/** Enable/disable view widgets.*/
 	void EnableWidgets(bool enable = true);
 
-  void EnableExportImages( bool enable );
+	void EnableExportImages( bool enable );
 	void OnEventThis(mafEventBase *maf_event);  
+
+	enum {
+		X_RULER=0,
+		Y_RULER=1,
+		Z_RULER=2,
+	};
+
+	void ShowRuler( int ruler , bool show);
+
 	void OnLUTChooser();
 	void OnLUTRangeModified();
 
@@ -289,19 +307,28 @@ protected:
 	void OnEventGizmoCrossRotateZNormalView(mafEventBase *maf_event);
 
 	/** Update export images bounds lines actors only if needed*/
-    void UpdateExportImagesBoundsLineActors();
+	void UpdateExportImagesBoundsLineActors();
 
-    void UpdateXView2DActors();
+	void UpdateXView2DActors();
 	void UpdateYView2DActors();
 
-    void UpdateYnViewZPlanes();
+	void UpdateYnViewZPlanes();
+
+	void ShowRulerVMEVector(vector<mafVMESurface *> &rulerVector, 
+  vector<vtkCaptionActor2D *> &captionActorVector,
+  int fromDirection, int guestView);
+
+	void HideRulerVMEVector(vector<mafVMESurface *> &rulerVector, 
+  vector<vtkCaptionActor2D *> &captionActorVector, 
+  int guestView);
+
 	void UpdateZView2DActors();
 
 	/**	This function is called when a translate gizmo is moved*/
 	void OnEventGizmoCrossTranslateZNormalView(mafEventBase *maf_event);
 
 	void PostMultiplyEventMatrixToGizmoCross( mafEventBase * inputEvent , medGizmoCrossRotateTranslate *targetGizmo);
-	
+
 	/** Recalculate the RX projection for the three slicers and display it */
 	void UpdateThicknessStuff();
 
@@ -329,54 +356,56 @@ protected:
 
 	void OnEventGizmoCrossTranslateXNormalView(mafEventBase *maf_event);
 	void OnEventGizmoCrossTranslateYNormalView(mafEventBase *maf_event);
+
+	void UpdateXnViewZPlanes();
+	void UpdateYnViewXPlanes();
+	void UpdateXnViewYPlanes();
+	void UpdateZnViewYPlanes();
+	void UpdateZnViewXPlanes();
+
+	void UpdateXCutPlanes();
+	void ShowXCutPlanes( bool show );
+
+	void ShowVMESurfacesVector( vector<mafVMESurface *> &inVector, int view, bool show );
+
+	void UpdateZCutPlanes();
+	void ShowZCutPlanes(bool show);
+
+	void UpdateYCutPlanes();
+	void ShowYCutPlanes( bool show );
+
+	mafPipeSurface * GetPipe(int inView, mafVMESurface *inSurface);
+
+	void OnEventID_COMBO_CHOOSE_EXPORT_AXIS();
+
+	void HideCutPlanes();
+	void OnID_CHOOSE_DIR();
+	void OnEventID_ENABLE_EXPORT_IMAGES();
+
+	/** Write on file the texture slice from the selected view */
+	void SaveSlicesTextureToFile();
+
+	/** Write on file the full render window from the selected view */
+	void SaveSlicesFromRenderWindowToFile();
+
+	void OnEventID_ENABLE_THICKNESS();
+
+	void EnableThickness(bool enable);
+
+	void EnableThicknessGUI( bool enable );
+
+	/** Recompute all slicers output */
+	void UpdateSlicers();
+
+	void OnEventID_THICKNESS_VALUE_CHANGED();
+	void OnEventID_EXPORT_PLANES_HEIGHT();
+
+	void CreateViewCameraNormalFeedbackActor(double col[3], int view);
+	void DestroyViewCameraNormalFeedbackActor(int view);
+	void ThicknessComboAssignment();
+	void UpdateWindowing(bool enable,mafNode *node);
   
-  void UpdateXnViewZPlanes();
-  void UpdateYnViewXPlanes();
-  void UpdateXnViewYPlanes();
-  void UpdateZnViewYPlanes();
-  void UpdateZnViewXPlanes();
-  
-  void UpdateXCutPlanes();
-  void ShowXCutPlanes( bool show );
-
-  void UpdateZCutPlanes();
-  void ShowZCutPlanes(bool show);
-
-  void UpdateYCutPlanes();
-  void ShowYCutPlanes( bool show );
-
-  mafPipeSurface * GetPipe(int inView, mafVMESurface *inSurface);
-
-  void OnEventID_COMBO_CHOOSE_EXPORT_AXIS();
-
-  void HideCutPlanes();
-  void OnID_CHOOSE_DIR();
-  void OnEventID_ENABLE_EXPORT_IMAGES();
-
-  /** Write on file the texture slice from the selected view */
-  void SaveSliceTextureToFile();
-  
-  /** Write on file the full render window from the selected view */
-  void SaveRenderWindowToFile();
-
-  void OnEventID_ENABLE_THICKNESS();
-
-  void EnableThickness(bool enable);
-
-  void EnableThicknessGUI( bool enable );
-  
-  /** Recompute all slicers output */
-  void UpdateSlicers();
-
-  void OnEventID_THICKNESS_VALUE_CHANGED();
-  void OnEventID_EXPORT_PLANES_HEIGHT();
- 
-  void CreateViewCameraNormalFeedbackActor(double col[3], int view);
-  void DestroyViewCameraNormalFeedbackActor(int view);
-  void ThicknessComboAssignment();
-  void UpdateWindowing(bool enable,mafNode *node);
-  
-  mafViewVTK *m_ViewSliceX;
+	mafViewVTK *m_ViewSliceX;
 	mafViewVTK *m_ViewSliceY;
 	mafViewVTK *m_ViewSliceZ;
 
@@ -430,53 +459,57 @@ protected:
 
 	mafVMEVolumeGray *m_InputVolume;
 
-
-  // Xn view cut feedback gizmos
-  mafVMESurface *m_ViewXnSliceYpVME;
-  mafVMESurface *m_ViewXnSliceYmVME;
+	// Xn view cut feedback gizmos
+	vector<mafVMESurface *> m_ViewXnSliceYBoundsVMEVector;
+  vector<mafVMESurface *> m_ViewXnSliceYRulerVMEVector;
+  vector<vtkCaptionActor2D *> m_ViewXnSliceYRulerTextActorsVector;
   
-  mafVMESurface *m_ViewXnSliceZpVME;
-  mafVMESurface *m_ViewXnSliceZmVME;
+	vector<mafVMESurface *> m_ViewXnSliceZBoundsVMEVector;
+	vector<mafVMESurface *> m_ViewXnSliceZRulerVMEVector;
+  vector<vtkCaptionActor2D *> m_ViewXnSliceZRulerTextActorsVector;
 
-  // Yn view cut feedback gizmos
-  mafVMESurface *m_ViewYnSliceZpVME;
-  mafVMESurface *m_ViewYnSliceZmVME;
+	// Yn view cut feedback gizmos
+	vector<mafVMESurface *> m_ViewYnSliceZBoundsVMEVector;
+  vector<mafVMESurface *> m_ViewYnSliceZRulerVMEVector;
+  vector<vtkCaptionActor2D *> m_ViewYnSliceZRulerTextActorsVector;
 
-  mafVMESurface *m_ViewYnSliceXpVME;
-  mafVMESurface *m_ViewYnSliceXmVME;
+	vector<mafVMESurface *> m_ViewYnSliceXBoundsVMEVector;
+	vector<mafVMESurface *> m_ViewYnSliceXRulerVMEVector;
+  vector<vtkCaptionActor2D *> m_ViewYnSliceXRulerTextActorsVector;
 
-  // Zn view cut feedback gizmos
-  mafVMESurface *m_ViewZnSliceXpVME;
-  mafVMESurface *m_ViewZnSliceXmVME;
+	// Zn view cut feedback gizmos
+	vector<mafVMESurface *> m_ViewZnSliceXBoundsVMEVector;
+	vector<mafVMESurface *> m_ViewZnSliceXRulerVMEVector;
+  vector<vtkCaptionActor2D *> m_ViewZnSliceXRulerTextActorsVector;
 
-  mafVMESurface *m_ViewZnSliceYpVME;
-  mafVMESurface *m_ViewZnSliceYmVME;
+	vector<mafVMESurface *> m_ViewZnSliceYBoundsVMEVector;
+	vector<mafVMESurface *> m_ViewZnSliceYRulerVMEVector;
+  vector<vtkCaptionActor2D *> m_ViewZnSliceYRulerTextActorsVector;
 
+	int m_FeedbackLineHeight;
+	int m_NumberOfAxialSections;
+	int m_ExportPlanesHeight;
 
-  int m_FeedbackLineHeight;
-  int m_NumberOfAxialSections;
-  int m_ExportPlanesHeight;
+	int m_EnableExportImages;
+	int m_ComboChooseExportAxis;
 
-  int m_EnableExportImages;
-  int m_ComboChooseExportAxis;
-  
-  // Enable RX like accumulation: corresponding point scalar values are added and the resulting number is divided
-  // by the number of slices 
-  int m_EnableThickness; 
-  
-  double m_ThicknessValue;
-  int m_ThicknessComboAssignment;
+	// Enable RX like accumulation: corresponding point scalar values are added and the resulting number is divided
+	// by the number of slices 
+	int m_EnableThickness; 
 
-  wxString m_PathFromDialog;
+	double m_ThicknessValue;
+	int m_ThicknessComboAssignment;
 
-  /** Enable debug facilities */
-  bool m_DebugMode;
+	wxString m_PathFromDialog;
 
-  medInteractorPicker *m_XSlicerPicker;
-  medInteractorPicker *m_YSlicerPicker;
-  medInteractorPicker *m_ZSlicerPicker;
+	/** Enable debug facilities */
+	bool m_DebugMode;
 
-  mafString m_ThicknessText;
+	medInteractorPicker *m_XSlicerPicker;
+	medInteractorPicker *m_YSlicerPicker;
+	medInteractorPicker *m_ZSlicerPicker;
+
+	mafString m_ThicknessText;
 };
 
 #endif

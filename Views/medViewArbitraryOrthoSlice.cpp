@@ -2,14 +2,16 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2011-03-21 09:54:54 $
-Version:   $Revision: 1.1.2.55 $
+Date:      $Date: 2011-05-13 16:26:01 $
+Version:   $Revision: 1.1.2.56 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
+const int BOUND_0=0;
+const int BOUND_1=1;
 
 #include "mafDefines.h" 
 //----------------------------------------------------------------------------
@@ -95,8 +97,13 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkOutlineFilter.h"
 #include "vtkSphereSource.h"
 #include "vtkMAFSmartPointer.h"
+#include "vtkTextSource.h"
+#include "vtkCaptionActor2D.h"
 
 mafCxxTypeMacro(medViewArbitraryOrthoSlice);
+
+const int MID = 1;
+const int PID = 0;
 
 
 //----------------------------------------------------------------------------
@@ -123,6 +130,7 @@ medViewArbitraryOrthoSlice::medViewArbitraryOrthoSlice(wxString label, bool show
 : medViewCompoundWindowing(label, 2, 2)
 
 {
+	
 	m_ThicknessText = "UNDEFINED_THICKNESS_TEXT";
 	m_XSlicerPicker = NULL;
   m_YSlicerPicker = NULL;
@@ -140,24 +148,6 @@ medViewArbitraryOrthoSlice::medViewArbitraryOrthoSlice(wxString label, bool show
 
 	m_ExportPlanesHeight = 20;
 	m_ThicknessValue = 2;
-
-	m_ViewXnSliceYpVME = NULL;
-	m_ViewXnSliceYmVME = NULL;
-
-	m_ViewXnSliceZpVME = NULL;
-	m_ViewXnSliceZmVME = NULL;
-
-	m_ViewYnSliceZpVME = NULL;
-	m_ViewYnSliceZmVME = NULL;
-
-	m_ViewZnSliceXpVME = NULL;
-	m_ViewZnSliceXmVME = NULL;
-
-	m_ViewYnSliceXpVME = NULL;
-	m_ViewYnSliceXmVME = NULL;
-
-	m_ViewZnSliceYpVME = NULL;
-	m_ViewZnSliceYmVME = NULL;
 
 	m_InputVolume = NULL;
 	m_GizmoZView = NULL;
@@ -1245,8 +1235,8 @@ void medViewArbitraryOrthoSlice::OnEventThis(mafEventBase *maf_event)
 
 		case ID_EXPORT:
 			{
-				//SaveSliceTextureToFile();
-				SaveRenderWindowToFile();
+				//SaveSlicesTextureToFile();
+				SaveSlicesFromRenderWindowToFile();
 			}
 			break;
 
@@ -1261,7 +1251,7 @@ void medViewArbitraryOrthoSlice::OnEventThis(mafEventBase *maf_event)
 		case ID_THICKNESS_VALUE_CHANGED:
 			{
 				OnEventID_THICKNESS_VALUE_CHANGED();
-			}
+		 	}
 			break;
 
 		case ID_EXPORT_PLANES_HEIGHT:
@@ -1281,6 +1271,24 @@ void medViewArbitraryOrthoSlice::OnEventThis(mafEventBase *maf_event)
 				UpdateSlicersLUT();
 			}
 			break;
+
+		case  ID_SHOW_RULER:
+			{
+				
+				ShowRuler(X_RULER, true);
+				ShowRuler(Y_RULER, true);
+				ShowRuler(Z_RULER, true);
+			}
+			break;
+
+		case  ID_HIDE_RULER:
+			{
+				ShowRuler(X_RULER, false);
+				ShowRuler(Y_RULER, false);
+				ShowRuler(Z_RULER, false);
+			}
+			break;
+
 
 		default:
 			mafViewCompound::OnEvent(maf_event);
@@ -1312,10 +1320,10 @@ mafGUI* medViewArbitraryOrthoSlice::CreateGui()
 	//	m_Gui->Divider(2);
 
 	//button to reset at the sta
-  m_Gui->Label("");
-  m_Gui->Label(_("CTRL + MOUSE LEFT click"),true);
-  m_Gui->Label("moves the cross on picked point");
-m_Gui->Divider(2);
+	m_Gui->Label("");
+	m_Gui->Label(_("CTRL + MOUSE LEFT click"),true);
+	m_Gui->Label("moves the cross on picked point");
+	m_Gui->Divider(2);
 	
 	//m_Gui->Label("reset slices", true);
 	m_Gui->Button(ID_RESET,_("reset slices"),"");
@@ -1325,7 +1333,6 @@ m_Gui->Divider(2);
 	//m_Gui->Label("show gizmo", true);
 
 	m_Gui->Divider();
-
 
 	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
 
@@ -1366,6 +1373,12 @@ m_Gui->Divider(2);
 
 	m_Gui->Button(ID_CHOOSE_DIR,"Choose export dir");
 	m_Gui->Button(ID_EXPORT,"Write images");
+
+// 	m_Gui->Label("");
+// 	m_Gui->Button(ID_SHOW_RULER, "Show Ruler");
+// 	m_Gui->Button(ID_HIDE_RULER, "Hide Ruler");
+// 	m_Gui->Label("");
+
 
 	// vme lut update test
 	// m_Gui->Button(ID_UPDATE_LUT, "update lut");
@@ -1720,8 +1733,6 @@ void medViewArbitraryOrthoSlice::ShowMafVMEVolume( mafVME * vme, bool show )
 	zView->GetSceneGraph()->m_AlwaysVisibleRenderer->AddActor2D(m_TextActorRightZView);
 	zView->GetSceneGraph()->m_AlwaysVisibleRenderer->AddActor2D(m_ZnThicknessTextActor);
 
-	
-	
 	double sr[2],volumeVTKDataCenterLocalCoords[3];
 	mafVME *vmeVolume=mafVME::SafeDownCast(vme);
 	m_CurrentVolume = vmeVolume;
@@ -3217,8 +3228,8 @@ void medViewArbitraryOrthoSlice::ShowVTKDataAsVMESurface( vtkPolyData *vmeVTKDat
 }
 
 void medViewArbitraryOrthoSlice::BuildSlicingPlane(mafVMESurface *inVME, 
-												   int fromDirection, int guestView, double sliceHeight, mafVMESlicer * outputSlicer,
-												   vtkMatrix4x4 * outputMatrix )
+	int fromDirection, int guestView, double sliceHeight, mafVMESlicer * outputSlicer,
+	vtkMatrix4x4 * outputMatrix , bool showHeightText, vtkCaptionActor2D *captionActor)
 {
 	mafVMESlicer *plane1SourceSlicer = NULL;
 
@@ -3441,7 +3452,7 @@ void medViewArbitraryOrthoSlice::BuildSlicingPlane(mafVMESurface *inVME,
 	vtkLinearTransform *inputABSTransform = NULL;
 	inputABSTransform = plane1SourceSlicer->GetAbsMatrixPipe()->GetVTKTransform();
 
-	assert(m_ViewXnSliceYpVME);
+	assert(m_ViewXnSliceYBoundsVMEVector[BOUND_0]);
 
 	// build implicit plane for cutting
 	vtkCutter *boundsCutter = vtkCutter::New();
@@ -3493,6 +3504,12 @@ void medViewArbitraryOrthoSlice::BuildSlicingPlane(mafVMESurface *inVME,
 
 		ShowVTKDataAsVMESurface(tubeFilter->GetOutput(), inVME , matrix);
 
+    if (showHeightText == true)
+    {
+       ShowCaptionActor(captionActor, guestView, captionActor->GetCaption() , (p1[0] + p2[0])/2, 
+         (p1[1] + p2[1])/2 , (p1[2] + p2[2])/2);
+    }
+
 		tubeFilter->Delete();
 		matrix->Delete();
 		lineSource->Delete();
@@ -3501,6 +3518,7 @@ void medViewArbitraryOrthoSlice::BuildSlicingPlane(mafVMESurface *inVME,
 	plane1TPDF->Delete();
 	boundsCutter->Delete();
 	plane2->Delete();
+
 }
 
 void medViewArbitraryOrthoSlice::AddVMEToMSFTree(mafVMESurface *vme)
@@ -3515,26 +3533,41 @@ void medViewArbitraryOrthoSlice::AddVMEToMSFTree(mafVMESurface *vme)
 
 void medViewArbitraryOrthoSlice::UpdateYnViewZPlanes()
 {
-	BuildSlicingPlane(m_ViewYnSliceZpVME, 
+
+	assert(m_FeedbackLineHeight > 0);
+
+	assert(m_ViewYnSliceZBoundsVMEVector[BOUND_0]);
+	BuildSlicingPlane(m_ViewYnSliceZBoundsVMEVector[BOUND_0], 
 		FROM_Z, Y_VIEW,  m_FeedbackLineHeight);
 
-	BuildSlicingPlane(m_ViewYnSliceZmVME, 
+	// build ruler
+
+	// for every axial section
+	
+	assert(m_ViewYnSliceZBoundsVMEVector[BOUND_1]);
+	BuildSlicingPlane(m_ViewYnSliceZBoundsVMEVector[BOUND_1], 
 		FROM_Z, Y_VIEW,  -m_FeedbackLineHeight);
 }
 
+
+
 void medViewArbitraryOrthoSlice::UpdateXnViewZPlanes()
 {
-	BuildSlicingPlane(m_ViewXnSliceZpVME, 
+	assert(m_ViewXnSliceZBoundsVMEVector[BOUND_0]);
+
+	BuildSlicingPlane(m_ViewXnSliceZBoundsVMEVector[BOUND_0], 
 		FROM_Z, X_VIEW,  m_FeedbackLineHeight);
 
-	BuildSlicingPlane(m_ViewXnSliceZmVME, 
+	assert(m_ViewXnSliceZBoundsVMEVector[BOUND_1]);
+
+	BuildSlicingPlane(m_ViewXnSliceZBoundsVMEVector[BOUND_1], 
 		FROM_Z, X_VIEW,  -m_FeedbackLineHeight);
 }
 
 void medViewArbitraryOrthoSlice::UpdateZCutPlanes()
 {
 	// build Yn view images export gizmos
-	if (m_ViewYnSliceZpVME && m_ViewYnSliceZmVME)
+	if (m_ViewYnSliceZBoundsVMEVector[BOUND_0] && m_ViewYnSliceZBoundsVMEVector[BOUND_1])
 	{
 		UpdateYnViewZPlanes();
 		UpdateXnViewZPlanes();
@@ -3543,70 +3576,40 @@ void medViewArbitraryOrthoSlice::UpdateZCutPlanes()
 
 void medViewArbitraryOrthoSlice::ShowZCutPlanes( bool show )
 {
-	m_ChildViewList[X_VIEW]->VmeShow(m_ViewXnSliceZpVME, show);
-	m_ChildViewList[X_VIEW]->VmeShow(m_ViewXnSliceZmVME, show);
-	m_ChildViewList[Y_VIEW]->VmeShow(m_ViewYnSliceZpVME, show);
-	m_ChildViewList[Y_VIEW]->VmeShow(m_ViewYnSliceZmVME, show);
-
-	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_ViewXnSliceZpVME, show);
-	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_ViewXnSliceZmVME, show);
-	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_ViewYnSliceZpVME, show);
-	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_ViewYnSliceZmVME, show);
-
-
-	mafPipeSurface *pipe = NULL;
-
-	pipe = GetPipe(X_VIEW, m_ViewXnSliceZpVME);
-	if (pipe) pipe->SetActorPicking(false);
-
-	pipe = GetPipe(X_VIEW, m_ViewXnSliceZmVME);
-	if (pipe) pipe->SetActorPicking(false);
-
-	pipe = GetPipe(Y_VIEW, m_ViewYnSliceZpVME);
-	if (pipe) pipe->SetActorPicking(false);
-
-	pipe = GetPipe(Y_VIEW, m_ViewYnSliceZmVME);
-	if (pipe) pipe->SetActorPicking(false);
-
-	pipe = GetPipe(PERSPECTIVE_VIEW, m_ViewXnSliceZpVME);
-	if (pipe) pipe->SetActorPicking(false);
-
-	pipe = GetPipe(PERSPECTIVE_VIEW, m_ViewXnSliceZmVME);
-	if (pipe) pipe->SetActorPicking(false);
-
-	pipe = GetPipe(PERSPECTIVE_VIEW, m_ViewYnSliceZpVME);
-	if (pipe) pipe->SetActorPicking(false);
-
-	pipe = GetPipe(PERSPECTIVE_VIEW, m_ViewYnSliceZmVME);
-	if (pipe) pipe->SetActorPicking(false);
-
-
+	ShowVMESurfacesVector(m_ViewXnSliceZBoundsVMEVector, X_VIEW, show);
+	ShowVMESurfacesVector(m_ViewYnSliceZBoundsVMEVector, Y_VIEW, show);
+	ShowVMESurfacesVector(m_ViewXnSliceZBoundsVMEVector, PERSPECTIVE_VIEW, show);
+	ShowVMESurfacesVector(m_ViewYnSliceZBoundsVMEVector, PERSPECTIVE_VIEW, show);
 }
 
 ////////////// X cut planes
 
 void medViewArbitraryOrthoSlice::UpdateYnViewXPlanes()
 {
-	BuildSlicingPlane(m_ViewYnSliceXpVME, 
+	BuildSlicingPlane(m_ViewYnSliceXBoundsVMEVector[BOUND_0], 
 		FROM_X, Y_VIEW,  m_FeedbackLineHeight);
 
-	BuildSlicingPlane(m_ViewYnSliceXmVME, 
+	assert(m_FeedbackLineHeight > 0);
+
+	BuildSlicingPlane(m_ViewYnSliceXBoundsVMEVector[BOUND_1], 
 		FROM_X, Y_VIEW,  -m_FeedbackLineHeight);
 }
 
 void medViewArbitraryOrthoSlice::UpdateZnViewXPlanes()
 {
-	BuildSlicingPlane(m_ViewZnSliceXpVME, 
+	BuildSlicingPlane(m_ViewZnSliceXBoundsVMEVector[BOUND_0], 
 		FROM_X, Z_VIEW,  m_FeedbackLineHeight);
 
-	BuildSlicingPlane(m_ViewZnSliceXmVME, 
+	assert(m_FeedbackLineHeight > 0);
+
+	BuildSlicingPlane(m_ViewZnSliceXBoundsVMEVector[BOUND_1], 
 		FROM_X, Z_VIEW,  -m_FeedbackLineHeight);
 }
 
 void medViewArbitraryOrthoSlice::UpdateXCutPlanes()
 {
 	// build Yn view images export gizmos
-	if (m_ViewYnSliceXpVME && m_ViewZnSliceXmVME)
+	if (m_ViewYnSliceXBoundsVMEVector[BOUND_0] && m_ViewZnSliceXBoundsVMEVector[BOUND_1])
 	{
 		UpdateYnViewXPlanes();
 		UpdateZnViewXPlanes();
@@ -3615,67 +3618,35 @@ void medViewArbitraryOrthoSlice::UpdateXCutPlanes()
 
 void medViewArbitraryOrthoSlice::ShowXCutPlanes( bool show )
 {
-	m_ChildViewList[Y_VIEW]->VmeShow(m_ViewYnSliceXpVME, show);
-	m_ChildViewList[Y_VIEW]->VmeShow(m_ViewYnSliceXmVME, show);
-	m_ChildViewList[Z_VIEW]->VmeShow(m_ViewZnSliceXpVME, show);
-	m_ChildViewList[Z_VIEW]->VmeShow(m_ViewZnSliceXmVME, show);
-
-	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_ViewYnSliceXpVME, show);
-	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_ViewYnSliceXmVME, show);
-	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_ViewZnSliceXpVME, show);
-	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_ViewZnSliceXmVME, show);
-
-	mafPipeSurface *pipe = NULL;
-
-	pipe = GetPipe(Y_VIEW, m_ViewYnSliceXpVME);
-	if (pipe) pipe->SetActorPicking(false);
-
-	pipe = GetPipe(Y_VIEW, m_ViewYnSliceXmVME);
-	if (pipe) pipe->SetActorPicking(false);
-
-	pipe = GetPipe(Z_VIEW, m_ViewZnSliceXpVME);
-	if (pipe) pipe->SetActorPicking(false);
-
-	pipe = GetPipe(Z_VIEW, m_ViewZnSliceXmVME);
-	if (pipe) pipe->SetActorPicking(false);
-
-	pipe = GetPipe(PERSPECTIVE_VIEW, m_ViewYnSliceXpVME);
-	if (pipe) pipe->SetActorPicking(false);
-
-	pipe = GetPipe(PERSPECTIVE_VIEW, m_ViewYnSliceXmVME);
-	if (pipe) pipe->SetActorPicking(false);
-
-	pipe = GetPipe(PERSPECTIVE_VIEW, m_ViewZnSliceXpVME);
-	if (pipe) pipe->SetActorPicking(false);
-
-	pipe = GetPipe(PERSPECTIVE_VIEW, m_ViewZnSliceXmVME);
-	if (pipe) pipe->SetActorPicking(false);
-
-
+	ShowVMESurfacesVector(m_ViewYnSliceXBoundsVMEVector, Y_VIEW, show);
+	ShowVMESurfacesVector(m_ViewZnSliceXBoundsVMEVector, Z_VIEW, show);
+	
+	ShowVMESurfacesVector(m_ViewYnSliceXBoundsVMEVector, PERSPECTIVE_VIEW, show);
+	ShowVMESurfacesVector(m_ViewZnSliceXBoundsVMEVector, PERSPECTIVE_VIEW, show);
 }
 
 void medViewArbitraryOrthoSlice::UpdateXnViewYPlanes()
 {
-	BuildSlicingPlane(m_ViewXnSliceYpVME, 
+	BuildSlicingPlane(m_ViewXnSliceYBoundsVMEVector[BOUND_0], 
 		FROM_Y, X_VIEW,  m_FeedbackLineHeight);
 
-	BuildSlicingPlane(m_ViewXnSliceYmVME, 
+	BuildSlicingPlane(m_ViewXnSliceYBoundsVMEVector[BOUND_1], 
 		FROM_Y, X_VIEW,  -m_FeedbackLineHeight);
 }
 
 void medViewArbitraryOrthoSlice::UpdateZnViewYPlanes()
 {
-	BuildSlicingPlane(m_ViewZnSliceYpVME, 
+	BuildSlicingPlane(m_ViewZnSliceYBoundsVMEVector[BOUND_0], 
 		FROM_Y, Z_VIEW,  m_FeedbackLineHeight);
 
-	BuildSlicingPlane(m_ViewZnSliceYmVME, 
+	BuildSlicingPlane(m_ViewZnSliceYBoundsVMEVector[BOUND_1], 
 		FROM_Y, Z_VIEW,  -m_FeedbackLineHeight);
 }
 
 void medViewArbitraryOrthoSlice::UpdateYCutPlanes()
 {
 	// build Yn view images export gizmos
-	if (m_ViewZnSliceYpVME && m_ViewZnSliceYmVME)
+	if (m_ViewZnSliceYBoundsVMEVector[BOUND_0] && m_ViewZnSliceYBoundsVMEVector[BOUND_1])
 	{
 		UpdateZnViewYPlanes();
 		UpdateXnViewYPlanes();
@@ -3684,84 +3655,108 @@ void medViewArbitraryOrthoSlice::UpdateYCutPlanes()
 
 void medViewArbitraryOrthoSlice::ShowYCutPlanes( bool show )
 {
-	m_ChildViewList[X_VIEW]->VmeShow(m_ViewXnSliceYpVME, show);
-	m_ChildViewList[X_VIEW]->VmeShow(m_ViewXnSliceYmVME, show);
-	m_ChildViewList[Z_VIEW]->VmeShow(m_ViewZnSliceYpVME, show);
-	m_ChildViewList[Z_VIEW]->VmeShow(m_ViewZnSliceYmVME, show);
-
-	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_ViewXnSliceYpVME, show);
-	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_ViewXnSliceYmVME, show);
-	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_ViewZnSliceYpVME, show);
-	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_ViewZnSliceYmVME, show);
-
-	mafPipeSurface *pipe = NULL;
-
-	pipe = GetPipe(X_VIEW, m_ViewXnSliceYpVME);
-	if (pipe) pipe->SetActorPicking(false);
-
-	pipe = GetPipe(X_VIEW, m_ViewXnSliceYmVME);
-	if (pipe) pipe->SetActorPicking(false);
-
-	pipe = GetPipe(Z_VIEW, m_ViewZnSliceYpVME);
-	if (pipe) pipe->SetActorPicking(false);
-
-	pipe = GetPipe(Z_VIEW, m_ViewZnSliceYmVME);
-	if (pipe) pipe->SetActorPicking(false);
-
-	pipe = GetPipe(PERSPECTIVE_VIEW, m_ViewXnSliceYpVME);
-	if (pipe) pipe->SetActorPicking(false);
-
-	pipe = GetPipe(PERSPECTIVE_VIEW, m_ViewXnSliceYmVME);
-	if (pipe) pipe->SetActorPicking(false);
-
-	pipe = GetPipe(PERSPECTIVE_VIEW, m_ViewZnSliceYpVME);
-	if (pipe) pipe->SetActorPicking(false);
-
-	pipe = GetPipe(PERSPECTIVE_VIEW, m_ViewZnSliceYmVME);
-	if (pipe) pipe->SetActorPicking(false);
-
+	ShowVMESurfacesVector(m_ViewXnSliceYBoundsVMEVector, X_VIEW, show);
+	ShowVMESurfacesVector(m_ViewZnSliceYBoundsVMEVector, Z_VIEW, show);
+	ShowVMESurfacesVector(m_ViewXnSliceYBoundsVMEVector, PERSPECTIVE_VIEW, show);
+	ShowVMESurfacesVector(m_ViewZnSliceYBoundsVMEVector, PERSPECTIVE_VIEW, show);
 }
 
 void medViewArbitraryOrthoSlice::BuildSliceHeightFeedbackLinesVMEs()
 {
+	
+
 	// view Xn
-	mafNEW(m_ViewXnSliceYpVME);
-	AddVMEToMSFTree(m_ViewXnSliceYpVME);
 
-	mafNEW(m_ViewXnSliceYmVME);
-	AddVMEToMSFTree(m_ViewXnSliceYmVME);
+	/*
+           
+	P      |   Zn
+		   |   GC_Zn
+	--------------------
+	Xn     |   Yn
+|	GC_Xn  |   GC_Yn     
+ ---                      
+	           
+				Y
+				V
+	    	|      <X
+	----------------------
+      	Z    |   Z 
+		V        V
+|	Y>              <X   
+ ---					  
 
-	mafNEW(m_ViewXnSliceZpVME);
-	AddVMEToMSFTree(m_ViewXnSliceZpVME);
+	*/
 
-	mafNEW(m_ViewXnSliceZmVME);
-	AddVMEToMSFTree(m_ViewXnSliceZmVME);
+	m_ViewXnSliceYBoundsVMEVector.push_back(NULL);
+	mafNEW(m_ViewXnSliceYBoundsVMEVector[BOUND_0]);
+	AddVMEToMSFTree(m_ViewXnSliceYBoundsVMEVector[BOUND_0]);
+
+	m_ViewXnSliceYBoundsVMEVector.push_back(NULL);
+	mafNEW(m_ViewXnSliceYBoundsVMEVector[BOUND_1]);
+	AddVMEToMSFTree(m_ViewXnSliceYBoundsVMEVector[BOUND_1]);
+
+	m_ViewXnSliceZBoundsVMEVector.push_back(NULL);
+	mafNEW(m_ViewXnSliceZBoundsVMEVector[BOUND_0]);
+	AddVMEToMSFTree(m_ViewXnSliceZBoundsVMEVector[BOUND_0]);
+
+	m_ViewXnSliceZBoundsVMEVector.push_back(NULL);
+	mafNEW(m_ViewXnSliceZBoundsVMEVector[BOUND_1]);
+	AddVMEToMSFTree(m_ViewXnSliceZBoundsVMEVector[BOUND_1]);
+	//-----------
 
 	// view Yn
-	mafNEW(m_ViewYnSliceZpVME);
-	AddVMEToMSFTree(m_ViewYnSliceZpVME);
 
-	mafNEW(m_ViewYnSliceZmVME);
-	AddVMEToMSFTree(m_ViewYnSliceZmVME);
+	/*
+           
+	P      |   Zn
+		   |   GC_Zn
+	--------------------
+	Xn     |   Yn
+	GC_Xn  |   GC_Yn     |
+                      ---
+	           
+				Y
+				V
+	    	|      <X
+	----------------------
+      	Z    |   Z 
+		V        V
+	Y>              <X   | 
+					  ---
 
-	mafNEW(m_ViewYnSliceXpVME);
-	AddVMEToMSFTree(m_ViewYnSliceXpVME);
+	*/
 
-	mafNEW(m_ViewYnSliceXmVME);
-	AddVMEToMSFTree(m_ViewYnSliceXmVME);
+	m_ViewYnSliceZBoundsVMEVector.push_back(NULL);
+	mafNEW(m_ViewYnSliceZBoundsVMEVector[BOUND_0]);
+	AddVMEToMSFTree(m_ViewYnSliceZBoundsVMEVector[BOUND_0]);
 
-	// view Zn
-	mafNEW(m_ViewZnSliceXpVME);
-	AddVMEToMSFTree(m_ViewZnSliceXpVME);
+	m_ViewYnSliceZBoundsVMEVector.push_back(NULL);
+	mafNEW(m_ViewYnSliceZBoundsVMEVector[BOUND_1]);
+	AddVMEToMSFTree(m_ViewYnSliceZBoundsVMEVector[BOUND_1]);
 
-	mafNEW(m_ViewZnSliceXmVME);
-	AddVMEToMSFTree(m_ViewZnSliceXmVME);
+	m_ViewYnSliceXBoundsVMEVector.push_back(NULL);
+	mafNEW(m_ViewYnSliceXBoundsVMEVector[BOUND_0]);
+	AddVMEToMSFTree(m_ViewYnSliceXBoundsVMEVector[BOUND_0]);
 
-	mafNEW(m_ViewZnSliceYpVME);
-	AddVMEToMSFTree(m_ViewZnSliceYpVME);
+	m_ViewYnSliceXBoundsVMEVector.push_back(NULL);
+	mafNEW(m_ViewYnSliceXBoundsVMEVector[BOUND_1]);
+	AddVMEToMSFTree(m_ViewYnSliceXBoundsVMEVector[BOUND_1]);
 
-	mafNEW(m_ViewZnSliceYmVME);
-	AddVMEToMSFTree(m_ViewZnSliceYmVME);
+	m_ViewZnSliceXBoundsVMEVector.push_back(NULL);
+	mafNEW(m_ViewZnSliceXBoundsVMEVector[BOUND_0]);
+	AddVMEToMSFTree(m_ViewZnSliceXBoundsVMEVector[BOUND_0]);
+
+	m_ViewZnSliceXBoundsVMEVector.push_back(NULL);
+	mafNEW(m_ViewZnSliceXBoundsVMEVector[BOUND_1]);
+	AddVMEToMSFTree(m_ViewZnSliceXBoundsVMEVector[BOUND_1]);
+
+	m_ViewZnSliceYBoundsVMEVector.push_back(NULL);
+	mafNEW(m_ViewZnSliceYBoundsVMEVector[BOUND_0]);
+	AddVMEToMSFTree(m_ViewZnSliceYBoundsVMEVector[BOUND_0]);
+
+	m_ViewZnSliceYBoundsVMEVector.push_back(NULL);
+	mafNEW(m_ViewZnSliceYBoundsVMEVector[BOUND_1]);
+	AddVMEToMSFTree(m_ViewZnSliceYBoundsVMEVector[BOUND_1]);
 }
 
 void medViewArbitraryOrthoSlice::UpdateExportImagesBoundsLineActors()
@@ -3857,7 +3852,7 @@ void medViewArbitraryOrthoSlice::OnEventID_ENABLE_EXPORT_IMAGES()
 	ChildViewsCameraUpdate();
 }
 
-void medViewArbitraryOrthoSlice::SaveSliceTextureToFile()
+void medViewArbitraryOrthoSlice::SaveSlicesTextureToFile()
 {
 	wxBusyInfo wait("please wait");
 
@@ -4395,7 +4390,23 @@ void medViewArbitraryOrthoSlice::MyMethod( medInteractorPicker * picker, double 
   UpdateThicknessStuff();
 }
 
-void medViewArbitraryOrthoSlice::SaveRenderWindowToFile()
+void medViewArbitraryOrthoSlice::ShowVMESurfacesVector( vector<mafVMESurface *> &inVector, int view, bool show )
+{
+	int size = inVector.size();
+
+	for (int i = 0; i < size; i++)
+	{
+		m_ChildViewList[view]->VmeShow(inVector[i], show);
+
+		mafPipeSurface *pipe = NULL;
+
+		pipe = GetPipe(view, inVector[i]);
+		if (pipe) pipe->SetActorPicking(false);
+
+	}
+}
+
+void medViewArbitraryOrthoSlice::SaveSlicesFromRenderWindowToFile()
 {
 	wxBusyInfo wait("please wait");
 
@@ -4408,25 +4419,41 @@ void medViewArbitraryOrthoSlice::SaveRenderWindowToFile()
 
 	medGizmoCrossRotateTranslate *crossGizmo[3] = {m_GizmoXView, m_GizmoYView, m_GizmoZView};
 
-	// hide the cross before exporting
-	crossGizmo[m_ComboChooseExportAxis]->Show(false);
+	// hide the cross from all views before exporting
+	
+  
+  for (int crossGizmoId = 0; crossGizmoId < 3; crossGizmoId++) 
+  {
+      crossGizmo[crossGizmoId]->Show(false);
+  }
+  
+  int guideView0 = -1;
+  int guideView1 = -1;
 
 	if (m_ComboChooseExportAxis == X)
 	{
 		currentSlicer = m_SlicerX;
 		viewToExport = X_VIEW;
+    guideView0 = Y_VIEW;
+    guideView1 = Z_VIEW;
 	}
 	else if (m_ComboChooseExportAxis == Y)
 	{
 		currentSlicer = m_SlicerY;
 		viewToExport = Y_VIEW;
+    guideView0 = X_VIEW;
+    guideView1 = Z_VIEW;
 	}
 	else if (m_ComboChooseExportAxis == Z)
 	{
 		currentSlicer = m_SlicerZ;
 		viewToExport = Z_VIEW;
+    guideView0 = X_VIEW;
+    guideView1 = Y_VIEW;
 	}
 
+  ShowRuler(m_ComboChooseExportAxis, true);
+  
 	// export X slices BMP
 	double thickness = m_FeedbackLineHeight * 2;
 	double step = thickness / (m_NumberOfAxialSections - 1);
@@ -4500,8 +4527,20 @@ void medViewArbitraryOrthoSlice::SaveRenderWindowToFile()
 		}
 
 		// write it
-
 		wxString fileName = m_PathFromDialog.c_str();
+
+    if (i == 0)
+    {
+      // save guide images
+
+      wxString guide0FileName = fileName;
+      guide0FileName.append("/Reference0.png");
+      ((mafViewSlice*)m_ChildViewList[guideView0])->GetRWI()->SaveImage(guide0FileName.c_str());
+      
+      wxString guide1FileName = fileName;
+      guide1FileName.append("/Reference1.png");
+      ((mafViewSlice*)m_ChildViewList[guideView1])->GetRWI()->SaveImage(guide1FileName.c_str());  
+    }
 
 		if (currentSlicer == m_SlicerX)
 		{
@@ -4537,8 +4576,156 @@ void medViewArbitraryOrthoSlice::SaveRenderWindowToFile()
 	mafEvent eHide(this,PROGRESSBAR_HIDE);
 	mafEventMacro(eHide);
 
+  ShowRuler(m_ComboChooseExportAxis, false);
+
 	// reshow the cross after exporting
-	crossGizmo[m_ComboChooseExportAxis]->Show(true);
+  for (int crossGizmoId = 0; crossGizmoId < 3; crossGizmoId++) 
+  {
+    crossGizmo[crossGizmoId]->Show(true);
+  }
 
 	UpdateSlicersLUT();
+}
+
+void medViewArbitraryOrthoSlice::ShowRulerVMEVector(vector<mafVMESurface *> &rulerVector, 
+vector<vtkCaptionActor2D *> &captionActorVector , int fromDirection , int guestView)
+{
+	rulerVector.clear();
+
+	double step = 2 * m_FeedbackLineHeight / (m_NumberOfAxialSections - 1);
+
+	for (int idAxialSection = 0 ; idAxialSection < m_NumberOfAxialSections ; idAxialSection++)
+	{
+		// build the slicing plane
+		rulerVector.push_back(NULL);
+		mafNEW(rulerVector[idAxialSection]);
+
+		AddVMEToMSFTree(rulerVector[idAxialSection]);
+
+		double height = -m_FeedbackLineHeight + step*idAxialSection;
+		
+    captionActorVector.push_back(NULL);
+    vtkNEW(captionActorVector[idAxialSection]);
+
+    wxString sliceId;
+    
+    if (m_ComboChooseExportAxis == 1)
+    {
+      sliceId << (m_NumberOfAxialSections - idAxialSection - 1);
+    }
+    else
+    {
+      sliceId << idAxialSection;
+    }
+
+    captionActorVector[idAxialSection]->SetCaption(sliceId.c_str());
+    BuildSlicingPlane(rulerVector[idAxialSection],fromDirection, guestView, height , NULL, NULL,
+    true, captionActorVector[idAxialSection]);	    
+	}
+
+	ShowVMESurfacesVector(rulerVector, guestView, true);
+
+}
+
+void medViewArbitraryOrthoSlice::ShowRuler( int ruler , bool show)
+{
+	if (ruler == X_RULER)
+	{
+		if (show == true)
+		{
+			ShowRulerVMEVector(m_ViewYnSliceXRulerVMEVector, m_ViewYnSliceXRulerTextActorsVector,
+        FROM_X, Y_VIEW);
+			ShowRulerVMEVector(m_ViewZnSliceXRulerVMEVector, m_ViewZnSliceXRulerTextActorsVector,
+        FROM_X, Z_VIEW);
+		}
+		else
+		{
+			HideRulerVMEVector(m_ViewYnSliceXRulerVMEVector,  m_ViewYnSliceXRulerTextActorsVector,
+        Y_VIEW);
+			HideRulerVMEVector(m_ViewZnSliceXRulerVMEVector,  m_ViewZnSliceXRulerTextActorsVector,
+        Z_VIEW);
+		}
+		
+	}
+	else if (ruler == Y_RULER)
+	{
+		if (show == true)
+		{
+			ShowRulerVMEVector(m_ViewXnSliceYRulerVMEVector,  m_ViewXnSliceYRulerTextActorsVector,
+        FROM_Y, X_VIEW);
+			ShowRulerVMEVector(m_ViewZnSliceYRulerVMEVector, m_ViewZnSliceYRulerTextActorsVector ,
+        FROM_Y, Z_VIEW);	
+		}
+		else
+		{
+			HideRulerVMEVector(m_ViewXnSliceYRulerVMEVector, m_ViewXnSliceYRulerTextActorsVector,
+        X_VIEW);
+			HideRulerVMEVector(m_ViewZnSliceYRulerVMEVector, m_ViewZnSliceYRulerTextActorsVector,
+        Z_VIEW);	
+		}
+
+	}
+	else if (ruler == Z_RULER)
+	{
+		if (show == true)
+		{
+			ShowRulerVMEVector(m_ViewXnSliceZRulerVMEVector, m_ViewXnSliceZRulerTextActorsVector,
+        FROM_Z, X_VIEW);
+			ShowRulerVMEVector(m_ViewYnSliceZRulerVMEVector, m_ViewYnSliceZRulerTextActorsVector,
+        FROM_Z, Y_VIEW);
+		}
+		else
+		{
+			HideRulerVMEVector(m_ViewXnSliceZRulerVMEVector, m_ViewXnSliceZRulerTextActorsVector, 
+        X_VIEW);
+			HideRulerVMEVector(m_ViewYnSliceZRulerVMEVector, m_ViewYnSliceZRulerTextActorsVector, 
+        Y_VIEW);
+		}
+	}
+}
+
+void medViewArbitraryOrthoSlice::HideRulerVMEVector(vector<mafVMESurface *> &rulerVector, 
+vector<vtkCaptionActor2D *> &captionActorVector , int guestView)
+{
+	ShowVMESurfacesVector(rulerVector, guestView, false);
+	int size  = rulerVector.size();
+
+	for (int i = 0; i < size; i++)
+	{
+		rulerVector[i]->ReparentTo(NULL);
+		rulerVector[i] = NULL;
+
+    vtkRenderer *currentRenderer = ((mafViewVTK*)(m_ChildViewList[guestView]))->m_Rwi->m_RenFront;
+    currentRenderer->RemoveActor2D(captionActorVector[i]);
+    captionActorVector[i]->Delete();
+  
+	}
+
+  captionActorVector.clear();
+	rulerVector.clear();
+
+	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+
+}
+
+
+void medViewArbitraryOrthoSlice::ShowCaptionActor(vtkCaptionActor2D *actor, 
+int guestView, wxString text, double x, double y ,double z)
+{
+    assert(actor != NULL);
+
+    actor->SetPosition(0,0);
+    actor->ThreeDimensionalLeaderOff();
+    
+    actor->SetHeight(0.01);
+    actor->SetWidth(0.01);
+    actor->BorderOff();
+
+    actor->SetCaption(text.c_str());
+    actor->SetVisibility(true);
+    actor->SetAttachmentPoint(x,y,z);
+
+    vtkRenderer *currentRenderer = ((mafViewVTK*)(m_ChildViewList[guestView]))->m_Rwi->m_RenFront;
+
+    currentRenderer->AddActor2D(actor);
 }
