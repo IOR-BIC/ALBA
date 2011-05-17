@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2011-05-17 15:02:19 $
-Version:   $Revision: 1.1.2.57 $
+Date:      $Date: 2011-05-17 15:46:47 $
+Version:   $Revision: 1.1.2.58 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -1438,9 +1438,7 @@ mafGUI* medViewArbitraryOrthoSlice::CreateGui()
 
 	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
 
-	m_Gui->Divider();
-	m_Gui->Divider();
-
+	
 	m_Gui->Update();
 
 
