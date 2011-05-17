@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafAxes.cpp,v $
 Language:  C++
-Date:      $Date: 2010-10-13 08:15:00 $
-Version:   $Revision: 1.2.2.7 $
+Date:      $Date: 2011-05-17 16:44:11 $
+Version:   $Revision: 1.2.2.8 $
 Authors:   Silvano Imboden , Stefano perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -146,7 +146,7 @@ mafAxes::mafAxes(vtkRenderer *ren, mafVME* vme, int axesType)
 		m_OrientationMarkerWidget->SetInteractor(m_Renderer->GetRenderWindow()->GetInteractor());
 		m_OrientationMarkerWidget->SetEnabled(1);
 		m_OrientationMarkerWidget->SetInteractive(0);
-		m_OrientationMarkerWidget->SetViewport(0., 0., 0.4, 0.4);
+		m_OrientationMarkerWidget->SetViewport(0., 0., 0.25, 0.25);
 	}
 
 }
