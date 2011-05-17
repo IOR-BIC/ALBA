@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.h,v $
 Language:  C++
-Date:      $Date: 2011-05-13 16:26:01 $
-Version:   $Revision: 1.1.2.30 $
+Date:      $Date: 2011-05-17 15:02:19 $
+Version:   $Revision: 1.1.2.31 $
 Authors:   Stefano Perticoni	
 ==========================================================================
 Copyright (c) 2002/2004
@@ -133,17 +133,32 @@ public:
 		ID_COMBO_CHOOSE_EXPORT_AXIS = Superclass::ID_LAST,
 		ID_RESET,
 		ID_SHOW_GIZMO,
-		ID_ENABLE_EXPORT_IMAGES,
 		ID_CHOOSE_DIR,
 		ID_EXPORT,
 
 		ID_UPDATE_LUT, 
 
-		ID_ENABLE_THICKNESS,
-		ID_ENABLE_THICKNESS_ACTORS,
-		ID_THICKNESS_VALUE_CHANGED,
-		ID_NUMBER_OF_AXIAL_SECTIONS,
-		ID_EXPORT_PLANES_HEIGHT,
+		ID_ENABLE_THICKNESS_RED,
+		ID_ENABLE_THICKNESS_ACTORS_RED,
+		ID_THICKNESS_VALUE_CHANGED_RED,
+		ID_NUMBER_OF_AXIAL_SECTIONS_RED,
+		ID_EXPORT_PLANES_HEIGHT_RED,
+		ID_ENABLE_EXPORT_IMAGES_RED,
+
+		ID_ENABLE_THICKNESS_GREEN,
+		ID_ENABLE_THICKNESS_ACTORS_GREEN,
+		ID_THICKNESS_VALUE_CHANGED_GREEN,
+		ID_NUMBER_OF_AXIAL_SECTIONS_GREEN,
+		ID_EXPORT_PLANES_HEIGHT_GREEN,
+		ID_ENABLE_EXPORT_IMAGES_GREEN,
+
+		ID_ENABLE_THICKNESS_BLUE,
+		ID_ENABLE_THICKNESS_ACTORS_BLUE,
+		ID_THICKNESS_VALUE_CHANGED_BLUE,
+		ID_NUMBER_OF_AXIAL_SECTIONS_BLUE,
+		ID_EXPORT_PLANES_HEIGHT_BLUE,
+		ID_ENABLE_EXPORT_IMAGES_BLUE,
+
 		ID_SHOW_RULER,
 		ID_HIDE_RULER,
 		ID_LAST,
@@ -213,6 +228,15 @@ protected:
 	vtkActor2D *m_TextActorRightZView;
 	vtkTextMapper *m_TextMapperRightZView;
 
+	vtkActor2D *m_XnSliceHeightTextActor;
+	vtkTextMapper *m_XnSliceHeightTextMapper;
+
+	vtkActor2D *m_YnSliceHeightTextActor;
+	vtkTextMapper *m_YnSliceHeightTextMapper;
+
+	vtkActor2D *m_ZnSliceHeightTextActor;
+	vtkTextMapper *m_ZnSliceHeightTextMapper;
+
 	bool BelongsToXNormalGizmo( mafVME * vme );
 	bool BelongsToYNormalGizmo( mafVME * vme );
 	bool BelongsToZNormalGizmo( mafVME * vme );
@@ -224,7 +248,7 @@ protected:
 
 	void ShowMafVMEVolume( mafVME * vme, bool show );
 
-	void ShowThickness2DTextActors( bool show );
+	void ShowThickness2DTextActors( bool show , int color);
 
 	void StoreCameraParametersForAllSubviews();
 
@@ -279,8 +303,14 @@ protected:
 	/** Enable/disable view widgets.*/
 	void EnableWidgets(bool enable = true);
 
-	void EnableExportImages( bool enable );
+	void EnableExportImages( bool enable , int color);
 	void OnEventThis(mafEventBase *maf_event);  
+
+	void ExportBLUEView();
+
+	void ExportGREENView();
+
+	void ExportREDView();
 
 	enum {
 		X_RULER=0,
@@ -330,7 +360,7 @@ protected:
 	void PostMultiplyEventMatrixToGizmoCross( mafEventBase * inputEvent , medGizmoCrossRotateTranslate *targetGizmo);
 
 	/** Recalculate the RX projection for the three slicers and display it */
-	void UpdateThicknessStuff();
+	void UpdateAllViewsThickness();
 
 	/** structured points only: create rx projection for the given slicer normal and set it as slicer texture.	
 	If rxTexture is provided result of the accumulation will be deepcopied to it */
@@ -376,34 +406,36 @@ protected:
 
 	mafPipeSurface * GetPipe(int inView, mafVMESurface *inSurface);
 
-	void OnEventID_COMBO_CHOOSE_EXPORT_AXIS();
-
-	void HideCutPlanes();
+	void HideAllCutPlanes();
 	void OnID_CHOOSE_DIR();
-	void OnEventID_ENABLE_EXPORT_IMAGES();
+	void OnEventID_ENABLE_EXPORT_IMAGES(int axis);
+
+	void ShowCutPlanes( int axis , bool show);
 
 	/** Write on file the texture slice from the selected view */
-	void SaveSlicesTextureToFile();
+	void SaveSlicesTextureToFile(int choosedExportAxis);
 
 	/** Write on file the full render window from the selected view */
-	void SaveSlicesFromRenderWindowToFile();
+	void SaveSlicesFromRenderWindowToFile(int chooseExportAxis);
 
-	void OnEventID_ENABLE_THICKNESS();
+	void OnEventID_ENABLE_THICKNESS(int color);
 
-	void EnableThickness(bool enable);
+	void EnableThickness(bool enable, int color);
 
-	void EnableThicknessGUI( bool enable );
+	void EnableThicknessGUI( bool enable , int color);
 
 	/** Recompute all slicers output */
-	void UpdateSlicers();
+	void UpdateSlicers(int axis);
 
-	void OnEventID_THICKNESS_VALUE_CHANGED();
-	void OnEventID_EXPORT_PLANES_HEIGHT();
+	void OnEventID_THICKNESS_VALUE_CHANGED(int color);
+	void OnEventID_EXPORT_PLANES_HEIGHT(int color);
 
 	void CreateViewCameraNormalFeedbackActor(double col[3], int view);
 	void DestroyViewCameraNormalFeedbackActor(int view);
-	void ThicknessComboAssignment();
+	void ThicknessComboAssignment(int axis);
 	void UpdateWindowing(bool enable,mafNode *node);
+	void UpdateThickness( int axis);
+	void ShowSliceHeight2DTextActors( bool show , int color);
   
 	mafViewVTK *m_ViewSliceX;
 	mafViewVTK *m_ViewSliceY;
@@ -486,19 +518,18 @@ protected:
 	vector<mafVMESurface *> m_ViewZnSliceYRulerVMEVector;
   vector<vtkCaptionActor2D *> m_ViewZnSliceYRulerTextActorsVector;
 
-	int m_FeedbackLineHeight;
-	int m_NumberOfAxialSections;
-	int m_ExportPlanesHeight;
+	int m_FeedbackLineHeight[3];
+	int m_NumberOfAxialSections[3];
+	int m_ExportPlanesHeight[3];
 
-	int m_EnableExportImages;
-	int m_ComboChooseExportAxis;
-
+	int m_EnableExportImages[3];
+	
 	// Enable RX like accumulation: corresponding point scalar values are added and the resulting number is divided
 	// by the number of slices 
-	int m_EnableThickness; 
+	int m_EnableThickness[3]; 
 
-	double m_ThicknessValue;
-	int m_ThicknessComboAssignment;
+	double m_ThicknessValue[3];
+	int m_ThicknessComboAssignment[3];
 
 	wxString m_PathFromDialog;
 
@@ -509,7 +540,9 @@ protected:
 	medInteractorPicker *m_YSlicerPicker;
 	medInteractorPicker *m_ZSlicerPicker;
 
-	mafString m_ThicknessText;
+	mafString m_ThicknessText[3];
+
+	enum {RED=0, GREEN, BLUE, NUMBER_OF_COLORS =3};
 };
 
 #endif
