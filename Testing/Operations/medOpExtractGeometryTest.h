@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpExtractGeometryTest.h,v $
 Language:  C++
-Date:      $Date: 2011-05-18 13:28:34 $
-Version:   $Revision: 1.1.2.2 $
-Authors:   Daniele Giunchi
+Date:      $Date: 2011-05-18 16:04:41 $
+Version:   $Revision: 1.1.2.3 $
+Authors:   Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2002/2004 
 CINECA - Interuniversity Consortium (www.cineca.it)
