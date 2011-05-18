@@ -98,6 +98,9 @@ ADD_TEST(medOpSplitSurfaceTest ${EXECUTABLE_OUTPUT_PATH}/medOpSplitSurfaceTest)
 ADD_EXECUTABLE(medOpMML3Test medOpMML3Test.h medOpMML3Test.cpp)
 ADD_TEST(medOpMML3Test ${EXECUTABLE_OUTPUT_PATH}/medOpMML3Test)
 
+ADD_EXECUTABLE(medOpExtractGeometryTest medOpExtractGeometryTest.h medOpExtractGeometryTest.cpp)
+ADD_TEST(medOpExtractGeometryTest ${EXECUTABLE_OUTPUT_PATH}/medOpExtractGeometryTest)
+
 
 IF (MED_USE_Offis)
 
