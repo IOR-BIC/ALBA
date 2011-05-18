@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpExtractGeometryTest.h,v $
 Language:  C++
-Date:      $Date: 2011-05-18 13:26:18 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-05-18 13:28:34 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -60,7 +60,6 @@ main( int argc, char* argv[] )
   CPPUNIT_NS::CompilerOutputter outputter( &result, CPPUNIT_NS::stdCOut() );
   outputter.write(); 
 
-  system("pause");
   return result.wasSuccessful() ? 0 : 1;
 }
 
