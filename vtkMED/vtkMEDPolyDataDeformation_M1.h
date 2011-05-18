@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMEDPolyDataDeformation_M1.h,v $ 
   Language: C++ 
-  Date: $Date: 2011-04-28 15:18:44 $ 
-  Version: $Revision: 1.1.2.8 $ 
+  Date: $Date: 2011-05-18 09:06:30 $ 
+  Version: $Revision: 1.1.2.9 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -68,6 +68,7 @@ public:
 
   friend class CMatrixTestM1;
   friend class CSkeletonEdgeM1Test;
+  friend class CSkeletonVertexM1Test;
 
 protected:
   vtkMEDPolyDataDeformation_M1();           
