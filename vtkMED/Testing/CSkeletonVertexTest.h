@@ -2,16 +2,16 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: CSkeletonVertexTest.h,v $
 Language:  C++
-Date:      $Date: 2011-04-04 11:56:49 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-05-18 09:07:14 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2002/2004 
 CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#ifndef __CPP_UNIT_CSkeletonVertexTEST_H__
-#define __CPP_UNIT_CSkeletonVertexTEST_H__
+#ifndef __CPP_UNIT_CSkeletonVertexM1TEST_H__
+#define __CPP_UNIT_CSkeletonVertexM1TEST_H__
 
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/BriefTestProgressListener.h>
