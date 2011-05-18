@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpGarbageCollectMSFDir.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-04-19 10:51:10 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-18 07:14:57 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -34,6 +34,7 @@
 #include "mafVMEExternalData.h"
 #include "vtkDirectory.h"
 #include <algorithm>
+#include <iterator> 
 #include "mafOpValidateTree.h"
 
 //----------------------------------------------------------------------------
