@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIFloatSlider.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2011-05-23 14:11:35 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -78,7 +78,7 @@ void mafGUIFloatSlider::SetValue(double value)
 	//value has to be discretized
 	this->m_Value = m_Step*(int)floor(m_Value/m_Step+0.5);
 
-	wxSlider::SetValue(ceil((value-this->m_Min)/this->m_Step));
+	wxSlider::SetValue(floor((value-this->m_Min)/this->m_Step+0.5));
 }
 //----------------------------------------------------------------------------
 void mafGUIFloatSlider::SetMin(double min)
