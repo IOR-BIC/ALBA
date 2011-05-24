@@ -160,6 +160,10 @@ ADD_TEST(CSkeletonEdgeM1Test ${EXECUTABLE_OUTPUT_PATH}/CSkeletonEdgeM1Test)
 ADD_EXECUTABLE(CSkeletonVertexM1Test CSkeletonVertexM1Test.h CSkeletonVertexM1Test.cpp)
 ADD_TEST(CSkeletonVertexM1Test ${EXECUTABLE_OUTPUT_PATH}/CSkeletonVertexM1Test)
 
+ADD_EXECUTABLE(CSkeletonVertexM2Test CSkeletonVertexM2Test.h CSkeletonVertexM2Test.cpp)
+ADD_TEST(CSkeletonVertexM2Test ${EXECUTABLE_OUTPUT_PATH}/CSkeletonVertexM2Test)
+
+
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
 #ENDIF (MAF_USE_WX)
