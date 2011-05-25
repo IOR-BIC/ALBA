@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventInteraction.h,v $
   Language:  C++
-  Date:      $Date: 2009-09-14 12:02:06 $
-  Version:   $Revision: 1.6.10.2 $
+  Date:      $Date: 2011-05-25 11:26:19 $
+  Version:   $Revision: 1.6.10.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -26,7 +26,7 @@
   optional word of modifiers can be used.
   @sa mafEventBase mafDeviceButtonsPadTracker MoveEvent ButtonDownEvent ButtonUpEvent
 */
-class mafEventInteraction : public mafEventBase
+class MAF_EXPORT mafEventInteraction : public mafEventBase
 {
 public:
   /** RTTI macro*/
@@ -95,6 +95,7 @@ protected:
   double        m_Y;          ///< Y coordinate, used by mouse device
   bool          m_XYFlag;     ///< Used to signal a 2D coordinate is present
 
+  template class MAF_EXPORT mafAutoPointer<mafMatrix>;
   mafAutoPointer<mafMatrix>  m_Matrix;    ///< Pose matrix, used by 3D trackers
 };
 

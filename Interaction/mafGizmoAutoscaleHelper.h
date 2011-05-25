@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoAutoscaleHelper.h,v $
   Language:  C++
-  Date:      $Date: 2010-11-10 20:40:41 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2011-05-25 11:26:19 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -33,7 +33,7 @@ Helper object for gizmo autoscaling ie actor2D-like behavior
 
 */
 
-class mafGizmoAutoscaleHelper:public mafTransformBase
+class MAF_EXPORT mafGizmoAutoscaleHelper:public mafTransformBase
 {
 public:
   mafGizmoAutoscaleHelper();

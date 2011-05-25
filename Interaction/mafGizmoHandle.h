@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoHandle.h,v $
   Language:  C++
-  Date:      $Date: 2010-02-04 16:50:23 $
-  Version:   $Revision: 1.6.2.3 $
+  Date:      $Date: 2011-05-25 11:26:19 $
+  Version:   $Revision: 1.6.2.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -81,7 +81,7 @@ class vtkPlaneSource;
   @sa mafGizmoROI mafOpCrop 
 */
 
-class mafGizmoHandle: public mafObserver 
+class MAF_EXPORT mafGizmoHandle: public mafObserver 
 {
 public:
 

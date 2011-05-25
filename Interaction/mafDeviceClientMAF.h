@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafDeviceClientMAF.h,v $
 Language:  C++
-Date:      $Date: 2009-05-25 14:48:12 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-05-25 11:26:19 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -26,7 +26,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
   @sa mafDevice
 */
 
-class mafDeviceClientMAF : public mafDevice
+class MAF_EXPORT mafDeviceClientMAF : public mafDevice
 {
 public:
   mafTypeMacro(mafDeviceClientMAF, mafDevice); 

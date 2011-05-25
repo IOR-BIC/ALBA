@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDeviceButtonsPadTracker.h,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 14:48:12 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 11:26:19 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -17,12 +17,12 @@
 #include "mafMutexLock.h"
 #include "mafSmartPointer.h"
 #include "mafOBB.h"
+#include "mafAvatar.h"
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
 class mafTransform;
 class mafMatrix;
-class mafAvatar;
 class mafOBB;
 
 /** Generic spatial position tracking device.
@@ -58,7 +58,7 @@ class mafOBB;
     - manage multiple button press (rewrite mflActionEvent)
     - use an action event also for move events (rewrite SetLastPoseMatrix() ). 
 */
-class mafDeviceButtonsPadTracker : public mafDeviceButtonsPad
+class MAF_EXPORT mafDeviceButtonsPadTracker : public mafDeviceButtonsPad
 {
 public:
   mafTypeMacro(mafDeviceButtonsPadTracker,mafDeviceButtonsPad);
@@ -68,10 +68,10 @@ public:
   //------------------------------------------------------------------------------
   /** @ingroup Events
       Issued when the tracker is moved */
-  MAF_ID_DEC(TRACKER_3D_MOVE)
+  // MAF_ID_DEC(TRACKER_3D_MOVE)
   /** @ingroup Events
       Issued when the tracked bounds is changed */
-  MAF_ID_DEC(TRACKER_BOUNDS_UPDATED)
+  // MAF_ID_DEC(TRACKER_BOUNDS_UPDATED)
 
   //----------------------------------------------------------------------------
   //    GUI Constants
@@ -88,6 +88,11 @@ public:
     ID_LAST
   };
 
+  /** return the tracker 3d move id */
+  static mafID GetTracker3DMoveId();
+
+  /** return th tracker bounds updated id */
+  static mafID GetTrackerBoundsUpdatedId();
   /**
     Reimplemented to manage fusion of move events. */
   virtual void OnEvent(mafEventBase *event);
@@ -204,6 +209,7 @@ protected:
 
   mafTransform*         m_TrackerToCanonicalTransform;
 
+  template class MAF_EXPORT mafAutoPointer<mafAvatar>;
   mafAutoPointer<mafAvatar> m_Avatar;        ///< the current avatar
   mafAutoPointer<mafAvatar> m_DefaultAvatar; ///< the avatar set thorugh the GUI
 

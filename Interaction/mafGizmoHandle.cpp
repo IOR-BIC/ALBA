@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoHandle.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:47:18 $
-  Version:   $Revision: 1.12.2.2 $
+  Date:      $Date: 2011-05-25 11:26:19 $
+  Version:   $Revision: 1.12.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,6 +24,7 @@
 #include "mafGizmoHandle.h"
 #include "mafDecl.h"
 #include "mmaMaterial.h"
+#include "mafRefSys.h"
 
 // isa stuff
 #include "mafInteractorCompositorMouse.h"

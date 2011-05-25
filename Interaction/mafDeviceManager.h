@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDeviceManager.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-07 08:22:03 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2011-05-25 11:26:19 $
+  Version:   $Revision: 1.5.10.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -45,7 +45,7 @@ class mafDeviceSet;
   @todo 
   - implement AddDevice()
  */
-class mafDeviceManager : public mafAgentEventHandler, public mafStorable
+class MAF_EXPORT mafDeviceManager : public mafAgentEventHandler, public mafStorable
 {
 public:
   //------------------------------------------------------------------------------

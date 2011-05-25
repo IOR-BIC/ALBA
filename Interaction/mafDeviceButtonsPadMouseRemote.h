@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDeviceButtonsPadMouseRemote.h,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 14:48:12 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 11:26:19 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -32,7 +32,7 @@ class mafRWIBase;
   widget or windows toolkit can inject events into this centralized mouse.
   @sa mafDeviceButtonsPad mafRWI
 */
-class mafDeviceButtonsPadMouseRemote : public mafDeviceButtonsPadMouse
+class MAF_EXPORT mafDeviceButtonsPadMouseRemote : public mafDeviceButtonsPadMouse
 {
 public:
   mafTypeMacro(mafDeviceButtonsPadMouseRemote, mafDeviceButtonsPadMouse); 

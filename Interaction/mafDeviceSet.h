@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDeviceSet.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-07 08:22:03 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2011-05-25 11:26:19 $
+  Version:   $Revision: 1.3.10.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -14,6 +14,11 @@
 
 #include "mafDevice.h"
 #include <list>
+
+#ifdef MAF_EXPORTS
+#include "mafDllMacros.h"
+EXPORT_STL_LIST(MAF_EXPORT,mafDevice *);
+#endif
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -26,7 +31,7 @@ class mafMutexLock;
   serializes their dispatching.
   @sa mafDeviceManager mafEvent
   */
-class mafDeviceSet : public mafDevice
+class MAF_EXPORT mafDeviceSet : public mafDevice
 {
 public:
   //------------------------------------------------------------------------------

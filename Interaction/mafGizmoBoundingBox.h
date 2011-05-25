@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoBoundingBox.h,v $
   Language:  C++
-  Date:      $Date: 2010-02-04 16:50:23 $
-  Version:   $Revision: 1.5.2.1 $
+  Date:      $Date: 2011-05-25 11:26:19 $
+  Version:   $Revision: 1.5.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -44,7 +44,7 @@ class mafMatrix;
    Bounding box gizmo for highlighting a region of interest.
    @sa mafGizmoROI               
 */
-class mafGizmoBoundingBox: public mafObserver 
+class MAF_EXPORT mafGizmoBoundingBox: public mafObserver 
 {
 public:
            mafGizmoBoundingBox(mafVME *input, mafObserver *listener = NULL,mafVME* parent=NULL);

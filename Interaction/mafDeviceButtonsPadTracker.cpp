@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDeviceButtonsPadTracker.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 14:48:12 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 11:26:19 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -40,8 +40,8 @@
 //------------------------------------------------------------------------------
 // Events
 //------------------------------------------------------------------------------
-MAF_ID_IMP(mafDeviceButtonsPadTracker::TRACKER_3D_MOVE)
-MAF_ID_IMP(mafDeviceButtonsPadTracker::TRACKER_BOUNDS_UPDATED)
+// MAF_ID_IMP(mafDeviceButtonsPadTracker::TRACKER_3D_MOVE)
+// MAF_ID_IMP(mafDeviceButtonsPadTracker::TRACKER_BOUNDS_UPDATED)
 
 mafCxxTypeMacro(mafDeviceButtonsPadTracker)
 
@@ -73,7 +73,20 @@ mafDeviceButtonsPadTracker::~mafDeviceButtonsPadTracker()
   mafDEL(m_TrackerToCanonicalTransform);
   mafDEL(m_LastPoseMatrix);
 }
-
+//------------------------------------------------------------------------------
+mafID mafDeviceButtonsPadTracker::GetTracker3DMoveId()
+//------------------------------------------------------------------------------
+{
+  static const mafID tracker3DModeId = mmuIdFactory::GetNextId("TRACKER_3D_MOVE");
+  return tracker3DModeId;
+}
+//------------------------------------------------------------------------------
+mafID mafDeviceButtonsPadTracker::GetTrackerBoundsUpdatedId()
+//------------------------------------------------------------------------------
+{
+  static const mafID trackerBoundsUpdatedId = mmuIdFactory::GetNextId("TRACKER_BOUNDS_UPDATED");
+  return trackerBoundsUpdatedId;
+}
 //------------------------------------------------------------------------------
 int mafDeviceButtonsPadTracker::InternalStore(mafStorageElement *node)
 //------------------------------------------------------------------------------
@@ -264,7 +277,7 @@ void mafDeviceButtonsPadTracker::SetLastPoseMatrix(const mafMatrix &matrix)
     *m_LastPoseMatrix=matrix;
     m_LastPoseMatrix->SetTimeStamp(vtkTimerLog::GetCurrentTime()); // set the time stamp to the current time
 
-    mafEventInteraction move_event(this,TRACKER_3D_MOVE,m_LastPoseMatrix);    
+    mafEventInteraction move_event(this,GetTracker3DMoveId(),m_LastPoseMatrix);    
 
     m_LastMoveTime=m_LastPoseMatrix->GetTimeStamp();
     AsyncInvokeEvent(&move_event,MCH_INPUT);
@@ -343,7 +356,7 @@ void mafDeviceButtonsPadTracker::ComputeTrackerToCanonicalTansform()
 	m_TrackerToCanonicalTransform->Scale(scale,scale,scale,POST_MULTIPLY);
   
   // inform consumers the m_CanonicalBounds has been recomputed
-  InvokeEvent(TRACKER_BOUNDS_UPDATED,MCH_INPUT);
+  InvokeEvent(GetTrackerBoundsUpdatedId(),MCH_INPUT);
 }
 
 //------------------------------------------------------------------------------
@@ -565,7 +578,7 @@ void mafDeviceButtonsPadTracker::OnEvent(mafEventBase *event)
 
     m_LastPoseMutex.Lock();                     /// LOCK
     // if it was a move event clear the m_LastMoveEvent variable
-    if (id==TRACKER_3D_MOVE)
+    if (id==GetTracker3DMoveId())
       m_LastPose=0;
     m_LastPoseMutex.Unlock();                   /// UNLOCK
   }
