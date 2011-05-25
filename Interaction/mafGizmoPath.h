@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoPath.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:47:18 $
-  Version:   $Revision: 1.6.2.1 $
+  Date:      $Date: 2011-05-25 11:20:00 $
+  Version:   $Revision: 1.6.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -38,7 +38,7 @@ events with mafGizmoPath::ABS_POSE argument;
 REFACTOR NOTE: this object should be the expanded to support mouse interaction
 */
 
-class mafGizmoPath : public mafGizmoInterface
+class MAF_EXPORT mafGizmoPath : public mafGizmoInterface
 {
 public:
 

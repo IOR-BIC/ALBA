@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoPath.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:47:18 $
-  Version:   $Revision: 1.10.2.3 $
+  Date:      $Date: 2011-05-25 11:20:00 $
+  Version:   $Revision: 1.10.2.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -33,6 +33,7 @@
 #include "mafMatrix.h"
 #include "mafAbsMatrixPipe.h"
 #include "mafVMERoot.h"
+#include "mafRefSys.h"
 
 #include "vtkMath.h"
 #include "vtkLineSource.h"

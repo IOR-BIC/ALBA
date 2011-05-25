@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotate.h,v $
   Language:  C++
-  Date:      $Date: 2010-11-10 16:51:28 $
-  Version:   $Revision: 1.5.2.3 $
+  Date:      $Date: 2011-05-25 11:20:00 $
+  Version:   $Revision: 1.5.2.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -67,7 +67,7 @@ class mafMatrix;
 
 */
 
-class mafGizmoRotate : public mafGizmoInterface 
+class MAF_EXPORT mafGizmoRotate : public mafGizmoInterface 
 {
 public:
            mafGizmoRotate(mafVME *input, mafObserver* listener = NULL, bool buildGUI = true);

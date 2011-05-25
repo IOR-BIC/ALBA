@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotateCircle.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-11-17 15:25:04 $
-  Version:   $Revision: 1.8.4.5 $
+  Date:      $Date: 2011-05-25 11:20:00 $
+  Version:   $Revision: 1.8.4.6 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -20,6 +20,7 @@
 //----------------------------------------------------------------------------
 
 #include "mafGizmoRotateCircle.h"
+#include "mafRefSys.h"
 
 // wxwin stuff
 #include "wx/string.h"

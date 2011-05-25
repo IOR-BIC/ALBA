@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGizmoPathRuler.h,v $
 Language:  C++
-Date:      $Date: 2008-11-03 14:46:57 $
-Version:   $Revision: 1.6.2.2 $
+Date:      $Date: 2011-05-25 11:20:00 $
+Version:   $Revision: 1.6.2.3 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -52,7 +52,7 @@ usage example:
   m_GizmoPathRuler->SetCurvilinearAbscissa(0);
 */
 
-class mafGizmoPathRuler : public mafGizmoInterface 
+class MAF_EXPORT mafGizmoPathRuler : public mafGizmoInterface 
 {
 public:
   

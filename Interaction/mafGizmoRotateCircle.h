@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotateCircle.h,v $
   Language:  C++
-  Date:      $Date: 2010-11-10 16:51:28 $
-  Version:   $Revision: 1.2.22.4 $
+  Date:      $Date: 2011-05-25 11:20:00 $
+  Version:   $Revision: 1.2.22.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -40,7 +40,7 @@ class vtkTransform;
   
   @sa mafGizmoRotate
 */
-class mafGizmoRotateCircle: public mafGizmoInterface
+class MAF_EXPORT mafGizmoRotateCircle: public mafGizmoInterface
 {
 public:
            mafGizmoRotateCircle(mafVME *input, mafObserver *listener = NULL);
@@ -120,6 +120,7 @@ protected:
   Both reference system type are set to CUSTOM.*/
   void SetRefSysMatrix(mafMatrix *matrix);
 
+  template class MAF_EXPORT mafAutoPointer<mafMatrix>;
   mafAutoPointer<mafMatrix> m_AbsInputMatrix;
   
   /** Circle gizmo */

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIGizmoInterface.h,v $
   Language:  C++
-  Date:      $Date: 2010-07-05 12:04:14 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2011-05-25 11:20:00 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,7 +36,7 @@ class mafGUI;
   - enforce superclass implementation by using pure virtuals
 */
 
-class mafGUIGizmoInterface : public mafObserver
+class MAF_EXPORT mafGUIGizmoInterface : public mafObserver
 {
 public:
 
