@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotateFan.h,v $
   Language:  C++
-  Date:      $Date: 2010-11-10 16:51:28 $
-  Version:   $Revision: 1.3.2.2 $
+  Date:      $Date: 2011-05-25 11:11:56 $
+  Version:   $Revision: 1.3.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -51,7 +51,7 @@ class mafRefSys;
 
   @sa mafGizmoRotate 
 */
-class mafGizmoRotateFan : public mafGizmoInterface 
+class MAF_EXPORT mafGizmoRotateFan : public mafGizmoInterface 
 {
 public:
            mafGizmoRotateFan(mafVME *input, mafObserver *listener = NULL);

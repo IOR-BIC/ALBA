@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScaleAxis.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-11-10 16:51:28 $
-  Version:   $Revision: 1.7.4.4 $
+  Date:      $Date: 2011-05-25 11:11:56 $
+  Version:   $Revision: 1.7.4.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -22,6 +22,7 @@
 
 #include "mafGizmoScaleAxis.h"
 #include "mafDecl.h"
+#include "mafRefSys.h"
 
 // isa stuff
 #include "mafInteractorCompositorMouse.h"

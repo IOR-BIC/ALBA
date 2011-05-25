@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScale.h,v $
   Language:  C++
-  Date:      $Date: 2010-11-10 16:51:28 $
-  Version:   $Revision: 1.5.2.3 $
+  Date:      $Date: 2011-05-25 11:11:56 $
+  Version:   $Revision: 1.5.2.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -60,7 +60,7 @@ class mafGUI;
  @sa mafGizmoScaleAxis
 */
 
-class mafGizmoScale: public mafGizmoInterface 
+class MAF_EXPORT mafGizmoScale: public mafGizmoInterface 
 {
 public:
   mafGizmoScale(mafVME *input, mafObserver* listener = NULL , bool buildGUI = true);

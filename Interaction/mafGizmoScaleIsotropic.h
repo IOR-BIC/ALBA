@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScaleIsotropic.h,v $
   Language:  C++
-  Date:      $Date: 2010-11-10 16:51:28 $
-  Version:   $Revision: 1.2.2.3 $
+  Date:      $Date: 2011-05-25 11:11:56 $
+  Version:   $Revision: 1.2.2.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -35,7 +35,7 @@ class vtkTransform;
   
   @sa mafGizmoScale
 */
-class mafGizmoScaleIsotropic: public mafGizmoInterface 
+class MAF_EXPORT mafGizmoScaleIsotropic: public mafGizmoInterface 
 {
 public:
            mafGizmoScaleIsotropic(mafVME *input, mafObserver *listener = NULL);

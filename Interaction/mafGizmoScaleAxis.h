@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScaleAxis.h,v $
   Language:  C++
-  Date:      $Date: 2010-11-10 16:51:28 $
-  Version:   $Revision: 1.1.22.4 $
+  Date:      $Date: 2011-05-25 11:11:56 $
+  Version:   $Revision: 1.1.22.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -38,7 +38,7 @@ class vtkTransform;
   
   @sa mafGizmoScale
 */
-class mafGizmoScaleAxis: public mafGizmoInterface 
+class MAF_EXPORT mafGizmoScaleAxis: public mafGizmoInterface 
 {
 public:
            mafGizmoScaleAxis(mafVME *input, mafObserver *listener = NULL);
