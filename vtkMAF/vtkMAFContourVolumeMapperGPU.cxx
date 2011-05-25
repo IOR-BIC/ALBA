@@ -3,8 +3,8 @@
 Program:   Multimod Application framework RELOADED
 Module:    $RCSfile: vtkMAFContourVolumeMapperGPU.cxx,v $
 Language:  C++
-Date:      $Date: 2008-12-12 11:04:21 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-05-25 11:53:13 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Alexander Savenko, Nigel McFarlane, Baoquan Liu (GPU)
 
 ================================================================================
@@ -55,22 +55,22 @@ All rights reserved.
 // vtkMAFContourVolumeMapperGPU::IndicesFromPointer()
 
 //
-// Polyline2D::Reallocate()
-// Polyline2D::Allocate()
-// Polyline2D::Polyline2D()
-// Polyline2D::AddNextLine()
-// Polyline2D::Merge()
-// Polyline2D::Close()
-// Polyline2D::UpdateBoundingBox()
-// Polyline2D::FindClosestPolyline()    - commented out
-// Polyline2D::FindSubPolyline()        -     "      "
-// Polyline2D::SplitPolyline()          -     "      "
-// Polyline2D::Move()
-// Polyline2D::IsInsideOf()
+// Polyline2DGPU::Reallocate()
+// Polyline2DGPU::Allocate()
+// Polyline2DGPU::Polyline2DGPU()
+// Polyline2DGPU::AddNextLine()
+// Polyline2DGPU::Merge()
+// Polyline2DGPU::Close()
+// Polyline2DGPU::UpdateBoundingBox()
+// Polyline2DGPU::FindClosestPolyline()    - commented out
+// Polyline2DGPU::FindSubPolyline()        -     "      "
+// Polyline2DGPU::SplitPolyline()          -     "      "
+// Polyline2DGPU::Move()
+// Polyline2DGPU::IsInsideOf()
 //
-// ListOfPolyline2D::Clear()
-// ListOfPolyline2D::IsInside()
-// ListOfPolyline2D::FindContour()
+// ListOfPolyline2DGPU::Clear()
+// ListOfPolyline2DGPU::IsInside()
+// ListOfPolyline2DGPU::FindContour()
 
 #include "../GPUAPI/glew/glew.h"
 
@@ -110,12 +110,12 @@ All rights reserved.
 
 static const vtkMarchingCubesTriangleCases* marchingCubesCases = vtkMarchingCubesTriangleCases::GetCases();
 
-namespace Baoquan
-{
+//namespace Baoquan
+//{
 
   using namespace vtkMAFContourVolumeMapperNamespace;
 
-  vtkCxxRevisionMacro(vtkMAFContourVolumeMapperGPU, "$Revision: 1.1.2.1 $");
+  vtkCxxRevisionMacro(vtkMAFContourVolumeMapperGPU, "$Revision: 1.1.2.2 $");
   vtkStandardNewMacro(vtkMAFContourVolumeMapperGPU);
 
 
@@ -2243,13 +2243,13 @@ namespace Baoquan
     const int rowSize   = this->DataDimensions[0];
     const int sliceSize = this->DataDimensions[0] * this->DataDimensions[1];
 
-    // create array of ListOfPolyLine2D pointers polylines[0..dimz-1] and set them all to zero
-    ListOfPolyline2D **polylines = new ListOfPolyline2D*[this->DataDimensions[2]];
-    memset(polylines, 0, this->DataDimensions[2]*sizeof(ListOfPolyline2D*));
+    // create array of ListOfPolyline2DGPU pointers polylines[0..dimz-1] and set them all to zero
+    ListOfPolyline2DGPU **polylines = new ListOfPolyline2DGPU*[this->DataDimensions[2]];
+    memset(polylines, 0, this->DataDimensions[2]*sizeof(ListOfPolyline2DGPU*));
 
     if (EnableContourAnalysis) {
       for (int z = 0; z < this->DataDimensions[2]; z++) {
-        polylines[z] = new ListOfPolyline2D();
+        polylines[z] = new ListOfPolyline2DGPU();
         this->PrepareContours(z, dataPointer + z * sliceSize, *polylines[z]);
       }
     }
@@ -2657,7 +2657,7 @@ namespace Baoquan
 
 
     // create 2 polyline lists
-    ListOfPolyline2D polylines[2];
+    ListOfPolyline2DGPU polylines[2];
 
     if (EnableContourAnalysis) {
       // assign first slice to polylines[0]
@@ -3038,7 +3038,7 @@ namespace Baoquan
     //Modified by Matteo 27/06/06
     memset(pointLocator, -1, 2 * sizeof(vtkIdType) * plOffsets[2]);
 
-    ListOfPolyline2D polylines[2];
+    ListOfPolyline2DGPU polylines[2];
 
     const int lastIndex[3] = { this->DataDimensions[0] - level - 1, this->DataDimensions[1] - level - 1, this->DataDimensions[2] - 1};
 
@@ -3537,7 +3537,7 @@ namespace Baoquan
 
   //------------------------------------------------------------------------------
   // Call PrepareContoursTemplate() for data type
-  void vtkMAFContourVolumeMapperGPU::PrepareContours(const int slice, const void *imageData, ListOfPolyline2D& polylines)
+  void vtkMAFContourVolumeMapperGPU::PrepareContours(const int slice, const void *imageData, ListOfPolyline2DGPU& polylines)
     //------------------------------------------------------------------------------
   {
     this->Polylines = &polylines;
@@ -3570,7 +3570,7 @@ namespace Baoquan
     const int lastXBlock = this->NumBlocks[0] - 1, lastYBlock = this->NumBlocks[1] - 1;
     const int lastXBlockSize = this->DataDimensions[0] - 1 - (lastXBlock << VoxelBlockSizeLog), lastYBlockSize = this->DataDimensions[1] - 1 - (lastYBlock << VoxelBlockSizeLog);
 
-    ListOfPolyline2D& polylines = *this->Polylines;
+    ListOfPolyline2DGPU& polylines = *this->Polylines;
     polylines.clear();
 
     int statCounter = 0;
@@ -3603,7 +3603,7 @@ namespace Baoquan
             const int x = (xBlock + xi) << 1;
             const int y = (yBlock + yi) << 1;
 
-            Polyline2D::Point line[2];
+            Polyline2DGPU::Point line[2];
 
             while(*edge >= 0) {
               static const int edgeToOffset[4][2] = {{1, 0}, {2, 1}, {1, 2}, {0, 1}};
@@ -3635,7 +3635,7 @@ namespace Baoquan
                 }
                 continue;
               }
-              polylines.push_back(new Polyline2D(line));
+              polylines.push_back(new Polyline2DGPU(line));
             } // edge loop
 
           } // for (xi)
@@ -3833,12 +3833,12 @@ namespace Baoquan
 #pragma endregion //CPU based MC
 
 
-#pragma region Polyline2D
+#pragma region Polyline2DGPU
   ///////////////////////////////////////////////////////////////////////////////////
-  //                             class Polyline2D
+  //                             class Polyline2DGPU
 
   //---------------------------------------------------------------------------------
-  void Polyline2D::Reallocate() {
+  void Polyline2DGPU::Reallocate() {
     const int newsize = 2 * (size + 1);
     Point *buffer = new Point[newsize];
     const int newstart = int(0.5f * size + 1);
@@ -3855,7 +3855,7 @@ namespace Baoquan
 
 
   //---------------------------------------------------------------------------------
-  void Polyline2D::Allocate(int newsize) {
+  void Polyline2DGPU::Allocate(int newsize) {
     if (this->vertices != NULL && (this->end - this->start) > newsize)
       return;
     if (this->vertices != this->verticesBuffer)
@@ -3870,7 +3870,7 @@ namespace Baoquan
 
 
   //---------------------------------------------------------------------------------
-  Polyline2D::Polyline2D(const Point *line) {
+  Polyline2DGPU::Polyline2DGPU(const Point *line) {
     assert(sizeof(Point) == (2 * sizeof(short)));
     this->size = VERTICES_BUFFER_SIZE;
     this->start = this->end = VERTICES_BUFFER_SIZE >> 1;
@@ -3885,7 +3885,7 @@ namespace Baoquan
 
 
   //---------------------------------------------------------------------------------
-  bool Polyline2D::AddNextLine(const Point *newLine) {
+  bool Polyline2DGPU::AddNextLine(const Point *newLine) {
     if (newLine[0] == this->vertices[this->start]) {
       if (this->start == 0)
         Reallocate();
@@ -3916,7 +3916,7 @@ namespace Baoquan
 
 
   //---------------------------------------------------------------------------------
-  bool Polyline2D::Merge(Polyline2D &polyline) {
+  bool Polyline2DGPU::Merge(Polyline2DGPU &polyline) {
     if (polyline.vertices[polyline.start] == this->vertices[start]) {
       while (this->start <= (polyline.end - polyline.start))
         Reallocate();
@@ -3953,7 +3953,7 @@ namespace Baoquan
 
 
   //---------------------------------------------------------------------------------
-  void Polyline2D::Close() {
+  void Polyline2DGPU::Close() {
     if (this->vertices[this->start] == this->vertices[this->end]) {
       if ((this->end + 1) == this->size)
         this->Reallocate();
@@ -3964,7 +3964,7 @@ namespace Baoquan
 
 
   //---------------------------------------------------------------------------------
-  void Polyline2D::UpdateBoundingBox() const {
+  void Polyline2DGPU::UpdateBoundingBox() const {
     this->bbox[0] = this->bbox[2] = VTK_SHORT_MAX;
     this->bbox[1] = this->bbox[3] = VTK_SHORT_MIN;
     for (int i = this->start; i <= this->end; i++) {
@@ -3982,7 +3982,7 @@ namespace Baoquan
   }
 
   //------------------------------------------------------------------------------
-  void Polyline2D::Move(Polyline2D &polyline) {
+  void Polyline2DGPU::Move(Polyline2DGPU &polyline) {
     if (this->vertices != this->verticesBuffer)
       delete [] vertices;
     *this = polyline; // copy all members
@@ -3996,7 +3996,7 @@ namespace Baoquan
 
   //------------------------------------------------------------------------------
   // check if one polyline is inside another       
-  bool Polyline2D::IsInsideOf(const Polyline2D *outerPolyline) const {
+  bool Polyline2DGPU::IsInsideOf(const Polyline2DGPU *outerPolyline) const {
     if (this->updateBoundingBox)
       this->UpdateBoundingBox();
     if (outerPolyline->updateBoundingBox)
@@ -4052,7 +4052,7 @@ namespace Baoquan
 
   //------------------------------------------------------------------------------
   // Clear the list of polylines
-  void ListOfPolyline2D::clear() 
+  void ListOfPolyline2DGPU::clear() 
     //------------------------------------------------------------------------------
   {
     for (int pj = size() - 1; pj >= 0; pj--)
@@ -4062,12 +4062,12 @@ namespace Baoquan
 
 
   //------------------------------------------------------------------------------
-  bool ListOfPolyline2D::IsInside(int x, int y, int polylineLengthThreshold) {
+  bool ListOfPolyline2DGPU::IsInside(int x, int y, int polylineLengthThreshold) {
     const short sx = x << 1;
     const short sy = y << 1;
 
     for (int pi = this->size() - 1; pi >= 0; pi--) {
-      const Polyline2D * const polyline = at(pi);
+      const Polyline2DGPU * const polyline = at(pi);
 
       // ignore polyline if length < threshold
       if (polyline->Length() < polylineLengthThreshold)
@@ -4135,13 +4135,13 @@ namespace Baoquan
 
 
   //------------------------------------------------------------------------------
-  Polyline2D *ListOfPolyline2D::FindContour(int x, int y, int polylineLengthThreshold, int distance) {
+  Polyline2DGPU *ListOfPolyline2DGPU::FindContour(int x, int y, int polylineLengthThreshold, int distance) {
     const short sx = x << 1;
     const short sy = y << 1;
     distance = distance << 1;
 
     for (int pi = this->size() - 1; pi >= 0; pi--) {
-      Polyline2D *polyline = at(pi);
+      Polyline2DGPU *polyline = at(pi);
       if (polyline->Length() < polylineLengthThreshold)
         continue;
 
@@ -4165,4 +4165,4 @@ namespace Baoquan
     return NULL;
   }
 #pragma endregion
-}//end baoquan space
+//}//end baoquan space

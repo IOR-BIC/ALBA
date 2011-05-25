@@ -3,8 +3,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFTextOrientatorTest.cpp,v $
 Language:  C++
-Date:      $Date: 2011-01-24 13:33:11 $
-Version:   $Revision: 1.1.4.1 $
+Date:      $Date: 2011-05-25 11:53:13 $
+Version:   $Revision: 1.1.4.2 $
 Authors:   Daniele Giunchi
 
 ================================================================================
@@ -12,13 +12,6 @@ Copyright (c) 2007 Cineca, UK (www.cineca.it)
 All rights reserved.
 ===============================================================================*/
 
-#include "mafDefines.h" 
-//----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
-// This force to include Window,wxWidgets and VTK exactly in this order.
-// Failing in doing this will result in a run-time error saying:
-// "Failure#0: The value of ESP was not properly saved across a function call"
-//----------------------------------------------------------------------------
 #include "vtkMAFTextOrientator.h"
 #include "vtkMAFTextOrientatorTest.h"
 
@@ -36,8 +29,6 @@ All rights reserved.
 #include "vtkJPEGWriter.h"
 #include "vtkJPEGReader.h"
 #include "vtkPointData.h"
-
-#include "mafString.h"
 
 
 
@@ -73,7 +64,11 @@ void vtkMAFTextOrientatorTest::RenderData(vtkActor2D *actor)
 
   //renderWindowInteractor->Start();
   CompareImages(renderWindow);
-  mafSleep(2000);
+#ifdef WIN32
+  Sleep(2000);
+#else
+  usleep(2000*1000);
+#endif
 
 }
 //------------------------------------------------------------------
@@ -107,10 +102,10 @@ void vtkMAFTextOrientatorTest::TestText()
   SetText(actor);
 
   //test GetText
-  CPPUNIT_ASSERT(mafString(actor->GetTextLeft()).Equals("L"));
-  CPPUNIT_ASSERT(mafString(actor->GetTextDown()).Equals("D"));
-  CPPUNIT_ASSERT(mafString(actor->GetTextRight()).Equals("R"));
-  CPPUNIT_ASSERT(mafString(actor->GetTextUp()).Equals("U"));
+  CPPUNIT_ASSERT(strcmp(actor->GetTextLeft(),"L")==0);
+  CPPUNIT_ASSERT(strcmp(actor->GetTextDown(),"D")==0);
+  CPPUNIT_ASSERT(strcmp(actor->GetTextRight(),"R")==0);
+  CPPUNIT_ASSERT(strcmp(actor->GetTextUp(),"U")==0);
 
 
   RenderData(actor);
@@ -205,84 +200,80 @@ void vtkMAFTextOrientatorTest::CompareImages(vtkRenderWindow * renwin)
   name = name.substr(0, pointIndex);
 
 
-  mafString controlOriginFile;
-  controlOriginFile<<path.c_str();
-  controlOriginFile<<"\\";
-  controlOriginFile<<name.c_str();
-  controlOriginFile<<"_";
-  controlOriginFile<<"image";
-  controlOriginFile<<m_TestNumber;
-  controlOriginFile<<".jpg";
+  std::string controlOriginFile;
+  controlOriginFile+=(path.c_str());
+  controlOriginFile+=("\\");
+  controlOriginFile+=(name.c_str());
+  controlOriginFile+=("_");
+  controlOriginFile+=("image");
+  controlOriginFile+=vtkMAFTextOrientatorTest::ConvertInt(m_TestNumber).c_str();
+  controlOriginFile+=(".jpg");
 
   fstream controlStream;
-  controlStream.open(controlOriginFile.GetCStr()); 
+  controlStream.open(controlOriginFile.c_str()); 
 
   // visualization control
   renwin->OffScreenRenderingOn();
-  vtkWindowToImageFilter *w2i;
-  vtkNEW(w2i);
+  vtkWindowToImageFilter *w2i = vtkWindowToImageFilter::New();
   w2i->SetInput(renwin);
   //w2i->SetMagnification(magnification);
   w2i->Update();
   renwin->OffScreenRenderingOff();
 
   //write comparing image
-  vtkJPEGWriter *w;
-  vtkNEW(w);
+  vtkJPEGWriter *w = vtkJPEGWriter::New();
   w->SetInput(w2i->GetOutput());
-  mafString imageFile="";
+  std::string imageFile="";
 
   if(!controlStream)
   {
-    imageFile<<path.c_str();
-    imageFile<<"\\";
-    imageFile<<name.c_str();
-    imageFile<<"_";
-    imageFile<<"image";
+    imageFile+=(path.c_str());
+    imageFile+=("\\");
+    imageFile+=(name.c_str());
+    imageFile+=("_");
+    imageFile+=("image");
   }
   else
   {
-    imageFile<<path.c_str();
-    imageFile<<"\\";
-    imageFile<<name.c_str();
-    imageFile<<"_";
-    imageFile<<"comp";
+    imageFile+=(path.c_str());
+    imageFile+=("\\");
+    imageFile+=(name.c_str());
+    imageFile+=("_");
+    imageFile+=("comp");
   }
 
-  imageFile<<m_TestNumber;
-  imageFile<<".jpg";
-  w->SetFileName(imageFile.GetCStr());
+  imageFile+=vtkMAFTextOrientatorTest::ConvertInt(m_TestNumber).c_str();
+  imageFile+=(".jpg");
+  w->SetFileName(imageFile.c_str());
   w->Write();
 
   if(!controlStream)
   {
     controlStream.close();
-    vtkDEL(w);
-    vtkDEL(w2i);
+    w->Delete();
+    w2i->Delete();
     return;
   }
   controlStream.close();
 
   //read original Image
-  vtkJPEGReader *rO;
-  vtkNEW(rO);
-  mafString imageFileOrig="";
-  imageFileOrig<<path.c_str();
-  imageFileOrig<<"\\";
-  imageFileOrig<<name.c_str();
-  imageFileOrig<<"_";
-  imageFileOrig<<"image";
-  imageFileOrig<<m_TestNumber;
-  imageFileOrig<<".jpg";
-  rO->SetFileName(imageFileOrig.GetCStr());
+  vtkJPEGReader *rO = vtkJPEGReader::New();
+  std::string imageFileOrig="";
+  imageFileOrig+=(path.c_str());
+  imageFileOrig+=("\\");
+  imageFileOrig+=(name.c_str());
+  imageFileOrig+=("_");
+  imageFileOrig+=("image");
+  imageFileOrig+=vtkMAFTextOrientatorTest::ConvertInt(m_TestNumber).c_str();
+  imageFileOrig+=(".jpg");
+  rO->SetFileName(imageFileOrig.c_str());
   rO->Update();
 
   vtkImageData *imDataOrig = rO->GetOutput();
 
   //read compared image
-  vtkJPEGReader *rC;
-  vtkNEW(rC);
-  rC->SetFileName(imageFile.GetCStr());
+  vtkJPEGReader *rC = vtkJPEGReader::New();
+  rC->SetFileName(imageFile.c_str());
   rC->Update();
 
   vtkImageData *imDataComp = rC->GetOutput();
@@ -300,10 +291,18 @@ void vtkMAFTextOrientatorTest::CompareImages(vtkRenderWindow * renwin)
   CPPUNIT_ASSERT(srR[0] == 0.0 && srR[1] == 0.0);
 
   // end visualization control
-  vtkDEL(rO);
-  vtkDEL(rC);
-  vtkDEL(imageMath);
+  rO->Delete();
+  rC->Delete();
+  imageMath->Delete();
 
-  vtkDEL(w);
-  vtkDEL(w2i);
+  w->Delete();
+  w2i->Delete();
+}
+//--------------------------------------------------
+std::string vtkMAFTextOrientatorTest::ConvertInt(int number)
+//--------------------------------------------------
+{
+  std::stringstream stringStream;
+  stringStream << number;//add number to the stream
+  return stringStream.str();//return a string with the contents of the stream
 }

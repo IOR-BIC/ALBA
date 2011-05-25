@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataVector.h,v $
   Language:  C++
-  Date:      $Date: 2010-12-15 15:34:23 $
-  Version:   $Revision: 1.8.2.2 $
+  Date:      $Date: 2011-05-25 11:52:18 $
+  Version:   $Revision: 1.8.2.3 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,6 +22,11 @@
 #include "mafEventSender.h"
 #include "mafVMEItem.h"
 
+#ifdef MAF_EXPORTS
+#include "mafDllMacros.h"
+EXPORT_STL_MAP(MAF_EXPORT,mafTimeStamp, mafAutoPointer<mafVMEItem>);
+#endif
+
 //------------------------------------------------------------------------------
 // Forward declarations
 //------------------------------------------------------------------------------
@@ -38,11 +43,9 @@
 class MAF_EXPORT mafDataVector : public mafTimeMap<mafVMEItem>, public mafObserver, public mafStorable, public mafEventSender
 {
 public:
+
   mafDataVector();  
   virtual ~mafDataVector();
-
-  /** Event ID used to know if the VME should serialize itself as a single or multiple binary files.*/
-  MAF_ID_DEC(SINGLE_FILE_DATA);
 
   mafTypeMacro(mafDataVector,mafTimeMap<mafVMEItem>);
 
@@ -102,6 +105,8 @@ public:
   Allow to perform a DeepCopy with data very large.
   Release memory of the input mafNode. */
   void DeepCopyVmeLarge(mafDataVector *o);
+
+  static mafID GetSingleFileDataId();
 
 protected:
  

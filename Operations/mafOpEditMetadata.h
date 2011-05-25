@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpEditMetadata.h,v $
   Language:  C++
-  Date:      $Date: 2010-01-13 16:12:18 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 11:49:23 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,7 +29,7 @@ class mafTagItem;
 // mafOpEditMetadata :
 //----------------------------------------------------------------------------
 /** */
-class mafOpEditMetadata: public mafOp
+class MAF_EXPORT mafOpEditMetadata: public mafOp
 {
 public:
   mafOpEditMetadata(const wxString &label = "EditMetadata");

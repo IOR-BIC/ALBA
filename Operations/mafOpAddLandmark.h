@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpAddLandmark.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:45:06 $
-  Version:   $Revision: 1.2.2.2 $
+  Date:      $Date: 2011-05-25 11:49:21 $
+  Version:   $Revision: 1.2.2.3 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,10 +32,15 @@ class mafInteractor;
 class mafInteractorPicker;
 class mafGUINamedPanel;
 class mafGUIDictionaryWidget;
+
+#ifdef MAF_EXPORTS
+#include "mafDllMacros.h"
+EXPORT_STL_VECTOR(MAF_EXPORT,mafVMELandmark*);
+#endif
 //----------------------------------------------------------------------------
 // mafOpAddLandmark :
 //----------------------------------------------------------------------------
-class mafOpAddLandmark: public mafOp
+class MAF_EXPORT mafOpAddLandmark: public mafOp
 {
 public:
 	mafOpAddLandmark(const wxString &label = "AddLandmark");

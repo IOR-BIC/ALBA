@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpImporterRAWVolume.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:51 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2011-05-25 11:49:23 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -33,7 +33,7 @@ class vtkWindowLevelLookupTable;
 //----------------------------------------------------------------------------
 // mafOpImporterRAWVolume :
 //----------------------------------------------------------------------------
-class mafOpImporterRAWVolume: public mafOp
+class MAF_EXPORT mafOpImporterRAWVolume: public mafOp
 {
 public:
              

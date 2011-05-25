@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpMAFTransform.h,v $
   Language:  C++
-  Date:      $Date: 2010-02-10 14:25:14 $
-  Version:   $Revision: 1.2.2.1 $
+  Date:      $Date: 2011-05-25 11:49:23 $
+  Version:   $Revision: 1.2.2.2 $
   Authors:   Stefano Perticoni        
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,7 +36,7 @@ class mafNode;
 Transform a vme using constrains 
 */
 
-class mafOpMAFTransform : public mafOpTransformInterface
+class MAF_EXPORT mafOpMAFTransform : public mafOpTransformInterface
 {
 public:
   mafOpMAFTransform(const wxString &label = "Transform  \tCtrl+T");

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeFactoryVME.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-03 15:20:11 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2011-05-25 11:52:18 $
+  Version:   $Revision: 1.1.24.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -32,7 +32,7 @@ public:
   virtual const char* GetMAFSourceVersion() const;
   virtual const char* GetDescription() const;
   
-  static mafPipeFactoryVME *GetInstance() {if (!m_Instance) Initialize(); return m_Instance;}
+  static mafPipeFactoryVME *GetInstance(); //{if (!m_Instance) Initialize(); return m_Instance;}
 
   /* Initialize the factory creating and registering a new instance */
   static int Initialize();
@@ -40,8 +40,10 @@ public:
 protected:
   mafPipeFactoryVME();
   ~mafPipeFactoryVME() { }
+
+  static bool m_Initialized;
   
-  static mafPipeFactoryVME *m_Instance;
+  //static mafPipeFactoryVME *m_Instance;
 
 private:
   mafPipeFactoryVME(const mafPipeFactoryVME&);  // Not implemented.

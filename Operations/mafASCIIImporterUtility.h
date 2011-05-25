@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafASCIIImporterUtility.h,v $
 Language:  C++
-Date:      $Date: 2009-07-16 14:19:42 $
-Version:   $Revision: 1.2.12.1 $
+Date:      $Date: 2011-05-25 11:49:21 $
+Version:   $Revision: 1.2.12.2 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -13,6 +13,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #ifndef __mafASCIIImporterUtility_h
 #define __mafASCIIImporterUtility_h
 
+#include "mafDefines.h"
 #include <vnl/vnl_matrix.h>
 #include <vector>
 
@@ -20,7 +21,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
   Class Name: mafASCIIImporterUtility.
   Tool based on VNL for extract information from matrix.
 */
-class mafASCIIImporterUtility
+class MAF_EXPORT mafASCIIImporterUtility
 {
 public:
   /** constructor.*/

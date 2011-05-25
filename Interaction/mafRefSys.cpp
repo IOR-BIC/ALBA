@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRefSys.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-21 15:56:49 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2011-05-25 11:48:21 $
+  Version:   $Revision: 1.6.10.1 $
   Authors:   Marco Petrone, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -127,7 +127,7 @@ mafTransformBase *mafRefSys::GetTransform()
   switch (m_Type)
   {
   case CUSTOM:
-    return m_Transform.GetPointer()?m_Transform.GetPointer():m_Identity.GetPointer();
+    return m_Transform?m_Transform:(mafTransformBase*)m_Identity;
   case GLOBAL: 
     return m_Identity;
   case PARENT: 
@@ -151,7 +151,7 @@ mafTransformBase *mafRefSys::GetTransform()
     // 
 
     */
-    return m_Transform.GetPointer()?m_Transform.GetPointer():m_Identity;
+    return m_Transform?m_Transform:(mafTransformBase*)m_Identity;
   }
   return m_Identity;
 }

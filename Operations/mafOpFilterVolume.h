@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpFilterVolume.h,v $
   Language:  C++
-  Date:      $Date: 2010-01-26 11:43:12 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 11:49:23 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -25,7 +25,7 @@ class mafEvent;
 // mafOpFilterVolume :
 //----------------------------------------------------------------------------
 /** */
-class mafOpFilterVolume: public mafOp
+class MAF_EXPORT mafOpFilterVolume: public mafOp
 {
 public:
 	mafOpFilterVolume(const wxString &label = "FilterVolume");

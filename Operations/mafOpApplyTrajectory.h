@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpApplyTrajectory.h,v $
   Language:  C++
-  Date:      $Date: 2010-12-01 14:04:23 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2011-05-25 11:49:21 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Roberto Mucci, Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2004
@@ -31,7 +31,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
     Modified 30/11/2010 by Simone Brazzale:
     Added possibility to apply roto-translation from a time-varying VME to a static VME */
 
-class mafOpApplyTrajectory : public mafOp
+class MAF_EXPORT mafOpApplyTrajectory : public mafOp
 {
 public:
   //----------------------------------------------------------------------------

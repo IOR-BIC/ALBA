@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractorExtractIsosurface.h,v $
   Language:  C++
-  Date:      $Date: 2010-03-16 09:43:54 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2011-05-25 11:48:21 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Paolo Quadrani & Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -26,7 +26,7 @@ class vtkCamera;
   This class implements a mouse move of the renderer camera in the scene. The interaction
   modality is a mouse manipulation, where movements of the mouse are mapped
   into movements of the camera. More details to be written...*/
-class mafInteractorExtractIsosurface : public mafInteractorCameraMove
+class MAF_EXPORT mafInteractorExtractIsosurface : public mafInteractorCameraMove
 {
 public:
   mafTypeMacro(mafInteractorExtractIsosurface,mafInteractorCameraMove);

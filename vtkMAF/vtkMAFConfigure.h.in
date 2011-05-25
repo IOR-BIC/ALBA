@@ -14,7 +14,7 @@ wishing to create their own VTK classes locally.
 #endif
 
 #if defined(_WIN32) && defined(@PROJECT_NAME@_SHARED)
-# if defined(@PROJECT_NAME@_EXPORTS)
+# if defined(VTK_@PROJECT_NAME@_EXPORTS)
 #  define VTK_@PROJECT_NAME@_EXPORT __declspec( dllexport ) 
 # else
 #  define VTK_@PROJECT_NAME@_EXPORT __declspec( dllimport ) 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpCreateMeter.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:51 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2011-05-25 11:49:23 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -25,7 +25,7 @@ class mafEvent;
 // mafOpCreateMeter :
 //----------------------------------------------------------------------------
 /** */
-class mafOpCreateMeter: public mafOp
+class MAF_EXPORT mafOpCreateMeter: public mafOp
 {
 public:
   mafOpCreateMeter(const wxString &label = "CreateMeter");

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeMesh.h,v $
 Language:  C++
-Date:      $Date: 2009-09-08 13:03:47 $
-Version:   $Revision: 1.7.2.1 $
+Date:      $Date: 2011-05-25 11:52:18 $
+Version:   $Revision: 1.7.2.2 $
 Authors:   Daniele Giunchi , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -33,7 +33,7 @@ class mafGUIMaterialButton;
 //----------------------------------------------------------------------------
 // mafPipeMesh :
 //----------------------------------------------------------------------------
-class mafPipeMesh : public mafPipe
+class MAF_EXPORT mafPipeMesh : public mafPipe
 {
 public:
 	mafTypeMacro(mafPipeMesh,mafPipe);

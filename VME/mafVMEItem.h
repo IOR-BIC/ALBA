@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItem.h,v $
   Language:  C++
-  Date:      $Date: 2010-12-15 15:34:23 $
-  Version:   $Revision: 1.20.2.3 $
+  Date:      $Date: 2011-05-25 11:52:18 $
+  Version:   $Revision: 1.20.2.4 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -91,8 +91,8 @@ public:
   /** release data from memory */
   virtual void ReleaseData()=0;
 
-  mafVMEItem(const mafVMEItem&);
-  void operator=(const mafVMEItem&);
+  mafVMEItem(const mafVMEItem&){};
+  void operator=(const mafVMEItem&){};
 
   /**
     return true if the data stored in this object has been
@@ -195,8 +195,8 @@ public:
   /**
     Set/Get the flag for enabling comparison of dataset internal data in the
     Equals() function. This is a global flag impacting all mafVMEItem instances.*/
-  static void SetGlobalCompareDataFlag(bool f) {m_GlobalCompareDataFlag=f;}
-  static int GetGlobalCompareDataFlag() {return m_GlobalCompareDataFlag;}
+  static void SetGlobalCompareDataFlag(bool f);
+  static bool* GetGlobalCompareDataFlag();
   static void GlobalCompareDataFlagOn() {SetGlobalCompareDataFlag(true);}
   static void GlobalCompareDataFlagOff() {SetGlobalCompareDataFlag(false);}
 
@@ -295,7 +295,7 @@ protected:
 
   mafTagArray * m_TagArray;             ///< meta data attributes attached to this dataset      
   bool          m_DataModified;         ///< true when data has been modified from last storing
-  static bool   m_GlobalCompareDataFlag;///< if true Equals will also compare internal data
+  // static bool   m_GlobalCompareDataFlag;///< if true Equals will also compare internal data
 
   bool          m_ReleaseOldFile;       ///< whether to release the old VTK file when data filename changes (set by mafDataVector::InternalStore() ) 
 

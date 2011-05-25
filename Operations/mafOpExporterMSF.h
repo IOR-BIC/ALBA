@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpExporterMSF.h,v $
   Language:  C++
-  Date:      $Date: 2009-10-08 07:30:52 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2011-05-25 11:49:23 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -29,7 +29,7 @@ class mafEvent;
 // mafOpExporterMSF :
 //----------------------------------------------------------------------------
 /** */
-class mafOpExporterMSF: public mafOp
+class MAF_EXPORT mafOpExporterMSF: public mafOp
 {
 public:
   mafOpExporterMSF(const wxString &label = "MSFExporter");

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafScalarVector.h,v $
   Language:  C++
-  Date:      $Date: 2008-01-24 12:20:27 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2011-05-25 11:52:18 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -16,6 +16,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
+#include "mafTimeMapScalar.h"
 #include "mafTimeMapScalar.txx"
 #include "mafStorable.h"
 #include "mafStorageElement.h"
@@ -23,6 +24,12 @@
 //------------------------------------------------------------------------------
 // Forward declarations
 //------------------------------------------------------------------------------
+
+
+#ifdef MAF_EXPORTS
+#include "mafDllMacros.h"
+EXPORT_STL_MAP(MAF_EXPORT,mafTimeStamp, double);
+#endif
 
 
 /** a dynamic associative sorted vector of scalar values indexed by their "timestamp".*/

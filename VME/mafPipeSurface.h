@@ -2,8 +2,13 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.h,v $
   Language:  C++
-  Date:      $Date: 2011-04-15 09:58:45 $
-  Version:   $Revision: 1.29.2.2 $
+<<<<<<< mafPipeSurface.h
+  Date:      $Date: 2011-05-25 11:52:18 $
+  Version:   $Revision: 1.29.2.3 $
+=======
+  Date:      $Date: 2011-05-25 11:52:18 $
+  Version:   $Revision: 1.29.2.3 $
+>>>>>>> 1.29.2.1.4.1
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -47,7 +52,7 @@ Shared documentation:
 https://docs.google.com/a/scsitaly.com/document/d/1j_AtB2aB3cwph6Tpi4QzjQYysOxPMbXBCgE3ZyLiS3M/edit?hl=en#
 
 */
-class mafPipeSurface : public mafPipe
+class MAF_EXPORT mafPipeSurface : public mafPipe
 {
 public:
   mafTypeMacro(mafPipeSurface,mafPipe);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractorSelectCell.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:46:40 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 11:48:21 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -41,7 +41,7 @@ class vtkCamera;
 
 
 */
-class mafInteractorSelectCell : public mafInteractorCameraMove
+class MAF_EXPORT mafInteractorSelectCell : public mafInteractorCameraMove
 {
 public:
   mafTypeMacro(mafInteractorSelectCell,mafInteractorCameraMove);

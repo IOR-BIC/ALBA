@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataVector.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-12-15 15:34:23 $
-  Version:   $Revision: 1.19.2.4 $
+  Date:      $Date: 2011-05-25 11:52:18 $
+  Version:   $Revision: 1.19.2.5 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -43,7 +43,8 @@
 //------------------------------------------------------------------------------
 // Events
 //------------------------------------------------------------------------------
-MAF_ID_IMP(mafDataVector::SINGLE_FILE_DATA);
+/** Event ID used to know if the VME should serialize itself as a single or multiple binary files.*/
+// static const mafID m_SingleFileDataId = mmuIdFactory::GetNextId("SINGLE_FILE_DATA");
 
 //-----------------------------------------------------------------------
 mafCxxTypeMacro(mafDataVector)
@@ -71,7 +72,13 @@ mafDataVector::~mafDataVector()
     it->second->SetListener(NULL); // detach items before destroying
   }
 }
-
+//-------------------------------------------------------------------------
+mafID mafDataVector::GetSingleFileDataId()
+//-------------------------------------------------------------------------
+{
+  static const mafID singleFileDataId = mmuIdFactory::GetNextId("SINGLE_FILE_DATA");
+  return singleFileDataId;
+}
 //-------------------------------------------------------------------------
 bool mafDataVector::GetCrypting()
 //-------------------------------------------------------------------------

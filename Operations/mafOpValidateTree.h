@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpValidateTree.h,v $
   Language:  C++
-  Date:      $Date: 2010-04-19 10:51:10 $
-  Version:   $Revision: 1.3.2.3 $
+  Date:      $Date: 2011-05-25 11:49:23 $
+  Version:   $Revision: 1.3.2.4 $
   Authors:   Paolo Quadrani , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -23,6 +23,11 @@ using namespace std;
 //----------------------------------------------------------------------------
 class mafNode;
 
+#ifdef MAF_EXPORTS
+#include "mafDllMacros.h"
+EXPORT_STL_SET(MAF_EXPORT,string);
+#endif
+
 //----------------------------------------------------------------------------
 // mafOpValidateTree :
 //----------------------------------------------------------------------------
@@ -41,7 +46,7 @@ Sample usage:
   
 Check returnValue against VALIDATE_RETURN_VALUES
 */
-class mafOpValidateTree: public mafOp
+class MAF_EXPORT mafOpValidateTree: public mafOp
 {
 public:
   /** constructor */

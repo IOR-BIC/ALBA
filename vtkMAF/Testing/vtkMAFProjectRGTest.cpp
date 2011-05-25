@@ -2,24 +2,15 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFProjectRGTest.cpp,v $
 Language:  C++
-Date:      $Date: 2009-07-26 08:17:36 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-05-25 11:53:13 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
 CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#include "mafDefines.h" 
-//----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
-// This force to include Window,wxWidgets and VTK exactly in this order.
-// Failing in doing this will result in a run-time error saying:
-// "Failure#0: The value of ESP was not properly saved across a function call"
-//----------------------------------------------------------------------------
 #include <cppunit/config/SourcePrefix.h>
-
-#include "mafString.h"
 
 #include "vtkMAFProjectRGTest.h"
 #include "vtkMAFProjectRG.h"
@@ -49,7 +40,7 @@ void vtkMAFProjectRGTest::TestDynamicAllocation()
 {
   vtkMAFSmartPointer<vtkMAFProjectRG> filter;
   vtkMAFProjectRG *filter2 = vtkMAFProjectRG::New();
-  vtkDEL(filter2);
+  filter2->Delete();
 }
 //--------------------------------------------------
 void vtkMAFProjectRGTest::TestExecutionProjectionModeToX()
@@ -145,7 +136,7 @@ void vtkMAFProjectRGTest::TestExecutionProjectionModeToX()
     CPPUNIT_ASSERT(value1 == value2);
   }
 
-  CPPUNIT_ASSERT(mafString(filter->GetProjectionModeAsString()).Equals("X"));
+  CPPUNIT_ASSERT(strcmp(filter->GetProjectionModeAsString(),"X")==0);
   CPPUNIT_ASSERT(filter->GetProjectionMode() == VTK_PROJECT_FROM_X );
 }
 //--------------------------------------------------
@@ -238,7 +229,7 @@ void vtkMAFProjectRGTest::TestExecutionProjectionModeToY()
     float value2 = projectedRG->GetPointData()->GetScalars()->GetTuple1(j);
     CPPUNIT_ASSERT(value1 == value2);
   }
-  CPPUNIT_ASSERT(mafString(filter->GetProjectionModeAsString()).Equals("Y"));
+  CPPUNIT_ASSERT(strcmp(filter->GetProjectionModeAsString(),"Y")==0);
   CPPUNIT_ASSERT(filter->GetProjectionMode() == VTK_PROJECT_FROM_Y );
 }
 //--------------------------------------------------
@@ -334,7 +325,7 @@ void vtkMAFProjectRGTest::TestExecutionProjectionModeToZ()
     float value2 = projectedRG->GetPointData()->GetScalars()->GetTuple1(j);
     CPPUNIT_ASSERT(value1 == value2);
   }
-  CPPUNIT_ASSERT(mafString(filter->GetProjectionModeAsString()).Equals("Z"));
+  CPPUNIT_ASSERT(strcmp(filter->GetProjectionModeAsString(),"Z")==0);
   CPPUNIT_ASSERT(filter->GetProjectionMode() == VTK_PROJECT_FROM_Z );
 }
 //--------------------------------------------------

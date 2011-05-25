@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractorConstraint.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:46:39 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 11:48:21 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Marco Petrone, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -16,6 +16,7 @@
 #include "mafInteractorConstraint.h"
 #include "mafAbsMatrixPipe.h"
 #include "mafIndent.h"
+#include "mafRefSys.h"
 
 #include "vtkDoubleArray.h"
 #include <assert.h>
@@ -301,7 +302,12 @@ int mafInteractorConstraint::GetConstraintPlane()
   }
   return -1;
 }
-
+//----------------------------------------------------------------------------
+mafRefSys* mafInteractorConstraint::GetRefSys()
+//----------------------------------------------------------------------------
+{
+  return m_RefSys;
+}
 //----------------------------------------------------------------------------
 int mafInteractorConstraint::GetConstraintPlaneAxes(int& axis1, int& axis2)
 //----------------------------------------------------------------------------

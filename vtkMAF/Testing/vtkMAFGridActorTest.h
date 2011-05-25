@@ -3,8 +3,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFGridActorTest.h,v $
 Language:  C++
-Date:      $Date: 2009-06-19 12:48:42 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-05-25 11:53:13 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Daniele Giunchi
 
 ================================================================================
@@ -88,6 +88,8 @@ class vtkMAFGridActorTest : public CPPUNIT_NS::TestFixture
     void RenderData(vtkActor *actor );
     /** After saving images from render window, compare them in order to find difference between test sessions. */
     void CompareImages(vtkRenderWindow * renwin);
+    /** Convert an int to std::string */
+    static std::string ConvertInt(int number);
 
     int m_TestNumber;
 };

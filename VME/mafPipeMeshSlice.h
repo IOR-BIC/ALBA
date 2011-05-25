@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeMeshSlice.h,v $
 Language:  C++
-Date:      $Date: 2008-07-25 07:05:59 $
-Version:   $Revision: 1.9 $
+Date:      $Date: 2011-05-25 11:52:18 $
+Version:   $Revision: 1.9.2.1 $
 Authors:   Daniele Giunchi , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -41,7 +41,7 @@ class vtkPolyDataNormals;
 // TODO: REFACTOR THIS (Note by Stefano) 
 // This class need some cleanup: there are really too many Update methods in cpp file...
 
-class mafPipeMeshSlice : public mafPipe
+class MAF_EXPORT mafPipeMeshSlice : public mafPipe
 {
 public:
 	mafTypeMacro(mafPipeMeshSlice,mafPipe);

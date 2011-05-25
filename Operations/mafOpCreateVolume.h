@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpCreateVolume.h,v $
   Language:  C++
-  Date:      $Date: 2008-12-10 10:16:17 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 11:49:23 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -25,7 +25,7 @@ class mafVMEVolumeGray;
 //----------------------------------------------------------------------------
 /** Operation used to create a mafVolumeGray containing the vtkStructuredPoint
 dataset filled with a constant scalar value. This is useful for testing purposes.*/
-class mafOpCreateVolume: public mafOp
+class MAF_EXPORT mafOpCreateVolume: public mafOp
 {
 public:
   mafOpCreateVolume(const wxString &label = "Create Volume");

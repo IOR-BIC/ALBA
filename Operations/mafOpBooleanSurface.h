@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafOpBooleanSurface.h,v $
 Language:  C++
-Date:      $Date: 2009-12-17 11:45:06 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-05-25 11:49:21 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Daniele Giunchi - Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -31,11 +31,16 @@ class mafVMEGizmo;
 class mafInteractorCompositorMouse;
 class mafInteractorGenericMouse;
 
+#ifdef MAF_EXPORTS
+#include "mafDllMacros.h"
+EXPORT_STL_VECTOR(MAF_EXPORT,vtkPolyData*);
+#endif
+
 //----------------------------------------------------------------------------
 // mafOpBooleanSurface :
 //----------------------------------------------------------------------------
 /** */
-class mafOpBooleanSurface: public mafOp
+class MAF_EXPORT mafOpBooleanSurface: public mafOp
 {
 public:
 	mafOpBooleanSurface(const wxString &label = "FilterSurface");

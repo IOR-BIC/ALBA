@@ -3,8 +3,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFTransferFunction2DTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-04-12 10:07:41 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-05-25 11:53:13 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Alberto Losi
 
 ================================================================================
@@ -12,20 +12,10 @@ Copyright (c) 2007 Cineca, UK (www.cineca.it)
 All rights reserved.
 ===============================================================================*/
 
-#include "mafDefines.h" 
-//----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
-// This force to include Window,wxWidgets and VTK exactly in this order.
-// Failing in doing this will result in a run-time error saying:
-// "Failure#0: The value of ESP was not properly saved across a function call"
-//----------------------------------------------------------------------------
-
 #include <cppunit/config/SourcePrefix.h>
 
 #include "vtkMAFTransferFunction2D.h"
 #include "vtkMAFTransferFunction2DTest.h"
-
-#include "mafString.h"
 
 //----------------------------------------------------------------------------
 void vtkMAFTransferFunction2DTest::setUp()
@@ -48,33 +38,25 @@ void vtkMAFTransferFunction2DTest::TestDynamicAllocation()
 {
   vtkMAFTransferFunction2D *test1 = vtkMAFTransferFunction2D::New();
   test1->Delete();
-
-  vtkMAFTransferFunction2D *test2;
-  vtkNEW(test2);
-
-  vtkDEL(test2);
 }
 //----------------------------------------------------------------------------
 void vtkMAFTransferFunction2DTest::TetsInitialize()
 //----------------------------------------------------------------------------
 {
-  vtkMAFTransferFunction2D *test;
-  vtkNEW(test);
+  vtkMAFTransferFunction2D *test = vtkMAFTransferFunction2D::New();
 
   test->Initialize();
 
   // Nothing to test
 
-  vtkDEL(test);
+  test->Delete();
 }
 //----------------------------------------------------------------------------
 void vtkMAFTransferFunction2DTest::TestDeepCopy()
 //----------------------------------------------------------------------------
 {
-  vtkMAFTransferFunction2D *test1;
-  vtkMAFTransferFunction2D *test2;
-  vtkNEW(test1);
-  vtkNEW(test2);
+  vtkMAFTransferFunction2D *test1 = vtkMAFTransferFunction2D::New();
+  vtkMAFTransferFunction2D *test2 = vtkMAFTransferFunction2D::New();
 
   test1->Initialize();
   test2->Initialize();
@@ -124,19 +106,17 @@ void vtkMAFTransferFunction2DTest::TestDeepCopy()
   // Equals is not defined so the strings representing the objects are compared
   CPPUNIT_ASSERT(strcmp(new_string,to_string) == 0);
 
-  cppDEL(to_string);
-  cppDEL(new_string);
-  vtkDEL(test1);
-  vtkDEL(test2);
+  delete to_string;
+  delete new_string;
+  test1->Delete();
+  test2->Delete();
 }
 //----------------------------------------------------------------------------
 void vtkMAFTransferFunction2DTest::TestShallowCopy()
 //----------------------------------------------------------------------------
 {
-  vtkMAFTransferFunction2D *test1;
-  vtkMAFTransferFunction2D *test2;
-  vtkNEW(test1);
-  vtkNEW(test2);
+  vtkMAFTransferFunction2D *test1 = vtkMAFTransferFunction2D::New();
+  vtkMAFTransferFunction2D *test2 = vtkMAFTransferFunction2D::New();
 
   test1->Initialize();
 
@@ -185,29 +165,28 @@ void vtkMAFTransferFunction2DTest::TestShallowCopy()
   // Equals is not defined so the strings representing the objects are compared
   CPPUNIT_ASSERT(strcmp(new_string,to_string) == 0);
 
-  cppDEL(to_string);
-  cppDEL(new_string);
-  vtkDEL(test1);
-  vtkDEL(test2);
+  delete to_string;
+  delete new_string;
+  
+  test1->Delete();
+  test2->Delete();
 }
 //----------------------------------------------------------------------------
 void vtkMAFTransferFunction2DTest::TestGetDataObjectType()
 //----------------------------------------------------------------------------
 {
-  vtkMAFTransferFunction2D *test;
-  vtkNEW(test);
+  vtkMAFTransferFunction2D *test = vtkMAFTransferFunction2D::New();
 
   CPPUNIT_ASSERT(test->GetDataObjectType() == VTK_TRANSFER_FUNCTION_2D);
 
-  vtkDEL(test);
+  test->Delete();
 
 }
 //----------------------------------------------------------------------------
 void vtkMAFTransferFunction2DTest::TestGetNumberOfWidgets()
 //----------------------------------------------------------------------------
 {
-  vtkMAFTransferFunction2D *test;
-  vtkNEW(test);
+  vtkMAFTransferFunction2D *test = vtkMAFTransferFunction2D::New();
   test->Initialize();
 
   CPPUNIT_ASSERT(test->GetNumberOfWidgets() == 0);
@@ -231,14 +210,13 @@ void vtkMAFTransferFunction2DTest::TestGetNumberOfWidgets()
 
   CPPUNIT_ASSERT(test->GetNumberOfWidgets() == 3);
 
-  vtkDEL(test);
+  test->Delete();
 }
 //----------------------------------------------------------------------------
 void vtkMAFTransferFunction2DTest::TestAddRemoveWidget()
 //----------------------------------------------------------------------------
 {
-  vtkMAFTransferFunction2D *test;
-  vtkNEW(test);
+  vtkMAFTransferFunction2D *test = vtkMAFTransferFunction2D::New();
   test->Initialize();
 
   tfWidget widget;
@@ -260,14 +238,13 @@ void vtkMAFTransferFunction2DTest::TestAddRemoveWidget()
   test->RemoveWidget(0);
   CPPUNIT_ASSERT(test->GetNumberOfWidgets() == 0);
 
-  vtkDEL(test);
+  test->Delete();
 }
 //----------------------------------------------------------------------------
 void vtkMAFTransferFunction2DTest::TestSetGetWidget()
 //----------------------------------------------------------------------------
 {
-  vtkMAFTransferFunction2D *test;
-  vtkNEW(test);
+  vtkMAFTransferFunction2D *test = vtkMAFTransferFunction2D::New();
   test->Initialize();
 
   tfWidget widget;
@@ -301,14 +278,13 @@ void vtkMAFTransferFunction2DTest::TestSetGetWidget()
   CPPUNIT_ASSERT(ret_widget.Diffuse == widget.Diffuse);
   CPPUNIT_ASSERT(ret_widget.Visible == widget.Visible);
 
-  vtkDEL(test);
+  test->Delete();
 }
 //----------------------------------------------------------------------------
 void vtkMAFTransferFunction2DTest::TestSetGetWidgetName()
 //----------------------------------------------------------------------------
 {
-  vtkMAFTransferFunction2D *test;
-  vtkNEW(test);
+  vtkMAFTransferFunction2D *test = vtkMAFTransferFunction2D::New();
   test->Initialize();
 
   tfWidget widget;
@@ -327,15 +303,14 @@ void vtkMAFTransferFunction2DTest::TestSetGetWidgetName()
   test->SetWidgetName(0,"test_widget_name");
   CPPUNIT_ASSERT(strcmp(test->GetWidgetName(0),"test_widget_name") == 0);
 
-  vtkDEL(test);
+  test->Delete();
 
 }
 //----------------------------------------------------------------------------
 void vtkMAFTransferFunction2DTest::TestSetGetWidgetVisibility()
 //----------------------------------------------------------------------------
 {
-  vtkMAFTransferFunction2D *test;
-  vtkNEW(test);
+  vtkMAFTransferFunction2D *test = vtkMAFTransferFunction2D::New();
   test->Initialize();
 
   tfWidget widget;
@@ -354,14 +329,13 @@ void vtkMAFTransferFunction2DTest::TestSetGetWidgetVisibility()
   test->SetWidgetVisibility(0,false);
   CPPUNIT_ASSERT(test->GetWidgetVisibility(0) == false);
 
-  vtkDEL(test);
+  test->Delete();
 }
 //----------------------------------------------------------------------------
 void vtkMAFTransferFunction2DTest::TestSetGetWidgetOpacity()
 //----------------------------------------------------------------------------
 {
-  vtkMAFTransferFunction2D *test;
-  vtkNEW(test);
+  vtkMAFTransferFunction2D *test = vtkMAFTransferFunction2D::New();
   test->Initialize();
 
   tfWidget widget;
@@ -380,14 +354,13 @@ void vtkMAFTransferFunction2DTest::TestSetGetWidgetOpacity()
   test->SetWidgetOpacity(0,.3);
   CPPUNIT_ASSERT(test->GetWidgetOpacity(0) == .3);
 
-  vtkDEL(test);
+  test->Delete();
 }
 //----------------------------------------------------------------------------
 void vtkMAFTransferFunction2DTest::TestSetGetWidgetColor()
 //----------------------------------------------------------------------------
 {
-  vtkMAFTransferFunction2D *test;
-  vtkNEW(test);
+  vtkMAFTransferFunction2D *test = vtkMAFTransferFunction2D::New();
   test->Initialize();
 
   tfWidget widget;
@@ -415,14 +388,13 @@ void vtkMAFTransferFunction2DTest::TestSetGetWidgetColor()
   CPPUNIT_ASSERT(ret_color[1] == color[1]);
   CPPUNIT_ASSERT(ret_color[2] == color[2]);
 
-  vtkDEL(test);
+  test->Delete();
 }
 //----------------------------------------------------------------------------
 void vtkMAFTransferFunction2DTest::TestSetGetWidgetDiffuse()
 //----------------------------------------------------------------------------
 {
-  vtkMAFTransferFunction2D *test;
-  vtkNEW(test);
+  vtkMAFTransferFunction2D *test = vtkMAFTransferFunction2D::New();
   test->Initialize();
 
   tfWidget widget;
@@ -441,14 +413,13 @@ void vtkMAFTransferFunction2DTest::TestSetGetWidgetDiffuse()
   test->SetWidgetDiffuse(0,.3);
   CPPUNIT_ASSERT(test->GetWidgetDiffuse(0) == .3);
 
-  vtkDEL(test);
+  test->Delete();
 }
 //----------------------------------------------------------------------------
 void vtkMAFTransferFunction2DTest::TestSetGetWidgetValueRatio()
 //----------------------------------------------------------------------------
 {
-  vtkMAFTransferFunction2D *test;
-  vtkNEW(test);
+  vtkMAFTransferFunction2D *test = vtkMAFTransferFunction2D::New();
   test->Initialize();
 
   tfWidget widget;
@@ -467,14 +438,13 @@ void vtkMAFTransferFunction2DTest::TestSetGetWidgetValueRatio()
   test->SetWidgetValueRatio(0,.3);
   CPPUNIT_ASSERT(test->GetWidgetValueRatio(0) == .3);
 
-  vtkDEL(test);
+  test->Delete();
 }
 //----------------------------------------------------------------------------
 void vtkMAFTransferFunction2DTest::TestSetGetWidgetValueRange()
 //----------------------------------------------------------------------------
 {
-  vtkMAFTransferFunction2D *test;
-  vtkNEW(test);
+  vtkMAFTransferFunction2D *test = vtkMAFTransferFunction2D::New();
   test->Initialize();
 
   tfWidget widget;
@@ -504,14 +474,13 @@ void vtkMAFTransferFunction2DTest::TestSetGetWidgetValueRange()
   CPPUNIT_ASSERT(ret_range[1] == range[1]);
   CPPUNIT_ASSERT(ret_range[2] == range[2]);
 
-  vtkDEL(test);
+  test->Delete();
 }
 //----------------------------------------------------------------------------
 void vtkMAFTransferFunction2DTest::TestSetGetWidgetGradientRange()
 //----------------------------------------------------------------------------
 {
-  vtkMAFTransferFunction2D *test;
-  vtkNEW(test);
+  vtkMAFTransferFunction2D *test = vtkMAFTransferFunction2D::New();
   test->Initialize();
 
   tfWidget widget;
@@ -541,14 +510,14 @@ void vtkMAFTransferFunction2DTest::TestSetGetWidgetGradientRange()
   CPPUNIT_ASSERT(ret_range[1] == range[1]);
   CPPUNIT_ASSERT(ret_range[2] == range[2]);
 
-  vtkDEL(test);
+  test->Delete();
 }
 //----------------------------------------------------------------------------
 void vtkMAFTransferFunction2DTest::TestSetGetWidgetGradientInterpolation()
 //----------------------------------------------------------------------------
 {
-  vtkMAFTransferFunction2D *test;
-  vtkNEW(test);
+  vtkMAFTransferFunction2D *test = vtkMAFTransferFunction2D::New();
+  
   test->Initialize();
 
   tfWidget widget;
@@ -573,14 +542,14 @@ void vtkMAFTransferFunction2DTest::TestSetGetWidgetGradientInterpolation()
 
   CPPUNIT_ASSERT(test->GetWidgetGradientInterpolation(0) == 1);
 
-  vtkDEL(test);
+  test->Delete();
 }
 //----------------------------------------------------------------------------
 void vtkMAFTransferFunction2DTest::TestCheckWidget()
 //----------------------------------------------------------------------------
 {
-  vtkMAFTransferFunction2D *test;
-  vtkNEW(test);
+  vtkMAFTransferFunction2D *test = vtkMAFTransferFunction2D::New();
+  
   test->Initialize();
 
   tfWidget widget;
@@ -626,14 +595,14 @@ void vtkMAFTransferFunction2DTest::TestCheckWidget()
   widget.Diffuse = -1;
   CPPUNIT_ASSERT(test->CheckWidget(widget) == false);
 
-  vtkDEL(test);
+  test->Delete();
 }
 //----------------------------------------------------------------------------
 void vtkMAFTransferFunction2DTest::TestGetRange()
 //----------------------------------------------------------------------------
 {
-  vtkMAFTransferFunction2D *test;
-  vtkNEW(test);
+  vtkMAFTransferFunction2D *test = vtkMAFTransferFunction2D::New();
+  
   test->Initialize();
 
   tfWidget widget;
@@ -665,14 +634,14 @@ void vtkMAFTransferFunction2DTest::TestGetRange()
   CPPUNIT_ASSERT(range[0] == 0);
   CPPUNIT_ASSERT(range[1] == 5);
 
-  vtkDEL(test);
+  test->Delete();
 }
 //----------------------------------------------------------------------------
 void vtkMAFTransferFunction2DTest::TestGetGradientRange()
 //----------------------------------------------------------------------------
 {
-  vtkMAFTransferFunction2D *test;
-  vtkNEW(test);
+  vtkMAFTransferFunction2D *test = vtkMAFTransferFunction2D::New();
+  
   test->Initialize();
 
   tfWidget widget;
@@ -704,14 +673,14 @@ void vtkMAFTransferFunction2DTest::TestGetGradientRange()
   CPPUNIT_ASSERT(range[0] == 1);
   CPPUNIT_ASSERT(range[1] == 6);
 
-  vtkDEL(test);
+  test->Delete();
 }
 //----------------------------------------------------------------------------
 void vtkMAFTransferFunction2DTest::TestGetValue()
 //----------------------------------------------------------------------------
 {
-  vtkMAFTransferFunction2D *test;
-  vtkNEW(test);
+  vtkMAFTransferFunction2D *test = vtkMAFTransferFunction2D::New();
+  
   test->Initialize();
 
   double color[3] = {.2,.2,.2};
@@ -752,14 +721,14 @@ void vtkMAFTransferFunction2DTest::TestGetValue()
   CPPUNIT_ASSERT(test->GetValue(2,5.2,opacity,color,diffuse) == 0.f);
   CPPUNIT_ASSERT(test->GetValue(1.5,5.2,opacity,color,diffuse) == 0.17105263157894735);
 
-  vtkDEL(test);
+  test->Delete();
 }
 //----------------------------------------------------------------------------
 void vtkMAFTransferFunction2DTest::TestGetTable()
 //----------------------------------------------------------------------------
 {
-  vtkMAFTransferFunction2D *test;
-  vtkNEW(test);
+  vtkMAFTransferFunction2D *test = vtkMAFTransferFunction2D::New();
+  
   test->Initialize();
 
   double color[3] = {.2,.2,.2};
@@ -806,16 +775,14 @@ void vtkMAFTransferFunction2DTest::TestGetTable()
   CPPUNIT_ASSERT(opacityTable[2] == 0.17320261437908496);
   CPPUNIT_ASSERT(opacityTable[3] == 0.10784313725490191);
 
-  vtkDEL(test);
+  test->Delete();
 }
 //----------------------------------------------------------------------------
 void vtkMAFTransferFunction2DTest::TestSaveToStringLoadFromString()
 //----------------------------------------------------------------------------
 {
-  vtkMAFTransferFunction2D *test1;
-  vtkMAFTransferFunction2D *test2;
-  vtkNEW(test1);
-  vtkNEW(test2);
+  vtkMAFTransferFunction2D *test1 = vtkMAFTransferFunction2D::New();
+  vtkMAFTransferFunction2D *test2 = vtkMAFTransferFunction2D::New();
 
   test1->Initialize();
   test2->Initialize();
@@ -863,8 +830,8 @@ void vtkMAFTransferFunction2DTest::TestSaveToStringLoadFromString()
 
   CPPUNIT_ASSERT(strcmp(new_string,to_string) == 0);
 
-  cppDEL(to_string); // this strings are allocated with new
-  cppDEL(new_string);
-  vtkDEL(test1);
-  vtkDEL(test2);
+  delete to_string; // this strings are allocated with new
+  delete new_string;
+  test1->Delete();
+  test2->Delete();
 }

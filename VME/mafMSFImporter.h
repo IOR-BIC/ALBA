@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMSFImporter.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-15 15:30:41 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2011-05-25 11:52:18 $
+  Version:   $Revision: 1.6.22.1 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -27,7 +27,7 @@ class mafMatrixVector;
 
 /** utility class representing the MSF document.
  This class is used by mafMSFImporter to restore MSF 1.x files.*/
-class mmuMSF1xDocument : public mmuUtility, public mafStorable
+class MAF_EXPORT mmuMSF1xDocument : public mmuUtility, public mafStorable
 {
 public:
   mmuMSF1xDocument():m_Root(NULL) {}
@@ -85,7 +85,7 @@ protected:
   @todo
     - 
 */  
-class mafMSFImporter: public mafXMLStorage
+class MAF_EXPORT mafMSFImporter: public mafXMLStorage
 {
 public:
   

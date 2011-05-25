@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractorPicker.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:46:40 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 11:48:21 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Marco Petrone, originally by Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -20,7 +20,7 @@
 class mafObserver;
 
 /** interactor implementing a picking operation */
-class mafInteractorPicker : public mafInteractor
+class MAF_EXPORT mafInteractorPicker : public mafInteractor
 {
 public:
   mafTypeMacro(mafInteractorPicker,mafInteractor);

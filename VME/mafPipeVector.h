@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVector.h,v $
   Language:  C++
-  Date:      $Date: 2008-09-01 08:33:13 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2011-05-25 11:52:18 $
+  Version:   $Revision: 1.8.2.1 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,13 +32,18 @@ class vtkConeSource;
 class vtkActor;
 class mafVMEVector;
 class mafMatrixVector;
+
+#ifdef MAF_EXPORTS
+#include "mafDllMacros.h"
+EXPORT_STL_VECTOR(MAF_EXPORT,mafTimeStamp);
+#endif
   
 //----------------------------------------------------------------------------
 // mafPipeVector :
 //----------------------------------------------------------------------------
 /** Visual pipe for mafVMEVector: creates two platforms and visualize data stored 
 in mafVMEVector as two arrows.*/
-class mafPipeVector : public mafPipe
+class MAF_EXPORT mafPipeVector : public mafPipe
 {
 public:
   mafTypeMacro(mafPipeVector,mafPipe);

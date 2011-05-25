@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceTextured.h,v $
   Language:  C++
-  Date:      $Date: 2010-06-30 06:53:17 $
-  Version:   $Revision: 1.7.2.2 $
+  Date:      $Date: 2011-05-25 11:52:18 $
+  Version:   $Revision: 1.7.2.3 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,7 +36,7 @@ class vtkActor;
 //----------------------------------------------------------------------------
 /** Visual pipe used to render VTK polydata and allowing to manage scalar visibility,
 lookup table and textures applied to the polydata.*/
-class mafPipeSurfaceTextured : public mafPipe
+class MAF_EXPORT mafPipeSurfaceTextured : public mafPipe
 {
 public:
   mafTypeMacro(mafPipeSurfaceTextured,mafPipe);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractorGenericMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:46:40 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 11:48:21 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -14,6 +14,7 @@
 
 #include "mafDecl.h"
 #include "mafDevice.h"
+#include "mafRefSys.h"
 
 #include "mafDeviceButtonsPadMouse.h"
 
@@ -873,7 +874,7 @@ void mafInteractorGenericMouse::SendTransformMatrix(const mafMatrix &matrix, int
   }
   else
   {
-    event.SetId(mafDeviceButtonsPadMouse::MOUSE_2D_MOVE);
+    event.SetId(mafDeviceButtonsPadMouse::GetMouse2DMoveId());
   }
 
   mafEventMacro(event);

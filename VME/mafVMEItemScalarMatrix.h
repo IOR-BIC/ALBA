@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemScalarMatrix.h,v $
   Language:  C++
-  Date:      $Date: 2008-02-27 13:31:43 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2011-05-25 11:52:18 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,6 +20,7 @@
 #include "mafMTime.h"
 
 #include <vnl/vnl_matrix.h>
+#include <vnl/vnl_matrix.txx>
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -128,6 +129,7 @@ protected:
     into the URL. This method is called by Store().*/
   virtual int InternalStoreData(const char *url);
 
+  template class MAF_EXPORT vnl_matrix<double>;
   vnl_matrix<double>  m_Data;       ///< pointer to scalar data
   mafString           m_DataString; 
   int                 m_IOStatus;   ///< internally used to store the IO status

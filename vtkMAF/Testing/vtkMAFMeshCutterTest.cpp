@@ -3,23 +3,14 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFMeshCutterTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-11-29 10:38:35 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2011-05-25 11:53:13 $
+Version:   $Revision: 1.3.4.1 $
 Authors:   Nigel McFarlane
 
 ================================================================================
 Copyright (c) 2007 University of Bedfordshire, UK (www.beds.ac.uk)
 All rights reserved.
 ===============================================================================*/
-
-
-//----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
-// This force to include Window,wxWidgets and VTK exactly in this order.
-// Failing in doing this will result in a run-time error saying:
-// "Failure#0: The value of ESP was not properly saved across a function call"
-//----------------------------------------------------------------------------
-#include "mafDefines.h" 
 
 #include <cppunit/config/SourcePrefix.h>
 
@@ -1388,7 +1379,7 @@ void vtkMAFMeshCutterTest::TestUpdateChangeCutFunction()
   MeshCutter->SetInput(reader->GetOutput());
 
   // force update so that the output is there
-  MeshCutter->Update() ;
+  MeshCutter->Update();
 
   vtkPolyData *polydata = MeshCutter->GetOutput() ;
   vtkUnstructuredGrid *UG = reader->GetOutput() ;
@@ -1465,7 +1456,7 @@ void vtkMAFMeshCutterTest::TestUpdateChangeCutFunction()
   P->SetOrigin(porigin2);
 
   // force update so that the output is there
-  MeshCutter->Update() ;
+  MeshCutter->Update();
 
 
 
@@ -1642,7 +1633,7 @@ void vtkMAFMeshCutterTest::TestUpdateChangeInput()
   reader->SetFileName(fname2.str());
 
   // force update so that the output is there
-  MeshCutter->Update() ;
+  MeshCutter->Update();
 
   // Get the statistics of the polydata
 

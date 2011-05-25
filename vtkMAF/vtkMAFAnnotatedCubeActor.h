@@ -44,6 +44,7 @@ vtkAxesActor vtkMAFOrientationMarkerWidget vtkVectorText mafAxes
 #define __vtkMAFAnnotatedCubeActor_h
 
 #include "vtkProp3D.h"
+#include "vtkMAFConfigure.h"
 
 class vtkActor;
 class vtkAppendPolyData;
@@ -57,7 +58,7 @@ class vtkTransform;
 class vtkTransformFilter;
 class vtkVectorText;
 
-class vtkMAFAnnotatedCubeActor : public vtkProp3D
+class VTK_vtkMAF_EXPORT vtkMAFAnnotatedCubeActor : public vtkProp3D
 {
 public:
   static vtkMAFAnnotatedCubeActor *New();

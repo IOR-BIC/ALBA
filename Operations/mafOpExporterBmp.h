@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpExporterBmp.h,v $
   Language:  C++
-  Date:      $Date: 2009-04-22 09:42:30 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 11:49:23 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -30,7 +30,7 @@
 /** Export a volume as a stack bmp images. User can choose to export two 
 different bmp format files: 24 bit file or 8 bit gray scale format file, 
 compatible with microCT software. */
-class mafOpExporterBmp: public mafOp
+class MAF_EXPORT mafOpExporterBmp: public mafOp
 {
 public:
   mafOpExporterBmp(const wxString &label);

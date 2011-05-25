@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFFixedCutter.h,v $
   Language:  C++
-  Date:      $Date: 2009-11-17 09:32:20 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 11:53:13 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -59,7 +59,7 @@ that is the center of the input.
 class VTK_vtkMAF_EXPORT vtkMAFFixedCutter : public vtkCutter
 {
 public:
-  //vtkTypeRevisionMacro(vtkMAFFixedCutter,vtkCutter);
+  vtkTypeRevisionMacro(vtkMAFFixedCutter,vtkCutter);
   /** constructor */
            vtkMAFFixedCutter();
   /** destructor */

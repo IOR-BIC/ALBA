@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeIsosurface.h,v $
 Language:  C++
-Date:      $Date: 2008-12-18 08:57:31 $
-Version:   $Revision: 1.15.2.2 $
+Date:      $Date: 2011-05-25 11:52:18 $
+Version:   $Revision: 1.15.2.3 $
 Authors:   Alexander Savenko  -  Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -35,7 +35,7 @@ class mafVMESurface;
 threshold value. The value is extracted according to the scalar values present 
 into the volume data. The iso-surface is extracted in real time and can be changed 
 also the opacity value of the surface extracted.*/
-class mafPipeIsosurface : public mafPipe 
+class MAF_EXPORT mafPipeIsosurface : public mafPipe 
 {
 public:
 	mafTypeMacro(mafPipeIsosurface, mafPipe);

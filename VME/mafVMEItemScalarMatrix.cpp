@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemScalarMatrix.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-09 15:35:52 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2011-05-25 11:52:18 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005
@@ -87,7 +87,7 @@ bool mafVMEItemScalarMatrix::Equals(mafVMEItem *a)
   if (!Superclass::Equals(a))
     return false;
 
-  if (m_GlobalCompareDataFlag)
+  if ((*GetGlobalCompareDataFlag()))
   {
     mafVMEItemScalarMatrix *item = mafVMEItemScalarMatrix::SafeDownCast(a);
 

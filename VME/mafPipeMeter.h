@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeMeter.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:05:59 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2011-05-25 11:52:18 $
+  Version:   $Revision: 1.6.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -30,7 +30,7 @@ class mafGUIMaterialButton;
 //----------------------------------------------------------------------------
 // mafPipeMeter :
 //----------------------------------------------------------------------------
-class mafPipeMeter : public mafPipe
+class MAF_EXPORT mafPipeMeter : public mafPipe
 {
 public:
   mafTypeMacro(mafPipeMeter,mafPipe);

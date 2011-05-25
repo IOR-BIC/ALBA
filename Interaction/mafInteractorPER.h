@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractorPER.h,v $
   Language:  C++
-  Date:      $Date: 2010-01-27 09:41:16 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2011-05-25 11:48:21 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Marco Petrone, originally by Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -32,7 +32,7 @@ class vtkCamera;
   - create interactor for CameraBehavior
   - manage sending events to logic (VME_SELECT, CAMERA_FIT  the 
 */
-class mafInteractorPER : public mafInteractor
+class MAF_EXPORT mafInteractorPER : public mafInteractor
 {
 public: 
   mafTypeMacro(mafInteractorPER,mafInteractor);

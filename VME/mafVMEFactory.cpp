@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-10-21 15:54:05 $
-  Version:   $Revision: 1.25.2.1 $
+  Date:      $Date: 2011-05-25 11:52:18 $
+  Version:   $Revision: 1.25.2.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,7 +21,7 @@
 #include "mafVMEFactory.h"
 
 #include "mafVersion.h"
-
+#include "mafNodeLayout.h"
 #include "mafVMEExternalData.h"
 #include "mafVMEGeneric.h"
 #include "mafVMEGizmo.h"
@@ -67,22 +67,26 @@
 
 mafCxxTypeMacro(mafVMEFactory);
 
+bool mafVMEFactory::m_Initialized=false;
+
 //----------------------------------------------------------------------------
 // This is used to register the factory when linking statically
 int mafVMEFactory::Initialize()
 //----------------------------------------------------------------------------
 {
-  if (m_Instance==NULL)
+  if (!m_Initialized)
   {
-    m_Instance=mafVMEFactory::New();
+    // m_Instance=mafVMEFactory::New();
 
-    if (m_Instance)
+    m_Initialized=true;
+    if (GetInstance())
     {
-      m_Instance->RegisterFactory(m_Instance);
+      GetInstance()->RegisterFactory(GetInstance());
       return MAF_OK;  
     }
     else
     {
+      m_Initialized=true;
       return MAF_ERROR;
     }
   }
@@ -97,6 +101,8 @@ mafVMEFactory::mafVMEFactory()
   //
   // Plug here Nodes in this factory
   //
+
+  mafPlugNodeMacro(mafNodeLayout,"node for layout list");
 
   mafPlugObjectMacro(mafTagArray,"a basic kind of attribute used to store key-value pairs");
   mafPlugObjectMacro(mafVMEItemVTK,"a VME item storing VTK datasets");
@@ -157,3 +163,30 @@ mafVME *mafVMEFactory::CreateVMEInstance(const char *type_name)
 {
   return mafVME::SafeDownCast(Superclass::CreateInstance(type_name));
 }
+//------------------------------------------------------------------------------
+mafVMEFactory* mafVMEFactory::GetInstance()
+//------------------------------------------------------------------------------
+{
+  static mafVMEFactory &istance = *(mafVMEFactory::New());
+  Initialize();
+  return &istance;
+}
+// //------------------------------------------------------------------------------
+// void mafVMEFactory::RegisterNewNode(const char* node_name, const char* description, mafCreateObjectFunction createFunction)
+// //------------------------------------------------------------------------------
+// {
+//   std::vector<std::string, std::allocator<std::string> >::const_iterator it = std::find(GetNodeNames().begin (), GetNodeNames().end (), std::string(node_name));
+//   if(it != GetNodeNames().end() )
+//   {
+//     return;
+//   }
+//   GetNodeNames().push_back(node_name);
+//   RegisterNewObject(node_name,description,createFunction);
+// }
+// //------------------------------------------------------------------------------
+// std::vector<std::string> & mafVMEFactory::GetNodeNames()
+// //------------------------------------------------------------------------------
+// {
+//   static std::vector<std::string> nodeNames;
+//   return nodeNames;
+// }

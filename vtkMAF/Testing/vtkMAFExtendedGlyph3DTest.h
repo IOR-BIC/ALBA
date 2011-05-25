@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFExtendedGlyph3DTest.h,v $
 Language:  C++
-Date:      $Date: 2010-04-06 15:07:45 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-05-25 11:53:13 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010 
@@ -54,8 +54,8 @@ public:
 protected:
 
   void CreatePointsSet();
-  void CreateWindow();
-  void DeleteWindow();
+  void CreateRenWindow();
+  void DeleteRenWindow();
   void CompareImages();
 
   void TestFixture();
@@ -78,6 +78,8 @@ protected:
 
   vtkRenderer *m_Renderer;
   vtkRenderWindow *m_RenWin;
+
+  static std::string ConvertInt(int number);
 
 };
 

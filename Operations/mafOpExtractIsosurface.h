@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpExtractIsosurface.h,v $
   Language:  C++
-  Date:      $Date: 2010-09-07 09:10:43 $
-  Version:   $Revision: 1.5.2.6 $
+  Date:      $Date: 2011-05-25 11:49:23 $
+  Version:   $Revision: 1.5.2.7 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -44,6 +44,11 @@ class vtkMAFFixedCutter;
 class vtkPlane;
 class vtkVolume;
 
+#ifdef MAF_EXPORTS
+#include "mafDllMacros.h"
+EXPORT_STL_VECTOR(MAF_EXPORT,double);
+#endif
+
 //----------------------------------------------------------------------------
 // mafOpExtractIsosurface :
 //----------------------------------------------------------------------------
@@ -51,7 +56,7 @@ class vtkVolume;
 The operation offers a preview of the Iso-Density-Surface and offers also a section of the volume with the 
 contour of the surface itself. The user can pick also into the slice with the left mouse button to generate the 
 corresponding iso-density-surface.*/
-class mafOpExtractIsosurface: public mafOp
+class MAF_EXPORT mafOpExtractIsosurface: public mafOp
 {
 public:
 

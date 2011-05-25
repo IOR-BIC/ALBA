@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractorGeneric6DOF.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:46:39 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 11:48:21 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -20,7 +20,7 @@
   modality is a direct manipulation, where movement of the tracker are mapped
   into movements of the object. More details to be written...
 */
-class mafInteractorGeneric6DOF : public mafInteractor6DOF
+class MAF_EXPORT mafInteractorGeneric6DOF : public mafInteractor6DOF
 {
 public:
   mafTypeMacro(mafInteractorGeneric6DOF,mafInteractor6DOF);

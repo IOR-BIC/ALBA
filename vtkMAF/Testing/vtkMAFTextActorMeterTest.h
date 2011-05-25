@@ -3,8 +3,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFTextActorMeterTest.h,v $
 Language:  C++
-Date:      $Date: 2009-06-08 14:55:32 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-05-25 11:53:13 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Daniele Giunchi
 
 ================================================================================
@@ -75,6 +75,9 @@ class vtkMAFTextActorMeterTest : public CPPUNIT_NS::TestFixture
     void RenderData(vtkActor2D *actor );
 
     void CompareImages(vtkRenderWindow * renwin);
+
+    static std::string ConvertInt(int number);
+    static std::string ConvertDouble(double number);
     
     int m_TestNumber;
 };

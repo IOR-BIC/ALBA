@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpLabelExtractor.h,v $
   Language:  C++
-  Date:      $Date: 2008-10-28 13:15:33 $
-  Version:   $Revision: 1.5.2.1 $
+  Date:      $Date: 2011-05-25 11:49:23 $
+  Version:   $Revision: 1.5.2.2 $
   Authors:   Paolo Quadrani - porting Roberto Mucci 
 ==========================================================================
   Copyright (c) 2002/2004
@@ -30,11 +30,17 @@ class mafEvent;
 class vtkDataSet;
 class vtkStructuredPoints;
 
+#ifdef MAF_EXPORTS
+#include "mafDllMacros.h"
+EXPORT_STL_VECTOR(MAF_EXPORT,wxString);
+EXPORT_STL_VECTOR(MAF_EXPORT,bool);
+#endif
+
 //----------------------------------------------------------------------------
 // mafOpLabelExtractor :
 //----------------------------------------------------------------------------
 /** Operation to create a VMESurface draw from a Volume*/
-class mafOpLabelExtractor: public mafOp
+class MAF_EXPORT mafOpLabelExtractor: public mafOp
 {
 public:
   mafOpLabelExtractor(const wxString& label = "LabelExtractor");

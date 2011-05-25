@@ -3,8 +3,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFRulerActor2DTest.h,v $
 Language:  C++
-Date:      $Date: 2009-10-19 14:41:56 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-05-25 11:53:13 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Alberto Losi
 
 ================================================================================
@@ -114,6 +114,8 @@ public:
   void RenderData(vtkActor2D *actor );
   /** After saving images from render window, compare them in order to find difference between test sessions. */
   void CompareImages(vtkRenderWindow * renwin);
+  
+  static std::string ConvertInt(int number);
 
   int m_TestNumber;
 };

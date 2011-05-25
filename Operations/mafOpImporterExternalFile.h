@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpImporterExternalFile.h,v $
   Language:  C++
-  Date:      $Date: 2007-09-17 11:25:54 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2011-05-25 11:49:23 $
+  Version:   $Revision: 1.1.4.1 $
   Authors:   Paolo Quadrani     Stefano Perticoni    Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -26,7 +26,7 @@ class mafOp;
 // mafOpImporterExternalFile :
 //----------------------------------------------------------------------------
 /** Operation to import external files, such as Word or Excel files*/
-class mafOpImporterExternalFile: public mafOp
+class MAF_EXPORT mafOpImporterExternalFile: public mafOp
 {
 public:
   mafOpImporterExternalFile(const wxString &label = "ExternalFileImporter");

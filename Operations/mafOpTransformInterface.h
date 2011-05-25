@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpTransformInterface.h,v $
   Language:  C++
-  Date:      $Date: 2011-01-24 13:32:21 $
-  Version:   $Revision: 1.2.2.3 $
+  Date:      $Date: 2011-05-25 11:49:23 $
+  Version:   $Revision: 1.2.2.4 $
   Authors:   Stefano Perticoni        
 ==========================================================================
   Copyright (c) 2002/2004
@@ -31,7 +31,6 @@ class mafInteractorCompositorMouse;
 class mafInteractorGenericMouse;
 class mafVME;
 class mafNode;
-class mafTransform;
 
 //----------------------------------------------------------------------------
 // mafOpTransformInterface :
@@ -51,7 +50,7 @@ class mafTransform;
   - improve components plugging: see comments in mafOpMAFTransform.cpp
 
 */
-class mafOpTransformInterface : public mafOp
+class MAF_EXPORT mafOpTransformInterface : public mafOp
 {
 public:
   mafOpTransformInterface(const wxString &label = "TransformInterface");

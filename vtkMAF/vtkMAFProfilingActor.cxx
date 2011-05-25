@@ -3,20 +3,20 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFProfilingActor.cxx,v $
   Language:  C++
-  Date:      $Date: 2009-01-29 11:17:14 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 11:53:13 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Daniele Giunchi
   Project:   MultiMod Project (www.ior.it/multimod)
 
 ==========================================================================*/
-#include "mafDefines.h"
+//#include "mafDefines.h"
 #include "vtkMAFProfilingActor.h"
 
 #include "vtkObjectFactory.h"
 #include "vtkTimerLog.h"
 #include "vtkRenderer.h"
 
-vtkCxxRevisionMacro(vtkMAFProfilingActor, "$Revision: 1.1.2.1 $");
+vtkCxxRevisionMacro(vtkMAFProfilingActor, "$Revision: 1.1.2.2 $");
 vtkStandardNewMacro(vtkMAFProfilingActor);
 
 #define MAXIMUM_FPS 120.

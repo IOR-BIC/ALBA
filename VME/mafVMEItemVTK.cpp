@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-12-15 15:34:23 $
-  Version:   $Revision: 1.28.2.3 $
+  Date:      $Date: 2011-05-25 11:52:18 $
+  Version:   $Revision: 1.28.2.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005
@@ -146,7 +146,7 @@ bool mafVMEItemVTK::Equals(mafVMEItem *a)
   if (!Superclass::Equals(a))
     return false;
 
-  if (m_GlobalCompareDataFlag)
+  if ((*GetGlobalCompareDataFlag()))
   {
     mafVMEItemVTK *item=(mafVMEItemVTK *)a;
 

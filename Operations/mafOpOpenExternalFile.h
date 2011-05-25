@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpOpenExternalFile.h,v $
   Language:  C++
-  Date:      $Date: 2007-09-18 15:50:56 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2011-05-25 11:49:23 $
+  Version:   $Revision: 1.1.4.1 $
   Authors:   Stefano Perticoni    Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,7 +25,7 @@ class mafEvent;
 // mafOpOpenExternalFile :
 //----------------------------------------------------------------------------
 /** Open with external programs the data previously imported with the mafOpImporterExternalFile */
-class mafOpOpenExternalFile: public mafOp
+class MAF_EXPORT mafOpOpenExternalFile: public mafOp
 {
 public:
   mafOpOpenExternalFile(const wxString &label = "OpenExternalFile");

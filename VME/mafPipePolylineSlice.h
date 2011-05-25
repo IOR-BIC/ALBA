@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolylineSlice.h,v $
   Language:  C++
-  Date:      $Date: 2009-10-05 11:48:31 $
-  Version:   $Revision: 1.11.2.3 $
+  Date:      $Date: 2011-05-25 11:52:18 $
+  Version:   $Revision: 1.11.2.4 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -39,7 +39,7 @@ class vtkAppendPolyData;
 //----------------------------------------------------------------------------
 // mafPipePolylineSlice :
 //----------------------------------------------------------------------------
-class mafPipePolylineSlice : public mafPipe
+class MAF_EXPORT mafPipePolylineSlice : public mafPipe
 {
 public:
   mafTypeMacro(mafPipePolylineSlice,mafPipe);

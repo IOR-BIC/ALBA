@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeGizmo.h,v $
   Language:  C++
-  Date:      $Date: 2010-12-13 14:26:05 $
-  Version:   $Revision: 1.4.2.3 $
+  Date:      $Date: 2011-05-25 11:52:18 $
+  Version:   $Revision: 1.4.2.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,7 +29,7 @@ class mafGizmoInterface;
 // mafPipeGizmo :
 //----------------------------------------------------------------------------
 /** Visual pipe used to render a mafVMEGizmo. This show simply the polydata present into the VME.*/
-class mafPipeGizmo : public mafPipe
+class MAF_EXPORT mafPipeGizmo : public mafPipe
 {
 public:
   mafTypeMacro(mafPipeGizmo,mafPipe);

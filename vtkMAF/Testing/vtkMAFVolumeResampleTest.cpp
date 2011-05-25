@@ -2,31 +2,19 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFVolumeResampleTest.cpp,v $
 Language:  C++
-Date:      $Date: 2009-02-10 16:02:37 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-05-25 11:53:13 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
 CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-
-#include "mafDefines.h" 
-//----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
-// This force to include window,wxWidgets and VTK exactly in this order.
-// Failing in doing this will result in a run-time error saying:
-// "Failure#0: The value of ESP was not properly saved across a function call"
-//----------------------------------------------------------------------------
-
 #include <cppunit/config/SourcePrefix.h>
 #include "vtkMAFVolumeResampleTest.h"
 
-#include "mafString.h"
-#include "mafSmartPointer.h"
 #include "vtkMAFSmartPointer.h"
 #include "vtkMAFVolumeResample.h"
-#include "mafMatrix.h"
 
 #include "vtkDataSet.h"
 #include "vtkStructuredPoints.h"
@@ -59,13 +47,13 @@ void vtkMAFVolumeResampleTest::TestResample()
 
 void vtkMAFVolumeResampleTest::TestResampleInternal( const char *inFileName , const char *outVTKFileName )
 {  
-  mafString absPathFilename=MAF_DATA_ROOT;
-  absPathFilename<<"/Test_VolumeResample/";
-  absPathFilename.Append(inFileName);
+  std::string absPathFilename=MAF_DATA_ROOT;
+  absPathFilename += "/Test_VolumeResample/";
+  absPathFilename.append(inFileName);
 
   vtkRectilinearGridReader *reader = vtkRectilinearGridReader::New();
 
-  reader->SetFileName(absPathFilename);
+  reader->SetFileName(absPathFilename.c_str());
   reader->Update();
 
   double inputDataSpacing[3];
@@ -94,17 +82,20 @@ void vtkMAFVolumeResampleTest::TestResampleInternal( const char *inFileName , co
   vtkTransform *transform = vtkTransform::New();
   transform->Identity();
   transform->Update();
-
-  mafMatrix matrix;
-  matrix.SetVTKMatrix(transform->GetMatrix());
   
   double xAxis[3] = {0,0,0};
-  matrix.GetVersor(0, xAxis);
+  for (int i = 0; i < 3; i++)
+  {
+    xAxis[i] = transform->GetMatrix()->GetElement(i, 0);
+  }
   resample->SetVolumeAxisX(xAxis);
   PrintDouble3(cout, xAxis, "xAxis");
 
   double yAxis[3] = {0,0,0};
-  matrix.GetVersor(1, yAxis);
+  for (int i = 0; i < 3; i++)
+  {
+    yAxis[i] = transform->GetMatrix()->GetElement(i, 1);
+  }
   resample->SetVolumeAxisY(yAxis);
   PrintDouble3(cout, yAxis, "yAxis");
 
@@ -152,10 +143,10 @@ void vtkMAFVolumeResampleTest::TestResampleInternal( const char *inFileName , co
 
   WriteVTKDatasetToFile(outputSP, outVTKFileName);
   
-  mafDEL(reader);
-  mafDEL(resample); 
-  vtkDEL(outputSP);
-  vtkDEL(transform);
+  reader->Delete();
+  resample->Delete(); 
+  outputSP->Delete();
+  transform->Delete();
 }
 
 void vtkMAFVolumeResampleTest::WriteVTKDatasetToFile( vtkDataSet * outputVolumeVTKData, const char *outputFilename )
@@ -212,7 +203,7 @@ void vtkMAFVolumeResampleTest::TestSetGetVolumeOrigin()
     CPPUNIT_ASSERT(checkVolumeOrigin[i] == volumeOrigin[i]);
   }
   
-  vtkDEL(resample);
+  resample->Delete();
 }
 
 void vtkMAFVolumeResampleTest::TestSetGetVolumeAxisX()
@@ -229,7 +220,7 @@ void vtkMAFVolumeResampleTest::TestSetGetVolumeAxisX()
     CPPUNIT_ASSERT(checkVolumeAxisX[i] == volumeAxisX[i]);
   }
 
-  vtkDEL(resample);
+  resample->Delete();
 }
 
 
@@ -247,7 +238,7 @@ void vtkMAFVolumeResampleTest::TestSetGetVolumeAxisY()
     CPPUNIT_ASSERT(checkVolumeAxisY[i] == volumeAxisY[i]);
   }
 
-  vtkDEL(resample);
+  resample->Delete();
 }
 
 void vtkMAFVolumeResampleTest::TestSetGetWindow()
@@ -261,7 +252,7 @@ void vtkMAFVolumeResampleTest::TestSetGetWindow()
 
   CPPUNIT_ASSERT(checkWindow == window);
 
-  vtkDEL(resample);
+  resample->Delete();
 }
 
 void vtkMAFVolumeResampleTest::TestSetGetLevel()
@@ -275,5 +266,5 @@ void vtkMAFVolumeResampleTest::TestSetGetLevel()
 
   CPPUNIT_ASSERT(checkLevel == level);
   
-  vtkDEL(resample);
+  resample->Delete();
 }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpCrop.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:51 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2011-05-25 11:49:23 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Matteo Giacomoni & Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -38,7 +38,7 @@ class mafGizmoROI;
 Crop a vme gray volume  
 */
 
-class mafOpCrop: public mafOp
+class MAF_EXPORT mafOpCrop: public mafOp
 {
 public:
              

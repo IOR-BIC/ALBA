@@ -26,7 +26,8 @@ SET(vtkMAF_SRCS
   vtkMAFClipSurfaceBoundingBox.h
   vtkMAFContourVolumeMapper.cxx
   vtkMAFContourVolumeMapper.h
-#  vtkMAFContourVolumeMapperAdv.cxx
+  vtkMAFContourVolumeMapperAdv.cxx
+  vtkMAFContourVolumeMapperAdv.h
   vtkMAFDistanceFilter.cxx
   vtkMAFDistanceFilter.h
   vtkMAFDOFMatrix.cxx
@@ -98,12 +99,13 @@ SET(vtkMAF_LIBS
   vtkRendering
   vtkFiltering
   vtkGraphics
+  vtkHybrid
 )
 
 IF(WIN32)
 SET(vtkMAF_LIBS
   ${vtkMAF_LIBS}
-  GPUAPI
+  # GPUAPI
   )
 ENDIF(WIN32)
 
@@ -129,11 +131,20 @@ ENDIF (NOT VTK_FOUND)
 
 # Set VTKLOCAL_BUILD_SHARED_LIBS to 1 or 0 for use in creating the
 # configuration header.
-IF(BUILD_SHARED_LIBS)
+IF(MAF_BUILD_MAFDLL)
+  IF(WIN32)
+  SET(vtkMAF_LIBS
+    ${vtkMAF_LIBS}
+    GPUAPI
+    )
+  ENDIF(WIN32)
+  SET(BUILD_SHARED_LIBS 1)
   SET(VTKLOCAL_BUILD_SHARED_LIBS_CONFIG 1)
-ELSE(BUILD_SHARED_LIBS)
+  ADD_DEFINITIONS(-DVTK_vtkMAF_EXPORTS)
+ELSE(MAF_BUILD_MAFDLL)
+  SET(BUILD_SHARED_LIBS 0)
   SET(VTKLOCAL_BUILD_SHARED_LIBS_CONFIG 0)
-ENDIF(BUILD_SHARED_LIBS)
+ENDIF(MAF_BUILD_MAFDLL)
 
 IF (NOT LIBRARY_OUTPUT_PATH)
   SET (LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin CACHE PATH

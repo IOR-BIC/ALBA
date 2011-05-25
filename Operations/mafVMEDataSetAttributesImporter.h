@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEDataSetAttributesImporter.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-30 16:55:35 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2011-05-25 11:49:23 $
+  Version:   $Revision: 1.6.2.1 $
   Authors:   Stefano Perticoni     
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,7 +23,7 @@ Import generic time varying data set attributes in a vme.
 The input vme is modified ie all operations occurs in place.
 Actually supports vme mesh, surface and volumes 
 */
-class mafVMEDataSetAttributesImporter
+class MAF_EXPORT mafVMEDataSetAttributesImporter
 {
   
 public:

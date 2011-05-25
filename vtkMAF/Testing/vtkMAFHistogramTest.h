@@ -3,8 +3,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFHistogramTest.h,v $
 Language:  C++
-Date:      $Date: 2010-02-23 14:20:49 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-05-25 11:53:13 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Daniele Giunchi
 
 ================================================================================
@@ -98,6 +98,8 @@ class vtkMAFHistogramTest : public CPPUNIT_NS::TestFixture
     void RenderData(vtkActor2D *actor );
     /** After saving images from render window, compare them in order to find difference between test sessions. */
     void CompareImages(vtkRenderWindow * renwin);
+    /** Convert an int to std::string */
+    static std::string ConvertInt(int number);
 
     int m_TestNumber;
 };

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpConnectivitySurface.h,v $
   Language:  C++
-  Date:      $Date: 2009-01-09 13:29:24 $
-  Version:   $Revision: 1.2.2.1 $
+  Date:      $Date: 2011-05-25 11:49:23 $
+  Version:   $Revision: 1.2.2.2 $
   Authors:   Daniele Giunchi - Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -22,12 +22,17 @@ class vtkPolyData;
 class mafEvent;
 class mafVME;
 
+#ifdef MAF_EXPORTS
+#include "mafDllMacros.h"
+EXPORT_STL_VECTOR(MAF_EXPORT,mafVME*);
+#endif
+
 //----------------------------------------------------------------------------
 // mafOpConnectivitySurface :
 //----------------------------------------------------------------------------
 /** This operation keeps an input a surface and as output we get a number of connected surfaces. 
 Extract data is based on geometric connectivity.*/
-class mafOpConnectivitySurface: public mafOp
+class MAF_EXPORT mafOpConnectivitySurface: public mafOp
 {
 public:
 	mafOpConnectivitySurface(const wxString &label = "Connectivity Surface");

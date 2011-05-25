@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeLandmarkCloud.h,v $
   Language:  C++
-  Date:      $Date: 2009-07-06 11:29:21 $
-  Version:   $Revision: 1.8.2.1 $
+  Date:      $Date: 2011-05-25 11:52:18 $
+  Version:   $Revision: 1.8.2.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -35,7 +35,7 @@ spheres each one centered to the landmark position. The visual pipe is observer 
 the landmark cloud and according to the Open/Close cloud status the visual pipe
 switch the mode to manage the data contained into the cloud (cloud close) or into the
 landmarks (cloud open).*/
-class mafPipeLandmarkCloud : public mafPipe
+class MAF_EXPORT mafPipeLandmarkCloud : public mafPipe
 {
 public:
   mafTypeMacro(mafPipeLandmarkCloud,mafPipe);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpClipSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:45:06 $
-  Version:   $Revision: 1.3.2.2 $
+  Date:      $Date: 2011-05-25 11:49:21 $
+  Version:   $Revision: 1.3.2.3 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,21 +22,16 @@
 #include "mafOpClipSurface.h"
 #include "wx/busyinfo.h"
 
-#include "mafDecl.h"
-#include "mafEvent.h"
 #include "mafGUI.h"
+#include "mafRefSys.h"
 
 #include "mmaMaterial.h"
 #include "mafInteractorCompositorMouse.h"
-#include "mafInteractorGenericMouse.h"
 
-#include "mafSmartPointer.h"
 #include "mafVMEGizmo.h"
 #include "mafGizmoTranslate.h"
 #include "mafGizmoRotate.h"
 #include "mafGizmoScale.h"
-#include "mafAbsMatrixPipe.h"
-#include "mafTransform.h"
 
 #include "vtkProperty.h"
 #include "vtkTransform.h"

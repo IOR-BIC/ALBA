@@ -3,8 +3,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFGridActorTest.cpp,v $
 Language:  C++
-Date:      $Date: 2009-06-19 12:48:42 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-05-25 11:53:13 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Daniele Giunchi
 
 ================================================================================
@@ -12,13 +12,6 @@ Copyright (c) 2007 Cineca, UK (www.cineca.it)
 All rights reserved.
 ===============================================================================*/
 
-#include "mafDefines.h" 
-//----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
-// This force to include Window,wxWidgets and VTK exactly in this order.
-// Failing in doing this will result in a run-time error saying:
-// "Failure#0: The value of ESP was not properly saved across a function call"
-//----------------------------------------------------------------------------
 #include "vtkMAFGridActor.h"
 #include "vtkMAFGridActorTest.h"
 
@@ -37,8 +30,6 @@ All rights reserved.
 #include "vtkJPEGWriter.h"
 #include "vtkJPEGReader.h"
 #include "vtkPointData.h"
-
-#include "mafString.h"
 
 
 //------------------------------------------------------------
@@ -75,7 +66,11 @@ void vtkMAFGridActorTest::RenderData(vtkActor *actor)
 
   //renderWindowInteractor->Start();
   CompareImages(renderWindow);
-  mafSleep(2000);
+#ifdef WIN32
+  Sleep(2000);
+#else
+  usleep(2000*1000);
+#endif
 
 }
 //------------------------------------------------------------
@@ -147,7 +142,7 @@ void vtkMAFGridActorTest::TestGetLabelActor()
     
   */
 
-  CPPUNIT_ASSERT(mafString("0.2").Equals(actor->GetLabelActor()->GetInput()));
+  CPPUNIT_ASSERT(strcmp("0.2",actor->GetLabelActor()->GetInput())==0);
 
   actor->Delete();
 }
@@ -169,84 +164,80 @@ void vtkMAFGridActorTest::CompareImages(vtkRenderWindow * renwin)
   name = name.substr(0, pointIndex);
 
 
-  mafString controlOriginFile;
-  controlOriginFile<<path.c_str();
-  controlOriginFile<<"\\";
-  controlOriginFile<<name.c_str();
-  controlOriginFile<<"_";
-  controlOriginFile<<"image";
-  controlOriginFile<<m_TestNumber;
-  controlOriginFile<<".jpg";
+  std::string controlOriginFile;
+  controlOriginFile+=(path.c_str());
+  controlOriginFile+=("\\");
+  controlOriginFile+=(name.c_str());
+  controlOriginFile+=("_");
+  controlOriginFile+=("image");
+  controlOriginFile+=vtkMAFGridActorTest::ConvertInt(m_TestNumber).c_str();
+  controlOriginFile+=(".jpg");
 
   fstream controlStream;
-  controlStream.open(controlOriginFile.GetCStr()); 
+  controlStream.open(controlOriginFile.c_str()); 
 
   // visualization control
   renwin->OffScreenRenderingOn();
-  vtkWindowToImageFilter *w2i;
-  vtkNEW(w2i);
+  vtkWindowToImageFilter *w2i = vtkWindowToImageFilter::New();
   w2i->SetInput(renwin);
   //w2i->SetMagnification(magnification);
   w2i->Update();
   renwin->OffScreenRenderingOff();
 
   //write comparing image
-  vtkJPEGWriter *w;
-  vtkNEW(w);
+  vtkJPEGWriter *w = vtkJPEGWriter::New();
   w->SetInput(w2i->GetOutput());
-  mafString imageFile="";
+  std::string imageFile="";
 
   if(!controlStream)
   {
-    imageFile<<path.c_str();
-    imageFile<<"\\";
-    imageFile<<name.c_str();
-    imageFile<<"_";
-    imageFile<<"image";
+    imageFile+=(path.c_str());
+    imageFile+=("\\");
+    imageFile+=(name.c_str());
+    imageFile+=("_");
+    imageFile+=("image");
   }
   else
   {
-    imageFile<<path.c_str();
-    imageFile<<"\\";
-    imageFile<<name.c_str();
-    imageFile<<"_";
-    imageFile<<"comp";
+    imageFile+=(path.c_str());
+    imageFile+=("\\");
+    imageFile+=(name.c_str());
+    imageFile+=("_");
+    imageFile+=("comp");
   }
 
-  imageFile<<m_TestNumber;
-  imageFile<<".jpg";
-  w->SetFileName(imageFile.GetCStr());
+  imageFile+=vtkMAFGridActorTest::ConvertInt(m_TestNumber).c_str();
+  imageFile+=(".jpg");
+  w->SetFileName(imageFile.c_str());
   w->Write();
 
   if(!controlStream)
   {
     controlStream.close();
-    vtkDEL(w);
-    vtkDEL(w2i);
+    w->Delete();
+    w2i->Delete();
     return;
   }
   controlStream.close();
 
   //read original Image
-  vtkJPEGReader *rO;
-  vtkNEW(rO);
-  mafString imageFileOrig="";
-  imageFileOrig<<path.c_str();
-  imageFileOrig<<"\\";
-  imageFileOrig<<name.c_str();
-  imageFileOrig<<"_";
-  imageFileOrig<<"image";
-  imageFileOrig<<m_TestNumber;
-  imageFileOrig<<".jpg";
-  rO->SetFileName(imageFileOrig.GetCStr());
+  vtkJPEGReader *rO = vtkJPEGReader::New();
+  std::string imageFileOrig="";
+  imageFileOrig+=(path.c_str());
+  imageFileOrig+=("\\");
+  imageFileOrig+=(name.c_str());
+  imageFileOrig+=("_");
+  imageFileOrig+=("image");
+  imageFileOrig+=vtkMAFGridActorTest::ConvertInt(m_TestNumber).c_str();
+  imageFileOrig+=(".jpg");
+  rO->SetFileName(imageFileOrig.c_str());
   rO->Update();
 
   vtkImageData *imDataOrig = rO->GetOutput();
 
   //read compared image
-  vtkJPEGReader *rC;
-  vtkNEW(rC);
-  rC->SetFileName(imageFile.GetCStr());
+  vtkJPEGReader *rC = vtkJPEGReader::New();
+  rC->SetFileName(imageFile.c_str());
   rC->Update();
 
   vtkImageData *imDataComp = rC->GetOutput();
@@ -265,12 +256,12 @@ void vtkMAFGridActorTest::CompareImages(vtkRenderWindow * renwin)
   //CPPUNIT_ASSERT(ComparingImagesDetailed(imDataOrig,imDataComp));
 
   // end visualization control
-  vtkDEL(rO);
-  vtkDEL(rC);
-  vtkDEL(imageMath);
+  rO->Delete();
+  rC->Delete();
+  imageMath->Delete();
 
-  vtkDEL(w);
-  vtkDEL(w2i);
+  w->Delete();
+  w2i->Delete();
 }
 //----------------------------------------------------------------------------
 void vtkMAFGridActorTest::TestPrintSelf()
@@ -280,4 +271,12 @@ void vtkMAFGridActorTest::TestPrintSelf()
   actor = vtkMAFGridActor::New();
   actor->PrintSelf(std::cout, 3);
   actor->Delete();
+}
+//--------------------------------------------------
+std::string vtkMAFGridActorTest::ConvertInt(int number)
+//--------------------------------------------------
+{
+  std::stringstream stringStream;
+  stringStream << number;//add number to the stream
+  return stringStream.str();//return a string with the contents of the stream
 }

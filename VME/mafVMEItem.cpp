@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItem.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-01-14 17:08:45 $
-  Version:   $Revision: 1.13.2.1 $
+  Date:      $Date: 2011-05-25 11:52:18 $
+  Version:   $Revision: 1.13.2.2 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005
@@ -36,7 +36,7 @@
 #include <math.h>
 #include <assert.h>
 
-bool mafVMEItem::m_GlobalCompareDataFlag=0;
+// bool mafVMEItem::m_GlobalCompareDataFlag=0;
 
 MAF_ID_IMP(mafVMEItem::VME_ITEM_DATA_MODIFIED);
 
@@ -365,7 +365,19 @@ void mafVMEItem::UpdateItemId()
 
   SetId(itemId);
 }
-
+//----------------------------------------------------------------------------
+bool* mafVMEItem::GetGlobalCompareDataFlag()
+//----------------------------------------------------------------------------
+{
+  static bool globalCompareDataFlag = false;
+  return &globalCompareDataFlag;
+}
+//----------------------------------------------------------------------------
+void mafVMEItem::SetGlobalCompareDataFlag(bool f)
+//----------------------------------------------------------------------------
+{
+  (*GetGlobalCompareDataFlag()) = f;
+}
 
 //----------------------------------------------------------------------------
 //     ****************  mafVMEItemAsynchObserver  ****************
@@ -393,5 +405,3 @@ void mafVMEItemAsynchObserver::OnEvent(mafEventBase *maf_event)
     m_Item->ReadData(m_Filename);
   }
 }
-
-

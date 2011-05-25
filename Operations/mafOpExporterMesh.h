@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpExporterMesh.h,v $
   Language:  C++
-  Date:      $Date: 2010-11-11 15:55:57 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 11:49:23 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Simone Brazzale   
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,7 +28,7 @@ class mafVMEMesh;
 // mafOpExporterMesh :
 //----------------------------------------------------------------------------
 /** Export a Generic mesh */
-class mafOpExporterMesh: public mafOp
+class MAF_EXPORT mafOpExporterMesh: public mafOp
 {
 public:
 	mafOpExporterMesh(const wxString &label = "MeshExporter");

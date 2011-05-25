@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFClipSurfaceBoundingBoxTest.h,v $
 Language:  C++
-Date:      $Date: 2009-08-31 12:52:16 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-05-25 11:53:13 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -81,6 +81,8 @@ class vtkMAFClipSurfaceBoundingBoxTest : public CPPUNIT_NS::TestFixture
     void CompareImages(vtkRenderWindow * renwin);
     /** Test execution with parametrized clip inside*/
     void TestExecution(int clipInside);
+    /** Convert an int to std::string */
+    static std::string ConvertInt(int number);
 
     int m_TestNumber;
 

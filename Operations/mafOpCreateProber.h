@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpCreateProber.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:51 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2011-05-25 11:49:23 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -25,7 +25,7 @@ class mafEvent;
 // mafOpCreateProber :
 //----------------------------------------------------------------------------
 /** */
-class mafOpCreateProber: public mafOp
+class MAF_EXPORT mafOpCreateProber: public mafOp
 {
 public:
   mafOpCreateProber(const wxString &label = "CreateProber");

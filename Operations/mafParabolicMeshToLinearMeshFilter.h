@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafParabolicMeshToLinearMeshFilter.h,v $
 Language:  C++
-Date:      $Date: 2007-04-19 14:41:51 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2011-05-25 11:49:23 $
+Version:   $Revision: 1.1.4.1 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -13,6 +13,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #ifndef __mafParabolicMeshToLinearMeshFilter_h
 #define __mafParabolicMeshToLinearMeshFilter_h
 
+#include "mafDefines.h"
 #include "vtkUnstructuredGridToUnstructuredGridFilter.h"
 
 /**
@@ -21,7 +22,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
  Currently supported cells are 10 nodes tetra and 20 nodes hexa.
  If the input mesh is already linear or made of unsupported type elements the filter is simply bypassed.
 */
-class VTK_FILTERING_EXPORT mafParabolicMeshToLinearMeshFilter : public vtkUnstructuredGridToUnstructuredGridFilter
+class MAF_EXPORT mafParabolicMeshToLinearMeshFilter : public vtkUnstructuredGridToUnstructuredGridFilter
 {
 
 public:

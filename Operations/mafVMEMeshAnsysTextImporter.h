@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafVMEMeshAnsysTextImporter.h,v $
 Language:  C++
-Date:      $Date: 2008-02-05 10:12:22 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2011-05-25 11:49:23 $
+Version:   $Revision: 1.6.2.1 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -39,7 +39,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
  .SECTION ToDo
 */
-class mafVMEMeshAnsysTextImporter
+class MAF_EXPORT mafVMEMeshAnsysTextImporter
 {
 public:
 

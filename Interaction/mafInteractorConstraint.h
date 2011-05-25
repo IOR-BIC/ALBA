@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractorConstraint.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:46:39 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 11:48:21 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Marco Petrone, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -12,13 +12,12 @@
 #ifndef __mafInteractorConstraint_h
 #define __mafInteractorConstraint_h
 
-#include "mafRefSys.h"
 #include "vtkMAFSmartPointer.h"
-#include <vector>
 
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
+class mafRefSys;
 class vtkDoubleArray;
 
 //----------------------------------------------------------------------------
@@ -41,7 +40,7 @@ class vtkDoubleArray;
   - complete PrintSelf function
 
 */
-class mafInteractorConstraint
+class MAF_EXPORT mafInteractorConstraint
 {
 public:
   mafInteractorConstraint();
@@ -193,7 +192,7 @@ public:
   
   /** Get the constraint reference system, i.e. the refsys to which the
   transform will be constrained also known as Pivot reference system. */
-  mafRefSys *GetRefSys() {return m_RefSys;}
+  mafRefSys *GetRefSys();
 
   /** Copy the contents of another RefSys into the contraint one*/
   void SetRefSys(mafRefSys *ref_sys);

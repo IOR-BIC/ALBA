@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpTransformInterface.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-01-13 12:02:35 $
-  Version:   $Revision: 1.4.2.3 $
+  Date:      $Date: 2011-05-25 11:49:23 $
+  Version:   $Revision: 1.4.2.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -19,11 +19,10 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-
+#include "mafDecl.h"
 #include "mafOpTransformInterface.h"
 #include <wx/busyinfo.h>
-
-#include "mafDecl.h"
+#include "mafRefSys.h"
 #include "mafGUI.h"
 #include "mafGizmoTranslate.h"
 #include "mafGizmoRotate.h"
@@ -31,8 +30,6 @@
 
 #include "mafInteractorGenericMouse.h"
 
-#include "mafSmartPointer.h"
-#include "mafTransform.h"
 #include "mafVME.h"
 #include "mafVMEGizmo.h"
 #include "mafVMEGeneric.h"

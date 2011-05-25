@@ -2,21 +2,14 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFGlobalAxisCoordinateTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-08-26 15:05:41 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2011-05-25 11:53:13 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
 CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#include "mafDefines.h" 
-//----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
-// This force to include Window,wxWidgets and VTK exactly in this order.
-// Failing in doing this will result in a run-time error saying:
-// "Failure#0: The value of ESP was not properly saved across a function call"
-//----------------------------------------------------------------------------
 #include <cppunit/config/SourcePrefix.h>
 
 #include "vtkMAFGlobalAxisCoordinateTest.h"

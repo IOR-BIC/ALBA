@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipePolyline.h,v $
 Language:  C++
-Date:      $Date: 2009-07-13 12:23:23 $
-Version:   $Revision: 1.13.2.2 $
+Date:      $Date: 2011-05-25 11:52:18 $
+Version:   $Revision: 1.13.2.3 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -32,6 +32,11 @@ class mmaMaterial;
 class mafGUIMaterialButton;
 class vtkCaptionActor2D;
 
+#ifdef MAF_EXPORTS
+#include "mafDllMacros.h"
+EXPORT_STL_VECTOR(MAF_EXPORT,vtkCaptionActor2D*);
+#endif
+
 /**
   Class Name: mafPipePolyline
   Visualize Polyline inside a VTK Render Window with several modality:
@@ -43,7 +48,7 @@ class vtkCaptionActor2D;
   It is also possible to create a spline of the polyline or visualize polyline resulted by a
   deformation of the original one.
 */
-class mafPipePolyline : public mafPipe
+class MAF_EXPORT mafPipePolyline : public mafPipe
 {
 public:
   /** RTTI Macro. */

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeImage3D.h,v $
   Language:  C++
-  Date:      $Date: 2009-07-20 14:38:40 $
-  Version:   $Revision: 1.6.6.1 $
+  Date:      $Date: 2011-05-25 11:52:18 $
+  Version:   $Revision: 1.6.6.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -38,7 +38,7 @@ class vtkMAFAssembly;
 Class Name: mafPipeImage3D.
 
 */
-class mafPipeImage3D : public mafPipe
+class MAF_EXPORT mafPipeImage3D : public mafPipe
 {
 public:
   /** RTTI macro.*/

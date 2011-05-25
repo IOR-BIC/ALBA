@@ -3,8 +3,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFTextOrientatorTest.h,v $
 Language:  C++
-Date:      $Date: 2007-11-26 12:53:07 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2011-05-25 11:53:13 $
+Version:   $Revision: 1.1.4.1 $
 Authors:   Daniele Giunchi
 
 ================================================================================
@@ -79,6 +79,8 @@ class vtkMAFTextOrientatorTest : public CPPUNIT_NS::TestFixture
     void RenderData(vtkActor2D *actor );
 
     void CompareImages(vtkRenderWindow * renwin);
+
+    static std::string ConvertInt(int number);
     
     int m_TestNumber;
 };

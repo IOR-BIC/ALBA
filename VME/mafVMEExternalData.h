@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEExternalData.h,v $
   Language:  C++
-  Date:      $Date: 2009-04-21 15:39:18 $
-  Version:   $Revision: 1.3.2.1 $
+  Date:      $Date: 2011-05-25 11:52:18 $
+  Version:   $Revision: 1.3.2.2 $
   Authors:   Marco Petrone - Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -19,7 +19,7 @@
 /** mafVMEExternalData: VME that links an external file */
 
 
-class mafVMEExternalData : public mafVMEGroup
+class MAF_EXPORT mafVMEExternalData : public mafVMEGroup
 {
 public:
   mafTypeMacro(mafVMEExternalData,mafVMEGroup);

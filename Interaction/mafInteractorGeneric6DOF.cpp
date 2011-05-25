@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractorGeneric6DOF.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:46:39 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 11:48:21 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -15,6 +15,7 @@
 #include "mafInteractorGeneric6DOF.h"
 #include "mafDeviceButtonsPadTracker.h"
 #include "mafAvatar3D.h"
+#include "mafRefSys.h"
 
 #include "mafEventInteraction.h"
 #include "mafTransform.h"
@@ -77,7 +78,7 @@ void mafInteractorGeneric6DOF::OnEvent(mafEventBase *event)
   if (channel==MCH_INPUT && GetTracker())
   {
     // if the event comes from tracker which started the interaction continue...
-    if (id==mafDeviceButtonsPadTracker::TRACKER_3D_MOVE && event->GetSender()==GetTracker())
+    if (id==mafDeviceButtonsPadTracker::GetTracker3DMoveId() && event->GetSender()==GetTracker())
     {
       mafEventInteraction *e=mafEventInteraction::SafeDownCast(event);
       assert(e);        

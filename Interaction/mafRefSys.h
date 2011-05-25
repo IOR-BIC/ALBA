@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRefSys.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-21 07:55:50 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2011-05-25 11:48:21 $
+  Version:   $Revision: 1.3.22.1 $
   Authors:   Marco Petrone, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -15,14 +15,14 @@
 
 #include "mafConfigure.h"
 #include "mafSmartPointer.h"
+#include "mafVME.h"
+#include "mafTransform.h"
 #include <iostream>
 
 //----------------------------------------------------------------------------
 // forward declarations
 //----------------------------------------------------------------------------
-class mafTransform;
-class mafVME;
-class mafTransformBase;
+
 class mafMatrix;
 class vtkMatrix4x4;
 class vtkRenderer;
@@ -182,8 +182,12 @@ protected:
   /** internally used to set default values */
   void Initialize();
 
-  mafAutoPointer<mafTransform>        m_Identity;  
-  mafAutoPointer<mafTransformBase>    m_Transform;///< the ref sys matrix
+  template class mafAutoPointer<mafVME>;
+  template class mafAutoPointer<mafTransform>;
+  template class mafAutoPointer<mafTransformBase>;
+
+  mafAutoPointer<mafTransform> m_Identity;  
+  mafAutoPointer<mafTransformBase> m_Transform;///< the ref sys matrix
   vtkRenderer*                        m_Renderer; ///< ref sys renderer
   mafAutoPointer<mafVME>              m_VME;     ///< reference to VME
   int                                 m_Type;     ///< type of ref sys (CUSTOM, GLOBAL, LOCAL, PARENT, VIEW)

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractorPER.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-01-27 09:41:16 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2011-05-25 11:48:21 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Marco Petrone 
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -324,7 +324,7 @@ void mafInteractorPER::OnButtonDown(mafEventInteraction *e)
     SetPickedVME(device, picked_vme);
     // if a VME is picked its pointer is written in PickedVME
     int but_down_id = e->GetId();
-    if (but_down_id == mafDeviceButtonsPadMouse::MOUSE_DCLICK && !picked_vme->IsA("mafVMEGizmo"))
+    if (but_down_id == mafDeviceButtonsPadMouse::GetMouseDClickId() && !picked_vme->IsA("mafVMEGizmo"))
     {
       // Send event to inform Logic that a double click event is rised on a VME
       InvokeEvent(VME_DCLICKED,MCH_UP,picked_vme);
@@ -487,7 +487,7 @@ void mafInteractorPER::OnEvent(mafEventBase *event)
     mafDevice *device = (mafDevice *)event->GetSender();
     assert(device);
 
-    if (id == mafDeviceButtonsPadMouse::MOUSE_CHAR_EVENT && !IsInteracting(device))
+    if (id == mafDeviceButtonsPadMouse::GetMouseCharEventId() && !IsInteracting(device))
     {
       mafEventInteraction *e = mafEventInteraction::SafeDownCast(event);
       OnChar(e);
@@ -496,7 +496,7 @@ void mafInteractorPER::OnEvent(mafEventBase *event)
     if (IsInteracting(device))
     {
       // process the Move event
-      if (id == mafDeviceButtonsPadTracker::TRACKER_3D_MOVE || id == mafDeviceButtonsPadMouse::MOUSE_2D_MOVE)
+      if (id == mafDeviceButtonsPadTracker::GetTracker3DMoveId() || id == mafDeviceButtonsPadMouse::GetMouse2DMoveId())
       {
         mafEventInteraction *e = mafEventInteraction::SafeDownCast(event);
         OnMove(e);

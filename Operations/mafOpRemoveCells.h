@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpRemoveCells.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:45:06 $
-  Version:   $Revision: 1.3.2.2 $
+  Date:      $Date: 2011-05-25 11:49:23 $
+  Version:   $Revision: 1.3.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -52,7 +52,7 @@ This operation assumes that input polygonal data is made of triangles only.
 
 @todo Extract selection related stuff to class
 */
-class mafOpRemoveCells: public mafOp
+class MAF_EXPORT mafOpRemoveCells: public mafOp
 {
 public:
 	

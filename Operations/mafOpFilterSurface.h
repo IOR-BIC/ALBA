@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpFilterSurface.h,v $
   Language:  C++
-  Date:      $Date: 2009-10-08 07:31:50 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2011-05-25 11:49:23 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -25,7 +25,7 @@ class mafEvent;
 // mafOpFilterSurface :
 //----------------------------------------------------------------------------
 /** */
-class mafOpFilterSurface: public mafOp
+class MAF_EXPORT mafOpFilterSurface: public mafOp
 {
 public:
 	mafOpFilterSurface(const wxString &label = "FilterSurface");

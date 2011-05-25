@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceSlice.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:05:59 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2011-05-25 11:52:18 $
+  Version:   $Revision: 1.10.2.1 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -39,7 +39,7 @@ class vtkMAFToLinearTransform;
 //----------------------------------------------------------------------------
 /** Visual pipe that allow to visualize a surface polydata sliced according to 
 a slicing plain. The result effect is the contour of the surface cut by the plain.*/
-class mafPipeSurfaceSlice : public mafPipe
+class MAF_EXPORT mafPipeSurfaceSlice : public mafPipe
 {
 public:
   mafTypeMacro(mafPipeSurfaceSlice,mafPipe);

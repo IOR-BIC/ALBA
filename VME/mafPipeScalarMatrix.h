@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeScalarMatrix.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:05:59 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2011-05-25 11:52:18 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,7 +23,7 @@ class vtkActor;
 //----------------------------------------------------------------------------
 // mafPipeScalarMatrix :
 //----------------------------------------------------------------------------
-class mafPipeScalarMatrix : public mafPipe
+class MAF_EXPORT mafPipeScalarMatrix : public mafPipe
 {
 public:
   mafTypeMacro(mafPipeScalarMatrix,mafPipe);

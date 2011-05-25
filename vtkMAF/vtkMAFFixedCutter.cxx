@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFFixedCutter.cxx,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:27:45 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2011-05-25 11:53:13 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -18,7 +18,7 @@
 #include "vtkPointData.h"
 #include "vtkDataSet.h"
 
-//vtkCxxRevisionMacro(vtkMAFFixedCutter, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkMAFFixedCutter, "$Revision: 1.1.2.1 $");
 vtkStandardNewMacro(vtkMAFFixedCutter);
 
 //----------------------------------------------------------------------------

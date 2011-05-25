@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeScalar.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:05:59 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2011-05-25 11:52:18 $
+  Version:   $Revision: 1.6.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,7 +24,7 @@ class vtkActor;
 // mafPipeScalar :
 //----------------------------------------------------------------------------
 /** Visual pipe that visually represents the VTK representation of mafVMEScalar.*/
-class mafPipeScalar : public mafPipe
+class MAF_EXPORT mafPipeScalar : public mafPipe
 {
 public:
   mafTypeMacro(mafPipeScalar,mafPipe);

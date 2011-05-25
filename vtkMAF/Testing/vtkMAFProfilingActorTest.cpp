@@ -3,8 +3,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: vtkMAFProfilingActorTest.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-11-30 14:11:01 $
-  Version:   $Revision: 1.1.2.4 $
+  Date:      $Date: 2011-05-25 11:53:13 $
+  Version:   $Revision: 1.1.2.5 $
   Authors:   Alberto Losi
 
 ================================================================================
@@ -12,19 +12,10 @@
   All rights reserved.
 ===============================================================================*/
 
-#include "mafDefines.h" 
-//----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
-// This force to include Window,wxWidgets and VTK exactly in this order.
-// Failing in doing this will result in a run-time error saying:
-// "Failure#0: The value of ESP was not properly saved across a function call"
-//----------------------------------------------------------------------------
-
+#include <cppunit/config/SourcePrefix.h>
 #include "vtkMAFGridActor.h"
 #include "vtkMAFProfilingActor.h"
 #include "vtkMAFProfilingActorTest.h"
-
-#include <cppunit/config/SourcePrefix.h>
 
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
@@ -40,8 +31,6 @@
 #include "vtkJPEGReader.h"
 #include "vtkPointData.h"
 #include "vtkObjectFactory.h"
-
-#include "mafString.h"
 
 class vtkMAFProfilingActorDummy : public vtkMAFProfilingActor
 {
@@ -105,11 +94,8 @@ void vtkMAFProfilingActorTest::TestDynamicAllocation()
 void vtkMAFProfilingActorTest::TestRenderOverlay()
 //--------------------------------------------
 {
-  vtkRenderer *renderer;
-  vtkRenderWindow *renderWindow;
-
-  vtkNEW(renderer);
-  vtkNEW(renderWindow);
+  vtkRenderer *renderer = vtkRenderer::New();
+  vtkRenderWindow *renderWindow = vtkRenderWindow::New();
 
   PrepareToRender(renderer,renderWindow);
   
@@ -122,21 +108,22 @@ void vtkMAFProfilingActorTest::TestRenderOverlay()
   renderWindow->Render();
   profActor->FPSUpdate(renderer);
   CompareImages(renderWindow, 0);
-  mafSleep(2000);
+#ifdef WIN32
+  Sleep(2000);
+#else
+  usleep(2000*1000);
+#endif
   profActor->Delete();
 
-  vtkDEL(renderer);
-  vtkDEL(renderWindow);
+  renderer->Delete();
+  renderWindow->Delete();
 }
 //--------------------------------------------
 void vtkMAFProfilingActorTest::TestRenderOpaqueGeometry()
 //--------------------------------------------
 {
-  vtkRenderer *renderer;
-  vtkRenderWindow *renderWindow;
-
-  vtkNEW(renderer);
-  vtkNEW(renderWindow);
+  vtkRenderer *renderer = vtkRenderer::New();
+  vtkRenderWindow *renderWindow = vtkRenderWindow::New();
 
   PrepareToRender(renderer,renderWindow);
 
@@ -149,21 +136,22 @@ void vtkMAFProfilingActorTest::TestRenderOpaqueGeometry()
   renderWindow->Render();
   profActor->FPSUpdate(renderer);
   CompareImages(renderWindow, 1);
-  mafSleep(2000);
+#ifdef WIN32
+  Sleep(2000);
+#else
+  usleep(2000*1000);
+#endif
   profActor->Delete();
 
-  vtkDEL(renderer);
-  vtkDEL(renderWindow);
+  renderer->Delete();
+  renderWindow->Delete();
 }
 //--------------------------------------------
 void vtkMAFProfilingActorTest::TestRenderTranslucentGeometry()
 //--------------------------------------------
 {
-  vtkRenderer *renderer;
-  vtkRenderWindow *renderWindow;
-
-  vtkNEW(renderer);
-  vtkNEW(renderWindow);
+  vtkRenderer *renderer = vtkRenderer::New();
+  vtkRenderWindow *renderWindow = vtkRenderWindow::New();
 
   PrepareToRender(renderer,renderWindow);
 
@@ -179,8 +167,8 @@ void vtkMAFProfilingActorTest::TestRenderTranslucentGeometry()
   //CompareImages(renderWindow);
   //mafSleep(2000);
 
-  vtkDEL(renderer);
-  vtkDEL(renderWindow);
+  renderer->Delete();
+  renderWindow->Delete();
 }
 //----------------------------------------------------------------------------
 void vtkMAFProfilingActorTest::CompareImages(vtkRenderWindow * renwin, int indexTest)
@@ -201,84 +189,80 @@ void vtkMAFProfilingActorTest::CompareImages(vtkRenderWindow * renwin, int index
   name = name.substr(0, pointIndex);
 
 
-  mafString controlOriginFile;
-  controlOriginFile<<path.c_str();
-  controlOriginFile<<"\\";
-  controlOriginFile<<name.c_str();
-  controlOriginFile<<"_";
-  controlOriginFile<<"image";
-  controlOriginFile<<indexTest;
-  controlOriginFile<<".jpg";
+  std::string controlOriginFile;
+  controlOriginFile+=(path.c_str());
+  controlOriginFile+=("\\");
+  controlOriginFile+=(name.c_str());
+  controlOriginFile+=("_");
+  controlOriginFile+=("image");
+  controlOriginFile+=vtkMAFProfilingActorTest::ConvertInt(indexTest).c_str();
+  controlOriginFile+=(".jpg");
 
   fstream controlStream;
-  controlStream.open(controlOriginFile.GetCStr()); 
+  controlStream.open(controlOriginFile.c_str()); 
 
   // visualization control
   renwin->OffScreenRenderingOn();
-  vtkWindowToImageFilter *w2i;
-  vtkNEW(w2i);
+  vtkWindowToImageFilter *w2i = vtkWindowToImageFilter::New();
   w2i->SetInput(renwin);
   //w2i->SetMagnification(magnification);
   w2i->Update();
   renwin->OffScreenRenderingOff();
 
   //write comparing image
-  vtkJPEGWriter *w;
-  vtkNEW(w);
+  vtkJPEGWriter *w = vtkJPEGWriter::New();
   w->SetInput(w2i->GetOutput());
-  mafString imageFile="";
+  std::string imageFile="";
 
   if(!controlStream)
   {
-    imageFile<<path.c_str();
-    imageFile<<"\\";
-    imageFile<<name.c_str();
-    imageFile<<"_";
-    imageFile<<"image";
+    imageFile+=(path.c_str());
+    imageFile+=("\\");
+    imageFile+=(name.c_str());
+    imageFile+=("_");
+    imageFile+=("image");
   }
   else
   {
-    imageFile<<path.c_str();
-    imageFile<<"\\";
-    imageFile<<name.c_str();
-    imageFile<<"_";
-    imageFile<<"comp";
+    imageFile+=(path.c_str());
+    imageFile+=("\\");
+    imageFile+=(name.c_str());
+    imageFile+=("_");
+    imageFile+=("comp");
   }
 
-  imageFile<<indexTest;
-  imageFile<<".jpg";
-  w->SetFileName(imageFile.GetCStr());
+  imageFile+=vtkMAFProfilingActorTest::ConvertInt(indexTest).c_str();
+  imageFile+=(".jpg");
+  w->SetFileName(imageFile.c_str());
   w->Write();
 
   if(!controlStream)
   {
     controlStream.close();
-    vtkDEL(w);
-    vtkDEL(w2i);
+    w->Delete();
+    w2i->Delete();
     return;
   }
   controlStream.close();
 
   //read original Image
-  vtkJPEGReader *rO;
-  vtkNEW(rO);
-  mafString imageFileOrig="";
-  imageFileOrig<<path.c_str();
-  imageFileOrig<<"\\";
-  imageFileOrig<<name.c_str();
-  imageFileOrig<<"_";
-  imageFileOrig<<"image";
-  imageFileOrig<<indexTest;
-  imageFileOrig<<".jpg";
-  rO->SetFileName(imageFileOrig.GetCStr());
+  vtkJPEGReader *rO = vtkJPEGReader::New();
+  std::string imageFileOrig="";
+  imageFileOrig+=(path.c_str());
+  imageFileOrig+=("\\");
+  imageFileOrig+=(name.c_str());
+  imageFileOrig+=("_");
+  imageFileOrig+=("image");
+  imageFileOrig+=vtkMAFProfilingActorTest::ConvertInt(indexTest).c_str();
+  imageFileOrig+=(".jpg");
+  rO->SetFileName(imageFileOrig.c_str());
   rO->Update();
 
   vtkImageData *imDataOrig = rO->GetOutput();
 
   //read compared image
-  vtkJPEGReader *rC;
-  vtkNEW(rC);
-  rC->SetFileName(imageFile.GetCStr());
+  vtkJPEGReader *rC = vtkJPEGReader::New();
+  rC->SetFileName(imageFile.c_str());
   rC->Update();
 
   vtkImageData *imDataComp = rC->GetOutput();
@@ -297,12 +281,12 @@ void vtkMAFProfilingActorTest::CompareImages(vtkRenderWindow * renwin, int index
   //CPPUNIT_ASSERT(ComparingImagesDetailed(imDataOrig,imDataComp));
 
   // end visualization control
-  vtkDEL(rO);
-  vtkDEL(rC);
-  vtkDEL(imageMath);
+  rO->Delete();
+  rC->Delete();
+  imageMath->Delete();
 
-  vtkDEL(w);
-  vtkDEL(w2i);
+  w->Delete();
+  w2i->Delete();
 }
 //----------------------------------------------------------------------------
 void vtkMAFProfilingActorTest::TestPrintSelf()
@@ -312,4 +296,12 @@ void vtkMAFProfilingActorTest::TestPrintSelf()
   actor = vtkMAFProfilingActor::New();
   actor->PrintSelf(std::cout, 3);
   actor->Delete();
+}
+//--------------------------------------------------
+std::string vtkMAFProfilingActorTest::ConvertInt(int number)
+//--------------------------------------------------
+{
+  std::stringstream stringStream;
+  stringStream << number;//add number to the stream
+  return stringStream.str();//return a string with the contents of the stream
 }

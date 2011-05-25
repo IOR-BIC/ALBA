@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpClipSurface.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:45:06 $
-  Version:   $Revision: 1.2.2.2 $
+  Date:      $Date: 2011-05-25 11:49:23 $
+  Version:   $Revision: 1.2.2.3 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -17,7 +17,6 @@
 // Include :
 //----------------------------------------------------------------------------
 #include "mafOp.h"
-#include "mafNode.h"
 #include "mafVMESurface.h"
 
 //----------------------------------------------------------------------------
@@ -27,7 +26,6 @@ class mafEvent;
 
 class mafInteractorCompositorMouse;
 class mafInteractorGenericMouse;
-class mafVMESurface;
 class mafVMEGizmo;
 class mafGizmoTranslate;
 class mafGizmoRotate;
@@ -46,7 +44,7 @@ class vtkMAFClipSurfaceBoundingBox;
 // mafOpClipSurface :
 //----------------------------------------------------------------------------
 /** */
-class mafOpClipSurface: public mafOp
+class MAF_EXPORT mafOpClipSurface: public mafOp
 {
 public:
   mafOpClipSurface(const wxString &label = "ClipSurface");

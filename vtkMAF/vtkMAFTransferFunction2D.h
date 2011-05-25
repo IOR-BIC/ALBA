@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFTransferFunction2D.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:27:45 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2011-05-25 11:53:13 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Alexander Savenko, Mel Krokos
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -92,7 +92,7 @@ struct tfWidget {
   void   SetGradientRange(double from, double to, double center) { Range[1][0] = from; Range[1][1] = to; Range[1][2] = center; }
 
   bool   Inside(double val, double grad) const { return (val >= this->Range[0][0] && val <= this->Range[0][1] && grad >= this->Range[1][0] && grad <= this->Range[1][1]); }
-  double  Attenuation(double val, double grad) const;
+  VTK_vtkMAF_EXPORT double  Attenuation(double val, double grad) const;
 
   void   Update();
   };

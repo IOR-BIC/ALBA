@@ -2,21 +2,14 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFRemoveCellsFilterTest.cpp,v $
 Language:  C++
-Date:      $Date: 2009-01-09 09:36:26 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-05-25 11:53:13 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
 CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#include "mafDefines.h" 
-//----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
-// This force to include Window,wxWidgets and VTK exactly in this order.
-// Failing in doing this will result in a run-time error saying:
-// "Failure#0: The value of ESP was not properly saved across a function call"
-//----------------------------------------------------------------------------
 #include <cppunit/config/SourcePrefix.h>
 
 #include "vtkMAFSmartPointer.h"
@@ -32,6 +25,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkMAFRemoveCellsFilter.h"
 
 #include "vtkMAFRemoveCellsFilterTest.h"
+
+#include <assert.h>
 
 void vtkMAFRemoveCellsFilterTest::setUp()
 {
@@ -73,7 +68,11 @@ void vtkMAFRemoveCellsFilterTest::RenderData( vtkPolyData *data )
 
   renderWindowInteractor->Start();
 
-  mafSleep(1000);
+#ifdef WIN32
+  Sleep(1000);
+#else
+  usleep(1000*1000);
+#endif
 
 }
 

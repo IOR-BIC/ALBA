@@ -1,5 +1,3 @@
-#include "mafDefines.h"
-
 #include "vtkMAFSmartPointer.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"

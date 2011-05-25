@@ -2,25 +2,17 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFExtendedGlyph3DTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-04-06 15:07:45 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-05-25 11:53:13 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
 CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#include "mafDefines.h" 
-//----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
-// This force to include Window,wxWidgets and VTK exactly in this order.
-// Failing in doing this will result in a run-time error saying:
-// "Failure#0: The value of ESP was not properly saved across a function call"
-//----------------------------------------------------------------------------
 #include <cppunit/config/SourcePrefix.h>
 
 #include "vtkMAFExtendedGlyph3DTest.h"
-#include "mafString.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkMAFExtendedGlyph3D.h"
@@ -45,6 +37,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkWindowToImageFilter.h"
 #include "vtkArrowSource.h"
 
+#include <string>
+
 enum ID_TEST_LIST
 {
   ID_EXECUTION_TEST = 0,
@@ -59,13 +53,13 @@ void vtkMAFExtendedGlyph3DTest::setUp()
   TestNumber++;
 
   CreatePointsSet();
-  CreateWindow();
+  CreateRenWindow();
 }
 //-----------------------------------------------------------
 void vtkMAFExtendedGlyph3DTest::tearDown()
 //-----------------------------------------------------------
 {
-  DeleteWindow();
+  DeleteRenWindow();
 
   m_Points->Delete();
 
@@ -75,6 +69,14 @@ void vtkMAFExtendedGlyph3DTest::tearDown()
 void vtkMAFExtendedGlyph3DTest::TestFixture()
 //-----------------------------------------------------------
 {
+}
+//--------------------------------------------------
+std::string vtkMAFExtendedGlyph3DTest::ConvertInt(int number)
+//--------------------------------------------------
+{
+  std::stringstream stringStream;
+  stringStream << number;//add number to the stream
+  return stringStream.str();//return a string with the contents of the stream
 }
 //----------------------------------------------------------------------------
 void vtkMAFExtendedGlyph3DTest::CompareImages()
@@ -94,84 +96,80 @@ void vtkMAFExtendedGlyph3DTest::CompareImages()
   name = name.substr(0, pointIndex);
 
 
-  mafString controlOriginFile;
-  controlOriginFile<<path.c_str();
-  controlOriginFile<<"\\";
-  controlOriginFile<<name.c_str();
-  controlOriginFile<<"_";
-  controlOriginFile<<"image";
-  controlOriginFile<<m_TestNumber;
-  controlOriginFile<<".jpg";
+  std::string controlOriginFile;
+  controlOriginFile+=(path.c_str());
+  controlOriginFile+=("\\");
+  controlOriginFile+=(name.c_str());
+  controlOriginFile+=("_");
+  controlOriginFile+=("image");
+  controlOriginFile+=vtkMAFExtendedGlyph3DTest::ConvertInt(m_TestNumber).c_str();
+  controlOriginFile+=(".jpg");
 
   fstream controlStream;
-  controlStream.open(controlOriginFile.GetCStr()); 
+  controlStream.open(controlOriginFile.c_str()); 
 
   // visualization control
   m_RenWin->OffScreenRenderingOn();
-  vtkWindowToImageFilter *w2i;
-  vtkNEW(w2i);
+  vtkWindowToImageFilter *w2i = vtkWindowToImageFilter::New();
   w2i->SetInput(m_RenWin);
   //w2i->SetMagnification(magnification);
   w2i->Update();
   m_RenWin->OffScreenRenderingOff();
 
   //write comparing image
-  vtkJPEGWriter *w;
-  vtkNEW(w);
+  vtkJPEGWriter *w = vtkJPEGWriter::New();
   w->SetInput(w2i->GetOutput());
-  mafString imageFile="";
+  std::string imageFile="";
 
   if(!controlStream)
   {
-    imageFile<<path.c_str();
-    imageFile<<"\\";
-    imageFile<<name.c_str();
-    imageFile<<"_";
-    imageFile<<"image";
+    imageFile+=(path.c_str());
+    imageFile+=("\\");
+    imageFile+=(name.c_str());
+    imageFile+=("_");
+    imageFile+=("image");
   }
   else
   {
-    imageFile<<path.c_str();
-    imageFile<<"\\";
-    imageFile<<name.c_str();
-    imageFile<<"_";
-    imageFile<<"comp";
+    imageFile+=(path.c_str());
+    imageFile+=("\\");
+    imageFile+=(name.c_str());
+    imageFile+=("_");
+    imageFile+=("comp");
   }
 
-  imageFile<<m_TestNumber;
-  imageFile<<".jpg";
-  w->SetFileName(imageFile.GetCStr());
+  imageFile+=vtkMAFExtendedGlyph3DTest::ConvertInt(m_TestNumber).c_str();
+  imageFile+=(".jpg");
+  w->SetFileName(imageFile.c_str());
   w->Write();
 
   if(!controlStream)
   {
     controlStream.close();
-    vtkDEL(w);
-    vtkDEL(w2i);
+    w->Delete();
+    w2i->Delete();
     return;
   }
   controlStream.close();
 
   //read original Image
-  vtkJPEGReader *rO;
-  vtkNEW(rO);
-  mafString imageFileOrig="";
-  imageFileOrig<<path.c_str();
-  imageFileOrig<<"\\";
-  imageFileOrig<<name.c_str();
-  imageFileOrig<<"_";
-  imageFileOrig<<"image";
-  imageFileOrig<<m_TestNumber;
-  imageFileOrig<<".jpg";
-  rO->SetFileName(imageFileOrig.GetCStr());
+  vtkJPEGReader *rO = vtkJPEGReader::New();
+  std::string imageFileOrig="";
+  imageFileOrig+=(path.c_str());
+  imageFileOrig+=("\\");
+  imageFileOrig+=(name.c_str());
+  imageFileOrig+=("_");
+  imageFileOrig+=("image");
+  imageFileOrig+=vtkMAFExtendedGlyph3DTest::ConvertInt(m_TestNumber).c_str();
+  imageFileOrig+=(".jpg");
+  rO->SetFileName(imageFileOrig.c_str());
   rO->Update();
 
   vtkImageData *imDataOrig = rO->GetOutput();
 
   //read compared image
-  vtkJPEGReader *rC;
-  vtkNEW(rC);
-  rC->SetFileName(imageFile.GetCStr());
+  vtkJPEGReader *rC = vtkJPEGReader::New();
+  rC->SetFileName(imageFile.c_str());
   rC->Update();
 
   vtkImageData *imDataComp = rC->GetOutput();
@@ -190,12 +188,12 @@ void vtkMAFExtendedGlyph3DTest::CompareImages()
   //CPPUNIT_ASSERT(ComparingImagesDetailed(imDataOrig,imDataComp));
 
   // end visualization control
-  vtkDEL(rO);
-  vtkDEL(rC);
-  vtkDEL(imageMath);
+  rO->Delete();
+  rC->Delete();
+  imageMath->Delete();
 
-  vtkDEL(w);
-  vtkDEL(w2i);
+  w->Delete();
+  w2i->Delete();
 }
 //----------------------------------------------------------------------------
 void vtkMAFExtendedGlyph3DTest::TestStaticAllocation()
@@ -211,9 +209,6 @@ void vtkMAFExtendedGlyph3DTest::TestDynamicAllocation()
   //////////////////////////////////////////////////////////////////////////
   filter = vtkMAFExtendedGlyph3D::New();
   filter->Delete();
-  //////////////////////////////////////////////////////////////////////////
-  vtkNEW(filter);
-  vtkDEL(filter);
   //////////////////////////////////////////////////////////////////////////
   vtkMAFSmartPointer<vtkMAFExtendedGlyph3D> filterSmart;
   //////////////////////////////////////////////////////////////////////////
@@ -254,14 +249,14 @@ void vtkMAFExtendedGlyph3DTest::CreatePointsSet()
 
 }
 //----------------------------------------------------------------------------
-void vtkMAFExtendedGlyph3DTest::DeleteWindow()
+void vtkMAFExtendedGlyph3DTest::DeleteRenWindow()
 //----------------------------------------------------------------------------
 {
   m_RenWin->Delete();
   m_Renderer->Delete();
 }
 //----------------------------------------------------------------------------
-void vtkMAFExtendedGlyph3DTest::CreateWindow()
+void vtkMAFExtendedGlyph3DTest::CreateRenWindow()
 //----------------------------------------------------------------------------
 {
   // create windows
@@ -336,7 +331,11 @@ void vtkMAFExtendedGlyph3DTest::TestSetScaling()
 
   m_TestNumber = ID_EXECUTION_TEST + TestNumber;
   CompareImages();
-  mafSleep(2000);
+#ifdef WIN32
+  Sleep(2000);
+#else
+  usleep(2000*1000);
+#endif
 
   filter->ScalingOn();
   filter->Update();
@@ -348,7 +347,11 @@ void vtkMAFExtendedGlyph3DTest::TestSetScaling()
   TestNumber++;
   m_TestNumber = ID_EXECUTION_TEST + TestNumber;
   CompareImages();
-  mafSleep(2000);
+#ifdef WIN32
+  Sleep(2000);
+#else
+  usleep(2000*1000);
+#endif
 
   actor->Delete();
   mapper->Delete();
@@ -396,7 +399,11 @@ void vtkMAFExtendedGlyph3DTest::TestSetScaleFactor()
 
   m_TestNumber = ID_EXECUTION_TEST + TestNumber;
   CompareImages();
-  mafSleep(2000);
+#ifdef WIN32
+  Sleep(2000);
+#else
+  usleep(2000*1000);
+#endif
 
   actor->Delete();
   mapper->Delete();
@@ -523,8 +530,11 @@ void vtkMAFExtendedGlyph3DTest::TestSetScalarVisibility()
 
   m_TestNumber = ID_EXECUTION_TEST + TestNumber;
   CompareImages();
-  mafSleep(2000);
-
+#ifdef WIN32
+  Sleep(2000);
+#else
+  usleep(2000*1000);
+#endif
   actor->Delete();
   mapper->Delete();
 
@@ -575,7 +585,11 @@ void vtkMAFExtendedGlyph3DTest::TestSetOrient()
 
   m_TestNumber = ID_EXECUTION_TEST + TestNumber;
   CompareImages();
-  mafSleep(2000);
+#ifdef WIN32
+  Sleep(2000);
+#else
+  usleep(2000*1000);
+#endif
 
   actor->Delete();
   mapper->Delete();
@@ -632,7 +646,11 @@ void vtkMAFExtendedGlyph3DTest::TestSetClamping()
 
   m_TestNumber = ID_EXECUTION_TEST + TestNumber;
   CompareImages();
-  mafSleep(2000);
+#ifdef WIN32
+  Sleep(2000);
+#else
+  usleep(2000*1000);
+#endif
 
   filter->SetRange(12.0,20.0);
 
@@ -648,7 +666,11 @@ void vtkMAFExtendedGlyph3DTest::TestSetClamping()
   TestNumber++;
   m_TestNumber = ID_EXECUTION_TEST + TestNumber;
   CompareImages();
-  mafSleep(2000);
+#ifdef WIN32
+  Sleep(2000);
+#else
+  usleep(2000*1000);
+#endif
 
   actor->Delete();
   mapper->Delete();

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeFactoryVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-12-16 15:04:25 $
-  Version:   $Revision: 1.20.2.2 $
+  Date:      $Date: 2011-05-25 11:52:18 $
+  Version:   $Revision: 1.20.2.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -55,7 +55,9 @@
 #include <string>
 #include <ostream>
 
-mafPipeFactoryVME *mafPipeFactoryVME::m_Instance=NULL;
+//mafPipeFactoryVME *mafPipeFactoryVME::m_Instance=NULL;
+
+bool mafPipeFactoryVME::m_Initialized=false;
 
 mafCxxTypeMacro(mafPipeFactoryVME);
 
@@ -64,17 +66,19 @@ mafCxxTypeMacro(mafPipeFactoryVME);
 int mafPipeFactoryVME::Initialize()
 //----------------------------------------------------------------------------
 {
-  if (m_Instance==NULL)
+  if (!m_Initialized)
   {
-    m_Instance=mafPipeFactoryVME::New();
+    //m_Instance=mafPipeFactoryVME::New();
 
-    if (m_Instance)
+    m_Initialized=true;
+    if (GetInstance())
     {
-      m_Instance->RegisterFactory(m_Instance);
+      GetInstance()->RegisterFactory(GetInstance());
       return MAF_OK;  
     }
     else
     {
+      m_Initialized=false;
       return MAF_ERROR;
     }
   }
@@ -86,7 +90,7 @@ int mafPipeFactoryVME::Initialize()
 mafPipeFactoryVME::mafPipeFactoryVME()
 //------------------------------------------------------------------------------
 {
-  m_Instance = NULL;
+  //m_Instance = NULL;
   
   //
   // Plug here Pipes in this factory
@@ -130,4 +134,12 @@ const char* mafPipeFactoryVME::GetDescription() const
 //------------------------------------------------------------------------------
 {
   return "Factory for MAF Pipes of VME library";
+}
+//------------------------------------------------------------------------------
+mafPipeFactoryVME* mafPipeFactoryVME::GetInstance()
+//------------------------------------------------------------------------------
+{
+  static mafPipeFactoryVME &istance = *(mafPipeFactoryVME::New());
+  Initialize();
+  return &istance;
 }

@@ -3,8 +3,8 @@
 Program:   Multimod Application framework RELOADED
 Module:    $RCSfile: vtkMAFContourVolumeMapperGPU.h,v $
 Language:  C++
-Date:      $Date: 2009-11-17 09:32:20 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2011-05-25 11:53:13 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Alexander Savenko, Nigel McFarlane, Baoquan Liu (GPU)
 
 ================================================================================
@@ -37,8 +37,8 @@ vtkVolumeMapper vtkContourFilter vtkMarchingCubes
 /* CONTENTS
 namespace vtkMAFContourVolumeMapperNamespace
 class vtkMAFContourVolumeMapperGPU
-class Polyline2D
-class ListOfPolyline2D
+class Polyline2DGPU
+class ListOfPolyline2DGPU
 */
 
 /* PROGRAM FLOW
@@ -65,15 +65,15 @@ Then Render()
 /**
 namespace name: Baoquan
 */
-namespace Baoquan
-{
+// namespace Baoquan
+//{
 
   //------------------------------------------------------------------------------
   // Forward declarations
   //------------------------------------------------------------------------------
   class Idepth ;
-  class Polyline2D;
-  class ListOfPolyline2D;
+  class Polyline2DGPU;
+  class ListOfPolyline2DGPU;
 
 
   /**
@@ -355,7 +355,7 @@ class name: vtkMAFContourVolumeMapperGPU.
     /** prepare contours */
     template <typename DataType> void PrepareContoursTemplate(const int slice, const DataType *imageData);
     /** call prepare contours template */
-    void PrepareContours(const int slice, const void *imageData, ListOfPolyline2D&);
+    void PrepareContours(const int slice, const void *imageData, ListOfPolyline2DGPU&);
 
     /** Initialize OpenGL rendering */
     void InitializeRender(bool setup, vtkRenderer *renderer = NULL, vtkVolume *volume = NULL);
@@ -490,17 +490,17 @@ class name: vtkMAFContourVolumeMapperGPU.
     vtkMatrix4x4  *TransformMatrix;
     vtkMatrix4x4  *VolumeMatrix;
 
-    ListOfPolyline2D *Polylines; // This should be a parameter of a method but VStudio have problems with template argument in template function.
+    ListOfPolyline2DGPU *Polylines; // This should be a parameter of a method but VStudio have problems with template argument in template function.
 
     int GPUEnabled;         //<Non-zero if GPU processing should be used whenever it is possible
   };
 
 
 /**
-class name: Polyline2D
+class name: Polyline2DGPU
 these classes are used for optimizing the surface by analyzing 2D contours
 */
-  class Polyline2D 
+  class Polyline2DGPU 
   {
   public:
      /**
@@ -540,9 +540,9 @@ these classes are used for optimizing the surface by analyzing 2D contours
 
   public:
     /** constructor */
-    Polyline2D(const Point *line);
+    Polyline2DGPU(const Point *line);
     /** destructor */
-    ~Polyline2D() { if (this->vertices != this->verticesBuffer) delete [] vertices; }
+    ~Polyline2DGPU() { if (this->vertices != this->verticesBuffer) delete [] vertices; }
 
     /** get length*/
     int  Length() const   { return this->end -this->start + 1; }
@@ -552,7 +552,7 @@ these classes are used for optimizing the surface by analyzing 2D contours
     /** Add point and create next line*/
     bool AddNextLine(const Point *line);
     /** merge two polylines */
-    bool Merge(Polyline2D &polyline);
+    bool Merge(Polyline2DGPU &polyline);
     /** close polyline */
     void Close();
 
@@ -560,16 +560,16 @@ these classes are used for optimizing the surface by analyzing 2D contours
     void UpdateBoundingBox() const;
     
     /** check if one polyline is inside another  */
-    bool IsInsideOf(const Polyline2D *polyline) const;
+    bool IsInsideOf(const Polyline2DGPU *polyline) const;
     /** find the closest polyline */
-    void FindClosestPolyline(int index, int numOfPolylines, Polyline2D* polylines);
+    void FindClosestPolyline(int index, int numOfPolylines, Polyline2DGPU* polylines);
     /** compare polylines and find the best match */
-    int  FindSubPolyline(int numOfPolylines, Polyline2D* polylines, float &minDistance);
+    int  FindSubPolyline(int numOfPolylines, Polyline2DGPU* polylines, float &minDistance);
     /** create two polylines splitting the original*/
-    bool SplitPolyline(Polyline2D& subpoly, Polyline2D& newpoly);
+    bool SplitPolyline(Polyline2DGPU& subpoly, Polyline2DGPU& newpoly);
 
     /** if vertices are different, copy all members from parameter polyline */
-    void Move(Polyline2D &polyline);
+    void Move(Polyline2DGPU &polyline);
 
   protected:
     int size;
@@ -583,10 +583,10 @@ these classes are used for optimizing the surface by analyzing 2D contours
   };
 
 /**
-  Class Name:ListOfPolyline2D.
+  Class Name:ListOfPolyline2DGPU.
   This is a std::vector of polyline pointers, with 3 extra functions.
 */
-  class ListOfPolyline2D : public std::vector<Polyline2D*> 
+  class ListOfPolyline2DGPU : public std::vector<Polyline2DGPU*> 
   {
   public:
     /** Clear the list of polylines. */
@@ -594,7 +594,7 @@ these classes are used for optimizing the surface by analyzing 2D contours
     /** check if point is inside the contour */
     bool IsInside(int x, int y, int polylineLengthThreshold);
     /** retrieve contour polyline */
-    Polyline2D *FindContour(int x, int y, int polylineLengthThreshold, int distance = 1);
+    Polyline2DGPU *FindContour(int x, int y, int polylineLengthThreshold, int distance = 1);
   };
-}//end baoquan space
+//}//end baoquan space
 #endif

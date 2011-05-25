@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractorGenericInterface.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:46:40 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 11:48:21 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Marco Petrone, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -52,7 +52,7 @@ class vtkRenderer;
   - togliere shortcut per i vari ref sys (ved todo mafRefSys) 
   - fare esempi semplici da usare come tutorial 
 */
-class mafInteractorGenericInterface : public mafInteractor
+class MAF_EXPORT mafInteractorGenericInterface : public mafInteractor
 {
 public:
   //------------------------------------------------------------------------------

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpImporterMSF.h,v $
   Language:  C++
-  Date:      $Date: 2007-08-07 08:15:58 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2011-05-25 11:49:23 $
+  Version:   $Revision: 1.1.4.1 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004
@@ -27,7 +27,7 @@ class mafVMEGroup;
 // mafOpImporterMSF :
 //----------------------------------------------------------------------------
 /** Import an existing MSF or ZMSF file while working to another one, to merge or compare data. */
-class mafOpImporterMSF: public mafOp 
+class MAF_EXPORT mafOpImporterMSF: public mafOp 
 {
 public:
   mafOpImporterMSF(const wxString &label = "MSFImporter");

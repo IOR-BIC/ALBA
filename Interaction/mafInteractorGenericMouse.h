@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractorGenericMouse.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:46:40 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 11:48:21 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -35,7 +35,7 @@ class vtkDoubleArray;
   @sa
   - mmoTransformGeneric for examples on how to use this class with mafInteractorCompositorMouse
 */
-class mafInteractorGenericMouse : public mafInteractorGenericInterface
+class MAF_EXPORT mafInteractorGenericMouse : public mafInteractorGenericInterface
 {
 public:
   mafTypeMacro(mafInteractorGenericMouse, mafInteractor);

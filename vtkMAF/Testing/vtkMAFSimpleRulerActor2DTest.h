@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: vtkMAFSimpleRulerActor2DTest.h,v $
   Language:  C++
-  Date:      $Date: 2009-11-17 09:52:36 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 11:53:13 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Alberto Losi
 ================================================================================
   Copyright (c) 2007 Cineca, UK (www.cineca.it)
@@ -115,6 +115,8 @@ protected:
   void RenderData(vtkActor2D *actor );
   /** After saving images from render window, compare them in order to find difference between test sessions. */
   void CompareImages(vtkRenderWindow * renwin);
+
+  static std::string ConvertInt(int number);
 
   int m_TestNumber;
 };

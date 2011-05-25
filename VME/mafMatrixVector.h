@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrixVector.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:21:58 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2011-05-25 11:52:18 $
+  Version:   $Revision: 1.2.26.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -18,6 +18,11 @@
 #include "mafStorable.h"
 #include "mafStorageElement.h"
 #include "mafMatrix.h"
+
+#ifdef MAF_EXPORTS
+#include "mafDllMacros.h"
+EXPORT_STL_MAP(MAF_EXPORT,mafTimeStamp, mafAutoPointer<mafMatrix>);
+#endif
 //------------------------------------------------------------------------------
 // Forward declarations
 //------------------------------------------------------------------------------

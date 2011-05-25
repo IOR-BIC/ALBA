@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpImporterVMEDataSetAttributes.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-30 16:55:35 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2011-05-25 11:49:23 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Stefano Perticoni   
 ==========================================================================
   Copyright (c) 2002/2004
@@ -37,7 +37,7 @@ for mafVMEDataSetAttributesImporter utility class.
   @sa mafOpImporterVMEDataSetAttributesTest mafVMEDataSetAttributesImporter mafVMEDataSetAttributesImporterTest
 
 */
-class mafOpImporterVMEDataSetAttributes: public mafOp
+class MAF_EXPORT mafOpImporterVMEDataSetAttributes: public mafOp
 {
 public:
 

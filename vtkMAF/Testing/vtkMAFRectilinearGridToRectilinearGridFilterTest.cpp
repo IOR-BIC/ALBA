@@ -2,22 +2,13 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFRectilinearGridToRectilinearGridFilterTest.cpp,v $
 Language:  C++
-Date:      $Date: 2009-09-02 12:32:06 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-05-25 11:53:13 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2002/2004 
 CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-
-
-#include "mafDefines.h" 
-//----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
-// This force to include window,wxWidgets and VTK exactly in this order.
-// Failing in doing this will result in a run-time error saying:
-// "Failure#0: The value of ESP was not properly saved across a function call"
-//----------------------------------------------------------------------------
 
 #include <cppunit/config/SourcePrefix.h>
 #include "vtkMAFRectilinearGridToRectilinearGridFilterTest.h"

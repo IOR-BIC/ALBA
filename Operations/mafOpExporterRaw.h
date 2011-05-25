@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpExporterRaw.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:55:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2011-05-25 11:49:23 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Stefano Perticoni - Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -30,7 +30,7 @@ class mafString;
 // mafOpExporterRAW :
 //----------------------------------------------------------------------------
 /** */
-class mafOpExporterRAW: public mafOp
+class MAF_EXPORT mafOpExporterRAW: public mafOp
 {
 public:
   mafOpExporterRAW(const wxString &label);

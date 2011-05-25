@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpScalarToSurface.h,v $
   Language:  C++
-  Date:      $Date: 2009-10-19 08:41:11 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 11:49:23 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,7 +25,7 @@ class mafVMESurface;
 // mafOpScalarToSurface :
 //----------------------------------------------------------------------------
 /** */
-class mafOpScalarToSurface: public mafOp
+class MAF_EXPORT mafOpScalarToSurface: public mafOp
 {
 public:
   /** Constructor. */

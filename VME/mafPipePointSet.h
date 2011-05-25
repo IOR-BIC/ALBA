@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePointSet.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-02 22:00:51 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2011-05-25 11:52:18 $
+  Version:   $Revision: 1.3.18.1 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -25,7 +25,7 @@ class vtkProperty;
 //----------------------------------------------------------------------------
 // mafPipePointSet :
 //----------------------------------------------------------------------------
-class mafPipePointSet : public mafPipe
+class MAF_EXPORT mafPipePointSet : public mafPipe
 {
 public:
   mafTypeMacro(mafPipePointSet,mafPipe);

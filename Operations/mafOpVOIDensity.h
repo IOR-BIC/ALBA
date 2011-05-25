@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpVOIDensity.h,v $
   Language:  C++
-  Date:      $Date: 2008-12-10 14:28:55 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 11:49:23 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Matteo Giacomoni & Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,7 +24,7 @@ class vtkDoubleArray;
 //----------------------------------------------------------------------------
 // mafOpVOIDensity :
 //----------------------------------------------------------------------------
-class mafOpVOIDensity: public mafOp
+class MAF_EXPORT mafOpVOIDensity: public mafOp
 {
 public:
 	mafOpVOIDensity(const wxString &label = "VOIDensity");

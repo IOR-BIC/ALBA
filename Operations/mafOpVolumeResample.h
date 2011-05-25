@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpVolumeResample.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:55:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2011-05-25 11:49:23 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
 Copyright (c) 2002/2004
@@ -28,7 +28,7 @@ class vtkOutlineSource;
 class mafVMEVolumeGray;
 
 //----------------------------------------------------------------------------
-class mafOpVolumeResample: public mafOp
+class MAF_EXPORT mafOpVolumeResample: public mafOp
 {
 public:
              

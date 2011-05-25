@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp2DMeasure.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:45:06 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2011-05-25 11:49:21 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -15,6 +15,11 @@
 
 #include "mafOp.h"
 #include "mafString.h"
+
+#ifdef MAF_EXPORTS
+#include "mafDllMacros.h"
+EXPORT_STL_VECTOR(MAF_EXPORT,int);
+#endif
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -28,7 +33,7 @@ class mafEvent;
 // mafOp2DMeasure :
 //----------------------------------------------------------------------------
 /** */
-class mafOp2DMeasure: public mafOp
+class MAF_EXPORT mafOp2DMeasure: public mafOp
 {
 public:
 	mafOp2DMeasure(const wxString &label = "2DMeasure");

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpImporterImage.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:55:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2011-05-25 11:49:23 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Paolo Quadrani     
 ==========================================================================
   Copyright (c) 2002/2004
@@ -27,11 +27,16 @@ class mafEvent;
 class mafVMEImage;
 class mafVMEVolumeRGB;
 
+#ifdef MAF_EXPORTS
+#include "mafDllMacros.h"
+EXPORT_STL_VECTOR(MAF_EXPORT,std::string);
+#endif
+
 //----------------------------------------------------------------------------
 // mafOpImporterImage :
 //----------------------------------------------------------------------------
 /** */
-class mafOpImporterImage: public mafOp
+class MAF_EXPORT mafOpImporterImage: public mafOp
 {
 public:
   mafOpImporterImage(const wxString &label = "ImageImporter");

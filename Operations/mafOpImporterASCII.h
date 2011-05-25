@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpImporterASCII.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:55:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2011-05-25 11:49:23 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -25,12 +25,17 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 class mafNode;
 class mafVMEScalarMatrix;
 
+#ifdef MAF_EXPORTS
+#include "mafDllMacros.h"
+EXPORT_STL_VECTOR(MAF_EXPORT,std::string);
+#endif
+
 //----------------------------------------------------------------------------
 // mafOpImporterASCII :
 //----------------------------------------------------------------------------
 /** This type of importer allow to import files containing only numbers 
 written by rows or columns into a mafVMEScalarMatrix. Multiple files produce a time-varying mafVMEScalarMatrix.*/
-class mafOpImporterASCII: public mafOp
+class MAF_EXPORT mafOpImporterASCII: public mafOp
 {
 public:
   mafOpImporterASCII(const wxString &label = "ASCIIImporter");

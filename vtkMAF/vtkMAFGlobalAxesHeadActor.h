@@ -17,6 +17,7 @@
 #define __vtkMAFGlobalAxesHeadActor_h
 
 #include "vtkProp3D.h"
+#include "vtkMAFConfigure.h"
 
 class vtkActor;
 class vtkAppendPolyData;
@@ -56,7 +57,7 @@ vtkMAFOrientationMarkerWidget mafAxes
 
 */
 
-class vtkMAFGlobalAxesHeadActor : public vtkProp3D
+class VTK_vtkMAF_EXPORT vtkMAFGlobalAxesHeadActor : public vtkProp3D
 {
 public:
   static vtkMAFGlobalAxesHeadActor *New();

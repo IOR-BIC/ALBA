@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:05:59 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2011-05-25 11:52:18 $
+  Version:   $Revision: 1.24.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -54,7 +54,7 @@ enum SLICE_DIRECTION_ID
 position of a plane representing the cutter. The default position of the slice is the center 
 of the volume data. The visual pipe can also render 3 different slices centered in a origin point
 and oriented along 3 different axes.*/
-class mafPipeVolumeSlice : public mafPipe
+class MAF_EXPORT mafPipeVolumeSlice : public mafPipe
 {
 public:
   mafTypeMacro(mafPipeVolumeSlice,mafPipe);

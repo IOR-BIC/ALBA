@@ -3,8 +3,8 @@
 Program:   Multimod Application framework RELOADED
 Module:    $RCSfile: vtkMAFContourVolumeMapperAdv.cxx,v $
 Language:  C++
-Date:      $Date: 2008-07-03 11:27:45 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2011-05-25 11:53:13 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Alexander Savenko, Nigel McFarlane
 
 ================================================================================
@@ -17,22 +17,22 @@ All rights reserved.
 // PrepareContours()
 // PrepareContoursTemplate()
 //
-// Polyline2D::Reallocate()
-// Polyline2D::Allocate()
-// Polyline2D::Polyline2D()
-// Polyline2D::AddNextLine()
-// Polyline2D::Merge()
-// Polyline2D::Close()
-// Polyline2D::UpdateBoundingBox()
-// Polyline2D::FindClosestPolyline()    - commented out
-// Polyline2D::FindSubPolyline()        -     "      "
-// Polyline2D::SplitPolyline()          -     "      "
-// Polyline2D::Move()
-// Polyline2D::IsInsideOf()
+// Polyline2DAdv::Reallocate()
+// Polyline2DAdv::Allocate()
+// Polyline2DAdv::Polyline2DAdv()
+// Polyline2DAdv::AddNextLine()
+// Polyline2DAdv::Merge()
+// Polyline2DAdv::Close()
+// Polyline2DAdv::UpdateBoundingBox()
+// Polyline2DAdv::FindClosestPolyline()    - commented out
+// Polyline2DAdv::FindSubPolyline()        -     "      "
+// Polyline2DAdv::SplitPolyline()          -     "      "
+// Polyline2DAdv::Move()
+// Polyline2DAdv::IsInsideOf()
 //
-// ListOfPolyline2D::Clear()
-// ListOfPolyline2D::IsInside()
-// ListOfPolyline2D::FindContour()
+// ListOfPolyline2DAdv::Clear()
+// ListOfPolyline2DAdv::IsInside()
+// ListOfPolyline2DAdv::FindContour()
 
 #include <assert.h>
 
@@ -40,16 +40,66 @@ All rights reserved.
 #include "vtkMarchingSquaresCases.h"
 #include "vtkTransform.h"
 
-#include "vtkMAFContourVolumeMapper.h"
-
-using namespace vtkMAFContourVolumeMapperNamespace;
+#include "vtkMAFContourVolumeMapperAdv.h"
 
 static const vtkMarchingSquaresLineCases* marchingSquaresCases = vtkMarchingSquaresLineCases::GetCases();
 
+vtkCxxRevisionMacro(vtkMAFContourVolumeMapperAdv, "$Revision: 1.1.2.1 $");
+vtkStandardNewMacro(vtkMAFContourVolumeMapperAdv);
+
+//------------------------------------------------------------------------------
+// Constructor
+vtkMAFContourVolumeMapperAdv::vtkMAFContourVolumeMapperAdv()
+//------------------------------------------------------------------------------
+{
+  Alpha=1.0;
+
+  this->AutoLODRender = true;
+  this->AutoLODCreate = true;
+  this->EnableContourAnalysis = false;
+
+  this->BlockMinMax = NULL;
+
+  this->VoxelCoordinates[0] = this->VoxelCoordinates[1] = this->VoxelCoordinates[2] = NULL;
+
+  this->TransformMatrix = vtkMatrix4x4::New();
+  this->VolumeMatrix    = vtkMatrix4x4::New();
+
+  for (int lod = 0 ;  lod < NumberOfLods ;  lod++){
+    // set initial value of no. of triangles to undefined
+    this->NumberOfTriangles[lod] = -1 ;
+
+    // initialize times to draw to undefined
+    this->TimeToDrawDC[lod] = -1.0 ;
+    this->TimeToDrawRMC[lod] = -1.0 ;
+
+    // initialize caches to NULL
+    this->TriangleCache[lod] = NULL;
+    this->TriangleCacheSize[lod] = 0;
+
+    // sorting triangles
+    this->OrderedVertices[lod] = NULL ;
+  }
+
+  this->TimePerTriangle = -1.0 ;
+
+}
 
 
 //------------------------------------------------------------------------------
-void vtkMAFContourVolumeMapper::PrepareContours(const int slice, const void *imageData, ListOfPolyline2D& polylines) {
+// Destructor
+vtkMAFContourVolumeMapperAdv::~vtkMAFContourVolumeMapperAdv()
+//------------------------------------------------------------------------------
+{
+  // delete textures if any
+  ReleaseData();
+
+  this->TransformMatrix->Delete();
+  this->VolumeMatrix->Delete();
+}
+
+//------------------------------------------------------------------------------
+void vtkMAFContourVolumeMapperAdv::PrepareContours(const int slice, const void *imageData, ListOfPolyline2DAdv& polylines) {
   this->Polylines = &polylines;
 
   switch (this->GetDataType()) {
@@ -73,13 +123,13 @@ void vtkMAFContourVolumeMapper::PrepareContours(const int slice, const void *ima
 
 
 //------------------------------------------------------------------------------
-template<typename DataType> void vtkMAFContourVolumeMapper::PrepareContoursTemplate(const int slice, const DataType *imageData) {
+template<typename DataType> void vtkMAFContourVolumeMapperAdv::PrepareContoursTemplate(const int slice, const DataType *imageData) {
   const DataType (* const BlockMinMax)[2] = (DataType (*)[2])((DataType *)this->BlockMinMax + 2 * (slice >> VoxelBlockSizeLog) * this->NumBlocks[0] * this->NumBlocks[1]);
   const DataType ContourValue = (DataType)this->ContourValue;
   const int lastXBlock = this->NumBlocks[0] - 1, lastYBlock = this->NumBlocks[1] - 1;
   const int lastXBlockSize = this->DataDimensions[0] - 1 - (lastXBlock << VoxelBlockSizeLog), lastYBlockSize = this->DataDimensions[1] - 1 - (lastYBlock << VoxelBlockSizeLog);
 
-  ListOfPolyline2D& polylines = *this->Polylines;
+  ListOfPolyline2DAdv& polylines = *this->Polylines;
   polylines.clear();
 
   int statCounter = 0;
@@ -112,7 +162,7 @@ template<typename DataType> void vtkMAFContourVolumeMapper::PrepareContoursTempl
           const int x = (xBlock + xi) << 1;
           const int y = (yBlock + yi) << 1;
 
-          Polyline2D::Point line[2];
+          Polyline2DAdv::Point line[2];
 
           while(*edge >= 0) {
             static const int edgeToOffset[4][2] = {{1, 0}, {2, 1}, {1, 2}, {0, 1}};
@@ -144,7 +194,7 @@ template<typename DataType> void vtkMAFContourVolumeMapper::PrepareContoursTempl
               }
               continue;
             }
-            polylines.push_back(new Polyline2D(line));
+            polylines.push_back(new Polyline2DAdv(line));
           } // edge loop
 
         } // for (xi)
@@ -186,10 +236,10 @@ template<typename DataType> void vtkMAFContourVolumeMapper::PrepareContoursTempl
 
 
 ///////////////////////////////////////////////////////////////////////////////////
-//                             class Polyline2D
+//                             class Polyline2DAdv
 
 //---------------------------------------------------------------------------------
-void Polyline2D::Reallocate() {
+void Polyline2DAdv::Reallocate() {
   const int newsize = 2 * (size + 1);
   Point *buffer = new Point[newsize];
   const int newstart = int(0.5f * size + 1);
@@ -208,7 +258,7 @@ void Polyline2D::Reallocate() {
 
 
 //---------------------------------------------------------------------------------
-void Polyline2D::Allocate(int newsize) {
+void Polyline2DAdv::Allocate(int newsize) {
   if (this->vertices != NULL && (this->end - this->start) > newsize)
     return;
   if (this->vertices != this->verticesBuffer)
@@ -225,7 +275,7 @@ void Polyline2D::Allocate(int newsize) {
 
 
 //---------------------------------------------------------------------------------
-Polyline2D::Polyline2D(const Point *line) {
+Polyline2DAdv::Polyline2DAdv(const Point *line) {
   assert(sizeof(Point) == (2 * sizeof(short)));
   this->size = VERTICES_BUFFER_SIZE;
   this->start = this->end = VERTICES_BUFFER_SIZE >> 1;
@@ -242,7 +292,7 @@ Polyline2D::Polyline2D(const Point *line) {
 
 
 //---------------------------------------------------------------------------------
-bool Polyline2D::AddNextLine(const Point *newLine) {
+bool Polyline2DAdv::AddNextLine(const Point *newLine) {
   if (newLine[0] == this->vertices[this->start]) {
     if (this->start == 0)
       Reallocate();
@@ -275,7 +325,7 @@ bool Polyline2D::AddNextLine(const Point *newLine) {
 
 
 //---------------------------------------------------------------------------------
-bool Polyline2D::Merge(Polyline2D &polyline) {
+bool Polyline2DAdv::Merge(Polyline2DAdv &polyline) {
   if (polyline.vertices[polyline.start] == this->vertices[start]) {
     while (this->start <= (polyline.end - polyline.start))
       Reallocate();
@@ -314,7 +364,7 @@ bool Polyline2D::Merge(Polyline2D &polyline) {
 
 
 //---------------------------------------------------------------------------------
-void Polyline2D::Close() {
+void Polyline2DAdv::Close() {
   if (this->vertices[this->start] == this->vertices[this->end]) {
     if ((this->end + 1) == this->size)
       this->Reallocate();
@@ -326,7 +376,7 @@ void Polyline2D::Close() {
 
 
 //---------------------------------------------------------------------------------
-void Polyline2D::UpdateBoundingBox() const {
+void Polyline2DAdv::UpdateBoundingBox() const {
   this->bbox[0] = this->bbox[2] = VTK_SHORT_MAX;
   this->bbox[1] = this->bbox[3] = VTK_SHORT_MIN;
   for (int i = this->start; i <= this->end; i++) {
@@ -346,7 +396,7 @@ void Polyline2D::UpdateBoundingBox() const {
 
 /*
 //------------------------------------------------------------------------------------------------
-void Polyline2D::FindClosestPolyline(int index, int numOfPolylines, Polyline2D* polylines) {
+void Polyline2DAdv::FindClosestPolyline(int index, int numOfPolylines, Polyline2DAdv* polylines) {
 assert(index == 0 || index == 1);
 
 this->minDistance[index] = VTK_FLOAT_MAX;
@@ -390,7 +440,7 @@ this->minDistance[index] = 0;
 
 
 //----------------------------------------------------------------------------------------------------
-int Polyline2D::FindSubPolyline(int numOfPolylines, Polyline2D* polylines, float &minDistance) {
+int Polyline2DAdv::FindSubPolyline(int numOfPolylines, Polyline2DAdv* polylines, float &minDistance) {
 const int numPoints = (this->end - this->start + 1);
 minDistance = VTK_FLOAT_MAX;
 int bestMatch = -1;
@@ -431,7 +481,7 @@ return bestMatch;
 
 
 //---------------------------------------------------------------------------------
-bool Polyline2D::SplitPolyline(Polyline2D& subpoly, Polyline2D& newpoly) {
+bool Polyline2DAdv::SplitPolyline(Polyline2DAdv& subpoly, Polyline2DAdv& newpoly) {
 const int polyLength = this->end - this->start + 1;
 const int subpolyLength = subpoly.end - subpoly.start + 1;
 
@@ -574,7 +624,7 @@ return true;
 
 
 //------------------------------------------------------------------------------
-void Polyline2D::Move(Polyline2D &polyline) {
+void Polyline2DAdv::Move(Polyline2DAdv &polyline) {
   if (this->vertices != this->verticesBuffer)
     delete [] vertices;
   *this = polyline; // copy all members
@@ -590,7 +640,7 @@ void Polyline2D::Move(Polyline2D &polyline) {
 
 //------------------------------------------------------------
 // check if one polyline is inside another       
-bool Polyline2D::IsInsideOf(const Polyline2D *outerPolyline) const {
+bool Polyline2DAdv::IsInsideOf(const Polyline2DAdv *outerPolyline) const {
   if (this->updateBoundingBox)
     this->UpdateBoundingBox();
   if (outerPolyline->updateBoundingBox)
@@ -645,7 +695,7 @@ bool Polyline2D::IsInsideOf(const Polyline2D *outerPolyline) const {
 
 
 //------------------------------------------------------------------------------
-void ListOfPolyline2D::clear() {
+void ListOfPolyline2DAdv::clear() {
   for (int pj = size() - 1; pj >= 0; pj--)
     delete at(pj);
   erase(begin(), end());
@@ -654,12 +704,12 @@ void ListOfPolyline2D::clear() {
 
 
 //------------------------------------------------------------------------------
-bool ListOfPolyline2D::IsInside(int x, int y, int polylineLengthThreshold) {
+bool ListOfPolyline2DAdv::IsInside(int x, int y, int polylineLengthThreshold) {
   const short sx = x << 1;
   const short sy = y << 1;
 
   for (int pi = this->size() - 1; pi >= 0; pi--) {
-    const Polyline2D * const polyline = at(pi);
+    const Polyline2DAdv * const polyline = at(pi);
     if (polyline->Length() < polylineLengthThreshold)
       continue;
 
@@ -724,13 +774,13 @@ bool ListOfPolyline2D::IsInside(int x, int y, int polylineLengthThreshold) {
 
 
 //------------------------------------------------------------------------------
-Polyline2D *ListOfPolyline2D::FindContour(int x, int y, int polylineLengthThreshold, int distance) {
+Polyline2DAdv *ListOfPolyline2DAdv::FindContour(int x, int y, int polylineLengthThreshold, int distance) {
   const short sx = x << 1;
   const short sy = y << 1;
   distance = distance << 1;
 
   for (int pi = this->size() - 1; pi >= 0; pi--) {
-    Polyline2D *polyline = at(pi);
+    Polyline2DAdv *polyline = at(pi);
     if (polyline->Length() < polylineLengthThreshold)
       continue;
 

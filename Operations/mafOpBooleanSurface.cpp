@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafOpBooleanSurface.cpp,v $
 Language:  C++
-Date:      $Date: 2009-12-17 11:45:06 $
-Version:   $Revision: 1.3.2.1 $
+Date:      $Date: 2011-05-25 11:49:21 $
+Version:   $Revision: 1.3.2.2 $
 Authors:   Daniele Giunchi - Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -21,6 +21,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafOpBooleanSurface.h"
 #include "mafDecl.h"
 
+#include "mafRefSys.h"
 #include "mafGUI.h"
 #include "mafMatrix.h"
 #include "mafAbsMatrixPipe.h"

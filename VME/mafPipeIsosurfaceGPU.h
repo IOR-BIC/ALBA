@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeIsosurfaceGPU.h,v $
 Language:  C++
-Date:      $Date: 2008-12-12 11:03:45 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-05-25 11:52:18 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Alexander Savenko  -  Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -36,7 +36,7 @@ class mafVMESurface;
 threshold value. The value is extracted according to the scalar values present 
 into the volume data. The iso-surface is extracted in real time and can be changed 
 also the opacity value of the surface extracted.*/
-class mafPipeIsosurfaceGPU : public mafPipe 
+class MAF_EXPORT mafPipeIsosurfaceGPU : public mafPipe 
 {
 public:
 	mafTypeMacro(mafPipeIsosurfaceGPU, mafPipe);
@@ -91,7 +91,7 @@ protected:
 
 	mafVMESurface            *m_IsosurfaceVme;
 
-  Baoquan::vtkMAFContourVolumeMapperGPU   *m_ContourMapper; 
+  vtkMAFContourVolumeMapperGPU   *m_ContourMapper; 
 	vtkVolume                *m_Volume;
 
 	vtkOutlineCornerFilter   *m_OutlineBox;

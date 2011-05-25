@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractorCompositorMouse.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:46:39 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 11:48:21 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -75,7 +75,7 @@ enum MOUSE_BUTTON
   - mafGUITransformMouse component used by mafOpMAFTransform
   
 */
-class mafInteractorCompositorMouse : public mafInteractor
+class MAF_EXPORT mafInteractorCompositorMouse : public mafInteractor
 {
 public:
   mafTypeMacro(mafInteractorCompositorMouse, mafInteractor);

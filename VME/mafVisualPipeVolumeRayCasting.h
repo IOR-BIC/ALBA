@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVisualPipeVolumeRayCasting.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:05:59 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2011-05-25 11:52:18 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Alexander Savenko - Paolo Quadrani (porting MAF2.2)
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,7 +28,7 @@ class vtkMAFAdaptiveVolumeMapper;
 //----------------------------------------------------------------------------
 // mafVisualPipeVolumeRayCasting :
 //----------------------------------------------------------------------------
-class mafVisualPipeVolumeRayCasting : public mafPipe 
+class MAF_EXPORT mafVisualPipeVolumeRayCasting : public mafPipe 
 {
 public:
   mafTypeMacro(mafVisualPipeVolumeRayCasting, mafPipe);

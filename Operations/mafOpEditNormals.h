@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafOpEditNormals.h,v $
 Language:  C++
-Date:      $Date: 2008-03-06 11:55:06 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2011-05-25 11:49:23 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -25,7 +25,7 @@ class mafEvent;
 // mafOpEditNormals :
 //----------------------------------------------------------------------------
 /** */
-class mafOpEditNormals: public mafOp
+class MAF_EXPORT mafOpEditNormals: public mafOp
 {
 public:
 	mafOpEditNormals(const wxString &label = "Edit Normals");
