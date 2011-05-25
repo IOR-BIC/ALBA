@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractor6DOF.h,v $
   Language:  C++
-  Date:      $Date: 2010-06-08 07:29:49 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2011-05-25 11:40:18 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -29,7 +29,7 @@ class mafAvatar3D;
   @todo
   - rewrite the UpdateDeltaTransform()
 */
-class mafInteractor6DOF : public mafInteractorGenericInterface
+class MAF_EXPORT mafInteractor6DOF : public mafInteractorGenericInterface
 {
 public:
   mafAbstractTypeMacro(mafInteractor6DOF,mafInteractorGenericInterface);

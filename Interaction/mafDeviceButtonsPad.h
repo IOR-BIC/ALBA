@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDeviceButtonsPad.h,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 14:48:12 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 11:34:01 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -24,7 +24,7 @@ class mafEventInteraction;
   mafDeviceButtonsPad is a class providing interface for a button device.
   @sa mafDevice 
 */
-class mafDeviceButtonsPad : public mafDevice
+class MAF_EXPORT mafDeviceButtonsPad : public mafDevice
 {
 public:
   mafTypeMacro(mafDeviceButtonsPad,mafDevice); 
@@ -34,10 +34,10 @@ public:
   //------------------------------------------------------------------------------
   /** @ingroup Events
       Issued when one of the tracker's buttons is pressed */
-  MAF_ID_DEC(BUTTON_DOWN)
+  // MAF_ID_DEC(BUTTON_DOWN)
   /** @ingroup Events
       Issued when one of the tracker's buttons is released */
-  MAF_ID_DEC(BUTTON_UP)
+  // MAF_ID_DEC(BUTTON_UP)
 
   /**
    Internally used to set the last button state. After setting the button state eventual
@@ -55,6 +55,12 @@ public:
     Set the number of buttons for this device. Do not change this
     if you don't know what you are doing.*/
   void SetNumberOfButtons(int num);
+
+  /** return the button down id */
+  static mafID GetButtonDownId();
+
+  /** return the button up id */
+  static mafID GetButtonUpId();
 
 protected:
   mafDeviceButtonsPad();

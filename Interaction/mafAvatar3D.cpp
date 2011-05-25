@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar3D.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:47:18 $
-  Version:   $Revision: 1.12.2.2 $
+  Date:      $Date: 2011-05-25 11:34:01 $
+  Version:   $Revision: 1.12.2.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -693,11 +693,11 @@ void mafAvatar3D::OnEvent(mafEventBase* event)
     {
       mafEventInteraction *e = (mafEventInteraction *)event;
 
-      if (id==mafDeviceButtonsPadTracker::TRACKER_3D_MOVE) // manage changes in the bounds of the tracker
+      if (id==mafDeviceButtonsPadTracker::GetTracker3DMoveId()) // manage changes in the bounds of the tracker
       {
         OnMove3DEvent(e);
       }
-      else if (id==mafDeviceButtonsPadTracker::TRACKER_BOUNDS_UPDATED)
+      else if (id==mafDeviceButtonsPadTracker::GetTrackerBoundsUpdatedId())
       {
         OnUpdateBoundsEvent(GetTracker());          
       }

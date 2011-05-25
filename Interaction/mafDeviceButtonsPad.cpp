@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDeviceButtonsPad.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 14:48:12 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 11:34:01 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -19,8 +19,9 @@
 //------------------------------------------------------------------------------
 // Events
 //------------------------------------------------------------------------------
-MAF_ID_IMP(mafDeviceButtonsPad::BUTTON_DOWN)
-MAF_ID_IMP(mafDeviceButtonsPad::BUTTON_UP)
+/** Event ID used to know if the VME should serialize itself as a single or multiple binary files.*/
+// MAF_ID_IMP(mafDeviceButtonsPad::BUTTON_DOWN)
+// MAF_ID_IMP(mafDeviceButtonsPad::BUTTON_UP)
 
 mafCxxTypeMacro(mafDeviceButtonsPad)
 
@@ -97,14 +98,14 @@ void mafDeviceButtonsPad::SetButtonState(int num, bool value, unsigned long modi
     case 1:
       {
         // issue OnButtonDown
-        mafEventInteraction e(this,BUTTON_DOWN,num,modifiers);
+        mafEventInteraction e(this,GetButtonDownId(),num,modifiers);
         SendButtonEvent(&e);
       }
       break;
     case -1:
       {
         // issue OnButtonUp
-        mafEventInteraction e(this,BUTTON_UP,num,modifiers);
+        mafEventInteraction e(this,GetButtonUpId(),num,modifiers);
         this->SendButtonEvent(&e);
       }
       break;
@@ -125,4 +126,18 @@ bool mafDeviceButtonsPad::GetButtonState(int num)
 //------------------------------------------------------------------------------
 {
   return (num>=0&&num<m_NumberOfButtons)?m_ButtonState[num]:false;
+}
+//------------------------------------------------------------------------------
+mafID mafDeviceButtonsPad::GetButtonDownId()
+//------------------------------------------------------------------------------
+{
+  static const mafID buttonDownId = mmuIdFactory::GetNextId("BUTTON_DOWN");
+  return buttonDownId;
+}
+//------------------------------------------------------------------------------
+mafID mafDeviceButtonsPad::GetButtonUpId()
+//------------------------------------------------------------------------------
+{
+  static const mafID buttonUpId = mmuIdFactory::GetNextId("BUTTON_UP");
+  return buttonUpId;
 }

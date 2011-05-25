@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDeviceButtonsPadMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 14:48:12 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 11:34:01 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -36,9 +36,9 @@
 //------------------------------------------------------------------------------
 // Events
 //------------------------------------------------------------------------------
-MAF_ID_IMP(mafDeviceButtonsPadMouse::MOUSE_2D_MOVE)
-MAF_ID_IMP(mafDeviceButtonsPadMouse::MOUSE_CHAR_EVENT)
-MAF_ID_IMP(mafDeviceButtonsPadMouse::MOUSE_DCLICK)
+// MAF_ID_IMP(mafDeviceButtonsPadMouse::MOUSE_2D_MOVE)
+// MAF_ID_IMP(mafDeviceButtonsPadMouse::MOUSE_CHAR_EVENT)
+// MAF_ID_IMP(mafDeviceButtonsPadMouse::MOUSE_DCLICK)
 
 //------------------------------------------------------------------------------
 mafCxxTypeMacro(mafDeviceButtonsPadMouse)
@@ -75,7 +75,7 @@ void mafDeviceButtonsPadMouse::OnEvent(mafEventBase *event)
 
   mafEventInteraction *e = mafEventInteraction::SafeDownCast(event);
 
-  if (id == MOUSE_2D_MOVE)
+  if (id == GetMouse2DMoveId())
   {
     double pos[2];
     e->Get2DPosition(pos);
@@ -85,7 +85,7 @@ void mafDeviceButtonsPadMouse::OnEvent(mafEventBase *event)
     }
     SetLastPosition(pos[0],pos[1],e->GetModifiers());
   }
-  else if (id == BUTTON_DOWN || id == MOUSE_DCLICK)
+  else if (id == GetButtonDownId() || id == GetMouseDClickId())
   {
     // store the Selected RWI is needed for compounded view
     m_ButtonPressed = true;
@@ -107,7 +107,7 @@ void mafDeviceButtonsPadMouse::OnEvent(mafEventBase *event)
       InvokeEvent(remoteEv,REMOTE_COMMAND_CHANNEL);
     }
   }
-  else if (id == BUTTON_UP)
+  else if (id == GetButtonUpId())
   {
     m_ButtonPressed = false;
     e->Get2DPosition(m_LastPosition);
@@ -120,7 +120,7 @@ void mafDeviceButtonsPadMouse::OnEvent(mafEventBase *event)
       DisplayToNormalizedDisplay(disp);
       mafEventInteraction remoteEv;
       remoteEv.SetSender(this);
-      remoteEv.SetId(BUTTON_UP);
+      remoteEv.SetId(GetButtonUpId());
       remoteEv.SetButton(e->GetButton());
       remoteEv.Set2DPosition(disp);
       remoteEv.SetModifiers(e->GetModifiers());
@@ -135,13 +135,13 @@ void mafDeviceButtonsPadMouse::OnEvent(mafEventBase *event)
       m_SelectedView = ev->GetView();    
     }
   }
-  else if (id == MOUSE_CHAR_EVENT)
+  else if (id == GetMouseCharEventId())
   {
     mafEvent *ev = mafEvent::SafeDownCast(event);
     if (ev)
     {
       unsigned char key = (unsigned char)ev->GetArg();
-      mafEventInteraction ei(this,MOUSE_CHAR_EVENT);
+      mafEventInteraction ei(this,GetMouseCharEventId());
       ei.SetKey(key);
       InvokeEvent(&ei,MCH_INPUT);
     }
@@ -163,7 +163,7 @@ void mafDeviceButtonsPadMouse::SetLastPosition(double x,double y,unsigned long m
     DisplayToNormalizedDisplay(disp);
     mafEventInteraction remoteEv;
     remoteEv.SetSender(this);
-    remoteEv.SetId(MOUSE_2D_MOVE);
+    remoteEv.SetId(GetMouse2DMoveId());
     remoteEv.SetModifiers(modifiers);
     remoteEv.Set2DPosition(disp);
     InvokeEvent(remoteEv,REMOTE_COMMAND_CHANNEL);
@@ -171,7 +171,7 @@ void mafDeviceButtonsPadMouse::SetLastPosition(double x,double y,unsigned long m
   m_FromRemote = false;
 
   // create a new event with last position
-  mafEventInteraction e(this,MOUSE_2D_MOVE,x,y);
+  mafEventInteraction e(this,GetMouse2DMoveId(),x,y);
   e.SetModifiers(modifiers);
   InvokeEvent(e,MCH_INPUT);
 }
@@ -253,4 +253,25 @@ void mafDeviceButtonsPadMouse::NormalizedDisplayToDisplay(double normalized[2])
   normalized[0] += (size[0]*.5);
   normalized[1] += (size[1]*.5);
   //  r->NormalizedDisplayToDisplay(normalized[0],normalized[1]);
+}
+//------------------------------------------------------------------------------
+mafID mafDeviceButtonsPadMouse::GetMouse2DMoveId()
+//------------------------------------------------------------------------------
+{
+  static const mafID mouse2DMoveId = mmuIdFactory::GetNextId("MOUSE_2D_MOVE");
+  return mouse2DMoveId;
+}
+//------------------------------------------------------------------------------
+mafID mafDeviceButtonsPadMouse::GetMouseCharEventId()
+//------------------------------------------------------------------------------
+{
+  static const mafID mouseCharEventId = mmuIdFactory::GetNextId("MOUSE_CHAR_EVENT");
+  return mouseCharEventId;
+}
+//------------------------------------------------------------------------------
+mafID mafDeviceButtonsPadMouse::GetMouseDClickId()
+//------------------------------------------------------------------------------
+{
+  static const mafID mouseDClickId = mmuIdFactory::GetNextId("MOUSE_DCLICK");
+  return mouseDClickId;
 }

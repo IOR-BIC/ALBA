@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoInterface.h,v $
   Language:  C++
-  Date:      $Date: 2010-11-10 16:51:28 $
-  Version:   $Revision: 1.4.2.4 $
+  Date:      $Date: 2011-05-25 11:35:56 $
+  Version:   $Revision: 1.4.2.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,7 +36,7 @@ class mafMatrix;
  
   @todo
 */
-class mafGizmoInterface : public mafObserver 
+class MAF_EXPORT mafGizmoInterface : public mafObserver 
 {
 public:
 	

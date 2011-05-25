@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar.h,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 14:49:03 $
-  Version:   $Revision: 1.5.2.1 $
+  Date:      $Date: 2011-05-25 11:34:01 $
+  Version:   $Revision: 1.5.2.2 $
   Authors:   Marco Petrone & Michele Diegoli
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -40,7 +40,7 @@ class vtkAbstractPropPicker;
   hiding and showing it at the right time. The Avatar moves according to an
   interactor, which must also be set by subclasses.
  */
-class mafAvatar : public mafInteractor, public mafStorable
+class MAF_EXPORT mafAvatar : public mafInteractor, public mafStorable
 {
 public:
   /** @ingroup Events

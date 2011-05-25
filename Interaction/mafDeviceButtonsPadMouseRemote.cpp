@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDeviceButtonsPadMouseRemote.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 14:48:12 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 11:35:56 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -61,12 +61,12 @@ void mafDeviceButtonsPadMouseRemote::OnEvent(mafEventBase *event)
     e->Get2DPosition(pos);
   }
 
-  if (id == mafDeviceButtonsPadMouse::MOUSE_2D_MOVE)
+  if (id == mafDeviceButtonsPadMouse::GetMouse2DMoveId())
   {
     NormalizedDisplayToDisplay(pos);
     SetLastPosition(pos[0],pos[1],e->GetModifiers());
   }
-  else if (id == BUTTON_DOWN || id == MOUSE_DCLICK)
+  else if (id == GetButtonDownId() || id == GetMouseDClickId())
   {
     // store the Selected RWI is needed for compounded view
     m_ButtonPressed = true;
@@ -81,7 +81,7 @@ void mafDeviceButtonsPadMouseRemote::OnEvent(mafEventBase *event)
     e->Set2DPosition(m_LastPosition);
     InvokeEvent(e,MCH_INPUT);
   }
-  else if (id == BUTTON_UP)
+  else if (id == GetButtonUpId())
   {
     NormalizedDisplayToDisplay(pos);
     m_LastPosition[0] = pos[0];
@@ -103,13 +103,13 @@ void mafDeviceButtonsPadMouseRemote::OnEvent(mafEventBase *event)
     m_SelectedView = NULL;
     m_SelectedRWI  = NULL;
   }
-  else if (id == mafDeviceButtonsPadMouse::MOUSE_CHAR_EVENT)
+  else if (id == mafDeviceButtonsPadMouse::GetMouseCharEventId())
   {
     mafEvent *ev = mafEvent::SafeDownCast(event);
     if (ev)
     {
       unsigned char key = (unsigned char)ev->GetArg();
-      mafEventInteraction ei(this, mafDeviceButtonsPadMouse::MOUSE_CHAR_EVENT);
+      mafEventInteraction ei(this, mafDeviceButtonsPadMouse::GetMouseCharEventId());
       ei.SetKey(key);
       InvokeEvent(ei,MCH_INPUT);
     }

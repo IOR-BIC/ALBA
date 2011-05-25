@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAction.h,v $
   Language:  C++
-  Date:      $Date: 2009-10-29 10:22:45 $
-  Version:   $Revision: 1.4.4.1 $
+  Date:      $Date: 2011-05-25 11:35:56 $
+  Version:   $Revision: 1.4.4.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -27,7 +27,7 @@ class mafInteractor;
 class vtkRenderer;
 
 /** Class used to route events from devices to interactors */
-class mafAction : public mafAgent, public mafStorable
+class MAF_EXPORT mafAction : public mafAgent, public mafStorable
 {
 public:
   /** @ingroup Events */

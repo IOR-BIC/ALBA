@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-22 16:44:18 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2011-05-25 11:35:56 $
+  Version:   $Revision: 1.5.22.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -30,7 +30,8 @@
 //----------------------------------------------------------------------------
 // static variables
 //----------------------------------------------------------------------------
-mafInteractionFactory *mafInteractionFactory::m_Instance=NULL;
+bool mafInteractionFactory::m_Initialized=false;
+// mafInteractionFactory *mafInteractionFactory::m_Instance=NULL;
 std::set<std::string> mafInteractionFactory::m_DeviceNames; 
 std::set<std::string> mafInteractionFactory::m_AvatarNames;
 
@@ -43,17 +44,19 @@ mafCxxTypeMacro(mafInteractionFactory);
 int mafInteractionFactory::Initialize()
 //----------------------------------------------------------------------------
 {
-  if (m_Instance==NULL)
+  if (!m_Initialized)
   {
-    m_Instance=mafInteractionFactory::New();
+    //m_Instance=mafInteractionFactory::New();
 
-    if (m_Instance)
+    m_Initialized=true;
+    if (GetInstance())
     {
-      m_Instance->RegisterFactory(m_Instance);
+      GetInstance()->RegisterFactory(GetInstance());
       return MAF_OK;  
     }
     else
     {
+      m_Initialized=false;
       return MAF_ERROR;
     }
   }
@@ -65,7 +68,7 @@ int mafInteractionFactory::Initialize()
 mafInteractionFactory::mafInteractionFactory()
 //------------------------------------------------------------------------------
 {
-  m_Instance = NULL;
+  //m_Instance = NULL;
   
   //
   // Plug here Devices in this factory
@@ -208,4 +211,12 @@ const char *mafInteractionFactory::GetAvatarName(int idx)
   for (int i=0;i<idx;i++)
     it++;
   return it->c_str();
+}
+//------------------------------------------------------------------------------
+mafInteractionFactory* mafInteractionFactory::GetInstance()
+//------------------------------------------------------------------------------
+{
+  static mafInteractionFactory &istance = *(mafInteractionFactory::New());
+  Initialize();
+  return &istance;
 }

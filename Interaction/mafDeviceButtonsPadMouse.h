@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDeviceButtonsPadMouse.h,v $
   Language:  C++
-  Date:      $Date: 2010-01-13 12:04:24 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2011-05-25 11:34:01 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -29,7 +29,7 @@ class vtkRenderWindowInteractor;
   widget or windows toolkit can inject events into this centralized mouse.
   @sa mafDeviceButtonsPad mafRWI
 */
-class mafDeviceButtonsPadMouse : public mafDeviceButtonsPad
+class MAF_EXPORT mafDeviceButtonsPadMouse : public mafDeviceButtonsPad
 {
 public:
   mafTypeMacro(mafDeviceButtonsPadMouse,mafDeviceButtonsPad); 
@@ -39,13 +39,22 @@ public:
   //------------------------------------------------------------------------------
   /** @ingroup Events
       Issued when a mouse is moved */
-  MAF_ID_DEC(MOUSE_2D_MOVE)
+  // MAF_ID_DEC(MOUSE_2D_MOVE)
   /** @ingroup Events
       Issued when a keyboard char is pressed */
-  MAF_ID_DEC(MOUSE_CHAR_EVENT)
+  // MAF_ID_DEC(MOUSE_CHAR_EVENT)
   /** @ingroup Events
       Issued on double click mouse button */
-  MAF_ID_DEC(MOUSE_DCLICK)
+  // MAF_ID_DEC(MOUSE_DCLICK)
+
+  /** return the mouse 2d move id */
+  static mafID GetMouse2DMoveId();
+
+  /** return the mouse char event id */
+  static mafID GetMouseCharEventId();
+
+  /** return the mouse D click id */
+  static mafID GetMouseDClickId();
     
   /** Reimplemented to manage fusion of move events. */
   virtual void OnEvent(mafEventBase *event);

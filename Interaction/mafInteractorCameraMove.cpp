@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractorCameraMove.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-12-22 16:39:00 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2011-05-25 11:40:18 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Paolo Quadrani & Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -67,7 +67,7 @@ void mafInteractorCameraMove::OnEvent(mafEventBase *event)
     mafDeviceButtonsPadMouse *mouse = mafDeviceButtonsPadMouse::SafeDownCast(GetDevice());
     
     // if the event comes from tracker which started the interaction continue...
-    if (id == mafDeviceButtonsPadMouse::MOUSE_2D_MOVE && mouse)
+    if (id == mafDeviceButtonsPadMouse::GetMouse2DMoveId() && mouse)
     {
       if (!m_CurrentCamera)
         return;

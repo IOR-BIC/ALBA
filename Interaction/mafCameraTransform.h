@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafCameraTransform.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-02 15:18:16 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2011-05-25 11:34:01 $
+  Version:   $Revision: 1.2.22.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -57,7 +57,7 @@ class vtkObject;
   @todo:
   - implement issuing of MATRIX_UPDATE (to be done in mafTranformBase)
   */
-class mafCameraTransform:public mafTransformBase
+class MAF_EXPORT mafCameraTransform:public mafTransformBase
 {
 public:
   mafCameraTransform();

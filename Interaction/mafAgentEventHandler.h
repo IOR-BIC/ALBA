@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafAgentEventHandler.h,v $
 Language:  C++
-Date:      $Date: 2005-04-29 16:10:17 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2011-05-25 11:35:56 $
+Version:   $Revision: 1.1.22.1 $
 Authors:   Marco Petrone
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -24,7 +24,7 @@ class mafWXEventHandler;
   mafAgentEventHandler is sused to synchronize event dispatching with the wxWindows 
   message pump.
 @sa mflEvent mafAgentEventQueue */
-class mafAgentEventHandler : public mafAgentEventQueue
+class MAF_EXPORT mafAgentEventHandler : public mafAgentEventQueue
 {
 public:
   mafTypeMacro(mafAgentEventHandler,mafAgentEventQueue);

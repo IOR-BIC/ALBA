@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUITransformInterface.h,v $
   Language:  C++
-  Date:      $Date: 2009-10-02 08:49:09 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 11:35:56 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,7 +36,7 @@ class mafVME;
   @todo
 
 */
-class mafGUITransformInterface : public mafObserver
+class MAF_EXPORT mafGUITransformInterface : public mafObserver
 {
 public:
 

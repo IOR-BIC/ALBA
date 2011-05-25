@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionFactory.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-13 13:53:00 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2011-05-25 11:35:56 $
+  Version:   $Revision: 1.5.22.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -17,6 +17,11 @@
 #include "mafObjectFactory.h"
 #include "mafInteractionConfigure.h"
 #include <set>
+
+#ifdef MAF_EXPORTS
+#include "mafDllMacros.h"
+EXPORT_STL_SET(MAF_EXPORT,std::string);
+#endif
 
 /** to be used internally for plugging default devices --- calls a member function directly */
 #define mafPlugDeviceMacro(node_type,descr) \
@@ -47,7 +52,7 @@ public:
   static int Initialize();
   
   /** return the instance pointer of the factory. return NULL if not initialized yet */
-  static mafInteractionFactory *GetInstance() {if (!m_Instance) Initialize(); return m_Instance;}
+  static mafInteractionFactory *GetInstance();// {if (!m_Instance) Initialize(); return m_Instance;}
 
   /** create an instance of the node give its type name */
   static mafDevice *CreateDeviceInstance(const char *type_name);
@@ -91,7 +96,8 @@ protected:
   mafInteractionFactory();
   ~mafInteractionFactory() { }
 
-  static mafInteractionFactory *m_Instance;
+  static bool m_Initialized;
+  //static mafInteractionFactory *m_Instance;
   static std::set<std::string> m_DeviceNames; 
   static std::set<std::string> m_AvatarNames; 
   
@@ -102,7 +108,7 @@ private:
 
 /** Plug  a node in the main MAF Avatar factory.*/
 template <class T>
-class MAF_EXPORT mafPlugAvatar
+class mafPlugAvatar
 {
   public:
   mafPlugAvatar(const char *description);
@@ -124,7 +130,7 @@ mafPlugAvatar<T>::mafPlugAvatar(const char *description)
 
 /** Plug  a node in the main MAF Device factory.*/
 template <class T>
-class MAF_EXPORT mafPlugDevice
+class mafPlugDevice
 {
   public:
   mafPlugDevice(const char *description);

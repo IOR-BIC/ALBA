@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIGizmoTranslate.h,v $
   Language:  C++
-  Date:      $Date: 2009-07-15 14:26:49 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 11:35:56 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,7 +32,7 @@ class mafGUI;
  
   @todo
 */
-class mafGUIGizmoTranslate : public mafGUIGizmoInterface
+class MAF_EXPORT mafGUIGizmoTranslate : public mafGUIGizmoInterface
 {
 public:
 

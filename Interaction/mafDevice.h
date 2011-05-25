@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDevice.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:38 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2011-05-25 11:34:01 $
+  Version:   $Revision: 1.6.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -32,7 +32,7 @@ class mafGUI;
   @todo
    - check about ID restoring
  */
-class mafDevice : public mafAgentThreaded, public mafStorable
+class MAF_EXPORT mafDevice : public mafAgentThreaded, public mafStorable
 {
 public:
   /** non persistent device IDs start from MAF_MIN_DEVICE_ID. This means I cannot have more then 

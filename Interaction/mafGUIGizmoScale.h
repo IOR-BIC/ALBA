@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIGizmoScale.h,v $
   Language:  C++
-  Date:      $Date: 2009-09-08 12:39:45 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 11:35:56 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -33,7 +33,7 @@ class mafGUI;
   @todo
 */
 
-class mafGUIGizmoScale : public mafGUIGizmoInterface
+class MAF_EXPORT mafGUIGizmoScale : public mafGUIGizmoInterface
 {
 public:
 

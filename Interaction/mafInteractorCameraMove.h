@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractorCameraMove.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:46:39 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 11:40:18 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Paolo Quadrani & Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -38,7 +38,7 @@ class vtkCamera;
   This class implements a mouse move of the renderer camera in the scene. The interaction
   modality is a mouse manipulation, where movements of the mouse are mapped
   into movements of the camera. More details to be written...*/
-class mafInteractorCameraMove : public mafInteractor
+class MAF_EXPORT mafInteractorCameraMove : public mafInteractor
 {
 public:
   mafTypeMacro(mafInteractorCameraMove,mafInteractor);

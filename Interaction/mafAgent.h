@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAgent.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-21 07:55:50 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2011-05-25 11:35:56 $
+  Version:   $Revision: 1.8.22.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -18,6 +18,11 @@
 #include "mafEventSender.h"
 #include "mafString.h"
 #include "mafEventBase.h"
+
+#ifdef MAF_EXPORTS
+#include "mafDllMacros.h"
+EXPORT_STL_VECTOR(MAF_EXPORT,mafEventSource*);
+#endif
 
 //----------------------------------------------------------------------------
 // forward declarations

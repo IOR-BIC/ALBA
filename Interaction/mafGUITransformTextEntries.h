@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUITransformTextEntries.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:47:19 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2011-05-25 11:35:56 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -51,7 +51,7 @@ class mafMatrix;
 
 
 */
-class mafGUITransformTextEntries : public mafGUITransformInterface
+class MAF_EXPORT mafGUITransformTextEntries : public mafGUITransformInterface
 {
 public:
 

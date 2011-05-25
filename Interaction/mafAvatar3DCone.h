@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar3DCone.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-03 05:58:11 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2011-05-25 11:34:01 $
+  Version:   $Revision: 1.2.22.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -27,7 +27,7 @@ class vtkAssembly;
   Simple implementation of avatar being represented in the scene as a Cone
   @sa mafAvatar3D
 */
-class mafAvatar3DCone : public mafAvatar3D
+class MAF_EXPORT mafAvatar3DCone : public mafAvatar3D
 {
 public:
   mafTypeMacro(mafAvatar3DCone,mafAvatar3D);

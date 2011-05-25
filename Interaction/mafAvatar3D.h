@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar3D.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:47:18 $
-  Version:   $Revision: 1.7.2.2 $
+  Date:      $Date: 2011-05-25 11:34:01 $
+  Version:   $Revision: 1.7.2.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -49,7 +49,7 @@ class vtkRenderWindowInteractor;
   - make the avatar have its own GUI plugged into the device gui settings
   - refactoring to have the avatar picking nodes (VME)
  */
-class mafAvatar3D : public mafAvatar
+class MAF_EXPORT mafAvatar3D : public mafAvatar
 {
 public:  
   //----------------------------------------------------------------------------

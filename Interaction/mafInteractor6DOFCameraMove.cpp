@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractor6DOFCameraMove.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:46:39 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 11:40:18 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Michele Diegoli & Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -65,7 +65,7 @@ void mafInteractor6DOFCameraMove::OnEvent(mafEventBase *event)
     }  
     
     // if the event comes from tracker which started the interaction continue...
-    if (id==mafDeviceButtonsPadTracker::TRACKER_3D_MOVE && tracker)
+    if (id==mafDeviceButtonsPadTracker::GetTracker3DMoveId() && tracker)
     {
       if (!m_CurrentCamera)
         return;

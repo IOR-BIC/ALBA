@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractor6DOFCameraMove.h,v $
   Language:  C++
-  Date:      $Date: 2010-04-09 07:00:44 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2011-05-25 11:40:18 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Michele Diegoli & Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -26,7 +26,7 @@ class vtkCamera;
   modality is a direct manipulation, where movement of the tracker are mapped
   into movements of the camera. More details to be written...
 */
-class mafInteractor6DOFCameraMove : public mafInteractor6DOF
+class MAF_EXPORT mafInteractor6DOFCameraMove : public mafInteractor6DOF
 {
 public:
   mafTypeMacro(mafInteractor6DOFCameraMove,mafInteractor6DOF);

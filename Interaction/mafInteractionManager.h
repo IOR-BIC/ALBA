@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:47:19 $
-  Version:   $Revision: 1.16.2.2 $
+  Date:      $Date: 2011-05-25 11:40:18 $
+  Version:   $Revision: 1.16.2.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -30,7 +30,11 @@ class mafEventBase;
 class mafEvent;
 class mafAction;
 class mafInteractor;
+#ifdef MAF_EXPORTS
+#include "mafAvatar.h"
+#else
 class mafAvatar;
+#endif
 class mafDevice;
 class mafDeviceManager;
 class mafDeviceSet;
@@ -54,6 +58,13 @@ class mafGUIHolder;
 class mafGUINamedPanel;
 class mafDeviceClientMAF;
 
+#ifdef MAF_EXPORTS
+#include "mafDllMacros.h"
+EXPORT_STL_MAP(MAF_EXPORT,mafString,mafAutoPointer<mafAvatar>);
+EXPORT_STL_LIST(MAF_EXPORT,mafAutoPointer<mafInteractorPER>);
+EXPORT_STL_SET(MAF_EXPORT,mafView*);
+#endif
+
 
 /** This class takes care of mastering the interaction inside views.
   This class is responsible to coordinate interaction, i.e. 
@@ -68,7 +79,7 @@ class mafDeviceClientMAF;
   @todo
   - check the renderer to be RenFront
 */
-class mafInteractionManager : public mafObject, public mafObserver, public mafEventSender, public mafStorable
+class MAF_EXPORT mafInteractionManager : public mafObject, public mafObserver, public mafEventSender, public mafStorable
 {
 public:
   mafInteractionManager();

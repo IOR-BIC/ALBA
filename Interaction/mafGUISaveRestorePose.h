@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUISaveRestorePose.h,v $
   Language:  C++
-  Date:      $Date: 2009-11-09 09:54:20 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 11:35:56 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Paolo Quadrani , Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -37,7 +37,7 @@ class mafMatrix;
   @sa mafOpMAFTransform
   
 */
-class mafGUISaveRestorePose : public mafGUITransformInterface
+class MAF_EXPORT mafGUISaveRestorePose : public mafGUITransformInterface
 {
 public:
 

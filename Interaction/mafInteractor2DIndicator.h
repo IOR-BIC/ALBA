@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafInteractor2DIndicator.h,v $
 Language:  C++
-Date:      $Date: 2009-12-17 11:46:39 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-05-25 11:40:18 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -45,7 +45,7 @@ the histogram of the probed points on VME. This interactor works in renderwindow
 maintaining measure persistence at button up
 */
 //----------------------------------------------------------------------------
-class mafInteractor2DIndicator : public mafInteractorPER
+class MAF_EXPORT mafInteractor2DIndicator : public mafInteractorPER
 	//----------------------------------------------------------------------------
 {
 public:
