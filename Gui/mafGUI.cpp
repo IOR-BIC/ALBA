@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUI.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-06-14 13:41:53 $
-  Version:   $Revision: 1.2.2.8 $
+  Date:      $Date: 2011-05-25 10:03:24 $
+  Version:   $Revision: 1.2.2.9 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -96,7 +96,7 @@ const int DW	= EW+HM+EW+HM+EW;					// Data Width - Full Width without the Label 
 
 static wxPoint dp = wxDefaultPosition; 
 
-int MAFWidgetId = MINID;
+// int MAFWidgetId = MINID;
 
 //----------------------------------------------------------------------------
 // mafGUI
@@ -239,7 +239,7 @@ void mafGUI::Enable(int mod_id, bool enable)
   }
   else
   {
-    for(int i = MINID; i <= MAFWidgetId; i++) 
+    for(int i = MINID; i <= (*GetMAFWidgetId()); i++) 
     {
       if(m_WidgetTableID[i - MINID] == mod_id)   
       {
@@ -1593,3 +1593,19 @@ void mafGUI::SetWidgetValue(int id, WidgetDataType &widget_data)
     id = GetModuleId(id);
   mafEventMacro(mafEvent(this, id));
 }
+//----------------------------------------------------------------------------
+int* mafGUI::GetMAFWidgetId()
+//----------------------------------------------------------------------------
+{
+  static int MAFWidgetId = MINID;
+  return &MAFWidgetId;
+}
+//----------------------------------------------------------------------------
+int mafGUI::GetWidgetId(int mod_id)
+//----------------------------------------------------------------------------
+{
+  int *MAFWidgetId = GetMAFWidgetId();
+  (*MAFWidgetId)++; 
+  m_WidgetTableID[(*MAFWidgetId) - MINID] = mod_id; 
+  return (*MAFWidgetId);
+} 

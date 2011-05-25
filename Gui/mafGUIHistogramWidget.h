@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIHistogramWidget.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-11 11:38:57 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2011-05-25 10:08:10 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -35,7 +35,7 @@ class vtkLookupTable;
 
 //----------------------------------------------------------------------------
 /** mafGUIHistogramWidget : widget that encapsulate render window into a gui*/
-class mafGUIHistogramWidget: public mafGUIPanel, public mafObserver
+class MAF_EXPORT mafGUIHistogramWidget: public mafGUIPanel, public mafObserver
 {
 public:
   mafGUIHistogramWidget(wxWindow* parent, wxWindowID id = -1, const wxPoint& pos = wxDefaultPosition, 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIColorSwatch.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2011-05-25 10:05:18 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,7 +21,7 @@ Transparency is visually suggested using a b/w chessboard
 which become more visible as long as the alpha increase.
 
 */
-class mafGUIColorSwatch: public wxPanel
+class MAF_EXPORT mafGUIColorSwatch: public wxPanel
 {
 public:
   mafGUIColorSwatch(wxWindow* parent, wxWindowID id = -1, const wxPoint& pos = wxDefaultPosition, 

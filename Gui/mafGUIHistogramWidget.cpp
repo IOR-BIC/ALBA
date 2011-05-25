@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUIHistogramWidget.cpp,v $
 Language:  C++
-Date:      $Date: 2009-12-11 11:38:57 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2011-05-25 10:08:10 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -246,7 +246,7 @@ void mafGUIHistogramWidget::OnEvent( mafEventBase *event )
   }
   else if (mafEventInteraction *ei = mafEventInteraction::SafeDownCast(event))
   {
-    if (ei->GetId() == mafDeviceButtonsPadMouse::MOUSE_2D_MOVE)
+    if (ei->GetId() == mafDeviceButtonsPadMouse::GetMouse2DMoveId())
     {
       if(m_Histogram->GetInputData() == NULL) return;
       double pos[2];
@@ -268,7 +268,7 @@ void mafGUIHistogramWidget::OnEvent( mafEventBase *event )
       }
       m_HistogramRWI->CameraUpdate();
     }
-    else if (ei->GetId() == mafDeviceButtonsPad::BUTTON_DOWN)
+    else if (ei->GetId() == mafDeviceButtonsPad::GetButtonDownId())
     {
       if (ei->GetButton() == MAF_LEFT_BUTTON && ei->GetModifier(MAF_CTRL_KEY))
       {
@@ -294,7 +294,7 @@ void mafGUIHistogramWidget::OnEvent( mafEventBase *event )
         }
       }
     }
-    else if (ei->GetId() == mafDeviceButtonsPad::BUTTON_UP)
+    else if (ei->GetId() == mafDeviceButtonsPad::GetButtonUpId())
     {
       if (ei->GetButton() == MAF_RIGHT_BUTTON)
       {

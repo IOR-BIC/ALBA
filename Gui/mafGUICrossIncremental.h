@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUICrossIncremental.h,v $
   Language:  C++
-  Date:      $Date: 2009-06-16 09:14:49 $
-  Version:   $Revision: 1.4.2.4 $
+  Date:      $Date: 2011-05-25 10:05:18 $
+  Version:   $Revision: 1.4.2.5 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2008
@@ -46,7 +46,7 @@ It can use two accumulator variable that are updated. It needed absolutely step 
 After modification, it returns to listener an event with in Arg the sign of increment.
 */
 //----------------------------------------------------------------------------
-class mafGUICrossIncremental: public mafGUIPanel , public mafObserver
+class MAF_EXPORT mafGUICrossIncremental: public mafGUIPanel , public mafObserver
 {
 public:
   mafGUICrossIncremental(wxWindow* parent, 

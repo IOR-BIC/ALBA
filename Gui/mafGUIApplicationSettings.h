@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUIApplicationSettings.h,v $
 Language:  C++
-Date:      $Date: 2009-11-03 14:49:31 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2011-05-25 10:03:24 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -32,7 +32,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
    - passphrase for data encryption
    - default image type when saving a snapshot
 */
-class mafGUIApplicationSettings : public mafGUISettings
+class MAF_EXPORT mafGUIApplicationSettings : public mafGUISettings
 {
 public:
   /** constructor .*/

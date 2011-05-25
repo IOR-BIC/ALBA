@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUITransformMouse.h,v $
   Language:  C++
-  Date:      $Date: 2011-03-29 10:00:01 $
-  Version:   $Revision: 1.1.2.6 $
+  Date:      $Date: 2011-05-25 10:14:03 $
+  Version:   $Revision: 1.1.2.7 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -37,7 +37,7 @@ class mafVME;
   @todo
 
 */
-class mafGUITransformMouse : public mafGUITransformInterface
+class MAF_EXPORT mafGUITransformMouse : public mafGUITransformInterface
 {
 public:
   mafGUITransformMouse(mafVME *input, mafObserver *listener = NULL, bool testMode = false);

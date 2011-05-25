@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUILutSwatch.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2011-05-25 10:09:29 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,7 +21,7 @@
 /** mafGUILutSwatch : widget representing a LUT, usually used to call the LutEditor.
 @sa mafGUILutEditor
 */
-class mafGUILutSwatch: public wxPanel
+class MAF_EXPORT mafGUILutSwatch: public wxPanel
 {
 public:
   mafGUILutSwatch(wxWindow* parent, wxWindowID id = -1, const wxPoint& pos = wxDefaultPosition, 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIRollOut.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:39 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2011-05-25 10:10:51 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,7 +32,7 @@ The main gui and the rolled out gui are passed through the constructor and the c
 plug the title bar with the picture button on the main gui and then plug the sub-gui
 that can be shown/hidden by pressing on the picture button on the left of the title.
 */
-class mafGUIRollOut: public wxPanel
+class MAF_EXPORT mafGUIRollOut: public wxPanel
 {
 public:
            mafGUIRollOut(mafGUI *parent, mafString title, mafGUI *roll_gui, int id = -1, bool rollOutOpen = true);

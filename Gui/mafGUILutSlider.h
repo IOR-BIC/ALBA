@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUILutSlider.h,v $
   Language:  C++
-  Date:      $Date: 2010-04-29 07:40:00 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2011-05-25 10:09:29 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -32,7 +32,7 @@ mafGUILutSlider is a Label that notify user-click using the normal wxEvents.
 It is used on the title bar of mafGUINamedPanel to popup a menu.
 */
 //----------------------------------------------------------------------------
-class mafGUILutSlider : public wxPanel
+class MAF_EXPORT mafGUILutSlider : public wxPanel
 {
 public:
   mafGUILutSlider(

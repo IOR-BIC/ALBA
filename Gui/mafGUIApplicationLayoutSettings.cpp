@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUIApplicationLayoutSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-25 06:53:38 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2011-05-25 10:03:24 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -452,7 +452,7 @@ void mafGUIApplicationLayoutSettings::ApplyLayout()
     m_Win->ShowDockPane("logbar", lb_vis);
     m_Win->ShowDockPane("sidebar", sb_vis);
     int num = app_layout->GetNumberOfViewsInLayout();
-    std::vector<mmaApplicationLayout::ViewLayoutInfo>::iterator iter = app_layout->GetLayoutList();
+    std::vector<ViewLayoutInfo>::iterator iter = app_layout->GetLayoutList();
     mafView *v = NULL;
     for (int i = 0; i < num; i++, iter++)
     {
@@ -509,7 +509,7 @@ void mafGUIApplicationLayoutSettings::ApplyTreeLayout()
     m_Win->ShowDockPane("logbar", lb_vis);
     m_Win->ShowDockPane("sidebar", sb_vis);
     int num = app_layout->GetNumberOfViewsInLayout();
-    std::vector<mmaApplicationLayout::ViewLayoutInfo>::iterator iter = app_layout->GetLayoutList();
+    std::vector<ViewLayoutInfo>::iterator iter = app_layout->GetLayoutList();
     mafView *v = NULL;
     for (int i = 0; i < num; i++, iter++)
     {

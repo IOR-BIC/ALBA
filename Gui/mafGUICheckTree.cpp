@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUICheckTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2011-05-25 10:05:18 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -341,7 +341,7 @@ void mafGUICheckTree::InitializeImageList()
   // ClassNameToIcon(vme-class-name) + vme-state
 
   std::vector<wxString>  v;
-  mafPics.GetVmeNames(v);
+  mafPictureFactory::GetPictureFactory()->GetVmeNames(v);
 
   const int num_of_status = 5; 
   int num_types = v.size();
@@ -355,17 +355,17 @@ void mafGUICheckTree::InitializeImageList()
   //retrieve state icons
   //I assume all state-icon to have the same size
   wxBitmap state_ico[num_of_status];
-  state_ico[NODE_NON_VISIBLE] = mafPics.GetBmp("DISABLED");
-  state_ico[NODE_VISIBLE_OFF] = mafPics.GetBmp("CHECK_OFF");
-  state_ico[NODE_VISIBLE_ON]  = mafPics.GetBmp("CHECK_ON");
-  state_ico[NODE_MUTEX_OFF]   = mafPics.GetBmp("RADIO_OFF");
-  state_ico[NODE_MUTEX_ON]    = mafPics.GetBmp("RADIO_ON");
+  state_ico[NODE_NON_VISIBLE] = mafPictureFactory::GetPictureFactory()->GetBmp("DISABLED");
+  state_ico[NODE_VISIBLE_OFF] = mafPictureFactory::GetPictureFactory()->GetBmp("CHECK_OFF");
+  state_ico[NODE_VISIBLE_ON]  = mafPictureFactory::GetPictureFactory()->GetBmp("CHECK_ON");
+  state_ico[NODE_MUTEX_OFF]   = mafPictureFactory::GetPictureFactory()->GetBmp("RADIO_OFF");
+  state_ico[NODE_MUTEX_ON]    = mafPictureFactory::GetPictureFactory()->GetBmp("RADIO_ON");
   int sw = state_ico[0].GetWidth();
   int sh = state_ico[0].GetHeight();
 
   //get icon size 
   //I assume all vme-icon to have the same size
-  wxBitmap bmp = mafPics.GetVmePic(v[0]);
+  wxBitmap bmp = mafPictureFactory::GetPictureFactory()->GetVmePic(v[0]);
   assert(bmp != wxNullBitmap);
   int w = bmp.GetWidth();
   int h = bmp.GetHeight();
@@ -385,7 +385,7 @@ void mafGUICheckTree::InitializeImageList()
     int s;
     for( s=0; s<num_of_status; s++)
     {
-      wxBitmap vmeico = mafPics.GetVmePic(name);
+      wxBitmap vmeico = mafPictureFactory::GetPictureFactory()->GetVmePic(name);
       if(s == 0)
         vmeico = mafGrayScale(vmeico);
       wxBitmap merged = MergeIcons(state_ico[s],vmeico);

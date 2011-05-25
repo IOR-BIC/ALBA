@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUISettingsStorage.h,v $
 Language:  C++
-Date:      $Date: 2008-02-28 11:12:21 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2011-05-25 10:10:51 $
+Version:   $Revision: 1.6.2.1 $
 Authors:   Paolo Quadrani, Robero Mucci
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -24,7 +24,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 /** Gui to set storage parameters. 
     Commented example of SRB List Dialog; requires OPENSSL*/
-class mafGUISettingsStorage : public mafGUISettings
+class MAF_EXPORT mafGUISettingsStorage : public mafGUISettings
 {
 public:
 	mafGUISettingsStorage(mafObserver *Listener, const mafString &label = _("Storage"));

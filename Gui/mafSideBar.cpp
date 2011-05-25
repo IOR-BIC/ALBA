@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSideBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-09-24 16:16:56 $
-  Version:   $Revision: 1.35.2.2 $
+  Date:      $Date: 2011-05-25 10:12:13 $
+  Version:   $Revision: 1.35.2.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,6 +22,7 @@
 #include "mafSideBar.h"
 #include "mafView.h"
 #include "mafViewVTK.h"
+#include "mafPipe.h"
 #include "mafGUI.h"
 #include "mafGUIHolder.h"
 #include "mafGUIPanelStack.h"

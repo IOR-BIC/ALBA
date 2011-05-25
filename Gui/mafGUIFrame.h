@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIFrame.h,v $
   Language:  C++
-  Date:      $Date: 2009-07-16 14:19:31 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 10:08:10 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,7 +28,7 @@ class mafObserver;
   toolbar and status bar. Inherit from wxFrame and override several methods of it.
 
 */
-class mafGUIFrame: public wxFrame
+class MAF_EXPORT mafGUIFrame: public wxFrame
 {
 public:
   /** constructor. */

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIDictionaryWidget.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-01 14:36:33 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 10:08:10 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -78,11 +78,15 @@ protected:
   mafVME      *m_Vme;
 };
 
+#ifdef MAF_EXPORTS
+#include "mafDllMacros.h"
+EXPORT_STL_VECTOR(MAF_EXPORT,mafString);
+#endif
 /**
  class name: mafStorableDictionary
   Utility object that supply the  InternalStore  and InternalRestore method for serialization.
 */
-class mafStorableDictionary: public mafObject, public mafStorable
+class MAF_EXPORT mafStorableDictionary: public mafObject, public mafStorable
 {
 public:
   /** RTTI macro*/

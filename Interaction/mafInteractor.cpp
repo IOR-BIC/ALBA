@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractor.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-03-15 08:43:41 $
-  Version:   $Revision: 1.14.2.2 $
+  Date:      $Date: 2011-05-25 10:14:03 $
+  Version:   $Revision: 1.14.2.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -64,8 +64,8 @@ mafInteractor::mafInteractor()
   m_DeviceIsSet           = false;
   m_IgnoreTriggerEvents   = false;
   m_InteractionFlag       = false;
-  m_StartInteractionEvent = mafDeviceButtonsPad::BUTTON_DOWN;
-  m_StopInteractionEvent  = mafDeviceButtonsPad::BUTTON_UP;
+  m_StartInteractionEvent = mafDeviceButtonsPad::GetButtonDownId();
+  m_StopInteractionEvent  = mafDeviceButtonsPad::GetButtonUpId();
   m_StartButton           = 0;// Button 0
   m_Modifiers             = 0;// no modifiers
   m_ButtonMode            = SINGLE_BUTTON_MODE;
@@ -277,7 +277,7 @@ void mafInteractor::OnEvent(mafEventBase *event)
   if (ch==MCH_INPUT)
   {
     // Start the interaction if not disabled
-    if ((id == m_StartInteractionEvent || id == mafDeviceButtonsPadMouse::MOUSE_DCLICK) && !m_IgnoreTriggerEvents)
+    if ((id == m_StartInteractionEvent || id == mafDeviceButtonsPadMouse::GetMouseDClickId()) && !m_IgnoreTriggerEvents)
     {
       mafEventInteraction *e = mafEventInteraction::SafeDownCast(event);
       assert(e);

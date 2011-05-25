@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIColorWidget.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2011-05-25 10:05:18 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -21,7 +21,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
     Usage: Create it, set the initial color, set the Listener.
     The listener will be informed when the user has changed the color.
 */
-class mafGUIColorWidget: public wxPanel, public mafObserver
+class MAF_EXPORT mafGUIColorWidget: public wxPanel, public mafObserver
 {
 public:
   mafGUIColorWidget(wxWindow* parent, wxWindowID id = -1, const wxPoint& pos = wxDefaultPosition, 

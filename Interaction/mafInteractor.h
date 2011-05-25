@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractor.h,v $
   Language:  C++
-  Date:      $Date: 2011-03-15 08:43:41 $
-  Version:   $Revision: 1.4.22.1 $
+  Date:      $Date: 2011-05-25 10:14:03 $
+  Version:   $Revision: 1.4.22.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -53,7 +53,7 @@ class vtkProp3D;
   Interactors usually send output events through the DefaultChannel, and also through the m_listener by wrapping
   the event inside a MFL_EVENT_ID event (event can be retrieved with mafEvent::GetVtkObject().
 */
-class mafInteractor : public mafAgent
+class MAF_EXPORT mafInteractor : public mafAgent
 {
 public:
   mafInteractor();

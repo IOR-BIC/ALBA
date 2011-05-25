@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafWXLog.h,v $
   Language:  C++
-  Date:      $Date: 2009-04-22 09:43:04 $
-  Version:   $Revision: 1.2.22.2 $
+  Date:      $Date: 2011-05-25 10:12:13 $
+  Version:   $Revision: 1.2.22.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -19,7 +19,7 @@
 // mafWXLog :
 //----------------------------------------------------------------------------
 /** */
-class WXDLLEXPORT mafWXLog : public wxLog
+class MAF_EXPORT mafWXLog : public wxLog
 {
 public:
   mafWXLog(wxTextCtrl *pTextCtrl);

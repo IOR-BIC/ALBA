@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUICrossSplitter.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2011-05-25 10:05:18 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -51,7 +51,7 @@ enum CrossSplitterDragModes
 Use Put(w,id) to place widgets on the various pane - id should be in 0..3.
 Putting a new pane delete the previous
 */
-class mafGUICrossSplitter: public mafGUIPanel
+class MAF_EXPORT mafGUICrossSplitter: public mafGUIPanel
 {
 public:
   mafGUICrossSplitter(wxWindow* parent,wxWindowID id = -1);

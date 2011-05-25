@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEvent.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-10-17 11:49:29 $
-  Version:   $Revision: 1.13.2.1 $
+  Date:      $Date: 2011-05-25 10:03:24 $
+  Version:   $Revision: 1.13.2.2 $
   Authors:   Marco Petrone, Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -166,7 +166,8 @@ void mafEvent::DeepCopy(const mafEventBase *maf_event)
 void mafEvent::Init(void *sender, int id, long arg) 
 //----------------------------------------------------------------------------
 {
-  if (id != UPDATE_UI && m_LogVerbose)
+  bool *verbose = GetLogVerbose();
+  if (id != UPDATE_UI && (*verbose))
   {
     mafString sender_type = "Sent Event. Sender: ";
     try

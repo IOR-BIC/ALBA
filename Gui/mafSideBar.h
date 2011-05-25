@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSideBar.h,v $
   Language:  C++
-  Date:      $Date: 2009-09-24 16:16:56 $
-  Version:   $Revision: 1.14.2.1 $
+  Date:      $Date: 2011-05-25 10:12:13 $
+  Version:   $Revision: 1.14.2.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -37,7 +37,7 @@ class mafGUISplittedPanel;
 //----------------------------------------------------------------------------
 /**
 */
-class mafSideBar
+class MAF_EXPORT mafSideBar
 {
 public:
 	mafSideBar(wxWindow* parent, int id, mafObserver *Listener, long style = DOUBLE_NOTEBOOK);

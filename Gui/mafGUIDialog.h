@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIDialog.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2011-05-25 10:05:18 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -65,7 +65,7 @@ Example:
 
 @sa mafGUIDialogPreview
 */
-class mafGUIDialog : public wxDialog, public mafObserver  
+class MAF_EXPORT mafGUIDialog : public wxDialog, public mafObserver  
 {
 public:
 	mafGUIDialog (const wxString& title,	long style = mafCLOSEWINDOW | mafRESIZABLE | mafCLOSE);

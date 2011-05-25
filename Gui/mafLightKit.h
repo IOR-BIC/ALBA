@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLightKit.h,v $
   Language:  C++
-  Date:      $Date: 2009-03-26 16:52:47 $
-  Version:   $Revision: 1.3.2.1 $
+  Date:      $Date: 2011-05-25 10:12:13 $
+  Version:   $Revision: 1.3.2.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,7 +34,7 @@ class mafGUI;
 //----------------------------------------------------------------------------
 /**
 */
-class mafLightKit : public mafObserver
+class MAF_EXPORT mafLightKit : public mafObserver
 {
 public:
 	mafLightKit(wxWindow* parent, vtkRenderer *r, mafObserver *Listener = NULL);

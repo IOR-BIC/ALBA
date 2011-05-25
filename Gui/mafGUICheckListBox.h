@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUICheckListBox.h,v $
   Language:  C++
-  Date:      $Date: 2009-03-20 08:21:58 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 10:05:18 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -42,7 +42,7 @@ a CheckList that send mafEventNotification in the form
 mafEvent(this, widget_id, item_id, checked)
 */
 //----------------------------------------------------------------------------
-class mafGUICheckListBox: public mafGUIPanel
+class MAF_EXPORT mafGUICheckListBox: public mafGUIPanel
 {
 public:
   mafGUICheckListBox(wxWindow* parent, 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIDockManager.h,v $
   Language:  C++
-  Date:      $Date: 2010-01-13 12:01:20 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2011-05-25 10:08:10 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Benjamin I. Williams
 ==========================================================================
   Copyright:   (C) Copyright 2005, Kirix Corporation, All Rights Reserved.
@@ -12,6 +12,8 @@
 
 #ifndef __mafGUIDockManager__H
 #define __mafGUIDockManager__H
+
+#include "mafDefines.h"
 
 enum wxFrameManagerDock
 {
@@ -82,22 +84,22 @@ enum wxPaneInsertLevel
 
 
 // forwards and array declarations
-class wxDockUIPart;
-class wxPaneButton;
-class wxPaneInfo;
-class wxDockInfo;
-class wxDockArt;
-class wxFrameManagerEvent;
+class MAF_EXPORT wxDockUIPart;
+class MAF_EXPORT wxPaneButton;
+class MAF_EXPORT wxPaneInfo;
+class MAF_EXPORT wxDockInfo;
+class MAF_EXPORT wxDockArt;
+class MAF_EXPORT wxFrameManagerEvent;
 
-WX_DECLARE_OBJARRAY(wxDockInfo, wxDockInfoArray);
-WX_DECLARE_OBJARRAY(wxDockUIPart, wxDockUIPartArray);
-WX_DECLARE_OBJARRAY(wxPaneButton, wxPaneButtonArray);
-WX_DECLARE_OBJARRAY(wxPaneInfo, wxPaneInfoArray);
+WX_DECLARE_OBJARRAY_WITH_DECL(wxDockInfo, wxDockInfoArray,class MAF_EXPORT);
+WX_DECLARE_OBJARRAY_WITH_DECL(wxDockUIPart, wxDockUIPartArray,class MAF_EXPORT);
+WX_DECLARE_OBJARRAY_WITH_DECL(wxPaneButton, wxPaneButtonArray,class MAF_EXPORT);
+WX_DECLARE_OBJARRAY_WITH_DECL(wxPaneInfo, wxPaneInfoArray,class MAF_EXPORT);
 WX_DEFINE_ARRAY_PTR(wxPaneInfo*, wxPaneInfoPtrArray);
 WX_DEFINE_ARRAY_PTR(wxDockInfo*, wxDockInfoPtrArray);
 
-extern wxDockInfo wxNullDockInfo;
-extern wxPaneInfo wxNullPaneInfo;
+MAF_EXPORT extern wxDockInfo wxNullDockInfo;
+MAF_EXPORT extern wxPaneInfo wxNullPaneInfo;
 
 
 
@@ -105,7 +107,7 @@ extern wxPaneInfo wxNullPaneInfo;
   class name: wxPaneInfo
   This class define properties of a pane. That is a panel that can be floating, dockable with a proper side.
 */
-class WXDLLEXPORT wxPaneInfo
+class MAF_EXPORT wxPaneInfo
 {
 public:
 
@@ -416,7 +418,7 @@ public:
 class name: wxFrameManager
 Manager for dockabale panels; it can manage flags, attach/detach panes.
 */
-class WXDLLEXPORT wxFrameManager : public wxEvtHandler
+class MAF_EXPORT wxFrameManager : public wxEvtHandler
 {
 friend class wxFloatingPane;
 
@@ -630,7 +632,7 @@ protected:
   class name: wxFrameManagerEvent
   Event handled by frame manager
 */
-class WXDLLEXPORT wxFrameManagerEvent : public wxEvent
+class MAF_EXPORT wxFrameManagerEvent : public wxEvent
 {
 public:
     /** constructor */
@@ -673,7 +675,7 @@ public:
   functionality to the wxAui dock manager.  This allows the dock
   manager to have pluggable look-and-feels.
 */
-class wxDockArt
+class MAF_EXPORT wxDockArt
 {
 public:
     /** constructor */
@@ -735,7 +737,7 @@ class name: wxDefaultDockArt
   can be customized by creating a class derived from this one,
   or replacing this class entirely
 */
-class wxDefaultDockArt : public wxDockArt
+class MAF_EXPORT wxDefaultDockArt : public wxDockArt
 {
 public:
     /** constructor */
@@ -819,7 +821,7 @@ protected:
 class name: wxDockInfo
 This class define properties of a dock. That contains an array of panes.
 */
-class wxDockInfo
+class MAF_EXPORT wxDockInfo
 {
 public:
     /** constructor */
@@ -890,7 +892,7 @@ public:
 class name: wxDockUIPart
 This class define a UI part of a dock.
 */
-class wxDockUIPart
+class MAF_EXPORT wxDockUIPart
 {
 public:
     enum
@@ -920,7 +922,7 @@ public:
 class name: wxPaneButton
 This class define a button of a pane.
 */
-class wxPaneButton
+class MAF_EXPORT wxPaneButton
 {
 public:
     int m_ButtonId;        // id of the button (e.g. buttonClose)
@@ -936,7 +938,7 @@ public:
 // spectrum of events will be implemented in the next incremental version
 
 BEGIN_DECLARE_EVENT_TYPES()
-    DECLARE_EVENT_TYPE(wxEVT_AUI_PANEBUTTON, 0)   
+    DECLARE_EXPORTED_EVENT_TYPE(MAF_EXPORT,wxEVT_AUI_PANEBUTTON, 0)
 END_DECLARE_EVENT_TYPES()
 
 typedef void (wxEvtHandler::*wxFrameManagerEventFunction)(wxFrameManagerEvent&);
@@ -955,7 +957,7 @@ typedef void (wxEvtHandler::*wxFrameManagerEventFunction)(wxFrameManagerEvent&);
   class name: mafGUIDockManager
   Represent a frame manager for gui dock elements.
 */
-class WXDLLEXPORT mafGUIDockManager : public wxFrameManager 
+class MAF_EXPORT mafGUIDockManager : public wxFrameManager 
 {
 public:
   /** add pane */

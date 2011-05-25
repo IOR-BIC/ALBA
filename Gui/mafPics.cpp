@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPics.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-14 11:03:18 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2011-05-25 10:12:13 $
+  Version:   $Revision: 1.18.4.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -38,8 +38,8 @@ struct mafPictureFactory_Pimpl
 //----------------------------------------------------------------------------
 // the mafPic Singleton
 //----------------------------------------------------------------------------
-mafPictureFactory mafPics;
-bool mafPics_Initialized = false;
+//mafPictureFactory mafPics;
+static bool mafPics_Initialized = false;
 
 //----------------------------------------------------------------------------
 mafPictureFactory::mafPictureFactory()
@@ -229,6 +229,19 @@ void mafPictureFactory::GetVmeNames( std::vector<wxString>& v )
     wxString s = ((*it).first).c_str();
     v.push_back(s);
   }
+}
+//----------------------------------------------------------------------------
+mafPictureFactory* mafPictureFactory::GetPictureFactory()
+//----------------------------------------------------------------------------
+{
+  static mafPictureFactory pictureFactory;
+  return &pictureFactory;
+}
+//----------------------------------------------------------------------------
+bool mafPictureFactory::GetPicsInitialized()
+//----------------------------------------------------------------------------
+{
+  return mafPics_Initialized;
 }
 /*
 NOTE FOR SILVANO

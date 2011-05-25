@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVTKLog.h,v $
   Language:  C++
-  Date:      $Date: 2010-07-08 15:40:49 $
-  Version:   $Revision: 1.1.22.1 $
+  Date:      $Date: 2011-05-25 10:12:13 $
+  Version:   $Revision: 1.1.22.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-class mafVTKLog : public vtkOutputWindow
+class MAF_EXPORT mafVTKLog : public vtkOutputWindow
 //----------------------------------------------------------------------------
 {
 public:

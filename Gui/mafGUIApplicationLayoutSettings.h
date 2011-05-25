@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUIApplicationLayoutSettings.h,v $
 Language:  C++
-Date:      $Date: 2009-06-03 15:28:47 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-05-25 10:03:24 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -36,7 +36,7 @@ class mafVMERoot;
   - camera position
   - gui layout (toolbar, logbar, sidebar)
 */
-class mafGUIApplicationLayoutSettings : public mafGUISettings
+class MAF_EXPORT mafGUIApplicationLayoutSettings : public mafGUISettings
 {
 public:
   /** constructor .*/

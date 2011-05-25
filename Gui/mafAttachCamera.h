@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAttachCamera.h,v $
   Language:  C++
-  Date:      $Date: 2009-03-10 14:55:25 $
-  Version:   $Revision: 1.7.2.1 $
+  Date:      $Date: 2011-05-25 10:03:24 $
+  Version:   $Revision: 1.7.2.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -40,7 +40,7 @@ This tool has to be updated by calling UpdateCameraMatrix() during CameraUpdate 
 @sa mafViewVTK for an example on how to use it, mafRWI
 
 */
-class mafAttachCamera : public mafObserver
+class MAF_EXPORT mafAttachCamera : public mafObserver
 {
 public:
 

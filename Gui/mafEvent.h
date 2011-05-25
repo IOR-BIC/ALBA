@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEvent.h,v $
   Language:  C++
-  Date:      $Date: 2008-02-19 08:41:01 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2011-05-25 10:03:24 $
+  Version:   $Revision: 1.14.2.1 $
   Authors:   Silvano Imboden, Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -19,6 +19,7 @@
 #include "mafEventBase.h" // base class for mafEvent
 #include "mafObserver.h"
 #include "mafString.h"    // used by mafEvent
+
 //----------------------------------------------------------------------------
 // Forward References:
 //----------------------------------------------------------------------------
@@ -31,6 +32,11 @@ class mafMatrix;
   class vtkObject;
   class vtkProp;  
 #endif
+
+#ifdef MAF_EXPORTS
+#include "mafDllMacros.h"
+  EXPORT_STL_VECTOR(MAF_EXPORT,mafNode *);
+#endif
 //----------------------------------------------------------------------------
 // mafEvent :
 //----------------------------------------------------------------------------
@@ -39,7 +45,7 @@ class mafMatrix;
   all kind of possible information traveling around the MAF is defined. 
   @sa mafEventBase mafSubject mafObserver
 */
-class mafEvent : public mafEventBase
+class MAF_EXPORT mafEvent : public mafEventBase
 {
 public:
   mafTypeMacro(mafEvent,mafEventBase);

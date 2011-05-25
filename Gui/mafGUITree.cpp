@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUITree.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:39 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2011-05-25 10:10:51 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -49,15 +49,15 @@ mafGUITree::mafGUITree( wxWindow* parent,wxWindowID id, bool CloseButton, bool H
   m_Sizer->Add(m_NodeTree,1,wxEXPAND);
 
   //default image list
-  wxBitmap bmp = mafPics.GetBmp("NODE_GRAY");
+  wxBitmap bmp = mafPictureFactory::GetPictureFactory()->GetBmp("NODE_GRAY");
   int w = bmp.GetWidth();
   int h = bmp.GetHeight();
 
   m_NodeImages = new wxImageList(w,h,FALSE,4);
   m_NodeImages->Add(bmp);
-  m_NodeImages->Add(mafPics.GetBmp("NODE_RED"));
-  m_NodeImages->Add(mafPics.GetBmp("NODE_BLUE"));
-  m_NodeImages->Add(mafPics.GetBmp("NODE_YELLOW"));
+  m_NodeImages->Add(mafPictureFactory::GetPictureFactory()->GetBmp("NODE_RED"));
+  m_NodeImages->Add(mafPictureFactory::GetPictureFactory()->GetBmp("NODE_BLUE"));
+  m_NodeImages->Add(mafPictureFactory::GetPictureFactory()->GetBmp("NODE_YELLOW"));
   m_NodeTree->SetImageList(m_NodeImages);
 
   Reset();

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIValidator.h,v $
   Language:  C++
-  Date:      $Date: 2009-06-16 09:14:49 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 10:10:51 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -53,7 +53,7 @@ enum VALIDATOR_MODES
 //-----------------------------------------------------------------------------
 // mafGUIValidator :
 //-----------------------------------------------------------------------------
-class mafGUIValidator : public wxValidator
+class MAF_EXPORT mafGUIValidator : public wxValidator
 {
 public:
   mafGUIValidator (mafObserver* listener,int mid,wxStaticText *win, wxString* var);   //String

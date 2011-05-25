@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIDialogPreview.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2011-05-25 10:05:18 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,7 +34,7 @@ enum DIALOG_EXSTYLES
 mafGUIDialogPreview can be used inside operations to make a preview window.
 @sa mafGUIDialog
 */
-class mafGUIDialogPreview : public mafGUIDialog
+class MAF_EXPORT mafGUIDialogPreview : public mafGUIDialog
 {
 public:
 	mafGUIDialogPreview (const wxString& title,	long style = mafCLOSEWINDOW | mafRESIZABLE | mafCLOSE | mafUSEGUI | mafUSERWI );

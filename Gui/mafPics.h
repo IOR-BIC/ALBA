@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPics.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:23 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2011-05-25 10:12:13 $
+  Version:   $Revision: 1.11.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -59,7 +59,7 @@ NOTE:
 - Icons to be used in one ImageList (mafGUITree,mafGUICheckTree,...) must be all the same size, and with white background.
 - Icons to be used in mafGUICheckTree (vme icons) must be 16x16 with white background
 */
-class mafPictureFactory 
+class MAF_EXPORT mafPictureFactory 
 {
 public:
   /** initialize the factory with the standard icons */
@@ -99,6 +99,10 @@ public:
   /** retrieve the names of the registered vme-pics */
   void GetVmeNames( std::vector<wxString>& v );
 
+  static mafPictureFactory* GetPictureFactory();
+
+  static bool GetPicsInitialized();
+
 
 protected:
   mafPictureFactory_Pimpl *m_PictureMaps;
@@ -107,14 +111,14 @@ protected:
 // macro
 //----------------------------------------------------------------------------
 /* shotcut to add a picture to the factory */
-#define mafADDPIC(X) mafPics.Add( #X , X##_xpm )
+#define mafADDPIC(X) mafPictureFactory::GetPictureFactory()->Add( #X , X##_xpm )
 
 /* shotcut to add a vmepicture to the factory */
-#define mafADDVMEPIC(X) mafPics.AddVmePic( #X , X##_xpm )
+#define mafADDVMEPIC(X) mafPictureFactory::GetPictureFactory()->AddVmePic( #X , X##_xpm )
 
 //----------------------------------------------------------------------------
 // the mafPics and mafVmePics singleton
 //----------------------------------------------------------------------------
-extern mafPictureFactory mafPics;
-extern bool mafPics_Initialized;
+// extern "C" __declspec(dllexport) mafPictureFactory mafPics;
+// extern bool mafPics_Initialized;
 #endif // __mafPics_H__

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIPanel.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-01 14:36:33 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 10:09:29 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -19,7 +19,7 @@
   class name: mafGUIPanel
    Inherits directly from wxPanel and adds the pointer to the next panel
 */
-class mafGUIPanel: public wxPanel
+class MAF_EXPORT mafGUIPanel: public wxPanel
 {
 public:
   /** constructor */

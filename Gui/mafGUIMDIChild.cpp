@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIMDIChild.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2011-05-25 10:09:29 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -67,7 +67,7 @@ mafGUIMDIChild::mafGUIMDIChild(wxMDIParentFrame* parent,mafView *view)
   m_Win->Reparent(this);
   m_Win->Show(true);
 
-  SetIcon(mafPics.GetIcon("MDICHILD_ICON"));
+  SetIcon(mafPictureFactory::GetPictureFactory()->GetIcon("MDICHILD_ICON"));
 	SetTitle(wxStripMenuCodes(m_View->GetLabel()));
 }
 //----------------------------------------------------------------------------

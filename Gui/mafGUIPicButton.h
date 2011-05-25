@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIPicButton.h,v $
   Language:  C++
-  Date:      $Date: 2008-12-02 15:07:18 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 10:09:29 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -31,7 +31,7 @@ To create a mafGUIPicButton you must specify
 - ID: the ID of the Event that will be sent to the mafListener --- must be in the range MINID-MAXID or PIC_START-PIC-STOP (see mafDecl.h)
 - obviously you must also specify a Listener */
 //----------------------------------------------------------------------------
-class mafGUIPicButton : public wxBitmapButton
+class MAF_EXPORT mafGUIPicButton : public wxBitmapButton
 {
 DECLARE_DYNAMIC_CLASS(mafGUIPicButton)
 

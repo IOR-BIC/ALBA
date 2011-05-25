@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIMDIFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-11-25 13:27:57 $
-  Version:   $Revision: 1.1.2.5 $
+  Date:      $Date: 2011-05-25 10:09:29 $
+  Version:   $Revision: 1.1.2.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -41,6 +41,8 @@
 class mafGUIMDIFrameCallback : public vtkCommand
 {
   public:
+    vtkTypeMacro(mafGUIMDIFrameCallback,vtkCommand);
+
     static mafGUIMDIFrameCallback *New() {return new mafGUIMDIFrameCallback;}
     mafGUIMDIFrameCallback() {m_mode=0; m_Frame=NULL;};
     void SetMode(int mode){m_mode=mode;};
@@ -135,8 +137,8 @@ mafGUIMDIFrame::mafGUIMDIFrame(const wxString& title, const wxPoint& pos, const 
 #endif
 
   wxIconBundle ib;
-  ib.AddIcon( mafPics.GetIcon("FRAME_ICON16x16") );
-  ib.AddIcon( mafPics.GetIcon("FRAME_ICON32x32") );
+  ib.AddIcon( mafPictureFactory::GetPictureFactory()->GetIcon("FRAME_ICON16x16") );
+  ib.AddIcon( mafPictureFactory::GetPictureFactory()->GetIcon("FRAME_ICON32x32") );
   SetIcons(ib);
 
 #ifdef MAF_USE_VTK

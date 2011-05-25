@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIScrolledPanel.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:39 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2011-05-25 10:10:51 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,7 +23,7 @@ A vertical scrollbar will automatically appear if
 child-widgets require more space then the avaiable.
 */
 //----------------------------------------------------------------------------
-class mafGUIScrolledPanel: public wxScrolledWindow
+class MAF_EXPORT mafGUIScrolledPanel: public wxScrolledWindow
 {
 public:
   mafGUIScrolledPanel(wxWindow* parent,wxWindowID id = -1);

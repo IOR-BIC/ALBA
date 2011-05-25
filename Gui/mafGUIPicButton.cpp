@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIPicButton.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-12-02 15:07:18 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 10:09:29 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -42,7 +42,7 @@ mafGUIPicButton::mafGUIPicButton(wxWindow *parent, wxString BitmapId, wxWindowID
   m_Listener = listener;
   m_Id = id;
 
-  wxBitmap b = mafPics.GetBmp(BitmapId);
+  wxBitmap b = mafPictureFactory::GetPictureFactory()->GetBmp(BitmapId);
   wxSize size(b.GetWidth()+offset,b.GetHeight()+offset);
 
   //Create(parent, m_Id, b, wxDefaultPosition, size,0);
@@ -80,7 +80,7 @@ void mafGUIPicButton::Command(wxCommandEvent& event)
 void mafGUIPicButton::SetBitmap(wxString BitmapId, wxWindowID id )
 //----------------------------------------------------------------------------
 {
-  wxBitmap b = mafPics.GetBmp(BitmapId);
+  wxBitmap b = mafPictureFactory::GetPictureFactory()->GetBmp(BitmapId);
   SetBitmapLabel(b);
   //SetBitmapDisabled(mafGrayScale(b));
   m_Id = id;

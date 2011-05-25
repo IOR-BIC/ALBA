@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUI.h,v $
   Language:  C++
-  Date:      $Date: 2010-05-05 10:12:36 $
-  Version:   $Revision: 1.3.2.8 $
+  Date:      $Date: 2011-05-25 10:03:24 $
+  Version:   $Revision: 1.3.2.9 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2005
@@ -14,12 +14,18 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
+
 #include "wx/grid.h"
 #include "mafDecl.h"
 #include "mafGUIPanel.h"
 #include "mafEvent.h"
 #include "mafObserver.h"
 #include <map>
+
+#ifdef MAF_EXPORTS
+#include "mafDllMacros.h"
+EXPORT_STL_MAP(MAF_EXPORT,int,int);
+#endif
 
 //----------------------------------------------------------------------------
 // class forward :
@@ -41,7 +47,7 @@ MAFWidgetId is a counter that holds the last generated widget_ID.
 It is used and incremented by GetWidgetId.
 \sa GetWidgetId GetModuleId MAFWidgetId m_WidgetTableID
 */
-extern int MAFWidgetId;
+//extern "C" int MAFWidgetId;
 
 //----------------------------------------------------------------------------
 // Constants :
@@ -93,7 +99,7 @@ two member functions : GetModuleID and GetWidgetId. GetWidgetId increments an in
 \sa GetWidgetId GetModuleId MAFWidgetId m_WidgetTableID
 */
 //----------------------------------------------------------------------------
-class mafGUI: public mafGUIPanel, public mafObserver
+class MAF_EXPORT mafGUI: public mafGUIPanel, public mafObserver
 {
 public:
            mafGUI(mafObserver *listener);
@@ -276,7 +282,9 @@ public:
   As a side effect a new pair widget_ID->module_ID is stored in m_WidgetTableID
   \sa GetWidgetId GetModuleId MAFWidgetId m_WidgetTableID
   */
-  int GetWidgetId(int mod_id) {MAFWidgetId++; m_WidgetTableID[MAFWidgetId - MINID] = mod_id; return MAFWidgetId;}; 
+  int GetWidgetId(int mod_id);
+
+  int* GetMAFWidgetId();
 
   /** Turn On/Off the collaboration status. */
   void Collaborate(bool status) {m_CollaborateStatus = status;};
@@ -314,7 +322,7 @@ protected:
   translate a widget_ID in it's module_ID, accessing m_WidgetTableID
   \sa GetWidgetId GetModuleId MAFWidgetId m_WidgetTableID
   */
-  int GetModuleId(int w_id)   {assert(w_id > 0 && w_id <= MAFWidgetId); return  m_WidgetTableID[w_id - MINID];};
+  int GetModuleId(int w_id)   {assert(w_id > 0 && w_id <= (*GetMAFWidgetId())); return  m_WidgetTableID[w_id - MINID];};
 
   void OnSlider			  (wxCommandEvent &event) { }//@@@ this->OnEvent(mafEvent(this, GetModuleId(event.GetWidgetId()))); }
 	void OnListBox      (wxCommandEvent &event);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUISettingsDialog.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:39 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2011-05-25 10:10:51 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -48,9 +48,9 @@ mafGUISettingsDialog::mafGUISettingsDialog(wxString dialog_title)
 //----------------------------------------------------------------------------
 {  
   #include <pic/FOLDER.xpm>
-  mafPics.Add("FOLDER", FOLDER_xpm);
+  mafPictureFactory::GetPictureFactory()->Add("FOLDER", FOLDER_xpm);
   wxImageList *tree_images = new wxImageList(20,20,FALSE,1);
-  tree_images->Add(mafPics.GetBmp("FOLDER"));
+  tree_images->Add(mafPictureFactory::GetPictureFactory()->GetBmp("FOLDER"));
 
   m_Dialog = new mafGUIDialog(dialog_title);
 	m_Tree   = new mafGUITree(m_Dialog,ID_SELECT_PAGE,false,true);

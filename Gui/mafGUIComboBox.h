@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIComboBox.h,v $
   Language:  C++
-  Date:      $Date: 2008-12-17 08:14:44 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2011-05-25 10:05:18 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,7 +28,7 @@ mafEvent(this, widget_id, item_id, checked)
 */
 //----------------------------------------------------------------------------
 
-class mafGUIComboBox: public wxComboBox
+class MAF_EXPORT mafGUIComboBox: public wxComboBox
 {
 public:
     mafGUIComboBox(wxWindow* parent, 

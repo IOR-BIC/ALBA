@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUITransformMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-03-29 10:00:01 $
-  Version:   $Revision: 1.1.2.6 $
+  Date:      $Date: 2011-05-25 10:14:03 $
+  Version:   $Revision: 1.1.2.7 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,6 +23,7 @@
 #include "mafGUITransformMouse.h"
 #include "mafDecl.h"
 
+#include "mafRefSys.h"
 #include "mafGUI.h"
 #include "mafGUIButton.h"
 

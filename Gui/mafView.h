@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2010-11-22 11:04:20 $
-  Version:   $Revision: 1.23.2.4 $
+  Date:      $Date: 2011-05-25 10:12:13 $
+  Version:   $Revision: 1.23.2.5 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -14,18 +14,17 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafEvent.h"
 #include "mafObserver.h"
-#include "mafObject.h"
-#include "mafDecl.h"
-#include "mafNode.h"
-#include "mafGUIHolder.h"
-#include "mafGUI.h"
-#include "mafPipe.h"
 
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
+class mafNode;
+class mafPipe;
+class mafSceneGraph;
+class mafVME;
+class mafGUI;
+class mafGUIHolder;
 class mafDeviceButtonsPadMouse;
 class mafDevice;
 class mafInteractor;
@@ -71,7 +70,7 @@ mafView doesn't have a Scenegraph, nor knowledge about VTK /sa mafViewVTK.
 mafView can be the base class for composed Views.
 
 */
-class mafView: public mafObserver, public mafObject
+class MAF_EXPORT mafView: public mafObserver, public mafObject
 {
 public:
   mafView(const wxString &label = "View");

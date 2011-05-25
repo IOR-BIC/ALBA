@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIDialogTransferFunction2D.h,v $
   Language:  C++
-  Date:      $Date: 2010-07-08 15:40:49 $
-  Version:   $Revision: 1.4.2.2 $
+  Date:      $Date: 2011-05-25 10:05:18 $
+  Version:   $Revision: 1.4.2.3 $
   Authors:   Alexander Savenko
 ==========================================================================
   Copyright (c) 2002/2004
@@ -55,7 +55,7 @@ class vtkInteractorStylePreviewImage;
 //----------------------------------------------------------------------------
 /** This dialog is used to define a 2D transfer function to make a volume Ray Cast.
 @sa vtkMAFAdaptiveVolumeRendering mafVisualPipeVolumeRayCasting*/
-class mafGUIDialogTransferFunction2D : public mafGUIDialog
+class MAF_EXPORT mafGUIDialogTransferFunction2D : public mafGUIDialog
 {
   friend class vtkInteractorStylePreviewImage;
   friend class vtkInteractorStyleWidget;
@@ -155,7 +155,7 @@ DECLARE_EVENT_TABLE()
 //----------------------------------------------------------------------------
 // vtkWidgetActor :
 //----------------------------------------------------------------------------
-class vtkWidgetActor : public vtkProp 
+class MAF_EXPORT vtkWidgetActor : public vtkProp 
 {
 public:
   static vtkWidgetActor *New() { return new vtkWidgetActor(); }
@@ -197,7 +197,7 @@ protected:
 //----------------------------------------------------------------------------
 // vtkInteractorStylePreviewImage :
 //----------------------------------------------------------------------------
-class vtkInteractorStylePreviewImage : public vtkInteractorStyleImage 
+class MAF_EXPORT vtkInteractorStylePreviewImage : public vtkInteractorStyleImage 
 {
 public:
   static vtkInteractorStylePreviewImage *New() { return new vtkInteractorStylePreviewImage(); }
@@ -233,7 +233,7 @@ protected:
 //----------------------------------------------------------------------------
 // vtkInteractorStyleWidget :
 //----------------------------------------------------------------------------
-class vtkInteractorStyleWidget : public vtkInteractorStylePreviewImage 
+class MAF_EXPORT vtkInteractorStyleWidget : public vtkInteractorStylePreviewImage 
 {
 public:
   static vtkInteractorStyleWidget *New() { return new vtkInteractorStyleWidget(); }

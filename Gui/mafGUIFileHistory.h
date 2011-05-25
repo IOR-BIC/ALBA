@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIFileHistory.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-01 14:36:33 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 10:08:10 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -26,7 +26,7 @@
   class that handle a list of file called history.  Tipically it is used by an application
   as an history for last opened files.
 */
-class mafGUIFileHistory : public wxFileHistory
+class MAF_EXPORT mafGUIFileHistory : public wxFileHistory
 {
 public:
   /** constructor */

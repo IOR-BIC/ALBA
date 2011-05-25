@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUISettings.h,v $
 Language:  C++
-Date:      $Date: 2009-12-01 14:36:33 $
-Version:   $Revision: 1.3.2.1 $
+Date:      $Date: 2011-05-25 10:10:51 $
+Version:   $Revision: 1.3.2.2 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -26,7 +26,7 @@ class mafGUI;
   base class for more complex specified classes regarding the setting of application.
   It returns a gui and generally can access to registry keys.
 */
-class mafGUISettings : public mafObserver
+class MAF_EXPORT mafGUISettings : public mafObserver
 {
 public:
   /** constructor */

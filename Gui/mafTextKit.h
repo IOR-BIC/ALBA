@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTextKit.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:24 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2011-05-25 10:12:13 $
+  Version:   $Revision: 1.5.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,7 +34,7 @@ class vtkTextMapper;
 mafTextKit is tool to visualize text into a given mafRWI.
 \sa mafRWI
 */
-class mafTextKit : public mafObserver
+class MAF_EXPORT mafTextKit : public mafObserver
 {
 public:
 	mafTextKit(wxWindow* parent, vtkRenderer *renderer, mafObserver *Listener = NULL);

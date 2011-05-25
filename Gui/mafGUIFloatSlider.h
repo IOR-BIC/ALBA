@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIFloatSlider.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2011-05-25 10:08:10 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -31,7 +31,7 @@ Use mafGUIFloatSlider in combination with a mafGUIValidator
 to receive notification as mafEvents.
 */
 //----------------------------------------------------------------------------
-class mafGUIFloatSlider: public FLOAT_SLIDER_PARENT
+class MAF_EXPORT mafGUIFloatSlider: public FLOAT_SLIDER_PARENT
 {
     DECLARE_DYNAMIC_CLASS(mafGUIFloatSlider)
 public:

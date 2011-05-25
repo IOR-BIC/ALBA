@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUILutPreset.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2011-05-25 10:09:29 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -23,7 +23,7 @@ extern const int lutPresetNum;
 extern wxString LutNames[];
 
 /** initalize a given LUT with the idx.th preset */
-extern void lutPreset(int idx, vtkLookupTable *lut);
+MAF_EXPORT extern void lutPreset(int idx, vtkLookupTable *lut);
 
 #endif
 

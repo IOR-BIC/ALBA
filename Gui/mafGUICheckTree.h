@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUICheckTree.h,v $
   Language:  C++
-  Date:      $Date: 2009-06-03 15:28:47 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 10:05:18 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -19,6 +19,10 @@
 #include <wx/imaglist.h>
 #include <wx/treectrl.h>
 #include <map>
+#ifdef MAF_EXPORTS
+#include "mafDllMacros.h"
+EXPORT_STL_MAP(MAF_EXPORT,wxString,int);
+#endif
 //----------------------------------------------------------------------------
 // Forward refs:
 //----------------------------------------------------------------------------
@@ -33,7 +37,7 @@ class mafView;
   Class that represents the widget component put inside side bar and containing the vme tree with the possibility 
   to check vme visibility and/or  vme selection. It is possible only one selection at time.
 */
-class mafGUICheckTree: public mafGUITree
+class MAF_EXPORT mafGUICheckTree: public mafGUITree
 {
 public:
   /** constructor .*/

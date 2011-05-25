@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIListCtrl.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2011-05-25 10:08:10 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -43,10 +43,10 @@ mafGUIListCtrl::mafGUIListCtrl( wxWindow* parent,wxWindowID id, bool CloseButton
   m_Listener = NULL;
 
   m_Images = new wxImageList(15,15,FALSE,4);
-  m_Images->Add(mafPics.GetBmp("NODE_YELLOW"));
-  m_Images->Add(mafPics.GetBmp("NODE_GRAY"));
-  m_Images->Add(mafPics.GetBmp("NODE_RED"));
-  m_Images->Add(mafPics.GetBmp("NODE_BLUE"));
+  m_Images->Add(mafPictureFactory::GetPictureFactory()->GetBmp("NODE_YELLOW"));
+  m_Images->Add(mafPictureFactory::GetPictureFactory()->GetBmp("NODE_GRAY"));
+  m_Images->Add(mafPictureFactory::GetPictureFactory()->GetBmp("NODE_RED"));
+  m_Images->Add(mafPictureFactory::GetPictureFactory()->GetBmp("NODE_BLUE"));
 
   m_List = new wxListCtrl(this,ID_LIST,wxDefaultPosition,wxSize(100,100) ,wxLC_REPORT);
   

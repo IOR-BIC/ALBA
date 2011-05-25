@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIButton.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2011-05-25 10:03:24 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -27,7 +27,7 @@ mafGUIButton is able to send both wxWindows messages and mafEvents.
 mafEvents are sent if m_Listener in not NULL otherwise wxWindows messages are sent.
 */
 //----------------------------------------------------------------------------
-class mafGUIButton : public wxButton
+class MAF_EXPORT mafGUIButton : public wxButton
 {
 
 public:
