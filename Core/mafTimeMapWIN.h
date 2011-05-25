@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTimeMapWIN.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-31 11:23:32 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2011-05-25 09:49:35 $
+  Version:   $Revision: 1.2.4.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -37,7 +37,7 @@ typedef std::vector<mafTimeStamp> mmuTimeVector;
 */
 
 template <class T>
-class MAF_EXPORT mafTimeMap : public mafObject, public mafTimeStamped
+class mafTimeMap : public mafObject, public mafTimeStamped
 {
 public:
   typedef std::map<mafTimeStamp, mafAutoPointer<T> > TimeMap;
@@ -46,8 +46,8 @@ public:
   mafTimeMap();  
   virtual ~mafTimeMap();
 
-  mafTimeMap(const mafTimeMap<T>&);  
-  void operator=(const mafTimeMap<T>&);
+  mafTimeMap(const mafTimeMap<T>&){};  
+  void operator=(const mafTimeMap<T>&){};
 
   //mafAbstractTypeMacro(mafTimeMap<T>,mafObject);
 
@@ -155,4 +155,5 @@ protected:
   TimeMap         m_TimeMap;        ///< the set storing the datasets
   mafString       m_ItemTypeName;   ///< the name of the item type accepted by this container
 };
+
 #endif

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:56:04 $
-  Version:   $Revision: 1.35 $
+  Date:      $Date: 2011-05-25 09:38:43 $
+  Version:   $Revision: 1.35.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -26,6 +26,13 @@
 #include <vector>
 #include <map>
 #include <string>
+
+#ifdef MAF_EXPORTS
+#include "mafDllMacros.h"
+EXPORT_STL_VECTOR(MAF_EXPORT,mafAutoPointer<mafNode>);
+EXPORT_STL_MAP(MAF_EXPORT,mafString,mafAutoPointer<mafAttribute>);
+#endif
+
 //----------------------------------------------------------------------------
 // forward declarations
 //----------------------------------------------------------------------------
@@ -33,6 +40,19 @@ class mafEventSource;
 class mafNodeIterator;
 class mafTagArray;
 class mafGUI;
+
+/** data structure used to store a link VME and its Id */
+class MAF_EXPORT mmuNodeLink :public mmuUtility
+{
+public:
+  mmuNodeLink(mafID id=-1,mafNode *node=NULL, mafID sub_id=-1):m_NodeId(id),m_Node(node),m_NodeSubId(sub_id) {}
+  mafNode *m_Node;
+  mafID   m_NodeId;
+  mafID   m_NodeSubId;
+};
+#ifdef MAF_EXPORTS
+EXPORT_STL_MAP(MAF_EXPORT,mafString,mmuNodeLink);
+#endif
 
 //----------------------------------------------------------------------------
 // mafNode
@@ -289,15 +309,6 @@ public:
     (e.g. @sa mmaMaterial). */
   mafTagArray  *GetTagArray();
 
-  /** data structure used to store a link VME and its Id */
-  class mmuNodeLink :public mmuUtility
-  {
-  public:
-    mmuNodeLink(mafID id=-1,mafNode *node=NULL, mafID sub_id=-1):m_NodeId(id),m_Node(node),m_NodeSubId(sub_id) {}
-    mafNode *m_Node;
-    mafID   m_NodeId;
-    mafID   m_NodeSubId;
-  };
   typedef std::map<mafString,mmuNodeLink> mafLinksMap;
 
   /** 

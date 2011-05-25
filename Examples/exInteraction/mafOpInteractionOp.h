@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpInteractionOp.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:45:27 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 09:55:16 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -23,7 +23,7 @@ class mafVMEGizmo;
 class mafInteractorCompositorMouse;
 
 // ============================================================================
-class mafOpInteractionOp : public mafOp
+class __declspec( dllexport ) mafOpInteractionOp : public mafOp
 // ============================================================================
 {
 public:

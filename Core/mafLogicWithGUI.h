@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:56:04 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2011-05-25 09:36:40 $
+  Version:   $Revision: 1.25.2.1 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -63,7 +63,7 @@ Proper Initialization must follow this order
 4- Show:
 5- Init: Calls FileOpen or FileNew
 */
-class mafLogicWithGUI: public mafObserver
+class MAF_EXPORT mafLogicWithGUI: public mafObserver
 {
 public:
                mafLogicWithGUI();

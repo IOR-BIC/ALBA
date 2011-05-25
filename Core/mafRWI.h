@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafRWI.h,v $
 Language:  C++
-Date:      $Date: 2010-12-23 10:38:37 $
-Version:   $Revision: 1.25.2.3 $
+Date:      $Date: 2011-05-25 09:46:30 $
+Version:   $Revision: 1.25.2.4 $
 Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -47,7 +47,7 @@ enum RWI_LAYERS
 //----------------------------------------------------------------------------
 // mafRWI :
 //----------------------------------------------------------------------------
-class mafRWI : public mafObserver
+class MAF_EXPORT mafRWI : public mafObserver
 {
 public:
 	mafRWI();

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafAxes.h,v $
 Language:  C++
-Date:      $Date: 2010-10-12 15:25:52 $
-Version:   $Revision: 1.1.22.3 $
+Date:      $Date: 2011-05-25 09:34:21 $
+Version:   $Revision: 1.1.22.4 $
 Authors:   Silvano Imboden , Stefano perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -30,7 +30,7 @@ class vtkMAFOrientationMarkerWidget;
 class vtkMAFGlobalAxesHeadActor;
 
 //----------------------------------------------------------------------------
-class mafAxes
+class MAF_EXPORT mafAxes
 	//----------------------------------------------------------------------------
 	/**
 	create a vtkAxes and insert it in the passed renderer

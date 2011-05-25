@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exInteractionApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 14:50:49 $
-  Version:   $Revision: 1.7.2.1 $
+  Date:      $Date: 2011-05-25 09:55:15 $
+  Version:   $Revision: 1.7.2.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -26,7 +26,6 @@
 #include "mafPics.h"
 #include "mafGUIMDIFrame.h"
 
-#include "mafNodeFactory.h"
 #include "mafNodeGeneric.h"
 #include "mafNodeRoot.h"
 #include "mafVMERoot.h"
@@ -71,7 +70,7 @@ IMPLEMENT_APP(exInteractionApp)
 bool exInteractionApp::OnInit()
 //--------------------------------------------------------------------------------
 {
-  mafPics.Initialize();	
+  mafPictureFactory::GetPictureFactory()->Initialize();	
 
   int result = mafVMEFactory::Initialize();
   assert(result==MAF_OK);

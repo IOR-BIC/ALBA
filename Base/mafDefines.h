@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.h,v $
   Language:  C++
-  Date:      $Date: 2008-01-07 16:12:39 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2011-05-25 09:24:46 $
+  Version:   $Revision: 1.25.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,6 +20,7 @@
 // Pragmas: disable the "singned/unsigned mismatch" warning
 //----------------------------------------------------------------------------
 #pragma warning( disable : 4018 )
+#pragma warning( disable : 4251 )
 
 //----------------------------------------------------------------------------
 // Includes: mafConfigure should be first, mafIncludeWX second
@@ -164,12 +165,12 @@ MAF_EXPORT void mafSleep(int msec);
   const mafTypeID &thisClass::GetTypeId() const {return typeid(thisClass);} \
   const char *thisClass::GetStaticTypeName() {return #thisClass;} \
   const char *thisClass::GetTypeName() const {return #thisClass;} \
-  MAF_EXPORT bool thisClass::IsStaticType(const char *type) \
+  bool thisClass::IsStaticType(const char *type) \
   { return ( strcmp(#thisClass,type)==0 ) ? true : Superclass::IsStaticType(type); } \
-  MAF_EXPORT bool thisClass::IsStaticType(const mafTypeID &type) \
+  bool thisClass::IsStaticType(const mafTypeID &type) \
   { return ( type==typeid(thisClass) ? true : Superclass::IsStaticType(type) ); } \
-  MAF_EXPORT bool thisClass::IsA(const char *type) const {return IsStaticType(type);} \
-  MAF_EXPORT bool thisClass::IsA(const mafTypeID &type) const {return IsStaticType(type);} \
+  bool thisClass::IsA(const char *type) const {return IsStaticType(type);} \
+  bool thisClass::IsA(const mafTypeID &type) const {return IsStaticType(type);} \
   thisClass* thisClass::SafeDownCast(mafObject *o) \
   { try { return dynamic_cast<thisClass *>(o); } catch (std::bad_cast) { return NULL;} }
 
@@ -178,17 +179,17 @@ MAF_EXPORT void mafSleep(int msec);
   in the .cpp file. */
 #define mafCxxTypeMacro(thisClass) \
   mafCxxAbstractTypeMacro(thisClass); \
-  MAF_EXPORT mafObject *thisClass::NewObject() \
+  mafObject *thisClass::NewObject() \
   { \
     thisClass *obj = new thisClass; \
     if (obj) obj->m_HeapFlag=true; \
     return obj; \
   } \
-  MAF_EXPORT mafObject *thisClass::NewObjectInstance() const \
+  mafObject *thisClass::NewObjectInstance() const \
   { return NewObject(); } \
-  MAF_EXPORT thisClass *thisClass::New() \
+  thisClass *thisClass::New() \
   { return (thisClass *)NewObject(); } \
-  MAF_EXPORT thisClass *thisClass::NewInstance() const \
+  thisClass *thisClass::NewInstance() const \
   { return (thisClass *)NewObjectInstance(); }
 
 /** Shortcut for type checking */

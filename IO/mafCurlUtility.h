@@ -3,8 +3,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafCurlUtility.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-02 11:26:01 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2011-05-25 09:57:52 $
+  Version:   $Revision: 1.2.6.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,6 +20,6 @@ struct msfTreeSearchReult {
 };
 
 /** initalize a given LUT with the idx.th preset */
-extern size_t WriteMemoryCallback(void *ptr, size_t size, size_t nmemb, void *data);
+MAF_EXPORT extern size_t WriteMemoryCallback(void *ptr, size_t size, size_t nmemb, void *data);
 
 #endif

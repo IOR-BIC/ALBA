@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTimeMapScalarWIN.h,v $
   Language:  C++
-  Date:      $Date: 2008-01-24 12:16:59 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2011-05-25 09:49:35 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -41,7 +41,7 @@ typedef std::vector<mafTimeStamp> mmuTimeVectorScalars;
 */
 
 template <class T>
-class MAF_EXPORT mafTimeMapScalar : public mafObject, public mafTimeStamped
+class mafTimeMapScalar : public mafObject, public mafTimeStamped
 {
 public:
   typedef std::map<mafTimeStamp, T > TimeMapScalars;
@@ -50,8 +50,8 @@ public:
   mafTimeMapScalar();  
   virtual ~mafTimeMapScalar();
 
-  mafTimeMapScalar(const mafTimeMapScalar<T>&);  
-  void operator=(const mafTimeMapScalar<T>&);
+  mafTimeMapScalar(const mafTimeMapScalar<T>&){};  
+  void operator=(const mafTimeMapScalar<T>&){};
 
   /** set the TypeName of the kind of item accepted by this container */
   void SetItemTypeName(const char *tname) {m_ItemTypeName = tname;}

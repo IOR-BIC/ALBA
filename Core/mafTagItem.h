@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTagItem.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-24 09:41:46 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2011-05-25 09:47:56 $
+  Version:   $Revision: 1.5.4.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,6 +20,11 @@
 #include <vector>
 #include <string>
 #include <iosfwd>
+
+#ifdef MAF_EXPORTS
+#include "mafDllMacros.h"
+EXPORT_STL_VECTOR(MAF_EXPORT,mafString);
+#endif
 
 //----------------------------------------------------------------------------
 // constants

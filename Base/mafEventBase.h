@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventBase.h,v $
   Language:  C++
-  Date:      $Date: 2008-10-17 11:48:07 $
-  Version:   $Revision: 1.5.22.1 $
+  Date:      $Date: 2011-05-25 09:24:46 $
+  Version:   $Revision: 1.5.22.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -55,7 +55,10 @@ public:
   virtual void DeepCopy(const mafEventBase *maf_event);
 
   /** Static function to turn On/Off the verbose logging.*/
-  static void SetLogVerbose(bool verbose = true) {m_LogVerbose = verbose;};
+  static void SetLogVerbose(bool verbose = true);
+
+  /** Static function to get the verbose logging.*/
+  static bool* GetLogVerbose();
 
   /** set the sender (invoker) of this event */
   void SetSender(void *sender);
@@ -105,6 +108,6 @@ protected:
   mafID           m_Id;
   mafID           m_Channel;
   bool            m_SkipFlag;
-  static bool     m_LogVerbose;
+  // static bool     m_LogVerbose;
 };
 #endif /* __mafEventBase_h */

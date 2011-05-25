@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTagArray.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-24 08:52:58 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2011-05-25 09:47:56 $
+  Version:   $Revision: 1.7.10.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -17,6 +17,11 @@
 #include "mafAttribute.h"
 #include "mafTagItem.h"
 #include <map>
+
+#ifdef MAF_EXPORTS
+#include "mafDllMacros.h"
+EXPORT_STL_MAP(MAF_EXPORT,std::string,mafTagItem);
+#endif
 
 /** An attribute used to store an associtive array of <key,value> pairs, where value is multi component.
   mafTagArray is an attribute storing an associative array of <key,value> pairs (a map), where values are

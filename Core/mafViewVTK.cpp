@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-11-23 11:17:33 $
-  Version:   $Revision: 1.79.2.8 $
+  Date:      $Date: 2011-05-25 09:51:23 $
+  Version:   $Revision: 1.79.2.9 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,6 +24,7 @@
 
 #include "mafIndent.h"
 
+#include "mafGUI.h"
 #include "mafPipe.h"
 #include "mafPipeFactory.h"
 #include "mafLightKit.h"

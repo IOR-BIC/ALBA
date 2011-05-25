@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeFactory.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:38:42 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2011-05-25 09:40:18 $
+  Version:   $Revision: 1.7.24.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,8 +20,8 @@
 /** to be used internally for plugging default nodes --- calls a member function directly */
 #define mafPlugNodeMacro(node_type,descr) \
   RegisterNewNode(node_type::GetStaticTypeName(), descr, node_type::NewObject); \
-  if (mafPics_Initialized) \
-    mafPics.AddVmePic(node_type::GetStaticTypeName(),node_type::GetIcon());
+  if (mafPictureFactory::GetPicsInitialized()) \
+  mafPictureFactory::GetPictureFactory()->AddVmePic(node_type::GetStaticTypeName(),node_type::GetIcon());
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -43,7 +43,7 @@ public:
   /* Initialize the factory creating and registering a new instance */
   static int Initialize();
   /** return the instance pointer of the factory. return NULL if not initialized yet */
-  static mafNodeFactory *GetInstance() {if (!m_Instance) Initialize(); return m_Instance;}
+  static mafNodeFactory *GetInstance();// {if (!m_Instance) Initialize(); return m_Instance;}
 
   /** create an instance of the node give its type name */
   static mafNode *CreateNodeInstance(const char *type_name);
@@ -53,14 +53,15 @@ public:
   void RegisterNewNode(const char* node_name, const char* description, mafCreateObjectFunction createFunction);
 
   /** return list of names for nodes plugged into this factory */
-  const static std::vector<std::string> &GetNodeNames() {return m_NodeNames;}
+  static std::vector<std::string> &GetNodeNames();// {return m_NodeNames;}
 
 protected:
   mafNodeFactory();
   ~mafNodeFactory() { }
 
-  static mafNodeFactory *m_Instance;
-  static std::vector<std::string> m_NodeNames; 
+  static bool m_Initialized;
+  // static mafNodeFactory *m_Instance;
+  // static std::vector<std::string> m_NodeNames; 
   
 private:
   mafNodeFactory(const mafNodeFactory&);  // Not implemented.
@@ -69,7 +70,7 @@ private:
 
 /** Plug  a node in the main MAF Node factory.*/
 template <class T>
-class MAF_EXPORT mafPlugNode
+class mafPlugNode
 {
   public:
   mafPlugNode(const char *description);
@@ -87,14 +88,14 @@ mafPlugNode<T>::mafPlugNode(const char *description)
   {
     factory->RegisterNewNode(T::GetStaticTypeName(), description, T::NewObject);
     // here plug node's icon inside picture factory
-    if (mafPics_Initialized)
-      mafPics.AddVmePic(T::GetStaticTypeName(),T::GetIcon());
+    if (mafPictureFactory::GetPicsInitialized())
+      mafPictureFactory::GetPictureFactory()->AddVmePic(T::GetStaticTypeName(),T::GetIcon());
   }
 }
 
 /** Plug an attribute class into the Node factory.*/
 template <class T>
-class MAF_EXPORT mafPlugAttribute
+class mafPlugAttribute
 {
   public:
   mafPlugAttribute(const char *description) \

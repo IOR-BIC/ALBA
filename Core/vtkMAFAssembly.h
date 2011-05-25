@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: vtkMAFAssembly.h,v $
   Language:  C++
-  Date:      $Date: 2010-07-08 15:40:35 $
-  Version:   $Revision: 1.4.22.1 $
+  Date:      $Date: 2011-05-25 09:53:22 $
+  Version:   $Revision: 1.4.22.2 $
   Authors:   Sivano Imboden 
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -29,7 +29,7 @@ class mafNode;
   for client data.
   @sa vtkActor vtkAssembly vtkTransform vtkMapper vtkPolyDataMapper vtkPropAssembly
   */
-class /*MFL_CORE_EXPORT*/ vtkMAFAssembly : public vtkProp3D
+class MAF_EXPORT vtkMAFAssembly : public vtkProp3D
 {
 public:
   static vtkMAFAssembly *New();

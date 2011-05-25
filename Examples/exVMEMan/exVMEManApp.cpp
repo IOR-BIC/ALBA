@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exVMEManApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:02:58 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2011-05-25 09:57:09 $
+  Version:   $Revision: 1.6.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,7 +21,6 @@
 
 
 #include "exVMEManApp.h"
-#include "mafNodeFactory.h"
 #include "mafPics.h"
 #include "mafGUIMDIFrame.h"
 #include "mafPipeFactoryVME.h"
@@ -42,7 +41,7 @@ bool exVMEManApp::OnInit()
 {
   // this must be initialized before of Node/VME factories to allow
   // plugging of Node/VME icons
-  mafPics.Initialize();  
+  mafPictureFactory::GetPictureFactory()->Initialize();  
 
   int result = mafVMEFactory::Initialize();
   assert(result==MAF_OK);

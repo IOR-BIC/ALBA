@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafCoreFactory.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:23:13 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2011-05-25 09:34:21 $
+  Version:   $Revision: 1.3.24.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -28,13 +28,14 @@ public:
   /* Initialize the factory creating and registering a new instance */
   static int Initialize();
   /** return the instance pointer of the factory. return NULL if not iitialized yet */
-  static mafCoreFactory *GetInstance() {if (!m_Instance) Initialize(); return m_Instance;}
+  static mafCoreFactory *GetInstance();// {if (!m_Instance) Initialize(); return m_Instance;}
 
 protected:
   mafCoreFactory();
   ~mafCoreFactory() { }
 
-  static mafCoreFactory *m_Instance;
+  static bool m_Initialized;
+  // static mafCoreFactory *m_Instance;
   
 private:
   mafCoreFactory(const mafCoreFactory&);  // Not implemented.
@@ -43,7 +44,7 @@ private:
 
 /** Plug generic object into the MAF Core factory.*/
 template <class T>
-class MAF_EXPORT mafPlugObject
+class mafPlugObject
 {
   public:
   mafPlugObject(const char *description) \

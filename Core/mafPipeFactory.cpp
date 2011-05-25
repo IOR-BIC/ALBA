@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-19 09:32:29 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2011-05-25 09:45:11 $
+  Version:   $Revision: 1.6.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -31,28 +31,31 @@
 #include <ostream>
 #include <algorithm>
 
-mafPipeFactory *mafPipeFactory::m_Instance=NULL;
+bool mafPipeFactory::m_Initialized=false;
+// mafPipeFactory *mafPipeFactory::m_Instance=NULL;
 
 mafCxxTypeMacro(mafPipeFactory);
 
-std::vector<std::string> mafPipeFactory::m_PipeNames;
+// std::vector<std::string> mafPipeFactory::m_PipeNames;
 
 //----------------------------------------------------------------------------
 // This is used to register the factory when linking statically
 int mafPipeFactory::Initialize()
 //----------------------------------------------------------------------------
 {
-  if (m_Instance==NULL)
+  if (!m_Initialized)
   {
-    m_Instance=mafPipeFactory::New();
+    // m_Instance=mafPipeFactory::New();
 
-    if (m_Instance)
+    m_Initialized=true;
+    if (GetInstance())
     {
-      m_Instance->RegisterFactory(m_Instance);
+      GetInstance()->RegisterFactory(GetInstance());
       return MAF_OK;  
     }
     else
     {
+      m_Initialized=false;
       return MAF_ERROR;
     }
   }
@@ -64,7 +67,7 @@ int mafPipeFactory::Initialize()
 mafPipeFactory::mafPipeFactory()
 //------------------------------------------------------------------------------
 {
-  m_Instance = NULL;
+  // m_Instance = NULL;
   
   //
   // Plug here Pipes in this factory
@@ -101,11 +104,26 @@ mafPipe *mafPipeFactory::CreatePipeInstance(const char *type_name)
 void mafPipeFactory::RegisterNewPipe(const char* pipe_name, const char* description, mafCreateObjectFunction createFunction)
 //------------------------------------------------------------------------------
 {
-	std::vector<std::string, std::allocator<std::string> >::const_iterator it = std::find(m_PipeNames.begin (), m_PipeNames.end (), std::string(pipe_name));
-	if(it != m_PipeNames.end() )
+	std::vector<std::string, std::allocator<std::string> >::const_iterator it = std::find(GetPipeNames().begin (), GetPipeNames().end (), std::string(pipe_name));
+	if(it != GetPipeNames().end() )
 	{
     return;
 	}
-  m_PipeNames.push_back(pipe_name);
+  GetPipeNames().push_back(pipe_name);
   RegisterNewObject(pipe_name,description,createFunction);
+}
+//------------------------------------------------------------------------------
+mafPipeFactory* mafPipeFactory::GetInstance()
+//------------------------------------------------------------------------------
+{
+  static mafPipeFactory &istance = *(mafPipeFactory::New());
+  Initialize();
+  return &istance;
+}
+//------------------------------------------------------------------------------
+std::vector<std::string> &mafPipeFactory::GetPipeNames()
+//------------------------------------------------------------------------------
+{
+  static std::vector<std::string> pipeNames;
+  return pipeNames;
 }

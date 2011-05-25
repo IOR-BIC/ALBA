@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaApplicationLayout.h,v $
   Language:  C++
-  Date:      $Date: 2006-12-06 14:12:48 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2011-05-25 09:53:22 $
+  Version:   $Revision: 1.5.6.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,6 +25,22 @@
 //----------------------------------------------------------------------------
 class mafView;
 
+struct ViewLayoutInfo 
+{
+  mafString m_Label;
+  int m_Id;
+  int m_Mult;
+  int m_Maximized;
+  int m_Position[2];
+  int m_Size[2];
+  std::vector<int> m_VisibleVmes;
+  double m_CameraParameters[9];
+};
+
+#ifdef MAF_EXPORTS
+#include "mafDllMacros.h"
+EXPORT_STL_VECTOR(MAF_EXPORT,ViewLayoutInfo);
+#endif
 //----------------------------------------------------------------------------
 // mmaApplicationLayout:
 //----------------------------------------------------------------------------
@@ -36,18 +52,6 @@ public:
   virtual ~mmaApplicationLayout();
 
   mafTypeMacro(mmaApplicationLayout, mafAttribute);
-  
-  struct ViewLayoutInfo 
-  {
-    mafString m_Label;
-    int m_Id;
-    int m_Mult;
-    int m_Maximized;
-    int m_Position[2];
-    int m_Size[2];
-    std::vector<int> m_VisibleVmes;
-    double m_CameraParameters[9];
-  };
 
   /** print a dump of this object */
   virtual void Print(std::ostream& os, const int tabs=0) const;

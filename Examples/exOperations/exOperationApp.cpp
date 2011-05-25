@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exOperationApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-01-19 10:55:44 $
-  Version:   $Revision: 1.46.2.2 $
+  Date:      $Date: 2011-05-25 09:56:04 $
+  Version:   $Revision: 1.46.2.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -19,7 +19,6 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-
 #include "exOperationApp.h"
 #include "mafDecl.h"
 
@@ -27,7 +26,6 @@
 #include "mafPics.h"
 #include "mafGUIMDIFrame.h"
 
-#include "mafNodeFactory.h"
 #include "mafNodeGeneric.h"
 #include "mafNodeRoot.h"
 #include "mafVMERoot.h"
@@ -91,7 +89,7 @@ IMPLEMENT_APP(exOperationApp)
 bool exOperationApp::OnInit()
 //--------------------------------------------------------------------------------
 {
-  mafPics.Initialize();	
+  mafPictureFactory::GetPictureFactory()->Initialize();	
 
 #include "Examples/exOperations/MAFIcons/FRAME_ICON16x16.xpm"
   mafADDPIC(FRAME_ICON16x16);

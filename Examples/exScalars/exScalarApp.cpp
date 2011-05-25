@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exScalarApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:01:19 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2011-05-25 09:56:55 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -27,7 +27,6 @@
 #include "mafPics.h"
 #include "mafGUIMDIFrame.h"
 
-#include "mafNodeFactory.h"
 #include "mafNodeGeneric.h"
 #include "mafNodeRoot.h"
 #include "mafVMERoot.h"
@@ -52,7 +51,7 @@ IMPLEMENT_APP(exScalarApp)
 bool exScalarApp::OnInit()
 //--------------------------------------------------------------------------------
 {
-  mafPics.Initialize();	
+  mafPictureFactory::GetPictureFactory()->Initialize();	
 
   int result = mafVMEFactory::Initialize();
   assert(result==MAF_OK);

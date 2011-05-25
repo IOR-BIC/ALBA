@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransform.h,v $
   Language:  C++
-  Date:      $Date: 2010-07-08 15:40:18 $
-  Version:   $Revision: 1.12.2.3 $
+  Date:      $Date: 2011-05-25 09:30:12 $
+  Version:   $Revision: 1.12.2.4 $
   Authors:   Marco Petrone, Stefano Perticoni,Stefania Paperini
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -13,9 +13,7 @@
 #ifndef __mafTransform_h
 #define __mafTransform_h
 
-#include "mafRefSys.h"
 #include "mafTransformBase.h"
-
 #include "mafInteractorConstraint.h"
 
 #include "mmuUtility.h"
@@ -57,6 +55,18 @@ class MAF_EXPORT mafTransform : public mafTransformBase
 	
   mafTransform();
   ~mafTransform();
+
+  //----------------------------------------------------------------------------
+  // Ref Sys Type:
+  //----------------------------------------------------------------------------
+  enum 
+  {
+    CUSTOM = 0, ///< auxiliar ref sys 
+    GLOBAL, 
+    PARENT,
+    LOCAL,   ///< the local ref sys of the VME
+    VIEW     ///< the view ref sys
+  };
 
   /** copy constructor */
   mafTransform(const mafTransform&);
@@ -232,7 +242,7 @@ class MAF_EXPORT mafTransform : public mafTransformBase
   static void BuildVector(double *p1, double *p2, double *out_vector);
 
   /** Build vector [coeff * inVector] */
-  static void BuildVector(double coeff, const double *inVector, double *outVector, int refSysType = mafRefSys::LOCAL, int localAxis = mafInteractorConstraint::X);
+  static void BuildVector(double coeff, const double *inVector, double *outVector, int refSysType = LOCAL, int localAxis = mafInteractorConstraint::X);
 
   /** Project in_vector on in_axis direction; in_axis does not need to be 
   normalised. The projection signed value is returned */

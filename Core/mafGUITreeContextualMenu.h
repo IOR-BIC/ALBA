@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUITreeContextualMenu.h,v $
   Language:  C++
-  Date:      $Date: 2009-08-20 08:13:35 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 09:36:40 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -30,7 +30,7 @@ class mafVME;
 /** Used to create and manage contextual menu' for tree widget used in side bar
 @sa mafGUIContextualMenu
 */
-class mafGUITreeContextualMenu : public wxMenu
+class MAF_EXPORT mafGUITreeContextualMenu : public wxMenu
 {
 public:
   mafGUITreeContextualMenu();

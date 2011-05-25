@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFRulerActor2D.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:01:03 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2011-05-25 09:56:41 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -40,7 +40,7 @@ class vtkPoints;
 # define NUM_LAB 30
 
 //-----------------------------------------------------------------------------
-class VTK_vtkMAF_EXPORT vtkMAFRulerActor2D : public vtkActor2D
+class __declspec( dllexport ) vtkMAFRulerActor2D : public vtkActor2D
 //-----------------------------------------------------------------------------
 {
  public:

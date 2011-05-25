@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVector.h,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:34:00 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2011-05-25 09:30:12 $
+  Version:   $Revision: 1.2.22.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -23,7 +23,7 @@ template <class T> class mmuVectorItems;
   mafSmartPointers to store mafReferenceCounted pointers.
 */
 template <class T>
-class MAF_EXPORT mafVector : public mafBase
+class mafVector : public mafBase
 {
 public:
   mafVector();

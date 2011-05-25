@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneNode.h,v $
   Language:  C++
-  Date:      $Date: 2010-11-10 16:52:01 $
-  Version:   $Revision: 1.8.6.2 $
+  Date:      $Date: 2011-05-25 09:47:55 $
+  Version:   $Revision: 1.8.6.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,7 +25,7 @@ class mafSceneGraph;
 // mafSceneNode :
 //----------------------------------------------------------------------------
 /** mafSceneNode is a node of mafScenegraph. */
-class mafSceneNode
+class MAF_EXPORT mafSceneNode
 {
 public:
 								mafSceneNode(mafSceneGraph *sg, mafSceneNode *parent, const mafNode* vme, vtkRenderer *ren1, vtkRenderer *ren2=NULL, vtkRenderer *ren3 = NULL);

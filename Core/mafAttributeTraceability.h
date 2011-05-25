@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAttributeTraceability.h,v $
   Language:  C++
-  Date:      $Date: 2008-10-29 11:03:21 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2011-05-25 09:34:21 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -16,6 +16,22 @@
 //----------------------------------------------------------------------------
 #include "mafAttribute.h"
 #include <vector>
+
+struct m_Traceability
+{
+  mafString m_TrialEvent;
+  mafString m_OperationName;
+  mafString m_Parameters;
+  mafString m_Date;
+  mafString m_AppStamp;
+  mafString m_OperatorID;
+  mafString m_IsNatural;
+};
+
+#ifdef MAF_EXPORTS
+#include "mafDllMacros.h"
+EXPORT_STL_VECTOR(MAF_EXPORT,m_Traceability);
+#endif
 
 //----------------------------------------------------------------------------
 // mafAttributeTraceability:
@@ -46,17 +62,6 @@ public:
 
   /** return trial type form vetor of traceability event*/
   mafString GetLastTrialEvent();
-
-  struct m_Traceability
-  {
-    mafString m_TrialEvent;
-    mafString m_OperationName;
-    mafString m_Parameters;
-    mafString m_Date;
-    mafString m_AppStamp;
-    mafString m_OperatorID;
-    mafString m_IsNatural;
-  };
 
   std::vector<m_Traceability> m_TraceabilityVector;
 

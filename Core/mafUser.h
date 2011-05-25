@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafUser.h,v $
 Language:  C++
-Date:      $Date: 2009-01-15 11:06:52 $
-Version:   $Revision: 1.2.2.2 $
+Date:      $Date: 2011-05-25 09:49:35 $
+Version:   $Revision: 1.2.2.3 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -25,7 +25,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 This is intended as starting point for user managing. Method for Check User Credentials can be redefined to be
 customized at application level according to custom requests.
 */
-class mafUser
+class MAF_EXPORT mafUser
 {
 public:
   mafUser();

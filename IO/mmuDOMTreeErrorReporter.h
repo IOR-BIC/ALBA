@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmuDOMTreeErrorReporter.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-21 15:39:30 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2011-05-25 09:57:52 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -24,7 +24,7 @@ class name: mmuDOMTreeErrorReporter
   Utility class to catch XML error rised while parsing XML 
 */
 
-class mmuDOMTreeErrorReporter : public XERCES_CPP_NAMESPACE_QUALIFIER ErrorHandler
+class MAF_EXPORT mmuDOMTreeErrorReporter : public XERCES_CPP_NAMESPACE_QUALIFIER ErrorHandler
 {
 public:
     /** constructor */

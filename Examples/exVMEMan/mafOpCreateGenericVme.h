@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpCreateGenericVme.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 12:03:10 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2011-05-25 09:57:09 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 class mafNodeGeneric;
 // ============================================================================
-class mafOpCreateGenericVme : public mafOp
+class __declspec( dllexport ) mafOpCreateGenericVme : public mafOp
 // ============================================================================
 {
 public:

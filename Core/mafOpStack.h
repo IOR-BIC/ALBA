@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpStack.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 12:16:32 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2011-05-25 09:42:20 $
+  Version:   $Revision: 1.2.24.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -20,7 +20,7 @@ class mafOp;
 //----------------------------------------------------------------------------
 /**
 */
-class mafOpStack
+class MAF_EXPORT mafOpStack
 {
 public:
 				mafOpStack();

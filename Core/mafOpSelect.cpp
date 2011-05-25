@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpSelect.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-06-04 14:23:07 $
-  Version:   $Revision: 1.11.2.2 $
+  Date:      $Date: 2011-05-25 09:42:20 $
+  Version:   $Revision: 1.11.2.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,7 +32,9 @@
 #include "vtkDataSet.h"
 
 //initialize the Clipboard
-mafAutoPointer<mafNode>  mafOpEdit::m_Clipboard(NULL); 
+// mafAutoPointer<mafNode>  mafOpEdit::m_Clipboard(NULL);
+
+static mafAutoPointer<mafNode> m_Clipboard = NULL;
 
 //////////////////
 // mafOpSelect ://
@@ -114,31 +116,42 @@ mafOpEdit::~mafOpEdit()
 bool mafOpEdit::ClipboardIsEmpty()
 //----------------------------------------------------------------------------
 {
-  return m_Clipboard.GetPointer() == NULL;
+  return GetClipboard() == NULL;
 }
 //----------------------------------------------------------------------------
 void mafOpEdit::ClipboardClear()
 //----------------------------------------------------------------------------
 {
-  m_Clipboard = NULL;
+  SetClipboard(NULL);
 }
 //----------------------------------------------------------------------------
 void mafOpEdit::ClipboardBackup()
 //----------------------------------------------------------------------------
 {
   assert(m_Backup.GetPointer() == NULL);
-  m_Backup = m_Clipboard;
-  m_Clipboard = NULL;
+  m_Backup = GetClipboard();
+  SetClipboard(NULL);
 }
 //----------------------------------------------------------------------------
 void mafOpEdit::ClipboardRestore()
 //----------------------------------------------------------------------------
 {
   //assert(m_Backup.GetPointer() ); - //SIL. 6-11-2003: assert removed, I may make a backup of an empy clipboard
-  m_Clipboard = m_Backup;
+  SetClipboard(m_Backup);
   m_Backup = NULL;
 }
-
+//----------------------------------------------------------------------------
+mafNode* mafOpEdit::GetClipboard()
+//----------------------------------------------------------------------------
+{
+  return m_Clipboard;
+}
+//----------------------------------------------------------------------------
+void mafOpEdit::SetClipboard(mafNode *node)
+//----------------------------------------------------------------------------
+{
+  m_Clipboard = node;
+}
 ///////////////
 // mafOpCut ://
 ///////////////
@@ -177,8 +190,8 @@ Select the vme parent
 */
 {
   ClipboardBackup();
-  m_SelectionParent = m_Selection->GetParent(); 
-  m_Clipboard = m_Selection;
+  m_SelectionParent = m_Selection->GetParent();
+  SetClipboard(m_Selection);
 
   //////////////////////////////////////////////////////////////////////////
   // It is necessary load all vtk data of the vme time varying otherwise paste or undo cause an application crash
@@ -238,7 +251,7 @@ Restore the Clipboard
 Restore the Selection
 */
 {
-  m_Selection = m_Clipboard.GetPointer();
+  m_Selection = GetClipboard();
 
 #ifdef MAF_USE_VTK
   if (m_SelectionParent->IsMAFType(mafVMELandmarkCloud) && !((mafVMELandmarkCloud *)m_SelectionParent.GetPointer())->IsOpen())
@@ -290,8 +303,8 @@ bool mafOpCopy::Accept(mafNode* vme)
 //----------------------------------------------------------------------------
 {
   bool res = (vme!=NULL) && (!vme->IsMAFType(mafVMERoot));
-  if(m_Clipboard)
-    res = res && m_Clipboard->CanCopy(vme);
+  if(GetClipboard() != NULL)
+    res = res && GetClipboard()->CanCopy(vme);
   return res;
 }
 //----------------------------------------------------------------------------
@@ -303,11 +316,11 @@ copy the selected VME and its subtree into the clipboard
 */
 {
   ClipboardBackup();
-  m_Clipboard = m_Selection->CopyTree();
+  SetClipboard(m_Selection->CopyTree());
   mafString copy_name;
   copy_name = "copy of ";
-  copy_name += m_Clipboard->GetName();
-  m_Clipboard->SetName(copy_name.GetCStr());
+  copy_name += GetClipboard()->GetName();
+  GetClipboard()->SetName(copy_name.GetCStr());
 }
 //----------------------------------------------------------------------------
 void mafOpCopy::OpUndo()
@@ -350,7 +363,7 @@ bool mafOpPaste::Accept(mafNode* vme)
 
   if(ClipboardIsEmpty()) return false;
   if(vme == NULL) return false;
-  mafNode *cv = m_Clipboard.GetPointer();
+  mafNode *cv = GetClipboard();
   return cv->CanReparentTo(vme);
 };
 //----------------------------------------------------------------------------
@@ -366,9 +379,9 @@ but place in the scene the original and keep the copy in the clipboard.
 Them a VME_ADD is sent, selection is not changed
 */
 {
-  m_PastedVme = m_Clipboard.GetPointer(); 
+  m_PastedVme = GetClipboard(); 
   m_PastedVme->ReparentTo(m_Selection);
-  m_Clipboard = m_PastedVme->CopyTree(); 
+  SetClipboard(m_PastedVme->CopyTree());
 }
 //----------------------------------------------------------------------------
 void mafOpPaste::OpUndo()                  
@@ -378,7 +391,7 @@ Remove the pasted vme from the scene and place it in the clipboard.
 The copy in the clipboard will be automatically deleted
 */
 {
-  m_Clipboard = m_PastedVme;
+  SetClipboard(m_PastedVme);
   mafEventMacro(mafEvent(this,VME_REMOVE,m_PastedVme));
 }
 

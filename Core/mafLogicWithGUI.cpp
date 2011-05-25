@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-01-15 11:07:13 $
-  Version:   $Revision: 1.44.2.2 $
+  Date:      $Date: 2011-05-25 09:36:40 $
+  Version:   $Revision: 1.44.2.3 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -116,7 +116,7 @@ void mafLogicWithGUI::Show()
 void mafLogicWithGUI::ShowSplashScreen()
 //----------------------------------------------------------------------------
 {
-  wxBitmap splashImage = mafPics.GetBmp("SPLASH_SCREEN");
+  wxBitmap splashImage = mafPictureFactory::GetPictureFactory()->GetBmp("SPLASH_SCREEN");
   ShowSplashScreen(splashImage);
 }
 //----------------------------------------------------------------------------
@@ -283,22 +283,22 @@ void mafLogicWithGUI::CreateToolbar()
   m_ToolBar->SetMargins(0,0);
   m_ToolBar->SetToolSeparation(2);
   m_ToolBar->SetToolBitmapSize(wxSize(20,20));
-  m_ToolBar->AddTool(MENU_FILE_NEW,mafPics.GetBmp("FILE_NEW"),    _("new msf storage file"));
-  m_ToolBar->AddTool(MENU_FILE_OPEN,mafPics.GetBmp("FILE_OPEN"),  _("open msf storage file"));
-  m_ToolBar->AddTool(MENU_FILE_SAVE,mafPics.GetBmp("FILE_SAVE"),  _("save current msf storage file"));
+  m_ToolBar->AddTool(MENU_FILE_NEW,mafPictureFactory::GetPictureFactory()->GetBmp("FILE_NEW"),    _("new msf storage file"));
+  m_ToolBar->AddTool(MENU_FILE_OPEN,mafPictureFactory::GetPictureFactory()->GetBmp("FILE_OPEN"),  _("open msf storage file"));
+  m_ToolBar->AddTool(MENU_FILE_SAVE,mafPictureFactory::GetPictureFactory()->GetBmp("FILE_SAVE"),  _("save current msf storage file"));
   m_ToolBar->AddSeparator();
 
-  m_ToolBar->AddTool(OP_UNDO,mafPics.GetBmp("OP_UNDO"),  _("undo (ctrl+z)")); //correggere tooltip - shortcut sbagliati
-  m_ToolBar->AddTool(OP_REDO,mafPics.GetBmp("OP_REDO"),  _("redo (ctrl+shift+z)"));
+  m_ToolBar->AddTool(OP_UNDO,mafPictureFactory::GetPictureFactory()->GetBmp("OP_UNDO"),  _("undo (ctrl+z)")); //correggere tooltip - shortcut sbagliati
+  m_ToolBar->AddTool(OP_REDO,mafPictureFactory::GetPictureFactory()->GetBmp("OP_REDO"),  _("redo (ctrl+shift+z)"));
   m_ToolBar->AddSeparator();
 
-  m_ToolBar->AddTool(OP_CUT,  mafPics.GetBmp("OP_CUT"),  _("cut selected vme (ctrl+x)"));
-  m_ToolBar->AddTool(OP_COPY, mafPics.GetBmp("OP_COPY"), _("copy selected vme (ctrl+c)"));
-  m_ToolBar->AddTool(OP_PASTE,mafPics.GetBmp("OP_PASTE"),_("paste vme (ctrl+v)"));
+  m_ToolBar->AddTool(OP_CUT,  mafPictureFactory::GetPictureFactory()->GetBmp("OP_CUT"),  _("cut selected vme (ctrl+x)"));
+  m_ToolBar->AddTool(OP_COPY, mafPictureFactory::GetPictureFactory()->GetBmp("OP_COPY"), _("copy selected vme (ctrl+c)"));
+  m_ToolBar->AddTool(OP_PASTE,mafPictureFactory::GetPictureFactory()->GetBmp("OP_PASTE"),_("paste vme (ctrl+v)"));
   m_ToolBar->AddSeparator();
-  m_ToolBar->AddTool(CAMERA_RESET,mafPics.GetBmp("ZOOM_ALL"),_("reset camera to fit all (ctrl+f)"));
-  m_ToolBar->AddTool(CAMERA_FIT,  mafPics.GetBmp("ZOOM_SEL"),_("reset camera to fit selected object (ctrl+shift+f)"));
-  m_ToolBar->AddTool(CAMERA_FLYTO,mafPics.GetBmp("FLYTO"),_("fly to object under mouse (press f inside a 3Dview)"));
+  m_ToolBar->AddTool(CAMERA_RESET,mafPictureFactory::GetPictureFactory()->GetBmp("ZOOM_ALL"),_("reset camera to fit all (ctrl+f)"));
+  m_ToolBar->AddTool(CAMERA_FIT,  mafPictureFactory::GetPictureFactory()->GetBmp("ZOOM_SEL"),_("reset camera to fit selected object (ctrl+shift+f)"));
+  m_ToolBar->AddTool(CAMERA_FLYTO,mafPictureFactory::GetPictureFactory()->GetBmp("FLYTO"),_("fly to object under mouse (press f inside a 3Dview)"));
   m_ToolBar->Realize();
   m_Win->SetToolBar(m_ToolBar);
 

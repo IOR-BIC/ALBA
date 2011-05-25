@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testViewApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:01:31 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2011-05-25 09:57:03 $
+  Version:   $Revision: 1.6.2.1 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,7 +25,6 @@
 #include "mafPics.h"
 #include "mafGUIMDIFrame.h"
 
-#include "mafNodeFactory.h"
 #include "mafNodeGeneric.h"
 #include "mafNodeRoot.h"
 #include "mafVMERoot.h"
@@ -47,7 +46,7 @@ IMPLEMENT_APP(testViewApp)
 bool testViewApp::OnInit()
 //--------------------------------------------------------------------------------
 {
-  mafPics.Initialize();	
+  mafPictureFactory::GetPictureFactory()->Initialize();	
 
   int result = mafVMEFactory::Initialize();
   assert(result==MAF_OK);

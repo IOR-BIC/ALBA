@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafCoreFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 13:57:38 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2011-05-25 09:34:21 $
+  Version:   $Revision: 1.7.24.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -26,7 +26,8 @@
 #include <string>
 #include <ostream>
 
-mafCoreFactory *mafCoreFactory::m_Instance=NULL;
+bool mafCoreFactory::m_Initialized=false;
+// mafCoreFactory *mafCoreFactory::m_Instance=NULL;
 
 mafCxxTypeMacro(mafCoreFactory);
 
@@ -35,13 +36,14 @@ mafCxxTypeMacro(mafCoreFactory);
 int mafCoreFactory::Initialize()
 //----------------------------------------------------------------------------
 {
-  if (m_Instance==NULL)
+  if (m_Initialized)
   {
-    m_Instance=mafCoreFactory::New();
+    // m_Instance=mafCoreFactory::New();
 
-    if (m_Instance)
+    if (GetInstance())
     {
-      m_Instance->RegisterFactory(m_Instance);
+      GetInstance()->RegisterFactory(GetInstance());
+      m_Initialized=true;
       return MAF_OK;  
     }
     else
@@ -57,7 +59,7 @@ int mafCoreFactory::Initialize()
 mafCoreFactory::mafCoreFactory()
 //------------------------------------------------------------------------------
 {
-  m_Instance = NULL;
+  // m_Instance = NULL;
   
   //
   // Plug here Objects in this factory
@@ -77,4 +79,11 @@ const char* mafCoreFactory::GetDescription() const
 //------------------------------------------------------------------------------
 {
   return "MAF-Core Object Factory";
+}
+//------------------------------------------------------------------------------
+mafCoreFactory* mafCoreFactory::GetInstance()
+//------------------------------------------------------------------------------
+{
+  static mafCoreFactory &instance = *(mafCoreFactory::New());
+  return &instance;
 }

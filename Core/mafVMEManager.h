@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.h,v $
   Language:  C++
-  Date:      $Date: 2010-11-11 16:14:58 $
-  Version:   $Revision: 1.20.2.4 $
+  Date:      $Date: 2011-05-25 09:53:22 $
+  Version:   $Revision: 1.20.2.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,7 +34,7 @@ It can add or remove VME to the current tree, add a new tree, load and save a tr
 
 */
 //----------------------------------------------------------------------------
-class mafVMEManager: public mafObserver
+class MAF_EXPORT mafVMEManager: public mafObserver
 //----------------------------------------------------------------------------
 {
 public:

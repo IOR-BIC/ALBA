@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpSelect.h,v $
   Language:  C++
-  Date:      $Date: 2010-06-04 14:23:07 $
-  Version:   $Revision: 1.7.2.2 $
+  Date:      $Date: 2011-05-25 09:42:20 $
+  Version:   $Revision: 1.7.2.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,7 +29,7 @@ class vtkMatrix4x4;
     class name: mafOpSelect
     Operation for the selection of a vme.
 */
-class mafOpSelect: public mafOp
+class MAF_EXPORT mafOpSelect: public mafOp
 {
 public:
     /** Constructor. */
@@ -53,6 +53,7 @@ public:
     /** return a instance of current object. */
     mafOp* Copy();
 protected:
+    template class MAF_EXPORT mafAutoPointer<mafNode>;
     mafAutoPointer<mafNode> m_OldNodeSelected;
     mafAutoPointer<mafNode> m_NewNodeSelected;
 };
@@ -60,7 +61,7 @@ protected:
     class name: mafOpEdit
     Interface operation for cut, copy, and paste operation.
 */
-class mafOpEdit: public mafOp
+class MAF_EXPORT mafOpEdit: public mafOp
 {
 public:
     /** Constructor. */
@@ -77,17 +78,21 @@ public:
 		void     ClipboardBackup();
     /** restore clipboard from backup */
 		void     ClipboardRestore();
-
-    static   mafAutoPointer<mafNode> m_Clipboard;
+    /** return the mafNode that is in the clipboard */
+    mafNode* GetClipboard();
+    /** set the clipboard */
+    void SetClipboard(mafNode *node);
 protected:
-             mafAutoPointer<mafNode> m_Backup;
-             mafAutoPointer<mafNode> m_Selection;
+  template class MAF_EXPORT mafAutoPointer<mafNode>;
+  // static   mafAutoPointer<mafNode> m_Clipboard;
+  mafAutoPointer<mafNode> m_Backup;
+  mafAutoPointer<mafNode> m_Selection;
 };
 /**
     class name: mafOpCut
     Operation which perform cut on a node input. (copying it into a clipboard)
 */
-class mafOpCut: public mafOpEdit
+class MAF_EXPORT mafOpCut: public mafOpEdit
 {
 public:
     /** Constructor. */
@@ -112,7 +117,7 @@ protected:
     class name: mafOpCopy
     Operation which perform copy of a node.
 */
-class mafOpCopy: public mafOpEdit
+class MAF_EXPORT mafOpCopy: public mafOpEdit
 {
 public:
     /** Constructor. */
@@ -132,7 +137,7 @@ public:
     class name: mafOpPaste
     Operation which perform paste of a node previously copied or cut.
 */
-class mafOpPaste: public mafOpEdit
+class MAF_EXPORT mafOpPaste: public mafOpEdit
 {
 public:
     /** Constructor. */

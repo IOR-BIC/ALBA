@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSmartPointer.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-25 15:15:00 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2011-05-25 09:27:41 $
+  Version:   $Revision: 1.7.4.1 $
   Authors:   based on vtkSmartPointer (www.vtk.org), rewritten by Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,7 +25,7 @@ class mafReferenceCounted;
   allocated on the stack this object allows to automatically unregister an object 
   when exiting from the scope. */
 template <class T>
-class MAF_EXPORT mafAutoPointer : public mafBase
+class mafAutoPointer : public mafBase
 {
 public:  
   /** Initialize smart pointer to (optional) given object. */
@@ -104,7 +104,7 @@ protected:
   mafSmartPointer is a specialization of mafAutoPointer which automatically
   instantiate an object in the default constructor. */
 template <class T>
-class MAF_EXPORT mafSmartPointer: public mafAutoPointer<T>
+class mafSmartPointer: public mafAutoPointer<T>
 {
 public:
   /**

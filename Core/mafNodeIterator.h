@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeIterator.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-17 11:13:38 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2011-05-25 09:40:18 $
+  Version:   $Revision: 1.10.18.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -17,6 +17,7 @@
 #include "mafObject.h"
 #include "mafNode.h"
 #include "mafVector.h"
+#include "mafVector.txx"
 #include "mafEventSource.h"
 
 /** mafNodeIterator - an m-way tree data structure iterator
@@ -148,6 +149,7 @@ protected:
   int             m_TraversalDone;
   bool            m_IgnoreVisibleToTraverse;
 
+  template class MAF_EXPORT mafVector<mafID>;
   mafVector<mafID> m_CurrentIdx;
 
   mafEventSource  m_EventSource; ///< Source of events issued during traverse

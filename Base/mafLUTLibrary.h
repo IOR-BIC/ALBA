@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafLUTLibrary.h,v $
 Language:  C++
-Date:      $Date: 2008-09-01 08:15:11 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2011-05-25 09:27:40 $
+Version:   $Revision: 1.4.2.1 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -21,7 +21,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <vector>
 
 /** A component to handle lookup table libraries */
-class mafLUTLibrary
+class MAF_EXPORT mafLUTLibrary
 {
 public:
   mafLUTLibrary();

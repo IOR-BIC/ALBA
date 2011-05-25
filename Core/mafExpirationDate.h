@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafExpirationDate.h,v $
 Language:  C++
-Date:      $Date: 2010-10-14 13:40:30 $
-Version:   $Revision: 1.1.2.6 $
+Date:      $Date: 2011-05-25 09:35:14 $
+Version:   $Revision: 1.1.2.7 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -30,7 +30,7 @@ Class Name: mafExpirationDate.
 Class that supplies API for handling expiration based on simple control of local date
 in the machine in which the application is installed.
 */
-class mafExpirationDate : public mafExpiration
+class MAF_EXPORT mafExpirationDate : public mafExpiration
 {
 public:
 	/** Control trial period is over */

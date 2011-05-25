@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLODActor.h,v $
   Language:  C++
-  Date:      $Date: 2010-07-08 15:40:35 $
-  Version:   $Revision: 1.2.10.1 $
+  Date:      $Date: 2011-05-25 09:36:40 $
+  Version:   $Revision: 1.2.10.2 $
   Authors:   Paolo Quadrani & Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -19,7 +19,7 @@ class vtkPolyDataMapper;
 class vtkActor;
 
 
-class mafLODActor : public vtkOpenGLActor
+class MAF_EXPORT mafLODActor : public vtkOpenGLActor
 {
 protected:
   

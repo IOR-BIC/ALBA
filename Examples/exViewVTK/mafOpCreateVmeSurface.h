@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpCreateVmeSurface.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 12:02:57 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2011-05-25 09:57:03 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,7 +21,7 @@
 //----------------------------------------------------------------------------
 class mafVMESurface;
 // ============================================================================
-class mafOpCreateVmeSurface : public mafOp
+class __declspec( dllexport ) mafOpCreateVmeSurface : public mafOp
 // ============================================================================
 {
 public:

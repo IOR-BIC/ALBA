@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: vtkMAFSmartPointer.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-14 18:18:12 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2011-05-25 09:31:22 $
+  Version:   $Revision: 1.2.22.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -20,7 +20,7 @@
   instantiate an object in the default constructor.
 */
 template <class T>
-class MAF_EXPORT vtkMAFAutoPointer: public vtkSmartPointer<T>
+class vtkMAFAutoPointer: public vtkSmartPointer<T>
 {
 public:
   /** Initialize smart pointer to a new instanse of class T.*/
@@ -40,7 +40,7 @@ public:
 };
 
 template <class T>
-class MAF_EXPORT vtkMAFSmartPointer: public vtkMAFAutoPointer<T>
+class vtkMAFSmartPointer: public vtkMAFAutoPointer<T>
 {
 public:
   /**

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-10-17 11:48:53 $
-  Version:   $Revision: 1.5.22.1 $
+  Date:      $Date: 2011-05-25 09:24:46 $
+  Version:   $Revision: 1.5.22.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -26,7 +26,7 @@
 mafCxxTypeMacro(mafEventBase)
 //------------------------------------------------------------------------------
 
-bool mafEventBase::m_LogVerbose = false;
+// bool mafEventBase::m_LogVerbose = false;
 
 //------------------------------------------------------------------------------
 mafEventBase::mafEventBase(void *sender, mafID id, void *data, mafID channel):
@@ -109,7 +109,8 @@ void mafEventBase::SetId(mafID id)
 mafID mafEventBase::GetId()
 //------------------------------------------------------------------------------
 {
-  if (m_Id != UPDATE_UI && m_LogVerbose)
+  bool *verbose = GetLogVerbose();
+  if (m_Id != UPDATE_UI && (*verbose) )
   {
     mafString sender_type = "Received Event. Sender: ";
     try
@@ -163,4 +164,19 @@ void mafEventBase::SetChannel(mafID channel)
 //------------------------------------------------------------------------------
 {
   m_Channel=channel;
+}
+//------------------------------------------------------------------------------
+void mafEventBase::SetLogVerbose(bool verbose /* = true */)
+//------------------------------------------------------------------------------
+{
+  bool *help = GetLogVerbose();
+
+  *help = verbose;
+}
+//------------------------------------------------------------------------------
+bool* mafEventBase::GetLogVerbose()
+//------------------------------------------------------------------------------
+{
+  static bool logVerbose = false;
+  return &logVerbose;
 }

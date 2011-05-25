@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipe.h,v $
   Language:  C++
-  Date:      $Date: 2010-11-10 16:52:01 $
-  Version:   $Revision: 1.18.2.3 $
+  Date:      $Date: 2011-05-25 09:45:10 $
+  Version:   $Revision: 1.18.2.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -40,7 +40,7 @@ class mafGUI;
   creates actors that will be rendered in a render view.
   It can handle a GUI, which events can be catched by OnEvent.
 */
-class mafPipe : public mafObject, public mafObserver
+class MAF_EXPORT mafPipe : public mafObject, public mafObserver
 {
 public:
   mafTypeMacro(mafPipe,mafObject);

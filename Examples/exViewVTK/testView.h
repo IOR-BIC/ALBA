@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testView.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-18 15:32:41 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2011-05-25 09:57:03 $
+  Version:   $Revision: 1.2.22.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,7 +28,7 @@ class mafObserver;
 /** 
  an example view that can display every vme which self provide a VisualPipe
 */
-class testView: public mafViewVTK
+class __declspec( dllexport ) testView: public mafViewVTK
 {
 public:
   testView(wxString label) : mafViewVTK(label) {};

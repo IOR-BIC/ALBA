@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIContextualMenu.h,v $
   Language:  C++
-  Date:      $Date: 2010-02-24 09:36:41 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 09:35:14 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,7 +24,7 @@ class mafObserver;
   class name: mafGUIContextualMenu
   Class that handle menu' opened with right button click of the mouse over the view.
 */
-class mafGUIContextualMenu : public wxMenu
+class MAF_EXPORT mafGUIContextualMenu : public wxMenu
 {
 public:
   /** constructor  */

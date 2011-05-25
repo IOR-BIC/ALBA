@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafReferenceCounted.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-11-30 14:10:05 $
-  Version:   $Revision: 1.3.22.1 $
+  Date:      $Date: 2011-05-25 09:27:41 $
+  Version:   $Revision: 1.3.22.2 $
   Authors:   based on vtkObjectBase (www.vtk.org), adapted Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -30,7 +30,7 @@ mafReferenceCounted::mafReferenceCounted()
   // Create an object with Debug turned off and modified time initialized 
   // to zero.
   // objects not created with New() cannot be reference counted...
-  m_HeapFlag=0;
+  m_HeapFlag=false;
 
   // initial reference count = 0, objects must be refernced explicitelly by
   // their creators.

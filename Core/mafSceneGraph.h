@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneGraph.h,v $
   Language:  C++
-  Date:      $Date: 2010-09-10 15:42:40 $
-  Version:   $Revision: 1.15.2.2 $
+  Date:      $Date: 2011-05-25 09:47:55 $
+  Version:   $Revision: 1.15.2.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -30,7 +30,7 @@ class vtkRenderer;
 //----------------------------------------------------------------------------
 // mafSceneGraph :
 //----------------------------------------------------------------------------
-class mafSceneGraph  /*: public mafObserver*/
+class MAF_EXPORT mafSceneGraph  /*: public mafObserver*/
 {
 public:
 								mafSceneGraph(mafView	*view, vtkRenderer *ren1, vtkRenderer *ren2=NULL, vtkRenderer *ren3 = NULL);

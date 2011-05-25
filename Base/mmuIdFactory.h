@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmuIdFactory.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-05 12:43:02 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2011-05-25 09:31:22 $
+  Version:   $Revision: 1.5.4.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -45,6 +45,9 @@ public:
   static const char *GetIdName(mafID id);
 protected:
   static mafID m_IdCounter;
+
+  /** friend test class */
+  friend class mmuIdFactoryTest;
 };
 
 #endif /* __mmuIdFactory_h */

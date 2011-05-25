@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutput.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:56:05 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2011-05-25 09:53:22 $
+  Version:   $Revision: 1.14.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -24,7 +24,11 @@
 //----------------------------------------------------------------------------
 class mafVME;
 class mafMatrix;
+#ifdef MAF_EXPORTS
+#include "mafTransformBase.h"
+#else
 class mafTransformBase;
+#endif
 class mafOBB;
 class mafNodeIterator;
 class mafGUI;
@@ -187,6 +191,9 @@ protected:
   mafOBB                    m_Bounds;   ///< bounds of the output data (i.e. for current time)
   mafGUI                   *m_Gui;      ///< user interface
 
+#ifdef MAF_EXPORTS
+  template class MAF_EXPORT mafAutoPointer<mafTransformBase>;
+#endif
   mafAutoPointer<mafTransformBase> m_Transform; ///< the transform generating the output pose matrix
 
 private:

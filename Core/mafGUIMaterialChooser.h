@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIMaterialChooser.h,v $
   Language:  C++
-  Date:      $Date: 2008-11-05 17:07:21 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-25 09:35:14 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -45,7 +45,7 @@ class mafVME;
 //----------------------------------------------------------------------------
 /** mafMaterialChooser let the user Choose one of the predefined materials,
     but also edit material settings, or create a new one. */  
-class mafGUIMaterialChooser : public mafObserver
+class MAF_EXPORT mafGUIMaterialChooser : public mafObserver
 {
 
 public:
@@ -125,7 +125,7 @@ protected:
 	mafString m_Filename;
 };
 //------------------------------------------------------------------------------
-class mafStorableMaterialLibrary: public mafObject, public mafStorable
+class MAF_EXPORT mafStorableMaterialLibrary: public mafObject, public mafStorable
 //------------------------------------------------------------------------------
 {
 public:

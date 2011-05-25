@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewScalar.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:01:19 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2011-05-25 09:56:55 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -33,7 +33,7 @@ class vtkPolyDataMapper;
 mafViewScalar is a View that got a RenderWindow and a SceneGraph
 \sa mafSceneNode mafRWIBase mafRWI
 */
-class mafViewScalar: public mafViewVTK
+class __declspec( dllexport ) mafViewScalar: public mafViewVTK
 {
 public:
   mafViewScalar(wxString label = "Scalar", int camera_position = CAMERA_PERSPECTIVE, bool show_axes = true, bool show_grid = false, bool show_ruler = false, int stereo = 0);

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafRemoteLogic.h,v $
 Language:  C++
-Date:      $Date: 2009-05-25 14:51:13 $
-Version:   $Revision: 1.2.2.1 $
+Date:      $Date: 2011-05-25 09:46:30 $
+Version:   $Revision: 1.2.2.2 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -31,7 +31,7 @@ class mafDeviceClientMAF;
 /** This class is used to manage remote messages to be sent to the server or received from it and allow
 to reproduce locally remote messages coming from server.
 */
-class mafRemoteLogic : public mafObserver
+class MAF_EXPORT mafRemoteLogic : public mafObserver
 {
 public:
 	mafRemoteLogic(mafObserver *Listener, mafViewManager *view_manager, mafOpManager *operation_manager);

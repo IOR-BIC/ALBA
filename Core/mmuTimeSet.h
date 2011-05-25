@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmuTimeSet.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:23:21 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2011-05-25 09:53:22 $
+  Version:   $Revision: 1.4.24.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -18,6 +18,11 @@
 #include "mafDefines.h"
 #include <set>
 #include <vector>
+#ifdef MAF_EXPORTS
+#include "mafDllMacros.h"
+EXPORT_STL_SET(MAF_EXPORT,mafTimeStamp);
+EXPORT_STL_VECTOR(MAF_EXPORT,mafTimeStamp);
+#endif
 //------------------------------------------------------------------------------
 // Forward declarations
 //------------------------------------------------------------------------------
@@ -31,7 +36,7 @@ typedef std::vector<mafTimeStamp> mmuTimeVector;
   @todo
   - test Merge of variuos case of time vectors
 */
-class MAF_EXPORT mmuTimeSet: public mmuUtility
+class mmuTimeSet: public mmuUtility
 {
 public:
   mmuTimeSet();

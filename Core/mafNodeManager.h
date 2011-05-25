@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeManager.h,v $
   Language:  C++
-  Date:      $Date: 2010-10-14 16:08:18 $
-  Version:   $Revision: 1.6.2.3 $
+  Date:      $Date: 2011-05-25 09:40:18 $
+  Version:   $Revision: 1.6.2.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,6 +22,11 @@
 #include "mafVMERoot.h"
 #include "mafGUIFileHistory.h"
 
+#ifdef MAF_EXPORTS
+#include "mafDllMacros.h"
+EXPORT_STL_VECTOR(MAF_EXPORT,wxString);
+#endif
+
 //----------------------------------------------------------------------------
 // Forward References :
 //----------------------------------------------------------------------------
@@ -30,7 +35,7 @@ class mafNodeStorage;
 //----------------------------------------------------------------------------
 // mafNodeManager :
 //----------------------------------------------------------------------------
-class mafNodeManager: public mafObserver
+class MAF_EXPORT mafNodeManager: public mafObserver
 {
 public:
     mafNodeManager();

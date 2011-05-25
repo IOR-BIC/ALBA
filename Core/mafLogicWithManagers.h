@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.h,v $
   Language:  C++
-  Date:      $Date: 2010-10-14 16:08:18 $
-  Version:   $Revision: 1.46.2.2 $
+  Date:      $Date: 2011-05-25 09:38:43 $
+  Version:   $Revision: 1.46.2.3 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -71,7 +71,7 @@ USAGE - member function MUST be called in this order:
   -- call Init(argc,argv)   will call MSFNew or MSFLoad
 
 */
-class mafLogicWithManagers: public mafLogicWithGUI
+class MAF_EXPORT mafLogicWithManagers: public mafLogicWithGUI
 {
 public:
                mafLogicWithManagers();
@@ -146,9 +146,9 @@ public:
   void FindVME();
 
   /* Set MAF Expert Mode*/
-  void MAFExpertModeOn(){MAFExpertMode = TRUE;};
-  void MAFExpertModeOff(){MAFExpertMode = FALSE;};
-  void SetMAFExpertMode(int value){MAFExpertMode = value;};
+  void MAFExpertModeOn(){(*GetMAFExpertMode()) = TRUE;};
+  void MAFExpertModeOff(){(*GetMAFExpertMode())= FALSE;};
+  void SetMAFExpertMode(int value){(*GetMAFExpertMode()) = value;};
 
 protected:
   //---------------------------------------------------------

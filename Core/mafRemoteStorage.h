@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRemoteStorage.h,v $
   Language:  C++
-  Date:      $Date: 2007-08-21 14:40:47 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2011-05-25 09:46:30 $
+  Version:   $Revision: 1.6.4.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -30,7 +30,7 @@ class mmdRemoteFileManager;
   @sa mafVMEStorage
     - 
 */  
-class mafRemoteStorage: public mafVMEStorage
+class MAF_EXPORT mafRemoteStorage: public mafVMEStorage
 {
 public:
   mafTypeMacro(mafRemoteStorage, mafVMEStorage)

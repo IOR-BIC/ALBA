@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIMaterialButton.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:54 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2011-05-25 09:35:14 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -33,7 +33,7 @@ class mafGUI;
 /**
 This component allow to manage surface materials.
 */
-class mafGUIMaterialButton : public mafObserver
+class MAF_EXPORT mafGUIMaterialButton : public mafObserver
 {
 public:
 	mafGUIMaterialButton(mafVME *vme, mafObserver *listener = NULL);

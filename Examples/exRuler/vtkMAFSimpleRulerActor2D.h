@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFSimpleRulerActor2D.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:01:03 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2011-05-25 09:56:41 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -38,7 +38,7 @@ Camera must be in ParallelProjection and aligned with world axis
 */
 
 //-----------------------------------------------------------------------------
-class VTK_vtkMAF_EXPORT vtkMAFSimpleRulerActor2D : public vtkActor2D
+class __declspec( dllexport ) vtkMAFSimpleRulerActor2D : public vtkActor2D
 //-----------------------------------------------------------------------------
 {
  public:

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeFactory.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-03 15:14:49 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2011-05-25 09:45:12 $
+  Version:   $Revision: 1.3.22.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -26,6 +26,11 @@
 //----------------------------------------------------------------------------  
 class mafPipe;
 
+#ifdef MAF_EXPORTS
+#include "mafDllMacros.h"
+EXPORT_STL_VECTOR(MAF_EXPORT,std::string);
+#endif
+
 /** Object factory for Pipes.
   To make a new VME available in the MAF it must be plugged inside a factory, in particular
   this factory must be of type mafPipeFactory to be able to retrieve the list of pipes plugged
@@ -41,7 +46,7 @@ public:
   /* Initialize the factory creating and registering a new instance */
   static int Initialize();
   /** return the instance pointer of the factory. return NULL if not initialized yet */
-  static mafPipeFactory *GetInstance() {if (!m_Instance) Initialize(); return m_Instance;}
+  static mafPipeFactory *GetInstance();// {if (!m_Instance) Initialize(); return m_Instance;}
 
   /** create an instance of the pipe give its type name */
   static mafPipe *CreatePipeInstance(const char *type_name);
@@ -51,14 +56,15 @@ public:
   void RegisterNewPipe(const char* pipe_name, const char* description, mafCreateObjectFunction createFunction);
 
   /** return list of names for pipes plugged into this factory */
-  const static std::vector<std::string> &GetPipeNames() {return m_PipeNames;}
+  static std::vector<std::string> &GetPipeNames();// {return m_PipeNames;}
 
 protected:
   mafPipeFactory();
   ~mafPipeFactory() { }
 
-  static mafPipeFactory *m_Instance;
-  static std::vector<std::string> m_PipeNames; 
+  // static mafPipeFactory *m_Instance;
+  static bool m_Initialized;
+  // static std::vector<std::string> m_PipeNames; 
   
 private:
   mafPipeFactory(const mafPipeFactory&);  // Not implemented.
@@ -67,7 +73,7 @@ private:
 
 /** Plug  a pipe in the main MAF Pipe factory.*/
 template <class T>
-class MAF_EXPORT mafPlugPipe
+class mafPlugPipe
 {
   public:
   mafPlugPipe(const char *description);

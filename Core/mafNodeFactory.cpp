@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-05 14:00:30 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2011-05-25 09:40:18 $
+  Version:   $Revision: 1.7.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -31,28 +31,31 @@
 #include <ostream>
 #include <algorithm>
 
-mafNodeFactory *mafNodeFactory::m_Instance=NULL;
+bool mafNodeFactory::m_Initialized=false;
+// mafNodeFactory *mafNodeFactory::m_Instance=NULL;
 
 mafCxxTypeMacro(mafNodeFactory);
 
-std::vector<std::string> mafNodeFactory::m_NodeNames;
+// std::vector<std::string> mafNodeFactory::m_NodeNames;
 
 //----------------------------------------------------------------------------
 // This is used to register the factory when linking statically
 int mafNodeFactory::Initialize()
 //----------------------------------------------------------------------------
 {
-  if (m_Instance==NULL)
+  if (!m_Initialized)
   {
-    m_Instance=mafNodeFactory::New();
+    // m_Instance=mafNodeFactory::New();
 
-    if (m_Instance)
+    m_Initialized=true;
+    if (GetInstance())
     {
-      m_Instance->RegisterFactory(m_Instance);
+      GetInstance()->RegisterFactory(GetInstance());
       return MAF_OK;  
     }
     else
     {
+      m_Initialized=false;
       return MAF_ERROR;
     }
   }
@@ -64,7 +67,7 @@ int mafNodeFactory::Initialize()
 mafNodeFactory::mafNodeFactory()
 //------------------------------------------------------------------------------
 {
-  m_Instance = NULL;
+  // m_Instance = NULL;
   
   //
   // Plug here Nodes in this factory
@@ -100,11 +103,26 @@ mafNode *mafNodeFactory::CreateNodeInstance(const char *type_name)
 void mafNodeFactory::RegisterNewNode(const char* node_name, const char* description, mafCreateObjectFunction createFunction)
 //------------------------------------------------------------------------------
 {
-  std::vector<std::string, std::allocator<std::string> >::const_iterator it = std::find(m_NodeNames.begin (), m_NodeNames.end (), std::string(node_name));
-  if(it != m_NodeNames.end() )
+  std::vector<std::string, std::allocator<std::string> >::const_iterator it = std::find(GetNodeNames().begin (), GetNodeNames().end (), std::string(node_name));
+  if(it != GetNodeNames().end() )
   {
     return;
   }
-  m_NodeNames.push_back(node_name);
+  GetNodeNames().push_back(node_name);
   RegisterNewObject(node_name,description,createFunction);
+}
+//------------------------------------------------------------------------------
+mafNodeFactory* mafNodeFactory::GetInstance()
+//------------------------------------------------------------------------------
+{
+  static mafNodeFactory &istance = *(mafNodeFactory::New());
+  Initialize();
+  return &istance;
+}
+//------------------------------------------------------------------------------
+std::vector<std::string> & mafNodeFactory::GetNodeNames()
+//------------------------------------------------------------------------------
+{
+  static std::vector<std::string> nodeNames;
+  return nodeNames;
 }

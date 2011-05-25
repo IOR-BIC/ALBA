@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewPlot.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-11-22 11:04:03 $
-  Version:   $Revision: 1.6.2.2 $
+  Date:      $Date: 2011-05-25 09:51:23 $
+  Version:   $Revision: 1.6.2.3 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,6 +21,7 @@
 
 #include "mafViewPlot.h"
 #include <wx/dc.h>
+#include "mafGUI.h"
 #include "mafPipe.h"
 #include "mafPipeFactory.h"
 

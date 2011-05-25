@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:56:04 $
-  Version:   $Revision: 1.58 $
+  Date:      $Date: 2011-05-25 09:38:43 $
+  Version:   $Revision: 1.58.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -1241,7 +1241,7 @@ mafGUI* mafNode::CreateGui()
   m_Gui = new mafGUI(this);
   
   mafString type_name = GetTypeName();
-  if(MAFExpertMode == TRUE) 
+  if((*GetMAFExpertMode()) == TRUE) 
     m_Gui->Button(ID_PRINT_INFO, type_name, "", "Print node debug information");
   
   m_Gui->String(ID_NAME,"name :", &m_Name);

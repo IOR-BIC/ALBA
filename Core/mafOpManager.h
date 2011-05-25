@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-01 10:21:26 $
-  Version:   $Revision: 1.16.2.4 $
+  Date:      $Date: 2011-05-25 09:42:20 $
+  Version:   $Revision: 1.16.2.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -38,11 +38,16 @@ class mafGUISettings;
 class mafGUISettingsDialog;
 class mafUser;
 
+#ifdef MAF_EXPORTS
+#include "mafDllMacros.h"
+EXPORT_STL_VECTOR(MAF_EXPORT,mafOp*);
+#endif
+
 //----------------------------------------------------------------------------
 // mafOpManager :
 //----------------------------------------------------------------------------
 /**  */
-class mafOpManager: public mafObserver
+class MAF_EXPORT mafOpManager: public mafObserver
 {
 public:
 	         mafOpManager();

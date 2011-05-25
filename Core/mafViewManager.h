@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.h,v $
   Language:  C++
-  Date:      $Date: 2010-02-10 12:47:16 $
-  Version:   $Revision: 1.16.2.2 $
+  Date:      $Date: 2011-05-25 09:51:23 $
+  Version:   $Revision: 1.16.2.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,11 +28,17 @@ class mafView;
 class mafGUIViewPanel;
 class mafRWIBase;
 class mafDeviceButtonsPadMouse;
+
+#ifdef MAF_EXPORTS
+#include "mafDllMacros.h"
+EXPORT_STL_VECTOR(MAF_EXPORT,long);
+#endif
+
 //----------------------------------------------------------------------------
 // mafViewManager :
 //----------------------------------------------------------------------------
 /** An implementation of mafViewManager with [D]ynamic view [C]reation feature */
-class mafViewManager: public mafObserver
+class MAF_EXPORT mafViewManager: public mafObserver
 {
 
 public:

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-01 10:20:58 $
-  Version:   $Revision: 1.24.2.3 $
+  Date:      $Date: 2011-05-25 09:42:20 $
+  Version:   $Revision: 1.24.2.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -44,7 +44,7 @@ enum OPERATIONS_TYPE_ID
 //----------------------------------------------------------------------------
 /**
 */
-class mafOp: public mafObserver, public mafObject
+class MAF_EXPORT mafOp: public mafObserver, public mafObject
 {
 public:
   mafTypeMacro(mafOp, mafObject);

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafRemoteLogic.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-25 14:51:13 $
-Version:   $Revision: 1.13.2.1 $
+Date:      $Date: 2011-05-25 09:46:30 $
+Version:   $Revision: 1.13.2.2 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -28,6 +28,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafOpManager.h"
 #include "mafView.h"
 #include "mafOp.h"
+#include "mafGUI.h"
 
 #include "mafEventBase.h"
 #include "mafDeviceButtonsPadMouse.h"
@@ -175,9 +176,9 @@ void mafRemoteLogic::OnEvent(mafEventBase *event)
   }
   else if (mafEventInteraction *ei = mafEventInteraction::SafeDownCast(event))
   {
-    if (id == mafDeviceButtonsPad::BUTTON_DOWN ||
-      id == mafDeviceButtonsPad::BUTTON_UP   ||
-      id == mafDeviceButtonsPadMouse::MOUSE_2D_MOVE)
+    if (id == mafDeviceButtonsPad::GetButtonDownId() ||
+      id == mafDeviceButtonsPad::GetButtonUpId()   ||
+      id == mafDeviceButtonsPadMouse::GetMouse2DMoveId())
     {
       unsigned long modifiers = ei->GetModifiers();
       double pos[2];
@@ -194,7 +195,7 @@ void mafRemoteLogic::OnEvent(mafEventBase *event)
       m_RemoteMsg << m_CommandSeparator;
       m_RemoteMsg << ei->GetButton();
     }
-    else if (id == mafDeviceButtonsPadMouse::MOUSE_CHAR_EVENT)
+    else if (id == mafDeviceButtonsPadMouse::GetMouseCharEventId())
     {
     }
   }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.h,v $
   Language:  C++
-  Date:      $Date: 2010-11-22 11:04:03 $
-  Version:   $Revision: 1.55.2.4 $
+  Date:      $Date: 2011-05-25 09:51:23 $
+  Version:   $Revision: 1.55.2.5 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -41,7 +41,7 @@ class mafAnimate;
 mafViewVTK is a View that got a RenderWindow and a SceneGraph
 \sa mafSceneNode mafRWIBase mafRWI
 */
-class mafViewVTK: public mafView
+class MAF_EXPORT mafViewVTK: public mafView
 {
 public:
 

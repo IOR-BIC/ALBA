@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFHistogram.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:56:33 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2011-05-25 09:54:37 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Paolo Quadrani
   Project:   MultiMod Project
 
@@ -34,7 +34,7 @@ class vtkPolyData;
 class vtkLineSource;
 
 //-----------------------------------------------------------------------------
-class VTK_vtkMAF_EXPORT vtkMAFHistogram : public vtkActor2D
+class __declspec( dllexport ) vtkMAFHistogram : public vtkActor2D
 //-----------------------------------------------------------------------------
 {
  public:

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransformBase.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-18 08:47:07 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2011-05-25 09:30:12 $
+  Version:   $Revision: 1.13.4.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -142,6 +142,9 @@ public:
 #endif
 
 protected:
+#ifdef MAF_EXPORTS
+  template class MAF_EXPORT mafAutoPointer<mafMatrix>;
+#endif
   mafAutoPointer<mafMatrix> m_Matrix;        ///< internally stored matrix.
   mafMTime        m_MTime;           ///< modification time
   mafMTime        m_UpdateTime;      ///< We need to record the time of the last update

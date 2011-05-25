@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-11-11 16:14:58 $
-  Version:   $Revision: 1.43.2.5 $
+  Date:      $Date: 2011-05-25 09:53:22 $
+  Version:   $Revision: 1.43.2.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -98,7 +98,7 @@ void mafVMEManager::OnEvent(mafEventBase *maf_event)
 {
   if (maf_event->GetChannel()==MCH_UP)
   {
-    if (maf_event->GetId() == mafDataVector::SINGLE_FILE_DATA)
+    if (maf_event->GetId() == mafDataVector::GetSingleFileDataId())
     {
       ((mafEvent *)maf_event)->SetBool(m_SingleBinaryFile);
       return;
@@ -650,7 +650,7 @@ void mafVMEManager::MSFSave()
   {
     // new file to save: ask to the application which is the default
     // modality to save binary files.
-    mafEvent e(this,mafDataVector::SINGLE_FILE_DATA);
+    mafEvent e(this,mafDataVector::GetSingleFileDataId());
     mafEventMacro(e);
     SetSingleBinaryFile(e.GetBool()); // set the save modality for time-varying vme
     

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.h,v $
   Language:  C++
-  Date:      $Date: 2010-11-22 11:04:02 $
-  Version:   $Revision: 1.27.2.2 $
+  Date:      $Date: 2011-05-25 09:49:35 $
+  Version:   $Revision: 1.27.2.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -26,6 +26,11 @@ class mafSceneGraph;
 class mafGUI;
 class mafRWIBase;
 
+#ifdef MAF_EXPORTS
+#include "mafDllMacros.h"
+EXPORT_STL_VECTOR(MAF_EXPORT,mafView*);
+#endif
+
 //----------------------------------------------------------------------------
 // mafViewCompound :
 //----------------------------------------------------------------------------
@@ -38,7 +43,7 @@ the SceneGraph anymore)
 
 mafViewCompound doesn't have a Scenegraph, nor knowledge about VTK /sa mafViewVTK.
 */
-class mafViewCompound: public mafView
+class MAF_EXPORT mafViewCompound: public mafView
 {
 public:
   mafViewCompound(const wxString &label = "View Compound", int num_row = 1, int num_col = 2);

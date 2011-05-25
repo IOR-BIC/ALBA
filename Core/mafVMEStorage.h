@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEStorage.h,v $
   Language:  C++
-  Date:      $Date: 2005-09-28 23:05:34 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2011-05-25 09:53:22 $
+  Version:   $Revision: 1.3.22.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -41,7 +41,7 @@ protected:
   @todo
     - 
 */  
-class mafVMEStorage: public mafXMLStorage, public mafObserver, public mafEventSender
+class MAF_EXPORT mafVMEStorage: public mafXMLStorage, public mafObserver, public mafEventSender
 {
 public:
   MAF_ID_DEC(MSF_FILENAME_CHANGED);

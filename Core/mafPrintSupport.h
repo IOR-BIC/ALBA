@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPrintSupport.h,v $
 Language:  C++
-Date:      $Date: 2005-11-28 13:00:29 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2011-05-25 09:46:30 $
+Version:   $Revision: 1.1.22.1 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -26,7 +26,7 @@ class mafView;
 //----------------------------------------------------------------------------
 // mafPrintout :
 //----------------------------------------------------------------------------
-class mafPrintSupport
+class MAF_EXPORT mafPrintSupport
 {
  public:
   mafPrintSupport();

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDirectory.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-06 12:48:05 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2011-05-25 09:24:46 $
+  Version:   $Revision: 1.7.4.1 $
   Authors:   Based on itkDirectory (www.itk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -17,6 +17,11 @@
 #include <iostream>
 #include <string>
 #include <vector>
+
+#ifdef MAF_EXPORTS
+#include "mafDllMacros.h"
+EXPORT_STL_VECTOR(MAF_EXPORT,std::string);
+#endif
 
 /** Portable directory/filename traversal.
   mafDirectory provides a portable way of finding the names of the files

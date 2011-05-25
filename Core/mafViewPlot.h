@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewPlot.h,v $
   Language:  C++
-  Date:      $Date: 2010-11-22 11:04:03 $
-  Version:   $Revision: 1.3.2.2 $
+  Date:      $Date: 2011-05-25 09:51:23 $
+  Version:   $Revision: 1.3.2.3 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -26,13 +26,25 @@
 class mafVME;
 class mafDeviceButtonsPadMouse;
 
+/** Struct containing information regarding visual pipe plugged into the view. */
+struct mafVisualPipeInfo
+{
+  mafString m_PipeName;
+  long      m_Visibility;
+};
+
+#ifdef MAF_EXPORTS
+#include "mafDllMacros.h"
+EXPORT_STL_MAP(MAF_EXPORT,mafString,mafVisualPipeInfo);
+#endif
+
 //----------------------------------------------------------------------------
 // mafViewPlot :
 //----------------------------------------------------------------------------
 /** 
 mafViewPlot is a View that got a mafXYPlot and plot curves on a plane.
 */
-class mafViewPlot: public mafView
+class MAF_EXPORT mafViewPlot: public mafView
 {
 public:
   mafViewPlot(const wxString &label = "plot View");
@@ -92,12 +104,6 @@ public:
   /** Return a pointer to the image of the plot.*/
   void GetImage(wxBitmap &bmp, int magnification = 1);
 
-  /** Struct containing information regarding visual pipe plugged into the view. */
-  struct mafVisualPipeInfo
-  {
-    mafString m_PipeName;
-    long      m_Visibility;
-  };
   typedef std::map<mafString, mafVisualPipeInfo> mafPipeMap;
 
   /** Plug a visual pipe for a particular vme. It is used also to plug custom pipe.*/
