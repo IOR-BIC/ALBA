@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafBase.h,v $
   Language:  C++
-  Date:      $Date: 2005-02-20 23:33:15 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2011-05-25 09:19:15 $
+  Version:   $Revision: 1.2.22.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -19,7 +19,7 @@
 /** mafBase - the pourpose of this class is just to groups utilities classes
 */
 
-class MAF_EXPORT mafBase 
+class mafBase 
 {
 };
 

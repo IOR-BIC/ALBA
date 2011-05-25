@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:44:00 $
-  Version:   $Revision: 1.43.2.2 $
+  Date:      $Date: 2011-05-25 09:19:15 $
+  Version:   $Revision: 1.43.2.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -37,7 +37,7 @@ const int MAXWIDGET = 4096;
 const int MAXOP = 200; 
 const int MAXVIEW = 200; 
 
-extern MAF_EXPORT int MAFExpertMode; ///< Flag to turn On/Off detailed debug information or GUI widgets
+// extern MAF_EXPORT int MAFExpertMode; ///< Flag to turn On/Off detailed debug information or GUI widgets
 
 /** Data Type enum that identify data stored in WidgetDataType struct */
 enum MAF_EXPORT WIDGET_DATA_TYPE_ID
@@ -406,7 +406,7 @@ MAF_EXPORT void mafSetFrame(wxWindow* frame);
 MAF_EXPORT void mafYield();
 
 /** show the Dir Selection Dialog Box */
-std::string  mafGetDirName(const char * initial, const char * title = "Select Directory", wxWindow *parent = NULL);
+MAF_EXPORT std::string  mafGetDirName(const char * initial, const char * title = "Select Directory", wxWindow *parent = NULL);
 
 /** show the File Open Dialog Box */
 MAF_EXPORT std::string  mafGetOpenFile(const char * initial, const char * wildcard, const char * title = "Open File", wxWindow *parent = NULL);
@@ -441,5 +441,7 @@ MAF_EXPORT double RoundValue(double d_in, int decimal_digits = 2);
 
 /** Formats the specified size to B, KB, MB or GB */
 MAF_EXPORT void mafFormatDataSize(long long size, mafString& szOut);
+
+MAF_EXPORT int* GetMAFExpertMode();
 
 #endif
