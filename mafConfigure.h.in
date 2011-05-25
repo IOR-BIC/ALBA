@@ -1,9 +1,9 @@
 #ifndef __mafConfigure_h
 #define __mafConfigure_h
 
-#if @BUILD_SHARED_LIBS@
+#if @MAF_BUILD_MAFDLL@
 # define MAF_SHARED
-# define MAF_EXPORTS
+// # define MAF_EXPORTS
 #endif
 
 //--------------------------------------------------------------------------

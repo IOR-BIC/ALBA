@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2010-12-21 08:41:03 $
-# Version:   $Revision: 1.44.2.6 $
+# Date:      $Date: 2011-05-25 12:08:22 $
+# Version:   $Revision: 1.44.2.7 $
 #
 # Description:
 # CMake Project file for the MAF.
@@ -69,13 +69,18 @@ ENDIF(WIN32)
 #-----------------------------------------------------------------------------
 #Remove temporarily the BUILD_SHARED_LIBS because it is not possible to switch the compilation to dynamic.
 #SET(BUILD_SHARED_LIBS 0)
-OPTION(BUILD_SHARED_LIBS "Build with shared libraries." OFF )
+# OPTION(BUILD_SHARED_LIBS "Build with shared libraries." OFF )
 OPTION(BUILD_EXAMPLES "Build examples." ON )
 OPTION(BUILD_TESTING "Build the testing tree." OFF)
+OPTION(MAF_BUILD_MAFDLL "Build mafDLL.dll." OFF)
 
-MARK_AS_ADVANCED (
-  BUILD_SHARED_LIBS
-)
+# MARK_AS_ADVANCED (
+  # BUILD_SHARED_LIBS
+# )
+
+IF(MAF_BUILD_MAFDLL)
+  SET(MAF_BUILD_MAFDLL 1)
+ENDIF (MAF_BUILD_MAFDLL)
 
 SET (CONFIGURE_ERROR 0)
 
@@ -126,34 +131,80 @@ IF (MAF_CAN_BUILD)
               "${MAF_SOURCE_DIR}/Core" "${MAF_SOURCE_DIR}/Gui" "${MAF_SOURCE_DIR}/IO" "${MAF_SOURCE_DIR}/Operations" "${MAF_SOURCE_DIR}/VME" 
               "${MAF_SOURCE_DIR}/VME/DataPipes" "${MAF_SOURCE_DIR}/vtkMAF" "${MAF_BINARY_DIR}/vtkMAF" "${MAF_SOURCE_DIR}/GPUAPI" 
               "${MAF_SOURCE_DIR}/GPUAPI/GLEW" "${MAF_SOURCE_DIR}/GPUAPI/FBO")
+  # IF(MAF_BUILD_MAFDLL)
+    SET(INCLUDE_DIRS ${INCLUDE_DIRS} "${MAF_SOURCE_DIR}/mafDLL")
+  # ENDIF(MAF_BUILD_MAFDLL)
+  
   INCLUDE_DIRECTORIES(${INCLUDE_DIRS})
 
 IF(WIN32)
 	LINK_DIRECTORIES(${MAF_SOURCE_DIR}/GPUAPI/GLEW)
 ENDIF(WIN32)
-	
+
+# IF(MAF_BUILD_MAFDLL)
+  ################################
+  #It's necessary to delete the previous files from the mafDLL project
+  # FILE(GLOB h_to_delete "${MAF_SOURCE_DIR}/mafDLL/*.h")
+  # FILE(GLOB cpp_to_delete "${MAF_SOURCE_DIR}/mafDLL/*.cpp")
+  # FILE(GLOB cxx_to_delete "${MAF_SOURCE_DIR}/mafDLL/*.cxx")
+  # FILE(GLOB txx_to_delete "${MAF_SOURCE_DIR}/mafDLL/*.txx")
+
+  # FOREACH(f ${h_to_delete})
+    # FILE(REMOVE "${f}")
+  # ENDFOREACH(f ${h_to_delete})
+
+  # FOREACH(f ${cpp_to_delete})
+    # FILE(REMOVE "${f}")
+  # ENDFOREACH(f ${cpp_to_delete})
+  
+  # FOREACH(f ${cxx_to_delete})
+    # FILE(REMOVE "${f}")
+  # ENDFOREACH(f ${cxx_to_delete})
+
+  # FOREACH(f ${txx_to_delete})
+    # FILE(REMOVE "${f}")
+  # ENDFOREACH(f ${txx_to_delete})
+  ################################
+# ENDIF(MAF_BUILD_MAFDLL)
+
   # Configuring MAF kits
   DBG_MESSAGE("MAF: Configuring MAF Kits")
   MESSAGE(STATUS "MAF: Configuring MAF Kits")
-IF(WIN32)
-  SUBDIRS (GPUAPI)
-ENDIF(WIN32)
-  SUBDIRS (Base)
-  IF (MAF_USE_VTK)
-    SUBDIRS (Interaction)
-  ENDIF (MAF_USE_VTK)	
-  SUBDIRS (Gui)
-  SUBDIRS (IO)
-  SUBDIRS (Core)
-  IF (MAF_USE_VTK)
-    SUBDIRS (vtkMAF)
-    SUBDIRS (VME)
-    SUBDIRS (Operations)
-  ENDIF (MAF_USE_VTK)
+  
+  IF(MAF_BUILD_MAFDLL)
+  
+    IF(WIN32)
+      SUBDIRS (GPUAPI)
+    ENDIF(WIN32)
+    IF (MAF_USE_VTK)
+      SUBDIRS (vtkMAF)
+    ENDIF (MAF_USE_VTK)
+    SUBDIRS (mafDLL)
+    
+  ELSE (MAF_BUILD_MAFDLL)
+  
+    IF(WIN32)
+      SUBDIRS (GPUAPI)
+    ENDIF(WIN32)
+      SUBDIRS (Base)
+    IF (MAF_USE_VTK)
+      SUBDIRS (Interaction)
+    ENDIF (MAF_USE_VTK)	
+    SUBDIRS (Gui)
+    SUBDIRS (IO)
+    SUBDIRS (Core)
+    IF (MAF_USE_VTK)
+      SUBDIRS (vtkMAF)
+      SUBDIRS (VME)
+      SUBDIRS (Operations)
+    ENDIF (MAF_USE_VTK)
+    
+  ENDIF(MAF_BUILD_MAFDLL)
 
-  IF(BUILD_SHARED_LIBS)
-    SET(BUILD_SHARED_LIBS 1)
-  ENDIF (BUILD_SHARED_LIBS)
+  SET(BUILD_SHARED_LIBS 0)
+  # IF(BUILD_SHARED_LIBS)
+    # SET(BUILD_SHARED_LIBS 1)
+  # ENDIF (BUILD_SHARED_LIBS)
   # Configuring Doxygen documentation  
   SUBDIRS (Docs)
   
