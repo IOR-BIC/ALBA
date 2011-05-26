@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterLandmarkTXT.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-28 08:40:14 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2011-05-26 08:08:41 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004
@@ -16,6 +16,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -27,7 +28,7 @@ class mafEvent;
 // medOpImporterLandmarkTXT :
 //----------------------------------------------------------------------------
 /** */
-class medOpImporterLandmarkTXT : public mafOp
+class MED_EXPORT medOpImporterLandmarkTXT : public mafOp
 {
 public:
 	medOpImporterLandmarkTXT(wxString label);

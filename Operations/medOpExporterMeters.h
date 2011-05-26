@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterMeters.h,v $
   Language:  C++
-  Date:      $Date: 2008-09-22 11:54:14 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2011-05-26 08:08:41 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -13,6 +13,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #ifndef __medOpExporterMeters_H__
 #define __medOpExporterMeters_H__
 
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafOp.h"
 #include <fstream>
 #include <map>
@@ -31,7 +35,7 @@ class mafEvent;
 // medOpExporterMeters :
 //----------------------------------------------------------------------------
 /** */
-class medOpExporterMeters: public mafOp
+class MED_EXPORT medOpExporterMeters: public mafOp
 {
 public:
   medOpExporterMeters(const wxString &label = "WrappedMeter");

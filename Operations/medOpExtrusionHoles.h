@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpExtrusionHoles.h,v $
 Language:  C++
-Date:      $Date: 2008-07-25 10:32:50 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2011-05-26 08:08:41 $
+Version:   $Revision: 1.3.2.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -41,6 +41,10 @@ MafMedical is partially based on OpenMAF.
 #ifndef __medOpExtrusionHoles_H__
 #define __medOpExtrusionHoles_H__
 
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafOp.h"
 #include "vtkAppendPolyData.h"
 #include "vtkFeatureEdges.h"
@@ -72,7 +76,7 @@ Perform extrusion of holes in a surface.
 CTRL modifier must be used in order to select a hole in render window while
 performing mouse dragging.
 */
-class medOpExtrusionHoles: public mafOp
+class MED_EXPORT medOpExtrusionHoles: public mafOp
 {
 public:
 	medOpExtrusionHoles(const wxString &label = "Extrude Holes");

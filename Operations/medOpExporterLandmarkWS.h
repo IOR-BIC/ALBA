@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterLandmarkWS.h,v $
   Language:  C++
-  Date:      $Date: 2010-11-26 09:25:53 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-26 08:08:41 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2004
@@ -16,6 +16,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -27,7 +28,7 @@ class mafVMELandmarkCloud;
 /** 
 class name: medOpExporterLandmarkWS
 /** Export trajectories in a cvs file */
-class medOpExporterLandmarkWS : public mafOp
+class MED_EXPORT medOpExporterLandmarkWS : public mafOp
 {
 public:
 	medOpExporterLandmarkWS(const wxString &label = "Trajectories Exporter");

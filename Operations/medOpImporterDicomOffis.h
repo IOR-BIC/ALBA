@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2011-02-14 16:55:33 $
-Version:   $Revision: 1.1.2.52 $
+Date:      $Date: 2011-05-26 08:08:41 $
+Version:   $Revision: 1.1.2.53 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -44,6 +44,7 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafOp.h"
 #include "vtkImageData.h"
 #include <map>
@@ -85,7 +86,7 @@ class medDicomSeriesSliceList;
 Perform DICOM importer.
 From a DICOM dataset return a VME Volume, a VME Image or a VME Mesh.
 */
-class medOpImporterDicomOffis : public mafOp
+class MED_EXPORT medOpImporterDicomOffis : public mafOp
 {
 public:
 	/** constructor */
@@ -375,7 +376,7 @@ We are using Image Position (Patient) (0020,0032) dicom tag to set dicom slice p
 See here for the motivation behind this decision:
 http://www.cmake.org/pipermail/insight-users/2005-September/014711.html
 */
-class medDicomSlice
+class MED_EXPORT medDicomSlice
 {
 public:
 	/** constructor */

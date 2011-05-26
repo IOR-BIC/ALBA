@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterLandmark.h,v $
   Language:  C++
-  Date:      $Date: 2010-07-29 15:27:21 $
-  Version:   $Revision: 1.3.2.2 $
+  Date:      $Date: 2011-05-26 08:08:41 $
+  Version:   $Revision: 1.3.2.3 $
   Authors:   Daniele Giunchi, Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2004
@@ -16,6 +16,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -27,7 +28,7 @@ class mafEvent;
 // medOpImporterLandmark :
 //----------------------------------------------------------------------------
 /** */
-class medOpImporterLandmark : public mafOp
+class MED_EXPORT medOpImporterLandmark : public mafOp
 {
 public:
 	medOpImporterLandmark(wxString label);
