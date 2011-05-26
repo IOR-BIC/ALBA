@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medDataPipeCustomSegmentationVolume.h,v $
 Language:  C++
-Date:      $Date: 2010-11-05 11:16:34 $
-Version:   $Revision: 1.1.2.8 $
+Date:      $Date: 2011-05-26 08:27:37 $
+Version:   $Revision: 1.1.2.9 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -25,7 +25,7 @@ class vtkRectilinearGrid;
 class vtkStructuredPoints;
 
 /** */
-class MAF_EXPORT medDataPipeCustomSegmentationVolume : public mafDataPipeCustom
+class medDataPipeCustomSegmentationVolume : public mafDataPipeCustom
 {
 public:
   mafTypeMacro(medDataPipeCustomSegmentationVolume,mafDataPipe);

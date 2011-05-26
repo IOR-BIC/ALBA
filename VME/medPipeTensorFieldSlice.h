@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeTensorFieldSlice.h,v $ 
   Language: C++ 
-  Date: $Date: 2010-06-16 07:04:40 $ 
-  Version: $Revision: 1.1.2.2 $ 
+  Date: $Date: 2011-05-26 08:28:49 $ 
+  Version: $Revision: 1.1.2.3 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -13,9 +13,16 @@
 #ifndef medPipeTensorFieldSlice_h__
 #define medPipeTensorFieldSlice_h__
 
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "medPipeTensorFieldSurface.h"
 #include "mafPipeSlice.h"
 
+//----------------------------------------------------------------------------
+// Forward declarations:
+//----------------------------------------------------------------------------
 class mafGUI;
 class mafGUIFloatSlider;
 
@@ -27,7 +34,7 @@ Displays slice of input VME colored according to X,Y,Z component
 or magnitude of the associated tensor field. 
 Note: this class should be derived from mafPipeSlice, but
 it would lead into multiple inheritance, which causes lot of troubles*/
-class medPipeTensorFieldSlice : public medPipeTensorFieldSurface
+class MED_EXPORT medPipeTensorFieldSlice : public medPipeTensorFieldSurface
 {
 public:
   /** RTTI macro */

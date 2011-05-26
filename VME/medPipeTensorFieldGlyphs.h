@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeTensorFieldGlyphs.h,v $ 
   Language: C++ 
-  Date: $Date: 2010-06-16 07:04:40 $ 
-  Version: $Revision: 1.1.2.5 $ 
+  Date: $Date: 2011-05-26 08:28:49 $ 
+  Version: $Revision: 1.1.2.6 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -13,9 +13,16 @@
 #ifndef medPipeTensorFieldGlyphs_h__
 #define medPipeTensorFieldGlyphs_h__
 
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "medPipeTensorField.h"
 #include <wx/listctrl.h>
 
+//----------------------------------------------------------------------------
+// Forward declarations:
+//----------------------------------------------------------------------------
 class mafGUI;
 class mafGUIPicButton;
 class mafVMESurface;
@@ -39,7 +46,7 @@ class vtkFloatArray;
 class name: medPipeTensorFieldGlyphs
 Class for Volumes with compound pipes which show tensor field using glyphs.
  */
-class medPipeTensorFieldGlyphs : public medPipeTensorField
+class MED_EXPORT medPipeTensorFieldGlyphs : public medPipeTensorField
 {
 public:
   /** RTTI macro*/

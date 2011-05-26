@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPolylineGraph.h,v $
 Language:  C++
-Date:      $Date: 2009-05-06 14:22:15 $
-Version:   $Revision: 1.9.2.2 $
+Date:      $Date: 2011-05-26 08:26:08 $
+Version:   $Revision: 1.9.2.3 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -17,6 +17,7 @@ to use in VTK filters (=> wxString was replaced by char*)*/
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "vtkPolydata.h"
 #include <ostream>
 #include <vector>
@@ -65,7 +66,7 @@ Adding and deleting items from branches has no effect on the graph connectivity.
 */
 
 //----------------------------------------------------------------------------
-class mafPolylineGraph
+class MED_EXPORT mafPolylineGraph
 {
 public:  
   /** consts for undefined index values */
@@ -230,7 +231,7 @@ public:
   The ith edge joins this vertex to the ith vertex neighbour. 
   Coordinates are optional */
   //----------------------------------------------------------------------------
-  class Vertex{
+  class MED_EXPORT Vertex{
   public:
     Vertex() ;                   ///< constructor
     Vertex(double *coords) ;     ///< constructor
@@ -265,7 +266,7 @@ public:
   The edge can have a weight, and can be directed.
   The edge can optionally be a member of a branch. */
   //----------------------------------------------------------------------------
-  class Edge{
+  class MED_EXPORT Edge{
   public:
     Edge() ;                                     ///< constructor
     Edge(vtkIdType v0, vtkIdType v1) ;           ///< constructor with end vertices
@@ -308,7 +309,7 @@ public:
   The sequence is stored as a list of vertices and a list of edges. 
   The branch can optionally have a name */
   //----------------------------------------------------------------------------
-  class Branch{
+  class MED_EXPORT Branch{
   public:
     Branch(const char* name = NULL) ;                                     ///< constructor: empty branch with optional name
     explicit Branch(vtkIdType startvertex, const char* name = NULL) ; ///< constructor: branch with initial vertex and optional name

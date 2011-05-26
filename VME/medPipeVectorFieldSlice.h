@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeVectorFieldSlice.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-06-09 16:04:32 $ 
-  Version: $Revision: 1.1.2.1 $ 
+  Date: $Date: 2011-05-26 08:28:49 $ 
+  Version: $Revision: 1.1.2.2 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -13,19 +13,25 @@
 #ifndef medPipeVectorFieldSlice_h__
 #define medPipeVectorFieldSlice_h__
 
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "medPipeVectorFieldSurface.h"
 #include "mafPipeSlice.h"
 
+//----------------------------------------------------------------------------
+// Forward declarations:
+//----------------------------------------------------------------------------
 class mafGUI;
 class mafGUIFloatSlider;
-
 class vtkPlane;
 
 /** Displays slice of input VME colored according to X,Y,Z component 
 or magnitude of the associated vector field. 
 Note: this class should be derived from mafPipeSlice, but
 it would lead into multiple inheritance, which causes lot of troubles*/
-class medPipeVectorFieldSlice : public medPipeVectorFieldSurface
+class MED_EXPORT medPipeVectorFieldSlice : public medPipeVectorFieldSurface
 {
 public:
   mafTypeMacro(medPipeVectorFieldSlice, medPipeVectorFieldSurface);

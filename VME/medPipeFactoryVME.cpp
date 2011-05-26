@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeFactoryVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-12-09 16:43:01 $
-  Version:   $Revision: 1.13.2.7 $
+  Date:      $Date: 2011-05-26 08:27:37 $
+  Version:   $Revision: 1.13.2.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -65,39 +65,37 @@
 #include <string>
 #include <ostream>
 
-medPipeFactoryVME *medPipeFactoryVME::m_Instance=NULL;
-
 mafCxxTypeMacro(medPipeFactoryVME);
+
+bool medPipeFactoryVME::m_Initialized=false;
 
 //----------------------------------------------------------------------------
 // This is used to register the factory when linking statically
 int medPipeFactoryVME::Initialize()
 //----------------------------------------------------------------------------
 {
-  if (m_Instance == NULL)
+  if (!m_Initialized)
   {
-    m_Instance = medPipeFactoryVME::New();
-
-    if (m_Instance)
+    m_Initialized=true;
+    if (GetInstance())
     {
-      m_Instance->RegisterFactory(m_Instance);
+      GetInstance()->RegisterFactory(GetInstance());
       return MAF_OK;  
     }
     else
     {
+      m_Initialized=false;
       return MAF_ERROR;
     }
   }
-  
+
   return MAF_OK;
 }
 
 //------------------------------------------------------------------------
 medPipeFactoryVME::medPipeFactoryVME()
 //------------------------------------------------------------------------------
-{
-  m_Instance = NULL;
-  
+{ 
   //
   // Plug here Pipes in this factory
   //
@@ -158,4 +156,12 @@ const char* medPipeFactoryVME::GetDescription() const
 //------------------------------------------------------------------------------
 {
   return "Factory for medical Pipes of medVME library";
+}
+//------------------------------------------------------------------------------
+medPipeFactoryVME* medPipeFactoryVME::GetInstance()
+//------------------------------------------------------------------------------
+{
+  static medPipeFactoryVME &istance = *(medPipeFactoryVME::New());
+  Initialize();
+  return &istance;
 }

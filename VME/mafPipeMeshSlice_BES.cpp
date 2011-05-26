@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeMeshSlice_BES.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-13 15:48:46 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-05-26 08:26:08 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -27,6 +27,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafAxes.h"
 #include "mmaMaterial.h"
 #include "mafGUILutPreset.h"
+#include "mafTransformBase.h"
 #include "mafVMEOutputMesh.h"
 #include "mafEventSource.h"
 #include "mafAbsMatrixPipe.h"

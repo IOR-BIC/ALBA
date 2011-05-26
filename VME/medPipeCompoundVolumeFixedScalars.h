@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeCompoundVolumeFixedScalars.h,v $ 
   Language: C++ 
-  Date: $Date: 2010-11-29 13:18:12 $ 
-  Version: $Revision: 1.1.2.3 $ 
+  Date: $Date: 2011-05-26 08:27:37 $ 
+  Version: $Revision: 1.1.2.4 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -13,12 +13,16 @@
 #ifndef medPipeCompoundVolumeFixedScalars_h__
 #define medPipeCompoundVolumeFixedScalars_h__
 
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "medPipeCompoundVolume.h"
 
 /** Scalar visual pipe is fixed and cannot be changed. Vector visual pipe
 and tensor visual pipe can be changed but only one change is available.
 This class serves for a backward compatibility. */
-class medPipeCompoundVolumeFixedScalars : public medPipeCompoundVolume
+class MED_EXPORT medPipeCompoundVolumeFixedScalars : public medPipeCompoundVolume
 {
 public:
   /** RTTI macro */
@@ -64,7 +68,7 @@ protected:
 };
 
 /** Override for Isosurface */
-class medPipeCompoundVolumeIsosurface : public medPipeCompoundVolumeFixedScalars
+class MED_EXPORT medPipeCompoundVolumeIsosurface : public medPipeCompoundVolumeFixedScalars
 {
 public:
   /** RTTI macro */
@@ -78,7 +82,7 @@ protected:
 };
 
 /** Override for MIP */
-class medPipeCompoundVolumeDRR : public medPipeCompoundVolumeFixedScalars
+class MED_EXPORT medPipeCompoundVolumeDRR : public medPipeCompoundVolumeFixedScalars
 {
 public:
   /** RTTI macro */
@@ -92,7 +96,7 @@ protected:
 };
 
 /** Override for MIP */
-class medPipeCompoundVolumeMIP : public medPipeCompoundVolumeFixedScalars
+class MED_EXPORT medPipeCompoundVolumeMIP : public medPipeCompoundVolumeFixedScalars
 {
 public:
   /** RTTI macro */
@@ -106,7 +110,7 @@ protected:
 };
 
 /** Override for VR */
-class medPipeCompoundVolumeVR : public medPipeCompoundVolumeFixedScalars
+class MED_EXPORT medPipeCompoundVolumeVR : public medPipeCompoundVolumeFixedScalars
 {
 public:
   /** RTTI macro */

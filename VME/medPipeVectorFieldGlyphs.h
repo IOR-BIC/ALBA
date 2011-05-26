@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeVectorFieldGlyphs.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-11-18 15:37:49 $ 
-  Version: $Revision: 1.1.2.6 $ 
+  Date: $Date: 2011-05-26 08:28:49 $ 
+  Version: $Revision: 1.1.2.7 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -13,13 +13,19 @@
 #ifndef medPipeVectorFieldGlyphs_h__
 #define medPipeVectorFieldGlyphs_h__
 
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "medPipeVectorField.h"
 #include <wx/listctrl.h>
 
+//----------------------------------------------------------------------------
+// Forward declarations:
+//----------------------------------------------------------------------------
 class mafGUI;
 class mafGUIPicButton;
 class mafVMESurface;
-
 class vtkPolyDataMapper;
 class vtkDataSet;
 class vtkGlyph3D;
@@ -38,7 +44,7 @@ class vtkRectilinearGrid;
 class vtkFloatArray;
 
 /** General class for Volumes with compound pipes */
-class medPipeVectorFieldGlyphs : public medPipeVectorField
+class MED_EXPORT medPipeVectorFieldGlyphs : public medPipeVectorField
 {
 public:
   mafTypeMacro(medPipeVectorFieldGlyphs, medPipeVectorField);

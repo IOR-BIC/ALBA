@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice_BES.h,v $
   Language:  C++
-  Date:      $Date: 2010-05-18 15:48:38 $
-  Version:   $Revision: 1.1.2.5 $
+  Date:      $Date: 2011-05-26 08:26:08 $
+  Version:   $Revision: 1.1.2.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,6 +16,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafPipeSlice.h"
 
 //----------------------------------------------------------------------------
@@ -44,7 +45,7 @@ class name: mafPipeVolumeSlice_BES
   of the volume data. The visual pipe can also render 3 different slices centered in a origin point
   and oriented along 3 different axes.
 */
-class mafPipeVolumeSlice_BES : public mafPipeSlice
+class MED_EXPORT mafPipeVolumeSlice_BES : public mafPipeSlice
 {
 public:
   /** RTTI Macro */

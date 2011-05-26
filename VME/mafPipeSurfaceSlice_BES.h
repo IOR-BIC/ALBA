@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceSlice_BES.h,v $
   Language:  C++
-  Date:      $Date: 2010-04-20 12:33:55 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2011-05-26 08:26:08 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,6 +16,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafPipeSlice.h"
 #include "mafVMEImage.h"
 
@@ -39,7 +40,7 @@ class vtkMAFToLinearTransform;
   Visual pipe that allow to visualize a surface polydata sliced according to 
   a slicing plain. The result effect is the contour of the surface cut by the plain.
 */
-class mafPipeSurfaceSlice_BES : public mafPipeSlice
+class MED_EXPORT mafPipeSurfaceSlice_BES : public mafPipeSlice
 {
 public:
   /** RTTI Macro */

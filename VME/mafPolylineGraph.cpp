@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2011-03-14 16:10:09 $
-Version:   $Revision: 1.10.2.7 $
+Date:      $Date: 2011-05-26 08:26:08 $
+Version:   $Revision: 1.10.2.8 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -35,7 +35,7 @@ hack for mafLogMessage was used.
 
 #ifndef _NO_MAF //MAF platform is used  
 /** write a message in the log area */
-extern void mafLogMessage(const char *format, ...);
+// void mafLogMessage(const char *format, ...);
 #define LogMessage mafLogMessage
 #else
 #if defined(_MSC_VER) && _MSC_VER >= 1400

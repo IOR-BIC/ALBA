@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeTensorField.h,v $ 
   Language: C++ 
-  Date: $Date: 2010-06-16 07:04:40 $ 
-  Version: $Revision: 1.1.2.3 $ 
+  Date: $Date: 2011-05-26 08:28:49 $ 
+  Version: $Revision: 1.1.2.4 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -13,8 +13,15 @@
 #ifndef medPipeTensorField_h__
 #define medPipeTensorField_h__
 
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafPipe.h"
 
+//----------------------------------------------------------------------------
+// Forward declarations:
+//----------------------------------------------------------------------------
 class mafGUI;
 
 
@@ -22,7 +29,7 @@ class mafGUI;
 class name:  medPipeTensorField
 General class for tensor fields, contains useful stuff 
  */
-class medPipeTensorField : public mafPipe
+class MED_EXPORT medPipeTensorField : public mafPipe
 {
 public:
   /** RTTI macro*/

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVectorFieldMapWithArrows.h,v $
   Language:  C++
-  Date:      $Date: 2011-01-26 14:23:02 $
-  Version:   $Revision: 1.1.2.5 $
+  Date:      $Date: 2011-05-26 08:28:49 $
+  Version:   $Revision: 1.1.2.6 $
   Authors:   Simone Brazzale
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -13,10 +13,16 @@
 #ifndef medPipeVectorFieldMapWithArrows_h__
 #define medPipeVectorFieldMapWithArrows_h__
 
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "medPipeVectorFieldSurface.h"
 
+//----------------------------------------------------------------------------
+// Forward declarations:
+//----------------------------------------------------------------------------
 class mafGUI;
-
 class vtkArrowSource;
 class vtkLineSource;
 class vtkConeSource;
@@ -34,7 +40,7 @@ NB: The pipe supports time-varying VME, but to update correctly scalars and vect
 NB: The pipe looks for scalar and vectors in the point data; if it finds them, only point data fields are displayed! If they are not found, the pipe looks to the cell data.
 TO DO: Implement a way to display both cell data and point data.
 */
-class medPipeVectorFieldMapWithArrows : public medPipeVectorField
+class MED_EXPORT medPipeVectorFieldMapWithArrows : public medPipeVectorField
 {
 public:
   mafTypeMacro(medPipeVectorFieldMapWithArrows, medPipeVectorField);

@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: mafVMEVolumeLargeUtils.h,v $ 
   Language: C++ 
-  Date: $Date: 2010-01-08 13:58:03 $ 
-  Version: $Revision: 1.1.2.2 $ 
+  Date: $Date: 2011-05-26 08:27:37 $ 
+  Version: $Revision: 1.1.2.3 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -13,9 +13,16 @@
 #ifndef mafVMEVolumeLargeUtils_h__
 #define mafVMEVolumeLargeUtils_h__
 
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "../BES_Beta/vtkMAF/vtkMafFile.h"
 #include "vtkMAFIdType64.h"
 
+//----------------------------------------------------------------------------
+// Forward declarations:
+//----------------------------------------------------------------------------
 class mafObject;
 class mafObserver;
 class mafString;
@@ -23,7 +30,7 @@ class mafString;
   class name: mafVMEVolumeLargeUtils
   the class that gather several static methods usefull for import a large volume dataset.
 */
-class mafVMEVolumeLargeUtils
+class MED_EXPORT mafVMEVolumeLargeUtils
 {
 public:
   /** Returns the size of the given file in bytes */

@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: mafPipeSlice.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-11-04 16:07:54 $ 
-  Version: $Revision: 1.1.2.2 $ 
+  Date: $Date: 2011-05-26 08:26:08 $ 
+  Version: $Revision: 1.1.2.3 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -21,6 +21,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafPipe.h"
 
 //----------------------------------------------------------------------------
@@ -32,7 +33,7 @@ class vtkActor;
 /**
 class name : mafPipeSlice
 */
-class mafPipeSlice : public mafPipe
+class MED_EXPORT mafPipeSlice : public mafPipe
 {
 public:
   /** RTTI macro */

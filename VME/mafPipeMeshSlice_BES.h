@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeMeshSlice_BES.h,v $
 Language:  C++
-Date:      $Date: 2009-10-05 14:33:39 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2011-05-26 08:26:08 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -16,6 +16,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafPipeSlice.h"
 
 //----------------------------------------------------------------------------
@@ -44,7 +45,7 @@ class vtkPolyDataNormals;
   class name : mafPipeMeshSlice_BES
   Pipe for sliceing a mesh, modified by University of Bedfordshire.
 */
-class mafPipeMeshSlice_BES : public mafPipeSlice
+class MED_EXPORT mafPipeMeshSlice_BES : public mafPipeSlice
 {
 public:
   /** RTTI macro*/

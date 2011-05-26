@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeVectorField.h,v $ 
   Language: C++ 
-  Date: $Date: 2011-01-26 14:23:02 $ 
-  Version: $Revision: 1.1.2.4 $ 
+  Date: $Date: 2011-05-26 08:28:49 $ 
+  Version: $Revision: 1.1.2.5 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -13,13 +13,20 @@
 #ifndef medPipeVectorField_h__
 #define medPipeVectorField_h__
 
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafPipe.h"
 
+//----------------------------------------------------------------------------
+// Forward declarations:
+//----------------------------------------------------------------------------
 class mafGUI;
 
 
 /** General class for vector fields, contains useful stuff  */
-class medPipeVectorField : public mafPipe
+class MED_EXPORT medPipeVectorField : public mafPipe
 {
 public:
   mafAbstractTypeMacro(medPipeVectorField, mafPipe);

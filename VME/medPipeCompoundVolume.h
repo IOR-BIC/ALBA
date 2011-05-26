@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeCompoundVolume.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-06-12 16:34:48 $ 
-  Version: $Revision: 1.1.2.2 $ 
+  Date: $Date: 2011-05-26 08:27:37 $ 
+  Version: $Revision: 1.1.2.3 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -13,10 +13,14 @@
 #ifndef medPipeCompoundVolume_h__
 #define medPipeCompoundVolume_h__
 
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "medPipeCompound.h"
 
 /** General class for Volumes with compound pipes */
-class medPipeCompoundVolume : public medPipeCompound
+class MED_EXPORT medPipeCompoundVolume : public medPipeCompound
 {
 public:
   mafTypeMacro(medPipeCompoundVolume, medPipeCompound);

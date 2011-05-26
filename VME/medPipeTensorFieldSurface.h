@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeTensorFieldSurface.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-09-14 16:40:26 $ 
-  Version: $Revision: 1.1.2.4 $ 
+  Date: $Date: 2011-05-26 08:28:49 $ 
+  Version: $Revision: 1.1.2.5 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -13,8 +13,15 @@
 #ifndef medPipeTensorFieldSurface_h__
 #define medPipeTensorFieldSurface_h__
 
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "medPipeTensorField.h"
 
+//----------------------------------------------------------------------------
+// Forward declarations:
+//----------------------------------------------------------------------------
 class mafGUI;
 
 class vtkPolyDataMapper;
@@ -27,7 +34,7 @@ class vtkStructuredPoints;
 /** Displays the surface of input VME (even, if it is volume),
 using color mapping according to X,Y,Z or magnitude of associated
 tensor field (selected in the gui). */
-class medPipeTensorFieldSurface : public medPipeTensorField
+class MED_EXPORT medPipeTensorFieldSurface : public medPipeTensorField
 {
 public:
   mafTypeMacro(medPipeTensorFieldSurface, medPipeTensorField);

@@ -3,7 +3,7 @@
 File:    	 mafVMEVolumeLarge.h
 Language:  C++
 Date:      22:1:2008   10:57
-Version:   $Revision: 1.1.2.1 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Josef Kohout (Josef.Kohout@beds.ac.uk)
 
 Copyright (c) 2008
@@ -41,7 +41,7 @@ mafVMEVolumeLarge is a specialized VME inheriting the VME-Generic features to in
 store data, and specialized for VTK data. This specialization consists in creating
 a specialized data pipe and to redefining some APIs for casting to concrete classes.
 @sa mafVME mafMatrixVector mafDataVector  */
-class MAF_EXPORT mafVMEVolumeLarge : public mafVMEVolume
+class mafVMEVolumeLarge : public mafVMEVolume
 	//mafVMEGenericLarge
 {
 protected:

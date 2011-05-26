@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeFactoryVME.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-29 11:34:31 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2011-05-26 08:27:37 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -14,7 +14,8 @@
 //----------------------------------------------------------------------------
 // includes :
 //----------------------------------------------------------------------------
-#include "mafPipeFactoryVME.h"  
+#include "medDefines.h"
+#include "mafPipeFactoryVME.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -25,14 +26,14 @@
   this factory must be of type medPipeFactoryVME to be able to retrieve the list of pipes plugged
   in the factory. Also when using mafPlugPipe<pipe_type> the pipe icon is plugged inside the
   the MAF picture factory. */
-class MAF_EXPORT medPipeFactoryVME : public mafPipeFactoryVME
+class MED_EXPORT medPipeFactoryVME : public mafPipeFactoryVME
 {
 public: 
   mafTypeMacro(medPipeFactoryVME,mafPipeFactoryVME);
   //virtual const char* GetMAFSourceVersion() const;
   virtual const char* GetDescription() const;
   
-  static medPipeFactoryVME *GetInstance() {if (!m_Instance) Initialize(); return m_Instance;}
+  static medPipeFactoryVME *GetInstance();// {if (!m_Instance) Initialize(); return m_Instance;}
 
   /* Initialize the factory creating and registering a new instance */
   static int Initialize();
@@ -41,7 +42,7 @@ protected:
   medPipeFactoryVME();
   ~medPipeFactoryVME() { }
   
-  static medPipeFactoryVME *m_Instance;
+  static bool m_Initialized;
 
 private:
   medPipeFactoryVME(const medPipeFactoryVME&);  // Not implemented.
