@@ -25,17 +25,13 @@ ELSE (WIN32)
   ADD_EXECUTABLE(${PROJECT_NAME} ${PROJECT_SRCS} )
 ENDIF (WIN32)
 
-SET(PROJECT_LIBS
-  medOperations medGui medViews medVME medInteraction mafVME mafOperations vtkMAF
-)
-
 IF(MED_BUILD_MEDDLL)
   SET(PROJECT_LIBS
   medDLL
 )
 ELSE(MED_BUILD_MEDDLL)
   SET(PROJECT_LIBS
-  medOperations medGui medViews medVME medInteraction mafVME mafOperations vtkMAF
+  medOperations medGui medViews medVME medInteraction mafVME mafOperations vtkMAF GPUAPI
 )
 ENDIF (MED_BUILD_MEDDLL)
 
