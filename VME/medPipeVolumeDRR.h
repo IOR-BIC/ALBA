@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeDRR.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:19:42 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2011-05-26 08:29:56 $
+  Version:   $Revision: 1.6.2.1 $
   Authors:   Paolo Quadrani - porting Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -16,6 +16,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafPipe.h"
 
 //----------------------------------------------------------------------------
@@ -34,7 +35,7 @@ class mafGUIFloatSlider;
 //----------------------------------------------------------------------------
 // medPipeVolumeDRR :
 //----------------------------------------------------------------------------
-class medPipeVolumeDRR : public mafPipe
+class MED_EXPORT medPipeVolumeDRR : public mafPipe
 {
 public:
   mafTypeMacro(medPipeVolumeDRR,mafPipe);

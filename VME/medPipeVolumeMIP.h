@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeMIP.h,v $
   Language:  C++
-  Date:      $Date: 2009-05-13 15:48:46 $
-  Version:   $Revision: 1.11.2.2 $
+  Date:      $Date: 2011-05-26 08:29:56 $
+  Version:   $Revision: 1.11.2.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -16,6 +16,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafPipe.h"
 
 //----------------------------------------------------------------------------
@@ -41,7 +42,7 @@ class vtkImageCast;
 //----------------------------------------------------------------------------
 // medPipeVolumeMIP :
 //----------------------------------------------------------------------------
-class medPipeVolumeMIP : public mafPipe
+class MED_EXPORT medPipeVolumeMIP : public mafPipe
 {
 public:
   mafTypeMacro(medPipeVolumeMIP,mafPipe);

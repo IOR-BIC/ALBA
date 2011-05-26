@@ -2,14 +2,15 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMAFIdType64.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-05-14 15:05:44 $ 
-  Version: $Revision: 1.1.2.1 $ 
+  Date: $Date: 2011-05-26 08:33:31 $ 
+  Version: $Revision: 1.1.2.2 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
   See the COPYINGS file for license details 
   =========================================================================
 */
+#include "vtkMEDConfigure.h"
 
 #pragma  once
 
@@ -26,14 +27,14 @@ typedef long long vtkIdType64;
 
 #if defined(_MSC_VER) && (_MSC_VER < 1300)
 # if !defined(VTK_NO_INT64_OSTREAM_OPERATOR)
-VTK_COMMON_EXPORT ostream& vtkIdTypeOutput(ostream& os, __int64 id);
+VTK_vtkMED_EXPORT ostream& vtkIdTypeOutput(ostream& os, __int64 id);
 inline ostream& operator << (ostream& os, __int64 id)
 {
 	return vtkIdTypeOutput(os, id);
 }
 # endif
 # if !defined(VTK_NO_INT64_ISTREAM_OPERATOR)
-VTK_COMMON_EXPORT istream& vtkIdTypeInput(istream& is, __int64& id);
+VTK_vtkMED_EXPORT istream& vtkIdTypeInput(istream& is, __int64& id);
 inline istream& operator >> (istream& is, __int64& id)
 {
 	return vtkIdTypeInput(is, id);

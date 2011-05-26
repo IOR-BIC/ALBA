@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEMapsTest.cpp,v $
 Language:  C++
-Date:      $Date: 2009-11-09 15:37:05 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2011-05-26 08:33:56 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -28,6 +28,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 #include "mafVMEVolumeGray.h"
 #include "mafVMEVolume.h"
+#include "mafVMESurface.h"
 
 #include "vtkImageData.h"
 #include "vtkMAFSmartPointer.h"

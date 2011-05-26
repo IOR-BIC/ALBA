@@ -1,9 +1,10 @@
 PROJECT (MedicalViews_TEST)
 
-LINK_LIBRARIES(medViews)
-LINK_LIBRARIES(medCommon)
-LINK_LIBRARIES(medVME)
-LINK_LIBRARIES(medInteraction)
+IF(MED_BUILD_MEDDLL)
+  LINK_LIBRARIES(medDLL)
+ELSE(MED_BUILD_MEDDLL)
+  LINK_LIBRARIES(GPUAPI medVME medCommon medViews medInteraction)
+ENDIF (MED_BUILD_MEDDLL)
 
 #-----------------------------------------------------------------------------
 # tests using cppunit testing framework

@@ -1,6 +1,10 @@
 PROJECT (MedicalGui_TEST)
 
-LINK_LIBRARIES(medGui mafCore)
+IF(MED_BUILD_MEDDLL)
+  LINK_LIBRARIES(medDLL)
+ELSE(MED_BUILD_MEDDLL)
+  LINK_LIBRARIES(medGui mafCore)
+ENDIF (MED_BUILD_MEDDLL)
 
 #-----------------------------------------------------------------------------
 # tests using cppunit testing framework

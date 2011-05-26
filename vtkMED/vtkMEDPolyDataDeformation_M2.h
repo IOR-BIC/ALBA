@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMEDPolyDataDeformation_M2.h,v $ 
   Language: C++ 
-  Date: $Date: 2011-05-24 13:22:03 $ 
-  Version: $Revision: 1.1.2.5 $ 
+  Date: $Date: 2011-05-26 08:33:31 $ 
+  Version: $Revision: 1.1.2.6 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -42,6 +42,8 @@
 #ifndef vtkMEDPolyDataDeformation_M2_h__
 #define vtkMEDPolyDataDeformation_M2_h__
 
+#include "vtkMEDConfigure.h"
+
 #pragma once
 
 #pragma warning(push)
@@ -59,12 +61,13 @@ class vtkPolyData;
 class vtkIdList;
 class vtkCellLocator;
 
-class VTK_GRAPHICS_EXPORT vtkMEDPolyDataDeformation_M2 : public vtkPolyDataToPolyDataFilter
+class VTK_vtkMED_EXPORT vtkMEDPolyDataDeformation_M2 : public vtkPolyDataToPolyDataFilter
 {
 public:
+  vtkTypeRevisionMacro(vtkMEDPolyDataDeformation_M2, vtkPolyDataToPolyDataFilter);
+
   static vtkMEDPolyDataDeformation_M2 *New();
 
-  vtkTypeRevisionMacro(vtkMEDPolyDataDeformation_M2, vtkPolyDataToPolyDataFilter);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   friend class CMatrixTestM2;

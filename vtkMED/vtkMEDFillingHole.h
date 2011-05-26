@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDFillingHole.h,v $
 Language:  C++
-Date:      $Date: 2010-02-24 11:12:41 $
-Version:   $Revision: 1.1.2.6 $
+Date:      $Date: 2011-05-26 08:33:31 $
+Version:   $Revision: 1.1.2.7 $
 Authors:   Fuli Wu, Josef Kohout
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -16,6 +16,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
+#include "vtkMEDConfigure.h"
 #include "vtkstd/vector"
 #include "vtkCellArray.h"
 #include "vtkPointLocator.h"
@@ -32,7 +33,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
   class name: vtkMEDFillingHole
   Filter which fill holes of a vtkPolydata
 */
-class VTK_GRAPHICS_EXPORT vtkMEDFillingHole : public vtkPolyDataToPolyDataFilter
+class VTK_vtkMED_EXPORT vtkMEDFillingHole : public vtkPolyDataToPolyDataFilter
 {
 public:
 #pragma region Nested classes
@@ -66,7 +67,7 @@ public:
     Nested Triangle class 
     Each triangle has three edges and three vertices.
     */
-  class  CTriangle
+  class VTK_vtkMED_EXPORT CTriangle
     {
     public:
       bool  BDeleted;
@@ -89,7 +90,7 @@ public:
   Nested Edge class 
   Normally, each edge has two neighbor triangles. Two vertices consist of an edge.
   */
-  class CEdge
+  class VTK_vtkMED_EXPORT CEdge
     {
     public:
       bool  BBoundary;

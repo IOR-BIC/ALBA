@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkXRayVolumeMapper.cxx,v $
   Language:  C++
-  Date:      $Date: 2009-05-11 13:47:36 $
-  Version:   $Revision: 1.3.2.2 $
+  Date:      $Date: 2011-05-26 08:33:31 $
+  Version:   $Revision: 1.3.2.3 $
 
 
 Copyright (c) 1993-2001 Ken Martin, Will Schroeder, Bill Lorensen 
@@ -81,20 +81,20 @@ static const unsigned int ColorMapLength          = 1 << TargetImageColorDepth;
 static const unsigned int HistogramSize = 2048;
 
 // parameters
-bool  vtkXRayVolumeMapper::ReduceColorResolution = true;
+static bool ReduceColorResolution = true;
 bool  vtkXRayVolumeMapper::AutoExposure = true;
-bool  vtkXRayVolumeMapper::EnableAutoLOD = true;
-bool  vtkXRayVolumeMapper::PerspectiveCorrection = false;
-double vtkXRayVolumeMapper::ExposureCorrection[2] = { 0, 0};
-double vtkXRayVolumeMapper::Gamma = 1.6f;
+static bool  EnableAutoLOD = true;
+static bool  PerspectiveCorrection = false;
+static double ExposureCorrection[2] = { 0, 0};
+static double Gamma = 1.6f;
 double vtkXRayVolumeMapper::AttenuationCoefficient = 0.001f;
 double vtkXRayVolumeMapper::ScalingCoefficient = 1.f;
-float vtkXRayVolumeMapper::Color[4] = { 0.5f, 0.5f, 0.5f, 1.f };
+static float Color[4] = { 0.5f, 0.5f, 0.5f, 1.f };
 
 
 void ProjectBoxToViewport(const vtkMatrix4x4 *matrixObject, const double (&boundingBox)[6], double (&minMaxViewportCoordinates)[4]);
   
-vtkCxxRevisionMacro(vtkXRayVolumeMapper, "$Revision: 1.3.2.2 $");
+vtkCxxRevisionMacro(vtkXRayVolumeMapper, "$Revision: 1.3.2.3 $");
 vtkStandardNewMacro(vtkXRayVolumeMapper);
 
 //------------------------------------------------------------------------------
@@ -121,7 +121,129 @@ vtkXRayVolumeMapper::vtkXRayVolumeMapper() {
   this->ColorMap = new unsigned char[1 << TargetImageColorDepth];
   }
 
-
+//------------------------------------------------------------------------------
+void vtkXRayVolumeMapper::SetColor(double r, double g, double b)
+{
+  Color[0] = r;
+  Color[1] = g; 
+  Color[2] = b;
+}
+//------------------------------------------------------------------------------
+void vtkXRayVolumeMapper::SetColor(double *val)
+{
+  Color[0] = val[0];
+  Color[1] = val[1];
+  Color[2] = val[2];
+}
+//------------------------------------------------------------------------------
+const float* vtkXRayVolumeMapper::GetColor()
+{
+  return Color;
+}
+//------------------------------------------------------------------------------
+void vtkXRayVolumeMapper::GetColor(double color[3])
+{
+  color[0] = Color[0];
+  color[1] = Color[1];
+  color[2] = Color[2];
+}
+//------------------------------------------------------------------------------
+bool vtkXRayVolumeMapper::GetPerspectiveCorrection()
+{
+  return PerspectiveCorrection;
+}
+//------------------------------------------------------------------------------
+void vtkXRayVolumeMapper::SetPerspectiveCorrection(bool val)
+{
+  PerspectiveCorrection = val;
+}
+//------------------------------------------------------------------------------
+void vtkXRayVolumeMapper::PerspectiveCorrectionOn()
+{
+  PerspectiveCorrection = true;
+}
+//------------------------------------------------------------------------------
+void vtkXRayVolumeMapper::PerspectiveCorrectionOff()
+{
+  PerspectiveCorrection = false;
+}
+//------------------------------------------------------------------------------
+bool vtkXRayVolumeMapper::SetGamma(double val)
+{
+  if (val > 3.f && val < 0.1f) 
+  {
+    return false; 
+  }
+  Gamma = val; 
+  return true;
+}
+//------------------------------------------------------------------------------
+double vtkXRayVolumeMapper::GetGamma()
+{
+  return Gamma;
+}
+//------------------------------------------------------------------------------
+void vtkXRayVolumeMapper::GetExposureCorrection(double correction[2])
+{
+  correction[0] = ExposureCorrection[0]; 
+  correction[1] = ExposureCorrection[1];
+}
+//------------------------------------------------------------------------------
+const double* vtkXRayVolumeMapper::GetExposureCorrection()
+{
+  return ExposureCorrection;
+}
+//------------------------------------------------------------------------------
+bool vtkXRayVolumeMapper::SetExposureCorrection(double *val)
+{
+  if (val[1] <= 1.f && val[1] >= -1.f && val[0] <= 1.f && val[0] >= -1.f)
+  {
+    ExposureCorrection[0] = val[0]; 
+    ExposureCorrection[1] = val[1]; 
+    return true;
+  }
+  return false;
+}
+//------------------------------------------------------------------------------
+bool vtkXRayVolumeMapper::GetReduceColorResolution()
+{
+  return ReduceColorResolution;
+}
+//------------------------------------------------------------------------------
+void vtkXRayVolumeMapper::SetReduceColorResolution(bool val)
+{
+  ReduceColorResolution = val;
+}
+//------------------------------------------------------------------------------
+void vtkXRayVolumeMapper::ReduceColorResolutionOn()
+{
+  ReduceColorResolution = true;
+}
+//------------------------------------------------------------------------------
+void vtkXRayVolumeMapper::ReduceColorResolutionOff()
+{
+  ReduceColorResolution = false;
+}
+//------------------------------------------------------------------------------
+bool vtkXRayVolumeMapper::GetEnableAutoLOD()
+{
+  return EnableAutoLOD;
+}
+//------------------------------------------------------------------------------
+void vtkXRayVolumeMapper::SetEnableAutoLOD(bool val)
+{
+  EnableAutoLOD = val;
+}
+//------------------------------------------------------------------------------
+void vtkXRayVolumeMapper::EnableAutoLODOn()
+{
+  EnableAutoLOD = true;
+}
+//------------------------------------------------------------------------------
+void vtkXRayVolumeMapper::EnableAutoLODOff()
+{
+  EnableAutoLOD = false;
+}
 //------------------------------------------------------------------------------
 vtkXRayVolumeMapper::~vtkXRayVolumeMapper() {
   // delete textures if any

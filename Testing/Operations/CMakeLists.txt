@@ -1,10 +1,10 @@
 PROJECT (MedicalOperations_TEST)
 
-LINK_LIBRARIES(medVME)
-LINK_LIBRARIES(medOperations)
-LINK_LIBRARIES(medCommon)
-
-
+IF(MED_BUILD_MEDDLL)
+  LINK_LIBRARIES(medDLL)
+ELSE(MED_BUILD_MEDDLL)
+  LINK_LIBRARIES(medVME medCommon medOperations)
+ENDIF (MED_BUILD_MEDDLL)
 
 #-----------------------------------------------------------------------------
 # tests using cppunit testing framework

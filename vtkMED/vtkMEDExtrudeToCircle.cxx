@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDExtrudeToCircle.cxx,v $
 Language:  C++
-Date:      $Date: 2009-11-04 10:46:59 $
-Version:   $Revision: 1.4.2.4 $
+Date:      $Date: 2011-05-26 08:33:31 $
+Version:   $Revision: 1.4.2.5 $
 Authors:   Nigel McFarlane
 
 ================================================================================
@@ -11,8 +11,6 @@ Copyright (c) 2008 University of Bedfordshire, UK (www.beds.ac.uk)
 All rights reserved.
 ===============================================================================*/
 
-
-#include "mafDefines.h"
 #include "vtkPolyDataToPolyDataFilter.h"
 #include "vtkObjectFactory.h"
 #include "vtkIdList.h"
@@ -22,25 +20,20 @@ All rights reserved.
 #include "vtkCellArray.h"
 #include "vtkMEDPastValuesList.h"
 #include "vtkMEDExtrudeToCircle.h"
+#include "vtkMath.h"
 #include <assert.h>
 
-#ifndef M_PI
+#ifndef vtkMath::Pi()
   #define _USE_MATH_DEFINES
 #endif
 
 #include <cmath>
 
-
-
-
 //------------------------------------------------------------------------------
 // standard macros
-vtkCxxRevisionMacro(vtkMEDExtrudeToCircle, "$Revision: 1.4.2.4 $");
+vtkCxxRevisionMacro(vtkMEDExtrudeToCircle, "$Revision: 1.4.2.5 $");
 vtkStandardNewMacro(vtkMEDExtrudeToCircle);
 //------------------------------------------------------------------------------
-
-
-
 
 //------------------------------------------------------------------------------
 // Constructor
@@ -470,7 +463,7 @@ void vtkMEDExtrudeToCircle::CalcExtrusionRings()
   }
 
   // calculate circumference of extrusion
-  double circumf = 2*M_PI * m_EndRadius ;
+  double circumf = 2*vtkMath::Pi() * m_EndRadius ;
 
   // try increasing the no. of rings k until we get a number which gives the right length.
   k = 2 ;
@@ -568,7 +561,7 @@ void vtkMEDExtrudeToCircle::CalcExtrusionVertices()
   // calculate the cylindrical coords of the end ring, which is of course a 
   // perfect circle, normal to the z axis
   int iend = m_Mesh->NumRings - 1 ;
-  double dphi = 2*M_PI / (double)m_Mesh->Ring[iend].NumVerts ;
+  double dphi = 2*vtkMath::Pi() / (double)m_Mesh->Ring[iend].NumVerts ;
   for (j = 0 ;  j < m_Mesh->Ring[iend].NumVerts ;  j++){
     r = m_EndRadius ;
     phi = (double)j * dphi ;
@@ -613,7 +606,7 @@ void vtkMEDExtrudeToCircle::CalcExtrusionVertices()
       m_Mesh->Ring[iend].Vertex[jend].GetCylCoords(&r_end, &phi_end, &z_end) ;
       if (jstart1 == 0){
         // special case: deal with phi wrapping round from 2pi to zero
-        phi_start1 += + 2.0*M_PI ;
+        phi_start1 += + 2.0*vtkMath::Pi() ;
       }
 
       // interpolate the three points
@@ -773,7 +766,7 @@ void vtkMEDExtrudeToCircle::CalcCylinderCoords(const double *x, const double *ce
 
   // put phi into range 0 to 2pi
   if (*phi < 0.0)
-    *phi += 2*M_PI ;
+    *phi += 2*vtkMath::Pi() ;
 
 }
 
@@ -985,7 +978,7 @@ int vtkMEDExtrudeToCircle::CalcSenseOfPointsAroundHole(vtkIdList *holepts, const
   // We define two models of the line phi = m*j = c
   // with m = +/- 2pi/n 
   // and c = 0
-  mplus = 2.0*M_PI / (double)n ;
+  mplus = 2.0*vtkMath::Pi() / (double)n ;
   mneg = -mplus ;
 
   for (j = 0, Eplus = 0.0, Eneg = 0.0 ;  j < n ;  j++){
@@ -1000,7 +993,7 @@ int vtkMEDExtrudeToCircle::CalcSenseOfPointsAroundHole(vtkIdList *holepts, const
     // Make sure the calculated phi is in the range 0-2pi, the same as the input data.
     // NB if we got the slope of the line by least squares, it would be hard to account for this.
     if (phicalc_neg < 0.0)
-      phicalc_neg += 2.0*M_PI ;
+      phicalc_neg += 2.0*vtkMath::Pi() ;
 
     // calculate deviations from lines
     double dphi_plus = phi - phicalc_plus ;
@@ -1029,7 +1022,7 @@ void vtkMEDExtrudeToCircle::Remove2PiArtefactsFromFirstRing()
   int n = m_Mesh->Ring[0].NumVerts ;
 
   // slope of model line phi = m*j + c where c = 0
-  double m = 2.0*M_PI / (double)n ;
+  double m = 2.0*vtkMath::Pi() / (double)n ;
 
   for (j = 0 ;  j < n ;  j++){
     double phi = m_Mesh->Ring[0].Vertex[j].GetCylPhi() ;
@@ -1037,10 +1030,10 @@ void vtkMEDExtrudeToCircle::Remove2PiArtefactsFromFirstRing()
     double dphi = phi - phicalc ;
 
     // add or subtract 2pi to improve value
-    if (dphi > M_PI)
-      phi -= 2.0*M_PI ;
-    else if (dphi < -M_PI)
-      phi += 2.0*M_PI ;
+    if (dphi > vtkMath::Pi())
+      phi -= 2.0*vtkMath::Pi() ;
+    else if (dphi < -vtkMath::Pi())
+      phi += 2.0*vtkMath::Pi() ;
 
     m_Mesh->Ring[0].Vertex[j].SetCylPhi(phi) ;
   }

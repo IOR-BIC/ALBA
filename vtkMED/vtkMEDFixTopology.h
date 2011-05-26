@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDFixTopology.h,v $
 Language:  C++
-Date:      $Date: 2010-06-15 13:56:33 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-05-26 08:33:31 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Fuli Wu
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -16,6 +16,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
+#include "vtkMEDConfigure.h"
 #include "vtkPolyData.h"
 #include "vtkCellArray.h"
 #include "vtkPointData.h"
@@ -28,7 +29,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // vtkMEDFixTopology class 
 //----------------------------------------------------------------------------
-class VTK_GRAPHICS_EXPORT vtkMEDFixTopology : public vtkPolyDataToPolyDataFilter
+class VTK_vtkMED_EXPORT vtkMEDFixTopology : public vtkPolyDataToPolyDataFilter
 {
   public:
     static vtkMEDFixTopology *New();

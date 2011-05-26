@@ -19,9 +19,9 @@ PURPOSE.  See the above copyright notice for more information.
 class vtkImageData;
 
 #include "vtkProcessObject.h"
-#include "vtkMAFConfigure.h"
+#include "vtkMEDConfigure.h"
 
-class VTK_vtkMAF_EXPORT vtkMEDRegionGrowingLocalGlobalThreshold : public vtkProcessObject
+class VTK_vtkMED_EXPORT vtkMEDRegionGrowingLocalGlobalThreshold : public vtkProcessObject
 {
 public:
   vtkTypeRevisionMacro(vtkMEDRegionGrowingLocalGlobalThreshold,vtkProcessObject);

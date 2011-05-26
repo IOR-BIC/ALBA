@@ -4,12 +4,19 @@ IF (CPPUNIT_FOUND)
   #MESSAGE("Found Cppunit library")
   INCLUDE_DIRECTORIES(${CPPUNIT_INCLUDE_DIR})
   LINK_LIBRARIES(${CPPUNIT_LIBRARIES})
+  
+  IF(MED_BUILD_MEDDLL)
+    LINK_LIBRARIES(medDLL vtkMED)
+  ELSE(MED_BUILD_MEDDLL)
+    LINK_LIBRARIES(vtkMED vtkGraphics vtkRendering medCommon)
+  ENDIF (MED_BUILD_MEDDLL)
 
-  LINK_LIBRARIES(vtkMED vtkGraphics vtkRendering medCommon)
   
 ELSE (CPPUNIT_FOUND)
   MESSAGE("Cppunit library not found! Please fill the corresponding cache entries")
 ENDIF (CPPUNIT_FOUND)
+
+REMOVE_DEFINITIONS(-DvtkMED_EXPORTS)
 
 #-----------------------------------------------------------------------------
 # tests using cppunit testing framework

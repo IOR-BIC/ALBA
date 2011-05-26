@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMAFVolumeTextureMapper2D.h,v $ 
   Language: C++ 
-  Date: $Date: 2010-04-06 06:37:50 $ 
-  Version: $Revision: 1.1.2.3 $ 
+  Date: $Date: 2011-05-26 08:33:31 $ 
+  Version: $Revision: 1.1.2.4 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -18,6 +18,7 @@
 #ifndef vtkMAFVolumeTextureMapper2D_h__
 #define vtkMAFVolumeTextureMapper2D_h__
 
+#include "vtkMEDConfigure.h"
 #include "vtkOpenGLVolumeTextureMapper2D.h"
 
 class vtkRenderer;
@@ -26,7 +27,7 @@ class vtkVolume;
     class name: vtkMAFVolumeTextureMapper2D
     Mapper class used by texture 2D volume pipe.
 */
-class VTK_RENDERING_EXPORT vtkMAFVolumeTextureMapper2D : public vtkOpenGLVolumeTextureMapper2D
+class VTK_vtkMED_EXPORT vtkMAFVolumeTextureMapper2D : public vtkOpenGLVolumeTextureMapper2D
 {
 protected:
   unsigned long LastCheckSum;   ///<Here is stored CheckSum used to detect if Casting needs to be reexecuted

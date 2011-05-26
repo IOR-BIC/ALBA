@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEMaps.h,v $
 Language:  C++
-Date:      $Date: 2009-10-19 14:51:39 $
-Version:   $Revision: 1.1.2.9 $
+Date:      $Date: 2011-05-26 08:30:59 $
+Version:   $Revision: 1.1.2.10 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -14,14 +14,17 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafVMESurface.h"
-#include "mafVMEVolume.h"
+#include "medDefines.h"
+#include "mafVME.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
+class mafVMESurface;
+class mafVMEVolume;
 class mafTransform;
 class mafVMEOutputSurface;
+class mmaMaterial;
 class vtkColorTransferFunction;
 
 class vtkMAFDistanceFilter;
@@ -34,7 +37,7 @@ class vtkLookupTable;
 VME with input a surface and a volume, and producing a distance/density scalar surface.  
 */
 
-class MAF_EXPORT medVMEMaps : public mafVME
+class MED_EXPORT medVMEMaps : public mafVME
 {
 public:
   

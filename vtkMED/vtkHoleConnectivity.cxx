@@ -3,7 +3,7 @@
 Program:   Visualization Toolkit
 Module:    vtkHoleConnectivity.cxx
 Language:  C++
-Version:   $Id: vtkHoleConnectivity.cxx,v 1.3.2.1 2008-11-06 09:27:27 ior02 Exp $
+Version:   $Id: vtkHoleConnectivity.cxx,v 1.3.2.2 2011-05-26 08:33:31 ior02 Exp $
 
 Copyright (c) 2003-2004 Goodwin Lawlor
 All rights reserved.
@@ -21,6 +21,9 @@ under MAF (www.openmaf.org)
 
 #include "vtkPolyDataConnectivityFilter.h"
 #include "vtkPolyData.h"
+#include "vtkObjectFactory.h"
+
+vtkStandardNewMacro(vtkHoleConnectivity);
 
 //----------------------------------------------------------------------------
 vtkHoleConnectivity::vtkHoleConnectivity(vtkPolyData *input,vtkIdType ID)

@@ -9,7 +9,7 @@
 #ifndef __vtkWeightedLandmarkTransform_h
 #define __vtkWeightedLandmarkTransform_h
 
-
+#include "vtkMEDConfigure.h"
 #include "vtkLandmarkTransform.h"
 
 
@@ -20,7 +20,7 @@
     class name: vtkWeightedLandmarkTransform
     It handle landmark transform using weights which be associated to each landmark.
  */  
-class vtkWeightedLandmarkTransform : public vtkLandmarkTransform
+class VTK_vtkMED_EXPORT vtkWeightedLandmarkTransform : public vtkLandmarkTransform
 {
 public:
   /** construct the object */

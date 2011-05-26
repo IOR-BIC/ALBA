@@ -3,8 +3,8 @@
 Program:   Multimod Fundation Library
 Module:    $RCSfile: vtkMAFVolumeSlicer_BES.h,v $
 Language:  C++
-Date:      $Date: 2010-04-20 09:44:20 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2011-05-26 08:33:31 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Alexander Savenko, Josef Kohout
 Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -63,7 +63,7 @@ POSSIBILITY OF SUCH DAMAGES.
 #ifndef __vtkMAFVolumeSlicer_BES_h
 #define __vtkMAFVolumeSlicer_BES_h
 
-#include "vtkMAFConfigure.h"
+#include "vtkMEDConfigure.h"
 #include "vtkDataSetToDataSetFilter.h"
 #include "vtkImageData.h"
 #include "vtkPolyData.h"
@@ -83,7 +83,7 @@ class mafGPUOGL;
 #endif
 
 
-class VTK_vtkMAF_EXPORT vtkMAFVolumeSlicer_BES : public vtkDataSetToDataSetFilter {
+class VTK_vtkMED_EXPORT vtkMAFVolumeSlicer_BES : public vtkDataSetToDataSetFilter {
 public:
   static vtkMAFVolumeSlicer_BES *New();
   vtkTypeRevisionMacro(vtkMAFVolumeSlicer_BES, vtkDataSetToDataSetFilter);

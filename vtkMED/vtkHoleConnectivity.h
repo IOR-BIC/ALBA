@@ -3,7 +3,7 @@
 Program:   Visualization Toolkit
 Module:    vtkHoleConnectivity.h
 Language:  C++
-Version:   $Id: vtkHoleConnectivity.h,v 1.4.2.2 2009-11-23 10:49:00 ior04 Exp $
+Version:   $Id: vtkHoleConnectivity.h,v 1.4.2.3 2011-05-26 08:33:31 ior02 Exp $
 
 Copyright (c) Goodwin Lawlor 2003-2004
 All rights reserved.
@@ -20,22 +20,26 @@ under MAF (www.openmaf.org)
 #define __vtkHoleConnectivity_h
 
 #include "vtkPolyDataToPolyDataFilter.h"
-#include "vtkMAFConfigure.h"
+#include "vtkMEDConfigure.h"
 /**
   class name: vtkHoleConnectivity
   This filter uses vtkPolyDataConnectivityFilter in order to extract the Closest Point Region
   after pass it the coordinates of the point.
 */
-class VTK_vtkMAF_EXPORT vtkHoleConnectivity : public vtkPolyDataToPolyDataFilter
+class VTK_vtkMED_EXPORT vtkHoleConnectivity : public vtkPolyDataToPolyDataFilter
 {
 public:
+
+  /** RTTI macro */
+  vtkTypeMacro(vtkHoleConnectivity,vtkPolyDataToPolyDataFilter);
+
   /** retrieve class name */
 	const char *GetClassName() {return "vtkHoleConnectivity";};
   /** print information */
 	void PrintSelf(ostream& os, vtkIndent indent); 
 
   /** create an instance of the object */
-	static vtkHoleConnectivity *New() {return new vtkHoleConnectivity;};
+	static vtkHoleConnectivity *New();
 
   /** macro for setting point id */
 	vtkSetMacro(PointID,vtkIdType);

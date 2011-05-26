@@ -20,10 +20,10 @@
 #ifndef __vtkMEDImageUnsharpFilter_h
 #define __vtkMEDImageUnsharpFilter_h
 
-
+#include "vtkMEDConfigure.h"
 #include "vtkImageToImageFilter.h"
 
-class VTK_IMAGING_EXPORT vtkMEDImageUnsharpFilter : public vtkImageToImageFilter
+class VTK_vtkMED_EXPORT vtkMEDImageUnsharpFilter : public vtkImageToImageFilter
 {
 public:
   vtkTypeRevisionMacro(vtkMEDImageUnsharpFilter,vtkImageToImageFilter);

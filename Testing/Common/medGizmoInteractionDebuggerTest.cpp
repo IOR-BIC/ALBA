@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGizmoInteractionDebuggerTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-12-01 17:09:23 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-05-26 08:33:56 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -29,6 +29,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkPointData.h"
 #include "medGizmoInteractionDebugger.h"
 #include "medVMEPolylineGraph.h"
+#include "vtkMAFSmartPointer.h"
 #include "vtkDoubleArray.h"
 #include "vtkPoints.h"
 #include "vtkPolyData.h"

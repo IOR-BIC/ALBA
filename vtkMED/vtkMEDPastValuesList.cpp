@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDPastValuesList.cpp,v $
 Language:  C++
-Date:      $Date: 2008-11-06 09:27:27 $
-Version:   $Revision: 1.2.2.1 $
+Date:      $Date: 2011-05-26 08:33:31 $
+Version:   $Revision: 1.2.2.2 $
 Authors:   Nigel McFarlane
 
 ================================================================================
@@ -11,10 +11,6 @@ Copyright (c) 2008 University of Bedfordshire, UK (www.beds.ac.uk)
 All rights reserved.
 ===============================================================================*/
 
-
-
-
-#include "mafDefines.h"
 #include "vtkMEDPastValuesList.h"
 #include <algorithm>
 #include <iostream>

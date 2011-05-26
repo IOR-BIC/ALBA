@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEPolylineEditor.h,v $
 Language:  C++
-Date:      $Date: 2007-07-04 09:46:41 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2011-05-26 08:30:59 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -44,13 +44,14 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafVMEGeneric.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
 
-class MAF_EXPORT medVMEPolylineEditor : public mafVMEGeneric
+class MED_EXPORT medVMEPolylineEditor : public mafVMEGeneric
 {
 public:
 	mafTypeMacro(medVMEPolylineEditor, mafVMEGeneric);

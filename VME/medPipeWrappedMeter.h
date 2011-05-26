@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeWrappedMeter.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:19:42 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2011-05-26 08:29:56 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -13,7 +13,12 @@
 #ifndef __medPipeWrappedMeter_H__
 #define __medPipeWrappedMeter_H__
 
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafPipe.h"
+
 //----------------------------------------------------------------------------
 // forward refs :
 //----------------------------------------------------------------------------
@@ -30,7 +35,7 @@ class mafGUIMaterialButton;
 //----------------------------------------------------------------------------
 // medPipeWrappedMeter :
 //----------------------------------------------------------------------------
-class medPipeWrappedMeter : public mafPipe
+class MED_EXPORT medPipeWrappedMeter : public mafPipe
 {
 public:
   mafTypeMacro(medPipeWrappedMeter,mafPipe);

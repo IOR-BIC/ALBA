@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMELabeledVolume.h,v $
   Language:  C++
-  Date:      $Date: 2010-12-21 14:36:29 $
-  Version:   $Revision: 1.13.2.2 $
+  Date:      $Date: 2011-05-26 08:29:56 $
+  Version:   $Revision: 1.13.2.3 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -13,6 +13,10 @@
 #ifndef __medVMELabeledVolume_h
 #define __medVMELabeledVolume_h
 
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafVME.h"
 
 //----------------------------------------------------------------------------
@@ -43,7 +47,7 @@ class mmaVolumeMaterial;
 /** mafVmeDataLabeledVolume - Volume with interface to assign labels to certain portions of a volume, identified by
 scalar thresholds  */
 
-class MAF_EXPORT medVMELabeledVolume : public mafVME
+class MED_EXPORT medVMELabeledVolume : public mafVME
 {
 public:	
 

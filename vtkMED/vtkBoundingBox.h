@@ -27,9 +27,9 @@ under MAF (www.openmaf.org)
 #ifndef __vtkBoundingBox_h
 #define __vtkBoundingBox_h
 #include "vtkSystemIncludes.h"
-#include "vtkMAFConfigure.h"
+#include "vtkMEDConfigure.h"
 
-class VTK_COMMON_EXPORT vtkBoundingBox 
+class VTK_vtkMED_EXPORT vtkBoundingBox 
 {
 public:
   // Description:

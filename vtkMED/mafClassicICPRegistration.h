@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: mafClassicICPRegistration.h,v $
   Language:  C++
-  Date:      $Date: 2010-01-08 13:59:39 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-26 08:33:30 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Stefania Paperini paperini@tecno.ior.it 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -68,7 +68,7 @@ POSSIBILITY OF SUCH DAMAGES.
 #ifndef __mafClassicICPRegistration_h
 #define __mafClassicICPRegistration_h
 
-#include "vtkMAFConfigure.h"
+#include "vtkMEDConfigure.h"
 
 //vtk include
 #include <vtkLinearTransform.h>
@@ -76,7 +76,6 @@ POSSIBILITY OF SUCH DAMAGES.
 #include <vtkPolyData.h>
 #include <vtkPointLocator.h>
 
-#include "mafString.h"
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
@@ -92,7 +91,7 @@ class mafICPUtility;
   that modify one surface to best match the other (in a least square sense).
   This has to be iterated to get proper convergence of the surfaces.
 */
-class VTK_vtkMAF_EXPORT mafClassicICPRegistration : public vtkIterativeClosestPointTransform
+class VTK_vtkMED_EXPORT mafClassicICPRegistration : public vtkIterativeClosestPointTransform
 {
 public:
   static mafClassicICPRegistration *New();
@@ -116,7 +115,7 @@ public:
   
   void SetResultsFileName(const char *name);
   
-  const char *GetResultsFileName() {return this->ResultsFile.GetCStr(); }
+  const char *GetResultsFileName() {return this->ResultsFile.c_str(); }
 
   vtkSetMacro(Convergence, float);
   vtkGetMacro(Convergence, float);
@@ -171,7 +170,7 @@ protected:
   float Convergence;
   
   int SaveResults;
-  mafString ResultsFile;
+  std::string ResultsFile;
 
   mafICPUtility *ICPUtil;
 

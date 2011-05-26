@@ -31,11 +31,19 @@ under MAF (www.openmaf.org)
 #ifndef __vtkBox_h
 #define __vtkBox_h
 
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
+#include "vtkMEDConfigure.h"
 #include "vtkImplicitFunction.h"
 #include "vtkMAFConfigure.h"
+
+//----------------------------------------------------------------------------
+// Forward declarations:
+//----------------------------------------------------------------------------
 class vtkBoundingBox;
 
-class VTK_COMMON_EXPORT vtkBox : public vtkImplicitFunction
+class VTK_vtkMED_EXPORT vtkBox : public vtkImplicitFunction
 {
 public:
   vtkTypeRevisionMacro(vtkBox,vtkImplicitFunction);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEOutputComputeWrapping.h,v $
   Language:  C++
-  Date:      $Date: 2010-06-30 06:30:59 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2011-05-26 08:30:59 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -14,7 +14,9 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafVMEOutputPolyline.h"
+
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
@@ -26,7 +28,7 @@ class mafGUI;
   medVMEOutputComputeWrapping is the output produced by a node generating an output
   with a VTK dataset.
 */
-class MAF_EXPORT medVMEOutputComputeWrapping : public mafVMEOutputPolyline
+class MED_EXPORT medVMEOutputComputeWrapping : public mafVMEOutputPolyline
 {
 public:
   /** constructor */

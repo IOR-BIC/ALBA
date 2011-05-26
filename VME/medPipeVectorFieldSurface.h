@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeVectorFieldSurface.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-06-09 16:04:32 $ 
-  Version: $Revision: 1.1.2.1 $ 
+  Date: $Date: 2011-05-26 08:29:56 $ 
+  Version: $Revision: 1.1.2.2 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -13,8 +13,15 @@
 #ifndef medPipeVectorFieldSurface_h__
 #define medPipeVectorFieldSurface_h__
 
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "medPipeVectorField.h"
 
+//----------------------------------------------------------------------------
+// Forward declarations:
+//----------------------------------------------------------------------------
 class mafGUI;
 
 class vtkPolyDataMapper;
@@ -26,7 +33,7 @@ class vtkScalarBarActor;
 /** Displays the surface of input VME (even, if it is volume),
 using color mapping according to X,Y,Z or magnitude of associated
 vector field (selected in the gui). */
-class medPipeVectorFieldSurface : public medPipeVectorField
+class MED_EXPORT medPipeVectorFieldSurface : public medPipeVectorField
 {
 public:
   mafTypeMacro(medPipeVectorFieldSurface, medPipeVectorField);

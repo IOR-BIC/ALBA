@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkTriangleQualityRatio.cxx,v $
 Language:  C++
-Date:      $Date: 2008-11-06 09:27:28 $
-Version:   $Revision: 1.4.2.1 $
+Date:      $Date: 2011-05-26 08:33:31 $
+Version:   $Revision: 1.4.2.2 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -49,17 +49,20 @@ MafMedical is partially based on OpenMAF.
 #include "vtkPolyData.h"
 
 #include "vtkTriangleQualityRatio.h"
-//-------------------------------------------------------------------------
-vtkTriangleQualityRatio* vtkTriangleQualityRatio::New()
-//-------------------------------------------------------------------------
-{
-	vtkObject* ret = vtkObjectFactory::CreateInstance("vtkTriangleQualityRatio");
-	if(ret)
-	{
-		return (vtkTriangleQualityRatio*)ret;
-	}
-	return new vtkTriangleQualityRatio;
-}
+
+vtkStandardNewMacro(vtkTriangleQualityRatio);
+
+// //-------------------------------------------------------------------------
+// vtkTriangleQualityRatio* vtkTriangleQualityRatio::New()
+// //-------------------------------------------------------------------------
+// {
+// 	vtkObject* ret = vtkObjectFactory::CreateInstance("vtkTriangleQualityRatio");
+// 	if(ret)
+// 	{
+// 		return (vtkTriangleQualityRatio*)ret;
+// 	}
+// 	return new vtkTriangleQualityRatio;
+// }
 //-------------------------------------------------------------------------
 vtkTriangleQualityRatio::vtkTriangleQualityRatio()
 //-------------------------------------------------------------------------

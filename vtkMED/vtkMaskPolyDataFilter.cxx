@@ -42,7 +42,9 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkMaskPolyDataFilter.h"
 #include "vtkPointData.h"
 #include "vtkCellData.h"
+#include "vtkObjectFactory.h"
 
+vtkStandardNewMacro(vtkMaskPolyDataFilter);
 
 // Construct with user-specified polygonal dataset, initial distance of 0.0,
 // capping is turned on with CapValue equal to a large positive number and 

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGizmoROI_BESTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-02-04 16:51:58 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-05-26 08:33:56 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -33,6 +33,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafAbsMatrixPipe.h"
 #include "mafObserver.h"
 #include "mafTransform.h"
+#include "mafRefSys.h"
 
 #include "mafInteractorGenericMouse.h"
 #include "mmaMaterial.h"

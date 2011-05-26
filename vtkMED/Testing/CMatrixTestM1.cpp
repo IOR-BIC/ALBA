@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: CMatrixTestM1.cpp,v $
 Language:  C++
-Date:      $Date: 2010-12-03 12:07:14 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-05-26 08:33:31 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -21,7 +21,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <cppunit/config/SourcePrefix.h>
 #include "CMatrixTestM1.h"
 
-#include "vtkMEDPolyDataDeformation_M1.h"
+#include "vtkMEDPolyDataDeformation_M1.cpp"
 
 //-------------------------------------------------------------------------
 void CMatrixTestM1::TestDynamicAllocation()

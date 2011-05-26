@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEOutputWrappedMeter.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:19:42 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2011-05-26 08:30:59 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -14,7 +14,9 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafVMEOutputPolyline.h"
+
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
@@ -24,7 +26,7 @@ class mafGUI;
   medVMEOutputWrappedMeter is the output produced by a node generating an output
   with a VTK dataset.
 */
-class MAF_EXPORT medVMEOutputWrappedMeter : public mafVMEOutputPolyline
+class MED_EXPORT medVMEOutputWrappedMeter : public mafVMEOutputPolyline
 {
 public:
   medVMEOutputWrappedMeter();

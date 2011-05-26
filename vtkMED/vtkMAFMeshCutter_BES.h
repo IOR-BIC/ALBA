@@ -3,8 +3,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFMeshCutter_BES.h,v $
 Language:  C++
-Date:      $Date: 2010-03-24 09:52:16 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2011-05-26 08:33:31 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Nigel McFarlane
 
 ================================================================================
@@ -20,7 +20,7 @@ All rights reserved.
 // includes:
 //---------------------------------------------
 #include "vtkUnstructuredGridToPolyDataFilter.h"
-#include "vtkMAFConfigure.h"
+#include "vtkMEDConfigure.h"
 #include "assert.h"
 #include <vector>
 #include <map>
@@ -55,7 +55,7 @@ edges cut by the plane, although their endpoints are.
 3) No cells of lower order than triangles are created.
 Therefore if the plane cuts exactly through an isolated edge or vertex, the output
 polydata will contain the points, but no cell will be created.*/
-class VTK_vtkMAF_EXPORT vtkMAFMeshCutter_BES : public vtkUnstructuredGridToPolyDataFilter
+class VTK_vtkMED_EXPORT vtkMAFMeshCutter_BES : public vtkUnstructuredGridToPolyDataFilter
 {
 public:
   /** RTTI macro*/

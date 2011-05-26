@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEAnalog.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:19:42 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2011-05-26 08:29:56 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafVMEScalarMatrix.h"
 
 //----------------------------------------------------------------------------
@@ -23,7 +24,7 @@ class mafVMEOutputScalarMatrix;
 
 
 /** VME child of mafVMEScalarMatrix, for EMG data. Refactor CreateGui and Print methods not to show parameters used for VTK representation */
-class MAF_EXPORT medVMEAnalog : public mafVMEScalarMatrix
+class MED_EXPORT medVMEAnalog : public mafVMEScalarMatrix
 {
 public:
   mafTypeMacro(medVMEAnalog, mafVMEScalarMatrix);

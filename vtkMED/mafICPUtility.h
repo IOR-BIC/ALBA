@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafICPUtility.h,v $
   Language:  C++
-  Date:      $Date: 2010-01-08 13:59:39 $
-  Version:   $Revision: 1.4.2.2 $
+  Date:      $Date: 2011-05-26 08:33:30 $
+  Version:   $Revision: 1.4.2.3 $
   Authors:   Andrea Cutti porting Matteo Giacomoni    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -19,7 +19,7 @@
 //system includes
 #include <fstream>
 
-#include "vtkMAFConfigure.h"
+#include "vtkMEDConfigure.h"
 
 #include "vtkObject.h"
 
@@ -40,7 +40,7 @@
   class name: mafICPUtility
   Implementation of the ICP algorithm utility.
 */
-class VTK_vtkMAF_EXPORT mafICPUtility : public vtkObject
+class VTK_vtkMED_EXPORT mafICPUtility : public vtkObject
 {
 public:
   static mafICPUtility *New();
@@ -86,9 +86,9 @@ public:
 
   inline RegResult StandardRegistration( vnl_matrix<double>& MS, vnl_matrix<double>& DS, float Convergence);
 
-  mafString RotationFixedFile;
-  mafString RotationFixedIndexFile;
-  mafString KnownMinLocalPositionFile;
+  std::string RotationFixedFile;
+  std::string RotationFixedIndexFile;
+  std::string KnownMinLocalPositionFile;
   bool KnownMinLocalFlag;
   bool RotationFixedFlag;
 
@@ -97,7 +97,7 @@ protected:
   ~mafICPUtility() {};
 };
 
-vtkCxxRevisionMacro(mafICPUtility, "$Revision: 1.4.2.2 $");
+vtkCxxRevisionMacro(mafICPUtility, "$Revision: 1.4.2.3 $");
   vtkStandardNewMacro(mafICPUtility);
 //----------------------------------------------------------------------------
 inline vnl_matrix<double> mafICPUtility::PolyData2VnlFilter(vtkPolyData* Shape)
@@ -713,7 +713,7 @@ inline void mafICPUtility::Rotation_classif(vcl_multimap<double,int>& mm,const v
 	const int DS_temp_cols=DS_temp.columns();
 
 	vnl_vector<int> index;
-	vcl_ifstream ml_rot_fixed(this->RotationFixedIndexFile.GetCStr(), std::ios::in);//Changed from "Rot_fixed_index.txt"
+	vcl_ifstream ml_rot_fixed(this->RotationFixedIndexFile.c_str(), std::ios::in);//Changed from "Rot_fixed_index.txt"
 	index.read_ascii(ml_rot_fixed);
 	//vcl_cout << "There are  " << index.size() << "  to be tested\n";
 
@@ -804,7 +804,7 @@ inline mafICPUtility::RegResult mafICPUtility::ICP_vtkPointLocator(vnl_matrix<do
 	vnl_matrix<double> Min;
 	vnl_matrix<double> DS_R(DS.rows(),DS.columns());//3xn
 	
-	vcl_ifstream ml_rot_fixed(this->RotationFixedFile.GetCStr(), std::ios::in); //Changed from Rotation_fixed.txt
+	vcl_ifstream ml_rot_fixed(this->RotationFixedFile.c_str(), std::ios::in); //Changed from Rotation_fixed.txt
 	if(ml_rot_fixed.is_open() == 0) 
 	{
 		//vcl_cout << "File rotazioni RAR2 inesistente: impossibile proseguire" <<'\n';

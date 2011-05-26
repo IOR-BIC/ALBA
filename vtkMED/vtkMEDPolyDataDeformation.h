@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMEDPolyDataDeformation.h,v $ 
   Language: C++ 
-  Date: $Date: 2011-04-04 11:55:59 $ 
-  Version: $Revision: 1.1.2.11 $ 
+  Date: $Date: 2011-05-26 08:33:31 $ 
+  Version: $Revision: 1.1.2.12 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -42,15 +42,23 @@
 #ifndef vtkMEDPolyDataDeformation_h__
 #define vtkMEDPolyDataDeformation_h__
 
+#include "vtkMEDConfigure.h"
+
+class CSkeletonEdge;
+class CSkeletonVertex;
+
+
+#include <vector>
+#include <list>
+
+#include "mafDllMacros.h"
+
 #pragma once
 
 #pragma warning(push)
 #pragma warning(disable:4996)
 #include "vtkPolyDataToPolyDataFilter.h"
 #pragma warning(pop)
-
-#include <vector>
-#include <list>
 
 //#define DEBUG_vtkMEDPolyDataDeformation
 
@@ -59,7 +67,7 @@ class vtkPolyData;
 class vtkIdList;
 class vtkCellLocator;
 
-class VTK_GRAPHICS_EXPORT vtkMEDPolyDataDeformation : public vtkPolyDataToPolyDataFilter
+class VTK_vtkMED_EXPORT vtkMEDPolyDataDeformation : public vtkPolyDataToPolyDataFilter
 {
 public:
   static vtkMEDPolyDataDeformation *New();
@@ -76,6 +84,7 @@ protected:
 
 protected:
 #pragma region //Nested Classes
+
   class CSkeletonEdge;
     
   //internal data structure describing vertex of a mesh
@@ -97,7 +106,7 @@ protected:
   typedef vtkstd::vector< CMeshVertexParametrization > CMeshVertex;
 
   //internal structure for one vertex in the skeleton
-  class CSkeletonVertex
+  class VTK_vtkMED_EXPORT CSkeletonVertex
   {
   public:
     int Id;             //<ID of this point
@@ -112,9 +121,12 @@ protected:
 
     LOCAL_FRAME LF;             //<local frame system
     CSkeletonVertex* PMatch;    //<matched vertex
-    
-    vtkstd::vector< CSkeletonEdge* > OneRingEdges;    //<edges around this vertex
-    vtkstd::vector< CSkeletonVertex* > JoinedVertices;//<vertices of other curves with the same coordinates   
+
+    EXPORT_STL_VECTOR(VTK_vtkMED_EXPORT,CSkeletonEdge*);
+    EXPORT_STL_VECTOR(VTK_vtkMED_EXPORT,CSkeletonVertex*);
+
+    std::vector< CSkeletonEdge* > OneRingEdges;    //<edges around this vertex
+    std::vector< CSkeletonVertex* > JoinedVertices;//<vertices of other curves with the same coordinates   
 
     double WT;          //<topology weight
     int NMark;          //<vertex tag for internal use
@@ -164,7 +176,7 @@ protected:
   };
   
   //internal structure for one edge in the skeleton
-  class CSkeletonEdge
+  class VTK_vtkMED_EXPORT CSkeletonEdge
   {
   public:
     int Id;                     //<ID of this edge
@@ -205,11 +217,14 @@ protected:
   };
 
   //Internal data structure to encapsulates one skeleton
-  class CSkeleton
+  class VTK_vtkMED_EXPORT CSkeleton
   {
   public:
-    vtkstd::vector< CSkeletonVertex* > Vertices;
-    vtkstd::vector< CSkeletonEdge* > Edges;
+    EXPORT_STL_VECTOR(VTK_vtkMED_EXPORT,CSkeletonEdge*);
+    EXPORT_STL_VECTOR(VTK_vtkMED_EXPORT,CSkeletonVertex*);
+
+    std::vector< CSkeletonVertex* > Vertices;
+    std::vector< CSkeletonEdge* > Edges;
 
   public:
     ~CSkeleton();
@@ -250,7 +265,7 @@ protected:
 #pragma region Munkres
   //This class was adopted from John Weaver code (GNU - see below) and thoroughly modified 
   template <class T>
-  class CMatrix 
+  class VTK_vtkMED_EXPORT CMatrix 
   {
   public:
     /** Constructor. */

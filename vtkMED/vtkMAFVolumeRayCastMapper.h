@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMAFVolumeRayCastMapper.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-10-21 11:54:14 $ 
-  Version: $Revision: 1.1.2.2 $ 
+  Date: $Date: 2011-05-26 08:33:31 $ 
+  Version: $Revision: 1.1.2.3 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -18,12 +18,13 @@
 #ifndef vtkMAFVolumeRayCastMapper_h__
 #define vtkMAFVolumeRayCastMapper_h__
 
+#include "vtkMEDConfigure.h"
 #include "vtkOpenGLVolumeRayCastMapper.h"
 
 class vtkRenderer;
 class vtkVolume;
 
-class VTK_RENDERING_EXPORT vtkMAFVolumeRayCastMapper : public vtkOpenGLVolumeRayCastMapper
+class VTK_vtkMED_EXPORT vtkMAFVolumeRayCastMapper : public vtkOpenGLVolumeRayCastMapper
 {
 protected:
   unsigned long LastCheckSum;   //<Here is stored CheckSum used to detect if Casting needs to be reexecuted

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-04-19 14:22:17 $
-  Version:   $Revision: 1.13.2.4 $
+  Date:      $Date: 2011-05-26 08:29:56 $
+  Version:   $Revision: 1.13.2.5 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -43,30 +43,30 @@
 #include <string>
 #include <ostream>
 
-medVMEFactory *medVMEFactory::m_Instance=NULL;
-
 mafCxxTypeMacro(medVMEFactory);
+
+bool medVMEFactory::m_Initialized=false;
 
 //----------------------------------------------------------------------------
 // This is used to register the factory when linking statically
 int medVMEFactory::Initialize()
 //----------------------------------------------------------------------------
 {
-  if (m_Instance==NULL)
+  if (!m_Initialized)
   {
-    m_Instance = medVMEFactory::New();
-
-    if (m_Instance)
+    m_Initialized=true;
+    if (GetInstance())
     {
-      m_Instance->RegisterFactory(m_Instance);
+      GetInstance()->RegisterFactory(GetInstance());
       return MAF_OK;  
     }
     else
     {
+      m_Initialized=true;
       return MAF_ERROR;
     }
   }
-  
+
   return MAF_OK;
 }
 
@@ -114,4 +114,12 @@ mafVME *medVMEFactory::CreateVMEInstance(const char *type_name)
 //------------------------------------------------------------------------------
 {
   return mafVME::SafeDownCast(Superclass::CreateInstance(type_name));
+}
+//------------------------------------------------------------------------------
+medVMEFactory* medVMEFactory::GetInstance()
+//------------------------------------------------------------------------------
+{
+  static medVMEFactory &istance = *(medVMEFactory::New());
+  Initialize();
+  return &istance;
 }

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDExtrudeToCircle.h,v $
 Language:  C++
-Date:      $Date: 2011-03-01 08:45:54 $
-Version:   $Revision: 1.4.2.7 $
+Date:      $Date: 2011-05-26 08:33:31 $
+Version:   $Revision: 1.4.2.8 $
 Authors:   Nigel McFarlane
 
 ================================================================================
@@ -18,7 +18,7 @@ All rights reserved.
 #include "vtkPolyDataToPolyDataFilter.h"
 #include "vtkPolyData.h"
 #include "vtkMatrix4x4.h"
-#include "vtkMAFConfigure.h"
+#include "vtkMEDConfigure.h"
 #include <iostream>
 
 
@@ -27,7 +27,7 @@ All rights reserved.
 /// Extrusion filter based on vtkLinearExtrusionFilter. \n
 /// This creates an extrusion terminating in a circle.
 //------------------------------------------------------------------------------
-class VTK_vtkMAF_EXPORT vtkMEDExtrudeToCircle : public vtkPolyDataToPolyDataFilter
+class VTK_vtkMED_EXPORT vtkMEDExtrudeToCircle : public vtkPolyDataToPolyDataFilter
 {
 public:
   //----------------------------------------------------------------------------

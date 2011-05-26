@@ -1,9 +1,10 @@
 PROJECT (mafInteraction_TEST)
 
-LINK_LIBRARIES(medInteraction)
-LINK_LIBRARIES(medVME)
-LINK_LIBRARIES(medViews)
-LINK_LIBRARIES(medCommon)
+IF(MED_BUILD_MEDDLL)
+  LINK_LIBRARIES(medDLL)
+ELSE(MED_BUILD_MEDDLL)
+  LINK_LIBRARIES(medVME medCommon medViews medInteraction GPUAPI)
+ENDIF (MED_BUILD_MEDDLL)
 
 #-----------------------------------------------------------------------------
 # tests using cppunit testing framework

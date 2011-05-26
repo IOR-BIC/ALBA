@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDPastValuesList.h,v $
 Language:  C++
-Date:      $Date: 2010-03-10 11:32:59 $
-Version:   $Revision: 1.2.2.2 $
+Date:      $Date: 2011-05-26 08:33:31 $
+Version:   $Revision: 1.2.2.3 $
 Authors:   Nigel McFarlane
 
 ================================================================================
@@ -14,8 +14,8 @@ All rights reserved.
 #ifndef __vtkMEDPastValuesList_h
 #define __vtkMEDPastValuesList_h
 
-#include "vtkMAFConfigure.h"
-
+#include "vtkMEDConfigure.h"
+#include <ostream>
 
 
 /** 
@@ -25,7 +25,7 @@ It is a push-only stack with a maxiumum of n values.
 Values are pushed onto the top of the list.  
 Values which fall of the bottom of the list are lost 
 */
-class VTK_vtkMAF_EXPORT vtkMEDPastValuesList
+class VTK_vtkMED_EXPORT vtkMEDPastValuesList
 {
 public:
   /** construct class with max no. of past values */

@@ -4,7 +4,7 @@
   Module:    $RCSfile: mafClassicICPRegistration.cxx,v $
   Language:  C++
   Date:      $Date: 21-8-2003
-  Version:   $Revision: 1.1 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Stefania Paperini paperini@tecno.ior.it 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -66,7 +66,7 @@ POSSIBILITY OF SUCH DAMAGES.
 
 #include "mafICPUtility.h"
 
-	vtkCxxRevisionMacro(mafClassicICPRegistration, "$Revision: 1.1 $");
+	vtkCxxRevisionMacro(mafClassicICPRegistration, "$Revision: 1.1.2.1 $");
   vtkStandardNewMacro(mafClassicICPRegistration);
 
 /*//--------------------------------------------------------------------------
@@ -322,7 +322,7 @@ void mafClassicICPRegistration::InternalUpdate()
 	{
 		// simple testing file result
 			
-    std::ofstream risultati (this->ResultsFile.GetCStr(),std::ios::out); 
+    std::ofstream risultati (this->ResultsFile.c_str(),std::ios::out); 
 
 		risultati << "Rotation: " <<"\n" << FFReg_res.R << "\n";
 		risultati << "\n" << "Translation: " <<"\n" << FFReg_res.t << "\n";

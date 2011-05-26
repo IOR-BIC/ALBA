@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMEDErythrocyteSource.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-11-19 10:43:53 $ 
-  Version: $Revision: 1.1.2.2 $ 
+  Date: $Date: 2011-05-26 08:33:31 $ 
+  Version: $Revision: 1.1.2.3 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -15,6 +15,7 @@
 
 #pragma once
 
+#include "vtkMEDConfigure.h"
 #include "vtkPolyDataSource.h"
 
 /** This class generates polydata with model of erythrocyte (blood cell).
@@ -23,7 +24,7 @@ types of cells, if needed. Model is based on the paper:
 S. Mu?oz San Martín, J.L. Sebastián,M. Sancho and G. Álvarez:
 Modeling Human Erythrocyte Shape and Size Abnormalities
 http://arxiv.org/ftp/q-bio/papers/0507/0507024.pdf*/
-class VTK_GRAPHICS_EXPORT vtkMEDErythrocyteSource : public vtkPolyDataSource
+class VTK_vtkMED_EXPORT vtkMEDErythrocyteSource : public vtkPolyDataSource
 {
 public:  
   vtkTypeRevisionMacro(vtkMEDErythrocyteSource,vtkPolyDataSource);

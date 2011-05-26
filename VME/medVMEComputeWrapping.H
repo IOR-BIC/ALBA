@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEComputeWrapping.H,v $
 Language:  C++
-Date:      $Date: 2009-11-23 14:26:16 $
-Version:   $Revision: 1.1.2.16 $
+Date:      $Date: 2011-05-26 08:29:56 $
+Version:   $Revision: 1.1.2.17 $
 Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -30,6 +30,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafVME.h"
 #include "medVMEOutputComputeWrapping.h"
 #include "mafEvent.h"
@@ -56,7 +57,7 @@ class vtkCellArray;
 class mafGUIRollOut;
 /** medVMEComputeWrapping - 
 */
-class MAF_EXPORT medVMEComputeWrapping : public mafVME
+class MED_EXPORT medVMEComputeWrapping : public mafVME
 {
 
 

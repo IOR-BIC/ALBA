@@ -3,7 +3,7 @@
 Program:   Visualization Toolkit
 Module:    $RCSfile: vtkMEDRegionGrowingLocalGlobalThreshold.cxx,v $
 
-Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+Copyright (c) Matteo Giacomoni
 All rights reserved.
 See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
 
@@ -12,7 +12,6 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "medDefines.h"
 #include "vtkMEDRegionGrowingLocalGlobalThreshold.h"
 
 #include "vtkImageData.h"
@@ -31,7 +30,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #define APLHA 1.0
 
-vtkCxxRevisionMacro(vtkMEDRegionGrowingLocalGlobalThreshold, "$Revision: 1.1.2.3 $");
+vtkCxxRevisionMacro(vtkMEDRegionGrowingLocalGlobalThreshold, "$Revision: 1.1.2.4 $");
 vtkStandardNewMacro(vtkMEDRegionGrowingLocalGlobalThreshold);
 
 //----------------------------------------------------------------------------
@@ -100,7 +99,7 @@ void vtkMEDRegionGrowingLocalGlobalThreshold::ComputeIndexNearstPoints(int index
   if( x>dims[0] || y>dims[1] || z>dims[2] )
   {
     error = TRUE;
-    mafLogMessage("Error in the computing of the coordinates!");
+    // mafLogMessage("Error in the computing of the coordinates!");
     return;
   }
 
@@ -111,7 +110,7 @@ void vtkMEDRegionGrowingLocalGlobalThreshold::ComputeIndexNearstPoints(int index
   if( xBordered>dims[0] || yBordered>dims[1] || zBordered>dims[2] )
   {
     error = TRUE;
-    mafLogMessage("Error in the computing of the coordinates!");
+    // mafLogMessage("Error in the computing of the coordinates!");
     return;
   }
 

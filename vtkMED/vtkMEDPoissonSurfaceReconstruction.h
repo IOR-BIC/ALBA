@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDPoissonSurfaceReconstruction.h,v $
 Language:  C++
-Date:      $Date: 2011-03-01 11:05:33 $
-Version:   $Revision: 1.1.2.10 $
+Date:      $Date: 2011-05-26 08:33:31 $
+Version:   $Revision: 1.1.2.11 $
 Authors:   Fuli Wu
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -16,6 +16,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
+#include "vtkMEDConfigure.h"
 #include "vtkPolyData.h"
 #include "vtkCellArray.h"
 #include "vtkPointData.h"
@@ -37,7 +38,7 @@ class name: vtkMEDPoissonSurfaceReconstruction
 This class implement Poisson Surface Reconstruction method.
 A paper can be viewed here: research.microsoft.com/en-us/um/people/hoppe/poissonrecon.pdf
 */
-class VTK_GRAPHICS_EXPORT vtkMEDPoissonSurfaceReconstruction : public vtkDataSetToPolyDataFilter
+class VTK_vtkMED_EXPORT vtkMEDPoissonSurfaceReconstruction : public vtkDataSetToPolyDataFilter
 {
 public:
   /** create instance of the object */
@@ -752,7 +753,7 @@ public:
 class name: TriangulationEdge
 Edge created by triangulation
 */
-class TriangulationEdge
+class VTK_vtkMED_EXPORT TriangulationEdge
 {
 public:
   /** Constructor. */
@@ -765,7 +766,7 @@ public:
 class name: TriangulationTriangle
 Triangle created by triangulation
 */
-class TriangulationTriangle
+class VTK_vtkMED_EXPORT TriangulationTriangle
 {
 public:
   /** Constructor. */
@@ -1490,7 +1491,7 @@ Octrees are most often used to partition a three dimensional space by recursivel
 Octrees are the three-dimensional analog of quadtrees.
 */
 template<class NodeData,class Real=float>
-class OctNode
+class VTK_vtkMED_EXPORT OctNode
 {
 private:
 	static int UseAlloc;
@@ -1545,8 +1546,13 @@ private:
   /** return neighbor with the same edge*/
 	OctNode* __edgeNeighbor(const int& o,const int i[2],const int idx[2],const int& forceChildren);
 public:
-	static const int DepthShift,OffsetShift,OffsetShift1,OffsetShift2,OffsetShift3;
-	static const int DepthMask,OffsetMask;
+	static const int DepthShift;
+  static const int OffsetShift;
+  static const int OffsetShift1;
+  static const int OffsetShift2;
+  static const int OffsetShift3;
+	static const int DepthMask;
+  static const int OffsetMask;
 
 	static Allocator<OctNode> Allocator;
   /** return allocator */
@@ -1807,7 +1813,7 @@ public:
 	static long long CenterIndex(const TreeOctNode* node,const int& maxDepth);
 };
 /** class name: SortedTreeNodes */
-class SortedTreeNodes{
+class VTK_vtkMED_EXPORT SortedTreeNodes{
 public:
 	TreeOctNode** treeNodes;
 	int *nodeCount;
@@ -1822,7 +1828,7 @@ public:
 /** class name: TreeNodeData
     index, weight and values associated with every tree node
 */
-class TreeNodeData{
+class VTK_vtkMED_EXPORT TreeNodeData{
 public:
 	static int UseIndex;
 	union{

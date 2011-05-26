@@ -35,20 +35,23 @@
 #include "vtkPolyData.h"
 #include "vtkMath.h"
 #include "vtkPolygon.h"
-#include "vtkMAFConfigure.h"
+#include "vtkMEDConfigure.h"
 //#include "vtkSVTKWin32Header.h"
 
-class VTK_vtkMAF_EXPORT vtkMaskPolyDataFilter : public vtkDataSetToDataSetFilter
+class VTK_vtkMED_EXPORT vtkMaskPolyDataFilter : public vtkDataSetToDataSetFilter
 {
 public:
   
+  /** RTTI macro */
+  vtkTypeMacro(vtkMaskPolyDataFilter,vtkDataSetToDataSetFilter);
+
   const char *GetClassName() {return "vtkMaskPolyDataFilter";};
   void PrintSelf(ostream& os, vtkIndent indent);
 
   /**
   Construct with user-specified implicit Surface; initial value of 0.0; and
   generating Mask scalars turned off.*/
-  static vtkMaskPolyDataFilter *New() {return new vtkMaskPolyDataFilter;};
+  static vtkMaskPolyDataFilter *New();
 
   /**
   Set/Get a signed distance value */

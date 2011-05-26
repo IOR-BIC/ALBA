@@ -51,6 +51,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkXRayVolumeMapper_h
 #define __vtkXRayVolumeMapper_h
 
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
+#include "vtkMEDConfigure.h"
 #include "vtkVolumeMapper.h"
 #include "vtkImageData.h"
 #include "vtkCamera.h"
@@ -63,8 +67,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <GL/glu.h>
 #endif
 
-#include "vtkMAFConfigure.h"
-
 #define MaxNumberOfMipmapLevels 3
 #define MaxNumberOfRenderings   360
 /**
@@ -73,7 +75,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     It can enable LOD, corrects resolution, handles with colors and gamma correction.
     
 */
-class VTK_vtkMAF_EXPORT vtkXRayVolumeMapper : public vtkVolumeMapper {
+class VTK_vtkMED_EXPORT vtkXRayVolumeMapper : public vtkVolumeMapper {
   public:
     static vtkXRayVolumeMapper *New();
     vtkTypeRevisionMacro(vtkXRayVolumeMapper, vtkVolumeMapper);
@@ -86,32 +88,32 @@ class VTK_vtkMAF_EXPORT vtkXRayVolumeMapper : public vtkVolumeMapper {
     virtual void Render(vtkRenderer *ren, vtkVolume *vol);
 
     // reduce resolution to 9 bit
-    static bool GetReduceColorResolution() { return ReduceColorResolution; } 
-    static void SetReduceColorResolution(bool val) { ReduceColorResolution = val;}
-    static void ReduceColorResolutionOn() { ReduceColorResolution = true;}
-    static void ReduceColorResolutionOff() { ReduceColorResolution = false;}
+    static bool GetReduceColorResolution();// { return ReduceColorResolution; } 
+    static void SetReduceColorResolution(bool val);// { ReduceColorResolution = val;}
+    static void ReduceColorResolutionOn();// { ReduceColorResolution = true;}
+    static void ReduceColorResolutionOff();// { ReduceColorResolution = false;}
     
-    static void GetExposureCorrection(double correction[2]) { correction[0] = ExposureCorrection[0]; correction[1] = ExposureCorrection[1];}
-    static const double *GetExposureCorrection() { return ExposureCorrection; }
-    static bool SetExposureCorrection(double *val) { if (val[1] <= 1.f && val[1] >= -1.f && val[0] <= 1.f && val[0] >= -1.f) { ExposureCorrection[0] = val[0]; ExposureCorrection[1] = val[1]; return true;} return false; }
+    static void GetExposureCorrection(double correction[2]);// { correction[0] = ExposureCorrection[0]; correction[1] = ExposureCorrection[1];}
+    static const double *GetExposureCorrection();// { return ExposureCorrection; }
+    static bool SetExposureCorrection(double *val);// { if (val[1] <= 1.f && val[1] >= -1.f && val[0] <= 1.f && val[0] >= -1.f) { ExposureCorrection[0] = val[0]; ExposureCorrection[1] = val[1]; return true;} return false; }
     
-    static double GetGamma() { return Gamma; }
-    static bool SetGamma(double val) { if (val > 3.f && val < 0.1f) return false; Gamma = val; return true; }
+    static double GetGamma();// { return Gamma; }
+    static bool SetGamma(double val);// { if (val > 3.f && val < 0.1f) return false; Gamma = val; return true; }
 
-    static bool GetPerspectiveCorrection() { return PerspectiveCorrection; } 
-    static void SetPerspectiveCorrection(bool val) { PerspectiveCorrection = val;}
-    static void PerspectiveCorrectionOn() { PerspectiveCorrection = true;}
-    static void PerspectiveCorrectionOff() { PerspectiveCorrection = false;}
+    static bool GetPerspectiveCorrection();// { return PerspectiveCorrection; } 
+    static void SetPerspectiveCorrection(bool val);// { PerspectiveCorrection = val;}
+    static void PerspectiveCorrectionOn();// { PerspectiveCorrection = true;}
+    static void PerspectiveCorrectionOff();// { PerspectiveCorrection = false;}
 
-    static void GetColor(double color[3]) { color[0] = Color[0]; color[1] = Color[1]; color[2] = Color[2]; }
-    static const float *GetColor() { return Color; }
-    static void SetColor(double *val) { Color[0] = val[0]; Color[1] = val[1]; Color[2] = val[2];/* no Modified() */ }
-    static void SetColor(double r, double g, double b) { Color[0] = r; Color[1] = g; Color[2] = b;/* no Modified() */ }
+    static void GetColor(double color[3]);// { color[0] = Color[0]; color[1] = Color[1]; color[2] = Color[2]; }
+    static const float *GetColor();// { return Color; }
+    static void SetColor(double *val);// { Color[0] = val[0]; Color[1] = val[1]; Color[2] = val[2];/* no Modified() */ }
+    static void SetColor(double r, double g, double b);// { Color[0] = r; Color[1] = g; Color[2] = b;/* no Modified() */ }
 
-    static bool GetEnableAutoLOD() { return EnableAutoLOD; } 
-    static void SetEnableAutoLOD(bool val) { EnableAutoLOD = val;}
-    static void EnableAutoLODOn() { SetEnableAutoLOD(true);}
-    static void EnableAutoLODOff() { SetEnableAutoLOD(false);}
+    static bool GetEnableAutoLOD();// { return EnableAutoLOD; } 
+    static void SetEnableAutoLOD(bool val);// { EnableAutoLOD = val;}
+    static void EnableAutoLODOn();// { SetEnableAutoLOD(true);}
+    static void EnableAutoLODOff();// { SetEnableAutoLOD(false);}
 
     vtkGetMacro( AllocatedTextureMemory, int );    
     vtkGetMacro( PercentageOfResidentTextures, int );
@@ -148,15 +150,15 @@ class VTK_vtkMAF_EXPORT vtkXRayVolumeMapper : public vtkVolumeMapper {
     void operator=(const vtkXRayVolumeMapper&);  // Not implemented.
 
     // parameters
-    static bool  ReduceColorResolution;
+    // static bool  ReduceColorResolution;
     static bool  AutoExposure;
-    static bool  EnableAutoLOD;
-    static bool  PerspectiveCorrection;
-    static double ExposureCorrection[2];
-    static double Gamma;
+    // static bool  EnableAutoLOD;
+    // static bool  PerspectiveCorrection;
+    // static double ExposureCorrection[2];
+    // static double Gamma;
     static double AttenuationCoefficient;
     static double ScalingCoefficient;
-    static float Color[4];
+    // static float Color[4];
 
     // internal data
     enum { majorAxisX, majorAxisY, majorAxisZ };

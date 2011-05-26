@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmiInfoImageTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-11-17 16:04:14 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-05-26 08:33:56 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -63,7 +63,7 @@ void mmiInfoImageTest::TestOnEvent()
   mafEventInteraction dummyMouse2DMoveEvent;
   dummyMouse2DMoveEvent.SetChannel(MCH_INPUT);
   dummyMouse2DMoveEvent.SetSender(dummyDevice);
-  dummyMouse2DMoveEvent.SetId(mafDeviceButtonsPadMouse::MOUSE_2D_MOVE);
+  dummyMouse2DMoveEvent.SetId(mafDeviceButtonsPadMouse::GetMouse2DMoveId());
 
   info->OnEvent(&dummyMouse2DMoveEvent);
   dummyDevice->Delete();

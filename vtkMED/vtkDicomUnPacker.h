@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    vtkDicomUnPacker.h
   Language:  C++
-  Date:      $Date: 2009-11-19 11:16:49 $
-  Version:   $Revision: 1.3.4.3 $
+  Date:      $Date: 2011-05-26 08:33:31 $
+  Version:   $Revision: 1.3.4.4 $
   Authors:   Marco Petrone m.petrone@cineca.it, Paolo Quadrani p.quadrani@cineca.it
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -59,7 +59,7 @@ POSSIBILITY OF SUCH DAMAGES.
 #include "vtkImageUnPacker.h"
 #include "vtkPackedImage.h"
 
-#include "vtkMAFConfigure.h"
+#include "vtkMEDConfigure.h"
 
 #include <string>
 
@@ -82,7 +82,7 @@ typedef unsigned char     uint8;
 
 typedef long int          int32;
 
-class VTK_vtkMAF_EXPORT vtkDicomUnPacker : public vtkImageUnPacker
+class VTK_vtkMED_EXPORT vtkDicomUnPacker : public vtkImageUnPacker
 {
 public:
   /************************************************

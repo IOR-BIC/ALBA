@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEPolylineGraph.h,v $
 Language:  C++
-Date:      $Date: 2008-02-08 09:59:07 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2011-05-26 08:30:59 $
+Version:   $Revision: 1.5.2.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -44,6 +44,7 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafVMEGeneric.h"
 
 //----------------------------------------------------------------------------
@@ -51,7 +52,7 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 class vtkPolyData;
 
-class MAF_EXPORT medVMEPolylineGraph : public mafVMEGeneric
+class MED_EXPORT medVMEPolylineGraph : public mafVMEGeneric
 {
 public:
 	mafTypeMacro(medVMEPolylineGraph, mafVMEGeneric);

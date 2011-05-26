@@ -2,17 +2,14 @@
 Program: Multimod Application Framework RELOADED 
 Module: $RCSfile: vtkMAFVolumeRayCastMapper.cxx,v $ 
 Language: C++ 
-Date: $Date: 2009-10-21 11:54:14 $ 
-Version: $Revision: 1.1.2.2 $ 
+Date: $Date: 2011-05-26 08:33:31 $ 
+Version: $Revision: 1.1.2.3 $ 
 Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
 ========================================================================== 
 Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
 See the COPYINGS file for license details 
 =========================================================================
 */
-
-
-//#include "mafDefines.h"
 
 #include "vtkMAFVolumeRayCastMapper.h"
 #include "vtkObjectFactory.h"
@@ -28,7 +25,7 @@ See the COPYINGS file for license details
 #include "vtkVolumeProperty.h"
 #include "gl/gl.h"
 
-vtkCxxRevisionMacro(vtkMAFVolumeRayCastMapper, "$Revision: 1.1.2.2 $");
+vtkCxxRevisionMacro(vtkMAFVolumeRayCastMapper, "$Revision: 1.1.2.3 $");
 vtkStandardNewMacro(vtkMAFVolumeRayCastMapper);
 
 #include "mafMemDbg.h"

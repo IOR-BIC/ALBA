@@ -20,14 +20,8 @@ SET(vtkMED_SRCS
   vtkWeightedLandmarkTransform.h
   vtkTriangleQualityRatio.cxx
   vtkTriangleQualityRatio.h
-  vtkMaskPolyDataFilter.cxx
-  vtkMaskPolyDataFilter.h
-  vtkHoleConnectivity.cxx
-  vtkHoleConnectivity.h
   vtkMEDExtrudeToCircle.cxx
   vtkMEDExtrudeToCircle.h
-  vtkMEDPastValuesList.cpp
-  vtkMEDPastValuesList.h
   vtkMEDPolyDataMirror.cxx
   vtkMEDPolyDataMirror.h
   vtkMEDImageUnsharpFilter.cxx
@@ -42,10 +36,31 @@ SET(vtkMED_SRCS
   vtkMEDPoissonSurfaceReconstruction.h
   vtkMAFCellLocator.cxx
   vtkMAFCellLocator.h
-  vtkBoundingBox.cxx
-  vtkBoundingBox.h
   vtkBox.cxx
   vtkBox.h
+  vtkMaskPolyDataFilter.cxx
+  vtkMaskPolyDataFilter.h
+  vtkHoleConnectivity.cxx
+  vtkHoleConnectivity.h
+  
+  ############# VolumeLarge Files - TO BE COMMITTED DOWN ########
+  ../BES_Beta/vtkMAF/vtkMAFDataArrayDescriptor.cxx
+  ../BES_Beta/vtkMAF/vtkMAFDataArrayDescriptor.h
+  ../BES_Beta/vtkMAF/vtkMAFFileDataProvider.cxx
+  ../BES_Beta/vtkMAF/vtkMAFFileDataProvider.h
+  ../BES_Beta/vtkMAF/vtkMAFLargeImageData.cxx
+  ../BES_Beta/vtkMAF/vtkMAFLargeImageData.h
+  ../BES_Beta/vtkMAF/vtkMAFLargeImageReader.cxx
+  ../BES_Beta/vtkMAF/vtkMAFLargeImageReader.h
+  ../BES_Beta/vtkMAF/vtkMAFLargeImageSource.cxx
+  ../BES_Beta/vtkMAF/vtkMAFLargeImageSource.h
+  ../BES_Beta/vtkMAF/vtkMAFFile.cxx
+  ../BES_Beta/vtkMAF/vtkMAFFile.h	
+  ../BES_Beta/vtkMAF/vtkMAFDataArrayLayout.cpp
+  ../BES_Beta/vtkMAF/vtkMAFDataArrayLayout.h
+  ../BES_Beta/vtkMAF/vtkMAFMultiFileDataProvider.cpp
+  ../BES_Beta/vtkMAF/vtkMAFMultiFileDataProvider.h
+  ###############################################################
   
   ########## Should be committed down ###########
   vtkMAFVolumeRayCastMapper.cxx
@@ -67,31 +82,7 @@ SET(vtkMED_SRCS
   vtkMEDPolyDataDeformation_M2.h  
   ###############################################
     
-  ############# VolumeLarge Files - TO BE COMMITTED DOWN ########
-  vtkMAFIdType64.h
-  ../BES_Beta/vtkMAF/vtkMAFDataArrayDescriptor.cxx
-  ../BES_Beta/vtkMAF/vtkMAFDataArrayDescriptor.h	
-  ../BES_Beta/vtkMAF/vtkMAFFileDataProvider.cxx
-  ../BES_Beta/vtkMAF/vtkMAFFileDataProvider.h  
-  ../BES_Beta/vtkMAF/vtkMAFLargeDataProvider.cxx
-  ../BES_Beta/vtkMAF/vtkMAFLargeDataProvider.h
-  ../BES_Beta/vtkMAF/vtkMAFLargeDataSet.cxx
-  ../BES_Beta/vtkMAF/vtkMAFLargeDataSet.h
-  ../BES_Beta/vtkMAF/vtkMAFLargeDataSetCallback.cxx
-  ../BES_Beta/vtkMAF/vtkMAFLargeDataSetCallback.h
-  ../BES_Beta/vtkMAF/vtkMAFLargeImageData.cxx
-  ../BES_Beta/vtkMAF/vtkMAFLargeImageData.h
-  ../BES_Beta/vtkMAF/vtkMAFLargeImageReader.cxx
-  ../BES_Beta/vtkMAF/vtkMAFLargeImageReader.h
-  ../BES_Beta/vtkMAF/vtkMAFLargeImageSource.cxx
-  ../BES_Beta/vtkMAF/vtkMAFLargeImageSource.h
-  ../BES_Beta/vtkMAF/vtkMAFFile.cxx
-  ../BES_Beta/vtkMAF/vtkMAFFile.h	
-  ../BES_Beta/vtkMAF/vtkMAFDataArrayLayout.cpp
-  ../BES_Beta/vtkMAF/vtkMAFDataArrayLayout.h
-  ../BES_Beta/vtkMAF/vtkMAFMultiFileDataProvider.cpp
-  ../BES_Beta/vtkMAF/vtkMAFMultiFileDataProvider.h
-  ###############################################################
+
   
   vtkMEDErythrocyteSource.cpp
   vtkMEDErythrocyteSource.h  
@@ -105,11 +96,32 @@ SET(vtkMED_SRCS  ${vtkMED_SRCS}
 )
 ENDIF (MAF_USE_ITK)
 
+SET(vtkMED_SRCS_INSTANTIATOR
+  ${vtkMED_SRCS}
+)
+
+SET(vtkMED_SRCS
+  ${vtkMED_SRCS}
+  vtkBoundingBox.cxx
+  vtkBoundingBox.h
+  vtkMEDPastValuesList.cpp
+  vtkMEDPastValuesList.h
+  
+  ############# VolumeLarge Files - TO BE COMMITTED DOWN ########
+  vtkMAFIdType64.h
+  ../BES_Beta/vtkMAF/vtkMAFLargeDataProvider.cxx
+  ../BES_Beta/vtkMAF/vtkMAFLargeDataProvider.h
+  ../BES_Beta/vtkMAF/vtkMAFLargeDataSet.cxx
+  ../BES_Beta/vtkMAF/vtkMAFLargeDataSet.h
+  ###############################################################
+)
+
 # List the kits from VTK that are needed by this project.
 SET(vtkMED_LIBS
   vtkCommon
   vtkRendering
   vtkFiltering
+  vtkHybrid
 )
 
 #-----------------------------------------------------------------------------
@@ -129,16 +141,30 @@ ENDIF (NOT VTK_FOUND)
 
 # Give user option of building shared or static libraries.  Default to
 # the choice made for VTK.
-OPTION(BUILD_SHARED_LIBS "Build with shared libraries." 
-       ${VTK_BUILD_SHARED_LIBS})
+#OPTION(BUILD_SHARED_LIBS "Build with shared libraries." ${VTK_BUILD_SHARED_LIBS})
 
 # Set VTKLOCAL_BUILD_SHARED_LIBS to 1 or 0 for use in creating the
 # configuration header.
-IF(BUILD_SHARED_LIBS)
+# IF(BUILD_SHARED_LIBS)
+#   SET(VTKLOCAL_BUILD_SHARED_LIBS_CONFIG 1)
+# ELSE(BUILD_SHARED_LIBS)
+#   SET(VTKLOCAL_BUILD_SHARED_LIBS_CONFIG 0)
+# ENDIF(BUILD_SHARED_LIBS)
+
+IF(MED_BUILD_MEDDLL)
+  IF(WIN32)
+  SET(vtkMED_LIBS
+    ${vtkMED_LIBS}
+    GPUAPI
+    )
+  ENDIF(WIN32)
+  SET(BUILD_SHARED_LIBS 1)
   SET(VTKLOCAL_BUILD_SHARED_LIBS_CONFIG 1)
-ELSE(BUILD_SHARED_LIBS)
+  ADD_DEFINITIONS(-DVTK_vtkMED_EXPORTS)
+ELSE(MED_BUILD_MEDDLL)
+  SET(BUILD_SHARED_LIBS 0)
   SET(VTKLOCAL_BUILD_SHARED_LIBS_CONFIG 0)
-ENDIF(BUILD_SHARED_LIBS)
+ENDIF(MED_BUILD_MEDDLL)
 
 IF (NOT LIBRARY_OUTPUT_PATH)
   SET (LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin CACHE PATH
@@ -174,7 +200,7 @@ IF(VTK_FOUND)
   # Create the instantiator for these classes.
   SET(VTK_USE_INSTANTIATOR_NEW 1)
   VTK_MAKE_INSTANTIATOR2("${PROJECT_NAME}Instantiator" vtkMEDInstantiator_SRCS
-                         ${vtkMED_SRCS}
+                         ${vtkMED_SRCS_INSTANTIATOR}
                          EXPORT_MACRO "VTK_${PROJECT_NAME}_EXPORT"
                          HEADER_LOCATION ${PROJECT_BINARY_DIR}
                          INCLUDES "${PROJECT_NAME}Configure.h")

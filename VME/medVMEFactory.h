@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEFactory.h,v $
   Language:  C++
-  Date:      $Date: 2009-11-17 11:20:13 $
-  Version:   $Revision: 1.3.2.1 $
+  Date:      $Date: 2011-05-26 08:29:56 $
+  Version:   $Revision: 1.3.2.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -14,7 +14,8 @@
 //----------------------------------------------------------------------------
 // includes :
 //----------------------------------------------------------------------------
-#include "mafVMEFactory.h"  
+#include "medDefines.h"
+#include "mafVMEFactory.h"
 #include "mafVME.h"
 
 /**
@@ -24,7 +25,7 @@
   a mafNodeFactory this last does not need to be crated: you should create one or the other but
   not both since the Instance would be overwritten and thus the Plug*<> methods would always
   plug inside one of the two. */
-class MAF_EXPORT medVMEFactory : public mafVMEFactory
+class MED_EXPORT medVMEFactory : public mafVMEFactory
 {
 public: 
   /** RTTI Macro */
@@ -33,7 +34,7 @@ public:
   virtual const char* GetDescription() const;
 
   /** retrieve the singleton of the factory */
-  static medVMEFactory *GetInstance() {if (!m_Instance) Initialize(); return m_Instance;}
+  static medVMEFactory *GetInstance();// {if (!m_Instance) Initialize(); return m_Instance;}
 
   /** Initialize the factory creating and registering a new instance */
   static int Initialize();
@@ -47,7 +48,9 @@ protected:
   /** destructor */
   ~medVMEFactory() { }
 
-	static medVMEFactory *m_Instance;
+	// static medVMEFactory *m_Instance;
+
+  static bool m_Initialized;
   
 private:
   /** Copy Constructor , not implemented */

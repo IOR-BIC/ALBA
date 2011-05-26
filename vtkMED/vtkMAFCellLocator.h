@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMAFCellLocator.h,v $ 
   Language: C++ 
-  Date: $Date: 2011-02-16 21:15:02 $ 
-  Version: $Revision: 1.1.2.1 $ 
+  Date: $Date: 2011-05-26 08:33:31 $ 
+  Version: $Revision: 1.1.2.2 $ 
   Authors: Simone Brazzale
   ========================================================================== 
   Copyright (c) 2008 CINECA
@@ -16,6 +16,7 @@
 #ifndef vtkMAFCellLocator_h__
 #define vtkMAFCellLocator_h__
 
+#include "vtkMEDConfigure.h"
 #include "vtkCellLocator.h"
 #include "vtkMAFConfigure.h"
 
@@ -24,7 +25,7 @@
     Spatial search object to quickly locate cells in 3D.
 */
 
-class vtkMAFCellLocator : public vtkCellLocator
+class VTK_vtkMED_EXPORT vtkMAFCellLocator : public vtkCellLocator
 {
 
 public:
