@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2011-05-26 15:53:26 $
-# Version:   $Revision: 1.44.2.8 $
+# Date:      $Date: 2011-05-26 16:49:57 $
+# Version:   $Revision: 1.44.2.9 $
 #
 # Description:
 # CMake Project file for the MAF.
@@ -131,9 +131,7 @@ IF (MAF_CAN_BUILD)
               "${MAF_SOURCE_DIR}/Core" "${MAF_SOURCE_DIR}/Gui" "${MAF_SOURCE_DIR}/IO" "${MAF_SOURCE_DIR}/Operations" "${MAF_SOURCE_DIR}/VME" 
               "${MAF_SOURCE_DIR}/VME/DataPipes" "${MAF_SOURCE_DIR}/vtkMAF" "${MAF_BINARY_DIR}/vtkMAF" "${MAF_SOURCE_DIR}/GPUAPI" 
               "${MAF_SOURCE_DIR}/GPUAPI/GLEW" "${MAF_SOURCE_DIR}/GPUAPI/FBO")
-  IF(MAF_BUILD_MAFDLL)
-    SET(INCLUDE_DIRS ${INCLUDE_DIRS} "${MAF_SOURCE_DIR}/mafDLL")
-  ENDIF(MAF_BUILD_MAFDLL)
+  SET(INCLUDE_DIRS ${INCLUDE_DIRS} "${MAF_SOURCE_DIR}/mafDLL")
   
   INCLUDE_DIRECTORIES(${INCLUDE_DIRS})
 
