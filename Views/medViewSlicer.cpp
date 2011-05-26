@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewSlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-11-22 11:04:58 $
-  Version:   $Revision: 1.14.2.4 $
+  Date:      $Date: 2011-05-26 08:22:31 $
+  Version:   $Revision: 1.14.2.5 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -19,6 +19,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
+#include "mafGUI.h"
 #include "medViewSlicer.h"
 #include "mafViewSlice.h"
 #include "mafVme.h"
@@ -50,6 +51,7 @@
 #include "mafAttribute.h"
 #include "mafGUILutSlider.h"
 #include "mafGUILutSwatch.h"
+#include "mafAttachCamera.h"
 
 #include "vtkTransform.h"
 #include "vtkLookupTable.h"

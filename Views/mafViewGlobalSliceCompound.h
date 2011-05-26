@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSliceCompound.h,v $
   Language:  C++
-  Date:      $Date: 2010-11-22 11:04:58 $
-  Version:   $Revision: 1.3.2.5 $
+  Date:      $Date: 2011-05-26 08:19:56 $
+  Version:   $Revision: 1.3.2.6 $
   Authors:   Eleonora Mambrini
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,6 +16,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "medViewCompoundWindowing.h"
 
 //----------------------------------------------------------------------------
@@ -32,7 +33,7 @@ class mafGUIFloatSlider;
   Class Name: mafViewGlobalSliceCompound.
   Class that contain mafViewGlobalSlice in order to add gui view widget like windowing buttons.
 */
-class mafViewGlobalSliceCompound: public medViewCompoundWindowing
+class MED_EXPORT mafViewGlobalSliceCompound: public medViewCompoundWindowing
 {
 public:
   /** constructor .*/

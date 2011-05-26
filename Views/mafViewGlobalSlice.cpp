@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-11-22 11:04:58 $
-  Version:   $Revision: 1.29.2.11 $
+  Date:      $Date: 2011-05-26 08:19:56 $
+  Version:   $Revision: 1.29.2.12 $
   Authors:   Matteo Giacomoni, Simone Brazzale
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,6 +29,7 @@
 #include "mafPipeSurfaceSlice.h"
 #include "mafPipeMeshSlice.h"
 #include "mafAttachCamera.h"
+#include "mafGUI.h"
 #include "mafGUIFloatSlider.h"
 
 #include "mafTransform.h"

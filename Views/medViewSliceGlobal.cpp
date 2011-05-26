@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewSliceGlobal.cpp,v $
 Language:  C++
-Date:      $Date: 2010-11-22 11:04:58 $
-Version:   $Revision: 1.1.2.6 $
+Date:      $Date: 2011-05-26 08:22:31 $
+Version:   $Revision: 1.1.2.7 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2002/2004
@@ -20,6 +20,7 @@ const bool DEBUG_MODE = false;
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
+#include "mafGUI.h"
 #include "mafIndent.h"
 #include "medViewSliceGlobal.h"
 #include "mafPipeVolumeSlice.h"

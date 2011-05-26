@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpVolumeResample.h,v $
   Language:  C++
-  Date:      $Date: 2010-03-05 12:25:52 $
-  Version:   $Revision: 1.3.2.4 $
+  Date:      $Date: 2011-05-26 08:16:40 $
+  Version:   $Revision: 1.3.2.5 $
   Authors:   Marco Petrone
 ==========================================================================
 Copyright (c) 2002/2004
@@ -17,6 +17,7 @@ using namespace std;
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -34,7 +35,7 @@ class mafGizmoROI;
 class mafVMESurface;
 
 //----------------------------------------------------------------------------
-class medOpVolumeResample: public mafOp
+class MED_EXPORT medOpVolumeResample: public mafOp
 {
 public:
              

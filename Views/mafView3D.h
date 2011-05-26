@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView3D.h,v $
   Language:  C++
-  Date:      $Date: 2010-11-22 11:04:57 $
-  Version:   $Revision: 1.10.2.1 $
+  Date:      $Date: 2011-05-26 08:19:55 $
+  Version:   $Revision: 1.10.2.2 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -15,6 +15,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafViewVTK.h"
 
 //----------------------------------------------------------------------------
@@ -25,6 +26,7 @@ class mafSceneNode;
 class mafGUI;
 class mafVMEVolumeGray;
 class mafVMESurface;
+class mafGUIFloatSlider;
 
 //----------------------------------------------------------------------------
 // mafViewRX :
@@ -34,7 +36,7 @@ mafViewRX is a View that visualize volume as projection along x or y axis and
 initialize the visual pipe according to the camera position that is passed through constructor
 \sa mafViewVTK
 */
-class mafView3D: public mafViewVTK
+class MED_EXPORT mafView3D: public mafViewVTK
 {
 public:
   mafView3D(wxString label = "3D", int camera_position = CAMERA_PERSPECTIVE, bool show_axes = false, bool show_grid = false, bool show_ruler = false, int stereo = 0);

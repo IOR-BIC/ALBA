@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpSplitSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 12:30:11 $
-  Version:   $Revision: 1.4.2.1 $
+  Date:      $Date: 2011-05-26 08:16:40 $
+  Version:   $Revision: 1.4.2.2 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,7 +25,7 @@
 #include "mafDecl.h"
 #include "mafEvent.h"
 #include "mafGUI.h"
-
+#include "mafRefSys.h"
 #include "mmaMaterial.h"
 #include "mafInteractorCompositorMouse.h"
 #include "mafInteractorGenericMouse.h"

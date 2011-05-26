@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCT.h,v $
 Language:  C++
-Date:      $Date: 2010-11-22 11:04:58 $
-Version:   $Revision: 1.2.2.1 $
+Date:      $Date: 2011-05-26 08:19:56 $
+Version:   $Revision: 1.2.2.2 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -16,6 +16,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafViewCompound.h"
 
 //----------------------------------------------------------------------------
@@ -30,7 +31,7 @@ class mafViewVTK;
 //----------------------------------------------------------------------------
 /**
 This view features two Rx views and one compound view made of six CT slices.*/
-class mafViewCT : public mafViewCompound
+class MED_EXPORT mafViewCT : public mafViewCompound
 {
 public:
 	mafViewCT(wxString label = "View CT");

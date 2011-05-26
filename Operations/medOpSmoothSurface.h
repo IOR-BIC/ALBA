@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSmoothSurface.h,v $
 Language:  C++
-Date:      $Date: 2008-03-25 13:16:33 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2011-05-26 08:16:40 $
+Version:   $Revision: 1.3.2.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -42,6 +42,10 @@ MafMedical is partially based on OpenMAF.
 #ifndef __medOpSmoothSurface_H__
 #define __medOpSmoothSurface_H__
 
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -54,7 +58,7 @@ class mafEvent;
 // medOpSmoothSurface :
 //----------------------------------------------------------------------------
 /** */
-class medOpSmoothSurface: public mafOp
+class MED_EXPORT medOpSmoothSurface: public mafOp
 {
 public:
 	medOpSmoothSurface(const wxString &label = "FilterSurface");

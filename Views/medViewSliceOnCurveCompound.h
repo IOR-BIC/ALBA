@@ -2,8 +2,8 @@
 Program: Multimod Application Framework RELOADED 
 Module: $RCSfile: medViewSliceOnCurveCompound.h,v $ 
 Language: C++ 
-Date: $Date: 2010-11-22 11:04:58 $ 
-Version: $Revision: 1.1.2.3 $ 
+Date: $Date: 2011-05-26 08:22:31 $ 
+Version: $Revision: 1.1.2.4 $ 
 Authors: Eleonora Mambrini
 ========================================================================== 
 Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -20,6 +20,7 @@ See the COPYINGS file for license details
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "medViewCompoundWindowing.h"
 #include "mafSceneNode.h"
 #include "vtkPoints.h"
@@ -43,7 +44,7 @@ class vtkTextMapper;
 //----------------------------------------------------------------------------
 /** 
 This compound view is made of four child views used to analyze different orthogonal slices of the volume*/
-class medViewSliceOnCurveCompound: public medViewCompoundWindowing
+class MED_EXPORT medViewSliceOnCurveCompound: public medViewCompoundWindowing
 {
 public:
 

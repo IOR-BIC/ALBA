@@ -2,8 +2,8 @@
 Program:   @neufuse
 Module:    $RCSfile: medOpSegmentationRegionGrowingConnectedThreshold.h,v $
 Language:  C++
-Date:      $Date: 2009-12-17 12:30:11 $
-Version:   $Revision: 1.1.2.5 $
+Date:      $Date: 2011-05-26 08:16:40 $
+Version:   $Revision: 1.1.2.6 $
 Authors:   Matteo Giacomoni, Alessandro Chiarini
 ==========================================================================
 Copyright (c) 2008
@@ -16,6 +16,7 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -33,7 +34,7 @@ class vtkSphereSource;
 // medOpSegmentationRegionGrowingConnectedThreshold :
 //----------------------------------------------------------------------------
 /** */
-class medOpSegmentationRegionGrowingConnectedThreshold: public mafOp
+class MED_EXPORT medOpSegmentationRegionGrowingConnectedThreshold: public mafOp
 {
 public:
   medOpSegmentationRegionGrowingConnectedThreshold(wxString label = "Connected Threshold");

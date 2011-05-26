@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewCompoundWindowing.h,v $
   Language:  C++
-  Date:      $Date: 2010-11-22 11:04:58 $
-  Version:   $Revision: 1.1.2.5 $
+  Date:      $Date: 2011-05-26 08:22:31 $
+  Version:   $Revision: 1.1.2.6 $
   Authors:   Eleonora Mambrini
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,6 +16,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafViewCompound.h"
 
 //----------------------------------------------------------------------------
@@ -35,7 +36,7 @@ class vtkWindowLevelLookupTable;
   Class Name: medViewCompoundWindowing.
   Abstract class managing gui view widget like windowing buttons.
 */
-class medViewCompoundWindowing: public mafViewCompound
+class MED_EXPORT medViewCompoundWindowing: public mafViewCompound
 {
 public:
   /** constructor */

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML3.h,v $
 Language:  C++
-Date:      $Date: 2010-11-10 14:53:23 $
-Version:   $Revision: 1.1.2.15 $
+Date:      $Date: 2011-05-26 08:14:27 $
+Version:   $Revision: 1.1.2.16 $
 Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -13,6 +13,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #ifndef __medOpMML3_H__
 #define __medOpMML3_H__
 
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafOp.h"
 #include "mafDefines.h"
 
@@ -92,7 +96,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // vtkPlane/vtkCutter requires an inverse transform.
 //
 //------------------------------------------------------------------------------
-class medOpMML3: public mafOp
+class MED_EXPORT medOpMML3: public mafOp
 {
 public:
   medOpMML3(const wxString &label); ///< constructor

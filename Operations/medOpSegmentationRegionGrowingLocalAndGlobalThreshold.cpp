@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSegmentationRegionGrowingLocalAndGlobalThreshold.cpp,v $
 Language:  C++
-Date:      $Date: 2010-06-07 07:56:18 $
-Version:   $Revision: 1.1.2.16 $
+Date:      $Date: 2011-05-26 08:16:40 $
+Version:   $Revision: 1.1.2.17 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2009
@@ -693,7 +693,7 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::OnEvent(mafEventBase
 {
   if (mafEventInteraction *ei = mafEventInteraction::SafeDownCast(maf_event))
   {
-    if (ei->GetId() == mafDeviceButtonsPad::BUTTON_DOWN && ei->GetButton() == MAF_LEFT_BUTTON && ei->GetModifier(MAF_CTRL_KEY))
+    if (ei->GetId() == mafDeviceButtonsPad::GetButtonDownId() && ei->GetButton() == MAF_LEFT_BUTTON && ei->GetModifier(MAF_CTRL_KEY))
     {
       //         if(m_Histogram->GetInputData() == NULL) return;
       double pos[2];

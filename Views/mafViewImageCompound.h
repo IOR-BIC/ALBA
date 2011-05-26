@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewImageCompound.h,v $
   Language:  C++
-  Date:      $Date: 2010-11-22 11:04:58 $
-  Version:   $Revision: 1.2.2.2 $
+  Date:      $Date: 2011-05-26 08:22:31 $
+  Version:   $Revision: 1.2.2.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,6 +16,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafViewCompound.h"
 
 //----------------------------------------------------------------------------
@@ -35,7 +36,7 @@ class vtkWindowLevelLookupTable;
   Class Name: mafViewImageCompound.
   Class that contain mafViewImage in order to add gui view widget like windowing buttons.
 */
-class mafViewImageCompound: public mafViewCompound
+class MED_EXPORT mafViewImageCompound: public mafViewCompound
 {
 public:
   /** constructor. */

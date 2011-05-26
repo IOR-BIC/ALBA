@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.h,v $
   Language:  C++
-  Date:      $Date: 2010-11-22 11:04:58 $
-  Version:   $Revision: 1.23.2.4 $
+  Date:      $Date: 2011-05-26 08:22:31 $
+  Version:   $Revision: 1.23.2.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,6 +16,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafViewCompound.h"
 
 //----------------------------------------------------------------------------
@@ -38,7 +39,7 @@ This compound view is made of four child views used to analyze different orthogo
 slices of the volume. This is an experimental component with rotated volumes interaction
 and visualization enabled.
 */
-class mafViewOrthoSlice: public mafViewCompound
+class MED_EXPORT mafViewOrthoSlice: public mafViewCompound
 {
 public:
   /** constructor */

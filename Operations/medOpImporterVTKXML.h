@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterVTKXML.h,v $
 Language:  C++
-Date:      $Date: 2010-12-23 11:31:50 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2011-05-26 08:14:27 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -45,6 +45,7 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -64,7 +65,7 @@ class vtkCallbackCommand;
 /**
 class name: medOpImporterVTKXMLXML
 Operation to importer VTK XML format (.vtp extension)*/
-class medOpImporterVTKXML: public mafOp 
+class MED_EXPORT medOpImporterVTKXML: public mafOp 
 {
 public:
   /** constructor */

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpTriangulateSurface.h,v $
 Language:  C++
-Date:      $Date: 2007-12-17 19:07:40 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2011-05-26 08:16:40 $
+Version:   $Revision: 1.2.2.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -42,6 +42,10 @@ MafMedical is partially based on OpenMAF.
 #ifndef __medOpTriangulateSurface_H__
 #define __medOpTriangulateSurface_H__
 
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -54,7 +58,7 @@ class mafEvent;
 // medOpSmoothSurface :
 //----------------------------------------------------------------------------
 /** */
-class medOpTriangulateSurface: public mafOp
+class MED_EXPORT medOpTriangulateSurface: public mafOp
 {
 public:
 	medOpTriangulateSurface(const wxString &label = "FilterSurface");

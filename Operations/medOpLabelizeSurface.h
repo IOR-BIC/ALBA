@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpLabelizeSurface.h,v $
 Language:  C++
-Date:      $Date: 2009-12-17 12:30:11 $
-Version:   $Revision: 1.6.2.1 $
+Date:      $Date: 2011-05-26 08:14:27 $
+Version:   $Revision: 1.6.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -44,6 +44,7 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -70,7 +71,7 @@ class vtkLookupTable;
 // medOpLabelizeSurface :
 //----------------------------------------------------------------------------
 /** */
-class medOpLabelizeSurface: public mafOp
+class MED_EXPORT medOpLabelizeSurface: public mafOp
 {
 public:
 	medOpLabelizeSurface(const wxString &label = "ClipSurface");

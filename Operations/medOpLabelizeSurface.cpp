@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpLabelizeSurface.cpp,v $
 Language:  C++
-Date:      $Date: 2009-12-17 12:30:11 $
-Version:   $Revision: 1.12.2.1 $
+Date:      $Date: 2011-05-26 08:14:27 $
+Version:   $Revision: 1.12.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -55,7 +55,7 @@ MafMedical is partially based on OpenMAF.
 #include "mafGizmoTranslate.h"
 #include "mafGizmoRotate.h"
 #include "mafGizmoScale.h"
-
+#include "mafRefSys.h"
 #include "mafTransform.h"
 #include "mafEventSource.h"
 

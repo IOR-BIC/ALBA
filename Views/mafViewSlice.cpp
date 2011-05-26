@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-11-22 11:04:58 $
-  Version:   $Revision: 1.51.2.17 $
+  Date:      $Date: 2011-05-26 08:22:31 $
+  Version:   $Revision: 1.51.2.18 $
   Authors:   Paolo Quadrani , Stefano Perticoni , Josef Kohout
 ==========================================================================
   Copyright (c) 2002/2004
@@ -20,6 +20,7 @@ const bool DEBUG_MODE = false;
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
+#include "mafGUI.h"
 #include "mafIndent.h"
 #include "mafViewSlice.h"
 #include "mafPipeVolumeSlice_BES.h"

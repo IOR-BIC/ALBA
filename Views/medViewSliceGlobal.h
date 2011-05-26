@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewSliceGlobal.h,v $
 Language:  C++
-Date:      $Date: 2010-11-22 11:04:58 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2011-05-26 08:22:31 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2002/2004
@@ -15,12 +15,14 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafViewSlice.h"
 
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
 class mafVME;
+class mafGUIFloatSlider;
 
 //----------------------------------------------------------------------------
 // medViewSliceGlobal :
@@ -32,7 +34,7 @@ This is an experimental component with rotated volumes interaction
 and visualization enabled.
 */
 
-class medViewSliceGlobal: public mafViewSlice
+class MED_EXPORT medViewSliceGlobal: public mafViewSlice
 {
 public:
   medViewSliceGlobal(wxString label = "Slice", int camera_position = CAMERA_CT, bool show_axes = false, bool show_grid = false, bool show_ruler = false, int stereo = 0,bool showTICKs=false,bool textureInterpolate=true);

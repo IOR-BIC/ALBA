@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpVolumeMeasure.h,v $
   Language:  C++
-  Date:      $Date: 2009-08-10 14:36:21 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-26 08:16:40 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -13,10 +13,14 @@
 #ifndef __medOpVolumeMeasure_H__
 #define __medOpVolumeMeasure_H__
 
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafOp.h"
-#include "mafNode.h"
 #include "mafVMESurface.h"
 #include "mafVMESurfaceParametric.h"
+
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
@@ -40,7 +44,7 @@ of the divergence theorem. The general assumption here is
 that the model is of closed surface.
 */
 
-class medOpVolumeMeasure: public mafOp
+class MED_EXPORT medOpVolumeMeasure: public mafOp
 {
 public:
              

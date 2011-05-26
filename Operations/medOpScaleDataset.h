@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpScaleDataset.h,v $
   Language:  C++
-  Date:      $Date: 2010-01-13 14:48:12 $
-  Version:   $Revision: 1.5.2.1 $
+  Date:      $Date: 2011-05-26 08:14:27 $
+  Version:   $Revision: 1.5.2.2 $
   Authors:   Daniele Giunchi , Stefano Perticoni  
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,6 +16,7 @@
 //----------------------------------------------------------------------------
 // includes :
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafOpTransformInterface.h"
 
 //----------------------------------------------------------------------------
@@ -36,7 +37,7 @@ Scale vme data set
 Scale vme dataset using the scaling gizmo or gui text entries
 */
 
-class medOpScaleDataset : public mafOpTransformInterface
+class MED_EXPORT medOpScaleDataset : public mafOpTransformInterface
 {
 public:
   medOpScaleDataset(const wxString &label = "Scale Dataset");

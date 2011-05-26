@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-11-22 11:04:57 $
-  Version:   $Revision: 1.38.2.8 $
+  Date:      $Date: 2011-05-26 08:19:56 $
+  Version:   $Revision: 1.38.2.9 $
   Authors:   Eleonora Mambrini
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,6 +21,7 @@
 
 #include "medDecl.h"
 #include "mafViewArbitrarySlice.h"
+#include "mafGUI.h"
 #include "mafViewSlice.h"
 #include "mafVme.h"
 #include "mafVMESlicer.h"

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpInteractiveClipSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-12-28 15:51:57 $
-  Version:   $Revision: 1.13.2.2 $
+  Date:      $Date: 2011-05-26 08:14:27 $
+  Version:   $Revision: 1.13.2.3 $
   Authors:   Paolo Quadrani, Stefano Perticoni , Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -39,7 +39,7 @@ bool DEBUG_MODE = true;
 #include "mafGizmoScale.h"
 #include "mafAbsMatrixPipe.h"
 #include "mafTransform.h"
-
+#include "mafRefSys.h"
 #include "medCurvilinearAbscissaOnSkeletonHelper.h"
 #include "medVMEPolylineGraph.h"
 

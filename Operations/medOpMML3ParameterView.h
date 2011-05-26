@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpMML3ParameterView.h,v $
   Language:  C++
-  Date:      $Date: 2009-05-29 11:05:29 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-26 08:14:27 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Mel Krokos
 ==========================================================================
   Copyright (c) 2002/2004
@@ -13,7 +13,10 @@
 #ifndef __medOpMML3ParameterView_H__
 #define __medOpMML3ParameterView_H__
 
-#include "mafDefines.h"
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
+#include "medDefines.h"
 
 // vtk includes
 #include "vtkRenderer.h"
@@ -35,7 +38,7 @@
 /// Helper class for medOpMML3. \n
 /// Visual pipe for displaying plot of parameter value against slice number.
 //----------------------------------------------------------------------------
-class medOpMML3ParameterView  
+class MED_EXPORT medOpMML3ParameterView  
 {
 public:
 	medOpMML3ParameterView( vtkRenderWindow *rw, vtkRenderer *ren );

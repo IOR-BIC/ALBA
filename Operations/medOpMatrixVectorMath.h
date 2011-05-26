@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMatrixVectorMath.h,v $
 Language:  C++
-Date:      $Date: 2010-09-10 14:02:09 $
-Version:   $Revision: 1.1.2.6 $
+Date:      $Date: 2011-05-26 08:14:27 $
+Version:   $Revision: 1.1.2.7 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -13,6 +13,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #ifndef __medOpMatrixVectorMath_h
 #define __medOpMatrixVectorMath_h
 
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
+#include "medDefines.h"
 #include <ostream>
 
 
@@ -37,7 +41,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 /// Matrix convention in this code: i is the row, j is the column, and k is the 1D array index. \n
 /// The output matrix can be the same as the input unless stated otherwise. \n
 //------------------------------------------------------------------------------
-class medOpMatrixVectorMath{
+class MED_EXPORT medOpMatrixVectorMath{
 public:
   /// Constructor.
   medOpMatrixVectorMath(bool homogeneous = false) : m_Homogeneous(homogeneous) {}

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewSlicer.h,v $
   Language:  C++
-  Date:      $Date: 2010-11-22 11:04:58 $
-  Version:   $Revision: 1.4.2.2 $
+  Date:      $Date: 2011-05-26 08:22:31 $
+  Version:   $Revision: 1.4.2.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,6 +16,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "medViewCompoundWindowing.h"
 
 //----------------------------------------------------------------------------
@@ -39,7 +40,7 @@ class mafGUILutSwatch;
 //----------------------------------------------------------------------------
 /** 
   This compound view is made of four child views used to analyze different orthogonal slices of the volume*/
-class medViewSlicer: public medViewCompoundWindowing
+class MED_EXPORT medViewSlicer: public medViewCompoundWindowing
 {
 public:
   medViewSlicer(wxString label = "View Arbitrary Slice", bool show_ruler = false);

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterVTK.h,v $
 Language:  C++
-Date:      $Date: 2010-10-07 06:54:49 $
-Version:   $Revision: 1.3.2.1 $
+Date:      $Date: 2011-05-26 08:14:27 $
+Version:   $Revision: 1.3.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -45,6 +45,7 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafOpImporterVTK.h"
 
 //----------------------------------------------------------------------------
@@ -56,7 +57,7 @@ class medVMEPolylineGraph;
 class name: medOpImporterVTK
 The same importer of the MAF , but polylines are stored inside 
 the medVMEPolylineGraph instead mafVMEPolyline*/
-class medOpImporterVTK: public mafOpImporterVTK 
+class MED_EXPORT medOpImporterVTK: public mafOpImporterVTK 
 {
 public:
   /** constructor */

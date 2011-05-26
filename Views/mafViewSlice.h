@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.h,v $
   Language:  C++
-  Date:      $Date: 2010-11-22 11:04:58 $
-  Version:   $Revision: 1.26.2.10 $
+  Date:      $Date: 2011-05-26 08:22:31 $
+  Version:   $Revision: 1.26.2.11 $
   Authors:   Paolo Quadrani,Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -15,6 +15,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafViewVTK.h"
 #include "mafMatrix.h"
 #include <vector>
@@ -46,7 +47,7 @@ This is an experimental component with rotated volumes interaction
 and visualization enabled.
 */
 
-class mafViewSlice: public mafViewVTK
+class MED_EXPORT mafViewSlice: public mafViewVTK
 {
 public:
   mafViewSlice(wxString label = "Slice", int camera_position = CAMERA_CT, bool show_axes = false, bool show_grid = false, bool show_ruler = false, int stereo = 0,bool showTICKs=false,bool textureInterpolate=true);

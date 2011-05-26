@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpSubdivide.h,v $
   Language:  C++
-  Date:      $Date: 2009-01-07 13:42:06 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-26 08:16:40 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2008
@@ -45,6 +45,7 @@
 //----------------------------------------------------------------------------
 // Includes :
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -56,7 +57,7 @@ class vtkPolyData;
 // medOpSubdivide :
 //----------------------------------------------------------------------------
 /** Apply vtkLinearSubdivideFilter to a VME Surface*/
-class medOpSubdivide: public mafOp
+class MED_EXPORT medOpSubdivide: public mafOp
 {
 public:
 	medOpSubdivide(const wxString &label = "Subdivide");
