@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUISettingsAdvanced.h,v $
 Language:  C++
-Date:      $Date: 2010-05-17 13:20:51 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2011-05-26 07:43:15 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2009
@@ -44,7 +44,7 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-
+#include "medDefines.h"
 #include "mafGUISettings.h"
 
 //----------------------------------------------------------------------------
@@ -59,7 +59,7 @@ MafMedical is partially based on OpenMAF.
   Represents advanced settings which can be modified accessing to option menu.
   - conversion units 
 */
-class medGUISettingsAdvanced : public mafGUISettings
+class MED_EXPORT medGUISettingsAdvanced : public mafGUISettings
 {
 public:
   /** constructor.  */

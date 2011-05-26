@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoInteractionDebugger.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-12-01 17:09:39 $
-  Version:   $Revision: 1.6.2.2 $
+  Date:      $Date: 2011-05-26 07:51:33 $
+  Version:   $Revision: 1.6.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -35,6 +35,7 @@ const bool DEBUG_MODE = true;
 #include "mafMatrix.h"
 #include "mafAbsMatrixPipe.h" 
 #include "mafVMERoot.h"
+#include "mafRefSys.h"
 
 #include "vtkMath.h"
 #include "vtkLineSource.h"

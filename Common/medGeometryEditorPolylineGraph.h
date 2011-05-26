@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGeometryEditorPolylineGraph.h,v $
 Language:  C++
-Date:      $Date: 2010-01-08 13:54:52 $
-Version:   $Revision: 1.11.2.3 $
+Date:      $Date: 2011-05-26 07:51:33 $
+Version:   $Revision: 1.11.2.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -44,6 +44,7 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafObserver.h"
 #include "mafPolylineGraph.h"
 #include "vtkSystemIncludes.h"
@@ -72,7 +73,7 @@ class vtkPolyData;
   It creates ISA, can add, insert, remove, move point in the polyline graph,
   it can also add, remove branch in which points are.
 */
-class medGeometryEditorPolylineGraph: public mafObserver 
+class MED_EXPORT medGeometryEditorPolylineGraph: public mafObserver 
 {
 public:
   /** contructor*/

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpCreateSurface.h,v $
 Language:  C++
-Date:      $Date: 2009-01-29 10:12:52 $
-Version:   $Revision: 1.3.2.1 $
+Date:      $Date: 2011-05-26 08:00:03 $
+Version:   $Revision: 1.3.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -44,6 +44,7 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -55,7 +56,7 @@ class mafVMESurface;
 // medOpCreateSurface :
 //----------------------------------------------------------------------------
 /**Convert a Parametric Surface into a Normal Surface*/
-class medOpCreateSurface: public mafOp
+class MED_EXPORT medOpCreateSurface: public mafOp
 {
 public:
 

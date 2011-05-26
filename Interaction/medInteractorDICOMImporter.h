@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medInteractorDICOMImporter.h,v $
   Language:  C++
-  Date:      $Date: 2011-02-14 16:55:07 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-26 07:55:17 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Paolo Quadrani , Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -13,6 +13,10 @@
 #ifndef __medInteractorDICOMImporter_h
 #define __medInteractorDICOMImporter_h
 
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafInteractorCameraMove.h"
 #include "mafMTime.h"
 
@@ -45,7 +49,7 @@ mafEventMacro(mafEvent(this, event_id, position_point.GetPointer()));
 @sa medOpImporterDicomOffis where this class is used in the Dicom importer wizard dialog
 
 */
-class medInteractorDICOMImporter : public mafInteractorCameraMove
+class MED_EXPORT medInteractorDICOMImporter : public mafInteractorCameraMove
 {
 public:
   mafTypeMacro(medInteractorDICOMImporter,mafInteractorCameraMove);

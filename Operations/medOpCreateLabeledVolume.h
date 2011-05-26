@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpCreateLabeledVolume.h,v $
   Language:  C++
-  Date:      $Date: 2009-11-04 16:39:43 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-26 08:00:03 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004
@@ -13,6 +13,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #ifndef __medOpCreateLabeledVolume_H__
 #define __medOpCreateLabeledVolume_H__
 
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -28,7 +32,7 @@ class mafEvent;
 class name medOpCreateLabeledVolume
 Create a medVMELabeledVolume.
 */
-class medOpCreateLabeledVolume: public mafOp
+class MED_EXPORT medOpCreateLabeledVolume: public mafOp
 {
 public:
   /** constructor */

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGizmoCrossTranslateAxis.cpp,v $
 Language:  C++
-Date:      $Date: 2011-02-15 14:02:36 $
-Version:   $Revision: 1.1.2.11 $
+Date:      $Date: 2011-05-26 07:55:17 $
+Version:   $Revision: 1.1.2.12 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -43,6 +43,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafTagArray.h"
 #include "mafInteractorCompositorMouse.h"
 #include "mafInteractorGenericMouse.h"
+#include "mafRefSys.h"
 
 
 // vtk stuff

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medLogicWithManagers.h,v $
 Language:  C++
-Date:      $Date: 2009-07-16 08:43:46 $
-Version:   $Revision: 1.2.2.1 $
+Date:      $Date: 2011-05-26 07:51:33 $
+Version:   $Revision: 1.2.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -45,6 +45,7 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 // includes :
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafLogicWithManagers.h"
 
 //----------------------------------------------------------------------------
@@ -55,7 +56,7 @@ MafMedical is partially based on OpenMAF.
   Class Name: medLogicWithManagers.
   Class for handle the high level logic of a medical application.
 */
-class medLogicWithManagers: public mafLogicWithManagers
+class MED_EXPORT medLogicWithManagers: public mafLogicWithManagers
 {
 public:
   /** constructor. */

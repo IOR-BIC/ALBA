@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: itkRawMotionImporterUtility.h,v $
   Language:  C++
-  Date:      $Date: 2009-06-17 13:05:42 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-26 08:00:03 $
+  Version:   $Revision: 1.1.2.2 $
   Thanks:    Thanks to Sebastien Barre who developed this class. Thanks to
              Tim Hutton too for the idea.
 
@@ -49,13 +49,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //-----------------------------------------------
 // Include:
 //-----------------------------------------------
+#include "medDefines.h"
 #include "vnl/vnl_matrix.h"
 
 /**
   Class Name: itkRawMotionImporterUtility.
   Utility class for reading matrix from file.  Depends from vnl library.
 */
-class itkRawMotionImporterUtility
+class MED_EXPORT itkRawMotionImporterUtility
 {
 public:
   /** constructor. */

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterAnalogWS.h,v $
   Language:  C++
-  Date:      $Date: 2010-10-20 13:11:05 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2011-05-26 08:00:03 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2004
@@ -16,6 +16,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafOp.h"
 #include "medVMEAnalog.h"
 
@@ -28,7 +29,7 @@ class medVMEAnalog;
 /** 
 class name: medOpExporterAnalogWS
 /** Export analog signals from a medVMEAnalog VME */
-class medOpExporterAnalogWS : public mafOp
+class MED_EXPORT medOpExporterAnalogWS : public mafOp
 {
 public:
 	medOpExporterAnalogWS(const wxString &label = "Analog Exporter");

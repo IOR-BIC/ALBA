@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiInfoImage.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 12:24:37 $
-  Version:   $Revision: 1.7.8.2 $
+  Date:      $Date: 2011-05-26 07:51:33 $
+  Version:   $Revision: 1.7.8.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -67,7 +67,7 @@ void mmiInfoImage::OnEvent(mafEventBase *event)
     mafDevice *device = (mafDevice *)event->GetSender();
     assert(device);
 
-    if (id == mafDeviceButtonsPadMouse::MOUSE_CHAR_EVENT && !IsInteracting(device))
+    if (id == mafDeviceButtonsPadMouse::GetMouseCharEventId() && !IsInteracting(device))
     {
       mafEventInteraction *e = mafEventInteraction::SafeDownCast(event);
       OnChar(e);
@@ -76,7 +76,7 @@ void mmiInfoImage::OnEvent(mafEventBase *event)
     if (IsInteracting(device))
     {
       // process the Move event
-      if (id == mafDeviceButtonsPadTracker::TRACKER_3D_MOVE || id == mafDeviceButtonsPadMouse::MOUSE_2D_MOVE)
+      if (id == mafDeviceButtonsPadTracker::GetTracker3DMoveId() || id == mafDeviceButtonsPadMouse::GetMouse2DMoveId())
       {
         mafEventInteraction *e = mafEventInteraction::SafeDownCast(event);
         OnMove(e);

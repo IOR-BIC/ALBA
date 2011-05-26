@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2010-10-20 14:04:47 $
-# Version:   $Revision: 1.12.2.3 $
+# Date:      $Date: 2011-05-26 07:47:28 $
+# Version:   $Revision: 1.12.2.4 $
 #
 # Description:
 # CMake Project file for the Medical Library.
@@ -49,14 +49,20 @@ ENDIF(WIN32)
 #-----------------------------------------------------------------------------
 # Options for MAF building
 #-----------------------------------------------------------------------------
-OPTION(BUILD_SHARED_LIBS "Build with shared libraries." OFF )
+# OPTION(BUILD_SHARED_LIBS "Build with shared libraries." OFF )
 OPTION(BUILD_EXAMPLES "Build examples." ON )
 OPTION(BUILD_TESTING "Build the testing tree." OFF)
+OPTION(MED_BUILD_MEDDLL "Build medDLL.dll." OFF)
 OPTION(BUILD_IPOSE "Build iPose application." OFF)
 
-MARK_AS_ADVANCED (
-  BUILD_SHARED_LIBS 
-)
+# MARK_AS_ADVANCED (
+  # BUILD_SHARED_LIBS 
+# )
+
+
+IF(MED_BUILD_MEDDLL)
+  SET(MED_BUILD_MEDDLL 1)
+ENDIF (MED_BUILD_MEDDLL)
 
 SET (CONFIGURE_ERROR 0)
 
@@ -95,13 +101,19 @@ IF(MAF_FOUND)
 
   # Configuring MED kits
   MESSAGE(STATUS "MAF: Configuring MAF Kits")
-  SUBDIRS (Gui)
-  SUBDIRS (vtkMED)
-  SUBDIRS (Common)
-  SUBDIRS (Operations)
-  SUBDIRS (Interaction)
-  SUBDIRS (Views)
-  SUBDIRS (VME)
+  
+  IF(MED_BUILD_MEDDLL)
+    SUBDIRS (vtkMED)
+    SUBDIRS (medDLL)
+  ELSE(MED_BUILD_MEDDLL)
+    SUBDIRS (Gui)
+    SUBDIRS (vtkMED)
+    SUBDIRS (Common)
+    SUBDIRS (Operations)
+    SUBDIRS (Interaction)
+    SUBDIRS (Views)
+    SUBDIRS (VME)
+  ENDIF (MED_BUILD_MEDDLL)
   
   # Configuring Doxygen documentation  
   SUBDIRS (Docs)
@@ -115,6 +127,11 @@ IF(MAF_FOUND)
         SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /MANIFEST:NO")
     ENDIF(NOT tmp_manifest)
 	ENDIF(WIN32)
+
+	IF(MED_BUILD_MEDDLL)
+	  SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /FORCE:MULTIPLE")
+	ENDIF (MED_BUILD_MEDDLL)
+	
 
   # Export Build settings and library dependences
   INCLUDE(CMakeExportBuildSettings)

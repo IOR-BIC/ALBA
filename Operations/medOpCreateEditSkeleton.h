@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpCreateEditSkeleton.h,v $
 Language:  C++
-Date:      $Date: 2009-11-04 16:39:43 $
-Version:   $Revision: 1.3.2.1 $
+Date:      $Date: 2011-05-26 08:00:03 $
+Version:   $Revision: 1.3.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -44,6 +44,7 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -58,7 +59,7 @@ class vtkPolyData;
 class name: medOpCreateEditSkeleton
 Class for creating and editing the skeleton polyline.
 */
-class medOpCreateEditSkeleton: public mafOp
+class MED_EXPORT medOpCreateEditSkeleton: public mafOp
 {
 public:
   /** constructor */

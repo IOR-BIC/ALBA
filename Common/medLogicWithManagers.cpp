@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medLogicWithManagers.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-25 10:25:33 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2011-05-26 07:51:33 $
+Version:   $Revision: 1.4.2.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -53,6 +53,7 @@ MafMedical is partially based on OpenMAF.
 #include "mafGUIMDIChild.h"
 #include "mafViewManager.h"
 #include "mafGUIMDIFrame.h"
+#include "mafOpManager.h"
 
 //----------------------------------------------------------------------------
 medLogicWithManagers::medLogicWithManagers()

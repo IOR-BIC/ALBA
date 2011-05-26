@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafOpImporterRAWVolume_BES.h,v $
 Language:  C++
-Date:      $Date: 2010-01-08 13:57:39 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2011-05-26 08:00:03 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Paolo Quadrani     Silvano Imboden     Josef Kohout
 ==========================================================================
 Copyright (c) 2002/2004
@@ -15,6 +15,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafOp.h"
 #include "mafEvent.h"
 #include "mafString.h"
@@ -48,7 +49,7 @@ class vtkPlaneSource;
   class name: mafOpImporterRAWVolume_BES
   This importer imports Large Volume. It uses mafVMEVolumeLargeUtils made by BES.
 */
-class mafOpImporterRAWVolume_BES: public mafOp
+class MED_EXPORT mafOpImporterRAWVolume_BES: public mafOp
 {	
 public:
 

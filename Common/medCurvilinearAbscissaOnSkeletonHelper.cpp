@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medCurvilinearAbscissaOnSkeletonHelper.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-11-24 14:03:01 $
-  Version:   $Revision: 1.9.2.3 $
+  Date:      $Date: 2011-05-26 07:51:33 $
+  Version:   $Revision: 1.9.2.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -38,6 +38,7 @@ const bool DEBUG_MODE = true;
 #include "mafMatrix.h"
 #include "mafAbsMatrixPipe.h" 
 #include "mafVMERoot.h"
+#include "mafRefSys.h"
 
 #include "vtkMath.h"
 #include "vtkLineSource.h"

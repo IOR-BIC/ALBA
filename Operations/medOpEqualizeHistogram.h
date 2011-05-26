@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpEqualizeHistogram.h,v $
 Language:  C++
-Date:      $Date: 2009-11-18 14:16:16 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2011-05-26 08:00:03 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2009
@@ -45,6 +45,7 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 // Includes :
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -57,7 +58,7 @@ class mafGUIHistogramWidget;
 /** 
 class name : medOpEqualizeHistogram
 */
-class medOpEqualizeHistogram: public mafOp
+class MED_EXPORT medOpEqualizeHistogram: public mafOp
 {
 public:
 

@@ -34,6 +34,10 @@ SET(PROJECT_SRCS
 	mafDbg.h
 	mafDataChecksum.h
 	##################################
+	
+	#Removed from vtkMED because it need of MAF Utilities
+	../BES_Beta/vtkMAF/vtkMAFLargeDataSetCallback.cxx
+  ../BES_Beta/vtkMAF/vtkMAFLargeDataSetCallback.h
 )
 
 # List libraries that are needed by this project.

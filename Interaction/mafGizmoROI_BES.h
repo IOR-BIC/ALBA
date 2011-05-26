@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGizmoROI_BES.h,v $
 Language:  C++
-Date:      $Date: 2010-02-04 16:53:16 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2011-05-26 07:55:17 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Stefano Perticoni, Josef Kohout
 ==========================================================================
 Copyright (c) 2002/2004
@@ -17,6 +17,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafGizmoInterface.h"
 #include "mafObserver.h"
 #include "mafGizmoBoundingBox.h"
@@ -72,7 +73,7 @@ In order to use it in your client create an instance of it and ask for the regio
 @sa mafGizmoHandle mafGizmoBoundingBox
 */
 
-class mafGizmoROI_BES: public mafGizmoInterface
+class MED_EXPORT mafGizmoROI_BES: public mafGizmoInterface
 {
 public:
   //BES: backward compatibility

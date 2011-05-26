@@ -4,6 +4,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -19,7 +20,7 @@ that accept the bbf data format. If no VME can accept the format a message box w
 to the user and no data will be imported.
 bbf files come from a raw volume file .By using importe ->images->RAW VOLUME can generate bbf files .
 */
-class mafOpImporterBBF: public mafOp 
+class MED_EXPORT mafOpImporterBBF: public mafOp 
 {
 public:
   /** constructor. */

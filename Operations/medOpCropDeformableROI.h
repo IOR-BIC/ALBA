@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpCropDeformableROI.h,v $
 Language:  C++
-Date:      $Date: 2009-12-01 16:31:42 $
-Version:   $Revision: 1.2.2.1 $
+Date:      $Date: 2011-05-26 08:00:03 $
+Version:   $Revision: 1.2.2.2 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -42,6 +42,10 @@ MafMedical is partially based on OpenMAF.
 #ifndef __medOpCropDeformableROI_H__
 #define __medOpCropDeformableROI_H__
 
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafOp.h"
 #include "mafVME.h"
 
@@ -60,7 +64,7 @@ class mafVMESurface;
   class name: medOpCropDeformableROI
    Operation that use m_MaskPolydataFilter, cropping  a volume with a output surface of a vme.
 */
-class medOpCropDeformableROI: public mafOp
+class MED_EXPORT medOpCropDeformableROI: public mafOp
 {
 public:
   /** construct */

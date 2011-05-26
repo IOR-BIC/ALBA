@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmiSelectPoint.h,v $
 Language:  C++
-Date:      $Date: 2010-11-12 17:17:36 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2011-05-26 07:51:33 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Matteo Giacomoni , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -13,6 +13,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #ifndef __mmiSelectPoint_h
 #define __mmiSelectPoint_h
 
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafInteractorCameraMove.h"
 #include "mafMTime.h"
 
@@ -44,7 +48,7 @@ pointFromEvent->GetPoint(0,pointCoordinates);
 int cellID = e->GetArg();
 
 */
-class mmiSelectPoint : public mafInteractorCameraMove
+class MED_EXPORT mmiSelectPoint : public mafInteractorCameraMove
 {
 public:
 	mafTypeMacro(mmiSelectPoint,mafInteractorCameraMove);

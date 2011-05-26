@@ -2,8 +2,8 @@
 Program:   VPH2
 Module:    $RCSfile: medDeviceButtonsPadMouseDialog.h,v $
 Language:  C++
-Date:      $Date: 2010-07-09 08:16:10 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2011-05-26 07:55:17 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Alberto Losi
 ==========================================================================
 Copyright (c) 2008
@@ -12,6 +12,10 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #ifndef __medDeviceButtonsPadMouseDialog_h
 #define __medDeviceButtonsPadMouseDialog_h
 
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafDeviceButtonsPadMouse.h"
 
 //----------------------------------------------------------------------------
@@ -35,7 +39,7 @@ set the desired view.
 (An operation using this class is vph2OpAnnulusIdentification)
 */
 //----------------------------------------------------------------------------
-class medDeviceButtonsPadMouseDialog : public  mafDeviceButtonsPadMouse
+class MED_EXPORT medDeviceButtonsPadMouseDialog : public  mafDeviceButtonsPadMouse
 //----------------------------------------------------------------------------
 {
 public:

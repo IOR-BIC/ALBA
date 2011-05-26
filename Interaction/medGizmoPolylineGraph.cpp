@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGizmoPolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2010-03-17 15:43:44 $
-Version:   $Revision: 1.1.2.5 $
+Date:      $Date: 2011-05-26 07:55:17 $
+Version:   $Revision: 1.1.2.6 $
 Authors:   Josef Kohout, Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -33,6 +33,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafMatrix.h"
 #include "mafAbsMatrixPipe.h" 
 #include "mafVMERoot.h"
+#include "mafRefSys.h"
 
 #include "vtkMath.h"
 #include "vtkArrowSource.h"

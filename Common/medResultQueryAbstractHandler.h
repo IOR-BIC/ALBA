@@ -2,8 +2,8 @@
 Program:   @neufuse
 Module:    $RCSfile: medResultQueryAbstractHandler.h,v $
 Language:  C++
-Date:      $Date: 2009-09-28 05:44:24 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2011-05-26 07:51:33 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2008
@@ -16,6 +16,7 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafObject.h"
 #include "medQueryObject.h"
 #include <vector>
@@ -36,7 +37,7 @@ typedef std::vector<std::vector<medQueryObject *> >   WebRowSetQueryObjectsTable
   class name: medResultQueryAbstractHandler
   Interface for handle results from a query to a database
 */
-class medResultQueryAbstractHandler : public mafObject
+class MED_EXPORT medResultQueryAbstractHandler : public mafObject
 {
 public:
   /** constructor */

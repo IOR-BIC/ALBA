@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUITransformSliders.h,v $
 Language:  C++
-Date:      $Date: 2010-08-31 07:25:06 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2011-05-26 07:55:17 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2002/2004
@@ -16,6 +16,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafObserver.h"
 #include "mafGUITransformInterface.h"
 
@@ -36,7 +37,7 @@ class mafGUIFloatSlider;
 
 A GUI component with sliders widgets for transform operations.
 */
-class medGUITransformSliders : public mafGUITransformInterface
+class MED_EXPORT medGUITransformSliders : public mafGUITransformInterface
 {
 public:
 
