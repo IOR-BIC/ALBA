@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medInteractorPERScalarInformation.cpp,v $
 Language:  C++
-Date:      $Date: 2011-05-10 15:08:19 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-05-26 16:14:19 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2010
@@ -73,7 +73,7 @@ void medInteractorPERScalarInformation::OnEvent(mafEventBase *event)
     mafDevice *device = (mafDevice *)event->GetSender();
     assert(device);
 
-    if (id == mafDeviceButtonsPadMouse::MOUSE_CHAR_EVENT && !IsInteracting(device))
+    if (id == mafDeviceButtonsPadMouse::GetMouseCharEventId() && !IsInteracting(device))
     {
       mafEventInteraction *e = mafEventInteraction::SafeDownCast(event);
       OnChar(e);
@@ -82,7 +82,7 @@ void medInteractorPERScalarInformation::OnEvent(mafEventBase *event)
     if (IsInteracting(device))
     {
       // process the Move event
-      if (id == mafDeviceButtonsPadTracker::TRACKER_3D_MOVE || id == mafDeviceButtonsPadMouse::MOUSE_2D_MOVE)
+      if (id == mafDeviceButtonsPadTracker::GetTracker3DMoveId() || id == mafDeviceButtonsPadMouse::GetMouse2DMoveId())
       {
         mafEventInteraction *e = mafEventInteraction::SafeDownCast(event);
         OnMove(e);

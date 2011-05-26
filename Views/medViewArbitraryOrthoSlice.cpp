@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2011-05-17 15:46:47 $
-Version:   $Revision: 1.1.2.58 $
+Date:      $Date: 2011-05-26 16:15:29 $
+Version:   $Revision: 1.1.2.59 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -22,6 +22,7 @@ const int BOUND_1=1;
 //----------------------------------------------------------------------------
 
 #include "medGizmoCrossRotateTranslate.h"
+#include "mafGUI.h"
 #include "medDecl.h"
 #include "medViewArbitraryOrthoSlice.h"
 #include "mafViewSlice.h"
