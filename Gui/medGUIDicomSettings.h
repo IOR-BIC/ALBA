@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.h,v $
 Language:  C++
-Date:      $Date: 2010-07-27 13:37:47 $
-Version:   $Revision: 1.5.2.16 $
+Date:      $Date: 2011-05-26 07:41:54 $
+Version:   $Revision: 1.5.2.17 $
 Authors:   Matteo Giacomoni, Simone Brazzale
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -13,6 +13,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #ifndef __medGUIDicomSettings_H__
 #define __medGUIDicomSettings_H__
 
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafGUISettings.h"
 
 //----------------------------------------------------------------------------
@@ -35,7 +39,7 @@ class mafGUICheckListBox;
   - resample volume
   - rescale to 16Bit
 */
-class medGUIDicomSettings : public mafGUISettings
+class MED_EXPORT medGUIDicomSettings : public mafGUISettings
 {
 public:
   /** constructor.*/

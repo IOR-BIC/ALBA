@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILandmark.h,v $
   Language:  C++
-  Date:      $Date: 2011-02-14 13:46:57 $
-  Version:   $Revision: 1.4.2.3 $
+  Date:      $Date: 2011-05-26 07:41:54 $
+  Version:   $Revision: 1.4.2.4 $
   Authors:   Stefano Perticoni - porting Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,6 +16,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafVME.h"
 #include "mafEvent.h"
 
@@ -41,7 +42,7 @@ class mafVMELandmarkCloud;
   - Code cleaning and improve documentation
 */
 
-class medGUILandmark : public mafObserver
+class MED_EXPORT medGUILandmark : public mafObserver
 {
 public:
 

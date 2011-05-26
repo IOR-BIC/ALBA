@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medGUIDynamicVP.h,v $ 
   Language: C++ 
-  Date: $Date: 2010-01-08 13:55:59 $ 
-  Version: $Revision: 1.1.2.3 $ 
+  Date: $Date: 2011-05-26 07:41:54 $ 
+  Version: $Revision: 1.1.2.4 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -17,6 +17,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "mafEvent.h"
 #include "mafObserver.h"
 #include "mafGUIPanel.h"
@@ -48,7 +49,7 @@ mafEvent::GetArg). medGUIDynamicVP can be configured so it does not contain
 neither close button nor create combo nor any other widget. In such a
 special mode, the construction of visual pipe is governed by the caller.*/
 //----------------------------------------------------------------------------
-class medGUIDynamicVP: public mafGUIPanel, public mafObserver
+class MED_EXPORT medGUIDynamicVP: public mafGUIPanel, public mafObserver
 {
 public:  
   enum PLAYER_WIDGET_ID

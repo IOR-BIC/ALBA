@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUIContextualMenu.h,v $
   Language:  C++
-  Date:      $Date: 2009-06-17 13:05:30 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-26 07:41:54 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Daniele Giunchi    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -12,6 +12,8 @@
 
 #ifndef __medGUIContextualMenu_H__
 #define __medGUIContextualMenu_H__
+
+#include "medDefines.h"
 
 //----------------------------------------------------------------------------
 // forward references;
@@ -25,7 +27,7 @@ class mafObserver;
   Represents the contexctual menu' which compares when click right button 
   over a viewport.
 */
-class medGUIContextualMenu : public wxMenu
+class MED_EXPORT medGUIContextualMenu : public wxMenu
 {
 public:
   /** constructor. */

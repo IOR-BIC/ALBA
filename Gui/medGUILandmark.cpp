@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUILandmark.cpp,v $
 Language:  C++
-Date:      $Date: 2011-02-14 13:46:57 $
-Version:   $Revision: 1.4.2.4 $
+Date:      $Date: 2011-05-26 07:41:54 $
+Version:   $Revision: 1.4.2.5 $
 Authors:   Stefano Perticoni - porting Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -11,8 +11,6 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 =========================================================================*/
 
-
-#include "mafDefines.h" 
 #include "medDefines.h"
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
@@ -32,6 +30,7 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #include "mafMatrix.h"
 #include "mafTransform.h"
 #include "mafVME.h"
+#include "mafRefSys.h"
 
 #include "mafVMELandmark.h"
 #include "mafVMELandmarkCloud.h"
