@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: exMedicalApp.cpp,v $
 Language:  C++
-Date:      $Date: 2011-03-10 08:36:39 $
-Version:   $Revision: 1.15.2.6 $
+Date:      $Date: 2011-05-26 08:40:39 $
+Version:   $Revision: 1.15.2.7 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -190,7 +190,7 @@ IMPLEMENT_APP(exMedicalApp)
 bool exMedicalApp::OnInit()
 //--------------------------------------------------------------------------------
 {
-	mafPics.Initialize();	
+  mafPictureFactory::GetPictureFactory()->Initialize();	
 
 #include "Examples/MedicalIcons/FRAME_ICON16x16.xpm"
 	mafADDPIC(FRAME_ICON16x16);

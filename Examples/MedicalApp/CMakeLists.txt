@@ -28,6 +28,17 @@ ENDIF (WIN32)
 SET(PROJECT_LIBS
   medOperations medGui medViews medVME medInteraction mafVME mafOperations vtkMAF
 )
+
+IF(MED_BUILD_MEDDLL)
+  SET(PROJECT_LIBS
+  medDLL
+)
+ELSE(MED_BUILD_MEDDLL)
+  SET(PROJECT_LIBS
+  medOperations medGui medViews medVME medInteraction mafVME mafOperations vtkMAF
+)
+ENDIF (MED_BUILD_MEDDLL)
+
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
 IF (WIN32)
   SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/MANIFEST")
