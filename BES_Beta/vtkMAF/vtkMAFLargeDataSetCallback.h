@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMAFLargeDataSetCallback.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-09-29 09:33:32 $ 
-  Version: $Revision: 1.1.2.2 $ 
+  Date: $Date: 2011-05-26 08:51:01 $ 
+  Version: $Revision: 1.1.2.3 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -14,12 +14,22 @@
 #ifndef __vtkMAFLargeDataSetCallback__
 #define __vtkMAFLargeDataSetCallback__
 
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
+#include "medDefines.h"
 #include "vtkCommand.h"
-#include "mafObserver.h"
+
+//----------------------------------------------------------------------------
+// Forward declarations:
+//----------------------------------------------------------------------------
+class mafObserver;
 
 //this class handles events produced by LargeDataSet
-class vtkMAFLargeDataSetCallback : public vtkCommand
+class MED_EXPORT vtkMAFLargeDataSetCallback : public vtkCommand
 {
+  //vtkTypeMacro(vtkMAFLargeDataSetCallback,vtkCommand);
+
 protected:
 	mafObserver* Listener;
 public:
@@ -28,12 +38,13 @@ public:
 	}
 
 	//set the MAF listener that should process the MAF generated events
-	inline void SetListener(mafObserver* listener) {
-		Listener = listener;
-	}
+  void SetListener(mafObserver* listener);
 
 	//callback routine called by VTK, translate events into MAF events
 	virtual void Execute(vtkObject* caller, unsigned long eventId, void* callData);
+  
+  virtual const char *GetClassName() const {return "vtkMAFLargeDataSetCallback";};
+
 
 protected:
 	vtkMAFLargeDataSetCallback() {

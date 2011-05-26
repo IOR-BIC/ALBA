@@ -3,7 +3,7 @@
   File:    	 vtkMAFFile.h
   Language:  C++
   Date:      11:2:2008   12:36
-  Version:   $Revision: 1.1.2.3 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Josef Kohout (Josef.Kohout@beds.ac.uk)
   
   Copyright (c) 2008
@@ -17,6 +17,8 @@ under _WIN32 (although they are supported for _WIN64)
 #ifndef vtkMAFFile_h__
 #define vtkMAFFile_h__
 
+#include "vtkMEDConfigure.h"
+
 #include <stdio.h>
 #include <errno.h>
 #include "vtkObject.h"
@@ -28,7 +30,7 @@ under _WIN32 (although they are supported for _WIN64)
 #pragma once
 
 //This is nothrow version
-class VTK_COMMON_EXPORT vtkMAFFile : public vtkObject
+class VTK_vtkMED_EXPORT vtkMAFFile : public vtkObject
 {
 protected:
 #ifdef _WIN32
@@ -179,7 +181,7 @@ inline long long vtkMAFFile::GetCurrentPos() throw(...)
 
 
 //This class is vtkMAFFile that throws exceptions when something goes wrong  
-class VTK_COMMON_EXPORT vtkMAFFile2 : public vtkMAFFile
+class VTK_vtkMED_EXPORT vtkMAFFile2 : public vtkMAFFile
 {
 public:
   vtkTypeRevisionMacro(vtkMAFFile2, vtkMAFFile);

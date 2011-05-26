@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMAFLargeDataSet.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-05-14 15:03:31 $ 
-  Version: $Revision: 1.1.2.1 $ 
+  Date: $Date: 2011-05-26 08:51:00 $ 
+  Version: $Revision: 1.1.2.2 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -27,7 +27,7 @@ class vtkGenericCell;
 class vtkIdList;
 class vtkMAFLargeDataProvider;
 
-class VTK_COMMON_EXPORT vtkMAFLargeDataSet : public vtkDataObject
+class VTK_vtkMED_EXPORT vtkMAFLargeDataSet : public vtkDataObject
 {
 public:
 	vtkTypeRevisionMacro(vtkMAFLargeDataSet,vtkDataObject);

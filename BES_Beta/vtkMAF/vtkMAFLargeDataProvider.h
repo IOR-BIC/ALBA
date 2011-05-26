@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMAFLargeDataProvider.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-09-29 09:33:32 $ 
-  Version: $Revision: 1.1.2.3 $ 
+  Date: $Date: 2011-05-26 08:51:00 $ 
+  Version: $Revision: 1.1.2.4 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -35,7 +35,7 @@ class vtkTimeStamp;
 
 #pragma warning(disable: 4068)	//Unknown pragma: VC 2003 does not support regions
 
-class VTK_COMMON_EXPORT vtkMAFLargeDataProvider : public vtkObject
+class VTK_vtkMED_EXPORT vtkMAFLargeDataProvider : public vtkObject
 {	
 protected:
   //Data Array Layout Descriptor

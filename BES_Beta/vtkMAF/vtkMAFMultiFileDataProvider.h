@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMAFMultiFileDataProvider.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-11-04 10:36:29 $ 
-  Version: $Revision: 1.1.2.3 $ 
+  Date: $Date: 2011-05-26 08:51:01 $ 
+  Version: $Revision: 1.1.2.4 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -17,10 +17,11 @@
 #define vtkMAFMultiFileDataProvider_h__
 
 #pragma once
+#include "vtkMEDConfigure.h"
 #include "vtkMAFLargeDataProvider.h"
 #include "vtkMAFFile.h"
 
-class vtkMAFMultiFileDataProvider : public vtkMAFLargeDataProvider
+class VTK_vtkMED_EXPORT vtkMAFMultiFileDataProvider : public vtkMAFLargeDataProvider
 {
 protected:
   //describes one file 

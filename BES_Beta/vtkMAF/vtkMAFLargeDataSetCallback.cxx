@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMAFLargeDataSetCallback.cxx,v $ 
   Language: C++ 
-  Date: $Date: 2009-09-29 09:33:32 $ 
-  Version: $Revision: 1.1.2.2 $ 
+  Date: $Date: 2011-05-26 08:51:00 $ 
+  Version: $Revision: 1.1.2.3 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -11,10 +11,11 @@
   =========================================================================
 */
 
-#include "mafDefines.h"		//must be included first
-#include "vtkObject.h"
 #include "vtkMAFLargeDataSetCallback.h"
 
+#include "mafObserver.h"
+
+#include "vtkObject.h"
 
 /*virtual*/ void vtkMAFLargeDataSetCallback
 	::Execute(vtkObject* caller, unsigned long eventId, void* callData)
@@ -35,7 +36,7 @@
 			ev.SetArg(0);
 			Listener->OnEvent(&ev);
 
-			mafString szStr = caller->GetClassName(); //"Processing ";
+      mafString szStr = caller->GetClassName(); //"Processing ";
 			ev.SetId(PROGRESSBAR_SET_TEXT);
 			ev.SetString(&szStr);
 		}
@@ -45,4 +46,8 @@
 			Listener->OnEvent(&ev);
 		}
 	}
-}	
+}
+/*virtual*/ void vtkMAFLargeDataSetCallback::SetListener(mafObserver* listener)
+  {
+    Listener = listener;
+  }

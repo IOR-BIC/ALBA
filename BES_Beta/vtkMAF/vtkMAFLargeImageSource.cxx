@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMAFLargeImageSource.cxx,v $ 
   Language: C++ 
-  Date: $Date: 2009-05-14 15:03:31 $ 
-  Version: $Revision: 1.1.2.1 $ 
+  Date: $Date: 2011-05-26 08:51:01 $ 
+  Version: $Revision: 1.1.2.2 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -18,7 +18,8 @@
 #include "vtkObjectFactory.h"
 
 #include "mafMemDbg.h"
-vtkCxxRevisionMacro(vtkMAFLargeImageSource, "$Revision: 1.1.2.1 $");
+vtkCxxRevisionMacro(vtkMAFLargeImageSource, "$Revision: 1.1.2.2 $");
+vtkStandardNewMacro(vtkMAFLargeImageSource);
 
 //----------------------------------------------------------------------------
 vtkMAFLargeImageSource::vtkMAFLargeImageSource()

@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMAFLargeImageData.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-09-29 09:33:32 $ 
-  Version: $Revision: 1.1.2.3 $ 
+  Date: $Date: 2011-05-26 08:51:01 $ 
+  Version: $Revision: 1.1.2.4 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -26,7 +26,7 @@ class vtkVoxel;
 
 #pragma warning(disable: 4068)	//pragma region is unsupported in VS2003
 
-class VTK_COMMON_EXPORT vtkMAFLargeImageData : public vtkMAFLargeDataSet
+class VTK_vtkMED_EXPORT vtkMAFLargeImageData : public vtkMAFLargeDataSet
 {
 public:
 	static vtkMAFLargeImageData *New();

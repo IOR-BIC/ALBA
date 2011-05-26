@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMAFLargeImageReader.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-05-14 15:03:31 $ 
-  Version: $Revision: 1.1.2.1 $ 
+  Date: $Date: 2011-05-26 08:51:01 $ 
+  Version: $Revision: 1.1.2.2 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -16,9 +16,10 @@
 
 #pragma warning(disable: 4068)	//VS2003 does not support regions
 
+#include "vtkMEDConfigure.h"
 #include "vtkMAFLargeImageSource.h"
 
-class VTK_IO_EXPORT vtkMAFLargeImageReader : public vtkMAFLargeImageSource
+class VTK_vtkMED_EXPORT vtkMAFLargeImageReader : public vtkMAFLargeImageSource
 {
 protected:
 	//Sample rate (in x,y and z) denotes the quality of the snapshot on output

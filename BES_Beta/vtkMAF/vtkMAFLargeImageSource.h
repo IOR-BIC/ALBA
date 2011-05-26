@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMAFLargeImageSource.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-05-14 15:03:31 $ 
-  Version: $Revision: 1.1.2.1 $ 
+  Date: $Date: 2011-05-26 08:51:01 $ 
+  Version: $Revision: 1.1.2.2 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -14,14 +14,17 @@
 #ifndef __vtkMAFLargeImageSource_h
 #define __vtkMAFLargeImageSource_h
 
+#include "vtkMEDConfigure.h"
 #include "vtkSource.h"
 #include "vtkMAFIdType64.h"
 
 class vtkMAFLargeImageData;
 
-class VTK_FILTERING_EXPORT vtkMAFLargeImageSource : public vtkSource
+class VTK_vtkMED_EXPORT vtkMAFLargeImageSource : public vtkSource
 {
 public:
+  static vtkMAFLargeImageSource* New();
+
   vtkTypeRevisionMacro(vtkMAFLargeImageSource,vtkSource);
   void PrintSelf(ostream& os, vtkIndent indent);
 
@@ -45,7 +48,6 @@ protected:
 private:
   vtkMAFLargeImageSource(const vtkMAFLargeImageSource&);  // Not implemented.
   void operator=(const vtkMAFLargeImageSource&);  // Not implemented.
-  static vtkMAFLargeImageSource* New() {return NULL;}		//Not implemented - abstract class
 };
 
 
