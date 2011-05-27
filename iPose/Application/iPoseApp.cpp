@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: iPoseApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-10-20 13:58:36 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-05-27 07:40:46 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -78,7 +78,7 @@ IMPLEMENT_APP(iPoseApp)
 bool iPoseApp::OnInit()
 //--------------------------------------------------------------------------------
 {
-  mafPics.Initialize();
+  mafPictureFactory::GetPictureFactory()->Initialize();
   #include "iPose/pic/FRAME_ICON16x16.xpm"
   mafADDPIC(FRAME_ICON16x16);
   
