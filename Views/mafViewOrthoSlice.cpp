@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-11-22 11:04:58 $
-  Version:   $Revision: 1.61.2.17 $
-  Authors:   Stefano Perticoni
+  Date:      $Date: 2011-05-30 13:06:48 $
+  Version:   $Revision: 1.61.2.18 $
+  Authors:   Stefano Perticoni, Gianluigi Crimi
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -84,6 +84,8 @@ mafViewOrthoSlice::mafViewOrthoSlice(wxString label)
 	m_AllSurface=0;
 	m_Border=1;
 
+  m_canPlugVisualPipes=true;
+
   // Added by Losi 11.25.2009
   m_EnableGPU=FALSE;
 }
@@ -115,6 +117,9 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
 {
 	wxWindowDisabler wait1;
 	wxBusyCursor wait2;
+
+  //Disable Visal pipes plug at run time
+  m_canPlugVisualPipes=false;
 
 	for(int i=0; i<m_NumOfChildView; i++)
 		m_ChildViewList[i]->VmeShow(node, show);
@@ -423,6 +428,39 @@ mafGUI* mafViewOrthoSlice::CreateGui()
 
   m_Gui->Divider();
   return m_Gui;
+}
+
+//----------------------------------------------------------------------------
+void mafViewOrthoSlice::PlugVisualPipeInSliceViews(mafString vme_type, mafString pipe_type, long visibility)
+//----------------------------------------------------------------------------
+{
+  if (m_canPlugVisualPipes)
+  {
+    for(int v=PERSPECTIVE_VIEW; v<VIEWS_NUMBER; v++)
+      if (v != PERSPECTIVE_VIEW && m_Views[v]!=NULL)
+        m_Views[v]->PlugVisualPipe(vme_type, "mafPipeSurfaceSlice",MUTEX);
+       
+  }
+  else
+  {
+    mafLogMessage("OthoSlice Error: You cannot plug visual pipes after visualization operation");
+  }
+}
+
+//----------------------------------------------------------------------------
+void mafViewOrthoSlice::PlugVisualPipeInPerspective(mafString vme_type, mafString pipe_type, long visibility)
+//----------------------------------------------------------------------------
+{
+      if (m_canPlugVisualPipes)
+      {
+         if (m_Views[PERSPECTIVE_VIEW]!=NULL)
+            m_Views[PERSPECTIVE_VIEW]->PlugVisualPipe(vme_type, "mafPipeSurfaceSlice",MUTEX);
+
+      }
+      else
+      {
+        mafLogMessage("OthoSlice Error: You cannot plug visual pipes after visualization operation");
+      }
 }
 
 //----------------------------------------------------------------------------

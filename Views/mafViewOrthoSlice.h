@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:22:31 $
-  Version:   $Revision: 1.23.2.5 $
-  Authors:   Stefano Perticoni
+  Date:      $Date: 2011-05-30 13:06:48 $
+  Version:   $Revision: 1.23.2.6 $
+  Authors:   Stefano Perticoni, Gianluigi Crimi
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -44,6 +44,7 @@ class MED_EXPORT mafViewOrthoSlice: public mafViewCompound
 public:
   /** constructor */
   mafViewOrthoSlice(wxString label = "View OrthoSlice");
+
   /** destructor */
   virtual ~mafViewOrthoSlice(); 
 
@@ -120,8 +121,16 @@ public:
   /** print a dump of this object */
   virtual void Print(std::ostream& os, const int tabs=0);// const;
 
-  /* Method for determine if the pick is over a Slice view or not*/
+  /** Method for determine if the pick is over a Slice view or not*/
   bool IsPickedSliceView();
+
+  /** Plug a visual pipe for a particular vme in the perspective sub-view
+  Note: This method will be called immediately after the call of PackageView */ 
+  void PlugVisualPipeInPerspective(mafString vme_type, mafString pipe_type, long visibility = VISIBLE);
+
+  /** Plug a visual pipe for a particular vme in each perspective sub-view
+  Note: This method will be called immediately after the call of PackageView */ 
+  void PlugVisualPipeInSliceViews(mafString vme_type, mafString pipe_type, long visibility = VISIBLE);
 
 protected:
   /**
@@ -170,6 +179,9 @@ protected:
   int	m_Side; ///< change Azimuth of the camera
 	int m_Snap; ///<change modality of gizmo to snap on grid
 
+  bool m_canPlugVisualPipes; ///< true if u can plug visual pipes
+
+  
   int m_EnableGPU;
 
 };
