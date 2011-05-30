@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medRelationalDatabaseAbstractConnectorTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-11-08 12:38:42 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-05-30 15:01:53 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -67,7 +67,7 @@ public:
   /** overloaded constructor */
   medRelationalDatabaseAbstractConnectorSample(const char *queryString);
   /** destructor */
-  virtual ~medRelationalDatabaseAbstractConnectorSample(){}; 
+  virtual ~medRelationalDatabaseAbstractConnectorSample(); 
 
   /** RTTI macro */
   mafTypeMacro(medRelationalDatabaseAbstractConnectorSample, medRelationalDatabaseAbstractConnector);
@@ -105,6 +105,7 @@ public:
 mafCxxTypeMacro(medRelationalDatabaseAbstractConnectorSample);
 //----------------------------------------------------------------------------
 
+
 //----------------------------------------------------------------------------
 medRelationalDatabaseAbstractConnectorSample::medRelationalDatabaseAbstractConnectorSample()
 //----------------------------------------------------------------------------
@@ -118,6 +119,13 @@ medRelationalDatabaseAbstractConnectorSample::medRelationalDatabaseAbstractConne
 //----------------------------------------------------------------------------
 {
     m_ResultQueryHandler = new medResultQueryAbstractHandlerSampleForConnector();
+}
+
+//----------------------------------------------------------------------------
+medRelationalDatabaseAbstractConnectorSample::~medRelationalDatabaseAbstractConnectorSample()
+//----------------------------------------------------------------------------
+{
+  delete m_ResultQueryHandler;
 }
 
 //----------------------------------------------------------------------------
