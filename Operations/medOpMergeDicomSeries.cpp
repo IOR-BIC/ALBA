@@ -2,8 +2,8 @@
 Program:   MED
 Module:    $RCSfile: medOpMergeDicomSeries.cpp,v $
 Language:  C++
-Date:      $Date: 2011-05-06 10:12:48 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-05-30 09:39:07 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Alberto Losi
 ==========================================================================
 Copyright (c) 2009
@@ -72,8 +72,8 @@ medOpMergeDicomSeries::~medOpMergeDicomSeries()
 mafOp *medOpMergeDicomSeries::Copy()
 //----------------------------------------------------------------------------
 {
+  // returns a copy of this operation
 	medOpMergeDicomSeries *op = new medOpMergeDicomSeries(m_Label);
-
 	return op;
 }
 //----------------------------------------------------------------------------
@@ -85,6 +85,7 @@ void medOpMergeDicomSeries::OpRun()
 	{
 		if (m_DicomDirectoryABSFileName == "")
 		{	
+      // Get the selected dicom directory
 			wxString lastDicomDir = ((medGUIDicomSettings*)GetSetting())->GetLastDicomDir();
 
 			if (lastDicomDir == "UNEDFINED_m_LastDicomDir")
@@ -101,6 +102,8 @@ void medOpMergeDicomSeries::OpRun()
 				wxString path = dialog.GetPath();
 				((medGUIDicomSettings*)GetSetting())->SetLastDicomDir(path);
 				m_DicomDirectoryABSFileName = path.c_str();
+
+        // call the "renaming" function
         RanameSeriesAndManufacturer(m_DicomDirectoryABSFileName);
 			}
 			else
@@ -123,7 +126,10 @@ void medOpMergeDicomSeries::OpRun()
 //----------------------------------------------------------------------------
 bool medOpMergeDicomSeries::RanameSeriesAndManufacturer(const char *dicomDirABSPath)
 //----------------------------------------------------------------------------
-{   
+{
+  // This function change the value for the dicom tag
+  // that refers to SeriesID and Manufacturer in order to merge dicom data represnting single images
+  // into a data that represents a volume
 
   long progress;
   int sliceNum = -1;
@@ -220,9 +226,11 @@ bool medOpMergeDicomSeries::RanameSeriesAndManufacturer(const char *dicomDirABSP
         continue;
       }
 
+      // change dicom SeriesUID tag to 999 for all images in order to merge them to a single series
       const char *dcmSeriesInstanceUID = "999";
       status = dicomDataset->putAndInsertString(DCM_SeriesInstanceUID,dcmSeriesInstanceUID);
 
+      // change the manufacturer to invalid in order to "inform" dicom importer that this data was merged by this op
       const char *dcmManufacturer = "INVALID";
       status = dicomDataset->putAndInsertString(DCM_Manufacturer,dcmManufacturer);
 
