@@ -2,8 +2,8 @@
 Program:   MED
 Module:    $RCSfile: medOpMergeDicomSeries.h,v $
 Language:  C++
-Date:      $Date: 2011-05-06 10:12:48 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-05-30 08:58:59 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Alberto Losi
 ==========================================================================
 Copyright (c) 2009
@@ -14,10 +14,12 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #include "vtkDirectory.h"
 
 //----------------------------------------------------------------------------
-// medOpMergeDicomSeries :
+// medOpMergeDicomSeries : Merge dicom series located in the same folder
 //----------------------------------------------------------------------------
 /** 
-@ToDo
+Merge dicom series located in the same folder; this operation was implemented to correctly import and visualize data located in 
+"\\HD01\Public\Dati\Dicom Regression\NIG004_MAGLU_SA" and "\\HD01\Public\Dati\Dicom Regression\NIG009-PAVVI_SA"
+WARNING: This operation will be removed and integrated in the importer dicom operation as an optiona functionality
 */
 class medOpMergeDicomSeries : public mafOp
 {
@@ -37,7 +39,7 @@ public:
 	/** Builds operation's interface calling CreateGui() method. */
 	virtual void OpRun();
 
-  /** @ToDo */
+  /** turn true for the acceptable vme type. */
   virtual bool Accept(mafNode *node){return true;};
 
 protected:
