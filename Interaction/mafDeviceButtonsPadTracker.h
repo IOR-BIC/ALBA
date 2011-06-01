@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDeviceButtonsPadTracker.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-25 11:26:19 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2011-06-01 08:35:54 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -24,6 +24,8 @@
 class mafTransform;
 class mafMatrix;
 class mafOBB;
+
+template class MAF_EXPORT mafAutoPointer<mafAvatar>;
 
 /** Generic spatial position tracking device.
   mafDeviceButtonsPadTracker is a class providing basic functionalities for space trackers, 
@@ -209,7 +211,6 @@ protected:
 
   mafTransform*         m_TrackerToCanonicalTransform;
 
-  template class MAF_EXPORT mafAutoPointer<mafAvatar>;
   mafAutoPointer<mafAvatar> m_Avatar;        ///< the current avatar
   mafAutoPointer<mafAvatar> m_DefaultAvatar; ///< the avatar set thorugh the GUI
 
