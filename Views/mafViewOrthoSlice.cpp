@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-05-30 13:06:48 $
-  Version:   $Revision: 1.61.2.18 $
+  Date:      $Date: 2011-06-01 07:58:15 $
+  Version:   $Revision: 1.61.2.19 $
   Authors:   Stefano Perticoni, Gianluigi Crimi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -84,7 +84,7 @@ mafViewOrthoSlice::mafViewOrthoSlice(wxString label)
 	m_AllSurface=0;
 	m_Border=1;
 
-  m_canPlugVisualPipes=true;
+  m_CanPlugVisualPipes=true;
 
   // Added by Losi 11.25.2009
   m_EnableGPU=FALSE;
@@ -119,7 +119,7 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
 	wxBusyCursor wait2;
 
   //Disable Visal pipes plug at run time
-  m_canPlugVisualPipes=false;
+  m_CanPlugVisualPipes=false;
 
 	for(int i=0; i<m_NumOfChildView; i++)
 		m_ChildViewList[i]->VmeShow(node, show);
@@ -434,7 +434,7 @@ mafGUI* mafViewOrthoSlice::CreateGui()
 void mafViewOrthoSlice::PlugVisualPipeInSliceViews(mafString vme_type, mafString pipe_type, long visibility)
 //----------------------------------------------------------------------------
 {
-  if (m_canPlugVisualPipes)
+  if (m_CanPlugVisualPipes)
   {
     for(int v=PERSPECTIVE_VIEW; v<VIEWS_NUMBER; v++)
       if (v != PERSPECTIVE_VIEW && m_Views[v]!=NULL)
@@ -451,7 +451,7 @@ void mafViewOrthoSlice::PlugVisualPipeInSliceViews(mafString vme_type, mafString
 void mafViewOrthoSlice::PlugVisualPipeInPerspective(mafString vme_type, mafString pipe_type, long visibility)
 //----------------------------------------------------------------------------
 {
-      if (m_canPlugVisualPipes)
+      if (m_CanPlugVisualPipes)
       {
          if (m_Views[PERSPECTIVE_VIEW]!=NULL)
             m_Views[PERSPECTIVE_VIEW]->PlugVisualPipe(vme_type, "mafPipeSurfaceSlice",MUTEX);

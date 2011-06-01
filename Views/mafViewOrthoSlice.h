@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-30 13:06:48 $
-  Version:   $Revision: 1.23.2.6 $
+  Date:      $Date: 2011-06-01 07:58:15 $
+  Version:   $Revision: 1.23.2.7 $
   Authors:   Stefano Perticoni, Gianluigi Crimi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -179,7 +179,7 @@ protected:
   int	m_Side; ///< change Azimuth of the camera
 	int m_Snap; ///<change modality of gizmo to snap on grid
 
-  bool m_canPlugVisualPipes; ///< true if u can plug visual pipes
+  bool m_CanPlugVisualPipes; ///< true if u can plug visual pipes
 
   
   int m_EnableGPU;
