@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotateCircle.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-25 11:20:00 $
-  Version:   $Revision: 1.2.22.5 $
+  Date:      $Date: 2011-06-01 07:46:13 $
+  Version:   $Revision: 1.2.22.6 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -34,6 +34,8 @@ class vtkCleanPolyData;
 class vtkTubeFilter;
 class vtkTransformPolyDataFilter;
 class vtkTransform;
+
+template class MAF_EXPORT mafAutoPointer<mafMatrix>;
 
 //----------------------------------------------------------------------------
 /** Basic gizmo component used to perform constrained rotation around an axis.
@@ -120,7 +122,6 @@ protected:
   Both reference system type are set to CUSTOM.*/
   void SetRefSysMatrix(mafMatrix *matrix);
 
-  template class MAF_EXPORT mafAutoPointer<mafMatrix>;
   mafAutoPointer<mafMatrix> m_AbsInputMatrix;
   
   /** Circle gizmo */

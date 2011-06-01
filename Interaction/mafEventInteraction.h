@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventInteraction.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-25 11:26:19 $
-  Version:   $Revision: 1.6.10.3 $
+  Date:      $Date: 2011-06-01 07:46:13 $
+  Version:   $Revision: 1.6.10.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -16,6 +16,8 @@
 #include "mafEventBase.h"
 #include "mafMatrix.h"
 #include "mafSmartPointer.h"
+
+template class MAF_EXPORT mafAutoPointer<mafMatrix>;
 
 /** Event class to transport a triggering button and a position from pointing devices.
   Evant issue by 2D and 3D tracking devices in correspondace to
@@ -95,7 +97,6 @@ protected:
   double        m_Y;          ///< Y coordinate, used by mouse device
   bool          m_XYFlag;     ///< Used to signal a 2D coordinate is present
 
-  template class MAF_EXPORT mafAutoPointer<mafMatrix>;
   mafAutoPointer<mafMatrix>  m_Matrix;    ///< Pose matrix, used by 3D trackers
 };
 

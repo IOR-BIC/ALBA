@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafScalarMatrixInterpolator.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-25 11:52:18 $
-  Version:   $Revision: 1.2.2.2 $
+  Date:      $Date: 2011-06-01 07:46:33 $
+  Version:   $Revision: 1.2.2.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,6 +21,8 @@
 // forward declarations
 //----------------------------------------------------------------------------
 class mafVMEItemScalarMatrix;
+
+template class MAF_EXPORT vnl_matrix<double>;
 
 /**
   Class Name: mafScalarMatrixInterpolator.
@@ -68,7 +70,6 @@ protected:
   /** Execute possible procedural code: Empty function */
   virtual void Execute() {}
 
-  template class MAF_EXPORT vnl_matrix<double>;
   vnl_matrix<double> m_ScalarData;
 
 private:

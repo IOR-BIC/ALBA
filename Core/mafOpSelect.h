@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpSelect.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-25 09:42:20 $
-  Version:   $Revision: 1.7.2.3 $
+  Date:      $Date: 2011-06-01 07:46:00 $
+  Version:   $Revision: 1.7.2.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,6 +24,8 @@
 //----------------------------------------------------------------------------
 class mafNode;
 class vtkMatrix4x4;
+
+template class MAF_EXPORT mafAutoPointer<mafNode>;
 
 /**
     class name: mafOpSelect
@@ -53,7 +55,6 @@ public:
     /** return a instance of current object. */
     mafOp* Copy();
 protected:
-    template class MAF_EXPORT mafAutoPointer<mafNode>;
     mafAutoPointer<mafNode> m_OldNodeSelected;
     mafAutoPointer<mafNode> m_NewNodeSelected;
 };
@@ -83,7 +84,6 @@ public:
     /** set the clipboard */
     void SetClipboard(mafNode *node);
 protected:
-  template class MAF_EXPORT mafAutoPointer<mafNode>;
   // static   mafAutoPointer<mafNode> m_Clipboard;
   mafAutoPointer<mafNode> m_Backup;
   mafAutoPointer<mafNode> m_Selection;
