@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRefSys.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-25 11:48:21 $
-  Version:   $Revision: 1.3.22.1 $
+  Date:      $Date: 2011-06-01 08:36:35 $
+  Version:   $Revision: 1.3.22.2 $
   Authors:   Marco Petrone, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -27,6 +27,9 @@ class mafMatrix;
 class vtkMatrix4x4;
 class vtkRenderer;
 
+template class mafAutoPointer<mafVME>;
+template class mafAutoPointer<mafTransform>;
+template class mafAutoPointer<mafTransformBase>;
 
 /** class representing reference system
 
@@ -181,10 +184,6 @@ protected:
 
   /** internally used to set default values */
   void Initialize();
-
-  template class mafAutoPointer<mafVME>;
-  template class mafAutoPointer<mafTransform>;
-  template class mafAutoPointer<mafTransformBase>;
 
   mafAutoPointer<mafTransform> m_Identity;  
   mafAutoPointer<mafTransformBase> m_Transform;///< the ref sys matrix
