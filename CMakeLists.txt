@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2011-05-26 07:47:28 $
-# Version:   $Revision: 1.12.2.4 $
+# Date:      $Date: 2011-06-06 14:10:24 $
+# Version:   $Revision: 1.12.2.5 $
 #
 # Description:
 # CMake Project file for the Medical Library.
@@ -52,17 +52,8 @@ ENDIF(WIN32)
 # OPTION(BUILD_SHARED_LIBS "Build with shared libraries." OFF )
 OPTION(BUILD_EXAMPLES "Build examples." ON )
 OPTION(BUILD_TESTING "Build the testing tree." OFF)
-OPTION(MED_BUILD_MEDDLL "Build medDLL.dll." OFF)
 OPTION(BUILD_IPOSE "Build iPose application." OFF)
 
-# MARK_AS_ADVANCED (
-  # BUILD_SHARED_LIBS 
-# )
-
-
-IF(MED_BUILD_MEDDLL)
-  SET(MED_BUILD_MEDDLL 1)
-ENDIF (MED_BUILD_MEDDLL)
 
 SET (CONFIGURE_ERROR 0)
 
@@ -72,8 +63,18 @@ SET (CONFIGURE_ERROR 0)
 INCLUDE("${PROJECT_SOURCE_DIR}/FindMAF.cmake")
 
 IF(MAF_FOUND)
+
   INCLUDE("${MAF_USE_FILE}")
-  
+
+	IF(MAF_BUILD_MAFDLL)
+		OPTION(MED_BUILD_MEDDLL "Build medDLL.dll." OFF)
+	ENDIF(MAF_BUILD_MAFDLL)
+
+	IF(MED_BUILD_MEDDLL)
+	  SET(MED_BUILD_MEDDLL 1)
+	ENDIF (MED_BUILD_MEDDLL)
+
+	
   SET(MFL_SOURCE_DIR ${MFL_SOURCE_PATH})
   MED_SUBPROJECT(MedFL Libraries)
 	IF (MedFL_CONFIG_FOUND)
