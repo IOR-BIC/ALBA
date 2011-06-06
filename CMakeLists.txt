@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2011-06-06 14:10:24 $
-# Version:   $Revision: 1.12.2.5 $
+# Date:      $Date: 2011-06-06 16:23:47 $
+# Version:   $Revision: 1.12.2.6 $
 #
 # Description:
 # CMake Project file for the Medical Library.
@@ -72,6 +72,8 @@ IF(MAF_FOUND)
 
 	IF(MED_BUILD_MEDDLL)
 	  SET(MED_BUILD_MEDDLL 1)
+	ELSE(MED_BUILD_MEDDLL)
+          SET(MED_BUILD_MEDDLL 0)
 	ENDIF (MED_BUILD_MEDDLL)
 
 	
