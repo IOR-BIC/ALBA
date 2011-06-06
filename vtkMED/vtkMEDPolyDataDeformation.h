@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMEDPolyDataDeformation.h,v $ 
   Language: C++ 
-  Date: $Date: 2011-05-26 08:33:31 $ 
-  Version: $Revision: 1.1.2.12 $ 
+  Date: $Date: 2011-06-06 14:20:13 $ 
+  Version: $Revision: 1.1.2.13 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -67,6 +67,9 @@ class vtkPolyData;
 class vtkIdList;
 class vtkCellLocator;
 
+EXPORT_STL_VECTOR(VTK_vtkMED_EXPORT,CSkeletonEdge*);
+EXPORT_STL_VECTOR(VTK_vtkMED_EXPORT,CSkeletonVertex*);
+
 class VTK_vtkMED_EXPORT vtkMEDPolyDataDeformation : public vtkPolyDataToPolyDataFilter
 {
 public:
@@ -121,9 +124,6 @@ protected:
 
     LOCAL_FRAME LF;             //<local frame system
     CSkeletonVertex* PMatch;    //<matched vertex
-
-    EXPORT_STL_VECTOR(VTK_vtkMED_EXPORT,CSkeletonEdge*);
-    EXPORT_STL_VECTOR(VTK_vtkMED_EXPORT,CSkeletonVertex*);
 
     std::vector< CSkeletonEdge* > OneRingEdges;    //<edges around this vertex
     std::vector< CSkeletonVertex* > JoinedVertices;//<vertices of other curves with the same coordinates   
@@ -220,8 +220,6 @@ protected:
   class VTK_vtkMED_EXPORT CSkeleton
   {
   public:
-    EXPORT_STL_VECTOR(VTK_vtkMED_EXPORT,CSkeletonEdge*);
-    EXPORT_STL_VECTOR(VTK_vtkMED_EXPORT,CSkeletonVertex*);
 
     std::vector< CSkeletonVertex* > Vertices;
     std::vector< CSkeletonEdge* > Edges;
