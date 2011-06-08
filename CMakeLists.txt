@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2011-05-26 16:49:57 $
-# Version:   $Revision: 1.44.2.9 $
+# Date:      $Date: 2011-06-08 08:53:45 $
+# Version:   $Revision: 1.44.2.10 $
 #
 # Description:
 # CMake Project file for the MAF.
@@ -278,8 +278,11 @@ ENDIF(WIN32)
   #-----------------------------------------------------------------------------
   # Testing stuff
   #-----------------------------------------------------------------------------
+  
+  # TestData MAF_DATA_ROOT should be filled even if BUILD_TESTING is set to off 
+  FIND_PATH(MAF_DATA_ROOT "TestingDataRoot.txt" "${MAF_SOURCE_DIR}/Testing/unittestData" "${MAF_SOURCE_DIR}/../mmData/TestingData" "${MAF_SOURCE_DIR}/../unittestData" DOC "Test data repository")
+    
   IF(BUILD_TESTING)
-    FIND_PATH(MAF_DATA_ROOT "TestingDataRoot.txt" "${MAF_SOURCE_DIR}/Testing/unittestData" "${MAF_SOURCE_DIR}/../mmData/TestingData" "${MAF_SOURCE_DIR}/../unittestData" DOC "Test data repository")
     INCLUDE (${CMAKE_ROOT}/Modules/Dart.cmake)
     ENABLE_TESTING()
   
