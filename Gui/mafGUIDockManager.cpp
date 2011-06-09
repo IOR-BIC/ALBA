@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIDockManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-12-02 15:06:44 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-06-09 09:39:32 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Benjamin I. Williams
 ==========================================================================
   Copyright:   (C) Copyright 2005, Kirix Corporation, All Rights Reserved.
@@ -4151,14 +4151,14 @@ void wxFrameManager::OnChildFocus(wxChildFocusEvent& event)
 // when a pane button has been pressed.
 void wxFrameManager::OnPaneButton(wxFrameManagerEvent& event)
 {
-    wxPaneInfo& pane = *(event.pane);
+    wxPaneInfo& pane = *(event.m_Pane);
     
-    if (event.button == wxPaneInfo::buttonClose)
+    if (event.m_Button == wxPaneInfo::buttonClose)
     {
         pane.Hide();
         Update();
     }
-     else if (event.button == wxPaneInfo::buttonPin)
+     else if (event.m_Button == wxPaneInfo::buttonPin)
     {
         if ((m_Flags & wxAUI_MGR_ALLOW_FLOATING) &&
             pane.IsFloatable())

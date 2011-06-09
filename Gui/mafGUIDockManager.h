@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIDockManager.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-25 10:08:10 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2011-06-09 09:39:32 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Benjamin I. Williams
 ==========================================================================
   Copyright:   (C) Copyright 2005, Kirix Corporation, All Rights Reserved.
@@ -638,32 +638,32 @@ public:
     /** constructor */
     wxFrameManagerEvent(wxEventType type) : wxEvent(0, type)
     {
-        pane = NULL;
-        button = 0;
+        m_Pane = NULL;
+        m_Button = 0;
     }
 
     /** constructor */
     wxFrameManagerEvent(const wxFrameManagerEvent& c) : wxEvent(c)
     {
-        pane = c.pane;
-        button = c.button;
+        m_Pane = c.m_Pane;
+        m_Button = c.m_Button;
     }
 
     /** clone the event and retrieve the new instance */
     wxEvent *Clone() const { return new wxFrameManagerEvent(*this); }
 
     /** set pane member */
-    void SetPane(wxPaneInfo* p) { pane = p; }
+    void SetPane(wxPaneInfo* p) { m_Pane = p; }
     /** set button member */
-    void SetButton(int b) { button = b; }
+    void SetButton(int b) { m_Button = b; }
     /** retrieve pane*/
-    wxPaneInfo* GetPane() { return pane; }
+    wxPaneInfo* GetPane() { return m_Pane; }
     /** retrieve button */
-    int GetButton() { return button; }
+    int GetButton() { return m_Button; }
 
 public:
-    wxPaneInfo* pane;
-    int button;
+    wxPaneInfo* m_Pane;
+    int m_Button;
 };
 
 
