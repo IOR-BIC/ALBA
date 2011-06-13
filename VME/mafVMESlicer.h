@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESlicer.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:06:00 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2011-06-13 15:59:35 $
+  Version:   $Revision: 1.15.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -36,6 +36,11 @@ class mafVMEOutputSurface;
 class MAF_EXPORT mafVMESlicer : public mafVME
 {
 public:
+
+  /** Enable/Disable slicer texture vtk property automatic update from material (default behavior is 
+  updating from material) */
+  void SetUpdateVTKPropertiesFromMaterial(bool updateFromMaterial) {m_UpdateVTKPropertiesFromMaterial = updateFromMaterial;};
+  bool GetUpdateVTKPropertiesFromMaterial() {return m_UpdateVTKPropertiesFromMaterial;};
 
   mafTypeMacro(mafVMESlicer,mafVME);
 
@@ -124,6 +129,8 @@ protected:
   int               m_TextureRes;
   double            m_Xspc;
   double            m_Yspc;
+
+  bool m_UpdateVTKPropertiesFromMaterial;
 
 private:
   mafVMESlicer(const mafVMESlicer&); // Not implemented

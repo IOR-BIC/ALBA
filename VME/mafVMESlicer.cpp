@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-09-02 12:30:40 $
-  Version:   $Revision: 1.28.2.1 $
+  Date:      $Date: 2011-06-13 15:59:35 $
+  Version:   $Revision: 1.28.2.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -53,6 +53,8 @@ mafCxxTypeMacro(mafVMESlicer)
 mafVMESlicer::mafVMESlicer()
 //-------------------------------------------------------------------------
 {
+  m_UpdateVTKPropertiesFromMaterial = true;
+
   mafNEW(m_Transform);
 	mafNEW(m_CopyTransform);
   mafVMEOutputSurface *output=mafVMEOutputSurface::New(); // an output with no data
@@ -324,8 +326,12 @@ void mafVMESlicer::InternalPreUpdate()
 
       GetMaterial()->SetMaterialTexture(texture);
       texture->GetScalarRange(GetMaterial()->m_TableRange);
-      GetMaterial()->UpdateProp();
-
+      
+	  if (m_UpdateVTKPropertiesFromMaterial == true)
+	  {
+		  GetMaterial()->UpdateProp();
+	  }
+	  
       m_PSlicer->SetInput(vtkdata);
       m_PSlicer->SetPlaneOrigin(pos);
       m_PSlicer->SetPlaneAxisX(vectX);
@@ -371,7 +377,11 @@ void mafVMESlicer::InternalUpdate()
 
       GetMaterial()->SetMaterialTexture(texture);
       texture->GetScalarRange(GetMaterial()->m_TableRange);
-      GetMaterial()->UpdateProp();
+
+	  if (m_UpdateVTKPropertiesFromMaterial == true)
+	  {
+		GetMaterial()->UpdateProp();
+	  }
     }
   }
 }
