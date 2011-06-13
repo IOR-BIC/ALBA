@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medInteractorPERBrushFeedback.h,v $
 Language:  C++
-Date:      $Date: 2011-05-10 15:08:19 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-06-13 16:02:54 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Eleonora Mambrini, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -55,14 +55,18 @@ public:
   /** Set the radius */
   void SetRadius(double radius);
 
-  /***/
+  /** Set the Shape of the brush*/
   void SetBrushShape(int shape);
 
 protected:
+  /** constructor. */
   medInteractorPERBrushFeedback();
+  /** destructor. */
   virtual ~medInteractorPERBrushFeedback();
   
+  /* draw an the Brush ellipse*/
   void DrawEllipse(double x, double y);
+  /* draw an the Brush box*/
   void DrawBox(double x, double y);
 
   int m_Radius;
@@ -77,9 +81,5 @@ protected:
   bool m_IsActorAdded;
   bool m_EnableDrawing;
 
-  
-private:
-  medInteractorPERBrushFeedback(const medInteractorPERBrushFeedback&);  // Not implemented.
-  void operator=(const medInteractorPERBrushFeedback&);  // Not implemented.
 };
 #endif 

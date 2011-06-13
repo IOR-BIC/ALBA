@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medInteractorPERScalarInformation.h,v $
 Language:  C++
-Date:      $Date: 2011-05-10 15:08:19 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-06-13 16:02:54 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2010
@@ -25,14 +25,14 @@ class medInteractorPERScalarInformation : public mafInteractorPER
 public: 
   mafTypeMacro(medInteractorPERScalarInformation,mafInteractorPER);
 
+   /** Function that handles events sent from other objects. */
   virtual void OnEvent(mafEventBase *event);
 
 protected:
+  /** constructor. */
   medInteractorPERScalarInformation();
+  /** destructor. */
   virtual ~medInteractorPERScalarInformation();
 
-private:
-  medInteractorPERScalarInformation(const medInteractorPERScalarInformation&);  // Not implemented.
-  void operator=(const medInteractorPERScalarInformation&);  // Not implemented.
 };
 #endif 

@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpExtractGeometry.h,v $
 Language:  C++
-Date:      $Date: 2011-05-10 15:13:28 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-06-13 16:01:44 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Eleonora Mambrini, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
@@ -31,9 +31,6 @@ class vtkImageData;
 class vtkMAFContourVolumeMapper;
 class vtkPolyData;
 
-/** 
-class name : lhpOpExtractGeometry
-*/
 class medOpExtractGeometry: public mafOp
 {
 public:
@@ -64,33 +61,35 @@ public:
 
   /** constructor. */
   medOpExtractGeometry(const wxString &label = "Extract Geometry from binary volume");
+  
   /** destructor. */
   ~medOpExtractGeometry(); 
 
   /** Precess events coming from other objects */
-  /*virtual*/ void OnEvent(mafEventBase *maf_event);
+  void OnEvent(mafEventBase *maf_event);
 
   /** RTTI macro */
   mafTypeMacro(medOpExtractGeometry, mafOp);
 
-  /*virtual*/ mafOp* Copy();
+  /** return the copy of the operation object */
+  mafOp* Copy();
 
   /** Return true for the acceptable vme type. */
-  /*virtual*/ bool Accept(mafNode *node);
+  bool Accept(mafNode *node);
 
   /** Builds operation's interface. */
-  /*virtual*/ void OpRun();
+  void OpRun();
 
   /** Execute the operation. */
-  /*virtual*/ void OpDo();
+  void OpDo();
 
   /** Makes the undo for the operation. */
-  /*virtual*/ void OpUndo();
+  void OpUndo();
 
 protected:
 
   /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
-  /*virtual*/ void OpStop(int result);
+   void OpStop(int result);
 
   /** Compute derived surface. */
   int GenerateIsosurface();
