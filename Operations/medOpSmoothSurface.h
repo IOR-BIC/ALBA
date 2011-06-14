@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSmoothSurface.h,v $
 Language:  C++
-Date:      $Date: 2011-05-26 08:16:40 $
-Version:   $Revision: 1.3.2.1 $
+Date:      $Date: 2011-06-14 08:31:57 $
+Version:   $Revision: 1.3.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -57,16 +57,23 @@ class mafEvent;
 //----------------------------------------------------------------------------
 // medOpSmoothSurface :
 //----------------------------------------------------------------------------
-/** */
+/** 
+class name:  medOpSmoothSurface.
+Class which supplies the possibility to smooth a surface, giving a number of iteration of smooth, clear the result or
+preview the output.
+*/
 class MED_EXPORT medOpSmoothSurface: public mafOp
 {
 public:
+  /** object constructor */
 	medOpSmoothSurface(const wxString &label = "FilterSurface");
-	~medOpSmoothSurface(); 
+  /** object destructor */  
+	~medOpSmoothSurface();
+  /** method for catch the dispatched events */
 	virtual void OnEvent(mafEventBase *maf_event);
-
+  /** RTTI macro */
 	mafTypeMacro(medOpSmoothSurface, mafOp);
-
+  /** method for clone object */
 	mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */
@@ -87,7 +94,7 @@ public:
 protected:
 	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
 	void OpStop(int result);
-
+  /** implement gui and create widgets */
   void CreateGui();
 
 	int	m_Iterations;

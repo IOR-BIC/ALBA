@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterMeters.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:08:41 $
-  Version:   $Revision: 1.2.2.1 $
+  Date:      $Date: 2011-06-14 08:31:57 $
+  Version:   $Revision: 1.2.2.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -34,13 +34,18 @@ class mafEvent;
 //----------------------------------------------------------------------------
 // medOpExporterMeters :
 //----------------------------------------------------------------------------
-/** */
+/** 
+    class name: medOpExporterMeters
+   This class provides the functionality for exporting medVMEWrappedMeter, writing all in a txt file.
+*/
 class MED_EXPORT medOpExporterMeters: public mafOp
 {
 public:
+  /** object constructor */
   medOpExporterMeters(const wxString &label = "WrappedMeter");
+  /** object destructor */
   ~medOpExporterMeters(); 
-
+  /** RTTI Macro */
   mafTypeMacro(medOpExporterMeters, mafOp);
   
   enum ID_METER_EXPORT
@@ -50,8 +55,9 @@ public:
     VME_WRAPPED_METERS,
     VME_ALL_METERS,
   };
-
+  /** method for clone object */
   mafOp* Copy();
+  /** method for catch the dispatched events */
 	void OnEvent(mafEventBase *maf_event);
 
  	/** Return true for the acceptable vme type. */
@@ -60,6 +66,7 @@ public:
 	/** Builds operation's interface. */
   void OpRun();
 
+  /** execute operation */
   void OpDo();
 
   /** Set the filename for the .stl to export */

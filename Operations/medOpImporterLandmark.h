@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterLandmark.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:08:41 $
-  Version:   $Revision: 1.3.2.3 $
+  Date:      $Date: 2011-06-14 08:31:57 $
+  Version:   $Revision: 1.3.2.4 $
   Authors:   Daniele Giunchi, Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2004
@@ -27,13 +27,26 @@ class mafEvent;
 //----------------------------------------------------------------------------
 // medOpImporterLandmark :
 //----------------------------------------------------------------------------
-/** */
+/** 
+class name: medOpImporterLandmark
+this class provides the landmark importing written in the following format:
+1) a line with initial # is a comment
+2) Before a sequence of landmark it can be a line with "Time XXX" where XXX is a number current of timestep
+     After the list of landmark is finished for that time, a new line with Time XXY or similar will follow.
+     If there's not time, the cloud is considered time-INVARIANT
+3) the line with landmark data are:
+     nameOfLandmark x y z
+*/
 class MED_EXPORT medOpImporterLandmark : public mafOp
 {
 public:
+  /** object cosntructor */
 	medOpImporterLandmark(wxString label);
-	~medOpImporterLandmark(); 
+  /** object destructor */
+	~medOpImporterLandmark();
+  /** method for clone object */
 	mafOp* Copy();
+  /** method for catch the dispatched events */
   virtual void OnEvent(mafEventBase *maf_event);
 
 	/** Return true for the acceptable vme type. */

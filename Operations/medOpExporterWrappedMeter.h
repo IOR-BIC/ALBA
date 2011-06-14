@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterWrappedMeter.h,v $
   Language:  C++
-  Date:      $Date: 2009-07-02 08:15:31 $
-  Version:   $Revision: 1.1.2.4 $
+  Date:      $Date: 2011-06-14 08:31:57 $
+  Version:   $Revision: 1.1.2.5 $
   Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -27,11 +27,16 @@ class mafEvent;
 //----------------------------------------------------------------------------
 // medOpExporterWrappedMeter :
 //----------------------------------------------------------------------------
-/** */
+/** 
+class name: medOpExporterWrappedMeter
+   This class provides the functionality for exporting medVMEWrappedMeter, writing all in a txt file.
+*/
 class medOpExporterWrappedMeter: public mafOp
 {
 public:
+  /** object constructor */
   medOpExporterWrappedMeter(const wxString &label = "ActionLine");
+  /** object destructor */  
   ~medOpExporterWrappedMeter(); 
 
   std::vector<mafNode *> m_Meters;
@@ -42,9 +47,11 @@ public:
   std::ofstream      m_OutputFile;
   std::vector<int>  m_KeyNumList;
 
+  /** RTTI macro*/
   mafTypeMacro(medOpExporterWrappedMeter, mafOp);
-
+  /** method for clone object */
   mafOp* Copy();
+  /** method for catch the dispatched events */
 	void OnEvent(mafEventBase *maf_event);
 
  	/** Return true for the acceptable vme type. */
@@ -61,8 +68,11 @@ public:
   /** test method copy from test medOpExporterWrappedMeterTest**/
   void Test() ;
 
+  /** specific exporter for wrapped meters */
   void ExportWrappedMeter();
+  /** generic function for handling export*/
   void Export();
+  /** write the data stream to a file */
   void WriteOnFile();
 
 protected:

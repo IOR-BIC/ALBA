@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterLandmarkTXT.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:08:41 $
-  Version:   $Revision: 1.3.2.1 $
+  Date:      $Date: 2011-06-14 08:31:57 $
+  Version:   $Revision: 1.3.2.2 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004
@@ -27,13 +27,23 @@ class mafEvent;
 //----------------------------------------------------------------------------
 // medOpImporterLandmarkTXT :
 //----------------------------------------------------------------------------
-/** */
+/** 
+class name : medOpImporterLandmarkTXT
+this class provides the landmark importing written in the following format:
+1) Ignore the first line
+2) Ignore the first n columns specified by user
+3) the first element of each line is Time, then x y z x1 y1 z1 ecco
+*/
 class MED_EXPORT medOpImporterLandmarkTXT : public mafOp
 {
 public:
+  /** object constructor */
 	medOpImporterLandmarkTXT(wxString label);
-	~medOpImporterLandmarkTXT(); 
+  /** object destructor */
+	~medOpImporterLandmarkTXT();
+  /** method for clone object */
 	mafOp* Copy();
+  /** method for catch the dispatched events */
   virtual void OnEvent(mafEventBase *maf_event);
 
 	/** Return true for the acceptable vme type. */
