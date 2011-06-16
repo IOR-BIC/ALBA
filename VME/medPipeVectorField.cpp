@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeVectorField.cpp,v $ 
   Language: C++ 
-  Date: $Date: 2009-07-02 08:58:02 $ 
-  Version: $Revision: 1.1.2.3 $ 
+  Date: $Date: 2011-06-16 09:18:40 $ 
+  Version: $Revision: 1.1.2.4 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -72,24 +72,26 @@ void medPipeVectorField::Create(mafSceneNode *n)
 }
 
 //------------------------------------------------------------------------
-//Default radius, etc. should be calculated in this method, 
-//i.e., inherited classes should always override this method. 
-//The default implementation is to update VME
 /*virtual*/ void medPipeVectorField::ComputeDefaultParameters()
 //------------------------------------------------------------------------
 {
+  //Default radius, etc. should be calculated in this method, 
+  //i.e., inherited classes should always override this method. 
+  //The default implementation is to update VME
+  
   vtkDataSet* ds = m_Vme->GetOutput()->GetVTKData();
   ds->Update(); //force its update
 }
 
 //------------------------------------------------------------------------
-//Returns the index of specified field (scalar or vectors depending on
-//bVectors parameter). If szName is NULL, the index of currently active
-//(scalar or vector) field is returned.
-//The routine returns -1, if it cannot find appropriate field.
 int medPipeVectorField::GetFieldIndex(const char* szName, bool bVectors)
 //------------------------------------------------------------------------
 {
+  //Returns the index of specified field (scalar or vectors depending on
+  //bVectors parameter). If szName is NULL, the index of currently active
+  //(scalar or vector) field is returned.
+  //The routine returns -1, if it cannot find appropriate field.
+  
   vtkPointData* pd = m_Vme->GetOutput()->GetVTKData()->GetPointData();
   if (pd == NULL)
     return -1;
@@ -127,10 +129,11 @@ int medPipeVectorField::GetFieldIndex(const char* szName, bool bVectors)
 }
 
 //------------------------------------------------------------------------
-//Returns the number of available scalars/vectors.
 int medPipeVectorField::GetNumberOfFields(bool bVectors)
 //------------------------------------------------------------------------
 {
+  //Returns the number of available scalars/vectors.
+  
   vtkPointData* pd = m_Vme->GetOutput()->GetVTKData()->GetPointData();
   if (pd == NULL)
     return -1;
@@ -148,12 +151,13 @@ int medPipeVectorField::GetNumberOfFields(bool bVectors)
 }
 
 //------------------------------------------------------------------------
-//Returns the name of field (scalar or vectors depending on
-//bVectors parameter) at the specified index. 
-//The routine returns NULL, if it cannot find appropriate field.
 const char* medPipeVectorField::GetFieldName(int nIndex, bool bVectors)
 //------------------------------------------------------------------------
 {
+  //Returns the name of field (scalar or vectors depending on
+  //bVectors parameter) at the specified index. 
+  //The routine returns NULL, if it cannot find appropriate field.
+  
   vtkPointData* pd = m_Vme->GetOutput()->GetVTKData()->GetPointData();
   if (pd == NULL)
     return NULL;
@@ -176,10 +180,11 @@ const char* medPipeVectorField::GetFieldName(int nIndex, bool bVectors)
 }
 
 //------------------------------------------------------------------------
-//Populates the combo box by names of scalar/vector fields
 void medPipeVectorField::PopulateCombo(wxComboBox* combo, bool bVectors)
 //------------------------------------------------------------------------
 {
+  //Populates the combo box by names of scalar/vector fields
+  
   vtkPointData* pd = m_Vme->GetOutput()->GetVTKData()->GetPointData();
   if (pd != NULL)
   {

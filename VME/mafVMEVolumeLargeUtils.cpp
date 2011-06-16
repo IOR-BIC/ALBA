@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: mafVMEVolumeLargeUtils.cpp,v $ 
   Language: C++ 
-  Date: $Date: 2009-05-14 15:05:19 $ 
-  Version: $Revision: 1.1.2.1 $ 
+  Date: $Date: 2011-06-16 09:15:38 $ 
+  Version: $Revision: 1.1.2.2 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -30,11 +30,12 @@
 #include "../BES_Beta/vtkMAF/vtkMAFLargeImageData.h"
 #include "../BES_Beta/IO/mafVolumeLargeWriter.h"
 
-//returns true, if the volume to be imported is larger than
-//the given limit (in MB) and should be processed as VMEVolumeLarge
+
 /*static*/ bool mafVMEVolumeLargeUtils::IsVolumeLarge(
   int VOI[6], int nDataType, int nNumOfComp, int nMemLimit)
 {
+  //returns true, if the volume to be imported is larger than
+  //the given limit (in MB) and should be processed as VMEVolumeLarge
   vtkIdType64 size = (((vtkIdType64)(VOI[1] - VOI[0] + 1))*
     (VOI[3] - VOI[2] + 1)*(VOI[5] - VOI[4] + 1)*nNumOfComp*
     vtkMAFDataArrayDescriptor::GetDataTypeSize(nDataType)) 
@@ -43,12 +44,13 @@
   return size >= nMemLimit;
 }
 
-//Get directory into which the volume files should be stored.
-//Typical call: GetBrickedLayoutDir(this, m_Listener)
-//If an error occurs, an empty string is returned.
 /*static*/ mafString mafVMEVolumeLargeUtils::GetBrickedLayoutDir(
   void* sender, mafObserver* m_Listener)
 {
+  //Get directory into which the volume files should be stored.
+  //Typical call: GetBrickedLayoutDir(this, m_Listener)
+  //If an error occurs, an empty string is returned.
+
   //save the .MSF file
   mafEventMacro( mafEvent(sender, MENU_FILE_SAVE));	
 
@@ -109,11 +111,11 @@
 
 
 //------------------------------------------------------------------------
-//Displays a warning that the volume to be imported is large
-//Returns true, if the user confirms the import (i.e., it can proceed)
 /*static*/ bool mafVMEVolumeLargeUtils::ConfirmVolumeLargeImport()
 //------------------------------------------------------------------------
 {
+  //Displays a warning that the volume to be imported is large
+  //Returns true, if the user confirms the import (i.e., it can proceed)
   wxString msg = _("The selected VOI is too large to fit the given memory limit and, therefore, "
     "if you continue, it will be imported as a VolumeLarge VME.\n"
     "NB: VolumeLarge VME does not support all operations that are available for Volume VME. \n"
@@ -126,12 +128,12 @@
 }
 
 //------------------------------------------------------------------------
-//Displays a warning that the volume to be imported is large
-//Returns true, if the user confirms the import (i.e., it can proceed)
 /*static*/ bool mafVMEVolumeLargeUtils
           ::ConfirmVolumeLargeSpaceConsumtion(vtkIdType64 nEstimatedSize)
 //------------------------------------------------------------------------
 {
+  //Displays a warning that the volume to be imported is large
+  //Returns true, if the user confirms the import (i.e., it can proceed)
   mafString szSize;
   mafFormatDataSize(nEstimatedSize, szSize);
 
@@ -145,10 +147,10 @@
 }
 
 //------------------------------------------------------------------------
-//Displays a message box with the information about consumed space
 /*static*/ void mafVMEVolumeLargeUtils::DisplayVolumeLargeSpaceConsumtion(vtkIdType64 nRealSize)
 //------------------------------------------------------------------------
 {
+  //Displays a message box with the information about consumed space
   mafString szSize;
   mafFormatDataSize(nRealSize, szSize);
 
@@ -159,17 +161,17 @@
 }
 
 //------------------------------------------------------------------------
-//Performs various checks in order to determine whether the given
-//volume can be imported. It may display one or more dialogs.
-//Returns 0, if the Volume cannot be imported at all,
-//1, if it is small volume and 2, if it is large volume.
-//For large volumes, it returns also path, where the brick files
-//should be placed (see szOutDir)
 /*static*/ int mafVMEVolumeLargeUtils::VolumeLargeCheck(
       mafObject* caller, mafObserver* listener, int VOI[6], int nDataType, 
       int nNumOfComp, int nMemLimit, mafString& szOutDir)
 //------------------------------------------------------------------------
 {
+  //Performs various checks in order to determine whether the given
+  //volume can be imported. It may display one or more dialogs.
+  //Returns 0, if the Volume cannot be imported at all,
+  //1, if it is small volume and 2, if it is large volume.
+  //For large volumes, it returns also path, where the brick files
+  //should be placed (see szOutDir)
   if (!IsVolumeLarge(VOI, nDataType, nNumOfComp, nMemLimit))
     return 1; //small volume
 

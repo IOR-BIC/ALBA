@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medLogicWithManagers.cpp,v $
 Language:  C++
-Date:      $Date: 2011-05-26 07:51:33 $
-Version:   $Revision: 1.4.2.1 $
+Date:      $Date: 2011-06-16 09:12:22 $
+Version:   $Revision: 1.4.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -70,6 +70,7 @@ medLogicWithManagers::~medLogicWithManagers()
 void medLogicWithManagers::ViewContextualMenu(bool vme_menu)
 //----------------------------------------------------------------------------
 {
+  // Create and visualize the contextual menu for the active vme
   medGUIContextualMenu *contextMenu = new medGUIContextualMenu();
   contextMenu->SetListener(this);
   mafView *v = m_ViewManager->GetSelectedView();
@@ -91,6 +92,7 @@ void medLogicWithManagers::OnEvent(mafEventBase *maf_event)
 		{
 		case ABOUT_APPLICATION:
 			{
+        // trap the ABOUT_APPLICATION event and shows the about window with the application infos
 				wxString message = m_AppTitle.GetCStr();
 				message += _(" Application ");
 				message += m_Revision;
