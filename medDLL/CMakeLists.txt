@@ -266,6 +266,8 @@ SET(INTERACTION_SRCS
   ../Interaction/medGizmoCrossTranslateAxis.h
   ../Interaction/medGizmoCrossTranslatePlane.cpp
   ../Interaction/medGizmoCrossTranslatePlane.h
+  ../Interaction/medInteractorPicker.cpp
+  ../Interaction/medInteractorPicker.h
 )
 ###############################################
 #OPERATIONS
