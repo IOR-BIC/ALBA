@@ -35,7 +35,7 @@ isInComment = False
 isInLineComment = False
 
 asc_time = time.strftime("%Y.%m.%d",time.localtime(time.time()))
-resultFile = open(resultsDir + "/" + framework + "Results_" +  asc_time + ".txt","w+")
+resultFile = open(resultsDir + "/" + framework + "comments.txt","w+")
 
 for dirPath,dirName,fileName in os.walk(classDir):
 
