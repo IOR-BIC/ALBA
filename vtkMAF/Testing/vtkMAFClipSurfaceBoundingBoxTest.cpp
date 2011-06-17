@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFClipSurfaceBoundingBoxTest.cpp,v $
 Language:  C++
-Date:      $Date: 2011-05-25 11:53:13 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2011-06-17 11:47:25 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -52,7 +52,6 @@ std::string vtkMAFClipSurfaceBoundingBoxTest::ConvertInt(int number)
 void vtkMAFClipSurfaceBoundingBoxTest::setUp()
 //--------------------------------------------------
 {
-  m_SphereInput = vtkSphereSource::New();
   m_SphereInput = vtkSphereSource::New();
   m_PlaneMask = vtkPlaneSource::New();
 }
