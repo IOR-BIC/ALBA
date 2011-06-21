@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medInteractor2DAngle.h,v $
 Language:  C++
-Date:      $Date: 2011-03-23 14:23:21 $
-Version:   $Revision: 1.2.2.3 $
+Date:      $Date: 2011-06-21 14:03:04 $
+Version:   $Revision: 1.2.2.4 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -13,6 +13,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #ifndef __medInteractor2DAngle_h
 #define __medInteractor2DAngle_h
 
+#include "medDefines.h"
 #include "mafInteractorPER.h"
 #include "mafEvent.h"
 #include "vtkMAFTextActorMeter.h"
@@ -42,7 +43,7 @@ the histogram of the probed points on VME. This interactor works in renderwindow
 maintaining measure persistence at button up
 */
 //----------------------------------------------------------------------------
-class medInteractor2DAngle : public mafInteractorPER
+class MED_EXPORT medInteractor2DAngle : public mafInteractorPER
 	//----------------------------------------------------------------------------
 {
 public:
@@ -118,7 +119,7 @@ public:
   int SizeMeasureVector(){ return m_Measure.size(); }
 protected:
   /** Implemented a New() function for testing mode. */
-  MAF_EXPORT static medInteractor2DAngle *medInteractor2DAngle::NewTest();
+  static medInteractor2DAngle *medInteractor2DAngle::NewTest();
 
 	medInteractor2DAngle(bool testMode = false);
 	virtual ~medInteractor2DAngle();

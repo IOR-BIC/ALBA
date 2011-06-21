@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medInteractor2DDistance.h,v $
 Language:  C++
-Date:      $Date: 2011-03-23 14:23:21 $
-Version:   $Revision: 1.2.2.4 $
+Date:      $Date: 2011-06-21 14:03:04 $
+Version:   $Revision: 1.2.2.5 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -13,6 +13,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #ifndef __medInteractor2DDistance_h
 #define __medInteractor2DDistance_h
 
+#include "medDefines.h"
 #include "mafInteractorPER.h"
 #include "mafEvent.h"
 #include "vtkMAFTextActorMeter.h"
@@ -45,7 +46,7 @@ the histogram of the probed points on VME. This interactor works in renderwindow
 maintaining measure persistence at button up
 */
 //----------------------------------------------------------------------------
-class medInteractor2DDistance : public mafInteractorPER
+class MED_EXPORT medInteractor2DDistance : public mafInteractorPER
 	//----------------------------------------------------------------------------
 {
 public:
@@ -130,7 +131,7 @@ public:
   int SizeMeasureVector(){ return m_Measure.size(); }
 protected:
 	/** Implemented a New() function for testing mode. */
-  	MAF_EXPORT static medInteractor2DDistance *medInteractor2DDistance::NewTest();
+  static medInteractor2DDistance *medInteractor2DDistance::NewTest();
 
 	medInteractor2DDistance(bool testMode = false);
 	virtual ~medInteractor2DDistance();
