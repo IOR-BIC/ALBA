@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMEDPolyDataDeformation_M2.h,v $ 
   Language: C++ 
-  Date: $Date: 2011-05-26 08:33:31 $ 
-  Version: $Revision: 1.1.2.6 $ 
+  Date: $Date: 2011-06-21 07:47:26 $ 
+  Version: $Revision: 1.1.2.7 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -96,7 +96,7 @@ protected:
   };      
 
   //internal structure for one vertex in the skeleton
-  class CSkeletonVertex
+  class VTK_vtkMED_EXPORT CSkeletonVertex
   {
   public:
     int m_Id;             //<ID of this point
@@ -178,7 +178,7 @@ protected:
   };
   
   //internal structure for one edge in the skeleton
-  class CSkeletonEdge
+  class VTK_vtkMED_EXPORT CSkeletonEdge
   {
   public:
     int m_Id;                     //<ID of this edge
@@ -221,7 +221,7 @@ protected:
   };
 
   //Internal data structure to encapsulates one skeleton
-  class CSkeleton
+  class VTK_vtkMED_EXPORT CSkeleton
   {
   public:
     vtkstd::vector< CSkeletonVertex* > m_Vertices;
@@ -242,7 +242,7 @@ protected:
     int ComputeEdgeWeight(CSkeletonEdge* pEdge, int iDir);    
   };
 
-  class CSuperSkeleton
+  class VTK_vtkMED_EXPORT CSuperSkeleton
   {
   public:
     CSkeleton* m_pOC_Skel;    //<original skeleton (it is linked to deformed)
