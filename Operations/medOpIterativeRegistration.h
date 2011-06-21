@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpIterativeRegistration.h,v $
   Language:  C++
-  Date:      $Date: 2011-03-07 14:39:20 $
-  Version:   $Revision: 1.2.2.1 $
+  Date:      $Date: 2011-06-21 07:31:25 $
+  Version:   $Revision: 1.2.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -41,7 +41,7 @@ class vtkMatrix4x4;
   - Code cleaning and improve documentation
 */
 
-class medOpIterativeRegistration : public mafOp
+class MED_EXPORT medOpIterativeRegistration : public mafOp
 {
   public:
     medOpIterativeRegistration(wxString label = "Iterative Registration");
