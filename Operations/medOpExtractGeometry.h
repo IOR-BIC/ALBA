@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpExtractGeometry.h,v $
 Language:  C++
-Date:      $Date: 2011-06-13 16:01:44 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2011-06-22 08:29:16 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Eleonora Mambrini, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
@@ -17,6 +17,7 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 // Includes :
 //----------------------------------------------------------------------------
 #include "mafOp.h"
+#include "medDefines.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -31,7 +32,7 @@ class vtkImageData;
 class vtkMAFContourVolumeMapper;
 class vtkPolyData;
 
-class medOpExtractGeometry: public mafOp
+class MED_EXPORT medOpExtractGeometry: public mafOp
 {
 public:
   //----------------------------------------------------------------------------
