@@ -389,6 +389,8 @@ SET(OPERATIONS_SRCS
   ../Operations/medOpExporterGRFWS.h
   ../Operations/medOpExporterLandmarkWS.cpp
   ../Operations/medOpExporterLandmarkWS.h
+  ../Operations/medOpExtractGeometry.cpp
+  ../Operations/medOpExtractGeometry.h
 )
   
 IF (MED_USE_Offis)
