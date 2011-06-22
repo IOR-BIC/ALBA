@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMEDPolyDataDeformation_M1.h,v $ 
   Language: C++ 
-  Date: $Date: 2011-06-21 07:50:37 $ 
-  Version: $Revision: 1.1.2.11 $ 
+  Date: $Date: 2011-06-22 09:37:04 $ 
+  Version: $Revision: 1.1.2.12 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -44,6 +44,8 @@
 
 #include "vtkMEDConfigure.h"
 
+#include "mafDllMacros.h"
+
 #pragma once
 
 #pragma warning(push)
@@ -59,6 +61,8 @@
 class vtkPolyData;
 class vtkIdList;
 class vtkCellLocator;
+class CSkeletonEdge;
+class CSkeletonVertex;
 
 class VTK_vtkMED_EXPORT vtkMEDPolyDataDeformation_M1 : public vtkPolyDataToPolyDataFilter
 {
@@ -78,7 +82,12 @@ protected:
 
 protected:
 #pragma region //Nested Classes
-  class VTK_vtkMED_EXPORT CSkeletonEdge;
+
+  class CSkeletonEdge;
+  class CSkeletonVertex;
+
+  EXPORT_STL_VECTOR(VTK_vtkMED_EXPORT,CSkeletonEdge*);
+  EXPORT_STL_VECTOR(VTK_vtkMED_EXPORT,CSkeletonVertex*);
     
   //internal data structure describing vertex of a mesh
   class CMeshVertex
@@ -115,7 +124,7 @@ protected:
     LOCAL_FRAME m_LF;   //<local frame system
     CSkeletonVertex* m_pMatch;    //<matched vertex
     
-    vtkstd::vector< CSkeletonEdge* > m_OneRingEdges;    //<edges around this vertex
+    std::vector< CSkeletonEdge* > m_OneRingEdges;    //<edges around this vertex
 
     double m_WT;          //<topology weight
     int m_nMark;          //<vertex tag for internal use
@@ -159,6 +168,7 @@ protected:
     }
   };
   
+  EXPORT_STL_VECTOR(VTK_vtkMED_EXPORT,vtkIdType);
   //internal structure for one edge in the skeleton
   class VTK_vtkMED_EXPORT CSkeletonEdge
   {
@@ -169,7 +179,7 @@ protected:
     CSkeletonEdge* m_pMatch;      //<matched edge
     int m_nMark;                  //<edge tag for internal use        
     
-    vtkstd::vector< vtkIdType > m_ROI; //<vertices in the influence of this edge
+    std::vector< vtkIdType > m_ROI; //<vertices in the influence of this edge
 
   public:
     CSkeletonEdge() 
@@ -206,8 +216,8 @@ protected:
   class VTK_vtkMED_EXPORT CSkeleton
   {
   public:
-    vtkstd::vector< CSkeletonVertex* > Vertices;
-    vtkstd::vector< CSkeletonEdge* > Edges;
+    std::vector< CSkeletonVertex* > Vertices;
+    std::vector< CSkeletonEdge* > Edges;
 
   public:
     ~CSkeleton();
@@ -224,7 +234,7 @@ protected:
     int ComputeEdgeWeight(CSkeletonEdge* pEdge, int iDir);    
   };
 
-  class CSuperSkeleton
+  class VTK_vtkMED_EXPORT CSuperSkeleton
   {
   public:
     CSkeleton* m_pOC_Skel;    //<original skeleton (it is linked to deformed)
@@ -325,7 +335,9 @@ protected:
   int DivideSkeletonEdges;          //<1 if large skeleton edges should be divided  
   int PreserveVolume;               //<1, if volume should be preserved
 
-  vtkstd::vector< CMeshVertex > m_MeshVertices; //<internal data structure describing the mesh  
+  
+  EXPORT_STL_VECTOR(VTK_vtkMED_EXPORT,CMeshVertex);
+  std::vector< CMeshVertex > m_MeshVertices; //<internal data structure describing the mesh  
 
 public:  
   /** Gets the weight using to match geometry of skeletons */

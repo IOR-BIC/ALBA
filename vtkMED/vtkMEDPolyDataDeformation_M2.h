@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMEDPolyDataDeformation_M2.h,v $ 
   Language: C++ 
-  Date: $Date: 2011-06-21 07:47:26 $ 
-  Version: $Revision: 1.1.2.7 $ 
+  Date: $Date: 2011-06-22 09:37:04 $ 
+  Version: $Revision: 1.1.2.8 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -42,6 +42,8 @@
 #ifndef vtkMEDPolyDataDeformation_M2_h__
 #define vtkMEDPolyDataDeformation_M2_h__
 
+#include "mafDllMacros.h"
+
 #include "vtkMEDConfigure.h"
 
 #pragma once
@@ -79,7 +81,12 @@ protected:
 
 protected:
 #pragma region //Nested Classes
+
   class CSkeletonEdge;
+  class CSkeletonVertex;
+
+  EXPORT_STL_VECTOR(VTK_vtkMED_EXPORT,CSkeletonEdge*);
+  EXPORT_STL_VECTOR(VTK_vtkMED_EXPORT,CSkeletonVertex*);
     
   //internal data structure describing vertex of a mesh
   class CMeshVertex
@@ -177,6 +184,7 @@ protected:
     }
   };
   
+  EXPORT_STL_VECTOR(VTK_vtkMED_EXPORT,vtkIdType);
   //internal structure for one edge in the skeleton
   class VTK_vtkMED_EXPORT CSkeletonEdge
   {
