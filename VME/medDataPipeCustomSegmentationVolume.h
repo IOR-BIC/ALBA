@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medDataPipeCustomSegmentationVolume.h,v $
 Language:  C++
-Date:      $Date: 2011-06-21 14:09:09 $
-Version:   $Revision: 1.1.2.10 $
+Date:      $Date: 2011-06-23 15:56:01 $
+Version:   $Revision: 1.1.2.11 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -45,14 +45,23 @@ public:
   /** Return the threshold modality for automatic segmentation: GLOBAL or RANGE */
   int GetAutomaticSegmentationThresholdModality(){return m_AutomaticSegmentationThresholdModality;};
 
+  /** Set Threshold filtering to double Threshold if modality is true*/
+  void SetDoubleThresholdModality(int modality);
+
+  /** Return Threshold filtering modality, true if double Threshold is enabled */
+  int GetDoubleThresholdModality(){return m_AutomaticSegmentationThresholdModality;};
+
   /** Add a new range with the threshold value */
-  int AddRange(int startSlice,int endSlice,double threshold);
+  int AddRange(int startSlice,int endSlice,double threshold, double upperThershold=0);
 
   /** Return the value of the range of the position index */
   int GetRange(int index,int &startSlice, int &endSlice, double &threshold);
 
+  /** Return the value of the range of the position index */
+  int GetRange(int index,int &startSlice, int &endSlice, double &threshold, double &upperThreshold);
+
   /** Update the value of the range of the position index - return MAF_ERROR if the index isn't correct*/
-  int UpdateRange(int index,int &startSlice, int &endSlice, double &threshold);
+  int UpdateRange(int index,int startSlice, int endSlice, double threshold, double upperThershold=0);
 
   /** Delete the range of the position index */
   int DeleteRange(int index);
@@ -64,10 +73,13 @@ public:
   int GetNumberOfRanges(){return m_AutomaticSegmentationRanges.size();};
 
   /** Set the value to use during a global threshold */
-  void SetAutomaticSegmentationGlobalThreshold(double threshold);
+  void SetAutomaticSegmentationGlobalThreshold(double threshold, double upperThreshold=0);
 
   /** Return the value to use during a global threshold */
   double GetAutomaticSegmentationGlobalThreshold(){return m_AutomaticSegmentationGlobalThreshold;};
+
+  /** Return the value to use during a global threshold */
+  double GetAutomaticSegmentationGlobalUpperThreshold(){ return m_AutomaticSegmentationGlobalUpperThreshold; };
 
   /** Check if all thresholds exist */
   bool CheckNumberOfThresholds();
@@ -108,8 +120,10 @@ public:
   /** Return the region growing lower threshold */
   double GetRegionGrowingLowerThreshold(){return m_RegionGrowingLowerThreshold;};
 
+  /** Set the range of action of Region Growing algorithm */
   void SetRegionGrowingSliceRange(int startSlice, int endSlice);
 
+  /** Return the range of action of Region Growing algorithm */
   int GetRegionGrowingSliceRange(int &startSlice, int &endSlice);
 
   /** Return the seed of the position index */
@@ -128,7 +142,9 @@ public:
   int GetNumberOfSeeds(){return m_RegionGrowingSeeds.size();};
 
 protected:
+  /** constructor. */
   medDataPipeCustomSegmentationVolume();
+  /** destructor. */
   virtual ~medDataPipeCustomSegmentationVolume();
 
   /** Check that the range has right values */
@@ -174,10 +190,13 @@ protected:
   mafNode *m_RefinementVolumeMask;
 
   //Stuff for automatic threshold
+  int m_UseDoubleThreshold;
   int m_AutomaticSegmentationThresholdModality;
   double m_AutomaticSegmentationGlobalThreshold;
+  double m_AutomaticSegmentationGlobalUpperThreshold;
   std::vector<int*> m_AutomaticSegmentationRanges;
   std::vector<double> m_AutomaticSegmentationThresholds;
+  std::vector<double> m_AutomaticSegmentationUpperThresholds;
   //////////////////////////////////////////////////////////////////////////
 
   //Stuff for region growing
@@ -190,7 +209,9 @@ protected:
 
 
 private:
-  medDataPipeCustomSegmentationVolume(const medDataPipeCustomSegmentationVolume&); // Not implemented
-  void operator=(const medDataPipeCustomSegmentationVolume&); // Not implemented  
+  /** Not implemented */
+  medDataPipeCustomSegmentationVolume(const medDataPipeCustomSegmentationVolume&); 
+  /** Operator = Not implemented*/
+  void operator=(const medDataPipeCustomSegmentationVolume&); 
 };
 #endif /* __medDataPipeCustomSegmentationVolume_h */

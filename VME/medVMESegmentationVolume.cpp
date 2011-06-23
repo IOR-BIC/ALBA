@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMESegmentationVolume.cpp,v $
 Language:  C++
-Date:      $Date: 2010-11-05 11:13:41 $
-Version:   $Revision: 1.1.2.9 $
+Date:      $Date: 2011-06-23 15:56:01 $
+Version:   $Revision: 1.1.2.10 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -112,6 +112,7 @@ int medVMESegmentationVolume::InternalInitialize()
     m_SegmentingDataPipe->SetManualVolumeMask(this->GetManualVolumeMask());
     m_SegmentingDataPipe->SetDependOnVMETime(false);
     m_SegmentingDataPipe->SetAutomaticSegmentationThresholdModality(m_VolumeAttribute->GetAutomaticSegmentationThresholdModality());
+    m_SegmentingDataPipe->SetDoubleThresholdModality(m_VolumeAttribute->GetDoubleThresholdModality());
     m_SegmentingDataPipe->SetAutomaticSegmentationGlobalThreshold(m_VolumeAttribute->GetAutomaticSegmentationGlobalThreshold());
     for (int i=0;i<m_VolumeAttribute->GetNumberOfRanges();i++)
     {
@@ -277,7 +278,7 @@ void medVMESegmentationVolume::OnEvent(mafEventBase *maf_event)
   }
 }
 //-------------------------------------------------------------------------
-int medVMESegmentationVolume::AddRange(int startSlice,int endSlice,double threshold)
+int medVMESegmentationVolume::AddRange(int startSlice,int endSlice,double threshold, double upperThreshold)
 //-------------------------------------------------------------------------
 {
   int result = m_SegmentingDataPipe->AddRange(startSlice,endSlice,threshold);
@@ -294,11 +295,20 @@ int medVMESegmentationVolume::AddRange(int startSlice,int endSlice,double thresh
   return MAF_ERROR;
 }
 //-----------------------------------------------------------------------
+int medVMESegmentationVolume::GetRange(int index,int &startSlice, int &endSlice, double &threshold, double &upperThreshold)
+//-----------------------------------------------------------------------
+{
+  return m_VolumeAttribute->GetRange(index,startSlice,endSlice,threshold, upperThreshold );
+}
+
+//-----------------------------------------------------------------------
 int medVMESegmentationVolume::GetRange(int index,int &startSlice, int &endSlice, double &threshold)
 //-----------------------------------------------------------------------
 {
-  return m_VolumeAttribute->GetRange(index,startSlice,endSlice,threshold);
+  return m_VolumeAttribute->GetRange(index,startSlice,endSlice,threshold );
 }
+
+
 //-----------------------------------------------------------------------
 bool medVMESegmentationVolume::CheckNumberOfThresholds()
 //-----------------------------------------------------------------------
@@ -306,13 +316,13 @@ bool medVMESegmentationVolume::CheckNumberOfThresholds()
   return m_SegmentingDataPipe->CheckNumberOfThresholds();
 }
 //-----------------------------------------------------------------------
-int medVMESegmentationVolume::UpdateRange(int index,int startSlice, int endSlice, double threshold)
+int medVMESegmentationVolume::UpdateRange(int index,int startSlice, int endSlice, double threshold, double upperThershold)
 //-----------------------------------------------------------------------
 {
-  int result = m_SegmentingDataPipe->UpdateRange(index,startSlice,endSlice,threshold);
+  int result = m_SegmentingDataPipe->UpdateRange(index,startSlice,endSlice,threshold, upperThershold);
   if (result == MAF_OK)
   {
-    result = m_VolumeAttribute->UpdateRange(index,startSlice,endSlice,threshold);
+    result = m_VolumeAttribute->UpdateRange(index,startSlice,endSlice,threshold, upperThershold);
     if (result == MAF_OK)
     {
       Modified();
@@ -550,8 +560,9 @@ int medVMESegmentationVolume::GetAutomaticSegmentationThresholdModality()
 {
   return m_VolumeAttribute->GetAutomaticSegmentationThresholdModality();
 }
+
 //-----------------------------------------------------------------------
-void medVMESegmentationVolume::SetAutomaticSegmentationGlobalThreshold(double threshold)
+void medVMESegmentationVolume::SetDoubleThresholdModality(int modality)
 //-----------------------------------------------------------------------
 {
   if (m_VolumeAttribute == NULL)// force attribute reading
@@ -559,8 +570,27 @@ void medVMESegmentationVolume::SetAutomaticSegmentationGlobalThreshold(double th
     GetVolumeAttribute();
   }
 
-  m_VolumeAttribute->SetAutomaticSegmentationGlobalThreshold(threshold);
-  m_SegmentingDataPipe->SetAutomaticSegmentationGlobalThreshold(threshold);
+  m_VolumeAttribute->SetDoubleThresholdModality(modality);
+  m_SegmentingDataPipe->SetDoubleThresholdModality(modality);
+  Modified();
+}
+//-----------------------------------------------------------------------
+int medVMESegmentationVolume::GetDoubleThresholdModality()
+//-----------------------------------------------------------------------
+{
+  return m_VolumeAttribute->GetDoubleThresholdModality();
+}
+//-----------------------------------------------------------------------
+void medVMESegmentationVolume::SetAutomaticSegmentationGlobalThreshold(double lowerThreshold, double uppperThreshold)
+//-----------------------------------------------------------------------
+{
+  if (m_VolumeAttribute == NULL)// force attribute reading
+  {
+    GetVolumeAttribute();
+  }
+
+  m_VolumeAttribute->SetAutomaticSegmentationGlobalThreshold(lowerThreshold,uppperThreshold);
+  m_SegmentingDataPipe->SetAutomaticSegmentationGlobalThreshold(lowerThreshold,uppperThreshold);
   Modified();
 }
 //-----------------------------------------------------------------------
@@ -568,6 +598,13 @@ double medVMESegmentationVolume::GetAutomaticSegmentationGlobalThreshold()
 //-----------------------------------------------------------------------
 {
   return m_VolumeAttribute->GetAutomaticSegmentationGlobalThreshold();
+}
+
+//-----------------------------------------------------------------------
+double medVMESegmentationVolume::GetAutomaticSegmentationGlobalUpperThreshold()
+//-----------------------------------------------------------------------
+{
+  return m_VolumeAttribute->GetAutomaticSegmentationGlobalUpperThreshold();
 }
 
 //------------------------------------------------------------------------

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medAttributeSegmentationVolume.h,v $
 Language:  C++
-Date:      $Date: 2011-05-26 08:27:37 $
-Version:   $Revision: 1.1.2.6 $
+Date:      $Date: 2011-06-23 15:56:00 $
+Version:   $Revision: 1.1.2.7 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -31,7 +31,9 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 class MED_EXPORT medAttributeSegmentationVolume : public mafAttribute
 {
 public:
+  /** constructor. */
   medAttributeSegmentationVolume();
+  /** destructor. */
   virtual ~medAttributeSegmentationVolume();
 
   mafTypeMacro(medAttributeSegmentationVolume, mafAttribute);
@@ -45,26 +47,40 @@ public:
   /** Compare with another Meter attribute. */
   /*virtual*/ bool Equals(const mafAttribute *a);
 
+
   /** Set the threshold modality for automatic segmentation: GLOBAL or RANGE */
   void SetAutomaticSegmentationThresholdModality(int modality){m_AutomaticSegmentationThresholdModality = modality;};
 
   /** Return the threshold modality for automatic segmentation: GLOBAL or RANGE */
   int GetAutomaticSegmentationThresholdModality(){return m_AutomaticSegmentationThresholdModality;};
 
+  /** Set Threshold filtering to double Threshold if modality is true */
+  void SetDoubleThresholdModality(int modality){m_UseDoubleThreshold = modality;};
+
+  /** Return Threshold filtering modality, true if double Threshold is enabled, on modality changes all ranges will be remove */
+  int GetDoubleThresholdModality(){return m_UseDoubleThreshold;};
+
   /** Set the value to use during a global threshold */
-  void SetAutomaticSegmentationGlobalThreshold(double threshold){m_AutomaticSegmentationGlobalThreshold = threshold;};
+  void SetAutomaticSegmentationGlobalThreshold(double lowerThreshold, double uppperThreshold=0){m_AutomaticSegmentationGlobalThreshold = lowerThreshold; m_AutomaticSegmentationGlobalUpperThreshold = uppperThreshold;};
 
   /** Return the value to use during a global threshold */
-  double GetAutomaticSegmentationGlobalThreshold(){return m_AutomaticSegmentationGlobalThreshold;};
+  double GetAutomaticSegmentationGlobalThreshold(){ return m_AutomaticSegmentationGlobalThreshold; };
+
+  /** Return the value to use during a global threshold */
+  double GetAutomaticSegmentationGlobalUpperThreshold(){ return m_AutomaticSegmentationGlobalUpperThreshold; };
 
   /** Add a new range with the threshold value */
-  int AddRange(int startSlice,int endSlice,double threshold);
+  int AddRange(int startSlice,int endSlice,double threshold, double upperThreshold=0);
 
   /** Return the value of the range of the position index */
   int GetRange(int index,int &startSlice, int &endSlice, double &threshold);
 
+  /** Return the value of the range of the position index */
+  int GetRange(int index,int &startSlice, int &endSlice, double &threshold, double &upperThreshold);
+
+
   /** Update the value of the range of the position index - return MAF_ERROR if the index isn't correct*/
-  int UpdateRange(int index,int startSlice, int endSlice, double threshold);
+  int UpdateRange(int index,int startSlice, int endSlice, double threshold, double upperThershold=0);
 
   /** Delete the range of the position index */
   int DeleteRange(int index);
@@ -103,14 +119,19 @@ public:
   int RemoveAllSeeds();
 
 protected:
+  //** Auto storing function */  
   /*virtual*/ int InternalStore(mafStorageElement *parent);
+  //** Auto restoring function */  
   /*virtual*/ int InternalRestore(mafStorageElement *node);
 
   //Stuff for automatic threshold
+  int m_UseDoubleThreshold;
   int m_AutomaticSegmentationThresholdModality;
   double m_AutomaticSegmentationGlobalThreshold;
+  double m_AutomaticSegmentationGlobalUpperThreshold;
   std::vector<int*> m_AutomaticSegmentationRanges;
   std::vector<double> m_AutomaticSegmentationThresholds;
+  std::vector<double> m_AutomaticSegmentationUpperThresholds;
   //////////////////////////////////////////////////////////////////////////
   
   //Stuff for region growing

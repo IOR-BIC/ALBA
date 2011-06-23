@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medDataPipeCustomSegmentationVolume.cpp,v $
 Language:  C++
-Date:      $Date: 2011-04-28 14:45:38 $
-Version:   $Revision: 1.1.2.14 $
+Date:      $Date: 2011-06-23 15:56:01 $
+Version:   $Revision: 1.1.2.15 $
 Authors:   Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2010
@@ -125,6 +125,8 @@ int medDataPipeCustomSegmentationVolume::DeepCopy(mafDataPipe *pipe)
       m_ManualVolumeMask = ((medDataPipeCustomSegmentationVolume*)pipe)->GetManualVolumeMask();
 
       m_AutomaticSegmentationThresholdModality = ((medDataPipeCustomSegmentationVolume*)pipe)->GetAutomaticSegmentationThresholdModality();
+      m_UseDoubleThreshold = ((medDataPipeCustomSegmentationVolume*)pipe)->GetDoubleThresholdModality();
+
       m_AutomaticSegmentationGlobalThreshold = ((medDataPipeCustomSegmentationVolume*)pipe)->GetAutomaticSegmentationGlobalThreshold();
 
       for (int i=0;i<((medDataPipeCustomSegmentationVolume*)pipe)->GetNumberOfRanges();i++)
@@ -159,6 +161,17 @@ void medDataPipeCustomSegmentationVolume::SetAutomaticSegmentationThresholdModal
   m_ChangedAutomaticData = true;
   Modified();
 }
+
+//------------------------------------------------------------------------------
+void medDataPipeCustomSegmentationVolume::SetDoubleThresholdModality(int modality)
+//------------------------------------------------------------------------------
+{
+ 
+  m_UseDoubleThreshold = modality;
+  m_ChangedAutomaticData = true;
+  Modified();
+}
+
 //------------------------------------------------------------------------------
 void medDataPipeCustomSegmentationVolume::ApplyManualSegmentation()
 //------------------------------------------------------------------------------
@@ -323,6 +336,7 @@ void medDataPipeCustomSegmentationVolume::ApplyAutomaticSegmentation()
     }
 
     double localThreshold;
+    double localUpperTheshold;
     bool inRange = false;
     if(m_AutomaticSegmentationThresholdModality == medVMESegmentationVolume::RANGE)
     {
@@ -334,6 +348,7 @@ void medDataPipeCustomSegmentationVolume::ApplyAutomaticSegmentation()
         {
           rangeIndex = j;
           localThreshold = m_AutomaticSegmentationThresholds[j];
+          localUpperTheshold = m_AutomaticSegmentationUpperThresholds[j];
           inRange = true;
         }
       }
@@ -342,110 +357,35 @@ void medDataPipeCustomSegmentationVolume::ApplyAutomaticSegmentation()
     {
       inRange = true;
       localThreshold = m_AutomaticSegmentationGlobalThreshold;
+      localUpperTheshold = m_AutomaticSegmentationGlobalUpperThreshold;
     }
     //////////////////////////////////////////////////////////////////////////
 
+    int numberOfPoints = volumeDimensions[0] * volumeDimensions[1];
     if(!inRange)
     // range not specified
     {
-      int numberOfPoints = volumeDimensions[0] * volumeDimensions[1];
+      
       for (int k=0;k<numberOfPoints;k++)
       {
         char value = 0;
-        newScalars->SetTuple1(k+i*(volumeDimensions[0]*volumeDimensions[1]),value);
+        newScalars->SetTuple1(k + i*numberOfPoints,value);
       }
     }
 
     else
     {
-      //////////////////////////////////////////////////////////////////////////
-      //Generate the slice image data for itk filters
-      //////////////////////////////////////////////////////////////////////////
-      double spacing[3];
-
-      if (volumeData->IsA("vtkStructuredPoints"))
+      for (int k=0;k<(numberOfPoints);k++)
       {
-        vtkStructuredPoints::SafeDownCast(volumeData)->GetSpacing(spacing); 
+        vtkDataArray *inputScalars = volumeData->GetPointData()->GetScalars();       
+        double value = inputScalars->GetTuple1(k + i*numberOfPoints);
+
+        if((!m_UseDoubleThreshold && value >= localThreshold) || (value>= localThreshold && value <= localUpperTheshold))
+          newScalars->SetTuple1(k + i*numberOfPoints,255);
+        else    
+          newScalars->SetTuple1(k + i*numberOfPoints,0);
       }
-      else if (volumeData->IsA("vtkRectilinearGrid"))
-      {
-        vtkDataArray *x = vtkRectilinearGrid::SafeDownCast(volumeData)->GetXCoordinates();
-        vtkDataArray *y = vtkRectilinearGrid::SafeDownCast(volumeData)->GetYCoordinates();
-
-        //assumed that the slices are image data
-        spacing[0] = x->GetTuple1(1) - x->GetTuple1(0);
-        spacing[1] = y->GetTuple1(1) - y->GetTuple1(0);
-        spacing[2] = 0.0;
-      }
-
-      vtkDataArray *inputScalars = volumeData->GetPointData()->GetScalars();
-      vtkMAFSmartPointer<vtkDoubleArray> scalars;
-      scalars->SetName("SCALARS");
-      scalars->SetNumberOfTuples(volumeDimensions[0]*volumeDimensions[1]);
-      for (int k=0;k<(volumeDimensions[0]*volumeDimensions[1]);k++)
-      {
-        double value = inputScalars->GetTuple1(k+i*(volumeDimensions[0]*volumeDimensions[1]));
-        scalars->SetTuple1(k,value);
-      }
-
-      vtkMAFSmartPointer<vtkImageData> im;
-      im->SetDimensions(volumeDimensions[0],volumeDimensions[1],1);
-      im->SetSpacing(spacing[0],spacing[1],0.0);
-      im->SetScalarTypeToDouble();
-      im->GetPointData()->AddArray(scalars);
-      im->GetPointData()->SetActiveScalars("SCALARS");
-      im->Update();
-      //////////////////////////////////////////////////////////////////////////
-
-      /////////////////////////////////////////////////////////////////////////
-      //ITK pipeline to binarize
-      //////////////////////////////////////////////////////////////////////////
-      typedef itk::VTKImageToImageFilter< RealImage > ConvertervtkTOitk;
-      ConvertervtkTOitk::Pointer vtkTOitk = ConvertervtkTOitk::New();
-      vtkTOitk->SetInput( im );
-      vtkTOitk->Update();
-
-      double range[2];
-      volumeData->GetScalarRange(range);
-
-      binaryThreshold->SetInput( ((RealImage*)vtkTOitk->GetOutput()) );
-      binaryThreshold->SetInsideValue(255);
-      binaryThreshold->SetOutsideValue(0);
-      binaryThreshold->SetLowerThreshold(localThreshold);
-      binaryThreshold->SetUpperThreshold(range[1]);
-
-      try
-      {
-        binaryThreshold->Update();
-      }
-      catch ( itk::ExceptionObject &err )
-      {
-        std::cout << "ExceptionObject caught !" << std::endl; 
-        std::cout << err << std::endl; 
-      }
-
-      typedef itk::ImageToVTKImageFilter< RealImage > ConverteritkTOvtk;
-      ConverteritkTOvtk::Pointer itkTOvtk = ConverteritkTOvtk::New();
-      itkTOvtk->SetInput( binaryThreshold->GetOutput() );
-      itkTOvtk->Update();
-      //////////////////////////////////////////////////////////////////////////
-
-      //////////////////////////////////////////////////////////////////////////
-      //Copy the new scalars
-      //////////////////////////////////////////////////////////////////////////
-      vtkImageData *imageBinary = ((vtkImageData*)itkTOvtk->GetOutput());
-      imageBinary->Update();
-
-      vtkDataArray *binaryScalars = imageBinary->GetPointData()->GetScalars();
-      for (int k=0;k<imageBinary->GetNumberOfPoints();k++)
-      {
-        char value = binaryScalars->GetTuple1(k);
-        newScalars->SetTuple1(k+i*(volumeDimensions[0]*volumeDimensions[1]),value);
-      }
-      //////////////////////////////////////////////////////////////////////////
-      
     }
-
   }
 
 
@@ -461,7 +401,7 @@ void medDataPipeCustomSegmentationVolume::ApplyAutomaticSegmentation()
 
     m_AutomaticSP->DeepCopy(newSP);
     m_AutomaticSP->Update();
-    m_SP->DeepCopy(newSP);
+    m_SP->DeepCopy(newSP); 
     m_SP->Update();
   }
   else
@@ -889,7 +829,7 @@ void medDataPipeCustomSegmentationVolume::Execute()
 {
 }
 //----------------------------------------------------------------------------
-int medDataPipeCustomSegmentationVolume::AddRange(int startSlice,int endSlice,double threshold)
+int medDataPipeCustomSegmentationVolume::AddRange(int startSlice,int endSlice,double threshold, double upperThreshold)
 //----------------------------------------------------------------------------
 {
   if (!this->GetVME()->IsDataAvailable())
@@ -907,6 +847,7 @@ int medDataPipeCustomSegmentationVolume::AddRange(int startSlice,int endSlice,do
   range[1] = endSlice;
   m_AutomaticSegmentationRanges.push_back(range);
   m_AutomaticSegmentationThresholds.push_back(threshold);
+  m_AutomaticSegmentationUpperThresholds.push_back(upperThreshold);
 
   m_ChangedAutomaticData = true;
   Modified();
@@ -916,10 +857,6 @@ int medDataPipeCustomSegmentationVolume::AddRange(int startSlice,int endSlice,do
 int medDataPipeCustomSegmentationVolume::GetRange(int index,int &startSlice, int &endSlice, double &threshold)
 //----------------------------------------------------------------------------
 {
-  //was (index<0 || index>m_AutomaticSegmentationRanges.size()-1)
-  //but m_AutomaticSegmentationRanges.size() is unsiged, if you remove 1 when it is 0
-  //you get 4294967295 and the control fails
-  //The same update was done in the similar check in this file
   if (index<0 || index+1>m_AutomaticSegmentationRanges.size())
   {
     return MAF_ERROR;
@@ -931,6 +868,25 @@ int medDataPipeCustomSegmentationVolume::GetRange(int index,int &startSlice, int
 
   return MAF_OK;
 }
+
+//----------------------------------------------------------------------------
+int medDataPipeCustomSegmentationVolume::GetRange(int index,int &startSlice, int &endSlice, double &threshold, double &upperThreshold)
+//----------------------------------------------------------------------------
+{
+  if (index<0 || index+1>m_AutomaticSegmentationRanges.size())
+  {
+    return MAF_ERROR;
+  }
+
+  startSlice = m_AutomaticSegmentationRanges[index][0];
+  endSlice = m_AutomaticSegmentationRanges[index][1];
+  threshold = m_AutomaticSegmentationThresholds[index];
+  upperThreshold = m_AutomaticSegmentationUpperThresholds[index];
+
+  return MAF_OK;
+}
+
+
 //------------------------------------------------------------------------------
 int medDataPipeCustomSegmentationVolume::SetVolume(mafNode *volume)
 //------------------------------------------------------------------------------
@@ -1138,7 +1094,7 @@ bool medDataPipeCustomSegmentationVolume::CheckNumberOfThresholds()
   //////////////////////////////////////////////////////////////////////////
 }
 //----------------------------------------------------------------------------
-int medDataPipeCustomSegmentationVolume::UpdateRange(int index,int &startSlice, int &endSlice, double &threshold)
+int medDataPipeCustomSegmentationVolume::UpdateRange(int index,int startSlice, int endSlice, double threshold, double upperThreshold)
 //----------------------------------------------------------------------------
 {
   if (m_AutomaticSegmentationRanges.size()==0 || index<0 || index+1>m_AutomaticSegmentationRanges.size() || AutomaticCheckRange(startSlice,endSlice,index) == MAF_ERROR)
@@ -1148,6 +1104,8 @@ int medDataPipeCustomSegmentationVolume::UpdateRange(int index,int &startSlice, 
   m_AutomaticSegmentationRanges[index][0] = startSlice;
   m_AutomaticSegmentationRanges[index][1] = endSlice;
   m_AutomaticSegmentationThresholds[index] = threshold;
+  m_AutomaticSegmentationUpperThresholds[index] = upperThreshold;
+
 
   m_ChangedAutomaticData = true;
   Modified();
@@ -1163,6 +1121,7 @@ int medDataPipeCustomSegmentationVolume::RemoveAllRanges()
   }
   m_AutomaticSegmentationRanges.clear();
   m_AutomaticSegmentationThresholds.clear();
+  m_AutomaticSegmentationUpperThresholds.clear();
 
   m_ChangedAutomaticData = true;
   Modified();
@@ -1227,6 +1186,7 @@ int medDataPipeCustomSegmentationVolume::DeleteRange(int index)
       m_AutomaticSegmentationRanges[j][0] = m_AutomaticSegmentationRanges[i][0];
       m_AutomaticSegmentationRanges[j][1] = m_AutomaticSegmentationRanges[i][1];
       m_AutomaticSegmentationThresholds[j] = m_AutomaticSegmentationThresholds[i];
+      m_AutomaticSegmentationUpperThresholds[j] = m_AutomaticSegmentationUpperThresholds[i];
       j++;
     }
   }
@@ -1234,16 +1194,19 @@ int medDataPipeCustomSegmentationVolume::DeleteRange(int index)
   delete []m_AutomaticSegmentationRanges[m_AutomaticSegmentationRanges.size()-1];
   m_AutomaticSegmentationRanges.pop_back();
   m_AutomaticSegmentationThresholds.pop_back();
+  m_AutomaticSegmentationUpperThresholds.pop_back();
+
 
   m_ChangedAutomaticData = true;
   Modified();
   return MAF_OK;
 }
 //------------------------------------------------------------------------
-void medDataPipeCustomSegmentationVolume::SetAutomaticSegmentationGlobalThreshold(double threshold)
+void medDataPipeCustomSegmentationVolume::SetAutomaticSegmentationGlobalThreshold(double threshold, double upperThreshold)
 //------------------------------------------------------------------------
 {
   m_AutomaticSegmentationGlobalThreshold = threshold;
+  m_AutomaticSegmentationGlobalUpperThreshold = upperThreshold;
   m_ChangedAutomaticData = true;
   Modified();
 }

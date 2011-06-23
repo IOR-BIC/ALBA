@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMESegmentationVolume.h,v $
 Language:  C++
-Date:      $Date: 2011-05-26 08:30:59 $
-Version:   $Revision: 1.1.2.9 $
+Date:      $Date: 2011-06-23 15:56:01 $
+Version:   $Revision: 1.1.2.10 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -125,13 +125,16 @@ public:
   mafNode *GetRefinementVolumeMask();
 
   /** Add a new range with a particular threshold */
-  int AddRange(int startSlice,int endSlice,double threshold);
+  int AddRange(int startSlice,int endSlice,double threshold, double upperThershold=0);
+
+  /** Return the value of the range of the position index */
+  int GetRange(int index,int &startSlice, int &endSlice, double &threshold, double &upperThreshold);
 
   /** Return the value of the range of the position index */
   int GetRange(int index,int &startSlice, int &endSlice, double &threshold);
 
   /** Update the value of the range of the position index - return MAF_ERROR if the index isn't correct*/
-  int UpdateRange(int index,int startSlice, int endSlice, double threshold);
+  int UpdateRange(int index,int startSlice, int endSlice, double threshold, double upperThershold=0);
 
   /** Delete the range of the position index */
   int DeleteRange(int index);
@@ -148,10 +151,19 @@ public:
   /** Get the threshold modality for automatic segmentation: GLOBAL or RANGE */
   int GetAutomaticSegmentationThresholdModality();
 
-  /** Set the value to use during a global threshold */
-  void SetAutomaticSegmentationGlobalThreshold(double threshold);
+  /** Set Threshold filtering to double Threshold if modality is true */
+  void SetDoubleThresholdModality(int modality);
 
-  /** Return the value to use during a global threshold */
+  /** Return Threshold filtering modality, true if double Threshold is enabled */
+  int GetDoubleThresholdModality();
+
+  /** Set the value to use during a global threshold, on single threshold mode set only the lower threshold*/
+  void SetAutomaticSegmentationGlobalThreshold(double lowerThreshold, double uppperThreshold=0);
+
+  /** Return the value of upper threshold to use during a global threshold*/
+  double GetAutomaticSegmentationGlobalUpperThreshold();
+
+  /** Return the value to use during a global threshold, in double threshold mode return the lower threshold*/
   double GetAutomaticSegmentationGlobalThreshold();
 
   /** Check if all thresholds exist */
@@ -184,17 +196,22 @@ public:
   /** Return the number of seeds */
   int GetNumberOfSeeds();
 
+  /** Set the range of action of Region Growing algorithm */
   void SetRegionGrowingSliceRange(int startSlice, int endSlice);
 
+  /** Return the range of action of Region Growing algorithm */
   int GetRegionGrowingSliceRange(int &startSlice, int &endSlice);
 
   /** return the right type of output */  
   /*virtual*/ mafVMEOutput *GetOutput();
 
+  /** Return true if node is of type mafVMEVolume. */
   static bool VolumeAccept(mafNode *node) {return(node != NULL && node->IsA("mafVMEVolume"));}
 
 protected:
+  /** constructor. */
   medVMESegmentationVolume();
+  /** destructor. */
   virtual ~medVMESegmentationVolume(); 
 
   /** Internally used to create a new instance of the GUI.*/
@@ -221,7 +238,9 @@ protected:
   medAttributeSegmentationVolume *m_VolumeAttribute;
 
 private:
-  medVMESegmentationVolume(const medVMESegmentationVolume&); // Not implemented
-  void operator=(const medVMESegmentationVolume&); // Not implemented
+  /** Not implemented */
+  medVMESegmentationVolume(const medVMESegmentationVolume&); 
+  /** Operator = Not implemented*/
+  void operator=(const medVMESegmentationVolume&);
 };
 #endif

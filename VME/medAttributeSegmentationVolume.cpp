@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medAttributeSegmentationVolume.cpp,v $
 Language:  C++
-Date:      $Date: 2010-06-07 14:31:09 $
-Version:   $Revision: 1.1.2.7 $
+Date:      $Date: 2011-06-23 15:56:00 $
+Version:   $Revision: 1.1.2.8 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -40,6 +40,9 @@ medAttributeSegmentationVolume::medAttributeSegmentationVolume()
 
   m_AutomaticSegmentationThresholdModality = medVMESegmentationVolume::GLOBAL;
   m_AutomaticSegmentationGlobalThreshold = 0.0;
+  m_AutomaticSegmentationGlobalUpperThreshold = 0.0;
+
+  m_UseDoubleThreshold=0;
 
   m_RegionGrowingLowerThreshold = m_RegionGrowingUpperThreshold = 0.0;
 }
@@ -72,7 +75,9 @@ void medAttributeSegmentationVolume::DeepCopy(const mafAttribute *a)
 
   //////////////////////////////////////////////////////////////////////////
  	m_AutomaticSegmentationThresholdModality = ((medAttributeSegmentationVolume*)a)->GetAutomaticSegmentationThresholdModality();
+  m_UseDoubleThreshold= ((medAttributeSegmentationVolume*)a)->GetDoubleThresholdModality();
   m_AutomaticSegmentationGlobalThreshold = ((medAttributeSegmentationVolume*)a)->GetAutomaticSegmentationGlobalThreshold();
+  m_AutomaticSegmentationGlobalUpperThreshold = ((medAttributeSegmentationVolume*)a)->GetAutomaticSegmentationGlobalUpperThreshold();
   for (int i=0;i<((medAttributeSegmentationVolume*)a)->GetNumberOfRanges();i++)
   {
     int startSlice,endSlice;
@@ -102,10 +107,22 @@ bool medAttributeSegmentationVolume::Equals(const mafAttribute *a)
       return false;
     }
 
+    if (m_UseDoubleThreshold != ((medAttributeSegmentationVolume*)a)->GetDoubleThresholdModality())
+    {
+      return false;
+    }
+
     if (m_AutomaticSegmentationGlobalThreshold != ((medAttributeSegmentationVolume*)a)->GetAutomaticSegmentationGlobalThreshold())
     {
       return false;
     }
+
+    if (m_AutomaticSegmentationGlobalUpperThreshold != ((medAttributeSegmentationVolume*)a)->GetAutomaticSegmentationGlobalUpperThreshold() &&
+        m_UseDoubleThreshold)
+    {
+      return false;
+    }
+
 
     if (m_AutomaticSegmentationRanges.size() != ((medAttributeSegmentationVolume*)a)->GetNumberOfRanges())
     {
@@ -165,8 +182,16 @@ int medAttributeSegmentationVolume::InternalStore(mafStorageElement *parent)
     int valueInt = m_AutomaticSegmentationThresholdModality;
     parent->StoreInteger(value,valueInt);
     //////////////////////////////////////////////////////////////////////////
+    value = "USE_DOUBLE_THRESHOLD";
+    valueInt = m_UseDoubleThreshold;
+    parent->StoreInteger(value,valueInt);
+    //////////////////////////////////////////////////////////////////////////
     value = "AUTOMATIC_SEGMENTATION_GLOBAL_THRESHOLD";
     double valueDouble = m_AutomaticSegmentationGlobalThreshold;
+    parent->StoreDouble(value,valueDouble);
+    //////////////////////////////////////////////////////////////////////////
+    value = "AUTOMATIC_SEGMENTATION_GLOBAL_UPPER_THRESHOLD";
+    valueDouble = m_AutomaticSegmentationGlobalUpperThreshold;
     parent->StoreDouble(value,valueDouble);
     //////////////////////////////////////////////////////////////////////////
     value = "NUM_OF_RANGES";
@@ -212,9 +237,23 @@ int medAttributeSegmentationVolume::InternalRestore(mafStorageElement *node)
     //////////////////////////////////////////////////////////////////////////
     mafString value = "AUTOMATIC_SEGMENTATION_THRESHOLD_MODALITY";
     node->RestoreInteger(value,m_AutomaticSegmentationThresholdModality);
+    
+    value = "USE_DOUBLE_THRESHOLD";
+    if(node->RestoreInteger(value,m_UseDoubleThreshold) == MAF_ERROR)
+    {
+      mafLogMessage("Old file version loaded  for retro-compatility please save it again");
+      m_UseDoubleThreshold=0;
+    }
+    
     //////////////////////////////////////////////////////////////////////////
     value = "AUTOMATIC_SEGMENTATION_GLOBAL_THRESHOLD";
     node->RestoreDouble(value,m_AutomaticSegmentationGlobalThreshold);
+    //////////////////////////////////////////////////////////////////////////
+    if (m_UseDoubleThreshold)
+    {
+      value = "AUTOMATIC_SEGMENTATION_GLOBAL_UPPER_THRESHOLD";
+      node->RestoreDouble(value,m_AutomaticSegmentationGlobalUpperThreshold);
+    }
     //////////////////////////////////////////////////////////////////////////
     int numOfRanges;
     value = "NUM_OF_RANGES";
@@ -257,7 +296,7 @@ int medAttributeSegmentationVolume::InternalRestore(mafStorageElement *node)
   return MAF_ERROR;
 }
 //----------------------------------------------------------------------------
-int medAttributeSegmentationVolume::AddRange(int startSlice,int endSlice,double threshold)
+int medAttributeSegmentationVolume::AddRange(int startSlice,int endSlice,double threshold, double upperThreshold)
 //----------------------------------------------------------------------------
 {
   int *range = new int[2];
@@ -285,7 +324,24 @@ int medAttributeSegmentationVolume::GetRange(int index,int &startSlice, int &end
   return MAF_OK;
 }
 //----------------------------------------------------------------------------
-int medAttributeSegmentationVolume::UpdateRange(int index,int startSlice, int endSlice, double threshold)
+int medAttributeSegmentationVolume::GetRange(int index,int &startSlice, int &endSlice, double &threshold, double &upperThreshold)
+//----------------------------------------------------------------------------
+{
+  int nRanges = m_AutomaticSegmentationRanges.size();
+  if (index<0 || index>(nRanges-1))
+  {
+    return MAF_ERROR;
+  }
+
+  startSlice = m_AutomaticSegmentationRanges[index][0];
+  endSlice = m_AutomaticSegmentationRanges[index][1];
+  threshold = m_AutomaticSegmentationThresholds[index];
+  upperThreshold = m_AutomaticSegmentationUpperThresholds[index];
+
+  return MAF_OK;
+}
+//----------------------------------------------------------------------------
+int medAttributeSegmentationVolume::UpdateRange(int index,int startSlice, int endSlice, double threshold, double upperThreshold)
 //----------------------------------------------------------------------------
 {
   int nRanges = m_AutomaticSegmentationRanges.size();
@@ -296,9 +352,11 @@ int medAttributeSegmentationVolume::UpdateRange(int index,int startSlice, int en
   m_AutomaticSegmentationRanges[index][0] = startSlice;
   m_AutomaticSegmentationRanges[index][1] = endSlice;
   m_AutomaticSegmentationThresholds[index] = threshold;
+  m_AutomaticSegmentationUpperThresholds[index] = upperThreshold;
 
   return MAF_OK;
 }
+
 //----------------------------------------------------------------------------
 int medAttributeSegmentationVolume::RemoveAllRanges()
 //----------------------------------------------------------------------------
@@ -309,6 +367,7 @@ int medAttributeSegmentationVolume::RemoveAllRanges()
   }
   m_AutomaticSegmentationRanges.clear();
   m_AutomaticSegmentationThresholds.clear();
+  m_AutomaticSegmentationUpperThresholds.clear();
 
   return MAF_OK;
 }
@@ -367,6 +426,7 @@ int medAttributeSegmentationVolume::DeleteRange(int index)
       m_AutomaticSegmentationRanges[j][0] = m_AutomaticSegmentationRanges[i][0];
       m_AutomaticSegmentationRanges[j][1] = m_AutomaticSegmentationRanges[i][1];
       m_AutomaticSegmentationThresholds[j] = m_AutomaticSegmentationThresholds[i];
+      m_AutomaticSegmentationUpperThresholds[j] = m_AutomaticSegmentationUpperThresholds[i];
       j++;
     }
   }
@@ -374,6 +434,7 @@ int medAttributeSegmentationVolume::DeleteRange(int index)
   delete []m_AutomaticSegmentationRanges[m_AutomaticSegmentationRanges.size()-1];
   m_AutomaticSegmentationRanges.pop_back();
   m_AutomaticSegmentationThresholds.pop_back();
+  m_AutomaticSegmentationUpperThresholds.pop_back();
 
   return MAF_OK;
 }
@@ -420,6 +481,15 @@ void medAttributeSegmentationVolume::Print(std::ostream& os, const int tabs) con
   else
   {
     os << indent << indent << "AutomaticSegmentationThresholdModality: RANGE"<<std::endl;
+  }
+  //////////////////////////////////////////////////////////////////////////
+  if (m_UseDoubleThreshold)
+  {
+    os << indent << indent << "Double threshold active"<<std::endl;
+  }
+  else
+  {
+    os << indent << indent << "Single threshold active"<<std::endl;
   }
   //////////////////////////////////////////////////////////////////////////
   os << indent << indent << "Global Threshold: "<<m_AutomaticSegmentationGlobalThreshold<<std::endl;
