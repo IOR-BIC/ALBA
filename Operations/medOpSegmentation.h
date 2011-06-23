@@ -2,16 +2,16 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.h,v $
 Language:  C++
-Date:      $Date: 2011-05-10 15:13:28 $
-Version:   $Revision: 1.1.2.1 $
-Authors:   Eleonora Mambrini, Gianluigi Crii
+Date:      $Date: 2011-06-23 15:50:27 $
+Version:   $Revision: 1.1.2.2 $
+Authors:   Eleonora Mambrini, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
 SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 =========================================================================*/
 
-#ifndef __lhpOpSegmentation_H__
-#define __lhpOpSegmentation_H__
+#ifndef __medOpSegmentation_H__
+#define __medOpSegmentation_H__
 
 #include "mafOp.h"
 #include "mafMatrix.h"
@@ -65,7 +65,7 @@ class vtkStructuredPoints;
 class vtkDataArray;
 
 //----------------------------------------------------------------------------
-// lhpOpSegmentation :
+// medOpSegmentation :
 //----------------------------------------------------------------------------
 /**
 This operation accept a volume as input and produces a surface as output of segmentation procedure.
@@ -77,7 +77,11 @@ or he can load a previous segmentation.
 */
 class medOpSegmentation: public mafOp
 {
+
 public:
+
+  mafTypeMacro(medOpSegmentation, mafOp);
+
   //----------------------------------------------------------------------------
   // Constants:
   //----------------------------------------------------------------------------
@@ -86,7 +90,6 @@ public:
     ID_OPERATION_TYPE = MINID,
     ID_PRE_SEGMENTATION,
     ID_AUTO_SEGMENTATION,
-    ID_REGION_GROWING_SEGMENTATION,
     ID_MANUAL_SEGMENTATION,
     ID_REFINEMENT,
     ID_LOAD_SEGMENTATION,
@@ -137,37 +140,12 @@ public:
     ID_REFINEMENT_APPLY,
     ID_REFINEMENT_UNDO,
     ID_REFINEMENT_REDO,
-    ID_REGION_GROWING_LOWER_THRESHOLD,
-    ID_REGION_GROWING_UPPER_THRESHOLD,
-    ID_REGION_GROWING_SEED,
-    ID_REGION_GROWING_ADD_SEED,
-    ID_REGION_GROWING_DELETE_SEED,
-    ID_REGION_GROWING_LIST_OF_SEEDS,
-    ID_REGION_GROWING_SPHERE_RADIUS,
-    ID_REGION_GROWING_INCREASE_MIN_THRESHOLD_RANGE_VALUE,
-    ID_REGION_GROWING_DECREASE_MIN_THRESHOLD_RANGE_VALUE,
-    ID_REGION_GROWING_INCREASE_MAX_THRESHOLD_RANGE_VALUE,
-    ID_REGION_GROWING_DECREASE_MAX_THRESHOLD_RANGE_VALUE,
-    ID_REGION_GROWING_DECREASE_MIDDLE_THRESHOLD_RANGE_VALUE,
-    ID_REGION_GROWING_INCREASE_MIDDLE_THRESHOLD_RANGE_VALUE,
-    ID_REGION_GROWING_INCREASE_MIN_SLICE_RANGE_VALUE,
-    ID_REGION_GROWING_DECREASE_MIN_SLICE_RANGE_VALUE,
-    ID_REGION_GROWING_INCREASE_MAX_SLICE_RANGE_VALUE,
-    ID_REGION_GROWING_DECREASE_MAX_SLICE_RANGE_VALUE,
-    ID_REGION_GROWING_DECREASE_MIDDLE_SLICE_RANGE_VALUE,
-    ID_REGION_GROWING_INCREASE_MIDDLE_SLICE_RANGE_VALUE,
-    ID_REGION_GROWING_PREVIEW,
-    ID_REGION_GROWING_ADD_RANGE,
-    ID_REGION_GROWING_REMOVE_RANGE,
-    ID_REGION_GROWING_LIST_OF_RANGE,
-    ID_REGION_GROWING_UPDATE_RANGE,
   };
 
   enum OPERATIONS_IDS
   {
     PRE_SEGMENTATION = 0,
     AUTOMATIC_SEGMENTATION,
-    //REGION_GROWING_SEGMENTATION,
     MANUAL_SEGMENTATION,
     REFINEMENT_SEGMENTATION,
     LOAD_SEGMENTATION,
@@ -199,13 +177,15 @@ public:
     ID_REFINEMENT_HOLES_FILL,
   };
 
+  /** constructor. */
   medOpSegmentation(const wxString &label = "Segmentate Volume");
+  /** destructor. */
   ~medOpSegmentation(); 
 
+   /** Function that handles events sent from other objects. */
   void OnEvent(mafEventBase *maf_event);
 
-  mafTypeMacro(medOpSegmentation, mafOp);
-
+  /** return the copy of the operation object */
   mafOp* Copy();
 
   /** Return true for the acceptable vme type. */
@@ -242,9 +222,7 @@ protected:
   virtual void CreateLoadSegmentationGui();
   /** Creates GUI widgets to select the right slice (number of slice and plane)*/
   virtual void CreateSliceNavigationGui();
-  /** Creates GUI for region growing step */
-  virtual void CreateRegionGrowingGui();
-
+  
   //////////////////////////////////////////////////////////////////////////
   //Method to initialize the stuff
   //////////////////////////////////////////////////////////////////////////
@@ -254,7 +232,7 @@ protected:
   void InitializeViewSlice();
   /** Initialize the volume spacing attribute */
   void InitVolumeSpacing();
-  /***/
+  /** Initialize the Interactors  */
   void InitializeInteractors();
   /** Init GUI slice slider with volume parameters. */
   void InitGui();
@@ -262,9 +240,9 @@ protected:
   void InitManualSegmentationGui();
   /** Initialize the slices stuff for manual step */
   void InitManualVolumeSlice();
-  /***/
+  /** Initialize the Threshold Volume*/
   void InitThresholdVolume();
-  /***/
+  /** Initialize the Segmented Volume*/
   void InitSegmentedVolume();
   /** Initialize color table values for segmented volume visualization. */
   void InitSegmentationColorLut();
@@ -272,19 +250,15 @@ protected:
   void InitManualColorLut();
   //////////////////////////////////////////////////////////////////////////
 
-  /***/
+  /** Remove the VMEs nedded by the operation*/
   void RemoveVMEs();
-
-  void RemoveSpheres();
-
-  void AddFirstSphere();
 
   /**Update windowing */
   void UpdateWindowing();
   /** Update slice widgets and labels. Set current slice position. */
   void UpdateSlice();
 
-  /** Uset to sesample input volume*/
+  /** Used to resample input volume*/
   bool Resample();
 
   /** Used to remove islands or fill holes in a binary volume*/
@@ -296,9 +270,7 @@ protected:
   void OnManualSegmentationEvent(mafEvent *e);
   /***/
   void OnRefinementSegmentationEvent(mafEvent *e);
-  /***/
-  void OnRegionGrowingSegmentationEvent(mafEvent *e);
-
+  
 
   double GetPosFromSliceIndexZ();
 
@@ -376,10 +348,13 @@ protected:
   
   /***/
   void OnBrushEvent(mafEvent *e);
+  
   /***/
   void ResetManualUndoList();
+  
   /***/
   void ResetManualRedoList();
+  
   /***/
   bool ManualVolumeSliceRefinement();
 
@@ -393,7 +368,6 @@ protected:
   mafGUIFloatSlider *m_ManualBrushSizeSlider;
   wxTextCtrl     *m_ManualBrushSizeText;
   wxRadioBox *m_ManualBrushShapeRadioBox;
-  //wxCheckBox *m_ManualContinuousPickingCheck;
   mafGUIButton *m_ManualApplyChanges;
   int m_ManualSegmentationMode;
   int m_ManualSegmentationAction;
@@ -468,6 +442,7 @@ protected:
 
   int m_AutomaticGlobalThreshold;
   double m_AutomaticThreshold;
+  double m_AutomaticUpperThreshold;
   double m_AutomaticLabel;
   wxListBox *m_AutomaticListOfRange;
   mafGUILutSlider *m_AutomaticRangeSlider;
@@ -477,6 +452,7 @@ protected:
     int m_StartSlice;
     int m_EndSlice;
     double m_ThresholdValue;
+    double m_UpperThresholdValue;
   };
   std::vector<AutomaticInfoRange> m_AutomaticRanges;
   std::vector<AutomaticInfoRange> m_AutomaticRangesHelper;
@@ -519,47 +495,6 @@ protected:
 
   std::vector<vtkDataArray *> m_RefinementUndoList;
   std::vector<vtkDataArray *> m_RefinementRedoList;
-  //int m_RefinementUndoCounter;
-
-  //////////////////////////////////////////////////////////////////////////
-
-  //////////////////////////////////////////////////////////////////////////
-  //Segmentation Region Growing stuff
-  //////////////////////////////////////////////////////////////////////////
-  
-  /***/
-  void SetSelectionRegionGrowingListOfSeeds(int index);
-  /** Perform the region growing */
-  void OnRegionGrowingPreview();
-  /** Perform the region growing */
-  void RegionGrowing();
-
-  /** Compute seed position */
-  void OnRegionGrowingPicker(mafEvent *e);
-
-  /** Function called when the user use the fine button to change the threshold range of the region growing segmentation */
-  void OnRegionGrowingChangeThresholdRangeManually(int eventID);
-  /** Function called when the user use the fine button to change the slice range of the region growing segmentation */
-  void OnRegionGrowingChangeSliceRangeManually(int eventID);
-
-
-  /** Update the select range using gui values */
-  void OnRegionGrowingUpdateSliceRange();
-
-  std::vector<int*> m_RegionGrowingSeeds;
-  std::vector<vtkSphereSource*> m_RegionGrowingSpheres;
-  std::vector<mafVMESurface*> m_RegionGrowingSphereSurface;
-  mafGUILutSlider *m_RegionGrowingThresholdRangeSlider;
-  mafGUILutSlider *m_RegionGrowingSliceRangeSlider;
-  wxListBox *m_RegionGrowingListOfSeeds;
-  int m_RegionGrowingSeed[3];
-  double m_RegionGrowingSphereRadius;
-  //double m_RegionGrowingLowerThreshold;
-  //double m_RegionGrowingUpperThreshold;
-
-  int m_RegionGrowingSliceRange[2];
-  //////////////////////////////////////////////////////////////////////////
-
-
+ 
 };
 #endif

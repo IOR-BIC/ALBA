@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2011-05-10 15:13:28 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-06-23 15:50:27 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
@@ -205,6 +205,7 @@ medOpSegmentation::medOpSegmentation(const wxString &label) : mafOp(label)
   //Automatic initializations
   //////////////////////////////////////////////////////////////////////////
   m_AutomaticThreshold = 0.0;
+  m_AutomaticUpperThreshold = 0.0;
   m_AutomaticLabel = 0.0;
   m_AutomaticRanges.clear();
   m_AutomaticListOfRange = NULL;
@@ -218,16 +219,6 @@ medOpSegmentation::medOpSegmentation(const wxString &label) : mafOp(label)
   m_AutomaticPicker = NULL;
   m_AutomaticPER = NULL;
   m_AutomaticGlobalThreshold = GLOBAL;
-
-  //////////////////////////////////////////////////////////////////////////
-  //Region growing initializations
-  //////////////////////////////////////////////////////////////////////////
-  /*m_RegionGrowingSeed[0] = m_RegionGrowingSeed[1] = m_RegionGrowingSeed[2] = 0;
-  m_RegionGrowingSphereRadius = 1.0;
-
-  m_RegionGrowingSliceRangeSlider = NULL;
-  m_RegionGrowingThresholdRangeSlider = NULL;*/
-  //////////////////////////////////////////////////////////////////////////
 
   //////////////////////////////////////////////////////////////////////////
   //Refinement initializations
@@ -271,24 +262,6 @@ medOpSegmentation::~medOpSegmentation()
 
   ResetRefinementRedoList();
 
-  /*for (int i=0;i<m_RegionGrowingSeeds.size();i++)
-  {
-  delete []m_RegionGrowingSeeds[i];
-  }
-  for (int i=0;i<m_RegionGrowingSpheres.size();i++)
-  {
-  vtkDEL(m_RegionGrowingSpheres[i]);
-  }
-
-  for (int i=0;i<m_RegionGrowingSphereSurface.size();i++)
-  {
-  mafDEL(m_RegionGrowingSphereSurface[i]);
-  }
-
-  m_RegionGrowingSeeds.clear();
-  m_RegionGrowingSpheres.clear();
-  m_RegionGrowingSphereSurface.clear();*/
-
   Superclass;
 }
 //----------------------------------------------------------------------------
@@ -307,6 +280,7 @@ mafOp *medOpSegmentation::Copy()
 void medOpSegmentation::OpRun()   
 //----------------------------------------------------------------------------
 {
+  
   //////////////////////////////////////////////////////////////////////////
   //Initialize of the volume matrix to the indentity
   //////////////////////////////////////////////////////////////////////////
@@ -335,30 +309,9 @@ void medOpSegmentation::OpRun()
   m_View->UpdateSlicePos(0.0);
   m_View->CameraReset();
   m_View->CameraUpdate();
-
-  /*InitThresholdVolume();
-  InitSegmentedVolume();
-
-  InitializeInteractors();
-  InitVolumeDimensions();
-  InitVolumeSpacing();
-  InitGui();
-  UpdateSlice();
-  UpdateWindowing();
-  InitGui();
-
-  m_SnippetsLabel->SetLabel( _("CTRL + left click on the slice to select a scalar value"));
-  m_Dialog->Update();
-  UpdateThresholdLabel();
-  m_GuiDialog->Enable(ID_AUTO_SEGMENTATION,true);
-  m_GuiDialog->Enable(ID_BUTTON_NEXT,false);*/
-
-  //if (m_Volume->GetOutput()->GetVTKData()->IsA("vtkStructuredPoints"))
-  //{
+  
   OnNextStep();
-  //}
-
-
+  
   int result = m_Dialog->ShowModal() == wxID_OK ? OP_RUN_OK : OP_RUN_CANCEL;
 
   DeleteOpDialog();
@@ -388,12 +341,6 @@ void medOpSegmentation::OpUndo()
 void medOpSegmentation::RemoveVMEs()
 //----------------------------------------------------------------------------
 {
-  /*for (int i=0;i<m_RegionGrowingSphereSurface.size();i++)
-  {
-  m_RegionGrowingSphereSurface[i]->ReparentTo(NULL);
-  mafDEL(m_RegionGrowingSphereSurface[i]);
-  }
-  m_RegionGrowingSphereSurface.clear();*/
 
 #ifndef _DEBUG
   if(m_ManualVolumeSlice)
@@ -588,28 +535,21 @@ void medOpSegmentation::CreateOpDialog()
   choices[1] = wxString("Manual");
   choices[2] = wxString("Refinement");
   choices[3] = wxString("Load");
-  //m_OperationsList = m_GuiDialog->Combo(ID_OPERATION_TYPE, "Operation", &m_CurrentOperation, 4, choices);
-  //m_OperationsList->SetSelection(m_CurrentOperation);
 
-  //CreatePreSegmentationGui();
   CreateAutoSegmentationGui();
-  //CreateRegionGrowingGui();
   CreateManualSegmentationGui();
   CreateRefinementGui();
   CreateLoadSegmentationGui();
 
   InitManualSegmentationGui();
 
-  //m_SegmentationOperationsRollOut[PRE_SEGMENTATION]   = m_GuiDialog->RollOut(ID_PRE_SEGMENTATION, "Volume Resampling", m_SegmentationOperationsGui[PRE_SEGMENTATION], true);
   m_SegmentationOperationsRollOut[AUTOMATIC_SEGMENTATION]   = m_GuiDialog->RollOut(ID_AUTO_SEGMENTATION, "Automatic Segmentation", m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION], false);
-  //m_SegmentationOperationsRollOut[REGION_GROWING_SEGMENTATION] = m_GuiDialog->RollOut(ID_REGION_GROWING_SEGMENTATION, "Region Growing Segmentation", m_SegmentationOperationsGui[REGION_GROWING_SEGMENTATION], false);
   m_SegmentationOperationsRollOut[MANUAL_SEGMENTATION]      = m_GuiDialog->RollOut(ID_MANUAL_SEGMENTATION, "Manual Segmentation", m_SegmentationOperationsGui[MANUAL_SEGMENTATION], false);
   m_SegmentationOperationsRollOut[REFINEMENT_SEGMENTATION]  = m_GuiDialog->RollOut(ID_REFINEMENT, "Segmentation Refinement", m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION], false);
   m_SegmentationOperationsRollOut[LOAD_SEGMENTATION]        = m_GuiDialog->RollOut(ID_LOAD_SEGMENTATION, "Load Segmentation", m_SegmentationOperationsGui[LOAD_SEGMENTATION], false);
 
   m_GuiDialog->Enable(ID_AUTO_SEGMENTATION, false);
   m_GuiDialog->Enable(ID_MANUAL_SEGMENTATION,false);
-  //m_GuiDialog->Enable(ID_REGION_GROWING_SEGMENTATION,false);
   m_GuiDialog->Enable(ID_REFINEMENT,false);
   m_GuiDialog->Enable(ID_LOAD_SEGMENTATION,false);
 
@@ -640,24 +580,16 @@ void medOpSegmentation::DeleteOpDialog()
     m_View->VmeShow(m_ThresholdVolume,false);
     m_View->VmeRemove(m_ThresholdVolume);
   }
-  /*for (int i=0;i<m_RegionGrowingSphereSurface.size();i++)
-  {
-  m_View->VmeShow(m_RegionGrowingSphereSurface[i],false);
-  m_View->VmeRemove(m_RegionGrowingSphereSurface[i]);
-  }*/
   if(m_ManualVolumeSlice)
   {
     m_View->VmeShow(m_ManualVolumeSlice,false);
     m_View->VmeRemove(m_ManualVolumeSlice);
   }
-
   m_Volume->ReparentTo(m_OldVolumeParent);
   m_Volume->SetBehavior(m_OldBehavior);
   m_Volume->Update();
   m_View->VmeShow(m_Volume,false);
   m_View->VmeRemove(m_Volume);
-  //    if(m_OutputVolume != NULL)
-  //      m_OutputVolume->ReparentTo(m_Volume);
 
   //////////////////////////////////////////////////////////////////////////
   //Remove the threshold label
@@ -708,7 +640,6 @@ void medOpSegmentation::DeleteOpDialog()
   }
 
   cppDEL(m_SliceSlider);
-  //cppDEL(m_OperationsList);
 
   cppDEL(m_GuiDialog);
   cppDEL(m_Dialog);
@@ -768,7 +699,6 @@ bool medOpSegmentation::Resample()
   op->SetInput(m_Volume);
   op->TestModeOn();
   op->OpRun();
-  //op->AutoSpacing();
   op->SetSpacing(m_VolumeSpacing);
   op->Resample();
   op->OpDo();
@@ -788,9 +718,6 @@ bool medOpSegmentation::Resample()
 bool medOpSegmentation::Refinement()
 //----------------------------------------------------------------------------
 {
-
-  //wxBusyCursor wait_cursor;
-  //wxBusyInfo wait(_("Wait! The algorithm could take long time!"));
 
   bool checkRadius = true;
 
@@ -986,9 +913,6 @@ bool medOpSegmentation::ManualVolumeSliceRefinement()
 //----------------------------------------------------------------------------
 {
 
-  //wxBusyCursor wait_cursor;
-  //wxBusyInfo wait(_("Wait! The algorithm could take long time!"));
-
   bool checkRadius = true;
 
   if ( m_CurrentSlicePlane == XY && (m_ManualRefinementRegionsSize>m_VolumeDimensions[0] || m_ManualRefinementRegionsSize>m_VolumeDimensions[1]) )
@@ -1106,8 +1030,6 @@ bool medOpSegmentation::ManualVolumeSliceRefinement()
     mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
 
 
-    //m_View->VmeShow(m_ThresholdVolume,false);
-    //m_View->VmeShow(m_ThresholdVolume,true);
     m_View->VmeShow(m_ManualVolumeSlice,false);
     m_View->VmeShow(m_ManualVolumeSlice,true);
 
@@ -1128,7 +1050,6 @@ bool medOpSegmentation::ApplyRefinementFilter(vtkStructuredPoints *inputImage, v
   typedef itk::VotingBinaryIterativeHoleFillingImageFilter<UCharImage> ITKVotingIterativeHoleFillingFilter;
   ITKVotingIterativeHoleFillingFilter::Pointer iterativeHoleFillingFilter = ITKVotingIterativeHoleFillingFilter::New();
 
-  //vtkImageData *refinedImage = NULL;
   vtkMAFSmartPointer<vtkStructuredPoints> refinedImage;
 
 
@@ -1160,7 +1081,6 @@ bool medOpSegmentation::ApplyRefinementFilter(vtkStructuredPoints *inputImage, v
   {
     iterativeHoleFillingFilter->SetInput( ((UCharImage*)vtkTOitk->GetOutput()) );
     iterativeHoleFillingFilter->SetRadius( indexRadius );
-    //iterativeHoleFillingFilter->SetMajorityThreshold(m_RefinementRegionsSize*2);
     if(m_RefinementSegmentationAction == ID_REFINEMENT_HOLES_FILL)
     {
       iterativeHoleFillingFilter->SetBackgroundValue( 0 );
@@ -1327,6 +1247,7 @@ void medOpSegmentation::CreateAutoSegmentationGui()
   double sr[2];
   m_Volume->GetOutput()->GetVTKData()->GetScalarRange(sr);
   currentGui->Double(ID_AUTOMATIC_THRESHOLD,"",&m_AutomaticThreshold,sr[0],sr[1]);
+  currentGui->Double(ID_AUTOMATIC_THRESHOLD,"",&m_AutomaticUpperThreshold,sr[0],sr[1]);
   wxString choices[2] = {_("Global"),_("Range")};
   currentGui->Label(_("Threshold type:"));
   currentGui->Radio(ID_AUTOMATIC_GLOBAL_THRESHOLD,"",&m_AutomaticGlobalThreshold,2,choices);
@@ -1382,114 +1303,6 @@ void medOpSegmentation::CreateLoadSegmentationGui()
   mafGUI *currentGui = new mafGUI(this);
 
   m_SegmentationOperationsGui[LOAD_SEGMENTATION] = currentGui;
-
-}
-//----------------------------------------------------------------------------
-void medOpSegmentation::CreateRegionGrowingGui()
-//----------------------------------------------------------------------------
-{
-  /*mafGUI *currentGui = new mafGUI(this);
-
-  //////////////////////////////////////////////////////////////////////////
-  // THRESHOLD RANGE
-  //////////////////////////////////////////////////////////////////////////
-  double sr[2];
-  m_Volume->GetOutput()->GetVTKData()->GetScalarRange(sr);
-  m_RegionGrowingThresholdRangeSlider = new mafGUILutSlider(currentGui,-1,wxPoint(0,0),wxSize(300,24));
-  m_RegionGrowingThresholdRangeSlider->SetListener(currentGui);
-  m_RegionGrowingThresholdRangeSlider->SetText(1,_("threshold"));
-  m_RegionGrowingThresholdRangeSlider->SetRange(sr[0],sr[1]);
-  m_RegionGrowingThresholdRangeSlider->SetSubRange(sr[0],sr[1]);
-
-  currentGui->Label("");
-  std::vector<int> thresholdIncreaseIDs;
-  thresholdIncreaseIDs.push_back(ID_REGION_GROWING_INCREASE_MIN_THRESHOLD_RANGE_VALUE);
-  thresholdIncreaseIDs.push_back(ID_REGION_GROWING_INCREASE_MIDDLE_THRESHOLD_RANGE_VALUE);
-  thresholdIncreaseIDs.push_back(ID_REGION_GROWING_INCREASE_MAX_THRESHOLD_RANGE_VALUE);
-  std::vector<const char*> thresholdIncreaseLabels;
-  thresholdIncreaseLabels.push_back("+");
-  thresholdIncreaseLabels.push_back("+");
-  thresholdIncreaseLabels.push_back("+");
-  //currentGui->TwoButtons(ID_REGION_GROWING_INCREASE_MIN_RANGE_VALUE,ID_REGION_GROWING_INCREASE_MAX_RANGE_VALUE,_("+"),_("+"),wxCENTER,50);
-  currentGui->MultipleButtons(3,3,thresholdIncreaseIDs,thresholdIncreaseLabels);
-  currentGui->Add(m_RegionGrowingThresholdRangeSlider);
-  std::vector<int> thresholdDecreaseIDs;
-  thresholdDecreaseIDs.push_back(ID_REGION_GROWING_DECREASE_MIN_THRESHOLD_RANGE_VALUE);
-  thresholdDecreaseIDs.push_back(ID_REGION_GROWING_DECREASE_MIDDLE_THRESHOLD_RANGE_VALUE);
-  thresholdDecreaseIDs.push_back(ID_REGION_GROWING_DECREASE_MAX_THRESHOLD_RANGE_VALUE);
-  std::vector<const char*> thresholdDecreaseLabels;
-  thresholdDecreaseLabels.push_back("-");
-  thresholdDecreaseLabels.push_back("-");
-  thresholdDecreaseLabels.push_back("-");
-  currentGui->MultipleButtons(3,3,thresholdDecreaseIDs,thresholdDecreaseLabels);
-  currentGui->Label("");
-  //////////////////////////////////////////////////////////////////////////
-
-
-  //////////////////////////////////////////////////////////////////////////
-  // SEEDS
-  //////////////////////////////////////////////////////////////////////////
-  currentGui->VectorN(ID_REGION_GROWING_SEED,_("seed"),m_RegionGrowingSeed,3,MININT,MAXINT,_("seed point to start growing, in image coordinates"));
-  currentGui->TwoButtons(ID_REGION_GROWING_ADD_SEED,ID_REGION_GROWING_DELETE_SEED,_("Add"),_("Remove"));
-  //currentGui->Enable(ID_REGION_GROWING_DELETE_SEED,false);
-  m_RegionGrowingListOfSeeds = currentGui->ListBox(ID_REGION_GROWING_LIST_OF_SEEDS,"");
-
-  double bounds[6];
-  m_Volume->GetOutput()->GetVTKData()->GetBounds(bounds);
-  int dimMax = max(bounds[1]-bounds[0],bounds[3]-bounds[2]);
-  m_RegionGrowingSphereRadius = (double)dimMax/60;
-  currentGui->Label(_("Sphere radius"));
-  currentGui->Double(ID_REGION_GROWING_SPHERE_RADIUS,"",&m_RegionGrowingSphereRadius);
-  currentGui->Button(ID_REGION_GROWING_PREVIEW,_("Preview"));
-  //////////////////////////////////////////////////////////////////////////
-
-
-  //////////////////////////////////////////////////////////////////////////
-  // SLICE RANGES
-  //////////////////////////////////////////////////////////////////////////
-  currentGui->Label(_("Slice range settings"),true);
-  currentGui->Label(_("1)Move the sliding button"));
-  currentGui->Label(_("to set a slices' range."));
-  currentGui->Label(_("2)right click to manually"));
-  currentGui->Label(_("enter slice's values."));
-
-  m_RegionGrowingSliceRangeSlider = new mafGUILutSlider(currentGui,-1,wxPoint(0,0),wxSize(300,24));
-  m_RegionGrowingSliceRangeSlider->SetListener(currentGui);
-  m_RegionGrowingSliceRangeSlider->SetText(1,"range");  
-  m_RegionGrowingSliceRangeSlider->SetRange(1,m_VolumeDimensions[2]);
-  m_RegionGrowingSliceRangeSlider->SetSubRange(1,m_VolumeDimensions[2]);
-
-  currentGui->Label("");
-  std::vector<int> rangeIncreaseIDs;
-  rangeIncreaseIDs.push_back(ID_REGION_GROWING_INCREASE_MIN_SLICE_RANGE_VALUE);
-  rangeIncreaseIDs.push_back(ID_REGION_GROWING_INCREASE_MIDDLE_SLICE_RANGE_VALUE);
-  rangeIncreaseIDs.push_back(ID_REGION_GROWING_INCREASE_MAX_SLICE_RANGE_VALUE);
-  std::vector<const char*> rangeIncreaseLabels;
-  rangeIncreaseLabels.push_back("+");
-  rangeIncreaseLabels.push_back("+");
-  rangeIncreaseLabels.push_back("+");
-  currentGui->MultipleButtons(3,3,rangeIncreaseIDs,rangeIncreaseLabels);
-
-  currentGui->Add(m_RegionGrowingSliceRangeSlider);
-
-  std::vector<int> rangeDecreaseIDs;
-  rangeDecreaseIDs.push_back(ID_REGION_GROWING_DECREASE_MIN_SLICE_RANGE_VALUE);
-  rangeDecreaseIDs.push_back(ID_REGION_GROWING_DECREASE_MIDDLE_SLICE_RANGE_VALUE);
-  rangeDecreaseIDs.push_back(ID_REGION_GROWING_DECREASE_MAX_SLICE_RANGE_VALUE);
-  std::vector<const char*> rangeDecreaseLabels;
-  rangeDecreaseLabels.push_back("+");
-  rangeDecreaseLabels.push_back("+");
-  rangeDecreaseLabels.push_back("+");
-  currentGui->MultipleButtons(3,3,rangeDecreaseIDs,rangeDecreaseLabels);
-  currentGui->Label("");
-
-  //currentGui->TwoButtons(ID_REGION_GROWING_ADD_RANGE,ID_REGION_GROWING_REMOVE_RANGE,("Add"),_("Remove"));
-  //currentGui->TwoButtons(ID_REGION_GROWING_ADD_RANGE,ID_REGION_GROWING_REMOVE_RANGE,("Set"),_("Reset"));
-  currentGui->Button(ID_REGION_GROWING_UPDATE_RANGE,("Update Range"));
-  //wxListBox *regionGrowingListOfRange;
-  //regionGrowingListOfRange = currentGui->ListBox(ID_REGION_GROWING_LIST_OF_RANGE,"");
-
-  m_SegmentationOperationsGui[REGION_GROWING_SEGMENTATION] = currentGui;*/
 
 }
 //----------------------------------------------------------------------------
@@ -1825,6 +1638,7 @@ void medOpSegmentation::InitSegmentedVolume()
   m_SegmentatedVolume->SetVolumeLink(m_Volume);
   m_SegmentatedVolume->SetName("Segmented Volume");
   m_SegmentatedVolume->ReparentTo(m_Volume->GetParent());
+  m_SegmentatedVolume->SetDoubleThresholdModality(true);
   m_SegmentatedVolume->Update();
 }
 //------------------------------------------------------------------------
@@ -1845,13 +1659,6 @@ void medOpSegmentation::OnNextStep()
 {
   if(m_CurrentOperation == PRE_SEGMENTATION)
   {
-    /*if (m_Volume->GetOutput()->GetVTKData()->IsA("vtkRectilinearGrid"))
-    {
-    if(!Resample())
-    {
-    return;
-    }
-    }*/
 
     InitThresholdVolume();
     InitSegmentedVolume();
@@ -1870,25 +1677,9 @@ void medOpSegmentation::OnNextStep()
   } else if (m_CurrentOperation == AUTOMATIC_SEGMENTATION)
   {
     m_AutomaticThresholdTextMapper->SetInput("");
-    //m_AutomaticScalarTextMapper->SetInput("");
-
     m_GuiDialog->Enable(ID_AUTO_SEGMENTATION,false);
     m_GuiDialog->Enable(ID_BUTTON_PREV,true);
   }
-  /*else if (m_CurrentOperation == REGION_GROWING_SEGMENTATION)
-  {
-  m_SER->GetAction("pntActionAutomatic")->UnBindInteractor(m_AutomaticPER);
-  m_SER->GetAction("pntActionAutomatic")->UnBindDevice(m_DialogMouse);
-
-  RegionGrowing();
-
-  for (int i=0;i<m_RegionGrowingSphereSurface.size();i++)
-  {
-  m_View->VmeShow(m_RegionGrowingSphereSurface[i],false);
-  }
-
-  m_GuiDialog->Enable(ID_REGION_GROWING_SEGMENTATION,false);
-  }*/
   else if (m_CurrentOperation == MANUAL_SEGMENTATION)
   {
     if (m_ManualModifiedWithoutApplied)
@@ -1940,34 +1731,15 @@ void medOpSegmentation::OnNextStep()
     m_GuiDialog->Enable(ID_AUTO_SEGMENTATION,true);
     m_GuiDialog->Enable(ID_BUTTON_NEXT,false);
   }
-  /*else if (m_CurrentOperation == REGION_GROWING_SEGMENTATION)
-  {
-  //////////////////////////////////////////////////////////////////////////
-  //Reset all seeds and all spheres
-  //////////////////////////////////////////////////////////////////////////
-  RemoveSpheres();
-
-  //////////////////////////////////////////////////////////////////////////
-  //Create a new sphere!
-  //////////////////////////////////////////////////////////////////////////
-  AddFirstSphere();
-  //////////////////////////////////////////////////////////////////////////
-  m_SnippetsLabel->SetLabel(_("CTRL + left click on the slice to select a seed point"));
-  m_Dialog->Update();
-  m_GuiDialog->Enable(ID_BUTTON_NEXT,true);
-  m_GuiDialog->Enable(ID_REGION_GROWING_SEGMENTATION,true);
-  }*/
   else if (m_CurrentOperation == MANUAL_SEGMENTATION)
   {
 
     if(m_CurrentSlicePlane == XY)
     {
-      //m_View->VmeShow(m_ThresholdVolume, false);
       InitManualVolumeSlice();
       UpdateVolumeSlice();
       m_View->SetTextureInterpolate(false);
       m_View->VmeShow(m_Volume, false);
-      //m_View->VmeShow(m_ManualVolumeSlice, false);
       m_View->VmeShow(m_Volume, true);
       m_View->VmeShow(m_ManualVolumeSlice, true);
     }
@@ -1975,7 +1747,7 @@ void medOpSegmentation::OnNextStep()
     m_SER->GetAction("pntEditingAction")->BindInteractor(m_ManualPER);
     m_SER->GetAction("pntEditingAction")->BindDevice(m_DialogMouse);
 
-    if(m_CurrentSlicePlane == XY && m_ManualSegmentationMode == MANUAL_SEGMENTATION_BRUSH)
+    if( m_ManualSegmentationMode == MANUAL_SEGMENTATION_BRUSH)
     {
       m_Volume->SetBehavior(m_ManualPicker);
 
@@ -2050,16 +1822,6 @@ void medOpSegmentation::OnNextStep()
 void medOpSegmentation::OnPreviousStep()
 //------------------------------------------------------------------------
 {
-  /*if (m_CurrentOperation == REGION_GROWING_SEGMENTATION)
-  {
-  for (int i=0;i<m_RegionGrowingSphereSurface.size();i++)
-  {
-  m_View->VmeShow(m_RegionGrowingSphereSurface[i],false);
-  }
-  m_View->CameraUpdate();
-  m_GuiDialog->Enable(ID_REGION_GROWING_SEGMENTATION,false);
-  }
-  else*/ 
   if (m_CurrentOperation == MANUAL_SEGMENTATION)
   {
     m_Volume->SetBehavior(m_AutomaticPicker);
@@ -2073,20 +1835,12 @@ void medOpSegmentation::OnPreviousStep()
       m_View->GetWindow()->SetCursor(cursor);
 
       m_ManualPER->RemoveActor();
-      //m_View->VmeShow(m_ThresholdVolume, true);
-
     }
 
     m_View->VmeShow(m_ManualVolumeSlice, false);
 
     m_AutomaticThresholdTextMapper->SetInput("Threshold =");
     m_AutomaticScalarTextMapper->SetInput("Scalar =");
-
-
-    /*for (int i=0;i<m_RegionGrowingSphereSurface.size();i++)
-    {
-    m_View->VmeShow(m_RegionGrowingSphereSurface[i],true);
-    }*/
 
     m_View->CameraUpdate();
 
@@ -2133,33 +1887,6 @@ void medOpSegmentation::OnPreviousStep()
     m_View->VmeShow(m_ThresholdVolume,true);
 
   }
-  /*else if (m_CurrentOperation == REGION_GROWING_SEGMENTATION)
-  {
-  m_View->VmeShow(m_ManualVolumeSlice,false);
-
-  for (int i=0;i<m_RegionGrowingSphereSurface.size();i++)
-  {
-  m_View->VmeShow(m_RegionGrowingSphereSurface[i],true);
-  }
-
-  m_SER->GetAction("pntActionAutomatic")->BindInteractor(m_AutomaticPER);
-  m_SER->GetAction("pntActionAutomatic")->BindDevice(m_DialogMouse);
-
-  m_SnippetsLabel->SetLabel(_("CTRL + left click on the slice to select a seed point"));
-  m_Dialog->Update();
-
-  m_GuiDialog->Enable(ID_REGION_GROWING_SEGMENTATION,true);
-
-  m_View->SetTextureInterpolate(true);
-  m_View->VmeShow(m_Volume, false);
-  m_View->VmeShow(m_Volume, true);
-  m_View->VmeShow(m_ThresholdVolume,false);
-
-  m_ThresholdVolume->SetData(vtkStructuredPoints::SafeDownCast(m_SegmentatedVolume->GetRegionGrowingOutput()),0.0);
-  m_ThresholdVolume->Update();
-
-  m_View->VmeShow(m_ThresholdVolume,true);
-  }*/
   else if (m_CurrentOperation == MANUAL_SEGMENTATION)
   {
     m_SnippetsLabel->SetLabel(_("CTRL + left click on the slice to edit the slice"));
@@ -2263,544 +1990,7 @@ void medOpSegmentation::OnPreviousStep()
   m_View->CameraUpdate();
 
 }
-//------------------------------------------------------------------------
-void medOpSegmentation::OnRegionGrowingChangeThresholdRangeManually(int eventID)
-//------------------------------------------------------------------------
-{
-  double subMin,subMax;
-  double min,max;
-  m_RegionGrowingThresholdRangeSlider->GetSubRange(&subMin,&subMax);
-  m_RegionGrowingThresholdRangeSlider->GetRange(&min,&max);
 
-  switch(eventID)
-  {
-  case ID_REGION_GROWING_INCREASE_MIN_THRESHOLD_RANGE_VALUE:
-    {
-      subMin++;
-    }
-    break;
-  case ID_REGION_GROWING_INCREASE_MAX_THRESHOLD_RANGE_VALUE:
-    {
-      subMax++;
-    }
-    break;
-  case ID_REGION_GROWING_DECREASE_MAX_THRESHOLD_RANGE_VALUE:
-    {
-      subMax--;
-    }
-    break;
-  case ID_REGION_GROWING_DECREASE_MIN_THRESHOLD_RANGE_VALUE:
-    {
-      subMin--;
-    }
-    break;
-  case ID_REGION_GROWING_INCREASE_MIDDLE_THRESHOLD_RANGE_VALUE:
-    {
-      subMin++;
-      subMax++;
-    }
-    break;
-  case ID_REGION_GROWING_DECREASE_MIDDLE_THRESHOLD_RANGE_VALUE:
-    {
-      subMin--;
-      subMax--;
-    }
-    break;
-
-  }
-
-  m_RegionGrowingThresholdRangeSlider->SetSubRange(subMin,subMax);
-}
-
-//------------------------------------------------------------------------
-void medOpSegmentation::OnRegionGrowingChangeSliceRangeManually(int eventID)
-//------------------------------------------------------------------------
-{
-  double subMin,subMax;
-  double min,max;
-  m_RegionGrowingSliceRangeSlider->GetSubRange(&subMin,&subMax);
-  m_RegionGrowingSliceRangeSlider->GetRange(&min,&max);
-
-  switch(eventID)
-  {
-  case ID_REGION_GROWING_INCREASE_MIN_SLICE_RANGE_VALUE:
-    {
-      subMin++;
-    }
-    break;
-  case ID_REGION_GROWING_INCREASE_MAX_SLICE_RANGE_VALUE:
-    {
-      subMax++;
-    }
-    break;
-  case ID_REGION_GROWING_DECREASE_MAX_SLICE_RANGE_VALUE:
-    {
-      subMax--;
-    }
-    break;
-  case ID_REGION_GROWING_DECREASE_MIN_SLICE_RANGE_VALUE:
-    {
-      subMin--;
-    }
-    break;
-  case ID_REGION_GROWING_INCREASE_MIDDLE_SLICE_RANGE_VALUE:
-    {
-      subMin++;
-      subMax++;
-    }
-    break;
-  case ID_REGION_GROWING_DECREASE_MIDDLE_SLICE_RANGE_VALUE:
-    {
-      subMin--;
-      subMax--;
-    }
-    break;
-
-  }
-
-  m_RegionGrowingSliceRangeSlider->SetSubRange(subMin,subMax);
-}
-
-//------------------------------------------------------------------------
-void medOpSegmentation::OnRegionGrowingUpdateSliceRange()
-//------------------------------------------------------------------------
-{
-
-  double min,max;
-  m_RegionGrowingSliceRangeSlider->GetSubRange(&min,&max);
-  int iMin = round(min)-1;
-  int iMax = round(max)-1;
-
-  m_RegionGrowingSliceRange[0] = iMin;
-  m_RegionGrowingSliceRange[1] = iMax;
-
-  // update di qualche label
-  //wxString line = wxString::Format("From %d to %d threshold %f",iMin+1,iMax+1,m_AutomaticThreshold);
-
-  RegionGrowing();
-}
-
-//----------------------------------------------------------------------------
-void medOpSegmentation::AddFirstSphere()
-//----------------------------------------------------------------------------
-{
-  m_RegionGrowingSeed[0] = 0;
-  m_RegionGrowingSeed[1] = 0;
-  m_RegionGrowingSeed[2] = 0;
-
-  double x = m_RegionGrowingSeed[0] * m_VolumeSpacing[0];
-  double y = m_RegionGrowingSeed[1] * m_VolumeSpacing[1];
-  double z = m_RegionGrowingSeed[2] * m_VolumeSpacing[2];
-
-
-  double origin[3]; 
-
-  vtkDataSet *ds = m_Volume->GetOutput()->GetVTKData();
-  if (ds->IsA("vtkStructuredPoints"))
-  {
-    double or[3];
-    vtkStructuredPoints::SafeDownCast(ds)->GetOrigin(or);
-    origin[0] = or[0];
-    origin[1] = or[1];
-    origin[2] = (m_CurrentSliceIndex-1)*m_VolumeSpacing[2]+or[2];
-  }
-  else if (ds->IsA("vtkRectilinearGrid"))
-  {
-    double x = vtkRectilinearGrid::SafeDownCast(ds)->GetXCoordinates()->GetTuple1(0);
-    double y = vtkRectilinearGrid::SafeDownCast(ds)->GetYCoordinates()->GetTuple1(0);
-    double z = vtkRectilinearGrid::SafeDownCast(ds)->GetZCoordinates()->GetTuple1(m_CurrentSliceIndex-1);
-
-    origin[0] = x;
-    origin[1] = y;
-    origin[2] = z;
-  }
-
-  x += origin[0];
-  y += origin[1];
-  z += origin[2];
-
-  vtkSphereSource *sphere;
-  vtkNEW(sphere);
-  sphere->SetRadius(m_RegionGrowingSphereRadius);
-  sphere->SetCenter(x,y,z);
-
-  mafVMESurface *surface;
-  mafNEW(surface);
-
-  surface->ReparentTo(m_Volume->GetParent());
-  surface->SetData(sphere->GetOutput(),0.0);
-  surface->Update();
-
-  m_View->VmeAdd(surface);
-  m_View->VmeShow(surface,true);
-
-  m_RegionGrowingSpheres.push_back(sphere);
-  m_RegionGrowingSphereSurface.push_back(surface);
-}
-//----------------------------------------------------------------------------
-void medOpSegmentation::RemoveSpheres()
-//----------------------------------------------------------------------------
-{
-  for (int i=0;i<m_RegionGrowingSeeds.size();i++)
-  {
-    delete []m_RegionGrowingSeeds[i];
-  }
-  m_RegionGrowingSeeds.clear();
-
-  for (int i=0;i<m_RegionGrowingSphereSurface.size();i++)
-  {
-    m_View->VmeRemove(m_RegionGrowingSphereSurface[i]);
-    m_RegionGrowingSphereSurface[i]->ReparentTo(NULL);
-    mafDEL(m_RegionGrowingSphereSurface[i]);
-    vtkDEL(m_RegionGrowingSpheres[i]);
-  }
-  m_RegionGrowingSphereSurface.clear();
-  m_RegionGrowingSpheres.clear();
-
-  m_RegionGrowingListOfSeeds->Clear();
-}
-//----------------------------------------------------------------------------
-void medOpSegmentation::OnRegionGrowingSegmentationEvent(mafEvent *e)
-//----------------------------------------------------------------------------
-{
-  /*switch(e->GetId())
-  {
-  case ID_REGION_GROWING_PREVIEW:
-  {
-  OnRegionGrowingUpdateSliceRange();
-  RegionGrowing();
-  }
-  break;
-  case ID_REGION_GROWING_DECREASE_MAX_SLICE_RANGE_VALUE:
-  case ID_REGION_GROWING_DECREASE_MIN_SLICE_RANGE_VALUE:
-  case ID_REGION_GROWING_INCREASE_MAX_SLICE_RANGE_VALUE:
-  case ID_REGION_GROWING_INCREASE_MIN_SLICE_RANGE_VALUE:
-  case ID_REGION_GROWING_INCREASE_MIDDLE_SLICE_RANGE_VALUE:
-  case ID_REGION_GROWING_DECREASE_MIDDLE_SLICE_RANGE_VALUE:
-  {
-  OnRegionGrowingChangeSliceRangeManually(e->GetId());
-  m_GuiDialog->Enable(ID_BUTTON_NEXT,false);
-  }
-  break;
-  case ID_REGION_GROWING_DECREASE_MAX_THRESHOLD_RANGE_VALUE:
-  case ID_REGION_GROWING_DECREASE_MIN_THRESHOLD_RANGE_VALUE:
-  case ID_REGION_GROWING_INCREASE_MAX_THRESHOLD_RANGE_VALUE:
-  case ID_REGION_GROWING_INCREASE_MIN_THRESHOLD_RANGE_VALUE:
-  case ID_REGION_GROWING_INCREASE_MIDDLE_THRESHOLD_RANGE_VALUE:
-  case ID_REGION_GROWING_DECREASE_MIDDLE_THRESHOLD_RANGE_VALUE:
-  {
-  OnRegionGrowingChangeThresholdRangeManually(e->GetId());
-  m_GuiDialog->Enable(ID_BUTTON_NEXT,false);
-  }
-  break;
-  case ID_REGION_GROWING_UPDATE_RANGE:
-  {
-  OnRegionGrowingUpdateSliceRange();
-  }
-  break;
-  case ID_REGION_GROWING_ADD_SEED:
-  {
-  m_RegionGrowingListOfSeeds->Append(wxString::Format("x %d y %d z %d",m_RegionGrowingSeed[0],m_RegionGrowingSeed[1],m_RegionGrowingSeed[2]));
-
-  int *seed = new int[3];
-  seed[0] = m_RegionGrowingSeed[0]-1;
-  seed[1] = m_RegionGrowingSeed[1]-1;
-  seed[2] = m_RegionGrowingSeed[2]-1;
-
-  m_RegionGrowingSeeds.push_back(seed);
-  m_GuiDialog->Enable(ID_BUTTON_NEXT,false);
-  }
-  break;
-  case ID_REGION_GROWING_DELETE_SEED:
-  {
-
-
-  if (m_RegionGrowingListOfSeeds->GetSelection()<0)
-  {
-  return;
-  }
-
-  int j = 0;
-  for (int i=0;i<m_RegionGrowingSpheres.size();i++)
-  {
-  if (i != m_RegionGrowingListOfSeeds->GetSelection())
-  {
-  if (i<m_RegionGrowingSeeds.size())
-  {
-  m_RegionGrowingSeeds[j] = m_RegionGrowingSeeds[i];
-  }
-  m_RegionGrowingSpheres[j] = m_RegionGrowingSpheres[i];
-  m_RegionGrowingSphereSurface[j] = m_RegionGrowingSphereSurface[i];
-  j++;
-  }
-  else
-  {
-  m_View->VmeShow(m_RegionGrowingSphereSurface[i],false);
-  m_View->CameraUpdate();
-  //m_View->VmeRemove(m_RegionGrowingSphereSurface[i]);
-  m_RegionGrowingSphereSurface[i]->ReparentTo(NULL);
-  vtkDEL(m_RegionGrowingSpheres[i]);
-  }
-  }
-  m_RegionGrowingListOfSeeds->Delete(m_RegionGrowingListOfSeeds->GetSelection());
-
-  if (m_RegionGrowingListOfSeeds->GetCount()>0)
-  {
-  SetSelectionRegionGrowingListOfSeeds(0);
-  }
-  else
-  {
-  SetSelectionRegionGrowingListOfSeeds(-1);
-  }
-
-  m_RegionGrowingSeeds.pop_back();
-  m_RegionGrowingSpheres.pop_back();
-  m_RegionGrowingSphereSurface.pop_back();
-
-  m_GuiDialog->Enable(ID_BUTTON_NEXT,false);
-  m_SegmentationOperationsGui[REGION_GROWING_SEGMENTATION]->Update();
-
-  m_View->CameraUpdate();
-  }
-  break;
-  case ID_REGION_GROWING_SPHERE_RADIUS:
-  {
-  for (int i=0;i<m_RegionGrowingSpheres.size();i++)
-  {
-  m_RegionGrowingSpheres[i]->SetRadius(m_RegionGrowingSphereRadius);
-
-  m_View->VmeShow(m_RegionGrowingSphereSurface[i],false);
-  m_RegionGrowingSphereSurface[i]->SetData(m_RegionGrowingSpheres[i]->GetOutput(),0.0);
-  m_View->VmeShow(m_RegionGrowingSphereSurface[i],true);
-  }
-  UpdateSlice();
-  m_View->CameraUpdate();
-  }
-  break;
-  case ID_REGION_GROWING_SEED:
-  {
-  vtkStructuredPoints *sp = vtkStructuredPoints::SafeDownCast(m_ThresholdVolume->GetOutput()->GetVTKData());
-  sp->Update();
-
-  double point[3];
-
-  double origin[3]; 
-
-  vtkDataSet *ds = m_Volume->GetOutput()->GetVTKData();
-  if (ds->IsA("vtkStructuredPoints"))
-  {
-  double spc[3],or[3];
-  vtkStructuredPoints::SafeDownCast(ds)->GetOrigin(or);
-  origin[0] = or[0];
-  origin[1] = or[1];
-  origin[2] = (m_CurrentSliceIndex-1)*m_VolumeSpacing[2]+or[2];
-
-  point[0] = origin[0] + m_VolumeSpacing[0]*m_RegionGrowingSeed[0];
-  point[1] = origin[1] + m_VolumeSpacing[1]*m_RegionGrowingSeed[1];
-  point[2] = origin[2] + m_VolumeSpacing[2]*m_RegionGrowingSeed[2];
-
-  }
-  else if (ds->IsA("vtkRectilinearGrid"))
-  {
-  double x = vtkRectilinearGrid::SafeDownCast(ds)->GetXCoordinates()->GetTuple1(0);
-  double y = vtkRectilinearGrid::SafeDownCast(ds)->GetYCoordinates()->GetTuple1(0);
-  double z = vtkRectilinearGrid::SafeDownCast(ds)->GetZCoordinates()->GetTuple1(m_CurrentSliceIndex-1);
-
-  origin[0] = x;
-  origin[1] = y;
-  origin[2] = z;
-
-  point[0] = origin[0] + m_VolumeSpacing[0]*m_RegionGrowingSeed[0];
-  point[1] = origin[1] + m_VolumeSpacing[1]*m_RegionGrowingSeed[1];
-  point[2] = vtkRectilinearGrid::SafeDownCast(ds)->GetZCoordinates()->GetTuple1(m_CurrentSliceIndex-1);
-  }
-
-
-  if (m_RegionGrowingSpheres.size() == 0 || m_RegionGrowingSpheres.size() == m_RegionGrowingSeeds.size())//It's necessary add a sphere
-  {
-  //Create a new sphere!
-  vtkSphereSource *sphere;
-  vtkNEW(sphere);
-  sphere->SetRadius(m_RegionGrowingSphereRadius);
-  sphere->SetCenter(point);
-
-  mafVMESurface *surface;
-  mafNEW(surface);
-
-  surface->ReparentTo(m_Volume);
-  surface->SetData(sphere->GetOutput(),0.0);
-  surface->Update();
-
-  m_View->VmeAdd(surface);
-  m_View->VmeShow(surface,true);
-  m_View->CameraUpdate();
-
-  m_RegionGrowingSpheres.push_back(sphere);
-  m_RegionGrowingSphereSurface.push_back(surface);
-  }
-  else
-  {
-  //Update the position of the last sphere
-  m_RegionGrowingSpheres[m_RegionGrowingSpheres.size()-1]->SetCenter(point);
-  m_RegionGrowingSpheres[m_RegionGrowingSpheres.size()-1]->Update();
-
-  m_View->VmeShow(m_RegionGrowingSphereSurface[m_RegionGrowingSphereSurface.size()-1],false);
-  m_RegionGrowingSphereSurface[m_RegionGrowingSphereSurface.size()-1]->SetData(m_RegionGrowingSpheres[m_RegionGrowingSpheres.size()-1]->GetOutput(),0.0);
-  m_View->VmeShow(m_RegionGrowingSphereSurface[m_RegionGrowingSphereSurface.size()-1],true);
-  }
-
-  m_GuiDialog->Enable(ID_BUTTON_NEXT,false);
-  m_SegmentationOperationsGui[REGION_GROWING_SEGMENTATION]->Update();
-
-  UpdateSlice();
-  }
-  break;
-  default:
-  mafEventMacro(*e);
-  }*/
-}
-//----------------------------------------------------------------------------
-void medOpSegmentation::OnRegionGrowingPicker(mafEvent *e)
-//----------------------------------------------------------------------------
-{
-  /*vtkDataSet *sp = m_Volume->GetOutput()->GetVTKData();
-
-
-
-  int id;
-  id = e->GetArg();
-  double point[3],origin[3];
-  int ix,iy,iz;
-  int dim[3];
-  sp->GetPoint(id,point);
-  //sp->GetDimensions(dim);
-  dim[0] = m_VolumeDimensions[0];
-  dim[1] = m_VolumeDimensions[1];
-  dim[2] = m_VolumeDimensions[2];
-
-  int dimXY = dim[0]*dim[1];
-  if (m_CurrentSlicePlane == XY)
-  {
-  ix = (int)(id%dim[0]);
-  iy = (int)((id%dimXY)/dim[0]);
-  iz = m_CurrentSliceIndex-1;
-  }
-  else if (m_CurrentSlicePlane == XZ)
-  {
-  ix = (int)id%dim[0];
-  iy = m_CurrentSliceIndex-1;
-  iz = (int)(id/(dim[0]*dim[1]));
-  }
-  else if (m_CurrentSlicePlane == YZ)
-  {
-  ix = m_CurrentSliceIndex-1;
-  iy = (int)((id%dimXY)/dim[0]);
-  iz = (int)(id/(dim[0]*dim[1]));
-  }
-
-  m_RegionGrowingSeed[0] = ix+1;
-  m_RegionGrowingSeed[1] = iy+1;
-  m_RegionGrowingSeed[2] = iz+1;
-
-  if (m_RegionGrowingSpheres.size() == 0 || m_RegionGrowingSpheres.size() == m_RegionGrowingSeeds.size())//It's necessary add a sphere
-  {
-  //Create a new sphere!
-  vtkSphereSource *sphere;
-  vtkNEW(sphere);
-  sphere->SetRadius(m_RegionGrowingSphereRadius);
-  sphere->SetCenter(point);
-
-  mafVMESurface *surface;
-  mafNEW(surface);
-
-  surface->ReparentTo(m_Volume);
-  surface->SetData(sphere->GetOutput(),0.0);
-  surface->Update();
-
-  m_View->VmeAdd(surface);
-  m_View->VmeShow(surface,true);
-  m_View->CameraUpdate();
-
-  m_RegionGrowingSpheres.push_back(sphere);
-  m_RegionGrowingSphereSurface.push_back(surface);
-  }
-  else
-  {
-  //Update the position of the last sphere
-  m_RegionGrowingSpheres[m_RegionGrowingSpheres.size()-1]->SetCenter(point);
-  m_RegionGrowingSpheres[m_RegionGrowingSpheres.size()-1]->Update();
-
-  m_View->VmeShow(m_RegionGrowingSphereSurface[m_RegionGrowingSphereSurface.size()-1],false);
-  m_RegionGrowingSphereSurface[m_RegionGrowingSphereSurface.size()-1]->SetData(m_RegionGrowingSpheres[m_RegionGrowingSpheres.size()-1]->GetOutput(),0.0);
-  m_View->VmeShow(m_RegionGrowingSphereSurface[m_RegionGrowingSphereSurface.size()-1],true);
-  }
-
-  m_SegmentationOperationsGui[REGION_GROWING_SEGMENTATION]->Update();
-
-  UpdateSlice();*/
-}
-//----------------------------------------------------------------------------
-void medOpSegmentation::RegionGrowing()
-//----------------------------------------------------------------------------
-{
-  /*wxBusyCursor wait_cursor;
-  wxBusyInfo wait(_("Creating preview: Please wait"));
-  //////////////////////////////////////////////////////////////////////////
-  //PREVIEW
-  //////////////////////////////////////////////////////////////////////////
-
-  m_SegmentatedVolume->RemoveAllSeeds();
-
-  for (int i=0;i<m_RegionGrowingSeeds.size();i++)
-  {
-  int seed[3];
-  seed[0] = m_RegionGrowingSeeds[i][0];
-  seed[1] = m_RegionGrowingSeeds[i][1];
-  seed[2] = m_RegionGrowingSeeds[i][2];
-
-  m_SegmentatedVolume->AddSeed(seed);
-  }
-
-  double low,hi;
-  m_RegionGrowingThresholdRangeSlider->GetSubRange(&low,&hi);
-  m_SegmentatedVolume->SetRegionGrowingLowerThreshold(low);
-  m_SegmentatedVolume->SetRegionGrowingUpperThreshold(hi);
-  m_SegmentatedVolume->SetRegionGrowingSliceRange(m_RegionGrowingSliceRange[0], m_RegionGrowingSliceRange[1]);
-
-  m_SegmentatedVolume->GetOutput()->Update();
-  m_SegmentatedVolume->Update();
-
-
-  vtkDataSet *inputDataSet = m_Volume->GetOutput()->GetVTKData();
-
-  if (inputDataSet->IsA("vtkStructuredPoints"))
-  {
-  vtkStructuredPoints *newData = vtkStructuredPoints::SafeDownCast(m_SegmentatedVolume->GetRegionGrowingOutput());
-  m_ThresholdVolume->SetData(newData,mafVME::SafeDownCast(m_Volume)->GetTimeStamp());
-  vtkStructuredPoints *spVME = vtkStructuredPoints::SafeDownCast(mafVMEVolumeGray::SafeDownCast(m_ThresholdVolume)->GetOutput()->GetVTKData());
-  spVME->Update();
-
-  }
-
-  else
-  {
-  vtkRectilinearGrid *newData = vtkRectilinearGrid::SafeDownCast(m_SegmentatedVolume->GetRegionGrowingOutput());
-  m_ThresholdVolume->SetData(newData,mafVME::SafeDownCast(m_Volume)->GetTimeStamp());
-  vtkRectilinearGrid *rgVME = vtkRectilinearGrid::SafeDownCast(mafVMEVolumeGray::SafeDownCast(m_ThresholdVolume)->GetOutput()->GetVTKData());
-  rgVME->Update();
-  }
-
-
-  m_ThresholdVolume->Update();
-
-  m_View->VmeShow(m_ThresholdVolume,false);
-  m_View->VmeShow(m_ThresholdVolume,true);
-
-  m_View->CameraUpdate();
-
-  m_GuiDialog->Enable(ID_BUTTON_NEXT,true);*/
-
-}
 //----------------------------------------------------------------------------
 void medOpSegmentation::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
@@ -2822,12 +2012,6 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
       OnRefinementSegmentationEvent(e);
       return;
     }
-    /*if(e->GetSender() == m_SegmentationOperationsGui[REGION_GROWING_SEGMENTATION])
-    {
-    OnRegionGrowingSegmentationEvent(e);
-    return;
-    }*/
-
     switch(e->GetId())
     {
     case ID_BUTTON_NEXT:
@@ -3068,7 +2252,6 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
       }
     case VME_PICKED:
       {
-        //mafLogMessage("Picked");
         //////////////////////////////////////////////////////////////////////////
         //Picking during automatic segmentation
         //////////////////////////////////////////////////////////////////////////
@@ -3078,16 +2261,7 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
           UpdateSlice();
           break;
         }
-        //////////////////////////////////////////////////////////////////////////
-        //Picking during region growing
-        //////////////////////////////////////////////////////////////////////////
-        /*if (e->GetSender() == m_AutomaticPicker && m_CurrentOperation==REGION_GROWING_SEGMENTATION)
-        {
-        OnRegionGrowingPicker(e);
-        break;
-        }*/
-        //////////////////////////////////////////////////////////////////////////
-
+       
         if(m_CurrentOperation == MANUAL_SEGMENTATION && m_ManualSegmentationMode == MANUAL_SEGMENTATION_BRUSH)
         {
           if(m_ManualContinuousPickingOn)
@@ -3154,67 +2328,6 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         m_Dialog->EndModal(wxID_CANCEL);
         break;
       }
-      /*case ID_LOAD_SEGMENTATION:
-      {
-      medVMESegmentationVolume *loadedVolume;
-
-
-      mafString title = _("Choose previous segmentation VME");
-      mafEvent e;
-      e.SetId(VME_CHOOSE);
-      e.SetArg((long)&lhpOpSegmentation::VolumeAccept);
-      e.SetString(&title);
-      mafEventMacro(e);
-
-      mafNode *n = e.GetVme();
-      if (n != NULL)
-      {
-      loadedVolume = medVMESegmentationVolume::SafeDownCast(n);
-      if(loadedVolume->GetVolumeLink() == m_Volume)
-      {
-      m_SegmentatedVolume = loadedVolume;
-
-      if(!m_ThresholdVolume)
-      mafNEW(m_ThresholdVolume);
-
-      if (vtkStructuredPoints::SafeDownCast(m_SegmentatedVolume->GetOutput()->GetVTKData()))
-      {
-      vtkStructuredPoints *newData = vtkStructuredPoints::SafeDownCast(m_SegmentatedVolume->GetAutomaticOutput());
-      m_ThresholdVolume->SetData(newData,mafVME::SafeDownCast(m_Volume)->GetTimeStamp());
-      vtkStructuredPoints *spVME = vtkStructuredPoints::SafeDownCast(mafVMEVolumeGray::SafeDownCast(m_ThresholdVolume)->GetOutput()->GetVTKData());
-      spVME->Update();
-
-      }
-      else
-      {
-      vtkRectilinearGrid *newData = vtkRectilinearGrid::SafeDownCast(m_SegmentatedVolume->GetAutomaticOutput());
-      m_ThresholdVolume->SetData(newData,mafVME::SafeDownCast(m_Volume)->GetTimeStamp());
-      vtkRectilinearGrid *rgVME = vtkRectilinearGrid::SafeDownCast(mafVMEVolumeGray::SafeDownCast(m_ThresholdVolume)->GetOutput()->GetVTKData());
-      rgVME->Update();
-      }
-
-      m_ThresholdVolume->Update();
-
-      lutPreset(16,m_ThresholdVolume->GetMaterial()->m_ColorLut);
-
-      m_ThresholdVolume->GetMaterial()->m_ColorLut->SetTableRange(0,255);
-      mmaVolumeMaterial *currentVolumeMaterial = ((mafVMEOutputVolume *)m_ThresholdVolume->GetOutput())->GetMaterial();
-      currentVolumeMaterial->UpdateFromTables();
-
-      m_View->VmeShow(m_ThresholdVolume,false);
-      m_View->VmeShow(m_ThresholdVolume,true);
-
-      m_View->CameraUpdate();
-
-      m_OldOperation = AUTOMATIC_SEGMENTATION;
-      OnNextStep();
-      }
-
-      }
-
-
-      break;
-      }*/
     case ID_RANGE_MODIFIED:
       {
         //Windowing
@@ -3321,13 +2434,6 @@ void medOpSegmentation::SaveRefinementVolumeMask()
 
   mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
 
-  /*vtkMAFSmartPointer<vtkStructuredPoints> sp;
-  sp->CopyStructure(dataSetRefinement);
-  sp->GetPointData()->AddArray(newScalars);
-  sp->GetPointData()->SetActiveScalars("SCALARS");
-  sp->SetScalarTypeToUnsignedChar();
-  sp->Update();*/
-
   if (m_RefinementVolumeMask == NULL)
   {
     mafNEW(m_RefinementVolumeMask);
@@ -3355,7 +2461,6 @@ void medOpSegmentation::SaveRefinementVolumeMask()
 
     rg->GetPointData()->AddArray(newScalars);
     rg->GetPointData()->SetActiveScalars("SCALARS");
-    //rg->SetScalarTypeToUnsignedChar();
     rg->Update();
 
     m_RefinementVolumeMask->SetData(rg,0.0);
@@ -3531,9 +2636,6 @@ void medOpSegmentation::OnAutomaticAddRange()
   int iMin = round(min)-1;
   int iMax = round(max)-1;
 
-  //////////////////////////////////////////////////////////////////////////
-  //int result = m_SegmentatedVolume->AddRange(iMin,iMax,m_AutomaticThreshold);
-  //////////////////////////////////////////////////////////////////////////
 
   if (!AutomaticCheckRange())
   {
@@ -3545,12 +2647,12 @@ void medOpSegmentation::OnAutomaticAddRange()
   range.m_EndSlice = iMax;
   range.m_StartSlice = iMin;
   range.m_ThresholdValue = m_AutomaticThreshold;
+  range.m_UpperThresholdValue = m_AutomaticUpperThreshold;
 
   m_AutomaticRanges.push_back(range);
 
-  m_AutomaticListOfRange->Append(wxString::Format("From %d to %d threshold %.3f",range.m_StartSlice+1,range.m_EndSlice+1,m_AutomaticThreshold));
+  m_AutomaticListOfRange->Append(wxString::Format("From %d to %d threshold low:%.3f high:%.3f",range.m_StartSlice+1,range.m_EndSlice+1,m_AutomaticThreshold,m_AutomaticUpperThreshold));
 
-  //m_GuiDialog->Enable(ID_BUTTON_NEXT,CheckNumberOfThresholds());
   m_GuiDialog->Enable(ID_BUTTON_NEXT,true);
 
   m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Update();
@@ -3559,6 +2661,7 @@ void medOpSegmentation::OnAutomaticAddRange()
 
   OnAutomaticPreview();
 }
+
 //----------------------------------------------------------------------------
 void medOpSegmentation::SetSelectionAutomaticListOfRange(int index)
 //----------------------------------------------------------------------------
@@ -3570,17 +2673,8 @@ void medOpSegmentation::SetSelectionAutomaticListOfRange(int index)
   event.SetInt(index);
   m_AutomaticListOfRange->GetEventHandler()->ProcessEvent(event);
 }
-//----------------------------------------------------------------------------
-void medOpSegmentation::SetSelectionRegionGrowingListOfSeeds(int index)
-//----------------------------------------------------------------------------
-{
-  m_RegionGrowingListOfSeeds->SetSelection(index);
-  m_RegionGrowingListOfSeeds->Update();
-  wxCommandEvent event(wxEVT_COMMAND_LISTBOX_SELECTED,m_RegionGrowingListOfSeeds->GetId());
-  event.SetEventObject( m_RegionGrowingListOfSeeds );
-  event.SetInt(index);
-  m_RegionGrowingListOfSeeds->GetEventHandler()->ProcessEvent(event);
-}
+
+
 //------------------------------------------------------------------------
 void medOpSegmentation::OnAutomaticRemoveRange()
 //------------------------------------------------------------------------
@@ -3612,7 +2706,6 @@ void medOpSegmentation::OnAutomaticRemoveRange()
 
   m_AutomaticRanges.pop_back();
 
-  //m_GuiDialog->Enable(ID_BUTTON_NEXT,CheckNumberOfThresholds());
   m_GuiDialog->Enable(ID_BUTTON_NEXT, true);
 
   m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Update();
@@ -3621,6 +2714,7 @@ void medOpSegmentation::OnAutomaticRemoveRange()
 
   OnAutomaticPreview();
 }
+
 //------------------------------------------------------------------------
 void medOpSegmentation::OnAutomaticPreview()
 //------------------------------------------------------------------------
@@ -3648,16 +2742,11 @@ void medOpSegmentation::OnAutomaticPreview()
   else
   {
     m_SegmentatedVolume->SetAutomaticSegmentationThresholdModality(medVMESegmentationVolume::GLOBAL);
-    m_SegmentatedVolume->SetAutomaticSegmentationGlobalThreshold(m_AutomaticThreshold);
+    m_SegmentatedVolume->SetAutomaticSegmentationGlobalThreshold(m_AutomaticThreshold,m_AutomaticUpperThreshold);
   }
 
   m_SegmentatedVolume->GetOutput()->Update();
   m_SegmentatedVolume->Update();
-
-  //vtkStructuredPoints *newData = vtkStructuredPoints::SafeDownCast(m_SegmentatedVolume->GetAutomaticOutput());
-  //m_ThresholdVolume->SetData(newData,mafVME::SafeDownCast(m_Volume)->GetTimeStamp());
-  //vtkStructuredPoints *spVME = vtkStructuredPoints::SafeDownCast(mafVMEVolumeGray::SafeDownCast(m_ThresholdVolume)->GetOutput()->GetVTKData());
-  //spVME->Update();
 
   if (vtkStructuredPoints::SafeDownCast(m_SegmentatedVolume->GetOutput()->GetVTKData()))
   {
@@ -3677,7 +2766,6 @@ void medOpSegmentation::OnAutomaticPreview()
 
   m_ThresholdVolume->Update();
 
-  //lutPreset(16,m_ThresholdVolume->GetMaterial()->m_ColorLut);
   m_SegmentationColorLUT = m_ThresholdVolume->GetMaterial()->m_ColorLut;
   InitSegmentationColorLut();
 
@@ -3688,7 +2776,6 @@ void medOpSegmentation::OnAutomaticPreview()
   m_View->VmeShow(m_ThresholdVolume,false);
   m_View->VmeShow(m_ThresholdVolume,true);
 
-  //m_View->CameraReset();
   m_View->CameraUpdate();
   //////////////////////////////////////////////////////////////////////////
 }
@@ -3712,13 +2799,13 @@ void medOpSegmentation::OnAutomaticUpdateRange()
     m_AutomaticRangeSlider->GetSubRange(&min,&max);
 
     m_AutomaticRanges[m_AutomaticListOfRange->GetSelection()].m_ThresholdValue = m_AutomaticThreshold;
+    m_AutomaticRanges[m_AutomaticListOfRange->GetSelection()].m_UpperThresholdValue = m_AutomaticUpperThreshold;
     m_AutomaticRanges[m_AutomaticListOfRange->GetSelection()].m_StartSlice = iMin;
     m_AutomaticRanges[m_AutomaticListOfRange->GetSelection()].m_EndSlice = iMax;
 
-    wxString line = wxString::Format("From %d to %d threshold %f",iMin+1,iMax+1,m_AutomaticThreshold);
+    wxString line = wxString::Format("From %d to %d threshold low %f high %f",iMin+1,iMax+1,m_AutomaticThreshold,m_AutomaticUpperThreshold);
     m_AutomaticListOfRange->SetString(m_AutomaticListOfRange->GetSelection(),line);
 
-    //m_GuiDialog->Enable(ID_BUTTON_NEXT,CheckNumberOfThresholds());
     m_GuiDialog->Enable(ID_BUTTON_NEXT, true);
 
     m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Update();
@@ -3728,6 +2815,7 @@ void medOpSegmentation::OnAutomaticUpdateRange()
     OnAutomaticPreview();
   }
 }
+
 //------------------------------------------------------------------------
 void medOpSegmentation::OnAutomaticChangeRangeManually(int eventID)
 //------------------------------------------------------------------------
@@ -3859,7 +2947,6 @@ void medOpSegmentation::OnAutomaticSegmentationEvent(mafEvent *e)
       {
         wxMessageBox(_("Tip: Double click on the sliding button to set it to the current slice value"));
       }
-      //m_GuiDialog->Enable(ID_BUTTON_NEXT,(CheckNumberOfThresholds()&&m_AutomaticGlobalThreshold==RANGE));
       m_GuiDialog->Enable(ID_BUTTON_NEXT,m_AutomaticGlobalThreshold==RANGE);
     }
     break;
@@ -3875,6 +2962,7 @@ void medOpSegmentation::OnAutomaticSegmentationEvent(mafEvent *e)
         double min,max;
 
         m_AutomaticThreshold = m_AutomaticRanges[m_AutomaticListOfRange->GetSelection()].m_ThresholdValue;
+        m_AutomaticUpperThreshold = m_AutomaticRanges[m_AutomaticListOfRange->GetSelection()].m_UpperThresholdValue;
         min = m_AutomaticRanges[m_AutomaticListOfRange->GetSelection()].m_StartSlice+1;
         max = m_AutomaticRanges[m_AutomaticListOfRange->GetSelection()].m_EndSlice+1;
 
@@ -3899,6 +2987,7 @@ void medOpSegmentation::OnAutomaticSegmentationEvent(mafEvent *e)
   }
 
 }
+
 //------------------------------------------------------------------------
 void medOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
 //------------------------------------------------------------------------
@@ -4253,6 +3342,7 @@ void medOpSegmentation::UpdateWindowing()
   m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
   m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
 }
+
 //----------------------------------------------------------------------------
 void medOpSegmentation::SelectBrushImage(double x, double y, double z, bool selection)
 //----------------------------------------------------------------------------
@@ -4477,6 +3567,7 @@ void medOpSegmentation::InitializeInteractors()
   m_AutomaticPER->SetRenderer(m_View->GetFrontRenderer());
 
 }
+
 //------------------------------------------------------------------------
 bool medOpSegmentation::AutomaticCheckRange(int indexToExclude /* = -1 */)
 //------------------------------------------------------------------------
@@ -4521,6 +3612,7 @@ bool medOpSegmentation::AutomaticCheckRange(int indexToExclude /* = -1 */)
 
   return true;
 }
+
 //------------------------------------------------------------------------
 void medOpSegmentation::UpdateSliceLabel()
 //------------------------------------------------------------------------
@@ -4546,6 +3638,7 @@ void medOpSegmentation::UpdateSliceLabel()
   m_AutomaticSliceTextMapper->SetInput(text.GetCStr());
   //////////////////////////////////////////////////////////////////////////
 }
+
 //------------------------------------------------------------------------
 void medOpSegmentation::UpdateThresholdLabel()
 //------------------------------------------------------------------------
@@ -4559,7 +3652,7 @@ void medOpSegmentation::UpdateThresholdLabel()
       {
         if (m_AutomaticRanges[i].m_StartSlice<=m_CurrentSliceIndex && m_AutomaticRanges[i].m_EndSlice>=m_CurrentSliceIndex)
         {
-          mafString text = wxString::Format("Threshold = %.3f",m_AutomaticRanges[i].m_ThresholdValue);
+          mafString text = wxString::Format("Threshold low:%.3f high:%.3f",m_AutomaticRanges[i].m_ThresholdValue,m_AutomaticRanges[i].m_UpperThresholdValue);
           m_AutomaticThresholdTextMapper->SetInput(text.GetCStr());
 
           m_View->CameraUpdate();
@@ -4570,7 +3663,7 @@ void medOpSegmentation::UpdateThresholdLabel()
     }
     else if(m_AutomaticGlobalThreshold == GLOBAL)
     {
-      mafString text = wxString::Format("Threshold = %.3f",m_AutomaticThreshold);
+      mafString text = wxString::Format("Threshold low:%.3f high:%.3f",m_AutomaticThreshold,m_AutomaticUpperThreshold);
       m_AutomaticThresholdTextMapper->SetInput(text.GetCStr());
       m_View->CameraUpdate();
 
@@ -4590,6 +3683,7 @@ void medOpSegmentation::UpdateThresholdLabel()
   }
 
 }
+
 //------------------------------------------------------------------------
 void medOpSegmentation::OnAutomaticPicker(mafEvent *e)
 //------------------------------------------------------------------------
@@ -4611,6 +3705,7 @@ void medOpSegmentation::OnAutomaticPicker(mafEvent *e)
     m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Update();
   }
 }
+
 //----------------------------------------------------------------------------
 bool medOpSegmentation::CheckNumberOfThresholds()
 //----------------------------------------------------------------------------
@@ -4688,6 +3783,7 @@ void medOpSegmentation::InitVolumeDimensions()
   }
 }
 
+
 //----------------------------------------------------------------------------
 void medOpSegmentation::InitVolumeSpacing()
 //----------------------------------------------------------------------------
@@ -4729,6 +3825,7 @@ void medOpSegmentation::InitVolumeSpacing()
     }
   }
 }
+
 //----------------------------------------------------------------------------
 double medOpSegmentation::GetPosFromSliceIndexZ()
 //----------------------------------------------------------------------------
@@ -4909,13 +4006,7 @@ void medOpSegmentation::UpdateVolumeSlice()
     origin[2] = z;
   }
 
-  /*vtkStructuredPoints *sp = vtkStructuredPoints::SafeDownCast(m_Volume->GetOutput()->GetVTKData());
-  double spc[3],or[3];
-  sp->GetSpacing(spc);
-  sp->GetOrigin(or);
-  origin[0] = or[0];
-  origin[1] = or[1];
-  origin[2] = (m_CurrentSliceIndex-1)*spc[2]+or[2];*/
+  
 
 
   //////////////////////////////////////////////////////////////////////////
