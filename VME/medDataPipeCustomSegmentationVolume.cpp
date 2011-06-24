@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medDataPipeCustomSegmentationVolume.cpp,v $
 Language:  C++
-Date:      $Date: 2011-06-23 15:56:01 $
-Version:   $Revision: 1.1.2.15 $
+Date:      $Date: 2011-06-24 12:14:56 $
+Version:   $Revision: 1.1.2.16 $
 Authors:   Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2010
@@ -300,9 +300,6 @@ void medDataPipeCustomSegmentationVolume::ApplyAutomaticSegmentation()
   vol->GetOutput()->Update();
   vtkDataSet *volumeData = vol->GetOutput()->GetVTKData();
   volumeData->Update();
-
-  typedef itk::BinaryThresholdImageFilter<RealImage, RealImage> BinaryThresholdFilter;
-  BinaryThresholdFilter::Pointer binaryThreshold = BinaryThresholdFilter::New();
 
   int volumeDimensions[3];
   if(volumeData->IsA("vtkRectilinearGrid")) {

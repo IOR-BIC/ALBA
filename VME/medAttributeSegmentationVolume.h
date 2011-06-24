@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medAttributeSegmentationVolume.h,v $
 Language:  C++
-Date:      $Date: 2011-06-23 15:56:00 $
-Version:   $Revision: 1.1.2.7 $
-Authors:   Matteo Giacomoni
+Date:      $Date: 2011-06-24 12:14:56 $
+Version:   $Revision: 1.1.2.8 $
+Authors:   Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2010
 CINECA - Interuniversity Consortium (www.cineca.it)

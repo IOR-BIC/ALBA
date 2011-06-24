@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medDataPipeCustomSegmentationVolume.h,v $
 Language:  C++
-Date:      $Date: 2011-06-23 15:56:01 $
-Version:   $Revision: 1.1.2.11 $
-Authors:   Matteo Giacomoni
+Date:      $Date: 2011-06-24 12:14:56 $
+Version:   $Revision: 1.1.2.12 $
+Authors:   Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2010
 CINECA - Interuniversity Consortium (www.cineca.it)
