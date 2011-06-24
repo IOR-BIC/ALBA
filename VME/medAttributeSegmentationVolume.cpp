@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medAttributeSegmentationVolume.cpp,v $
 Language:  C++
-Date:      $Date: 2011-06-24 12:14:56 $
-Version:   $Revision: 1.1.2.9 $
+Date:      $Date: 2011-06-24 14:00:17 $
+Version:   $Revision: 1.1.2.10 $
 Authors:   Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2010
@@ -111,7 +111,7 @@ bool medAttributeSegmentationVolume::Equals(const mafAttribute *a)
          (m_AutomaticSegmentationRanges.size() != ((medAttributeSegmentationVolume*)a)->GetNumberOfRanges()) ||
          (m_RegionGrowingLowerThreshold != ((medAttributeSegmentationVolume*)a)->GetRegionGrowingLowerThreshold()) ||
          (m_RegionGrowingUpperThreshold != ((medAttributeSegmentationVolume*)a)->GetRegionGrowingUpperThreshold()) ||
-         (m_RegionGrowingSeeds.size() != ((medAttributeSegmentationVolume*)a)->GetNumberOfSeeds()) ||
+         (m_RegionGrowingSeeds.size() != ((medAttributeSegmentationVolume*)a)->GetNumberOfSeeds()) )
     {
       return false;
     }
@@ -243,8 +243,8 @@ int medAttributeSegmentationVolume::InternalRestore(mafStorageElement *node)
       value = "THRESHOLD_";
       value<<i;
       node->RestoreDouble(value,threshold);
-      //do not load upper thershold m_UseDoubleThreshold is false 
-      //in this mode retro-compatibily i guaranteed
+      //do not load upper threshold m_UseDoubleThreshold is false 
+      //in this mode retro-compatibility is guaranteed
       if (m_UseDoubleThreshold)
       {
         value = "UPPER_THRESHOLD_";
