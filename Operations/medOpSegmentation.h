@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.h,v $
 Language:  C++
-Date:      $Date: 2011-06-23 15:50:27 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2011-06-28 11:59:20 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Eleonora Mambrini, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
@@ -121,6 +121,13 @@ public:
     ID_BUTTON_PREV,
     ID_BUTTON_NEXT,
     ID_AUTOMATIC_THRESHOLD,//IDs for automatic segmetation gui
+    ID_AUTOMATIC_INCREASE_MIN_THRESHOLD,
+    ID_AUTOMATIC_INCREASE_MAX_THRESHOLD,
+    ID_AUTOMATIC_DECREASE_MIN_THRESHOLD,
+    ID_AUTOMATIC_DECREASE_MAX_THRESHOLD,
+    ID_AUTOMATIC_DECREASE_MIDDLE_THRESHOLD,
+    ID_AUTOMATIC_INCREASE_MIDDLE_THRESHOLD,
+
     ID_AUTOMATIC_ADD_RANGE,
     ID_AUTOMATIC_REMOVE_RANGE,
     ID_AUTOMATIC_LIST_OF_RANGE,
@@ -405,6 +412,9 @@ protected:
   /** Check that the range has right values */
   bool AutomaticCheckRange(int indexToExclude = -1);
 
+  /** Function called when the user use the fine button to change the threshold*/
+  void OnAutomaticChangeThresholdManually(int eventID);
+
   /** Check if all thresholds exist */
   bool CheckNumberOfThresholds();
 
@@ -429,9 +439,6 @@ protected:
   /** Update the select range using gui values */
   void OnAutomaticUpdateRange();
 
-  /** Fill the list helper to have a preview during the automatic step */
-  void FillListHelper();
-
   /** Perform the preview of automatic segmentation */
   void OnAutomaticPreview();
 
@@ -455,13 +462,17 @@ protected:
     double m_UpperThresholdValue;
   };
   std::vector<AutomaticInfoRange> m_AutomaticRanges;
-  std::vector<AutomaticInfoRange> m_AutomaticRangesHelper;
+  
+  mafGUILutSlider *m_AutomaticThresholdSlider;
+
 
   vtkTextMapper *m_AutomaticThresholdTextMapper;
   vtkActor2D *m_AutomaticThresholdTextActor;
 
   vtkTextMapper *m_AutomaticScalarTextMapper;
   vtkActor2D *m_AutomaticScalarTextActor;
+
+
 
   vtkTextMapper *m_AutomaticSliceTextMapper;
   vtkActor2D *m_AutomaticSliceTextActor;

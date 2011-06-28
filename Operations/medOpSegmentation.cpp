@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2011-06-23 15:50:27 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2011-06-28 11:59:20 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
@@ -1244,10 +1244,46 @@ void medOpSegmentation::CreateAutoSegmentationGui()
   currentGui->Label(_("Threshold"),true);
   //currentGui->Label(_("(CTRL + left click on the slice "),false,true);
   //currentGui->Label(_("to select a scalar value)"));
+  std::vector<const char*> increaseLabels;
+  increaseLabels.push_back("+");
+  increaseLabels.push_back("+");
+  increaseLabels.push_back("+");
+  std::vector<const char*> decreaseLabels;
+  decreaseLabels.push_back("-");
+  decreaseLabels.push_back("-");
+  decreaseLabels.push_back("-");
   double sr[2];
   m_Volume->GetOutput()->GetVTKData()->GetScalarRange(sr);
-  currentGui->Double(ID_AUTOMATIC_THRESHOLD,"",&m_AutomaticThreshold,sr[0],sr[1]);
-  currentGui->Double(ID_AUTOMATIC_THRESHOLD,"",&m_AutomaticUpperThreshold,sr[0],sr[1]);
+  
+
+  //Threshold 
+  //[ + ] [ + ] [ + ]
+  //[min][range][max]
+  //[ - ] [ - ] [ - ] 
+  m_AutomaticThreshold=sr[0];
+  m_AutomaticUpperThreshold=sr[1];
+  m_AutomaticThresholdSlider = new mafGUILutSlider(currentGui,-1,wxPoint(0,0),wxSize(300,24));
+  m_AutomaticThresholdSlider->SetListener(this);
+  m_AutomaticThresholdSlider->SetText(1,"Threshold");  
+  m_AutomaticThresholdSlider->SetRange(sr[0],sr[1]);
+  m_AutomaticThresholdSlider->SetSubRange(sr[0],sr[1]);
+
+  std::vector<int> increaseTrIDs;
+  increaseTrIDs.push_back(ID_AUTOMATIC_INCREASE_MIN_THRESHOLD);
+  increaseTrIDs.push_back(ID_AUTOMATIC_INCREASE_MIDDLE_THRESHOLD);
+  increaseTrIDs.push_back(ID_AUTOMATIC_INCREASE_MAX_THRESHOLD);
+  currentGui->MultipleButtons(3,3,increaseTrIDs,increaseLabels);
+
+  currentGui->Add(m_AutomaticThresholdSlider);
+
+  std::vector<int> decreaseTrIDs;
+  decreaseTrIDs.push_back(ID_AUTOMATIC_DECREASE_MIN_THRESHOLD);
+  decreaseTrIDs.push_back(ID_AUTOMATIC_DECREASE_MIDDLE_THRESHOLD);
+  decreaseTrIDs.push_back(ID_AUTOMATIC_DECREASE_MAX_THRESHOLD);
+  currentGui->MultipleButtons(3,3,decreaseTrIDs,decreaseLabels);
+
+  //end Threshold
+
   wxString choices[2] = {_("Global"),_("Range")};
   currentGui->Label(_("Threshold type:"));
   currentGui->Radio(ID_AUTOMATIC_GLOBAL_THRESHOLD,"",&m_AutomaticGlobalThreshold,2,choices);
@@ -1258,6 +1294,13 @@ void medOpSegmentation::CreateAutoSegmentationGui()
   currentGui->Label(_("to set a slices' range."));
   currentGui->Label(_("2)right click to manually"));
   currentGui->Label(_("enter slice's values."));
+
+ 
+
+  //Slides Range
+  //[ + ] [ + ] [ + ]
+  //[min][range][max]
+  //[ - ] [ - ] [ - ] 
 
   m_AutomaticRangeSlider = new mafGUILutSlider(currentGui,-1,wxPoint(0,0),wxSize(300,24));
   m_AutomaticRangeSlider->SetListener(currentGui);
@@ -1270,24 +1313,17 @@ void medOpSegmentation::CreateAutoSegmentationGui()
   increaseIDs.push_back(ID_AUTOMATIC_INCREASE_MIN_RANGE_VALUE);
   increaseIDs.push_back(ID_AUTOMATIC_INCREASE_MIDDLE_RANGE_VALUE);
   increaseIDs.push_back(ID_AUTOMATIC_INCREASE_MAX_RANGE_VALUE);
-  std::vector<const char*> increaseLabels;
-  increaseLabels.push_back("+");
-  increaseLabels.push_back("+");
-  increaseLabels.push_back("+");
   currentGui->MultipleButtons(3,3,increaseIDs,increaseLabels);
-  //currentGui->TwoButtons(ID_AUTOMATIC_INCREASE_MIN_RANGE_VALUE,ID_AUTOMATIC_INCREASE_MAX_RANGE_VALUE,_("+"),_("+"),wxCENTER,50);
+  
   currentGui->Add(m_AutomaticRangeSlider);
-  //currentGui->TwoButtons(ID_AUTOMATIC_DECREASE_MIN_RANGE_VALUE,ID_AUTOMATIC_DECREASE_MAX_RANGE_VALUE,_("-"),_("-"),wxCENTER,50);
+  
   std::vector<int> decreaseIDs;
   decreaseIDs.push_back(ID_AUTOMATIC_DECREASE_MIN_RANGE_VALUE);
   decreaseIDs.push_back(ID_AUTOMATIC_DECREASE_MIDDLE_RANGE_VALUE);
   decreaseIDs.push_back(ID_AUTOMATIC_DECREASE_MAX_RANGE_VALUE);
-  std::vector<const char*> decreaseLabels;
-  decreaseLabels.push_back("+");
-  decreaseLabels.push_back("+");
-  decreaseLabels.push_back("+");
   currentGui->MultipleButtons(3,3,decreaseIDs,decreaseLabels);
   currentGui->Label("");
+  //End
 
   currentGui->TwoButtons(ID_AUTOMATIC_ADD_RANGE,ID_AUTOMATIC_REMOVE_RANGE,("Add"),_("Remove"));
   currentGui->Button(ID_AUTOMATIC_UPDATE_RANGE,("Update"));
@@ -2330,13 +2366,22 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
       }
     case ID_RANGE_MODIFIED:
       {
+        //threshold slider
+        if (e->GetSender()==m_AutomaticThresholdSlider)
+        {
+          m_AutomaticThresholdSlider->GetSubRange(&m_AutomaticThreshold,&m_AutomaticUpperThreshold);
+          UpdateThresholdLabel();
+        }
         //Windowing
-        double low, hi;
-        m_LutSlider->GetSubRange(&low,&hi);
-        m_ColorLUT->SetTableRange(low,hi);
-        m_View->CameraUpdate();
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-        break;
+        else
+       {
+          double low, hi;
+          m_LutSlider->GetSubRange(&low,&hi);
+          m_ColorLUT->SetTableRange(low,hi);
+          m_View->CameraUpdate();
+          mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+          break;
+        }
       }
     case ID_LUT_CHOOSER:
       {
@@ -2576,57 +2621,7 @@ void medOpSegmentation::OnChangeThresholdType()
     m_GuiDialog->Enable(ID_BUTTON_NEXT,m_AutomaticGlobalThreshold == RANGE);
   UpdateThresholdLabel();
 }
-//------------------------------------------------------------------------
-void medOpSegmentation::FillListHelper()
-//------------------------------------------------------------------------
-{
-  mafVMEOutputVolume *volumeOutput = mafVMEOutputVolume::SafeDownCast(m_Volume->GetOutput());
-  double sr[2];
-  volumeOutput->GetVTKData()->GetScalarRange(sr);
 
-  m_AutomaticRangesHelper.clear();
-
-  if (!CheckNumberOfThresholds())//If it is necessary fill the list
-  {
-    //////////////////////////////////////////////////////////////////////////
-    //Check that all slices have a threshold
-    for (int i=0;i<m_VolumeDimensions[2];i++)
-    {
-      bool found = false;
-      int indexFound = -1;
-      for (int j=0;j<m_AutomaticRanges.size();j++)
-      {
-        if (i>=(m_AutomaticRanges[j].m_StartSlice) && i<=(m_AutomaticRanges[j].m_EndSlice))
-        {
-          found = true;
-          indexFound = j;
-          break;
-        }
-      }
-      if (!found)
-      {
-        AutomaticInfoRange info;
-        info.m_StartSlice = i;
-        info.m_EndSlice = i;
-        info.m_ThresholdValue = sr[1];//scalar max to exclude this slide
-        m_AutomaticRangesHelper.push_back(info);
-      }
-      else
-      {
-        AutomaticInfoRange info;
-        info.m_StartSlice = i;
-        info.m_EndSlice = i;
-        info.m_ThresholdValue = m_AutomaticRanges[indexFound].m_ThresholdValue;
-        m_AutomaticRangesHelper.push_back(info);
-      }
-    }
-    //////////////////////////////////////////////////////////////////////////
-  }
-  else
-  {
-    m_AutomaticRangesHelper = m_AutomaticRanges;
-  }
-}
 //------------------------------------------------------------------------
 void medOpSegmentation::OnAutomaticAddRange()
 //------------------------------------------------------------------------
@@ -2651,7 +2646,7 @@ void medOpSegmentation::OnAutomaticAddRange()
 
   m_AutomaticRanges.push_back(range);
 
-  m_AutomaticListOfRange->Append(wxString::Format("From %d to %d threshold low:%.3f high:%.3f",range.m_StartSlice+1,range.m_EndSlice+1,m_AutomaticThreshold,m_AutomaticUpperThreshold));
+  m_AutomaticListOfRange->Append(wxString::Format("[%d,%d] low:%.3f high:%.3f",range.m_StartSlice+1,range.m_EndSlice+1,m_AutomaticThreshold,m_AutomaticUpperThreshold));
 
   m_GuiDialog->Enable(ID_BUTTON_NEXT,true);
 
@@ -2727,12 +2722,11 @@ void medOpSegmentation::OnAutomaticPreview()
   m_SegmentatedVolume->RemoveAllRanges();
   if (m_AutomaticGlobalThreshold == RANGE)
   {
-    FillListHelper();
     int result;
     m_SegmentatedVolume->SetAutomaticSegmentationThresholdModality(medVMESegmentationVolume::RANGE);
-    for (int i=0;i<m_AutomaticRangesHelper.size();i++)
+    for (int i=0;i<m_AutomaticRanges.size();i++)
     {
-      result = m_SegmentatedVolume->AddRange(m_AutomaticRangesHelper[i].m_StartSlice,m_AutomaticRangesHelper[i].m_EndSlice,m_AutomaticRangesHelper[i].m_ThresholdValue);
+      result = m_SegmentatedVolume->AddRange(m_AutomaticRanges[i].m_StartSlice,m_AutomaticRanges[i].m_EndSlice,m_AutomaticRanges[i].m_ThresholdValue,m_AutomaticRanges[i].m_UpperThresholdValue);
       if (result == MAF_ERROR)
       {
         return;
@@ -2803,7 +2797,7 @@ void medOpSegmentation::OnAutomaticUpdateRange()
     m_AutomaticRanges[m_AutomaticListOfRange->GetSelection()].m_StartSlice = iMin;
     m_AutomaticRanges[m_AutomaticListOfRange->GetSelection()].m_EndSlice = iMax;
 
-    wxString line = wxString::Format("From %d to %d threshold low %f high %f",iMin+1,iMax+1,m_AutomaticThreshold,m_AutomaticUpperThreshold);
+    wxString line = wxString::Format("[%d,%d] low %.3f high %.3f",iMin+1,iMax+1,m_AutomaticThreshold,m_AutomaticUpperThreshold);
     m_AutomaticListOfRange->SetString(m_AutomaticListOfRange->GetSelection(),line);
 
     m_GuiDialog->Enable(ID_BUTTON_NEXT, true);
@@ -2821,47 +2815,70 @@ void medOpSegmentation::OnAutomaticChangeRangeManually(int eventID)
 //------------------------------------------------------------------------
 {
   double subMin,subMax;
-  double min,max;
   m_AutomaticRangeSlider->GetSubRange(&subMin,&subMax);
-  m_AutomaticRangeSlider->GetRange(&min,&max);
-
+  
   switch(eventID)
   {
   case ID_AUTOMATIC_INCREASE_MIN_RANGE_VALUE:
-    {
       subMin++;
-    }
     break;
   case ID_AUTOMATIC_INCREASE_MAX_RANGE_VALUE:
-    {
       subMax++;
-    }
     break;
   case ID_AUTOMATIC_DECREASE_MAX_RANGE_VALUE:
-    {
       subMax--;
-    }
     break;
   case ID_AUTOMATIC_DECREASE_MIN_RANGE_VALUE:
-    {
       subMin--;
-    }
     break;
   case ID_AUTOMATIC_INCREASE_MIDDLE_RANGE_VALUE:
-    {
       subMin++;
       subMax++;
-    }
     break;
   case ID_AUTOMATIC_DECREASE_MIDDLE_RANGE_VALUE:
-    {
       subMin--;
       subMax--;
-    }
+    break;
   }
 
   m_AutomaticRangeSlider->SetSubRange(subMin,subMax);
 }
+
+
+//------------------------------------------------------------------------
+void medOpSegmentation::OnAutomaticChangeThresholdManually(int eventID)
+//------------------------------------------------------------------------
+{
+  m_AutomaticThresholdSlider->GetSubRange(&m_AutomaticThreshold,&m_AutomaticUpperThreshold);
+  //Fine tuning threshold selection, get the event and update relative values
+  switch(eventID)
+  {
+  case ID_AUTOMATIC_INCREASE_MIN_THRESHOLD:
+    m_AutomaticThreshold++;
+    break;
+  case ID_AUTOMATIC_INCREASE_MAX_THRESHOLD:
+    m_AutomaticUpperThreshold++;
+    break;
+  case ID_AUTOMATIC_DECREASE_MAX_THRESHOLD:
+    m_AutomaticUpperThreshold--;
+    break;
+  case ID_AUTOMATIC_DECREASE_MIN_THRESHOLD:
+    m_AutomaticThreshold--;
+    break;
+  case ID_AUTOMATIC_INCREASE_MIDDLE_THRESHOLD:
+    m_AutomaticThreshold++;
+    m_AutomaticUpperThreshold++;
+    break;
+  case ID_AUTOMATIC_DECREASE_MIDDLE_THRESHOLD:
+    m_AutomaticThreshold--;
+    m_AutomaticUpperThreshold--;
+    break;
+  }
+  m_AutomaticThresholdSlider->SetSubRange(m_AutomaticThreshold,m_AutomaticUpperThreshold);
+  
+  UpdateThresholdLabel();
+}
+
 //------------------------------------------------------------------------
 void medOpSegmentation::OnAutomaticSegmentationEvent(mafEvent *e)
 //------------------------------------------------------------------------
@@ -2870,10 +2887,22 @@ void medOpSegmentation::OnAutomaticSegmentationEvent(mafEvent *e)
   {
   case ID_AUTOMATIC_INCREASE_MIN_RANGE_VALUE:
   case ID_AUTOMATIC_INCREASE_MAX_RANGE_VALUE:
+  case ID_AUTOMATIC_INCREASE_MIDDLE_RANGE_VALUE:
   case ID_AUTOMATIC_DECREASE_MIN_RANGE_VALUE:
   case ID_AUTOMATIC_DECREASE_MAX_RANGE_VALUE:
+  case ID_AUTOMATIC_DECREASE_MIDDLE_RANGE_VALUE:
     {
       OnAutomaticChangeRangeManually(e->GetId());
+    }
+    break;
+  case ID_AUTOMATIC_INCREASE_MIN_THRESHOLD:
+  case ID_AUTOMATIC_INCREASE_MAX_THRESHOLD:
+  case ID_AUTOMATIC_INCREASE_MIDDLE_THRESHOLD:
+  case ID_AUTOMATIC_DECREASE_MIN_THRESHOLD:
+  case ID_AUTOMATIC_DECREASE_MAX_THRESHOLD:
+  case ID_AUTOMATIC_DECREASE_MIDDLE_THRESHOLD:
+    {
+      OnAutomaticChangeThresholdManually(e->GetId()); 
     }
     break;
   case mafGUILutSlider::ID_MOUSE_D_CLICK_LEFT:
@@ -2937,6 +2966,7 @@ void medOpSegmentation::OnAutomaticSegmentationEvent(mafEvent *e)
     break;
   case ID_AUTOMATIC_THRESHOLD:
     {
+      m_AutomaticThresholdSlider->GetSubRange(&m_AutomaticThreshold,&m_AutomaticUpperThreshold);
       UpdateThresholdLabel();
     }
     break;
@@ -3643,20 +3673,17 @@ void medOpSegmentation::UpdateSliceLabel()
 void medOpSegmentation::UpdateThresholdLabel()
 //------------------------------------------------------------------------
 {
-  if (m_CurrentOperation == AUTOMATIC_SEGMENTATION && m_CameraPositionId == CAMERA_OS_Z)
+  if (m_CurrentOperation == AUTOMATIC_SEGMENTATION && (m_CameraPositionId == CAMERA_OS_Z || m_AutomaticGlobalThreshold == GLOBAL) )
   {
     if (m_AutomaticGlobalThreshold == RANGE)
     {
       //Try to find the threshold of the visualized slice
       for (int i=0;i<m_AutomaticRanges.size();i++)
       {
-        if (m_AutomaticRanges[i].m_StartSlice<=m_CurrentSliceIndex && m_AutomaticRanges[i].m_EndSlice>=m_CurrentSliceIndex)
+        if (m_AutomaticRanges[i].m_StartSlice<=m_CurrentSliceIndex-1 && m_AutomaticRanges[i].m_EndSlice>=m_CurrentSliceIndex-1)
         {
           mafString text = wxString::Format("Threshold low:%.3f high:%.3f",m_AutomaticRanges[i].m_ThresholdValue,m_AutomaticRanges[i].m_UpperThresholdValue);
           m_AutomaticThresholdTextMapper->SetInput(text.GetCStr());
-
-          m_View->CameraUpdate();
-
           return;
         }
       }
@@ -3665,23 +3692,13 @@ void medOpSegmentation::UpdateThresholdLabel()
     {
       mafString text = wxString::Format("Threshold low:%.3f high:%.3f",m_AutomaticThreshold,m_AutomaticUpperThreshold);
       m_AutomaticThresholdTextMapper->SetInput(text.GetCStr());
-      m_View->CameraUpdate();
-
       return;
     }
-
-    mafString text = _("");
-    m_AutomaticThresholdTextMapper->SetInput(text.GetCStr());
-
-    m_View->CameraUpdate();
   }
-  else
-  {
-    m_AutomaticThresholdTextMapper->SetInput("");
-
-    m_View->CameraUpdate();
-  }
-
+  //If we are showing a vertical slice in witch can be multiple threshold and global threshold is not active
+  //or if the current slice doesn't have a threshold 
+  //we use an empty label
+  m_AutomaticThresholdTextMapper->SetInput("");
 }
 
 //------------------------------------------------------------------------
