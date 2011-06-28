@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMEDPolyDataDeformation.h,v $ 
   Language: C++ 
-  Date: $Date: 2011-06-22 09:37:04 $ 
-  Version: $Revision: 1.1.2.14 $ 
+  Date: $Date: 2011-06-28 09:31:46 $ 
+  Version: $Revision: 1.1.2.15 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -47,7 +47,7 @@
 #include <vector>
 #include <list>
 
-#include "mafDllMacros.h"
+// #include "mafDllMacros.h"
 
 #pragma once
 
@@ -63,8 +63,14 @@ class vtkPolyData;
 class vtkIdList;
 class vtkCellLocator;
 
+// class CSkeletonEdge;
+// class CSkeletonVertex;
+// EXPORT_STL_VECTOR(VTK_vtkMED_EXPORT,CSkeletonEdge*);
+// EXPORT_STL_VECTOR(VTK_vtkMED_EXPORT,CSkeletonVertex*);
+
 class VTK_vtkMED_EXPORT vtkMEDPolyDataDeformation : public vtkPolyDataToPolyDataFilter
 {
+
 public:
   static vtkMEDPolyDataDeformation *New();
 
@@ -82,6 +88,7 @@ protected:
 #pragma region //Nested Classes
 
   class CSkeletonEdge;
+  class CSkeletonVertex;
     
   //internal data structure describing vertex of a mesh
   class CMeshVertexParametrization
@@ -101,10 +108,6 @@ protected:
 
   typedef vtkstd::vector< CMeshVertexParametrization > CMeshVertex;
 
-  class CSkeletonEdge;
-  class CSkeletonVertex;
-  EXPORT_STL_VECTOR(VTK_vtkMED_EXPORT,CSkeletonEdge*);
-  EXPORT_STL_VECTOR(VTK_vtkMED_EXPORT,CSkeletonVertex*);
   //internal structure for one vertex in the skeleton
   class VTK_vtkMED_EXPORT CSkeletonVertex
   {

@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMEDPolyDataDeformation_M1.h,v $ 
   Language: C++ 
-  Date: $Date: 2011-06-22 09:37:04 $ 
-  Version: $Revision: 1.1.2.12 $ 
+  Date: $Date: 2011-06-28 09:31:46 $ 
+  Version: $Revision: 1.1.2.13 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -44,7 +44,7 @@
 
 #include "vtkMEDConfigure.h"
 
-#include "mafDllMacros.h"
+// #include "mafDllMacros.h"
 
 #pragma once
 
@@ -61,12 +61,17 @@
 class vtkPolyData;
 class vtkIdList;
 class vtkCellLocator;
-class CSkeletonEdge;
-class CSkeletonVertex;
+
+// EXPORT_STL_VECTOR(VTK_vtkMED_EXPORT,CSkeletonEdge*);
+// EXPORT_STL_VECTOR(VTK_vtkMED_EXPORT,CSkeletonVertex*);
+// EXPORT_STL_VECTOR(VTK_vtkMED_EXPORT,CMeshVertex);
+// EXPORT_STL_VECTOR(VTK_vtkMED_EXPORT,vtkIdType);
+    
 
 class VTK_vtkMED_EXPORT vtkMEDPolyDataDeformation_M1 : public vtkPolyDataToPolyDataFilter
 {
 public:
+
   static vtkMEDPolyDataDeformation_M1 *New();
 
   vtkTypeRevisionMacro(vtkMEDPolyDataDeformation_M1, vtkPolyDataToPolyDataFilter);
@@ -86,13 +91,13 @@ protected:
   class CSkeletonEdge;
   class CSkeletonVertex;
 
-  EXPORT_STL_VECTOR(VTK_vtkMED_EXPORT,CSkeletonEdge*);
-  EXPORT_STL_VECTOR(VTK_vtkMED_EXPORT,CSkeletonVertex*);
-    
   //internal data structure describing vertex of a mesh
   class CMeshVertex
   {
   public:
+
+    CMeshVertex(){};
+
     //vertex parametrization
     typedef struct VERTEX_PARAM
     {
@@ -108,7 +113,7 @@ protected:
       
 
   //internal structure for one vertex in the skeleton
-  class VTK_vtkMED_EXPORT CSkeletonVertex
+  class CSkeletonVertex
   {
   public:
     int m_Id;             //<ID of this point
@@ -168,9 +173,8 @@ protected:
     }
   };
   
-  EXPORT_STL_VECTOR(VTK_vtkMED_EXPORT,vtkIdType);
   //internal structure for one edge in the skeleton
-  class VTK_vtkMED_EXPORT CSkeletonEdge
+  class CSkeletonEdge
   {
   public:
     int Id;                     //<ID of this edge
@@ -213,7 +217,7 @@ protected:
   };
 
   //Internal data structure to encapsulates one skeleton
-  class VTK_vtkMED_EXPORT CSkeleton
+  class CSkeleton
   {
   public:
     std::vector< CSkeletonVertex* > Vertices;
@@ -234,7 +238,7 @@ protected:
     int ComputeEdgeWeight(CSkeletonEdge* pEdge, int iDir);    
   };
 
-  class VTK_vtkMED_EXPORT CSuperSkeleton
+  class CSuperSkeleton
   {
   public:
     CSkeleton* m_pOC_Skel;    //<original skeleton (it is linked to deformed)
@@ -335,8 +339,6 @@ protected:
   int DivideSkeletonEdges;          //<1 if large skeleton edges should be divided  
   int PreserveVolume;               //<1, if volume should be preserved
 
-  
-  EXPORT_STL_VECTOR(VTK_vtkMED_EXPORT,CMeshVertex);
   std::vector< CMeshVertex > m_MeshVertices; //<internal data structure describing the mesh  
 
 public:  
