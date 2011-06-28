@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medDataPipeCustomSegmentationVolume.cpp,v $
 Language:  C++
-Date:      $Date: 2011-06-24 12:14:56 $
-Version:   $Revision: 1.1.2.16 $
+Date:      $Date: 2011-06-28 11:57:54 $
+Version:   $Revision: 1.1.2.17 $
 Authors:   Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2010
@@ -347,6 +347,7 @@ void medDataPipeCustomSegmentationVolume::ApplyAutomaticSegmentation()
           localThreshold = m_AutomaticSegmentationThresholds[j];
           localUpperTheshold = m_AutomaticSegmentationUpperThresholds[j];
           inRange = true;
+          break;
         }
       }
     }
@@ -792,19 +793,19 @@ void medDataPipeCustomSegmentationVolume::PreExecute()
     vtkDataSet *volumeData = vol->GetOutput()->GetVTKData();
     if(volumeData)
     {
-      if (m_ChangedAutomaticData && CheckNumberOfThresholds())
+      if (m_ChangedAutomaticData)
       {
         ApplyAutomaticSegmentation();
       }
-      if ((m_ChangedAutomaticData && CheckNumberOfThresholds()) || m_ChangedRegionGrowingData)
+      if ((m_ChangedAutomaticData ) || m_ChangedRegionGrowingData)
       {
         ApplyRegionGrowingSegmentation();
       }
-      if ((m_ChangedAutomaticData && CheckNumberOfThresholds()) || m_ChangedRegionGrowingData || m_ChangedManualData)
+      if ((m_ChangedAutomaticData) || m_ChangedRegionGrowingData || m_ChangedManualData)
       {
         ApplyManualSegmentation();
       }
-      if ((m_ChangedAutomaticData && CheckNumberOfThresholds()) || m_ChangedRegionGrowingData || m_ChangedManualData || m_ChangedRefinementData)
+      if ((m_ChangedAutomaticData) || m_ChangedRegionGrowingData || m_ChangedManualData || m_ChangedRefinementData)
       {
         ApplyRefinementSegmentation();
       }

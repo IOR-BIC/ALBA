@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMESegmentationVolume.cpp,v $
 Language:  C++
-Date:      $Date: 2011-06-24 12:14:56 $
-Version:   $Revision: 1.1.2.11 $
+Date:      $Date: 2011-06-28 11:57:54 $
+Version:   $Revision: 1.1.2.12 $
 Authors:   Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2010
@@ -281,10 +281,10 @@ void medVMESegmentationVolume::OnEvent(mafEventBase *maf_event)
 int medVMESegmentationVolume::AddRange(int startSlice,int endSlice,double threshold, double upperThreshold)
 //-------------------------------------------------------------------------
 {
-  int result = m_SegmentingDataPipe->AddRange(startSlice,endSlice,threshold);
+  int result = m_SegmentingDataPipe->AddRange(startSlice,endSlice,threshold, upperThreshold);
   if (result == MAF_OK)
   {
-    result = m_VolumeAttribute->AddRange(startSlice,endSlice,threshold);
+    result = m_VolumeAttribute->AddRange(startSlice,endSlice,threshold, upperThreshold);
     if (result == MAF_OK)
     {
       Modified();
