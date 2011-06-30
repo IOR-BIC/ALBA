@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2011-06-28 11:59:20 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2011-06-30 10:05:37 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
@@ -2999,6 +2999,8 @@ void medOpSegmentation::OnAutomaticSegmentationEvent(mafEvent *e)
         m_AutomaticRangeSlider->SetSubRange(min,max);
 
         m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Update();
+       
+        m_AutomaticThresholdSlider->SetSubRange(m_AutomaticThreshold,m_AutomaticUpperThreshold);
       }
     }
     break;
