@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.h,v $
 Language:  C++
-Date:      $Date: 2011-05-26 07:41:54 $
-Version:   $Revision: 1.5.2.17 $
+Date:      $Date: 2011-07-01 12:57:19 $
+Version:   $Revision: 1.5.2.18 $
 Authors:   Matteo Giacomoni, Simone Brazzale
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -70,6 +70,7 @@ public:
     ID_SCALAR_TOLERANCE,
     ID_PERCENTAGE_DISTANCE_TOLERANCE,
     ID_PERCENTAGE_TOLERANCE,
+    ID_OUTPUT_NAME,
 	};
   
   /** Type VMEs*/
@@ -106,6 +107,12 @@ public:
   {
     NONE = 0,
     mm2m,
+  };
+
+  enum OUTPUT_NAME_FORMAT
+  {
+    TRADITIONAL = 0,
+    DESCRIPTION_DATE,
   };
 
 	/** Answer to the messages coming from interface. */
@@ -161,6 +168,9 @@ public:
   void SetLastDicomDir(wxString lastDicomDir);;
   wxString GetLastDicomDir() {return m_LastDicomDir;};
 
+  /** Return the type of output name format */
+  int GetOutputNameFormat(){return m_OutputNameType;};
+
 protected:
 	/** Create the GUI for the setting panel.*/
 	void CreateGui();
@@ -193,6 +203,7 @@ protected:
   int m_PercentageTolerance;
   int m_AutoVMEType;
   int m_VisualizePosition;
+  int m_OutputNameType;
   wxString m_LastDicomDir;
   double m_ScalarDistanceTolerance;
   double m_PercentageDistanceTolerance;

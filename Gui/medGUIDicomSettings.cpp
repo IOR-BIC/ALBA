@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2010-07-27 13:37:47 $
-Version:   $Revision: 1.7.2.15 $
+Date:      $Date: 2011-07-01 12:57:19 $
+Version:   $Revision: 1.7.2.16 $
 Authors:   Matteo Giacomoni, Simone Brazzale
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -11,7 +11,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
 
-#include "mafDefines.h" 
+#include "medDefines.h" 
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
@@ -54,6 +54,7 @@ mafGUISettings(Listener, label)
   m_PercentageDistanceTolerance = 88;
   m_LastDicomDir = "UNEDFINED_m_LastDicomDir";
   m_Step = ID_1X;
+  m_OutputNameType = TRADITIONAL;
 
   m_Config->SetPath("Importer Dicom"); // Regiser key path Added by Losi 15.11.2009
 	InitializeSettings();
@@ -114,6 +115,11 @@ void medGUIDicomSettings::CreateGui()
   m_DicomModalityListBox->AddItem(ID_OT_MODALITY,_("OT"),m_CheckOnOff[4] != 0);
   m_DicomModalityListBox->AddItem(ID_CR_MODALITY,_("CR"),m_CheckOnOff[5] != 0);
 	m_Gui->Divider(1);
+
+
+  wxString outputNameTypeChoices[2] = {_("Traditional format"),_("Format : 'descrition_date'")};
+  m_Gui->Radio(ID_OUTPUT_NAME,_("Output name"),&m_OutputNameType,2,outputNameTypeChoices);
+  m_Gui->Divider(1);
 
 	m_Gui->Update();
   m_Gui->Enable(ID_VME_TYPE,!m_AutoVMEType);
@@ -260,6 +266,11 @@ void medGUIDicomSettings::OnEvent(mafEventBase *maf_event)
       m_Config->Write("PercentageDistance",m_PercentageDistanceTolerance);
     }
     break;
+  case ID_OUTPUT_NAME:
+    {
+      m_Config->Write("OutputNameFormat",m_OutputNameType);
+    }
+    break;
 	default:
 		mafEventMacro(*maf_event);
 		break; 
@@ -274,6 +285,15 @@ void medGUIDicomSettings::InitializeSettings()
 	wxString string_item;
 	long long_item;
 	double double_item;
+
+  if(m_Config->Read("OutputNameFormat", &long_item))
+  {
+    m_OutputNameType=long_item;
+  }
+  else
+  {
+    m_Config->Write("OutputNameFormat",m_OutputNameType);
+  }
 
 	if(m_Config->Read("EnableSide", &long_item))
 	{

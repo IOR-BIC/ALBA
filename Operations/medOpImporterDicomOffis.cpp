@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2011-03-25 13:40:03 $
-Version:   $Revision: 1.1.2.128 $
+Date:      $Date: 2011-07-01 13:01:08 $
+Version:   $Revision: 1.1.2.129 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -2246,9 +2246,18 @@ void medOpImporterDicomOffis::Crop()
 	double pixelDimY = diffy/spacing[0] + 1;
 
 
-	wxString  seriesName = m_SeriesListbox->GetString(m_SeriesListbox->GetSelection());
-	m_VolumeName = seriesName.Mid(0,seriesName.find_last_of('_'));
-	m_VolumeName.Append(wxString::Format("_%ix%ix%i", (int)pixelDimX, (int)pixelDimY, cropInterval));
+  if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::TRADITIONAL)
+  {
+	  wxString  seriesName = m_SeriesListbox->GetString(m_SeriesListbox->GetSelection());
+		m_VolumeName = seriesName.Mid(0,seriesName.find_last_of('_'));
+		m_VolumeName.Append(wxString::Format("_%ix%ix%i", (int)pixelDimX, (int)pixelDimY, cropInterval));
+  }
+  else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::DESCRIPTION_DATE)
+  {
+    m_VolumeName = m_StudyDescription;
+    m_VolumeName<<"_";
+    m_VolumeName<<m_StudyDate;
+  }
 }
 //----------------------------------------------------------------------------
 void medOpImporterDicomOffis::AutoPositionCropPlane()
@@ -3133,6 +3142,13 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 				progress = i * 100 / m_DICOMDirectoryReader->GetNumberOfFiles();
 				mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
 			}
+
+      char *date,*description;
+      dicomDataset->findAndGetString(DCM_StudyDate,date);
+      dicomDataset->findAndGetString(DCM_StudyDescription,description);
+
+      m_StudyDate = date;
+      m_StudyDescription = description;
 
 			dicomImg.clear();
 			seriesId.clear();
