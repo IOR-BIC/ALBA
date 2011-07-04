@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMEDPolyDataDeformation_M1.h,v $ 
   Language: C++ 
-  Date: $Date: 2011-07-01 09:00:38 $ 
-  Version: $Revision: 1.1.2.14 $ 
+  Date: $Date: 2011-07-04 06:11:16 $ 
+  Version: $Revision: 1.1.2.15 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -217,7 +217,7 @@ protected:
   };
 
   //Internal data structure to encapsulates one skeleton
-  class CSkeleton
+  class VTK_vtkMED_EXPORT CSkeleton
   {
   public:
     std::vector< CSkeletonVertex* > Vertices;
