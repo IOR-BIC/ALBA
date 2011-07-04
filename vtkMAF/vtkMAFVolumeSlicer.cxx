@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkMAFVolumeSlicer.cxx,v $
   Language:  C++
-  Date:      $Date: 2008-09-08 13:08:06 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2011-07-04 17:24:54 $
+  Version:   $Revision: 1.2.2.1 $
 
 =========================================================================*/
 
@@ -21,7 +21,7 @@
 
 #include "assert.h"
 
-vtkCxxRevisionMacro(vtkMAFVolumeSlicer, "$Revision: 1.2 $");
+vtkCxxRevisionMacro(vtkMAFVolumeSlicer, "$Revision: 1.2.2.1 $");
 vtkStandardNewMacro(vtkMAFVolumeSlicer);
 
 typedef unsigned short u_short;
@@ -87,6 +87,13 @@ void vtkMAFVolumeSlicer::SetPlaneAxisX(float axis[3])
   }
   else
   {
+    // bug 2454 fix
+	// http://bugzilla.b3c.it/show_bug.cgi?id=2454    
+    if (PlaneAxisX[0] < 1.e-5f)
+	{
+		PlaneAxisX[0] = 1.e-5f;
+	}
+
     memcpy(GlobalPlaneAxisX, PlaneAxisX, sizeof(this->PlaneAxisX));
   }
   this->Modified();
