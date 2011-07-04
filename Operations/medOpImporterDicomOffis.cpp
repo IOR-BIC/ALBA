@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2011-07-01 13:01:08 $
-Version:   $Revision: 1.1.2.129 $
+Date:      $Date: 2011-07-04 08:54:47 $
+Version:   $Revision: 1.1.2.130 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -3143,7 +3143,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 				mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
 			}
 
-      char *date,*description;
+      const char *date,*description;
       dicomDataset->findAndGetString(DCM_StudyDate,date);
       dicomDataset->findAndGetString(DCM_StudyDescription,description);
 
