@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2011-07-04 08:54:47 $
-Version:   $Revision: 1.1.2.130 $
+Date:      $Date: 2011-07-05 09:18:39 $
+Version:   $Revision: 1.1.2.131 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -1875,7 +1875,18 @@ void medOpImporterDicomOffis::CreateBuildPage()
 
 	}
 
-	m_BuildGuiUnderLeft->String(ID_VOLUME_NAME," VME name",&m_VolumeName);
+  if(((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::TRADITIONAL)
+  {
+	  m_BuildGuiUnderLeft->String(ID_VOLUME_NAME," VME name",&m_VolumeName);
+  }
+  else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::DESCRIPTION_DATE)
+  {
+    m_VolumeName = m_StudyDescription;
+    m_VolumeName<<"_";
+    m_VolumeName<<m_StudyDate;
+    m_BuildGuiUnderLeft->String(ID_VOLUME_NAME," VME name",&m_VolumeName);
+  }
+
 
 	m_BuildGuiLeft->FitGui();
 	m_BuildGuiUnderLeft->FitGui();
