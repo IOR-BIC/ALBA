@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceTextured.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-03-21 11:22:03 $
-  Version:   $Revision: 1.11.2.5 $
+  Date:      $Date: 2011-07-06 14:33:51 $
+  Version:   $Revision: 1.11.2.6 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -169,6 +169,34 @@ void mafPipeSurfaceTextured::Create(mafSceneNode *n/*, bool use_axes*/)
   vtkNEW(m_Actor);
 	m_Actor->SetMapper(m_Mapper);
   m_Actor->SetEnableHighThreshold(m_EnableActorLOD);
+  
+  if (m_EnableActorLOD == false)
+  {
+	  // bug 2454 fix
+	  // http://bugzilla.b3c.it/show_bug.cgi?id=2454
+	  // small LOD rectangle is activated even if LOD is disabled
+	  // Setting PixelThreshold to 1 will deactivate small square visualization 
+	  // ie entering
+	  /*
+	  
+	  if( sz < m_PixelThreshold)
+	  {
+		  // Assign the actor's transformation matrix to the m_FlagActor 
+		  // to put this one at the same position of the actor
+		  m_FlagActor->PokeMatrix(GetMatrix());
+
+		  glPointSize( m_FlagDimension );
+		  m_FlagActor->Render(ren,m_FlagMapper); 
+		  glPointSize( 1 );
+	  }
+
+	  */
+	  //
+	  // code section in mafLODActor.cpp
+	  //
+	  m_Actor->SetPixelThreshold(1);
+  }
+
   if (m_SurfaceMaterial->m_MaterialType == mmaMaterial::USE_LOOKUPTABLE)
   {
     m_UseTexture = 0;
