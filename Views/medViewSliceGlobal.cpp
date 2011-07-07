@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewSliceGlobal.cpp,v $
 Language:  C++
-Date:      $Date: 2011-05-26 08:22:31 $
-Version:   $Revision: 1.1.2.7 $
+Date:      $Date: 2011-07-07 08:10:41 $
+Version:   $Revision: 1.1.2.8 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2002/2004
@@ -528,13 +528,16 @@ void medViewSliceGlobal::VmeShow(mafNode *node, bool show)
   {
     vtkDataSet *dataSet = mafVME::SafeDownCast(m_CurrentVolume->m_Vme)->GetOutput()->GetVTKData();
 
-    if(dataSet->IsA("vtkRectilinearGrid")) {
-      vtkRectilinearGrid *rectilinearGrid = vtkRectilinearGrid::SafeDownCast(dataSet);
-      rectilinearGrid->GetDimensions(m_NumberOfSlices);
-    }
-    else if (dataSet->IsA("vtkImageData")) {
-      vtkImageData *imageData=vtkImageData::SafeDownCast(dataSet);
-      imageData->GetDimensions(m_NumberOfSlices);
+    if(NULL!=dataSet)
+    {
+      if(dataSet->IsA("vtkRectilinearGrid")) {
+        vtkRectilinearGrid *rectilinearGrid = vtkRectilinearGrid::SafeDownCast(dataSet);
+        rectilinearGrid->GetDimensions(m_NumberOfSlices);
+      }
+      else if (dataSet->IsA("vtkImageData")) {
+        vtkImageData *imageData=vtkImageData::SafeDownCast(dataSet);
+        imageData->GetDimensions(m_NumberOfSlices);
+      }
     }
 
     m_NumberOfFrames = mafVME::SafeDownCast(m_CurrentVolume->m_Vme)->GetNumberOfLocalTimeStamps();
