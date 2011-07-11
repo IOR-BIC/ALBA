@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medPipeTrajectoriesTest.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-19 15:08:03 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-07-11 16:42:39 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004
@@ -136,6 +136,7 @@ void medPipeTrajectoriesTest::TestPipeExecution()
     cloud->SetLandmark("first",x,y,z, i);
   }
   cloud->Update();
+  cloud->TestModeOn();
   cloud->Open();
 
   mafSmartPointer<mafVMELandmark> landmark;
