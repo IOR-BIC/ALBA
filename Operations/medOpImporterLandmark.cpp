@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterLandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-11-18 16:51:31 $
-  Version:   $Revision: 1.7.2.4 $
+  Date:      $Date: 2011-07-11 16:30:26 $
+  Version:   $Revision: 1.7.2.5 $
   Authors:   Daniele Giunchi, Simone Brazzale
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -228,6 +228,11 @@ void medOpImporterLandmark::Read()
   }
 
 	mafNEW(m_VmeCloud);
+
+  if (m_TestMode == true)
+  {
+	  m_VmeCloud->TestModeOn();
+  }
   m_VmeCloud->Open();
 
   std::ifstream  landmarkFileStream(m_File);
@@ -302,7 +307,13 @@ void medOpImporterLandmark::Read()
 void medOpImporterLandmark::ReadWithoutTag()   
 //----------------------------------------------------------------------------
 {
- 	mafNEW(m_VmeCloud);
+  mafNEW(m_VmeCloud);
+  
+  if (m_TestMode == true)
+  {
+	  m_VmeCloud->TestModeOn();
+  }
+  
   m_VmeCloud->Open();
 
   // need the number of landmarks for the progress bar

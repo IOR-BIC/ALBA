@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterLandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-11-26 16:26:30 $
-  Version:   $Revision: 1.1.2.4 $
+  Date:      $Date: 2011-07-11 16:30:26 $
+  Version:   $Revision: 1.1.2.5 $
   Authors:   Stefania Paperini , Daniele Giunchi, Simone Brazzale
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -207,6 +207,11 @@ void medOpExporterLandmark::ExportLandmark(mafVMELandmarkCloud* cloud)
     bool statusOpen = cloud->IsOpen();
     if (!statusOpen)
     {
+      if (m_TestMode == true)
+	  {
+		  cloud->TestModeOn();
+	  }
+
       cloud->Open();
     }
     int numberLandmark = cloud->GetNumberOfLandmarks();

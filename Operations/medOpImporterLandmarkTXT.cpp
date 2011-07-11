@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterLandmarkTXT.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:10:50 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2011-07-11 16:30:26 $
+  Version:   $Revision: 1.4.2.1 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -161,6 +161,12 @@ void medOpImporterLandmarkTXT::Read()
   tag_Nature.SetValue("NATURAL");
 
   m_VmeCloud->GetTagArray()->SetTag(tag_Nature);
+
+  if (m_TestMode == true)
+  {
+    m_VmeCloud->TestModeOn();
+  }
+
   m_VmeCloud->Open();
   m_VmeCloud->SetRadius(10);
 

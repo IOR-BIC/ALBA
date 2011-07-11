@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterMotionDataTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-12-03 09:29:23 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-07-11 16:30:46 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -105,6 +105,11 @@ void medopImporterMotionDataTest::TestOnRawMotionData()
   y = 761.53;
   z = -289.80;
            
+  if (importer->GetTestMode() == true)
+  {
+     ((mafVMELandmarkCloud *)vme_raw->GetChild(0))->TestModeOn();
+  }
+
   ((mafVMELandmarkCloud *)vme_raw->GetChild(0))->Open();
   mafVMELandmark *landmark = ((mafVMELandmark *)((mafVMELandmarkCloud *)vme_raw->GetChild(0))->GetLandmark(0));
   
