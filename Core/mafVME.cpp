@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:56:04 $
-  Version:   $Revision: 1.47 $
+  Date:      $Date: 2011-07-11 13:04:00 $
+  Version:   $Revision: 1.47.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -48,6 +48,8 @@ mafCxxAbstractTypeMacro(mafVME)
 mafVME::mafVME()
 //-------------------------------------------------------------------------
 {
+  m_TestMode = false;
+
   m_Output        = NULL;
   m_Behavior      = NULL;
 

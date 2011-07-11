@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-10-30 09:35:43 $
-  Version:   $Revision: 1.39.2.1 $
+  Date:      $Date: 2011-07-11 13:04:26 $
+  Version:   $Revision: 1.39.2.2 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -740,11 +740,11 @@ void mafVMELandmarkCloud::Close()
 
   wxBusyCursor *busyCursor = NULL;
 
-  try
+  if (m_TestMode == false)
   {
     busyCursor = new wxBusyCursor();
   }
-  catch (...)
+  else if (m_TestMode == true)
   {
     std::ostringstream stringStream;
     stringStream << "cannot render busy cursor..."  << std::endl;
@@ -908,11 +908,11 @@ void mafVMELandmarkCloud::Open()
 
   wxBusyCursor *busyCursor = NULL;
 
-  try
+  if (m_TestMode == false)
   {
     busyCursor = new wxBusyCursor();
   }
-  catch (...)
+  else if (m_TestMode == true)
   {
     std::ostringstream stringStream;
     stringStream << "cannot render busy cursor..."  << std::endl;

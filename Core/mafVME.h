@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-25 09:51:23 $
-  Version:   $Revision: 1.37.2.2 $
+  Date:      $Date: 2011-07-11 13:04:00 $
+  Version:   $Revision: 1.37.2.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -225,6 +225,16 @@ public:
   /** set the interactor representing the behavior of this VME. @sa GetBehavior() */
   void SetBehavior(mafInteractor *bh) {m_Behavior=bh;};
   
+  /** Turn On m_TestMode flag. 
+  The m_TestMode flag is used to exclude the execution of splash screen or wxBusyInfo that conflicts with test machine.*/
+  void TestModeOn() {m_TestMode = true;};
+
+  /** Used to turn off m_TestMode flag.*/
+  void TestModeOff() {m_TestMode = false;};
+
+  /** Get TestMode*/
+  bool GetTestMode(){return m_TestMode;};
+
 protected:
   mafVME(); // to be allocated with New()
   virtual ~mafVME(); // to be deleted with Delete()
@@ -258,6 +268,8 @@ protected:
   /** Create GUI for the VME */
   virtual mafGUI  *CreateGui();
 
+  bool m_TestMode; ///< Flag used with cppunitTest: put this flag at true when executing tests to avoid busy-info or splash screen to be created, default is false.
+
 #ifdef MAF_EXPORTS
   template class MAF_EXPORT mafAutoPointer<mafDataPipe>;
   template class MAF_EXPORT mafAutoPointer<mafMatrixPipe>;
@@ -279,6 +291,8 @@ private:
   mafVME(const mafVME&); // Not implemented
   void operator=(const mafVME&); // Not implemented
   virtual bool Equals(mafNode *node); // not accessible from other classes
+
+
 };
 
 #endif
