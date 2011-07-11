@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafVMERawMotionDataTest.cpp,v $
 Language:  C++
-Date:      $Date: 2006-10-06 09:11:22 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2011-07-11 16:48:26 $
+Version:   $Revision: 1.2.4.1 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -93,7 +93,8 @@ void mafVMERawMotionDataTest::Test()
   x = -390.13;
   y = 761.53;
   z = -289.80;
-           
+  
+  ((mafVMELandmarkCloud *)vmeRawMotionData->GetChild(0))->TestModeOn();
   ((mafVMELandmarkCloud *)vmeRawMotionData->GetChild(0))->Open();
   mafVMELandmark *landmark = ((mafVMELandmark *)((mafVMELandmarkCloud *)vmeRawMotionData->GetChild(0))->GetLandmark(0));
   
