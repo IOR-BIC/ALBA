@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpAddLandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:45:06 $
-  Version:   $Revision: 1.4.2.3 $
+  Date:      $Date: 2011-07-11 14:11:08 $
+  Version:   $Revision: 1.4.2.4 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -138,6 +138,12 @@ void mafOpAddLandmark::OpRun()
 		{
 			m_PickedVme = mafVME::SafeDownCast(m_Input);
 			mafNEW(m_Cloud);
+
+			if (m_TestMode == true)
+			{
+				m_Cloud->TestModeOn();
+			}
+
 			m_Cloud->Open();
 			m_Cloud->SetName(_("new landmark cloud"));
 			m_Cloud->SetRadius(m_PickedVme->GetOutput()->GetVTKData()->GetLength()/60.0);

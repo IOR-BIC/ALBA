@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpExporterVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-10-23 16:34:12 $
-  Version:   $Revision: 1.2.2.4 $
+  Date:      $Date: 2011-07-11 14:11:08 $
+  Version:   $Revision: 1.2.2.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -193,11 +193,11 @@ void mafOpExporterVTK::SaveVTKData()
 {
   wxBusyCursor *busyCursor = NULL;
 
-  try
+  if (m_TestMode == true)
   {
     busyCursor = new wxBusyCursor();
   }
-  catch (...)
+  else if (m_TestMode == false)
   {
     std::ostringstream stringStream;
     stringStream << "cannot render busy cursor..."  << std::endl;

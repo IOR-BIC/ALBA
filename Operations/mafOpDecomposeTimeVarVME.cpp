@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpDecomposeTimeVarVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-08-18 08:51:02 $
-  Version:   $Revision: 1.7.2.1 $
+  Date:      $Date: 2011-07-11 14:11:08 $
+  Version:   $Revision: 1.7.2.2 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -461,6 +461,10 @@ void mafOpDecomposeTimeVarVME::CreateStaticVME(mafTimeStamp timeSt)
   if (typeVme.Equals("mafVMELandmark"))
   {
     mafNEW(m_Cloud);
+	if (m_TestMode == true)
+	{
+		m_Cloud->TestModeOn();
+	}
     m_Cloud->Open();
     m_VectorCloud.push_back(m_Cloud);
   }
