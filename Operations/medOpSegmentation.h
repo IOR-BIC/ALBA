@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.h,v $
 Language:  C++
-Date:      $Date: 2011-06-28 11:59:20 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2011-07-12 15:45:37 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Eleonora Mambrini, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
@@ -30,7 +30,7 @@ class mafGUIDialog;
 class mafGUIButton;
 class mafGUI;
 class mafGUILutSlider;
-class mafGUILutSwatch;
+class medGUILutHistogramSwatch;
 class mafGUIRollOut;
 class mafGUIFloatSlider;
 class mafInteractorPicker;
@@ -310,7 +310,7 @@ protected:
   mafGUIButton* m_CancelButton;       //<Button -GUI
   mafGUIButton* m_LoadSegmentationButton;       //<Button -GUI
   mafGUI* m_GuiDialog;                //Dialog - GUI
-  mafGUILutSwatch	*m_LutWidget;       //<LUT widget
+  medGUILutHistogramSwatch	*m_LutWidget;       //<LUT widget
   mafGUILutSlider *m_LutSlider;       //<LUT Slider
   vtkLookupTable *m_ColorLUT;         //<Lookup table for LUT widget
 

@@ -24,6 +24,10 @@ SET(PROJECT_SRCS
   medGUISettingsAdvanced.h
   medGUIDynamicVP.cpp
   medGUIDynamicVP.h
+	medGUILutHistogramSwatch.cpp
+	medGUILutHistogramSwatch.h
+	medGUILutHistogramEditor.cpp
+	medGUILutHistogramEditor.h
   
 )
 
