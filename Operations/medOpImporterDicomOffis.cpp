@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2011-07-05 09:18:39 $
-Version:   $Revision: 1.1.2.131 $
+Date:      $Date: 2011-07-12 11:24:51 $
+Version:   $Revision: 1.1.2.132 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -1881,7 +1881,7 @@ void medOpImporterDicomOffis::CreateBuildPage()
   }
   else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::DESCRIPTION_DATE)
   {
-    m_VolumeName = m_StudyDescription;
+    m_VolumeName = m_SeriesDescription;
     m_VolumeName<<"_";
     m_VolumeName<<m_StudyDate;
     m_BuildGuiUnderLeft->String(ID_VOLUME_NAME," VME name",&m_VolumeName);
@@ -2265,7 +2265,7 @@ void medOpImporterDicomOffis::Crop()
   }
   else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::DESCRIPTION_DATE)
   {
-    m_VolumeName = m_StudyDescription;
+    m_VolumeName = m_SeriesDescription;
     m_VolumeName<<"_";
     m_VolumeName<<m_StudyDate;
   }
@@ -3156,10 +3156,10 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 
       const char *date,*description;
       dicomDataset->findAndGetString(DCM_StudyDate,date);
-      dicomDataset->findAndGetString(DCM_StudyDescription,description);
+      dicomDataset->findAndGetString(DCM_SeriesDescription,description);
 
       m_StudyDate = date;
-      m_StudyDescription = description;
+      m_SeriesDescription = description;
 
 			dicomImg.clear();
 			seriesId.clear();
