@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2011-07-13 12:15:10 $
-Version:   $Revision: 1.1.2.133 $
+Date:      $Date: 2011-07-13 13:40:03 $
+Version:   $Revision: 1.1.2.134 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -3219,7 +3219,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 		// Cardiac MRI Handling
 		//---------------------------------------
 
-    std::vector<std::vector<mafString>> seriesToDelete;
+    std::vector< std::vector<mafString> > seriesToDelete;
 		// foreach series
 		for ( it=m_SeriesIDToSlicesListMap.begin() ; it != m_SeriesIDToSlicesListMap.end(); it++ )
 		{
