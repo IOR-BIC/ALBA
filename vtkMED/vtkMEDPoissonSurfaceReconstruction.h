@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDPoissonSurfaceReconstruction.h,v $
 Language:  C++
-Date:      $Date: 2011-05-26 08:33:31 $
-Version:   $Revision: 1.1.2.11 $
+Date:      $Date: 2011-07-13 07:42:31 $
+Version:   $Revision: 1.1.2.12 $
 Authors:   Fuli Wu
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -1075,6 +1075,11 @@ public:
 /*=========================================================================
 MemoryUseage.h
 =========================================================================*/
+/**
+className: MemoryInfo
+Used for keeping trace of the physical memory (total and free), swap space (total and free), virtual address space (total and free)
+and page size.
+*/
 class MemoryInfo{
 public:
 	size_t TotalPhysicalMemory;

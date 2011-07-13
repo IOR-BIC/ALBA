@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeMIP.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:29:56 $
-  Version:   $Revision: 1.11.2.3 $
+  Date:      $Date: 2011-07-13 07:38:59 $
+  Version:   $Revision: 1.11.2.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -39,15 +39,18 @@ class vtkImageResample;
 class vtkLookupTable;
 //class vtkColorTransferFunction;
 class vtkImageCast;
-//----------------------------------------------------------------------------
-// medPipeVolumeMIP :
-//----------------------------------------------------------------------------
+/**
+className: medPipeVolumeMIP
+Pipe which uses vtkVolumeRayCastMIPFunction with vtkMAFVolumeRayCastMapper and predefined Transfer Functions. 
+*/
 class MED_EXPORT medPipeVolumeMIP : public mafPipe
 {
 public:
+  /** RTTI macro */
   mafTypeMacro(medPipeVolumeMIP,mafPipe);
-
+  /** constructor */
            medPipeVolumeMIP();
+  /** destructor */
   virtual ~medPipeVolumeMIP();
 
   /** process events coming from gui */
@@ -60,15 +63,20 @@ public:
     ID_LUT_CHOOSER,
     ID_LAST
   };
-
+ 
+  /** pipe creation */
   virtual void Create(mafSceneNode *n);
+  /** called when vme associated with the pipe is selected */
   virtual void Select(bool select); 
 
+  /** set a resample factor of the rendered volume */
   void SetResampleFactor(double value);
+  /** get sample factor for rendered volume */
   double GetResampleFactor(){return m_ResampleFactor;};
 
-  /** Get assembly front/back */
+  /** Get assembly front */
   virtual vtkMAFAssembly *GetAssemblyFront(){return m_AssemblyFront;};
+  /** Get assembly back */
   virtual vtkMAFAssembly *GetAssemblyBack(){return m_AssemblyBack;};
 
 
@@ -76,7 +84,7 @@ protected:
   /** 
   Given a color LUT, generate color transfer function and opacity transfer function*/
   void UpdateMIPFromLUT();
-
+  /** create gui widget for pipe */
   virtual mafGUI  *CreateGui();
 
   double					  m_ResampleFactor;

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeVR.h,v $
   Language:  C++
-  Date:      $Date: 2009-11-17 13:11:08 $
-  Version:   $Revision: 1.5.2.2 $
+  Date:      $Date: 2011-07-13 07:38:59 $
+  Version:   $Revision: 1.5.2.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -33,15 +33,18 @@ class vtkProbeFilter;
 class vtkRectilinearGrid; 
 class vtkStructuredPoints;
 class vtkImageResample;
-//----------------------------------------------------------------------------
-// medPipeVolumeVR :
-//----------------------------------------------------------------------------
+/**
+className: medPipeVolumeVR
+Pipe which uses vtkMAFVolumeTextureMapper2D and different Piecewise and ColorTransfer Functions.
+*/
 class medPipeVolumeVR : public mafPipe
 {
 public:
+  /** RTTI macro */
   mafTypeMacro(medPipeVolumeVR,mafPipe);
-
+  /** constructor */
            medPipeVolumeVR();
+  /** destructor */
   virtual ~medPipeVolumeVR();
 
   /** process events coming from gui */
@@ -72,6 +75,7 @@ public:
 	
 	/** Get gradient transfer function of the volume. */
   vtkPiecewiseFunction *GetGradientTransferFunction() {return m_GradientFunction;};
+  /** set the number of slices in z axes */
   void SetNumberPoints(int n);
 
 	/** Add one point for the scalar transfer function. */
@@ -105,6 +109,7 @@ public:
 	double GetResampleFactor();
 
 protected:
+  /** create the gui widget for the pipe*/
   virtual mafGUI  *CreateGui();
 
   vtkColorTransferFunction		*m_ColorTransferFunction;

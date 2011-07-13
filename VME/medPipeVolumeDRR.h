@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeDRR.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:29:56 $
-  Version:   $Revision: 1.6.2.1 $
+  Date:      $Date: 2011-07-13 07:38:59 $
+  Version:   $Revision: 1.6.2.2 $
   Authors:   Paolo Quadrani - porting Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -31,16 +31,18 @@ class vtkVolume;
 class vtkLookupTable;
 class vtkImageResample;
 class mafGUIFloatSlider;
-
-//----------------------------------------------------------------------------
-// medPipeVolumeDRR :
-//----------------------------------------------------------------------------
+/**
+className: medPipeVolumeDRR
+Pipe which uses BES vtkXRayVolumeMapper.
+*/
 class MED_EXPORT medPipeVolumeDRR : public mafPipe
 {
 public:
+  /** RTTI macro*/
   mafTypeMacro(medPipeVolumeDRR,mafPipe);
-
+  /** constructor*/
            medPipeVolumeDRR();
+  /** destructor */
   virtual ~medPipeVolumeDRR();
 
   /** process events coming from gui */
@@ -66,21 +68,31 @@ public:
 		ID_RESAMPLE_FACTOR,
 		ID_LAST
   };
-
+  /** create pipe*/
   virtual void Create(mafSceneNode *n);
+  /** called when the vme has been selected*/
   virtual void Select(bool select); 
-
+        /** set color used by the mapper*/
 	void SetColor(wxColor color);
+        /** set exposure correction which is a parameter for simulate RX*/
 	void SetExposureCorrection(double value[2]);
+        /** set gamma correction*/
 	void SetGamma(double value);
+        /** set view angle */
 	void SetCameraAngle(double value);
+        /** set position of the camera*/
 	void SetCameraPosition(double value[3]);
+        /** set focus point of the camera*/
 	void SetCameraFocus(double value[3]);
+        /** set roll angle of the camera */
 	void SetCameraRoll(double value);
+        /** set resample factor of the rendered volume*/
 	void SetResampleFactor(double value);
+        /** get the resample factor of the rendered volume*/
 	double GetResampleFactor();
 
 protected:
+  /** create the gui widget for the pipe*/
   virtual mafGUI  *CreateGui();
 
   vtkLookupTable              *m_ColorLUT;
