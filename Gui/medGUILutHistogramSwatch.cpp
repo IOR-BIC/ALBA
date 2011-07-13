@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILutHistogramSwatch.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-07-12 15:46:04 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-07-13 12:38:21 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -125,6 +125,7 @@ void medGUILutHistogramSwatch::OnLeftMouseButtonDown(wxMouseEvent &event)
 void medGUILutHistogramSwatch::OnLeftMouseButtonUp(wxMouseEvent &event)
 //----------------------------------------------------------------------------
 {
+  //no left mouse button functionality now.
 }
 //----------------------------------------------------------------------------
 void medGUILutHistogramSwatch::OnMouseMotion(wxMouseEvent &event)
@@ -166,6 +167,7 @@ void medGUILutHistogramSwatch::OnMouseMotion(wxMouseEvent &event)
 void medGUILutHistogramSwatch::SetLut(vtkLookupTable *lut)
 //----------------------------------------------------------------------------
 {
+  //update lut pointer
   m_Lut = lut;
   Update();
   Refresh();
@@ -175,6 +177,7 @@ void medGUILutHistogramSwatch::SetLut(vtkLookupTable *lut)
 void medGUILutHistogramSwatch::SetVME(mafVME *vme)
 //----------------------------------------------------------------------------
 {
+  //Update volume pointer
   m_VME = vme;
   Update();
   Refresh();
@@ -203,6 +206,7 @@ void medGUILutHistogramSwatch::Update()
   {
     for(x=0; x<w; x++)
     {
+      //Generating the pixel from the Lut Value
       float i = ( num * x ) / w;
       mafColor col  = mafColor( m_Lut->GetTableValue(i) );
       mafColor col2 = mafColor::CheckeredColor(col,x,y);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILutHistogramEditor.h,v $
   Language:  C++
-  Date:      $Date: 2011-07-12 15:46:04 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-07-13 12:38:21 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -57,10 +57,15 @@ public:
     ID_RESET_LUT,
   };
 
+  /** Constructor. */
   medGUILutHistogramEditor(mafVME *vme, vtkLookupTable *lut, char *name="Histogram & Windowing", mafObserver *Listener=NULL, int id=MINID);
+  /** Destructor. */
   virtual ~medGUILutHistogramEditor(); 
-
+  
+  /** Set the event listener */
   virtual void SetListener(mafObserver *Listener) {m_Listener = Listener;};
+
+  /* Main event handler */
   void OnEvent(mafEventBase *maf_event);
 
   /** Assign the external lookup table to the widget.*/
@@ -71,18 +76,21 @@ public:
 
 protected:
 
+  /* Resample the VME becouse full histogram is slow*/
   static void Resample(mafVME *vme, mafVMEVolumeGray* resampled);
 
+  /* Resets the dialog values to default */
   void ResetLutDialog(double gamma, double low, double high);
 
+  /* Update the volume lut, if reset is true the update i make from default values */
   void UpdateVolumeLut(bool reset = false);
 
+  /* Set the volume for the histogram */
   void SetVolume(mafVME *vol);
+
   /** Copy the external Lookup Table given by the user to the internal one.*/
   void CopyLut(vtkLookupTable *from, vtkLookupTable *to);
 	
-  //void OnComboSelection(wxCommandEvent &event);
-  
   mafObserver *m_Listener;
   mafGUI *m_GuiDialog;
   mafGUIFloatSlider *m_GammaSlider;

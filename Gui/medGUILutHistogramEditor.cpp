@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILutHistogramEditor.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-07-12 15:46:04 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-07-13 12:38:21 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -73,22 +73,7 @@ medGUILutHistogramEditor::medGUILutHistogramEditor(mafVME *vme, vtkLookupTable *
 :mafGUIDialog(name)         
 //----------------------------------------------------------------------------
 {
-	
-  
-  /*wxBoxSizer *sizer =  new wxBoxSizer( wxVERTICAL );
-
-  sizer->Add( m_LutSwatch, 0, wxALL, 4);
-
-  this->SetAutoLayout( TRUE );
-  this->SetSizer( sizer );
-  sizer->Fit(this);
-  sizer->SetSizeHints(this);
-
-  m_Lut = vtkLookupTable::New();
-  m_Lut->Build();
-  m_LutSwatch->SetLut(m_Lut);
-  TransferDataToWindow();
-  */
+	  
   m_LutSwatch = NULL;// new medGUILutHistogramSwatch(this, -1, dp,wxSize(286,16));
   m_Lut = vtkLookupTable::New();
   m_Lut->Build();
@@ -112,7 +97,8 @@ medGUILutHistogramEditor::medGUILutHistogramEditor(mafVME *vme, vtkLookupTable *
   double sr[2], srR[2];
   mmaVolumeMaterial *material = ((mafVMEVolume *)m_Volume)->GetMaterial();
   
-
+  //resampling data beacouse full histograms
+  //take long time
   vtkDataSet *data, *dataResampled;
   data = m_Volume->GetOutput()->GetVTKData();
   data->Update();
@@ -128,35 +114,23 @@ medGUILutHistogramEditor::medGUILutHistogramEditor(mafVME *vme, vtkLookupTable *
   mafString tag_name;
   tag_name = "HISTOGRAM_VOLUME";
 
-  mafVME *histogram_volume = mafVME::SafeDownCast(m_Volume->FindInTreeByTag(tag_name));
+  //Setting up the histogram
   mafGUIHistogramWidget *histogram = new mafGUIHistogramWidget(gui,-1,wxPoint(0,0),wxSize(500,100),wxTAB_TRAVERSAL); //,true);
   histogram->SetLut(  material->m_ColorLut );
   histogram->SetListener(gui);
   histogram->SetRepresentation(vtkMAFHistogram::BAR_REPRESENTATION);
-
-
-  if (histogram_volume)
-  {
-    vtkImageData *hd = vtkImageData::SafeDownCast(resampled->GetOutput()->GetVTKData());
-    histogram->SetHistogramData(hd);
-  }
-  else
-  {
-    histogram->SetData(dataResampled->GetPointData()->GetScalars());
-  }
+  histogram->SetData(dataResampled->GetPointData()->GetScalars());
   gui->Add(histogram,1);
 
 
   m_Windowing = new mafGUILutSlider(gui,-1,wxPoint(0,0),wxSize(500,24));
-  
   m_Windowing->SetListener(gui);
   gui->Add(m_Windowing,0);
 
   gui->Divider();
-  gui->Label("Gamma Correction:");
-  //gamma correction
+  //gamma correction slider 
   m_Gamma = material->m_GammaCorrection;
-  m_GammaSlider = gui->FloatSlider(ID_GAMMA_CORRETION,_("Value: "), &m_Gamma,0,5, wxSize(400,30), "", false);
+  m_GammaSlider = gui->FloatSlider(ID_GAMMA_CORRETION,_("Gamma: "), &m_Gamma,0,5, wxSize(400,30), "", false);
   gui->Button(ID_RESET_LUT,"Reset Lut");
   this->Add(gui,1);
   this->SetMinSize(wxSize(500,124));
@@ -174,11 +148,10 @@ medGUILutHistogramEditor::medGUILutHistogramEditor(mafVME *vme, vtkLookupTable *
 medGUILutHistogramEditor::~medGUILutHistogramEditor()
 //----------------------------------------------------------------------------
 {
+  
+  //Deleting Lut
   if(m_Lut) 
-	{
-		m_Lut->Delete();
-		m_Lut = NULL;
-	}
+    mafDEL(m_Lut);
 }
 
 
@@ -193,42 +166,30 @@ void medGUILutHistogramEditor::OnEvent(mafEventBase *maf_event)
       case ID_RANGE_MODIFIED:
         {
           mafGUILutSlider *lut;
-          if(lut = (mafGUILutSlider *)e->GetWin())
-          {
-            lut->GetSubRange(&m_LowRange, &m_HiRange);
-          }
-          else if(lut = (mafGUILutSlider *)e->GetWxObj())
-          {
-            lut->GetSubRange(&m_LowRange, &m_HiRange);
-          }
+          lut->GetSubRange(&m_LowRange, &m_HiRange);
           UpdateVolumeLut();
+          //Generating Event to update other views
           mafEventMacro(mafEvent(this,GetId()));
         }
         break;
       case ID_GAMMA_CORRETION:
         {
           mafGUIFloatSlider *gamma;
-
-          if(e->GetArg() == wxEVT_SCROLL_THUMBRELEASE)
-          {
-            if(gamma = (mafGUIFloatSlider *)e->GetWin())
-            {
-              m_Gamma = gamma->GetValue(); 
-              UpdateVolumeLut();
-            }
-          }
+          m_Gamma = gamma->GetValue(); 
+          UpdateVolumeLut();
+          //Generating Event to update other views
           mafEventMacro(mafEvent(this,GetId()));
         }
         break;
       case ID_RESET_LUT:
         {
+            //Setting lut/gamma to default values
             UpdateVolumeLut(true);
             ResetLutDialog(1.0, m_LowRange, m_HiRange);
+            //Generating Event to update other views
+            mafEventMacro(mafEvent(this,GetId()));
         }
         break;
-      default:
-			  e->Log();
-		  break; 
     }
   }
 }
@@ -256,6 +217,7 @@ void medGUILutHistogramEditor::SetLut(vtkLookupTable *lut)
   if(m_ExternalLut)
     CopyLut(m_ExternalLut, m_Lut);
   
+  //If we have a Lut swatch set the lut to show
   if (m_LutSwatch)
     m_LutSwatch->SetLut(m_Lut);
   
@@ -272,6 +234,7 @@ void medGUILutHistogramEditor::CopyLut(vtkLookupTable *from, vtkLookupTable *to)
   if(n>256) n=256;
   to->SetNumberOfTableValues(n);
   to->SetRange(from->GetRange());
+  //copying lut values
   for(int i=0; i<n; i++)
   {
     double *rgba;
@@ -284,20 +247,17 @@ void medGUILutHistogramEditor::CopyLut(vtkLookupTable *from, vtkLookupTable *to)
 void medGUILutHistogramEditor::ShowLutHistogramDialog(mafVME *vme, vtkLookupTable *lut,char *name, mafObserver *listener, int id)
 //----------------------------------------------------------------------------
 {
-  
-  /*int x_init,y_init;
-  x_init = mafGetFrame()->GetPosition().x;
-  y_init = mafGetFrame()->GetPosition().y;
-  */
-  
+  //Call the defaut constructor to show the Dialog
   medGUILutHistogramEditor *led = new medGUILutHistogramEditor(vme,lut,name,listener,id);
-  
 }
 
 //----------------------------------------------------------------------------
 void medGUILutHistogramEditor::Resample(mafVME *vme, mafVMEVolumeGray* resampled)
 //----------------------------------------------------------------------------
 {
+
+  //THIS FUNCTION WILL BE REPLACED WHIT A VOLUME INDIPENDENT 
+  //SUB-SAMPLING SYSTEM
   double volumeOrientation[3] = {0.,0.,0.};
   double volumePosition[3] = {0.,0.,0.};
   mafSmartPointer<mafTransform> box_pose;
@@ -417,7 +377,7 @@ void medGUILutHistogramEditor::Resample(mafVME *vme, mafVMEVolumeGray* resampled
 void medGUILutHistogramEditor::ResetLutDialog(double gamma, double low, double high)
 //----------------------------------------------------------------------------
 {
-
+  
   m_Gamma = gamma;
   m_GammaSlider->SetRange(0.0, 5.0, m_Gamma); 
   m_GammaSlider->Update();
@@ -457,7 +417,7 @@ void medGUILutHistogramEditor::UpdateVolumeLut(bool reset)
     material->ApplyGammaCorrection(4);
     
   }
-
+  //Forward event to update other views
   mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 }
 
