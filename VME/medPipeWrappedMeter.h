@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeWrappedMeter.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:29:56 $
-  Version:   $Revision: 1.2.2.1 $
+  Date:      $Date: 2011-07-13 07:45:58 $
+  Version:   $Revision: 1.2.2.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,21 +32,25 @@ class vtkLookupTable;
 class vtkCaptionActor2D;
 class mafGUIMaterialButton;
 
-//----------------------------------------------------------------------------
-// medPipeWrappedMeter :
-//----------------------------------------------------------------------------
+/**
+className: medPipeWrappedMeter
+Pipe for visualizing wrapped meters. Gives the possibility to change representation just like classical meter pipe.
+*/
 class MED_EXPORT medPipeWrappedMeter : public mafPipe
 {
 public:
+  /** RTTI macro */
   mafTypeMacro(medPipeWrappedMeter,mafPipe);
-
+  /** constructor */
                medPipeWrappedMeter();
+  /** destructor */
   virtual     ~medPipeWrappedMeter ();
 
   /** process events coming from gui */
   virtual void OnEvent(mafEventBase *maf_event);
-
+  /** create the pipe */
   virtual void Create(mafSceneNode *n /*,bool use_axes = true*/ ); //Can't add parameters - is Virtual
+  /** called when the associated vme has been selected */
   virtual void Select(bool select); 
 
   /** IDs for the GUI */
@@ -81,6 +85,7 @@ protected:
 
   /** Update visual properties*/
   void UpdateProperty(bool fromTag = false);
+  /** create the gui widget associated to the pipe */
   virtual mafGUI  *CreateGui();
 };
 #endif // __medPipeWrappedMeter_H__
