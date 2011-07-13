@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewSliceGlobal.cpp,v $
 Language:  C++
-Date:      $Date: 2011-07-07 08:10:41 $
-Version:   $Revision: 1.1.2.8 $
+Date:      $Date: 2011-07-13 08:30:23 $
+Version:   $Revision: 1.1.2.9 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2002/2004
@@ -796,7 +796,7 @@ void medViewSliceGlobal::SetSlice(double* Origin, double* Normal)
   coord[0]=Origin[0];
   coord[1]=Origin[1];
   coord[2]=Origin[2];
-  VolumePositionCorrection(coord);
+  MultiplyPointByInputVolumeABSMatrix(coord);
 
   for(int i = 0; i < m_CurrentSurface.size(); i++)
   {

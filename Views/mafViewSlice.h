@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:22:31 $
-  Version:   $Revision: 1.26.2.11 $
+  Date:      $Date: 2011-07-13 08:30:23 $
+  Version:   $Revision: 1.26.2.12 $
   Authors:   Paolo Quadrani,Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -43,8 +43,7 @@ class vtkTextMapper;
 /** 
 mafViewSlice is a View that visualize volume as slices and 
 initialize the visual pipe according to the camera position that is passed through constructor.
-This is an experimental component with rotated volumes interaction
-and visualization enabled.
+Rotated volumes interaction and visualizationo is supported by this component.
 */
 
 class MED_EXPORT mafViewSlice: public mafViewVTK
@@ -57,6 +56,33 @@ public:
 
   virtual mafView*  Copy(mafObserver *Listener, bool lightCopyEnabled = false);
   virtual void			OnEvent(mafEventBase *maf_event);
+
+    /** Set the origin of the slice */
+  inline void SetSliceOrigin(double *Origin) {
+    SetSlice(Origin, NULL);
+  }
+
+  /** gets the slice origin coordinates */
+  inline double* GetSliceOrigin() {
+    return m_Slice;
+  }
+
+  /** Set the normal of the slice*/
+  void SetSliceNormal(double *Normal) {
+    SetSlice(NULL, Normal);
+  }
+
+  /** gets the slice normal */
+  inline double* GetSliceNormal() {
+    return m_SliceNormal;
+  }
+
+  /** Set the origin and normal of the slice 
+  Both, Origin and Normal may be NULL, if the current value is to be preserved */
+  virtual void SetSlice(double* Origin, double* Normal = NULL);
+
+  /** Get the slice origin coordinates and normal.*/
+  void GetSlice(double* Origin, double* Normal = NULL);
 
   void Create();
 
@@ -85,56 +111,6 @@ public:
   /** 
   Change the range of the WindowLevel Lookup table.*/
   void SetLutRange(double low_val, double high_val);
-
-
-  /** Set the slice coordinates. 
-  DEPRECATED - use SetOrigin or SetSlice */
-  inline virtual DECLSPEC_DEPRECATED_S("SetSliceLocalOrigin(double origin[3]) is deprecated, use SetSlice or SetSliceOrigin") 
-    void SetSliceLocalOrigin(double origin[3]) {
-      return SetSlice(origin, NULL);
-  }
-
-  /** Set the origin of the slice */
-  inline void SetSliceOrigin(double *Origin) {
-    SetSlice(Origin, NULL);
-  }
-
-  /** gets the slice origin coordinates */
-  inline double* GetSliceOrigin() {
-    return m_Slice;
-  }
-
-  /** Set the slice coordinates. 
-  DEPRECATED - use SetOrigin or SetSlice */
-  inline virtual DECLSPEC_DEPRECATED_S("SetNormal(double normal[3]) is deprecated, use SetSlice or SetSliceNormal") 
-    void SetNormal(double normal[3]) {
-      return SetSlice(NULL, normal);
-  }
-
-  /** Set the normal of the slice*/
-  void SetSliceNormal(double *Normal) {
-    SetSlice(NULL, Normal);
-  }
-
-  /** gets the slice normal */
-  inline double* GetSliceNormal() {
-    return m_SliceNormal;
-  }
-
-  /** Set the origin and normal of the slice 
-  Both, Origin and Normal may be NULL, if the current value is to be preserved */
-  virtual void SetSlice(double* Origin, double* Normal = NULL);
-
-  /** Get the Slice coordinates.
-  DEPRECATED - use GetOrigin or GetSlice*/
-  inline DECLSPEC_DEPRECATED_S("double *GetSlice() is deprecated, use GetSliceOrigin") 
-    double *GetSlice() {
-    return GetSliceOrigin();
-  }
-
-  /** Get the slice origin coordinates and normal.*/
-  void GetSlice(double* Origin, double* Normal = NULL);
-
 
   /** 
   Return true if a there is a volume inside the view.*/
@@ -166,9 +142,6 @@ public:
   /** print a dump of this object */
   virtual void Print(std::ostream& os, const int tabs=0);// const;
 
-  /* Function for the correction of slice pose in case of currentvolume pose matrix is different from identity */
-  void VolumePositionCorrection(double *point);
-
   /* Update the visualization of the border */
   void BorderUpdate();
   
@@ -180,8 +153,34 @@ public:
   void SetEnableGPU(int enable){m_EnableGPU = enable;};
 
   void SetTextureInterpolate(bool interpolate) {m_TextureInterpolate = interpolate;};
+  
+  /** Set the slice coordinates. 
+  DEPRECATED - use SetOrigin or SetSlice */
+  inline virtual DECLSPEC_DEPRECATED_S("SetSliceLocalOrigin(double origin[3]) is deprecated, use SetSlice or SetSliceOrigin") 
+    void SetSliceLocalOrigin(double origin[3]) {
+      return SetSlice(origin, NULL);
+  }
+
+  /** Set the slice coordinates. 
+  DEPRECATED - use SetOrigin or SetSlice */
+  inline virtual DECLSPEC_DEPRECATED_S("SetNormal(double normal[3]) is deprecated, use SetSlice or SetSliceNormal") 
+    void SetNormal(double normal[3]) {
+      return SetSlice(NULL, normal);
+  }
+
+    /** Get the Slice coordinates.
+  DEPRECATED - use GetOrigin or GetSlice*/
+  inline DECLSPEC_DEPRECATED_S("double *GetSlice() is deprecated, use GetSliceOrigin") 
+    double *GetSlice() {
+    return GetSliceOrigin();
+  }
 
 protected:
+
+  /* Correction of slice pose when current volume pose matrix is different from identity: 
+  the multiplication is performed inplace */
+  void MultiplyPointByInputVolumeABSMatrix(double *point);
+
   virtual mafGUI *CreateGui();
 
   void CameraUpdateForRotatedVolumes();

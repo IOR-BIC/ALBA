@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:22:31 $
-  Version:   $Revision: 1.51.2.18 $
+  Date:      $Date: 2011-07-13 08:30:23 $
+  Version:   $Revision: 1.51.2.19 $
   Authors:   Paolo Quadrani , Stefano Perticoni , Josef Kohout
 ==========================================================================
   Copyright (c) 2002/2004
@@ -366,7 +366,7 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
           positionSlice[0] = m_Slice[0];
           positionSlice[1] = m_Slice[1];
           positionSlice[2] = m_Slice[2];
-          VolumePositionCorrection(positionSlice);
+          MultiplyPointByInputVolumeABSMatrix(positionSlice);
           spipe->SetSlice(positionSlice, m_SliceNormal);
         }
         else
@@ -412,7 +412,7 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
             positionSlice[0] = m_Slice[0];
             positionSlice[1] = m_Slice[1];
             positionSlice[2] = m_Slice[2];
-            VolumePositionCorrection(positionSlice);
+            MultiplyPointByInputVolumeABSMatrix(positionSlice);
             ((mafPipeSurfaceSlice *)pipe)->SetSlice(positionSlice);
             ((mafPipeSurfaceSlice *)pipe)->SetNormal(normal);
 
@@ -455,7 +455,7 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
             positionSlice[0] = m_Slice[0];
             positionSlice[1] = m_Slice[1];
             positionSlice[2] = m_Slice[2];
-            VolumePositionCorrection(positionSlice);
+            MultiplyPointByInputVolumeABSMatrix(positionSlice);
             ((mafPipePolylineSlice *)pipe)->SetSlice(positionSlice);
             ((mafPipePolylineSlice *)pipe)->SetNormal(normal);
           }          
@@ -497,7 +497,7 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
             positionSlice[0] = m_Slice[0];
             positionSlice[1] = m_Slice[1];
             positionSlice[2] = m_Slice[2];
-            VolumePositionCorrection(positionSlice);
+            MultiplyPointByInputVolumeABSMatrix(positionSlice);
             ((mafPipeMeshSlice *)pipe)->SetSlice(positionSlice);
             ((mafPipeMeshSlice *)pipe)->SetNormal(normal);
           }
@@ -679,7 +679,7 @@ void mafViewSlice::SetSlice(double* Origin, double* Normal)
   coord[0]=Origin[0];
   coord[1]=Origin[1];
   coord[2]=Origin[2];
-  VolumePositionCorrection(coord);
+  MultiplyPointByInputVolumeABSMatrix(coord);
 
   for(int i = 0; i < m_CurrentSurface.size(); i++)
   {
@@ -960,12 +960,12 @@ void mafViewSlice::Print(std::ostream& os, const int tabs)// const
 }
 
 //-------------------------------------------------------------------------
-void mafViewSlice::VolumePositionCorrection(double *point)
+void mafViewSlice::MultiplyPointByInputVolumeABSMatrix(double *point)
 //-------------------------------------------------------------------------
 {
   if(m_CurrentVolume && m_CurrentVolume->m_Vme)
   {
-    mafMatrix *mat = ((mafVME *)m_CurrentVolume->m_Vme)->GetOutput()->GetMatrix();
+    mafMatrix *mat = ((mafVME *)m_CurrentVolume->m_Vme)->GetAbsMatrixPipe()->GetMatrixPointer();
     double coord[4];
     coord[0] = point[0];
     coord[1] = point[1];
