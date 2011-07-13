@@ -2,8 +2,8 @@
 Program:   MED
 Module:    $RCSfile: medOpMergeDicomSeries.h,v $
 Language:  C++
-Date:      $Date: 2011-05-30 08:58:59 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2011-07-13 12:53:06 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Alberto Losi
 ==========================================================================
 Copyright (c) 2009
@@ -46,6 +46,7 @@ protected:
 
   mafString m_DicomDirectoryABSFileName;
   vtkDirectory  *m_DICOMDirectoryReader;
+  int m_DicomSeriesInstanceUID;
 
-  bool RanameSeriesAndManufacturer(const char *dicomDirABSPath);
+  bool RanameSeriesAndManufacturer(const char *dicomDirABSPath, int dicomSeriesUID);
 };

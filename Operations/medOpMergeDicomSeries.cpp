@@ -2,8 +2,8 @@
 Program:   MED
 Module:    $RCSfile: medOpMergeDicomSeries.cpp,v $
 Language:  C++
-Date:      $Date: 2011-05-30 09:39:07 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2011-07-13 12:53:06 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Alberto Losi
 ==========================================================================
 Copyright (c) 2009
@@ -61,6 +61,7 @@ mafOp(label)
 //----------------------------------------------------------------------------
 {
 	m_OpType = OPTYPE_OP;
+  m_DicomSeriesInstanceUID = -1;
 }
 //----------------------------------------------------------------------------
 medOpMergeDicomSeries::~medOpMergeDicomSeries()
@@ -103,8 +104,14 @@ void medOpMergeDicomSeries::OpRun()
 				((medGUIDicomSettings*)GetSetting())->SetLastDicomDir(path);
 				m_DicomDirectoryABSFileName = path.c_str();
 
+        int m_DicomSeriesInstanceUID = wxGetNumberFromUser(_("Series number"),_("Insert the series  ID for the output merged series"),"Input",999,0,999);
+        if( m_DicomSeriesInstanceUID == -1)
+        {
+          mafEventMacro(mafEvent(this,OP_RUN_CANCEL)); 
+          return;
+        }
         // call the "renaming" function
-        RanameSeriesAndManufacturer(m_DicomDirectoryABSFileName);
+        RanameSeriesAndManufacturer(m_DicomDirectoryABSFileName,m_DicomSeriesInstanceUID);
 			}
 			else
 			{
@@ -124,7 +131,7 @@ void medOpMergeDicomSeries::OpRun()
   
 }
 //----------------------------------------------------------------------------
-bool medOpMergeDicomSeries::RanameSeriesAndManufacturer(const char *dicomDirABSPath)
+bool medOpMergeDicomSeries::RanameSeriesAndManufacturer(const char *dicomDirABSPath, int dicomSeriesUID)
 //----------------------------------------------------------------------------
 {
   // This function change the value for the dicom tag
@@ -227,7 +234,9 @@ bool medOpMergeDicomSeries::RanameSeriesAndManufacturer(const char *dicomDirABSP
       }
 
       // change dicom SeriesUID tag to 999 for all images in order to merge them to a single series
-      const char *dcmSeriesInstanceUID = "999";
+      assert(dicomSeriesUID != -1);
+      wxString strDcmSeriesInstanceUID = wxString::Format("%i",dicomSeriesUID);
+      const char *dcmSeriesInstanceUID = (const char*)strDcmSeriesInstanceUID.mb_str();
       status = dicomDataset->putAndInsertString(DCM_SeriesInstanceUID,dcmSeriesInstanceUID);
 
       // change the manufacturer to invalid in order to "inform" dicom importer that this data was merged by this op
