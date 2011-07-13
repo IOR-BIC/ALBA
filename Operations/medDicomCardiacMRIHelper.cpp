@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medDicomCardiacMRIHelper.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-05-06 10:12:48 $
-  Version:   $Revision: 1.1.2.21 $
+  Date:      $Date: 2011-07-13 12:15:10 $
+  Version:   $Revision: 1.1.2.22 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -66,7 +66,7 @@ medDicomCardiacMRIHelper::~medDicomCardiacMRIHelper()
 
 }
 
-void medDicomCardiacMRIHelper::ParseDicomDirectory() 
+int medDicomCardiacMRIHelper::ParseDicomDirectory() 
 {
   // core parsing and transformation code: matlab pseudo code is used
   // in comments and identified by the matlab comment symbol (%)
@@ -114,10 +114,10 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
   }
   else
   { 
-	std::ostringstream stringStream;
-	stringStream << "Unsupported mode: " << m_Mode << std::endl;          
-	mafLogMessage(stringStream.str().c_str());
-	return;
+	  std::ostringstream stringStream;
+	  stringStream << "Unsupported mode: " << m_Mode << std::endl;          
+	  mafLogMessage(stringStream.str().c_str());
+	  return MAF_ERROR;
   }
   
   wxString file1ABSFileName = dicomABSFileNamesVector[0].c_str();
@@ -138,6 +138,12 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
 
   // planesPerFrame
   planesPerFrame = dicomABSFileNamesVector.size() / timeFrames;
+
+  if (planesPerFrame == 0)
+  {
+    vtkDEL(directoryReader);
+    return MAF_ERROR;
+  }
 
   //   spacing = info.PixelSpacing;
   // 
@@ -473,7 +479,7 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
       int col = int(frame(i,0)-1);
       int row = seriesNumbers[i] - minSeriesNumber;
 
-      fileNumberForPlaneIFrameJ.put(row,col,i);
+      fileNumberForPlaneIFrameJ.put(col,row,i);
     }
   }
   m_FileNumberForPlaneIFrameJ = fileNumberForPlaneIFrameJ;
@@ -1093,6 +1099,8 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
 	  cppDEL(busyCursor);
 	  cppDEL(busyInfo);
   }
+
+  return MAF_OK;
 }
 
 void medDicomCardiacMRIHelper::RemoveRows\

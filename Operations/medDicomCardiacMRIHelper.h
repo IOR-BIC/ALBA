@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medDicomCardiacMRIHelper.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:00:03 $
-  Version:   $Revision: 1.1.2.9 $
+  Date:      $Date: 2011-07-13 12:15:10 $
+  Version:   $Revision: 1.1.2.10 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -95,7 +95,7 @@ public:
 
   /** 
   Perform dicom directory parsing: works on a single dicom series only*/
-  void ParseDicomDirectory();
+  int ParseDicomDirectory();
 
   /** 
   Query for dicom dir parsing results: look at the matlab script for further informations.

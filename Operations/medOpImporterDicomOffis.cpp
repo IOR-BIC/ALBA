@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2011-07-12 11:24:51 $
-Version:   $Revision: 1.1.2.132 $
+Date:      $Date: 2011-07-13 12:15:10 $
+Version:   $Revision: 1.1.2.133 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -3219,6 +3219,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 		// Cardiac MRI Handling
 		//---------------------------------------
 
+    std::vector<std::vector<mafString>> seriesToDelete;
 		// foreach series
 		for ( it=m_SeriesIDToSlicesListMap.begin() ; it != m_SeriesIDToSlicesListMap.end(); it++ )
 		{
@@ -3249,12 +3250,16 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 				currentHelper->SetListener(this);
 				currentHelper->SetModeToInputDicomSlicesABSFileNamesVector();
 				currentHelper->SetInputDicomSlicesABSFileNamesVector(absFileNames);
-				currentHelper->ParseDicomDirectory();
 
 				std::vector<mafString> seriesId = (*it).first;
 
-				m_SeriesIDToCardiacMRIHelperMap[seriesId] = currentHelper;
+        if (currentHelper->ParseDicomDirectory() != MAF_OK)
+        {
+          seriesToDelete.push_back(seriesId);
+          continue;
+        }
 
+				m_SeriesIDToCardiacMRIHelperMap[seriesId] = currentHelper;
 
 				vnl_matrix<double> rotateFlag = currentHelper->GetRotateFlagIdPlaneMatrix();
 
@@ -3441,7 +3446,17 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 
 				}
 			}
-		}  
+		}
+
+    for (int i=0;i<seriesToDelete.size();++i)
+    {
+      m_SeriesIDToCardiacMRIHelperMap.erase(seriesToDelete[i]);
+      m_SeriesIDToSlicesListMap.erase(seriesToDelete[i]);
+
+      wxMessageBox("ERROR during reading series");
+      mafLogMessage("ERROR during reading series : %s %s",seriesToDelete[i].at(0).GetCStr(),seriesToDelete[i].at(1).GetCStr());
+    }
+    
 
 		return true;
 	}
