@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medInteractorPERBrushFeedback.h,v $
 Language:  C++
-Date:      $Date: 2011-06-13 16:02:54 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2011-07-13 11:50:45 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Eleonora Mambrini, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -41,6 +41,7 @@ public:
 
   mafTypeMacro(medInteractorPERBrushFeedback,mafInteractorPER);
 
+  /* Main event handler */
   virtual void OnEvent(mafEventBase *event);
 
   /** Remove actor from render */
