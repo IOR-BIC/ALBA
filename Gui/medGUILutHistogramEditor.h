@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILutHistogramEditor.h,v $
   Language:  C++
-  Date:      $Date: 2011-07-13 12:38:21 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2011-07-14 08:23:37 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -24,22 +24,13 @@
 
 #include "vtkLookupTable.h"
 #include "mafVMEVolumeGray.h"
-/** mafGUILutEditor : vtkLookupTable Editor
+/** medGUIHistogramLutEditor : vtkLookupTable Histogram Based Editor
 
   USAGE:
-  - call the static member mafGUILutEditor::ShowLutDialog(vtkLookupTable *lut)
+  - call the static member medGUILutHistogramEditor::ShowLutHistogramDialog(mafVME *vme, vtkLookupTable *lut,char *name, mafObserver *listener, int id)
 
-  FEATURES:
-  - 20 preset available @sa mafLutPreset
-  - editable number of LUT entries - limited to [1..256]
-  - scalars range editing  --- ( 4 programmers - Set and Get it by calling Set/GetRange on your vtkLookupTable )
-  - LUT Entry selection:
-    - single selection -- mouse left click
-    - range selection  -- mouse left click + drag
-    - sparse selection -- mouse right click
-  - Selected entries can be "shaded" interpolating first and last color both in RGBA and HSV space.
-
-@sa mafColor mafGUIColorSwatch mafGUIColorWidget mafGUILutPreset mafGUILutSwatch mafGUILutWidget
+  
+@sa medGUILutSwatch medGUILutHistogramSwatch
 */
 class mafVME;
 class mafGUI;
@@ -59,17 +50,24 @@ public:
 
   /** Constructor. */
   medGUILutHistogramEditor(mafVME *vme, vtkLookupTable *lut, char *name="Histogram & Windowing", mafObserver *Listener=NULL, int id=MINID);
+  
   /** Destructor. */
   virtual ~medGUILutHistogramEditor(); 
   
   /** Set the event listener */
   virtual void SetListener(mafObserver *Listener) {m_Listener = Listener;};
 
+  /** Get the event listener */
+  virtual mafObserver *GetListener() {return m_Listener;};
+
   /* Main event handler */
   void OnEvent(mafEventBase *maf_event);
 
   /** Assign the external lookup table to the widget.*/
   void SetLut(vtkLookupTable *lut);
+
+  /** Assign the external lookup table to the widget.*/
+  vtkLookupTable *GetLut(){return m_ExternalLut;};
 
   /** Show the dialog.*/
   static void ShowLutHistogramDialog(mafVME *vme, vtkLookupTable *lut, char *name="Histogram & Windowing", mafObserver *Listener=NULL, int id=MINID);

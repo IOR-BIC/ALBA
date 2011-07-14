@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILutHistogramSwatch.h,v $
   Language:  C++
-  Date:      $Date: 2011-07-13 12:38:21 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2011-07-14 08:23:37 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -29,19 +29,31 @@ public:
   medGUILutHistogramSwatch(wxWindow* parent, wxWindowID id = -1, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(100,50), long style = wxTAB_TRAVERSAL );
 
   /** Set the Lock Up Table */
-  void     SetLut(vtkLookupTable *lut); 
+  void SetLut(vtkLookupTable *lut);
+
+  /** Assign the external lookup table to the widget.*/
+  vtkLookupTable *GetLut(){return m_Lut;};
+
   /** Set the VME for the histogram */
-  void     SetVME(mafVME *vme); 
+  void SetVME(mafVME *vme); 
   
   /** 
   -if b=true LeftMouseButtonDown will pop-up the LutEditor
   -the user is notified anyway
   -default = false
   */
-  void     SetEditable(bool b) {m_Editable = b;};  
+  void SetEditable(bool b) {m_Editable = b;};  
+
+  /* return true if the pop-up menu is enabled */
+  bool IsEditable(){return m_Editable;};
 
   /** Set the event listener */
   virtual void SetListener(mafObserver *Listener) {m_Listener = Listener;};
+
+  /** Get the event listener */
+  virtual mafObserver *GetListener() {return m_Listener;};
+
+
 protected:
   mafObserver *m_Listener;
 

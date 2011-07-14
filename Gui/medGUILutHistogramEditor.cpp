@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILutHistogramEditor.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-07-13 12:38:21 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2011-07-14 08:23:37 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -165,8 +165,7 @@ void medGUILutHistogramEditor::OnEvent(mafEventBase *maf_event)
 	  {
       case ID_RANGE_MODIFIED:
         {
-          mafGUILutSlider *lut;
-          lut->GetSubRange(&m_LowRange, &m_HiRange);
+          m_Windowing->GetSubRange(&m_LowRange, &m_HiRange);
           UpdateVolumeLut();
           //Generating Event to update other views
           mafEventMacro(mafEvent(this,GetId()));
@@ -174,8 +173,6 @@ void medGUILutHistogramEditor::OnEvent(mafEventBase *maf_event)
         break;
       case ID_GAMMA_CORRETION:
         {
-          mafGUIFloatSlider *gamma;
-          m_Gamma = gamma->GetValue(); 
           UpdateVolumeLut();
           //Generating Event to update other views
           mafEventMacro(mafEvent(this,GetId()));
