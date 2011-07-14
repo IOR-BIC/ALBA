@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILutHistogramEditor.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-07-14 08:23:37 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2011-07-14 15:29:26 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -96,7 +96,7 @@ medGUILutHistogramEditor::medGUILutHistogramEditor(mafVME *vme, vtkLookupTable *
 
   double sr[2], srR[2];
   mmaVolumeMaterial *material = ((mafVMEVolume *)m_Volume)->GetMaterial();
-  
+ 
   //resampling data beacouse full histograms
   //take long time
   vtkDataSet *data, *dataResampled;
@@ -136,7 +136,9 @@ medGUILutHistogramEditor::medGUILutHistogramEditor(mafVME *vme, vtkLookupTable *
   this->SetMinSize(wxSize(500,124));
 
   m_Windowing->SetRange((long)sr[0],(long)sr[1]);
-  m_Windowing->SetSubRange((long)material->m_TableRange[0],(long)material->m_TableRange[1]);
+  double ranges[2];
+  material->m_ColorLut->GetTableRange(ranges);
+  m_Windowing->SetSubRange(ranges[0],ranges[1]);
   histogram->Refresh();
 
   this->ShowModal();
@@ -412,7 +414,8 @@ void medGUILutHistogramEditor::UpdateVolumeLut(bool reset)
 
     material->UpdateFromTables();
     material->ApplyGammaCorrection(4);
-    
+    material->UpdateProp();
+
   }
   //Forward event to update other views
   mafEventMacro(mafEvent(this, CAMERA_UPDATE));

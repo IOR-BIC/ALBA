@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2011-07-12 15:45:37 $
-Version:   $Revision: 1.1.2.5 $
+Date:      $Date: 2011-07-14 15:29:53 $
+Version:   $Revision: 1.1.2.6 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
@@ -474,11 +474,15 @@ void medOpSegmentation::CreateOpDialog()
   m_LutSlider->SetSize(650,24);
   m_LutSlider->SetMinSize(wxSize(650,24));
 
+
   wxBoxSizer * hSz1 = new wxBoxSizer(wxHORIZONTAL);
 
   wxBoxSizer * vSz1 = new wxBoxSizer(wxVERTICAL);
   vSz1->Add(m_View->m_Rwi->m_RwiBase, 1, wxEXPAND | wxALL, 5 );
   vSz1->Add(m_LutSlider, 0,wxLEFT );
+
+  m_LutSlider->Update();
+
 
   wxBoxSizer * vSz2 = new wxBoxSizer(wxVERTICAL);
 
@@ -671,7 +675,6 @@ void medOpSegmentation::DeleteOpDialog()
   {
     cppDEL(m_SegmentationOperationsRollOut[i]);
     cppDEL(m_SegmentationOperationsGui[i]);
-
   }
 
   cppDEL(m_SliceSlider);
@@ -3399,15 +3402,18 @@ void medOpSegmentation::UpdateWindowing()
 //----------------------------------------------------------------------------
 {
   mafVMEOutputVolume *volumeOutput = mafVMEOutputVolume::SafeDownCast(m_Volume->GetOutput());
-  double sr[2];
+  double sr[2],subR[2];
   volumeOutput->GetVTKData()->GetScalarRange(sr);
   mmaVolumeMaterial *currentSurfaceMaterial = volumeOutput->GetMaterial();
+  currentSurfaceMaterial->m_ColorLut->GetTableRange(subR);
+
   m_ColorLUT = volumeOutput->GetMaterial()->m_ColorLut;
   volumeOutput->GetMaterial()->UpdateProp();
   m_LutWidget->SetLut(m_ColorLUT);
   m_LutWidget->Enable(true);
-  m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
-  m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
+  m_LutSlider->SetRange(sr[0],sr[1]);
+  m_LutSlider->SetSubRange(subR[0],subR[1]);
+
 }
 
 //----------------------------------------------------------------------------
