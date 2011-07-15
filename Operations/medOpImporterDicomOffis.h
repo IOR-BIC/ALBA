@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2011-07-12 11:24:51 $
-Version:   $Revision: 1.1.2.55 $
+Date:      $Date: 2011-07-15 12:40:39 $
+Version:   $Revision: 1.1.2.56 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -387,6 +387,9 @@ public:
 		m_DcmImagePositionPatient[0] = -9999;
 		m_DcmImagePositionPatient[1] = -9999;
 		m_DcmImagePositionPatient[2] = -9999;
+    m_DcmImagePositionPatientOriginal[0] = m_DcmImagePositionPatient[0];
+    m_DcmImagePositionPatientOriginal[1] = m_DcmImagePositionPatient[1];
+    m_DcmImagePositionPatientOriginal[2] = m_DcmImagePositionPatient[2];
 		m_DcmImageOrientationPatient[0] = 0.0;
 		m_DcmImageOrientationPatient[1] = 0.0; 
 		m_DcmImageOrientationPatient[2] = 0.0; 
@@ -407,6 +410,9 @@ public:
 		m_DcmImagePositionPatient[0] = dcmImagePositionPatient[0];
 		m_DcmImagePositionPatient[1] = dcmImagePositionPatient[1];
 		m_DcmImagePositionPatient[2] = dcmImagePositionPatient[2];
+    m_DcmImagePositionPatientOriginal[0] = m_DcmImagePositionPatient[0];
+    m_DcmImagePositionPatientOriginal[1] = m_DcmImagePositionPatient[1];
+    m_DcmImagePositionPatientOriginal[2] = m_DcmImagePositionPatient[2];
 		m_DcmImageOrientationPatient[0] = dcmImageOrientationPatient[0];
 		m_DcmImageOrientationPatient[1] = dcmImageOrientationPatient[1];
 		m_DcmImageOrientationPatient[2] = dcmImageOrientationPatient[2];
@@ -476,6 +482,14 @@ public:
 		dcmImagePositionPatient[2]=m_DcmImagePositionPatient[2];
 	};
 
+  /** Get the DcmImagePositionPatient tag original for the slice */
+  void GetDcmImagePositionPatientOriginal(double dcmImagePositionPatient[3])
+  {
+    dcmImagePositionPatient[0]=m_DcmImagePositionPatientOriginal[0];
+    dcmImagePositionPatient[1]=m_DcmImagePositionPatientOriginal[1];
+    dcmImagePositionPatient[2]=m_DcmImagePositionPatientOriginal[2];
+  };
+
 
 	/** Set the DcmImageOrientationPatient tag for the slice*/
 	void SetDcmImageOrientationPatient(double dcmImageOrientationPatient[6])
@@ -505,6 +519,7 @@ public:
 
 protected:
 	double m_DcmImagePositionPatient[3];
+  double m_DcmImagePositionPatientOriginal[3];
 	double m_DcmImageOrientationPatient[6];
 	mafString m_SliceABSFileName;
 

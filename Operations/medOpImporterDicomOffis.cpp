@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2011-07-13 13:40:03 $
-Version:   $Revision: 1.1.2.134 $
+Date:      $Date: 2011-07-15 12:40:38 $
+Version:   $Revision: 1.1.2.135 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -115,6 +115,8 @@ MafMedical is partially based on OpenMAF.
 #include "vtkUnsignedShortArray.h"
 #include "vtkCharArray.h"
 #include "vtkImageFlip.h"
+
+#include "vtkMath.h"
 
 //BES: 4.7.2009 - VS 2008 cannot compile it due to the following error
 //C:\MAF\Medical\Libraries\Offis\Sources\dcmtk-3.5.4\config\include\dcmtk/config/cfwin32.h(362) : error C2371: 'ssize_t' : redefinition; different basic types
@@ -1182,6 +1184,72 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 	int progressCounter = 0;
 	// for every timestamp
 
+  bool applyCorrectionToRotateZcoordinate = false;
+  if (m_SeriesIDContainsRotationsMap[m_SelectedSeriesID] == true  && m_ApplyRotation)
+  {
+    applyCorrectionToRotateZcoordinate = true;
+    bool forcedToExit = false;
+    bool storedFirstCosinDirector = false;
+    double cosinDirectorToCheck[6];
+    for (int ts = 0; ts < m_NumberOfTimeFrames; ts++)
+    {
+      int probeHeigthId = 0;
+      for (int sourceVolumeSliceId = m_ZCropBounds[0], targetVolumeSliceId = 0; sourceVolumeSliceId < m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
+      {
+        // show the current slice
+        currImageId = GetSliceIDInSeries(ts, probeHeigthId);
+
+        if (storedFirstCosinDirector)
+        {
+          double cosinDirector[6];
+          m_SelectedSeriesSlicesList->Item(currImageId)->GetData()->GetDcmImageOrientationPatient(cosinDirector);
+
+          for (int i=0;i<6;++i)
+          {
+            if (cosinDirector[i] != cosinDirectorToCheck[i])
+            {
+              int result = wxMessageBox(_("WARNING: slices aren't parallel in Z axis. Do you want force this?"),"",wxOK|wxCENTRE|wxCANCEL);
+              if (result == wxOK)
+              {
+                applyCorrectionToRotateZcoordinate = true;
+              }
+              else
+              {
+                applyCorrectionToRotateZcoordinate = false;
+              }
+
+              forcedToExit = true;
+              break;
+            }
+          }
+          if (forcedToExit)
+          {
+            break;
+          }
+        }
+        else
+        {
+          m_SelectedSeriesSlicesList->Item(currImageId)->GetData()->GetDcmImageOrientationPatient(cosinDirectorToCheck);
+        }
+
+        if (forcedToExit)
+        {
+          break;
+        }
+
+        targetVolumeSliceId++;
+        probeHeigthId++;
+
+      }
+
+      if (forcedToExit)
+      {
+        break;
+      }
+
+    }
+  }
+
 	for (int ts = 0; ts < m_NumberOfTimeFrames; ts++)
 	{
 		// BEWARE:
@@ -1215,6 +1283,10 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 		element0 = (medDicomSlice *)m_SelectedSeriesSlicesList->Item(tsImageId)->GetData();
 		mafTimeStamp tsDouble = (mafTimeStamp)(element0->GetDcmTriggerTime());
 
+    double oldZPosTrasformed = -1.0;
+    double oldOrigin[3];
+
+
 		for (int sourceVolumeSliceId = m_ZCropBounds[0], targetVolumeSliceId = 0; sourceVolumeSliceId < m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
 		{
 			if(!this->m_TestMode)
@@ -1232,6 +1304,51 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 				// update v_texture ivar
 				GenerateSliceTexture(currImageId);
 			}
+
+      if (applyCorrectionToRotateZcoordinate)
+      {
+	      if (targetVolumeSliceId != 0)
+	      {
+	        double originSlice[3];
+	        m_SelectedSeriesSlicesList->Item(currImageId)->GetData()->GetDcmImagePositionPatientOriginal(originSlice);
+	
+	        vtkImageData *im = m_SliceTexture->GetInput();
+	        im->Update();
+	
+	        double originTexture[3];
+	        im->GetOrigin(originTexture);
+	
+	        double newZPosTransformed;
+	
+	        double spacing = sqrt(vtkMath::Distance2BetweenPoints(originSlice,oldOrigin));
+	
+	        newZPosTransformed = oldZPosTrasformed - spacing;
+	
+	        oldZPosTrasformed = newZPosTransformed;
+	
+	        for (int i=0;i<3;++i)
+	        {
+	          oldOrigin[i] = originSlice[i];
+	        }
+	
+	        originTexture[2] = newZPosTransformed;
+	
+	        im->SetOrigin(originTexture);
+	        im->Update();
+	      }
+	      else
+	      {
+          double originSlice[3];
+          m_SelectedSeriesSlicesList->Item(currImageId)->GetData()->GetDcmImagePositionPatientOriginal(originSlice);
+	
+	        oldZPosTrasformed = originSlice[2];
+	
+	        for (int i=0;i<3;++i)
+	        {
+	          oldOrigin[i] = originSlice[i];
+	        }
+	      }
+      }
 
 			vtkImageData *imageData = NULL;
 			imageData = m_SliceTexture->GetInput();
@@ -3347,7 +3464,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 							double center[3] = {-9999,-9999,-9999};
 							imageData->GetCenter(center);
 
-							double bounds[6] = {-9999,-9999,-9999};
+							double bounds[6] = {-9999,-9999,-9999,-9999,-9999,-9999};
 							imageData->GetBounds(bounds);
 
 							vtkTransform *tr = vtkTransform::New();
