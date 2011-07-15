@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2011-07-15 12:40:39 $
-Version:   $Revision: 1.1.2.56 $
+Date:      $Date: 2011-07-15 16:09:17 $
+Version:   $Revision: 1.1.2.57 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -300,9 +300,8 @@ protected:
 	mafString m_PatientName;
 	mafString m_SurgeonName;
 	mafString	m_Identifier;
-  mafString m_StudyDate;
-  mafString m_SeriesDescription;
 	mafString m_PatientPosition;
+  mafString m_VolumeName;
 
 	int				m_BuildStepValue;
 	int				m_DicomReaderModality; ///<Type DICOM Read from file
@@ -321,7 +320,6 @@ protected:
 
 	std::map<std::vector<mafString>,bool> m_SeriesIDContainsRotationsMap; ///< StudyUID-SeriesUIDWithPlanesNumber-SeriesUIDWithoutPlanesNumber vector to boolean map 
 
-	mafString	m_VolumeName;
 	wxString  m_CurrentSliceABSFileName;
 	int				m_VolumeSide;
 
@@ -383,6 +381,8 @@ public:
 	/** constructor */
 	medDicomSlice() 
 	{
+    m_Description = "###";
+    m_Date = "###";
 		m_SliceABSFileName = "";
 		m_DcmImagePositionPatient[0] = -9999;
 		m_DcmImagePositionPatient[1] = -9999;
@@ -404,8 +404,10 @@ public:
 
 	/** overloaded constructor */
 	medDicomSlice(mafString sliceABSFilename,double dcmImagePositionPatient[3], double dcmImageOrientationPatient[6],\
-		vtkImageData *data ,int dcmInstanceNumber=-1, int dcmCardiacNumberOfImages=-1, double dcmTtriggerTime=-1.0)  
+		vtkImageData *data , mafString description, mafString date,int dcmInstanceNumber=-1, int dcmCardiacNumberOfImages=-1, double dcmTtriggerTime=-1.0)  
 	{
+    m_Description = description;
+    m_Date = date;
 		m_SliceABSFileName = sliceABSFilename;
 		m_DcmImagePositionPatient[0] = dcmImagePositionPatient[0];
 		m_DcmImagePositionPatient[1] = dcmImagePositionPatient[1];
@@ -516,12 +518,20 @@ public:
 	/** 
 	Write dicom slice orientation on matrix*/
 	void GetOrientation( vtkMatrix4x4 * matrix );
+ 
+  /** return the description */
+  mafString GetDescription(){return m_Description;};
+
+  /** return the date */
+  mafString GetDate(){return m_Date;};
 
 protected:
 	double m_DcmImagePositionPatient[3];
   double m_DcmImagePositionPatientOriginal[3];
 	double m_DcmImageOrientationPatient[6];
 	mafString m_SliceABSFileName;
+  mafString m_Description;
+  mafString m_Date;
 
 	double m_DcmTriggerTime;
 	int m_DcmInstanceNumber;
