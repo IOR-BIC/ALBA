@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILutHistogramEditor.h,v $
   Language:  C++
-  Date:      $Date: 2011-07-15 14:54:17 $
-  Version:   $Revision: 1.1.2.4 $
+  Date:      $Date: 2011-07-15 16:17:40 $
+  Version:   $Revision: 1.1.2.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -38,6 +38,7 @@ class mafGUI;
 
 class mafGUIFloatSlider;
 class mafGUILutSlider;
+class mafGUIHistogramWidget;
 
 class medGUILutHistogramEditor: public mafGUIDialog
 {
@@ -47,6 +48,7 @@ public:
     ID_ = MINID,
     ID_GAMMA_CORRETION,
     ID_RESET_LUT,
+    ID_FULL_SAMPLING
   };
 
   /** Constructor. */
@@ -97,12 +99,13 @@ protected:
   vtkDataSet *m_DataSet;
   vtkDataArray *m_ResampledData;
 
-  int m_resapling;
+  int m_FullSampling;
   double m_Gamma;
   double m_LowRange;
   double m_HiRange;
+  
 
-
+  mafGUIHistogramWidget *m_Histogram;
   medGUILutHistogramSwatch   *m_LutSwatch;
   vtkLookupTable *m_ExternalLut;  ///< Given lut that will be modified by "ok" or "apply"
   vtkLookupTable *m_Lut;          ///< Internal lut -- initialized in SetLut

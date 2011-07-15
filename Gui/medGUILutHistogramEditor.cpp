@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILutHistogramEditor.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-07-15 14:54:17 $
-  Version:   $Revision: 1.1.2.5 $
+  Date:      $Date: 2011-07-15 16:17:40 $
+  Version:   $Revision: 1.1.2.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -56,6 +56,7 @@ medGUILutHistogramEditor::medGUILutHistogramEditor(vtkDataSet *dataSet,mmaVolume
   SetListener(Listener);
   SetId(id);
   
+  m_FullSampling=0;
 
   /*
   mafVMEVolumeGray *resampled = NULL;
@@ -79,12 +80,12 @@ medGUILutHistogramEditor::medGUILutHistogramEditor(vtkDataSet *dataSet,mmaVolume
   tag_name = "HISTOGRAM_VOLUME";
 
   //Setting up the histogram
-  mafGUIHistogramWidget *histogram = new mafGUIHistogramWidget(gui,-1,wxPoint(0,0),wxSize(500,100),wxTAB_TRAVERSAL); //,true);
-  histogram->SetLut(  material->m_ColorLut );
-  histogram->SetListener(gui);
-  histogram->SetRepresentation(vtkMAFHistogram::BAR_REPRESENTATION);
-  histogram->SetData(m_ResampledData);
-  gui->Add(histogram,1);
+  m_Histogram = new mafGUIHistogramWidget(gui,-1,wxPoint(0,0),wxSize(500,100),wxTAB_TRAVERSAL); //,true);
+  m_Histogram->SetLut(  material->m_ColorLut );
+  m_Histogram->SetListener(gui);
+  m_Histogram->SetRepresentation(vtkMAFHistogram::BAR_REPRESENTATION);
+  m_Histogram->SetData(m_ResampledData);
+  gui->Add(m_Histogram,1);
 
 
   m_Windowing = new mafGUILutSlider(gui,-1,wxPoint(0,0),wxSize(500,24));
@@ -95,6 +96,11 @@ medGUILutHistogramEditor::medGUILutHistogramEditor(vtkDataSet *dataSet,mmaVolume
   //gamma correction slider 
   m_Gamma = material->m_GammaCorrection;
   m_GammaSlider = gui->FloatSlider(ID_GAMMA_CORRETION,_("Gamma: "), &m_Gamma,0,5, wxSize(400,30), "", false);
+
+  //Activate only if required
+  if (m_DataSet->GetPointData()->GetScalars()->GetNumberOfTuples()>SUB_SAMPLED_SIZE)
+    gui->Bool(ID_FULL_SAMPLING,"Full Sampling (accurate but slow)",&m_FullSampling,1);
+  
   gui->Button(ID_RESET_LUT,"Reset Lut");
   this->Add(gui,1);
   this->SetMinSize(wxSize(500,124));
@@ -104,7 +110,7 @@ medGUILutHistogramEditor::medGUILutHistogramEditor(vtkDataSet *dataSet,mmaVolume
   double ranges[2];
   material->m_ColorLut->GetTableRange(ranges);
   m_Windowing->SetSubRange(ranges[0],ranges[1]);
-  histogram->Refresh();
+  m_Histogram->Refresh();
 
   this->ShowModal();
 
@@ -157,6 +163,17 @@ void medGUILutHistogramEditor::OnEvent(mafEventBase *maf_event)
             mafEventMacro(mafEvent(this,GetId()));
         }
         break;
+      case ID_FULL_SAMPLING:
+      {
+         wxBusyCursor wait;
+         
+         if (m_FullSampling)
+           m_Histogram->SetData(m_DataSet->GetPointData()->GetScalars());
+         else 
+           m_Histogram->SetData(m_ResampledData);
+
+      }
+      break;
     }
   }
 }
@@ -237,7 +254,7 @@ vtkDataArray* medGUILutHistogramEditor::Resample(vtkDataArray *inDA, vtkDataArra
   outDA=tmp;
   
   //Generating new resampled dataset
-  outDA->SetNumberOfTuples(SUB_SAMPLED_SIZE);
+  outDA->SetNumberOfTuples(SUB_SAMPLED_SIZE + 2);
   outDA->SetName("SCALARS");
 
 
@@ -249,6 +266,9 @@ vtkDataArray* medGUILutHistogramEditor::Resample(vtkDataArray *inDA, vtkDataArra
     double value = inDA->GetTuple1( ceil( i * fullSize / (double)SUB_SAMPLED_SIZE ) );
     outDA->SetTuple1(i,value);
   }
+  //Add the min and max values in order to obtain the same range after sub-sampling
+  outDA->SetTuple1(SUB_SAMPLED_SIZE,inDA->GetRange()[0]);
+  outDA->SetTuple1(SUB_SAMPLED_SIZE+1,inDA->GetRange()[1]);
 
   outDA->ComputeRange(0);
 
