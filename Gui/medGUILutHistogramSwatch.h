@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILutHistogramSwatch.h,v $
   Language:  C++
-  Date:      $Date: 2011-07-14 08:23:37 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2011-07-15 14:54:17 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,7 +20,8 @@
 /** mafGUILutSwatch : widget representing a LUT, usually used to call the LutEditor.
 @sa mafGUILutEditor
 */
-class mafVME;
+class vtkDataSet;
+class mmaVolumeMaterial;
 
 class MAF_EXPORT medGUILutHistogramSwatch: public wxPanel
 {
@@ -29,13 +30,10 @@ public:
   medGUILutHistogramSwatch(wxWindow* parent, wxWindowID id = -1, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(100,50), long style = wxTAB_TRAVERSAL );
 
   /** Set the Lock Up Table */
-  void SetLut(vtkLookupTable *lut);
-
-  /** Assign the external lookup table to the widget.*/
-  vtkLookupTable *GetLut(){return m_Lut;};
+  void SetMaterial(mmaVolumeMaterial *material);
 
   /** Set the VME for the histogram */
-  void SetVME(mafVME *vme); 
+  void SetDataSet(vtkDataSet *dataSet); 
   
   /** 
   -if b=true LeftMouseButtonDown will pop-up the LutEditor
@@ -72,9 +70,11 @@ protected:
   /* Show/update the label */
   void OnMouseMotion(wxMouseEvent &event);
   
-  // widgets
+  mmaVolumeMaterial *m_Material;
   vtkLookupTable *m_Lut;
-  mafVME         *m_VME;
+  vtkDataSet *m_DataSet;
+
+  // widgets
   bool            m_MouseInWindow;
   wxString        m_Tip;
   int             m_MouseX;

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILutHistogramEditor.h,v $
   Language:  C++
-  Date:      $Date: 2011-07-14 08:23:37 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2011-07-15 14:54:17 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -32,7 +32,8 @@
   
 @sa medGUILutSwatch medGUILutHistogramSwatch
 */
-class mafVME;
+class vtkDataSet;
+class mmaVolumeMaterial;
 class mafGUI;
 
 class mafGUIFloatSlider;
@@ -49,7 +50,7 @@ public:
   };
 
   /** Constructor. */
-  medGUILutHistogramEditor(mafVME *vme, vtkLookupTable *lut, char *name="Histogram & Windowing", mafObserver *Listener=NULL, int id=MINID);
+  medGUILutHistogramEditor(vtkDataSet *dataSet,mmaVolumeMaterial *material, char *name="Histogram & Windowing", mafObserver *Listener=NULL, int id=MINID);
   
   /** Destructor. */
   virtual ~medGUILutHistogramEditor(); 
@@ -63,19 +64,13 @@ public:
   /* Main event handler */
   void OnEvent(mafEventBase *maf_event);
 
-  /** Assign the external lookup table to the widget.*/
-  void SetLut(vtkLookupTable *lut);
-
-  /** Assign the external lookup table to the widget.*/
-  vtkLookupTable *GetLut(){return m_ExternalLut;};
-
   /** Show the dialog.*/
-  static void ShowLutHistogramDialog(mafVME *vme, vtkLookupTable *lut, char *name="Histogram & Windowing", mafObserver *Listener=NULL, int id=MINID);
+  static void ShowLutHistogramDialog(vtkDataSet *dataSet,mmaVolumeMaterial *material, char *name="Histogram & Windowing", mafObserver *Listener=NULL, int id=MINID);
 
 protected:
 
-  /* Resample the VME becouse full histogram is slow*/
-  static void Resample(mafVME *vme, mafVMEVolumeGray* resampled);
+  /* Resample the VME because full histogram is slow*/
+  static vtkDataArray* Resample(vtkDataArray *inDA, vtkDataArray* outDA);
 
   /* Resets the dialog values to default */
   void ResetLutDialog(double gamma, double low, double high);
@@ -84,7 +79,10 @@ protected:
   void UpdateVolumeLut(bool reset = false);
 
   /* Set the volume for the histogram */
-  void SetVolume(mafVME *vol);
+  void SetMaterial(mmaVolumeMaterial *material);
+
+  /* Set the volume for the histogram */
+  void SetDataSet(vtkDataSet *dataSet);
 
   /** Copy the external Lookup Table given by the user to the internal one.*/
   void CopyLut(vtkLookupTable *from, vtkLookupTable *to);
@@ -94,6 +92,12 @@ protected:
   mafGUIFloatSlider *m_GammaSlider;
   mafGUILutSlider *m_Windowing;
 
+  
+  mmaVolumeMaterial *m_Material;
+  vtkDataSet *m_DataSet;
+  vtkDataArray *m_ResampledData;
+
+  int m_resapling;
   double m_Gamma;
   double m_LowRange;
   double m_HiRange;
@@ -102,7 +106,6 @@ protected:
   medGUILutHistogramSwatch   *m_LutSwatch;
   vtkLookupTable *m_ExternalLut;  ///< Given lut that will be modified by "ok" or "apply"
   vtkLookupTable *m_Lut;          ///< Internal lut -- initialized in SetLut
-  mafVME *m_Volume;
   
 };
 #endif

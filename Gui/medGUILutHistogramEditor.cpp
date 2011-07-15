@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILutHistogramEditor.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-07-14 15:29:26 $
-  Version:   $Revision: 1.1.2.4 $
+  Date:      $Date: 2011-07-15 14:54:17 $
+  Version:   $Revision: 1.1.2.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,92 +22,56 @@
 #include <math.h>
 
 #include "medGUILutHistogramEditor.h"
-#include "mafGUIValidator.h"
-#include "mafGUIButton.h"
 #include "mafGUIFloatSlider.h"
 #include "mafGUILutPreset.h"
 #include "mafGUILutSlider.h"
 #include "mafGUIDialog.h"
-#include "vtkTransform.h"
-#include "mafTransformFrame.h"
 #include "vtkDataSet.h"
-#include "mafVME.h"
-#include "mafVMELandmark.h"
-#include "mafTransform.h"
 #include "vtkPointData.h"
-#include "vtkMAFVolumeResample.h"
-#include "vtkStructuredPoints.h"
 #include "mmaMaterial.h"
 #include "mmaVolumeMaterial.h"
 #include "mafGUIHistogramWidget.h"
-#include "vtkMAFHistogram.h"
+#include "vtkFloatArray.h"
 
-//----------------------------------------------------------------------------
-// const
-//----------------------------------------------------------------------------
-const int  M	= 1;											// margin all around a row
-const int LM	= 5;											// label margin
-const int HM	= 2*M;										// horizontal margin
-
-const int LH	= 16;											// label/entry height
-const int BH	= 20;											// button height
-
-const int LW	= 128; 									  // label width
-const int EW	= 50;											// entry width  - era 45
-const int FW	= LW+LM+EW+HM+EW+HM+EW;		// full width
-const int DW	= EW+HM+EW+HM+EW;					// Data Width - Full Width without the Label
-
-static wxPoint dp = wxDefaultPosition; 
-  
-//----------------------------------------------------------------------------
-// Widgets ID's
-//----------------------------------------------------------------------------
-
+#define SUB_SAMPLED_SIZE (64*64*64)
 
 //----------------------------------------------------------------------------
 // mafGUILutEditor
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-medGUILutHistogramEditor::medGUILutHistogramEditor(mafVME *vme, vtkLookupTable *lut, char *name, mafObserver *Listener, int id)
+//vtkDataSet *dataSet, mmaVolumeMaterial *material, char *name="Histogram & Windowing", mafObserver *Listener=NULL, int id=MINID);
+medGUILutHistogramEditor::medGUILutHistogramEditor(vtkDataSet *dataSet,mmaVolumeMaterial *material, char *name, mafObserver *Listener, int id)
 :mafGUIDialog(name)         
 //----------------------------------------------------------------------------
 {
 	  
-  m_LutSwatch = NULL;// new medGUILutHistogramSwatch(this, -1, dp,wxSize(286,16));
+  m_LutSwatch = NULL;// new medGUILutHistogramSwatch(this, -1, wxDefaultPosition,wxSize(286,16));
+  m_ResampledData = NULL;
   m_Lut = vtkLookupTable::New();
   m_Lut->Build();
 
-  SetVolume(vme);
+  SetDataSet(dataSet);
+  SetMaterial(material);
   SetListener(Listener);
-  SetLut(lut);
   SetId(id);
   
 
-  ///END OLD CODE
+  /*
   mafVMEVolumeGray *resampled = NULL;
   resampled = mafVMEVolumeGray::New();
-
+*/
   wxBusyCursor wait;
   
-  //mafGUIDialog dlg(_("Histogram & Windowing"));
-  //resaple
-  Resample(m_Volume, resampled);
 
-  double sr[2], srR[2];
-  mmaVolumeMaterial *material = ((mafVMEVolume *)m_Volume)->GetMaterial();
- 
-  //resampling data beacouse full histograms
+  //resampling data because full histograms
   //take long time
-  vtkDataSet *data, *dataResampled;
-  data = m_Volume->GetOutput()->GetVTKData();
-  data->Update();
-  data->GetScalarRange(sr);
-
-  dataResampled = resampled->GetOutput()->GetVTKData();
-  dataResampled->Update();
-  dataResampled->GetScalarRange(srR);
-
+  //resample
+  if (m_DataSet->GetPointData()->GetScalars()->GetNumberOfTuples()>SUB_SAMPLED_SIZE)
+    m_ResampledData = Resample(m_DataSet->GetPointData()->GetScalars(), m_ResampledData );
+  else 
+    m_ResampledData = m_DataSet->GetPointData()->GetScalars();
+  
   this->SetListener(Listener);
   mafGUI *gui = new mafGUI(this);
   m_GuiDialog = gui;
@@ -119,7 +83,7 @@ medGUILutHistogramEditor::medGUILutHistogramEditor(mafVME *vme, vtkLookupTable *
   histogram->SetLut(  material->m_ColorLut );
   histogram->SetListener(gui);
   histogram->SetRepresentation(vtkMAFHistogram::BAR_REPRESENTATION);
-  histogram->SetData(dataResampled->GetPointData()->GetScalars());
+  histogram->SetData(m_ResampledData);
   gui->Add(histogram,1);
 
 
@@ -135,7 +99,8 @@ medGUILutHistogramEditor::medGUILutHistogramEditor(mafVME *vme, vtkLookupTable *
   this->Add(gui,1);
   this->SetMinSize(wxSize(500,124));
 
-  m_Windowing->SetRange((long)sr[0],(long)sr[1]);
+  m_Windowing->SetRange(m_LowRange,m_HiRange);
+  m_Windowing->SetSubRange(m_Lut->GetTableRange()[0],m_Lut->GetTableRange()[1]);
   double ranges[2];
   material->m_ColorLut->GetTableRange(ranges);
   m_Windowing->SetSubRange(ranges[0],ranges[1]);
@@ -143,7 +108,6 @@ medGUILutHistogramEditor::medGUILutHistogramEditor(mafVME *vme, vtkLookupTable *
 
   this->ShowModal();
 
-  mafDEL(resampled);
 
 }
 //----------------------------------------------------------------------------
@@ -154,6 +118,10 @@ medGUILutHistogramEditor::~medGUILutHistogramEditor()
   //Deleting Lut
   if(m_Lut) 
     mafDEL(m_Lut);
+
+  //Deleting Sub Sampled Data
+  if (m_ResampledData)
+    vtkDEL(m_ResampledData);
 }
 
 
@@ -194,34 +162,37 @@ void medGUILutHistogramEditor::OnEvent(mafEventBase *maf_event)
 }
 
 //----------------------------------------------------------------------------
-void medGUILutHistogramEditor::SetVolume(mafVME *vol)
+void medGUILutHistogramEditor::SetDataSet(vtkDataSet *dataSet)
 //----------------------------------------------------------------------------
 {
-  m_Volume = vol;
-  mmaVolumeMaterial *material = ((mafVMEVolume *)m_Volume)->GetMaterial();
-
-  m_LowRange = m_Volume->GetOutput()->GetVTKData()->GetScalarRange()[0];
-  m_HiRange = m_Volume->GetOutput()->GetVTKData()->GetScalarRange()[1];
-
-  m_Gamma = material->m_GammaCorrection;
+  m_DataSet = dataSet;
+  
+  m_LowRange = dataSet->GetScalarRange()[0];
+  m_HiRange = dataSet->GetScalarRange()[1];
 }
 
 //----------------------------------------------------------------------------
-void medGUILutHistogramEditor::SetLut(vtkLookupTable *lut)
+void medGUILutHistogramEditor::SetMaterial(mmaVolumeMaterial *material)
 //----------------------------------------------------------------------------
 {
+  m_Material=material;
+  m_Gamma = material->m_GammaCorrection;
+  vtkLookupTable *lut = material->m_ColorLut;
+
   m_ExternalLut = lut;
 
   // copy the given lut on the internal one
   if(m_ExternalLut)
     CopyLut(m_ExternalLut, m_Lut);
-  
+
   //If we have a Lut swatch set the lut to show
   if (m_LutSwatch)
-    m_LutSwatch->SetLut(m_Lut);
-  
+    m_LutSwatch->SetMaterial(m_Material);
+
   TransferDataToWindow();
 }
+
+
 
 //----------------------------------------------------------------------------
 void medGUILutHistogramEditor::CopyLut(vtkLookupTable *from, vtkLookupTable *to)
@@ -243,133 +214,45 @@ void medGUILutHistogramEditor::CopyLut(vtkLookupTable *from, vtkLookupTable *to)
  
 }
 //----------------------------------------------------------------------------
-void medGUILutHistogramEditor::ShowLutHistogramDialog(mafVME *vme, vtkLookupTable *lut,char *name, mafObserver *listener, int id)
+void medGUILutHistogramEditor::ShowLutHistogramDialog(vtkDataSet *dataSet,mmaVolumeMaterial *material,char *name, mafObserver *listener, int id)
 //----------------------------------------------------------------------------
 {
-  //Call the defaut constructor to show the Dialog
-  medGUILutHistogramEditor *led = new medGUILutHistogramEditor(vme,lut,name,listener,id);
+  //Call the default constructor to show the Dialog
+  medGUILutHistogramEditor *led = new medGUILutHistogramEditor(dataSet,material,name,listener,id);
 }
 
 //----------------------------------------------------------------------------
-void medGUILutHistogramEditor::Resample(mafVME *vme, mafVMEVolumeGray* resampled)
+vtkDataArray* medGUILutHistogramEditor::Resample(vtkDataArray *inDA, vtkDataArray* outDA)
 //----------------------------------------------------------------------------
 {
 
-  //THIS FUNCTION WILL BE REPLACED WHIT A VOLUME INDIPENDENT 
-  //SUB-SAMPLING SYSTEM
-  double volumeOrientation[3] = {0.,0.,0.};
-  double volumePosition[3] = {0.,0.,0.};
-  mafSmartPointer<mafTransform> box_pose;
-  box_pose->SetOrientation(volumeOrientation);
-  box_pose->SetPosition(volumePosition);
+  if (outDA)
+    vtkDEL(outDA);
+
+  double fullSize;
+
+  vtkFloatArray *tmp;
+  vtkNEW(tmp);
+
+  outDA=tmp;
+  
+  //Generating new resampled dataset
+  outDA->SetNumberOfTuples(SUB_SAMPLED_SIZE);
+  outDA->SetName("SCALARS");
 
 
-  double bounds[6];
-  vme->GetOutput()->GetVTKData()->GetBounds(bounds);
+  fullSize=inDA->GetNumberOfTuples();
 
-  double spacing[3];
-  vtkImageData::SafeDownCast(vme->GetOutput()->GetVTKData())->GetSpacing(spacing);
-
-  double factor = 4.;
-  spacing[0] *= factor;
-  spacing[1] *= factor;
-  spacing[2] *= factor;
-
-  mafSmartPointer<mafTransformFrame> local_pose;
-  local_pose->SetInput(box_pose);
-
-  mafSmartPointer<mafTransformFrame> output_to_input;
-
-  int output_extent[6];
-  output_extent[0] = 0;
-  output_extent[1] = (bounds[1] - bounds[0]) / spacing[0];
-  output_extent[2] = 0;
-  output_extent[3] = (bounds[3] - bounds[2]) / spacing[1];
-  output_extent[4] = 0;
-  output_extent[5] = (bounds[5] - bounds[4]) / spacing[2];
-
-  if (vtkDataSet *input_data = vme->GetOutput()->GetVTKData())
+  for (int i=0;i<SUB_SAMPLED_SIZE;i++)
   {
-    // the resample filter
-    vtkMAFSmartPointer<vtkMAFVolumeResample> resampler;
-    resampler->SetZeroValue(0.);
-
-    // Set the target be vme's parent frame. And Input frame to the root. I've to 
-    // set at each iteration since I'm using the SetMatrix, which doesn't support
-    // transform pipelines.
-    mafSmartPointer<mafMatrix> output_parent_abs_pose;
-    vme->GetParent()->GetOutput()->GetAbsMatrix(*output_parent_abs_pose.GetPointer(),0.);
-    local_pose->SetInputFrame(output_parent_abs_pose);
-
-    mafSmartPointer<mafMatrix> input_parent_abs_pose;
-    vme->GetParent()->GetOutput()->GetAbsMatrix(*input_parent_abs_pose.GetPointer(),0.);
-    local_pose->SetTargetFrame(input_parent_abs_pose);
-    local_pose->Update();
-
-    mafSmartPointer<mafMatrix> output_abs_pose;
-    vme->GetOutput()->GetAbsMatrix(*output_abs_pose.GetPointer(),0.);
-    output_to_input->SetInputFrame(output_abs_pose);
-
-    mafSmartPointer<mafMatrix> input_abs_pose;
-    vme->GetOutput()->GetAbsMatrix(*input_abs_pose.GetPointer(),0.);
-    output_to_input->SetTargetFrame(input_abs_pose);
-    output_to_input->Update();
-
-    double orient_input[3],orient_target[3];
-    mafTransform::GetOrientation(*output_abs_pose.GetPointer(),orient_target);
-    mafTransform::GetOrientation(*input_abs_pose.GetPointer(),orient_input);
-
-    double origin[3];
-    origin[0] = bounds[0];
-    origin[1] = bounds[2];
-    origin[2] = bounds[4];
-
-    output_to_input->TransformPoint(origin,origin);
-
-    resampler->SetVolumeOrigin(origin[0],origin[1],origin[2]);
-
-    vtkMatrix4x4 *mat = output_to_input->GetMatrix().GetVTKMatrix();
-
-    double local_orient[3],local_position[3];
-    mafTransform::GetOrientation(output_to_input->GetMatrix(),local_orient);
-    mafTransform::GetPosition(output_to_input->GetMatrix(),local_position);
-
-    // extract versors
-    double x_axis[3],y_axis[3];
-
-    mafMatrix::GetVersor(0,mat,x_axis);
-    mafMatrix::GetVersor(1,mat,y_axis);
-
-    resampler->SetVolumeAxisX(x_axis);
-    resampler->SetVolumeAxisY(y_axis);
-
-    vtkMAFSmartPointer<vtkStructuredPoints> output_data;
-    output_data->SetSpacing(spacing);
-    // TODO: here I probably should allow a data type casting... i.e. a GUI widget
-    output_data->SetScalarType(input_data->GetPointData()->GetScalars()->GetDataType());
-    output_data->SetExtent(output_extent);
-    output_data->SetUpdateExtent(output_extent);
-
-    double w,l,sr[2];
-    input_data->GetScalarRange(sr);
-
-    w = sr[1] - sr[0];
-    l = (sr[1] + sr[0]) * 0.5;
-
-    resampler->SetWindow(w);
-    resampler->SetLevel(l);
-    resampler->SetInput(input_data);
-    resampler->SetOutput(output_data);
-    resampler->AutoSpacingOff();
-    resampler->Update();
-
-    output_data->SetSource(NULL);
-    output_data->SetOrigin(bounds[0],bounds[2],bounds[4]);
-
-
-    resampled->SetData(vtkImageData::SafeDownCast(output_data),0.);
-    resampled->Update();
+    //copying only a sub-set of the data
+    double value = inDA->GetTuple1( ceil( i * fullSize / (double)SUB_SAMPLED_SIZE ) );
+    outDA->SetTuple1(i,value);
   }
+
+  outDA->ComputeRange(0);
+
+  return outDA;
 }
 
 //----------------------------------------------------------------------------
@@ -395,29 +278,26 @@ void medGUILutHistogramEditor::ResetLutDialog(double gamma, double low, double h
 void medGUILutHistogramEditor::UpdateVolumeLut(bool reset)
 //----------------------------------------------------------------------------
 {  
-  if (m_Volume)
+  if (m_Material)
   {
     if(reset)
     {
-      double sr[2];
-      ((mafVMEVolume *)m_Volume)->GetVolumeOutput()->GetVTKData()->GetScalarRange(sr);
-      m_LowRange = sr[0];
-      m_HiRange = sr[1];
+      m_LowRange = m_DataSet->GetScalarRange()[0];
+      m_HiRange = m_DataSet->GetScalarRange()[1];
     }
 
-    mmaVolumeMaterial *material = ((mafVMEVolume *)m_Volume)->GetMaterial();
+    double oldGamma = m_Material->m_GammaCorrection;
 
-    double oldGamma = material->m_GammaCorrection;
+    m_Material->m_ColorLut->SetTableRange(m_LowRange,m_HiRange );
+    m_Material->m_GammaCorrection = m_Gamma;
 
-    material->m_ColorLut->SetTableRange(m_LowRange,m_HiRange );
-    material->m_GammaCorrection = m_Gamma;
-
-    material->UpdateFromTables();
-    material->ApplyGammaCorrection(4);
-    material->UpdateProp();
+    m_Material->UpdateFromTables();
+    m_Material->ApplyGammaCorrection(4);
+    m_Material->UpdateProp();
 
   }
   //Forward event to update other views
   mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 }
+
 

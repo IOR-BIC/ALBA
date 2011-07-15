@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILutHistogramSwatch.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-07-13 12:38:21 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2011-07-15 14:54:17 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -27,7 +27,7 @@
 #include "medGUILutHistogramSwatch.h"
 #include "mafColor.h"
 #include "medGUILutHistogramEditor.h"
-#include "mafVME.h"
+#include "mmaVolumeMaterial.h"
 
 // ugly hack to make DrawText Work
 // if you remove this line you will have a Compile-Error "DrawTextA is not defined for wxPaintDC"
@@ -56,7 +56,7 @@ medGUILutHistogramSwatch::medGUILutHistogramSwatch(wxWindow* parent, wxWindowID 
 {
 	m_Listener = NULL;
   m_Editable = false;
-  SetLut(NULL);
+  SetMaterial(NULL);
 
   m_MouseInWindow = false;
   m_Tip = "";
@@ -113,7 +113,7 @@ void medGUILutHistogramSwatch::OnLeftMouseButtonDown(wxMouseEvent &event)
       Refresh();
     }
 
-    medGUILutHistogramEditor::ShowLutHistogramDialog(m_VME,m_Lut,"Histogram Lut Editor",m_Listener,  GetId());
+    medGUILutHistogramEditor::ShowLutHistogramDialog(m_DataSet,m_Material,"Histogram Lut Editor",m_Listener,  GetId());
     Update();
     Refresh();
   }
@@ -164,21 +164,25 @@ void medGUILutHistogramSwatch::OnMouseMotion(wxMouseEvent &event)
   }
 }
 //----------------------------------------------------------------------------
-void medGUILutHistogramSwatch::SetLut(vtkLookupTable *lut)
+void medGUILutHistogramSwatch::SetMaterial(mmaVolumeMaterial *material)
 //----------------------------------------------------------------------------
 {
   //update lut pointer
-  m_Lut = lut;
+  m_Material = material;
+  if (m_Material)
+    m_Lut=material->m_ColorLut;
+  else 
+    m_Lut=NULL;
   Update();
   Refresh();
 }
 
 //----------------------------------------------------------------------------
-void medGUILutHistogramSwatch::SetVME(mafVME *vme)
+void medGUILutHistogramSwatch::SetDataSet(vtkDataSet *dataSet)
 //----------------------------------------------------------------------------
 {
   //Update volume pointer
-  m_VME = vme;
+  m_DataSet = dataSet;
   Update();
   Refresh();
 }

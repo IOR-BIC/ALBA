@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2011-07-14 15:29:53 $
-Version:   $Revision: 1.1.2.6 $
+Date:      $Date: 2011-07-15 14:54:51 $
+Version:   $Revision: 1.1.2.7 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
@@ -510,8 +510,8 @@ void medOpSegmentation::CreateOpDialog()
   //lab->SetFont(m_Font);
 
   m_LutWidget = new medGUILutHistogramSwatch (m_GuiDialog,m_GuiDialog->GetWidgetId(ID_LUT_CHOOSER), wxDefaultPosition, wxSize(DW,18), wxTAB_TRAVERSAL | wxSIMPLE_BORDER );
-  m_LutWidget->SetVME(m_Volume);
-  m_LutWidget->SetLut(m_ColorLUT);
+  m_LutWidget->SetDataSet(m_Volume->GetOutput()->GetVTKData());
+  m_LutWidget->SetMaterial(m_Volume->GetMaterial());
   m_LutWidget->SetEditable(true);
   m_LutWidget->SetListener(m_GuiDialog);
 
@@ -3387,7 +3387,7 @@ void medOpSegmentation::InitializeViewSlice()
   m_View->PlugVisualPipe("medVMESegmentationVolume","mafPipeVolumeSlice_BES");
   m_View->PlugVisualPipe("mafVMEImage","mafPipeImage3D");
   m_View->PlugVisualPipe("mafVMESurface","mafPipeSurfaceSlice");
-
+ 
   dataSet->GetPoint((0,0,0),m_SliceOrigin);
   m_View->InitializeSlice(m_SliceOrigin);
 
@@ -3407,9 +3407,8 @@ void medOpSegmentation::UpdateWindowing()
   mmaVolumeMaterial *currentSurfaceMaterial = volumeOutput->GetMaterial();
   currentSurfaceMaterial->m_ColorLut->GetTableRange(subR);
 
-  m_ColorLUT = volumeOutput->GetMaterial()->m_ColorLut;
   volumeOutput->GetMaterial()->UpdateProp();
-  m_LutWidget->SetLut(m_ColorLUT);
+  m_LutWidget->SetMaterial(volumeOutput->GetMaterial());
   m_LutWidget->Enable(true);
   m_LutSlider->SetRange(sr[0],sr[1]);
   m_LutSlider->SetSubRange(subR[0],subR[1]);
