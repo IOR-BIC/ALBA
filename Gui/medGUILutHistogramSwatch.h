@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILutHistogramSwatch.h,v $
   Language:  C++
-  Date:      $Date: 2011-07-15 14:54:17 $
-  Version:   $Revision: 1.1.2.4 $
+  Date:      $Date: 2011-07-18 12:10:23 $
+  Version:   $Revision: 1.1.2.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,12 +22,16 @@
 */
 class vtkDataSet;
 class mmaVolumeMaterial;
+class mafGUI;
 
 class MAF_EXPORT medGUILutHistogramSwatch: public wxPanel
 {
 public:
   /** constructor. */
   medGUILutHistogramSwatch(wxWindow* parent, wxWindowID id = -1, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(100,50), long style = wxTAB_TRAVERSAL );
+
+  /** constructor. */
+  medGUILutHistogramSwatch::medGUILutHistogramSwatch(mafGUI *parent, wxWindowID id, wxString name, vtkDataSet *dataSet, mmaVolumeMaterial *material, wxSize size = wxSize(100,50), bool showText=1);
 
   /** Set the Lock Up Table */
   void SetMaterial(mmaVolumeMaterial *material);

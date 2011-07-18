@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2011-07-15 14:54:51 $
-Version:   $Revision: 1.1.2.7 $
+Date:      $Date: 2011-07-18 12:11:35 $
+Version:   $Revision: 1.1.2.8 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
@@ -489,40 +489,8 @@ void medOpSegmentation::CreateOpDialog()
   mafVMEOutputVolume *volumeOutput = mafVMEOutputVolume::SafeDownCast(m_Volume->GetOutput());
   m_ColorLUT = volumeOutput->GetMaterial()->m_ColorLut;
 
-  ///////////G,G/////////////// Relocate Code ///////////
-  const int  M	= 1;											// margin all around a row  
-  const int LM	= 5;											// label margin             
-  const int LH	= 18;											// label/entry height       
-  const int BH	= 20;											// button height            
-  const int HM	= 2*M;										// horizontal margin        (2)
-#ifdef WIN32
-  const int LW	= 55;	// label width Windows
-#else
-  const int LW	= 100;	// label width Linux
-#endif
-  const int EW	= 45;											// entry width  - (was 48)  
-  const int FW	= LW+LM+EW+HM+EW+HM+EW;		// full width               (304)
-  const int DW	= EW+HM+EW+HM+EW;					// Data Width - Full Width without the Label (184)
-
-  wxStaticText	*lab  = new wxStaticText(m_GuiDialog, m_GuiDialog->GetWidgetId(ID_LUT_CHOOSER), "LUT",wxDefaultPosition, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
-  //if(m_UseBackgroundColor) 
-  //  lab->SetBackgroundColour(m_BackgroundColor);
-  //lab->SetFont(m_Font);
-
-  m_LutWidget = new medGUILutHistogramSwatch (m_GuiDialog,m_GuiDialog->GetWidgetId(ID_LUT_CHOOSER), wxDefaultPosition, wxSize(DW,18), wxTAB_TRAVERSAL | wxSIMPLE_BORDER );
-  m_LutWidget->SetDataSet(m_Volume->GetOutput()->GetVTKData());
-  m_LutWidget->SetMaterial(m_Volume->GetMaterial());
+  m_LutWidget = new medGUILutHistogramSwatch(m_GuiDialog,m_GuiDialog->GetWidgetId(ID_LUT_CHOOSER), "LUT", m_Volume->GetOutput()->GetVTKData(), m_Volume->GetMaterial() );
   m_LutWidget->SetEditable(true);
-  m_LutWidget->SetListener(m_GuiDialog);
-
-  wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-  sizer->Add( lab,  0, wxRIGHT, LM);
-  sizer->Add( m_LutWidget, 0, wxEXPAND, HM);
-  m_GuiDialog->Add(sizer,0,wxALL, M); 
-
-  //////////////////////////OLD////////
-
-  //m_LutWidget = m_GuiDialog->Lut(ID_LUT_CHOOSER,"LUT",m_ColorLUT);
 
   /////////////////////////////////////////////////////
   m_GuiDialog->Divider();

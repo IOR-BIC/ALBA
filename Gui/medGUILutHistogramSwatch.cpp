@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILutHistogramSwatch.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-07-15 14:54:17 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2011-07-18 12:10:23 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -28,6 +28,20 @@
 #include "mafColor.h"
 #include "medGUILutHistogramEditor.h"
 #include "mmaVolumeMaterial.h"
+
+const int  M	= 1;											// margin all around a row  
+const int LM	= 5;											// label margin             
+const int LH	= 18;											// label/entry height       
+const int BH	= 20;											// button height            
+const int HM	= 2*M;										// horizontal margin        (2)
+#ifdef WIN32
+const int LW	= 55;	// label width Windows
+#else
+const int LW	= 100;	// label width Linux
+#endif
+const int EW	= 45;											// entry width  - (was 48)  
+const int FW	= LW+LM+EW+HM+EW+HM+EW;		// full width               (304)
+const int DW	= EW+HM+EW+HM+EW;					// Data Width - Full Width without the Label (184)
 
 // ugly hack to make DrawText Work
 // if you remove this line you will have a Compile-Error "DrawTextA is not defined for wxPaintDC"
@@ -65,6 +79,34 @@ medGUILutHistogramSwatch::medGUILutHistogramSwatch(wxWindow* parent, wxWindowID 
   m_Font = wxFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
   m_Font.SetPointSize(9);
 }
+
+medGUILutHistogramSwatch::medGUILutHistogramSwatch(mafGUI *parent, wxWindowID id, wxString name, vtkDataSet *dataSet, mmaVolumeMaterial *material, wxSize size, bool showText)
+:wxPanel(parent,id,wxDefaultPosition, wxSize(DW,18),  wxTAB_TRAVERSAL | wxSIMPLE_BORDER )
+{
+
+  
+  m_Editable = false;
+  
+  m_MouseInWindow = false;
+  m_Tip = "";
+  SetCursor(*wxCROSS_CURSOR);
+
+  m_Font = wxFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
+  m_Font.SetPointSize(9);
+  
+  SetMaterial(material);
+  SetDataSet(dataSet);
+  SetListener(parent);
+
+
+  wxStaticText	*lab  = new wxStaticText(parent, id , name ,wxDefaultPosition, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
+
+  wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
+  sizer->Add( lab,  0, wxRIGHT, LM);
+  sizer->Add( this, 0, wxEXPAND, HM);
+  parent->Add(sizer,0,wxALL, M); 
+}
+
 //----------------------------------------------------------------------------
 void medGUILutHistogramSwatch::OnPaint(wxPaintEvent &event)
 //----------------------------------------------------------------------------
