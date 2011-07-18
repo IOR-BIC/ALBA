@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUILutSlider.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-04-29 07:40:00 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2011-07-18 12:57:46 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -191,37 +191,33 @@ void mafGUILutSlider::MoveButton(int id, int pos)
 		case MIN_BUTTON: //min
 		{
 			pos = (pos<0) ? 0 : pos;  
-			pos = (pos>x2-w1-BUTT_W) ? x2-w1-BUTT_W : pos;  
-			m_MinButton->Move(pos,0);
-			m_MiddleButton->SetSize(pos+w1,0,x2-pos-w1,BUTT_H);
 			x1 = pos;   
 
       m_LowValue = ( x1 * (m_MaxValue - m_MinValue) ) / (w-w2-w2-BUTT_W) + m_MinValue;
-      if(false == m_FixedText)
-      {
-        m_MinButton->SetLabel(wxString::Format(m_FloatingPointText?"%.1f":"%.0f",m_LowValue));	
-      }
 
-			m_MinLabel->SetSize(0,0,pos,BUTT_H);
-      Refresh(false);
+      if(!m_FloatingPointText)
+        m_LowValue=round(m_LowValue);
+      
+      if (m_LowValue>m_HighValue)
+        m_LowValue=m_HighValue;
+ 
+      SetSubRange(m_LowValue,m_HighValue);
 		}
 		break;
 		case MAX_BUTTON: //max
 		{
-			pos = (pos<x1+w1+BUTT_W) ? x1+w1+BUTT_W : pos;  
-			pos = (pos>w-w2) ? w-w2 : pos;  
-			m_MaxButton->Move(pos,0);
-			m_MiddleButton->SetSize(x1+w1,0,pos-x1-w1,BUTT_H);
-			x2 = pos;
-
+      pos = (pos>w-w2) ? w-w2 : pos;  
+      x2 = pos;
+      
       m_HighValue  =( (x2-w2-BUTT_W)*(m_MaxValue - m_MinValue) ) / (w-w2-w2-BUTT_W) + m_MinValue;
-      if(false == m_FixedText)
-      {
-	    m_MaxButton->SetLabel(wxString::Format(m_FloatingPointText?"%.1f":"%.0f",m_HighValue));
-      }
 
-			m_MaxLabel->SetSize(pos+w2,0,w-(pos+w2),BUTT_H);
-      Refresh(false);
+      if(!m_FloatingPointText)
+        m_HighValue=round(m_HighValue);
+      
+      if (m_HighValue<m_LowValue) 
+        m_HighValue=m_LowValue;
+
+      SetSubRange(m_LowValue,m_HighValue);
 		}
 		break;
 		case MIDDLE_BUTTON: //mid
@@ -237,10 +233,17 @@ void mafGUILutSlider::MoveButton(int id, int pos)
 
       m_LowValue = ( x1 * (m_MaxValue - m_MinValue) ) / (w-w2-w2-BUTT_W) + m_MinValue;
       m_HighValue  =( (x2-w2-BUTT_W)*(m_MaxValue - m_MinValue) ) / (w-w2-w2-BUTT_W) + m_MinValue;
+
+      if(!m_FloatingPointText)
+      {
+        m_HighValue=round(m_HighValue);
+        m_LowValue=round(m_LowValue);
+      }
+
       if(false == m_FixedText)
       {
 	    m_MinButton->SetLabel(wxString::Format(m_FloatingPointText?"%.1f":"%.0f",m_LowValue));
-		m_MaxButton->SetLabel(wxString::Format(m_FloatingPointText?"%.1f":"%.0f",m_HighValue));
+		  m_MaxButton->SetLabel(wxString::Format(m_FloatingPointText?"%.1f":"%.0f",m_HighValue));
       }
 		
 			m_MinLabel->SetSize(0,0,x1,BUTT_H);
