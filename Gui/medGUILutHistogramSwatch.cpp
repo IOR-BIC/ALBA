@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILutHistogramSwatch.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-07-18 12:10:23 $
-  Version:   $Revision: 1.1.2.4 $
-  Authors:   Silvano Imboden
+  Date:      $Date: 2011-07-19 10:25:27 $
+  Version:   $Revision: 1.1.2.5 $
+  Authors:   Crimi Gianluigi
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
@@ -28,6 +28,7 @@
 #include "mafColor.h"
 #include "medGUILutHistogramEditor.h"
 #include "mmaVolumeMaterial.h"
+#include "vtkDataSet.h"
 
 const int  M	= 1;											// margin all around a row  
 const int LM	= 5;											// label margin             
@@ -68,6 +69,7 @@ medGUILutHistogramSwatch::medGUILutHistogramSwatch(wxWindow* parent, wxWindowID 
 :wxPanel(parent,id,pos,size,style)         
 //----------------------------------------------------------------------------
 {
+  m_ShowThreshold= false;
 	m_Listener = NULL;
   m_Editable = false;
   SetMaterial(NULL);
@@ -81,10 +83,10 @@ medGUILutHistogramSwatch::medGUILutHistogramSwatch(wxWindow* parent, wxWindowID 
 }
 
 medGUILutHistogramSwatch::medGUILutHistogramSwatch(mafGUI *parent, wxWindowID id, wxString name, vtkDataSet *dataSet, mmaVolumeMaterial *material, wxSize size, bool showText)
-:wxPanel(parent,id,wxDefaultPosition, wxSize(DW,18),  wxTAB_TRAVERSAL | wxSIMPLE_BORDER )
+:wxPanel(parent,id,wxDefaultPosition, size,  wxTAB_TRAVERSAL | wxSIMPLE_BORDER )
 {
 
-  
+  m_ShowThreshold = false;
   m_Editable = false;
   
   m_MouseInWindow = false;
@@ -98,12 +100,22 @@ medGUILutHistogramSwatch::medGUILutHistogramSwatch(mafGUI *parent, wxWindowID id
   SetDataSet(dataSet);
   SetListener(parent);
 
-
-  wxStaticText	*lab  = new wxStaticText(parent, id , name ,wxDefaultPosition, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
-
   wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-  sizer->Add( lab,  0, wxRIGHT, LM);
-  sizer->Add( this, 0, wxEXPAND, HM);
+
+  //add label only if showText is true
+  if (showText)
+  {
+    wxStaticText	*lab  = new wxStaticText(parent, id , name ,wxDefaultPosition, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
+    sizer->Add( lab,  0, wxRIGHT, LM);
+    sizer->Add( this, 0, wxEXPAND, HM);
+  }
+  else
+  {
+    wxStaticText *foo_l = new wxStaticText(parent,id, "",wxDefaultPosition, wxSize(4,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE);
+    sizer->Add(foo_l, 0, wxLEFT, 0);
+    sizer->Add( this, 0, wxEXPAND, 0);
+  }
+  
   parent->Add(sizer,0,wxALL, M); 
 }
 
@@ -230,6 +242,24 @@ void medGUILutHistogramSwatch::SetDataSet(vtkDataSet *dataSet)
 }
 
 //----------------------------------------------------------------------------
+voif medGUILutHistogramSwatch::showThreshold(bool b) 
+ //----------------------------------------------------------------------------
+{
+  m_ShowThreshold =b;
+  Update();
+  Refresh()
+}
+
+//----------------------------------------------------------------------------
+void medGUILutHistogramSwatch::Modified()
+//----------------------------------------------------------------------------
+{
+  Update();
+  Refresh();
+}
+
+
+//----------------------------------------------------------------------------
 void medGUILutHistogramSwatch::Update()
 //----------------------------------------------------------------------------
 {
@@ -248,21 +278,50 @@ void medGUILutHistogramSwatch::Update()
   unsigned char *p = data;
 
   int x,y;
-  for(y=0; y<h; y++)
-  {
-    for(x=0; x<w; x++)
+  if (m_ShowThreshold)
+    for(y=0; y<h; y++)
     {
-      //Generating the pixel from the Lut Value
-      float i = ( num * x ) / w;
-      mafColor col  = mafColor( m_Lut->GetTableValue(i) );
-      mafColor col2 = mafColor::CheckeredColor(col,x,y);
+      for(x=0; x<w; x++)
+      {
+        double *range,*subRange,rangeSize;
+        float i;
+        range=m_DataSet->GetScalarRange();
+        subRange=subRange=m_Lut->GetTableRange();
+        rangeSize=range[1]-range[0];
+        float leftLimit, rightLimit;
+        leftLimit=((subRange[0]-range[0])/rangeSize)*w;
+        rightLimit=((subRange[1]-range[0])/rangeSize)*w;
 
-      *p++ = col2.m_Red;
-      *p++ = col2.m_Green;
-      *p++ = col2.m_Blue;
+        
+        //Generating the pixel from the Lut Value
+        if (x<leftLimit) i=0;
+        else if (x>rightLimit) i=num;
+        else i = (( x - leftLimit ) / (rightLimit-leftLimit)) * num;
+        mafColor col  = mafColor( m_Lut->GetTableValue(i) );
+        mafColor col2 = mafColor::CheckeredColor(col,x,y);
+
+        *p++ = col2.m_Red;
+        *p++ = col2.m_Green;
+        *p++ = col2.m_Blue;
+      }
     }
-  }
-  wxImage img(w,h,data); // data will be freed by the image
+  else
+    for(y=0; y<h; y++)
+    {
+      for(x=0; x<w; x++)
+      {
+        //Generating the pixel from the Lut Value
+        float i = ( num * x ) / w;
+        mafColor col  = mafColor( m_Lut->GetTableValue(i) );
+        mafColor col2 = mafColor::CheckeredColor(col,x,y);
+
+        *p++ = col2.m_Red;
+        *p++ = col2.m_Green;
+        *p++ = col2.m_Blue;
+      }
+    }
+
+wxImage img(w,h,data); // data will be freed by the image
   //m_Bmp = img.ConvertToBitmap(); // changed in passing from wx242 -> wx263
   m_Bmp = wxBitmap(img);
 

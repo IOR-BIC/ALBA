@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILutHistogramEditor.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-07-15 16:17:40 $
-  Version:   $Revision: 1.1.2.6 $
-  Authors:   Silvano Imboden
+  Date:      $Date: 2011-07-19 10:25:27 $
+  Version:   $Revision: 1.1.2.7 $
+  Authors:   Crimi Gianluigi
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
@@ -32,6 +32,7 @@
 #include "mmaVolumeMaterial.h"
 #include "mafGUIHistogramWidget.h"
 #include "vtkFloatArray.h"
+#include "medGUILutHistogramSwatch.h"
 
 #define SUB_SAMPLED_SIZE (64*64*64)
 
@@ -46,7 +47,7 @@ medGUILutHistogramEditor::medGUILutHistogramEditor(vtkDataSet *dataSet,mmaVolume
 //----------------------------------------------------------------------------
 {
 	  
-  m_LutSwatch = NULL;// new medGUILutHistogramSwatch(this, -1, wxDefaultPosition,wxSize(286,16));
+  m_LutSwatch = NULL;
   m_ResampledData = NULL;
   m_Lut = vtkLookupTable::New();
   m_Lut->Build();
@@ -58,10 +59,6 @@ medGUILutHistogramEditor::medGUILutHistogramEditor(vtkDataSet *dataSet,mmaVolume
   
   m_FullSampling=0;
 
-  /*
-  mafVMEVolumeGray *resampled = NULL;
-  resampled = mafVMEVolumeGray::New();
-*/
   wxBusyCursor wait;
   
 
@@ -87,6 +84,9 @@ medGUILutHistogramEditor::medGUILutHistogramEditor(vtkDataSet *dataSet,mmaVolume
   m_Histogram->SetData(m_ResampledData);
   gui->Add(m_Histogram,1);
 
+  m_LutSwatch = new medGUILutHistogramSwatch(gui ,-1,"", dataSet, material, wxSize(482,18),false);
+  m_LutSwatch->showThreshold(true);
+
 
   m_Windowing = new mafGUILutSlider(gui,-1,wxPoint(0,0),wxSize(500,24));
   m_Windowing->SetListener(gui);
@@ -96,6 +96,7 @@ medGUILutHistogramEditor::medGUILutHistogramEditor(vtkDataSet *dataSet,mmaVolume
   //gamma correction slider 
   m_Gamma = material->m_GammaCorrection;
   m_GammaSlider = gui->FloatSlider(ID_GAMMA_CORRETION,_("Gamma: "), &m_Gamma,0,5, wxSize(400,30), "", false);
+
 
   //Activate only if required
   if (m_DataSet->GetPointData()->GetScalars()->GetNumberOfTuples()>SUB_SAMPLED_SIZE)
@@ -165,13 +166,14 @@ void medGUILutHistogramEditor::OnEvent(mafEventBase *maf_event)
         break;
       case ID_FULL_SAMPLING:
       {
-         wxBusyCursor wait;
+         wxBusyCursor *wait =  new wxBusyCursor();
          
          if (m_FullSampling)
            m_Histogram->SetData(m_DataSet->GetPointData()->GetScalars());
          else 
            m_Histogram->SetData(m_ResampledData);
 
+         delete wait;
       }
       break;
     }
@@ -316,6 +318,9 @@ void medGUILutHistogramEditor::UpdateVolumeLut(bool reset)
     m_Material->UpdateProp();
 
   }
+
+  if (m_LutSwatch)
+    m_LutSwatch->Modified();
   //Forward event to update other views
   mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 }

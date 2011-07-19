@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILutHistogramEditor.h,v $
   Language:  C++
-  Date:      $Date: 2011-07-15 16:17:40 $
-  Version:   $Revision: 1.1.2.5 $
-  Authors:   Silvano Imboden
+  Date:      $Date: 2011-07-19 10:25:27 $
+  Version:   $Revision: 1.1.2.6 $
+  Authors:   Crimi Gianluigi 
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
