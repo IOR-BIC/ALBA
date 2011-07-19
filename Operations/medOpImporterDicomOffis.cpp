@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2011-07-15 16:09:17 $
-Version:   $Revision: 1.1.2.136 $
+Date:      $Date: 2011-07-19 12:32:53 $
+Version:   $Revision: 1.1.2.137 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -3087,6 +3087,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 
 					if(dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[2]).bad())
 					{
+            cppDEL(busyInfo);
 						std::ostringstream stringStream;
 						stringStream << "Cannot read dicom tag DCM_ImagePositionPatient. Exiting"<< std::endl;          
 						mafLogMessage(stringStream.str().c_str());
@@ -3115,6 +3116,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 							{
 								if (!this->m_TestMode)
 								{
+                  cppDEL(busyInfo);
 									mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
 								}
 								return false;
@@ -3186,6 +3188,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 
 					if(dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[2]).bad())
 					{
+            cppDEL(busyInfo);
 						std::ostringstream stringStream;
 						stringStream << "Cannot read dicom tag DCM_ImagePositionPatient. Exiting"<< std::endl;          
 						mafLogMessage(stringStream.str().c_str());
@@ -3216,10 +3219,11 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 						{
 							if(!this->m_TestMode)
 							{
+                cppDEL(busyInfo);
 								wxString msg = _("cMRI damaged !");
-								wxMessageBox(msg,"Confirm", wxOK , NULL);
-								return false;
+								wxMessageBox(msg,"Confirm", wxOK , NULL);								
 							}
+              return false;
 						}
 					}
 					else
@@ -3230,10 +3234,11 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 						{
 							if(!this->m_TestMode)
 							{
+                cppDEL(busyInfo);
 								wxString msg = _("cMRI damaged !");
 								wxMessageBox(msg,"Confirm", wxOK , NULL);
-								return false;
 							}
+              return false;                
 						}
 					}
 
@@ -3277,6 +3282,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 
 					if(dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[2]).bad())
 					{
+            cppDEL(busyInfo);
 						std::ostringstream stringStream;
 						stringStream << "Cannot read dicom tag DCM_ImagePositionPatient. Exiting"<< std::endl;          
 						mafLogMessage(stringStream.str().c_str());
@@ -3347,6 +3353,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 	{
 		if (!this->m_TestMode)
 		{
+      cppDEL(busyInfo);
 			wxString msg = "No study found!";
 			wxMessageBox(msg,"Confirm", wxOK , NULL);
 		}
@@ -3598,7 +3605,8 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 					}
 
 					mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
-					if(wait) delete wait;
+          cppDEL(wait);
+          cppDEL(busyInfo);
 
 				}
 			}
@@ -3613,7 +3621,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
       mafLogMessage("ERROR during reading series : %s %s",seriesToDelete[i].at(0).GetCStr(),seriesToDelete[i].at(1).GetCStr());
     }
     
-
+    cppDEL(busyInfo);
 		return true;
 	}
 }
