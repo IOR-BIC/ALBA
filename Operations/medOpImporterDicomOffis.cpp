@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2011-07-19 12:32:53 $
-Version:   $Revision: 1.1.2.137 $
+Date:      $Date: 2011-07-20 10:21:13 $
+Version:   $Revision: 1.1.2.138 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -1000,6 +1000,57 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
 		n_slices+=1;
 	}
 
+  int count,s_count;
+  bool applyCorrectionToRotateZcoordinate = false;
+  if (m_SeriesIDContainsRotationsMap[m_SelectedSeriesID] == true  && m_ApplyRotation)
+  {
+    applyCorrectionToRotateZcoordinate = true;
+    bool forcedToExit = false;
+    bool storedFirstCosinDirector = false;
+    double cosinDirectorToCheck[6];
+    for (count = m_ZCropBounds[0], s_count = 0; count < m_ZCropBounds[1]+1; count += step)
+    {        
+      if (storedFirstCosinDirector)
+      {
+        double cosinDirector[6];
+        m_SelectedSeriesSlicesList->Item(count)->GetData()->GetDcmImageOrientationPatient(cosinDirector);
+
+        for (int i=0;i<6;++i)
+        {
+          if (cosinDirector[i] != cosinDirectorToCheck[i])
+          {
+            int result = wxMessageBox(_("WARNING: slices aren't parallel in Z axis. Do you want force this?"),"",wxOK|wxCENTRE|wxCANCEL);
+            if (result == wxOK)
+            {
+              applyCorrectionToRotateZcoordinate = true;
+            }
+            else
+            {
+              applyCorrectionToRotateZcoordinate = false;
+            }
+
+            forcedToExit = true;
+            break;
+          }
+        }
+        if (forcedToExit)
+        {
+          break;
+        }
+      }
+      else
+      {
+        m_SelectedSeriesSlicesList->Item(count)->GetData()->GetDcmImageOrientationPatient(cosinDirectorToCheck);
+        storedFirstCosinDirector = true;
+      }
+
+      if (forcedToExit)
+      {
+        break;
+      }
+    }
+  }
+
 	if(!this->m_TestMode)
 	{
 		wxBusyInfo wait_info("Building volume: please wait");
@@ -1010,12 +1061,69 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
 	accumulate->SetNumberOfSlices(n_slices);
 	accumulate->BuildVolumeOnAxes(m_SortAxes);
 
+  double oldPosTrasformed = -1.0;
+  double oldOrigin[3];
+
 	long progress = 0;
-	int count,s_count;
 	for (count = m_ZCropBounds[0], s_count = 0; count < m_ZCropBounds[1]+1; count += step)
 	{
 		if (s_count == n_slices) {break;}
 		GenerateSliceTexture(count);
+
+    if (applyCorrectionToRotateZcoordinate)
+    {
+      if (s_count != 0)
+      {
+        double originSlice[3];
+        m_SelectedSeriesSlicesList->Item(count)->GetData()->GetDcmImagePositionPatientOriginal(originSlice);
+
+        vtkImageData *im = m_SliceTexture->GetInput();
+        im->Update();
+
+        double originTexture[3];
+        im->GetOrigin(originTexture);
+
+        double newPosTransformed;
+
+        double spacing = sqrt(vtkMath::Distance2BetweenPoints(originSlice,oldOrigin));
+
+        mafLogMessage("SPACING: %3f",spacing);
+
+        if (oldOrigin[m_SortAxes] < originSlice[m_SortAxes])
+        {
+          newPosTransformed = oldPosTrasformed + spacing;
+        }
+        else
+        {
+          newPosTransformed = oldPosTrasformed - spacing;
+        }
+
+        oldPosTrasformed = newPosTransformed;
+
+        for (int i=0;i<3;++i)
+        {
+          oldOrigin[i] = originSlice[i];
+        }
+
+        originTexture[m_SortAxes] = newPosTransformed;
+
+        im->SetOrigin(originTexture);
+        im->Update();
+      }
+      else
+      {
+        double originSlice[3];
+        m_SelectedSeriesSlicesList->Item(count)->GetData()->GetDcmImagePositionPatientOriginal(originSlice);
+
+        oldPosTrasformed = originSlice[m_SortAxes];
+
+        for (int i=0;i<3;++i)
+        {
+          oldOrigin[i] = originSlice[i];
+        }
+      }
+    }
+
 		accumulate->SetSlice(s_count,m_SliceTexture->GetInput());
 		s_count++;
 
@@ -1039,6 +1147,9 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
 	vtkRectilinearGrid *rg_out;
 	rg_out=accumulate->GetOutput();
 	rg_out->Update();
+
+  double b[6];
+  rg_out->GetBounds(b);
 
 	if(!this->m_TestMode)
 	{
@@ -1230,6 +1341,7 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
         else
         {
           m_SelectedSeriesSlicesList->Item(currImageId)->GetData()->GetDcmImageOrientationPatient(cosinDirectorToCheck);
+          storedFirstCosinDirector = true;
         }
 
         if (forcedToExit)
@@ -1283,9 +1395,8 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 		element0 = (medDicomSlice *)m_SelectedSeriesSlicesList->Item(tsImageId)->GetData();
 		mafTimeStamp tsDouble = (mafTimeStamp)(element0->GetDcmTriggerTime());
 
-    double oldZPosTrasformed = -1.0;
+    double oldPosTrasformed = -1.0;
     double oldOrigin[3];
-
 
 		for (int sourceVolumeSliceId = m_ZCropBounds[0], targetVolumeSliceId = 0; sourceVolumeSliceId < m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
 		{
@@ -1318,20 +1429,29 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 	        double originTexture[3];
 	        im->GetOrigin(originTexture);
 	
-	        double newZPosTransformed;
+	        double newPosTransformed;
 	
 	        double spacing = sqrt(vtkMath::Distance2BetweenPoints(originSlice,oldOrigin));
+
+          mafLogMessage("SPACING: %3f",spacing);
 	
-	        newZPosTransformed = oldZPosTrasformed - spacing;
+	        if (oldOrigin[m_SortAxes] < originSlice[m_SortAxes])
+	        {
+	        	newPosTransformed = oldPosTrasformed + spacing;
+	        }
+          else
+          {
+            newPosTransformed = oldPosTrasformed - spacing;
+          }
 	
-	        oldZPosTrasformed = newZPosTransformed;
+	        oldPosTrasformed = newPosTransformed;
 	
 	        for (int i=0;i<3;++i)
 	        {
 	          oldOrigin[i] = originSlice[i];
 	        }
 	
-	        originTexture[2] = newZPosTransformed;
+	        originTexture[m_SortAxes] = newPosTransformed;
 	
 	        im->SetOrigin(originTexture);
 	        im->Update();
@@ -1341,7 +1461,7 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
           double originSlice[3];
           m_SelectedSeriesSlicesList->Item(currImageId)->GetData()->GetDcmImagePositionPatientOriginal(originSlice);
 	
-	        oldZPosTrasformed = originSlice[2];
+	        oldPosTrasformed = originSlice[m_SortAxes];
 	
 	        for (int i=0;i<3;++i)
 	        {
