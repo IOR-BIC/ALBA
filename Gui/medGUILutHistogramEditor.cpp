@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILutHistogramEditor.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-07-21 14:23:00 $
-  Version:   $Revision: 1.1.2.8 $
+  Date:      $Date: 2011-07-21 16:04:15 $
+  Version:   $Revision: 1.1.2.9 $
   Authors:   Crimi Gianluigi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -30,8 +30,7 @@
 #include "vtkPointData.h"
 #include "mmaMaterial.h"
 #include "mmaVolumeMaterial.h"
-// G,G Corregere prima del commit!!!!!!!!!!!!!
-#include "C:\mycvs\openMAF22_ITK\Gui\mafGUIHistogramWidget.h" 
+#include "mafGUIHistogramWidget.h" 
 #include "vtkFloatArray.h"
 #include "medGUILutHistogramSwatch.h"
 #include <wx/busyinfo.h>
