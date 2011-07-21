@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUIHistogramWidget.cpp,v $
 Language:  C++
-Date:      $Date: 2011-05-25 10:08:10 $
-Version:   $Revision: 1.1.2.5 $
-Authors:   Paolo Quadrani
+Date:      $Date: 2011-07-21 13:44:37 $
+Version:   $Revision: 1.1.2.6 $
+Authors:   Paolo Quadrani, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2001/2005 
 CINECA - Interuniversity Consortium (www.cineca.it)
@@ -72,6 +72,7 @@ mafGUIHistogramWidget::mafGUIHistogramWidget(wxWindow* parent, wxWindowID id /* 
   m_AutoscaleHistogram = true;
   m_LogHistogramFlag   = false;
   m_Dragging           = false;
+  m_ShowText           = true;
   //////////////////////////////////////////////////////////////////////////
 
   vtkNEW(m_Histogram);
@@ -142,6 +143,8 @@ mafGUIHistogramWidget::~mafGUIHistogramWidget()
 void mafGUIHistogramWidget::UpdateLines(int min,int max)
 //----------------------------------------------------------------------------
 {
+  m_LowerThreshold=min;
+  m_UpperThreshold=max;
   m_Histogram->UpdateLines(min,max);
   m_HistogramRWI->CameraUpdate();
 }
@@ -159,10 +162,8 @@ mafGUI *mafGUIHistogramWidget::GetGui()
 void mafGUIHistogramWidget::GetThresholds(double *lower, double *upper)
 //----------------------------------------------------------------------------
 {
-  if (m_SliderThresholds != NULL)
-  {
-    m_SliderThresholds->GetSubRange(lower,upper);
-  }
+  *lower=m_LowerThreshold;
+  *upper=m_UpperThreshold;
 }
 //----------------------------------------------------------------------------
 void mafGUIHistogramWidget::CreateGui()
@@ -210,7 +211,8 @@ void mafGUIHistogramWidget::OnEvent( mafEventBase *event )
     {
     case ID_RANGE_MODIFIED:
       {
-        m_SliderThresholds->GetSubRange(&m_LowerThreshold,&m_UpperThreshold);
+        if (m_SliderThresholds)
+          m_SliderThresholds->GetSubRange(&m_LowerThreshold,&m_UpperThreshold);
         m_Histogram->UpdateLines(m_LowerThreshold,m_UpperThreshold);
       }
       break;
@@ -260,11 +262,15 @@ void mafGUIHistogramWidget::OnEvent( mafEventBase *event )
           m_Gui->Update();
         }
         m_Histogram->SetScaleFactor(m_ScaleFactor);
+        m_DragStart=pos[1];
       }
       else
       {
+        if (m_ShowText)
+        {
         m_HisctogramValue = m_Histogram->GetHistogramValue(pos[0],pos[1]);
         m_Histogram->SetLabel(mafString(m_HisctogramValue).GetCStr());
+        }
       }
       m_HistogramRWI->CameraUpdate();
     }
@@ -325,22 +331,52 @@ void mafGUIHistogramWidget::SetData(vtkDataArray *data)
 {
   m_Data = data;
   m_Histogram->SetInputData(m_Data);
-  double sr[2];
+  double sr[2],subR[2];
   m_Data->GetRange(sr);
-  m_LowerThreshold = sr[0];
-  m_UpperThreshold = sr[1];
+  if (m_Lut)
+  {
+    m_Lut->GetTableRange(subR);
+    m_LowerThreshold = subR[0];
+    m_UpperThreshold = subR[1];
+  }
+  else
+  {
+    m_LowerThreshold = sr[0];
+    m_UpperThreshold = sr[1];
+  }
+
   if (m_SliderThresholds != NULL)
   {
-	  m_SliderThresholds->SetRange(m_LowerThreshold,m_UpperThreshold);
+	  m_SliderThresholds->SetRange(sr[0],sr[1]);
 	  m_SliderThresholds->SetSubRange(m_LowerThreshold,m_UpperThreshold);
   }
-  /*m_Data->GetRange(m_SelectedRange);
-  m_Slider->SetRange(m_SelectedRange);
-  m_Slider->SetValue(0, m_SelectedRange[0]);
-  m_Slider->SetValue(2, m_SelectedRange[1]);
-  m_Slider->Update();*/
+  m_Histogram->UpdateLines(m_LowerThreshold,m_UpperThreshold);
   UpdateGui();
 }
+
+//----------------------------------------------------------------------------
+void mafGUIHistogramWidget::SetLut(vtkLookupTable *lut)
+//----------------------------------------------------------------------------
+{
+  m_Lut=lut;
+  double sr[2],subR[2];
+  if(m_Data)
+    m_Data->GetRange(sr);
+  else 
+    lut->GetTableRange(sr);
+  lut->GetTableRange(subR);
+  m_LowerThreshold = subR[0];
+  m_UpperThreshold = subR[1];
+  if (m_SliderThresholds != NULL)
+  {
+	  m_SliderThresholds->SetRange(sr[0],sr[1]);
+	  m_SliderThresholds->SetSubRange(m_LowerThreshold,m_UpperThreshold);
+  }
+  m_Histogram->UpdateLines(m_LowerThreshold,m_UpperThreshold);
+  UpdateGui();
+}
+
+
 //----------------------------------------------------------------------------
 void mafGUIHistogramWidget::SetScaleFactor(double factor)
 //----------------------------------------------------------------------------
@@ -399,6 +435,18 @@ void mafGUIHistogramWidget::EnableWidgets(bool enable)
   m_Gui->Enable(mafGUIHistogramWidget::ID_LOGSCALE,enable);
   m_Gui->Enable(mafGUIHistogramWidget::ID_LOGFACTOR,m_LogHistogramFlag != 0);
 }
+
+//----------------------------------------------------------------------------
+void mafGUIHistogramWidget::ShowLines(int value)
+//----------------------------------------------------------------------------
+{
+  if (value)
+    m_Histogram->ShowLinesOn();
+  else
+    m_Histogram->ShowLinesOff();
+}
+
+
 //----------------------------------------------------------------------------
 void mafGUIHistogramWidget::SetHistogramData(vtkImageData *histogram)
 //----------------------------------------------------------------------------

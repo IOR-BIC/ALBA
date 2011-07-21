@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIHistogramWidget.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-25 10:08:10 $
-  Version:   $Revision: 1.1.2.3 $
-  Authors:   Paolo Quadrani
+  Date:      $Date: 2011-07-21 13:44:37 $
+  Version:   $Revision: 1.1.2.4 $
+  Authors:   Paolo Quadrani, Gianluigi Crimi
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
@@ -12,6 +12,7 @@
 
 #ifndef __mafGUIHistogramWidget_H__
 #define __mafGUIHistogramWidget_H__
+
 
 //----------------------------------------------------------------------------
 // Include:
@@ -38,12 +39,16 @@ class vtkLookupTable;
 class MAF_EXPORT mafGUIHistogramWidget: public mafGUIPanel, public mafObserver
 {
 public:
+  /** Constructor */
   mafGUIHistogramWidget(wxWindow* parent, wxWindowID id = -1, const wxPoint& pos = wxDefaultPosition, 
            const wxSize& size = wxSize(400,300), long style = wxTAB_TRAVERSAL /*| wxSUNKEN_BORDER */, bool showThresholds = false);
+  /** Destructor. */
   virtual ~mafGUIHistogramWidget();
 
+  /** Set the listener for the widget */
   virtual void SetListener(mafObserver *Listener) {m_Listener = Listener;};
   
+  /** Main Event handler */
   void OnEvent(mafEventBase *event);
 
   MAF_ID_DEC(RANGE_MODIFIED);
@@ -106,26 +111,33 @@ public:
   Possible values are: vtkMAFHistogram::POINT_REPRESENTATION, vtkMAFHistogram::LINE_REPRESENTATION or vtkMAFHistogram::BAR_REPRESENTATION*/
   void SetRepresentation(int represent);
 
-  void GetSelectedRange(double range[2]);
+  
+  /** Enable/Disable threshold lines visualization */
+  void ShowLines(int value=1);
 
+  /** Enable/Disable the visualization of the number of samples in the bin under the mouse cursor */
+  void ShowText(int value=1){m_ShowText=value;};
+  
   /** Set the reference to the lut which range will be adjusted by the slider.
   The reference to the Lookup Table should be set before asking for the Histogram's Gui, so the slider to 
   change the lookup table's range will appear on the UI.*/
-  void SetLut(vtkLookupTable *lut) {m_Lut = lut;};
+  void SetLut(vtkLookupTable *lut);
 
   /** Return a reference to the UI.*/
   mafGUI *GetGui();
 
+  /** Get the threshold of the histogram if setted */
   void GetThresholds(double *lower, double *upper);
 
+  /* Get the number of samples in the bin associated to the x coordinate */
   long int GetHistogramValue(int x, int y);
 
+  /* Get the scalar vale of the histogram associated to the x coordinate */
   double GetHistogramScalarValue(int x, int y);
-
-protected:
-
+  
   /** Update position of the gizmo lines */
   void UpdateLines(int min,int max);
+protected:
 
   /** Create GUI for histogram widget.*/
   void CreateGui();
@@ -151,6 +163,7 @@ protected:
   int            m_DragStart;
   double         m_LowerThreshold;
   double         m_UpperThreshold;
+  int            m_ShowText;
 
   mafGUI        *m_Gui;
 
