@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkMAFVolumeSlicer.cxx,v $
   Language:  C++
-  Date:      $Date: 2011-07-04 17:24:54 $
-  Version:   $Revision: 1.2.2.1 $
+  Date:      $Date: 2011-07-21 13:11:07 $
+  Version:   $Revision: 1.2.2.2 $
 
 =========================================================================*/
 
@@ -21,19 +21,13 @@
 
 #include "assert.h"
 
-vtkCxxRevisionMacro(vtkMAFVolumeSlicer, "$Revision: 1.2.2.1 $");
+vtkCxxRevisionMacro(vtkMAFVolumeSlicer, "$Revision: 1.2.2.2 $");
 vtkStandardNewMacro(vtkMAFVolumeSlicer);
 
 typedef unsigned short u_short;
 typedef unsigned char u_char;
 typedef unsigned int u_int;
-/*
-inline void clip(float val, float& out) { out = val; }
-inline void clip(float val, char&  out) { int x = float(VTK_CHAR_MAX) * (val - 0.5f); if (x < VTK_CHAR_MIN) out = VTK_CHAR_MIN; else if (x > VTK_CHAR_MAX) out = VTK_CHAR_MAX; else out = char(x); }
-inline void clip(float val, short& out) { int x = float(VTK_SHORT_MAX) * (val - 0.5f); if (x < VTK_SHORT_MIN) out = VTK_SHORT_MIN; else if (x > VTK_SHORT_MAX) out = VTK_SHORT_MAX; else out = short(x); }
-inline void clip(float val, u_char &  out) { int x = VTK_UNSIGNED_CHAR_MAX * val; if (x < VTK_UNSIGNED_CHAR_MIN) out = VTK_UNSIGNED_CHAR_MIN; else if (x > VTK_UNSIGNED_CHAR_MAX) out = VTK_UNSIGNED_CHAR_MAX; else out = u_char(x); }
-inline void clip(float val, u_short & out) { int x = VTK_UNSIGNED_SHORT_MAX * val; if (x < VTK_UNSIGNED_SHORT_MIN) out = VTK_UNSIGNED_SHORT_MIN; else if (x > VTK_UNSIGNED_SHORT_MAX) out = VTK_UNSIGNED_SHORT_MAX; else out = u_short(x); }
-*/
+
 #define min(x0, x1) (((x0) < (x1)) ? (x0) : (x1))
 #define max(x0, x1) (((x0) > (x1)) ? (x0) : (x1))
 
@@ -87,13 +81,6 @@ void vtkMAFVolumeSlicer::SetPlaneAxisX(float axis[3])
   }
   else
   {
-    // bug 2454 fix
-	// http://bugzilla.b3c.it/show_bug.cgi?id=2454    
-    if (PlaneAxisX[0] < 1.e-5f)
-	{
-		PlaneAxisX[0] = 1.e-5f;
-	}
-
     memcpy(GlobalPlaneAxisX, PlaneAxisX, sizeof(this->PlaneAxisX));
   }
   this->Modified();
@@ -139,11 +126,11 @@ void vtkMAFVolumeSlicer::SetPlaneOrigin(double origin[3])
 void vtkMAFVolumeSlicer::SetPlaneOrigin(double x, double y, double z)
 //----------------------------------------------------------------------------
 {
-  double plane_origin[3];
-  plane_origin[0] = x;
-  plane_origin[1] = y;
-  plane_origin[2] = z;
-  SetPlaneOrigin(plane_origin);
+  double planeOrigin[3];
+  planeOrigin[0] = x;
+  planeOrigin[1] = y;
+  planeOrigin[2] = z;
+  SetPlaneOrigin(planeOrigin);
 }
 //----------------------------------------------------------------------------
 unsigned long int vtkMAFVolumeSlicer::GetMTime() 
