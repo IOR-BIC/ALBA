@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILutHistogramSwatch.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-07-19 11:45:40 $
-  Version:   $Revision: 1.1.2.6 $
+  Date:      $Date: 2011-07-21 14:23:00 $
+  Version:   $Revision: 1.1.2.7 $
   Authors:   Crimi Gianluigi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -44,6 +44,8 @@ const int EW	= 45;											// entry width  - (was 48)
 const int FW	= LW+LM+EW+HM+EW+HM+EW;		// full width               (304)
 const int DW	= EW+HM+EW+HM+EW;					// Data Width - Full Width without the Label (184)
 
+#define max(a,b)  (((a) > (b)) ? (a) : (b))
+
 // ugly hack to make DrawText Work
 // if you remove this line you will have a Compile-Error "DrawTextA is not defined for wxPaintDC"
 // .... waiting a better workaround. SIL 30/11/05 
@@ -62,6 +64,7 @@ BEGIN_EVENT_TABLE(medGUILutHistogramSwatch,wxPanel)
   EVT_LEFT_DOWN(medGUILutHistogramSwatch::OnLeftMouseButtonDown)
   EVT_LEFT_UP(medGUILutHistogramSwatch::OnLeftMouseButtonUp)
   EVT_MOTION(medGUILutHistogramSwatch::OnMouseMotion)
+ 
 END_EVENT_TABLE()
 
 //----------------------------------------------------------------------------
@@ -87,6 +90,8 @@ medGUILutHistogramSwatch::medGUILutHistogramSwatch(mafGUI *parent, wxWindowID id
 {
 
   m_ShowThreshold = false;
+  m_OverHighlight = false;
+  m_Highlighted = false;
   m_Editable = false;
   
   m_MouseInWindow = false;
@@ -166,10 +171,11 @@ void medGUILutHistogramSwatch::OnLeftMouseButtonDown(wxMouseEvent &event)
       m_MouseInWindow = false;
       Refresh();
     }
+    //run only if editable
 
     medGUILutHistogramEditor::ShowLutHistogramDialog(m_DataSet,m_Material,"Histogram Lut Editor",m_Listener,  GetId());
-    Update();
-    Refresh();
+
+    Modified();
   }
 
   //notify the user
@@ -212,9 +218,41 @@ void medGUILutHistogramSwatch::OnMouseMotion(wxMouseEvent &event)
   {
     double *range = m_Lut->GetRange();
     double v = range[0] + ((range[1]-range[0]) * x ) / w;
+    
     m_Tip = wxString::Format(" value=%g ",v);
     m_MouseX = x;
+   
+    if (m_OverHighlight)
+    {
+      int i= GetLutIndexByPos(w,x);
+      //redraw only if previously was not highlighted
+      //or if the highlighted table value index is changed
+      if (i!=m_LastHighlighted || !m_Highlighted)
+      {
+        m_Material->ApplyGammaCorrection(4);
+        double newcol[4];
+        newcol[0]=0.5;
+        newcol[1]=0;
+        newcol[2]=0;
+        newcol[3]=1.0;
+        //updating the values on the lut whit a red color
+        //for highlighting on the views
+        m_Lut->SetTableValue(i,newcol);
+        m_Material->UpdateFromTables();
+        mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+        m_LastHighlighted=i;
+        m_Highlighted=true;
+      }
+    }
     Refresh();
+  }
+  else if (m_Lut && m_Highlighted) 
+  {
+    //mouse out of window and previously highlighted 
+    m_Material->ApplyGammaCorrection(4);
+    m_Material->UpdateProp();
+    m_Highlighted=0;
+    mafEventMacro(mafEvent(this, CAMERA_UPDATE));
   }
 }
 //----------------------------------------------------------------------------
@@ -227,8 +265,7 @@ void medGUILutHistogramSwatch::SetMaterial(mmaVolumeMaterial *material)
     m_Lut=material->m_ColorLut;
   else 
     m_Lut=NULL;
-  Update();
-  Refresh();
+  Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -237,8 +274,7 @@ void medGUILutHistogramSwatch::SetDataSet(vtkDataSet *dataSet)
 {
   //Update volume pointer
   m_DataSet = dataSet;
-  Update();
-  Refresh();
+  Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -246,8 +282,7 @@ void medGUILutHistogramSwatch::showThreshold(bool b)
  //----------------------------------------------------------------------------
 {
   m_ShowThreshold =b;
-  Update();
-  Refresh();
+  Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -256,6 +291,36 @@ void medGUILutHistogramSwatch::Modified()
 {
   Update();
   Refresh();
+}
+
+//----------------------------------------------------------------------------
+int medGUILutHistogramSwatch::GetLutIndexByPos(float fullWidth, float x)
+//----------------------------------------------------------------------------
+{
+  float i;
+  float num = m_Lut->GetNumberOfTableValues();
+
+  if (m_ShowThreshold)
+  {
+    //if m_showThreshold is true i need to calculate the table index 
+    //inside the sub range
+    double *range,*subRange,rangeSize;
+    range=m_DataSet->GetScalarRange();
+    subRange=subRange=m_Lut->GetTableRange();
+    rangeSize=range[1]-range[0];
+    float leftLimit, rightLimit;
+    leftLimit=((subRange[0]-range[0])/rangeSize)*fullWidth;
+    rightLimit=((subRange[1]-range[0])/rangeSize)*fullWidth;
+    //Generating the pixel from the Lut Value
+    if (x<=leftLimit) i=0;
+    else if (x>rightLimit) i=num-1;
+    else i = (( x - leftLimit ) / (rightLimit-leftLimit)) * num;
+  }
+  else 
+  {
+    i = ( num * x ) / fullWidth;
+  }
+  return (int) i;
 }
 
 
@@ -272,57 +337,27 @@ void medGUILutHistogramSwatch::Update()
     return;
   }
   
-  float num = m_Lut->GetNumberOfTableValues();
-
+  
   unsigned char *data = (unsigned char*)malloc(sizeof(unsigned char)*w*h*3);
   unsigned char *p = data;
 
   int x,y;
-  if (m_ShowThreshold)
-    for(y=0; y<h; y++)
+  for(y=0; y<h; y++)
+  {
+    for(x=0; x<w; x++)
     {
-      for(x=0; x<w; x++)
-      {
-        double *range,*subRange,rangeSize;
-        float i;
-        range=m_DataSet->GetScalarRange();
-        subRange=subRange=m_Lut->GetTableRange();
-        rangeSize=range[1]-range[0];
-        float leftLimit, rightLimit;
-        leftLimit=((subRange[0]-range[0])/rangeSize)*w;
-        rightLimit=((subRange[1]-range[0])/rangeSize)*w;
+      //updating image whit Lut data
+      int i = GetLutIndexByPos(w, x);
+      mafColor col  = mafColor( m_Lut->GetTableValue(i) );
+      mafColor col2 = mafColor::CheckeredColor(col,x,y);
 
-        
-        //Generating the pixel from the Lut Value
-        if (x<leftLimit) i=0;
-        else if (x>rightLimit) i=num;
-        else i = (( x - leftLimit ) / (rightLimit-leftLimit)) * num;
-        mafColor col  = mafColor( m_Lut->GetTableValue(i) );
-        mafColor col2 = mafColor::CheckeredColor(col,x,y);
-
-        *p++ = col2.m_Red;
-        *p++ = col2.m_Green;
-        *p++ = col2.m_Blue;
-      }
+      *p++ = col2.m_Red;
+      *p++ = col2.m_Green;
+      *p++ = col2.m_Blue;
     }
-  else
-    for(y=0; y<h; y++)
-    {
-      for(x=0; x<w; x++)
-      {
-        //Generating the pixel from the Lut Value
-        float i = ( num * x ) / w;
-        mafColor col  = mafColor( m_Lut->GetTableValue(i) );
-        mafColor col2 = mafColor::CheckeredColor(col,x,y);
-
-        *p++ = col2.m_Red;
-        *p++ = col2.m_Green;
-        *p++ = col2.m_Blue;
-      }
-    }
-
-wxImage img(w,h,data); // data will be freed by the image
-  //m_Bmp = img.ConvertToBitmap(); // changed in passing from wx242 -> wx263
+  }
+  
+  wxImage img(w,h,data); // data will be freed by the image
   m_Bmp = wxBitmap(img);
 
   m_UpdateTime = m_Lut->GetMTime();

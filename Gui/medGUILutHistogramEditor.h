@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILutHistogramEditor.h,v $
   Language:  C++
-  Date:      $Date: 2011-07-19 10:25:27 $
-  Version:   $Revision: 1.1.2.6 $
+  Date:      $Date: 2011-07-21 14:23:00 $
+  Version:   $Revision: 1.1.2.7 $
   Authors:   Crimi Gianluigi 
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -48,7 +48,8 @@ public:
     ID_ = MINID,
     ID_GAMMA_CORRETION,
     ID_RESET_LUT,
-    ID_FULL_SAMPLING
+    ID_FULL_SAMPLING,
+    ID_LOG_SCALE_VIEW
   };
 
   /** Constructor. */
@@ -100,6 +101,7 @@ protected:
   vtkDataArray *m_ResampledData;
 
   int m_FullSampling;
+  int m_LogScale;
   double m_Gamma;
   double m_LowRange;
   double m_HiRange;

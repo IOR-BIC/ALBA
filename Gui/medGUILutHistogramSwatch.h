@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILutHistogramSwatch.h,v $
   Language:  C++
-  Date:      $Date: 2011-07-19 10:25:27 $
-  Version:   $Revision: 1.1.2.6 $
+  Date:      $Date: 2011-07-21 14:23:00 $
+  Version:   $Revision: 1.1.2.7 $
   Authors:   Crimi Gianluigi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -49,6 +49,9 @@ public:
   /** Activate/Deactivate threshold view on LUT */
   void showThreshold(bool b);
 
+  /** Activate/Deactivate threshold view on LUT */
+  void EnableOverHighlight(bool b) {m_OverHighlight=b;};
+
   /** return true if the pop-up menu is enabled */
   bool IsEditable(){return m_Editable;};
 
@@ -79,8 +82,14 @@ protected:
   void OnLeftMouseButtonUp(wxMouseEvent &event);
   /* Show/update the label */
   void OnMouseMotion(wxMouseEvent &event);
+
+  /* Get the lut index by the x position over the widget */
+  int GetLutIndexByPos(float fullWidth, float x);
   
   int m_ShowThreshold;
+  int m_OverHighlight;
+  int m_Highlighted;
+  int m_LastHighlighted;
   mmaVolumeMaterial *m_Material;
   vtkLookupTable *m_Lut;
   vtkDataSet *m_DataSet;

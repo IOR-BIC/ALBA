@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILutHistogramEditor.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-07-19 10:25:27 $
-  Version:   $Revision: 1.1.2.7 $
+  Date:      $Date: 2011-07-21 14:23:00 $
+  Version:   $Revision: 1.1.2.8 $
   Authors:   Crimi Gianluigi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -30,9 +30,12 @@
 #include "vtkPointData.h"
 #include "mmaMaterial.h"
 #include "mmaVolumeMaterial.h"
-#include "mafGUIHistogramWidget.h"
+// G,G Corregere prima del commit!!!!!!!!!!!!!
+#include "C:\mycvs\openMAF22_ITK\Gui\mafGUIHistogramWidget.h" 
 #include "vtkFloatArray.h"
 #include "medGUILutHistogramSwatch.h"
+#include <wx/busyinfo.h>
+
 
 #define SUB_SAMPLED_SIZE (64*64*64)
 
@@ -43,10 +46,10 @@
 //----------------------------------------------------------------------------
 //vtkDataSet *dataSet, mmaVolumeMaterial *material, char *name="Histogram & Windowing", mafObserver *Listener=NULL, int id=MINID);
 medGUILutHistogramEditor::medGUILutHistogramEditor(vtkDataSet *dataSet,mmaVolumeMaterial *material, char *name, mafObserver *Listener, int id)
-:mafGUIDialog(name)         
+:mafGUIDialog(name)
 //----------------------------------------------------------------------------
 {
-	  
+	 
   m_LutSwatch = NULL;
   m_ResampledData = NULL;
   m_Lut = vtkLookupTable::New();
@@ -58,6 +61,7 @@ medGUILutHistogramEditor::medGUILutHistogramEditor(vtkDataSet *dataSet,mmaVolume
   SetId(id);
   
   m_FullSampling=0;
+  m_LogScale=0;
 
   wxBusyCursor wait;
   
@@ -77,15 +81,18 @@ medGUILutHistogramEditor::medGUILutHistogramEditor(vtkDataSet *dataSet,mmaVolume
   tag_name = "HISTOGRAM_VOLUME";
 
   //Setting up the histogram
-  m_Histogram = new mafGUIHistogramWidget(gui,-1,wxPoint(0,0),wxSize(500,100),wxTAB_TRAVERSAL); //,true);
-  m_Histogram->SetLut(  material->m_ColorLut );
-  m_Histogram->SetListener(gui);
+  m_Histogram = new mafGUIHistogramWidget(gui,-1,wxPoint(0,0),wxSize(500,100),wxTAB_TRAVERSAL);
+  m_Histogram->SetListener(this);
   m_Histogram->SetRepresentation(vtkMAFHistogram::BAR_REPRESENTATION);
   m_Histogram->SetData(m_ResampledData);
+  m_Histogram->SetLut(  material->m_ColorLut );
+  m_Histogram->ShowLines();
+  m_Histogram->ShowText(false);
   gui->Add(m_Histogram,1);
 
   m_LutSwatch = new medGUILutHistogramSwatch(gui ,-1,"", dataSet, material, wxSize(482,18),false);
   m_LutSwatch->showThreshold(true);
+  m_LutSwatch->EnableOverHighlight(true);
 
 
   m_Windowing = new mafGUILutSlider(gui,-1,wxPoint(0,0),wxSize(500,24));
@@ -97,12 +104,20 @@ medGUILutHistogramEditor::medGUILutHistogramEditor(vtkDataSet *dataSet,mmaVolume
   m_Gamma = material->m_GammaCorrection;
   m_GammaSlider = gui->FloatSlider(ID_GAMMA_CORRETION,_("Gamma: "), &m_Gamma,0,5, wxSize(400,30), "", false);
 
-
   //Activate only if required
   if (m_DataSet->GetPointData()->GetScalars()->GetNumberOfTuples()>SUB_SAMPLED_SIZE)
     gui->Bool(ID_FULL_SAMPLING,"Full Sampling (accurate but slow)",&m_FullSampling,1);
   
+  gui->Bool(ID_LOG_SCALE_VIEW,"View histogram in log scale",&m_LogScale,1);
+
   gui->Button(ID_RESET_LUT,"Reset Lut");
+
+  wxStaticText *label = new wxStaticText(this, -1, " Right click + Up/Down in the histogram to zoom In/Out", wxDefaultPosition, wxSize(500,18), wxALIGN_LEFT | wxST_NO_AUTORESIZE );
+
+  gui->Add(label,0,wxEXPAND | wxALL);
+
+  gui->FitGui();
+  gui->Update();
   this->Add(gui,1);
   this->SetMinSize(wxSize(500,124));
 
@@ -113,10 +128,10 @@ medGUILutHistogramEditor::medGUILutHistogramEditor(vtkDataSet *dataSet,mmaVolume
   m_Windowing->SetSubRange(ranges[0],ranges[1]);
   m_Histogram->Refresh();
 
-  this->ShowModal();
-
-
+  this->Fit();
+  this->Update();
 }
+
 //----------------------------------------------------------------------------
 medGUILutHistogramEditor::~medGUILutHistogramEditor()
 //----------------------------------------------------------------------------
@@ -143,7 +158,9 @@ void medGUILutHistogramEditor::OnEvent(mafEventBase *maf_event)
       case ID_RANGE_MODIFIED:
         {
           m_Windowing->GetSubRange(&m_LowRange, &m_HiRange);
+          m_Histogram->UpdateLines(m_LowRange, m_HiRange);
           UpdateVolumeLut();
+          m_LutSwatch->Modified();
           //Generating Event to update other views
           mafEventMacro(mafEvent(this,GetId()));
         }
@@ -151,30 +168,54 @@ void medGUILutHistogramEditor::OnEvent(mafEventBase *maf_event)
       case ID_GAMMA_CORRETION:
         {
           UpdateVolumeLut();
+          m_LutSwatch->Modified();
           //Generating Event to update other views
           mafEventMacro(mafEvent(this,GetId()));
         }
         break;
       case ID_RESET_LUT:
         {
-            //Setting lut/gamma to default values
-            UpdateVolumeLut(true);
-            ResetLutDialog(1.0, m_LowRange, m_HiRange);
-            //Generating Event to update other views
-            mafEventMacro(mafEvent(this,GetId()));
+          //Setting lut/gamma to default values
+          ResetLutDialog(1.0, m_LowRange, m_HiRange);
+          m_Histogram->UpdateLines(m_LowRange, m_HiRange);
+          UpdateVolumeLut();
+          m_LutSwatch->Modified();
+          //Generating Event to update other views
+          mafEventMacro(mafEvent(this,GetId()));
         }
         break;
       case ID_FULL_SAMPLING:
       {
-         wxBusyCursor *wait =  new wxBusyCursor();
+
+         wxBusyCursor wait;
          
          if (m_FullSampling)
+         {
+           //Set busy info only on slow (full histogram) operation
+           wxBusyInfo wait(_("Updating Histogram ..."));
            m_Histogram->SetData(m_DataSet->GetPointData()->GetScalars());
+         }
          else 
            m_Histogram->SetData(m_ResampledData);
-
-         delete wait;
       }
+      break;
+      case ID_LOG_SCALE_VIEW:
+        {
+          //Enable disable log scale
+          m_Histogram->AutoscaleHistogramOn();
+          m_Histogram->LogarithmicScale(m_LogScale);
+          this->Refresh();
+          this->Update();
+        }
+        break;
+
+      default:
+        {
+         //forward up events, needed for showing highlight in other views  
+         this->Update();
+         this->Refresh();
+         mafEventMacro(*e);
+        }
       break;
     }
   }
@@ -238,6 +279,7 @@ void medGUILutHistogramEditor::ShowLutHistogramDialog(vtkDataSet *dataSet,mmaVol
 {
   //Call the default constructor to show the Dialog
   medGUILutHistogramEditor *led = new medGUILutHistogramEditor(dataSet,material,name,listener,id);
+  led->ShowModal();
 }
 
 //----------------------------------------------------------------------------
@@ -321,6 +363,7 @@ void medGUILutHistogramEditor::UpdateVolumeLut(bool reset)
 
   if (m_LutSwatch)
     m_LutSwatch->Modified();
+
   //Forward event to update other views
   mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 }
