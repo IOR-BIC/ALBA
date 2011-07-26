@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2011-07-26 10:20:17 $
-Version:   $Revision: 1.1.2.139 $
+Date:      $Date: 2011-07-26 12:36:09 $
+Version:   $Revision: 1.1.2.140 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -3301,14 +3301,21 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
           dicomDataset->findAndGetString(DCM_StudyDate,date);
           dicomDataset->findAndGetString(DCM_SeriesDescription,description);
 
-          if(((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::TRADITIONAL)
+          if (!this->m_TestMode)
+          {
+	          if(((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::TRADITIONAL)
+	          {
+	            seriesName.Append(wxString::Format("%i_%ix%i",seriesCounter, dcmRows, dcmColumns));
+	          }
+	          else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::DESCRIPTION_DATE)
+	          {
+	            seriesName = (wxString::Format("%s_%s_%d",description,date,seriesIndex));
+	            seriesIndex++;
+	          }
+          }
+          else
           {
             seriesName.Append(wxString::Format("%i_%ix%i",seriesCounter, dcmRows, dcmColumns));
-          }
-          else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::DESCRIPTION_DATE)
-          {
-            seriesName = (wxString::Format("%s_%s_%d",description,date,seriesIndex));
-            seriesIndex++;
           }
 					
           seriesId.push_back(seriesName);
