@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffisTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-04-12 16:18:35 $
-Version:   $Revision: 1.1.2.14 $
+Date:      $Date: 2011-07-26 12:35:12 $
+Version:   $Revision: 1.1.2.15 $
 Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -153,40 +153,43 @@ void medOpImporterDicomOffisTest::TestCreateVolume()
   bool cont = dir.GetFirst(&dicomDir, "", wxDIR_DIRS);
   while ( cont )
   {
-    medOpImporterDicomOffis *importer=new medOpImporterDicomOffis();
-    importer->TestModeOn();
-
-    wxString dicomPath = dirName + dicomDir;
-    importer->SetDicomDirectoryABSFileName(dicomPath.c_str());
-    importer->CreateSliceVTKPipeline();
-    importer->OpenDir();
-    importer->ReadDicom();
-    importer->GenerateSliceTexture(0);
-    importer->BuildOutputVMEGrayVolumeFromDicom();
-
-    mafVME *VME=mafVME::SafeDownCast(importer->GetOutput());
-    VME->Update();
-    CPPUNIT_ASSERT(VME!=NULL);
-
-    double sr[2];
-    if(VME->IsA("mafVMEVolumeGray"))
+    if (dicomDir != "CVS")
     {
-      vtkRectilinearGrid *data=vtkRectilinearGrid::SafeDownCast(VME->GetOutput()->GetVTKData());
-      data->UpdateData();
-      data->GetScalarRange(sr);
+	    medOpImporterDicomOffis *importer=new medOpImporterDicomOffis();
+      importer->TestModeOn();
+	
+	    wxString dicomPath = dirName + dicomDir;
+	    importer->SetDicomDirectoryABSFileName(dicomPath.c_str());
+	    importer->CreateSliceVTKPipeline();
+	    importer->OpenDir();
+	    importer->ReadDicom();
+	    importer->GenerateSliceTexture(0);
+	    importer->BuildOutputVMEGrayVolumeFromDicom();
+	
+	    mafVME *VME=mafVME::SafeDownCast(importer->GetOutput());
+	    VME->Update();
+	    CPPUNIT_ASSERT(VME!=NULL);
+	
+	    double sr[2];
+	    if(VME->IsA("mafVMEVolumeGray"))
+	    {
+	      vtkRectilinearGrid *data=vtkRectilinearGrid::SafeDownCast(VME->GetOutput()->GetVTKData());
+	      data->UpdateData();
+	      data->GetScalarRange(sr);
+	    }
+	    else 
+	    {
+	      CPPUNIT_ASSERT(VME->IsA("mafVMEImage"));
+	      VME->GetOutput()->GetVTKData()->UpdateData();
+	      VME->GetOutput()->GetVTKData()->GetScalarRange(sr);
+	    }
+	       
+	    CPPUNIT_ASSERT(sr[0]-sr[1] != 0);
+	   
+	    importer->OpStop(OP_RUN_OK);
+	    mafDEL(importer);
+	    VME = NULL;
     }
-    else 
-    {
-      CPPUNIT_ASSERT(VME->IsA("mafVMEImage"));
-      VME->GetOutput()->GetVTKData()->UpdateData();
-      VME->GetOutput()->GetVTKData()->GetScalarRange(sr);
-    }
-       
-    CPPUNIT_ASSERT(sr[0]-sr[1] != 0);
-   
-    importer->OpStop(OP_RUN_OK);
-    mafDEL(importer);
-    VME = NULL;
 
     cont = dir.GetNext(&dicomDir);
   }
@@ -209,66 +212,69 @@ void medOpImporterDicomOffisTest::TestCompareDicomImage()
   bool cont = dir.GetFirst(&dicomDir, "", wxDIR_DIRS);
   while ( cont )
   {
-    //find the .txt file
-    wxString name, path, short_name, ext;
-    wxString dicomPath = dirName + dicomDir;
-    wxDir dirDicom(dicomPath);
-    wxArrayString files;
-    wxString extension = "txt";
-    const wxString FileSpec = "*" + extension;
-
-    if (dicomPath != wxEmptyString && wxDirExists(dicomPath))
+    if (dicomDir != "CVS")
     {
-      wxDir::GetAllFiles(dicomPath, &files, FileSpec);
+	    //find the .txt file
+	    wxString name, path, short_name, ext;
+	    wxString dicomPath = dirName + dicomDir;
+	    wxDir dirDicom(dicomPath);
+	    wxArrayString files;
+	    wxString extension = "txt";
+	    const wxString FileSpec = "*" + extension;
+	
+	    if (dicomPath != wxEmptyString && wxDirExists(dicomPath))
+	    {
+	      wxDir::GetAllFiles(dicomPath, &files, FileSpec);
+	    }
+	    CPPUNIT_ASSERT(files.GetCount() == 1);
+	    wxString txtFilePath = files[0];
+	
+	    medOpImporterDicomOffis *importer=new medOpImporterDicomOffis();
+	    importer->TestModeOn();
+	    
+	    importer->SetDicomDirectoryABSFileName(dicomPath.c_str());
+	    importer->CreateSliceVTKPipeline();
+	    importer->OpenDir();
+	    importer->ReadDicom();
+	    importer->GenerateSliceTexture(0);
+	
+	    wxSplitPath(txtFilePath, &path, &short_name, &ext);
+	    vtkMAFSmartPointer<vtkImageData> imageImported = importer->GetSliceImageDataFromLocalDicomFileName(short_name);
+	   
+	    wxFileInputStream inputFile( txtFilePath );
+	    wxTextInputStream text( inputFile );
+	    wxString line = text.ReadLine();
+	
+	    do 
+	    {
+	      wxStringTokenizer tkz(line,wxT('\t'),wxTOKEN_RET_EMPTY_ALL);
+	
+	      while (tkz.HasMoreTokens())
+	      {
+	        pixelValue = atof(tkz.GetNextToken().c_str());
+	        pixelVector.push_back(pixelValue);
+	      }
+	      line = text.ReadLine();
+	
+	    } while (!inputFile.Eof());
+	
+	    CPPUNIT_ASSERT(imageImported->GetNumberOfPoints() == pixelVector.size());
+	
+	    bool idem = true;
+	    for(int i=0 ; i<imageImported->GetNumberOfPoints();i++)
+	    {
+	      idem = imageImported->GetPointData()->GetScalars()->GetTuple1(i) == pixelVector[i];
+	      if (!idem)
+	      {
+	        break;
+	      }
+	      CPPUNIT_ASSERT(imageImported->GetPointData()->GetScalars()->GetTuple1(i) == pixelVector[i]);
+	    }
+	
+	    importer->OpStop(OP_RUN_OK);
+	    mafDEL(importer);
+	    pixelVector.clear();
     }
-    CPPUNIT_ASSERT(files.GetCount() == 1);
-    wxString txtFilePath = files[0];
-
-    medOpImporterDicomOffis *importer=new medOpImporterDicomOffis();
-    importer->TestModeOn();
-    
-    importer->SetDicomDirectoryABSFileName(dicomPath.c_str());
-    importer->CreateSliceVTKPipeline();
-    importer->OpenDir();
-    importer->ReadDicom();
-    importer->GenerateSliceTexture(0);
-
-    wxSplitPath(txtFilePath, &path, &short_name, &ext);
-    vtkMAFSmartPointer<vtkImageData> imageImported = importer->GetSliceImageDataFromLocalDicomFileName(short_name);
-   
-    wxFileInputStream inputFile( txtFilePath );
-    wxTextInputStream text( inputFile );
-    wxString line = text.ReadLine();
-
-    do 
-    {
-      wxStringTokenizer tkz(line,wxT('\t'),wxTOKEN_RET_EMPTY_ALL);
-
-      while (tkz.HasMoreTokens())
-      {
-        pixelValue = atof(tkz.GetNextToken().c_str());
-        pixelVector.push_back(pixelValue);
-      }
-      line = text.ReadLine();
-
-    } while (!inputFile.Eof());
-
-    CPPUNIT_ASSERT(imageImported->GetNumberOfPoints() == pixelVector.size());
-
-    bool idem = true;
-    for(int i=0 ; i<imageImported->GetNumberOfPoints();i++)
-    {
-      idem = imageImported->GetPointData()->GetScalars()->GetTuple1(i) == pixelVector[i];
-      if (!idem)
-      {
-        break;
-      }
-      CPPUNIT_ASSERT(imageImported->GetPointData()->GetScalars()->GetTuple1(i) == pixelVector[i]);
-    }
-
-    importer->OpStop(OP_RUN_OK);
-    mafDEL(importer);
-    pixelVector.clear();
 
     cont = dir.GetNext(&dicomDir);
   }
