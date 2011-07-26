@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-06-01 07:58:15 $
-  Version:   $Revision: 1.61.2.19 $
+  Date:      $Date: 2011-07-26 12:26:48 $
+  Version:   $Revision: 1.61.2.20 $
   Authors:   Stefano Perticoni, Gianluigi Crimi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -491,10 +491,12 @@ void mafViewOrthoSlice::PackageView()
       m_Views[v]->PlugVisualPipe("mafVMEPolyline", "mafPipePolylineSlice");
       m_Views[v]->PlugVisualPipe("mafVMEPolylineSpline", "mafPipePolylineSlice");
       m_Views[v]->PlugVisualPipe("mafVMEMeter", "mafPipePolyline");
+			m_Views[v]->PlugVisualPipe("medVMEMuscleWrapper", "mafPipeSurfaceSlice",MUTEX);
     }
     else
     {
       m_Views[v]->PlugVisualPipe("mafVMESurface", "mafPipeSurface",MUTEX);
+			m_Views[v]->PlugVisualPipe("medVMEMuscleWrapper", "mafPipeSurface",MUTEX);
     }
 		
   }
@@ -785,7 +787,7 @@ void mafViewOrthoSlice::SetThicknessForAllSurfaceSlices(mafNode *root)
 	mafNodeIterator *iter = root->NewIterator();
 	for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
 	{
-		if(node->IsA("mafVMESurface"))
+		if (((mafVME *)node)->GetOutput()->IsA("mafVMEOutputSurface")) //if(node->IsA("mafVMESurface"))
 		{
 			if(mafPipeSurfaceSlice *pipe = mafPipeSurfaceSlice::SafeDownCast(m_ChildViewList[CHILD_XN_VIEW]->GetNodePipe(node)))
 			{
