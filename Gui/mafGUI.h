@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUI.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-25 10:03:24 $
-  Version:   $Revision: 1.3.2.9 $
+  Date:      $Date: 2011-07-26 14:19:00 $
+  Version:   $Revision: 1.3.2.10 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2005
@@ -178,6 +178,9 @@ public:
 
   /** Checkbutton widget. */
   void Bool(int id, mafString label, int *var, int flag = 0, mafString tooltip = ""	);
+
+  /** Checkbutton grid widget. */
+  void BoolGrid(int numRows, int numColumns, std::vector<int> &ids, std::vector<const char*> &labelsRows,std::vector<const char*> &labelsColumns, int *var, mafString tooltip = ""	);
 
   /** Radiobutton widget. */
   void Radio(int id,wxString label, int *var, int numchoices = 0, const wxString choices[] = NULL, int dim = 1, wxString tooltip = "", int style = wxRA_SPECIFY_COLS);

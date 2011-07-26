@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUI.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-05-25 10:03:24 $
-  Version:   $Revision: 1.2.2.9 $
+  Date:      $Date: 2011-07-26 14:19:00 $
+  Version:   $Revision: 1.2.2.10 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -1609,3 +1609,48 @@ int mafGUI::GetWidgetId(int mod_id)
   m_WidgetTableID[(*MAFWidgetId) - MINID] = mod_id; 
   return (*MAFWidgetId);
 } 
+//----------------------------------------------------------------------------
+void mafGUI::BoolGrid(int numRows, int numColumns, std::vector<int> &ids, std::vector<const char*> &labelsRows,std::vector<const char*> &labelsColumns, int *var, mafString tooltip /* = "" */ )
+//----------------------------------------------------------------------------
+{
+  std::vector<int> w_ids;
+  std::vector<wxCheckBox *> check_list;
+  for(int i=0; i< ids.size(); i++)
+  {
+    w_ids.push_back(GetWidgetId(ids[i]));
+    check_list.push_back(new wxCheckBox(this, w_ids[i], "" ,dp, wxSize(FW/(numColumns+1),BH),m_EntryStyle ));
+    check_list[i]->SetValidator( mafGUIValidator(this,w_ids[i],check_list[i],&(var[i])));
+    check_list[i]->SetFont(m_Font);
+  }
+
+  wxStaticText* div = new wxStaticText(this, -1, "",dp, wxSize(-1, LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE);
+
+  wxFlexGridSizer *fgSizer=  new wxFlexGridSizer( numRows+1, numColumns+1, 1, 1 );
+  
+  fgSizer->Add(div);//ad the position 0,0 an empty cell
+
+  for (int i=0;i<labelsColumns.size();i++)
+  {
+    const char *a = labelsColumns[i];
+    wxStaticText* lab = new wxStaticText(this, -1, labelsColumns[i],dp, wxSize(FW/(numColumns+1),LH), wxALIGN_LEFT);
+    fgSizer->Add(lab);
+  }
+
+  for(int i = 0,j=0,k=0; i < (numColumns+1)*numRows; i++)
+  {
+    if (i%(numColumns+1)!=0)
+    {
+    	fgSizer->Add(check_list[j]);
+      j++;
+    }
+    else//Add label of rows
+    {
+      const char *a = labelsRows[k];
+      wxStaticText* lab = new wxStaticText(this, -1, labelsRows[k],dp, wxSize(FW/(numColumns+1),LH), wxALIGN_LEFT);
+      fgSizer->Add(lab);
+      k++;
+    }
+  }
+
+  Add(fgSizer,0,wxALL, M);
+}
