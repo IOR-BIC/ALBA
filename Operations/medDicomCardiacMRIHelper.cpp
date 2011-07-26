@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medDicomCardiacMRIHelper.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-07-14 09:46:16 $
-  Version:   $Revision: 1.1.2.23 $
+  Date:      $Date: 2011-07-26 10:20:17 $
+  Version:   $Revision: 1.1.2.24 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -233,6 +233,11 @@ int medDicomCardiacMRIHelper::ParseDicomDirectory()
     }
     seriesNumbers.push_back(dcmSeriesNumber);
 
+#ifdef _DEBUG
+    mafLogMessage("DEBUG >>>>>>>>> Series Number Found %ld",dcmSeriesNumber);
+#endif // _DEBUG
+    
+
     long int dcmColumns;
     dicomDataset->findAndGetLongInt(DCM_Columns, dcmColumns);
   
@@ -304,6 +309,20 @@ int medDicomCardiacMRIHelper::ParseDicomDirectory()
       {
         id_frame.push_back(i);
       }
+    }
+
+    //Number of frame must be the same
+    if (id_frame.size() != planesPerFrame)
+    {
+      wxMessageBox("ERROR during processing Cardiac MRI");
+      vtkDEL(directoryReader);
+
+      mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
+
+      cppDEL(busyCursor);
+      cppDEL(busyInfo);
+
+      return MAF_ERROR;
     }
 
     for (int i = 0; i < fileNumberForPlaneIFrameJ.rows(); i++) 
@@ -474,11 +493,42 @@ int medDicomCardiacMRIHelper::ParseDicomDirectory()
     const double inv = -1;
     fileNumberForPlaneIFrameJ.set(&inv); // laminate with invalid value
 
+    std::map<int,int> series;
+
+    for (int i = 0; i < timeFrames * planesPerFrame; i++) 
+    {
+      series[seriesNumbers[i]] = 0;
+    }
+
+    int index = 0;
+    for (std::map<int,int>::iterator it = series.begin(); it != series.end(); ++it,++index)
+    {
+      it->second = index;
+    }
+
     for (int i = 0; i < timeFrames * planesPerFrame; i++) 
     {
       int col = int(frame(i,0)-1);
       int row = seriesNumbers[i] - minSeriesNumber;
 
+#ifdef _DEBUG
+      mafLogMessage("DEBUG >>>>>>>>> Row from %d began %d",row,series[seriesNumbers[i]]);
+#endif // _DEBUG
+
+      row = series[seriesNumbers[i]];
+
+      if (row >= planesPerFrame || col >= timeFrames)
+      {
+        wxMessageBox("ERROR during processing Cardiac MRI");
+        vtkDEL(directoryReader);
+
+        mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
+
+        cppDEL(busyCursor);
+        cppDEL(busyInfo);
+
+        return MAF_ERROR;
+      }
       fileNumberForPlaneIFrameJ.put(row,col,i);
     }
   }

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2011-07-20 10:21:13 $
-Version:   $Revision: 1.1.2.138 $
+Date:      $Date: 2011-07-26 10:20:17 $
+Version:   $Revision: 1.1.2.139 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -118,6 +118,8 @@ MafMedical is partially based on OpenMAF.
 
 #include "vtkMath.h"
 
+#define round(x) (x<0?ceil((x)-0.5):floor((x)+0.5))
+
 //BES: 4.7.2009 - VS 2008 cannot compile it due to the following error
 //C:\MAF\Medical\Libraries\Offis\Sources\dcmtk-3.5.4\config\include\dcmtk/config/cfwin32.h(362) : error C2371: 'ssize_t' : redefinition; different basic types
 //  C:\MAF\openMAF\Libraries\wxWin\Sources\include\wx/defs.h(1018) : see declaration of 'ssize_t'
@@ -210,7 +212,8 @@ enum DICOM_IMPORTER_GUI_ID
 	ID_SCAN_SLICE,
 	ID_VOLUME_NAME,
 	ID_VOLUME_SIDE,
-	ID_VME_TYPE
+	ID_VME_TYPE,
+  ID_SORT_AXIS,
 };
 enum VOLUME_SIDE
 {
@@ -648,7 +651,7 @@ void medOpImporterDicomOffis::Destroy()
 	{
 		cppDEL(m_LoadGuiLeft);
 		cppDEL(m_LoadGuiUnderLeft);
-		cppDEL(m_LoadGuiCenter);
+		cppDEL(m_LoadGuiUnderCenter);
 		cppDEL(m_CropGuiLeft);
 		cppDEL(m_CropGuiCenter);
 		cppDEL(m_BuildGuiLeft); 
@@ -1001,6 +1004,13 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
 	}
 
   int count,s_count;
+  int numSliceToSkip = 0;
+  bool *sliceToSkip = new bool[n_slices];
+  for (int i=0;i<n_slices;i++)
+  {
+    sliceToSkip[i] = false;
+  }
+
   bool applyCorrectionToRotateZcoordinate = false;
   if (m_SeriesIDContainsRotationsMap[m_SelectedSeriesID] == true  && m_ApplyRotation)
   {
@@ -1008,6 +1018,7 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
     bool forcedToExit = false;
     bool storedFirstCosinDirector = false;
     double cosinDirectorToCheck[6];
+    int dimensionsToCheck[3];
     for (count = m_ZCropBounds[0], s_count = 0; count < m_ZCropBounds[1]+1; count += step)
     {        
       if (storedFirstCosinDirector)
@@ -1017,7 +1028,7 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
 
         for (int i=0;i<6;++i)
         {
-          if (cosinDirector[i] != cosinDirectorToCheck[i])
+          if (cosinDirector[i] != cosinDirectorToCheck[i] && applyCorrectionToRotateZcoordinate)
           {
             int result = wxMessageBox(_("WARNING: slices aren't parallel in Z axis. Do you want force this?"),"",wxOK|wxCENTRE|wxCANCEL);
             if (result == wxOK)
@@ -1029,24 +1040,38 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
               applyCorrectionToRotateZcoordinate = false;
             }
 
-            forcedToExit = true;
             break;
           }
         }
-        if (forcedToExit)
+
+        int dim[3];
+        vtkImageData *image = m_SelectedSeriesSlicesList->Item(count)->GetData()->GetVTKImageData();
+        image->Update();
+        image->GetDimensions(dim);
+
+        for (int i=0;i<3;i++)
         {
-          break;
+          if (dim[i] != dimensionsToCheck[i])
+          {
+            wxMessageBox("A slice have different dimensions! This slice will be skipped!");
+            mafLogMessage("SLICE SKIPPED: %d",m_SelectedSeriesSlicesList->Item(count)->GetData()->GetDcmInstanceNumber());
+
+            numSliceToSkip++;
+            sliceToSkip[count] = true;
+            break;
+          }
         }
+
       }
       else
       {
         m_SelectedSeriesSlicesList->Item(count)->GetData()->GetDcmImageOrientationPatient(cosinDirectorToCheck);
-        storedFirstCosinDirector = true;
-      }
 
-      if (forcedToExit)
-      {
-        break;
+        vtkImageData *image = m_SelectedSeriesSlicesList->Item(count)->GetData()->GetVTKImageData();
+        image->Update();
+        image->GetDimensions(dimensionsToCheck);
+        
+        storedFirstCosinDirector = true;
       }
     }
   }
@@ -1057,6 +1082,7 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
 		mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
 	}
 
+  n_slices -= numSliceToSkip;
 	vtkMAFSmartPointer<vtkMAFRGSliceAccumulate> accumulate;
 	accumulate->SetNumberOfSlices(n_slices);
 	accumulate->BuildVolumeOnAxes(m_SortAxes);
@@ -1067,6 +1093,11 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
 	long progress = 0;
 	for (count = m_ZCropBounds[0], s_count = 0; count < m_ZCropBounds[1]+1; count += step)
 	{
+    if (sliceToSkip[count])
+    {
+      break;
+    }
+
 		if (s_count == n_slices) {break;}
 		GenerateSliceTexture(count);
 
@@ -1133,6 +1164,9 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
 			mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
 		}
 	}
+
+  delete []sliceToSkip;
+
 	if(!this->m_TestMode)
 	{
 		mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
@@ -1293,6 +1327,14 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 	long progress = 0;
 	int totalNumberOfImages = (m_ZCropBounds[1]+1)*m_NumberOfTimeFrames;
 	int progressCounter = 0;
+
+  int numSliceToSkip = 0;
+  bool *sliceToSkip = new bool[n_slices];
+  for (int i=0;i<n_slices;i++)
+  {
+    sliceToSkip[i] = false;
+  }
+
 	// for every timestamp
 
   bool applyCorrectionToRotateZcoordinate = false;
@@ -1304,6 +1346,7 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
     double cosinDirectorToCheck[6];
     for (int ts = 0; ts < m_NumberOfTimeFrames; ts++)
     {
+      int dimensionsToCheck[3];
       int probeHeigthId = 0;
       for (int sourceVolumeSliceId = m_ZCropBounds[0], targetVolumeSliceId = 0; sourceVolumeSliceId < m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
       {
@@ -1317,7 +1360,7 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 
           for (int i=0;i<6;++i)
           {
-            if (cosinDirector[i] != cosinDirectorToCheck[i])
+            if (cosinDirector[i] != cosinDirectorToCheck[i] && applyCorrectionToRotateZcoordinate)
             {
               int result = wxMessageBox(_("WARNING: slices aren't parallel in Z axis. Do you want force this?"),"",wxOK|wxCENTRE|wxCANCEL);
               if (result == wxOK)
@@ -1329,34 +1372,46 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
                 applyCorrectionToRotateZcoordinate = false;
               }
 
-              forcedToExit = true;
               break;
             }
           }
-          if (forcedToExit)
+          
+          int dim[3];
+          vtkImageData *image = m_SelectedSeriesSlicesList->Item(currImageId)->GetData()->GetVTKImageData();
+          image->Update();
+          image->GetDimensions(dim);
+
+          if (!sliceToSkip[sourceVolumeSliceId])
           {
-            break;
+	          for (int i=0;i<3;i++)
+	          {
+	            if (dim[i] != dimensionsToCheck[i])
+	            {
+	              wxMessageBox("A slice have different dimensions! This slice will be skipped!");
+	              mafLogMessage("SLICE SKIPPED: %d",m_SelectedSeriesSlicesList->Item(currImageId)->GetData()->GetDcmInstanceNumber());
+	
+	              numSliceToSkip++;
+	              sliceToSkip[sourceVolumeSliceId] = true;
+	              break;
+	            }
+	          }
           }
+
         }
         else
         {
           m_SelectedSeriesSlicesList->Item(currImageId)->GetData()->GetDcmImageOrientationPatient(cosinDirectorToCheck);
-          storedFirstCosinDirector = true;
-        }
+          
+          vtkImageData *image = m_SelectedSeriesSlicesList->Item(currImageId)->GetData()->GetVTKImageData();
+          image->Update();
+          image->GetDimensions(dimensionsToCheck);
 
-        if (forcedToExit)
-        {
-          break;
+          storedFirstCosinDirector = true;
         }
 
         targetVolumeSliceId++;
         probeHeigthId++;
 
-      }
-
-      if (forcedToExit)
-      {
-        break;
       }
 
     }
@@ -1433,7 +1488,9 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 	
 	        double spacing = sqrt(vtkMath::Distance2BetweenPoints(originSlice,oldOrigin));
 
+#ifdef _DEBUG
           mafLogMessage("SPACING: %3f",spacing);
+#endif // _DEBUG
 	
 	        if (oldOrigin[m_SortAxes] < originSlice[m_SortAxes])
 	        {
@@ -1520,12 +1577,17 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 
 		// always build the volume on z-axis
 		accumulator->BuildVolumeOnAxes(m_SortAxes);
-		accumulator->SetNumberOfSlices(m_NumberOfSlices);
+		accumulator->SetNumberOfSlices(m_NumberOfSlices - numSliceToSkip);
 
 		int i = 0;
+    int j = 0;
 
-		for( map<double,int>::iterator currentMapElement=zToIDMap.begin(); currentMapElement!=zToIDMap.end(); ++currentMapElement)
+		for( map<double,int>::iterator currentMapElement=zToIDMap.begin(); currentMapElement!=zToIDMap.end(); ++currentMapElement,++j)
 		{
+      if (sliceToSkip[j])
+      {
+        break;
+      }
 			double id = currentMapElement->second;
 			double z = currentMapElement->first;
 			accumulator->SetSlice(i, imageDataVector[currentMapElement->second]);
@@ -1611,6 +1673,8 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 		imageDataVector.clear();
 
 	}
+
+  delete []sliceToSkip;
 
 	if(!this->m_TestMode)
 	{
@@ -1981,7 +2045,11 @@ void medOpImporterDicomOffis::CreateLoadPage()
 	m_LoadPage = new medGUIWizardPageNew(m_Wizard,medUSEGUI|medUSERWI);
 	m_LoadGuiLeft = new mafGUI(this);
 	m_LoadGuiUnderLeft = new mafGUI(this);
-	m_LoadGuiCenter = new mafGUI(this);
+	m_LoadGuiUnderCenter = new mafGUI(this);
+
+  mafGUI *loadGuiCenter = new mafGUI(this);
+  wxString choices[3] = {_("X"),_("Y"),_("Z")};
+  loadGuiCenter->Radio(ID_SORT_AXIS,_("Sort type:"),&m_SortAxes,3,choices);
 
 	m_SliceScannerLoadPage=m_LoadGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_CurrentSlice,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice());
 	m_SliceScannerLoadPage->SetPageSize(1);
@@ -1992,14 +2060,17 @@ void medOpImporterDicomOffis::CreateLoadPage()
 	}
 
 	m_StudyListbox = m_LoadGuiUnderLeft->ListBox(ID_STUDY_SELECT,_("study"),80,"",wxLB_HSCROLL,190);
-	m_SeriesListbox = m_LoadGuiCenter->ListBox(ID_SERIES_SELECT,_("series"),80,"",wxLB_HSCROLL|wxLB_SORT,190);
+	m_SeriesListbox = m_LoadGuiUnderCenter->ListBox(ID_SERIES_SELECT,_("series"),80,"",wxLB_HSCROLL|wxLB_SORT,190);
+
+  
 
 	m_LoadGuiLeft->FitGui();
 	m_LoadGuiUnderLeft->FitGui();
-	m_LoadGuiCenter->FitGui();
+	m_LoadGuiUnderCenter->FitGui();
 	m_LoadPage->AddGuiLowerLeft(m_LoadGuiLeft);
 	m_LoadPage->AddGuiLowerUnderLeft(m_LoadGuiUnderLeft);
-	m_LoadPage->AddGuiLowerUnderCenter(m_LoadGuiCenter);
+	m_LoadPage->AddGuiLowerUnderCenter(m_LoadGuiUnderCenter);
+  m_LoadPage->AddGuiLowerCenter(loadGuiCenter);
 
 	m_LoadPage->GetRWI()->m_RwiBase->SetMouse(m_Mouse);
 	m_LoadPage->GetRWI()->m_RenFront->AddActor(m_SliceActor);
@@ -2221,19 +2292,40 @@ void medOpImporterDicomOffis::ReadDicom()
 	// sort dicom slices
 	if(m_SelectedSeriesSlicesList->GetCount() > 1)
 	{
-		double item1_pos[3],item2_pos[3],d[3];
-		medDicomSlice *element1;
-		medDicomSlice *element2;
+    double item1_pos[3],item2_pos[3],d[3];
+    medDicomSlice *element1;
+    medDicomSlice *element2;
 
-		element1 = (medDicomSlice *)m_SelectedSeriesSlicesList->Item(0)->GetData();
-		element2 = (medDicomSlice *)m_SelectedSeriesSlicesList->Item(1)->GetData();
+    d[0] = 0.0;
+    d[1] = 0.0;
+    d[2] = 0.0;
 
-		element1->GetDcmImagePositionPatient(item1_pos);
-		element2->GetDcmImagePositionPatient(item2_pos);
+    for (int i=0;i<m_SelectedSeriesSlicesList->GetCount()-1;++i)
+    {
+      element1 = (medDicomSlice *)m_SelectedSeriesSlicesList->Item(i)->GetData();
+      element2 = (medDicomSlice *)m_SelectedSeriesSlicesList->Item(i+1)->GetData();
 
-		d[0] = fabs(item1_pos[0] - item2_pos[0]);
-		d[1] = fabs(item1_pos[1] - item2_pos[1]);
-		d[2] = fabs(item1_pos[2] - item2_pos[2]);
+      element1->GetDcmImagePositionPatient(item1_pos);
+      element2->GetDcmImagePositionPatient(item2_pos);
+
+      d[0] += fabs(item1_pos[0] - item2_pos[0]);
+      d[1] += fabs(item1_pos[1] - item2_pos[1]);
+      d[2] += fabs(item1_pos[2] - item2_pos[2]);
+    }
+
+    d[0] /= (m_SelectedSeriesSlicesList->GetCount()-1);
+    d[1] /= (m_SelectedSeriesSlicesList->GetCount()-1);
+    d[2] /= (m_SelectedSeriesSlicesList->GetCount()-1);
+
+// 		element1 = (medDicomSlice *)m_SelectedSeriesSlicesList->Item(0)->GetData();
+// 		element2 = (medDicomSlice *)m_SelectedSeriesSlicesList->Item(1)->GetData();
+// 
+// 		element1->GetDcmImagePositionPatient(item1_pos);
+// 		element2->GetDcmImagePositionPatient(item2_pos);
+// 
+// 		d[0] = fabs(item1_pos[0] - item2_pos[0]);
+// 		d[1] = fabs(item1_pos[1] - item2_pos[1]);
+// 		d[2] = fabs(item1_pos[2] - item2_pos[2]);
 		if(d[0] > d[1] && d[0] > d[2])
 			m_SortAxes = 0;
 		else if(d[1] > d[0] && d[1] > d[2])
@@ -2341,6 +2433,44 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
 	{
 		switch(e->GetId())
 		{
+    case ID_SORT_AXIS:
+      {
+        if (m_DicomReaderModality != medGUIDicomSettings::ID_CMRI_MODALITY)
+        {
+          switch (m_SortAxes)
+          {
+          case 0:
+            m_SelectedSeriesSlicesList->Sort(CompareX);
+            break;
+          case 1:
+            m_SelectedSeriesSlicesList->Sort(CompareY);
+            break;
+          case 2:
+            m_SelectedSeriesSlicesList->Sort(CompareZ);
+            break;
+          }
+        }
+
+        // reset the current slice number to view the first slice
+        m_CurrentSlice = 0;
+        m_CurrentTime = 0;
+        m_CropFlag = false;
+        int currImageId = GetSliceIDInSeries(m_CurrentTime, m_CurrentSlice);
+
+        if(!this->m_TestMode)
+        {
+          if (currImageId != -1) 
+          {
+            // show the selected slice
+            GenerateSliceTexture(currImageId);
+            ShowSlice();
+            CameraReset();
+            ResetSliders();
+            CameraUpdate();
+          }
+        }
+      }
+      break;
 		case ID_VOLUME_SIDE:
 			{
 				if(((medGUIDicomSettings*)GetSetting())->AutoCropPosition())
@@ -3739,6 +3869,13 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 
       wxMessageBox("ERROR during reading series");
       mafLogMessage("ERROR during reading series : %s %s",seriesToDelete[i].at(0).GetCStr(),seriesToDelete[i].at(1).GetCStr());
+
+      if (m_SeriesIDToSlicesListMap.size()==0)
+      {
+        cppDEL(busyInfo);
+        return false;
+      }
+      
     }
     
     cppDEL(busyInfo);
@@ -3935,8 +4072,11 @@ void medOpImporterDicomOffis::GenerateSliceTexture(int imageID)
 		if(crop_bounds[5] > m_SliceBounds[5]) 
 			crop_bounds[5] = m_SliceBounds[5];
 
-		double dim_x_clip = ceil((double)(((crop_bounds[1] - crop_bounds[0]) / spacing[0]) + 1));
-		double dim_y_clip = ceil((double)(((crop_bounds[3] - crop_bounds[2]) / spacing[1]) + 1));
+    double dim_x_clip = round(((crop_bounds[1] - crop_bounds[0]) / spacing[0]))+1;
+    double dim_y_clip = round(((crop_bounds[3] - crop_bounds[2]) / spacing[1]))+1;
+
+		// double dim_x_clip = ceil((double)(((crop_bounds[1] - crop_bounds[0]) / spacing[0]) + 1));
+		// double dim_y_clip = ceil((double)(((crop_bounds[3] - crop_bounds[2]) / spacing[1]) + 1));
 
 		vtkMAFSmartPointer<vtkStructuredPoints> clip;
 
