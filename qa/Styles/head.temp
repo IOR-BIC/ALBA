@@ -1,0 +1,54 @@
+<html>
+<head>
+  <title>MAF Quality Assurance @@@_PUBLISH_DATE_@@@</title>
+  <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+
+  <!-- **** layout stylesheet **** -->
+  <link rel="stylesheet" type="text/css" href="Styles/style.css" />
+
+  <!-- **** colour scheme stylesheet **** -->
+  <link rel="stylesheet" type="text/css" href="Styles/colour.css" />
+
+</head>
+
+<body>
+  <div id="main">
+    <div id="links">
+      <!-- **** INSERT LINKS HERE **** -->
+      <!--a href="#">another link</a> | <a href="#">another link</a> | <a href="#">another link</a> | <a href="#">another link</a-->
+    @@@_PUBLISH_DATE_@@@
+    </div>
+    <div id="logo"><h1>MAF Quality Assurance</h1></div>
+    <div id="content">
+      <div id="menu">
+        <ul>
+          <li><a href="index.html">Introduction</a></li>
+          <!-- **** INSERT ADDITIONAL EXTERNAL TOOLS REPORT_LINK HERE **** -->
+          @@@_EXTERNAL_TOOLS_REPORT_@@@
+        </ul>
+      </div>
+      <div id="column1">
+        <div class="sidebaritem">
+          <!--div class="sbihead">
+            <h1>latest news</h1>
+          </div>
+          <div class="sbicontent">
+            <h2>01.09.2006</h2>
+            <p>This is where you can put your latest news.</p>
+            <p><a href="#">read more ...</a></p>
+            <p></p>
+            <p></p>
+            <h2>01.09.2006</h2>
+            <p>This is where you can put your latest news.</p>
+            <p><a href="#">read more ...</a></p>
+          </div-->
+        </div>
+        <div class="sidebaritem">
+          <div class="sbihead">
+            <h1>Rule Scripts</h1>
+          </div>
+          <div class="sbilinks">
+            <!-- **** INSERT ADDITIONAL LINKS HERE **** -->
+            <ul>
+              <div class="maf3LinkInsertion">
+               
