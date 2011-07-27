@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice_BES.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:26:08 $
-  Version:   $Revision: 1.1.2.6 $
+  Date:      $Date: 2011-07-27 09:05:38 $
+  Version:   $Revision: 1.1.2.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -51,7 +51,7 @@ public:
   /** RTTI Macro */
   mafTypeMacro(mafPipeVolumeSlice_BES,mafPipeSlice);
   /** Constructor */
-	mafPipeVolumeSlice_BES();
+	  mafPipeVolumeSlice_BES();
   /** Destructor */
   virtual ~mafPipeVolumeSlice_BES();
 	
@@ -67,6 +67,7 @@ public:
     ID_SLICE_SLIDER_Z,
 		ID_OPACITY_SLIDER,
     ID_ENABLE_GPU,
+    ID_ENABLE_TRILINEAR_INTERPOLATION,
     ID_LAST
   };
 
@@ -144,6 +145,15 @@ public:
   /** Get the flag that enable/disable GPU */
   int GetEnableGPU();
 
+  /** Set tri-linear interpolation */  
+  void SetTrilinearInterpolation(int on){m_TrilinearInterpolationOn = on; UpdateSlice();};
+
+  /** Set tri-linear interpolation to off */
+  void SetTrilinearInterpolationOff(){SetTrilinearInterpolation(0);};
+
+  /** Set tri-linear interpolation to on */
+  void SetTrilinearInterpolationOn(){SetTrilinearInterpolation(1);};
+
 protected:
 	/** Create the slicer pipeline. */
 	void CreateSlice(int direction);
@@ -199,5 +209,6 @@ protected:
 	bool										m_ShowSlider;
 	bool										m_ShowTICKs;
   bool                    m_Interpolate;
+  int m_TrilinearInterpolationOn; //<define if tri-linear interpolation is performed or not on slice's texture
 };
 #endif // __mafPipeVolumeSlice_H__B

@@ -3,8 +3,8 @@
 Program:   Multimod Fundation Library
 Module:    $RCSfile: vtkMAFVolumeSlicer_BES.h,v $
 Language:  C++
-Date:      $Date: 2011-05-26 08:33:31 $
-Version:   $Revision: 1.1.2.5 $
+Date:      $Date: 2011-07-27 09:05:22 $
+Version:   $Revision: 1.1.2.6 $
 Authors:   Alexander Savenko, Josef Kohout
 Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -136,6 +136,15 @@ public:
   //vtkSetMacro( GPUEnabled, int );
   void SetGPUEnabled(int enable);
   vtkGetMacro( GPUEnabled, int );
+
+  /** Set tri-linear interpolation to on */
+  void SetTrilinearInterpolationOn(){m_TriLinearInterpolationOn = true;};
+  
+  /** Set tri-linear interpolation to off */
+  void SetTrilinearInterpolationOff(){m_TriLinearInterpolationOn = false;};
+  
+  /** Set tri-linear interpolation */
+  void SetTrilinearInterpolation(bool on){m_TriLinearInterpolationOn = on;};
 #pragma endregion Attributes
 
 
@@ -288,6 +297,8 @@ protected:
   int m_TextureId;           //<Texture representing the input data
 
   float m_GPUDataDimensions[3]; //<area covered by input data (in mm)
+
+  bool m_TriLinearInterpolationOn; //<define if tri-linear interpolation is performed or not on slice's texture
 #endif  
 
 private:

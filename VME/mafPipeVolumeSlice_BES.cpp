@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice_BES.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-11-18 13:53:49 $
-  Version:   $Revision: 1.1.2.6 $
+  Date:      $Date: 2011-07-27 09:05:38 $
+  Version:   $Revision: 1.1.2.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -122,6 +122,7 @@ mafPipeVolumeSlice_BES::mafPipeVolumeSlice_BES()
 	m_ShowTICKs	 = false;
   m_EnableGPU = FALSE;
   m_Interpolate = true;
+  m_TrilinearInterpolationOn = 0;
 }
 //----------------------------------------------------------------------------
 void mafPipeVolumeSlice_BES::InitializeSliceParameters(int direction, bool show_vol_bbox, bool show_bounds/* =false */, bool interpolate/* =true */)
@@ -715,6 +716,7 @@ mafGUI *mafPipeVolumeSlice_BES::CreateGui()
 	m_Gui->Divider();
 //   m_Gui->Bool(ID_ENABLE_GPU, "Enable GPU", &m_EnableGPU, 1, 
 //     _("Enables / disables GPU support for slicing. GPU slicing is typically faster but may produce wrong results on some hardware."));
+  m_Gui->Bool(ID_ENABLE_TRILINEAR_INTERPOLATION,"Interpolation",&m_TrilinearInterpolationOn,1,"Enable/Disable tri-linear interpolation on slices");
   return m_Gui;
 }
 //----------------------------------------------------------------------------
@@ -744,6 +746,10 @@ void mafPipeVolumeSlice_BES::OnEvent(mafEventBase *maf_event)
         break;
 			break;
       case ID_ENABLE_GPU:
+        UpdateSlice();
+        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+        break;
+      case ID_ENABLE_TRILINEAR_INTERPOLATION:
         UpdateSlice();
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
         break;
@@ -832,12 +838,14 @@ void mafPipeVolumeSlice_BES::UpdateSlice()
     if (m_SlicerImage[i] != NULL)
     {
       m_SlicerImage[i]->SetGPUEnabled(m_EnableGPU);
+      m_SlicerImage[i]->SetTrilinearInterpolation(m_TrilinearInterpolationOn == 1);
       m_SlicerImage[i]->Update();
     }
 
     if (m_SlicerPolygonal[i] != NULL)
     {
-      m_SlicerPolygonal[i]->SetGPUEnabled(m_EnableGPU);  
+      m_SlicerPolygonal[i]->SetGPUEnabled(m_EnableGPU);
+      m_SlicerPolygonal[i]->SetTrilinearInterpolation(m_TrilinearInterpolationOn == 1);
       m_SlicerPolygonal[i]->Update();
     }
   }    
