@@ -22,26 +22,26 @@ find_package(Doxygen)
 ## #################################################################
 
 if (DOXYGEN_FOUND)
-  configure_file(MAF3Doxyfile.in     ${CMAKE_BINARY_DIR}/qa/doc_output/MAF3Doxyfile IMMEDIATE @ONLY)
-  configure_file(MAF3DoxyfileWithTests.in     ${CMAKE_BINARY_DIR}/qa/doc_output/MAF3DoxyfileWithTests IMMEDIATE @ONLY)
-  configure_file(MAF3PythonDoxyfile.in     ${CMAKE_BINARY_DIR}/qa/doc_output/MAF3PythonDoxyfile IMMEDIATE @ONLY)
+  configure_file(MAF2Doxyfile.in     ${CMAKE_BINARY_DIR}/qa/doc_output/MAF2Doxyfile IMMEDIATE @ONLY)
+  configure_file(MAF2DoxyfileWithTests.in     ${CMAKE_BINARY_DIR}/qa/doc_output/MAF2DoxyfileWithTests IMMEDIATE @ONLY)
+  configure_file(MAF2PythonDoxyfile.in     ${CMAKE_BINARY_DIR}/qa/doc_output/MAF2PythonDoxyfile IMMEDIATE @ONLY)
 
 execute_process(
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/qa/doc_output
   COMMAND ${CMAKE_COMMAND} -E remove_directory DocOutput
-  COMMAND ${DOXYGEN_EXECUTABLE} MAF3Doxyfile
+  COMMAND ${DOXYGEN_EXECUTABLE} MAF2Doxyfile
 )
 
 execute_process(
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/qa/doc_output
   COMMAND ${CMAKE_COMMAND} -E remove_directory DocWithTestsOutput
-  COMMAND ${DOXYGEN_EXECUTABLE} MAF3DoxyfileWithTests
+  COMMAND ${DOXYGEN_EXECUTABLE} MAF2DoxyfileWithTests
 )
 
 execute_process(
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/qa/doc_output
   COMMAND ${CMAKE_COMMAND} -E remove_directory PythonDocOutput
-  COMMAND ${DOXYGEN_EXECUTABLE} MAF3PythonDoxyfile
+  COMMAND ${DOXYGEN_EXECUTABLE} MAF2PythonDoxyfile
 )
 
 
