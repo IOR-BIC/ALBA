@@ -20,19 +20,26 @@ class UselessIncludesRule(AbstractRule):
                 pass
         except:
             pass
-        refInclude = self.dom.getElementsByTagName('compounddef')[0].getElementsByTagName('includes')[0].attributes["refid"].value
-        
+        refInclude = ""    
+        try:    
+            refInclude = self.dom.getElementsByTagName('compounddef')[0].getElementsByTagName('includes')[0].attributes["refid"].value
+        except:
+            pass
+            
         f = open("./Rules/ClassStructureRules/" + self.ParameterList[0], 'r')
         lines = f.readlines()
         for line in lines:
             self.DictionaryList.append(line.replace("\n","").replace("\r",""))
         
         directory =  os.path.dirname(self.FullPathInputFile)
-        xmlFile = os.path.join(directory, refInclude + ".xml")
-        extDom = xd.parse(xmlFile)
         
-        includeList = extDom.getElementsByTagName('compounddef')[0].getElementsByTagName('includes')
-        classToIcludeList = [i.firstChild.nodeValue.split('.')[0] for i in includeList]
+        classToIcludeList = []
+        if(refInclude != ""):
+            xmlFile = os.path.join(directory, refInclude + ".xml")
+            extDom = xd.parse(xmlFile)
+            includeList = extDom.getElementsByTagName('compounddef')[0].getElementsByTagName('includes')
+            classToIcludeList = [i.firstChild.nodeValue.split('.')[0] for i in includeList]
+        
         #print len(classToIcludeList)
         dict = {}
         for item in classToIcludeList:
@@ -48,7 +55,11 @@ class UselessIncludesRule(AbstractRule):
               attrs = member.attributes
               if(attrs["kind"].value  == "variable"):
                 #check type
-                typeVariable = member.getElementsByTagName('type')[0].firstChild.nodeValue
+                typeVariable = None
+                try:
+                  typeVariable = member.getElementsByTagName('definition')[0].firstChild.nodeValue
+                except:
+                    pass
                 #check
                 if(typeVariable != None and item in typeVariable and not((item + "*") in typeVariable) and not((item + " *") in typeVariable)):
                   #include correct! exit from for loop
