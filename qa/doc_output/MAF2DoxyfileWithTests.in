@@ -585,24 +585,20 @@ WARN_LOGFILE           =
 # with spaces.
 
 INPUT                  = . \
-                         @CMAKE_SOURCE_DIR@/src/mafCore \
-                         @CMAKE_SOURCE_DIR@/test/mafCoreTest\ \
-                         @CMAKE_SOURCE_DIR@/src/mafQA \
-                         @CMAKE_SOURCE_DIR@/test/mafQATest \
-                         @CMAKE_SOURCE_DIR@/src/mafEventBus \
-                         @CMAKE_SOURCE_DIR@/test/mafEventBusTest \
-                         @CMAKE_SOURCE_DIR@/src/mafTimeSpace \
-                         @CMAKE_SOURCE_DIR@/test/mafTimeSpaceTest \
-                         @CMAKE_SOURCE_DIR@/src/mafSerialization \
-                         @CMAKE_SOURCE_DIR@/test/mafSerializationTest \
-                         @CMAKE_SOURCE_DIR@/src/mafResources \
-                         @CMAKE_SOURCE_DIR@/test/mafResourcesTest \
-                         @CMAKE_SOURCE_DIR@/src/mafPluginVTK \
-                         @CMAKE_SOURCE_DIR@/test/mafPluginVTKTest \
-                         @CMAKE_SOURCE_DIR@/src/mafApplicationLogic \
-                         @CMAKE_SOURCE_DIR@/test/mafApplicationLogicTest \
-                         @CMAKE_SOURCE_DIR@/src/mafGUI \
-                         @CMAKE_SOURCE_DIR@/test/mafGUITest
+                         @CMAKE_SOURCE_DIR@/Base \
+                         @CMAKE_SOURCE_DIR@/Core \
+                         @CMAKE_SOURCE_DIR@/Gui \
+                         @CMAKE_SOURCE_DIR@/Interaction \
+                         @CMAKE_SOURCE_DIR@/IO \
+                         @CMAKE_SOURCE_DIR@/VME \
+                         @CMAKE_SOURCE_DIR@/Operations \
+                         @CMAKE_SOURCE_DIR@/Testing/Base \
+                         @CMAKE_SOURCE_DIR@/Testing/Core \
+                         @CMAKE_SOURCE_DIR@/Testing/Interaction \
+                         @CMAKE_SOURCE_DIR@/Testing/IO \
+                         @CMAKE_SOURCE_DIR@/Testing/Interaction \
+                         @CMAKE_SOURCE_DIR@/Testing/Operations \
+                         @CMAKE_SOURCE_DIR@/Testing/VME
 
 # This tag can be used to specify the character encoding of the source files 
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is 
