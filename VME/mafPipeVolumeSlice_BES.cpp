@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice_BES.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-07-27 09:05:38 $
-  Version:   $Revision: 1.1.2.7 $
+  Date:      $Date: 2011-07-28 07:57:51 $
+  Version:   $Revision: 1.1.2.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -122,7 +122,7 @@ mafPipeVolumeSlice_BES::mafPipeVolumeSlice_BES()
 	m_ShowTICKs	 = false;
   m_EnableGPU = FALSE;
   m_Interpolate = true;
-  m_TrilinearInterpolationOn = 0;
+  m_TrilinearInterpolationOn = 1;
 }
 //----------------------------------------------------------------------------
 void mafPipeVolumeSlice_BES::InitializeSliceParameters(int direction, bool show_vol_bbox, bool show_bounds/* =false */, bool interpolate/* =true */)
