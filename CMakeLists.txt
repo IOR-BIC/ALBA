@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2011-06-08 08:53:45 $
-# Version:   $Revision: 1.44.2.10 $
+# Date:      $Date: 2011-07-28 07:50:37 $
+# Version:   $Revision: 1.44.2.11 $
 #
 # Description:
 # CMake Project file for the MAF.
@@ -73,6 +73,7 @@ ENDIF(WIN32)
 OPTION(BUILD_EXAMPLES "Build examples." ON )
 OPTION(BUILD_TESTING "Build the testing tree." OFF)
 OPTION(MAF_BUILD_MAFDLL "Build mafDLL.dll." OFF)
+OPTION(MAF_QA "Generate QA" OFF)
 
 # MARK_AS_ADVANCED (
   # BUILD_SHARED_LIBS
@@ -274,6 +275,13 @@ ENDIF(WIN32)
   IF (BUILD_EXAMPLES AND MAF_CAN_BUILD)
     SUBDIRS(Examples)
   ENDIF (BUILD_EXAMPLES AND MAF_CAN_BUILD)
+  
+  #-----------------------------------------------------------------------------
+  # QA stuff
+  #-----------------------------------------------------------------------------
+  IF(MAF_QA)
+    SUBDIRS(qa)
+  ENDIF(MAF_QA)
   
   #-----------------------------------------------------------------------------
   # Testing stuff
