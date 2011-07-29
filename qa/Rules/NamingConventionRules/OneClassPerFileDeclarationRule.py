@@ -5,53 +5,72 @@ from Rules.AbstractRule import AbstractRule
 class OneClassPerFileDeclarationRule(AbstractRule):
     def __init__(self):
         AbstractRule.__init__(self)
-
+        self.TempFile = os.path.join(self.TempDir,"OneClassPerFileDeclarationTemp.txt")
+        
     def execute(self):
+        f = None
+        if not(os.path.exists(self.TempFile)):
+            f = open(self.TempFile,"w")
+          
+            reg = "\Aclass.*\.xml";
+            y = re.compile(reg);
+          
+            path = os.path.dirname(self.FullPathInputFile)
+            dirList=os.listdir(path)
+            for fname in dirList:
+                if(re.match(y, str(fname)) == None):
+                    pass
+                else:
+                    dom = xd.parse(os.path.join(path, fname))
+                    
+                    classCurrentName = None
+                    inclusionFile = None
+                    try:
+                        classCurrentName = dom.getElementsByTagName('compounddef')[0].getElementsByTagName('compoundname')[0].firstChild.nodeValue
+                        inclusionFile = dom.getElementsByTagName('includes')[0].firstChild.nodeValue
+                        
+                    except:
+                        pass
+                    if(classCurrentName and inclusionFile):
+                        f.write(classCurrentName+"#"+inclusionFile+"\n")
+                        
+            f.close()
+            
+          
+        f = open(self.TempFile,"r")
+        lines = f.readlines()
+        
+        
         self.dom = xd.parse(self.FullPathInputFile)
         classCurrentName = self.dom.getElementsByTagName('compounddef')[0].getElementsByTagName('compoundname')[0].firstChild.nodeValue
-        #print classCurrentName
         try:
             inclusionFile = self.dom.getElementsByTagName('includes')[0].firstChild.nodeValue
         except:
-            print "***********  Include file is not present **************"
             return self.MarkedList
         
-        path = self.FullPathInputFile[0:self.FullPathInputFile.rfind("/")]
-        
-        dirList=os.listdir(path)
-        reg = "\Aclass.*\.xml";
-        y = re.compile(reg);
         sameInclusionFileClasses = []
-        for fname in dirList:
-            if(re.match(y, str(fname)) == None):
-                pass
-            else:
-                #print className + " " + fname
-                dom = xd.parse(path + "/" + fname)
-                #print fname
-                className = dom.getElementsByTagName('compounddef')[0].getElementsByTagName('compoundname')[0].firstChild.nodeValue
-                if(className == classCurrentName):
-                    continue
-                
-                #remove namespace
-                className = className[className.rfind(":")+1:]
-                
-                try:
-                    inclusionFileToCheck = dom.getElementsByTagName('includes')[0].firstChild.nodeValue
-                    if(inclusionFileToCheck == inclusionFile):
-                       if(className != inclusionFileToCheck[:-2]):
-                           sameInclusionFileClasses.append(className);
-                except:
-                    print "***********  Include file is not present **************"
-        
-        
+        for line in lines:
+            couple = line.split("#")
             
+            classNameToCheck = couple[0].replace("\n","")
+            inclusionFileToCheck = couple[1].replace("\n","")
+            
+            #print classNameToCheck + " # " + inclusionFileToCheck
+            
+            if(classNameToCheck != classCurrentName):
+                if(inclusionFileToCheck == inclusionFile):
+                    sameInclusionFileClasses.append(classNameToCheck)
+                else:
+                    print "INCLUSIONI DIVERSE : " +inclusionFileToCheck + " # " +inclusionFile
+        
         if(len(sameInclusionFileClasses) > 0) :
             self.MarkedList.append("<item>\n"\
                                    + "  <class>" +  str(classCurrentName) + "</class>\n"\
                                    + "  <otherClasses>" + " ".join(sameInclusionFileClasses) + "</otherClasses>\n"\
                                    + " <includeFile>" + inclusionFile + "</includeFile>" \
                                    + "</item>")
+        
+        f.close()
         
         return self.MarkedList
                   
