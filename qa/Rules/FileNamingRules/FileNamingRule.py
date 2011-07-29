@@ -42,7 +42,7 @@ class FileNamingRule(AbstractRule):
             break;
         if(result == False):
           #print "***NO 1 with base*** " , className
-          self.MarkedList.append("<err_item>" + str(className) + "</err_item>")
+          self.MarkedList.append("<item><class>" + str(className) + "</class></item>")
           return self.MarkedList
           
         # baseClassName = self.dom.getElementsByTagName('compounddef')[0].getElementsByTagName('basecompoundref')[0].firstChild.nodeValue
