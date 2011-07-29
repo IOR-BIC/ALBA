@@ -1,6 +1,7 @@
 import os
 import sys
 import getopt
+import shutil
 
 try:
     from qa import mafPath
@@ -29,6 +30,12 @@ def run(param):
     resultDir = os.path.abspath(os.path.join(outputDir, "QAResults" , "xml"))
     if not os.path.exists(resultDir):
         os.makedirs(resultDir)
+
+    tempDir = os.path.join(outputDir , "Temp")
+    #destroy and create temporary directory for Rules operations
+    if  os.path.exists(tempDir):
+        shutil.rmtree(tempDir)
+    os.makedirs(tempDir)
 
     for line in lines:
         line = line.replace("\r", "").replace("\n", "")
