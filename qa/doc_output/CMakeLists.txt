@@ -29,21 +29,22 @@ if (DOXYGEN_FOUND)
 execute_process(
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/qa/doc_output
   COMMAND ${CMAKE_COMMAND} -E remove_directory DocOutput
-  COMMAND ${DOXYGEN_EXECUTABLE} MAF2Doxyfile
 )
 
 execute_process(
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/qa/doc_output
   COMMAND ${CMAKE_COMMAND} -E remove_directory DocWithTestsOutput
-  COMMAND ${DOXYGEN_EXECUTABLE} MAF2DoxyfileWithTests
 )
 
 execute_process(
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/qa/doc_output
-  COMMAND ${CMAKE_COMMAND} -E remove_directory PythonDocOutput
-  COMMAND ${DOXYGEN_EXECUTABLE} MAF2PythonDoxyfile
+  COMMAND ${DOXYGEN_EXECUTABLE} MAF2Doxyfile
 )
 
+execute_process(
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/qa/doc_output
+  COMMAND ${DOXYGEN_EXECUTABLE} MAF2DoxyfileWithTests
+)
 
 else (DOXYGEN_FOUND)
   message(INFO "Install doxygen for creating input for QA.")
