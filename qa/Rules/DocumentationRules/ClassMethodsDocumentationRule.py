@@ -15,8 +15,8 @@ class ClassMethodsDocumentationRule(AbstractRule):
           attrs = member.attributes
           if(attrs["kind"].value  == self.ParameterList[0]):
             functionName = member.getElementsByTagName('name')[0].firstChild.nodeValue
-            briefDescription = member.getElementsByTagName('briefdescription')[0]
-            para = briefDescription.getElementsByTagName('para')
+            detailedDescription = member.getElementsByTagName('detaileddescription')[0]
+            para = detailedDescription.getElementsByTagName('para')
             if(para == []):
               #self.MarkedList.append((str(className))+"-> "+functionName+ "<-")
               self.MarkedList.append("<item>\n"\
