@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medDicomCardiacMRIHelper.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-07-26 10:20:17 $
-  Version:   $Revision: 1.1.2.24 $
+  Date:      $Date: 2011-08-04 11:57:40 $
+  Version:   $Revision: 1.1.2.25 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -979,7 +979,8 @@ int medDicomCardiacMRIHelper::ParseDicomDirectory()
 
 			for (int i = 0; i < theta.size(); i++) 
 			{
-				if (theta[i] < 1.1 * (vnl_math::pi/planesPerFrame))
+        // Commented by Losi 2011/08/04 to open "NIG003 - PIAAL" series
+				//if (theta[i] < 1.1 * (vnl_math::pi/planesPerFrame))
 				{
 				id_theta.push_back(i);
 				}
