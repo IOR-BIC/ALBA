@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGizmoCrossRotateAxis.cpp,v $
 Language:  C++
-Date:      $Date: 2011-05-26 07:55:17 $
-Version:   $Revision: 1.1.2.9 $
+Date:      $Date: 2011-08-24 12:51:06 $
+Version:   $Revision: 1.1.2.10 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -199,7 +199,7 @@ void medGizmoCrossRotateAxis::CreatePipeline()
 	boundingBoxDiagonal = sqrt(vtkMath::Distance2BetweenPoints(p1,p2));
 
 	double min = boundingBoxDiagonal/2;
-	double max = boundingBoxDiagonal * 3;
+	double max = boundingBoxDiagonal * 10;
 	// create line
 
 	m_LineSourceEast = vtkLineSource::New();
