@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-06-13 15:59:35 $
-  Version:   $Revision: 1.28.2.2 $
+  Date:      $Date: 2011-08-24 10:23:14 $
+  Version:   $Revision: 1.28.2.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -61,7 +61,7 @@ mafVMESlicer::mafVMESlicer()
   output->SetTransform(m_Transform); // force my transform in the output
   SetOutput(output);
 
-  m_TextureRes = 256;
+  m_TextureRes = 512;
   m_Xspc = m_Yspc = 0.3;
 
   vtkMAFSmartPointer<vtkImageData> image;
