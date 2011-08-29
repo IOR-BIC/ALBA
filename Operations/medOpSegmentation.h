@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.h,v $
 Language:  C++
-Date:      $Date: 2011-07-12 15:45:37 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2011-08-29 09:22:30 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Eleonora Mambrini, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
@@ -62,7 +62,7 @@ class vtkSphereSource;
 class vtkPolyDataMapper;
 class vtkActor;
 class vtkStructuredPoints;
-class vtkDataArray;
+class vtkUnsignedCharArray;
 
 //----------------------------------------------------------------------------
 // medOpSegmentation :
@@ -105,29 +105,24 @@ public:
     ID_SLICE_PLANE,
 	  ID_PRE_VOLUME_SPACING,
 	  ID_PRE_VOLUME_ZERO_VALUE,
-    ID_MANUAL_MODE,
     ID_MANUAL_PICKING_ACTION,
     ID_MANUAL_PICKING_MODALITY,
     ID_MANUAL_CONTINUOUS_PICKING,
     ID_MANUAL_BRUSH_SHAPE,
     ID_MANUAL_BRUSH_SIZE,
-    ID_MANUAL_REFINEMENT_FILLIN,
-    ID_MANUAL_REFINEMENT_REMOVE,
     ID_MANUAL_REFINEMENT_REGIONS_SIZE,
-    ID_MANUAL_OK,
     ID_MANUAL_CANCEL,
     ID_MANUAL_UNDO, 
     ID_MANUAL_REDO,
     ID_BUTTON_PREV,
     ID_BUTTON_NEXT,
-    ID_AUTOMATIC_THRESHOLD,//IDs for automatic segmetation gui
+    ID_AUTOMATIC_THRESHOLD,//IDs for automatic segmentation GUI
     ID_AUTOMATIC_INCREASE_MIN_THRESHOLD,
     ID_AUTOMATIC_INCREASE_MAX_THRESHOLD,
     ID_AUTOMATIC_DECREASE_MIN_THRESHOLD,
     ID_AUTOMATIC_DECREASE_MAX_THRESHOLD,
     ID_AUTOMATIC_DECREASE_MIDDLE_THRESHOLD,
     ID_AUTOMATIC_INCREASE_MIDDLE_THRESHOLD,
-
     ID_AUTOMATIC_ADD_RANGE,
     ID_AUTOMATIC_REMOVE_RANGE,
     ID_AUTOMATIC_LIST_OF_RANGE,
@@ -147,6 +142,7 @@ public:
     ID_REFINEMENT_APPLY,
     ID_REFINEMENT_UNDO,
     ID_REFINEMENT_REDO,
+    MINID,
   };
 
   enum OPERATIONS_IDS
@@ -163,13 +159,6 @@ public:
   {
     MANUAL_SEGMENTATION_SELECT = 0,
     MANUAL_SEGMENTATION_ERASE,
-  };
-
-  enum MANUAL_SEGMENTATION_MODES
-  {
-    MANUAL_SEGMENTATION_MOVE = 0,
-    MANUAL_SEGMENTATION_BRUSH,
-    MANUAL_SEGMENTATION_REFINEMENT,
   };
 
   enum BRUSH_SHAPES
@@ -217,8 +206,6 @@ protected:
   virtual void CreateOpDialog();
   /** Destroys GUI */
   virtual void DeleteOpDialog(); 
-  /** Creates GUI with commands for pre-segmentation.(resampling) */
-  virtual void CreatePreSegmentationGui();
   /** Creates GUI with commands for automatic segmentation. */
   virtual void CreateAutoSegmentationGui();
   /**Creates GUI with commands for manual segmentation. */
@@ -251,10 +238,8 @@ protected:
   void InitThresholdVolume();
   /** Initialize the Segmented Volume*/
   void InitSegmentedVolume();
-  /** Initialize color table values for segmented volume visualization. */
-  void InitSegmentationColorLut();
-  /** Initialize color table values for segmented volume visualization in manual step. */
-  void InitManualColorLut();
+  /** Initialize color table values for mask visualization. */
+  void InitMaskColorLut(vtkLookupTable *lut);
   //////////////////////////////////////////////////////////////////////////
 
   /** Remove the VMEs nedded by the operation*/
@@ -262,11 +247,12 @@ protected:
 
   /**Update windowing */
   void UpdateWindowing();
+
+  /** Get current slices origin coords origin[3] */
+  void GetSliceOrigin(double *origin);
+
   /** Update slice widgets and labels. Set current slice position. */
   void UpdateSlice();
-
-  /** Used to resample input volume*/
-  bool Resample();
 
   /** Used to remove islands or fill holes in a binary volume*/
   bool Refinement();
@@ -281,8 +267,11 @@ protected:
 
   double GetPosFromSliceIndexZ();
 
-  /** Perform the initializations when the user press next or prev button */
-  void OnChangeStep(int eventID);
+  void onAutomaticStep();
+  void onManualStep();
+  void onManualStepExit();
+  void onRefinementStep();
+
   /** Perform the initializations when the user press next button */
   void OnNextStep();
   /** Perform the initializations when the user press previous button */
@@ -291,7 +280,6 @@ protected:
   mafVMEVolumeGray* m_Volume; //<Input volume
 
   double m_SliceOrigin[3];    //<Origin of the slice plane
-  int m_CameraPositionId;     //<Identifier of the camera position (CAMERA_OS_X,CAMERA_OS_Y,CAMERA_OS_Z)
   int m_VolumeDimensions[3];    //<Dimensions of the volumes (number of slices)
   double m_VolumeSpacing[3];
   double m_VolumeBounds[6];
@@ -299,10 +287,10 @@ protected:
   int m_CurrentSliceIndex;    //<Index of the current slice position
   int m_OldSliceIndex;
   int m_CurrentSlicePlane;
+  int m_OldSlicePlane;
   int m_NumSliceSliderEvents;
 
   int m_CurrentOperation;
-  int m_OldOperation;
   
   mafGUIDialog* m_Dialog;             //<Dialog - GUI
   medViewSliceGlobal* m_View;	              //<Rendering Slice view
@@ -343,18 +331,28 @@ protected:
   //////////////////////////////////////////////////////////////////////////
   //Manual segmentation stuff
   //////////////////////////////////////////////////////////////////////////
+  typedef struct urstate
+  {
+    int plane;
+    int slice;
+    vtkUnsignedCharArray *dataArray;
+  } UndoRedoState;
 
   /** Save the volume mask for the procedural segmentation volume */
-  void SaveManualVolumeMask();
+  void InitManualVolumeMask();
   /***/
   void UpdateVolumeSlice();
   /***/
+
   void ApplyVolumeSliceChanges();
   /***/
   void SelectBrushImage(double x, double y, double z, bool selection);
   
   /***/
   void OnBrushEvent(mafEvent *e);
+
+  /***/
+  void ReloadUndoRedoState(vtkDataSet *dataSet, UndoRedoState state);
   
   /***/
   void ResetManualUndoList();
@@ -362,9 +360,6 @@ protected:
   /***/
   void ResetManualRedoList();
   
-  /***/
-  bool ManualVolumeSliceRefinement();
-
   /***/
   void EnableManualSegmentationGui();
 
@@ -376,24 +371,19 @@ protected:
   wxTextCtrl     *m_ManualBrushSizeText;
   wxRadioBox *m_ManualBrushShapeRadioBox;
   mafGUIButton *m_ManualApplyChanges;
-  int m_ManualSegmentationMode;
+  //int m_ManualSegmentationMode;
   int m_ManualSegmentationAction;
   int m_ManualBrushShape;
   double m_ManualBrushSize;
   int m_ManualRefinementRegionsSize; 
 
-  int m_ManualContinuousPickingOn;
-
+  
   wxComboBox *m_ManualRefinementComboBox;
   wxTextCtrl  *m_ManualRefinementRegionSizeText;
-
-  bool m_ManualModifiedWithoutApplied;
-
-  unsigned char m_ManualSelectionScalarValue;
-
-  std::vector<vtkDataArray *> m_ManualUndoList;
-  std::vector<vtkDataArray *> m_ManualRedoList;
-  int m_ManualUndoCounter;
+  
+  std::vector<UndoRedoState> m_ManualUndoList;
+  std::vector<UndoRedoState> m_ManualRedoList;
+  bool m_PickingStarted;
 
   medInteractorSegmentationPicker *m_ManualPicker;
 
@@ -450,7 +440,7 @@ protected:
   int m_AutomaticGlobalThreshold;
   double m_AutomaticThreshold;
   double m_AutomaticUpperThreshold;
-  double m_AutomaticLabel;
+  double m_AutomaticMouseThreshold;
   wxListBox *m_AutomaticListOfRange;
   mafGUILutSlider *m_AutomaticRangeSlider;
 
@@ -486,6 +476,9 @@ protected:
   //////////////////////////////////////////////////////////////////////////
   //Segmentation Refinement stuff
   //////////////////////////////////////////////////////////////////////////
+  
+  /** Save the volume mask for the procedural segmentation volume */
+  void InitRefinementVolumeMask();
 
   /** Save the volume mask for the procedural segmentation volume */
   void SaveRefinementVolumeMask();
@@ -504,8 +497,8 @@ protected:
   int m_RefinementEverySlice;
   int m_RefinementIterative;
 
-  std::vector<vtkDataArray *> m_RefinementUndoList;
-  std::vector<vtkDataArray *> m_RefinementRedoList;
+  std::vector<vtkUnsignedCharArray *> m_RefinementUndoList;
+  std::vector<vtkUnsignedCharArray *> m_RefinementRedoList;
  
 };
 #endif

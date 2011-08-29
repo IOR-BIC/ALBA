@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medInteractorPERBrushFeedback.h,v $
 Language:  C++
-Date:      $Date: 2011-07-13 11:50:45 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2011-08-29 09:22:07 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Eleonora Mambrini, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -70,6 +70,8 @@ protected:
   /* draw an the Brush box*/
   void DrawBox(double x, double y);
 
+
+ 
   int m_Radius;
   int m_CurrentShape;
 
@@ -81,6 +83,7 @@ protected:
 
   bool m_IsActorAdded;
   bool m_EnableDrawing;
+  bool m_MouseDown;
 
 };
 #endif 

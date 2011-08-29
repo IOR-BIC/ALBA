@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medInteractorPERBrushFeedback.cpp,v $
 Language:  C++
-Date:      $Date: 2011-05-26 16:14:19 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2011-08-29 09:22:07 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Eleonora Mambrini, Gianluigi Crimi 
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -189,6 +189,7 @@ void medInteractorPERBrushFeedback::OnEvent(mafEventBase *event)
     }
     else
     {
+      /*
       double mouse_pos[2];
       mafEventInteraction *e = mafEventInteraction::SafeDownCast(event);
       e->Get2DPosition(mouse_pos);
@@ -245,7 +246,7 @@ void medInteractorPERBrushFeedback::OnEvent(mafEventBase *event)
         }
       }
       vtkDEL(cellPicker);
-    
+    */
     }
   }
   // Make the superclass to manage StartInteractionEvent
@@ -342,6 +343,7 @@ void medInteractorPERBrushFeedback::SetRadius(double radius)
 
     m_CubeSource->SetXLength(2*m_Radius);
     m_CubeSource->SetYLength(2*m_Radius);
+    m_CubeSource->SetZLength(2*m_Radius);
     m_CubeSource->Update();
 
     m_Renderer->Render();
