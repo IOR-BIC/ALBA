@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-04-15 09:58:45 $
-  Version:   $Revision: 1.52.2.3 $
+  Date:      $Date: 2011-08-31 14:22:18 $
+  Version:   $Revision: 1.52.2.4 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,7 +25,7 @@
 #include "mafGUIMaterialButton.h"
 #include "mafAxes.h"
 #include "mmaMaterial.h"
-
+#include "mafEventSource.h"
 #include "mafVMESurface.h"
 
 #include "vtkMAFSmartPointer.h"
@@ -111,6 +111,8 @@ void mafPipeSurface::Create(mafSceneNode *n)
   vtkPolyData *data = vtkPolyData::SafeDownCast(surface_output->GetVTKData());
   assert(data);
   data->Update();
+
+  m_Vme->GetEventSource()->AddObserver(this);
 
   vtkDataSetAttributes *dataAttribute = NULL;
   if(m_SelectedDataAttribute == 0) // Point data
@@ -298,6 +300,8 @@ void mafPipeSurface::CreateNormalsPipe()
 mafPipeSurface::~mafPipeSurface()
 //----------------------------------------------------------------------------
 {
+  m_Vme->GetEventSource()->RemoveObserver(this);
+
 	if(m_Actor)
 		m_AssemblyFront->RemovePart(m_Actor);
 	if(m_OutlineActor)
@@ -524,6 +528,14 @@ void mafPipeSurface::OnEvent(mafEventBase *maf_event)
       default:
         mafEventMacro(*e);
       break;
+    }
+  }
+  else if (maf_event->GetSender() == m_Vme)
+  {
+    if(maf_event->GetId() == VME_TIME_SET)
+    {
+      vtkDataSetAttributes *dataAttribute = GetSelectedDataAttribute(); 
+      UpdateScalarsArrayVisualization(dataAttribute);
     }
   }
 }
