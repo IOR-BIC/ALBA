@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2011-05-26 16:15:29 $
-Version:   $Revision: 1.1.2.59 $
+Date:      $Date: 2011-08-31 15:24:25 $
+Version:   $Revision: 1.1.2.60 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -77,7 +77,6 @@ const int BOUND_1=1;
 #include "vtkTextProperty.h"
 #include "vtkRenderer.h"
 #include "vtkCellPicker.h"
-#include "medOpMatrixVectorMath.h"
 #include "mafTransformFrame.h"
 #include "mafVMEGizmo.h"
 #include "mafGizmoInterface.h"
