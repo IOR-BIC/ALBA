@@ -20,22 +20,26 @@ SET(vtkMED_SRCS
   vtkWeightedLandmarkTransform.h
   vtkTriangleQualityRatio.cxx
   vtkTriangleQualityRatio.h
-  vtkMEDExtrudeToCircle.cxx
-  vtkMEDExtrudeToCircle.h
-  vtkMEDPolyDataMirror.cxx
-  vtkMEDPolyDataMirror.h
-  vtkMEDImageUnsharpFilter.cxx
-  vtkMEDImageUnsharpFilter.h
-  vtkMEDFillingHole.cxx
-  vtkMEDFillingHole.h
-  vtkMEDRegionGrowingLocalGlobalThreshold.cxx
-  vtkMEDRegionGrowingLocalGlobalThreshold.h
-  vtkMEDFixTopology.cxx
-  vtkMEDFixTopology.h
-  vtkMEDPoissonSurfaceReconstruction.cxx
-  vtkMEDPoissonSurfaceReconstruction.h
   vtkMAFCellLocator.cxx
   vtkMAFCellLocator.h
+  vtkMEDExtrudeToCircle.cxx
+  vtkMEDExtrudeToCircle.h
+  vtkMEDFillingHole.cxx
+  vtkMEDFillingHole.h
+  vtkMEDFixTopology.cxx
+  vtkMEDFixTopology.h
+  vtkMEDImageUnsharpFilter.cxx
+  vtkMEDImageUnsharpFilter.h
+  vtkMEDMatrixVectorMath.h
+  vtkMEDMatrixVectorMath.cxx
+  vtkMEDPoissonSurfaceReconstruction.cxx
+  vtkMEDPoissonSurfaceReconstruction.h
+  vtkMEDPolyDataMirror.cxx
+  vtkMEDPolyDataMirror.h
+  vtkMEDPolyDataNavigator.h
+  vtkMEDPolyDataNavigator.cxx
+  vtkMEDRegionGrowingLocalGlobalThreshold.cxx
+  vtkMEDRegionGrowingLocalGlobalThreshold.h
   vtkBox.cxx
   vtkBox.h
   vtkMaskPolyDataFilter.cxx
