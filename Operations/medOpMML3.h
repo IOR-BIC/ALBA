@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML3.h,v $
 Language:  C++
-Date:      $Date: 2011-05-26 08:14:27 $
-Version:   $Revision: 1.1.2.16 $
+Date:      $Date: 2011-09-01 12:53:07 $
+Version:   $Revision: 1.1.2.17 $
 Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -66,7 +66,6 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // Replace polydata slices with better method, eg one used in lhpOpMultiscale and lhpOpTextureOrientation.
 // If axis is straight, consider creating all contours at once with a single vtkCutter execution.
 //
-// Remove medOpMatrixVectorMath from aneuFuse and lhp.
 //------------------------------------------------------------------------------
 
 

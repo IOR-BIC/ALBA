@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML3NonUniformSlicePipe.h,v $
 Language:  C++
-Date:      $Date: 2009-10-05 16:41:58 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2011-09-01 12:53:08 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -21,6 +21,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkActor2D.h"
 #include "vtkRenderer.h"
 #include "vtkSphereSource.h"
+#include "vtkMEDMatrixVectorMath.h"
 
 #include <vector>
 
@@ -88,7 +89,7 @@ private:
   vtkPolyData *m_SliceLinesPolydata ;
   vtkActor2D *m_SliceLinesActor ;   // lines showing slice positions
 
-
+  vtkMEDMatrixVectorMath *m_Math ;
 } ;
 
 

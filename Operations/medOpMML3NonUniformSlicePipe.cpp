@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 #include "  Module:    $RCSfile: medOpMML3NonUniformSlicePipe.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-07 11:36:49 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2011-09-01 12:53:08 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -31,7 +31,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkPoints.h"
 #include "vtkCellArray.h"
 
-#include "medOpMatrixVectorMath.h"
+#include "vtkMEDMatrixVectorMath.h"
 #include "medOpMML3NonUniformSlicePipe.h"
 
 #include <vector>
@@ -48,6 +48,8 @@ medOpMML3NonUniformSlicePipe::medOpMML3NonUniformSlicePipe(vtkPolyData *surface,
 : m_Renderer(renderer), m_NumberOfSections(numberOfSections), m_NumberOfSlices(0)
 //------------------------------------------------------------------------------
 {
+  m_Math = vtkMEDMatrixVectorMath::New() ;
+
   // default values for end-of-axis landmarks
   m_AxisStart[0] = 100.0 ;
   m_AxisStart[1] = 100.0 ;
@@ -245,6 +247,8 @@ medOpMML3NonUniformSlicePipe::medOpMML3NonUniformSlicePipe(vtkPolyData *surface,
 medOpMML3NonUniformSlicePipe::~medOpMML3NonUniformSlicePipe()
 //------------------------------------------------------------------------------
 {
+  m_Math->Delete() ;
+
   m_Transform->Delete() ;
   m_ContourActor->Delete() ;
   m_SectionLinesActor->Delete() ;
@@ -284,12 +288,8 @@ void medOpMML3NonUniformSlicePipe::SetEndsOfAxis(double *x0, double *x1)
 void medOpMML3NonUniformSlicePipe::CalculateAxisVector(double *u)
 //------------------------------------------------------------------------------
 {
-  medOpMatrixVectorMath *vecMath = new medOpMatrixVectorMath ;
-
-  vecMath->SubtractVectors(m_AxisEnd, m_AxisStart, u) ;
-  vecMath->NormalizeVector(u) ;
-
-  delete vecMath ;
+  m_Math->SubtractVectors(m_AxisEnd, m_AxisStart, u) ;
+  m_Math->NormalizeVector(u) ;
 }
 
 
@@ -301,12 +301,9 @@ double medOpMML3NonUniformSlicePipe::CalculateAxisLength()
 {
   double u[3], length ;
 
-  medOpMatrixVectorMath *vecMath = new medOpMatrixVectorMath ;
+  m_Math->SubtractVectors(m_AxisEnd, m_AxisStart, u) ;
+  length = m_Math->MagnitudeOfVector(u) ;
 
-  vecMath->SubtractVectors(m_AxisEnd, m_AxisStart, u) ;
-  length = vecMath->MagnitudeOfVector(u) ;
-
-  delete vecMath ;
   return length ;
 }
 
@@ -317,12 +314,8 @@ double medOpMML3NonUniformSlicePipe::CalculateAxisLength()
 void medOpMML3NonUniformSlicePipe::CalculateAxisMidPoint(double *midPoint)
 //------------------------------------------------------------------------------
 {
-  medOpMatrixVectorMath *vecMath = new medOpMatrixVectorMath ;
-
-  vecMath->AddVectors(m_AxisEnd, m_AxisStart, midPoint) ;
-  vecMath->DivideVectorByScalar(2.0, midPoint, midPoint) ;
-
-  delete vecMath ;
+  m_Math->AddVectors(m_AxisEnd, m_AxisStart, midPoint) ;
+  m_Math->DivideVectorByScalar(2.0, midPoint, midPoint) ;
 }
 
 
@@ -336,13 +329,9 @@ void medOpMML3NonUniformSlicePipe::CalculateAxisNormals(double *v,  double *w)
   double u[3] ;
   CalculateAxisVector(u) ;
 
-  medOpMatrixVectorMath *vecMath = new medOpMatrixVectorMath ;
-
-  vecMath->CalculateNormalsToU(u,v,w) ;
-  vecMath->NormalizeVector(v) ;
-  vecMath->NormalizeVector(w) ;
-
-  delete vecMath ;
+  m_Math->CalculateNormalsToU(u,v,w) ;
+  m_Math->NormalizeVector(v) ;
+  m_Math->NormalizeVector(w) ;
 }
 
 

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML3ModelView.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-05 16:41:57 $
-Version:   $Revision: 1.1.2.9 $
+Date:      $Date: 2011-09-01 12:53:07 $
+Version:   $Revision: 1.1.2.10 $
 Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -13,10 +13,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafDefines.h"
 #include "mafSmartPointer.h"
 
-#include "medOpMatrixVectorMath.h"
 #include "medOpMML3ModelView.h"
 #include "medOpMML3ModelView2DPipe.h"
 #include "medOpMML3ModelView3DPipe.h"
+#include "vtkMEDMatrixVectorMath.h"
 
 #include "vtkMath.h"
 #include "vtkInteractorStyleImage.h"
@@ -38,6 +38,8 @@ medOpMML3ModelView::medOpMML3ModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
 : m_RenderWindow(rw), m_Renderer(ren), m_MuscleInput(muscleIn),  m_MuscleOutput(muscleOut),
 m_Scans(volume), m_NumberOfScans(numberOfScans), m_4Landmarks(0), m_ScalingOccured(false), m_ScansGrain(1)
 { 
+  m_Math = vtkMEDMatrixVectorMath::New() ;
+
   //----------------------------------------------------------------------------
   // Set up slices and their pose matrices
   //----------------------------------------------------------------------------
@@ -132,7 +134,6 @@ m_Scans(volume), m_NumberOfScans(numberOfScans), m_4Landmarks(0), m_ScalingOccur
 
   // allocate the operations stack, used for undo purposes
   AllocateOperationsStack(5, 2000) ;
-
 }
 
 
@@ -143,6 +144,8 @@ m_Scans(volume), m_NumberOfScans(numberOfScans), m_4Landmarks(0), m_ScalingOccur
 medOpMML3ModelView::~medOpMML3ModelView()
 //----------------------------------------------------------------------------
 {
+  m_Math->Delete() ;
+
   // slice positions etc
   delete [] m_Alpha ;
   delete [] m_Zeta ;
@@ -693,8 +696,6 @@ void medOpMML3ModelView::CalculateNormalsOfScans()
 void medOpMML3ModelView::CalculatePoseMatricesOfScans()
 //----------------------------------------------------------------------------
 {
-  medOpMatrixVectorMath *vecMath = new medOpMatrixVectorMath ;
-
   for (int i = 0 ;  i < m_NumberOfScans ;  i++){
     vtkMatrix4x4 *mat = m_SlicePoseMat[i] ;
     mat->Identity() ;
@@ -705,9 +706,9 @@ void medOpMML3ModelView::CalculatePoseMatricesOfScans()
 
     // calculate x and y axes
     double u[3], v[3] ;
-    vecMath->CalculateNormalsToW(u, v, m_SliceNormals[i]) ;
-    vecMath->NormalizeVector(u) ;
-    vecMath->NormalizeVector(v) ;
+    m_Math->CalculateNormalsToW(u, v, m_SliceNormals[i]) ;
+    m_Math->NormalizeVector(u) ;
+    m_Math->NormalizeVector(v) ;
 
     // set x, y and z axes
     for (int j = 0 ;  j < 3 ;  j++){
@@ -719,8 +720,6 @@ void medOpMML3ModelView::CalculatePoseMatricesOfScans()
     // also calculate the inverse matrix
     mat->Invert(mat, m_SlicePoseInvMat[i]) ;
   }
-
-  delete vecMath ;
 }
 
 
@@ -929,8 +928,6 @@ void medOpMML3ModelView::CalculateSliceNormal(double zeta, double *normal) const
 void medOpMML3ModelView::CalculateSlicePoseMatrix(double zeta, vtkMatrix4x4 *mat) const
 //------------------------------------------------------------------------------
 {
-  medOpMatrixVectorMath *vecMath = new medOpMatrixVectorMath ;
-
   double pos[3], normal[3] ;
   CalculateSlicePosition(zeta, pos) ;
   CalculateSliceNormal(zeta, normal) ;
@@ -943,9 +940,9 @@ void medOpMML3ModelView::CalculateSlicePoseMatrix(double zeta, vtkMatrix4x4 *mat
 
   // calculate x and y axes
   double u[3], v[3] ;
-  vecMath->CalculateNormalsToW(u, v, normal) ;
-  vecMath->NormalizeVector(u) ;
-  vecMath->NormalizeVector(v) ;
+  m_Math->CalculateNormalsToW(u, v, normal) ;
+  m_Math->NormalizeVector(u) ;
+  m_Math->NormalizeVector(v) ;
 
   // set x, y and z axes
   for (int j = 0 ;  j < 3 ;  j++){
@@ -953,8 +950,6 @@ void medOpMML3ModelView::CalculateSlicePoseMatrix(double zeta, vtkMatrix4x4 *mat
     mat->SetElement(j, 1, v[j]) ;
     mat->SetElement(j, 2, normal[j]) ;
   }
-
-  delete vecMath ;
 }
 
 

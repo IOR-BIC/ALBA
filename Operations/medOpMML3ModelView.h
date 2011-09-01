@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML3ModelView.h,v $
 Language:  C++
-Date:      $Date: 2009-09-18 08:10:33 $
-Version:   $Revision: 1.1.2.6 $
+Date:      $Date: 2011-09-01 12:53:08 $
+Version:   $Revision: 1.1.2.7 $
 Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -32,6 +32,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkInteractorStyleTrackballCamera.h"
 #include "vtkInteractorStyleImage.h"
 
+#include "vtkMEDMatrixVectorMath.h"
 #include "medOpMML3ModelView2DPipe.h"
 #include "medOpMML3ModelView3DPipe.h"
 
@@ -491,6 +492,7 @@ protected:
   double m_NormalMidPoint[3] ;  // value at axis mid point
   double m_NormalEnd[3] ;       // value at alpha = 1.0, not value of last slice
 
+  vtkMEDMatrixVectorMath *m_Math ; 
 };
 
 #endif 
