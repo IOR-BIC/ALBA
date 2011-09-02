@@ -2,8 +2,8 @@
 Program:   MED
 Module:    $RCSfile: medOpMergeDicomSeries.cpp,v $
 Language:  C++
-Date:      $Date: 2011-07-13 12:53:06 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2011-09-02 08:16:58 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Alberto Losi
 ==========================================================================
 Copyright (c) 2009
@@ -104,7 +104,9 @@ void medOpMergeDicomSeries::OpRun()
 				((medGUIDicomSettings*)GetSetting())->SetLastDicomDir(path);
 				m_DicomDirectoryABSFileName = path.c_str();
 
-        int m_DicomSeriesInstanceUID = wxGetNumberFromUser(_("Series number"),_("Insert the series  ID for the output merged series"),"Input",999,0,999);
+        m_DicomSeriesInstanceUID = wxGetNumberFromUser(_("Series number"),_("Insert the series  ID for the output merged series"),"Input",999,0,999);
+        
+        m_ChangeManufacturer = wxMessageBox("Would you like to set manufacturer as INVALID?","Question:",wxYES_NO);
         if( m_DicomSeriesInstanceUID == -1)
         {
           mafEventMacro(mafEvent(this,OP_RUN_CANCEL)); 
@@ -239,9 +241,12 @@ bool medOpMergeDicomSeries::RanameSeriesAndManufacturer(const char *dicomDirABSP
       const char *dcmSeriesInstanceUID = (const char*)strDcmSeriesInstanceUID.mb_str();
       status = dicomDataset->putAndInsertString(DCM_SeriesInstanceUID,dcmSeriesInstanceUID);
 
-      // change the manufacturer to invalid in order to "inform" dicom importer that this data was merged by this op
-      const char *dcmManufacturer = "INVALID";
-      status = dicomDataset->putAndInsertString(DCM_Manufacturer,dcmManufacturer);
+      if(wxYES == m_ChangeManufacturer)
+      {
+        // change the manufacturer to invalid in order to "inform" dicom importer that this data was merged by this op
+        const char *dcmManufacturer = "INVALID";
+        status = dicomDataset->putAndInsertString(DCM_Manufacturer,dcmManufacturer);
+      }
 
       // Must load image data before save!
       long int val_long;
