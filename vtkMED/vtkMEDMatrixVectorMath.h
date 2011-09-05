@@ -2,8 +2,8 @@
 Program:   vph2
 Module:    $RCSfile: vtkMEDMatrixVectorMath.h,v $
 Language:  C++
-Date:      $Date: 2011-09-02 13:49:00 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2011-09-05 06:13:40 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2010
@@ -17,6 +17,7 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #ifndef __vtkMEDMatrixVectorMath_h
 #define __vtkMEDMatrixVectorMath_h
 
+#include "vtkMEDConfigure.h"
 #include "vtkObject.h"
 #include <ostream>
 

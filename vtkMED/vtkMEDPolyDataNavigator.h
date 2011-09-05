@@ -1,6 +1,7 @@
 #ifndef __vtkMEDPolyDataNavigator_h
 #define __vtkMEDPolyDataNavigator_h
 
+#include "vtkMEDConfigure.h"
 #include "vtkObject.h"
 #include "vtkPolyData.h"
 #include "vtkIdType.h"
