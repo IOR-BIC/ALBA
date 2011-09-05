@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medInteractorSegmentationPicker.h,v $
 Language:  C++
-Date:      $Date: 2011-06-13 16:02:54 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2011-09-05 16:52:05 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2010 
@@ -22,6 +22,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 class medInteractorSegmentationPicker : public mafInteractorCameraMove
 {
 public:
+  enum GUI_IDS
+  {
+    VME_ALT_PICKED = MINID,
+  };
   mafTypeMacro(medInteractorSegmentationPicker,mafInteractorCameraMove);
 
   /** Redefined to send picking events if continuous picking is enabled */

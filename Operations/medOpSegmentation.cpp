@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2011-08-29 09:22:29 $
-Version:   $Revision: 1.1.2.9 $
+Date:      $Date: 2011-09-05 16:52:22 $
+Version:   $Revision: 1.1.2.10 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
@@ -175,7 +175,6 @@ medOpSegmentation::medOpSegmentation(const wxString &label) : mafOp(label)
   //Manual initializations
   //////////////////////////////////////////////////////////////////////////
 
-  m_ManualEditingActionComboBox = NULL;
   m_ManualBrushShapeRadioBox = NULL;
   m_ManualBrushShape = CIRCLE_BRUSH_SHAPE;
   m_ManualBrushSize = 0;
@@ -187,7 +186,7 @@ medOpSegmentation::medOpSegmentation(const wxString &label) : mafOp(label)
   m_ManualRefinementComboBox = NULL;
   m_ManualRefinementRegionSizeText = NULL;
 
-  m_ManualPicker = NULL;
+  m_SegmentationPicker = NULL;
 
   m_ManualVolumeMask = NULL;
   m_ManualVolumeSlice = NULL;
@@ -213,7 +212,6 @@ medOpSegmentation::medOpSegmentation(const wxString &label) : mafOp(label)
   m_AutomaticScalarTextActor = NULL;
   m_AutomaticScalarTextMapper = NULL;
   m_AutomaticRangeSlider = NULL;
-  m_AutomaticPicker = NULL;
   m_AutomaticPER = NULL;
   m_AutomaticGlobalThreshold = GLOBAL;
 
@@ -232,32 +230,10 @@ medOpSegmentation::~medOpSegmentation()
 //----------------------------------------------------------------------------
 {
 
-  if(m_ThresholdVolume)
-  {
-    mafDEL(m_ThresholdVolume);
-  }
-  if(m_SegmentatedVolume)
-  {
-    mafDEL(m_SegmentatedVolume);
-  }
+  RemoveVMEs();
 
-  if(m_ManualVolumeSlice)
-  {
-    mafDEL(m_ManualVolumeSlice);
-  }
-
-  if(m_ManualVolumeMask)
-  {
-    mafDEL(m_ManualVolumeMask);
-  }
-
-  ResetManualUndoList();
-
-  ResetManualRedoList();
-
-  ResetRefinementUndoList();
-
-  ResetRefinementRedoList();
+  mafDEL(m_OutputVolume);
+  mafDEL(m_SegmentatedVolume);
 
   Superclass;
 }
@@ -265,7 +241,7 @@ medOpSegmentation::~medOpSegmentation()
 bool medOpSegmentation::Accept(mafNode *node)
 //----------------------------------------------------------------------------
 {
-  return (node && node->IsA("mafVMEVolumeGray") );//&& mafVME::SafeDownCast(node)->GetOutput()->GetVTKData()->IsA("vtkStructuredPoints"));
+  return (node && node->IsA("mafVMEVolumeGray") );
 }
 //----------------------------------------------------------------------------
 mafOp *medOpSegmentation::Copy()   
@@ -320,18 +296,50 @@ void medOpSegmentation::OpRun()
 void medOpSegmentation::OpDo()
 //----------------------------------------------------------------------------
 {
-  m_ThresholdVolume->ReparentTo(m_Volume->GetParent());
-  m_ThresholdVolume->SetName(_("Segmentation Output"));
-  lutPreset(4,m_ThresholdVolume->GetMaterial()->m_ColorLut);
-  m_SegmentatedVolume->ReparentTo(m_Volume->GetParent());
+  if (!m_OutputVolume)
+    mafNEW(m_OutputVolume);
+
+  switch (m_CurrentOperation)
+  {
+    case  AUTOMATIC_SEGMENTATION:
+    {
+      m_OutputVolume->DeepCopy(m_ThresholdVolume);
+    }
+    break;
+    case  MANUAL_SEGMENTATION:
+    {
+      m_OutputVolume->DeepCopy(m_ManualVolumeMask);
+    }
+    break;
+    case  REFINEMENT_SEGMENTATION:
+    case  LOAD_SEGMENTATION:
+    {
+      m_OutputVolume->DeepCopy(m_RefinementVolumeMask);
+    }
+    break;
+  }
+  m_OutputVolume->ReparentTo(m_Volume->GetParent());
+  m_OutputVolume->SetName(_("Segmentation Output"));
+  lutPreset(4,m_OutputVolume->GetMaterial()->m_ColorLut);
+  m_OutputVolume->ReparentTo(m_Volume->GetParent());
+  RemoveVMEs();
   mafOp::OpDo();
 }
+
 //----------------------------------------------------------------------------
 void medOpSegmentation::OpUndo()
 //----------------------------------------------------------------------------
 {
-  m_ThresholdVolume->ReparentTo(NULL);
-  m_SegmentatedVolume->ReparentTo(NULL);
+  if (m_OutputVolume)
+  {
+    m_OutputVolume->ReparentTo(NULL);
+    mafDEL(m_OutputVolume);
+  }
+  if (m_SegmentatedVolume)
+  {
+    m_SegmentatedVolume->ReparentTo(NULL);
+    mafDEL(m_SegmentatedVolume);
+  }
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
@@ -339,34 +347,50 @@ void medOpSegmentation::RemoveVMEs()
 //----------------------------------------------------------------------------
 {
 
-#ifndef _DEBUG
   if(m_ManualVolumeSlice)
   {
     m_ManualVolumeSlice->ReparentTo(NULL);
     mafDEL(m_ManualVolumeSlice);
   }
-#endif
+
+  if(m_ThresholdVolume)
+  {
+    m_ThresholdVolume->ReparentTo(NULL);
+    mafDEL(m_ThresholdVolume);
+  }
+  
+  if(m_ManualVolumeMask)
+  {
+    m_ManualVolumeMask->ReparentTo(NULL);
+    mafDEL(m_ManualVolumeMask);
+  }
+
+  if(m_RefinementVolumeMask)
+  {
+    m_RefinementVolumeMask->ReparentTo(NULL);
+    mafDEL(m_RefinementVolumeMask);
+  }
 
 }
 //----------------------------------------------------------------------------
 void medOpSegmentation::OpStop(int result)
 //----------------------------------------------------------------------------
 {
-  RemoveVMEs();
-
+  //remove vme now on cancel on ok vme will be removed by opdo method
   if (result == OP_RUN_CANCEL)
   {
-    if(m_ThresholdVolume)
-    {
-      m_ThresholdVolume->ReparentTo(NULL);
-      mafDEL(m_ThresholdVolume);
-    }
-    if(m_SegmentatedVolume)
+    RemoveVMEs();
+    if (m_SegmentatedVolume)
     {
       m_SegmentatedVolume->ReparentTo(NULL);
       mafDEL(m_SegmentatedVolume);
     }
   }
+
+  ResetManualUndoList();
+  ResetManualRedoList();
+  ResetRefinementUndoList();
+  ResetRefinementRedoList();
 
   mafEventMacro(mafEvent(this,result));
 }
@@ -521,12 +545,7 @@ void medOpSegmentation::CreateOpDialog()
 
   hSz2->Add(m_OkButton,0,wxEXPAND | wxALL);
   hSz2->Add(m_CancelButton,0,wxEXPAND | wxALL);
-  //hSz2->Add(m_LoadSegmentationButton,0,wxEXPAND | wxALL);
-
-  wxBoxSizer * hSzDiv = new wxBoxSizer(wxHORIZONTAL);
-  hSzDiv->SetMinSize(wxSize(10,10));
   m_Dialog->Add(hSz1);
-  m_Dialog->Add(hSzDiv);
   m_Dialog->Add(hSz3);
   m_Dialog->Add(hSz2);
 
@@ -534,18 +553,13 @@ void medOpSegmentation::CreateOpDialog()
 
   CreateSliceNavigationGui();
 
-  wxString choices[4];
-  choices[0] = wxString("Automatic");
-  choices[1] = wxString("Manual");
-  choices[2] = wxString("Refinement");
-  choices[3] = wxString("Load");
-
+  
   CreateAutoSegmentationGui();
   CreateManualSegmentationGui();
   CreateRefinementGui();
   CreateLoadSegmentationGui();
 
-  InitManualSegmentationGui();
+  
 
   m_SegmentationOperationsRollOut[AUTOMATIC_SEGMENTATION]   = m_GuiDialog->RollOut(ID_AUTO_SEGMENTATION, "Automatic Segmentation", m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION], false);
   m_SegmentationOperationsRollOut[MANUAL_SEGMENTATION]      = m_GuiDialog->RollOut(ID_MANUAL_SEGMENTATION, "Manual Segmentation", m_SegmentationOperationsGui[MANUAL_SEGMENTATION], false);
@@ -563,7 +577,7 @@ void medOpSegmentation::CreateOpDialog()
   m_GuiDialog->Update();
 
   m_GuiDialog->Enable(ID_BUTTON_PREV,false);
-  m_GuiDialog->Enable(ID_BUTTON_NEXT,true);
+  m_GuiDialog->Enable(ID_BUTTON_NEXT,false);
 
   int x_pos,y_pos,w,h;
   mafGetFrame()->GetPosition(&x_pos,&y_pos);
@@ -579,9 +593,8 @@ void medOpSegmentation::CreateOpDialog()
 void medOpSegmentation::DeleteOpDialog()
 //----------------------------------------------------------------------------
 {
-  mafDEL(m_ManualPicker);
-  mafDEL(m_AutomaticPicker);
-
+  mafDEL(m_SegmentationPicker);
+  
   if (m_ThresholdVolume)
   {
     m_View->VmeShow(m_ThresholdVolume,false);
@@ -650,8 +663,7 @@ void medOpSegmentation::DeleteOpDialog()
   cppDEL(m_GuiDialog);
   cppDEL(m_Dialog);
 
-  mafDEL(m_ManualPicker);
-  mafDEL(m_AutomaticPicker);
+  mafDEL(m_SegmentationPicker);
 
   if (m_DeviceManager)
   {
@@ -665,8 +677,6 @@ void medOpSegmentation::DeleteOpDialog()
 }
 
 
-
-//G,G Sostituire m_ThesholdVolume con m_ManualVolMask
 //----------------------------------------------------------------------------
 bool medOpSegmentation::Refinement()
 //----------------------------------------------------------------------------
@@ -1053,31 +1063,30 @@ void medOpSegmentation::CreateAutoSegmentationGui()
   //end Threshold
 
   wxString choices[2] = {_("Global"),_("Range")};
-  currentGui->Label(_("Threshold type:"));
+  currentGui->Label("");
+  currentGui->Label(_("Threshold type:"),true);
   currentGui->Radio(ID_AUTOMATIC_GLOBAL_THRESHOLD,"",&m_AutomaticGlobalThreshold,2,choices);
+
+  currentGui->Label("");
+  currentGui->Label("Global range:",true);
   currentGui->Button(ID_AUTOMATIC_GLOBAL_PREVIEW,_("preview"));
   currentGui->Enable(ID_AUTOMATIC_GLOBAL_PREVIEW,m_AutomaticGlobalThreshold==GLOBAL);
-  currentGui->Label(_("Slice range settings"),true);
-  currentGui->Label(_("1)Move the sliding button"));
-  currentGui->Label(_("to set a slices' range."));
-  currentGui->Label(_("2)right click to manually"));
-  currentGui->Label(_("enter slice's values."));
-  currentGui->Label(_("Ranges refers to XY Plane"),true);
-
- 
-
+  
+  
   //Slides Range
   //[ + ] [ + ] [ + ]
   //[min][range][max]
   //[ - ] [ - ] [ - ] 
 
   m_AutomaticRangeSlider = new mafGUILutSlider(currentGui,-1,wxPoint(0,0),wxSize(300,24));
+  currentGui->Label("");
+  currentGui->Label(_("Slice range settings:"),true);
   m_AutomaticRangeSlider->SetListener(currentGui);
-  m_AutomaticRangeSlider->SetText(1,"range");  
+  m_AutomaticRangeSlider->SetText(1,"Z Axis");  
   m_AutomaticRangeSlider->SetRange(1,m_VolumeDimensions[2]);
   m_AutomaticRangeSlider->SetSubRange(1,m_VolumeDimensions[2]);
 
-  currentGui->Label("");
+//  currentGui->Label("");
   std::vector<int> increaseIDs;
   increaseIDs.push_back(ID_AUTOMATIC_INCREASE_MIN_RANGE_VALUE);
   increaseIDs.push_back(ID_AUTOMATIC_INCREASE_MIDDLE_RANGE_VALUE);
@@ -1091,12 +1100,12 @@ void medOpSegmentation::CreateAutoSegmentationGui()
   decreaseIDs.push_back(ID_AUTOMATIC_DECREASE_MIDDLE_RANGE_VALUE);
   decreaseIDs.push_back(ID_AUTOMATIC_DECREASE_MAX_RANGE_VALUE);
   currentGui->MultipleButtons(3,3,decreaseIDs,decreaseLabels);
-  currentGui->Label("");
   //End
 
+  m_AutomaticListOfRange = currentGui->ListBox(ID_AUTOMATIC_LIST_OF_RANGE,"");
   currentGui->TwoButtons(ID_AUTOMATIC_ADD_RANGE,ID_AUTOMATIC_REMOVE_RANGE,("Add"),_("Remove"));
   currentGui->Button(ID_AUTOMATIC_UPDATE_RANGE,("Update"));
-  m_AutomaticListOfRange = currentGui->ListBox(ID_AUTOMATIC_LIST_OF_RANGE,"");
+  currentGui->Label("");
 
   m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION] = currentGui;
 }
@@ -1122,28 +1131,12 @@ void medOpSegmentation::CreateManualSegmentationGui()
   //////////////////////////////////////////////////////////////////////////
 
   wxStaticBoxSizer *brushEditingSizer = new wxStaticBoxSizer(wxVERTICAL, currentGui, "Brush Options");
-
-  // BRUSH ACTION
-  m_ManualSegmentationAction = MANUAL_SEGMENTATION_SELECT;
-  wxString operations[2];
-  operations[MANUAL_SEGMENTATION_SELECT] = wxString("Select");
-  operations[MANUAL_SEGMENTATION_ERASE] = wxString("Erase");
-
-  wxBoxSizer *editingComboSizer = new wxBoxSizer(wxHORIZONTAL);
-
-  int w_id = currentGui->GetWidgetId((ID_MANUAL_PICKING_ACTION));
-
-  wxStaticText *editingComboLab = new wxStaticText(currentGui, w_id, "Brush Mode", wxDefaultPosition, wxSize(60,-1));//, wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
-  m_ManualEditingActionComboBox = new wxComboBox  (currentGui, w_id, "", wxDefaultPosition, wxSize(130,-1), 2, operations,wxCB_READONLY);
-  m_ManualEditingActionComboBox->SetValidator( mafGUIValidator(currentGui,w_id,m_ManualEditingActionComboBox, &m_ManualSegmentationAction) );
-  editingComboSizer->Add( editingComboLab);//,  0, wxRIGHT, 5);
-  editingComboSizer->Add( m_ManualEditingActionComboBox);//,0, wxRIGHT, 2);
-
+  
   // BRUSH SHAPE
   wxString shapes[2];
   shapes[0] = wxString("circle");
   shapes[1] = wxString("square");
-  w_id = currentGui->GetWidgetId(ID_MANUAL_BRUSH_SHAPE);;
+  int w_id = currentGui->GetWidgetId(ID_MANUAL_BRUSH_SHAPE);;
 
   wxBoxSizer *brushShapesSizer = new wxBoxSizer(wxHORIZONTAL);
   wxStaticText *brushShapeLab = new wxStaticText(currentGui, w_id, "Shape");
@@ -1174,7 +1167,6 @@ void medOpSegmentation::CreateManualSegmentationGui()
 
   
 
-  brushEditingSizer->Add(editingComboSizer, 0, wxALL, 1);
   brushEditingSizer->Add(brushShapesSizer, 0, wxALL, 1);
   brushEditingSizer->Add(brushSizeSizer, 0, wxALL, 1);
  
@@ -1185,7 +1177,6 @@ void medOpSegmentation::CreateManualSegmentationGui()
 
   m_SegmentationOperationsGui[MANUAL_SEGMENTATION] = currentGui;
 
-  InitManualSegmentationGui();
   EnableManualSegmentationGui();
 
 }
@@ -1196,11 +1187,9 @@ void medOpSegmentation::EnableManualSegmentationGui()
 {
   //brush options
   // erase/select, shape, size, continuous picking
-  m_ManualEditingActionComboBox->Enable(true);
   m_ManualBrushShapeRadioBox->Enable(true);
   m_ManualBrushSizeText->Enable(true);
   m_ManualBrushSizeSlider->Enable(true);
-  m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_CONTINUOUS_PICKING, true);
 
 }
 //----------------------------------------------------------------------------
@@ -1273,51 +1262,12 @@ void medOpSegmentation::InitGui()
 
   m_SliceSlider->Update();
 
-  InitManualSegmentationGui();
 
   m_GuiDialog->FitGui();
   m_GuiDialog->Update();
 
 }
 
-//----------------------------------------------------------------------------
-void medOpSegmentation::InitManualSegmentationGui()
-//----------------------------------------------------------------------------
-{
-  // brush size slider: min = 1; max = slice size
-  if(!m_ManualBrushSizeSlider || ! m_SegmentationOperationsGui[MANUAL_SEGMENTATION])
-    return;
-
-  m_ManualBrushSizeSlider->SetMin(1);
-
-  int maxBrushSize = 1;
-
-  if(m_CurrentSlicePlane == XY)
-  {
-    maxBrushSize = min(m_VolumeDimensions[0], m_VolumeDimensions[1]);
-  }
-  else if(m_CurrentSlicePlane == XZ)
-  {
-    maxBrushSize = min(m_VolumeDimensions[0], m_VolumeDimensions[2]);
-  }
-  else if(m_CurrentSlicePlane == YZ)
-  {
-    maxBrushSize = min(m_VolumeDimensions[1], m_VolumeDimensions[2]);
-  }
-
-  maxBrushSize = round(maxBrushSize/2);
-
-  m_ManualBrushSizeSlider->SetMax(maxBrushSize);
-  m_ManualBrushSizeSlider->SetMin(0.5);
-  m_ManualBrushSize = 0.5;
-  m_ManualBrushSizeSlider->SetValue(m_ManualBrushSize);
-  m_ManualBrushSizeSlider->Update();
-
-  m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_CONTINUOUS_PICKING, true );
-
-  m_GuiDialog->Update();
-
-}
 
 //------------------------------------------------------------------------
 void medOpSegmentation::InitSegmentedVolume()
@@ -1385,12 +1335,11 @@ void medOpSegmentation::onAutomaticStep()
 //------------------------------------------------------------------------
 {
   //gui stuff 
-  m_SnippetsLabel->SetLabel( _("left/right click on the slice to select lower/upper threshold value"));
+  m_SnippetsLabel->SetLabel( _("Right click + Ctrl to select lower threshold.  Right click + Alt to select upper threshold"));
   m_Dialog->Update();
   UpdateThresholdLabel();
   m_GuiDialog->Enable(ID_AUTO_SEGMENTATION,true);
   m_GuiDialog->Enable(ID_BUTTON_PREV,false);
-  //m_GuiDialog->Enable(ID_BUTTON_NEXT,false);
 }
 
 //------------------------------------------------------------------------
@@ -1399,14 +1348,31 @@ void medOpSegmentation::onManualStep()
 {
   //gui stuff
   //set brush cursor - enable drawing
+  // brush size slider: min = 1; max = slice size
+  m_SnippetsLabel->SetLabel( _("Right click + Ctrl Draw.  Right click + Alt Erase"));
 
+  int maxBrushSize = 1;
+  if(m_CurrentSlicePlane == XY)
+    maxBrushSize = min(m_VolumeDimensions[0], m_VolumeDimensions[1]);
+  else if(m_CurrentSlicePlane == XZ)
+    maxBrushSize = min(m_VolumeDimensions[0], m_VolumeDimensions[2]);
+  else if(m_CurrentSlicePlane == YZ)
+    maxBrushSize = min(m_VolumeDimensions[1], m_VolumeDimensions[2]);
+  maxBrushSize = round(maxBrushSize/2);
+
+  m_ManualBrushSizeSlider->SetMax(maxBrushSize);
+  m_ManualBrushSizeSlider->SetMin(1);
+  m_ManualBrushSize = 1;
+  m_ManualBrushSizeSlider->SetValue(m_ManualBrushSize);
+  m_ManualBrushSizeSlider->Update();
+
+  
   m_SER->GetAction("pntActionAutomatic")->UnBindDevice(m_DialogMouse);
   m_SER->GetAction("pntActionAutomatic")->UnBindInteractor(m_AutomaticPER);
   m_SER->GetAction("pntEditingAction")->BindInteractor(m_ManualPER);
   m_SER->GetAction("pntEditingAction")->BindDevice(m_DialogMouse);
   
-  m_Volume->SetBehavior(m_ManualPicker);
-
+  
   m_AutomaticScalarTextMapper->SetInput("");
 
 
@@ -1418,6 +1384,7 @@ void medOpSegmentation::onManualStep()
   m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_UNDO, false);
   m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_REDO, false);
   m_GuiDialog->Enable(ID_MANUAL_SEGMENTATION,true);
+  m_GuiDialog->Update();
   //logic stuff
 
   UpdateVolumeSlice();
@@ -1434,7 +1401,6 @@ void medOpSegmentation::onManualStepExit()
   m_View->GetWindow()->SetCursor(cursor);
   m_ManualPER->RemoveActor();
   //logic stuff
-  m_Volume->SetBehavior(m_AutomaticPicker);
   m_SER->GetAction("pntEditingAction")->UnBindInteractor(m_ManualPER);
   m_SER->GetAction("pntEditingAction")->UnBindDevice(m_DialogMouse);
   m_SER->GetAction("pntActionAutomatic")->BindDevice(m_DialogMouse);
@@ -1445,6 +1411,7 @@ void medOpSegmentation::onManualStepExit()
   m_View->VmeShow(m_ManualVolumeSlice, false);
   m_GuiDialog->Enable(ID_MANUAL_SEGMENTATION,false);
 
+  m_SnippetsLabel->SetLabel( _(""));
 }
 
 //------------------------------------------------------------------------
@@ -1452,7 +1419,6 @@ void medOpSegmentation::onRefinementStep()
 //------------------------------------------------------------------------
 {
   //gui stuff
-  m_SnippetsLabel->SetLabel(_(""));
   m_Dialog->Update();
   m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_UNDO, false);
   m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_REDO, false);
@@ -1618,40 +1584,22 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
     if(e->GetSender() == m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION])
-    {
       OnAutomaticSegmentationEvent(e);
-      return;
-    }
-    if(e->GetSender() == m_SegmentationOperationsGui[MANUAL_SEGMENTATION])
-    {
+    else if(e->GetSender() == m_SegmentationOperationsGui[MANUAL_SEGMENTATION])
       OnManualSegmentationEvent(e);
-      return;
-    }
-    if(e->GetSender() == m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION])
-    {
+    else if(e->GetSender() == m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION])
       OnRefinementSegmentationEvent(e);
-      return;
-    }
-          
-    if (e->GetSender() == m_AutomaticPER)
+    else if (e->GetSender() == m_AutomaticPER && e->GetId()== MOUSE_MOVE)
     {
-      if (e->GetId()== MOUSE_MOVE)
-      {
-        m_AutomaticMouseThreshold = e->GetDouble();
-        mafString text = wxString::Format("Scalar = %.3f",m_AutomaticMouseThreshold);
-        m_AutomaticScalarTextMapper->SetInput(text.GetCStr());
-        m_View->CameraUpdate();
-      }
-/*    G,G AGGIUNGERE UN MODO PER SELEZIONARE I VALORI COL PICK.
-      else if  (e->GetId()== medInteractorPERScalarInformation::ID_INTERACTION_PSI_LEFT_BUTTON)
-      {
-        m_AutomaticThreshold = m_AutomaticMouseThreshold;
-        m_AutomaticUpperThreshold=max(m_AutomaticUpperThreshold,m_AutomaticThreshold);
-        m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Update();
-        m_AutomaticThresholdSlider->SetSubRange(m_AutomaticThreshold,m_AutomaticUpperThreshold);
-        UpdateThresholdLabel();
-      }
-      else if  (e->GetId()== medInteractorPERScalarInformation::ID_INTERACTION_PSI_RIGHT_BUTTON)
+      m_AutomaticMouseThreshold = e->GetDouble();
+      mafString text = wxString::Format("Scalar = %.3f",m_AutomaticMouseThreshold);
+      m_AutomaticScalarTextMapper->SetInput(text.GetCStr());
+      m_View->CameraUpdate();
+    }
+    else if (e->GetSender() == m_SegmentationPicker && e->GetId()== medInteractorSegmentationPicker::VME_ALT_PICKED)
+    {
+      //Picking during automatic segmentation
+      if (m_CurrentOperation==AUTOMATIC_SEGMENTATION)
       {
         m_AutomaticUpperThreshold = m_AutomaticMouseThreshold;
         m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Update();
@@ -1659,9 +1607,12 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         m_AutomaticThresholdSlider->SetSubRange(m_AutomaticThreshold,m_AutomaticUpperThreshold);
         UpdateThresholdLabel();
       }
-*/
+      //Picking during manual segmentation
+      else if(m_CurrentOperation == MANUAL_SEGMENTATION)
+        StartDraw(e, true);
     }
-    switch(e->GetId())
+    //SWITCH
+    else switch(e->GetId()) 
     {
     case ID_BUTTON_NEXT:
       {
@@ -1725,7 +1676,9 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
       }
     case ID_SLICE_PLANE:
       {
-        ApplyVolumeSliceChanges();
+        if (m_CurrentOperation == MANUAL_SEGMENTATION)
+          ApplyVolumeSliceChanges();
+
         m_CurrentSliceIndex = 1;
         UpdateSlice();
 
@@ -1743,50 +1696,27 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
       }
     case VME_PICKED:
       {
-        //////////////////////////////////////////////////////////////////////////
         //Picking during automatic segmentation
-        //////////////////////////////////////////////////////////////////////////
-       
-        if(m_CurrentOperation == MANUAL_SEGMENTATION)
+        if (m_CurrentOperation==AUTOMATIC_SEGMENTATION)
         {
-          //Picking starts here I need to save an undo stack
-          if(!m_PickingStarted)
-          {
-            mafLogMessage("--- START PICKING");
-
-            UndoRedoState urs;
-            urs.dataArray = vtkUnsignedCharArray::New();
-            urs.dataArray->DeepCopy( m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->GetScalars() );
-            urs.dataArray->SetName("SCALARS");
-            urs.plane=m_CurrentSlicePlane;
-            urs.slice=m_CurrentSliceIndex;
-            m_ManualUndoList.push_back( urs );
-
-            m_PickingStarted = true;
-
-            //On edit a new branch of redo-list starts, i need to clear the redo stack
-            ResetManualRedoList();
-            m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_REDO, false);
-          }
-          else
-          {
-            mafLogMessage("--- END PICKING");
-            OnBrushEvent(e);
-            m_PickingStarted=false;
-          }
+          m_AutomaticThreshold = m_AutomaticMouseThreshold;
+          m_AutomaticUpperThreshold=max(m_AutomaticUpperThreshold,m_AutomaticThreshold);
+          m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Update();
+          m_AutomaticThresholdSlider->SetSubRange(m_AutomaticThreshold,m_AutomaticUpperThreshold);
+          UpdateThresholdLabel();
         }
+        //Picking during manual segmentation
+        if(m_CurrentOperation == MANUAL_SEGMENTATION)
+          StartDraw(e, false);
 
         break;
       }
     case VME_PICKING:
       {
         if(m_CurrentOperation == MANUAL_SEGMENTATION)
-        {
-          mafLogMessage("---Picking...");
           OnBrushEvent(e);
-        }
+        break;
       }
-      break;
     case ID_OK:
       {
         m_Dialog->EndModal(wxID_OK);
@@ -1807,14 +1737,14 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         }
         //Windowing
         else
-       {
+        {
           double low, hi;
           m_LutSlider->GetSubRange(&low,&hi);
           m_ColorLUT->SetTableRange(low,hi);
           m_View->CameraUpdate();
           mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-          break;
         }
+        break;
       }
     case ID_LUT_CHOOSER:
       {
@@ -1830,6 +1760,35 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
   }
 }
 
+//------------------------------------------------------------------------
+void medOpSegmentation::StartDraw(mafEvent *e, bool erase)
+//------------------------------------------------------------------------
+{
+  if (erase) m_ManualSegmentationAction = MANUAL_SEGMENTATION_ERASE;
+  else m_ManualSegmentationAction = MANUAL_SEGMENTATION_SELECT;
+  //Picking starts here I need to save an undo stack
+  if(!m_PickingStarted)
+  {
+    UndoRedoState urs;
+    urs.dataArray = vtkUnsignedCharArray::New();
+    urs.dataArray->DeepCopy( m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->GetScalars() );
+    urs.dataArray->SetName("SCALARS");
+    urs.plane=m_CurrentSlicePlane;
+    urs.slice=m_CurrentSliceIndex;
+    m_ManualUndoList.push_back( urs );
+
+    m_PickingStarted = true;
+
+    //On edit a new branch of redo-list starts, i need to clear the redo stack
+    ResetManualRedoList();
+    m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_REDO, false);
+  }
+  else
+  {
+    OnBrushEvent(e);
+    m_PickingStarted=false;
+  }
+}
 //------------------------------------------------------------------------
 void medOpSegmentation::OnBrushEvent(mafEvent *e)
 //------------------------------------------------------------------------
@@ -1880,6 +1839,9 @@ void medOpSegmentation::OnChangeThresholdType()
   m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Enable(ID_AUTOMATIC_DECREASE_MIDDLE_RANGE_VALUE,m_AutomaticGlobalThreshold == RANGE );
   m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Enable(ID_AUTOMATIC_INCREASE_MIDDLE_RANGE_VALUE,m_AutomaticGlobalThreshold == RANGE );
   m_AutomaticRangeSlider->Enable(m_AutomaticGlobalThreshold == RANGE);
+  m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Enable(ID_AUTOMATIC_GLOBAL_PREVIEW,m_AutomaticGlobalThreshold==GLOBAL);
+
+
   UpdateThresholdLabel();
 }
 
@@ -2214,7 +2176,9 @@ void medOpSegmentation::OnAutomaticSegmentationEvent(mafEvent *e)
   case ID_AUTOMATIC_GLOBAL_THRESHOLD:
     {
       OnChangeThresholdType();
-      m_GuiDialog->Enable(ID_BUTTON_NEXT,m_AutomaticGlobalThreshold==RANGE);
+      if (m_AutomaticRanges.size()>0)
+        OnAutomaticPreview();
+      m_GuiDialog->Enable(ID_BUTTON_NEXT,m_AutomaticGlobalThreshold==RANGE && m_AutomaticRanges.size()>0);
     }
     break;
   case ID_AUTOMATIC_UPDATE_RANGE:
@@ -2289,10 +2253,6 @@ void medOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
   switch(e->GetId())
   {
 
-  case ID_MANUAL_CONTINUOUS_PICKING:
-    {
-      break;
-    }
   case ID_MANUAL_BRUSH_SHAPE:
     {
       m_ManualBrushShape = m_ManualBrushShapeRadioBox->GetSelection();
@@ -2672,14 +2632,14 @@ void medOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
   newImage->DeepCopy(dataset);
   newImage->Update();
 
-  m_View->VmeShow(m_ManualVolumeSlice, false);
+  //m_View->VmeShow(m_ManualVolumeSlice, false);
   m_ManualVolumeSlice->SetData(newImage,mafVME::SafeDownCast(m_ThresholdVolume)->GetTimeStamp(), 2);
   m_ManualVolumeSlice->GetEventSource()->InvokeEvent(m_ManualVolumeSlice, VME_OUTPUT_DATA_UPDATE);
   m_ManualVolumeSlice->GetOutput()->GetVTKData()->Update();
   m_ManualVolumeSlice->GetOutput()->Update();
   m_ManualVolumeSlice->Update();
 
-  m_View->VmeShow(m_ManualVolumeSlice, true);
+  //m_View->VmeShow(m_ManualVolumeSlice, true);
 
 }
 
@@ -2717,22 +2677,23 @@ void medOpSegmentation::InitializeInteractors()
   assert(m_View);
   m_ManualPER->SetRenderer(m_View->GetFrontRenderer());
 
-  mafNEW(m_ManualPicker);
-  m_ManualPicker->EnableContinuousPicking(true);
+  mafNEW(m_SegmentationPicker);
+  m_SegmentationPicker->EnableContinuousPicking(true);
 
-  m_ManualPicker->SetRenderer(m_View->GetFrontRenderer());
-  m_ManualPicker->SetListener(this);
+  m_SegmentationPicker->SetRenderer(m_View->GetFrontRenderer());
+  m_SegmentationPicker->SetListener(this);
+
+  m_Volume->SetBehavior(m_SegmentationPicker);
 
 
   m_View->GetRWI()->SetMouse(m_DialogMouse);
   m_View->SetMouse(m_DialogMouse);
   m_OldBehavior=m_Volume->GetBehavior();
   m_DialogMouse->SetView(m_View);
-  m_ManualPicker->AddObserver(this);
 
   m_SER->AddAction("pntEditingAction");
   pntAction = m_SER->GetAction("pntEditingAction");
-  m_ManualPER->AddObserver(m_ManualPicker);
+  m_ManualPER->AddObserver(m_SegmentationPicker);
 
   m_View->GetRWI()->SetMouse(m_DialogMouse);
   m_View->SetMouse(m_DialogMouse);
@@ -2851,12 +2812,6 @@ void medOpSegmentation::UpdateThresholdLabel()
   m_AutomaticThresholdTextMapper->SetInput("");
 }
 
-//------------------------------------------------------------------------
-void medOpSegmentation::OnAutomaticPicker(mafEvent *e)
-//------------------------------------------------------------------------
-{
-  
-}
 
 //----------------------------------------------------------------------------
 bool medOpSegmentation::CheckNumberOfThresholds()

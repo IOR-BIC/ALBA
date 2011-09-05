@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.h,v $
 Language:  C++
-Date:      $Date: 2011-08-29 09:22:30 $
-Version:   $Revision: 1.1.2.5 $
+Date:      $Date: 2011-09-05 16:52:22 $
+Version:   $Revision: 1.1.2.6 $
 Authors:   Eleonora Mambrini, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
@@ -105,9 +105,7 @@ public:
     ID_SLICE_PLANE,
 	  ID_PRE_VOLUME_SPACING,
 	  ID_PRE_VOLUME_ZERO_VALUE,
-    ID_MANUAL_PICKING_ACTION,
     ID_MANUAL_PICKING_MODALITY,
-    ID_MANUAL_CONTINUOUS_PICKING,
     ID_MANUAL_BRUSH_SHAPE,
     ID_MANUAL_BRUSH_SIZE,
     ID_MANUAL_REFINEMENT_REGIONS_SIZE,
@@ -174,7 +172,7 @@ public:
   };
 
   /** constructor. */
-  medOpSegmentation(const wxString &label = "Segmentate Volume");
+  medOpSegmentation(const wxString &label = "Segmentation");
   /** destructor. */
   ~medOpSegmentation(); 
 
@@ -328,6 +326,9 @@ protected:
 
   wxStaticText *m_SnippetsLabel;
 
+  medInteractorSegmentationPicker *m_SegmentationPicker;
+
+
   //////////////////////////////////////////////////////////////////////////
   //Manual segmentation stuff
   //////////////////////////////////////////////////////////////////////////
@@ -346,6 +347,9 @@ protected:
 
   void ApplyVolumeSliceChanges();
   /***/
+  
+  void StartDraw(mafEvent *e, bool erase);
+
   void SelectBrushImage(double x, double y, double z, bool selection);
   
   /***/
@@ -366,12 +370,10 @@ protected:
   mafVMEVolumeGray *m_ManualVolumeMask;
   mafVMEVolumeGray *m_ManualVolumeSlice;
 
-  wxComboBox *m_ManualEditingActionComboBox;
   mafGUIFloatSlider *m_ManualBrushSizeSlider;
   wxTextCtrl     *m_ManualBrushSizeText;
   wxRadioBox *m_ManualBrushShapeRadioBox;
   mafGUIButton *m_ManualApplyChanges;
-  //int m_ManualSegmentationMode;
   int m_ManualSegmentationAction;
   int m_ManualBrushShape;
   double m_ManualBrushSize;
@@ -384,9 +386,7 @@ protected:
   std::vector<UndoRedoState> m_ManualUndoList;
   std::vector<UndoRedoState> m_ManualRedoList;
   bool m_PickingStarted;
-
-  medInteractorSegmentationPicker *m_ManualPicker;
-
+  
   //lhpInteractorPERScalarInformation *m_ManualStandardPER;   //<Dinamic event router  
   medInteractorPERBrushFeedback *m_ManualPER;
   //////////////////////////////////////////////////////////////////////////
@@ -414,9 +414,7 @@ protected:
   /** Update the value of slice label for the current slice */
   void UpdateSliceLabel();
 
-  /**When the user select manually the scalar value */
-  void OnAutomaticPicker(mafEvent *e);
-
+  
   /** Gui update when the user change threshold type */
   void OnChangeThresholdType();
 
@@ -467,7 +465,6 @@ protected:
   vtkTextMapper *m_AutomaticSliceTextMapper;
   vtkActor2D *m_AutomaticSliceTextActor;
 
-  medInteractorSegmentationPicker *m_AutomaticPicker;
   medInteractorPERScalarInformation *m_AutomaticPER;
   //////////////////////////////////////////////////////////////////////////
 

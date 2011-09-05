@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medInteractorSegmentationPicker.cpp,v $
 Language:  C++
-Date:      $Date: 2011-05-10 15:08:19 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-09-05 16:52:05 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2010 
@@ -119,6 +119,13 @@ void medInteractorSegmentationPicker::OnButtonUp(mafEventInteraction *e)
         e->Get2DPosition(mouse_pos);
         SendPickingInformation(mouse->GetView(), mouse_pos);
       }
+      else if (e->GetModifier(MAF_ALT_KEY) && e->GetButton() == MAF_LEFT_BUTTON)
+      {
+        double mouse_pos[2];
+        e->Get2DPosition(mouse_pos);
+        SendPickingInformation(mouse->GetView(), mouse_pos, VME_ALT_PICKED);
+      }
+
     }
   }
 }
@@ -192,7 +199,7 @@ void medInteractorSegmentationPicker::OnEvent(mafEventBase *event)
   Superclass::OnEvent(event);
   mafEventInteraction *e = (mafEventInteraction *)event;
 
-  if ( m_ContinuousPickingFlag && (e->GetModifier(MAF_CTRL_KEY)) && e->GetButton() == MAF_LEFT_BUTTON)
+  if ( m_ContinuousPickingFlag && (e->GetModifier(MAF_CTRL_KEY) || e->GetModifier(MAF_ALT_KEY)) && e->GetButton() == MAF_LEFT_BUTTON)
   {
     if (mafDeviceButtonsPadMouse *mouse=mafDeviceButtonsPadMouse::SafeDownCast((mafDevice *)event->GetSender()))
     { 
