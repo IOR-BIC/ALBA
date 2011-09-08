@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2011-09-05 16:52:22 $
-Version:   $Revision: 1.1.2.10 $
+Date:      $Date: 2011-09-08 08:53:36 $
+Version:   $Revision: 1.1.2.11 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
@@ -1335,7 +1335,7 @@ void medOpSegmentation::onAutomaticStep()
 //------------------------------------------------------------------------
 {
   //gui stuff 
-  m_SnippetsLabel->SetLabel( _("Right click + Ctrl to select lower threshold.  Right click + Alt to select upper threshold"));
+  m_SnippetsLabel->SetLabel( _("Left click + Ctrl to select lower threshold.  Left click + Alt to select upper threshold"));
   m_Dialog->Update();
   UpdateThresholdLabel();
   m_GuiDialog->Enable(ID_AUTO_SEGMENTATION,true);
@@ -1349,22 +1349,22 @@ void medOpSegmentation::onManualStep()
   //gui stuff
   //set brush cursor - enable drawing
   // brush size slider: min = 1; max = slice size
-  m_SnippetsLabel->SetLabel( _("Right click + Ctrl Draw.  Right click + Alt Erase"));
+  m_SnippetsLabel->SetLabel( _("Left click + Ctrl Draw.  Left click + Alt Erase"));
 
-  int maxBrushSize = 1;
-  if(m_CurrentSlicePlane == XY)
-    maxBrushSize = min(m_VolumeDimensions[0], m_VolumeDimensions[1]);
-  else if(m_CurrentSlicePlane == XZ)
-    maxBrushSize = min(m_VolumeDimensions[0], m_VolumeDimensions[2]);
-  else if(m_CurrentSlicePlane == YZ)
-    maxBrushSize = min(m_VolumeDimensions[1], m_VolumeDimensions[2]);
-  maxBrushSize = round(maxBrushSize/2);
+  int maxBrushSize;
+  maxBrushSize = min(m_VolumeDimensions[0], m_VolumeDimensions[1]);
+  maxBrushSize = min(maxBrushSize, m_VolumeDimensions[2]);
+  maxBrushSize = round(maxBrushSize/2.0);
 
+  m_ManualBrushSize=1;
   m_ManualBrushSizeSlider->SetMax(maxBrushSize);
   m_ManualBrushSizeSlider->SetMin(1);
-  m_ManualBrushSize = 1;
   m_ManualBrushSizeSlider->SetValue(m_ManualBrushSize);
   m_ManualBrushSizeSlider->Update();
+  m_ManualBrushSizeText->SetValue("1");
+  m_ManualBrushSizeText->Update();
+  m_ManualPER->SetRadius(m_ManualBrushSize/2.0);
+  m_View->CameraUpdate();
 
   
   m_SER->GetAction("pntActionAutomatic")->UnBindDevice(m_DialogMouse);
@@ -1422,9 +1422,9 @@ void medOpSegmentation::onRefinementStep()
   m_Dialog->Update();
   m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_UNDO, false);
   m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_REDO, false);
+  m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_APPLY, true);
   m_GuiDialog->Enable(ID_REFINEMENT,true);
-  m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_APPLY, m_CurrentSlicePlane);
-
+  
   //logic stuff
   InitRefinementVolumeMask();
   m_View->VmeShow(m_RefinementVolumeMask,true);
@@ -1631,67 +1631,54 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         if (m_NumSliceSliderEvents == 2)//Validator generate 2 events when the user move the slider
         {
           m_NumSliceSliderEvents = 0;
-        
           if (m_CurrentSliceIndex != m_OldSliceIndex && m_CurrentOperation==MANUAL_SEGMENTATION)
             ApplyVolumeSliceChanges();
-
           UpdateSlice();
         }
         else
+        {
           m_NumSliceSliderEvents++;
-
+        }
       }
       break;
     case ID_SLICE_NEXT:
       {
         if(m_CurrentSliceIndex<m_SliceSlider->GetMax())
           m_CurrentSliceIndex++;
-        
         if (m_CurrentSliceIndex != m_OldSliceIndex && m_CurrentOperation==MANUAL_SEGMENTATION)
           ApplyVolumeSliceChanges();
-
         UpdateSlice();        
         break;
       }
     case ID_SLICE_PREV:
       {
         if(m_CurrentSliceIndex>1)
-          m_CurrentSliceIndex --;
-        
+          m_CurrentSliceIndex--;
         if (m_CurrentSliceIndex != m_OldSliceIndex && m_CurrentOperation==MANUAL_SEGMENTATION)
           ApplyVolumeSliceChanges();
-
         UpdateSlice();
-
         break;
       }
     case ID_SLICE_TEXT:
       {
         if (m_CurrentSliceIndex != m_OldSliceIndex && m_CurrentOperation==MANUAL_SEGMENTATION)
           ApplyVolumeSliceChanges();
-
         UpdateSlice();
-
         break;
       }
     case ID_SLICE_PLANE:
       {
+        m_CurrentSliceIndex = 1;
         if (m_CurrentOperation == MANUAL_SEGMENTATION)
           ApplyVolumeSliceChanges();
-
-        m_CurrentSliceIndex = 1;
         UpdateSlice();
-
         m_View->ChangeView(m_CurrentSlicePlane);
         InitGui();
-       
         if (m_CurrentOperation == AUTOMATIC_SEGMENTATION)
           OnChangeThresholdType();
         else if(m_CurrentOperation == MANUAL_SEGMENTATION)
           m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
-
         m_View->CameraUpdate();
-
         break;
       }
     case VME_PICKED:
@@ -2678,7 +2665,6 @@ void medOpSegmentation::InitializeInteractors()
   m_ManualPER->SetRenderer(m_View->GetFrontRenderer());
 
   mafNEW(m_SegmentationPicker);
-  m_SegmentationPicker->EnableContinuousPicking(true);
 
   m_SegmentationPicker->SetRenderer(m_View->GetFrontRenderer());
   m_SegmentationPicker->SetListener(this);
@@ -2992,9 +2978,6 @@ void medOpSegmentation::UpdateSlice()
 
   m_View->CameraUpdate();
   m_GuiDialog->Update();
-
-  m_OldSliceIndex = m_CurrentSliceIndex;
-  m_OldSlicePlane = m_CurrentSlicePlane;
 }
 
 //----------------------------------------------------------------------------
@@ -3018,6 +3001,10 @@ void medOpSegmentation::UpdateVolumeSlice()
 {
   if(!m_ManualVolumeSlice || !m_ManualVolumeMask || !m_ManualVolumeMask->GetOutput()->GetVTKData())
     return;
+
+  m_OldSliceIndex = m_CurrentSliceIndex;
+  m_OldSlicePlane = m_CurrentSlicePlane;
+
   
   vtkDataSet *inputData = NULL;
   
@@ -3166,6 +3153,7 @@ void medOpSegmentation::UpdateVolumeSlice()
   InitMaskColorLut(m_ManualColorLUT);
   m_ManualVolumeSlice->GetMaterial()->UpdateFromTables();
   m_ManualVolumeSlice->Update();
+
 }
 
 //----------------------------------------------------------------------------

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medInteractorSegmentationPicker.cpp,v $
 Language:  C++
-Date:      $Date: 2011-09-05 16:52:05 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2011-09-08 08:53:22 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2010 
@@ -46,7 +46,7 @@ mafCxxTypeMacro(medInteractorSegmentationPicker)
 medInteractorSegmentationPicker::medInteractorSegmentationPicker()
 //------------------------------------------------------------------------------
 {
-  m_ContinuousPickingFlag = false;
+  m_IsPicking = false;
 }
 
 //------------------------------------------------------------------------------
@@ -55,10 +55,10 @@ medInteractorSegmentationPicker::~medInteractorSegmentationPicker()
 {
 }
 //----------------------------------------------------------------------------
-void medInteractorSegmentationPicker::OnButtonDown(mafEventInteraction *e)
+void medInteractorSegmentationPicker::OnLeftButtonDown(mafEventInteraction *e)
 //----------------------------------------------------------------------------
 {
-  Superclass::OnButtonDown(e);
+  Superclass::OnLeftButtonDown(e);
   if (mafDeviceButtonsPadTracker *tracker=mafDeviceButtonsPadTracker::SafeDownCast((mafDevice *)e->GetSender()))
   { // is it a tracker?
     mafMatrix *tracker_pose = e->GetMatrix();
@@ -84,50 +84,22 @@ void medInteractorSegmentationPicker::OnButtonDown(mafEventInteraction *e)
 	    e->Get2DPosition(mouse_pos);
 	    SendPickingInformation(mouse->GetView(), mouse_pos);
     }
+    else if (e->GetModifier(MAF_ALT_KEY) && e->GetButton() == MAF_LEFT_BUTTON)
+    {
+      double mouse_pos[2];
+      e->Get2DPosition(mouse_pos);
+      SendPickingInformation(mouse->GetView(), mouse_pos, VME_ALT_PICKED);
+    }
   }
+  m_IsPicking = true;
 }
 
 //----------------------------------------------------------------------------
-void medInteractorSegmentationPicker::OnButtonUp(mafEventInteraction *e) 
+void medInteractorSegmentationPicker::OnLeftButtonUp() 
 //----------------------------------------------------------------------------
 {
-  Superclass::OnButtonUp(e);
-  if (m_ContinuousPickingFlag)
-  {
-    if (mafDeviceButtonsPadTracker *tracker=mafDeviceButtonsPadTracker::SafeDownCast((mafDevice *)e->GetSender()))
-    { // is it a tracker?
-      mafMatrix *tracker_pose = e->GetMatrix();
-      // extract device avatar's renderer, no avatar == no picking
-      mafAvatar *avatar = tracker->GetAvatar();
-      if (avatar)
-      {
-        // compute pose in the world frame
-        mafMatrix world_pose;
-        mafAvatar3D *avatar3D=mafAvatar3D::SafeDownCast(avatar);
-        if (avatar3D)
-          avatar3D->TrackerToWorld(*tracker_pose,world_pose,mafAvatar3D::CANONICAL_TO_WORLD_SCALE);
-        else
-          world_pose = *tracker_pose;
-        SendPickingInformation(avatar->GetView(),NULL,VME_PICKED,&world_pose,false);
-      }
-    }
-    else if (mafDeviceButtonsPadMouse *mouse=mafDeviceButtonsPadMouse::SafeDownCast((mafDevice *)e->GetSender()))
-    { 
-      if (e->GetModifier(MAF_CTRL_KEY) && e->GetButton() == MAF_LEFT_BUTTON)
-      {
-        double mouse_pos[2];
-        e->Get2DPosition(mouse_pos);
-        SendPickingInformation(mouse->GetView(), mouse_pos);
-      }
-      else if (e->GetModifier(MAF_ALT_KEY) && e->GetButton() == MAF_LEFT_BUTTON)
-      {
-        double mouse_pos[2];
-        e->Get2DPosition(mouse_pos);
-        SendPickingInformation(mouse->GetView(), mouse_pos, VME_ALT_PICKED);
-      }
-
-    }
-  }
+  Superclass::OnLeftButtonUp();
+  m_IsPicking = false;
 }
 //----------------------------------------------------------------------------
 void medInteractorSegmentationPicker::SendPickingInformation(mafView *v, double *mouse_pos, int msg_id, mafMatrix *tracker_pos, bool mouse_flag)
@@ -137,12 +109,9 @@ void medInteractorSegmentationPicker::SendPickingInformation(mafView *v, double 
 
   vtkCellPicker *cellPicker;
   vtkNEW(cellPicker);
-  cellPicker->SetTolerance(0.001);
+  cellPicker->SetTolerance(0);
   if (v)
   {
-    /*mafViewCompound *vc = mafViewCompound::SafeDownCast(v);
-    if (vc)
-    v = vc->GetSubView();*/ // the code is integrated into the GetRWI method of the mafViewCompound, so it is not necessary!
     if(mouse_flag)
     {
       vtkRendererCollection *rc = v->GetRWI()->GetRenderWindow()->GetRenderers();
@@ -170,12 +139,20 @@ void medInteractorSegmentationPicker::SendPickingInformation(mafView *v, double 
       if(pickedVME)
       {
         vtkDataSet *vtk_data = pickedVME->GetOutput()->GetVTKData();
+        //GetPickPosition calulate the picking position with matrix multiplication 
+        //the return value can be affected of some approximation errors, if the value
+        //is outside the bounds FindPoint will return -1;
+        double bounds[6];
+        vtk_data->GetBounds(bounds);
+        if (pos_picked[0]<bounds[0]) pos_picked[0]=bounds[0];
+        if (pos_picked[0]>bounds[1]) pos_picked[0]=bounds[1];
+        if (pos_picked[1]<bounds[2]) pos_picked[1]=bounds[2];
+        if (pos_picked[1]>bounds[3]) pos_picked[1]=bounds[3];
+        if (pos_picked[2]<bounds[4]) pos_picked[2]=bounds[4];
+        if (pos_picked[2]>bounds[5]) pos_picked[2]=bounds[5];
+
         int pid = vtk_data->FindPoint(pos_picked);
-        vtkDataArray *scalars = vtk_data->GetPointData()->GetScalars();
-        if (scalars)
-          scalars->GetTuple(pid,&scalar_value);
         mafEvent pick_event(this,msg_id,p);
-        pick_event.SetDouble(scalar_value);
         pick_event.SetArg(pid);
         mafEventMacro(pick_event);
         p->Delete();
@@ -185,12 +162,6 @@ void medInteractorSegmentationPicker::SendPickingInformation(mafView *v, double 
   vtkDEL(cellPicker);
 }
 
-//----------------------------------------------------------------------------
-void medInteractorSegmentationPicker::EnableContinuousPicking(bool enable)
-//----------------------------------------------------------------------------
-{
-  m_ContinuousPickingFlag = enable;
-}
 
 //------------------------------------------------------------------------------
 void medInteractorSegmentationPicker::OnEvent(mafEventBase *event)
@@ -199,7 +170,7 @@ void medInteractorSegmentationPicker::OnEvent(mafEventBase *event)
   Superclass::OnEvent(event);
   mafEventInteraction *e = (mafEventInteraction *)event;
 
-  if ( m_ContinuousPickingFlag && (e->GetModifier(MAF_CTRL_KEY) || e->GetModifier(MAF_ALT_KEY)) && e->GetButton() == MAF_LEFT_BUTTON)
+  if ( m_IsPicking && (e->GetModifier(MAF_CTRL_KEY) || e->GetModifier(MAF_ALT_KEY)) && e->GetButton() == MAF_LEFT_BUTTON)
   {
     if (mafDeviceButtonsPadMouse *mouse=mafDeviceButtonsPadMouse::SafeDownCast((mafDevice *)event->GetSender()))
     { 

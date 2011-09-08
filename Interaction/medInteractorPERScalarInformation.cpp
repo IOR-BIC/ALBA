@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medInteractorPERScalarInformation.cpp,v $
 Language:  C++
-Date:      $Date: 2011-05-26 16:14:19 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2011-09-08 08:53:22 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2010
@@ -152,6 +152,17 @@ void medInteractorPERScalarInformation::OnEvent(mafEventBase *event)
           if(pickedVME)
           {
             vtkDataSet *vtk_data = pickedVME->GetOutput()->GetVTKData();
+            //GetPickPosition calulate the picking position with matrix multiplication 
+            //the return value can be affected of some approximation errors, if the value
+            //is outside the bounds FindPoint will return -1;
+            double bounds[6];
+            vtk_data->GetBounds(bounds);
+            if (pos_picked[0]<bounds[0]) pos_picked[0]=bounds[0];
+            if (pos_picked[0]>bounds[1]) pos_picked[0]=bounds[1];
+            if (pos_picked[1]<bounds[2]) pos_picked[1]=bounds[2];
+            if (pos_picked[1]>bounds[3]) pos_picked[1]=bounds[3];
+            if (pos_picked[2]<bounds[4]) pos_picked[2]=bounds[4];
+            if (pos_picked[2]>bounds[5]) pos_picked[2]=bounds[5];
             int pid = vtk_data->FindPoint(pos_picked);
             vtkDataArray *scalars = vtk_data->GetPointData()->GetScalars();
             if (scalars)
