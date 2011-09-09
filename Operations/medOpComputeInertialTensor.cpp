@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpComputeInertialTensor.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-02-16 22:45:20 $
-  Version:   $Revision: 1.1.2.4 $
+  Date:      $Date: 2011-09-09 09:20:46 $
+  Version:   $Revision: 1.1.2.5 $
   Authors:   Simone Brazzale
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -85,12 +85,13 @@ mafOp(label)
 
   m_Density = 1.0;
   m_Mass = 0.0;
-  m_Ixx = 0.0;
-  m_Iyy = 0.0;
-  m_Izz = 0.0;
+  m_I1 = 0.0;
+  m_I2 = 0.0;
+  m_I3 = 0.0;
   m_Accuracy = 1000;
+  m_Vtkcomp = 1;
 
-  m_MethodToUse = MONTE_CARLO;
+  m_MethodToUse = GEOMETRY;
 }
 //----------------------------------------------------------------------------
 medOpComputeInertialTensor::~medOpComputeInertialTensor( ) 
@@ -124,7 +125,7 @@ void medOpComputeInertialTensor::OpDo()
 //----------------------------------------------------------------------------
 {
   mafVME* vme = (mafVME*) m_Input;
-  if (!vme->GetTagArray()->IsTagPresent("INERTIAL_TENSOR_COMPONENTS_[Ixx,Iyy,Izz]"))
+  if (!vme->GetTagArray()->IsTagPresent("INERTIAL_TENSOR_COMPONENTS_[I1,I2,I3]"))
   {
     if (m_TagTensor.GetNumberOfComponents()>0)
     {
@@ -144,9 +145,9 @@ void medOpComputeInertialTensor::OpUndo()
 //----------------------------------------------------------------------------
 {
   mafVME* vme = (mafVME*) m_Input;
-  vme->GetTagArray()->GetTag("INERTIAL_TENSOR_COMPONENTS_[Ixx,Iyy,Izz]",m_TagTensor);
+  vme->GetTagArray()->GetTag("INERTIAL_TENSOR_COMPONENTS_[I1,I2,I3]",m_TagTensor);
   vme->GetTagArray()->GetTag("SURFACE_MASS",m_TagMass);
-  vme->GetTagArray()->DeleteTag("INERTIAL_TENSOR_COMPONENTS_[Ixx,Iyy,Izz]");
+  vme->GetTagArray()->DeleteTag("INERTIAL_TENSOR_COMPONENTS_[I1,I2,I3]");
   vme->GetTagArray()->DeleteTag("SURFACE_MASS");
 }
 //----------------------------------------------------------------------------
@@ -184,6 +185,19 @@ void medOpComputeInertialTensor::OnEvent(mafEventBase *maf_event)
         OpStop(OP_RUN_CANCEL);
       }
 			break;
+    case ID_COMBO:
+      {
+        if (m_MethodToUse==1) 
+        {
+          m_Gui->Enable(ID_ACCURACY,false);
+          m_Gui->Enable(ID_VTKCOMP,false);
+        }
+        else
+        {
+          m_Gui->Enable(ID_ACCURACY,true);
+          m_Gui->Enable(ID_VTKCOMP,true);
+        }
+      }
     default:
       mafEventMacro(*e);
       break;
@@ -196,12 +210,12 @@ void medOpComputeInertialTensor::AddAttributes()
 {
   //save results in vme attributes
   std::vector<double> vec_comp;
-  vec_comp.push_back(m_Ixx);
-  vec_comp.push_back(m_Iyy);
-  vec_comp.push_back(m_Izz);
+  vec_comp.push_back(m_I1);
+  vec_comp.push_back(m_I2);
+  vec_comp.push_back(m_I3);
 
 	mafTagItem tag;
-	tag.SetName("INERTIAL_TENSOR_COMPONENTS_[Ixx,Iyy,Izz]");
+	tag.SetName("INERTIAL_TENSOR_COMPONENTS_[I1,I2,I3]");
   tag.SetNumberOfComponents(3);
   tag.SetComponents(vec_comp);
   m_Input->GetTagArray()->SetTag(tag);
@@ -229,21 +243,28 @@ void medOpComputeInertialTensor::CreateGui()
   m_Gui->Double(-1,_("Density"),&m_Density);
   m_Gui->Divider(0);
   m_Gui->Divider(0);  
-  m_Gui->Integer(-1,_("Accuracy"),&m_Accuracy,0,100000);
+  m_Gui->Integer(ID_ACCURACY,_("Accuracy"),&m_Accuracy,0,100000);
   m_Gui->Divider(0);
 
   wxString choices[2]={_("Monte Carlo"),_("Geometry")};
-  m_Gui->Combo(ID_COMBO,_("Method to use:"),&m_MethodToUse,2,choices,"Select method to use");
+  m_Gui->Combo(ID_COMBO,_("Method:"),&m_MethodToUse,2,choices,"Select method");
   m_Gui->Divider(0);
+
+  m_Gui->Bool(ID_VTKCOMP,"Use VTK compatibility",&m_Vtkcomp,1,"Use VTK compatibility");
   m_Gui->Divider(0);
+
+  if (m_MethodToUse==1) {
+    m_Gui->Enable(ID_ACCURACY,false);
+    m_Gui->Enable(ID_VTKCOMP,false);
+  }
 
   m_Gui->OkCancel();
 }
 //----------------------------------------------------------------------------
-double medOpComputeInertialTensor::GetSurfaceVolume()
+double medOpComputeInertialTensor::GetSurfaceVolume(mafNode* node)
 //----------------------------------------------------------------------------
 {
-  mafVMESurface* surf = mafVMESurface::SafeDownCast(m_Input);
+  mafVMESurface* surf = mafVMESurface::SafeDownCast(node);
 
   if (surf->GetOutput() == NULL)
     return -1;
@@ -271,10 +292,10 @@ double medOpComputeInertialTensor::GetSurfaceVolume()
   return volume;
 }
 //----------------------------------------------------------------------------
-double medOpComputeInertialTensor::GetSurfaceArea()
+double medOpComputeInertialTensor::GetSurfaceArea(mafNode* node)
 //----------------------------------------------------------------------------
 {
-  mafVMESurface* surf = mafVMESurface::SafeDownCast(m_Input);
+  mafVMESurface* surf = mafVMESurface::SafeDownCast(node);
 
   if (surf->GetOutput() == NULL)
     return -1;
@@ -302,26 +323,98 @@ double medOpComputeInertialTensor::GetSurfaceArea()
   return area;
 }
 //----------------------------------------------------------------------------
-double medOpComputeInertialTensor::GetSurfaceMass()
+double medOpComputeInertialTensor::GetSurfaceMassFromVolume(mafNode* node)
 //----------------------------------------------------------------------------
 {
-  return GetSurfaceMassFromVolume();
-}
-//----------------------------------------------------------------------------
-double medOpComputeInertialTensor::GetSurfaceMassFromVolume()
-//----------------------------------------------------------------------------
-{
-  double mass = GetSurfaceVolume()*m_Density;
+  double mass = GetSurfaceVolume(node)*m_Density;
 
   return mass;
 }
 //----------------------------------------------------------------------------
-double medOpComputeInertialTensor::GetSurfaceMassFromArea()
+double medOpComputeInertialTensor::GetSurfaceMassFromArea(mafNode* node)
 //----------------------------------------------------------------------------
 {
-  double mass = GetSurfaceArea()*m_Density;
+  double mass = GetSurfaceArea(node)*m_Density;
 
   return mass;
+}
+//----------------------------------------------------------------------------
+double medOpComputeInertialTensor::GetSurfaceMassFromVTK(mafNode* node)
+//----------------------------------------------------------------------------
+{
+  // get surface
+  mafVMESurface* surf = (mafVMESurface*) node;
+  if (surf->GetOutput() == NULL || surf->GetOutput()->GetVTKData() == NULL)
+    return 0;
+  surf->GetOutput()->Update();
+  surf->GetOutput()->GetVTKData()->Update();
+
+  // get dataset
+  vtkDataSet* ds = surf->GetOutput()->GetVTKData();
+  int npoints = ds->GetNumberOfPoints();
+  int ncells = ds->GetNumberOfCells();
+
+  // compute mass
+  double distributed_mass = GetSurfaceMassFromVolume(node)/GetSurfaceArea(node);
+  double tot_mass=0;
+
+  // initialize variables
+  int pId, qId, rId;
+  double p[3],q[3],r[3],dp0[3],dp1[3],c[3],xp[3];
+  
+  tot_mass = 0.0;
+  
+  // loop through cells
+  for (int i=0; i<ncells;i++)
+  {
+    int cellId = i;
+    vtkCell* cell = ds->GetCell(cellId);
+    int type = cell->GetCellType();
+    
+    vtkIdType numPts = 0;
+    vtkIdType *ptIds = 0;
+
+    // get cell points
+    switch (ds->GetDataObjectType())
+      {
+      case VTK_POLY_DATA:
+        ((vtkPolyData *)ds)->GetCellPoints( cellId, numPts, ptIds );
+        break;
+      case VTK_UNSTRUCTURED_GRID:
+        ((vtkUnstructuredGrid *)ds)->GetCellPoints( cellId, numPts, ptIds );
+        break;
+      default:
+        break;
+      }
+    for (int j=0; j<numPts-2; j++ )
+    {
+      // trianglize cells
+      vtkCELLTRIANGLES( ptIds, type, j, pId, qId, rId );
+      if ( pId < 0 )
+        {
+        continue;
+        }
+      ds->GetPoint(pId, p);
+      ds->GetPoint(qId, q);
+      ds->GetPoint(rId, r);
+      // p, q, and r are the oriented triangle points.
+      // compute the components of the moment of inertia tensor.
+      for (int k=0; k<3; k++ )
+        {
+        // two edge vectors
+        dp0[k] = q[k] - p[k];
+        dp1[k] = r[k] - p[k];
+        // centroid
+        c[k] = (p[k] + q[k] + r[k])/3;
+        }
+      vtkMath::Cross( dp0, dp1, xp );
+
+      double tri_area = 0.5*vtkMath::Norm( xp );
+      double tri_mass = distributed_mass*tri_area;
+      tot_mass += tri_mass;
+	}
+  }
+  return tot_mass;
 }
 //----------------------------------------------------------------------------
 int medOpComputeInertialTensor::ComputeInertialTensor(mafNode* node, int current_node, int n_of_nodes)
@@ -391,16 +484,16 @@ int medOpComputeInertialTensor::ComputeInertialTensorUsingGeometry(mafNode* node
     mafEventMacro(mafEvent(this,PROGRESSBAR_SET_TEXT,&s));
   }
 
-  // compute mass
-  double distributed_mass = GetSurfaceMassFromVolume()/GetSurfaceArea();
-  double tot_mass=0;
-
   // initialize variables
   int pId, qId, rId;
-  double p[3],q[3],r[3],dp0[3],dp1[3],c[3],xp[3];
-  double *a[3], a0[3], a1[3], a2[3], *v[3], v0[3], v1[3], v2[3];;
+  double p[3],q[3],r[3];
+  double *a[3], a0[3], a1[3], a2[3], *v[3], v0[3], v1[3], v2[3];
+
+  double _xx=0; double _yy=0; double _zz=0;
+  double _yx=0; double _zx=0; double _zy=0;
+  double _Cx=0; double _Cy=0; double _Cz=0;
+  double _m=0;
   
-  tot_mass = 0.0;
   a[0] = a0; a[1] = a1; a[2] = a2;
   for (int i=0; i<3; i++ )
     {
@@ -441,30 +534,39 @@ int medOpComputeInertialTensor::ComputeInertialTensorUsingGeometry(mafNode* node
       ds->GetPoint(qId, q);
       ds->GetPoint(rId, r);
       // p, q, and r are the oriented triangle points.
-      // compute the components of the moment of inertia tensor.
-      for (int k=0; k<3; k++ )
-        {
-        // two edge vectors
-        dp0[k] = q[k] - p[k];
-        dp1[k] = r[k] - p[k];
-        // centroid
-        c[k] = (p[k] + q[k] + r[k])/3;
-        }
-      vtkMath::Cross( dp0, dp1, xp );
 
-      double tri_area = 0.5*vtkMath::Norm( xp );
-      double tri_mass = distributed_mass*tri_area;
-      tot_mass += tri_mass;
-      
-      // on-diagonal terms
-      a0[0] = tri_mass*(9*c[0]*c[0] + p[0]*p[0] + q[0]*q[0] + r[0]*r[0])/12;
-      a1[1] = tri_mass*(9*c[1]*c[1] + p[1]*p[1] + q[1]*q[1] + r[1]*r[1])/12;
-      a2[2] = tri_mass*(9*c[2]*c[2] + p[2]*p[2] + q[2]*q[2] + r[2]*r[2])/12;
-      
-      // off-diagonal terms
-      a0[1] = tri_mass*(9*c[0]*c[1] + p[0]*p[1] + q[0]*q[1] + r[0]*r[1])/12;
-      a0[2] = tri_mass*(9*c[0]*c[2] + p[0]*p[2] + q[0]*q[2] + r[0]*r[2])/12;
-      a1[2] = tri_mass*(9*c[1]*c[2] + p[1]*p[2] + q[1]*q[2] + r[1]*r[2])/12;
+      double x1=p[0];
+      double y1=p[1];
+      double z1=p[2];
+      double x2=q[0];
+      double y2=q[1];
+      double z2=q[2];
+      double x3=r[0];
+      double y3=r[1];
+      double z3=r[2];
+
+      // Signed volume of this tetrahedron.
+      double v = x1*y2*z3 + y1*z2*x3 + x2*y3*z1 -
+                  (x3*y2*z1 + x2*y1*z3 + y3*z2*x1);
+        
+      // Contribution to the mass
+      _m += v;
+
+      // Contribution to the centroid
+      double x4 = x1 + x2 + x3;           
+      _Cx += (v * x4);
+      double y4 = y1 + y2 + y3;           
+      _Cy += (v * y4);
+      double z4 = z1 + z2 + z3;           
+      _Cz += (v * z4);
+
+      // Contribution to moment of inertia 
+      _xx += v * (x1*x1 + x2*x2 + x3*x3 + x4*x4);
+      _yy += v * (y1*y1 + y2*y2 + y3*y3 + y4*y4);
+      _zz += v * (z1*z1 + z2*z2 + z3*z3 + z4*z4);
+      _yx += v * (y1*x1 + y2*x2 + y3*x3 + y4*x4);
+      _zx += v * (z1*x1 + z2*x2 + z3*x3 + z4*x4);
+      _zy += v * (z1*y1 + z2*y2 + z3*y3 + z4*y4);
 
       if (!m_TestMode)
       {
@@ -473,24 +575,51 @@ int medOpComputeInertialTensor::ComputeInertialTensorUsingGeometry(mafNode* node
 
     } // end foreach triangle
   }// end foreach cell
-  
-  // matrix is symmetric
-  a1[0] = a0[1];
-  a2[0] = a0[2];
-  a2[1] = a1[2];
-  
+
+  // Centroid.  
+  // The case _m = 0 needs to be addressed here.
+  double rr = 1.0 / (4 * _m);
+  double Cx = _Cx * rr;
+  double Cy = _Cy * rr;
+  double Cz = _Cz * rr;
+
+  // Mass
+  double m = _m / 6;
+
+  // Moment of inertia about the centroid.
+  rr = 1.0 / 120;
+  double Iyx = _yx * rr - m * Cy*Cx;
+  double Izx = _zx * rr - m * Cz*Cx;
+  double Izy = _zy * rr - m * Cz*Cy;
+
+  _xx = _xx * rr - m * Cx*Cx;
+  _yy = _yy * rr - m * Cy*Cy;
+  _zz = _zz * rr - m * Cz*Cz;
+
+  double Ixx = _yy + _zz;
+  double Iyy = _zz + _xx;
+  double Izz = _xx + _yy;  
+
+  // Fill matrix 
+  a0[0] = Ixx; a0[1] = Iyx; a0[2] = Izx;
+  a1[0] = Iyx; a1[1] = Iyy; a1[2] = Izy;
+  a2[0] = Izx; a2[1] = Izy; a2[2] = Izz;
+
   // by the spectral theorem, since the moment of inertia tensor is real and symmetric, there exists a Cartesian coordinate system in which it is diagonal,
-  // the coordinate axes are called the principal axes and the constants Ixx, Iyy and Izz are called the principal moments of inertia. 
-  // extract eigenvalues from jacobian matrix (inertial tensor components referred to principal axes)
+  // the coordinate axes are called the principal axes and the constants I1, I2 and I3 are called the principal moments of inertia. 
+  // extract eigenvalues from jacobian matrix (inertial tensor components referred to principal axes).
   double eval[3];
   v[0] = v0; v[1] = v1; v[2] = v2; 
   vtkMath::Jacobi(a,eval,v);
-  
-  m_Ixx += eval[0];
-  m_Iyy += eval[1];
-  m_Iyy += eval[2];
 
-  m_Mass += tot_mass;
+  // scale by the density
+  double scale = m_Density;
+
+  // Fill results
+  m_I1 += scale*eval[0];
+  m_I2 += scale*eval[1];
+  m_I3 += scale*eval[2];
+  m_Mass += scale*m;
 
   if(!m_TestMode)
   {
@@ -542,7 +671,7 @@ int medOpComputeInertialTensor::ComputeInertialTensorUsingMonteCarlo(mafNode* no
   if(!m_TestMode)
   {
     wxSetCursor(wxCursor(wxCURSOR_WAIT));
-    wait = new wxBusyInfo("Computing inertial tensor components...");
+    wait = new wxBusyInfo("Computing inertial tensor components, please wait...");
     mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
     mafEventMacro(mafEvent(this,PROGRESSBAR_SET_TEXT,&s));
   }
@@ -554,9 +683,13 @@ int medOpComputeInertialTensor::ComputeInertialTensorUsingMonteCarlo(mafNode* no
   gfilter->Update();
   vtkPolyData* pd = gfilter->GetOutput();
 
-  // get bounds
-  double bounds[6];
-  ds->GetBounds(bounds);
+  // get vme bounds
+  double vme_bounds[6];
+  surf->GetOutput()->GetBounds(vme_bounds);
+
+  // get dataset bounds
+  double ds_bounds[6];
+  ds->GetBounds(ds_bounds);
   
   // initialize points for Monte Carlo method
   double pint = 0; // this is the counter for the internal points
@@ -581,23 +714,74 @@ int medOpComputeInertialTensor::ComputeInertialTensorUsingMonteCarlo(mafNode* no
 
     For the moment of inertia, each count is weighted by the square of the distance of the point to the reference axis.
   */
+ 
+  // 1) Measure Center Of Mass coordinates
+
+  double com[3];
+  com[0]=0;com[1]=0;com[2]=0;
+  double pcom = 0;
   for (int i=0; i<m_Accuracy; i++)
   {
     // get random point
-    double x = vtkMath::Random(bounds[0],bounds[1]);
-    double y = vtkMath::Random(bounds[2],bounds[3]);
-    double z = vtkMath::Random(bounds[4],bounds[5]);
+    double x = vtkMath::Random(vme_bounds[0],vme_bounds[1]);
+    double y = vtkMath::Random(vme_bounds[2],vme_bounds[3]);
+    double z = vtkMath::Random(vme_bounds[4],vme_bounds[5]);
     
+    // refer points to the center of the bounding box for vtk calculations
     double p[3];
-    p[0] = x;
-    p[1] = y;
-    p[2] = z;
+    p[0] = x - (vme_bounds[0] - ds_bounds[0]);
+    p[1] = y - (vme_bounds[2] - ds_bounds[2]);
+    p[2] = z - (vme_bounds[4] - ds_bounds[4]);
+    
+    // is it inside surface? (the algorithm assumes the surface is closed)
+    if (IsInsideSurface(pd,p))
+    {
+      com[0] += x;
+      com[1] += y;
+      com[2] += z;
+      pcom++;
+    }
+
+    if (!m_TestMode)
+    {
+      mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)(((double) i)/((double) m_Accuracy)*50.)));
+    }
+  }
+  com[0] /= pcom;
+  com[1] /= pcom;
+  com[2] /= pcom;
+
+  if (!m_TestMode)
+  {
+    mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,50.0));
+  }
+
+  // 2) Apply Monte Carlo method
+
+  for (int i=0; i<m_Accuracy; i++)
+  {
+    // get random point
+    double x = vtkMath::Random(vme_bounds[0],vme_bounds[1]);
+    double y = vtkMath::Random(vme_bounds[2],vme_bounds[3]);
+    double z = vtkMath::Random(vme_bounds[4],vme_bounds[5]);
+    
+    // refer points to the center of the bounding box for vtk calculations
+    double p[3];
+    p[0] = x - (vme_bounds[0] - ds_bounds[0]);
+    p[1] = y - (vme_bounds[2] - ds_bounds[2]);
+    p[2] = z - (vme_bounds[4] - ds_bounds[4]);
 
     // is it inside surface? (the algorithm assumes the surface is closed)
     if (IsInsideSurface(pd,p))
     {
       pint++;
 
+      // refere points to the center of mass of the surface for Monte Carlo calculations
+      x -= com[0];
+      y -= com[1];
+      z -= com[2];
+
+      // perform matrix element calculation
       ai0[0] += y*y + z*z ;
       ai1[1] += x*x + z*z ;
       ai2[2] += x*x + y*y ;
@@ -610,9 +794,11 @@ int medOpComputeInertialTensor::ComputeInertialTensorUsingMonteCarlo(mafNode* no
 
     if (!m_TestMode)
     {
-      mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)(((double) i)/((double) m_Accuracy)*100.)));
+      mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)(50+(((double) i)/((double) m_Accuracy)*50.))));
     }
   }
+
+  // 3) Get final values
 
   // matrix is symmetric
   ai1[0] = ai0[1];
@@ -620,7 +806,7 @@ int medOpComputeInertialTensor::ComputeInertialTensorUsingMonteCarlo(mafNode* no
   ai2[1] = ai1[2];
 
   // get hypercube volume and mass
-  double hycube_v = abs(bounds[1]-bounds[0]) * abs(bounds[3]-bounds[2]) * abs(bounds[5]-bounds[4]);
+  double hycube_v = abs(ds_bounds[1]-ds_bounds[0]) * abs(ds_bounds[3]-ds_bounds[2]) * abs(ds_bounds[5]-ds_bounds[4]);
   double hycube_m = m_Density*hycube_v;
 
   // get Monte Carlo ratios
@@ -635,8 +821,21 @@ int medOpComputeInertialTensor::ComputeInertialTensorUsingMonteCarlo(mafNode* no
   double ph_t31ratio = ai2[0]/ptot;
   double ph_t32ratio = ai2[1]/ptot;
   
-  // calculates mass
-  m_Mass += hycube_m * poly_hycube_mratio;
+  // calculate mass, check if compatibility with VTK is required 
+  // NB: the scale factor should be used when the mass is measured using VTK method (vtk compatibility) rather than MC method. 
+  //     in this case also the tensor components need to be rescaled by the ratio mass_VTK/mass_MC.
+  double scale = 1.0;
+  double mc_mass = hycube_m * poly_hycube_mratio;
+  if (!m_Vtkcomp)
+  {
+    m_Mass += mc_mass;
+  }
+  else
+  {
+    double vtk_mass = GetSurfaceMassFromVTK(node);
+    m_Mass += vtk_mass;
+    scale = vtk_mass/mc_mass;
+  }
 
   // fill final inertia tensor
   a[0][0] = hycube_m*ph_t11ratio;
@@ -649,13 +848,17 @@ int medOpComputeInertialTensor::ComputeInertialTensorUsingMonteCarlo(mafNode* no
   a[2][1] = hycube_m*ph_t32ratio;
   a[2][2] = hycube_m*ph_t33ratio;
 
-  // perform eigenvalues evaluation: I(symmetric)=nIn
+  mafString ss;
+  
+  // by the spectral theorem, since the moment of inertia tensor is real and symmetric, there exists a Cartesian coordinate system in which it is diagonal,
+  // the coordinate axes are called the principal axes and the constants I1, I2 and I3 are called the principal moments of inertia. 
+  // extract eigenvalues from jacobian matrix (inertial tensor components referred to principal axes).
   double eval[3];  
   vtkMath::Jacobi(a,eval,v);
 
-  m_Ixx += eval[0];
-  m_Iyy += eval[1];
-  m_Izz += eval[2];
+  m_I1 += scale*eval[0];
+  m_I2 += scale*eval[1];
+  m_I3 += scale*eval[2];
 
   if(!m_TestMode)
   {

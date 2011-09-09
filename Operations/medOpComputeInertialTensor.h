@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpComputeInertialTensor.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:00:03 $
-  Version:   $Revision: 1.1.2.5 $
+  Date:      $Date: 2011-09-09 09:20:47 $
+  Version:   $Revision: 1.1.2.6 $
   Authors:   Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2004
@@ -37,6 +37,9 @@ class vtkCell;
   The input is a surface selected from the tree and a scalar that represents the density (assumed uniformly distributed over the volume) of the geometry.
   The outputs are the mass of the surface and the six independent components of the inertial tensor expressed in a specified reference coordinate system. The outputs (i.e. the mass and the inertial tensor) are stored as attributes associated to the input geometry.
   In the group case the resulting mass and the inertial tensor are those of the whole group of geometries and, the computed attributes (i.e. the overall mass and inertial tensor) are stored as attributes of the group.
+
+  https://picasaweb.google.com/104563709532324716730/MedOpComputeInertialTensor?authuser=0&feat=directlink
+	
 */
 class MED_EXPORT medOpComputeInertialTensor: public mafOp
 {
@@ -85,19 +88,19 @@ protected:
   virtual void CreateGui();
 
   /** Get surface volume. */
-  double GetSurfaceVolume();
+  double GetSurfaceVolume(mafNode* node);
 
   /** Get surface area. */
-  double GetSurfaceArea();
+  double GetSurfaceArea(mafNode* node);
 
   /** Get surface mass using volume. */
-  double GetSurfaceMassFromVolume();
+  double GetSurfaceMassFromVolume(mafNode* node);
 
   /** Get surface mass using area. */
-  double GetSurfaceMassFromArea();
+  double GetSurfaceMassFromArea(mafNode* node);
 
-  /** Get surface mass. */
-  double GetSurfaceMass();
+  /** Compute mass using both surface and volume. (VTK method, most accurate)*/
+  double GetSurfaceMassFromVTK(mafNode* node);
 
   /** Get if a point is inside or outside a surface */
   int IsInsideSurface(vtkPolyData* surface, double x[3]);
@@ -115,6 +118,8 @@ protected:
   enum GUI_METHOD_ID
   {
     ID_COMBO = MINID,
+	  ID_ACCURACY,
+	  ID_VTKCOMP,
     MINID,
   };	
 
@@ -126,13 +131,14 @@ protected:
   
   double  m_Density;                            // Material density
   double  m_Mass;                               // Material mass
-  double  m_Ixx,m_Iyy,m_Izz;                    // Tensor components.
+  double  m_I1,m_I2,m_I3;                    // Tensor components.
 
   mafTagItem m_TagTensor;
   mafTagItem m_TagMass;
 
   int m_MethodToUse;
   int m_Accuracy;
+  int m_Vtkcomp;
 
 };
 #endif
