@@ -2,8 +2,8 @@
 Program:   vph2
 Module:    $RCSfile: vtkMEDMatrixVectorMath.h,v $
 Language:  C++
-Date:      $Date: 2011-09-05 06:13:40 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2011-09-12 12:57:29 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2010
@@ -58,7 +58,7 @@ public:
 
   /// Set to false for non-homogeneous 3x3 (default), \n
   /// set to true for homogeneous 4x4
-  void SetHomogeneous(bool homogeneous) {m_homogeneous = homogeneous ;}
+  void SetHomogeneous(bool homogeneous) {Homogeneous = homogeneous ;}
 
 
   //----------------------------------------------------------------------------
@@ -380,7 +380,7 @@ protected:
   vtkMEDMatrixVectorMath() ;  ///< constructor
   ~vtkMEDMatrixVectorMath() ; ///< deconstructor
 
-  bool m_homogeneous ;  ///< flag which switches homogeneous mode on or off
+  bool Homogeneous ;  ///< flag which switches homogeneous mode on or off
 
 } ;
 
