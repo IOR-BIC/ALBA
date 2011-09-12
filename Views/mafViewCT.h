@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCT.h,v $
 Language:  C++
-Date:      $Date: 2011-05-26 08:19:56 $
-Version:   $Revision: 1.2.2.2 $
+Date:      $Date: 2011-09-12 15:42:45 $
+Version:   $Revision: 1.2.2.3 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -34,12 +34,16 @@ This view features two Rx views and one compound view made of six CT slices.*/
 class MED_EXPORT mafViewCT : public mafViewCompound
 {
 public:
+  /** constructor */
 	mafViewCT(wxString label = "View CT");
+  /** destructor */
 	virtual ~mafViewCT();
-
+  /** RTTI macro */
 	mafTypeMacro(mafViewCT, mafViewCompound);
 
+    /** clone the object*/
 	virtual mafView *Copy(mafObserver *Listener, bool lightCopyEnabled = false);
+	/** listen to other object events*/
 	virtual void OnEvent(mafEventBase *maf_event);
 
 	/** Show/Hide VMEs into plugged sub-views */

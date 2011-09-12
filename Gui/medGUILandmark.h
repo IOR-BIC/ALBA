@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILandmark.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 07:41:54 $
-  Version:   $Revision: 1.4.2.4 $
+  Date:      $Date: 2011-09-12 15:38:55 $
+  Version:   $Revision: 1.4.2.5 $
   Authors:   Stefano Perticoni - porting Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -45,9 +45,10 @@ class mafVMELandmarkCloud;
 class MED_EXPORT medGUILandmark : public mafObserver
 {
 public:
-
+  /** constructor */
   medGUILandmark(mafNode *InputVME, mafObserver *listener = NULL, bool testMode  = false);
-	~medGUILandmark(); 
+	/** destructor */
+  ~medGUILandmark(); 
 
   /** Set the event receiver object*/
   void  SetListener(mafObserver *Listener) {m_Listener = Listener;};

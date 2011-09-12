@@ -28,122 +28,142 @@ under MAF (www.openmaf.org)
 #define __vtkBoundingBox_h
 #include "vtkSystemIncludes.h"
 #include "vtkMEDConfigure.h"
-
+/**
+class name: vtkBoundingBox.
+Fast Simple Class for dealing with 3D bounds.
+vtkBoundingBox maintains a 3D axis aligned bounding box.  It is very
+lite weight and many of the member functions are in-lined so its very fast
+It is not derived from vtkObject so it can be allocated on the stack
+*/
 class VTK_vtkMED_EXPORT vtkBoundingBox 
 {
 public:
   // Description:
-  // Construct a bounding box with the min point set to 
-  // VTK_DOUBLE_MAX and the max point set to VTK_DOUBLE_MIN
+  /**Construct a bounding box with the min point set to 
+  VTK_DOUBLE_MAX and the max point set to VTK_DOUBLE_MIN*/
   vtkBoundingBox();
   
   // Description:
-  // Copy Constructor
+  /**Copy Constructor*/
   vtkBoundingBox(const vtkBoundingBox &bbox);
 
   // Description:
-  // Assignment Operator
+  /**Assignment Operator*/
   vtkBoundingBox &operator=(const vtkBoundingBox &bbox);
 
   // Description:
-  // Equality Operator
+  /**Equality Operator*/
   int operator==(const vtkBoundingBox &bbox)const;
+  /**Unequality Operator*/
   int operator!=(const vtkBoundingBox &bbox)const;
 
   // Description:
-  // Set the bounds explicitly of the box (vtk Style)
-  // Returns 1 if the box was changed else 0
+  /**Set the bounds explicitly of the box (vtk Style)
+     Returns 1 if the box was changed else 0*/
   void SetBounds(double bounds[6]);
+  /**Set the bounds explicitly of the box (vtk Style)
+     Returns 1 if the box was changed else 0*/
   void SetBounds(double xMin, double xMax,
                  double yMin, double yMax,
                  double zMin, double zMax);
 
   // Description:
-  // Set the minimum point of the bounding box - if the min point 
-  // is greater than the max point then the max point will also be changed
+  /**Set the minimum point of the bounding box - if the min point 
+     is greater than the max point then the max point will also be changed*/
   void SetMinPoint(double x, double y, double z);
+  /**Set the minimum point of the bounding box - if the min point 
+     is greater than the max point then the max point will also be changed*/
   void SetMinPoint(double p[3]);
 
   // Description:
-  // Set the maximum point of the bounding box - if the max point 
-  // is less than the min point then the  min point will also be changed
+  /**Set the maximum point of the bounding box - if the max point 
+     is less than the min point then the  min point will also be changed */
   void SetMaxPoint(double x, double y, double z);
+  /**Set the maximum point of the bounding box - if the max point 
+     is less than the min point then the  min point will also be changed */
   void SetMaxPoint(double p[3]);
 
   // Description:
-  // Change bounding box so it includes the point p
-  // Note that the bounding box may have 0 volume if its bounds
-  // were just initialized.  
+  /**Change bounding box so it includes the point p
+     Note that the bounding box may have 0 volume if its bounds
+     were just initialized.  */
   void AddPoint(double p[3]);
+  /**Change bounding box so it includes the point p
+     Note that the bounding box may have 0 volume if its bounds
+     were just initialized.  */
   void AddPoint(double px, double py, double pz);
   
   // Description:
-  // Change the bouding box to be the union of itself and bbox
+  /**Change the bouding box to be the union of itself and bbox*/
   void AddBox(const vtkBoundingBox &bbox);
   
   // Description:
-  // Change the bounding box so it includes bounds (defined by vtk standard)
+  /**Change the bounding box so it includes bounds (defined by vtk standard)*/
   void AddBounds(double bounds[6]);
   
   // Desciption:
-  // Intersect this box with bbox. The method returns 1 if
-  // both boxes are valid and they do have overlap else it will return 0.
-  // If 0 is returned the box has not been modified
+  /**Intersect this box with bbox. The method returns 1 if
+      both boxes are valid and they do have overlap else it will return 0.
+      If 0 is returned the box has not been modified*/
   int IntersectBox(const vtkBoundingBox &bbox);
   
   // Description:
-  // Returns 1 if the boxes intersect else returns 0
+  /**Returns 1 if the boxes intersect else returns 0*/
   int Intersects(const vtkBoundingBox &bbox) const;
 
   // Description:
-  // Get the bounds of the box (defined by vtk style)
+  /**Get the bounds of the box (defined by vtk style)*/
   void GetBounds(double bounds[6]) const;
+  /**Get the bounds of the box (defined by vtk style)*/
   void GetBounds(double &xMin, double &xMax,
                  double &yMin, double &yMax,
                  double &zMin, double &zMax) const;
     
   // Description:
-  // Return the ith bounds of the box (defined by vtk style)
+  /**Return the ith bounds of the box (defined by vtk style)*/
   double GetBound(int i) const;
     
   // Description:
-  // Get the minimum point of the bounding box
+  /**Get the minimum point of the bounding box*/
   const double *GetMinPoint() const;
+  /**Get the minimum point of the bounding box*/
   void GetMinPoint(double &x, double &y, double &z) const;
 
   // Description:
-  // Get the maximum point of the bounding box
+  /**Get the maximum point of the bounding box*/
   const double *GetMaxPoint() const;
+  /**Get the maximum point of the bounding box*/
   void GetMaxPoint(double &x, double &y, double &z) const;
 
   // Description:
-  // Returns 1 if the point is contained in the box else 0;
+  /**Returns 1 if the point is contained in the box else 0;*/
   int ContainsPoint(double p[3]) const;
+  /**Returns 1 if the point is contained in the box else 0;*/
   int ContainsPoint(double px, double py, double pz) const;
 
   // Description:
-  // Get the center of the bounding box
+  /**Get the center of the bounding box*/
   void GetCenter(double center[3]) const;
 
   // Description:
-  // Get the lengths of the box
+  /**Get the lengths of the box*/
   void GetLengths(double lengths[3]) const;
 
   // Description:
-  // Return the length in the ith direction
+  /**Return the length in the ith direction*/
   double GetLength(int i) const;
 
   // Description:
-  // Return the Max Length of the box
+  /**Return the Max Length of the box*/
   double GetMaxLength() const;
 
   // Description:
-  // Returns 1 if the bounds have been set and 0 if the box is in its
-  // initialized state which is an inverted state
+  /**Returns 1 if the bounds have been set and 0 if the box is in its
+      initialized state which is an inverted state*/
   int IsValid() const;
   
   // Description:
-  // Returns the box to its initialized state
+  /**Returns the box to its initialized state*/
   void Reset();
 protected:
   double MinPnt[3], MaxPnt[3];

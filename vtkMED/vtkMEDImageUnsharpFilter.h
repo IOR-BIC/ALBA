@@ -22,26 +22,36 @@
 
 #include "vtkMEDConfigure.h"
 #include "vtkImageToImageFilter.h"
-
+/**
+class name : vtkMEDImageUnsharpFilter.
+Filter for applying unsharp to an image
+*/
 class VTK_vtkMED_EXPORT vtkMEDImageUnsharpFilter : public vtkImageToImageFilter
 {
 public:
+  /** RTTI macro*/
   vtkTypeRevisionMacro(vtkMEDImageUnsharpFilter,vtkImageToImageFilter);
+  /** print information */
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Creates an instance of vtkMEDImageUnsharpFilter with the following
+  /**Creates an instance of vtkMEDImageUnsharpFilter with the following*/
   static vtkMEDImageUnsharpFilter *New();
 
 protected:
+  /** constructor */
   vtkMEDImageUnsharpFilter();
+  /** destructor */
   ~vtkMEDImageUnsharpFilter();
 
+  /** execute filter on threads*/
   void ThreadedExecute(vtkImageData *inData, vtkImageData *outData, int extent[6], int id);
   
 private:
-  vtkMEDImageUnsharpFilter(const vtkMEDImageUnsharpFilter&);  // Not implemented.
-  void operator=(const vtkMEDImageUnsharpFilter&);  // Not implemented.
+  /** copy constructor not implemented */
+  vtkMEDImageUnsharpFilter(const vtkMEDImageUnsharpFilter&);
+  /** operator= not implemented */
+  void operator=(const vtkMEDImageUnsharpFilter&);
 };
 
 #endif
