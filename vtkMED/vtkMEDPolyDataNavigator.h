@@ -388,22 +388,22 @@ public:
 class vtkMEDPolyDataNavigator::Edge
 {
 public:
-  Edge(int id0, int id1) : m_Id0(id0), m_Id1(id1) {} ///< constructor
-  int GetId0() const {return m_Id0 ;} ///< get id0
-  int GetId1() const {return m_Id1 ;} ///< get id1
-  void SetId0(int id0) {m_Id0 = id0 ;} ///< set id0
-  void SetId1(int id1) {m_Id1 = id1 ;} ///< set id1
-  int GetOtherId(int id) const {if (id == m_Id0) return m_Id1 ; else if (id == m_Id1) return m_Id0 ; else return -1 ;}
-  bool ContainsPoint(int id) const {return ((m_Id0 == id) || (m_Id1 == id)) ;} ///< does edge contain point
-  bool IsSameDirection(const Edge& edge) const {return (m_Id0 == edge.m_Id0) && (m_Id1 == edge.m_Id1) ;} ///< is edge same direction as this one
-  bool IsReversed(const Edge& edge) const {return (m_Id0 == edge.m_Id1) && (m_Id1 == edge.m_Id0) ;} ///< is edge reverse of this one
-  void Reverse() {std::swap(m_Id0,m_Id1) ;} ///< reverse direction (swap end points)
-  void PrintSelf(ostream& os, vtkIndent indent) const {os << m_Id0 << " " << m_Id1 << std::endl ;} ///< print self
+  Edge(int id0, int id1) : Id0(id0), Id1(id1) {} ///< constructor
+  int GetId0() const {return Id0 ;} ///< get id0
+  int GetId1() const {return Id1 ;} ///< get id1
+  void SetId0(int id0) {Id0 = id0 ;} ///< set id0
+  void SetId1(int id1) {Id1 = id1 ;} ///< set id1
+  int GetOtherId(int id) const {if (id == Id0) return Id1 ; else if (id == Id1) return Id0 ; else return -1 ;}
+  bool ContainsPoint(int id) const {return ((Id0 == id) || (Id1 == id)) ;} ///< does edge contain point
+  bool IsSameDirection(const Edge& edge) const {return (Id0 == edge.Id0) && (Id1 == edge.Id1) ;} ///< is edge same direction as this one
+  bool IsReversed(const Edge& edge) const {return (Id0 == edge.Id1) && (Id1 == edge.Id0) ;} ///< is edge reverse of this one
+  void Reverse() {std::swap(Id0,Id1) ;} ///< reverse direction (swap end points)
+  void PrintSelf(ostream& os, vtkIndent indent) const {os << Id0 << " " << Id1 << std::endl ;} ///< print self
   bool operator==(const Edge& edge) const ; ///< equals operator
   bool operator!=(const Edge& edge) const ; ///< not equals operator
 private:
-  vtkIdType m_Id0 ;   ///< id of endpoint 0
-  vtkIdType m_Id1 ;   ///< id of endpoint 1
+  vtkIdType Id0 ;   ///< id of endpoint 0
+  vtkIdType Id1 ;   ///< id of endpoint 1
 };
 
 

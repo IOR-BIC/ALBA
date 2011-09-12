@@ -25,7 +25,7 @@
 
 //------------------------------------------------------------------------------
 // standard macros
-vtkCxxRevisionMacro(vtkMEDPolyDataNavigator, "$Revision: 1.1.2.1 $");
+vtkCxxRevisionMacro(vtkMEDPolyDataNavigator, "$Revision: 1.1.2.2 $");
 vtkStandardNewMacro(vtkMEDPolyDataNavigator);
 //------------------------------------------------------------------------------
 
@@ -2217,8 +2217,8 @@ bool vtkMEDPolyDataNavigator::Edge::operator==(const Edge& edge) const
 //------------------------------------------------------------------------------
 {
   return (
-    ((edge.m_Id0 == m_Id0) && (edge.m_Id1 == m_Id1)) || 
-    ((edge.m_Id0 == m_Id1) && (edge.m_Id1 == m_Id0))
+    ((edge.Id0 == Id0) && (edge.Id1 == Id1)) || 
+    ((edge.Id0 == Id1) && (edge.Id1 == Id0))
     );
 } 
 
@@ -2229,8 +2229,8 @@ bool vtkMEDPolyDataNavigator::Edge::operator!=(const Edge& edge) const
 //------------------------------------------------------------------------------
 {
   return !(
-    ((edge.m_Id0 == m_Id0) && (edge.m_Id1 == m_Id1)) || 
-    ((edge.m_Id0 == m_Id1) && (edge.m_Id1 == m_Id0))
+    ((edge.Id0 == Id0) && (edge.Id1 == Id1)) || 
+    ((edge.Id0 == Id1) && (edge.Id1 == Id0))
     );
 } 
 
