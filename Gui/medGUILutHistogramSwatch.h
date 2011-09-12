@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILutHistogramSwatch.h,v $
   Language:  C++
-  Date:      $Date: 2011-07-21 14:23:00 $
-  Version:   $Revision: 1.1.2.7 $
+  Date:      $Date: 2011-09-12 12:15:46 $
+  Version:   $Revision: 1.1.2.8 $
   Authors:   Crimi Gianluigi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -47,7 +47,7 @@ public:
   void SetEditable(bool b) {m_Editable = b;};  
 
   /** Activate/Deactivate threshold view on LUT */
-  void showThreshold(bool b);
+  void ShowThreshold(bool b);
 
   /** Activate/Deactivate threshold view on LUT */
   void EnableOverHighlight(bool b) {m_OverHighlight=b;};

@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.h,v $
 Language:  C++
-Date:      $Date: 2011-09-05 16:52:22 $
-Version:   $Revision: 1.1.2.6 $
+Date:      $Date: 2011-09-12 12:15:37 $
+Version:   $Revision: 1.1.2.7 $
 Authors:   Eleonora Mambrini, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
@@ -265,10 +265,10 @@ protected:
 
   double GetPosFromSliceIndexZ();
 
-  void onAutomaticStep();
-  void onManualStep();
-  void onManualStepExit();
-  void onRefinementStep();
+  void OnAutomaticStep();
+  void OnManualStep();
+  void OnManualStepExit();
+  void OnRefinementStep();
 
   /** Perform the initializations when the user press next button */
   void OnNextStep();

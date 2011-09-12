@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILutHistogramEditor.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-07-21 16:04:15 $
-  Version:   $Revision: 1.1.2.9 $
+  Date:      $Date: 2011-09-12 12:15:46 $
+  Version:   $Revision: 1.1.2.10 $
   Authors:   Crimi Gianluigi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -90,7 +90,7 @@ medGUILutHistogramEditor::medGUILutHistogramEditor(vtkDataSet *dataSet,mmaVolume
   gui->Add(m_Histogram,1);
 
   m_LutSwatch = new medGUILutHistogramSwatch(gui ,-1,"", dataSet, material, wxSize(482,18),false);
-  m_LutSwatch->showThreshold(true);
+  m_LutSwatch->ShowThreshold(true);
   m_LutSwatch->EnableOverHighlight(true);
 
 

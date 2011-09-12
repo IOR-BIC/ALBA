@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILutHistogramSwatch.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-07-21 14:23:00 $
-  Version:   $Revision: 1.1.2.7 $
+  Date:      $Date: 2011-09-12 12:15:46 $
+  Version:   $Revision: 1.1.2.8 $
   Authors:   Crimi Gianluigi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -278,7 +278,7 @@ void medGUILutHistogramSwatch::SetDataSet(vtkDataSet *dataSet)
 }
 
 //----------------------------------------------------------------------------
-void medGUILutHistogramSwatch::showThreshold(bool b) 
+void medGUILutHistogramSwatch::ShowThreshold(bool b) 
  //----------------------------------------------------------------------------
 {
   m_ShowThreshold =b;

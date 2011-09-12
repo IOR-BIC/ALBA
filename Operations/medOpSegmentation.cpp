@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2011-09-08 08:53:36 $
-Version:   $Revision: 1.1.2.11 $
+Date:      $Date: 2011-09-12 12:15:37 $
+Version:   $Revision: 1.1.2.12 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
@@ -1331,7 +1331,7 @@ void medOpSegmentation::InitRefinementVolumeMask()
 }
 
 //------------------------------------------------------------------------
-void medOpSegmentation::onAutomaticStep()
+void medOpSegmentation::OnAutomaticStep()
 //------------------------------------------------------------------------
 {
   //gui stuff 
@@ -1343,7 +1343,7 @@ void medOpSegmentation::onAutomaticStep()
 }
 
 //------------------------------------------------------------------------
-void medOpSegmentation::onManualStep()
+void medOpSegmentation::OnManualStep()
 //------------------------------------------------------------------------
 {
   //gui stuff
@@ -1392,7 +1392,7 @@ void medOpSegmentation::onManualStep()
 }
 
 //------------------------------------------------------------------------
-void medOpSegmentation::onManualStepExit()
+void medOpSegmentation::OnManualStepExit()
 //------------------------------------------------------------------------
 {
   //Gui stuff
@@ -1415,7 +1415,7 @@ void medOpSegmentation::onManualStepExit()
 }
 
 //------------------------------------------------------------------------
-void medOpSegmentation::onRefinementStep()
+void medOpSegmentation::OnRefinementStep()
 //------------------------------------------------------------------------
 {
   //gui stuff
@@ -1450,7 +1450,7 @@ void medOpSegmentation::OnNextStep()
       InitGui();
 
       //next step -> AUTOMATIC_SEGMENTATION 
-      onAutomaticStep();
+      OnAutomaticStep();
     } 
     break;
     case AUTOMATIC_SEGMENTATION:
@@ -1464,16 +1464,16 @@ void medOpSegmentation::OnNextStep()
 
 
       //next step -> MANUAL_SEGMENTATION
-      onManualStep();
+      OnManualStep();
     }
     break;
     case  MANUAL_SEGMENTATION:
     {
       
-      onManualStepExit();
+      OnManualStepExit();
 
       //next step -> REFINEMENT_SEGMENTATION
-      onRefinementStep();
+      OnRefinementStep();
     }
     break;
     case REFINEMENT_SEGMENTATION:
@@ -1529,9 +1529,9 @@ void medOpSegmentation::OnPreviousStep()
   {
     case MANUAL_SEGMENTATION:
     {
-      onManualStepExit();
+      OnManualStepExit();
       //prev step -> AUTOMATIC_SEGMENTATION
-      onAutomaticStep();
+      OnAutomaticStep();
       m_View->VmeShow(m_ThresholdVolume,true);
     }
     break;
@@ -1539,7 +1539,7 @@ void medOpSegmentation::OnPreviousStep()
     {
       m_GuiDialog->Enable(ID_REFINEMENT,false);
       m_View->VmeShow(m_RefinementVolumeMask,false);
-      onManualStep();
+      OnManualStep();
     }
     break;
     case LOAD_SEGMENTATION:
@@ -1548,7 +1548,7 @@ void medOpSegmentation::OnPreviousStep()
       m_GuiDialog->Enable(ID_BUTTON_NEXT,true);
       
       //prev step -> REFINEMENT_SEGMENTATION
-      onRefinementStep();
+      OnRefinementStep();
     }
     break;
     default:
