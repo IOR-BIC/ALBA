@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDPoissonSurfaceReconstruction.cxx,v $
 Language:  C++
-Date:      $Date: 2011-09-12 13:15:57 $
-Version:   $Revision: 1.1.2.9 $
+Date:      $Date: 2011-09-12 13:51:12 $
+Version:   $Revision: 1.1.2.10 $
 Authors:   Fuli Wu
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -21,7 +21,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "float.h"
 
 
-vtkCxxRevisionMacro(vtkMEDPoissonSurfaceReconstruction, "$Revision: 1.1.2.9 $");
+vtkCxxRevisionMacro(vtkMEDPoissonSurfaceReconstruction, "$Revision: 1.1.2.10 $");
 vtkStandardNewMacro(vtkMEDPoissonSurfaceReconstruction);
 
 vtkDataSet* vtk_psr_input;
@@ -2072,14 +2072,14 @@ Polynomial<Degree>& Polynomial<Degree>::operator  = (const Polynomial<Degree2> &
 }
 
 template<int Degree>
-Polynomial<Degree-1> Polynomial<Degree>::derivative(void) const{
+Polynomial<Degree-1> Polynomial<Degree>::Derivative(void) const{
 	Polynomial<Degree-1> p;
 	for(int i=0;i<Degree;i++){p.coefficients[i]=coefficients[i+1]*(i+1);}
 	return p;
 }
 
 template<int Degree>
-Polynomial<Degree+1> Polynomial<Degree>::integral(void) const{
+Polynomial<Degree+1> Polynomial<Degree>::Integral(void) const{
 	Polynomial<Degree+1> p;
 	p.coefficients[0]=0;
 	for(int i=0;i<=Degree;i++){p.coefficients[i+1]=coefficients[i]/(i+1);}
@@ -2096,7 +2096,7 @@ double Polynomial<Degree>::operator() (const double& t) const{
 	return v;
 }
 template<int Degree>
-double Polynomial<Degree>::integral(const double& tMin,const double& tMax) const{
+double Polynomial<Degree>::Integral(const double& tMin,const double& tMax) const{
 	double v=0;
 	double t1,t2;
 	t1=tMin;
@@ -2119,15 +2119,15 @@ int Polynomial<Degree>::operator != (const Polynomial& p) const{
 	return 1;
 }
 template<int Degree>
-int Polynomial<Degree>::isZero(void) const{
+int Polynomial<Degree>::IsZero(void) const{
 	for(int i=0;i<=Degree;i++){if(coefficients[i]!=0){return 0;}}
 	return 1;
 }
 template<int Degree>
-void Polynomial<Degree>::setZero(void){memset(coefficients,0,sizeof(double)*(Degree+1));}
+void Polynomial<Degree>::SetZero(void){memset(coefficients,0,sizeof(double)*(Degree+1));}
 
 template<int Degree>
-Polynomial<Degree>& Polynomial<Degree>::addScaled(const Polynomial& p,const double& s){
+Polynomial<Degree>& Polynomial<Degree>::AddScaled(const Polynomial& p,const double& s){
 	for(int i=0;i<=Degree;i++){coefficients[i]+=p.coefficients[i]*s;}
 	return *this;
 }
@@ -2239,7 +2239,7 @@ Polynomial<Degree> Polynomial<Degree>::operator / (const double& s) const{
 	return q;
 }
 template<int Degree>
-Polynomial<Degree> Polynomial<Degree>::scale(const double& s) const{
+Polynomial<Degree> Polynomial<Degree>::Scale(const double& s) const{
 	Polynomial q=*this;
 	double s2=1.0;
 	for(int i=0;i<=Degree;i++){
@@ -2249,7 +2249,7 @@ Polynomial<Degree> Polynomial<Degree>::scale(const double& s) const{
 	return q;
 }
 template<int Degree>
-Polynomial<Degree> Polynomial<Degree>::shift(const double& t) const{
+Polynomial<Degree> Polynomial<Degree>::Shift(const double& t) const{
 	Polynomial<Degree> q;
 	for(int i=0;i<=Degree;i++){
 		double temp=1;
@@ -2262,7 +2262,7 @@ Polynomial<Degree> Polynomial<Degree>::shift(const double& t) const{
 	return q;
 }
 template<int Degree>
-void Polynomial<Degree>::printnl(void) const{
+void Polynomial<Degree>::Printnl(void) const{
 	for(int j=0;j<=Degree;j++){
 		printf("%6.4f x^%d ",coefficients[j],j);
 		if(j<Degree && coefficients[j+1]>=0){printf("+");}
@@ -2270,7 +2270,7 @@ void Polynomial<Degree>::printnl(void) const{
 	printf("\n");
 }
 template<int Degree>
-void Polynomial<Degree>::getSolutions(const double& c,std::vector<double>& roots,const double& EPS) const {
+void Polynomial<Degree>::GetSolutions(const double& c,std::vector<double>& roots,const double& EPS) const {
 	double r[4][2];
 	int rCount=0;
 	roots.clear();
@@ -2314,14 +2314,14 @@ template<int Degree>
 StartingPolynomial<Degree> StartingPolynomial<Degree>::scale(const double& s) const{
 	StartingPolynomial q;
 	q.start=start*s;
-	q.p=p.scale(s);
+	q.p=p.Scale(s);
 	return q;
 }
 template<int Degree>
 StartingPolynomial<Degree> StartingPolynomial<Degree>::shift(const double& s) const{
 	StartingPolynomial q;
 	q.start=start+s;
-	q.p=p.shift(s);
+	q.p=p.Shift(s);
 	return q;
 }
 
@@ -2431,7 +2431,7 @@ double PPolynomial<Degree>::integral(const double& tMin,const double& tMax) cons
 	for(int i=0;i<int(polyCount) && polys[i].start<end;i++){
 		if(start<polys[i].start){s=polys[i].start;}
 		else{s=start;}
-		v+=polys[i].p.integral(s,end);
+		v+=polys[i].p.Integral(s,end);
 	}
 	return v*m;
 }
@@ -2545,7 +2545,7 @@ PPolynomial<Degree-1> PPolynomial<Degree>::derivative(void) const{
 	q.set(polyCount);
 	for(size_t i=0;i<polyCount;i++){
 		q.polys[i].start=polys[i].start;
-		q.polys[i].p=polys[i].p.derivative();
+		q.polys[i].p=polys[i].p.Derivative();
 	}
 	return q;
 }
@@ -2556,7 +2556,7 @@ PPolynomial<Degree+1> PPolynomial<Degree>::integral(void) const{
 	q.set(polyCount);
 	for(i=0;i<int(polyCount);i++){
 		q.polys[i].start=polys[i].start;
-		q.polys[i].p=polys[i].p.integral();
+		q.polys[i].p=polys[i].p.Integral();
 		q.polys[i].p-=q.polys[i].p(q.polys[i].start);
 	}
 	return q;
@@ -2619,7 +2619,7 @@ void PPolynomial<Degree>::printnl(void) const{
 			else if	(polys[i+1].start==-DBL_MAX){printf("-Infinity]\t");}
 			else								{printf("%f]\t",polys[i+1].start);}
 			p=p+polys[i].p;
-			p.printnl();
+			p.Printnl();
 		}
 	}
 	printf("\n");
@@ -2660,9 +2660,9 @@ PPolynomial<Degree+1> PPolynomial<Degree>::MovingAverage(const double& radius){
 	for(int i=0;i<int(polyCount);i++){
 		sps[2*i  ].start=polys[i].start-radius;
 		sps[2*i+1].start=polys[i].start+radius;
-		p=polys[i].p.integral()-polys[i].p.integral()(polys[i].start);
-		sps[2*i  ].p=p.shift(-radius);
-		sps[2*i+1].p=p.shift( radius)*-1;
+		p=polys[i].p.Integral()-polys[i].p.Integral()(polys[i].start);
+		sps[2*i  ].p=p.Shift(-radius);
+		sps[2*i+1].p=p.Shift( radius)*-1;
 	}
 	A.set(sps,int(polyCount*2));
 	free(sps);
@@ -2674,12 +2674,12 @@ void PPolynomial<Degree>::getSolutions(const double& c,std::vector<double>& root
 	Polynomial<Degree> p;
 	std::vector<double> tempRoots;
 
-	p.setZero();
+	p.SetZero();
 	for(size_t i=0;i<polyCount;i++){
 		p+=polys[i].p;
 		if(polys[i].start>max){break;}
 		if(i<polyCount-1 && polys[i+1].start<min){continue;}
-		p.getSolutions(c,tempRoots,EPS);
+		p.GetSolutions(c,tempRoots,EPS);
 		for(size_t j=0;j<tempRoots.size();j++){
 			if(tempRoots[j]>polys[i].start && (i+1==polyCount || tempRoots[j]<=polys[i+1].start)){
 				if(tempRoots[j]>min && tempRoots[j]<max){roots.push_back(tempRoots[j]);}
@@ -5406,7 +5406,7 @@ int Octree<Degree>::GetRoot(const RootInfo& ri,const Real& isoValue,Point3D<Real
 	P.coefficients[1]=dx0;
 	P.coefficients[2]=3*(x1-x0)-dx1-2*dx0;
 
-	P.getSolutions(isoValue,roots,EPSILON);
+	P.GetSolutions(isoValue,roots,EPSILON);
 	for(i=0;i<int(roots.size());i++){
 		if(roots[i]>=0 && roots[i]<=1){
 			averageRoot+=Real(roots[i]);

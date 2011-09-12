@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDPoissonSurfaceReconstruction.h,v $
 Language:  C++
-Date:      $Date: 2011-09-12 13:15:57 $
-Version:   $Revision: 1.1.2.13 $
+Date:      $Date: 2011-09-12 13:51:12 $
+Version:   $Revision: 1.1.2.14 $
 Authors:   Fuli Wu
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -355,16 +355,16 @@ public:
   /** overload operator () which retrieves  the sum of the product of the coefficients*/
 	double operator()(const double& t) const;
   /** calculate integral */
-	double integral(const double& tMin,const double& tMax) const;
+	double Integral(const double& tMin,const double& tMax) const;
 
   /** operator== overload , checking coefficients */
 	int operator == (const Polynomial& p) const;
   /** operator!= overload, checking coefficients */
 	int operator != (const Polynomial& p) const;
   /** check if all coefficients are zero*/
-	int isZero(void) const;
+	int IsZero(void) const;
   /** set  all coefficients as zero*/
-	void setZero(void);
+	void SetZero(void);
 
   /** overload operator, according to the operation over coefficients */
 	template<int Degree2>
@@ -401,20 +401,20 @@ public:
 	Polynomial  operator /  (const double& s) const;
 
   /** overload operator, according to the operation over coefficients */
-	Polynomial scale(const double& s) const;
+	Polynomial Scale(const double& s) const;
   /** overload operator, according to the operation over coefficients */
-	Polynomial shift(const double& t) const;
+	Polynomial Shift(const double& t) const;
 
   /** calculate derivative */
-	Polynomial<Degree-1> derivative(void) const;
+	Polynomial<Degree-1> Derivative(void) const;
   /** calculate integral */
-	Polynomial<Degree+1> integral(void) const;
+	Polynomial<Degree+1> Integral(void) const;
 
   /** print representation of polynomial */
-	void printnl(void) const;
+	void Printnl(void) const;
 
   /** overload operator, according to the operation over coefficients */
-	Polynomial& addScaled(const Polynomial& p,const double& scale);
+	Polynomial& AddScaled(const Polynomial& p,const double& scale);
 
   /** overload operator, according to the operation over coefficients */
 	static void Negate(const Polynomial& in,Polynomial& out);
@@ -430,7 +430,7 @@ public:
 	static void AddScaled(const Polynomial& p1,const double& w1,const Polynomial& p2,Polynomial& q);
 
   /** calculate roots */
-	void getSolutions(const double& c,std::vector<double>& roots,const double& EPS) const;
+	void GetSolutions(const double& c,std::vector<double>& roots,const double& EPS) const;
 };
 
 /*=========================================================================
