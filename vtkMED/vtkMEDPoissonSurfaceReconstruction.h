@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDPoissonSurfaceReconstruction.h,v $
 Language:  C++
-Date:      $Date: 2011-07-13 07:42:31 $
-Version:   $Revision: 1.1.2.12 $
+Date:      $Date: 2011-09-12 13:15:57 $
+Version:   $Revision: 1.1.2.13 $
 Authors:   Fuli Wu
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -771,7 +771,7 @@ class VTK_vtkMED_EXPORT TriangulationTriangle
 public:
   /** Constructor. */
 	TriangulationTriangle(void);
-	int eIndex[3];
+	int EIndex[3];
 };
 
 /**

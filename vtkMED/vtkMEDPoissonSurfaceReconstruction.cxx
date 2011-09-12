@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDPoissonSurfaceReconstruction.cxx,v $
 Language:  C++
-Date:      $Date: 2011-02-28 11:07:49 $
-Version:   $Revision: 1.1.2.8 $
+Date:      $Date: 2011-09-12 13:15:57 $
+Version:   $Revision: 1.1.2.9 $
 Authors:   Fuli Wu
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -21,7 +21,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "float.h"
 
 
-vtkCxxRevisionMacro(vtkMEDPoissonSurfaceReconstruction, "$Revision: 1.1.2.8 $");
+vtkCxxRevisionMacro(vtkMEDPoissonSurfaceReconstruction, "$Revision: 1.1.2.9 $");
 vtkStandardNewMacro(vtkMEDPoissonSurfaceReconstruction);
 
 vtkDataSet* vtk_psr_input;
@@ -658,13 +658,13 @@ long long Triangulation<Real>::EdgeIndex(const int& p1,const int& p2){
 
 template<class Real>
 int Triangulation<Real>::Factor(const int& tIndex,int& p1,int& p2,int & p3){
-	if(triangles[tIndex].eIndex[0]<0 || triangles[tIndex].eIndex[1]<0 || triangles[tIndex].eIndex[2]<0){return 0;}
-	if(edges[triangles[tIndex].eIndex[0]].tIndex[0]==tIndex){p1=edges[triangles[tIndex].eIndex[0]].pIndex[0];}
-	else													{p1=edges[triangles[tIndex].eIndex[0]].pIndex[1];}
-	if(edges[triangles[tIndex].eIndex[1]].tIndex[0]==tIndex){p2=edges[triangles[tIndex].eIndex[1]].pIndex[0];}
-	else													{p2=edges[triangles[tIndex].eIndex[1]].pIndex[1];}
-	if(edges[triangles[tIndex].eIndex[2]].tIndex[0]==tIndex){p3=edges[triangles[tIndex].eIndex[2]].pIndex[0];}
-	else													{p3=edges[triangles[tIndex].eIndex[2]].pIndex[1];}
+	if(triangles[tIndex].EIndex[0]<0 || triangles[tIndex].EIndex[1]<0 || triangles[tIndex].EIndex[2]<0){return 0;}
+	if(edges[triangles[tIndex].EIndex[0]].tIndex[0]==tIndex){p1=edges[triangles[tIndex].EIndex[0]].pIndex[0];}
+	else													{p1=edges[triangles[tIndex].EIndex[0]].pIndex[1];}
+	if(edges[triangles[tIndex].EIndex[1]].tIndex[0]==tIndex){p2=edges[triangles[tIndex].EIndex[1]].pIndex[0];}
+	else													{p2=edges[triangles[tIndex].EIndex[1]].pIndex[1];}
+	if(edges[triangles[tIndex].EIndex[2]].tIndex[0]==tIndex){p3=edges[triangles[tIndex].EIndex[2]].pIndex[0];}
+	else													{p3=edges[triangles[tIndex].EIndex[2]].pIndex[1];}
 	return 1;
 }
 template<class Real>
@@ -725,7 +725,7 @@ int Triangulation<Real>::AddTriangle(const int& p1,const int& p2,const int& p3){
 			}
 
 		}
-		triangles[tIdx].eIndex[i]=eIdx;
+		triangles[tIdx].EIndex[i]=eIdx;
 	}
 	return tIdx;
 }
@@ -774,14 +774,14 @@ int Triangulation<Real>::FlipMinimize(const int& eIndex){
 	for(int i=0;i<3;i++){
 		int idx;
 		idx=edgeMap[EdgeIndex(newQ[i],newQ[(i+1)%3])];
-		triangles[edges[eIndex].tIndex[0]].eIndex[i]=idx;
+		triangles[edges[eIndex].tIndex[0]].EIndex[i]=idx;
 		if(idx!=eIndex){
 			if(edges[idx].tIndex[0]==edges[eIndex].tIndex[1]){edges[idx].tIndex[0]=edges[eIndex].tIndex[0];}
 			if(edges[idx].tIndex[1]==edges[eIndex].tIndex[1]){edges[idx].tIndex[1]=edges[eIndex].tIndex[0];}
 		}
 
 		idx=edgeMap[EdgeIndex(newP[i],newP[(i+1)%3])];
-		triangles[edges[eIndex].tIndex[1]].eIndex[i]=idx;
+		triangles[edges[eIndex].tIndex[1]].EIndex[i]=idx;
 		if(idx!=eIndex){
 			if(edges[idx].tIndex[0]==edges[eIndex].tIndex[0]){edges[idx].tIndex[0]=edges[eIndex].tIndex[1];}
 			if(edges[idx].tIndex[1]==edges[eIndex].tIndex[0]){edges[idx].tIndex[1]=edges[eIndex].tIndex[1];}
@@ -6199,7 +6199,7 @@ int Solve(const double* eqns,const double* values,double* solutions,const int& d
 const int CoredMeshData::IN_CORE_FLAG[]={1,2,4};
 
 TriangulationEdge::TriangulationEdge(void){pIndex[0]=pIndex[1]=tIndex[0]=tIndex[1]=-1;}
-TriangulationTriangle::TriangulationTriangle(void){eIndex[0]=eIndex[1]=eIndex[2]=-1;}
+TriangulationTriangle::TriangulationTriangle(void){EIndex[0]=EIndex[1]=EIndex[2]=-1;}
 
 /////////////////////////
 // CoredVectorMeshData //
