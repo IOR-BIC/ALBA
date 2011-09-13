@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: TriangulationTriangleTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-11-19 10:29:19 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-09-13 12:46:40 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -29,7 +29,7 @@ void TriangulationTriangleTest::TestDynamicAllocation()
 {
   TriangulationTriangle *var = new TriangulationTriangle();
 
-  CPPUNIT_ASSERT( var->eIndex[0] == -1 && var->eIndex[1] == -1 && var->eIndex[2] );
+  CPPUNIT_ASSERT( var->EIndex[0] == -1 && var->EIndex[1] == -1 && var->EIndex[2] );
 
   delete var;
 }

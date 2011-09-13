@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: PolynomialTest.cpp,v $
 Language:  C++
-Date:      $Date: 2011-03-15 14:01:53 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-09-13 12:46:40 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -56,10 +56,10 @@ void PolynomialTest::TestAllMethods()
 	tmp = p2(B);
 	CPPUNIT_ASSERT(tmp == 6);  // A + B
 
-	// 	/** calculate integral */
-	// 	double integral(const double& tMin,const double& tMax) const;
+	// 	/** calculate Integral */
+	// 	double Integral(const double& tMin,const double& tMax) const;
 
-	CPPUNIT_ASSERT(p1.integral(0,1) == 4);
+	CPPUNIT_ASSERT(p1.Integral(0,1) == 4);
 
 	/** operator== overload , checking coefficients */
 	// int operator == (const Polynomial& p) const;
@@ -73,9 +73,9 @@ void PolynomialTest::TestAllMethods()
 	CPPUNIT_ASSERT((p1 != p2) == false);
 
 	// 	/** check if all coefficients are zero*/
-	// 	int isZero(void) const;
+	// 	int IsZero(void) const;
 
-	CPPUNIT_ASSERT(p1.isZero() == false);
+	CPPUNIT_ASSERT(p1.IsZero() == false);
 
 	// 	/** set  all coefficients as zero*/
 	// 	void setZero(void);
@@ -83,12 +83,12 @@ void PolynomialTest::TestAllMethods()
 	p1.coefficients[A] = 0;
 	p1.coefficients[B] = 0;
 
-	CPPUNIT_ASSERT(p1.isZero() == true);
+	CPPUNIT_ASSERT(p1.IsZero() == true);
 
 	p1.coefficients[A] = coeffAValue;
 	p1.coefficients[B] = coeffBValue;
 
-	CPPUNIT_ASSERT(p1.isZero() == false);
+	CPPUNIT_ASSERT(p1.IsZero() == false);
 
 // 	/** overload operator, according to the operation over coefficients */
 // 	template<int Degree2>
@@ -97,7 +97,7 @@ void PolynomialTest::TestAllMethods()
 	p1.coefficients[A] = 0;
 	p1.coefficients[B] = 0;
 
-	CPPUNIT_ASSERT(p1.isZero() == true);
+	CPPUNIT_ASSERT(p1.IsZero() == true);
 
 	p1 = p2;
 
@@ -118,7 +118,7 @@ void PolynomialTest::TestAllMethods()
 // 	Polynomial& operator -= (const Polynomial& p);
 
 
-	CPPUNIT_ASSERT((p1 -= p2).isZero() == true);
+	CPPUNIT_ASSERT((p1 -= p2).IsZero() == true);
 
 // 	/** overload operator, according to the operation over coefficients */
 // 	Polynomial  operator -  (void) const;
@@ -130,9 +130,9 @@ void PolynomialTest::TestAllMethods()
 
 	p3 = p2 - p1;
 
-	CPPUNIT_ASSERT(!p1.isZero());
-	CPPUNIT_ASSERT(!p2.isZero());
-	CPPUNIT_ASSERT(p3.isZero());
+	CPPUNIT_ASSERT(!p1.IsZero());
+	CPPUNIT_ASSERT(!p2.IsZero());
+	CPPUNIT_ASSERT(p3.IsZero());
 
 // 	/** overload operator, according to the operation over coefficients */
 // 	Polynomial  operator +  (const Polynomial& p) const;
@@ -145,7 +145,7 @@ void PolynomialTest::TestAllMethods()
 	// 	/** overload operator, according to the operation over coefficients */
 // 	Polynomial  operator -  (const Polynomial& p) const;
 
-	CPPUNIT_ASSERT((p2 - p1).isZero());
+	CPPUNIT_ASSERT((p2 - p1).IsZero());
 
 // 	/** overload operator, according to the operation over coefficients */
 // 	template<int Degree2>
@@ -161,20 +161,20 @@ void PolynomialTest::TestAllMethods()
 
 	CPPUNIT_ASSERT(product == checkProduct);
 
-// 	/** calculate derivative */
-// 	Polynomial<Degree-1> derivative(void) const;
+// 	/** calculate Derivative */
+// 	Polynomial<Degree-1> Derivative(void) const;
 
-	Polynomial<1> d = product.derivative();
+	Polynomial<1> d = product.Derivative();
 
 	CPPUNIT_ASSERT(d.coefficients[A] == 16);
 	CPPUNIT_ASSERT(d.coefficients[B] = 32);
 		
 // 
-// 	/** calculate integral */
-// 	Polynomial<Degree+1> integral(void) const;
+// 	/** calculate Integral */
+// 	Polynomial<Degree+1> Integral(void) const;
 // 
 
-	Polynomial<2> i = d.integral();
+	Polynomial<2> i = d.Integral();
 	i.coefficients[A] = 0; // constant coefficient is 0
 	i.coefficients[B] = 16;
 	i.coefficients[C] = 16;
