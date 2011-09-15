@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2011-07-26 12:36:09 $
-Version:   $Revision: 1.1.2.140 $
+Date:      $Date: 2011-09-15 15:00:27 $
+Version:   $Revision: 1.1.2.141 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -592,7 +592,7 @@ void medOpImporterDicomOffis::Destroy()
 	for ( it=m_SeriesIDToSlicesListMap.begin() ; it != m_SeriesIDToSlicesListMap.end(); it++ )
 	{
 		m_SeriesIDToSlicesListMap[(*it).first]->DeleteContents(TRUE);
-		m_SeriesIDToSlicesListMap[(*it).first]->Clear();
+    delete m_SeriesIDToSlicesListMap[(*it).first];
 	}
 
 	m_SeriesIDToSlicesListMap.clear();
@@ -3904,7 +3904,7 @@ void medOpImporterDicomOffis::ResetStructure()
 	for ( it=m_SeriesIDToSlicesListMap.begin() ; it != m_SeriesIDToSlicesListMap.end(); it++ )
 	{
 		m_SeriesIDToSlicesListMap[(*it).first]->DeleteContents(TRUE);
-		m_SeriesIDToSlicesListMap[(*it).first]->Clear();
+    delete m_SeriesIDToSlicesListMap[(*it).first];
 	}
 
 	m_SeriesIDToSlicesListMap.clear();
