@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeLandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-07-06 11:30:16 $
-  Version:   $Revision: 1.15.2.1 $
+  Date:      $Date: 2011-09-16 12:26:57 $
+  Version:   $Revision: 1.15.2.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -42,6 +42,7 @@
 #include "vtkProperty.h"
 #include "vtkPolyData.h"
 #include "vtkDataSet.h"
+#include "vtkRenderer.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafPipeLandmarkCloud);
@@ -308,7 +309,14 @@ void mafPipeLandmarkCloud::CreateClosedCloudPipe(vtkDataSet *data, double radius
   m_CloudActor->GetProperty()->SetInterpolationToGouraud();
   m_CloudActor->SetMapper(m_CloudMapper);
 
-  m_AssemblyFront->AddPart(m_CloudActor);
+  if (m_AssemblyFront)
+  {
+  	m_AssemblyFront->AddPart(m_CloudActor);
+  }
+  else if (m_RenFront)
+  {
+    m_RenFront->AddActor(m_CloudActor);
+  }
 
   // selection highlight
   vtkMAFSmartPointer<vtkOutlineCornerFilter> corner;
@@ -330,7 +338,14 @@ void mafPipeLandmarkCloud::CreateClosedCloudPipe(vtkDataSet *data, double radius
   m_CloudSelectionActor->SetProperty(corner_props);
   m_CloudSelectionActor->SetScale(1.01,1.01,1.01);
 
-  m_AssemblyFront->AddPart(m_CloudSelectionActor);
+  if (m_AssemblyFront)
+  {
+  	m_AssemblyFront->AddPart(m_CloudSelectionActor);
+  }
+  else if (m_RenFront)
+  {
+    m_RenFront->AddActor(m_CloudSelectionActor);
+  }
 }
 //----------------------------------------------------------------------------
 void mafPipeLandmarkCloud::RemoveClosedCloudPipe()
@@ -338,11 +353,25 @@ void mafPipeLandmarkCloud::RemoveClosedCloudPipe()
 {
   if(m_CloudActor)
   {
-    m_AssemblyFront->RemovePart(m_CloudActor);
+    if (m_AssemblyFront)
+    {
+      m_AssemblyFront->RemovePart(m_CloudActor);
+    }
+    else if (m_RenFront)
+    {
+      m_RenFront->RemoveActor(m_CloudActor);
+    }
   }
   if (m_CloudSelectionActor)
   {
-    m_AssemblyFront->RemovePart(m_CloudSelectionActor);
+    if (m_AssemblyFront)
+    {
+      m_AssemblyFront->RemovePart(m_CloudSelectionActor);
+    }
+    else if (m_RenFront)
+    {
+      m_RenFront->RemoveActor(m_CloudSelectionActor);
+    }
   }
 
   vtkDEL(m_SphereSource);
