@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVisualPipePolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2010-07-22 07:53:25 $
-Version:   $Revision: 1.3.2.3 $
+Date:      $Date: 2011-09-16 09:55:09 $
+Version:   $Revision: 1.3.2.4 $
 Authors:   DMatteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -123,7 +123,10 @@ medVisualPipePolylineGraph::medVisualPipePolylineGraph()
 void medVisualPipePolylineGraph::Create(mafSceneNode *n)
 //----------------------------------------------------------------------------
 {
-  Superclass::Create(n);
+  if (n != NULL)
+  {
+    Superclass::Create(n);
+  }
 
   m_Selected = false;
   m_Mapper          = NULL;
@@ -375,8 +378,21 @@ void medVisualPipePolylineGraph::InitializeFromTag()
 void medVisualPipePolylineGraph::AddActorsToAssembly(vtkMAFAssembly *assembly)
 //----------------------------------------------------------------------------
 {
-  assembly->AddPart(m_Actor);
-  assembly->AddPart(m_OutlineActor);
+  if (assembly)
+  {
+	  assembly->AddPart(m_Actor);
+	  assembly->AddPart(m_OutlineActor);
+  }
+  else if (m_RenFront)
+  {
+    m_RenFront->AddActor(m_Actor);
+    m_RenFront->AddActor(m_OutlineActor);
+  }
+  else if (m_RenBack)
+  {
+    m_RenBack->AddActor(m_Actor);
+    m_RenBack->AddActor(m_OutlineActor);
+  }
  
   if (m_RenFront)
   {
@@ -391,8 +407,22 @@ void medVisualPipePolylineGraph::AddActorsToAssembly(vtkMAFAssembly *assembly)
 void medVisualPipePolylineGraph::RemoveActorsFromAssembly(vtkMAFAssembly *assembly)
 //----------------------------------------------------------------------------
 {
-  assembly->RemovePart(m_Actor);
-  assembly->RemovePart(m_OutlineActor);
+  if (assembly)
+  {
+    assembly->RemovePart(m_Actor);
+    assembly->RemovePart(m_OutlineActor);
+  }
+  else if (m_RenFront)
+  {
+    m_RenFront->RemoveActor(m_Actor);
+    m_RenFront->RemoveActor(m_OutlineActor);
+  }
+  else if (m_RenBack)
+  {
+    m_RenBack->RemoveActor(m_Actor);
+    m_RenBack->RemoveActor(m_OutlineActor);
+  }
+
   if (m_RenFront)
   {
     m_RenFront->RemoveActor2D(m_ActorBranchId);
