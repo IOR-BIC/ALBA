@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpOpenExternalFile.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-01-28 13:22:35 $
-  Version:   $Revision: 1.3.2.1 $
+  Date:      $Date: 2011-09-19 09:49:18 $
+  Version:   $Revision: 1.3.2.2 $
   Authors:   Stefano Perticoni   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -81,6 +81,7 @@ void mafOpOpenExternalFile::OpRun()
 
 	if (filetype->GetOpenCommand(&command2execute, wxFileType::MessageParameters(file, mime)))
 	{
+    command2execute.Replace("/", "\\");
     mafLogMessage( _T("Executing command: '%s'"), command2execute.c_str() );
 		m_Pid = wxExecute(command2execute); //,FALSE
 		cppDEL(filetype);
