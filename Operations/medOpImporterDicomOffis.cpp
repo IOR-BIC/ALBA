@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2011-09-15 15:00:27 $
-Version:   $Revision: 1.1.2.141 $
+Date:      $Date: 2011-09-22 12:47:23 $
+Version:   $Revision: 1.1.2.142 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -2141,44 +2141,44 @@ void medOpImporterDicomOffis::CreateBuildPage()
 		bool type_volume = ((medGUIDicomSettings*)GetSetting())->EnableToRead("VOLUME");
 		bool type_mesh = ((medGUIDicomSettings*)GetSetting())->EnableToRead("MESH");
 		bool type_image = ((medGUIDicomSettings*)GetSetting())->EnableToRead("IMAGE");
-		wxString typeArray[3] = {_("Volume"),_("Mesh"),_("Image")};    
-		wxString typeArray2[2] = {_("Image"),_("Volume")};
-		wxString typeArray3[2] = {_("Mesh"),_("Image")};
+		wxString typeArrayVolumeMeshImage[3] = {_("Volume"),_("Mesh"),_("Image")};    
+		wxString typeArrayImageVolume[2] = {_("Image"),_("Volume")};
+		wxString typeArrayMeshImage[2] = {_("Mesh"),_("Image")};
 		if ((type_volume && type_mesh && type_image) || (!type_volume && !type_mesh && !type_image))
 		{
-			m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_OutputType, 3, typeArray, 1, ""/*, wxRA_SPECIFY_ROWS*/);
+			m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_OutputType, 3, typeArrayVolumeMeshImage, 1, ""/*, wxRA_SPECIFY_ROWS*/);
 		}
 		else if (type_volume && !type_mesh && !type_image)
 		{
 			m_OutputType = 0;
-			m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_OutputType, 1, typeArray, 1, ""/*, wxRA_SPECIFY_ROWS*/);
+			m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_OutputType, 1, typeArrayVolumeMeshImage, 1, ""/*, wxRA_SPECIFY_ROWS*/);
 			m_BuildGuiCenter->Enable(ID_VME_TYPE,0);
 		}
 		else if (!type_volume && type_mesh && !type_image)
 		{
 			m_OutputType = 1;
-			m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_RadioButton, 1, typeArray3, 1, ""/*, wxRA_SPECIFY_ROWS*/);
+			m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_RadioButton, 1, typeArrayMeshImage, 1, ""/*, wxRA_SPECIFY_ROWS*/);
 			m_BuildGuiCenter->Enable(ID_VME_TYPE,0);
 		} 
 		else if (!type_volume && !type_mesh && type_image)
 		{
 			m_OutputType = 2;
-			m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_RadioButton, 1, typeArray2, 1, ""/*, wxRA_SPECIFY_ROWS*/);
+			m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_RadioButton, 1, typeArrayImageVolume, 1, ""/*, wxRA_SPECIFY_ROWS*/);
 			m_BuildGuiCenter->Enable(ID_VME_TYPE,0);
 		}
 		else if (type_volume && type_mesh && !type_image)
 		{
-			m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_OutputType, 2, typeArray, 1, ""/*, wxRA_SPECIFY_ROWS*/);
+			m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_OutputType, 2, typeArrayVolumeMeshImage, 1, ""/*, wxRA_SPECIFY_ROWS*/);
 		}    
 		else if (type_volume && !type_mesh && type_image)
 		{
 			m_OutputType = 2;
-			m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_RadioButton, 2, typeArray2, 1, ""/*, wxRA_SPECIFY_ROWS*/);
+			m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_RadioButton, 2, typeArrayImageVolume, 1, ""/*, wxRA_SPECIFY_ROWS*/);
 		}             
 		else if (!type_volume && type_mesh && type_image)
 		{
 			m_OutputType = 1;
-			m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_RadioButton, 2, typeArray3, 1, ""/*, wxRA_SPECIFY_ROWS*/);
+			m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_RadioButton, 2, typeArrayMeshImage, 1, ""/*, wxRA_SPECIFY_ROWS*/);
 		}
 
 	}
