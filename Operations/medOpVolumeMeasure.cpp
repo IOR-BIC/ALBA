@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpVolumeMeasure.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-08-10 14:36:21 $
-  Version:   $Revision: 1.2.2.1 $
+  Date:      $Date: 2011-10-12 09:27:34 $
+  Version:   $Revision: 1.2.2.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -71,21 +71,10 @@ mafOp *medOpVolumeMeasure::Copy()
 bool medOpVolumeMeasure::Accept(mafNode *node)
 //----------------------------------------------------------------------------
 {
-	if(node)
-	{
-		mafNode *root=node->GetRoot();
-		mafNodeIterator *iter = root->NewIterator();
-		for (mafNode *Inode = iter->GetFirstNode(); Inode; Inode = iter->GetNextNode())
-		{
-			if(Inode->IsA("mafVMESurface") || Inode->IsA("mafVMESurfaceParametric"))
-			{
-				iter->Delete();
-				return true;
-			}
-		}
-		iter->Delete();
-		return false;
-	}
+  if(node->IsA("mafVMESurface") || node->IsA("mafVMESurfaceParametric"))
+  {
+    return true;
+  }
 	return false;
 }
 //----------------------------------------------------------------------------
@@ -94,7 +83,6 @@ bool medOpVolumeMeasure::Accept(mafNode *node)
 enum ID_VOLUME_MEASURE
 {
   ID_CLOSE_OP = MINID,
-  ID_CHOOSE_ORIGIN,
   ID_MEASURE_TYPE,
   ID_COMPUTE_MEASURE,
   ID_STORE_MEASURE,
@@ -106,15 +94,14 @@ enum ID_VOLUME_MEASURE
 void medOpVolumeMeasure::OpRun()   
 //----------------------------------------------------------------------------
 {
+  m_VmeSurface = (mafVME*)m_Input;
+
 	wxString measure[3] = {_("points"), _("lines"), _("angle")};
 
   // setup Gui
 	m_Gui = new mafGUI(this);
 	m_Gui->SetListener(this);
 
-  m_Gui->Label(_("volume to measure:"),true);
-  m_Gui->Button(ID_CHOOSE_ORIGIN,_("Surface"));
-  m_Gui->Divider();
   m_Gui->Button(ID_COMPUTE_MEASURE,_("Compute"));
   m_Gui->Label(_("measure result:"),true);
   
@@ -164,15 +151,6 @@ void medOpVolumeMeasure::OnEvent(mafEventBase *maf_event)
 	{
 		switch(e->GetId())
 		{
-			case ID_CHOOSE_ORIGIN:
-    {
-		  mafString title = _("Choose Origin Surface");
-	    mafEvent e(this,VME_CHOOSE,&title,(long)&medOpVolumeMeasure::SurfaceAccept);
-      mafEventMacro(e); 
-      m_VmeSurface = (mafVMESurface *)e.GetVme();
-			
-    }
-    break;	
 	case ID_COMPUTE_MEASURE:
     {
 	 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpVolumeMeasure.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:16:40 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2011-10-12 09:27:34 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -74,7 +74,7 @@ protected:
 
   
 
-  mafVMESurface  *m_VmeSurface;
+  mafVME *m_VmeSurface;
   
   mafString m_MeasureText;
   mafString m_NormalizedShapeIndex;
