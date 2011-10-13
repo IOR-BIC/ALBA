@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUILocaleSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2008-10-16 17:37:31 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-10-13 10:07:03 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Paolo Quadrani - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -89,6 +89,10 @@ void mafGUILocaleSettings::OnEvent(mafEventBase *maf_event)
 		m_Language = wxLANGUAGE_CZECH;
 		m_LanguageDictionary = "cs";
 		break;
+	  case 8:
+		  m_Language = wxLANGUAGE_CHINESE_SIMPLIFIED;
+		  m_LanguageDictionary = "zh";
+		  break;
       default:
         m_Language = wxLANGUAGE_ENGLISH;
         m_LanguageDictionary = "en";
@@ -161,6 +165,9 @@ void mafGUILocaleSettings::InitializeSettings()
   case wxLANGUAGE_CZECH:
 	m_LanguageId =7;
 	break;
+  case wxLANGUAGE_CHINESE_SIMPLIFIED:
+	  m_LanguageId =8;
+	  break;
   default: //wxLANGUAGE_ENGLISH;
     m_LanguageId =0; 
   }
@@ -207,6 +214,11 @@ void mafGUILocaleSettings::SetLanguageDirectory(const char* prefix, const char* 
   {
 	m_Language		= wxLANGUAGE_CZECH;
 	m_LanguageId	= 7;
+  }
+  else if (strcmp(wxT(m_LanguageDictionary.GetCStr()), "zh") == 0)
+  {
+	  m_Language		= wxLANGUAGE_CHINESE_SIMPLIFIED;
+	  m_LanguageId	= 8;
   }
   else if (strcmp(wxT(m_LanguageDictionary.GetCStr()), "en") == 0)
   {
