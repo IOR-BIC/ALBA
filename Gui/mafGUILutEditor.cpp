@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUILutEditor.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-09-01 08:21:53 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2011-10-13 13:59:08 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -116,7 +116,10 @@ mafGUILutEditor::mafGUILutEditor(wxWindow* parent, wxWindowID id, const wxPoint&
 
   wxArrayString userLutNames;
 
-  for (int id = 0; id < userLutPresetNum; id++) 
+  userLutPresetNum++;
+  userLutNames.Add("");//To avoid bug of wx , if there is only one lut in combo box it's impossible to choise it
+
+  for (int id = 0; id < userLutPresetNum-1; id++) 
   { 
     userLutNames.Add(lutNames[id].c_str());
   }
@@ -336,6 +339,11 @@ void mafGUILutEditor::OnEvent(mafEventBase *maf_event)
 
       case ID_REMOVE_FROM_ULIB:
       {
+        if (m_UserPresetCombo->GetSelection() == 0)
+        {
+          return;
+        }
+
         mafLogMessage("ID_REMOVE_FROM_ULIB");
         m_UserLutLibrary->Add(m_Lut, m_NewUserLutName.c_str());
         int id = m_UserPresetCombo->GetSelection();
@@ -348,6 +356,11 @@ void mafGUILutEditor::OnEvent(mafEventBase *maf_event)
 
       case ID_USER_PRESET:
       {
+        if (m_UserPresetCombo->GetSelection() == 0)
+        {
+          return;
+        }
+
         mafLogMessage("ID_USER_PRESET");
         int id = m_UserPresetCombo->GetSelection();
         wxString sel = m_UserPresetCombo->GetString(id) ;
@@ -360,6 +373,15 @@ void mafGUILutEditor::OnEvent(mafEventBase *maf_event)
 
       case ID_PRESET:
       {
+        if (m_UserPresetCombo->GetSelection() != 0)
+        {
+          m_UserPreset = 0;
+       	  m_UserPresetCombo->SetSelection(0);
+          m_UserPresetCombo->Update();
+
+          this->Update();
+        }
+
         UpdateLut();
       }
       break; 
