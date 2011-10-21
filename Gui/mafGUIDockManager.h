@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIDockManager.h,v $
   Language:  C++
-  Date:      $Date: 2011-10-21 07:34:38 $
-  Version:   $Revision: 1.1.2.5 $
+  Date:      $Date: 2011-10-21 07:59:41 $
+  Version:   $Revision: 1.1.2.6 $
   Authors:   Benjamin I. Williams
 ==========================================================================
   Copyright:   (C) Copyright 2005, Kirix Corporation, All Rights Reserved.
@@ -908,14 +908,14 @@ public:
         typePaneButton,
     };
 
-    int type;                // ui part type (see enum above)
-    int orientation;         // orientation (either wxHORIZONTAL or wxVERTICAL)
-    wxDockInfo* dock;        // which dock the item is associated with
-    wxPaneInfo* pane;        // which pane the item is associated with
-    wxPaneButton* button;    // which pane button the item is associated with
-    wxSizer* cont_sizer;     // the part's containing sizer
-    wxSizerItem* sizer_item; // the sizer item of the part
-    wxRect rect;             // client coord rectangle of the part itself
+    int m_Type;                // ui part type (see enum above)
+    int m_Orientation;         // orientation (either wxHORIZONTAL or wxVERTICAL)
+    wxDockInfo* m_Dock;        // which dock the item is associated with
+    wxPaneInfo* m_Pane;        // which pane the item is associated with
+    wxPaneButton* m_Button;    // which pane button the item is associated with
+    wxSizer* m_ContSizer;     // the part's containing sizer
+    wxSizerItem* m_SizerItem; // the sizer item of the part
+    wxRect m_Rect;             // client coord rectangle of the part itself
 };
 
 /**
