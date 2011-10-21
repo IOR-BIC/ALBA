@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIDockManager.h,v $
   Language:  C++
-  Date:      $Date: 2011-10-21 07:59:41 $
-  Version:   $Revision: 1.1.2.6 $
+  Date:      $Date: 2011-10-21 08:09:30 $
+  Version:   $Revision: 1.1.2.7 $
   Authors:   Benjamin I. Williams
 ==========================================================================
   Copyright:   (C) Copyright 2005, Kirix Corporation, All Rights Reserved.
@@ -827,64 +827,64 @@ public:
     /** constructor */
     wxDockInfo()
     {
-        dock_direction = 0;
-        dock_layer = 0;
-        dock_row = 0;
-        size = 0;
-        min_size = 0;
-        resizable = true;
-        fixed = false;
-        toolbar = false;
+        m_DockDirection = 0;
+        m_DockLayer = 0;
+        m_DockRow = 0;
+        m_Size = 0;
+        m_MinSize = 0;
+        m_Resizable = true;
+        m_Fixed = false;
+        m_Toolbar = false;
     }
     /** copy constructor */
     wxDockInfo(const wxDockInfo& c)
     {
-        dock_direction = c.dock_direction;
-        dock_layer = c.dock_layer;
-        dock_row = c.dock_row;
-        size = c.size;
-        min_size = c.min_size;
-        resizable = c.resizable;
-        fixed = c.fixed;
-        toolbar = c.toolbar;
-        panes = c.panes;
-        rect = c.rect;
+        m_DockDirection = c.m_DockDirection;
+        m_DockLayer = c.m_DockLayer;
+        m_DockRow = c.m_DockRow;
+        m_Size = c.m_Size;
+        m_MinSize = c.m_MinSize;
+        m_Resizable = c.m_Resizable;
+        m_Fixed = c.m_Fixed;
+        m_Toolbar = c.m_Toolbar;
+        m_Panes = c.m_Panes;
+        m_Rect = c.m_Rect;
     }
     /** assignment operator */
     wxDockInfo& operator=(const wxDockInfo& c)
     {
-        dock_direction = c.dock_direction;
-        dock_layer = c.dock_layer;
-        dock_row = c.dock_row;
-        size = c.size;
-        min_size = c.min_size;
-        resizable = c.resizable;
-        fixed = c.fixed;
-        toolbar = c.toolbar;
-        panes = c.panes;
-        rect = c.rect;
+        m_DockDirection = c.m_DockDirection;
+        m_DockLayer = c.m_DockLayer;
+        m_DockRow = c.m_DockRow;
+        m_Size = c.m_Size;
+        m_MinSize = c.m_MinSize;
+        m_Resizable = c.m_Resizable;
+        m_Fixed = c.m_Fixed;
+        m_Toolbar = c.m_Toolbar;
+        m_Panes = c.m_Panes;
+        m_Rect = c.m_Rect;
         return *this;
     }
     /** retrieve if dock direction is active */
-    bool IsOk() const { return (dock_direction != 0) ? true : false; }
+    bool IsOk() const { return (m_DockDirection != 0) ? true : false; }
     /** retrieve if dock direction is top or bottom */
-    bool IsHorizontal() const { return (dock_direction == wxAUI_DOCK_TOP ||
-                             dock_direction == wxAUI_DOCK_BOTTOM) ? true:false; }
+    bool IsHorizontal() const { return (m_DockDirection == wxAUI_DOCK_TOP ||
+                             m_DockDirection == wxAUI_DOCK_BOTTOM) ? true:false; }
     /** retrieve if dock direction is left , rigth or center */
-    bool IsVertical() const { return (dock_direction == wxAUI_DOCK_LEFT ||
-                             dock_direction == wxAUI_DOCK_RIGHT ||
-                             dock_direction == wxAUI_DOCK_CENTER) ? true:false; }
+    bool IsVertical() const { return (m_DockDirection == wxAUI_DOCK_LEFT ||
+                             m_DockDirection == wxAUI_DOCK_RIGHT ||
+                             m_DockDirection == wxAUI_DOCK_CENTER) ? true:false; }
 public:
-    wxPaneInfoPtrArray panes; // array of panes
-    wxRect rect;              // current rectangle
-    int dock_direction;       // dock direction (top, bottom, left, right, center)
-    int dock_layer;           // layer number (0 = innermost layer)
-    int dock_row;             // row number on the docking bar (0 = first row)
-    int size;                 // size of the dock
-    int min_size;             // minimum size of a dock (0 if there is no min)
-    bool resizable;           // flag indicating whether the dock is resizable
-    bool toolbar;             // flag indicating dock contains only toolbars
-    bool fixed;               // flag indicating that the dock operates on
+    wxPaneInfoPtrArray m_Panes; // array of panes
+    wxRect m_Rect;              // current rectangle
+    int m_DockDirection;       // dock direction (top, bottom, left, right, center)
+    int m_DockLayer;           // layer number (0 = innermost layer)
+    int m_DockRow;             // row number on the docking bar (0 = first row)
+    int m_Size;                 // size of the dock
+    int m_MinSize;             // minimum size of a dock (0 if there is no min)
+    bool m_Resizable;           // flag indicating whether the dock is resizable
+    bool m_Toolbar;             // flag indicating dock contains only toolbars
+    bool m_Fixed;               // flag indicating that the dock operates on
                               // absolute coordinates as opposed to proportional
 };
 
