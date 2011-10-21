@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIMDIFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-05-25 10:09:29 $
-  Version:   $Revision: 1.1.2.6 $
+  Date:      $Date: 2011-10-21 08:44:53 $
+  Version:   $Revision: 1.1.2.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -539,7 +539,7 @@ void mafGUIMDIFrame::RemoveDockPane(wxString pane_name)
   wxPaneInfo& pi = m_DockManager.GetPane(pane_name);
   if(pi.IsOk())
   {
-    m_DockManager.DetachPane(pi.window);
+    m_DockManager.DetachPane(pi.m_Window);
     m_DockManager.Update();
   }
 }
