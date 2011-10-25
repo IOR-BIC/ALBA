@@ -119,7 +119,11 @@ public:
   // Description:
   // Get the assembly so that user supplied transforms can be applied
   vtkAssembly *GetAssembly()
-    { return this->Assembly; }
+    { return this->Assembly; };
+  
+  // Description:
+  // Set the initial position
+  void SetInitialPose(vtkMatrix4x4* initMatrix);
 
 protected:
   vtkMAFGlobalAxesHeadActor();

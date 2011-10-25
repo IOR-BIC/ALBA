@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafAxes.cpp,v $
 Language:  C++
-Date:      $Date: 2011-07-20 10:58:10 $
-Version:   $Revision: 1.2.2.9 $
+Date:      $Date: 2011-10-25 20:36:07 $
+Version:   $Revision: 1.2.2.10 $
 Authors:   Silvano Imboden , Stefano perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -115,9 +115,11 @@ mafAxes::mafAxes(vtkRenderer *ren, mafVME* vme, int axesType)
 	}
 	else if (m_AxesType == HEAD)
 	{
-		m_OrientationMarkerWidget = vtkMAFOrientationMarkerWidget::New();
-		m_GlobalAxesHeadActor = vtkMAFGlobalAxesHeadActor::New();	
-		
+		m_GlobalAxesHeadActor = vtkMAFGlobalAxesHeadActor::New();
+    m_OrientationMarkerWidget = vtkMAFOrientationMarkerWidget::New();
+    if(m_Vme)
+      m_GlobalAxesHeadActor->SetInitialPose(m_Vme->GetAbsMatrixPipe()->GetMatrix().GetVTKMatrix());
+
 		wxString headABSFileName = m_GlobalAxesHeadActor->GetHeadABSFileName().c_str();
 
 		wxString cwd = wxGetCwd().c_str();

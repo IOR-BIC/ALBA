@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafAxes.h,v $
 Language:  C++
-Date:      $Date: 2011-05-25 09:34:21 $
-Version:   $Revision: 1.1.22.4 $
+Date:      $Date: 2011-10-25 20:36:07 $
+Version:   $Revision: 1.1.22.5 $
 Authors:   Silvano Imboden , Stefano perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -33,8 +33,15 @@ class vtkMAFGlobalAxesHeadActor;
 class MAF_EXPORT mafAxes
 	//----------------------------------------------------------------------------
 	/**
-	create a vtkAxes and insert it in the passed renderer
-	as a vtkActor2D 
+	Create 3D axes representation and insert them in the passed renderer: axes can be global (World Coordinates
+	reference system )or local ( VME reference system ).
+	
+	Axes representation can be:
+	TRIAD: Common 3D refsys featuring 3 orthogonal axes
+	CUBE: A rotating cube featuring orientation feedback letters on cube faces
+    HEAD: A rotating head
+
+	Some API use cases follows.
 
 	mafAxes(renderer, NULL, TRIAD); => Create a global axis triad 2D actor in the passed renderer
 	mafAxes(renderer, vme, TRIAD); => Create a vme local axis triad 2D actor in the passed renderer
@@ -43,7 +50,7 @@ class MAF_EXPORT mafAxes
 	//mafAxes(renderer, vme, CUBE); => BEWARE !!! NOT SUPPORTED !!!
 	
 	mafAxes(renderer, NULL, HEAD); => Create a 3D global axes head on a new renderer and on a superimposed layer
-	//mafAxes(renderer, vme, HEAD); => BEWARE !!! NOT SUPPORTED !!!
+	mafAxes(renderer, vme, HEAD); => Create a 3D local axes head on a new renderer and on a superimposed layer
 	
 	If a vme is provided, the axes will represent 
 	the local vme-reference system.

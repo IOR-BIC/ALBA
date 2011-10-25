@@ -34,8 +34,9 @@
 #include "vcl_cassert.h"
 #include "vtkPolyDataReader.h"
 #include "vtkDirectory.h"
+#include "vtkTransformPolydataFilter.h"
 
-vtkCxxRevisionMacro(vtkMAFGlobalAxesHeadActor, "$Revision: 1.1.2.4 $");
+vtkCxxRevisionMacro(vtkMAFGlobalAxesHeadActor, "$Revision: 1.1.2.5 $");
 vtkStandardNewMacro(vtkMAFGlobalAxesHeadActor);
 
 #include "mafConfigure.h"
@@ -248,4 +249,31 @@ bool vtkMAFGlobalAxesHeadActor::FileExists(const char* filename)
 	}
 
 	return false;
+}
+
+void vtkMAFGlobalAxesHeadActor::SetInitialPose(vtkMatrix4x4* initMatrix)
+{
+  // Directly transform polydata
+  vtkPolyData* data = ((vtkPolyData*)((vtkPolyDataMapper*)this->HeadActor->GetMapper())->GetInput());
+
+  vtkTransform* initTransform;
+  vtkTransformPolyDataFilter* transformer;
+
+  initTransform = vtkTransform::New();
+  transformer = vtkTransformPolyDataFilter::New();
+
+  initTransform->SetMatrix(initMatrix);
+  transformer->SetInput(data);
+  transformer->SetTransform(initTransform);
+  transformer->Update();
+
+  data->DeepCopy(transformer->GetOutput());
+  data->Update();
+  data->Modified();
+  ((vtkPolyDataMapper*)this->HeadActor->GetMapper())->Update();
+  ((vtkPolyDataMapper*)this->HeadActor->GetMapper())->Modified();
+  this->HeadActor->Modified();
+
+  transformer->Delete();
+  initTransform->Delete();
 }
