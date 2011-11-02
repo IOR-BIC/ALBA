@@ -21,7 +21,7 @@ class ClassMethodsDocumentationRule(AbstractRule):
               #self.MarkedList.append((str(className))+"-> "+functionName+ "<-")
               self.MarkedList.append("<item>\n"\
                                         + "  <class>" +  str(className) + "</class>\n"\
-                                        + "  <function>" + functionName + "</function>\n"\
+                                        + "  <function>" + functionName.replace("<","&lt;").replace(">","&gt;") + "</function>\n"\
                                         + "</item>")
 
         
