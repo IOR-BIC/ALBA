@@ -15,6 +15,9 @@ class VariableNamingRule(AbstractRule):
           attrs = member.attributes
           if(attrs["kind"].value  == self.ParameterList[0]):
             for memberChild in member.childNodes:
+              if(memberChild.nodeName == "type"):
+                if(memberChild.firstChild == None):
+                  break
               if(memberChild.nodeName == "name"):
                 x = re.compile(self.ParameterList[1]) 
                 if(re.match(x, str(memberChild.firstChild.nodeValue))):
