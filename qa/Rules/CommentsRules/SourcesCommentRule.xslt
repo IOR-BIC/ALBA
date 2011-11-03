@@ -6,7 +6,7 @@
 				<div id="subheader" class="clear">
 					<h3>
 						Each source file is evaluated, checking the ratio between number of commented lines on total number of lines.
-                        If the value, expressed as percentage, falls inside a range of 20% - 40%, the class is considered well commented,
+                        If the value, expressed as percentage, falls inside a range of 10% - 40%, the class is considered well commented,
                         otherwise the file is reported in the following table with the current percentage.
 					</h3>
                     <h4><br/>Link to <a href="http://www.biomedtown.org/biomed_town/MAF/MAF3%20Floor/documentation/conventions/">Coding Conventions</a></h4>

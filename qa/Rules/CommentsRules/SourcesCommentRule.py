@@ -44,7 +44,7 @@ class SourcesCommentRule(AbstractRule):
         pCLOC = int(float(float(nCLOC)/float(nTLOC)) * 100)
       else:
 	    pCLOC = 0
-      if ((pCLOC < 20) or (pCLOC > 40)):
+      if ((pCLOC < 10) or (pCLOC > 40)):
         self.MarkedList.append("<item><class>"+(os.path.split(self.FullPathInputFile)[-1]) + "</class><commentPercentage>" + str(pCLOC) + "%</commentPercentage>" + "</item>")
       return self.MarkedList
                   
