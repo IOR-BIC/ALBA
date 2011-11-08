@@ -1,16 +1,16 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mafDataInterpolator.h,v $
+  Module:    $RCSfile: mafDataPipeInterpolator.h,v $
   Language:  C++
-  Date:      $Date: 2008-02-27 16:24:43 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2011-11-08 10:05:09 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-#ifndef __mafDataInterpolator_h
-#define __mafDataInterpolator_h
+#ifndef __mafDataPipeInterpolator_h
+#define __mafDataPipeInterpolator_h
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
@@ -21,16 +21,16 @@
 class mafVMEItem;
 
 /** superclass for computing the VME output data out of the internal VME-Items.
-  mafDataInterpolator is a data pipe producing as output a dataset interpolated
+  mafDataPipeInterpolator is a data pipe producing as output a dataset interpolated
   against the ones stored in the array associated to the VME itself (only for VMEs
   with data array like mafVMEGeneric). The class also provides the mechanism to 
   obtain the 3D bounds for any time.
   @sa mflDataPipe mafVMEGeneric
 */
-class MAF_EXPORT mafDataInterpolator : public mafDataPipe
+class MAF_EXPORT mafDataPipeInterpolator : public mafDataPipe
 {
 public:
-  mafAbstractTypeMacro(mafDataInterpolator,mafDataPipe);
+  mafAbstractTypeMacro(mafDataPipeInterpolator,mafDataPipe);
 
   /** This DataPipe accepts only VME's with internal DataArray. */
   virtual bool Accept(mafVME *vme);
@@ -59,8 +59,8 @@ public:
   virtual unsigned long GetMTime();
 
 protected:
-  mafDataInterpolator();
-  virtual ~mafDataInterpolator();
+  mafDataPipeInterpolator();
+  virtual ~mafDataPipeInterpolator();
 
   virtual void PreExecute()=0;
   virtual void Execute()=0;
@@ -91,10 +91,10 @@ protected:
   bool          m_ReleaseDataFlag; ///< this flag forces the interpolator to release unnecessary data (default == false)
 
 private:
-  mafDataInterpolator(const mafDataInterpolator&); // Not implemented
-  void operator=(const mafDataInterpolator&); // Not implemented
+  mafDataPipeInterpolator(const mafDataPipeInterpolator&); // Not implemented
+  void operator=(const mafDataPipeInterpolator&); // Not implemented
   
 };
 
-#endif /* __mafDataInterpolator_h */
+#endif /* __mafDataPipeInterpolator_h */
  

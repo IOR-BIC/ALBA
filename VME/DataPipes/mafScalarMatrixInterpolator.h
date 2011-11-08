@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafScalarMatrixInterpolator.h,v $
   Language:  C++
-  Date:      $Date: 2011-06-01 07:46:33 $
-  Version:   $Revision: 1.2.2.3 $
+  Date:      $Date: 2011-11-08 10:06:09 $
+  Version:   $Revision: 1.2.2.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -14,7 +14,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafDataInterpolator.h"
+#include "mafDataPipeInterpolator.h"
 #include <vnl/vnl_matrix.h>
 
 //----------------------------------------------------------------------------
@@ -36,11 +36,11 @@ template class MAF_EXPORT vnl_matrix<double>;
   @todo
   -
 */
-class MAF_EXPORT mafScalarMatrixInterpolator : public mafDataInterpolator
+class MAF_EXPORT mafScalarMatrixInterpolator : public mafDataPipeInterpolator
 {
 public:
   /** type macro for RTTI and instance creation*/
-  mafTypeMacro(mafScalarMatrixInterpolator,mafDataInterpolator);
+  mafTypeMacro(mafScalarMatrixInterpolator,mafDataPipeInterpolator);
 
   /** This DataPipe accepts only VME's with internal DataArray. */
   virtual bool Accept(mafVME *vme);

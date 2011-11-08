@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataPipeCustom.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-27 15:17:03 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2011-11-08 10:06:09 $
+  Version:   $Revision: 1.1.4.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -14,7 +14,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafDataInterpolator.h"
+#include "mafDataPipeInterpolator.h"
 //----------------------------------------------------------------------------
 // forward declarations
 //----------------------------------------------------------------------------

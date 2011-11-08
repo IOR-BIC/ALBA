@@ -1,9 +1,9 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mafDataInterpolator.cpp,v $
+  Module:    $RCSfile: mafDataPipeInterpolator.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-04 10:32:13 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2011-11-08 10:05:09 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 
 
-#include "mafDataInterpolator.h"
+#include "mafDataPipeInterpolator.h"
 
 #include "mafVME.h"
 #include "mafVMEItem.h"
@@ -29,11 +29,11 @@
 #include "mafDataVector.h"
 
 //------------------------------------------------------------------------------
-mafCxxAbstractTypeMacro(mafDataInterpolator)
+mafCxxAbstractTypeMacro(mafDataPipeInterpolator)
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
-mafDataInterpolator::mafDataInterpolator()
+mafDataPipeInterpolator::mafDataPipeInterpolator()
 //------------------------------------------------------------------------------
 {
   m_CurrentItem     = NULL;
@@ -44,14 +44,14 @@ mafDataInterpolator::mafDataInterpolator()
 }
 
 //------------------------------------------------------------------------------
-mafDataInterpolator::~mafDataInterpolator()
+mafDataPipeInterpolator::~mafDataPipeInterpolator()
 //------------------------------------------------------------------------------
 {
   SetCurrentItem(NULL);
 }
 
 //----------------------------------------------------------------------------
-void mafDataInterpolator::SetTimeStamp(mafTimeStamp time)
+void mafDataPipeInterpolator::SetTimeStamp(mafTimeStamp time)
 //----------------------------------------------------------------------------
 {
   if (m_CurrentTime==time)
@@ -64,7 +64,7 @@ void mafDataInterpolator::SetTimeStamp(mafTimeStamp time)
 
 //----------------------------------------------------------------------------
 // Get the MTime. Take in consideration also modifications to the Input Array
-unsigned long mafDataInterpolator::GetMTime()
+unsigned long mafDataPipeInterpolator::GetMTime()
 //------------------------------------------------------------------------------
 {
   unsigned long mtime = Superclass::GetMTime();
@@ -84,14 +84,14 @@ unsigned long mafDataInterpolator::GetMTime()
 }
 
 //------------------------------------------------------------------------------
-bool mafDataInterpolator::Accept(mafVME *vme)
+bool mafDataPipeInterpolator::Accept(mafVME *vme)
 //------------------------------------------------------------------------------
 {
   return vme && vme->IsA(mafVMEGenericAbstract::GetStaticTypeId());
 }
 
 //------------------------------------------------------------------------------
-void mafDataInterpolator::PreExecute()
+void mafDataPipeInterpolator::PreExecute()
 //------------------------------------------------------------------------------
 {
   Superclass::PreExecute();
@@ -114,7 +114,7 @@ void mafDataInterpolator::PreExecute()
 }
 
 //------------------------------------------------------------------------------
-void mafDataInterpolator::UpdateBounds()
+void mafDataPipeInterpolator::UpdateBounds()
 //------------------------------------------------------------------------------
 {
   mafVMEItem *old_item=m_CurrentItem;
@@ -132,7 +132,7 @@ void mafDataInterpolator::UpdateBounds()
 }
 
 //------------------------------------------------------------------------------
-void mafDataInterpolator::InternalItemUpdate()
+void mafDataPipeInterpolator::InternalItemUpdate()
 //------------------------------------------------------------------------------
 {  
   mafVMEGenericAbstract *vme=(mafVMEGenericAbstract *)m_VME;
@@ -147,7 +147,7 @@ void mafDataInterpolator::InternalItemUpdate()
 }
 
 //-------------------------------------------------------------------------
-void mafDataInterpolator::SetCurrentItem(mafVMEItem *data)
+void mafDataPipeInterpolator::SetCurrentItem(mafVMEItem *data)
 //------------------------------------------------------------------------------
 {
   if (data==m_CurrentItem)
@@ -157,7 +157,7 @@ void mafDataInterpolator::SetCurrentItem(mafVMEItem *data)
 }
 
 //-------------------------------------------------------------------------
-void mafDataInterpolator::UpdateCurrentItem(mafVMEItem *item)
+void mafDataPipeInterpolator::UpdateCurrentItem(mafVMEItem *item)
 //------------------------------------------------------------------------------
 {
   if (item)
@@ -179,7 +179,7 @@ void mafDataInterpolator::UpdateCurrentItem(mafVMEItem *item)
   }
 }
 //------------------------------------------------------------------------------
-void mafDataInterpolator::OnEvent(mafEventBase *maf_event)
+void mafDataPipeInterpolator::OnEvent(mafEventBase *maf_event)
 //------------------------------------------------------------------------------
 {
   switch (maf_event->GetId())

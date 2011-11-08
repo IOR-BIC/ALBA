@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-07-11 13:04:26 $
-  Version:   $Revision: 1.39.2.2 $
+  Date:      $Date: 2011-11-08 10:08:22 $
+  Version:   $Revision: 1.39.2.3 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -24,7 +24,7 @@ const bool DEBUG_MODE = false;
 #include "mmuIdFactory.h"
 #include "mafDataVector.h"
 #include "mafMatrixInterpolator.h"
-#include "mafDataInterpolator.h"
+#include "mafDataPipeInterpolator.h"
 #include "mafTagArray.h"
 #include "mafVMELandmark.h"
 #include "mafMatrixVector.h"

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurfaceParametric.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-01-07 09:48:01 $
-  Version:   $Revision: 1.17.2.5 $
+  Date:      $Date: 2011-11-08 10:08:22 $
+  Version:   $Revision: 1.17.2.6 $
   Authors:   Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -24,7 +24,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mmuIdFactory.h"
 #include "mafDataVector.h"
 #include "mafMatrixInterpolator.h"
-#include "mafDataInterpolator.h"
+#include "mafDataPipeInterpolator.h"
 #include "mafTagArray.h"
 #include "mafMatrixVector.h"
 #include "mafVMEItemVTK.h"

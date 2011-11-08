@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataPipe.h,v $
   Language:  C++
-  Date:      $Date: 2008-02-27 16:25:46 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2011-11-08 10:09:39 $
+  Version:   $Revision: 1.14.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -35,7 +35,7 @@ class mafVME;
   also implements the mechanism to compute the 3D bounds
   at any time...
  
-  @sa mafDataInterpolator
+  @sa mafDataPipeInterpolator
  
   @todo
   - rewrite comments
@@ -55,7 +55,7 @@ public:
     This function makes the current bounds to be updated. It should be optimized
     to not require data loading, i.e. data bounds to be evaluated 
     without actually loading the data, but reading dataset bounds from 
-    VME item meta-data structure (@sa mafDataInterpolator)*/
+    VME item meta-data structure (@sa mafDataPipeInterpolator)*/
   virtual void UpdateBounds() {}
  
   /** update the output of the data pipe */

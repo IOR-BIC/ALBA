@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVTKInterpolator.h,v $
   Language:  C++
-  Date:      $Date: 2008-06-23 13:01:29 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2011-11-08 10:06:09 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -14,7 +14,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafDataInterpolator.h"
+#include "mafDataPipeInterpolator.h"
 //----------------------------------------------------------------------------
 // forward declarations
 //----------------------------------------------------------------------------
@@ -31,10 +31,10 @@ class vtkMAFDataPipe;
   @todo
   -
 */
-class MAF_EXPORT mafVTKInterpolator : public mafDataInterpolator
+class MAF_EXPORT mafVTKInterpolator : public mafDataPipeInterpolator
 {
 public:
-  mafTypeMacro(mafVTKInterpolator,mafDataInterpolator);
+  mafTypeMacro(mafVTKInterpolator,mafDataPipeInterpolator);
 
   /** This DataPipe accepts only VME's with internal DataArray. */
   virtual bool Accept(mafVME *vme);

@@ -4,8 +4,8 @@ DBG_MESSAGE("Configuring project ${PROJECT_NAME}")
 
 # Set your list of sources here.
 SET(PROJECT_SRCS
-  mafDataInterpolator.cpp
-  mafDataInterpolator.h
+  mafDataPipeInterpolator.cpp
+  mafDataPipeInterpolator.h
   mafDataPipeCustom.cpp
   mafDataPipeCustom.h
   mafDataPipeCustomProber.cpp
