@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.h,v $
 Language:  C++
-Date:      $Date: 2011-07-01 12:57:19 $
-Version:   $Revision: 1.5.2.18 $
+Date:      $Date: 2011-11-08 13:19:14 $
+Version:   $Revision: 1.5.2.19 $
 Authors:   Matteo Giacomoni, Simone Brazzale
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -71,6 +71,7 @@ public:
     ID_PERCENTAGE_DISTANCE_TOLERANCE,
     ID_PERCENTAGE_TOLERANCE,
     ID_OUTPUT_NAME,
+    ID_SHOW_ADVANCED_OPTION_SORTING,
 	};
   
   /** Type VMEs*/
@@ -145,10 +146,12 @@ public:
   int EnableScalarTolerance(){return m_ScalarTolerance;};
   /** GReturn scalar tolerance. */
   double GetScalarTolerance(){return m_ScalarDistanceTolerance;};
-  /** Enable Pprcentage tolerance. */
+  /** Enable percentage tolerance. */
   int EnablePercentageTolerance(){return m_PercentageTolerance;};
-  /** Get percetnage tolerance. */
+  /** Get percentage tolerance. */
   double GetPercentageTolerance(){return m_PercentageDistanceTolerance;};
+  /** Get m_ShowAdvancedOptionOfSorting */
+  int GetShowAdvancedOptionSorting(){return m_ShowAdvancedOptionOfSorting;};
 
 
 
@@ -204,6 +207,7 @@ protected:
   int m_AutoVMEType;
   int m_VisualizePosition;
   int m_OutputNameType;
+  int m_ShowAdvancedOptionOfSorting;
   wxString m_LastDicomDir;
   double m_ScalarDistanceTolerance;
   double m_PercentageDistanceTolerance;

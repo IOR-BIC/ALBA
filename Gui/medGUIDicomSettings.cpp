@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2011-07-01 12:57:19 $
-Version:   $Revision: 1.7.2.16 $
+Date:      $Date: 2011-11-08 13:19:13 $
+Version:   $Revision: 1.7.2.17 $
 Authors:   Matteo Giacomoni, Simone Brazzale
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -55,6 +55,7 @@ mafGUISettings(Listener, label)
   m_LastDicomDir = "UNEDFINED_m_LastDicomDir";
   m_Step = ID_1X;
   m_OutputNameType = TRADITIONAL;
+  m_ShowAdvancedOptionOfSorting = TRUE;
 
   m_Config->SetPath("Importer Dicom"); // Regiser key path Added by Losi 15.11.2009
 	InitializeSettings();
@@ -78,6 +79,7 @@ void medGUIDicomSettings::CreateGui()
   m_Gui->Bool(ID_RESAMPLE_VOLUME,_("Enable Resample Volume"),&m_EnableResampleVolume,1);
   m_Gui->Bool(ID_RESCALE_TO_16_BIT,_("Enable Rescaling to 16 Bit"),&m_EnableRescaleTo16Bit,1);
   m_Gui->Bool(ID_Z_CROP,_("Enable Z-direction Crop"),&m_EnableZCrop,1);
+  m_Gui->Bool(ID_SHOW_ADVANCED_OPTION_SORTING,_("Show adv setting of sorting"),&m_ShowAdvancedOptionOfSorting,1);
   m_Gui->Bool(ID_ENABLE_POS_INFO,_("Visualize Position and Orientation"),&m_VisualizePosition,1);
 
   m_Gui->Bool(ID_SCALAR_DISTANCE_TOLERANCE,_("Scalar distance tolerance"),&m_ScalarTolerance,1);
@@ -153,6 +155,11 @@ void medGUIDicomSettings::OnEvent(mafEventBase *maf_event)
 // 			m_Config->Write("DicomDictionary",m_Dictionary.GetCStr());
 // 		}
 // 		break;
+  case ID_SHOW_ADVANCED_OPTION_SORTING:
+    {
+      m_Config->Write("ShowAdvancedOptionOfSorting",m_ShowAdvancedOptionOfSorting);
+    }
+    break;
 	case ID_TYPE_DICOM:
 		{
       m_CheckOnOff[ID_CT_MODALITY] = m_DicomModalityListBox->IsItemChecked(ID_CT_MODALITY);
@@ -529,6 +536,15 @@ void medGUIDicomSettings::InitializeSettings()
 	{
 		m_Config->Write("PercentageDistance",m_PercentageDistanceTolerance);
 	}
+
+  if(m_Config->Read("ShowAdvancedOptionOfSorting", &long_item))
+  {
+    m_ShowAdvancedOptionOfSorting=long_item;
+  }
+  else
+  {
+    m_Config->Write("ShowAdvancedOptionOfSorting",m_ShowAdvancedOptionOfSorting);
+  }
 
 
 	m_Config->Flush();

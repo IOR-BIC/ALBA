@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2011-09-22 12:47:23 $
-Version:   $Revision: 1.1.2.142 $
+Date:      $Date: 2011-11-08 13:19:29 $
+Version:   $Revision: 1.1.2.143 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -2048,8 +2048,11 @@ void medOpImporterDicomOffis::CreateLoadPage()
 	m_LoadGuiUnderCenter = new mafGUI(this);
 
   mafGUI *loadGuiCenter = new mafGUI(this);
-  wxString choices[3] = {_("X"),_("Y"),_("Z")};
-  loadGuiCenter->Radio(ID_SORT_AXIS,_("Sort type:"),&m_SortAxes,3,choices);
+  if(((medGUIDicomSettings*)GetSetting())->GetShowAdvancedOptionSorting() == TRUE)
+  {
+	  wxString choices[3] = {_("X"),_("Y"),_("Z")};
+	  loadGuiCenter->Radio(ID_SORT_AXIS,_("Sort type:"),&m_SortAxes,3,choices);
+  }
 
 	m_SliceScannerLoadPage=m_LoadGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_CurrentSlice,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice());
 	m_SliceScannerLoadPage->SetPageSize(1);
