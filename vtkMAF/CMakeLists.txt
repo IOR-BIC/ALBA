@@ -82,6 +82,8 @@ SET(vtkMAF_SRCS
   vtkMAFTextOrientator.h
   vtkMAFProfilingActor.cxx
   vtkMAFProfilingActor.h
+	vtkMAFXYPlotActor.cxx
+	vtkMAFXYPlotActor.h
 )
 
 IF(WIN32)
