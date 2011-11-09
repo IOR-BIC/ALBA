@@ -730,8 +730,8 @@ ENDIF(WIN32)
 #DATAPIPES
 ###############################################
 SET(DATAPIPES_SRCS
-  ../VME/DataPipes/mafDataInterpolator.cpp
-  ../VME/DataPipes/mafDataInterpolator.h
+  ../VME/DataPipes/mafDataPipeInterpolator.cpp
+  ../VME/DataPipes/mafDataPipeInterpolator.h
   ../VME/DataPipes/mafDataPipeCustom.cpp
   ../VME/DataPipes/mafDataPipeCustom.h
   ../VME/DataPipes/mafDataPipeCustomProber.cpp
