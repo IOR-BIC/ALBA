@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFXYPlotActor.h,v $
   Language:  C++
-  Date:      $Date: 2011-11-09 11:43:19 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-11-10 08:33:29 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Gianluigi Crimi
   Project:   
 
@@ -46,7 +46,7 @@ class vtkTextProperty;
     The original vtk class have some problems when a line intersect the render area, but both
     ending points are outside that area. In this case the original class will render bad lines.
 */
-class VTK_HYBRID_EXPORT vtkMAFXYPlotActor : public vtkActor2D
+class VTK_vtkMAF_EXPORT vtkMAFXYPlotActor : public vtkActor2D
 {
 public:
   vtkTypeRevisionMacro(vtkMAFXYPlotActor,vtkActor2D);
