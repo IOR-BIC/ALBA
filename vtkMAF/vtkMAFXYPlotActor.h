@@ -3,15 +3,17 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFXYPlotActor.h,v $
   Language:  C++
-  Date:      $Date: 2011-11-10 08:33:29 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2011-11-10 09:37:10 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Gianluigi Crimi
   Project:   
 
 ==========================================================================*/
 
-#ifndef __vtkXYPlotActor_h
-#define __vtkXYPlotActor_h
+#ifndef __vtkMAFXYPlotActor_h
+#define __vtkMAFXYPlotActor_h
+
+#include "vtkMAFConfigure.h"
 
 #define VTK_XYPLOT_INDEX                 0
 #define VTK_XYPLOT_ARC_LENGTH            1
