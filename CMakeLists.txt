@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2011-06-06 16:23:47 $
-# Version:   $Revision: 1.12.2.6 $
+# Date:      $Date: 2011-11-11 15:16:44 $
+# Version:   $Revision: 1.12.2.7 $
 #
 # Description:
 # CMake Project file for the Medical Library.
@@ -99,7 +99,11 @@ IF(MAF_FOUND)
                       "${MED_SOURCE_DIR}/Interaction" "${MED_SOURCE_DIR}/VME" "${MED_SOURCE_DIR}/Views" "${MED_SOURCE_DIR}/vtkMED"
                       "${MED_BINARY_DIR}/vtkMED")
 
-#other inclusions
+  SET(INCLUDE_DIRS "${MED_BINARY_DIR}" "${MED_SOURCE_DIR}/Gui" "${MED_SOURCE_DIR}/Common" "${MED_SOURCE_DIR}/Operations"
+                 "${MED_SOURCE_DIR}/Interaction" "${MED_SOURCE_DIR}/VME" "${MED_SOURCE_DIR}/Views" "${MED_SOURCE_DIR}/vtkMED"
+                 "${MED_BINARY_DIR}/vtkMED")
+
+  #other inclusions
   INCLUDE_DIRECTORIES(${MAF_BINARY_PATH}/Libraries/ITK/Sources/InsightToolkit-3.0.1/Wrapping/WrapITK/ExternalProjects/ItkVtkGlue/src)
 
   # Configuring MED kits
@@ -147,6 +151,73 @@ IF(MAF_FOUND)
     ${MED_BINARY_DIR}/MEDLibraryDepends.cmake
   )
 
+  #### Include directory for binary distribution of MAF
+  SET(MED_INSTALL_INCLUDE_DIRS ${MED_BINARY_DIR}/Include)
+  FILE(MAKE_DIRECTORY ${MED_INSTALL_INCLUDE_DIRS})
+	
+	#NO MEDICAL REBUILD
+	#searching python executable
+	FIND_PROGRAM(PYTHON_EXECUTABLE
+        NAMES python python3.2 python3.1 python3.0 python2.7 python2.6 python2.5 
+				python2.4 python2.3 python2.2 python2.1 python2.0 python1.6 python1.5
+		PATHS
+        [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\3.2\\InstallPath]
+        [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\3.1\\InstallPath]
+        [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\3.0\\InstallPath]
+        [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.7\\InstallPath]
+        [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.6\\InstallPath]
+        [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.5\\InstallPath]
+				[HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.4\\InstallPath]
+        [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.3\\InstallPath]
+        [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.2\\InstallPath]
+        [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.1\\InstallPath]
+        [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.0\\InstallPath]
+        [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\1.6\\InstallPath]
+        [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\1.5\\InstallPath]
+        )
+  
+	#NO MEDICAL REBUILD
+	#if Python executable is not present i use the old system and i delete all the source headers
+	#in this case there is no improvement to the old system 
+	IF (NOT PYTHON_EXECUTABLE)
+		FILE(GLOB files_to_remove "${MED_INSTALL_INCLUDE_DIRS}/*.*")
+		FOREACH(f ${files_to_remove})
+			FILE(REMOVE "${f}")
+		ENDFOREACH(f ${files_to_remove})
+  ENDIF(NOT PYTHON_EXECUTABLE)
+	
+		  
+  FOREACH(dirs ${INCLUDE_DIRS})
+    FILE(GLOB include_file_list "${dirs}/*.h")
+    FILE(GLOB template_file_list "${dirs}/*.txx")
+    FILE(GLOB icons_file_list "${dirs}/*.xpm")
+		
+    FOREACH(file ${include_file_list})
+      FILE(RELATIVE_PATH file_name "${dirs}" "${file}")
+    	CONFIGURE_FILE("${file}" "${MED_INSTALL_INCLUDE_DIRS}/${file_name}")
+    ENDFOREACH(file ${include_file_list})
+    
+    FOREACH(template_file ${template_file_list})
+      FILE(RELATIVE_PATH template_file_name "${dirs}" "${template_file}")
+    	CONFIGURE_FILE("${template_file}" "${MED_INSTALL_INCLUDE_DIRS}/${template_file_name}")
+    ENDFOREACH(template_file ${template_file_list})
+    
+    FOREACH(icons_file ${icons_file_list})
+      FILE(RELATIVE_PATH icons_file_name "${dirs}" "${icons_file}")
+    	CONFIGURE_FILE("${icons_file}" "${MED_INSTALL_INCLUDE_DIRS}/${icons_file_name}")
+    ENDFOREACH(icons_file ${icons_file_list})
+  ENDFOREACH(dirs ${MAF_INCLUDE_DIRS})
+  
+	#NO MEDICAL REBUILD
+	#if Python executable is present i delete only removed header with python script
+	IF(PYTHON_EXECUTABLE)
+		EXEC_PROGRAM("${PYTHON_EXECUTABLE}"
+			ARGS "${MED_SOURCE_DIR}/RemoveDeletedH.py ${MED_INSTALL_INCLUDE_DIRS} ${INCLUDE_DIRS} "
+			OUTPUT_VARIABLE py_output
+		)
+		message("${py_output}")
+	ENDIF(PYTHON_EXECUTABLE)
+  
   CONFIGURE_FILE(
     ${MED_SOURCE_DIR}/MEDConfig.cmake.in
     ${MED_BINARY_DIR}/MEDConfig.cmake
