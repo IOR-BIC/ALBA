@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEScalarMatrix.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:06:00 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2011-11-15 09:01:37 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -42,7 +42,7 @@ mafVMEScalarMatrix::mafVMEScalarMatrix()
   m_DataVector = mafDataVector::New();
   m_DataVector->SetItemTypeName(mafVMEItemScalarMatrix::GetStaticTypeName());  
   m_DataVector->SetListener(this);
-  SetDataPipe(mafScalarMatrixInterpolator::New()); // interpolator data pipe
+  SetDataPipe(mafDataPipeInterpolatorScalarMatrix::New()); // interpolator data pipe
 
   m_ScalarArrayOrientationInMatrix = ROWS;
   m_Xtype = USE_TIME;

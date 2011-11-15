@@ -1,9 +1,9 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mafScalarMatrixInterpolator.cpp,v $
+  Module:    $RCSfile: mafDataPipeInterpolatorScalarMatrix.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-11-19 14:04:17 $
-  Version:   $Revision: 1.2.2.1 $
+  Date:      $Date: 2011-11-15 09:01:01 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 
 
-#include "mafScalarMatrixInterpolator.h"
+#include "mafDataPipeInterpolatorScalarMatrix.h"
 
 #include "mafVME.h"
 #include "mafVMEItemScalarMatrix.h"
@@ -30,30 +30,30 @@
 #include <assert.h>
 
 //------------------------------------------------------------------------------
-mafCxxTypeMacro(mafScalarMatrixInterpolator)
+mafCxxTypeMacro(mafDataPipeInterpolatorScalarMatrix)
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
-mafScalarMatrixInterpolator::mafScalarMatrixInterpolator()
+mafDataPipeInterpolatorScalarMatrix::mafDataPipeInterpolatorScalarMatrix()
 //------------------------------------------------------------------------------
 {
 }
 
 //------------------------------------------------------------------------------
-mafScalarMatrixInterpolator::~mafScalarMatrixInterpolator()
+mafDataPipeInterpolatorScalarMatrix::~mafDataPipeInterpolatorScalarMatrix()
 //------------------------------------------------------------------------------
 {
 } 
 
 //------------------------------------------------------------------------------
-bool mafScalarMatrixInterpolator::Accept(mafVME *vme)
+bool mafDataPipeInterpolatorScalarMatrix::Accept(mafVME *vme)
 //------------------------------------------------------------------------------
 {
   return Superclass::Accept(vme) && vme->IsA(mafVMEScalarMatrix::GetStaticTypeId());
 }
 
 //------------------------------------------------------------------------------
-vnl_matrix<double> &mafScalarMatrixInterpolator::GetScalarData()
+vnl_matrix<double> &mafDataPipeInterpolatorScalarMatrix::GetScalarData()
 //------------------------------------------------------------------------------
 {
   OnEvent(&mafEventBase(this,VME_OUTPUT_DATA_PREUPDATE));
@@ -61,7 +61,7 @@ vnl_matrix<double> &mafScalarMatrixInterpolator::GetScalarData()
 }
 
 //------------------------------------------------------------------------------
-void mafScalarMatrixInterpolator::PreExecute()
+void mafDataPipeInterpolatorScalarMatrix::PreExecute()
 //------------------------------------------------------------------------------
 {
   Superclass::PreExecute();
@@ -85,7 +85,7 @@ void mafScalarMatrixInterpolator::PreExecute()
 }
 
 //------------------------------------------------------------------------------
-void mafScalarMatrixInterpolator::OnEvent(mafEventBase *e)
+void mafDataPipeInterpolatorScalarMatrix::OnEvent(mafEventBase *e)
 //------------------------------------------------------------------------------
 {
   Superclass::OnEvent(e); // this also forwards the event to parent class

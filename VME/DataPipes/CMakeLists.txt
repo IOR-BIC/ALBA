@@ -18,8 +18,8 @@ SET(PROJECT_SRCS
 
 IF (MAF_USE_ITK)
 SET(PROJECT_SRCS  ${PROJECT_SRCS}
-  mafScalarMatrixInterpolator.cpp
-  mafScalarMatrixInterpolator.h
+  mafDataPipeInterpolatorScalarMatrix.cpp
+  mafDataPipeInterpolatorScalarMatrix.h
   )
 ENDIF (MAF_USE_ITK)
 

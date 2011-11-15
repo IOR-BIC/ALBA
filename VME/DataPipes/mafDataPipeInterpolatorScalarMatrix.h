@@ -1,9 +1,9 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mafScalarMatrixInterpolator.h,v $
+  Module:    $RCSfile: mafDataPipeInterpolatorScalarMatrix.h,v $
   Language:  C++
-  Date:      $Date: 2011-11-08 10:06:09 $
-  Version:   $Revision: 1.2.2.4 $
+  Date:      $Date: 2011-11-15 09:01:01 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -36,11 +36,11 @@ template class MAF_EXPORT vnl_matrix<double>;
   @todo
   -
 */
-class MAF_EXPORT mafScalarMatrixInterpolator : public mafDataPipeInterpolator
+class MAF_EXPORT mafDataPipeInterpolatorScalarMatrix : public mafDataPipeInterpolator
 {
 public:
   /** type macro for RTTI and instance creation*/
-  mafTypeMacro(mafScalarMatrixInterpolator,mafDataPipeInterpolator);
+  mafTypeMacro(mafDataPipeInterpolatorScalarMatrix,mafDataPipeInterpolator);
 
   /** This DataPipe accepts only VME's with internal DataArray. */
   virtual bool Accept(mafVME *vme);
@@ -60,9 +60,9 @@ public:
 
 protected:
   /** constructor */
-  mafScalarMatrixInterpolator();
+  mafDataPipeInterpolatorScalarMatrix();
   /** destructor */
-  virtual ~mafScalarMatrixInterpolator();
+  virtual ~mafDataPipeInterpolatorScalarMatrix();
 
   /** Set m_ScalarData to current item data*/
   virtual void PreExecute();
@@ -74,9 +74,9 @@ protected:
 
 private:
   /** copy constructor not implemented */
-  mafScalarMatrixInterpolator(const mafScalarMatrixInterpolator&); 
+  mafDataPipeInterpolatorScalarMatrix(const mafDataPipeInterpolatorScalarMatrix&); 
   /** assignment operator not implemeted */
-  void operator=(const mafScalarMatrixInterpolator&); 
+  void operator=(const mafDataPipeInterpolatorScalarMatrix&); 
 };
 
 #endif /* __mafScalarInterpolator_h */

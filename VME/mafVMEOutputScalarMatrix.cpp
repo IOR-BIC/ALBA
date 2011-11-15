@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputScalarMatrix.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-11-20 08:51:38 $
-  Version:   $Revision: 1.3.2.2 $
+  Date:      $Date: 2011-11-15 09:01:37 $
+  Version:   $Revision: 1.3.2.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -71,7 +71,7 @@ vnl_matrix<double> &mafVMEOutputScalarMatrix::GetScalarData()
 //-------------------------------------------------------------------------
 {
   assert(m_VME);
-  mafScalarMatrixInterpolator *scalarInterpolator = (mafScalarMatrixInterpolator *)m_VME->GetDataPipe();
+  mafDataPipeInterpolatorScalarMatrix *scalarInterpolator = (mafDataPipeInterpolatorScalarMatrix *)m_VME->GetDataPipe();
   scalarInterpolator->Update();
   return scalarInterpolator->GetScalarData();
 }
@@ -94,7 +94,7 @@ void mafVMEOutputScalarMatrix::UpdateVTKRepresentation()
 
   int active_scalar = scalar_vme->GetActiveScalarOnGeometry();
 
-  mafScalarMatrixInterpolator *scalarInterpolator = (mafScalarMatrixInterpolator *)scalar_vme->GetDataPipe();
+  mafDataPipeInterpolatorScalarMatrix *scalarInterpolator = (mafDataPipeInterpolatorScalarMatrix *)scalar_vme->GetDataPipe();
   scalarInterpolator->Update();
   if (scalarInterpolator->GetCurrentItem() != NULL)
   {
