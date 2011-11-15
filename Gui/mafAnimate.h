@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAnimate.h,v $
   Language:  C++
-  Date:      $Date: 2008-11-07 14:46:21 $
-  Version:   $Revision: 1.12.2.2 $
+  Date:      $Date: 2011-11-15 10:31:51 $
+  Version:   $Revision: 1.12.2.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -13,7 +13,6 @@
 #ifndef __mafAnimate_H__
 #define __mafAnimate_H__
 
-#include "mafEvent.h"
 #include "mafObserver.h"
 
 class mafNode;
@@ -38,10 +37,10 @@ public:
 	mafAnimate(vtkRenderer *renderer, mafNode *vme, mafObserver *listener = NULL);
 	~mafAnimate(); 
 	void OnEvent(mafEventBase *maf_event);
-	void SetListener(mafObserver *listener) {m_Listener = listener;};
+	void SetListener(mafObserver *listener);
 
 	/** Return mafAnimate User Interface */
-	mafGUI *GetGui() {return m_Gui;};
+	mafGUI *GetGui();
 
   /** set the vme that hold the tag-array where the ViewPoint are stored */
 	void SetInputVME(mafNode *vme);
@@ -53,7 +52,7 @@ public:
   void FlyTo(const char *fly_position);
 
   /** Return the tag-array containing the stored positions (tag) list.*/
-  mafTagArray *GetStoredPositions() {RetrieveStoredPositions(false); return m_StoredPositions;};
+  mafTagArray *GetStoredPositions();
 
   /** Set the list of stored position given by the user.*/
   void SetStoredPositions(mafTagArray *positions);

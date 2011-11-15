@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAnimate.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-11-07 14:46:21 $
-  Version:   $Revision: 1.15.2.2 $
+  Date:      $Date: 2011-11-15 10:31:51 $
+  Version:   $Revision: 1.15.2.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -699,4 +699,23 @@ void mafAnimate::SetCurrentSelection( int pos )
                                   // wxEVT_COMMAND_LISTBOX_SELECTED
                                   // trapped from mafGUI
   ((mafGUIValidator *)m_PositionList->GetValidator())->TransferFromWindow();
+}
+//----------------------------------------------------------------------------
+mafGUI * mafAnimate::GetGui()
+//----------------------------------------------------------------------------
+{
+  return m_Gui;
+}
+//----------------------------------------------------------------------------
+void mafAnimate::SetListener( mafObserver *listener )
+//----------------------------------------------------------------------------
+{
+  m_Listener = listener;
+}
+//----------------------------------------------------------------------------
+mafTagArray * mafAnimate::GetStoredPositions()
+//----------------------------------------------------------------------------
+{
+  RetrieveStoredPositions(false);
+  return m_StoredPositions;
 }
