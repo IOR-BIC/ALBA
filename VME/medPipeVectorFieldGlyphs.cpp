@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeVectorFieldGlyphs.cpp,v $ 
   Language: C++ 
-  Date: $Date: 2009-11-18 15:37:49 $ 
-  Version: $Revision: 1.1.2.8 $ 
+  Date: $Date: 2011-11-15 09:23:14 $ 
+  Version: $Revision: 1.1.2.9 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   modify: Hui Wei (beds.ac.uk)
   ========================================================================== 
@@ -82,7 +82,8 @@ int medPipeVectorFieldGlyphs::count;
 //----------------------------------------------------------------------------
 medPipeVectorFieldGlyphs::medPipeVectorFieldGlyphs() : medPipeVectorField()
 //----------------------------------------------------------------------------
-{    
+{
+  //default constructor
   m_GlyphType = GLYPH_LINES;
   m_GlyphRadius = 0.1;
   m_GlyphLength = 1.0;
@@ -114,10 +115,12 @@ medPipeVectorFieldGlyphs::medPipeVectorFieldGlyphs() : medPipeVectorField()
 //----------------------------------------------------------------------------
 medPipeVectorFieldGlyphs::~medPipeVectorFieldGlyphs()
 //----------------------------------------------------------------------------
-{  
+{ 
+  // default destructor
   m_AssemblyFront->RemovePart(m_GlyphsActor);  
   m_RenFront->RemoveActor2D(m_SFActor);  
   
+  // destroy objects
   vtkDEL(m_SFActor);
   
   vtkDEL(m_GlyphsActor);
@@ -133,12 +136,12 @@ medPipeVectorFieldGlyphs::~medPipeVectorFieldGlyphs()
 
 
 //----------------------------------------------------------------------------
-//Default radius, etc. should be calculated in this method, 
-//i.e., inherited classes should always override this method. 
-//The default implementation is to update VME
 /*virtual*/ void medPipeVectorFieldGlyphs::ComputeDefaultParameters()
 //----------------------------------------------------------------------------
 {
+  //Default radius, etc. should be calculated in this method, 
+  //i.e., inherited classes should always override this method. 
+  //The default implementation is to update VME
   Superclass::ComputeDefaultParameters();
 
   double dblDiag = m_Vme->GetOutput()->GetVTKData()->GetLength();
@@ -149,6 +152,7 @@ medPipeVectorFieldGlyphs::~medPipeVectorFieldGlyphs()
 mafGUI *medPipeVectorFieldGlyphs::CreateGui()
 //----------------------------------------------------------------------------
 {
+  // Create the operation GUI
   int nVectors = GetNumberOfVectors();
   int nScalars = GetNumberOfScalars();
 
@@ -210,7 +214,7 @@ mafGUI *medPipeVectorFieldGlyphs::CreateGui()
 
     //and validator
     comboGlyphs->SetValidator(mafGUIValidator(this, ID_GLYPH_TYPE, comboGlyphs, &m_GlyphType));
-//-----------weih add-----------
+//weih add----------------------
 #pragma region Glyph range
 //----------------------first filter list----------
 	wxStaticBoxSizer* sbSizer3 = new wxStaticBoxSizer( 
@@ -223,7 +227,7 @@ mafGUI *medPipeVectorFieldGlyphs::CreateGui()
 	sbSizer3->Add(new wxStaticText( m_Gui, wxID_ANY, _("magnitude value:"), 
 		wxDefaultPosition, wxSize( 60,-1 ), 0 ), 0, wxALL, 5 );
 	sbSizer3->Add( m_RangeCtrl, 1, wxALL|wxEXPAND, 1 );
-//-------------------------buttons---------
+//buttons----------------------------------
 	wxBoxSizer* bSizer6 = new wxBoxSizer( wxHORIZONTAL );  
 	bSizer6->Add( new wxPanel( m_Gui, wxID_ANY, wxDefaultPosition, 
 		wxDefaultSize, wxTAB_TRAVERSAL ), 1, wxALL, 5 );
@@ -254,7 +258,7 @@ mafGUI *medPipeVectorFieldGlyphs::CreateGui()
 
 	 if (nScalars > 0)
 	 {
-		//----------------------second filter list----------
+		//second filter list--------------------------------
 		m_RangeCtrl2 = new wxListCtrl( m_Gui, ID_LIST_RANGES, wxDefaultPosition, 
 			wxDefaultSize, wxLC_NO_SORT_HEADER|wxLC_REPORT|wxLC_SINGLE_SEL );
 		m_RangeCtrl2->SetColumnWidth(0,200);//wxLIST_AUTOSIZE_USEHEADER
@@ -263,7 +267,7 @@ mafGUI *medPipeVectorFieldGlyphs::CreateGui()
 		sbSizer3->Add(new wxStaticText( m_Gui, wxID_ANY, _("scalar Filter:"), 
 			wxDefaultPosition, wxSize( 60,-1 ), 0 ), 0, wxALL, 5 );
 		sbSizer3->Add( m_RangeCtrl2, 1, wxALL|wxEXPAND, 1 );
-		//----------------------buttons----------
+		//buttons--------------------------------
 		wxBoxSizer* bSizer7 = new wxBoxSizer( wxHORIZONTAL );  
 		bSizer7->Add( new wxPanel( m_Gui, wxID_ANY, wxDefaultPosition, 
 			wxDefaultSize, wxTAB_TRAVERSAL ), 1, wxALL, 5 );
@@ -292,7 +296,7 @@ mafGUI *medPipeVectorFieldGlyphs::CreateGui()
 
 		sbSizer3->Add( bSizer7, 0, wxEXPAND, 1 );
 
-		//-----------------------logic widgets-----------------
+		//logic widgets----------------------------------------
 		wxBoxSizer* bSizer8= new wxBoxSizer( wxHORIZONTAL );  
 		bSizer8->Add( new wxPanel( m_Gui, wxID_ANY, wxDefaultPosition, 
 			wxDefaultSize, wxTAB_TRAVERSAL ), 1, wxALL, 5 );
@@ -314,7 +318,7 @@ mafGUI *medPipeVectorFieldGlyphs::CreateGui()
 		bSizer8->Add(m_BttnShowAssociate,0, wxALIGN_CENTER_VERTICAL|wxALL, 1 );
 		sbSizer3->Add( bSizer8, 0, wxEXPAND, 1 );
 	}
-//------------------------check box-------------
+//check box-------------------------------------
 /*	wxBoxSizer* bSizer7 = new wxBoxSizer( wxVERTICAL );  
 */
 	wxCheckBox* chckShowAll = new wxCheckBox( m_Gui, 
@@ -327,15 +331,13 @@ mafGUI *medPipeVectorFieldGlyphs::CreateGui()
 	//bSizer7->Add( chckShowAll, 0, wxALL|wxEXPAND, 5 );	
 	sbSizer3->Add( chckShowAll, 0, wxALL|wxEXPAND, 5 );
 
-
-
 //----------------------------------------------	
 	bSizerMain->Add( sbSizer3, 0, wxEXPAND, 1 );
 
 #pragma endregion Glyph range
     InitFilterList(nScalars);
 
-//----------weih add end---------
+//weih add end-------------------
 
 #pragma region Glyph shape
     wxStaticBoxSizer* sbSizer2 = new wxStaticBoxSizer( 
@@ -479,9 +481,11 @@ mafGUI *medPipeVectorFieldGlyphs::CreateGui()
 }
 
 //----------------------------------------------------------------------------
-// init items of this gui when load vme--[7/31/2009 weih]
-void medPipeVectorFieldGlyphs::InitFilterList(int nScalars){
+void medPipeVectorFieldGlyphs::InitFilterList(int nScalars)
 //----------------------------------------------------------------------------
+{
+  // init items of this gui
+  // when load vme--[7/31/2009 weih]
 	wxString cols[2] = { wxT("filter name"), wxT("range value") };
 	for (int i = 0; i < 2; i++){
 		m_RangeCtrl->InsertColumn(i, cols[i]);
@@ -500,7 +504,8 @@ void medPipeVectorFieldGlyphs::InitFilterList(int nScalars){
 		mafString linkName = i->first;
 		if (linkName.StartsWith(FILTER_LINK_NAME))
 		{
-			//------insert item----format--"filter-link0:aa:0.100:1.214"
+			//------insert item----
+      //format--"filter-link0:aa:0.100:1.214"
 			FILTER_ITEM* pItem = new FILTER_ITEM;
 			memset(pItem, 0, sizeof(FILTER_ITEM));
 
@@ -536,7 +541,8 @@ void medPipeVectorFieldGlyphs::InitFilterList(int nScalars){
 
 		}else if (linkName.StartsWith(FILTER_LINK_NAME2) &&  nScalars>0)
 		{
-			//------insert item----format--"filter-link0:aa:0.100:1.214"
+			//------insert item----
+      //format--"filter-link0:aa:0.100:1.214"
 			FILTER_ITEM* pItem = new FILTER_ITEM;
 			memset(pItem, 0, sizeof(FILTER_ITEM));
 
@@ -591,7 +597,8 @@ void medPipeVectorFieldGlyphs::InitFilterList(int nScalars){
 //----------------------------------------------------------------------------
 void medPipeVectorFieldGlyphs::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
-{			
+{
+  // Processes events coming from GUI
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {	
     if (e->GetId() >= Superclass::ID_LAST && e->GetId() < ID_LAST)
@@ -649,7 +656,7 @@ void medPipeVectorFieldGlyphs::OnEvent(mafEventBase *maf_event)
 	  }
 	  else if (e->GetId()==ID_ITEM_OK)//check value
 	  {
-		  if (AddItem())//if values are valid ,an item inserted
+		  if (AddItem())//values are valid ,an item inserted
 		  {
 			  m_AddItemDlg->EndModal(wxID_OK);
 			  m_BttnShow->Enable(true);
@@ -665,7 +672,7 @@ void medPipeVectorFieldGlyphs::OnEvent(mafEventBase *maf_event)
 	  }	  
 	  else if (e->GetId()==ID_ITEM_OK2)//check value
 	  {
-		  if (AddItem2())//if values are valid ,an item inserted
+		  if (AddItem2())//values are valid ,an item inserted
 		  {
 			  m_AddItemDlg->EndModal(wxID_OK);
 			  m_BttnShow2->Enable(true);
@@ -710,10 +717,10 @@ void medPipeVectorFieldGlyphs::OnEvent(mafEventBase *maf_event)
   mafEventMacro(*maf_event);
 }
 //-----------------------------------------------------------------------
-//Store Filter values into link 
-void medPipeVectorFieldGlyphs::StoreFilterLinks(){
+void medPipeVectorFieldGlyphs::StoreFilterLinks()
 //-----------------------------------------------------------------------
-
+{
+  //Store Filter values into link 
 	mafNode::mafLinksMap* pLinks = m_Vme->GetLinks(); 
 	//remove old filter of this link
 	bool bNeedRestart;  
@@ -755,56 +762,57 @@ void medPipeVectorFieldGlyphs::StoreFilterLinks(){
 	}
 }
 
-	//-----------------------------------------------------------------------
-	//Store Filter values into link 
-	void medPipeVectorFieldGlyphs::StoreFilterLinks2(){
-		//-----------------------------------------------------------------------
-
-		mafNode::mafLinksMap* pLinks = m_Vme->GetLinks(); 
-		//remove old filter of this link
-		bool bNeedRestart;  
-		do
+//-----------------------------------------------------------------------
+void medPipeVectorFieldGlyphs::StoreFilterLinks2()
+//-----------------------------------------------------------------------
+{
+  //Store Filter values into link 
+	mafNode::mafLinksMap* pLinks = m_Vme->GetLinks(); 
+	//remove old filter of this link
+	bool bNeedRestart;  
+	do
+	{
+		bNeedRestart = false;
+		for (mafNode::mafLinksMap::iterator i = pLinks->begin(); i != pLinks->end(); i++)
 		{
-			bNeedRestart = false;
-			for (mafNode::mafLinksMap::iterator i = pLinks->begin(); i != pLinks->end(); i++)
+			if (i->first.StartsWith(FILTER_LINK_NAME2))
 			{
-				if (i->first.StartsWith(FILTER_LINK_NAME2))
-				{
-					m_Vme->RemoveLink(i->first);
-					bNeedRestart = true;
-					break;
-				}
-			}
-		}while (bNeedRestart);
-
-		//then add new links
-		mafString szName;
-		wxString itemName;
-		int nCount = m_RangeCtrl2->GetItemCount();
-		if (nCount>0)
-		{
-			for (int i=0;i<nCount;i++)
-			{
-				itemName = m_RangeCtrl2->GetItemText(i);
-				FILTER_ITEM* pItem = (FILTER_ITEM*)m_RangeCtrl2->GetItemData(i);
-				mafString szName;
-				szName = wxString::Format("%s%d",FILTER_LINK_NAME2,i);
-				szName += ":";
-				szName += itemName;
-				szName += ":";
-				szName +=   wxString::Format("%.4f",pItem->value[0]);//wxString::Format("%.3f%d",szName,pItem->value[0]);
-				szName += ":";
-				szName +=  wxString::Format("%.4f",pItem->value[1]);//wxString::Format("%s%.3f",szName,pItem->value[1]);
-
-				m_Vme->SetLink(szName,m_Vme);
+				m_Vme->RemoveLink(i->first);
+				bNeedRestart = true;
+				break;
 			}
 		}
+	}while (bNeedRestart);
+
+	//then add new links
+	mafString szName;
+	wxString itemName;
+	int nCount = m_RangeCtrl2->GetItemCount();
+	if (nCount>0)
+	{
+		for (int i=0;i<nCount;i++)
+		{
+			itemName = m_RangeCtrl2->GetItemText(i);
+			FILTER_ITEM* pItem = (FILTER_ITEM*)m_RangeCtrl2->GetItemData(i);
+			mafString szName;
+			szName = wxString::Format("%s%d",FILTER_LINK_NAME2,i);
+			szName += ":";
+			szName += itemName;
+			szName += ":";
+			szName +=   wxString::Format("%.4f",pItem->value[0]);//wxString::Format("%.3f%d",szName,pItem->value[0]);
+			szName += ":";
+			szName +=  wxString::Format("%.4f",pItem->value[1]);//wxString::Format("%s%.3f",szName,pItem->value[1]);
+
+			m_Vme->SetLink(szName,m_Vme);
+		}
 	}
+}
 //-----------------------------------------------------------------------
-//use value of this item to filte data
-void medPipeVectorFieldGlyphs::OnShowFilter(int mode){
+void medPipeVectorFieldGlyphs::OnShowFilter(int mode)
 //-----------------------------------------------------------------------
-	int nIndex1 = -1;
+{
+	//use value of this item to filter data
+  int nIndex1 = -1;
 	int nIndex2 = -1;
 	nIndex1 = m_RangeCtrl->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED); 
 	
@@ -842,45 +850,50 @@ void medPipeVectorFieldGlyphs::OnShowFilter(int mode){
 	}
 }
 //-----------------------------------------------------------------------
-//Add a range item
-void medPipeVectorFieldGlyphs::OnAddItem(int idx){
+void medPipeVectorFieldGlyphs::OnAddItem(int idx)
 //-----------------------------------------------------------------------
-
+{
+  //Add a range item
 	CreateAddItemDlg(idx);
 	
 }
 //-----------------------------------------------------------------------
-//Remove a range item
-void medPipeVectorFieldGlyphs::OnRemoveItem(){
+void medPipeVectorFieldGlyphs::OnRemoveItem()
 //--------------------------------------------------------------------
+{
+  //Remove a range item
 	int nIndex = m_RangeCtrl->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED); 
 	if (nIndex >= 0)
 	{
 		m_RangeCtrl->DeleteItem(nIndex);
+    // Update the GUI
 		if (m_RangeCtrl2->GetItemCount()<1)
 		{
 			m_BttnShowAssociate->Enable(false);
 		}
 	}
 }
-//Remove a range item
-void medPipeVectorFieldGlyphs::OnRemoveItem2(){
-	//--------------------------------------------------------------------
+//--------------------------------------------------------------------
+void medPipeVectorFieldGlyphs::OnRemoveItem2()
+//--------------------------------------------------------------------
+{
+  //Remove a range item
 	int nIndex = m_RangeCtrl2->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED); 
 	if (nIndex >= 0)
 	{
 		m_RangeCtrl2->DeleteItem(nIndex);
+    // Update the GUI
 		if (m_RangeCtrl->GetItemCount()<1)
 		{
 			m_BttnShowAssociate->Enable(false);
 		}
 	}
 }
-/*---------------------------------------------*/
-//insert item 
 //----------------------------------------------
-bool medPipeVectorFieldGlyphs::AddItem2(){
-
+bool medPipeVectorFieldGlyphs::AddItem2()
+//----------------------------------------------
+{
+  //insert item 
 	double dValue1,dValue2;
 	bool rtn = false;
 	m_FilterValue1.ToDouble(&dValue1);
@@ -920,8 +933,8 @@ bool medPipeVectorFieldGlyphs::AddItem2(){
 	return rtn;
 }
 
-bool medPipeVectorFieldGlyphs::AddItem(){
-	
+bool medPipeVectorFieldGlyphs::AddItem()
+{	
 	double dValue1,dValue2;
 	bool rtn = false;
 	m_FilterValue1.ToDouble(&dValue1);
@@ -968,9 +981,10 @@ bool medPipeVectorFieldGlyphs::AddItem(){
 	return rtn;
 }
 //-----------------------------------------------------------------------
-//create dialog
-void medPipeVectorFieldGlyphs::CreateAddItemDlg(int idx){
+void medPipeVectorFieldGlyphs::CreateAddItemDlg(int idx)
 //-----------------------------------------------------------------------
+{
+  //create dialog
 	/*vtkDataArray *dataArr = m_Vme->GetOutput()->GetVTKData()->GetPointData()->GetScalars();
 	double range[2];
 	dataArr->GetRange(range);*/
@@ -1080,15 +1094,12 @@ void medPipeVectorFieldGlyphs::CreateAddItemDlg(int idx){
 	 m_AddItemDlg->ShowModal();
 
 	 cppDEL(m_AddItemDlg);
-
-
-
 }
 //------------------------------------------------------------------------
-// Handles change of material.
 /*virtual*/ void medPipeVectorFieldGlyphs::OnChangeMaterial()
 //------------------------------------------------------------------------
-{    
+{
+  // Handles change of material.
   mafGUIMaterialChooser dlg;
   if (dlg.ShowChooserDialog(m_GlyphMaterial))
   {
@@ -1104,7 +1115,8 @@ void medPipeVectorFieldGlyphs::CreateAddItemDlg(int idx){
     m_Gui->Update();
   }
 }
-bool medPipeVectorFieldGlyphs::DoCondition(int mode,double vectorValue,double scaleValue,double *rangeValue1,double *rangeValue2){
+bool medPipeVectorFieldGlyphs::DoCondition(int mode,double vectorValue,double scaleValue,double *rangeValue1,double *rangeValue2)
+{
 	bool rtn = false;
 	bool vectorFlag;
 	bool scaleFlag;
@@ -1132,20 +1144,17 @@ bool medPipeVectorFieldGlyphs::DoCondition(int mode,double vectorValue,double sc
 	}
 
 	return rtn;
-
 }
 
 //--------------------------------------------------------------------------
-//filter begin
+void medPipeVectorFieldGlyphs::DoFilter(int mode ,double *rangeValue,double *rangeValue2)
 //--------------------------------------------------------------------------
-void medPipeVectorFieldGlyphs::DoFilter(int mode ,double *rangeValue,double *rangeValue2){
-
-	
-
-	
+{	
+  //filter begin
 	m_Output = vtkPolyData::New();
 	m_Output->Initialize();
-	vtkPoints *points = vtkPoints::New() ;// Create points and attribute arrays (vector or tensor as requested by user)
+  // Create points and attribute arrays (vector or tensor as requested by user)
+	vtkPoints *points = vtkPoints::New() ;
 
 	vtkDoubleArray *scalars ;
 	vtkDoubleArray *vectors ;
@@ -1182,10 +1191,10 @@ void medPipeVectorFieldGlyphs::DoFilter(int mode ,double *rangeValue,double *ran
 		
 		//vtkImageData* pImgData = GetImageData(orgDataR);
 		
-		mafString logFname2 = "coordFile.txt";//if debug
-		std::ofstream outputFile2(logFname2, std::ios::out|std::ios::app);//if debug
-		outputFile2.clear();//if debug
-		outputFile2<<"---------------begin--------------------------------"<<std::endl;//if debug
+		mafString logFname2 = "coordFile.txt";//debug
+		std::ofstream outputFile2(logFname2, std::ios::out|std::ios::app);//debug
+		outputFile2.clear();//debug
+		outputFile2<<"---------------begin--------------------------------"<<std::endl;//debug
 		int dim[3];
 
 		vtkRectilinearGrid *orgDataR = vtkRectilinearGrid::SafeDownCast(orgData);
@@ -1212,7 +1221,7 @@ void medPipeVectorFieldGlyphs::DoFilter(int mode ,double *rangeValue,double *ran
 					{
 						idx = ix+iy*dim[0]+iz*dim[0]*dim[1];//position in whole image
 						
-						outputFile2<< "  tmpScale="<<old_scalars->GetTuple1(idx)<<std::endl;//if debug
+						outputFile2<< "  tmpScale="<<old_scalars->GetTuple1(idx)<<std::endl;//debug
 						
 						xDvalue = old_vectors->GetTuple3(idx)[0];
 						yDvalue = old_vectors->GetTuple3(idx)[1];
@@ -1240,7 +1249,7 @@ void medPipeVectorFieldGlyphs::DoFilter(int mode ,double *rangeValue,double *ran
 			}
 			
 		}
-		outputFile2.close();//if debug
+		outputFile2.close();//debug
 	}
 	else if (orgData->IsA("vtkStructuredPoints") || orgData->IsA("vtkImageData"))
 	{
@@ -1305,10 +1314,6 @@ void medPipeVectorFieldGlyphs::DoFilter(int mode ,double *rangeValue,double *ran
 		}
 	}//end of else if
 
-
-
-
-
 	scalars->Squeeze();
 	vectors->Squeeze();
 	tensors->Squeeze();
@@ -1321,8 +1326,6 @@ void medPipeVectorFieldGlyphs::DoFilter(int mode ,double *rangeValue,double *ran
 	m_Output->GetPointData()->SetTensors(tensors);
 	//m_Output->GetPointData()->SetActiveScalars("scalars1");
 	m_Output->Update();
-
-
 
 	m_Glyphs->SetInput(m_Output);
 	//m_Glyphs->SelectInputScalars("scalars1");
@@ -1345,22 +1348,17 @@ void medPipeVectorFieldGlyphs::DoFilter(int mode ,double *rangeValue,double *ran
 	double sr[2];
 	testScalars2->GetRange(sr);*/
 
-
-
-
-	
 }
 
-
 //------------------------------------------------------------------------
-//Converts the given rectilinear grid into a regular grid.
-//If the operation cannot be successfully completed (e.g., because
-//it is not allowed or it would needed sampling of data),
-//it returns NULL, otherwise it constructs a new object
+
 vtkImageData* medPipeVectorFieldGlyphs::GetImageData(vtkRectilinearGrid* pInput)
 //------------------------------------------------------------------------
 {
-
+  //Converts the given rectilinear grid into a regular grid.
+  //In case the operation cannot be successfully completed (e.g., because
+  //it is not allowed or it would needed sampling of data),
+  //it returns NULL, otherwise it constructs a new object
 
 	vtkFloatArray* pXYZ[3];
 	/*pXYZ[0] = vtkDoubleArray::SafeDownCast(pInput->GetXCoordinates());
@@ -1397,11 +1395,11 @@ vtkImageData* medPipeVectorFieldGlyphs::GetImageData(vtkRectilinearGrid* pInput)
 }
 
 //------------------------------------------------------------------------
-//Detects spacing in the given array of coordinates.
-//It returns false, if the spacing between values is non-uniform
 bool medPipeVectorFieldGlyphs::DetectSpacing(vtkFloatArray* pCoords, double* pOutSpacing)
 //------------------------------------------------------------------------
 {
+  //Detects spacing in the given array of coordinates.
+  //It returns false, if the spacing between values is non-uniform
 	int nCount = pCoords->GetNumberOfTuples();
 	if (nCount <= 1)        //one slice
 	{
@@ -1423,7 +1421,7 @@ bool medPipeVectorFieldGlyphs::DetectSpacing(vtkFloatArray* pCoords, double* pOu
 			dblMax = dblSp;
 	}
 
-	//if the difference between min and max spacing is insignificant,
+	//the difference between min and max spacing is insignificant,
 	//then we can assume the coordinates have uniform spacing
 	*pOutSpacing = (pData[nCount - 1] - pData[0]) / nCount;
 	if ((dblMax - dblMin) / *pOutSpacing <= 1e-3)  
@@ -1434,10 +1432,10 @@ bool medPipeVectorFieldGlyphs::DetectSpacing(vtkFloatArray* pCoords, double* pOu
 }
 
 //------------------------------------------------------------------------
-//Constructs VTK pipeline.
 /*virtual*/ void medPipeVectorFieldGlyphs::CreateVTKPipe()
 //------------------------------------------------------------------------
 {
+  //Constructs VTK pipeline.
   //build materials  
   mafNEW(m_GlyphMaterial);
 
@@ -1453,6 +1451,7 @@ bool medPipeVectorFieldGlyphs::DetectSpacing(vtkFloatArray* pCoords, double* pOu
   m_GlyphLine->SetPoint1(0.0, 0.0, 0.0);
   m_GlyphLine->SetPoint2(1.0, 0.0, 0.0);
 //  m_GlyphLine->CappingOn();
+  //Set capping to on
   m_GlyphCone->CappingOn();  
   m_GlyphArrow->SetTipLength(0.5);     
 
@@ -1489,11 +1488,11 @@ bool medPipeVectorFieldGlyphs::DetectSpacing(vtkFloatArray* pCoords, double* pOu
 }
 
 //------------------------------------------------------------------------
-//Updates VTK pipeline (setting radius, etc.). 
 /*virtual*/ void medPipeVectorFieldGlyphs::UpdateVTKPipe()
 //------------------------------------------------------------------------
 {
-  
+  //Updates VTK pipeline
+  //(setting radius and other parmeters). 
   medPipeVectorFieldGlyphs::count ++; 
 
   if (m_GlyphType == GLYPH_LINES)
@@ -1557,12 +1556,12 @@ bool medPipeVectorFieldGlyphs::DetectSpacing(vtkFloatArray* pCoords, double* pOu
   {
 	  if (medPipeVectorFieldGlyphs::count==1)
 	  {
-		da->GetRange(m_Sr);//for vtkStructedPoint
+		da->GetRange(m_Sr);//used for vtkStructedPoint
 
 		int nScalars = GetNumberOfScalars();
 		if ( nScalars>0)
 		{
-			double tmpValue; // for vtkRectilinearGrid
+			double tmpValue; //used for vtkRectilinearGrid
 			m_Sr2[0] = old_scalars->GetTuple1(0);
 			m_Sr2[1] = old_scalars->GetTuple1(0);
 

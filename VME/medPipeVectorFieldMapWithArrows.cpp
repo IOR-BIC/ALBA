@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVectorFieldMapWithArrows.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-01-26 16:04:44 $
-  Version:   $Revision: 1.1.2.8 $
+  Date:      $Date: 2011-11-15 09:23:14 $
+  Version:   $Revision: 1.1.2.9 $
   Authors:   Simone Brazzale
 ==========================================================================
   Copyright (c) 2001/2005
@@ -143,12 +143,14 @@ medPipeVectorFieldMapWithArrows::~medPipeVectorFieldMapWithArrows()
 //----------------------------------------------------------------------------
 mafGUI *medPipeVectorFieldMapWithArrows::CreateGui()
 //----------------------------------------------------------------------------
-{  
+{ 
+  // Get number of vectors and scalars
   int nVectors = GetNumberOfVectors();
   int nScalars = GetNumberOfScalars();
   
   m_Gui = new mafGUI(this);
 
+  // If no fields found don't build widgets
   if (nVectors==0 && nScalars==0)
   {
     m_Gui->Label("No vector or scalar fields to visualize.", false);
@@ -370,6 +372,7 @@ void medPipeVectorFieldMapWithArrows::OnEvent(mafEventBase *maf_event)
             return;
           }
 
+          // deactivate vectors
           m_ActivateVectors = 0;
 
           if (m_ComboField_s!=NULL) {
@@ -401,6 +404,7 @@ void medPipeVectorFieldMapWithArrows::OnEvent(mafEventBase *maf_event)
             return;
           }
 
+          // deactivate scalars
           m_ActivateScalars = 0;
 
           if (m_ComboField_s!=NULL) {
