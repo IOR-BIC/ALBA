@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAttachCamera.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-25 10:03:24 $
-  Version:   $Revision: 1.7.2.2 $
+  Date:      $Date: 2011-11-15 10:23:27 $
+  Version:   $Revision: 1.7.2.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -76,7 +76,7 @@ public:
 
 	/** 
   Returns the mafAttachCamera's GUI */
-	mafGUI *GetGui() {return m_Gui;};
+	mafGUI *GetGui();
 
   void PrintSelf(ostream& os);
 

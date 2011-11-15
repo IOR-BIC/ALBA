@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAttachCamera.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-05-27 09:55:44 $
-  Version:   $Revision: 1.20.2.2 $
+  Date:      $Date: 2011-11-15 10:23:27 $
+  Version:   $Revision: 1.20.2.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -274,4 +274,9 @@ void mafAttachCamera::SetEnableAttachCamera( int enable )
 mafNode * mafAttachCamera::GetVme()
 {
   return m_AttachedVme;
+}
+
+mafGUI * mafAttachCamera::GetGui()
+{
+  return m_Gui;
 }
