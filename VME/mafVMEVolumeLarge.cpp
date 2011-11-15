@@ -3,7 +3,7 @@
 File:    	 mafVMEVolumeLarge.cpp
 Language:  C++
 Date:      8:2:2008   11:28
-Version:   $Revision: 1.1.2.1 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Josef Kohout (Josef.Kohout@beds.ac.uk)
 
 Copyright (c) 2008
@@ -26,7 +26,7 @@ June 9-11, 2008, Manchester, UK, p. 1-8
 #include "mafVMEVolumeLarge.h"
 #include "mafVMEVolumeLargeUtils.h"
 #include "mafVMEVolumeGray.h"
-#include "mafVTKInterpolator.h"
+#include "mafDataPipeInterpolatorVTK.h"
 #include "mafDataVector.h"
 #include "mafVMEItemVTK.h"
 #include "mafTagArray.h"
