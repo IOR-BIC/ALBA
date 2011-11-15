@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEScalarMatrix.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-11-15 09:01:37 $
-  Version:   $Revision: 1.3.2.1 $
+  Date:      $Date: 2011-11-15 09:21:37 $
+  Version:   $Revision: 1.3.2.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -27,7 +27,7 @@
 #include "mafVME.h"
 #include "mafVMEOutputScalarMatrix.h"
 
-#include "mafScalarMatrixInterpolator.h"
+#include "mafDataPipeInterpolatorScalarMatrix.h"
 #include "mafDataVector.h"
 #include "mafVMEItemScalarMatrix.h"
 
