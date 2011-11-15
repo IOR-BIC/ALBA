@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEvent.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-25 10:03:24 $
-  Version:   $Revision: 1.14.2.1 $
+  Date:      $Date: 2011-11-15 09:05:51 $
+  Version:   $Revision: 1.14.2.2 $
   Authors:   Silvano Imboden, Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -18,7 +18,6 @@
 #include "mafDecl.h"
 #include "mafEventBase.h" // base class for mafEvent
 #include "mafObserver.h"
-#include "mafString.h"    // used by mafEvent
 
 //----------------------------------------------------------------------------
 // Forward References:
@@ -27,6 +26,7 @@ class mafView;
 class mafOp;
 class mafNode;
 class mafMatrix;
+class mafString;
 
 #ifdef MAF_USE_VTK
   class vtkObject;
@@ -68,7 +68,7 @@ public:
   long              GetArg()     {return m_Arg;};
   bool              GetBool()    {return m_Bool;};
   double            GetDouble()   {return m_Double;};
-  mafString*        GetString()  {return m_MAFString;};
+  mafString*        GetString();
   mafView*          GetView()    {return m_View;};
   mafNode*          GetVme()     {return m_Vme;};
   mafOp*					  GetOp()      {return m_Op;};
@@ -88,7 +88,7 @@ public:
   void SetArg(long arg)         { m_Arg = arg;};
   void SetBool(bool b)          { m_Bool = b;};
   void SetDouble(double f)      { m_Double = f;};
-  void SetString(mafString *s)  { m_MAFString = s;};
+  void SetString(mafString *s);
   void SetView(mafView* view)   { m_View = view;};
   void SetVme(mafNode* vme)     { m_Vme = vme;};
   void SetOp(mafOp* op)         { m_Op = op;};

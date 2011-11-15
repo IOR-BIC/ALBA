@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEvent.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-05-25 10:03:24 $
-  Version:   $Revision: 1.13.2.2 $
+  Date:      $Date: 2011-11-15 09:05:50 $
+  Version:   $Revision: 1.13.2.3 $
   Authors:   Marco Petrone, Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,6 +25,7 @@
 #include "mafView.h"
 #include "mafOp.h"
 #include "mafNode.h"
+#include "mafString.h"
 #include "mafMatrix.h"
 
 
@@ -253,6 +254,18 @@ std::vector<mafNode*> mafEvent::GetVmeVector()
 //------------------------------------------------------------------------------
 {
   return m_VmeVector;
+}
+//------------------------------------------------------------------------------
+mafString* mafEvent::GetString()
+//------------------------------------------------------------------------------
+{
+  return m_MAFString;
+}
+//------------------------------------------------------------------------------
+void mafEvent::SetString( mafString *s )
+//------------------------------------------------------------------------------
+{
+  m_MAFString = s;
 }
 
 //----------------------------------------------------------------------------
