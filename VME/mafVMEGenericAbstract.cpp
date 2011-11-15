@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGenericAbstract.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-12-15 15:34:23 $
-  Version:   $Revision: 1.25.2.1 $
+  Date:      $Date: 2011-11-15 07:57:38 $
+  Version:   $Revision: 1.25.2.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -31,7 +31,7 @@
 #include "mmuTimeSet.h"
 #include "mafNodeIterator.h"
 #include "mafVMEStorage.h"
-#include "mafVTKInterpolator.h"
+#include "mafDataPipeInterpolatorVTK.h"
 #include "mafVMEItemVTK.h"
 
 #include <assert.h>
@@ -96,8 +96,8 @@ int mafVMEGenericAbstract::DeepCopyVmeLarge(mafNode *a)
     if (vme->GetDataVector())
     {
       //////////////////////////////////////////////////////////////////////////
-      mafVTKInterpolator::SafeDownCast(vme->GetDataPipe())->GetVTKDataPipe()->RemoveAllInputs();
-      mafVTKInterpolator::SafeDownCast(vme->GetDataPipe())->GetVTKDataPipe()->UnRegisterAllOutputs();
+      mafDataPipeInterpolatorVTK::SafeDownCast(vme->GetDataPipe())->GetVTKDataPipe()->RemoveAllInputs();
+      mafDataPipeInterpolatorVTK::SafeDownCast(vme->GetDataPipe())->GetVTKDataPipe()->UnRegisterAllOutputs();
       //////////////////////////////////////////////////////////////////////////
 
       if(m_DataVector == NULL)

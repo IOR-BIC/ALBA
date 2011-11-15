@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-01-08 15:17:26 $
-  Version:   $Revision: 1.4.2.1 $
+  Date:      $Date: 2011-11-15 07:57:38 $
+  Version:   $Revision: 1.4.2.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,7 +22,7 @@
 #include "mafVMEVolume.h"
 #include "mafMatrixInterpolator.h"
 #include "mafDataVector.h"
-#include "mafVTKInterpolator.h"
+#include "mafDataPipeInterpolatorVTK.h"
 #include "mafVMEItemVTK.h"
 #include "mafAbsMatrixPipe.h"
 #include "mmaVolumeMaterial.h"

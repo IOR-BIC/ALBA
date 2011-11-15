@@ -10,8 +10,8 @@ SET(PROJECT_SRCS
   mafDataPipeCustom.h
   mafDataPipeCustomProber.cpp
   mafDataPipeCustomProber.h
-  mafVTKInterpolator.cpp
-  mafVTKInterpolator.h
+  mafDataPipeInterpolatorVTK.cpp
+  mafDataPipeInterpolatorVTK.h
   vtkMAFDataPipe.cpp
   vtkMAFDataPipe.h
 )

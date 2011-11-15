@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGeneric.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-01-08 15:16:56 $
-  Version:   $Revision: 1.10.2.1 $
+  Date:      $Date: 2011-11-15 07:57:38 $
+  Version:   $Revision: 1.10.2.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,7 +21,7 @@
 
 #include "mafVMEGeneric.h"
 #include "mafDataVector.h"
-#include "mafVTKInterpolator.h"
+#include "mafDataPipeInterpolatorVTK.h"
 #include "mafVMEItemVTK.h"
 #include "vtkDataSet.h"
 //-------------------------------------------------------------------------
@@ -35,7 +35,7 @@ mafVMEGeneric::mafVMEGeneric()
   m_DataVector = mafDataVector::New();
   m_DataVector->SetItemTypeName(mafVMEItemVTK::GetStaticTypeName());  
   m_DataVector->SetListener(this);
-  SetDataPipe(mafVTKInterpolator::New()); // interpolator data pipe
+  SetDataPipe(mafDataPipeInterpolatorVTK::New()); // interpolator data pipe
 
   // The output is created on demand in GetOutput() to avoid
   // subclasses to have to destroy base class output

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMesh.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-25 09:22:23 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2011-11-15 07:57:38 $
+  Version:   $Revision: 1.3.4.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,7 +25,7 @@
 #include "mafVME.h"
 #include "mafMatrixInterpolator.h"
 #include "mafDataVector.h"
-#include "mafVTKInterpolator.h"
+#include "mafDataPipeInterpolatorVTK.h"
 #include "mafVMEItemVTK.h"
 #include "mafAbsMatrixPipe.h"
 #include "mmaMaterial.h"
