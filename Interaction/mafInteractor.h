@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractor.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-25 10:14:03 $
-  Version:   $Revision: 1.4.22.2 $
+  Date:      $Date: 2011-11-16 15:47:27 $
+  Version:   $Revision: 1.4.22.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -213,7 +213,7 @@ protected:
   vtkMAFSmartPointer<vtkRenderer> m_Renderer; ///< the renderer this interactor is working on
   vtkMAFSmartPointer<vtkProp3D>   m_Prop;     ///< the prop being interacted (optional)
 
-  int m_TestMode;///< Flag used with cppunitTest
+  bool m_TestMode;///< Flag used with cppunitTest
 
 private:
   mafInteractor(const mafInteractor&);  // Not implemented.
