@@ -736,8 +736,8 @@ SET(DATAPIPES_SRCS
   ../VME/DataPipes/mafDataPipeCustom.h
   ../VME/DataPipes/mafDataPipeCustomProber.cpp
   ../VME/DataPipes/mafDataPipeCustomProber.h
-  ../VME/DataPipes/mafVTKInterpolator.cpp
-  ../VME/DataPipes/mafVTKInterpolator.h
+  ../VME/DataPipes/mafDataPipeInterpolatorVTK.cpp
+  ../VME/DataPipes/mafDataPipeInterpolatorVTK.h
   ../VME/DataPipes/vtkMAFDataPipe.cpp
   ../VME/DataPipes/vtkMAFDataPipe.h
 )
