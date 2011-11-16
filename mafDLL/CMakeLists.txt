@@ -745,8 +745,8 @@ SET(DATAPIPES_SRCS
 IF (MAF_USE_ITK)
   SET(DATAPIPES_SRCS
     ${DATAPIPES_SRCS}
-    ../VME/DataPipes/mafScalarMatrixInterpolator.cpp
-    ../VME/DataPipes/mafScalarMatrixInterpolator.h
+    ../VME/DataPipes/mafDataPipeInterpolatorScalarMatrix.cpp
+    ../VME/DataPipes/mafDataPipeInterpolatorScalarMatrix.h
   )
 ENDIF (MAF_USE_ITK)
 ###############################################
