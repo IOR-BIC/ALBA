@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2011-11-08 13:19:13 $
-Version:   $Revision: 1.7.2.17 $
+Date:      $Date: 2011-11-21 14:06:29 $
+Version:   $Revision: 1.7.2.18 $
 Authors:   Matteo Giacomoni, Simone Brazzale
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -32,7 +32,7 @@ mafGUISettings(Listener, label)
 {
 	// m_Dictionary = "";
 
-	m_CheckOnOff[0] = m_CheckOnOff[1] = m_CheckOnOff[2] = m_CheckOnOff[3] = m_CheckOnOff[4] = m_CheckOnOff[5] = true;
+	m_CheckOnOff[0] = m_CheckOnOff[1] = m_CheckOnOff[2] = m_CheckOnOff[3] = m_CheckOnOff[4] = m_CheckOnOff[5] = m_CheckOnOff[6] = true;
 
   m_CheckOnOffVmeType[0] = m_CheckOnOffVmeType[2] = true;
   m_CheckOnOffVmeType[1] = false;
@@ -116,6 +116,8 @@ void medGUIDicomSettings::CreateGui()
 	m_DicomModalityListBox->AddItem(ID_XA_MODALITY,_("XA"),m_CheckOnOff[3] != 0);
   m_DicomModalityListBox->AddItem(ID_OT_MODALITY,_("OT"),m_CheckOnOff[4] != 0);
   m_DicomModalityListBox->AddItem(ID_CR_MODALITY,_("CR"),m_CheckOnOff[5] != 0);
+  m_DicomModalityListBox->AddItem(ID_DX_MODALITY,_("DX"),m_CheckOnOff[6] != 0);
+  
 	m_Gui->Divider(1);
 
 
@@ -168,6 +170,7 @@ void medGUIDicomSettings::OnEvent(mafEventBase *maf_event)
       m_CheckOnOff[ID_XA_MODALITY] = m_DicomModalityListBox->IsItemChecked(ID_XA_MODALITY);
       m_CheckOnOff[ID_CR_MODALITY] = m_DicomModalityListBox->IsItemChecked(ID_CR_MODALITY);
       m_CheckOnOff[ID_OT_MODALITY] = m_DicomModalityListBox->IsItemChecked(ID_OT_MODALITY);
+      m_CheckOnOff[ID_DX_MODALITY] = m_DicomModalityListBox->IsItemChecked(ID_DX_MODALITY);
 
 			m_Config->Write("EnableReadCT",m_DicomModalityListBox->IsItemChecked(ID_CT_MODALITY));
 			m_Config->Write("EnableReadSC",m_DicomModalityListBox->IsItemChecked(ID_SC_MODALITY));
@@ -175,6 +178,7 @@ void medGUIDicomSettings::OnEvent(mafEventBase *maf_event)
 			m_Config->Write("EnableReadXA",m_DicomModalityListBox->IsItemChecked(ID_XA_MODALITY));
       m_Config->Write("EnableReadCR",m_DicomModalityListBox->IsItemChecked(ID_CR_MODALITY));
       m_Config->Write("EnableReadOT",m_DicomModalityListBox->IsItemChecked(ID_OT_MODALITY));
+      m_Config->Write("EnableReadDX",m_DicomModalityListBox->IsItemChecked(ID_DX_MODALITY));
 		}
 		break;
   case ID_VME_TYPE:
@@ -429,6 +433,15 @@ void medGUIDicomSettings::InitializeSettings()
 		m_Config->Write("EnableReadCR",m_CheckOnOff[5]);
 	}
 
+  if(m_Config->Read("EnableReadDX", &long_item))
+  {
+    m_CheckOnOff[6]=long_item;
+  }
+  else
+  {
+    m_Config->Write("EnableReadDX",m_CheckOnOff[6]);
+  }
+
   if(m_Config->Read("EnableTypeVolume", &long_item))
 	{
 		m_CheckOnOffVmeType[0]=long_item;
@@ -583,6 +596,11 @@ void medGUIDicomSettings::SetEnableToRead(char* type,bool enable)
     m_CheckOnOff[ID_CR_MODALITY] = enable;
     m_Config->Write("EnableReadCR",m_CheckOnOff[ID_CR_MODALITY]);
   }
+  if (strcmp( type, "DX" ) == 0)
+  {	
+    m_CheckOnOff[ID_DX_MODALITY] = enable;
+    m_Config->Write("EnableReadDX",m_CheckOnOff[ID_DX_MODALITY]);
+  }
 
   if (strcmp( type, "VOLUME" ) == 0)
   {	
@@ -632,6 +650,10 @@ bool medGUIDicomSettings::EnableToRead(char* type)
 	  {	
 	    return true;
 	  }
+    if (strcmp( type, "DX" ) == 0 && (m_DicomModalityListBox->IsItemChecked(ID_DX_MODALITY)))
+    {	
+      return true;
+    }
 
     if (strcmp( type, "VOLUME" ) == 0 && (m_DicomVmeTypeListBox->IsItemChecked(ID_VOLUME)))
 	  {	
@@ -671,6 +693,10 @@ bool medGUIDicomSettings::EnableToRead(char* type)
       return true;
     }
     if (strcmp( type, "CR" ) == 0 && m_CheckOnOff[ID_CR_MODALITY])
+    {	
+      return true;
+    }
+    if (strcmp( type, "DX" ) == 0 && m_CheckOnOff[ID_DX_MODALITY])
     {	
       return true;
     }
