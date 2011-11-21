@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2011-07-26 10:20:17 $
-Version:   $Revision: 1.1.2.58 $
+Date:      $Date: 2011-11-21 14:15:18 $
+Version:   $Revision: 1.1.2.59 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -139,8 +139,6 @@ public:
 	/** Build a volume from the list of CineMRI files. */
 	int BuildOutputVMEGrayVolumeFromDicomCineMRI();
 
-
-
 	/** Build a mesh from the list of dicom files. */
 	int BuildOutputVMEMeshFromDicom();
 
@@ -178,6 +176,7 @@ protected:
 	void OnSeriesSelect();
 	void OnStudySelect();
 	void OnVmeTypeSelected();
+  void OnReferenceSystemSelected();
 
 	/** Create load page and his GUI for the wizard. */
 	void CreateLoadPage();
@@ -187,6 +186,12 @@ protected:
 
 	/** Create build page and his GUI for the wizard. */
 	void CreateBuildPage();
+
+  /** Create reference system page and his GUI for the wizard.\n
+  This page is shown only if VME image is created as output\n
+  This page allow to select reference system (xy, xz or yz) for the
+  selected images */
+  void CreateReferenceSystemPage();
 
 	/** Reset the list of files and all the structures that own images information. */
 	void ResetStructure();
@@ -260,6 +265,9 @@ protected:
 	/** Rescale to 16 Bit */
 	void RescaleTo16Bit(vtkImageData *dataSet);
 
+  /** Reference system page is shown only if image is the vme output type */
+  void UpdateReferenceSystemPageConnection();
+
 	vtkDirectory			*m_DICOMDirectoryReader; 
 	vtkWindowLevelLookupTable	*m_SliceLookupTable;
 	vtkPlaneSource		*m_SlicePlane;
@@ -281,6 +289,7 @@ protected:
 	medGUIWizardPageNew	*m_LoadPage;
 	medGUIWizardPageNew	*m_CropPage;
 	medGUIWizardPageNew	*m_BuildPage;
+  medGUIWizardPageNew	*m_ReferenceSystemPage; ///< Wizard step to choose reference system
 	mafVMEMesh        *m_Mesh;
 	mafVMEGroup       *m_ImagesGroup;
 
@@ -288,9 +297,12 @@ protected:
 	mafGUI	*m_LoadGuiUnderLeft;
 	mafGUI	*m_CropGuiLeft;
 	mafGUI	*m_CropGuiCenter;
-	mafGUI	*m_BuildGuiLeft;
-	mafGUI	*m_BuildGuiUnderLeft;
-	mafGUI	*m_BuildGuiCenter;
+	mafGUI	*m_BuildGuiLeft;      ///< Left gui for RS step
+	mafGUI	*m_BuildGuiUnderLeft; ///< Underleft gui for RS step
+	mafGUI	*m_BuildGuiCenter;    ///< Center gui for RS step
+  mafGUI	*m_ReferenceSystemGuiLeft;
+  mafGUI	*m_ReferenceSystemGuiUnderLeft;
+  //mafGUI	*m_ReferenceSystemGuiCenter;
 
 	mafGUI  *m_LoadGuiUnderCenter;
 
@@ -333,11 +345,13 @@ protected:
 	wxSlider		 *m_SliceScannerLoadPage;
 	wxSlider		 *m_SliceScannerCropPage;
 	wxSlider		 *m_SliceScannerBuildPage;
+  wxSlider		 *m_SliceScannerReferenceSystemPage; ///< Slice slider for RS page
 
 	int						m_CurrentTime;
 	wxSlider		 *m_TimeScannerLoadPage;
 	wxSlider		 *m_TimeScannerCropPage;
 	wxSlider		 *m_TimeScannerBuildPage;
+  wxSlider		 *m_TimeScannerReferenceSystemPage; ///< Time slider for RS page
 
 	mafTagArray	*m_TagArray;
 
@@ -356,6 +370,9 @@ protected:
 	int m_ResampleFlag;
 	int m_DiscardPosition;
 	int m_RescaleTo16Bit;
+  int m_SelectedReferenceSystem;  ///< Specify the reference system (xy xz yx)
+  int m_SwapReferenceSystem;      ///< Specify the if the reference system is swapped or not (e.g xy to yx)
+  int m_ApplyToAllReferenceSystem;///< Specify if the current refernce system is applyed to all images
 
 	mafVMEImage				*m_Image;
 	mafVMEVolumeGray	*m_Volume;
@@ -378,6 +395,14 @@ http://www.cmake.org/pipermail/insight-users/2005-September/014711.html
 class MED_EXPORT medDicomSlice
 {
 public:
+  /** Enumerate reference system modalities */
+  enum ID_REFERENCE_SYSTEM
+  {
+    ID_RS_XY = 0,
+    ID_RS_XZ,
+    ID_RS_YZ,
+  };
+
 	/** constructor */
 	medDicomSlice() 
 	{
@@ -400,11 +425,13 @@ public:
 		m_DcmTriggerTime = -1.0;
 		m_DcmCardiacNumberOfImages = -1;
 		m_Data = NULL;
+    m_ReferenceSystem = ID_RS_XY;
 	};
 
 	/** overloaded constructor */
 	medDicomSlice(mafString sliceABSFilename,double dcmImagePositionPatient[3], double dcmImageOrientationPatient[6],\
-		vtkImageData *data , mafString description, mafString date,int dcmInstanceNumber=-1, int dcmCardiacNumberOfImages=-1, double dcmTtriggerTime=-1.0)  
+		vtkImageData *data , mafString description, mafString date,int dcmInstanceNumber=-1, int dcmCardiacNumberOfImages=-1,\
+    double dcmTtriggerTime=-1.0, int referenceSystem = ID_RS_XY)  
 	{
     m_Description = description;
     m_Date = date;
@@ -433,6 +460,8 @@ public:
 		{
 			m_Data = NULL;
 		}
+
+    SetReferenceSystem(referenceSystem);
 	};
 
 	/** destructor */
@@ -525,6 +554,38 @@ public:
   /** return the date */
   mafString GetDate(){return m_Date;};
 
+  /** Set the information about the selected reference system (xy, xz, yx). see ID_REFERENCE_SYSTEM enum */
+  bool SetReferenceSystem(int referenceSystem)
+  {
+    if(referenceSystem>= ID_RS_XY && referenceSystem <= ID_RS_YZ)
+    {
+      m_ReferenceSystem = referenceSystem;
+      return true;
+    }
+    else
+    {
+      CheckReferenceSystem();
+    }
+    return false;
+  };
+
+  /** Get the information about the selected reference system (xy, xz, yx). see ID_REFERENCE_SYSTEM enum */
+  int GetReferenceSystem()
+  {
+    CheckReferenceSystem();
+    return m_ReferenceSystem;
+  };
+
+  /** Utility function to check reference system integrity */
+  void CheckReferenceSystem()
+  {
+    if(!(m_ReferenceSystem>= ID_RS_XY && m_ReferenceSystem <= ID_RS_YZ)) // Initialization (m_ReferenceSystem have an invalid value)
+    {
+      m_ReferenceSystem = ID_RS_XY;
+    } // Otherwise keep the old value
+  };
+
+
 protected:
 	double m_DcmImagePositionPatient[3];
   double m_DcmImagePositionPatientOriginal[3];
@@ -538,6 +599,8 @@ protected:
 	int m_DcmCardiacNumberOfImages;
 
 	vtkImageData *m_Data;
+
+  int m_ReferenceSystem; //< Store information about the selected reference system (xy, xz, yx). see ID_REFERENCE_SYSTEM enum
 
 };
 #endif

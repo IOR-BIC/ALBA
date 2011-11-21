@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2011-11-08 13:19:29 $
-Version:   $Revision: 1.1.2.143 $
+Date:      $Date: 2011-11-21 14:15:18 $
+Version:   $Revision: 1.1.2.144 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -204,6 +204,8 @@ enum DICOM_IMPORTER_GUI_ID
 	ID_UNDO_CROP,
 	ID_BUILD_STEP,
 	ID_BUILD_BUTTON,
+  ID_RS_STEP,
+  ID_RS_BUTTON,
 	ID_CANCEL,
 	ID_PATIENT_NAME,
 	ID_PATIENT_ID,
@@ -214,6 +216,9 @@ enum DICOM_IMPORTER_GUI_ID
 	ID_VOLUME_SIDE,
 	ID_VME_TYPE,
   ID_SORT_AXIS,
+  ID_RS_SELECT,
+  ID_RS_SWAP,
+  ID_RS_APPLYTOALL,
 };
 enum VOLUME_SIDE
 {
@@ -261,10 +266,12 @@ mafOp(label)
 	m_LoadPage = NULL;
 	m_CropPage = NULL;
 	m_BuildPage = NULL;
+  m_ReferenceSystemPage = NULL;
 	m_Mesh = NULL;
 	m_ImagesGroup = NULL;
 
 	m_BuildGuiLeft = NULL;
+  m_ReferenceSystemGuiLeft = NULL;
 	m_CropGuiLeft = NULL;
 	m_LoadGuiLeft = NULL;
 	m_LoadGuiUnderLeft = NULL;
@@ -273,6 +280,7 @@ mafOp(label)
 	m_TimeScannerLoadPage = NULL;
 	m_TimeScannerCropPage = NULL;
 	m_TimeScannerBuildPage = NULL;
+  m_TimeScannerReferenceSystemPage = NULL;
 
 	m_DICOMDirectoryReader = NULL;
 	m_SliceLookupTable = NULL;
@@ -303,6 +311,7 @@ mafOp(label)
 	m_RadioButton = 0;
 
 	m_SliceScannerBuildPage = NULL;
+  m_SliceScannerReferenceSystemPage = NULL;
 	m_SliceScannerCropPage = NULL;
 	m_SliceScannerLoadPage = NULL;
 
@@ -340,6 +349,10 @@ mafOp(label)
 	m_RescaleTo16Bit = FALSE;
 
 	m_ApplyRotation = false;
+
+  m_SelectedReferenceSystem = medDicomSlice::ID_RS_XY;
+  m_SwapReferenceSystem = FALSE;
+  m_ApplyToAllReferenceSystem = FALSE;
 
 }
 //----------------------------------------------------------------------------
@@ -386,6 +399,7 @@ void medOpImporterDicomOffis::OpRun()
 	CreateLoadPage();
 	CreateCropPage();
 	CreateBuildPage();
+  CreateReferenceSystemPage();
 	m_Wizard->SetButtonString("Crop >");
 	EnableSliceSlider(false);
 	EnableTimeSlider(false);
@@ -393,6 +407,7 @@ void medOpImporterDicomOffis::OpRun()
 	//Create a chain between pages
 	m_LoadPage->SetNextPage(m_CropPage);
 	m_CropPage->SetNextPage(m_BuildPage);
+  UpdateReferenceSystemPageConnection();
 	m_Wizard->SetFirstPage(m_LoadPage);
 
 	bool result = false;
@@ -632,6 +647,15 @@ void medOpImporterDicomOffis::Destroy()
 		}
 	}
 
+  if(m_ReferenceSystemPage)
+  {
+    m_ReferenceSystemPage->GetRWI()->m_RenFront->RemoveActor(m_SliceActor);
+    if(((medGUIDicomSettings*)GetSetting())->EnableVisualizationPosition())
+    {
+      m_BuildPage->GetRWI()->m_RenFront->RemoveActor(m_TextActor);
+    }
+  }
+
 	vtkDEL(m_SliceTexture);
 	vtkDEL(m_DICOMDirectoryReader);
 	vtkDEL(m_SliceLookupTable);
@@ -657,9 +681,13 @@ void medOpImporterDicomOffis::Destroy()
 		cppDEL(m_BuildGuiLeft); 
 		cppDEL(m_BuildGuiUnderLeft);
 		cppDEL(m_BuildGuiCenter);
+    cppDEL(m_ReferenceSystemGuiLeft); 
+    cppDEL(m_ReferenceSystemGuiUnderLeft);
+    //cppDEL(m_ReferenceSystemGuiCenter);
 		cppDEL(m_LoadPage);
 		cppDEL(m_CropPage);
 		cppDEL(m_BuildPage);
+    cppDEL(m_ReferenceSystemPage);
 		cppDEL(m_Wizard);
 	}
 }
@@ -2212,6 +2240,42 @@ void medOpImporterDicomOffis::CreateBuildPage()
 	}
 }
 //----------------------------------------------------------------------------
+void medOpImporterDicomOffis::CreateReferenceSystemPage()
+//----------------------------------------------------------------------------
+{
+  m_ReferenceSystemPage = new medGUIWizardPageNew(m_Wizard,medUSEGUI|medUSERWI);
+  m_ReferenceSystemGuiLeft = new mafGUI(this);
+  m_ReferenceSystemGuiUnderLeft = new mafGUI(this);
+  //m_ReferenceSystemGuiCenter = new mafGUI(this);
+
+  m_SliceScannerReferenceSystemPage=m_ReferenceSystemGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,VTK_INT_MAX,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice());
+  m_SliceScannerReferenceSystemPage->SetPageSize(1);
+
+  m_TimeScannerReferenceSystemPage=m_ReferenceSystemGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,VTK_INT_MAX);
+  m_TimeScannerReferenceSystemPage->SetPageSize(1);
+
+  wxString choices[3];
+  choices[0] = _T("XY");
+  choices[1] = _T("XZ");
+  choices[2] = _T("YZ");
+  //m_ReferenceSystemGuiCenter->Radio(ID_RS_SELECT,"Ref.Sys.",&m_SelectedReferenceSystem,3,choices,1,"Select reference system\nfor image position and orientation.");
+  //m_ReferenceSystemGuiCenter->Divider();
+  m_ReferenceSystemGuiUnderLeft->Radio(ID_RS_SELECT,"ref.sys.",&m_SelectedReferenceSystem,3,choices,1,"Select reference system for image position and orientation.");
+  m_ReferenceSystemGuiUnderLeft->Bool(ID_RS_SWAP,"swap",&m_SwapReferenceSystem,1,"specify if the reference system is swapped or not (e.g. xy to yx)");
+  m_ReferenceSystemGuiUnderLeft->Bool(ID_RS_APPLYTOALL,"apply to all",&m_ApplyToAllReferenceSystem,1,"specify if the current reference system is applied to all images");
+  m_ReferenceSystemGuiLeft->FitGui();
+  m_ReferenceSystemGuiUnderLeft->FitGui();
+  m_ReferenceSystemPage->AddGuiLowerLeft(m_ReferenceSystemGuiLeft);
+  m_ReferenceSystemPage->AddGuiLowerCenter(m_ReferenceSystemGuiUnderLeft);
+
+  m_ReferenceSystemPage->GetRWI()->m_RwiBase->SetMouse(m_Mouse);
+  m_ReferenceSystemPage->GetRWI()->m_RenFront->AddActor(m_SliceActor);
+  if(((medGUIDicomSettings*)GetSetting())->EnableVisualizationPosition())
+  {
+    m_ReferenceSystemPage->GetRWI()->m_RenFront->AddActor(m_TextActor);
+  }
+}
+//----------------------------------------------------------------------------
 void medOpImporterDicomOffis::GuiUpdate()
 //----------------------------------------------------------------------------
 {
@@ -2224,6 +2288,10 @@ void medOpImporterDicomOffis::GuiUpdate()
 	m_BuildGuiLeft->Update();
 	m_BuildGuiUnderLeft->Update();
 	m_BuildGuiCenter->Update();
+
+  m_ReferenceSystemGuiLeft->Update();
+  m_ReferenceSystemGuiUnderLeft->Update();
+  //m_ReferenceSystemGuiCenter->Update();
 }
 //----------------------------------------------------------------------------
 void medOpImporterDicomOffis::CreateGui()
@@ -2543,8 +2611,24 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
 		case ID_VME_TYPE:
 			{
 				OnVmeTypeSelected();
+        if (m_Wizard->GetCurrentPage()==m_BuildPage && m_OutputType == medGUIDicomSettings::ID_IMAGE)//Check the type to determine the next step
+        {
+          m_Wizard->SetButtonString("Reference >");
+          m_ReferenceSystemPage->UpdateActor();
+          m_Wizard->Update();
+        }
+        else
+        {
+          m_Wizard->SetButtonString("Finish");
+          m_Wizard->Update();
+        }
 			}
-
+      break;
+    case ID_RS_SELECT:
+      {
+        OnReferenceSystemSelected();
+      }
+      break;
 		default:
 			{
 				mafEventMacro(*e);
@@ -2578,6 +2662,8 @@ void medOpImporterDicomOffis::OnUndoCrop()
 	m_CropPage->GetRWI()->CameraUpdate();
 	m_BuildPage->GetRWI()->CameraReset(boundsCamera);
 	m_BuildPage->GetRWI()->CameraUpdate();
+  m_ReferenceSystemPage->GetRWI()->CameraReset(boundsCamera);
+  m_ReferenceSystemPage->GetRWI()->CameraUpdate();
 	m_CropActor->VisibilityOn();
 	m_CropExecuted=false;
 }
@@ -2600,29 +2686,32 @@ void medOpImporterDicomOffis::Crop()
 	}
 	m_CropActor->VisibilityOff();
 	m_CropExecuted=true;
-	double diffx,diffy,boundsCamera[6];
-	diffx=m_SliceBounds[1]-m_SliceBounds[0];
-	diffy=m_SliceBounds[3]-m_SliceBounds[2];
 
-	boundsCamera[0]=0.0;
-	boundsCamera[1]=diffx;
-	boundsCamera[2]=0.0;
-	boundsCamera[3]=diffy;
-	boundsCamera[4]=0.0;
-	boundsCamera[5]=0.0;
+  double diffx,diffy,boundsCamera[6];
+  diffx=m_SliceBounds[1]-m_SliceBounds[0];
+  diffy=m_SliceBounds[3]-m_SliceBounds[2];
 
-	m_CropPage->GetRWI()->CameraReset(boundsCamera);
-	m_CropPage->GetRWI()->CameraUpdate();
+  boundsCamera[0]=0.0;
+  boundsCamera[1]=diffx;
+  boundsCamera[2]=0.0;
+  boundsCamera[3]=diffy;
+  boundsCamera[4]=0.0;
+  boundsCamera[5]=0.0;
 
-	m_LoadPage->GetRWI()->CameraReset(boundsCamera);
-	m_LoadPage->GetRWI()->CameraUpdate();
-	m_BuildPage->GetRWI()->CameraReset(boundsCamera);
-	m_BuildPage->GetRWI()->CameraUpdate();
+  m_CropPage->GetRWI()->CameraReset(boundsCamera);
+  m_CropPage->GetRWI()->CameraUpdate();
+  m_LoadPage->GetRWI()->CameraReset(boundsCamera);
+  m_LoadPage->GetRWI()->CameraUpdate();
+  m_BuildPage->GetRWI()->CameraReset(boundsCamera);
+  m_BuildPage->GetRWI()->CameraUpdate();
+  m_ReferenceSystemPage->GetRWI()->CameraReset(boundsCamera);
+  m_ReferenceSystemPage->GetRWI()->CameraUpdate();
 
 	//Modify name
 	double spacing[3];
 	int cropInterval = (m_ZCropBounds[1]+1 - m_ZCropBounds[0]);
 	m_SelectedSeriesSlicesList->Item(currImageId)->GetData()->GetVTKImageData()->GetSpacing(spacing);
+
 	double pixelDimX = diffx/spacing[0] + 1;
 	double pixelDimY = diffy/spacing[0] + 1;
 
@@ -2684,6 +2773,7 @@ void medOpImporterDicomOffis::CameraUpdate()
 	m_LoadPage->UpdateActor();
 	m_CropPage->UpdateActor();
 	m_BuildPage->UpdateActor();
+  m_ReferenceSystemPage->UpdateActor();
 }
 //----------------------------------------------------------------------------
 void medOpImporterDicomOffis::CameraReset()
@@ -2695,6 +2785,8 @@ void medOpImporterDicomOffis::CameraReset()
 	m_CropPage->UpdateWindowing();
 	m_BuildPage->GetRWI()->CameraReset();
 	m_BuildPage->UpdateWindowing();
+  m_ReferenceSystemPage->GetRWI()->CameraReset();
+  m_ReferenceSystemPage->UpdateWindowing();
 }
 //----------------------------------------------------------------------------
 void medOpImporterDicomOffis::EnableSliceSlider(bool enable)
@@ -2703,6 +2795,7 @@ void medOpImporterDicomOffis::EnableSliceSlider(bool enable)
 	m_LoadGuiLeft->Enable(ID_SCAN_SLICE,enable);
 	m_BuildGuiLeft->Enable(ID_SCAN_SLICE,enable);
 	m_CropGuiLeft->Enable(ID_SCAN_SLICE,enable);
+  m_ReferenceSystemGuiLeft->Enable(ID_SCAN_SLICE,enable);
 }
 //----------------------------------------------------------------------------
 void medOpImporterDicomOffis::EnableTimeSlider(bool enable)
@@ -2712,6 +2805,7 @@ void medOpImporterDicomOffis::EnableTimeSlider(bool enable)
 	{
 		m_LoadGuiLeft->Enable(ID_SCAN_TIME,enable);
 		m_BuildGuiLeft->Enable(ID_SCAN_TIME,enable);
+    m_ReferenceSystemGuiLeft->Enable(ID_SCAN_TIME,enable);
 		m_CropGuiLeft->Enable(ID_SCAN_TIME,enable);
 	}
 }
@@ -3977,6 +4071,21 @@ void medOpImporterDicomOffis::ResetSliders()
 		}
 		m_BuildPage->AddGuiLowerLeft(m_BuildGuiLeft);
 	}
+
+  if(m_ReferenceSystemGuiLeft)
+  {
+    m_ReferenceSystemPage->RemoveGuiLowerLeft(m_ReferenceSystemGuiLeft);
+    delete m_ReferenceSystemGuiLeft;
+    m_ReferenceSystemGuiLeft = new mafGUI(this);
+    m_SliceScannerReferenceSystemPage=m_ReferenceSystemGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_NumberOfSlices-1,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice());
+    m_SliceScannerReferenceSystemPage->SetPageSize(1);
+    if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
+    {
+      m_TimeScannerReferenceSystemPage=m_ReferenceSystemGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,m_NumberOfTimeFrames - 1);
+      m_TimeScannerReferenceSystemPage->SetPageSize(1);
+    }
+    m_ReferenceSystemPage->AddGuiLowerLeft(m_ReferenceSystemGuiLeft);
+  }
 }
 //----------------------------------------------------------------------------
 int medOpImporterDicomOffis::GetSliceIDInSeries(int timeId, int heigthId)
@@ -4553,6 +4662,14 @@ void medOpImporterDicomOffis::OnVmeTypeSelected()
 	{
 		m_OutputType = m_RadioButton+1;
 	}
+
+// if vmw type is image connect the reference system page
+  UpdateReferenceSystemPageConnection();
+}
+
+void medOpImporterDicomOffis::OnReferenceSystemSelected()
+{
+  ((medDicomSlice *)m_SelectedSeriesSlicesList->Item(0)->GetData())->SetReferenceSystem(m_SelectedReferenceSystem);
 }
 
 void medOpImporterDicomOffis::OnStudySelect()
@@ -4654,8 +4771,13 @@ void medOpImporterDicomOffis::OnWizardChangePage( mafEvent * e )
 		{
 			if(m_CropPage)
 				Crop();
-			m_Wizard->SetButtonString("Import >"); 
+
 			m_BuildPage->UpdateActor();
+      if(m_OutputType == medGUIDicomSettings::ID_IMAGE)// If vme type is image next step is reference system
+      {
+        m_Wizard->SetButtonString("Reference >");
+      }
+      
 			if(m_ZCropBounds[0] > m_CurrentSlice || m_CurrentSlice > m_ZCropBounds[1])
 			{
 				m_CurrentSlice = m_ZCropBounds[0];
@@ -4697,6 +4819,20 @@ void medOpImporterDicomOffis::OnWizardChangePage( mafEvent * e )
 		else
 			m_CropActor->VisibilityOff();
 	}
+
+  if (m_Wizard->GetCurrentPage()==m_BuildPage)//From build page to reference system page
+  {
+    m_Wizard->SetButtonString("Reference >");
+    m_ReferenceSystemPage->UpdateActor();
+    m_ReferenceSystemPage->GetRWI()->CameraReset();
+  }
+  if (m_Wizard->GetCurrentPage()==m_ReferenceSystemPage && (!e->GetBool()))//From reference system page to build page
+  {
+    m_Wizard->SetButtonString("Reference >");
+    m_BuildPage->UpdateActor();
+    m_BuildPage->GetRWI()->CameraReset();
+  }
+
 	GuiUpdate();
 }
 
@@ -4930,11 +5066,13 @@ void medOpImporterDicomOffis::OnRangeModified()
 	fractpart >= 0.5 ?  m_ZCropBounds[1] = ceil(minMax[1]) : m_ZCropBounds[1] = floor(minMax[1]);
 
 	m_SliceScannerBuildPage->SetRange(m_ZCropBounds[0], m_ZCropBounds[1]);
+  m_SliceScannerReferenceSystemPage->SetRange(m_ZCropBounds[0], m_ZCropBounds[1]);
 
 	if(m_ZCropBounds[0] > m_CurrentSlice || m_CurrentSlice > m_ZCropBounds[1])
 	{
 		m_CurrentSlice = m_ZCropBounds[0];
 		m_SliceScannerBuildPage->SetValue(m_CurrentSlice);
+    m_SliceScannerReferenceSystemPage->SetValue(m_CurrentSlice);
 		// show the current slice
 		int currImageId = GetSliceIDInSeries(m_CurrentTime, m_CurrentSlice);
 		if (currImageId != -1) 
@@ -4949,6 +5087,8 @@ void medOpImporterDicomOffis::OnRangeModified()
 		m_SliceScannerCropPage->Update();
 		m_SliceScannerBuildPage->SetValue(m_CurrentSlice);
 		m_SliceScannerBuildPage->Update();
+    m_SliceScannerReferenceSystemPage->SetValue(m_CurrentSlice);
+    m_SliceScannerReferenceSystemPage->Update();
 	}
 	GuiUpdate();
 }
@@ -4999,7 +5139,8 @@ void medOpImporterDicomOffis::OnScanSlice()
 	m_SliceScannerCropPage->Update();
 	m_SliceScannerBuildPage->SetValue(m_CurrentSlice);
 	m_SliceScannerBuildPage->Update();
-
+  m_SliceScannerReferenceSystemPage->SetValue(m_CurrentSlice);
+  m_SliceScannerReferenceSystemPage->Update();
 	// windows 7 64 bit / nvidia graphic card patch: otherwise scan slice will not work
 	// as expected and slices will be black while scanning until mouse dowin
 	// is performed in view
@@ -5019,6 +5160,13 @@ void medOpImporterDicomOffis::OnScanSlice()
 		m_BuildPage->UpdateActor();
 		m_BuildPage->GetRWI()->CameraUpdate();
 	}
+  else if (m_Wizard->GetCurrentPage()==m_ReferenceSystemPage)
+  {
+    m_SelectedReferenceSystem = ((medDicomSlice *)m_SelectedSeriesSlicesList->Item(m_CurrentSlice)->GetData())->GetReferenceSystem();
+    m_ReferenceSystemGuiUnderLeft->Update();
+    m_ReferenceSystemPage->UpdateActor();
+    m_ReferenceSystemPage->GetRWI()->CameraUpdate();
+  }
 	//</patch>
 	GuiUpdate();
 }
@@ -5038,6 +5186,8 @@ void medOpImporterDicomOffis::OnScanTime()
 	m_TimeScannerCropPage->Update();
 	m_TimeScannerBuildPage->SetValue(m_CurrentTime);
 	m_TimeScannerBuildPage->Update();
+  m_TimeScannerReferenceSystemPage->SetValue(m_CurrentTime);
+  m_TimeScannerReferenceSystemPage->Update();
 
 	GuiUpdate();
 
@@ -5060,6 +5210,11 @@ void medOpImporterDicomOffis::OnScanTime()
 		m_BuildPage->UpdateActor();
 		m_BuildPage->GetRWI()->CameraUpdate();
 	}
+  else if (m_Wizard->GetCurrentPage()==m_ReferenceSystemPage)
+  {
+    m_ReferenceSystemPage->UpdateActor();
+    m_ReferenceSystemPage->GetRWI()->CameraUpdate();
+  }
 
 	// </patch>
 
@@ -5146,4 +5301,17 @@ void medDicomSlice::GetOrientation( vtkMatrix4x4 * matrix )
 	matrix->SetElement(2,2,Vz2);
 	matrix->SetElement(3,2,0);
 	matrix->SetElement(3,3,1);
+}
+
+void medOpImporterDicomOffis::UpdateReferenceSystemPageConnection()
+{
+  if(m_OutputType == medGUIDicomSettings::ID_IMAGE)
+  {
+    m_BuildPage->SetNextPage(m_ReferenceSystemPage);
+  }
+  else
+  {
+    m_BuildPage->SetNext(NULL);
+    m_ReferenceSystemPage->SetPrev(NULL);
+  }
 }
