@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaVolumeMaterial.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-09-23 14:33:54 $
-  Version:   $Revision: 1.9.2.1 $
+  Date:      $Date: 2011-11-22 15:14:56 $
+  Version:   $Revision: 1.9.2.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -106,6 +106,7 @@ void mmaVolumeMaterial::DeepCopy(const mafAttribute *a)
   m_NumValues           = ((mmaVolumeMaterial *)a)->m_NumValues;
   m_InterpolationType   = ((mmaVolumeMaterial *)a)->m_InterpolationType;
   m_Shade               = ((mmaVolumeMaterial *)a)->m_Shade;
+  UpdateProp();
 }
 //----------------------------------------------------------------------------
 bool mmaVolumeMaterial::Equals(const mafAttribute *a)
