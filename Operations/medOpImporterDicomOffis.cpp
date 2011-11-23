@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2011-11-23 14:59:13 $
-Version:   $Revision: 1.1.2.147 $
+Date:      $Date: 2011-11-23 16:42:32 $
+Version:   $Revision: 1.1.2.148 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -4836,18 +4836,6 @@ void medOpImporterDicomOffis::OnWizardChangePage( mafEvent * e )
 			if(m_CropPage)
 				Crop();
 
-			UpdateReferenceSystemPageConnection();
-      if (/*m_Wizard->GetCurrentPage()==m_BuildPage &&*/ m_OutputType == medGUIDicomSettings::ID_IMAGE)//Check the type to determine the next step
-      {
-        m_Wizard->SetButtonString("Reference >");
-        m_ReferenceSystemPage->UpdateActor();
-        m_Wizard->Update();
-      }
-      else
-      {
-        m_Wizard->SetButtonString("Finish");
-        m_Wizard->Update();
-      }
       m_BuildPage->UpdateActor();
       
 			if(m_ZCropBounds[0] > m_CurrentSlice || m_CurrentSlice > m_ZCropBounds[1])
@@ -4861,9 +4849,22 @@ void medOpImporterDicomOffis::OnWizardChangePage( mafEvent * e )
 				m_BuildPage->AddGuiLowerUnderLeft(m_BuildGuiCenter);
 				m_BuildPage->Update();
 				GuiUpdate();
+        OnVmeTypeSelected();
 			}
 			else
 				m_OutputType = 2;
+
+      if (/*m_Wizard->GetCurrentPage()==m_BuildPage &&*/ m_OutputType == medGUIDicomSettings::ID_IMAGE)//Check the type to determine the next step
+      {
+        m_Wizard->SetButtonString("Reference >");
+        m_ReferenceSystemPage->UpdateActor();
+        m_Wizard->Update();
+      }
+      else
+      {
+        m_Wizard->SetButtonString("Finish");
+        m_Wizard->Update();
+      }
 		} 
 		else
 		{
@@ -4892,9 +4893,9 @@ void medOpImporterDicomOffis::OnWizardChangePage( mafEvent * e )
 			m_CropActor->VisibilityOff();
 	}
 
-  if (m_Wizard->GetCurrentPage()==m_BuildPage)//From build page to reference system page
+  if (m_Wizard->GetCurrentPage()==m_BuildPage && e->GetBool())//From build page to reference system page
   {
-    m_Wizard->SetButtonString("Reference >");
+    //m_Wizard->SetButtonString("Reference >");
     m_ReferenceSystemPage->UpdateActor();
     m_ReferenceSystemPage->GetRWI()->CameraReset();
   }
