@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2011-11-21 14:15:18 $
-Version:   $Revision: 1.1.2.59 $
+Date:      $Date: 2011-11-23 10:45:41 $
+Version:   $Revision: 1.1.2.60 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -267,6 +267,9 @@ protected:
 
   /** Reference system page is shown only if image is the vme output type */
   void UpdateReferenceSystemPageConnection();
+
+  /** Apply transform according to the specified reference system */
+  void ApplyReferenceSystem();
 
 	vtkDirectory			*m_DICOMDirectoryReader; 
 	vtkWindowLevelLookupTable	*m_SliceLookupTable;
@@ -584,7 +587,6 @@ public:
       m_ReferenceSystem = ID_RS_XY;
     } // Otherwise keep the old value
   };
-
 
 protected:
 	double m_DcmImagePositionPatient[3];

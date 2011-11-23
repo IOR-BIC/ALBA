@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2011-11-22 16:33:08 $
-Version:   $Revision: 1.1.2.145 $
+Date:      $Date: 2011-11-23 10:45:41 $
+Version:   $Revision: 1.1.2.146 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -71,6 +71,7 @@ MafMedical is partially based on OpenMAF.
 #include "mafSmartPointer.h"
 #include "mafVMEMesh.h"
 #include "mafVMEGroup.h"
+#include "mafMatrixPipe.h"
 
 #include "vtkMAFVolumeResample.h"
 #include "vtkMAFSmartPointer.h"
@@ -568,6 +569,10 @@ int medOpImporterDicomOffis::RunWizard()
 					result = BuildOutputVMEImagesFromDicom();
 				else
 					result = BuildOutputVMEImagesFromDicomCineMRI();
+
+        // if output is an image
+        ApplyReferenceSystem();
+
 				break;
 			}
 		}
@@ -5315,4 +5320,112 @@ void medOpImporterDicomOffis::UpdateReferenceSystemPageConnection()
     m_BuildPage->SetNext(NULL);
     m_ReferenceSystemPage->SetPrev(NULL);
   }
+}
+
+void medOpImporterDicomOffis::ApplyReferenceSystem()
+{
+  // Apply reference system to dicom slices
+    
+  // Operate on patient position
+
+  // This step will be executed after output build
+  // So it apply only transform on the images mafMatrix!
+
+  // create the transform matrix
+
+  // 
+  // xy->xy
+  // no transform
+  vtkTransform *xy2xy = vtkTransform::New();
+  if(!m_SwapReferenceSystem)
+  {
+    //No transform
+  }
+  else
+  {
+    xy2xy->RotateY(180);
+    xy2xy->RotateZ(90);
+  }
+  xy2xy->Update();
+
+  //xy->xz
+  vtkTransform *xy2xz = vtkTransform::New();
+
+  if(!m_SwapReferenceSystem)
+  {
+    xy2xz->RotateX(90);
+  }
+  else
+  {
+    xy2xz->RotateX(-90);
+    xy2xz->RotateZ(-90);
+  }
+  xy2xz->Update();
+
+  //xy->yz
+  vtkTransform *xy2yz = vtkTransform::New();
+  if(!m_SwapReferenceSystem)
+  {
+    //xy2yz->RotateWXYZ(-90,0,1,1);
+    xy2yz->RotateY(90);
+    xy2yz->RotateZ(90);
+  }
+  else
+  {
+    xy2yz->RotateY(-90);
+  }
+  xy2yz->Update();
+  
+  for(int s = 0; s < m_SelectedSeriesSlicesList->size(); s++)
+  {
+    medDicomSlice* currSlice =  (medDicomSlice*)(m_SelectedSeriesSlicesList->Item(s)->GetData());
+
+    // Get the reference system
+    int refSys = currSlice->GetReferenceSystem();
+    
+    if(refSys != medDicomSlice::ID_RS_XY || m_SwapReferenceSystem)
+    {
+      mafVMEImage* image = mafVMEImage::SafeDownCast(m_ImagesGroup->GetChild(s));
+      mafTimeStamp dcmTriggerTime = (mafTimeStamp)(currSlice->GetDcmTriggerTime());
+
+      vtkTransform *dummyTransform = vtkTransform::New();
+      switch(refSys)
+      {
+        case medDicomSlice::ID_RS_XY:
+          {
+            // Flip Y with Z
+            //dummyTransform->DeepCopy(xy2xy);
+            dummyTransform->SetMatrix(xy2xy->GetMatrix());
+          }break;
+        case medDicomSlice::ID_RS_XZ:
+          {
+            // Flip Y with Z
+            //dummyTransform->DeepCopy(xy2xz);
+            dummyTransform->SetMatrix(xy2xz->GetMatrix());
+          }break;
+        case medDicomSlice::ID_RS_YZ:
+          {
+            // Flip X with Y
+            //dummyTransform->DeepCopy(xy2yz);
+            dummyTransform->SetMatrix(xy2yz->GetMatrix());
+          }break;
+      }
+      
+      dummyTransform->PostMultiply();
+      dummyTransform->Concatenate(image->GetMatrixPipe()->GetMatrix().GetVTKMatrix());
+      dummyTransform->Update();
+
+      mafSmartPointer<mafTransform> boxPose;
+      boxPose->SetMatrix(dummyTransform->GetMatrix());
+      boxPose->Update();
+
+      image->SetAbsMatrix(boxPose->GetMatrix());
+      image->Update();
+
+      dummyTransform->Delete();
+    }
+  }
+  xy2xy->Delete();
+  xy2xz->Delete();
+  xy2yz->Delete();
 }
