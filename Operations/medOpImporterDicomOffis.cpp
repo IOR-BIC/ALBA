@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2011-11-23 10:45:41 $
-Version:   $Revision: 1.1.2.146 $
+Date:      $Date: 2011-11-23 14:59:13 $
+Version:   $Revision: 1.1.2.147 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -219,6 +219,7 @@ enum DICOM_IMPORTER_GUI_ID
   ID_SORT_AXIS,
   ID_RS_SELECT,
   ID_RS_SWAP,
+  ID_RS_SWAPALL,
   ID_RS_APPLYTOALL,
 };
 enum VOLUME_SIDE
@@ -352,7 +353,9 @@ mafOp(label)
 	m_ApplyRotation = false;
 
   m_SelectedReferenceSystem = medDicomSlice::ID_RS_XY;
+  m_GlobalReferenceSystem = medDicomSlice::ID_RS_XY;
   m_SwapReferenceSystem = FALSE;
+  m_SwapAllReferenceSystem = FALSE;
   m_ApplyToAllReferenceSystem = FALSE;
 
 }
@@ -2268,6 +2271,7 @@ void medOpImporterDicomOffis::CreateReferenceSystemPage()
   //m_ReferenceSystemGuiCenter->Divider();
   m_ReferenceSystemGuiUnderLeft->Radio(ID_RS_SELECT,"ref.sys.",&m_SelectedReferenceSystem,3,choices,1,"Select reference system for image position and orientation.");
   m_ReferenceSystemGuiUnderLeft->Bool(ID_RS_SWAP,"swap",&m_SwapReferenceSystem,1,"specify if the reference system is swapped or not (e.g. xy to yx)");
+  m_ReferenceSystemGuiUnderLeft->Bool(ID_RS_SWAPALL,"swap all",&m_SwapAllReferenceSystem,1,"specify if the reference system is swapped or not (e.g. xy to yx)");
   m_ReferenceSystemGuiUnderLeft->Bool(ID_RS_APPLYTOALL,"apply to all",&m_ApplyToAllReferenceSystem,1,"specify if the current reference system is applied to all images");
   m_ReferenceSystemGuiLeft->FitGui();
   m_ReferenceSystemGuiUnderLeft->FitGui();
@@ -2633,6 +2637,37 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
     case ID_RS_SELECT:
       {
         OnReferenceSystemSelected();
+      }
+      break;
+    case ID_RS_SWAP:
+      {
+        OnSwapReferenceSystemSelected();
+      }
+      break;
+    case ID_RS_APPLYTOALL:
+      {
+        if(m_ApplyToAllReferenceSystem)
+        {
+          m_ReferenceSystemGuiUnderLeft->Enable(ID_RS_SWAP,false);
+          m_SwapAllReferenceSystem = m_SwapReferenceSystem;
+          m_GlobalReferenceSystem = m_SelectedReferenceSystem;
+        }
+        else
+        {
+          m_ReferenceSystemGuiUnderLeft->Enable(ID_RS_SWAP,true);
+        }
+//         UpdateReferenceSystemVariables();
+//         m_ReferenceSystemGuiUnderLeft->Update();
+//         m_ReferenceSystemPage->Update();
+//         m_ReferenceSystemPage->UpdateActor();
+      }
+      // BEWARE NO BRAK!!! break;
+    case ID_RS_SWAPALL:
+      {
+        UpdateReferenceSystemVariables();
+        m_ReferenceSystemGuiUnderLeft->Update();
+        m_ReferenceSystemPage->Update();
+        m_ReferenceSystemPage->UpdateActor();
       }
       break;
 		default:
@@ -4675,7 +4710,30 @@ void medOpImporterDicomOffis::OnVmeTypeSelected()
 
 void medOpImporterDicomOffis::OnReferenceSystemSelected()
 {
-  ((medDicomSlice *)m_SelectedSeriesSlicesList->Item(0)->GetData())->SetReferenceSystem(m_SelectedReferenceSystem);
+  if(!m_ApplyToAllReferenceSystem)
+  {
+    ((medDicomSlice *)m_SelectedSeriesSlicesList->Item(0)->GetData())->SetReferenceSystem(m_SelectedReferenceSystem);
+
+  }
+  else
+  {
+    m_GlobalReferenceSystem = m_SelectedReferenceSystem;
+  }
+
+}
+void medOpImporterDicomOffis::OnSwapReferenceSystemSelected()
+{
+  if(!m_ApplyToAllReferenceSystem)
+  {
+    ((medDicomSlice *)m_SelectedSeriesSlicesList->Item(0)->GetData())->SetSwapReferenceSystem(m_SwapReferenceSystem);
+  }
+  else// if(m_ApplyToAllReferenceSystem)
+  {
+    m_SwapAllReferenceSystem = m_SwapReferenceSystem;
+    m_ReferenceSystemGuiUnderLeft->Update();
+    m_ReferenceSystemPage->Update();
+    m_ReferenceSystemPage->UpdateActor();
+  }
 }
 
 void medOpImporterDicomOffis::OnStudySelect()
@@ -4778,11 +4836,19 @@ void medOpImporterDicomOffis::OnWizardChangePage( mafEvent * e )
 			if(m_CropPage)
 				Crop();
 
-			m_BuildPage->UpdateActor();
-      if(m_OutputType == medGUIDicomSettings::ID_IMAGE)// If vme type is image next step is reference system
+			UpdateReferenceSystemPageConnection();
+      if (/*m_Wizard->GetCurrentPage()==m_BuildPage &&*/ m_OutputType == medGUIDicomSettings::ID_IMAGE)//Check the type to determine the next step
       {
         m_Wizard->SetButtonString("Reference >");
+        m_ReferenceSystemPage->UpdateActor();
+        m_Wizard->Update();
       }
+      else
+      {
+        m_Wizard->SetButtonString("Finish");
+        m_Wizard->Update();
+      }
+      m_BuildPage->UpdateActor();
       
 			if(m_ZCropBounds[0] > m_CurrentSlice || m_CurrentSlice > m_ZCropBounds[1])
 			{
@@ -5168,13 +5234,35 @@ void medOpImporterDicomOffis::OnScanSlice()
 	}
   else if (m_Wizard->GetCurrentPage()==m_ReferenceSystemPage)
   {
-    m_SelectedReferenceSystem = ((medDicomSlice *)m_SelectedSeriesSlicesList->Item(m_CurrentSlice)->GetData())->GetReferenceSystem();
+    UpdateReferenceSystemVariables();
     m_ReferenceSystemGuiUnderLeft->Update();
+    m_ReferenceSystemPage->Update();
     m_ReferenceSystemPage->UpdateActor();
     m_ReferenceSystemPage->GetRWI()->CameraUpdate();
   }
 	//</patch>
 	GuiUpdate();
+}
+
+void medOpImporterDicomOffis::UpdateReferenceSystemVariables()
+{
+  if(!m_ApplyToAllReferenceSystem)
+  {
+    m_SelectedReferenceSystem = ((medDicomSlice *)m_SelectedSeriesSlicesList->Item(m_CurrentSlice)->GetData())->GetReferenceSystem();
+    if(!m_SwapAllReferenceSystem)
+    {
+      m_SwapReferenceSystem = ((medDicomSlice *)m_SelectedSeriesSlicesList->Item(m_CurrentSlice)->GetData())->GetSwapReferenceSystem();
+    }
+    else
+    {
+      m_SwapReferenceSystem = m_SwapAllReferenceSystem;
+    }
+  }
+  else
+  {
+    m_SelectedReferenceSystem = m_GlobalReferenceSystem;
+    m_SwapReferenceSystem = m_SwapAllReferenceSystem;
+  }
 }
 
 void medOpImporterDicomOffis::OnScanTime()
@@ -5333,6 +5421,7 @@ void medOpImporterDicomOffis::ApplyReferenceSystem()
 
   // create the transform matrix
 
+  /**
   // 
   // xy->xy
   // no transform
@@ -5375,17 +5464,29 @@ void medOpImporterDicomOffis::ApplyReferenceSystem()
     xy2yz->RotateY(-90);
   }
   xy2yz->Update();
+  */
   
   for(int s = 0; s < m_SelectedSeriesSlicesList->size(); s++)
   {
     medDicomSlice* currSlice =  (medDicomSlice*)(m_SelectedSeriesSlicesList->Item(s)->GetData());
 
     // Get the reference system
-    int refSys = currSlice->GetReferenceSystem();
-    
-    if(refSys != medDicomSlice::ID_RS_XY || m_SwapReferenceSystem)
+    int refSys;
+    if(!m_ApplyToAllReferenceSystem)
     {
-      mafVMEImage* image = mafVMEImage::SafeDownCast(m_ImagesGroup->GetChild(s));
+      refSys = currSlice->GetReferenceSystem();
+    }
+    else
+    {
+      refSys = m_GlobalReferenceSystem;
+    }
+
+    // Get the swap variable
+    int swap = currSlice->GetSwapReferenceSystem() || m_SwapAllReferenceSystem;
+    
+    mafVMEImage* image = mafVMEImage::SafeDownCast(m_ImagesGroup->GetChild(s));
+    if((refSys != medDicomSlice::ID_RS_XY || swap) && (image != NULL))
+    {
       mafTimeStamp dcmTriggerTime = (mafTimeStamp)(currSlice->GetDcmTriggerTime());
 
       vtkTransform *dummyTransform = vtkTransform::New();
@@ -5395,23 +5496,45 @@ void medOpImporterDicomOffis::ApplyReferenceSystem()
           {
             // Flip Y with Z
             //dummyTransform->DeepCopy(xy2xy);
-            dummyTransform->SetMatrix(xy2xy->GetMatrix());
+            if(swap)
+            {
+              dummyTransform->RotateY(180);
+              dummyTransform->RotateZ(90);
+            }
+            
           }break;
         case medDicomSlice::ID_RS_XZ:
           {
             // Flip Y with Z
             //dummyTransform->DeepCopy(xy2xz);
-            dummyTransform->SetMatrix(xy2xz->GetMatrix());
+            if(!swap)
+            {
+              dummyTransform->RotateX(90);
+            }
+            else
+            {
+              dummyTransform->RotateX(-90);
+              dummyTransform->RotateZ(-90);
+            }
           }break;
         case medDicomSlice::ID_RS_YZ:
           {
             // Flip X with Y
             //dummyTransform->DeepCopy(xy2yz);
-            dummyTransform->SetMatrix(xy2yz->GetMatrix());
+            if(!swap)
+            {
+              //xy2yz->RotateWXYZ(-90,0,1,1);
+              dummyTransform->RotateY(90);
+              dummyTransform->RotateZ(90);
+            }
+            else
+            {
+              dummyTransform->RotateY(-90);
+            }
           }break;
       }
-      
-      dummyTransform->PostMultiply();
+      dummyTransform->Update();
+      dummyTransform->PreMultiply();
       dummyTransform->Concatenate(image->GetMatrixPipe()->GetMatrix().GetVTKMatrix());
       dummyTransform->Update();
 
@@ -5425,7 +5548,4 @@ void medOpImporterDicomOffis::ApplyReferenceSystem()
       dummyTransform->Delete();
     }
   }
-  xy2xy->Delete();
-  xy2xz->Delete();
-  xy2yz->Delete();
 }

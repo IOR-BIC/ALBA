@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2011-11-23 10:45:41 $
-Version:   $Revision: 1.1.2.60 $
+Date:      $Date: 2011-11-23 14:59:13 $
+Version:   $Revision: 1.1.2.61 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -177,6 +177,8 @@ protected:
 	void OnStudySelect();
 	void OnVmeTypeSelected();
   void OnReferenceSystemSelected();
+  void OnSwapReferenceSystemSelected();
+  void UpdateReferenceSystemVariables();
 
 	/** Create load page and his GUI for the wizard. */
 	void CreateLoadPage();
@@ -375,7 +377,9 @@ protected:
 	int m_RescaleTo16Bit;
   int m_SelectedReferenceSystem;  ///< Specify the reference system (xy xz yx)
   int m_SwapReferenceSystem;      ///< Specify the if the reference system is swapped or not (e.g xy to yx)
+  int m_SwapAllReferenceSystem;   ///< Specify the if the reference system is swapped or not (e.g xy to yx)
   int m_ApplyToAllReferenceSystem;///< Specify if the current refernce system is applyed to all images
+  int m_GlobalReferenceSystem;    ///< Global reference system if apply to all is selected
 
 	mafVMEImage				*m_Image;
 	mafVMEVolumeGray	*m_Volume;
@@ -429,6 +433,7 @@ public:
 		m_DcmCardiacNumberOfImages = -1;
 		m_Data = NULL;
     m_ReferenceSystem = ID_RS_XY;
+    SetSwapReferenceSystem(FALSE);
 	};
 
 	/** overloaded constructor */
@@ -465,6 +470,7 @@ public:
 		}
 
     SetReferenceSystem(referenceSystem);
+    SetSwapReferenceSystem(FALSE);
 	};
 
 	/** destructor */
@@ -588,6 +594,22 @@ public:
     } // Otherwise keep the old value
   };
 
+  /** Set if reference system is swapped */
+  void SetSwapReferenceSystem(int swap)
+  {
+    if(swap != FALSE)
+    {
+      swap = TRUE;
+    }
+    m_SwapReferenceSystem = swap;
+  };
+
+  /** Set if reference system is swapped */
+  int GetSwapReferenceSystem()
+  {
+    return m_SwapReferenceSystem;
+  };
+
 protected:
 	double m_DcmImagePositionPatient[3];
   double m_DcmImagePositionPatientOriginal[3];
@@ -602,7 +624,7 @@ protected:
 
 	vtkImageData *m_Data;
 
-  int m_ReferenceSystem; //< Store information about the selected reference system (xy, xz, yx). see ID_REFERENCE_SYSTEM enum
-
+  int m_ReferenceSystem;  ///< Store information about the selected reference system (xy, xz, yx). see ID_REFERENCE_SYSTEM enum
+  int m_SwapReferenceSystem;
 };
 #endif
