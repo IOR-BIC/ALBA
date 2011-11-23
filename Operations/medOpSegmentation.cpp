@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2011-09-12 12:15:37 $
-Version:   $Revision: 1.1.2.12 $
+Date:      $Date: 2011-11-23 10:57:15 $
+Version:   $Revision: 1.1.2.13 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
@@ -561,7 +561,7 @@ void medOpSegmentation::CreateOpDialog()
 
   
 
-  m_SegmentationOperationsRollOut[AUTOMATIC_SEGMENTATION]   = m_GuiDialog->RollOut(ID_AUTO_SEGMENTATION, "Automatic Segmentation", m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION], false);
+  m_SegmentationOperationsRollOut[AUTOMATIC_SEGMENTATION]   = m_GuiDialog->RollOut(ID_AUTO_SEGMENTATION, "Thresholding", m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION], false);
   m_SegmentationOperationsRollOut[MANUAL_SEGMENTATION]      = m_GuiDialog->RollOut(ID_MANUAL_SEGMENTATION, "Manual Segmentation", m_SegmentationOperationsGui[MANUAL_SEGMENTATION], false);
   m_SegmentationOperationsRollOut[REFINEMENT_SEGMENTATION]  = m_GuiDialog->RollOut(ID_REFINEMENT, "Segmentation Refinement", m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION], false);
   m_SegmentationOperationsRollOut[LOAD_SEGMENTATION]        = m_GuiDialog->RollOut(ID_LOAD_SEGMENTATION, "Load Segmentation", m_SegmentationOperationsGui[LOAD_SEGMENTATION], false);
@@ -1216,12 +1216,14 @@ void medOpSegmentation::CreateRefinementGui()
   int text_w   = 45*0.8;
   int slider_w = 60;
 
-  wxTextCtrl *refinementRegionSizeText = new wxTextCtrl (currentGui, w_id, "", wxDefaultPosition, wxSize(text_w,  18), wxSUNKEN_BORDER);
+  wxTextCtrl *refinementRegionSizeText = new wxTextCtrl (currentGui, w_id, "", wxDefaultPosition, wxSize(text_w,  18), wxSUNKEN_BORDER,wxDefaultValidator,"Size:");
+  
   wxSlider *sli = new wxSlider(currentGui, w_id,1,1,stepsNumber, wxDefaultPosition, wxSize(slider_w,18));
   sli->SetValidator(mafGUIValidator(currentGui,w_id,sli,&m_RefinementRegionsSize,refinementRegionSizeText));
   refinementRegionSizeText->SetValidator(mafGUIValidator(currentGui,w_id,refinementRegionSizeText,&m_RefinementRegionsSize,sli,1,stepsNumber)); //- if uncommented, remove also wxTE_READONLY from the text (in both places)
-
+  wxStaticText *sizeText = new wxStaticText(currentGui,w_id,"Size: ");
   wxBoxSizer *regionSizeSizer = new wxBoxSizer(wxHORIZONTAL);
+  regionSizeSizer->Add(sizeText,0);
   regionSizeSizer->Add(refinementRegionSizeText, 0);
   regionSizeSizer->Add(sli,  0);
 
