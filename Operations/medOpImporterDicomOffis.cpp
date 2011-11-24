@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2011-11-23 16:42:32 $
-Version:   $Revision: 1.1.2.148 $
+Date:      $Date: 2011-11-24 10:08:12 $
+Version:   $Revision: 1.1.2.149 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -2648,22 +2648,21 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
       {
         if(m_ApplyToAllReferenceSystem)
         {
-          m_ReferenceSystemGuiUnderLeft->Enable(ID_RS_SWAP,false);
           m_SwapAllReferenceSystem = m_SwapReferenceSystem;
           m_GlobalReferenceSystem = m_SelectedReferenceSystem;
+        }
+      }
+      // BEWARE NO BRAK!!! break;
+    case ID_RS_SWAPALL:
+      {
+        if(m_SwapAllReferenceSystem || m_ApplyToAllReferenceSystem)
+        {
+          m_ReferenceSystemGuiUnderLeft->Enable(ID_RS_SWAP,false);
         }
         else
         {
           m_ReferenceSystemGuiUnderLeft->Enable(ID_RS_SWAP,true);
         }
-//         UpdateReferenceSystemVariables();
-//         m_ReferenceSystemGuiUnderLeft->Update();
-//         m_ReferenceSystemPage->Update();
-//         m_ReferenceSystemPage->UpdateActor();
-      }
-      // BEWARE NO BRAK!!! break;
-    case ID_RS_SWAPALL:
-      {
         UpdateReferenceSystemVariables();
         m_ReferenceSystemGuiUnderLeft->Update();
         m_ReferenceSystemPage->Update();
@@ -4712,7 +4711,7 @@ void medOpImporterDicomOffis::OnReferenceSystemSelected()
 {
   if(!m_ApplyToAllReferenceSystem)
   {
-    ((medDicomSlice *)m_SelectedSeriesSlicesList->Item(0)->GetData())->SetReferenceSystem(m_SelectedReferenceSystem);
+    ((medDicomSlice *)m_SelectedSeriesSlicesList->Item(m_CurrentSlice)->GetData())->SetReferenceSystem(m_SelectedReferenceSystem);
 
   }
   else
@@ -4725,7 +4724,7 @@ void medOpImporterDicomOffis::OnSwapReferenceSystemSelected()
 {
   if(!m_ApplyToAllReferenceSystem)
   {
-    ((medDicomSlice *)m_SelectedSeriesSlicesList->Item(0)->GetData())->SetSwapReferenceSystem(m_SwapReferenceSystem);
+    ((medDicomSlice *)m_SelectedSeriesSlicesList->Item(m_CurrentSlice)->GetData())->SetSwapReferenceSystem(m_SwapReferenceSystem);
   }
   else// if(m_ApplyToAllReferenceSystem)
   {
