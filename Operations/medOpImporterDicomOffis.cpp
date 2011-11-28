@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2011-11-24 10:08:12 $
-Version:   $Revision: 1.1.2.149 $
+Date:      $Date: 2011-11-28 14:07:34 $
+Version:   $Revision: 1.1.2.150 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -2090,7 +2090,7 @@ void medOpImporterDicomOffis::CreateLoadPage()
 	  loadGuiCenter->Radio(ID_SORT_AXIS,_("Sort type:"),&m_SortAxes,3,choices);
   }
 
-	m_SliceScannerLoadPage=m_LoadGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_CurrentSlice,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice());
+	m_SliceScannerLoadPage=m_LoadGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_CurrentSlice,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice() != FALSE);
 	m_SliceScannerLoadPage->SetPageSize(1);
 	if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
 	{
@@ -2122,13 +2122,13 @@ void medOpImporterDicomOffis::CreateLoadPage()
 void medOpImporterDicomOffis::CreateCropPage()
 //----------------------------------------------------------------------------
 {
-	m_ZCrop = ((medGUIDicomSettings*)GetSetting())->EnableZCrop();
+	m_ZCrop = ((medGUIDicomSettings*)GetSetting())->EnableZCrop() != FALSE;
 	m_CropPage = new medGUIWizardPageNew(m_Wizard,medUSEGUI|medUSERWI,m_ZCrop);
 	m_CropPage->SetListener(this);
 	m_CropGuiLeft = new mafGUI(this);
 	m_CropGuiCenter = new mafGUI(this);
 
-	m_SliceScannerCropPage=m_CropGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,VTK_INT_MAX,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice());
+	m_SliceScannerCropPage=m_CropGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,VTK_INT_MAX,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice() != FALSE);
 	m_SliceScannerCropPage->SetPageSize(1);
 	if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
 	{
@@ -2164,7 +2164,7 @@ void medOpImporterDicomOffis::CreateBuildPage()
 	m_BuildGuiUnderLeft = new mafGUI(this);
 	m_BuildGuiCenter = new mafGUI(this);
 
-	m_SliceScannerBuildPage=m_BuildGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,VTK_INT_MAX,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice());
+	m_SliceScannerBuildPage=m_BuildGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,VTK_INT_MAX,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice() != FALSE);
 	m_SliceScannerBuildPage->SetPageSize(1);
 
 	m_TimeScannerBuildPage=m_BuildGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,VTK_INT_MAX);
@@ -2257,7 +2257,7 @@ void medOpImporterDicomOffis::CreateReferenceSystemPage()
   m_ReferenceSystemGuiUnderLeft = new mafGUI(this);
   //m_ReferenceSystemGuiCenter = new mafGUI(this);
 
-  m_SliceScannerReferenceSystemPage=m_ReferenceSystemGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,VTK_INT_MAX,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice());
+  m_SliceScannerReferenceSystemPage=m_ReferenceSystemGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,VTK_INT_MAX,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice() != FALSE);
   m_SliceScannerReferenceSystemPage->SetPageSize(1);
 
   m_TimeScannerReferenceSystemPage=m_ReferenceSystemGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,VTK_INT_MAX);
@@ -3029,8 +3029,8 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 
 	if(!this->m_TestMode)
 	{
-		enableScalarTolerance = ((medGUIDicomSettings*)GetSetting())->EnableScalarTolerance();
-		enablePercentageTolerance = ((medGUIDicomSettings*)GetSetting())->EnablePercentageTolerance();
+		enableScalarTolerance = ((medGUIDicomSettings*)GetSetting())->EnableScalarTolerance() != FALSE;
+		enablePercentageTolerance = ((medGUIDicomSettings*)GetSetting())->EnablePercentageTolerance() != FALSE;
 
 		if (enableScalarTolerance)
 			scalarTolerance = ((medGUIDicomSettings*)GetSetting())->GetScalarTolerance();
@@ -3071,6 +3071,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 	}
 
 	// foreach dicom directory file
+  int img_pos_result = wxNO; // added by Losi to avoid exiting series without image position
 	for (i=0; i < m_DICOMDirectoryReader->GetNumberOfFiles(); i++)
 	{
 		time(&start);
@@ -3409,9 +3410,9 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 						stringStream << "Cannot read dicom tag DCM_ImagePositionPatient. Exiting"<< std::endl;          
 						mafLogMessage(stringStream.str().c_str());
 
-            int result = wxMessageBox(_("Cannot read dicom tag DCM_ImagePositionPatient. Would you like to use default position"), "", wxYES_NO);
+            img_pos_result = wxMessageBox(_("Cannot read dicom tag DCM_ImagePositionPatient. Would you like to use default position"), "", wxYES_NO);
 
-            if (result == wxNO)
+            if (img_pos_result == wxNO)
             {
               delete busyInfo;
               return false;
@@ -3485,7 +3486,18 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 						std::ostringstream stringStream;
 						stringStream << "Cannot read dicom tag DCM_ImagePositionPatient. Exiting"<< std::endl;          
 						mafLogMessage(stringStream.str().c_str());
-						return false;
+            
+            if (img_pos_result == wxNO) // Added by losi to avoid exiting with series that don't have image position
+            {
+              delete busyInfo;
+              return false;
+            }
+            else
+            {
+              dcmImagePositionPatient[0] = 0.0;
+              dcmImagePositionPatient[1] = 0.0;
+              dcmImagePositionPatient[2] = 0.0;
+            }
 					} 
 					else
 					{
@@ -4071,7 +4083,7 @@ void medOpImporterDicomOffis::ResetSliders()
 		m_LoadPage->RemoveGuiLowerLeft(m_LoadGuiLeft);
 		delete m_LoadGuiLeft;
 		m_LoadGuiLeft = new mafGUI(this);
-		m_SliceScannerLoadPage=m_LoadGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_NumberOfSlices-1,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice());
+		m_SliceScannerLoadPage=m_LoadGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_NumberOfSlices-1,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice() != FALSE);
 		m_SliceScannerLoadPage->SetPageSize(1);
 		if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
 		{
@@ -4086,7 +4098,7 @@ void medOpImporterDicomOffis::ResetSliders()
 		m_CropPage->RemoveGuiLowerLeft(m_CropGuiLeft);
 		delete m_CropGuiLeft;
 		m_CropGuiLeft = new mafGUI(this);
-		m_SliceScannerCropPage=m_CropGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_NumberOfSlices-1,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice());
+		m_SliceScannerCropPage=m_CropGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_NumberOfSlices-1,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice() != FALSE);
 		m_SliceScannerCropPage->SetPageSize(1);
 		if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
 		{
@@ -4102,7 +4114,7 @@ void medOpImporterDicomOffis::ResetSliders()
 		m_BuildPage->RemoveGuiLowerLeft(m_BuildGuiLeft);
 		delete m_BuildGuiLeft;
 		m_BuildGuiLeft = new mafGUI(this);
-		m_SliceScannerBuildPage=m_BuildGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_NumberOfSlices-1,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice());
+		m_SliceScannerBuildPage=m_BuildGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_NumberOfSlices-1,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice() != FALSE);
 		m_SliceScannerBuildPage->SetPageSize(1);
 		if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
 		{
@@ -4117,7 +4129,7 @@ void medOpImporterDicomOffis::ResetSliders()
     m_ReferenceSystemPage->RemoveGuiLowerLeft(m_ReferenceSystemGuiLeft);
     delete m_ReferenceSystemGuiLeft;
     m_ReferenceSystemGuiLeft = new mafGUI(this);
-    m_SliceScannerReferenceSystemPage=m_ReferenceSystemGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_NumberOfSlices-1,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice());
+    m_SliceScannerReferenceSystemPage=m_ReferenceSystemGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_NumberOfSlices-1,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice() != FALSE);
     m_SliceScannerReferenceSystemPage->SetPageSize(1);
     if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
     {
