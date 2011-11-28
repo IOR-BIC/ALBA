@@ -39,6 +39,11 @@ execute_process(
 
 execute_process(
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/qa/doc_output
+  COMMAND ${CMAKE_COMMAND} -E remove_directory vtkMAF2Doxyfile
+)
+
+execute_process(
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/qa/doc_output
   COMMAND ${DOXYGEN_EXECUTABLE} MAF2Doxyfile
 )
 
