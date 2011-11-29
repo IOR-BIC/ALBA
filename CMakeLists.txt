@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2011-11-11 15:16:44 $
-# Version:   $Revision: 1.12.2.7 $
+# Date:      $Date: 2011-11-29 09:04:19 $
+# Version:   $Revision: 1.12.2.8 $
 #
 # Description:
 # CMake Project file for the Medical Library.
@@ -53,9 +53,17 @@ ENDIF(WIN32)
 OPTION(BUILD_EXAMPLES "Build examples." ON )
 OPTION(BUILD_TESTING "Build the testing tree." OFF)
 OPTION(BUILD_IPOSE "Build iPose application." OFF)
+OPTION(MED_QA "Generate QA" OFF)
 
 
 SET (CONFIGURE_ERROR 0)
+
+#-----------------------------------------------------------------------------
+# QA stuff
+#-----------------------------------------------------------------------------
+IF(MED_QA)
+  SUBDIRS(qa)
+ENDIF(MED_QA)
 
 #-----------------------------------------------------------------------------
 # If MAF found or configure continue with MED Configuration
