@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2011-11-23 14:59:13 $
-Version:   $Revision: 1.1.2.61 $
+Date:      $Date: 2011-12-01 15:12:40 $
+Version:   $Revision: 1.1.2.62 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -385,6 +385,7 @@ protected:
 	mafVMEVolumeGray	*m_Volume;
 
 	mafGUICheckListBox *m_DicomModalityListBox;
+  int m_CurrentImageID;
 
 	/** destructor */
 	~medOpImporterDicomOffis();

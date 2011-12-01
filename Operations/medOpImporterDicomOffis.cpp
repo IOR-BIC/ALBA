@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2011-11-28 14:07:34 $
-Version:   $Revision: 1.1.2.150 $
+Date:      $Date: 2011-12-01 15:12:40 $
+Version:   $Revision: 1.1.2.151 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -357,6 +357,8 @@ mafOp(label)
   m_SwapReferenceSystem = FALSE;
   m_SwapAllReferenceSystem = FALSE;
   m_ApplyToAllReferenceSystem = FALSE;
+
+  m_CurrentImageID = 0;
 
 }
 //----------------------------------------------------------------------------
@@ -2810,10 +2812,22 @@ void medOpImporterDicomOffis::AutoPositionCropPlane()
 void medOpImporterDicomOffis::CameraUpdate()
 //----------------------------------------------------------------------------
 {
-	m_LoadPage->UpdateActor();
-	m_CropPage->UpdateActor();
-	m_BuildPage->UpdateActor();
-  m_ReferenceSystemPage->UpdateActor();
+  if(m_Wizard->GetCurrentPage() == m_LoadPage)
+  {
+    m_LoadPage->UpdateActor();
+  }
+  else if(m_Wizard->GetCurrentPage() == m_CropPage)
+  {
+    m_CropPage->UpdateActor();
+  }
+  else if(m_Wizard->GetCurrentPage() == m_BuildPage)
+  {
+    m_BuildPage->UpdateActor();
+  }
+  else if(m_Wizard->GetCurrentPage() == m_ReferenceSystemPage)
+  {
+    m_ReferenceSystemPage->UpdateActor();
+  }
 }
 //----------------------------------------------------------------------------
 void medOpImporterDicomOffis::CameraReset()
@@ -4143,7 +4157,6 @@ void medOpImporterDicomOffis::ResetSliders()
 int medOpImporterDicomOffis::GetSliceIDInSeries(int timeId, int heigthId)
 //----------------------------------------------------------------------------
 {
-
 	if (m_DicomReaderModality != medGUIDicomSettings::ID_CMRI_MODALITY)
 		return heigthId;
 
@@ -4151,14 +4164,12 @@ int medOpImporterDicomOffis::GetSliceIDInSeries(int timeId, int heigthId)
 	{
 		m_SelectedSeriesID = m_SeriesIDToSlicesListMap.begin()->first;
 	}
-
 	m_SelectedSeriesSlicesList = m_SeriesIDToSlicesListMap\
 		[m_SelectedSeriesID];
 
 	medDicomSlice *firstDicomListElement;
 	firstDicomListElement = (medDicomSlice *)m_SelectedSeriesSlicesList->\
 		Item(0)->GetData();
-
 	int timeFrames =  firstDicomListElement->GetDcmCardiacNumberOfImages();
 
 	int dicomFilesNumber = m_SelectedSeriesSlicesList->GetCount();
@@ -4184,10 +4195,10 @@ int medOpImporterDicomOffis::GetSliceIDInSeries(int timeId, int heigthId)
 
 	medDicomCardiacMRIHelper *helper = NULL;
 	helper = m_SeriesIDToCardiacMRIHelperMap[m_SelectedSeriesID];
+  mafLogMessage("%d",__LINE__);
 	assert(helper);
 
 	vnl_matrix<double> planeIFrameJFileNumberMatrix = helper->GetFileNumberForPlaneIFrameJIdPlaneMatrix();
-
 	return (planeIFrameJFileNumberMatrix(heigthId, timeId)); 
 }
 //----------------------------------------------------------------------------
@@ -5210,8 +5221,13 @@ void medOpImporterDicomOffis::OnScanSlice()
 {
 	// show the current slice
 	int currImageId = GetSliceIDInSeries(m_CurrentTime, m_CurrentSlice);
+  if(m_CurrentImageID == currImageId)
+  {
+    return;
+  }
 	if (currImageId != -1) 
 	{
+    m_CurrentImageID = currImageId;
 		GenerateSliceTexture(currImageId);
 		ShowSlice();
 		CameraUpdate();
