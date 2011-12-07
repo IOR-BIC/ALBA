@@ -60,7 +60,7 @@ def run(param):
      destDir = os.path.join(htmlDir, "Styles")
      files = os.listdir(origDir)
      for item in files:
-        if item != 'CVS':
+        if (item != 'CVS' and item != 'SVN' and item != '.cvs' and item != '.svn'):
             shutil.copyfile(os.path.join(origDir,item), os.path.join(destDir, item))
               
    xmlList=os.listdir(xmlDir)
