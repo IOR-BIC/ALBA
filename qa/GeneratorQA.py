@@ -1,8 +1,8 @@
 import os
 try:
-    from qa import mafPath
+    from qa import medPath
 except ImportError:
-    import mafPath
+    import medPath
 
 currentPathScript = os.path.split(os.path.realpath(__file__))[0]
 
@@ -96,7 +96,7 @@ def GeneratePythonQAScripts():
         f.write("    " + "    if(xmlFile != None):" + "\n")
         f.write("    " + "      self.Classes.append(xmlFile)" + "\n")
       
-      ruleIni = os.path.join(mafPath.mafQADir, "Rules", ruleGroup + "FilePattern.ini")
+      ruleIni = os.path.join(medPath.medQADir, "Rules", ruleGroup + "FilePattern.ini")
       iniR = open(ruleIni , 'r')
       lines = iniR.readlines()
       iniR.close()
