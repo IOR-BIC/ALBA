@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2011-12-01 15:12:40 $
-Version:   $Revision: 1.1.2.151 $
+Date:      $Date: 2011-12-12 07:55:46 $
+Version:   $Revision: 1.1.2.152 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -51,7 +51,6 @@ MafMedical is partially based on OpenMAF.
 
 #include "medOpImporterDicomOffis.h"
 
-#include "medGUIWizard.h"
 #include "medGUIWizardPageNew.h"
 #include "mafGUIValidator.h"
 #include "mafDeviceButtonsPadMouse.h"
@@ -196,32 +195,7 @@ mafCxxTypeMacro(medOpImporterDicomOffis);
 #define FIRST_SELECTION 0
 #define START_PROGRESS_BAR 0
 
-enum DICOM_IMPORTER_GUI_ID
-{
-	ID_FIRST = medGUIWizard::ID_LAST,
-	ID_STUDY_SELECT,
-	ID_SERIES_SELECT,
-	ID_CROP,
-	ID_UNDO_CROP,
-	ID_BUILD_STEP,
-	ID_BUILD_BUTTON,
-  ID_RS_STEP,
-  ID_RS_BUTTON,
-	ID_CANCEL,
-	ID_PATIENT_NAME,
-	ID_PATIENT_ID,
-	ID_SURGEON_NAME,
-	ID_SCAN_TIME,
-	ID_SCAN_SLICE,
-	ID_VOLUME_NAME,
-	ID_VOLUME_SIDE,
-	ID_VME_TYPE,
-  ID_SORT_AXIS,
-  ID_RS_SELECT,
-  ID_RS_SWAP,
-  ID_RS_SWAPALL,
-  ID_RS_APPLYTOALL,
-};
+
 enum VOLUME_SIDE
 {
 	NON_VALID_SIDE = 0,

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2011-12-01 15:12:40 $
-Version:   $Revision: 1.1.2.62 $
+Date:      $Date: 2011-12-12 07:55:46 $
+Version:   $Revision: 1.1.2.63 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -49,6 +49,7 @@ MafMedical is partially based on OpenMAF.
 #include "vtkImageData.h"
 #include <map>
 #include "medDicomCardiacMRIHelper.h"
+#include "medGUIWizard.h"
 #include "vtkMatrix4x4.h"
 
 
@@ -57,7 +58,6 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 class medDicomSlice;
 class medInteractorDICOMImporter;
-class medGUIWizard;
 class medGUIWizardPageNew;
 class mafString;
 class mafTagArray;
@@ -165,6 +165,33 @@ public:
 
 protected:
 
+  enum DICOM_IMPORTER_GUI_ID
+  {
+    ID_FIRST = medGUIWizard::ID_LAST,
+    ID_STUDY_SELECT,
+    ID_SERIES_SELECT,
+    ID_CROP,
+    ID_UNDO_CROP,
+    ID_BUILD_STEP,
+    ID_BUILD_BUTTON,
+    ID_RS_STEP,
+    ID_RS_BUTTON,
+    ID_CANCEL,
+    ID_PATIENT_NAME,
+    ID_PATIENT_ID,
+    ID_SURGEON_NAME,
+    ID_SCAN_TIME,
+    ID_SCAN_SLICE,
+    ID_VOLUME_NAME,
+    ID_VOLUME_SIDE,
+    ID_VME_TYPE,
+    ID_SORT_AXIS,
+    ID_RS_SELECT,
+    ID_RS_SWAP,
+    ID_RS_SWAPALL,
+    ID_RS_APPLYTOALL,
+  };
+
 	/** OnEvent helper functions */
 	void OnScanTime();
 	void OnScanSlice();
@@ -244,7 +271,7 @@ protected:
 	void OnWizardPageChanging(){};
 
 	/** On wizard start. */
-	int RunWizard();
+	virtual int RunWizard();
 
 	/** Auto position of the crop plane in way of Volume side. */
 	void AutoPositionCropPlane();
