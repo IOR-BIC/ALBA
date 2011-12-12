@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizard.h,v $
 Language:  C++
-Date:      $Date: 2011-05-26 07:43:15 $
-Version:   $Revision: 1.4.2.4 $
+Date:      $Date: 2011-12-12 07:56:10 $
+Version:   $Revision: 1.4.2.5 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -50,15 +50,7 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 // Const:
 //----------------------------------------------------------------------------
-/** Dialog Ids */
-enum DIALOG_STYLES
-{
-	mafRESIZABLE    =  1,  // make the Dialog Resizable  
-	mafCLOSEWINDOW  =  2,  // to enable the close button on the window frame
-	mafOK           =  4,  // to create an ok button
-	mafCANCEL       =  8,  // to create a cancel button 
-	mafCLOSE        = 16, // to create a close button
-};
+
 /**
   Class Name: medGUIWizard.
   This class is the container of wizard pages in order to handle typical gui wizard widget.
