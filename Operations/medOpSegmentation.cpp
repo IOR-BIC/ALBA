@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2011-11-23 10:57:15 $
-Version:   $Revision: 1.1.2.13 $
+Date:      $Date: 2011-12-14 16:06:07 $
+Version:   $Revision: 1.1.2.14 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
@@ -402,7 +402,7 @@ void medOpSegmentation::CreateOpDialog()
   wxPoint defPos = wxDefaultPosition;
   wxSize defSize = wxDefaultSize;
 
-  m_Dialog = new mafGUIDialog(m_Label, mafCLOSEWINDOW|mafRESIZABLE);  
+  m_Dialog = new mafGUIDialog(m_Label, mafCLOSEWINDOW);  
   m_Dialog->SetListener(this);
 
   m_GuiDialog = new mafGUI(this);
@@ -510,7 +510,7 @@ void medOpSegmentation::CreateOpDialog()
   mafVMEOutputVolume *volumeOutput = mafVMEOutputVolume::SafeDownCast(m_Volume->GetOutput());
   m_ColorLUT = volumeOutput->GetMaterial()->m_ColorLut;
 
-  m_LutWidget = new medGUILutHistogramSwatch(m_GuiDialog,m_GuiDialog->GetWidgetId(ID_LUT_CHOOSER), "LUT", m_Volume->GetOutput()->GetVTKData(), m_Volume->GetMaterial() );
+  m_LutWidget = new medGUILutHistogramSwatch(m_GuiDialog,m_GuiDialog->GetWidgetId(ID_LUT_CHOOSER), "LUT", m_Volume->GetOutput()->GetVTKData(), m_Volume->GetMaterial(),wxSize(135,18) );
   m_LutWidget->SetEditable(true);
 
   /////////////////////////////////////////////////////
