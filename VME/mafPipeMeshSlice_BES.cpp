@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeMeshSlice_BES.cpp,v $
 Language:  C++
-Date:      $Date: 2011-05-26 08:26:08 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2011-12-14 14:32:12 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -698,6 +698,10 @@ void mafPipeMeshSlice_BES::CreateFieldDataControlArrays()
 
 void mafPipeMeshSlice_BES::UpdateVtkPolyDataNormalFilterActiveScalar()
 {
+
+  vtkUnstructuredGrid *data = vtkUnstructuredGrid::SafeDownCast(m_Vme->GetOutput()->GetVTKData());
+  data->Update();
+
   m_NormalFilter->Update();
 
   vtkPolyData *pd = m_NormalFilter->GetOutput();
@@ -705,6 +709,9 @@ void mafPipeMeshSlice_BES::UpdateVtkPolyDataNormalFilterActiveScalar()
   if(m_ActiveScalarType == POINT_TYPE)
   {
     mafString activeScalarName = m_ScalarsVTKName[m_ScalarIndex].c_str();
+    data->GetPointData()->SetActiveScalars(activeScalarName.GetCStr());
+    data->Update();
+
     int res = pd->GetPointData()->SetActiveScalars(activeScalarName.GetCStr());
     
     if (res == -1)
@@ -724,6 +731,9 @@ void mafPipeMeshSlice_BES::UpdateVtkPolyDataNormalFilterActiveScalar()
   else if(m_ActiveScalarType == CELL_TYPE)
   {
     mafString activeScalarName = m_ScalarsVTKName[m_ScalarIndex].c_str();
+	data->GetPointData()->SetActiveScalars(activeScalarName.GetCStr());
+    data->Update();
+
     int res = pd->GetCellData()->SetActiveScalars(activeScalarName.GetCStr());
 
     if (res == -1)
