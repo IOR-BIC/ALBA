@@ -3,8 +3,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFMeshCutter_BES.cxx,v $
 Language:  C++
-Date:      $Date: 2010-03-24 09:52:16 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2011-12-14 14:32:44 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Nigel McFarlane
 
 ================================================================================
@@ -35,7 +35,7 @@ All rights reserved.
 
 //------------------------------------------------------------------------------
 // standard macros
-vtkCxxRevisionMacro(vtkMAFMeshCutter_BES, "$Revision: 1.1.2.2 $");
+vtkCxxRevisionMacro(vtkMAFMeshCutter_BES, "$Revision: 1.1.2.3 $");
 vtkStandardNewMacro(vtkMAFMeshCutter_BES);
 //------------------------------------------------------------------------------
 #include "mafMemDbg.h"
@@ -1041,6 +1041,17 @@ void vtkMAFMeshCutter_BES::TransferScalars()
       UnstructGrid->GetCellData()->GetArray(j)->GetTuple(idin, tuple0) ;
       Polydata->GetCellData()->GetArray(j)->SetTuple(i, tuple0) ;
     }
+  }
+
+  if (UnstructGrid->GetPointData()->GetScalars())
+  {
+    const char* scalarName = UnstructGrid->GetPointData()->GetScalars()->GetName();
+    Polydata->GetPointData()->SetActiveScalars(scalarName);
+  }
+  else if (UnstructGrid->GetCellData()->GetScalars())
+  {
+    const char* scalarName = UnstructGrid->GetCellData()->GetScalars()->GetName();
+    Polydata->GetCellData()->SetActiveScalars(scalarName);
   }
 }
 
