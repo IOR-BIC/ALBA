@@ -2,3 +2,7 @@ mafOp
 mafVisualPipe
 mafView
 mafVME
+mafAction
+mafAgent
+mafAnimate
+mafNode
