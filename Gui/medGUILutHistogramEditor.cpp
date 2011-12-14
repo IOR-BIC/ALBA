@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILutHistogramEditor.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-09-12 12:15:46 $
-  Version:   $Revision: 1.1.2.10 $
+  Date:      $Date: 2011-12-14 16:05:26 $
+  Version:   $Revision: 1.1.2.11 $
   Authors:   Crimi Gianluigi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -92,6 +92,7 @@ medGUILutHistogramEditor::medGUILutHistogramEditor(vtkDataSet *dataSet,mmaVolume
   m_LutSwatch = new medGUILutHistogramSwatch(gui ,-1,"", dataSet, material, wxSize(482,18),false);
   m_LutSwatch->ShowThreshold(true);
   m_LutSwatch->EnableOverHighlight(true);
+  m_LutSwatch->SetListener(this);
 
 
   m_Windowing = new mafGUILutSlider(gui,-1,wxPoint(0,0),wxSize(500,24));
@@ -101,7 +102,7 @@ medGUILutHistogramEditor::medGUILutHistogramEditor(vtkDataSet *dataSet,mmaVolume
   gui->Divider();
   //gamma correction slider 
   m_Gamma = material->m_GammaCorrection;
-  m_GammaSlider = gui->FloatSlider(ID_GAMMA_CORRETION,_("Gamma: "), &m_Gamma,0,5, wxSize(400,30), "", false);
+  m_GammaSlider = gui->FloatSlider(ID_GAMMA_CORRETION,_("Gamma: "), &m_Gamma,0,5, wxSize(300,30), "", false);
 
   //Activate only if required
   if (m_DataSet->GetPointData()->GetScalars()->GetNumberOfTuples()>SUB_SAMPLED_SIZE)
@@ -126,8 +127,8 @@ medGUILutHistogramEditor::medGUILutHistogramEditor(vtkDataSet *dataSet,mmaVolume
   material->m_ColorLut->GetTableRange(ranges);
   m_Windowing->SetSubRange(ranges[0],ranges[1]);
   m_Histogram->Refresh();
-
   this->Fit();
+  this->SetMinSize(wxSize(410,620));
   this->Update();
 }
 
@@ -140,9 +141,9 @@ medGUILutHistogramEditor::~medGUILutHistogramEditor()
   if(m_Lut) 
     mafDEL(m_Lut);
 
-  //Deleting Sub Sampled Data
-  if (m_ResampledData)
-    vtkDEL(m_ResampledData);
+// Already deleted by the histogram
+//   if (m_ResampledData)
+//     vtkDEL(m_ResampledData);
 }
 
 
@@ -278,6 +279,7 @@ void medGUILutHistogramEditor::ShowLutHistogramDialog(vtkDataSet *dataSet,mmaVol
 {
   //Call the default constructor to show the Dialog
   medGUILutHistogramEditor *led = new medGUILutHistogramEditor(dataSet,material,name,listener,id);
+  led->CentreOnScreen();
   led->ShowModal();
 }
 

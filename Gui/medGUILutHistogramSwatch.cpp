@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILutHistogramSwatch.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-09-12 12:15:46 $
-  Version:   $Revision: 1.1.2.8 $
+  Date:      $Date: 2011-12-14 16:05:26 $
+  Version:   $Revision: 1.1.2.9 $
   Authors:   Crimi Gianluigi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -64,6 +64,7 @@ BEGIN_EVENT_TABLE(medGUILutHistogramSwatch,wxPanel)
   EVT_LEFT_DOWN(medGUILutHistogramSwatch::OnLeftMouseButtonDown)
   EVT_LEFT_UP(medGUILutHistogramSwatch::OnLeftMouseButtonUp)
   EVT_MOTION(medGUILutHistogramSwatch::OnMouseMotion)
+  EVT_SIZE(medGUILutHistogramSwatch::OnSize)
  
 END_EVENT_TABLE()
 
@@ -105,23 +106,23 @@ medGUILutHistogramSwatch::medGUILutHistogramSwatch(mafGUI *parent, wxWindowID id
   SetDataSet(dataSet);
   SetListener(parent);
 
-  wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-
   //add label only if showText is true
   if (showText)
   {
+    wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
     wxStaticText	*lab  = new wxStaticText(parent, id , name ,wxDefaultPosition, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
     sizer->Add( lab,  0, wxRIGHT, LM);
-    sizer->Add( this, 0, wxEXPAND, HM);
+    sizer->Add( this, 0, wxLEFT, HM);
+    parent->Add(sizer,0,wxEXPAND, M);
   }
   else
   {
-    wxStaticText *foo_l = new wxStaticText(parent,id, "",wxDefaultPosition, wxSize(4,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE);
-    sizer->Add(foo_l, 0, wxLEFT, 0);
-    sizer->Add( this, 0, wxEXPAND, 0);
-  }
-  
-  parent->Add(sizer,0,wxALL, M); 
+//     wxStaticText *foo_l = new wxStaticText(parent,id, "",wxDefaultPosition, wxSize(4,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE);
+//     sizer->Add(foo_l, 0, wxLEFT, 0);
+    wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
+    sizer->Add( this, 1, wxEXPAND, HM);
+    parent->Add( sizer, 0, wxEXPAND, LM);
+  }  
 }
 
 //----------------------------------------------------------------------------
@@ -254,6 +255,16 @@ void medGUILutHistogramSwatch::OnMouseMotion(wxMouseEvent &event)
     m_Highlighted=0;
     mafEventMacro(mafEvent(this, CAMERA_UPDATE));
   }
+}
+//----------------------------------------------------------------------------
+void medGUILutHistogramSwatch::OnSize(wxSizeEvent &event)
+//----------------------------------------------------------------------------
+{
+  m_Material->ApplyGammaCorrection(4);
+  m_Material->UpdateProp();
+  m_Highlighted=0;
+  mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+  Refresh();
 }
 //----------------------------------------------------------------------------
 void medGUILutHistogramSwatch::SetMaterial(mmaVolumeMaterial *material)

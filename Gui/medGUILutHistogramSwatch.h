@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILutHistogramSwatch.h,v $
   Language:  C++
-  Date:      $Date: 2011-09-12 12:15:46 $
-  Version:   $Revision: 1.1.2.8 $
+  Date:      $Date: 2011-12-14 16:05:26 $
+  Version:   $Revision: 1.1.2.9 $
   Authors:   Crimi Gianluigi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -82,6 +82,9 @@ protected:
   void OnLeftMouseButtonUp(wxMouseEvent &event);
   /* Show/update the label */
   void OnMouseMotion(wxMouseEvent &event);
+
+  /** Update the panel when resized */
+  void OnSize(wxSizeEvent &event);
 
   /* Get the lut index by the x position over the widget */
   int GetLutIndexByPos(float fullWidth, float x);
