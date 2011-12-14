@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUIHistogramWidget.cpp,v $
 Language:  C++
-Date:      $Date: 2011-07-21 13:44:37 $
-Version:   $Revision: 1.1.2.6 $
+Date:      $Date: 2011-12-14 16:01:57 $
+Version:   $Revision: 1.1.2.7 $
 Authors:   Paolo Quadrani, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -113,10 +113,10 @@ mafGUIHistogramWidget::mafGUIHistogramWidget(wxWindow* parent, wxWindowID id /* 
   wxStaticText *foo_r = new wxStaticText(this,-1, "");
 
   wxBoxSizer *sizerH2 = new wxBoxSizer(wxHORIZONTAL);
-  sizerH2->Add(foo_l, 0, wxLEFT, 5);
-  sizerH2->Add(m_HistogramRWI->m_RwiBase, 1, wxEXPAND, 5);
-  sizerH2->Add(foo_r, 0, wxLEFT, 5);
-  sizerV->Add(sizerH2, 0,wxEXPAND);
+  sizerH2->Add(foo_l, 0, wxLEFT, 0);
+  sizerH2->Add(m_HistogramRWI->m_RwiBase, 1, wxEXPAND, 0);
+  sizerH2->Add(foo_r, 0, wxLEFT, 0);
+  sizerV->Add(sizerH2, 1,wxEXPAND);
 
   SetSizer(sizerV);
 
