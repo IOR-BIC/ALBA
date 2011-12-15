@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIDialog.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 08:55:49 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2011-12-15 16:24:36 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,6 +34,7 @@ BEGIN_EVENT_TABLE(mafGUIDialog, wxDialog)
   EVT_BUTTON(wxID_CLOSE, mafGUIDialog::nvOnClose)
   EVT_BUTTON(wxOK, mafGUIDialog::nvOnOK)
   EVT_BUTTON(wxCANCEL, mafGUIDialog::nvOnCancel)
+  EVT_SIZE(mafGUIDialog::OnSize)
 
 /* todo: discover if the following syntax is valid -- if yes I can have the redefined handler called (if handler are virtual)
   EVT_CLOSE(OnCloseWindow)

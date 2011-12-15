@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIDialog.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-25 10:05:18 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-12-15 16:24:36 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -109,6 +109,8 @@ public:
   The default behavior is to call OnCancel() - I recommend not to override this, but OnCancel */
   virtual void OnCloseWindow(wxCloseEvent &event);
 
+  /** Handle on size event */
+  virtual void OnSize(wxSizeEvent &event){DoLayout();};
 
   wxBoxSizer *m_GuiSizer;          ///< Sizer for user widgets -- Calling Add() insert a widget in this sizer
   wxBoxSizer *m_ButtonsSizer;  ///< Sizer holding the ok,cancel,close button (if any)
