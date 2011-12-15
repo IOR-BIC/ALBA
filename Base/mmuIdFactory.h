@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmuIdFactory.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-25 09:31:22 $
-  Version:   $Revision: 1.5.4.1 $
+  Date:      $Date: 2011-12-15 10:36:29 $
+  Version:   $Revision: 1.5.4.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -13,7 +13,7 @@
 #ifndef __mmuIdFactory_h
 #define __mmuIdFactory_h
 
-#include "mmuUtility.h"
+#include "mafUtility.h"
 #include "mafDefines.h"
 
 //------------------------------------------------------------------------------
@@ -28,7 +28,7 @@
   defined in mafDefines.h (e.g. MAF_ID_DEC() MAF_ID_GLOB() )
   @sa mafEvent
 */
-class MAF_EXPORT mmuIdFactory : public mmuUtility
+class MAF_EXPORT mmuIdFactory : public mafUtility
 {
 public:
   /** Internally used to keep a unique ID for the events */

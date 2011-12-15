@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEStorage.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-25 09:53:22 $
-  Version:   $Revision: 1.3.22.1 $
+  Date:      $Date: 2011-12-15 10:38:59 $
+  Version:   $Revision: 1.3.22.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -15,7 +15,7 @@
 #include "mafXMLStorage.h"
 #include "mafObserver.h"
 #include "mafEventSender.h"
-#include "mmuUtility.h"
+#include "mafUtility.h"
 #include "mafStorable.h"
 
 //----------------------------------------------------------------------------
@@ -24,7 +24,7 @@
 class mafVMERoot;
 
 /** utility class representing the MSF document. */
-class mmuMSFDocument : public mmuUtility, public mafStorable
+class mmuMSFDocument : public mafUtility, public mafStorable
 {
 public:
   mmuMSFDocument(mafVMERoot *root=NULL):m_Root(root) {}

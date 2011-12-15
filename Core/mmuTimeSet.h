@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmuTimeSet.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-25 09:53:22 $
-  Version:   $Revision: 1.4.24.1 $
+  Date:      $Date: 2011-12-15 10:38:59 $
+  Version:   $Revision: 1.4.24.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -14,7 +14,7 @@
 //----------------------------------------------------------------------------
 // includes :
 //----------------------------------------------------------------------------
-#include "mmuUtility.h"
+#include "mafUtility.h"
 #include "mafDefines.h"
 #include <set>
 #include <vector>
@@ -36,13 +36,13 @@ typedef std::vector<mafTimeStamp> mmuTimeVector;
   @todo
   - test Merge of variuos case of time vectors
 */
-class mmuTimeSet: public mmuUtility
+class mmuTimeSet: public mafUtility
 {
 public:
   mmuTimeSet();
   virtual ~mmuTimeSet();
 
-//  mafTypeMacro(mmuTimeSet,mmuUtility);
+//  mafTypeMacro(mmuTimeSet,mafUtility);
  
   /** copy constructor, this makes a copy of the set */
   mmuTimeSet(const mmuTimeSet& c);

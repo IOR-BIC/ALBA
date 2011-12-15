@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTagItem.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-25 09:47:56 $
-  Version:   $Revision: 1.5.4.1 $
+  Date:      $Date: 2011-12-15 10:38:59 $
+  Version:   $Revision: 1.5.4.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -14,7 +14,7 @@
 //----------------------------------------------------------------------------
 // includes :
 //----------------------------------------------------------------------------
-#include "mmuUtility.h"
+#include "mafUtility.h"
 #include "mafStorable.h"
 #include "mafString.h"
 #include <vector>
@@ -39,7 +39,7 @@ enum MAF_TAG_IDS {MAF_MISSING_TAG=0,MAF_NUMERIC_TAG,MAF_STRING_TAG};
   an utility class for storing <key-type-array of values> information.
   @sa mafTagArray
 */
-class MAF_EXPORT mafTagItem : public mmuUtility, public mafStorable
+class MAF_EXPORT mafTagItem : public mafUtility, public mafStorable
 {
 public:
   mafTagItem();

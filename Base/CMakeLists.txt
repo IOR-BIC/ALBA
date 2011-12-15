@@ -67,7 +67,7 @@ mafVector.txx
 mafVersion.h
 mmuIdFactory.cpp
 mmuIdFactory.h
-mmuUtility.h
+mafUtility.h
 vtkMAFSmartPointer.h
 vtkMAFToLinearTransform.h
 mafZipUtility.cpp

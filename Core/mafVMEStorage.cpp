@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEStorage.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-11-30 14:10:26 $
-  Version:   $Revision: 1.7.2.1 $
+  Date:      $Date: 2011-12-15 10:38:59 $
+  Version:   $Revision: 1.7.2.2 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -14,7 +14,7 @@
 
 #include "mafVMEStorage.h"
 #include "mafVMERoot.h"
-#include "mmuUtility.h"
+#include "mafUtility.h"
 #include "mafStorable.h"
 #include "mafStorageElement.h"
 #include "mmuIdFactory.h"

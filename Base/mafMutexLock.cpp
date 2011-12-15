@@ -2,15 +2,15 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMutexLock.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-06 10:44:51 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2011-12-15 10:34:30 $
+  Version:   $Revision: 1.7.6.1 $
   Authors:   Based on itkmafMutexLock (www.itk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 #include "mafMutexLock.h"
-#include "mmuUtility.h"
+#include "mafUtility.h"
 
 #ifdef CMAKE_USE_SPROC_INIT
 #include <abi_mutex.h>
@@ -49,7 +49,7 @@ typedef int FastMutexType;
 #endif
 
 //----------------------------------------------------------------------------
-class mmuPIMPLMutexLock:mmuUtility
+class mmuPIMPLMutexLock:mafUtility
 //----------------------------------------------------------------------------
 {
 public:

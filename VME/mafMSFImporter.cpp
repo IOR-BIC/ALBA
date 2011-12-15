@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMSFImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-07-13 12:40:40 $
-  Version:   $Revision: 1.19.2.2 $
+  Date:      $Date: 2011-12-15 10:41:56 $
+  Version:   $Revision: 1.19.2.3 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,7 +20,7 @@
 #include "mafTagItem.h"
 #include "mafVMEItemVTK.h"
 #include "mafDataVectorVTK.h"
-#include "mmuUtility.h"
+#include "mafUtility.h"
 #include "mafStorable.h"
 #include "mafStorageElement.h"
 #include "mmaMaterial.h"

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVector.txx,v $
   Language:  C++
-  Date:      $Date: 2005-07-20 15:42:23 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2011-12-15 10:36:29 $
+  Version:   $Revision: 1.2.22.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -13,7 +13,7 @@
 #define __mafVector_txx
 
 #include "mafVector.h"
-#include "mmuUtility.h"
+#include "mafUtility.h"
 #include <vector>
 
 template <class T>
@@ -23,7 +23,7 @@ T mafVector<T>::NullItem;
 // PIMPL declarations
 //------------------------------------------------------------------------------
 template <class T>
-class mmuVectorItems: public mmuUtility 
+class mmuVectorItems: public mafUtility 
 {
   public:
   std::vector<T> Vector;

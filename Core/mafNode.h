@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-25 09:38:43 $
-  Version:   $Revision: 1.35.2.1 $
+  Date:      $Date: 2011-12-15 10:38:59 $
+  Version:   $Revision: 1.35.2.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -42,7 +42,7 @@ class mafTagArray;
 class mafGUI;
 
 /** data structure used to store a link VME and its Id */
-class MAF_EXPORT mmuNodeLink :public mmuUtility
+class MAF_EXPORT mmuNodeLink :public mafUtility
 {
 public:
   mmuNodeLink(mafID id=-1,mafNode *node=NULL, mafID sub_id=-1):m_NodeId(id),m_Node(node),m_NodeSubId(sub_id) {}

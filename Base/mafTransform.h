@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransform.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-25 09:30:12 $
-  Version:   $Revision: 1.12.2.4 $
+  Date:      $Date: 2011-12-15 10:33:54 $
+  Version:   $Revision: 1.12.2.5 $
   Authors:   Marco Petrone, Stefano Perticoni,Stefania Paperini
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -16,7 +16,7 @@
 #include "mafTransformBase.h"
 #include "mafInteractorConstraint.h"
 
-#include "mmuUtility.h"
+#include "mafUtility.h"
 
 //------------------------------------------------------------------------------
 // Forward declarations

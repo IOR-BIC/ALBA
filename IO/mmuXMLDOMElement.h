@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmuXMLDOMElement.h,v $
   Language:  C++
-  Date:      $Date: 2010-12-03 12:24:31 $
-  Version:   $Revision: 1.4.4.1 $
+  Date:      $Date: 2011-12-15 10:40:31 $
+  Version:   $Revision: 1.4.4.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -12,7 +12,7 @@
 #ifndef __mmuXMLDOMElement_h__
 #define __mmuXMLDOMElement_h__
 
-#include "mmuUtility.h"
+#include "mafUtility.h"
 
 
 #include <xercesc/dom/DOM.hpp>
@@ -36,7 +36,7 @@
 /** PIMPL class to hide XercesC specific XML DOM objects. 
   This class is internally used by mafXMLElement for accessing XML DOM objects.
 */
-class MAF_EXPORT mmuXMLDOMElement: public mmuUtility
+class MAF_EXPORT mmuXMLDOMElement: public mafUtility
 {
 public:
   /** constructor */
