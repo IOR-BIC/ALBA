@@ -6,3 +6,6 @@ mafAction
 mafAgent
 mafAnimate
 mafNode
+mafEventBase
+mafEventSource
+mafUtility
