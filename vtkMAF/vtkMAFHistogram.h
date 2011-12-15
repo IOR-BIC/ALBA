@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFHistogram.h,v $
   Language:  C++
-  Date:      $Date: 2010-11-02 13:49:12 $
-  Version:   $Revision: 1.1.2.4 $
+  Date:      $Date: 2011-12-15 16:30:14 $
+  Version:   $Revision: 1.1.2.5 $
   Authors:   Paolo Quadrani
   Project:   MultiMod Project
 
@@ -122,7 +122,6 @@ class VTK_vtkMAF_EXPORT vtkMAFHistogram : public vtkActor2D
 
   /** Change text label actor*/
   void SetLabel(const char *lab);
-
 
   /** Draw the object to the screen */
   int	 RenderOverlay(vtkViewport *viewport);

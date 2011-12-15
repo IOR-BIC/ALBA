@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFHistogram.cxx,v $
   Language:  C++
-  Date:      $Date: 2010-02-23 14:14:08 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2011-12-15 16:30:14 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Paolo Quadrani
   Project:   MultiMod Project
 
@@ -34,7 +34,7 @@
 #include "vtkPolyDataMapper.h"
 #include "vtkProperty.h"
 
-vtkCxxRevisionMacro(vtkMAFHistogram, "$Revision: 1.1.2.3 $");
+vtkCxxRevisionMacro(vtkMAFHistogram, "$Revision: 1.1.2.4 $");
 vtkStandardNewMacro(vtkMAFHistogram);
 //------------------------------------------------------------------------------
 vtkMAFHistogram::vtkMAFHistogram()
@@ -304,7 +304,7 @@ void vtkMAFHistogram::HistogramUpdate(vtkRenderer *ren)
   Accumulate->SetComponentSpacing(srw/NumberOfBins,0,0); // bins maps all the Scalars Range
   Accumulate->Update();
 
-  if (AutoscaleHistogram && !AutoscaleCalculated)
+  if (AutoscaleHistogram /*&& !AutoscaleCalculated recalculate always fix bug #2462 */)
   {
     AutoscaleCalculated = true;
     double m = VTK_DOUBLE_MIN;
@@ -317,7 +317,15 @@ void vtkMAFHistogram::HistogramUpdate(vtkRenderer *ren)
     }
     double mean = m;
     if (mean < 0) mean = -mean;
-    ScaleFactor = 1.0 / mean;
+    
+    if (LogHistogram)
+    {
+      ScaleFactor = 1.0 / mean;
+    }
+    else
+    {
+      ScaleFactor = 1.0 / mean;
+    }
   }
 
   ChangeInfo->SetInput(Accumulate->GetOutput());
@@ -330,12 +338,12 @@ void vtkMAFHistogram::HistogramUpdate(vtkRenderer *ren)
 
   if (LogHistogram)
   {
-    if (AutoscaleHistogram)
-    {
-      double mean = Accumulate->GetMean()[0];
-      if (mean < 0) mean = -mean;
-      ScaleFactor = .5 / log(1 + mean);
-    }
+//     if (AutoscaleHistogram)
+//     {
+//       double mean = Accumulate->GetMean()[0];
+//       if (mean < 0) mean = -mean;
+//       ScaleFactor = .5 / log(1 + mean);
+//     }
     Glyph->SetInput(LogScale->GetOutput());
   }
   else
