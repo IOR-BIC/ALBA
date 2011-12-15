@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILutHistogramEditor.h,v $
   Language:  C++
-  Date:      $Date: 2011-07-21 14:23:00 $
-  Version:   $Revision: 1.1.2.7 $
+  Date:      $Date: 2011-12-15 16:32:29 $
+  Version:   $Revision: 1.1.2.8 $
   Authors:   Crimi Gianluigi 
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -66,6 +66,9 @@ public:
 
   /* Main event handler */
   void OnEvent(mafEventBase *maf_event);
+
+  /** Handle resize event */
+  void OnSize(wxSizeEvent &event);
 
   /** Show the dialog.*/
   static void ShowLutHistogramDialog(vtkDataSet *dataSet,mmaVolumeMaterial *material, char *name="Histogram & Windowing", mafObserver *Listener=NULL, int id=MINID);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILutHistogramEditor.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-12-14 16:05:26 $
-  Version:   $Revision: 1.1.2.11 $
+  Date:      $Date: 2011-12-15 16:32:29 $
+  Version:   $Revision: 1.1.2.12 $
   Authors:   Crimi Gianluigi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -204,6 +204,7 @@ void medGUILutHistogramEditor::OnEvent(mafEventBase *maf_event)
           //Enable disable log scale
           m_Histogram->AutoscaleHistogramOn();
           m_Histogram->LogarithmicScale(m_LogScale);
+          m_Histogram->UpdateLines(m_LowRange, m_HiRange);
           this->Refresh();
           this->Update();
         }
@@ -369,4 +370,10 @@ void medGUILutHistogramEditor::UpdateVolumeLut(bool reset)
   mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 }
 
-
+//----------------------------------------------------------------------------
+void medGUILutHistogramEditor::OnSize(wxSizeEvent &event)
+//----------------------------------------------------------------------------
+{
+  mafGUIDialog::OnSize(event);
+  mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+}
