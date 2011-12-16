@@ -675,6 +675,7 @@ EXCLUDE                = @CMAKE_SOURCE_DIR@/Docs \
                          @CMAKE_SOURCE_DIR@/modules \
                          @CMAKE_SOURCE_DIR@/Testing \
                          @CMAKE_SOURCE_DIR@/vtkMED \
+                         @CMAKE_SOURCE_DIR@/qa \
                          @CMAKE_SOURCE_DIR@/BES_Beta/vtkMAF
 
 # The EXCLUDE_SYMLINKS tag can be used select whether or not files or 
