@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2011-12-14 16:06:07 $
-Version:   $Revision: 1.1.2.14 $
+Date:      $Date: 2011-12-16 12:40:29 $
+Version:   $Revision: 1.1.2.15 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
@@ -49,6 +49,7 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #include "mafVMEImage.h"
 #include "mafGUILutSlider.h"
 #include "mafVMESurface.h"
+#include "mafPipeVolumeSlice_BES.h"
 
 #include "mmaVolumeMaterial.h"
 #include "mmaMaterial.h"
@@ -224,6 +225,7 @@ medOpSegmentation::medOpSegmentation(const wxString &label) : mafOp(label)
   m_RefinementRedoList.clear();
   //////////////////////////////////////////////////////////////////////////
 
+  m_TrilinearInterpolationOn = FALSE;
 }
 //----------------------------------------------------------------------------
 medOpSegmentation::~medOpSegmentation()
@@ -279,6 +281,8 @@ void medOpSegmentation::OpRun()
 
   m_View->VmeAdd(m_Volume);
   m_View->VmeShow(m_Volume, true);
+  //m_View->VmeCreatePipe(m_Volume);
+  SetTrilinearInterpolation(m_Volume);
   m_View->UpdateSlicePos(0.0);
   m_View->CameraReset();
   m_View->CameraUpdate();
@@ -517,6 +521,7 @@ void medOpSegmentation::CreateOpDialog()
   m_GuiDialog->Divider();
   m_GuiDialog->Divider();
   m_GuiDialog->Divider(0);
+  m_GuiDialog->Bool(ID_ENABLE_TRILINEAR_INTERPOLATION,"Interpolation",&m_TrilinearInterpolationOn,1,"Enable/Disable tri-linear interpolation on slices");
 
   m_GuiDialog->SetMinSize(wxSize(200,650));
 
@@ -839,6 +844,7 @@ bool medOpSegmentation::Refinement()
 
     m_View->VmeShow(m_RefinementVolumeMask,false);
     m_View->VmeShow(m_RefinementVolumeMask,true);
+    SetTrilinearInterpolation(m_RefinementVolumeMask);
 
     m_View->CameraUpdate();
   }
@@ -1293,6 +1299,8 @@ void medOpSegmentation::InitThresholdVolume()
   m_ThresholdVolume->Update();
 
   m_View->VmeAdd(m_ThresholdVolume);
+  //m_View->VmeCreatePipe(m_ThresholdVolume);
+  m_View->CameraUpdate();
 }
 
 //------------------------------------------------------------------------
@@ -1330,6 +1338,7 @@ void medOpSegmentation::InitRefinementVolumeMask()
   m_ManualVolumeSlice->Update();
   m_RefinementVolumeMask->Update();
   m_View->VmeAdd(m_RefinementVolumeMask);
+  //m_View->VmeCreatePipe(m_RefinementVolumeMask);
 }
 
 //------------------------------------------------------------------------
@@ -1391,6 +1400,7 @@ void medOpSegmentation::OnManualStep()
 
   UpdateVolumeSlice();
   m_View->VmeShow(m_ManualVolumeSlice, true);
+  SetTrilinearInterpolation(m_ManualVolumeSlice);
 }
 
 //------------------------------------------------------------------------
@@ -1430,6 +1440,7 @@ void medOpSegmentation::OnRefinementStep()
   //logic stuff
   InitRefinementVolumeMask();
   m_View->VmeShow(m_RefinementVolumeMask,true);
+  SetTrilinearInterpolation(m_RefinementVolumeMask);
 }
 
 //------------------------------------------------------------------------
@@ -1535,6 +1546,7 @@ void medOpSegmentation::OnPreviousStep()
       //prev step -> AUTOMATIC_SEGMENTATION
       OnAutomaticStep();
       m_View->VmeShow(m_ThresholdVolume,true);
+      SetTrilinearInterpolation(m_ThresholdVolume);
     }
     break;
     case REFINEMENT_SEGMENTATION:
@@ -1743,6 +1755,14 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         m_View->CameraUpdate();
         break;
       }
+    case ID_ENABLE_TRILINEAR_INTERPOLATION:
+      {
+        SetTrilinearInterpolation(m_Volume);
+        SetTrilinearInterpolation(m_ManualVolumeSlice);
+        SetTrilinearInterpolation(m_RefinementVolumeMask);
+        SetTrilinearInterpolation(m_ThresholdVolume);
+        m_View->CameraUpdate();
+      }break;
     default:
       break;
     }
@@ -1981,6 +2001,7 @@ void medOpSegmentation::OnAutomaticPreview()
 
   m_View->VmeShow(m_ThresholdVolume,false);
   m_View->VmeShow(m_ThresholdVolume,true);
+  SetTrilinearInterpolation(m_ThresholdVolume);
 
   m_View->CameraUpdate();
   //////////////////////////////////////////////////////////////////////////
@@ -2231,6 +2252,7 @@ void medOpSegmentation::ReloadUndoRedoState(vtkDataSet *dataSet,UndoRedoState st
   m_View->VmeShow(m_ManualVolumeSlice, false);
   m_ManualVolumeSlice->Update();
   m_View->VmeShow(m_ManualVolumeSlice, true);
+  SetTrilinearInterpolation(m_ManualVolumeSlice);
   m_View->ChangeView(m_CurrentSlicePlane);
   m_View->CameraUpdate();
 }
@@ -2391,6 +2413,7 @@ void medOpSegmentation::OnRefinementSegmentationEvent(mafEvent *e)
         m_View->VmeShow(m_RefinementVolumeMask, false);
         m_RefinementVolumeMask->SetData(newDataSet, m_Volume->GetTimeStamp());
         m_View->VmeShow(m_RefinementVolumeMask, true);
+        SetTrilinearInterpolation(m_RefinementVolumeMask);
 
         vtkDEL(m_RefinementUndoList[numOfChanges-1]);
         m_RefinementUndoList.pop_back();
@@ -2424,6 +2447,7 @@ void medOpSegmentation::OnRefinementSegmentationEvent(mafEvent *e)
         m_View->VmeShow(m_RefinementVolumeMask, false);
         m_RefinementVolumeMask->SetData(newDataSet, m_Volume->GetTimeStamp());
         m_View->VmeShow(m_RefinementVolumeMask, true);
+        SetTrilinearInterpolation(m_RefinementVolumeMask);
 
         vtkDEL(m_RefinementRedoList[numOfChanges-1]);
         m_RefinementRedoList.pop_back();
@@ -2477,7 +2501,6 @@ void medOpSegmentation::InitializeViewSlice()
  
   dataSet->GetPoint((0,0,0),m_SliceOrigin);
   m_View->InitializeSlice(m_SliceOrigin);
-
   m_CurrentSliceIndex = 1;
 
   m_View->UpdateSlicePos(0.0);
@@ -2993,6 +3016,8 @@ void medOpSegmentation::InitManualVolumeSlice()
     m_ManualVolumeSlice->ReparentTo(m_Volume->GetParent());
     m_ManualVolumeSlice->SetName("Manual Volume Slice");
     m_View->VmeAdd(m_ManualVolumeSlice);
+    //m_View->VmeCreatePipe(m_ManualVolumeSlice);
+    m_View->CameraUpdate();
   }
 
 }
@@ -3263,5 +3288,17 @@ void medOpSegmentation::InitMaskColorLut(vtkLookupTable *lut)
     lut->SetNumberOfTableValues(2);
     lut->SetTableValue(0, 0.0, 0.0, 0.0, 0.0);
     lut->SetTableValue(1, 0.9, 0.1, 0.1, 0.4);
+  }
+}
+
+void medOpSegmentation::SetTrilinearInterpolation(mafVMEVolumeGray *volume)
+{
+  if(volume)
+  {
+    mafPipeVolumeSlice_BES *pipe = mafPipeVolumeSlice_BES::SafeDownCast(m_View->GetNodePipe(volume));
+    if(pipe)
+    {
+      pipe->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
+    }
   }
 }

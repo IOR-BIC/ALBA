@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.h,v $
 Language:  C++
-Date:      $Date: 2011-09-12 12:15:37 $
-Version:   $Revision: 1.1.2.7 $
+Date:      $Date: 2011-12-16 12:40:29 $
+Version:   $Revision: 1.1.2.8 $
 Authors:   Eleonora Mambrini, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
@@ -140,6 +140,7 @@ public:
     ID_REFINEMENT_APPLY,
     ID_REFINEMENT_UNDO,
     ID_REFINEMENT_REDO,
+    ID_ENABLE_TRILINEAR_INTERPOLATION,
     MINID,
   };
 
@@ -485,6 +486,7 @@ protected:
   void ResetRefinementRedoList();
 
   bool ApplyRefinementFilter(vtkStructuredPoints *inputImage, vtkStructuredPoints *outputImage);
+  void SetTrilinearInterpolation(mafVMEVolumeGray *volume);
 
   mafVMEVolumeGray *m_RefinementVolumeMask;
 
@@ -493,6 +495,7 @@ protected:
   int m_RefinementMajorityThreshold;
   int m_RefinementEverySlice;
   int m_RefinementIterative;
+  int m_TrilinearInterpolationOn;
 
   std::vector<vtkUnsignedCharArray *> m_RefinementUndoList;
   std::vector<vtkUnsignedCharArray *> m_RefinementRedoList;
