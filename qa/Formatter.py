@@ -9,9 +9,9 @@ from datetime import datetime
 import getopt
 
 try:
-    from qa import mafPath
+    from qa import medPath
 except ImportError:
-    import mafPath
+    import medPath
 
 currentPathScript = os.path.split(os.path.realpath(__file__))[0]
 
@@ -39,7 +39,7 @@ def search_file(filename, search_path):
 def run(param):
    #read xml file
    scriptsDir = os.getcwd()
-   os.chdir(mafPath.mafQADir)
+   os.chdir(medPath.medQADir)
    baseDir = os.getcwd()
    qaResultsDir = os.path.join(baseDir,"QAResults")
    xmlDir = os.path.join(baseDir,"QAResults","xml")
@@ -186,7 +186,7 @@ def run(param):
            <ul>
            <li> Build Documentation<br/> Each rule needs a source directory in which extracts information from a specified file types. Most part of QA scripts takes advantage from doxygen XML output that is created as first step. A script can also base its execution over another kind of source directory like code directory, and even extract information discriminating files using regular-expression.
 
-             At present there are three source information used by scripts: doxygen xml output of the code without Tests and with Tests, Maf3 source directory.
+             At present there are three source information used by scripts: doxygen xml output of the code without Tests and with Tests, MAF2 source directory.
 
              Operativelly after installing doxygen 1.5.9 in your computer, you need to run build_doc.bat for windows , or build_doc.sh for Unix like system. They'll be created two directories named Doc and DocWithTests in the same path.</li>
            <li>Generate python scripts<br/> GeneratorQA.py must be launched to create all the scripts based on RuleGroups and Rules inside the last.
