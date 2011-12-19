@@ -72,7 +72,7 @@ SET(BASE_SRCS
   ../Base/mafVersion.h
   ../Base/mmuIdFactory.cpp
   ../Base/mmuIdFactory.h
-  ../Base/mmuUtility.h
+  ../Base/mafUtility.h
   ../Base/vtkMAFSmartPointer.h
   ../Base/vtkMAFToLinearTransform.h
   ../Base/mafZipUtility.cpp
