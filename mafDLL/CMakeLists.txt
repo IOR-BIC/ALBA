@@ -714,8 +714,6 @@ IF (MAF_USE_VTK)
     ../VME/mafVMEVolumeRGB.h
     ../VME/mmaMeter.cpp
     ../VME/mmaMeter.h
-    ../VME/mafDataVectorVTK.cpp
-    ../VME/mafDataVectorVTK.h
   )
 ENDIF (MAF_USE_VTK)
 
