@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFHistogram.cxx,v $
   Language:  C++
-  Date:      $Date: 2011-12-15 16:30:14 $
-  Version:   $Revision: 1.1.2.4 $
+  Date:      $Date: 2011-12-19 14:19:23 $
+  Version:   $Revision: 1.1.2.5 $
   Authors:   Paolo Quadrani
   Project:   MultiMod Project
 
@@ -34,7 +34,7 @@
 #include "vtkPolyDataMapper.h"
 #include "vtkProperty.h"
 
-vtkCxxRevisionMacro(vtkMAFHistogram, "$Revision: 1.1.2.4 $");
+vtkCxxRevisionMacro(vtkMAFHistogram, "$Revision: 1.1.2.5 $");
 vtkStandardNewMacro(vtkMAFHistogram);
 //------------------------------------------------------------------------------
 vtkMAFHistogram::vtkMAFHistogram()
@@ -318,13 +318,20 @@ void vtkMAFHistogram::HistogramUpdate(vtkRenderer *ren)
     double mean = m;
     if (mean < 0) mean = -mean;
     
-    if (LogHistogram)
+    if (!LogHistogram)
     {
       ScaleFactor = 1.0 / mean;
     }
     else
     {
-      ScaleFactor = 1.0 / mean;
+      if(mean > 0)
+      {
+        ScaleFactor = 1.0 / (LogScaleConstant * log(1 + mean));
+      }
+      else
+      {
+        ScaleFactor = 1.0 / (- LogScaleConstant * log(1 - mean));
+      }
     }
   }
 
