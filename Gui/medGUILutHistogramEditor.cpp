@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILutHistogramEditor.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-12-15 16:32:29 $
-  Version:   $Revision: 1.1.2.12 $
+  Date:      $Date: 2011-12-19 09:38:56 $
+  Version:   $Revision: 1.1.2.13 $
   Authors:   Crimi Gianluigi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -119,7 +119,6 @@ medGUILutHistogramEditor::medGUILutHistogramEditor(vtkDataSet *dataSet,mmaVolume
   gui->FitGui();
   gui->Update();
   this->Add(gui,1);
-  this->SetMinSize(wxSize(500,124));
 
   m_Windowing->SetRange(m_LowRange,m_HiRange);
   m_Windowing->SetSubRange(m_Lut->GetTableRange()[0],m_Lut->GetTableRange()[1]);
@@ -128,7 +127,7 @@ medGUILutHistogramEditor::medGUILutHistogramEditor(vtkDataSet *dataSet,mmaVolume
   m_Windowing->SetSubRange(ranges[0],ranges[1]);
   m_Histogram->Refresh();
   this->Fit();
-  this->SetMinSize(wxSize(410,620));
+  this->SetMinSize(wxSize(620,410));
   this->Update();
 }
 
