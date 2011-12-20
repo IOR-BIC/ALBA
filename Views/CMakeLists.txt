@@ -51,6 +51,10 @@ SET(PROJECT_SRCS
   medViewSliceGlobal.h
   medViewArbitraryOrthoSlice.cpp
   medViewArbitraryOrthoSlice.h
+  medViewSliceBlendRX.cpp
+  medViewSliceBlendRX.h
+  medViewSliceBlend.cpp
+  medViewSliceBlend.h
 )
 
 # List libraries that are needed by this project.
