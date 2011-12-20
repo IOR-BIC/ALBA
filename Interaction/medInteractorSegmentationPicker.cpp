@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medInteractorSegmentationPicker.cpp,v $
 Language:  C++
-Date:      $Date: 2011-09-08 08:53:22 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2011-12-20 12:13:58 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2010 
@@ -109,7 +109,7 @@ void medInteractorSegmentationPicker::SendPickingInformation(mafView *v, double 
 
   vtkCellPicker *cellPicker;
   vtkNEW(cellPicker);
-  cellPicker->SetTolerance(0);
+  cellPicker->SetTolerance(0.001);
   if (v)
   {
     if(mouse_flag)
