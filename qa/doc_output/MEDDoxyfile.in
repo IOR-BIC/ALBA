@@ -638,7 +638,14 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                  = @CMAKE_SOURCE_DIR@
+INPUT                  = . \
+                         @CMAKE_SOURCE_DIR@/Common \
+                         @CMAKE_SOURCE_DIR@/Gui \
+                         @CMAKE_SOURCE_DIR@/Interaction \
+                         @CMAKE_SOURCE_DIR@/Views \
+                         @CMAKE_SOURCE_DIR@/VME \
+                         @CMAKE_SOURCE_DIR@/Operations \
+                         @CMAKE_SOURCE_DIR@/BES_Beta/IO
 
 # This tag can be used to specify the character encoding of the source files 
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is 
@@ -669,14 +676,7 @@ RECURSIVE              = YES
 # subdirectory from a directory tree whose root is specified with the INPUT tag. 
 # Note that relative paths are relative to directory from which doxygen is run.
 
-EXCLUDE                = @CMAKE_SOURCE_DIR@/Docs \
-                         @CMAKE_SOURCE_DIR@/Examples \
-                         @CMAKE_SOURCE_DIR@/Libraries \
-                         @CMAKE_SOURCE_DIR@/modules \
-                         @CMAKE_SOURCE_DIR@/Testing \
-                         @CMAKE_SOURCE_DIR@/vtkMED \
-                         @CMAKE_SOURCE_DIR@/qa \
-                         @CMAKE_SOURCE_DIR@/BES_Beta/vtkMAF
+EXCLUDE                = 
 
 # The EXCLUDE_SYMLINKS tag can be used select whether or not files or 
 # directories that are symbolic links (a Unix file system feature) are excluded 
