@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2011-12-16 12:40:29 $
-Version:   $Revision: 1.1.2.15 $
+Date:      $Date: 2011-12-20 14:30:58 $
+Version:   $Revision: 1.1.2.16 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
@@ -1715,7 +1715,10 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
     case VME_PICKING:
       {
         if(m_CurrentOperation == MANUAL_SEGMENTATION)
+        {          
           OnBrushEvent(e);
+          m_PickingStarted=false;
+        }
         break;
       }
     case ID_OK:
