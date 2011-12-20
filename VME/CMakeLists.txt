@@ -126,6 +126,9 @@ SET(PROJECT_SRCS
   mafVMEVolumeLargeUtils.cpp
   mafVMEVolumeLargeUtils.h  
   ###############################################################
+
+  medPipeVolumeSliceBlend.cpp
+  medPipeVolumeSliceBlend.h
 )
 
 IF (MAF_USE_ITK)
