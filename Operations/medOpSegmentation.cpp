@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2011-12-20 14:30:58 $
-Version:   $Revision: 1.1.2.16 $
+Date:      $Date: 2011-12-21 12:58:09 $
+Version:   $Revision: 1.1.2.17 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
@@ -2238,6 +2238,7 @@ void medOpSegmentation::OnAutomaticSegmentationEvent(mafEvent *e)
 void medOpSegmentation::ReloadUndoRedoState(vtkDataSet *dataSet,UndoRedoState state)
 //------------------------------------------------------------------------
 {
+
   if (state.plane!=m_CurrentSlicePlane || state.slice!=m_CurrentSliceIndex)
   {
 
@@ -2697,22 +2698,21 @@ void medOpSegmentation::InitializeInteractors()
   m_SegmentationPicker->SetRenderer(m_View->GetFrontRenderer());
   m_SegmentationPicker->SetListener(this);
 
-  m_Volume->SetBehavior(m_SegmentationPicker);
-
-
   m_View->GetRWI()->SetMouse(m_DialogMouse);
   m_View->SetMouse(m_DialogMouse);
   m_OldBehavior=m_Volume->GetBehavior();
   m_DialogMouse->SetView(m_View);
+
+  m_Volume->SetBehavior(m_SegmentationPicker);
 
   m_SER->AddAction("pntEditingAction");
   pntAction = m_SER->GetAction("pntEditingAction");
   m_ManualPER->AddObserver(m_SegmentationPicker);
 
-  m_View->GetRWI()->SetMouse(m_DialogMouse);
-  m_View->SetMouse(m_DialogMouse);
-  m_OldBehavior=m_Volume->GetBehavior();
-  m_DialogMouse->SetView(m_View);
+//   m_View->GetRWI()->SetMouse(m_DialogMouse);
+//   m_View->SetMouse(m_DialogMouse);
+//   m_OldBehavior=m_Volume->GetBehavior();
+//   m_DialogMouse->SetView(m_View);
   
   m_SER->AddAction("pntEditingAction");
   pntAction = m_SER->GetAction("pntEditingAction");
