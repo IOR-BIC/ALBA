@@ -170,6 +170,8 @@ SET(VME_SRCS
   ../VME/mafVMEVolumeLarge.h
   ../VME/mafVMEVolumeLargeUtils.cpp
   ../VME/mafVMEVolumeLargeUtils.h  
+  ../VME/medPipeVolumeSliceBlend.cpp
+  ../VME/medPipeVolumeSliceBlend.h
 )
 IF (MAF_USE_ITK)
   SET(VME_SRCS  
@@ -229,6 +231,10 @@ SET(VIEWS_SRCS
   ../Views/medViewSliceGlobal.h
   ../Views/medViewArbitraryOrthoSlice.cpp
   ../Views/medViewArbitraryOrthoSlice.h
+  ../Views/medViewSliceBlendRX.cpp
+  ../Views/medViewSliceBlendRX.h
+  ../Views/medViewSliceBlend.cpp
+  ../Views/medViewSliceBlend.h
 )
 ###############################################
 #INTERACTION
