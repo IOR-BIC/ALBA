@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewSliceBlendRX.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-12-20 14:57:34 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2011-12-21 13:00:33 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Stefano Perticoni , Paolo Quadrani, Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -82,18 +82,14 @@ medViewSliceBlendRX::medViewSliceBlendRX(wxString label)
 
 	m_BorderColor[0][0] = 1.0; m_BorderColor[0][1] = 0.0; m_BorderColor[0][2] = 1.0;
   m_BorderColor[1][0] = 1.0; m_BorderColor[1][1] = 0.65; m_BorderColor[1][2] = 1.0;
-
-  m_CurrentSurface.clear();
 }
 //----------------------------------------------------------------------------
 medViewSliceBlendRX::~medViewSliceBlendRX()
 //----------------------------------------------------------------------------
 {
-  m_ViewsRX = NULL;
-  m_ViewSliceBlend = NULL;
-  
-  m_CurrentSurface.clear();
-  
+//   m_ViewsRX = NULL;
+//   m_ViewSliceBlend = NULL;
+    
   cppDEL(m_LutSliders);
   vtkDEL(m_VtkLUT);
 }
