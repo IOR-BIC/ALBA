@@ -40,42 +40,9 @@ macro(configure_files srcDir destDir)
     endforeach(templateFile)
 endmacro(configure_files)
 
+SET(PROJ_SOURCE_DIR "${MED_SOURCE_DIR}")
+SET(PROJ_BINARY_DIR "${MED_BINARY_DIR}")
+
 get_filename_component(CUR_ABSOLUTE_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
-
-# SET(SRC_TMP_DIR ${CMAKE_BINARY_DIR}/qa/doc_output/TmpSrc)
-# FILE(MAKE_DIRECTORY ${SRC_TMP_DIR})
-
-# SET(SRC_DIRS  "${MED_BINARY_DIR}" "${MED_SOURCE_DIR}/Base" "${MED_BINARY_DIR}/Interaction" "${MED_SOURCE_DIR}/Interaction" "${MED_SOURCE_DIR}/Interaction/Drivers" 
-              # "${MED_SOURCE_DIR}/Core" "${MED_SOURCE_DIR}/Gui" "${MED_SOURCE_DIR}/IO" "${MED_SOURCE_DIR}/Operations" "${MED_SOURCE_DIR}/VME" 
-              # "${MED_SOURCE_DIR}/VME/DataPipes" "${MED_SOURCE_DIR}/vtkMED" "${MED_BINARY_DIR}/vtkMED" "${MED_SOURCE_DIR}/GPUAPI" 
-              # "${MED_SOURCE_DIR}/GPUAPI/GLEW" "${MED_SOURCE_DIR}/GPUAPI/FBO")
-              
-# FILE(GLOB files_to_remove "${SRC_TMP_DIR}/*.*")
-
-# FOREACH(f ${files_to_remove})
-  # FILE(REMOVE "${f}")
-# ENDFOREACH(f ${files_to_remove})
-
-# FOREACH(dirs ${SRC_DIRS})
-  # FILE(GLOB source1_file_list "${dirs}/*.cpp")
-  # FILE(GLOB template_file_list "${dirs}/*.txx")
-  # FILE(GLOB source2_file_list "${dirs}/*.cxx")
-  
-  # FOREACH(source1_file ${source1_file_list})
-    # FILE(RELATIVE_PATH source1_file_name "${dirs}" "${source1_file}")
-    # CONFIGURE_FILE("${source1_file}" "${CMAKE_BINARY_DIR}/qa/doc_output/TmpSrc/${source1_file_name}")
-  # ENDFOREACH(source1_file ${source1_file_list})
-  
-  # FOREACH(template_file ${template_file_list})
-    # FILE(RELATIVE_PATH template_file_name "${dirs}" "${template_file}")
-    # CONFIGURE_FILE("${template_file}" "${CMAKE_BINARY_DIR}/qa/doc_output/TmpSrc/${template_file_name}")
-  # ENDFOREACH(template_file ${template_file_list})
-  
-  # FOREACH(source2_file ${source2_file_list})
-    # FILE(RELATIVE_PATH source2_file_name "${dirs}" "${source2_file}")
-    # CONFIGURE_FILE("${source2_file}" "${CMAKE_BINARY_DIR}/qa/doc_output/TmpSrc/${source2_file_name}")
-  # ENDFOREACH(source2_file ${source2_file_list})
-# ENDFOREACH(dirs ${SRC_DIRS})
-
-configure_files("${CUR_ABSOLUTE_DIR}" "${MED_BINARY_DIR}/qa")
+configure_files("${CUR_ABSOLUTE_DIR}" "${PROJ_BINARY_DIR}/qa")
 add_subdirectory(doc_output)
