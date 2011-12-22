@@ -3,8 +3,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFHistogramTest.cpp,v $
 Language:  C++
-Date:      $Date: 2011-05-25 11:53:13 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2011-12-22 08:48:54 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Daniele Giunchi
 
 ================================================================================
@@ -272,19 +272,22 @@ void vtkMAFHistogramTest::TestHistogramGetAttributesAndUpdateLines()
 void vtkMAFHistogramTest::CompareImages(vtkRenderWindow * renwin)
 //----------------------------------------------------------------------------
 {
-  char *file = __FILE__;
-  std::string name(file);
-  std::string path(file);
-  int slashIndex =  name.find_last_of('\\');
+//   char *file = __FILE__;
+//   std::string name(file);
+//   std::string path(file);
+//   int slashIndex =  name.find_last_of('\\');
+// 
+//   
+//   name = name.substr(slashIndex+1);
+//   path = path.substr(0,slashIndex);
+// 
+//   int pointIndex =  name.find_last_of('.');
+// 
+//   name = name.substr(0, pointIndex);
 
-  
-  name = name.substr(slashIndex+1);
-  path = path.substr(0,slashIndex);
 
-  int pointIndex =  name.find_last_of('.');
-
-  name = name.substr(0, pointIndex);
-
+  std::string path = MAF_DATA_ROOT;
+  std::string name = "vtkMAFHistogramTest";
 
   std::string controlOriginFile;
   controlOriginFile+=(path.c_str());
