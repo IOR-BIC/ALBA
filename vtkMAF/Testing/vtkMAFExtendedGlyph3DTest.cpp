@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFExtendedGlyph3DTest.cpp,v $
 Language:  C++
-Date:      $Date: 2011-05-25 11:53:13 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2011-12-22 12:49:10 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -82,19 +82,21 @@ std::string vtkMAFExtendedGlyph3DTest::ConvertInt(int number)
 void vtkMAFExtendedGlyph3DTest::CompareImages()
 //----------------------------------------------------------------------------
 {
-  char *file = __FILE__;
-  std::string name(file);
-  std::string path(file);
-  int slashIndex =  name.find_last_of('\\');
+//   char *file = __FILE__;
+//   std::string name(file);
+//   std::string path(file);
+//   int slashIndex =  name.find_last_of('\\');
+// 
+// 
+//   name = name.substr(slashIndex+1);
+//   path = path.substr(0,slashIndex);
+// 
+//   int pointIndex =  name.find_last_of('.');
+// 
+//   name = name.substr(0, pointIndex);
 
-
-  name = name.substr(slashIndex+1);
-  path = path.substr(0,slashIndex);
-
-  int pointIndex =  name.find_last_of('.');
-
-  name = name.substr(0, pointIndex);
-
+  std::string path = MAF_DATA_ROOT;
+  std::string name = "vtkMAFExtendedGlyph3DTest";
 
   std::string controlOriginFile;
   controlOriginFile+=(path.c_str());
