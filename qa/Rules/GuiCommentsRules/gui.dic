@@ -1,0 +1,10 @@
+->Combo\( 6 3
+->String\( 4 3
+->Integer\( 6 3
+->Float\( 8 3
+->Double\( 7 3
+->Bool\( 5 3
+->BoolGrid\( 7 6
+->Radio\( 7 3
+->FileOpen\( 5 3
+->FileSave\( 5 3
