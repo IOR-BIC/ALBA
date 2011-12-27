@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafOpExtractIsosurface.cpp,v $
 Language:  C++
-Date:      $Date: 2010-09-07 09:10:43 $
-Version:   $Revision: 1.5.2.8 $
+Date:      $Date: 2011-12-27 16:46:36 $
+Version:   $Revision: 1.5.2.9 $
 Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -121,6 +121,8 @@ mafOp(label)
   m_DensityPicker  = NULL;
   m_IsoValueVector.clear();
 
+  m_TrilinearInterpolationOn = TRUE;
+
 }
 //----------------------------------------------------------------------------
 mafOpExtractIsosurface::~mafOpExtractIsosurface()
@@ -209,6 +211,7 @@ enum EXTRACT_ISOSURFACE_ID
   ID_CANCEL,
 	ID_TRIANGULATE,
 	ID_CLEAN,
+  ID_TRILINEAR_INTERPOLATION_ON,
 };
 //----------------------------------------------------------------------------
 void mafOpExtractIsosurface::CreateOpDialog()
@@ -286,6 +289,8 @@ void mafOpExtractIsosurface::CreateOpDialog()
   mafGUIButton *b_incr =       new mafGUIButton(m_Dialog, ID_INCREASE_ISO,   ">",	p,wxSize(25, 20));
   mafGUIButton *b_decr =       new mafGUIButton(m_Dialog, ID_DECREASE_ISO,   "<",	p,wxSize(25, 20));
 
+  wxCheckBox *chk_interpolation = new wxCheckBox(m_Dialog, ID_TRILINEAR_INTERPOLATION_ON,"interpolation", p, wxSize(80,20),1);
+
   wxCheckBox *chk_slice = new wxCheckBox(m_Dialog, ID_VIEW_SLICE,       "slice", p, wxSize(80,20));
   wxCheckBox *chk_opt =   new wxCheckBox(m_Dialog, ID_OPTIMIZE_CONTOUR, "optimize", p, wxSize(80,20));
   wxCheckBox *chk_lod =   new wxCheckBox(m_Dialog, ID_AUTO_LOD,         "auto-lod", p, wxSize(80,20));
@@ -319,6 +324,7 @@ void mafOpExtractIsosurface::CreateOpDialog()
   b_ok->SetValidator(mafGUIValidator(this,ID_OK,b_ok));
   b_cancel->SetValidator(mafGUIValidator(this,ID_CANCEL,b_cancel));
   //  b_grid->SetValidator(mafGUIValidator(this,ID_GRID,b_grid));
+  chk_interpolation->SetValidator( mafGUIValidator(this, ID_TRILINEAR_INTERPOLATION_ON, chk_interpolation, &m_TrilinearInterpolationOn));
 	chk_slice->SetValidator( mafGUIValidator(this, ID_VIEW_SLICE, chk_slice, &m_ShowSlice));
 	chk_clean->SetValidator( mafGUIValidator(this, ID_CLEAN, chk_clean, &m_Clean));
   chk_triangulate->SetValidator( mafGUIValidator(this, ID_TRIANGULATE, chk_triangulate, &m_Triangulate));
@@ -346,6 +352,7 @@ void mafOpExtractIsosurface::CreateOpDialog()
 
   wxBoxSizer *h_sizer3 = new wxBoxSizer(wxHORIZONTAL);
 //  h_sizer3->Add(foo,       1,wxEXPAND);	
+  h_sizer3->Add(chk_interpolation,0,wxLEFT);
   h_sizer3->Add(chk_lod,   0,wxLEFT);
   h_sizer3->Add(chk_opt,   0,wxLEFT);
   h_sizer3->Add(chk_slice, 0,wxLEFT);
@@ -757,6 +764,11 @@ void mafOpExtractIsosurface::OnEvent(mafEventBase *maf_event)
         m_Dialog->TransferDataToWindow();
       }
       break;
+    case ID_TRILINEAR_INTERPOLATION_ON:
+      {
+        m_VolumeSlicer->SetTrilinearInterpolation(m_TrilinearInterpolationOn == TRUE);
+        m_Rwi->CameraUpdate();
+      }
     default:
       mafEventMacro(*e);
       break; 

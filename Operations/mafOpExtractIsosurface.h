@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpExtractIsosurface.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-25 11:49:23 $
-  Version:   $Revision: 1.5.2.7 $
+  Date:      $Date: 2011-12-27 16:46:36 $
+  Version:   $Revision: 1.5.2.8 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -117,6 +117,7 @@ protected:
   double       m_SliceOrigin[3];
   float        m_SliceXVect[3];
   float        m_SliceYVect[3];
+  int m_TrilinearInterpolationOn;
 
   std::vector<double> m_IsoValueVector;
 
