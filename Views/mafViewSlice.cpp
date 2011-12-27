@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-07-13 08:30:23 $
-  Version:   $Revision: 1.51.2.19 $
+  Date:      $Date: 2011-12-27 16:49:07 $
+  Version:   $Revision: 1.51.2.20 $
   Authors:   Paolo Quadrani , Stefano Perticoni , Josef Kohout
 ==========================================================================
   Copyright (c) 2002/2004
@@ -99,7 +99,7 @@ mafViewSlice::mafViewSlice(wxString label /* =  */, int camera_position /* = CAM
 
   // Added by Losi 11.25.2009
   m_EnableGPU=FALSE;
-
+  m_TrilinearInterpolationOn = TRUE;
   m_TextureInterpolate = textureInterpolate;
 
 }
@@ -332,6 +332,7 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
         else
           ((mafPipeVolumeSlice_BES *)pipe)->ShowTICKsOff();
         ((mafPipeVolumeSlice_BES *)pipe)->SetEnableGPU(m_EnableGPU);
+        ((mafPipeVolumeSlice_BES *)pipe)->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
         UpdateText();
       }
       else 
@@ -582,10 +583,12 @@ mafGUI *mafViewSlice::CreateGui()
     if (p) // Is this required?
     {
       p->SetEnableGPU(m_EnableGPU);
+      p->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
     }
   };
    m_Gui->Divider(1);
   //m_Gui->Bool(ID_ENABLE_GPU,"Enable GPU",&m_EnableGPU,1);
+   m_Gui->Bool(ID_TRILINEAR_INTERPOLATION,"Interpolation",&m_TrilinearInterpolationOn,1);
 
 	m_Gui->Divider();
   return m_Gui;
@@ -608,6 +611,20 @@ void mafViewSlice::OnEvent(mafEventBase *maf_event)
             if(p)
             {
               p->SetEnableGPU(m_EnableGPU);
+              this->CameraUpdate();
+            }
+          }
+        }
+        break;
+      case ID_TRILINEAR_INTERPOLATION:
+        {
+          if (m_CurrentVolume)
+          {
+            mafPipeVolumeSlice_BES *p = NULL;
+            p = mafPipeVolumeSlice_BES::SafeDownCast(this->GetNodePipe(m_CurrentVolume->m_Vme));
+            if(p)
+            {
+              p->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
               this->CameraUpdate();
             }
           }

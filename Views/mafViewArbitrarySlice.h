@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:19:56 $
-  Version:   $Revision: 1.8.2.5 $
+  Date:      $Date: 2011-12-27 16:49:07 $
+  Version:   $Revision: 1.8.2.6 $
   Authors:   Eleonora Mambrini
 ==========================================================================
   Copyright (c) 2002/2004
@@ -56,6 +56,7 @@ public:
 	{
 		ID_COMBO_GIZMOS = Superclass::ID_LAST,
 		ID_RESET,
+    ID_TRILINEAR_INTERPOLATION_ON,
 		ID_LAST,
 	};
 
@@ -131,6 +132,6 @@ protected:
 
   medVMEPolylineEditor *m_CurrentPolylineGraphEditor;
 
-
+  int m_TrilinearInterpolationOn;
 };
 #endif

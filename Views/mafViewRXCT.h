@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:22:31 $
-  Version:   $Revision: 1.17.2.6 $
+  Date:      $Date: 2011-12-27 16:49:07 $
+  Version:   $Revision: 1.17.2.7 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -78,6 +78,7 @@ public:
     ID_ALL_SURFACE,
     ID_RESET_SLICES,
     ID_ENABLE_GPU,
+    ID_TRILINEAR_INTERPOLATION,
     ID_LAST
   };
 
@@ -173,5 +174,6 @@ protected:
 
   // Added by Losi 11.25.2009
   int m_EnableGPU; ///<Non-zero, if the GPU support for slicing is used (default)
+  int m_TrilinearInterpolationOn;
 };
 #endif

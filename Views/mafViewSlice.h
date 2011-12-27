@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.h,v $
   Language:  C++
-  Date:      $Date: 2011-07-13 08:30:23 $
-  Version:   $Revision: 1.26.2.12 $
+  Date:      $Date: 2011-12-27 16:49:08 $
+  Version:   $Revision: 1.26.2.13 $
   Authors:   Paolo Quadrani,Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -95,6 +95,7 @@ public:
   {
     ID_NONE = Superclass::ID_LAST,
     ID_ENABLE_GPU,
+    ID_TRILINEAR_INTERPOLATION,
     ID_LAST
   };
 
@@ -151,6 +152,8 @@ public:
   virtual void CameraUpdate();
 
   void SetEnableGPU(int enable){m_EnableGPU = enable;};
+
+  void SetTrilinearInterpolation(int interpolation){m_TrilinearInterpolationOn = interpolation;};
 
   void SetTextureInterpolate(bool interpolate) {m_TextureInterpolate = interpolate;};
   
@@ -214,5 +217,6 @@ protected:
   int m_EnableGPU; ///<Non-zero, if the GPU support for slicing is used (default)
 
   bool m_TextureInterpolate;
+  int m_TrilinearInterpolationOn;
 };
 #endif

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-07-26 12:26:48 $
-  Version:   $Revision: 1.61.2.20 $
+  Date:      $Date: 2011-12-27 16:49:07 $
+  Version:   $Revision: 1.61.2.21 $
   Authors:   Stefano Perticoni, Gianluigi Crimi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -88,6 +88,7 @@ mafViewOrthoSlice::mafViewOrthoSlice(wxString label)
 
   // Added by Losi 11.25.2009
   m_EnableGPU=FALSE;
+  m_TrilinearInterpolationOn = TRUE;
 }
 //----------------------------------------------------------------------------
 mafViewOrthoSlice::~mafViewOrthoSlice()
@@ -371,6 +372,23 @@ void mafViewOrthoSlice::OnEvent(mafEventBase *maf_event)
           }
         }
         break;
+      case ID_TRILINEAR_INTERPOLATION:
+        {
+          if (m_CurrentVolume)
+          {
+            for(int i=0; i<m_NumOfChildView; i++)
+            {
+              mafPipeVolumeSlice_BES *p = NULL;
+              p = mafPipeVolumeSlice_BES::SafeDownCast(((mafViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume));
+              if (p)
+              {
+                p->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
+              }
+            }
+            this->CameraUpdate();
+          }
+        }
+        break;
       default:
         mafViewCompound::OnEvent(maf_event);
     }
@@ -420,11 +438,13 @@ mafGUI* mafViewOrthoSlice::CreateGui()
       if (p)
       {
         p->SetEnableGPU(m_EnableGPU);
+        p->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
       }
     }
   }
   m_Gui->Divider(1);
   //m_Gui->Bool(ID_ENABLE_GPU,"Enable GPU",&m_EnableGPU,1);
+  m_Gui->Bool(ID_TRILINEAR_INTERPOLATION,"Interpolation",&m_TrilinearInterpolationOn,1);
 
   m_Gui->Divider();
   return m_Gui;
@@ -746,6 +766,7 @@ void mafViewOrthoSlice::CreateOrthoslicesAndGizmos( mafNode * node )
 	{
 		mafPipeVolumeSlice_BES *p = (mafPipeVolumeSlice_BES *)((mafViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume);
     p->SetEnableGPU(m_EnableGPU);
+    p->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
 		p->SetColorLookupTable(m_ColorLUT);
 	}
 	((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->SetSliceLocalOrigin(m_GizmoHandlePosition);

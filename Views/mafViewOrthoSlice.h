@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.h,v $
   Language:  C++
-  Date:      $Date: 2011-06-01 07:58:15 $
-  Version:   $Revision: 1.23.2.7 $
+  Date:      $Date: 2011-12-27 16:49:07 $
+  Version:   $Revision: 1.23.2.8 $
   Authors:   Stefano Perticoni, Gianluigi Crimi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -88,6 +88,7 @@ public:
 		ID_ALL_SURFACE,
 		ID_BORDER_CHANGE,
     ID_ENABLE_GPU,
+    ID_TRILINEAR_INTERPOLATION,
     ID_LAST
   };
 
@@ -183,6 +184,7 @@ protected:
 
   
   int m_EnableGPU;
+  int m_TrilinearInterpolationOn;
 
 };
 #endif

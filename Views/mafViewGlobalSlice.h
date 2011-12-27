@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:19:56 $
-  Version:   $Revision: 1.9.2.8 $
+  Date:      $Date: 2011-12-27 16:49:07 $
+  Version:   $Revision: 1.9.2.9 $
   Authors:   Matteo Giacomoni, Simone Brazzale
 ==========================================================================
   Copyright (c) 2002/2004
@@ -60,6 +60,7 @@ public:
     ID_POS_SLIDER = Superclass::ID_LAST,
 		ID_CHANGE_VIEW,
 		ID_OPACITY_SLIDER,
+    ID_TRILINEAR_INTERPOLATION_ON,
     ID_LAST
   };
   
@@ -143,5 +144,7 @@ protected:
   std::vector<vtkProperty*>             m_BoundsOutlineProperty;
   std::vector<vtkPolyDataMapper*>       m_BoundsOutlineMapper;
   std::vector<vtkActor*>	              m_BoundsOutlineActor;
+
+  int m_TrilinearInterpolationOn;
 };
 #endif

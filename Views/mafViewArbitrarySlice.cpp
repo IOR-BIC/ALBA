@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:19:56 $
-  Version:   $Revision: 1.38.2.9 $
+  Date:      $Date: 2011-12-27 16:49:07 $
+  Version:   $Revision: 1.38.2.10 $
   Authors:   Eleonora Mambrini
 ==========================================================================
   Copyright (c) 2002/2004
@@ -41,7 +41,6 @@
 #include "mafAbsMatrixPipe.h"
 #include "mafAttachCamera.h"
 #include "mafInteractorGenericMouse.h"
-#include "mafVMESlicer.h"
 #include "mafTagArray.h"
 #include "mmaMaterial.h"
 #include "mmaVolumeMaterial.h"
@@ -122,6 +121,7 @@ mafViewArbitrarySlice::mafViewArbitrarySlice(wxString label, bool show_ruler)
 
 	m_TypeGizmo = GIZMO_TRANSLATE;
 
+  m_TrilinearInterpolationOn = TRUE;
 }
 //----------------------------------------------------------------------------
 mafViewArbitrarySlice::~mafViewArbitrarySlice()
@@ -785,7 +785,14 @@ void mafViewArbitrarySlice::OnEventThis(mafEventBase *maf_event)
           }
         }
         break;
-			}
+      }
+      case ID_TRILINEAR_INTERPOLATION_ON:
+        {
+          m_Slicer->SetTrilinearInterpolation(m_TrilinearInterpolationOn == TRUE);
+          mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+
+        }
+        break;
 		default:
 			mafViewCompound::OnEvent(maf_event);
 		}
@@ -823,6 +830,8 @@ mafGUI* mafViewArbitrarySlice::CreateGui()
 	m_Gui->Divider(2);
 
 	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
+
+  m_Gui->Bool(ID_TRILINEAR_INTERPOLATION_ON,"Interpolation",&m_TrilinearInterpolationOn,1);
 
 	m_Gui->Divider();
 	m_Gui->Update();

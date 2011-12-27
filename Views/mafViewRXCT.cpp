@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-11-22 11:04:58 $
-  Version:   $Revision: 1.45.2.12 $
+  Date:      $Date: 2011-12-27 16:49:07 $
+  Version:   $Revision: 1.45.2.13 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -101,6 +101,7 @@ mafViewRXCT::mafViewRXCT(wxString label)
 
   // Added by Losi 11.25.2009
   m_EnableGPU=FALSE;
+  m_TrilinearInterpolationOn = TRUE;
 }
 //----------------------------------------------------------------------------
 mafViewRXCT::~mafViewRXCT()
@@ -274,6 +275,7 @@ void mafViewRXCT::VmeShow(mafNode *node, bool show)
         p = mafPipeVolumeSlice_BES::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->GetNodePipe(node));
 
         p->SetEnableGPU(m_EnableGPU);
+        p->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
 
         //p->SetColorLookupTable(m_vtkLUT[CT_COMPOUND_VIEW]);
         p->SetColorLookupTable(m_Lut);
@@ -663,7 +665,39 @@ void mafViewRXCT::OnEvent(mafEventBase *maf_event)
           }
         }
         break;
+      case ID_TRILINEAR_INTERPOLATION:
+        {
+          if (m_CurrentVolume)
+          {
+            for(int i=0; i<CT_CHILD_VIEWS_NUMBER; i++)
+            {
+              mafPipeVolumeSlice_BES *p = NULL;
+              p = mafPipeVolumeSlice_BES::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->GetNodePipe(m_CurrentVolume));
+              if (p)
+              {
+                p->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
+              }
+            }
+            mafPipeVolumeSlice_BES *p = NULL;
+            p = mafPipeVolumeSlice_BES::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[RX_SIDE_VIEW]))->GetNodePipe(m_CurrentVolume));
+            if (p)
+            {
+              p->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
+            }
+            p = mafPipeVolumeSlice_BES::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[RX_FRONT_VIEW]))->GetNodePipe(m_CurrentVolume));
+            if (p)
+            {
+              p->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
+            }
+            this->CameraUpdate();
+          }
 
+          for (int i=0;i<CT_CHILD_VIEWS_NUMBER;i++)
+          {
+            ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW]))->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
+          }
+        }
+        break;
       case ID_ALL_SURFACE:
       {
         if(m_AllSurface)
@@ -730,23 +764,24 @@ mafGUI* mafViewRXCT::CreateGui()
   m_Gui->Button(ID_RESET_SLICES,"reset slices","");
 
   // Added by Losi 11.25.2009
-  if (((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume"))
+  if (m_CurrentVolume)
   {
-    for(int i=0; i<CT_CHILD_VIEWS_NUMBER; i++)
+    for (int i=0; i<m_NumOfChildView; i++)
     {
       mafPipeVolumeSlice_BES *p = NULL;
-      p = mafPipeVolumeSlice_BES::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->GetNodePipe(node));
+      p = mafPipeVolumeSlice_BES::SafeDownCast(((mafViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume));
       if (p)
       {
         p->SetEnableGPU(m_EnableGPU);
+        p->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
       }
     }
   }
   m_Gui->Divider(1);
   //m_Gui->Bool(ID_ENABLE_GPU,"Enable GPU",&m_EnableGPU,1);
+  m_Gui->Bool(ID_TRILINEAR_INTERPOLATION,"Interpolation",&m_TrilinearInterpolationOn,1);
 
-  EnableWidgets(m_CurrentVolume != NULL);
-
+  m_Gui->Divider();
   return m_Gui;
 }
 //----------------------------------------------------------------------------

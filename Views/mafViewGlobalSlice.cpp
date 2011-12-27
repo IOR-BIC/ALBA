@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:19:56 $
-  Version:   $Revision: 1.29.2.12 $
+  Date:      $Date: 2011-12-27 16:49:07 $
+  Version:   $Revision: 1.29.2.13 $
   Authors:   Matteo Giacomoni, Simone Brazzale
 ==========================================================================
   Copyright (c) 2002/2004
@@ -125,6 +125,8 @@ mafViewGlobalSlice::mafViewGlobalSlice(wxString label, int camera_position, bool
 	m_BoundsOutlineProperty.clear();
 	m_BoundsOutlineActor.clear();
 	m_BoundsOutlineMapper.clear();
+
+  m_TrilinearInterpolationOn = TRUE;
 }
 //----------------------------------------------------------------------------
 mafViewGlobalSlice::~mafViewGlobalSlice()
@@ -298,6 +300,8 @@ void mafViewGlobalSlice::VmeSelect(mafNode *node,bool select)
       {
         m_Opacity = ((mafPipeVolumeSlice *)m_SelectedVolume->m_Pipe)->GetSliceOpacity();
         m_Gui->Enable(ID_OPACITY_SLIDER,true);
+        ((mafPipeVolumeSlice *)m_SelectedVolume->m_Pipe)->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
+        m_Gui->Enable(ID_TRILINEAR_INTERPOLATION_ON,true);
       }
       m_Gui->Update();
     }
@@ -409,6 +413,8 @@ void mafViewGlobalSlice::VmeCreatePipe(mafNode *node)
 			{
 				m_Gui->Enable(ID_OPACITY_SLIDER,true);
 				m_Opacity=((mafPipeVolumeSlice *)m_SelectedVolume->m_Pipe)->GetSliceOpacity();
+        m_Gui->Enable(ID_TRILINEAR_INTERPOLATION_ON,true);
+        ((mafPipeVolumeSlice *)m_SelectedVolume->m_Pipe)->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
 				m_Gui->Update();
 			}
 
@@ -489,6 +495,16 @@ void mafViewGlobalSlice::OnEvent(mafEventBase *maf_event)
 					m_OpacitySlider->SetValue(m_Opacity);
 				}
 			}
+      break;
+      case ID_TRILINEAR_INTERPOLATION_ON:
+      {
+        mafPipeVolumeSlice* pipe = (mafPipeVolumeSlice *)m_SelectedVolume->m_Pipe;
+        if (pipe)
+        {
+          pipe->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
+          mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+        }
+      }
 			break;
 			case ID_POS_SLIDER:
 				m_Dn = m_SliderOrigin - m_SliderOldOrigin;
@@ -605,6 +621,7 @@ mafGUI* mafViewGlobalSlice::CreateGui()
 
   m_SliderOldOrigin = m_SliderOrigin;
 
+  m_Gui->Bool(ID_TRILINEAR_INTERPOLATION_ON,"Interpolation",&m_TrilinearInterpolationOn,1);
 	m_Gui->Divider();
 	m_Gui->Update();
   return m_Gui;
@@ -679,6 +696,7 @@ void mafViewGlobalSlice::UpdateSlice()
       else if(((mafVME *)node->m_Vme)->GetOutput()->IsA("mafVMEOutputVolume"))
       {
         ((mafPipeVolumeSlice *)node->m_Pipe)->SetSlice(applied_origin, applied_xVector, applied_yVector);
+        ((mafPipeVolumeSlice *)node->m_Pipe)->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
       }
       transform->Delete();
       transform = NULL;
@@ -856,7 +874,9 @@ void mafViewGlobalSlice::VmeShow(mafNode *node, bool show)
     if (((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume"))
     {
       m_Opacity   = ((mafPipeVolumeSlice *)m_SelectedVolume->m_Pipe)->GetSliceOpacity();
+      ((mafPipeVolumeSlice *)m_SelectedVolume->m_Pipe)->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
       m_Gui->Enable(ID_OPACITY_SLIDER,true);
+      m_Gui->Enable(ID_TRILINEAR_INTERPOLATION_ON,true);
     }
     m_Gui->Update();
   }
