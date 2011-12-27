@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESlicer.h,v $
   Language:  C++
-  Date:      $Date: 2011-06-13 15:59:35 $
-  Version:   $Revision: 1.15.2.1 $
+  Date:      $Date: 2011-12-27 16:46:05 $
+  Version:   $Revision: 1.15.2.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -101,6 +101,16 @@ public:
 
   static bool VolumeAccept(mafNode* node) {return(node != NULL  && node->IsMAFType(mafVMEVolume));};
 
+
+  /** Set tri-linear interpolation to on */
+  void SetTrilinearInterpolationOn(){m_TrilinearInterpolationOn = true;};
+
+  /** Set tri-linear interpolation to off */
+  void SetTrilinearInterpolationOff(){m_TrilinearInterpolationOn = false;};
+
+  /** Set tri-linear interpolation */
+  void SetTrilinearInterpolation(bool on);
+
 protected:
   mafVMESlicer();
   virtual ~mafVMESlicer();
@@ -131,6 +141,8 @@ protected:
   double            m_Yspc;
 
   bool m_UpdateVTKPropertiesFromMaterial;
+
+  bool m_TrilinearInterpolationOn;
 
 private:
   mafVMESlicer(const mafVMESlicer&); // Not implemented

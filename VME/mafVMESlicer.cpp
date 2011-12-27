@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-08-24 10:23:14 $
-  Version:   $Revision: 1.28.2.3 $
+  Date:      $Date: 2011-12-27 16:46:05 $
+  Version:   $Revision: 1.28.2.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -95,6 +95,8 @@ mafVMESlicer::mafVMESlicer()
   GetMaterial()->SetMaterialTexture(GetSurfaceOutput()->GetTexture());
   GetMaterial()->m_MaterialType = mmaMaterial::USE_TEXTURE;
   GetMaterial()->m_TextureMappingMode = mmaMaterial::PLANE_MAPPING;
+
+  m_TrilinearInterpolationOn = true;
 }
 
 //-------------------------------------------------------------------------
@@ -431,4 +433,14 @@ char** mafVMESlicer::GetIcon()
 {
   #include "mafVMESurface.xpm"
   return mafVMESurface_xpm;
+}
+//-------------------------------------------------------------------------
+void mafVMESlicer::SetTrilinearInterpolation(bool on) 
+//-------------------------------------------------------------------------
+{
+  m_TrilinearInterpolationOn = on;
+  if(m_ISlicer)
+  {
+    m_ISlicer->SetTrilinearInterpolation(on == TRUE);
+  }
 }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:05:59 $
-  Version:   $Revision: 1.52 $
+  Date:      $Date: 2011-12-27 16:46:05 $
+  Version:   $Revision: 1.52.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -116,6 +116,7 @@ mafPipeVolumeSlice::mafPipeVolumeSlice()
 
 	m_ShowSlider = true;
 	m_ShowTICKs	 = false;
+  m_TrilinearInterpolationOn = FALSE;
 }
 //----------------------------------------------------------------------------
 void mafPipeVolumeSlice::InitializeSliceParameters(int direction, bool show_vol_bbox, bool show_bounds)
@@ -446,7 +447,7 @@ void mafPipeVolumeSlice::CreateSlice(int direction)
 
 	vtkNEW(m_Texture[direction]);
 	m_Texture[direction]->RepeatOff();
-	m_Texture[direction]->InterpolateOn();
+  m_Texture[direction]->InterpolateOn();
 	m_Texture[direction]->SetQualityTo32Bit();
 	m_Texture[direction]->SetInput(m_Image[direction]);
   m_Texture[direction]->SetLookupTable(m_ColorLUT);
@@ -648,6 +649,7 @@ mafGUI *mafPipeVolumeSlice::CreateGui()
 			m_SliceSlider[2] = m_Gui->FloatSlider(ID_SLICE_SLIDER_Z,"z",&m_Origin[2],b[4],b[5]);
 		}
 	}
+  m_Gui->Bool(ID_ENABLE_TRILINEAR_INTERPOLATION,"Interpolation",&m_TrilinearInterpolationOn,1,"Enable/Disable tri-linear interpolation on slices");
 	m_Gui->Divider();
   return m_Gui;
 }
@@ -676,6 +678,10 @@ void mafPipeVolumeSlice::OnEvent(mafEventBase *maf_event)
 				SetSliceOpacity(m_SliceOpacity);
 				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 			break;
+      case ID_ENABLE_TRILINEAR_INTERPOLATION:
+        UpdateSlice();
+        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+      break;
       default:
       break;
     }
@@ -742,4 +748,24 @@ void mafPipeVolumeSlice::ShowTICKsOff()
 	m_ShowTICKs=false;
 	if(m_TickActor)
 		m_TickActor->SetVisibility(m_ShowTICKs);
+}
+
+//------------------------------------------------------------------------
+void mafPipeVolumeSlice::UpdateSlice()
+//------------------------------------------------------------------------
+{
+  for (int i = 0; i < 3; i++)
+  {
+    if (m_SlicerImage[i] != NULL)
+    {
+      m_SlicerImage[i]->SetTrilinearInterpolation(m_TrilinearInterpolationOn == TRUE);
+      m_SlicerImage[i]->Update();
+    }
+
+    if (m_SlicerPolygonal[i] != NULL)
+    {
+      //m_SlicerPolygonal[i]->SetTrilinearInterpolation(m_TrilinearInterpolationOn == TRUE);
+      m_SlicerPolygonal[i]->Update();
+    }
+  }    
 }

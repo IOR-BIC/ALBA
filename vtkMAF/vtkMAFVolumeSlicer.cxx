@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkMAFVolumeSlicer.cxx,v $
   Language:  C++
-  Date:      $Date: 2011-07-21 13:11:07 $
-  Version:   $Revision: 1.2.2.2 $
+  Date:      $Date: 2011-12-27 16:45:20 $
+  Version:   $Revision: 1.2.2.3 $
 
 =========================================================================*/
 
@@ -21,7 +21,7 @@
 
 #include "assert.h"
 
-vtkCxxRevisionMacro(vtkMAFVolumeSlicer, "$Revision: 1.2.2.2 $");
+vtkCxxRevisionMacro(vtkMAFVolumeSlicer, "$Revision: 1.2.2.3 $");
 vtkStandardNewMacro(vtkMAFVolumeSlicer);
 
 typedef unsigned short u_short;
@@ -58,6 +58,7 @@ vtkMAFVolumeSlicer::vtkMAFVolumeSlicer()
   this->AutoSpacing = true;
 
   this->VoxelCoordinates[0] = this->VoxelCoordinates[1] = this->VoxelCoordinates[2] = NULL;
+  TriLinearInterpolationOn = true;
 }
 //----------------------------------------------------------------------------
 vtkMAFVolumeSlicer::~vtkMAFVolumeSlicer() 
@@ -723,22 +724,27 @@ template<typename InputDataType, typename OutputDataType> void vtkMAFVolumeSlice
       if (pi[0] > SamplingTableSize || pi[1] > SamplingTableSize || pi[2] > SamplingTableSize)
         continue;
 
-      // tri-linear interpolation
       int   index = stIndices[0][pi[0]] + stIndices[1][pi[1]] + stIndices[2][pi[2]];
       for (int comp = 0; comp < numComp; comp++) 
       {
-        float sample = 0.f;
-        for (int z = 0, si = 0; z < 2; z++) 
+        double sample = 0.0;
+        if(TriLinearInterpolationOn)
         {
-          const float zweight = z ? 1.f - stOffsets[2][pi[2]] : stOffsets[2][pi[2]];
-          for (int y = 0; y < 2; y++) 
+          for (int z = 0, si = 0; z < 2; z++) 
           {
-            const float yzweight = (y ? 1.f - stOffsets[1][pi[1]] : stOffsets[1][pi[1]]) * zweight;
-            for (int x = 0; x < 2; x++, si++)
-              sample += samplingPtr[si][index + comp] * (x ? 1.f - stOffsets[0][pi[0]] : stOffsets[0][pi[0]]) * yzweight;
-	        }
+            const float zweight = z ? 1.f - stOffsets[2][pi[2]] : stOffsets[2][pi[2]];
+            for (int y = 0; y < 2; y++) 
+            {
+              const float yzweight = (y ? 1.f - stOffsets[1][pi[1]] : stOffsets[1][pi[1]]) * zweight;
+              for (int x = 0; x < 2; x++, si++)
+                sample += samplingPtr[si][index + comp] * (x ? 1.f - stOffsets[0][pi[0]] : stOffsets[0][pi[0]]) * yzweight;
+            }
+          }
         }
-					
+        else
+        {
+          sample = input[index + comp];
+        }
         // mapping
         //clip(((sample + shift) * scale), pixel[comp]);
         pixel[comp] = sample;

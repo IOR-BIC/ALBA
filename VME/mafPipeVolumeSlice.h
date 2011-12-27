@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-25 11:52:18 $
-  Version:   $Revision: 1.24.2.1 $
+  Date:      $Date: 2011-12-27 16:46:05 $
+  Version:   $Revision: 1.24.2.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -73,6 +73,7 @@ public:
     ID_SLICE_SLIDER_Y,
     ID_SLICE_SLIDER_Z,
 		ID_OPACITY_SLIDER,
+    ID_ENABLE_TRILINEAR_INTERPOLATION,
     ID_LAST
   };
 
@@ -127,6 +128,18 @@ public:
 	void HideSlider();
 	void ShowSlider();
 
+
+  /** Set tri-linear interpolation */  
+  void SetTrilinearInterpolation(int on){m_TrilinearInterpolationOn = on; UpdateSlice();};
+
+  /** Set tri-linear interpolation to off */
+  void SetTrilinearInterpolationOff(){SetTrilinearInterpolation(FALSE);};
+
+  /** Set tri-linear interpolation to on */
+  void SetTrilinearInterpolationOn(){SetTrilinearInterpolation(TRUE);};
+
+  void UpdateSlice();
+
 protected:
 	/** Create the slicer pipeline. */
 	void CreateSlice(int direction);
@@ -174,5 +187,6 @@ protected:
 	bool										m_ShowBounds;
 	bool										m_ShowSlider;
 	bool										m_ShowTICKs;
+  int                     m_TrilinearInterpolationOn;
 };
 #endif // __mafPipeVolumeSlice_H__

@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFVolumeSlicer.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:27:45 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2011-12-27 16:45:20 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Alexander Savenko
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -124,6 +124,15 @@ public:
   Transform slicer plane according to the given transformation before slicing.*/
   void SetSliceTransform(vtkLinearTransform *trans);
 
+  /** Set tri-linear interpolation to on */
+  void SetTrilinearInterpolationOn(){TriLinearInterpolationOn = true;};
+
+  /** Set tri-linear interpolation to off */
+  void SetTrilinearInterpolationOff(){TriLinearInterpolationOn = false;};
+
+  /** Set tri-linear interpolation */
+  void SetTrilinearInterpolation(bool on){TriLinearInterpolationOn = on;this->ExecuteData(this->GetOutput(0));};
+
 protected:
   vtkMAFVolumeSlicer();
   ~vtkMAFVolumeSlicer();
@@ -167,12 +176,12 @@ protected:
   // look-up tables and caches
   vtkTimeStamp PreprocessingTime;
 
-  float*       VoxelCoordinates[3];
-  double       DataOrigin[3];
-  double        DataBounds[3][2];
-  int          DataDimensions[3];
-  double        SamplingTableMultiplier[3];
-
+  float*  VoxelCoordinates[3];
+  double  DataOrigin[3];
+  double  DataBounds[3][2];
+  int     DataDimensions[3];
+  double  SamplingTableMultiplier[3];
+  bool    TriLinearInterpolationOn;
 private:
   vtkMAFVolumeSlicer(const vtkMAFVolumeSlicer&);  // Not implemented.
   void operator=(const vtkMAFVolumeSlicer&);  // Not implemented.
