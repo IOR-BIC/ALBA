@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2011-12-21 12:58:09 $
-Version:   $Revision: 1.1.2.17 $
+Date:      $Date: 2011-12-29 09:29:36 $
+Version:   $Revision: 1.1.2.18 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
@@ -687,19 +687,19 @@ bool medOpSegmentation::Refinement()
 //----------------------------------------------------------------------------
 {
   
-  if ( !(( m_CurrentSlicePlane == XY && (m_RefinementRegionsSize>m_VolumeDimensions[0] || m_RefinementRegionsSize>m_VolumeDimensions[1]) ) ||
-         ( m_CurrentSlicePlane == YZ && (m_RefinementRegionsSize>m_VolumeDimensions[1] || m_RefinementRegionsSize>m_VolumeDimensions[2]) ) ||
-         ( m_CurrentSlicePlane == XZ && (m_RefinementRegionsSize>m_VolumeDimensions[0] || m_RefinementRegionsSize>m_VolumeDimensions[2]) )) )
-  {
-    wxMessageBox("Region size is bigger than slice dimension - Choose another value.");
-    return false;
-  }
+//   if ( !(( m_CurrentSlicePlane == XY && (m_RefinementRegionsSize>m_VolumeDimensions[0] || m_RefinementRegionsSize>m_VolumeDimensions[1]) ) ||
+//          ( m_CurrentSlicePlane == YZ && (m_RefinementRegionsSize>m_VolumeDimensions[1] || m_RefinementRegionsSize>m_VolumeDimensions[2]) ) ||
+//          ( m_CurrentSlicePlane == XZ && (m_RefinementRegionsSize>m_VolumeDimensions[0] || m_RefinementRegionsSize>m_VolumeDimensions[2]) )) )
+//   {
+//     wxMessageBox("Region size is bigger than slice dimension - Choose another value.");
+//     return false;
+//   }
 
   // threshold values empirically assigned
 
-  if( !(( m_RefinementRegionsSize > 5) || ( m_RefinementRegionsSize>=3 && (m_RefinementIterative || m_RefinementEverySlice) ) ))
-    if (wxMessageBox( "Region size is too big, it could take a long time  - Continue?", "Warning", wxYES_NO, NULL) == wxNO)
-      return false;
+//   if( !(( m_RefinementRegionsSize > 5) || ( m_RefinementRegionsSize>=3 && (m_RefinementIterative || m_RefinementEverySlice) ) ))
+//     if (wxMessageBox( "Region size is too big, it could take a long time  - Continue?", "Warning", wxYES_NO, NULL) == wxNO)
+//       return false;
   
   wxBusyCursor wait_cursor;
   wxBusyInfo wait(_("Wait! The algorithm could take long time!"));
