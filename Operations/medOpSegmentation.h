@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.h,v $
 Language:  C++
-Date:      $Date: 2011-12-16 12:40:29 $
-Version:   $Revision: 1.1.2.8 $
+Date:      $Date: 2012-01-04 15:30:46 $
+Version:   $Revision: 1.1.2.9 $
 Authors:   Eleonora Mambrini, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
@@ -434,6 +434,10 @@ protected:
   /** Function called when the user use the fine button to change the range of the automatic segmentation */
   void OnAutomaticChangeRangeManually(int eventID);
 
+  void GetCameraAttribute(double *focalPoint, double* scaleFactor);
+  void GetVisualizedBounds(double focalPoint[3], double scaleFactor, double bounds[4]);
+  bool ResetZoom(vtkDataSet* dataset,double visbleBounds[4]);
+
   medVMESegmentationVolume *m_SegmentatedVolume;
 
   int m_AutomaticGlobalThreshold;
@@ -496,6 +500,9 @@ protected:
   int m_RefinementEverySlice;
   int m_RefinementIterative;
   int m_TrilinearInterpolationOn;
+
+  double m_InitialFocalPoint[3];
+  double m_InitialScaleFactor;
 
   std::vector<vtkUnsignedCharArray *> m_RefinementUndoList;
   std::vector<vtkUnsignedCharArray *> m_RefinementRedoList;

@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2011-12-29 09:29:36 $
-Version:   $Revision: 1.1.2.18 $
+Date:      $Date: 2012-01-04 15:30:46 $
+Version:   $Revision: 1.1.2.19 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
@@ -80,6 +80,7 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #include "vtkPointData.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkActor.h"
+#include "vtkCamera.h"
 
 #include "itkImage.h"
 #include "itkImageToVTKImageFilter.h"
@@ -226,6 +227,11 @@ medOpSegmentation::medOpSegmentation(const wxString &label) : mafOp(label)
   //////////////////////////////////////////////////////////////////////////
 
   m_TrilinearInterpolationOn = FALSE;
+
+  m_InitialFocalPoint[0]=9999;
+  m_InitialFocalPoint[1]=9999;
+  m_InitialFocalPoint[2]=9999;
+  m_InitialScaleFactor = -1;
 }
 //----------------------------------------------------------------------------
 medOpSegmentation::~medOpSegmentation()
@@ -288,7 +294,8 @@ void medOpSegmentation::OpRun()
   m_View->CameraUpdate();
   
   OnNextStep();
-  
+  GetCameraAttribute(m_InitialFocalPoint, &m_InitialScaleFactor);
+
   int result = m_Dialog->ShowModal() == wxID_OK ? OP_RUN_OK : OP_RUN_CANCEL;
 
   DeleteOpDialog();
@@ -2238,26 +2245,32 @@ void medOpSegmentation::OnAutomaticSegmentationEvent(mafEvent *e)
 void medOpSegmentation::ReloadUndoRedoState(vtkDataSet *dataSet,UndoRedoState state)
 //------------------------------------------------------------------------
 {
-
   if (state.plane!=m_CurrentSlicePlane || state.slice!=m_CurrentSliceIndex)
   {
 
     m_CurrentSlicePlane=state.plane;
     m_CurrentSliceIndex=state.slice;
-    m_View->ChangeView(m_CurrentSlicePlane);
+    //m_View->ChangeView(m_CurrentSlicePlane);
     UpdateSlice();
     InitGui();
     m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
   }
 
+  double focalPoint[3];
+  double scaleFactor;
+  GetCameraAttribute(focalPoint, &scaleFactor);
+  double bounds[4];
+  GetVisualizedBounds(focalPoint, scaleFactor, bounds);
   dataSet->GetPointData()->SetScalars(state.dataArray);
-
   //Show changes
   m_View->VmeShow(m_ManualVolumeSlice, false);
   m_ManualVolumeSlice->Update();
   m_View->VmeShow(m_ManualVolumeSlice, true);
-  SetTrilinearInterpolation(m_ManualVolumeSlice);
-  m_View->ChangeView(m_CurrentSlicePlane);
+  //SetTrilinearInterpolation(m_ManualVolumeSlice);
+//   if(ResetZoom(dataSet,bounds))
+//   {
+//     m_View->ChangeView(m_CurrentSlicePlane);
+//   }
   m_View->CameraUpdate();
 }
 
@@ -3294,7 +3307,9 @@ void medOpSegmentation::InitMaskColorLut(vtkLookupTable *lut)
   }
 }
 
+//----------------------------------------------------------------------------
 void medOpSegmentation::SetTrilinearInterpolation(mafVMEVolumeGray *volume)
+//----------------------------------------------------------------------------
 {
   if(volume)
   {
@@ -3304,4 +3319,55 @@ void medOpSegmentation::SetTrilinearInterpolation(mafVMEVolumeGray *volume)
       pipe->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
     }
   }
+}
+
+//----------------------------------------------------------------------------
+void medOpSegmentation::GetCameraAttribute(double *focalPoint, double *scaleFactor)
+//----------------------------------------------------------------------------
+{
+  *scaleFactor = m_View->m_Rwi->m_RenFront->GetActiveCamera()->GetParallelScale();
+  m_View->m_Rwi->m_RenFront->GetActiveCamera()->GetFocalPoint(focalPoint);
+}
+//----------------------------------------------------------------------------
+void medOpSegmentation::GetVisualizedBounds(double focalPoint[3], double scaleFactor, double bounds[4])
+//----------------------------------------------------------------------------
+{
+  double visualizedRatio = scaleFactor / m_InitialScaleFactor;
+  double xTranslation = focalPoint[0] - m_InitialFocalPoint[0];
+  double yTranslation = focalPoint[1] - m_InitialFocalPoint[1];
+
+  double b[6];
+  m_Volume->GetOutput()->GetVTKData()->GetBounds(b);
+  
+  double xSize = b[1] - b[0];
+  double ySize = b[3] - b[2];
+
+  double size = max(xSize,ySize);
+
+  double newSize = size * visualizedRatio;
+
+  bounds[0] = focalPoint[0] - newSize/2;
+  bounds[1] = focalPoint[0] + newSize/2;
+
+  bounds[2] = focalPoint[1] - newSize/2;
+  bounds[3] = focalPoint[1] + newSize/2;
+
+}
+//----------------------------------------------------------------------------
+bool medOpSegmentation::ResetZoom(vtkDataSet* dataset, double visbleBounds[4])
+//----------------------------------------------------------------------------
+{
+  for(int i = 0; i < dataset->GetNumberOfPoints(); i++)
+  {
+    if(dataset->GetPointData()->GetScalars()->GetTuple1(i) != 0)
+    {
+      double x[3];
+      dataset->GetPoint(i,x);
+      if(x[0] > visbleBounds[0] && x[0] < visbleBounds[1] && x[1] > visbleBounds[2] && x[1] < visbleBounds[3])
+      {
+        return true;
+      }
+    }
+  }  
+  return false;
 }
