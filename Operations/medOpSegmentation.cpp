@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2012-01-04 15:30:46 $
-Version:   $Revision: 1.1.2.19 $
+Date:      $Date: 2012-01-05 10:17:46 $
+Version:   $Revision: 1.1.2.20 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
@@ -2261,17 +2261,32 @@ void medOpSegmentation::ReloadUndoRedoState(vtkDataSet *dataSet,UndoRedoState st
   GetCameraAttribute(focalPoint, &scaleFactor);
   double bounds[4];
   GetVisualizedBounds(focalPoint, scaleFactor, bounds);
+
+  vtkImageData* undoRedoData = vtkImageData::New();
+  undoRedoData->DeepCopy(dataSet);
+  undoRedoData->Update();
+
+  for(int i = 0; i < undoRedoData->GetPointData()->GetScalars()->GetNumberOfTuples(); i++)
+  {
+    undoRedoData->GetPointData()->GetScalars()->SetTuple1(i,(unsigned char)abs(state.dataArray->GetTuple1(i) - dataSet->GetPointData()->GetScalars()->GetTuple1(i)));
+  }
+   undoRedoData->Update();
+
   dataSet->GetPointData()->SetScalars(state.dataArray);
   //Show changes
   m_View->VmeShow(m_ManualVolumeSlice, false);
   m_ManualVolumeSlice->Update();
   m_View->VmeShow(m_ManualVolumeSlice, true);
   //SetTrilinearInterpolation(m_ManualVolumeSlice);
-//   if(ResetZoom(dataSet,bounds))
-//   {
-//     m_View->ChangeView(m_CurrentSlicePlane);
-//   }
+
+  if(ResetZoom(undoRedoData,bounds))
+  {
+    m_View->ChangeView(m_CurrentSlicePlane);
+  }
+
   m_View->CameraUpdate();
+
+  undoRedoData->Delete();
 }
 
 //------------------------------------------------------------------------
@@ -3359,15 +3374,15 @@ bool medOpSegmentation::ResetZoom(vtkDataSet* dataset, double visbleBounds[4])
 {
   for(int i = 0; i < dataset->GetNumberOfPoints(); i++)
   {
-    if(dataset->GetPointData()->GetScalars()->GetTuple1(i) != 0)
+    if((unsigned char)(dataset->GetPointData()->GetScalars()->GetTuple1(i)) == 255)
     {
       double x[3];
       dataset->GetPoint(i,x);
       if(x[0] > visbleBounds[0] && x[0] < visbleBounds[1] && x[1] > visbleBounds[2] && x[1] < visbleBounds[3])
       {
-        return true;
+        return false;
       }
     }
   }  
-  return false;
+  return true;
 }
