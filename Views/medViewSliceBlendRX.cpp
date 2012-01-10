@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewSliceBlendRX.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-12-21 13:00:33 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2012-01-10 15:31:25 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Stefano Perticoni , Paolo Quadrani, Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -141,11 +141,14 @@ void medViewSliceBlendRX::VmeShow(mafNode *node, bool show)
       ((mafViewRX*)m_ChildViewList[RX_VIEW])->SetLutRange(minMax[0],minMax[1]);
       
       m_CurrentVolume = mafVME::SafeDownCast(node);
+
+      //Create Gizmos for the volume visualized
       GizmoCreate();
 
     }
     else
     {
+      // Remove Gizmos for the volume showed off
       m_CurrentVolume = NULL;
       GizmoDelete();
     }
@@ -157,6 +160,7 @@ void medViewSliceBlendRX::VmeShow(mafNode *node, bool show)
 void medViewSliceBlendRX::VmeRemove(mafNode *node)
 //----------------------------------------------------------------------------
 {
+  //If node is a volume delete gizmos
   if (m_CurrentVolume && node == m_CurrentVolume) 
   {
     m_CurrentVolume = NULL;
@@ -180,7 +184,9 @@ void medViewSliceBlendRX::OnEvent(mafEventBase *maf_event)
         {
           double low, hi;
 
+          //Get new values of LUT
           m_LutSliders->GetSubRange(&low,&hi);
+          //Set new values of LUT
           ((mafViewRX*)m_ChildViewList[RX_VIEW])->SetLutRange(low,hi);
           
           CameraUpdate();
@@ -189,6 +195,7 @@ void medViewSliceBlendRX::OnEvent(mafEventBase *maf_event)
       case MOUSE_UP:
       case MOUSE_MOVE:
         {
+          //Manage MOUSE events
           OnEventMouseMove(e);
         }
         break;
@@ -211,7 +218,7 @@ mafGUI* medViewSliceBlendRX::CreateGui()
 
   m_Gui->Label(_("Blend View"),true);
   m_BlendGui = m_ChildViewList[BLEND_VIEW]->GetGui();
-  /*m_BlendGui->SetListener(this);*/
+  // m_BlendGui->SetListener(this);
   m_Gui->AddGui(m_ChildViewList[BLEND_VIEW]->GetGui());
   m_Gui->FitInside();
   m_Gui->Update();
@@ -219,6 +226,7 @@ mafGUI* medViewSliceBlendRX::CreateGui()
 
   m_Gui->Divider(1);
   
+  //Enable/disable gui componets depending from volume
   EnableWidgets(m_CurrentVolume != NULL);
 
 	for(int i=0;i<m_NumOfChildView;i++)
@@ -298,6 +306,7 @@ void medViewSliceBlendRX::LayoutSubViewCustom(int width, int height)
 void medViewSliceBlendRX::GizmoCreate()
 //----------------------------------------------------------------------------
 {
+  // Retrieve medPipeVolumeSliceBlend to obtain slices positions
   medPipeVolumeSliceBlend *p = medPipeVolumeSliceBlend::SafeDownCast(m_ChildViewList[BLEND_VIEW]->GetNodePipe(m_CurrentVolume));
 
   if (p == NULL)
@@ -309,14 +318,17 @@ void medViewSliceBlendRX::GizmoCreate()
   p->GetSliceOrigin(GIZMO_0,pos0);
   double pos1[3];
   p->GetSliceOrigin(GIZMO_1,pos1);
+  //Create Gizmo0
   m_GizmoSlice[GIZMO_0] = new mafGizmoSlice(m_CurrentVolume, this);
   m_GizmoSlice[GIZMO_0]->CreateGizmoSliceInLocalPositionOnAxis(GIZMO_0,mafGizmoSlice::GIZMO_SLICE_Z,pos0[2]);
   m_GizmoSlice[GIZMO_0]->SetColor(m_BorderColor[GIZMO_0]);
 
+  //Create Gizmo1
   m_GizmoSlice[GIZMO_1] = new mafGizmoSlice(m_CurrentVolume, this);
   m_GizmoSlice[GIZMO_1]->CreateGizmoSliceInLocalPositionOnAxis(GIZMO_1,mafGizmoSlice::GIZMO_SLICE_Z,pos1[2]);
   m_GizmoSlice[GIZMO_1]->SetColor(m_BorderColor[GIZMO_1]);
 
+  //Show On Gizmos
   m_ChildViewList[RX_VIEW]->VmeShow(m_GizmoSlice[GIZMO_0]->GetOutput(), true);
   m_ChildViewList[RX_VIEW]->VmeShow(m_GizmoSlice[GIZMO_1]->GetOutput(), true);
 }
@@ -324,6 +336,7 @@ void medViewSliceBlendRX::GizmoCreate()
 void medViewSliceBlendRX::GizmoDelete()
 //----------------------------------------------------------------------------
 {
+  //Show Off Gizmos
   m_ChildViewList[RX_VIEW]->VmeShow(m_GizmoSlice[GIZMO_0]->GetOutput(),false);
   m_ChildViewList[RX_VIEW]->VmeShow(m_GizmoSlice[GIZMO_1]->GetOutput(),false);
   cppDEL(m_GizmoSlice[GIZMO_0]);
@@ -341,7 +354,10 @@ void medViewSliceBlendRX::OnEventMouseMove( mafEvent *e )
   if(p == NULL) {
     return;
   }
+  //Get point picked
   p->GetPoint(0,newSliceLocalOrigin);
+
+  //Validate slices origins and adjust them
   BoundsValidate(newSliceLocalOrigin);
   
 	((medViewSliceBlend *)m_ChildViewList[BLEND_VIEW])->SetSlice(movingSliceId,newSliceLocalOrigin);
@@ -354,6 +370,7 @@ void medViewSliceBlendRX::OnEventMouseMove( mafEvent *e )
 void medViewSliceBlendRX::BoundsValidate(double *pos)
 //----------------------------------------------------------------------------
 {
+  //Check if a volume is present
   if(m_CurrentVolume)
   {
     double b[6];
