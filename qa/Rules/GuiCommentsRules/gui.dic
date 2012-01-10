@@ -8,3 +8,11 @@
 ->Radio\( 7 3
 ->FileOpen\( 5 3
 ->FileSave\( 5 3
+->DirOpen\( 4 3
+->Color\( 4 3
+->CrossIncremental\( 7 6
+->TwoButtons\( 6 4
+->Slider\( 6 3
+->CheckList\( 4 1
+->ListBox\( 4 1
+->Grid\(6 1
