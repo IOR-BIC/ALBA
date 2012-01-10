@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medPipeVolumeSliceBlend.cpp,v $
 Language:  C++
-Date:      $Date: 2011-12-20 14:59:01 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2012-01-10 15:36:56 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -62,9 +62,10 @@ mafCxxTypeMacro(medPipeVolumeSliceBlend);
 
 //----------------------------------------------------------------------------
 medPipeVolumeSliceBlend::medPipeVolumeSliceBlend()
-  :mafPipe()
-  //----------------------------------------------------------------------------
-{ 
+:mafPipe()
+//----------------------------------------------------------------------------
+{
+  //Initialize values
   for(int j=0;j<2;j++)
     for(int i = 0; i<3; i++)
     {
@@ -117,7 +118,7 @@ medPipeVolumeSliceBlend::medPipeVolumeSliceBlend()
 }
 //----------------------------------------------------------------------------
 void medPipeVolumeSliceBlend::InitializeSliceParameters(int direction, bool show_vol_bbox, bool show_bounds)
-  //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 {
   m_SliceDirection= direction;
   m_ShowVolumeBox = show_vol_bbox;
@@ -125,7 +126,7 @@ void medPipeVolumeSliceBlend::InitializeSliceParameters(int direction, bool show
 }
 //----------------------------------------------------------------------------
 void medPipeVolumeSliceBlend::InitializeSliceParameters(int direction, double slice_origin0[3],double slice_origin1[3], bool show_vol_bbox,bool show_bounds)
-  //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 {
   m_SliceParametersInitialized = true;
   m_SliceDirection= direction;
@@ -142,7 +143,7 @@ void medPipeVolumeSliceBlend::InitializeSliceParameters(int direction, double sl
 }
 //----------------------------------------------------------------------------
 void medPipeVolumeSliceBlend::InitializeSliceParameters(int direction, double slice_origin0[3],double slice_origin1[3], float slice_xVect[3], float slice_yVect[3], bool show_vol_bbox,bool show_bounds)
-  //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 {
   m_SliceParametersInitialized = true;
   m_ShowBounds = show_bounds;
@@ -188,16 +189,19 @@ void medPipeVolumeSliceBlend::Create(mafSceneNode *n)
 
   assert(m_Vme->IsMAFType(mafVMEVolume));
   double b[6];
+  //Update input data
   m_Vme->GetOutput()->Update();
   m_Vme->GetOutput()->GetVTKData()->Update();
   m_Vme->GetOutput()->GetVMELocalBounds(b);
 
   mmaVolumeMaterial *material = ((mafVMEVolume *)m_Vme)->GetMaterial();
+  //If material has a valid table range use it
   if (material->m_TableRange[1] < material->m_TableRange[0]) 
   {
     m_Vme->GetOutput()->GetVTKData()->GetScalarRange(material->m_TableRange);
   }
 
+  //Update material
   m_ColorLUT = material->m_ColorLut;
   material->UpdateProp();
 
@@ -212,6 +216,7 @@ void medPipeVolumeSliceBlend::Create(mafSceneNode *n)
 
   if (!m_SliceParametersInitialized)
   {
+    //If slices aren't initialized
     m_Origin[0][0] = (b[0] + b[1])*.5;
     m_Origin[0][1] = (b[2] + b[3])*.5;
     m_Origin[0][2] = (b[4] + b[5])*.5;
@@ -268,6 +273,7 @@ void medPipeVolumeSliceBlend::Create(mafSceneNode *n)
     CreateSlice(m_SliceDirection);
   }
 
+  //Create selezion actor
   vtkNEW(m_VolumeBox);
   m_VolumeBox->SetInput(m_Vme->GetOutput()->GetVTKData());
 
@@ -316,8 +322,9 @@ void medPipeVolumeSliceBlend::Create(mafSceneNode *n)
 }
 //----------------------------------------------------------------------------
 void medPipeVolumeSliceBlend::CreateSlice(int direction)
-  //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 {
+  //Generate slices scalars using scalars
   double xspc = 0.33, yspc = 0.33, zspc = 1.0;
 
   vtkDataSet *vtk_data = m_Vme->GetOutput()->GetVTKData();
@@ -380,8 +387,9 @@ void medPipeVolumeSliceBlend::CreateSlice(int direction)
 }
 //----------------------------------------------------------------------------
 medPipeVolumeSliceBlend::~medPipeVolumeSliceBlend()
-  //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 {
+  //remove all actors from renderer
   if(m_VolumeBoxActor)
     m_AssemblyFront->RemovePart(m_VolumeBoxActor);
   if(m_Actor)
@@ -427,8 +435,9 @@ medPipeVolumeSliceBlend::~medPipeVolumeSliceBlend()
 }
 //----------------------------------------------------------------------------
 void medPipeVolumeSliceBlend::SetLutRange(double low, double high)
-  //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 {
+  //Update material with new LUT range
   mmaVolumeMaterial *material = ((mafVMEVolume *)m_Vme)->GetMaterial();
   material->m_Window_LUT = high-low;
   material->m_Level_LUT  = (low+high)*.5;
@@ -438,14 +447,14 @@ void medPipeVolumeSliceBlend::SetLutRange(double low, double high)
 }
 //----------------------------------------------------------------------------
 void medPipeVolumeSliceBlend::GetLutRange(double range[2])
-  //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 {
   mmaVolumeMaterial *material = ((mafVMEVolume *)m_Vme)->GetMaterial();
   material->m_ColorLut->GetTableRange(range);
 }
 //----------------------------------------------------------------------------
 void medPipeVolumeSliceBlend::SetSlice(int nSlice,double origin[3], float xVect[3], float yVect[3])
-  //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 {
   m_XVector[m_SliceDirection][0] = xVect[0];
   m_XVector[m_SliceDirection][1] = xVect[1];
@@ -466,7 +475,7 @@ void medPipeVolumeSliceBlend::SetSlice(int nSlice,double origin[3], float xVect[
 }
 //----------------------------------------------------------------------------
 void medPipeVolumeSliceBlend::SetSlice(int nSlice,double origin[3])
-  //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 {
   m_Origin[nSlice][0] = origin[0];
   m_Origin[nSlice][1] = origin[1];
@@ -494,7 +503,7 @@ void medPipeVolumeSliceBlend::SetSlice(int nSlice,double origin[3])
 }
 //----------------------------------------------------------------------------
 void medPipeVolumeSliceBlend::GetSliceOrigin(int nSlice,double origin[3])
-  //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 {
   origin[0] = m_Origin[nSlice][0];
   origin[1] = m_Origin[nSlice][1];
@@ -502,7 +511,7 @@ void medPipeVolumeSliceBlend::GetSliceOrigin(int nSlice,double origin[3])
 }
 //----------------------------------------------------------------------------
 void medPipeVolumeSliceBlend::GetSliceNormal(double normal[3])
-  //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 {
   normal[0] = m_Normal[m_SliceDirection][0];
   normal[1] = m_Normal[m_SliceDirection][1];
@@ -519,6 +528,7 @@ void medPipeVolumeSliceBlend::SetSliceOpacity(double opacity)
     //Implemented only for z-axis
     if(m_SliceDirection==SLICE_Z)
     {
+      //Check witch slice are at the TOP
       if(m_Origin[0][2]>m_Origin[1][2])
       {
         if(m_SliceActor[0][i]&&m_SliceActor[1][i])
@@ -571,8 +581,10 @@ void medPipeVolumeSliceBlend::OnEvent(mafEventBase *maf_event)
       }
       break;
     case ID_OPACITY_SLIDER:
-      SetSliceOpacity(m_SliceOpacity);
-      mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+      {
+        SetSliceOpacity(m_SliceOpacity);
+        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+      }
       break;
     default:
       break;
@@ -587,6 +599,7 @@ void medPipeVolumeSliceBlend::OnEvent(mafEventBase *maf_event)
 void medPipeVolumeSliceBlend::SetColorLookupTable(vtkLookupTable *lut)
   //----------------------------------------------------------------------------
 {
+  //Set for every slice the new LUT
   int i;
   if (lut == NULL)
   {
@@ -613,8 +626,9 @@ void medPipeVolumeSliceBlend::SetColorLookupTable(vtkLookupTable *lut)
 }
 //----------------------------------------------------------------------------
 void medPipeVolumeSliceBlend::Select(bool sel)
-  //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 {
+  //Update actor selection
   m_Selected = sel;
   m_ShowVolumeBox = sel;
   m_VolumeBoxActor->SetVisibility(sel);
