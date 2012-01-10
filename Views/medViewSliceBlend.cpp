@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewSliceBlend.cpp,v $
 Language:  C++
-Date:      $Date: 2011-12-20 14:57:34 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2012-01-10 15:25:29 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -93,9 +93,10 @@ mafCxxTypeMacro(medViewSliceBlend);
 
 //----------------------------------------------------------------------------
 medViewSliceBlend::medViewSliceBlend(wxString label, int camera_position, bool show_axes, bool show_grid, bool show_ruler, int stereo)
-  :mafViewVTK(label,camera_position,show_axes,show_grid, show_ruler, stereo)
-  //----------------------------------------------------------------------------
+:mafViewVTK(label,camera_position,show_axes,show_grid, show_ruler, stereo)
+//----------------------------------------------------------------------------
 {
+  // default values
   m_CurrentVolume = NULL;
   m_Border        = NULL;
 
@@ -110,14 +111,14 @@ medViewSliceBlend::medViewSliceBlend(wxString label, int camera_position, bool s
 }
 //----------------------------------------------------------------------------
 medViewSliceBlend::~medViewSliceBlend()
-  //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 {
   BorderDelete();
   m_CurrentSurface.clear();
 }
 //----------------------------------------------------------------------------
 mafView *medViewSliceBlend::Copy(mafObserver *Listener, bool lightCopyEnabled /* = false */)
-  //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 {
   medViewSliceBlend *v = new medViewSliceBlend(m_Label, m_CameraPositionId, m_ShowAxes,m_ShowGrid, m_ShowRuler, m_StereoType);
   v->m_Listener = Listener;
@@ -148,7 +149,7 @@ void medViewSliceBlend::Create()
 }
 //----------------------------------------------------------------------------
 void medViewSliceBlend::InitializeSlice(double slice1[3],double slice2[3])
-  //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 {
   memcpy(m_Slice1,slice1,sizeof(m_Slice1));
   memcpy(m_Slice2,slice2,sizeof(m_Slice2));
@@ -156,7 +157,7 @@ void medViewSliceBlend::InitializeSlice(double slice1[3],double slice2[3])
 }
 //----------------------------------------------------------------------------
 void medViewSliceBlend::VmeCreatePipe(mafNode *vme)
-  //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 {
   int result = GetNodeStatus(vme);
 
@@ -189,6 +190,7 @@ void medViewSliceBlend::VmeCreatePipe(mafNode *vme)
     if (pipe)
     {
       pipe->SetListener(this);
+      // Initialize medPipeVolumeSliceBlend
       if (pipe_name.Equals("medPipeVolumeSliceBlend"))
       {
         m_CurrentVolume = n;
@@ -215,6 +217,7 @@ void medViewSliceBlend::VmeCreatePipe(mafNode *vme)
         default:
           slice_mode = SLICE_Z;
         }
+        //check if slices are initialized
         if (m_SliceInitialized)
         {
           ((medPipeVolumeSliceBlend *)pipe)->InitializeSliceParameters(slice_mode,m_Slice1,m_Slice2,false);
@@ -234,7 +237,7 @@ void medViewSliceBlend::VmeCreatePipe(mafNode *vme)
 }
 //----------------------------------------------------------------------------
 void medViewSliceBlend::VmeDeletePipe(mafNode *vme)
-  //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 {
   mafSceneNode *n = m_Sg->Vme2Node(vme);
   if((vme->IsMAFType(mafVMELandmarkCloud) && ((mafVMELandmarkCloud*)vme)->IsOpen()) || vme->IsMAFType(mafVMELandmark) && m_NumberOfVisibleVme == 0)
@@ -258,7 +261,7 @@ void medViewSliceBlend::VmeDeletePipe(mafNode *vme)
 }
 //-------------------------------------------------------------------------
 int medViewSliceBlend::GetNodeStatus(mafNode *vme)
-  //-------------------------------------------------------------------------
+//-------------------------------------------------------------------------
 {
   mafSceneNode *n = NULL;
   if (m_Sg != NULL)
@@ -285,13 +288,14 @@ int medViewSliceBlend::GetNodeStatus(mafNode *vme)
 }
 //-------------------------------------------------------------------------
 mafGUI *medViewSliceBlend::CreateGui()
-  //-------------------------------------------------------------------------
+//-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
   m_Gui = new mafGUI(this);
 
   if (m_CurrentVolume)
   {
+    // if a Volume is present use his bounds
     double b[6];
     mafVMEVolumeGray::SafeDownCast(m_CurrentVolume->m_Vme)->GetOutput()->GetBounds(b);
     m_Slice1Position = b[4];
@@ -299,6 +303,7 @@ mafGUI *medViewSliceBlend::CreateGui()
   }
   else
   {
+    //Otherwise use 0,1 as range
     m_Slice1Position = 0;
     m_Slice2Position = 1;
   }
@@ -320,6 +325,7 @@ void medViewSliceBlend::OnEvent(mafEventBase *maf_event)
     case ID_OPACITY:
       {
         medPipeVolumeSliceBlend *pipe = (medPipeVolumeSliceBlend *)m_CurrentVolume->m_Pipe;
+        //Set new opacity for the pipe medPipeVolumeSliceBlend
         pipe->SetSliceOpacity(m_Opacity);
         CameraUpdate();
       }
@@ -336,8 +342,9 @@ void medViewSliceBlend::OnEvent(mafEventBase *maf_event)
 }
 //----------------------------------------------------------------------------
 void medViewSliceBlend::SetLutRange(double low_val, double high_val)
-  //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 {
+  //If a volume is visualized set his lut range
   if(!m_CurrentVolume) 
     return;
   mafString pipe_name = m_CurrentVolume->m_Pipe->GetTypeName();
@@ -349,8 +356,9 @@ void medViewSliceBlend::SetLutRange(double low_val, double high_val)
 }
 //----------------------------------------------------------------------------
 void medViewSliceBlend::SetSliceLocalOrigin(double origin0[3],double origin1[3])
-  //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 {
+  //If a volume is visualized set slice position
   if(m_CurrentVolume)
   {
     memcpy(m_Slice1,origin0,sizeof(origin0));
@@ -387,9 +395,13 @@ void medViewSliceBlend::SetSlice(int nSlice,double pos[3])
 }
 //----------------------------------------------------------------------------
 void medViewSliceBlend::BorderCreate(double col[3])
-  //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 {
-  if(m_Border) BorderDelete();
+  if(m_Border) 
+  {
+    //Before create a new border delete previous border
+    BorderDelete();
+  }
 
   vtkPlaneSource *ps = vtkPlaneSource::New();
   ps->SetOrigin(0, 0, 0);
@@ -427,7 +439,7 @@ void medViewSliceBlend::BorderCreate(double col[3])
 }
 //----------------------------------------------------------------------------
 void medViewSliceBlend::BorderDelete()
-  //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 {
   if(m_Border)
   {
@@ -440,6 +452,7 @@ void medViewSliceBlend::BorderDelete()
 void medViewSliceBlend::UpdateSurfacesList(mafNode *node)
   //----------------------------------------------------------------------------
 {
+  // Remove node form surface list
   for(int i=0;i<m_CurrentSurface.size();i++)
   {
     if (m_CurrentSurface[i]==m_Sg->Vme2Node(node))
@@ -458,6 +471,7 @@ void medViewSliceBlend::VmeShow(mafNode *node, bool show)
   {
     if (show)
     {
+      // Attach the camera to the volume visualized
       if(m_AttachCamera)
         m_AttachCamera->SetVme(node);
     }
@@ -478,6 +492,8 @@ void medViewSliceBlend::VmeShow(mafNode *node, bool show)
 
   if (m_CurrentVolume!=NULL)
   {
+    // if a Volume is present use his bounds for slices positions
+
     double b[6];
     mafVMEVolumeGray::SafeDownCast(m_CurrentVolume->m_Vme)->GetOutput()->GetBounds(b);
     m_Slice1Position = b[4];
@@ -493,6 +509,7 @@ void medViewSliceBlend::VmeShow(mafNode *node, bool show)
   }
   else
   {
+    //Otherwise use 0,1 as range 
     m_Slice1Position = 0;
     m_Slice2Position = 1;
 
@@ -545,7 +562,7 @@ void medViewSliceBlend::SetNormal(double normal[3])
 }
 //-------------------------------------------------------------------------
 void medViewSliceBlend::MultiplyPointByInputVolumeABSMatrix(double *point)
-  //-------------------------------------------------------------------------
+//-------------------------------------------------------------------------
 {
   if(m_CurrentVolume && m_CurrentVolume->m_Vme)
   {
