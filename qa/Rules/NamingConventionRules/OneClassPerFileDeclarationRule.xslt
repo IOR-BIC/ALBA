@@ -17,7 +17,6 @@
 						<tr>
 							<th>Class</th>
                             <th>Other Classes</th>
-                            <th>Include File</th>
 						</tr>
 						</thead>
 						<tbody>
@@ -27,14 +26,12 @@
                             <tr class="odd">
                             <td width="100%"><b><xsl:value-of select="class"/></b></td>
                             <td width="100%"><b><xsl:value-of select="otherClasses"/></b></td>
-                            <td width="100%"><b><xsl:value-of select="includeFile"/></b></td>
                             </tr>
                            </xsl:when>
                            <xsl:otherwise>
                             <tr class="even">
                             <td width="100%"><b><xsl:value-of select="class"/></b></td>
-                            <td width="100%"><b><xsl:value-of select="otherClasses"/></b></td>
-                            <td width="100%"><b><xsl:value-of select="includeFile"/></b></td>
+                            <td width="100%"><b><xsl:value-of select="otherClasses"/></b></td>                            
                             </tr>
                            </xsl:otherwise>
                          </xsl:choose>
