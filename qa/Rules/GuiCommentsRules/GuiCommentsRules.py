@@ -18,11 +18,11 @@ class GuiCommentsRules(AbstractRule):
         x = re.compile(match)
         if(re.search(x, line)):
 
-          founded =  re.findall('".+"\b*,|_\(".+"\b*\),|".+"\b*\);',re.split(x, line)[1])
+          founded =  re.findall('".+"\b*,|_\(".+"\b*\),|".+"\b*\);',re.split(x, line)[1])#sUBDIVIDE ELEMENTS OF THE GUI METHOD
           for f in founded:
-            line = line.replace(re.findall('".*"',f)[0],re.findall('".*"',f)[0].replace(',',' '))
+            line = line.replace(re.findall('".*"',f)[0],re.findall('".*"',f)[0].replace(',',' '))#REMOVE ','
 
-          if (len(re.split(',',re.split(x, line)[1])) != num and len(re.split(',',re.split(x, line)[1])) >= minNumElem):
+          if (len(re.split(',',re.split(x, line)[1])) != num and len(re.split(',',re.split(x, line)[1])) >= minNumElem):#CHECK IF THE GUI METHOD HAS A NUMBER OF ELEMENTS SUFFICIENT FOR TOOLTIP
             # print filename + ' : ' + line
             self.MarkedList.append("<item><class>" + (os.path.split(self.FullPathInputFile)[-1]) + "</class><line>" + str(lineNumber) + "</line>" + "</item>")          
 
