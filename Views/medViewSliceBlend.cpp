@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewSliceBlend.cpp,v $
 Language:  C++
-Date:      $Date: 2012-01-10 15:25:29 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2012-01-10 15:48:47 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -100,11 +100,13 @@ medViewSliceBlend::medViewSliceBlend(wxString label, int camera_position, bool s
   m_CurrentVolume = NULL;
   m_Border        = NULL;
 
+  //Default values of slices
   m_Slice1[0] = m_Slice1[1] = m_Slice1[2] = 0.0;
   m_Slice2[0] = m_Slice2[1] = m_Slice2[2] = 0.0;
 
   m_SliceInitialized = false;
 
+  //Default values of opacity is 0.5
   m_Opacity = 0.5;
 
   m_CurrentSurface.clear();
@@ -161,6 +163,7 @@ void medViewSliceBlend::VmeCreatePipe(mafNode *vme)
 {
   int result = GetNodeStatus(vme);
 
+  //If node can't be visualized
   if (result == NODE_NON_VISIBLE)
   {
     return;
@@ -200,6 +203,7 @@ void medViewSliceBlend::VmeCreatePipe(mafNode *vme)
         vtkDataSet *data = ((mafVME *)vme)->GetOutput()->GetVTKData();
         assert(data);
         data->Update();
+        // check the type of camera
         switch(m_CameraPositionId)
         {
         case CAMERA_OS_X:
@@ -220,10 +224,12 @@ void medViewSliceBlend::VmeCreatePipe(mafNode *vme)
         //check if slices are initialized
         if (m_SliceInitialized)
         {
+          //If slice position is already set
           ((medPipeVolumeSliceBlend *)pipe)->InitializeSliceParameters(slice_mode,m_Slice1,m_Slice2,false);
         }
         else
         {
+          //If slice position isn't already set
           ((medPipeVolumeSliceBlend *)pipe)->InitializeSliceParameters(slice_mode,false);
         }
         ((medPipeVolumeSliceBlend *)pipe)->SetSliceOpacity(m_Opacity);
@@ -245,6 +251,7 @@ void medViewSliceBlend::VmeDeletePipe(mafNode *vme)
   else
     m_NumberOfVisibleVme--;
 
+  //if vme is a volume detach camera
   if (vme->IsMAFType(mafVMEVolume))
   {
     m_CurrentVolume = NULL;
@@ -257,7 +264,10 @@ void medViewSliceBlend::VmeDeletePipe(mafNode *vme)
   cppDEL(n->m_Pipe);
 
   if(vme->IsMAFType(mafVMELandmark))
+  {
+    //Update list of surfaces visualized
     UpdateSurfacesList(vme);
+  }
 }
 //-------------------------------------------------------------------------
 int medViewSliceBlend::GetNodeStatus(mafNode *vme)
@@ -269,6 +279,7 @@ int medViewSliceBlend::GetNodeStatus(mafNode *vme)
     if (vme->IsMAFType(mafVMEVolume))
     {
       n = m_Sg->Vme2Node(vme);
+      //Only a volume can be visualized
       n->m_Mutex = true;
     }
     else if (vme->IsMAFType(mafVMESlicer))
@@ -280,6 +291,7 @@ int medViewSliceBlend::GetNodeStatus(mafNode *vme)
     {
       n = m_Sg->Vme2Node(vme);
       //n->m_Mutex = true;
+      //It's impossible visualize vme image
       n->m_PipeCreatable = false;
     }
   }
@@ -308,6 +320,7 @@ mafGUI *medViewSliceBlend::CreateGui()
     m_Slice2Position = 1;
   }
 
+  //Create attach camera for the volume
   m_AttachCamera = new mafAttachCamera(m_Gui, m_Rwi, this);
   m_Gui->FloatSlider(ID_OPACITY,&m_Opacity,0.0,1.0,_("Down"),_("Top"));
   m_Gui->FitGui();
@@ -331,6 +344,7 @@ void medViewSliceBlend::OnEvent(mafEventBase *maf_event)
       }
       break;
     default:
+      //Other events
       mafEventMacro(*maf_event);
       break;
     }
@@ -367,7 +381,9 @@ void medViewSliceBlend::SetSliceLocalOrigin(double origin0[3],double origin1[3])
     if (pipe_name.Equals("medPipeVolumeSliceBlend"))
     {
       medPipeVolumeSliceBlend *pipe = (medPipeVolumeSliceBlend *)m_CurrentVolume->m_Pipe;
+      //Set origin0 for slice 0
       pipe->SetSlice(0,origin0);
+      //Set origin1 for slice 1
       pipe->SetSlice(1,origin1);
     }
   }
@@ -381,6 +397,7 @@ void medViewSliceBlend::SetSlice(int nSlice,double pos[3])
 
   if(m_CurrentVolume)
   {
+    //Check wicth slices to set position
     if(nSlice==0)
       memcpy(m_Slice1,pos,sizeof(m_Slice1));
     else if(nSlice==1)
@@ -429,6 +446,7 @@ void medViewSliceBlend::BorderCreate(double col[3])
   m_Border->SetProperty(pd);
   m_Border->SetPosition(0,0);
 
+  //Add border to ren front
   m_Rwi->m_RenFront->AddActor(m_Border);
 
   vtkDEL(ps);
@@ -443,6 +461,7 @@ void medViewSliceBlend::BorderDelete()
 {
   if(m_Border)
   {
+    //Remove border from ren front
     m_Rwi->m_RenFront->RemoveActor(m_Border);
     vtkDEL(m_Border);
   }  
@@ -477,12 +496,13 @@ void medViewSliceBlend::VmeShow(mafNode *node, bool show)
     }
     else
     {
+      //detach volume from the camera
       if(m_AttachCamera)
         m_AttachCamera->SetVme(NULL);
     }
-    //CameraUpdate();
-    //CameraReset(node);
-    //m_Rwi->CameraUpdate();
+    // CameraUpdate();
+    // CameraReset(node);
+    // m_Rwi->CameraUpdate();
   }
 
   Superclass::VmeShow(node, show);
@@ -524,6 +544,7 @@ void medViewSliceBlend::VmeRemove(mafNode *vme)
 {
   if(vme->IsA("mafVMEPolyline")||vme->IsA("mafVMESurface")||vme->IsA("medVMEPolylineEditor"))
   {
+    //remove surfaces from surfaces list
     this->UpdateSurfacesList(vme);
   }
   Superclass::VmeRemove(vme);
@@ -544,6 +565,7 @@ void medViewSliceBlend::Print(std::ostream& os, const int tabs)// const
 void medViewSliceBlend::SetNormal(double normal[3])
 //-------------------------------------------------------------------------
 {
+  //set normal to the surfaces pipes
   if(!m_CurrentSurface.empty())
   {
     for(int i=0;i<m_CurrentSurface.size();i++)

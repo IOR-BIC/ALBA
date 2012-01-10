@@ -2,15 +2,13 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewSliceBlendRX.cpp,v $
   Language:  C++
-  Date:      $Date: 2012-01-10 15:31:25 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2012-01-10 15:52:18 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Stefano Perticoni , Paolo Quadrani, Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
-
-
 #include "mafDefines.h" 
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
@@ -42,22 +40,18 @@
 //----------------------------------------------------------------------------
 // constants:
 //----------------------------------------------------------------------------
-
 enum RX_SUBVIEW_ID
 {
   RX_VIEW = 0,
   BLEND_VIEW,
   VIEWS_NUMBER,
 };
-
 enum GIZMO_ID
 {
   GIZMO_0 = 0,
   GIZMO_1,
 
 };
-
-
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(medViewSliceBlendRX);
 //----------------------------------------------------------------------------
@@ -67,19 +61,15 @@ medViewSliceBlendRX::medViewSliceBlendRX(wxString label)
 : mafViewCompound(label, 1, 2)
 //----------------------------------------------------------------------------
 {
-
+  //default values
   m_LutWidget = NULL;
   m_CurrentVolume = NULL;
   m_LayoutConfiguration = LAYOUT_CUSTOM;
-
   m_ViewsRX = NULL;
   m_ViewSliceBlend = NULL;
-    
   m_LutSliders = NULL;
   m_VtkLUT = NULL ;
-
   m_BlendGui = NULL;
-
 	m_BorderColor[0][0] = 1.0; m_BorderColor[0][1] = 0.0; m_BorderColor[0][2] = 1.0;
   m_BorderColor[1][0] = 1.0; m_BorderColor[1][1] = 0.65; m_BorderColor[1][2] = 1.0;
 }
@@ -122,13 +112,11 @@ void medViewSliceBlendRX::VmeShow(mafNode *node, bool show)
   {
     if (show)
     {
-         
       double minMax[2];
       ((mafViewRX*)m_ChildViewList[RX_VIEW])->GetLutRange(minMax);
-
+      //set new values for lut slider
       m_LutSliders->SetRange(minMax[0],minMax[1]);
       m_LutSliders->SetSubRange(minMax[0],minMax[1]);
-      
       // create a lookup table for each RX view
       vtkNEW(m_VtkLUT);
       m_VtkLUT->SetRange(minMax);
@@ -152,8 +140,7 @@ void medViewSliceBlendRX::VmeShow(mafNode *node, bool show)
       m_CurrentVolume = NULL;
       GizmoDelete();
     }
-  }
-    
+  } 
   EnableWidgets(m_CurrentVolume != NULL);
 }
 //----------------------------------------------------------------------------
@@ -201,6 +188,7 @@ void medViewSliceBlendRX::OnEvent(mafEventBase *maf_event)
         break;
       break;
       default:
+        //Other events
         mafViewCompound::OnEvent(maf_event);
     }
   }
@@ -223,19 +211,16 @@ mafGUI* medViewSliceBlendRX::CreateGui()
   m_Gui->FitInside();
   m_Gui->Update();
   m_Gui->Divider(1);
-
   m_Gui->Divider(1);
   
   //Enable/disable gui componets depending from volume
   EnableWidgets(m_CurrentVolume != NULL);
-
 	for(int i=0;i<m_NumOfChildView;i++)
   {
+    //Generate gui for the subviews
 		((mafViewRX*)m_ChildViewList[i])->GetGui();
   }
-
 	m_Gui->Divider();
-
   return m_Gui;
 }
 //----------------------------------------------------------------------------
@@ -250,30 +235,28 @@ void medViewSliceBlendRX::CreateGuiView()
   m_LutSliders->SetListener(this);
   m_LutSliders->SetMinSize(wxSize(500,24));
   lutsSizer->Add(m_LutSliders,wxALIGN_CENTER|wxRIGHT);
-
+  //Addd lut slider to the gui view
   m_GuiView->Add(lutsSizer);
   m_GuiView->Reparent(m_Win);
   m_GuiView->FitGui();
   m_GuiView->Update();
 }
-
 //----------------------------------------------------------------------------
 void medViewSliceBlendRX::PackageView()
 //----------------------------------------------------------------------------
 {
   int cam_pos[2] = {CAMERA_RX_FRONT, CAMERA_RX_LEFT};
   // create to the child view
+  //Create a mafViewRX
   m_ViewsRX = new mafViewRX("RX child view", cam_pos[0]);
   m_ViewsRX->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeProjected",MUTEX);
   m_ViewsRX->PlugVisualPipe("mafVMELabeledVolume", "mafPipeVolumeProjected",MUTEX);
-
   PlugChildView(m_ViewsRX);
-
+  //Create a medViewSliceBlend
   m_ViewSliceBlend = new medViewSliceBlend("Blend",CAMERA_BLEND);
   m_ViewSliceBlend->PlugVisualPipe("mafVMEVolumeGray","medPipeVolumeSliceBlend",MUTEX);
 
   PlugChildView(m_ViewSliceBlend);
-  
 }
 //----------------------------------------------------------------------------
 void medViewSliceBlendRX::EnableWidgets(bool enable)
@@ -311,6 +294,7 @@ void medViewSliceBlendRX::GizmoCreate()
 
   if (p == NULL)
   {
+    //No volume is visualized
     return;
   }
 
