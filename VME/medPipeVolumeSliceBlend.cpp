@@ -2,14 +2,13 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medPipeVolumeSliceBlend.cpp,v $
 Language:  C++
-Date:      $Date: 2012-01-10 15:36:56 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2012-01-11 08:03:44 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
-
 
 #include "medDefines.h" 
 //----------------------------------------------------------------------------
@@ -24,14 +23,11 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafGUI.h"
 #include "mafSceneNode.h"
 #include "mmaVolumeMaterial.h"
-
 #include "mafPipeVolumeSlice.h"
 #include "mafTransformBase.h"
 #include "mafVMEVolume.h"
 #include "mafVMEOutputVolume.h"
-
 #include "mafGUIFloatSlider.h"
-
 #include "mafLODActor.h"
 #include "vtkMAFSmartPointer.h"
 #include "vtkMAFAssembly.h"
@@ -80,21 +76,17 @@ medPipeVolumeSliceBlend::medPipeVolumeSliceBlend()
     m_SliceParametersInitialized  = false;
     m_ShowVolumeBox               = false;
     m_ShowBounds									= false;
-
     m_AssemblyUsed = NULL;
     m_ColorLUT  = NULL;
     m_CustomColorLUT = NULL;
-
     m_Box = NULL;
     m_Mapper = NULL;
     m_Actor = NULL;
-
     m_TickActor = NULL;
-
     m_SliceDirection  = SLICE_Z;
     m_SliceOpacity  = 1.0;
     m_TextureRes    = 512;
-
+    ///Default value of X Y vectors
     m_XVector[0][0] = 0.0001;	//should be 0 !!! but there is a bug into vtkVolumeSlicer filter
     m_XVector[0][1] = 1;
     m_XVector[0][2] = 0;
@@ -132,11 +124,9 @@ void medPipeVolumeSliceBlend::InitializeSliceParameters(int direction, double sl
   m_SliceDirection= direction;
   m_ShowVolumeBox = show_vol_bbox;
   m_ShowBounds = show_bounds;
-
   m_Origin[0][0] = slice_origin0[0];
   m_Origin[0][1] = slice_origin0[1];
   m_Origin[0][2] = slice_origin0[2];
-
   m_Origin[1][0] = slice_origin1[0];
   m_Origin[1][1] = slice_origin1[1];
   m_Origin[1][2] = slice_origin1[2];
@@ -225,7 +215,7 @@ void medPipeVolumeSliceBlend::Create(mafSceneNode *n)
     m_Origin[1][1] = (b[2] + b[3])*.5;
     m_Origin[1][2] = (b[4] + b[5])*.5;
   }
-
+  //Define X and Y vector
   if(m_SliceDirection == SLICE_ORTHO)
   {
     // overwrite the plane vector, because the slices have to be orthogonal
@@ -273,7 +263,7 @@ void medPipeVolumeSliceBlend::Create(mafSceneNode *n)
     CreateSlice(m_SliceDirection);
   }
 
-  //Create selezion actor
+  //Create selection actor
   vtkNEW(m_VolumeBox);
   m_VolumeBox->SetInput(m_Vme->GetOutput()->GetVTKData());
 
@@ -333,7 +323,6 @@ void medPipeVolumeSliceBlend::CreateSlice(int direction)
   {
     ((vtkImageData *)vtk_data)->GetSpacing(xspc,yspc,zspc);
   }
-
   for(int i=0;i<2;i++)
   {
     vtkNEW(m_SlicerPolygonal[i][direction]);
@@ -396,7 +385,7 @@ medPipeVolumeSliceBlend::~medPipeVolumeSliceBlend()
     m_AssemblyUsed->RemovePart(m_Actor);
   if(m_TickActor)
     m_AssemblyUsed->RemovePart(m_TickActor);
-
+  //Delete all pipe stuff
   for(int j=0;j<2;j++)
   {
     for(int i = 0; i<3; i++)
@@ -456,31 +445,29 @@ void medPipeVolumeSliceBlend::GetLutRange(double range[2])
 void medPipeVolumeSliceBlend::SetSlice(int nSlice,double origin[3], float xVect[3], float yVect[3])
 //----------------------------------------------------------------------------
 {
+  //set new slice position
   m_XVector[m_SliceDirection][0] = xVect[0];
   m_XVector[m_SliceDirection][1] = xVect[1];
   m_XVector[m_SliceDirection][2] = xVect[2];
-
   m_YVector[m_SliceDirection][0] = yVect[0];
   m_YVector[m_SliceDirection][1] = yVect[1];
   m_YVector[m_SliceDirection][2] = yVect[2];
-
   vtkMath::Normalize(m_XVector[m_SliceDirection]);
   vtkMath::Normalize(m_YVector[m_SliceDirection]);
   vtkMath::Cross(m_YVector[m_SliceDirection], m_XVector[m_SliceDirection], m_Normal[m_SliceDirection]);
   vtkMath::Normalize(m_Normal[m_SliceDirection]);
   vtkMath::Cross(m_Normal[m_SliceDirection], m_XVector[m_SliceDirection], m_YVector[m_SliceDirection]);
   vtkMath::Normalize(m_YVector[m_SliceDirection]);
-
   SetSlice(nSlice,origin);
 }
 //----------------------------------------------------------------------------
 void medPipeVolumeSliceBlend::SetSlice(int nSlice,double origin[3])
 //----------------------------------------------------------------------------
 {
+  //set new slice position
   m_Origin[nSlice][0] = origin[0];
   m_Origin[nSlice][1] = origin[1];
   m_Origin[nSlice][2] = origin[2];
-
   for(int j=0;j<2;j++)
   {
     for(int i=0;i<3;i++)
@@ -493,7 +480,6 @@ void medPipeVolumeSliceBlend::SetSlice(int nSlice,double origin[3])
         m_SlicerImage[j][i]->SetPlaneAxisY(m_YVector[i]);
         m_SlicerPolygonal[j][i]->SetPlaneAxisX(m_XVector[i]);
         m_SlicerPolygonal[j][i]->SetPlaneAxisY(m_YVector[i]);
-
         m_SlicerImage[j][i]->Update();
         m_SlicerPolygonal[j][i]->Update();
       }
@@ -534,6 +520,7 @@ void medPipeVolumeSliceBlend::SetSliceOpacity(double opacity)
         if(m_SliceActor[0][i]&&m_SliceActor[1][i])
         {
           m_SliceActor[0][i]->GetProperty()->SetOpacity(m_SliceOpacity);
+          //Set opacity 1 for slice at bottom
           m_SliceActor[1][i]->GetProperty()->SetOpacity(1.0);
         }
       }
@@ -542,6 +529,7 @@ void medPipeVolumeSliceBlend::SetSliceOpacity(double opacity)
         if(m_SliceActor[1][i]&&m_SliceActor[1][i])
         {
           m_SliceActor[1][i]->GetProperty()->SetOpacity(m_SliceOpacity);
+          //Set opacity 1 for slice at bottom
           m_SliceActor[0][i]->GetProperty()->SetOpacity(1.0);
         }
       }
@@ -558,6 +546,7 @@ float medPipeVolumeSliceBlend::GetSliceOpacity()
 mafGUI *medPipeVolumeSliceBlend::CreateGui()
   //----------------------------------------------------------------------------
 {
+  //Create pipe gui
   assert(m_Gui == NULL);
   m_Gui = new mafGUI(this);
   m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
@@ -582,11 +571,14 @@ void medPipeVolumeSliceBlend::OnEvent(mafEventBase *maf_event)
       break;
     case ID_OPACITY_SLIDER:
       {
+        //Event to modify the opacity of the slice at top
         SetSliceOpacity(m_SliceOpacity);
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       }
       break;
     default:
+      //Other events
+      mafEventMacro(*maf_event);
       break;
     }
   }
