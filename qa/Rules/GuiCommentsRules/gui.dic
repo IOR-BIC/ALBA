@@ -1,18 +1,19 @@
-->Combo\( 6 3
-->String\( 4 3
-->Integer\( 6 3
-->Float\( 8 3
-->Double\( 7 3
-->Bool\( 5 3
-->BoolGrid\( 7 6
-->Radio\( 7 3
-->FileOpen\( 5 3
-->FileSave\( 5 3
-->DirOpen\( 4 3
-->Color\( 4 3
-->CrossIncremental\( 7 6
-->TwoButtons\( 6 4
-->Slider\( 6 3
-->CheckList\( 4 1
-->ListBox\( 4 1
-->Grid\(6 1
+->Combo\( 6
+->String\( 4
+->Integer\( 6
+->Float\( 8
+->Double\( 7
+->Bool\( 5
+->BoolGrid\( 7
+->Radio\( 7
+->FileOpen\( 5
+->FileSave\( 5
+->DirOpen\( 4
+->Color\( 4
+->CrossIncremental\( 7
+->TwoButtons\( 6
+->Slider\( 6
+->CheckList\( 4
+->ListBox\( 4
+->Grid\( 6
+->Button\( 4
