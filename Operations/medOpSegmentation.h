@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.h,v $
 Language:  C++
-Date:      $Date: 2012-01-04 15:30:46 $
-Version:   $Revision: 1.1.2.9 $
+Date:      $Date: 2012-01-13 13:40:41 $
+Version:   $Revision: 1.1.2.10 $
 Authors:   Eleonora Mambrini, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
@@ -506,6 +506,8 @@ protected:
 
   std::vector<vtkUnsignedCharArray *> m_RefinementUndoList;
   std::vector<vtkUnsignedCharArray *> m_RefinementRedoList;
+
+  int m_MajorityThreshold;
  
 };
 #endif

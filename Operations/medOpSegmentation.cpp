@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2012-01-05 10:17:46 $
-Version:   $Revision: 1.1.2.20 $
+Date:      $Date: 2012-01-13 13:40:41 $
+Version:   $Revision: 1.1.2.21 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
@@ -232,6 +232,8 @@ medOpSegmentation::medOpSegmentation(const wxString &label) : mafOp(label)
   m_InitialFocalPoint[1]=9999;
   m_InitialFocalPoint[2]=9999;
   m_InitialScaleFactor = -1;
+
+  m_MajorityThreshold = 9;
 }
 //----------------------------------------------------------------------------
 medOpSegmentation::~medOpSegmentation()
@@ -917,8 +919,7 @@ bool medOpSegmentation::ApplyRefinementFilter(vtkStructuredPoints *inputImage, v
   {
     holeFillingFilter->SetInput( ((UCharImage*)vtkTOitk->GetOutput()) );
     holeFillingFilter->SetRadius( indexRadius );
-
-    //holeFillingFilter->SetMajorityThreshold(m_RefinementRegionsSize*2);
+    holeFillingFilter->SetMajorityThreshold( m_MajorityThreshold ); 
 
     if(m_RefinementSegmentationAction == ID_REFINEMENT_HOLES_FILL)
     {
@@ -958,6 +959,17 @@ bool medOpSegmentation::ApplyRefinementFilter(vtkStructuredPoints *inputImage, v
   refinedImage->Update();
 
   outputImage->DeepCopy(refinedImage);
+
+  vtkStructuredPointsWriter *winput = vtkStructuredPointsWriter::New();
+  vtkStructuredPointsWriter *woutput = vtkStructuredPointsWriter::New();
+  winput->SetInput(inputImage);
+  woutput->SetInput(outputImage);
+  winput->SetFileName("C:\\img_ref_input.vtk");
+  winput->Write();
+  woutput->SetFileName("C:\\img_ref_output.vtk");
+  woutput->Write();
+  winput->Delete();
+  woutput->Delete();
 
   return true;
 }
@@ -1252,6 +1264,8 @@ void medOpSegmentation::CreateRefinementGui()
   currentGui->TwoButtons(ID_REFINEMENT_REDO, ID_REFINEMENT_UNDO, "Redo", "Undo");
 
   currentGui->Button(ID_REFINEMENT_APPLY, mafString("Apply"), "");
+
+  currentGui->Integer(-1,"m. thr.",&m_MajorityThreshold,0);
 
   currentGui->Divider();
 
