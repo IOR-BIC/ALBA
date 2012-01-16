@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medInteractorPERBrushFeedback.h,v $
 Language:  C++
-Date:      $Date: 2011-08-29 09:22:07 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2012-01-16 09:33:14 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Eleonora Mambrini, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -72,7 +72,7 @@ protected:
 
 
  
-  int m_Radius;
+  double m_Radius;
   int m_CurrentShape;
 
   vtkCoordinate *m_Coordinate;
