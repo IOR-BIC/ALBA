@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medInteractorPERBrushFeedback.cpp,v $
 Language:  C++
-Date:      $Date: 2011-08-29 09:22:07 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2012-01-16 15:16:24 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Eleonora Mambrini, Gianluigi Crimi 
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -69,14 +69,15 @@ medInteractorPERBrushFeedback::medInteractorPERBrushFeedback()
   m_SphereSource = vtkSphereSource::New();
   m_SphereSource->SetCenter(10, 10, 10);
   m_SphereSource->SetRadius(m_Radius);
-  m_SphereSource->SetPhiResolution(20);
+  m_SphereSource->SetPhiResolution
+    (20);
   m_SphereSource->SetThetaResolution(20);
   m_SphereSource->Update();
 
   m_CubeSource = vtkCubeSource::New();
   m_CubeSource->SetCenter(10, 10, 10);
-  m_CubeSource->SetXLength(m_Radius*2);
-  m_CubeSource->SetYLength(m_Radius*2);
+  m_CubeSource->SetXLength(int(m_Radius*2));
+  m_CubeSource->SetYLength(int(m_Radius*2));
   m_CubeSource->SetZLength(1);
   m_CubeSource->Update();
 
@@ -341,9 +342,9 @@ void medInteractorPERBrushFeedback::SetRadius(double radius)
     m_SphereSource->SetRadius(m_Radius);
     m_SphereSource->Update();
 
-    m_CubeSource->SetXLength(2*m_Radius);
-    m_CubeSource->SetYLength(2*m_Radius);
-    m_CubeSource->SetZLength(2*m_Radius);
+    m_CubeSource->SetXLength(int(2*m_Radius));
+    m_CubeSource->SetYLength(int(2*m_Radius));
+    m_CubeSource->SetZLength(int(2*m_Radius));
     m_CubeSource->Update();
 
     m_Renderer->Render();
