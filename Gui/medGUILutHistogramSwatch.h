@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILutHistogramSwatch.h,v $
   Language:  C++
-  Date:      $Date: 2011-12-14 16:05:26 $
-  Version:   $Revision: 1.1.2.9 $
+  Date:      $Date: 2012-01-16 14:52:15 $
+  Version:   $Revision: 1.1.2.10 $
   Authors:   Crimi Gianluigi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -13,8 +13,9 @@
 #ifndef __mafGUILutSwatch_H__
 #define __mafGUILutSwatch_H__
 
+#include "medDefines.h"
 #include "mafEvent.h"
-#include "mafDecl.h"
+#include "medDecl.h"
 #include "vtkLookupTable.h"
 //----------------------------------------------------------------------------
 /** mafGUILutSwatch : widget representing a LUT, usually used to call the LutEditor.
@@ -24,7 +25,7 @@ class vtkDataSet;
 class mmaVolumeMaterial;
 class mafGUI;
 
-class MAF_EXPORT medGUILutHistogramSwatch: public wxPanel
+class MED_EXPORT medGUILutHistogramSwatch: public wxPanel
 {
 public:
   /** constructor. */
