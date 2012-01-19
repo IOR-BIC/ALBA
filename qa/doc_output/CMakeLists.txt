@@ -25,7 +25,7 @@ if (DOXYGEN_FOUND)
   configure_file(MEDDoxyfile.in     ${CMAKE_BINARY_DIR}/qa/doc_output/MEDDoxyfile IMMEDIATE @ONLY)
   configure_file(MEDDoxyfileWithTests.in     ${CMAKE_BINARY_DIR}/qa/doc_output/MEDDoxyfileWithTests IMMEDIATE @ONLY)
   # configure_file(MAF2PythonDoxyfile.in     ${CMAKE_BINARY_DIR}/qa/doc_output/MAF2PythonDoxyfile IMMEDIATE @ONLY)
-  # configure_file(vtkMAF2Doxyfile.in     ${CMAKE_BINARY_DIR}/qa/doc_output/vtkMAF2Doxyfile IMMEDIATE @ONLY)
+  configure_file(vtkMEDDoxyfile.in     ${CMAKE_BINARY_DIR}/qa/doc_output/vtkMEDDoxyfile IMMEDIATE @ONLY)
 
 execute_process(
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/qa/doc_output
@@ -47,10 +47,10 @@ execute_process(
   COMMAND ${DOXYGEN_EXECUTABLE} MEDDoxyfileWithTests
 )
 
-# execute_process(
-  # WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/qa/doc_output
-  # COMMAND ${DOXYGEN_EXECUTABLE} vtkMAF2Doxyfile
-# )
+execute_process(
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/qa/doc_output
+  COMMAND ${DOXYGEN_EXECUTABLE} vtkMEDDoxyfile
+)
 
 else (DOXYGEN_FOUND)
   message(INFO "Install doxygen for creating input for QA.")
