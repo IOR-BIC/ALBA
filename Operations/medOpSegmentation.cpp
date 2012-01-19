@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2012-01-13 13:40:41 $
-Version:   $Revision: 1.1.2.21 $
+Date:      $Date: 2012-01-19 09:25:49 $
+Version:   $Revision: 1.1.2.22 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
@@ -81,6 +81,14 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #include "vtkPolyDataMapper.h"
 #include "vtkActor.h"
 #include "vtkCamera.h"
+#include "vtkConnectivityFilter.h"
+#include "vtkUnstructuredGrid.h"
+#include "vtkPointData.h"
+// #include "vtkPolyData.h"
+// #include "vtkPoints.h"
+// #include "vtkCellArray.h"
+// #include "vtkMatrix4x4.h"
+// #include "mafVMEPolyline.h"
 
 #include "itkImage.h"
 #include "itkImageToVTKImageFilter.h"
@@ -756,7 +764,7 @@ bool medOpSegmentation::Refinement()
         im->Update();
 
         vtkMAFSmartPointer<vtkStructuredPoints> filteredImage;
-        if(ApplyRefinementFilter(im, filteredImage) && filteredImage)
+        if(ApplyRefinementFilter2(im, filteredImage) && filteredImage)
         {
           vtkDataArray *binaryScalars = filteredImage->GetPointData()->GetScalars();
 
@@ -799,7 +807,7 @@ bool medOpSegmentation::Refinement()
           im->Update();
 
           vtkMAFSmartPointer<vtkStructuredPoints> filteredImage;
-          if(ApplyRefinementFilter(im, filteredImage) && filteredImage)
+          if(ApplyRefinementFilter2(im, filteredImage) && filteredImage)
           {
             vtkDataArray *binaryScalars = filteredImage->GetPointData()->GetScalars();
 
@@ -860,8 +868,102 @@ bool medOpSegmentation::Refinement()
 
   return true;
 }
+//----------------------------------------------------------------------------
+bool medOpSegmentation::ApplyRefinementFilter2(vtkStructuredPoints *inputImage, vtkStructuredPoints *outputImage)
+//----------------------------------------------------------------------------
+{
+  outputImage->DeepCopy(inputImage);
+  int imgDims[3];
+  outputImage->GetDimensions(imgDims);
+
+  vtkUnsignedCharArray* imgScalars = (vtkUnsignedCharArray*)outputImage->GetPointData()->GetScalars();
+  
+  int recognitionSquareEdge = m_RefinementRegionsSize + 2; // Number of pixels of the recognition square
+  // @ToDo: test image bounds?
 
 
+  // @Todo: OPTIMIZATION:
+  // Start from first coordinates (xs,ys) where the value is different from discrimination value (not necessary depending on the same pixel)
+  // End from last coordinates (xl,yl) where the value is different from discrimination value (not necessary depending on the same pixel)
+
+  double discriminationValue = 0;
+
+  if(m_RefinementSegmentationAction == ID_REFINEMENT_HOLES_FILL)
+  {
+     discriminationValue = 255;
+  }
+
+  while(recognitionSquareEdge >= 3)
+  {
+    // (x0, y0) origin of the recognition square
+    for(int y0 = 0; y0 < imgDims[1] - recognitionSquareEdge; y0++)
+    {
+
+      for(int x0 = 0; x0 < imgDims[0] - recognitionSquareEdge; x0++)
+      {
+        // imgScalars->SetTuple1(y0 * imgDims[0] + x0, 255);
+        bool isolatedRegion = true;
+
+        // check "y" sides
+        for(int y = y0; y < y0 + recognitionSquareEdge; y = y + recognitionSquareEdge - 1)
+        {
+          for(int x = x0; x < x0 + recognitionSquareEdge; x++)
+          {
+            if(imgScalars->GetTuple1(y * imgDims[0] + x) != discriminationValue)
+            {
+              isolatedRegion = false;
+              //mafLogMessage("Square x0,y0 %d,%d is NOT an island",x0,y0);
+              break;
+            }
+          }
+          if(!isolatedRegion)
+          {
+            break;
+          }
+        }
+        // check x sides
+        if(isolatedRegion)
+        {
+          for(int x = x0; x < x0 + recognitionSquareEdge; x = x + recognitionSquareEdge - 1)
+          {
+            for(int y = y0; y < y0 + recognitionSquareEdge; y++)
+            {
+              if(imgScalars->GetTuple1(y * imgDims[0] + x) != discriminationValue)
+              {
+                isolatedRegion = false;
+                //mafLogMessage("Square x0,y0 %d,%d is NOT an island",x0,y0);
+                break;
+              }
+            }
+            if(!isolatedRegion)
+            {
+              break;
+            }
+          }
+        }
+        if(isolatedRegion)
+        {
+          //mafLogMessage("Square x0,y0 %d,%d IS an island",x0,y0);
+          // fill all the recognition square with discrimination value
+          for(int y = y0; y < y0 + recognitionSquareEdge; y++)
+          {
+            for(int x = x0; x < x0 + recognitionSquareEdge; x++)
+            {
+              imgScalars->SetTuple1(y * imgDims[0] + x, discriminationValue);
+            }
+          }
+        }
+      }
+    }
+    recognitionSquareEdge --;
+  }
+  outputImage->GetPointData()->SetScalars(imgScalars);
+  outputImage->GetPointData()->Modified();
+  outputImage->GetPointData()->Update();
+  outputImage->Update();
+
+  return true;
+}
 //----------------------------------------------------------------------------
 bool medOpSegmentation::ApplyRefinementFilter(vtkStructuredPoints *inputImage, vtkStructuredPoints *outputImage)
 //----------------------------------------------------------------------------
@@ -1259,7 +1361,7 @@ void medOpSegmentation::CreateRefinementGui()
   currentGui->Bool(ID_REFINEMENT_EVERY_SLICE, mafString("Global"), &m_RefinementEverySlice, 0, mafString("Apply refinement procedure on every slice"));
 
   m_RefinementIterative = 0;
-  currentGui->Bool(ID_REFINEMENT_ITERATIVE, mafString("Iterative"), &m_RefinementIterative, 0, mafString("Switch on/off the iterative feature"));
+  //currentGui->Bool(ID_REFINEMENT_ITERATIVE, mafString("Iterative"), &m_RefinementIterative, 0, mafString("Switch on/off the iterative feature"));
 
   currentGui->TwoButtons(ID_REFINEMENT_REDO, ID_REFINEMENT_UNDO, "Redo", "Undo");
 

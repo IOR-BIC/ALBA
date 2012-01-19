@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.h,v $
 Language:  C++
-Date:      $Date: 2012-01-13 13:40:41 $
-Version:   $Revision: 1.1.2.10 $
+Date:      $Date: 2012-01-19 09:25:49 $
+Version:   $Revision: 1.1.2.11 $
 Authors:   Eleonora Mambrini, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
@@ -490,6 +490,7 @@ protected:
   void ResetRefinementRedoList();
 
   bool ApplyRefinementFilter(vtkStructuredPoints *inputImage, vtkStructuredPoints *outputImage);
+  bool ApplyRefinementFilter2(vtkStructuredPoints *inputImage, vtkStructuredPoints *outputImage);
   void SetTrilinearInterpolation(mafVMEVolumeGray *volume);
 
   mafVMEVolumeGray *m_RefinementVolumeMask;
