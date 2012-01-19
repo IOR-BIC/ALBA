@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2012-01-19 09:25:49 $
-Version:   $Revision: 1.1.2.22 $
+Date:      $Date: 2012-01-19 09:43:30 $
+Version:   $Revision: 1.1.2.23 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
@@ -1367,7 +1367,7 @@ void medOpSegmentation::CreateRefinementGui()
 
   currentGui->Button(ID_REFINEMENT_APPLY, mafString("Apply"), "");
 
-  currentGui->Integer(-1,"m. thr.",&m_MajorityThreshold,0);
+  //currentGui->Integer(-1,"m. thr.",&m_MajorityThreshold,0);
 
   currentGui->Divider();
 
