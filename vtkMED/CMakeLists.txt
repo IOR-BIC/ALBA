@@ -89,7 +89,10 @@ SET(vtkMED_SRCS
 
   
   vtkMEDErythrocyteSource.cpp
-  vtkMEDErythrocyteSource.h  
+  vtkMEDErythrocyteSource.h
+  
+  vtkMEDImageFillHolesRemoveIslands.cxx
+  vtkMEDImageFillHolesRemoveIslands.h
 )
 
 IF (MAF_USE_ITK)
