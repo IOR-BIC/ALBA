@@ -9,7 +9,7 @@
                         If not the error is showed in the following table, giving information on class, variable name, and line
                         of source file.
 					</h3>
-                    <h4><br/>Link to <a href="http://www.biomedtown.org/biomed_town/MAF/MAF3%20Floor/documentation/conventions/">Coding Conventions</a></h4>
+                    <h4><br/>Link to <a href="http://www.biomedtown.org/biomed_town/MAF/MAF2%20Floor/documentation/conventions/">Coding Conventions</a></h4>
 				</div>
 				<div id="contentTable">
 					<table id="listing">

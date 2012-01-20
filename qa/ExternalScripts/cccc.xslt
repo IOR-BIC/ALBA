@@ -31,14 +31,14 @@ xmlns:str="http://exslt.org/strings" extension-element-prefixes="str">
 <div class="sidebaritem"></div> 
 <div class="sidebaritem"> 
 <div class="sbihead"><h1>Cyc.Complexity</h1></div> 
-<div class="sbilinks"><ul><div class="maf3LinkInsertion"> 
+<div class="sbilinks"><ul><div class="maf2LinkInsertion"> 
     @@@_EXTERNAL_TOOLS_LINKS_@@@
 </div></ul></div> 
 </div></div>
 
 <div class="sidebaritem"></div> 
 
-<div id="column2"><div class="maf3RuleInsertion"><div id="wrapper-container"><div id="container"> 
+<div id="column2"><div class="maf2RuleInsertion"><div id="wrapper-container"><div id="container"> 
 <div id="header" class="clear"><h1>Cyclomatic Complexity</h1></div> 
 <div id="subheader" class="clear"><h3> Each file is evaluated, checking the Cyclomatic Complexity.</h3></div>
 <div id="contentTable" align="center">
@@ -80,7 +80,7 @@ xmlns:str="http://exslt.org/strings" extension-element-prefixes="str">
 </div>
 </div>
 <div id="footer"> 
-      copyright 2010 SCS | <a href="http://www.biomedtown.org/biomed_town/MAF/MAF3%20Floor/">MAF3</a> | <a href="http://validator.w3.org/check?uri=referer">XHTML 1.1</a> | <a href="http://jigsaw.w3.org/css-validator/check/referer">CSS</a> 
+      copyright 2010 SCS | <a href="http://www.biomedtown.org/biomed_town/MAF/MAF2%20Floor/">MAF2</a> | <a href="http://validator.w3.org/check?uri=referer">XHTML 1.1</a> | <a href="http://jigsaw.w3.org/css-validator/check/referer">CSS</a> 
 </div>
 </div>
 </body>
