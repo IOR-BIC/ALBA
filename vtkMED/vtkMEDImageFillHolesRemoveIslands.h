@@ -2,8 +2,8 @@
 Program:   Medical
 Module:    $RCSfile: vtkMEDImageFillHolesRemoveIslands.h,v $
 Language:  C++
-Date:      $Date: 2012-01-20 15:28:07 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2012-01-23 12:50:32 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Alberto Losi
 =============================================================================
 Copyright (c) 2010
@@ -27,7 +27,7 @@ vtkMEDImageFillHolesRemoveIslands is a vtkStructuredPointsToStructuredPointsFilt
 that must be a binary image represented by a vtkUCharArray with values of 0 or 255 only.
 */
 //---------------------------------------------------------------------------
-class VTK_FILTERING_EXPORT vtkMEDImageFillHolesRemoveIslands : public vtkStructuredPointsToStructuredPointsFilter
+class VTK_vtkMED_EXPORT vtkMEDImageFillHolesRemoveIslands : public vtkStructuredPointsToStructuredPointsFilter
 //---------------------------------------------------------------------------
 {
 public:
