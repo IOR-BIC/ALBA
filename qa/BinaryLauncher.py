@@ -3,15 +3,15 @@ import sys
 import getopt
 
 try:
-    from qa import mafPath
+    from qa import medPath
 except ImportError:
-    import mafPath
+    import medPath
 
 currentPathScript = os.path.split(os.path.realpath(__file__))[0]
 
 extensionToAvoid = [".dll",".prl", ".a",".lib", ".dylib",".so", ".0", ".1"] # necessary to insert .N because of symbolic link of linux
 currentPathScript = os.path.split(os.path.realpath(__file__))[0]
-modulesDir = mafPath.mafSourcesDir #need to be changed
+modulesDir = medPath.mafSourcesDir #need to be changed
 param = {}
 
 def find_executable(executable, path=None):
