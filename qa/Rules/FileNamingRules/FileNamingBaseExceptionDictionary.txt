@@ -1,0 +1,4 @@
+mafBase
+mafReferenceCounted
+mafObject
+mafObserver
