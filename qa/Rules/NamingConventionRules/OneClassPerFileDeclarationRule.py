@@ -60,8 +60,8 @@ class OneClassPerFileDeclarationRule(AbstractRule):
             if(classNameToCheck != classCurrentName):
                 if(inclusionFileToCheck == inclusionFile):
                     sameInclusionFileClasses.append(classNameToCheck)
-                else:
-                    print "INCLUSIONI DIVERSE : " +inclusionFileToCheck + " # " +inclusionFile
+                # else:
+                    # print "INCLUSIONI DIVERSE : " +inclusionFileToCheck + " # " +inclusionFile
         
         if(len(sameInclusionFileClasses) > 0) :
             self.MarkedList.append("<item>\n"\
