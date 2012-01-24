@@ -2,10 +2,11 @@ mafOp
 mafVisualPipe
 mafView
 mafVME
-mafAction
+mafDevice
+mafPipe
+mafGUI
+mafGizmo
+mafInteractor
+mafAvatar
+mafEvent
 mafAgent
-mafAnimate
-mafNode
-mafEventBase
-mafEventSource
-mafUtility
