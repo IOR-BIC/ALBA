@@ -38,7 +38,7 @@ PROJECT_NUMBER         = "v 2.2"
 # If a relative path is entered, it will be relative to the location 
 # where doxygen was started. If left blank the current directory will be used.
 
-OUTPUT_DIRECTORY       = @CMAKE_BINARY_DIR@/qa/doc_output/DocOutput
+OUTPUT_DIRECTORY       = @CMAKE_BINARY_DIR@/qa/doc_output/DocOutputWithoutvtkMed
 
 # If the CREATE_SUBDIRS tag is set to YES, then doxygen will create 
 # 4096 sub-directories (in 2 levels) under the output directory of each output 
@@ -575,7 +575,6 @@ INPUT                  = . \
                          @CMAKE_SOURCE_DIR@/Views \
                          @CMAKE_SOURCE_DIR@/VME \
                          @CMAKE_SOURCE_DIR@/Operations \
-                         @CMAKE_SOURCE_DIR@/vtkMED \
                          @CMAKE_SOURCE_DIR@/BES_Beta/IO
 
 # This tag can be used to specify the character encoding of the source files 
