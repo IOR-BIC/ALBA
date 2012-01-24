@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2012-01-20 15:28:41 $
-Version:   $Revision: 1.1.2.24 $
+Date:      $Date: 2012-01-24 09:56:21 $
+Version:   $Revision: 1.1.2.25 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
@@ -1284,7 +1284,7 @@ void medOpSegmentation::CreateRefinementGui()
   m_RefinementIterative = 0;
   //currentGui->Bool(ID_REFINEMENT_ITERATIVE, mafString("Iterative"), &m_RefinementIterative, 0, mafString("Switch on/off the iterative feature"));
 
-  currentGui->TwoButtons(ID_REFINEMENT_REDO, ID_REFINEMENT_UNDO, "Redo", "Undo");
+  currentGui->TwoButtons(ID_REFINEMENT_UNDO, ID_REFINEMENT_REDO, "Undo", "Redo");
 
   currentGui->Button(ID_REFINEMENT_APPLY, mafString("Apply"), "");
 
@@ -2314,7 +2314,8 @@ void medOpSegmentation::ReloadUndoRedoState(vtkDataSet *dataSet,UndoRedoState st
   m_View->VmeShow(m_ManualVolumeSlice, false);
   m_ManualVolumeSlice->Update();
   m_View->VmeShow(m_ManualVolumeSlice, true);
-  //SetTrilinearInterpolation(m_ManualVolumeSlice);
+  
+  SetTrilinearInterpolation(m_ManualVolumeSlice);
 
   if(ResetZoom(undoRedoData,bounds))
   {
@@ -2489,6 +2490,8 @@ void medOpSegmentation::OnRefinementSegmentationEvent(mafEvent *e)
 
         m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_UNDO, m_RefinementUndoList.size()>0);
         m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_REDO, m_RefinementRedoList.size()>0);
+
+        m_View->CameraUpdate();
       }
       break;
     }
@@ -2523,6 +2526,8 @@ void medOpSegmentation::OnRefinementSegmentationEvent(mafEvent *e)
 
         m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_UNDO, m_RefinementUndoList.size()>0);
         m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_REDO, m_RefinementRedoList.size()>0);
+
+        m_View->CameraUpdate();
       }
       break;
     }
