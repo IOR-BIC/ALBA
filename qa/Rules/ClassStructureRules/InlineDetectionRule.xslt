@@ -7,7 +7,7 @@
 					<h3>
 						This rule checks, in particular, if the a method is inline and show all the inline methods. 
 					</h3>
-                    <h4><br/>Link to <a href="http://www.biomedtown.org/biomed_town/MAF/MAF2%20Floor/documentation/conventions/">Coding Conventions</a></h4>
+                    <h4><br/>Link to <a href="https://www.biomedtown.org/biomed_town/MAF/MAF2%20Floor/documentation/doc/maf-2-0-documentation/CodingStandard/">Coding Conventions</a></h4>
 				</div>
 				<div id="contentTable">
 					<table id="listing">
