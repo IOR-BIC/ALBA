@@ -10,7 +10,7 @@ class ProtectedDestructorRule(AbstractRule):
         self.dom = xd.parse(self.FullPathInputFile)
         className = self.dom.getElementsByTagName('compounddef')[0].getElementsByTagName('compoundname')[0].firstChild.nodeValue
         foundDestructor = False
-        if(className[:3] == "maf"):
+        if(className[:3] == "med"):
             members = self.dom.getElementsByTagName('memberdef')
             for member in members:
                 attrs = member.attributes

@@ -5,7 +5,7 @@
 				</div>
 				<div id="subheader" class="clear">
 					<h3>
-						This rule checks, in particular, if the each maf class which inherits from mafObject
+						This rule checks, in particular, if the each med class which inherits from mafObject
 						has the <u>Protected Destructor</u> in order to ensure Reference Counting.  
 					</h3>
                     <h4><br/>Link to <a href="http://www.biomedtown.org/biomed_town/MAF/MAF2%20Floor/documentation/conventions/">Coding Conventions</a></h4>

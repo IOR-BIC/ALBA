@@ -9,7 +9,7 @@ except ImportError:
     import medPath
 
 scriptsDir = os.getcwd() #original directory
-os.chdir(medPath.mafQADir)
+os.chdir(medPath.medQADir)
 baseDir = os.getcwd()
 
 currentResultDir = os.path.join(baseDir,"QAResults")

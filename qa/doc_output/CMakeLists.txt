@@ -1,6 +1,6 @@
 #
 #  CMakeLists.txt
-#  MAF
+#  MED
 #
 #  Created by Daniele Giunchi - Paolo Quadrani on 10/09/10.
 #  Copyright 2009 B3C. All rights reserved.
@@ -25,7 +25,7 @@ if (DOXYGEN_FOUND)
   configure_file(MEDDoxyfile.in     ${CMAKE_BINARY_DIR}/qa/doc_output/MEDDoxyfile IMMEDIATE @ONLY)
   configure_file(MEDDoxyfileWithTests.in     ${CMAKE_BINARY_DIR}/qa/doc_output/MEDDoxyfileWithTests IMMEDIATE @ONLY)
   configure_file(MEDDoxyfileWithoutvtkMed.in     ${CMAKE_BINARY_DIR}/qa/doc_output/MEDDoxyfileWithoutvtkMed IMMEDIATE @ONLY)
-  # configure_file(MAF2PythonDoxyfile.in     ${CMAKE_BINARY_DIR}/qa/doc_output/MAF2PythonDoxyfile IMMEDIATE @ONLY)
+  # configure_file(MEDPythonDoxyfile.in     ${CMAKE_BINARY_DIR}/qa/doc_output/MEDPythonDoxyfile IMMEDIATE @ONLY)
   configure_file(vtkMEDDoxyfile.in     ${CMAKE_BINARY_DIR}/qa/doc_output/vtkMEDDoxyfile IMMEDIATE @ONLY)
 
 execute_process(
