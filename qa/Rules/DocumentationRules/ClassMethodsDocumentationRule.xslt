@@ -8,7 +8,7 @@
 						This rule checks, in particular, if the each method of a class has brief documentation.
                         If not, the erroneus method is inserted in the table with information about the class.  
 					</h3>
-                    <h4><br/>Link to <a href="http://www.biomedtown.org/biomed_town/MAF/MAF2%20Floor/documentation/conventions/">Coding Conventions</a></h4>
+                    <h4><br/>Link to <a href="https://www.biomedtown.org/biomed_town/MAF/MAF2%20Floor/documentation/doc/maf-2-0-documentation/CodingStandard/">Coding Conventions</a></h4>
 				</div>
 				<div id="contentTable">
 					<table id="listing">
