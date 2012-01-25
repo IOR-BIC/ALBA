@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2011-12-12 07:55:46 $
-Version:   $Revision: 1.1.2.152 $
+Date:      $Date: 2012-01-25 11:05:37 $
+Version:   $Revision: 1.1.2.153 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -331,6 +331,9 @@ mafOp(label)
   m_SwapReferenceSystem = FALSE;
   m_SwapAllReferenceSystem = FALSE;
   m_ApplyToAllReferenceSystem = FALSE;
+
+  totalDicomRange[0]=0;
+  totalDicomRange[1]=1;
 
   m_CurrentImageID = 0;
 
@@ -2808,13 +2811,12 @@ void medOpImporterDicomOffis::CameraReset()
 //----------------------------------------------------------------------------
 {
 	m_LoadPage->GetRWI()->CameraReset();
-	m_LoadPage->UpdateWindowing();
+	m_LoadPage->UpdateWindowing(totalDicomRange);
 	m_CropPage->GetRWI()->CameraReset();
-	m_CropPage->UpdateWindowing();
+	m_CropPage->UpdateWindowing(totalDicomRange);
 	m_BuildPage->GetRWI()->CameraReset();
-	m_BuildPage->UpdateWindowing();
+	m_BuildPage->UpdateWindowing(totalDicomRange);
   m_ReferenceSystemPage->GetRWI()->CameraReset();
-  m_ReferenceSystemPage->UpdateWindowing();
 }
 //----------------------------------------------------------------------------
 void medOpImporterDicomOffis::EnableSliceSlider(bool enable)
@@ -4190,6 +4192,8 @@ void medOpImporterDicomOffis::GenerateSliceTexture(int imageID)
 
 	slice->GetVTKImageData()->Update();
 	slice->GetVTKImageData()->GetBounds(m_SliceBounds);
+ 
+
 
 	double Origin[3];
 	m_SelectedSeriesSlicesList->Item(imageID)->GetData()->GetVTKImageData()->GetOrigin(Origin);
@@ -4744,6 +4748,30 @@ void medOpImporterDicomOffis::OnStudySelect()
 	}
 }
 
+void medOpImporterDicomOffis::GetDicomRange(double *range)
+{
+  double sliceRange[2];
+
+  range[0]=MAXDOUBLE;
+  range[1]=MINDOUBLE;
+
+  for(int imageID=0;imageID<m_SelectedSeriesSlicesList->size();imageID++)
+  {  
+    medDicomSlice* slice = NULL;
+    
+    slice = m_SelectedSeriesSlicesList->Item(imageID)->GetData();
+    assert(slice);
+
+    slice->GetVTKImageData()->Update();
+    slice->GetVTKImageData()->GetScalarRange(sliceRange);
+
+    if (sliceRange[0]<range[0]) range[0]=sliceRange[0];
+    if (sliceRange[1]>range[1]) range[1]=sliceRange[1];
+  }
+
+
+}
+
 void medOpImporterDicomOffis::OnSeriesSelect()
 {
 	mafString *st = (mafString *)m_StudyListbox->GetClientData(m_StudyListbox->GetSelection());
@@ -4794,6 +4822,11 @@ void medOpImporterDicomOffis::OnSeriesSelect()
 		}
 	}
 	ReadDicom();
+
+  
+  GetDicomRange(totalDicomRange);
+  CameraReset();
+
 	if(((medGUIDicomSettings*)GetSetting())->AutoCropPosition())
 	{
 		AutoPositionCropPlane();

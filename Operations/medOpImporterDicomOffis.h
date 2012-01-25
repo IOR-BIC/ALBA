@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2011-12-12 07:55:46 $
-Version:   $Revision: 1.1.2.63 $
+Date:      $Date: 2012-01-25 11:05:37 $
+Version:   $Revision: 1.1.2.64 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -200,7 +200,7 @@ protected:
 	void OnMouseMove( mafEvent * e );
 	void OnMouseUp();
 	void OnWizardChangePage( mafEvent * e );
-	void OnSeriesSelect();
+  void OnSeriesSelect();
 	void OnStudySelect();
 	void OnVmeTypeSelected();
   void OnReferenceSystemSelected();
@@ -224,6 +224,9 @@ protected:
 
 	/** Reset the list of files and all the structures that own images information. */
 	void ResetStructure();
+
+  /** gets the range of the dicom by walking thought the slices */
+  void GetDicomRange(double *range);
 
 	/** Reset the slider that allow to scan the slices. */
 	void ResetSliders();
@@ -414,9 +417,11 @@ protected:
 	mafGUICheckListBox *m_DicomModalityListBox;
   int m_CurrentImageID;
 
+  double totalDicomRange[2]; ///< contains the scalar range og the full dicom
+
 	/** destructor */
 	~medOpImporterDicomOffis();
-
+ 
 };
 
 /**

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizardPageNew.cpp,v $
 Language:  C++
-Date:      $Date: 2011-02-15 09:41:57 $
-Version:   $Revision: 1.1.2.7 $
+Date:      $Date: 2012-01-25 11:05:44 $
+Version:   $Revision: 1.1.2.8 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -205,6 +205,25 @@ void medGUIWizardPageNew::UpdateWindowing()
   m_LutSlider->SetRange(scalarRange[0],scalarRange[1]);
   m_LutSlider->SetSubRange(tableRange[0], tableRange[1]);
 }
+
+//--------------------------------------------------------------------------------
+void medGUIWizardPageNew::UpdateWindowing( double *scalarRange )
+//--------------------------------------------------------------------------------
+{
+  double tableRange[2];
+  if(m_Rwi == NULL) return;
+
+  vtkActorCollection *actorCollection = m_Rwi->m_RenFront->GetActors();
+  actorCollection->InitTraversal();
+  actorCollection->GetNextItem();
+  actorCollection->GetNextItem()->GetTexture()->GetLookupTable()->GetTableRange(tableRange);
+
+  
+  m_LutSlider->SetRange(scalarRange[0],scalarRange[1]);
+  m_LutSlider->SetSubRange(scalarRange[0], scalarRange[1]);
+
+  UpdateActor();
+}
 //----------------------------------------------------------------------------
 void medGUIWizardPageNew::UpdateActor()
 //----------------------------------------------------------------------------
@@ -310,3 +329,5 @@ void medGUIWizardPageNew::GetZCropBounds(double ZCropBounds[2])
   m_ZCropSlider->GetSubRange(&ZCropBounds[0],&ZCropBounds[1]);
 
 }
+
+

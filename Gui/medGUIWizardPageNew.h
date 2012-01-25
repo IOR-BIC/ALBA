@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizardPageNew.h,v $
 Language:  C++
-Date:      $Date: 2011-05-26 07:43:15 $
-Version:   $Revision: 1.1.2.8 $
+Date:      $Date: 2012-01-25 11:05:44 $
+Version:   $Revision: 1.1.2.9 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -125,6 +125,12 @@ public:
 
   /** Update windowing in order to set correct values in lut slider. */
   void UpdateWindowing();
+
+  /** Update windowing (with custom range) in order to set correct values in lut slider.  
+  (used in dicom importer because the windowing must be that of the total dicom
+  and we see only a slice)*/
+  void UpdateWindowing(double *scalarRange);
+
   /** Update Actor Texture from current lut slider values. */
   void UpdateActor();
 
@@ -152,6 +158,8 @@ protected:
   vtkLookupTable	*m_ColorLUT;
 
   bool m_ZCropOn;
+
+  
 
   friend class medGUIWizardPageNewTest;
 	//DECLARE_EVENT_TABLE()
