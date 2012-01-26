@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizard.cpp,v $
 Language:  C++
-Date:      $Date: 2011-01-12 08:25:11 $
-Version:   $Revision: 1.5.2.2 $
-Authors:   Matteo Giacomoni
+Date:      $Date: 2012-01-26 13:48:05 $
+Version:   $Revision: 1.5.2.3 $
+Authors:   Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2002/2007
 SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
@@ -56,6 +56,7 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 BEGIN_EVENT_TABLE(medGUIWizard, wxWizard)
 	EVT_WIZARD_PAGE_CHANGING(wxID_ANY, medGUIWizard::OnWizardPageChanging)
+  EVT_WIZARD_PAGE_CHANGED(wxID_ANY, medGUIWizard::OnWizardPageChange)
 END_EVENT_TABLE()
 
 //----------------------------------------------------------------------------
@@ -83,14 +84,25 @@ medGUIWizard::~medGUIWizard()
 }
 //----------------------------------------------------------------------------
 void medGUIWizard::OnWizardPageChanging(wxWizardEvent& event)
-//----------------------------------------------------------------------------
+  //----------------------------------------------------------------------------
 {
-	mafEventMacro(mafEvent(this,MED_WIZARD_CHANGE_PAGE,event.GetDirection()));
+  mafEventMacro(mafEvent(this,MED_WIZARD_CHANGE_PAGE,event.GetDirection()));
 
-	if(!m_EnableChangePage)
-	{
-		event.Veto();
-	}
+  if(!m_EnableChangePage)
+  {
+    event.Veto();
+  }
+}
+//----------------------------------------------------------------------------
+void medGUIWizard::OnWizardPageChange(wxWizardEvent& event)
+  //----------------------------------------------------------------------------
+{
+  mafEventMacro(mafEvent(this,MED_WIZARD_CHANGED_PAGE,event.GetDirection()));
+
+  if(!m_EnableChangePage)
+  {
+    event.Veto();
+  }
 }
 //--------------------------------------------------------------------------------
 void medGUIWizard::OnEvent(mafEventBase *maf_event)

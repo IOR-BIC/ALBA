@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizardPageNew.cpp,v $
 Language:  C++
-Date:      $Date: 2012-01-25 11:05:44 $
-Version:   $Revision: 1.1.2.8 $
-Authors:   Matteo Giacomoni
+Date:      $Date: 2012-01-26 13:48:05 $
+Version:   $Revision: 1.1.2.9 $
+Authors:   Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2002/2007
 SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
@@ -207,23 +207,29 @@ void medGUIWizardPageNew::UpdateWindowing()
 }
 
 //--------------------------------------------------------------------------------
-void medGUIWizardPageNew::UpdateWindowing( double *scalarRange )
+void medGUIWizardPageNew::UpdateWindowing( double *scalarRange, double *scalarSubRange )
 //--------------------------------------------------------------------------------
 {
-  double tableRange[2];
+  
   if(m_Rwi == NULL) return;
 
-  vtkActorCollection *actorCollection = m_Rwi->m_RenFront->GetActors();
-  actorCollection->InitTraversal();
-  actorCollection->GetNextItem();
-  actorCollection->GetNextItem()->GetTexture()->GetLookupTable()->GetTableRange(tableRange);
-
-  
   m_LutSlider->SetRange(scalarRange[0],scalarRange[1]);
-  m_LutSlider->SetSubRange(scalarRange[0], scalarRange[1]);
+  m_LutSlider->SetSubRange(scalarSubRange[0], scalarSubRange[1]);
 
   UpdateActor();
 }
+
+//--------------------------------------------------------------------------------
+void medGUIWizardPageNew::GetWindowing( double *scalarRange, double *scalarSubRange )
+//--------------------------------------------------------------------------------
+{
+  m_LutSlider->GetRange(&scalarRange[0],&scalarRange[1]);
+  m_LutSlider->GetSubRange(&scalarSubRange[0],&scalarSubRange[1]);
+}
+
+
+
+
 //----------------------------------------------------------------------------
 void medGUIWizardPageNew::UpdateActor()
 //----------------------------------------------------------------------------
@@ -329,5 +335,4 @@ void medGUIWizardPageNew::GetZCropBounds(double ZCropBounds[2])
   m_ZCropSlider->GetSubRange(&ZCropBounds[0],&ZCropBounds[1]);
 
 }
-
 

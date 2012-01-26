@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2012-01-25 11:05:37 $
-Version:   $Revision: 1.1.2.153 $
-Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
+Date:      $Date: 2012-01-26 13:48:29 $
+Version:   $Revision: 1.1.2.154 $
+Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2002/2007
 SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
@@ -332,8 +332,8 @@ mafOp(label)
   m_SwapAllReferenceSystem = FALSE;
   m_ApplyToAllReferenceSystem = FALSE;
 
-  totalDicomRange[0]=0;
-  totalDicomRange[1]=1;
+  m_totalDicomRange[0]=0;
+  m_totalDicomRange[1]=1;
 
   m_CurrentImageID = 0;
 
@@ -2543,13 +2543,23 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
 				OnRangeModified();
 			}
 			break;
-		case medGUIWizard::MED_WIZARD_CHANGE_PAGE:
-			{
-				OnWizardChangePage(e);
-				return;
-			}
-			break;
-		case ID_UNDO_CROP:
+    case medGUIWizard::MED_WIZARD_CHANGE_PAGE:
+      {
+        OnWizardChangePage(e);
+      }
+      break;
+    case medGUIWizard::MED_WIZARD_CHANGED_PAGE:
+      {
+        /* This is a ack, beacouse that "genius" of wx  send the change event 
+           before page show, so we need to duplicate the code here in order to 
+           manage the camera update */
+        m_Wizard->GetCurrentPage()->Show();
+        m_Wizard->GetCurrentPage()->SetFocus();
+        m_Wizard->GetCurrentPage()->Update();
+        CameraReset();
+      }
+      break;
+    case ID_UNDO_CROP:
 			{
 				OnUndoCrop();
 			}
@@ -2810,12 +2820,12 @@ void medOpImporterDicomOffis::CameraUpdate()
 void medOpImporterDicomOffis::CameraReset()
 //----------------------------------------------------------------------------
 {
-	m_LoadPage->GetRWI()->CameraReset();
-	m_LoadPage->UpdateWindowing(totalDicomRange);
-	m_CropPage->GetRWI()->CameraReset();
-	m_CropPage->UpdateWindowing(totalDicomRange);
-	m_BuildPage->GetRWI()->CameraReset();
-	m_BuildPage->UpdateWindowing(totalDicomRange);
+	m_LoadPage->UpdateWindowing(m_totalDicomRange,m_totalDicomSubRange);
+  m_LoadPage->GetRWI()->CameraReset();
+  m_CropPage->UpdateWindowing(m_totalDicomRange,m_totalDicomSubRange);
+  m_CropPage->GetRWI()->CameraReset();
+  m_BuildPage->UpdateWindowing(m_totalDicomRange,m_totalDicomSubRange);
+  m_BuildPage->GetRWI()->CameraReset();
   m_ReferenceSystemPage->GetRWI()->CameraReset();
 }
 //----------------------------------------------------------------------------
@@ -4077,8 +4087,9 @@ void medOpImporterDicomOffis::ResetSliders()
 		m_SliceScannerLoadPage->SetPageSize(1);
 		if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
 		{
-			m_TimeScannerLoadPage=m_LoadGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,m_NumberOfTimeFrames - 1);
-			m_TimeScannerLoadPage->SetPageSize(1);
+			m_TimeScannerLoadPage=m_LoadGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,max(m_NumberOfTimeFrames - 1,0));
+      m_TimeScannerLoadPage->SetPageSize(1);
+      m_LoadGuiLeft->Enable(ID_SCAN_TIME,(m_NumberOfTimeFrames>0));
 		}
 		m_LoadPage->AddGuiLowerLeft(m_LoadGuiLeft);
 	}
@@ -4092,8 +4103,9 @@ void medOpImporterDicomOffis::ResetSliders()
 		m_SliceScannerCropPage->SetPageSize(1);
 		if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
 		{
-			m_TimeScannerCropPage=m_CropGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,m_NumberOfTimeFrames - 1);
-			m_TimeScannerCropPage->SetPageSize(1);
+			m_TimeScannerCropPage=m_CropGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,max(m_NumberOfTimeFrames - 1,0));
+      m_TimeScannerCropPage->SetPageSize(1);
+      m_CropGuiLeft->Enable(ID_SCAN_TIME,(m_NumberOfTimeFrames>0));
 		}
 		m_CropPage->AddGuiLowerLeft(m_CropGuiLeft);
 	}
@@ -4108,8 +4120,9 @@ void medOpImporterDicomOffis::ResetSliders()
 		m_SliceScannerBuildPage->SetPageSize(1);
 		if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
 		{
-			m_TimeScannerBuildPage=m_BuildGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,m_NumberOfTimeFrames - 1);
-			m_TimeScannerBuildPage->SetPageSize(1);
+			m_TimeScannerBuildPage=m_BuildGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,max(m_NumberOfTimeFrames - 1,0));
+      m_TimeScannerBuildPage->SetPageSize(1);
+      m_BuildGuiLeft->Enable(ID_SCAN_TIME,(m_NumberOfTimeFrames>0));
 		}
 		m_BuildPage->AddGuiLowerLeft(m_BuildGuiLeft);
 	}
@@ -4123,8 +4136,9 @@ void medOpImporterDicomOffis::ResetSliders()
     m_SliceScannerReferenceSystemPage->SetPageSize(1);
     if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
     {
-      m_TimeScannerReferenceSystemPage=m_ReferenceSystemGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,m_NumberOfTimeFrames - 1);
+      m_TimeScannerReferenceSystemPage=m_ReferenceSystemGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,max(m_NumberOfTimeFrames - 1,0));
       m_TimeScannerReferenceSystemPage->SetPageSize(1);
+      m_ReferenceSystemGuiLeft->Enable(ID_SCAN_TIME,(m_NumberOfTimeFrames>0));
     }
     m_ReferenceSystemPage->AddGuiLowerLeft(m_ReferenceSystemGuiLeft);
   }
@@ -4824,7 +4838,9 @@ void medOpImporterDicomOffis::OnSeriesSelect()
 	ReadDicom();
 
   
-  GetDicomRange(totalDicomRange);
+  GetDicomRange(m_totalDicomRange);
+  m_totalDicomSubRange[0]=m_totalDicomRange[0];
+  m_totalDicomSubRange[1]=m_totalDicomRange[1];
   CameraReset();
 
 	if(((medGUIDicomSettings*)GetSetting())->AutoCropPosition())
@@ -4842,8 +4858,13 @@ void medOpImporterDicomOffis::OnSeriesSelect()
 
 void medOpImporterDicomOffis::OnWizardChangePage( mafEvent * e )
 {
-	if(m_Wizard->GetCurrentPage()==m_LoadPage)//From Load page to Crop Page
+  
+  if(m_Wizard->GetCurrentPage()==m_LoadPage)//From Load page to Crop Page
 	{
+    //get the current windowing in order to maintain subrange thought the 
+    //wizard pages 
+    m_LoadPage->GetWindowing(m_totalDicomRange,m_totalDicomSubRange);
+
 		if(m_NumberOfStudies<1)
 		{
 			m_Wizard->EnableChangePageOff();
@@ -4860,6 +4881,9 @@ void medOpImporterDicomOffis::OnWizardChangePage( mafEvent * e )
 
 	if (m_Wizard->GetCurrentPage()==m_CropPage)//From Crop page to build page
 	{
+    //get the current windowing in order to maintain subrange thought the 
+    //wizard pages 
+    m_CropPage->GetWindowing(m_totalDicomRange,m_totalDicomSubRange);
 		if (e->GetBool())
 		{
 			if(m_CropPage)
@@ -4897,13 +4921,18 @@ void medOpImporterDicomOffis::OnWizardChangePage( mafEvent * e )
 		} 
 		else
 		{
-			m_Wizard->SetButtonString("Crop >"); 
+      m_Wizard->SetButtonString("Crop >"); 
 			m_LoadPage->UpdateActor();
 		}
 	}
 
-	if (m_Wizard->GetCurrentPage()==m_BuildPage && (!e->GetBool()))//From build page to crop page
+  //From build page to crop page
+	if (m_Wizard->GetCurrentPage()==m_BuildPage && (!e->GetBool()))
 	{
+    //get the current windowing in order to maintain subrange thought the 
+    //wizard pages 
+    m_BuildPage->GetWindowing(m_totalDicomRange,m_totalDicomSubRange);
+
 		OnUndoCrop();
 		m_Wizard->SetButtonString("Build >");
 		m_BuildPage->RemoveGuiLowerUnderLeft(m_BuildGuiCenter);
@@ -4935,7 +4964,7 @@ void medOpImporterDicomOffis::OnWizardChangePage( mafEvent * e )
     m_BuildPage->GetRWI()->CameraReset();
   }
 
-	GuiUpdate();
+  GuiUpdate();
 }
 
 void medOpImporterDicomOffis::OnMouseDown( mafEvent * e )

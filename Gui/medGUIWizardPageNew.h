@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizardPageNew.h,v $
 Language:  C++
-Date:      $Date: 2012-01-25 11:05:44 $
-Version:   $Revision: 1.1.2.9 $
-Authors:   Matteo Giacomoni
+Date:      $Date: 2012-01-26 13:48:05 $
+Version:   $Revision: 1.1.2.10 $
+Authors:   Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2002/2007
 SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
@@ -129,7 +129,10 @@ public:
   /** Update windowing (with custom range) in order to set correct values in lut slider.  
   (used in dicom importer because the windowing must be that of the total dicom
   and we see only a slice)*/
-  void UpdateWindowing(double *scalarRange);
+  void UpdateWindowing(double *scalarRange,double *scalarSubRange);
+
+  /** Get the windowing range values */
+  void GetWindowing(double *scalarRange,double *scalarSubRange);
 
   /** Update Actor Texture from current lut slider values. */
   void UpdateActor();

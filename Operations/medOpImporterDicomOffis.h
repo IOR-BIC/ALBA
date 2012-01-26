@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2012-01-25 11:05:37 $
-Version:   $Revision: 1.1.2.64 $
-Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
+Date:      $Date: 2012-01-26 13:50:35 $
+Version:   $Revision: 1.1.2.66 $
+Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2002/2007
 SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
@@ -199,7 +199,7 @@ protected:
 	void OnMouseDown( mafEvent * e );
 	void OnMouseMove( mafEvent * e );
 	void OnMouseUp();
-	void OnWizardChangePage( mafEvent * e );
+  void OnWizardChangePage( mafEvent * e );
   void OnSeriesSelect();
 	void OnStudySelect();
 	void OnVmeTypeSelected();
@@ -417,7 +417,8 @@ protected:
 	mafGUICheckListBox *m_DicomModalityListBox;
   int m_CurrentImageID;
 
-  double totalDicomRange[2]; ///< contains the scalar range og the full dicom
+  double m_totalDicomRange[2]; ///< contains the scalar range og the full dicom
+  double m_totalDicomSubRange[2]; ///< contains the scalar range og the full dicom
 
 	/** destructor */
 	~medOpImporterDicomOffis();

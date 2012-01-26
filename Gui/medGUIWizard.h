@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizard.h,v $
 Language:  C++
-Date:      $Date: 2011-12-12 07:56:10 $
-Version:   $Revision: 1.4.2.5 $
-Authors:   Matteo Giacomoni
+Date:      $Date: 2012-01-26 13:48:05 $
+Version:   $Revision: 1.4.2.6 $
+Authors:   Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2002/2007
 SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
@@ -89,6 +89,7 @@ public:
 	enum ID_MESSAGES
 	{
 		MED_WIZARD_CHANGE_PAGE = MINID,
+    MED_WIZARD_CHANGED_PAGE,
 		ID_LAST,
 	};
 
@@ -108,6 +109,8 @@ private:
 	void OnClose(wxCommandEvent &event)     {wxDialog::Close();};
   /** event handler function for changing page in the wizard. */
 	void OnWizardPageChanging(wxWizardEvent& event);
+  /** event handler function for change page in the wizard. */
+  void OnWizardPageChange(wxWizardEvent& event);
 
   /** event table declaration */
 	DECLARE_EVENT_TABLE()
