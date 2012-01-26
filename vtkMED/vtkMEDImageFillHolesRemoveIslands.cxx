@@ -2,8 +2,8 @@
 Program:   Medical
 Module:    $RCSfile: vtkMEDImageFillHolesRemoveIslands.cxx,v $
 Language:  C++
-Date:      $Date: 2012-01-20 15:28:07 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2012-01-26 13:44:58 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Alberto Losi
 =============================================================================
 Copyright (c) 2010
@@ -19,7 +19,7 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #include "vtkPointData.h"
 #include <cassert>
 
-vtkCxxRevisionMacro(vtkMEDImageFillHolesRemoveIslands, "$Revision: 1.1.2.1 $");
+vtkCxxRevisionMacro(vtkMEDImageFillHolesRemoveIslands, "$Revision: 1.1.2.2 $");
 vtkStandardNewMacro(vtkMEDImageFillHolesRemoveIslands);
 
 //----------------------------------------------------------------------------
@@ -40,7 +40,8 @@ vtkMEDImageFillHolesRemoveIslands::~vtkMEDImageFillHolesRemoveIslands()
 void vtkMEDImageFillHolesRemoveIslands::SetAlgorithm(int algorithm)
 //----------------------------------------------------------------------------
 {
-  assert(algorithm < INVALID_ALGORITHM && algorithm > 0);
+  assert(algorithm < INVALID_ALGORITHM && algorithm >= 0);
+  Algorithm = algorithm;
   switch (Algorithm)
   {
   case FILL_HOLES:
