@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2012-01-26 13:48:29 $
-Version:   $Revision: 1.1.2.154 $
+Date:      $Date: 2012-01-26 15:42:51 $
+Version:   $Revision: 1.1.2.155 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -4706,17 +4706,21 @@ void medOpImporterDicomOffis::OnVmeTypeSelected()
 	bool type_volume = ((medGUIDicomSettings*)GetSetting())->EnableToRead("VOLUME");
 	bool type_mesh = ((medGUIDicomSettings*)GetSetting())->EnableToRead("MESH");
 	bool type_image = ((medGUIDicomSettings*)GetSetting())->EnableToRead("IMAGE");
-	if (type_volume && !type_mesh && type_image)
-	{
-		if (m_RadioButton==0)
-			m_OutputType = 2;
-		else
-			m_OutputType = 0;
-	}
-	else if (!type_volume && type_mesh && type_image)
-	{
-		m_OutputType = m_RadioButton+1;
-	}
+
+  if(!((medGUIDicomSettings*)GetSetting())->AutoVMEType())
+  {
+	  if (type_volume && !type_mesh && type_image)
+	  {
+		  if (m_RadioButton==0)
+			  m_OutputType = 2;
+		  else
+			  m_OutputType = 0;
+	  }
+	  else if (!type_volume && type_mesh && type_image)
+	  {
+  		m_OutputType = m_RadioButton+1;
+	  }
+  }
 
 // if vmw type is image connect the reference system page
   UpdateReferenceSystemPageConnection();
