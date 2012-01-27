@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2012-01-26 15:42:51 $
-Version:   $Revision: 1.1.2.155 $
+Date:      $Date: 2012-01-27 16:21:30 $
+Version:   $Revision: 1.1.2.156 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -1012,7 +1012,7 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
 
 	int cropInterval = (m_ZCropBounds[1]+1 - m_ZCropBounds[0]);
 
-	int n_slices = cropInterval/ step;
+	int n_slices = (cropInterval/ step);
 	if(cropInterval % step != 0)
 	{
 		n_slices+=1;
@@ -1020,8 +1020,8 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
 
   int count,s_count;
   int numSliceToSkip = 0;
-  bool *sliceToSkip = new bool[n_slices];
-  for (int i=0;i<n_slices;i++)
+  bool *sliceToSkip = new bool[n_slices+1];
+  for (int i=0;i<n_slices+1;i++)
   {
     sliceToSkip[i] = false;
   }
@@ -1108,7 +1108,7 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
 	long progress = 0;
 	for (count = m_ZCropBounds[0], s_count = 0; count < m_ZCropBounds[1]+1; count += step)
 	{
-    if (sliceToSkip[count])
+    if (sliceToSkip[count-m_ZCropBounds[0]])
     {
       break;
     }
