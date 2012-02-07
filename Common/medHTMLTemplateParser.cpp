@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medHTMLTemplateParser.cpp,v $
 Language:  C++
-Date:      $Date: 2012-01-31 16:55:54 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2012-02-07 16:45:07 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -52,7 +52,76 @@ MafMedical is partially based on OpenMAF.
 
 
 //----------------------------------------------------------------------------
-medHTMLTemplateParser::medHTMLTemplateParser(int blockType)
+medHTMLTemplateParser::medHTMLTemplateParser()
 //----------------------------------------------------------------------------
 {
+  m_MainBlock=NULL;
+  m_Template="";
+  m_Output="";
+}
+
+//----------------------------------------------------------------------------
+medHTMLTemplateParser::~medHTMLTemplateParser()
+//----------------------------------------------------------------------------
+{
+  delete m_MainBlock;
+}
+
+//----------------------------------------------------------------------------
+void medHTMLTemplateParser::SetTemplateFromFile( wxString filename )
+//----------------------------------------------------------------------------
+{
+  FILE *templateFile;
+  int stringSize;
+
+  char *fileString;
+
+  templateFile=fopen(filename.c_str(),"R");
+
+  fseek(templateFile, 0L, SEEK_END);
+  stringSize = ftell(templateFile);
+  
+  fileString=new char[stringSize];
+
+  fseek(templateFile, 0L, SEEK_SET);
+
+  fread(fileString,sizeof(char),stringSize,templateFile);
+
+  m_Template=fileString;
+
+  fclose(templateFile);
+
+  delete fileString;
+}
+
+//----------------------------------------------------------------------------
+void medHTMLTemplateParser::SetTemplateFromString( wxString templateString )
+//----------------------------------------------------------------------------
+{
+  m_Template=templateString;
+}
+
+
+medHTMLTemplateParserBlock * medHTMLTemplateParser::GetMainBlock()
+{
+  return m_MainBlock;
+}
+
+wxString medHTMLTemplateParser::GetOutputString()
+{
+  return m_Output;
+}
+
+void medHTMLTemplateParser::WriteOutputFile(wxString filename)
+{
+  FILE *outputFile;
+
+  outputFile=fopen(filename.c_str(),"W");
+  fwrite(m_Output.c_str(),sizeof(char),m_Output.size(),outputFile);
+  fclose(outputFile);
+}
+
+void medHTMLTemplateParser::Update()
+{
+  m_MainBlock->Parse(&m_Template,&m_Output);
 }

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medHTMLTemplateParser.h,v $
 Language:  C++
-Date:      $Date: 2012-01-31 16:55:54 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2012-02-07 16:45:07 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -50,9 +50,30 @@ MafMedical is partially based on OpenMAF.
 class MED_EXPORT medHTMLTemplateParser
 {
 public:
-  medHTMLTemplateParser(int blockType);
-  ~medHTMLTemplateParser(); 
-protected:
   
+  /** constructor*/
+  medHTMLTemplateParser();
+  /** destructor*/
+  ~medHTMLTemplateParser(); 
+
+  /** Set the template from a file */
+  void SetTemplateFromFile(wxString filename);
+  /** Set the template from a string */
+  void SetTemplateFromString(wxString templateString);
+  /** Returns the html template main Block */
+  medHTMLTemplateParserBlock *GetMainBlock();
+  /** Return the Parsed output */
+  wxString GetOutputString();
+  /** Writes the output to disk */
+  void WriteOutputFile(wxString filename);
+  /** Updates all the structures and generate internal output 
+      Note: this function must be called before GetOutputString() or 
+        WriteOutput() functions*/
+  void Update();
+  
+protected:
+  medHTMLTemplateParserBlock *m_MainBlock;
+  wxString m_Template;
+  wxString m_Output;
 };
 #endif

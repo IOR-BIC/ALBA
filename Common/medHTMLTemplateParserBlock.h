@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medHTMLTemplateParserBlock.h,v $
 Language:  C++
-Date:      $Date: 2012-02-07 01:52:14 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2012-02-07 16:45:07 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -127,7 +127,7 @@ protected:
   void updateChildrenVars();
 
   /* Write a specified Var to the output */
-  void  WriteSubstitution(HTMLTemplateSubstitution var, wxString *outputHTML);
+  void  WriteSubstitution(HTMLTemplateParsedItems var, wxString *outputHTML);
 
   /** Generate PreParsing structures from input template 
       for this block and return the number of parsed chars */

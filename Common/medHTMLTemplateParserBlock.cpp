@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medHTMLTemplateParserBlock.cpp,v $
 Language:  C++
-Date:      $Date: 2012-02-07 01:52:14 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2012-02-07 16:45:07 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -67,6 +67,7 @@ medHTMLTemplateParserBlock::medHTMLTemplateParserBlock(int blockType, wxString n
 
   m_DoubleFormat="%.3f";
 
+  m_CurrentLoop=0;
   m_LoopsNumber=-1;  
 }
 
@@ -75,7 +76,26 @@ medHTMLTemplateParserBlock::medHTMLTemplateParserBlock(int blockType, wxString n
 medHTMLTemplateParserBlock::~medHTMLTemplateParserBlock()
 //----------------------------------------------------------------------------
 {
+  m_SubstitutionTable.clear();
+  
+  m_Variables.clear();
 
+  for (int i=0;i<m_VariablesArray.size();i++)
+    m_VariablesArray[i].clear();
+  m_VariablesArray.clear();
+
+  for (int i=0;i<m_SubBlocks.size();i++)
+    delete m_SubBlocks[i];
+  m_SubBlocks.clear();
+  
+  for (int i=0;i<m_SubBlocksArray.size();i++)
+  {
+    for (int j=0;j<m_SubBlocksArray[i].size();j++)
+      delete m_SubBlocksArray[i][j];
+    m_SubBlocksArray[i].clear();
+  }
+  m_SubBlocksArray.clear();
+    
 }
 
 
@@ -225,39 +245,43 @@ medHTMLTemplateParserBlock::HTMLTemplateSubstitution medHTMLTemplateParserBlock:
 }
 
 //----------------------------------------------------------------------------
-void medHTMLTemplateParserBlock::WriteSubstitution( HTMLTemplateSubstitution var, wxString *outputHTML )
+void medHTMLTemplateParserBlock::WriteSubstitution( HTMLTemplateParsedItems var, wxString *outputHTML )
 //----------------------------------------------------------------------------
 {
-  switch (var.Type)
+  HTMLTemplateSubstitution substitution;
+
+  substitution=m_SubstitutionTable[var.SubstitutionPos];
+
+  switch (substitution.Type)
   {
     case MED_HTML_TEMPLATE_VARIABLE:
     {
-      outputHTML->Append(m_Variables[var.Pos]);
+      outputHTML->Append(m_Variables[substitution.Pos]);
     }
     break;
     case MED_HTML_TEMPLATE_VARIABLE_ARRAY:
     {
       if (m_BlockType!=MED_HTML_TEMPLATE_LOOP)
       {
-        mafLogMessage("HTML Template ERROR: Substitution: \"%s\" not found",var.Name.ToAscii());
+        mafLogMessage("HTML Template ERROR: Substitution: \"%s\" not found",substitution.Name.ToAscii());
         return;
       }
-      outputHTML->Append(m_VariablesArray[var.Pos][m_CurrentLoop]);
+      outputHTML->Append(m_VariablesArray[substitution.Pos][m_CurrentLoop]);
     }
     break;
     case MED_HTML_TEMPLATE_LOOP:
       {
-        m_SubBlocksArray[var.Pos][m_CurrentLoop]->GenerateOutput(outputHTML);
+        m_SubBlocksArray[substitution.Pos][m_CurrentLoop]->GenerateOutput(outputHTML);
       }
     break;
     case MED_HTML_TEMPLATE_IF:
       {
-        m_SubBlocks[var.Pos]->GenerateOutput(outputHTML);
+        m_SubBlocks[substitution.Pos]->GenerateOutput(outputHTML);
       }
     break;
     default:
       {
-        mafLogMessage("HTML Template ERROR: WRONG Substitution type: \"%s\" not found",var.Name.ToAscii());
+        mafLogMessage("HTML Template ERROR: WRONG Substitution type: \"%s\" not found",substitution.Name.ToAscii());
       }
   }
 
@@ -267,7 +291,7 @@ void medHTMLTemplateParserBlock::WriteSubstitution( HTMLTemplateSubstitution var
 void medHTMLTemplateParserBlock::CleanPreParsingInfo()
 //----------------------------------------------------------------------------
 {
-    //TO DO
+    
 }
 
 //----------------------------------------------------------------------------
@@ -347,7 +371,7 @@ void medHTMLTemplateParserBlock::updateChildrenVars()
       }
       for (int j=0;j<m_SubBlocks.size();j++)
       {
-        m_SubBlocksArray[j][m_CurrentLoop]->UpdateVar(m_SubstitutionTable[i].Name, m_VariablesArray[newValue]);
+        m_SubBlocksArray[j][m_CurrentLoop]->UpdateVar(m_SubstitutionTable[i].Name, newValue);
       }
     }
   }
@@ -432,15 +456,19 @@ void medHTMLTemplateParserBlock::PreParse( wxString *inputTemplate, int &parsing
 int medHTMLTemplateParserBlock::SubStringCompare( wxString *input, char *subString, int inputPos )
 //----------------------------------------------------------------------------
 {
-    int subStringSize=subString->size();
+    int subStringSize;
+
+    
+
+    wxString subWxString=subString;
+    subStringSize=subWxString.size();
     if (inputPos+subStringSize>input->size())
       return false;
- 
-    wxString subWxString=subString;
+
     wxString tmpStr=input->SubString(inputPos,inputPos+subStringSize);
     
     //Substitute this whit CmpNoCase for case independent templates
-    return !(tmpStr.Cmp(subWxString))
+    return !(tmpStr.Cmp(subWxString));
 }
 
 #define MAF_TAG_OPENING "[MAF"
@@ -448,7 +476,7 @@ int medHTMLTemplateParserBlock::SubStringCompare( wxString *input, char *subStri
 #define MAF_TAG_VARIABLE "Variable"
 #define MAF_TAG_LOOP "Loop"
 #define MAF_TAG_IF "If"
-#defien MAF_TAG_ELSE "Else"
+#define MAF_TAG_ELSE "Else"
 
 //----------------------------------------------------------------------------
 int medHTMLTemplateParserBlock::PreParseTag( wxString *inputTemplate, int &parsingPos )
@@ -489,12 +517,16 @@ int medHTMLTemplateParserBlock::PreParseTag( wxString *inputTemplate, int &parsi
 int medHTMLTemplateParserBlock::ConsistenceCheck()
 //----------------------------------------------------------------------------
 {
+
+  ///TO DO;
   return true;
 }
 
 void medHTMLTemplateParserBlock::SkipInputSpaces( wxString *inputTemplate, int &parsingPos )
 {
-
+  //add more white spaces chars here if necessary
+  while ( inputTemplate[parsingPos] == ' ')
+    parsingPos++;
 }
 
 
