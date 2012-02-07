@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medHTMLTemplateParserBlock.h,v $
 Language:  C++
-Date:      $Date: 2012-01-31 16:55:55 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2012-02-07 01:52:14 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -56,16 +56,17 @@ enum HTMLBLOCK_TYPES
   MED_HTML_TEMPLATE_MAIN,
   MED_HTML_TEMPLATE_LOOP,
   MED_HTML_TEMPLATE_IF,
-  MED_HTML_TEMPLATE_ELSE,
   MED_HTML_TEMPLATE_VARIABLE,
   MED_HTML_TEMPLATE_VARIABLE_ARRAY,
 };
 
+/*
 enum HTML_PARSED_TYPES
 {
   MED_HTML_TEMPLATE_VAR,
   MED_HTML_TEMPLATE_BLOCK,
 };
+*/
 
 class wxString;
 
@@ -83,8 +84,7 @@ public:
 public:
   typedef struct parsedItems{
     int TextPos;
-    int ItemType;
-    int ItemPos;    
+    int SubstitutionPos;    
   } HTMLTemplateParsedItems;
 
   /** constructor*/
@@ -120,16 +120,35 @@ protected:
   /* Finds a variable starting from his name */
   HTMLTemplateSubstitution GetSubstitution(wxString name);
 
+  /* Update the variable specified in the name string */
+  void UpdateVar(wxString name, wxString newValue);
+
+  /*  Updates children vars (called from LOOP blocks */
+  void updateChildrenVars();
+
   /* Write a specified Var to the output */
-  void  WriteVar(HTMLTemplateSubstitution var, wxString *outputHTML);
+  void  WriteSubstitution(HTMLTemplateSubstitution var, wxString *outputHTML);
 
   /** Generate PreParsing structures from input template 
       for this block and return the number of parsed chars */
-  int PreParse(wxString *inputTemplate, int parsingPos);
+  void PreParse(wxString *inputTemplate, int &parsingPos);
+
+  /** Parse the input starting from a tag */
+  int PreParseTag(wxString *inputTemplate, int &parsingPos);
+
+  /** Utility function that skip spaces on input template */
+  void SkipInputSpaces(wxString *inputTemplate, int &parsingPos);
+
+  /** AddSubstitution to m_Subistitution and if necessary gives parsing control
+      to children for sub-scope management */
+  void AddSubstitution(wxString *inputTemplate, int &parsingPos, int SubstitutionType); 
+
+  /** Return true if input contains subString starting from inputPos */
+  int SubStringCompare(wxString *input, char *subString, int inputPos);
 
   /** Clean the structures generated on PreParse phase */
   void CleanPreParsingInfo();
-
+  
   /** Generate HTML output */
   void GenerateOutput(wxString *outputHTML);
 
@@ -141,17 +160,25 @@ protected:
     
   //VARIABLES
   wxString m_BlockName;
-  int m_BlockType;
+  int m_BlockType; 
+  
+  int m_IfChars;
+  bool m_IfCondition;
   
   wxString m_DoubleFormat;
+  int m_CurrentLoop;
   int m_LoopsNumber;
 
   std::vector<HTMLTemplateSubstitution>	m_SubstitutionTable;
 
-  std::vector<wxString> m_Variables;
-  std::vector< std::vector<wxString> > m_VariablesArray;
+  std::vector < wxString > m_Variables;
+  std::vector < std::vector<wxString> > m_VariablesArray;
 
   std::vector < medHTMLTemplateParserBlock * > m_SubBlocks;
-  std::vector< std::vector< medHTMLTemplateParserBlock * > > m_SubBlocksArray;
+  std::vector < std::vector< medHTMLTemplateParserBlock * > > m_SubBlocksArray;
+
+  wxString m_PreParsedHTML;
+  std::vector < HTMLTemplateParsedItems > m_Substitutions;
+
 };
 #endif

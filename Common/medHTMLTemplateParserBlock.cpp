@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medHTMLTemplateParserBlock.cpp,v $
 Language:  C++
-Date:      $Date: 2012-01-31 16:55:55 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2012-02-07 01:52:14 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -49,20 +49,21 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 
 
-
 //----------------------------------------------------------------------------
 medHTMLTemplateParserBlock::medHTMLTemplateParserBlock(int blockType, wxString name)
 //----------------------------------------------------------------------------
 {
   if (blockType != MED_HTML_TEMPLATE_MAIN && blockType != MED_HTML_TEMPLATE_LOOP &&
-      blockType != MED_HTML_TEMPLATE_ELSE && blockType != MED_HTML_TEMPLATE_IF)
+      blockType != MED_HTML_TEMPLATE_IF)
   {
     mafLogMessage("medHTMLTemplateParserBlock: Invalid Block Type");
     return;
   }
 
+
   m_BlockName=name;
   m_BlockType=blockType;
+  m_IfChars=0;
 
   m_DoubleFormat="%.3f";
 
@@ -182,7 +183,6 @@ int medHTMLTemplateParserBlock::SubstitutionPos( wxString name )
 void medHTMLTemplateParserBlock::AddBlock( wxString name, int blockType )
 //----------------------------------------------------------------------------
 {
-
   if (SubstitutionPos(name)>0)
   {
     mafLogMessage("HTML Template ERROR: Block: \"%s\" already exists",name.ToAscii());
@@ -192,18 +192,17 @@ void medHTMLTemplateParserBlock::AddBlock( wxString name, int blockType )
     medHTMLTemplateParserBlock *newBlock;
     newBlock=new medHTMLTemplateParserBlock(blockType, name);
     newBlock->InheritVars(this);
-    
-
   }
-
-  
 }
 
 //----------------------------------------------------------------------------
-void medHTMLTemplateParserBlock::Parse( wxString *inputTemplate,wxString *outputHTML )
+void medHTMLTemplateParserBlock::Parse( wxString *inputTemplate,wxString *outputHTML)
 //----------------------------------------------------------------------------
 {
-
+  int parsingPos=0;
+  PreParse(inputTemplate,parsingPos);
+  if (ConsistenceCheck())
+    GenerateOutput(outputHTML);
 }
 
 //----------------------------------------------------------------------------
@@ -226,9 +225,41 @@ medHTMLTemplateParserBlock::HTMLTemplateSubstitution medHTMLTemplateParserBlock:
 }
 
 //----------------------------------------------------------------------------
-void medHTMLTemplateParserBlock::WriteVar( HTMLTemplateSubstitution var, wxString *outputHTML )
+void medHTMLTemplateParserBlock::WriteSubstitution( HTMLTemplateSubstitution var, wxString *outputHTML )
 //----------------------------------------------------------------------------
 {
+  switch (var.Type)
+  {
+    case MED_HTML_TEMPLATE_VARIABLE:
+    {
+      outputHTML->Append(m_Variables[var.Pos]);
+    }
+    break;
+    case MED_HTML_TEMPLATE_VARIABLE_ARRAY:
+    {
+      if (m_BlockType!=MED_HTML_TEMPLATE_LOOP)
+      {
+        mafLogMessage("HTML Template ERROR: Substitution: \"%s\" not found",var.Name.ToAscii());
+        return;
+      }
+      outputHTML->Append(m_VariablesArray[var.Pos][m_CurrentLoop]);
+    }
+    break;
+    case MED_HTML_TEMPLATE_LOOP:
+      {
+        m_SubBlocksArray[var.Pos][m_CurrentLoop]->GenerateOutput(outputHTML);
+      }
+    break;
+    case MED_HTML_TEMPLATE_IF:
+      {
+        m_SubBlocks[var.Pos]->GenerateOutput(outputHTML);
+      }
+    break;
+    default:
+      {
+        mafLogMessage("HTML Template ERROR: WRONG Substitution type: \"%s\" not found",var.Name.ToAscii());
+      }
+  }
 
 }
 
@@ -236,21 +267,221 @@ void medHTMLTemplateParserBlock::WriteVar( HTMLTemplateSubstitution var, wxStrin
 void medHTMLTemplateParserBlock::CleanPreParsingInfo()
 //----------------------------------------------------------------------------
 {
-
+    //TO DO
 }
 
 //----------------------------------------------------------------------------
 void medHTMLTemplateParserBlock::GenerateOutput( wxString *outputHTML )
 //----------------------------------------------------------------------------
 {
+  int parsedChars;
+  int totalChars;
+  int totalLoops;
+  int currentSubstitution;
+  int parseTo;
+
+  m_CurrentLoop=0;
+  
+  if (m_BlockType==MED_HTML_TEMPLATE_LOOP)
+    totalLoops=m_LoopsNumber;
+  else totalLoops=1;
+ 
+  for (int i=0;i<totalLoops;i++)
+  {
+    currentSubstitution=0;
+    parsedChars=0;
+    totalChars=m_PreParsedHTML.size();
+    if (m_BlockType==MED_HTML_TEMPLATE_IF)
+    {
+      //The if-block is composed of both if and else chars 
+      //when the variable is true we consider the chars from 0 to m_IfChars 
+      //when the variable is false we consider the chars from m_ifChars to end
+      //[-----TRUE-----]m_ifChars[----FALSE----]
+      if (m_IfCondition) 
+        totalChars=m_IfChars;
+      else 
+        parsedChars=m_IfChars;
+    }
+
+
+    do 
+    {
+      if (currentSubstitution==m_Substitutions.size())
+      {
+        //copy all unparsed chars
+        parseTo=totalChars;
+      }
+      else 
+      {
+        //copy all chars form current position (parsedChars) to the next substitution
+        parseTo=m_Substitutions[currentSubstitution].TextPos;
+      }
+      
+      outputHTML->Append(m_PreParsedHTML.SubString(parsedChars,parseTo));
+
+      if (currentSubstitution<m_Substitutions.size())
+        WriteSubstitution(m_Substitutions[currentSubstitution],outputHTML);
+
+      currentSubstitution++;
+      parsedChars=parseTo;
+    } 
+    while (parsedChars<totalChars);
+  }
+
+  
+}
+
+//----------------------------------------------------------------------------
+void medHTMLTemplateParserBlock::updateChildrenVars()
+//----------------------------------------------------------------------------
+{
+  for (int i=0;i<m_SubstitutionTable.size();i++)
+  {
+    if (m_SubstitutionTable[i].Type==MED_HTML_TEMPLATE_VARIABLE_ARRAY)
+    {
+      wxString newValue;
+      newValue=m_VariablesArray[m_SubstitutionTable[i].Pos][m_CurrentLoop];
+      for (int j=0;j<m_SubBlocks.size();j++)
+      {
+        m_SubBlocks[j]->UpdateVar(m_SubstitutionTable[i].Name, newValue);
+      }
+      for (int j=0;j<m_SubBlocks.size();j++)
+      {
+        m_SubBlocksArray[j][m_CurrentLoop]->UpdateVar(m_SubstitutionTable[i].Name, m_VariablesArray[newValue]);
+      }
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+void medHTMLTemplateParserBlock::UpdateVar( wxString name, wxString newValue )
+//----------------------------------------------------------------------------
+{
+  int pos;
+  pos=SubstitutionPos(name);
+  m_Variables[pos]=newValue;
+  
+  for (int i=0;i<m_SubBlocks.size();i++)
+    m_SubBlocks[i]->UpdateVar(name,newValue);
+  
+  if (m_BlockType==MED_HTML_TEMPLATE_LOOP)
+    for (int i=0;i<m_SubBlocksArray.size();i++)
+      for(int j=0;j<m_SubBlocksArray[i].size();j++)
+        m_SubBlocksArray[i][j]->UpdateVar(name,newValue);
 
 }
+
 
 //----------------------------------------------------------------------------
 void medHTMLTemplateParserBlock::InheritVars( medHTMLTemplateParserBlock *father )
 //----------------------------------------------------------------------------
 {
-  //Loops does not Inherit ArrayVars 
+  //Bocks Inherit ArrayVars as simple vars 
+  //These will be updated every loop
+  int pos;
+
+  for(int i=0;i<father->m_SubstitutionTable.size();i++)
+  {
+    if (father->m_SubstitutionTable[i].Type==MED_HTML_TEMPLATE_VARIABLE)
+    {
+      pos=father->m_SubstitutionTable[i].Pos;
+      AddVar(father->m_SubstitutionTable[i].Name,father->m_Variables[pos]);
+    }
+    else if (father->m_SubstitutionTable[i].Type==MED_HTML_TEMPLATE_VARIABLE_ARRAY)
+    {
+      pos=father->m_SubstitutionTable[i].Pos;
+      //we inherit variables array from the first var
+      AddVar(father->m_SubstitutionTable[i].Name,father->m_VariablesArray[pos][0]);
+    }
+  }
+  
+}
+
+//----------------------------------------------------------------------------
+void medHTMLTemplateParserBlock::PreParse( wxString *inputTemplate, int &parsingPos )
+//----------------------------------------------------------------------------
+{
+  int templateSize=inputTemplate->size();
+  int continueParsing=true;
+  int stdHTMLtoCopy;
+
+  while (parsingPos<templateSize && continueParsing)
+  {
+    stdHTMLtoCopy=0;
+    //we start parsing outside from MAFtags 
+    //we search the next tag inside the input and parse it
+    while (parsingPos<templateSize && inputTemplate[parsingPos+stdHTMLtoCopy]!='[')
+      stdHTMLtoCopy++;
+
+    //coping stdHtml to preParsedHTML
+    if (stdHTMLtoCopy>0)
+      m_PreParsedHTML.Append(inputTemplate->SubString(parsingPos,parsingPos+stdHTMLtoCopy));
+
+    parsingPos+=stdHTMLtoCopy;
+
+    if (inputTemplate[parsingPos]=='[')
+      continueParsing=PreParseTag(inputTemplate,parsingPos);
+  }
+  //continueParsing is true only if we reach the end of template and not find the end tag
+  if (continueParsing && m_BlockType==MED_HTML_TEMPLATE_MAIN)
+    mafLogMessage("HTML Template ERROR: NO [/MAFMain] Tag");
+    
+}
+
+//----------------------------------------------------------------------------
+int medHTMLTemplateParserBlock::SubStringCompare( wxString *input, char *subString, int inputPos )
+//----------------------------------------------------------------------------
+{
+    int subStringSize=subString->size();
+    if (inputPos+subStringSize>input->size())
+      return false;
+ 
+    wxString subWxString=subString;
+    wxString tmpStr=input->SubString(inputPos,inputPos+subStringSize);
+    
+    //Substitute this whit CmpNoCase for case independent templates
+    return !(tmpStr.Cmp(subWxString))
+}
+
+#define MAF_TAG_OPENING "[MAF"
+#define MAF_TAG_CLOSING "[/MAF"
+#define MAF_TAG_VARIABLE "Variable"
+#define MAF_TAG_LOOP "Loop"
+#define MAF_TAG_IF "If"
+#defien MAF_TAG_ELSE "Else"
+
+//----------------------------------------------------------------------------
+int medHTMLTemplateParserBlock::PreParseTag( wxString *inputTemplate, int &parsingPos )
+//----------------------------------------------------------------------------
+{
+  int templateSize=inputTemplate->size();
+  
+ 
+  if (SubStringCompare(inputTemplate,MAF_TAG_OPENING,parsingPos)) 
+  {    
+    if (SubStringCompare(inputTemplate,MAF_TAG_VARIABLE,parsingPos))
+    {
+      parsingPos+=Strlen("MAF_TAG_VARIABLE");
+
+      
+    }
+  }
+  else if (SubStringCompare(inputTemplate,MAF_TAG_CLOSING,parsingPos)) 
+  {
+
+  }
+  else 
+  {
+    //there is a '[' char but there is not a MAF tag
+    //in this case the input must be copied to pre parsed string
+    //we add '[' char to m_PreParsedHTML and increase parsingPos 
+    //in order to avoid a non ending loop in the caller function
+    m_PreParsedHTML.Append("[");
+    parsingPos++;
+    return true; //continue parsing
+  }
+
+
 
 }
 
@@ -260,3 +491,11 @@ int medHTMLTemplateParserBlock::ConsistenceCheck()
 {
   return true;
 }
+
+void medHTMLTemplateParserBlock::SkipInputSpaces( wxString *inputTemplate, int &parsingPos )
+{
+
+}
+
+
+
