@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.h,v $
 Language:  C++
-Date:      $Date: 2012-01-19 09:25:49 $
-Version:   $Revision: 1.1.2.11 $
+Date:      $Date: 2012-02-08 13:14:05 $
+Version:   $Revision: 1.1.2.12 $
 Authors:   Eleonora Mambrini, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
@@ -276,6 +276,8 @@ protected:
   /** Perform the initializations when the user press previous button */
   void OnPreviousStep();
 
+  void ResetOriginalDataForFeedBack();
+
   mafVMEVolumeGray* m_Volume; //<Input volume
 
   double m_SliceOrigin[3];    //<Origin of the slice plane
@@ -392,6 +394,7 @@ protected:
   medInteractorPERBrushFeedback *m_ManualPER;
   //////////////////////////////////////////////////////////////////////////
 
+  double m_CurrentEventCount;
 
   //////////////////////////////////////////////////////////////////////////
   //Automatic segmentation stuff
@@ -509,6 +512,8 @@ protected:
   std::vector<vtkUnsignedCharArray *> m_RefinementRedoList;
 
   int m_MajorityThreshold;
- 
+
+  vtkUnsignedCharArray *m_OriginalManualDataForFeedBack;
+  mafEvent *m_OldBrushEvent;
 };
 #endif

@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2012-01-24 09:56:21 $
-Version:   $Revision: 1.1.2.25 $
+Date:      $Date: 2012-02-08 13:14:05 $
+Version:   $Revision: 1.1.2.26 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
@@ -238,6 +238,9 @@ medOpSegmentation::medOpSegmentation(const wxString &label) : mafOp(label)
   m_InitialScaleFactor = -1;
 
   m_MajorityThreshold = 9;
+
+  m_OriginalManualDataForFeedBack = NULL;
+  m_CurrentEventCount = 0;
 }
 //----------------------------------------------------------------------------
 medOpSegmentation::~medOpSegmentation()
@@ -1445,12 +1448,33 @@ void medOpSegmentation::OnManualStep()
   UpdateVolumeSlice();
   m_View->VmeShow(m_ManualVolumeSlice, true);
   SetTrilinearInterpolation(m_ManualVolumeSlice);
+
+  ResetOriginalDataForFeedBack();
+
+  m_CurrentEventCount = 0;
 }
 
 //------------------------------------------------------------------------
 void medOpSegmentation::OnManualStepExit()
 //------------------------------------------------------------------------
 {
+  if(m_OriginalManualDataForFeedBack)
+  {
+    vtkImageData* dataSet = (vtkImageData*) m_ManualVolumeSlice->GetOutput()->GetVTKData();
+    dataSet->GetPointData()->SetScalars(m_OriginalManualDataForFeedBack);
+    dataSet->Update();
+    m_ManualVolumeSlice->SetData(dataSet,mafVME::SafeDownCast(m_Volume)->GetTimeStamp());
+    m_ManualVolumeSlice->Update();
+    m_ManualVolumeSlice->Update();
+    ApplyVolumeSliceChanges();
+  }
+
+  if(m_OriginalManualDataForFeedBack)
+  {
+    m_OriginalManualDataForFeedBack->Delete();
+    m_OriginalManualDataForFeedBack = NULL;
+  }
+
   //Gui stuff
   //set default cursor - remove draw actor  
   wxCursor cursor = wxCursor( wxCURSOR_DEFAULT );
@@ -1654,6 +1678,31 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
       m_AutomaticScalarTextMapper->SetInput(text.GetCStr());
       m_View->CameraUpdate();
     }
+    else if (e->GetSender() == m_ManualPER && e->GetId()== MOUSE_MOVE)
+    {
+      if(m_OriginalManualDataForFeedBack)
+      {
+         vtkImageData* dataSet = (vtkImageData*) m_ManualVolumeSlice->GetOutput()->GetVTKData();
+         dataSet->GetPointData()->SetScalars(m_OriginalManualDataForFeedBack);
+         dataSet->Update();
+         m_ManualVolumeSlice->SetData(dataSet,mafVME::SafeDownCast(m_Volume)->GetTimeStamp());
+         m_ManualVolumeSlice->Update();
+         m_ManualVolumeSlice->Update();
+         ApplyVolumeSliceChanges();
+      }
+      //vtkPoints* pts = (vtkPoints*)e->GetVtkObj();
+      //mafLogMessage(">> %f %f %f",pts->GetPoint(0)[0],pts->GetPoint(0)[1],pts->GetPoint(0)[2]);
+      //mafLogMessage(">> %d",e->GetArg());
+      //mafLogMessage(">> %f %f",e->GetDouble(),m_CurrentEventCount);
+      if(e->GetDouble() > m_CurrentEventCount)
+      {
+        m_CurrentEventCount = e->GetDouble();
+        m_ManualSegmentationAction = MANUAL_SEGMENTATION_SELECT;
+        OnBrushEvent(e);
+      }
+
+      m_View->CameraUpdate();
+    }
     else if (e->GetSender() == m_SegmentationPicker && e->GetId()== medInteractorSegmentationPicker::VME_ALT_PICKED)
     {
       //Picking during automatic segmentation
@@ -1690,8 +1739,14 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         {
           m_NumSliceSliderEvents = 0;
           if (m_CurrentSliceIndex != m_OldSliceIndex && m_CurrentOperation==MANUAL_SEGMENTATION)
+          {
             ApplyVolumeSliceChanges();
+          }
           UpdateSlice();
+          if(m_CurrentOperation == MANUAL_SEGMENTATION)
+          {
+            ResetOriginalDataForFeedBack();
+          }
         }
         else
         {
@@ -1704,8 +1759,14 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         if(m_CurrentSliceIndex<m_SliceSlider->GetMax())
           m_CurrentSliceIndex++;
         if (m_CurrentSliceIndex != m_OldSliceIndex && m_CurrentOperation==MANUAL_SEGMENTATION)
+        {
           ApplyVolumeSliceChanges();
-        UpdateSlice();        
+        }
+        UpdateSlice();
+        if(m_CurrentOperation == MANUAL_SEGMENTATION)
+        {
+          ResetOriginalDataForFeedBack();
+        }
         break;
       }
     case ID_SLICE_PREV:
@@ -1713,23 +1774,41 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         if(m_CurrentSliceIndex>1)
           m_CurrentSliceIndex--;
         if (m_CurrentSliceIndex != m_OldSliceIndex && m_CurrentOperation==MANUAL_SEGMENTATION)
+        {
           ApplyVolumeSliceChanges();
+        }
         UpdateSlice();
+        if(m_CurrentOperation == MANUAL_SEGMENTATION)
+        {
+          ResetOriginalDataForFeedBack();
+        }
         break;
       }
     case ID_SLICE_TEXT:
       {
         if (m_CurrentSliceIndex != m_OldSliceIndex && m_CurrentOperation==MANUAL_SEGMENTATION)
+        {
           ApplyVolumeSliceChanges();
+        }
         UpdateSlice();
+        if(m_CurrentOperation == MANUAL_SEGMENTATION)
+        {
+          ResetOriginalDataForFeedBack();
+        }
         break;
       }
     case ID_SLICE_PLANE:
       {
         m_CurrentSliceIndex = 1;
         if (m_CurrentOperation == MANUAL_SEGMENTATION)
+        {
           ApplyVolumeSliceChanges();
+        }
         UpdateSlice();
+        if(m_CurrentOperation == MANUAL_SEGMENTATION)
+        {
+          ResetOriginalDataForFeedBack();
+        }
         m_View->ChangeView(m_CurrentSlicePlane);
         InitGui();
         if (m_CurrentOperation == AUTOMATIC_SEGMENTATION)
@@ -1753,7 +1832,7 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         //Picking during manual segmentation
         if(m_CurrentOperation == MANUAL_SEGMENTATION)
           StartDraw(e, false);
-
+        m_CurrentEventCount = 0;
         break;
       }
     case VME_PICKING:
@@ -1761,6 +1840,9 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         if(m_CurrentOperation == MANUAL_SEGMENTATION)
         {          
           OnBrushEvent(e);
+          m_ManualVolumeSlice->GetOutput()->GetVTKData()->Update();
+          m_ManualVolumeSlice->Update();
+          ResetOriginalDataForFeedBack();
           m_PickingStarted=false;
         }
         break;
@@ -2307,7 +2389,7 @@ void medOpSegmentation::ReloadUndoRedoState(vtkDataSet *dataSet,UndoRedoState st
   {
     undoRedoData->GetPointData()->GetScalars()->SetTuple1(i,(unsigned char)abs(state.dataArray->GetTuple1(i) - dataSet->GetPointData()->GetScalars()->GetTuple1(i)));
   }
-   undoRedoData->Update();
+  undoRedoData->Update();
 
   dataSet->GetPointData()->SetScalars(state.dataArray);
   //Show changes
@@ -3428,3 +3510,15 @@ bool medOpSegmentation::ResetZoom(vtkDataSet* dataset, double visbleBounds[4])
   }  
   return true;
 }
+
+//----------------------------------------------------------------------------
+void medOpSegmentation::ResetOriginalDataForFeedBack()
+//----------------------------------------------------------------------------
+{
+  if(!m_OriginalManualDataForFeedBack)
+  {
+    m_OriginalManualDataForFeedBack = vtkUnsignedCharArray::New();
+  }
+  m_OriginalManualDataForFeedBack->DeepCopy( m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->GetScalars() );
+  m_OriginalManualDataForFeedBack->SetName("SCALARS");
+};
