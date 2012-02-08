@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medInteractorPERBrushFeedback.h,v $
 Language:  C++
-Date:      $Date: 2012-01-16 09:33:14 $
-Version:   $Revision: 1.1.2.5 $
+Date:      $Date: 2012-02-08 13:13:21 $
+Version:   $Revision: 1.1.2.6 $
 Authors:   Eleonora Mambrini, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -84,6 +84,7 @@ protected:
   bool m_IsActorAdded;
   bool m_EnableDrawing;
   bool m_MouseDown;
+  double m_Count;
 
 };
 #endif 

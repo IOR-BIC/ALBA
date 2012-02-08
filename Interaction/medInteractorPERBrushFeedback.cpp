@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medInteractorPERBrushFeedback.cpp,v $
 Language:  C++
-Date:      $Date: 2012-01-16 15:16:24 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2012-02-08 13:13:21 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Eleonora Mambrini, Gianluigi Crimi 
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -85,11 +85,13 @@ medInteractorPERBrushFeedback::medInteractorPERBrushFeedback()
   m_BrushMapper->SetTransformCoordinate(m_Coordinate);
   m_BrushActor->SetMapper(m_BrushMapper);
   m_BrushActor->GetProperty()->SetColor(0.0,0.0,1.0);
-  m_BrushActor->GetProperty()->SetOpacity(0.15);
+  m_BrushActor->GetProperty()->SetOpacity(0.025);
 
   m_IsActorAdded = false;
 
   m_EnableDrawing = true;
+
+  m_Count = 0;
 
 }
 
@@ -111,6 +113,11 @@ medInteractorPERBrushFeedback::~medInteractorPERBrushFeedback()
 void medInteractorPERBrushFeedback::OnEvent(mafEventBase *event)
 //------------------------------------------------------------------------------
 {
+  // Make the superclass to manage StartInteractionEvent
+  // and StopInteractionEvent: this will make OnStart/StopInteraction()
+  // to be called, or eventually the event to be forwarded.
+  Superclass::OnEvent(event);
+
   mafID ch = event->GetChannel();
 
   if (ch == MCH_INPUT)
@@ -155,13 +162,13 @@ void medInteractorPERBrushFeedback::OnEvent(mafEventBase *event)
               DrawBox(pos_2d[0], pos_2d[1]);
           }
         }
-
       }
     }
 
     // find if this device is one of those currently interacting
     if (IsInteracting(device))
     {
+      /*m_Count = 0;*/
       // process the Move event
       if (id == mafDeviceButtonsPadTracker::GetTracker3DMoveId() || id == mafDeviceButtonsPadMouse::GetMouse2DMoveId())
       {
@@ -190,7 +197,6 @@ void medInteractorPERBrushFeedback::OnEvent(mafEventBase *event)
     }
     else
     {
-      /*
       double mouse_pos[2];
       mafEventInteraction *e = mafEventInteraction::SafeDownCast(event);
       e->Get2DPosition(mouse_pos);
@@ -234,26 +240,37 @@ void medInteractorPERBrushFeedback::OnEvent(mafEventBase *event)
           if(pickedVME)
           {
             vtkDataSet *vtk_data = pickedVME->GetOutput()->GetVTKData();
+            //GetPickPosition calculate the picking position with matrix multiplication 
+            //the return value can be affected of some approximation errors, if the value
+            //is outside the bounds FindPoint will return -1;
+            double bounds[6];
+            vtk_data->GetBounds(bounds);
+            if (pos_picked[0]<bounds[0]) pos_picked[0]=bounds[0];
+            if (pos_picked[0]>bounds[1]) pos_picked[0]=bounds[1];
+            if (pos_picked[1]<bounds[2]) pos_picked[1]=bounds[2];
+            if (pos_picked[1]>bounds[3]) pos_picked[1]=bounds[3];
+            if (pos_picked[2]<bounds[4]) pos_picked[2]=bounds[4];
+            if (pos_picked[2]>bounds[5]) pos_picked[2]=bounds[5];
             int pid = vtk_data->FindPoint(pos_picked);
             vtkDataArray *scalars = vtk_data->GetPointData()->GetScalars();
             if (scalars)
               scalars->GetTuple(pid,&scalar_value);
+
+            //add a patch otherwise some old events will be rise at the end of mouse move
+            m_Count++;
+
             mafEvent pick_event(this,MOUSE_MOVE,p);
-            pick_event.SetDouble(scalar_value);
             pick_event.SetArg(pid);
+            pick_event.SetDouble(m_Count);
+
             mafEventMacro(pick_event);
             p->Delete();
           }
         }
       }
       vtkDEL(cellPicker);
-    */
     }
   }
-  // Make the superclass to manage StartInteractionEvent
-  // and StopInteractionEvent: this will make OnStart/StopInteraction()
-  // to be called, or eventually the event to be forwarded.
-  Superclass::OnEvent(event);
 }
 
 //------------------------------------------------------------------------------
@@ -363,7 +380,7 @@ void medInteractorPERBrushFeedback::SetBrushShape(int shape)
     m_BrushMapper->SetTransformCoordinate(m_Coordinate);
     m_BrushActor->SetMapper(m_BrushMapper);
     m_BrushActor->GetProperty()->SetColor(0.0,0.0,1.0);
-    m_BrushActor->GetProperty()->SetOpacity(0.15);
+    m_BrushActor->GetProperty()->SetOpacity(0.025);
   }
   else
   {
@@ -373,6 +390,6 @@ void medInteractorPERBrushFeedback::SetBrushShape(int shape)
     m_BrushMapper->SetTransformCoordinate(m_Coordinate);
     m_BrushActor->SetMapper(m_BrushMapper);
     m_BrushActor->GetProperty()->SetColor(0.0,0.0,1.0);
-    m_BrushActor->GetProperty()->SetOpacity(0.15);
+    m_BrushActor->GetProperty()->SetOpacity(0.05);
   }
 }
