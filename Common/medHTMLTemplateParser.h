@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medHTMLTemplateParser.h,v $
 Language:  C++
-Date:      $Date: 2012-02-07 16:45:07 $
-Version:   $Revision: 1.1.2.2 $
-Authors:   Matteo Giacomoni
+Date:      $Date: 2012-02-08 16:54:27 $
+Version:   $Revision: 1.1.2.3 $
+Authors:   Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2002/2007
 SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
@@ -44,7 +44,7 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medHTMLTemplateParserBlock.h"
+class medHTMLTemplateParserBlock;
 
 
 class MED_EXPORT medHTMLTemplateParser
