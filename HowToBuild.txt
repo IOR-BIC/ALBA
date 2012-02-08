@@ -41,6 +41,7 @@ For KDevelop3 configuration:
    7. enter the "bin" subdirectory and run one of the examples (currently none!)
 
 Note:
+
 No installation process is currently supported.
 No compilation of external applications is currently supported.
 Currently only some base classes has been ported to the new tree. 
