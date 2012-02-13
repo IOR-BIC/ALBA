@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medvmecomputewrapping.cpp,v $
 Language:  C++
-Date:      $Date: 2011-03-25 13:35:48 $
-Version:   $Revision: 1.1.2.27 $
+Date:      $Date: 2012-02-13 17:48:51 $
+Version:   $Revision: 1.1.2.28 $
 Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -5406,39 +5406,36 @@ void medVMEComputeWrapping::OnEvent(mafEventBase *maf_event)
 //-------------------------------------------------------------------------
 {
 
-
-	if (maf_event->GetSender() == m_RollOutNewMeter) // from this operation gui
-	{
-		mafEvent *e = mafEvent::SafeDownCast(maf_event);
-		if  (e->GetBool())//new meter
-		{
-			m_WrappedClass = NEW_METER;     
-			m_RollOutOldMeter->RollOut(false);
-		}
-		else//old meter
-		{
-			m_WrappedClass =OLD_METER;   
-			m_RollOutOldMeter->RollOut(true);
-		}
-	}else if  (maf_event->GetSender() == m_RollOutOldMeter) // from this operation gui
-	{
-		mafEvent *e = mafEvent::SafeDownCast(maf_event);
-		if  (e->GetBool())//old meter
-		{
-			m_WrappedClass = OLD_METER;     
-			m_RollOutNewMeter->RollOut(false);
-		}
-		else//new meter
-		{
-			m_WrappedClass = NEW_METER;   
-			m_RollOutNewMeter->RollOut(true);
-		}
-	}
 	// events to be sent up or down in the tree are simply forwarded
 	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
 	{
+	    
+
 		switch(e->GetId())
 		{
+
+		case ID_ROLLOUT_NEW:
+		case ID_ROLLOUT_OLD:
+			{
+				// if I'm using the old meter
+				if (m_WrappedClass == OLD_METER)
+				{
+
+					m_WrappedClass = NEW_METER;  // switch to the new one
+					m_RollOutNewMeter->RollOut(true); // show the new one
+					
+					m_RollOutOldMeter->RollOut(false); // hide the old one
+				}
+				else // if I'm using the new meter
+				{
+					m_WrappedClass = OLD_METER;  // switch to the old one
+					m_RollOutOldMeter->RollOut(true); // show the old one
+
+					m_RollOutNewMeter->RollOut(false); // hide the new one
+				}
+			}
+		break;
+
 		case ID_START_METER_LINK:
 		case ID_END1_METER_LINK:
 		case ID_WRAPPED_METER_LINK1:
