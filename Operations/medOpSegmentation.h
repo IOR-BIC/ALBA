@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.h,v $
 Language:  C++
-Date:      $Date: 2012-02-08 13:14:05 $
-Version:   $Revision: 1.1.2.12 $
+Date:      $Date: 2012-02-13 16:26:59 $
+Version:   $Revision: 1.1.2.13 $
 Authors:   Eleonora Mambrini, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
@@ -199,6 +199,7 @@ public:
   static bool VolumeAccept(mafNode* node) {return(node != NULL  && node->IsMAFType(medVMESegmentationVolume));};
 
 protected:
+
   /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
   void OpStop(int result);
   /** Creates GUI including renderer window */
@@ -235,6 +236,8 @@ protected:
   void InitManualVolumeSlice();
   /** Initialize the Threshold Volume*/
   void InitThresholdVolume();
+  /** Initialize the Threshold Volume*/
+  void InitThresholdVolumeSlice();
   /** Initialize the Segmented Volume*/
   void InitSegmentedVolume();
   /** Initialize color table values for mask visualization. */
@@ -267,6 +270,7 @@ protected:
   double GetPosFromSliceIndexZ();
 
   void OnAutomaticStep();
+  void OnAutomaticStepExit();
   void OnManualStep();
   void OnManualStepExit();
   void OnRefinementStep();
@@ -277,6 +281,11 @@ protected:
   void OnPreviousStep();
 
   void ResetOriginalDataForFeedBack();
+
+  void InitEmptyVolumeSlice();
+
+  template <class ImageType>
+  void InitDataVolumeSlice(mafVMEVolumeGray *slice);
 
   mafVMEVolumeGray* m_Volume; //<Input volume
 
@@ -325,6 +334,8 @@ protected:
   mafMatrix m_Matrix;
 
   mafVMEVolumeGray *m_ThresholdVolume;
+  mafVMEVolumeGray *m_ThresholdVolumeSlice;
+  mafVMEVolumeGray *m_EmptyVolumeSlice;
   mafVMEVolumeGray *m_OutputVolume;
 
   wxStaticText *m_SnippetsLabel;
@@ -440,6 +451,7 @@ protected:
   void GetCameraAttribute(double *focalPoint, double* scaleFactor);
   void GetVisualizedBounds(double focalPoint[3], double scaleFactor, double bounds[4]);
   bool ResetZoom(vtkDataSet* dataset,double visbleBounds[4]);
+  void UpdateRangePrieview();
 
   medVMESegmentationVolume *m_SegmentatedVolume;
 
