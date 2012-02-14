@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: UseMedFL.cmake.in,v $
 # Language:  CMake 1.2
-# Date:      $Date: 2010-02-09 14:05:38 $
-# Version:   $Revision: 1.2.2.3 $
+# Date:      $Date: 2012-02-14 15:31:19 $
+# Version:   $Revision: 1.2.2.4 $
 #
 # Description:
 # This module add the MFL include paths to a project
@@ -29,7 +29,7 @@ ENDIF (MED_USE_Offis)
 #
 # BTK library
 #
-IF (${CMAKE_GENERATOR} STREQUAL "Visual Studio 9 2008")
+IF (${CMAKE_GENERATOR} STREQUAL "Visual Studio 9 2008" OR ${CMAKE_GENERATOR} STREQUAL "Visual Studio 10")
   SET(MED_USE_BTK @MED_USE_BTK@)
   IF (MED_USE_BTK)
     SET (BTK_POSSIBLE_ROOT_PATHS @MedFL_BINARY_DIR@/BTK/Build @MedFL_SOURCE_DIR@/BTK/Sources)
@@ -39,5 +39,5 @@ IF (${CMAKE_GENERATOR} STREQUAL "Visual Studio 9 2008")
       INCLUDE (${BTK_USE_FILE}) # currently only local library is supported
     ENDIF (BTK_USE_FILE)
   ENDIF (MED_USE_BTK)
-ENDIF (${CMAKE_GENERATOR} STREQUAL "Visual Studio 9 2008")
+ENDIF (${CMAKE_GENERATOR} STREQUAL "Visual Studio 9 2008" OR ${CMAKE_GENERATOR} STREQUAL "Visual Studio 10")
 

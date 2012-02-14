@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: Configure.cmake,v $
 # Language:  CMake 1.2
-# Date:      $Date: 2010-02-09 14:06:12 $
-# Version:   $Revision: 1.1.2.1 $
+# Date:      $Date: 2012-02-14 15:32:02 $
+# Version:   $Revision: 1.1.2.2 $
 #
 # Description:
 # Project file for configuring the BTK library as an external project.
@@ -12,7 +12,7 @@
 
 
 
-IF (${CMAKE_GENERATOR} STREQUAL "Visual Studio 9 2008")
+IF (${CMAKE_GENERATOR} STREQUAL "Visual Studio 9 2008" OR ${CMAKE_GENERATOR} STREQUAL "Visual Studio 10")
   OPTION(MAF_USE_CRYPTO "Find and Link the CRYPTO library." ON)
 INCLUDE (${MFL_SOURCE_PATH}/modules/PackagesMacro.cmake)
 INCLUDE (${MFL_SOURCE_PATH}/modules/PatchMacro.cmake)
@@ -125,4 +125,4 @@ IF (DEBUG_MESSAGES)
   							"${var} \"${${var}}\"\n")
   ENDFOREACH(var ${VARS})
 ENDIF (DEBUG_MESSAGES)
-ENDIF (${CMAKE_GENERATOR} STREQUAL "Visual Studio 9 2008")
+ENDIF (${CMAKE_GENERATOR} STREQUAL "Visual Studio 9 2008" OR ${CMAKE_GENERATOR} STREQUAL "Visual Studio 10")
