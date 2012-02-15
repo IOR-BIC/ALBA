@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.h,v $
 Language:  C++
-Date:      $Date: 2012-02-13 16:26:59 $
-Version:   $Revision: 1.1.2.13 $
+Date:      $Date: 2012-02-15 12:12:41 $
+Version:   $Revision: 1.1.2.14 $
 Authors:   Eleonora Mambrini, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2007
@@ -147,10 +147,10 @@ public:
   enum OPERATIONS_IDS
   {
     PRE_SEGMENTATION = 0,
+    LOAD_SEGMENTATION,
     AUTOMATIC_SEGMENTATION,
     MANUAL_SEGMENTATION,
     REFINEMENT_SEGMENTATION,
-    LOAD_SEGMENTATION,
     NUMBER_OF_OPERATIONS,
   };
 
@@ -197,6 +197,7 @@ public:
 
   /** Return true if node is of type mafVMEVolume. */
   static bool VolumeAccept(mafNode* node) {return(node != NULL  && node->IsMAFType(medVMESegmentationVolume));};
+  static bool VolumeGreyAccept(mafNode* node) {return(node != NULL  && node->IsMAFType(mafVMEVolumeGray));};
 
 protected:
 
@@ -265,7 +266,8 @@ protected:
   void OnManualSegmentationEvent(mafEvent *e);
   /***/
   void OnRefinementSegmentationEvent(mafEvent *e);
-  
+  /***/
+  void OnLoadSegmentationEvent(mafEvent *e);
 
   double GetPosFromSliceIndexZ();
 
@@ -274,6 +276,7 @@ protected:
   void OnManualStep();
   void OnManualStepExit();
   void OnRefinementStep();
+  void OnLoadSegmentationStep();
 
   /** Perform the initializations when the user press next button */
   void OnNextStep();
@@ -332,6 +335,8 @@ protected:
   mafInteractorSER *m_SER;      //<Static event router                        
  
   mafMatrix m_Matrix;
+
+  mafVMEVolumeGray *m_LoadedVolume;
 
   mafVMEVolumeGray *m_ThresholdVolume;
   mafVMEVolumeGray *m_ThresholdVolumeSlice;
@@ -527,5 +532,7 @@ protected:
 
   vtkUnsignedCharArray *m_OriginalManualDataForFeedBack;
   mafEvent *m_OldBrushEvent;
+
+  int m_LastID;
 };
 #endif
