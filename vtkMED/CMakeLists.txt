@@ -93,6 +93,10 @@ SET(vtkMED_SRCS
   
   vtkMEDImageFillHolesRemoveIslands.cxx
   vtkMEDImageFillHolesRemoveIslands.h
+
+  ######vtkbioeng################################
+  vtkMEDCollisionDetectionFilter.cxx
+  vtkMEDCollisionDetectionFilter.h
 )
 
 IF (MAF_USE_ITK)
