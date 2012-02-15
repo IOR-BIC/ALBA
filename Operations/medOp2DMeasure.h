@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOp2DMeasure.h,v $
   Language:  C++
-  Date:      $Date: 2009-11-04 16:07:49 $
-  Version:   $Revision: 1.2.2.1 $
+  Date:      $Date: 2012-02-15 10:44:48 $
+  Version:   $Revision: 1.2.2.2 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -54,9 +54,9 @@ protected:
   /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
   /*virtual*/ void OpStop(int result);
 
-  medInteractor2DDistance *m_2DDistanceInteractor;
-  medInteractor2DAngle *m_2DAngleInteractor;
-  medInteractor2DIndicator *m_2DIndicatorInteractor;
+  medInteractor2DDistance *m_DistanceInteractor2D;
+  medInteractor2DAngle *m_AngleInteractor2D;
+  medInteractor2DIndicator *m_IndicatorInteractor2D;
 
   mafString m_DistanceMeasure;
   mafString m_AcuteAngle;
