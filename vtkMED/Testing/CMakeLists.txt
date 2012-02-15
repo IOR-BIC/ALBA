@@ -170,6 +170,9 @@ ADD_TEST(CSkeletonVertexM1Test ${EXECUTABLE_OUTPUT_PATH}/CSkeletonVertexM1Test)
 ADD_EXECUTABLE(CSkeletonVertexM2Test CSkeletonVertexM2Test.h CSkeletonVertexM2Test.cpp)
 ADD_TEST(CSkeletonVertexM2Test ${EXECUTABLE_OUTPUT_PATH}/CSkeletonVertexM2Test)
 
+ADD_EXECUTABLE(vtkMEDCollisionDetectionFilterTest vtkMEDCollisionDetectionFilterTest.h vtkMEDCollisionDetectionFilterTest.cpp)
+ADD_TEST(vtkMEDCollisionDetectionFilterTest ${EXECUTABLE_OUTPUT_PATH}/vtkMEDCollisionDetectionFilterTest)
+
 ADD_EXECUTABLE(vtkMEDImageFillHolesRemoveIslandsTest vtkMEDImageFillHolesRemoveIslandsTest.h vtkMEDImageFillHolesRemoveIslandsTest.cpp)
 ADD_TEST(vtkMEDImageFillHolesRemoveIslandsTest ${EXECUTABLE_OUTPUT_PATH}/vtkMEDImageFillHolesRemoveIslandsTest)
 
@@ -184,3 +187,5 @@ ENDIF (MAF_USE_VTK)
 # classes using VTK+wxWidgets
 #IF (MAF_USE_WX AND MAF_USE_VTK)
 #ENDIF (MAF_USE_WX AND MAF_USE_VTK)
+
+
