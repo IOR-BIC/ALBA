@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMEDPolyDataDeformation_M2.h,v $ 
   Language: C++ 
-  Date: $Date: 2011-06-28 09:31:46 $ 
-  Version: $Revision: 1.1.2.9 $ 
+  Date: $Date: 2012-02-15 11:07:44 $ 
+  Version: $Revision: 1.1.2.10 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -342,10 +342,10 @@ protected:
     vtkIdList* pCCList;            //<list of correspondences between curves
   } CONTROL_SKELETON;
 
-  CONTROL_SKELETON* m_Skeletons;   //<input array of skeletons
-  int m_NumberOfSkeletons;         //<number of skeletons in this array
+  CONTROL_SKELETON* Skeletons;   //<input array of skeletons
+  int NumberOfSkeletons;         //<number of skeletons in this array
 
-  CSuperSkeleton* m_SuperSkeleton;  //<dynamical data structure describing super skeleton
+  CSuperSkeleton* SuperSkeleton;  //<dynamical data structure describing super skeleton
 
   double MatchGeometryWeight;       //<weight (0-1) for geometry matching of skeletons
   double MatchTopologyWeight;       //<weight (0-1) for topology matching of skeletons
@@ -354,7 +354,7 @@ protected:
   int DivideSkeletonEdges;          //<1 if large skeleton edges should be divided
   int PreserveVolume;               //<1, if volume should be preserved
 
-  CMeshVertex* m_MeshVertices;      //<internal data structure describing the mesh  
+  CMeshVertex* MeshVertices;      //<internal data structure describing the mesh  
 
 public:  
   /** Gets the weight using to match geometry of skeletons */
@@ -400,7 +400,7 @@ public:
 
   /** Get the number of control curves. */
   inline virtual int GetNumberOfSkeletons() {
-    return m_NumberOfSkeletons;
+    return NumberOfSkeletons;
   }
 
   /** Sets the number of control skeletons.  
@@ -430,8 +430,8 @@ protected:
 
   /** Destroys the super skeleton */
   inline void DestroySuperSkeleton() {
-    delete m_SuperSkeleton;
-    m_SuperSkeleton = NULL;
+    delete SuperSkeleton;
+    SuperSkeleton = NULL;
   }
 
   /** Creates a single super skeleton for the given control skeleton.
