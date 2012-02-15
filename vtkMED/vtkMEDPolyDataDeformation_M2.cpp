@@ -2,8 +2,8 @@
 Program: Multimod Application Framework RELOADED 
 Module: $RCSfile: vtkMEDPolyDataDeformation_M2.cpp,v $ 
 Language: C++ 
-Date: $Date: 2012-02-15 11:07:44 $ 
-Version: $Revision: 1.1.2.3 $ 
+Date: $Date: 2012-02-15 11:14:48 $ 
+Version: $Revision: 1.1.2.4 $ 
 Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
 ========================================================================== 
 Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -35,7 +35,7 @@ See the COPYINGS file for license details
 
 
 
-vtkCxxRevisionMacro(vtkMEDPolyDataDeformation_M2, "$Revision: 1.1.2.3 $");
+vtkCxxRevisionMacro(vtkMEDPolyDataDeformation_M2, "$Revision: 1.1.2.4 $");
 vtkStandardNewMacro(vtkMEDPolyDataDeformation_M2);
 
 #include "mafMemDbg.h"
@@ -171,29 +171,29 @@ template <class T>
 vtkMEDPolyDataDeformation_M2::CMatrix<T>::CMatrix(int rows, int columns) 
 {  
   // alloc arrays
-  m_Matrix = new T*[rows]; // rows
+  Matrix = new T*[rows]; // rows
   for ( int i = 0 ; i < rows ; i++ )
   {
-    m_Matrix[i] = new T[columns]; // columns
-    memset(m_Matrix[i], 0, sizeof(T)*columns);
+    Matrix[i] = new T[columns]; // columns
+    memset(Matrix[i], 0, sizeof(T)*columns);
   }
 
-  m_NumOfRows = rows;
-  m_nNumOfCols = columns;
+  NumOfRows = rows;
+  NumOfCols = columns;
 }
 
 template <class T>
 vtkMEDPolyDataDeformation_M2::CMatrix<T>::~CMatrix() 
 {
-  if ( m_Matrix != NULL ) 
+  if ( Matrix != NULL ) 
   {
     // free arrays
-    for ( int i = 0 ; i < m_NumOfRows ; i++ )
-      delete [] m_Matrix[i];
+    for ( int i = 0 ; i < NumOfRows ; i++ )
+      delete [] Matrix[i];
 
-    delete [] m_Matrix;
+    delete [] Matrix;
   }
-  m_Matrix = NULL;
+  Matrix = NULL;
 }
 
 #pragma region CMunkres algorithm
