@@ -3,7 +3,7 @@
   File:    	 mafBrickedFileWriter.cpp
   Language:  C++
   Date:      11:2:2008   12:42
-  Version:   $Revision: 1.1.2.2 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Josef Kohout (Josef.Kohout@beds.ac.uk)
   
   Copyright (c) 2008
@@ -30,8 +30,8 @@ mafCxxTypeMacro(mafBrickedFileWriter);
 mafBrickedFileWriter::mafBrickedFileWriter()
 {
 	memset(&m_FileHeader, 0, sizeof(m_FileHeader));
-	m_FileHeader.signature = Signature;
-	m_FileHeader.version = CurrentVersion;		//version 1
+	m_FileHeader.signature = m_Signature;
+	m_FileHeader.version = m_CurrentVersion;		//version 1
 	m_FileHeader.bricksize = 16;	//16x16x16 by the default
 	m_FileHeader.sample_rate = 1;	//no subsampling by the default
 	

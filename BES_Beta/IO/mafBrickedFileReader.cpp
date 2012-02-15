@@ -3,7 +3,7 @@
 File:    	 mafBrickedFileReader.cpp
 Language:  C++
 Date:      13:2:2008   14:25
-Version:   $Revision: 1.1.2.4 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Josef Kohout (Josef.Kohout@beds.ac.uk)
 
 Copyright (c) 2008
@@ -95,7 +95,7 @@ void mafBrickedFileReader::SetOutputRLGDataSet(vtkRectilinearGrid* ds)
   m_BrickFile = vtkMAFFile2::New();
 	m_BrickFile->Open(m_BrickFileName);
 	m_BrickFile->Read(&m_FileHeader, sizeof(m_FileHeader));
-	if (m_FileHeader.signature != mafBrickedFile::Signature) {
+	if (m_FileHeader.signature != mafBrickedFile::m_Signature) {
 		m_BrickFile->Close();
 		throw std::ios::failure(_("Not BBF file or corrupted one."));
 	}

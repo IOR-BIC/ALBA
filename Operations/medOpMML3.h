@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML3.h,v $
 Language:  C++
-Date:      $Date: 2012-02-15 10:56:40 $
-Version:   $Revision: 1.1.2.18 $
+Date:      $Date: 2012-02-15 10:57:33 $
+Version:   $Revision: 1.1.2.19 $
 Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -266,7 +266,7 @@ protected:
   // Memory threshold constant
   // This is a rule of thumb limit in MB for the quantity
   // n * (res / 1024)^2 <= MemoryMax, where n = no. of slices and res is the resolution (grain).
-  static const int MemoryThreshold = 15 ;
+  static const int m_MemoryThreshold = 15 ;
 
   // dialogs
   mafGUIDialog *m_InputsDlg;		         ///< inputs dialog
@@ -314,7 +314,7 @@ protected:
   int m_ContourVisibility ; ///< show contour
   int m_MuscleType;	///< muscle type (axis is single line or piecewise 2 lines)
   int m_RegistrationStatus;	///< flag indicating if registration has taken place
-  int m_3DFlag;	///< display mode for model view: 0 = 2D or 1 = 3D
+  int m_Flag3D;	///< display mode for model view: 0 = 2D or 1 = 3D
   int m_PreviewFlag;	///< display mode for preview view: 0 = off, 1 = on
   int m_Slicexyz ;  ///< validator for default slice direction
   int m_ScansGrain; ///< set by user, used to calculate size and resolution of scans

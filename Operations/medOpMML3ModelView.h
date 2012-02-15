@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML3ModelView.h,v $
 Language:  C++
-Date:      $Date: 2011-09-01 12:53:08 $
-Version:   $Revision: 1.1.2.7 $
+Date:      $Date: 2012-02-15 11:02:25 $
+Version:   $Revision: 1.1.2.8 $
 Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -296,7 +296,7 @@ public:
  int GetTypeOfMuscles() const {return m_MuscleType ;}
  void SetTypeOfMuscles(int t) {m_MuscleType = t ;}
 
- void Set4LandmarksFlag(int n) {m_4Landmarks = n ;}
+ void Set4LandmarksFlag(int n) {m_Landmarks4 = n ;}
 
  /// Print self. \n
  /// NB This does not print the visual pipes - \n
@@ -381,7 +381,7 @@ protected:
 
 
   // visual pipes and corresponding interactor styles
-  int m_3DDisplay; ///< flag for display mode (0 = 2d, 1 = 3d, 2 = preview)
+  int m_Display3D; ///< flag for display mode (0 = 2d, 1 = 3d, 2 = preview)
   medOpMML3ModelView2DPipe *m_VisualPipe2D ;
   medOpMML3ModelView3DPipe *m_VisualPipe3D ;
   medOpMML3ModelView3DPipe *m_VisualPipePreview ;
@@ -433,7 +433,7 @@ protected:
 
 
   // 4 landmarks flag
-  int m_4Landmarks;
+  int m_Landmarks4;
 
   // patient scans
   vtkDataSet* m_Scans;

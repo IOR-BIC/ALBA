@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 #include "  Module:    $RCSfile: medOpMML3.cpp,v $
 Language:  C++
-Date:      $Date: 2012-02-15 10:56:40 $
-Version:   $Revision: 1.1.2.15 $
+Date:      $Date: 2012-02-15 10:57:33 $
+Version:   $Revision: 1.1.2.16 $
 Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -170,7 +170,7 @@ medOpMML3::medOpMML3(const wxString &label) : mafOp(label)
 
 
   // initial display 2d, no preview
-  m_3DFlag = 0 ;
+  m_Flag3D = 0 ;
   m_PreviewFlag = 0 ;
 
   // default axis is z
@@ -590,7 +590,7 @@ void medOpMML3::CreateRegistrationDlg()
   m_DisplayModeButton = new mafGUIButton(m_OpDlg, ID_REG_DISPLAY_MODE, "Display 3D", wxPoint(0,0), wxSize(75,20));
   m_DisplayModeButton->SetListener(this);
   m_DisplayModeButton->Enable(true);
-  if (m_3DFlag == 0) 
+  if (m_Flag3D == 0) 
     m_DisplayModeButton->SetTitle("Display 3D");
   else 
     m_DisplayModeButton->SetTitle("Display 2D");
@@ -615,7 +615,7 @@ void medOpMML3::CreateRegistrationDlg()
   // undo button
   m_UndoButton = new mafGUIButton(m_OpDlg, ID_REG_UNDO, "Undo", wxPoint(0,0), wxSize(75,20));
   m_UndoButton->SetListener(this);
-  m_UndoButton->Enable((m_3DFlag == 0) && (m_PreviewFlag == 0)) ;
+  m_UndoButton->Enable((m_Flag3D == 0) && (m_PreviewFlag == 0)) ;
 
 
   // ok button
@@ -643,19 +643,19 @@ void medOpMML3::CreateRegistrationDlg()
   // create p/t/r/s operation buttons
   m_PlaceOpButton = new mafGUIButton(m_OpDlg, ID_REG_P_OPERATION, "P", wxPoint(0,0), wxSize(75,20));
   m_PlaceOpButton->SetListener(this);
-  m_PlaceOpButton->Enable((m_3DFlag == 0) && (m_PreviewFlag == 0)) ;
+  m_PlaceOpButton->Enable((m_Flag3D == 0) && (m_PreviewFlag == 0)) ;
 
   m_TranslateOpButton = new mafGUIButton(m_OpDlg, ID_REG_T_OPERATION,"T", wxPoint(0,0), wxSize(75,20));
   m_TranslateOpButton->SetListener(this);
-  m_TranslateOpButton->Enable((m_3DFlag == 0) && (m_PreviewFlag == 0)) ;
+  m_TranslateOpButton->Enable((m_Flag3D == 0) && (m_PreviewFlag == 0)) ;
 
   m_RotateOpButton = new mafGUIButton(m_OpDlg, ID_REG_R_OPERATION, "R", wxPoint(0,0), wxSize(75,20));
   m_RotateOpButton->SetListener(this);
-  m_RotateOpButton->Enable((m_3DFlag == 0) && (m_PreviewFlag == 0)) ;
+  m_RotateOpButton->Enable((m_Flag3D == 0) && (m_PreviewFlag == 0)) ;
 
   m_ScaleOpButton = new mafGUIButton(m_OpDlg, ID_REG_S_OPERATION, "S", wxPoint(0,0), wxSize(75,20));
   m_ScaleOpButton->SetListener(this);
-  m_ScaleOpButton->Enable((m_3DFlag == 0) && (m_PreviewFlag == 0)) ;
+  m_ScaleOpButton->Enable((m_Flag3D == 0) && (m_PreviewFlag == 0)) ;
 
 
   // maf model view RWI
@@ -1280,7 +1280,7 @@ void medOpMML3::OnTextNumberChange(mafID id)
   // enable warning if memory threshold exceeded
   double sliceMemory = (double)m_NumberOfScans * (double)(m_ScansGrain*m_ScansGrain) / (1024.0*1024.0) ;
 
-  if (sliceMemory <= MemoryThreshold)
+  if (sliceMemory <= m_MemoryThreshold)
     m_WarningTotalSlices->Enable(false) ;
   else
     m_WarningTotalSlices->Enable(true) ;
@@ -1310,7 +1310,7 @@ void medOpMML3::OnNumberOfSlices()
   // enable warning if memory threshold exceeded
   double sliceMemory = (double)m_NumberOfScans * (double)(m_ScansGrain*m_ScansGrain) / (1024.0*1024.0) ;
 
-  if (sliceMemory <= MemoryThreshold)
+  if (sliceMemory <= m_MemoryThreshold)
     m_WarningNumberOfSlices->Enable(false) ;
   else
     m_WarningNumberOfSlices->Enable(true) ;
@@ -1325,7 +1325,7 @@ void medOpMML3::OnResolutionOfSlices()
   // enable warning if memory threshold exceeded
   double sliceMemory = (double)m_NumberOfScans * (double)(m_ScansGrain*m_ScansGrain) / (1024.0*1024.0) ;
 
-  if (sliceMemory <= MemoryThreshold)
+  if (sliceMemory <= m_MemoryThreshold)
     m_WarningNumberOfSlices->Enable(false) ;
   else
     m_WarningNumberOfSlices->Enable(true) ;
@@ -2317,9 +2317,9 @@ void medOpMML3::ResetOperation()
 void medOpMML3::OnDisplayMode() 
 //----------------------------------------------------------------------------
 {
-  m_3DFlag = (m_3DFlag + 1) % 2 ;
+  m_Flag3D = (m_Flag3D + 1) % 2 ;
 
-  if (m_3DFlag == 0){
+  if (m_Flag3D == 0){
     m_Model->SetDisplay2D() ;
     m_Widget->On() ;
     m_DisplayModeButton->SetTitle("Display 3D");
@@ -2351,7 +2351,7 @@ void medOpMML3::OnPreview()
   
   if (m_PreviewFlag == 0){
     // switch off preview and return to previous 2d or 3d view
-    if (m_3DFlag == 0){
+    if (m_Flag3D == 0){
       m_Model->SetDisplay2D() ;
       m_Widget->On() ;
       Set2DButtonsEnable(true) ;
@@ -3388,7 +3388,7 @@ bool medOpMML3::SetUpModelView()
   // select 2d or 3d view
   if (m_PreviewFlag == 1)
     m_Model->SetDisplayToPreview() ;
-  else if (m_3DFlag == 0)
+  else if (m_Flag3D == 0)
     m_Model->SetDisplay2D() ;
   else
     m_Model->SetDisplay3D() ;
@@ -3668,7 +3668,7 @@ bool medOpMML3::SetUpContourWidget()
   m_Widget->GetSelectedPlaneProperty()->SetColor(1.0, 1.0, 1.0);
   m_Widget->GetSelectedPlaneProperty()->SetOpacity(0.001);
 
-  if ((m_3DFlag == 1) || (m_PreviewFlag == 1))
+  if ((m_Flag3D == 1) || (m_PreviewFlag == 1))
     m_Widget->Off();
   else
     m_Widget->On();

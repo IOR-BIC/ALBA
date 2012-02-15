@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML3ModelView.cpp,v $
 Language:  C++
-Date:      $Date: 2011-09-01 12:53:07 $
-Version:   $Revision: 1.1.2.10 $
+Date:      $Date: 2012-02-15 11:02:25 $
+Version:   $Revision: 1.1.2.11 $
 Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -36,7 +36,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 medOpMML3ModelView::medOpMML3ModelView( vtkRenderWindow *rw, vtkRenderer *ren, vtkPolyData *muscleIn, vtkPolyData *muscleOut,
                                        vtkDataSet* volume, int numberOfScans)
 : m_RenderWindow(rw), m_Renderer(ren), m_MuscleInput(muscleIn),  m_MuscleOutput(muscleOut),
-m_Scans(volume), m_NumberOfScans(numberOfScans), m_4Landmarks(0), m_ScalingOccured(false), m_ScansGrain(1)
+m_Scans(volume), m_NumberOfScans(numberOfScans), m_Landmarks4(0), m_ScalingOccured(false), m_ScansGrain(1)
 { 
   m_Math = vtkMEDMatrixVectorMath::New() ;
 
@@ -213,7 +213,7 @@ void medOpMML3ModelView::Initialize()
   m_VisualPipe3D->AddLandmark(m_PatientLandmark1) ;
   m_VisualPipe3D->AddLandmark(m_PatientLandmark2) ;
   m_VisualPipe3D->AddLandmark(m_PatientLandmark3) ;
-  if (m_4Landmarks)
+  if (m_Landmarks4)
     m_VisualPipe3D->AddLandmark(m_PatientLandmark4) ;
   m_VisualPipe3D->AddAxisLandmark(m_AxisLandmark1) ;
   m_VisualPipe3D->AddAxisLandmark(m_AxisLandmark2) ;
@@ -225,7 +225,7 @@ void medOpMML3ModelView::Initialize()
   m_VisualPipePreview->AddLandmark(m_PatientLandmark1) ;
   m_VisualPipePreview->AddLandmark(m_PatientLandmark2) ;
   m_VisualPipePreview->AddLandmark(m_PatientLandmark3) ;
-  if (m_4Landmarks)
+  if (m_Landmarks4)
     m_VisualPipePreview->AddLandmark(m_PatientLandmark4) ;
   m_VisualPipePreview->AddAxisLandmark(m_AxisLandmark1) ;
   m_VisualPipePreview->AddAxisLandmark(m_AxisLandmark2) ;
@@ -300,7 +300,7 @@ void medOpMML3ModelView::Initialize()
 void medOpMML3ModelView::SetDisplay2D()
 //------------------------------------------------------------------------------
 {
-  m_3DDisplay = 0 ;
+  m_Display3D = 0 ;
   m_Renderer->GetRenderWindow()->GetInteractor()->SetInteractorStyle(m_Style2D) ;
   m_VisualPipe2D->SetVisibility(1) ;
   m_VisualPipe3D->SetVisibility(0) ;
@@ -316,7 +316,7 @@ void medOpMML3ModelView::SetDisplay2D()
 void medOpMML3ModelView::SetDisplay3D()
 //------------------------------------------------------------------------------
 {
-  m_3DDisplay = 1 ;
+  m_Display3D = 1 ;
   m_Renderer->GetRenderWindow()->GetInteractor()->SetInteractorStyle(m_Style3D) ;
   m_VisualPipe2D->SetVisibility(0) ;
   m_VisualPipe3D->SetVisibility(1) ;
@@ -331,7 +331,7 @@ void medOpMML3ModelView::SetDisplay3D()
 void medOpMML3ModelView::SetDisplayToPreview()
 //------------------------------------------------------------------------------
 {
-  m_3DDisplay = 2 ;
+  m_Display3D = 2 ;
 
   // apply registration ops to update the output muscle
   ApplyRegistrationOps() ;
@@ -354,7 +354,7 @@ void medOpMML3ModelView::ResetCameraPosition()
   double maxSize = std::max(m_ScanSizeX, m_ScanSizeY) ;
   double r = 2*maxSize ;
 
-  if (m_3DDisplay == 0){
+  if (m_Display3D == 0){
     // if 2d, set camera to point at (0,0,0) along z axis
     GetRenderer()->GetActiveCamera()->SetFocalPoint(0,0,0) ;
     GetRenderer()->GetActiveCamera()->SetPosition(0, 0, r) ;
@@ -2030,13 +2030,13 @@ void medOpMML3ModelView::PrintSelf(ostream &os, int indent)
   os << "atlas landmark 1 " << m_AtlasLandmark1[0] << " " << m_AtlasLandmark1[1] << " " << m_AtlasLandmark1[2] << std::endl ;
   os << "atlas landmark 2 " << m_AtlasLandmark2[0] << " " << m_AtlasLandmark2[1] << " " << m_AtlasLandmark2[2] << std::endl ;
   os << "atlas landmark 3 " << m_AtlasLandmark3[0] << " " << m_AtlasLandmark3[1] << " " << m_AtlasLandmark3[2] << std::endl ;
-  if (m_4Landmarks)
+  if (m_Landmarks4)
     os << "atlas landmark 4 " << m_AtlasLandmark4[0] << " " << m_AtlasLandmark4[1] << " " << m_AtlasLandmark4[2] << std::endl ;
 
   os << "patient landmark 1 " << m_PatientLandmark1[0] << " " << m_PatientLandmark1[1] << " " << m_PatientLandmark1[2] << std::endl ;
   os << "patient landmark 2 " << m_PatientLandmark2[0] << " " << m_PatientLandmark2[1] << " " << m_PatientLandmark2[2] << std::endl ;
   os << "patient landmark 3 " << m_PatientLandmark3[0] << " " << m_PatientLandmark3[1] << " " << m_PatientLandmark3[2] << std::endl ;
-  if (m_4Landmarks)
+  if (m_Landmarks4)
     os << "patient landmark 4 " << m_PatientLandmark4[0] << " " << m_PatientLandmark4[1] << " " << m_PatientLandmark4[2] << std::endl ;
 
   os << "axis landmark 1 " << m_AxisLandmark1[0] << " " << m_AxisLandmark1[1] << " " << m_AxisLandmark1[2] << std::endl ;
@@ -2045,9 +2045,9 @@ void medOpMML3ModelView::PrintSelf(ostream &os, int indent)
     os << "axis landmark 3 " << m_AxisLandmark3[0] << " " << m_AxisLandmark3[1] << " " << m_AxisLandmark3[2] << std::endl ;
   os << std::endl ;
 
-  if (m_3DDisplay == 0)
+  if (m_Display3D == 0)
     os << "display mode = 2D" << std::endl ;
-  else if (m_3DDisplay == 1)
+  else if (m_Display3D == 1)
     os << "display mode = 3D" << std::endl ;
   else
     os << "display mode = Preview" << std::endl ;

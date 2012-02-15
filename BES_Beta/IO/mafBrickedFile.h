@@ -3,7 +3,7 @@
   File:    	 BrickedFile.h
   Language:  C++
   Date:      11:2:2008   11:49
-  Version:   $Revision: 1.1.2.2 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Josef Kohout (Josef.Kohout@beds.ac.uk)
   
   Copyright (c) 2008
@@ -30,8 +30,8 @@ class mafBrickedFile : public mafObject, public mafTimeStamped
 public:
 	mafAbstractTypeMacro(mafBrickedFile, mafObject);
 
-	const static unsigned long Signature = 0xCA464242;	//'BBF' + CRC of 'BBF'		
-  const static unsigned short CurrentVersion = 2;
+	const static unsigned long m_Signature = 0xCA464242;	//'BBF' + CRC of 'BBF'		
+  const static unsigned short m_CurrentVersion = 2;
 
 public:
 
