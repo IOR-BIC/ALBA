@@ -2,9 +2,9 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2012-02-15 12:12:41 $
-Version:   $Revision: 1.1.2.28 $
-Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi
+Date:      $Date: 2012-02-15 13:46:05 $
+Version:   $Revision: 1.1.2.29 $
+Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi, Alberto Losi
 ==========================================================================
 Copyright (c) 2007
 SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
@@ -239,14 +239,14 @@ medOpSegmentation::medOpSegmentation(const wxString &label) : mafOp(label)
 
   m_MajorityThreshold = 9;
 
-  m_OriginalManualDataForFeedBack = NULL;
-  m_CurrentEventCount = 0;
+  m_RealDrawnImage = NULL;
+  m_CurrentBrushMoveEventCount = 0;
 
   m_ThresholdVolumeSlice = NULL;
   m_EmptyVolumeSlice = NULL;
 
   m_LoadedVolume = NULL;
-  m_LastID = 0;
+  m_LastMouseMovePointID = 0;
 }
 //----------------------------------------------------------------------------
 medOpSegmentation::~medOpSegmentation()
@@ -1521,9 +1521,9 @@ void medOpSegmentation::OnManualStep()
   m_View->VmeShow(m_ManualVolumeSlice, true);
   SetTrilinearInterpolation(m_ManualVolumeSlice);
 
-  ResetOriginalDataForFeedBack();
+  CreateRealDrawnImage();
 
-  m_CurrentEventCount = 0;
+  m_CurrentBrushMoveEventCount = 0;
 }
 //------------------------------------------------------------------------
 void medOpSegmentation::OnAutomaticStepExit()
@@ -1538,27 +1538,18 @@ void medOpSegmentation::OnAutomaticStepExit()
     m_EmptyVolumeSlice->ReparentTo(NULL);
     mafDEL(m_EmptyVolumeSlice);
   }
-  
+
+  m_GuiDialog->Enable(ID_AUTO_SEGMENTATION,false);
 }
 //------------------------------------------------------------------------
 void medOpSegmentation::OnManualStepExit()
 //------------------------------------------------------------------------
 {
-  if(m_OriginalManualDataForFeedBack)
+  UndoBrushPreview();
+  if(m_RealDrawnImage)
   {
-    vtkImageData* dataSet = (vtkImageData*) m_ManualVolumeSlice->GetOutput()->GetVTKData();
-    dataSet->GetPointData()->SetScalars(m_OriginalManualDataForFeedBack);
-    dataSet->Update();
-    m_ManualVolumeSlice->SetData(dataSet,mafVME::SafeDownCast(m_Volume)->GetTimeStamp());
-    m_ManualVolumeSlice->Update();
-    m_ManualVolumeSlice->Update();
-    ApplyVolumeSliceChanges();
-  }
-
-  if(m_OriginalManualDataForFeedBack)
-  {
-    m_OriginalManualDataForFeedBack->Delete();
-    m_OriginalManualDataForFeedBack = NULL;
+    m_RealDrawnImage->Delete();
+    m_RealDrawnImage = NULL;
   }
 
   //Gui stuff
@@ -1598,7 +1589,7 @@ void medOpSegmentation::OnRefinementStep()
 }
 
 //------------------------------------------------------------------------
-void medOpSegmentation::OnLoadSegmentationStep()
+void medOpSegmentation::OnLoadStep()
 //------------------------------------------------------------------------
 {
   m_GuiDialog->Enable(ID_LOAD_SEGMENTATION,true);
@@ -1625,7 +1616,7 @@ void medOpSegmentation::OnNextStep()
       InitGui();
 
       //next step -> LOAD Segmentation
-      OnLoadSegmentationStep();
+      OnLoadStep();
     } 
     break;
     case LOAD_SEGMENTATION:
@@ -1640,6 +1631,7 @@ void medOpSegmentation::OnNextStep()
           m_GuiDialog->Enable(ID_BUTTON_PREV,true);
           //next step -> MANUAL_SEGMENTATION
           OnManualStep();
+          m_SegmentationOperationsRollOut[m_CurrentOperation+1]->RollOut(false);
           m_CurrentOperation = AUTOMATIC_SEGMENTATION; // trick
         }
         else
@@ -1726,9 +1718,10 @@ void medOpSegmentation::OnPreviousStep()
       
       if(m_LoadedVolume)
       {
+        m_SegmentationOperationsRollOut[m_CurrentOperation]->RollOut(false);
         m_CurrentOperation = AUTOMATIC_SEGMENTATION;
         //prev step -> LOAD_SEGMENTATION
-        OnLoadSegmentationStep();
+        OnLoadStep();
         m_View->VmeShow(m_LoadedVolume,true);
         SetTrilinearInterpolation(m_LoadedVolume);
       }
@@ -1755,7 +1748,7 @@ void medOpSegmentation::OnPreviousStep()
       {
         OnAutomaticStepExit();
         //prev step -> AUTOMATIC_SEGMENTATION
-        OnLoadSegmentationStep();
+        OnLoadStep();
 //         m_View->VmeShow(m_ThresholdVolume,true);
 //         SetTrilinearInterpolation(m_ThresholdVolume)
       }
@@ -1809,25 +1802,12 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
     }
     else if (e->GetSender() == m_ManualPER && e->GetId()== MOUSE_MOVE)
     {
-      if(m_OriginalManualDataForFeedBack)
+      UndoBrushPreview();
+      if(e->GetDouble() > m_CurrentBrushMoveEventCount)
       {
-         vtkImageData* dataSet = (vtkImageData*) m_ManualVolumeSlice->GetOutput()->GetVTKData();
-         dataSet->GetPointData()->SetScalars(m_OriginalManualDataForFeedBack);
-         dataSet->Update();
-         m_ManualVolumeSlice->SetData(dataSet,mafVME::SafeDownCast(m_Volume)->GetTimeStamp());
-         m_ManualVolumeSlice->Update();
-         m_ManualVolumeSlice->Update();
-         ApplyVolumeSliceChanges();
-      }
-      //vtkPoints* pts = (vtkPoints*)e->GetVtkObj();
-      //mafLogMessage(">> %f %f %f",pts->GetPoint(0)[0],pts->GetPoint(0)[1],pts->GetPoint(0)[2]);
-      //mafLogMessage(">> %d",e->GetArg());
-      //mafLogMessage(">> %f %f",e->GetDouble(),m_CurrentEventCount);
-      if(e->GetDouble() > m_CurrentEventCount)
-      {
-        m_CurrentEventCount = e->GetDouble();
+        m_CurrentBrushMoveEventCount = e->GetDouble();
         m_ManualSegmentationAction = MANUAL_SEGMENTATION_SELECT;
-        m_LastID = e->GetArg();
+        m_LastMouseMovePointID = e->GetArg();
         OnBrushEvent(e);
       }
 
@@ -1875,12 +1855,12 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
           else if (m_CurrentSliceIndex != m_OldSliceIndex && m_CurrentOperation==AUTOMATIC_SEGMENTATION)
           {
             InitEmptyVolumeSlice();
-            UpdateRangePrieview();
+            UpdateThresholdRealTimePreview();
           }
           UpdateSlice();
           if(m_CurrentOperation == MANUAL_SEGMENTATION)
           {
-            ResetOriginalDataForFeedBack();
+            CreateRealDrawnImage();
           }
         }
         else
@@ -1900,12 +1880,12 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         else if (m_CurrentSliceIndex != m_OldSliceIndex && m_CurrentOperation==AUTOMATIC_SEGMENTATION)
         {
           InitEmptyVolumeSlice();
-          UpdateRangePrieview();
+          UpdateThresholdRealTimePreview();
         }
         UpdateSlice();
         if(m_CurrentOperation == MANUAL_SEGMENTATION)
         {
-          ResetOriginalDataForFeedBack();
+          CreateRealDrawnImage();
         }
         break;
       }
@@ -1920,12 +1900,12 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         else if (m_CurrentSliceIndex != m_OldSliceIndex && m_CurrentOperation==AUTOMATIC_SEGMENTATION)
         {
           InitEmptyVolumeSlice();
-          UpdateRangePrieview();
+          UpdateThresholdRealTimePreview();
         }
         UpdateSlice();
         if(m_CurrentOperation == MANUAL_SEGMENTATION)
         {
-          ResetOriginalDataForFeedBack();
+          CreateRealDrawnImage();
         }
         break;
       }
@@ -1938,12 +1918,12 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         else if (m_CurrentSliceIndex != m_OldSliceIndex && m_CurrentOperation==AUTOMATIC_SEGMENTATION)
         {
           InitEmptyVolumeSlice();
-          UpdateRangePrieview();
+          UpdateThresholdRealTimePreview();
         }
         UpdateSlice();
         if(m_CurrentOperation == MANUAL_SEGMENTATION)
         {
-          ResetOriginalDataForFeedBack();
+          CreateRealDrawnImage();
         }
         break;
       }
@@ -1957,12 +1937,12 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         else if (m_CurrentSliceIndex != m_OldSliceIndex && m_CurrentOperation==AUTOMATIC_SEGMENTATION)
         {
           InitEmptyVolumeSlice();
-          UpdateRangePrieview();
+          UpdateThresholdRealTimePreview();
         }
         UpdateSlice();
         if(m_CurrentOperation == MANUAL_SEGMENTATION)
         {
-          ResetOriginalDataForFeedBack();
+          CreateRealDrawnImage();
         }
         m_View->ChangeView(m_CurrentSlicePlane);
         InitGui();
@@ -1987,7 +1967,7 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         //Picking during manual segmentation
         if(m_CurrentOperation == MANUAL_SEGMENTATION)
           StartDraw(e, false);
-        m_CurrentEventCount = 0;
+        m_CurrentBrushMoveEventCount = 0;
         break;
       }
     case VME_PICKING:
@@ -1997,7 +1977,7 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
           OnBrushEvent(e);
           m_ManualVolumeSlice->GetOutput()->GetVTKData()->Update();
           m_ManualVolumeSlice->Update();
-          ResetOriginalDataForFeedBack();
+          CreateRealDrawnImage();
           m_PickingStarted=false;
         }
         break;
@@ -2019,7 +1999,7 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         {
           m_AutomaticThresholdSlider->GetSubRange(&m_AutomaticThreshold,&m_AutomaticUpperThreshold);
           UpdateThresholdLabel();
-          UpdateRangePrieview();
+          UpdateThresholdRealTimePreview();
         }
         //Windowing
         else
@@ -2048,6 +2028,7 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         SetTrilinearInterpolation(m_EmptyVolumeSlice);
         SetTrilinearInterpolation(m_RefinementVolumeMask);
         SetTrilinearInterpolation(m_ThresholdVolume);
+        SetTrilinearInterpolation(m_LoadedVolume);
         m_View->CameraUpdate();
       }break;
     default:
@@ -2172,7 +2153,7 @@ void medOpSegmentation::OnAutomaticAddRange()
   m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Update();
 
   UpdateThresholdLabel();
-  UpdateRangePrieview();
+  UpdateThresholdRealTimePreview();
 
   //OnAutomaticPreview();
 }
@@ -2226,7 +2207,7 @@ void medOpSegmentation::OnAutomaticRemoveRange()
   m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION]->Update();
 
   UpdateThresholdLabel();
-  UpdateRangePrieview();
+  UpdateThresholdRealTimePreview();
 
   OnAutomaticPreview();
 }
@@ -2364,7 +2345,7 @@ void medOpSegmentation::OnAutomaticChangeRangeManually(int eventID)
   }
 
   m_AutomaticRangeSlider->SetSubRange(subMin,subMax);
-  UpdateRangePrieview();
+  UpdateThresholdRealTimePreview();
 }
 
 
@@ -2400,7 +2381,7 @@ void medOpSegmentation::OnAutomaticChangeThresholdManually(int eventID)
   m_AutomaticThresholdSlider->SetSubRange(m_AutomaticThreshold,m_AutomaticUpperThreshold);
   
   UpdateThresholdLabel();
-  UpdateRangePrieview();
+  UpdateThresholdRealTimePreview();
 }
 
 //------------------------------------------------------------------------
@@ -2585,24 +2566,12 @@ void medOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
         m_ManualPER->SetBrushShape(CIRCLE_BRUSH_SHAPE);
       else 
         m_ManualPER->SetBrushShape(SQUARE_BRUSH_SHAPE);
-/*      m_View->CameraUpdate();*/
-
-
-      if(m_OriginalManualDataForFeedBack)
-      {
-        vtkImageData* dataSet = (vtkImageData*) m_ManualVolumeSlice->GetOutput()->GetVTKData();
-        dataSet->GetPointData()->SetScalars(m_OriginalManualDataForFeedBack);
-        dataSet->Update();
-        m_ManualVolumeSlice->SetData(dataSet,mafVME::SafeDownCast(m_Volume)->GetTimeStamp());
-        m_ManualVolumeSlice->Update();
-        m_ManualVolumeSlice->Update();
-        ApplyVolumeSliceChanges();
-      }
+      UndoBrushPreview();
       m_ManualSegmentationAction = MANUAL_SEGMENTATION_SELECT;
       mafEvent dummyEvent;
       vtkPoints *dummyPoints = vtkPoints::New();
       dummyEvent.SetVtkObj(dummyPoints);
-      dummyEvent.SetArg(m_LastID);
+      dummyEvent.SetArg(m_LastMouseMovePointID);
       OnBrushEvent(&dummyEvent);
       dummyPoints->Delete();
       m_View->CameraUpdate();
@@ -2611,24 +2580,14 @@ void medOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
   case ID_MANUAL_BRUSH_SIZE:
     {
       m_ManualPER->SetRadius(m_ManualBrushSize/2);
-      if(m_OriginalManualDataForFeedBack)
-      {
-        vtkImageData* dataSet = (vtkImageData*) m_ManualVolumeSlice->GetOutput()->GetVTKData();
-        dataSet->GetPointData()->SetScalars(m_OriginalManualDataForFeedBack);
-        dataSet->Update();
-        m_ManualVolumeSlice->SetData(dataSet,mafVME::SafeDownCast(m_Volume)->GetTimeStamp());
-        m_ManualVolumeSlice->Update();
-        m_ManualVolumeSlice->Update();
-        ApplyVolumeSliceChanges();
-      }
+      UndoBrushPreview();
       m_ManualSegmentationAction = MANUAL_SEGMENTATION_SELECT;
       mafEvent dummyEvent;
       vtkPoints *dummyPoints = vtkPoints::New();
       dummyEvent.SetVtkObj(dummyPoints);
-      dummyEvent.SetArg(m_LastID);
+      dummyEvent.SetArg(m_LastMouseMovePointID);
       OnBrushEvent(&dummyEvent);
       dummyPoints->Delete();
-      m_View->CameraUpdate();
       m_View->CameraUpdate();
       break;
     }
@@ -2730,7 +2689,7 @@ void medOpSegmentation::OnLoadSegmentationEvent(mafEvent *e)
       mafString title = mafString("Select a segmentation:");
       mafEvent e(this,VME_CHOOSE);
       e.SetString(&title);
-      e.SetArg((long)(&medOpSegmentation::VolumeGreyAccept));
+      e.SetArg((long)(&medOpSegmentation::VolumeAccept));
       mafEventMacro(e);
       mafVME *vme = (mafVME *)e.GetVme();
       m_LoadedVolume = mafVMEVolumeGray::SafeDownCast(vme);
@@ -3936,19 +3895,33 @@ bool medOpSegmentation::ResetZoom(vtkDataSet* dataset, double visbleBounds[4])
 }
 
 //----------------------------------------------------------------------------
-void medOpSegmentation::ResetOriginalDataForFeedBack()
+void medOpSegmentation::CreateRealDrawnImage()
 //----------------------------------------------------------------------------
 {
-  if(!m_OriginalManualDataForFeedBack)
+  if(!m_RealDrawnImage)
   {
-    m_OriginalManualDataForFeedBack = vtkUnsignedCharArray::New();
+    m_RealDrawnImage = vtkUnsignedCharArray::New();
   }
-  m_OriginalManualDataForFeedBack->DeepCopy( m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->GetScalars() );
-  m_OriginalManualDataForFeedBack->SetName("SCALARS");
+  m_RealDrawnImage->DeepCopy( m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->GetScalars() );
+  m_RealDrawnImage->SetName("SCALARS");
 }
 
 //----------------------------------------------------------------------------
-void medOpSegmentation::UpdateRangePrieview()
+void medOpSegmentation::UndoBrushPreview()
+//----------------------------------------------------------------------------
+{
+  if(m_RealDrawnImage)
+  {
+    vtkImageData* dataSet = (vtkImageData*) m_ManualVolumeSlice->GetOutput()->GetVTKData();
+    dataSet->GetPointData()->SetScalars(m_RealDrawnImage);
+    dataSet->Update();
+    m_ManualVolumeSlice->SetData(dataSet,mafVME::SafeDownCast(m_Volume)->GetTimeStamp());
+    m_ManualVolumeSlice->Update();
+    ApplyVolumeSliceChanges();
+  }
+}
+//----------------------------------------------------------------------------
+void medOpSegmentation::UpdateThresholdRealTimePreview()
 //----------------------------------------------------------------------------
 {
   medVMESegmentationVolume *tVol;
