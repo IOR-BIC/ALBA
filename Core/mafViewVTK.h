@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-25 09:51:23 $
-  Version:   $Revision: 1.55.2.5 $
+  Date:      $Date: 2012-02-15 09:13:28 $
+  Version:   $Revision: 1.55.2.6 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -45,14 +45,19 @@ class MAF_EXPORT mafViewVTK: public mafView
 {
 public:
 
+  /** constructor */
   mafViewVTK(const wxString &label = "vtkView", int camera_position = CAMERA_PERSPECTIVE, bool show_axes = true, bool show_grid = false, bool show_ruler = false, int stereo = 0, bool show_orientator = false, int axesType = mafAxes::TRIAD);
+  /** constructor */
   virtual ~mafViewVTK(); 
-
+  /** RTTI macro */
   mafTypeMacro(mafViewVTK, mafView);
 
+  /** clone the object*/
   virtual mafView*  Copy(mafObserver *Listener, bool lightCopyEnabled = false);
-  virtual void      Create();
-  virtual void			OnEvent(mafEventBase *maf_event);
+  /** create rwi */
+  virtual void Create();
+  /** listen to other object events*/
+  virtual void OnEvent(mafEventBase *maf_event);
 
   /** IDs for the GUI */
   enum VIEW_VTK_WIDGET_ID
