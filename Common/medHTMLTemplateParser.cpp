@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medHTMLTemplateParser.cpp,v $
 Language:  C++
-Date:      $Date: 2012-02-08 16:54:27 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2012-02-15 10:35:45 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -41,7 +41,6 @@ MafMedical is partially based on OpenMAF.
 
 
 #include "medDefines.h" 
-#include "medHTMLTemplateParserBlock.h"
 #include "medHTMLTemplateParser.h"
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
@@ -52,11 +51,10 @@ MafMedical is partially based on OpenMAF.
 
 
 
-//----------------------------------------------------------------------------
-medHTMLTemplateParser::medHTMLTemplateParser()
-//----------------------------------------------------------------------------
+
+medHTMLTemplateParser::medHTMLTemplateParser():
+medHTMLTemplateParserBlock(MED_HTML_TEMPLATE_MAIN,wxString("Main Block"))
 {
-  m_MainBlock=NULL;
   m_Template="";
   m_Output="";
 }
@@ -65,7 +63,7 @@ medHTMLTemplateParser::medHTMLTemplateParser()
 medHTMLTemplateParser::~medHTMLTemplateParser()
 //----------------------------------------------------------------------------
 {
-  delete m_MainBlock;
+  
 }
 
 //----------------------------------------------------------------------------
@@ -77,52 +75,77 @@ void medHTMLTemplateParser::SetTemplateFromFile( wxString filename )
 
   char *fileString;
 
-  templateFile=fopen(filename.c_str(),"R");
+  templateFile=fopen(filename.c_str(),"r");
+  if (templateFile!=NULL)
+  {
 
-  fseek(templateFile, 0L, SEEK_END);
-  stringSize = ftell(templateFile);
+    //we need to read the file char by char to get the count of char
+    //the filesize is not correct because windows stores two char
+    //for each newline and the char count results wrong.
+    stringSize=0;
+    char memArea[2];
+    while (fread(memArea,sizeof(char),1,templateFile)>0)
+      stringSize++;
   
-  fileString=new char[stringSize];
+  
+    fileString=new char[stringSize+1];
 
-  fseek(templateFile, 0L, SEEK_SET);
+    fseek(templateFile, 0L, SEEK_SET);
 
-  fread(fileString,sizeof(char),stringSize,templateFile);
+    fread(fileString,sizeof(char),stringSize,templateFile);
 
-  m_Template=fileString;
-
-  fclose(templateFile);
-
-  delete fileString;
+    //Adding a string terminator char at the end of the readed string
+    fileString[stringSize]='\0';
+  
+    m_Template=fileString;
+    fclose(templateFile);
+    //memory releasing
+    delete fileString;
+  }
+  else
+  {
+    mafLogMessage("medHTMLTemplateParser: Cannot open File: %s",filename.c_str());
+  }
+  
 }
 
 //----------------------------------------------------------------------------
 void medHTMLTemplateParser::SetTemplateFromString( wxString templateString )
 //----------------------------------------------------------------------------
 {
+  //simple assignement
   m_Template=templateString;
 }
 
 
-medHTMLTemplateParserBlock * medHTMLTemplateParser::GetMainBlock()
-{
-  return m_MainBlock;
-}
-
 wxString medHTMLTemplateParser::GetOutputString()
 {
+  //You must call this function after parsing
   return m_Output;
 }
 
 void medHTMLTemplateParser::WriteOutputFile(wxString filename)
 {
   FILE *outputFile;
-
-  outputFile=fopen(filename.c_str(),"W");
+  //You must call this function after parsing
+  outputFile=fopen(filename.c_str(),"w");
   fwrite(m_Output.c_str(),sizeof(char),m_Output.size(),outputFile);
   fclose(outputFile);
 }
 
-void medHTMLTemplateParser::Update()
+
+//----------------------------------------------------------------------------
+void medHTMLTemplateParser::Parse()
+//----------------------------------------------------------------------------
 {
-  m_MainBlock->Parse(&m_Template,&m_Output);
+
+  int parsingPos=0;
+  // Checks the consistence of the parsing tree
+  if (ConsistenceCheck())
+  {
+    //pre-parsing (generates substitutions tables inside the blocks)
+    PreParse(&m_Template,parsingPos);
+    //use pre-parsing info to generate the output
+    GenerateOutput(&m_Output);
+  }
 }

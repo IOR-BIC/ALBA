@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medHTMLTemplateParserBlock.h,v $
 Language:  C++
-Date:      $Date: 2012-02-08 16:54:27 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2012-02-15 10:35:45 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -56,18 +56,17 @@ enum HTMLBLOCK_TYPES
   MED_HTML_TEMPLATE_MAIN,
   MED_HTML_TEMPLATE_LOOP,
   MED_HTML_TEMPLATE_IF,
-  MED_HTML_TEMPLATE_VARIABLE,
-  MED_HTML_TEMPLATE_VARIABLE_ARRAY,
-  MED_HTML_TEMPLATE_UP_FORWARD,
 };
 
-/*
-enum HTML_PARSED_TYPES
+enum HTML_SUBSTITUTION_TYPES
 {
-  MED_HTML_TEMPLATE_VAR,
-  MED_HTML_TEMPLATE_BLOCK,
+MED_HTML_SUBSTITUTION_VARIABLE,
+MED_HTML_SUBSTITUTION_VARIABLE_ARRAY,
+MED_HTML_SUBSTITUTION_BLOCK,
+MED_HTML_SUBSTITUTION_BLOCK_ARRAY,
+MED_HTML_SUBSTITUTION_FORWARD_UP,
 };
-*/
+
 
 class wxString;
 
@@ -85,7 +84,7 @@ public:
 public:
   typedef struct parsedItems{
     int TextPos;
-    int SubstitutionPos;    
+    int SubsTablePos;    
   } HTMLTemplateParsedItems;
 
   /** constructor*/
@@ -100,35 +99,43 @@ public:
   /** Add the variable specified in the name string to the list of variables */
   void AddVar(wxString name, wxString varValue);
   
-  /** Add the variable specified in the name string to the list of variables */
+  /** Push the variable specified in the name string to the list of variables */
   void PushVar(wxString name, double varValue);
-  /** Add the variable specified in the name string to the list of variables */
+  /** Push the variable specified in the name string to the list of variables */
   void PushVar(wxString name, int varValue);
-  /** Add the variable specified in the name string to the list of variables */
+  /** Push the variable specified in the name string to the list of variables */
   void PushVar(wxString name, wxString varValue);
   
   /** Add the Block specified in the list of Blocks*/
   void AddBlock(wxString name, int blockType);
 
-  /** Template parsing */
-  void Parse(wxString *inputTemplate,wxString *outputHTML);
-    
+  /** Push the Block specified in the list of Blocks*/
+  void PushBlock(wxString name, int blockType);
+
+  /** Return the pointer to the block specified in name 
+     if the block is part of an block-array last pushed block will be returned */
+  medHTMLTemplateParserBlock *GetBlock(wxString name);
+
+  /** Return the pointer to the block specified in name and pos.
+     Used for block-arrays, if pos=-1 last pushed block will be returned*/
+  medHTMLTemplateParserBlock *GetNthBlock(wxString name,int pos=-1);
+
+  /** Set the verity value for the "if" blocks*/
+  void SetIfCondition(int condition);
+
+  /** Set the number of loops for the "if" blocks*/
+  void SetNLoops(int nloops);
+
 protected:
-  /* Return the position of the variable in the Variable Table.
+  /** Return the position of the variable in the Variable Table.
      Returns -1 if variable is not found */
-  int SubstitutionPos(wxString name);
+  int SubstitutionPos(wxString *name);
     
-  /* Finds a variable starting from his name */
+  /** Finds a variable starting from his name */
   HTMLTemplateSubstitution GetSubstitution(wxString name);
 
-  /* Update the variable specified in the name string */
-  void UpdateVar(wxString name, wxString newValue);
-
-  /*  Updates children vars (called from LOOP blocks */
-  void updateChildrenVars();
-
-  /* Write a specified Var to the output */
-  void  WriteSubstitution(HTMLTemplateParsedItems var, wxString *outputHTML);
+  /** Write a specified Var to the output */
+  void  WriteSubstitution(HTMLTemplateSubstitution var, wxString *outputHTML);
 
   /** Generate PreParsing structures from input template 
       for this block and return the number of parsed chars */
@@ -140,9 +147,14 @@ protected:
   /** Utility function that skip spaces on input template */
   void SkipInputSpaces(wxString *inputTemplate, int &parsingPos);
 
-  /** AddSubstitution to m_Subistitution and if necessary gives parsing control
-      to children for sub-scope management */
-  void AddSubstitution(wxString *inputTemplate, int &parsingPos, int SubstitutionType); 
+  /** AddSubstitution to m_Subistitution if necessary search the correspondent variable
+      to the block root, returns the position of the added substitution*/
+  int AddSubstitution(wxString *tagName, int SubstitutionType); 
+
+  /** This function is called when a substitution is not found in local scope in order to search
+      it upward to the blocks root.
+      Returns the father substitution pos and generates a path to the substitution if is necessary */
+  int AddForward(wxString *tagName, int substitutionType);
 
   /** Return true if input contains subString starting from inputPos */
   int SubStringCompare(wxString *input, char *subString, int inputPos);
@@ -153,13 +165,19 @@ protected:
   /** Generate HTML output */
   void GenerateOutput(wxString *outputHTML);
 
-  /** Inherit Variables from father Block */
-  void InheritVars(medHTMLTemplateParserBlock *father);
+  /** Reads the name of the tag from the input template and save it to varName.
+      This function skips spaces and the closing char ']'*/
+  void ReadTagName(wxString *inputTemplate, int &parsingPos, wxString &tagName);
 
   /** Check the consistence of the generated structure*/
   int ConsistenceCheck();
+
+  /** Sets the father for the block */
+  void SetFather(medHTMLTemplateParserBlock *father);
     
   //VARIABLES
+  medHTMLTemplateParserBlock *m_Father;
+
   wxString m_BlockName;
   int m_BlockType; 
   

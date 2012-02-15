@@ -29,6 +29,12 @@ SET(PROJECT_SRCS
   medResultQueryAbstractHandler.h
   
   medQueryObject.h
+  
+  medHTMLTemplateParser.cpp
+  medHTMLTemplateParser.h
+  medHTMLTemplateParserBlock.cpp
+  medHTMLTemplateParserBlock.h
+  
 
 	#### SHOULD BE COMMITTED DOWN ######
 	mafDbg.h
