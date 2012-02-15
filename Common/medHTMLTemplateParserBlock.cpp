@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medHTMLTemplateParserBlock.cpp,v $
 Language:  C++
-Date:      $Date: 2012-02-15 10:35:45 $
-Version:   $Revision: 1.1.2.5 $
+Date:      $Date: 2012-02-15 13:17:03 $
+Version:   $Revision: 1.1.2.6 $
 Authors:   Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -53,6 +53,7 @@ MafMedical is partially based on OpenMAF.
 medHTMLTemplateParserBlock::medHTMLTemplateParserBlock(int blockType, wxString name)
 //----------------------------------------------------------------------------
 {
+  //Checking Block Type
   if (blockType != MED_HTML_TEMPLATE_MAIN && blockType != MED_HTML_TEMPLATE_LOOP &&
       blockType != MED_HTML_TEMPLATE_IF)
   {
@@ -80,18 +81,23 @@ medHTMLTemplateParserBlock::~medHTMLTemplateParserBlock()
 {
   m_SubstitutionTable.clear();
   
+  //Cleaning Variables
   m_Variables.clear();
 
+  //Deleting Cleaning variables inside each sub-array
   for (int i=0;i<m_VariablesArray.size();i++)
     m_VariablesArray[i].clear();
+  //Cleaning the array
   m_VariablesArray.clear();
 
+  //Deleting sub-blocks
   for (int i=0;i<m_SubBlocks.size();i++)
     delete m_SubBlocks[i];
   m_SubBlocks.clear();
   
   for (int i=0;i<m_SubBlocksArray.size();i++)
   {
+    //Deleting Sub-Array blocks and cleaning array
     for (int j=0;j<m_SubBlocksArray[i].size();j++)
       delete m_SubBlocksArray[i][j];
     m_SubBlocksArray[i].clear();
@@ -105,6 +111,7 @@ medHTMLTemplateParserBlock::~medHTMLTemplateParserBlock()
 void medHTMLTemplateParserBlock::AddVar( wxString name, double varValue )
 //----------------------------------------------------------------------------
 {
+  //Formatting the double var using m_Doubleformat ("%.3f") 
   AddVar(name,wxString::Format(m_DoubleFormat,varValue));
 }
 
@@ -119,10 +126,12 @@ void medHTMLTemplateParserBlock::AddVar( wxString name, int varValue )
 void medHTMLTemplateParserBlock::AddVar( wxString name, wxString varValue )
 //----------------------------------------------------------------------------
 {
+  //if Variable already exists we dont add it again
   if (SubstitutionPos(&name)>0)
     mafLogMessage("HTML Template ERROR: Variable: \"%s\" already exists",name.ToAscii());
   else
   {
+    //Adding the Variable to the array and the relative substitution to the substitution table
     HTMLTemplateSubstitution subst;
     subst.Name=name;
     subst.Pos=m_Variables.size();
@@ -153,11 +162,13 @@ void medHTMLTemplateParserBlock::PushVar( wxString name, wxString varValue )
   int varPos=SubstitutionPos(&name);
   int blockPos;
 
+  //We can push Variables only to the loops block
   if (m_BlockType!=MED_HTML_TEMPLATE_LOOP)
   {
     mafLogMessage("HTML Template ERROR: You can push variables only on Loop blocks, use AddVar instead");
     return;
   }
+  //We need to set the loop number before pushing anything to the loop
   else if (m_LoopsNumber<0)
   {
     mafLogMessage("HTML Template ERROR: You must set the loops number before push any variable");
@@ -175,6 +186,8 @@ void medHTMLTemplateParserBlock::PushVar( wxString name, wxString varValue )
     subst.Pos=m_VariablesArray.size()-1;
     subst.Type=MED_HTML_SUBSTITUTION_VARIABLE_ARRAY;
     
+    //if a new entry is created in the substitution table the position is
+    //equal at the size before the push 
     varPos=m_SubstitutionTable.size();
     m_SubstitutionTable.push_back(subst);
   }
@@ -574,7 +587,8 @@ int medHTMLTemplateParserBlock::PreParseTag( wxString *inputTemplate, int &parsi
       }
       else if (m_SubstitutionTable[tablePos].Type=MED_HTML_SUBSTITUTION_FORWARD_UP)
       {
-        ma
+          mafLogMessage("Tag Name already used");
+          return false;
       }
     }
     
@@ -698,7 +712,7 @@ int medHTMLTemplateParserBlock::AddForward( wxString *tagName, int SubstitutionT
   // we simply return the tablepos of the substitution and the soon will add this info to his scope
   if (pos>=0)
   {
-    if (m_SubstitutionTable[pos].Type==MED_HTML_SUBSTITUTION_BLOCK || m_SubstitutionTable[pos]==MED_HTML_SUBSTITUTION_BLOCK_ARRAY)
+    if (m_SubstitutionTable[pos].Type==MED_HTML_SUBSTITUTION_BLOCK || m_SubstitutionTable[pos].Type==MED_HTML_SUBSTITUTION_BLOCK_ARRAY)
     {
       mafLogMessage("medHTMLTemplateParserBlock Error: Tag '%s' was not found as Block",tagName->c_str());
       return -1;
