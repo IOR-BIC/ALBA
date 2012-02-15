@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2012-02-15 13:46:05 $
-Version:   $Revision: 1.1.2.29 $
+Date:      $Date: 2012-02-15 16:51:19 $
+Version:   $Revision: 1.1.2.30 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi, Alberto Losi
 ==========================================================================
 Copyright (c) 2007
@@ -247,6 +247,8 @@ medOpSegmentation::medOpSegmentation(const wxString &label) : mafOp(label)
 
   m_LoadedVolume = NULL;
   m_LastMouseMovePointID = 0;
+
+  m_LoadedVolumeName = "[Select input volume]";
 }
 //----------------------------------------------------------------------------
 medOpSegmentation::~medOpSegmentation()
@@ -1183,8 +1185,8 @@ void medOpSegmentation::CreateLoadSegmentationGui()
 {
   mafGUI *currentGui = new mafGUI(this);
 
-  currentGui->Button(ID_LOAD_SEGMENTATION,"Load");
-
+  currentGui->Label(&m_LoadedVolumeName);
+  currentGui->TwoButtons(ID_LOAD_SEGMENTATION,ID_RESET_LOADED,"Load","Reset");
   m_SegmentationOperationsGui[LOAD_SEGMENTATION] = currentGui;
 
 }
@@ -1631,7 +1633,7 @@ void medOpSegmentation::OnNextStep()
           m_GuiDialog->Enable(ID_BUTTON_PREV,true);
           //next step -> MANUAL_SEGMENTATION
           OnManualStep();
-          m_SegmentationOperationsRollOut[m_CurrentOperation+1]->RollOut(false);
+          m_SegmentationOperationsRollOut[m_CurrentOperation]->RollOut(false);
           m_CurrentOperation = AUTOMATIC_SEGMENTATION; // trick
         }
         else
@@ -2699,9 +2701,21 @@ void medOpSegmentation::OnLoadSegmentationEvent(mafEvent *e)
       m_LoadedVolume->GetMaterial()->UpdateFromTables();
       m_LoadedVolume->Update();
 
+      m_LoadedVolumeName = m_LoadedVolume->GetName();
+      m_SegmentationOperationsGui[LOAD_SEGMENTATION]->Update();
       m_View->VmeAdd(m_LoadedVolume);
       m_View->VmeShow(m_LoadedVolume,true);
       m_View->CameraUpdate();
+    }
+    break;
+  case ID_RESET_LOADED:
+    {
+      m_View->VmeShow(m_LoadedVolume,false);
+      //m_View->VmeRemove(m_LoadedVolume);
+      m_View->CameraUpdate();
+      m_LoadedVolume = NULL;
+      m_LoadedVolumeName = "[Select input volume]";
+      m_SegmentationOperationsGui[LOAD_SEGMENTATION]->Update();
     }
     break;
   }

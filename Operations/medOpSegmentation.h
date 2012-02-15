@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.h,v $
 Language:  C++
-Date:      $Date: 2012-02-15 13:46:05 $
-Version:   $Revision: 1.1.2.15 $
+Date:      $Date: 2012-02-15 16:51:20 $
+Version:   $Revision: 1.1.2.16 $
 Authors:   Eleonora Mambrini, Gianluigi Crimi, Alberto Losi
 ==========================================================================
 Copyright (c) 2007
@@ -94,6 +94,7 @@ public:
     ID_MANUAL_SEGMENTATION,
     ID_REFINEMENT,
     ID_LOAD_SEGMENTATION,
+    ID_RESET_LOADED,
     ID_OK,
     ID_CANCEL,
     ID_VIEW,
@@ -366,6 +367,7 @@ protected:
   mafInteractorSER *m_SER;              //<Static event router                        
   mafMatrix m_Matrix;                   //<Volume initial matrix
   mafVMEVolumeGray *m_LoadedVolume;     //<Loaded volume
+  mafString m_LoadedVolumeName;        //<Loaded volume name
   mafVMEVolumeGray *m_ThresholdVolume;  //<Volume mask for thresholding
   mafVMEVolumeGray *m_ThresholdVolumeSlice; //<Single slice volume mask for real-time thresholding preview
   mafVMEVolumeGray *m_EmptyVolumeSlice; //<Single slice volume that represent current slice (for real-time thresholding preview)
