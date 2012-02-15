@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 #include "  Module:    $RCSfile: medOpMML3.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-07 11:36:49 $
-Version:   $Revision: 1.1.2.14 $
+Date:      $Date: 2012-02-15 10:56:40 $
+Version:   $Revision: 1.1.2.15 $
 Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -92,7 +92,7 @@ enum MML_IDS
 
   // non-uniform slice dlg events
   ID_NUSLICES_NUMBER_BEGIN,
-  ID_NUSLICES_NUMBER_LAST = ID_NUSLICES_NUMBER_BEGIN + medOpMML3::NumberOfNonUniformSections - 1,
+  ID_NUSLICES_NUMBER_LAST = ID_NUSLICES_NUMBER_BEGIN + medOpMML3::m_NumberOfNonUniformSections - 1,
   ID_NUSLICES_TOTAL,
   ID_NUSLICES_OK,
   ID_NUSLICES_CANCEL,
@@ -884,13 +884,13 @@ void medOpMML3::CreateNonUniformSlicesDlg()
   // initialize the numbers in each section so that they add up to m_NumberOfScans
   // and the distribution is as uniform as possible
   //----------------------------------------------------------------------------
-  for (i = 0 ;  i < NumberOfNonUniformSections ;  i++)
+  for (i = 0 ;  i < m_NumberOfNonUniformSections ;  i++)
     m_SlicesInSection[i] = 0 ;
   for (total = 0 ;  total < m_NumberOfScans ;  total++){
-    i = total % NumberOfNonUniformSections ; // section index
+    i = total % m_NumberOfNonUniformSections ; // section index
     m_SlicesInSection[i]++ ;
   }
-  for (i = 0, total = 0 ;  i < NumberOfNonUniformSections ;  i++)
+  for (i = 0, total = 0 ;  i < m_NumberOfNonUniformSections ;  i++)
     total += m_SlicesInSection[i] ;
   assert(total == m_NumberOfScans) ;
 
@@ -902,7 +902,7 @@ void medOpMML3::CreateNonUniformSlicesDlg()
 
   // window size parameters
   int winSize = 400 ;
-  int sectionHeight = winSize / NumberOfNonUniformSections ;
+  int sectionHeight = winSize / m_NumberOfNonUniformSections ;
   int textHeight = sectionHeight ;
   int textCtrlHeight = sectionHeight/2 ;
   int spacerHeight = (sectionHeight - textCtrlHeight) / 2 ;
@@ -930,16 +930,16 @@ void medOpMML3::CreateNonUniformSlicesDlg()
   //----------------------------------------------------------------------------
 
   wxBoxSizer *widgetsBoxSizer = new wxBoxSizer(wxVERTICAL);
-  m_NumSlicesRowBoxSizer = new (wxBoxSizer* [NumberOfNonUniformSections]) ;
-  m_NumSlicesLabel = new (wxStaticText* [NumberOfNonUniformSections]) ;
-  m_NumSlicesEntry = new (wxTextCtrl* [NumberOfNonUniformSections]) ;
+  m_NumSlicesRowBoxSizer = new (wxBoxSizer* [m_NumberOfNonUniformSections]) ;
+  m_NumSlicesLabel = new (wxStaticText* [m_NumberOfNonUniformSections]) ;
+  m_NumSlicesEntry = new (wxTextCtrl* [m_NumberOfNonUniformSections]) ;
 
   // column title
   wxStaticText *numSlicesTitleTxt = new wxStaticText(m_NonUniformSlicesDlg, wxID_ANY, "Number of slices", wxPoint(0,0), wxSize(75,textHeight)) ;
   widgetsBoxSizer->Add(numSlicesTitleTxt, 0, wxALIGN_LEFT | wxALIGN_CENTRE_VERTICAL | wxALL, 1);
 
   // number of slices entry widgets (stacked in reverse order)
-  for (int i = NumberOfNonUniformSections-1 ;  i >= 0 ;  i--){
+  for (int i = m_NumberOfNonUniformSections-1 ;  i >= 0 ;  i--){
     wxString label = wxString::Format(wxT("%d"),i);
 
     m_NumSlicesLabel[i] = new wxStaticText(m_NonUniformSlicesDlg, wxID_ANY, label, wxPoint(0,0), wxSize(25,textCtrlHeight));
@@ -1009,7 +1009,7 @@ void medOpMML3::CreateNonUniformSlicesDlg()
   //----------------------------------------------------------------------------
   // create visual pipe
   //----------------------------------------------------------------------------
-  m_NonUniformSlicePipe = new medOpMML3NonUniformSlicePipe(m_MuscleGlobalReg, m_SectionsViewRWI->m_RenFront, NumberOfNonUniformSections) ;
+  m_NonUniformSlicePipe = new medOpMML3NonUniformSlicePipe(m_MuscleGlobalReg, m_SectionsViewRWI->m_RenFront, m_NumberOfNonUniformSections) ;
   m_NonUniformSlicePipe->SetEndsOfAxis(m_Axis1Point_PatientCoords, m_Axis2Point_PatientCoords) ;
 
   m_SectionsViewRWI->CameraUpdate();
@@ -1271,7 +1271,7 @@ void medOpMML3::OnTextNumberChange(mafID id)
   int i ;
 
   // update the total number of slices
-  for (i = 0, m_NumberOfScans = 0; i < medOpMML3::NumberOfNonUniformSections; i++)
+  for (i = 0, m_NumberOfScans = 0; i < medOpMML3::m_NumberOfNonUniformSections; i++)
     m_NumberOfScans += m_SlicesInSection[i];
 
   m_NonUniformSlicesDlg->TransferDataToWindow();
@@ -3309,9 +3309,9 @@ void medOpMML3::CalculateSlicePositionsAlongAxis(double *alpha) const
   if (m_NonUniformSliceSpacing == 1){
     // non-uniform slicing
     // calculate fraction of distance along axis for each slice
-    for (i = 0, k = 0 ;  i < NumberOfNonUniformSections ;  i++){
-      double sectionStart = (double)i / (double)NumberOfNonUniformSections ;    // fractional pos of section start
-      double sectionEnd = (double)(i+1) / (double)NumberOfNonUniformSections ;  // fraction pos of section end
+    for (i = 0, k = 0 ;  i < m_NumberOfNonUniformSections ;  i++){
+      double sectionStart = (double)i / (double)m_NumberOfNonUniformSections ;    // fractional pos of section start
+      double sectionEnd = (double)(i+1) / (double)m_NumberOfNonUniformSections ;  // fraction pos of section end
       double s = (sectionEnd - sectionStart) / (double)m_SlicesInSection[i] ;   // slice spacing for this section
 
       for (j = 0 ;  j < m_SlicesInSection[i] ;  j++)

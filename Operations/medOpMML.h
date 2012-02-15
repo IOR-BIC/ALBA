@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML.h,v $
 Language:  C++
-Date:      $Date: 2008-07-25 11:30:49 $
-Version:   $Revision: 1.13 $
+Date:      $Date: 2012-02-15 10:55:06 $
+Version:   $Revision: 1.13.2.1 $
 Authors:   Mel Krokos
 ==========================================================================
 Copyright (c) 2002/2004
@@ -182,7 +182,7 @@ protected:
   int m_RegistrationStatus;
 
   // 3d flag
-  int m_3DFlag;
+  int m_Flag3D;
 
   // 4 landmarks flag
   int m_LandmarksFlag;

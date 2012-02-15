@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2012-01-27 16:21:30 $
-Version:   $Revision: 1.1.2.156 $
+Date:      $Date: 2012-02-15 10:51:37 $
+Version:   $Revision: 1.1.2.157 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -332,8 +332,8 @@ mafOp(label)
   m_SwapAllReferenceSystem = FALSE;
   m_ApplyToAllReferenceSystem = FALSE;
 
-  m_totalDicomRange[0]=0;
-  m_totalDicomRange[1]=1;
+  m_TotalDicomRange[0]=0;
+  m_TotalDicomRange[1]=1;
 
   m_CurrentImageID = 0;
 
@@ -2820,11 +2820,11 @@ void medOpImporterDicomOffis::CameraUpdate()
 void medOpImporterDicomOffis::CameraReset()
 //----------------------------------------------------------------------------
 {
-	m_LoadPage->UpdateWindowing(m_totalDicomRange,m_totalDicomSubRange);
+	m_LoadPage->UpdateWindowing(m_TotalDicomRange,m_TotalDicomSubRange);
   m_LoadPage->GetRWI()->CameraReset();
-  m_CropPage->UpdateWindowing(m_totalDicomRange,m_totalDicomSubRange);
+  m_CropPage->UpdateWindowing(m_TotalDicomRange,m_TotalDicomSubRange);
   m_CropPage->GetRWI()->CameraReset();
-  m_BuildPage->UpdateWindowing(m_totalDicomRange,m_totalDicomSubRange);
+  m_BuildPage->UpdateWindowing(m_TotalDicomRange,m_TotalDicomSubRange);
   m_BuildPage->GetRWI()->CameraReset();
   m_ReferenceSystemPage->GetRWI()->CameraReset();
 }
@@ -4842,9 +4842,9 @@ void medOpImporterDicomOffis::OnSeriesSelect()
 	ReadDicom();
 
   
-  GetDicomRange(m_totalDicomRange);
-  m_totalDicomSubRange[0]=m_totalDicomRange[0];
-  m_totalDicomSubRange[1]=m_totalDicomRange[1];
+  GetDicomRange(m_TotalDicomRange);
+  m_TotalDicomSubRange[0]=m_TotalDicomRange[0];
+  m_TotalDicomSubRange[1]=m_TotalDicomRange[1];
   CameraReset();
 
 	if(((medGUIDicomSettings*)GetSetting())->AutoCropPosition())
@@ -4867,7 +4867,7 @@ void medOpImporterDicomOffis::OnWizardChangePage( mafEvent * e )
 	{
     //get the current windowing in order to maintain subrange thought the 
     //wizard pages 
-    m_LoadPage->GetWindowing(m_totalDicomRange,m_totalDicomSubRange);
+    m_LoadPage->GetWindowing(m_TotalDicomRange,m_TotalDicomSubRange);
 
 		if(m_NumberOfStudies<1)
 		{
@@ -4887,7 +4887,7 @@ void medOpImporterDicomOffis::OnWizardChangePage( mafEvent * e )
 	{
     //get the current windowing in order to maintain subrange thought the 
     //wizard pages 
-    m_CropPage->GetWindowing(m_totalDicomRange,m_totalDicomSubRange);
+    m_CropPage->GetWindowing(m_TotalDicomRange,m_TotalDicomSubRange);
 		if (e->GetBool())
 		{
 			if(m_CropPage)
@@ -4935,7 +4935,7 @@ void medOpImporterDicomOffis::OnWizardChangePage( mafEvent * e )
 	{
     //get the current windowing in order to maintain subrange thought the 
     //wizard pages 
-    m_BuildPage->GetWindowing(m_totalDicomRange,m_totalDicomSubRange);
+    m_BuildPage->GetWindowing(m_TotalDicomRange,m_TotalDicomSubRange);
 
 		OnUndoCrop();
 		m_Wizard->SetButtonString("Build >");

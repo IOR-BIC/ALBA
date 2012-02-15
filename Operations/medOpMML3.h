@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML3.h,v $
 Language:  C++
-Date:      $Date: 2011-09-01 12:53:07 $
-Version:   $Revision: 1.1.2.17 $
+Date:      $Date: 2012-02-15 10:56:40 $
+Version:   $Revision: 1.1.2.18 $
 Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -124,7 +124,7 @@ public:
   }
 
   /// static constant: number of non-uniform sections
-  static const int NumberOfNonUniformSections = 10 ; 
+  static const int m_NumberOfNonUniformSections = 10 ; 
 
 
 protected:
@@ -333,7 +333,7 @@ protected:
   //----------------------------------------------------------------------------
   int m_NumberOfScans ;                              ///< total number of slices
   int m_NonUniformSliceSpacing ;                     ///< is slice spacing non-uniform
-  int m_SlicesInSection[NumberOfNonUniformSections] ; ///< no. of slices per section, if non-uniform
+  int m_SlicesInSection[m_NumberOfNonUniformSections] ; ///< no. of slices per section, if non-uniform
   int m_NumberOfScansSaved ;                          ///< save no. of slices on entering non-uniform dialog, for undo purposes
 
   mafRWI *m_SectionsViewRWI ;
