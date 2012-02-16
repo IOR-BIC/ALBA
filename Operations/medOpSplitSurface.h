@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpSplitSurface.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:16:40 $
-  Version:   $Revision: 1.3.2.2 $
-  Authors:   Paolo Quadrani    
+  Date:      $Date: 2012-02-16 12:52:54 $
+  Version:   $Revision: 1.3.2.3 $
+  Authors:   Paolo Quadrani , Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 

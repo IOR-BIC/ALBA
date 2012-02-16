@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpInteractiveClipSurface.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:14:27 $
-  Version:   $Revision: 1.7.2.2 $
+  Date:      $Date: 2012-02-16 12:52:54 $
+  Version:   $Revision: 1.7.2.3 $
   Authors:   Paolo Quadrani , Stefano Perticoni , Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -55,7 +55,7 @@ class vtkMAFClipSurfaceBoundingBox;
 class MED_EXPORT medOpInteractiveClipSurface: public mafOp
 {
 public:
-  medOpInteractiveClipSurface(const wxString &label = "ClipSurface");
+  medOpInteractiveClipSurface(const wxString &label = "medOpInteractiveClipSurface");
   ~medOpInteractiveClipSurface(); 
 	virtual void OnEvent(mafEventBase *maf_event);
 

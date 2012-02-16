@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpSplitSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:16:40 $
-  Version:   $Revision: 1.4.2.2 $
-  Authors:   Paolo Quadrani    
+  Date:      $Date: 2012-02-16 12:52:54 $
+  Version:   $Revision: 1.4.2.3 $
+  Authors:   Paolo Quadrani ,  Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -45,7 +45,6 @@
 #include "vtkPlaneSource.h"
 #include "vtkClipPolyData.h"
 #include "vtkMAFImplicitPolyData.h"
-#include "vtkLinearSubdivisionFilter.h"
 #include "vtkTriangleFilter.h"
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkArrowSource.h"
@@ -586,15 +585,9 @@ int medOpSplitSurface::Clip()
 
     // clip input surface by another surface
     // triangulate input for subdivision filter
-		vtkMAFSmartPointer<vtkTriangleFilter> triangles;
-		triangles->SetInput(transform_data_input->GetOutput());
-    triangles->Update();
-		
-		// subdivide triangles in sphere 1 to get better clipping
-		vtkMAFSmartPointer<vtkLinearSubdivisionFilter> subdivider;
-		subdivider->SetInput(triangles->GetOutput());
-		subdivider->SetNumberOfSubdivisions(1);   //  use  this  (0-3+)  to  see improvement in clipping
-    subdivider->Update();
+		vtkMAFSmartPointer<vtkTriangleFilter> triangulatedInput;
+		triangulatedInput->SetInput(transform_data_input->GetOutput());
+    triangulatedInput->Update();
 		
     m_ClipperVME->Update();
     vtkMAFSmartPointer<vtkTransformPolyDataFilter> transform_data_clipper;
@@ -604,7 +597,7 @@ int medOpSplitSurface::Clip()
 
 		vtkMAFSmartPointer<vtkMAFImplicitPolyData> implicitPolyData;
 		implicitPolyData->SetInput(transform_data_clipper->GetOutput());
-		m_Clipper->SetInput(subdivider->GetOutput());
+		m_Clipper->SetInput(triangulatedInput->GetOutput());
 		m_Clipper->SetClipFunction(implicitPolyData);
 	}
   else
