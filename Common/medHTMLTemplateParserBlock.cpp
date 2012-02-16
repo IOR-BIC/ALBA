@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medHTMLTemplateParserBlock.cpp,v $
 Language:  C++
-Date:      $Date: 2012-02-15 13:17:03 $
-Version:   $Revision: 1.1.2.6 $
+Date:      $Date: 2012-02-16 14:25:22 $
+Version:   $Revision: 1.1.2.7 $
 Authors:   Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -194,18 +194,20 @@ void medHTMLTemplateParserBlock::PushVar( wxString name, wxString varValue )
 
   blockPos=m_SubstitutionTable[varPos].Pos;
 
+  //checking substitusion type before push
   if (m_SubstitutionTable[varPos].Type!=MED_HTML_SUBSTITUTION_VARIABLE_ARRAY)
   {
     mafLogMessage("HTML Template ERROR: Array: \"%s\" has incompatible type",name.ToAscii());
     return;
   }
+  //checking if there are free slots for pushing vars
   else if (m_VariablesArray[blockPos].size()>m_LoopsNumber)
   {
     mafLogMessage("HTML Template ERROR: to many push for: '%s'",name.ToAscii());
     return;
   }
-  else
-    m_VariablesArray[blockPos].push_back(varValue);
+  
+  m_VariablesArray[blockPos].push_back(varValue);
 }
 
 
@@ -214,12 +216,14 @@ void medHTMLTemplateParserBlock::PushVar( wxString name, wxString varValue )
 void medHTMLTemplateParserBlock::AddBlock( wxString name, int blockType )
 //----------------------------------------------------------------------------
 {
+  //checking if block already exist
   if (SubstitutionPos(&name)>0)
   {
     mafLogMessage("HTML Template ERROR: Block: \"%s\" already exists",name.ToAscii());
   }
   else
   {
+    //adding the new block in block array and the relative substitution to the table
     medHTMLTemplateParserBlock *newBlock;
     newBlock=new medHTMLTemplateParserBlock(blockType, name);
     newBlock->SetFather(this);
@@ -240,22 +244,26 @@ void medHTMLTemplateParserBlock::PushBlock( wxString name, int blockType )
   int varPos=SubstitutionPos(&name);
   int blockPos;
 
+  //blocks can be pushed only on loop blocks
   if (m_BlockType!=MED_HTML_TEMPLATE_LOOP)
   {
     mafLogMessage("HTML Template ERROR: You can push sub-blocks only on Loop blocks, , use AddBLock instead");
     return;
   }
+  //we need to set the loop number before any push
   else if (m_LoopsNumber<0)
   {
     mafLogMessage("HTML Template ERROR: You must set the loops number before push any sub-block");
     return;
   }
-  //if the vars does not exists i need to create the array entry
+  //if the block does not exists i need to create the array entry
   if (varPos<0)
   {
+    //creating the new array for this block and
+    //adding the substitution in the substitution table
     std::vector<medHTMLTemplateParserBlock *> newArray;
     m_SubBlocksArray.push_back(newArray);
-
+    
     HTMLTemplateSubstitution subst;
     subst.Name=name;
     subst.Pos=m_SubBlocksArray.size()-1;
@@ -264,14 +272,18 @@ void medHTMLTemplateParserBlock::PushBlock( wxString name, int blockType )
     varPos=m_SubstitutionTable.size();
     m_SubstitutionTable.push_back(subst);
   }
+  //if the block already exist there are already the correspondent array
+  //and the relative substitution so we don't need to add it
 
   blockPos=m_SubstitutionTable[varPos].Pos;
 
+  //checking if the existent substitution refers to a block array to
   if (m_SubstitutionTable[varPos].Type!=MED_HTML_SUBSTITUTION_BLOCK_ARRAY)
   {
     mafLogMessage("HTML Template ERROR: Array: \"%s\" has incompatible type",name.ToAscii());
     return;
   }
+  //checking if there are free slots for pushing blocks
   else if (m_SubBlocksArray[blockPos].size()>m_LoopsNumber)
   {
     mafLogMessage("HTML Template ERROR: to many push for: '%s'",name.ToAscii());
@@ -292,6 +304,7 @@ void medHTMLTemplateParserBlock::PushBlock( wxString name, int blockType )
 int medHTMLTemplateParserBlock::SubstitutionPos( wxString *name )
 //----------------------------------------------------------------------------
 {
+  //searching in the substitutions table for a block name
   for (int i=0;i<m_SubstitutionTable.size();i++)
   {
     if (name->compare(m_SubstitutionTable[i].Name)==0)
@@ -309,6 +322,7 @@ medHTMLTemplateParserBlock::HTMLTemplateSubstitution medHTMLTemplateParserBlock:
 {
   HTMLTemplateSubstitution retValue;
   int retPos;
+  //get the position of the substitution
   retPos=SubstitutionPos(&name);
   if (retPos>=0)
   {
@@ -328,6 +342,7 @@ void medHTMLTemplateParserBlock::WriteSubstitution( HTMLTemplateSubstitution sub
 {
    switch (substitution.Type)
   {
+    //write the matching output to outputHTML depending on sustitution type
     case MED_HTML_SUBSTITUTION_VARIABLE:
     {
       outputHTML->Append(m_Variables[substitution.Pos]);
@@ -343,6 +358,8 @@ void medHTMLTemplateParserBlock::WriteSubstitution( HTMLTemplateSubstitution sub
       outputHTML->Append(m_VariablesArray[substitution.Pos][m_CurrentLoop]);
     }
     break;
+    //if the substitution match a block we write is output to the outputHTML starting 
+    //from this point
     case MED_HTML_SUBSTITUTION_BLOCK:
     {
       m_SubBlocks[substitution.Pos]->GenerateOutput(outputHTML);
@@ -353,6 +370,8 @@ void medHTMLTemplateParserBlock::WriteSubstitution( HTMLTemplateSubstitution sub
       m_SubBlocksArray[substitution.Pos][m_CurrentLoop]->GenerateOutput(outputHTML);
     }
     break;
+    //if a variable is not in local scope there is  a forward up substitution
+    //so we need to call this method in the father block to write the substitution
     case MED_HTML_SUBSTITUTION_FORWARD_UP:
     {
       int fatherPos;
@@ -389,6 +408,7 @@ void medHTMLTemplateParserBlock::GenerateOutput( wxString *outputHTML )
 
   m_CurrentLoop=0;
   
+  //for non loops block we need to generate the output just one time
   if (m_BlockType==MED_HTML_TEMPLATE_LOOP)
     totalLoops=m_LoopsNumber;
   else totalLoops=1;
@@ -430,8 +450,12 @@ void medHTMLTemplateParserBlock::GenerateOutput( wxString *outputHTML )
         parseTo=m_Substitutions[currentSubstitution].TextPos;
       }
       
+
+      //coping the simple html unparsed part to the output
       outputHTML->Append(m_PreParsedHTML.SubString(parsedChars,parseTo-1));
 
+      //if there are substitution to write we write it 
+      //at the end of the block we don't write any substitution
       if (currentSubstitution<m_Substitutions.size())
       {
         int pos;
@@ -499,6 +523,7 @@ int medHTMLTemplateParserBlock::SubStringCompare( wxString *input, char *subStri
     if (inputPos+subStringSize>input->size())
       return false;
 
+    //split the input string from current pos (inputpos) to the size of the sub string
     wxString tmpStr=input->SubString(inputPos,inputPos+subStringSize-1);
     
     //Substitute this whit CmpNoCase for case independent templates
@@ -517,16 +542,17 @@ int medHTMLTemplateParserBlock::PreParseTag( wxString *inputTemplate, int &parsi
 //----------------------------------------------------------------------------
 {
   int templateSize=inputTemplate->size();
-  
+  wxString tagName;
+
   // OPENING TAG
   if (SubStringCompare(inputTemplate,MED_HMTL_TAG_OPENING,parsingPos)) 
   { 
     int substitutionType;
-    wxString tagName;
+    
     int subPos;
 
     parsingPos+=Strlen(MED_HMTL_TAG_OPENING);
-    
+    //cheking the opening tag type
     if (SubStringCompare(inputTemplate,MED_HTML_TAG_VARIABLE,parsingPos))
     {
       substitutionType=MED_HTML_SUBSTITUTION_VARIABLE;
@@ -544,13 +570,20 @@ int medHTMLTemplateParserBlock::PreParseTag( wxString *inputTemplate, int &parsi
     }
     else if (SubStringCompare(inputTemplate,MED_HTML_TAG_ELSE,parsingPos))
     {
-      m_IfChars=m_PreParsedHTML.size();
+      //if I find a else tag I update local variables and continue parsing inside this block
+      if (m_BlockType!=MED_HTML_TEMPLATE_IF)
+        mafLogMessage("medHTMLTemplateParserBlock: [MAFElse] found inside a non [MAFIf] block ");
       parsingPos+=Strlen(MED_HTML_TAG_ELSE);
-      SkipInputSpaces(inputTemplate,parsingPos);
-      if (inputTemplate->GetChar(parsingPos)!=']')
-        mafLogMessage("medHTMLTemplateParserBlock: Expected tag end:']'");
-      else parsingPos++; 
-      //continue parsing
+
+      ReadTagName(inputTemplate,parsingPos,tagName);
+
+      int comp=tagName.Cmp(m_BlockName);
+
+      if (comp!=0)
+        mafLogMessage(" ELSE medHTMLTemplateParserBlock: warning wrong closing tag");
+      else m_IfChars=m_PreParsedHTML.size();
+
+      //return because Else tag has not a tag name
       return true;
     }
     else 
@@ -559,10 +592,7 @@ int medHTMLTemplateParserBlock::PreParseTag( wxString *inputTemplate, int &parsi
     ReadTagName(inputTemplate,parsingPos,tagName);
     subPos=AddSubstitution(&tagName,substitutionType);
     
-    if (inputTemplate->GetChar(parsingPos)!=']')
-      mafLogMessage("medHTMLTemplateParserBlock: Expected tag end:']'");
-
-    else parsingPos++; 
+   
 
     //Parsing sub tags
     if (subPos>=0 && (substitutionType==MED_HTML_TEMPLATE_IF || substitutionType==MED_HTML_TEMPLATE_LOOP))
@@ -616,14 +646,15 @@ int medHTMLTemplateParserBlock::PreParseTag( wxString *inputTemplate, int &parsi
     else 
      mafLogMessage("medHTMLTemplateParserBlock: Invalid TAG Type");
    
-    SkipInputSpaces(inputTemplate,parsingPos);
-    if (inputTemplate->GetChar(parsingPos)!=']')
-    {
-      mafLogMessage("medHTMLTemplateParserBlock: Expected tag end:']'");
-    }
-    else parsingPos++;
-    //stop parsing on closing tag reached
-    return false;
+    ReadTagName(inputTemplate,parsingPos,tagName);
+
+
+    int comp=tagName.Cmp(m_BlockName);
+
+    if (comp!=0)
+      mafLogMessage("medHTMLTemplateParserBlock: warning wrong closing tag");
+
+    return comp;
   } 
   else 
   {
@@ -644,7 +675,45 @@ int medHTMLTemplateParserBlock::ConsistenceCheck()
 //----------------------------------------------------------------------------
 {
 
-  ///G,G to do;
+  if (m_BlockType==MED_HTML_TEMPLATE_LOOP)
+  {
+    //m_LoopsNumber must be set for loop blocks
+    if (m_LoopsNumber<0)
+    {
+       mafLogMessage("medHTMLTemplateParserBlock: loops number is not set for:%s",m_BlockName.c_str());
+       return false;
+    }
+    for (int i=0;i<m_VariablesArray.size();i++)
+    {
+      //Each variable array must contain exactly m_LoopsNumber Elements
+      if (m_VariablesArray[i].size()!=m_LoopsNumber)
+      {
+        mafLogMessage("medHTMLTemplateParserBlock: wrong variable number for:%s Block",m_BlockName.c_str());
+        return false;
+      }
+    }
+    for (int i=0;i<m_SubBlocksArray.size();i++)
+    {
+      //Each Sub-Blocks array must contain exactly m_LoopsNumber Elements
+      if (m_SubBlocksArray[i].size()!=m_LoopsNumber)
+      {
+        mafLogMessage("medHTMLTemplateParserBlock: wrong Sub-Blocks number for:%s Block",m_BlockName.c_str());
+        return false;
+      }
+    }
+  }
+
+  //Each Sub-Block must be consistent
+  for (int i=0;i<m_SubBlocks.size();i++)
+    if (m_SubBlocks[i]->ConsistenceCheck()==false)
+      return false;
+
+  //Also Each Sub-Block in each Array must be consistent 
+  for (int i=0;i<m_SubBlocksArray.size();i++)
+    for (int j=0;j<m_SubBlocksArray[i].size();j++)
+      if (m_SubBlocksArray[i][j]->ConsistenceCheck()==false)
+        return false;
+
   return true;
 }
 
@@ -662,18 +731,24 @@ void medHTMLTemplateParserBlock::ReadTagName( wxString *inputTemplate, int &pars
 //----------------------------------------------------------------------------
 {
   int nameStart;
+  //skip spaces before name 
   SkipInputSpaces(inputTemplate,parsingPos);
   nameStart=parsingPos;
 
+  //reads textual char (stopping on spaces or tag end)
   while ( inputTemplate->GetChar(parsingPos) != ' ' &&  inputTemplate->GetChar(parsingPos) != ']' )
     parsingPos++;
 
+
   tagName=inputTemplate->SubString(nameStart,parsingPos-1);
 
+  //skip other spaces
   SkipInputSpaces(inputTemplate,parsingPos);
 
+  //read closing char ']'
   if (inputTemplate->GetChar(parsingPos)!=']')
     mafLogMessage("medHTMLTemplateParserBlock: Expected tag end:']'");
+  else parsingPos++; 
 }
 
 //----------------------------------------------------------------------------
@@ -683,13 +758,17 @@ int medHTMLTemplateParserBlock::AddSubstitution(wxString *tagName, int Substitut
   int pos;
   HTMLTemplateParsedItems substitution;
   
+  //Searching in substitution table
   pos=SubstitutionPos(tagName);
 
   if (pos>=0) 
     substitution.SubsTablePos=pos;    
   else 
+    //if a substitution was not found locally we search to the root
     substitution.SubsTablePos=AddForward(tagName,SubstitutionType);
   
+  //if a substitution was not found in local or global scope 
+  //we return -1 and not add it to local m_substitutions
   if (substitution.SubsTablePos<0)
     return -1;
   else 
@@ -714,7 +793,7 @@ int medHTMLTemplateParserBlock::AddForward( wxString *tagName, int SubstitutionT
   {
     if (m_SubstitutionTable[pos].Type==MED_HTML_SUBSTITUTION_BLOCK || m_SubstitutionTable[pos].Type==MED_HTML_SUBSTITUTION_BLOCK_ARRAY)
     {
-      mafLogMessage("medHTMLTemplateParserBlock Error: Tag '%s' was not found as Block",tagName->c_str());
+      mafLogMessage("medHTMLTemplateParserBlock Warning: Tag '%s' was not found as Block",tagName->c_str());
       return -1;
     }
     return pos;
@@ -723,7 +802,7 @@ int medHTMLTemplateParserBlock::AddForward( wxString *tagName, int SubstitutionT
   // does not exist and we return -1
   else if (m_BlockType == MED_HTML_TEMPLATE_MAIN)
   {
-    mafLogMessage("medHTMLTemplateParserBlock: Tag '%s' was not found",tagName->c_str());
+    mafLogMessage("medHTMLTemplateParserBlock: Warning Tag '%s' was not found",tagName->c_str());
     return -1;
   }
   else 
@@ -808,6 +887,7 @@ medHTMLTemplateParserBlock * medHTMLTemplateParserBlock::GetNthBlock( wxString n
 void medHTMLTemplateParserBlock::SetIfCondition( int condition )
 //----------------------------------------------------------------------------
 {
+  //checking block type
   if (m_BlockType!=MED_HTML_TEMPLATE_IF)
   {
     mafLogMessage("HTML Template ERROR: You can set the value of if condition only on 'if' blocks");
@@ -820,14 +900,16 @@ void medHTMLTemplateParserBlock::SetIfCondition( int condition )
 void medHTMLTemplateParserBlock::SetNLoops( int nloops )
 //----------------------------------------------------------------------------
 {
+  //checking block type
   if (m_BlockType!=MED_HTML_TEMPLATE_LOOP)
   {
     mafLogMessage("HTML Template ERROR: You can set the loops number only on 'loops' blocks");
     return;
   }
-  else if (nloops<=0)
+  //checking nloops is an acceptable value
+  else if (nloops<0)
   {
-    mafLogMessage("HTML Template ERROR: nloops must be at the least one");
+    mafLogMessage("HTML Template ERROR: nloops must be at the least zero");
     return;
   }
   m_LoopsNumber=nloops;
@@ -838,6 +920,8 @@ void medHTMLTemplateParserBlock::SetFather( medHTMLTemplateParserBlock *father )
 //----------------------------------------------------------------------------
 {
 
+  //if block type is MED_HTML_TEMPLATE_MAIN this is the root of the tree
+  //so we cannot set a father
   if (m_BlockType==MED_HTML_TEMPLATE_MAIN)
   {
     mafLogMessage("HTML Template ERROR: The main Block does not have a father");
