@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSplitSurfaceTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-07-01 08:33:26 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2012-02-16 14:38:00 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2007
@@ -105,7 +105,9 @@ void medOpSplitSurfaceTest::TestClip()
 
   surface->Update();
   int numberOfChildren = parentSurface->GetNumberOfChildren();
-  CPPUNIT_ASSERT(((mafVMESurface *)parentSurface->GetLastChild())->GetOutput()->GetVTKData()->GetNumberOfPoints() == 191);
+  int numPoints = ((mafVMESurface *)parentSurface->GetLastChild())->GetOutput()->GetVTKData()->GetNumberOfPoints();
+
+  CPPUNIT_ASSERT(numPoints == 61);
   CPPUNIT_ASSERT(clippedName.Compare(parentSurface->GetLastChild()->GetName()) == 0);
 
   mafDEL(surfaceParametricClip);
