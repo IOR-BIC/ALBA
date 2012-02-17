@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2012-02-15 16:51:19 $
-Version:   $Revision: 1.1.2.30 $
+Date:      $Date: 2012-02-17 13:37:43 $
+Version:   $Revision: 1.1.2.31 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi, Alberto Losi
 ==========================================================================
 Copyright (c) 2007
@@ -1495,6 +1495,8 @@ void medOpSegmentation::OnManualStep()
   m_ManualBrushSizeSlider->Update();
   m_ManualBrushSizeText->SetValue("1");
   m_ManualBrushSizeText->Update();
+
+  m_ManualPER->SetTargetVolumeSpacing(max(m_VolumeSpacing[0] , m_VolumeSpacing[1]));
   m_ManualPER->SetRadius(m_ManualBrushSize/2.0);
   m_View->CameraUpdate();
 
@@ -2710,7 +2712,10 @@ void medOpSegmentation::OnLoadSegmentationEvent(mafEvent *e)
     break;
   case ID_RESET_LOADED:
     {
-      m_View->VmeShow(m_LoadedVolume,false);
+      if(m_LoadedVolume)
+      {
+        m_View->VmeShow(m_LoadedVolume,false);
+      }
       //m_View->VmeRemove(m_LoadedVolume);
       m_View->CameraUpdate();
       m_LoadedVolume = NULL;
@@ -2881,7 +2886,105 @@ void medOpSegmentation::UpdateWindowing()
   m_LutSlider->SetSubRange(subR[0],subR[1]);
 
 }
+//----------------------------------------------------------------------------
+void medOpSegmentation::SelectBrushImage(double x, double y, double z, bool selection)
+//----------------------------------------------------------------------------
+{
+  vtkDataSet *dataset = ((mafVME *)m_ManualVolumeSlice)->GetOutput()->GetVTKData();
+  if(!dataset)
+    return;
+  
+  double center[3]={x,y,z};
 
+  double numberOfPoints = m_VolumeDimensions[0] * m_VolumeDimensions[1];
+
+  unsigned char scalar = 0;
+  if(selection)
+  {
+    scalar = 255;
+  }
+
+  double min_distance = MAXDOUBLE;
+  double nearestIndex = -1;
+  //get the nearest dataset point
+  for (int i=0;i<numberOfPoints;i++)
+  {
+    double xyz[3];
+    dataset->GetPoint(i,xyz);
+    //Get the center of the pixel
+
+    xyz[0] = xyz[0] + m_VolumeSpacing[0] / 2.;
+    xyz[1] = xyz[1] + m_VolumeSpacing[1] / 2.;
+    xyz[2] = z;
+
+    double distance = vtkMath::Distance2BetweenPoints(xyz,center);
+    if(distance < min_distance)
+    {
+      nearestIndex = i;
+      min_distance = distance;
+    }
+
+  }
+  int nearestDummyIndex = int(m_ManualBrushSize / 2) + (int(m_ManualBrushSize / 2))  * m_VolumeDimensions[0];
+  std::vector<int> dummyIndices;
+  if(m_ManualBrushShape == 0) // circle
+  {
+    double radius = (m_ManualBrushSize / 2. )* m_VolumeSpacing[0];
+    double radius2 = pow(radius,2);
+    double dummyCenter[3] = {radius,radius,0};
+    
+    for(int i = 0; i < int(m_ManualBrushSize); i++)
+    {
+      for(int j = 0; j < int(m_ManualBrushSize); j++) // remove pixel that are not inside the circle
+      {
+        // get the center of the pixel
+        double dummmyPixel[3] = {i * m_VolumeSpacing[0] + m_VolumeSpacing[0] / 2., j * m_VolumeSpacing[1] + m_VolumeSpacing[1] / 2.,0};
+        if(vtkMath::Distance2BetweenPoints(dummmyPixel,dummyCenter) < radius2)
+        {
+          dummyIndices.push_back(i + j * m_VolumeDimensions[0] - nearestDummyIndex);
+        }
+        else
+        {
+          dummyIndices.push_back(-(m_VolumeDimensions[0]*m_VolumeDimensions[1]) + 1);
+        }
+      }
+    }
+  }
+  else // square
+  {
+    for(int i = 0; i < int(m_ManualBrushSize); i++)
+    {
+      for(int j = 0; j < int(m_ManualBrushSize); j++) // all pixel in the square are on
+      {
+        dummyIndices.push_back(i + j * m_VolumeDimensions[0] - nearestDummyIndex);
+      }
+    }
+  }
+  for(int i = 0; i < dummyIndices.size(); i++)
+  {
+    int curIndex = dummyIndices.at(i) + nearestIndex;
+    if(curIndex >= 0 && curIndex < numberOfPoints)
+    {
+      dataset->GetPointData()->GetScalars()->SetTuple1(curIndex, scalar);
+    }
+  }
+  dataset->GetPointData()->Update();
+  dataset->Update();
+  vtkMAFSmartPointer<vtkStructuredPoints> newImage;
+  newImage->DeepCopy(dataset);
+  newImage->Update();
+
+  //m_View->VmeShow(m_ManualVolumeSlice, false);
+  m_ManualVolumeSlice->SetData(newImage,mafVME::SafeDownCast(m_ThresholdVolume)->GetTimeStamp(), 2);
+  m_ManualVolumeSlice->GetEventSource()->InvokeEvent(m_ManualVolumeSlice, VME_OUTPUT_DATA_UPDATE);
+  m_ManualVolumeSlice->GetOutput()->GetVTKData()->Update();
+  m_ManualVolumeSlice->GetOutput()->Update();
+  m_ManualVolumeSlice->Update();
+
+  //m_View->VmeShow(m_ManualVolumeSlice, true);
+
+}
+/**
 //----------------------------------------------------------------------------
 void medOpSegmentation::SelectBrushImage(double x, double y, double z, bool selection)
 //----------------------------------------------------------------------------
@@ -2901,7 +3004,9 @@ void medOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
 
   double centerOfPick[3]={x,y,z};
 
-  double ray = m_ManualBrushSize/2; 
+  double spacing = max(m_VolumeSpacing[0] , m_VolumeSpacing[1]);
+
+  double ray = ((m_ManualBrushSize/2.) * spacing);
 
   unsigned char scalar = 0;
   if(selection)
@@ -3011,7 +3116,7 @@ void medOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
   //m_View->VmeShow(m_ManualVolumeSlice, true);
 
 }
-
+*/
 //------------------------------------------------------------------------
 void medOpSegmentation::InitializeInteractors()
 //------------------------------------------------------------------------
