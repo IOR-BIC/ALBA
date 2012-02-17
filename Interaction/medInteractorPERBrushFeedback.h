@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medInteractorPERBrushFeedback.h,v $
 Language:  C++
-Date:      $Date: 2012-02-08 13:13:21 $
-Version:   $Revision: 1.1.2.6 $
+Date:      $Date: 2012-02-17 13:36:29 $
+Version:   $Revision: 1.1.2.7 $
 Authors:   Eleonora Mambrini, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -59,6 +59,12 @@ public:
   /** Set the Shape of the brush*/
   void SetBrushShape(int shape);
 
+  /** Set the target spacing to "align" volume and brush dimensions */
+  void SetTargetVolumeSpacing(double spacing){m_TargetVolumeSpacing = spacing;};
+
+  /** */
+  double GetRealFeedBackShapeRadius(){return double(m_Radius * m_TargetVolumeSpacing);};
+
 protected:
   /** constructor. */
   medInteractorPERBrushFeedback();
@@ -85,6 +91,7 @@ protected:
   bool m_EnableDrawing;
   bool m_MouseDown;
   double m_Count;
+  double m_TargetVolumeSpacing;
 
 };
 #endif 

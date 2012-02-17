@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medInteractorPERBrushFeedback.cpp,v $
 Language:  C++
-Date:      $Date: 2012-02-08 13:13:21 $
-Version:   $Revision: 1.1.2.5 $
+Date:      $Date: 2012-02-17 13:36:29 $
+Version:   $Revision: 1.1.2.6 $
 Authors:   Eleonora Mambrini, Gianluigi Crimi 
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -93,6 +93,7 @@ medInteractorPERBrushFeedback::medInteractorPERBrushFeedback()
 
   m_Count = 0;
 
+  m_TargetVolumeSpacing = 1;
 }
 
 //------------------------------------------------------------------------------
@@ -356,12 +357,12 @@ void medInteractorPERBrushFeedback::SetRadius(double radius)
 
   if (m_SphereSource && m_CubeSource && m_Renderer)
   {
-    m_SphereSource->SetRadius(m_Radius);
+    m_SphereSource->SetRadius(m_Radius * m_TargetVolumeSpacing);
     m_SphereSource->Update();
 
-    m_CubeSource->SetXLength(int(2*m_Radius));
-    m_CubeSource->SetYLength(int(2*m_Radius));
-    m_CubeSource->SetZLength(int(2*m_Radius));
+    m_CubeSource->SetXLength(double(int(2*m_Radius) * m_TargetVolumeSpacing));
+    m_CubeSource->SetYLength(double(int(2*m_Radius) * m_TargetVolumeSpacing));
+    m_CubeSource->SetZLength(double(int(2*m_Radius) * m_TargetVolumeSpacing));
     m_CubeSource->Update();
 
     m_Renderer->Render();
