@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2012-02-17 13:37:43 $
-Version:   $Revision: 1.1.2.31 $
+Date:      $Date: 2012-02-21 11:59:57 $
+Version:   $Revision: 1.1.2.32 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi, Alberto Losi
 ==========================================================================
 Copyright (c) 2007
@@ -183,7 +183,7 @@ medOpSegmentation::medOpSegmentation(const wxString &label) : mafOp(label)
 
   m_ManualBrushShapeRadioBox = NULL;
   m_ManualBrushShape = CIRCLE_BRUSH_SHAPE;
-  m_ManualBrushSize = 0;
+  m_ManualBrushSize = 1;
   m_ManualRefinementRegionsSize = 1;
 
   m_ManualBrushSizeText = NULL;
@@ -1107,13 +1107,13 @@ void medOpSegmentation::CreateAutoSegmentationGui()
   //[ + ] [ + ] [ + ]
   //[min][range][max]
   //[ - ] [ - ] [ - ] 
-  m_AutomaticThreshold=sr[0];
+  m_AutomaticThreshold=sr[1];
   m_AutomaticUpperThreshold=sr[1];
   m_AutomaticThresholdSlider = new mafGUILutSlider(currentGui,-1,wxPoint(0,0),wxSize(300,24));
   m_AutomaticThresholdSlider->SetListener(this);
   m_AutomaticThresholdSlider->SetText(1,"Threshold");  
   m_AutomaticThresholdSlider->SetRange(sr[0],sr[1]);
-  m_AutomaticThresholdSlider->SetSubRange(sr[0],sr[1]);
+  m_AutomaticThresholdSlider->SetSubRange(sr[1],sr[1]);
 
   std::vector<int> increaseTrIDs;
   increaseTrIDs.push_back(ID_AUTOMATIC_INCREASE_MIN_THRESHOLD);
@@ -1228,15 +1228,24 @@ void medOpSegmentation::CreateManualSegmentationGui()
 
   m_ManualBrushSizeText = new wxTextCtrl(currentGui, id, "", wxDefaultPosition, wxSize(40, 18));
 
-  m_ManualBrushSizeSlider = new mafGUIFloatSlider(currentGui, id,m_ManualBrushSize,0,130, wxDefaultPosition, wxDefaultSize);
+  m_ManualBrushSizeSlider = new mafGUIFloatSlider(currentGui, id,m_ManualBrushSize,1,int(min(m_VolumeDimensions[0],m_VolumeDimensions[1])/2), wxDefaultPosition, wxDefaultSize);
 
-  m_ManualBrushSizeText->SetValidator(mafGUIValidator(currentGui, id, m_ManualBrushSizeText, &m_ManualBrushSize, m_ManualBrushSizeSlider, 0, 130));
+  m_ManualBrushSizeText->SetValidator(mafGUIValidator(currentGui, id, m_ManualBrushSizeText, &m_ManualBrushSize, m_ManualBrushSizeSlider, 1, int(min(m_VolumeDimensions[0],m_VolumeDimensions[1])/2)));
   m_ManualBrushSizeSlider->SetValidator(mafGUIValidator(currentGui, id, m_ManualBrushSizeSlider, &m_ManualBrushSize, m_ManualBrushSizeText));
+  
+  m_ManualBrushSize=1;
+  m_ManualBrushSizeSlider->SetValue(m_ManualBrushSize);
+  m_ManualBrushSizeText->SetValue("1");
+  m_ManualBrushSizeSlider->SetNumberOfSteps(int(min(m_VolumeDimensions[0],m_VolumeDimensions[1])/4)-2);
+  m_ManualBrushSizeSlider->SetRange(1,int(min(m_VolumeDimensions[0],m_VolumeDimensions[1])/4),1);
+  m_ManualBrushSizeSlider->SetMax(int(min(m_VolumeDimensions[0],m_VolumeDimensions[1])/4));
+  m_ManualBrushSizeSlider->SetMin(1);
+  m_ManualBrushSizeSlider->Update();
+  m_ManualBrushSizeText->Update();
+
   brushSizeSizer->Add(brushSizeLab,  0, wxRIGHT, 5);
   brushSizeSizer->Add(m_ManualBrushSizeText, 0);
-  brushSizeSizer->Add(m_ManualBrushSizeSlider,  0);
-
-  
+  brushSizeSizer->Add(m_ManualBrushSizeSlider, 0);
 
   brushEditingSizer->Add(brushShapesSizer, 0, wxALL, 1);
   brushEditingSizer->Add(brushSizeSizer, 0, wxALL, 1);
@@ -1483,21 +1492,23 @@ void medOpSegmentation::OnManualStep()
   // brush size slider: min = 1; max = slice size
   m_SnippetsLabel->SetLabel( _("Left click + Ctrl Draw.  Left click + Alt Erase"));
 
-  int maxBrushSize;
-  maxBrushSize = min(m_VolumeDimensions[0], m_VolumeDimensions[1]);
-  maxBrushSize = min(maxBrushSize, m_VolumeDimensions[2]);
-  maxBrushSize = round(maxBrushSize/2.0);
-
+//   int maxBrushSize;
+//   maxBrushSize = min(m_VolumeDimensions[0], m_VolumeDimensions[1]);
+//   maxBrushSize = min(maxBrushSize, m_VolumeDimensions[2]);
+//   maxBrushSize = round(maxBrushSize/2.0);
+// 
   m_ManualBrushSize=1;
-  m_ManualBrushSizeSlider->SetMax(maxBrushSize);
-  m_ManualBrushSizeSlider->SetMin(1);
   m_ManualBrushSizeSlider->SetValue(m_ManualBrushSize);
-  m_ManualBrushSizeSlider->Update();
   m_ManualBrushSizeText->SetValue("1");
+  m_ManualBrushSizeSlider->SetNumberOfSteps(int(min(m_VolumeDimensions[0],m_VolumeDimensions[1])/4)-2);
+  m_ManualBrushSizeSlider->SetRange(1,int(min(m_VolumeDimensions[0],m_VolumeDimensions[1])/4),1);
+  m_ManualBrushSizeSlider->SetMax(int(min(m_VolumeDimensions[0],m_VolumeDimensions[1])/4));
+  m_ManualBrushSizeSlider->SetMin(1);
+  m_ManualBrushSizeSlider->Update();
   m_ManualBrushSizeText->Update();
-
+  
   m_ManualPER->SetTargetVolumeSpacing(max(m_VolumeSpacing[0] , m_VolumeSpacing[1]));
-  m_ManualPER->SetRadius(m_ManualBrushSize/2.0);
+  m_ManualPER->SetRadius(double(m_ManualBrushSize)/2.0);
   m_View->CameraUpdate();
 
   
@@ -2583,7 +2594,7 @@ void medOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
     }
   case ID_MANUAL_BRUSH_SIZE:
     {
-      m_ManualPER->SetRadius(m_ManualBrushSize/2);
+      m_ManualPER->SetRadius(double(m_ManualBrushSize)/2);
       UndoBrushPreview();
       m_ManualSegmentationAction = MANUAL_SEGMENTATION_SELECT;
       mafEvent dummyEvent;
@@ -2929,7 +2940,7 @@ void medOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
   std::vector<int> dummyIndices;
   if(m_ManualBrushShape == 0) // circle
   {
-    double radius = (m_ManualBrushSize / 2. )* m_VolumeSpacing[0];
+    double radius = (double(m_ManualBrushSize) / 2. )* m_VolumeSpacing[0];
     double radius2 = pow(radius,2);
     double dummyCenter[3] = {radius,radius,0};
     
