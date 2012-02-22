@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2012-02-22 10:50:13 $
-Version:   $Revision: 1.1.2.33 $
+Date:      $Date: 2012-02-22 12:23:00 $
+Version:   $Revision: 1.1.2.34 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi, Alberto Losi
 ==========================================================================
 Copyright (c) 2007
@@ -1561,7 +1561,7 @@ void medOpSegmentation::OnManualStep()
   SetTrilinearInterpolation(m_ManualVolumeSlice);
 
   CreateRealDrawnImage();
-
+  m_GuiDialog->Enable(ID_BUTTON_NEXT,true);
   m_CurrentBrushMoveEventCount = 0;
 }
 //------------------------------------------------------------------------
@@ -1619,6 +1619,7 @@ void medOpSegmentation::OnRefinementStep()
   m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_UNDO, false);
   m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_REDO, false);
   m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_APPLY, true);
+  m_GuiDialog->Enable(ID_BUTTON_NEXT,false);
   m_GuiDialog->Enable(ID_REFINEMENT,true);
   
   //logic stuff
