@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.h,v $
 Language:  C++
-Date:      $Date: 2012-02-22 10:50:14 $
-Version:   $Revision: 1.1.2.17 $
+Date:      $Date: 2012-02-22 15:46:36 $
+Version:   $Revision: 1.1.2.18 $
 Authors:   Eleonora Mambrini, Gianluigi Crimi, Alberto Losi
 ==========================================================================
 Copyright (c) 2007
@@ -560,5 +560,8 @@ protected:
   std::vector<vtkUnsignedCharArray *> m_RefinementRedoList; //<Refinement redo list
 
   int m_MajorityThreshold;                   //<Used in itk algorithm (not yet exposed and used)
+
+  int m_OldAutomaticThreshold;      //<Used to update real time threshold preview only if needed
+  int m_OldAutomaticUpperThreshold; //<Used to update real time threshold preview only if needed
 };
 #endif
