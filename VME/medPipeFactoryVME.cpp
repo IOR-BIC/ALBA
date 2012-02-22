@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeFactoryVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-12-20 14:59:01 $
-  Version:   $Revision: 1.13.2.9 $
+  Date:      $Date: 2012-02-22 12:56:57 $
+  Version:   $Revision: 1.13.2.10 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -62,6 +62,7 @@
 #include "medPipeTensorFieldSurface.h"
 #include "medPipeTensorFieldSlice.h"
 #include "medPipeVolumeSliceBlend.h"
+#include "medVisualPipeCollisionDetection.h"
 
 #include <string>
 #include <ostream>
@@ -137,6 +138,7 @@ medPipeFactoryVME::medPipeFactoryVME()
   mafPlugPipeMacro(medPipeTensorFieldSurface, "Pipe for rendering of tensor fields using color mapping on the object surface.");
   mafPlugPipeMacro(medPipeTensorFieldSlice, "Pipe for rendering of tensor fields using color mapping on the slice of the object.");
   mafPlugPipeMacro(medPipeVolumeSliceBlend, "Pipe for rendering volume with 2 slices with opacity.");
+  mafPlugPipeMacro(medVisualPipeCollisionDetection, "Pipe for visualization of collision between 2 surfaces.");
 
 
   //BES: 16.4.2008 - these pipes are to be committed down (without _BES suffix) to openMAF in the future

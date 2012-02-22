@@ -129,6 +129,9 @@ SET(PROJECT_SRCS
 
   medPipeVolumeSliceBlend.cpp
   medPipeVolumeSliceBlend.h
+
+  medVisualPipeCollisionDetection.cpp
+  medVisualPipeCollisionDetection.h
 )
 
 IF (MAF_USE_ITK)
