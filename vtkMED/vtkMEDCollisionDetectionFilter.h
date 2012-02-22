@@ -3,7 +3,7 @@
   Program:   Visualization Toolkit
   Module:    vtkMEDCollisionDetectionFilter.h
   Language:  C++
-  RCS:   $Id: vtkMEDCollisionDetectionFilter.h,v 1.1.2.1 2012-02-15 07:49:08 ior02 Exp $
+  RCS:   $Id: vtkMEDCollisionDetectionFilter.h,v 1.1.2.2 2012-02-22 12:53:16 ior02 Exp $
 
   Copyright (c) 2003 and onwards, Goodwin Lawlor
   All rights reserved.
@@ -183,6 +183,8 @@ protected:
   float Opacity;
   
   int CollisionMode;
+  vtkOBBTree *Tree[2]; 
+
 
 private:  
 

@@ -3,7 +3,7 @@
   Program:   Visualization Toolkit
   Module:    vtkMEDCollisionDetectionFilter.cxx
   Language:  C++
-  RCS:   $Id: vtkMEDCollisionDetectionFilter.cxx,v 1.1.2.1 2012-02-15 07:49:08 ior02 Exp $
+  RCS:   $Id: vtkMEDCollisionDetectionFilter.cxx,v 1.1.2.2 2012-02-22 12:53:16 ior02 Exp $
 
   Copyright (c) 2003-2004 Goodwin Lawlor
   All rights reserved.
@@ -38,7 +38,7 @@
 #include "vtkMAFSmartPointer.h"
 #include "vtkCellArray.h"
 
-vtkCxxRevisionMacro(vtkMEDCollisionDetectionFilter, "$Revision: 1.1.2.1 $");
+vtkCxxRevisionMacro(vtkMEDCollisionDetectionFilter, "$Revision: 1.1.2.2 $");
 vtkStandardNewMacro(vtkMEDCollisionDetectionFilter);
 
 // Constructs with initial 0 values.
@@ -67,10 +67,15 @@ vtkMEDCollisionDetectionFilter::vtkMEDCollisionDetectionFilter()
   this->NumberOfBoxTests = 0;
   this->BoxTolerance = 0.0;
   this->CellTolerance = 0.0;
-  this->NumberOfCellsPerBucket = 2;
+  this->NumberOfCellsPerBucket = 10;
   this->GenerateScalars = 0;
   this->CollisionMode = VTK_ALL_CONTACTS;
   this->Opacity = 1.0;
+  this->Tree[0] = NULL;
+  this->Tree[1] = NULL;
+
+  this->Tree[0] = vtkOBBTree::New();
+  this->Tree[1] = vtkOBBTree::New();
 }
 
 // Destroy any allocated memory.
@@ -98,6 +103,9 @@ vtkMEDCollisionDetectionFilter::~vtkMEDCollisionDetectionFilter()
     this->Transform[1] = NULL;
     }
 
+  Tree[0]->Delete();
+  Tree[1]->Delete();
+
 }
 
 
@@ -114,6 +122,12 @@ void vtkMEDCollisionDetectionFilter::SetInput(int idx, vtkPolyData *input)
     
   // Ask the superclass to connect the input.
   this->SetNthInput(idx, input);
+
+  Tree[idx]->SetDataSet(input);
+  Tree[idx]->AutomaticOn();
+  Tree[idx]->SetNumberOfCellsPerBucket(this->NumberOfCellsPerBucket);
+  Tree[idx]->BuildLocator();
+  Tree[idx]->SetTolerance(this->BoxTolerance);
 }
 
 
@@ -484,27 +498,27 @@ void vtkMEDCollisionDetectionFilter::Execute()
   
 
   // rebuild the obb trees... they do their own mtime checking with input data
-  vtkOBBTree *tree0 = vtkOBBTree::New();
-  vtkOBBTree *tree1 = vtkOBBTree::New();
-  tree0->SetDataSet(input[0]);
-  tree0->AutomaticOn();
-  tree0->SetNumberOfCellsPerBucket(this->NumberOfCellsPerBucket);
-  tree0->BuildLocator();
-
-  tree1->SetDataSet(input[1]);
-  tree1->AutomaticOn();
-  tree1->SetNumberOfCellsPerBucket(this->NumberOfCellsPerBucket);
-  tree1->BuildLocator();
-    
-  // Set the Box Tolerance
-  tree0->SetTolerance(this->BoxTolerance);
-  tree1->SetTolerance(this->BoxTolerance);
+//   vtkOBBTree *Tree0 = vtkOBBTree::New();
+//   vtkOBBTree *Tree1 = vtkOBBTree::New();
+//   Tree0->SetDataSet(input[0]);
+//   Tree0->AutomaticOn();
+//   Tree0->SetNumberOfCellsPerBucket(this->NumberOfCellsPerBucket);
+//   Tree0->BuildLocator();
+// 
+//   Tree1->SetDataSet(input[1]);
+//   Tree1->AutomaticOn();
+//   Tree1->SetNumberOfCellsPerBucket(this->NumberOfCellsPerBucket);
+//   Tree1->BuildLocator();
+//     
+//   // Set the Box Tolerance
+//   Tree0->SetTolerance(this->BoxTolerance);
+//   Tree1->SetTolerance(this->BoxTolerance);
 
   // Do the collision detection...
-  vtkIdType BoxTests = tree0->IntersectWithOBBTree(tree1,  matrix, ComputeCollisions, this);
+  vtkIdType BoxTests = Tree[0]->IntersectWithOBBTree(Tree[1],  matrix, ComputeCollisions, this);
 
-  tree0->Delete();
-  tree1->Delete();
+//   Tree0->Delete();
+//   Tree1->Delete();
 
   matrix->Delete();
   tmpMatrix->Delete();
