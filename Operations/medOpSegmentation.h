@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.h,v $
 Language:  C++
-Date:      $Date: 2012-02-15 16:51:20 $
-Version:   $Revision: 1.1.2.16 $
+Date:      $Date: 2012-02-22 10:50:14 $
+Version:   $Revision: 1.1.2.17 $
 Authors:   Eleonora Mambrini, Gianluigi Crimi, Alberto Losi
 ==========================================================================
 Copyright (c) 2007
@@ -202,7 +202,7 @@ public:
   static bool SegmentationVolumeAccept(mafNode* node) {return(node != NULL  && node->IsMAFType(medVMESegmentationVolume));};
 
   /** Return true if node is of type mafVMEVolume. */
-  static bool VolumeAccept(mafNode* node) {return(node != NULL  && node->IsMAFType(mafVMEVolumeGray));};
+  static bool SegmentedVolumeAccept(mafNode* node);
 
 protected:
 

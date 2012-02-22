@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2012-02-21 11:59:57 $
-Version:   $Revision: 1.1.2.32 $
+Date:      $Date: 2012-02-22 10:50:13 $
+Version:   $Revision: 1.1.2.33 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi, Alberto Losi
 ==========================================================================
 Copyright (c) 2007
@@ -118,6 +118,11 @@ enum THRESHOLD_TYPE
 
 typedef  itk::Image< float, 3> RealImage;
 typedef  itk::Image< unsigned char, 3> UCharImage;
+
+static int m_CurrentVolumeDimensions[3] = {0,0,0};          //<Used to load only volume with the specified dimensions
+static double m_CurrentVolumeSpacing[3] = {0,0,0};          //<Used to load only volume with the specified spacing
+static double m_CurrentVolumeBounds[6] = {0,0,0,0,0,0};           //<Used to load only volume with the specified bounds
+static bool m_CurrentVolumeParametersInitialized = false;
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(medOpSegmentation);
@@ -283,6 +288,7 @@ void medOpSegmentation::OpRun()
   //Initialize of the volume matrix to the indentity
   //////////////////////////////////////////////////////////////////////////
   m_Volume=mafVMEVolumeGray::SafeDownCast(m_Input);
+
   m_Volume->Update();
   m_Matrix = m_Volume->GetMatrixPipe()->GetMatrix();
   mafMatrix matrixNoTransf;
@@ -293,6 +299,24 @@ void medOpSegmentation::OpRun()
   //////////////////////////////////////////////////////////////////////////
 
   InitVolumeDimensions();
+  InitVolumeSpacing();
+  // Set static variable for load segmentation step
+  if(m_VolumeParametersInitialized)
+  {
+    for(int i = 0; i < 6; i++)
+    {
+      m_CurrentVolumeBounds[i] =  m_VolumeBounds[i];
+    }
+    for(int i = 0; i < 3; i++)
+    {
+      m_CurrentVolumeDimensions[i] =  m_VolumeDimensions[i];
+    }
+    for(int i = 0; i < 3; i++)
+    {
+      m_CurrentVolumeSpacing[i] =  m_VolumeSpacing[i];
+    }
+    m_CurrentVolumeParametersInitialized = true;
+  }
 
   // interface:
   CreateOpDialog();
@@ -2704,21 +2728,24 @@ void medOpSegmentation::OnLoadSegmentationEvent(mafEvent *e)
       mafString title = mafString("Select a segmentation:");
       mafEvent e(this,VME_CHOOSE);
       e.SetString(&title);
-      e.SetArg((long)(&medOpSegmentation::VolumeAccept));
+      e.SetArg((long)(&medOpSegmentation::SegmentedVolumeAccept));
       mafEventMacro(e);
       mafVME *vme = (mafVME *)e.GetVme();
       m_LoadedVolume = mafVMEVolumeGray::SafeDownCast(vme);
 
-      m_SegmentationColorLUT = m_LoadedVolume->GetMaterial()->m_ColorLut;
-      InitMaskColorLut(m_SegmentationColorLUT);
-      m_LoadedVolume->GetMaterial()->UpdateFromTables();
-      m_LoadedVolume->Update();
+      if(m_LoadedVolume)
+      {
+        m_SegmentationColorLUT = m_LoadedVolume->GetMaterial()->m_ColorLut;
+        InitMaskColorLut(m_SegmentationColorLUT);
+        m_LoadedVolume->GetMaterial()->UpdateFromTables();
+        m_LoadedVolume->Update();
 
-      m_LoadedVolumeName = m_LoadedVolume->GetName();
-      m_SegmentationOperationsGui[LOAD_SEGMENTATION]->Update();
-      m_View->VmeAdd(m_LoadedVolume);
-      m_View->VmeShow(m_LoadedVolume,true);
-      m_View->CameraUpdate();
+        m_LoadedVolumeName = m_LoadedVolume->GetName();
+        m_SegmentationOperationsGui[LOAD_SEGMENTATION]->Update();
+        m_View->VmeAdd(m_LoadedVolume);
+        m_View->VmeShow(m_LoadedVolume,true);
+        m_View->CameraUpdate();
+      }
     }
     break;
   case ID_RESET_LOADED:
@@ -4123,4 +4150,46 @@ void medOpSegmentation::UpdateThresholdRealTimePreview()
   m_View->CameraUpdate();
 
   mafDEL(tVol);
+}
+
+//----------------------------------------------------------------------------
+bool medOpSegmentation::SegmentedVolumeAccept(mafNode* node)
+//----------------------------------------------------------------------------
+{
+  
+  if(node != NULL  \
+    && node->IsMAFType(mafVMEVolumeGray) \
+    && m_CurrentVolumeParametersInitialized \
+    && mafVMEVolumeGray::SafeDownCast(node)->GetOutput() != NULL \
+    && mafVMEVolumeGray::SafeDownCast(node)->GetOutput()->GetVTKData() != NULL \
+//     && vtkDataSet::SafeDownCast(mafVMEVolumeGray::SafeDownCast(node)->GetOutput()->GetVTKData())->GetPointData()->GetScalars() != NULL
+    )
+  {
+    mafVMEVolumeGray *volumeToCheck = mafVMEVolumeGray::SafeDownCast(node);
+    /* loaded volume must have the same bounds of the input volume */
+    double b[6];
+    volumeToCheck->GetOutput()->GetBounds(b);
+    for(int i = 0; i < 6; i++)
+    {
+      if(b[i] != m_CurrentVolumeBounds[i])
+      {
+        return false;
+      }
+    }
+    /* scalar range should be 0 - 255 */
+    double sr[2];
+    volumeToCheck->GetOutput()->Update();
+    volumeToCheck->GetOutput()->GetVTKData()->Update();
+    if(vtkDataSet::SafeDownCast(volumeToCheck->GetOutput()->GetVTKData())->GetPointData() != NULL && vtkDataSet::SafeDownCast(volumeToCheck->GetOutput()->GetVTKData())->GetPointData()->GetScalars() != NULL)
+    {
+      vtkDataSet::SafeDownCast(volumeToCheck->GetOutput()->GetVTKData())->GetPointData()->GetScalars()->GetRange(sr);
+      if(sr[0] < 0 || sr[1] > 255) /* scalar range could be 0-0 empty masc or 255-255 full mask */
+      {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  return false;
 }
