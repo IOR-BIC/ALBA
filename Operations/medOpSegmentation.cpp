@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2012-02-23 08:23:26 $
-Version:   $Revision: 1.1.2.36 $
+Date:      $Date: 2012-02-23 09:39:30 $
+Version:   $Revision: 1.1.2.37 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi, Alberto Losi
 ==========================================================================
 Copyright (c) 2007
@@ -2048,6 +2048,7 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
           m_AutomaticThresholdSlider->GetSubRange(&m_AutomaticThreshold,&m_AutomaticUpperThreshold);
           UpdateThresholdLabel();
           UpdateThresholdRealTimePreview();
+          UpdateSlice();
           m_View->CameraUpdate();
         }
         //Windowing
@@ -2073,7 +2074,10 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
             m_CurrentSliceIndex = hi;
           }
 
+          InitEmptyVolumeSlice();
+          UpdateThresholdRealTimePreview();
           UpdateSlice();
+          m_View->CameraUpdate();
         }
         break;
       }
@@ -4140,14 +4144,15 @@ void medOpSegmentation::UpdateThresholdRealTimePreview()
     for (int i=0;i<m_AutomaticRanges.size();i++)
     {
       if(m_CurrentSliceIndex >= m_AutomaticRanges[i].m_StartSlice && m_CurrentSliceIndex <= m_AutomaticRanges[i].m_EndSlice)
-      result = tVol->AddRange(0,1,m_AutomaticRanges[i].m_ThresholdValue,m_AutomaticRanges[i].m_UpperThresholdValue);
+        result = tVol->AddRange(0,1,m_AutomaticRanges[i].m_ThresholdValue,m_AutomaticRanges[i].m_UpperThresholdValue);
       
 //       if (result == MAF_ERROR)
 //       {
 //         return;
 //       }
     }
-    result = tVol->AddRange(0,1,m_AutomaticThreshold,m_AutomaticUpperThreshold);
+    if(tVol->GetNumberOfRanges() == 0)
+      result = tVol->AddRange(0,1,m_AutomaticThreshold,m_AutomaticUpperThreshold);
   }
   else
   {
