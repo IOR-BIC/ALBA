@@ -156,6 +156,8 @@ SET(VME_SRCS
   ../VME/mafPipeSurfaceSlice_BES.h
   ../VME/mafPipeVolumeSlice_BES.cpp
   ../VME/mafPipeVolumeSlice_BES.h
+  ../VME/medVisualPipeCollisionDetection.cpp
+  ../VME/medVisualPipeCollisionDetection.h
   ../BES_Beta/IO/mafBrickedFile.cpp
   ../BES_Beta/IO/mafBrickedFile.h
   ../BES_Beta/IO/mafBrickedFileReader.cpp
