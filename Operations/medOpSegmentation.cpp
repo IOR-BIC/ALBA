@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2012-02-22 15:46:36 $
-Version:   $Revision: 1.1.2.35 $
+Date:      $Date: 2012-02-23 08:23:26 $
+Version:   $Revision: 1.1.2.36 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi, Alberto Losi
 ==========================================================================
 Copyright (c) 2007
@@ -1177,7 +1177,7 @@ void medOpSegmentation::CreateAutoSegmentationGui()
   m_AutomaticRangeSlider = new mafGUILutSlider(currentGui,-1,wxPoint(0,0),wxSize(300,24));
   currentGui->Label("");
   currentGui->Label(_("Slice range settings:"),true);
-  m_AutomaticRangeSlider->SetListener(currentGui);
+  m_AutomaticRangeSlider->SetListener(this);
   m_AutomaticRangeSlider->SetText(1,"Z Axis");  
   m_AutomaticRangeSlider->SetRange(1,m_VolumeDimensions[2]);
   m_AutomaticRangeSlider->SetSubRange(1,m_VolumeDimensions[2]);
@@ -2051,13 +2051,29 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
           m_View->CameraUpdate();
         }
         //Windowing
-        else
+        else if(e->GetSender() == m_LutSlider)
         {
           double low, hi;
           m_LutSlider->GetSubRange(&low,&hi);
           m_ColorLUT->SetTableRange(low,hi);
           m_View->CameraUpdate();
           mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+        }
+        else if(e->GetSender() == m_AutomaticRangeSlider)
+        {
+          double low, hi;
+          m_AutomaticRangeSlider->GetSubRange(&low,&hi);
+
+          if(m_CurrentSliceIndex < low)
+          {
+            m_CurrentSliceIndex = low;
+          }
+          if(m_CurrentSliceIndex > hi)
+          {
+            m_CurrentSliceIndex = hi;
+          }
+
+          UpdateSlice();
         }
         break;
       }
