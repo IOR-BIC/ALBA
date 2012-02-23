@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2012-02-23 09:39:30 $
-Version:   $Revision: 1.1.2.37 $
+Date:      $Date: 2012-02-23 14:27:06 $
+Version:   $Revision: 1.1.2.38 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi, Alberto Losi
 ==========================================================================
 Copyright (c) 2007
@@ -3012,6 +3012,9 @@ void medOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
       {
         // get the center of the pixel
         double dummmyPixel[3] = {i * m_VolumeSpacing[0] + m_VolumeSpacing[0] / 2., j * m_VolumeSpacing[1] + m_VolumeSpacing[1] / 2.,0};
+
+        double index = i + j * m_VolumeDimensions[0] - nearestDummyIndex;
+
         if(vtkMath::Distance2BetweenPoints(dummmyPixel,dummyCenter) < radius2)
         {
           dummyIndices.push_back(i + j * m_VolumeDimensions[0] - nearestDummyIndex);
@@ -3033,14 +3036,30 @@ void medOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
       }
     }
   }
-  for(int i = 0; i < dummyIndices.size(); i++)
+//   for(int i = 0; i < dummyIndices.size(); i++)
+//   {
+//     int curIndex = dummyIndices.at(i) + nearestIndex;
+//     if(curIndex >= 0 && curIndex < numberOfPoints)
+//     {
+//       dataset->GetPointData()->GetScalars()->SetTuple1(curIndex, scalar);
+//     }
+//   }
+
+  int initialLine = int(double(nearestIndex) / m_VolumeDimensions[0]) - int(m_ManualBrushSize/2);
+  for(int i = 0; i < int(m_ManualBrushSize); i++)
   {
-    int curIndex = dummyIndices.at(i) + nearestIndex;
-    if(curIndex >= 0 && curIndex < numberOfPoints)
+    for(int j = 0; j < int(m_ManualBrushSize); j++) // all pixel in the square are on
     {
-      dataset->GetPointData()->GetScalars()->SetTuple1(curIndex, scalar);
+      int curIndex = dummyIndices.at(i + j * m_ManualBrushSize) + int(nearestIndex);
+      int realLine = int(double(curIndex) / m_VolumeDimensions[0]);
+      //mafLogMessage("----> %d  %d || %d  %d || %d || %d  %d",realLine,initialLine + j,initialLine,j, curIndex,i,j);
+      if(curIndex >= 0 && curIndex < numberOfPoints && realLine == initialLine + i)
+      {
+        dataset->GetPointData()->GetScalars()->SetTuple1(curIndex, scalar);
+      }
     }
   }
+
   dataset->GetPointData()->Update();
   dataset->Update();
   vtkMAFSmartPointer<vtkStructuredPoints> newImage;
