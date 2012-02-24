@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEVector.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-08-21 13:19:44 $
-  Version:   $Revision: 1.3.4.2 $
+  Date:      $Date: 2012-02-24 15:09:45 $
+  Version:   $Revision: 1.3.4.3 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -74,7 +74,6 @@ int mafVMEVector::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
     return mafVMEGeneric::SetData(data,t,mode);
   }
   
-  mafErrorMacro("Trying to set the wrong type of fata inside a VME Vector :"<< (data?data->GetClassName():"NULL"));
   return MAF_ERROR;
 }
 //-------------------------------------------------------------------------

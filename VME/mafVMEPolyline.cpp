@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPolyline.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-05-31 10:35:13 $
-  Version:   $Revision: 1.7.4.1 $
+  Date:      $Date: 2012-02-24 15:09:45 $
+  Version:   $Revision: 1.7.4.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -100,7 +100,6 @@ int mafVMEPolyline::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
     return Superclass::SetData(data,t,mode);
   }
   
-  mafErrorMacro("Trying to set the wrong type of fata inside a VME Polyline :"<< (data?data->GetClassName():"NULL"));
   return MAF_ERROR;
 }
 

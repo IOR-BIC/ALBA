@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEImage.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-11-15 07:57:38 $
-  Version:   $Revision: 1.3.24.1 $
+  Date:      $Date: 2012-02-24 15:09:45 $
+  Version:   $Revision: 1.3.24.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -76,7 +76,6 @@ int mafVMEImage::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
     return Superclass::SetData(data,t,mode);
   }
   
-  mafErrorMacro("Trying to set the wrong type of fata inside a VME Image :"<< (data?data->GetClassName():"NULL"));
   return MAF_ERROR;
 }
 
