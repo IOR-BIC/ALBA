@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2012-02-23 14:27:06 $
-Version:   $Revision: 1.1.2.38 $
+Date:      $Date: 2012-02-24 09:42:19 $
+Version:   $Revision: 1.1.2.39 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi, Alberto Losi
 ==========================================================================
 Copyright (c) 2007
@@ -2776,7 +2776,22 @@ void medOpSegmentation::OnLoadSegmentationEvent(mafEvent *e)
 
         m_LoadedVolumeName = m_LoadedVolume->GetName();
         m_SegmentationOperationsGui[LOAD_SEGMENTATION]->Update();
-        m_View->VmeAdd(m_LoadedVolume);
+
+        // add vme parents to the view
+
+        mafVME* parent = m_LoadedVolume;
+        std::vector<mafVME*> parents;
+        do 
+        {
+          parents.push_back(parent);
+          parent = parent->GetParent();
+        }
+        while(!parent->IsA("mafVMERoot"));
+
+        for(int p = 0; p < parents.size(); p++)
+        {
+          m_View->VmeAdd(parents.at(parents.size() - (p + 1)));
+        }
         m_View->VmeShow(m_LoadedVolume,true);
         SetTrilinearInterpolation(m_LoadedVolume);
         m_View->CameraUpdate();
