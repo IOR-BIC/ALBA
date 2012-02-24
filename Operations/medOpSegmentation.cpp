@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2012-02-24 09:42:19 $
-Version:   $Revision: 1.1.2.39 $
+Date:      $Date: 2012-02-24 10:37:06 $
+Version:   $Revision: 1.1.2.40 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi, Alberto Losi
 ==========================================================================
 Copyright (c) 2007
@@ -1466,6 +1466,13 @@ void medOpSegmentation::OnAutomaticStep()
   if(m_LoadedVolume == NULL)
   {
     m_GuiDialog->Enable(ID_BUTTON_NEXT,true);
+    m_OldAutomaticThreshold = MAXINT;
+    m_OldAutomaticUpperThreshold = MAXINT;
+
+    InitEmptyVolumeSlice();
+    UpdateThresholdRealTimePreview();
+    UpdateSlice();
+    m_View->CameraUpdate();
   }
   else
   {
@@ -2652,6 +2659,7 @@ void medOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
     }
   case ID_MANUAL_BRUSH_SIZE:
     {
+      m_ManualBrushSize = int(m_ManualBrushSize);
       m_ManualPER->SetRadius(double(m_ManualBrushSize)/2);
       UndoBrushPreview();
       m_ManualSegmentationAction = MANUAL_SEGMENTATION_SELECT;
@@ -2662,6 +2670,7 @@ void medOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
       OnBrushEvent(&dummyEvent);
       dummyPoints->Delete();
       m_View->CameraUpdate();
+      m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
       break;
     }
   case ID_MANUAL_UNDO:
