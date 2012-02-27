@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2012-02-24 10:37:06 $
-Version:   $Revision: 1.1.2.40 $
+Date:      $Date: 2012-02-27 16:19:33 $
+Version:   $Revision: 1.1.2.41 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi, Alberto Losi
 ==========================================================================
 Copyright (c) 2007
@@ -2866,8 +2866,9 @@ void medOpSegmentation::OnRefinementSegmentationEvent(mafEvent *e)
 
         m_View->VmeShow(m_RefinementVolumeMask, false);
         m_RefinementVolumeMask->SetData(newDataSet, m_Volume->GetTimeStamp());
-        SetTrilinearInterpolation(m_RefinementVolumeMask);
+        
         m_View->VmeShow(m_RefinementVolumeMask, true);
+        SetTrilinearInterpolation(m_RefinementVolumeMask);
         
 
         vtkDEL(m_RefinementUndoList[numOfChanges-1]);
@@ -2987,13 +2988,66 @@ void medOpSegmentation::UpdateWindowing()
 void medOpSegmentation::SelectBrushImage(double x, double y, double z, bool selection)
 //----------------------------------------------------------------------------
 {
+
+  // if spacing are different get the target spacing
+
+  double diffSpacingXY = abs(m_VolumeSpacing[0] - m_VolumeSpacing[1]);
+  double diffSpacingXZ = abs(m_VolumeSpacing[0] - m_VolumeSpacing[2]);
+  double diffSpacingYZ = abs(m_VolumeSpacing[1] - m_VolumeSpacing[2]);
+
+  double minDiffSpacing = min(min(diffSpacingXY,diffSpacingXZ),diffSpacingYZ);
+
+  double targetSpacing = m_VolumeSpacing[0];
+
+
   vtkDataSet *dataset = ((mafVME *)m_ManualVolumeSlice)->GetOutput()->GetVTKData();
   if(!dataset)
     return;
   
   double center[3]={x,y,z};
 
-  double numberOfPoints = m_VolumeDimensions[0] * m_VolumeDimensions[1];
+  int abscissa = 0;
+  int ordinate = 1;
+  int unused = 2;
+
+  double factors[2] = {1,m_VolumeDimensions[0]};
+  switch (m_CurrentSlicePlane)
+  {
+// 
+//     case XY:
+//       {
+// 
+//       }
+//       break;
+    case XZ:
+      {
+        abscissa = 0;
+        ordinate = 2;
+        unused = 1;
+        // y dimension = 2
+        factors[0] = 1;
+        factors[1] = m_VolumeDimensions[0] * 2;
+      }
+      break;
+    case YZ:
+      {
+        abscissa = 1;
+        ordinate = 2;
+        unused = 0;
+        // x dimension = 2
+        factors[0] = 2;
+        factors[1] = m_VolumeDimensions[1] * 2;
+      }
+      break;
+  }
+
+  double volumeDimensions[3];
+
+  volumeDimensions[abscissa] =  m_VolumeDimensions[abscissa];
+  volumeDimensions[ordinate] = m_VolumeDimensions[ordinate];
+  volumeDimensions[unused] = 2;
+   
+  double numberOfPoints = m_VolumeDimensions[abscissa] * m_VolumeDimensions[ordinate] * volumeDimensions[unused];
 
   unsigned char scalar = 0;
   if(selection)
@@ -3010,9 +3064,9 @@ void medOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
     dataset->GetPoint(i,xyz);
     //Get the center of the pixel
 
-    xyz[0] = xyz[0] + m_VolumeSpacing[0] / 2.;
-    xyz[1] = xyz[1] + m_VolumeSpacing[1] / 2.;
-    xyz[2] = z;
+    xyz[0] = xyz[0] + targetSpacing / 2.;
+    xyz[1] = xyz[1] + targetSpacing / 2.;
+    xyz[2] = xyz[2] + targetSpacing / 2.;
 
     double distance = vtkMath::Distance2BetweenPoints(xyz,center);
     if(distance < min_distance)
@@ -3022,30 +3076,35 @@ void medOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
     }
 
   }
-  int nearestDummyIndex = int(m_ManualBrushSize / 2) + (int(m_ManualBrushSize / 2))  * m_VolumeDimensions[0];
+  int nearestDummyIndex = int(m_ManualBrushSize / 2) * factors[0] + int(m_ManualBrushSize / 2) * factors[1];//int(m_ManualBrushSize / 2) + int(m_ManualBrushSize / 2) * volumeDimensions[0] + int(m_ManualBrushSize / 2) * volumeDimensions[1];
   std::vector<int> dummyIndices;
   if(m_ManualBrushShape == 0) // circle
   {
-    double radius = (double(m_ManualBrushSize) / 2. )* m_VolumeSpacing[0];
+    double radius = (double(m_ManualBrushSize) / 2. )* targetSpacing;
     double radius2 = pow(radius,2);
-    double dummyCenter[3] = {radius,radius,0};
+    double dummyCenter[3];
+    dummyCenter[abscissa] = radius;
+    dummyCenter[ordinate] = radius;
+    dummyCenter[unused] = 0;
     
     for(int i = 0; i < int(m_ManualBrushSize); i++)
     {
       for(int j = 0; j < int(m_ManualBrushSize); j++) // remove pixel that are not inside the circle
       {
         // get the center of the pixel
-        double dummmyPixel[3] = {i * m_VolumeSpacing[0] + m_VolumeSpacing[0] / 2., j * m_VolumeSpacing[1] + m_VolumeSpacing[1] / 2.,0};
+        double dummyPixel[3]; // = {i * m_VolumeSpacing[abscissa] + m_VolumeSpacing[abscissa] / 2., j * m_VolumeSpacing[ordinate] + m_VolumeSpacing[ordinate] / 2.,0};
+        dummyPixel[abscissa] = i * targetSpacing;
+        dummyPixel[ordinate] = j * targetSpacing;
+        dummyPixel[unused] = dummyCenter[unused];
+        double index = (i * factors[0] + j * factors[1] - nearestDummyIndex);
 
-        double index = i + j * m_VolumeDimensions[0] - nearestDummyIndex;
-
-        if(vtkMath::Distance2BetweenPoints(dummmyPixel,dummyCenter) < radius2)
+        if(vtkMath::Distance2BetweenPoints(dummyPixel,dummyCenter) < radius2)
         {
-          dummyIndices.push_back(i + j * m_VolumeDimensions[0] - nearestDummyIndex);
+          dummyIndices.push_back(index);
         }
         else
         {
-          dummyIndices.push_back(-(m_VolumeDimensions[0]*m_VolumeDimensions[1]) + 1);
+          dummyIndices.push_back(-(numberOfPoints + 1));
         }
       }
     }
@@ -3056,7 +3115,7 @@ void medOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
     {
       for(int j = 0; j < int(m_ManualBrushSize); j++) // all pixel in the square are on
       {
-        dummyIndices.push_back(i + j * m_VolumeDimensions[0] - nearestDummyIndex);
+        dummyIndices.push_back((i * factors[0] + j * factors[1] - nearestDummyIndex));
       }
     }
   }
@@ -3069,13 +3128,13 @@ void medOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
 //     }
 //   }
 
-  int initialLine = int(double(nearestIndex) / m_VolumeDimensions[0]) - int(m_ManualBrushSize/2);
+  int initialLine = int(double(nearestIndex) / factors[1]) - int(m_ManualBrushSize/2);
   for(int i = 0; i < int(m_ManualBrushSize); i++)
   {
     for(int j = 0; j < int(m_ManualBrushSize); j++) // all pixel in the square are on
     {
       int curIndex = dummyIndices.at(i + j * m_ManualBrushSize) + int(nearestIndex);
-      int realLine = int(double(curIndex) / m_VolumeDimensions[0]);
+      int realLine = int(double(curIndex) / factors[1]);
       //mafLogMessage("----> %d  %d || %d  %d || %d || %d  %d",realLine,initialLine + j,initialLine,j, curIndex,i,j);
       if(curIndex >= 0 && curIndex < numberOfPoints && realLine == initialLine + i)
       {
