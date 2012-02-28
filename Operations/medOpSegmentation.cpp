@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2012-02-27 16:19:33 $
-Version:   $Revision: 1.1.2.41 $
+Date:      $Date: 2012-02-28 10:27:31 $
+Version:   $Revision: 1.1.2.42 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi, Alberto Losi
 ==========================================================================
 Copyright (c) 2007
@@ -1690,10 +1690,10 @@ void medOpSegmentation::OnNextStep()
         }
         else
         {
-          mafNEW(m_ThresholdVolumeSlice);
-          InitThresholdVolumeSlice();
           mafNEW(m_EmptyVolumeSlice);
           InitEmptyVolumeSlice();
+          mafNEW(m_ThresholdVolumeSlice);
+          InitThresholdVolumeSlice();
           //next step -> AUTOMATIC_SEGMENTATION 
           OnAutomaticStep();
         }
@@ -3844,9 +3844,6 @@ void medOpSegmentation::InitThresholdVolumeSlice()
   {
     m_ThresholdVolumeSlice->ReparentTo(m_Volume->GetParent());
     m_ThresholdVolumeSlice->SetName("Threshold Volume Slice");
-    m_View->VmeAdd(m_ThresholdVolumeSlice);
-    //m_View->VmeCreatePipe(m_ThresholdVolumeSlice);
-    m_View->CameraUpdate();
 
     InitDataVolumeSlice<vtkUnsignedCharArray>(m_ThresholdVolumeSlice);
 
@@ -3854,6 +3851,11 @@ void medOpSegmentation::InitThresholdVolumeSlice()
     InitMaskColorLut(m_SegmentationColorLUT);
     m_ThresholdVolumeSlice->GetMaterial()->UpdateFromTables();
     m_ThresholdVolumeSlice->Update();
+
+    m_View->VmeAdd(m_ThresholdVolumeSlice);
+    UpdateThresholdRealTimePreview();
+    SetTrilinearInterpolation(m_ThresholdVolumeSlice);
+    m_View->CameraUpdate();
   }
 }
 
@@ -4289,10 +4291,12 @@ void medOpSegmentation::UpdateThresholdRealTimePreview()
   m_ThresholdVolumeSlice->GetMaterial()->m_ColorLut->SetTableRange(0,255);
   mmaVolumeMaterial *currentVolumeMaterial = ((mafVMEOutputVolume *)m_ThresholdVolumeSlice->GetOutput())->GetMaterial();
   currentVolumeMaterial->UpdateFromTables();
-
-  m_View->VmeShow(m_ThresholdVolumeSlice,false);
+  
+  m_ThresholdVolumeSlice->Modified();
+  m_ThresholdVolumeSlice->Update();
   m_View->VmeShow(m_ThresholdVolumeSlice,true);
-  SetTrilinearInterpolation(m_ThresholdVolumeSlice);
+  /*SetTrilinearInterpolation(m_ThresholdVolumeSlice);*/
+  
   mafDEL(tVol);
 }
 
