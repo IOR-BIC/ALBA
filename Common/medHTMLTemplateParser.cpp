@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medHTMLTemplateParser.cpp,v $
 Language:  C++
-Date:      $Date: 2012-02-15 10:35:45 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2012-02-28 16:33:05 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -129,8 +129,11 @@ void medHTMLTemplateParser::WriteOutputFile(wxString filename)
   FILE *outputFile;
   //You must call this function after parsing
   outputFile=fopen(filename.c_str(),"w");
-  fwrite(m_Output.c_str(),sizeof(char),m_Output.size(),outputFile);
-  fclose(outputFile);
+  if (outputFile)
+  {
+    fwrite(m_Output.c_str(),sizeof(char),m_Output.size(),outputFile);
+    fclose(outputFile);
+  }
 }
 
 
@@ -141,7 +144,7 @@ void medHTMLTemplateParser::Parse()
 
   int parsingPos=0;
   // Checks the consistence of the parsing tree
-  if (ConsistenceCheck())
+  if (ConsistenceCheck() && m_Template != "")
   {
     //pre-parsing (generates substitutions tables inside the blocks)
     PreParse(&m_Template,parsingPos);

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medHTMLTemplateParserBlock.cpp,v $
 Language:  C++
-Date:      $Date: 2012-02-16 14:25:22 $
-Version:   $Revision: 1.1.2.7 $
+Date:      $Date: 2012-02-28 16:33:05 $
+Version:   $Revision: 1.1.2.8 $
 Authors:   Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -929,4 +929,101 @@ void medHTMLTemplateParserBlock::SetFather( medHTMLTemplateParserBlock *father )
   else 
     m_Father=father;
 
+}
+
+wxString medHTMLTemplateParserBlock::GetVar( wxString name )
+{
+
+  //getting substitution pos
+  int pos = SubstitutionPos(&name);
+  
+  //if pos < 0 the substitution was not found
+  if (pos<0)
+  {
+    mafLogMessage("medHTMLTemplateParserBlock: Variable: '%s' not found!",name.c_str());
+    return "Error";
+  }
+
+  //we need to check the substitution type
+  else if (m_SubstitutionTable[pos].Type!=MED_HTML_SUBSTITUTION_VARIABLE)
+  {
+    //block not found
+    mafLogMessage("medHTMLTemplateParserBlock: Variable: '%s' wrong type!",name.c_str());
+    return "Error";
+  }
+  //Return the variable
+  else 
+  {
+    return m_Variables[ m_SubstitutionTable[pos].Pos ];
+  }
+
+}
+
+wxString medHTMLTemplateParserBlock::GetNthVar( wxString name, int arrayPos/*=-1*/ )
+{
+
+  
+  //getting substitution pos
+  int pos = SubstitutionPos(&name);
+
+  //if pos < 0 the substitution was not found
+  if (pos<0)
+  {
+    mafLogMessage("medHTMLTemplateParserBlock: Variable Array: '%s' not found!",name.c_str());
+    return "Error";
+  }
+
+  //we need to check the substitution type
+  else if (m_SubstitutionTable[pos].Type!=MED_HTML_SUBSTITUTION_VARIABLE_ARRAY)
+  {
+    //block not found
+    mafLogMessage("medHTMLTemplateParserBlock: Variable Array: '%s' wrong type!",name.c_str());
+    return "Error";
+  }
+
+  //Return the variable
+  else 
+  {
+    
+    int arraySize= m_VariablesArray[ m_SubstitutionTable[pos].Pos ].size();
+
+    if (arrayPos>arraySize-1)
+    {
+      //block not found
+      mafLogMessage("medHTMLTemplateParserBlock: Variable Array: '%s', there are few element in the array",name.c_str());
+      return "Error";
+    }
+    
+    //if array pos is -1 last element will be returned
+    if (arrayPos==-1)
+    {
+      arrayPos=arraySize-1;
+    }
+
+    return m_VariablesArray[ m_SubstitutionTable[pos].Pos ][arrayPos];
+  }
+
+}
+
+int medHTMLTemplateParserBlock::GetIfCondition()
+{
+  //checking block type
+  if (m_BlockType!=MED_HTML_TEMPLATE_IF)
+  {
+    mafLogMessage("HTML Template ERROR: You can get the value of if condition only on 'if' blocks");
+    return false;
+  }
+  return m_IfCondition;
+}
+
+int medHTMLTemplateParserBlock::GetNLoops()
+{
+  //checking block type
+  if (m_BlockType!=MED_HTML_TEMPLATE_LOOP)
+  {
+    mafLogMessage("HTML Template ERROR: You can get the loops number only on 'loops' blocks");
+    return -1;
+  }
+  
+  return m_LoopsNumber;
 }

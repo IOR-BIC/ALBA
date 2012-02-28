@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medHTMLTemplateParserBlock.h,v $
 Language:  C++
-Date:      $Date: 2012-02-15 10:35:45 $
-Version:   $Revision: 1.1.2.5 $
+Date:      $Date: 2012-02-28 16:33:05 $
+Version:   $Revision: 1.1.2.6 $
 Authors:   Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -106,6 +106,16 @@ public:
   /** Push the variable specified in the name string to the list of variables */
   void PushVar(wxString name, wxString varValue);
   
+  /** Return the string of the Variable 
+      used for added vars*/
+  wxString GetVar(wxString name);
+
+  /** Return the string of the Variable
+      Used for variable-arrays, if pos=-1 last pushed variable will be returned
+      used for pushed vars*/
+  wxString GetNthVar(wxString name, int arrayPos=-1);
+
+
   /** Add the Block specified in the list of Blocks*/
   void AddBlock(wxString name, int blockType);
 
@@ -123,8 +133,14 @@ public:
   /** Set the verity value for the "if" blocks*/
   void SetIfCondition(int condition);
 
+  /** Set the verity value for the "if" blocks*/
+  int GetIfCondition();
+
   /** Set the number of loops for the "if" blocks*/
   void SetNLoops(int nloops);
+
+  /** Set the number of loops for the "if" blocks*/
+  int GetNLoops();
 
 protected:
   /** Return the position of the variable in the Variable Table.

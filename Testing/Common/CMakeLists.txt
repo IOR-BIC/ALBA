@@ -34,6 +34,13 @@ ADD_TEST(mafGizmoSliceTest  ${EXECUTABLE_OUTPUT_PATH}/mafGizmoSliceTest)
 ADD_EXECUTABLE(medGizmoInteractionDebuggerTest  medGizmoInteractionDebuggerTest.h medGizmoInteractionDebuggerTest.cpp)
 ADD_TEST(medGizmoInteractionDebuggerTest   ${EXECUTABLE_OUTPUT_PATH}/medGizmoInteractionDebuggerTest )
 
+ADD_EXECUTABLE(medHTMLTemplateParserTest  medHTMLTemplateParserTest.h medHTMLTemplateParserTest.cpp)
+ADD_TEST(medHTMLTemplateParserTest   ${EXECUTABLE_OUTPUT_PATH}/medHTMLTemplateParserTest )
+
+ADD_EXECUTABLE(medHTMLTemplateParserBlockTest  medHTMLTemplateParserBlockTest.h medHTMLTemplateParserBlockTest.cpp)
+ADD_TEST(medHTMLTemplateParserBlockTest   ${EXECUTABLE_OUTPUT_PATH}/medHTMLTemplateParserBlockTest )
+
+
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
 #ENDIF (MAF_USE_WX)

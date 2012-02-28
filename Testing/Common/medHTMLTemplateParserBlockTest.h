@@ -1,9 +1,9 @@
 /*=========================================================================
 Program:   Multimod Application Framework
-Module:    $RCSfile: medHTMLTemplateParserTest.h,v $
+Module:    $RCSfile: medHTMLTemplateParserBlockTest.h,v $
 Language:  C++
-Date:      $Date: 2012-02-28 16:35:57 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2012-02-28 16:33:46 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -35,17 +35,24 @@ class medHTMLTemplateParserTest : public CPPUNIT_NS::TestFixture
 
   CPPUNIT_TEST_SUITE( medHTMLTemplateParserTest );
   CPPUNIT_TEST( TestConstructorDestuctor );
-  CPPUNIT_TEST( TestSetWriteTemplateFile );
-  CPPUNIT_TEST( TestSetGetTemplateString );
-  CPPUNIT_TEST( TestParse );
+  CPPUNIT_TEST( TestAddGetVar );
+  CPPUNIT_TEST( TestPushGetNthVar );
+  CPPUNIT_TEST( TestAddGetBlock );
+  CPPUNIT_TEST( TestPushGetNthBlock );
+  CPPUNIT_TEST( TestSetGetIfCondition );
+  CPPUNIT_TEST( TestSetGetNloop );
   CPPUNIT_TEST_SUITE_END();
 
   protected:
     
     void TestConstructorDestuctor();
-    void TestSetWriteTemplateFile();
-    void TestSetGetTemplateString();
-    void TestParse();
+    void TestAddGetVar();
+    void TestPushGetNthVar();
+    void TestAddGetBlock();
+    void TestPushGetNthBlock();
+    void TestSetGetIfCondition();
+    void TestSetGetNloop();
+     
 };
 
 
@@ -71,7 +78,6 @@ main( int argc, char* argv[] )
   // Print test in a compiler compatible format.
   CPPUNIT_NS::CompilerOutputter outputter( &result, CPPUNIT_NS::stdCOut() );
   outputter.write(); 
-
 
   return result.wasSuccessful() ? 0 : 1;
 }
