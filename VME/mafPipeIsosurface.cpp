@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeIsosurface.cpp,v $
 Language:  C++
-Date:      $Date: 2008-12-18 08:57:31 $
-Version:   $Revision: 1.24.2.2 $
+Date:      $Date: 2012-02-28 07:07:16 $
+Version:   $Revision: 1.24.2.3 $
 Authors:   Alexander Savenko  -  Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -57,8 +57,6 @@ mafPipeIsosurface::mafPipeIsosurface()
 	m_OutlineBox      = NULL;
 	m_OutlineMapper   = NULL;
 	m_ContourSlider   = NULL;
-
-	m_IsosurfaceVme   = NULL;
 
 	m_ContourValue    = 300.0;
 
@@ -238,7 +236,7 @@ void mafPipeIsosurface::UpdateFromData()
   }
 }
 //----------------------------------------------------------------------------
-void mafPipeIsosurface::ExctractIsosurface()
+mafVMESurface *mafPipeIsosurface::ExctractIsosurface()
 //----------------------------------------------------------------------------
 {
 	vtkPolyData *surface = vtkPolyData::New();
@@ -251,15 +249,21 @@ void mafPipeIsosurface::ExctractIsosurface()
     m_ExtractIsosurfaceName = name;
   }
 	
-	mafNEW(m_IsosurfaceVme);
-	m_IsosurfaceVme->SetName(m_ExtractIsosurfaceName.GetCStr());
-	m_IsosurfaceVme->SetDataByDetaching(surface,0);
+  mafVMESurface *tmp;
+  mafVMESurface *isosurfaceVme;
+	mafNEW(isosurfaceVme);
+	isosurfaceVme->SetName(m_ExtractIsosurfaceName.GetCStr());
+	isosurfaceVme->SetDataByDetaching(surface,0);
 
-	m_IsosurfaceVme->ReparentTo(m_Vme);
+	isosurfaceVme->ReparentTo(m_Vme);
 
 	surface->Delete();
   m_ExtractIsosurfaceName = "";
-	mafDEL(m_IsosurfaceVme);
+
+  tmp = isosurfaceVme;
+	mafDEL(isosurfaceVme);
+
+  return tmp;
 }
 //----------------------------------------------------------------------------
 void mafPipeIsosurface::EnableBoundingBoxVisibility(bool enable)
@@ -282,4 +286,14 @@ void mafPipeIsosurface::SetActorVisibility(int visibility)
 {
   m_Volume->SetVisibility(visibility);
   m_Volume->Modified();
+}
+//----------------------------------------------------------------------------
+void mafPipeIsosurface::SetEnableContourAnalysis( bool clean )
+//----------------------------------------------------------------------------
+{
+  if (m_ContourMapper)
+  {
+	  m_ContourMapper->SetEnableContourAnalysis(clean);
+	  m_ContourMapper->Update();
+  }
 }

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeIsosurface.h,v $
 Language:  C++
-Date:      $Date: 2011-05-25 11:52:18 $
-Version:   $Revision: 1.15.2.3 $
+Date:      $Date: 2012-02-28 07:07:16 $
+Version:   $Revision: 1.15.2.4 $
 Authors:   Alexander Savenko  -  Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -38,9 +38,12 @@ also the opacity value of the surface extracted.*/
 class MAF_EXPORT mafPipeIsosurface : public mafPipe 
 {
 public:
+  /** RTTI macro */
 	mafTypeMacro(mafPipeIsosurface, mafPipe);
 
+  /** constructor */
 	mafPipeIsosurface();
+  /** destructor */
 	virtual  ~mafPipeIsosurface();
 
 	/** process events coming from Gui */
@@ -64,13 +67,15 @@ public:
   /** return the contour value. */
   void  EnableBoundingBoxVisibility(bool enable = true);
 
-	void ExctractIsosurface();
+	mafVMESurface *ExctractIsosurface();
 
   void UpdateFromData();
 
   void SetActorVisibility(int visibility);
 
   void SetExtractIsosurfaceName(const char *name){m_ExtractIsosurfaceName = mafString(name);}
+
+  void SetEnableContourAnalysis(bool clean);
 
 	/** IDs for the GUI */
 	enum PIPE_ISOSURFACE_WIDGET_ID
@@ -90,8 +95,6 @@ public:
 protected:
   /** Create the Gui for the visual pipe that allow the user to change the pipe's parameters.*/
 	virtual mafGUI  *CreateGui();
-
-	mafVMESurface            *m_IsosurfaceVme;
 
 	vtkMAFContourVolumeMapper   *m_ContourMapper; 
 	vtkVolume                *m_Volume;
