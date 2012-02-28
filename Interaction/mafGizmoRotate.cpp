@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotate.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-11-10 16:51:28 $
-  Version:   $Revision: 1.7.2.3 $
+  Date:      $Date: 2012-02-28 07:04:27 $
+  Version:   $Revision: 1.7.2.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -55,12 +55,12 @@ mafGizmoRotate::mafGizmoRotate(mafVME* input, mafObserver *listener, bool buildG
     // create the fan and send events to this
     m_GRFan[i] = new mafGizmoRotateFan(input, this);
     m_GRFan[i]->SetAxis(i);
-	m_GRFan[i]->SetMediator(this);
+	  m_GRFan[i]->SetMediator(this);
 
     // Create mafGizmoRotateCircle and send events to the corresponding fan
     m_GRCircle[i] = new mafGizmoRotateCircle(input, m_GRFan[i]);
-	m_GRCircle[i]->SetAxis(i);
-	m_GRCircle[i]->SetMediator(this);
+	  m_GRCircle[i]->SetAxis(i);
+	  m_GRCircle[i]->SetMediator(this);
 
   }
 
@@ -273,6 +273,20 @@ void mafGizmoRotate::Show(bool show)
       m_GuiGizmoRotate->EnableWidgets(false);
     }
   }
+}
+//----------------------------------------------------------------------------
+void mafGizmoRotate::Show( bool showX, bool showY, bool showZ )
+//----------------------------------------------------------------------------
+{
+  // set visibility ivar
+  m_Visibility = showX || showY || showZ;
+
+  m_GRCircle[mafGizmoRotate::X_AXIS]->Show(showX);
+  m_GRFan[mafGizmoRotate::X_AXIS]->Show(showX);
+  m_GRCircle[mafGizmoRotate::Y_AXIS]->Show(showY);
+  m_GRFan[mafGizmoRotate::Y_AXIS]->Show(showY);
+  m_GRCircle[mafGizmoRotate::Z_AXIS]->Show(showZ);
+  m_GRFan[mafGizmoRotate::Z_AXIS]->Show(showZ);
 }
 
 //----------------------------------------------------------------------------  
