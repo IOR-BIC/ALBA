@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medHTMLTemplateParserTest.h,v $
 Language:  C++
-Date:      $Date: 2012-02-28 16:35:57 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2012-02-28 16:33:46 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -71,6 +71,8 @@ main( int argc, char* argv[] )
   // Print test in a compiler compatible format.
   CPPUNIT_NS::CompilerOutputter outputter( &result, CPPUNIT_NS::stdCOut() );
   outputter.write(); 
+
+  system("pause");
 
 
   return result.wasSuccessful() ? 0 : 1;
