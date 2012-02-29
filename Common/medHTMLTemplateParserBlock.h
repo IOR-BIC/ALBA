@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medHTMLTemplateParserBlock.h,v $
 Language:  C++
-Date:      $Date: 2012-02-28 16:33:05 $
-Version:   $Revision: 1.1.2.6 $
+Date:      $Date: 2012-02-29 11:04:27 $
+Version:   $Revision: 1.1.2.7 $
 Authors:   Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -70,6 +70,10 @@ MED_HTML_SUBSTITUTION_FORWARD_UP,
 
 class wxString;
 
+/**
+ class name: medHTMLTemplateParserBlock
+    sub-class for Template parsing used by medHTMLTemplateParser
+*/
 class MED_EXPORT medHTMLTemplateParserBlock
 {
 
