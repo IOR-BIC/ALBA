@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medHTMLTemplateParserTest.cpp,v $
 Language:  C++
-Date:      $Date: 2012-02-28 16:33:46 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2012-02-29 09:36:43 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -108,6 +108,8 @@ void medHTMLTemplateParserTest::TestSetGetTemplateString()
   //testing template reading
   cmpValue=RightString.Cmp(OutputString);
   CPPUNIT_ASSERT(cmpValue==0);
+  
+  cppDEL(testBlock);
 }
 
 //----------------------------------------------------------------------------
