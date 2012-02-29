@@ -34,6 +34,10 @@ SET(COMMON_SRCS
   ../Common/medQueryObject.h
 	../Common/mafDbg.h
 	../Common/mafDataChecksum.h
+  ../Common/medHTMLTemplateParser.cpp
+  ../Common/medHTMLTemplateParser.h
+  ../Common/medHTMLTemplateParserBlock.cpp
+  ../Common/medHTMLTemplateParserBlock.h
 	
 	../BES_Beta/vtkMAF/vtkMAFLargeDataSetCallback.cxx
   ../BES_Beta/vtkMAF/vtkMAFLargeDataSetCallback.h
