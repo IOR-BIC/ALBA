@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2012-02-28 15:15:07 $
-Version:   $Revision: 1.1.2.43 $
+Date:      $Date: 2012-03-01 09:13:43 $
+Version:   $Revision: 1.1.2.44 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi, Alberto Losi
 ==========================================================================
 Copyright (c) 2007
@@ -1862,9 +1862,11 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
       if(e->GetDouble() > m_CurrentBrushMoveEventCount)
       {
         m_CurrentBrushMoveEventCount = e->GetDouble();
+        int oldAction = m_ManualSegmentationAction;
         m_ManualSegmentationAction = MANUAL_SEGMENTATION_SELECT;
         m_LastMouseMovePointID = e->GetArg();
         OnBrushEvent(e);
+        m_ManualSegmentationAction = oldAction;
       }
 
       m_View->CameraUpdate();
@@ -2648,6 +2650,7 @@ void medOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
       else 
         m_ManualPER->SetBrushShape(SQUARE_BRUSH_SHAPE);
       UndoBrushPreview();
+      int oldAction = m_ManualSegmentationAction;
       m_ManualSegmentationAction = MANUAL_SEGMENTATION_SELECT;
       mafEvent dummyEvent;
       vtkPoints *dummyPoints = vtkPoints::New();
@@ -2656,6 +2659,7 @@ void medOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
       OnBrushEvent(&dummyEvent);
       dummyPoints->Delete();
       m_View->CameraUpdate();
+      m_ManualSegmentationAction = oldAction;
       break;
     }
   case ID_MANUAL_BRUSH_SIZE:
@@ -2663,6 +2667,7 @@ void medOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
       m_ManualBrushSize = int(m_ManualBrushSize);
       m_ManualPER->SetRadius(double(m_ManualBrushSize)/2);
       UndoBrushPreview();
+      int oldAction = m_ManualSegmentationAction;
       m_ManualSegmentationAction = MANUAL_SEGMENTATION_SELECT;
       mafEvent dummyEvent;
       vtkPoints *dummyPoints = vtkPoints::New();
@@ -2672,6 +2677,7 @@ void medOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
       dummyPoints->Delete();
       m_View->CameraUpdate();
       m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
+      m_ManualSegmentationAction = oldAction;
       break;
     }
   case ID_MANUAL_UNDO:
