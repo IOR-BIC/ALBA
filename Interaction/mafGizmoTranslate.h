@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslate.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-25 11:11:56 $
-  Version:   $Revision: 1.5.2.4 $
+  Date:      $Date: 2012-03-05 14:35:22 $
+  Version:   $Revision: 1.5.2.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -107,6 +107,10 @@ public:
   /**
   Show the gizmo*/
   void Show(bool show);
+
+  /**
+  Show the gizmo*/
+  void Show(bool showX,bool showY,bool showZ);
 
   /**
   Set/Get the gizmo pose*/

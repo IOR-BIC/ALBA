@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslate.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-11-10 16:51:28 $
-  Version:   $Revision: 1.8.2.3 $
+  Date:      $Date: 2012-03-05 14:35:22 $
+  Version:   $Revision: 1.8.2.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -351,6 +351,34 @@ void mafGizmoTranslate::Show(bool show)
     if (m_RefSysVME == m_InputVME)
     {
       m_GuiGizmoTranslate->EnableWidgets(show);
+    }
+    else
+    {
+      m_GuiGizmoTranslate->EnableWidgets(false);
+    }
+  }
+}
+//----------------------------------------------------------------------------
+void mafGizmoTranslate::Show( bool showX,bool showY,bool showZ )
+//----------------------------------------------------------------------------
+{
+  // set visibility ivar
+  m_Visibility = showX || showY || showZ;
+
+  m_GTAxis[mafGizmoTranslate::X_AXIS]->Show(showX);
+  m_GTPlane[mafGizmoTranslate::X_AXIS]->Show(showX&&showY&&showZ);
+  m_GTAxis[mafGizmoTranslate::Y_AXIS]->Show(showY);
+  m_GTPlane[mafGizmoTranslate::Y_AXIS]->Show(showX&&showY&&showZ);
+  m_GTAxis[mafGizmoTranslate::Z_AXIS]->Show(showZ);
+  m_GTPlane[mafGizmoTranslate::Z_AXIS]->Show(showX&&showY&&showZ);
+
+  if (m_BuildGUI)
+  {
+    // if auxiliary ref sys is different from vme its orientation cannot be changed
+    // so gui must not be keyable. Otherwise set gui keyability to show.
+    if (m_RefSysVME == m_InputVME)
+    {
+      m_GuiGizmoTranslate->EnableWidgets(m_Visibility);
     }
     else
     {
