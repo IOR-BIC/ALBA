@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoBoundingBox.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-25 11:26:19 $
-  Version:   $Revision: 1.5.2.2 $
+  Date:      $Date: 2012-03-05 14:33:37 $
+  Version:   $Revision: 1.5.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -86,7 +86,7 @@ public:
 
   /** Set the gizmo local pose*/
   void SetPose(mafMatrix *pose);
-	mafMatrix *GetPose(){return m_BoxGizmo->GetOutput()->GetMatrix();};
+	mafMatrix *GetPose();
 
 protected:
   /** Set gizmo color*/

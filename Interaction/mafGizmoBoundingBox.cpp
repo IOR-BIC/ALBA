@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoBoundingBox.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:47:18 $
-  Version:   $Revision: 1.8.2.1 $
+  Date:      $Date: 2012-03-05 14:33:37 $
+  Version:   $Revision: 1.8.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -187,4 +187,10 @@ void mafGizmoBoundingBox::SetBounds(double bounds[6])
 {
   m_BoxOutline->SetBounds(bounds);
   m_BoxGizmo->GetOutput()->GetVTKData()->Update();
+}
+//----------------------------------------------------------------------------
+mafMatrix * mafGizmoBoundingBox::GetPose()
+//----------------------------------------------------------------------------
+{
+  return m_BoxGizmo->GetOutput()->GetMatrix();
 }
