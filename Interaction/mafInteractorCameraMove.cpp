@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractorCameraMove.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-05-25 11:40:18 $
-  Version:   $Revision: 1.1.2.4 $
+  Date:      $Date: 2012-03-05 14:31:56 $
+  Version:   $Revision: 1.1.2.5 $
   Authors:   Paolo Quadrani & Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -155,6 +155,12 @@ void mafInteractorCameraMove::OnButtonUp(mafEventInteraction *e)
 void mafInteractorCameraMove::OnMouseMove() 
 //----------------------------------------------------------------------------
 { 
+
+  if (m_Renderer)
+  {
+	 m_Renderer->GetRenderWindow()->SetDesiredUpdateRate(15.0);
+  }
+
   switch (this->m_State) 
   {
     case MOUSE_CAMERA_ROTATE:
@@ -183,11 +189,7 @@ void mafInteractorCameraMove::OnMouseMove()
     break;
   }
 
-  if (m_Renderer)
-  {
-	  m_Renderer->GetRenderWindow()->SetDesiredUpdateRate(15.0);
-	  m_Renderer->GetRenderWindow()->Render();
-  }
+  
 }
 //----------------------------------------------------------------------------
 void mafInteractorCameraMove::OnLeftButtonDown(mafEventInteraction *e)
