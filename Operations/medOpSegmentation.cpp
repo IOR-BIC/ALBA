@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2012-03-06 10:02:10 $
-Version:   $Revision: 1.1.2.45 $
+Date:      $Date: 2012-03-06 12:53:51 $
+Version:   $Revision: 1.1.2.46 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi, Alberto Losi
 ==========================================================================
 Copyright (c) 2007
@@ -4290,7 +4290,7 @@ void medOpSegmentation::UpdateThresholdRealTimePreview()
     spVME->Update();
 
   }
-  else
+  else if(vtkRectilinearGrid::SafeDownCast(tVol->GetOutput()->GetVTKData()))
   {
     vtkRectilinearGrid *newData = vtkRectilinearGrid::SafeDownCast(tVol->GetAutomaticOutput());
     m_ThresholdVolumeSlice->SetData(newData,mafVME::SafeDownCast(m_Volume)->GetTimeStamp());
