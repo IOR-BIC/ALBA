@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2012-03-01 09:13:43 $
-Version:   $Revision: 1.1.2.44 $
+Date:      $Date: 2012-03-06 10:02:10 $
+Version:   $Revision: 1.1.2.45 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi, Alberto Losi
 ==========================================================================
 Copyright (c) 2007
@@ -1480,7 +1480,7 @@ void medOpSegmentation::OnAutomaticStep()
     m_View->VmeShow(m_ThresholdVolume,false);
 
     m_GuiDialog->Enable(ID_BUTTON_NEXT,true);
-  
+   
     if (vtkStructuredPoints::SafeDownCast(m_LoadedVolume->GetOutput()->GetVTKData()))
     {
       vtkStructuredPoints *newData = vtkStructuredPoints::SafeDownCast(m_LoadedVolume->GetOutput()->GetVTKData());
@@ -1908,6 +1908,7 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
           m_NumSliceSliderEvents = 0;
           if (m_CurrentSliceIndex != m_OldSliceIndex && m_CurrentOperation==MANUAL_SEGMENTATION)
           {
+            UndoBrushPreview();
             ApplyVolumeSliceChanges();
           }
           else if (m_CurrentOperation==AUTOMATIC_SEGMENTATION)
@@ -1933,6 +1934,7 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
           m_CurrentSliceIndex++;
         if (m_CurrentSliceIndex != m_OldSliceIndex && m_CurrentOperation==MANUAL_SEGMENTATION)
         {
+          UndoBrushPreview();
           ApplyVolumeSliceChanges();
         }
         else if (m_CurrentOperation==AUTOMATIC_SEGMENTATION)
@@ -1953,6 +1955,7 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
           m_CurrentSliceIndex--;
         if (m_CurrentOperation==MANUAL_SEGMENTATION)
         {
+          UndoBrushPreview();
           ApplyVolumeSliceChanges();
         }
         else if (m_CurrentSliceIndex != m_OldSliceIndex && m_CurrentOperation==AUTOMATIC_SEGMENTATION)
@@ -1971,6 +1974,7 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
       {
         if (m_CurrentSliceIndex != m_OldSliceIndex && m_CurrentOperation==MANUAL_SEGMENTATION)
         {
+          UndoBrushPreview();
           ApplyVolumeSliceChanges();
         }
         else if (m_CurrentOperation==AUTOMATIC_SEGMENTATION)
@@ -1990,6 +1994,7 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         m_CurrentSliceIndex = 1;
         if (m_CurrentOperation == MANUAL_SEGMENTATION)
         {
+          UndoBrushPreview();
           ApplyVolumeSliceChanges();
         }
         else if (m_CurrentOperation==AUTOMATIC_SEGMENTATION)
@@ -2759,6 +2764,7 @@ void medOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
         m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_UNDO, true);
         m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_REDO, m_ManualRedoList.size()>0);
 
+        //UndoBrushPreview();
         ApplyVolumeSliceChanges();
       }
       break;
@@ -4204,6 +4210,7 @@ bool medOpSegmentation::ResetZoom(vtkDataSet* dataset, double visbleBounds[4])
 void medOpSegmentation::CreateRealDrawnImage()
 //----------------------------------------------------------------------------
 {
+  m_ManualVolumeSlice->GetOutput()->GetVTKData()->Update();
   if(!m_RealDrawnImage)
   {
     m_RealDrawnImage = vtkUnsignedCharArray::New();
@@ -4230,10 +4237,11 @@ void medOpSegmentation::UndoBrushPreview()
 void medOpSegmentation::UpdateThresholdRealTimePreview()
 //----------------------------------------------------------------------------
 {
-  if(m_OldAutomaticThreshold == m_AutomaticThreshold && m_OldAutomaticUpperThreshold == m_AutomaticUpperThreshold && m_OldSliceIndex == m_CurrentSliceIndex)
+  if(m_OldAutomaticThreshold == m_AutomaticThreshold && m_OldAutomaticUpperThreshold == m_AutomaticUpperThreshold && m_OldSliceIndex == m_CurrentSliceIndex && m_OldSlicePlane != m_CurrentSlicePlane)
   {
     return;
   }
+  m_OldSlicePlane = m_CurrentSlicePlane;
   m_OldAutomaticThreshold = m_AutomaticThreshold;
   m_OldAutomaticUpperThreshold = m_AutomaticUpperThreshold;
   
