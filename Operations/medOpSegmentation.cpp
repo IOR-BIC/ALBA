@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2012-03-06 12:53:51 $
-Version:   $Revision: 1.1.2.46 $
+Date:      $Date: 2012-03-07 12:47:42 $
+Version:   $Revision: 1.1.2.47 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi, Alberto Losi
 ==========================================================================
 Copyright (c) 2007
@@ -1473,6 +1473,7 @@ void medOpSegmentation::OnAutomaticStep()
     UpdateThresholdRealTimePreview();
     SetTrilinearInterpolation(m_ThresholdVolumeSlice);
     UpdateSlice();
+    m_View->ChangeView(m_CurrentSlicePlane);
     m_View->CameraUpdate();
   }
   else
@@ -1566,15 +1567,22 @@ void medOpSegmentation::OnManualStep()
   m_GuiDialog->Enable(ID_MANUAL_SEGMENTATION,true);
   m_GuiDialog->Update();
   //logic stuff
-
   UpdateVolumeSlice();
   m_View->VmeShow(m_ManualVolumeSlice, true);
   SetTrilinearInterpolation(m_ManualVolumeSlice);
 
-  CreateRealDrawnImage();
   m_GuiDialog->Enable(ID_BUTTON_NEXT,true);
   m_CurrentBrushMoveEventCount = 0;
 
+
+  UndoBrushPreview();
+  ApplyVolumeSliceChanges();
+
+  UpdateSlice();
+
+  CreateRealDrawnImage();
+
+  m_View->ChangeView(m_CurrentSlicePlane);
   m_View->CameraUpdate();
 }
 //------------------------------------------------------------------------
@@ -1640,6 +1648,8 @@ void medOpSegmentation::OnRefinementStep()
   m_View->VmeShow(m_RefinementVolumeMask,true);
   SetTrilinearInterpolation(m_RefinementVolumeMask);
 
+  UpdateSlice();
+  m_View->ChangeView(m_CurrentSlicePlane);
   m_View->CameraUpdate();
 }
 
@@ -1650,6 +1660,10 @@ void medOpSegmentation::OnLoadStep()
   m_GuiDialog->Enable(ID_LOAD_SEGMENTATION,true);
   m_GuiDialog->Enable(ID_BUTTON_NEXT,true);
   m_GuiDialog->Enable(ID_BUTTON_PREV,false);
+
+  UpdateSlice();
+  m_View->ChangeView(m_CurrentSlicePlane);
+  m_View->CameraUpdate();
 }
 
 //------------------------------------------------------------------------
@@ -1776,9 +1790,9 @@ void medOpSegmentation::OnPreviousStep()
         m_SegmentationOperationsRollOut[m_CurrentOperation]->RollOut(false);
         m_CurrentOperation = AUTOMATIC_SEGMENTATION;
         //prev step -> LOAD_SEGMENTATION
-        OnLoadStep();
         m_View->VmeShow(m_LoadedVolume,true);
         SetTrilinearInterpolation(m_LoadedVolume);
+        OnLoadStep();
         m_View->CameraUpdate();
       }
       else
@@ -2816,6 +2830,9 @@ void medOpSegmentation::OnLoadSegmentationEvent(mafEvent *e)
         }
         m_View->VmeShow(m_LoadedVolume,true);
         SetTrilinearInterpolation(m_LoadedVolume);
+
+        UpdateSlice();
+        m_View->ChangeView(m_CurrentSlicePlane);
         m_View->CameraUpdate();
       }
     }
