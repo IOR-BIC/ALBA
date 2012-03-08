@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2012-03-08 09:42:01 $
-Version:   $Revision: 1.1.2.49 $
+Date:      $Date: 2012-03-08 10:42:04 $
+Version:   $Revision: 1.1.2.50 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi, Alberto Losi
 ==========================================================================
 Copyright (c) 2007
@@ -1800,7 +1800,6 @@ void medOpSegmentation::OnPreviousStep()
       {
         //prev step -> AUTOMATIC_SEGMENTATION
         OnAutomaticStepExit();
-        InitThresholdVolumeSlice();
         mafNEW(m_EmptyVolumeSlice);
         InitEmptyVolumeSlice();
         OnAutomaticStep();
@@ -3884,6 +3883,8 @@ void medOpSegmentation::InitThresholdVolumeSlice()
     m_ThresholdVolumeSlice->Update();
 
     m_View->VmeAdd(m_ThresholdVolumeSlice);
+    m_View->VmeShow(m_ThresholdVolumeSlice,false);
+    m_OldSliceIndex = -1;
     UpdateThresholdRealTimePreview();
     SetTrilinearInterpolation(m_ThresholdVolumeSlice);
     m_View->CameraUpdate();
