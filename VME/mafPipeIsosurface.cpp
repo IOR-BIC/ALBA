@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeIsosurface.cpp,v $
 Language:  C++
-Date:      $Date: 2012-02-28 07:07:16 $
-Version:   $Revision: 1.24.2.3 $
+Date:      $Date: 2012-03-08 13:03:50 $
+Version:   $Revision: 1.24.2.4 $
 Authors:   Alexander Savenko  -  Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -236,7 +236,7 @@ void mafPipeIsosurface::UpdateFromData()
   }
 }
 //----------------------------------------------------------------------------
-mafVMESurface *mafPipeIsosurface::ExctractIsosurface()
+void mafPipeIsosurface::ExctractIsosurface(mafVMESurface *isoSurface /* = NULL */)
 //----------------------------------------------------------------------------
 {
 	vtkPolyData *surface = vtkPolyData::New();
@@ -249,21 +249,17 @@ mafVMESurface *mafPipeIsosurface::ExctractIsosurface()
     m_ExtractIsosurfaceName = name;
   }
 	
-  mafVMESurface *tmp;
-  mafVMESurface *isosurfaceVme;
-	mafNEW(isosurfaceVme);
-	isosurfaceVme->SetName(m_ExtractIsosurfaceName.GetCStr());
-	isosurfaceVme->SetDataByDetaching(surface,0);
 
-	isosurfaceVme->ReparentTo(m_Vme);
+	if (isoSurface)
+	{
+		isoSurface->SetName(m_ExtractIsosurfaceName.GetCStr());
+		isoSurface->SetData(surface,0);
+	
+		isoSurface->ReparentTo(m_Vme);
+	}
 
 	surface->Delete();
   m_ExtractIsosurfaceName = "";
-
-  tmp = isosurfaceVme;
-	mafDEL(isosurfaceVme);
-
-  return tmp;
 }
 //----------------------------------------------------------------------------
 void mafPipeIsosurface::EnableBoundingBoxVisibility(bool enable)
