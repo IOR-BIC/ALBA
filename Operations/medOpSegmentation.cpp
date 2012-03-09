@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2012-03-08 10:42:04 $
-Version:   $Revision: 1.1.2.50 $
+Date:      $Date: 2012-03-09 11:02:49 $
+Version:   $Revision: 1.1.2.51 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi, Alberto Losi
 ==========================================================================
 Copyright (c) 2007
@@ -3027,7 +3027,7 @@ void medOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
 
   double minDiffSpacing = min(min(diffSpacingXY,diffSpacingXZ),diffSpacingYZ);
 
-  double targetSpacing = m_VolumeSpacing[0];
+  double targetSpacing = max(m_VolumeSpacing[0],m_VolumeSpacing[1]);
 
 
   vtkDataSet *dataset = ((mafVME *)m_ManualVolumeSlice)->GetOutput()->GetVTKData();
@@ -3086,7 +3086,7 @@ void medOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
   }
 
   double min_distance = MAXDOUBLE;
-  double nearestIndex = -1;
+  int nearestIndex = -1;
   //get the nearest dataset point
   for (int i=0;i<numberOfPoints;i++)
   {
@@ -3094,23 +3094,50 @@ void medOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
     dataset->GetPoint(i,xyz);
     //Get the center of the pixel
 
-    xyz[0] = xyz[0] + targetSpacing / 2.;
-    xyz[1] = xyz[1] + targetSpacing / 2.;
-    xyz[2] = xyz[2] + targetSpacing / 2.;
+    xyz[0] = xyz[0] + (targetSpacing / 2.) - (targetSpacing * .0001);
+    xyz[1] = xyz[1] + (targetSpacing / 2.) - (targetSpacing * .0001);
+    xyz[2] = xyz[2] + (targetSpacing / 2.) - (targetSpacing * .0001);
 
     double distance = vtkMath::Distance2BetweenPoints(xyz,center);
-    if(distance < min_distance)
+    if(distance <= min_distance)
     {
       nearestIndex = i;
       min_distance = distance;
     }
 
   }
+//   mafLogMessage(">>>> nearest is %d",nearestIndex);
+//   mafLogMessage(">>>> mindist is %f",min_distance);
+// 
+//   double xyz[3];
+//   dataset->GetPoint(nearestIndex-1,xyz);
+//   //Get the center of the pixel
+// 
+//   xyz[0] = xyz[0] + (targetSpacing / 2.) - (targetSpacing * .1);
+//   xyz[1] = xyz[1] + (targetSpacing / 2.) - (targetSpacing * .1);
+//   xyz[2] = xyz[2] + (targetSpacing / 2.) - (targetSpacing * .1);
+// 
+//   double prev_distance = vtkMath::Distance2BetweenPoints(xyz,center);
+// 
+//   dataset->GetPoint(nearestIndex+1,xyz);
+//   //Get the center of the pixel
+// 
+//   xyz[0] = xyz[0] + (targetSpacing / 2.) - (targetSpacing * .0001);
+//   xyz[1] = xyz[1] + (targetSpacing / 2.) - (targetSpacing * .0001);
+//   xyz[2] = xyz[2] + (targetSpacing / 2.) - (targetSpacing * .0001);
+// 
+//   double next_distance = vtkMath::Distance2BetweenPoints(xyz,center);
+// 
+//   mafLogMessage(">>>> prevdis is %f",prev_distance);
+//   mafLogMessage(">>>> nextdis is %f",next_distance);
+//   mafLogMessage(">>>> prevdis is %f",prev_distance);
+//   mafLogMessage("-----------------------------------");
+
   int nearestDummyIndex = int(m_ManualBrushSize / 2) * factors[0] + int(m_ManualBrushSize / 2) * factors[1];//int(m_ManualBrushSize / 2) + int(m_ManualBrushSize / 2) * volumeDimensions[0] + int(m_ManualBrushSize / 2) * volumeDimensions[1];
   std::vector<int> dummyIndices;
   if(m_ManualBrushShape == 0) // circle
   {
-    double radius = (double(m_ManualBrushSize) / 2. )* targetSpacing;
+    double radius = (double(m_ManualBrushSize))* targetSpacing;
     double radius2 = pow(radius,2);
     double dummyCenter[3];
     dummyCenter[abscissa] = radius;
