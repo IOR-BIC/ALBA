@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2012-03-12 10:11:04 $
-Version:   $Revision: 1.1.2.53 $
+Date:      $Date: 2012-03-12 14:37:48 $
+Version:   $Revision: 1.1.2.54 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi, Alberto Losi
 ==========================================================================
 Copyright (c) 2007
@@ -369,7 +369,7 @@ void medOpSegmentation::OpDo()
     case  REFINEMENT_SEGMENTATION:
     case  LOAD_SEGMENTATION:
     {
-      m_OutputVolume->DeepCopy(m_RefinementVolumeMask);
+      m_OutputVolume->DeepCopy(m_LoadedVolume);
     }
     break;
   }
@@ -679,6 +679,11 @@ void medOpSegmentation::DeleteOpDialog()
   {
     m_View->VmeShow(m_EmptyVolumeSlice,false);
     m_View->VmeRemove(m_EmptyVolumeSlice);
+  }
+  if(m_LoadedVolume)
+  {
+    m_View->VmeShow(m_LoadedVolume,false);
+    m_View->VmeRemove(m_LoadedVolume);
   }
 
   m_Volume->ReparentTo(m_OldVolumeParent);
@@ -3117,7 +3122,7 @@ void medOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
   std::vector<int> dummyIndices;
   if(m_ManualBrushShape == 0) // circle
   {
-    double radius = (double(m_ManualBrushSize / 2.))* targetSpacing;
+    double radius = (double((m_ManualBrushSize + 1) / 2.))* targetSpacing;
     double radius2 = pow(radius,2);
     double dummyCenter[3];
     dummyCenter[abscissa] = radius;
@@ -4345,7 +4350,6 @@ void medOpSegmentation::UpdateThresholdRealTimePreview()
 bool medOpSegmentation::SegmentedVolumeAccept(mafNode* node)
 //----------------------------------------------------------------------------
 {
-  
   if(node != NULL  \
     && node->IsMAFType(mafVMEVolumeGray) \
     && m_CurrentVolumeParametersInitialized \
@@ -4355,6 +4359,7 @@ bool medOpSegmentation::SegmentedVolumeAccept(mafNode* node)
     )
   {
     mafVMEVolumeGray *volumeToCheck = mafVMEVolumeGray::SafeDownCast(node);
+    volumeToCheck->Update();
     /* loaded volume must have the same bounds of the input volume */
     double b[6];
     volumeToCheck->GetOutput()->GetBounds(b);
