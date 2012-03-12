@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2012-03-09 13:39:57 $
-Version:   $Revision: 1.1.2.52 $
+Date:      $Date: 2012-03-12 10:11:04 $
+Version:   $Revision: 1.1.2.53 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi, Alberto Losi
 ==========================================================================
 Copyright (c) 2007
@@ -3027,7 +3027,7 @@ void medOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
 
   double minDiffSpacing = min(min(diffSpacingXY,diffSpacingXZ),diffSpacingYZ);
 
-  double targetSpacing = max(m_VolumeSpacing[0],m_VolumeSpacing[1]);
+  double targetSpacing = max(max(m_VolumeSpacing[0],m_VolumeSpacing[1]),m_VolumeSpacing[2]);
 
 
   vtkDataSet *dataset = ((mafVME *)m_ManualVolumeSlice)->GetOutput()->GetVTKData();
@@ -3093,9 +3093,9 @@ void medOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
     double xyz[3];
     dataset->GetPoint(i,xyz);
     //double distance = vtkMath::Distance2BetweenPoints(xyz,center);
-    if(center[0] >= xyz[0] && center[0] <= xyz[0] + m_VolumeSpacing[0] \
-        && center[1] >= xyz[1] && center[1] <= xyz[1] + m_VolumeSpacing[1] \
-        && center[2] >= xyz[2] && center[2] <= xyz[2] + m_VolumeSpacing[2] \
+    if(center[0] >= xyz[0] && center[0] < xyz[0] + m_VolumeSpacing[0] \
+        && center[1] >= xyz[1] && center[1] < xyz[1] + m_VolumeSpacing[1] \
+        && center[2] >= xyz[2] && center[2] < xyz[2] + m_VolumeSpacing[2] \
         /*&& nearestIndex == -1*/)
     {
       xyz[0] = xyz[0] +  m_VolumeSpacing[0];
@@ -3117,7 +3117,7 @@ void medOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
   std::vector<int> dummyIndices;
   if(m_ManualBrushShape == 0) // circle
   {
-    double radius = (double(m_ManualBrushSize))* targetSpacing;
+    double radius = (double(m_ManualBrushSize / 2.))* targetSpacing;
     double radius2 = pow(radius,2);
     double dummyCenter[3];
     dummyCenter[abscissa] = radius;
@@ -3135,7 +3135,7 @@ void medOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
         dummyPixel[unused] = dummyCenter[unused];
         double index = (i * factors[0] + j * factors[1] - nearestDummyIndex);
 
-        if(vtkMath::Distance2BetweenPoints(dummyPixel,dummyCenter) < radius2)
+        if(vtkMath::Distance2BetweenPoints(dummyPixel,dummyCenter) < radius2 || index == 0)
         {
           dummyIndices.push_back(index);
         }
