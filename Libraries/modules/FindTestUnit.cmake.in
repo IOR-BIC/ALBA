@@ -1,0 +1,91 @@
+#
+# Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
+# Module:    $RCSfile: FindTestUnit.cmake.in,v $
+# Language:  CMake 1.2
+# Date:      $Date: 2004-08-25 13:44:27 $
+# Version:   $Revision: 1.1 $
+#
+# Description:
+# This module finds the location of the TestUnit include and library paths 
+#
+# This module defines
+#
+# TestUnit_SOURCE_PATH - where is the source tree (only defined if sources are provided)
+# TestUnit_BINARY_PATH - where is the binary tree (only defined if sources are provided)
+# USE_PRECOMPILED_TestUnit - true if a precompiled version of the binaries is provided
+# TestUnit_FOUND - Whether TestUnit was found.  If this is true, the other variables are OK
+
+#MESSAGE("FindTestUnit: SOF")
+IF (NOT MFL_BINARY_PATH)
+  IF (MFL_BINARY_DIR)
+    SET (MFL_BINARY_PATH ${MFL_BINARY_DIR})
+  ENDIF (MFL_BINARY_DIR)
+ENDIF (NOT MFL_BINARY_PATH)
+
+IF (NOT MFL_SOURCE_PATH)
+  IF (MFL_SOURCE_DIR)
+    SET (MFL_SOURCE_PATH ${MFL_SOURCE_DIR})
+  ENDIF (MFL_SOURCE_DIR)
+ENDIF (NOT MFL_SOURCE_PATH)
+
+
+IF (MFL_SOURCE_PATH)
+  FIND_PATH(TestUnit_SOURCE_PATH UseTestUnit.cmake.in ${MFL_SOURCE_PATH}/TestUnit)
+  
+  IF (TestUnit_SOURCE_PATH)
+    #MESSAGE("FindTestUnit: Found TestUnit sources, setting TestUnit_BINARY_PATH to$MFL_BINARY_PATH/TestUnit")
+    #FIND_PATH(TestUnit_BINARY_PATH UseTestUnit.cmake ${MFL_BINARY_PATH}/TestUnit)
+    SET (TestUnit_BINARY_PATH ${MFL_BINARY_PATH}/TestUnit)
+    
+    FIND_FILE(USE_TestUnit_FILE UseTestUnit.cmake.in ${TestUnit_SOURCE_PATH})
+  ELSE (TestUnit_SOURCE_PATH)
+    #MESSAGE("FindTestUnit: TestUnit sources not found")
+    # searching for precompiled binaries
+    FIND_PATH(TestUnit_BINARY_PATH UseTestUnit.cmake ${MFL_SOURCE_PATH}/TestUnit)
+    IF (TestUnit_BINARY_PATH)
+      #MESSAGE ("FindTestUnit: Found TestUnit precompiled binaries inside MFL source tree.")
+      SET (USE_PRECOMPILED_TestUnit 1 CACHE INTERNAL "Using TestUnit precompiled binaries")
+      SET (TestUnit_LIBRARY_PATH  ${TestUnit_BINARY_PATH}/lib CACHE INTERNAL "Path to TestUnit precompiled libraries")
+      
+      FIND_FILE(USE_TestUnit_FILE UseTestUnit.cmake ${TestUnit_BINARY_PATH})
+    
+    ENDIF (TestUnit_BINARY_PATH)
+  ENDIF (TestUnit_SOURCE_PATH)
+  
+ELSE (MFL_SOURCE_PATH)
+  MESSAGE ("UseTestUnit: Searching TestUnit outside MFL source tree not supported.")
+  # If not built within MAF project try standard places
+  FIND_PATH(TestUnit_BINARY_PATH UseTestUnit.cmake
+      [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild1]
+      [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild2]
+      [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild3]
+      [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild4]
+      [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild5]
+      [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild6]
+      [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild7]
+      [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild8]
+      [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild9]
+      [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild10]
+      )
+  IF (TestUnit_BINARY_PATH)
+    MESSAGE ("UseTestUnit: Found TestUnit precompiled binaries outside MFL source tree.")
+    SET (USE_PRECOMPILED_TestUnit 1 CACHE INTERNAL "Using TestUnit installed binaries")
+    SET (TestUnit_LIBRARY_PATH  ${TestUnit_BINARY_PATH}/lib CACHE INTERNAL "Path to TestUnit precompiled libraries")
+    
+    FIND_FILE(USE_TestUnit_FILE UseTestUnit.cmake ${TestUnit_BINARY_PATH})
+  ENDIF (TestUnit_BINARY_PATH)
+ENDIF (MFL_SOURCE_PATH)
+
+IF (USE_TestUnit_FILE)
+  SET (TestUnit_FOUND 1)
+ELSE (USE_TestUnit_FILE)
+  SET (TestUnit_FOUND 0)  
+ENDIF (USE_TestUnit_FILE) 
+
+MARK_AS_ADVANCED (
+  TestUnit_BINARY_PATH
+  TestUnit_SOURCE_PATH
+  USE_TestUnit_FILE
+  )
+  
+#MESSAGE("FindTestUnit: EOF")

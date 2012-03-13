@@ -1,0 +1,94 @@
+#
+# Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
+# Module:    $RCSfile: FindVCollide.cmake.in,v $
+# Language:  CMake 1.2
+# Date:      $Date: 2004-08-25 13:44:27 $
+# Version:   $Revision: 1.1 $
+#
+# Description:
+# This module finds the location of the VCollide include and library paths 
+# It works if included from within the MFL build tree or if FindMFL is called before this one
+#
+# This module defines
+#
+# VCOLLIDE_SOURCE_PATH - where is the source tree (only defined if sources are provided)
+# VCOLLIDE_BINARY_PATH - where is the binary tree (only defined if sources are provided)
+# USE_PRECOMPILED_VCOLLIDE - true if a precompiled version of the binaries is provided
+# VCOLLIDE_FOUND - Whether VCollide was found.  If this is true, the other variables are OK
+
+#MESSAGE("FindVCollide: SOF")
+IF (NOT MFL_BINARY_PATH)
+  IF (MFL_BINARY_DIR)
+    SET (MFL_BINARY_PATH ${MFL_BINARY_DIR})
+  ENDIF (MFL_BINARY_DIR)
+ENDIF (NOT MFL_BINARY_PATH)
+
+IF (NOT MFL_SOURCE_PATH)
+  IF (MFL_SOURCE_DIR)
+    SET (MFL_SOURCE_PATH ${MFL_SOURCE_DIR})
+  ENDIF (MFL_SOURCE_DIR)
+ENDIF (NOT MFL_SOURCE_PATH)
+
+
+IF (MFL_SOURCE_PATH)
+  FIND_PATH(VCOLLIDE_SOURCE_PATH UseVCollide.cmake.in ${MFL_SOURCE_PATH}/VCollide20)
+  
+  IF (VCOLLIDE_SOURCE_PATH)
+    #MESSAGE("FindVCollide: Found VCollide sources, setting VCOLLIDE_BINARY_PATH to$MFL_BINARY_PATH/VCollide20")
+    #FIND_PATH(VCOLLIDE_BINARY_PATH UseVCollide.cmake ${MFL_BINARY_PATH}/VCollide20)
+    SET (VCOLLIDE_BINARY_PATH ${MFL_BINARY_PATH}/VCollide20)
+    
+    FIND_FILE(USE_VCOLLIDE_FILE UseVCollide.cmake.in ${VCOLLIDE_SOURCE_PATH})
+  ELSE (VCOLLIDE_SOURCE_PATH)
+    #MESSAGE("FindVCollide: VCollide sources not found")
+    # searching for precompiled binaries
+    FIND_PATH(VCOLLIDE_BINARY_PATH UseVCollide.cmake ${MFL_SOURCE_PATH}/VCollide20)
+    IF (VCOLLIDE_BINARY_PATH)
+      #MESSAGE ("FindVCollide: Found VCollide precompiled binaries inside MFL source tree.")
+      SET (USE_PRECOMPILED_VCOLLIDE 1 CACHE INTERNAL "Using VCollide precompiled binaries")
+      SET (VCOLLIDE_LIBRARY_PATH  ${VCOLLIDE_BINARY_PATH}/lib CACHE INTERNAL "Path to VCollide precompiled libraries")
+      
+      FIND_FILE(USE_VCOLLIDE_FILE UseVCollide.cmake ${VCOLLIDE_BINARY_PATH})
+    
+    ENDIF (VCOLLIDE_BINARY_PATH)
+  ENDIF (VCOLLIDE_SOURCE_PATH)
+  
+ELSE (MFL_SOURCE_PATH)
+  MESSAGE ("UseVCollide: Searching VCollide outside MFL source tree not supported.")
+  # If not built within MAF project try standard places
+  FIND_PATH(VCOLLIDE_BINARY_PATH UseVCollide.cmake
+      [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild1]
+      [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild2]
+      [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild3]
+      [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild4]
+      [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild5]
+      [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild6]
+      [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild7]
+      [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild8]
+      [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild9]
+      [HKEY_CURRENT_USER\\Software\\Kitware\\CMakeSetup\\Settings\\StartPath;WhereBuild10]
+      )
+  IF (VCOLLIDE_BINARY_PATH)
+    MESSAGE ("UseVCollide: Found VCollide precompiled binaries outside MFL source tree.")
+    SET (USE_PRECOMPILED_VCOLLIDE 1 CACHE INTERNAL "Using VCollide installed binaries")
+    SET (VCOLLIDE_LIBRARY_PATH  ${VCOLLIDE_BINARY_PATH}/lib CACHE INTERNAL "Path to VCollide precompiled libraries")
+    
+    FIND_FILE(USE_VCOLLIDE_FILE UseVCollide.cmake ${VCOLLIDE_BINARY_PATH})
+    
+  
+  ENDIF (VCOLLIDE_BINARY_PATH)
+ENDIF (MFL_SOURCE_PATH)
+
+IF (USE_VCOLLIDE_FILE)
+  SET (VCOLLIDE_FOUND 1)
+ELSE (USE_VCOLLIDE_FILE)
+  SET (VCOLLIDE_FOUND 0)  
+ENDIF (USE_VCOLLIDE_FILE) 
+
+MARK_AS_ADVANCED (
+  VCOLLIDE_BINARY_PATH
+  VCOLLIDE_SOURCE_PATH
+  USE_VCOLLIDE_FILE
+  )
+  
+#MESSAGE("FindVCollide: EOF")

@@ -1,0 +1,27 @@
+#
+# Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
+# Module:    $RCSfile: FindVTK.cmake.in,v $
+# Language:  CMake 1.2
+# Date:      $Date: 2004-10-18 07:42:55 $
+# Version:   $Revision: 1.3 $
+#
+# Description:
+# This module finds the location of the VTK source and binary paths. It
+# first searches for it inside the MAF tree, otherwise it uses the standard
+# CMAKE FindVTK module 
+#
+# This module defines
+# VTK_DIR - where is the VTK binary tree
+# also defines all variables set by standard FindVTK.cmake module
+
+#MESSAGE ("FindVTK: SOF")
+# try to setup legacy search path for VTK
+FIND_PATH(VTK_DIR UseVTK.cmake "${MFL_BINARY_DIR}/VTK/Build")
+
+INCLUDE ("${CMAKE_ROOT}/Modules/FindVTK.cmake")
+
+#MARK_AS_ADVANCED (
+#  VTK_DIR
+#  )
+
+#MESSAGE ("FindVTK: EOF")

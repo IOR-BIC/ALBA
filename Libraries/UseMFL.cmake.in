@@ -1,0 +1,139 @@
+#
+# Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
+# Module:    $RCSfile: UseMFL.cmake.in,v $
+# Language:  CMake 1.2
+# Date:      $Date: 2007-03-21 14:03:33 $
+# Version:   $Revision: 1.24 $
+#
+# Description:
+# This module add the MFL include paths to a project
+# It should be included after the FindMFL module. It works
+# also if included from within the MFL build tree
+#
+
+SET(MAF_USE_VTK @MAF_USE_VTK@)
+SET(MAF_USE_ITK @MAF_USE_ITK@)
+SET(MAF_USE_WX @MAF_USE_WX@)
+SET(MAF_USE_VCOLLIDE @MAF_USE_VCOLLIDE@)
+SET(MAF_USE_XercesC @MAF_USE_XercesC@)
+SET(MAF_USE_CURL @MAF_USE_CURL@)
+SET(MAF_USE_CRYPTO @MAF_USE_CRYPTO@)
+
+# path to MFL binary directory
+SET (MFL_BINARY_PATH @MFL_BINARY_DIR@)
+SET (MFL_SOURCE_PATH @MFL_SOURCE_DIR@)
+
+#
+# VTK library
+#
+IF (MAF_USE_VTK)
+  INCLUDE (@MFL_BINARY_DIR@/modules/FindVTK.cmake)
+  IF (VTK_FOUND)
+    MESSAGE(STATUS "USE_MFL: Usining VTK library: ${VTK_USE_FILE}")
+    INCLUDE(${VTK_USE_FILE})
+  ELSE (VTK_FOUND)
+    MESSAGE(FATAL_ERROR "USE_MFL: Cannot find required VTK library, cannot build!")
+  ENDIF (VTK_FOUND)
+ENDIF (MAF_USE_VTK)
+  
+#
+# XercesC library
+#
+IF (MAF_USE_XercesC)
+  SET (XercesC_POSSIBLE_ROOT_PATHS @MFL_BINARY_DIR@/XercesC/Build @MFL_SOURCE_DIR@/XercesC/Sources)
+  FIND_FILE(XercesC_USE_FILE UseXercesC.cmake ${XercesC_POSSIBLE_ROOT_PATHS})
+  FIND_PATH(XercesC_BINARY_PATH UseXercesC.cmake ${XercesC_POSSIBLE_ROOT_PATHS})
+  IF (XercesC_USE_FILE)
+    INCLUDE (${XercesC_USE_FILE}) # currently only local library is supported
+  ENDIF (XercesC_USE_FILE)
+ENDIF (MAF_USE_XercesC)
+
+#
+# cURL library
+#
+IF (MAF_USE_CURL)
+  SET (CURL_POSSIBLE_ROOT_PATHS @MFL_BINARY_DIR@/CURL/Build @MFL_SOURCE_DIR@/CURL/Sources @MFL_BINARY_DIR@/CURL)
+  FIND_FILE(CURL_USE_FILE UseCurl.cmake ${CURL_POSSIBLE_ROOT_PATHS})
+  FIND_PATH(CURL_BINARY_PATH UseCurl.cmake ${CURL_POSSIBLE_ROOT_PATHS})
+  IF (CURL_USE_FILE)
+    INCLUDE (${CURL_USE_FILE}) # currently only local library is supported
+  IF(NOT WIN32)
+    EXEC_PROGRAM("pkg-config" ARGS "openssl --libs" OUTPUT_VARIABLE CURL_OPENSSL_LIB RETURN_VALUE RET)
+    IF(RET)
+      MESSAGE(${CURL_OPENSSL_LIB})
+    ELSE(RET)
+      SET(CMAKE_EXE_LINKER_FLAGS ${CURL_OPENSSL_LIB} CACHE STRING "" FORCE)
+    ENDIF(RET)
+  ENDIF(NOT WIN32)
+  ENDIF (CURL_USE_FILE)
+ENDIF (MAF_USE_CURL)
+
+#
+# wxWindows library
+#
+IF (MAF_USE_WX)
+  SET (WXWINDOWS_POSSIBLE_ROOT_PATHS @MFL_BINARY_DIR@/wxWin/Build @MFL_SOURCE_DIR@/wxWin/Sources)
+#2  FIND_FILE(WX_USE_FILE UseWX.cmake ${WXWINDOWS_POSSIBLE_ROOT_PATHS})
+#2  FIND_PATH(WX_BINARY_PATH UseWX.cmake ${WXWINDOWS_POSSIBLE_ROOT_PATHS})
+  
+  FIND_FILE(WX_USE_FILE wxUse.cmake ${WXWINDOWS_POSSIBLE_ROOT_PATHS})
+  FIND_PATH(WX_BINARY_PATH wxUse.cmake ${WXWINDOWS_POSSIBLE_ROOT_PATHS})
+  
+  IF (WIN32)   
+    SET (WXWINDOWS_DEFINITIONS "${WXWINDOWS_DEFINITIONS} -D__WXMSW__")
+  ENDIF (WIN32)
+  IF (WX_USE_FILE)
+    INCLUDE (${WX_USE_FILE})
+#2  ELSE (WX_USE_FILE)
+#2    INCLUDE ("${CMAKE_ROOT}/Modules/UsewxWidgets.cmake")
+  ENDIF (WX_USE_FILE)
+ENDIF (MAF_USE_WX)
+
+#
+# ITK library
+#
+IF (MAF_USE_ITK)
+  INCLUDE (@MFL_BINARY_DIR@/modules/FindITK.cmake)
+  IF (ITK_FOUND)
+    MESSAGE(STATUS "USE_MFL: Usining ITK library: ${ITK_USE_FILE}")
+    INCLUDE(${ITK_USE_FILE})
+    LINK_DIRECTORIES(${ITK_LIBRARY_DIRS})
+    LINK_LIBRARIES(${ITK_LIBRARIES})
+  ELSE (ITK_FOUND)
+    MESSAGE(FATAL_ERROR "USE_MFL: Cannot find required ITK library, cannot build!")
+  ENDIF (ITK_FOUND)
+ENDIF (MAF_USE_ITK)
+
+#
+# CRYPTO library
+#
+IF (MAF_USE_CRYPTO)
+  SET (CRYPTO_POSSIBLE_ROOT_PATHS @MFL_BINARY_DIR@/CRYPTO/Build @MFL_SOURCE_DIR@/CRYPTO/Sources)
+  FIND_FILE(CRYPTO_USE_FILE UseCrypto.cmake ${CRYPTO_POSSIBLE_ROOT_PATHS})
+  FIND_PATH(CRYPTO_BINARY_PATH UseCrypto.cmake ${CRYPTO_POSSIBLE_ROOT_PATHS})
+  IF (CRYPTO_USE_FILE)
+    INCLUDE (${CRYPTO_USE_FILE}) # currently only local library is supported
+  ENDIF (CRYPTO_USE_FILE)
+ENDIF (MAF_USE_CRYPTO)
+
+#
+# wxMozilla library
+#
+IF (MAF_USE_WXMOZILLA)
+  SET (wxMozilla_POSSIBLE_ROOT_PATHS @MFL_BINARY_DIR@/wxMozilla/Build @MFL_SOURCE_DIR@/wxMozilla/Sources)
+  FIND_FILE(wxMozilla_USE_FILE UsewxMozilla.cmake ${wxMozilla_POSSIBLE_ROOT_PATHS})
+  FIND_PATH(wxMozilla_BINARY_PATH UsewxMozilla.cmake ${wxMozilla_POSSIBLE_ROOT_PATHS})
+  IF (wxMozilla_USE_FILE)
+    INCLUDE (${wxMozilla_USE_FILE}) # currently only local library is supported
+  ENDIF (wxMozilla_USE_FILE)
+ENDIF (MAF_USE_WXMOZILLA)
+
+
+#2 MARK_AS_ADVANCED (
+#2 MAF_USE_VTK
+#2 MAF_USE_WX
+#2 MAF_USE_ITK
+#2 MAF_USE_VCOLLIDE
+#2 MAF_USE_XercesC
+#2 )
+  
