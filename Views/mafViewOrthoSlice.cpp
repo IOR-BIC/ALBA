@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-12-27 16:49:07 $
-  Version:   $Revision: 1.61.2.21 $
+  Date:      $Date: 2012-03-13 17:05:21 $
+  Version:   $Revision: 1.61.2.22 $
   Authors:   Stefano Perticoni, Gianluigi Crimi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -458,7 +458,7 @@ void mafViewOrthoSlice::PlugVisualPipeInSliceViews(mafString vme_type, mafString
   {
     for(int v=PERSPECTIVE_VIEW; v<VIEWS_NUMBER; v++)
       if (v != PERSPECTIVE_VIEW && m_Views[v]!=NULL)
-        m_Views[v]->PlugVisualPipe(vme_type, "mafPipeSurfaceSlice",MUTEX);
+        m_Views[v]->PlugVisualPipe(vme_type, pipe_type,MUTEX);
        
   }
   else
@@ -474,7 +474,7 @@ void mafViewOrthoSlice::PlugVisualPipeInPerspective(mafString vme_type, mafStrin
       if (m_CanPlugVisualPipes)
       {
          if (m_Views[PERSPECTIVE_VIEW]!=NULL)
-            m_Views[PERSPECTIVE_VIEW]->PlugVisualPipe(vme_type, "mafPipeSurfaceSlice",MUTEX);
+            m_Views[PERSPECTIVE_VIEW]->PlugVisualPipe(vme_type, pipe_type ,MUTEX);
 
       }
       else
