@@ -1,0 +1,161 @@
+/*=========================================================================
+Program:   Multimod Application Framework
+Module:    $RCSfile: mafNodeTest.h,v $
+Language:  C++
+Date:      $Date: 2007-11-26 15:56:15 $
+Version:   $Revision: 1.3 $
+Authors:   Paolo Quadrani
+==========================================================================
+Copyright (c) 2002/2004 
+CINECA - Interuniversity Consortium (www.cineca.it)
+=========================================================================*/
+
+#ifndef __CPP_UNIT_mafNodeTest_H__
+#define __CPP_UNIT_mafNodeTest_H__
+
+#include <cppunit/extensions/HelperMacros.h>
+#include <cppunit/BriefTestProgressListener.h>
+#include <cppunit/CompilerOutputter.h>
+#include <cppunit/extensions/TestFactoryRegistry.h>
+#include <cppunit/TestResult.h>
+#include <cppunit/TestResultCollector.h>
+#include <cppunit/TestRunner.h>
+
+/** Test for mafMatrix; Use this suite to trace memory problems */
+class mafNodeTest : public CPPUNIT_NS::TestFixture
+{
+public: 
+  // CPPUNIT fixture: executed before each test
+  void setUp();
+
+  // CPPUNIT fixture: executed after each test
+  void tearDown();
+
+  // CPPUNIT test suite
+  CPPUNIT_TEST_SUITE( mafNodeTest );
+  CPPUNIT_TEST(TestFixture); // just to test that the fixture has no leaks
+  CPPUNIT_TEST(TestDynamicAllocation);
+  CPPUNIT_TEST(TestAllConstructor);
+  CPPUNIT_TEST(TestSetName);
+  CPPUNIT_TEST(TestEquals);
+  CPPUNIT_TEST(TestGetAttribute);
+  CPPUNIT_TEST(TestGetLink);
+  CPPUNIT_TEST(TestSetLink);
+  CPPUNIT_TEST(TestGetLinkSubId);
+  CPPUNIT_TEST(TestDependsOnLinkedNode);
+  CPPUNIT_TEST(TestCanCopy);
+  CPPUNIT_TEST(TestDeepCopy);
+  CPPUNIT_TEST(TestMakeCopy);
+  CPPUNIT_TEST(TestReparentTo);
+  CPPUNIT_TEST(TestGetParent);
+  CPPUNIT_TEST(TestGetRoot);
+  CPPUNIT_TEST(TestGetTagArray);
+  CPPUNIT_TEST(TestIsInTree);
+  CPPUNIT_TEST(TestIsAChild);
+  CPPUNIT_TEST(TestIsValid);
+  CPPUNIT_TEST(TestIsVisible);
+  CPPUNIT_TEST(TestGetNumberOfChildren);
+  CPPUNIT_TEST(TestGetNumberOfLinks);
+  CPPUNIT_TEST(TestRemoveLink);
+  CPPUNIT_TEST(TestRemoveAllLinks);
+  CPPUNIT_TEST(TestIsEmpty);
+  CPPUNIT_TEST(TestSetAttribute);
+  CPPUNIT_TEST(TestRemoveAttribute);
+  CPPUNIT_TEST(TestRemoveAllAttributes);
+  CPPUNIT_TEST(TestCleanTree);
+  CPPUNIT_TEST(TestNewIterator);
+  CPPUNIT_TEST(TestCanReparentTo);
+  CPPUNIT_TEST(TestGetChildren);
+  CPPUNIT_TEST(TestGetFirstChild);
+  CPPUNIT_TEST(TestGetLastChild);
+  CPPUNIT_TEST(TestAddChild);
+  CPPUNIT_TEST(TestGetChild);
+  CPPUNIT_TEST(TestCompareTree);
+  CPPUNIT_TEST(TestCopyTree);
+  CPPUNIT_TEST(TestFindInTreeById);
+  CPPUNIT_TEST(TestFindInTreeByName);
+  CPPUNIT_TEST(TestFindInTreeByTag);
+  CPPUNIT_TEST(TestFindNodeIdx);
+  CPPUNIT_TEST(TestRemoveChild);
+  CPPUNIT_TEST(TestRemoveAllChildren);
+  CPPUNIT_TEST(TestImport);
+  CPPUNIT_TEST(TestBuildAndDestroyATree);
+  CPPUNIT_TEST_SUITE_END();
+
+private:
+  void TestFixture();
+  void TestDynamicAllocation();
+  void TestAllConstructor();
+  void TestAddChild();
+  void TestCanCopy();
+  void TestCanReparentTo();
+  void TestCleanTree();
+  void TestCompareTree();
+  void TestCopyTree();
+  void TestDeepCopy();
+  void TestDependsOnLinkedNode();
+  void TestEquals();
+  void TestFindInTreeById();
+  void TestFindInTreeByName();
+  void TestFindInTreeByTag();
+  void TestFindNodeIdx();
+  void TestGetAttribute();
+  void TestGetChild();
+  void TestGetChildren();
+  void TestGetFirstChild();
+  void TestGetLastChild();
+  void TestGetLink();
+  void TestGetLinkSubId();
+  void TestGetNumberOfChildren();
+  void TestGetNumberOfLinks();
+  void TestGetParent();
+  void TestGetRoot();
+  void TestGetTagArray();
+  void TestImport();
+  void TestIsAChild();
+  void TestIsEmpty();
+  void TestIsInTree();
+  void TestIsValid();
+  void TestIsVisible();
+  void TestMakeCopy();
+  void TestNewIterator();
+  void TestRemoveAllAttributes();
+  void TestRemoveAllChildren();
+  void TestRemoveAllLinks();
+  void TestRemoveAttribute();
+  void TestRemoveChild();
+  void TestRemoveLink();
+  void TestReparentTo();
+  void TestSetAttribute();
+  void TestSetLink();
+  void TestSetName();
+  void TestBuildAndDestroyATree();
+
+  bool result;
+};
+
+int main( int argc, char* argv[] )
+{
+  // Create the event manager and test controller
+  CPPUNIT_NS::TestResult controller;
+
+  // Add a listener that collects test result
+  CPPUNIT_NS::TestResultCollector result;
+  controller.addListener( &result );        
+
+  // Add a listener that print dots as test run.
+  CPPUNIT_NS::BriefTestProgressListener progress;
+  controller.addListener( &progress );      
+
+  // Add the top suite to the test runner
+  CPPUNIT_NS::TestRunner runner;
+  runner.addTest( mafNodeTest::suite());
+  runner.run( controller );
+
+  // Print test in a compiler compatible format.
+  CPPUNIT_NS::CompilerOutputter outputter( &result, CPPUNIT_NS::stdCOut() );
+  outputter.write(); 
+
+  return result.wasSuccessful() ? 0 : 1;
+}
+#endif

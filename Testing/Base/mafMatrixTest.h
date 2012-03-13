@@ -1,0 +1,102 @@
+/*=========================================================================
+Program:   Multimod Application Framework
+Module:    $RCSfile: mafMatrixTest.h,v $
+Language:  C++
+Date:      $Date: 2007-06-12 15:49:48 $
+Version:   $Revision: 1.2 $
+Authors:   Paolo Quadrani
+==========================================================================
+Copyright (c) 2002/2004 
+CINECA - Interuniversity Consortium (www.cineca.it)
+=========================================================================*/
+
+#ifndef __CPP_UNIT_mafMatrixTest_H__
+#define __CPP_UNIT_mafMatrixTest_H__
+
+#include <cppunit/extensions/HelperMacros.h>
+#include <cppunit/BriefTestProgressListener.h>
+#include <cppunit/CompilerOutputter.h>
+#include <cppunit/extensions/TestFactoryRegistry.h>
+#include <cppunit/TestResult.h>
+#include <cppunit/TestResultCollector.h>
+#include <cppunit/TestRunner.h>
+
+/** Test for mafMatrix; Use this suite to trace memory problems */
+class mafMatrixTest : public CPPUNIT_NS::TestFixture
+{
+public: 
+  // CPPUNIT fixture: executed before each test
+  void setUp();
+
+  // CPPUNIT fixture: executed after each test
+  void tearDown();
+
+  // CPPUNIT test suite
+  CPPUNIT_TEST_SUITE( mafMatrixTest );
+  CPPUNIT_TEST(TestFixture); // just to test that the fixture has no leaks
+  CPPUNIT_TEST(TestStaticAllocation);
+  CPPUNIT_TEST(TestDynamicAllocation);
+  CPPUNIT_TEST(TestAllConstructors);
+  CPPUNIT_TEST(TestSetTimeStamp);
+  CPPUNIT_TEST(TestCopy);
+  CPPUNIT_TEST(TestZero);
+  CPPUNIT_TEST(TestGetVersor);
+  CPPUNIT_TEST(TestSetVTKMatrix);
+  CPPUNIT_TEST(TestCopyRotation);
+  CPPUNIT_TEST(TestIdentity);
+  CPPUNIT_TEST(TestInvert);
+  CPPUNIT_TEST(TestDeterminant);
+  CPPUNIT_TEST(TestAdjoint);
+  CPPUNIT_TEST(TestTranspose);
+  CPPUNIT_TEST(TestMultiplyPoint);
+  CPPUNIT_TEST(TestMultiply4x4);
+  CPPUNIT_TEST(TestPointMultiply);
+  CPPUNIT_TEST_SUITE_END();
+
+private:
+  void TestFixture();
+  void TestStaticAllocation();
+  void TestDynamicAllocation();
+  void TestAllConstructors();
+  void TestSetTimeStamp();
+  void TestCopy();
+  void TestZero();
+  void TestGetVersor();
+  void TestSetVTKMatrix();
+  void TestCopyRotation();
+  void TestIdentity();
+  void TestInvert();
+  void TestDeterminant();
+  void TestAdjoint();
+  void TestTranspose();
+  void TestMultiplyPoint();
+  void TestMultiply4x4();
+  void TestPointMultiply();
+};
+
+int
+main( int argc, char* argv[] )
+{
+  // Create the event manager and test controller
+  CPPUNIT_NS::TestResult controller;
+
+  // Add a listener that collects test result
+  CPPUNIT_NS::TestResultCollector result;
+  controller.addListener( &result );        
+
+  // Add a listener that print dots as test run.
+  CPPUNIT_NS::BriefTestProgressListener progress;
+  controller.addListener( &progress );      
+
+  // Add the top suite to the test runner
+  CPPUNIT_NS::TestRunner runner;
+  runner.addTest( mafMatrixTest::suite());
+  runner.run( controller );
+
+  // Print test in a compiler compatible format.
+  CPPUNIT_NS::CompilerOutputter outputter( &result, CPPUNIT_NS::stdCOut() );
+  outputter.write(); 
+
+  return result.wasSuccessful() ? 0 : 1;
+}
+#endif
