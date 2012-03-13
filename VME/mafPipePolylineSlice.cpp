@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolylineSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-01-20 16:45:36 $
-  Version:   $Revision: 1.16.2.4 $
+  Date:      $Date: 2012-03-13 16:43:01 $
+  Version:   $Revision: 1.16.2.5 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -214,7 +214,11 @@ void mafPipePolylineSlice::Create(mafSceneNode *n)
   m_Actor = vtkActor::New();
   m_Actor->SetMapper(m_Mapper);
 
-	m_Actor->GetProperty()->SetColor(((mafVMEOutputPolyline *)((mafVME *)m_Vme)->GetOutput())->GetMaterial()->m_Diffuse);
+  if(((mafVMEOutputPolyline *)((mafVME *)m_Vme)->GetOutput())->GetMaterial()!=NULL)
+  {
+	  m_Actor->GetProperty()->SetColor(((mafVMEOutputPolyline *)((mafVME *)m_Vme)->GetOutput())->GetMaterial()->m_Diffuse);
+  }
+  
   m_Actor->GetProperty()->SetLineWidth (1);
   m_AssemblyFront->AddPart(m_Actor);
 
@@ -363,7 +367,7 @@ void mafPipePolylineSlice::SetSlice(double *Origin)
 		m_Cutter->Update();
         UpdateProperty();
 	}
-  if(m_Vme != NULL)
+  if(m_Vme != NULL && ((mafVMEOutputPolyline *)((mafVME *)m_Vme)->GetOutput())->GetMaterial()!=NULL)
     m_Actor->GetProperty()->SetColor(((mafVMEOutputPolyline *)((mafVME *)m_Vme)->GetOutput())->GetMaterial()->m_Diffuse);
 }
 //----------------------------------------------------------------------------
@@ -397,7 +401,8 @@ void mafPipePolylineSlice::SetThickness(double thickness)
 	m_Actor->GetProperty()->SetLineWidth(m_Border);
   m_Actor->GetProperty()->SetPointSize(m_Border);
 
-  m_Actor->GetProperty()->SetColor(((mafVMEOutputPolyline *)((mafVME *)m_Vme)->GetOutput())->GetMaterial()->m_Diffuse);
+  if (((mafVMEOutputPolyline *)((mafVME *)m_Vme)->GetOutput())->GetMaterial()!=NULL)
+    m_Actor->GetProperty()->SetColor(((mafVMEOutputPolyline *)((mafVME *)m_Vme)->GetOutput())->GetMaterial()->m_Diffuse);
   
   m_Actor->Modified();
 	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
@@ -417,7 +422,8 @@ void mafPipePolylineSlice::SetRadius(double radius)
   {
     m_Tube->SetRadius(m_Radius);
     m_Tube->Update();
-    m_Actor->GetProperty()->SetColor(((mafVMEOutputPolyline *)((mafVME *)m_Vme)->GetOutput())->GetMaterial()->m_Diffuse);
+    if (((mafVMEOutputPolyline *)((mafVME *)m_Vme)->GetOutput())->GetMaterial()!=NULL)
+      m_Actor->GetProperty()->SetColor(((mafVMEOutputPolyline *)((mafVME *)m_Vme)->GetOutput())->GetMaterial()->m_Diffuse);
     m_Actor->Modified();
   }
 	//mafEventMacro(mafEvent(this,CAMERA_UPDATE));
@@ -469,7 +475,11 @@ void mafPipePolylineSlice::UpdateProperty()
 
   if(m_Actor)
   {
-    m_Actor->GetProperty()->SetColor(((mafVMEOutputPolyline *)((mafVME *)m_Vme)->GetOutput())->GetMaterial()->m_Diffuse);
+    if(((mafVMEOutputPolyline *)((mafVME *)m_Vme)->GetOutput())->GetMaterial()!=NULL)
+    {
+      m_Actor->GetProperty()->SetColor(((mafVMEOutputPolyline *)((mafVME *)m_Vme)->GetOutput())->GetMaterial()->m_Diffuse);
+    }
+
     m_Actor->Modified();
   }
   
