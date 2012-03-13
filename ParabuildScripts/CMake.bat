@@ -1,0 +1,142 @@
+REM -----------------------------------------------------------------------------
+REM cmake execution driver script
+REM -----------------------------------------------------------------------------
+
+IF "%1" == "MAF_DEBUG" GOTO MAF_DEBUG
+IF "%1" == "MAF_ITK_DEBUG" GOTO MAF_ITK_DEBUG
+IF "%1" == "MAF_ITK_DEBUG_DLL" GOTO MAF_ITK_DEBUG_DLL
+IF "%1" == "MAF_DOCUMENTATION" GOTO MAF_DOCUMENTATION
+IF "%1" == "VAPP_DEBUG" GOTO VAPP_DEBUG
+IF "%1" == "VAPP_RELEASE" GOTO VAPP_RELEASE
+IF "%1" == "VAPP_RELEASE_2005" GOTO VAPP_RELEASE_2005
+IF "%1" == "VAPP_RELEASE_2008" GOTO VAPP_RELEASE_2008
+IF NOT "%1" == "MAF_DEBUG" GOTO UNKNOWN_CONDITION
+
+:MAF_DEBUG
+
+cmake.exe  .  ^
+  -G"Visual Studio 7 .NET 2003" ^
+  -DBUILD_TESTING:BOOL=ON ^
+  -DBUILD_EXAMPLES:BOOL=OFF ^
+  -DCMAKE_BACKWARDS_COMPATIBILITY:STRING=2.0 ^
+  -DMAF_USE_ITK:BOOL=OFF ^
+  -DCPPUNIT_INCLUDE_DIR:PATH="C:/cppunit-1.12.0/include" ^
+  -DCPPUNIT_LIBRARY:FILEPATH="C:/cppunit-1.12.0/lib/cppunitd.lib"
+
+GOTO END
+
+:MAF_ITK_DEBUG
+
+cmake.exe  .  ^
+  -G"Visual Studio 7 .NET 2003" ^
+  -DBUILD_TESTING:BOOL=ON ^
+  -DBUILD_EXAMPLES:BOOL=OFF ^
+  -DCMAKE_BACKWARDS_COMPATIBILITY:STRING=2.0 ^
+  -DMAF_USE_ITK:BOOL=ON ^
+  -DCPPUNIT_INCLUDE_DIR:PATH="C:/cppunit-1.12.0/include" ^
+  -DCPPUNIT_LIBRARY:FILEPATH="C:/cppunit-1.12.0/lib/cppunitd.lib"
+
+GOTO END
+
+:MAF_ITK_DEBUG_DLL
+
+cmake.exe  .  ^
+  -G"Visual Studio 7 .NET 2003" ^
+  -DBUILD_SHARED_LIBS:BOOL=ON ^
+  -DBUILD_TESTING:BOOL=OFF ^
+  -DBUILD_EXAMPLES:BOOL=OFF ^
+  -DCMAKE_BACKWARDS_COMPATIBILITY:STRING=2.0 ^
+  -DMAF_USE_ITK:BOOL=ON 
+  
+cd ..
+
+GOTO END
+
+:MAF_DOCUMENTATION
+
+cd openMAF_ITK_Parabuild
+
+cmake.exe  .  ^
+  -G"Visual Studio 7 .NET 2003" ^
+  -DCMAKE_BACKWARDS_COMPATIBILITY:STRING=2.0 ^
+  -DMAF_USE_ITK:BOOL=ON ^
+  -DBUILD_DOCUMENTATION=ON
+
+cd ..
+
+GOTO END
+
+:VAPP_DEBUG
+
+cd openMAF_ITK_Parabuild
+
+cmake.exe . ^
+  -G"Visual Studio 7 .NET 2003" ^
+  -DBUILD_EXAMPLES:BOOL=OFF ^
+  -DBUILD_TESTING:BOOL=OFF ^
+  -DCMAKE_BACKWARDS_COMPATIBILITY:STRING=2.0 ^
+  -DMAF_USE_ITK:BOOL=ON ^
+  -DCPPUNIT_INCLUDE_DIR:PATH="C:/cppunit-1.12.0/include" ^
+  -DCPPUNIT_LIBRARY:FILEPATH="C:/cppunit-1.12.0/lib/cppunitd.lib"
+  
+cd ..   
+   
+GOTO END
+
+:VAPP_RELEASE
+
+cd openMAF_ITK_Parabuild
+
+cmake.exe . ^
+  -G"Visual Studio 7 .NET 2003" ^
+  -DBUILD_EXAMPLES:BOOL=OFF ^
+  -DBUILD_TESTING:BOOL=OFF ^
+  -DCMAKE_BACKWARDS_COMPATIBILITY:STRING=2.0 ^
+  -DMAF_USE_ITK:BOOL=ON ^
+  -DCPPUNIT_INCLUDE_DIR:PATH="C:/cppunit-1.12.0/include" ^
+  -DCPPUNIT_LIBRARY:FILEPATH="C:/cppunit-1.12.0/lib/cppunitd.lib" 
+
+cd ..   
+
+
+GOTO END
+
+:VAPP_RELEASE_2005
+
+cd openMAF_ITK_Parabuild
+
+cmake.exe . ^
+  -G"Visual Studio 8 2005" ^
+  -DBUILD_EXAMPLES:BOOL=OFF ^
+  -DBUILD_TESTING:BOOL=OFF ^
+  -DCMAKE_BACKWARDS_COMPATIBILITY:STRING=2.0 ^
+  -DMAF_USE_ITK:BOOL=ON ^
+  -DCPPUNIT_INCLUDE_DIR:PATH="C:/cppunit-1.12.0/include" ^
+  -DCPPUNIT_LIBRARY:FILEPATH="C:/cppunit-1.12.0/lib/cppunitd.lib" 
+
+cd ..   
+
+
+GOTO END
+
+:VAPP_RELEASE_2008
+
+cd openMAF_ITK_Parabuild
+
+cmake.exe . ^
+  -G"Visual Studio 9 2008" ^
+  -DBUILD_EXAMPLES:BOOL=OFF ^
+  -DBUILD_TESTING:BOOL=OFF ^
+  -DCMAKE_BACKWARDS_COMPATIBILITY:STRING=2.0 ^
+  -DMAF_USE_ITK:BOOL=ON ^
+  -DCPPUNIT_INCLUDE_DIR:PATH="C:/cppunit-1.12.0/include" ^
+  -DCPPUNIT_LIBRARY:FILEPATH="C:/cppunit-1.12.0/lib/cppunitd.lib" 
+
+cd ..   
+
+
+GOTO END
+
+:UNKNOWN_CONDITION
+
+:END
