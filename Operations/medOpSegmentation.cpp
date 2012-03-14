@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2012-03-12 14:37:48 $
-Version:   $Revision: 1.1.2.54 $
+Date:      $Date: 2012-03-14 13:49:47 $
+Version:   $Revision: 1.1.2.55 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi, Alberto Losi
 ==========================================================================
 Copyright (c) 2007
@@ -367,6 +367,10 @@ void medOpSegmentation::OpDo()
     }
     break;
     case  REFINEMENT_SEGMENTATION:
+    {
+      m_OutputVolume->DeepCopy(m_RefinementVolumeMask);
+    }
+    break;
     case  LOAD_SEGMENTATION:
     {
       m_OutputVolume->DeepCopy(m_LoadedVolume);
@@ -2108,9 +2112,13 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
             m_CurrentSliceIndex = hi;
           }
 
-          InitEmptyVolumeSlice();
-          UpdateThresholdRealTimePreview();
-          UpdateSlice();
+
+          if(m_CurrentSlicePlane = XY)
+          {
+            InitEmptyVolumeSlice();
+            UpdateThresholdRealTimePreview();
+            UpdateSlice();
+          }
           m_View->CameraUpdate();
         }
         break;
@@ -3091,7 +3099,7 @@ void medOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
   }
 
   double min_distance = MAXDOUBLE;
-  int nearestIndex = -1;
+  int nearestIndex = 0;
   //get the nearest dataset point
   for (int i=0;i<numberOfPoints;i++)
   {
@@ -3122,7 +3130,7 @@ void medOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
   std::vector<int> dummyIndices;
   if(m_ManualBrushShape == 0) // circle
   {
-    double radius = (double((m_ManualBrushSize + 1) / 2.))* targetSpacing;
+    double radius = (double((m_ManualBrushSize) / 2.))* targetSpacing;
     double radius2 = pow(radius,2);
     double dummyCenter[3];
     dummyCenter[abscissa] = radius;
@@ -4268,13 +4276,13 @@ void medOpSegmentation::UndoBrushPreview()
 void medOpSegmentation::UpdateThresholdRealTimePreview()
 //----------------------------------------------------------------------------
 {
-  if(m_OldAutomaticThreshold == m_AutomaticThreshold && m_OldAutomaticUpperThreshold == m_AutomaticUpperThreshold && m_OldSliceIndex == m_CurrentSliceIndex && m_OldSlicePlane != m_CurrentSlicePlane)
-  {
-    return;
-  }
-  m_OldSlicePlane = m_CurrentSlicePlane;
-  m_OldAutomaticThreshold = m_AutomaticThreshold;
-  m_OldAutomaticUpperThreshold = m_AutomaticUpperThreshold;
+//   if(m_OldAutomaticThreshold == m_AutomaticThreshold && m_OldAutomaticUpperThreshold == m_AutomaticUpperThreshold && m_OldSliceIndex == m_CurrentSliceIndex && m_OldSlicePlane != m_CurrentSlicePlane)
+//   {
+//     return;
+//   }
+//   m_OldSlicePlane = m_CurrentSlicePlane;
+//   m_OldAutomaticThreshold = m_AutomaticThreshold;
+//   m_OldAutomaticUpperThreshold = m_AutomaticUpperThreshold;
   
   medVMESegmentationVolume *tVol;
   mafNEW(tVol);
