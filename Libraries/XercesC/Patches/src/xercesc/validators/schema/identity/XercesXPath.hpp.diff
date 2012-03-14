@@ -1,0 +1,4 @@
+145c145
+<     unsigned short  fAxisType;
+---
+>     XMLCh  fAxisType;

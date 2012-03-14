@@ -1,0 +1,16 @@
+21,23c21,27
+<   itkGDCMImageIO.cxx
+<   itkGDCMImageIOFactory.cxx
+<   itkGDCMSeriesFileNames.cxx
+---
+>   
+> ### commented to avoid conflicts with GDCM 2.0.10 ###
+>   #itkGDCMImageIO.cxx
+>   #itkGDCMImageIOFactory.cxx
+>   #itkGDCMSeriesFileNames.cxx
+> ###-------------------------------------###
+>   
+75c79
+< ${ITK_GDCM_LIBRARIES}
+---
+> #${ITK_GDCM_LIBRARIES}

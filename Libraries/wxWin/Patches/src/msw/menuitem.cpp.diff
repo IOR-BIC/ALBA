@@ -1,0 +1,8 @@
+173,175d172
+<     // setting default colors switched ownerdraw on: switch it off again
+<     ResetOwnerDrawn();
+< 
+178a176,178
+> 
+>     // setting default colors switched ownerdraw on: switch it off again
+>     ResetOwnerDrawn();

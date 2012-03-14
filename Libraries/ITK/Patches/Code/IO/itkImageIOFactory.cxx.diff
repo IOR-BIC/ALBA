@@ -1,0 +1,12 @@
+24c24,26
+< #include "itkGDCMImageIOFactory.h"
+---
+> //--- commented to avoid conflicts with GDCM 2.0.10 ---###
+> //#include "itkGDCMImageIOFactory.h"
+> //----------------------------------------------------///
+103c105,107
+<     ObjectFactoryBase::RegisterFactory( GDCMImageIOFactory::New() );
+---
+>     //--- commented to avoid conflicts with GDCM 2.0.10 ---###
+>     //ObjectFactoryBase::RegisterFactory( GDCMImageIOFactory::New() );
+>     //-----------------------------------------------------//

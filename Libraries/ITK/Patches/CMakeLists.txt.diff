@@ -1,4 +1,45 @@
-581c581,582
+253c253
+< OPTION(BUILD_EXAMPLES "Build the Examples directory." ON)
+---
+> OPTION(BUILD_EXAMPLES "Build the Examples directory." OFF)
+510,525c510,528
+< OPTION(ITK_USE_SYSTEM_GDCM "Use an outside build of GDCM." OFF)
+< MARK_AS_ADVANCED(ITK_USE_SYSTEM_GDCM)
+< IF(ITK_USE_SYSTEM_GDCM)
+<   FIND_PACKAGE(GDCM)
+<   IF(GDCM_FOUND)
+<     INCLUDE(${GDCM_USE_FILE})
+<     SET(ITK_GDCM_LIBRARIES gdcm)
+<   ELSE(GDCM_FOUND)
+<     MESSAGE(FATAL_ERROR "Must set GDCM_DIR for ITK_USE_SYSTEM_GDCM.")
+<   ENDIF(GDCM_FOUND)
+< ELSE(ITK_USE_SYSTEM_GDCM)
+<   SET(ITK_GDCM_LIBRARIES itkgdcm)
+<   SET(GDCM_INCLUDE_DIR
+<     ${ITK_SOURCE_DIR}/Utilities/gdcm/src
+<     )
+< ENDIF(ITK_USE_SYSTEM_GDCM)
+---
+> 
+> ### commented to avoid conflicts with GDCM 2.0.10 ###
+> #OPTION(ITK_USE_SYSTEM_GDCM "Use an outside build of GDCM." ON)
+> #MARK_AS_ADVANCED(ITK_USE_SYSTEM_GDCM)
+> #IF(ITK_USE_SYSTEM_GDCM)
+> #  FIND_PACKAGE(GDCM)
+> #  IF(GDCM_FOUND)
+> #    INCLUDE(${GDCM_USE_FILE})
+> #    SET(ITK_GDCM_LIBRARIES gdcm)
+> #  ELSE(GDCM_FOUND)
+> #    MESSAGE(FATAL_ERROR "Must set GDCM_DIR for ITK_USE_SYSTEM_GDCM.")
+> #  ENDIF(GDCM_FOUND)
+> #ELSE(ITK_USE_SYSTEM_GDCM)
+>   #SET(ITK_GDCM_LIBRARIES itkgdcm)
+>   #SET(GDCM_INCLUDE_DIR
+>    # ${ITK_SOURCE_DIR}/Utilities/gdcm/src
+>    # )
+> #ENDIF(ITK_USE_SYSTEM_GDCM)
+> ###-------------------------------------###
+581c584,585
 < 
 ---
 > # to enable compilation from MAF project

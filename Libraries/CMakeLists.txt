@@ -2,11 +2,12 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 1.2
-# Date:      $Date: 2004-11-10 15:59:18 $
-# Version:   $Revision: 1.11 $
+# Date:      $Date: 2010-12-29 18:50:18 $
+# Version:   $Revision: 1.11.22.1 $
 #
 # Description:
 # Project file of the Multimod Fundation Layer.
+
 
 MESSAGE(STATUS "MFL: Configuring MFL")
 PROJECT (MFL)

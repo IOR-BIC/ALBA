@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: Configure.cmake,v $
 # Language:  CMake 1.2
-# Date:      $Date: 2006-06-14 14:46:34 $
-# Version:   $Revision: 1.10 $
+# Date:      $Date: 2011-05-18 07:20:15 $
+# Version:   $Revision: 1.10.10.1 $
 #
 # Description:
 # Project file for configuring the XercesC library as an external project.
@@ -27,10 +27,14 @@ IF (EXISTS "${XercesC_SOURCE_DIR}/Packages")
   SET (XercesC_PACKAGE_PATH "${XercesC_SOURCE_DIR}/Packages")
   ##The macro must run only one time
   SET (XercesC_SOURCE_PATH "${XercesC_BINARY_DIR}/Sources/XercesC")
+  SET (XercesC_PATCH_PATH "${XercesC_SOURCE_DIR}/Patches")
   IF (NOT EXISTS "${XercesC_SOURCE_PATH}")
   	FIND_AND_UNPACK_PACKAGE (XercesC ${XercesC_PACKAGE_PATH} "${XercesC_BINARY_DIR}/Sources" ${XercesC_SOURCE_PATH})
+  	FIND_AND_APPLAY_PATCHES (XercesC ${XercesC_PATCH_PATH} "${XercesC_SOURCE_PATH}")
   ENDIF (NOT EXISTS "${XercesC_SOURCE_PATH}")
 ENDIF (EXISTS "${XercesC_SOURCE_DIR}/Packages")
+
+
 
 ##ci vorra' un controllo se tutto e' stato eseguito???
 

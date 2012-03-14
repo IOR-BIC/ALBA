@@ -1,0 +1,9 @@
+144c144,148
+< typedef unsigned short  XMLCh;
+---
+> #if !defined(_MSC_VER) || _MSC_VER < 1600
+> 	typedef unsigned short  XMLCh;
+> #else
+> 	typedef wchar_t  XMLCh;
+> #endif
+

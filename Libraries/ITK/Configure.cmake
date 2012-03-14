@@ -2,14 +2,13 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: Configure.cmake,v $
 # Language:  CMake 1.2
-# Date:      $Date: 2007-03-07 09:45:58 $
-# Version:   $Revision: 1.4 $
+# Date:      $Date: 2011-11-22 10:35:33 $
+# Version:   $Revision: 1.4.6.2 $
 #
 # Description:
 # Project file for configuring the ITK library as an external project.
 # Return variables:
 # ITK_CONFIGURED  true if library configured correctly
-
 
 
 INCLUDE (${MFL_SOURCE_DIR}/modules/PackagesMacro.cmake)
@@ -23,6 +22,7 @@ IF (EXISTS "${ITK_SOURCE_DIR}/Sources")
   SET (ITK_SOURCE_PATH "${ITK_SOURCE_DIR}/Sources")
 ENDIF (EXISTS "${ITK_SOURCE_DIR}/Sources")
 
+
 #look if there is a package for ITK
 IF (EXISTS "${ITK_SOURCE_DIR}/Packages")   
   MESSAGE(STATUS "ITK: Found ITK packages")
@@ -31,12 +31,18 @@ IF (EXISTS "${ITK_SOURCE_DIR}/Packages")
   SET (ITK_UNPACK_PATH "${ITK_BINARY_DIR}/Sources")
   SET (ITK_PATCH_PATH "${ITK_SOURCE_DIR}/Patches")
   SET (ITK_SOURCE_PATH "${ITK_UNPACK_PATH}/InsightToolkit-3.0.1") # where sources are 
-  
+
+  IF(EXISTS "${ITK_SOURCE_PATH}" AND NOT EXISTS "${ITK_SOURCE_PATH}/CMakeLists.txt")
+    MESSAGE(STATUS "ITK: Waiting for ITK sources directory complete removal...")
+    WHILE(EXISTS "${ITK_SOURCE_PATH}")
+      # Do Nothing
+    ENDWHILE(EXISTS "${ITK_SOURCE_PATH}")
+  ENDIF(EXISTS "${ITK_SOURCE_PATH}" AND NOT EXISTS "${ITK_SOURCE_PATH}/CMakeLists.txt")
   ##The macro must run only one time
-  IF (NOT EXISTS "${ITK_SOURCE_PATH}")
+  IF (NOT EXISTS "${ITK_SOURCE_PATH}" OR NOT EXISTS "${ITK_SOURCE_PATH}/CMakeLists.txt")
   	FIND_AND_UNPACK_PACKAGE (ITK ${ITK_PACKAGE_PATH} "${ITK_UNPACK_PATH}")
   	FIND_AND_APPLAY_PATCHES(ITK ${ITK_PATCH_PATH} "${ITK_SOURCE_PATH}")
-  ENDIF (NOT EXISTS "${ITK_SOURCE_PATH}")
+  ENDIF (NOT EXISTS "${ITK_SOURCE_PATH}" OR NOT EXISTS "${ITK_SOURCE_PATH}/CMakeLists.txt")
 ENDIF (EXISTS "${ITK_SOURCE_DIR}/Packages")
 
 ##ci vorra' un controllo se tutto e' stato eseguito???

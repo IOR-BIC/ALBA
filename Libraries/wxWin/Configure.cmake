@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: Configure.cmake,v $
 # Language:  CMake 1.2
-# Date:      $Date: 2008-03-13 17:14:25 $
-# Version:   $Revision: 1.4 $
+# Date:      $Date: 2011-05-25 09:59:40 $
+# Version:   $Revision: 1.4.2.1 $
 #
 # Description:
 # Project file for configuring the WXWIN library as an external project.
@@ -88,7 +88,7 @@ IF (WXWIN_SOURCE_PATH)
       -DLIBRARY_OUTPUT_PATH:PATH="${LIBRARY_OUTPUT_PATH}" 
       -DEXECUTABLE_OUTPUT_PATH:PATH="${EXECUTABLE_OUTPUT_PATH}" 
       -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
-      -DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS} 
+      -DBUILD_SHARED_LIBS:BOOL=${MAF_BUILD_MAFDLL}
       -DWX_USE_HTML:BOOL=TRUE
       OUTPUT_VARIABLE CMAKE_OUTPUT 
       RETURN_VALUE CMAKE_RETURN)

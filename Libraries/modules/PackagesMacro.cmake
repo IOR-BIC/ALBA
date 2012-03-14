@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: PackagesMacro.cmake,v $
 # Language:  CMake 1.2
-# Date:      $Date: 2006-06-14 14:46:34 $
-# Version:   $Revision: 1.8 $
+# Date:      $Date: 2011-06-03 09:29:54 $
+# Version:   $Revision: 1.8.10.1 $
 #
 # Description:
 # Macro file for find and unpack a tar.gz package and to apply patches.
@@ -38,8 +38,12 @@
 		IF (WIN32)
 	    #searching for decompress programs
 	    SET (GNUWIN32_INSTALL_PATH ${MFL_SOURCE_DIR}/Extras)
-  		FIND_PROGRAM(GZIP  gzip  ${GNUWIN32_INSTALL_PATH}/bin )
-  		FIND_PROGRAM(TAR  tar  ${GNUWIN32_INSTALL_PATH}/bin )  	
+		
+  		#FIND_PROGRAM(GZIP  gzip  ${GNUWIN32_INSTALL_PATH}/bin )
+		SET (GZIP ${GNUWIN32_INSTALL_PATH}/bin/gzip.exe)
+  		#FIND_PROGRAM(TAR  tar  ${GNUWIN32_INSTALL_PATH}/bin )  
+		SET (TAR ${GNUWIN32_INSTALL_PATH}/bin/tar.exe)
+		
   		#FIND_PROGRAM(GTAR  gtar  ${GNUWIN32_INSTALL_PATH}/bin )	  		
   		IF(GZIP AND TAR)
 	   		#use a batch file to run the unpacking program

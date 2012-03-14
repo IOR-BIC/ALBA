@@ -1,0 +1,11 @@
+443c443,446
+<   friend bool operator== VCL_NULL_TMPL_ARGS (const self&,const self&);
+---
+> #if !defined(_MSC_VER) || _MSC_VER < 1600
+>   friend
+> #endif
+> 		bool operator== VCL_NULL_TMPL_ARGS (const self&,const self&);
+1042a1046
+> #if !defined(_MSC_VER) || _MSC_VER < 1600
+1050a1055
+> #endif
