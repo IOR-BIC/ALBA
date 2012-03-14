@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafOpTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-25 07:04:07 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2009-05-25 14:49:40 $
+Version:   $Revision: 1.2.2.1 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -25,7 +25,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafSmartPointer.h"
 #include "mafOp.h"
 #include "mafVMEGroup.h"
-#include "mmdMouse.h"
+#include "mafDeviceButtonsPadMouse.h"
 #include "mafGUI.h"
 
 #include <iostream>
@@ -265,8 +265,8 @@ void mafOpTest::TestGetActions()
 void mafOpTest::TestSetGetMouse()
 //----------------------------------------------------------------------------
 {
-  mmdMouse *mouse;
-  mouse = mmdMouse::New();
+  mafDeviceButtonsPadMouse *mouse;
+  mouse = mafDeviceButtonsPadMouse::New();
   m_Op->SetMouse(mouse);
   result = m_Op->GetMouse() == mouse;
   TEST_RESULT

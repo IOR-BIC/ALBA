@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafOpCopyTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-02-22 14:34:43 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2011-05-25 11:58:32 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2008
@@ -62,11 +62,11 @@ void mafOpCopyTest::TestOpDo()
   m_OpCopy->SetInput(groupChild);
   m_OpCopy->OpDo();
 
-  CPPUNIT_ASSERT(m_OpCopy->m_Clipboard.GetPointer()!=groupChild);
-  CPPUNIT_ASSERT(strcmp(m_OpCopy->m_Clipboard.GetPointer()->GetName(),"copy of GROUP_CHILD")==0);
-  CPPUNIT_ASSERT(m_OpCopy->m_Clipboard.GetPointer()->IsA("mafVMEGroup"));
-  CPPUNIT_ASSERT(m_OpCopy->m_Clipboard.GetPointer()->GetNumberOfChildren()==1);
-  CPPUNIT_ASSERT(m_OpCopy->m_Clipboard.GetPointer()->GetChild(0)->IsA("mafVMESurface"));
+  CPPUNIT_ASSERT(m_OpCopy->GetClipboard()!=groupChild);
+  CPPUNIT_ASSERT(strcmp(m_OpCopy->GetClipboard()->GetName(),"copy of GROUP_CHILD")==0);
+  CPPUNIT_ASSERT(m_OpCopy->GetClipboard()->IsA("mafVMEGroup"));
+  CPPUNIT_ASSERT(m_OpCopy->GetClipboard()->GetNumberOfChildren()==1);
+  CPPUNIT_ASSERT(m_OpCopy->GetClipboard()->GetChild(0)->IsA("mafVMESurface"));
 
   mafDEL(surfaceChild);
   mafDEL(groupChild);
@@ -93,7 +93,7 @@ void mafOpCopyTest::TestOpUndo()
 
   m_OpCopy->OpUndo();
 
-  CPPUNIT_ASSERT(m_OpCopy->m_Clipboard==NULL);
+  CPPUNIT_ASSERT(m_OpCopy->GetClipboard()==NULL);
 
   mafDEL(surfaceChild);
   mafDEL(groupChild);

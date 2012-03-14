@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafOpImporterVTKTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-14 12:15:20 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2011-05-25 11:58:32 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2008

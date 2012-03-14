@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGizmoROITest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-01 15:22:25 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2011-05-25 11:58:32 $
+Version:   $Revision: 1.2.2.2 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -25,6 +25,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <iostream>
 
 #include "mafString.h"
+#include "mafRefSys.h"
 #include "mafGizmoROI.h"
 #include "mafVMERoot.h"
 #include "mafSmartPointer.h"
@@ -34,7 +35,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafObserver.h"
 #include "mafTransform.h"
 
-#include "mmiGenericMouse.h"
+#include "mafInteractorGenericMouse.h"
 #include "mmaMaterial.h"
 
 #include "vtkMAFSmartPointer.h"

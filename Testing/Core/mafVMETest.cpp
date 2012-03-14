@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafVMETest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-11-29 17:06:21 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2011-05-25 11:58:32 $
+Version:   $Revision: 1.1.4.2 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -22,7 +22,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <cppunit/config/SourcePrefix.h>
 #include "mafVMETest.h"
 
-#include "mmiCameraMove.h"
+#include "mafInteractorCameraMove.h"
 
 #include "mafMatrix.h"
 #include "mafTransform.h"
@@ -280,9 +280,9 @@ void mafVMETest::TestSetBehavior()
   // default behavior
   result = vme1->GetBehavior() == NULL;
 
-  mafSmartPointer<mmiCameraMove> bh;
+  mafSmartPointer<mafInteractorCameraMove> bh;
   vme1->SetBehavior(bh);
-  result = vme1->GetBehavior()->IsMAFType(mmiCameraMove);
+  result = vme1->GetBehavior()->IsMAFType(mafInteractorCameraMove);
   TEST_RESULT;
 
   result = bh.GetPointer() == vme1->GetBehavior();

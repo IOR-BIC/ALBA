@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGizmoTranslateAxisTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-18 16:06:19 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2011-05-25 11:58:32 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -24,6 +24,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <cppunit/config/SourcePrefix.h>
 #include <iostream>
 
+#include "mafRefSys.h"
 #include "mafString.h"
 #include "mafGizmoTranslateAxis.h"
 #include "mafVMERoot.h"
@@ -34,7 +35,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafObserver.h"
 #include "mafTransform.h"
 
-#include "mmiGenericMouse.h"
+#include "mafInteractorGenericMouse.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkPoints.h"
@@ -122,7 +123,7 @@ void mafGizmoTranslateAxisTest::CreateTestData()
 void mafGizmoTranslateAxisTest::TestConstructor()
 {
   mafGizmoTranslateAxis *gizmoTranslateAxis = new mafGizmoTranslateAxis(m_GizmoInputSurface);
-  gizmoTranslateAxis->SetAxis(mmiConstraint::X);
+  gizmoTranslateAxis->SetAxis(mafInteractorConstraint::X);
 
   gizmoTranslateAxis->SetCylinderLength(5);
   gizmoTranslateAxis->SetConeLength(5);
@@ -131,11 +132,11 @@ void mafGizmoTranslateAxisTest::TestConstructor()
   RenderGizmo(gizmoTranslateAxis);
   mafSleep(500);
 
-  gizmoTranslateAxis->SetAxis(mmiConstraint::Y);
+  gizmoTranslateAxis->SetAxis(mafInteractorConstraint::Y);
   RenderGizmo(gizmoTranslateAxis);
   mafSleep(500);
 
-  gizmoTranslateAxis->SetAxis(mmiConstraint::Z);
+  gizmoTranslateAxis->SetAxis(mafInteractorConstraint::Z);
   RenderGizmo(gizmoTranslateAxis);
   mafSleep(500);
 
@@ -196,7 +197,7 @@ void mafGizmoTranslateAxisTest::TestSetRefSysMatrix()
   // using friend mafGizmoTranslateAxis
   for (int i = 0; i < 2; i++)
   {
-    mafMatrix *mat = gizmoTranslateAxis->IsaGen[i]->GetTranslationConstraint()->GetRefSys()->GetMatrix();
+    mafMatrix *mat = gizmoTranslateAxis->m_IsaGen[i]->GetTranslationConstraint()->GetRefSys()->GetMatrix();
     CPPUNIT_ASSERT(mat == &refSys);
   }
 
@@ -207,14 +208,14 @@ void mafGizmoTranslateAxisTest::TestSetConstraintModality()
 {
   mafGizmoTranslateAxis *gizmoTranslateAxis = new mafGizmoTranslateAxis(m_GizmoInputSurface);
 
-  gizmoTranslateAxis->SetAxis(mmiConstraint::X);
-  gizmoTranslateAxis->SetConstraintModality(mmiConstraint::X, mmiConstraint::LOCK);
+  gizmoTranslateAxis->SetAxis(mafInteractorConstraint::X);
+  gizmoTranslateAxis->SetConstraintModality(mafInteractorConstraint::X, mafInteractorConstraint::LOCK);
   
   // using friend mafGizmoTranslateAxis
   for (int i = 0; i < 2; i++)
   {
-    int constrainModality = gizmoTranslateAxis->IsaGen[i]->GetTranslationConstraint()->GetConstraintModality(mmiConstraint::X);
-    CPPUNIT_ASSERT(constrainModality  ==  mmiConstraint::LOCK);
+    int constrainModality = gizmoTranslateAxis->m_IsaGen[i]->GetTranslationConstraint()->GetConstraintModality(mafInteractorConstraint::X);
+    CPPUNIT_ASSERT(constrainModality  ==  mafInteractorConstraint::LOCK);
   } 
 
   cppDEL(gizmoTranslateAxis);
@@ -239,7 +240,7 @@ void mafGizmoTranslateAxisTest::TestSetInput()
   gizmoTranslateAxis->SetInput(m_GizmoInputSurface);
 
   // using friend mafGizmoTranslateAxis
-  CPPUNIT_ASSERT(gizmoTranslateAxis->InputVme == m_GizmoInputSurface);
+  CPPUNIT_ASSERT(gizmoTranslateAxis->m_InputVme == m_GizmoInputSurface);
 
   cppDEL(gizmoTranslateAxis);
 }
@@ -280,12 +281,12 @@ void mafGizmoTranslateAxisTest::TestSetStep()
   mafTransform::SetPosition(absPose, position);
 
   mafGizmoTranslateAxis *gizmoTranslateAxis = new mafGizmoTranslateAxis(m_GizmoInputSurface);
-  gizmoTranslateAxis->SetStep(mmiConstraint::Y, 2);
+  gizmoTranslateAxis->SetStep(mafInteractorConstraint::Y, 2);
 
   for (int i = 0; i < 2; i++)
   {
     CPPUNIT_ASSERT(
-      gizmoTranslateAxis->IsaGen[i]->GetTranslationConstraint()->GetStep(mmiConstraint::Y)
+      gizmoTranslateAxis->m_IsaGen[i]->GetTranslationConstraint()->GetStep(mafInteractorConstraint::Y)
       == 2);
   }
 
@@ -333,7 +334,7 @@ void mafGizmoTranslateAxisTest::CreateRenderStuff()
 
 void mafGizmoTranslateAxisTest::RenderGizmo( mafGizmoTranslateAxis * gizmoTranslateAxis )
 {
-  RenderData(gizmoTranslateAxis->CylGizmo->GetOutput()->GetVTKData());
-  RenderData(gizmoTranslateAxis->ConeGizmo->GetOutput()->GetVTKData());
+  RenderData(gizmoTranslateAxis->m_CylGizmo->GetOutput()->GetVTKData());
+  RenderData(gizmoTranslateAxis->m_ConeGizmo->GetOutput()->GetVTKData());
 }
 

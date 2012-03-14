@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafNodeFactoryTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-06-05 13:57:28 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2011-05-25 11:58:32 $
+Version:   $Revision: 1.3.2.1 $
 Authors:   Stefano Perticoni, Marco Petrone
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -114,7 +114,7 @@ mafVMECustom::~mafVMECustom()
 
 //-------------------------------------------------------------------------
 /** example of CUSTOM node factory */
-class MAF_EXPORT mafNodeFactoryCustom : public mafNodeFactory
+class mafNodeFactoryCustom : public mafNodeFactory
 //-------------------------------------------------------------------------
 {
 public: 
@@ -125,13 +125,13 @@ public:
   /* Initialize the factory creating and registering a new instance */
   static int Initialize();
   
-  static mafNodeFactoryCustom *GetInstance() {if (!m_Instance) Initialize(); return m_Instance; }
+  static mafNodeFactoryCustom *GetInstance();
 
 protected:
   mafNodeFactoryCustom();
   ~mafNodeFactoryCustom() {}
 
-  static mafNodeFactoryCustom *m_Instance; // stores pointer to this kind of factory
+  static bool m_Initialized;
   
 private:
   mafNodeFactoryCustom(const mafNodeFactoryCustom&);  // Not implemented.
@@ -139,7 +139,7 @@ private:
 };
 
 //----------------------------------------------------------------------------
-mafNodeFactoryCustom *mafNodeFactoryCustom::m_Instance=NULL;
+bool mafNodeFactoryCustom::m_Initialized=false;
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
@@ -150,56 +150,43 @@ mafCxxTypeMacro(mafNodeFactoryCustom)
 mafNodeFactoryCustom::mafNodeFactoryCustom()
 //----------------------------------------------------------------------------
 {
-  m_Instance = NULL;
+  // m_Instance = NULL;
   
 // a VME plugged by default in this factory
   mafPlugNodeMacro(mafVMECustom,"a test VME");
   mafPlugObjectMacro(mafTagArray,"the TagArray attribute");
 }
-
+//----------------------------------------------------------------------------
+mafNodeFactoryCustom* mafNodeFactoryCustom::GetInstance()
+//----------------------------------------------------------------------------
+{
+  static mafNodeFactoryCustom &istance = *(mafNodeFactoryCustom::New());;
+  mafNodeFactoryCustom::Initialize();
+  return &istance;
+}
 //----------------------------------------------------------------------------
 // This is used to register the factory when linking statically
 int mafNodeFactoryCustom::Initialize()
 //----------------------------------------------------------------------------
 {
-  if (m_Instance==NULL)
+  if (!m_Initialized)
   {
-    if (m_Instance=mafNodeFactoryCustom::New())
+    // m_Instance=mafNodeFactory::New();
+
+    m_Initialized = true;
+    if (mafNodeFactoryCustom::GetInstance())
     {
-      m_Instance->RegisterFactory(m_Instance);
+      mafNodeFactoryCustom::GetInstance()->RegisterFactory(mafNodeFactoryCustom::GetInstance());
       return MAF_OK;  
     }
-    
-    return MAF_ERROR;
+    else
+    {
+      m_Initialized = false;
+      return MAF_ERROR;
+    }
   }
 
   return MAF_OK;
-}
-
-//------------------------------------------------------------------------------
-// a custom plugger for the new factory
-template <class T>
-class mafPlugTestNode
-//------------------------------------------------------------------------------
-{
-  public:
-  mafPlugTestNode(const char *description);
-  
-};
-
-//------------------------------------------------------------------------------
-template <class T>
-mafPlugTestNode<T>::mafPlugTestNode(const char *description)
-//------------------------------------------------------------------------------
-{ 
-  mafNodeFactoryCustom *factory=mafNodeFactoryCustom::GetInstance();
-  if (factory)
-  {
-    factory->RegisterNewNode(T::GetStaticTypeName(), description, T::NewObject);
-    // here plug node's icon inside picture factory
-    if (mafPics_Initialized)
-      mafPics.AddVmePic(T::GetStaticTypeName(),T::GetIcon());
-  }
 }
 
 //-------------------------------------------------------------------------
@@ -216,7 +203,7 @@ void mafNodeFactoryTest::TestCreateNodeInstance()
   std::list<mafObjectFactory *> list=mafObjectFactory::GetRegisteredFactories();
   CPPUNIT_ASSERT(list.size()==2);
 
-  mafPlugTestNode<mafNodeCustom>("a test node"); // plug a node in the main node factory
+  mafPlugNode<mafNodeCustom>("a test node"); // plug a node in the main node factory
 
   mafNode *node0 = mafNodeFactory::CreateNodeInstance("mafNodeNotExisting");
   mafNode *node1 = mafNodeFactory::CreateNodeInstance("mafNodeCustom");

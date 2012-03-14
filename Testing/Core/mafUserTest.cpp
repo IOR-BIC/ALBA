@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafUserTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-01-09 13:12:05 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2011-05-25 11:58:32 $
+Version:   $Revision: 1.2.2.2 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -28,7 +28,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // to store settings into the registry with the same name of the application
 // ===============================================================================
 class TestApp : public wxApp
-  // ===============================================================================
+// ===============================================================================
 {
 public:
   bool OnInit();
@@ -89,14 +89,17 @@ void mafUserTest::TestDynamicAllocation()
 void mafUserTest::TestSetCredentials()
 //----------------------------------------------------------------------------
 {
-  mafString usr, pwd;
-  int r_me;
+  mafString usr, pwd, proxyHost, proxyPort;
+  int r_me, proxyFlag;
   usr = "name";
   pwd = "pwd";
+  proxyHost = "cineca";
+  proxyPort = 1111;
   r_me = 0;
+  proxyFlag = 0;
 
   mafUser *user = new mafUser();
-  CPPUNIT_ASSERT(user->SetCredentials(usr, pwd, r_me));
+  CPPUNIT_ASSERT(user->SetCredentials(usr, pwd, proxyFlag, proxyHost, proxyPort, r_me));
   
   bool name_ok = user->GetName().Equals("name");
   CPPUNIT_ASSERT(name_ok);
@@ -104,12 +107,21 @@ void mafUserTest::TestSetCredentials()
   bool pwd_ok = user->GetPwd().Equals("pwd");
   CPPUNIT_ASSERT(pwd_ok);
 
+  bool proxyHost_ok = user->GetProxyHost().Equals("cineca");
+  CPPUNIT_ASSERT(proxyHost_ok);
+
+  bool proxyPort_ok = user->GetProxyPort() == 1111;
+  CPPUNIT_ASSERT(proxyPort_ok);
+
+  bool proxyFlag_ok = user->GetProxyFlag() == 0;
+  CPPUNIT_ASSERT(proxyFlag_ok);
+
   bool remember = user->GetRememberUserCredentials() == 0;
   CPPUNIT_ASSERT(remember);
 
   // test storing user information.
   r_me = 1;
-  CPPUNIT_ASSERT(user->SetCredentials(usr, pwd, r_me));
+  CPPUNIT_ASSERT(user->SetCredentials(usr, pwd, proxyFlag, proxyHost,proxyPort, r_me));
   cppDEL(user);
 
   user = new mafUser();
@@ -118,10 +130,16 @@ void mafUserTest::TestSetCredentials()
   CPPUNIT_ASSERT(name_ok);
   pwd_ok = user->GetPwd().Equals("pwd");
   CPPUNIT_ASSERT(pwd_ok);
+   proxyHost_ok = user->GetProxyHost().Equals("cineca");
+  CPPUNIT_ASSERT(proxyHost_ok);
+  proxyPort_ok = user->GetProxyPort() == 1111;
+  CPPUNIT_ASSERT(proxyPort_ok);
+  proxyFlag_ok = user->GetProxyFlag() == 0;
+  CPPUNIT_ASSERT(proxyFlag_ok);
 
   // remove user info file.
   r_me = 0;
-  bool cred_ok = user->SetCredentials(usr, pwd, r_me);
+  bool cred_ok = user->SetCredentials(usr, pwd, proxyFlag, proxyHost,proxyPort, r_me);
   CPPUNIT_ASSERT(cred_ok);
   cppDEL(user);
 }
@@ -129,15 +147,19 @@ void mafUserTest::TestSetCredentials()
 void mafUserTest::TestCheckUserCredentials()
 //----------------------------------------------------------------------------
 {
-  mafString usr, pwd;
-  int r_me;
-  bool cred_ok;
+  mafString usr, pwd, proxyHost, proxyPort;
+  int r_me, proxyFlag;
   usr = "name";
   pwd = "pwd";
+  proxyHost = "cineca";
+  proxyPort = 1111;
   r_me = 0;
+  proxyFlag = 0;
+  bool cred_ok;
+
 
   mafUser *user = new mafUser();
-  cred_ok = user->SetCredentials(usr, pwd, r_me);
+  cred_ok = user->SetCredentials(usr, pwd, proxyFlag, proxyHost,proxyPort, r_me);
   CPPUNIT_ASSERT(cred_ok);
 
   // both username and password are given: basic credential check is ok.
@@ -145,7 +167,7 @@ void mafUserTest::TestCheckUserCredentials()
   CPPUNIT_ASSERT(cred_ok);
 
   pwd = "";
-  cred_ok = user->SetCredentials(usr, pwd, r_me);
+  cred_ok = user->SetCredentials(usr, pwd, proxyFlag, proxyHost,proxyPort, r_me);
   CPPUNIT_ASSERT(cred_ok);
 
   // empty password is admitted (anonymous authentication): basic credential check is ok.
@@ -156,7 +178,7 @@ void mafUserTest::TestCheckUserCredentials()
   pwd = "pwd";
 
   // empty username is NOT admitted (anonymous authentication): basic credential check is ok.
-  cred_ok = user->SetCredentials(usr, pwd, r_me);
+  cred_ok = user->SetCredentials(usr, pwd, proxyFlag, proxyHost,proxyPort, r_me);
   CPPUNIT_ASSERT(!cred_ok);
   cppDEL(user);
 }

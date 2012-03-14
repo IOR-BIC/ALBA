@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafOpExporterRAWTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-03-06 12:01:16 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2009-04-22 10:20:21 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -81,22 +81,25 @@ void mafOpExporterRAWTest::Test()
 	exporter->SaveVolume();
 
 	//Import the volume exported
-	importer->SetInput(storage->GetRoot());
+
+  mafOpImporterRAWVolume *importer2=new mafOpImporterRAWVolume("importer");
+  importer2->TestModeOn();
+	importer2->SetInput(storage->GetRoot());
 	wxString path,name,ext;
 	::wxSplitPath(FilenameExporter,&path,&name,&ext);
 	path+= "/";
 	wxString FilenameCHECK = wxString::Format("%s%s_%dx%dx%d.raw",path,name,Dimensions[0],Dimensions[1],Dimensions[2]);
-	importer->SetFileName(FilenameCHECK);
-	importer->SetDataDimensions(Dimensions);
-	importer->SetDataSpacing(Spacing);
-	importer->SetScalarType(importer->SHORT_SCALAR);
-	importer->ScalarSignedOn();
-	importer->SetScalarDataToLittleEndian();
-	importer->SetDataVOI(VOI);
-	ok=importer->Import();
+	importer2->SetFileName(FilenameCHECK);
+	importer2->SetDataDimensions(Dimensions);
+	importer2->SetDataSpacing(Spacing);
+	importer2->SetScalarType(importer->SHORT_SCALAR);
+	importer2->ScalarSignedOn();
+	importer2->SetScalarDataToLittleEndian();
+	importer2->SetDataVOI(VOI);
+	ok=importer2->Import();
 	CPPUNIT_ASSERT(ok);
 
-	mafVMEVolumeGray *vmeVolumeGrayExported = mafVMEVolumeGray::SafeDownCast(importer->GetOutput());
+	mafVMEVolumeGray *vmeVolumeGrayExported = mafVMEVolumeGray::SafeDownCast(importer2->GetOutput());
 	vmeVolumeGrayExported->Update();
 	((vtkRectilinearGrid *)(vmeVolumeGrayExported->GetOutput()->GetVTKData()))->UpdateData();
 
@@ -133,9 +136,12 @@ void mafOpExporterRAWTest::Test()
 		CPPUNIT_ASSERT(ScalarsImported->GetValue(i)==ScalarsExported->GetValue(i));
 	}
 
+  DataExported = NULL;
+  DataImported = NULL;
 	vmeVolumeGrayImported = NULL;
 	vmeVolumeGrayExported = NULL;
 	mafDEL(exporter);
+  mafDEL(importer2);
 	mafDEL(importer);
 	mafDEL(storage);
 }
@@ -254,6 +260,8 @@ void mafOpExporterRAWTest::TestRG()
 		CPPUNIT_ASSERT(ScalarsImported->GetValue(i)==ScalarsExported->GetValue(i));
 	}
 
+  DataExported = NULL;
+  DataImported = NULL;
 	vmeVolumeGrayImported = NULL;
 	vmeVolumeGrayExported = NULL;
 	mafDEL(exporter);

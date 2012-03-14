@@ -2,13 +2,14 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafDirectoryTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-06-21 09:10:46 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2010-07-22 10:20:04 $
+Version:   $Revision: 1.2.4.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004 
 CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
+
 
 #include "mafDefines.h" 
 //----------------------------------------------------------------------------

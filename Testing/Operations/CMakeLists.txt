@@ -1,6 +1,10 @@
 PROJECT (Operations_TEST)
 
-LINK_LIBRARIES(mafOperations)
+IF(MAF_BUILD_MAFDLL)
+  LINK_LIBRARIES(mafDLL)
+ELSE(MAF_BUILD_MAFDLL)
+  LINK_LIBRARIES(mafOperations)
+ENDIF (MAF_BUILD_MAFDLL)
 
 ####### Tests
 ############ mafOpImporterMSF1xTest
@@ -173,7 +177,128 @@ IF (WIN32)
   SET_TARGET_PROPERTIES(mafOpImporterVTKTest PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)
 
+############ mafOpCreateVolumeTest
+ADD_EXECUTABLE(mafOpCreateVolumeTest mafOpCreateVolumeTest.h mafOpCreateVolumeTest.cpp)
+ADD_TEST(mafOpCreateVolumeTest ${EXECUTABLE_OUTPUT_PATH}/mafOpCreateVolumeTest)
+IF (WIN32)
+  SET_TARGET_PROPERTIES(mafOpCreateVolumeTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
 
+############ mafOpVOIDensityEditorTestTest
+ADD_EXECUTABLE(mafOpVOIDensityEditorTestTest mafOpVOIDensityEditorTestTest.h mafOpVOIDensityEditorTestTest.cpp)
+ADD_TEST(mafOpVOIDensityEditorTestTest ${EXECUTABLE_OUTPUT_PATH}/mafOpVOIDensityEditorTestTest)
+IF (WIN32)
+  SET_TARGET_PROPERTIES(mafOpVOIDensityEditorTestTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
+
+############ mafOpAddLandmarkTest
+ADD_EXECUTABLE(mafOpAddLandmarkTest mafOpAddLandmarkTest.h mafOpAddLandmarkTest.cpp)
+ADD_TEST(mafOpAddLandmarkTest ${EXECUTABLE_OUTPUT_PATH}/mafOpAddLandmarkTest)
+IF (WIN32)
+  SET_TARGET_PROPERTIES(mafOpAddLandmarkTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
+
+############ mafOpApplyTrajectoryTest
+ADD_EXECUTABLE(mafOpApplyTrajectoryTest mafOpApplyTrajectoryTest.h mafOpApplyTrajectoryTest.cpp)
+ADD_TEST(mafOpApplyTrajectoryTest ${EXECUTABLE_OUTPUT_PATH}/mafOpApplyTrajectoryTest)
+IF (WIN32)
+  SET_TARGET_PROPERTIES(mafOpApplyTrajectoryTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
+
+############ mafOpExplodeCollapseTest
+ADD_EXECUTABLE(mafOpExplodeCollapseTest mafOpExplodeCollapseTest.h mafOpExplodeCollapseTest.cpp)
+ADD_TEST(mafOpExplodeCollapseTest ${EXECUTABLE_OUTPUT_PATH}/mafOpExplodeCollapseTest)
+IF (WIN32)
+  SET_TARGET_PROPERTIES(mafOpExplodeCollapseTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
+
+############ mafOpExtractIsosurfaceTest
+ADD_EXECUTABLE(mafOpExtractIsosurfaceTest mafOpExtractIsosurfaceTest.h mafOpExtractIsosurfaceTest.cpp)
+ADD_TEST(mafOpExtractIsosurfaceTest ${EXECUTABLE_OUTPUT_PATH}/mafOpExtractIsosurfaceTest)
+IF (WIN32)
+  SET_TARGET_PROPERTIES(mafOpExtractIsosurfaceTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
+
+############ mafOpImporterASCIITest
+ADD_EXECUTABLE(mafOpImporterASCIITest mafOpImporterASCIITest.h mafOpImporterASCIITest.cpp)
+ADD_TEST(mafOpImporterASCIITest ${EXECUTABLE_OUTPUT_PATH}/mafOpImporterASCIITest)
+IF (WIN32)
+  SET_TARGET_PROPERTIES(mafOpImporterASCIITest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
+
+############ mafOpExporterMSFTest
+ADD_EXECUTABLE(mafOpExporterMSFTest mafOpExporterMSFTest.h mafOpExporterMSFTest.cpp)
+ADD_TEST(mafOpExporterMSFTest ${EXECUTABLE_OUTPUT_PATH}/mafOpExporterMSFTest)
+IF (WIN32)
+  SET_TARGET_PROPERTIES(mafOpExporterMSFTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
+
+############ mafOpFilterSurfaceTest
+ADD_EXECUTABLE(mafOpFilterSurfaceTest mafOpFilterSurfaceTest.h mafOpFilterSurfaceTest.cpp)
+ADD_TEST(mafOpFilterSurfaceTest ${EXECUTABLE_OUTPUT_PATH}/mafOpFilterSurfaceTest)
+IF (WIN32)
+  SET_TARGET_PROPERTIES(mafOpFilterSurfaceTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
+
+############ mafOpValidateTreeTest
+ADD_EXECUTABLE(mafOpValidateTreeTest mafOpValidateTreeTest.h mafOpValidateTreeTest.cpp)
+ADD_TEST(mafOpValidateTreeTest ${EXECUTABLE_OUTPUT_PATH}/mafOpValidateTreeTest)
+IF (WIN32)
+ SET_TARGET_PROPERTIES(mafOpValidateTreeTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
+
+
+############ mafOpGarbageCollectMSFDirTest
+ADD_EXECUTABLE(mafOpGarbageCollectMSFDirTest mafOpGarbageCollectMSFDirTest.h mafOpGarbageCollectMSFDirTest.cpp)
+ADD_TEST(mafOpGarbageCollectMSFDirTest ${EXECUTABLE_OUTPUT_PATH}/mafOpGarbageCollectMSFDirTest)
+IF (WIN32)
+ SET_TARGET_PROPERTIES(mafOpGarbageCollectMSFDirTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
+
+############ mafOpScalarToSurfaceTest
+ ADD_EXECUTABLE(mafOpScalarToSurfaceTest mafOpScalarToSurfaceTest.h mafOpScalarToSurfaceTest.cpp)
+ ADD_TEST(mafOpScalarToSurfaceTest ${EXECUTABLE_OUTPUT_PATH}/mafOpScalarToSurfaceTest)
+ IF (WIN32)
+   SET_TARGET_PROPERTIES(mafOpScalarToSurfaceTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ ENDIF (WIN32)
+ 
+############ mafASCIIImporterUtilityTest
+ ADD_EXECUTABLE(mafASCIIImporterUtilityTest mafASCIIImporterUtilityTest.h mafASCIIImporterUtilityTest.cpp)
+ ADD_TEST(mafASCIIImporterUtilityTest ${EXECUTABLE_OUTPUT_PATH}/mafASCIIImporterUtilityTest)
+ IF (WIN32)
+   SET_TARGET_PROPERTIES(mafASCIIImporterUtilityTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ ENDIF (WIN32)
+ 
+ ############ mafOpEditMetadataTest
+ ADD_EXECUTABLE(mafOpEditMetadataTest mafOpEditMetadataTest.h mafOpEditMetadataTest.cpp)
+ ADD_TEST(mafOpEditMetadataTest ${EXECUTABLE_OUTPUT_PATH}/mafOpEditMetadataTest)
+ IF (WIN32)
+   SET_TARGET_PROPERTIES(mafOpEditMetadataTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ ENDIF (WIN32)
+
+ ############ mafOpFilterVolumeTest
+ ADD_EXECUTABLE(mafOpFilterVolumeTest mafOpFilterVolumeTest.h mafOpFilterVolumeTest.cpp)
+ ADD_TEST(mafOpFilterVolumeTest ${EXECUTABLE_OUTPUT_PATH}/mafOpFilterVolumeTest)
+ IF (WIN32)
+   SET_TARGET_PROPERTIES(mafOpFilterVolumeTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ ENDIF (WIN32)
+
+ ############ mafOpMAFTransformTest
+ ADD_EXECUTABLE(mafOpMAFTransformTest mafOpMAFTransformTest.h mafOpMAFTransformTest.cpp)
+ ADD_TEST(mafOpMAFTransformTest ${EXECUTABLE_OUTPUT_PATH}/mafOpMAFTransformTest)
+ IF (WIN32)
+   SET_TARGET_PROPERTIES(mafOpMAFTransformTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ ENDIF (WIN32)
+ 
+  ############ mafOpTransformInterfaceTest
+ ADD_EXECUTABLE(mafOpTransformInterfaceTest mafOpTransformInterfaceTest.h mafOpTransformInterfaceTest.cpp)
+ ADD_TEST(mafOpTransformInterfaceTest ${EXECUTABLE_OUTPUT_PATH}/mafOpTransformInterfaceTest)
+ IF (WIN32)
+   SET_TARGET_PROPERTIES(mafOpTransformInterfaceTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ ENDIF (WIN32)
+ 
+ 
+ 
 IF (MAF_USE_ITK)
   ############ mafVMEMeshAnsysTextImporterTest
   ADD_EXECUTABLE(mafVMEMeshAnsysTextImporterTest mafVMEMeshAnsysTextImporterTest.h mafVMEMeshAnsysTextImporterTest.cpp)
@@ -194,6 +319,13 @@ IF (MAF_USE_ITK)
   ADD_TEST(mafOpImporterMeshTest ${EXECUTABLE_OUTPUT_PATH}/mafOpImporterMeshTest)
 	IF (WIN32)
 	  SET_TARGET_PROPERTIES(mafOpImporterMeshTest PROPERTIES LINK_FLAGS "/MANIFEST")
+	ENDIF (WIN32)
+
+  ############ mafOpExporterMeshTest
+  ADD_EXECUTABLE(mafOpExporterMeshTest mafOpExporterMeshTest.h mafOpExporterMeshTest.cpp)
+  ADD_TEST(mafOpExporterMeshTest ${EXECUTABLE_OUTPUT_PATH}/mafOpExporterMeshTest)
+	IF (WIN32)
+	  SET_TARGET_PROPERTIES(mafOpExporterMeshTest PROPERTIES LINK_FLAGS "/MANIFEST")
 	ENDIF (WIN32)
 
   ############ mafVMEDataSetAttributesImporterTest
@@ -251,5 +383,14 @@ IF (MAF_USE_ITK)
   IF (WIN32)
     SET_TARGET_PROPERTIES(mafOpCreateSurfaceParametricTest PROPERTIES LINK_FLAGS "/MANIFEST")
   ENDIF (WIN32)
+  
+  ############ mafOpExporterVTKTest
+  ADD_EXECUTABLE(mafOpExporterVTKTest mafOpExporterVTKTest.h mafOpExporterVTKTest.cpp)
+  ADD_TEST(mafOpExporterVTKTest ${EXECUTABLE_OUTPUT_PATH}/mafOpExporterVTKTest)
+  IF (WIN32)
+    SET_TARGET_PROPERTIES(mafOpExporterVTKTest PROPERTIES LINK_FLAGS "/MANIFEST")
+  ENDIF (WIN32)
 
 ENDIF (MAF_USE_ITK)
+
+

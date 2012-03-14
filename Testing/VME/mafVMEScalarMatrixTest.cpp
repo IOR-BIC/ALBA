@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafVMEScalarMatrixTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-12-12 08:28:48 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2011-05-25 11:58:33 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -22,7 +22,6 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <cppunit/config/SourcePrefix.h>
 #include "mafVMEScalarMatrixTest.h"
 
-#include "mafNodeFactory.h"
 #include "mafVMEFactory.h"
 #include "mafVMEScalarMatrix.h"
 #include "mafVMEOutputScalarMatrix.h"

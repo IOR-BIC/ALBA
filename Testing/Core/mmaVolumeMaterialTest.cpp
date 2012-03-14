@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmaVolumeMaterialTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-06-24 12:15:18 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2009-10-08 07:28:45 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2008
@@ -125,11 +125,16 @@ void mmaVolumeMaterialTest::TestUpdateFromTables()
 //----------------------------------------------------------------------------
 {
   mmaVolumeMaterial *vm1 = new mmaVolumeMaterial();
+  
+  // Set a valid range to allow UpdateFromTables() update m_TableRange member
+  vm1->m_TableRange[0] = 0;
+  vm1->m_TableRange[0] = 1;
+  
   vm1->m_ColorLut->SetHueRange(0.0, 0.4);
   vm1->m_ColorLut->SetSaturationRange(0.0, 0.5);
   vm1->m_ColorLut->SetTableRange(100.0, 300.0);
   vm1->UpdateFromTables();
-
+  
   result = mafEquals(vm1->m_HueRange[0], 0);
   TEST_RESULT;
   result = mafEquals(vm1->m_HueRange[1], 0.4);

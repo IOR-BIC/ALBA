@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafOpConnectivitySurfaceTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-03-06 12:01:16 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2009-01-13 09:39:56 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Daniele Giunchi - Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -57,7 +57,7 @@ void mafOpConnectivitySurfaceTest::Test()
   connectSurface->TestModeOn();
 	connectSurface->SetInput(Data);
 	connectSurface->OpRun();
-  connectSurface->SetThresold(1.0);
+  connectSurface->SetThresold(20.0);
   connectSurface->OnVtkConnect();
   Data->Update();
 

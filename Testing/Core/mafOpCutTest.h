@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafOpCutTest.h,v $
 Language:  C++
-Date:      $Date: 2008-02-19 10:18:20 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2010-06-04 12:55:32 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -39,12 +39,18 @@ public:
   CPPUNIT_TEST( TestFixture ); // just to test that the fixture has no leaks
   CPPUNIT_TEST( TestOpDo );
   CPPUNIT_TEST( TestOpUndo );
+  CPPUNIT_TEST( TestOpDoVMETimeVarying );
+  CPPUNIT_TEST( TestOpUndoVMETimeVarying );
+  CPPUNIT_TEST( TestOpUndoVMEWithChildren );
   CPPUNIT_TEST_SUITE_END();
 
 private:
   void TestFixture();
   void TestOpDo();
   void TestOpUndo();
+  void TestOpDoVMETimeVarying();
+  void TestOpUndoVMETimeVarying();
+  void TestOpUndoVMEWithChildren();
 
   mafOpCut *m_OpCut;
 };

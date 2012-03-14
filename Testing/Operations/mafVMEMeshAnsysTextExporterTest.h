@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafVMEMeshAnsysTextExporterTest.h,v $
 Language:  C++
-Date:      $Date: 2008-07-07 14:30:40 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2009-07-08 11:48:28 $
+Version:   $Revision: 1.4.2.1 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -47,6 +47,8 @@ public:
   CPPUNIT_TEST( TestBonemattedTetra10ElementsIdJumpingMaterialsIdJumpingMaterialsGroupingNoTimevarExport);
   CPPUNIT_TEST( TestBonemattedTetra10ElementsIdJumpingMaterialsIdJumpingMaterialsGroupingNoTimevarExportWithAppliedPose );
   CPPUNIT_TEST( TestBonemattedTetra10ElementsIdJumpingNoMaterialsNoTimeVarExport);
+  CPPUNIT_TEST(TestExportTetra10VtkWithoutAnsysInformation);
+  CPPUNIT_TEST(TestExportTetra4VtkWithoutAnsysInformation);
   CPPUNIT_TEST_SUITE_END();
 
 protected:
@@ -58,6 +60,8 @@ protected:
   void TestBonemattedTetra10ElementsIdJumpingMaterialsIdJumpingMaterialsGroupingNoTimevarExport();
   void TestBonemattedTetra10ElementsIdJumpingMaterialsIdJumpingMaterialsGroupingNoTimevarExportWithAppliedPose();
   void TestBonemattedTetra10ElementsIdJumpingNoMaterialsNoTimeVarExport();
+  void TestExportTetra10VtkWithoutAnsysInformation();
+  void TestExportTetra4VtkWithoutAnsysInformation();
 
   // dataType
   enum
@@ -72,7 +76,10 @@ private:
   void SaveUnstructuredGridToFile(mafString &dirPrefix, mafString &fileName, vtkUnstructuredGrid *data);
 
   void RenderData( vtkUnstructuredGrid *data, int dataType = 0);
-  void Read( mafVMEMeshAnsysTextImporter *reader, mafString &dirPrefix, bool readMaterials /*= false*/, bool writeToDisk /*= false*/, mafString &outputFileName );
+  void Read( mafVMEMeshAnsysTextImporter *reader, mafString &dirPrefix, \
+bool readMaterials /*= false*/, bool writeToDisk /*= false*/, mafString &outputFileName , \
+mafString inputNLISTFileName = "NLIST.lis", mafString inputELISTFileName = "ELIST.lis", \
+mafString mafinputMPLISTFileName = "MPLIST.LIS");
 
   void WriteNodesFile(vtkUnstructuredGrid *ugridconst, const char *outputDirPrefix, const char *outputFileName);
   int  GetRowsNumber(vtkUnstructuredGrid *inputUGrid);

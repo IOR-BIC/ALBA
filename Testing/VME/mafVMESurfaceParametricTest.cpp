@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafVMESurfaceParametricTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-04-17 12:44:27 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2009-01-07 09:48:16 $
+Version:   $Revision: 1.2.4.2 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -163,6 +163,30 @@ void mafVMESurfaceParametricTest::TestSetData()
 		fabs(boundsPolyData[4] - bounds[4]) < 0.0001 &&
 		fabs(boundsPolyData[5] - bounds[5]) < 0.0001 
 		);
+
+  //ellipsoide with resolution 20 radius 2 heigth 5
+  vmeParametricSurface->SetGeometryType(mafVMESurfaceParametric::PARAMETRIC_ELLIPSOID);
+  vmeParametricSurface->Modified();
+  vmeParametricSurface->Update();
+  numberOfPolyDataPoints = 82;
+  CPPUNIT_ASSERT(numberOfPolyDataPoints == polydata->GetNumberOfPoints());
+
+  bounds[0] = -0.9848;
+  bounds[1] = 0.9848;
+  bounds[2] = -1.87321;
+  bounds[3] = 1.87321;
+  bounds[4] = -3;
+  bounds[5] = 3;
+
+  polydata->GetBounds(boundsPolyData);
+  CPPUNIT_ASSERT(
+    fabs(boundsPolyData[0] - bounds[0]) < 0.0001 &&
+    fabs(boundsPolyData[1] - bounds[1]) < 0.0001 &&
+    fabs(boundsPolyData[2] - bounds[2]) < 0.0001 &&
+    fabs(boundsPolyData[3] - bounds[3]) < 0.0001 &&
+    fabs(boundsPolyData[4] - bounds[4]) < 0.0001 &&
+    fabs(boundsPolyData[5] - bounds[5]) < 0.0001 
+    );
 
 	mafVMESurfaceParametric *copySurfaceParametric;
 	mafNEW(copySurfaceParametric);

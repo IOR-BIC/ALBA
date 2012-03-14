@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafVMELandmarkCloudTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-06-05 16:29:55 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2011-07-11 13:05:08 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -63,6 +63,7 @@ void mafVMELandmarkCloudTest::AppendLandmarkTest()
   double z = 15.5;
   mafString name = "land";
 
+  cloud->TestModeOn();
   cloud->AppendLandmark(x, y, z, name.GetCStr());
 
   cloud->Open();
@@ -79,6 +80,7 @@ void mafVMELandmarkCloudTest::AppendLandmarkTest()
   landmark1->SetName(name);
   landmark1->SetPoint(z,y,z);
 
+  cloud1->TestModeOn();
   cloud1->AppendLandmark(name);
   cloud1->Open();
 
@@ -102,6 +104,7 @@ void mafVMELandmarkCloudTest::SetLandmarkTest()
   landmark->SetName(name);
   landmark->SetPoint(z,y,z);
 
+  cloud->TestModeOn();
   cloud->SetLandmark(landmark);
   cloud->Open();
 
@@ -113,6 +116,7 @@ void mafVMELandmarkCloudTest::SetLandmarkTest()
   mafSmartPointer<mafVMELandmarkCloud> cloud1;
   mafSmartPointer<mafVMELandmark> landmark1;
 
+  cloud1->TestModeOn();
   cloud1->AppendLandmark(name);
   cloud1->SetLandmark(name,x,y,z);
   cloud1->Open();
@@ -128,6 +132,7 @@ void mafVMELandmarkCloudTest::SetLandmarkTest()
   mafSmartPointer<mafVMELandmarkCloud> cloud2;
   mafSmartPointer<mafVMELandmark> landmark2;
 
+  cloud2->TestModeOn();
   cloud2->AppendLandmark(name);
   cloud2->SetLandmark(0,x,y,z);
   cloud2->Open();
@@ -153,6 +158,7 @@ void mafVMELandmarkCloudTest::FindLandmarkIndexTest()
   mafSmartPointer<mafVMELandmarkCloud> cloud2;
   mafSmartPointer<mafVMELandmark> landmark2;
 
+  cloud2->TestModeOn();
   cloud2->AppendLandmark(name);
   cloud2->SetLandmark(0,x,y,z);
   cloud2->Open();
@@ -176,6 +182,7 @@ void mafVMELandmarkCloudTest::RemoveLandmarkTest()
   mafSmartPointer<mafVMELandmarkCloud> cloud;
   mafSmartPointer<mafVMELandmark> landmark;
 
+  cloud->TestModeOn();
   cloud->AppendLandmark(name);
   cloud->SetLandmark(0,x,y,z);
   cloud->Open();
@@ -218,6 +225,7 @@ void mafVMELandmarkCloudTest::GetLandmarkNameTest()
   mafSmartPointer<mafVMELandmarkCloud> cloud;
   mafSmartPointer<mafVMELandmark> landmark;
 
+  cloud->TestModeOn();
   cloud->AppendLandmark("");
   cloud->SetLandmark(0,x,y,z);
   cloud->SetLandmarkName(0, name);
@@ -244,6 +252,7 @@ void mafVMELandmarkCloudTest::SetRadiusTest()
   mafSmartPointer<mafVMELandmarkCloud> cloud;
   mafSmartPointer<mafVMELandmark> landmark;
 
+  cloud->TestModeOn();
   cloud->AppendLandmark(name);
   cloud->SetLandmark(0,x,y,z);
   cloud->SetRadius(radius);
@@ -268,6 +277,7 @@ void mafVMELandmarkCloudTest::SetSphereResolutionTest()
   mafSmartPointer<mafVMELandmarkCloud> cloud;
   mafSmartPointer<mafVMELandmark> landmark;
 
+  cloud->TestModeOn();
   cloud->AppendLandmark(name);
   cloud->SetLandmark(0,x,y,z);
   cloud->SetSphereResolution(res);
@@ -290,6 +300,7 @@ void mafVMELandmarkCloudTest::DeepCopyTest()
   double res = 30;
   int number = 5;
   
+  landmarkCloud->TestModeOn();
   landmarkCloud->SetNumberOfLandmarks(number);
   landmarkCloud->SetRadius(rad);
   landmarkCloud->SetSphereResolution(res);

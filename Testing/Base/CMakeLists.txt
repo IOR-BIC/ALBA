@@ -1,6 +1,10 @@
 PROJECT (mafBase_TEST)
 
-LINK_LIBRARIES(mafBase vtkRendering vtkGraphics mafGui)
+IF(MAF_BUILD_MAFDLL)
+  LINK_LIBRARIES(mafDLL)
+ELSE(MAF_BUILD_MAFDLL)
+  LINK_LIBRARIES(mafBase vtkRendering vtkGraphics mafGui)
+ENDIF (MAF_BUILD_MAFDLL)
 
 #-----------------------------------------------------------------------------
 # tests using cppunit testing framework

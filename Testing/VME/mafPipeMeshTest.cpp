@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeMeshTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-03-10 15:45:56 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2011-01-24 13:33:00 $
+Version:   $Revision: 1.5.2.1 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -269,6 +269,8 @@ void mafPipeMeshTest::CompareImages(int scalarIndex)
   if(!controlStream)
   {
     controlStream.close();
+    vtkDEL(w);
+    vtkDEL(w2i);
     return;
   }
   controlStream.close();

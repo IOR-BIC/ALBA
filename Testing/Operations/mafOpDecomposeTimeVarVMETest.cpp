@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafOpDecomposeTimeVarVMETest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-11-21 15:38:57 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2011-07-11 14:10:53 $
+Version:   $Revision: 1.1.4.1 $
 Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -75,6 +75,7 @@ void mafOpDecomposeTimeVarVMETest::TestModeTimeStampsVME()
   mafNode *oldNode = node->FindInTreeByName("C7");
 
   mafOpDecomposeTimeVarVME *decompose = new mafOpDecomposeTimeVarVME("decompose vme");
+  decompose->TestModeOn();
   decompose->SetInput(oldNode );
 
   char *frame = "2.5000";
@@ -137,6 +138,7 @@ void mafOpDecomposeTimeVarVMETest::TestModeIntervalVME()
   mafNode *oldNode = node->FindInTreeByName("C7");
 
   mafOpDecomposeTimeVarVME *decompose = new mafOpDecomposeTimeVarVME("decompose vme");
+  decompose->TestModeOn();
   decompose->SetInput(oldNode );
 
   double from = 2.500;
@@ -204,6 +206,7 @@ void mafOpDecomposeTimeVarVMETest::TestModePeriodicityVME()
   mafNode *oldNode = node->FindInTreeByName("C7");
 
   mafOpDecomposeTimeVarVME *decompose = new mafOpDecomposeTimeVarVME("decompose vme");
+  decompose->TestModeOn();
   decompose->SetInput(oldNode );
 
   decompose->SelectMode(mafOpDecomposeTimeVarVME::MODE_PERIODICITY);

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafOpPasteTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-02-22 14:34:43 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2011-05-25 11:58:32 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2008
@@ -91,7 +91,7 @@ void mafOpPasteTest::TestAccept()
   mafVMEGroup *groupChild;
   mafNEW(groupChild);
   CPPUNIT_ASSERT(m_OpPaste->Accept(groupParent)==false);
-  m_OpPaste->m_Clipboard=groupChild;
+  m_OpPaste->SetClipboard(groupChild);
   CPPUNIT_ASSERT(m_OpPaste->Accept(NULL)==false);
   CPPUNIT_ASSERT(m_OpPaste->Accept(groupParent)==true);
 
@@ -107,7 +107,7 @@ void mafOpPasteTest::TestOpDo()
   mafVMEGroup *groupChild;
   mafNEW(groupChild);
   m_OpPaste->SetInput(groupParent);
-  m_OpPaste->m_Clipboard=groupChild;
+  m_OpPaste->SetClipboard(groupChild);
 
   m_OpPaste->OpDo();
 
@@ -129,12 +129,12 @@ void mafOpPasteTest::TestOpUndo()
 
   m_OpPaste->SetListener(observer);
   m_OpPaste->SetInput(groupParent);
-  m_OpPaste->m_Clipboard=groupChild;
+  m_OpPaste->SetClipboard(groupChild);
 
   m_OpPaste->OpDo();
   m_OpPaste->OpUndo();
 
-  CPPUNIT_ASSERT(m_OpPaste->m_Clipboard.GetPointer()==groupChild);
+  CPPUNIT_ASSERT(m_OpPaste->GetClipboard() == groupChild);
   CPPUNIT_ASSERT(observer->GetEvent(0)->GetSender()==m_OpPaste);
   CPPUNIT_ASSERT(observer->GetEvent(0)->GetVme()==groupChild);
   CPPUNIT_ASSERT(observer->GetEvent(0)->GetId()==VME_REMOVE);

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafOpCutTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-02-19 10:18:20 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2010-06-04 12:55:32 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -25,6 +25,11 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafOpSelect.h"
 #include "mafVMEGroup.h"
 #include "mafEvent.h"
+#include "mafVMEStorage.h"
+#include "mafVMERoot.h"
+#include "mafVMESurface.h"
+#include "mafVMEFactory.h"
+#include "mafVMEVolumeGray.h"
 
 #include <vector>
 
@@ -82,6 +87,8 @@ void mafOpCutTest::tearDown()
 //----------------------------------------------------------------------------
 {
   mafDEL(m_OpCut);
+
+  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafOpCutTest::TestOpDo()
@@ -112,6 +119,8 @@ void mafOpCutTest::TestOpDo()
   CPPUNIT_ASSERT(observer->GetEvent(1)->GetSender()==m_OpCut);
   CPPUNIT_ASSERT(observer->GetEvent(1)->GetVme()==groupParent);
   CPPUNIT_ASSERT(observer->GetEvent(1)->GetId()==VME_SELECTED);
+
+  m_OpCut->ClipboardClear();
 
   delete observer;
   mafDEL(groupParent);
@@ -144,6 +153,107 @@ void mafOpCutTest::TestOpUndo()
 
   CPPUNIT_ASSERT(groupChild->GetParent()==groupParent);
 
+  m_OpCut->ClipboardClear();
+
   mafDEL(groupParent);
-  mafDEL(groupChild);
+  mafDEL(groupChild);  
+}
+//----------------------------------------------------------------------------
+void mafOpCutTest::TestOpDoVMETimeVarying()
+//----------------------------------------------------------------------------
+{
+  // in order to create VME from storage we need the factory to initialize 
+  mafVMEFactory::Initialize();
+
+  mafString filename = MAF_DATA_ROOT;
+  filename << "/Test_Cut/TestMSFOpCut/TestMSFOpCut.msf";
+  mafVMEStorage storage;
+  storage.GetRoot()->SetName("root");
+  storage.GetRoot()->Initialize();
+  storage.SetURL(filename);
+  storage.Restore();
+
+  mafVMESurface *surfaceTimeVarying = mafVMESurface::SafeDownCast(storage.GetRoot()->GetFirstChild());
+  surfaceTimeVarying->GetOutput()->Update();
+  surfaceTimeVarying->Update();
+
+  DummyObserver *observer = new DummyObserver();
+
+  m_OpCut->SetInput(surfaceTimeVarying);
+  m_OpCut->SetListener(observer);
+  m_OpCut->OpDo();
+
+  CPPUNIT_ASSERT(observer->GetEvent(0)->GetSender()==m_OpCut);
+  CPPUNIT_ASSERT(observer->GetEvent(0)->GetVme()==surfaceTimeVarying);
+  CPPUNIT_ASSERT(observer->GetEvent(0)->GetId()==VME_REMOVE);
+
+  CPPUNIT_ASSERT(observer->GetEvent(1)->GetSender()==m_OpCut);
+  CPPUNIT_ASSERT(observer->GetEvent(1)->GetVme()==storage.GetRoot());
+  CPPUNIT_ASSERT(observer->GetEvent(1)->GetId()==VME_SELECTED);
+
+  delete observer;
+
+  m_OpCut->ClipboardClear();
+}
+//----------------------------------------------------------------------------
+void mafOpCutTest::TestOpUndoVMETimeVarying()
+//----------------------------------------------------------------------------
+{
+  // in order to create VME from storage we need the factory to initialize 
+  mafVMEFactory::Initialize();
+
+  mafString filename = MAF_DATA_ROOT;
+  filename << "/Test_Cut/TestMSFOpCut/TestMSFOpCut.msf";
+  mafVMEStorage storage;
+  storage.GetRoot()->SetName("root");
+  storage.GetRoot()->Initialize();
+  storage.SetURL(filename);
+  storage.Restore();
+
+  mafVMESurface *surfaceTimeVarying = mafVMESurface::SafeDownCast(storage.GetRoot()->GetFirstChild());
+  surfaceTimeVarying->GetOutput()->Update();
+  surfaceTimeVarying->Update();
+  m_OpCut->SetInput(surfaceTimeVarying);
+  m_OpCut->OpDo();
+
+  surfaceTimeVarying->SetParent(NULL); //OpDo send only a message.
+
+  CPPUNIT_ASSERT(surfaceTimeVarying->GetParent()==NULL);
+
+  m_OpCut->OpUndo();
+
+  CPPUNIT_ASSERT(surfaceTimeVarying->GetParent()==storage.GetRoot());
+
+  m_OpCut->ClipboardClear();
+}
+//----------------------------------------------------------------------------
+void mafOpCutTest::TestOpUndoVMEWithChildren()
+//----------------------------------------------------------------------------
+{
+  // Added by Losi:
+  // This method is added to test the case when the VME to cut has some children with vtk data
+
+  mafString filename = MAF_DATA_ROOT;
+  filename << "/Test_Cut/TestMSFOpCutWithChildren/TestMSFOpCutWithChildren.msf";
+  mafVMEStorage storage;
+  storage.GetRoot()->SetName("root");
+  storage.GetRoot()->Initialize();
+  storage.SetURL(filename);
+  storage.Restore();
+
+  mafVMEVolumeGray *volume_parent = mafVMEVolumeGray::SafeDownCast(storage.GetRoot()->GetFirstChild());
+  volume_parent->GetOutput()->Update();
+  volume_parent->Update();
+  m_OpCut->SetInput(volume_parent);
+  m_OpCut->OpDo();
+
+  volume_parent->SetParent(NULL); //OpDo send only a message.
+
+  CPPUNIT_ASSERT(volume_parent->GetParent()==NULL);
+
+  m_OpCut->OpUndo();
+
+  CPPUNIT_ASSERT(volume_parent->GetParent()==storage.GetRoot());
+
+  m_OpCut->ClipboardClear();
 }

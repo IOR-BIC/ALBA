@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafVMEScalarTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-01-24 12:30:22 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2011-05-25 11:58:33 $
+Version:   $Revision: 1.6.2.1 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -22,7 +22,6 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <cppunit/config/SourcePrefix.h>
 #include "mafVMEScalarTest.h"
 
-#include "mafNodeFactory.h"
 #include "mafVMEFactory.h"
 
 #include "mafSmartPointer.h"

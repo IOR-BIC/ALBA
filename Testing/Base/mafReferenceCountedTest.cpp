@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafReferenceCountedTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-01-23 08:04:32 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2011-05-25 11:58:32 $
+Version:   $Revision: 1.2.2.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004 

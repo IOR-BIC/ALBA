@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafVMEStorageTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-03 11:32:34 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2011-05-25 11:58:32 $
+Version:   $Revision: 1.2.2.1 $
 Authors:   Marco Petrone, Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 

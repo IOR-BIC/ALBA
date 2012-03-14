@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeSurfaceTexturedTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-10-20 15:22:57 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-10-20 15:24:21 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2008

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeGizmoTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-10-08 14:30:56 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-10-27 11:56:11 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2008
@@ -181,7 +181,7 @@ void mafPipeGizmoTest::CompareImages(int scalarIndex)
   name = name.substr(0, pointIndex);
 
   mafString controlOriginFile=MAF_DATA_ROOT;
-  controlOriginFile<<"/Test_PipeGizmo/";
+  controlOriginFile<<"/Test_PipeGizmo/ImagesOriginal/";
   controlOriginFile<<name.c_str();
   controlOriginFile<<"_";
   controlOriginFile<<"image";
@@ -208,14 +208,14 @@ void mafPipeGizmoTest::CompareImages(int scalarIndex)
 
   if(!controlStream)
   {
-    imageFile<<"/Test_PipeGizmo/";
+    imageFile<<"/Test_PipeGizmo/ImagesOriginal/";
     imageFile<<name.c_str();
     imageFile<<"_";
     imageFile<<"image";
   }
   else
   {
-    imageFile<<"/Test_PipeGizmo/";
+    imageFile<<"/Test_PipeGizmo/ImagesToCompare/";
     imageFile<<name.c_str();
     imageFile<<"_";
     imageFile<<"comp";
@@ -239,7 +239,7 @@ void mafPipeGizmoTest::CompareImages(int scalarIndex)
   vtkJPEGReader *rO;
   vtkNEW(rO);
   mafString imageFileOrig=MAF_DATA_ROOT;
-  imageFileOrig<<"/Test_PipeGizmo/";
+  imageFileOrig<<"/Test_PipeGizmo/ImagesOriginal/";
   imageFileOrig<<name.c_str();
   imageFileOrig<<"_";
   imageFileOrig<<"image";

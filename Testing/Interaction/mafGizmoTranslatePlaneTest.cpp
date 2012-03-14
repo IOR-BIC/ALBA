@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGizmoTranslatePlaneTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-18 16:09:44 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2011-05-25 11:58:32 $
+Version:   $Revision: 1.2.2.4 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -25,6 +25,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <iostream>
 
 #include "mafString.h"
+#include "mafRefSys.h"
 #include "mafGizmoTranslatePlane.h"
 #include "mafVMERoot.h"
 #include "mafSmartPointer.h"
@@ -34,7 +35,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafObserver.h"
 #include "mafTransform.h"
 
-#include "mmiGenericMouse.h"
+#include "mafInteractorGenericMouse.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkPoints.h"
@@ -188,7 +189,7 @@ void mafGizmoTranslatePlaneTest::TestSetConstrainRefSys()
   // using friend mafGizmoTranslatePlane
   for (int i = 0; i < 2; i++)
   {
-    mafMatrix *mat = gizmoTranslatePlane->IsaGen[i]->GetTranslationConstraint()->GetRefSys()->GetMatrix();
+    mafMatrix *mat = gizmoTranslatePlane->m_IsaGen[i]->GetTranslationConstraint()->GetRefSys()->GetMatrix();
     CPPUNIT_ASSERT(mat == &refSys);
   }
 
@@ -200,13 +201,13 @@ void mafGizmoTranslatePlaneTest::TestSetConstraintModality()
   mafGizmoTranslatePlane *gizmoTranslatePlane = new mafGizmoTranslatePlane(m_GizmoInputSurface);
 
   gizmoTranslatePlane->SetPlane(mafGizmoTranslatePlane::XY);
-  gizmoTranslatePlane->SetConstraintModality(mafGizmoTranslatePlane::XY, mmiConstraint::LOCK);
+  gizmoTranslatePlane->SetConstraintModality(mafGizmoTranslatePlane::XY, mafInteractorConstraint::LOCK);
   
   // using friend mafGizmoTranslatePlane
   for (int i = 0; i < 2; i++)
   {
-    int constrainModality = gizmoTranslatePlane->IsaGen[i]->GetTranslationConstraint()->GetConstraintModality(mafGizmoTranslatePlane::XY);
-    CPPUNIT_ASSERT(constrainModality  ==  mmiConstraint::LOCK);
+    int constrainModality = gizmoTranslatePlane->m_IsaGen[i]->GetTranslationConstraint()->GetConstraintModality(mafGizmoTranslatePlane::XY);
+    CPPUNIT_ASSERT(constrainModality  ==  mafInteractorConstraint::LOCK);
   } 
 
   cppDEL(gizmoTranslatePlane);
@@ -231,7 +232,7 @@ void mafGizmoTranslatePlaneTest::TestSetInput()
   gizmoTranslatePlane->SetInput(m_GizmoInputSurface);
 
   // using friend mafGizmoTranslatePlane
-  CPPUNIT_ASSERT(gizmoTranslatePlane->InputVme == m_GizmoInputSurface);
+  CPPUNIT_ASSERT(gizmoTranslatePlane->m_InputVme == m_GizmoInputSurface);
 
   cppDEL(gizmoTranslatePlane);
 }
@@ -272,12 +273,12 @@ void mafGizmoTranslatePlaneTest::TestSetStep()
   mafTransform::SetPosition(absPose, position);
 
   mafGizmoTranslatePlane *gizmoTranslatePlane = new mafGizmoTranslatePlane(m_GizmoInputSurface);
-  gizmoTranslatePlane->SetStep(mmiConstraint::Y, 2);
+  gizmoTranslatePlane->SetStep(mafInteractorConstraint::Y, 2);
 
   for (int i = 0; i < 2; i++)
   {
     CPPUNIT_ASSERT(
-      gizmoTranslatePlane->IsaGen[i]->GetTranslationConstraint()->GetStep(mmiConstraint::Y)
+      gizmoTranslatePlane->m_IsaGen[i]->GetTranslationConstraint()->GetStep(mafInteractorConstraint::Y)
       == 2);
   }
 
@@ -327,7 +328,7 @@ void mafGizmoTranslatePlaneTest::RenderGizmo( mafGizmoTranslatePlane * gizmoTran
 {
   for (int i = 0; i < 3; i++) 
   { 
-    RenderData(gizmoTranslatePlane->Gizmo[i]->GetOutput()->GetVTKData()); 
+    RenderData(gizmoTranslatePlane->m_Gizmo[i]->GetOutput()->GetVTKData()); 
   }
 }
 

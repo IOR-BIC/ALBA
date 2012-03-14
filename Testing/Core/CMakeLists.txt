@@ -1,6 +1,10 @@
 PROJECT (mafCore_TEST)
 
-LINK_LIBRARIES(mafCore mafVME)
+IF(MAF_BUILD_MAFDLL)
+  LINK_LIBRARIES(mafDLL)
+ELSE(MAF_BUILD_MAFDLL)
+  LINK_LIBRARIES(mafCore mafVME)
+ENDIF (MAF_BUILD_MAFDLL)
 
 #-----------------------------------------------------------------------------
 # tests using cppunit testing framework
@@ -285,6 +289,99 @@ IF (WIN32)
   SET_TARGET_PROPERTIES(mafGUITreeContextualMenuTest PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)
 
+############ mafAttributeTraceabilityTest
+ADD_EXECUTABLE(mafAttributeTraceabilityTest mafAttributeTraceabilityTest.h mafAttributeTraceabilityTest.cpp)
+ADD_TEST(mafAttributeTraceabilityTest ${EXECUTABLE_OUTPUT_PATH}/mafAttributeTraceabilityTest)
+IF (WIN32)
+  SET_TARGET_PROPERTIES(mafAttributeTraceabilityTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
+
+############ mafAxesTest
+ADD_EXECUTABLE(mafAxesTest mafAxesTest.h mafAxesTest.cpp)
+ADD_TEST(mafAxesTest ${EXECUTABLE_OUTPUT_PATH}/mafAxesTest)
+IF (WIN32)
+  SET_TARGET_PROPERTIES(mafAxesTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
+
+############ mafCoreFactoryTest
+ADD_EXECUTABLE(mafCoreFactoryTest mafCoreFactoryTest.h mafCoreFactoryTest.cpp)
+ADD_TEST(mafCoreFactoryTest ${EXECUTABLE_OUTPUT_PATH}/mafCoreFactoryTest)
+IF (WIN32)
+  SET_TARGET_PROPERTIES(mafCoreFactoryTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
+
+
+############ mafOpStackTest
+ADD_EXECUTABLE(mafOpStackTest mafOpStackTest.h mafOpStackTest.cpp)
+ADD_TEST(mafOpStackTest ${EXECUTABLE_OUTPUT_PATH}/mafOpStackTest)
+IF (WIN32)
+  SET_TARGET_PROPERTIES(mafOpStackTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
+
+
+############ mafNodeGenericTest
+ADD_EXECUTABLE(mafNodeGenericTest mafNodeGenericTest.h mafNodeGenericTest.cpp)
+ADD_TEST(mafNodeGenericTest ${EXECUTABLE_OUTPUT_PATH}/mafNodeGenericTest)
+IF (WIN32)
+  SET_TARGET_PROPERTIES(mafNodeGenericTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
+
+
+############ mafExpirationDateTest
+ADD_EXECUTABLE(mafExpirationDateTest mafExpirationDateTest.h mafExpirationDateTest.cpp)
+ADD_TEST(mafExpirationDateTest ${EXECUTABLE_OUTPUT_PATH}/mafExpirationDateTest)
+IF (WIN32)
+ SET_TARGET_PROPERTIES(mafExpirationDateTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
+
+############ mafNodeManagerTest
+ADD_EXECUTABLE(mafNodeManagerTest mafNodeManagerTest.h mafNodeManagerTest.cpp)
+ADD_TEST(mafNodeManagerTest ${EXECUTABLE_OUTPUT_PATH}/mafNodeManagerTest)
+IF (WIN32)
+ SET_TARGET_PROPERTIES(mafNodeManagerTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
+
+############ mafOpManagerTest
+ADD_EXECUTABLE(mafOpManagerTest mafOpManagerTest.h mafOpManagerTest.cpp)
+ADD_TEST(mafOpManagerTest ${EXECUTABLE_OUTPUT_PATH}/mafOpManagerTest)
+IF (WIN32)
+ SET_TARGET_PROPERTIES(mafOpManagerTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
+
+############ mafViewManagerTest
+ADD_EXECUTABLE(mafViewManagerTest mafViewManagerTest.h mafViewManagerTest.cpp)
+ADD_TEST(mafViewManagerTest ${EXECUTABLE_OUTPUT_PATH}/mafViewManagerTest)
+IF (WIN32)
+ SET_TARGET_PROPERTIES(mafViewManagerTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
+
+############ mafVMEManagerTest
+ADD_EXECUTABLE(mafVMEManagerTest mafVMEManagerTest.h mafVMEManagerTest.cpp)
+ADD_TEST(mafVMEManagerTest ${EXECUTABLE_OUTPUT_PATH}/mafVMEManagerTest)
+IF (WIN32)
+ SET_TARGET_PROPERTIES(mafVMEManagerTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
+
+############ mafAbsMatrixPipeTest
+ADD_EXECUTABLE(mafAbsMatrixPipeTest mafAbsMatrixPipeTest.h mafAbsMatrixPipeTest.cpp)
+ADD_TEST(mafAbsMatrixPipeTest ${EXECUTABLE_OUTPUT_PATH}/mafAbsMatrixPipeTest)
+IF (WIN32)
+ SET_TARGET_PROPERTIES(mafAbsMatrixPipeTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
+
+############ vtkMAFAssemblyTest
+ADD_EXECUTABLE(vtkMAFAssemblyTest vtkMAFAssemblyTest.h vtkMAFAssemblyTest.cpp)
+ADD_TEST(vtkMAFAssemblyTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFAssemblyTest)
+IF (WIN32)
+ SET_TARGET_PROPERTIES(vtkMAFAssemblyTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
+
+############ mafViewPlotTest
+ADD_EXECUTABLE(mafViewPlotTest mafViewPlotTest.h mafViewPlotTest.cpp)
+ADD_TEST(mafViewPlotTest ${EXECUTABLE_OUTPUT_PATH}/mafViewPlotTest)
+IF (WIN32)
+ SET_TARGET_PROPERTIES(mafViewPlotTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
 
 #-----------------------------------------------------------------------------
 # tests not using cppunit testing framework: to be converted...

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafVMEVolumeGrayTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-08-17 12:56:03 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2009-01-08 15:18:03 $
+Version:   $Revision: 1.3.4.1 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -95,7 +95,9 @@ void mafVMEVolumeGrayTest::TestSetData()
 
   rectilinearGrid->GetPointData()->SetScalars(scalars);
   returnValue = vmeVolumeGray->SetData(rectilinearGrid, 0);
-  CPPUNIT_ASSERT(returnValue == MAF_OK);
+  // This SetData should produce a MAF_ERROR; you can not set
+  // different data type to a mafVMEVolume when created and initialized.
+  CPPUNIT_ASSERT(returnValue == MAF_ERROR);
 
   // destroy vme
   mafDEL(vmeVolumeGray);

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafOpEditTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-02-19 10:18:20 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2011-05-25 11:58:32 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -51,7 +51,7 @@ void mafOpEditTest::TestClipboardIsEmpty()
   mafVMEGroup *group;
   mafNEW(group);
   
-  m_OpEdit->m_Clipboard=group;
+  m_OpEdit->SetClipboard(group);
 
   CPPUNIT_ASSERT(!m_OpEdit->ClipboardIsEmpty());
 
@@ -64,7 +64,7 @@ void mafOpEditTest::TestClipboardClear()
   mafVMEGroup *group;
   mafNEW(group);
 
-  m_OpEdit->m_Clipboard=group;
+  m_OpEdit->SetClipboard(group);
 
   m_OpEdit->ClipboardClear();
 
@@ -79,7 +79,7 @@ void mafOpEditTest::TestClipboardBackupRestore()
   mafVMEGroup *group;
   mafNEW(group);
 
-  m_OpEdit->m_Clipboard=group;
+  m_OpEdit->SetClipboard(group);
 
   m_OpEdit->ClipboardBackup();
 
@@ -89,7 +89,7 @@ void mafOpEditTest::TestClipboardBackupRestore()
 
   CPPUNIT_ASSERT(!m_OpEdit->ClipboardIsEmpty());
 
-  CPPUNIT_ASSERT(m_OpEdit->m_Clipboard.GetPointer()==group);
+  CPPUNIT_ASSERT(m_OpEdit->GetClipboard()==group);
 
   mafDEL(group);
 }

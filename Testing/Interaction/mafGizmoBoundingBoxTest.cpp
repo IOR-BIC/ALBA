@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGizmoBoundingBoxTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-05-02 15:42:24 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2009-12-17 11:48:36 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -34,7 +34,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafObserver.h"
 #include "mafTransform.h"
 
-#include "mmiGenericMouse.h"
+#include "mafInteractorGenericMouse.h"
 #include "mmaMaterial.h"
 
 #include "vtkMAFSmartPointer.h"

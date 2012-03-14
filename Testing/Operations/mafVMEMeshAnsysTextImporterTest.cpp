@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafVMEMeshAnsysTextImporterTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-02-14 14:24:51 $
-Version:   $Revision: 1.9 $
+Date:      $Date: 2009-07-08 11:48:28 $
+Version:   $Revision: 1.9.2.1 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -217,7 +217,7 @@ void mafVMEMeshAnsysTextImporterTest::ReadAndDisplay( mafString &dirPrefix, int 
     CPPUNIT_ASSERT(ntuples == ugrid->GetNumberOfCells());
 
     // render cell data for linear cells only (vtk 4.4 bug)
-    if (reader->GetElementType() == mafVMEMeshAnsysTextImporter::LINEAR)
+    if (reader->GetMeshType() == mafVMEMeshAnsysTextImporter::LINEAR)
     {
       RenderData(ugrid, dataType);
     }

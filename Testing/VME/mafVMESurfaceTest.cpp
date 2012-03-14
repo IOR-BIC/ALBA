@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafVMESurfaceTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-12-12 08:33:59 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2011-05-25 11:58:33 $
+Version:   $Revision: 1.7.2.1 $
 Authors:   Matteo Giacomoni, Stefano Perticoni, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -11,7 +11,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
 
-#include "mafDefines.h" 
+#include "mafDefines.h"
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.

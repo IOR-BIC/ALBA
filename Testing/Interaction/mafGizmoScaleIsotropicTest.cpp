@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGizmoScaleIsotropicTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-05-21 10:13:09 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2009-12-17 11:48:37 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -34,7 +34,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafObserver.h"
 #include "mafTransform.h"
 
-#include "mmiGenericMouse.h"
+#include "mafInteractorGenericMouse.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkPoints.h"
@@ -53,21 +53,24 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 class mockListener : public mafObserver 
 {
 public:
+  mockListener() : m_Listener(NULL), m_Event(NULL), m_Id(-1) {}
+  virtual ~mockListener() {}
 
   /** Set the event receiver object*/
   void  SetListener(mafObserver *Listener) {m_Listener = Listener;};
 
   /** Events handling*/        
-  virtual void OnEvent(mafEventBase *maf_event) {m_Event = maf_event;};
+  void OnEvent(mafEventBase *maf_event) {m_Id = maf_event->GetId(); m_Event = *maf_event;};
 
-  mafEventBase *GetEvent() {return m_Event;};
+  mafEventBase *GetEvent() {return &m_Event;};
 
 private:
   /**
   Register the event receiver object*/
   mafObserver *m_Listener;
 
-  mafEventBase *m_Event;
+  mafEventBase m_Event;
+  mafID m_Id;
 };
 
 void mafGizmoScaleIsotropicTest::setUp()
@@ -169,7 +172,7 @@ void mafGizmoScaleIsotropicTest::TestSetInput()
   gizmoScaleIsotropic->SetInput(m_GizmoInputSurface);
 
   // using friend mafGizmoScaleIsotropic
-  CPPUNIT_ASSERT(gizmoScaleIsotropic->InputVme == m_GizmoInputSurface);
+  CPPUNIT_ASSERT(gizmoScaleIsotropic->m_InputVme == m_GizmoInputSurface);
 
   cppDEL(gizmoScaleIsotropic);
 }
@@ -184,7 +187,9 @@ void mafGizmoScaleIsotropicTest::TestShow()
  
   gizmoScaleIsotropic->Show(true);
   
-  mafID evId = mockList->GetEvent()->GetId();
+  mafEventBase *ev = mockList->GetEvent();
+  int evId = 0;
+  evId = ev->GetId();
 
   CPPUNIT_ASSERT( evId == VME_SHOW );
   
@@ -195,6 +200,7 @@ void mafGizmoScaleIsotropicTest::TestShow()
 void mafGizmoScaleIsotropicTest::TestSetGetAbsPose()
 {
   mafMatrix absPose;
+  absPose.SetElement(0,3,10);
 
   mafGizmoScaleIsotropic *gizmoScaleIsotropic = new mafGizmoScaleIsotropic(m_GizmoInputSurface);
   gizmoScaleIsotropic->SetAbsPose(&absPose);
@@ -246,6 +252,6 @@ void mafGizmoScaleIsotropicTest::CreateRenderStuff()
 
 void mafGizmoScaleIsotropicTest::RenderGizmo( mafGizmoScaleIsotropic * gizmoScaleIsotropic )
 {
-  RenderData(gizmoScaleIsotropic->CubeGizmo->GetOutput()->GetVTKData());
+  RenderData(gizmoScaleIsotropic->m_CubeGizmo->GetOutput()->GetVTKData());
 }
 

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafNodeTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-05-27 11:17:39 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2011-05-25 11:58:32 $
+Version:   $Revision: 1.7.2.1 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004 

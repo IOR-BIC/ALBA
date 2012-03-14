@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFDataPipeTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-05-06 10:18:45 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2011-05-25 11:58:33 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 

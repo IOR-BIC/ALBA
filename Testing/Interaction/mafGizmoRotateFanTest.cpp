@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGizmoRotateFanTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-06-12 11:16:52 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2010-11-30 09:37:52 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -34,7 +34,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafObserver.h"
 #include "mafTransform.h"
 
-#include "mmiGenericMouse.h"
+#include "mafInteractorGenericMouse.h"
 #include "mmaMaterial.h"
 
 #include "vtkMAFSmartPointer.h"
@@ -60,16 +60,16 @@ public:
   void  SetListener(mafObserver *Listener) {m_Listener = Listener;};
 
   /** Events handling*/        
-  virtual void OnEvent(mafEventBase *maf_event) {m_Event = maf_event;};
+  virtual void OnEvent(mafEventBase *maf_event) {m_Event =  *maf_event;};
 
-  mafEventBase *GetEvent() {return m_Event;};
+  mafEventBase *GetEvent() {return &m_Event;};
 
 private:
   /**
   Register the event receiver object*/
   mafObserver *m_Listener;
 
-  mafEventBase *m_Event;
+  mafEventBase m_Event;
 };
 
 void mafGizmoRotateFanTest::setUp()
@@ -167,7 +167,7 @@ void mafGizmoRotateFanTest::TestSetGetAbsPose()
   mafGizmoRotateFan *gizmoRotateFan = new mafGizmoRotateFan(m_GizmoInputSurface);
   gizmoRotateFan->SetAbsPose(&absPose);
   
-  mafMatrix gipo = gizmoRotateFan->m_Gizmo->GetAbsMatrixPipe()->GetMatrix();
+  mafMatrix gipo = gizmoRotateFan->m_GizmoFan->GetAbsMatrixPipe()->GetMatrix();
   CPPUNIT_ASSERT(gipo.Equals(&absPose));
  
   cppDEL(gizmoRotateFan);
@@ -254,5 +254,5 @@ void mafGizmoRotateFanTest::CreateRenderStuff()
 
 void mafGizmoRotateFanTest::RenderGizmo( mafGizmoRotateFan *gizmoRotateFan )
 {
-  RenderData(gizmoRotateFan->m_Gizmo->GetOutput()->GetVTKData());
+  RenderData(gizmoRotateFan->m_GizmoFan->GetOutput()->GetVTKData());
 }

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafVMEGizmoTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-12-12 17:15:12 $
-Version:   $Revision: 1.8 $
+Date:      $Date: 2011-05-25 11:58:33 $
+Version:   $Revision: 1.8.2.1 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 

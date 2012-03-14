@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafVMELandmarkTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-05-06 17:28:26 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2011-07-11 13:05:08 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -124,6 +124,7 @@ void mafVMELandmarkTest::SetRadiusTest()
   mafSmartPointer<mafVMELandmarkCloud> landmarkCloud;
   mafSmartPointer<mafVMELandmark> landmark;
 
+  landmarkCloud->TestModeOn();
   landmarkCloud->Open();
   landmarkCloud->AddChild(landmark);
 
@@ -143,6 +144,7 @@ void mafVMELandmarkTest::SetSphereResolutionTest()
   mafSmartPointer<mafVMELandmarkCloud> landmarkCloud;
   mafSmartPointer<mafVMELandmark> landmark;
 
+  landmarkCloud->TestModeOn();
   landmarkCloud->Open();
   landmarkCloud->AddChild(landmark);
 
@@ -180,6 +182,7 @@ void mafVMELandmarkTest::CanReparentToTest()
   mafSmartPointer<mafVMELandmarkCloud> landmarkCloud;
   mafSmartPointer<mafVMELandmark> landmark;
 
+  landmarkCloud->TestModeOn();
   landmarkCloud->Open();
 
   bool result = false;
@@ -233,9 +236,11 @@ void mafVMELandmarkTest::DeepCopyTest()
   mafSmartPointer<mafVMELandmark> landmark;
   mafSmartPointer<mafVMELandmark> newLandmark;
 
+  landmarkCloud->TestModeOn();
   landmarkCloud->Open();
   landmarkCloud->AddChild(landmark);
 
+  newLandmarkCloud->TestModeOn();
   newLandmarkCloud->Open();
   newLandmarkCloud->AddChild(newLandmark);
 

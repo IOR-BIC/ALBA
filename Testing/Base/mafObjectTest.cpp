@@ -3,8 +3,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafObjectTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-06-13 14:41:06 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2011-05-25 11:58:32 $
+Version:   $Revision: 1.2.4.1 $
 Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004 

@@ -24,7 +24,7 @@ IF (BUILD_CORE_TESTING)
   SUBDIRS(Core)
 ENDIF (BUILD_CORE_TESTING)
 
-OPTION(BUILD_GUI_TESTING "Enable building of testing for GUI classes" OFF)
+OPTION(BUILD_GUI_TESTING "Enable building of testing for GUI classes" ON)
 IF (BUILD_GUI_TESTING)
   SUBDIRS(Gui)
 ENDIF (BUILD_GUI_TESTING)

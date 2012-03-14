@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafTimeMapTest.cpp,v $
 Language:  C++
-Date:      $Date: 2006-11-08 15:34:40 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2011-05-25 11:58:32 $
+Version:   $Revision: 1.1.6.1 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -24,6 +24,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 #include "mmuTimeSet.cpp"
 #include "mafReferenceCounted.h"
+#include "mafTimeMap.h"
 #include "mafTimeMap.txx"
 #include "mafSmartPointer.h"
 
@@ -42,6 +43,8 @@ public:
   void SetTimeStamp(mafTimeStamp t) {m_TimeStamp=t;}
   void SetFlag(bool &flag) {Flag=&flag;}
   bool GetFlag() {return *Flag;}
+  bool Equals(mafTestTObject *a){return false;};
+  void DeepCopy(mafTestTObject *a){};
 protected:
   bool *Flag;
   mafTimeStamp m_TimeStamp;

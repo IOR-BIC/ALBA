@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmuIdFactoryTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-11-05 13:57:47 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2011-05-25 11:58:32 $
+Version:   $Revision: 1.1.4.1 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -59,7 +59,7 @@ void mmuIdFactoryTest::GetNextIdTest()
 //----------------------------------------------------------------------------
 {
   mmuIdFactory *m = new mmuIdFactory();
-  int idCounter = MAF_BASE_ID;
+  int idCounter = m->m_IdCounter;
   mafString idName1 = "eventNew1";
   mafString idName2 = "eventNew2";
   mafID id;

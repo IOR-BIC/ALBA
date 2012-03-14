@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeSurfaceTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-10-08 14:14:13 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-10-08 14:14:32 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2008

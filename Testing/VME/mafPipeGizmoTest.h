@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeGizmoTest.h,v $
 Language:  C++
-Date:      $Date: 2008-10-08 14:30:56 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-10-08 14:31:10 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2008
