@@ -150,7 +150,7 @@ class coverageCalculator:
 	coverageLog.write('\n')
 	coverageLog.write('\n')
 	numTests = self.CountTests()
-	coverageLog.write("Number of Unit Tests: ")
+	coverageLog.write("Number of Unit Tests (Takes into consideration also non executed tests: TO BE FIXED!!): ")
 	coverageLog.write(str(numTests))
 	coverageLog.write('\n')
 	coverageLog.write('\n')

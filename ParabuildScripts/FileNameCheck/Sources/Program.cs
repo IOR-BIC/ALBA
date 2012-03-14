@@ -113,6 +113,7 @@ namespace FileNameConvention
           int wellWrittenFiles = 0;
           string baseName;
           string wrongFiles = "";
+          string goodFiles = "";
           foreach (string f in files)
           {
             bool wrong = true;
@@ -137,6 +138,7 @@ namespace FileNameConvention
                 {
                   wrong = false;
                   wellWrittenFiles++;
+                  goodFiles += " " + baseName;
                 }
                 break;
               }
@@ -156,6 +158,17 @@ namespace FileNameConvention
               continue;
             }
             xwriter.WriteStartElement("WrongFiles");
+            xwriter.WriteAttributeString("FileName", f);
+            xwriter.WriteEndElement();
+          }
+          string[] gfilesList = goodFiles.Split(' ');
+		  foreach (string f in gfilesList)
+          {
+            if (f == "")
+            {
+              continue;
+            }
+            xwriter.WriteStartElement("GoodFiles");
             xwriter.WriteAttributeString("FileName", f);
             xwriter.WriteEndElement();
           }

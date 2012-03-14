@@ -105,6 +105,7 @@
       End If
     
       If canProfile = True Then
+        logFile.WriteLine("Starting AQTime on: " + exeFileName)
         ' Selects the desired profiler
         If Not IntegrationManager.SelectProfiler("Allocation Profiler") Then 
           'MsgBox "The specified profiler was not found."
@@ -132,10 +133,10 @@
         ' Waits until profiling is over
         While IntegrationManager.ProfilingStarted
           ' the Sleep command is needed otherwise the profiler application will hang
-          WScript.Sleep 5000
+          WScript.Sleep 10000
         Wend
         
-        WScript.Sleep 5000
+        WScript.Sleep 10000
         
        
         ' increase the tested files number
@@ -159,7 +160,7 @@
         
      ' Closes AQtime
      AQtimeObject.Quit
-     WScript.Sleep 15000
+     WScript.Sleep 30000
   
      Else 'canProfile
        'skipping the file 

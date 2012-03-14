@@ -12,10 +12,15 @@
         <xsl:for-each select="root/Directory">
           <xsl:if test="$dir = @DirName">
             <h1>
-              Wrong files in <xsl:value-of select="$dir"/>
+              Wrong files in <xsl:value-of select="$dir"/> are shown in red
             </h1>
             <p>
               <xsl:for-each select="WrongFiles">
+                <p><font color="red">
+                  <xsl:value-of select="@FileName"/>
+                </font></p>
+              </xsl:for-each>
+              <xsl:for-each select="GoodFiles">
                 <p>
                   <xsl:value-of select="@FileName"/>
                 </p>
