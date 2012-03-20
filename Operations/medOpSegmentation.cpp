@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2012-03-14 13:49:47 $
-Version:   $Revision: 1.1.2.55 $
+Date:      $Date: 2012-03-20 11:33:57 $
+Version:   $Revision: 1.1.2.56 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi, Alberto Losi
 ==========================================================================
 Copyright (c) 2007
@@ -925,6 +925,7 @@ bool medOpSegmentation::Refinement()
     m_View->VmeShow(m_RefinementVolumeMask,false);
     m_View->VmeShow(m_RefinementVolumeMask,true);
     SetTrilinearInterpolation(m_RefinementVolumeMask);
+    m_View->ChangeView(m_CurrentSlicePlane);
 
     m_View->CameraUpdate();
   }
