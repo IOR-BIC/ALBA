@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUITransformMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-05-25 10:14:03 $
-  Version:   $Revision: 1.1.2.7 $
+  Date:      $Date: 2012-03-21 07:31:09 $
+  Version:   $Revision: 1.1.2.8 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -388,4 +388,9 @@ mafInteractorGenericMouse* mafGUITransformMouse::CreateBehavior(MMI_ACTIVATOR ac
 //----------------------------------------------------------------------------
 {
   return m_IsaCompositor->CreateBehavior(activator);
+}
+
+mafInteractorGenericMouse* mafGUITransformMouse::GetIsaRotate()
+{
+  return m_IsaRotate;
 }
