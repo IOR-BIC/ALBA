@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSegmentationRegionGrowingConnectedThresholdTest.h,v $
 Language:  C++
-Date:      $Date: 2009-10-12 13:40:36 $
-Version:   $Revision: 1.1.2.1 $
-Authors:   Matteo Giacomoni
+Date:      $Date: 2012-03-22 10:49:41 $
+Version:   $Revision: 1.1.2.2 $
+Authors:   Matteo Giacomoni, Di Cosmo Grazia
 ==========================================================================
 Copyright (c) 2009
 
@@ -67,6 +67,7 @@ public:
   CPPUNIT_TEST( TestDynamicAllocation );
   CPPUNIT_TEST( TestAccept );
   CPPUNIT_TEST( TestAlgorithm );
+  CPPUNIT_TEST( TestAlgorithmRG );
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -75,6 +76,7 @@ private:
   void TestDynamicAllocation();
   void TestAccept();
   void TestAlgorithm();
+  void TestAlgorithmRG();
 
   void CompareImageData(vtkImageData *imITK,vtkImageData *imOP);
 

@@ -2,9 +2,9 @@
 Program:   @neufuse
 Module:    $RCSfile: medOpSegmentationRegionGrowingConnectedThreshold.h,v $
 Language:  C++
-Date:      $Date: 2011-05-26 08:16:40 $
-Version:   $Revision: 1.1.2.6 $
-Authors:   Matteo Giacomoni, Alessandro Chiarini
+Date:      $Date: 2012-03-22 10:49:16 $
+Version:   $Revision: 1.1.2.7 $
+Authors:   Matteo Giacomoni, Alessandro Chiarini, Di Cosmo Grazia
 ==========================================================================
 Copyright (c) 2008
 SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
@@ -27,7 +27,7 @@ class mafInteractorPicker;
 class mafInteractor;
 class mafVMESurface;
 class mafVMEVolumeGray;
-
+class medOpVolumeResample;
 class vtkSphereSource;
 
 //----------------------------------------------------------------------------
@@ -86,12 +86,19 @@ public:
   void SetSeed(int *seed);
   /** Get the seed */
   void GetSeed(int *seed);
-  
+    
 protected:
-
+  /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
   /*virtual*/ void OpStop(int result);
-
+  
+  /** Create the operation GUI. */
   void CreateGui();
+
+  /** Resample volume if it is a rectilinear grid */ 
+  void CreateResample();
+  
+  /** Check the spacing and if is too little and could create some memory problems return false */
+  bool CheckSpacing();
 
   int m_Lower;
   int m_Upper;
@@ -114,6 +121,12 @@ protected:
   vtkSphereSource *m_SphereVTK;
 
   mafString m_SeedScalarValue;
+  medOpVolumeResample *m_Resample;
+
+  mafVMEVolumeGray *m_ResampleInput;
+  double m_VolumeSpacing[3];
+  double m_VolumeBounds[6];
+
 
 };
 

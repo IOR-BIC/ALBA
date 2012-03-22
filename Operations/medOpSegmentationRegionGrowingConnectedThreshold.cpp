@@ -2,9 +2,9 @@
 Program:   @neufuse
 Module:    $RCSfile: medOpSegmentationRegionGrowingConnectedThreshold.cpp,v $
 Language:  C++
-Date:      $Date: 2010-07-15 07:43:11 $
-Version:   $Revision: 1.1.2.6 $
-Authors:   Matteo Giacomoni, Alessandro Chiarini
+Date:      $Date: 2012-03-22 10:49:16 $
+Version:   $Revision: 1.1.2.7 $
+Authors:   Matteo Giacomoni, Alessandro Chiarini, Grazia Di Cosmo
 ==========================================================================
 Copyright (c) 2008
 SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
@@ -40,8 +40,11 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #include "itkConnectedThresholdImageFilter.h"
 #include "vtkMAFSmartPointer.h"
 #include "vtkImageToStructuredPoints.h"
+#include "medOpVolumeResample.h"
+#include "vtkRectilinearGrid.h"
 
 #define ITK_IMAGE_DIMENSION 3
+#define SPACING_PERCENTAGE_BOUNDS 0.1
 typedef  itk::Image< float, ITK_IMAGE_DIMENSION> RealImage;
 using namespace std;
 
@@ -79,8 +82,15 @@ medOpSegmentationRegionGrowingConnectedThreshold::medOpSegmentationRegionGrowing
   m_Sphere = NULL;
   m_SphereVTK = NULL;
   m_VolumeOut = NULL;
+  m_Resample=NULL;
+  m_ResampleInput= NULL;
 
   m_SeedScalarValue = "";
+
+  m_VolumeBounds[0] = m_VolumeBounds[1] = m_VolumeBounds[2] = \
+  m_VolumeBounds[3] = m_VolumeBounds[4] = m_VolumeBounds[5] = 0;
+
+  m_VolumeSpacing[0] = m_VolumeSpacing[1] = m_VolumeSpacing[2] = 1;
 }
 //----------------------------------------------------------------------------
 medOpSegmentationRegionGrowingConnectedThreshold::~medOpSegmentationRegionGrowingConnectedThreshold( ) 
@@ -95,8 +105,8 @@ medOpSegmentationRegionGrowingConnectedThreshold::~medOpSegmentationRegionGrowin
 bool medOpSegmentationRegionGrowingConnectedThreshold::Accept(mafNode *node)
 //----------------------------------------------------------------------------
 {
-  // accepts only structuredpoints data!
-  return  (node->IsA("mafVMEVolumeGray")) && ((mafVME*)node)->GetOutput()->GetVTKData() &&(((mafVME*)node)->GetOutput()->GetVTKData()->IsA("vtkStructuredPoints"));
+  // accepts mafVMEVolumeGray data
+  return  (node->IsA("mafVMEVolumeGray")) && ((mafVME*)node)->GetOutput()->GetVTKData();
 }
 //----------------------------------------------------------------------------
 mafOp* medOpSegmentationRegionGrowingConnectedThreshold::Copy()   
@@ -108,22 +118,23 @@ mafOp* medOpSegmentationRegionGrowingConnectedThreshold::Copy()
 void medOpSegmentationRegionGrowingConnectedThreshold::OpRun()   
 //----------------------------------------------------------------------------
 {
+  CreateResample();
   CreateGui();
 
 
-	m_OldBehavior = mafVME::SafeDownCast(m_Input)->GetBehavior();
+	m_OldBehavior = mafVME::SafeDownCast(m_ResampleInput)->GetBehavior();
 
 	m_Picker = mafInteractorPicker::New();
 	m_Picker->SetListener(this);
-	mafVME::SafeDownCast(m_Input)->SetBehavior(m_Picker);
+	mafVME::SafeDownCast(m_ResampleInput)->SetBehavior(m_Picker);
 
 	mafNEW(m_Sphere);
 	m_Sphere->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 0.0));
 	m_Sphere->SetVisibleToTraverse(false);
-	m_Sphere->ReparentTo(m_Input->GetParent());
+	m_Sphere->ReparentTo(m_ResampleInput->GetParent());
 
 	vtkNEW(m_SphereVTK);
-  double bounds[6];mafVME::SafeDownCast(m_Input)->GetOutput()->GetBounds(bounds);
+  double bounds[6];mafVME::SafeDownCast(m_ResampleInput)->GetOutput()->GetBounds(bounds);
 	m_SphereVTK->SetRadius((bounds[5]-bounds[4])/256);
   mafLogMessage("Sphere radius = %f",(bounds[5]-bounds[4])/256);
 	m_SphereVTK->Update();
@@ -157,13 +168,20 @@ void medOpSegmentationRegionGrowingConnectedThreshold::CreateGui()
 //----------------------------------------------------------------------------
 void medOpSegmentationRegionGrowingConnectedThreshold::OpStop(int result)   
 //----------------------------------------------------------------------------
-{
+{  
   mafEventMacro(mafEvent(this,VME_SHOW,m_Sphere,false));
   m_Sphere->ReparentTo(NULL);
 
-  mafVME::SafeDownCast(m_Input)->SetBehavior(m_OldBehavior);
-  mafVME::SafeDownCast(m_Input)->Update();
-
+  mafVME::SafeDownCast(m_ResampleInput)->SetBehavior(m_OldBehavior);
+  mafVME::SafeDownCast(m_ResampleInput)->Update();
+  if (m_ResampleInput!=m_Input)
+  { 
+    mafEventMacro(mafEvent(this,VME_SHOW,m_ResampleInput,false)); 
+    mafEventMacro(mafEvent(this,VME_SHOW,m_Input,true)); 
+    m_ResampleInput->ReparentTo(NULL);
+    m_ResampleInput->Update();
+    mafDEL(m_Resample); 
+  }
   HideGui();
   mafEventMacro(mafEvent(this,result));
 }
@@ -178,10 +196,13 @@ void medOpSegmentationRegionGrowingConnectedThreshold::Algorithm()
 	  wxBusyInfo wait_info("Please wait");
   }
 
+  //in test mode resample is not created before algorithm call
+  if (m_TestMode) CreateResample();
+
  typedef itk::ConnectedThresholdImageFilter<RealImage, RealImage> ITKConnectedThresholdFilter;
   ITKConnectedThresholdFilter::Pointer connectedThreshold = ITKConnectedThresholdFilter::New();
 
-  vtkImageData *im = vtkImageData::SafeDownCast(mafVMEVolumeGray::SafeDownCast(m_Input)->GetOutput()->GetVTKData());
+  vtkImageData *im = vtkImageData::SafeDownCast(mafVMEVolumeGray::SafeDownCast(m_ResampleInput)->GetOutput()->GetVTKData());
   
   vtkMAFSmartPointer<vtkImageCast> vtkImageToFloat;
   vtkImageToFloat->SetOutputScalarTypeToFloat ();
@@ -248,7 +269,7 @@ void medOpSegmentationRegionGrowingConnectedThreshold::Algorithm()
   vtkMAFSmartPointer<vtkImageToStructuredPoints> image_to_sp;
   image_to_sp->SetInput(image);
   image_to_sp->Update();
-  m_VolumeOut->SetData(image_to_sp->GetOutput(),mafVME::SafeDownCast(m_Input)->GetTimeStamp());
+  m_VolumeOut->SetData(image_to_sp->GetOutput(),mafVME::SafeDownCast(m_ResampleInput)->GetTimeStamp());
 
   mafTagItem tag_Nature;
   tag_Nature.SetName("VME_NATURE");
@@ -272,9 +293,9 @@ void medOpSegmentationRegionGrowingConnectedThreshold::OnEvent(mafEventBase *maf
     case ID_SEED:
       {
         double b[6],spacing[3],origin[3];
-        mafVMEVolumeGray::SafeDownCast(m_Input)->GetOutput()->GetBounds(b);
+        mafVMEVolumeGray::SafeDownCast(m_ResampleInput)->GetOutput()->GetBounds(b);
 
-        vtkStructuredPoints *sp = vtkStructuredPoints::SafeDownCast(mafVMEVolumeGray::SafeDownCast(m_Input)->GetOutput()->GetVTKData());
+        vtkStructuredPoints *sp = vtkStructuredPoints::SafeDownCast(mafVMEVolumeGray::SafeDownCast(m_ResampleInput)->GetOutput()->GetVTKData());
         sp->Update();
 
         sp->GetSpacing(spacing);
@@ -312,7 +333,7 @@ void medOpSegmentationRegionGrowingConnectedThreshold::OnEvent(mafEventBase *maf
           mafEventMacro(mafEvent(this,VME_SHOW,m_Sphere,true));
           mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 
-          vtkStructuredPoints *sp = vtkStructuredPoints::SafeDownCast(mafVMEVolumeGray::SafeDownCast(m_Input)->GetOutput()->GetVTKData());
+          vtkStructuredPoints *sp = vtkStructuredPoints::SafeDownCast(mafVMEVolumeGray::SafeDownCast(m_ResampleInput)->GetOutput()->GetVTKData());
           sp->Update();
 
           int id;
@@ -373,4 +394,68 @@ void medOpSegmentationRegionGrowingConnectedThreshold::GetSeed(int *seed)
   {
     seed[i]=m_Seed[i];
   }
+}
+//----------------------------------------------------------------------------
+void medOpSegmentationRegionGrowingConnectedThreshold::CreateResample()
+//----------------------------------------------------------------------------
+{
+    m_Resample=new medOpVolumeResample();
+  
+   // if the volume is a rectilinear grid we resample it 
+   if(((mafVME*)m_Input)->GetOutput()->GetVTKData()->IsA("vtkRectilinearGrid"))
+   {
+     m_Resample->SetInput(m_Input);
+     m_Resample->TestModeOn();
+     m_Resample->AutoSpacing();
+     m_Resample->GetSpacing(m_VolumeSpacing);
+      
+     ((mafVME*)m_Input)->GetOutput()->GetVMEBounds(m_VolumeBounds);
+     m_Resample->SetBounds(m_VolumeBounds,medOpVolumeResample::CUSTOMBOUNDS);
+          
+     if (!CheckSpacing())
+     {
+       int answer = wxMessageBox( "Spacing values are too little and could generate memory problems - Continue?", "Warning", wxYES_NO, NULL);
+       if (answer == wxNO)
+       {
+         OpStop(OP_RUN_CANCEL);
+       }
+     }
+     if (!m_TestMode)
+     {
+       wxBusyCursor wait;
+       wxBusyInfo wait_info("Please wait");
+     }
+     m_Resample->Resample();
+     
+     mafVME *Output = mafVME::SafeDownCast(m_Resample->GetOutput());
+     Output->GetOutput()->GetVTKData()->Update();
+     m_ResampleInput=mafVMEVolumeGray::SafeDownCast(Output);
+     m_ResampleInput->Update();
+
+     // show volume resampled
+     mafEventMacro(mafEvent(this, VME_SHOW, m_ResampleInput, true));
+     mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+
+   }
+   else 
+     m_ResampleInput=mafVMEVolumeGray::SafeDownCast(m_Input);
+}
+//----------------------------------------------------------------------------
+bool medOpSegmentationRegionGrowingConnectedThreshold::CheckSpacing()
+//----------------------------------------------------------------------------
+{
+  if ((m_VolumeSpacing[0]/(m_VolumeBounds[1] - m_VolumeBounds[0]))*100 < SPACING_PERCENTAGE_BOUNDS)
+  {
+    return false;
+  }
+  if ((m_VolumeSpacing[1]/(m_VolumeBounds[3] - m_VolumeBounds[2]))*100 < SPACING_PERCENTAGE_BOUNDS)
+  {
+    return false;
+  }
+  if ((m_VolumeSpacing[2]/(m_VolumeBounds[5] - m_VolumeBounds[4]))*100 < SPACING_PERCENTAGE_BOUNDS)
+  {
+    return false;
+  }
+
+  return true;
 }

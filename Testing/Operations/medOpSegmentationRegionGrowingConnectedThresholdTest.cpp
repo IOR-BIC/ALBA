@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSegmentationRegionGrowingConnectedThresholdTest.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-12 13:40:35 $
-Version:   $Revision: 1.1.2.1 $
-Authors:   Matteo Giacomoni
+Date:      $Date: 2012-03-22 10:49:41 $
+Version:   $Revision: 1.1.2.2 $
+Authors:   Matteo Giacomoni, Di Cosmo Grazia
 ==========================================================================
 Copyright (c) 2009
 
@@ -64,6 +64,12 @@ MafMedical is partially based on OpenMAF.
 #include "itkImage.h"
 #include "itkImageToVTKImageFilter.h"
 #include "itkConnectedThresholdImageFilter.h"
+#include "vtkRectilinearGrid.h"
+#include "medOpImporterVTK.h"
+#include "mafstring.h"
+#include "mafVMEStorage.h"
+#include "mafVMERoot.h"
+
 
 #define ITK_IMAGE_DIMENSION 3
 typedef itk::Image< float, ITK_IMAGE_DIMENSION > RealImage;
@@ -242,6 +248,67 @@ void medOpSegmentationRegionGrowingConnectedThresholdTest::TestAlgorithm()
   imOP->Update();
 
   CompareImageData(imITK,imOP);
+
+  mafDEL(op);
+
+}
+//----------------------------------------------------------------------------
+void medOpSegmentationRegionGrowingConnectedThresholdTest::TestAlgorithmRG()
+//----------------------------------------------------------------------------
+{
+  //import the data of input and use it as input of the operation
+  mafVMEStorage *storage = mafVMEStorage::New();
+  storage->GetRoot()->SetName("root");
+  storage->GetRoot()->Initialize();
+
+  medOpImporterVTK *importerVTK=new medOpImporterVTK("importerVTK");
+  importerVTK->TestModeOn();
+  importerVTK->SetInput(storage->GetRoot());
+
+  mafString absPathFilename=MED_DATA_ROOT;
+  absPathFilename<<"/VTK_Volumes/";
+  absPathFilename.Append("LabeledVolumeTest.vtk");
+  importerVTK->SetFileName(absPathFilename);
+  importerVTK->OpRun();
+
+  mafVMEVolumeGray *inputVolume = mafVMEVolumeGray::SafeDownCast(importerVTK->GetOutput());
+  inputVolume->ReparentTo(storage->GetRoot());
+  inputVolume->Update();
+  inputVolume->GetOutput()->Update();
+  inputVolume->GetOutput()->GetVTKData()->Update();
+  int k=inputVolume->GetOutput()->GetVTKData()->GetNumberOfPoints();
+
+
+  CPPUNIT_ASSERT(inputVolume!=NULL);
+  
+  int seed[3] = {106,74,5};
+  medOpSegmentationRegionGrowingConnectedThreshold *op = new medOpSegmentationRegionGrowingConnectedThreshold();
+  op->TestModeOn();
+  op->SetInput(inputVolume);
+  op->SetLowerThreshold(1000);
+  op->SetUpperThreshold(1800);
+  op->SetSeed(seed);
+  op->Algorithm();
+  mafVMEVolumeGray *volumeOperationOutput = mafVMEVolumeGray::SafeDownCast(op->GetOutput());
+  volumeOperationOutput->GetOutput()->Update();
+  volumeOperationOutput->Update();
+
+  //read the result expected
+  vtkMAFSmartPointer<vtkDataSetReader> outputRead;
+  mafString fileNameOut = MED_DATA_ROOT;
+  fileNameOut<<"/VTK_Volumes/ConnectedThreshold.vtk";
+  outputRead->SetFileName(fileNameOut.GetCStr());
+  outputRead->Update();
+ 
+  //Compare the two results
+  vtkMAFSmartPointer<vtkImageData> imFile;
+  imFile->DeepCopy(vtkImageData::SafeDownCast(outputRead->GetOutput()));
+  imFile->Update();
+  vtkMAFSmartPointer<vtkImageData> imOP;
+  imOP->DeepCopy(vtkImageData::SafeDownCast(volumeOperationOutput->GetOutput()->GetVTKData()));
+  imOP->Update();
+
+  CompareImageData(imFile,imOP);
 
   mafDEL(op);
 
