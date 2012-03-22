@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpExporterSTL.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:51 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2012-03-22 13:22:17 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -78,13 +78,13 @@ void mafOpExporterSTL::OpRun()
   mafString wildc = "Stereo Litography (*.stl)|*.stl";
 
   m_Gui = new mafGUI(this);
-	//m_Gui->FileSave(ID_CHOOSE_FILENAME,"stl file", &m_File, wildc,"Save As...");
+	m_Gui->FileSave(ID_CHOOSE_FILENAME,"stl file", &m_File, wildc,"Save As...");
   m_Gui->Label("file type",true);
 	m_Gui->Bool(ID_STL_BINARY_FILE,"binary",&m_Binary,0);
 	m_Gui->Label("absolute matrix",true);
 	m_Gui->Bool(ID_ABS_MATRIX_TO_STL,"apply",&m_ABSMatrixFlag,0);
 	m_Gui->OkCancel();
-  //m_Gui->Enable(wxOK,m_File != "");
+  m_Gui->Enable(wxOK,m_File != "");
 	
 	m_Gui->Divider();
 
@@ -99,7 +99,7 @@ void mafOpExporterSTL::OnEvent(mafEventBase *maf_event)
     switch(e->GetId())
     {
       case wxOK:
-				{
+				/*{
 					//mafString FileDir = mafGetApplicationDirectory().c_str();
 					//FileDir<<"\\";
           mafString name = m_Input->GetName();
@@ -127,7 +127,9 @@ void mafOpExporterSTL::OnEvent(mafEventBase *maf_event)
             ExportSurface();
             OpStop(OP_RUN_OK);
           }
-				}
+				}*/
+        ExportSurface();
+        OpStop(OP_RUN_OK);
       break;
       case ID_CHOOSE_FILENAME:
         m_Gui->Enable(wxOK,m_File != "");
