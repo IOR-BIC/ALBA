@@ -2,8 +2,8 @@
 Program:   @neufuse
 Module:    $RCSfile: medOpSegmentationRegionGrowingConnectedThreshold.cpp,v $
 Language:  C++
-Date:      $Date: 2012-03-22 10:49:16 $
-Version:   $Revision: 1.1.2.7 $
+Date:      $Date: 2012-03-26 09:10:31 $
+Version:   $Revision: 1.1.2.8 $
 Authors:   Matteo Giacomoni, Alessandro Chiarini, Grazia Di Cosmo
 ==========================================================================
 Copyright (c) 2008
@@ -189,11 +189,13 @@ void medOpSegmentationRegionGrowingConnectedThreshold::OpStop(int result)
 void medOpSegmentationRegionGrowingConnectedThreshold::Algorithm()   
 //----------------------------------------------------------------------------
 {
+  wxBusyInfo *info;
+  wxBusyCursor *wait;
 
   if (!m_TestMode)
   {
-	  wxBusyCursor wait;
-	  wxBusyInfo wait_info("Please wait");
+    wait = new wxBusyCursor;
+    info = new wxBusyInfo("Please wait");
   }
 
   //in test mode resample is not created before algorithm call
@@ -280,7 +282,11 @@ void medOpSegmentationRegionGrowingConnectedThreshold::Algorithm()
   m_VolumeOut->Update();
 
   m_Output = m_VolumeOut;
-
+  if(!m_TestMode)
+  {
+    delete wait;
+    delete info;
+  }
 }
 //----------------------------------------------------------------------------
 void medOpSegmentationRegionGrowingConnectedThreshold::OnEvent(mafEventBase *maf_event)
@@ -399,46 +405,55 @@ void medOpSegmentationRegionGrowingConnectedThreshold::GetSeed(int *seed)
 void medOpSegmentationRegionGrowingConnectedThreshold::CreateResample()
 //----------------------------------------------------------------------------
 {
-    m_Resample=new medOpVolumeResample();
-  
-   // if the volume is a rectilinear grid we resample it 
-   if(((mafVME*)m_Input)->GetOutput()->GetVTKData()->IsA("vtkRectilinearGrid"))
-   {
-     m_Resample->SetInput(m_Input);
-     m_Resample->TestModeOn();
-     m_Resample->AutoSpacing();
-     m_Resample->GetSpacing(m_VolumeSpacing);
+  m_Resample=new medOpVolumeResample();
+ 
+  // if the volume is a rectilinear grid we resample it 
+  if(((mafVME*)m_Input)->GetOutput()->GetVTKData()->IsA("vtkRectilinearGrid"))
+  { 
+    wxBusyInfo *info;
+    wxBusyCursor *wait;
+
+    m_Resample->SetInput(m_Input);
+    m_Resample->TestModeOn();
+    m_Resample->AutoSpacing();
+    m_Resample->GetSpacing(m_VolumeSpacing);
       
-     ((mafVME*)m_Input)->GetOutput()->GetVMEBounds(m_VolumeBounds);
-     m_Resample->SetBounds(m_VolumeBounds,medOpVolumeResample::CUSTOMBOUNDS);
+    ((mafVME*)m_Input)->GetOutput()->GetVMEBounds(m_VolumeBounds);
+    m_Resample->SetBounds(m_VolumeBounds,medOpVolumeResample::CUSTOMBOUNDS);
           
-     if (!CheckSpacing())
-     {
-       int answer = wxMessageBox( "Spacing values are too little and could generate memory problems - Continue?", "Warning", wxYES_NO, NULL);
-       if (answer == wxNO)
-       {
-         OpStop(OP_RUN_CANCEL);
-       }
-     }
-     if (!m_TestMode)
-     {
-       wxBusyCursor wait;
-       wxBusyInfo wait_info("Please wait");
-     }
-     m_Resample->Resample();
+    if (!CheckSpacing())
+    {
+      int answer = wxMessageBox( "Spacing values are too little and could generate memory problems - Continue?", "Warning", wxYES_NO, NULL);
+      if (answer == wxNO)
+      {
+        OpStop(OP_RUN_CANCEL);
+      }
+    }
+    if(!m_TestMode)
+    {
+      wait = new wxBusyCursor;
+      info = new wxBusyInfo("Please wait");
+    }
+    
+    m_Resample->Resample();
      
-     mafVME *Output = mafVME::SafeDownCast(m_Resample->GetOutput());
-     Output->GetOutput()->GetVTKData()->Update();
-     m_ResampleInput=mafVMEVolumeGray::SafeDownCast(Output);
-     m_ResampleInput->Update();
+    mafVME *Output = mafVME::SafeDownCast(m_Resample->GetOutput());
+    Output->GetOutput()->GetVTKData()->Update();
+    m_ResampleInput=mafVMEVolumeGray::SafeDownCast(Output);
+    m_ResampleInput->Update();
 
-     // show volume resampled
-     mafEventMacro(mafEvent(this, VME_SHOW, m_ResampleInput, true));
-     mafEventMacro(mafEvent(this, CAMERA_UPDATE));
-
-   }
-   else 
-     m_ResampleInput=mafVMEVolumeGray::SafeDownCast(m_Input);
+    // show volume resampled
+    mafEventMacro(mafEvent(this, VME_SHOW, m_ResampleInput, true));
+    mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+     
+    if(!m_TestMode)
+    {
+      delete wait;
+      delete info;
+    }
+  }
+  else 
+    m_ResampleInput=mafVMEVolumeGray::SafeDownCast(m_Input);
 }
 //----------------------------------------------------------------------------
 bool medOpSegmentationRegionGrowingConnectedThreshold::CheckSpacing()
