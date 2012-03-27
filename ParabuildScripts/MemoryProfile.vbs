@@ -18,23 +18,22 @@
    End IF
   End Function
 
-  relativeExePath = ".\bin\debug\"
+  relativeExePath = ".\Medical_Parabuild\bin\debug\"
   
   ' create a text log
   Set fso = CreateObject("Scripting.FileSystemObject")
-  Set logFile = fso.CreateTextFile(".\bin\Debug\MemoryAllocation\XML\MemoryAllocationLog.txt", True)
+  Set logFile = fso.CreateTextFile(".\Medical_Parabuild\bin\Debug\MemoryAllocation\XML\MemoryAllocationLog.txt", True)
   logFile.WriteLine("** Log file for AQTime memory profiling: **")
   logFile.WriteLine("")
   logFile.Write("Memory profile started on ")
   logFile.WriteLine(Now)
   logFile.WriteLine("")
    
-  Dim path, i, intTestedFiles, intLeakedFiles, intTotalLeak
+  Dim path, i, intTestedFiles, intLeakedFiles
   Dim fso, dir, ExeFile
   
   intTestedFiles = 0
   intLeakedFiles = 0
-  intTotalLeak = 0
 
   ' Path in which create projects; executables are located here (parabuil dependent)  
   ' Parabuild active directory is the downloaded CVS module name for example OpenMAF
@@ -72,13 +71,13 @@
     '-----------------------------------------------------------------------------
     ' executed tests name pattern 
     '-----------------------------------------------------------------------------
-    ' Works with files beginning with "maf" ending with "Test.exe" files only
+    ' Works with files beginning with "med" ending with "Test.exe" files only
     ' only tests matching this pattern are executed
     ' is you need to modify this behavior modify the next line
     
     ' Names pattern examples:
-    ' pattern to test all maf*Test.exe files
-    ' If  Left(exeFileName, 3) = "maf" And Right(ExeFile, 8) = "Test.exe" Then 
+    ' pattern to test all med*Test.exe files
+    ' If  Left(exeFileName, 3) = "med" And Right(ExeFile, 8) = "Test.exe" Then 
     
     ' CURRENT ACTIVE TEST NAME PATTERN
     ' pattern to test all *.exe files
@@ -106,6 +105,7 @@
     
       If canProfile = True Then
         logFile.WriteLine("Starting AQTime on: " + exeFileName)
+    
         ' Selects the desired profiler
         If Not IntegrationManager.SelectProfiler("Allocation Profiler") Then 
           'MsgBox "The specified profiler was not found."
@@ -154,7 +154,6 @@
           logFile.WriteLine(CStr(message))
           ' increase leaked files number
           intLeakedFiles = intLeakedFiles + 1
-          intTotalLeak = intTotalLeak + strLiveObjectsNumber
           
         End If
         
@@ -178,8 +177,6 @@
   logFile.WriteLine("profiled " + CStr(intTestedFiles) + " files") 
   logFile.WriteLine("found " + CStr(intLeakedFiles) + " leaked files")  
   logFile.WriteLine(CStr(Int(intLeakedFiles / intTestedFiles * 100)) + "% leaked")
-  logFile.WriteLine("")
-  logFile.WriteLine(CStr(intTotalLeak) + " live objects detected") 
   logFile.WriteLine("")
   logFile.Write("Memory profile ended on ")
   logFile.WriteLine(Now)

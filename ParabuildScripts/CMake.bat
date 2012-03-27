@@ -2,111 +2,34 @@ REM ----------------------------------------------------------------------------
 REM cmake execution driver script
 REM -----------------------------------------------------------------------------
 
-IF "%1" == "MAF_QA" GOTO MAF_QA
-IF "%1" == "MAF_DEBUG" GOTO MAF_DEBUG
-IF "%1" == "MAF_ITK_DEBUG" GOTO MAF_ITK_DEBUG
-IF "%1" == "MAF_ITK_DEBUG_DLL" GOTO MAF_ITK_DEBUG_DLL
-IF "%1" == "MAF_ITK_DEBUG_DLL_TEST" GOTO MAF_ITK_DEBUG_DLL_TEST
+IF "%1" == "MED_QA" GOTO MED_QA
 IF "%1" == "MAF_MED_DEBUG_DLL_TEST" GOTO MAF_MED_DEBUG_DLL_TEST
-IF "%1" == "MAF_MED_DEBUG_TEST" GOTO MAF_MED_DEBUG_TEST
-IF "%1" == "MAF_DOCUMENTATION" GOTO MAF_DOCUMENTATION
+IF "%1" == "MAFMED_DEBUG" GOTO MAFMED_DEBUG
+IF "%1" == "MAFMED_DEBUG_2010" GOTO MAFMED_DEBUG_2010
+IF "%1" == "MAFMED_DOCUMENTATION" GOTO MAFMED_DOCUMENTATION
 IF "%1" == "VAPP_DEBUG" GOTO VAPP_DEBUG
-IF "%1" == "VAPP_DEBUG_2010" GOTO VAPP_DEBUG_2010
 IF "%1" == "VAPP_RELEASE" GOTO VAPP_RELEASE
+IF "%1" == "VAPP_MEDICAL_RELEASE" GOTO VAPP_MEDICAL_RELEASE
 IF "%1" == "VAPP_RELEASE_2005" GOTO VAPP_RELEASE_2005
 IF "%1" == "VAPP_RELEASE_2008" GOTO VAPP_RELEASE_2008
 IF "%1" == "VAPP_RELEASE_2010" GOTO VAPP_RELEASE_2010
-IF "%1" == "MAF_ITK_DEBUG_2010" GOTO MAF_ITK_DEBUG_2010
 IF NOT "%1" == "MAF_DEBUG" GOTO UNKNOWN_CONDITION
 
-:MAF_DEBUG
+:MED_QA
 
-cmake.exe  .  ^
-  -G"Visual Studio 7 .NET 2003" ^
-  -DBUILD_TESTING:BOOL=ON ^
-  -DDART_TESTING_TIMEOUT:STRING=120 ^
-  -DBUILD_EXAMPLES:BOOL=OFF ^
-  -DCMAKE_BACKWARDS_COMPATIBILITY:STRING=2.0 ^
-  -DMAF_USE_ITK:BOOL=OFF ^
-  -DCPPUNIT_INCLUDE_DIR:PATH="C:/cppunit-1.12.0/include" ^
-  -DCPPUNIT_LIBRARY:FILEPATH="C:/cppunit-1.12.0/lib/cppunitd.lib"
+mkdir Medical_Parabuild.build
+cd Medical_Parabuild.build
 
-GOTO END
-
-:MAF_ITK_DEBUG
-
-cmake.exe  .  ^
-  -G"Visual Studio 7 .NET 2003" ^
-  -DBUILD_TESTING:BOOL=ON ^
-  -DDART_TESTING_TIMEOUT:STRING=120 ^
-  -DBUILD_EXAMPLES:BOOL=OFF ^
-  -DCMAKE_BACKWARDS_COMPATIBILITY:STRING=2.0 ^
-  -DMAF_USE_ITK:BOOL=ON ^
-  -DCPPUNIT_INCLUDE_DIR:PATH="C:/cppunit-1.12.0/include" ^
-  -DCPPUNIT_LIBRARY:FILEPATH="C:/cppunit-1.12.0/lib/cppunitd.lib"
-
-GOTO END
-
-:MAF_QA
-
-mkdir openMAF_ITK_Parabuild.build
-cd openMAF_ITK_Parabuild.build
-
-cmake.exe  ../openMAF_ITK_Parabuild  ^
+cmake.exe  ../Medical_Parabuild  ^
   -G"Visual Studio 10" ^
   -DBUILD_TESTING:BOOL=OFF ^
-  -DMAF_QA:BOOL=ON ^
+  -DDART_TESTING_TIMEOUT:STRING=120 ^
+  -DMED_QA:BOOL=ON ^
   -DBUILD_EXAMPLES:BOOL=OFF ^
   -DCMAKE_BACKWARDS_COMPATIBILITY:STRING=2.0 ^
-  -DMAF_USE_ITK:BOOL=ON ^
   -DCPPUNIT_INCLUDE_DIR:PATH="C:/cppunit-1.12.0_VS2010_BUILD/cppunit-1.12.0/include" ^
-  -DCPPUNIT_LIBRARY:FILEPATH="C:/cppunit-1.12.0_VS2010_BUILD/cppunit-1.12.0/lib/cppunitd.lib"
-  
-cd ..
-
-GOTO END
-
-:MAF_ITK_DEBUG_DLL
-
-cmake.exe  .  ^
-  -G"Visual Studio 7 .NET 2003" ^
-  -DMAF_BUILD_MAFDLL:BOOL=ON ^
-  -DBUILD_TESTING:BOOL=ON ^
-  -DDART_TESTING_TIMEOUT:STRING=240 ^
-  -DBUILD_EXAMPLES:BOOL=ON ^
-  -DCMAKE_BACKWARDS_COMPATIBILITY:STRING=2.0 ^
-  -DMAF_USE_ITK:BOOL=ON 
-  
-cd ..
-
-GOTO END
-
-:MAF_ITK_DEBUG_2010
-
-cmake.exe  .  ^
-  -G"Visual Studio 10" ^
-  -DBUILD_TESTING:BOOL=ON ^
-  -DDART_TESTING_TIMEOUT:STRING=120 ^
-  -DBUILD_EXAMPLES:BOOL=OFF ^
-  -DCMAKE_BACKWARDS_COMPATIBILITY:STRING=2.0 ^
-  -DMAF_USE_ITK:BOOL=ON ^
-  -DCPPUNIT_INCLUDE_DIR:PATH="C:/cppunit-1.12.0_VS2010_BUILD/cppunit-1.12.0/include" ^
-  -DCPPUNIT_LIBRARY:FILEPATH="C:/cppunit-1.12.0_VS2010_BUILD/cppunit-1.12.0/lib/cppunitd.lib"
-
-GOTO END
-
-:MAF_ITK_DEBUG_DLL_TEST
-
-cmake.exe  .  ^
-  -G"Visual Studio 7 .NET 2003" ^
-  -DMAF_BUILD_MAFDLL:BOOL=ON ^
-  -DBUILD_TESTING:BOOL=ON ^
-  -DDART_TESTING_TIMEOUT:STRING=120 ^
-  -DBUILD_EXAMPLES:BOOL=ON ^
-  -DCMAKE_BACKWARDS_COMPATIBILITY:STRING=2.0 ^
-  -DMAF_USE_ITK:BOOL=ON ^
-  -DCPPUNIT_INCLUDE_DIR:PATH="C:/cppunit-1.12.0/include" ^
-  -DCPPUNIT_LIBRARY:FILEPATH="C:/cppunit-1.12.0/lib/cppunitd.lib"
+  -DCPPUNIT_LIBRARY:FILEPATH="C:/cppunit-1.12.0_VS2010_BUILD/cppunit-1.12.0/lib/cppunitd.lib" ^
+  -DMAF_BINARY_PATH:PATH="%PARABUILD_CHECKOUT_DIR%/openMAF_ITK_Medical_Parabuild/openMAF_ITK_Parabuild.build" 
   
 cd ..
 
@@ -114,84 +37,91 @@ GOTO END
 
 :MAF_MED_DEBUG_DLL_TEST
 
-cd openMAF_ITK_Parabuild
+cd Medical_Parabuild
 
 cmake.exe  .  ^
   -G"Visual Studio 7 .NET 2003" ^
-  -DMAF_BUILD_MAFDLL:BOOL=ON ^
+  -DMED_BUILD_MEDDLL:BOOL=ON ^
   -DBUILD_TESTING:BOOL=ON ^
   -DDART_TESTING_TIMEOUT:STRING=120 ^
   -DBUILD_EXAMPLES:BOOL=ON ^
   -DCMAKE_BACKWARDS_COMPATIBILITY:STRING=2.0 ^
-  -DMAF_USE_ITK:BOOL=ON ^
   -DCPPUNIT_INCLUDE_DIR:PATH="C:/cppunit-1.12.0/include" ^
-  -DCPPUNIT_LIBRARY:FILEPATH="C:/cppunit-1.12.0/lib/cppunitd.lib"
+  -DCPPUNIT_LIBRARY:FILEPATH="C:/cppunit-1.12.0/lib/cppunitd.lib" ^
+  -DMAF_BINARY_PATH:PATH="%PARABUILD_CHECKOUT_DIR%/openMAF_ITK_Medical_Parabuild/openMAF_ITK_Parabuild" 
   
 cd ..
 
 GOTO END
 
-:MAF_MED_DEBUG_TEST
+:MAFMED_DEBUG
 
-cd openMAF_ITK_Parabuild
+cd Medical_Parabuild
 
 cmake.exe  .  ^
   -G"Visual Studio 7 .NET 2003" ^
-  -DMAF_BUILD_MAFDLL:BOOL=OFF ^
   -DBUILD_TESTING:BOOL=ON ^
-  -DBUILD_EXAMPLES:BOOL=ON ^
+  -DDART_TESTING_TIMEOUT:STRING=120 ^
+  -DBUILD_EXAMPLES:BOOL=OFF ^
+  -DBUILD_IPOSE:BOOL=OFF ^
   -DCMAKE_BACKWARDS_COMPATIBILITY:STRING=2.0 ^
-  -DMAF_USE_ITK:BOOL=ON ^
   -DCPPUNIT_INCLUDE_DIR:PATH="C:/cppunit-1.12.0/include" ^
-  -DCPPUNIT_LIBRARY:FILEPATH="C:/cppunit-1.12.0/lib/cppunitd.lib"
-  
-cd ..
+  -DCPPUNIT_LIBRARY:FILEPATH="C:/cppunit-1.12.0/lib/cppunitd.lib" ^
+  -DMAF_BINARY_PATH:PATH="%PARABUILD_CHECKOUT_DIR%/openMAF_ITK_Medical_Parabuild/openMAF_ITK_Parabuild" 
+
+cd ..   
 
 GOTO END
 
-:MAF_DOCUMENTATION
+:MAFMED_DEBUG_2010
 
-cd openMAF_ITK_Parabuild
+cd Medical_Parabuild
+
+cmake.exe  .  ^
+  -G"Visual Studio 10" ^
+  -DBUILD_TESTING:BOOL=ON ^
+  -DDART_TESTING_TIMEOUT:STRING=120 ^
+  -DBUILD_EXAMPLES:BOOL=OFF ^
+  -DBUILD_IPOSE:BOOL=OFF ^
+  -DCMAKE_BACKWARDS_COMPATIBILITY:STRING=2.0 ^
+  -DCPPUNIT_INCLUDE_DIR:PATH="C:/cppunit-1.12.0_VS2010_BUILD/cppunit-1.12.0/include" ^
+  -DCPPUNIT_LIBRARY:FILEPATH="C:/cppunit-1.12.0_VS2010_BUILD/cppunit-1.12.0/lib/cppunitd.lib" ^
+  -DMAF_BINARY_PATH:PATH="%PARABUILD_CHECKOUT_DIR%/openMAF_ITK_Medical_Parabuild/openMAF_ITK_Parabuild" 
+
+cd ..   
+
+GOTO END
+
+
+
+:MAFMED_DOCUMENTATION
+
+cd Medical_Parabuild
 
 cmake.exe  .  ^
   -G"Visual Studio 7 .NET 2003" ^
   -DCMAKE_BACKWARDS_COMPATIBILITY:STRING=2.0 ^
-  -DMAF_USE_ITK:BOOL=ON ^
+  -DMAF_BINARY_PATH:PATH="%PARABUILD_CHECKOUT_DIR%/openMAF_ITK_Medical_Parabuild/openMAF_ITK_Parabuild" ^
   -DBUILD_DOCUMENTATION=ON
 
-cd ..
+cd ..   
 
 GOTO END
 
 :VAPP_DEBUG
 
-cd openMAF_ITK_Parabuild
+cd Medical_Parabuild
 
 cmake.exe . ^
   -G"Visual Studio 7 .NET 2003" ^
   -DBUILD_EXAMPLES:BOOL=OFF ^
   -DBUILD_TESTING:BOOL=OFF ^
+  -DBUILD_IPOSE:BOOL=OFF ^
   -DCMAKE_BACKWARDS_COMPATIBILITY:STRING=2.0 ^
-  -DMAF_USE_ITK:BOOL=ON ^
   -DCPPUNIT_INCLUDE_DIR:PATH="C:/cppunit-1.12.0/include" ^
-  -DCPPUNIT_LIBRARY:FILEPATH="C:/cppunit-1.12.0/lib/cppunitd.lib"
-  
-cd ..   
-   
-GOTO END
+  -DCPPUNIT_LIBRARY:FILEPATH="C:/cppunit-1.12.0/lib/cppunitd.lib" ^
+  -DMAF_BINARY_PATH:PATH="%PARABUILD_CHECKOUT_DIR%/vapp/openMAF_ITK_Parabuild" 
 
-:VAPP_DEBUG_2010
-
-cd openMAF_ITK_Parabuild
-
-cmake.exe . ^
-  -G"Visual Studio 10" ^
-  -DBUILD_EXAMPLES:BOOL=OFF ^
-  -DBUILD_TESTING:BOOL=OFF ^
-  -DCMAKE_BACKWARDS_COMPATIBILITY:STRING=2.0 ^
-  -DMAF_USE_ITK:BOOL=ON ^
-  -DCPPUNIT_INCLUDE_DIR:PATH="C:/cppunit-1.12.0_VS2010_BUILD/cppunit-1.12.0/include" ^
-  -DCPPUNIT_LIBRARY:FILEPATH="C:/cppunit-1.12.0_VS2010_BUILD/cppunit-1.12.0/lib/cppunitd.lib"
   
 cd ..   
    
@@ -199,73 +129,94 @@ GOTO END
 
 :VAPP_RELEASE
 
-cd openMAF_ITK_Parabuild
+cd Medical_Parabuild
 
-cmake.exe . ^
+cmake.exe     ^
   -G"Visual Studio 7 .NET 2003" ^
   -DBUILD_EXAMPLES:BOOL=OFF ^
   -DBUILD_TESTING:BOOL=OFF ^
+  -DBUILD_IPOSE:BOOL=OFF ^
   -DCMAKE_BACKWARDS_COMPATIBILITY:STRING=2.0 ^
-  -DMAF_USE_ITK:BOOL=ON ^
   -DCPPUNIT_INCLUDE_DIR:PATH="C:/cppunit-1.12.0/include" ^
-  -DCPPUNIT_LIBRARY:FILEPATH="C:/cppunit-1.12.0/lib/cppunitd.lib" 
-
+  -DCPPUNIT_LIBRARY:FILEPATH="C:/cppunit-1.12.0/lib/cppunitd.lib" ^
+  -DMAF_BINARY_PATH:PATH="%PARABUILD_CHECKOUT_DIR%/vapp/openMAF_ITK_Parabuild" 
+  
 cd ..   
 
+GOTO END
+
+:VAPP_MEDICAL_RELEASE
+
+cd Medical_Parabuild
+
+cmake.exe     ^
+  -G"Visual Studio 7 .NET 2003" ^
+  -DBUILD_EXAMPLES:BOOL=ON ^
+  -DBUILD_IPOSE:BOOL=ON ^
+  -DBUILD_TESTING:BOOL=OFF ^
+  -DCMAKE_BACKWARDS_COMPATIBILITY:STRING=2.0 ^
+  -DCPPUNIT_INCLUDE_DIR:PATH="C:/cppunit-1.12.0/include" ^
+  -DCPPUNIT_LIBRARY:FILEPATH="C:/cppunit-1.12.0/lib/cppunitd.lib" ^
+  -DMAF_BINARY_PATH:PATH="%PARABUILD_CHECKOUT_DIR%/vapp/openMAF_ITK_Parabuild" ^
+  -DIPOSE_EXECUTABLE_OUTPUT_PATH:PATH="%PARABUILD_CHECKOUT_DIR%/vapp/Medical_Parabuild/bin/Release" ^
+  -DIPOSE_INSTALLER_EXECUTABLE_OUTPUT_DIR:PATH="%PARABUILD_CHECKOUT_DIR%/vapp/Medical_Parabuild/bin/Deploy"
+  
+cd ..   
 
 GOTO END
 
 :VAPP_RELEASE_2005
 
-cd openMAF_ITK_Parabuild
+cd Medical_Parabuild
 
-cmake.exe . ^
+cmake.exe     ^
   -G"Visual Studio 8 2005" ^
   -DBUILD_EXAMPLES:BOOL=OFF ^
   -DBUILD_TESTING:BOOL=OFF ^
+  -DBUILD_IPOSE:BOOL=OFF ^
   -DCMAKE_BACKWARDS_COMPATIBILITY:STRING=2.0 ^
-  -DMAF_USE_ITK:BOOL=ON ^
   -DCPPUNIT_INCLUDE_DIR:PATH="C:/cppunit-1.12.0/include" ^
-  -DCPPUNIT_LIBRARY:FILEPATH="C:/cppunit-1.12.0/lib/cppunitd.lib" 
-
+  -DCPPUNIT_LIBRARY:FILEPATH="C:/cppunit-1.12.0/lib/cppunitd.lib" ^
+  -DMAF_BINARY_PATH:PATH="%PARABUILD_CHECKOUT_DIR%/vapp/openMAF_ITK_Parabuild" 
+  
 cd ..   
-
 
 GOTO END
 
+
 :VAPP_RELEASE_2008
 
-cd openMAF_ITK_Parabuild
+cd Medical_Parabuild
 
-cmake.exe . ^
+cmake.exe     ^
   -G"Visual Studio 9 2008" ^
   -DBUILD_EXAMPLES:BOOL=OFF ^
   -DBUILD_TESTING:BOOL=OFF ^
+  -DBUILD_IPOSE:BOOL=OFF ^
   -DCMAKE_BACKWARDS_COMPATIBILITY:STRING=2.0 ^
-  -DMAF_USE_ITK:BOOL=ON ^
   -DCPPUNIT_INCLUDE_DIR:PATH="C:/cppunit-1.12.0/include" ^
-  -DCPPUNIT_LIBRARY:FILEPATH="C:/cppunit-1.12.0/lib/cppunitd.lib" 
-
+  -DCPPUNIT_LIBRARY:FILEPATH="C:/cppunit-1.12.0/lib/cppunitd.lib" ^
+  -DMAF_BINARY_PATH:PATH="%PARABUILD_CHECKOUT_DIR%/vapp/openMAF_ITK_Parabuild" 
+  
 cd ..   
-
 
 GOTO END
 
 :VAPP_RELEASE_2010
 
-cd openMAF_ITK_Parabuild
+cd Medical_Parabuild
 
-cmake.exe . ^
+cmake.exe     ^
   -G"Visual Studio 10" ^
   -DBUILD_EXAMPLES:BOOL=OFF ^
   -DBUILD_TESTING:BOOL=OFF ^
+  -DBUILD_IPOSE:BOOL=OFF ^
   -DCMAKE_BACKWARDS_COMPATIBILITY:STRING=2.0 ^
-  -DMAF_USE_ITK:BOOL=ON ^
   -DCPPUNIT_INCLUDE_DIR:PATH="C:/cppunit-1.12.0_VS2010_BUILD/cppunit-1.12.0/include" ^
-  -DCPPUNIT_LIBRARY:FILEPATH="C:/cppunit-1.12.0_VS2010_BUILD/cppunit-1.12.0/lib/cppunitd.lib"
-
+  -DCPPUNIT_LIBRARY:FILEPATH="C:/cppunit-1.12.0_VS2010_BUILD/cppunit-1.12.0/lib/cppunitd.lib" ^
+  -DMAF_BINARY_PATH:PATH="%PARABUILD_CHECKOUT_DIR%/vapp/openMAF_ITK_Parabuild" 
+  
 cd ..   
-
 
 GOTO END
 
