@@ -16,7 +16,7 @@ cd Build
 
 cmake.exe  ../Source ^
 	-G"Visual Studio 10" ^
-    -DMAF_BINARY_PATH:PATH=d:\MAF2MedicalLibs\VS2010\Build\
+    -DMAF_BINARY_PATH:PATH=d:\MAF2Libs\VS2010\Build\
 
 cd ../Source
   
