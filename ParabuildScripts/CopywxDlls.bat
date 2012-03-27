@@ -1,1 +1,0 @@
-copy .\openMAF_ITK_Parabuild\Libraries\wxWin\Build\bin\debug\*.dll .\openMAF_ITK_Parabuild\bin\debug\

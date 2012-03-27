@@ -1,8 +1,0 @@
-..\..\Base
-..\..\Core
-..\..\Gui
-..\..\Interaction
-..\..\Operations
-..\..\VME
-..\..\VME\DataPipes
-..\..\vtkMAF
