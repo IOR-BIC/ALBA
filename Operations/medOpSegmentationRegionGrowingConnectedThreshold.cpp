@@ -2,8 +2,8 @@
 Program:   @neufuse
 Module:    $RCSfile: medOpSegmentationRegionGrowingConnectedThreshold.cpp,v $
 Language:  C++
-Date:      $Date: 2012-03-26 09:10:31 $
-Version:   $Revision: 1.1.2.8 $
+Date:      $Date: 2012-03-27 12:45:31 $
+Version:   $Revision: 1.1.2.9 $
 Authors:   Matteo Giacomoni, Alessandro Chiarini, Grazia Di Cosmo
 ==========================================================================
 Copyright (c) 2008
@@ -143,6 +143,17 @@ void medOpSegmentationRegionGrowingConnectedThreshold::OpRun()
 	m_Sphere->Update();
 }
 //----------------------------------------------------------------------------
+void medOpSegmentationRegionGrowingConnectedThreshold::OpDo()
+//----------------------------------------------------------------------------
+{
+  if(m_Output)
+  {
+    m_Output->ReparentTo(m_ResampleInput);
+    mafEventMacro(mafEvent(this,VME_SHOW,m_Output,true));
+    mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+  }
+}
+//----------------------------------------------------------------------------
 void medOpSegmentationRegionGrowingConnectedThreshold::CreateGui()   
 //----------------------------------------------------------------------------
 {
@@ -174,7 +185,7 @@ void medOpSegmentationRegionGrowingConnectedThreshold::OpStop(int result)
 
   mafVME::SafeDownCast(m_ResampleInput)->SetBehavior(m_OldBehavior);
   mafVME::SafeDownCast(m_ResampleInput)->Update();
-  if (m_ResampleInput!=m_Input)
+  if (result==OP_RUN_CANCEL && m_ResampleInput!=m_Input)
   { 
     mafEventMacro(mafEvent(this,VME_SHOW,m_ResampleInput,false)); 
     mafEventMacro(mafEvent(this,VME_SHOW,m_Input,true)); 

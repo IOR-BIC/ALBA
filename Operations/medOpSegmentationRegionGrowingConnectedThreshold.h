@@ -2,9 +2,9 @@
 Program:   @neufuse
 Module:    $RCSfile: medOpSegmentationRegionGrowingConnectedThreshold.h,v $
 Language:  C++
-Date:      $Date: 2012-03-22 10:49:16 $
-Version:   $Revision: 1.1.2.7 $
-Authors:   Matteo Giacomoni, Alessandro Chiarini, Di Cosmo Grazia
+Date:      $Date: 2012-03-27 12:45:31 $
+Version:   $Revision: 1.1.2.8 $
+Authors:   Matteo Giacomoni, Alessandro Chiarini, Grazia Di Cosmo
 ==========================================================================
 Copyright (c) 2008
 SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
@@ -51,6 +51,9 @@ public:
   /*virtual*/ void OpRun();
 
   /*virtual*/ void OnEvent(mafEventBase *maf_event);
+
+  /** Execute the operation. */
+  void OpDo();
 
   enum CONNECTED_THRESHOLD_WIDGET_IDs
   {
