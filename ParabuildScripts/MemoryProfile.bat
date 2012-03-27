@@ -5,7 +5,7 @@ echo  ** memory profile started **
 echo.
 
 REM BEWARE! These directory names are  referenced in MemoryProfile.vbs script so the not change them
-set ProfilingResultsDirectory=.\Medical_Parabuild\bin\Debug\MemoryAllocation\
+set ProfilingResultsDirectory=.\bin\Debug\MemoryAllocation\
 set XMLResultsDirectory=%ProfilingResultsDirectory%\XML\
 set HTMLResultsDirectory=%ProfilingResultsDirectory%\HTML\
 
@@ -18,7 +18,7 @@ mkdir %HTMLResultsDirectory%
 echo  creating profiling results... 
 
 REM run the memory profile Visual Basic script
-.\Medical_Parabuild\ParabuildScripts\MemoryProfile.vbs
+.\ParabuildScripts\MemoryProfile.vbs
 echo.
 echo   profiling results created successfully!
 echo.

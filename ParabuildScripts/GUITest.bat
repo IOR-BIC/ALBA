@@ -10,7 +10,7 @@ REM BEWARE! These directory names are  referenced in GUITest.vbs script so the n
 set GUITestResultsDirectory=.\bin\debug\GUITesting\
 rmdir /s /q %GUITestResultsDirectory%
 mkdir %GUITestResultsDirectory%
-.\Medical_Parabuild\ParabuildScripts\GUITest.vbs
+.\ParabuildScripts\GUITest.vbs
 echo.
 echo writing results...
 echo.

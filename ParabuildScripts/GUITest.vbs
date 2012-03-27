@@ -8,7 +8,7 @@
 
   ' create a text log    
   Set fso = CreateObject("Scripting.FileSystemObject")
-  Set logFile = fso.CreateTextFile(".\Medical_Parabuild\bin\debug\GUITesting\GUITestLog.txt", True)
+  Set logFile = fso.CreateTextFile(".\bin\debug\GUITesting\GUITestLog.txt", True)
   logFile.WriteLine("** Log file for TestComplete GUI testing: **")
   logFile.WriteLine("")
   logFile.Write("GUI testing started on ")
