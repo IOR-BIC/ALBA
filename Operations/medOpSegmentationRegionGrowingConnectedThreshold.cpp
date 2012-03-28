@@ -2,8 +2,8 @@
 Program:   @neufuse
 Module:    $RCSfile: medOpSegmentationRegionGrowingConnectedThreshold.cpp,v $
 Language:  C++
-Date:      $Date: 2012-03-27 12:45:31 $
-Version:   $Revision: 1.1.2.9 $
+Date:      $Date: 2012-03-28 12:35:35 $
+Version:   $Revision: 1.1.2.10 $
 Authors:   Matteo Giacomoni, Alessandro Chiarini, Grazia Di Cosmo
 ==========================================================================
 Copyright (c) 2008
@@ -443,7 +443,7 @@ void medOpSegmentationRegionGrowingConnectedThreshold::CreateResample()
     if(!m_TestMode)
     {
       wait = new wxBusyCursor;
-      info = new wxBusyInfo("Please wait");
+      info = new wxBusyInfo("Waiting for volume to be resampled");
     }
     
     m_Resample->Resample();
