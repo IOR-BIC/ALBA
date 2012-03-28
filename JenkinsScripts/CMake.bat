@@ -9,14 +9,12 @@ IF NOT "%1" == "LIB_VS2010_DEBUG" GOTO UNKNOWN_CONDITION
 
 :LIB_VS2010_DEBUG
 
-cd ..
-
 mkdir Build
 cd Build
 
 cmake.exe  ../Source  -G"Visual Studio 10"
 
-cd ../Source
+cd ..
   
 GOTO END
 
