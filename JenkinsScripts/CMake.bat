@@ -15,8 +15,8 @@ mkdir Build
 cd Build
 
 cmake.exe  ../Source ^
-	-G"Visual Studio 10" ^
-    -DMAF_BINARY_PATH:PATH=d:\MAF2Libs\VS2010\Build\
+     -G"Visual Studio 10" ^
+     -DMAF_BINARY_PATH:PATH=d:\MAF2Libs\VS2010D\Build\
 
 cd ../Source
   
