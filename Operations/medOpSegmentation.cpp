@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medOpSegmentation.cpp,v $
 Language:  C++
-Date:      $Date: 2012-03-20 11:33:57 $
-Version:   $Revision: 1.1.2.56 $
+Date:      $Date: 2012-03-28 14:35:35 $
+Version:   $Revision: 1.1.2.57 $
 Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi, Alberto Losi
 ==========================================================================
 Copyright (c) 2007
@@ -123,6 +123,7 @@ static int m_CurrentVolumeDimensions[3] = {0,0,0};          //<Used to load only
 static double m_CurrentVolumeSpacing[3] = {0,0,0};          //<Used to load only volume with the specified spacing
 static double m_CurrentVolumeBounds[6] = {0,0,0,0,0,0};           //<Used to load only volume with the specified bounds
 static bool m_CurrentVolumeParametersInitialized = false;
+static int m_InputVtkType = 0;
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(medOpSegmentation);
@@ -304,6 +305,7 @@ void medOpSegmentation::OpRun()
   InitVolumeDimensions();
   InitVolumeSpacing();
   // Set static variable for load segmentation step
+  m_InputVtkType = m_Volume->GetOutput()->GetVTKData()->GetDataObjectType();
   if(m_VolumeParametersInitialized)
   {
     for(int i = 0; i < 6; i++)
@@ -3119,8 +3121,6 @@ void medOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
       if(distance2 < min_distance)
       {
         nearestIndex = i;
-        //min_distance = distance2;
-      /*break;*/
       }
     }
   }
@@ -4369,6 +4369,11 @@ bool medOpSegmentation::SegmentedVolumeAccept(mafNode* node)
   {
     mafVMEVolumeGray *volumeToCheck = mafVMEVolumeGray::SafeDownCast(node);
     volumeToCheck->Update();
+    /* loaded volume is of the same vtk type of the input volume */
+    if(volumeToCheck->GetOutput()->GetVTKData()->GetDataObjectType() != m_InputVtkType)
+    {
+      return false;
+    }
     /* loaded volume must have the same bounds of the input volume */
     double b[6];
     volumeToCheck->GetOutput()->GetBounds(b);
