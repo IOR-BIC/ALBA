@@ -2,8 +2,8 @@
 Program:   @neufuse
 Module:    $RCSfile: medOpSegmentationRegionGrowingConnectedThreshold.h,v $
 Language:  C++
-Date:      $Date: 2012-03-27 12:45:31 $
-Version:   $Revision: 1.1.2.8 $
+Date:      $Date: 2012-03-30 09:56:58 $
+Version:   $Revision: 1.1.2.9 $
 Authors:   Matteo Giacomoni, Alessandro Chiarini, Grazia Di Cosmo
 ==========================================================================
 Copyright (c) 2008
@@ -98,7 +98,7 @@ protected:
   void CreateGui();
 
   /** Resample volume if it is a rectilinear grid */ 
-  void CreateResample();
+  int CreateResample();
   
   /** Check the spacing and if is too little and could create some memory problems return false */
   bool CheckSpacing();
@@ -129,7 +129,6 @@ protected:
   mafVMEVolumeGray *m_ResampleInput;
   double m_VolumeSpacing[3];
   double m_VolumeBounds[6];
-
 
 };
 
