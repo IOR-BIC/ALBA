@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-05-25 09:38:43 $
-  Version:   $Revision: 1.139.2.5 $
+  Date:      $Date: 2012-04-03 08:26:49 $
+  Version:   $Revision: 1.139.2.6 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -836,13 +836,15 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
           {
             v->GetRWI()->SaveAllImages(v->GetLabel(),v, m_ApplicationSettings->GetImageTypeId());
           }
-				}
-				else
-				{
-          mafView *v = m_ViewManager->GetSelectedView();
-          if (v)
-            v->GetRWI()->SaveImage(v->GetLabel());
-				}
+          else
+          {
+            mafView *v = m_ViewManager->GetSelectedView();
+            if (v)
+            {
+              v->GetRWI()->SaveImage(v->GetLabel());
+            }
+          }
+        }
       }
       break;
       case LAYOUT_LOAD:
