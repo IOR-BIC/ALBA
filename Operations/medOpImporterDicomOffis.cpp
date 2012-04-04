@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2012-04-04 13:11:00 $
-Version:   $Revision: 1.1.2.158 $
+Date:      $Date: 2012-04-04 13:20:10 $
+Version:   $Revision: 1.1.2.159 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -399,10 +399,19 @@ void medOpImporterDicomOffis::OpRun()
 	{
 		if (m_DicomDirectoryABSFileName == "")
 		{	
+      bool useDefaultFolder = false;
       wxString lastDicomDir = "";
       if (((medGUIDicomSettings*)GetSetting())->GetUseDefaultDicomFolder() == TRUE && ((medGUIDicomSettings*)GetSetting())->GetDefaultDicomFolder() != "UNEDFINED_DicomFolder")
       {
+        
         lastDicomDir = ((medGUIDicomSettings*)GetSetting())->GetDefaultDicomFolder().GetCStr();
+
+        //Check if default folder exist
+        if (::wxDirExists(lastDicomDir))
+        {
+          useDefaultFolder = true;
+        }
+
       }
       else if (((medGUIDicomSettings*)GetSetting())->GetLastDicomDir() != "UNEDFINED_m_LastDicomDir")
       {
@@ -414,30 +423,45 @@ void medOpImporterDicomOffis::OpRun()
 				lastDicomDir = defaultPath;		
 			};
 
-			wxDirDialog dialog(m_Wizard->GetParent(),"", lastDicomDir,wxRESIZE_BORDER, m_Wizard->GetPosition());
-			dialog.SetReturnCode(wxID_OK);
-			int ret_code = dialog.ShowModal();
-
-
-
-			if (ret_code == wxID_OK)
+      //User should choice a folder
+			if (!useDefaultFolder)
 			{
-				wxString path = dialog.GetPath();
-				((medGUIDicomSettings*)GetSetting())->SetLastDicomDir(path);
-				m_DicomDirectoryABSFileName = path.c_str();
-				GuiUpdate();
-				result = OpenDir();
-				if (!result)
+				wxDirDialog dialog(m_Wizard->GetParent(),"", lastDicomDir,wxRESIZE_BORDER, m_Wizard->GetPosition());
+				dialog.SetReturnCode(wxID_OK);
+				int ret_code = dialog.ShowModal();
+	
+	
+	
+				if (ret_code == wxID_OK)
+				{
+					wxString path = dialog.GetPath();
+					((medGUIDicomSettings*)GetSetting())->SetLastDicomDir(path);
+					m_DicomDirectoryABSFileName = path.c_str();
+					GuiUpdate();
+					result = OpenDir();
+					if (!result)
+					{
+						OpStop(OP_RUN_CANCEL);
+						return;
+					}
+				}
+				else
 				{
 					OpStop(OP_RUN_CANCEL);
 					return;
 				}
 			}
-			else
-			{
-				OpStop(OP_RUN_CANCEL);
-				return;
-			}
+      else//Importer use the default folder
+      {
+        m_DicomDirectoryABSFileName = lastDicomDir.c_str();
+        GuiUpdate();
+        result = OpenDir();
+        if (!result)
+        {
+          OpStop(OP_RUN_CANCEL);
+          return;
+        }
+      }
 
 		}
 		else
