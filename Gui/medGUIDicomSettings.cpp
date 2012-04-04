@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2011-11-21 14:06:29 $
-Version:   $Revision: 1.7.2.18 $
+Date:      $Date: 2012-04-04 13:10:33 $
+Version:   $Revision: 1.7.2.19 $
 Authors:   Matteo Giacomoni, Simone Brazzale
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -56,6 +56,8 @@ mafGUISettings(Listener, label)
   m_Step = ID_1X;
   m_OutputNameType = TRADITIONAL;
   m_ShowAdvancedOptionOfSorting = TRUE;
+  m_DicomFolder = "UNEDFINED_DicomFolder";
+  m_UseDefaultDicomFolder = FALSE;
 
   m_Config->SetPath("Importer Dicom"); // Regiser key path Added by Losi 15.11.2009
 	InitializeSettings();
@@ -70,6 +72,8 @@ void medGUIDicomSettings::CreateGui()
 //----------------------------------------------------------------------------
 {
 	m_Gui = new mafGUI(this);
+  m_Gui->Bool(ID_USE_DEFAULT_DICOM_FOLDER,_("Use Default DICOM Folder"),&m_UseDefaultDicomFolder,1);
+  m_Gui->DirOpen(ID_DICOM_FOLDER,_("Folder"),&m_DicomFolder,_("Folder where are placed DICOM files"));
 	// m_Gui->FileOpen(ID_DICTONARY,_("Dictionary"),&m_Dictionary); Remove dictionary selection (Losi 25.11.2009)
 	m_Gui->Bool(ID_AUTO_POS_CROP,_("Auto Crop"),&m_AutoCropPos,1);
   m_Gui->Bool(ID_ENALBLE_TIME_BAR,_("Enable Time Bar"),&m_EnableNumberOfTime,1);
@@ -126,10 +130,11 @@ void medGUIDicomSettings::CreateGui()
   m_Gui->Divider(1);
 
 	m_Gui->Update();
-  m_Gui->Enable(ID_VME_TYPE,!m_AutoVMEType);
-  m_Gui->Enable(ID_SETTING_VME_TYPE,m_AutoVMEType);
-  m_Gui->Enable(ID_SCALAR_TOLERANCE,m_ScalarTolerance);
-  m_Gui->Enable(ID_PERCENTAGE_TOLERANCE,m_PercentageTolerance);
+  m_Gui->Enable(ID_DICOM_FOLDER,(m_UseDefaultDicomFolder==TRUE));
+  m_Gui->Enable(ID_VME_TYPE,!(m_AutoVMEType==TRUE));
+  m_Gui->Enable(ID_SETTING_VME_TYPE,(m_AutoVMEType==TRUE));
+  m_Gui->Enable(ID_SCALAR_TOLERANCE,(m_ScalarTolerance==TRUE));
+  m_Gui->Enable(ID_PERCENTAGE_TOLERANCE,(m_PercentageTolerance==TRUE));
 }
 //----------------------------------------------------------------------------
 void medGUIDicomSettings::EnableItems()
@@ -138,10 +143,11 @@ void medGUIDicomSettings::EnableItems()
 	//m_Gui->Enable(ID_DICTONARY,true); Remove dictionary selection (Losi 25.11.2009)
   if (m_Gui)
   {
-	  m_Gui->Enable(ID_VME_TYPE,!m_AutoVMEType);
-    m_Gui->Enable(ID_SETTING_VME_TYPE,m_AutoVMEType);
-	  m_Gui->Enable(ID_SCALAR_TOLERANCE,m_ScalarTolerance);
-	  m_Gui->Enable(ID_PERCENTAGE_TOLERANCE,m_PercentageTolerance);
+    m_Gui->Enable(ID_DICOM_FOLDER,(m_UseDefaultDicomFolder==TRUE));
+	  m_Gui->Enable(ID_VME_TYPE,!(m_AutoVMEType==TRUE));
+    m_Gui->Enable(ID_SETTING_VME_TYPE,(m_AutoVMEType==TRUE));
+	  m_Gui->Enable(ID_SCALAR_TOLERANCE,(m_ScalarTolerance==TRUE));
+	  m_Gui->Enable(ID_PERCENTAGE_TOLERANCE,(m_PercentageTolerance==TRUE));
 	  m_Gui->Update();
   }
 }
@@ -157,6 +163,17 @@ void medGUIDicomSettings::OnEvent(mafEventBase *maf_event)
 // 			m_Config->Write("DicomDictionary",m_Dictionary.GetCStr());
 // 		}
 // 		break;
+  case ID_USE_DEFAULT_DICOM_FOLDER:
+    {
+      m_Config->Write("UseDefaultDicomFolder",m_UseDefaultDicomFolder);
+      EnableItems();
+    }
+    break;
+  case ID_DICOM_FOLDER:
+    {
+      m_Config->Write("DicomFolder",m_DicomFolder.GetCStr());
+    }
+    break;
   case ID_SHOW_ADVANCED_OPTION_SORTING:
     {
       m_Config->Write("ShowAdvancedOptionOfSorting",m_ShowAdvancedOptionOfSorting);
@@ -557,6 +574,24 @@ void medGUIDicomSettings::InitializeSettings()
   else
   {
     m_Config->Write("ShowAdvancedOptionOfSorting",m_ShowAdvancedOptionOfSorting);
+  }
+
+  if(m_Config->Read("DicomFolder", &string_item))
+  {
+    m_DicomFolder=string_item;
+  }
+  else
+  {
+    m_Config->Write("DicomFolder",m_DicomFolder.GetCStr());
+  }
+
+  if(m_Config->Read("UseDefaultDicomFolder", &long_item))
+  {
+    m_UseDefaultDicomFolder=long_item;
+  }
+  else
+  {
+    m_Config->Write("UseDefaultDicomFolder",m_UseDefaultDicomFolder);
   }
 
 

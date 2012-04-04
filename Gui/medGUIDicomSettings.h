@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.h,v $
 Language:  C++
-Date:      $Date: 2011-11-21 14:06:29 $
-Version:   $Revision: 1.5.2.20 $
+Date:      $Date: 2012-04-04 13:10:33 $
+Version:   $Revision: 1.5.2.21 $
 Authors:   Matteo Giacomoni, Simone Brazzale
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -72,6 +72,8 @@ public:
     ID_PERCENTAGE_TOLERANCE,
     ID_OUTPUT_NAME,
     ID_SHOW_ADVANCED_OPTION_SORTING,
+    ID_DICOM_FOLDER,
+    ID_USE_DEFAULT_DICOM_FOLDER,
 	};
   
   /** Type VMEs*/
@@ -153,6 +155,10 @@ public:
   double GetPercentageTolerance(){return m_PercentageDistanceTolerance;};
   /** Get m_ShowAdvancedOptionOfSorting */
   int GetShowAdvancedOptionSorting(){return m_ShowAdvancedOptionOfSorting;};
+  /** return if default dicom folder should be used */
+  int GetUseDefaultDicomFolder(){return m_UseDefaultDicomFolder;};
+  /** return if default dicom folder should be used */
+  mafString GetDefaultDicomFolder(){return m_DicomFolder;};
 
 
 
@@ -209,7 +215,9 @@ protected:
   int m_VisualizePosition;
   int m_OutputNameType;
   int m_ShowAdvancedOptionOfSorting;
+  int m_UseDefaultDicomFolder;
   wxString m_LastDicomDir;
+  mafString m_DicomFolder;
   double m_ScalarDistanceTolerance;
   double m_PercentageDistanceTolerance;
 
