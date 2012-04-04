@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2012-02-15 10:51:37 $
-Version:   $Revision: 1.1.2.157 $
+Date:      $Date: 2012-04-04 13:11:00 $
+Version:   $Revision: 1.1.2.158 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -399,9 +399,16 @@ void medOpImporterDicomOffis::OpRun()
 	{
 		if (m_DicomDirectoryABSFileName == "")
 		{	
-			wxString lastDicomDir = ((medGUIDicomSettings*)GetSetting())->GetLastDicomDir();
-
-			if (lastDicomDir == "UNEDFINED_m_LastDicomDir")
+      wxString lastDicomDir = "";
+      if (((medGUIDicomSettings*)GetSetting())->GetUseDefaultDicomFolder() == TRUE && ((medGUIDicomSettings*)GetSetting())->GetDefaultDicomFolder() != "UNEDFINED_DicomFolder")
+      {
+        lastDicomDir = ((medGUIDicomSettings*)GetSetting())->GetDefaultDicomFolder().GetCStr();
+      }
+      else if (((medGUIDicomSettings*)GetSetting())->GetLastDicomDir() != "UNEDFINED_m_LastDicomDir")
+      {
+        lastDicomDir = ((medGUIDicomSettings*)GetSetting())->GetLastDicomDir();
+      }
+			else if (lastDicomDir == "UNEDFINED_m_LastDicomDir")
 			{
 				wxString defaultPath = (mafGetApplicationDirectory()+"/data/external/").c_str();
 				lastDicomDir = defaultPath;		
