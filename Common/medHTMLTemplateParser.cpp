@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medHTMLTemplateParser.cpp,v $
 Language:  C++
-Date:      $Date: 2012-02-28 16:33:05 $
-Version:   $Revision: 1.1.2.5 $
-Authors:   Matteo Giacomoni
+Date:      $Date: 2012-04-05 08:19:12 $
+Version:   $Revision: 1.1.2.6 $
+Authors:   Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2002/2007
 SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
