@@ -3,8 +3,8 @@
 Program:   Multimod Application framework RELOADED
 Module:    $RCSfile: vtkMAFContourVolumeMapper.cxx,v $
 Language:  C++
-Date:      $Date: 2009-06-22 13:29:05 $
-Version:   $Revision: 1.1.2.5 $
+Date:      $Date: 2012-04-05 12:56:22 $
+Version:   $Revision: 1.1.2.6 $
 Authors:   Alexander Savenko, Nigel McFarlane
 
 ================================================================================
@@ -12,65 +12,6 @@ Copyright (c) 2002/2006 University of Bedfordshire, UK (www.beds.ac.uk)
 All rights reserved.
 ===============================================================================*/
 
-
-// CONTENTS
-//
-// vtkMAFContourVolumeMapper::vtkCxxRevisionMacro()
-// vtkMAFContourVolumeMapper::vtkStandardNewMacro()
-// vtkMAFContourVolumeMapper::vtkMAFContourVolumeMapper()
-// vtkMAFContourVolumeMapper::~vtkMAFContourVolumeMapper()
-// vtkMAFContourVolumeMapper::ReleaseData()
-// vtkMAFContourVolumeMapper::ClearCachesAndStats()
-// vtkMAFContourVolumeMapper::PrintSelf()
-// vtkMAFContourVolumeMapper::SetInput()
-// vtkMAFContourVolumeMapper::EstimateRelevantVolume()
-// vtkMAFContourVolumeMapper::EstimateRelevantVolumeTemplate()
-// vtkMAFContourVolumeMapper::Render()
-// vtkMAFContourVolumeMapper::PrepareAccelerationDataTemplate()
-// vtkMAFContourVolumeMapper::EnableClipPlanes()
-// vtkMAFContourVolumeMapper::Update()
-// vtkMAFContourVolumeMapper::IsDataValid()
-// vtkMAFContourVolumeMapper::GetDataType()
-// vtkMAFContourVolumeMapper::GetOutput()
-// vtkMAFContourVolumeMapper::InitializeRender()
-// vtkMAFContourVolumeMapper::DrawCache()
-// vtkMAFContourVolumeMapper::RenderMCubes()
-// vtkMAFContourVolumeMapper::CreateMCubes()
-// vtkMAFContourVolumeMapper::CalculateLodIncrements()
-// vtkMAFContourVolumeMapper::CalculateVoxelVertIndicesOffsets()
-// vtkMAFContourVolumeMapper::VoxelVolume()
-// vtkMAFContourVolumeMapper::EstimateTrianglesFromRelevantVolume()
-// vtkMAFContourVolumeMapper::EstimateNumberOfTriangles()
-// vtkMAFContourVolumeMapper::EstimateTimeToDrawDC()
-// vtkMAFContourVolumeMapper::EstimateTimeToDrawRMC()
-// vtkMAFContourVolumeMapper::BestLODForDrawCache()
-// vtkMAFContourVolumeMapper::BestLODForRenderMCubes()
-// vtkMAFContourVolumeMapper::BestLODForCreateMCubes()
-// vtkMAFContourVolumeMapper::PrepareContours()
-// vtkMAFContourVolumeMapper::PrepareContoursTemplate()
-// vtkMAFContourVolumeMapper::CalculateDepthMatrix()
-// vtkMAFContourVolumeMapper::DepthOfVertex()
-// vtkMAFContourVolumeMapper::SortTriangles()
-// vtkMAFContourVolumeMapper::PointerFromIndices()
-// vtkMAFContourVolumeMapper::IndicesFromPointer()
-
-//
-// Polyline2D::Reallocate()
-// Polyline2D::Allocate()
-// Polyline2D::Polyline2D()
-// Polyline2D::AddNextLine()
-// Polyline2D::Merge()
-// Polyline2D::Close()
-// Polyline2D::UpdateBoundingBox()
-// Polyline2D::FindClosestPolyline()    - commented out
-// Polyline2D::FindSubPolyline()        -     "      "
-// Polyline2D::SplitPolyline()          -     "      "
-// Polyline2D::Move()
-// Polyline2D::IsInsideOf()
-//
-// ListOfPolyline2D::Clear()
-// ListOfPolyline2D::IsInside()
-// ListOfPolyline2D::FindContour()
 
 #include <assert.h>
 #include <vector>
@@ -105,7 +46,7 @@ static const vtkMarchingCubesTriangleCases* marchingCubesCases = vtkMarchingCube
 
 using namespace vtkMAFContourVolumeMapperNamespace;
 
-vtkCxxRevisionMacro(vtkMAFContourVolumeMapper, "$Revision: 1.1.2.5 $");
+vtkCxxRevisionMacro(vtkMAFContourVolumeMapper, "$Revision: 1.1.2.6 $");
 vtkStandardNewMacro(vtkMAFContourVolumeMapper);
 
 
@@ -2273,10 +2214,13 @@ int vtkMAFContourVolumeMapper::BestLODForDrawCache(vtkRenderer *renderer)
     return 0 ;
 
   // return highest lod with acceptable no. of triangles and time to draw
+  // Nigel 4.4.12 - removed time constraint if no transparency
   for (int lod = 0 ;  lod < NumberOfLods ;  lod++){
-    if (EstimateNumberOfTriangles(lod) < MaxTrianglesNotOptimized &&
-      EstimateTimeToDrawDC(lod) < renderer->GetAllocatedRenderTime())
-      return lod ;
+      bool trianglesOk = (EstimateNumberOfTriangles(lod) < MaxTrianglesNotOptimized) ;
+      bool timeOk = (this->Alpha == 1) || (EstimateTimeToDrawDC(lod) < renderer->GetAllocatedRenderTime()) ; 
+      
+      if (trianglesOk && timeOk)
+        return lod ;
   }
 
   // nothing valid - return lowest level
