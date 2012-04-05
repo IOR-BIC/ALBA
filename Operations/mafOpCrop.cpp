@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpCrop.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-09-08 12:41:43 $
-  Version:   $Revision: 1.4.2.4 $
+  Date:      $Date: 2012-04-05 12:28:04 $
+  Version:   $Revision: 1.4.2.5 $
   Authors:   Matteo Giacomoni & Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -305,6 +305,11 @@ void mafOpCrop::OpDo()
 
 	((mafVMEVolume*)m_Input)->GetOutput()->Update();
 	((mafVMEVolume*)m_Input)->Update();
+	
+    // bug# 2628: gizmos do not update after cropping (workaround code)
+	mafEventMacro(mafEvent(this,VME_SHOW,m_Input,false));
+	mafEventMacro(mafEvent(this,VME_SHOW,m_Input,true));
+	///////
 
 	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 }
@@ -319,6 +324,11 @@ void mafOpCrop::OpUndo()
 
 	((mafVMEVolume*)m_Input)->GetOutput()->Update();
 	((mafVMEVolume*)m_Input)->Update();
+
+	// bug# 2628: gizmos do not update after cropping (workaround code)
+	mafEventMacro(mafEvent(this,VME_SHOW,m_Input,false));
+	mafEventMacro(mafEvent(this,VME_SHOW,m_Input,true));
+	///////
 
 	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 }
