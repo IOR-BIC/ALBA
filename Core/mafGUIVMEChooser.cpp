@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIVMEChooser.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:54 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2012-04-05 11:04:59 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -43,9 +43,9 @@ mafGUIVMEChooser::mafGUIVMEChooser(mafGUICheckTree *tree, wxString dialog_title,
   m_ChooserTree = new mafGUIVMEChooserTree(this,tree,m_ValidateCallback,-1,false,true,style, multiSelect);
   m_ChooserTree->SetListener(this);
   m_ChooserTree->SetTitle("");
-  m_ChooserTree->SetSize(wxSize(200,400));
-  m_ChooserTree->SetMinSize(wxSize(200,400));
-  
+  m_ChooserTree->SetSize(wxSize(400,640));
+  m_ChooserTree->SetMinSize(wxSize(400,640));	
+
   Add(m_ChooserTree,1,wxEXPAND);
   m_OkButton->Enable(false);
 }
