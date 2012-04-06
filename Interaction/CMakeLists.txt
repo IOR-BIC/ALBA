@@ -34,8 +34,8 @@ SET(PROJECT_SRCS
   medGUITransformSliders.h
   
   ##### Introduced with VolumeLarge - to be committed down ###
-  mafGizmoROI_BES.cpp
-  mafGizmoROI_BES.h  
+  # mafGizmoROI_BES.cpp
+  # mafGizmoROI_BES.h  
   ############################################################
 
   medGizmoCrossRotateTranslate.cpp
@@ -81,9 +81,19 @@ SET(PROJECT_LIBS mafBase mafIO mafGui vtkMAF)
 #  SET(PROJECT_LIBS ${PROJECT_LIBS} vtkHybrid)
 #ENDIF (MAF_USE_VTK)
 
-# Create the library.
-ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
+IF(MED_BUILD_MEDDLL)
+  SET(BUILD_SHARED_LIBS 1)
+  ADD_DEFINITIONS(-DMED_INTERACTION_EXPORTS)
+  # Create the library.
+  ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
+  TARGET_LINK_LIBRARIES(${PROJECT_NAME} mafDLL medCommon)
+ELSE(MED_BUILD_MEDDLL)
+  # Create the library.
+  ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
+  TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
+ENDIF (MED_BUILD_MEDDLL)
+
+ADD_DEPENDENCIES(${PROJECT_NAME} medCommon medVME vtkMED)
 
 #IF (MAF_USE_WX)
 #  ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_WXWIN_LIBRARY)
