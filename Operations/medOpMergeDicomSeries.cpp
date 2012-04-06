@@ -2,8 +2,8 @@
 Program:   MED
 Module:    $RCSfile: medOpMergeDicomSeries.cpp,v $
 Language:  C++
-Date:      $Date: 2011-09-02 08:16:58 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2012-04-06 09:16:38 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Alberto Losi
 ==========================================================================
 Copyright (c) 2009
@@ -21,7 +21,6 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #include "wx/busyinfo.h"
 
 #include "medOpMergeDicomSeries.h"
-#include "medOpImporterDicomOffis.h"
 #include "medGUIDicomSettings.h"
 #include "vtkDicomUnPacker.h"
 
