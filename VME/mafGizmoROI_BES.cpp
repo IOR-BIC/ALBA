@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGizmoROI_BES.cpp,v $
 Language:  C++
-Date:      $Date: 2012-04-06 09:38:55 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2012-04-06 12:49:42 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Stefano Perticoni, Josef Kohout
 ==========================================================================
 Copyright (c) 2002/2004
@@ -32,6 +32,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafVME.h"
 #include "mafVMEOutput.h"
 #include "mafSmartPointer.h"
+#include "mafGizmoTranslatePlane.h"
+#include "mafGizmoTranslateAxis.h"
+#include "mafObserver.h"
+#include "mafGizmoBoundingBox.h"
 
 #include "vtkTransform.h"
 #include "vtkCubeSource.h"

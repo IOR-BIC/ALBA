@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGizmoROI_BES.h,v $
 Language:  C++
-Date:      $Date: 2012-04-06 09:38:55 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2012-04-06 12:49:42 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Stefano Perticoni, Josef Kohout
 ==========================================================================
 Copyright (c) 2002/2004
@@ -19,17 +19,17 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 #include "medVMEDefines.h"
 #include "mafGizmoInterface.h"
-#include "mafObserver.h"
-#include "mafGizmoBoundingBox.h"
 #include "mafGizmoHandle.h"
-#include "mafGizmoTranslateAxis.h"
-#include "mafGizmoTranslatePlane.h"
 
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
 class mafMatrix;
 class mafVME;
+class mafGizmoTranslatePlane;
+class mafGizmoTranslateAxis;
+class mafObserver;
+class mafGizmoBoundingBox;
 
 //----------------------------------------------------------------------------
 // mafGizmoROI_BES :
