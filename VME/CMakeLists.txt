@@ -24,8 +24,8 @@ SET(PROJECT_SRCS
   medPipeVolumeVR.cpp
   medPipeVolumeVR.h
 
-  mafPolylineGraph.cpp
-  mafPolylineGraph.h
+  # mafPolylineGraph.cpp
+  # mafPolylineGraph.h
   medVMEPolylineGraph.cpp
   medVMEPolylineGraph.h
   medVMEPolylineEditor.cpp
@@ -101,6 +101,8 @@ SET(PROJECT_SRCS
   mafPipeSlice.h
   ############################
   
+  mafGizmoROI_BES.cpp
+  mafGizmoROI_BES.h
   mafPipeMeshSlice_BES.cpp
   mafPipeMeshSlice_BES.h
   mafPipePolylineSlice_BES.cpp
@@ -145,12 +147,23 @@ SET(PROJECT_SRCS  ${PROJECT_SRCS}
 )
 ENDIF (MAF_USE_ITK)
 
+SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /FORCE:MULTIPLE")
+
+MESSAGE("${CMAKE_SHARED_LINKER_FLAGS}")
+
 # List libraries that are needed by this project.
 SET(PROJECT_LIBS "mafVME" "mafInteraction" "vtkMAF")
 
 SET(PROJECT_LIBS ${PROJECT_LIBS} vtkMED)
 
-# Create the library.
-ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
-
+IF(MED_BUILD_MEDDLL)
+  SET(BUILD_SHARED_LIBS 1)
+  ADD_DEFINITIONS(-DMED_VME_EXPORTS)
+  # Create the library.
+  ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
+  TARGET_LINK_LIBRARIES(${PROJECT_NAME} mafDLL vtkMED medGui medCommon)
+ELSE(MED_BUILD_MEDDLL)
+  # Create the library.
+  ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
+  TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
+ENDIF (MED_BUILD_MEDDLL)

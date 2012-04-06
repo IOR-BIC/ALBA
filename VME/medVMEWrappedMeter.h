@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:30:59 $
-  Version:   $Revision: 1.12.2.1 $
+  Date:      $Date: 2012-04-06 10:12:07 $
+  Version:   $Revision: 1.12.2.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -14,7 +14,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medVMEDefines.h"
 #include "mafVME.h"
 #include "medVMEOutputWrappedMeter.h"
 #include "mafEvent.h"
@@ -38,7 +38,7 @@ class vtkPoints;
 
 /** medVMEWrappedMeter - 
 */
-class MED_EXPORT medVMEWrappedMeter : public mafVME
+class MED_VME_EXPORT medVMEWrappedMeter : public mafVME
 {
 public:
   MAF_ID_DEC(LENGTH_THRESHOLD_EVENT);

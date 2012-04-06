@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEFactory.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:29:56 $
-  Version:   $Revision: 1.3.2.2 $
+  Date:      $Date: 2012-04-06 10:12:07 $
+  Version:   $Revision: 1.3.2.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -14,7 +14,7 @@
 //----------------------------------------------------------------------------
 // includes :
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medVMEDefines.h"
 #include "mafVMEFactory.h"
 #include "mafVME.h"
 
@@ -25,7 +25,7 @@
   a mafNodeFactory this last does not need to be crated: you should create one or the other but
   not both since the Instance would be overwritten and thus the Plug*<> methods would always
   plug inside one of the two. */
-class MED_EXPORT medVMEFactory : public mafVMEFactory
+class MED_VME_EXPORT medVMEFactory : public mafVMEFactory
 {
 public: 
   /** RTTI Macro */

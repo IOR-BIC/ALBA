@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMESegmentationVolume.h,v $
 Language:  C++
-Date:      $Date: 2011-06-24 12:14:56 $
-Version:   $Revision: 1.1.2.11 $
+Date:      $Date: 2012-04-06 10:12:07 $
+Version:   $Revision: 1.1.2.12 $
 Authors:   Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2010
@@ -15,7 +15,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medVMEDefines.h"
 #include "mafVME.h"
 #include "mafVMEVolumeGray.h"
 
@@ -27,7 +27,7 @@ class mmaVolumeMaterial;
 class medDataPipeCustomSegmentationVolume;
 class medAttributeSegmentationVolume;
 
-class MED_EXPORT medVMESegmentationVolume : public mafVME
+class MED_VME_EXPORT medVMESegmentationVolume : public mafVME
 {
 public:
   mafTypeMacro(medVMESegmentationVolume, mafVME);
