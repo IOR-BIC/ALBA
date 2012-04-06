@@ -6,6 +6,8 @@ PROJECT(medOperations)
 
 # Set your list of sources here.
 SET(PROJECT_SRCS
+  medGeometryEditorPolylineGraph.cpp
+  medGeometryEditorPolylineGraph.h
   medOpCreateLabeledVolume.cpp
   medOpCreateLabeledVolume.h
   medOpImporterLandmark.cpp
@@ -172,8 +174,8 @@ ENDIF (MED_USE_Offis)
   
 IF (MAF_USE_ITK)
 SET(PROJECT_SRCS  ${PROJECT_SRCS}
-  itkRawMotionImporterUtility.cxx
-  itkRawMotionImporterUtility.h
+  # itkRawMotionImporterUtility.cxx
+  # itkRawMotionImporterUtility.h
   medOpImporterMotionData.h
   medOpExporterLandmark.cpp
   medOpExporterLandmark.h
@@ -199,9 +201,17 @@ SET(PROJECT_LIBS "mafVME" "mafInteraction")
 
 SET(PROJECT_LIBS ${PROJECT_LIBS} vtkMED medCommon medInteraction medGUI)
 
-# Create the library.
-ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
+IF(MED_BUILD_MEDDLL)
+  SET(BUILD_SHARED_LIBS 1)
+  ADD_DEFINITIONS(-DMED_OPERATION_EXPORTS)
+  # Create the library.
+  ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
+  TARGET_LINK_LIBRARIES(${PROJECT_NAME} mafDLL medCommon medVME medInteraction medGui medViews)
+ELSE(MED_BUILD_MEDDLL)
+  # Create the library.
+  ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
+  TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
+ENDIF (MED_BUILD_MEDDLL)
 
-ADD_DEPENDENCIES(${PROJECT_NAME} medGui)
+ADD_DEPENDENCIES(${PROJECT_NAME} medGui medCommon medInteraction vtkMED)
   
