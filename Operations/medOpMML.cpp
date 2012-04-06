@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 #include "  Module:    $RCSfile: medOpMML.cpp,v $
 Language:  C++
-Date:      $Date: 2012-02-15 10:55:06 $
-Version:   $Revision: 1.14.2.1 $
+Date:      $Date: 2012-04-06 09:19:25 $
+Version:   $Revision: 1.14.2.2 $
 Authors:   Mel Krokos
 ==========================================================================
 Copyright (c) 2002/2004
@@ -13,7 +13,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 #define TestingVersion
 
-#include "mafDefines.h"
+#include "medDefines.h"
 
 #include <wx/slider.h>
 #include <wx/defs.h>
