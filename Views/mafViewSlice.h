@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.h,v $
   Language:  C++
-  Date:      $Date: 2011-12-27 16:49:08 $
-  Version:   $Revision: 1.26.2.13 $
+  Date:      $Date: 2012-04-06 09:37:38 $
+  Version:   $Revision: 1.26.2.14 $
   Authors:   Paolo Quadrani,Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -15,7 +15,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medViewsDefines.h"
 #include "mafViewVTK.h"
 #include "mafMatrix.h"
 #include <vector>
@@ -46,7 +46,7 @@ initialize the visual pipe according to the camera position that is passed throu
 Rotated volumes interaction and visualizationo is supported by this component.
 */
 
-class MED_EXPORT mafViewSlice: public mafViewVTK
+class MED_VIEWS_EXPORT mafViewSlice: public mafViewVTK
 {
 public:
   mafViewSlice(wxString label = "Slice", int camera_position = CAMERA_CT, bool show_axes = false, bool show_grid = false, bool show_ruler = false, int stereo = 0,bool showTICKs=false,bool textureInterpolate=true);

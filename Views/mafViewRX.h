@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRX.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:22:31 $
-  Version:   $Revision: 1.7.2.4 $
+  Date:      $Date: 2012-04-06 09:37:38 $
+  Version:   $Revision: 1.7.2.5 $
   Authors:   Paolo Quadrani , Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -15,7 +15,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medViewsDefines.h"
 #include "mafViewVTK.h"
 #include "mafMatrix.h"
 
@@ -34,7 +34,7 @@ mafViewRX is a View that visualize volume as projection along x or y axis and
 initialize the visual pipe according to the camera position that is passed through constructor
 \sa mafViewVTK
 */
-class MED_EXPORT mafViewRX: public mafViewVTK
+class MED_VIEWS_EXPORT mafViewRX: public mafViewVTK
 {
 public:
   /** constructor */

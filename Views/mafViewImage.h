@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewImage.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:19:56 $
-  Version:   $Revision: 1.3.2.2 $
+  Date:      $Date: 2012-04-06 09:37:38 $
+  Version:   $Revision: 1.3.2.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -15,7 +15,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medViewsDefines.h"
 #include "mafViewVTK.h"
 #include <vector>
 
@@ -35,7 +35,7 @@ mafViewImage is a View that visualize volume as slices and
 initialize the visual pipe according to the camera position that is passed through constructor
 \sa mafViewVTK
 */
-class MED_EXPORT mafViewImage: public mafViewVTK
+class MED_VIEWS_EXPORT mafViewImage: public mafViewVTK
 {
 public:
   mafViewImage(wxString label = "Image", int camera_position = CAMERA_FRONT, bool show_axes = false, bool show_grid = false, bool show_ruler = false, int stereo = 0);

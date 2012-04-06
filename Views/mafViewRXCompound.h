@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCompound.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:22:31 $
-  Version:   $Revision: 1.4.2.2 $
+  Date:      $Date: 2012-04-06 09:37:38 $
+  Version:   $Revision: 1.4.2.3 $
   Authors:   Stefano Perticoni , Paolo Quadrani, Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,7 +16,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medViewsDefines.h"
 #include "mafViewCompound.h"
 #include "mafSceneNode.h"
 
@@ -34,7 +34,7 @@ class mafGUILutSlider;
 //----------------------------------------------------------------------------
 /** 
 This view features two Rx views and one compound view made of six CT slices.*/
-class MED_EXPORT mafViewRXCompound: public mafViewCompound
+class MED_VIEWS_EXPORT mafViewRXCompound: public mafViewCompound
 {
 public:
   mafViewRXCompound(wxString label = "View RXCT");

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewArbitraryOrthoSlice.h,v $
 Language:  C++
-Date:      $Date: 2011-05-17 15:02:19 $
-Version:   $Revision: 1.1.2.31 $
+Date:      $Date: 2012-04-06 09:37:38 $
+Version:   $Revision: 1.1.2.32 $
 Authors:   Stefano Perticoni	
 ==========================================================================
 Copyright (c) 2002/2004
@@ -82,7 +82,7 @@ It is possible to export arbitrary volume slices as image files.
 
 */
 
-class medViewArbitraryOrthoSlice: public medViewCompoundWindowing
+class MED_VIEWS_EXPORT medViewArbitraryOrthoSlice: public medViewCompoundWindowing
 {
 
 	/*

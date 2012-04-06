@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewSliceBlendRX.h,v $
   Language:  C++
-  Date:      $Date: 2011-12-20 14:57:34 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2012-04-06 09:37:38 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,7 +16,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medViewsDefines.h"
 #include "mafViewCompound.h"
 #include "mafSceneNode.h"
 
@@ -36,7 +36,7 @@ class mafGizmoSlice;
 //----------------------------------------------------------------------------
 /** 
 This view features one Rx views and one Slice Blend view.*/
-class MED_EXPORT medViewSliceBlendRX: public mafViewCompound
+class MED_VIEWS_EXPORT medViewSliceBlendRX: public mafViewCompound
 {
 public:
   

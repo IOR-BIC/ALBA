@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSlice.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:22:31 $
-  Version:   $Revision: 1.8.2.2 $
+  Date:      $Date: 2012-04-06 09:37:38 $
+  Version:   $Revision: 1.8.2.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -15,7 +15,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medViewsDefines.h"
 #include "mafViewVTK.h"
 #include <vector>
 
@@ -36,7 +36,7 @@ mafViewSingleSlice is a View that visualize volume as slices and
 initialize the visual pipe according to the camera position that is passed through constructor
 \sa mafViewVTK
 */
-class MED_EXPORT mafViewSingleSlice: public mafViewVTK
+class MED_VIEWS_EXPORT mafViewSingleSlice: public mafViewVTK
 {
 public:
   mafViewSingleSlice(wxString label = "Slice", int camera_position = CAMERA_CT, bool show_axes = false, bool show_grid = false, bool show_ruler = false, int stereo = 0, bool show_orientation = false);

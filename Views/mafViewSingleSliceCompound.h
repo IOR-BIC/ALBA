@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSliceCompound.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:22:31 $
-  Version:   $Revision: 1.3.2.4 $
+  Date:      $Date: 2012-04-06 09:37:38 $
+  Version:   $Revision: 1.3.2.5 $
   Authors:   Eleonora Mambrini
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,7 +16,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medViewsDefines.h"
 #include "medViewCompoundWindowing.h"
 
 //----------------------------------------------------------------------------
@@ -35,7 +35,7 @@ class vtkLookupTable;
   Class Name: mafViewSingleSliceCompound.
   Class that contain mafViewSingleSlice in order to add gui view widget like windowing buttons.
 */
-class MED_EXPORT mafViewSingleSliceCompound: public medViewCompoundWindowing
+class MED_VIEWS_EXPORT mafViewSingleSliceCompound: public medViewCompoundWindowing
 {
 public:
   /** constructor */

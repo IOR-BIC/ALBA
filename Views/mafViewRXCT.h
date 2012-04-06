@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.h,v $
   Language:  C++
-  Date:      $Date: 2011-12-27 16:49:07 $
-  Version:   $Revision: 1.17.2.7 $
+  Date:      $Date: 2012-04-06 09:37:38 $
+  Version:   $Revision: 1.17.2.8 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,7 +16,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medViewsDefines.h"
 #include "mafViewCompound.h"
 #include "mafSceneNode.h"
 
@@ -38,7 +38,7 @@ This view features two Rx views and one compound view made of six CT slices.
 This is an experimental component with rotated volumes interaction
 and visualization enabled.*/
 
-class MED_EXPORT mafViewRXCT : public mafViewCompound
+class MED_VIEWS_EXPORT mafViewRXCT : public mafViewCompound
 {
 public:
   /** constructor */

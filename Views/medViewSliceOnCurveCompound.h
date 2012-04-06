@@ -2,8 +2,8 @@
 Program: Multimod Application Framework RELOADED 
 Module: $RCSfile: medViewSliceOnCurveCompound.h,v $ 
 Language: C++ 
-Date: $Date: 2011-05-26 08:22:31 $ 
-Version: $Revision: 1.1.2.4 $ 
+Date: $Date: 2012-04-06 09:37:38 $ 
+Version: $Revision: 1.1.2.5 $ 
 Authors: Eleonora Mambrini
 ========================================================================== 
 Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -20,7 +20,7 @@ See the COPYINGS file for license details
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medViewsDefines.h"
 #include "medViewCompoundWindowing.h"
 #include "mafSceneNode.h"
 #include "vtkPoints.h"
@@ -44,7 +44,7 @@ class vtkTextMapper;
 //----------------------------------------------------------------------------
 /** 
 This compound view is made of four child views used to analyze different orthogonal slices of the volume*/
-class MED_EXPORT medViewSliceOnCurveCompound: public medViewCompoundWindowing
+class MED_VIEWS_EXPORT medViewSliceOnCurveCompound: public medViewCompoundWindowing
 {
 public:
 
@@ -97,11 +97,11 @@ public:
   } VPIPE_ENTRY;
 
 protected:
-  ///layout names to be displayed in GUI
-  static const char* m_LayoutNames[];
-
-  ///3D volume pipes to be plugged
-  static const VPIPE_ENTRY m_VolumePipes[];
+//   ///layout names to be displayed in GUI
+//   static const char* m_LayoutNames[];
+// 
+//   ///3D volume pipes to be plugged
+//   static const VPIPE_ENTRY m_VolumePipes[];
 
   ///current volume pipe configuration
   int m_VolumePipeConfiguration;	
@@ -162,18 +162,14 @@ public:
 
   /** Returns the array of layouts names.
   The list is terminated by NULL item. */
-  inline virtual const char** GetLayoutsNames() {    
-    return medViewSliceOnCurveCompound::m_LayoutNames;
-  }  
+  inline virtual const char** GetLayoutsNames();
 
   /** Returns number of volumes pipes available for the user */
   virtual int GetNumberOfVolumePipes();
 
   /** Returns the array of volume pipes descriptor.
   The list is terminated by NULL item. */
-  inline virtual const VPIPE_ENTRY* GetVolumePipesDesc() {    
-    return medViewSliceOnCurveCompound::m_VolumePipes;
-  }  
+  inline virtual const VPIPE_ENTRY* GetVolumePipesDesc(); 
 
   //change the visualization pipe for volumes
   virtual void ChangeVolumePipe(const char* pipename);
