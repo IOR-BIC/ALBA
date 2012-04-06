@@ -6,6 +6,13 @@ PROJECT(medCommon)
 
 # Set your list of sources here.
 SET(PROJECT_SRCS
+
+  itkRawMotionImporterUtility.cxx
+  itkRawMotionImporterUtility.h
+  medGUIContextualMenu.cpp
+  medGUIContextualMenu.h
+  mafPolylineGraph.cpp
+  mafPolylineGraph.h
   mafGizmoSlice.cpp
   mafGizmoSlice.h
   mmiInfoImage.cpp
@@ -14,8 +21,8 @@ SET(PROJECT_SRCS
   mmiSelectPoint.h
   medLogicWithManagers.cpp
   medLogicWithManagers.h
-  medGeometryEditorPolylineGraph.cpp
-  medGeometryEditorPolylineGraph.h
+  # medGeometryEditorPolylineGraph.cpp
+  # medGeometryEditorPolylineGraph.h
   medDecl.h
   medCurvilinearAbscissaOnSkeletonHelper.cpp
   medCurvilinearAbscissaOnSkeletonHelper.h
@@ -51,6 +58,16 @@ SET(PROJECT_LIBS "mafVME" "mafInteraction")
 
 SET(PROJECT_LIBS ${PROJECT_LIBS} vtkMED)
 
-# Create the library.
-ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
+IF(MED_BUILD_MEDDLL)
+  SET(BUILD_SHARED_LIBS 1)
+  ADD_DEFINITIONS(-DMED_COMMON_EXPORTS)
+  # Create the library.
+  ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
+  TARGET_LINK_LIBRARIES(${PROJECT_NAME} mafDLL)
+ELSE(MED_BUILD_MEDDLL)
+  # Create the library.
+  ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
+  TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
+ENDIF (MED_BUILD_MEDDLL)
+
+ADD_DEPENDENCIES(${PROJECT_NAME} vtkMED)
