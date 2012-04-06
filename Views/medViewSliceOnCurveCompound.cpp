@@ -2,8 +2,8 @@
 Program: Multimod Application Framework RELOADED 
 Module: $RCSfile: medViewSliceOnCurveCompound.cpp,v $ 
 Language: C++ 
-Date: $Date: 2010-11-22 11:04:58 $ 
-Version: $Revision: 1.1.2.5 $ 
+Date: $Date: 2012-04-06 09:36:51 $ 
+Version: $Revision: 1.1.2.6 $ 
 Authors: Eleonora Mambrini
 ========================================================================== 
 Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -69,27 +69,6 @@ See the COPYINGS file for license details
 mafCxxTypeMacro(medViewSliceOnCurveCompound);
 //----------------------------------------------------------------------------
 #include "mafMemDbg.h"
-
-
-//3D volume pipes to be plugged
-/*static*/ const medViewSliceOnCurveCompound::VPIPE_ENTRY medViewSliceOnCurveCompound::m_VolumePipes[] = 
-{
-  {"medPipeVolumeDRR", "DRR"},
-  {"medPipeVolumeMIP", "MIP"},
-  {"medPipeVolumeVR", "VR"},
-  {"mafPipeIsosurface", "ISO"},
-  {NULL, NULL},  
-};
-
-//layout names
-/*static*/ const char* medViewSliceOnCurveCompound::m_LayoutNames[] = 
-{
-  "one row",
-    "Mps horz", "Mps vert", 
-    "Smp horz", "Smp vert",
-    NULL,
-};
-
 
 //----------------------------------------------------------------------------
 medViewSliceOnCurveCompound::medViewSliceOnCurveCompound(wxString label) : medViewCompoundWindowing(label, 1, 3)
@@ -476,7 +455,7 @@ void medViewSliceOnCurveCompound::OnEvent(mafEventBase *maf_event)
     switch(e->GetId()) 
     {
     case ID_VOL_PIPE:
-      ChangeVolumePipe(m_VolumePipes[m_VolumePipeConfiguration].szClassName);
+      ChangeVolumePipe(GetVolumePipesDesc()[m_VolumePipeConfiguration].szClassName);
       break;
 
     case ID_SHOW_POLYLINE_IN_MAINVIEW:
@@ -800,10 +779,10 @@ void medViewSliceOnCurveCompound::SetSlicePosition(double abscisa, vtkIdType bra
     if (MAIN_VIEW < vws.size())
     {
       mafViewVTK* v = ((mafViewVTK*)vws[MAIN_VIEW]);
-      v->PlugVisualPipe("mafVMEVolumeGray", m_VolumePipes[m_VolumePipeConfiguration].szClassName, MUTEX);	
-      v->PlugVisualPipe("medVMELabeledVolume", m_VolumePipes[m_VolumePipeConfiguration].szClassName, MUTEX);
-      v->PlugVisualPipe("mafVMEVolumeRGB", m_VolumePipes[m_VolumePipeConfiguration].szClassName, MUTEX);
-      v->PlugVisualPipe("mafVMEVolumeLarge", m_VolumePipes[m_VolumePipeConfiguration].szClassName, MUTEX);
+      v->PlugVisualPipe("mafVMEVolumeGray", GetVolumePipesDesc()[m_VolumePipeConfiguration].szClassName, MUTEX);	
+      v->PlugVisualPipe("medVMELabeledVolume", GetVolumePipesDesc()[m_VolumePipeConfiguration].szClassName, MUTEX);
+      v->PlugVisualPipe("mafVMEVolumeRGB", GetVolumePipesDesc()[m_VolumePipeConfiguration].szClassName, MUTEX);
+      v->PlugVisualPipe("mafVMEVolumeLarge", GetVolumePipesDesc()[m_VolumePipeConfiguration].szClassName, MUTEX);
     }
 
     if (SLICE_VIEW < vws.size())
@@ -964,4 +943,18 @@ void medViewSliceOnCurveCompound::Print(std::ostream& os, const int tabs)// cons
     UpdateGizmoStatusText(szText);
   }
 }
+
+const char** medViewSliceOnCurveCompound::GetLayoutsNames()
+{ 
+
+  static const char* layoutNames[] = {"one row","Mps horz","Mps vert","Smp horz", "Smp vert",NULL,};
+  return layoutNames;  
+}
+
+const medViewSliceOnCurveCompound::VPIPE_ENTRY* medViewSliceOnCurveCompound::GetVolumePipesDesc()
+{
+  static const medViewSliceOnCurveCompound::VPIPE_ENTRY volumePipes[] = {{"medPipeVolumeDRR", "DRR"},{"medPipeVolumeMIP", "MIP"},{"medPipeVolumeVR", "VR"},{"mafPipeIsosurface", "ISO"},{NULL, NULL},};
+  return volumePipes;
+}
+
 #pragma  endregion
