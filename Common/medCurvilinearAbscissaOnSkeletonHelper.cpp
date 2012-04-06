@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medCurvilinearAbscissaOnSkeletonHelper.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 07:51:33 $
-  Version:   $Revision: 1.9.2.4 $
+  Date:      $Date: 2012-04-06 08:02:03 $
+  Version:   $Revision: 1.9.2.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -12,7 +12,7 @@
 
 const bool DEBUG_MODE = true;
 
-#include "mafDefines.h" 
+#include "medDefines.h" 
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.

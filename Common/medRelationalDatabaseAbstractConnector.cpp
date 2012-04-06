@@ -2,15 +2,15 @@
 Program:   @neufuse
 Module:    $RCSfile: medRelationalDatabaseAbstractConnector.cpp,v $
 Language:  C++
-Date:      $Date: 2009-09-22 07:33:45 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2012-04-06 08:07:32 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2007
 SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 =========================================================================*/
 
-#include "mafDefines.h" 
+#include "medDefines.h" 
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.

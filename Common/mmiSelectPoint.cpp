@@ -2,15 +2,15 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmiSelectPoint.cpp,v $
 Language:  C++
-Date:      $Date: 2010-11-12 17:17:35 $
-Version:   $Revision: 1.2.2.3 $
+Date:      $Date: 2012-04-06 08:10:01 $
+Version:   $Revision: 1.2.2.4 $
 Authors:   Matteo Giacomoni , Stefano Perticoni	
 ==========================================================================
 Copyright (c) 2002/2004 
 CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#include "mafDefines.h"
+#include "medDefines.h"
 
 #include "mmiSelectPoint.h"
 #include "mafDeviceButtonsPadMouse.h"

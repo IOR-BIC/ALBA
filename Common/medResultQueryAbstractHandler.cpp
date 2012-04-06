@@ -2,15 +2,15 @@
 Program:   @neufuse
 Module:    $RCSfile: medResultQueryAbstractHandler.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-23 14:56:40 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2012-04-06 08:07:56 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2007
 SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 =========================================================================*/
 
-#include "mafDefines.h" 
+#include "medDefines.h" 
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
