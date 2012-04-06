@@ -27,7 +27,7 @@ ENDIF (WIN32)
 
 IF(MED_BUILD_MEDDLL)
   SET(PROJECT_LIBS
-  medDLL
+  medOperations medGui medViews medVME medInteraction
 )
 ELSE(MED_BUILD_MEDDLL)
   SET(PROJECT_LIBS
