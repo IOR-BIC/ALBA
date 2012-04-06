@@ -2,15 +2,15 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-07-02 08:15:31 $
-  Version:   $Revision: 1.3.2.5 $
+  Date:      $Date: 2012-04-06 09:10:20 $
+  Version:   $Revision: 1.3.2.6 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#include "mafDefines.h" 
+#include "medDefines.h"
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
