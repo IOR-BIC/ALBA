@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoInteractionDebugger.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 07:51:33 $
-  Version:   $Revision: 1.3.2.3 $
+  Date:      $Date: 2012-04-06 08:17:58 $
+  Version:   $Revision: 1.3.2.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -17,7 +17,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medCommonDefines.h"
 #include "mafGizmoInterface.h"
 #include "mafMatrix.h"
 #include "medCurvilinearAbscissaOnSkeletonHelper.h"
@@ -46,7 +46,7 @@ class medCurvilinearAbscissaOnSkeletonHelper;
 refactored incrementally to ease interaction stuff debug.
 See also medOpInteractionDebugger */
 
-class MED_EXPORT medGizmoInteractionDebugger : public mafGizmoInterface
+class MED_COMMON_EXPORT medGizmoInteractionDebugger : public mafGizmoInterface
 {
 public:
 

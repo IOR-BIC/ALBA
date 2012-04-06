@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoSlice.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 07:51:33 $
-  Version:   $Revision: 1.11.2.6 $
+  Date:      $Date: 2012-04-06 08:17:06 $
+  Version:   $Revision: 1.11.2.7 $
   Authors:   Paolo Quadrani, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -16,7 +16,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medCommonDefines.h"
 #include "mafGizmoInterface.h"
 #include "mafMatrix.h"
 
@@ -34,7 +34,7 @@ class vtkDoubleArray;
 local coordinates.
 @sa mafViewRXCT, mafViewOrthoSlice for usage examples: these views act as mediators between gizmo slices
 */
-class MED_EXPORT mafGizmoSlice : public mafGizmoInterface
+class MED_COMMON_EXPORT mafGizmoSlice : public mafGizmoInterface
 {
 public:
 

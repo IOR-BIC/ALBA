@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiInfoImage.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 07:51:33 $
-  Version:   $Revision: 1.1.8.2 $
+  Date:      $Date: 2012-04-06 08:19:22 $
+  Version:   $Revision: 1.1.8.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -15,7 +15,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medCommonDefines.h"
 #include "mafInteractorPER.h"
 
 //----------------------------------------------------------------------------
@@ -24,7 +24,7 @@
 
 /** Class implementing image info reporting on status bar when not interacting.
 */
-class MED_EXPORT mmiInfoImage : public mafInteractorPER
+class MED_COMMON_EXPORT mmiInfoImage : public mafInteractorPER
 {
 public: 
   mafTypeMacro(mmiInfoImage,mafInteractorPER);

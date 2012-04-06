@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medHTMLTemplateParserBlock.h,v $
 Language:  C++
-Date:      $Date: 2012-02-29 11:04:27 $
-Version:   $Revision: 1.1.2.7 $
+Date:      $Date: 2012-04-06 08:17:58 $
+Version:   $Revision: 1.1.2.8 $
 Authors:   Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -44,7 +44,7 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medDefines.h" //important: mafDefines should always be included as first
+#include "medCommonDefines.h" //important: mafDefines should always be included as first
 #include <vector>
 
 //----------------------------------------------------------------------------
@@ -74,7 +74,7 @@ class wxString;
  class name: medHTMLTemplateParserBlock
     sub-class for Template parsing used by medHTMLTemplateParser
 */
-class MED_EXPORT medHTMLTemplateParserBlock
+class MED_COMMON_EXPORT medHTMLTemplateParserBlock
 {
 
   

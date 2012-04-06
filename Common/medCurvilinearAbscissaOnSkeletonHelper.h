@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medCurvilinearAbscissaOnSkeletonHelper.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 07:51:33 $
-  Version:   $Revision: 1.6.2.2 $
+  Date:      $Date: 2012-04-06 08:17:06 $
+  Version:   $Revision: 1.6.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -16,7 +16,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medCommonDefines.h"
 #include "vtkIdList.h"
 
 //----------------------------------------------------------------------------
@@ -29,7 +29,7 @@ class medVMEPolylineGraph;
 
 /** Decorate input vme with curvilinear abscissa interface for medVMEPolylineGraph 
  constrained interaction */
-class MED_EXPORT medCurvilinearAbscissaOnSkeletonHelper : mafObserver
+class MED_COMMON_EXPORT medCurvilinearAbscissaOnSkeletonHelper : mafObserver
 {
 public:
 

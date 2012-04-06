@@ -2,8 +2,8 @@
 Program:   @neufuse
 Module:    $RCSfile: medRelationalDatabaseAbstractConnector.h,v $
 Language:  C++
-Date:      $Date: 2011-05-26 07:51:33 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2012-04-06 08:19:22 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2008
@@ -16,7 +16,7 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medCommonDefines.h"
 #include "mafObject.h"
 #include "medResultQueryAbstractHandler.h"
 
@@ -41,7 +41,7 @@ struct medRelationalDatabaseInformation
   class that handle all the process of connection, retrieving data executing query
   ad by medResultQueryAbstractHandler load them
 */
-class MED_EXPORT medRelationalDatabaseAbstractConnector : public mafObject
+class MED_COMMON_EXPORT medRelationalDatabaseAbstractConnector : public mafObject
 {
 public:
   /** constructor */
