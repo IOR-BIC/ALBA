@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2012-04-04 13:10:33 $
-Version:   $Revision: 1.7.2.19 $
+Date:      $Date: 2012-04-06 08:25:27 $
+Version:   $Revision: 1.7.2.20 $
 Authors:   Matteo Giacomoni, Simone Brazzale
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -21,7 +21,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 #include "medGUIDicomSettings.h"
 
-#include "mafDecl.h"
+#include "medDecl.h"
 #include "mafGUI.h"
 #include "mafGUICheckListBox.h"
 
