@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizardPage.h,v $
 Language:  C++
-Date:      $Date: 2011-05-26 07:43:15 $
-Version:   $Revision: 1.4.2.8 $
+Date:      $Date: 2012-04-06 08:34:47 $
+Version:   $Revision: 1.4.2.9 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -42,7 +42,7 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medGuiDefines.h"
 #include "wx/wizard.h"
 #include "mafEvent.h"
 #include "mafObserver.h"
@@ -71,7 +71,7 @@ enum DIALOG_EXSTYLES
   - lower right
   - lower center
 */
-class MED_EXPORT medGUIWizardPage : public wxWizardPageSimple, public mafObserver  
+class MED_GUI_EXPORT medGUIWizardPage : public wxWizardPageSimple, public mafObserver  
 {
 public:
   /** constructor. */

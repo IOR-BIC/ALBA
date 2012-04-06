@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILutHistogramEditor.h,v $
   Language:  C++
-  Date:      $Date: 2011-12-15 16:32:29 $
-  Version:   $Revision: 1.1.2.8 $
+  Date:      $Date: 2012-04-06 08:34:47 $
+  Version:   $Revision: 1.1.2.9 $
   Authors:   Crimi Gianluigi 
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -13,7 +13,7 @@
 #ifndef __medGUILutHistogramEditor_H__
 #define __medGUILutHistogramEditor_H__
 
-#include "mafDecl.h"
+#include "medGuiDefines.h"
 #include "mafEvent.h"
 #include "mafLUTLibrary.h"
 
@@ -23,7 +23,6 @@
 #include "mafGUIDialog.h"
 
 #include "vtkLookupTable.h"
-#include "mafVMEVolumeGray.h"
 /** medGUIHistogramLutEditor : vtkLookupTable Histogram Based Editor
 
   USAGE:
@@ -40,7 +39,7 @@ class mafGUIFloatSlider;
 class mafGUILutSlider;
 class mafGUIHistogramWidget;
 
-class medGUILutHistogramEditor: public mafGUIDialog
+class MED_GUI_EXPORT medGUILutHistogramEditor: public mafGUIDialog
 {
 public:
   enum LUT_EDITOR_WIDGET_ID

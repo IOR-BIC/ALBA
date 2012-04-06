@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizard.h,v $
 Language:  C++
-Date:      $Date: 2012-01-26 13:48:05 $
-Version:   $Revision: 1.4.2.6 $
+Date:      $Date: 2012-04-06 08:34:47 $
+Version:   $Revision: 1.4.2.7 $
 Authors:   Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -42,7 +42,7 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medGuiDefines.h"
 #include "wx/wizard.h"
 #include "mafEvent.h"
 #include "mafObserver.h"
@@ -56,7 +56,7 @@ MafMedical is partially based on OpenMAF.
   This class is the container of wizard pages in order to handle typical gui wizard widget.
   It can set first page and enable changing pages.
 */
-class MED_EXPORT medGUIWizard : public wxWizard, public mafObserver  
+class MED_GUI_EXPORT medGUIWizard : public wxWizard, public mafObserver  
 {
 public:
   /** constructor. */
