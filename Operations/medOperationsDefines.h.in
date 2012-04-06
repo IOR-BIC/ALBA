@@ -1,0 +1,21 @@
+#ifndef __medOperationsDefines_h
+#define __medOperationsDefines_h
+
+#if @MED_BUILD_MEDDLL@
+# define MED_SHARED
+#endif
+
+//--------------------------------------------------------------------------
+// For WIN32 dynamic linking
+//--------------------------------------------------------------------------
+#if defined(_WIN32) && defined(MED_SHARED)
+# if defined(MED_OPERATION_EXPORTS)
+#  define MED_OPERATION_EXPORT __declspec( dllexport ) 
+# else
+#  define MED_OPERATION_EXPORT __declspec( dllimport ) 
+# endif
+#else
+# define MED_OPERATION_EXPORT
+#endif
+
+#endif // __medOperationsDefines_h
