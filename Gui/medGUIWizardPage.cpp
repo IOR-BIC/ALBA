@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizardPage.cpp,v $
 Language:  C++
-Date:      $Date: 2009-09-15 07:39:56 $
-Version:   $Revision: 1.5.2.6 $
+Date:      $Date: 2012-04-06 08:32:38 $
+Version:   $Revision: 1.5.2.7 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 MafMedical is partially based on OpenMAF.
 =========================================================================*/
 
-#include "mafDefines.h" 
+#include "medDefines.h" 
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.

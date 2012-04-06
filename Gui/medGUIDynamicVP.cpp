@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medGUIDynamicVP.cpp,v $ 
   Language: C++ 
-  Date: $Date: 2009-07-02 08:18:15 $ 
-  Version: $Revision: 1.1.2.3 $ 
+  Date: $Date: 2012-04-06 08:28:12 $ 
+  Version: $Revision: 1.1.2.4 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -11,8 +11,7 @@
   =========================================================================
 */
 
-
-#include "mafDefines.h" 
+#include "medDefines.h" 
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILutHistogramEditor.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-12-19 09:38:56 $
-  Version:   $Revision: 1.1.2.13 $
+  Date:      $Date: 2012-04-06 08:31:45 $
+  Version:   $Revision: 1.1.2.14 $
   Authors:   Crimi Gianluigi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -11,7 +11,7 @@
 =========================================================================*/
 
 
-#include "mafDefines.h" 
+#include "medDefines.h" 
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
