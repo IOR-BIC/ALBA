@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medHTMLTemplateParser.cpp,v $
 Language:  C++
-Date:      $Date: 2012-04-05 08:19:12 $
-Version:   $Revision: 1.1.2.6 $
+Date:      $Date: 2012-04-06 08:04:54 $
+Version:   $Revision: 1.1.2.7 $
 Authors:   Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -41,7 +41,6 @@ MafMedical is partially based on OpenMAF.
 
 
 #include "medDefines.h" 
-#include "medHTMLTemplateParser.h"
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
@@ -49,7 +48,7 @@ MafMedical is partially based on OpenMAF.
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-
+#include "medHTMLTemplateParser.h"
 
 
 medHTMLTemplateParser::medHTMLTemplateParser():
