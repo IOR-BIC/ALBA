@@ -2,15 +2,15 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medInteractorSegmentationPicker.cpp,v $
 Language:  C++
-Date:      $Date: 2011-12-20 12:13:58 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2012-04-06 08:39:27 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2010 
 CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#include "mafDefines.h"
+#include "medDefines.h"
 #include "medInteractorSegmentationPicker.h"
 
 #include "mafView.h"

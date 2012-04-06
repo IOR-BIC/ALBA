@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medInteractorPERScalarInformation.cpp,v $
 Language:  C++
-Date:      $Date: 2011-09-08 08:53:22 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2012-04-06 08:39:27 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2010
@@ -11,7 +11,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
 
-#include "mafDefines.h" 
+#include "medDefines.h" 
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
