@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice_BES.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-12-27 16:47:25 $
-  Version:   $Revision: 1.1.2.9 $
+  Date:      $Date: 2012-04-06 09:42:14 $
+  Version:   $Revision: 1.1.2.10 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -11,7 +11,7 @@
 =========================================================================*/
 
 
-#include "mafDefines.h" 
+#include "medDefines.h" 
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.

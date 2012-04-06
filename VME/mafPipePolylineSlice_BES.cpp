@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipePolylineSlice_BES.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-13 15:48:46 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2012-04-06 09:39:48 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -11,7 +11,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
 
-#include "mafDefines.h" 
+#include "medDefines.h" 
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.

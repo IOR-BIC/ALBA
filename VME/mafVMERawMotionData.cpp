@@ -2,15 +2,15 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERawMotionData.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-16 13:03:52 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2012-04-06 09:45:15 $
+  Version:   $Revision: 1.4.2.1 $
   Authors:   Stefano Perticoni - porting Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#include "mafDefines.h" 
+#include "medDefines.h" 
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.

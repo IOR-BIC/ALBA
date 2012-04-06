@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: mafPipeSlice.cpp,v $ 
   Language: C++ 
-  Date: $Date: 2009-05-12 16:21:24 $ 
-  Version: $Revision: 1.1.2.1 $ 
+  Date: $Date: 2012-04-06 09:41:19 $ 
+  Version: $Revision: 1.1.2.2 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -11,7 +11,7 @@
   =========================================================================
 */
 
-#include "mafDefines.h" 
+#include "medDefines.h" 
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
