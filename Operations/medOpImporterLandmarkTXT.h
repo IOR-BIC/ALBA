@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterLandmarkTXT.h,v $
   Language:  C++
-  Date:      $Date: 2011-06-14 08:31:57 $
-  Version:   $Revision: 1.3.2.2 $
+  Date:      $Date: 2012-04-06 09:13:46 $
+  Version:   $Revision: 1.3.2.3 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004
@@ -16,7 +16,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medOperationsDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -34,7 +34,7 @@ this class provides the landmark importing written in the following format:
 2) Ignore the first n columns specified by user
 3) the first element of each line is Time, then x y z x1 y1 z1 ecco
 */
-class MED_EXPORT medOpImporterLandmarkTXT : public mafOp
+class MED_OPERATION_EXPORT medOpImporterLandmarkTXT : public mafOp
 {
 public:
   /** object constructor */

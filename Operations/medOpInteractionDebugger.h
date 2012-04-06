@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpInteractionDebugger.h,v $
   Language:  C++
-  Date:      $Date: 2011-06-21 07:42:09 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2012-04-06 09:15:55 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Stefano Perticoni   
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,6 +16,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
+#include "medOperationsDefines.h"
 #include "mafOp.h"
 #include "vtkPoints.h"
 #include "mafVMEPolyline.h"
@@ -30,7 +31,7 @@ class medGizmoInteractionDebugger;
 
 /** Facility for medical interaction stuff debug:  this class should be expanded and
 refactored incrementally to ease interaction stuff debug */
-class MED_EXPORT medOpInteractionDebugger: public mafOp
+class MED_OPERATION_EXPORT medOpInteractionDebugger: public mafOp
 {
 public:
 	medOpInteractionDebugger(const wxString &label = "medOpInteractionDebugger");

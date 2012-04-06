@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML.h,v $
 Language:  C++
-Date:      $Date: 2012-02-15 10:55:06 $
-Version:   $Revision: 1.13.2.1 $
+Date:      $Date: 2012-04-06 09:20:28 $
+Version:   $Revision: 1.13.2.2 $
 Authors:   Mel Krokos
 ==========================================================================
 Copyright (c) 2002/2004
@@ -13,7 +13,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #ifndef __medOpMML_H__
 #define __medOpMML_H__
 
-#include "mafDefines.h"
+#include "medOperationsDefines.h"
 
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
@@ -52,7 +52,7 @@ class mafGUIButton;
 // The inputs are a volume (the patient data) and a surface (the model).
 //----------------------------------------------------------------------------
 
-class medOpMML: public mafOp
+class MED_OPERATION_EXPORT medOpMML: public mafOp
 {
 public:
   void ApplyInverseRegistrationOps();

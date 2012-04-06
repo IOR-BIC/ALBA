@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterLandmark.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:08:41 $
-  Version:   $Revision: 1.1.2.4 $
+  Date:      $Date: 2012-04-06 09:09:53 $
+  Version:   $Revision: 1.1.2.5 $
   Authors:   Paolo Quadrani, Daniele Giunchi, Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2004
@@ -16,7 +16,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medOperationsDefines.h"
 #include "mafOp.h"
 #include "mafVMELandmarkCloud.h"
 
@@ -31,7 +31,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 Each raw represents a landmark and contains the (x,y,z) coordinate.
 The exporter can be performed on a single Landmark Cloud or on a tree containing many of them.
 In the latter case the operation exports all the LCs in the input VME sub-tree. */
-class MED_EXPORT medOpExporterLandmark: public mafOp
+class MED_OPERATION_EXPORT medOpExporterLandmark: public mafOp
 {
 public:
 	medOpExporterLandmark(const wxString &label = "Landmark Exporter");

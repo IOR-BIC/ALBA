@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterGRFWS.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:08:41 $
-  Version:   $Revision: 1.3.2.5 $
+  Date:      $Date: 2012-04-06 09:13:46 $
+  Version:   $Revision: 1.3.2.6 $
   Authors:   Roberto Mucci, Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2004
@@ -16,7 +16,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medOperationsDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -31,7 +31,7 @@ class mafVMEGroup;
 class name: medOpImporterGRFWS
 Importer for ground reactions force, used in motion analysis
 */
-class MED_EXPORT medOpImporterGRFWS : public mafOp
+class MED_OPERATION_EXPORT medOpImporterGRFWS : public mafOp
 {
 public:
   /** constructor */

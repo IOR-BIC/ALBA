@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMeshQuality.h,v $
 Language:  C++
-Date:      $Date: 2011-05-26 08:14:27 $
-Version:   $Revision: 1.3.2.3 $
+Date:      $Date: 2012-04-06 09:18:59 $
+Version:   $Revision: 1.3.2.4 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -45,7 +45,7 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medOperationsDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -69,7 +69,7 @@ class name: medOpMeshQuality
 
 Check the quality of the mesh, using an algorithm for checking the ratio of each triangle and then giving statistics about that.
  */
-class MED_EXPORT medOpMeshQuality: public mafOp
+class MED_OPERATION_EXPORT medOpMeshQuality: public mafOp
 {
 public:
 	medOpMeshQuality(const wxString &label = "Check Mesh Quality");

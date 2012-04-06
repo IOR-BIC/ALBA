@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMakeVMETimevarying.h,v $
 Language:  C++
-Date:      $Date: 2011-05-26 08:14:27 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2012-04-06 09:15:55 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Alberto Losi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -16,7 +16,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medOperationsDefines.h"
 #include "mafOp.h"
 #include "mafString.h"
 #include "mafVME.h"
@@ -40,7 +40,7 @@ It returns a timevaryng VME representing the object in different (user defined) 
 */
 
 //----------------------------------------------------------------------------
-class MED_EXPORT medOpMakeVMETimevarying: public mafOp
+class MED_OPERATION_EXPORT medOpMakeVMETimevarying: public mafOp
 //----------------------------------------------------------------------------
 {
 public:

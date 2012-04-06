@@ -2,8 +2,8 @@
 Program:   @neufuse
 Module:    $RCSfile: medOpMeshDeformation.h,v $
 Language:  C++
-Date:      $Date: 2009-07-02 09:23:59 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2012-04-06 09:18:59 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Josef Kohout
 ==========================================================================
 Copyright (c) 2007
@@ -13,6 +13,7 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #ifndef __medOpMeshDeformation_H__
 #define __medOpMeshDeformation_H__
 
+#include "medOperationsDefines.h"
 #include "mafOp.h"
 #include "mmiVTKPicker.h"
 
@@ -39,7 +40,7 @@ class vtkCellPicker;
 // medOpMeshDeformation :
 //----------------------------------------------------------------------------
 /** */
-class medOpMeshDeformation: public mafOp
+class MED_OPERATION_EXPORT medOpMeshDeformation: public mafOp
 {
 protected:
   //----------------------------------------------------------------------------

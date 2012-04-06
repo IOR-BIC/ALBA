@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpFreezeVME.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:08:41 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2012-04-06 09:11:44 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,7 +16,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medOperationsDefines.h"
 #include "mafOp.h"
 #include "mafString.h"
 
@@ -29,7 +29,7 @@
 // medOpFreezeVME :
 //----------------------------------------------------------------------------
 /** This operation coverts a procedural vme in the corresponding version not procedural*/
-class MED_EXPORT medOpFreezeVME: public mafOp
+class MED_OPERATION_EXPORT medOpFreezeVME: public mafOp
 {
 public:
 	medOpFreezeVME(wxString label = "Freeze VME");

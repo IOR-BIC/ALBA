@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSegmentationRegionGrowingLocalAndGlobalThreshold.h,v $
 Language:  C++
-Date:      $Date: 2011-05-26 08:16:40 $
-Version:   $Revision: 1.1.2.10 $
+Date:      $Date: 2012-04-06 09:21:34 $
+Version:   $Revision: 1.1.2.11 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2009
@@ -44,7 +44,7 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medOperationsDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -60,7 +60,7 @@ class vtkImageData;
 /** 
 class name : medOpSegmentationRegionGrowingLocalAndGlobalThreshold
 */
-class MED_EXPORT medOpSegmentationRegionGrowingLocalAndGlobalThreshold: public mafOp
+class MED_OPERATION_EXPORT medOpSegmentationRegionGrowingLocalAndGlobalThreshold: public mafOp
 {
 public:
 

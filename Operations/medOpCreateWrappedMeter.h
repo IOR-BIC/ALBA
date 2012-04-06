@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpCreateWrappedMeter.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:00:03 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2012-04-06 09:09:53 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -16,7 +16,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medOperationsDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -30,7 +30,7 @@ class mafEvent;
   class name: medOpCreateWrappedMeter
   Operation that create a medVMEWrappedMeter for wrap muscle action lines.
 */
-class MED_EXPORT medOpCreateWrappedMeter: public mafOp
+class MED_OPERATION_EXPORT medOpCreateWrappedMeter: public mafOp
 {
 public:
   /** constructor */

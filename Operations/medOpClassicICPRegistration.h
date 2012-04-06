@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpClassicICPRegistration.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:00:03 $
-  Version:   $Revision: 1.3.2.3 $
+  Date:      $Date: 2012-04-06 09:09:53 $
+  Version:   $Revision: 1.3.2.4 $
   Authors:   Stefania Paperini, Stefano Perticoni, porting Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,7 +16,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medOperationsDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -36,7 +36,7 @@ class mafString;
   surfaces using the iterative closest point (ICP) algorithm.
 */
 
-class MED_EXPORT medOpClassicICPRegistration: public mafOp
+class MED_OPERATION_EXPORT medOpClassicICPRegistration: public mafOp
 {
 public:
   /** constructor */

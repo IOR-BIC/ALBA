@@ -2,14 +2,15 @@
 Program:   MED
 Module:    $RCSfile: medOpMergeDicomSeries.h,v $
 Language:  C++
-Date:      $Date: 2011-09-02 08:16:58 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2012-04-06 09:18:59 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Alberto Losi
 ==========================================================================
 Copyright (c) 2009
 SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 =========================================================================*/
 
+#include "medOperationsDefines.h"
 #include "mafOp.h"
 #include "vtkDirectory.h"
 
@@ -21,7 +22,7 @@ Merge dicom series located in the same folder; this operation was implemented to
 "\\HD01\Public\Dati\Dicom Regression\NIG004_MAGLU_SA" and "\\HD01\Public\Dati\Dicom Regression\NIG009-PAVVI_SA"
 WARNING: This operation will be removed and integrated in the importer dicom operation as an optiona functionality
 */
-class medOpMergeDicomSeries : public mafOp
+class MED_OPERATION_EXPORT medOpMergeDicomSeries : public mafOp
 {
 public:
 	/** constructor */

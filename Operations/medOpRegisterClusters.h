@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpRegisterClusters.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:14:27 $
-  Version:   $Revision: 1.2.2.2 $
+  Date:      $Date: 2012-04-06 09:21:34 $
+  Version:   $Revision: 1.2.2.3 $
   Authors:   Paolo Quadrani      - porting Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,7 +16,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medOperationsDefines.h"
 #include "mafOp.h"
 #include "mafVMELandmarkCloud.h"
 #include "mafVMEGroup.h"
@@ -35,7 +35,7 @@ class mafGUIDialog;
 // medOpRegisterClusters :
 //----------------------------------------------------------------------------
 /** */
-class MED_EXPORT medOpRegisterClusters: public mafOp
+class MED_OPERATION_EXPORT medOpRegisterClusters: public mafOp
 {
 public:
   medOpRegisterClusters(wxString label = _("Register Landmark Cloud"));

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpSplitSurface.h,v $
   Language:  C++
-  Date:      $Date: 2012-02-16 12:52:54 $
-  Version:   $Revision: 1.3.2.3 $
+  Date:      $Date: 2012-04-06 09:24:52 $
+  Version:   $Revision: 1.3.2.4 $
   Authors:   Paolo Quadrani , Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,7 +16,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medOperationsDefines.h"
 #include "mafOp.h"
 #include "mafNode.h"
 #include "mafVMESurface.h"
@@ -47,7 +47,7 @@ class vtkMAFClipSurfaceBoundingBox;
 // medOpSplitSurface :
 //----------------------------------------------------------------------------
 /** */
-class MED_EXPORT medOpSplitSurface: public mafOp
+class MED_OPERATION_EXPORT medOpSplitSurface: public mafOp
 {
 public:
   medOpSplitSurface(const wxString &label = "ClipSurface");

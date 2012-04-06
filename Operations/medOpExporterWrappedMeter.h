@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterWrappedMeter.h,v $
   Language:  C++
-  Date:      $Date: 2011-06-14 08:31:57 $
-  Version:   $Revision: 1.1.2.5 $
+  Date:      $Date: 2012-04-06 09:11:44 $
+  Version:   $Revision: 1.1.2.6 $
   Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -13,6 +13,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #ifndef __medOpExporterWrappedMeter_H__
 #define __medOpExporterWrappedMeter_H__
 
+#include "medOperationsDefines.h"
 #include "mafOp.h"
 #include <vnl/vnl_matrix.h>
 #include "wx/busyinfo.h"
@@ -31,7 +32,7 @@ class mafEvent;
 class name: medOpExporterWrappedMeter
    This class provides the functionality for exporting medVMEWrappedMeter, writing all in a txt file.
 */
-class medOpExporterWrappedMeter: public mafOp
+class MED_OPERATION_EXPORT medOpExporterWrappedMeter: public mafOp
 {
 public:
   /** object constructor */

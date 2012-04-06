@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpComputeInertialTensor.h,v $
   Language:  C++
-  Date:      $Date: 2011-09-09 09:20:47 $
-  Version:   $Revision: 1.1.2.6 $
+  Date:      $Date: 2012-04-06 09:09:53 $
+  Version:   $Revision: 1.1.2.7 $
   Authors:   Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2004
@@ -16,7 +16,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medOperationsDefines.h"
 #include "mafOp.h"
 #include "mafVME.h"
 #include "mafTagItem.h"
@@ -41,7 +41,7 @@ class vtkCell;
   https://picasaweb.google.com/104563709532324716730/MedOpComputeInertialTensor?authuser=0&feat=directlink
 	
 */
-class MED_EXPORT medOpComputeInertialTensor: public mafOp
+class MED_OPERATION_EXPORT medOpComputeInertialTensor: public mafOp
 {
 public:
   /** constructor */

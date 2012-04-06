@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medDicomCardiacMRIHelper.h,v $
   Language:  C++
-  Date:      $Date: 2011-07-13 12:15:10 $
-  Version:   $Revision: 1.1.2.10 $
+  Date:      $Date: 2012-04-06 09:05:49 $
+  Version:   $Revision: 1.1.2.11 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -16,7 +16,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medOperationsDefines.h"
 #include "vnl/vnl_matrix.h"
 #include "vnl/vnl_vector.h"
 #include <vector>
@@ -55,7 +55,7 @@ helper->ParseDicomDirectory();
 cout << helper->GetFileNumberForPlaneIFrameJ();
 
 */
-class MED_EXPORT medDicomCardiacMRIHelper
+class MED_OPERATION_EXPORT medDicomCardiacMRIHelper
 {
 public:
 

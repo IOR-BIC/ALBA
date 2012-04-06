@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSmoothSurface.h,v $
 Language:  C++
-Date:      $Date: 2011-06-14 08:31:57 $
-Version:   $Revision: 1.3.2.2 $
+Date:      $Date: 2012-04-06 09:24:52 $
+Version:   $Revision: 1.3.2.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -45,7 +45,7 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medOperationsDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -62,7 +62,7 @@ class name:  medOpSmoothSurface.
 Class which supplies the possibility to smooth a surface, giving a number of iteration of smooth, clear the result or
 preview the output.
 */
-class MED_EXPORT medOpSmoothSurface: public mafOp
+class MED_OPERATION_EXPORT medOpSmoothSurface: public mafOp
 {
 public:
   /** object constructor */

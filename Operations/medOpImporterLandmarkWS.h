@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterLandmarkWS.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:08:41 $
-  Version:   $Revision: 1.3.2.1 $
+  Date:      $Date: 2012-04-06 09:14:30 $
+  Version:   $Revision: 1.3.2.2 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004
@@ -16,7 +16,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medOperationsDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -31,7 +31,7 @@ class mafEvent;
 for any single frame that composes the marker trajectory. Particularly, this file is produced by means of 
 Vicon Workstation© employed in Human Movement Analysis.*/
 
-class MED_EXPORT medOpImporterLandmarkWS : public mafOp
+class MED_OPERATION_EXPORT medOpImporterLandmarkWS : public mafOp
 {
 public:
 	medOpImporterLandmarkWS(wxString label);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterLandmark.h,v $
   Language:  C++
-  Date:      $Date: 2011-06-14 08:31:57 $
-  Version:   $Revision: 1.3.2.4 $
+  Date:      $Date: 2012-04-06 09:13:46 $
+  Version:   $Revision: 1.3.2.5 $
   Authors:   Daniele Giunchi, Simone Brazzale
 ==========================================================================
 Copyright (c) 2002/2004
@@ -16,7 +16,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medOperationsDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -37,7 +37,7 @@ this class provides the landmark importing written in the following format:
 3) the line with landmark data are:
      nameOfLandmark x y z
 */
-class MED_EXPORT medOpImporterLandmark : public mafOp
+class MED_OPERATION_EXPORT medOpImporterLandmark : public mafOp
 {
 public:
   /** object cosntructor */

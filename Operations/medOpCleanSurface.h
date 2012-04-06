@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpCleanSurface.h,v $
 Language:  C++
-Date:      $Date: 2011-05-26 08:00:03 $
-Version:   $Revision: 1.2.2.2 $
+Date:      $Date: 2012-04-06 09:09:53 $
+Version:   $Revision: 1.2.2.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -45,7 +45,7 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medOperationsDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -58,7 +58,7 @@ class mafEvent;
   class name: medOpCleanSurface
     Operation that apply cvtkCleanPolyData Filter to the input surface.  
 */
-class MED_EXPORT medOpCleanSurface: public mafOp
+class MED_OPERATION_EXPORT medOpCleanSurface: public mafOp
 {
 public:
   /** constructor */

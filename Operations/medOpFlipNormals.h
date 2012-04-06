@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpFlipNormals.h,v $
 Language:  C++
-Date:      $Date: 2011-05-26 08:08:41 $
-Version:   $Revision: 1.4.2.3 $
+Date:      $Date: 2012-04-06 09:11:44 $
+Version:   $Revision: 1.4.2.4 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -44,7 +44,7 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medOperationsDefines.h"
 #include "mafOp.h"
 #include "vtkIdList.h"
 
@@ -73,7 +73,7 @@ CTRL modifier must be used in order to select cells in render window while
 performing mouse dragging.
 This operation assumes that input polygonal data is made of triangles only.
 */
-class MED_EXPORT medOpFlipNormals: public mafOp
+class MED_OPERATION_EXPORT medOpFlipNormals: public mafOp
 {
 public:
 

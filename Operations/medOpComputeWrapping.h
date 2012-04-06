@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpComputeWrapping.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:00:03 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2012-04-06 09:09:53 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
 Copyright (c) 2002/2004
@@ -16,7 +16,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medOperationsDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -30,7 +30,7 @@ class mafEvent;
   class name: medOpComputeWrapping
   Operation used to create a medVMEComputeWrapping used to wrap muscle action lines.
 */
-class MED_EXPORT medOpComputeWrapping: public mafOp
+class MED_OPERATION_EXPORT medOpComputeWrapping: public mafOp
 {
 public:
   /** constructor */

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterC3D.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:08:41 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2012-04-06 09:13:46 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Paolo Quadrani - porting Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -16,7 +16,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medOperationsDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -34,7 +34,7 @@ class name: medOpImporterC3D
 Import C3D file inside a landmark cloud. C3D is a standard format file
 for movement analysis data. http://www.c3d.org/
 */
-class MED_EXPORT medOpImporterC3D: public mafOp
+class MED_OPERATION_EXPORT medOpImporterC3D: public mafOp
 {
 public:
   /** constructor */

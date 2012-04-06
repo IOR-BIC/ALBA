@@ -2,8 +2,8 @@
 Program:   @neufuse
 Module:    $RCSfile: medOpFillHoles.h,v $
 Language:  C++
-Date:      $Date: 2011-05-26 08:08:41 $
-Version:   $Revision: 1.1.2.7 $
+Date:      $Date: 2012-04-06 09:11:44 $
+Version:   $Revision: 1.1.2.8 $
 Authors:   Matteo Giacomoni, Josef Kohout
 ==========================================================================
 Copyright (c) 2007
@@ -16,7 +16,7 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medOperationsDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -41,7 +41,7 @@ class vtkGlyph3D;
    class name: medOpFillHoles
    Operation which takes in input a polydata and retrieve the same polydata with filled hole.
 */
-class MED_EXPORT medOpFillHoles: public mafOp
+class MED_OPERATION_EXPORT medOpFillHoles: public mafOp
 {
 public:
   /** constructor*/

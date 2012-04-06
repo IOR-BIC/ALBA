@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterRAWImages.h,v $
 Language:  C++
-Date:      $Date: 2011-05-26 08:14:27 $
-Version:   $Revision: 1.2.2.3 $
+Date:      $Date: 2012-04-06 09:14:30 $
+Version:   $Revision: 1.2.2.4 $
 Authors:   Stefania Paperini porting Matteo Giacomoni
 Modified by Josef Kohout to support large volumes	
 ==========================================================================
@@ -16,7 +16,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medOperationsDefines.h"
 #include "mafOp.h"
 #include "mafEvent.h"
 #include "mafString.h"
@@ -61,7 +61,7 @@ class vtkMAFLargeImageReader;
 Every file is a single slice of the volume data.
 In the directory must be present only raw slices.
 If the first slice is not 0, the slice offset (m_offset) must be setted. */
-class MED_EXPORT medOpImporterRAWImages: public mafOp
+class MED_OPERATION_EXPORT medOpImporterRAWImages: public mafOp
 {
 public:
   medOpImporterRAWImages(wxString label="RAWImporterImage");
