@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medAttributeSegmentationVolume.h,v $
 Language:  C++
-Date:      $Date: 2011-06-24 12:14:56 $
-Version:   $Revision: 1.1.2.8 $
+Date:      $Date: 2012-04-06 09:50:16 $
+Version:   $Revision: 1.1.2.9 $
 Authors:   Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2010
@@ -16,7 +16,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medVMEDefines.h"
 #include "mafAttribute.h"
 #include <vector>
 
@@ -28,7 +28,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // medAttributeSegmentationVolume:
 //----------------------------------------------------------------------------
 /**  */  
-class MED_EXPORT medAttributeSegmentationVolume : public mafAttribute
+class MED_VME_EXPORT medAttributeSegmentationVolume : public mafAttribute
 {
 public:
   /** constructor. */

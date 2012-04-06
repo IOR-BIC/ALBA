@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERawMotionData.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:26:08 $
-  Version:   $Revision: 1.3.2.1 $
+  Date:      $Date: 2012-04-06 09:50:16 $
+  Version:   $Revision: 1.3.2.2 $
   Authors:   Stefano Perticoni - porting Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -14,7 +14,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medVMEDefines.h"
 #include "mafVMEGroup.h"
 #include <fstream>
 //----------------------------------------------------------------------------
@@ -24,7 +24,7 @@ class mafVMELandmarkCloud;
 
 /** mafVMERawMotionData - 
 */
-class MED_EXPORT mafVMERawMotionData : public mafVMEGroup  
+class MED_VME_EXPORT mafVMERawMotionData : public mafVMEGroup  
 {
 public:
 

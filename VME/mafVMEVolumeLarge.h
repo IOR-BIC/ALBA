@@ -3,7 +3,7 @@
 File:    	 mafVMEVolumeLarge.h
 Language:  C++
 Date:      22:1:2008   10:57
-Version:   $Revision: 1.1.2.3 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Josef Kohout (Josef.Kohout@beds.ac.uk)
 
 Copyright (c) 2008
@@ -21,6 +21,7 @@ This is VME for large volumetric data sets
 //#define VME_VOLUME_VER1
 //#define VME_VOLUME_LARGE_EXCLUDE_CROP
 
+#include "medVMEDefines.h"
 #include "mafVMEVolume.h"
 #ifdef VME_VOLUME_VER1
 #include "../BES_Beta/vtkMAF/vtkMAFLargeDataSet.h"
@@ -41,7 +42,7 @@ mafVMEVolumeLarge is a specialized VME inheriting the VME-Generic features to in
 store data, and specialized for VTK data. This specialization consists in creating
 a specialized data pipe and to redefining some APIs for casting to concrete classes.
 @sa mafVME mafMatrixVector mafDataVector  */
-class MED_EXPORT mafVMEVolumeLarge : public mafVMEVolume
+class MED_VME_EXPORT mafVMEVolumeLarge : public mafVMEVolume
 	//mafVMEGenericLarge
 {
 protected:

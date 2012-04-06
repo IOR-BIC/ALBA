@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeCompound.h,v $ 
   Language: C++ 
-  Date: $Date: 2011-05-26 08:27:37 $ 
-  Version: $Revision: 1.1.2.5 $ 
+  Date: $Date: 2012-04-06 09:52:00 $ 
+  Version: $Revision: 1.1.2.6 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -16,7 +16,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medVMEDefines.h"
 #include "mafPipe.h"
 #include "medGUIDynamicVP.h"
 
@@ -37,7 +37,7 @@ class mafGUIFloatSlider;
     Pipe which works as a container of other pipes.
 */
 
-class MED_EXPORT medPipeCompound : public mafPipe
+class MED_VME_EXPORT medPipeCompound : public mafPipe
 {
 public:
   /** RTTI Macro */
