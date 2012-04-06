@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolylineSlice_BES.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:26:08 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2012-04-06 09:43:55 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,7 +16,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medVMEDefines.h"
 #include "mafPipeSlice.h"
 
 //----------------------------------------------------------------------------
@@ -40,7 +40,7 @@ class vtkAppendPolyData;
   class name: mafPipePolylineSlice_BES.
   Pipe which manage the visualisation of the section of a polyline.
 */
-class MED_EXPORT mafPipePolylineSlice_BES : public mafPipeSlice
+class MED_VME_EXPORT mafPipePolylineSlice_BES : public mafPipeSlice
 {
 public:
   /** RTTI Macro*/
