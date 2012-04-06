@@ -3,7 +3,7 @@
   File:    	 mafVolumeLargeReader.h
   Language:  C++
   Date:      20:2:2008   14:04
-  Version:   $Revision: 1.1.2.3 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Josef Kohout (Josef.Kohout@beds.ac.uk)
   
   Copyright (c) 2008
@@ -15,7 +15,7 @@
 #define __mafVolumeLargeReader__
 
 #include "mafobject.h"
-#include "medDefines.h"
+#include "medVMEDefines.h"
 #include "mafString.h"
 #include "mafObserver.h"
 #include "mafMTime.h"
@@ -23,7 +23,7 @@
 #include "mafBrickedFileReader.h"
 
 //this is similar to vtkImageMultipleInputOutputFilter 
-class MED_EXPORT mafVolumeLargeReader : public mafObject, mafTimeStamped
+class MED_VME_EXPORT mafVolumeLargeReader : public mafObject, mafTimeStamped
 {
 public:
 	mafTypeMacro(mafVolumeLargeReader, mafObject);

@@ -3,7 +3,7 @@
   File:    	 mafVolumeLargeWriter.h
   Language:  C++
   Date:      8:2:2008   11:26
-  Version:   $Revision: 1.1.2.2 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Josef Kohout (Josef.Kohout@beds.ac.uk)
   
   Copyright (c) 2008
@@ -14,13 +14,14 @@
 #ifndef __mafVolumeLargeWriter__
 #define __mafVolumeLargeWriter__
 
+#include "medVMEDefines.h"
 #include "mafObject.h"
 #include "mafString.h"
 #include "mafObserver.h"
 #include "../vtkMAF/vtkMAFLargeImageData.h"
 #include "vtkDoubleArray.h"
 
-class mafVolumeLargeWriter : public mafObject
+class MED_VME_EXPORT mafVolumeLargeWriter : public mafObject
 {
 public:
 	mafTypeMacro(mafVolumeLargeWriter, mafObject);
