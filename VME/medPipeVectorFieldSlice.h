@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeVectorFieldSlice.h,v $ 
   Language: C++ 
-  Date: $Date: 2011-05-26 08:28:49 $ 
-  Version: $Revision: 1.1.2.2 $ 
+  Date: $Date: 2012-04-06 10:06:18 $ 
+  Version: $Revision: 1.1.2.3 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -16,7 +16,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medVMEDefines.h"
 #include "medPipeVectorFieldSurface.h"
 #include "mafPipeSlice.h"
 
@@ -31,7 +31,7 @@ class vtkPlane;
 or magnitude of the associated vector field. 
 Note: this class should be derived from mafPipeSlice, but
 it would lead into multiple inheritance, which causes lot of troubles*/
-class MED_EXPORT medPipeVectorFieldSlice : public medPipeVectorFieldSurface
+class MED_VME_EXPORT medPipeVectorFieldSlice : public medPipeVectorFieldSurface
 {
 public:
   mafTypeMacro(medPipeVectorFieldSlice, medPipeVectorFieldSurface);

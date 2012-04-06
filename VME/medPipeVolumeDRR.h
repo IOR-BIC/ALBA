@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeDRR.h,v $
   Language:  C++
-  Date:      $Date: 2011-07-13 07:38:59 $
-  Version:   $Revision: 1.6.2.2 $
+  Date:      $Date: 2012-04-06 10:08:46 $
+  Version:   $Revision: 1.6.2.3 $
   Authors:   Paolo Quadrani - porting Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -16,7 +16,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medVMEDefines.h"
 #include "mafPipe.h"
 
 //----------------------------------------------------------------------------
@@ -35,7 +35,7 @@ class mafGUIFloatSlider;
 className: medPipeVolumeDRR
 Pipe which uses BES vtkXRayVolumeMapper.
 */
-class MED_EXPORT medPipeVolumeDRR : public mafPipe
+class MED_VME_EXPORT medPipeVolumeDRR : public mafPipe
 {
 public:
   /** RTTI macro*/

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medPipeVolumeSliceBlend.h,v $
 Language:  C++
-Date:      $Date: 2011-12-20 14:59:01 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2012-04-06 10:08:46 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -16,6 +16,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
+#include "medVMEDefines.h"
 #include "mafPipe.h"
 
 //----------------------------------------------------------------------------
@@ -39,7 +40,7 @@ class mafLODActor;
 //----------------------------------------------------------------------------
 // medPipeVolumeSliceBlend :
 //----------------------------------------------------------------------------
-class medPipeVolumeSliceBlend : public mafPipe
+class MED_VME_EXPORT medPipeVolumeSliceBlend : public mafPipe
 {
 public:
   mafTypeMacro(medPipeVolumeSliceBlend,mafPipe);

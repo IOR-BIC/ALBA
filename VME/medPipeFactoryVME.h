@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeFactoryVME.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:27:37 $
-  Version:   $Revision: 1.2.2.1 $
+  Date:      $Date: 2012-04-06 10:01:46 $
+  Version:   $Revision: 1.2.2.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -14,7 +14,7 @@
 //----------------------------------------------------------------------------
 // includes :
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medVMEDefines.h"
 #include "mafPipeFactoryVME.h"
 
 //----------------------------------------------------------------------------
@@ -26,7 +26,7 @@
   this factory must be of type medPipeFactoryVME to be able to retrieve the list of pipes plugged
   in the factory. Also when using mafPlugPipe<pipe_type> the pipe icon is plugged inside the
   the MAF picture factory. */
-class MED_EXPORT medPipeFactoryVME : public mafPipeFactoryVME
+class MED_VME_EXPORT medPipeFactoryVME : public mafPipeFactoryVME
 {
 public: 
   mafTypeMacro(medPipeFactoryVME,mafPipeFactoryVME);

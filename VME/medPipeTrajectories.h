@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeTrajectories.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:28:49 $
-  Version:   $Revision: 1.2.2.2 $
+  Date:      $Date: 2012-04-06 10:06:18 $
+  Version:   $Revision: 1.2.2.3 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,7 +16,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medVMEDefines.h"
 #include "mafPipe.h"
 #include "mafEvent.h"
 
@@ -37,7 +37,7 @@ class mafMatrixVector;
 //----------------------------------------------------------------------------
 // medPipeTrajectories :
 //----------------------------------------------------------------------------
-class MED_EXPORT medPipeTrajectories : public mafPipe
+class MED_VME_EXPORT medPipeTrajectories : public mafPipe
 {
 public:
   mafTypeMacro(medPipeTrajectories,mafPipe);

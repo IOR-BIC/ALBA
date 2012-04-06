@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVisualPipeSlicerSlice.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:29:56 $
-  Version:   $Revision: 1.3.2.1 $
+  Date:      $Date: 2012-04-06 10:08:46 $
+  Version:   $Revision: 1.3.2.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,7 +16,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medVMEDefines.h"
 #include "mafPipe.h"
 
 //----------------------------------------------------------------------------
@@ -39,7 +39,7 @@ class vtkSphereSource;
 //----------------------------------------------------------------------------
 // medVisualPipeSlicerSlice :
 //----------------------------------------------------------------------------
-class MED_EXPORT medVisualPipeSlicerSlice : public mafPipe
+class MED_VME_EXPORT medVisualPipeSlicerSlice : public mafPipe
 {
 public:
   mafTypeMacro(medVisualPipeSlicerSlice,mafPipe);

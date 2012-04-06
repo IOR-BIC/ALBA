@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeWrappedMeter.h,v $
   Language:  C++
-  Date:      $Date: 2011-07-13 07:45:58 $
-  Version:   $Revision: 1.2.2.2 $
+  Date:      $Date: 2012-04-06 10:08:46 $
+  Version:   $Revision: 1.2.2.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,7 +16,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medVMEDefines.h"
 #include "mafPipe.h"
 
 //----------------------------------------------------------------------------
@@ -36,7 +36,7 @@ class mafGUIMaterialButton;
 className: medPipeWrappedMeter
 Pipe for visualizing wrapped meters. Gives the possibility to change representation just like classical meter pipe.
 */
-class MED_EXPORT medPipeWrappedMeter : public mafPipe
+class MED_VME_EXPORT medPipeWrappedMeter : public mafPipe
 {
 public:
   /** RTTI macro */

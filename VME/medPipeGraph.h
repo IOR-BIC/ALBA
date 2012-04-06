@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:28:49 $
-  Version:   $Revision: 1.19.2.4 $
+  Date:      $Date: 2012-04-06 10:01:46 $
+  Version:   $Revision: 1.19.2.5 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,7 +16,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medVMEDefines.h"
 #include "mafPipe.h"
 #include "mafEvent.h"
 
@@ -36,7 +36,7 @@ class vtkRectilinearGrid;
 class name medPipeGraph.
 Visual pipe to visualize graphs of analog signals. 
 */
-class MED_EXPORT medPipeGraph : public mafPipe
+class MED_VME_EXPORT medPipeGraph : public mafPipe
 {
 public:
   /** RTTI Macro */

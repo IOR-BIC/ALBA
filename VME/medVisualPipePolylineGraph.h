@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVisualPipePolylineGraph.h,v $
 Language:  C++
-Date:      $Date: 2011-05-26 08:29:56 $
-Version:   $Revision: 1.2.2.2 $
+Date:      $Date: 2012-04-06 10:08:46 $
+Version:   $Revision: 1.2.2.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -45,7 +45,7 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medVMEDefines.h"
 #include "mafPipe.h"
 
 //----------------------------------------------------------------------------
@@ -67,7 +67,7 @@ class vtkActor2D;
 //----------------------------------------------------------------------------
 // medVisualPipePolylineGraph :
 //----------------------------------------------------------------------------
-class MED_EXPORT medVisualPipePolylineGraph : public mafPipe
+class MED_VME_EXPORT medVisualPipePolylineGraph : public mafPipe
 {
 public:
   mafTypeMacro(medVisualPipePolylineGraph,mafPipe);

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medPipeSurfaceEditor.h,v $
 Language:  C++
-Date:      $Date: 2011-05-26 08:28:49 $
-Version:   $Revision: 1.3.2.2 $
+Date:      $Date: 2012-04-06 10:01:46 $
+Version:   $Revision: 1.3.2.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -45,7 +45,7 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medVMEDefines.h"
 #include "mafPipe.h"
 
 //----------------------------------------------------------------------------
@@ -65,7 +65,7 @@ class vtkPlane;
   Class Name: medPipeSurfaceEditor.
   Default pipe of the medVMESurfaceEditor, that is a vme that permit the editing of topology.
 */
-class MED_EXPORT medPipeSurfaceEditor : public mafPipe
+class MED_VME_EXPORT medPipeSurfaceEditor : public mafPipe
 {
 public:
   /** RTTI Macro */

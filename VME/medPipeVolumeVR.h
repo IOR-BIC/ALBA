@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeVR.h,v $
   Language:  C++
-  Date:      $Date: 2011-07-13 07:38:59 $
-  Version:   $Revision: 1.5.2.3 $
+  Date:      $Date: 2012-04-06 10:08:46 $
+  Version:   $Revision: 1.5.2.4 $
   Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -16,6 +16,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
+#include "medVMEDefines.h"
 #include "mafPipe.h"
 
 //----------------------------------------------------------------------------
@@ -37,7 +38,7 @@ class vtkImageResample;
 className: medPipeVolumeVR
 Pipe which uses vtkMAFVolumeTextureMapper2D and different Piecewise and ColorTransfer Functions.
 */
-class medPipeVolumeVR : public mafPipe
+class MED_VME_EXPORT medPipeVolumeVR : public mafPipe
 {
 public:
   /** RTTI macro */

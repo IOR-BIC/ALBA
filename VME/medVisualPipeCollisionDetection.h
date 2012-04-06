@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVisualPipeCollisionDetection.h,v $
   Language:  C++
-  Date:      $Date: 2012-02-22 12:54:01 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2012-04-06 10:08:46 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,7 +16,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medVMEDefines.h"
 #include "mafPipe.h"
 
 #include <vector>
@@ -34,7 +34,7 @@ class vtkIdList;
 //----------------------------------------------------------------------------
 // mafPipeSurface :
 //----------------------------------------------------------------------------
-class MED_EXPORT medVisualPipeCollisionDetection : public mafPipe
+class MED_VME_EXPORT medVisualPipeCollisionDetection : public mafPipe
 {
 public:
   mafTypeMacro(medVisualPipeCollisionDetection,mafPipe);

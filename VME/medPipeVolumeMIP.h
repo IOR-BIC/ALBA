@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeMIP.h,v $
   Language:  C++
-  Date:      $Date: 2011-07-13 07:38:59 $
-  Version:   $Revision: 1.11.2.4 $
+  Date:      $Date: 2012-04-06 10:08:46 $
+  Version:   $Revision: 1.11.2.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -16,7 +16,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medVMEDefines.h"
 #include "mafPipe.h"
 
 //----------------------------------------------------------------------------
@@ -43,7 +43,7 @@ class vtkImageCast;
 className: medPipeVolumeMIP
 Pipe which uses vtkVolumeRayCastMIPFunction with vtkMAFVolumeRayCastMapper and predefined Transfer Functions. 
 */
-class MED_EXPORT medPipeVolumeMIP : public mafPipe
+class MED_VME_EXPORT medPipeVolumeMIP : public mafPipe
 {
 public:
   /** RTTI macro */

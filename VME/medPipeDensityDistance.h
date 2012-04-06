@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeDensityDistance.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-26 08:27:37 $
-  Version:   $Revision: 1.5.2.1 $
+  Date:      $Date: 2012-04-06 10:01:46 $
+  Version:   $Revision: 1.5.2.2 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,7 +16,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medVMEDefines.h"
 #include "mafPipe.h"
 #include "mafVMEImage.h"
 #include "mafVMEVolume.h"
@@ -43,7 +43,7 @@ class mafVMEVolume;
 //----------------------------------------------------------------------------
 // mafPipeSurface :
 //----------------------------------------------------------------------------
-class MED_EXPORT medPipeDensityDistance : public mafPipe
+class MED_VME_EXPORT medPipeDensityDistance : public mafPipe
 {
 public:
   mafTypeMacro(medPipeDensityDistance,mafPipe);
