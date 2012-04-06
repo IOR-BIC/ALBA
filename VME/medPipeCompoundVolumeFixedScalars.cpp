@@ -2,15 +2,15 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeCompoundVolumeFixedScalars.cpp,v $ 
   Language: C++ 
-  Date: $Date: 2010-11-29 13:18:46 $ 
-  Version: $Revision: 1.1.2.2 $ 
+  Date: $Date: 2012-04-06 09:58:24 $ 
+  Version: $Revision: 1.1.2.3 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
   See the COPYINGS file for license details 
   =========================================================================
 */
-#include "mafDefines.h" 
+#include "medDefines.h" 
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
@@ -18,7 +18,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mafDecl.h"
+#include "medDecl.h"
 #include "medPipeCompoundVolumeFixedScalars.h"
 #include "medGUIDynamicVP.h"
 
