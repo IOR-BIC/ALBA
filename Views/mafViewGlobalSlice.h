@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.h,v $
   Language:  C++
-  Date:      $Date: 2011-12-27 16:49:07 $
-  Version:   $Revision: 1.9.2.9 $
+  Date:      $Date: 2012-04-06 09:32:07 $
+  Version:   $Revision: 1.9.2.10 $
   Authors:   Matteo Giacomoni, Simone Brazzale
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,7 +16,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medViewsDefines.h"
 #include "mafViewVTK.h"
 #include <vector>
 
@@ -43,7 +43,7 @@ class vtkActor;
   the 3d world.
 */
 
-class MED_EXPORT mafViewGlobalSlice: public mafViewVTK
+class MED_VIEWS_EXPORT mafViewGlobalSlice: public mafViewVTK
 {
 public:
   /** constructor. */

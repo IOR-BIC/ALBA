@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.h,v $
   Language:  C++
-  Date:      $Date: 2011-12-27 16:49:07 $
-  Version:   $Revision: 1.8.2.6 $
+  Date:      $Date: 2012-04-06 09:32:07 $
+  Version:   $Revision: 1.8.2.7 $
   Authors:   Eleonora Mambrini
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,7 +16,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medViewsDefines.h"
 #include "medViewCompoundWindowing.h"
 
 //----------------------------------------------------------------------------
@@ -40,7 +40,7 @@ Class Name: mafViewArbitrarySlice.
   This compound view is made of two child views used to analyze arbitrary slice of the volume.
  */
 
-class MED_EXPORT mafViewArbitrarySlice: public medViewCompoundWindowing
+class MED_VIEWS_EXPORT mafViewArbitrarySlice: public medViewCompoundWindowing
 {
 public:
   /** constructor*/
