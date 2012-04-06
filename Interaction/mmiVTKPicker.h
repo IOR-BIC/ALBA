@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: mmiVTKPicker.h,v $ 
   Language: C++ 
-  Date: $Date: 2011-05-26 07:55:17 $ 
-  Version: $Revision: 1.1.2.4 $ 
+  Date: $Date: 2012-04-06 08:39:52 $ 
+  Version: $Revision: 1.1.2.5 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -17,7 +17,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medInteractionDefines.h"
 #include "mafInteractorCameraMove.h"
 
 //----------------------------------------------------------------------------
@@ -52,7 +52,7 @@ Bool = true
 VtkObj = reference to vtkPoints containing the new position of
 point picked during CTRL + left mouse down  
 */
-class MED_EXPORT mmiVTKPicker : public mafInteractorCameraMove
+class MED_INTERACTION_EXPORT mmiVTKPicker : public mafInteractorCameraMove
 {
 public:
   /** RTTI macro */

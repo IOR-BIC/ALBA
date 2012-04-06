@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medInteractorSegmentationPicker.h,v $
 Language:  C++
-Date:      $Date: 2011-09-08 08:53:22 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2012-04-06 08:39:52 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2010 
@@ -13,13 +13,14 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #ifndef __medInteractorSegmentationPicker_h
 #define __medInteractorSegmentationPicker_h
 
+#include "medInteractionDefines.h"
 #include "mafInteractorCameraMove.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
 
-class medInteractorSegmentationPicker : public mafInteractorCameraMove
+class MED_INTERACTION_EXPORT medInteractorSegmentationPicker : public mafInteractorCameraMove
 {
 public:
   enum GUI_IDS

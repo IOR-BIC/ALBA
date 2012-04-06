@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medInteractorPicker.h,v $
 Language:  C++
-Date:      $Date: 2011-02-26 17:36:30 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2012-04-06 08:39:52 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2010 
@@ -13,6 +13,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #ifndef __medInteractorPicker_h
 #define __medInteractorPicker_h
 
+#include "medInteractionDefines.h"
 #include "mafInteractorCameraMove.h"
 
 //----------------------------------------------------------------------------
@@ -32,7 +33,7 @@ CTRL + Left Mouse button => send picked vme abs coordinates to the listener
 
 @sa medViewArbitraryOrthoSlice as an example on how to use this picker
 */
-class medInteractorPicker : public mafInteractorCameraMove
+class MED_INTERACTION_EXPORT medInteractorPicker : public mafInteractorCameraMove
 {
 public:
   mafTypeMacro(medInteractorPicker,mafInteractorCameraMove);

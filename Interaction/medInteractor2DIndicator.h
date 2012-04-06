@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medInteractor2DIndicator.h,v $
 Language:  C++
-Date:      $Date: 2011-06-21 14:03:04 $
-Version:   $Revision: 1.2.2.4 $
+Date:      $Date: 2012-04-06 08:39:52 $
+Version:   $Revision: 1.2.2.5 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -13,7 +13,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #ifndef __medInteractor2DIndicator_h
 #define __medInteractor2DIndicator_h
 
-#include "medDefines.h"
+#include "medInteractionDefines.h"
 #include "mafInteractorPER.h"
 #include "mafEvent.h"
 #include "vtkMAFTextActorMeter.h"
@@ -46,7 +46,7 @@ the histogram of the probed points on VME. This interactor works in renderwindow
 maintaining measure persistence at button up
 */
 //----------------------------------------------------------------------------
-class MED_EXPORT medInteractor2DIndicator : public mafInteractorPER
+class MED_INTERACTION_EXPORT medInteractor2DIndicator : public mafInteractorPER
 	//----------------------------------------------------------------------------
 {
 public:

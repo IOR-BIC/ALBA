@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medInteractorPERBrushFeedback.h,v $
 Language:  C++
-Date:      $Date: 2012-02-17 13:36:29 $
-Version:   $Revision: 1.1.2.7 $
+Date:      $Date: 2012-04-06 08:39:52 $
+Version:   $Revision: 1.1.2.8 $
 Authors:   Eleonora Mambrini, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -12,6 +12,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #ifndef __medInteractorPERBrushFeedback_h
 #define __medInteractorPERBrushFeedback_h
 
+#include "medInteractionDefines.h"
 #include "mafInteractorPER.h"
 
 class vtkActor2D;
@@ -29,7 +30,7 @@ class vtkSphereSource;
 
 /** Segmentation Editing Interactor
 */
-class medInteractorPERBrushFeedback : public mafInteractorPER
+class MED_INTERACTION_EXPORT medInteractorPERBrushFeedback : public mafInteractorPER
 {
 public: 
   

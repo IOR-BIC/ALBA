@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGizmoCrossRotateTranslate.h,v $
 Language:  C++
-Date:      $Date: 2011-02-10 14:35:33 $
-Version:   $Revision: 1.1.2.5 $
+Date:      $Date: 2012-04-06 08:39:52 $
+Version:   $Revision: 1.1.2.6 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -27,7 +27,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medViewCompoundWindowing.h"
+#include "medInteractionDefines.h"
 #include "mafVMESurface.h"
 #include "mafGizmoInterface.h"
 
@@ -46,7 +46,7 @@ class medGizmoCrossRotate;
  Input must be a mafVMESlicer slicing a mafVMEVolumeGray (TO IMPROVE)
  Movement is costrained inside the sliced volume.
 */
-class medGizmoCrossRotateTranslate : mafGizmoInterface
+class MED_INTERACTION_EXPORT medGizmoCrossRotateTranslate : mafGizmoInterface
 {
 public:
 	
