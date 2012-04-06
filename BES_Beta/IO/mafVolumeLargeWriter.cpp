@@ -3,7 +3,7 @@
   File:    	 mafVolumeLargeWriter.cpp
   Language:  C++
   Date:      8:2:2008   11:27
-  Version:   $Revision: 1.1.2.2 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Josef Kohout (Josef.Kohout@beds.ac.uk)
   
   Copyright (c) 2008
@@ -12,7 +12,7 @@
 
 =========================================================================*/
 
-#include "mafDefines.h" 
+#include "medDefines.h" 
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
