@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMAFLargeDataSetCallback.h,v $ 
   Language: C++ 
-  Date: $Date: 2011-05-26 08:51:01 $ 
-  Version: $Revision: 1.1.2.3 $ 
+  Date: $Date: 2012-04-06 10:17:54 $ 
+  Version: $Revision: 1.1.2.4 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -17,7 +17,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medDefines.h"
+#include "medCommonDefines.h"
 #include "vtkCommand.h"
 
 //----------------------------------------------------------------------------
@@ -26,7 +26,7 @@
 class mafObserver;
 
 //this class handles events produced by LargeDataSet
-class MED_EXPORT vtkMAFLargeDataSetCallback : public vtkCommand
+class MED_COMMON_EXPORT vtkMAFLargeDataSetCallback : public vtkCommand
 {
   //vtkTypeMacro(vtkMAFLargeDataSetCallback,vtkCommand);
 
