@@ -46,6 +46,8 @@ SET(vtkMED_SRCS
   vtkMaskPolyDataFilter.h
   vtkHoleConnectivity.cxx
   vtkHoleConnectivity.h
+  vtkPatchLine.h
+  vtkPatchLine.cpp
   
   ############# VolumeLarge Files - TO BE COMMITTED DOWN ########
   ../BES_Beta/vtkMAF/vtkMAFDataArrayDescriptor.cxx

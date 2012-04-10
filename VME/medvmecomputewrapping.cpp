@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medvmecomputewrapping.cpp,v $
 Language:  C++
-Date:      $Date: 2012-02-13 17:48:51 $
-Version:   $Revision: 1.1.2.28 $
+Date:      $Date: 2012-04-10 17:11:25 $
+Version:   $Revision: 1.1.2.29 $
 Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -44,6 +44,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkPoints.h"
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkLinearTransform.h"
+#include "vtkPatchLine.h"
 #include "mafVMESurfaceParametric.h"
 #include "mafMatrix3x3.h"
 #include "vtkCellArray.h"
@@ -110,6 +111,7 @@ medVMEComputeWrapping::medVMEComputeWrapping()
 	vtkNEW(m_LineSource);
 	vtkNEW(m_LineSource2);
 	vtkNEW(m_Goniometer);
+	vtkNEW(m_LinePatcher);
 
 	m_Goniometer->AddInput(m_LineSource->GetOutput());
 	m_Goniometer->AddInput(m_LineSource2->GetOutput());
@@ -122,7 +124,8 @@ medVMEComputeWrapping::medVMEComputeWrapping()
 	mafDataPipeCustom *dpipe = mafDataPipeCustom::New();
 	dpipe->SetDependOnAbsPose(true);
 	SetDataPipe(dpipe);
-	dpipe->SetInput(m_Goniometer->GetOutput());
+	m_LinePatcher->SetInput(m_Goniometer->GetOutput());
+	dpipe->SetInput(m_LinePatcher->GetOutput());
 
 }
 //-------------------------------------------------------------------------
@@ -133,6 +136,7 @@ medVMEComputeWrapping::~medVMEComputeWrapping()
 	vtkDEL(m_LineSource);
 	vtkDEL(m_LineSource2);
 	vtkDEL(m_Goniometer);
+	vtkDEL(m_LinePatcher);
 	mafDEL(m_TmpTransform);
 	mafDEL(m_TmpTransform2);
 

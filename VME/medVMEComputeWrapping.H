@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEComputeWrapping.H,v $
 Language:  C++
-Date:      $Date: 2012-04-06 10:12:07 $
-Version:   $Revision: 1.1.2.18 $
+Date:      $Date: 2012-04-10 17:11:26 $
+Version:   $Revision: 1.1.2.19 $
 Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -40,6 +40,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkPlaneSource.h"
 #include "vtkCutter.h"
 #include "vtkClipPolyData.h"
+#include "vtkPatchLine.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -606,6 +607,7 @@ protected:
 	vtkLineSource     *m_LineSource2;
 	//vtkLineSource     *m_LineSourceMiddle;
 	vtkAppendPolyData *m_Goniometer;
+	vtkPatchLine      *m_LinePatcher;
 	mafTransform      *m_TmpTransform;
 	mafTransform      *m_TmpTransform2;  
 
