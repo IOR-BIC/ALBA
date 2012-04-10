@@ -23,6 +23,9 @@ IF (MAF_USE_ITK)
   ADD_TEST(medOpImporterAnalogWSTest ${EXECUTABLE_OUTPUT_PATH}/medOpImporterAnalogWSTest)
 ENDIF (MAF_USE_ITK)
 
+ADD_EXECUTABLE(medGeometryEditorPolylineGraphTest medGeometryEditorPolylineGraphTest.h medGeometryEditorPolylineGraphTest.cpp)
+ADD_TEST(medGeometryEditorPolylineGraphTest  ${EXECUTABLE_OUTPUT_PATH}/medGeometryEditorPolylineGraphTest)
+
 ADD_EXECUTABLE(medOpMatrixVectorMathTest medOpMatrixVectorMathTest.h medOpMatrixVectorMathTest.cpp)
 ADD_TEST(medOpMatrixVectorMathTest ${EXECUTABLE_OUTPUT_PATH}/medOpMatrixVectorMathTest)
 
