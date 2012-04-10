@@ -1,4 +1,4 @@
-PROJECT (MedicalVME_TEST)
+PROJECT (MedicalCommon_TEST)
 
 IF(MED_BUILD_MEDDLL)
   LINK_LIBRARIES(medDLL)
@@ -8,10 +8,7 @@ ENDIF (MED_BUILD_MEDDLL)
 
 #-----------------------------------------------------------------------------
 # tests using cppunit testing framework
-#-----------------------------------------------------------------------------
-
-ADD_EXECUTABLE(medGeometryEditorPolylineGraphTest medGeometryEditorPolylineGraphTest.h medGeometryEditorPolylineGraphTest.cpp)
-ADD_TEST(medGeometryEditorPolylineGraphTest  ${EXECUTABLE_OUTPUT_PATH}/medGeometryEditorPolylineGraphTest)
+#----------------------------------------------------------------------------
 
 ADD_EXECUTABLE(mafDataChecksumTest mafDataChecksumTest.h mafDataChecksumTest.cpp)
 ADD_TEST(mafDataChecksumTest  ${EXECUTABLE_OUTPUT_PATH}/mafDataChecksumTest)
