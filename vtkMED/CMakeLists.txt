@@ -95,6 +95,9 @@ SET(vtkMED_SRCS
   
   vtkMEDImageFillHolesRemoveIslands.cxx
   vtkMEDImageFillHolesRemoveIslands.h
+  
+  vtkMEDVolumeSlicerNotInterpolated.cxx
+  vtkMEDVolumeSlicerNotInterpolated.h
 
   ######vtkbioeng################################
   vtkMEDCollisionDetectionFilter.cxx
