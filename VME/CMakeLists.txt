@@ -134,6 +134,9 @@ SET(PROJECT_SRCS
 
   medVisualPipeCollisionDetection.cpp
   medVisualPipeCollisionDetection.h
+
+  medPipeVolumeSliceNotInterpolated.cpp
+  medPipeVolumeSliceNotInterpolated.h
 )
 
 IF (MAF_USE_ITK)
