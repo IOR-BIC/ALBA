@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeSliceNotInterpolated.h,v $
   Language:  C++
-  Date:      $Date: 2012-04-13 10:08:37 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2012-04-13 11:44:30 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Alberto Losi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -13,6 +13,7 @@
 #ifndef __medPipeVolumeSliceNotInterpolated_H__
 #define __medPipeVolumeSliceNotInterpolated_H__
 
+#include "medVMEDefines.h"
 #include "mafPipeSlice.h"
 
 class vtkMEDVolumeSlicerNotInterpolated;
@@ -25,7 +26,7 @@ class vtkImageShiftScale;
 class mafGUIFloatSlider;
 
 //----------------------------------------------------------------------------
-class MED_EXPORT medPipeVolumeSliceNotInterpolated : public mafPipeSlice
+class MED_VME_EXPORT medPipeVolumeSliceNotInterpolated : public mafPipeSlice
 //----------------------------------------------------------------------------
 {
 public:
