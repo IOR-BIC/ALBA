@@ -55,6 +55,8 @@ SET(PROJECT_SRCS
   medViewSliceBlendRX.h
   medViewSliceBlend.cpp
   medViewSliceBlend.h
+  medViewSliceNotInterpolated.cpp
+  medViewSliceNotInterpolated.h
 )
 
 # List libraries that are needed by this project.
