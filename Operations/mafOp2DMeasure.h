@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp2DMeasure.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-25 11:49:21 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2012-04-16 12:35:56 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -49,9 +49,31 @@ public:
   bool Accept(mafNode *node);
 
 	/** Set the input vme for the operation. */
-	void OpRun();
+	virtual void OpRun();
 
 protected:
+
+  //----------------------------------------------------------------------------
+  // Widgets ID's
+  //----------------------------------------------------------------------------
+  enum MEASURE2D_ID
+  {
+    ID_MEASURE_TYPE = MINID,
+    ID_PLOT_PROFILE,
+    ID_MANUAL_DISTANCE,
+    ID_MANUAL_ANGLE,
+    ID_MANUAL_INDICATOR,
+    ID_UNDO_MEASURE,
+
+    ID_STORE_MEASURE,
+    ID_REMOVE_MEASURE,
+    ID_MEASURE_LIST,
+
+    ID_DISTANCE_TYPE,
+    ID_ANGLE_TYPE,
+    ID_INDICATOR_TYPE,
+  };
+
   /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
   void OpStop(int result);
 

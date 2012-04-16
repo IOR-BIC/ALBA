@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp2DMeasure.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:45:06 $
-  Version:   $Revision: 1.3.2.2 $
+  Date:      $Date: 2012-04-16 12:35:56 $
+  Version:   $Revision: 1.3.2.3 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -80,26 +80,6 @@ mafOp* mafOp2DMeasure::Copy()
 {
 	return (new mafOp2DMeasure(m_Label));
 }
-//----------------------------------------------------------------------------
-// Widgets ID's
-//----------------------------------------------------------------------------
-enum MEASURE2D_ID
-{
-  ID_MEASURE_TYPE = MINID,
-  ID_PLOT_PROFILE,
-  ID_MANUAL_DISTANCE,
-  ID_MANUAL_ANGLE,
-  ID_MANUAL_INDICATOR,
-  ID_UNDO_MEASURE,
-	
-  ID_STORE_MEASURE,
-  ID_REMOVE_MEASURE,
-  ID_MEASURE_LIST,
-
-	ID_DISTANCE_TYPE,
-	ID_ANGLE_TYPE,
-  ID_INDICATOR_TYPE,
-};
 //----------------------------------------------------------------------------
 void mafOp2DMeasure::OpRun()   
 //----------------------------------------------------------------------------
@@ -430,9 +410,9 @@ void mafOp2DMeasure::OnEvent(mafEventBase *maf_event)
           {
 						if(atof(m_ManualDistance) > 0)
 						{
-            m_DistanceMeasure = mafString(m_ManualDistance);
-            m_DistanceInteractor2D->SetManualDistance(atof(m_ManualDistance));
-            m_Gui->Update();
+              m_DistanceMeasure = mafString(m_ManualDistance);
+              m_DistanceInteractor2D->SetManualDistance(atof(m_ManualDistance));
+              m_Gui->Update();
 						}
           }
 					else
