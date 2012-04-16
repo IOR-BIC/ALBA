@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewSliceNotInterpolated.cpp,v $
   Language:  C++
-  Date:      $Date: 2012-04-16 15:23:09 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2012-04-16 15:42:49 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Alberto Losi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -179,6 +179,12 @@ void medViewSliceNotInterpolated::OnEvent(mafEventBase * event)
         m_PipeSlice->SetSlice(m_CurrentSlice,m_SliceAxis);
         CameraUpdate();
       } break;
+    case ID_RANGE_MODIFIED:
+      {
+        Superclass::OnEvent(event);
+        // Set the pipe lut
+        m_PipeSlice->SetLut(m_ColorLUT);
+      }
     default:
       {
         Superclass::OnEvent(event);
