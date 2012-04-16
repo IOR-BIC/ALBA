@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeSliceNotInterpolated.cpp,v $
   Language:  C++
-  Date:      $Date: 2012-04-13 10:08:37 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2012-04-16 15:22:30 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Alberto Losi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -55,13 +55,15 @@ medPipeVolumeSliceNotInterpolated::medPipeVolumeSliceNotInterpolated()
   m_ImageMapToColors = NULL;
   m_ImageShiftScale = NULL;
   m_ImageActor = NULL;
+  m_ShowGui = false;
+  m_ScalarRange[0] = m_ScalarRange[1] = 0.0;
 }
 
 //----------------------------------------------------------------------------
 medPipeVolumeSliceNotInterpolated::~medPipeVolumeSliceNotInterpolated()
 //----------------------------------------------------------------------------
 {
-  // Destroy allocated objectes
+  // Destroy allocated objects
   m_Vme->GetEventSource()->RemoveObserver(this);
   m_RenFront->RemoveProp(m_ImageActor);
   m_Slicer->Delete();
@@ -84,10 +86,7 @@ void medPipeVolumeSliceNotInterpolated::OnEvent(mafEventBase * event)
     {
     case ID_LUT:
       {
-        // Rescale the volume lut with scalar range 0 255
-        RescaleLUT(m_VolumeLUT, m_ColorLUT);
-        mafVMEVolumeGray::SafeDownCast(m_Vme)->GetMaterial()->UpdateFromTables();
-        // Update camera
+        SetLut(m_VolumeLUT);
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       } break;
     case ID_AXIS:
@@ -136,6 +135,18 @@ void medPipeVolumeSliceNotInterpolated::SetSlice(double origin[3], int sliceAxis
 
   UpdateSlice();
 }
+
+//----------------------------------------------------------------------------
+void medPipeVolumeSliceNotInterpolated::SetSlice(double currentSlice, int sliceAxis)
+//----------------------------------------------------------------------------
+{
+  m_SliceAxis = sliceAxis;
+  m_CurrentSlice = currentSlice;
+  
+  SetOrigin();
+  UpdateSlice();
+}
+
 //----------------------------------------------------------------------------
 void medPipeVolumeSliceNotInterpolated::SetSlice()
 //----------------------------------------------------------------------------
@@ -153,13 +164,16 @@ void medPipeVolumeSliceNotInterpolated::UpdateSlice()
   m_Slicer->Modified();
   m_Slicer->Update();
 
+  // Update output image
   UpdateImageToRender();
 
-  m_ImageMapToColors->Modified();
-  m_ImageMapToColors->Update();
-  m_ImageShiftScale->Modified();
-  m_ImageShiftScale->Update();
+  // Update shift scale filter
+  UpdateShiftScaleFilter();
 
+  // Update color map filter
+  UpdateMapToColorsFilter();
+
+  // Update image actor
   UpdateImageActor();
 }
 
@@ -207,13 +221,47 @@ void medPipeVolumeSliceNotInterpolated::UpdateImageToRender()
 }
 
 //----------------------------------------------------------------------------
+void medPipeVolumeSliceNotInterpolated::UpdateShiftScaleFilter()
+//----------------------------------------------------------------------------
+{
+  if(!m_SlicerImageDataToRender)
+  {
+    return;
+  }
+  // Shift scale of the image
+  // Image actor can render only unsigned char images with scalar range 0 255
+  if(m_ImageShiftScale)
+    m_ImageShiftScale->Delete();
+  m_ImageShiftScale = vtkImageShiftScale::New();
+  m_ImageShiftScale->SetScale(255./(m_ScalarRange[1]-m_ScalarRange[0]));
+  m_ImageShiftScale->SetShift(-m_ScalarRange[0]);
+  m_ImageShiftScale->SetOutputScalarTypeToUnsignedChar();
+  m_ImageShiftScale->SetInput(m_SlicerImageDataToRender);
+  m_ImageShiftScale->Update();
+}
+
+//----------------------------------------------------------------------------
+void medPipeVolumeSliceNotInterpolated::UpdateMapToColorsFilter()
+//----------------------------------------------------------------------------
+{
+  if(!m_ImageShiftScale->GetOutput())
+  {
+    return;
+  }
+  if(m_ImageMapToColors)
+    m_ImageMapToColors->Delete();
+  m_ImageMapToColors = vtkImageMapToColors::New();
+  m_ImageMapToColors->SetLookupTable(m_ColorLUT);
+  m_ImageMapToColors->SetInput(m_ImageShiftScale->GetOutput());
+  m_ImageMapToColors->Update();
+}
+
+//----------------------------------------------------------------------------
 void medPipeVolumeSliceNotInterpolated::CreateSlice()
 //----------------------------------------------------------------------------
 {
   vtkDataSet * data = m_Vme->GetOutput()->GetVTKData();
 
-  double sr[2] = {0,0};
-  
   // Get the volume lut and rescale to 0 255 scalar range
   m_ColorLUT = vtkLookupTable::New();
   m_VolumeLUT = mafVMEVolumeGray::SafeDownCast(m_Vme)->GetMaterial()->m_ColorLut;
@@ -221,7 +269,7 @@ void medPipeVolumeSliceNotInterpolated::CreateSlice()
   
   // Get bound and scalar range
   data->GetBounds(m_Bounds);
-  data->GetScalarRange(sr);
+  data->GetScalarRange(m_ScalarRange);
   
   // Evaluate the origin from bounds and current slice
   m_CurrentSlice = m_Bounds[m_SliceAxis * 2];
@@ -232,32 +280,11 @@ void medPipeVolumeSliceNotInterpolated::CreateSlice()
 
   // Create the slicer and set it's attributes
   m_Slicer = vtkMEDVolumeSlicerNotInterpolated::New();
-  m_Slicer->SetSliceOrigin(m_Origin);
-  m_Slicer->SetSliceAxis(m_SliceAxis);
   m_Slicer->SetInput(data);
   m_SlicerOutputImageData = vtkImageData::New();
   m_Slicer->SetOutput(m_SlicerOutputImageData);
-  m_Slicer->Update();
 
-  UpdateImageToRender();
-
-  // Shift scale of the image
-  // Image actor can render only unsigned char images with scalar range 0 255
-  m_ImageShiftScale = vtkImageShiftScale::New();
-  m_ImageShiftScale->SetScale(255./(sr[1]-sr[0]));
-  m_ImageShiftScale->SetShift(-sr[0]);
-  m_ImageShiftScale->SetOutputScalarTypeToUnsignedChar();
-  m_ImageShiftScale->SetInput(m_SlicerImageDataToRender);
-  m_ImageShiftScale->Update();
-
-  // Map the lut on the images
-  m_ImageMapToColors = vtkImageMapToColors::New();
-  m_ImageMapToColors->SetLookupTable(m_ColorLUT);
-  m_ImageMapToColors->SetInput(m_ImageShiftScale->GetOutput());
-  m_ImageMapToColors->Update();
-
-  // Render
-  UpdateImageActor();
+  UpdateSlice();
 }
 
 //----------------------------------------------------------------------------
@@ -265,12 +292,32 @@ mafGUI * medPipeVolumeSliceNotInterpolated::CreateGui()
 //----------------------------------------------------------------------------
 {
   m_Gui = new mafGUI(this);
-  m_Gui->Lut(ID_LUT,"LUT",m_VolumeLUT); // Lut widget
-  wxString choices[3] = {"X","Y","Z"};
-  m_Gui->Combo(ID_AXIS,"Axis",&m_SliceAxis,3,choices); // Slice Axis
-  m_SliceSlider = m_Gui->FloatSlider(ID_SLICE,"Slice",&m_CurrentSlice, m_Bounds[m_SliceAxis * 2], m_Bounds[(m_SliceAxis * 2) + 1]); // Current slice coordinate
-  m_Gui->Divider();
+  if(m_ShowGui)
+  {
+    m_Gui->Lut(ID_LUT,"LUT",m_VolumeLUT); // Lut widget
+    wxString choices[3] = {"X","Y","Z"};
+    m_Gui->Combo(ID_AXIS,"Axis",&m_SliceAxis,3,choices); // Slice Axis
+    m_SliceSlider = m_Gui->FloatSlider(ID_SLICE,"Slice",&m_CurrentSlice, m_Bounds[m_SliceAxis * 2], m_Bounds[(m_SliceAxis * 2) + 1]); // Current slice coordinate
+    m_Gui->Divider();
+  }
   return m_Gui;
+}
+
+//----------------------------------------------------------------------------
+void medPipeVolumeSliceNotInterpolated::SetLut(vtkLookupTable *lut)
+//----------------------------------------------------------------------------
+{
+  m_VolumeLUT = lut;
+  SetLut();
+}
+
+//----------------------------------------------------------------------------
+void medPipeVolumeSliceNotInterpolated::SetLut()
+//----------------------------------------------------------------------------
+{
+  // Rescale the volume lut with scalar range 0 255
+  RescaleLUT(m_VolumeLUT, m_ColorLUT);
+  mafVMEVolumeGray::SafeDownCast(m_Vme)->GetMaterial()->UpdateFromTables();
 }
 
 //----------------------------------------------------------------------------
@@ -299,3 +346,14 @@ void medPipeVolumeSliceNotInterpolated::SetOrigin()
   m_Origin[2] = m_Bounds[4];
   m_Origin[m_SliceAxis] = m_CurrentSlice;
 }
+
+/*
+//----------------------------------------------------------------------------
+mafGUI *medPipeVolumeSliceNotInterpolated::GetGui()
+//----------------------------------------------------------------------------
+{
+  if(!m_Gui)
+    CreateGui();
+  return m_Gui;
+}
+*/

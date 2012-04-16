@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeSliceNotInterpolated.h,v $
   Language:  C++
-  Date:      $Date: 2012-04-13 11:44:30 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2012-04-16 15:22:30 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Alberto Losi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -31,6 +31,7 @@ class MED_VME_EXPORT medPipeVolumeSliceNotInterpolated : public mafPipeSlice
 {
 public:
 
+  /** Gui widget events id */
   enum GUI_WIDGET_ID
   {
     ID_LUT,
@@ -48,7 +49,7 @@ public:
   /** dtor */
   ~medPipeVolumeSliceNotInterpolated();
 
-  /** process events coming from gui */
+  /** Process events coming from gui */
   virtual void OnEvent(mafEventBase * event);
 
   /** The real setup must be performed here - not in the ctor */
@@ -56,6 +57,15 @@ public:
 
   /** Set slice with the specified parameters */
   void SetSlice(double origin[3], int sliceAxis);
+
+  /** Set slice with the specified parameters */
+  void SetSlice(double currentSlice, int sliceAxis);
+
+  /** Set Volume lookup table */
+  void SetLut(vtkLookupTable *lut);
+
+  /** Return the pipe's gui */
+  // mafGUI *GetGui();
 
 protected:
 
@@ -78,8 +88,13 @@ protected:
   vtkImageMapToColors *m_ImageMapToColors;      //> Filter that map colors on image data
   vtkImageShiftScale *m_ImageShiftScale;        //> Filter that rescale image to be an unsigned char with scalar range from 0 to 255
   vtkImageActor *m_ImageActor;                  //> Image actor to display image
+  bool m_ShowGui;                               //> Determine if pipe Gui is shown or not
+  double m_ScalarRange[2];                      //> Input scalar range
 
 private:
+
+  /** Set lookup table */
+  void SetLut();
 
   /** Rescale output lookup table to 0 255 scalar range */
   void RescaleLUT(vtkLookupTable *inputLUT,vtkLookupTable *outputLUT);
@@ -98,6 +113,12 @@ private:
 
   /** Update intermediate image to be rendered */
   void UpdateImageToRender();
+
+  /** Update shift scale filter */
+  void UpdateShiftScaleFilter();
+
+  /** Update map to colors filter */
+  void UpdateMapToColorsFilter();
 
 };
 
