@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractor2DIndicator.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:46:39 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2012-04-16 12:36:27 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -73,6 +73,7 @@ mafInteractor2DIndicator::mafInteractor2DIndicator()
   m_ProbedVME = NULL;
   m_Mouse     = NULL;
 
+  m_CurrentRwi = NULL;
   m_CurrentRenderer  = NULL;
   m_LastRenderer     = NULL;
   m_PreviousRenderer   = NULL;
@@ -179,6 +180,7 @@ void mafInteractor2DIndicator::OnLeftButtonDown(mafEventInteraction *e)
   {
     m_Mouse = mouse;
   }
+  m_CurrentRwi = m_Mouse->GetRWI();
   m_CurrentRenderer = m_Mouse->GetRenderer();
   m_ParallelView = m_CurrentRenderer->GetActiveCamera()->GetParallelProjection() != 0;
   if (m_ParallelView)
@@ -266,6 +268,7 @@ void mafInteractor2DIndicator::DrawMeasureTool(double x, double y)
 	static long counter = 0;
 	static double dx, dy, dz;
   
+  m_CurrentRwi =  m_Mouse->GetRWI();
   m_CurrentRenderer = m_Mouse->GetRenderer();
 	if (m_CurrentRenderer == NULL || (m_DisableUndoAndOkCancel && counter == 2 && m_CurrentRenderer != m_PreviousRenderer ))	{return;}
 
@@ -536,4 +539,104 @@ void mafInteractor2DIndicator::SetLabel(mafString label)
 {
 	m_MeterVector[m_MeterVector.size()-1]->SetText(label);
 	m_CurrentRenderer->GetRenderWindow()->Render();
+}
+//----------------------------------------------------------------------------
+void mafInteractor2DIndicator::ShowOnlyLastMeasure( bool show )
+  //----------------------------------------------------------------------------
+{
+  //No check last actor
+  for (int i=0;i<m_LineActorVector1.size()-1;i++)
+  {
+    if (m_LineActorVector1[i])
+    {
+      if (!show)
+      {
+        m_RendererVector[i]->AddActor2D(m_LineActorVector1[i]);
+      }
+      else
+      {
+        m_RendererVector[i]->RemoveActor2D(m_LineActorVector1[i]);
+      }
+    }
+
+    if (m_LineActorVector2[i])
+    {
+      if (!show)
+      {
+        m_RendererVector[i]->AddActor2D(m_LineActorVector2[i]);
+      }
+      else
+      {
+        m_RendererVector[i]->RemoveActor2D(m_LineActorVector2[i]);
+      }
+    }
+
+    if (m_MeterVector[i])
+    {
+      if (!show)
+      {
+        m_RendererVector[i]->AddActor2D(m_MeterVector[i]);
+      }
+      else
+      {
+        m_RendererVector[i]->RemoveActor2D(m_MeterVector[i]);
+      }
+    }
+  }
+
+  m_CurrentRenderer->GetRenderWindow()->Render();
+}
+//----------------------------------------------------------------------------
+mafRWIBase * mafInteractor2DIndicator::GetCurrentRwi()
+  //----------------------------------------------------------------------------
+{
+  return m_CurrentRwi;
+}
+//----------------------------------------------------------------------------
+void mafInteractor2DIndicator::ShowAllMeasures( bool show )
+  //----------------------------------------------------------------------------
+{
+  for (int i=0;i<m_LineActorVector1.size();i++)
+  {
+    if (m_LineActorVector1[i])
+    {
+      if (show)
+      {
+        m_RendererVector[i]->AddActor2D(m_LineActorVector1[i]);
+      }
+      else
+      {
+        m_RendererVector[i]->RemoveActor2D(m_LineActorVector1[i]);
+      }
+    }
+
+    if (m_LineActorVector2[i])
+    {
+      if (show)
+      {
+        m_RendererVector[i]->AddActor2D(m_LineActorVector2[i]);
+      }
+      else
+      {
+        m_RendererVector[i]->RemoveActor2D(m_LineActorVector2[i]);
+      }
+    }
+
+    if (m_MeterVector[i])
+    {
+      if (show)
+      {
+        m_RendererVector[i]->AddActor2D(m_MeterVector[i]);
+      }
+      else
+      {
+        m_RendererVector[i]->RemoveActor2D(m_MeterVector[i]);
+      }
+    }
+  }
+
+  if (m_CurrentRenderer)
+  {
+  	m_CurrentRenderer->GetRenderWindow()->Render();
+  }
 }

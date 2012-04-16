@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafInteractor2DIndicator.h,v $
 Language:  C++
-Date:      $Date: 2011-05-25 11:40:18 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2012-04-16 12:36:27 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -21,6 +21,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // forward refs
 //----------------------------------------------------------------------------
 class mafRWI;
+class mafRWIBase;
 class mafDeviceButtonsPadMouse;
 
 class vtkLineSource;
@@ -94,6 +95,16 @@ public:
   Return the dimension of Measure Vector
   */
   int SizeMeasureVector(){ return m_MeterVector.size(); }
+
+  /** Show On/Off only last measure */
+  void ShowOnlyLastMeasure(bool show);
+
+  /** Show On/Off all measures */
+  void ShowAllMeasures(bool show);
+
+  /** return the current rwi */
+  mafRWIBase *GetCurrentRwi();
+
 protected:
 	mafInteractor2DIndicator();
 	virtual ~mafInteractor2DIndicator();
@@ -146,9 +157,8 @@ protected:
 	vtkRenderer         *m_LastRenderer; ///< Renderer used for the first line
 	vtkRenderer         *m_CurrentRenderer;
   vtkRenderer         *m_PreviousRenderer;
-
-	
-
+  
+  mafRWIBase *m_CurrentRwi;
 	
 	bool m_DraggingLine;
 	bool m_DraggingLeft;

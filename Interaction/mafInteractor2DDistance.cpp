@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractor2DDistance.cpp,v $
   Language:  C++
-  Date:      $Date: 2012-04-16 08:47:46 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2012-04-16 12:36:27 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Daniele Giunchi - Roberto Mucci 
 ==========================================================================
   Copyright (c) 2002/2004
@@ -114,6 +114,7 @@ mafInteractor2DDistance::mafInteractor2DDistance()
   m_HistogramDialog->SetSize(x_init,y_init,width,height);
 	m_HistogramDialog->Show(FALSE);
 
+  m_CurrentRwi = NULL;
   m_CurrentRenderer  = NULL;
   m_LastRenderer     = NULL;
   m_PreviousRenderer   = NULL;
@@ -199,7 +200,6 @@ mafInteractor2DDistance::~mafInteractor2DDistance()
   m_LineMapperVector2.clear();
   m_LineActorVector2.clear();
   m_RendererVector.clear();
-  m_RwiVector.clear();
   m_Measure.clear();
   m_FlagMeasureType.clear();
 
@@ -347,6 +347,7 @@ void mafInteractor2DDistance::DrawMeasureTool(double x, double y)
 	static long counter = 0;
 	static double dx, dy, dz;
   
+  m_CurrentRwi = m_Mouse->GetRWI();
   m_CurrentRenderer = m_Mouse->GetRenderer();
 	if (m_CurrentRenderer == NULL || (m_DisableUndoAndOkCancel && counter == 2 && m_CurrentRenderer != m_PreviousRenderer ))	{return;}
 
@@ -520,7 +521,6 @@ void mafInteractor2DDistance::DrawMeasureTool(double x, double y)
 	  counter = 0;
     CalculateMeasure();
     m_RendererVector.push_back(m_CurrentRenderer);
-    m_RwiVector.push_back(m_CurrentRwi);
 
     if(mafString::Equals("*Error*",m_MeterVector[m_MeterVector.size()-1]->GetText()))
     {
@@ -801,8 +801,6 @@ void mafInteractor2DDistance::UndoMeasure()
 
     m_RendererVector[m_RendererVector.size()-1]->GetRenderWindow()->Render();
     m_RendererVector.pop_back();
-
-    m_RwiVector.pop_back();
       
     //gui
     m_Measure.pop_back();
@@ -955,8 +953,6 @@ void mafInteractor2DDistance::ShowOnlyLastMeasure( bool show )
   //No check last actor
   for (int i=0;i<m_LineActorVector1.size()-1;i++)
   {
-    //Set opacity to 0.0 if actor should be show off otherwise set opacity to 1.0
-    double opacity = show ? 0.0 : 1.0;
     if (m_LineActorVector1[i])
     {
       if (!show)
@@ -1001,4 +997,52 @@ mafRWIBase * mafInteractor2DDistance::GetCurrentRwi()
 //----------------------------------------------------------------------------
 {
   return m_CurrentRwi;
+}
+//----------------------------------------------------------------------------
+void mafInteractor2DDistance::ShowAllMeasures( bool show )
+//----------------------------------------------------------------------------
+{
+  for (int i=0;i<m_LineActorVector1.size();i++)
+  {
+    if (m_LineActorVector1[i])
+    {
+      if (show)
+      {
+        m_RendererVector[i]->AddActor2D(m_LineActorVector1[i]);
+      }
+      else
+      {
+        m_RendererVector[i]->RemoveActor2D(m_LineActorVector1[i]);
+      }
+    }
+
+    if (m_LineActorVector2[i])
+    {
+      if (show)
+      {
+        m_RendererVector[i]->AddActor2D(m_LineActorVector2[i]);
+      }
+      else
+      {
+        m_RendererVector[i]->RemoveActor2D(m_LineActorVector2[i]);
+      }
+    }
+
+    if (m_MeterVector[i])
+    {
+      if (show)
+      {
+        m_RendererVector[i]->AddActor2D(m_MeterVector[i]);
+      }
+      else
+      {
+        m_RendererVector[i]->RemoveActor2D(m_MeterVector[i]);
+      }
+    }
+  }
+
+  if (m_CurrentRenderer)
+  {
+    m_CurrentRenderer->GetRenderWindow()->Render();
+  }
 }

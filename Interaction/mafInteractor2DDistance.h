@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafInteractor2DDistance.h,v $
 Language:  C++
-Date:      $Date: 2012-04-16 08:47:46 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2012-04-16 12:36:27 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Daniele Giunchi - Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004
@@ -136,6 +136,9 @@ public:
   /** Show On/Off only last measure */
   void ShowOnlyLastMeasure(bool show);
 
+  /** Show On/Off all measures */
+  void ShowAllMeasures(bool show);
+
   /** return the current rwi */
   mafRWIBase *GetCurrentRwi();
 
@@ -201,7 +204,6 @@ protected:
 	vtkRenderer         *m_CurrentRenderer;
   vtkRenderer         *m_PreviousRenderer;
 
-  std::vector<mafRWIBase *> m_RwiVector;
   mafRWIBase *m_CurrentRwi;
 
   mafGUIDialogPreview  *m_HistogramDialog;
