@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafInteractor2DDistance.h,v $
 Language:  C++
-Date:      $Date: 2011-05-25 11:40:18 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2012-04-16 08:47:46 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Daniele Giunchi - Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004
@@ -23,6 +23,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // forward refs
 //----------------------------------------------------------------------------
 class mafRWI;
+class mafRWIBase;
 class mafDeviceButtonsPadMouse;
 class vtkCamera;
 
@@ -131,6 +132,13 @@ public:
   Return the dimension of Measure Vector
   */
   int SizeMeasureVector(){ return m_Measure.size(); }
+
+  /** Show On/Off only last measure */
+  void ShowOnlyLastMeasure(bool show);
+
+  /** return the current rwi */
+  mafRWIBase *GetCurrentRwi();
+
 protected:
 	mafInteractor2DDistance();
 	virtual ~mafInteractor2DDistance();
@@ -192,6 +200,9 @@ protected:
 	vtkRenderer         *m_LastRenderer; ///< Renderer used for the first line
 	vtkRenderer         *m_CurrentRenderer;
   vtkRenderer         *m_PreviousRenderer;
+
+  std::vector<mafRWIBase *> m_RwiVector;
+  mafRWIBase *m_CurrentRwi;
 
   mafGUIDialogPreview  *m_HistogramDialog;
 	mafRWI    *m_HistogramRWI;
