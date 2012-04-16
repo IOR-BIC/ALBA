@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeSliceNotInterpolated.cpp,v $
   Language:  C++
-  Date:      $Date: 2012-04-16 15:22:30 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2012-04-16 15:42:33 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Alberto Losi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -326,8 +326,14 @@ void medPipeVolumeSliceNotInterpolated::RescaleLUT(vtkLookupTable *inputLUT,vtkL
 {
   // Copy volume lut
   outputLUT->DeepCopy(inputLUT);
+
+  double tableRange[2];
+  inputLUT->GetTableRange(tableRange);
+  double maxRange = (tableRange[1] / m_ScalarRange[1]) * 255.;
+  double minRange = 255 - (tableRange[0] / m_ScalarRange[0]) * 255.;
   // Set table scalar range
-  outputLUT->SetTableRange(0,255);
+  outputLUT->SetTableRange(minRange,maxRange);
+  
   // Copy table entries
   for(int c = 0; c < inputLUT->GetNumberOfTableValues(); c++)
   {
