@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeSliceNotInterpolated.cpp,v $
   Language:  C++
-  Date:      $Date: 2012-04-16 15:42:33 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2012-04-17 10:15:29 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Alberto Losi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,6 +36,10 @@
 #include "mafGUIFloatSlider.h"
 
 mafCxxTypeMacro(medPipeVolumeSliceNotInterpolated);
+
+#define max(a,b)(((a) > (b)) ? (a) : (b))
+#define min(a,b)(((a) < (b)) ? (a) : (b))
+#define round(x) (x<0?ceil((x)-0.5):floor((x)+0.5))
 
 //----------------------------------------------------------------------------
 medPipeVolumeSliceNotInterpolated::medPipeVolumeSliceNotInterpolated()
@@ -260,6 +264,8 @@ void medPipeVolumeSliceNotInterpolated::UpdateMapToColorsFilter()
 void medPipeVolumeSliceNotInterpolated::CreateSlice()
 //----------------------------------------------------------------------------
 {
+  // Ensure that data is loaded in memory
+  m_Vme->Update();
   vtkDataSet * data = m_Vme->GetOutput()->GetVTKData();
 
   // Get the volume lut and rescale to 0 255 scalar range
@@ -329,8 +335,11 @@ void medPipeVolumeSliceNotInterpolated::RescaleLUT(vtkLookupTable *inputLUT,vtkL
 
   double tableRange[2];
   inputLUT->GetTableRange(tableRange);
-  double maxRange = (tableRange[1] / m_ScalarRange[1]) * 255.;
-  double minRange = 255 - (tableRange[0] / m_ScalarRange[0]) * 255.;
+
+  double maxRange = 255 - (m_ScalarRange[1] - tableRange[1]) / (m_ScalarRange[1] - m_ScalarRange[0]) * 255;
+  double minRange = ((tableRange[0] - m_ScalarRange[0]) / (m_ScalarRange[1] - m_ScalarRange[0])) * 255;
+
+  mafLogMessage("> Rescaled lut range %f %f",minRange,maxRange);
   // Set table scalar range
   outputLUT->SetTableRange(minRange,maxRange);
   
