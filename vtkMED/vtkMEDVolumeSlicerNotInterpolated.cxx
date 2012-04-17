@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: vtkMEDVolumeSlicerNotInterpolated.cxx,v $
   Language:  C++
-  Date:      $Date: 2012-04-12 12:39:04 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2012-04-17 14:52:28 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Alberto Losi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,7 +32,7 @@
 
 #define min(a,b) (((a) < (b)) ? (a) : (b))
 
-vtkCxxRevisionMacro(vtkMEDVolumeSlicerNotInterpolated, "$Revision: 1.1.2.1 $");
+vtkCxxRevisionMacro(vtkMEDVolumeSlicerNotInterpolated, "$Revision: 1.1.2.2 $");
 vtkStandardNewMacro(vtkMEDVolumeSlicerNotInterpolated);
 
 //----------------------------------------------------------------------------
@@ -104,7 +104,7 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
       double xyz[3];
       imageData->GetPoint(curIndex,xyz);
       int dist = 0;
-      if(((dist = abs(xyz[SliceAxis] - SliceOrigin[SliceAxis])) < minDist) && ((xyz[SliceAxis] - SliceOrigin[2]) <= 0))
+      if(((dist = abs(xyz[SliceAxis] - SliceOrigin[SliceAxis])) < minDist) /*&& ((xyz[SliceAxis] - SliceOrigin[2]) <= 0)*/)
       {
         nearestIndex = curIndex;
         minDist = dist;
