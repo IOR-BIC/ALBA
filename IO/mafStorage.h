@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorage.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-25 09:57:52 $
-  Version:   $Revision: 1.16.2.1 $
+  Date:      $Date: 2012-04-19 07:42:13 $
+  Version:   $Revision: 1.16.2.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -15,11 +15,6 @@
 #include "mafObject.h"
 #include "mafString.h"
 #include <set>
-
-#ifdef MAF_EXPORTS
-#include "mafDllMacros.h"
-EXPORT_STL_SET(MAF_EXPORT,mafString);
-#endif
 
 //----------------------------------------------------------------------------
 // forward declarations :

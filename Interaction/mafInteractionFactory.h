@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionFactory.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-25 11:35:56 $
-  Version:   $Revision: 1.5.22.1 $
+  Date:      $Date: 2012-04-19 07:41:46 $
+  Version:   $Revision: 1.5.22.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -17,11 +17,6 @@
 #include "mafObjectFactory.h"
 #include "mafInteractionConfigure.h"
 #include <set>
-
-#ifdef MAF_EXPORTS
-#include "mafDllMacros.h"
-EXPORT_STL_SET(MAF_EXPORT,std::string);
-#endif
 
 /** to be used internally for plugging default devices --- calls a member function directly */
 #define mafPlugDeviceMacro(node_type,descr) \

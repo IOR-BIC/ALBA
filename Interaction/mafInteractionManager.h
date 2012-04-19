@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-25 11:40:18 $
-  Version:   $Revision: 1.16.2.3 $
+  Date:      $Date: 2012-04-19 07:41:46 $
+  Version:   $Revision: 1.16.2.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -62,7 +62,6 @@ class mafDeviceClientMAF;
 #include "mafDllMacros.h"
 EXPORT_STL_MAP(MAF_EXPORT,mafString,mafAutoPointer<mafAvatar>);
 EXPORT_STL_LIST(MAF_EXPORT,mafAutoPointer<mafInteractorPER>);
-EXPORT_STL_SET(MAF_EXPORT,mafView*);
 #endif
 
 

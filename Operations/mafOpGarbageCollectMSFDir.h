@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpGarbageCollectMSFDir.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-25 11:49:23 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2012-04-19 07:42:46 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -23,10 +23,6 @@ using namespace std;
 //----------------------------------------------------------------------------
 class mafNode;
 
-#ifdef MAF_EXPORTS
-#include "mafDllMacros.h"
-EXPORT_STL_SET(MAF_EXPORT,string);
-#endif
 //----------------------------------------------------------------------------
 // mafOpGarbageCollectMSFDir :
 //----------------------------------------------------------------------------
