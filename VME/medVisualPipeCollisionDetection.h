@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVisualPipeCollisionDetection.h,v $
   Language:  C++
-  Date:      $Date: 2012-04-06 10:08:46 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2012-04-19 12:56:42 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -74,7 +74,11 @@ public:
   /** set a list of cells to exclude to the collision */
   void SetListOfCellToExclude(bool *list);
 
+  /** set name of aarray of scalars that rappresent cells to exclude to collision */
   void SetScalarNameToExclude(wxString name){m_ScalarNameToExclude = name;};
+
+  /** set opacity value */
+  void SetOpacity(double opacity);
 
 protected:
 
