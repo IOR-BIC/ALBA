@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafColor.h,v $
   Language:  C++
-  Date:      $Date: 2007-09-04 16:22:15 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2012-04-19 09:13:22 $
+  Version:   $Revision: 1.3.4.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -35,7 +35,7 @@ mafColor is a class representing an RGBA color:
   will draw an image with a checkered pattern.
   The pattern visibility is proportional with the alpha value.
 */
-class mafColor
+class MAF_EXPORT mafColor
 //----------------------------------------------------------------------------
 {
   public:
