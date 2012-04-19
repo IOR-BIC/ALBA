@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransform.h,v $
   Language:  C++
-  Date:      $Date: 2011-12-15 10:33:54 $
-  Version:   $Revision: 1.12.2.5 $
+  Date:      $Date: 2012-04-19 07:39:38 $
+  Version:   $Revision: 1.12.2.6 $
   Authors:   Marco Petrone, Stefano Perticoni,Stefania Paperini
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -315,7 +315,7 @@ class MAF_EXPORT mafTransform : public mafTransformBase
   static double PolarDecomp(HMatrix M, HMatrix Q, HMatrix S);
   static void DecompAffine(HMatrix A, mmuAffineParts *parts);
   static HVect SpectDecomp(HMatrix S, HMatrix U);
-  static mmuQuat mmuQuaternionFromMatrix(HMatrix mat);
+  static mmuQuat QuaternionFromMatrix(HMatrix mat);
   static void InvertAffine(mmuAffineParts *parts, mmuAffineParts *inverse);
   static mmuQuat Snuggle(mmuQuat q, HVect *k);
   //----------------------------------------------------------------------------

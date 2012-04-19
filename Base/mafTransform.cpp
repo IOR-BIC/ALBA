@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransform.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-05-25 09:30:12 $
-  Version:   $Revision: 1.9.2.4 $
+  Date:      $Date: 2012-04-19 07:39:38 $
+  Version:   $Revision: 1.9.2.5 $
   Authors:   Marco Petrone, Stefano Perticoni,Stefania Paperini
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -369,7 +369,7 @@ mafTransform::mmuQuat Qt_Scale(mafTransform::mmuQuat q, double w)
 // used to multiply column vector on the left: vnew = mat vold.	 Works
 // correctly for right-handed coordinate system and right-handed rotations.
 // Translation and perspective components ignored.
-mafTransform::mmuQuat mafTransform::mmuQuaternionFromMatrix(HMatrix mat)
+mafTransform::mmuQuat mafTransform::QuaternionFromMatrix(HMatrix mat)
 //----------------------------------------------------------------------------
 {
     /* This algorithm avoids near-zero divides by looking for a large component
@@ -757,9 +757,9 @@ void mafTransform::DecompAffine(HMatrix A, mmuAffineParts *parts)
 	mat_copy(Q,=,-Q,3);
 	parts->f = -1;
     } else parts->f = 1;
-    parts->q = mmuQuaternionFromMatrix(Q);
+    parts->q = QuaternionFromMatrix(Q);
     parts->k = SpectDecomp(S, U);
-    parts->u = mmuQuaternionFromMatrix(U);
+    parts->u = QuaternionFromMatrix(U);
     p = Snuggle(parts->u, &parts->k);
     parts->u = Qt_Mul(parts->u, p);
 }
