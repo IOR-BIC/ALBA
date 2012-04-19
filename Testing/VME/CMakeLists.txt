@@ -1,10 +1,6 @@
 PROJECT (MedicalVME_TEST)
 
-IF(MED_BUILD_MEDDLL)
-  LINK_LIBRARIES(GPUAPI medDLL)
-ELSE(MED_BUILD_MEDDLL)
-  LINK_LIBRARIES(GPUAPI medVME medCommon medOperations)
-ENDIF (MED_BUILD_MEDDLL)
+LINK_LIBRARIES(GPUAPI medVME medCommon medOperations)
 
 #-----------------------------------------------------------------------------
 # tests using cppunit testing framework
