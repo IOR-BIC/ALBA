@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmuTimeSet.h,v $
   Language:  C++
-  Date:      $Date: 2011-12-15 10:38:59 $
-  Version:   $Revision: 1.4.24.2 $
+  Date:      $Date: 2012-04-19 07:27:16 $
+  Version:   $Revision: 1.4.24.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,7 +20,6 @@
 #include <vector>
 #ifdef MAF_EXPORTS
 #include "mafDllMacros.h"
-EXPORT_STL_SET(MAF_EXPORT,mafTimeStamp);
 EXPORT_STL_VECTOR(MAF_EXPORT,mafTimeStamp);
 #endif
 //------------------------------------------------------------------------------

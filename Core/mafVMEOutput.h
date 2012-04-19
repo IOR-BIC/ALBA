@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutput.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-25 09:53:22 $
-  Version:   $Revision: 1.14.2.1 $
+  Date:      $Date: 2012-04-19 07:26:36 $
+  Version:   $Revision: 1.14.2.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -35,6 +35,10 @@ class mafGUI;
 #ifdef MAF_USE_VTK
 class vtkDataSet;
 #endif //MAF_USE_VTK
+
+#ifdef MAF_EXPORTS
+template class MAF_EXPORT mafAutoPointer<mafTransformBase>;
+#endif
 
 /** mafVMEOutput - the output data structure of a VME node.
   mafVMEOutput is the output produced by a VME node.
@@ -191,9 +195,6 @@ protected:
   mafOBB                    m_Bounds;   ///< bounds of the output data (i.e. for current time)
   mafGUI                   *m_Gui;      ///< user interface
 
-#ifdef MAF_EXPORTS
-  template class MAF_EXPORT mafAutoPointer<mafTransformBase>;
-#endif
   mafAutoPointer<mafTransformBase> m_Transform; ///< the transform generating the output pose matrix
 
 private:
