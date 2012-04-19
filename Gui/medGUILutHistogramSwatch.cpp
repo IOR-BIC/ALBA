@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILutHistogramSwatch.cpp,v $
   Language:  C++
-  Date:      $Date: 2012-04-06 08:31:45 $
-  Version:   $Revision: 1.1.2.10 $
+  Date:      $Date: 2012-04-19 12:45:28 $
+  Version:   $Revision: 1.1.2.11 $
   Authors:   Crimi Gianluigi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -24,6 +24,7 @@
 #include <wx/dc.h>
 #include <wx/dcclient.h>
 
+#include "mafGUI.h"
 #include "medGUILutHistogramSwatch.h"
 #include "mafColor.h"
 #include "medGUILutHistogramEditor.h"

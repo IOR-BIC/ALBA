@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medInteractorPERScalarInformation.cpp,v $
 Language:  C++
-Date:      $Date: 2012-04-06 08:39:27 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2012-04-19 12:47:51 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Matteo Giacomoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2010
@@ -36,6 +36,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafRWIBase.h"
 
 #include "mafVME.h"
+#include "mafVMEOutput.h"
 
 #include "vtkCellPicker.h"
 #include "vtkRenderWindow.h"

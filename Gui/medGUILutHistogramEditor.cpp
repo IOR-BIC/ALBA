@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILutHistogramEditor.cpp,v $
   Language:  C++
-  Date:      $Date: 2012-04-06 08:31:45 $
-  Version:   $Revision: 1.1.2.14 $
+  Date:      $Date: 2012-04-19 12:45:28 $
+  Version:   $Revision: 1.1.2.15 $
   Authors:   Crimi Gianluigi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,6 +22,7 @@
 #include <math.h>
 
 #include "medGUILutHistogramEditor.h"
+#include "mafGUI.h"
 #include "mafGUIFloatSlider.h"
 #include "mafGUILutPreset.h"
 #include "mafGUILutSlider.h"

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medInteractorPicker.cpp,v $
 Language:  C++
-Date:      $Date: 2011-04-04 12:59:45 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2012-04-19 12:47:51 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2010 
@@ -22,6 +22,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 #include "mafRWIBase.h"
 #include "mafVME.h"
+#include "mafVMEOutput.h"
 #include "mafTransform.h"
 
 #include "vtkMAFSmartPointer.h"

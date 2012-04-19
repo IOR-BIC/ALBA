@@ -2,8 +2,8 @@
 Program:   LHP
 Module:    $RCSfile: medInteractorPERBrushFeedback.cpp,v $
 Language:  C++
-Date:      $Date: 2012-02-17 13:36:29 $
-Version:   $Revision: 1.1.2.6 $
+Date:      $Date: 2012-04-19 12:47:51 $
+Version:   $Revision: 1.1.2.7 $
 Authors:   Eleonora Mambrini, Gianluigi Crimi 
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -31,6 +31,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafView.h"
 #include "mafViewCompound.h"
 #include "mafVME.h"
+#include "mafVMEOutput.h"
 
 #include "vtkActor2D.h"
 #include "vtkCamera.h"

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpCropDeformableROI.h,v $
 Language:  C++
-Date:      $Date: 2012-04-06 09:09:53 $
-Version:   $Revision: 1.2.2.3 $
+Date:      $Date: 2012-04-19 12:48:36 $
+Version:   $Revision: 1.2.2.4 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -48,6 +48,7 @@ MafMedical is partially based on OpenMAF.
 #include "medOperationsDefines.h"
 #include "mafOp.h"
 #include "mafVME.h"
+#include "mafVMEOutput.h"
 
 //----------------------------------------------------------------------------
 // forward references :

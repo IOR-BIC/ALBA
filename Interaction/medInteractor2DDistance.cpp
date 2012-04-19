@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medInteractor2DDistance.cpp,v $
   Language:  C++
-  Date:      $Date: 2011-03-15 10:16:03 $
-  Version:   $Revision: 1.2.2.2 $
+  Date:      $Date: 2012-04-19 12:47:51 $
+  Version:   $Revision: 1.2.2.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,6 +16,7 @@
 #include "mafRWI.h"
 #include "mafView.h"
 #include "mafVME.h"
+#include "mafVMEOutput.h"
 #include "mafEventInteraction.h"
 
 #include "vtkMAFSmartPointer.h"
