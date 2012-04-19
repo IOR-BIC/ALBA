@@ -31,16 +31,16 @@
 	std::allocator<T_ > >::_Node*>; \
 	template class declspec_ std::list<T_ >;
 
-#define EXPORT_STL_SET(declspec_, T_) \
-	template class declspec_ std::allocator<T_ >; \
-	template struct declspec_ std::less<T_ >; \
-	template class declspec_ std::allocator<std::_Tree_nod< \
-	std::_Tset_traits<T_, std::less<T_ >, std::allocator<T_ >, false> \
-	>::_Node>; \
-	template class declspec_ std::allocator<std::_Tree_ptr< \
-	std::_Tset_traits<T_, std::less<T_ >, std::allocator<T_ >, false> \
-	>::_Node*>; \
-	template class declspec_ std::set<T_ >;
+// #define EXPORT_STL_SET(declspec_, T_) \
+// 	template class declspec_ std::allocator<T_ >; \
+// 	template struct declspec_ std::less<T_ >; \
+// 	template class declspec_ std::allocator<std::_Tree_nod< \
+// 	std::_Tset_traits<T_, std::less<T_ >, std::allocator<T_ >, false> \
+// 	>::_Node>; \
+// 	template class declspec_ std::allocator<std::_Tree_ptr< \
+// 	std::_Tset_traits<T_, std::less<T_ >, std::allocator<T_ >, false> \
+// 	>::_Node*>; \
+// 	template class declspec_ std::set<T_ >;
 
 #define EXPORT_STL_MULTISET(declspec_, T_) \
 	template class declspec_ std::allocator<T_ >; \
