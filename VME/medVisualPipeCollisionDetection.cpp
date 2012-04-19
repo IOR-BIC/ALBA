@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVisualPipeCollisionDetection.cpp,v $
   Language:  C++
-  Date:      $Date: 2012-02-28 14:49:51 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2012-04-19 13:10:46 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -39,6 +39,7 @@
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkRenderer.h"
 #include "vtkIdList.h"
+#include "vtkProperty.h"
 
 #include <vector>
 
@@ -502,5 +503,18 @@ void medVisualPipeCollisionDetection::SetListOfCellToExclude(bool *list)
   for (int i=0;i<n;i++)
   {
     m_CellToExlude[i] = list[i];;
+  }
+}
+//----------------------------------------------------------------------------
+void medVisualPipeCollisionDetection::SetOpacity( double opacity )
+//----------------------------------------------------------------------------
+{
+  if (m_Actor)
+  {
+    m_Actor->GetProperty()->SetOpacity(opacity);
+  }
+  for (int i=0;i<m_SurfacebToCollideActor.size();i++)
+  {
+    m_SurfacebToCollideActor[i]->GetProperty()->SetOpacity(opacity);
   }
 }
