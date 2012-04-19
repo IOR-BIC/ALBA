@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVector.txx,v $
   Language:  C++
-  Date:      $Date: 2011-12-15 10:36:29 $
-  Version:   $Revision: 1.2.22.1 $
+  Date:      $Date: 2012-04-19 07:33:49 $
+  Version:   $Revision: 1.2.22.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -17,7 +17,7 @@
 #include <vector>
 
 template <class T>
-T mafVector<T>::NullItem;
+T mafVector<T>::m_NullItem;
 
 //------------------------------------------------------------------------------
 // PIMPL declarations
@@ -95,7 +95,7 @@ T &mafVector<T>::GetItem(const mafID idx)
 	}
 	else
 	{
-		return NullItem;
+		return m_NullItem;
 	}
 }
 
@@ -104,7 +104,7 @@ template <class T>
 T &mafVector<T>::operator [](const mafID idx)
 //------------------------------------------------------------------------------
 {
-  return (idx<m_Items->Vector.size())?m_Items->Vector[idx]:NullItem;
+  return (idx<m_Items->Vector.size())?m_Items->Vector[idx]:m_NullItem;
 }
 
 //------------------------------------------------------------------------------
@@ -112,7 +112,7 @@ template <class T>
 const T &mafVector<T>::operator [](const mafID idx) const
 //------------------------------------------------------------------------------
 {
-  return (idx<m_Items->Vector.size())?m_Items->Vector[idx]:NullItem;
+  return (idx<m_Items->Vector.size())?m_Items->Vector[idx]:m_NullItem;
 }
 
 //------------------------------------------------------------------------------

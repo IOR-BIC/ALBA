@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVector.h,v $
   Language:  C++
-  Date:      $Date: 2011-05-25 09:30:12 $
-  Version:   $Revision: 1.2.22.1 $
+  Date:      $Date: 2012-04-19 07:33:49 $
+  Version:   $Revision: 1.2.22.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -94,7 +94,7 @@ public:
   /** provide access to vector items. If idx is outside the result is invalid */
   const T &operator [](const mafID idx) const;
 
-  static T NullItem;
+  static T m_NullItem;
   
 protected:
 
