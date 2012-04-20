@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: vtkMEDVolumeSlicerNotInterpolated.cxx,v $
   Language:  C++
-  Date:      $Date: 2012-04-17 14:52:28 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2012-04-20 13:59:55 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Alberto Losi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,8 +21,9 @@
 #include "vtkMEDVolumeSlicerNotInterpolated.h"
 #include "vtkObjectFactory.h"
 #include "vtkImageData.h"
-#include "vtkRectilinearGrid.h"
+/*#include "vtkRectilinearGrid.h"*/
 #include "vtkPointData.h"
+#include "vtkCellData.h"
 #include "vtkCharArray.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkShortArray.h"
@@ -31,8 +32,9 @@
 #include "vtkDoubleArray.h"
 
 #define min(a,b) (((a) < (b)) ? (a) : (b))
+#define max(a,b)  (((a) > (b)) ? (a) : (b))
 
-vtkCxxRevisionMacro(vtkMEDVolumeSlicerNotInterpolated, "$Revision: 1.1.2.2 $");
+vtkCxxRevisionMacro(vtkMEDVolumeSlicerNotInterpolated, "$Revision: 1.1.2.3 $");
 vtkStandardNewMacro(vtkMEDVolumeSlicerNotInterpolated);
 
 //----------------------------------------------------------------------------
@@ -40,18 +42,29 @@ vtkMEDVolumeSlicerNotInterpolated::vtkMEDVolumeSlicerNotInterpolated()
 //----------------------------------------------------------------------------
 {
   // Initialize attributes
-  SliceOrigin[0] = SliceOrigin[1] = SliceOrigin[2] = .0;
+  Origin[0] = Origin[1] = Origin[2] = .0;
+  SliceOrigin[0] = SliceOrigin[1] = 0.;
   SliceAxis = SLICE_Z;
   NumberOfComponents = 0;
   BaseIndex = -1;
   SliceDimensions[0] = SliceDimensions[1] = 0;
   InputDimensions[0] = InputDimensions[1] = InputDimensions[2] = 0;
   InputSpacing[0] = InputSpacing[1] = InputSpacing[2] = 1.; 
+  SliceSpacing[0] = SliceSpacing[1] = SliceSpacing[2] = 1.;
+  InputDataType = VTK_IMAGE_DATA;
+  OutputDataType = VTK_IMAGE_DATA;
+  CoordsXY[0] = CoordsXY[1] = NULL;
+  OutputRectilinearGrid = NULL;
 }
 //----------------------------------------------------------------------------
 vtkMEDVolumeSlicerNotInterpolated::~vtkMEDVolumeSlicerNotInterpolated() 
 //----------------------------------------------------------------------------
 {
+  if(OutputRectilinearGrid)
+  {
+    OutputRectilinearGrid->Delete();
+    OutputRectilinearGrid = NULL;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -69,33 +82,41 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
   vtkRectilinearGrid * rectilinearGrid = NULL;
   if ((imageData = vtkImageData::SafeDownCast(input)) != NULL) 
   {
+    InputDataType = VTK_IMAGE_DATA;
+
     // Input is an image data
     imageData->GetDimensions(InputDimensions);
     imageData->GetSpacing(InputSpacing);
     int multiplyFactor = InputDimensions[1] * InputDimensions[0];
 
     // Fill slice dimensions (output image is always defined in xy plane)
+    int axisX = 0;
+    int axisY = 1;
     switch(SliceAxis)
     {
       case SLICE_Z:
         {
-          SliceDimensions[0] = InputDimensions[0];
-          SliceDimensions[1] = InputDimensions[1];
         } break;
       case SLICE_Y:
         {
           multiplyFactor = InputDimensions[0];
-          SliceDimensions[0] = InputDimensions[0];
-          SliceDimensions[1] = InputDimensions[2];
+          axisX = 0;
+          axisY = 2;
         } break;
       case SLICE_X:
         {
           multiplyFactor = 1;
-          SliceDimensions[0] = InputDimensions[1];
-          SliceDimensions[1] = InputDimensions[2];
+          axisX = 1;
+          axisY = 2;
         } break;
     }
-    // Get the first point index where axis is nearest to SliceOrigin[SliceAxis]
+    SliceDimensions[0] = InputDimensions[axisX];
+    SliceDimensions[1] = InputDimensions[axisY];
+    SliceSpacing[0] = InputSpacing[axisX];
+    SliceSpacing[1] = InputSpacing[axisY];
+    SliceSpacing[2] = 1;
+
+    // Get the first point index where axis is nearest to Origin[SliceAxis]
     double minDist = VTK_DOUBLE_MAX;
     int nearestIndex = -1;
     for(int i = 0; i < InputDimensions[SliceAxis]; i++)
@@ -104,10 +125,12 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
       double xyz[3];
       imageData->GetPoint(curIndex,xyz);
       int dist = 0;
-      if(((dist = abs(xyz[SliceAxis] - SliceOrigin[SliceAxis])) < minDist) /*&& ((xyz[SliceAxis] - SliceOrigin[2]) <= 0)*/)
+      if(((dist = abs(xyz[SliceAxis] - Origin[SliceAxis])) < minDist) /*&& ((xyz[SliceAxis] - Origin[2]) <= 0)*/)
       {
         nearestIndex = curIndex;
         minDist = dist;
+        SliceOrigin[0] = xyz[axisX];
+        SliceOrigin[1] = xyz[axisY];
       }
       else if(dist > minDist && nearestIndex != -1)
       {
@@ -116,48 +139,65 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
     }
     // BaseIndex is the current slice first point index
     BaseIndex = nearestIndex;
+
+    OutputDataType = VTK_IMAGE_DATA;
   }
   else if((rectilinearGrid = vtkRectilinearGrid::SafeDownCast(input)) != NULL)
   {
+    InputDataType = VTK_RECTILINEAR_GRID;
+
     // Input is a rectilinear grid
     rectilinearGrid->GetDimensions(InputDimensions);
-    vtkDoubleArray *coords = NULL;
+    vtkDoubleArray *coordsZ = NULL;
 
     // Fill slice dimensions (output image is always in xy plane)
+    int axisX = 0;
+    int axisY = 1;
     switch(SliceAxis)
       {
       case SLICE_Z:
         {
-          coords = (vtkDoubleArray *)rectilinearGrid->GetZCoordinates();
-          SliceDimensions[0] = InputDimensions[0];
-          SliceDimensions[1] = InputDimensions[1];
+          coordsZ = (vtkDoubleArray *)rectilinearGrid->GetZCoordinates();
+          CoordsXY[0] = (vtkDoubleArray *)rectilinearGrid->GetXCoordinates();
+          CoordsXY[1] = (vtkDoubleArray *)rectilinearGrid->GetYCoordinates();
         } break;
       case SLICE_Y:
         {
-          coords = (vtkDoubleArray *)rectilinearGrid->GetYCoordinates();
-          SliceDimensions[0] = InputDimensions[0];
-          SliceDimensions[1] = InputDimensions[2];
+          coordsZ = (vtkDoubleArray *)rectilinearGrid->GetYCoordinates();
+          CoordsXY[0] = (vtkDoubleArray *)rectilinearGrid->GetXCoordinates();
+          CoordsXY[1] = (vtkDoubleArray *)rectilinearGrid->GetZCoordinates();
+          axisX = 0;
+          axisY = 2;
         } break;
       case SLICE_X:
         {
-          coords = (vtkDoubleArray *)rectilinearGrid->GetXCoordinates();
-          SliceDimensions[0] = InputDimensions[1];
-          SliceDimensions[1] = InputDimensions[2];
+          coordsZ = (vtkDoubleArray *)rectilinearGrid->GetXCoordinates();
+          CoordsXY[0] = (vtkDoubleArray *)rectilinearGrid->GetYCoordinates();
+          CoordsXY[1] = (vtkDoubleArray *)rectilinearGrid->GetZCoordinates();
+          axisX = 1;
+          axisY = 2;
         } break;
      }
 
-    // Get the first point index where axis is nearest to SliceOrigin[axis]
+    SliceDimensions[0] = InputDimensions[axisX];
+    SliceDimensions[1] = InputDimensions[axisY];
+
+    // Get the first point index where axis is nearest to Origin[axis]
     double minDist = VTK_DOUBLE_MAX;
     int nearestIndex = -1;
     for(int i = 0; i < InputDimensions[SliceAxis]; i++)
     {
-      double tupleVal = coords->GetTuple1(i);
+      double tupleVal = coordsZ->GetTuple1(i);
       int dist = 0;
-      if(((dist = abs(tupleVal - SliceOrigin[SliceAxis])) < minDist) /*&& ((tupleVal - SliceOrigin[2]) <= 0)*/)
+      if(((dist = abs(tupleVal - Origin[SliceAxis])) < minDist) /*&& ((tupleVal - Origin[2]) <= 0)*/)
       {
         int ijk[3] = {0,0,0};
         ijk[SliceAxis] = i;
         nearestIndex = rectilinearGrid->ComputePointId(ijk);
+        double xyz[3];
+        rectilinearGrid->GetPoint(nearestIndex,xyz);
+        SliceOrigin[0] = xyz[axisX];
+        SliceOrigin[1] = xyz[axisY];
         minDist = dist;
       }
       else if(dist > minDist && nearestIndex != -1)
@@ -167,9 +207,30 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
     }
 
     // BaseIndex is the current slice first point index
-    BaseIndex = nearestIndex;
-
-    // NOT COMPLETELY IMPLEMENTED FOR RG!
+    BaseIndex = nearestIndex;  
+    
+    SliceSpacing[0] = SliceSpacing[1] = SliceSpacing[2] = 1.; // Dummy spacing
+    // Loop on coordinates to determine if spacing on this slice plane is regular.
+    // If spacing is regular the output can be only the image data.
+    OutputDataType = VTK_IMAGE_DATA;
+    for(int i = 0; i < 2; i++)
+    {
+      for(int c = 0; c < CoordsXY[i]->GetNumberOfTuples() - 2; c++)
+      {
+        double spac1 = CoordsXY[i]->GetTuple1(c + 1) - CoordsXY[i]->GetTuple1(c);
+        double spac2 = CoordsXY[i]->GetTuple1(c + 2) - CoordsXY[i]->GetTuple1(c + 1);
+        SliceSpacing[i] = spac1;
+        if(abs(spac1 - spac2)/(spac1 + spac2) > 0.001)
+        {
+          OutputDataType = VTK_RECTILINEAR_GRID;
+          break;
+        }
+      }
+      if(OutputDataType == VTK_RECTILINEAR_GRID)
+      {
+        break;
+      }
+    }
   }
 
   // Now nearest index is the "origin" of the slice so all points in the slice can be evaluated as 
@@ -250,7 +311,7 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteData(vtkImageData *output)
     }
   case VTK_DOUBLE:
     {
-      scalars =vtkDoubleArray::New();
+      scalars = vtkDoubleArray::New();
       break;
     }
   default:
@@ -259,19 +320,53 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteData(vtkImageData *output)
   scalars->SetNumberOfComponents(inputScalars->GetNumberOfComponents());
   scalars->SetName("SCALARS");
 
-  // Fill output scalars with the right values
-  for(int j = 0; j < SliceDimensions[1]; j++)
+
+  int iLenght = SliceDimensions[0];
+  int jLenght = SliceDimensions[1];
+  if(OutputDataType == VTK_RECTILINEAR_GRID)
   {
-    for(int i = 0; i < SliceDimensions[0]; i++)
+    iLenght--;
+    jLenght--;
+  }
+  // Fill output scalars with the right values
+  for(int j = 0; j < jLenght; j++)
+  {
+    for(int i = 0; i < iLenght; i++)
     {
-      double *tuple = inputScalars->GetTuple(i * iFactor + j * jFactor + BaseIndex);
+      int index[2] = {i,j};
+      double *tuple = inputScalars->GetTuple(index[0] * iFactor + index[1] * jFactor + BaseIndex);
       vtkIdType sid = scalars->InsertNextTuple(tuple);
-      // NOT COMPLETELY IMPLEMENTED FOR RG!
     }
   }
+  if(OutputDataType == VTK_RECTILINEAR_GRID)
+  {
+    // Create the rectilinear grid structure
+    if(OutputRectilinearGrid)
+    {
+      OutputRectilinearGrid->Delete();
+      OutputRectilinearGrid = NULL;
+    }
+    OutputRectilinearGrid = vtkRectilinearGrid::New();
+    OutputRectilinearGrid->SetDimensions(SliceDimensions[0],SliceDimensions[1],1);
+    OutputRectilinearGrid->SetXCoordinates(CoordsXY[0]);
+    OutputRectilinearGrid->SetYCoordinates(CoordsXY[1]);
+    vtkDoubleArray *CoordsZ = vtkDoubleArray::New();
+    CoordsZ->SetNumberOfComponents(1);
+    CoordsZ->InsertNextTuple1(0.);
+    OutputRectilinearGrid->SetZCoordinates(CoordsZ);
+    CoordsZ->Delete();
+    
+    // Set Scalars
+    OutputRectilinearGrid->GetCellData()->RemoveArray("SCALARS");
+    OutputRectilinearGrid->GetCellData()->SetScalars(scalars);
+    OutputRectilinearGrid->GetCellData()->SetActiveScalars("SCALARS");
+    OutputRectilinearGrid->GetCellData()->Update();
 
+    OutputRectilinearGrid->Modified();
+    OutputRectilinearGrid->Update();
+  }
   // Prepare and generate output image
-  output->SetSpacing(InputSpacing[0],InputSpacing[1],InputSpacing[2]);
+  output->SetSpacing(SliceSpacing[0],SliceSpacing[1],SliceSpacing[2]);
   output->SetExtent(0, (SliceDimensions[0] - 1) , 0, (SliceDimensions[1] - 1), 0, 0);
   output->SetOrigin(0,0,0);
 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeSliceNotInterpolated.cpp,v $
   Language:  C++
-  Date:      $Date: 2012-04-17 10:15:29 $
-  Version:   $Revision: 1.1.2.4 $
+  Date:      $Date: 2012-04-20 14:00:08 $
+  Version:   $Revision: 1.1.2.5 $
   Authors:   Alberto Losi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -33,6 +33,10 @@
 #include "vtkImageMapToColors.h"
 #include "vtkStructuredPointsWriter.h"
 #include "vtkImageShiftScale.h"
+#include "vtkRectilinearGrid.h"
+#include "vtkDataSetMapper.h"
+#include "vtkActor.h"
+#include "vtkProperty.h"
 #include "mafGUIFloatSlider.h"
 
 mafCxxTypeMacro(medPipeVolumeSliceNotInterpolated);
@@ -61,6 +65,10 @@ medPipeVolumeSliceNotInterpolated::medPipeVolumeSliceNotInterpolated()
   m_ImageActor = NULL;
   m_ShowGui = false;
   m_ScalarRange[0] = m_ScalarRange[1] = 0.0;
+  m_SlicerOutputRectilinearGrid = NULL;
+  m_RectilinearGridMapper = NULL;
+  m_RectilinearGridActor = NULL;
+  m_DataType = VTK_IMAGE_DATA;
 }
 
 //----------------------------------------------------------------------------
@@ -69,13 +77,23 @@ medPipeVolumeSliceNotInterpolated::~medPipeVolumeSliceNotInterpolated()
 {
   // Destroy allocated objects
   m_Vme->GetEventSource()->RemoveObserver(this);
-  m_RenFront->RemoveProp(m_ImageActor);
+
+  if (m_DataType == VTK_IMAGE_DATA)
+  {
+    DeleteImageActor();
+    DeleteMapToColorsFilter();
+    DeleteShiftScaleFilter();
+    m_SlicerImageDataToRender->Delete();
+    m_SlicerOutputImageData->Delete();
+
+  }
+  else if(m_DataType == VTK_RECTILINEAR_GRID)
+  {
+    DeleteRectilinearGridActor();
+    DeleteRectilinearGridMapper();
+  }
+
   m_Slicer->Delete();
-  m_SlicerOutputImageData->Delete();
-  m_SlicerImageDataToRender->Delete();
-  m_ImageMapToColors->Delete();
-  m_ImageShiftScale->Delete();
-  m_ImageActor->Delete();
   m_ColorLUT->Delete();
 }
 
@@ -162,46 +180,132 @@ void medPipeVolumeSliceNotInterpolated::SetSlice()
 void medPipeVolumeSliceNotInterpolated::UpdateSlice()
 //----------------------------------------------------------------------------
 {
+
+  if(m_DataType == VTK_IMAGE_DATA)
+  {
+    DeleteImageActor();
+    DeleteMapToColorsFilter();
+    DeleteShiftScaleFilter();
+  }
+  else if (m_DataType == VTK_RECTILINEAR_GRID)
+  {
+    DeleteRectilinearGridActor();
+    DeleteRectilinearGridMapper();
+  }
+
   // Update slicer pipeline
-  m_Slicer->SetSliceOrigin(m_Origin);
+  m_Slicer->SetOrigin(m_Origin);
   m_Slicer->SetSliceAxis(m_SliceAxis);
   m_Slicer->Modified();
   m_Slicer->Update();
 
-  // Update output image
-  UpdateImageToRender();
+  m_DataType = m_Slicer->GetOutputDataType();
 
-  // Update shift scale filter
-  UpdateShiftScaleFilter();
+  if (m_DataType == VTK_IMAGE_DATA)
+  {
+    // Update output image
+    UpdateImageToRender();
 
-  // Update color map filter
-  UpdateMapToColorsFilter();
+    // Update shift scale filter
+    CreateShiftScaleFilter();
 
-  // Update image actor
-  UpdateImageActor();
+    // Update color map filter
+    CreateMapToColorsFilter();
+
+    // Update image actor
+    CreateImageActor();
+  }
+  else if (m_DataType == VTK_RECTILINEAR_GRID)
+  {
+    m_SlicerOutputRectilinearGrid = m_Slicer->GetOutputRectilinearGrid();
+
+    // Update mapper
+    CreateRectilinearGridMapper();
+
+    // Update actor
+    CreateRectilinearGridActor();
+  }
 }
 
 //----------------------------------------------------------------------------
-void medPipeVolumeSliceNotInterpolated::UpdateImageActor()
+void medPipeVolumeSliceNotInterpolated::CreateRectilinearGridMapper()
+//----------------------------------------------------------------------------
+{
+  assert(m_SlicerOutputRectilinearGrid);
+  m_RectilinearGridMapper = vtkDataSetMapper::New();
+  m_RectilinearGridMapper->SetInput(m_SlicerOutputRectilinearGrid);
+  m_RectilinearGridMapper->SetLookupTable(m_VolumeLUT);
+  m_RectilinearGridMapper->ScalarVisibilityOn();
+  m_RectilinearGridMapper->SetScalarModeToUseCellData();
+  m_RectilinearGridMapper->SetUseLookupTableScalarRange(TRUE);
+  m_RectilinearGridMapper->Update();
+}
+
+//----------------------------------------------------------------------------
+void medPipeVolumeSliceNotInterpolated::DeleteRectilinearGridMapper()
+//----------------------------------------------------------------------------
+{
+  if(m_RectilinearGridMapper)
+  {
+    m_RectilinearGridMapper->Delete();
+    m_RectilinearGridMapper = NULL;
+  }
+}
+
+//----------------------------------------------------------------------------
+void medPipeVolumeSliceNotInterpolated::CreateRectilinearGridActor()
+//----------------------------------------------------------------------------
+{
+  assert(m_RectilinearGridMapper);
+  m_RectilinearGridActor = vtkActor::New();
+  m_RectilinearGridActor->SetMapper(m_RectilinearGridMapper);
+  m_RectilinearGridActor->GetProperty()->SetInterpolationToFlat();
+  m_RectilinearGridActor->Modified();
+  m_RenFront->AddActor(m_RectilinearGridActor);
+  m_RenFront->Modified();
+}
+
+//----------------------------------------------------------------------------
+void medPipeVolumeSliceNotInterpolated::DeleteRectilinearGridActor()
+//----------------------------------------------------------------------------
+{
+  if(m_RectilinearGridActor)
+  {
+    m_RenFront->RemoveActor(m_RectilinearGridActor);
+    m_RectilinearGridActor->Delete();
+    m_RectilinearGridActor = NULL;
+  }
+}
+//----------------------------------------------------------------------------
+void medPipeVolumeSliceNotInterpolated::CreateImageActor()
 //----------------------------------------------------------------------------
 {
   // Update image actor
-  // Is necessary to remove and add the actor to the rendere otherwise the visualisation may be incorrect
   if(!m_ImageMapToColors->GetOutput())
   {
     return;
-  }
-  if(m_ImageActor)
-  {
-    m_RenFront->RemoveProp(m_ImageActor);
-    m_ImageActor->Delete();
   }
   m_ImageActor = vtkImageActor::New();
   m_ImageActor->SetInput(m_ImageMapToColors->GetOutput());
   m_ImageActor->InterpolateOff();
   m_ImageActor->Modified();
   m_RenFront->AddProp(m_ImageActor);
+  m_RenFront->Modified();
 }
+
+//----------------------------------------------------------------------------
+void medPipeVolumeSliceNotInterpolated::DeleteImageActor()
+//----------------------------------------------------------------------------
+{
+  // Is necessary to remove and add the actor to the renderer otherwise the visualization may be incorrect
+  if(m_ImageActor)
+  {
+    m_RenFront->RemoveProp(m_ImageActor);
+    m_ImageActor->Delete();
+    m_ImageActor = NULL;
+  }
+}
+
 //----------------------------------------------------------------------------
 void medPipeVolumeSliceNotInterpolated::UpdateImageToRender()
 //----------------------------------------------------------------------------
@@ -225,7 +329,7 @@ void medPipeVolumeSliceNotInterpolated::UpdateImageToRender()
 }
 
 //----------------------------------------------------------------------------
-void medPipeVolumeSliceNotInterpolated::UpdateShiftScaleFilter()
+void medPipeVolumeSliceNotInterpolated::CreateShiftScaleFilter()
 //----------------------------------------------------------------------------
 {
   if(!m_SlicerImageDataToRender)
@@ -234,8 +338,6 @@ void medPipeVolumeSliceNotInterpolated::UpdateShiftScaleFilter()
   }
   // Shift scale of the image
   // Image actor can render only unsigned char images with scalar range 0 255
-  if(m_ImageShiftScale)
-    m_ImageShiftScale->Delete();
   m_ImageShiftScale = vtkImageShiftScale::New();
   m_ImageShiftScale->SetScale(255./(m_ScalarRange[1]-m_ScalarRange[0]));
   m_ImageShiftScale->SetShift(-m_ScalarRange[0]);
@@ -245,19 +347,40 @@ void medPipeVolumeSliceNotInterpolated::UpdateShiftScaleFilter()
 }
 
 //----------------------------------------------------------------------------
-void medPipeVolumeSliceNotInterpolated::UpdateMapToColorsFilter()
+void medPipeVolumeSliceNotInterpolated::DeleteShiftScaleFilter()
+//----------------------------------------------------------------------------
+{
+  if(m_ImageShiftScale)
+  {
+    m_ImageShiftScale->Delete();
+    m_ImageShiftScale = NULL;
+  }
+}
+
+//----------------------------------------------------------------------------
+void medPipeVolumeSliceNotInterpolated::CreateMapToColorsFilter()
 //----------------------------------------------------------------------------
 {
   if(!m_ImageShiftScale->GetOutput())
   {
     return;
   }
-  if(m_ImageMapToColors)
-    m_ImageMapToColors->Delete();
   m_ImageMapToColors = vtkImageMapToColors::New();
   m_ImageMapToColors->SetLookupTable(m_ColorLUT);
+  m_ImageMapToColors->PassAlphaToOutputOn();
   m_ImageMapToColors->SetInput(m_ImageShiftScale->GetOutput());
   m_ImageMapToColors->Update();
+}
+
+//----------------------------------------------------------------------------
+void medPipeVolumeSliceNotInterpolated::DeleteMapToColorsFilter()
+//----------------------------------------------------------------------------
+{
+  if(m_ImageMapToColors)
+  {
+    m_ImageMapToColors->Delete();
+    m_ImageMapToColors = NULL;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -284,12 +407,12 @@ void medPipeVolumeSliceNotInterpolated::CreateSlice()
   m_Origin[2] = m_Bounds[4];
   m_Origin[m_SliceAxis] = m_CurrentSlice;
 
-  // Create the slicer and set it's attributes
+  // Create the slicer and set its attributes
   m_Slicer = vtkMEDVolumeSlicerNotInterpolated::New();
   m_Slicer->SetInput(data);
   m_SlicerOutputImageData = vtkImageData::New();
   m_Slicer->SetOutput(m_SlicerOutputImageData);
-
+  
   UpdateSlice();
 }
 

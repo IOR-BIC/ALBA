@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewSliceNotInterpolated.cpp,v $
   Language:  C++
-  Date:      $Date: 2012-04-16 15:42:49 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2012-04-20 14:00:18 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Alberto Losi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -112,6 +112,9 @@ void medViewSliceNotInterpolated::VmeShow(mafNode *node, bool show)
       m_SliceSlider->SetRange(m_Bounds[m_SliceAxis * 2], m_Bounds[(m_SliceAxis * 2) + 1]);
       // Set the pipe lut
       m_PipeSlice->SetLut(m_ColorLUT);
+      m_PipeSlice->SetSlice(m_CurrentSlice,m_SliceAxis);
+      CameraReset();
+      CameraUpdate();
     }
     else
     {

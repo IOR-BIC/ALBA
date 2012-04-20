@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: vtkMEDVolumeSlicerNotInterpolated.h,v $
   Language:  C++
-  Date:      $Date: 2012-04-12 12:39:04 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2012-04-20 13:59:55 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Alberto Losi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,6 +16,9 @@
 #include "vtkImageData.h"
 #include "vtkMEDConfigure.h"
 #include "vtkDataSetToImageFilter.h"
+#include "vtkRectilinearGrid.h"
+
+class vtkDoubleArray;
 
 //----------------------------------------------------------------------------
 class VTK_vtkMED_EXPORT vtkMEDVolumeSlicerNotInterpolated : public vtkDataSetToImageFilter
@@ -41,13 +44,19 @@ public:
   inline void SetOutput(vtkImageData * data) {vtkImageSource::SetOutput(data);};
 
   /** Set the slice origin */
-  vtkSetVector3Macro(SliceOrigin,double);
+  vtkSetVector3Macro(Origin,double);
 
   /** Get the slice origin */
-  vtkGetVector3Macro(SliceOrigin,double);
+  vtkGetVector3Macro(Origin,double);
 
   /** Set the slice direction */
   vtkSetMacro(SliceAxis,int);
+
+  /** Get the rectilinear grid output */
+  vtkGetMacro(OutputRectilinearGrid,vtkRectilinearGrid*);
+
+  /** Get output data type */
+  vtkGetMacro(OutputDataType,int);
 
 protected:
 
@@ -69,13 +78,20 @@ protected:
    /** Create geometry for the slice. */
    virtual void ExecuteData(vtkImageData *output);
 
-  double SliceOrigin[3];            //< Origin of the slice
-  int SliceAxis;                    //< Axis on which slicing is performed (only "perpendicular" slicing is allowed)
-  int NumberOfComponents;           //< Number of scalar components
-  int BaseIndex;                    //< Starting point of the slice
-  int SliceDimensions[2];           //< 2D dimensions of the slice (in number of points)
-  int InputDimensions[3];           //< Input volume dimensions
-  double InputSpacing[3];           //< Input volume spacing
+  double Origin[3];                           //< Origin of the cutting plane
+  double SliceOrigin[2];                      //< Origin of the slice
+  int SliceAxis;                              //< Axis on which slicing is performed (only "perpendicular" slicing is allowed)
+  int NumberOfComponents;                     //< Number of scalar components
+  int BaseIndex;                              //< Starting point of the slice
+  int SliceDimensions[2];                     //< 2D dimensions of the slice (in number of points)
+  int InputDimensions[3];                     //< Input volume dimensions
+  double InputSpacing[3];                     //< Input volume spacing
+  double SliceSpacing[3];                     //< Output slice spacing
+  int InputDataType;                          //< Input data type
+  int OutputDataType;                         //< Output data type
+  vtkDoubleArray *CoordsXY[2];                //< X and Y coordinates of the slice if input is a rectilinear grid
+  vtkRectilinearGrid *OutputRectilinearGrid;  //< Rectilinear grid as output produced if the input is a vtkRectilinearGrid
+  
 private:
 
 

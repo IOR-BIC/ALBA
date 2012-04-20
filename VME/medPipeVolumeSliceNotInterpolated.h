@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeSliceNotInterpolated.h,v $
   Language:  C++
-  Date:      $Date: 2012-04-16 15:22:30 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2012-04-20 14:00:08 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Alberto Losi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,6 +24,9 @@ class vtkImageActor;
 class vtkImageMapToColors;
 class vtkImageShiftScale;
 class mafGUIFloatSlider;
+class vtkRectilinearGrid;
+class vtkDataSetMapper;
+class vtkActor;
 
 //----------------------------------------------------------------------------
 class MED_VME_EXPORT medPipeVolumeSliceNotInterpolated : public mafPipeSlice
@@ -74,22 +77,25 @@ protected:
 
   /** Create the GUI for the visual pipe that allow the user to change the pipe's parameters.*/
   virtual mafGUI * CreateGui();
-
   
-  int m_SliceAxis;                              //> Slicer direction
-  double m_Bounds[6];                           //> Input volume bounds
-  double m_CurrentSlice;                        //> Current slice coordinate
-  mafGUIFloatSlider *m_SliceSlider;             //> Slice coordinate slider
-  vtkLookupTable  *m_ColorLUT;                  //> Lookup table to display slice
-  vtkLookupTable *m_VolumeLUT;                  //> Input volume lookup table
-  vtkMEDVolumeSlicerNotInterpolated * m_Slicer; //> Not interpolated slicer
-  vtkImageData *m_SlicerOutputImageData;        //> Image data from the slicer
-  vtkImageData * m_SlicerImageDataToRender;     //> Image data to be rendered
-  vtkImageMapToColors *m_ImageMapToColors;      //> Filter that map colors on image data
-  vtkImageShiftScale *m_ImageShiftScale;        //> Filter that rescale image to be an unsigned char with scalar range from 0 to 255
-  vtkImageActor *m_ImageActor;                  //> Image actor to display image
-  bool m_ShowGui;                               //> Determine if pipe Gui is shown or not
-  double m_ScalarRange[2];                      //> Input scalar range
+  int m_SliceAxis;                                    //> Slicer direction
+  double m_Bounds[6];                                 //> Input volume bounds
+  double m_CurrentSlice;                              //> Current slice coordinate
+  mafGUIFloatSlider *m_SliceSlider;                   //> Slice coordinate slider
+  vtkLookupTable  *m_ColorLUT;                        //> Lookup table to display slice
+  vtkLookupTable *m_VolumeLUT;                        //> Input volume lookup table
+  vtkMEDVolumeSlicerNotInterpolated * m_Slicer;       //> Not interpolated slicer
+  vtkImageData *m_SlicerOutputImageData;              //> Image data from the slicer
+  vtkImageData * m_SlicerImageDataToRender;           //> Image data to be rendered
+  vtkImageMapToColors *m_ImageMapToColors;            //> Filter that map colors on image data
+  vtkImageShiftScale *m_ImageShiftScale;              //> Filter that rescale image to be an unsigned char with scalar range from 0 to 255
+  vtkImageActor *m_ImageActor;                        //> Image actor to display image
+  bool m_ShowGui;                                     //> Determine if pipe Gui is shown or not
+  double m_ScalarRange[2];                            //> Input scalar range
+  vtkRectilinearGrid * m_SlicerOutputRectilinearGrid; //> Slicer rectilinear grid output(used if input is a vtkRectilinearGrid)
+  vtkDataSetMapper *m_RectilinearGridMapper;          //> Rectilinear grid mapper (used if input is a vtkRectilinearGrid)
+  vtkActor *m_RectilinearGridActor;                   //> Rectilinear grid actor (used if input is a vtkRectilinearGrid)
+  int m_DataType;                                     //> Specify the rendered data type
 
 private:
 
@@ -108,17 +114,38 @@ private:
   /** Set slice origin the current parameters */
   void SetOrigin();
 
-  /** Update image actor in front renderer */
-  void UpdateImageActor();
-
   /** Update intermediate image to be rendered */
   void UpdateImageToRender();
 
-  /** Update shift scale filter */
-  void UpdateShiftScaleFilter();
+  /** Create image actor in front renderer */
+  void CreateImageActor();
 
-  /** Update map to colors filter */
-  void UpdateMapToColorsFilter();
+  /** Delete image actor in front renderer */
+  void DeleteImageActor();
+
+  /** Create shift scale filter */
+  void CreateShiftScaleFilter();
+
+  /** Delete shift scale filter */
+  void DeleteShiftScaleFilter();
+
+  /** Create map to colors filter */
+  void CreateMapToColorsFilter();
+
+  /** Delete map to colors filter */
+  void DeleteMapToColorsFilter();
+
+  /** Create rectilinear grid mapper */
+  void CreateRectilinearGridMapper();
+
+  /** Delete rectilinear grid mapper */
+  void DeleteRectilinearGridMapper();
+
+  /** Create rectilinear grid actor */
+  void CreateRectilinearGridActor();
+
+  /** Delete rectilinear grid actor */
+  void DeleteRectilinearGridActor();
 
 };
 
