@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medvmecomputewrapping.cpp,v $
 Language:  C++
-Date:      $Date: 2012-04-20 16:00:20 $
-Version:   $Revision: 1.1.2.30 $
+Date:      $Date: 2012-04-20 16:01:53 $
+Version:   $Revision: 1.1.2.31 $
 Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -141,7 +141,7 @@ medVMEComputeWrapping::medVMEComputeWrapping()
 	State : 'Exp'
 	Lines : +7 -3
 	CommitID : 'lTvDMUOCgvfspl0w'
-	Description :
+	Description : 
 	SHA: vtk filter fixing medVMEComputeWrapping segment problems
 	----------------------------
 
