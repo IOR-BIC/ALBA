@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medvmecomputewrapping.cpp,v $
 Language:  C++
-Date:      $Date: 2012-04-10 17:11:25 $
-Version:   $Revision: 1.1.2.29 $
+Date:      $Date: 2012-04-20 16:00:20 $
+Version:   $Revision: 1.1.2.30 $
 Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -124,9 +124,36 @@ medVMEComputeWrapping::medVMEComputeWrapping()
 	mafDataPipeCustom *dpipe = mafDataPipeCustom::New();
 	dpipe->SetDependOnAbsPose(true);
 	SetDataPipe(dpipe);
-	m_LinePatcher->SetInput(m_Goniometer->GetOutput());
-	dpipe->SetInput(m_LinePatcher->GetOutput());
+	
+	//----------------------------
+	// Commented line (roll back to )since it reopens Bug 2594: 
+	// http://bugzilla.b3c.it/show_bug.cgi?id=2594
+	//
+	// Roll back to 1.1.2.28
+	//
+	/* 
 
+	This commit was reverted:
+	----------------------------
+	Revision : 1.1.2.29
+	Date : 2012/4/10 17:11:25
+	Author : 'josef'
+	State : 'Exp'
+	Lines : +7 -3
+	CommitID : 'lTvDMUOCgvfspl0w'
+	Description :
+	SHA: vtk filter fixing medVMEComputeWrapping segment problems
+	----------------------------
+
+	In particular action line visualization via cylinder is crashing and there are also issues
+	on line visualization
+
+	*/
+	// m_LinePatcher->SetInput(m_Goniometer->GetOutput());
+	// dpipe->SetInput(m_LinePatcher->GetOutput());
+	//-----------------------------
+
+	dpipe->SetInput(m_Goniometer->GetOutput());
 }
 //-------------------------------------------------------------------------
 medVMEComputeWrapping::~medVMEComputeWrapping()
