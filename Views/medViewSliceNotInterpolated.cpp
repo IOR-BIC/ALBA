@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewSliceNotInterpolated.cpp,v $
   Language:  C++
-  Date:      $Date: 2012-04-20 14:00:18 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2012-04-26 12:53:59 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Alberto Losi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,17 +29,16 @@ mafCxxTypeMacro(medViewSliceNotInterpolated);
 
 //----------------------------------------------------------------------------
 medViewSliceNotInterpolated::medViewSliceNotInterpolated(wxString label /* = "View Slice not interpolated" */, bool show_ruler /* = false */)
-:medViewCompoundWindowing(label,1,1)
+:mafViewVTK(label,CAMERA_CT)
 //----------------------------------------------------------------------------
 {
   // Initialize parameters
-  m_ViewSlice = NULL;
+/*  m_ViewSlice = NULL;*/
   m_Bounds[0] = m_Bounds[1] = m_Bounds[2] = m_Bounds[3] = m_Bounds[4] = m_Bounds[5] = .0;
   m_SliceAxis = 2;
   m_CurrentSlice = 0;
   m_SliceSlider = NULL;
   m_ColorLUT = NULL;
-  m_PipeSlice = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -52,11 +51,7 @@ medViewSliceNotInterpolated::~medViewSliceNotInterpolated()
 void medViewSliceNotInterpolated::PackageView()
 //----------------------------------------------------------------------------
 {
-  // Create child slice view
-  m_ViewSlice = new mafViewVTK("",CAMERA_CT);
-
-  m_ViewSlice->PlugVisualPipe("mafVMEVolumeGray", "medPipeVolumeSliceNotInterpolated", MUTEX);
-  PlugChildView(m_ViewSlice);
+  PlugVisualPipe("mafVMEVolumeGray", "medPipeVolumeSliceNotInterpolated");
 }
 
 //----------------------------------------------------------------------------
@@ -68,11 +63,7 @@ mafView *medViewSliceNotInterpolated::Copy(mafObserver *Listener, bool lightCopy
   medViewSliceNotInterpolated *v = new medViewSliceNotInterpolated(m_Label);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
-  for (int i=0;i<m_PluggedChildViewList.size();i++)
-  {
-    v->m_PluggedChildViewList.push_back(m_PluggedChildViewList[i]->Copy(this));
-  }
-  v->m_NumOfPluggedChildren = m_NumOfPluggedChildren;
+  v->PlugVisualPipe("mafVMEVolumeGray", "medPipeVolumeSliceNotInterpolated");
   v->Create();
   return v;
 }
@@ -104,22 +95,23 @@ void medViewSliceNotInterpolated::VmeShow(mafNode *node, bool show)
     if(show)
     {
       // Get the volume visual pipe
-      m_PipeSlice = medPipeVolumeSliceNotInterpolated::SafeDownCast(m_ChildViewList[0]->GetNodePipe(node));
+      m_PipesSlice[node] = medPipeVolumeSliceNotInterpolated::SafeDownCast(this->GetNodePipe(node));
+      assert(m_PipesSlice[node]);
       // Get the vme parameters (bounds and lut)
       GetVolumeParameters(volume);
       // Update gui
       m_LutSwatch->SetLut(m_ColorLUT);
       m_SliceSlider->SetRange(m_Bounds[m_SliceAxis * 2], m_Bounds[(m_SliceAxis * 2) + 1]);
       // Set the pipe lut
-      m_PipeSlice->SetLut(m_ColorLUT);
-      m_PipeSlice->SetSlice(m_CurrentSlice,m_SliceAxis);
+      m_PipesSlice[node]->SetLut(m_ColorLUT);
+      m_PipesSlice[node]->SetSlice(m_CurrentSlice,m_SliceAxis);
       CameraReset();
       CameraUpdate();
     }
     else
     {
       // De-reference the pipe
-      m_PipeSlice = NULL;
+      m_PipesSlice[node] = NULL;
     }
     EnableGuiWidgets(show);
   }
@@ -161,32 +153,33 @@ void medViewSliceNotInterpolated::OnEvent(mafEventBase * event)
     case ID_LUT:
       {
         // Set the pipe lut
-        m_PipeSlice->SetLut(m_ColorLUT);
+        for(std::map<mafNode*,medPipeVolumeSliceNotInterpolated*>::iterator it = m_PipesSlice.begin(); it != m_PipesSlice.end(); it++)
+        {
+          it->second->SetLut(m_ColorLUT);
+        }
         CameraUpdate();
       } break;
     case ID_AXIS:
       {
-        // Update parameters
-        m_CurrentSlice = m_Bounds[m_SliceAxis * 2];
-        m_SliceSlider->SetRange(m_Bounds[m_SliceAxis * 2], m_Bounds[(m_SliceAxis * 2) + 1]);
-        m_Gui->Update();
-
-        // Update the pipe
-        m_PipeSlice->SetSlice(m_CurrentSlice,m_SliceAxis);
-        CameraReset();
-        CameraUpdate();
+        SetSliceAxis();
       } break;
     case ID_SLICE:
       {
         // Update the pipe
-        m_PipeSlice->SetSlice(m_CurrentSlice,m_SliceAxis);
+        for(std::map<mafNode*,medPipeVolumeSliceNotInterpolated*>::iterator it = m_PipesSlice.begin(); it != m_PipesSlice.end(); it++)
+        {
+          it->second->SetSlice(m_CurrentSlice,m_SliceAxis);
+        }
         CameraUpdate();
       } break;
     case ID_RANGE_MODIFIED:
       {
         Superclass::OnEvent(event);
         // Set the pipe lut
-        m_PipeSlice->SetLut(m_ColorLUT);
+        for(std::map<mafNode*,medPipeVolumeSliceNotInterpolated*>::iterator it = m_PipesSlice.begin(); it != m_PipesSlice.end(); it++)
+        {
+          it->second->SetLut(m_ColorLUT);
+        }
       }
     default:
       {
@@ -195,4 +188,63 @@ void medViewSliceNotInterpolated::OnEvent(mafEventBase * event)
     }
   }
   mafEventMacro(*event);
+}
+
+//----------------------------------------------------------------------------
+void medViewSliceNotInterpolated::SetSliceAxis(int axis)
+//----------------------------------------------------------------------------
+{
+  m_SliceAxis = axis;
+  SetSliceAxis();
+}
+
+//----------------------------------------------------------------------------
+void medViewSliceNotInterpolated::SetSliceAxis()
+//----------------------------------------------------------------------------
+{
+  // Update parameters
+  m_CurrentSlice = m_Bounds[m_SliceAxis * 2];
+  m_SliceSlider->SetRange(m_Bounds[m_SliceAxis * 2], m_Bounds[(m_SliceAxis * 2) + 1]);
+  m_Gui->Update();
+
+  UpdateSlice();
+}
+
+//----------------------------------------------------------------------------
+void medViewSliceNotInterpolated::SetSlice(double position)
+//----------------------------------------------------------------------------
+{
+  assert(position >= m_Bounds[m_SliceAxis * 2] && position <= m_Bounds[(m_SliceAxis * 2) + 1]);
+
+  // Update parameters
+  m_CurrentSlice = position;
+  m_Gui->Update();
+
+  UpdateSlice();
+}
+
+//----------------------------------------------------------------------------
+void medViewSliceNotInterpolated::SetSlice(double origin[3])
+//----------------------------------------------------------------------------
+{
+  assert(origin[m_SliceAxis] >= m_Bounds[m_SliceAxis * 2] && origin[m_SliceAxis] <= m_Bounds[(m_SliceAxis * 2) + 1]);
+
+  // Update parameters
+  m_CurrentSlice = origin[m_SliceAxis];
+  m_Gui->Update();
+
+  UpdateSlice();
+}
+
+//----------------------------------------------------------------------------
+void medViewSliceNotInterpolated::UpdateSlice()
+//----------------------------------------------------------------------------
+{
+  // Update the pipe
+  for(std::map<mafNode*,medPipeVolumeSliceNotInterpolated*>::iterator it = m_PipesSlice.begin(); it != m_PipesSlice.end(); it++)
+  {
+    it->second->SetSlice(m_CurrentSlice,m_SliceAxis);
+  }
+  CameraReset();
+  CameraUpdate();
 }
