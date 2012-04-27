@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewSliceNotInterpolated.cpp,v $
   Language:  C++
-  Date:      $Date: 2012-04-26 12:53:59 $
-  Version:   $Revision: 1.1.2.4 $
+  Date:      $Date: 2012-04-27 08:17:59 $
+  Version:   $Revision: 1.1.2.5 $
   Authors:   Alberto Losi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -111,7 +111,7 @@ void medViewSliceNotInterpolated::VmeShow(mafNode *node, bool show)
     else
     {
       // De-reference the pipe
-      m_PipesSlice[node] = NULL;
+      m_PipesSlice.erase(node);
     }
     EnableGuiWidgets(show);
   }
