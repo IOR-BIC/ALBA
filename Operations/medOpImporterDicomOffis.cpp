@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2012-04-04 13:20:10 $
-Version:   $Revision: 1.1.2.159 $
+Date:      $Date: 2012-04-27 15:41:46 $
+Version:   $Revision: 1.1.2.160 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -48,6 +48,7 @@ MafMedical is partially based on OpenMAF.
 
 #include "wx/listimpl.cpp"
 #include "wx/busyinfo.h"
+#include "wx/choicdlg.h"
 
 #include "medOpImporterDicomOffis.h"
 
@@ -3181,12 +3182,44 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 			dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[1],1);
 			dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[2],2);
 
-			dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient,dcmImageOrientationPatient[0],0);
-			dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient,dcmImageOrientationPatient[1],1);
-			dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient,dcmImageOrientationPatient[2],2);
-			dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient,dcmImageOrientationPatient[3],3);
-			dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient,dcmImageOrientationPatient[4],4);
-			dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient,dcmImageOrientationPatient[5],5);
+			//Position Check
+      if(dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[2]).bad())
+      {
+        std::ostringstream stringStream;
+        stringStream << "Cannot read dicom tag DCM_ImagePositionPatient. Asking..."<< std::endl;          
+        mafLogMessage(stringStream.str().c_str());
+        
+        wxString choices[] = {"Skip Image", "Set Default position"};
+        
+        int img_pos_result = wxGetSingleChoiceIndex("Cannot read dicom tag DCM_ImagePositionPatient.\n","",2, choices);
+      
+        if (img_pos_result == -1) //cancel
+        {
+          delete busyInfo;
+          mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
+          return false;
+        }
+        else if (img_pos_result == 0) //skip
+        {
+          errorOccurred = true;
+          sliceNum--;
+          continue;
+        }
+        else //default position
+        {
+          dcmImagePositionPatient[0] = 0.0;
+          dcmImagePositionPatient[1] = 0.0;
+          dcmImagePositionPatient[2] = 0.0;
+        }
+       
+      } 
+
+      dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient,dcmImageOrientationPatient[0],0);
+      dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient,dcmImageOrientationPatient[1],1);
+      dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient,dcmImageOrientationPatient[2],2);
+      dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient,dcmImageOrientationPatient[3],3);
+      dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient,dcmImageOrientationPatient[4],4);
+      dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient,dcmImageOrientationPatient[5],5);
 
 			bool currentSliceIsRotated = false;
 			currentSliceIsRotated = IsRotated(dcmImageOrientationPatient);
@@ -3435,33 +3468,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 					medDicomSeriesSliceList *dicomSeries = new medDicomSeriesSliceList;
 					m_DicomReaderModality=-1;
 
-					if(dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[2]).bad())
-					{
-						std::ostringstream stringStream;
-						stringStream << "Cannot read dicom tag DCM_ImagePositionPatient. Exiting"<< std::endl;          
-						mafLogMessage(stringStream.str().c_str());
-
-            img_pos_result = wxMessageBox(_("Cannot read dicom tag DCM_ImagePositionPatient. Would you like to use default position"), "", wxYES_NO);
-
-            if (img_pos_result == wxNO)
-            {
-              delete busyInfo;
-              return false;
-            }
-            else
-            {
-              dcmImagePositionPatient[0] = 0.0;
-              dcmImagePositionPatient[1] = 0.0;
-              dcmImagePositionPatient[2] = 0.0;
-            }
-					} 
-					else
-					{
-						dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[0],0);
-						dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[1],1);
-						dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[2],2);
-					}
-
+				
 					lastZPos = dcmImagePositionPatient[2];
 					dicomSliceVTKImageData->SetOrigin(dcmImagePositionPatient);
 					dicomSliceVTKImageData->Update();
@@ -3511,32 +3518,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 						m_SeriesIDContainsRotationsMap[seriesId] = true;
 					}
 
-					if(dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[2]).bad())
-					{
-            cppDEL(busyInfo);
-						std::ostringstream stringStream;
-						stringStream << "Cannot read dicom tag DCM_ImagePositionPatient. Exiting"<< std::endl;          
-						mafLogMessage(stringStream.str().c_str());
-            
-            if (img_pos_result == wxNO) // Added by losi to avoid exiting with series that don't have image position
-            {
-              delete busyInfo;
-              return false;
-            }
-            else
-            {
-              dcmImagePositionPatient[0] = 0.0;
-              dcmImagePositionPatient[1] = 0.0;
-              dcmImagePositionPatient[2] = 0.0;
-            }
-					} 
-					else
-					{
-						dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[0],0);
-						dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[1],1);
-						dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[2],2);
-					}
-
+					
 					dicomSliceVTKImageData->SetOrigin(dcmImagePositionPatient);
 					dicomSliceVTKImageData->Update();
 
@@ -3623,20 +3605,6 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 
 					m_DicomReaderModality=-1;
 
-					if(dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[2]).bad())
-					{
-            cppDEL(busyInfo);
-						std::ostringstream stringStream;
-						stringStream << "Cannot read dicom tag DCM_ImagePositionPatient. Exiting"<< std::endl;          
-						mafLogMessage(stringStream.str().c_str());
-						return false;
-					} 
-					else
-					{
-						dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[0],0);
-						dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[1],1);
-						dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[2],2);
-					}
 
 					dicomSliceVTKImageData->SetOrigin(dcmImagePositionPatient);
 					dicomSliceVTKImageData->Update();
@@ -3717,20 +3685,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 						m_SeriesIDContainsRotationsMap[seriesId] = true;
 					}
 
-					if(dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[2]).bad())
-					{
-            cppDEL(busyInfo);
-						std::ostringstream stringStream;
-						stringStream << "Cannot read dicom tag DCM_ImagePositionPatient. Exiting"<< std::endl;          
-						mafLogMessage(stringStream.str().c_str());
-						return false;
-					} 
-					else
-					{
-						dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[0],0);
-						dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[1],1);
-						dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[2],2);
-					}
+					
 
 					dicomSliceVTKImageData->SetOrigin(dcmImagePositionPatient);
 					dicomSliceVTKImageData->Update();
