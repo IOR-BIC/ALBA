@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2012-04-27 15:41:46 $
-Version:   $Revision: 1.1.2.160 $
+Date:      $Date: 2012-04-27 16:15:14 $
+Version:   $Revision: 1.1.2.161 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -48,7 +48,6 @@ MafMedical is partially based on OpenMAF.
 
 #include "wx/listimpl.cpp"
 #include "wx/busyinfo.h"
-#include "wx/choicdlg.h"
 
 #include "medOpImporterDicomOffis.h"
 
@@ -3182,17 +3181,18 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 			dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[1],1);
 			dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[2],2);
 
-			//Position Check
+      //Position Check
+      int useDefaultPos=false;
       if(dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[2]).bad())
       {
         std::ostringstream stringStream;
         stringStream << "Cannot read dicom tag DCM_ImagePositionPatient. Asking..."<< std::endl;          
         mafLogMessage(stringStream.str().c_str());
-        
+
         wxString choices[] = {"Skip Image", "Set Default position"};
-        
+
         int img_pos_result = wxGetSingleChoiceIndex("Cannot read dicom tag DCM_ImagePositionPatient.\n","",2, choices);
-      
+
         if (img_pos_result == -1) //cancel
         {
           delete busyInfo;
@@ -3207,19 +3207,15 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
         }
         else //default position
         {
-          dcmImagePositionPatient[0] = 0.0;
-          dcmImagePositionPatient[1] = 0.0;
-          dcmImagePositionPatient[2] = 0.0;
+          useDefaultPos=true;
         }
-       
-      } 
-
-      dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient,dcmImageOrientationPatient[0],0);
-      dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient,dcmImageOrientationPatient[1],1);
-      dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient,dcmImageOrientationPatient[2],2);
-      dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient,dcmImageOrientationPatient[3],3);
-      dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient,dcmImageOrientationPatient[4],4);
-      dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient,dcmImageOrientationPatient[5],5);
+      }
+			dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient,dcmImageOrientationPatient[0],0);
+			dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient,dcmImageOrientationPatient[1],1);
+			dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient,dcmImageOrientationPatient[2],2);
+			dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient,dcmImageOrientationPatient[3],3);
+			dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient,dcmImageOrientationPatient[4],4);
+			dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient,dcmImageOrientationPatient[5],5);
 
 			bool currentSliceIsRotated = false;
 			currentSliceIsRotated = IsRotated(dcmImageOrientationPatient);
@@ -3468,7 +3464,19 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 					medDicomSeriesSliceList *dicomSeries = new medDicomSeriesSliceList;
 					m_DicomReaderModality=-1;
 
-				
+					if(useDefaultPos)
+					{
+              dcmImagePositionPatient[0] = 0.0;
+              dcmImagePositionPatient[1] = 0.0;
+              dcmImagePositionPatient[2] = 0.0;
+					} 
+					else
+					{
+						dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[0],0);
+						dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[1],1);
+						dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[2],2);
+					}
+
 					lastZPos = dcmImagePositionPatient[2];
 					dicomSliceVTKImageData->SetOrigin(dcmImagePositionPatient);
 					dicomSliceVTKImageData->Update();
@@ -3518,7 +3526,19 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 						m_SeriesIDContainsRotationsMap[seriesId] = true;
 					}
 
-					
+          if(useDefaultPos)
+          {
+            dcmImagePositionPatient[0] = 0.0;
+            dcmImagePositionPatient[1] = 0.0;
+            dcmImagePositionPatient[2] = 0.0;
+          } 
+          else
+          {
+            dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[0],0);
+            dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[1],1);
+            dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[2],2);
+          }
+
 					dicomSliceVTKImageData->SetOrigin(dcmImagePositionPatient);
 					dicomSliceVTKImageData->Update();
 
@@ -3605,6 +3625,18 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 
 					m_DicomReaderModality=-1;
 
+          if(useDefaultPos)
+          {
+            dcmImagePositionPatient[0] = 0.0;
+            dcmImagePositionPatient[1] = 0.0;
+            dcmImagePositionPatient[2] = 0.0;
+          } 
+          else
+          {
+            dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[0],0);
+            dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[1],1);
+            dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[2],2);
+          }
 
 					dicomSliceVTKImageData->SetOrigin(dcmImagePositionPatient);
 					dicomSliceVTKImageData->Update();
@@ -3685,7 +3717,18 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 						m_SeriesIDContainsRotationsMap[seriesId] = true;
 					}
 
-					
+          if(useDefaultPos)
+          {
+            dcmImagePositionPatient[0] = 0.0;
+            dcmImagePositionPatient[1] = 0.0;
+            dcmImagePositionPatient[2] = 0.0;
+          } 
+          else
+          {
+            dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[0],0);
+            dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[1],1);
+            dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[2],2);
+          }
 
 					dicomSliceVTKImageData->SetOrigin(dcmImagePositionPatient);
 					dicomSliceVTKImageData->Update();
