@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewSliceNotInterpolated.cpp,v $
   Language:  C++
-  Date:      $Date: 2012-04-27 08:17:59 $
-  Version:   $Revision: 1.1.2.5 $
+  Date:      $Date: 2012-04-30 15:44:00 $
+  Version:   $Revision: 1.1.2.6 $
   Authors:   Alberto Losi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,12 +24,13 @@
 #include "vtkLookupTable.h"
 #include "mafGUILutSwatch.h"
 #include "wx\sizer.h"
+#include "vtkMEDVolumeSlicerNotInterpolated.h"
 
 mafCxxTypeMacro(medViewSliceNotInterpolated);
 
 //----------------------------------------------------------------------------
 medViewSliceNotInterpolated::medViewSliceNotInterpolated(wxString label /* = "View Slice not interpolated" */, bool show_ruler /* = false */)
-:mafViewVTK(label,CAMERA_CT)
+:mafViewVTK(label,CAMERA_OS_Z)
 //----------------------------------------------------------------------------
 {
   // Initialize parameters
@@ -162,6 +163,24 @@ void medViewSliceNotInterpolated::OnEvent(mafEventBase * event)
     case ID_AXIS:
       {
         SetSliceAxis();
+        switch(m_SliceAxis)
+        {
+          case vtkMEDVolumeSlicerNotInterpolated::SLICE_X:
+            {
+              m_CameraPositionId = CAMERA_OS_X;
+            } break;
+          case vtkMEDVolumeSlicerNotInterpolated::SLICE_Y:
+            {
+              m_CameraPositionId = CAMERA_OS_Y;
+            } break;
+          case vtkMEDVolumeSlicerNotInterpolated::SLICE_Z:
+            {
+              m_CameraPositionId = CAMERA_OS_Z;
+            } break;
+        }
+        CameraSet(m_CameraPositionId);
+        CameraReset();
+        CameraUpdate();
       } break;
     case ID_SLICE:
       {
