@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeSliceNotInterpolated.cpp,v $
   Language:  C++
-  Date:      $Date: 2012-04-20 14:00:08 $
-  Version:   $Revision: 1.1.2.5 $
+  Date:      $Date: 2012-04-30 07:57:24 $
+  Version:   $Revision: 1.1.2.6 $
   Authors:   Alberto Losi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -38,6 +38,7 @@
 #include "vtkActor.h"
 #include "vtkProperty.h"
 #include "mafGUIFloatSlider.h"
+#include "vtkMAFAssembly.h"
 
 mafCxxTypeMacro(medPipeVolumeSliceNotInterpolated);
 
@@ -261,8 +262,8 @@ void medPipeVolumeSliceNotInterpolated::CreateRectilinearGridActor()
   m_RectilinearGridActor->SetMapper(m_RectilinearGridMapper);
   m_RectilinearGridActor->GetProperty()->SetInterpolationToFlat();
   m_RectilinearGridActor->Modified();
-  m_RenFront->AddActor(m_RectilinearGridActor);
-  m_RenFront->Modified();
+  m_AssemblyFront->AddPart(m_RectilinearGridActor);
+  m_AssemblyFront->Modified();
 }
 
 //----------------------------------------------------------------------------
