@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeSliceNotInterpolated.h,v $
   Language:  C++
-  Date:      $Date: 2012-04-20 14:00:08 $
-  Version:   $Revision: 1.1.2.4 $
+  Date:      $Date: 2012-04-30 09:07:06 $
+  Version:   $Revision: 1.1.2.5 $
   Authors:   Alberto Losi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -27,6 +27,7 @@ class mafGUIFloatSlider;
 class vtkRectilinearGrid;
 class vtkDataSetMapper;
 class vtkActor;
+class vtkPolyData;
 
 //----------------------------------------------------------------------------
 class MED_VME_EXPORT medPipeVolumeSliceNotInterpolated : public mafPipeSlice
@@ -96,6 +97,9 @@ protected:
   vtkDataSetMapper *m_RectilinearGridMapper;          //> Rectilinear grid mapper (used if input is a vtkRectilinearGrid)
   vtkActor *m_RectilinearGridActor;                   //> Rectilinear grid actor (used if input is a vtkRectilinearGrid)
   int m_DataType;                                     //> Specify the rendered data type
+  vtkActor *m_ImageDummyActor;                        //> Dummy actor to allow picking on image data
+  vtkPolyDataMapper *m_ImageDummyMapper;              //> Mapper for dummy data to allow picking
+  vtkPolyData *m_ImageDummyData;                      //> Dummy data (plane of the image) to allow picking
 
 private:
 
@@ -146,6 +150,24 @@ private:
 
   /** Delete rectilinear grid actor */
   void DeleteRectilinearGridActor();
+
+  /** Create image plane data */
+  void CreateImageDummyData();
+
+  /** Delete image plane data */
+  void DeleteImageDummyData();
+
+  /** Create rimage dummy mapper */
+  void CreateImageDummyMapper();
+
+  /** Delete image dummy mapper */
+  void DeleteImageDummyMapper();
+
+  /** Create image dummy actor */
+  void CreateImageDummyActor();
+
+  /** Delete image dummy actor */
+  void DeleteImageDummyActor();
 
 };
 

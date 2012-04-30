@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeSliceNotInterpolated.cpp,v $
   Language:  C++
-  Date:      $Date: 2012-04-30 07:57:24 $
-  Version:   $Revision: 1.1.2.6 $
+  Date:      $Date: 2012-04-30 09:07:06 $
+  Version:   $Revision: 1.1.2.7 $
   Authors:   Alberto Losi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -39,6 +39,10 @@
 #include "vtkProperty.h"
 #include "mafGUIFloatSlider.h"
 #include "vtkMAFAssembly.h"
+#include "vtkPolyData.h"
+#include "vtkPolyDataMapper.h"
+#include "vtkPoints.h"
+#include "vtkCellArray.h"
 
 mafCxxTypeMacro(medPipeVolumeSliceNotInterpolated);
 
@@ -70,6 +74,9 @@ medPipeVolumeSliceNotInterpolated::medPipeVolumeSliceNotInterpolated()
   m_RectilinearGridMapper = NULL;
   m_RectilinearGridActor = NULL;
   m_DataType = VTK_IMAGE_DATA;
+  m_ImageDummyData = NULL;
+  m_ImageDummyMapper = NULL;
+  m_ImageDummyActor = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -81,6 +88,9 @@ medPipeVolumeSliceNotInterpolated::~medPipeVolumeSliceNotInterpolated()
 
   if (m_DataType == VTK_IMAGE_DATA)
   {
+    DeleteImageDummyActor();
+    DeleteImageDummyMapper();
+    DeleteImageDummyData();
     DeleteImageActor();
     DeleteMapToColorsFilter();
     DeleteShiftScaleFilter();
@@ -181,9 +191,11 @@ void medPipeVolumeSliceNotInterpolated::SetSlice()
 void medPipeVolumeSliceNotInterpolated::UpdateSlice()
 //----------------------------------------------------------------------------
 {
-
   if(m_DataType == VTK_IMAGE_DATA)
   {
+    DeleteImageDummyActor();
+    DeleteImageDummyMapper();
+    DeleteImageDummyData();
     DeleteImageActor();
     DeleteMapToColorsFilter();
     DeleteShiftScaleFilter();
@@ -215,6 +227,12 @@ void medPipeVolumeSliceNotInterpolated::UpdateSlice()
 
     // Update image actor
     CreateImageActor();
+
+    CreateImageDummyData();
+
+    CreateImageDummyMapper();
+    
+    CreateImageDummyActor();
   }
   else if (m_DataType == VTK_RECTILINEAR_GRID)
   {
@@ -272,7 +290,8 @@ void medPipeVolumeSliceNotInterpolated::DeleteRectilinearGridActor()
 {
   if(m_RectilinearGridActor)
   {
-    m_RenFront->RemoveActor(m_RectilinearGridActor);
+    m_AssemblyFront->RemovePart(m_RectilinearGridActor);
+    m_AssemblyFront->Modified();
     m_RectilinearGridActor->Delete();
     m_RectilinearGridActor = NULL;
   }
@@ -292,6 +311,107 @@ void medPipeVolumeSliceNotInterpolated::CreateImageActor()
   m_ImageActor->Modified();
   m_RenFront->AddProp(m_ImageActor);
   m_RenFront->Modified();
+}
+
+//----------------------------------------------------------------------------
+void medPipeVolumeSliceNotInterpolated::CreateImageDummyData()
+//----------------------------------------------------------------------------
+{
+  // Update image actor
+  if(!m_ImageMapToColors->GetOutput())
+  {
+    return;
+  }
+  double bounds[6];
+
+  m_ImageMapToColors->GetOutput()->GetBounds(bounds);
+
+  m_ImageDummyData = vtkPolyData::New();
+
+  vtkPoints *pts = vtkPoints::New();
+  vtkCellArray *polys = vtkCellArray::New();
+
+  pts->InsertNextPoint(bounds[0],bounds[2],bounds[4] + 0.01);
+  pts->InsertNextPoint(bounds[1],bounds[2],bounds[4] + 0.01);
+  pts->InsertNextPoint(bounds[1],bounds[3],bounds[4] + 0.01);
+  pts->InsertNextPoint(bounds[0],bounds[3],bounds[4] + 0.01);
+
+  polys->InsertNextCell(4);
+  for(int i = 0; i < 4; i++)
+  {
+    polys->InsertCellPoint(i);
+  }
+
+  m_ImageDummyData->SetPoints(pts);
+  m_ImageDummyData->SetPolys(polys);
+  m_ImageDummyData->Modified();
+  m_ImageDummyData->Update();
+
+  pts->Delete();
+  polys->Delete();
+}
+//----------------------------------------------------------------------------
+void medPipeVolumeSliceNotInterpolated::DeleteImageDummyData()
+//----------------------------------------------------------------------------
+{
+  if(m_ImageDummyData)
+  {
+    m_AssemblyFront->RemovePart(m_ImageDummyActor);
+    m_AssemblyFront->Modified();
+    m_ImageDummyData->Delete();
+    m_ImageDummyData = NULL;
+  }
+}
+//----------------------------------------------------------------------------
+void medPipeVolumeSliceNotInterpolated::CreateImageDummyMapper()
+//----------------------------------------------------------------------------
+{
+  if(!m_ImageDummyData)
+  {
+    return;
+  }
+  m_ImageDummyMapper = vtkPolyDataMapper::New();
+  m_ImageDummyMapper->SetInput(m_ImageDummyData);
+  m_ImageDummyMapper->Update();
+}
+
+//----------------------------------------------------------------------------
+void medPipeVolumeSliceNotInterpolated::DeleteImageDummyMapper()
+//----------------------------------------------------------------------------
+{
+  if(m_RectilinearGridMapper)
+  {
+    m_RectilinearGridMapper->Delete();
+    m_RectilinearGridMapper = NULL;
+  }
+}
+
+//----------------------------------------------------------------------------
+void medPipeVolumeSliceNotInterpolated::CreateImageDummyActor()
+//----------------------------------------------------------------------------
+{
+  if(!m_ImageDummyMapper)
+  {
+    return;
+  }
+  m_ImageDummyActor = vtkActor::New();
+  m_ImageDummyActor->SetMapper(m_ImageDummyMapper);
+  m_ImageDummyActor->Modified();
+  m_AssemblyFront->AddPart(m_ImageDummyActor);
+  m_AssemblyFront->Modified();
+}
+
+//----------------------------------------------------------------------------
+void medPipeVolumeSliceNotInterpolated::DeleteImageDummyActor()
+//----------------------------------------------------------------------------
+{
+  if(m_ImageDummyActor)
+  {
+    m_AssemblyFront->RemovePart(m_ImageDummyActor);
+    m_AssemblyFront->Modified();
+    m_ImageDummyActor->Delete();
+    m_ImageDummyActor = NULL;
+  }
 }
 
 //----------------------------------------------------------------------------
