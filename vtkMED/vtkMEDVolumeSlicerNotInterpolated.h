@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: vtkMEDVolumeSlicerNotInterpolated.h,v $
   Language:  C++
-  Date:      $Date: 2012-04-20 13:59:55 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2012-04-30 15:43:16 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Alberto Losi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -83,7 +83,7 @@ protected:
   int SliceAxis;                              //< Axis on which slicing is performed (only "perpendicular" slicing is allowed)
   int NumberOfComponents;                     //< Number of scalar components
   int BaseIndex;                              //< Starting point of the slice
-  int SliceDimensions[2];                     //< 2D dimensions of the slice (in number of points)
+  int SliceDimensions[2];                     //< Dimensions of the slice (in number of points)
   int InputDimensions[3];                     //< Input volume dimensions
   double InputSpacing[3];                     //< Input volume spacing
   double SliceSpacing[3];                     //< Output slice spacing
@@ -91,7 +91,9 @@ protected:
   int OutputDataType;                         //< Output data type
   vtkDoubleArray *CoordsXY[2];                //< X and Y coordinates of the slice if input is a rectilinear grid
   vtkRectilinearGrid *OutputRectilinearGrid;  //< Rectilinear grid as output produced if the input is a vtkRectilinearGrid
-  
+  int AxisX;                                  //< X axis of the image
+  int AxisY;                                  //< Y axis of the image
+
 private:
 
 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeSliceNotInterpolated.cpp,v $
   Language:  C++
-  Date:      $Date: 2012-04-30 09:07:06 $
-  Version:   $Revision: 1.1.2.7 $
+  Date:      $Date: 2012-04-30 15:43:32 $
+  Version:   $Revision: 1.1.2.8 $
   Authors:   Alberto Losi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -95,7 +95,9 @@ medPipeVolumeSliceNotInterpolated::~medPipeVolumeSliceNotInterpolated()
     DeleteMapToColorsFilter();
     DeleteShiftScaleFilter();
     m_SlicerImageDataToRender->Delete();
+    m_SlicerImageDataToRender = NULL;
     m_SlicerOutputImageData->Delete();
+    m_SlicerOutputImageData = NULL;
 
   }
   else if(m_DataType == VTK_RECTILINEAR_GRID)
@@ -207,6 +209,7 @@ void medPipeVolumeSliceNotInterpolated::UpdateSlice()
   }
 
   // Update slicer pipeline
+  m_Slicer->SetOutput(m_SlicerOutputImageData);
   m_Slicer->SetOrigin(m_Origin);
   m_Slicer->SetSliceAxis(m_SliceAxis);
   m_Slicer->Modified();
@@ -301,13 +304,16 @@ void medPipeVolumeSliceNotInterpolated::CreateImageActor()
 //----------------------------------------------------------------------------
 {
   // Update image actor
-  if(!m_ImageMapToColors->GetOutput())
+  if(!m_ImageMapToColors || !m_ImageMapToColors->GetOutput())
   {
     return;
   }
   m_ImageActor = vtkImageActor::New();
   m_ImageActor->SetInput(m_ImageMapToColors->GetOutput());
   m_ImageActor->InterpolateOff();
+  int extent[6];
+  m_ImageMapToColors->GetOutput()->GetExtent(extent);
+  m_ImageActor->SetDisplayExtent(extent);
   m_ImageActor->Modified();
   m_RenFront->AddProp(m_ImageActor);
   m_RenFront->Modified();
@@ -318,7 +324,7 @@ void medPipeVolumeSliceNotInterpolated::CreateImageDummyData()
 //----------------------------------------------------------------------------
 {
   // Update image actor
-  if(!m_ImageMapToColors->GetOutput())
+  if(!m_ImageMapToColors || !m_ImageMapToColors->GetOutput())
   {
     return;
   }
@@ -331,10 +337,30 @@ void medPipeVolumeSliceNotInterpolated::CreateImageDummyData()
   vtkPoints *pts = vtkPoints::New();
   vtkCellArray *polys = vtkCellArray::New();
 
-  pts->InsertNextPoint(bounds[0],bounds[2],bounds[4] + 0.01);
-  pts->InsertNextPoint(bounds[1],bounds[2],bounds[4] + 0.01);
-  pts->InsertNextPoint(bounds[1],bounds[3],bounds[4] + 0.01);
-  pts->InsertNextPoint(bounds[0],bounds[3],bounds[4] + 0.01);
+  switch(m_SliceAxis)
+  {
+  case vtkMEDVolumeSlicerNotInterpolated::SLICE_Z:
+    {
+      pts->InsertNextPoint(bounds[0],bounds[2],bounds[4] + 0.01);
+      pts->InsertNextPoint(bounds[1],bounds[2],bounds[4] + 0.01);
+      pts->InsertNextPoint(bounds[1],bounds[3],bounds[4] + 0.01);
+      pts->InsertNextPoint(bounds[0],bounds[3],bounds[4] + 0.01);
+    }break;
+  case vtkMEDVolumeSlicerNotInterpolated::SLICE_Y:
+    {
+      pts->InsertNextPoint(bounds[0],bounds[2] + 0.01,bounds[4]);
+      pts->InsertNextPoint(bounds[1],bounds[2] + 0.01,bounds[4]);
+      pts->InsertNextPoint(bounds[1],bounds[2] + 0.01,bounds[5]);
+      pts->InsertNextPoint(bounds[0],bounds[2] + 0.01,bounds[5]);
+    }break;
+  case vtkMEDVolumeSlicerNotInterpolated::SLICE_X:
+    {
+      pts->InsertNextPoint(bounds[0] - 0.01,bounds[2],bounds[4]);
+      pts->InsertNextPoint(bounds[0] - 0.01,bounds[3],bounds[4]);
+      pts->InsertNextPoint(bounds[0] - 0.01,bounds[3],bounds[5]);
+      pts->InsertNextPoint(bounds[0] - 0.01,bounds[2],bounds[5]);
+    }break;
+  }
 
   polys->InsertNextCell(4);
   for(int i = 0; i < 4; i++)
@@ -436,10 +462,12 @@ void medPipeVolumeSliceNotInterpolated::UpdateImageToRender()
   {
     return;
   }
+
   if(!m_SlicerImageDataToRender)
   {
     m_SlicerImageDataToRender = vtkImageData::New();
   }
+
   m_SlicerImageDataToRender->CopyStructure(m_SlicerOutputImageData);
   m_SlicerImageDataToRender->Update();
   m_SlicerImageDataToRender->GetPointData()->RemoveArray("SCALARS");
@@ -482,7 +510,7 @@ void medPipeVolumeSliceNotInterpolated::DeleteShiftScaleFilter()
 void medPipeVolumeSliceNotInterpolated::CreateMapToColorsFilter()
 //----------------------------------------------------------------------------
 {
-  if(!m_ImageShiftScale->GetOutput())
+  if(!m_ImageShiftScale || !m_ImageShiftScale->GetOutput())
   {
     return;
   }
@@ -530,10 +558,8 @@ void medPipeVolumeSliceNotInterpolated::CreateSlice()
 
   // Create the slicer and set its attributes
   m_Slicer = vtkMEDVolumeSlicerNotInterpolated::New();
-  m_Slicer->SetInput(data);
   m_SlicerOutputImageData = vtkImageData::New();
-  m_Slicer->SetOutput(m_SlicerOutputImageData);
-  
+  m_Slicer->SetInput(data);
   UpdateSlice();
 }
 
