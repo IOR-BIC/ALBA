@@ -15,5 +15,6 @@ devenv MAF.sln  /project RUN_TESTS.vcxproj  /build debug /out build_log
 
 cd ..
 
+REM -----------------------------------------------------------------------------
 
   

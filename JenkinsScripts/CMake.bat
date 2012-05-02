@@ -30,7 +30,8 @@ REM ----------------------------------------------------------------------------
 mkdir Build
 cd Build
 
-cmake.exe  ../Source  -G"Visual Studio 10"
+cmake.exe  ../Source  -G"Visual Studio 10" ^
+	-DBUILD_TESTING:BOOL=OFF
 
 cd ..
   
