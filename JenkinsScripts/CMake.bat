@@ -36,7 +36,26 @@ cd ..
 GOTO END
 
 REM -----------------------------------------------------------------------------
+:MAF_MED_DEBUG_DLL_TEST_2010
+REM -----------------------------------------------------------------------------
 
+mkdir Build
+cd Build
+
+cmake.exe  ../Source  -G"Visual Studio 10" ^
+  -DMAF_BUILD_MAFDLL:BOOL=ON ^
+  -DBUILD_TESTING:BOOL=ON ^
+  -DDART_TESTING_TIMEOUT:STRING=120 ^
+  -DBUILD_EXAMPLES:BOOL=ON ^
+  -DMAF_USE_ITK:BOOL=ON ^
+  -DCPPUNIT_INCLUDE_DIR:PATH="C:/cppunit-1.12.0_VS2010_BUILD/cppunit-1.12.0/include" ^
+  -DCPPUNIT_LIBRARY:FILEPATH="C:/cppunit-1.12.0_VS2010_BUILD/cppunit-1.12.0/lib/cppunitd.lib"
+  
+cd ..
+
+GOTO END
+
+REM -----------------------------------------------------------------------------
 
 :END
 
