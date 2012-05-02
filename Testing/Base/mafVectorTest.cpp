@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafVectorTest.cpp,v $
 Language:  C++
-Date:      $Date: 2011-05-25 11:58:32 $
-Version:   $Revision: 1.2.4.1 $
+Date:      $Date: 2012-04-23 07:43:41 $
+Version:   $Revision: 1.2.4.2 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -106,7 +106,7 @@ void mafVectorTest::TestVectorAPICombination()
 
   CPPUNIT_ASSERT(oarray.GetNumberOfItems()==10);
 
-  CPPUNIT_ASSERT(oarray[10]==mafVector<mafAutoPointer<mafTestObject> >::NullItem);
+  CPPUNIT_ASSERT(oarray[10]==mafVector<mafAutoPointer<mafTestObject> >::m_NullItem);
 
   for (i=0;i<10;i++)
   {
@@ -200,7 +200,7 @@ void mafVectorTest::TestVectorAPICombination()
   oarray.FindAndRemoveItem(objr);
 
   CPPUNIT_ASSERT(oarray.GetNumberOfItems()==9);
-  CPPUNIT_ASSERT(oarray[9] == mafVector<mafAutoPointer<mafTestObject> >::NullItem);
+  CPPUNIT_ASSERT(oarray[9] == mafVector<mafAutoPointer<mafTestObject> >::m_NullItem);
 
   //operator [] assign and retrieve
   mafSmartPointer<mafTestObject> objOp;
@@ -451,7 +451,7 @@ void mafVectorTest::TestFindAndRemoveItem()
   oarray.FindAndRemoveItem(objFR);
 
   CPPUNIT_ASSERT(oarray.GetNumberOfItems()==9);
-  CPPUNIT_ASSERT(oarray[9] == mafVector<mafAutoPointer<mafTestObject> >::NullItem);
+  CPPUNIT_ASSERT(oarray[9] == mafVector<mafAutoPointer<mafTestObject> >::m_NullItem);
 }
 //----------------------------------------------------------------------------
 void mafVectorTest::TestRemoveAllItems()
