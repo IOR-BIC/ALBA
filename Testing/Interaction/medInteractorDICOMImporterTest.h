@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medInteractorDICOMImporterTest.h,v $
 Language:  C++
-Date:      $Date: 2011-02-14 16:56:16 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2011-02-14 17:01:40 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -21,7 +21,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <cppunit/TestResultCollector.h>
 #include <cppunit/TestRunner.h>
 
-class mmiDICOMImporterInteractorTest : public CPPUNIT_NS::TestFixture
+class medInteractorDICOMImporterTest : public CPPUNIT_NS::TestFixture
 {
   public:
   
@@ -31,7 +31,7 @@ class mmiDICOMImporterInteractorTest : public CPPUNIT_NS::TestFixture
 	// CPPUNIT fixture: executed after each test
 	void tearDown();
 
-	CPPUNIT_TEST_SUITE( mmiDICOMImporterInteractorTest );
+	CPPUNIT_TEST_SUITE( medInteractorDICOMImporterTest );
 	CPPUNIT_TEST( TestFixture );
 	CPPUNIT_TEST( TestStartInteraction );
 	CPPUNIT_TEST( TestConstructorDestructor );
@@ -66,7 +66,7 @@ main( int argc, char* argv[] )
 
   // Add the top suite to the test runner
   CPPUNIT_NS::TestRunner runner;
-  runner.addTest( mmiDICOMImporterInteractorTest::suite());
+  runner.addTest( medInteractorDICOMImporterTest::suite());
   runner.run( controller );
 
   // Print test in a compiler compatible format.
