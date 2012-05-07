@@ -94,7 +94,7 @@ void medOpExporterVTKXML::OpRun()
   vtkDataSet *inputData = ((mafVME *)m_Input)->GetOutput()->GetVTKData();
   assert(inputData);
 
-  bool isStructuredPoints = inputData->IsA("vtkStructuredPoints");
+  bool isStructuredPoints = inputData->IsA("vtkStructuredPoints") != 0;
 
   mafString wildc;
   if(inputData->IsA("vtkRectilinearGrid"))

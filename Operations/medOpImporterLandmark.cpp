@@ -342,9 +342,9 @@ void medOpImporterLandmark::ReadWithoutTag()
   double y = 0;
   double z = 0;
 
-  char tx[20];
-  char ty[20];
-  char tz[20];
+//  char tx[20];
+//  char ty[20];
+//  char tz[20];
   
   long counter = 0; 
   long progress = 0;

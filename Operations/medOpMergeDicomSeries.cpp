@@ -139,7 +139,6 @@ bool medOpMergeDicomSeries::RanameSeriesAndManufacturer(const char *dicomDirABSP
   // that refers to SeriesID and Manufacturer in order to merge dicom data represnting single images
   // into a data that represents a volume
 
-  long progress;
   int sliceNum = -1;
   double lastZPos = 0;
   long int dcmInstanceNumber = -1;
@@ -171,7 +170,7 @@ bool medOpMergeDicomSeries::RanameSeriesAndManufacturer(const char *dicomDirABSP
 
   int i = -1;
 
-  time_t start,end;
+  time_t start;
 
   wxBusyInfo *busyInfo = NULL;
 
@@ -274,4 +273,5 @@ bool medOpMergeDicomSeries::RanameSeriesAndManufacturer(const char *dicomDirABSP
     mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
   }
   delete busyInfo;
+	return !errorOccurred;
 }

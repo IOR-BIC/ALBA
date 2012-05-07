@@ -55,17 +55,18 @@ bool medOpExporterLandmark::Accept(mafNode *node)
   bool result = node && node->IsMAFType(mafVMELandmarkCloud);
   
   // Accept a Landmark Cloud ..
-  if (result==true)
+  if (result)
   {
     m_LC_vector.push_back((mafVMELandmarkCloud*)node);
-    m_LC_names.push_back(node->GetName());
-    return true;
+    m_LC_names.push_back(node->GetName());    
   }
   // .. or a vme with many landmark clouds as children
   else
   {
     result = (node && FindLandmarkClouds(node)==1);
   }
+
+	return result;
 }
 //----------------------------------------------------------------------------
 int medOpExporterLandmark::FindLandmarkClouds(mafNode* node)   
