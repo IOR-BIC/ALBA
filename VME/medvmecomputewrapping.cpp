@@ -124,35 +124,9 @@ medVMEComputeWrapping::medVMEComputeWrapping()
 	mafDataPipeCustom *dpipe = mafDataPipeCustom::New();
 	dpipe->SetDependOnAbsPose(true);
 	SetDataPipe(dpipe);
-	
-	//----------------------------
-	// Commented line (roll back to )since it reopens Bug 2594: 
-	// http://bugzilla.b3c.it/show_bug.cgi?id=2594
-	//
-	// Roll back to 1.1.2.28
-	//
-	/* 
 
-	This commit was reverted:
-	----------------------------
-	Revision : 1.1.2.29
-	Date : 2012/4/10 17:11:25
-	Author : 'josef'
-	State : 'Exp'
-	Lines : +7 -3
-	CommitID : 'lTvDMUOCgvfspl0w'
-	Description : 
-	SHA: vtk filter fixing medVMEComputeWrapping segment problems
-	----------------------------
-
-	In particular action line visualization via cylinder is crashing and there are also issues
-	on line visualization
-
-	*/
-	// m_LinePatcher->SetInput(m_Goniometer->GetOutput());
-	// dpipe->SetInput(m_LinePatcher->GetOutput());
-	//-----------------------------
-
+	m_LinePatcher->SetInput(m_Goniometer->GetOutput());
+	dpipe->SetInput(m_LinePatcher->GetOutput());
 	dpipe->SetInput(m_Goniometer->GetOutput());
 }
 //-------------------------------------------------------------------------
@@ -170,9 +144,14 @@ medVMEComputeWrapping::~medVMEComputeWrapping()
 	mafDEL(m_Mat);
 	mafDEL(m_Imat);
 
-	for(int i=0; i< m_MiddlePointList.size(); i++)
+	for (int i = 0; i < (int)m_ExportPointList.size(); i++) {
+		delete[] m_ExportPointList[i];
+	}
+	m_ExportPointList.clear();
+
+	for(int i=0; i< (int)m_MiddlePointList.size(); i++)
 	{
-		if(m_MiddlePointList[i]) delete m_MiddlePointList[i];
+		delete[] m_MiddlePointList[i];
 	}
 	m_MiddlePointList.clear();
 
@@ -346,6 +325,9 @@ void medVMEComputeWrapping::Dispatch(){
 
 	bool prepareflag = PrepareData2();
 
+	for (int i = 0; i < (int)m_ExportPointList.size(); i++) {
+		delete[] m_ExportPointList[i];
+	}
 	m_ExportPointList.clear();
 	//---------------------test code----------------------------
 	/*
