@@ -163,24 +163,6 @@ void medViewSliceNotInterpolated::OnEvent(mafEventBase * event)
     case ID_AXIS:
       {
         SetSliceAxis();
-        switch(m_SliceAxis)
-        {
-          case vtkMEDVolumeSlicerNotInterpolated::SLICE_X:
-            {
-              m_CameraPositionId = CAMERA_OS_X;
-            } break;
-          case vtkMEDVolumeSlicerNotInterpolated::SLICE_Y:
-            {
-              m_CameraPositionId = CAMERA_OS_Y;
-            } break;
-          case vtkMEDVolumeSlicerNotInterpolated::SLICE_Z:
-            {
-              m_CameraPositionId = CAMERA_OS_Z;
-            } break;
-        }
-        CameraSet(m_CameraPositionId);
-        CameraReset();
-        CameraUpdate();
       } break;
     case ID_SLICE:
       {
@@ -225,6 +207,23 @@ void medViewSliceNotInterpolated::SetSliceAxis()
   m_CurrentSlice = m_Bounds[m_SliceAxis * 2];
   m_SliceSlider->SetRange(m_Bounds[m_SliceAxis * 2], m_Bounds[(m_SliceAxis * 2) + 1]);
   m_Gui->Update();
+
+  switch(m_SliceAxis)
+  {
+  case vtkMEDVolumeSlicerNotInterpolated::SLICE_X:
+    {
+      m_CameraPositionId = CAMERA_OS_X;
+    } break;
+  case vtkMEDVolumeSlicerNotInterpolated::SLICE_Y:
+    {
+      m_CameraPositionId = CAMERA_OS_Y;
+    } break;
+  case vtkMEDVolumeSlicerNotInterpolated::SLICE_Z:
+    {
+      m_CameraPositionId = CAMERA_OS_Z;
+    } break;
+  }
+  CameraSet(m_CameraPositionId);
 
   UpdateSlice();
 }

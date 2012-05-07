@@ -282,6 +282,7 @@ void medPipeVolumeSliceNotInterpolated::CreateRectilinearGridActor()
   m_RectilinearGridActor = vtkActor::New();
   m_RectilinearGridActor->SetMapper(m_RectilinearGridMapper);
   m_RectilinearGridActor->GetProperty()->SetInterpolationToFlat();
+  //m_RectilinearGridActor->SetOrigin(m_Origin);
   m_RectilinearGridActor->Modified();
   m_AssemblyFront->AddPart(m_RectilinearGridActor);
   m_AssemblyFront->Modified();

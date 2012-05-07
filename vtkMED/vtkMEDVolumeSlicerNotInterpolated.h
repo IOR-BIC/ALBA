@@ -79,7 +79,8 @@ protected:
    virtual void ExecuteData(vtkImageData *output);
 
   double Origin[3];                           //< Origin of the cutting plane
-  double SliceOrigin[2];                      //< Origin of the slice
+  double SliceOrigin[3];                      //< Origin of the slice
+  double Bounds[6];                           //< Bounds of the input volume
   int SliceAxis;                              //< Axis on which slicing is performed (only "perpendicular" slicing is allowed)
   int NumberOfComponents;                     //< Number of scalar components
   int BaseIndex;                              //< Starting point of the slice
