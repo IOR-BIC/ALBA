@@ -74,6 +74,7 @@ public:
     ID_SHOW_ADVANCED_OPTION_SORTING,
     ID_DICOM_FOLDER,
     ID_USE_DEFAULT_DICOM_FOLDER,
+    ID_NAME_COMPOSITOR,
 	};
   
   /** Type VMEs*/
@@ -117,6 +118,15 @@ public:
   {
     TRADITIONAL = 0,
     DESCRIPTION_DATE,
+    CUSTOM,
+  };
+
+  enum NAME_COMPOSITOR
+  {
+    ID_PATIENT_NAME = 0,
+    ID_DESCRIPTION,
+    ID_BIRTHDATE,
+    ID_NUM_SLICES,
   };
 
 	/** Answer to the messages coming from interface. */
@@ -181,6 +191,9 @@ public:
   /** Return the type of output name format */
   int GetOutputNameFormat(){return m_OutputNameType;};
 
+  /** Return if an element of custom name chack list is checked */
+  int GetEnabledCustomName(int type);
+
 protected:
 	/** Create the GUI for the setting panel.*/
 	void CreateGui();
@@ -194,7 +207,9 @@ protected:
 	// mafString m_Dictionary;
 	mafGUICheckListBox *m_DicomModalityListBox;
   mafGUICheckListBox *m_DicomVmeTypeListBox;
+  mafGUICheckListBox *m_NameCompositorList;
 
+  int m_CheckNameCompositor[4];
 	int m_CheckOnOff[7];
   int m_CheckOnOffVmeType[3];
 

@@ -2244,6 +2244,10 @@ void medOpImporterDicomOffis::CreateBuildPage()
     m_VolumeName << m_SelectedSeriesSlicesList->Item(0)->GetData()->GetDate();*/
     m_BuildGuiUnderLeft->String(ID_VOLUME_NAME," VME name",&m_VolumeName);
   }
+  else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::CUSTOM)
+  {
+    m_BuildGuiUnderLeft->String(ID_VOLUME_NAME," VME name",&m_VolumeName);
+  }
 
 
 	m_BuildGuiLeft->FitGui();
@@ -2788,6 +2792,44 @@ void medOpImporterDicomOffis::Crop()
     m_VolumeName << "_";
     m_VolumeName << m_SelectedSeriesSlicesList->Item(0)->GetData()->GetDate();
   }
+  else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::CUSTOM)
+  {
+    bool separator = false;
+    m_VolumeName = "";
+    if (((medGUIDicomSettings*)GetSetting())->GetEnabledCustomName(medGUIDicomSettings::ID_PATIENT_NAME))
+    {
+      m_VolumeName << m_SelectedSeriesSlicesList->Item(0)->GetData()->GetPatientName();
+      separator = true;
+    }
+    if (((medGUIDicomSettings*)GetSetting())->GetEnabledCustomName(medGUIDicomSettings::ID_DESCRIPTION))
+    {
+      if (separator)
+      {
+        m_VolumeName << "_";
+      }
+      m_VolumeName << m_SelectedSeriesSlicesList->Item(0)->GetData()->GetDescription();
+      separator = true;
+    }
+    if (((medGUIDicomSettings*)GetSetting())->GetEnabledCustomName(medGUIDicomSettings::ID_BIRTHDATE))
+    {
+      if (separator)
+      {
+        m_VolumeName << "_";
+      }
+      m_VolumeName << m_SelectedSeriesSlicesList->Item(0)->GetData()->GetPatientBirthday();
+      separator = true;
+    }
+    if (((medGUIDicomSettings*)GetSetting())->GetEnabledCustomName(medGUIDicomSettings::ID_NUM_SLICES))
+    {
+      if (separator)
+      {
+        m_VolumeName << "_";
+      }
+      /*wxString  seriesName = m_SeriesListbox->GetString(m_SeriesListbox->GetSelection());*/
+      m_VolumeName.Append(wxString::Format("_%ix%ix%i", (int)pixelDimX, (int)pixelDimY, cropInterval));
+      separator = true;
+    }
+  }
 }
 //----------------------------------------------------------------------------
 void medOpImporterDicomOffis::AutoPositionCropPlane()
@@ -3022,6 +3064,11 @@ void medOpImporterDicomOffis::FillSeriesListBox()
         else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::DESCRIPTION_DATE)
         {
           seriesName = m_SelectedSeriesID.at(2);
+        }
+        else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::CUSTOM)
+        {
+          seriesName = m_SelectedSeriesID.at(2);
+          seriesName.Append(wxString::Format("x%i", numberOfImages));
         }
 
         m_SeriesListbox->Append(seriesName.GetCStr());
@@ -3481,9 +3528,11 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 					dicomSliceVTKImageData->SetOrigin(dcmImagePositionPatient);
 					dicomSliceVTKImageData->Update();
 
-          const char *date,*description;
+          const char *date,*description,*patientName,*birthdate;
+          dicomDataset->findAndGetString(DCM_PatientsBirthDate,birthdate);
           dicomDataset->findAndGetString(DCM_StudyDate,date);
           dicomDataset->findAndGetString(DCM_SeriesDescription,description);
+          dicomDataset->findAndGetString(DCM_PatientsName,patientName);
 
           if (!this->m_TestMode)
           {
@@ -3496,6 +3545,10 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 	            seriesName = (wxString::Format("%s_%s_%d",description,date,seriesIndex));
 	            seriesIndex++;
 	          }
+            else
+            {
+              seriesName.Append(wxString::Format("%i_%ix%i",seriesCounter, dcmRows, dcmColumns));
+            }
           }
           else
           {
@@ -3506,7 +3559,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 
 					dicomSeries->Append(new medDicomSlice\
 						(m_CurrentSliceABSFileName,dcmImagePositionPatient, dcmImageOrientationPatient, \
-						dicomSliceVTKImageData,description,date));
+						dicomSliceVTKImageData,description,date,patientName,birthdate));
 
 					m_SeriesIDToSlicesListMap.insert\
 						(std::pair<std::vector<mafString>,medDicomSeriesSliceList*>\
@@ -3570,13 +3623,15 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 
 					lastZPos = dcmImagePositionPatient[2];
 
-          const char *date,*description;
+          const char *date,*description,*patientName,*birthdate;
+          dicomDataset->findAndGetString(DCM_PatientsBirthDate,birthdate);
           dicomDataset->findAndGetString(DCM_StudyDate,date);
           dicomDataset->findAndGetString(DCM_SeriesDescription,description);
+          dicomDataset->findAndGetString(DCM_PatientsName,patientName);
 
 					m_SeriesIDToSlicesListMap[seriesId]->Append(\
 						new medDicomSlice(m_CurrentSliceABSFileName,dcmImagePositionPatient, \
-						dcmImageOrientationPatient, dicomSliceVTKImageData,description,date));
+						dcmImageOrientationPatient, dicomSliceVTKImageData,description,date,patientName,birthdate));
 
 
 				}
@@ -3679,9 +3734,11 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 						}
 					}
 
-          const char *date,*description;
+          const char *date,*description,*patientName,*birthdate;
+          dicomDataset->findAndGetString(DCM_PatientsBirthDate,birthdate);
           dicomDataset->findAndGetString(DCM_StudyDate,date);
           dicomDataset->findAndGetString(DCM_SeriesDescription,description);
+          dicomDataset->findAndGetString(DCM_PatientsName,patientName);
 
           if(((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::TRADITIONAL)
           {
@@ -3692,12 +3749,16 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
             seriesName = (wxString::Format("%s_%s_%d",description,date,seriesIndex));
             seriesIndex++;
           }
+          else//CUSTOM
+          {
+            seriesName.Append(wxString::Format("%i_%ix%i",seriesCounter, dcmRows, dcmColumns));
+          }
 
 					seriesId.push_back(seriesName);
 
 					dicomSeries->Append(new medDicomSlice\
 						(m_CurrentSliceABSFileName,dcmImagePositionPatient, dcmImageOrientationPatient, \
-						dicomSliceVTKImageData,description,date, dcmInstanceNumber, dcmCardiacNumberOfImages, dcmTriggerTime));
+						dicomSliceVTKImageData,description,date,patientName,birthdate, dcmInstanceNumber, dcmCardiacNumberOfImages, dcmTriggerTime));
 
 					m_SeriesIDToSlicesListMap.insert\
 						(std::pair<std::vector<mafString>,medDicomSeriesSliceList*>\
@@ -3737,13 +3798,15 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 					dicomDataset->findAndGetLongInt(DCM_CardiacNumberOfImages,dcmCardiacNumberOfImages);
 					dicomDataset->findAndGetFloat64(DCM_TriggerTime,dcmTriggerTime);
 
-          const char *date,*description;
+          const char *date,*description,*patientName,*birthdate;
+          dicomDataset->findAndGetString(DCM_PatientsBirthDate,birthdate);
           dicomDataset->findAndGetString(DCM_StudyDate,date);
           dicomDataset->findAndGetString(DCM_SeriesDescription,description);
+          dicomDataset->findAndGetString(DCM_PatientsName,patientName);
 
 					m_SeriesIDToSlicesListMap[seriesId]->Append\
 						(new medDicomSlice(m_CurrentSliceABSFileName,dcmImagePositionPatient,dcmImageOrientationPatient ,\
-						dicomSliceVTKImageData,description,date,dcmInstanceNumber,dcmCardiacNumberOfImages,dcmTriggerTime));
+						dicomSliceVTKImageData,description,date,patientName,birthdate,dcmInstanceNumber,dcmCardiacNumberOfImages,dcmTriggerTime));
 				}
 			}
 
@@ -4834,6 +4897,10 @@ void medOpImporterDicomOffis::OnSeriesSelect()
   else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::DESCRIPTION_DATE)
   {
     tmp = seriesName;
+  }
+  else
+  {
+    tmp = seriesName.SubString(0, seriesName.find_last_of("x")-1);
   }
   m_SelectedSeriesID.at(2) = tmp;
 
