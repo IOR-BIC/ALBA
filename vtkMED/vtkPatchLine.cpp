@@ -1,12 +1,52 @@
+/*=========================================================================
+Program:   Multimod Application Framework
+Module:    $RCSfile: vtkTriangleQualityRatio.cxx,v $
+Language:  C++
+Date:      $Date: 2011-05-26 08:33:31 $
+Version:   $Revision: 1.4.2.2 $
+Authors:   Gabriel Shanahan
+==========================================================================
+Copyright (c) 2012 University of West Bohemia (www.zcu.cz)
+See the COPYINGS file for license details 
+=========================================================================
+*/
+#pragma warning(push)
+#pragma warning(disable: 4996)
 #include "vtkPatchLine.h"
 #include "vtkSetGet.h"
 #include "vtkObjectFactory.h"
+#include "vtkCleanPolyData.h"
+#include "vtkPolyData.h"
+#include "vtkMAFSmartPointer.h"
+#include "vtkCellArray.h"
+#include "vtkMath.h"
+#include "vtkPolyLine.h"
+#include <list>
+#pragma warning(pop)
 
+
+vtkCxxRevisionMacro(vtkPatchLine, "$Revision: 1.1.2.5 $");
 vtkStandardNewMacro(vtkPatchLine);
 
 void vtkPatchLine::ExecuteData(vtkDataObject *output)
 {
-	vtkPolyData* source = this->GetInput();
+	vtkSmartPointer<vtkPolyData> source = this->GetInput();
+	source->Update();
+
+	//Remove duplicate points etc.
+	vtkMAFSmartPointer<vtkCleanPolyData> cleaner = vtkCleanPolyData::New();
+	cleaner->SetInput(source.GetPointer());
+	cleaner->Update();  
+	source = cleaner->GetOutput();
+	source->Register(NULL);          	
+
+	if(source->GetNumberOfPoints() <= 2)
+	{
+		vtkSmartPointer<vtkPolyData> newLine = vtkPolyData::SafeDownCast(output);
+		newLine->SetPoints(source->GetPoints());
+		newLine->SetLines(source->GetLines());
+		return;
+	}
 
 	vtkSmartPointer<vtkCellArray> origLines = source->GetLines();
 
@@ -79,20 +119,20 @@ void vtkPatchLine::ExecuteData(vtkDataObject *output)
 		endVertices.erase(bestEnd_it);
 	}
 
-	vtkSmartPointer<vtkPolyLine> polyLine = vtkPolyLine::New();
+	vtkMAFSmartPointer<vtkPolyLine> polyLine = vtkPolyLine::New();
 	polyLine->GetPointIds()->SetNumberOfIds(nNumPoints);
 
 	//Set starting point of polyline
 	polyLine->GetPointIds()->SetId(0, startingPoint);
 	
 	//Shift i by one so as to accommodate 'startingPoint'
-	for(int i = 1; i < nNumPoints; i++)
-		polyLine->GetPointIds()->SetId(i, segments[i-1]); //so as to leave out last points in 'segments', which isn't connected to anything
+	for(int i = 0; i < nNumPoints; i++)
+		polyLine->GetPointIds()->SetId(i+1, segments[polyLine->GetPointIds()->GetId(i)]); //so as to leave out last points in 'segments', which isn't connected to anything
 
-	vtkSmartPointer<vtkCellArray> cells = vtkCellArray::New();
+	vtkMAFSmartPointer<vtkCellArray> cells = vtkCellArray::New();
 	cells->InsertNextCell(polyLine->GetPointIds());
 
-	vtkPolyData* newLine = vtkPolyData::SafeDownCast(output);
+	vtkMAFSmartPointer<vtkPolyData> newLine = vtkPolyData::SafeDownCast(output);
 	newLine->SetPoints(source->GetPoints());
 	newLine->SetLines(cells.GetPointer());
 
