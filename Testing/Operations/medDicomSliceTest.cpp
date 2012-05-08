@@ -93,7 +93,7 @@ void medDicomSliceTest::TestGetSliceABSFileName()
   //Using the initialization constructor
   double patientPos[3] = {0.0,1.0,2.0};
   double patientOri[6] = {0.0,1.0,2.0,3.0,4.0,5.0};
-  sliceDicom = new medDicomSlice(D_SliceABSFileName,patientPos,patientOri,NULL,"","");
+  sliceDicom = new medDicomSlice(D_SliceABSFileName,patientPos,patientOri,NULL,"","","","");
   
   CPPUNIT_ASSERT(strcmp(sliceDicom->GetSliceABSFileName(),D_SliceABSFileName) == 0);
 
@@ -114,7 +114,7 @@ void medDicomSliceTest::TestGetDcmInstanceNumber()
   //Using the initialization constructor
   double patientPos[3] = {0.0,1.0,2.0};
   double patientOri[6] = {0.0,1.0,2.0,3.0,4.0,5.0};
-  sliceDicom = new medDicomSlice(D_SliceABSFileName,patientPos,patientOri,NULL,"","",D_DcmInstanceNumber);
+  sliceDicom = new medDicomSlice(D_SliceABSFileName,patientPos,patientOri,NULL,"","","","",D_DcmInstanceNumber);
 
   CPPUNIT_ASSERT(sliceDicom->GetDcmInstanceNumber() == D_DcmInstanceNumber);
 
@@ -135,7 +135,7 @@ void medDicomSliceTest::TestGetDcmCardiacNumberOfImages()
   //Using the initialization constructor
   double patientPos[3] = {0.0,1.0,2.0};
   double patientOri[6] = {0.0,1.0,2.0,3.0,4.0,5.0};
-  sliceDicom = new medDicomSlice(D_SliceABSFileName,patientPos,patientOri,NULL,"","",D_DcmInstanceNumber,D_DcmCardiacNumberOfImages);
+  sliceDicom = new medDicomSlice(D_SliceABSFileName,patientPos,patientOri,NULL,"","","","",D_DcmInstanceNumber,D_DcmCardiacNumberOfImages);
 
   CPPUNIT_ASSERT(sliceDicom->GetDcmCardiacNumberOfImages() == D_DcmCardiacNumberOfImages);
 
@@ -156,7 +156,7 @@ void medDicomSliceTest::TestGetDcmTriggerTime()
   //Using the initialization constructor
   double patientPos[3] = {0.0,1.0,2.0};
   double patientOri[6] = {0.0,1.0,2.0,3.0,4.0,5.0};
-  sliceDicom = new medDicomSlice(D_SliceABSFileName,patientPos,patientOri,NULL,"","",D_DcmInstanceNumber,D_DcmCardiacNumberOfImages,D_DcmTriggerTime);
+  sliceDicom = new medDicomSlice(D_SliceABSFileName,patientPos,patientOri,NULL,"","","","",D_DcmInstanceNumber,D_DcmCardiacNumberOfImages,D_DcmTriggerTime);
 
   CPPUNIT_ASSERT(sliceDicom->GetDcmTriggerTime() == D_DcmTriggerTime);
 
@@ -184,7 +184,7 @@ void medDicomSliceTest::TestGetVTKImageData()
   //Using the initialization constructor
   double patientPos[3] = {0.0,1.0,2.0};
   double patientOri[6] = {0.0,1.0,2.0,3.0,4.0,5.0};
-  sliceDicom = new medDicomSlice(D_SliceABSFileName,patientPos,patientOri,reader->GetOutput(),"","",D_DcmInstanceNumber,D_DcmCardiacNumberOfImages,D_DcmTriggerTime);
+  sliceDicom = new medDicomSlice(D_SliceABSFileName,patientPos,patientOri,reader->GetOutput(),"","","","",D_DcmInstanceNumber,D_DcmCardiacNumberOfImages,D_DcmTriggerTime);
 
   CPPUNIT_ASSERT(sliceDicom->GetVTKImageData()->GetNumberOfPoints() == reader->GetOutput()->GetNumberOfPoints());
   CPPUNIT_ASSERT(sliceDicom->GetVTKImageData()->GetNumberOfCells() == reader->GetOutput()->GetNumberOfCells());
@@ -212,7 +212,7 @@ void medDicomSliceTest::TestGetDcmImagePositionPatient()
   cppDEL(sliceDicom);
 
   //Using the initialization constructor
-  sliceDicom = new medDicomSlice(D_SliceABSFileName,patientPos,patientOri,NULL,"","",D_DcmInstanceNumber,D_DcmCardiacNumberOfImages,D_DcmTriggerTime);
+  sliceDicom = new medDicomSlice(D_SliceABSFileName,patientPos,patientOri,NULL,"","","","",D_DcmInstanceNumber,D_DcmCardiacNumberOfImages,D_DcmTriggerTime);
 
   sliceDicom->GetDcmImagePositionPatient(testPos);
   CPPUNIT_ASSERT(testPos[0] == patientPos[0]);
@@ -245,7 +245,7 @@ void medDicomSliceTest::TestGetDcmImageOrientationPatient()
   cppDEL(sliceDicom);
 
   //Using the initialization constructor
-  sliceDicom = new medDicomSlice(D_SliceABSFileName,patientPos,patientOri,NULL,"","",D_DcmInstanceNumber,D_DcmCardiacNumberOfImages,D_DcmTriggerTime);
+  sliceDicom = new medDicomSlice(D_SliceABSFileName,patientPos,patientOri,NULL,"","","","",D_DcmInstanceNumber,D_DcmCardiacNumberOfImages,D_DcmTriggerTime);
 
   sliceDicom->GetDcmImageOrientationPatient(patientOri);
   CPPUNIT_ASSERT(testOri[0] == patientOri[0]);
@@ -291,7 +291,7 @@ void medDicomSliceTest::TestGetDcmImageOrientationPatientMatrix()
   cppDEL(sliceDicom);
 
   //Using the initialization constructor
-  sliceDicom = new medDicomSlice(D_SliceABSFileName,patientPos,patientOri,NULL,"","",D_DcmInstanceNumber,D_DcmCardiacNumberOfImages,D_DcmTriggerTime);
+  sliceDicom = new medDicomSlice(D_SliceABSFileName,patientPos,patientOri,NULL,"","","","",D_DcmInstanceNumber,D_DcmCardiacNumberOfImages,D_DcmTriggerTime);
 
   sliceDicom->GetOrientation(matrix);
 
