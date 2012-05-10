@@ -4,7 +4,7 @@
   Language:  C++
   Date:      $Date: 2012-03-13 17:05:21 $
   Version:   $Revision: 1.61.2.22 $
-  Authors:   Stefano Perticoni, Gianluigi Crimi
+  Authors:   Stefano Perticoni, Gianluigi Crimi, Grazia Di Cosmo
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -89,12 +89,13 @@ mafViewOrthoSlice::mafViewOrthoSlice(wxString label)
   // Added by Losi 11.25.2009
   m_EnableGPU=FALSE;
   m_TrilinearInterpolationOn = TRUE;
+
 }
 //----------------------------------------------------------------------------
 mafViewOrthoSlice::~mafViewOrthoSlice()
 //----------------------------------------------------------------------------
 {  
-
+  m_VMElist.clear();
 }
 //----------------------------------------------------------------------------
 mafView *mafViewOrthoSlice::Copy(mafObserver *Listener, bool lightCopyEnabled)
@@ -119,109 +120,50 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
 	wxWindowDisabler wait1;
 	wxBusyCursor wait2;
 
-  //Disable Visal pipes plug at run time
+  // Disable Visual pipes plug at run time
   m_CanPlugVisualPipes=false;
 
-	for(int i=0; i<m_NumOfChildView; i++)
-		m_ChildViewList[i]->VmeShow(node, show);
-
+  // Save selected vme 
+  if (show)
+     m_VMElist.push_back(node);
+  else
+  {
+    int pos=0;
+    for (int i=0; i<m_VMElist.size(); i++)
+      if(node==m_VMElist[i])
+        pos=i;
+    m_VMElist.erase(m_VMElist.begin()+pos);
+  }
+  
+  // Enable perspective View for every VME
+  m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(node, show);
+  // Disable ChildView XN, YN and ZN when no Volume is selected
+  if (m_CurrentVolume != NULL)
+ 	  for(int j=1; j<m_NumOfChildView; j++) 
+      m_ChildViewList[j]->VmeShow(node, show);
+  
 	if (((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume"))
 	{
+    // When one volume is selected enable ChildViews for all vme selected
+    for (int i=0;i<m_VMElist.size();i++)
+      for(int j=1; j<m_NumOfChildView; j++)
+      {
+        m_ChildViewList[j]->VmeShow(m_VMElist[i], show);
+        ApplyViewSettings(m_VMElist[i]);
+      }
+
 		if (show)
 		{
       // Create Ortho Stuff
       CreateOrthoslicesAndGizmos(node);
-
 		}
 		else
 		{
       DestroyOrthoSlicesAndGizmos();
     }
 	}
-	else if(node->IsMAFType(mafVMESurface))
-	{
-		if(show)
-		{
-			((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->SetSliceLocalOrigin(m_GizmoHandlePosition);
-			((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->SetSliceLocalOrigin(m_GizmoHandlePosition);
-			((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->SetSliceLocalOrigin(m_GizmoHandlePosition);
-		}
-		else
-		{
-			((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->UpdateSurfacesList(node);
-			((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->UpdateSurfacesList(node);
-			((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->UpdateSurfacesList(node);
-		}
-	}
-  else if(((mafVME *)node)->GetOutput()->IsA("mafVMEOutputPolyline"))
-  {
-    
-    mafPipePolyline *pipePolyX = mafPipePolyline::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->GetNodePipe(node));
-    if(pipePolyX)
-    {
-      if(node->IsA("mafVMEMeter"))
-      {
-        pipePolyX->SetRepresentationToTube();
-        pipePolyX->SetOpacity(0.3);
-      }
-    }
-    mafPipePolyline *pipePolyY = mafPipePolyline::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->GetNodePipe(node));
-    if(pipePolyY)
-    {
-      if(node->IsA("mafVMEMeter"))
-      {
-        pipePolyY->SetRepresentationToTube();
-        pipePolyY->SetOpacity(0.3);
-      }
-    }
-    mafPipePolyline *pipePolyZ = mafPipePolyline::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->GetNodePipe(node));
-    if(pipePolyZ)
-    {
-      if(node->IsA("mafVMEMeter"))
-      {
-        pipePolyZ->SetRepresentationToTube();
-        pipePolyZ->SetOpacity(0.3);
-      }
-    }
-
-    mafPipePolylineSlice *pipeSliceX = mafPipePolylineSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->GetNodePipe(node));
-    if(pipeSliceX) 
-    {
-      if(node->IsA("mafVMEMeter"))
-      {
-        //pipeSliceX->SplineModeOff();
-      }
-      else
-        pipeSliceX->SplineModeOn();
-      pipeSliceX->FillOn();
-    }
-
-    mafPipePolylineSlice *pipeSliceY = mafPipePolylineSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->GetNodePipe(node));
-    if(pipeSliceY) 
-    {
-      if(node->IsA("mafVMEMeter"))
-      {
-        //pipeSliceY->SplineModeOff();
-      }
-      else
-        pipeSliceY->SplineModeOn();
-      pipeSliceY->FillOn();
-      
-    }
-    
-    mafPipePolylineSlice *pipeSliceZ = mafPipePolylineSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->GetNodePipe(node));
-    if(pipeSliceZ) 
-    {
-      if(node->IsA("mafVMEMeter"))
-      {
-        //pipeSliceZ->SplineModeOff();
-      }
-      else
-        pipeSliceZ->SplineModeOn();
-      pipeSliceZ->FillOn(); 
-    }
-
-  }
+  else 
+    ApplyViewSettings(node);
 
 	//CameraUpdate();
 	EnableWidgets(m_CurrentVolume != NULL);
@@ -232,8 +174,19 @@ void mafViewOrthoSlice::VmeRemove(mafNode *node)
 {
   if (m_CurrentVolume && node == m_CurrentVolume) 
   {
+    // Disable ChildViews
+    for(int j=1; j<m_NumOfChildView; j++) 
+      m_ChildViewList[j]->VmeShow(node, false);
     DestroyOrthoSlicesAndGizmos();
+    EnableWidgets(false);
   }
+  // Remove node from list
+  int pos=-1;
+  for (int i=0; i<m_VMElist.size(); i++)
+    if(node==m_VMElist[i])
+      pos=i;
+  if (pos>=0)
+    m_VMElist.erase(m_VMElist.begin()+pos);
 
   Superclass::VmeRemove(node);
 }
@@ -852,4 +805,76 @@ bool mafViewOrthoSlice::IsPickedSliceView()
     }
   }
   return false;
+}
+//----------------------------------------------------------------------------
+void mafViewOrthoSlice::ApplyViewSettings(mafNode *node)
+//----------------------------------------------------------------------------
+{
+  if(((mafVME *)node)->GetOutput()->IsA("mafVMEOutputPolyline"))  
+  {
+    mafPipePolyline *pipePolyX = mafPipePolyline::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->GetNodePipe(node));
+    if(pipePolyX)
+    {
+      if(node->IsA("mafVMEMeter"))
+      {
+        pipePolyX->SetRepresentationToTube();
+        pipePolyX->SetOpacity(0.3);
+      }
+    }
+    mafPipePolyline *pipePolyY = mafPipePolyline::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->GetNodePipe(node));
+    if(pipePolyY)
+    {
+      if(node->IsA("mafVMEMeter"))
+      {
+        pipePolyY->SetRepresentationToTube();
+        pipePolyY->SetOpacity(0.3);
+      }
+    }
+    mafPipePolyline *pipePolyZ = mafPipePolyline::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->GetNodePipe(node));
+    if(pipePolyZ)
+    {
+      if(node->IsA("mafVMEMeter"))
+      {
+        pipePolyZ->SetRepresentationToTube();
+        pipePolyZ->SetOpacity(0.3);
+      }
+    }
+
+    mafPipePolylineSlice *pipeSliceX = mafPipePolylineSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->GetNodePipe(node));
+    if(pipeSliceX) 
+    {
+      if(node->IsA("mafVMEMeter"))
+      {
+        //pipeSliceX->SplineModeOff();
+      }
+      else
+        pipeSliceX->SplineModeOn();
+      pipeSliceX->FillOn();
+    }
+
+    mafPipePolylineSlice *pipeSliceY = mafPipePolylineSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->GetNodePipe(node));
+    if(pipeSliceY) 
+    {
+      if(node->IsA("mafVMEMeter"))
+      {
+        //pipeSliceY->SplineModeOff();
+      }
+      else
+        pipeSliceY->SplineModeOn();
+      pipeSliceY->FillOn();
+
+    }
+
+    mafPipePolylineSlice *pipeSliceZ = mafPipePolylineSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->GetNodePipe(node));
+    if(pipeSliceZ) 
+    {
+      if(node->IsA("mafVMEMeter"))
+      {
+        //pipeSliceZ->SplineModeOff();
+      }
+      else
+        pipeSliceZ->SplineModeOn();
+      pipeSliceZ->FillOn(); 
+    }
+  }
 }

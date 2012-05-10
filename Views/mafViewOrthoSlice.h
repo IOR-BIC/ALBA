@@ -4,7 +4,7 @@
   Language:  C++
   Date:      $Date: 2012-04-06 09:37:38 $
   Version:   $Revision: 1.23.2.9 $
-  Authors:   Stefano Perticoni, Gianluigi Crimi
+  Authors:   Stefano Perticoni, Gianluigi Crimi, Grazia Di Cosmo
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -164,7 +164,10 @@ protected:
   /** set thickness value for all the pipes*/
 	void SetThicknessForAllSurfaceSlices(mafNode *root);
 
-	int m_AllSurface;
+  /** Apply View Setting in ChildViews*/
+  void ApplyViewSettings(mafNode *node);
+	
+  int m_AllSurface;
 	double m_Border;
 
   mafGizmoSlice   *m_Gizmo[3];
@@ -185,6 +188,8 @@ protected:
   
   int m_EnableGPU;
   int m_TrilinearInterpolationOn;
+
+  std::vector<mafNode*> m_VMElist; ///< selected VME
 
 };
 #endif
