@@ -136,6 +136,8 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
     m_VMElist.erase(m_VMElist.begin()+pos);
   }
   
+
+
   // Enable perspective View for every VME
   m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(node, show);
   // Disable ChildView XN, YN and ZN when no Volume is selected
@@ -145,6 +147,9 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
   
 	if (((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume"))
 	{
+    for(int j=1; j<m_NumOfChildView; j++)
+      m_ChildViewList[j]->VmeShow(node, show);
+
 		if (show)
 		{
       // Create Ortho Stuff
