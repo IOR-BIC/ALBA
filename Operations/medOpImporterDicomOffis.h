@@ -357,6 +357,8 @@ protected:
 	int				m_SortAxes;
 	int				m_NumberOfTimeFrames;
 
+  int m_SkipAllNoPosition;
+
 	medDicomSeriesSliceList	*m_SelectedSeriesSlicesList; ///< Selected study slices list
 
 	std::vector<mafString> m_SelectedSeriesID; ///< Selected StudyUID-SeriesUIDWithPlanesNumber-SeriesUIDWithoutPlanesNumber vector
