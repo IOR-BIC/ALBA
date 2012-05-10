@@ -83,6 +83,7 @@ mafViewOrthoSlice::mafViewOrthoSlice(wxString label)
 
 	m_AllSurface=0;
 	m_Border=1;
+  m_PolylineRadiusSize=1;
 
   m_CanPlugVisualPipes=true;
 
@@ -144,25 +145,37 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
   
 	if (((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume"))
 	{
-    // When one volume is selected enable ChildViews for all vme selected
+		if (show)
+		{
+      // Create Ortho Stuff
+      CreateOrthoslicesAndGizmos(node);
+      
+      // Definig radius of polylines at the equivalent side of the medium voxel
+      double bounds[6], edges[3], vol, nPoints;
+      vtkDataSet *volOutput;
+      volOutput=((mafVME *)node)->GetOutput()->GetVTKData();
+      volOutput->GetBounds(bounds);
+      nPoints=volOutput->GetNumberOfPoints();
+      edges[0]=bounds[1]-bounds[0];
+      edges[1]=bounds[3]-bounds[2];
+      edges[2]=bounds[5]-bounds[4];
+      vol=edges[0]*edges[1]*edges[2];
+      m_PolylineRadiusSize=pow(vol/nPoints,1.0/3.0)/2.0;
+		}
+		else
+		{
+      DestroyOrthoSlicesAndGizmos();
+    }
+
+    // When one volume is selected/unselected we enable/disable ChildViews for all vme selected
     for (int i=0;i<m_VMElist.size();i++)
       for(int j=1; j<m_NumOfChildView; j++)
       {
         m_ChildViewList[j]->VmeShow(m_VMElist[i], show);
         ApplyViewSettings(m_VMElist[i]);
       }
-
-		if (show)
-		{
-      // Create Ortho Stuff
-      CreateOrthoslicesAndGizmos(node);
-		}
-		else
-		{
-      DestroyOrthoSlicesAndGizmos();
-    }
 	}
-  else 
+  else if (show)
     ApplyViewSettings(node);
 
 	//CameraUpdate();
@@ -806,75 +819,25 @@ bool mafViewOrthoSlice::IsPickedSliceView()
   }
   return false;
 }
+
 //----------------------------------------------------------------------------
 void mafViewOrthoSlice::ApplyViewSettings(mafNode *node)
 //----------------------------------------------------------------------------
 {
   if(((mafVME *)node)->GetOutput()->IsA("mafVMEOutputPolyline"))  
   {
-    mafPipePolyline *pipePolyX = mafPipePolyline::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->GetNodePipe(node));
-    if(pipePolyX)
+    for (int i=CHILD_ZN_VIEW;i<=CHILD_YN_VIEW;i++)
     {
-      if(node->IsA("mafVMEMeter"))
+      mafPipePolylineSlice *pipeSlice = mafPipePolylineSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[i]))->GetNodePipe(node));
+      if(pipeSlice) 
       {
-        pipePolyX->SetRepresentationToTube();
-        pipePolyX->SetOpacity(0.3);
+        if(!node->IsA("mafVMEMeter"))
+        {
+          pipeSlice->SetRadius(m_PolylineRadiusSize);
+          pipeSlice->SplineModeOn();
+        }
+        pipeSlice->FillOn(); 
       }
-    }
-    mafPipePolyline *pipePolyY = mafPipePolyline::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->GetNodePipe(node));
-    if(pipePolyY)
-    {
-      if(node->IsA("mafVMEMeter"))
-      {
-        pipePolyY->SetRepresentationToTube();
-        pipePolyY->SetOpacity(0.3);
-      }
-    }
-    mafPipePolyline *pipePolyZ = mafPipePolyline::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->GetNodePipe(node));
-    if(pipePolyZ)
-    {
-      if(node->IsA("mafVMEMeter"))
-      {
-        pipePolyZ->SetRepresentationToTube();
-        pipePolyZ->SetOpacity(0.3);
-      }
-    }
-
-    mafPipePolylineSlice *pipeSliceX = mafPipePolylineSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->GetNodePipe(node));
-    if(pipeSliceX) 
-    {
-      if(node->IsA("mafVMEMeter"))
-      {
-        //pipeSliceX->SplineModeOff();
-      }
-      else
-        pipeSliceX->SplineModeOn();
-      pipeSliceX->FillOn();
-    }
-
-    mafPipePolylineSlice *pipeSliceY = mafPipePolylineSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->GetNodePipe(node));
-    if(pipeSliceY) 
-    {
-      if(node->IsA("mafVMEMeter"))
-      {
-        //pipeSliceY->SplineModeOff();
-      }
-      else
-        pipeSliceY->SplineModeOn();
-      pipeSliceY->FillOn();
-
-    }
-
-    mafPipePolylineSlice *pipeSliceZ = mafPipePolylineSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->GetNodePipe(node));
-    if(pipeSliceZ) 
-    {
-      if(node->IsA("mafVMEMeter"))
-      {
-        //pipeSliceZ->SplineModeOff();
-      }
-      else
-        pipeSliceZ->SplineModeOn();
-      pipeSliceZ->FillOn(); 
     }
   }
 }

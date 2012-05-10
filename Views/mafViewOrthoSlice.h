@@ -182,6 +182,7 @@ protected:
   mafViewSlice *m_Views[4]; ///< Child views
   int	m_Side; ///< change Azimuth of the camera
 	int m_Snap; ///<change modality of gizmo to snap on grid
+  double m_PolylineRadiusSize;
 
   bool m_CanPlugVisualPipes; ///< true if u can plug visual pipes
 
