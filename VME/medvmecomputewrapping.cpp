@@ -176,6 +176,34 @@ int medVMEComputeWrapping::DeepCopy(mafNode *a)
 		medVMEComputeWrapping *meter = medVMEComputeWrapping::SafeDownCast(a);
 		m_Transform->SetMatrix(meter->m_Transform->GetMatrix());
 
+		//BES: 11.5.2012 - deep copy settings	
+		this->m_Angle = meter->m_Angle;
+		this->m_WrappedMode1 = meter->m_WrappedMode1;
+		this->m_WrappedMode2 = meter->m_WrappedMode2;
+		this->m_WrapSide = meter->m_WrapSide;
+		this->m_WrapReverse = meter->m_WrapReverse;
+		this->m_WrapReverseNew = meter->m_WrapReverseNew;
+		this->m_WrappedClass = meter->m_WrappedClass;
+
+		this->m_StartVmeName = meter->m_StartVmeName;
+		this->m_EndVme1Name = meter->m_EndVme1Name;
+		this->m_EndVme2Name = meter->m_EndVme2Name;
+		this->m_WrappedVmeName1 = meter->m_WrappedVmeName1;
+		this->m_WrappedVmeName2 = meter->m_WrappedVmeName2;
+
+		this->m_WrappedVmeName = meter->m_WrappedVmeName;
+		this->m_ViaPointName = meter->m_ViaPointName;
+		this->m_AbCurve = meter->m_AbCurve;
+
+		this->m_Idx = meter->m_Idx;
+		this->m_PathNum = meter->m_PathNum;
+
+		memcpy(this->m_Alist, meter->m_Alist, sizeof(this->m_Alist));		
+		memcpy(this->m_APoint, meter->m_APoint, sizeof(this->m_APoint));
+		
+		//TODO: Whoever implemented this class,  please DeepCopy other members !!!
+		//I have no idea which are important and which are not, too many of them
+
 		mafDataPipeCustom *dpipe =
 			mafDataPipeCustom::SafeDownCast(GetDataPipe());
 		if (dpipe)
