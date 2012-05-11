@@ -869,41 +869,22 @@ void mafViewSlice::BorderDelete()
 void mafViewSlice::UpdateSurfacesList(mafNode *node)
 //----------------------------------------------------------------------------
 {
+  mafSceneNode *sceneNode = m_Sg->Vme2Node(node);
   for(int i=0;i<m_CurrentSurface.size();i++)
-  {
-    if (m_CurrentSurface[i]==m_Sg->Vme2Node(node))
-    {
-      std::vector<mafSceneNode*>::iterator startIterator;
+    if (sceneNode==m_CurrentSurface[i])
       m_CurrentSurface.erase(m_CurrentSurface.begin()+i);
-    }
-  }
 
 	for(int i=0;i<m_CurrentPolyline.size();i++)
-	{
-		if (m_CurrentPolyline[i]==m_Sg->Vme2Node(node))
-		{
-			std::vector<mafSceneNode*>::iterator startIterator;
+		if (sceneNode==m_CurrentPolyline[i])
 			m_CurrentPolyline.erase(m_CurrentPolyline.begin()+i);
-		}
-	}
 
 	for(int i=0;i<m_CurrentPolylineGraphEditor.size();i++)
-	{
-		if (m_CurrentPolylineGraphEditor[i]==m_Sg->Vme2Node(node))
-		{
-			std::vector<mafSceneNode*>::iterator startIterator;
+		if (sceneNode==m_CurrentPolylineGraphEditor[i])
 			m_CurrentPolylineGraphEditor.erase(m_CurrentPolylineGraphEditor.begin()+i);
-		}
-	}
 
   for(int i=0;i<m_CurrentMesh.size();i++)
-  {
-    if (m_CurrentMesh[i]==m_Sg->Vme2Node(node))
-    {
-      std::vector<mafSceneNode*>::iterator startIterator;
+    if (sceneNode==m_CurrentMesh[i])
       m_CurrentMesh.erase(m_CurrentMesh.begin()+i);
-    }
-  }
 }
 
 //----------------------------------------------------------------------------
@@ -945,22 +926,18 @@ void mafViewSlice::VmeShow(mafNode *node, bool show)
     //CameraReset(node);
     //m_Rwi->CameraUpdate();
   }
-	else if(node->IsA("mafVMEPolyline")||node->IsA("mafVMESurface")||node->IsA("medVMEPolylineEditor")||node->IsA("mafVMEMesh") || node->IsA("mafVMELandmark") || node->IsA("mafVMELandmarkCloud") /*|| node->IsA("mafVMEMeter")*/)
-	{
-		this->UpdateSurfacesList(node);
-	}
-  
+  // bug #2761. New: Crash when a new msf is loaded
+	else 
+    this->UpdateSurfacesList(node);
+
 	Superclass::VmeShow(node, show);
 }
 //----------------------------------------------------------------------------
 void mafViewSlice::VmeRemove(mafNode *vme)
 //----------------------------------------------------------------------------
 {
-  if(vme->IsA("mafVMEPolyline")||vme->IsA("mafVMESurface")||
-    vme->IsA("medVMEPolylineEditor")||vme->IsA("mafVMEMesh"))
-  {
-    this->UpdateSurfacesList(vme);
-  }
+  // bug #2761. New: Crash when a new msf is loaded
+  this->UpdateSurfacesList(vme);
   Superclass::VmeRemove(vme);
 }
 
