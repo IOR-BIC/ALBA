@@ -357,6 +357,8 @@ protected:
 	int				m_SortAxes;
 	int				m_NumberOfTimeFrames;
 
+  int m_SkipAllNoPosition;
+
 	medDicomSeriesSliceList	*m_SelectedSeriesSlicesList; ///< Selected study slices list
 
 	std::vector<mafString> m_SelectedSeriesID; ///< Selected StudyUID-SeriesUIDWithPlanesNumber-SeriesUIDWithoutPlanesNumber vector
@@ -447,6 +449,8 @@ public:
 	/** constructor */
 	medDicomSlice() 
 	{
+    m_PatientBirthdate = '###';
+    m_PatientName = '###';
     m_Description = "###";
     m_Date = "###";
 		m_SliceABSFileName = "";
@@ -472,9 +476,11 @@ public:
 
 	/** overloaded constructor */
 	medDicomSlice(mafString sliceABSFilename,double dcmImagePositionPatient[3], double dcmImageOrientationPatient[6],\
-		vtkImageData *data , mafString description, mafString date,int dcmInstanceNumber=-1, int dcmCardiacNumberOfImages=-1,\
+		vtkImageData *data , mafString description , mafString date , mafString patientName , mafString patientBirthdate ,int dcmInstanceNumber=-1, int dcmCardiacNumberOfImages=-1,\
     double dcmTtriggerTime=-1.0, int referenceSystem = ID_RS_XY)  
 	{
+    m_PatientBirthdate = patientBirthdate;
+    m_PatientName = patientName;
     m_Description = description;
     m_Date = date;
 		m_SliceABSFileName = sliceABSFilename;
@@ -509,6 +515,12 @@ public:
 
 	/** destructor */
 	~medDicomSlice() {vtkDEL(m_Data);};
+
+  /** Return patient birthday */
+  mafString GetPatientBirthday(){return m_PatientBirthdate;};
+
+  /** Return patient name */
+  mafString GetPatientName(){return m_PatientName;};
 
 	/** Return the filename of the corresponding dicom slice. */
 	const char *GetSliceABSFileName() const {return m_SliceABSFileName.GetCStr();};
@@ -651,6 +663,8 @@ protected:
 	mafString m_SliceABSFileName;
   mafString m_Description;
   mafString m_Date;
+  mafString m_PatientName;
+  mafString m_PatientBirthdate;
 
 	double m_DcmTriggerTime;
 	int m_DcmInstanceNumber;

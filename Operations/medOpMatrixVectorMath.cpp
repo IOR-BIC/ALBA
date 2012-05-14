@@ -780,7 +780,7 @@ void medOpMatrixVectorMath::PrintMatrix(std::ostream& os, const double *A) const
 void medOpMatrixVectorMath::Transpose2DArray(const double arr1[3][3], double arr2[3][3]) const
 //------------------------------------------------------------------------------
 {
-  double temp[4][4] ;
+//  double temp[4][4] ;
 
   if (m_Homogeneous){
     /*for (int i = 0 ;  i < 4 ;  i++)

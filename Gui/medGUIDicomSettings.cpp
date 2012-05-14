@@ -32,10 +32,12 @@ mafGUISettings(Listener, label)
 {
 	// m_Dictionary = "";
 
-	m_CheckOnOff[0] = m_CheckOnOff[1] = m_CheckOnOff[2] = m_CheckOnOff[3] = m_CheckOnOff[4] = m_CheckOnOff[5] = m_CheckOnOff[6] = true;
+  m_CheckNameCompositor[ID_PATIENT_NAME] = m_CheckNameCompositor[ID_BIRTHDATE] = m_CheckNameCompositor[ID_NUM_SLICES] = m_CheckNameCompositor[ID_DESCRIPTION] = TRUE;
 
-  m_CheckOnOffVmeType[0] = m_CheckOnOffVmeType[2] = true;
-  m_CheckOnOffVmeType[1] = false;
+	m_CheckOnOff[0] = m_CheckOnOff[1] = m_CheckOnOff[2] = m_CheckOnOff[3] = m_CheckOnOff[4] = m_CheckOnOff[5] = m_CheckOnOff[6] = TRUE;
+
+  m_CheckOnOffVmeType[0] = m_CheckOnOffVmeType[2] = TRUE;
+  m_CheckOnOffVmeType[1] = FALSE;
 
 	m_AutoCropPos = FALSE;
 	m_EnableNumberOfSlice = TRUE;
@@ -125,8 +127,15 @@ void medGUIDicomSettings::CreateGui()
 	m_Gui->Divider(1);
 
 
-  wxString outputNameTypeChoices[2] = {_("Traditional format"),_("Format : 'descrition_date'")};
-  m_Gui->Radio(ID_OUTPUT_NAME,_("Output name"),&m_OutputNameType,2,outputNameTypeChoices);
+  wxString outputNameTypeChoices[3] = {_("Traditional format"),_("Format : 'descrition_date'"),_("Custom")};
+  m_Gui->Radio(ID_OUTPUT_NAME,_("Output name"),&m_OutputNameType,3,outputNameTypeChoices);
+  m_NameCompositorList = m_Gui->CheckList(ID_NAME_COMPOSITOR,"");
+  m_NameCompositorList->AddItem(ID_PATIENT_NAME,_("Patient Name"),m_CheckNameCompositor[ID_PATIENT_NAME]);
+  m_NameCompositorList->AddItem(ID_DESCRIPTION,_("Description"),m_CheckNameCompositor[ID_DESCRIPTION]);
+  m_NameCompositorList->AddItem(ID_BIRTHDATE,_("Birthdate"),m_CheckNameCompositor[ID_BIRTHDATE]);
+  m_NameCompositorList->AddItem(ID_NUM_SLICES,_("Num. Slices"),m_CheckNameCompositor[ID_NUM_SLICES]);
+  m_NameCompositorList->Enable(m_OutputNameType == CUSTOM);
+
   m_Gui->Divider(1);
 
 	m_Gui->Update();
@@ -209,6 +218,19 @@ void medGUIDicomSettings::OnEvent(mafEventBase *maf_event)
 			m_Config->Write("EnableTypeImage",m_DicomVmeTypeListBox->IsItemChecked(ID_IMAGE));
 		}
 		break;
+  case ID_NAME_COMPOSITOR:
+    {
+      m_CheckNameCompositor[ID_PATIENT_NAME] = m_NameCompositorList->IsItemChecked(ID_PATIENT_NAME);
+      m_CheckNameCompositor[ID_DESCRIPTION] = m_NameCompositorList->IsItemChecked(ID_DESCRIPTION);
+      m_CheckNameCompositor[ID_BIRTHDATE] = m_NameCompositorList->IsItemChecked(ID_BIRTHDATE);
+      m_CheckNameCompositor[ID_NUM_SLICES] = m_NameCompositorList->IsItemChecked(ID_NUM_SLICES);
+
+      m_Config->Write("NameCompositorPatientName",m_NameCompositorList->IsItemChecked(ID_PATIENT_NAME));
+      m_Config->Write("NameCompositorDescription",m_NameCompositorList->IsItemChecked(ID_DESCRIPTION));
+      m_Config->Write("NameCompositorBirthdate",m_NameCompositorList->IsItemChecked(ID_BIRTHDATE));
+      m_Config->Write("NameCompositorNumSlices",m_NameCompositorList->IsItemChecked(ID_NUM_SLICES));
+    }
+    break;
 	case ID_AUTO_POS_CROP:
 		{
 			m_Config->Write("AutoCropPos",m_AutoCropPos);
@@ -297,6 +319,8 @@ void medGUIDicomSettings::OnEvent(mafEventBase *maf_event)
   case ID_OUTPUT_NAME:
     {
       m_Config->Write("OutputNameFormat",m_OutputNameType);
+
+      m_NameCompositorList->Enable(m_OutputNameType == CUSTOM);
     }
     break;
 	default:
@@ -594,6 +618,50 @@ void medGUIDicomSettings::InitializeSettings()
     m_Config->Write("UseDefaultDicomFolder",m_UseDefaultDicomFolder);
   }
 
+//   if(m_Config->Read("NameCompositorPatientName", &long_item))
+//   {
+//     m_UseDefaultDicomFolder=long_item;
+//   }
+//   else
+//   {
+//     m_Config->Write("NameCompositorPatientName",m_UseDefaultDicomFolder);
+//   }
+
+  if(m_Config->Read("NameCompositorPatientName", &long_item))
+  {
+    m_CheckNameCompositor[ID_PATIENT_NAME] = long_item;
+  }
+  else
+  {
+    m_Config->Write("NameCompositorPatientName",m_CheckNameCompositor[ID_PATIENT_NAME]);
+  }
+
+  if(m_Config->Read("NameCompositorDescription", &long_item))
+  {
+    m_CheckNameCompositor[ID_DESCRIPTION] = long_item;
+  }
+  else
+  {
+    m_Config->Write("NameCompositorDescription",m_CheckNameCompositor[ID_DESCRIPTION]);
+  }
+
+  if(m_Config->Read("NameCompositorBirthdate", &long_item))
+  {
+    m_CheckNameCompositor[ID_BIRTHDATE] = long_item;
+  }
+  else
+  {
+    m_Config->Write("NameCompositorBirthdate",m_CheckNameCompositor[ID_BIRTHDATE]);
+  }
+
+  if(m_Config->Read("NameCompositorNumSlices", &long_item))
+  {
+    m_CheckNameCompositor[ID_NUM_SLICES] = long_item;
+  }
+  else
+  {
+    m_Config->Write("NameCompositorNumSlices",m_CheckNameCompositor[ID_NUM_SLICES]);
+  }
 
 	m_Config->Flush();
 }
@@ -759,4 +827,12 @@ void medGUIDicomSettings::SetLastDicomDir( wxString lastDicomDir )
   assert(m_Config);
   m_Config->Write("LastDicomDir",m_LastDicomDir.c_str());
 
+}
+
+int medGUIDicomSettings::GetEnabledCustomName( int type )
+{
+  if (type >= ID_PATIENT_NAME && type<=ID_NUM_SLICES)
+  {
+    return m_CheckNameCompositor[type];
+  }
 }

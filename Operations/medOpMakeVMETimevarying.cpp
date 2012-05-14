@@ -239,7 +239,7 @@ void medOpMakeVMETimevarying::OnEvent(mafEventBase *maf_event)
         mafString title = _("Choose VME");
         mafEvent e(this,VME_CHOOSE,&title,(long)&medOpMakeVMETimevarying::DialogAcceptVME);
         mafEventMacro(e);
-        mafVME * tmpCurrentVME;
+        
         //mafNEW(m_CurrentVME);
         m_CurrentVME = mafVME::SafeDownCast(e.GetVme());
         bool VMEOk = AcceptVME(m_CurrentVME);

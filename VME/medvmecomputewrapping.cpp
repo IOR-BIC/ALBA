@@ -124,35 +124,9 @@ medVMEComputeWrapping::medVMEComputeWrapping()
 	mafDataPipeCustom *dpipe = mafDataPipeCustom::New();
 	dpipe->SetDependOnAbsPose(true);
 	SetDataPipe(dpipe);
-	
-	//----------------------------
-	// Commented line (roll back to )since it reopens Bug 2594: 
-	// http://bugzilla.b3c.it/show_bug.cgi?id=2594
-	//
-	// Roll back to 1.1.2.28
-	//
-	/* 
 
-	This commit was reverted:
-	----------------------------
-	Revision : 1.1.2.29
-	Date : 2012/4/10 17:11:25
-	Author : 'josef'
-	State : 'Exp'
-	Lines : +7 -3
-	CommitID : 'lTvDMUOCgvfspl0w'
-	Description : 
-	SHA: vtk filter fixing medVMEComputeWrapping segment problems
-	----------------------------
-
-	In particular action line visualization via cylinder is crashing and there are also issues
-	on line visualization
-
-	*/
-	// m_LinePatcher->SetInput(m_Goniometer->GetOutput());
-	// dpipe->SetInput(m_LinePatcher->GetOutput());
-	//-----------------------------
-
+	m_LinePatcher->SetInput(m_Goniometer->GetOutput());
+	dpipe->SetInput(m_LinePatcher->GetOutput());
 	dpipe->SetInput(m_Goniometer->GetOutput());
 }
 //-------------------------------------------------------------------------
@@ -170,9 +144,14 @@ medVMEComputeWrapping::~medVMEComputeWrapping()
 	mafDEL(m_Mat);
 	mafDEL(m_Imat);
 
-	for(int i=0; i< m_MiddlePointList.size(); i++)
+	for (int i = 0; i < (int)m_ExportPointList.size(); i++) {
+		delete[] m_ExportPointList[i];
+	}
+	m_ExportPointList.clear();
+
+	for(int i=0; i< (int)m_MiddlePointList.size(); i++)
 	{
-		if(m_MiddlePointList[i]) delete m_MiddlePointList[i];
+		delete[] m_MiddlePointList[i];
 	}
 	m_MiddlePointList.clear();
 
@@ -196,6 +175,34 @@ int medVMEComputeWrapping::DeepCopy(mafNode *a)
 	{
 		medVMEComputeWrapping *meter = medVMEComputeWrapping::SafeDownCast(a);
 		m_Transform->SetMatrix(meter->m_Transform->GetMatrix());
+
+		//BES: 11.5.2012 - deep copy settings	
+		this->m_Angle = meter->m_Angle;
+		this->m_WrappedMode1 = meter->m_WrappedMode1;
+		this->m_WrappedMode2 = meter->m_WrappedMode2;
+		this->m_WrapSide = meter->m_WrapSide;
+		this->m_WrapReverse = meter->m_WrapReverse;
+		this->m_WrapReverseNew = meter->m_WrapReverseNew;
+		this->m_WrappedClass = meter->m_WrappedClass;
+
+		this->m_StartVmeName = meter->m_StartVmeName;
+		this->m_EndVme1Name = meter->m_EndVme1Name;
+		this->m_EndVme2Name = meter->m_EndVme2Name;
+		this->m_WrappedVmeName1 = meter->m_WrappedVmeName1;
+		this->m_WrappedVmeName2 = meter->m_WrappedVmeName2;
+
+		this->m_WrappedVmeName = meter->m_WrappedVmeName;
+		this->m_ViaPointName = meter->m_ViaPointName;
+		this->m_AbCurve = meter->m_AbCurve;
+
+		this->m_Idx = meter->m_Idx;
+		this->m_PathNum = meter->m_PathNum;
+
+		memcpy(this->m_Alist, meter->m_Alist, sizeof(this->m_Alist));		
+		memcpy(this->m_APoint, meter->m_APoint, sizeof(this->m_APoint));
+		
+		//TODO: Whoever implemented this class,  please DeepCopy other members !!!
+		//I have no idea which are important and which are not, too many of them
 
 		mafDataPipeCustom *dpipe =
 			mafDataPipeCustom::SafeDownCast(GetDataPipe());
@@ -346,6 +353,9 @@ void medVMEComputeWrapping::Dispatch(){
 
 	bool prepareflag = PrepareData2();
 
+	for (int i = 0; i < (int)m_ExportPointList.size(); i++) {
+		delete[] m_ExportPointList[i];
+	}
 	m_ExportPointList.clear();
 	//---------------------test code----------------------------
 	/*

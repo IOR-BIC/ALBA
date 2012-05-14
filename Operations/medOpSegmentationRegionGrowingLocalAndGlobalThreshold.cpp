@@ -304,7 +304,7 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::RegionGrowing()
   imageData->Update();
 
   //Get the thresholds values selected by the user
-  double lower,upper;
+  //double lower,upper;
   //m_Histogram->GetThresholds(&lower,&upper);
   
   //Apply the region growing filter
