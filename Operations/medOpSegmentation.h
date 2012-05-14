@@ -63,6 +63,7 @@ class vtkPolyDataMapper;
 class vtkActor;
 class vtkStructuredPoints;
 class vtkUnsignedCharArray;
+class medViewSliceNotInterpolated;
 
 //----------------------------------------------------------------------------
 // medOpSegmentation :
@@ -345,7 +346,7 @@ protected:
   int m_NumSliceSliderEvents;         //<Number of events raised by the slider in a single interaction
   int m_CurrentOperation;             //<Current step
   mafGUIDialog* m_Dialog;             //<Dialog - GUI
-  medViewSliceGlobal* m_View;         //<Rendering Slice view
+  medViewSliceNotInterpolated* m_View;                 //<Rendering Slice view
   mafGUIButton* m_OkButton;           //<Button -GUI
   mafGUIButton* m_CancelButton;       //<Button -GUI
   mafGUIButton* m_LoadSegmentationButton; //<Button -GUI
@@ -545,6 +546,12 @@ protected:
 
   /** Apply refinement algorithm implemented with vtk only */
   bool ApplyRefinementFilter2(vtkStructuredPoints *inputImage, vtkStructuredPoints *outputImage);
+
+  /** Update slice visualisation on threshold step */
+  void OnEventUpdateThresholdSlice();
+
+  /** Update slice visualisation on manual step */
+  void OnEventUpdateManualSlice();
 
   mafVMEVolumeGray *m_RefinementVolumeMask; //<Refinement volume mask
   int m_RefinementSegmentationAction;       //<Refinement action fill holes or remove islands

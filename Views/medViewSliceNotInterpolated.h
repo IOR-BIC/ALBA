@@ -71,6 +71,9 @@ public:
   /** Set the slice position */
   void SetSlice(double origin[3]);
 
+  /** update pipes lut */
+  void SetLut(mafNode *volume, vtkLookupTable *lut);
+
 protected:
 
   /** Create view Gui */

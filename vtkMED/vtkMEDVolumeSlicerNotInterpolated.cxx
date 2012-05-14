@@ -195,7 +195,7 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
     for(int i = 0; i < InputDimensions[SliceAxis]; i++)
     {
       double tupleVal = coordsZ->GetTuple1(i);
-      int dist = 0;
+      double dist = 0;
       if(((dist = abs(tupleVal - Origin[SliceAxis])) < minDist) /*&& ((tupleVal - Origin[2]) <= 0)*/)
       {
         int ijk[3] = {0,0,0};
