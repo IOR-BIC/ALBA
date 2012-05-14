@@ -2019,8 +2019,7 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
       {
         m_CurrentSliceIndex = 1;
         m_View->SetSliceAxis(m_CurrentSlicePlane);
-
-        if (m_CurrentSliceIndex != m_OldSliceIndex && m_CurrentOperation==MANUAL_SEGMENTATION)
+        if (m_CurrentOperation==MANUAL_SEGMENTATION)
         {
           OnEventUpdateManualSlice();
         }
@@ -2036,7 +2035,6 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         {
           CreateRealDrawnImage();
         }
-        
         InitGui();
         if (m_CurrentOperation == AUTOMATIC_SEGMENTATION)
           OnChangeThresholdType();
@@ -2202,6 +2200,7 @@ void medOpSegmentation::OnEventUpdateManualSlice()
   UndoBrushPreview();
   ApplyVolumeSliceChanges();
   UpdateSlice();
+  UpdateVolumeSlice();
   m_View->VmeShow(m_ManualVolumeSlice, true);
   m_View->CameraUpdate();
 }
@@ -3088,7 +3087,7 @@ void medOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
         unused = 1;
         // y dimension = 2
         factors[0] = 1;
-        factors[1] = m_VolumeDimensions[0] * 2;
+        factors[1] = m_VolumeDimensions[0] * 1;
       }
       break;
     case YZ:
@@ -3097,8 +3096,8 @@ void medOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
         ordinate = 2;
         unused = 0;
         // x dimension = 2
-        factors[0] = 2;
-        factors[1] = m_VolumeDimensions[1] * 2;
+        factors[0] = 1;
+        factors[1] = m_VolumeDimensions[1] * 1;
       }
       break;
   }
@@ -3107,7 +3106,7 @@ void medOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
 
   volumeDimensions[abscissa] =  m_VolumeDimensions[abscissa];
   volumeDimensions[ordinate] = m_VolumeDimensions[ordinate];
-  volumeDimensions[unused] = 2;
+  volumeDimensions[unused] = 1;
    
   double numberOfPoints = m_VolumeDimensions[abscissa] * m_VolumeDimensions[ordinate] * volumeDimensions[unused];
 
@@ -3864,27 +3863,27 @@ void medOpSegmentation::InitDataVolumeSlice(mafVMEVolumeGray *slice)
     {
       z = vtkDoubleArray::New();
       z->SetNumberOfComponents(1);
-      z->SetNumberOfTuples(2);
+      z->SetNumberOfTuples(1);
       z->SetTuple1(0, origin[2]);
-      z->SetTuple1(1, origin[2] + 1.0);
+      //z->SetTuple1(1, origin[2] + 1.0);
       newRgData->SetDimensions(m_VolumeDimensions[0],m_VolumeDimensions[1],numberOfSlices);
     }
     else if(m_CurrentSlicePlane == YZ)
     {
       x = vtkDoubleArray::New();
       x->SetNumberOfComponents(1);
-      x->SetNumberOfTuples(2);
+      x->SetNumberOfTuples(1);
       x->SetTuple1(0, origin[0]);
-      x->SetTuple1(1, origin[0] + 1.0);
+      //x->SetTuple1(1, origin[0] + 1.0);
       newRgData->SetDimensions(numberOfSlices,m_VolumeDimensions[1],m_VolumeDimensions[2]);
     }
     else if(m_CurrentSlicePlane == XZ)
     {
       y = vtkDoubleArray::New();
       y->SetNumberOfComponents(1);
-      y->SetNumberOfTuples(2);
+      y->SetNumberOfTuples(1);
       y->SetTuple1(0, origin[1]);
-      y->SetTuple1(1, origin[1] + 1.0);
+      //y->SetTuple1(1, origin[1] + 1.0);
       newRgData->SetDimensions(m_VolumeDimensions[0],numberOfSlices,m_VolumeDimensions[2]);
     }
     newRgData->SetXCoordinates(x);
@@ -3952,7 +3951,7 @@ void medOpSegmentation::UpdateVolumeSlice()
   GetSliceOrigin(origin);
   
   // Single slice volumes crashes on vmeshow
-  int numberOfSlices = 2;
+  int numberOfSlices = 1;
   int numberOfPoints;
 
   ///////////////////////////////////////////////////////////////////
@@ -4044,27 +4043,27 @@ void medOpSegmentation::UpdateVolumeSlice()
     {
       z = vtkDoubleArray::New();
       z->SetNumberOfComponents(1);
-      z->SetNumberOfTuples(2);
+      z->SetNumberOfTuples(1);
       z->SetTuple1(0, origin[2]);
-      z->SetTuple1(1, origin[2] + 1.0);
+      /*z->SetTuple1(1, origin[2] + 1.0);*/
       newRgData->SetDimensions(m_VolumeDimensions[0],m_VolumeDimensions[1],numberOfSlices);
     }
     else if(m_CurrentSlicePlane == YZ)
     {
       x = vtkDoubleArray::New();
       x->SetNumberOfComponents(1);
-      x->SetNumberOfTuples(2);
+      x->SetNumberOfTuples(1);
       x->SetTuple1(0, origin[0]);
-      x->SetTuple1(1, origin[0] + 1.0);
+      /*x->SetTuple1(1, origin[0] + 1.0);*/
       newRgData->SetDimensions(numberOfSlices,m_VolumeDimensions[1],m_VolumeDimensions[2]);
     }
     else if(m_CurrentSlicePlane == XZ)
     {
       y = vtkDoubleArray::New();
       y->SetNumberOfComponents(1);
-      y->SetNumberOfTuples(2);
+      y->SetNumberOfTuples(1);
       y->SetTuple1(0, origin[1]);
-      y->SetTuple1(1, origin[1] + 1.0);
+      /*y->SetTuple1(1, origin[1] + 1.0);*/
       newRgData->SetDimensions(m_VolumeDimensions[0],numberOfSlices,m_VolumeDimensions[2]);
     }
     newRgData->SetXCoordinates(x);
@@ -4098,7 +4097,7 @@ void medOpSegmentation::ApplyVolumeSliceChanges()
     vtkDataArray *scalars = sliceDataSet->GetPointData()->GetScalars();
 
     int numberOfPoints;
-    int numberOfSlices=2;
+    int numberOfSlices=1;
     
     if(m_OldSlicePlane == XY)
     {
