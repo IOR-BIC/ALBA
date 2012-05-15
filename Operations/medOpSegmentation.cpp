@@ -362,6 +362,7 @@ void medOpSegmentation::OpDo()
   {
     case  AUTOMATIC_SEGMENTATION:
     {
+      UpdateThresholdVolumeData();
       m_OutputVolume->DeepCopy(m_ThresholdVolume);
     }
     break;
@@ -1524,6 +1525,8 @@ void medOpSegmentation::OnAutomaticStep()
 
     //m_CurrentOperation = AUTOMATIC_SEGMENTATION;
     //OnNextStep();
+
+    OnEventUpdateThresholdSlice();
   }
 
 }
@@ -1592,6 +1595,8 @@ void medOpSegmentation::OnManualStep()
 
   m_View->SetSliceAxis(m_CurrentSlicePlane);
   m_View->CameraUpdate();
+
+  OnEventUpdateManualSlice();
 }
 //------------------------------------------------------------------------
 void medOpSegmentation::OnAutomaticStepExit()
@@ -2353,11 +2358,9 @@ void medOpSegmentation::OnAutomaticRemoveRange()
 }
 
 //------------------------------------------------------------------------
-void medOpSegmentation::OnAutomaticPreview()
+void medOpSegmentation::UpdateThresholdVolumeData()
 //------------------------------------------------------------------------
 {
-  wxBusyCursor wait_cursor;
-  wxBusyInfo wait(_("Creating preview: Please wait"));
   //////////////////////////////////////////////////////////////////////////
   //PREVIEW
   //////////////////////////////////////////////////////////////////////////
@@ -2401,6 +2404,15 @@ void medOpSegmentation::OnAutomaticPreview()
   }
 
   m_ThresholdVolume->Update();
+}
+//------------------------------------------------------------------------
+void medOpSegmentation::OnAutomaticPreview()
+//------------------------------------------------------------------------
+{
+  wxBusyCursor wait_cursor;
+  wxBusyInfo wait(_("Creating preview: Please wait"));
+  
+  UpdateThresholdVolumeData();
 
   m_SegmentationColorLUT = m_ThresholdVolume->GetMaterial()->m_ColorLut;
   InitMaskColorLut(m_SegmentationColorLUT);
@@ -3142,10 +3154,13 @@ void medOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
 
   assert(nearestIndex != -1);
 
+  double oldBrushSize = m_ManualBrushSize;
   int nearestDummyIndex = int(m_ManualBrushSize / 2) * factors[0] + int(m_ManualBrushSize / 2) * factors[1];//int(m_ManualBrushSize / 2) + int(m_ManualBrushSize / 2) * volumeDimensions[0] + int(m_ManualBrushSize / 2) * volumeDimensions[1];
   std::vector<int> dummyIndices;
   if(m_ManualBrushShape == 0) // circle
   {
+    m_ManualBrushSize ++;
+    nearestDummyIndex = int(m_ManualBrushSize / 2) * factors[0] + int(m_ManualBrushSize / 2) * factors[1];
     double radius = (double((m_ManualBrushSize) / 2.))* targetSpacing;
     double radius2 = pow(radius,2);
     double dummyCenter[3];
@@ -3220,7 +3235,8 @@ void medOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
   m_ManualVolumeSlice->GetOutput()->Update();
   m_ManualVolumeSlice->Update();
   m_View->VmeShow(m_ManualVolumeSlice, true);
-
+  
+  m_ManualBrushSize = oldBrushSize;
 }
 /**
 //----------------------------------------------------------------------------
@@ -3550,7 +3566,7 @@ void medOpSegmentation::InitVolumeDimensions()
   {
     inputDataSet->Update();
 
-    m_Volume->GetOutput()->GetBounds(m_VolumeBounds);
+    m_Volume->GetOutput()->GetVTKData()->GetBounds(m_VolumeBounds);
 
     if (vtkStructuredPoints *sp = vtkStructuredPoints::SafeDownCast(inputDataSet))
       sp->GetDimensions(m_VolumeDimensions); 
@@ -4391,7 +4407,7 @@ bool medOpSegmentation::SegmentedVolumeAccept(mafNode* node)
     volumeToCheck->GetOutput()->GetBounds(b);
     for(int i = 0; i < 6; i++)
     {
-      if(b[i] != m_CurrentVolumeBounds[i])
+      if((b[i] != m_CurrentVolumeBounds[i])) // Workaround: vme with children change its bounds
       {
         return false;
       }

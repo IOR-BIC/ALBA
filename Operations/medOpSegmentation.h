@@ -553,6 +553,9 @@ protected:
   /** Update slice visualisation on manual step */
   void OnEventUpdateManualSlice();
 
+  /** Update threshold volume data  for preview or output */
+  void UpdateThresholdVolumeData();
+
   mafVMEVolumeGray *m_RefinementVolumeMask; //<Refinement volume mask
   int m_RefinementSegmentationAction;       //<Refinement action fill holes or remove islands
   int m_RefinementRegionsSize;              //<Size for region recognition
