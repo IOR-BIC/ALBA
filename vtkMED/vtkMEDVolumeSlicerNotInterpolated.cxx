@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: vtkMEDVolumeSlicerNotInterpolated.cxx,v $
   Language:  C++
-  Date:      $Date: 2012-04-30 15:43:16 $
-  Version:   $Revision: 1.1.2.4 $
+  Date:      $Date: 2012-04-20 13:59:55 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Alberto Losi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,7 +35,7 @@
 #define min(a,b) (((a) < (b)) ? (a) : (b))
 #define max(a,b)  (((a) > (b)) ? (a) : (b))
 
-vtkCxxRevisionMacro(vtkMEDVolumeSlicerNotInterpolated, "$Revision: 1.1.2.4 $");
+vtkCxxRevisionMacro(vtkMEDVolumeSlicerNotInterpolated, "$Revision: 1.1.2.3 $");
 vtkStandardNewMacro(vtkMEDVolumeSlicerNotInterpolated);
 
 //----------------------------------------------------------------------------
@@ -81,10 +81,14 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
   if ((NumberOfComponents = input->GetPointData()->GetNumberOfComponents()) == 0)
     return; // Nothing to display
 
+  input->GetBounds(Bounds);
+
   vtkImageData* imageData = NULL;
   vtkRectilinearGrid * rectilinearGrid = NULL;
+  SliceSpacing[SliceAxis] = 1;
   if ((imageData = vtkImageData::SafeDownCast(input)) != NULL) 
   {
+    imageData->GetOrigin(SliceOrigin);
     InputDataType = VTK_IMAGE_DATA;
 
     // Input is an image data
@@ -116,9 +120,8 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
     }
     SliceDimensions[0] = InputDimensions[AxisX];
     SliceDimensions[1] = InputDimensions[AxisY];
-    SliceSpacing[0] = InputSpacing[AxisX];
-    SliceSpacing[1] = InputSpacing[AxisY];
-    SliceSpacing[2] = 1;
+    SliceSpacing[AxisX] = InputSpacing[AxisX];
+    SliceSpacing[AxisY] = InputSpacing[AxisY];
 
     // Get the first point index where axis is nearest to Origin[SliceAxis]
     double minDist = VTK_DOUBLE_MAX;
@@ -133,8 +136,7 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
       {
         nearestIndex = curIndex;
         minDist = dist;
-        SliceOrigin[0] = xyz[AxisX];
-        SliceOrigin[1] = xyz[AxisY];
+        SliceOrigin[SliceAxis] = xyz[SliceAxis];
       }
       else if(dist > minDist && nearestIndex != -1)
       {
@@ -193,7 +195,7 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
     for(int i = 0; i < InputDimensions[SliceAxis]; i++)
     {
       double tupleVal = coordsZ->GetTuple1(i);
-      int dist = 0;
+      double dist = 0;
       if(((dist = abs(tupleVal - Origin[SliceAxis])) < minDist) /*&& ((tupleVal - Origin[2]) <= 0)*/)
       {
         int ijk[3] = {0,0,0};
@@ -201,8 +203,7 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
         nearestIndex = rectilinearGrid->ComputePointId(ijk);
         double xyz[3];
         rectilinearGrid->GetPoint(nearestIndex,xyz);
-        SliceOrigin[0] = xyz[AxisX];
-        SliceOrigin[1] = xyz[AxisY];
+        SliceOrigin[SliceAxis] = tupleVal;
         minDist = dist;
       }
       else if(dist > minDist && nearestIndex != -1)
@@ -218,13 +219,14 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
     // Loop on coordinates to determine if spacing on this slice plane is regular.
     // If spacing is regular the output can be only the image data.
     OutputDataType = VTK_IMAGE_DATA;
+    double spacing[2];
     for(int i = 0; i < 2; i++)
     {
       for(int c = 0; c < CoordsXY[i]->GetNumberOfTuples() - 2; c++)
       {
         double spac1 = CoordsXY[i]->GetTuple1(c + 1) - CoordsXY[i]->GetTuple1(c);
         double spac2 = CoordsXY[i]->GetTuple1(c + 2) - CoordsXY[i]->GetTuple1(c + 1);
-        SliceSpacing[i] = spac1;
+        spacing[i] = spac1;
         if(abs(spac1 - spac2)/(spac1 + spac2) > 0.001)
         {
           OutputDataType = VTK_RECTILINEAR_GRID;
@@ -236,6 +238,10 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
         break;
       }
     }
+    SliceSpacing[AxisX] = spacing[0];
+    SliceSpacing[AxisY] = spacing[1];
+    SliceOrigin[AxisX] = Bounds[AxisX * 2];
+    SliceOrigin[AxisY] = Bounds[AxisY * 2];
   }
 
   // Now nearest index is the "origin" of the slice so all points in the slice can be evaluated as 
@@ -397,9 +403,9 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteData(vtkImageData *output)
     OutputRectilinearGrid->Update();
   }
   // Prepare and generate output image
-  output->SetSpacing(InputSpacing[0],InputSpacing[1],InputSpacing[2]);
+  output->SetSpacing(SliceSpacing[0],SliceSpacing[1],SliceSpacing[2]);
   output->SetExtent(0, (dimensions[0] - 1) , 0, (dimensions[1] - 1), 0, (dimensions[2] - 1));
-  output->SetOrigin(Origin[0],Origin[1],Origin[2]);
+  output->SetOrigin(SliceOrigin[0],SliceOrigin[1],SliceOrigin[2]);
 
   // Set the image scalars
   output->SetScalarType(inputScalars->GetDataType());

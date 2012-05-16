@@ -124,17 +124,18 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
   // Disable Visual pipes plug at run time
   m_CanPlugVisualPipes=false;
 
-  // Save selected vme 
-  if (show)
-     m_VMElist.push_back(node);
-  else
-  {
-    int pos=0;
-    for (int i=0; i<m_VMElist.size(); i++)
-      if(node==m_VMElist[i])
-        pos=i;
+  // Detect selected vme pos
+  int pos=-1;
+  for (int i=0; i<m_VMElist.size(); i++)
+    if(node==m_VMElist[i])
+      pos=i;
+
+  // if i want to show a vme that is not in list i add it to the list
+  if (show && pos == -1)
+    m_VMElist.push_back(node);
+  // else if i want to un-show a vme i remove it only if is in the list
+  else if (!show && pos>=0)
     m_VMElist.erase(m_VMElist.begin()+pos);
-  }
   
 
 

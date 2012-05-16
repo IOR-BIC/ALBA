@@ -43,6 +43,7 @@
 #include "vtkPolyDataMapper.h"
 #include "vtkPoints.h"
 #include "vtkCellArray.h"
+#include "vtkDataSetWriter.h"
 
 mafCxxTypeMacro(medPipeVolumeSliceNotInterpolated);
 
@@ -209,6 +210,14 @@ void medPipeVolumeSliceNotInterpolated::UpdateSlice()
   }
 
   // Update slicer pipeline
+  // Ensure that data is loaded in memory
+  m_Vme->Update();
+  vtkDataSet * data = m_Vme->GetOutput()->GetVTKData();
+
+  // Get bound and scalar range
+  data->GetBounds(m_Bounds);
+  data->GetScalarRange(m_ScalarRange);
+  m_Slicer->SetInput(data);
   m_Slicer->SetOutput(m_SlicerOutputImageData);
   m_Slicer->SetOrigin(m_Origin);
   m_Slicer->SetSliceAxis(m_SliceAxis);
@@ -260,6 +269,7 @@ void medPipeVolumeSliceNotInterpolated::CreateRectilinearGridMapper()
   m_RectilinearGridMapper->ScalarVisibilityOn();
   m_RectilinearGridMapper->SetScalarModeToUseCellData();
   m_RectilinearGridMapper->SetUseLookupTableScalarRange(TRUE);
+  m_RectilinearGridMapper->SetColorModeToMapScalars();
   m_RectilinearGridMapper->Update();
 }
 
@@ -282,6 +292,7 @@ void medPipeVolumeSliceNotInterpolated::CreateRectilinearGridActor()
   m_RectilinearGridActor = vtkActor::New();
   m_RectilinearGridActor->SetMapper(m_RectilinearGridMapper);
   m_RectilinearGridActor->GetProperty()->SetInterpolationToFlat();
+  //m_RectilinearGridActor->SetOrigin(m_Origin);
   m_RectilinearGridActor->Modified();
   m_AssemblyFront->AddPart(m_RectilinearGridActor);
   m_AssemblyFront->Modified();
@@ -422,6 +433,7 @@ void medPipeVolumeSliceNotInterpolated::CreateImageDummyActor()
   }
   m_ImageDummyActor = vtkActor::New();
   m_ImageDummyActor->SetMapper(m_ImageDummyMapper);
+  m_ImageDummyActor->GetProperty()->SetOpacity(.1);
   m_ImageDummyActor->Modified();
   m_AssemblyFront->AddPart(m_ImageDummyActor);
   m_AssemblyFront->Modified();
@@ -536,18 +548,10 @@ void medPipeVolumeSliceNotInterpolated::DeleteMapToColorsFilter()
 void medPipeVolumeSliceNotInterpolated::CreateSlice()
 //----------------------------------------------------------------------------
 {
-  // Ensure that data is loaded in memory
-  m_Vme->Update();
-  vtkDataSet * data = m_Vme->GetOutput()->GetVTKData();
-
   // Get the volume lut and rescale to 0 255 scalar range
   m_ColorLUT = vtkLookupTable::New();
   m_VolumeLUT = mafVMEVolumeGray::SafeDownCast(m_Vme)->GetMaterial()->m_ColorLut;
   RescaleLUT(m_VolumeLUT, m_ColorLUT);
-  
-  // Get bound and scalar range
-  data->GetBounds(m_Bounds);
-  data->GetScalarRange(m_ScalarRange);
   
   // Evaluate the origin from bounds and current slice
   m_CurrentSlice = m_Bounds[m_SliceAxis * 2];
@@ -559,7 +563,7 @@ void medPipeVolumeSliceNotInterpolated::CreateSlice()
   // Create the slicer and set its attributes
   m_Slicer = vtkMEDVolumeSlicerNotInterpolated::New();
   m_SlicerOutputImageData = vtkImageData::New();
-  m_Slicer->SetInput(data);
+
   UpdateSlice();
 }
 

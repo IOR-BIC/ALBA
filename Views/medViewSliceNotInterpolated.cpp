@@ -106,8 +106,8 @@ void medViewSliceNotInterpolated::VmeShow(mafNode *node, bool show)
       // Set the pipe lut
       m_PipesSlice[node]->SetLut(m_ColorLUT);
       m_PipesSlice[node]->SetSlice(m_CurrentSlice,m_SliceAxis);
-      CameraReset();
-      CameraUpdate();
+//       CameraReset();
+//       CameraUpdate();
     }
     else
     {
@@ -163,24 +163,6 @@ void medViewSliceNotInterpolated::OnEvent(mafEventBase * event)
     case ID_AXIS:
       {
         SetSliceAxis();
-        switch(m_SliceAxis)
-        {
-          case vtkMEDVolumeSlicerNotInterpolated::SLICE_X:
-            {
-              m_CameraPositionId = CAMERA_OS_X;
-            } break;
-          case vtkMEDVolumeSlicerNotInterpolated::SLICE_Y:
-            {
-              m_CameraPositionId = CAMERA_OS_Y;
-            } break;
-          case vtkMEDVolumeSlicerNotInterpolated::SLICE_Z:
-            {
-              m_CameraPositionId = CAMERA_OS_Z;
-            } break;
-        }
-        CameraSet(m_CameraPositionId);
-        CameraReset();
-        CameraUpdate();
       } break;
     case ID_SLICE:
       {
@@ -226,6 +208,23 @@ void medViewSliceNotInterpolated::SetSliceAxis()
   m_SliceSlider->SetRange(m_Bounds[m_SliceAxis * 2], m_Bounds[(m_SliceAxis * 2) + 1]);
   m_Gui->Update();
 
+  switch(m_SliceAxis)
+  {
+  case vtkMEDVolumeSlicerNotInterpolated::SLICE_X:
+    {
+      m_CameraPositionId = CAMERA_OS_X;
+    } break;
+  case vtkMEDVolumeSlicerNotInterpolated::SLICE_Y:
+    {
+      m_CameraPositionId = CAMERA_OS_Y;
+    } break;
+  case vtkMEDVolumeSlicerNotInterpolated::SLICE_Z:
+    {
+      m_CameraPositionId = CAMERA_OS_Z;
+    } break;
+  }
+  CameraSet(m_CameraPositionId);
+
   UpdateSlice();
 }
 
@@ -246,7 +245,7 @@ void medViewSliceNotInterpolated::SetSlice(double position)
 void medViewSliceNotInterpolated::SetSlice(double origin[3])
 //----------------------------------------------------------------------------
 {
-  assert(origin[m_SliceAxis] >= m_Bounds[m_SliceAxis * 2] && origin[m_SliceAxis] <= m_Bounds[(m_SliceAxis * 2) + 1]);
+  //assert(origin[m_SliceAxis] >= m_Bounds[m_SliceAxis * 2] && origin[m_SliceAxis] <= m_Bounds[(m_SliceAxis * 2) + 1]);
 
   // Update parameters
   m_CurrentSlice = origin[m_SliceAxis];
@@ -266,4 +265,11 @@ void medViewSliceNotInterpolated::UpdateSlice()
   }
   CameraReset();
   CameraUpdate();
+}
+
+//----------------------------------------------------------------------------
+void medViewSliceNotInterpolated::SetLut(mafNode *volume, vtkLookupTable *lut)
+//----------------------------------------------------------------------------
+{
+  m_PipesSlice[volume]->SetLut(lut);
 }
