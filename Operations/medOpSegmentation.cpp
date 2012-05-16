@@ -385,6 +385,7 @@ void medOpSegmentation::OpDo()
   m_OutputVolume->ReparentTo(m_Volume->GetParent());
   m_OutputVolume->SetName(_("Segmentation Output"));
   lutPreset(4,m_OutputVolume->GetMaterial()->m_ColorLut);
+  m_OutputVolume->GetMaterial()->m_ColorLut->SetTableRange(0,255);
   m_OutputVolume->ReparentTo(m_Volume->GetParent());
   RemoveVMEs();
   mafOp::OpDo();
@@ -2853,6 +2854,7 @@ void medOpSegmentation::OnLoadSegmentationEvent(mafEvent *e)
 
       if(m_LoadedVolume)
       {
+        m_LoadedVolume->Update();
         m_SegmentationColorLUT = m_LoadedVolume->GetMaterial()->m_ColorLut;
         InitMaskColorLut(m_SegmentationColorLUT);
         m_LoadedVolume->GetMaterial()->UpdateFromTables();
@@ -2877,10 +2879,7 @@ void medOpSegmentation::OnLoadSegmentationEvent(mafEvent *e)
           m_View->VmeAdd(parents.at(parents.size() - (p + 1)));
         }
         m_View->VmeShow(m_LoadedVolume,true);
-        SetTrilinearInterpolation(m_LoadedVolume);
-
         UpdateSlice();
-        m_View->SetSliceAxis(m_CurrentSlicePlane);
         m_View->CameraUpdate();
       }
     }
@@ -4205,6 +4204,7 @@ void medOpSegmentation::InitMaskColorLut(vtkLookupTable *lut)
     lut->SetNumberOfTableValues(2);
     lut->SetTableValue(0, 0.0, 0.0, 0.0, 0.0);
     lut->SetTableValue(1, 0.9, 0.1, 0.1, 0.4);
+    lut->SetTableRange(0,255);
   }
 }
 
