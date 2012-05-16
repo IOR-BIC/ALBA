@@ -58,6 +58,7 @@ medVisualPipeCollisionDetection::medVisualPipeCollisionDetection()
   m_Matrix0 = NULL;
   m_CellToExlude = NULL;
   m_ShowSurfaceToCollide = true;
+  m_EnablePipeUpdate = true;
 }
 //----------------------------------------------------------------------------
 void medVisualPipeCollisionDetection::Create(mafSceneNode *n/*, bool use_axes*/)
@@ -256,7 +257,10 @@ void medVisualPipeCollisionDetection::OnEvent(mafEventBase *maf_event)
   else if (maf_event->GetId() == VME_ABSMATRIX_UPDATE)
   {
     //Update the pipeline of visualization
-    UpdatePipeline();
+    if (m_EnablePipeUpdate)
+    {
+    	UpdatePipeline();
+    }
   }
 }
 //----------------------------------------------------------------------------

@@ -80,6 +80,9 @@ public:
   /** set opacity value */
   void SetOpacity(double opacity);
 
+  /** enable or disable pipe update after inputs matrix changed */
+  void EnableUpdate(bool enable){m_EnablePipeUpdate = enable;};
+
 protected:
 
   /** IDs for the GUI */
@@ -103,6 +106,7 @@ protected:
   mafMatrix *m_Matrix0;
   std::vector<mafMatrix *> m_Matrix1;
   bool m_ShowSurfaceToCollide;
+  bool m_EnablePipeUpdate;
   wxString m_ScalarNameToExclude;
 };  
 #endif // __mafPipeSurface_H__
