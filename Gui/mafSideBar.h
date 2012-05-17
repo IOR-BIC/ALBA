@@ -122,5 +122,13 @@ protected:
   mafNode     *m_SelectedVme;
   mafView     *m_SelectedView;
   mafObserver *m_Listener;
+
+  mafGUI *m_NewAppendingGUI;
+  mafGUI *m_OldAppendingGUI;
+
+  mafGUI *m_CurrentVmeGui;
+  mafGUI *m_CurrentPipeGui;
+
+  int m_Style;
 };
 #endif
