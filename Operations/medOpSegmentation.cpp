@@ -1654,8 +1654,8 @@ void medOpSegmentation::OnRefinementStep()
   //logic stuff
   InitRefinementVolumeMask();
   
-  UpdateSlice();
   m_View->VmeShow(m_RefinementVolumeMask,true);
+  UpdateSlice();
 
   m_View->CameraUpdate();
 }
