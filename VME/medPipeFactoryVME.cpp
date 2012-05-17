@@ -63,6 +63,7 @@
 #include "medPipeTensorFieldSlice.h"
 #include "medPipeVolumeSliceBlend.h"
 #include "medVisualPipeCollisionDetection.h"
+#include "medPipeVolumeSliceNotInterpolated.h"
 
 #include <string>
 #include <ostream>
@@ -145,7 +146,9 @@ medPipeFactoryVME::medPipeFactoryVME()
   mafPlugPipeMacro(mafPipeVolumeSlice_BES, "BES: mafPipeVolumeSlice_BES.");
   mafPlugPipeMacro(mafPipeSurfaceSlice_BES, "BES: mafPipeSurfaceSlice.");
   mafPlugPipeMacro(mafPipePolylineSlice_BES, "BES: mafPipePolylineSlice_BES.");
-  mafPlugPipeMacro(mafPipeMeshSlice_BES, "BES: mafPipeMeshSlice_BES.");   
+  mafPlugPipeMacro(mafPipeMeshSlice_BES, "BES: mafPipeMeshSlice_BES.");
+
+  mafPlugPipeMacro(medPipeVolumeSliceNotInterpolated, "Pipe for not interpolated and not resampled volume visualization");   
 }
 /*
 //------------------------------------------------------------------------------
