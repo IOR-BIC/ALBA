@@ -35,7 +35,7 @@ class mafGUI;
   Represents the main frame of a MAF Application. On this frame  they'll be plugged  toolbars,  panels, progress bar etc...
   Closing this frame is equal to close the application.
 */
-class mafGUIMDIFrame: public wxMDIParentFrame
+class MAF_EXPORT mafGUIMDIFrame: public wxMDIParentFrame
 {
  public:
   /** constructor. */

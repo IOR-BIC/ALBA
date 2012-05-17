@@ -35,7 +35,7 @@ class mafGUIDialog;
   Represent the settings collector dialog. It generates a tree (left parto of the dialogue) with all the settings appended to it.
 In the right part ofg the dialog there is the specific gui setting gui.
  */  
-class mafGUISettingsDialog : public mafObserver
+class MAF_EXPORT mafGUISettingsDialog : public mafObserver
 {
 
 public:
