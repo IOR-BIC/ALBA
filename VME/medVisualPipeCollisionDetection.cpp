@@ -343,7 +343,8 @@ void medVisualPipeCollisionDetection::UpdatePipeline(bool force /* = false */)
         for (int j=0;j<contactScalars1->GetNumberOfTuples();j++)
         {
           contactScalars1->SetTuple1(j,0.0);
-        }
+        }        
+
         vtkDataArray *array1 = m_CollisionFilter->GetOutput(1)->GetFieldData()->GetArray("ContactCells");
         vtkDataArray *arrayToExclude = poly->GetCellData()->GetArray(m_ScalarNameToExclude.c_str());
         if (array1 != NULL)
@@ -372,7 +373,7 @@ void medVisualPipeCollisionDetection::UpdatePipeline(bool force /* = false */)
         polyResult->GetCellData()->SetActiveScalars("CONTACT");
         polyResult->Update();
         //Add new mapper if a new surface has been added
-        if (m_SurfaceToCollideMapper.size() < i)
+        if (m_SurfaceToCollideMapper.size() > i)
         {
           m_SurfaceToCollideMapper[i]->SetInput(polyResult);
           m_SurfaceToCollideMapper[i]->Update();
