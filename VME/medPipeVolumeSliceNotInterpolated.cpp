@@ -607,6 +607,11 @@ void medPipeVolumeSliceNotInterpolated::RescaleLUT(vtkLookupTable *inputLUT,vtkL
   // Copy volume lut
   outputLUT->DeepCopy(inputLUT);
 
+  if(m_ScalarRange[0] == 0 && m_ScalarRange[1] == 255)
+  {
+    return;
+  }
+
   double tableRange[2];
   inputLUT->GetTableRange(tableRange);
 

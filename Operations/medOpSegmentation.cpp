@@ -238,8 +238,6 @@ medOpSegmentation::medOpSegmentation(const wxString &label) : mafOp(label)
   m_RefinementRedoList.clear();
   //////////////////////////////////////////////////////////////////////////
 
-  m_TrilinearInterpolationOn = FALSE;
-
   m_InitialFocalPoint[0]=9999;
   m_InitialFocalPoint[1]=9999;
   m_InitialFocalPoint[2]=9999;
@@ -336,7 +334,6 @@ void medOpSegmentation::OpRun()
   m_View->VmeAdd(m_Volume);
   m_View->VmeShow(m_Volume, true);
   //m_View->VmeCreatePipe(m_Volume);
-  SetTrilinearInterpolation(m_Volume);
   //m_View->UpdateSlicePos(0.0);
   m_View->CameraReset();
   m_View->CameraUpdate();
@@ -362,6 +359,7 @@ void medOpSegmentation::OpDo()
   {
     case  AUTOMATIC_SEGMENTATION:
     {
+      UpdateThresholdVolumeData();
       m_OutputVolume->DeepCopy(m_ThresholdVolume);
     }
     break;
@@ -384,6 +382,7 @@ void medOpSegmentation::OpDo()
   m_OutputVolume->ReparentTo(m_Volume->GetParent());
   m_OutputVolume->SetName(_("Segmentation Output"));
   lutPreset(4,m_OutputVolume->GetMaterial()->m_ColorLut);
+  m_OutputVolume->GetMaterial()->m_ColorLut->SetTableRange(0,255);
   m_OutputVolume->ReparentTo(m_Volume->GetParent());
   RemoveVMEs();
   mafOp::OpDo();
@@ -926,7 +925,8 @@ bool medOpSegmentation::Refinement()
     mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
 
     m_View->VmeShow(m_RefinementVolumeMask,true);
-    m_View->SetSliceAxis(m_CurrentSlicePlane);
+    UpdateSlice();
+    //m_View->SetSliceAxis(m_CurrentSlicePlane);
     m_View->CameraUpdate();
   }
 
@@ -1482,8 +1482,6 @@ void medOpSegmentation::OnAutomaticStep()
     UpdateSlice();
     InitEmptyVolumeSlice();
     UpdateThresholdRealTimePreview();
-    SetTrilinearInterpolation(m_ThresholdVolumeSlice);
-    m_View->SetSliceAxis(m_CurrentSlicePlane);
     m_View->CameraUpdate();
   }
   else
@@ -1524,6 +1522,8 @@ void medOpSegmentation::OnAutomaticStep()
 
     //m_CurrentOperation = AUTOMATIC_SEGMENTATION;
     //OnNextStep();
+
+    OnEventUpdateThresholdSlice();
   }
 
 }
@@ -1589,9 +1589,9 @@ void medOpSegmentation::OnManualStep()
   UpdateSlice();
 
   CreateRealDrawnImage();
-
-  m_View->SetSliceAxis(m_CurrentSlicePlane);
   m_View->CameraUpdate();
+
+  OnEventUpdateManualSlice();
 }
 //------------------------------------------------------------------------
 void medOpSegmentation::OnAutomaticStepExit()
@@ -1653,11 +1653,10 @@ void medOpSegmentation::OnRefinementStep()
   
   //logic stuff
   InitRefinementVolumeMask();
+  
   m_View->VmeShow(m_RefinementVolumeMask,true);
-  SetTrilinearInterpolation(m_RefinementVolumeMask);
-
   UpdateSlice();
-  m_View->SetSliceAxis(m_CurrentSlicePlane);
+
   m_View->CameraUpdate();
 }
 
@@ -1670,7 +1669,6 @@ void medOpSegmentation::OnLoadStep()
   m_GuiDialog->Enable(ID_BUTTON_PREV,false);
 
   UpdateSlice();
-  m_View->SetSliceAxis(m_CurrentSlicePlane);
   m_View->CameraUpdate();
 }
 
@@ -1774,7 +1772,7 @@ void medOpSegmentation::OnNextStep()
   m_SliceSlider->Update();
 
 
-  UpdateSlice();
+  //UpdateSlice();
 
   m_View->CameraUpdate();
 
@@ -1799,7 +1797,6 @@ void medOpSegmentation::OnPreviousStep()
         m_CurrentOperation = AUTOMATIC_SEGMENTATION;
         //prev step -> LOAD_SEGMENTATION
         m_View->VmeShow(m_LoadedVolume,true);
-        SetTrilinearInterpolation(m_LoadedVolume);
         OnLoadStep();
         m_View->CameraUpdate();
       }
@@ -1850,7 +1847,7 @@ void medOpSegmentation::OnPreviousStep()
   m_SliceSlider->SetValue(m_CurrentSliceIndex);
   m_SliceSlider->Update();
 
-  UpdateSlice();
+  //UpdateSlice();
 
   m_View->CameraUpdate();
 
@@ -2029,7 +2026,7 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         }
         else
         {
-          UpdateSlice();
+          //UpdateSlice();
         }
         if(m_CurrentOperation == MANUAL_SEGMENTATION)
         {
@@ -2353,11 +2350,9 @@ void medOpSegmentation::OnAutomaticRemoveRange()
 }
 
 //------------------------------------------------------------------------
-void medOpSegmentation::OnAutomaticPreview()
+void medOpSegmentation::UpdateThresholdVolumeData()
 //------------------------------------------------------------------------
 {
-  wxBusyCursor wait_cursor;
-  wxBusyInfo wait(_("Creating preview: Please wait"));
   //////////////////////////////////////////////////////////////////////////
   //PREVIEW
   //////////////////////////////////////////////////////////////////////////
@@ -2401,6 +2396,15 @@ void medOpSegmentation::OnAutomaticPreview()
   }
 
   m_ThresholdVolume->Update();
+}
+//------------------------------------------------------------------------
+void medOpSegmentation::OnAutomaticPreview()
+//------------------------------------------------------------------------
+{
+  wxBusyCursor wait_cursor;
+  wxBusyInfo wait(_("Creating preview: Please wait"));
+  
+  UpdateThresholdVolumeData();
 
   m_SegmentationColorLUT = m_ThresholdVolume->GetMaterial()->m_ColorLut;
   InitMaskColorLut(m_SegmentationColorLUT);
@@ -2410,7 +2414,6 @@ void medOpSegmentation::OnAutomaticPreview()
   currentVolumeMaterial->UpdateFromTables();
 
   m_View->VmeShow(m_ThresholdVolume,true);
-  SetTrilinearInterpolation(m_ThresholdVolume);
 
   m_View->CameraUpdate();
   //////////////////////////////////////////////////////////////////////////
@@ -2653,7 +2656,7 @@ void medOpSegmentation::ReloadUndoRedoState(vtkDataSet *dataSet,UndoRedoState st
 
     m_CurrentSlicePlane=state.plane;
     m_CurrentSliceIndex=state.slice;
-    m_View->SetSliceAxis(m_CurrentSlicePlane);
+    //m_View->SetSliceAxis(m_CurrentSlicePlane);
     UpdateSlice();
     InitGui();
     m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
@@ -2696,7 +2699,6 @@ void medOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
 {
   switch(e->GetId())
   {
-
   case ID_MANUAL_BRUSH_SHAPE:
     {
       m_ManualBrushShape = m_ManualBrushShapeRadioBox->GetSelection();
@@ -2841,6 +2843,7 @@ void medOpSegmentation::OnLoadSegmentationEvent(mafEvent *e)
 
       if(m_LoadedVolume)
       {
+        m_LoadedVolume->Update();
         m_SegmentationColorLUT = m_LoadedVolume->GetMaterial()->m_ColorLut;
         InitMaskColorLut(m_SegmentationColorLUT);
         m_LoadedVolume->GetMaterial()->UpdateFromTables();
@@ -2865,10 +2868,7 @@ void medOpSegmentation::OnLoadSegmentationEvent(mafEvent *e)
           m_View->VmeAdd(parents.at(parents.size() - (p + 1)));
         }
         m_View->VmeShow(m_LoadedVolume,true);
-        SetTrilinearInterpolation(m_LoadedVolume);
-
         UpdateSlice();
-        m_View->SetSliceAxis(m_CurrentSlicePlane);
         m_View->CameraUpdate();
       }
     }
@@ -3142,10 +3142,13 @@ void medOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
 
   assert(nearestIndex != -1);
 
+  double oldBrushSize = m_ManualBrushSize;
   int nearestDummyIndex = int(m_ManualBrushSize / 2) * factors[0] + int(m_ManualBrushSize / 2) * factors[1];//int(m_ManualBrushSize / 2) + int(m_ManualBrushSize / 2) * volumeDimensions[0] + int(m_ManualBrushSize / 2) * volumeDimensions[1];
   std::vector<int> dummyIndices;
   if(m_ManualBrushShape == 0) // circle
   {
+    m_ManualBrushSize ++;
+    nearestDummyIndex = int(m_ManualBrushSize / 2) * factors[0] + int(m_ManualBrushSize / 2) * factors[1];
     double radius = (double((m_ManualBrushSize) / 2.))* targetSpacing;
     double radius2 = pow(radius,2);
     double dummyCenter[3];
@@ -3220,7 +3223,8 @@ void medOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
   m_ManualVolumeSlice->GetOutput()->Update();
   m_ManualVolumeSlice->Update();
   m_View->VmeShow(m_ManualVolumeSlice, true);
-
+  
+  m_ManualBrushSize = oldBrushSize;
 }
 /**
 //----------------------------------------------------------------------------
@@ -3550,7 +3554,7 @@ void medOpSegmentation::InitVolumeDimensions()
   {
     inputDataSet->Update();
 
-    m_Volume->GetOutput()->GetBounds(m_VolumeBounds);
+    m_Volume->GetOutput()->GetVTKData()->GetBounds(m_VolumeBounds);
 
     if (vtkStructuredPoints *sp = vtkStructuredPoints::SafeDownCast(inputDataSet))
       sp->GetDimensions(m_VolumeDimensions); 
@@ -4189,21 +4193,8 @@ void medOpSegmentation::InitMaskColorLut(vtkLookupTable *lut)
     lut->SetNumberOfTableValues(2);
     lut->SetTableValue(0, 0.0, 0.0, 0.0, 0.0);
     lut->SetTableValue(1, 0.9, 0.1, 0.1, 0.4);
+    lut->SetTableRange(0,255);
   }
-}
-
-//----------------------------------------------------------------------------
-void medOpSegmentation::SetTrilinearInterpolation(mafVMEVolumeGray *volume)
-//----------------------------------------------------------------------------
-{
-//   if(volume)
-//   {
-//     mafPipeVolumeSlice_BES *pipe = mafPipeVolumeSlice_BES::SafeDownCast(m_View->GetNodePipe(volume));
-//     if(pipe)
-//     {
-//       pipe->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
-//     }
-//   }
 }
 
 //----------------------------------------------------------------------------
@@ -4391,7 +4382,7 @@ bool medOpSegmentation::SegmentedVolumeAccept(mafNode* node)
     volumeToCheck->GetOutput()->GetBounds(b);
     for(int i = 0; i < 6; i++)
     {
-      if(b[i] != m_CurrentVolumeBounds[i])
+      if((b[i] != m_CurrentVolumeBounds[i])) // Workaround: vme with children change its bounds
       {
         return false;
       }

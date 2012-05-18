@@ -330,9 +330,6 @@ protected:
   /** Perform the initializations when the user press previous button */
   void OnPreviousStep();
 
-  /** Set trilinear interpolation on/off for the operation volumes */
-  void SetTrilinearInterpolation(mafVMEVolumeGray *volume);
-
   mafVMEVolumeGray* m_Volume;         //<Input volume
   double m_SliceOrigin[3];            //<Origin of the slice plane
   int m_VolumeDimensions[3];          //<Dimensions of the volumes (number of slices)
@@ -375,7 +372,6 @@ protected:
   mafVMEVolumeGray *m_OutputVolume;     //<Output volume
   wxStaticText *m_SnippetsLabel;        //<Suggestion labels - GUI
   medInteractorSegmentationPicker *m_SegmentationPicker; //<Segmentation picker for interaction
-   int m_TrilinearInterpolationOn;      //<Determine if interpolation is on or off
 
   //////////////////////////////////////////////////////////////////////////
   //Manual segmentation stuff
@@ -552,6 +548,9 @@ protected:
 
   /** Update slice visualisation on manual step */
   void OnEventUpdateManualSlice();
+
+  /** Update threshold volume data  for preview or output */
+  void UpdateThresholdVolumeData();
 
   mafVMEVolumeGray *m_RefinementVolumeMask; //<Refinement volume mask
   int m_RefinementSegmentationAction;       //<Refinement action fill holes or remove islands

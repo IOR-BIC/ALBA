@@ -163,6 +163,8 @@ void medViewSliceNotInterpolated::OnEvent(mafEventBase * event)
     case ID_AXIS:
       {
         SetSliceAxis();
+        CameraReset();
+        CameraUpdate();
       } break;
     case ID_SLICE:
       {
@@ -263,8 +265,6 @@ void medViewSliceNotInterpolated::UpdateSlice()
   {
     it->second->SetSlice(m_CurrentSlice,m_SliceAxis);
   }
-  CameraReset();
-  CameraUpdate();
 }
 
 //----------------------------------------------------------------------------
