@@ -402,12 +402,12 @@ void mafGUI::Button  (int id,mafString *label,mafString button_text, mafString t
 	Add(sizer,0,wxALL, M); 
 }
 //----------------------------------------------------------------------------
-mafGUICrossIncremental *mafGUI::CrossIncremental(int id,const char* label, double *stepVariable, double *topBottomVariable, double *leftRightVariable, int modality ,wxString tooltip /* = */, bool boldLabel /* = true */, bool comboStep /* = false*/, int digits /* = -1*/)
+mafGUICrossIncremental *mafGUI::CrossIncremental(int id,const char* label, double *stepVariable, double *topBottomVariable, double *leftRightVariable, int modality ,wxString tooltip /* ="" */, bool boldLabel /* = true */, bool comboStep /* = false */, int digits /* = -1 */, mafString *buttonUpDown_text /* = NULL */, mafString *buttonLeftRight_text /* = NULL */)
 //----------------------------------------------------------------------------
 {
   int width = (label == "") ? FW : DW;
   
-  mafGUICrossIncremental *cI =  new mafGUICrossIncremental(this, GetWidgetId(id), label, stepVariable, topBottomVariable, leftRightVariable, boldLabel, modality, dp, wxDefaultSize, MINFLOAT, MAXFLOAT, digits,wxTAB_TRAVERSAL|wxCLIP_CHILDREN, comboStep);
+  mafGUICrossIncremental *cI =  new mafGUICrossIncremental(this, GetWidgetId(id), label, stepVariable, topBottomVariable, leftRightVariable, boldLabel, modality, dp, wxDefaultSize, MINFLOAT, MAXFLOAT, digits,wxTAB_TRAVERSAL|wxCLIP_CHILDREN, comboStep,buttonUpDown_text,buttonLeftRight_text);
   cI->SetListener(this);
   
 	Add(cI,0,wxALL, M); 
