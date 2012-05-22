@@ -5,6 +5,7 @@ REM ----------------------------------------------------------------------------
 IF "%1" == "LIB_VS2010_DEBUG" GOTO LIB_VS2010_DEBUG
 IF "%1" == "LIB_VS2010_RELEASE" GOTO LIB_VS2010_RELEASE
 IF "%1" == "DLL_VS2010_DEBUG" GOTO DLL_VS2010_DEBUG
+IF "%1" == "DLL_VS2010_RELEASE" GOTO DLL_VS2010_RELEASE
 
 REM -----------------------------------------------------------------------------
 :LIB_VS2010_DEBUG
@@ -55,6 +56,21 @@ cmake.exe  ../Source  -G"Visual Studio 10" ^
   
 cd ..
 
+GOTO END
+
+REM -----------------------------------------------------------------------------
+:DLL_VS2010_RELEASE
+REM -----------------------------------------------------------------------------
+
+mkdir Build
+cd Build
+
+cmake.exe  ../Source  -G"Visual Studio 10" ^
+  -DMAF_BUILD_MAFDLL:BOOL=ON ^
+  -DBUILD_TESTING:BOOL=OFF
+
+cd ..
+  
 GOTO END
 
 REM -----------------------------------------------------------------------------
