@@ -61,7 +61,9 @@ public:
                   const wxSize& size = wxDefaultSize,
                   double min = MINFLOAT, double max = MAXFLOAT, int decimal_digit = -1,
                   long style = wxTAB_TRAVERSAL | wxCLIP_CHILDREN,
-                  bool comboStep = false);
+                  bool comboStep = false,
+                  mafString *buttonUpDown_text = NULL,
+                  mafString *buttonLeftRight_text = NULL);
 
   virtual ~mafGUICrossIncremental();
 
@@ -116,8 +118,8 @@ public:
   void SetComboValue(int index);
 
 private:
-  void CreateWidgetTopBottom();
-  void CreateWidgetLeftRight();
+  void CreateWidgetTopBottom(mafString *button_text);
+  void CreateWidgetLeftRight(mafString *button_text);
   void CreateWidgetTextEntry(double min, double max);
   void CreateWidgetComboBox();
   void ConvertStepComboIntoStepVariable();

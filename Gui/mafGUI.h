@@ -212,7 +212,7 @@ public:
   void Button(int id,mafString *label,mafString button_text, mafString tooltip=""); 
 
 	/** Widget with 4 buttons and a text array disposed like a cross.*/
-  mafGUICrossIncremental *CrossIncremental(int id,const char* label, double *stepVariable, double *topBottomVariable, double *leftRightVariable, int modality ,wxString tooltip ="", bool boldLabel = true, bool comboStep = false, int digits = -1);
+  mafGUICrossIncremental *CrossIncremental(int id,const char* label, double *stepVariable, double *topBottomVariable, double *leftRightVariable, int modality ,wxString tooltip ="", bool boldLabel = true, bool comboStep = false, int digits = -1, mafString *buttonUpDown_text = NULL, mafString *buttonLeftRight_text = NULL);
 
   /** two generic Buttons widget. */
   void TwoButtons(int firstID, int secondID, const char* label1, const char* label2, int alignment = wxALL, int width = -1);
