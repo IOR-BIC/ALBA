@@ -528,7 +528,7 @@ IF (MAF_USE_WIIMOTE)
   )
 ENDIF (MAF_USE_WIIMOTE)
 
-CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/../Interaction/mafInteractionConfigure.h.in ${PROJECT_BINARY_DIR}/mafInteractionConfigure.h IMMEDIATE)
+CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/../Interaction/mafInteractionConfigure.h.in ${PROJECT_BINARY_DIR}/../Interaction/mafInteractionConfigure.h IMMEDIATE)
 
 ###############################################
 #IO
