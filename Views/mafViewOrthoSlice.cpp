@@ -838,10 +838,7 @@ void mafViewOrthoSlice::ApplyViewSettings(mafNode *node)
       if(pipeSlice) 
       {
         if(!node->IsA("mafVMEMeter"))
-        {
           pipeSlice->SetRadius(m_PolylineRadiusSize);
-          pipeSlice->SplineModeOn();
-        }
         pipeSlice->FillOn(); 
       }
     }
