@@ -49,7 +49,6 @@
 #include "vtkPoints.h"
 #include "vtkCellArray.h"
 #include "vtkMAFSmartPointer.h"
-#include "vtkMAFPolyDataToSinglePolyLine.h"
 #include "vtkClipPolyData.h"
 #include "vtkMAFImplicitPolyData.h"
 #include "vtkCubeSource.h"
@@ -100,7 +99,6 @@ mafPipePolylineSlice::mafPipePolylineSlice()
 
   m_Fill = 0;
 
-  m_PolydataToPolylineFilter = NULL;
 
   m_RoiEnable = FALSE;
   m_ROI[0] = m_ROI[2] = m_ROI[4] = VTK_DOUBLE_MIN;
@@ -136,14 +134,11 @@ void mafPipePolylineSlice::Create(mafSceneNode *n)
   vtkDataArray *scalars = data->GetPointData()->GetScalars();
   double sr[2] = {0,1};
 
-  vtkNEW(m_PolydataToPolylineFilter);
-  m_PolydataToPolylineFilter->SetInput(data);
-  m_PolydataToPolylineFilter->Update();
 
 	//////////////////////////////////
   vtkNEW(m_Tube);
 	m_Tube->UseDefaultNormalOn();
-	m_Tube->SetInput(m_PolydataToPolylineFilter->GetOutput());
+	m_Tube->SetInput(data);
 	m_Tube->SetRadius(m_Radius);
 	m_Tube->SetCapping(1);
 	m_Tube->SetNumberOfSides(16);
@@ -278,7 +273,6 @@ mafPipePolylineSlice::~mafPipePolylineSlice()
   vtkDEL(m_Plane);
   vtkDEL(m_VTKTransform);
   vtkDEL(m_Tube);
-  vtkDEL(m_PolydataToPolylineFilter);
   vtkDEL(m_PolySpline);
   cppDEL(m_Axes);
 	//@@@ if(m_use_axes) wxDEL(m_axes);  
@@ -445,12 +439,8 @@ void mafPipePolylineSlice::UpdateProperty()
 
   data->Modified();
   data->Update();
-
-  m_PolydataToPolylineFilter->SetInput(data);
-  m_PolydataToPolylineFilter->Update();
-
-
-  m_Tube->SetInput(m_PolydataToPolylineFilter->GetOutput());
+    
+  m_Tube->SetInput(data);
   m_Tube->Update();
   m_Cutter->SetInput(m_Tube->GetOutput());
   m_Cutter->Update();
@@ -489,54 +479,64 @@ vtkPolyData *mafPipePolylineSlice::SplineProcess(vtkPolyData *polyData)
 //----------------------------------------------------------------------------
 {
   //cleaned point list
-  vtkMAFSmartPointer<vtkPoints> pts;
+  vtkPoints *pts;
   vtkMAFSmartPointer<vtkPoints> ptsSplined;
-
   vtkNEW(m_PolySpline);
 
-  pts->DeepCopy(polyData->GetPoints());
+  vtkCellArray *cellArray;
+  vtkNEW(cellArray);
+  
+  vtkCellArray *lines=polyData->GetLines();
+  vtkIdType *linePoints;
+  vtkIdType linePointsNum;
+  int evaluedPoints=0;
+  int cellID=0;
 
-  vtkMAFSmartPointer<vtkCardinalSpline> splineX;
-  vtkMAFSmartPointer<vtkCardinalSpline> splineY;
-  vtkMAFSmartPointer<vtkCardinalSpline> splineZ;
+  pts=polyData->GetPoints();
 
-
-
-  for(int i=0 ; i<pts->GetNumberOfPoints(); i++)
+  //generating one spline for each branch (cell) of a polyline
+  for(int lin=0;lin<polyData->GetNumberOfLines();lin++)
   {
-    //mafLogMessage(wxString::Format(_("old %d : %f %f %f"), i, pts->GetPoint(i)[0],pts->GetPoint(i)[1],pts->GetPoint(i)[2] ));
-    splineX->AddPoint(i, pts->GetPoint(i)[0]);
-    splineY->AddPoint(i, pts->GetPoint(i)[1]);
-    splineZ->AddPoint(i, pts->GetPoint(i)[2]);
+
+    vtkMAFSmartPointer<vtkCardinalSpline> splineX;
+    vtkMAFSmartPointer<vtkCardinalSpline> splineY;
+    vtkMAFSmartPointer<vtkCardinalSpline> splineZ;
+    int branchStart=evaluedPoints;
+
+    lines->GetCell(cellID,linePointsNum,linePoints);
+    cellID+=linePointsNum+1;
+
+    for(int i=0 ; i<linePointsNum; i++)
+    {
+      //mafLogMessage(wxString::Format(_("old %d : %f %f %f"), i, pts->GetPoint(i)[0],pts->GetPoint(i)[1],pts->GetPoint(i)[2] ));
+      splineX->AddPoint(i, pts->GetPoint(linePoints[i])[0]);
+      splineY->AddPoint(i, pts->GetPoint(linePoints[i])[1]);
+      splineZ->AddPoint(i, pts->GetPoint(linePoints[i])[2]);
+    }
+
+    for(int i=0 ; i<(linePointsNum * m_SplineCoefficient); i++)
+    {		 
+      double t;
+      t = ( linePointsNum - 1.0 ) / ( linePointsNum*m_SplineCoefficient - 1.0 ) * i;
+      ptsSplined->InsertPoint(evaluedPoints , splineX->Evaluate(t), splineY->Evaluate(t), splineZ->Evaluate(t));
+      evaluedPoints++;
+    }
+
+
+
+    //order
+    //cell 
+    int pointId[2];
+
+    cellArray->InsertNextCell(evaluedPoints-branchStart);
+    for(int i = branchStart; i< evaluedPoints;i++)
+    {
+      cellArray->InsertCellPoint(i);
+    }
   }
-
-  for(int i=0 ; i<(pts->GetNumberOfPoints() * m_SplineCoefficient); i++)
-  {		 
-    double t;
-    t = ( pts->GetNumberOfPoints() - 1.0 ) / ( pts->GetNumberOfPoints()*m_SplineCoefficient - 1.0 ) * i;
-    ptsSplined->InsertPoint(i , splineX->Evaluate(t), splineY->Evaluate(t), splineZ->Evaluate(t));
-
-  }
-
 
   m_PolySpline->SetPoints(ptsSplined);
   m_PolySpline->Update();
-
-  //order
-  //cell 
-  vtkCellArray *cellArray;
-  vtkNEW(cellArray);
-  int pointId[2];
-
-  for(int i = 0; i< m_PolySpline->GetNumberOfPoints();i++)
-  {
-    if (i > 0)
-    {             
-      pointId[0] = i - 1;
-      pointId[1] = i;
-      cellArray->InsertNextCell(2 , pointId);  
-    }
-  }
 
   m_PolySpline->SetLines(cellArray);
   m_PolySpline->Modified();
