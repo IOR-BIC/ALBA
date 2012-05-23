@@ -3431,10 +3431,13 @@ static const vtkMarchingCubesTriangleCases* marchingCubesCases = vtkMarchingCube
     if (!this->AutoLODRender)
       return 0 ;
 
-    // return highest lod with acceptable no. of triangles and time to draw
+    // (Crimi) Apply the same politics of BestLODForDrawCache() 
+    // in order to solve bug #2765
     for (int lod = 0 ;  lod < NumberOfLods ;  lod++){
-      if (EstimateNumberOfTriangles(lod) < MaxTrianglesNotOptimized &&
-        EstimateTimeToDrawRMC(lod) < renderer->GetAllocatedRenderTime())
+      bool trianglesOk = (EstimateNumberOfTriangles(lod) < MaxTrianglesNotOptimized) ;
+      bool timeOk = (this->m_Alpha == 1) || (EstimateTimeToDrawDC(lod) < renderer->GetAllocatedRenderTime()) ; 
+
+      if (trianglesOk && timeOk)
         return lod ;
     }
 
