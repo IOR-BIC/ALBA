@@ -134,6 +134,7 @@ protected:
   vtkPlane				        *m_Plane;
   vtkMAFFixedCutter		      *m_Cutter;
   vtkPolyData             *m_PolySpline;
+  vtkMAFPolyDataToSinglePolyLine *m_PolydataToPolylineFilter;
   vtkMAFToLinearTransform *m_VTKTransform;
   double				           m_Border;
   double                   m_Radius;
