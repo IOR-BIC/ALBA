@@ -58,6 +58,12 @@ vtkMEDVolumeSlicerNotInterpolated::vtkMEDVolumeSlicerNotInterpolated()
   OutputRectilinearGrid = NULL;
   AxisX = 0;
   AxisY = 1;
+
+  NumberOfPieces = 1;
+  SlicePieceDimensions = NULL;
+  SlicePieceSpacings = NULL;
+  SlicePieceOrigins = NULL;
+
 }
 //----------------------------------------------------------------------------
 vtkMEDVolumeSlicerNotInterpolated::~vtkMEDVolumeSlicerNotInterpolated() 
@@ -146,6 +152,18 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
     // BaseIndex is the current slice first point index
     BaseIndex = nearestIndex;
 
+    NumberOfPieces = 1;
+    SlicePieceDimensions = new int[1][2];
+    SlicePieceSpacings = new double[1][2];
+    SlicePieceOrigins = new double[1][3];
+    SlicePieceDimensions[0][1] = SliceDimensions[AxisX];
+    SlicePieceDimensions[0][2] = SliceDimensions[AxisY];
+    SlicePieceSpacings[0][0] = SliceSpacing[AxisX];
+    SlicePieceSpacings[0][1] = SliceSpacing[AxisY];
+    SlicePieceOrigins[0][AxisX] = Origin[AxisX];
+    SlicePieceOrigins[0][AxisY] = Origin[AxisY];
+    SlicePieceOrigins[0][SliceAxis] = Origin[SliceAxis];
+
     OutputDataType = VTK_IMAGE_DATA;
   }
   else if((rectilinearGrid = vtkRectilinearGrid::SafeDownCast(input)) != NULL)
@@ -217,9 +235,9 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
     
     SliceSpacing[0] = SliceSpacing[1] = SliceSpacing[2] = 1.; // Dummy spacing
     // Loop on coordinates to determine if spacing on this slice plane is regular.
-    // If spacing is regular the output can be only the image data.
+    // If spacing is regular the output can be simply an image data.
     OutputDataType = VTK_IMAGE_DATA;
-    double spacing[2];
+    double spacing[2] = {1.,1.};
     for(int i = 0; i < 2; i++)
     {
       for(int c = 0; c < CoordsXY[i]->GetNumberOfTuples() - 2; c++)
@@ -242,6 +260,84 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
     SliceSpacing[AxisY] = spacing[1];
     SliceOrigin[AxisX] = Bounds[AxisX * 2];
     SliceOrigin[AxisY] = Bounds[AxisY * 2];
+
+    // New implementation for rg
+    int *pieceDimensions[2] = {NULL,NULL};
+    double *pieceSpacings[2] = {NULL,NULL};
+    int numberOfPieces[2] = {0,0};
+
+    for(int i = 0; i < 2; i++)
+    {
+      double pieceSpacing = -1; // invalid value
+      double pieceSize = 0;
+      for(int c = 0; c < CoordsXY[i]->GetNumberOfTuples() - 1; c++)
+      {
+        double spacing = CoordsXY[i]->GetTuple1(c + 1) - CoordsXY[i]->GetTuple1(c);
+        if(pieceSpacing == -1)
+        {
+          pieceSpacing = spacing;
+        }
+        if(spacing - pieceSpacing < 0.01)
+        {
+          pieceSize++;
+        }
+        else
+        {
+          AddOutputsAttributes(pieceSize,pieceSpacing,&(pieceDimensions[i]),&(pieceSpacings[i]),numberOfPieces[i]);
+          numberOfPieces[i]++;
+          pieceSpacing = spacing;
+        }
+      }
+      AddOutputsAttributes(pieceSize,pieceSpacing,&(pieceDimensions[i]),&(pieceSpacings[i]),numberOfPieces[i]);
+      numberOfPieces[i]++;
+    }
+    // Update global attributes
+    NumberOfPieces = numberOfPieces[0] * numberOfPieces[1];
+
+    delete [] SlicePieceDimensions;
+    delete [] SlicePieceSpacings;
+    delete [] SlicePieceOrigins;
+    SlicePieceDimensions = new int[NumberOfPieces][2];
+    SlicePieceSpacings = new double[NumberOfPieces][2];
+    SlicePieceOrigins = new double[NumberOfPieces][3];
+    for(int x = 0; x < numberOfPieces[0]; x++)
+    {
+      for(int y = 0; y < numberOfPieces[1]; y++)
+      {
+        int originXIndex = 0;
+        if(x > 0)
+        {
+          originXIndex = pieceDimensions[0][x - 1];
+        }
+        int originYIndex = 0;
+        if(x > 0)
+        {
+          originYIndex = pieceDimensions[0][y - 1];
+        }
+        SlicePieceDimensions[x + numberOfPieces[0] * y][0] = pieceDimensions[0][x];
+        SlicePieceDimensions[x + numberOfPieces[0] * y][1] = pieceDimensions[1][y];
+        SlicePieceSpacings[x + numberOfPieces[0] * y][0] = pieceSpacings[0][x];
+        SlicePieceSpacings[x + numberOfPieces[0] * y][1] = pieceSpacings[1][y];
+        SlicePieceOrigins[x + numberOfPieces[0] * y][AxisX] = CoordsXY[0]->GetTuple1(originXIndex);
+        SlicePieceOrigins[x + numberOfPieces[0] * y][AxisY] = CoordsXY[1]->GetTuple1(originYIndex);
+        SlicePieceOrigins[x + numberOfPieces[0] * y][SliceAxis] = Origin[SliceAxis];
+      }
+    }
+    delete [] pieceDimensions[0];
+    delete [] pieceDimensions[1];
+    delete [] pieceSpacings[0];
+    delete [] pieceSpacings[1];
+  }
+  if(NumberOfPieces <= MAX_NUMBER_OF_PIECES)
+  {
+    OutputDataType = VTK_IMAGE_DATA;
+    SetNumberOfOutputs(NumberOfPieces);
+  }
+  else
+  {
+    OutputDataType = VTK_RECTILINEAR_GRID;
+    SetNumberOfOutputs(0);
+    NumberOfPieces = 1;
   }
 
   // Now nearest index is the "origin" of the slice so all points in the slice can be evaluated as 
@@ -249,6 +345,29 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
   // x + z * InputDimensions[0] * InputDimensions[1] + BaseIndex for SLICE_Y
   // y * InputDimensions[0] + z * InputDimensions[1] * InputDimensions[0] + BaseIndex for SLICE_X
 }
+
+//----------------------------------------------------------------------------
+void vtkMEDVolumeSlicerNotInterpolated::AddOutputsAttributes(int dimension, double spacing, int** dimensions, double** spacings, int size)
+//----------------------------------------------------------------------------
+{
+  int *newDimensions = new int[size + 1];
+  double *newSpacing = new double[size + 1];
+
+  for(int i = 0; i < size; i++)
+  {
+    newDimensions[i] = *dimensions[i];
+    newSpacing[i] = *spacings[i];
+  }
+  delete [] *dimensions;
+  delete [] *spacings;
+  newDimensions[size] = dimension;
+  newSpacing[size] = spacing;
+  size++;
+
+  *dimensions = newDimensions;
+  *spacings = newSpacing;
+}
+
 //----------------------------------------------------------------------------
 void vtkMEDVolumeSlicerNotInterpolated::ExecuteData(vtkDataObject *output)
 //----------------------------------------------------------------------------
@@ -264,157 +383,187 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteData(vtkDataObject *output)
 void vtkMEDVolumeSlicerNotInterpolated::ExecuteData(vtkImageData *output)
 //----------------------------------------------------------------------------
 {
-  vtkDataSet* input = NULL;
-  if ((input = GetInput()) == NULL || this->GetNumberOfOutputs() == 0)
-    return; // No input or no output
-
-  input->Update();
-  vtkDataArray * inputScalars = input->GetPointData()->GetScalars();
-
-  // Fill variables for scalar index recognition
-  double iFactor = 1;
-  double jFactor = InputDimensions[0];
-  switch(SliceAxis)
-  {
-  case SLICE_Z:
-    {
-    } break;
-  case SLICE_Y:
-    {
-      iFactor = 1;
-      jFactor = InputDimensions[1] * InputDimensions[0];
-    } break;
-  case SLICE_X:
-    {
-      iFactor = InputDimensions[0];
-      jFactor = InputDimensions[1] * InputDimensions[0];
-    } break;
-  }
-
-  // Prepare output scalars
-  vtkDataArray *scalars = NULL;
-  switch (inputScalars->GetDataType()) 
-  {
-  case VTK_CHAR:
-    {
-      scalars = vtkCharArray::New();
-      break;
-    }
-  case VTK_UNSIGNED_CHAR:
-    {
-      scalars = vtkUnsignedCharArray::New();
-      break;
-    }
-  case VTK_SHORT:
-    {
-      scalars = vtkShortArray::New();
-      break;
-    }
-  case VTK_UNSIGNED_SHORT:
-    {
-      scalars = vtkUnsignedShortArray::New();
-      break;
-    }
-  case VTK_FLOAT:
-    {
-      scalars = vtkFloatArray::New();
-      break;
-    }
-  case VTK_DOUBLE:
-    {
-      scalars = vtkDoubleArray::New();
-      break;
-    }
-  default:
-    return;
-  }
-  scalars->SetNumberOfComponents(inputScalars->GetNumberOfComponents());
-  scalars->SetName("SCALARS");
-
-
-  int iLenght = SliceDimensions[0];
-  int jLenght = SliceDimensions[1];
   if(OutputDataType == VTK_RECTILINEAR_GRID)
   {
-    iLenght--;
-    jLenght--;
+    assert (this->GetNumberOfOutputs()== 0);
   }
-  // Fill output scalars with the right values
-  for(int j = 0; j < jLenght; j++)
+  for(int idx = 0; idx < NumberOfPieces; idx++)
   {
-    for(int i = 0; i < iLenght; i++)
-    {
-      int index[2] = {i,j};
-      double *tuple = inputScalars->GetTuple(index[0] * iFactor + index[1] * jFactor + BaseIndex);
-      vtkIdType sid = scalars->InsertNextTuple(tuple);
-    }
-  }
-  int dimensions[3];
-  dimensions[0] = InputDimensions[0];
-  dimensions[1] = InputDimensions[1];
-  dimensions[2] = InputDimensions[2];
-  dimensions[SliceAxis] = 1;
+    vtkDataSet* input = NULL;
+    if ((input = GetInput()) == NULL || this->GetNumberOfOutputs() == 0 && OutputDataType == VTK_IMAGE_DATA)
+      return; // No input or no output
 
-  if(OutputDataType == VTK_RECTILINEAR_GRID)
-  {
-    // Create the rectilinear grid structure
-    if(OutputRectilinearGrid)
-    {
-      OutputRectilinearGrid->Delete();
-      OutputRectilinearGrid = NULL;
-    }
-    OutputRectilinearGrid = vtkRectilinearGrid::New();
-    OutputRectilinearGrid->SetDimensions(dimensions[0],dimensions[1],dimensions[2]);
+    input->Update();
+    vtkDataArray * inputScalars = input->GetPointData()->GetScalars();
 
-    vtkDoubleArray *CoordsZ = vtkDoubleArray::New();
-    CoordsZ->SetNumberOfComponents(1);
-    CoordsZ->InsertNextTuple1(0.);
-
+    // Fill variables for scalar index recognition
+    double iFactor = 1;
+    double jFactor = InputDimensions[0];
     switch(SliceAxis)
     {
     case SLICE_Z:
       {
-        OutputRectilinearGrid->SetXCoordinates(CoordsXY[0]);
-        OutputRectilinearGrid->SetYCoordinates(CoordsXY[1]);
-        OutputRectilinearGrid->SetZCoordinates(CoordsZ);
       } break;
     case SLICE_Y:
       {
-        OutputRectilinearGrid->SetXCoordinates(CoordsXY[0]);
-        OutputRectilinearGrid->SetZCoordinates(CoordsXY[1]);
-        OutputRectilinearGrid->SetYCoordinates(CoordsZ);
+        iFactor = 1;
+        jFactor = InputDimensions[1] * InputDimensions[0];
       } break;
     case SLICE_X:
       {
-        OutputRectilinearGrid->SetYCoordinates(CoordsXY[0]);
-        OutputRectilinearGrid->SetZCoordinates(CoordsXY[1]);
-        OutputRectilinearGrid->SetXCoordinates(CoordsZ);
+        iFactor = InputDimensions[0];
+        jFactor = InputDimensions[1] * InputDimensions[0];
       } break;
     }
-    CoordsZ->Delete();
 
-    // Set Scalars
-    OutputRectilinearGrid->GetCellData()->RemoveArray("SCALARS");
-    OutputRectilinearGrid->GetCellData()->SetScalars(scalars);
-    OutputRectilinearGrid->GetCellData()->SetActiveScalars("SCALARS");
-    OutputRectilinearGrid->GetCellData()->Update();
+    // Prepare output scalars
+    vtkDataArray *scalars = NULL;
+    switch (inputScalars->GetDataType()) 
+    {
+    case VTK_CHAR:
+      {
+        scalars = vtkCharArray::New();
+        break;
+      }
+    case VTK_UNSIGNED_CHAR:
+      {
+        scalars = vtkUnsignedCharArray::New();
+        break;
+      }
+    case VTK_SHORT:
+      {
+        scalars = vtkShortArray::New();
+        break;
+      }
+    case VTK_UNSIGNED_SHORT:
+      {
+        scalars = vtkUnsignedShortArray::New();
+        break;
+      }
+    case VTK_FLOAT:
+      {
+        scalars = vtkFloatArray::New();
+        break;
+      }
+    case VTK_DOUBLE:
+      {
+        scalars = vtkDoubleArray::New();
+        break;
+      }
+    default:
+      return;
+    }
 
-    OutputRectilinearGrid->Modified();
-    OutputRectilinearGrid->Update();
+    int dimensions[3];
+    dimensions[AxisX] = SlicePieceDimensions[idx][0];
+    dimensions[AxisY] = SlicePieceDimensions[idx][1];
+    dimensions[SliceAxis] = 1;
+
+    double spacing[3];
+    spacing[AxisX] = SlicePieceSpacings[idx][0];
+    spacing[AxisY] = SlicePieceSpacings[idx][1];
+    spacing[SliceAxis] = 1;
+
+    scalars->SetNumberOfComponents(inputScalars->GetNumberOfComponents());
+    scalars->SetName("SCALARS");
+
+    int iLenght = dimensions[AxisX];
+    int jLenght = dimensions[AxisY];
+
+    if(OutputDataType == VTK_RECTILINEAR_GRID)
+    {
+      iLenght--;
+      jLenght--;
+    }
+
+    // Fill output scalars with the right values
+    int iStart = 0;
+    int jStart = 0;
+    if(idx > 0)
+    {
+      iStart = SlicePieceDimensions[idx-1][0];
+      jStart = SlicePieceDimensions[idx-1][1];
+    }
+    for(int j = 0; j < jLenght; j++)
+    {
+      for(int i = 0; i < iLenght; i++)
+      {
+        int index[2] = {i,j};
+        double *tuple = inputScalars->GetTuple(index[0] * iFactor + index[1] * jFactor + BaseIndex);
+        vtkIdType sid = scalars->InsertNextTuple(tuple);
+      }
+    }
+
+    // This is executed only if recognized image pieces are greater than MAX_NUMBER_OF_PIECES
+    if(OutputDataType == VTK_RECTILINEAR_GRID)
+    {
+      // Create the rectilinear grid structure
+      if(OutputRectilinearGrid)
+      {
+        OutputRectilinearGrid->Delete();
+        OutputRectilinearGrid = NULL;
+      }
+      OutputRectilinearGrid = vtkRectilinearGrid::New();
+      OutputRectilinearGrid->SetDimensions(dimensions[0],dimensions[1],dimensions[2]);
+
+      vtkDoubleArray *CoordsZ = vtkDoubleArray::New();
+      CoordsZ->SetNumberOfComponents(1);
+      CoordsZ->InsertNextTuple1(0.);
+
+      switch(SliceAxis)
+      {
+      case SLICE_Z:
+        {
+          OutputRectilinearGrid->SetXCoordinates(CoordsXY[0]);
+          OutputRectilinearGrid->SetYCoordinates(CoordsXY[1]);
+          OutputRectilinearGrid->SetZCoordinates(CoordsZ);
+        } break;
+      case SLICE_Y:
+        {
+          OutputRectilinearGrid->SetXCoordinates(CoordsXY[0]);
+          OutputRectilinearGrid->SetZCoordinates(CoordsXY[1]);
+          OutputRectilinearGrid->SetYCoordinates(CoordsZ);
+        } break;
+      case SLICE_X:
+        {
+          OutputRectilinearGrid->SetYCoordinates(CoordsXY[0]);
+          OutputRectilinearGrid->SetZCoordinates(CoordsXY[1]);
+          OutputRectilinearGrid->SetXCoordinates(CoordsZ);
+        } break;
+      }
+      CoordsZ->Delete();
+
+      // Set Scalars
+      OutputRectilinearGrid->GetCellData()->RemoveArray("SCALARS");
+      OutputRectilinearGrid->GetCellData()->SetScalars(scalars);
+      OutputRectilinearGrid->GetCellData()->SetActiveScalars("SCALARS");
+      OutputRectilinearGrid->GetCellData()->Update();
+
+      OutputRectilinearGrid->Modified();
+      OutputRectilinearGrid->Update();
+    }
+    else
+    {
+      vtkImageData *output = this->GetOutput(idx);
+      if (output == NULL)
+      {
+        this->Outputs[idx] = output = vtkImageData::New();
+      }
+      // Prepare and generate output image
+      output->SetSpacing(spacing[0],spacing[1],spacing[2]);
+      output->SetExtent(0, (dimensions[0] - 1) , 0, (dimensions[1] - 1), 0, (dimensions[2] - 1));
+      output->SetOrigin(SlicePieceOrigins[idx][0],SlicePieceOrigins[idx][1],SlicePieceOrigins[idx][2]);
+
+      // Set the image scalars
+      output->SetScalarType(inputScalars->GetDataType());
+      output->GetPointData()->RemoveArray("SCALARS");
+      output->GetPointData()->SetScalars(scalars);
+      output->GetPointData()->SetActiveScalars("SCALARS");
+      output->GetPointData()->Update();
+      scalars->Delete();
+
+      output->Modified();
+      output->Update();
+    }
   }
-  // Prepare and generate output image
-  output->SetSpacing(SliceSpacing[0],SliceSpacing[1],SliceSpacing[2]);
-  output->SetExtent(0, (dimensions[0] - 1) , 0, (dimensions[1] - 1), 0, (dimensions[2] - 1));
-  output->SetOrigin(SliceOrigin[0],SliceOrigin[1],SliceOrigin[2]);
-
-  // Set the image scalars
-  output->SetScalarType(inputScalars->GetDataType());
-  output->GetPointData()->RemoveArray("SCALARS");
-  output->GetPointData()->SetScalars(scalars);
-  output->GetPointData()->SetActiveScalars("SCALARS");
-  output->GetPointData()->Update();
-  scalars->Delete();
-
-  output->Modified();
-  output->Update();
 }

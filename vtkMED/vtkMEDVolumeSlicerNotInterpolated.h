@@ -18,6 +18,8 @@
 #include "vtkDataSetToImageFilter.h"
 #include "vtkRectilinearGrid.h"
 
+#define MAX_NUMBER_OF_PIECES 20
+
 class vtkDoubleArray;
 
 //----------------------------------------------------------------------------
@@ -95,8 +97,16 @@ protected:
   int AxisX;                                  //< X axis of the image
   int AxisY;                                  //< Y axis of the image
 
+  // new draft implementation for rectilinear grid
+  // in real images often there are pieces of rg that have regular spacing:
+  // the rg slicing algorithm decompose rg in pieces that have the same spacing along axis (image data)
+  int (*SlicePieceDimensions)[2];         //< Slice Piece dimensions
+  double (*SlicePieceSpacings)[2];         //< Slice Piece spacing
+  double (*SlicePieceOrigins)[3];         //< Slice Piece spacing
+  int NumberOfPieces;
 private:
 
+  void AddOutputsAttributes(int dimension, double spacing, int** dimensions, double** spacings, int size);
 
 };
 #endif //#ifndef __vtkMEDVolumeSlicerNotInterpolated_H__
