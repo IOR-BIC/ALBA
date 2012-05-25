@@ -284,10 +284,10 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
         }
         if(abs(spacing - pieceSpacing) < 0.01)
         {
-          if(spacing > pieceSpacing)
-          {
-            pieceSpacing = spacing;
-          }
+//           if(spacing > pieceSpacing)
+//           {
+//             pieceSpacing = spacing;
+//           }
           pieceSize++;
         }
         else
@@ -317,13 +317,15 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
           if(x > 0)
           {
             for(int x2 = 0; x2 < x; x2++)
-              originXIndex += pieceDimensions[x2][0];
+            {
+              originXIndex += (pieceDimensions[x2][0]-1);
+            }
           }
           int originYIndex = 0;
           if(y > 0)
           {
             for(int y2 = 0; y2 < y; y2++)
-              originYIndex += pieceDimensions[y2][1];
+              originYIndex += (pieceDimensions[y2][1]-1);
           }
           SlicePieceDimensions[x + numberOfPieces[0] * y][0] = pieceDimensions[x][0];
           SlicePieceDimensions[x + numberOfPieces[0] * y][1] = pieceDimensions[y][1];
