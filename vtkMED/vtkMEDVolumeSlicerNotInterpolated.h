@@ -60,6 +60,9 @@ public:
   /** Get output data type */
   vtkGetMacro(OutputDataType,int);
 
+  /** Get number of pieces */
+  vtkGetMacro(NumberOfPieces,int);
+
 protected:
 
   /** ctor */
@@ -100,9 +103,9 @@ protected:
   // new draft implementation for rectilinear grid
   // in real images often there are pieces of rg that have regular spacing:
   // the rg slicing algorithm decompose rg in pieces that have the same spacing along axis (image data)
-  int (*SlicePieceDimensions)[2];         //< Slice Piece dimensions
-  double (*SlicePieceSpacings)[2];         //< Slice Piece spacing
-  double (*SlicePieceOrigins)[3];         //< Slice Piece spacing
+  int SlicePieceDimensions[MAX_NUMBER_OF_PIECES][2];         //< Slice Piece dimensions
+  double SlicePieceSpacings[MAX_NUMBER_OF_PIECES][2];        //< Slice Piece spacing
+  double SlicePieceOrigins[MAX_NUMBER_OF_PIECES][3];         //< Slice Piece spacing
   int NumberOfPieces;
 private:
 

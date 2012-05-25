@@ -60,10 +60,6 @@ vtkMEDVolumeSlicerNotInterpolated::vtkMEDVolumeSlicerNotInterpolated()
   AxisY = 1;
 
   NumberOfPieces = 1;
-  SlicePieceDimensions = NULL;
-  SlicePieceSpacings = NULL;
-  SlicePieceOrigins = NULL;
-
 }
 //----------------------------------------------------------------------------
 vtkMEDVolumeSlicerNotInterpolated::~vtkMEDVolumeSlicerNotInterpolated() 
@@ -124,6 +120,13 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
           AxisY = 2;
         } break;
     }
+    if(InputDimensions[AxisX] <= 1 || InputDimensions[AxisY] <= 1)
+    {
+      OutputDataType = VTK_IMAGE_DATA;
+      NumberOfPieces = 0;
+      return;
+    }
+
     SliceDimensions[0] = InputDimensions[AxisX];
     SliceDimensions[1] = InputDimensions[AxisY];
     SliceSpacing[AxisX] = InputSpacing[AxisX];
@@ -153,9 +156,6 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
     BaseIndex = nearestIndex;
 
     NumberOfPieces = 1;
-    SlicePieceDimensions = new int[1][2];
-    SlicePieceSpacings = new double[1][2];
-    SlicePieceOrigins = new double[1][3];
     SlicePieceDimensions[0][1] = SliceDimensions[AxisX];
     SlicePieceDimensions[0][2] = SliceDimensions[AxisY];
     SlicePieceSpacings[0][0] = SliceSpacing[AxisX];
@@ -203,7 +203,12 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
           AxisY = 2;
         } break;
      }
-
+    if(CoordsXY[0]->GetNumberOfTuples() <= 1 || CoordsXY[1]->GetNumberOfTuples() <= 1)
+    {
+      OutputDataType = VTK_IMAGE_DATA;
+      NumberOfPieces = 0;
+      return;
+    }
     SliceDimensions[0] = InputDimensions[AxisX];
     SliceDimensions[1] = InputDimensions[AxisY];
 
@@ -262,73 +267,76 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
     SliceOrigin[AxisY] = Bounds[AxisY * 2];
 
     // New implementation for rg
-    int *pieceDimensions[2] = {NULL,NULL};
-    double *pieceSpacings[2] = {NULL,NULL};
+    int pieceDimensions[MAX_NUMBER_OF_PIECES][2];
+    double pieceSpacings[MAX_NUMBER_OF_PIECES][2];
     int numberOfPieces[2] = {0,0};
 
     for(int i = 0; i < 2; i++)
     {
       double pieceSpacing = -1; // invalid value
       double pieceSize = 0;
-      for(int c = 0; c < CoordsXY[i]->GetNumberOfTuples() - 1; c++)
+      for(int c = 0; c < CoordsXY[i]->GetNumberOfTuples() - 1 && numberOfPieces[i] < MAX_NUMBER_OF_PIECES; c++)
       {
         double spacing = CoordsXY[i]->GetTuple1(c + 1) - CoordsXY[i]->GetTuple1(c);
         if(pieceSpacing == -1)
         {
           pieceSpacing = spacing;
         }
-        if(spacing - pieceSpacing < 0.01)
+        if(abs(spacing - pieceSpacing) < 0.01)
         {
+          if(spacing > pieceSpacing)
+          {
+            pieceSpacing = spacing;
+          }
           pieceSize++;
         }
         else
         {
-          AddOutputsAttributes(pieceSize,pieceSpacing,&(pieceDimensions[i]),&(pieceSpacings[i]),numberOfPieces[i]);
+          pieceDimensions[ numberOfPieces[i] ][i] = pieceSize;
+          pieceSpacings[ numberOfPieces[i] ][i] = pieceSpacing;
           numberOfPieces[i]++;
+          pieceSize = 0;
           pieceSpacing = spacing;
         }
       }
-      AddOutputsAttributes(pieceSize,pieceSpacing,&(pieceDimensions[i]),&(pieceSpacings[i]),numberOfPieces[i]);
+      pieceDimensions[ numberOfPieces[i] ][i] = pieceSize;
+      pieceSpacings[ numberOfPieces[i] ][i] = pieceSpacing;
       numberOfPieces[i]++;
+      pieceSize = 0;
     }
     // Update global attributes
     NumberOfPieces = numberOfPieces[0] * numberOfPieces[1];
 
-    delete [] SlicePieceDimensions;
-    delete [] SlicePieceSpacings;
-    delete [] SlicePieceOrigins;
-    SlicePieceDimensions = new int[NumberOfPieces][2];
-    SlicePieceSpacings = new double[NumberOfPieces][2];
-    SlicePieceOrigins = new double[NumberOfPieces][3];
-    for(int x = 0; x < numberOfPieces[0]; x++)
+    if(NumberOfPieces < MAX_NUMBER_OF_PIECES)
     {
-      for(int y = 0; y < numberOfPieces[1]; y++)
+      for(int x = 0; x < numberOfPieces[0]; x++)
       {
-        int originXIndex = 0;
-        if(x > 0)
+        for(int y = 0; y < numberOfPieces[1]; y++)
         {
-          originXIndex = pieceDimensions[0][x - 1];
+          int originXIndex = 0;
+          if(x > 0)
+          {
+            for(int x2 = 0; x2 < x; x2++)
+              originXIndex += pieceDimensions[x2][0];
+          }
+          int originYIndex = 0;
+          if(y > 0)
+          {
+            for(int y2 = 0; y2 < y; y2++)
+              originYIndex += pieceDimensions[y2][1];
+          }
+          SlicePieceDimensions[x + numberOfPieces[0] * y][0] = pieceDimensions[x][0];
+          SlicePieceDimensions[x + numberOfPieces[0] * y][1] = pieceDimensions[y][1];
+          SlicePieceSpacings[x + numberOfPieces[0] * y][0] = pieceSpacings[x][0];
+          SlicePieceSpacings[x + numberOfPieces[0] * y][1] = pieceSpacings[y][1];
+          SlicePieceOrigins[x + numberOfPieces[0] * y][AxisX] = CoordsXY[0]->GetTuple1(originXIndex);
+          SlicePieceOrigins[x + numberOfPieces[0] * y][AxisY] = CoordsXY[1]->GetTuple1(originYIndex);
+          SlicePieceOrigins[x + numberOfPieces[0] * y][SliceAxis] = Origin[SliceAxis];
         }
-        int originYIndex = 0;
-        if(x > 0)
-        {
-          originYIndex = pieceDimensions[0][y - 1];
-        }
-        SlicePieceDimensions[x + numberOfPieces[0] * y][0] = pieceDimensions[0][x];
-        SlicePieceDimensions[x + numberOfPieces[0] * y][1] = pieceDimensions[1][y];
-        SlicePieceSpacings[x + numberOfPieces[0] * y][0] = pieceSpacings[0][x];
-        SlicePieceSpacings[x + numberOfPieces[0] * y][1] = pieceSpacings[1][y];
-        SlicePieceOrigins[x + numberOfPieces[0] * y][AxisX] = CoordsXY[0]->GetTuple1(originXIndex);
-        SlicePieceOrigins[x + numberOfPieces[0] * y][AxisY] = CoordsXY[1]->GetTuple1(originYIndex);
-        SlicePieceOrigins[x + numberOfPieces[0] * y][SliceAxis] = Origin[SliceAxis];
       }
     }
-    delete [] pieceDimensions[0];
-    delete [] pieceDimensions[1];
-    delete [] pieceSpacings[0];
-    delete [] pieceSpacings[1];
   }
-  if(NumberOfPieces <= MAX_NUMBER_OF_PIECES)
+  if(NumberOfPieces < MAX_NUMBER_OF_PIECES)
   {
     OutputDataType = VTK_IMAGE_DATA;
     SetNumberOfOutputs(NumberOfPieces);
@@ -336,7 +344,6 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
   else
   {
     OutputDataType = VTK_RECTILINEAR_GRID;
-    SetNumberOfOutputs(0);
     NumberOfPieces = 1;
   }
 
@@ -383,10 +390,8 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteData(vtkDataObject *output)
 void vtkMEDVolumeSlicerNotInterpolated::ExecuteData(vtkImageData *output)
 //----------------------------------------------------------------------------
 {
-  if(OutputDataType == VTK_RECTILINEAR_GRID)
-  {
-    assert (this->GetNumberOfOutputs()== 0);
-  }
+  int iStart = 0;
+  int jStart = 0;
   for(int idx = 0; idx < NumberOfPieces; idx++)
   {
     vtkDataSet* input = NULL;
@@ -477,21 +482,24 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteData(vtkImageData *output)
     }
 
     // Fill output scalars with the right values
-    int iStart = 0;
-    int jStart = 0;
-    if(idx > 0)
-    {
-      iStart = SlicePieceDimensions[idx-1][0];
-      jStart = SlicePieceDimensions[idx-1][1];
-    }
     for(int j = 0; j < jLenght; j++)
     {
       for(int i = 0; i < iLenght; i++)
       {
-        int index[2] = {i,j};
+        int index[2] = {i + iStart,j + jStart};
         double *tuple = inputScalars->GetTuple(index[0] * iFactor + index[1] * jFactor + BaseIndex);
         vtkIdType sid = scalars->InsertNextTuple(tuple);
       }
+    }
+    iStart += iLenght;
+    if(iStart >= InputDimensions[AxisX] - 1)
+    {
+      iStart = 0;
+    }
+    jStart += jLenght;
+    if(jStart >= InputDimensions[AxisY] - 1)
+    {
+      jStart = 0;
     }
 
     // This is executed only if recognized image pieces are greater than MAX_NUMBER_OF_PIECES
