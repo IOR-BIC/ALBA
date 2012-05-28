@@ -86,6 +86,10 @@ public:
   /** Function that retrieve a spline polyline when  input is a polyline */ 
   vtkPolyData *SplineProcess(vtkPolyData *polyData);
 
+  /** This Function prepares a polydata for vtktubefilter 
+      by removing consecutive points whit same coordinates */ 
+  vtkPolyData *LineProcess(vtkPolyData *polyData);
+
   /** Show actor of sliced polyline*/
   void ShowActorOn();
 
@@ -132,8 +136,8 @@ protected:
   vtkActor                *m_OutlineActor;
   mafAxes                 *m_Axes;
   vtkPlane				        *m_Plane;
-  vtkMAFFixedCutter		      *m_Cutter;
-  vtkPolyData             *m_PolySpline;
+  vtkMAFFixedCutter		    *m_Cutter;
+  vtkPolyData             *m_PolyFilteredLine;
   vtkMAFToLinearTransform *m_VTKTransform;
   double				           m_Border;
   double                   m_Radius;

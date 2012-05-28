@@ -109,6 +109,10 @@ public:
 	/** Calculate the cardinal spline over original polyline*/
   vtkPolyData *SplineProcess(vtkPolyData *polyData);
 
+   /** This Function prepares a polydata for vtktubefilter 
+      by removing consecutive points whit same coordinates */ 
+  vtkPolyData *LineProcess(vtkPolyData *polyData);
+
   /** Set Border Distance*/
   void SetDistanceBorder(double value){m_DistanceBorder = value;};
   /** Get Border Distance*/
@@ -197,7 +201,7 @@ protected:
   
 	vtkColorTransferFunction *m_Table;
   mmaMaterial              *m_PolylineMaterial;
-	vtkPolyData              *m_PolySpline;
+	vtkPolyData              *m_PolyFilteredLine;
   mafGUIMaterialButton        *m_MaterialButton;
   std::vector<vtkCaptionActor2D *> m_CaptionActorList;
   
