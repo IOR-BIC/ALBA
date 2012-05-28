@@ -199,19 +199,12 @@ Select the vme parent
   LoadVTKData(m_Selection);
 
   //////////////////////////////////////////////////////////////////////////
-  // Added by Losi on 03.06.2010
+  // Added by Losi on 03.06.2010, modify by Di Cosmo
   // It is necessary to load all vtk data of children vme otherwise paste or undo cause an application crash
   //////////////////////////////////////////////////////////////////////////
   mafVME *m_SelectionVme = mafVME::SafeDownCast(m_Selection);
   if(m_SelectionVme)
-  {
-    const mafNode::mafChildrenVector *children = m_SelectionVme->GetChildren();
-    for(int c = 0; c < children->size(); c++)
-    {
-      mafNode *child = children->at(c);
-      LoadVTKData(child);
-    }
-  }
+    LoadChild(m_SelectionVme);
   //////////////////////////////////////////////////////////////////////////
 
   mafEventMacro(mafEvent(this,VME_REMOVE,m_Selection));
@@ -239,6 +232,23 @@ void mafOpCut::LoadVTKData(mafNode *vme)
     }
 
     mafVME::SafeDownCast(vme)->SetTimeStamp(oldTime);
+  }
+}
+//----------------------------------------------------------------------------
+void mafOpCut::LoadChild(mafNode *vme)
+//----------------------------------------------------------------------------
+{
+  // Added by Di Cosmo on 24.05.2012
+  // it needs load vtk data for all objects in the tree
+  const mafNode::mafChildrenVector *children = vme->GetChildren();
+  if (children)
+  {
+    for(int c = 0; c < children->size(); c++)
+    {
+      mafNode *child = children->at(c);
+      LoadVTKData(child);
+      LoadChild(child);
+    }
   }
 }
 //----------------------------------------------------------------------------

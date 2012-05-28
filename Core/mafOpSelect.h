@@ -112,6 +112,8 @@ public:
 
 protected:
     mafAutoPointer<mafNode> m_SelectionParent;
+    /** Load all children in the tree (Added by Di Cosmo on 24.05.2012) */
+    void LoadChild(mafNode *vme);
 };
 /**
     class name: mafOpCopy
