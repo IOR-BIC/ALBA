@@ -41,6 +41,7 @@
 #include "vtkImageAccumulate.h"
 #include "vtkMAFTextActorMeter.h"
 
+#include "vtkRendererCollection.h"
 #include "vtkTransform.h"
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkPoints.h"
@@ -227,6 +228,30 @@ void mafInteractor2DDistance::OnLeftButtonDown(mafEventInteraction *e)
   }
   m_CurrentRwi = m_Mouse->GetRWI();
   m_CurrentRenderer = m_Mouse->GetRenderer();
+
+  if (m_CurrentRenderer->GetLayer() != 1)//Frontal Render
+  {
+	  vtkRendererCollection *rc = m_Mouse->GetRenderer()->GetRenderWindow()->GetRenderers();;
+	  if(rc)
+	  {
+	    rc->InitTraversal();
+	    
+	    vtkRenderer *ren = NULL;
+	    do 
+	    {
+		    ren = rc->GetNextItem();
+		    if(ren)
+		    {
+		      if (ren->GetLayer() == 1)//Frontal Render
+		      {
+		        m_CurrentRenderer = ren;
+	          break;
+	        }
+		    }
+	    } while (ren);
+	  }
+  }
+
   m_ParallelView = m_CurrentRenderer->GetActiveCamera()->GetParallelProjection() != 0;
   if (m_ParallelView)
   {
@@ -349,6 +374,29 @@ void mafInteractor2DDistance::DrawMeasureTool(double x, double y)
   
   m_CurrentRwi = m_Mouse->GetRWI();
   m_CurrentRenderer = m_Mouse->GetRenderer();
+  if (m_CurrentRenderer->GetLayer() != 1)//Frontal Render
+  {
+    vtkRendererCollection *rc = m_Mouse->GetRenderer()->GetRenderWindow()->GetRenderers();;
+    if(rc)
+    {
+      rc->InitTraversal();
+
+      vtkRenderer *ren = NULL;
+      do 
+      {
+        ren = rc->GetNextItem();
+        if(ren)
+        {
+          if (ren->GetLayer() == 1)//Frontal Render
+          {
+            m_CurrentRenderer = ren;
+            break;
+          }
+        }
+      } while (ren);
+    }
+  }
+
 	if (m_CurrentRenderer == NULL || (m_DisableUndoAndOkCancel && counter == 2 && m_CurrentRenderer != m_PreviousRenderer ))	{return;}
 
 	double wp[4], p[3];
