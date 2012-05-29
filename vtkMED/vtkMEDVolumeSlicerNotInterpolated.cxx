@@ -307,32 +307,45 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
     // Update global attributes
     NumberOfPieces = numberOfPieces[0] * numberOfPieces[1];
 
+    double sliceOriginX[MAX_NUMBER_OF_PIECES];
+    double sliceOriginY[MAX_NUMBER_OF_PIECES];
+
     if(NumberOfPieces < MAX_NUMBER_OF_PIECES)
     {
       for(int x = 0; x < numberOfPieces[0]; x++)
       {
         for(int y = 0; y < numberOfPieces[1]; y++)
         {
-          int originXIndex = 0;
           if(x > 0)
           {
+            sliceOriginX[x] = 0;
             for(int x2 = 0; x2 < x; x2++)
             {
-              originXIndex += (pieceDimensions[x2][0]-1);
+              sliceOriginX[x] = sliceOriginX[x2] + (pieceDimensions[x2][0]-1) * pieceSpacings[x2][0];
             }
           }
-          int originYIndex = 0;
+          else
+          {
+            sliceOriginX[x] = CoordsXY[0]->GetTuple1(0);
+          }
           if(y > 0)
           {
+            sliceOriginY[y] = 0;
             for(int y2 = 0; y2 < y; y2++)
-              originYIndex += (pieceDimensions[y2][1]-1);
+            {
+              sliceOriginY[y] = sliceOriginY[y2] + (pieceDimensions[y2][1]-1) * pieceSpacings[y2][1];
+            }
+          }
+          else
+          {
+            sliceOriginY[y] = CoordsXY[1]->GetTuple1(0);
           }
           SlicePieceDimensions[x + numberOfPieces[0] * y][0] = pieceDimensions[x][0];
           SlicePieceDimensions[x + numberOfPieces[0] * y][1] = pieceDimensions[y][1];
           SlicePieceSpacings[x + numberOfPieces[0] * y][0] = pieceSpacings[x][0];
           SlicePieceSpacings[x + numberOfPieces[0] * y][1] = pieceSpacings[y][1];
-          SlicePieceOrigins[x + numberOfPieces[0] * y][AxisX] = CoordsXY[0]->GetTuple1(originXIndex);
-          SlicePieceOrigins[x + numberOfPieces[0] * y][AxisY] = CoordsXY[1]->GetTuple1(originYIndex);
+          SlicePieceOrigins[x + numberOfPieces[0] * y][AxisX] = sliceOriginX[x];
+          SlicePieceOrigins[x + numberOfPieces[0] * y][AxisY] = sliceOriginY[y];
           SlicePieceOrigins[x + numberOfPieces[0] * y][SliceAxis] = Origin[SliceAxis];
         }
       }
