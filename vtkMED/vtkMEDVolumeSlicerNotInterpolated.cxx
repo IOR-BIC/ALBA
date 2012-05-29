@@ -156,8 +156,8 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
     BaseIndex = nearestIndex;
 
     NumberOfPieces = 1;
-    SlicePieceDimensions[0][1] = SliceDimensions[AxisX];
-    SlicePieceDimensions[0][2] = SliceDimensions[AxisY];
+    SlicePieceDimensions[0][0] = SliceDimensions[AxisX];
+    SlicePieceDimensions[0][1] = SliceDimensions[AxisY];
     SlicePieceSpacings[0][0] = SliceSpacing[AxisX];
     SlicePieceSpacings[0][1] = SliceSpacing[AxisY];
     SlicePieceOrigins[0][AxisX] = Origin[AxisX];
