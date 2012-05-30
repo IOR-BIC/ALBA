@@ -126,8 +126,7 @@ medVMEComputeWrapping::medVMEComputeWrapping()
 	SetDataPipe(dpipe);
 
 	m_LinePatcher->SetInput(m_Goniometer->GetOutput());
-	dpipe->SetInput(m_LinePatcher->GetOutput());
-	dpipe->SetInput(m_Goniometer->GetOutput());
+	dpipe->SetInput(m_LinePatcher->GetOutput());	
 }
 //-------------------------------------------------------------------------
 medVMEComputeWrapping::~medVMEComputeWrapping()
