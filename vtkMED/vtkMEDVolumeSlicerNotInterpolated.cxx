@@ -293,6 +293,7 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
         else
         {
           pieceDimensions[ numberOfPieces[i] ][i] = pieceSize;
+          pieceDimensions[ numberOfPieces[i] ][i]++;
           pieceSpacings[ numberOfPieces[i] ][i] = pieceSpacing;
           numberOfPieces[i]++;
           pieceSize = 0;
@@ -300,6 +301,7 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
         }
       }
       pieceDimensions[ numberOfPieces[i] ][i] = pieceSize;
+      pieceDimensions[ numberOfPieces[i] ][i]++;
       pieceSpacings[ numberOfPieces[i] ][i] = pieceSpacing;
       numberOfPieces[i]++;
       pieceSize = 0;
@@ -507,11 +509,13 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteData(vtkImageData *output)
       }
     }
     iStart += iLenght;
+    iStart--;
     if(iStart >= InputDimensions[AxisX] - 1)
     {
       iStart = 0;
     }
     jStart += jLenght;
+    jStart--;
     if(jStart >= InputDimensions[AxisY] - 1)
     {
       jStart = 0;
