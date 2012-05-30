@@ -1921,9 +1921,9 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
       break;
     case ID_SLICE_SLIDER:
       {
-        if (m_NumSliceSliderEvents == 2)//Validator generate 2 events when the user move the slider REMOVED: GEnerate problems on slice update!
-        {
-          m_NumSliceSliderEvents = 0;
+//         if (m_NumSliceSliderEvents == 2)//Validator generate 2 events when the user move the slider REMOVED: GEnerate problems on slice update!
+//         {
+//           m_NumSliceSliderEvents = 0;
           if (m_CurrentSliceIndex != m_OldSliceIndex && m_CurrentOperation==MANUAL_SEGMENTATION)
           {
             OnEventUpdateManualSlice();
@@ -1941,11 +1941,11 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
           {
             CreateRealDrawnImage();
           }
-        }
-        else
-        {
-          m_NumSliceSliderEvents++;
-        }
+//         }
+//         else
+//         {
+//           m_NumSliceSliderEvents++;
+//         }
       }
       break;
     case ID_SLICE_NEXT:
