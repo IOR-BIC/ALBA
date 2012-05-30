@@ -79,27 +79,28 @@ protected:
   /** Create the GUI for the visual pipe that allow the user to change the pipe's parameters.*/
   virtual mafGUI * CreateGui();
   
-  int m_SliceAxis;                                    //> Slicer direction
-  double m_Bounds[6];                                 //> Input volume bounds
-  double m_CurrentSlice;                              //> Current slice coordinate
-  mafGUIFloatSlider *m_SliceSlider;                   //> Slice coordinate slider
-  vtkLookupTable  *m_ColorLUT;                        //> Lookup table to display slice
-  vtkLookupTable *m_VolumeLUT;                        //> Input volume lookup table
-  vtkMEDVolumeSlicerNotInterpolated * m_Slicer;       //> Not interpolated slicer
-  vtkImageData *m_SlicerOutputImageData;              //> Image data from the slicer
-  vtkImageData * m_SlicerImageDataToRender;           //> Image data to be rendered
-  vtkImageMapToColors *m_ImageMapToColors;            //> Filter that map colors on image data
-  vtkImageShiftScale *m_ImageShiftScale;              //> Filter that rescale image to be an unsigned char with scalar range from 0 to 255
-  vtkImageActor *m_ImageActor;                        //> Image actor to display image
-  bool m_ShowGui;                                     //> Determine if pipe Gui is shown or not
-  double m_ScalarRange[2];                            //> Input scalar range
-  vtkRectilinearGrid * m_SlicerOutputRectilinearGrid; //> Slicer rectilinear grid output(used if input is a vtkRectilinearGrid)
-  vtkDataSetMapper *m_RectilinearGridMapper;          //> Rectilinear grid mapper (used if input is a vtkRectilinearGrid)
-  vtkActor *m_RectilinearGridActor;                   //> Rectilinear grid actor (used if input is a vtkRectilinearGrid)
-  int m_DataType;                                     //> Specify the rendered data type
-  vtkActor *m_ImageDummyActor;                        //> Dummy actor to allow picking on image data
-  vtkPolyDataMapper *m_ImageDummyMapper;              //> Mapper for dummy data to allow picking
-  vtkPolyData *m_ImageDummyData;                      //> Dummy data (plane of the image) to allow picking
+  int m_SliceAxis;                                        //> Slicer direction
+  double m_Bounds[6];                                     //> Input volume bounds
+  double m_CurrentSlice;                                  //> Current slice coordinate
+  mafGUIFloatSlider *m_SliceSlider;                       //> Slice coordinate slider
+  vtkLookupTable  *m_ColorLUT;                            //> Lookup table to display slice
+  vtkLookupTable *m_VolumeLUT;                            //> Input volume lookup table
+  vtkMEDVolumeSlicerNotInterpolated * m_Slicer;           //> Not interpolated slicer
+  std::vector<vtkImageData *>m_SlicerOutputImageData;     //> Image data from the slicer
+  std::vector<vtkImageData *> m_SlicerImageDataToRender;  //> Image data to be rendered
+  std::vector<vtkImageMapToColors *>m_ImageMapToColors;   //> Filter that map colors on image data
+  std::vector<vtkImageShiftScale *>m_ImageShiftScale;     //> Filter that rescale image to be an unsigned char with scalar range from 0 to 255
+  std::vector<vtkImageActor *>m_ImageActor;               //> Image actor to display image
+  int m_CurrentImageIndex;                                //> Image index that will be processed
+  bool m_ShowGui;                                         //> Determine if pipe Gui is shown or not
+  double m_ScalarRange[2];                                //> Input scalar range
+  vtkRectilinearGrid * m_SlicerOutputRectilinearGrid;     //> Slicer rectilinear grid output(used if input is a vtkRectilinearGrid)
+  vtkDataSetMapper *m_RectilinearGridMapper;              //> Rectilinear grid mapper (used if input is a vtkRectilinearGrid)
+  vtkActor *m_RectilinearGridActor;                       //> Rectilinear grid actor (used if input is a vtkRectilinearGrid)
+  int m_DataType;                                         //> Specify the rendered data type
+  std::vector<vtkActor *>m_ImageDummyActor;               //> Dummy actor to allow picking on image data
+  std::vector<vtkPolyDataMapper *>m_ImageDummyMapper;     //> Mapper for dummy data to allow picking
+  std::vector<vtkPolyData *>m_ImageDummyData;             //> Dummy data (plane of the image) to allow picking
 
 private:
 
