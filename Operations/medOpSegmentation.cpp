@@ -2941,8 +2941,6 @@ void medOpSegmentation::OnRefinementSegmentationEvent(mafEvent *e)
         m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_REDO, m_RefinementRedoList.size()>0);
 
         UpdateSlice();
-
-        SaveRefinementVolumeMask();
       }
       break;
     }
@@ -2977,8 +2975,6 @@ void medOpSegmentation::OnRefinementSegmentationEvent(mafEvent *e)
         m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_REDO, m_RefinementRedoList.size()>0);
 
         UpdateSlice();
-
-        SaveRefinementVolumeMask();
       }
       break;
     }
