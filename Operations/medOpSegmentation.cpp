@@ -2940,7 +2940,9 @@ void medOpSegmentation::OnRefinementSegmentationEvent(mafEvent *e)
         m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_UNDO, m_RefinementUndoList.size()>0);
         m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_REDO, m_RefinementRedoList.size()>0);
 
-        m_View->CameraUpdate();
+        UpdateSlice();
+
+        SaveRefinementVolumeMask();
       }
       break;
     }
@@ -2974,7 +2976,9 @@ void medOpSegmentation::OnRefinementSegmentationEvent(mafEvent *e)
         m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_UNDO, m_RefinementUndoList.size()>0);
         m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_REDO, m_RefinementRedoList.size()>0);
 
-        m_View->CameraUpdate();
+        UpdateSlice();
+
+        SaveRefinementVolumeMask();
       }
       break;
     }
