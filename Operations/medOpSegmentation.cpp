@@ -2689,7 +2689,7 @@ void medOpSegmentation::ReloadUndoRedoState(vtkDataSet *dataSet,UndoRedoState st
 //   }
 
   m_View->CameraUpdate();
-
+  CreateRealDrawnImage();
   undoRedoData->Delete();
 }
 

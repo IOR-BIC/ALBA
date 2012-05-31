@@ -284,10 +284,10 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
         }
         if(abs(spacing - pieceSpacing) < 0.01)
         {
-//           if(spacing > pieceSpacing)
-//           {
-//             pieceSpacing = spacing;
-//           }
+          if(spacing > pieceSpacing)
+          {
+            pieceSpacing = spacing;
+          }
           pieceSize++;
         }
         else
@@ -318,12 +318,14 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
       {
         for(int y = 0; y < numberOfPieces[1]; y++)
         {
+          int reachedDimension = 0;
           if(x > 0)
           {
             sliceOriginX[x] = 0;
             for(int x2 = 0; x2 < x; x2++)
             {
-              sliceOriginX[x] = sliceOriginX[x2] + (pieceDimensions[x2][0]-1) * pieceSpacings[x2][0];
+              reachedDimension += pieceDimensions[x2][0]-1;
+              sliceOriginX[x] = CoordsXY[0]->GetTuple1(reachedDimension);//((pieceDimensions[x2][0]-1) * pieceSpacings[x2][0]);
             }
           }
           else
@@ -333,9 +335,11 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
           if(y > 0)
           {
             sliceOriginY[y] = 0;
+            int reachedDimension = 0;
             for(int y2 = 0; y2 < y; y2++)
             {
-              sliceOriginY[y] = sliceOriginY[y2] + (pieceDimensions[y2][1]-1) * pieceSpacings[y2][1];
+              reachedDimension += pieceDimensions[y2][1]-1;
+              sliceOriginY[y] = CoordsXY[1]->GetTuple1(reachedDimension);//((pieceDimensions[y2][1]-1) * pieceSpacings[y2][1]);
             }
           }
           else
@@ -508,14 +512,12 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteData(vtkImageData *output)
         vtkIdType sid = scalars->InsertNextTuple(tuple);
       }
     }
-    iStart += iLenght;
-    iStart--;
+    iStart += (iLenght-1);
     if(iStart >= InputDimensions[AxisX] - 1)
     {
       iStart = 0;
     }
-    jStart += jLenght;
-    jStart--;
+    jStart += (jLenght-1);
     if(jStart >= InputDimensions[AxisY] - 1)
     {
       jStart = 0;
