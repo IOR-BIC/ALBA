@@ -643,7 +643,6 @@ void medPipeVolumeSliceNotInterpolated::RescaleLUT(vtkLookupTable *inputLUT,vtkL
   double maxRange = 255 - (m_ScalarRange[1] - tableRange[1]) / (m_ScalarRange[1] - m_ScalarRange[0]) * 255;
   double minRange = ((tableRange[0] - m_ScalarRange[0]) / (m_ScalarRange[1] - m_ScalarRange[0])) * 255;
 
-  mafLogMessage("> Rescaled lut range %f %f",minRange,maxRange);
   // Set table scalar range
   outputLUT->SetTableRange(minRange,maxRange);
   
