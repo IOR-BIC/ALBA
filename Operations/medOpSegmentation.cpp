@@ -1523,8 +1523,6 @@ void medOpSegmentation::OnAutomaticStep()
 
     //m_CurrentOperation = AUTOMATIC_SEGMENTATION;
     //OnNextStep();
-
-    OnEventUpdateThresholdSlice();
   }
 
 }
@@ -1712,11 +1710,13 @@ void medOpSegmentation::OnNextStep()
         }
         else
         {
-          mafNEW(m_EmptyVolumeSlice);
           InitEmptyVolumeSlice();
           InitThresholdVolumeSlice();
           //next step -> AUTOMATIC_SEGMENTATION 
           OnAutomaticStep();
+          UpdateThresholdRealTimePreview();
+          m_View->VmeShow(m_ThresholdVolumeSlice,true);
+          m_View->CameraUpdate();
         }
       }
       break;
@@ -1805,8 +1805,11 @@ void medOpSegmentation::OnPreviousStep()
         //prev step -> AUTOMATIC_SEGMENTATION
         OnAutomaticStepExit();
         InitEmptyVolumeSlice();
+        InitThresholdVolumeSlice();
         OnAutomaticStep();
-        //m_View->VmeShow(m_ThresholdVolume,false);
+        UpdateThresholdRealTimePreview();
+        m_View->VmeShow(m_ThresholdVolumeSlice,true);
+        m_View->CameraUpdate();
       }
     }
     break;
@@ -3734,7 +3737,6 @@ void medOpSegmentation::InitEmptyVolumeSlice()
 {
   if(m_EmptyVolumeSlice)
   {
-    m_View->VmeRemove(m_EmptyVolumeSlice);
     m_EmptyVolumeSlice->ReparentTo(NULL);
     mafDEL(m_EmptyVolumeSlice);
   }
@@ -3911,6 +3913,7 @@ void medOpSegmentation::InitThresholdVolumeSlice()
 {
   if(m_ThresholdVolumeSlice)
   {
+    m_View->VmeShow(m_ThresholdVolumeSlice,false);
     m_View->VmeRemove(m_ThresholdVolumeSlice);
     m_ThresholdVolumeSlice->ReparentTo(NULL);
     mafDEL(m_ThresholdVolumeSlice);
