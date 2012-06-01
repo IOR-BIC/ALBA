@@ -84,7 +84,7 @@ cd Build
 cmake.exe  ../Source  -G"Visual Studio 10" ^
   -DBUILD_DOCUMENTATION:BOOL=ON ^
   -DBUILD_TESTING:BOOL=OFF ^
-  -DBUILD_EXAMPLES:BOOL=OFF ^
+  -DBUILD_EXAMPLES:BOOL=OFF
 
 cd ..
   
