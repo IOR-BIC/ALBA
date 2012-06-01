@@ -2118,14 +2118,10 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
             m_CurrentSliceIndex = hi;
           }
 
-
           if(m_CurrentSlicePlane = XY)
           {
-            UpdateSlice();
-            InitEmptyVolumeSlice();
-            UpdateThresholdRealTimePreview();
+            OnEventUpdateThresholdSlice();
           }
-          m_View->CameraUpdate();
         }
         break;
       }
@@ -2182,7 +2178,7 @@ void medOpSegmentation::StartDraw(mafEvent *e, bool erase)
 void medOpSegmentation::OnEventUpdateThresholdSlice()
 //------------------------------------------------------------------------
 {
-  m_View->VmeShow(m_ThresholdVolumeSlice,false);
+  //m_View->VmeShow(m_ThresholdVolumeSlice,false);
   UpdateSlice();
   InitEmptyVolumeSlice();
   UpdateThresholdRealTimePreview();
@@ -3735,12 +3731,11 @@ void medOpSegmentation::InitManualVolumeSlice()
 void medOpSegmentation::InitEmptyVolumeSlice()
 //----------------------------------------------------------------------------
 {
-  if(m_EmptyVolumeSlice)
+  if(!m_EmptyVolumeSlice)
   {
-    m_EmptyVolumeSlice->ReparentTo(NULL);
-    mafDEL(m_EmptyVolumeSlice);
+    mafNEW(m_EmptyVolumeSlice);
   }
-  mafNEW(m_EmptyVolumeSlice);
+  
   m_EmptyVolumeSlice->ReparentTo(m_Volume->GetParent());
   m_EmptyVolumeSlice->SetName("Empty Volume Slice");
   //m_View->VmeAdd(m_EmptyVolumeSlice);
