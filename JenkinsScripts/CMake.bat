@@ -87,7 +87,7 @@ cmake.exe  ../Source  -G"Visual Studio 10" ^
   -DBUILD_EXAMPLES:BOOL=OFF ^
   -DDOXYGEN_DOT_EXECUTABLE="D:/Graphviz2.28/bin/dot.exe" ^
   -DDOXYGEN_DOT_PATH="D:/Graphviz2.28/bin" ^
-  -DDOXYGEN_EXECUTABLE:FILEPATH="D:/doxygen/bin/doxygen.exe"
+  -DDOXYGEN_EXECUTABLE="D:/doxygen/bin/doxygen.exe"
   
 cd ..
   
