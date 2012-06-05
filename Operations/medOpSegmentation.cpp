@@ -2151,6 +2151,7 @@ void medOpSegmentation::StartDraw(mafEvent *e, bool erase)
   if (erase) m_ManualSegmentationAction = MANUAL_SEGMENTATION_ERASE;
   else m_ManualSegmentationAction = MANUAL_SEGMENTATION_SELECT;
   //Picking starts here I need to save an undo stack
+  UndoBrushPreview();
   if(!m_PickingStarted)
   {
     UndoRedoState urs;
@@ -2647,7 +2648,8 @@ void medOpSegmentation::OnAutomaticSegmentationEvent(mafEvent *e)
 //------------------------------------------------------------------------
 void medOpSegmentation::ReloadUndoRedoState(vtkDataSet *dataSet,UndoRedoState state)
 //------------------------------------------------------------------------
-{
+{ 
+  UndoBrushPreview();
   if (state.plane!=m_CurrentSlicePlane || state.slice!=m_CurrentSliceIndex)
   {
 
