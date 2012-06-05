@@ -2649,7 +2649,6 @@ void medOpSegmentation::OnAutomaticSegmentationEvent(mafEvent *e)
 void medOpSegmentation::ReloadUndoRedoState(vtkDataSet *dataSet,UndoRedoState state)
 //------------------------------------------------------------------------
 { 
-  UndoBrushPreview();
   if (state.plane!=m_CurrentSlicePlane || state.slice!=m_CurrentSliceIndex)
   {
 
@@ -2754,6 +2753,7 @@ void medOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
         }
         
         //Add current state to Redo-list
+        UndoBrushPreview();
         UndoRedoState urs;
         urs.dataArray = vtkUnsignedCharArray::New();
         urs.dataArray->DeepCopy( dataSet->GetPointData()->GetScalars() );
@@ -2796,6 +2796,7 @@ void medOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
 
 
         //Add current state to Undo-list
+        UndoBrushPreview();
         UndoRedoState urs;
         urs.dataArray = vtkUnsignedCharArray::New();
         urs.dataArray->DeepCopy( dataSet->GetPointData()->GetScalars() );
