@@ -88,7 +88,7 @@ MAF_EXPORT bool mafEquals(double x, double y);
 MAF_EXPORT bool mafFloatEquals(float x, float y);
 
 /** retrieve the double value with the desired precision*/
-double mafRoundToPrecision(double val, unsigned prec);
+MAF_EXPORT double mafRoundToPrecision(double val, unsigned prec);
 
 /** return true if it's little endian*/
 MAF_EXPORT bool mafIsLittleEndian(void);

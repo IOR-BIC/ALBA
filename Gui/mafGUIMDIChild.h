@@ -30,7 +30,7 @@ class mafView;
   Represents the child frame in a MDI system. In MAF it is used in combination with views that support
   viewport and eventually a gui area in which some widgets can be used, like windowing widgets.
 */
-class mafGUIMDIChild: public wxMDIChildFrame
+class MAF_EXPORT mafGUIMDIChild: public wxMDIChildFrame
 {
 public:
   /** constructor. */
