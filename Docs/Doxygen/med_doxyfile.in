@@ -212,7 +212,7 @@ SKIP_FUNCTION_MACROS   = YES
 #---------------------------------------------------------------------------
 # Configuration::additions related to external references   
 #---------------------------------------------------------------------------
-TAGFILES               = "@MAF_BINARY_PATH@/Docs/Doxygen/maf.tag = http://doc.openmaf.org/"
+TAGFILES               = "@MAF_BINARY_PATH@/Docs/Doxygen/maf.tag"
 GENERATE_TAGFILE       = "@PROJECT_BINARY_DIR@/med.tag"
 ALLEXTERNALS           = NO
 EXTERNAL_GROUPS        = YES
@@ -232,8 +232,7 @@ INCLUDED_BY_GRAPH      = YES
 CALL_GRAPH             = YES
 GRAPHICAL_HIERARCHY    = YES
 DOT_IMAGE_FORMAT       = png
-DOT_PATH               = "@DOT_PATH@"
-DOTFILE_DIRS           = "@DOT_PATH@/../graphs/"
+DOT_PATH               = "@DOXYGEN_DOT_PATH@"
 MAX_DOT_GRAPH_WIDTH    = 1024
 MAX_DOT_GRAPH_HEIGHT   = 1024
 MAX_DOT_GRAPH_DEPTH    = 0
