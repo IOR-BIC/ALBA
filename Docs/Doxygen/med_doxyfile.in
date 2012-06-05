@@ -212,7 +212,7 @@ SKIP_FUNCTION_MACROS   = YES
 #---------------------------------------------------------------------------
 # Configuration::additions related to external references   
 #---------------------------------------------------------------------------
-TAGFILES               = "@MAF_BINARY_PATH@/Docs/Doxygen/maf.tag"
+TAGFILES               = "@MAF_BINARY_PATH@/Docs/Doxygen/maf.tag = http://scs03.cineca.it:9090/job/SCS04_SC_LIB_MAF2_DOXYGEN/Doxygen/"
 GENERATE_TAGFILE       = "@PROJECT_BINARY_DIR@/med.tag"
 ALLEXTERNALS           = NO
 EXTERNAL_GROUPS        = YES
