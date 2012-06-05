@@ -156,8 +156,8 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
     BaseIndex = nearestIndex;
 
     NumberOfPieces = 1;
-    SlicePieceDimensions[0][1] = SliceDimensions[AxisX];
-    SlicePieceDimensions[0][2] = SliceDimensions[AxisY];
+    SlicePieceDimensions[0][0] = SliceDimensions[AxisX];
+    SlicePieceDimensions[0][1] = SliceDimensions[AxisY];
     SlicePieceSpacings[0][0] = SliceSpacing[AxisX];
     SlicePieceSpacings[0][1] = SliceSpacing[AxisY];
     SlicePieceOrigins[0][AxisX] = Origin[AxisX];
@@ -284,15 +284,16 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
         }
         if(abs(spacing - pieceSpacing) < 0.01)
         {
-//           if(spacing > pieceSpacing)
-//           {
-//             pieceSpacing = spacing;
-//           }
+          if(spacing > pieceSpacing)
+          {
+            pieceSpacing = spacing;
+          }
           pieceSize++;
         }
         else
         {
           pieceDimensions[ numberOfPieces[i] ][i] = pieceSize;
+          pieceDimensions[ numberOfPieces[i] ][i]++;
           pieceSpacings[ numberOfPieces[i] ][i] = pieceSpacing;
           numberOfPieces[i]++;
           pieceSize = 0;
@@ -300,6 +301,7 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
         }
       }
       pieceDimensions[ numberOfPieces[i] ][i] = pieceSize;
+      pieceDimensions[ numberOfPieces[i] ][i]++;
       pieceSpacings[ numberOfPieces[i] ][i] = pieceSpacing;
       numberOfPieces[i]++;
       pieceSize = 0;
@@ -307,32 +309,49 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
     // Update global attributes
     NumberOfPieces = numberOfPieces[0] * numberOfPieces[1];
 
+    double sliceOriginX[MAX_NUMBER_OF_PIECES];
+    double sliceOriginY[MAX_NUMBER_OF_PIECES];
+
     if(NumberOfPieces < MAX_NUMBER_OF_PIECES)
     {
       for(int x = 0; x < numberOfPieces[0]; x++)
       {
         for(int y = 0; y < numberOfPieces[1]; y++)
         {
-          int originXIndex = 0;
+          int reachedDimension = 0;
           if(x > 0)
           {
+            sliceOriginX[x] = 0;
             for(int x2 = 0; x2 < x; x2++)
             {
-              originXIndex += (pieceDimensions[x2][0]-1);
+              reachedDimension += pieceDimensions[x2][0]-1;
+              sliceOriginX[x] = CoordsXY[0]->GetTuple1(reachedDimension);//((pieceDimensions[x2][0]-1) * pieceSpacings[x2][0]);
             }
           }
-          int originYIndex = 0;
+          else
+          {
+            sliceOriginX[x] = CoordsXY[0]->GetTuple1(0);
+          }
           if(y > 0)
           {
+            sliceOriginY[y] = 0;
+            int reachedDimension = 0;
             for(int y2 = 0; y2 < y; y2++)
-              originYIndex += (pieceDimensions[y2][1]-1);
+            {
+              reachedDimension += pieceDimensions[y2][1]-1;
+              sliceOriginY[y] = CoordsXY[1]->GetTuple1(reachedDimension);//((pieceDimensions[y2][1]-1) * pieceSpacings[y2][1]);
+            }
+          }
+          else
+          {
+            sliceOriginY[y] = CoordsXY[1]->GetTuple1(0);
           }
           SlicePieceDimensions[x + numberOfPieces[0] * y][0] = pieceDimensions[x][0];
           SlicePieceDimensions[x + numberOfPieces[0] * y][1] = pieceDimensions[y][1];
           SlicePieceSpacings[x + numberOfPieces[0] * y][0] = pieceSpacings[x][0];
           SlicePieceSpacings[x + numberOfPieces[0] * y][1] = pieceSpacings[y][1];
-          SlicePieceOrigins[x + numberOfPieces[0] * y][AxisX] = CoordsXY[0]->GetTuple1(originXIndex);
-          SlicePieceOrigins[x + numberOfPieces[0] * y][AxisY] = CoordsXY[1]->GetTuple1(originYIndex);
+          SlicePieceOrigins[x + numberOfPieces[0] * y][AxisX] = sliceOriginX[x];
+          SlicePieceOrigins[x + numberOfPieces[0] * y][AxisY] = sliceOriginY[y];
           SlicePieceOrigins[x + numberOfPieces[0] * y][SliceAxis] = Origin[SliceAxis];
         }
       }
@@ -493,12 +512,12 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteData(vtkImageData *output)
         vtkIdType sid = scalars->InsertNextTuple(tuple);
       }
     }
-    iStart += iLenght;
+    iStart += (iLenght-1);
     if(iStart >= InputDimensions[AxisX] - 1)
     {
       iStart = 0;
     }
-    jStart += jLenght;
+    jStart += (jLenght-1);
     if(jStart >= InputDimensions[AxisY] - 1)
     {
       jStart = 0;

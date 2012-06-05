@@ -1444,6 +1444,7 @@ void medOpSegmentation::InitRefinementVolumeMask()
   if (m_RefinementVolumeMask)
   {
     m_View->VmeRemove(m_RefinementVolumeMask);
+    m_RefinementVolumeMask->ReparentTo(NULL);
     mafDEL(m_RefinementVolumeMask);
   }
 
@@ -1522,8 +1523,6 @@ void medOpSegmentation::OnAutomaticStep()
 
     //m_CurrentOperation = AUTOMATIC_SEGMENTATION;
     //OnNextStep();
-
-    OnEventUpdateThresholdSlice();
   }
 
 }
@@ -1711,12 +1710,13 @@ void medOpSegmentation::OnNextStep()
         }
         else
         {
-          mafNEW(m_EmptyVolumeSlice);
           InitEmptyVolumeSlice();
-          mafNEW(m_ThresholdVolumeSlice);
           InitThresholdVolumeSlice();
           //next step -> AUTOMATIC_SEGMENTATION 
           OnAutomaticStep();
+          UpdateThresholdRealTimePreview();
+          m_View->VmeShow(m_ThresholdVolumeSlice,true);
+          m_View->CameraUpdate();
         }
       }
       break;
@@ -1804,10 +1804,12 @@ void medOpSegmentation::OnPreviousStep()
       {
         //prev step -> AUTOMATIC_SEGMENTATION
         OnAutomaticStepExit();
-        mafNEW(m_EmptyVolumeSlice);
         InitEmptyVolumeSlice();
+        InitThresholdVolumeSlice();
         OnAutomaticStep();
-        //m_View->VmeShow(m_ThresholdVolume,false);
+        UpdateThresholdRealTimePreview();
+        m_View->VmeShow(m_ThresholdVolumeSlice,true);
+        m_View->CameraUpdate();
       }
     }
     break;
@@ -1921,9 +1923,9 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
       break;
     case ID_SLICE_SLIDER:
       {
-        if (m_NumSliceSliderEvents == 2)//Validator generate 2 events when the user move the slider REMOVED: GEnerate problems on slice update!
-        {
-          m_NumSliceSliderEvents = 0;
+//         if (m_NumSliceSliderEvents == 2)//Validator generate 2 events when the user move the slider REMOVED: GEnerate problems on slice update!
+//         {
+//           m_NumSliceSliderEvents = 0;
           if (m_CurrentSliceIndex != m_OldSliceIndex && m_CurrentOperation==MANUAL_SEGMENTATION)
           {
             OnEventUpdateManualSlice();
@@ -1941,11 +1943,11 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
           {
             CreateRealDrawnImage();
           }
-        }
-        else
-        {
-          m_NumSliceSliderEvents++;
-        }
+//         }
+//         else
+//         {
+//           m_NumSliceSliderEvents++;
+//         }
       }
       break;
     case ID_SLICE_NEXT:
@@ -2116,15 +2118,10 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
             m_CurrentSliceIndex = hi;
           }
 
-
           if(m_CurrentSlicePlane = XY)
           {
-            UpdateSlice();
-            InitEmptyVolumeSlice();
-            UpdateThresholdRealTimePreview();
-            
+            OnEventUpdateThresholdSlice();
           }
-          m_View->CameraUpdate();
         }
         break;
       }
@@ -2181,7 +2178,7 @@ void medOpSegmentation::StartDraw(mafEvent *e, bool erase)
 void medOpSegmentation::OnEventUpdateThresholdSlice()
 //------------------------------------------------------------------------
 {
-  m_View->VmeShow(m_ThresholdVolumeSlice,false);
+  //m_View->VmeShow(m_ThresholdVolumeSlice,false);
   UpdateSlice();
   InitEmptyVolumeSlice();
   UpdateThresholdRealTimePreview();
@@ -2689,7 +2686,7 @@ void medOpSegmentation::ReloadUndoRedoState(vtkDataSet *dataSet,UndoRedoState st
 //   }
 
   m_View->CameraUpdate();
-
+  CreateRealDrawnImage();
   undoRedoData->Delete();
 }
 
@@ -2940,7 +2937,7 @@ void medOpSegmentation::OnRefinementSegmentationEvent(mafEvent *e)
         m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_UNDO, m_RefinementUndoList.size()>0);
         m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_REDO, m_RefinementRedoList.size()>0);
 
-        m_View->CameraUpdate();
+        UpdateSlice();
       }
       break;
     }
@@ -2974,7 +2971,7 @@ void medOpSegmentation::OnRefinementSegmentationEvent(mafEvent *e)
         m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_UNDO, m_RefinementUndoList.size()>0);
         m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_REDO, m_RefinementRedoList.size()>0);
 
-        m_View->CameraUpdate();
+        UpdateSlice();
       }
       break;
     }
@@ -3734,16 +3731,18 @@ void medOpSegmentation::InitManualVolumeSlice()
 void medOpSegmentation::InitEmptyVolumeSlice()
 //----------------------------------------------------------------------------
 {
-  if(m_EmptyVolumeSlice != NULL)
+  if(!m_EmptyVolumeSlice)
   {
-    m_EmptyVolumeSlice->ReparentTo(m_Volume->GetParent());
-    m_EmptyVolumeSlice->SetName("Threshold Volume Slice");
-    //m_View->VmeAdd(m_EmptyVolumeSlice);
-    //m_View->VmeCreatePipe(m_EmptyVolumeSlice);
-    //m_View->CameraUpdate();
-
-    InitDataVolumeSlice<vtkDoubleArray>(m_EmptyVolumeSlice);
+    mafNEW(m_EmptyVolumeSlice);
   }
+  
+  m_EmptyVolumeSlice->ReparentTo(m_Volume->GetParent());
+  m_EmptyVolumeSlice->SetName("Empty Volume Slice");
+  //m_View->VmeAdd(m_EmptyVolumeSlice);
+  //m_View->VmeCreatePipe(m_EmptyVolumeSlice);
+  //m_View->CameraUpdate();
+
+  InitDataVolumeSlice<vtkDoubleArray>(m_EmptyVolumeSlice);
 }
 
 //----------------------------------------------------------------------------
@@ -3907,24 +3906,31 @@ void medOpSegmentation::InitDataVolumeSlice(mafVMEVolumeGray *slice)
 void medOpSegmentation::InitThresholdVolumeSlice()
 //----------------------------------------------------------------------------
 {
-  if(m_ThresholdVolumeSlice != NULL)
+  if(m_ThresholdVolumeSlice)
   {
-    m_ThresholdVolumeSlice->ReparentTo(m_Volume->GetParent());
-    m_ThresholdVolumeSlice->SetName("Threshold Volume Slice");
-
-    InitDataVolumeSlice<vtkUnsignedCharArray>(m_ThresholdVolumeSlice);
-
-    m_SegmentationColorLUT = m_ThresholdVolumeSlice->GetMaterial()->m_ColorLut;
-    InitMaskColorLut(m_SegmentationColorLUT);
-    m_ThresholdVolumeSlice->GetMaterial()->UpdateFromTables();
-    m_ThresholdVolumeSlice->Update();
-
-    m_View->VmeAdd(m_ThresholdVolumeSlice);
     m_View->VmeShow(m_ThresholdVolumeSlice,false);
-    m_OldSliceIndex = -1;
-    UpdateThresholdRealTimePreview();
-    m_View->CameraUpdate();
+    m_View->VmeRemove(m_ThresholdVolumeSlice);
+    m_ThresholdVolumeSlice->ReparentTo(NULL);
+    mafDEL(m_ThresholdVolumeSlice);
   }
+  mafNEW(m_ThresholdVolumeSlice);
+
+  m_ThresholdVolumeSlice->ReparentTo(m_Volume->GetParent());
+  m_ThresholdVolumeSlice->SetName("Threshold Volume Slice");
+
+  InitDataVolumeSlice<vtkUnsignedCharArray>(m_ThresholdVolumeSlice);
+
+  m_SegmentationColorLUT = m_ThresholdVolumeSlice->GetMaterial()->m_ColorLut;
+  InitMaskColorLut(m_SegmentationColorLUT);
+  m_ThresholdVolumeSlice->GetMaterial()->UpdateFromTables();
+  m_ThresholdVolumeSlice->Update();
+
+  m_View->VmeAdd(m_ThresholdVolumeSlice);
+  m_View->VmeShow(m_ThresholdVolumeSlice,false);
+  m_OldSliceIndex = -1;
+  UpdateThresholdRealTimePreview();
+  m_View->CameraUpdate();
+
 }
 
 //----------------------------------------------------------------------------
