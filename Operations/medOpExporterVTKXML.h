@@ -17,6 +17,7 @@
 // Include :
 //----------------------------------------------------------------------------
 #include "mafOp.h"
+#include "medOperationsDefines.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -27,7 +28,7 @@ class mafVME;
 // medOpExporterVTKXML :
 //----------------------------------------------------------------------------
 /** */
-class medOpExporterVTKXML: public mafOp
+class MED_OPERATION_EXPORT medOpExporterVTKXML: public mafOp
 {
 public:
   medOpExporterVTKXML(const wxString &label = "VTKXMLExporter");
