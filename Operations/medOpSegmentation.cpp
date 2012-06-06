@@ -1938,7 +1938,11 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
           {
             m_View->VmeShow(m_LoadedVolume,true);
             UpdateSlice();
-            m_View->CameraUpdate();
+          }
+          else if(m_CurrentOperation==REFINEMENT_SEGMENTATION)
+          {
+            m_View->VmeShow(m_RefinementVolumeMask,true);
+            UpdateSlice();
           }
           else
           {
@@ -1968,6 +1972,16 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         {
           OnEventUpdateThresholdSlice();
         }
+        else if(m_CurrentOperation==LOAD_SEGMENTATION)
+        {
+          m_View->VmeShow(m_LoadedVolume,true);
+          UpdateSlice();
+        }
+        else if(m_CurrentOperation==REFINEMENT_SEGMENTATION)
+        {
+          m_View->VmeShow(m_RefinementVolumeMask,true);
+          UpdateSlice();
+        }
         else
         {
           UpdateSlice();
@@ -1990,6 +2004,16 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         {
           OnEventUpdateThresholdSlice();
         }
+        else if(m_CurrentOperation==LOAD_SEGMENTATION)
+        {
+          m_View->VmeShow(m_LoadedVolume,true);
+          UpdateSlice();
+        }
+        else if(m_CurrentOperation==REFINEMENT_SEGMENTATION)
+        {
+          m_View->VmeShow(m_RefinementVolumeMask,true);
+          UpdateSlice();
+        }
         else
         {
           UpdateSlice();
@@ -2009,6 +2033,16 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         else if (m_CurrentOperation==AUTOMATIC_SEGMENTATION)
         {
           OnEventUpdateThresholdSlice();
+        }
+        else if(m_CurrentOperation==LOAD_SEGMENTATION)
+        {
+          m_View->VmeShow(m_LoadedVolume,true);
+          UpdateSlice();
+        }
+        else if(m_CurrentOperation==REFINEMENT_SEGMENTATION)
+        {
+          m_View->VmeShow(m_RefinementVolumeMask,true);
+          UpdateSlice();
         }
         else
         {
@@ -2032,9 +2066,19 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         {
           OnEventUpdateThresholdSlice();
         }
+        else if(m_CurrentOperation==LOAD_SEGMENTATION)
+        {
+          m_View->VmeShow(m_LoadedVolume,true);
+          UpdateSlice();
+        }
+        else if(m_CurrentOperation==REFINEMENT_SEGMENTATION)
+        {
+          m_View->VmeShow(m_RefinementVolumeMask,true);
+          UpdateSlice();
+        }
         else
         {
-          //UpdateSlice();
+          UpdateSlice();
         }
         if(m_CurrentOperation == MANUAL_SEGMENTATION)
         {
