@@ -140,7 +140,7 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
       int curIndex = i * multiplyFactor;
       double xyz[3];
       imageData->GetPoint(curIndex,xyz);
-      int dist = 0;
+      double dist = 0;
       if(((dist = abs(xyz[SliceAxis] - Origin[SliceAxis])) < minDist) /*&& ((xyz[SliceAxis] - Origin[2]) <= 0)*/)
       {
         nearestIndex = curIndex;

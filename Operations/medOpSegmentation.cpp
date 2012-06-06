@@ -2151,6 +2151,7 @@ void medOpSegmentation::StartDraw(mafEvent *e, bool erase)
   if (erase) m_ManualSegmentationAction = MANUAL_SEGMENTATION_ERASE;
   else m_ManualSegmentationAction = MANUAL_SEGMENTATION_SELECT;
   //Picking starts here I need to save an undo stack
+  UndoBrushPreview();
   if(!m_PickingStarted)
   {
     UndoRedoState urs;
@@ -2647,7 +2648,7 @@ void medOpSegmentation::OnAutomaticSegmentationEvent(mafEvent *e)
 //------------------------------------------------------------------------
 void medOpSegmentation::ReloadUndoRedoState(vtkDataSet *dataSet,UndoRedoState state)
 //------------------------------------------------------------------------
-{
+{ 
   if (state.plane!=m_CurrentSlicePlane || state.slice!=m_CurrentSliceIndex)
   {
 
@@ -2752,6 +2753,7 @@ void medOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
         }
         
         //Add current state to Redo-list
+        UndoBrushPreview();
         UndoRedoState urs;
         urs.dataArray = vtkUnsignedCharArray::New();
         urs.dataArray->DeepCopy( dataSet->GetPointData()->GetScalars() );
@@ -2794,6 +2796,7 @@ void medOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
 
 
         //Add current state to Undo-list
+        UndoBrushPreview();
         UndoRedoState urs;
         urs.dataArray = vtkUnsignedCharArray::New();
         urs.dataArray->DeepCopy( dataSet->GetPointData()->GetScalars() );
@@ -3055,9 +3058,27 @@ void medOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
 
   double minDiffSpacing = min(min(diffSpacingXY,diffSpacingXZ),diffSpacingYZ);
 
-  double targetSpacing = max(max(m_VolumeSpacing[0],m_VolumeSpacing[1]),m_VolumeSpacing[2]);
+  double targetSpacing = /*max*/(max(m_VolumeSpacing[0],m_VolumeSpacing[1])/*,m_VolumeSpacing[2]*/);
+  switch (m_CurrentSlicePlane)
+  {
 
-
+//     case XY:
+//       {
+// 
+//       }
+//       break;
+  case XZ:
+    {
+      targetSpacing = (max(m_VolumeSpacing[0],m_VolumeSpacing[2]));
+    }
+    break;
+  case YZ:
+    {
+      targetSpacing = (max(m_VolumeSpacing[1],m_VolumeSpacing[2]));
+    }
+    break;
+  }
+  
   vtkDataSet *dataset = ((mafVME *)m_ManualVolumeSlice)->GetOutput()->GetVTKData();
   if(!dataset)
     return;
@@ -3142,7 +3163,7 @@ void medOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
   double oldBrushSize = m_ManualBrushSize;
   int nearestDummyIndex = int(m_ManualBrushSize / 2) * factors[0] + int(m_ManualBrushSize / 2) * factors[1];//int(m_ManualBrushSize / 2) + int(m_ManualBrushSize / 2) * volumeDimensions[0] + int(m_ManualBrushSize / 2) * volumeDimensions[1];
   std::vector<int> dummyIndices;
-  if(m_ManualBrushShape == 0) // circle
+  if(m_ManualBrushShape == 0 && m_ManualBrushSize > 1) // circle
   {
     m_ManualBrushSize ++;
     nearestDummyIndex = int(m_ManualBrushSize / 2) * factors[0] + int(m_ManualBrushSize / 2) * factors[1];
@@ -3587,9 +3608,9 @@ void medOpSegmentation::InitVolumeSpacing()
 {
   vtkDataSet *vme_data = ((mafVME *)m_Volume)->GetOutput()->GetVTKData();
 
-  m_VolumeSpacing[0] = VTK_DOUBLE_MAX;
-  m_VolumeSpacing[1] = VTK_DOUBLE_MAX;
-  m_VolumeSpacing[2] = VTK_DOUBLE_MAX;
+  m_VolumeSpacing[0] = 0;
+  m_VolumeSpacing[1] = 0;
+  m_VolumeSpacing[2] = 0;
 
   //vtkStructuredPoints *sp = vtkStructuredPoints::SafeDownCast(vme_data);
   //sp->GetSpacing(m_VolumeSpacing);
@@ -3603,21 +3624,21 @@ void medOpSegmentation::InitVolumeSpacing()
     for (int xi = 1; xi < rgrid->GetXCoordinates()->GetNumberOfTuples (); xi++)
     {
       double spcx = rgrid->GetXCoordinates()->GetTuple1(xi)-rgrid->GetXCoordinates()->GetTuple1(xi-1);
-      if (m_VolumeSpacing[0] > spcx && spcx != 0.0)
+      if (m_VolumeSpacing[0] < spcx && spcx != 0.0)
         m_VolumeSpacing[0] = spcx;
     }
 
     for (int yi = 1; yi < rgrid->GetYCoordinates()->GetNumberOfTuples (); yi++)
     {
       double spcy = rgrid->GetYCoordinates()->GetTuple1(yi)-rgrid->GetYCoordinates()->GetTuple1(yi-1);
-      if (m_VolumeSpacing[1] > spcy && spcy != 0.0)
+      if (m_VolumeSpacing[1] < spcy && spcy != 0.0)
         m_VolumeSpacing[1] = spcy;
     }
 
     for (int zi = 1; zi < rgrid->GetZCoordinates()->GetNumberOfTuples (); zi++)
     {
       double spcz = rgrid->GetZCoordinates()->GetTuple1(zi)-rgrid->GetZCoordinates()->GetTuple1(zi-1);
-      if (m_VolumeSpacing[2] > spcz && spcz != 0.0)
+      if (m_VolumeSpacing[2] < spcz && spcz != 0.0)
         m_VolumeSpacing[2] = spcz;
     }
   }

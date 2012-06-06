@@ -526,8 +526,11 @@ void medPipeVolumeSliceNotInterpolated::CreateShiftScaleFilter()
   // Shift scale of the image
   // Image actor can render only unsigned char images with scalar range 0 255
   m_ImageShiftScale.at(m_CurrentImageIndex)  = vtkImageShiftScale::New();
-  m_ImageShiftScale.at(m_CurrentImageIndex)->SetScale(255./(m_ScalarRange[1]-m_ScalarRange[0]));
-  m_ImageShiftScale.at(m_CurrentImageIndex)->SetShift(-m_ScalarRange[0]);
+  if(m_ScalarRange[0] !=  m_ScalarRange[1] && m_ScalarRange[1] != 255)
+  {
+    m_ImageShiftScale.at(m_CurrentImageIndex)->SetScale(255./(m_ScalarRange[1]-m_ScalarRange[0]));
+    m_ImageShiftScale.at(m_CurrentImageIndex)->SetShift(-m_ScalarRange[0]);
+  }
   m_ImageShiftScale.at(m_CurrentImageIndex)->SetOutputScalarTypeToUnsignedChar();
   m_ImageShiftScale.at(m_CurrentImageIndex)->SetInput(m_SlicerImageDataToRender.at(m_CurrentImageIndex));
   m_ImageShiftScale.at(m_CurrentImageIndex)->Update();
@@ -632,7 +635,7 @@ void medPipeVolumeSliceNotInterpolated::RescaleLUT(vtkLookupTable *inputLUT,vtkL
   // Copy volume lut
   outputLUT->DeepCopy(inputLUT);
 
-  if(m_ScalarRange[0] == 0 && m_ScalarRange[1] == 255)
+  if(m_ScalarRange[0] == 0 && m_ScalarRange[1] == 255 || m_ScalarRange[0] == 255 && m_ScalarRange[1] == 255)
   {
     return;
   }
