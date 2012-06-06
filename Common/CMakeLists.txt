@@ -42,7 +42,9 @@ SET(PROJECT_SRCS
   medHTMLTemplateParserBlock.cpp
   medHTMLTemplateParserBlock.h
   
-
+  medVect3d.cpp
+  medVect3d.h
+  
 	#### SHOULD BE COMMITTED DOWN ######
 	mafDbg.h
 	mafDataChecksum.h
