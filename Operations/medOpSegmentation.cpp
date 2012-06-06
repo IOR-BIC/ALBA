@@ -2833,16 +2833,23 @@ void medOpSegmentation::OnLoadSegmentationEvent(mafEvent *e)
   {
   case ID_LOAD_SEGMENTATION:
     {
+
       mafString title = mafString("Select a segmentation:");
       mafEvent e(this,VME_CHOOSE);
       e.SetString(&title);
       e.SetArg((long)(&medOpSegmentation::SegmentedVolumeAccept));
       mafEventMacro(e);
       mafVME *vme = (mafVME *)e.GetVme();
-      m_LoadedVolume = mafVMEVolumeGray::SafeDownCast(vme);
+      mafVMEVolumeGray *newVolume = mafVMEVolumeGray::SafeDownCast(vme);
 
-      if(m_LoadedVolume)
+      if(newVolume)
       {
+        if(m_LoadedVolume)
+        {
+          m_View->VmeShow(m_LoadedVolume,false);
+          m_View->VmeRemove(m_LoadedVolume);
+        }
+        m_LoadedVolume = newVolume;
         m_LoadedVolume->Update();
         m_SegmentationColorLUT = m_LoadedVolume->GetMaterial()->m_ColorLut;
         InitMaskColorLut(m_SegmentationColorLUT);
