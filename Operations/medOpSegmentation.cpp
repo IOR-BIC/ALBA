@@ -1934,6 +1934,12 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
           {
             OnEventUpdateThresholdSlice();
           }
+          else if(m_CurrentOperation==LOAD_SEGMENTATION)
+          {
+            m_View->VmeShow(m_LoadedVolume,true);
+            UpdateSlice();
+            m_View->CameraUpdate();
+          }
           else
           {
             UpdateSlice();
@@ -2875,7 +2881,7 @@ void medOpSegmentation::OnLoadSegmentationEvent(mafEvent *e)
           m_View->VmeAdd(parents.at(parents.size() - (p + 1)));
         }
         m_View->VmeShow(m_LoadedVolume,true);
-        UpdateSlice();
+        //UpdateSlice();
         m_View->CameraUpdate();
       }
     }
