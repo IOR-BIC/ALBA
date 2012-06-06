@@ -17,6 +17,7 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #include "mafMatrix.h"
 #include "mafNode.h"
 #include "medVMESegmentationVolume.h"
+#include "medOperationsDefines.h"
 
 
 //----------------------------------------------------------------------------
@@ -76,7 +77,7 @@ User can select:
 - segmentation refinement
 or he can load a previous segmentation.
 */
-class medOpSegmentation: public mafOp
+class MED_OPERATION_EXPORT medOpSegmentation: public mafOp
 {
 
 public:
