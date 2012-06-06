@@ -332,8 +332,9 @@ void medInteractorPERBrushFeedback::RemoveActor()
 {
   if (m_Renderer && m_BrushActor)
   {
-	  m_Renderer->RemoveActor2D(m_BrushActor);
-	  m_Renderer->Render();
+    // Uncomment this to render brush shadow
+// 	  m_Renderer->RemoveActor2D(m_BrushActor);
+// 	  m_Renderer->Render();
 
     m_IsActorAdded = false;
   }
@@ -344,8 +345,9 @@ void medInteractorPERBrushFeedback::AddActor()
 {
   if (m_Renderer && m_BrushActor)
   {
-	  m_Renderer->AddActor2D(m_BrushActor);
-	  m_Renderer->Render();
+    // Uncomment this to render brush shadow
+// 	  m_Renderer->AddActor2D(m_BrushActor);
+// 	  m_Renderer->Render();
 
     m_IsActorAdded = true;
   }
