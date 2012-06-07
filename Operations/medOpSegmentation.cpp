@@ -383,6 +383,7 @@ void medOpSegmentation::OpDo()
   m_OutputVolume->SetName(_("Segmentation Output"));
   lutPreset(4,m_OutputVolume->GetMaterial()->m_ColorLut);
   m_OutputVolume->GetMaterial()->m_ColorLut->SetTableRange(0,255);
+  m_OutputVolume->GetMaterial()->UpdateFromTables();
   m_OutputVolume->ReparentTo(m_Volume->GetParent());
   RemoveVMEs();
   mafOp::OpDo();
@@ -3138,7 +3139,7 @@ void medOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
   }
   
   vtkDataSet *dataset = ((mafVME *)m_ManualVolumeSlice)->GetOutput()->GetVTKData();
-  if(!dataset)
+  if(!dataset || dataset->GetPointData()->GetScalars())
     return;
   
   double center[3]={x,y,z};
