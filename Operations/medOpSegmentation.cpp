@@ -1934,6 +1934,16 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
           {
             OnEventUpdateThresholdSlice();
           }
+          else if(m_CurrentOperation==LOAD_SEGMENTATION)
+          {
+            m_View->VmeShow(m_LoadedVolume,true);
+            UpdateSlice();
+          }
+          else if(m_CurrentOperation==REFINEMENT_SEGMENTATION)
+          {
+            m_View->VmeShow(m_RefinementVolumeMask,true);
+            UpdateSlice();
+          }
           else
           {
             UpdateSlice();
@@ -1962,6 +1972,16 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         {
           OnEventUpdateThresholdSlice();
         }
+        else if(m_CurrentOperation==LOAD_SEGMENTATION)
+        {
+          m_View->VmeShow(m_LoadedVolume,true);
+          UpdateSlice();
+        }
+        else if(m_CurrentOperation==REFINEMENT_SEGMENTATION)
+        {
+          m_View->VmeShow(m_RefinementVolumeMask,true);
+          UpdateSlice();
+        }
         else
         {
           UpdateSlice();
@@ -1984,6 +2004,16 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         {
           OnEventUpdateThresholdSlice();
         }
+        else if(m_CurrentOperation==LOAD_SEGMENTATION)
+        {
+          m_View->VmeShow(m_LoadedVolume,true);
+          UpdateSlice();
+        }
+        else if(m_CurrentOperation==REFINEMENT_SEGMENTATION)
+        {
+          m_View->VmeShow(m_RefinementVolumeMask,true);
+          UpdateSlice();
+        }
         else
         {
           UpdateSlice();
@@ -2003,6 +2033,16 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         else if (m_CurrentOperation==AUTOMATIC_SEGMENTATION)
         {
           OnEventUpdateThresholdSlice();
+        }
+        else if(m_CurrentOperation==LOAD_SEGMENTATION)
+        {
+          m_View->VmeShow(m_LoadedVolume,true);
+          UpdateSlice();
+        }
+        else if(m_CurrentOperation==REFINEMENT_SEGMENTATION)
+        {
+          m_View->VmeShow(m_RefinementVolumeMask,true);
+          UpdateSlice();
         }
         else
         {
@@ -2026,9 +2066,19 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         {
           OnEventUpdateThresholdSlice();
         }
+        else if(m_CurrentOperation==LOAD_SEGMENTATION)
+        {
+          m_View->VmeShow(m_LoadedVolume,true);
+          UpdateSlice();
+        }
+        else if(m_CurrentOperation==REFINEMENT_SEGMENTATION)
+        {
+          m_View->VmeShow(m_RefinementVolumeMask,true);
+          UpdateSlice();
+        }
         else
         {
-          //UpdateSlice();
+          UpdateSlice();
         }
         if(m_CurrentOperation == MANUAL_SEGMENTATION)
         {
@@ -2180,10 +2230,11 @@ void medOpSegmentation::OnEventUpdateThresholdSlice()
 //------------------------------------------------------------------------
 {
   //m_View->VmeShow(m_ThresholdVolumeSlice,false);
-  UpdateSlice();
+  
   InitEmptyVolumeSlice();
   UpdateThresholdRealTimePreview();
   m_View->VmeShow(m_ThresholdVolumeSlice,true);
+  UpdateSlice();
   m_View->CameraUpdate();
 }
 
@@ -2191,12 +2242,12 @@ void medOpSegmentation::OnEventUpdateThresholdSlice()
 void medOpSegmentation::OnEventUpdateManualSlice()
 //------------------------------------------------------------------------
 {
-  m_View->VmeShow(m_ManualVolumeSlice, false);
   UndoBrushPreview();
   ApplyVolumeSliceChanges();
-  UpdateSlice();
+  
   UpdateVolumeSlice();
   m_View->VmeShow(m_ManualVolumeSlice, true);
+  UpdateSlice();
   m_View->CameraUpdate();
 }
 
@@ -2833,16 +2884,23 @@ void medOpSegmentation::OnLoadSegmentationEvent(mafEvent *e)
   {
   case ID_LOAD_SEGMENTATION:
     {
+
       mafString title = mafString("Select a segmentation:");
       mafEvent e(this,VME_CHOOSE);
       e.SetString(&title);
       e.SetArg((long)(&medOpSegmentation::SegmentedVolumeAccept));
       mafEventMacro(e);
       mafVME *vme = (mafVME *)e.GetVme();
-      m_LoadedVolume = mafVMEVolumeGray::SafeDownCast(vme);
+      mafVMEVolumeGray *newVolume = mafVMEVolumeGray::SafeDownCast(vme);
 
-      if(m_LoadedVolume)
+      if(newVolume)
       {
+        if(m_LoadedVolume)
+        {
+          m_View->VmeShow(m_LoadedVolume,false);
+          m_View->VmeRemove(m_LoadedVolume);
+        }
+        m_LoadedVolume = newVolume;
         m_LoadedVolume->Update();
         m_SegmentationColorLUT = m_LoadedVolume->GetMaterial()->m_ColorLut;
         InitMaskColorLut(m_SegmentationColorLUT);
@@ -2868,7 +2926,7 @@ void medOpSegmentation::OnLoadSegmentationEvent(mafEvent *e)
           m_View->VmeAdd(parents.at(parents.size() - (p + 1)));
         }
         m_View->VmeShow(m_LoadedVolume,true);
-        UpdateSlice();
+        //UpdateSlice();
         m_View->CameraUpdate();
       }
     }
