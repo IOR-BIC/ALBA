@@ -2242,12 +2242,12 @@ void medOpSegmentation::OnEventUpdateThresholdSlice()
 void medOpSegmentation::OnEventUpdateManualSlice()
 //------------------------------------------------------------------------
 {
+  m_View->VmeShow(m_ManualVolumeSlice, false);
   UndoBrushPreview();
   ApplyVolumeSliceChanges();
   
-  UpdateVolumeSlice();
-  m_View->VmeShow(m_ManualVolumeSlice, true);
   UpdateSlice();
+  m_View->VmeShow(m_ManualVolumeSlice, true);
   m_View->CameraUpdate();
 }
 
