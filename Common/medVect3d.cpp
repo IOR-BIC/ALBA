@@ -229,12 +229,13 @@ void medVect3d::Normalize(void)
 medVect3d medVect3d::Normal(void)
 //----------------------------------------------------------------------------
 {
-  //Generating a new vector witch the noralized values of each element   
+  //Generating a new vector witch the normalized values of each element   
   double magnitude = Magnitude();
   //Avoid division by zero
   if (magnitude != 0)
   {
-    return medVect3d(m_X/magnitude,m_Y/magnitude,m_Z /= magnitude); // Divide the Z value of our normal by it's magnitude
+    // Divide the X, Y, Z values of our vector by it's magnitude
+    return medVect3d(m_X/magnitude,m_Y/magnitude,m_Z/magnitude); 
   }
   else return medVect3d(0.0,0.0,0.0);
 }
@@ -262,7 +263,7 @@ double medVect3d::Distance(medVect3d vect)
 double medVect3d::Distance2(medVect3d vect)
 //----------------------------------------------------------------------------
 {
-  //calculating the qaudratic distance between two vector
+  //calculating the quadratic distance between two vector
   return ((m_X-vect.m_X) * (m_X-vect.m_X)) +
     ((m_Y-vect.m_Y) * (m_Y-vect.m_Y)) +
     ((m_Z-vect.m_Z) * (m_Z-vect.m_Z)) ;
