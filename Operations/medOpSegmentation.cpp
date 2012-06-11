@@ -3139,7 +3139,8 @@ void medOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
   }
   
   vtkDataSet *dataset = ((mafVME *)m_ManualVolumeSlice)->GetOutput()->GetVTKData();
-  if(!dataset || dataset->GetPointData()->GetScalars())
+
+  if(!dataset || !(dataset->GetPointData()->GetScalars()))
     return;
   
   double center[3]={x,y,z};
