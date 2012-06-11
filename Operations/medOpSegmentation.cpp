@@ -352,39 +352,49 @@ void medOpSegmentation::OpRun()
 void medOpSegmentation::OpDo()
 //----------------------------------------------------------------------------
 {
-  if (!m_OutputVolume)
-    mafNEW(m_OutputVolume);
 
+
+  mafVMEVolumeGray *targetVolume = NULL;
   switch (m_CurrentOperation)
   {
     case  AUTOMATIC_SEGMENTATION:
     {
       UpdateThresholdVolumeData();
-      m_OutputVolume->DeepCopy(m_ThresholdVolume);
+      targetVolume = m_ThresholdVolume;
     }
     break;
     case  MANUAL_SEGMENTATION:
     {
-      m_OutputVolume->DeepCopy(m_ManualVolumeMask);
+      targetVolume = m_ManualVolumeMask;
     }
     break;
     case  REFINEMENT_SEGMENTATION:
     {
-      m_OutputVolume->DeepCopy(m_RefinementVolumeMask);
+      targetVolume = m_RefinementVolumeMask;
     }
     break;
     case  LOAD_SEGMENTATION:
     {
-      m_OutputVolume->DeepCopy(m_LoadedVolume);
+     targetVolume = m_LoadedVolume;
     }
     break;
   }
-  m_OutputVolume->ReparentTo(m_Volume->GetParent());
-  m_OutputVolume->SetName(_("Segmentation Output"));
-  lutPreset(4,m_OutputVolume->GetMaterial()->m_ColorLut);
-  m_OutputVolume->GetMaterial()->m_ColorLut->SetTableRange(0,255);
-  m_OutputVolume->GetMaterial()->UpdateFromTables();
-  m_OutputVolume->ReparentTo(m_Volume->GetParent());
+
+
+  if(targetVolume)
+  {
+    if (!m_OutputVolume)
+    {
+      mafNEW(m_OutputVolume);
+    }
+    m_OutputVolume->DeepCopy(targetVolume);
+    m_OutputVolume->ReparentTo(m_Volume->GetParent());
+    m_OutputVolume->SetName(_("Segmentation Output"));
+    lutPreset(4,m_OutputVolume->GetMaterial()->m_ColorLut);
+    m_OutputVolume->GetMaterial()->m_ColorLut->SetTableRange(0,255);
+    m_OutputVolume->GetMaterial()->UpdateFromTables();
+    m_OutputVolume->ReparentTo(m_Volume->GetParent());
+  }
   RemoveVMEs();
   mafOp::OpDo();
 }
