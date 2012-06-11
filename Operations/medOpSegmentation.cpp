@@ -1934,9 +1934,9 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
       break;
     case ID_SLICE_SLIDER:
       {
-//         if (m_NumSliceSliderEvents == 2)//Validator generate 2 events when the user move the slider REMOVED: GEnerate problems on slice update!
-//         {
-//           m_NumSliceSliderEvents = 0;
+        if (m_NumSliceSliderEvents == 2)//Validator generate 2 events when the user move the slider REMOVED: GEnerate problems on slice update!
+        {
+          m_NumSliceSliderEvents = 0;
           if (m_CurrentSliceIndex != m_OldSliceIndex && m_CurrentOperation==MANUAL_SEGMENTATION)
           {
             OnEventUpdateManualSlice();
@@ -1964,11 +1964,11 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
           {
             CreateRealDrawnImage();
           }
-//         }
-//         else
-//         {
-//           m_NumSliceSliderEvents++;
-//         }
+        }
+        else
+        {
+          m_NumSliceSliderEvents++;
+        }
       }
       break;
     case ID_SLICE_NEXT:
@@ -2246,6 +2246,7 @@ void medOpSegmentation::OnEventUpdateThresholdSlice()
   UpdateThresholdRealTimePreview();
   m_View->VmeShow(m_ThresholdVolumeSlice,true);
   UpdateSlice();
+  m_View->VmeShow(m_ManualVolumeSlice, true);
   m_View->CameraUpdate();
 }
 
@@ -2253,10 +2254,10 @@ void medOpSegmentation::OnEventUpdateThresholdSlice()
 void medOpSegmentation::OnEventUpdateManualSlice()
 //------------------------------------------------------------------------
 {
-  m_View->VmeShow(m_ManualVolumeSlice, false);
+  //m_View->VmeShow(m_ManualVolumeSlice, false);
   UndoBrushPreview();
   ApplyVolumeSliceChanges();
-  
+  m_View->VmeShow(m_ManualVolumeSlice, true);
   UpdateSlice();
   m_View->VmeShow(m_ManualVolumeSlice, true);
   m_View->CameraUpdate();
