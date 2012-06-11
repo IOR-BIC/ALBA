@@ -4,7 +4,7 @@
   Language:  C++
   Date:      $Date: 2012-04-06 09:09:53 $
   Version:   $Revision: 1.1.2.7 $
-  Authors:   Simone Brazzale
+  Authors:   Simone Brazzale , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -33,12 +33,18 @@ class vtkCell;
 
 /** 
   class name: medOpComputeInertialTensor
+
   Operation used to compute the inertial tensor of a surface or a group of surfaces.
+
   The input is a surface selected from the tree and a scalar that represents the density (assumed uniformly distributed over the volume) of the geometry.
-  The outputs are the mass of the surface and the six independent components of the inertial tensor expressed in a specified reference coordinate system. The outputs (i.e. the mass and the inertial tensor) are stored as attributes associated to the input geometry.
-  In the group case the resulting mass and the inertial tensor are those of the whole group of geometries and, the computed attributes (i.e. the overall mass and inertial tensor) are stored as attributes of the group.
+  The outputs are the mass of the surface and the six independent components of the inertial tensor expressed in a specified reference coordinate system. 
+  The outputs (i.e. the mass and the inertial tensor) are stored as attributes associated to the input geometry.
+  In the group case the resulting mass and the inertial tensor are those of the whole group of geometries and, the computed attributes 
+  (i.e. the overall mass and inertial tensor) are stored as attributes of the group.
 
   https://picasaweb.google.com/104563709532324716730/MedOpComputeInertialTensor?authuser=0&feat=directlink
+
+  Density for each VME will be read from the "DENSITY" tag: if this tag is not found the Default density value will be used. 
 	
 */
 class MED_OPERATION_EXPORT medOpComputeInertialTensor: public mafOp
@@ -70,6 +76,12 @@ public:
   /** Precess events coming from other objects */
 	virtual void OnEvent(mafEventBase *maf_event);
 
+  /** Set the default density value used for computation */
+  void SetDefaultDensity(double val);
+
+  /** Return the default density value used for computation */
+  double GetDefaultDensity();
+
   /** Calculate inertial tensor components from a surface and store them in the input vme. */
   int ComputeInertialTensor(mafNode* node, int current_node = 1, int n_of_nodes = 1);
 
@@ -95,6 +107,9 @@ protected:
 
   /** Get surface mass using volume. */
   double GetSurfaceMassFromVolume(mafNode* node);
+
+  /** Get the VME density from the "DENSITY" tag if existent otherwise returns: */  enum {DENSITY_NOT_FOUND = -1};
+  double GetDensity( mafNode* node);
 
   /** Get surface mass using area. */
   double GetSurfaceMassFromArea(mafNode* node);
@@ -129,7 +144,7 @@ protected:
     GEOMETRY,
   };	
   
-  double  m_Density;                            // Material density
+  double  m_DefaultDensity;                            // Material density
   double  m_Mass;                               // Material mass
   double  m_I1,m_I2,m_I3;                    // Tensor components.
 

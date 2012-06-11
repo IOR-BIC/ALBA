@@ -4,7 +4,7 @@ Module:    $RCSfile: medOpComputeInertialTensorTest.cpp,v $
 Language:  C++
 Date:      $Date: 2011-09-09 09:19:15 $
 Version:   $Revision: 1.1.2.3 $
-Authors:   Simone Brazzale
+Authors:   Simone Brazzale , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2007
 CINECA - Interuniversity Consortium (www.cineca.it)
@@ -126,7 +126,7 @@ void medOpComputeInertialTensorTest::TestAddAttributes()
   delete wxLog::SetActiveTarget(NULL);
 }
 //-----------------------------------------------------------
-void medOpComputeInertialTensorTest::TestComputeInertialTensor() 
+void medOpComputeInertialTensorTest::TestComputeInertialTensorFromDefaultValue() 
 //-----------------------------------------------------------
 {
   // import VTK  
@@ -148,11 +148,31 @@ void medOpComputeInertialTensorTest::TestComputeInertialTensor()
   op->ComputeInertialTensor(surface);
   op->AddAttributes();
 
+  double tagValue = -1;
+
   mafTagItem tag;
   surface->GetTagArray()->GetTag("INERTIAL_TENSOR_COMPONENTS_[I1,I2,I3]",tag);
+
+  tagValue = tag.GetValueAsDouble(0);
+
   CPPUNIT_ASSERT(tag.GetNumberOfComponents()==3);
+  
+  tagValue = tag.GetValueAsDouble(0);
+  CPPUNIT_ASSERT(46.147349667471083 == tagValue);
+
+  tagValue = tag.GetValueAsDouble(1);
+  CPPUNIT_ASSERT(46.147348793016427 == tagValue);
+
+  tagValue = tag.GetValueAsDouble(2);
+  CPPUNIT_ASSERT(44.637590473208157 == tagValue);
+
   surface->GetTagArray()->GetTag("SURFACE_MASS",tag);
+
   CPPUNIT_ASSERT(tag.GetNumberOfComponents()==1);
+  
+  tagValue = tag.GetValueAsDouble(0);
+
+  CPPUNIT_ASSERT(30.403272694462050 == tagValue);
 
   mafDEL(op);
   mafDEL(importer);
@@ -160,7 +180,7 @@ void medOpComputeInertialTensorTest::TestComputeInertialTensor()
   delete wxLog::SetActiveTarget(NULL);
 }
 //-----------------------------------------------------------
-void medOpComputeInertialTensorTest::TestComputeInertialTensorFromGroup() 
+void medOpComputeInertialTensorTest::TestComputeInertialTensorFromGroupFromDefaultValue() 
 //-----------------------------------------------------------
 {
   // import VTK  
@@ -198,6 +218,31 @@ void medOpComputeInertialTensorTest::TestComputeInertialTensorFromGroup()
   CPPUNIT_ASSERT(tag.GetNumberOfComponents()==3);
   group->GetTagArray()->GetTag("SURFACE_MASS",tag);
   CPPUNIT_ASSERT(tag.GetNumberOfComponents()==1);
+
+  double tagValue = -1;
+
+  group->GetTagArray()->GetTag("INERTIAL_TENSOR_COMPONENTS_[I1,I2,I3]",tag);
+
+  tagValue = tag.GetValueAsDouble(0);
+
+  CPPUNIT_ASSERT(tag.GetNumberOfComponents()==3);
+
+  tagValue = tag.GetValueAsDouble(0);
+  CPPUNIT_ASSERT(92.294699334942152 == tagValue);
+
+  tagValue = tag.GetValueAsDouble(1);
+  CPPUNIT_ASSERT(92.294697586032868 == tagValue);
+
+  tagValue = tag.GetValueAsDouble(2);
+  CPPUNIT_ASSERT(89.275180946416327 == tagValue);
+
+  group->GetTagArray()->GetTag("SURFACE_MASS",tag);
+
+  CPPUNIT_ASSERT(tag.GetNumberOfComponents()==1);
+
+  tagValue = tag.GetValueAsDouble(0);
+
+  CPPUNIT_ASSERT(60.806545388924100 == tagValue);
 
   mafDEL(op);
   mafDEL(group);
@@ -244,4 +289,138 @@ void medOpComputeInertialTensorTest::TestOpDoUndo()
   mafDEL(importer);
 
   delete wxLog::SetActiveTarget(NULL);
+}
+
+//-----------------------------------------------------------
+void medOpComputeInertialTensorTest::TestComputeInertialTensorFromDENSITYTag() 
+	//-----------------------------------------------------------
+{
+	// import VTK  
+	medOpImporterVTK *importer=new medOpImporterVTK("importerVTK");
+	importer->TestModeOn();
+	mafString fileName=MED_DATA_ROOT;
+	fileName<<"/Surface/sphere.vtk";
+	importer->SetFileName(fileName);
+	importer->ImportVTK();
+	mafVMESurface *surface=mafVMESurface::SafeDownCast(importer->GetOutput());
+
+	surface->GetTagArray()->SetTag("DENSITY", "1.0");
+
+	CPPUNIT_ASSERT(surface!=NULL);
+	CPPUNIT_ASSERT(surface->GetOutput()->GetVTKData()!=NULL);
+
+	// test on surface
+	medOpComputeInertialTensor *op=new medOpComputeInertialTensor();
+	op->TestModeOn();
+	op->SetDefaultDensity(5.0);
+	op->SetInput(surface);
+	op->ComputeInertialTensor(surface);
+	op->AddAttributes();
+
+	double tagValue = -1;
+
+	mafTagItem tag;
+	surface->GetTagArray()->GetTag("INERTIAL_TENSOR_COMPONENTS_[I1,I2,I3]",tag);
+
+	tagValue = tag.GetValueAsDouble(0);
+
+	CPPUNIT_ASSERT(tag.GetNumberOfComponents()==3);
+
+	tagValue = tag.GetValueAsDouble(0);
+	CPPUNIT_ASSERT(46.147349667471083 == tagValue);
+
+	tagValue = tag.GetValueAsDouble(1);
+	CPPUNIT_ASSERT(46.147348793016427 == tagValue);
+
+	tagValue = tag.GetValueAsDouble(2);
+	CPPUNIT_ASSERT(44.637590473208157 == tagValue);
+
+	surface->GetTagArray()->GetTag("SURFACE_MASS",tag);
+
+	CPPUNIT_ASSERT(tag.GetNumberOfComponents()==1);
+
+	tagValue = tag.GetValueAsDouble(0);
+
+	CPPUNIT_ASSERT(30.403272694462050 == tagValue);
+
+	mafDEL(op);
+	mafDEL(importer);
+
+	delete wxLog::SetActiveTarget(NULL);
+}
+
+//-----------------------------------------------------------
+void medOpComputeInertialTensorTest::TestComputeInertialTensorFromGroupFromDENSITYTag() 
+//-----------------------------------------------------------
+{
+	// import VTK  
+	medOpImporterVTK *importer=new medOpImporterVTK("importerVTK");
+	importer->TestModeOn();
+	mafString fileName=MED_DATA_ROOT;
+	fileName<<"/Surface/sphere.vtk";
+	importer->SetFileName(fileName);
+	importer->ImportVTK();
+	mafVMESurface *surface=mafVMESurface::SafeDownCast(importer->GetOutput());
+
+	surface->GetTagArray()->SetTag("DENSITY", "1.0");
+
+	CPPUNIT_ASSERT(surface!=NULL);
+	CPPUNIT_ASSERT(surface->GetOutput()->GetVTKData()!=NULL);
+
+	// create surface copy
+	mafVMESurface* copy;
+	mafNEW(copy);
+	copy->DeepCopy(surface);
+
+	// create group
+	mafVMEGroup* group;
+	mafNEW(group);
+	group->AddChild(surface);
+	group->AddChild(copy);
+
+	// test on group
+	medOpComputeInertialTensor *op=new medOpComputeInertialTensor();
+	op->TestModeOn();
+	op->SetInput(group);
+	op->SetDefaultDensity(5.0);
+	op->ComputeInertialTensorFromGroup();
+	op->AddAttributes();
+
+	mafTagItem tag;
+	group->GetTagArray()->GetTag("INERTIAL_TENSOR_COMPONENTS_[I1,I2,I3]",tag);
+	CPPUNIT_ASSERT(tag.GetNumberOfComponents()==3);
+	group->GetTagArray()->GetTag("SURFACE_MASS",tag);
+	CPPUNIT_ASSERT(tag.GetNumberOfComponents()==1);
+
+	double tagValue = -1;
+
+	group->GetTagArray()->GetTag("INERTIAL_TENSOR_COMPONENTS_[I1,I2,I3]",tag);
+
+	tagValue = tag.GetValueAsDouble(0);
+
+	CPPUNIT_ASSERT(tag.GetNumberOfComponents()==3);
+
+	tagValue = tag.GetValueAsDouble(0);
+	CPPUNIT_ASSERT(92.294699334942152 == tagValue);
+
+	tagValue = tag.GetValueAsDouble(1);
+	CPPUNIT_ASSERT(92.294697586032868 == tagValue);
+
+	tagValue = tag.GetValueAsDouble(2);
+	CPPUNIT_ASSERT(89.275180946416327 == tagValue);
+
+	group->GetTagArray()->GetTag("SURFACE_MASS",tag);
+
+	CPPUNIT_ASSERT(tag.GetNumberOfComponents()==1);
+
+	tagValue = tag.GetValueAsDouble(0);
+
+	CPPUNIT_ASSERT(60.806545388924100 == tagValue);
+
+	mafDEL(op);
+	mafDEL(group);
+	mafDEL(copy);
+	mafDEL(importer);
+
+	delete wxLog::SetActiveTarget(NULL);
 }
