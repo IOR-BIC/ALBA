@@ -37,6 +37,9 @@ ADD_TEST(medHTMLTemplateParserTest   ${EXECUTABLE_OUTPUT_PATH}/medHTMLTemplatePa
 ADD_EXECUTABLE(medHTMLTemplateParserBlockTest  medHTMLTemplateParserBlockTest.h medHTMLTemplateParserBlockTest.cpp)
 ADD_TEST(medHTMLTemplateParserBlockTest   ${EXECUTABLE_OUTPUT_PATH}/medHTMLTemplateParserBlockTest )
 
+ADD_EXECUTABLE(medVect3dTest  medVect3dTest.h medVect3dTest.cpp)
+ADD_TEST(medVect3dTest   ${EXECUTABLE_OUTPUT_PATH}/medVect3dTest )
+
 
 # wxWidgets specific classes
 #IF (MAF_USE_WX)

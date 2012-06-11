@@ -121,7 +121,7 @@ public:
   inline void SetZ(double z){m_Z=z;};
 
   /** Return a pointer to the vector of double */
-  inline double* GetVect(){return &m_X;};
+  inline double* GetVect(){return (double*)this;};
 
   /** Operator: Return true if the vectors are equals */
   int operator==(medVect3d vect);
