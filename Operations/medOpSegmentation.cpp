@@ -2241,13 +2241,10 @@ void medOpSegmentation::OnEventUpdateThresholdSlice()
 //------------------------------------------------------------------------
 {
   //m_View->VmeShow(m_ThresholdVolumeSlice,false);
-  
   InitEmptyVolumeSlice();
   UpdateThresholdRealTimePreview();
-  m_View->VmeShow(m_ThresholdVolumeSlice,true);
+  m_View->VmeShow(m_ThresholdVolumeSlice, true);
   UpdateSlice();
-  m_View->VmeShow(m_ManualVolumeSlice, true);
-  m_View->CameraUpdate();
 }
 
 //------------------------------------------------------------------------
@@ -2256,11 +2253,11 @@ void medOpSegmentation::OnEventUpdateManualSlice()
 {
   //m_View->VmeShow(m_ManualVolumeSlice, false);
   UndoBrushPreview();
-  ApplyVolumeSliceChanges();
+  ApplyVolumeSliceChanges();  
+  UpdateVolumeSlice();
   m_View->VmeShow(m_ManualVolumeSlice, true);
   UpdateSlice();
-  m_View->VmeShow(m_ManualVolumeSlice, true);
-  m_View->CameraUpdate();
+  /*m_View->CameraUpdate();*/
 }
 
 //------------------------------------------------------------------------
@@ -3992,6 +3989,9 @@ void medOpSegmentation::InitDataVolumeSlice(mafVMEVolumeGray *slice)
     else if (m_CurrentSlicePlane == XZ) vtkDEL(y);
     else if (m_CurrentSlicePlane == XY) vtkDEL(z);
   }
+
+  slice->Modified();
+  slice->Update();
 }
 
 //----------------------------------------------------------------------------
