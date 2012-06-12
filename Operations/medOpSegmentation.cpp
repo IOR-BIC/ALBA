@@ -354,8 +354,6 @@ void medOpSegmentation::OpRun()
 void medOpSegmentation::OpDo()
 //----------------------------------------------------------------------------
 {
-
-
   mafVMEVolumeGray *targetVolume = NULL;
   switch (m_CurrentOperation)
   {
@@ -403,7 +401,6 @@ void medOpSegmentation::OpDo()
 
     //Eliminate previous outputs
     DeleteOutputs(m_Input->GetRoot());
-    m_OutputVolume->ReparentTo(m_Volume->GetParent());
     m_OutputVolume->SetName(wxString::Format("Segmentation Output (%s)",m_Volume->GetName()).c_str());
     lutPreset(4,m_OutputVolume->GetMaterial()->m_ColorLut);
     m_OutputVolume->GetMaterial()->m_ColorLut->SetTableRange(0,255);
@@ -751,7 +748,7 @@ void medOpSegmentation::DeleteOpDialog()
     m_View->VmeRemove(m_LoadedVolume);
   }
 
-  m_Volume->ReparentTo(m_OldVolumeParent);
+  //m_Volume->ReparentTo(m_OldVolumeParent);
   m_Volume->SetBehavior(m_OldBehavior);
   m_Volume->Update();
   m_View->VmeShow(m_Volume,false);
