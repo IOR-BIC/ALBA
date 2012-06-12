@@ -7,6 +7,7 @@ Version:   $Revision: 1.1.2.3 $
 Authors:   Simone Brazzale , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2007
+
 CINECA - Interuniversity Consortium (www.cineca.it)
 SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 
@@ -244,6 +245,34 @@ void medOpComputeInertialTensorTest::TestComputeInertialTensorFromGroupFromDefau
 
   CPPUNIT_ASSERT(60.806545388924100 == tagValue);
 
+  mafNode *child0 = NULL;
+  child0 = group->GetChild(0);
+  CPPUNIT_ASSERT(child0 != NULL);
+
+  CPPUNIT_ASSERT( child0->GetTagArray()->GetTag("SURFACE_MASS") != NULL);
+
+  child0->GetTagArray()->GetTag("SURFACE_MASS",tag);
+  CPPUNIT_ASSERT(tag.GetNumberOfComponents()==1);
+
+  CPPUNIT_ASSERT( child0->GetTagArray()->GetTag("INERTIAL_TENSOR_COMPONENTS_[I1,I2,I3]") == NULL);
+
+  mafNode *child1 = NULL;
+  child1 = group->GetChild(1);
+  CPPUNIT_ASSERT(child1 != NULL);
+
+  tagValue = tag.GetValueAsDouble(0);
+  CPPUNIT_ASSERT(30.403272694462050 == tagValue);
+
+  CPPUNIT_ASSERT( child1->GetTagArray()->GetTag("SURFACE_MASS") != NULL);
+
+  child1->GetTagArray()->GetTag("SURFACE_MASS",tag);
+  CPPUNIT_ASSERT(tag.GetNumberOfComponents()==1);
+
+  tagValue = tag.GetValueAsDouble(0);
+  CPPUNIT_ASSERT(30.403272694462050 == tagValue);
+
+  CPPUNIT_ASSERT( child1->GetTagArray()->GetTag("INERTIAL_TENSOR_COMPONENTS_[I1,I2,I3]") == NULL);
+  
   mafDEL(op);
   mafDEL(group);
   mafDEL(copy);

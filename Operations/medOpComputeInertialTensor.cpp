@@ -18,6 +18,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
+using namespace std;
 
 #include "medOpComputeInertialTensor.h"
 
@@ -139,6 +140,7 @@ void medOpComputeInertialTensor::OpDo()
       vme->GetTagArray()->SetTag(m_TagMass);
     }
   }
+
 }
 //----------------------------------------------------------------------------
 void medOpComputeInertialTensor::OpUndo()
@@ -208,22 +210,39 @@ void medOpComputeInertialTensor::OnEvent(mafEventBase *maf_event)
 void medOpComputeInertialTensor::AddAttributes()
 //----------------------------------------------------------------------------
 {
-  //save results in vme attributes
-  std::vector<double> vec_comp;
-  vec_comp.push_back(m_I1);
-  vec_comp.push_back(m_I2);
-  vec_comp.push_back(m_I3);
+	//save results in vme attributes
+	std::vector<double> vec_comp;
+	vec_comp.push_back(m_I1);
+	vec_comp.push_back(m_I2);
+	vec_comp.push_back(m_I3);
 
 	mafTagItem tag;
 	tag.SetName("INERTIAL_TENSOR_COMPONENTS_[I1,I2,I3]");
-  tag.SetNumberOfComponents(3);
-  tag.SetComponents(vec_comp);
-  m_Input->GetTagArray()->SetTag(tag);
+	tag.SetNumberOfComponents(3);
+	tag.SetComponents(vec_comp);
+	m_Input->GetTagArray()->SetTag(tag);
 
-  mafTagItem tagm;
+	mafTagItem tagm;
 	tagm.SetName("SURFACE_MASS");
-  tagm.SetValue(m_Mass);
-  m_Input->GetTagArray()->SetTag(tagm);
+	tagm.SetValue(m_Mass);
+	m_Input->GetTagArray()->SetTag(tagm);
+
+	if (m_Input->IsA("mafVMEGroup")) 
+	{
+		vector<pair<mafNode * , double>>::iterator iter;
+
+		for (iter = m_NodeMassPairVector.begin() ; iter != m_NodeMassPairVector.end() ; ++iter)
+		{
+			mafNode *node = iter->first;
+			double mass = iter->second;
+
+			mafTagItem ti;
+			ti.SetName("SURFACE_MASS");
+			ti.SetValue(mass);
+
+			node->GetTagArray()->SetTag(ti);
+		}
+	}
 }
 //----------------------------------------------------------------------------
 void medOpComputeInertialTensor::OpStop(int result)
@@ -646,7 +665,15 @@ int medOpComputeInertialTensor::ComputeInertialTensorUsingGeometry(mafNode* node
   m_I1 += scale*eval[0];
   m_I2 += scale*eval[1];
   m_I3 += scale*eval[2];
-  m_Mass += scale*m;
+
+  // store the mass for later use
+  double mass = scale * m;
+
+  pair<mafNode* , double> nodeMassPair(node , mass);
+
+  m_NodeMassPairVector.push_back(nodeMassPair);
+
+  m_Mass += mass;
 
   if(!m_TestMode)
   {
@@ -923,7 +950,7 @@ int medOpComputeInertialTensor::ComputeInertialTensorFromGroup()
   // get number of children surfaces (only direct child!)
   for (int i=0;i<n_of_children;i++)
   {
-    if (group->GetChild(i)->IsMAFType(mafVMESurface))
+    if (group->GetChild(i)->IsA("mafVMESurface"))
     {
       n_of_surfaces++;
     }
@@ -944,9 +971,16 @@ int medOpComputeInertialTensor::ComputeInertialTensorFromGroup()
   // compute inertial tensor fro each children (results will be summed)
   for (int i=0;i<n_of_children;i++)
   {
-    if (group->GetChild(i)->IsMAFType(mafVMESurface))
+	mafVMESurface *childSurface = mafVMESurface::SafeDownCast(group->GetChild(i));
+
+    if (childSurface != NULL)
     {
-      ComputeInertialTensor(group->GetChild(i),i+1,n_of_children);
+	  
+	  wxString s;
+	  s << "Computing Inertial tensor for: " << childSurface->GetName();
+	  mafLogMessage(s.c_str());      
+	  ComputeInertialTensor(childSurface,i+1,n_of_children - 1);
+
     }
   }
 
@@ -1081,6 +1115,26 @@ double medOpComputeInertialTensor::GetDensity( mafNode* node)
 	else
 	{
 		return DENSITY_NOT_FOUND;
+	}
+}
+
+double medOpComputeInertialTensor::GetMass( mafNode* node)
+{
+	double mass = SURFACE_MASS_NOT_FOUND;
+
+	wxString massTagName = "SURFACE_MASS";
+
+	mafTagItem *massTagItem = NULL;
+	massTagItem = node->GetTagArray()->GetTag(massTagName.c_str());
+
+	if (massTagItem != NULL)
+	{
+		mass = massTagItem->GetValueAsDouble();
+		return mass;
+	}
+	else
+	{
+		return SURFACE_MASS_NOT_FOUND;
 	}
 }
 

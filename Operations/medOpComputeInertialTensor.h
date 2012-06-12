@@ -24,6 +24,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkPolyData.h"
 #include "vnl/vnl_vector.h"
 
+using namespace std;
+
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
@@ -74,7 +76,7 @@ public:
   void OpUndo();
 
   /** Precess events coming from other objects */
-	virtual void OnEvent(mafEventBase *maf_event);
+  virtual void OnEvent(mafEventBase *maf_event);
 
   /** Set the default density value used for computation */
   void SetDefaultDensity(double val);
@@ -91,8 +93,14 @@ public:
    /** Add results to the vme in the attributes section. */
   void AddAttributes();
 
+  /** Get the VME mass from the "SURFACE_MASS" tag if existent otherwise returns: */  enum {SURFACE_MASS_NOT_FOUND = -1};
+  static double GetMass( mafNode* node);
+
 protected: 
 
+	/** Get the VME density from the "DENSITY" tag if existent otherwise returns: */  enum {DENSITY_NOT_FOUND = -1};
+	double GetDensity( mafNode* node);
+	
 	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
 	void OpStop(int result);
 
@@ -107,9 +115,6 @@ protected:
 
   /** Get surface mass using volume. */
   double GetSurfaceMassFromVolume(mafNode* node);
-
-  /** Get the VME density from the "DENSITY" tag if existent otherwise returns: */  enum {DENSITY_NOT_FOUND = -1};
-  double GetDensity( mafNode* node);
 
   /** Get surface mass using area. */
   double GetSurfaceMassFromArea(mafNode* node);
@@ -129,7 +134,8 @@ protected:
       This algorithm is fast but 
   */
   int ComputeInertialTensorUsingGeometry(mafNode* node, int current_node = 1, int n_of_nodes = 1);
-
+ 
+  
   enum GUI_METHOD_ID
   {
     ID_COMBO = MINID,
@@ -154,6 +160,8 @@ protected:
   int m_MethodToUse;
   int m_Accuracy;
   int m_Vtkcomp;
+
+  vector<pair<mafNode * , double>> m_NodeMassPairVector;
 
 };
 #endif
