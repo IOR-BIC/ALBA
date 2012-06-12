@@ -389,7 +389,7 @@ void medOpSegmentation::OpDo()
     {
       mafNEW(m_OutputVolume);
     }
-//     m_OutputVolume->DeepCopy(targetVolume);
+    m_OutputVolume->DeepCopy(targetVolume);
 // 
 //     if(m_LoadedVolume)
 //     {
@@ -426,7 +426,7 @@ void medOpSegmentation::DeleteOutputs(mafNode* vme)
     DeleteOutputs(child);
     if(IsOutput(child))
     {
-      mafDEL(child);
+      child->ReparentTo(NULL);
     }
   }
 }
