@@ -383,6 +383,11 @@ void medOpSegmentation::OpDo()
 
   if(targetVolume)
   {
+    if(m_LoadedVolume)
+    {
+      mafDEL(m_LoadedVolume);
+    }
+    
     if (!m_OutputVolume)
     {
       mafNEW(m_OutputVolume);
