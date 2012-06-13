@@ -406,7 +406,7 @@ void medOpSegmentation::OpDo()
     m_OutputVolume->GetMaterial()->m_ColorLut->SetTableRange(0,255);
     m_OutputVolume->GetMaterial()->UpdateFromTables();
     m_OutputVolume->GetTagArray()->SetTag("SEGMENTATION_PARENT",wxString::Format("%d",m_Volume->GetId()).c_str(),MAF_STRING_TAG);
-    m_OutputVolume->ReparentTo(m_Volume->GetParent());
+    m_OutputVolume->ReparentTo(m_Volume);
   }
   RemoveVMEs();
   mafOp::OpDo();
