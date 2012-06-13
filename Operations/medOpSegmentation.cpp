@@ -1945,6 +1945,7 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
       }
 
       m_View->CameraUpdate();
+      UndoBrushPreview(); // Undo is execute twice to ensure no spot are left by the brush
     }
     else if (e->GetSender() == m_SegmentationPicker && e->GetId()== medInteractorSegmentationPicker::VME_ALT_PICKED)
     {
