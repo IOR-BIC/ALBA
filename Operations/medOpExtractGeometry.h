@@ -57,7 +57,7 @@ public:
     ID_DECIMATE_SURFACE_TOPOLOGY, 
     ID_AUTO_CONTOUR_VALUE,
     ID_CONTOUR_VALUE,
-
+    ID_PROCESSING_TYPE,
   };
 
   /** constructor. */
@@ -146,6 +146,7 @@ protected:
 
   double m_ScalarRange[2];
 
+  int m_ProcessingType;
 
 };
 #endif
