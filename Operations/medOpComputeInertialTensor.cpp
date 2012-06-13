@@ -4,7 +4,7 @@
   Language:  C++
   Date:      $Date: 2011-09-09 09:20:46 $
   Version:   $Revision: 1.1.2.5 $
-  Authors:   Simone Brazzale
+  Authors:   Simone Brazzale , Stefano Perticoni
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
@@ -18,6 +18,9 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
+wxString DENSITY_TAG_NAME = "DENSITY";
+
+using namespace std;
 
 #include "medOpComputeInertialTensor.h"
 
@@ -83,7 +86,7 @@ mafOp(label)
   m_OpType	= OPTYPE_OP;
   m_Canundo = true;
 
-  m_Density = 1.0;
+  m_DefaultDensity = 1.0;
   m_Mass = 0.0;
   m_I1 = 0.0;
   m_I2 = 0.0;
@@ -103,7 +106,7 @@ mafOp* medOpComputeInertialTensor::Copy()
 //----------------------------------------------------------------------------
 {
 	 medOpComputeInertialTensor* op_copy = new medOpComputeInertialTensor(m_Label);
-   op_copy->m_Density = this->m_Density;
+   op_copy->m_DefaultDensity = this->m_DefaultDensity;
 
    return op_copy;
 }
@@ -139,6 +142,7 @@ void medOpComputeInertialTensor::OpDo()
       vme->GetTagArray()->SetTag(m_TagMass);
     }
   }
+
 }
 //----------------------------------------------------------------------------
 void medOpComputeInertialTensor::OpUndo()
@@ -208,22 +212,39 @@ void medOpComputeInertialTensor::OnEvent(mafEventBase *maf_event)
 void medOpComputeInertialTensor::AddAttributes()
 //----------------------------------------------------------------------------
 {
-  //save results in vme attributes
-  std::vector<double> vec_comp;
-  vec_comp.push_back(m_I1);
-  vec_comp.push_back(m_I2);
-  vec_comp.push_back(m_I3);
+	//save results in vme attributes
+	std::vector<double> vec_comp;
+	vec_comp.push_back(m_I1);
+	vec_comp.push_back(m_I2);
+	vec_comp.push_back(m_I3);
 
 	mafTagItem tag;
 	tag.SetName("INERTIAL_TENSOR_COMPONENTS_[I1,I2,I3]");
-  tag.SetNumberOfComponents(3);
-  tag.SetComponents(vec_comp);
-  m_Input->GetTagArray()->SetTag(tag);
+	tag.SetNumberOfComponents(3);
+	tag.SetComponents(vec_comp);
+	m_Input->GetTagArray()->SetTag(tag);
 
-  mafTagItem tagm;
+	mafTagItem tagm;
 	tagm.SetName("SURFACE_MASS");
-  tagm.SetValue(m_Mass);
-  m_Input->GetTagArray()->SetTag(tagm);
+	tagm.SetValue(m_Mass);
+	m_Input->GetTagArray()->SetTag(tagm);
+
+	if (m_Input->IsA("mafVMEGroup")) 
+	{
+		vector<pair<mafNode * , double>>::iterator iter;
+
+		for (iter = m_NodeMassPairVector.begin() ; iter != m_NodeMassPairVector.end() ; ++iter)
+		{
+			mafNode *node = iter->first;
+			double mass = iter->second;
+
+			mafTagItem ti;
+			ti.SetName("SURFACE_MASS");
+			ti.SetValue(mass);
+
+			node->GetTagArray()->SetTag(ti);
+		}
+	}
 }
 //----------------------------------------------------------------------------
 void medOpComputeInertialTensor::OpStop(int result)
@@ -240,7 +261,13 @@ void medOpComputeInertialTensor::CreateGui()
 
   m_Gui->Divider(0);
   m_Gui->Divider(0);
-  m_Gui->Double(-1,_("Density"),&m_Density);
+  m_Gui->Label("Default Density is the density");
+  m_Gui->Label("value that will be used for");
+  m_Gui->Label("computation if DENSITY tag");
+  m_Gui->Label("is not found in VME's tagArray.");
+  m_Gui->Label("");
+  m_Gui->Label("Default Density");
+  m_Gui->Double(-1,_(""),&m_DefaultDensity);
   m_Gui->Divider(0);
   m_Gui->Divider(0);  
   m_Gui->Integer(ID_ACCURACY,_("Accuracy"),&m_Accuracy,0,100000);
@@ -326,7 +353,14 @@ double medOpComputeInertialTensor::GetSurfaceArea(mafNode* node)
 double medOpComputeInertialTensor::GetSurfaceMassFromVolume(mafNode* node)
 //----------------------------------------------------------------------------
 {
-  double mass = GetSurfaceVolume(node)*m_Density;
+  double density = GetDensity(node);
+
+  if (density == DENSITY_NOT_FOUND)
+  {
+	  density = m_DefaultDensity;
+  }
+
+  double mass = GetSurfaceVolume(node)*density;
 
   return mass;
 }
@@ -334,7 +368,13 @@ double medOpComputeInertialTensor::GetSurfaceMassFromVolume(mafNode* node)
 double medOpComputeInertialTensor::GetSurfaceMassFromArea(mafNode* node)
 //----------------------------------------------------------------------------
 {
-  double mass = GetSurfaceArea(node)*m_Density;
+  double density = GetDensity(node);
+
+  if (density == DENSITY_NOT_FOUND)
+  {
+	  density = m_DefaultDensity;
+  }
+  double mass = GetSurfaceArea(node)*density;
 
   return mass;
 }
@@ -607,19 +647,48 @@ int medOpComputeInertialTensor::ComputeInertialTensorUsingGeometry(mafNode* node
 
   // by the spectral theorem, since the moment of inertia tensor is real and symmetric, there exists a Cartesian coordinate system in which it is diagonal,
   // the coordinate axes are called the principal axes and the constants I1, I2 and I3 are called the principal moments of inertia. 
-  // extract eigenvalues from jacobian matrix (inertial tensor components referred to principal axes).
+  // extract eigenvalues from jacobian matorix (inertial tensor components referred to principal axes).
   double eval[3];
   v[0] = v0; v[1] = v1; v[2] = v2; 
   vtkMath::Jacobi(a,eval,v);
 
   // scale by the density
-  double scale = m_Density;
+
+  double density = GetDensity(node);
+  
+  if (density == DENSITY_NOT_FOUND)
+  {
+
+	  density = m_DefaultDensity;
+
+	  std::ostringstream stringStream;
+	  stringStream << DENSITY_TAG_NAME.c_str() << " tag not found. Using default density value ie " << density << std::endl;          			
+	  mafLogMessage(stringStream.str().c_str());
+	  
+  }
+  else
+  {
+	  std::ostringstream stringStream;
+	  stringStream << DENSITY_TAG_NAME.c_str() << " tag found. Using value " << density << std::endl;          			
+	  mafLogMessage(stringStream.str().c_str());
+
+  }
+
+  double scale = density;
 
   // Fill results
   m_I1 += scale*eval[0];
   m_I2 += scale*eval[1];
   m_I3 += scale*eval[2];
-  m_Mass += scale*m;
+
+  // store the mass for later use
+  double mass = scale * m;
+
+  pair<mafNode* , double> nodeMassPair(node , mass);
+
+  m_NodeMassPairVector.push_back(nodeMassPair);
+
+  m_Mass += mass;
 
   if(!m_TestMode)
   {
@@ -807,7 +876,16 @@ int medOpComputeInertialTensor::ComputeInertialTensorUsingMonteCarlo(mafNode* no
 
   // get hypercube volume and mass
   double hycube_v = abs(ds_bounds[1]-ds_bounds[0]) * abs(ds_bounds[3]-ds_bounds[2]) * abs(ds_bounds[5]-ds_bounds[4]);
-  double hycube_m = m_Density*hycube_v;
+  
+  double density = GetDensity(node);
+
+  if (density == DENSITY_NOT_FOUND)
+  {
+
+	  density = m_DefaultDensity;
+  }
+  
+  double hycube_m = density*hycube_v;
 
   // get Monte Carlo ratios
   double poly_hycube_mratio = pint/ptot;
@@ -833,7 +911,9 @@ int medOpComputeInertialTensor::ComputeInertialTensorUsingMonteCarlo(mafNode* no
   else
   {
     double vtk_mass = GetSurfaceMassFromVTK(node);
+
     m_Mass += vtk_mass;
+
     scale = vtk_mass/mc_mass;
   }
 
@@ -886,7 +966,7 @@ int medOpComputeInertialTensor::ComputeInertialTensorFromGroup()
   // get number of children surfaces (only direct child!)
   for (int i=0;i<n_of_children;i++)
   {
-    if (group->GetChild(i)->IsMAFType(mafVMESurface))
+    if (group->GetChild(i)->IsA("mafVMESurface"))
     {
       n_of_surfaces++;
     }
@@ -907,9 +987,16 @@ int medOpComputeInertialTensor::ComputeInertialTensorFromGroup()
   // compute inertial tensor fro each children (results will be summed)
   for (int i=0;i<n_of_children;i++)
   {
-    if (group->GetChild(i)->IsMAFType(mafVMESurface))
+	mafVMESurface *childSurface = mafVMESurface::SafeDownCast(group->GetChild(i));
+
+    if (childSurface != NULL)
     {
-      ComputeInertialTensor(group->GetChild(i),i+1,n_of_children);
+	  
+	  wxString s;
+	  s << "Computing Inertial tensor for: " << childSurface->GetName();
+	  mafLogMessage(s.c_str());      
+	  ComputeInertialTensor(childSurface,i+1,n_of_children - 1);
+
     }
   }
 
@@ -1025,4 +1112,52 @@ int medOpComputeInertialTensor::IsInsideSurface(vtkPolyData* surface, double x[3
   //   If the number of votes is positive, the point is inside
   //
   return ( deltaVotes < 0 ? 0 : 1 );
+}
+
+double medOpComputeInertialTensor::GetDensity( mafNode* node)
+{
+	double density = DENSITY_NOT_FOUND;
+
+	mafTagItem *densityTagItem = NULL;
+	densityTagItem = node->GetTagArray()->GetTag(DENSITY_TAG_NAME.c_str());
+
+	if (densityTagItem != NULL)
+	{
+		density = densityTagItem->GetValueAsDouble();
+		return density;
+	}
+	else
+	{
+		return DENSITY_NOT_FOUND;
+	}
+}
+
+double medOpComputeInertialTensor::GetMass( mafNode* node)
+{
+	double mass = SURFACE_MASS_NOT_FOUND;
+
+	wxString massTagName = "SURFACE_MASS";
+
+	mafTagItem *massTagItem = NULL;
+	massTagItem = node->GetTagArray()->GetTag(massTagName.c_str());
+
+	if (massTagItem != NULL)
+	{
+		mass = massTagItem->GetValueAsDouble();
+		return mass;
+	}
+	else
+	{
+		return SURFACE_MASS_NOT_FOUND;
+	}
+}
+
+double medOpComputeInertialTensor::GetDefaultDensity()
+{
+	return m_DefaultDensity;
+}
+
+void medOpComputeInertialTensor::SetDefaultDensity( double val )
+{
+	m_DefaultDensity = val;
 }

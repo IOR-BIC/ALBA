@@ -44,6 +44,7 @@ class mafMatrix;
 class mafVMEVolumeGray;
 class mafVME;
 class mafVMEImage;
+class mafNode;
 
 class mmiSelectPoint;
 
@@ -570,5 +571,14 @@ protected:
 
   int m_OldAutomaticThreshold;      //<Used to update real time threshold preview only if needed
   int m_OldAutomaticUpperThreshold; //<Used to update real time threshold preview only if needed
+
+  mafNode* m_PreviousOutput;
+
+  /** Delete children of input vme if they are output of the input volume  */
+  void DeleteOutputs(mafNode* vme);
+
+  /** Determine if the specified vme is an output of the input volume */
+  bool IsOutput(mafNode* vme);
+
 };
 #endif
