@@ -334,9 +334,12 @@ void medOpComputeInertialTensorTest::TestComputeInertialTensorFromDENSITYTag()
 	mafVMESurface *surface=mafVMESurface::SafeDownCast(importer->GetOutput());
 
 	surface->GetTagArray()->SetTag("DENSITY", "1.0");
+	double density = surface->GetTagArray()->GetTag("DENSITY")->GetComponentAsDouble(0);
 
 	CPPUNIT_ASSERT(surface!=NULL);
 	CPPUNIT_ASSERT(surface->GetOutput()->GetVTKData()!=NULL);
+	CPPUNIT_ASSERT(surface->GetTagArray()->GetTag("DENSITY") != NULL);
+	CPPUNIT_ASSERT(density == 1.0);
 
 	// test on surface
 	medOpComputeInertialTensor *op=new medOpComputeInertialTensor();
