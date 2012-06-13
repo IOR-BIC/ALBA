@@ -18,6 +18,8 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
+wxString DENSITY_TAG_NAME = "DENSITY";
+
 using namespace std;
 
 #include "medOpComputeInertialTensor.h"
@@ -262,7 +264,7 @@ void medOpComputeInertialTensor::CreateGui()
   m_Gui->Label("Default Density is the density");
   m_Gui->Label("value that will be used for");
   m_Gui->Label("computation if DENSITY tag");
-  m_Gui->Label("is not found in VME's");
+  m_Gui->Label("is not found in VME's tagArray.");
   m_Gui->Label("");
   m_Gui->Label("Default Density");
   m_Gui->Double(-1,_(""),&m_DefaultDensity);
@@ -653,12 +655,25 @@ int medOpComputeInertialTensor::ComputeInertialTensorUsingGeometry(mafNode* node
   // scale by the density
 
   double density = GetDensity(node);
-
+  
   if (density == DENSITY_NOT_FOUND)
   {
+
 	  density = m_DefaultDensity;
+
+	  std::ostringstream stringStream;
+	  stringStream << DENSITY_TAG_NAME.c_str() << " tag not found. Using default density value ie " << density << std::endl;          			
+	  mafLogMessage(stringStream.str().c_str());
+	  
   }
-  
+  else
+  {
+	  std::ostringstream stringStream;
+	  stringStream << DENSITY_TAG_NAME.c_str() << " tag found. Using value " << density << std::endl;          			
+	  mafLogMessage(stringStream.str().c_str());
+
+  }
+
   double scale = density;
 
   // Fill results
@@ -866,6 +881,7 @@ int medOpComputeInertialTensor::ComputeInertialTensorUsingMonteCarlo(mafNode* no
 
   if (density == DENSITY_NOT_FOUND)
   {
+
 	  density = m_DefaultDensity;
   }
   
@@ -1102,10 +1118,8 @@ double medOpComputeInertialTensor::GetDensity( mafNode* node)
 {
 	double density = DENSITY_NOT_FOUND;
 
-	wxString densityTagName = "DENSITY";
-
 	mafTagItem *densityTagItem = NULL;
-	densityTagItem = node->GetTagArray()->GetTag(densityTagName.c_str());
+	densityTagItem = node->GetTagArray()->GetTag(DENSITY_TAG_NAME.c_str());
 
 	if (densityTagItem != NULL)
 	{
