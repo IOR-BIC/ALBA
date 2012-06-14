@@ -260,6 +260,8 @@ medOpSegmentation::medOpSegmentation(const wxString &label) : mafOp(label)
 
   m_OldAutomaticThreshold = MAXINT;
   m_OldAutomaticUpperThreshold = MAXINT;
+
+  m_RemovePeninsulaRegions = FALSE;
 }
 //----------------------------------------------------------------------------
 medOpSegmentation::~medOpSegmentation()
@@ -994,6 +996,7 @@ bool medOpSegmentation::ApplyRefinementFilter2(vtkStructuredPoints *inputImage, 
   vtkMEDImageFillHolesRemoveIslands *filter = vtkMEDImageFillHolesRemoveIslands::New();
   filter->SetInput(inputImage);
   filter->SetEdgeSize(m_RefinementRegionsSize);
+  filter->SetRemovePeninsulaRegions(m_RemovePeninsulaRegions == TRUE);
   if(m_RefinementSegmentationAction == ID_REFINEMENT_HOLES_FILL)
   {
     filter->SetAlgorithmToFillHoles();
@@ -1407,6 +1410,8 @@ void medOpSegmentation::CreateRefinementGui()
 
   m_RefinementIterative = 0;
   //currentGui->Bool(ID_REFINEMENT_ITERATIVE, mafString("Iterative"), &m_RefinementIterative, 0, mafString("Switch on/off the iterative feature"));
+  
+  currentGui->Bool(ID_REFINEMENT_REMOVE_PENINSULA_REGIONS, mafString("Remove peninsula regions"), &m_RemovePeninsulaRegions, 1, mafString("Remove or not peninsula regions"));
 
   currentGui->TwoButtons(ID_REFINEMENT_UNDO, ID_REFINEMENT_REDO, "Undo", "Redo");
 

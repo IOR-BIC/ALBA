@@ -146,6 +146,7 @@ public:
     ID_REFINEMENT_UNDO,
     ID_REFINEMENT_REDO,
     ID_ENABLE_TRILINEAR_INTERPOLATION,
+    ID_REFINEMENT_REMOVE_PENINSULA_REGIONS,
     MINID,
   };
 
@@ -572,7 +573,7 @@ protected:
   int m_OldAutomaticThreshold;      //<Used to update real time threshold preview only if needed
   int m_OldAutomaticUpperThreshold; //<Used to update real time threshold preview only if needed
 
-  mafNode* m_PreviousOutput;
+  int m_RemovePeninsulaRegions; // Determine if refinement filter removes penisula regions or not
 
   /** Delete children of input vme if they are output of the input volume  */
   void DeleteOutputs(mafNode* vme);
