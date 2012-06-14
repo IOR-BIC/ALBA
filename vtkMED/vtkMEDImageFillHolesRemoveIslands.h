@@ -63,6 +63,12 @@ public:
   /** Get the edge size of the areas that will be considered holes or islands */
   vtkGetMacro(EdgeSize,int);
 
+  /** Set if peninsula regions are removed or not */
+  vtkSetMacro(RemovePeninsulaRegions,bool);
+
+  /** Get if peninsula regions are removed or not  */
+  vtkGetMacro(RemovePeninsulaRegions,bool);
+
 protected:
 
   /** Execute this filter */
@@ -74,6 +80,7 @@ protected:
   int Algorithm;
   unsigned int EdgeSize;
   unsigned char DiscriminationPixelValue;
+  bool RemovePeninsulaRegions;
 
 private:
 
