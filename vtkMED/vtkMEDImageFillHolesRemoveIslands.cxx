@@ -16,13 +16,24 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #include "vtkObjectFactory.h"
 #include "vtkStructuredPoints.h"
 #include "vtkUnsignedCharArray.h"
+#include "vtkDoubleArray.h"
 #include "vtkPointData.h"
 #include <cassert>
+#include "vtkMAFSmartPointer.h"
+#include "vtkImageCast.h"
+#include "itkSignedMaurerDistanceMapImageFilter.h"
+#include "itkImageToVTKImageFilter.h"
+#include "itkVTKImageToImageFilter.h"
+#include "vtkStructuredPointsWriter.h"
 
 #define PENINSULA_CORNER_MAXIMUM_NUMBER_OF_PIXELS 1
 
 vtkCxxRevisionMacro(vtkMEDImageFillHolesRemoveIslands, "$Revision: 1.1.2.2 $");
 vtkStandardNewMacro(vtkMEDImageFillHolesRemoveIslands);
+
+typedef itk::Image< double, 2 > DoubleImage;
+typedef itk::Image< unsigned char, 2 > UCharImage;
+typedef itk::SignedMaurerDistanceMapImageFilter <UCharImage, DoubleImage > DistanceFilter;
 
 //----------------------------------------------------------------------------
 vtkMEDImageFillHolesRemoveIslands::vtkMEDImageFillHolesRemoveIslands()
@@ -82,7 +93,6 @@ void vtkMEDImageFillHolesRemoveIslands::Execute()
   // Start from first coordinates (xs,ys) where the value is different from discrimination value (not necessary depending on the same pixel)
   // End from last coordinates (xl,yl) where the value is different from discrimination value (not necessary depending on the same pixel)
 
-
   while(recognitionSquareEdge >= 3)
   {
     // (x0, y0) origin of the recognition square
@@ -101,16 +111,19 @@ void vtkMEDImageFillHolesRemoveIslands::Execute()
         {
           for(int x = x0; x < x0 + recognitionSquareEdge; x++)
           {
-            if(imgScalars->GetTuple1(y * imgDims[0] + x) != DiscriminationPixelValue)
+            //if(imgMapScalars->GetTuple1(y * imgDims[0] + x) <= 0)
             {
-              if(((x == x0 && y == y0) || (x == x0 + recognitionSquareEdge - 1 && y == y0) || (x == x0 && y == y0  + recognitionSquareEdge - 1) || (x == x0 + recognitionSquareEdge - 1 && y == y0  + recognitionSquareEdge - 1)) && RemovePeninsulaRegions) // Corner pixels
+              if((imgScalars->GetTuple1(y * imgDims[0] + x) != DiscriminationPixelValue))
               {
-                peninsulaConerNumberOfPixels++;
-              }
-              else
-              {
-                isolatedRegion = false;
-                break;
+                if(((x == x0 && y == y0) || (x == x0 + recognitionSquareEdge - 1 && y == y0) || (x == x0 && y == y0  + recognitionSquareEdge - 1) || (x == x0 + recognitionSquareEdge - 1 && y == y0  + recognitionSquareEdge - 1)) && RemovePeninsulaRegions) // Corner pixels
+                {
+                  peninsulaConerNumberOfPixels++;
+                }
+                else
+                {
+                  isolatedRegion = false;
+                  break;
+                }
               }
             }
           }
@@ -132,12 +145,15 @@ void vtkMEDImageFillHolesRemoveIslands::Execute()
           {
             for(int y = y0; y < y0 + recognitionSquareEdge; y++)
             {
-              if(imgScalars->GetTuple1(y * imgDims[0] + x) != DiscriminationPixelValue)
+              //if(imgMapScalars->GetTuple1(y * imgDims[0] + x) <= 0)
               {
-                if(!(((x == x0 && y == y0) || (x == x0 + recognitionSquareEdge - 1 && y == y0) || (x == x0 && y == y0  + recognitionSquareEdge - 1) || (x == x0 + recognitionSquareEdge - 1 && y == y0  + recognitionSquareEdge - 1)) && RemovePeninsulaRegions)) // Corner pixels
+                if((imgScalars->GetTuple1(y * imgDims[0] + x) != DiscriminationPixelValue))
                 {
-                  isolatedRegion = false;
-                  break;
+                  if(!(((x == x0 && y == y0) || (x == x0 + recognitionSquareEdge - 1 && y == y0) || (x == x0 && y == y0  + recognitionSquareEdge - 1) || (x == x0 + recognitionSquareEdge - 1 && y == y0  + recognitionSquareEdge - 1)) && RemovePeninsulaRegions)) // Corner pixels
+                  {
+                    isolatedRegion = false;
+                    break;
+                  }
                 }
               }
             }
@@ -156,7 +172,10 @@ void vtkMEDImageFillHolesRemoveIslands::Execute()
           {
             for(int x = x0 + 1; x < x0 + recognitionSquareEdge - 1; x++)
             {
-              imgScalars->SetTuple1(y * imgDims[0] + x, DiscriminationPixelValue);
+              //if(imgMapScalars->GetTuple1(y * imgDims[0] + x) <= 0)
+              {
+                imgScalars->SetTuple1(y * imgDims[0] + x, DiscriminationPixelValue);
+              }
             }
           }
         }

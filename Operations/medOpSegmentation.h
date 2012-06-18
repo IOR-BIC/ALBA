@@ -574,6 +574,8 @@ protected:
   int m_OldAutomaticUpperThreshold; //<Used to update real time threshold preview only if needed
 
   int m_RemovePeninsulaRegions; // Determine if refinement filter removes penisula regions or not
+  int m_OLdWindowingLow;        // Windowing original value to restore after exiting operation
+  int m_OLdWindowingHi;         // Windowing original value to restore after exiting operation
 
   /** Delete children of input vme if they are output of the input volume  */
   void DeleteOutputs(mafNode* vme);

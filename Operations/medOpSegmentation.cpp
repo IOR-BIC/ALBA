@@ -262,6 +262,9 @@ medOpSegmentation::medOpSegmentation(const wxString &label) : mafOp(label)
   m_OldAutomaticUpperThreshold = MAXINT;
 
   m_RemovePeninsulaRegions = FALSE;
+
+  m_OLdWindowingLow = -1;
+  m_OLdWindowingLow = -1;
 }
 //----------------------------------------------------------------------------
 medOpSegmentation::~medOpSegmentation()
@@ -505,6 +508,9 @@ void medOpSegmentation::RemoveVMEs()
 void medOpSegmentation::OpStop(int result)
 //----------------------------------------------------------------------------
 {
+  // Restore old windowing
+  m_ColorLUT->SetTableRange(m_OLdWindowingLow,m_OLdWindowingHi);
+
   //remove vme now on cancel on ok vme will be removed by opdo method
   if (result == OP_RUN_CANCEL)
   {
@@ -638,6 +644,10 @@ void medOpSegmentation::CreateOpDialog()
 
   mafVMEOutputVolume *volumeOutput = mafVMEOutputVolume::SafeDownCast(m_Volume->GetOutput());
   m_ColorLUT = volumeOutput->GetMaterial()->m_ColorLut;
+  double data[2];
+  m_ColorLUT->GetTableRange(data);
+  m_OLdWindowingLow = data[0];
+  m_OLdWindowingHi = data[1];
 
   m_LutWidget = new medGUILutHistogramSwatch(m_GuiDialog,m_GuiDialog->GetWidgetId(ID_LUT_CHOOSER), "LUT", m_Volume->GetOutput()->GetVTKData(), m_Volume->GetMaterial(),wxSize(135,18) );
   m_LutWidget->SetEditable(true);
@@ -1385,11 +1395,11 @@ void medOpSegmentation::CreateRefinementGui()
   m_RefinementRegionsSize = 1;
   //currentGui->Integer(ID_REFINEMENT_REGIONS_SIZE, mafString("Size"), &m_RefinementRegionsSize, 0, MAXINT, mafString("Max size of islands/holes to be taken into consideration"));
 
-  int stepsNumber = 5;
+  int stepsNumber = min(min(m_VolumeDimensions[0],m_VolumeDimensions[1]),m_VolumeDimensions[2]);
   int w_id = currentGui->GetWidgetId(ID_MANUAL_REFINEMENT_REGIONS_SIZE);
 
   int text_w   = 45*0.8;
-  int slider_w = 60;
+  int slider_w = 120;
 
   wxTextCtrl *refinementRegionSizeText = new wxTextCtrl (currentGui, w_id, "", wxDefaultPosition, wxSize(text_w,  18), wxSUNKEN_BORDER,wxDefaultValidator,"Size:");
   
@@ -2213,7 +2223,7 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
           m_ColorLUT->SetTableRange(low,hi);
           m_View->SetLut(m_Input,m_ColorLUT);
           m_View->CameraUpdate();
-          mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+          //mafEventMacro(mafEvent(this,CAMERA_UPDATE));
         }
         else if(e->GetSender() == m_AutomaticRangeSlider)
         {
