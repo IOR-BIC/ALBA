@@ -512,7 +512,7 @@ void medOpSegmentation::OpDo()
 
   //Generating Surface VME
   mafNEW(m_OutputSurface);
-  m_OutputSurface->SetName("Connected Threshold Surface");
+  m_OutputSurface->SetName(wxString::Format("Segmentation Surface (%s)",m_Volume->GetName()).c_str());
   m_OutputSurface->SetData(normalFilter->GetOutput(),mafVMEVolumeGray::SafeDownCast(m_Input)->GetTimeStamp());
   m_OutputSurface->ReparentTo(m_Input);
   m_OutputSurface->Modified();
