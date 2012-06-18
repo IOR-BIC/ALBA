@@ -21,7 +21,8 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #include <cassert>
 #include "vtkMAFSmartPointer.h"
 #include "vtkImageCast.h"
-#include "itkSignedMaurerDistanceMapImageFilter.h"
+#include "itkConnectedThresholdImageFilter.h"
+#include "itkOrImageFilter.h"
 #include "itkImageToVTKImageFilter.h"
 #include "itkVTKImageToImageFilter.h"
 #include "vtkStructuredPointsWriter.h"
@@ -33,7 +34,8 @@ vtkStandardNewMacro(vtkMEDImageFillHolesRemoveIslands);
 
 typedef itk::Image< double, 2 > DoubleImage;
 typedef itk::Image< unsigned char, 2 > UCharImage;
-typedef itk::SignedMaurerDistanceMapImageFilter <UCharImage, DoubleImage > DistanceFilter;
+typedef itk::ConnectedThresholdImageFilter <UCharImage, UCharImage > ConnectedThresholdFilter;
+typedef itk::OrImageFilter<UCharImage,UCharImage,UCharImage> OrFilter;
 
 //----------------------------------------------------------------------------
 vtkMEDImageFillHolesRemoveIslands::vtkMEDImageFillHolesRemoveIslands()
@@ -93,6 +95,67 @@ void vtkMEDImageFillHolesRemoveIslands::Execute()
   // Start from first coordinates (xs,ys) where the value is different from discrimination value (not necessary depending on the same pixel)
   // End from last coordinates (xl,yl) where the value is different from discrimination value (not necessary depending on the same pixel)
 
+  //-------------------------------------------------------------------------------------------------
+  vtkMAFSmartPointer<vtkImageCast> caster;
+  caster->SetOutputScalarTypeToUnsignedChar();
+  caster->SetInput(outputImage);
+  caster->Update();
+
+  int dims[3];
+
+  caster->GetOutput()->GetDimensions(dims);
+  ////
+
+  //// Convert vtk image to itk image
+  typedef itk::VTKImageToImageFilter<UCharImage> vtkImageDataToitkUcharImageFilter;
+  vtkImageDataToitkUcharImageFilter::Pointer vtkimage_converter = vtkImageDataToitkUcharImageFilter::New();
+  vtkimage_converter->SetInput(caster->GetOutput());
+  vtkimage_converter->Update();
+
+  caster->GetOutput()->GetDimensions(dims);
+
+  //// Flood Fill the exter of the shape
+  ConnectedThresholdFilter::Pointer connectedThreshold = ConnectedThresholdFilter::New();
+  connectedThreshold->SetLower(0);
+  connectedThreshold->SetUpper(100);
+ 
+  connectedThreshold->SetReplaceValue(DiscriminationPixelValue);
+ 
+  // Seed 1: (25, 35)
+  UCharImage::IndexType seed1;
+  seed1[0] = 0;
+  seed1[1] = 0;
+  connectedThreshold->SetSeed(seed1);
+  connectedThreshold->SetInput(vtkimage_converter->GetOutput());
+  connectedThreshold->Update();
+
+  OrFilter::Pointer or = OrFilter::New();
+  or->SetInput1(vtkimage_converter->GetOutput());
+  or->SetInput2(connectedThreshold->GetOutput());
+
+  //// Convert itk image to vtk image
+  typedef itk::ImageToVTKImageFilter<UCharImage> itkDoubleImageTovtkImageDataFilter;
+  itkDoubleImageTovtkImageDataFilter::Pointer itkimage_converter = itkDoubleImageTovtkImageDataFilter::New();
+  itkimage_converter->SetInput(or->GetOutput()); //binary_dilatator->GetOutput());
+  itkimage_converter->Update();
+  
+
+  //// Get the output image
+  vtkStructuredPoints *imageMap = ((vtkStructuredPoints*)itkimage_converter->GetOutput());
+  imageMap->Update();
+  //-------------------------------------------------------------------------------------------------
+
+  vtkUnsignedCharArray* imgMapScalars = (vtkUnsignedCharArray*)imageMap->GetPointData()->GetScalars();
+
+  /*
+  outputImage->GetPointData()->SetScalars(imgMapScalars);
+  outputImage->GetPointData()->Modified();
+  outputImage->GetPointData()->Update();
+  outputImage->UpdateData();
+  outputImage->Update();
+  return;
+  */
+
   while(recognitionSquareEdge >= 3)
   {
     // (x0, y0) origin of the recognition square
@@ -113,7 +176,7 @@ void vtkMEDImageFillHolesRemoveIslands::Execute()
           {
             //if(imgMapScalars->GetTuple1(y * imgDims[0] + x) <= 0)
             {
-              if((imgScalars->GetTuple1(y * imgDims[0] + x) != DiscriminationPixelValue))
+              if((imgMapScalars->GetTuple1(y * imgDims[0] + x) != DiscriminationPixelValue))
               {
                 if(((x == x0 && y == y0) || (x == x0 + recognitionSquareEdge - 1 && y == y0) || (x == x0 && y == y0  + recognitionSquareEdge - 1) || (x == x0 + recognitionSquareEdge - 1 && y == y0  + recognitionSquareEdge - 1)) && RemovePeninsulaRegions) // Corner pixels
                 {
@@ -147,7 +210,7 @@ void vtkMEDImageFillHolesRemoveIslands::Execute()
             {
               //if(imgMapScalars->GetTuple1(y * imgDims[0] + x) <= 0)
               {
-                if((imgScalars->GetTuple1(y * imgDims[0] + x) != DiscriminationPixelValue))
+                if((imgMapScalars->GetTuple1(y * imgDims[0] + x) != DiscriminationPixelValue))
                 {
                   if(!(((x == x0 && y == y0) || (x == x0 + recognitionSquareEdge - 1 && y == y0) || (x == x0 && y == y0  + recognitionSquareEdge - 1) || (x == x0 + recognitionSquareEdge - 1 && y == y0  + recognitionSquareEdge - 1)) && RemovePeninsulaRegions)) // Corner pixels
                   {
@@ -172,7 +235,7 @@ void vtkMEDImageFillHolesRemoveIslands::Execute()
           {
             for(int x = x0 + 1; x < x0 + recognitionSquareEdge - 1; x++)
             {
-              //if(imgMapScalars->GetTuple1(y * imgDims[0] + x) <= 0)
+              if(imgMapScalars->GetTuple1(y * imgDims[0] + x) != DiscriminationPixelValue)
               {
                 imgScalars->SetTuple1(y * imgDims[0] + x, DiscriminationPixelValue);
               }
