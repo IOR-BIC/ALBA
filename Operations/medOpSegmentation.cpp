@@ -100,6 +100,15 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #include "mafTagItem.h"
 #include "mafNode.h"
 
+
+#include "vtkMAFContourVolumeMapper.h"
+#include "vtkMEDFillingHole.h"
+#include "vtkTransformPolyDataFilter.h"
+#include "vtkTransform.h"
+#include "vtkWindowedSincPolyDataFilter.h"
+#include "vtkPolyDataNormals.h"
+
+
 #define max(a,b)(((a) > (b)) ? (a) : (b))
 #define min(a,b)(((a) < (b)) ? (a) : (b))
 #define round(x) (x<0?ceil((x)-0.5):floor((x)+0.5))
@@ -174,6 +183,7 @@ medOpSegmentation::medOpSegmentation(const wxString &label) : mafOp(label)
 
   m_ThresholdVolume           = NULL;
   m_OutputVolume              = NULL;
+  m_OutputSurface      =NULL;
 
   m_SER = NULL;
   m_DeviceManager = NULL;
@@ -274,6 +284,7 @@ medOpSegmentation::~medOpSegmentation()
   RemoveVMEs();
 
   mafDEL(m_OutputVolume);
+  mafDEL(m_OutputSurface);
   mafDEL(m_SegmentatedVolume);
 
   Superclass;
@@ -412,6 +423,109 @@ void medOpSegmentation::OpDo()
     m_OutputVolume->GetMaterial()->UpdateFromTables();
     m_OutputVolume->GetTagArray()->SetTag("SEGMENTATION_PARENT",wxString::Format("%d",m_Volume->GetId()).c_str(),MAF_STRING_TAG);
     m_OutputVolume->ReparentTo(m_Volume);
+   
+  m_OutputVolume->GetTagArray()->SetTag(mafTagItem("VOLUME_TYPE","BINARY"));
+
+
+  //GENERATIN SURFACE OUTPUT
+  wxBusyCursor wait_cursor;
+  wxBusyInfo wait(_("Wait! Generating Surface Output"));
+
+  vtkMAFSmartPointer<vtkMAFContourVolumeMapper> contourVolMapper;
+
+  contourVolMapper->SetInput(m_OutputVolume->GetOutput()->GetVTKData());
+  contourVolMapper->SetContourValue(127.5);
+  contourVolMapper->Update();
+
+  vtkMAFSmartPointer<vtkMEDFillingHole> fillingHoleFilter;
+  fillingHoleFilter->SetInput(contourVolMapper->GetOutput());
+  fillingHoleFilter->SetFillAllHole();  
+  fillingHoleFilter->SetFlatFill();		
+  fillingHoleFilter->Update();
+
+  vtkMAFSmartPointer<vtkWindowedSincPolyDataFilter> smoothFilter;
+
+  double bounds[6];
+  double traslation[3];
+  double scale[3];
+  //Transforming Surface in [-1,1],[-1,1],[-1,1] 
+  //To improve the numerical stability of the solution 
+  fillingHoleFilter->GetOutput()->GetBounds(bounds);
+  GetTransformFactor(true,bounds,scale,traslation);
+  vtkMAFSmartPointer<vtkTransform> transform;
+  transform->PostMultiply();
+  transform->Translate(traslation);
+  transform->Scale(scale);
+  vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformFilter;
+  transformFilter->SetTransform(transform);
+  transformFilter->SetInput(fillingHoleFilter->GetOutput());
+  transformFilter->Update();
+
+  //Taubin Smooth filter apply
+  smoothFilter->SetInput(transformFilter->GetOutput());
+  smoothFilter->SetFeatureAngle(30.0);
+  smoothFilter->SetBoundarySmoothing(0);
+  smoothFilter->SetNonManifoldSmoothing(0);
+  smoothFilter->SetFeatureEdgeSmoothing(0);
+  smoothFilter->SetNumberOfIterations(10);
+  smoothFilter->SetPassBand(0.1);
+  smoothFilter->Update();
+  smoothFilter->GetOutput()->Update();
+
+  //Transforming smoothed output in [-1,1],[-1,1],[-1,1] 
+  //To remove filter scaling/traslation artifact
+  smoothFilter->GetOutput()->GetBounds(bounds);
+  GetTransformFactor(true,bounds,scale,traslation);
+  vtkMAFSmartPointer<vtkTransform> transform2;
+  transform2->PostMultiply();
+  transform2->Translate(traslation);
+  transform2->Scale(scale);
+  vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformFilter2;
+  transformFilter2->SetTransform(transform2);
+  transformFilter2->SetInput(smoothFilter->GetOutput());
+  transformFilter2->Update();
+
+
+  //inverse transform to align outputs to original bounds 
+  fillingHoleFilter->GetOutput()->GetBounds(bounds);
+  GetTransformFactor(false,bounds,scale,traslation);
+  vtkMAFSmartPointer<vtkTransform> transform3;
+  //in this case we need to scale first to obtain the surface 
+  //at the original size and then we translate it to the original pos
+  transform3->PostMultiply();
+  transform3->Scale(scale);
+  transform3->Translate(traslation);
+  vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformFilter3;
+  transformFilter3->SetTransform(transform3);
+  transformFilter3->SetInput(transformFilter2->GetOutput());
+  transformFilter3->Update();
+
+  //Flipping normals for better surface view 
+  vtkMAFSmartPointer<vtkPolyDataNormals> normalFilter;
+  normalFilter->SetInput(transformFilter3->GetOutput());
+  normalFilter->ComputeCellNormalsOn();
+  normalFilter->FlipNormalsOn(); 
+  normalFilter->SetFeatureAngle(30.0);
+  normalFilter->SplittingOff();
+  normalFilter->Update();
+
+
+  //Generating Surface VME
+  mafNEW(m_OutputSurface);
+  m_OutputSurface->SetName("Connected Threshold Surface");
+  m_OutputSurface->SetData(normalFilter->GetOutput(),mafVMEVolumeGray::SafeDownCast(m_Input)->GetTimeStamp());
+  m_OutputSurface->ReparentTo(m_Input);
+  m_OutputSurface->Modified();
+  m_OutputSurface->Update();
+  
+  //Volume output is a child of surface out
+  //The result tree is Input
+  //                     |-Surface
+  //                          |-Binary volume
+  m_OutputVolume->ReparentTo(m_OutputSurface);
+
+  m_Output=m_OutputSurface;
+
   }
   RemoveVMEs();
   mafOp::OpDo();
@@ -4560,4 +4674,43 @@ bool medOpSegmentation::SegmentedVolumeAccept(mafNode* node)
   }
 
   return false;
+}
+
+//----------------------------------------------------------------------------
+void medOpSegmentation::GetTransformFactor( int toUnity,double *bounds, double *scale, double *traslation )
+//----------------------------------------------------------------------------
+{
+  double size[3];
+
+  //Getting size
+  size[0]=bounds[1]-bounds[0];
+  size[1]=bounds[3]-bounds[2];
+  size[2]=bounds[5]-bounds[4];
+
+  //Generating traslation and scale factors for obtain a [-1,1],[-1,1],[-1,1] cube
+  if (toUnity)
+  {
+    //Translation by -center 
+    traslation[0]=-(bounds[0]+size[0]/2.0);
+    traslation[1]=-(bounds[2]+size[1]/2.0);
+    traslation[2]=-(bounds[4]+size[2]/2.0);
+
+    //Scale by 2/size (2 is because a [-1,1] side has lenght 2)
+    scale[0]=2.0/size[0];
+    scale[1]=2.0/size[1];
+    scale[2]=2.0/size[2];
+  }
+  else 
+  {
+    //Translation by +center 
+    traslation[0]=bounds[0]+size[0]/2.0;
+    traslation[1]=bounds[2]+size[1]/2.0;
+    traslation[2]=bounds[4]+size[2]/2.0;
+
+    //scale by size/2
+    scale[0]=size[0]*0.5;
+    scale[1]=size[1]*0.5;
+    scale[2]=size[2]*0.5;
+  }
+
 }
