@@ -196,8 +196,8 @@ void medOpExtractGeometry::CreateExtractSurfaceGui()
   m_ExtractSurfaceGui->Label(mafString("Surface Processing"), true);
   m_ExtractSurfaceGui->Divider();
 
-  wxString processingType[2] = {"Poisson", "Fill Holes",};
-  m_ExtractSurfaceGui->Combo(ID_PROCESSING_TYPE, "", &m_ProcessingType, 2, processingType);
+  wxString processingType[3] = {"Poisson", "Fill Holes","No filter"};
+  m_ExtractSurfaceGui->Combo(ID_PROCESSING_TYPE, "", &m_ProcessingType, 3, processingType);
 
 
   //////////////////////////////////////////////////////////////////////////
@@ -645,7 +645,7 @@ int medOpExtractGeometry::GenerateIsosurface()
     fixTopologyFilter->Update();
     m_SurfaceData->DeepCopy(fixTopologyFilter->GetOutput());
   }
-  else
+  else if (m_ProcessingType==1)
   {
     vtkMEDFillingHole *fillingHoleFilter;
     vtkNEW(fillingHoleFilter);
