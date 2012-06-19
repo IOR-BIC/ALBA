@@ -1021,6 +1021,7 @@ bool medOpSegmentation::ApplyRefinementFilter2(vtkStructuredPoints *inputImage, 
   filter->Delete();
   return true;
 }
+
 //----------------------------------------------------------------------------
 bool medOpSegmentation::ApplyRefinementFilter(vtkStructuredPoints *inputImage, vtkStructuredPoints *outputImage)
 //----------------------------------------------------------------------------
@@ -1305,14 +1306,14 @@ void medOpSegmentation::CreateManualSegmentationGui()
   //////////////////////////////////////////////////////////////////////////
   // Brush Editing options
   //////////////////////////////////////////////////////////////////////////
-
+  
   wxStaticBoxSizer *brushEditingSizer = new wxStaticBoxSizer(wxVERTICAL, currentGui, "Brush Options");
   
   // BRUSH SHAPE
   wxString shapes[2];
   shapes[0] = wxString("circle");
   shapes[1] = wxString("square");
-  int w_id = currentGui->GetWidgetId(ID_MANUAL_BRUSH_SHAPE);;
+  int w_id = currentGui->GetWidgetId(ID_MANUAL_BRUSH_SHAPE);
 
   wxBoxSizer *brushShapesSizer = new wxBoxSizer(wxHORIZONTAL);
   wxStaticText *brushShapeLab = new wxStaticText(currentGui, w_id, "Shape");
@@ -1354,16 +1355,13 @@ void medOpSegmentation::CreateManualSegmentationGui()
 
   brushEditingSizer->Add(brushShapesSizer, 0, wxALL, 1);
   brushEditingSizer->Add(brushSizeSizer, 0, wxALL, 1);
- 
-  currentGui->Add(brushEditingSizer, wxALIGN_CENTER_HORIZONTAL);
-  
-  currentGui->TwoButtons(ID_MANUAL_UNDO,ID_MANUAL_REDO,"Undo","Redo");
 
+  currentGui->Add(brushEditingSizer, wxALIGN_CENTER_HORIZONTAL);
+  currentGui->TwoButtons(ID_MANUAL_UNDO,ID_MANUAL_REDO,"Undo","Redo");
 
   m_SegmentationOperationsGui[MANUAL_SEGMENTATION] = currentGui;
 
   EnableManualSegmentationGui();
-
 }
 
 //----------------------------------------------------------------------------
