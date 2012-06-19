@@ -88,11 +88,23 @@ mafOp(label)
 
   m_DefaultDensity = 1.0;
   m_Mass = 0.0;
-  m_I1 = 0.0;
-  m_I2 = 0.0;
-  m_I3 = 0.0;
+  m__Principal_I1 = 0.0;
+  m_Principal_I2 = 0.0;
+  m_Principal_I3 = 0.0;
   m_Accuracy = 1000;
   m_Vtkcomp = 1;
+
+  m_InertialTensor[0] += 0;
+  m_InertialTensor[1] += 0;
+  m_InertialTensor[2] += 0;
+
+  m_InertialTensor[3] += 0;
+  m_InertialTensor[4] += 0;
+  m_InertialTensor[5] += 0;
+
+  m_InertialTensor[6] += 0;
+  m_InertialTensor[7] += 0;
+  m_InertialTensor[8] += 0;
 
   m_MethodToUse = GEOMETRY;
 }
@@ -128,13 +140,23 @@ void medOpComputeInertialTensor::OpDo()
 //----------------------------------------------------------------------------
 {
   mafVME* vme = (mafVME*) m_Input;
-  if (!vme->GetTagArray()->IsTagPresent("INERTIAL_TENSOR_COMPONENTS_[I1,I2,I3]"))
+  
+  if (!vme->GetTagArray()->IsTagPresent("PRINCIPAL_INERTIAL_TENSOR_COMPONENTS"))
   {
-    if (m_TagTensor.GetNumberOfComponents()>0)
+    if (m_PrincipalInertialTensorTag.GetNumberOfComponents()>0)
     {
-      vme->GetTagArray()->SetTag(m_TagTensor);
+      vme->GetTagArray()->SetTag(m_PrincipalInertialTensorTag);
     }
   }
+
+  if (!vme->GetTagArray()->IsTagPresent("INERTIAL_TENSOR_COMPONENTS"))
+  {
+	  if (m_InertialTensorTag.GetNumberOfComponents()>0)
+	  {
+		  vme->GetTagArray()->SetTag(m_InertialTensorTag);
+	  }
+  }
+  
   if (!vme->GetTagArray()->IsTagPresent("SURFACE_MASS"))
   {
     if (m_TagMass.GetNumberOfComponents()>0)
@@ -149,9 +171,12 @@ void medOpComputeInertialTensor::OpUndo()
 //----------------------------------------------------------------------------
 {
   mafVME* vme = (mafVME*) m_Input;
-  vme->GetTagArray()->GetTag("INERTIAL_TENSOR_COMPONENTS_[I1,I2,I3]",m_TagTensor);
+  vme->GetTagArray()->GetTag("PRINCIPAL_INERTIAL_TENSOR_COMPONENTS",m_PrincipalInertialTensorTag);
+  vme->GetTagArray()->GetTag("INERTIAL_TENSOR_COMPONENTS",m_InertialTensorTag);
   vme->GetTagArray()->GetTag("SURFACE_MASS",m_TagMass);
-  vme->GetTagArray()->DeleteTag("INERTIAL_TENSOR_COMPONENTS_[I1,I2,I3]");
+
+  vme->GetTagArray()->DeleteTag("PRINCIPAL_INERTIAL_TENSOR_COMPONENTS");
+  vme->GetTagArray()->DeleteTag("INERTIAL_TENSOR_COMPONENTS");
   vme->GetTagArray()->DeleteTag("SURFACE_MASS");
 }
 //----------------------------------------------------------------------------
@@ -213,16 +238,28 @@ void medOpComputeInertialTensor::AddAttributes()
 //----------------------------------------------------------------------------
 {
 	//save results in vme attributes
-	std::vector<double> vec_comp;
-	vec_comp.push_back(m_I1);
-	vec_comp.push_back(m_I2);
-	vec_comp.push_back(m_I3);
+	std::vector<double> principalInertialTensorComponents;
+	principalInertialTensorComponents.push_back(m__Principal_I1);
+	principalInertialTensorComponents.push_back(m_Principal_I2);
+	principalInertialTensorComponents.push_back(m_Principal_I3);
 
-	mafTagItem tag;
-	tag.SetName("INERTIAL_TENSOR_COMPONENTS_[I1,I2,I3]");
-	tag.SetNumberOfComponents(3);
-	tag.SetComponents(vec_comp);
-	m_Input->GetTagArray()->SetTag(tag);
+	mafTagItem tagPrincipalInertialTensor;
+	tagPrincipalInertialTensor.SetName("PRINCIPAL_INERTIAL_TENSOR_COMPONENTS");
+	tagPrincipalInertialTensor.SetNumberOfComponents(principalInertialTensorComponents.size());
+	tagPrincipalInertialTensor.SetComponents(principalInertialTensorComponents);
+	m_Input->GetTagArray()->SetTag(tagPrincipalInertialTensor);
+
+	std::vector<double> inertialTensorComponents;
+	for (int i = 0 ; i < 9 ; i++)
+	{
+		inertialTensorComponents.push_back(m_InertialTensor[i]);
+	}
+
+	mafTagItem tagInertialTensor;
+	tagInertialTensor.SetName("INERTIAL_TENSOR_COMPONENTS");
+	tagInertialTensor.SetNumberOfComponents(inertialTensorComponents.size());
+	tagInertialTensor.SetComponents(inertialTensorComponents);
+	m_Input->GetTagArray()->SetTag(tagInertialTensor);
 
 	mafTagItem tagm;
 	tagm.SetName("SURFACE_MASS");
@@ -645,6 +682,18 @@ int medOpComputeInertialTensor::ComputeInertialTensorUsingGeometry(mafNode* node
   a1[0] = Iyx; a1[1] = Iyy; a1[2] = Izy;
   a2[0] = Izx; a2[1] = Izy; a2[2] = Izz;
 
+  m_InertialTensor[0] += Ixx;
+  m_InertialTensor[1] += Iyx;
+  m_InertialTensor[2] += Izx;
+
+  m_InertialTensor[3] += Iyx;
+  m_InertialTensor[4] += Iyy;
+  m_InertialTensor[5] += Izy;
+
+  m_InertialTensor[6] += Izx;
+  m_InertialTensor[7] += Izy;
+  m_InertialTensor[8] += Izz;
+
   // by the spectral theorem, since the moment of inertia tensor is real and symmetric, there exists a Cartesian coordinate system in which it is diagonal,
   // the coordinate axes are called the principal axes and the constants I1, I2 and I3 are called the principal moments of inertia. 
   // extract eigenvalues from jacobian matorix (inertial tensor components referred to principal axes).
@@ -677,9 +726,9 @@ int medOpComputeInertialTensor::ComputeInertialTensorUsingGeometry(mafNode* node
   double scale = density;
 
   // Fill results
-  m_I1 += scale*eval[0];
-  m_I2 += scale*eval[1];
-  m_I3 += scale*eval[2];
+  m__Principal_I1 += scale*eval[0];
+  m_Principal_I2 += scale*eval[1];
+  m_Principal_I3 += scale*eval[2];
 
   // store the mass for later use
   double mass = scale * m;
@@ -928,6 +977,18 @@ int medOpComputeInertialTensor::ComputeInertialTensorUsingMonteCarlo(mafNode* no
   a[2][1] = hycube_m*ph_t32ratio;
   a[2][2] = hycube_m*ph_t33ratio;
 
+
+  m_InertialTensor[0] += a[0][0];
+  m_InertialTensor[1] += a[0][1];
+  m_InertialTensor[2] += a[0][2];
+  m_InertialTensor[3] += a[1][0];
+  m_InertialTensor[4] += a[1][1];
+  m_InertialTensor[5] += a[1][2];
+  m_InertialTensor[6] += a[2][0];
+  m_InertialTensor[7] += a[2][1];
+  m_InertialTensor[8] += a[2][2];
+
+
   mafString ss;
   
   // by the spectral theorem, since the moment of inertia tensor is real and symmetric, there exists a Cartesian coordinate system in which it is diagonal,
@@ -936,9 +997,9 @@ int medOpComputeInertialTensor::ComputeInertialTensorUsingMonteCarlo(mafNode* no
   double eval[3];  
   vtkMath::Jacobi(a,eval,v);
 
-  m_I1 += scale*eval[0];
-  m_I2 += scale*eval[1];
-  m_I3 += scale*eval[2];
+  m__Principal_I1 += scale*eval[0];
+  m_Principal_I2 += scale*eval[1];
+  m_Principal_I3 += scale*eval[2];
 
   if(!m_TestMode)
   {

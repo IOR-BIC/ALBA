@@ -209,6 +209,9 @@ public:
   /** Return true if node is of type mafVMEVolume. */
   static bool SegmentedVolumeAccept(mafNode* node);
 
+  /** Returns the output Volume*/
+  mafVMEVolumeGray *GetOutputVolume(){return m_OutputVolume;};
+
 protected:
 
   /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
@@ -374,6 +377,7 @@ protected:
   mafVMEVolumeGray *m_ThresholdVolumeSlice; //<Single slice volume mask for real-time thresholding preview
   mafVMEVolumeGray *m_EmptyVolumeSlice; //<Single slice volume that represent current slice (for real-time thresholding preview)
   mafVMEVolumeGray *m_OutputVolume;     //<Output volume
+  mafVMESurface *m_OutputSurface;          //<Output Surface
   wxStaticText *m_SnippetsLabel;        //<Suggestion labels - GUI
   medInteractorSegmentationPicker *m_SegmentationPicker; //<Segmentation picker for interaction
 
@@ -583,6 +587,10 @@ protected:
 
   /** Determine if the specified vme is an output of the input volume */
   bool IsOutput(mafNode* vme);
+
+  /** Caluclates the scale/traslation to obtain a cube in [-1,1], 
+      If toUnity is set to false returns the inverse factors*/
+  void GetTransformFactor(int toUnity,double *bounds, double *scale, double *traslation);
 
 };
 #endif

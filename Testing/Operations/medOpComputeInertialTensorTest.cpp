@@ -118,7 +118,7 @@ void medOpComputeInertialTensorTest::TestAddAttributes()
   op->AddAttributes();
 
   // test attributes
-  CPPUNIT_ASSERT(surface->GetTagArray()->IsTagPresent("INERTIAL_TENSOR_COMPONENTS_[I1,I2,I3]"));
+  CPPUNIT_ASSERT(surface->GetTagArray()->IsTagPresent("PRINCIPAL_INERTIAL_TENSOR_COMPONENTS"));
   CPPUNIT_ASSERT(surface->GetTagArray()->IsTagPresent("SURFACE_MASS"));
 
   mafDEL(op);
@@ -152,7 +152,7 @@ void medOpComputeInertialTensorTest::TestComputeInertialTensorFromDefaultValue()
   double tagValue = -1;
 
   mafTagItem tag;
-  surface->GetTagArray()->GetTag("INERTIAL_TENSOR_COMPONENTS_[I1,I2,I3]",tag);
+  surface->GetTagArray()->GetTag("PRINCIPAL_INERTIAL_TENSOR_COMPONENTS",tag);
 
   tagValue = tag.GetValueAsDouble(0);
 
@@ -215,14 +215,14 @@ void medOpComputeInertialTensorTest::TestComputeInertialTensorFromGroupFromDefau
   op->AddAttributes();
 
   mafTagItem tag;
-  group->GetTagArray()->GetTag("INERTIAL_TENSOR_COMPONENTS_[I1,I2,I3]",tag);
+  group->GetTagArray()->GetTag("PRINCIPAL_INERTIAL_TENSOR_COMPONENTS",tag);
   CPPUNIT_ASSERT(tag.GetNumberOfComponents()==3);
   group->GetTagArray()->GetTag("SURFACE_MASS",tag);
   CPPUNIT_ASSERT(tag.GetNumberOfComponents()==1);
 
   double tagValue = -1;
 
-  group->GetTagArray()->GetTag("INERTIAL_TENSOR_COMPONENTS_[I1,I2,I3]",tag);
+  group->GetTagArray()->GetTag("PRINCIPAL_INERTIAL_TENSOR_COMPONENTS",tag);
 
   tagValue = tag.GetValueAsDouble(0);
 
@@ -254,7 +254,7 @@ void medOpComputeInertialTensorTest::TestComputeInertialTensorFromGroupFromDefau
   child0->GetTagArray()->GetTag("SURFACE_MASS",tag);
   CPPUNIT_ASSERT(tag.GetNumberOfComponents()==1);
 
-  CPPUNIT_ASSERT( child0->GetTagArray()->GetTag("INERTIAL_TENSOR_COMPONENTS_[I1,I2,I3]") == NULL);
+  CPPUNIT_ASSERT( child0->GetTagArray()->GetTag("PRINCIPAL_INERTIAL_TENSOR_COMPONENTS") == NULL);
 
   mafNode *child1 = NULL;
   child1 = group->GetChild(1);
@@ -271,7 +271,7 @@ void medOpComputeInertialTensorTest::TestComputeInertialTensorFromGroupFromDefau
   tagValue = tag.GetValueAsDouble(0);
   CPPUNIT_ASSERT(30.403272694462050 == tagValue);
 
-  CPPUNIT_ASSERT( child1->GetTagArray()->GetTag("INERTIAL_TENSOR_COMPONENTS_[I1,I2,I3]") == NULL);
+  CPPUNIT_ASSERT( child1->GetTagArray()->GetTag("PRINCIPAL_INERTIAL_TENSOR_COMPONENTS") == NULL);
   
   mafDEL(op);
   mafDEL(group);
@@ -305,13 +305,15 @@ void medOpComputeInertialTensorTest::TestOpDoUndo()
   op->OpUndo();
 
   // test undo 
-  CPPUNIT_ASSERT(!surface->GetTagArray()->IsTagPresent("INERTIAL_TENSOR_COMPONENTS_[I1,I2,I3]"));
+  CPPUNIT_ASSERT(!surface->GetTagArray()->IsTagPresent("PRINCIPAL_INERTIAL_TENSOR_COMPONENTS"));
+  CPPUNIT_ASSERT(!surface->GetTagArray()->IsTagPresent("INERTIAL_TENSOR_COMPONENTS"));
   CPPUNIT_ASSERT(!surface->GetTagArray()->IsTagPresent("SURFACE_MASS"));
 
   op->OpDo();
 
   // test do
-  CPPUNIT_ASSERT(surface->GetTagArray()->IsTagPresent("INERTIAL_TENSOR_COMPONENTS_[I1,I2,I3]"));
+  CPPUNIT_ASSERT(surface->GetTagArray()->IsTagPresent("PRINCIPAL_INERTIAL_TENSOR_COMPONENTS"));
+  CPPUNIT_ASSERT(surface->GetTagArray()->IsTagPresent("INERTIAL_TENSOR_COMPONENTS"));
   CPPUNIT_ASSERT(surface->GetTagArray()->IsTagPresent("SURFACE_MASS"));
 
   mafDEL(op);
@@ -352,7 +354,7 @@ void medOpComputeInertialTensorTest::TestComputeInertialTensorFromDENSITYTag()
 	double tagValue = -1;
 
 	mafTagItem tag;
-	surface->GetTagArray()->GetTag("INERTIAL_TENSOR_COMPONENTS_[I1,I2,I3]",tag);
+	surface->GetTagArray()->GetTag("PRINCIPAL_INERTIAL_TENSOR_COMPONENTS",tag);
 
 	tagValue = tag.GetValueAsDouble(0);
 
@@ -419,14 +421,14 @@ void medOpComputeInertialTensorTest::TestComputeInertialTensorFromGroupFromDENSI
 	op->AddAttributes();
 
 	mafTagItem tag;
-	group->GetTagArray()->GetTag("INERTIAL_TENSOR_COMPONENTS_[I1,I2,I3]",tag);
+	group->GetTagArray()->GetTag("PRINCIPAL_INERTIAL_TENSOR_COMPONENTS",tag);
 	CPPUNIT_ASSERT(tag.GetNumberOfComponents()==3);
 	group->GetTagArray()->GetTag("SURFACE_MASS",tag);
 	CPPUNIT_ASSERT(tag.GetNumberOfComponents()==1);
 
 	double tagValue = -1;
 
-	group->GetTagArray()->GetTag("INERTIAL_TENSOR_COMPONENTS_[I1,I2,I3]",tag);
+	group->GetTagArray()->GetTag("PRINCIPAL_INERTIAL_TENSOR_COMPONENTS",tag);
 
 	tagValue = tag.GetValueAsDouble(0);
 

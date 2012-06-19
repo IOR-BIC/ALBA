@@ -89,6 +89,9 @@ public:
   void SetSeed(int *seed);
   /** Get the seed */
   void GetSeed(int *seed);
+
+  /** Returns the output Volume*/
+  mafVMEVolumeGray *GetOutputVolume(){return m_VolumeOut;};
     
 protected:
   /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
@@ -102,6 +105,10 @@ protected:
   
   /** Check the spacing and if is too little and could create some memory problems return false */
   bool CheckSpacing();
+
+  /** Caluclates the scale/traslation to obtain a cube in [-1,1], 
+      If toUnity is set to false returns the inverse factors*/
+  void GetTransformFactor(int toUnity,double *bounds, double *scale, double *traslation);
 
   int m_Lower;
   int m_Upper;
@@ -119,7 +126,9 @@ protected:
   mafInteractor       *m_OldBehavior;
 
   mafVMEVolumeGray *m_VolumeOut;
+  mafVMESurface *m_SurfaceOut;
   mafVMESurface *m_Sphere;
+  
 
   vtkSphereSource *m_SphereVTK;
 
