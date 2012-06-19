@@ -152,9 +152,16 @@ protected:
   
   double  m_DefaultDensity;                            // Material density
   double  m_Mass;                               // Material mass
-  double  m_I1,m_I2,m_I3;                    // Tensor components.
+  double  m__Principal_I1,m_Principal_I2,m_Principal_I3;  // Principal Inertial Tensor components.
+  
+  /* Inertial tensor
+  | Ixx  Iyx  Izx |
+  | Iyx  Iyy  Izy | 
+  | Izx  Izy  Izz | */
+  double m_InertialTensor[9]; // [Ixx  Iyx  Izx ,  Iyx  Iyy  Izy , Izx  Izy  Izz]
+  mafTagItem m_InertialTensorTag;
 
-  mafTagItem m_TagTensor;
+  mafTagItem m_PrincipalInertialTensorTag;
   mafTagItem m_TagMass;
 
   int m_MethodToUse;
