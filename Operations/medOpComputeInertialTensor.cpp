@@ -94,17 +94,17 @@ mafOp(label)
   m_Accuracy = 1000;
   m_Vtkcomp = 1;
 
-  m_InertialTensor[0] += 0;
-  m_InertialTensor[1] += 0;
-  m_InertialTensor[2] += 0;
+  m_InertialTensor[0] = 0;
+  m_InertialTensor[1] = 0;
+  m_InertialTensor[2] = 0;
 
-  m_InertialTensor[3] += 0;
-  m_InertialTensor[4] += 0;
-  m_InertialTensor[5] += 0;
+  m_InertialTensor[3] = 0;
+  m_InertialTensor[4] = 0;
+  m_InertialTensor[5] = 0;
 
-  m_InertialTensor[6] += 0;
-  m_InertialTensor[7] += 0;
-  m_InertialTensor[8] += 0;
+  m_InertialTensor[6] = 0;
+  m_InertialTensor[7] = 0;
+  m_InertialTensor[8] = 0;
 
   m_MethodToUse = GEOMETRY;
 }
@@ -682,17 +682,6 @@ int medOpComputeInertialTensor::ComputeInertialTensorUsingGeometry(mafNode* node
   a1[0] = Iyx; a1[1] = Iyy; a1[2] = Izy;
   a2[0] = Izx; a2[1] = Izy; a2[2] = Izz;
 
-  m_InertialTensor[0] += Ixx;
-  m_InertialTensor[1] += Iyx;
-  m_InertialTensor[2] += Izx;
-
-  m_InertialTensor[3] += Iyx;
-  m_InertialTensor[4] += Iyy;
-  m_InertialTensor[5] += Izy;
-
-  m_InertialTensor[6] += Izx;
-  m_InertialTensor[7] += Izy;
-  m_InertialTensor[8] += Izz;
 
   // by the spectral theorem, since the moment of inertia tensor is real and symmetric, there exists a Cartesian coordinate system in which it is diagonal,
   // the coordinate axes are called the principal axes and the constants I1, I2 and I3 are called the principal moments of inertia. 
@@ -725,7 +714,20 @@ int medOpComputeInertialTensor::ComputeInertialTensorUsingGeometry(mafNode* node
 
   double scale = density;
 
-  // Fill results
+  // scale the inertial tensor with the density
+  m_InertialTensor[0] += scale * Ixx;
+  m_InertialTensor[1] += scale * Iyx;
+  m_InertialTensor[2] += scale * Izx;
+
+  m_InertialTensor[3] += scale * Iyx;
+  m_InertialTensor[4] += scale * Iyy;
+  m_InertialTensor[5] += scale * Izy;
+
+  m_InertialTensor[6] += scale * Izx;
+  m_InertialTensor[7] += scale * Izy;
+  m_InertialTensor[8] += scale * Izz;
+
+  // scale the principal inertial tensor components with the density
   m__Principal_I1 += scale*eval[0];
   m_Principal_I2 += scale*eval[1];
   m_Principal_I3 += scale*eval[2];
@@ -977,18 +979,6 @@ int medOpComputeInertialTensor::ComputeInertialTensorUsingMonteCarlo(mafNode* no
   a[2][1] = hycube_m*ph_t32ratio;
   a[2][2] = hycube_m*ph_t33ratio;
 
-
-  m_InertialTensor[0] += a[0][0];
-  m_InertialTensor[1] += a[0][1];
-  m_InertialTensor[2] += a[0][2];
-  m_InertialTensor[3] += a[1][0];
-  m_InertialTensor[4] += a[1][1];
-  m_InertialTensor[5] += a[1][2];
-  m_InertialTensor[6] += a[2][0];
-  m_InertialTensor[7] += a[2][1];
-  m_InertialTensor[8] += a[2][2];
-
-
   mafString ss;
   
   // by the spectral theorem, since the moment of inertia tensor is real and symmetric, there exists a Cartesian coordinate system in which it is diagonal,
@@ -997,9 +987,21 @@ int medOpComputeInertialTensor::ComputeInertialTensorUsingMonteCarlo(mafNode* no
   double eval[3];  
   vtkMath::Jacobi(a,eval,v);
 
+  // scale the principal inertial tensor
   m__Principal_I1 += scale*eval[0];
   m_Principal_I2 += scale*eval[1];
   m_Principal_I3 += scale*eval[2];
+
+  // scale the inertial tensor
+  m_InertialTensor[0] += scale * a[0][0];
+  m_InertialTensor[1] += scale * a[0][1];
+  m_InertialTensor[2] += scale * a[0][2];
+  m_InertialTensor[3] += scale * a[1][0];
+  m_InertialTensor[4] += scale * a[1][1];
+  m_InertialTensor[5] += scale * a[1][2];
+  m_InertialTensor[6] += scale * a[2][0];
+  m_InertialTensor[7] += scale * a[2][1];
+  m_InertialTensor[8] += scale * a[2][2];
 
   if(!m_TestMode)
   {
