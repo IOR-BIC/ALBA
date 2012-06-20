@@ -41,6 +41,8 @@ vtkMEDBinaryImageFloodFill::vtkMEDBinaryImageFloodFill()
   Seed[0] = 0;
   Seed[1] = 0;
   Seed[2] = 0;
+  Threshold[0] = OFF_PIXEL;
+  Threshold[1] = (ON_PIXEL - OFF_PIXEL) / 2;
 }
 
 //----------------------------------------------------------------------------
