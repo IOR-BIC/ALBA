@@ -48,6 +48,7 @@ vtkMEDImageFillHolesRemoveIslands::~vtkMEDImageFillHolesRemoveIslands()
 void vtkMEDImageFillHolesRemoveIslands::SetAlgorithm(int algorithm)
 //----------------------------------------------------------------------------
 {
+  // set the filter algorithm 
   assert(algorithm < INVALID_ALGORITHM && algorithm >= 0);
   Algorithm = algorithm;
   switch (Algorithm)
@@ -89,7 +90,9 @@ void vtkMEDImageFillHolesRemoveIslands::Execute()
   flood_fill->SetInput(input);
   flood_fill->Update();
 
+  // get flood fill scalars
   vtkUnsignedCharArray* filled_scalars = (vtkUnsignedCharArray*)flood_fill->GetOutput()->GetPointData()->GetScalars();
+  // get output scalars
   vtkUnsignedCharArray* output_scalars = (vtkUnsignedCharArray*)output->GetPointData()->GetScalars();
 
   while(recognitionSquareEdge >= 3)
@@ -112,7 +115,7 @@ void vtkMEDImageFillHolesRemoveIslands::Execute()
             {
               if(((x == x0 && y == y0) || (x == x0 + recognitionSquareEdge - 1 && y == y0) || (x == x0 && y == y0  + recognitionSquareEdge - 1) || (x == x0 + recognitionSquareEdge - 1 && y == y0  + recognitionSquareEdge - 1)) && RemovePeninsulaRegions) // Corner pixels
               {
-                peninsulaConerNumberOfPixels++;
+                peninsulaConerNumberOfPixels++; // update the number of "corner pixel"
               }
               else
               {
@@ -128,7 +131,7 @@ void vtkMEDImageFillHolesRemoveIslands::Execute()
         }
         if(peninsulaConerNumberOfPixels > PENINSULA_CORNER_MAXIMUM_NUMBER_OF_PIXELS && isolatedRegion == true)
         {
-          isolatedRegion = false;
+          isolatedRegion = false; // not isolated region is not a peninsula
         }
 
         // check x sides

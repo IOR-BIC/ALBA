@@ -155,6 +155,7 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
     // BaseIndex is the current slice first point index
     BaseIndex = nearestIndex;
 
+    // Number of pieces for image data is = 1
     NumberOfPieces = 1;
     SlicePieceDimensions[0][0] = SliceDimensions[0];
     SlicePieceDimensions[0][1] = SliceDimensions[1];
@@ -271,18 +272,21 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
     double pieceSpacings[MAX_NUMBER_OF_PIECES][2];
     int numberOfPieces[2] = {0,0};
 
+    // Get the pieces that have the same spacing:
+    // so rg can be visualized as "a couple" of image data
     for(int i = 0; i < 2; i++)
     {
       double pieceSpacing = -1; // invalid value
       double pieceSize = 0;
       for(int c = 0; c < CoordsXY[i]->GetNumberOfTuples() - 1 && numberOfPieces[i] < MAX_NUMBER_OF_PIECES; c++)
       {
+        // Get spacing and number of pieces
         double spacing = CoordsXY[i]->GetTuple1(c + 1) - CoordsXY[i]->GetTuple1(c);
         if(pieceSpacing == -1)
         {
           pieceSpacing = spacing;
         }
-        if(abs(spacing - pieceSpacing) < 0.01)
+        if(abs(spacing - pieceSpacing) < 0.01) // necessary because of vtk conversion errors
         {
           if(spacing > pieceSpacing)
           {
@@ -318,6 +322,7 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
       {
         for(int y = 0; y < numberOfPieces[1]; y++)
         {
+          // calculate piece origin
           int reachedDimension = 0;
           if(x > 0)
           {
@@ -346,6 +351,7 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
           {
             sliceOriginY[y] = CoordsXY[1]->GetTuple1(0);
           }
+          // Update global attributes
           SlicePieceDimensions[x + numberOfPieces[0] * y][0] = pieceDimensions[x][0];
           SlicePieceDimensions[x + numberOfPieces[0] * y][1] = pieceDimensions[y][1];
           SlicePieceSpacings[x + numberOfPieces[0] * y][0] = pieceSpacings[x][0];
@@ -359,11 +365,13 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
   }
   if(NumberOfPieces < MAX_NUMBER_OF_PIECES)
   {
+    // output data type is image data also for rg
     OutputDataType = VTK_IMAGE_DATA;
     SetNumberOfOutputs(NumberOfPieces);
   }
   else
   {
+    // if number of pieces is greater than MAX_NUMBER_OF_PIECES use the old rg representation
     OutputDataType = VTK_RECTILINEAR_GRID;
     NumberOfPieces = 1;
   }
@@ -378,6 +386,8 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
 void vtkMEDVolumeSlicerNotInterpolated::AddOutputsAttributes(int dimension, double spacing, int** dimensions, double** spacings, int size)
 //----------------------------------------------------------------------------
 {
+  // Convenince method to add output attribute
+  // Unused @ToDo remove it
   int *newDimensions = new int[size + 1];
   double *newSpacing = new double[size + 1];
 
@@ -413,7 +423,7 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteData(vtkImageData *output)
 {
   int iStart = 0;
   int jStart = 0;
-  for(int idx = 0; idx < NumberOfPieces; idx++)
+  for(int idx = 0; idx < NumberOfPieces; idx++) // iterate over pieces
   {
     vtkDataSet* input = NULL;
     if ((input = GetInput()) == NULL || this->GetNumberOfOutputs() == 0 && OutputDataType == VTK_IMAGE_DATA)
@@ -443,6 +453,7 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteData(vtkImageData *output)
     }
 
     // Prepare output scalars
+    // of the same type of the input scalars
     vtkDataArray *scalars = NULL;
     switch (inputScalars->GetDataType()) 
     {
@@ -480,16 +491,19 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteData(vtkImageData *output)
       return;
     }
 
+    // get dimensions
     int dimensions[3];
     dimensions[AxisX] = SlicePieceDimensions[idx][0];
     dimensions[AxisY] = SlicePieceDimensions[idx][1];
     dimensions[SliceAxis] = 1;
 
+    // get the spacing
     double spacing[3];
     spacing[AxisX] = SlicePieceSpacings[idx][0];
     spacing[AxisY] = SlicePieceSpacings[idx][1];
     spacing[SliceAxis] = 1;
 
+    // update scalars attribute
     scalars->SetNumberOfComponents(inputScalars->GetNumberOfComponents());
     scalars->SetName("SCALARS");
 
@@ -507,11 +521,14 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteData(vtkImageData *output)
     {
       for(int i = 0; i < iLenght; i++)
       {
+        // calculate right index
         int index[2] = {i + iStart,j + jStart};
         double *tuple = inputScalars->GetTuple(index[0] * iFactor + index[1] * jFactor + BaseIndex);
         vtkIdType sid = scalars->InsertNextTuple(tuple);
       }
     }
+    
+    // Indeces to computer the righ scalars
     iStart += (iLenght-1);
     if(iStart >= InputDimensions[AxisX] - 1)
     {

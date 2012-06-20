@@ -36,6 +36,7 @@ vtkStandardNewMacro(vtkMEDBinaryImageFloodFill);
 vtkMEDBinaryImageFloodFill::vtkMEDBinaryImageFloodFill()
 //----------------------------------------------------------------------------
 {
+  // initialize attributes to default
   ReplaceValue = ON_PIXEL;
   Seed[0] = 0;
   Seed[1] = 0;
@@ -52,6 +53,7 @@ vtkMEDBinaryImageFloodFill::~vtkMEDBinaryImageFloodFill()
 void vtkMEDBinaryImageFloodFill::Execute()
 //------------------------------------------------------------------------------
 {
+  // get input
   vtkStructuredPoints *input = (vtkStructuredPoints*)this->GetInput();
   input->Update();
 
@@ -59,6 +61,8 @@ void vtkMEDBinaryImageFloodFill::Execute()
   int dims[3];
   input->GetDimensions(dims);
   int image_dimension = 0;
+  
+  // calculate image dimensionality
   for(int i = 0; i < 3; i++)
   {
     if(dims[i] > 1)
@@ -69,6 +73,7 @@ void vtkMEDBinaryImageFloodFill::Execute()
   
   vtkStructuredPoints *intermediate_output = NULL;
   
+  // call the right flood fill template function
   switch(image_dimension)
   {
     case 0:
@@ -89,6 +94,7 @@ void vtkMEDBinaryImageFloodFill::Execute()
       } break;
   }
   
+  // prepare output
   vtkStructuredPoints *output = this->GetOutput();
   output->DeepCopy(intermediate_output);
   output->UpdateData();
@@ -115,10 +121,12 @@ vtkStructuredPoints *vtkMEDBinaryImageFloodFill::FloodFill(vtkStructuredPoints *
   caster->SetInput(input);
   caster->Update();
 
+  // Convert vtk image to itk
   Vtk2Itk::Pointer vtk2Itk = Vtk2Itk::New();
   vtk2Itk->SetInput(caster->GetOutput());
   vtk2Itk->Update();
 
+  // flood fill filter
   ConnectedThreshold::Pointer connectedThreshold = ConnectedThreshold::New();
   connectedThreshold->SetLower(Threshold[0]);
   connectedThreshold->SetUpper(Threshold[1]);
@@ -133,11 +141,13 @@ vtkStructuredPoints *vtkMEDBinaryImageFloodFill::FloodFill(vtkStructuredPoints *
   connectedThreshold->SetInput(vtk2Itk->GetOutput());
   connectedThreshold->Update();
 
+  // or filter to sum original image with flood filled one
   Or::Pointer or = Or::New();
   or->SetInput1(vtk2Itk->GetOutput());
   or->SetInput2(connectedThreshold->GetOutput());
   or->Update();
 
+  // convert itk to vtk
   Itk2Vtk::Pointer itk2Vtk = Itk2Vtk::New();
   itk2Vtk->SetInput(or->GetOutput());
   itk2Vtk->Update();
