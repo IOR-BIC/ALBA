@@ -26,6 +26,7 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #include "itkVTKImageToImageFilter.h"
 #include "itkConnectedThresholdImageFilter.h"
 #include "itkOrImageFilter.h"
+#include "itkSubtractImageFilter.h"
 #include "itkImageToVTKImageFilter.h"
 
 vtkCxxRevisionMacro(vtkMEDBinaryImageFloodFill, "$Revision: 1.1.2.2 $");
@@ -117,6 +118,7 @@ vtkStructuredPoints *vtkMEDBinaryImageFloodFill::FloodFill(vtkStructuredPoints *
   typedef itk::VTKImageToImageFilter< UChar > Vtk2Itk;
   typedef itk::ConnectedThresholdImageFilter < UChar, UChar > ConnectedThreshold;
   typedef itk::OrImageFilter< UChar, UChar, UChar > Or;
+  typedef itk::SubtractImageFilter< UChar, UChar, UChar > Difference;
   typedef itk::ImageToVTKImageFilter< UChar > Itk2Vtk;
 
   // must cast the image before pass it to the itk pipeline
@@ -159,7 +161,12 @@ vtkStructuredPoints *vtkMEDBinaryImageFloodFill::FloodFill(vtkStructuredPoints *
   }
   else
   {
-    itk2Vtk->SetInput(connectedThreshold->GetOutput());
+    // or filter to sum original image with flood filled one
+    Difference::Pointer difference = Difference::New();
+    difference->SetInput1(vtk2Itk->GetOutput());
+    difference->SetInput2(connectedThreshold->GetOutput());
+    difference->Update();
+    itk2Vtk->SetInput(difference->GetOutput());
   }
   
   itk2Vtk->Update();

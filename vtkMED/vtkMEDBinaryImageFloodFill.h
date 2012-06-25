@@ -38,10 +38,10 @@ public:
   static vtkMEDBinaryImageFloodFill *New();
 
   /** Set the filter to fill the "picked" area */
-  inline void SetFill(){ReplaceValue = ON_PIXEL; Threshold[0] = OFF_PIXEL; Threshold[1] = (ON_PIXEL - OFF_PIXEL) / 2; Erase = false;};
+  inline void SetFill(){/*ReplaceValue = ON_PIXEL;*/ Threshold[0] = OFF_PIXEL; Threshold[1] = (ON_PIXEL - OFF_PIXEL) / 2; Erase = false;};
 
   /** Set the filter to erase the "picked" area */
-  inline void SetErase(){ReplaceValue = OFF_PIXEL; Threshold[0] = (ON_PIXEL - OFF_PIXEL) / 2; Threshold[1] = ON_PIXEL; Erase = true;};
+  inline void SetErase(){/*ReplaceValue = OFF_PIXEL;*/ Threshold[0] = (ON_PIXEL - OFF_PIXEL) / 2; Threshold[1] = ON_PIXEL; Erase = true;};
 
 
   /** Set the filter to erase the "picked" area */
