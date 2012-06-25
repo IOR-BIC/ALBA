@@ -107,6 +107,7 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #include "vtkTransform.h"
 #include "vtkWindowedSincPolyDataFilter.h"
 #include "vtkPolyDataNormals.h"
+#include "vtkMEDBinaryImageFloodFill.h"
 
 
 #define max(a,b)(((a) > (b)) ? (a) : (b))
@@ -275,6 +276,12 @@ medOpSegmentation::medOpSegmentation(const wxString &label) : mafOp(label)
 
   m_OLdWindowingLow = -1;
   m_OLdWindowingLow = -1;
+
+  m_GlobalFloodFill = FALSE;
+  m_FloodErease = FALSE;
+
+  m_ManualSegmentationTools  = 0;
+  m_ManualBucketActions = 0;
 }
 //----------------------------------------------------------------------------
 medOpSegmentation::~medOpSegmentation()
@@ -812,8 +819,6 @@ void medOpSegmentation::CreateOpDialog()
   CreateManualSegmentationGui();
   CreateRefinementGui();
   
-
-  
   m_SegmentationOperationsRollOut[LOAD_SEGMENTATION]        = m_GuiDialog->RollOut(ID_LOAD_SEGMENTATION, "Load Segmentation", m_SegmentationOperationsGui[LOAD_SEGMENTATION], false);
   m_SegmentationOperationsRollOut[AUTOMATIC_SEGMENTATION]   = m_GuiDialog->RollOut(ID_AUTO_SEGMENTATION, "Thresholding", m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION], false);
   m_SegmentationOperationsRollOut[MANUAL_SEGMENTATION]      = m_GuiDialog->RollOut(ID_MANUAL_SEGMENTATION, "Manual Segmentation", m_SegmentationOperationsGui[MANUAL_SEGMENTATION], false);
@@ -945,6 +950,74 @@ void medOpSegmentation::DeleteOpDialog()
 
 }
 
+
+//----------------------------------------------------------------------------
+void medOpSegmentation::FloodFill(int seed[3])
+//----------------------------------------------------------------------------
+{
+  
+    if(m_GlobalFloodFill == TRUE)
+    {
+      vtkStructuredPoints *input = vtkStructuredPoints::New();
+      double dimensions[3];
+      dimensions[0] = m_VolumeDimensions[0];
+      dimensions[1] = m_VolumeDimensions[1];
+      dimensions[2] = m_VolumeDimensions[2];
+      //dimensions[m_CurrentSlicePlane] = 1;
+      input->SetExtent(0,dimensions[0]-1,0,dimensions[1]-1,0,dimensions[2]-1);
+
+      input->SetSpacing(m_VolumeSpacing);
+      input->SetOrigin(0,0,0);
+
+      m_ManualVolumeMask->GetOutput()->GetVTKData()->GetPointData()->Update();
+      input->SetScalarTypeToUnsignedChar();
+      input->GetPointData()->SetScalars(m_ManualVolumeMask->GetOutput()->GetVTKData()->GetPointData()->GetScalars());
+
+      vtkStructuredPoints *output = vtkStructuredPoints::New();
+      output->CopyStructure(input);
+      output->DeepCopy(input);
+
+      ApplyFloodFill(input,output,seed);
+
+      m_ManualVolumeMask->GetOutput()->GetVTKData()->GetPointData()->SetScalars(output->GetPointData()->GetScalars());
+      m_ManualVolumeMask->Update();
+
+      UpdateSlice();
+
+      m_View->CameraUpdate();
+    }
+    else
+    {
+      vtkStructuredPoints *input = vtkStructuredPoints::New();
+      double dimensions[3];
+      dimensions[0] = m_VolumeDimensions[0];
+      dimensions[1] = m_VolumeDimensions[1];
+      dimensions[2] = m_VolumeDimensions[2];
+      dimensions[m_CurrentSlicePlane] = 1;
+      input->SetExtent(0,dimensions[0]-1,0,dimensions[1]-1,0,dimensions[2]-1);
+
+      input->SetSpacing(m_VolumeSpacing);
+      input->SetOrigin(0,0,0);
+
+      m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->Update();
+      input->SetScalarTypeToUnsignedChar();
+      input->GetPointData()->SetScalars(m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->GetScalars());
+
+      vtkStructuredPoints *output = vtkStructuredPoints::New();
+      output->CopyStructure(input);
+      output->DeepCopy(input);
+
+      ApplyFloodFill(input,output,seed);
+
+      m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->SetScalars(output->GetPointData()->GetScalars());
+      m_ManualVolumeSlice->Update();
+      m_View->VmeShow(m_ManualVolumeSlice,true);
+
+      CreateRealDrawnImage();
+      m_View->CameraUpdate();
+
+    }
+}
 
 //----------------------------------------------------------------------------
 bool medOpSegmentation::Refinement()
@@ -1134,6 +1207,21 @@ bool medOpSegmentation::ApplyRefinementFilter2(vtkStructuredPoints *inputImage, 
   outputImage->Update();
   filter->Delete();
   return true;
+}
+
+//----------------------------------------------------------------------------
+void medOpSegmentation::ApplyFloodFill(vtkStructuredPoints *inputImage, vtkStructuredPoints *outputImage, int seed[3])
+//----------------------------------------------------------------------------
+{
+  vtkMEDBinaryImageFloodFill *filter = vtkMEDBinaryImageFloodFill::New();
+  filter->SetInput(inputImage);
+  filter->SetSeed(seed);
+  filter->SetFillErease(m_FloodErease == TRUE);
+
+  filter->Update();
+  outputImage->DeepCopy(filter->GetOutput());
+  outputImage->Update();
+  filter->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -1417,6 +1505,23 @@ void medOpSegmentation::CreateManualSegmentationGui()
 
   mafGUI *currentGui = new mafGUI(this);
 
+  wxString tools[2];
+  tools[0] = wxString("brush");
+  tools[1] = wxString("bucket");
+  int w_id = currentGui->GetWidgetId(ID_MANUAL_TOOLS);
+
+  wxBoxSizer *manualToolsSizer = new wxBoxSizer(wxHORIZONTAL);
+  wxStaticText *manualToolsLab = new wxStaticText(currentGui, w_id, "Tools");
+
+  wxRadioBox *manualToolsRadioBox = new wxRadioBox(currentGui, w_id, "",wxDefaultPosition, wxSize(130,-1), 2, tools, 2);
+  manualToolsRadioBox->SetValidator( mafGUIValidator(currentGui, w_id, manualToolsRadioBox, &m_ManualSegmentationTools) );
+  manualToolsSizer->Add( manualToolsLab,  0, wxRIGHT, 5);
+  manualToolsSizer->Add(manualToolsRadioBox,0, wxRIGHT, 2);
+
+   wxBoxSizer * manualToolsVSizer = new wxBoxSizer(wxVERTICAL);
+   manualToolsVSizer->Add(manualToolsSizer, 0, wxALL, 1);
+
+
   //////////////////////////////////////////////////////////////////////////
   // Brush Editing options
   //////////////////////////////////////////////////////////////////////////
@@ -1427,7 +1532,7 @@ void medOpSegmentation::CreateManualSegmentationGui()
   wxString shapes[2];
   shapes[0] = wxString("circle");
   shapes[1] = wxString("square");
-  int w_id = currentGui->GetWidgetId(ID_MANUAL_BRUSH_SHAPE);
+  w_id = currentGui->GetWidgetId(ID_MANUAL_BRUSH_SHAPE);
 
   wxBoxSizer *brushShapesSizer = new wxBoxSizer(wxHORIZONTAL);
   wxStaticText *brushShapeLab = new wxStaticText(currentGui, w_id, "Shape");
@@ -1470,7 +1575,32 @@ void medOpSegmentation::CreateManualSegmentationGui()
   brushEditingSizer->Add(brushShapesSizer, 0, wxALL, 1);
   brushEditingSizer->Add(brushSizeSizer, 0, wxALL, 1);
 
+
+  //////////////////////////////////////////////////////////////////////////
+  // bucket Editing options
+  //////////////////////////////////////////////////////////////////////////
+
+  wxStaticBoxSizer *bucketEditingSizer = new wxStaticBoxSizer(wxVERTICAL, currentGui, "Bucket Options");
+
+  // BRUSH SHAPE
+  wxString bucketActions[2];
+  bucketActions[0] = wxString("fill");
+  bucketActions[1] = wxString("erase");
+  w_id = currentGui->GetWidgetId(ID_MANUAL_BUCKET_ACTION);
+
+  wxBoxSizer *bucketActionsSizer = new wxBoxSizer(wxHORIZONTAL);
+  wxStaticText *bucketActionsLab = new wxStaticText(currentGui, w_id, "Action");
+
+  wxRadioBox *bucketActionsRadioBox = new wxRadioBox(currentGui, w_id, "",wxDefaultPosition, wxSize(130,-1), 2, shapes, 2);
+  bucketActionsRadioBox->SetValidator( mafGUIValidator(currentGui, w_id, bucketActionsRadioBox, &m_ManualBucketActions) );
+  bucketActionsSizer->Add(bucketActionsLab,  0, wxRIGHT, 5);
+  bucketActionsSizer->Add(bucketActionsRadioBox,0, wxRIGHT, 2);
+  bucketEditingSizer->Add(bucketActionsSizer, 0, wxALL, 1);
+
+  currentGui->Add(manualToolsVSizer, 0, wxALL, 1);
   currentGui->Add(brushEditingSizer, wxALIGN_CENTER_HORIZONTAL);
+  currentGui->Add(bucketEditingSizer, wxALIGN_CENTER_HORIZONTAL);
+  /*currentGui->Bool(-1,"Global",&m_GlobalFloodFill,1,"");*/
   currentGui->TwoButtons(ID_MANUAL_UNDO,ID_MANUAL_REDO,"Undo","Redo");
 
   m_SegmentationOperationsGui[MANUAL_SEGMENTATION] = currentGui;
@@ -1749,6 +1879,7 @@ void medOpSegmentation::OnManualStep()
 
   wxCursor cursor = wxCursor( wxCURSOR_PENCIL );
   m_View->GetWindow()->SetCursor(cursor);
+
   m_ManualPER->EnableDrawing(true);
 
   m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_PICKING_MODALITY, m_CurrentSlicePlane);
@@ -2061,7 +2192,7 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
     else if (e->GetSender() == m_ManualPER && e->GetId()== MOUSE_MOVE)
     {
       UndoBrushPreview();
-      if(e->GetDouble() > m_CurrentBrushMoveEventCount)
+      if(e->GetDouble() > m_CurrentBrushMoveEventCount && m_ManualSegmentationTools == 0)
       {
         m_CurrentBrushMoveEventCount = e->GetDouble();
         int oldAction = m_ManualSegmentationAction;
@@ -2289,13 +2420,75 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         }
         //Picking during manual segmentation
         if(m_CurrentOperation == MANUAL_SEGMENTATION)
-          StartDraw(e, false);
+        {
+          if(m_ManualSegmentationTools == 1) // bucket
+          {
+            int id;
+            id = e->GetArg();
+            int seed[3];
+            double seedCoords[3];
+            double origin[3];
+            vtkDataSet * dataSet = m_ManualVolumeMask->GetOutput()->GetVTKData();
+            dataSet->GetPoint(id,seedCoords);
+            dataSet->GetPoint(0,origin);
+
+            vtkImageData* im = vtkImageData::SafeDownCast(dataSet);
+            vtkRectilinearGrid* rg = vtkRectilinearGrid::SafeDownCast(dataSet);
+            if(im != NULL)
+            {
+              double spacing[3];
+              im->GetSpacing(spacing);
+              seed[0] = (seedCoords[0] - origin[0]) / spacing[0];
+              seed[1] = (seedCoords[1] - origin[1]) / spacing[1];
+              seed[2] = (seedCoords[2] - origin[2]) / spacing[2];
+            }
+            else if(rg)
+            {
+              vtkDoubleArray* xa = (vtkDoubleArray*)rg->GetXCoordinates();
+              vtkDoubleArray* ya = (vtkDoubleArray*)rg->GetYCoordinates();
+              vtkDoubleArray* za = (vtkDoubleArray*)rg->GetZCoordinates();
+
+              for(int x = 0; x < xa->GetSize(); x++)
+              {
+                if(xa->GetTuple1(x) == seedCoords[0])
+                {
+                  seed[0] = x;
+                  break;
+                }
+              }
+              for(int y = 0; y < ya->GetSize(); y++)
+              {
+                if(ya->GetTuple1(y) == seedCoords[1])
+                {
+                  seed[1] = y;
+                  break;
+                }
+              }
+              for(int z = 0; z < za->GetSize(); z++)
+              {
+                if(za->GetTuple1(z) == seedCoords[2])
+                {
+                  seed[2] = z;
+                  break;
+                }
+              }
+            }
+            FloodFill(seed);
+            CreateRealDrawnImage();
+          }
+          
+          //----------
+          else // brush
+          {
+            StartDraw(e, false);
+          }
+        }
         m_CurrentBrushMoveEventCount = 0;
         break;
       }
     case VME_PICKING:
       {
-        if(m_CurrentOperation == MANUAL_SEGMENTATION)
+        if(m_CurrentOperation == MANUAL_SEGMENTATION && m_ManualSegmentationTools == 0)
         {          
           OnBrushEvent(e);
           m_ManualVolumeSlice->GetOutput()->GetVTKData()->Update();
@@ -2928,6 +3121,22 @@ void medOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
 {
   switch(e->GetId())
   {
+  case ID_MANUAL_TOOLS:
+    {
+      if(m_ManualSegmentationTools == 0)
+      {
+        wxCursor cursor = wxCursor( wxCURSOR_PENCIL );
+        m_View->GetWindow()->SetCursor(cursor);
+      }
+      else
+      {
+        wxCursor cursor = wxCursor( wxCURSOR_SPRAYCAN );
+        m_View->GetWindow()->SetCursor(cursor);
+        UndoBrushPreview();
+        OnEventUpdateManualSlice();
+      }
+    }
+    break;
   case ID_MANUAL_BRUSH_SHAPE:
     {
       m_ManualBrushShape = m_ManualBrushShapeRadioBox->GetSelection();

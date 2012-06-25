@@ -16,6 +16,7 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 
 #include "vtkObjectFactory.h"
 #include "vtkStructuredPoints.h"
+#include "vtkStructuredPointsWriter.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkPointData.h"
 #include "vtkImageCast.h"
@@ -56,9 +57,15 @@ void vtkMEDBinaryImageFloodFill::Execute()
 //------------------------------------------------------------------------------
 {
   // get input
+  vtkStructuredPointsWriter *w = vtkStructuredPointsWriter::New();
+
   vtkStructuredPoints *input = (vtkStructuredPoints*)this->GetInput();
   input->Update();
-
+  w->SetInput(input);
+  w->SetFileName("D:\\MyGit\\data\\floodFill_input.vtk");
+  w->Update();
+  w->Write();
+ 
   // Get the image dimensions based on input
   int dims[3];
   input->GetDimensions(dims);
@@ -103,6 +110,13 @@ void vtkMEDBinaryImageFloodFill::Execute()
   output->Update();
   this->SetOutput(output);
   intermediate_output->Delete();
+
+  w->SetInput(output);
+  w->SetFileName("D:\\MyGit\\data\\floodFill_output.vtk");
+  w->Update();
+  w->Write();
+
+  w->Delete();
 }
 //------------------------------------------------------------------------------
 template <unsigned int ImageDimension>
@@ -155,6 +169,8 @@ vtkStructuredPoints *vtkMEDBinaryImageFloodFill::FloodFill(vtkStructuredPoints *
   itk2Vtk->Update();
 
   vtkStructuredPoints *output = vtkStructuredPoints::New();
+  output->CopyInformation(input);
+  output->CopyStructure(input);
   output->DeepCopy(itk2Vtk->GetOutput());
 
   return output;

@@ -111,9 +111,10 @@ public:
 	  ID_PRE_VOLUME_SPACING,
 	  ID_PRE_VOLUME_ZERO_VALUE,
     ID_MANUAL_PICKING_MODALITY,
-    ID_MANUAL_ACTION,
+    ID_MANUAL_TOOLS,
     ID_MANUAL_BRUSH_SHAPE,
     ID_MANUAL_BRUSH_SIZE,
+    ID_MANUAL_BUCKET_ACTION,
     ID_MANUAL_REFINEMENT_REGIONS_SIZE,
     ID_MANUAL_CANCEL,
     ID_MANUAL_UNDO, 
@@ -434,6 +435,8 @@ protected:
   wxRadioBox *m_ManualBrushShapeRadioBox;     //<Brush shape radio - GUI
   mafGUIButton *m_ManualApplyChanges;         //<Apply changes button - GUI
   int m_ManualSegmentationAction;             //<Manual segmentation action (draw/erease)
+  int m_ManualSegmentationTools;              //<Manual segmentation tools (bucket/brush)
+  int m_ManualBucketActions;
   int m_ManualBrushShape;                     //<Brush shape
   double m_ManualBrushSize;                   //<Brush size
   int m_ManualRefinementRegionsSize;          //<Refinement region size
@@ -578,9 +581,12 @@ protected:
   int m_OldAutomaticThreshold;      //<Used to update real time threshold preview only if needed
   int m_OldAutomaticUpperThreshold; //<Used to update real time threshold preview only if needed
 
-  int m_RemovePeninsulaRegions; // Determine if refinement filter removes penisula regions or not
-  int m_OLdWindowingLow;        // Windowing original value to restore after exiting operation
-  int m_OLdWindowingHi;         // Windowing original value to restore after exiting operation
+  int m_RemovePeninsulaRegions; //<Determine if refinement filter removes penisula regions or not
+  int m_OLdWindowingLow;        //<Windowing original value to restore after exiting operation
+  int m_OLdWindowingHi;         //<Windowing original value to restore after exiting operation
+
+  int m_GlobalFloodFill;  //<
+  int m_FloodErease;      //<
 
   /** Delete children of input vme if they are output of the input volume  */
   void DeleteOutputs(mafNode* vme);
@@ -591,6 +597,10 @@ protected:
   /** Caluclates the scale/traslation to obtain a cube in [-1,1], 
       If toUnity is set to false returns the inverse factors*/
   void GetTransformFactor(int toUnity,double *bounds, double *scale, double *traslation);
+
+  /** */
+  void FloodFill(int seed[3]);
+  void ApplyFloodFill(vtkStructuredPoints *inputImage, vtkStructuredPoints *outputImage, int seed[3]);
 
 };
 #endif
