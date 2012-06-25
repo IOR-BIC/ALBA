@@ -61,7 +61,7 @@ protected:
   unsigned char ReplaceValue; //> ON_PIXEL for fill OFF_PIXEL for erease
   unsigned char Threshold[2]; //> threshold for connectivity threshold filter
   int Seed[3];                //> point that identify the area
-  bool Erase;                //> Determine if fill or erase
+  bool Erase;                 //> Determine if fill or erase
 
 private:
 

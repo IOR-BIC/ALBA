@@ -1615,9 +1615,15 @@ void medOpSegmentation::CreateManualSegmentationGui()
 
   wxRadioBox *bucketActionsRadioBox = new wxRadioBox(currentGui, w_id, "",wxDefaultPosition, wxSize(130,-1), 2, bucketActions, 2);
   bucketActionsRadioBox->SetValidator( mafGUIValidator(currentGui, w_id, bucketActionsRadioBox, &m_ManualBucketActions) );
+
+  w_id = currentGui->GetWidgetId(ID_MANUAL_BUCKET_GLOBAL);
+  wxCheckBox *globalCheck = new wxCheckBox(currentGui,w_id,"Global");
+  globalCheck->SetValidator(mafGUIValidator(currentGui, w_id, globalCheck, &m_GlobalFloodFill));
+
   bucketActionsSizer->Add(bucketActionsLab,  0, wxRIGHT, 5);
   bucketActionsSizer->Add(bucketActionsRadioBox,0, wxRIGHT, 2);
   bucketEditingSizer->Add(bucketActionsSizer, 0, wxALL, 1);
+  bucketEditingSizer->Add(globalCheck, 0, wxALL, 1);
 
   currentGui->Add(manualToolsVSizer, 0, wxALL, 1);
   currentGui->Add(brushEditingSizer, wxALIGN_CENTER_HORIZONTAL);
