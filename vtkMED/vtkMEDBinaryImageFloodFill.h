@@ -38,14 +38,14 @@ public:
   static vtkMEDBinaryImageFloodFill *New();
 
   /** Set the filter to fill the "picked" area */
-  inline void SetFill(){ReplaceValue = ON_PIXEL; Threshold[0] = OFF_PIXEL; Threshold[1] = (ON_PIXEL - OFF_PIXEL) / 2;};
+  inline void SetFill(){ReplaceValue = ON_PIXEL; Threshold[0] = OFF_PIXEL; Threshold[1] = (ON_PIXEL - OFF_PIXEL) / 2; Erase = false;};
 
-  /** Set the filter to erease the "picked" area */
-  inline void SetErease(){ReplaceValue = OFF_PIXEL; Threshold[0] = (ON_PIXEL - OFF_PIXEL) / 2; Threshold[1] = ON_PIXEL;};
+  /** Set the filter to erase the "picked" area */
+  inline void SetErase(){ReplaceValue = OFF_PIXEL; Threshold[0] = (ON_PIXEL - OFF_PIXEL) / 2; Threshold[1] = ON_PIXEL; Erase = true;};
 
 
-  /** Set the filter to erease the "picked" area */
-  inline void SetFillErease(bool erease){if(!erease){SetFill();}else{SetErease();}};
+  /** Set the filter to erase the "picked" area */
+  inline void SetFillErase(bool erase){if(!erase){SetFill();}else{SetErase();}};
 
   /** Set the seed that identify the area */
   vtkSetVectorMacro(Seed, int, 3);
@@ -61,6 +61,7 @@ protected:
   unsigned char ReplaceValue; //> ON_PIXEL for fill OFF_PIXEL for erease
   unsigned char Threshold[2]; //> threshold for connectivity threshold filter
   int Seed[3];                //> point that identify the area
+  bool Erase;                //> Determine if fill or erase
 
 private:
 

@@ -44,6 +44,7 @@ vtkMEDBinaryImageFloodFill::vtkMEDBinaryImageFloodFill()
   Seed[2] = 0;
   Threshold[0] = OFF_PIXEL;
   Threshold[1] = (ON_PIXEL - OFF_PIXEL) / 2;
+  Erase = false;
 }
 
 //----------------------------------------------------------------------------
@@ -57,15 +58,9 @@ void vtkMEDBinaryImageFloodFill::Execute()
 //------------------------------------------------------------------------------
 {
   // get input
-  vtkStructuredPointsWriter *w = vtkStructuredPointsWriter::New();
-
   vtkStructuredPoints *input = (vtkStructuredPoints*)this->GetInput();
   input->Update();
-  w->SetInput(input);
-  w->SetFileName("D:\\MyGit\\data\\floodFill_input.vtk");
-  w->Update();
-  w->Write();
- 
+
   // Get the image dimensions based on input
   int dims[3];
   input->GetDimensions(dims);
@@ -110,13 +105,6 @@ void vtkMEDBinaryImageFloodFill::Execute()
   output->Update();
   this->SetOutput(output);
   intermediate_output->Delete();
-
-  w->SetInput(output);
-  w->SetFileName("D:\\MyGit\\data\\floodFill_output.vtk");
-  w->Update();
-  w->Write();
-
-  w->Delete();
 }
 //------------------------------------------------------------------------------
 template <unsigned int ImageDimension>
@@ -157,15 +145,23 @@ vtkStructuredPoints *vtkMEDBinaryImageFloodFill::FloodFill(vtkStructuredPoints *
   connectedThreshold->SetInput(vtk2Itk->GetOutput());
   connectedThreshold->Update();
 
-  // or filter to sum original image with flood filled one
-  Or::Pointer or = Or::New();
-  or->SetInput1(vtk2Itk->GetOutput());
-  or->SetInput2(connectedThreshold->GetOutput());
-  or->Update();
-
   // convert itk to vtk
   Itk2Vtk::Pointer itk2Vtk = Itk2Vtk::New();
-  itk2Vtk->SetInput(or->GetOutput());
+
+  if(!Erase)
+  {
+    // or filter to sum original image with flood filled one
+    Or::Pointer or = Or::New();
+    or->SetInput1(vtk2Itk->GetOutput());
+    or->SetInput2(connectedThreshold->GetOutput());
+    or->Update();
+    itk2Vtk->SetInput(or->GetOutput());
+  }
+  else
+  {
+    itk2Vtk->SetInput(connectedThreshold->GetOutput());
+  }
+  
   itk2Vtk->Update();
 
   vtkStructuredPoints *output = vtkStructuredPoints::New();

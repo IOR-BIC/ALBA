@@ -1216,7 +1216,15 @@ void medOpSegmentation::ApplyFloodFill(vtkStructuredPoints *inputImage, vtkStruc
   vtkMEDBinaryImageFloodFill *filter = vtkMEDBinaryImageFloodFill::New();
   filter->SetInput(inputImage);
   filter->SetSeed(seed);
-  filter->SetFillErease(m_FloodErease == TRUE);
+
+  m_FloodErease = FALSE;
+  if(m_ManualBucketActions == 1)
+  {
+    m_FloodErease = TRUE;
+  }
+
+  
+  filter->SetFillErase(m_FloodErease == TRUE);
 
   filter->Update();
   outputImage->DeepCopy(filter->GetOutput());
@@ -1591,7 +1599,7 @@ void medOpSegmentation::CreateManualSegmentationGui()
   wxBoxSizer *bucketActionsSizer = new wxBoxSizer(wxHORIZONTAL);
   wxStaticText *bucketActionsLab = new wxStaticText(currentGui, w_id, "Action");
 
-  wxRadioBox *bucketActionsRadioBox = new wxRadioBox(currentGui, w_id, "",wxDefaultPosition, wxSize(130,-1), 2, shapes, 2);
+  wxRadioBox *bucketActionsRadioBox = new wxRadioBox(currentGui, w_id, "",wxDefaultPosition, wxSize(130,-1), 2, bucketActions, 2);
   bucketActionsRadioBox->SetValidator( mafGUIValidator(currentGui, w_id, bucketActionsRadioBox, &m_ManualBucketActions) );
   bucketActionsSizer->Add(bucketActionsLab,  0, wxRIGHT, 5);
   bucketActionsSizer->Add(bucketActionsRadioBox,0, wxRIGHT, 2);
