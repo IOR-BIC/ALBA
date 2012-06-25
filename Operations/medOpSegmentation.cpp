@@ -955,68 +955,82 @@ void medOpSegmentation::DeleteOpDialog()
 void medOpSegmentation::FloodFill(int seed[3])
 //----------------------------------------------------------------------------
 {
-  
-    if(m_GlobalFloodFill == TRUE)
-    {
-      vtkStructuredPoints *input = vtkStructuredPoints::New();
-      double dimensions[3];
-      dimensions[0] = m_VolumeDimensions[0];
-      dimensions[1] = m_VolumeDimensions[1];
-      dimensions[2] = m_VolumeDimensions[2];
-      //dimensions[m_CurrentSlicePlane] = 1;
-      input->SetExtent(0,dimensions[0]-1,0,dimensions[1]-1,0,dimensions[2]-1);
+  UndoBrushPreview();
 
-      input->SetSpacing(m_VolumeSpacing);
-      input->SetOrigin(0,0,0);
+  UndoRedoState urs;
+  urs.dataArray = vtkUnsignedCharArray::New();
+  urs.dataArray->DeepCopy( m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->GetScalars() );
+  urs.dataArray->SetName("SCALARS");
+  urs.plane=m_CurrentSlicePlane;
+  urs.slice=m_CurrentSliceIndex;
+  m_ManualUndoList.push_back( urs );
+  //On edit a new branch of redo-list starts, i need to clear the redo stack
+  ResetManualRedoList();
 
-      m_ManualVolumeMask->GetOutput()->GetVTKData()->GetPointData()->Update();
-      input->SetScalarTypeToUnsignedChar();
-      input->GetPointData()->SetScalars(m_ManualVolumeMask->GetOutput()->GetVTKData()->GetPointData()->GetScalars());
+  m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_REDO, false);
+  m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_UNDO, m_ManualUndoList.size()>0);
 
-      vtkStructuredPoints *output = vtkStructuredPoints::New();
-      output->CopyStructure(input);
-      output->DeepCopy(input);
+  if(m_GlobalFloodFill == TRUE)
+  {
+    vtkStructuredPoints *input = vtkStructuredPoints::New();
+    double dimensions[3];
+    dimensions[0] = m_VolumeDimensions[0];
+    dimensions[1] = m_VolumeDimensions[1];
+    dimensions[2] = m_VolumeDimensions[2];
+    //dimensions[m_CurrentSlicePlane] = 1;
+    input->SetExtent(0,dimensions[0]-1,0,dimensions[1]-1,0,dimensions[2]-1);
 
-      ApplyFloodFill(input,output,seed);
+    input->SetSpacing(m_VolumeSpacing);
+    input->SetOrigin(0,0,0);
 
-      m_ManualVolumeMask->GetOutput()->GetVTKData()->GetPointData()->SetScalars(output->GetPointData()->GetScalars());
-      m_ManualVolumeMask->Update();
+    m_ManualVolumeMask->GetOutput()->GetVTKData()->GetPointData()->Update();
+    input->SetScalarTypeToUnsignedChar();
+    input->GetPointData()->SetScalars(m_ManualVolumeMask->GetOutput()->GetVTKData()->GetPointData()->GetScalars());
 
-      UpdateSlice();
+    vtkStructuredPoints *output = vtkStructuredPoints::New();
+    output->CopyStructure(input);
+    output->DeepCopy(input);
 
-      m_View->CameraUpdate();
-    }
-    else
-    {
-      vtkStructuredPoints *input = vtkStructuredPoints::New();
-      double dimensions[3];
-      dimensions[0] = m_VolumeDimensions[0];
-      dimensions[1] = m_VolumeDimensions[1];
-      dimensions[2] = m_VolumeDimensions[2];
-      dimensions[m_CurrentSlicePlane] = 1;
-      input->SetExtent(0,dimensions[0]-1,0,dimensions[1]-1,0,dimensions[2]-1);
+    ApplyFloodFill(input,output,seed);
 
-      input->SetSpacing(m_VolumeSpacing);
-      input->SetOrigin(0,0,0);
+    m_ManualVolumeMask->GetOutput()->GetVTKData()->GetPointData()->SetScalars(output->GetPointData()->GetScalars());
+    m_ManualVolumeMask->Update();
 
-      m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->Update();
-      input->SetScalarTypeToUnsignedChar();
-      input->GetPointData()->SetScalars(m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->GetScalars());
+    UpdateSlice();
 
-      vtkStructuredPoints *output = vtkStructuredPoints::New();
-      output->CopyStructure(input);
-      output->DeepCopy(input);
+    m_View->CameraUpdate();
+  }
+  else
+  {
+    vtkStructuredPoints *input = vtkStructuredPoints::New();
+    double dimensions[3];
+    dimensions[0] = m_VolumeDimensions[0];
+    dimensions[1] = m_VolumeDimensions[1];
+    dimensions[2] = m_VolumeDimensions[2];
+    dimensions[m_CurrentSlicePlane] = 1;
+    input->SetExtent(0,dimensions[0]-1,0,dimensions[1]-1,0,dimensions[2]-1);
 
-      ApplyFloodFill(input,output,seed);
+    input->SetSpacing(m_VolumeSpacing);
+    input->SetOrigin(0,0,0);
 
-      m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->SetScalars(output->GetPointData()->GetScalars());
-      m_ManualVolumeSlice->Update();
-      m_View->VmeShow(m_ManualVolumeSlice,true);
+    m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->Update();
+    input->SetScalarTypeToUnsignedChar();
+    input->GetPointData()->SetScalars(m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->GetScalars());
 
-      CreateRealDrawnImage();
-      m_View->CameraUpdate();
+    vtkStructuredPoints *output = vtkStructuredPoints::New();
+    output->CopyStructure(input);
+    output->DeepCopy(input);
 
-    }
+    ApplyFloodFill(input,output,seed);
+
+    m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->SetScalars(output->GetPointData()->GetScalars());
+    m_ManualVolumeSlice->Update();
+    m_View->VmeShow(m_ManualVolumeSlice,true);
+
+    CreateRealDrawnImage();
+    m_View->CameraUpdate();
+
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -3118,8 +3132,9 @@ void medOpSegmentation::ReloadUndoRedoState(vtkDataSet *dataSet,UndoRedoState st
 //     m_View->SetSliceAxis(m_CurrentSlicePlane);
 //   }
 
-  m_View->CameraUpdate();
+  //m_View->CameraUpdate();
   CreateRealDrawnImage();
+  OnEventUpdateManualSlice();
   undoRedoData->Delete();
 }
 
