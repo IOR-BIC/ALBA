@@ -169,7 +169,7 @@ vtkStructuredPoints *vtkMEDBinaryImageFloodFill::FloodFill(vtkStructuredPoints *
   }
   else
   {
-    // or filter to sum original image with flood filled one
+    // differnce filter to subtract original image with flood filled one
     Difference::Pointer difference = Difference::New();
     difference->SetInput1(vtk2Itk->GetOutput());
     difference->SetInput2(connectedThreshold->GetOutput());
@@ -198,15 +198,15 @@ vtkStructuredPoints *vtkMEDBinaryImageFloodFill::FloodFill(vtkStructuredPoints *
   distanceImage->Update();
   vtkDoubleArray *distanceScalars = (vtkDoubleArray *)distanceImage->GetPointData()->GetScalars();
 
-  // Iterate over scalars and get the id of the maximum
-  double maxDistance = VTK_DOUBLE_MIN;
+  // Iterate over scalars and get the id of the minimum
+  double minDistance = VTK_DOUBLE_MAX;
   for(vtkIdType s = 0; s < distanceScalars->GetNumberOfTuples(); s++)
   {
     double curDistance = distanceScalars->GetTuple1(s);
-    if(curDistance > maxDistance)
+    if(curDistance < minDistance)
     {
       Center = s;
-      maxDistance = curDistance;
+      minDistance = curDistance;
     }
   }
   return output;
