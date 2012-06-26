@@ -952,7 +952,7 @@ void medOpSegmentation::DeleteOpDialog()
 
 
 //----------------------------------------------------------------------------
-void medOpSegmentation::FloodFill(int seed[3])
+void medOpSegmentation::FloodFill(vtkIdType seed)
 //----------------------------------------------------------------------------
 {
   UndoBrushPreview();
@@ -972,6 +972,7 @@ void medOpSegmentation::FloodFill(int seed[3])
 
   if(m_GlobalFloodFill == TRUE)
   {
+
     vtkStructuredPoints *input = vtkStructuredPoints::New();
     double dimensions[3];
     dimensions[0] = m_VolumeDimensions[0];
@@ -1021,7 +1022,7 @@ void medOpSegmentation::FloodFill(int seed[3])
     output->CopyStructure(input);
     output->DeepCopy(input);
 
-    ApplyFloodFill(input,output,seed);
+    int center = ApplyFloodFill(input,output,seed);
 
     m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->SetScalars(output->GetPointData()->GetScalars());
     m_ManualVolumeSlice->Update();
@@ -1224,7 +1225,7 @@ bool medOpSegmentation::ApplyRefinementFilter2(vtkStructuredPoints *inputImage, 
 }
 
 //----------------------------------------------------------------------------
-void medOpSegmentation::ApplyFloodFill(vtkStructuredPoints *inputImage, vtkStructuredPoints *outputImage, int seed[3])
+int medOpSegmentation::ApplyFloodFill(vtkStructuredPoints *inputImage, vtkStructuredPoints *outputImage, vtkIdType seed)
 //----------------------------------------------------------------------------
 {
   vtkMEDBinaryImageFloodFill *filter = vtkMEDBinaryImageFloodFill::New();
@@ -1243,7 +1244,12 @@ void medOpSegmentation::ApplyFloodFill(vtkStructuredPoints *inputImage, vtkStruc
   filter->Update();
   outputImage->DeepCopy(filter->GetOutput());
   outputImage->Update();
+
+  int next_seed_id = filter->GetCenter();
+
   filter->Delete();
+
+  return next_seed_id;
 }
 
 //----------------------------------------------------------------------------
@@ -2501,7 +2507,16 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
                 }
               }
             }
-            FloodFill(seed);
+            double dims[3];
+            dims[0] = m_VolumeDimensions[0];
+            dims[1] = m_VolumeDimensions[1];
+            dims[2] = m_VolumeDimensions[2];
+            dims[m_CurrentSlicePlane] = 1;
+            seed[m_CurrentSlicePlane] = 0;
+
+            // recalculate seed id
+            vtkIdType seedID = seed[0] + seed[1] * dims[0] + seed[2] * dims[1] * dims[0];
+            FloodFill(seedID);
             CreateRealDrawnImage();
           }
           

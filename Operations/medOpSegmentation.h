@@ -18,6 +18,7 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #include "mafNode.h"
 #include "medVMESegmentationVolume.h"
 #include "medOperationsDefines.h"
+#include "vtkSystemIncludes.h"
 
 
 //----------------------------------------------------------------------------
@@ -595,13 +596,15 @@ protected:
   /** Determine if the specified vme is an output of the input volume */
   bool IsOutput(mafNode* vme);
 
-  /** Caluclates the scale/traslation to obtain a cube in [-1,1], 
+  /** Calculates the scale/traslation to obtain a cube in [-1,1], 
       If toUnity is set to false returns the inverse factors*/
   void GetTransformFactor(int toUnity,double *bounds, double *scale, double *traslation);
 
-  /** */
-  void FloodFill(int seed[3]);
-  void ApplyFloodFill(vtkStructuredPoints *inputImage, vtkStructuredPoints *outputImage, int seed[3]);
+  /** flood fill algorithm */
+  void FloodFill(vtkIdType seed);
+
+  /** Apply flood fill filter */
+  int ApplyFloodFill(vtkStructuredPoints *inputImage, vtkStructuredPoints *outputImage, vtkIdType seed);
 
 };
 #endif

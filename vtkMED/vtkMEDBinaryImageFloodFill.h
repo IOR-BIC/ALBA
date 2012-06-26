@@ -48,20 +48,27 @@ public:
   inline void SetFillErase(bool erase){if(!erase){SetFill();}else{SetErase();}};
 
   /** Set the seed that identify the area */
-  vtkSetVectorMacro(Seed, int, 3);
+  //vtkSetVectorMacro(Seed, int, 3);
+  vtkSetMacro(Seed, vtkIdType);
 
   /** Get the seed that identify the area */
-  vtkGetVectorMacro(Seed, int, 3);
+  //vtkGetVectorMacro(Seed, int, 3);
+  vtkGetMacro(Seed, vtkIdType);
+
+  /** Get the center of the filled area */
+  vtkGetMacro(Center, vtkIdType);
 
 protected:
 
   /** Execute this filter */
   void Execute();
 
-  unsigned char ReplaceValue; //> ON_PIXEL for fill OFF_PIXEL for erease
-  unsigned char Threshold[2]; //> threshold for connectivity threshold filter
-  int Seed[3];                //> point that identify the area
+  unsigned char ReplaceValue; //> ON_PIXEL
+  unsigned char Threshold[2]; //> Threshold for connectivity threshold filter
+  vtkIdType Seed;             //> Id of the seed (Point that identify the connected area)
+  int ItkSeed[3];             //> Point that identify the area
   bool Erase;                 //> Determine if fill or erase
+  vtkIdType Center;           //> Center of the filled region
 
 private:
 
@@ -75,6 +82,8 @@ private:
   template <unsigned int ImageDimension>
   vtkStructuredPoints *FloodFill(vtkStructuredPoints *input);
 
+  /** Compute Itk seed for the given Vtk id (Seed) */
+  void ComputeItkSeed();
 };
 
 #endif
