@@ -169,7 +169,7 @@ vtkStructuredPoints *vtkMEDBinaryImageFloodFill::FloodFill(vtkStructuredPoints *
   }
   else
   {
-    // differnce filter to subtract original image with flood filled one
+    // differEnce filter to subtract original image with flood filled one
     Difference::Pointer difference = Difference::New();
     difference->SetInput1(vtk2Itk->GetOutput());
     difference->SetInput2(connectedThreshold->GetOutput());
