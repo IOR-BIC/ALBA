@@ -1,16 +1,17 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: medOpRegisterClusters.cpp,v $
-  Language:  C++
-  Date:      $Date: 2011-03-31 13:35:21 $
-  Version:   $Revision: 1.2.2.2 $
-  Authors:   Paolo Quadrani - porting Daniele Giunchi  
+Program:   Multimod Application Framework
+Module:    $RCSfile: medOpRegisterClusters.cpp,v $
+Language:  C++
+Date:      $Date: 2011-03-31 13:35:21 $
+Version:   $Revision: 1.2.2.2 $
+Authors:   Paolo Quadrani - porting Daniele Giunchi
+Josef Kohout (refactoring)
 ==========================================================================
-  Copyright (c) 2002/2004
-  CINECA - Interuniversity Consortium (www.cineca.it) 
+Copyright (c) 2002/2004
+CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#include "mafDefines.h" 
+#include "mafDefines.h"
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
@@ -41,834 +42,1092 @@
 #include "vtkWeightedLandmarkTransform.h"
 #include "vtkTransform.h"
 #include "vtkTransformPolyDataFilter.h"
+#include "vtkDoubleArray.h"
+
+#if defined(_MSC_VER) && _MSC_VER >= 1600
+#define strcmpi _strcmpi
+#endif
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(medOpRegisterClusters);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-// Constants :
-//----------------------------------------------------------------------------
-enum ID_REGISTER_CLUSTERS
-{
-	RIGID =0,
-	SIMILARITY,
-	AFFINE
-};
-//----------------------------------------------------------------------------
 medOpRegisterClusters::medOpRegisterClusters(wxString label) :
 mafOp(label)
-//----------------------------------------------------------------------------
+	//----------------------------------------------------------------------------
 {
-  m_OpType	= OPTYPE_OP;
-  m_Canundo = true;
-  
-	m_Source					= NULL;
-  m_Target					= NULL;
-  m_Registered			= NULL;
-	m_Follower				= NULL;
-  m_Result          = NULL;
-  m_Info            = NULL;
-  m_PointsSource		= NULL;
-  m_PointsTarget		= NULL;
+	m_OpType	= OPTYPE_OP;
+	m_Canundo = true;
 
+	m_Target					= NULL;
+	m_Registered			= NULL;
+	m_RegisteredFollower = NULL;
+	m_Follower				= NULL;
+	m_Result          = NULL;
+	m_Info            = NULL;	
 
 	m_SourceName			="none";
-  m_TargetName			="none";
+	m_TargetName			="none";
 	m_FollowerName		="none";
 	m_Apply						= 0;
 	m_MultiTime				= 0;
 	m_RegistrationMode = RIGID;
 
-	m_CommonPoints = NULL;
-	m_Weight		   = NULL;
+	m_Weights = NULL;
+	m_Matches	=	NULL;
 
-  m_SettingsGuiFlag = false;
+	m_SettingsGuiFlag = false;
 
-  m_GuiSetWeights = NULL;
-  m_Dialog = NULL;
+	m_GuiSetWeights = NULL;
+	m_Dialog = NULL;
+
+	//m_bCloseSource = m_bCloseTarget = NULL;
+	m_FilteringMode = medOpRegisterClusters::Invisible | medOpRegisterClusters::InfiniteOrNaN;
+	m_FilteringUserCoords[0] = m_FilteringUserCoords[1] = m_FilteringUserCoords[2] = 0.0;
 }
-//----------------------------------------------------------------------------
-medOpRegisterClusters::~medOpRegisterClusters( ) 
-//----------------------------------------------------------------------------
-{
-	vtkDEL(m_Follower);
-	vtkDEL(m_PointsSource);
-	vtkDEL(m_PointsTarget);
-  mafDEL(m_Result);
-  mafDEL(m_Info);
-  mafDEL(m_Registered);
-  mafDEL(m_Follower);
-  mafDEL(m_CommonPoints);
 
-  if(m_Weight)
-	{
-		delete[] m_Weight;
-		m_Weight = NULL;
-	}
+//----------------------------------------------------------------------------
+medOpRegisterClusters::~medOpRegisterClusters( )
+	//----------------------------------------------------------------------------
+{	
+	mafDEL(m_Result);
+	mafDEL(m_Info);
+	mafDEL(m_Registered);
+	mafDEL(m_RegisteredFollower);
+
+	delete[] m_Weights;
+	m_Weights = NULL;
+
+	DestroyMatches();
 }
+
 //----------------------------------------------------------------------------
-mafOp* medOpRegisterClusters::Copy()   
-//----------------------------------------------------------------------------
+mafOp* medOpRegisterClusters::Copy()
+	//----------------------------------------------------------------------------
 {
 	return new medOpRegisterClusters(m_Label);
 }
+
 //----------------------------------------------------------------------------
+//Accept source landmark cloud (may not be time-variant).
 bool medOpRegisterClusters::Accept(mafNode* node)
-//----------------------------------------------------------------------------
+	//----------------------------------------------------------------------------
 {
-	if(!node) return false;
-  //if( node->IsA("mafVMELandmarkCloud") && !((mafVMELandmarkCloud*)node)->IsOpen() )
-  if(ClosedCloudAccept(node))
-  {
-    if(!mafVMELandmarkCloud::SafeDownCast(node)->IsAnimated())
-      return true;
-  }
-  return false;
+	if (!ClosedCloudAccept(node))
+		return false;
+
+	//source may not be time-variant!
+	return !mafVMELandmarkCloud::SafeDownCast(node)->IsAnimated();
 };
+
 //----------------------------------------------------------------------------
-// widget id's
-//----------------------------------------------------------------------------
-enum 
+//Callback for VME_CHOOSE that accepts Closed Landmarkclouds VMEs only.
+/*static*/ bool medOpRegisterClusters::ClosedCloudAccept(mafNode* node)
+	//----------------------------------------------------------------------------
 {
-	ID_CHOOSE = MINID,
-	ID_CHOOSE_SURFACE,
-	ID_MULTIPLE_TIME_REGISTRATION,
-	ID_APPLY_REGISTRATION,
-	ID_REGTYPE,
-	ID_WEIGHT,
-	
-};
-//----------------------------------------------------------------------------
-void medOpRegisterClusters::OpRun()   
-//----------------------------------------------------------------------------
-{
-  m_Source = (mafVMELandmarkCloud*)m_Input;
-  m_SourceName = m_Input->GetName();
-	
-  if(!m_TestMode)
-  {
-    int num_choices = 3;
-    const wxString choices_string[] = {_("rigid"), _("similarity"), _("affine")}; 
-    mafString wildcard = "Dictionary (*.txt)|*.txt|All Files (*.*)|*.*";
-
-    m_Gui = new mafGUI(this);
-    m_Gui->SetListener(this);
-
-    m_Gui->Label(_("source :"),true);
-    m_Gui->Label(&m_SourceName);
-
-    m_Gui->Label(_("target :"),true);
-    m_Gui->Label(&m_TargetName);
-
-    m_Gui->Label(_("follower surface:"),true);
-    m_Gui->Label(&m_FollowerName);
-
-    m_Gui->Button(ID_CHOOSE,_("target "));
-    m_Gui->Button(ID_CHOOSE_SURFACE,_("follower surface"));
-
-    m_Gui->Button(ID_WEIGHT,_("weighted registration"));
-    m_Gui->Enable(ID_WEIGHT,false);
-
-    m_Gui->Combo(ID_REGTYPE, _("reg. type"), &m_RegistrationMode, num_choices, choices_string); 
-
-    m_Gui->Bool(ID_MULTIPLE_TIME_REGISTRATION,_("multi-time"),&m_MultiTime,1);
-    m_Gui->Enable(ID_MULTIPLE_TIME_REGISTRATION,false);
-
-    m_Gui->Label(_("Apply registration matrix to landmarks"));
-    m_Gui->Bool(ID_APPLY_REGISTRATION,_("Apply"),&m_Apply,1);
-    m_Gui->Enable(ID_APPLY_REGISTRATION,false);
-
-    m_Gui->OkCancel();
-
-    m_Gui->Enable(wxOK,false);
-    m_Gui->Divider();
-    ShowGui();
-  }
-
-  assert(!m_PointsSource && !m_PointsTarget);
-  m_PointsSource = vtkPoints::New();
-	m_PointsTarget = vtkPoints::New();
-
+	mafVMELandmarkCloud* cloud = mafVMELandmarkCloud::SafeDownCast(node);
+	return (cloud != NULL && !cloud->IsOpen());
 }
+
 //----------------------------------------------------------------------------
-void medOpRegisterClusters::OnEvent(mafEventBase *maf_event)
+//Callback for VME_CHOOSE that accepts Surface VME only.
+/*static*/ bool medOpRegisterClusters::SurfaceAccept(mafNode* node)
+	//----------------------------------------------------------------------------
+{
+	return (mafVMESurface::SafeDownCast(node) != NULL);
+}
+
+//----------------------------------------------------------------------------
+//Set the input vme for the operation.
+//This method invalidates Weights, so specifying weights must be done after calling this method.
+/*virtual*/ void medOpRegisterClusters::SetInput(mafNode* vme)
+	//----------------------------------------------------------------------------
+{
+	if (vme == m_Input || (vme != NULL && !Accept(vme)))
+		return;	//ignore this because it is either already specified input or it is not acceptable
+
+	delete[] m_Weights;
+	m_Weights = NULL;
+
+	DestroyMatches();	//destroy current matches
+
+	if (NULL != (m_Input = vme))
+	{
+		m_SourceName = m_Input->GetName();		
+		CreateMatches();		
+	}
+	else
+		m_SourceName = "none";
+}
+
+//----------------------------------------------------------------------------
+//Sets the target landmark cloud.
+/*virtual*/ void medOpRegisterClusters::SetTarget(mafVMELandmarkCloud *target)
+	//----------------------------------------------------------------------------
+{
+	if (target == m_Target || (target != NULL && !ClosedCloudAccept(target)))
+		return;	//ignore this because it is either already specified input or it is not acceptable
+
+	if (NULL != (m_Target = target))
+	{
+		m_TargetName = m_Target->GetName();		
+		CreateMatches();	//recreate matches		
+	}
+	else
+		m_TargetName = "none";
+}
+
+//----------------------------------------------------------------------------
+//Sets the source landmark cloud follower surface.
+//Follower is supposed to be a child of source landmark cloud, i.e., it is subject to transformations of source landmark cloud only.
+//If any other than a child of source landmark cloud is specified, the result may be unpredictable (though it has no effect on
+//the correct registration of source and target landmark clouds. Follower is deep copied into the result
+//so that it is transformed by its parent target landmark cloud.
+/*virtual*/ void medOpRegisterClusters::SetFollower(mafVMESurface *follower)
+	//----------------------------------------------------------------------------
+{
+	if (follower == m_Follower || (follower != NULL && !SurfaceAccept(follower)))
+		return;	//ignore this because it is either already specified input or it is not acceptable
+
+	if (NULL != (m_Follower = follower))
+		m_FollowerName = m_Follower->GetName();
+	else
+		m_FollowerName = "none";
+}
+
+//----------------------------------------------------------------------------
+//Sets the weight for the given source landmark (identified by index).
+//Default weights are 1.0. Use 0.0, if you wish to ignore the landmark completely.
+//N.B. this method must be called only after SetInput or SetSource otherwise
+//weights may become lost.
+/*virtual*/ void medOpRegisterClusters::SetSourceWeight(int index, double weight)
+	//----------------------------------------------------------------------------
+{
+	if (m_Weights == NULL) {
+		InitializeWeights();
+	}
+
+	m_Weights[index] = weight;
+}
+
+//----------------------------------------------------------------------------
+//Sets the weight for the given source landmark (identified by name).
+//	Default weights are 1.0. Use 0.0, if you wish to ignore the landmark completely.
+//	N.B. this method must be called only after SetInput or SetSource otherwise
+//	weights may become lost.
+/*virtual*/ void medOpRegisterClusters::SetSourceWeight(const char* sourceName, double weight)
+{	
+	mafVMELandmarkCloud* source = GetSource();
+	if (source == NULL)
+		return;	//fatal error
+
+	int index = source->FindLandmarkIndex(sourceName);
+	if (index >= 0) {
+		SetSourceWeight(index, weight);
+	}
+}
+
+//----------------------------------------------------------------------------
+//Initializes weights.
+/*virtual*/ void medOpRegisterClusters::InitializeWeights()
+	//----------------------------------------------------------------------------
+{
+	delete[] m_Weights;
+	m_Weights = NULL;
+
+	mafVMELandmarkCloud* source = GetSource();
+	if (source != NULL)
+	{
+		int number = source->GetNumberOfLandmarks();
+
+		m_Weights = new double[number];
+		for (int i=0; i <number; i++) {
+			m_Weights[i] = 1.0;
+		}
+	}
+}
+
+//----------------------------------------------------------------------------
+//Detects correspondence between source and target landmarks exploiting
+//the predefined preferences given in m_Matches array.
+//N.B. If m_Matches is unallocated, it is constructed first. 
+//Call DestroyMatches to release the memory allocated by this method.
+void medOpRegisterClusters::CreateMatches()
 //----------------------------------------------------------------------------
 {
-	if(mafEvent *e = mafEvent::SafeDownCast(maf_event))
-  {
-    switch(e->GetId())
-    {
-		  case ID_CHOOSE:
-		  {
-			  mafString s(_("Choose cloud"));
-        mafEvent e(this,VME_CHOOSE, &s, (long)&medOpRegisterClusters::ClosedCloudAccept);
-			  mafEventMacro(e);
-			  mafNode *vme = e.GetVme();
-		    OnChooseVme(vme);
-        if(vme != NULL)
-          m_Gui->Enable(ID_WEIGHT,true);
-		  }
-		  break;
-		  case ID_CHOOSE_SURFACE:
-		  {
-			  mafString s(_("Choose surface"));
-        mafEvent e(this,VME_CHOOSE, &s, (long)&medOpRegisterClusters::SurfaceAccept);
-			  mafEventMacro(e);
-			  mafNode *vme = e.GetVme();
-		    OnChooseVme(vme);
-		  }
-		  break;
-		  case ID_REGTYPE:
-			  if(m_RegistrationMode == AFFINE)
-				  m_Gui->Enable(ID_APPLY_REGISTRATION, true);
-			  else
-				  m_Gui->Enable(ID_APPLY_REGISTRATION, false);
-		  break;
-		  case ID_WEIGHT:	
-			  {
-          m_SettingsGuiFlag = true;
-				  int x_init,y_init;
-				  x_init = mafGetFrame()->GetPosition().x;
-				  y_init = mafGetFrame()->GetPosition().y;
+	mafVMELandmarkCloud* source = GetSource();
+	if (source == NULL)
+		return;	//source is required	
 
-          m_Dialog = new mafGUIDialog(_("setting weights"), mafCLOSEWINDOW);
-				  m_Dialog->SetSize(x_init+40,y_init+40,220,220);
-  				
-				  m_GuiSetWeights = new mafGUI(this);
-				  m_GuiSetWeights->SetListener(this);
-  			
-				  /////////////////////////////////////////////////////
-				  if(m_CommonPoints)
-				  {
-					  mafVMELandmark *lmk;
-					  m_CommonPoints->Open();
-					  const char *name_lmk;
-					  int number = m_CommonPoints->GetNumberOfLandmarks();
+	//if m_Matches does not exist, create it
+	if (m_Matches == NULL)
+	{
+		int number = source->GetNumberOfLandmarks();
+		m_Matches = new MatchingInfo[number];
 
-					  if(!m_Weight)
-						  {
-							  m_Weight = new double[number];
-							  for (int i=0; i <number; i++)
-								  m_Weight[i] = 1.0;
-  							
-						  }
-  					
-					  for (int i=0; i <number; i++)
-					  {
-						  lmk = m_CommonPoints->GetLandmark(i);
-						  name_lmk = lmk->GetName();
-						  m_GuiSetWeights->Label(name_lmk);
-						  m_GuiSetWeights->Double(-1,"",&m_Weight[i]);
-					  }
-					  m_CommonPoints->Close();
-				  }
-          
-          m_GuiSetWeights->Show(true);
-				  m_GuiSetWeights->Reparent(m_Dialog);
-				  m_GuiSetWeights->FitGui();
-				  m_GuiSetWeights->SetSize(200, 220);
-   			  m_GuiSetWeights->OkCancel();
-					m_GuiSetWeights->Divider();
-          m_GuiSetWeights->Update();
- 
-				  m_Dialog->Add(m_GuiSetWeights,1,wxEXPAND);   
-				  m_Dialog->SetAutoLayout(TRUE);		
+		for (int i = 0; i < number; i++) {
+			m_Matches[i].AddAcceptableTargetName(source->GetLandmarkName(i));
+		}		
+	}	
 
-          m_Dialog->ShowModal();
-			  }
-		  break;
-		  case wxOK:
-        if(m_SettingsGuiFlag == false)
-			    OpStop(OP_RUN_OK);
-        else
-        {
-          m_GuiSetWeights->Close();
-          m_Dialog->Close();
-          m_SettingsGuiFlag = false;
-        }
-		  break;
-		  case wxCANCEL:
-        if(m_SettingsGuiFlag == false)
-			    OpStop(OP_RUN_CANCEL);
-        else
-        {
-          m_GuiSetWeights->Close();
-          m_Dialog->Close();
-          delete[] m_Weight;	
-					  m_Weight = NULL;
-          m_SettingsGuiFlag = false;
-        }
-		  break;
-		  default:
-			  mafEventMacro(*e);
-		  break;
-	  }
-  }
+	mafVMELandmarkCloud* target = GetTarget();
+	if (target != NULL)
+	{
+		//do matching of target landmarks
+		int number = source->GetNumberOfLandmarks();		
+		int tarnumber = target->GetNumberOfLandmarks();
+		for (int i = 0; i < number; i++)
+		{
+			//check, if the source landmark has not matching target landmark
+			if (m_Matches[i].GetTargetIndex() < 0)
+			{
+				for (int j = 0; j < tarnumber; j++) 
+				{
+					if (m_Matches[i].MatchTargetName(target->GetLandmarkName(j))){
+						m_Matches[i].SetTargetIndex(j); break;	//we have found our match
+					}
+				}			
+			}
+		}		
+	}	
 }
+
+//----------------------------------------------------------------------------
+//Sets explicitly the correspondence between source and target landmarks. 
+//If not specified, the correspondence is detected automatically using names of landmarks. 
+//N.B. must be called after SetInput (or SetSource) method.
+/*virtual*/ void medOpRegisterClusters::SetMatchingLandmarks(int sourceIndex, int targetIndex)
+	//----------------------------------------------------------------------------
+{
+	if (m_Matches == NULL) 
+	{
+		CreateMatches(); 
+		
+		if (m_Matches == NULL) {
+			return;	//failure
+		}
+	}
+
+	m_Matches[sourceIndex].SetTargetIndex(targetIndex);
+}
+
+//----------------------------------------------------------------------------
+//Sets explicitly the correspondence between source and target landmarks identified by names. 
+//N.B. must be called after SetInput (or SetSource) method.
+/*virtual*/ void medOpRegisterClusters::SetMatchingLandmarks(const char* sourceName, const char* targetName)
+	//----------------------------------------------------------------------------
+{
+	mafVMELandmarkCloud* source = GetSource();
+	if (source != NULL)
+	{
+		int sourceIndex = source->FindLandmarkIndex(sourceName);
+		if (sourceIndex >= 0)
+		{
+			m_Matches[sourceIndex].RemoveAllAcceptableTargetNames();
+			m_Matches[sourceIndex].AddAcceptableTargetName(targetName);
+		}
+	}
+}
+
+//----------------------------------------------------------------------------
+//Adds an alternative correspondence between source and target landmarks.
+//By default a source landmark matches the target landmark of the same name (unless this mechanism
+//is completely overridden by calling SetMatchingLandmarks). If some source landmark does not have
+//corresponding target landmark, alternative names (specified by this method) are checked to find the 
+//correspondence. For example, source landmark RGT is referenced in some target landmark clouds 
+//as RGT but in others (coming from different resources) as RGTR. This method enables easy specification
+//of such an alias: just call AddAlternativeMatching("RGT", "RGTR");
+//N.B. must be called after SetInput (or SetSource) method.	
+/*virtual*/ void medOpRegisterClusters::AddAlternativeMatching(const char* sourceName, const char* targetName)
+	//----------------------------------------------------------------------------
+{
+	mafVMELandmarkCloud* source = GetSource();
+	if (source != NULL)
+	{
+		int sourceIndex = source->FindLandmarkIndex(sourceName);
+		if (sourceIndex >= 0) {			
+			m_Matches[sourceIndex].AddAcceptableTargetName(targetName);
+		}
+	}
+}
+
+//----------------------------------------------------------------------------
+//Extract matching points between source and target for the given time.
+//Filtering is automatically applied and weights are stored. 
+//Returns number of matched points.
+//N.B. Call CreateMatches prior to this method, otherwise this method fails.
+/*virtual*/ int medOpRegisterClusters::ExtractMatchingPoints(vtkPoints* sourcePoints, 
+	vtkPoints* targetPoints, vtkDoubleArray* weights, double time)
+	//----------------------------------------------------------------------------
+{
+	sourcePoints->Reset();
+	targetPoints->Reset();
+	weights->Reset();
+
+	mafVMELandmarkCloud* source = GetSource();
+	mafVMELandmarkCloud* target = GetTarget();
+	if (source == NULL || target == NULL)
+		return 0;	//nothing to match
+
+	int npSource = source->GetNumberOfLandmarks();
+	int npTarget = target->GetNumberOfLandmarks();
+
+	if (npSource == 0 || npTarget == 0) 
+		return 0;	//nothing to match
+	
+	for(int i = 0; i < npSource; i++)
+	{
+		int j = m_Matches[i].GetTargetIndex();
+		if (j < 0)
+			continue;	//no matching landmark
+
+		//various filtering
+		if ((m_FilteringMode & medOpRegisterClusters::Invisible) == medOpRegisterClusters::Invisible) 
+		{
+			if(!target->GetLandmarkVisibility(j,time))
+				continue;	//target landmark is invisible
+		}
+
+		double targetPos[3];		
+		target->GetLandmarkPosition(j, targetPos, time);
+
+		if ((m_FilteringMode & medOpRegisterClusters::InfiniteOrNaN) == medOpRegisterClusters::InfiniteOrNaN) 
+		{
+			bool bOK = true;
+			for (int k = 0; k < 3; k++) {
+				if (!(targetPos[k] >= -DBL_MAX && targetPos[k] <= DBL_MAX)) {
+					bOK = false; break;		//inf or nan
+				}
+			}			
+
+			if (!bOK) {
+				continue;	//target landmark has invalid coordinate
+			}
+		}
+
+		if ((m_FilteringMode & medOpRegisterClusters::WithUserValue) == medOpRegisterClusters::WithUserValue) 
+		{
+			if (targetPos[0] == m_FilteringUserCoords[0] &&
+				targetPos[1] == m_FilteringUserCoords[1] && targetPos[2] == m_FilteringUserCoords[2]) {
+					continue;	//target landmark has invalid coordinate
+			}
+		}
+
+		//OK, target is valid
+		double sourcePos[3];
+		source->GetLandmarkPosition(i, sourcePos, time);
+
+		sourcePoints->InsertNextPoint(sourcePos);
+		targetPoints->InsertNextPoint(targetPos);
+		if (m_Weights != NULL) {
+			weights->InsertNextValue(m_Weights[i]);
+		}
+	}
+
+	return sourcePoints->GetNumberOfPoints();
+}
+
+//----------------------------------------------------------------------------
+//Register the source  on the target according to the registration method selected: rigid, similar or affine. 
+//sourcePoints, targetPoints and weights can be extracted using ExtractMatchingPoints method.
+//Returns the transformation matrix (must be deleted by the caller). 
+/*virtual*/ vtkMatrix4x4* medOpRegisterClusters::RegisterPoints(vtkPoints* sourcePoints, 
+	vtkPoints* targetPoints, vtkDoubleArray* weights)
+	//----------------------------------------------------------------------------
+{
+	vtkMAFSmartPointer< vtkWeightedLandmarkTransform > RegisterTransform;
+
+	RegisterTransform->SetSourceLandmarks(sourcePoints);
+	RegisterTransform->SetTargetLandmarks(targetPoints);
+
+	if (weights != NULL && weights->GetNumberOfTuples() != 0) {
+		RegisterTransform->SetWeights(weights->GetPointer(0), weights->GetNumberOfTuples());
+	}
+
+	switch (m_RegistrationMode)
+	{
+	case RIGID:
+		RegisterTransform->SetModeToRigidBody();
+		break;
+	case SIMILARITY:
+		RegisterTransform->SetModeToSimilarity();
+		break;
+	case AFFINE:
+		RegisterTransform->SetModeToAffine();
+		break;
+	}
+	RegisterTransform->Update();
+
+	vtkMatrix4x4* ret = RegisterTransform->GetMatrix();
+	ret->Register(NULL);
+
+	return ret;
+}
+
+//----------------------------------------------------------------------------
+//Calculates deviation between sourcePoints transformed by t_matrix and targetPoints.
+double medOpRegisterClusters::CalculateDeviation(vtkPoints* sourcePoints, vtkPoints* targetPoints, vtkMatrix4x4* t_matrix)
+	//----------------------------------------------------------------------------
+{	
+	//calculate deviation
+	double deviation = 0.0;
+
+	int nPoints = sourcePoints->GetNumberOfPoints();
+	for(int i = 0; i < nPoints; i++)
+	{
+		double coord[4];
+		double result[4];
+		double target[3];
+		double dx, dy, dz;
+		sourcePoints->GetPoint(i, coord);
+		coord[3] = 1.0;
+
+		targetPoints->GetPoint(i, target);
+
+		//transform point
+		t_matrix->MultiplyPoint(coord, result);
+
+		dx = target[0] - result[0];
+		dy = target[1] - result[1];
+		dz = target[2] - result[2];
+
+		deviation += dx * dx + dy * dy + dz * dz;
+	}
+
+	if(nPoints != 0)
+		deviation /= nPoints;
+
+	return sqrt(deviation);
+}
+
+//----------------------------------------------------------------------------
+//Register the source  on the target  at the given time (-1 == current time) according 
+//to the registration method selected: rigid, similar or affine.
+//Returns true, if the registration succeeded, false otherwise.
+//N.B. the method assumes that m_Info, m_Registered and m_RegisteredFollower (if Follower is valid) exist.
+//CreateMatches must be called prior to calling this method.
+/**virtual*/ bool medOpRegisterClusters::RegisterSource(double currTime)
+	//----------------------------------------------------------------------------
+{
+	vtkMAFSmartPointer< vtkPoints > sourcePoints;
+	vtkMAFSmartPointer< vtkPoints > targetPoints;
+	vtkMAFSmartPointer< vtkDoubleArray > weights;
+
+	int ncp = ExtractMatchingPoints(sourcePoints, targetPoints, weights, currTime);
+	if (ncp < 2 || ((ncp < 4) && (m_RegistrationMode == AFFINE)))	//check, if we have enough points to match
+		return false;
+
+	vtkMatrix4x4* matReg = RegisterPoints(sourcePoints, targetPoints, weights);
+	double deviation = CalculateDeviation(sourcePoints, targetPoints, matReg);
+	m_Info->SetAbsPose(deviation, 0.0, 0.0, 0.0, 0.0, 0.0, currTime);
+
+	vtkMAFSmartPointer< vtkMatrix4x4 > t_matrix;
+	t_matrix->Identity();
+
+	//post-multiply the registration matrix by the abs matrix of the target to position the
+	//registered  at the correct position in the space
+	mafMatrix *mat;
+	mafNEW(mat);
+	mat->Identity();
+
+	GetTarget()->GetOutput()->GetAbsMatrix(*mat, currTime);  //modified by Marco. 2-2-2004
+	vtkMatrix4x4::Multiply4x4(mat->GetVTKMatrix(), matReg, t_matrix);
+	mafDEL(mat);
+
+	//t_matrix now contains the correct transformation matrix for the current time
+	m_Registered->SetTimeStamp(currTime); //SetCurrentTime(currTime);
+		
+	mafMatrix *temp;
+	mafNEW(temp);
+	temp->SetVTKMatrix(t_matrix);
+	temp->SetTimeStamp(currTime);
+	temp->Modified();
+
+	mafMatrix *regMatrix = m_Registered->GetOutput()->GetMatrix();
+	regMatrix->DeepCopy(temp->GetVTKMatrix());
+	m_Registered->SetMatrix(*regMatrix);
+	m_Registered->Modified();
+	m_Registered->Update();
+
+	if(m_RegisteredFollower != NULL)
+	{
+		m_RegisteredFollower->SetTimeStamp(currTime); //SetCurrentTime(currTime);
+		mafMatrix *folMatrix = m_RegisteredFollower->GetOutput()->GetMatrix();
+		folMatrix->DeepCopy(temp->GetVTKMatrix());
+		m_RegisteredFollower->SetMatrix(*regMatrix);
+		m_RegisteredFollower->Modified();
+		m_RegisteredFollower->Update();
+	}
+
+	mafDEL(temp);
+	matReg->UnRegister(NULL);	//no longer needed
+	return true;
+}
+
+//----------------------------------------------------------------------------
+void medOpRegisterClusters::OpRun()
+//----------------------------------------------------------------------------
+{
+	if(!m_TestMode)
+	{
+		int num_choices = 3;
+		const wxString choices_string[] = {_("rigid"), _("similarity"), _("affine")};
+		mafString wildcard = "Dictionary (*.txt)|*.txt|All Files (*.*)|*.*";
+
+		m_Gui = new mafGUI(this);
+		m_Gui->SetListener(this);
+
+		m_Gui->Label(_("source :"),true);
+		m_Gui->Label(&m_SourceName);
+
+		m_Gui->Label(_("target :"),true);
+		m_Gui->Label(&m_TargetName);
+
+		m_Gui->Label(_("follower surface:"),true);
+		m_Gui->Label(&m_FollowerName);
+
+		m_Gui->Button(ID_CHOOSE,_("target "));
+		m_Gui->Button(ID_CHOOSE_SURFACE,_("follower surface"));
+
+		m_Gui->Button(ID_WEIGHT,_("weighted registration"));
+		m_Gui->Enable(ID_WEIGHT,false);
+
+		m_Gui->Combo(ID_REGTYPE, _("reg. type"), &m_RegistrationMode, num_choices, choices_string);
+
+		m_Gui->Bool(ID_MULTIPLE_TIME_REGISTRATION,_("multi-time"),&m_MultiTime,1);
+		m_Gui->Enable(ID_MULTIPLE_TIME_REGISTRATION,false);
+
+		m_Gui->Label(_("Apply registration matrix to landmarks"));
+		m_Gui->Bool(ID_APPLY_REGISTRATION,_("Apply"),&m_Apply,1);
+		m_Gui->Enable(ID_APPLY_REGISTRATION,false);
+
+		m_Gui->OkCancel();
+
+		m_Gui->Enable(wxOK,false);
+		m_Gui->Divider();
+		ShowGui();
+	}
+}
+
+//----------------------------------------------------------------------------
+//Called from OpDo to create all VMEs for the result. 
+/*virtual*/ void medOpRegisterClusters::CreateResultVMEs()
+	//----------------------------------------------------------------------------
+{
+	mafVMELandmarkCloud* source = GetSource();
+	mafVMELandmarkCloud* target = GetTarget();
+
+	mafNEW(m_Result);	
+	m_Result->SetName(wxString::Format("%s registered into %s", source->GetName(), m_Target->GetName()));
+	mafEventMacro(mafEvent(this, VME_ADD, m_Result));
+		
+	mafNEW(m_Info);	
+	m_Info->SetName(wxString::Format("Info for registration %s into %s",source->GetName(), target->GetName()));
+	m_Info->SetPosLabel("Registration residual: ", 0);
+	m_Info->SetPosShow(true, 0);
+	mafEventMacro(mafEvent(this, VME_ADD, m_Info));
+	m_Info->ReparentTo(m_Result);
+
+	wxString name = wxString::Format("%s registered on %s",source->GetName(), target->GetName());
+	mafNEW(m_Registered);
+	m_Registered->DeepCopy(source);
+	m_Registered->SetName(name);
+	mafEventMacro(mafEvent(this, VME_ADD, m_Registered));
+	m_Registered->ReparentTo(m_Result);
+
+	if (m_Follower != NULL)
+	{
+		mafNEW(m_RegisteredFollower);
+		m_RegisteredFollower->DeepCopy(m_Follower);		
+		m_RegisteredFollower->SetName(name);
+		wxString name = wxString::Format("%s registered on %s",m_Follower->GetName(), target->GetName());
+		mafEventMacro(mafEvent(this, VME_ADD, m_RegisteredFollower));
+		m_RegisteredFollower->ReparentTo(m_Result);
+	}
+}
+
+//----------------------------------------------------------------------------
+//Called from OpUndo to destroy all VMEs of the result. 
+//This method can be called also from OpDo when the registration process fails.
+/*virtual*/ void medOpRegisterClusters::DestroyResultVMEs()
+	//----------------------------------------------------------------------------
+{
+	if (m_Result != NULL)
+	{
+		mafEventMacro(mafEvent(this, VME_REMOVE, m_Info));
+		mafDEL(m_Info);
+
+		mafEventMacro(mafEvent(this, VME_REMOVE, m_Registered));
+		mafDEL(m_Registered);
+
+		if (m_RegisteredFollower != NULL)
+		{
+			mafEventMacro(mafEvent(this, VME_REMOVE, m_RegisteredFollower));
+			mafDEL(m_RegisteredFollower);
+		}
+
+		mafEventMacro(mafEvent(this, VME_REMOVE, m_Result));
+		mafDEL(m_Result);
+	}
+}
+
 //----------------------------------------------------------------------------
 void medOpRegisterClusters::OpDo()
 //----------------------------------------------------------------------------
-{
-  if(!m_TestMode)
-	  wxBusyInfo wait(_("Please wait, working..."));
-
-  mafNEW(m_Info);
-  wxString name = wxString::Format("Info for registration %s into %s",m_Source->GetName(), m_Target->GetName());
-  m_Info->SetName(name);
-  m_Info->SetPosLabel("Registration residual: ", 0);
-  m_Info->SetPosShow(true, 0);
-  mafEventMacro(mafEvent(this, VME_ADD, m_Info));
-
-  //check for the multi-time registration
-	if(m_MultiTime)
-	{
-    std::vector<mafTimeStamp> timeStamps;
-    m_Target->GetLocalTimeStamps(timeStamps);
-		int numTimeStamps = m_Target->GetNumberOfTimeStamps();
-
-		//mafProgressBarShowMacro();
-    if(!m_TestMode)
-      mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
-    
-		//mafProgressBarSetTextMacro("Multi time registration...");
+{	
+	if(!m_TestMode)
+		wxBusyInfo wait(_("Please wait, working..."));
 		
-		for (int t = 0; t < numTimeStamps; t++)
-		{
-			double currTime = timeStamps[t];
-			long p = t * 100 / numTimeStamps;
-		//	mafProgressBarSetValueMacro(p);
-      if(!m_TestMode)
-        mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,p));
-			//Set the new time for the vme used to register the one frame source 
-      m_Target->SetTimeStamp(currTime); //set current time
-      m_Target->Update(); //>UpdateAllData();
+	//create result VMEs
+	CreateResultVMEs();
 
-			if(ExtractMatchingPoints(currTime))
-      {
-				m_Info->SetAbsPose(RegisterPoints(currTime), 0.0, 0.0, 0.0, 0.0, 0.0, currTime);
-      }
+	//do the operation	
+	mafVMELandmarkCloud* source = GetSource();
+	mafVMELandmarkCloud* target = GetTarget();
+
+	//Make sure we have matches
+	CreateMatches();
+
+	bool bRegistrationOK = false;
+	if (m_MultiTime == 0)
+	{
+		if (false == (bRegistrationOK = RegisterSource(-1))) {
+			mafLogMessage("No matching landmarks found!");
 		}
-    timeStamps.clear();
-
-    if(!m_TestMode)
-      mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
 	}
 	else
 	{
-		//RegisterPoints(m_Source->GetCurrentTime());
-		m_Info->SetAbsPose(RegisterPoints(), 0.0, 0.0, 0.0, 0.0, 0.0);
+		std::vector<mafTimeStamp> timeStamps;
+		target->GetLocalTimeStamps(timeStamps);
+		int numTimeStamps = target->GetNumberOfTimeStamps();
+
+		//mafProgressBarShowMacro();
+		if(!m_TestMode)
+			mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
+
+		//mafProgressBarSetTextMacro("Multi time registration...");
+
+		for (int t = 0; t < numTimeStamps; t++)
+		{
+			double currTime = timeStamps[t];						
+			if(!m_TestMode) 
+			{
+				long p = t * 100 / numTimeStamps;
+				mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,p));
+			}
+			
+			if (RegisterSource(currTime))
+				bRegistrationOK = true;	//at least something has been registered
+			else
+				mafLogMessage("No visible matching landmarks found at timestamp %f", currTime);			
+		}
+
+		timeStamps.clear();
+
+		if(!m_TestMode)
+			mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));			
+	} //end else
+		
+	if (!bRegistrationOK)
+	{
+		//OK, so registration failed completely
+		DestroyResultVMEs();		
+	}
+	else
+	{	
+		if (m_Apply != 0) {
+			ApplyRegistrationMatrix();
+		}
+
+		
+		//conversion from time variant landmark cloud with non time variant landmark to
+		// non variant landmark cloud with time variant landmark
+		if(m_MultiTime) {
+			SetRegistrationMatrixForLandmarks();
+		}		
 	}
 
-  if(m_Registered || m_Follower)
-  {
-    mafNEW(m_Result);
-    wxString name = wxString::Format("%s registered into %s",m_Source->GetName(), m_Target->GetName());
-    m_Result->SetName(name);
-    mafEventMacro(mafEvent(this, VME_ADD, m_Result));
-    m_Info->ReparentTo(m_Result);
-  }
-  else
-  {
-    mafEventMacro(mafEvent(this, VME_REMOVE, m_Info));
-    mafDEL(m_Info);
-  }
+	mafEventMacro(mafEvent(this,TIME_SET,-1.0));
+}
 
-  if(m_Registered)
+//----------------------------------------------------------------------------
+void medOpRegisterClusters::OpUndo()
+	//----------------------------------------------------------------------------
+{
+	DestroyResultVMEs();
+}
+
+//----------------------------------------------------------------------------
+// Converts time-variant m_Registered landmark cloud containing static landmarks into
+//static landmark cloud (m_Registered) with time-variant landmarks.
+/*virtual*/ void medOpRegisterClusters::SetRegistrationMatrixForLandmarks()
+	//----------------------------------------------------------------------------
+{
+	if(!m_Registered->IsOpen())
+		m_Registered->Open();
+
+	std::vector<mafTimeStamp> timeStamps;
+	m_Target->GetLocalTimeStamps(timeStamps);
+	int numTimeStamps = m_Target->GetNumberOfTimeStamps();
+
+	mafVMELandmarkCloud *landmarkCloudWithTimeVariantLandmarks;
+	mafNEW(landmarkCloudWithTimeVariantLandmarks);
+	mafEventMacro(mafEvent(this, VME_ADD, landmarkCloudWithTimeVariantLandmarks));
+	landmarkCloudWithTimeVariantLandmarks->ReparentTo(m_Result);
+
+	landmarkCloudWithTimeVariantLandmarks->SetName(m_Registered->GetName());
+	landmarkCloudWithTimeVariantLandmarks->Open();
+
+	for (int t = 0; t < numTimeStamps; t++)
 	{
-		if(m_Apply)
+		double cTime = timeStamps[t];
+		m_Registered->SetTimeStamp(cTime); //Set current time
+		m_Registered->Update(); //>UpdateCurrentData();
+
+		for(int i=0; i< m_Registered->GetNumberOfLandmarks(); i++)
 		{
-			//Apply all matrix vector to the polydata so the gliphs are not deformed 
-			//when affine registration is choosed
-			double cTime;
-      std::vector<mafTimeStamp> time;
-			m_Registered->GetLocalTimeStamps(time); // time is to be deleted
-			int num = m_Registered->GetNumberOfLocalTimeStamps();
-			
-			vtkMAFSmartPointer<vtkPolyData> data;
-			mafSmartPointer<mafMatrix> matrix; //modified by Marco. 2-2-2004
-			vtkMAFSmartPointer<vtkTransform> transform;
-			vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformData;
-			transformData->SetTransform(transform);
-      
-      if(!m_Registered->IsOpen())
-					  m_Registered->Open();
-
-			if(m_MultiTime)
+			mafVMELandmark *landmark;
+			landmark = mafVMELandmark::SafeDownCast(landmarkCloudWithTimeVariantLandmarks->GetLandmark(i));
+			if(landmark == NULL)
 			{
-				for (int tm = 0; tm < num; tm++)
-				{
-					cTime = time[tm];
-          m_Registered->SetTimeStamp(cTime); //Set current time
-          // TODO: should not be necessary any more
-          m_Registered->Update(); //>UpdateCurrentData();
-					
-          //data = (vtkPolyData *)m_Registered->GetOutput()->GetVTKData(); //GetCurrentData();
-					
-					/** Variante */
-					vtkMAFSmartPointer<vtkPoints> points;
-
-          for(int i=0; i< m_Registered->GetNumberOfLandmarks(); i++)
-					{
-					  double coords[3];
-					  m_Registered->GetLandmark(i)->GetPoint(coords);
-					  points->InsertNextPoint(coords);
-          }
-					data->SetPoints(points);
-					data->Update();
-					
-          // TODO: refactoring to use directly the matrix pipe
-          transform->SetMatrix(m_Registered->GetOutput()->GetMatrix()->GetVTKMatrix());  //modified by Marco. 2-2-2004
-					transformData->SetInput(data);
-					transformData->Update();
-					
-					matrix->Identity();
-					m_Registered->SetPose(*matrix,cTime);
-
-					/** Variante */
-					for(int i=0; i< transformData->GetOutput()->GetNumberOfPoints(); i++)
-				  {
-					  double coords[3];
-            transformData->GetOutput()->GetPoint(i, coords);
-					  m_Registered->SetLandmark(i, coords[0], coords[1], coords[2] , cTime);
-					}
-          //m_Registered->SetDataByDetaching(vtkPolyData::SafeDownCast(transformData->GetOutput()) ,cTime );
-				}
+				mafNEW(landmark);
+				mafEventMacro(mafEvent(this, VME_ADD,landmark));
+				landmark->SetName(m_Registered->GetLandmark(i)->GetName());
+				landmark->ReparentTo(landmarkCloudWithTimeVariantLandmarks);
+				//BES: 30.3.2011 - now landmark can be released, since it is already ReparentTo => memory leak fix
+				landmark->UnRegister(this);
 			}
-			else
+
+			double pos[3], rot[3];
+			m_Registered->GetLandmark(i)->GetOutput()->GetAbsPose(pos,rot,cTime);
+
+			landmarkCloudWithTimeVariantLandmarks->SetLandmarkVisibility(i,m_Registered->GetLandmarkVisibility(i,cTime),cTime);
+			landmark->SetTimeStamp(cTime);
+			landmark->SetAbsPose(pos,rot,cTime);
+
+			//avoid matrix error log for the first creation of landmarks
+			mafMatrix *matrix = landmark->GetMatrixVector()->GetMatrix(cTime);
+			matrix->SetElement(0,0,1);
+			matrix->SetElement(1,1,1);
+			matrix->SetElement(2,2,1);
+
+			landmark->Modified();
+			landmark->Update();
+		}
+	}
+
+	landmarkCloudWithTimeVariantLandmarks->Update();
+	landmarkCloudWithTimeVariantLandmarks->Close();
+
+	m_Registered->Close();
+	mafEventMacro(mafEvent(this, VME_REMOVE, m_Registered));
+	mafDEL(m_Registered);
+
+	m_Registered = landmarkCloudWithTimeVariantLandmarks;	
+	timeStamps.clear();
+}		
+
+//----------------------------------------------------------------------------
+// Applies registration matrix. Called from OpDo, if m_Apply is non-zero.
+/*virtual*/ void medOpRegisterClusters::ApplyRegistrationMatrix()
+	//----------------------------------------------------------------------------
+{
+	//Apply all matrix vector to the polydata so the gliphs are not deformed
+	//when affine registration is choosed
+	double cTime;
+	std::vector<mafTimeStamp> time;
+	m_Registered->GetLocalTimeStamps(time); // time is to be deleted
+	int num = m_Registered->GetNumberOfLocalTimeStamps();
+
+	vtkMAFSmartPointer<vtkPolyData> data;
+	mafSmartPointer<mafMatrix> matrix; //modified by Marco. 2-2-2004
+	vtkMAFSmartPointer<vtkTransform> transform;
+	vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformData;
+	transformData->SetTransform(transform);
+
+	if(!m_Registered->IsOpen())
+		m_Registered->Open();
+
+	if(m_MultiTime)
+	{
+		for (int tm = 0; tm < num; tm++)
+		{
+			cTime = time[tm];
+			m_Registered->SetTimeStamp(cTime); //Set current time
+			// TODO: should not be necessary any more
+			m_Registered->Update(); //>UpdateCurrentData();
+
+			//data = (vtkPolyData *)m_Registered->GetOutput()->GetVTKData(); //GetCurrentData();
+
+			/** Variante */
+			vtkMAFSmartPointer<vtkPoints> points;
+
+			for(int i=0; i< m_Registered->GetNumberOfLandmarks(); i++)
 			{
-				cTime = m_Registered->GetTimeStamp(); //GetCurrentTime();
-        //data = (vtkPolyData *)m_Registered->GetOutput()->GetVTKData(); //GetCurrentData();
-
-				/** Variante */
-				vtkMAFSmartPointer<vtkPoints> points;
-
-				for(int i=0; i< m_Registered->GetNumberOfLandmarks(); i++)
-				{
 				double coords[3];
 				m_Registered->GetLandmark(i)->GetPoint(coords);
 				points->InsertNextPoint(coords);
-				}
-				data->SetPoints(points);
-				data->Update();
+			}
+			data->SetPoints(points);
+			data->Update();
 
-				//m_Registered->GetMatrix(matrix,cTime);
-  
-				// TODO: refactoring to use directly the matrix pipe
-        transform->SetMatrix(m_Registered->GetOutput()->GetMatrix()->GetVTKMatrix());
-				transformData->SetInput(data);
-				transformData->Update();
-				
-				matrix->Identity();
-				m_Registered->SetPose(*matrix,cTime);
+			// TODO: refactoring to use directly the matrix pipe
+			transform->SetMatrix(m_Registered->GetOutput()->GetMatrix()->GetVTKMatrix());  //modified by Marco. 2-2-2004
+			transformData->SetInput(data);
+			transformData->Update();
 
-				/** Variante */
-				for(int i=0; i< transformData->GetOutput()->GetNumberOfPoints(); i++)
-				{
+			matrix->Identity();
+			m_Registered->SetPose(*matrix,cTime);
+
+			/** Variante */
+			for(int i=0; i< transformData->GetOutput()->GetNumberOfPoints(); i++)
+			{
 				double coords[3];
 				transformData->GetOutput()->GetPoint(i, coords);
 				m_Registered->SetLandmark(i, coords[0], coords[1], coords[2] , cTime);
-				}
-        //m_Registered->SetDataByDetaching((vtkPolyData *)transformData->GetOutput(), cTime);
 			}
-
-      m_Registered->Close();
-			time.clear();
+			//m_Registered->SetDataByDetaching(vtkPolyData::SafeDownCast(transformData->GetOutput()) ,cTime );
 		}
-
-    //conversion from time variant landmark cloud with non time variant landmark to 
-    // non variant landmark cloud with time variant landmark
-    if(m_MultiTime)
-    {
-      if(!m_Registered->IsOpen())
-        m_Registered->Open();
-
-
-      std::vector<mafTimeStamp> timeStamps;
-      m_Target->GetLocalTimeStamps(timeStamps);
-      int numTimeStamps = m_Target->GetNumberOfTimeStamps();
-
-      mafVMELandmarkCloud *landmarkCloudWithTimeVariantLandmarks;
-      mafNEW(landmarkCloudWithTimeVariantLandmarks);
-      mafEventMacro(mafEvent(this, VME_ADD, landmarkCloudWithTimeVariantLandmarks));
-      landmarkCloudWithTimeVariantLandmarks->ReparentTo(m_Result);
-
-      landmarkCloudWithTimeVariantLandmarks->SetName(m_Registered->GetName());
-      landmarkCloudWithTimeVariantLandmarks->Open();
-
-      for (int t = 0; t < numTimeStamps; t++)
-      {
-        double cTime = timeStamps[t];
-        m_Registered->SetTimeStamp(cTime); //Set current time
-        m_Registered->Update(); //>UpdateCurrentData();
-        
-
-        for(int i=0; i< m_Registered->GetNumberOfLandmarks(); i++)
-        {
-          mafVMELandmark *landmark;
-          landmark = mafVMELandmark::SafeDownCast(landmarkCloudWithTimeVariantLandmarks->GetLandmark(i));
-          if(landmark == NULL)
-          {
-            mafNEW(landmark);
-            mafEventMacro(mafEvent(this, VME_ADD,landmark));
-            landmark->SetName(m_Registered->GetLandmark(i)->GetName());
-            landmark->ReparentTo(landmarkCloudWithTimeVariantLandmarks);
-						//BES: 30.3.2011 - now landmark can be released, since it is already ReparentTo => memory leak fix
-						landmark->UnRegister(this);
-          }
-
-          double pos[3], rot[3];
-          m_Registered->GetLandmark(i)->GetOutput()->GetAbsPose(pos,rot,cTime);
-          
-          landmarkCloudWithTimeVariantLandmarks->SetLandmarkVisibility(i,m_Registered->GetLandmarkVisibility(i,cTime),cTime);
-          landmark->SetTimeStamp(cTime);
-          landmark->SetAbsPose(pos,rot,cTime);
-
-          //avoid matrix error log for the first creation of landmarks
-          mafMatrix *matrix = landmark->GetMatrixVector()->GetMatrix(cTime);
-          matrix->SetElement(0,0,1);
-          matrix->SetElement(1,1,1);
-          matrix->SetElement(2,2,1);
-
-          landmark->Modified();
-          landmark->Update();
-          
-        }
-      }
-
-      landmarkCloudWithTimeVariantLandmarks->Update();
-      landmarkCloudWithTimeVariantLandmarks->Close();
-
-      mafDEL(landmarkCloudWithTimeVariantLandmarks);
-
-      m_Registered->Close();
-      timeStamps.clear();
-    }
-    else
-    {
-      //m_Registered->SetAbsMatrix(((mafVMELandmarkCloud *)m_Target)->GetAbsMatrixPipe()->GetMatrix());
-      mafEventMacro(mafEvent(this, VME_ADD, m_Registered));
-      /*std::vector<mafTimeStamp> timeStamps;
-      m_Registered->GetTimeStamps(timeStamps);
-      for(int i=0; i<timeStamps.size();i++)
-      {
-        double value;
-        value = timeStamps[i];
-        value = value;
-      }
-      m_Target->GetTimeStamps(timeStamps);
-      for(int i=0; i<timeStamps.size();i++)
-      {
-        double value;
-        value = timeStamps[i];
-        value = value;
-      }*/
-      m_Registered->ReparentTo(m_Result);
-    }
-    
-	}
-	
-	if(m_Follower)
-	{
-		wxString name = wxString::Format("%s registered on %s",m_Follower->GetName(), m_Target->GetName());
-		m_Follower->SetName(name);
-		mafEventMacro(mafEvent(this, VME_ADD, m_Follower));
-    m_Follower->ReparentTo(m_Result);
-	}
-
-  mafEventMacro(mafEvent(this,TIME_SET,-1.0));
-}
-//----------------------------------------------------------------------------
-void medOpRegisterClusters::OpUndo()
-//----------------------------------------------------------------------------
-{
-  assert(m_Result);
-  mafEventMacro(mafEvent(this, VME_REMOVE, m_Result));
-	mafDEL(m_Result);
-  mafDEL(m_Registered);
-  mafDEL(m_Follower);
-  mafDEL(m_CommonPoints);
-  mafDEL(m_Info);
-}
-//----------------------------------------------------------------------------
-int medOpRegisterClusters::ExtractMatchingPoints(double time)
-//----------------------------------------------------------------------------
-{
-	m_PointsSource->Reset();
-	m_PointsTarget->Reset();
-
-  m_Source->Update();
-  vtkDataSet *polySource =m_Source->GetOutput()->GetVTKData();
-  vtkDataSet *polyTarget =m_Target->GetOutput()->GetVTKData();
-
-  polySource->Update();
-  polyTarget->Update();
-
-
-	int npSource = polySource->GetNumberOfPoints();
-	int npTarget = polyTarget->GetNumberOfPoints();
-
-  
-	if(npSource == 0 ) return 0;
-	if(npTarget == 0) return 0;
-
-	int i;
-	int j;
-
-	//number of common points between m_Source and m_Target
-	int ncp = 0;
-
-  mafDEL(m_CommonPoints);
-	m_CommonPoints = mafVMELandmarkCloud::New();
-
-	bool found_one = false;
-
-	for(i=0;i<npSource;i++)
-	{
-		wxString SourceLandmarkName = m_Source->GetLandmarkName(i);
-
-		bool found = false;
-		for(j=0;j<npTarget;j++)
-		{
-			wxString TargetLandmarkName = m_Target->GetLandmarkName(j);
-			if(mafString(SourceLandmarkName) == mafString(TargetLandmarkName))
-			{
-				found = true;
-				found_one = true;
-				break;
-			}
-		}
-
-		if (found)
-		{
-			if(m_Target->GetLandmarkVisibility(j,time))
-			{
-				
-				m_PointsSource->InsertNextPoint(polySource->GetPoint(i));
-				m_PointsTarget->InsertNextPoint(polyTarget->GetPoint(j));
-
-				//modified by STEFY 24-5-2004(begin)
-				m_CommonPoints->AppendLandmark(SourceLandmarkName);
-				//modified by STEFY 24-5-2004(end)
-				ncp++;
-			}
-		}
-	}
-
-	if(!found_one)
-	{
-		wxMessageBox("No matching landmarks found!","Alert", wxOK , NULL);
-	}
-	else if(found_one && (ncp == 0) && (m_MultiTime == 0))
-	{
-		wxMessageBox("No visible matching landmarks found at this timestamp!","Alert", wxOK , NULL);
-	}
-
-	return ncp;
-}
-//----------------------------------------------------------------------------
-double medOpRegisterClusters::RegisterPoints(double currTime)
-//----------------------------------------------------------------------------
-{
-  double deviation = 0.0;
-	assert(m_PointsSource && m_PointsTarget);
-
-	vtkWeightedLandmarkTransform *RegisterTransform = vtkWeightedLandmarkTransform::New();
-
-	RegisterTransform->SetSourceLandmarks(m_PointsSource);	
-	RegisterTransform->SetTargetLandmarks(m_PointsTarget);	
-	
-	if(m_Weight)
-	{
-		if(m_CommonPoints)
-		{
-			int number = m_CommonPoints->GetNumberOfLandmarks();	
-			RegisterTransform->SetWeights(m_Weight,number);	
-		}
-	}
-
-	
-	switch (m_RegistrationMode)						
-	{
-		case RIGID:
-  		RegisterTransform->SetModeToRigidBody();
-		break;
-		case SIMILARITY:
-  		RegisterTransform->SetModeToSimilarity();
-		break;
-		case AFFINE:
-  		RegisterTransform->SetModeToAffine();
-		break;
-	}
-  RegisterTransform->Update();
-
-  vtkMatrix4x4 *t_matrix = vtkMatrix4x4::New();
-	t_matrix->Identity();
-
-  if(m_Registered == NULL )
-	{
-		wxString name = wxString::Format("%s registered on %s",m_Source->GetName(), m_Target->GetName());
-		mafNEW(m_Registered);
-		m_Registered->DeepCopy(m_Source);
-		m_Registered->SetName(name);
-	}
-
-  //calculate deviation
-  for(int i = 0; i < m_PointsSource->GetNumberOfPoints(); i++)
-  {
-    double coord[4];
-    double result[4];
-    double target[3];
-    double dx, dy, dz;
-    m_PointsSource->GetPoint(i, coord);
-    coord[3] = 1.0;
-
-    m_PointsTarget->GetPoint(i, target);
-
-    //transform point
-    RegisterTransform->GetMatrix()->MultiplyPoint(coord, result);
-
-    dx = target[0] - result[0];
-    dy = target[1] - result[1];
-    dz = target[2] - result[2];
-
-    deviation += dx * dx + dy * dy + dz * dz;
-  }
-  if(m_PointsSource->GetNumberOfPoints() != 0)
-    deviation /= m_PointsSource->GetNumberOfPoints();
-  deviation = sqrt(deviation);
-
-	
-	//post-multiply the registration matrix by the abs matrix of the target to position the
-	//registered  at the correct position in the space
-  mafMatrix *mat;
-	mafNEW(mat);
-	mat->Identity();
-  m_Target->GetOutput()->GetAbsMatrix(*mat,currTime);  //modified by Marco. 2-2-2004
-  vtkMatrix4x4::Multiply4x4(mat->GetVTKMatrix(),RegisterTransform->GetMatrix(),t_matrix);
-  mafDEL(mat);
-  
-	int numLandmarks = m_Target->GetNumberOfVisibleLandmarks(currTime);
-
-	if((numLandmarks < 2) || ((numLandmarks < 4) && (m_RegistrationMode == AFFINE)))
-	{
-		RegisterTransform->Delete();
-		t_matrix->Delete();
-		return deviation;
 	}
 	else
 	{
-    m_Registered->SetTimeStamp(currTime); //SetCurrentTime(currTime);
- 
-    //m_Registered->SetPose(t_matrix,currTime);
-    //m_Registered->Update();
-    mafMatrix *temp;
-    mafNEW(temp);
-    temp->SetVTKMatrix(t_matrix);
-    temp->SetTimeStamp(currTime);
-    temp->Modified();
-    mafMatrix *regMatrix = m_Registered->GetOutput()->GetMatrix();
-    regMatrix->DeepCopy(temp->GetVTKMatrix());
-    m_Registered->SetMatrix(*regMatrix);
-    m_Registered->Modified();
-    m_Registered->Update();
-    
-    //mafMatrix *z;
-    //z = m_Registered->GetOutput()->GetMatrix();
-    
+		cTime = m_Registered->GetTimeStamp(); //GetCurrentTime();
+		//data = (vtkPolyData *)m_Registered->GetOutput()->GetVTKData(); //GetCurrentData();
 
-		if(m_Follower)
+		/** Variante */
+		vtkMAFSmartPointer<vtkPoints> points;
+
+		for(int i=0; i< m_Registered->GetNumberOfLandmarks(); i++)
 		{
-      m_Follower->SetTimeStamp(currTime); //SetCurrentTime(currTime);
-      mafMatrix *folMatrix = m_Follower->GetOutput()->GetMatrix();
-      folMatrix->DeepCopy(temp->GetVTKMatrix());
-			m_Follower->SetMatrix(*regMatrix);
-      m_Follower->Modified();
-      m_Follower->Update();
+			double coords[3];
+			m_Registered->GetLandmark(i)->GetPoint(coords);
+			points->InsertNextPoint(coords);
 		}
-    mafDEL(temp);
+		data->SetPoints(points);
+		data->Update();
+
+		//m_Registered->GetMatrix(matrix,cTime);
+
+		// TODO: refactoring to use directly the matrix pipe
+		transform->SetMatrix(m_Registered->GetOutput()->GetMatrix()->GetVTKMatrix());
+		transformData->SetInput(data);
+		transformData->Update();
+
+		matrix->Identity();
+		m_Registered->SetPose(*matrix,cTime);
+
+		/** Variante */
+		for(int i=0; i< transformData->GetOutput()->GetNumberOfPoints(); i++)
+		{
+			double coords[3];
+			transformData->GetOutput()->GetPoint(i, coords);
+			m_Registered->SetLandmark(i, coords[0], coords[1], coords[2] , cTime);
+		}
+		//m_Registered->SetDataByDetaching((vtkPolyData *)transformData->GetOutput(), cTime);
 	}
 
-  vtkDEL(RegisterTransform);
-	vtkDEL(t_matrix);
-  return deviation;
+	m_Registered->Close();
+	time.clear();
 }
+
+
+#pragma region GUI
+//----------------------------------------------------------------------------
+void medOpRegisterClusters::OnEvent(mafEventBase *maf_event)
+	//----------------------------------------------------------------------------
+{
+	if(mafEvent *e = mafEvent::SafeDownCast(maf_event))
+	{
+		switch(e->GetId())
+		{
+		case ID_CHOOSE:
+			OnChooseLandmarkCloud();
+			break;
+
+		case ID_CHOOSE_SURFACE:
+			OnChooseSurface();
+			break;
+
+		case ID_REGTYPE:
+			if(m_RegistrationMode == AFFINE)
+				m_Gui->Enable(ID_APPLY_REGISTRATION, true);
+			else
+				m_Gui->Enable(ID_APPLY_REGISTRATION, false);
+			break;
+
+		case ID_WEIGHT:
+			OnChangeWeights();
+			break;
+
+		case wxOK:
+			if(m_SettingsGuiFlag == false)
+				OpStop(OP_RUN_OK);
+			else
+			{
+				m_GuiSetWeights->Close();
+				m_Dialog->Close();
+				m_SettingsGuiFlag = false;
+			}
+			break;
+
+		case wxCANCEL:
+			if(m_SettingsGuiFlag == false)
+				OpStop(OP_RUN_CANCEL);
+			else
+			{
+				m_GuiSetWeights->Close();
+				m_Dialog->Close();
+
+				delete[] m_Weights;
+				m_Weights = NULL;
+
+				m_SettingsGuiFlag = false;
+			}
+			break;
+
+		default:
+			mafEventMacro(*e);
+			break;
+		}
+	}
+}
+
+//----------------------------------------------------------------------------
+//Called when ID_CHOOSE event is raised.
+void medOpRegisterClusters::OnChooseLandmarkCloud()
+	//----------------------------------------------------------------------------
+{
+	mafString s(_("Choose cloud"));
+	mafEvent e(this,VME_CHOOSE, &s, (long)&medOpRegisterClusters::ClosedCloudAccept);
+	mafEventMacro(e);
+
+	mafNode *vme = e.GetVme();
+	OnChooseVme(vme);
+
+	if(vme != NULL) {
+		m_Gui->Enable(ID_WEIGHT,true);
+	}
+}
+
+//----------------------------------------------------------------------------
+//Called when ID_CHOOSE_SURFACE event is raised.
+void medOpRegisterClusters::OnChooseSurface()
+	//----------------------------------------------------------------------------
+{
+	mafString s(_("Choose surface"));
+	mafEvent e(this,VME_CHOOSE, &s, (long)&medOpRegisterClusters::SurfaceAccept);
+	mafEventMacro(e);
+
+	mafNode *vme = e.GetVme();
+	OnChooseVme(vme);
+}
+
 //----------------------------------------------------------------------------
 void medOpRegisterClusters::OnChooseVme(mafNode *vme)
-//----------------------------------------------------------------------------
+	//----------------------------------------------------------------------------
 {
-	if(!vme) // user choose cancel - keep everything as before
+	if(vme == NULL) // user choose cancel - keep everything as before
 		return;
 
-	if(vme->IsA("mafVMESurface"))
+	mafVMESurface* surface = mafVMESurface::SafeDownCast(vme);
+	if (surface != NULL)
 	{
-		if(m_Follower == NULL)
-		{
-			m_Follower = mafVMESurface::New();
-			m_Follower->Register(this); 
+		SetFollower(surface);
+		if(m_Follower == NULL) {
+			wxMessageBox(_("Bad follower!"), _("Alert"), wxOK, NULL);
 		}
-		if(m_Follower->CanCopy(vme))
-			m_Follower->DeepCopy(vme);
+	}
+	else
+	{
+		mafVMELandmarkCloud* target = mafVMELandmarkCloud::SafeDownCast(vme);
+		if (target != NULL)
+		{
+			SetTarget(target);
+			if (m_Target == NULL) {
+				wxMessageBox(_("Bad target!"), _("Alert"), wxOK, NULL);
+			}
+			else
+			{
+				if(m_Target->IsAnimated())
+					m_Gui->Enable(ID_MULTIPLE_TIME_REGISTRATION,true);
+
+				m_Gui->Enable(wxOK,true);
+			}
+		}
 		else
 		{
-			wxMessageBox(_("Bad follower!"), _("Alert"), wxOK, NULL);
-			vtkDEL(m_Follower);
-			return;
+			wxMessageBox(_("Bad vme type!"), _("Alert"), wxOK, NULL);
 		}
-		m_FollowerName = m_Follower->GetName();
-	}
-	else if(vme->IsA("mafVMELandmarkCloud"))
-	{
-    /*if(!Accept(vme))
-		{
-			wxMessageBox("Bad target!", "Alert", wxOK, NULL);
-			vtkDEL(m_Target);
-			return;
-		}*/
-		m_Target = (mafVMELandmarkCloud *)vme;
-		m_TargetName = m_Target->GetName();
-		if(m_Target->IsAnimated())
-			m_Gui->Enable(ID_MULTIPLE_TIME_REGISTRATION,true);
-		ExtractMatchingPoints(); 
-		m_Gui->Enable(wxOK,true);
 	}
 
-	if(!vme->IsA("mafVMESurface")  &&  !vme->IsA("mafVMELandmarkCloud"))
-	{
-		wxMessageBox(_("Bad vme type!"), _("Alert"), wxOK, NULL);
-		return;
-	}
 	m_Gui->Update();
 }
 
-
 //----------------------------------------------------------------------------
-void medOpRegisterClusters::SetTarget(mafVMELandmarkCloud *target)
-//----------------------------------------------------------------------------
+//Called when ID_WEIGHT event is raised.
+/*virtual*/ void medOpRegisterClusters::OnChangeWeights()
+	//----------------------------------------------------------------------------
 {
-  // added by Losi on 31/01/2011 to allow test OpDo method
-  if(ClosedCloudAccept(target))
-  {
-    m_Target = target;
-    m_TargetName = m_Target->GetName();
-    ExtractMatchingPoints(); 
-  }
+	m_SettingsGuiFlag = true;
+	int x_init,y_init;
+	x_init = mafGetFrame()->GetPosition().x;
+	y_init = mafGetFrame()->GetPosition().y;
+
+	m_Dialog = new mafGUIDialog(_("setting weights"), mafCLOSEWINDOW);
+	m_Dialog->SetSize(x_init+40,y_init+40,220,220);
+
+	m_GuiSetWeights = new mafGUI(this);
+	m_GuiSetWeights->SetListener(this);
+
+	/////////////////////////////////////////////////////	
+	mafVMELandmarkCloud* source = GetSource();
+	if (source != NULL)
+	{	
+		CreateMatches();	//make sure, we have matches
+		
+		int number = source->GetNumberOfLandmarks();
+		for (int i = 0; i < number; i++)
+		{
+			//if the source landmark has matching target landmark, display it,
+			//otherwise we will ignore it
+			if (m_Matches[i].GetTargetIndex() >= 0)
+			{			
+				m_GuiSetWeights->Label(source->GetLandmarkName(i));
+				m_GuiSetWeights->Double(-1,"",&m_Weights[i]);
+			}
+		}		
+	}
+
+	m_GuiSetWeights->Show(true);
+	m_GuiSetWeights->Reparent(m_Dialog);
+	m_GuiSetWeights->FitGui();
+	m_GuiSetWeights->SetSize(200, 220);
+	m_GuiSetWeights->OkCancel();
+	m_GuiSetWeights->Divider();
+	m_GuiSetWeights->Update();
+
+	m_Dialog->Add(m_GuiSetWeights,1,wxEXPAND);
+	m_Dialog->SetAutoLayout(TRUE);
+
+	m_Dialog->ShowModal();
 }
 
+#pragma endregion
+
+#pragma region Nested Classes
 //----------------------------------------------------------------------------
-void medOpRegisterClusters::SetFollower(mafVMESurface *follower)
-//----------------------------------------------------------------------------
+//Returns true, if the given targetName is in the list of acceptable list.
+//Typically, the caller then sets TargetIndex to speed-up process. 
+bool medOpRegisterClusters::MatchingInfo::MatchTargetName(const char* targetName)
 {
-  // added by Losi on 31/01/2011 to allow test OpDo method
-  if(SurfaceAccept(follower))
-  {
-    if(m_Follower == NULL)
-    {
-      m_Follower = mafVMESurface::New();
-      m_Follower->Register(this); 
-    }
-    if(m_Follower->CanCopy(follower))
-      m_Follower->DeepCopy(follower);
-    m_FollowerName = m_Follower->GetName();
-  }
+	int count = (int)m_TargetNames.size();
+	for (int i = 0; i < count; i++) 
+	{
+		if (0 == strcmpi(m_TargetNames[i].c_str(), targetName))
+			return true;	//match, we have found it!
+	}
+
+	return false;
 }
+#pragma endregion
