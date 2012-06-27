@@ -973,7 +973,10 @@ void medOpSegmentation::FloodFill(vtkIdType seed)
   int center = seed;
   if(m_GlobalFloodFill == TRUE)
   {
-    for(int s = m_CurrentSliceIndex; s < m_VolumeDimensions[m_CurrentSlicePlane]; s++)
+    double low, hi;
+    m_ManualRangeSlider->GetSubRange(&low,&hi);
+
+    for(int s = m_CurrentSliceIndex; s <= hi; s++)
     {
       vtkStructuredPoints *input = vtkStructuredPoints::New();
       double dimensions[3];
@@ -1005,7 +1008,10 @@ void medOpSegmentation::FloodFill(vtkIdType seed)
 
       input->Delete();
       output->Delete();
-      OnEvent(new mafEvent(this,ID_SLICE_NEXT));
+      if(s < hi)
+      {
+        OnEvent(new mafEvent(this,ID_SLICE_NEXT));
+      }
     }
     OnEvent(new mafEvent(this,ID_SLICE_SLIDER));
   }
@@ -1564,7 +1570,7 @@ void medOpSegmentation::CreateManualSegmentationGui()
   // Brush Editing options
   //////////////////////////////////////////////////////////////////////////
   
-  wxStaticBoxSizer *brushEditingSizer = new wxStaticBoxSizer(wxVERTICAL, currentGui, "Brush Options");
+  m_BrushEditingSizer = new wxStaticBoxSizer(wxVERTICAL, currentGui, "Brush Options");
   
   // BRUSH SHAPE
   wxString shapes[2];
@@ -1610,15 +1616,15 @@ void medOpSegmentation::CreateManualSegmentationGui()
   brushSizeSizer->Add(m_ManualBrushSizeText, 0);
   brushSizeSizer->Add(m_ManualBrushSizeSlider, 0);
 
-  brushEditingSizer->Add(brushShapesSizer, 0, wxALL, 1);
-  brushEditingSizer->Add(brushSizeSizer, 0, wxALL, 1);
+  m_BrushEditingSizer->Add(brushShapesSizer, 0, wxALL, 1);
+  m_BrushEditingSizer->Add(brushSizeSizer, 0, wxALL, 1);
 
 
   //////////////////////////////////////////////////////////////////////////
   // bucket Editing options
   //////////////////////////////////////////////////////////////////////////
 
-  wxStaticBoxSizer *bucketEditingSizer = new wxStaticBoxSizer(wxVERTICAL, currentGui, "Bucket Options");
+  m_BucketEditingSizer = new wxStaticBoxSizer(wxVERTICAL, currentGui, "Bucket Options");
 
   // BRUSH SHAPE
   wxString bucketActions[2];
@@ -1633,19 +1639,32 @@ void medOpSegmentation::CreateManualSegmentationGui()
   bucketActionsRadioBox->SetValidator( mafGUIValidator(currentGui, w_id, bucketActionsRadioBox, &m_ManualBucketActions) );
 
   w_id = currentGui->GetWidgetId(ID_MANUAL_BUCKET_GLOBAL);
-  wxCheckBox *globalCheck = new wxCheckBox(currentGui,w_id,"Global");
+  wxCheckBox *globalCheck = new wxCheckBox(currentGui,w_id,"Iterative");
   globalCheck->SetValidator(mafGUIValidator(currentGui, w_id, globalCheck, &m_GlobalFloodFill));
+
+  m_ManualRangeSlider = new mafGUILutSlider(currentGui,-1,wxPoint(0,0),wxSize(195,24));
+  m_ManualRangeSlider->SetListener(this);
+  m_ManualRangeSlider->SetText(1,"Z Axis");  
+  m_ManualRangeSlider->SetRange(1,m_VolumeDimensions[2]);
+  m_ManualRangeSlider->SetSubRange(1,m_VolumeDimensions[2]);
+  m_ManualRangeSlider->Enable(false);
 
   bucketActionsSizer->Add(bucketActionsLab,  0, wxRIGHT, 5);
   bucketActionsSizer->Add(bucketActionsRadioBox,0, wxRIGHT, 2);
-  bucketEditingSizer->Add(bucketActionsSizer, 0, wxALL, 1);
-  bucketEditingSizer->Add(globalCheck, 0, wxALL, 1);
+  m_BucketEditingSizer->Add(bucketActionsSizer, 0, wxALL, 1);
+  m_BucketEditingSizer->Add(globalCheck, 0, wxALL, 1);
+  m_BucketEditingSizer->Add(m_ManualRangeSlider, 0, wxALL, 1);
+
+  /////
 
   currentGui->Add(manualToolsVSizer, 0, wxALL, 1);
-  currentGui->Add(brushEditingSizer, wxALIGN_CENTER_HORIZONTAL);
-  currentGui->Add(bucketEditingSizer, wxALIGN_CENTER_HORIZONTAL);
+  currentGui->Add(m_BrushEditingSizer, wxALIGN_CENTER_HORIZONTAL);
+  currentGui->Add(m_BucketEditingSizer, wxALIGN_CENTER_HORIZONTAL);
   /*currentGui->Bool(-1,"Global",&m_GlobalFloodFill,1,"");*/
   currentGui->TwoButtons(ID_MANUAL_UNDO,ID_MANUAL_REDO,"Undo","Redo");
+
+  EnableSizerContent(m_BucketEditingSizer,false);
+  EnableSizerContent(m_BrushEditingSizer,true);
 
   m_SegmentationOperationsGui[MANUAL_SEGMENTATION] = currentGui;
 
@@ -1925,6 +1944,15 @@ void medOpSegmentation::OnManualStep()
   m_View->GetWindow()->SetCursor(cursor);
 
   m_ManualPER->EnableDrawing(true);
+
+  double low,hi;
+  m_ManualRangeSlider->GetSubRange(&low,&hi);
+  low = m_CurrentSliceIndex;
+  if(hi<low)
+  {
+    hi = low;
+  }
+  m_ManualRangeSlider->SetSubRange(low,hi);
 
   m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_PICKING_MODALITY, m_CurrentSlicePlane);
   m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_UNDO, false);
@@ -2310,6 +2338,18 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
           if(m_CurrentOperation == MANUAL_SEGMENTATION)
           {
             CreateRealDrawnImage();
+            if(e->GetSender()!=this)
+            {
+              double low,hi;
+              m_ManualRangeSlider->GetSubRange(&low,&hi);
+              low = m_CurrentSliceIndex;
+              if(hi<low)
+              {
+                hi = low;
+              }
+              m_ManualRangeSlider->SetSubRange(low,hi);
+              m_SegmentationOperationsGui[ID_MANUAL_SEGMENTATION]->Update();
+            }
           }
         }
         else
@@ -2347,6 +2387,18 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         if(m_CurrentOperation == MANUAL_SEGMENTATION)
         {
           CreateRealDrawnImage();
+          if(e->GetSender()!=this)
+          {
+            double low,hi;
+            m_ManualRangeSlider->GetSubRange(&low,&hi);
+            low = m_CurrentSliceIndex;
+            if(hi<low)
+            {
+              hi = low;
+            }
+            m_ManualRangeSlider->SetSubRange(low,hi);
+            m_SegmentationOperationsGui[ID_MANUAL_SEGMENTATION]->Update();
+          }
         }
         break;
       }
@@ -2379,6 +2431,18 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         if(m_CurrentOperation == MANUAL_SEGMENTATION)
         {
           CreateRealDrawnImage();
+          if(e->GetSender()!=this)
+          {
+            double low,hi;
+            m_ManualRangeSlider->GetSubRange(&low,&hi);
+            low = m_CurrentSliceIndex;
+            if(hi<low)
+            {
+              hi = low;
+            }
+            m_ManualRangeSlider->SetSubRange(low,hi);
+            m_SegmentationOperationsGui[ID_MANUAL_SEGMENTATION]->Update();
+          }
         }
         break;
       }
@@ -2409,6 +2473,18 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         if(m_CurrentOperation == MANUAL_SEGMENTATION)
         {
           CreateRealDrawnImage();
+          if(e->GetSender()!=this)
+          {
+            double low,hi;
+            m_ManualRangeSlider->GetSubRange(&low,&hi);
+            low = m_CurrentSliceIndex;
+            if(hi<low)
+            {
+              hi = low;
+            }
+            m_ManualRangeSlider->SetSubRange(low,hi);
+            m_SegmentationOperationsGui[ID_MANUAL_SEGMENTATION]->Update();
+          }
         }
         break;
       }
@@ -2600,6 +2676,23 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
           if(m_CurrentSlicePlane = XY)
           {
             OnEventUpdateThresholdSlice();
+          }
+        }
+        else if(e->GetSender() == m_ManualRangeSlider)
+        {
+          double low, hi;
+          m_ManualRangeSlider->GetSubRange(&low,&hi);
+
+          m_CurrentSliceIndex = low;
+
+          if(m_CurrentSliceIndex > hi)
+          {
+            m_CurrentSliceIndex = hi;
+          }
+
+          if(m_CurrentSlicePlane = XY)
+          {
+            OnEvent(new mafEvent(this,ID_SLICE_SLIDER));
           }
         }
         break;
@@ -3175,17 +3268,38 @@ void medOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
 {
   switch(e->GetId())
   {
+  case ID_MANUAL_BUCKET_GLOBAL:
+    {
+      if(m_GlobalFloodFill)
+      {
+        m_ManualRangeSlider->Enable(true);
+      }
+      else
+      {
+        m_ManualRangeSlider->Enable(false);
+      }
+      m_SegmentationOperationsGui[ID_MANUAL_SEGMENTATION]->Update();
+    }
+    break;
   case ID_MANUAL_TOOLS:
     {
       if(m_ManualSegmentationTools == 0)
       {
         wxCursor cursor = wxCursor( wxCURSOR_PENCIL );
         m_View->GetWindow()->SetCursor(cursor);
+
+        EnableSizerContent(m_BucketEditingSizer,false);
+        EnableSizerContent(m_BrushEditingSizer,true);
+        m_SegmentationOperationsGui[ID_MANUAL_SEGMENTATION]->Update();
       }
       else
       {
         wxCursor cursor = wxCursor( wxCURSOR_SPRAYCAN );
         m_View->GetWindow()->SetCursor(cursor);
+        EnableSizerContent(m_BucketEditingSizer,true);
+        EnableSizerContent(m_BrushEditingSizer,false);
+        m_ManualRangeSlider->Enable(m_GlobalFloodFill==TRUE);
+        m_SegmentationOperationsGui[ID_MANUAL_SEGMENTATION]->Update();
         UndoBrushPreview();
         OnEventUpdateManualSlice();
       }
@@ -4974,4 +5088,22 @@ void medOpSegmentation::GetTransformFactor( int toUnity,double *bounds, double *
     scale[2]=size[2]*0.5;
   }
 
+}
+
+//----------------------------------------------------------------------------
+void medOpSegmentation::EnableSizerContent(wxSizer* sizer, bool enable)
+//----------------------------------------------------------------------------
+{
+  wxSizerItemList childList = sizer->GetChildren();
+  for(int i = 0; i < childList.GetCount(); i++)
+  {
+    if(childList.Item(i)->GetData()->IsWindow())
+    {
+      childList.Item(i)->GetData()->GetWindow()->Enable(enable);
+    }
+    else if (childList.Item(i)->GetData()->IsSizer())
+    {
+      EnableSizerContent(childList.Item(i)->GetData()->GetSizer(),enable);
+    }
+  }
 }

@@ -67,6 +67,7 @@ class vtkActor;
 class vtkStructuredPoints;
 class vtkUnsignedCharArray;
 class medViewSliceNotInterpolated;
+class wxStaticBoxSizer;
 
 //----------------------------------------------------------------------------
 // medOpSegmentation :
@@ -430,27 +431,30 @@ protected:
   /** Create the real drawn image */
   void CreateRealDrawnImage();
 
-  mafVMEVolumeGray *m_ManualVolumeMask;       //< Manual volume mask
-  mafVMEVolumeGray *m_ManualVolumeSlice;      //< Single slice manual volume mask
-  mafGUIFloatSlider *m_ManualBrushSizeSlider; //<Brush size slider - GUI
-  wxTextCtrl *m_ManualBrushSizeText;          //<Brush size text box - GUI
-  wxRadioBox *m_ManualBrushShapeRadioBox;     //<Brush shape radio - GUI
-  mafGUIButton *m_ManualApplyChanges;         //<Apply changes button - GUI
-  int m_ManualSegmentationAction;             //<Manual segmentation action (draw/erease)
-  int m_ManualSegmentationTools;              //<Manual segmentation tools (bucket/brush)
-  int m_ManualBucketActions;
-  int m_ManualBrushShape;                     //<Brush shape
-  double m_ManualBrushSize;                   //<Brush size
-  int m_ManualRefinementRegionsSize;          //<Refinement region size
-  wxComboBox *m_ManualRefinementComboBox;     //<Refinement action combo - GUI
+  mafVMEVolumeGray *m_ManualVolumeMask;         //< Manual volume mask
+  mafVMEVolumeGray *m_ManualVolumeSlice;        //< Single slice manual volume mask
+  mafGUIFloatSlider *m_ManualBrushSizeSlider;   //<Brush size slider - GUI
+  wxTextCtrl *m_ManualBrushSizeText;            //<Brush size text box - GUI
+  wxRadioBox *m_ManualBrushShapeRadioBox;       //<Brush shape radio - GUI
+  wxStaticBoxSizer *m_BrushEditingSizer;
+  mafGUIButton *m_ManualApplyChanges;           //<Apply changes button - GUI
+  int m_ManualSegmentationAction;               //<Manual segmentation action (draw/erease)
+  int m_ManualSegmentationTools;                //<Manual segmentation tools (bucket/brush)
+  int m_ManualBucketActions;                    //<
+  int m_ManualBrushShape;                       //<Brush shape
+  double m_ManualBrushSize;                     //<Brush size
+  int m_ManualRefinementRegionsSize;            //<Refinement region size
+  wxComboBox *m_ManualRefinementComboBox;       //<Refinement action combo - GUI
   wxTextCtrl *m_ManualRefinementRegionSizeText; //<Refinement size text - GUI
-  std::vector<UndoRedoState> m_ManualUndoList; //< Undo stack
-  std::vector<UndoRedoState> m_ManualRedoList; // Redo stack
-  bool m_PickingStarted;                      //<Determine if picking has started
-  medInteractorPERBrushFeedback *m_ManualPER; //<Dynamic event router
-  double m_CurrentBrushMoveEventCount;        //<Id for mouse move event raised by the brush
-  vtkUnsignedCharArray *m_RealDrawnImage;     //<Real drawn image used in brush preview
-  int m_LastMouseMovePointID;                 //<Last point id in mouse move event
+  std::vector<UndoRedoState> m_ManualUndoList;  //< Undo stack
+  std::vector<UndoRedoState> m_ManualRedoList;  // Redo stack
+  bool m_PickingStarted;                        //<Determine if picking has started
+  medInteractorPERBrushFeedback *m_ManualPER;   //<Dynamic event router
+  double m_CurrentBrushMoveEventCount;          //<Id for mouse move event raised by the brush
+  vtkUnsignedCharArray *m_RealDrawnImage;       //<Real drawn image used in brush preview
+  int m_LastMouseMovePointID;                   //<Last point id in mouse move event
+  mafGUILutSlider* m_ManualRangeSlider;         //<
+  wxStaticBoxSizer *m_BucketEditingSizer;       //<
   //////////////////////////////////////////////////////////////////////////
 
   //////////////////////////////////////////////////////////////////////////
@@ -605,6 +609,8 @@ protected:
 
   /** Apply flood fill filter */
   int ApplyFloodFill(vtkStructuredPoints *inputImage, vtkStructuredPoints *outputImage, vtkIdType seed);
+
+  void EnableSizerContent(wxSizer* sizer, bool enable);
 
 };
 #endif
