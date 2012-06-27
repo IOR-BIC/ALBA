@@ -209,6 +209,10 @@ vtkStructuredPoints *vtkMEDBinaryImageFloodFill::FloodFill(vtkStructuredPoints *
       minDistance = curDistance;
     }
   }
+  if(Center == 0)
+  {
+    Center = Seed;
+  }
   return output;
 }
 

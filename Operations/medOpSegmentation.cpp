@@ -994,7 +994,6 @@ void medOpSegmentation::FloodFill(vtkIdType seed)
       output->CopyStructure(input);
       output->DeepCopy(input);
 
-      mafLogMessage(">>>>>>%d", center);
       center = ApplyFloodFill(input,output,center);
 
       m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->SetScalars(output->GetPointData()->GetScalars());
