@@ -1,13 +1,17 @@
 /*=========================================================================
-Program:   Multimod Application Framework
-Module:    $RCSfile: mafDeviceSetTest.h,v $
-Language:  C++
-Date:      $Date: 2009-06-24 11:08:58 $
-Version:   $Revision: 1.1.2.1 $
-Authors:   Stefano Perticoni
-==========================================================================
-Copyright (c) 2002/2004 
-CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2
+ Module: mafDeviceSetTest
+ Authors: Stefano Perticoni
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #ifndef __CPP_UNIT_mafDeviceSetTest_H__

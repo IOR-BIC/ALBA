@@ -1,13 +1,17 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: mafGUIDockManager.h,v $
-  Language:  C++
-  Date:      $Date: 2011-10-21 08:09:30 $
-  Version:   $Revision: 1.1.2.7 $
-  Authors:   Benjamin I. Williams
-==========================================================================
-  Copyright:   (C) Copyright 2005, Kirix Corporation, All Rights Reserved.
-  Licence:     wxWindows Library Licence, Version 3.1
+
+ Program: MAF2
+ Module: mafGUIDockManager
+ Authors: Benjamin I. Williams
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #ifndef __mafGUIDockManager__H

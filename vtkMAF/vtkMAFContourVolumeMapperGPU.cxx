@@ -1,16 +1,18 @@
-/*==============================================================================
+/*=========================================================================
 
-Program:   Multimod Application framework RELOADED
-Module:    $RCSfile: vtkMAFContourVolumeMapperGPU.cxx,v $
-Language:  C++
-Date:      $Date: 2012-04-05 12:56:22 $
-Version:   $Revision: 1.1.2.3 $
-Authors:   Alexander Savenko, Nigel McFarlane, Baoquan Liu (GPU)
+ Program: MAF2
+ Module: vtkMAFContourVolumeMapperGPU
+ Authors: Alexander Savenko, Nigel McFarlane, Baoquan Liu (GPU)
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
 
-================================================================================
-Copyright (c) 2002/2006 University of Bedfordshire, UK (www.beds.ac.uk) 
-All rights reserved.
-===============================================================================*/
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
 
 
 #include "../GPUAPI/glew/glew.h"

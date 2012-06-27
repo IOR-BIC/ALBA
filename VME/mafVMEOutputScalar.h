@@ -1,13 +1,17 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: mafVMEOutputScalar.h,v $
-  Language:  C++
-  Date:      $Date: 2009-03-24 13:53:00 $
-  Version:   $Revision: 1.7.2.1 $
-  Authors:   Paolo Quadrani
-==========================================================================
-  Copyright (c) 2001/2005 
-  CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2
+ Module: mafVMEOutputScalar
+ Authors: Paolo Quadrani
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 #ifndef __mafVMEOutputScalar_h
 #define __mafVMEOutputScalar_h

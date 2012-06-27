@@ -1,13 +1,17 @@
 /*=========================================================================
-Program:   Multimod Application Framework
-Module:    $RCSfile: mafVMEStorageTest.h,v $
-Language:  C++
-Date:      $Date: 2008-07-03 11:32:34 $
-Version:   $Revision: 1.2 $
-Authors:   Marco Petrone, Stefano Perticoni
-==========================================================================
-Copyright (c) 2002/2004 
-CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2
+ Module: mafVMEStorageTest
+ Authors: Marco Petrone, Stefano Perticoni
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #ifndef __CPP_UNIT_mafVMEStorageTest_H__

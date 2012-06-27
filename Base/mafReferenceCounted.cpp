@@ -1,13 +1,17 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: mafReferenceCounted.cpp,v $
-  Language:  C++
-  Date:      $Date: 2011-05-25 09:27:41 $
-  Version:   $Revision: 1.3.22.2 $
-  Authors:   based on vtkObjectBase (www.vtk.org), adapted Marco Petrone
-==========================================================================
-  Copyright (c) 2001/2005 
-  CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2
+ Module: mafReferenceCounted
+ Authors: based on vtkObjectBase (www.vtk.org), adapted Marco Petrone
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #include "mafReferenceCounted.h"

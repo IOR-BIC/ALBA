@@ -1,13 +1,17 @@
 /*=========================================================================
-Program:   Multimod Application Framework
-Module:    $RCSfile: mafOpContextStackTest.h,v $
-Language:  C++
-Date:      $Date: 2008-02-19 14:50:19 $
-Version:   $Revision: 1.1 $
-Authors:   Daniele Giunchi
-==========================================================================
-Copyright (c) 2002/2004 
-CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2
+ Module: mafOpContextStackTest
+ Authors: Daniele Giunchi
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #ifndef CPP_UNIT_mafOpContextStackTEST_H

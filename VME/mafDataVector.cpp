@@ -1,13 +1,17 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: mafDataVector.cpp,v $
-  Language:  C++
-  Date:      $Date: 2011-05-25 11:52:18 $
-  Version:   $Revision: 1.19.2.5 $
-  Authors:   Marco Petrone - Paolo Quadrani
-==========================================================================
-  Copyright (c) 2001/2005 
-  CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2
+ Module: mafDataVector
+ Authors: Marco Petrone - Paolo Quadrani
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 

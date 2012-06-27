@@ -1,13 +1,17 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: mafVMEOutputVTK.h,v $
-  Language:  C++
-  Date:      $Date: 2009-10-20 10:27:26 $
-  Version:   $Revision: 1.5.22.1 $
-  Authors:   Marco Petrone
-==========================================================================
-  Copyright (c) 2001/2005 
-  CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2
+ Module: mafVMEOutputVTK
+ Authors: Marco Petrone
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 #ifndef __mafVMEOutputVTK_h
 #define __mafVMEOutputVTK_h

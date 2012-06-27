@@ -1,13 +1,17 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: mafDeviceButtonsPadTrackerP5Glove.h,v $
-  Language:  C++
-  Date:      $Date: 2009-05-25 14:48:12 $
-  Version:   $Revision: 1.1.2.1 $
-  Authors:   Marco Petrone
-==========================================================================
-  Copyright (c) 2002/2004 
-  CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2
+ Module: mafDeviceButtonsPadTrackerP5Glove
+ Authors: Marco Petrone
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #ifndef __mafDeviceButtonsPadTrackerP5Glove_h

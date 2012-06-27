@@ -1,14 +1,18 @@
 /*=========================================================================
 
-  Program:   Multimod Fundation Library
-  Module:    $RCSfile: vtkMAFRulerActor2D.cxx,v $
-  Language:  C++
-  Date:      $Date: 2008-07-25 07:01:03 $
-  Version:   $Revision: 1.1 $
-  Authors:   Silvano Imboden 
-  Project:   MultiMod Project (www.ior.it/multimod)
+ Program: MAF2
+ Module: vtkMAFRulerActor2D
+ Authors: Silvano Imboden
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
 
-==========================================================================*/
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
 
 #include "vtkMAFRulerActor2D.h"
 

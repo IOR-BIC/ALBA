@@ -1,13 +1,17 @@
 /*=========================================================================
-Program:   Multimod Application Framework
-Module:    $RCSfile: mafOpEditMetadataTest.h,v $
-Language:  C++
-Date:      $Date: 2010-01-13 16:12:54 $
-Version:   $Revision: 1.1.2.1 $
-Authors:   Roberto Mucci
-==========================================================================
-Copyright (c) 2002/2004 
-CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2
+ Module: mafOpEditMetadataTest
+ Authors: Roberto Mucci
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #ifndef CPP_UNIT_mafOpEditMetadataTest_H

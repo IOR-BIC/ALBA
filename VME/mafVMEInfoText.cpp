@@ -1,13 +1,17 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: mafVMEInfoText.cpp,v $
-  Language:  C++
-  Date:      $Date: 2009-01-19 11:58:30 $
-  Version:   $Revision: 1.7.2.1 $
-  Authors:   Fedor Moiseev
-==========================================================================
-  Copyright (c) 2001/2007 
-  ULB - Universite Libre de Bruxelles (www.ulb.ac.be)
+
+ Program: MAF2
+ Module: mafVMEInfoText
+ Authors: Fedor Moiseev
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #include "mafDefines.h" 

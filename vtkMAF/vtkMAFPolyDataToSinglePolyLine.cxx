@@ -1,14 +1,18 @@
 /*=========================================================================
 
-  Program:   Multimod Fundation Library
-  Module:    $RCSfile: vtkMAFPolyDataToSinglePolyLine.cxx,v $
-  Language:  C++
-  Date:      $Date: 2008-07-03 11:28:24 $
-  Version:   $Revision: 1.2 $
-  Authors:   Alessandro Chiarini
-  Project:   
+ Program: MAF2
+ Module: vtkMAFPolyDataToSinglePolyLine
+ Authors: Alessandro Chiarini
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
 
-==========================================================================*/
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
 
 #include "vtkMAFPolyDataToSinglePolyLine.h"
 #include "vtkPoints.h"

@@ -1,16 +1,18 @@
-/*==============================================================================
+/*=========================================================================
 
-Program:   Multimod Application Framework
-Module:    $RCSfile: vtkMAFMultiResolutionActor.h,v $
-Language:  C++
-Date:      $Date: 2007-11-26 12:55:48 $
-Version:   $Revision: 1.1 $
-Authors:   Alexander Savenko
+ Program: MAF2
+ Module: vtkMAFMultiResolutionActor
+ Authors: Alexander Savenko
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
 
-================================================================================
-Copyright (c) 2007 University of Bedfordshire, UK (www.beds.ac.uk)
-All rights reserved.
-===============================================================================*/
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
 
 #ifndef __vtkMAFMultiResolutionActor_h
 #define __vtkMAFMultiResolutionActor_h

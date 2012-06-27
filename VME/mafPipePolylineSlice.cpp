@@ -1,13 +1,17 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: mafPipePolylineSlice.cpp,v $
-  Language:  C++
-  Date:      $Date: 2012-03-13 16:43:01 $
-  Version:   $Revision: 1.16.2.5 $
-  Authors:   Daniele Giunchi
-==========================================================================
-  Copyright (c) 2002/2004
-  CINECA - Interuniversity Consortium (www.cineca.it) 
+
+ Program: MAF2
+ Module: mafPipePolylineSlice
+ Authors: Daniele Giunchi
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 

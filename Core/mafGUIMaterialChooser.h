@@ -1,13 +1,17 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: mafGUIMaterialChooser.h,v $
-  Language:  C++
-  Date:      $Date: 2011-05-25 09:35:14 $
-  Version:   $Revision: 1.1.2.2 $
-  Authors:   Paolo Quadrani
-==========================================================================
-Copyright (c) 2001/2005 
-CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2
+ Module: mafGUIMaterialChooser
+ Authors: Paolo Quadrani
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #ifndef __mafGUIMaterialChooser_H__

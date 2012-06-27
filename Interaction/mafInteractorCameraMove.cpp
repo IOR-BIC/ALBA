@@ -1,13 +1,17 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: mafInteractorCameraMove.cpp,v $
-  Language:  C++
-  Date:      $Date: 2012-03-05 14:31:56 $
-  Version:   $Revision: 1.1.2.5 $
-  Authors:   Paolo Quadrani & Marco Petrone
-==========================================================================
-  Copyright (c) 2002/2004 
-  CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2
+ Module: mafInteractorCameraMove
+ Authors: Paolo Quadrani & Marco Petrone
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #include "mafDefines.h"

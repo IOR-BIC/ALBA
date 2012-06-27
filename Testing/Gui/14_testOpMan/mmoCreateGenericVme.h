@@ -1,13 +1,17 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: mmoCreateGenericVme.h,v $
-  Language:  C++
-  Date:      $Date: 2007-08-13 08:07:53 $
-  Version:   $Revision: 1.2 $
-  Authors:   Silvano Imboden
-==========================================================================
-  Copyright (c) 2001/2005 
-  CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2
+ Module: mmoCreateGenericVme
+ Authors: Silvano Imboden
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 #ifndef __mmoCreateGenericVme_H__
 #define __mmoCreateGenericVme_H__

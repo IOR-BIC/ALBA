@@ -1,14 +1,18 @@
 /*=========================================================================
 
-  Program:   Multimod Fundation Library
-  Module:    $RCSfile: vtkMAFGlobalAxisCoordinate.cxx,v $
-  Language:  C++
-  Date:      $Date: 2009-02-12 10:53:24 $
-  Version:   $Revision: 1.1.2.1 $
-  Authors:   Silvano Imboden 
-  Project:   MultiMod Project (www.ior.it/multimod)
+ Program: MAF2
+ Module: vtkMAFGlobalAxisCoordinate
+ Authors: Silvano Imboden
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
 
-==========================================================================*/
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
 
 #include "vtkMAFGlobalAxisCoordinate.h"
 #include "vtkViewport.h"

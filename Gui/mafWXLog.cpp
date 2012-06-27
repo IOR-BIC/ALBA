@@ -1,13 +1,17 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: mafWXLog.cpp,v $
-  Language:  C++
-  Date:      $Date: 2009-04-22 09:43:04 $
-  Version:   $Revision: 1.2.22.2 $
-  Authors:   Silvano Imboden
-==========================================================================
-  Copyright (c) 2002/2004
-  CINECA - Interuniversity Consortium (www.cineca.it) 
+
+ Program: MAF2
+ Module: mafWXLog
+ Authors: Silvano Imboden
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 

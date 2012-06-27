@@ -1,13 +1,17 @@
 /*=========================================================================
-Program:   Multimod Application Framework
-Module:    $RCSfile: mafOpApplyTrajectoryTest.h,v $
-Language:  C++
-Date:      $Date: 2010-12-01 14:04:40 $
-Version:   $Revision: 1.1.2.2 $
-Authors:   Roberto Mucci, Simone Brazzale
-==========================================================================
-  Copyright (c) 2002/2008
-  CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2
+ Module: mafOpApplyTrajectoryTest
+ Authors: Roberto Mucci, Simone Brazzale
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #ifndef __CPP_UNIT_mafOpApplyTrajectoryTest_H__

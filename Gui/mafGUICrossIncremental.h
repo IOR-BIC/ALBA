@@ -1,13 +1,17 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: mafGUICrossIncremental.h,v $
-  Language:  C++
-  Date:      $Date: 2011-05-25 10:05:18 $
-  Version:   $Revision: 1.4.2.5 $
-  Authors:   Daniele Giunchi
-==========================================================================
-  Copyright (c) 2008
-  CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2
+ Module: mafGUICrossIncremental
+ Authors: Daniele Giunchi
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #ifndef __mafGUICrossIncremental_H__

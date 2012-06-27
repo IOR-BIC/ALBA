@@ -1,13 +1,17 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: mafXMLStorage.cpp,v $
-  Language:  C++
-  Date:      $Date: 2009-02-23 14:48:28 $
-  Version:   $Revision: 1.21.2.2 $
-  Authors:   Marco Petrone m.petrone@cineca.it
-==========================================================================
-  Copyright (c) 2001/2005 
-  CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2
+ Module: mafXMLStorage
+ Authors: Marco Petrone m.petrone@cineca.it
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 //#include "mafIncludeWX.h" // to be removed

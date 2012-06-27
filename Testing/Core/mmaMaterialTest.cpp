@@ -1,13 +1,17 @@
 /*=========================================================================
-Program:   Multimod Application Framework
-Module:    $RCSfile: mmaMaterialTest.cpp,v $
-Language:  C++
-Date:      $Date: 2008-07-25 07:04:07 $
-Version:   $Revision: 1.2 $
-Authors:   Paolo Quadrani
-==========================================================================
-  Copyright (c) 2002/2008
-  CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2
+ Module: mmaMaterialTest
+ Authors: Paolo Quadrani
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 

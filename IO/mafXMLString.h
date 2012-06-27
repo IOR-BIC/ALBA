@@ -1,13 +1,17 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: mafXMLString.h,v $
-  Language:  C++
-  Date:      $Date: 2010-05-18 07:16:21 $
-  Version:   $Revision: 1.6.10.1 $
-  Authors:   Rick Parrish (rfmobile@swbell.net) adapted by Marco Petrone (CINECA)
-==========================================================================
-  Copyright (c) 2001/2005 
-  CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2
+ Module: mafXMLString
+ Authors: Rick Parrish (rfmobile@swbell.net) adapted by Marco Petrone (CINECA)
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #ifndef __mafXMLString_h__

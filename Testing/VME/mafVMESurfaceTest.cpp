@@ -1,13 +1,17 @@
 /*=========================================================================
-Program:   Multimod Application Framework
-Module:    $RCSfile: mafVMESurfaceTest.cpp,v $
-Language:  C++
-Date:      $Date: 2011-05-25 11:58:33 $
-Version:   $Revision: 1.7.2.1 $
-Authors:   Matteo Giacomoni, Stefano Perticoni, Paolo Quadrani
-==========================================================================
-Copyright (c) 2002/2004 
-CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2
+ Module: mafVMESurfaceTest
+ Authors: Matteo Giacomoni, Stefano Perticoni, Paolo Quadrani
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 

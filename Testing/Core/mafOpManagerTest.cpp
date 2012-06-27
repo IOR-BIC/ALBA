@@ -1,14 +1,18 @@
-/*==============================================================================
-Program:   Multimod Application Framework
-Module:    $RCSfile: mafOpManagerTest.cpp,v $
-Language:  C++
-Date:      $Date: 2009-12-01 10:22:33 $
-Version:   $Revision: 1.1.2.1 $
-Authors:   Matteo Giacomoni
-================================================================================
-Copyright (c) 2007 Cineca, UK (www.cineca.it)
-All rights reserved.
-===============================================================================*/
+/*=========================================================================
+
+ Program: MAF2
+ Module: mafOpManagerTest
+ Authors: Matteo Giacomoni
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
 
 #include "mafDefines.h" 
 //------------------------------------------------------------------------------

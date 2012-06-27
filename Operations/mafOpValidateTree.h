@@ -1,13 +1,17 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: mafOpValidateTree.h,v $
-  Language:  C++
-  Date:      $Date: 2012-04-19 07:42:47 $
-  Version:   $Revision: 1.3.2.5 $
-  Authors:   Paolo Quadrani , Stefano Perticoni
-==========================================================================
-Copyright (c) 2002/2004
-CINECA - Interuniversity Consortium (www.cineca.it) 
+
+ Program: MAF2
+ Module: mafOpValidateTree
+ Authors: Paolo Quadrani , Stefano Perticoni
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #ifndef __mafOpValidateTree_H__

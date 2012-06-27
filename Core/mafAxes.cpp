@@ -1,13 +1,17 @@
 /*=========================================================================
-Program:   Multimod Application Framework
-Module:    $RCSfile: mafAxes.cpp,v $
-Language:  C++
-Date:      $Date: 2011-10-25 20:36:07 $
-Version:   $Revision: 1.2.2.10 $
-Authors:   Silvano Imboden , Stefano perticoni
-==========================================================================
-Copyright (c) 2002/2004
-CINECA - Interuniversity Consortium (www.cineca.it) 
+
+ Program: MAF2
+ Module: mafAxes
+ Authors: Silvano Imboden , Stefano perticoni
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #include "mafDefines.h" 

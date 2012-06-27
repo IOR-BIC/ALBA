@@ -1,13 +1,17 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: mafRWIBase.cpp,v $
-  Language:  C++
-  Date:      $Date: 2011-05-25 09:47:55 $
-  Version:   $Revision: 1.33.2.5 $
-  Authors:   Silvano Imboden - Paolo Quadrani - Daniele Giunchi (Save Image)
-==========================================================================
-  Copyright (c) 2002/2004
-  CINECA - Interuniversity Consortium (www.cineca.it) 
+
+ Program: MAF2
+ Module: mafRWIBase
+ Authors: Silvano Imboden - Paolo Quadrani - Daniele Giunchi (Save Image)
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 

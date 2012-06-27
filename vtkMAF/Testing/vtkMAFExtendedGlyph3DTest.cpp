@@ -1,13 +1,17 @@
 /*=========================================================================
-Program:   Multimod Application Framework
-Module:    $RCSfile: vtkMAFExtendedGlyph3DTest.cpp,v $
-Language:  C++
-Date:      $Date: 2011-12-22 12:49:10 $
-Version:   $Revision: 1.1.2.3 $
-Authors:   Matteo Giacomoni
-==========================================================================
-Copyright (c) 2010
-CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2
+ Module: vtkMAFExtendedGlyph3DTest
+ Authors: Matteo Giacomoni
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #include <cppunit/config/SourcePrefix.h>

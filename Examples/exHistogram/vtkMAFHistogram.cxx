@@ -1,14 +1,18 @@
 /*=========================================================================
 
-  Program:   Multimod Fundation Library
-  Module:    $RCSfile: vtkMAFHistogram.cxx,v $
-  Language:  C++
-  Date:      $Date: 2008-07-25 06:56:33 $
-  Version:   $Revision: 1.1 $
-  Authors:   Paolo Quadrani
-  Project:   MultiMod Project
+ Program: MAF2
+ Module: vtkMAFHistogram
+ Authors: Paolo Quadrani
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
 
-==========================================================================*/
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
 
 #include "vtkMAFHistogram.h"
 

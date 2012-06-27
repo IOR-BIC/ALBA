@@ -1,13 +1,17 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: vtkMAFAssembly.h,v $
-  Language:  C++
-  Date:      $Date: 2011-05-25 09:53:22 $
-  Version:   $Revision: 1.4.22.2 $
-  Authors:   Sivano Imboden 
-==========================================================================
-  Copyright (c) 2002/2004 
-  CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2
+ Module: vtkMAFAssembly
+ Authors: Sivano Imboden
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #ifndef __vtkMAFAssembly_h

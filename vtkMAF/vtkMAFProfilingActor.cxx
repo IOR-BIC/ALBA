@@ -1,14 +1,18 @@
 /*=========================================================================
 
-  Program:   Multimod Fundation Library
-  Module:    $RCSfile: vtkMAFProfilingActor.cxx,v $
-  Language:  C++
-  Date:      $Date: 2011-05-25 11:53:13 $
-  Version:   $Revision: 1.1.2.2 $
-  Authors:   Daniele Giunchi
-  Project:   MultiMod Project (www.ior.it/multimod)
+ Program: MAF2
+ Module: vtkMAFProfilingActor
+ Authors: Daniele Giunchi
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
 
-==========================================================================*/
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
 //#include "mafDefines.h"
 #include "vtkMAFProfilingActor.h"
 

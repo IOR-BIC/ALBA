@@ -1,13 +1,17 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: mafMTime.h,v $
-  Language:  C++
-  Date:      $Date: 2005-04-07 20:41:14 $
-  Version:   $Revision: 1.8 $
-  Authors:   Marco Petrone, inspired to vtkTimeStamp (www.vtk.org)
-==========================================================================
-  Copyright (c) 2001/2005 
-  CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2
+ Module: mafMTime
+ Authors: Marco Petrone, inspired to vtkTimeStamp (www.vtk.org)
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #ifndef __mafMTime_h

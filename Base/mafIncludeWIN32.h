@@ -1,13 +1,17 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: mafIncludeWIN32.h,v $
-  Language:  C++
-  Date:      $Date: 2005-04-01 14:21:13 $
-  Version:   $Revision: 1.3 $
-  Authors:   Based on itkWindows.h (www.itk.org)
-==========================================================================
-  Copyright (c) 2001/2005 
-  CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2
+ Module: mafIncludeWIN32
+ Authors: Based on itkWindows.h (www.itk.org)
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 /** This file is used to create the smallest windows.h possible.
  * Also it removes a few annoying #define's in windows.h. */

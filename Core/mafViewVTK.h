@@ -1,13 +1,17 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: mafViewVTK.h,v $
-  Language:  C++
-  Date:      $Date: 2012-02-15 09:13:28 $
-  Version:   $Revision: 1.55.2.6 $
-  Authors:   Silvano Imboden - Paolo Quadrani
-==========================================================================
-  Copyright (c) 2002/2004
-  CINECA - Interuniversity Consortium (www.cineca.it) 
+
+ Program: MAF2
+ Module: mafViewVTK
+ Authors: Silvano Imboden - Paolo Quadrani
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 #ifndef __mafViewVTK_H__
 #define __mafViewVTK_H__

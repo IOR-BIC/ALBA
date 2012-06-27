@@ -1,12 +1,16 @@
 /*=========================================================================
 
-  Program:   Visualization Toolkit
-  Module:    $RCSfile: vtkMAFVolumeSlicerGPU.cxx,v $
-  Language:  C++
-  Date:      $Date: 2008-07-03 11:27:45 $
-  Version:   $Revision: 1.1 $
-  Authors:   Alexander Savenko, Josef Kohout (major change)
-  Project:   MultiMod Project (www.ior.it/multimod)
+ Program: MAF2
+ Module: vtkMAFVolumeSlicerGPU
+ Authors: Alexander Savenko, Josef Kohout (major change)
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 //it must be included before gl.h and glu.h

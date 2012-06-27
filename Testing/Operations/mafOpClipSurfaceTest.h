@@ -1,13 +1,17 @@
 /*=========================================================================
-Program:   Multimod Application Framework
-Module:    $RCSfile: mafOpClipSurfaceTest.h,v $
-Language:  C++
-Date:      $Date: 2008-03-06 12:01:16 $
-Version:   $Revision: 1.1 $
-Authors:   Daniele Giunchi & Matteo Giacomoni
-==========================================================================
-Copyright (c) 2002/2004 
-CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2
+ Module: mafOpClipSurfaceTest
+ Authors: Daniele Giunchi & Matteo Giacomoni
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #ifndef __CPP_UNIT_mafOpClipSurfaceTEST_H__

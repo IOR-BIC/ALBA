@@ -1,13 +1,17 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: vtkMAFRayCast3DPicker.cxx,v $
-  Language:  C++
-  Date:      $Date: 2009-01-29 11:17:14 $
-  Version:   $Revision: 1.1.2.1 $
-  Authors:   Michele Diegoli
-==========================================================================
-  Copyright (c) 2002/2004 
-  CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2
+ Module: vtkMAFRayCast3DPicker
+ Authors: Michele Diegoli
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #include "vtkMAFRayCast3DPicker.h"

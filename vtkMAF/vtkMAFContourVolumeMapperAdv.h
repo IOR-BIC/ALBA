@@ -1,16 +1,18 @@
-/*==============================================================================
+/*=========================================================================
 
-Program:   Multimod Application framework RELOADED
-Module:    $RCSfile: vtkMAFContourVolumeMapperAdv.h,v $
-Language:  C++
-Date:      $Date: 2011-05-25 11:53:13 $
-Version:   $Revision: 1.1.4.2 $
-Authors:   Alexander Savenko, Nigel McFarlane
+ Program: MAF2
+ Module: vtkMAFContourVolumeMapperAdv
+ Authors: Alexander Savenko, Nigel McFarlane
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
 
-================================================================================
-Copyright (c) 2002/2006 University of Bedfordshire, UK (www.beds.ac.uk)
-All rights reserved.
-===============================================================================*/
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
 
 /* DESCRIPTION
 vtkMAFContourVolumeMapperAdv - a mapper for direct rendering of isosurfaces &

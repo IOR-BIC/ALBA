@@ -1,14 +1,18 @@
-/*==============================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: vtkMAFSimpleRulerActor2DTest.cpp,v $
-  Language:  C++
-  Date:      $Date: 2011-05-25 11:53:13 $
-  Version:   $Revision: 1.1.2.2 $
-  Authors:   Alberto Losi
-================================================================================
-  Copyright (c) 2007 Cineca, UK (www.cineca.it)
-  All rights reserved.
-===============================================================================*/
+/*=========================================================================
+
+ Program: MAF2
+ Module: vtkMAFSimpleRulerActor2DTest
+ Authors: Alberto Losi
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
 
 #include <cppunit/config/SourcePrefix.h>
 #include "vtkMAFSimpleRulerActor2D.h"

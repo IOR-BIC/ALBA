@@ -1,14 +1,18 @@
 /*=========================================================================
 
-  Program:   Multimod Fundation Library
-  Module:    $RCSfile: vtkMAFXYPlotActor.cxx,v $
-  Language:  C++
-  Date:      $Date: 2011-11-09 11:43:19 $
-  Version:   $Revision: 1.1.2.1 $
-  Authors:   Gianluigi Crimi
-  Project:   
+ Program: MAF2
+ Module: vtkMAFXYPlotActor
+ Authors: Gianluigi Crimi
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
 
-==========================================================================*/
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
 #include "vtkMAFXYPlotActor.h"
 
 #include "vtkAppendPolyData.h"

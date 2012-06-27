@@ -1,13 +1,17 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: mafViewPlot.h,v $
-  Language:  C++
-  Date:      $Date: 2011-05-25 09:51:23 $
-  Version:   $Revision: 1.3.2.3 $
-  Authors:   Silvano Imboden - Paolo Quadrani
-==========================================================================
-  Copyright (c) 2002/2004
-  CINECA - Interuniversity Consortium (www.cineca.it) 
+
+ Program: MAF2
+ Module: mafViewPlot
+ Authors: Silvano Imboden - Paolo Quadrani
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 #ifndef __mafViewPlot_H__
 #define __mafViewPlot_H__

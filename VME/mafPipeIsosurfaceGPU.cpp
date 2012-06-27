@@ -1,13 +1,17 @@
 /*=========================================================================
-Program:   Multimod Application Framework
-Module:    $RCSfile: mafPipeIsosurfaceGPU.cpp,v $
-Language:  C++
-Date:      $Date: 2008-12-12 11:03:45 $
-Version:   $Revision: 1.1.2.1 $
-Authors:   Alexander Savenko  -  Paolo Quadrani
-==========================================================================
-Copyright (c) 2002/2004
-CINECA - Interuniversity Consortium (www.cineca.it) 
+
+ Program: MAF2
+ Module: mafPipeIsosurfaceGPU
+ Authors: Alexander Savenko  -  Paolo Quadrani
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #if defined(WIN32)

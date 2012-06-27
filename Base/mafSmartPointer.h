@@ -1,13 +1,17 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: mafSmartPointer.h,v $
-  Language:  C++
-  Date:      $Date: 2011-05-25 09:27:41 $
-  Version:   $Revision: 1.7.4.1 $
-  Authors:   based on vtkSmartPointer (www.vtk.org), rewritten by Marco Petrone
-==========================================================================
-  Copyright (c) 2001/2005 
-  CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2
+ Module: mafSmartPointer
+ Authors: based on vtkSmartPointer (www.vtk.org), rewritten by Marco Petrone
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 #ifndef __mafSmartPointer_h
 #define __mafSmartPointer_h

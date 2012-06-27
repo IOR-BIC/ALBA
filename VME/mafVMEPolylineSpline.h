@@ -1,13 +1,17 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: mafVMEPolylineSpline.h,v $
-  Language:  C++
-  Date:      $Date: 2009-04-27 10:38:37 $
-  Version:   $Revision: 1.10.2.3 $
-  Authors:   Daniele Giunchi & Matteo Giacomoni
-==========================================================================
-  Copyright (c) 2001/2005 
-  CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2
+ Module: mafVMEPolylineSpline
+ Authors: Daniele Giunchi & Matteo Giacomoni
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 #ifndef __mafVMEPolylineSpline_h
 #define __mafVMEPolylineSpline_h

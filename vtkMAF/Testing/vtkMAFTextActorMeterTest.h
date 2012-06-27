@@ -1,16 +1,18 @@
-/*==============================================================================
+/*=========================================================================
 
-Program:   Multimod Application Framework
-Module:    $RCSfile: vtkMAFTextActorMeterTest.h,v $
-Language:  C++
-Date:      $Date: 2011-05-25 11:53:13 $
-Version:   $Revision: 1.1.2.2 $
-Authors:   Daniele Giunchi
+ Program: MAF2
+ Module: vtkMAFTextActorMeterTest
+ Authors: Daniele Giunchi
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
 
-================================================================================
-Copyright (c) 2007 Cineca, UK (www.cineca.it)
-All rights reserved.
-===============================================================================*/
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
 
 #ifndef __CPP_UNIT_vtkMAFTextActorMetertest_H__
 #define __CPP_UNIT_vtkMAFTextActorMetertest_H__

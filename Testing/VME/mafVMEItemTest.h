@@ -1,13 +1,17 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: mafVMEItemTest.h,v $
-  Language:  C++
-  Date:      $Date: 2009-11-30 16:18:54 $
-  Version:   $Revision: 1.1.2.1 $
-  Authors:   Alberto Losi
-==========================================================================
-  Copyright (c) 2002/2008
-  CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2
+ Module: mafVMEItemTest
+ Authors: Alberto Losi
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #ifndef __mafVMEItemTest_H__

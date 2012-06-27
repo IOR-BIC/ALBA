@@ -1,58 +1,16 @@
-/*=======================================================================
+/*=========================================================================
 
-  Program:   Multimod Fundation Library
-  Module:    $RCSfile: vtkMAFDOFMatrix.h,v $
-  Language:  C++
-  Date:      $Date: 2009-11-17 09:32:20 $
-  Version:   $Revision: 1.1.2.2 $
-  Authors:   Stefano Perticoni (perticoni@tecno.ior.it)
-  Project:   Multimod Project (http://www.ior.it/multimod/)
+ Program: MAF2
+ Module: vtkMAFDOFMatrix
+ Authors: Stefano Perticoni (perticoni@tecno.ior.it)
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
 
-=========================================================================
-Copyright (c) 2001 B3C - BioComputing Compentence Centre 
-(http://www.cineca.it/B3C/)
-
-Redistribution and use in source and binary forms, with or 
-without modification, are permitted provided that the 
-following conditions are met: 
-
-* Redistributions of source code must retain the above 
-copyright notice, this list of conditions and the following 
-disclaimer.
-
-* Redistributions in binary form must reproduce the above 
-copyright notice, this list of conditions and the following 
-disclaimer in the documentation and/or other materials 
-provided with the distribution.
-
-* Neither name of the Multimod Consortium or its partner 
-institutions nor the names of any contributors may be used 
-to endorse or promote products derived from this software 
-without specific prior written permission.
-
-* Modified source versions must be plainly marked as such, 
-and must not be misrepresented
-as being the original software.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
-CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED 
-WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR 
-PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR 
-CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
-SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
-NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
-HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
-OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-THIS SOFTWARE IS INTENDED FOR EDUCATIONAL AND 
-INVESTIGATIONAL PURPOSES ONLY. THUS, NO MEDICAL DECISION 
-SHOULD BE BASED ON RESULTS PROVIDED BY THE SOFTWARE. UNDER 
-NO CIRCUMSTANCES SHALL SOFTWARE BE USED AS A CLINICAL 
-DIAGNOSTIC TOOL.
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 // .NAME vtkMAFDOFMatrix 

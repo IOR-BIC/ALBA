@@ -1,13 +1,17 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: mmuDOMTreeErrorReporter.cpp,v $
-  Language:  C++
-  Date:      $Date: 2009-12-21 15:40:04 $
-  Version:   $Revision: 1.1.2.2 $
-  Authors:   Marco Petrone m.petrone@cineca.it
-==========================================================================
-  Copyright (c) 2001/2005 
-  CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2
+ Module: mmuDOMTreeErrorReporter
+ Authors: Marco Petrone m.petrone@cineca.it
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 #include "mafDefines.h"
 //#include "mafIncludeWX.h" // to be removed
