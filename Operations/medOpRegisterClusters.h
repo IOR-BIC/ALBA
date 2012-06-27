@@ -290,13 +290,14 @@ public:
 	 /** Process events coming from other objects */ 
 	/*virtual*/ void OnEvent(mafEventBase *maf_event);    
 
-protected:
+public:
 	/** Callback for VME_CHOOSE that accepts Closed Landmarkclouds VMEs only.*/
 	static bool ClosedCloudAccept(mafNode* node); 
 
 	/** Callback for VME_CHOOSE that accepts Surface VME only. */
 	static bool SurfaceAccept(mafNode* node);
 
+protected:
   /** Extract matching points between source and target for the given time.
 	Filtering is automatically applied and weights are stored.
 	Returns number of matched points.
