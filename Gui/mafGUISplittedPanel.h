@@ -15,6 +15,7 @@
 // Include:
 //----------------------------------------------------------------------------
 #include <wx/laywin.h>
+#include "mafDefines.h"
 #include "mafGUIPanel.h"
 
 //----------------------------------------------------------------------------
@@ -25,7 +26,7 @@ that divide it in two sections vertically. Call SetTop and SetBottom
 to place things on it.
 */
 //----------------------------------------------------------------------------
-class mafGUISplittedPanel: public mafGUIPanel
+class MAF_EXPORT mafGUISplittedPanel: public mafGUIPanel
 {
 public:
   mafGUISplittedPanel(wxWindow* parent,wxWindowID id = -1,int size = 100);

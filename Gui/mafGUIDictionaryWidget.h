@@ -19,6 +19,7 @@
 */
 #include "mafObserver.h"
 #include "mafStorable.h"
+#include "mafDefines.h"
 //----------------------------------------------------------------------------
 // Forward Refs:
 //----------------------------------------------------------------------------
@@ -32,7 +33,7 @@ class mafObserver;
   class name : mafGUIDictionaryWidget
   Widget that handle a dictionary object. 
 */
-class mafGUIDictionaryWidget : public mafObserver
+class MAF_EXPORT mafGUIDictionaryWidget : public mafObserver
 {
 
 public:

@@ -16,6 +16,7 @@
 //----------------------------------------------------------------------------
 #include "mafGUILab.h"
 #include "mafGUIPanel.h"
+#include "mafDefines.h"
 
 /**
  Class Name: mafGUINamedPanel.
@@ -27,7 +28,7 @@
 \todo
 decide the ID to associate with the close button
 */
-class mafGUINamedPanel: public mafGUIPanel
+class MAF_EXPORT mafGUINamedPanel: public mafGUIPanel
 {
 public:
   /** constructor.  set CloseButton to show the close button */

@@ -24,7 +24,7 @@
   class name: mafGUIHolder
   Secialized panel in which a developer can put a mafGUI.
 */
-class mafGUIHolder: public mafGUINamedPanel
+class MAF_EXPORT mafGUIHolder: public mafGUINamedPanel
 {
 public:
   /** constructor */
