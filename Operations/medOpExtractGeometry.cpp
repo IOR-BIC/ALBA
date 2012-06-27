@@ -46,6 +46,7 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #include "vtkPolyDataConnectivityFilter.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkSmoothPolyDataFilter.h"
+#include "vtkMEDFillingHole.h"
 #include "vtkTriangleFilter.h"
 #include "vtkUnsignedCharArray.h"
 
@@ -84,6 +85,8 @@ mafOp(label)
   m_AutoSurfaceContourValue = 1;
   m_SurfaceContourValue = 0;
   m_SmoothSurfaceIterationsNumber = 50;
+
+  m_ProcessingType=1;
 
   m_VolumeInput = NULL;
   m_ResampledVolume = NULL;
@@ -186,6 +189,16 @@ void medOpExtractGeometry::CreateExtractSurfaceGui()
   m_ExtractSurfaceGui->Bool(ID_AUTO_CONTOUR_VALUE, _("Auto contour value"), &m_AutoSurfaceContourValue, 1);
   m_SurfaceContourValueSlider = m_ExtractSurfaceGui->FloatSlider(ID_CONTOUR_VALUE, _("Contour value"), &m_SurfaceContourValue, m_ScalarRange[0], m_ScalarRange[1]);
   m_ExtractSurfaceGui->Enable(ID_CONTOUR_VALUE, m_AutoSurfaceContourValue<=0);
+
+  //////////////////////////////////////////////////////////////////////////
+  // Surface Processing
+  //////////////////////////////////////////////////////////////////////////
+  m_ExtractSurfaceGui->Label(mafString("Surface Processing"), true);
+  m_ExtractSurfaceGui->Divider();
+
+  wxString processingType[3] = {"Poisson", "Fill Holes","No filter"};
+  m_ExtractSurfaceGui->Combo(ID_PROCESSING_TYPE, "", &m_ProcessingType, 3, processingType);
+
 
   //////////////////////////////////////////////////////////////////////////
   // Surface optimization
@@ -625,12 +638,26 @@ int medOpExtractGeometry::GenerateIsosurface()
 
   wxBusyInfo wait(_("Extracting Isosurface: please wait ..."));
 
-  vtkMAFSmartPointer<vtkMEDFixTopology> fixTopologyFilter;
-  fixTopologyFilter->SetInput(m_SurfaceData);
-  fixTopologyFilter->Update();
+  if (m_ProcessingType==0)
+  {
+    vtkMAFSmartPointer<vtkMEDFixTopology> fixTopologyFilter;
+    fixTopologyFilter->SetInput(m_SurfaceData);
+    fixTopologyFilter->Update();
+    m_SurfaceData->DeepCopy(fixTopologyFilter->GetOutput());
+  }
+  else if (m_ProcessingType==1)
+  {
+    vtkMEDFillingHole *fillingHoleFilter;
+    vtkNEW(fillingHoleFilter);
+    fillingHoleFilter->SetInput(m_ContourVolumeMapper->GetOutput());
+    fillingHoleFilter->SetFillAllHole();  
+    fillingHoleFilter->SetFlatFill();		
+    fillingHoleFilter->Update();
+    m_SurfaceData->DeepCopy(fillingHoleFilter->GetOutput());
+  }
 
-  m_SurfaceData->DeepCopy(fixTopologyFilter->GetOutput());
   
+
   //////////////////////////////////////////////////////////////////////////
 
   if(m_CleanSurface)

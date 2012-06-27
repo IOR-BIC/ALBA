@@ -97,6 +97,18 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #include "mafTransformFrame.h"
 #include "medOpVolumeResample.h"
 #include "medViewSliceNotInterpolated.h"
+#include "mafTagItem.h"
+#include "mafNode.h"
+
+
+#include "vtkMAFContourVolumeMapper.h"
+#include "vtkMEDFillingHole.h"
+#include "vtkTransformPolyDataFilter.h"
+#include "vtkTransform.h"
+#include "vtkWindowedSincPolyDataFilter.h"
+#include "vtkPolyDataNormals.h"
+#include "vtkMEDBinaryImageFloodFill.h"
+
 
 #define max(a,b)(((a) > (b)) ? (a) : (b))
 #define min(a,b)(((a) < (b)) ? (a) : (b))
@@ -172,6 +184,7 @@ medOpSegmentation::medOpSegmentation(const wxString &label) : mafOp(label)
 
   m_ThresholdVolume           = NULL;
   m_OutputVolume              = NULL;
+  m_OutputSurface      =NULL;
 
   m_SER = NULL;
   m_DeviceManager = NULL;
@@ -258,6 +271,17 @@ medOpSegmentation::medOpSegmentation(const wxString &label) : mafOp(label)
 
   m_OldAutomaticThreshold = MAXINT;
   m_OldAutomaticUpperThreshold = MAXINT;
+
+  m_RemovePeninsulaRegions = FALSE;
+
+  m_OLdWindowingLow = -1;
+  m_OLdWindowingLow = -1;
+
+  m_GlobalFloodFill = FALSE;
+  m_FloodErease = FALSE;
+
+  m_ManualSegmentationTools  = 0;
+  m_ManualBucketActions = 0;
 }
 //----------------------------------------------------------------------------
 medOpSegmentation::~medOpSegmentation()
@@ -267,6 +291,7 @@ medOpSegmentation::~medOpSegmentation()
   RemoveVMEs();
 
   mafDEL(m_OutputVolume);
+  mafDEL(m_OutputSurface);
   mafDEL(m_SegmentatedVolume);
 
   Superclass;
@@ -352,40 +377,196 @@ void medOpSegmentation::OpRun()
 void medOpSegmentation::OpDo()
 //----------------------------------------------------------------------------
 {
-  if (!m_OutputVolume)
-    mafNEW(m_OutputVolume);
-
+  mafVMEVolumeGray *targetVolume = NULL;
   switch (m_CurrentOperation)
   {
     case  AUTOMATIC_SEGMENTATION:
     {
       UpdateThresholdVolumeData();
-      m_OutputVolume->DeepCopy(m_ThresholdVolume);
+      targetVolume = m_ThresholdVolume;
     }
     break;
     case  MANUAL_SEGMENTATION:
     {
-      m_OutputVolume->DeepCopy(m_ManualVolumeMask);
+      targetVolume = m_ManualVolumeMask;
     }
     break;
     case  REFINEMENT_SEGMENTATION:
     {
-      m_OutputVolume->DeepCopy(m_RefinementVolumeMask);
+      targetVolume = m_RefinementVolumeMask;
     }
     break;
     case  LOAD_SEGMENTATION:
     {
-      m_OutputVolume->DeepCopy(m_LoadedVolume);
+     targetVolume = m_LoadedVolume;
     }
     break;
   }
-  m_OutputVolume->ReparentTo(m_Volume->GetParent());
-  m_OutputVolume->SetName(_("Segmentation Output"));
-  lutPreset(4,m_OutputVolume->GetMaterial()->m_ColorLut);
-  m_OutputVolume->GetMaterial()->m_ColorLut->SetTableRange(0,255);
-  m_OutputVolume->ReparentTo(m_Volume->GetParent());
+
+
+  if(targetVolume)
+  { 
+    if (!m_OutputVolume)
+    {
+      mafNEW(m_OutputVolume);
+    }
+    m_OutputVolume->DeepCopy(targetVolume);
+// 
+//     if(m_LoadedVolume)
+//     {
+// 
+//       if(IsOutput(m_LoadedVolume))
+//       {
+//         mafDEL(m_LoadedVolume);
+//       }
+//       
+//     }
+
+    //Eliminate previous outputs
+    DeleteOutputs(m_Input->GetRoot());
+    m_OutputVolume->SetName(wxString::Format("Segmentation Output (%s)",m_Volume->GetName()).c_str());
+    lutPreset(4,m_OutputVolume->GetMaterial()->m_ColorLut);
+    m_OutputVolume->GetMaterial()->m_ColorLut->SetTableRange(0,255);
+    m_OutputVolume->GetMaterial()->UpdateFromTables();
+    m_OutputVolume->GetTagArray()->SetTag("SEGMENTATION_PARENT",wxString::Format("%d",m_Volume->GetId()).c_str(),MAF_STRING_TAG);
+    m_OutputVolume->ReparentTo(m_Volume);
+   
+  m_OutputVolume->GetTagArray()->SetTag(mafTagItem("VOLUME_TYPE","BINARY"));
+
+
+  //GENERATIN SURFACE OUTPUT
+  wxBusyCursor wait_cursor;
+  wxBusyInfo wait(_("Wait! Generating Surface Output"));
+
+  vtkMAFSmartPointer<vtkMAFContourVolumeMapper> contourVolMapper;
+
+  contourVolMapper->SetInput(m_OutputVolume->GetOutput()->GetVTKData());
+  contourVolMapper->SetContourValue(127.5);
+  contourVolMapper->Update();
+
+  vtkMAFSmartPointer<vtkMEDFillingHole> fillingHoleFilter;
+  fillingHoleFilter->SetInput(contourVolMapper->GetOutput());
+  fillingHoleFilter->SetFillAllHole();  
+  fillingHoleFilter->SetFlatFill();		
+  fillingHoleFilter->Update();
+
+  vtkMAFSmartPointer<vtkWindowedSincPolyDataFilter> smoothFilter;
+
+  double bounds[6];
+  double traslation[3];
+  double scale[3];
+  //Transforming Surface in [-1,1],[-1,1],[-1,1] 
+  //To improve the numerical stability of the solution 
+  fillingHoleFilter->GetOutput()->GetBounds(bounds);
+  GetTransformFactor(true,bounds,scale,traslation);
+  vtkMAFSmartPointer<vtkTransform> transform;
+  transform->PostMultiply();
+  transform->Translate(traslation);
+  transform->Scale(scale);
+  vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformFilter;
+  transformFilter->SetTransform(transform);
+  transformFilter->SetInput(fillingHoleFilter->GetOutput());
+  transformFilter->Update();
+
+  //Taubin Smooth filter apply
+  smoothFilter->SetInput(transformFilter->GetOutput());
+  smoothFilter->SetFeatureAngle(30.0);
+  smoothFilter->SetBoundarySmoothing(0);
+  smoothFilter->SetNonManifoldSmoothing(0);
+  smoothFilter->SetFeatureEdgeSmoothing(0);
+  smoothFilter->SetNumberOfIterations(10);
+  smoothFilter->SetPassBand(0.1);
+  smoothFilter->Update();
+  smoothFilter->GetOutput()->Update();
+
+  //Transforming smoothed output in [-1,1],[-1,1],[-1,1] 
+  //To remove filter scaling/traslation artifact
+  smoothFilter->GetOutput()->GetBounds(bounds);
+  GetTransformFactor(true,bounds,scale,traslation);
+  vtkMAFSmartPointer<vtkTransform> transform2;
+  transform2->PostMultiply();
+  transform2->Translate(traslation);
+  transform2->Scale(scale);
+  vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformFilter2;
+  transformFilter2->SetTransform(transform2);
+  transformFilter2->SetInput(smoothFilter->GetOutput());
+  transformFilter2->Update();
+
+
+  //inverse transform to align outputs to original bounds 
+  fillingHoleFilter->GetOutput()->GetBounds(bounds);
+  GetTransformFactor(false,bounds,scale,traslation);
+  vtkMAFSmartPointer<vtkTransform> transform3;
+  //in this case we need to scale first to obtain the surface 
+  //at the original size and then we translate it to the original pos
+  transform3->PostMultiply();
+  transform3->Scale(scale);
+  transform3->Translate(traslation);
+  vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformFilter3;
+  transformFilter3->SetTransform(transform3);
+  transformFilter3->SetInput(transformFilter2->GetOutput());
+  transformFilter3->Update();
+
+  //Flipping normals for better surface view 
+  vtkMAFSmartPointer<vtkPolyDataNormals> normalFilter;
+  normalFilter->SetInput(transformFilter3->GetOutput());
+  normalFilter->ComputeCellNormalsOn();
+  normalFilter->FlipNormalsOn(); 
+  normalFilter->SetFeatureAngle(30.0);
+  normalFilter->SplittingOff();
+  normalFilter->Update();
+
+
+  //Generating Surface VME
+  mafNEW(m_OutputSurface);
+  m_OutputSurface->SetName(wxString::Format("Segmentation Surface (%s)",m_Volume->GetName()).c_str());
+  m_OutputSurface->SetData(normalFilter->GetOutput(),mafVMEVolumeGray::SafeDownCast(m_Input)->GetTimeStamp());
+  m_OutputSurface->ReparentTo(m_Input);
+  m_OutputSurface->Modified();
+  m_OutputSurface->Update();
+  
+  //Volume output is a child of surface out
+  //The result tree is Input
+  //                     |-Surface
+  //                          |-Binary volume
+  m_OutputVolume->ReparentTo(m_OutputSurface);
+
+  m_Output=m_OutputSurface;
+
+  }
   RemoveVMEs();
   mafOp::OpDo();
+}
+
+//----------------------------------------------------------------------------
+void medOpSegmentation::DeleteOutputs(mafNode* vme)
+  //----------------------------------------------------------------------------
+{
+  const  mafNode::mafChildrenVector *children = vme->GetChildren();
+  for(int i = 0; i < children->size(); i++)
+  {
+    mafNode *child = children->at(i);
+    DeleteOutputs(child);
+    if(IsOutput(child))
+    {
+      child->ReparentTo(NULL);
+    }
+  }
+}
+//----------------------------------------------------------------------------
+bool medOpSegmentation::IsOutput(mafNode* vme)
+  //----------------------------------------------------------------------------
+{
+  if(vme->GetTagArray() && vme->GetTagArray()->IsTagPresent("SEGMENTATION_PARENT")==true)
+  {
+    const char *tagValue = vme->GetTagArray()->GetTag("SEGMENTATION_PARENT")->GetValue();
+
+    if(atoi(tagValue) == m_Volume->GetId())
+    {
+      return true;
+    }
+  }
+  return false;
 }
 
 //----------------------------------------------------------------------------
@@ -448,6 +629,9 @@ void medOpSegmentation::RemoveVMEs()
 void medOpSegmentation::OpStop(int result)
 //----------------------------------------------------------------------------
 {
+  // Restore old windowing
+  m_ColorLUT->SetTableRange(m_OLdWindowingLow,m_OLdWindowingHi);
+
   //remove vme now on cancel on ok vme will be removed by opdo method
   if (result == OP_RUN_CANCEL)
   {
@@ -581,6 +765,10 @@ void medOpSegmentation::CreateOpDialog()
 
   mafVMEOutputVolume *volumeOutput = mafVMEOutputVolume::SafeDownCast(m_Volume->GetOutput());
   m_ColorLUT = volumeOutput->GetMaterial()->m_ColorLut;
+  double data[2];
+  m_ColorLUT->GetTableRange(data);
+  m_OLdWindowingLow = data[0];
+  m_OLdWindowingHi = data[1];
 
   m_LutWidget = new medGUILutHistogramSwatch(m_GuiDialog,m_GuiDialog->GetWidgetId(ID_LUT_CHOOSER), "LUT", m_Volume->GetOutput()->GetVTKData(), m_Volume->GetMaterial(),wxSize(135,18) );
   m_LutWidget->SetEditable(true);
@@ -630,8 +818,6 @@ void medOpSegmentation::CreateOpDialog()
   CreateAutoSegmentationGui();
   CreateManualSegmentationGui();
   CreateRefinementGui();
-  
-
   
   m_SegmentationOperationsRollOut[LOAD_SEGMENTATION]        = m_GuiDialog->RollOut(ID_LOAD_SEGMENTATION, "Load Segmentation", m_SegmentationOperationsGui[LOAD_SEGMENTATION], false);
   m_SegmentationOperationsRollOut[AUTOMATIC_SEGMENTATION]   = m_GuiDialog->RollOut(ID_AUTO_SEGMENTATION, "Thresholding", m_SegmentationOperationsGui[AUTOMATIC_SEGMENTATION], false);
@@ -693,7 +879,7 @@ void medOpSegmentation::DeleteOpDialog()
     m_View->VmeRemove(m_LoadedVolume);
   }
 
-  m_Volume->ReparentTo(m_OldVolumeParent);
+  //m_Volume->ReparentTo(m_OldVolumeParent);
   m_Volume->SetBehavior(m_OldBehavior);
   m_Volume->Update();
   m_View->VmeShow(m_Volume,false);
@@ -764,6 +950,105 @@ void medOpSegmentation::DeleteOpDialog()
 
 }
 
+
+//----------------------------------------------------------------------------
+void medOpSegmentation::FloodFill(vtkIdType seed)
+//----------------------------------------------------------------------------
+{
+  UndoBrushPreview();
+
+  UndoRedoState urs;
+  urs.dataArray = vtkUnsignedCharArray::New();
+  urs.dataArray->DeepCopy( m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->GetScalars() );
+  urs.dataArray->SetName("SCALARS");
+  urs.plane=m_CurrentSlicePlane;
+  urs.slice=m_CurrentSliceIndex;
+  m_ManualUndoList.push_back( urs );
+  //On edit a new branch of redo-list starts, i need to clear the redo stack
+  ResetManualRedoList();
+
+  m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_REDO, false);
+  m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_UNDO, m_ManualUndoList.size()>0);
+
+  int center = seed;
+  if(m_GlobalFloodFill == TRUE)
+  {
+    double low, hi;
+    m_ManualRangeSlider->GetSubRange(&low,&hi);
+
+    for(int s = m_CurrentSliceIndex; s <= hi; s++)
+    {
+      vtkStructuredPoints *input = vtkStructuredPoints::New();
+      double dimensions[3];
+      dimensions[0] = m_VolumeDimensions[0];
+      dimensions[1] = m_VolumeDimensions[1];
+      dimensions[2] = m_VolumeDimensions[2];
+      dimensions[m_CurrentSlicePlane] = 1;
+      input->SetExtent(0,dimensions[0]-1,0,dimensions[1]-1,0,dimensions[2]-1);
+
+      input->SetSpacing(m_VolumeSpacing);
+      input->SetOrigin(0,0,0);
+
+      m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->Update();
+      input->SetScalarTypeToUnsignedChar();
+      input->GetPointData()->SetScalars(m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->GetScalars());
+
+      vtkStructuredPoints *output = vtkStructuredPoints::New();
+      output->CopyStructure(input);
+      output->DeepCopy(input);
+
+      center = ApplyFloodFill(input,output,center);
+
+      m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->SetScalars(output->GetPointData()->GetScalars());
+      m_ManualVolumeSlice->Update();
+      m_View->VmeShow(m_ManualVolumeSlice,true);
+
+      CreateRealDrawnImage();
+      m_View->CameraUpdate();
+
+      input->Delete();
+      output->Delete();
+      if(s < hi)
+      {
+        OnEvent(new mafEvent(this,ID_SLICE_NEXT));
+      }
+    }
+    OnEvent(new mafEvent(this,ID_SLICE_SLIDER));
+  }
+  else
+  {
+    vtkStructuredPoints *input = vtkStructuredPoints::New();
+    double dimensions[3];
+    dimensions[0] = m_VolumeDimensions[0];
+    dimensions[1] = m_VolumeDimensions[1];
+    dimensions[2] = m_VolumeDimensions[2];
+    dimensions[m_CurrentSlicePlane] = 1;
+    input->SetExtent(0,dimensions[0]-1,0,dimensions[1]-1,0,dimensions[2]-1);
+
+    input->SetSpacing(m_VolumeSpacing);
+    input->SetOrigin(0,0,0);
+
+    m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->Update();
+    input->SetScalarTypeToUnsignedChar();
+    input->GetPointData()->SetScalars(m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->GetScalars());
+
+    vtkStructuredPoints *output = vtkStructuredPoints::New();
+    output->CopyStructure(input);
+    output->DeepCopy(input);
+
+    int center = ApplyFloodFill(input,output,seed);
+
+    m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->SetScalars(output->GetPointData()->GetScalars());
+    m_ManualVolumeSlice->Update();
+    m_View->VmeShow(m_ManualVolumeSlice,true);
+
+    CreateRealDrawnImage();
+    m_View->CameraUpdate();
+
+    input->Delete();
+    output->Delete();
+  }
+}
 
 //----------------------------------------------------------------------------
 bool medOpSegmentation::Refinement()
@@ -939,6 +1224,7 @@ bool medOpSegmentation::ApplyRefinementFilter2(vtkStructuredPoints *inputImage, 
   vtkMEDImageFillHolesRemoveIslands *filter = vtkMEDImageFillHolesRemoveIslands::New();
   filter->SetInput(inputImage);
   filter->SetEdgeSize(m_RefinementRegionsSize);
+  filter->SetRemovePeninsulaRegions(m_RemovePeninsulaRegions == TRUE);
   if(m_RefinementSegmentationAction == ID_REFINEMENT_HOLES_FILL)
   {
     filter->SetAlgorithmToFillHoles();
@@ -953,6 +1239,35 @@ bool medOpSegmentation::ApplyRefinementFilter2(vtkStructuredPoints *inputImage, 
   filter->Delete();
   return true;
 }
+
+//----------------------------------------------------------------------------
+int medOpSegmentation::ApplyFloodFill(vtkStructuredPoints *inputImage, vtkStructuredPoints *outputImage, vtkIdType seed)
+//----------------------------------------------------------------------------
+{
+  vtkMEDBinaryImageFloodFill *filter = vtkMEDBinaryImageFloodFill::New();
+  filter->SetInput(inputImage);
+  filter->SetSeed(seed);
+
+  m_FloodErease = FALSE;
+  if(m_ManualBucketActions == 1)
+  {
+    m_FloodErease = TRUE;
+  }
+
+  
+  filter->SetFillErase(m_FloodErease == TRUE);
+
+  filter->Update();
+  outputImage->DeepCopy(filter->GetOutput());
+  outputImage->Update();
+
+  vtkIdType next_seed_id = filter->GetCenter();
+
+  filter->Delete();
+
+  return next_seed_id;
+}
+
 //----------------------------------------------------------------------------
 bool medOpSegmentation::ApplyRefinementFilter(vtkStructuredPoints *inputImage, vtkStructuredPoints *outputImage)
 //----------------------------------------------------------------------------
@@ -1234,17 +1549,34 @@ void medOpSegmentation::CreateManualSegmentationGui()
 
   mafGUI *currentGui = new mafGUI(this);
 
+  wxString tools[2];
+  tools[0] = wxString("brush");
+  tools[1] = wxString("bucket");
+  int w_id = currentGui->GetWidgetId(ID_MANUAL_TOOLS);
+
+  wxBoxSizer *manualToolsSizer = new wxBoxSizer(wxHORIZONTAL);
+  wxStaticText *manualToolsLab = new wxStaticText(currentGui, w_id, "Tools");
+
+  wxRadioBox *manualToolsRadioBox = new wxRadioBox(currentGui, w_id, "",wxDefaultPosition, wxSize(130,-1), 2, tools, 2);
+  manualToolsRadioBox->SetValidator( mafGUIValidator(currentGui, w_id, manualToolsRadioBox, &m_ManualSegmentationTools) );
+  manualToolsSizer->Add( manualToolsLab,  0, wxRIGHT, 5);
+  manualToolsSizer->Add(manualToolsRadioBox,0, wxRIGHT, 2);
+
+   wxBoxSizer * manualToolsVSizer = new wxBoxSizer(wxVERTICAL);
+   manualToolsVSizer->Add(manualToolsSizer, 0, wxALL, 1);
+
+
   //////////////////////////////////////////////////////////////////////////
   // Brush Editing options
   //////////////////////////////////////////////////////////////////////////
-
-  wxStaticBoxSizer *brushEditingSizer = new wxStaticBoxSizer(wxVERTICAL, currentGui, "Brush Options");
+  
+  m_BrushEditingSizer = new wxStaticBoxSizer(wxVERTICAL, currentGui, "Brush Options");
   
   // BRUSH SHAPE
   wxString shapes[2];
   shapes[0] = wxString("circle");
   shapes[1] = wxString("square");
-  int w_id = currentGui->GetWidgetId(ID_MANUAL_BRUSH_SHAPE);;
+  w_id = currentGui->GetWidgetId(ID_MANUAL_BRUSH_SHAPE);
 
   wxBoxSizer *brushShapesSizer = new wxBoxSizer(wxHORIZONTAL);
   wxStaticText *brushShapeLab = new wxStaticText(currentGui, w_id, "Shape");
@@ -1284,18 +1616,59 @@ void medOpSegmentation::CreateManualSegmentationGui()
   brushSizeSizer->Add(m_ManualBrushSizeText, 0);
   brushSizeSizer->Add(m_ManualBrushSizeSlider, 0);
 
-  brushEditingSizer->Add(brushShapesSizer, 0, wxALL, 1);
-  brushEditingSizer->Add(brushSizeSizer, 0, wxALL, 1);
- 
-  currentGui->Add(brushEditingSizer, wxALIGN_CENTER_HORIZONTAL);
-  
+  m_BrushEditingSizer->Add(brushShapesSizer, 0, wxALL, 1);
+  m_BrushEditingSizer->Add(brushSizeSizer, 0, wxALL, 1);
+
+
+  //////////////////////////////////////////////////////////////////////////
+  // bucket Editing options
+  //////////////////////////////////////////////////////////////////////////
+
+  m_BucketEditingSizer = new wxStaticBoxSizer(wxVERTICAL, currentGui, "Bucket Options");
+
+  // BRUSH SHAPE
+  wxString bucketActions[2];
+  bucketActions[0] = wxString("fill");
+  bucketActions[1] = wxString("erase");
+  w_id = currentGui->GetWidgetId(ID_MANUAL_BUCKET_ACTION);
+
+  wxBoxSizer *bucketActionsSizer = new wxBoxSizer(wxHORIZONTAL);
+  wxStaticText *bucketActionsLab = new wxStaticText(currentGui, w_id, "Action");
+
+  wxRadioBox *bucketActionsRadioBox = new wxRadioBox(currentGui, w_id, "",wxDefaultPosition, wxSize(130,-1), 2, bucketActions, 2);
+  bucketActionsRadioBox->SetValidator( mafGUIValidator(currentGui, w_id, bucketActionsRadioBox, &m_ManualBucketActions) );
+
+  w_id = currentGui->GetWidgetId(ID_MANUAL_BUCKET_GLOBAL);
+  wxCheckBox *globalCheck = new wxCheckBox(currentGui,w_id,"Iterative");
+  globalCheck->SetValidator(mafGUIValidator(currentGui, w_id, globalCheck, &m_GlobalFloodFill));
+
+  m_ManualRangeSlider = new mafGUILutSlider(currentGui,-1,wxPoint(0,0),wxSize(195,24));
+  m_ManualRangeSlider->SetListener(this);
+  m_ManualRangeSlider->SetText(1,"Z Axis");  
+  m_ManualRangeSlider->SetRange(1,m_VolumeDimensions[2]);
+  m_ManualRangeSlider->SetSubRange(1,m_VolumeDimensions[2]);
+  m_ManualRangeSlider->Enable(false);
+
+  bucketActionsSizer->Add(bucketActionsLab,  0, wxRIGHT, 5);
+  bucketActionsSizer->Add(bucketActionsRadioBox,0, wxRIGHT, 2);
+  m_BucketEditingSizer->Add(bucketActionsSizer, 0, wxALL, 1);
+  m_BucketEditingSizer->Add(globalCheck, 0, wxALL, 1);
+  m_BucketEditingSizer->Add(m_ManualRangeSlider, 0, wxALL, 1);
+
+  /////
+
+  currentGui->Add(manualToolsVSizer, 0, wxALL, 1);
+  currentGui->Add(m_BrushEditingSizer, wxALIGN_CENTER_HORIZONTAL);
+  currentGui->Add(m_BucketEditingSizer, wxALIGN_CENTER_HORIZONTAL);
+  /*currentGui->Bool(-1,"Global",&m_GlobalFloodFill,1,"");*/
   currentGui->TwoButtons(ID_MANUAL_UNDO,ID_MANUAL_REDO,"Undo","Redo");
 
+  EnableSizerContent(m_BucketEditingSizer,false);
+  EnableSizerContent(m_BrushEditingSizer,true);
 
   m_SegmentationOperationsGui[MANUAL_SEGMENTATION] = currentGui;
 
   EnableManualSegmentationGui();
-
 }
 
 //----------------------------------------------------------------------------
@@ -1327,11 +1700,11 @@ void medOpSegmentation::CreateRefinementGui()
   m_RefinementRegionsSize = 1;
   //currentGui->Integer(ID_REFINEMENT_REGIONS_SIZE, mafString("Size"), &m_RefinementRegionsSize, 0, MAXINT, mafString("Max size of islands/holes to be taken into consideration"));
 
-  int stepsNumber = 5;
+  int stepsNumber = min(min(m_VolumeDimensions[0],m_VolumeDimensions[1]),m_VolumeDimensions[2]);
   int w_id = currentGui->GetWidgetId(ID_MANUAL_REFINEMENT_REGIONS_SIZE);
 
   int text_w   = 45*0.8;
-  int slider_w = 60;
+  int slider_w = 120;
 
   wxTextCtrl *refinementRegionSizeText = new wxTextCtrl (currentGui, w_id, "", wxDefaultPosition, wxSize(text_w,  18), wxSUNKEN_BORDER,wxDefaultValidator,"Size:");
   
@@ -1352,6 +1725,8 @@ void medOpSegmentation::CreateRefinementGui()
 
   m_RefinementIterative = 0;
   //currentGui->Bool(ID_REFINEMENT_ITERATIVE, mafString("Iterative"), &m_RefinementIterative, 0, mafString("Switch on/off the iterative feature"));
+  
+  currentGui->Bool(ID_REFINEMENT_REMOVE_PENINSULA_REGIONS, mafString("Remove peninsula regions"), &m_RemovePeninsulaRegions, 1, mafString("Remove or not peninsula regions"));
 
   currentGui->TwoButtons(ID_REFINEMENT_UNDO, ID_REFINEMENT_REDO, "Undo", "Redo");
 
@@ -1444,6 +1819,7 @@ void medOpSegmentation::InitRefinementVolumeMask()
   if (m_RefinementVolumeMask)
   {
     m_View->VmeRemove(m_RefinementVolumeMask);
+    m_RefinementVolumeMask->ReparentTo(NULL);
     mafDEL(m_RefinementVolumeMask);
   }
 
@@ -1522,8 +1898,6 @@ void medOpSegmentation::OnAutomaticStep()
 
     //m_CurrentOperation = AUTOMATIC_SEGMENTATION;
     //OnNextStep();
-
-    OnEventUpdateThresholdSlice();
   }
 
 }
@@ -1568,7 +1942,17 @@ void medOpSegmentation::OnManualStep()
 
   wxCursor cursor = wxCursor( wxCURSOR_PENCIL );
   m_View->GetWindow()->SetCursor(cursor);
+
   m_ManualPER->EnableDrawing(true);
+
+  double low,hi;
+  m_ManualRangeSlider->GetSubRange(&low,&hi);
+  low = m_CurrentSliceIndex;
+  if(hi<low)
+  {
+    hi = low;
+  }
+  m_ManualRangeSlider->SetSubRange(low,hi);
 
   m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_PICKING_MODALITY, m_CurrentSlicePlane);
   m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_UNDO, false);
@@ -1711,12 +2095,13 @@ void medOpSegmentation::OnNextStep()
         }
         else
         {
-          mafNEW(m_EmptyVolumeSlice);
           InitEmptyVolumeSlice();
-          mafNEW(m_ThresholdVolumeSlice);
           InitThresholdVolumeSlice();
           //next step -> AUTOMATIC_SEGMENTATION 
           OnAutomaticStep();
+          UpdateThresholdRealTimePreview();
+          m_View->VmeShow(m_ThresholdVolumeSlice,true);
+          m_View->CameraUpdate();
         }
       }
       break;
@@ -1804,10 +2189,12 @@ void medOpSegmentation::OnPreviousStep()
       {
         //prev step -> AUTOMATIC_SEGMENTATION
         OnAutomaticStepExit();
-        mafNEW(m_EmptyVolumeSlice);
         InitEmptyVolumeSlice();
+        InitThresholdVolumeSlice();
         OnAutomaticStep();
-        //m_View->VmeShow(m_ThresholdVolume,false);
+        UpdateThresholdRealTimePreview();
+        m_View->VmeShow(m_ThresholdVolumeSlice,true);
+        m_View->CameraUpdate();
       }
     }
     break;
@@ -1877,7 +2264,7 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
     else if (e->GetSender() == m_ManualPER && e->GetId()== MOUSE_MOVE)
     {
       UndoBrushPreview();
-      if(e->GetDouble() > m_CurrentBrushMoveEventCount)
+      if(e->GetDouble() > m_CurrentBrushMoveEventCount && m_ManualSegmentationTools == 0)
       {
         m_CurrentBrushMoveEventCount = e->GetDouble();
         int oldAction = m_ManualSegmentationAction;
@@ -1888,6 +2275,7 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
       }
 
       m_View->CameraUpdate();
+      UndoBrushPreview(); // Undo is execute twice to ensure no spot are left by the brush
     }
     else if (e->GetSender() == m_SegmentationPicker && e->GetId()== medInteractorSegmentationPicker::VME_ALT_PICKED)
     {
@@ -1932,6 +2320,16 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
           {
             OnEventUpdateThresholdSlice();
           }
+          else if(m_CurrentOperation==LOAD_SEGMENTATION)
+          {
+            m_View->VmeShow(m_LoadedVolume,true);
+            UpdateSlice();
+          }
+          else if(m_CurrentOperation==REFINEMENT_SEGMENTATION)
+          {
+            m_View->VmeShow(m_RefinementVolumeMask,true);
+            UpdateSlice();
+          }
           else
           {
             UpdateSlice();
@@ -1940,6 +2338,18 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
           if(m_CurrentOperation == MANUAL_SEGMENTATION)
           {
             CreateRealDrawnImage();
+            if(e->GetSender()!=this)
+            {
+              double low,hi;
+              m_ManualRangeSlider->GetSubRange(&low,&hi);
+              low = m_CurrentSliceIndex;
+              if(hi<low)
+              {
+                hi = low;
+              }
+              m_ManualRangeSlider->SetSubRange(low,hi);
+              m_SegmentationOperationsGui[ID_MANUAL_SEGMENTATION]->Update();
+            }
           }
         }
         else
@@ -1960,6 +2370,16 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         {
           OnEventUpdateThresholdSlice();
         }
+        else if(m_CurrentOperation==LOAD_SEGMENTATION)
+        {
+          m_View->VmeShow(m_LoadedVolume,true);
+          UpdateSlice();
+        }
+        else if(m_CurrentOperation==REFINEMENT_SEGMENTATION)
+        {
+          m_View->VmeShow(m_RefinementVolumeMask,true);
+          UpdateSlice();
+        }
         else
         {
           UpdateSlice();
@@ -1967,6 +2387,18 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         if(m_CurrentOperation == MANUAL_SEGMENTATION)
         {
           CreateRealDrawnImage();
+          if(e->GetSender()!=this)
+          {
+            double low,hi;
+            m_ManualRangeSlider->GetSubRange(&low,&hi);
+            low = m_CurrentSliceIndex;
+            if(hi<low)
+            {
+              hi = low;
+            }
+            m_ManualRangeSlider->SetSubRange(low,hi);
+            m_SegmentationOperationsGui[ID_MANUAL_SEGMENTATION]->Update();
+          }
         }
         break;
       }
@@ -1982,6 +2414,16 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         {
           OnEventUpdateThresholdSlice();
         }
+        else if(m_CurrentOperation==LOAD_SEGMENTATION)
+        {
+          m_View->VmeShow(m_LoadedVolume,true);
+          UpdateSlice();
+        }
+        else if(m_CurrentOperation==REFINEMENT_SEGMENTATION)
+        {
+          m_View->VmeShow(m_RefinementVolumeMask,true);
+          UpdateSlice();
+        }
         else
         {
           UpdateSlice();
@@ -1989,6 +2431,18 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         if(m_CurrentOperation == MANUAL_SEGMENTATION)
         {
           CreateRealDrawnImage();
+          if(e->GetSender()!=this)
+          {
+            double low,hi;
+            m_ManualRangeSlider->GetSubRange(&low,&hi);
+            low = m_CurrentSliceIndex;
+            if(hi<low)
+            {
+              hi = low;
+            }
+            m_ManualRangeSlider->SetSubRange(low,hi);
+            m_SegmentationOperationsGui[ID_MANUAL_SEGMENTATION]->Update();
+          }
         }
         break;
       }
@@ -2002,6 +2456,16 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         {
           OnEventUpdateThresholdSlice();
         }
+        else if(m_CurrentOperation==LOAD_SEGMENTATION)
+        {
+          m_View->VmeShow(m_LoadedVolume,true);
+          UpdateSlice();
+        }
+        else if(m_CurrentOperation==REFINEMENT_SEGMENTATION)
+        {
+          m_View->VmeShow(m_RefinementVolumeMask,true);
+          UpdateSlice();
+        }
         else
         {
           UpdateSlice();
@@ -2009,6 +2473,18 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         if(m_CurrentOperation == MANUAL_SEGMENTATION)
         {
           CreateRealDrawnImage();
+          if(e->GetSender()!=this)
+          {
+            double low,hi;
+            m_ManualRangeSlider->GetSubRange(&low,&hi);
+            low = m_CurrentSliceIndex;
+            if(hi<low)
+            {
+              hi = low;
+            }
+            m_ManualRangeSlider->SetSubRange(low,hi);
+            m_SegmentationOperationsGui[ID_MANUAL_SEGMENTATION]->Update();
+          }
         }
         break;
       }
@@ -2024,9 +2500,19 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         {
           OnEventUpdateThresholdSlice();
         }
+        else if(m_CurrentOperation==LOAD_SEGMENTATION)
+        {
+          m_View->VmeShow(m_LoadedVolume,true);
+          UpdateSlice();
+        }
+        else if(m_CurrentOperation==REFINEMENT_SEGMENTATION)
+        {
+          m_View->VmeShow(m_RefinementVolumeMask,true);
+          UpdateSlice();
+        }
         else
         {
-          //UpdateSlice();
+          UpdateSlice();
         }
         if(m_CurrentOperation == MANUAL_SEGMENTATION)
         {
@@ -2054,13 +2540,84 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         }
         //Picking during manual segmentation
         if(m_CurrentOperation == MANUAL_SEGMENTATION)
-          StartDraw(e, false);
+        {
+          if(m_ManualSegmentationTools == 1) // bucket
+          {
+            int id;
+            id = e->GetArg();
+            int seed[3];
+            double seedCoords[3];
+            double origin[3];
+            vtkDataSet * dataSet = m_ManualVolumeMask->GetOutput()->GetVTKData();
+            dataSet->GetPoint(id,seedCoords);
+            dataSet->GetPoint(0,origin);
+
+            vtkImageData* im = vtkImageData::SafeDownCast(dataSet);
+            vtkRectilinearGrid* rg = vtkRectilinearGrid::SafeDownCast(dataSet);
+            if(im != NULL)
+            {
+              double spacing[3];
+              im->GetSpacing(spacing);
+              seed[0] = (seedCoords[0] - origin[0]) / spacing[0];
+              seed[1] = (seedCoords[1] - origin[1]) / spacing[1];
+              seed[2] = (seedCoords[2] - origin[2]) / spacing[2];
+            }
+            else if(rg)
+            {
+              vtkDoubleArray* xa = (vtkDoubleArray*)rg->GetXCoordinates();
+              vtkDoubleArray* ya = (vtkDoubleArray*)rg->GetYCoordinates();
+              vtkDoubleArray* za = (vtkDoubleArray*)rg->GetZCoordinates();
+
+              for(int x = 0; x < xa->GetSize(); x++)
+              {
+                if(xa->GetTuple1(x) == seedCoords[0])
+                {
+                  seed[0] = x;
+                  break;
+                }
+              }
+              for(int y = 0; y < ya->GetSize(); y++)
+              {
+                if(ya->GetTuple1(y) == seedCoords[1])
+                {
+                  seed[1] = y;
+                  break;
+                }
+              }
+              for(int z = 0; z < za->GetSize(); z++)
+              {
+                if(za->GetTuple1(z) == seedCoords[2])
+                {
+                  seed[2] = z;
+                  break;
+                }
+              }
+            }
+            double dims[3];
+            dims[0] = m_VolumeDimensions[0];
+            dims[1] = m_VolumeDimensions[1];
+            dims[2] = m_VolumeDimensions[2];
+            dims[m_CurrentSlicePlane] = 1;
+            seed[m_CurrentSlicePlane] = 0;
+
+            // recalculate seed id
+            vtkIdType seedID = seed[0] + seed[1] * dims[0] + seed[2] * dims[1] * dims[0];
+            FloodFill(seedID);
+            CreateRealDrawnImage();
+          }
+          
+          //----------
+          else // brush
+          {
+            StartDraw(e, false);
+          }
+        }
         m_CurrentBrushMoveEventCount = 0;
         break;
       }
     case VME_PICKING:
       {
-        if(m_CurrentOperation == MANUAL_SEGMENTATION)
+        if(m_CurrentOperation == MANUAL_SEGMENTATION && m_ManualSegmentationTools == 0)
         {          
           OnBrushEvent(e);
           m_ManualVolumeSlice->GetOutput()->GetVTKData()->Update();
@@ -2100,7 +2657,7 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
           m_ColorLUT->SetTableRange(low,hi);
           m_View->SetLut(m_Input,m_ColorLUT);
           m_View->CameraUpdate();
-          mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+          //mafEventMacro(mafEvent(this,CAMERA_UPDATE));
         }
         else if(e->GetSender() == m_AutomaticRangeSlider)
         {
@@ -2116,15 +2673,27 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
             m_CurrentSliceIndex = hi;
           }
 
+          if(m_CurrentSlicePlane = XY)
+          {
+            OnEventUpdateThresholdSlice();
+          }
+        }
+        else if(e->GetSender() == m_ManualRangeSlider)
+        {
+          double low, hi;
+          m_ManualRangeSlider->GetSubRange(&low,&hi);
+
+          m_CurrentSliceIndex = low;
+
+          if(m_CurrentSliceIndex > hi)
+          {
+            m_CurrentSliceIndex = hi;
+          }
 
           if(m_CurrentSlicePlane = XY)
           {
-            UpdateSlice();
-            InitEmptyVolumeSlice();
-            UpdateThresholdRealTimePreview();
-            
+            OnEvent(new mafEvent(this,ID_SLICE_SLIDER));
           }
-          m_View->CameraUpdate();
         }
         break;
       }
@@ -2154,6 +2723,7 @@ void medOpSegmentation::StartDraw(mafEvent *e, bool erase)
   if (erase) m_ManualSegmentationAction = MANUAL_SEGMENTATION_ERASE;
   else m_ManualSegmentationAction = MANUAL_SEGMENTATION_SELECT;
   //Picking starts here I need to save an undo stack
+  UndoBrushPreview();
   if(!m_PickingStarted)
   {
     UndoRedoState urs;
@@ -2181,11 +2751,10 @@ void medOpSegmentation::StartDraw(mafEvent *e, bool erase)
 void medOpSegmentation::OnEventUpdateThresholdSlice()
 //------------------------------------------------------------------------
 {
-  m_View->VmeShow(m_ThresholdVolumeSlice,false);
-  UpdateSlice();
   InitEmptyVolumeSlice();
   UpdateThresholdRealTimePreview();
-  m_View->VmeShow(m_ThresholdVolumeSlice,true);
+  UpdateSlice();
+  m_View->VmeShow(m_ThresholdVolumeSlice, true);
   m_View->CameraUpdate();
 }
 
@@ -2193,11 +2762,10 @@ void medOpSegmentation::OnEventUpdateThresholdSlice()
 void medOpSegmentation::OnEventUpdateManualSlice()
 //------------------------------------------------------------------------
 {
-  m_View->VmeShow(m_ManualVolumeSlice, false);
   UndoBrushPreview();
-  ApplyVolumeSliceChanges();
-  UpdateSlice();
+  ApplyVolumeSliceChanges();  
   UpdateVolumeSlice();
+  UpdateSlice();
   m_View->VmeShow(m_ManualVolumeSlice, true);
   m_View->CameraUpdate();
 }
@@ -2650,7 +3218,7 @@ void medOpSegmentation::OnAutomaticSegmentationEvent(mafEvent *e)
 //------------------------------------------------------------------------
 void medOpSegmentation::ReloadUndoRedoState(vtkDataSet *dataSet,UndoRedoState state)
 //------------------------------------------------------------------------
-{
+{ 
   if (state.plane!=m_CurrentSlicePlane || state.slice!=m_CurrentSliceIndex)
   {
 
@@ -2688,8 +3256,9 @@ void medOpSegmentation::ReloadUndoRedoState(vtkDataSet *dataSet,UndoRedoState st
 //     m_View->SetSliceAxis(m_CurrentSlicePlane);
 //   }
 
-  m_View->CameraUpdate();
-
+  //m_View->CameraUpdate();
+  CreateRealDrawnImage();
+  OnEventUpdateManualSlice();
   undoRedoData->Delete();
 }
 
@@ -2699,6 +3268,43 @@ void medOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
 {
   switch(e->GetId())
   {
+  case ID_MANUAL_BUCKET_GLOBAL:
+    {
+      if(m_GlobalFloodFill)
+      {
+        m_ManualRangeSlider->Enable(true);
+      }
+      else
+      {
+        m_ManualRangeSlider->Enable(false);
+      }
+      m_SegmentationOperationsGui[ID_MANUAL_SEGMENTATION]->Update();
+    }
+    break;
+  case ID_MANUAL_TOOLS:
+    {
+      if(m_ManualSegmentationTools == 0)
+      {
+        wxCursor cursor = wxCursor( wxCURSOR_PENCIL );
+        m_View->GetWindow()->SetCursor(cursor);
+
+        EnableSizerContent(m_BucketEditingSizer,false);
+        EnableSizerContent(m_BrushEditingSizer,true);
+        m_SegmentationOperationsGui[ID_MANUAL_SEGMENTATION]->Update();
+      }
+      else
+      {
+        wxCursor cursor = wxCursor( wxCURSOR_SPRAYCAN );
+        m_View->GetWindow()->SetCursor(cursor);
+        EnableSizerContent(m_BucketEditingSizer,true);
+        EnableSizerContent(m_BrushEditingSizer,false);
+        m_ManualRangeSlider->Enable(m_GlobalFloodFill==TRUE);
+        m_SegmentationOperationsGui[ID_MANUAL_SEGMENTATION]->Update();
+        UndoBrushPreview();
+        OnEventUpdateManualSlice();
+      }
+    }
+    break;
   case ID_MANUAL_BRUSH_SHAPE:
     {
       m_ManualBrushShape = m_ManualBrushShapeRadioBox->GetSelection();
@@ -2755,6 +3361,7 @@ void medOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
         }
         
         //Add current state to Redo-list
+        UndoBrushPreview();
         UndoRedoState urs;
         urs.dataArray = vtkUnsignedCharArray::New();
         urs.dataArray->DeepCopy( dataSet->GetPointData()->GetScalars() );
@@ -2797,6 +3404,7 @@ void medOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
 
 
         //Add current state to Undo-list
+        UndoBrushPreview();
         UndoRedoState urs;
         urs.dataArray = vtkUnsignedCharArray::New();
         urs.dataArray->DeepCopy( dataSet->GetPointData()->GetScalars() );
@@ -2833,16 +3441,23 @@ void medOpSegmentation::OnLoadSegmentationEvent(mafEvent *e)
   {
   case ID_LOAD_SEGMENTATION:
     {
+
       mafString title = mafString("Select a segmentation:");
       mafEvent e(this,VME_CHOOSE);
       e.SetString(&title);
       e.SetArg((long)(&medOpSegmentation::SegmentedVolumeAccept));
       mafEventMacro(e);
       mafVME *vme = (mafVME *)e.GetVme();
-      m_LoadedVolume = mafVMEVolumeGray::SafeDownCast(vme);
+      mafVMEVolumeGray *newVolume = mafVMEVolumeGray::SafeDownCast(vme);
 
-      if(m_LoadedVolume)
+      if(newVolume)
       {
+        if(m_LoadedVolume)
+        {
+          m_View->VmeShow(m_LoadedVolume,false);
+          m_View->VmeRemove(m_LoadedVolume);
+        }
+        m_LoadedVolume = newVolume;
         m_LoadedVolume->Update();
         m_SegmentationColorLUT = m_LoadedVolume->GetMaterial()->m_ColorLut;
         InitMaskColorLut(m_SegmentationColorLUT);
@@ -2940,7 +3555,7 @@ void medOpSegmentation::OnRefinementSegmentationEvent(mafEvent *e)
         m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_UNDO, m_RefinementUndoList.size()>0);
         m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_REDO, m_RefinementRedoList.size()>0);
 
-        m_View->CameraUpdate();
+        UpdateSlice();
       }
       break;
     }
@@ -2974,7 +3589,7 @@ void medOpSegmentation::OnRefinementSegmentationEvent(mafEvent *e)
         m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_UNDO, m_RefinementUndoList.size()>0);
         m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_REDO, m_RefinementRedoList.size()>0);
 
-        m_View->CameraUpdate();
+        UpdateSlice();
       }
       break;
     }
@@ -3058,11 +3673,30 @@ void medOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
 
   double minDiffSpacing = min(min(diffSpacingXY,diffSpacingXZ),diffSpacingYZ);
 
-  double targetSpacing = max(max(m_VolumeSpacing[0],m_VolumeSpacing[1]),m_VolumeSpacing[2]);
+  double targetSpacing = /*max*/(max(m_VolumeSpacing[0],m_VolumeSpacing[1])/*,m_VolumeSpacing[2]*/);
+  switch (m_CurrentSlicePlane)
+  {
 
-
+//     case XY:
+//       {
+// 
+//       }
+//       break;
+  case XZ:
+    {
+      targetSpacing = (max(m_VolumeSpacing[0],m_VolumeSpacing[2]));
+    }
+    break;
+  case YZ:
+    {
+      targetSpacing = (max(m_VolumeSpacing[1],m_VolumeSpacing[2]));
+    }
+    break;
+  }
+  
   vtkDataSet *dataset = ((mafVME *)m_ManualVolumeSlice)->GetOutput()->GetVTKData();
-  if(!dataset)
+
+  if(!dataset || !(dataset->GetPointData()->GetScalars()))
     return;
   
   double center[3]={x,y,z};
@@ -3145,7 +3779,7 @@ void medOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
   double oldBrushSize = m_ManualBrushSize;
   int nearestDummyIndex = int(m_ManualBrushSize / 2) * factors[0] + int(m_ManualBrushSize / 2) * factors[1];//int(m_ManualBrushSize / 2) + int(m_ManualBrushSize / 2) * volumeDimensions[0] + int(m_ManualBrushSize / 2) * volumeDimensions[1];
   std::vector<int> dummyIndices;
-  if(m_ManualBrushShape == 0) // circle
+  if(m_ManualBrushShape == 0 && m_ManualBrushSize > 1) // circle
   {
     m_ManualBrushSize ++;
     nearestDummyIndex = int(m_ManualBrushSize / 2) * factors[0] + int(m_ManualBrushSize / 2) * factors[1];
@@ -3590,9 +4224,9 @@ void medOpSegmentation::InitVolumeSpacing()
 {
   vtkDataSet *vme_data = ((mafVME *)m_Volume)->GetOutput()->GetVTKData();
 
-  m_VolumeSpacing[0] = VTK_DOUBLE_MAX;
-  m_VolumeSpacing[1] = VTK_DOUBLE_MAX;
-  m_VolumeSpacing[2] = VTK_DOUBLE_MAX;
+  m_VolumeSpacing[0] = 0;
+  m_VolumeSpacing[1] = 0;
+  m_VolumeSpacing[2] = 0;
 
   //vtkStructuredPoints *sp = vtkStructuredPoints::SafeDownCast(vme_data);
   //sp->GetSpacing(m_VolumeSpacing);
@@ -3606,21 +4240,21 @@ void medOpSegmentation::InitVolumeSpacing()
     for (int xi = 1; xi < rgrid->GetXCoordinates()->GetNumberOfTuples (); xi++)
     {
       double spcx = rgrid->GetXCoordinates()->GetTuple1(xi)-rgrid->GetXCoordinates()->GetTuple1(xi-1);
-      if (m_VolumeSpacing[0] > spcx && spcx != 0.0)
+      if (m_VolumeSpacing[0] < spcx && spcx != 0.0)
         m_VolumeSpacing[0] = spcx;
     }
 
     for (int yi = 1; yi < rgrid->GetYCoordinates()->GetNumberOfTuples (); yi++)
     {
       double spcy = rgrid->GetYCoordinates()->GetTuple1(yi)-rgrid->GetYCoordinates()->GetTuple1(yi-1);
-      if (m_VolumeSpacing[1] > spcy && spcy != 0.0)
+      if (m_VolumeSpacing[1] < spcy && spcy != 0.0)
         m_VolumeSpacing[1] = spcy;
     }
 
     for (int zi = 1; zi < rgrid->GetZCoordinates()->GetNumberOfTuples (); zi++)
     {
       double spcz = rgrid->GetZCoordinates()->GetTuple1(zi)-rgrid->GetZCoordinates()->GetTuple1(zi-1);
-      if (m_VolumeSpacing[2] > spcz && spcz != 0.0)
+      if (m_VolumeSpacing[2] < spcz && spcz != 0.0)
         m_VolumeSpacing[2] = spcz;
     }
   }
@@ -3734,16 +4368,18 @@ void medOpSegmentation::InitManualVolumeSlice()
 void medOpSegmentation::InitEmptyVolumeSlice()
 //----------------------------------------------------------------------------
 {
-  if(m_EmptyVolumeSlice != NULL)
+  if(!m_EmptyVolumeSlice)
   {
-    m_EmptyVolumeSlice->ReparentTo(m_Volume->GetParent());
-    m_EmptyVolumeSlice->SetName("Threshold Volume Slice");
-    //m_View->VmeAdd(m_EmptyVolumeSlice);
-    //m_View->VmeCreatePipe(m_EmptyVolumeSlice);
-    //m_View->CameraUpdate();
-
-    InitDataVolumeSlice<vtkDoubleArray>(m_EmptyVolumeSlice);
+    mafNEW(m_EmptyVolumeSlice);
   }
+  
+  m_EmptyVolumeSlice->ReparentTo(m_Volume->GetParent());
+  m_EmptyVolumeSlice->SetName("Empty Volume Slice");
+  //m_View->VmeAdd(m_EmptyVolumeSlice);
+  //m_View->VmeCreatePipe(m_EmptyVolumeSlice);
+  //m_View->CameraUpdate();
+
+  InitDataVolumeSlice<vtkDoubleArray>(m_EmptyVolumeSlice);
 }
 
 //----------------------------------------------------------------------------
@@ -3901,30 +4537,40 @@ void medOpSegmentation::InitDataVolumeSlice(mafVMEVolumeGray *slice)
     else if (m_CurrentSlicePlane == XZ) vtkDEL(y);
     else if (m_CurrentSlicePlane == XY) vtkDEL(z);
   }
+
+  slice->Modified();
+  slice->Update();
 }
 
 //----------------------------------------------------------------------------
 void medOpSegmentation::InitThresholdVolumeSlice()
 //----------------------------------------------------------------------------
 {
-  if(m_ThresholdVolumeSlice != NULL)
+  if(m_ThresholdVolumeSlice)
   {
-    m_ThresholdVolumeSlice->ReparentTo(m_Volume->GetParent());
-    m_ThresholdVolumeSlice->SetName("Threshold Volume Slice");
-
-    InitDataVolumeSlice<vtkUnsignedCharArray>(m_ThresholdVolumeSlice);
-
-    m_SegmentationColorLUT = m_ThresholdVolumeSlice->GetMaterial()->m_ColorLut;
-    InitMaskColorLut(m_SegmentationColorLUT);
-    m_ThresholdVolumeSlice->GetMaterial()->UpdateFromTables();
-    m_ThresholdVolumeSlice->Update();
-
-    m_View->VmeAdd(m_ThresholdVolumeSlice);
     m_View->VmeShow(m_ThresholdVolumeSlice,false);
-    m_OldSliceIndex = -1;
-    UpdateThresholdRealTimePreview();
-    m_View->CameraUpdate();
+    m_View->VmeRemove(m_ThresholdVolumeSlice);
+    m_ThresholdVolumeSlice->ReparentTo(NULL);
+    mafDEL(m_ThresholdVolumeSlice);
   }
+  mafNEW(m_ThresholdVolumeSlice);
+
+  m_ThresholdVolumeSlice->ReparentTo(m_Volume->GetParent());
+  m_ThresholdVolumeSlice->SetName("Threshold Volume Slice");
+
+  InitDataVolumeSlice<vtkUnsignedCharArray>(m_ThresholdVolumeSlice);
+
+  m_SegmentationColorLUT = m_ThresholdVolumeSlice->GetMaterial()->m_ColorLut;
+  InitMaskColorLut(m_SegmentationColorLUT);
+  m_ThresholdVolumeSlice->GetMaterial()->UpdateFromTables();
+  m_ThresholdVolumeSlice->Update();
+
+  m_View->VmeAdd(m_ThresholdVolumeSlice);
+  m_View->VmeShow(m_ThresholdVolumeSlice,false);
+  m_OldSliceIndex = -1;
+  UpdateThresholdRealTimePreview();
+  m_View->CameraUpdate();
+
 }
 
 //----------------------------------------------------------------------------
@@ -4403,4 +5049,61 @@ bool medOpSegmentation::SegmentedVolumeAccept(mafNode* node)
   }
 
   return false;
+}
+
+//----------------------------------------------------------------------------
+void medOpSegmentation::GetTransformFactor( int toUnity,double *bounds, double *scale, double *traslation )
+//----------------------------------------------------------------------------
+{
+  double size[3];
+
+  //Getting size
+  size[0]=bounds[1]-bounds[0];
+  size[1]=bounds[3]-bounds[2];
+  size[2]=bounds[5]-bounds[4];
+
+  //Generating traslation and scale factors for obtain a [-1,1],[-1,1],[-1,1] cube
+  if (toUnity)
+  {
+    //Translation by -center 
+    traslation[0]=-(bounds[0]+size[0]/2.0);
+    traslation[1]=-(bounds[2]+size[1]/2.0);
+    traslation[2]=-(bounds[4]+size[2]/2.0);
+
+    //Scale by 2/size (2 is because a [-1,1] side has lenght 2)
+    scale[0]=2.0/size[0];
+    scale[1]=2.0/size[1];
+    scale[2]=2.0/size[2];
+  }
+  else 
+  {
+    //Translation by +center 
+    traslation[0]=bounds[0]+size[0]/2.0;
+    traslation[1]=bounds[2]+size[1]/2.0;
+    traslation[2]=bounds[4]+size[2]/2.0;
+
+    //scale by size/2
+    scale[0]=size[0]*0.5;
+    scale[1]=size[1]*0.5;
+    scale[2]=size[2]*0.5;
+  }
+
+}
+
+//----------------------------------------------------------------------------
+void medOpSegmentation::EnableSizerContent(wxSizer* sizer, bool enable)
+//----------------------------------------------------------------------------
+{
+  wxSizerItemList childList = sizer->GetChildren();
+  for(int i = 0; i < childList.GetCount(); i++)
+  {
+    if(childList.Item(i)->GetData()->IsWindow())
+    {
+      childList.Item(i)->GetData()->GetWindow()->Enable(enable);
+    }
+    else if (childList.Item(i)->GetData()->IsSizer())
+    {
+      EnableSizerContent(childList.Item(i)->GetData()->GetSizer(),enable);
+    }
+  }
 }

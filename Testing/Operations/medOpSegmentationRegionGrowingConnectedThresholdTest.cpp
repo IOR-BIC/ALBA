@@ -169,7 +169,7 @@ void medOpSegmentationRegionGrowingConnectedThresholdTest::TestAlgorithm()
   op->SetUpperThreshold(34000);
   op->SetSeed(seed);
   op->Algorithm();
-  mafVMEVolumeGray *volumeOperationOutput = mafVMEVolumeGray::SafeDownCast(op->GetOutput());
+  mafVMEVolumeGray *volumeOperationOutput = mafVMEVolumeGray::SafeDownCast(op->GetOutputVolume());
   volumeOperationOutput->GetOutput()->Update();
   volumeOperationOutput->Update();
 
@@ -289,7 +289,7 @@ void medOpSegmentationRegionGrowingConnectedThresholdTest::TestAlgorithmRG()
   op->SetUpperThreshold(1800);
   op->SetSeed(seed);
   op->Algorithm();
-  mafVMEVolumeGray *volumeOperationOutput = mafVMEVolumeGray::SafeDownCast(op->GetOutput());
+  mafVMEVolumeGray *volumeOperationOutput = mafVMEVolumeGray::SafeDownCast(op->GetOutputVolume());
   volumeOperationOutput->GetOutput()->Update();
   volumeOperationOutput->Update();
 

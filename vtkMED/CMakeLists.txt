@@ -99,6 +99,9 @@ SET(vtkMED_SRCS
   vtkMEDVolumeSlicerNotInterpolated.cxx
   vtkMEDVolumeSlicerNotInterpolated.h
 
+  vtkMEDBinaryImageFloodFill.cxx
+  vtkMEDBinaryImageFloodFill.h
+  
   ######vtkbioeng################################
   vtkMEDCollisionDetectionFilter.cxx
   vtkMEDCollisionDetectionFilter.h

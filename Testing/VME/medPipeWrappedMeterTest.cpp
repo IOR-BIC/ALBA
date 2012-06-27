@@ -11,7 +11,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
 
-#include "mafDefines.h" 
+#include "medDefines.h" 
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
@@ -190,7 +190,7 @@ void medPipeWrappedMeterTest::CompareImages(int testIndex)
   int pointIndex =  name.find_last_of('.');
   name = name.substr(0, pointIndex);
 
-  mafString controlOriginFile=MAF_DATA_ROOT;
+  mafString controlOriginFile=MED_DATA_ROOT;
   controlOriginFile<<"/Test_PipeMeter/";
   controlOriginFile<<name.c_str();
   controlOriginFile<<"_";

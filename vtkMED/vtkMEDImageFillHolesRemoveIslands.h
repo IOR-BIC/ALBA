@@ -63,17 +63,21 @@ public:
   /** Get the edge size of the areas that will be considered holes or islands */
   vtkGetMacro(EdgeSize,int);
 
+  /** Set if peninsula regions are removed or not */
+  vtkSetMacro(RemovePeninsulaRegions,bool);
+
+  /** Get if peninsula regions are removed or not  */
+  vtkGetMacro(RemovePeninsulaRegions,bool);
+
 protected:
 
   /** Execute this filter */
   void Execute();
 
-  /** Initialize this filter */
-  //void Initialize();
-
-  int Algorithm;
-  unsigned int EdgeSize;
-  unsigned char DiscriminationPixelValue;
+  int Algorithm;                            //> fill holes or remove islands
+  unsigned int EdgeSize;                    //> maximum holes/islands size
+  unsigned char DiscriminationPixelValue;   //> ON_PIXEL for fill holes, OFF_PIXEL for remove islands
+  bool RemovePeninsulaRegions;              //> determine if penisnula pixel are removed or not
 
 private:
 
@@ -82,7 +86,6 @@ private:
 
   /** Default dtor */
   ~vtkMEDImageFillHolesRemoveIslands();
-
 };
 
 #endif

@@ -71,6 +71,7 @@ medPipeVolumeSliceNotInterpolated::medPipeVolumeSliceNotInterpolated()
   m_RectilinearGridActor = NULL;
   m_DataType = VTK_IMAGE_DATA;
 
+  // Rectilinear grid visualization: iterate over number of pieces and initialize to NULLs
   for (int i = 0; i < MAX_NUMBER_OF_PIECES; i++)
   {
     m_ImageDummyData.push_back(NULL);
@@ -178,6 +179,7 @@ void medPipeVolumeSliceNotInterpolated::Create(mafSceneNode * node)
 void medPipeVolumeSliceNotInterpolated::SetSlice(double origin[3], int sliceAxis)
 //----------------------------------------------------------------------------
 {
+// Set slice origin and slice axis for the pipe
   m_Origin[0] = origin[0];
   m_Origin[1] = origin[1];
   m_Origin[2] = origin[2];
@@ -191,6 +193,7 @@ void medPipeVolumeSliceNotInterpolated::SetSlice(double origin[3], int sliceAxis
 void medPipeVolumeSliceNotInterpolated::SetSlice(double currentSlice, int sliceAxis)
 //----------------------------------------------------------------------------
 {
+  // Set origin[slice axis]
   m_SliceAxis = sliceAxis;
   m_CurrentSlice = currentSlice;
   
@@ -211,6 +214,7 @@ void medPipeVolumeSliceNotInterpolated::UpdateSlice()
 {
   if(m_DataType == VTK_IMAGE_DATA)
   {
+    // Image data (and rectilinear grid with a number of pieces less than MAX_NUMBER_OF_PIECES)
     for(m_CurrentImageIndex = 0; m_CurrentImageIndex < m_Slicer->GetNumberOfOutputs(); m_CurrentImageIndex++)
     {
       DeleteImageDummyActor();
@@ -223,6 +227,7 @@ void medPipeVolumeSliceNotInterpolated::UpdateSlice()
   }
   else if (m_DataType == VTK_RECTILINEAR_GRID)
   {
+    // Old rectilinear grid visualizations
     DeleteRectilinearGridActor();
     DeleteRectilinearGridMapper();
   }
@@ -245,6 +250,7 @@ void medPipeVolumeSliceNotInterpolated::UpdateSlice()
 
   if (m_DataType == VTK_IMAGE_DATA)
   {
+    // Image data (and rectilinear grid with a number of pieces less than MAX_NUMBER_OF_PIECES)
     assert(m_Slicer->GetNumberOfOutputs() < MAX_NUMBER_OF_PIECES);
     for(m_CurrentImageIndex = 0; m_CurrentImageIndex < m_Slicer->GetNumberOfOutputs(); m_CurrentImageIndex++)
     {
@@ -271,6 +277,7 @@ void medPipeVolumeSliceNotInterpolated::UpdateSlice()
   }
   else if (m_DataType == VTK_RECTILINEAR_GRID)
   {
+    // This representation is left to render rectilinear grid that cannot be represented by a number of image data less then MAX_NUMBER_OF_PIECES
     m_SlicerOutputRectilinearGrid = m_Slicer->GetOutputRectilinearGrid();
 
     // Update mapper
@@ -285,6 +292,7 @@ void medPipeVolumeSliceNotInterpolated::UpdateSlice()
 void medPipeVolumeSliceNotInterpolated::CreateRectilinearGridMapper()
 //----------------------------------------------------------------------------
 {
+  // data set mapper for rg
   assert(m_SlicerOutputRectilinearGrid);
   m_RectilinearGridMapper = vtkDataSetMapper::New();
   m_RectilinearGridMapper->SetInput(m_SlicerOutputRectilinearGrid);
@@ -311,6 +319,7 @@ void medPipeVolumeSliceNotInterpolated::DeleteRectilinearGridMapper()
 void medPipeVolumeSliceNotInterpolated::CreateRectilinearGridActor()
 //----------------------------------------------------------------------------
 {
+  // 3D actor for rgs
   assert(m_RectilinearGridMapper);
   m_RectilinearGridActor = vtkActor::New();
   m_RectilinearGridActor->SetMapper(m_RectilinearGridMapper);
@@ -358,7 +367,8 @@ void medPipeVolumeSliceNotInterpolated::CreateImageActor()
 void medPipeVolumeSliceNotInterpolated::CreateImageDummyData()
 //----------------------------------------------------------------------------
 {
-  // Update image actor
+  // Part of the "dummy" pipeline: necessary to allow pick on image actor
+  // Create a polydata that represents the bounds of the image actors
   if(!m_ImageMapToColors.at(m_CurrentImageIndex) || !m_ImageMapToColors.at(m_CurrentImageIndex)->GetOutput())
   {
     m_ImageDummyData.at(m_CurrentImageIndex) = NULL;
@@ -425,6 +435,7 @@ void medPipeVolumeSliceNotInterpolated::DeleteImageDummyData()
 void medPipeVolumeSliceNotInterpolated::CreateImageDummyMapper()
 //----------------------------------------------------------------------------
 {
+  // Part of the "dummy" pipeline: necessary to allow pick on image actor
   if(!m_ImageDummyData.at(m_CurrentImageIndex))
   {
     m_ImageDummyMapper.at(m_CurrentImageIndex) = NULL;
@@ -450,6 +461,7 @@ void medPipeVolumeSliceNotInterpolated::DeleteImageDummyMapper()
 void medPipeVolumeSliceNotInterpolated::CreateImageDummyActor()
 //----------------------------------------------------------------------------
 {
+  // Part of the "dummy" pipeline: necessary to allow pick on image actor
   if(!m_ImageDummyMapper.at(m_CurrentImageIndex))
   {
     m_ImageDummyActor.at(m_CurrentImageIndex) = NULL;
@@ -526,8 +538,13 @@ void medPipeVolumeSliceNotInterpolated::CreateShiftScaleFilter()
   // Shift scale of the image
   // Image actor can render only unsigned char images with scalar range 0 255
   m_ImageShiftScale.at(m_CurrentImageIndex)  = vtkImageShiftScale::New();
-  m_ImageShiftScale.at(m_CurrentImageIndex)->SetScale(255./(m_ScalarRange[1]-m_ScalarRange[0]));
-  m_ImageShiftScale.at(m_CurrentImageIndex)->SetShift(-m_ScalarRange[0]);
+  
+  // THe new scale must be from 0 to 255
+  if(m_ScalarRange[0] !=  m_ScalarRange[1] && m_ScalarRange[1] != 255)
+  {
+    m_ImageShiftScale.at(m_CurrentImageIndex)->SetScale(255./(m_ScalarRange[1]-m_ScalarRange[0]));
+    m_ImageShiftScale.at(m_CurrentImageIndex)->SetShift(-m_ScalarRange[0]);
+  }
   m_ImageShiftScale.at(m_CurrentImageIndex)->SetOutputScalarTypeToUnsignedChar();
   m_ImageShiftScale.at(m_CurrentImageIndex)->SetInput(m_SlicerImageDataToRender.at(m_CurrentImageIndex));
   m_ImageShiftScale.at(m_CurrentImageIndex)->Update();
@@ -548,6 +565,7 @@ void medPipeVolumeSliceNotInterpolated::DeleteShiftScaleFilter()
 void medPipeVolumeSliceNotInterpolated::CreateMapToColorsFilter()
 //----------------------------------------------------------------------------
 {
+  // Map rescaled lut on image data
   if(!m_ImageShiftScale.at(m_CurrentImageIndex) || !m_ImageShiftScale.at(m_CurrentImageIndex)->GetOutput())
   {
     m_ImageMapToColors.at(m_CurrentImageIndex) = NULL;
@@ -596,6 +614,7 @@ void medPipeVolumeSliceNotInterpolated::CreateSlice()
 mafGUI * medPipeVolumeSliceNotInterpolated::CreateGui()
 //----------------------------------------------------------------------------
 {
+  // create the pipe guis
   m_Gui = new mafGUI(this);
   if(m_ShowGui)
   {
@@ -632,7 +651,7 @@ void medPipeVolumeSliceNotInterpolated::RescaleLUT(vtkLookupTable *inputLUT,vtkL
   // Copy volume lut
   outputLUT->DeepCopy(inputLUT);
 
-  if(m_ScalarRange[0] == 0 && m_ScalarRange[1] == 255)
+  if(m_ScalarRange[0] == 0 && m_ScalarRange[1] == 255 || m_ScalarRange[0] == 255 && m_ScalarRange[1] == 255)
   {
     return;
   }
@@ -643,7 +662,6 @@ void medPipeVolumeSliceNotInterpolated::RescaleLUT(vtkLookupTable *inputLUT,vtkL
   double maxRange = 255 - (m_ScalarRange[1] - tableRange[1]) / (m_ScalarRange[1] - m_ScalarRange[0]) * 255;
   double minRange = ((tableRange[0] - m_ScalarRange[0]) / (m_ScalarRange[1] - m_ScalarRange[0])) * 255;
 
-  mafLogMessage("> Rescaled lut range %f %f",minRange,maxRange);
   // Set table scalar range
   outputLUT->SetTableRange(minRange,maxRange);
   

@@ -4,7 +4,7 @@ Module:    $RCSfile: medOpComputeInertialTensorTest.h,v $
 Language:  C++
 Date:      $Date: 2011-02-14 11:37:18 $
 Version:   $Revision: 1.1.2.1 $
-Authors:   Simone Brazzale
+Authors:   Simone Brazzale , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
 CINECA - Interuniversity Consortium (www.cineca.it)
@@ -29,8 +29,10 @@ class medOpComputeInertialTensorTest : public CPPUNIT_NS::TestFixture
   CPPUNIT_TEST( TestCopy );
   CPPUNIT_TEST( TestAccept );
   CPPUNIT_TEST( TestAddAttributes );
-  CPPUNIT_TEST( TestComputeInertialTensor );
-  CPPUNIT_TEST( TestComputeInertialTensorFromGroup );
+  CPPUNIT_TEST( TestComputeInertialTensorFromDefaultValue );
+  CPPUNIT_TEST( TestComputeInertialTensorFromDENSITYTag );
+  CPPUNIT_TEST( TestComputeInertialTensorFromGroupFromDefaultValue );
+  CPPUNIT_TEST( TestComputeInertialTensorFromGroupFromDENSITYTag );
   CPPUNIT_TEST( TestOpDoUndo );
   CPPUNIT_TEST_SUITE_END();
 
@@ -39,9 +41,12 @@ protected:
   void TestCopy();
   void TestAccept();
   void TestAddAttributes();
-  void TestComputeInertialTensor();
-  void TestComputeInertialTensorFromGroup();
+  void TestComputeInertialTensorFromDefaultValue();
+  void TestComputeInertialTensorFromDENSITYTag();
+  void TestComputeInertialTensorFromGroupFromDefaultValue();
+  void TestComputeInertialTensorFromGroupFromDENSITYTag();
   void TestOpDoUndo();
+  
 };
 
 

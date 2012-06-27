@@ -17,6 +17,8 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #include "mafMatrix.h"
 #include "mafNode.h"
 #include "medVMESegmentationVolume.h"
+#include "medOperationsDefines.h"
+#include "vtkSystemIncludes.h"
 
 
 //----------------------------------------------------------------------------
@@ -43,6 +45,7 @@ class mafMatrix;
 class mafVMEVolumeGray;
 class mafVME;
 class mafVMEImage;
+class mafNode;
 
 class mmiSelectPoint;
 
@@ -64,6 +67,7 @@ class vtkActor;
 class vtkStructuredPoints;
 class vtkUnsignedCharArray;
 class medViewSliceNotInterpolated;
+class wxStaticBoxSizer;
 
 //----------------------------------------------------------------------------
 // medOpSegmentation :
@@ -76,7 +80,7 @@ User can select:
 - segmentation refinement
 or he can load a previous segmentation.
 */
-class medOpSegmentation: public mafOp
+class MED_OPERATION_EXPORT medOpSegmentation: public mafOp
 {
 
 public:
@@ -109,8 +113,11 @@ public:
 	  ID_PRE_VOLUME_SPACING,
 	  ID_PRE_VOLUME_ZERO_VALUE,
     ID_MANUAL_PICKING_MODALITY,
+    ID_MANUAL_TOOLS,
     ID_MANUAL_BRUSH_SHAPE,
     ID_MANUAL_BRUSH_SIZE,
+    ID_MANUAL_BUCKET_ACTION,
+    ID_MANUAL_BUCKET_GLOBAL,
     ID_MANUAL_REFINEMENT_REGIONS_SIZE,
     ID_MANUAL_CANCEL,
     ID_MANUAL_UNDO, 
@@ -144,6 +151,7 @@ public:
     ID_REFINEMENT_UNDO,
     ID_REFINEMENT_REDO,
     ID_ENABLE_TRILINEAR_INTERPOLATION,
+    ID_REFINEMENT_REMOVE_PENINSULA_REGIONS,
     MINID,
   };
 
@@ -204,6 +212,9 @@ public:
 
   /** Return true if node is of type mafVMEVolume. */
   static bool SegmentedVolumeAccept(mafNode* node);
+
+  /** Returns the output Volume*/
+  mafVMEVolumeGray *GetOutputVolume(){return m_OutputVolume;};
 
 protected:
 
@@ -370,6 +381,7 @@ protected:
   mafVMEVolumeGray *m_ThresholdVolumeSlice; //<Single slice volume mask for real-time thresholding preview
   mafVMEVolumeGray *m_EmptyVolumeSlice; //<Single slice volume that represent current slice (for real-time thresholding preview)
   mafVMEVolumeGray *m_OutputVolume;     //<Output volume
+  mafVMESurface *m_OutputSurface;          //<Output Surface
   wxStaticText *m_SnippetsLabel;        //<Suggestion labels - GUI
   medInteractorSegmentationPicker *m_SegmentationPicker; //<Segmentation picker for interaction
 
@@ -419,25 +431,30 @@ protected:
   /** Create the real drawn image */
   void CreateRealDrawnImage();
 
-  mafVMEVolumeGray *m_ManualVolumeMask;       //< Manual volume mask
-  mafVMEVolumeGray *m_ManualVolumeSlice;      //< Single slice manual volume mask
-  mafGUIFloatSlider *m_ManualBrushSizeSlider; //<Brush size slider - GUI
-  wxTextCtrl *m_ManualBrushSizeText;          //<Brush size text box - GUI
-  wxRadioBox *m_ManualBrushShapeRadioBox;     //<Brush shape radio - GUI
-  mafGUIButton *m_ManualApplyChanges;         //<Apply changes button - GUI
-  int m_ManualSegmentationAction;             //<Manual segmentation action (draw/erease)
-  int m_ManualBrushShape;                     //<Brush shape
-  double m_ManualBrushSize;                   //<Brush size
-  int m_ManualRefinementRegionsSize;          //<Refinement region size
-  wxComboBox *m_ManualRefinementComboBox;     //<Refinement action combo - GUI
+  mafVMEVolumeGray *m_ManualVolumeMask;         //< Manual volume mask
+  mafVMEVolumeGray *m_ManualVolumeSlice;        //< Single slice manual volume mask
+  mafGUIFloatSlider *m_ManualBrushSizeSlider;   //<Brush size slider - GUI
+  wxTextCtrl *m_ManualBrushSizeText;            //<Brush size text box - GUI
+  wxRadioBox *m_ManualBrushShapeRadioBox;       //<Brush shape radio - GUI
+  wxStaticBoxSizer *m_BrushEditingSizer;
+  mafGUIButton *m_ManualApplyChanges;           //<Apply changes button - GUI
+  int m_ManualSegmentationAction;               //<Manual segmentation action (draw/erease)
+  int m_ManualSegmentationTools;                //<Manual segmentation tools (bucket/brush)
+  int m_ManualBucketActions;                    //<
+  int m_ManualBrushShape;                       //<Brush shape
+  double m_ManualBrushSize;                     //<Brush size
+  int m_ManualRefinementRegionsSize;            //<Refinement region size
+  wxComboBox *m_ManualRefinementComboBox;       //<Refinement action combo - GUI
   wxTextCtrl *m_ManualRefinementRegionSizeText; //<Refinement size text - GUI
-  std::vector<UndoRedoState> m_ManualUndoList; //< Undo stack
-  std::vector<UndoRedoState> m_ManualRedoList; // Redo stack
-  bool m_PickingStarted;                      //<Determine if picking has started
-  medInteractorPERBrushFeedback *m_ManualPER; //<Dynamic event router
-  double m_CurrentBrushMoveEventCount;        //<Id for mouse move event raised by the brush
-  vtkUnsignedCharArray *m_RealDrawnImage;     //<Real drawn image used in brush preview
-  int m_LastMouseMovePointID;                 //<Last point id in mouse move event
+  std::vector<UndoRedoState> m_ManualUndoList;  //< Undo stack
+  std::vector<UndoRedoState> m_ManualRedoList;  // Redo stack
+  bool m_PickingStarted;                        //<Determine if picking has started
+  medInteractorPERBrushFeedback *m_ManualPER;   //<Dynamic event router
+  double m_CurrentBrushMoveEventCount;          //<Id for mouse move event raised by the brush
+  vtkUnsignedCharArray *m_RealDrawnImage;       //<Real drawn image used in brush preview
+  int m_LastMouseMovePointID;                   //<Last point id in mouse move event
+  mafGUILutSlider* m_ManualRangeSlider;         //<
+  wxStaticBoxSizer *m_BucketEditingSizer;       //<
   //////////////////////////////////////////////////////////////////////////
 
   //////////////////////////////////////////////////////////////////////////
@@ -569,5 +586,31 @@ protected:
 
   int m_OldAutomaticThreshold;      //<Used to update real time threshold preview only if needed
   int m_OldAutomaticUpperThreshold; //<Used to update real time threshold preview only if needed
+
+  int m_RemovePeninsulaRegions; //<Determine if refinement filter removes penisula regions or not
+  int m_OLdWindowingLow;        //<Windowing original value to restore after exiting operation
+  int m_OLdWindowingHi;         //<Windowing original value to restore after exiting operation
+
+  int m_GlobalFloodFill;  //<
+  int m_FloodErease;      //<
+
+  /** Delete children of input vme if they are output of the input volume  */
+  void DeleteOutputs(mafNode* vme);
+
+  /** Determine if the specified vme is an output of the input volume */
+  bool IsOutput(mafNode* vme);
+
+  /** Calculates the scale/traslation to obtain a cube in [-1,1], 
+      If toUnity is set to false returns the inverse factors*/
+  void GetTransformFactor(int toUnity,double *bounds, double *scale, double *traslation);
+
+  /** flood fill algorithm */
+  void FloodFill(vtkIdType seed);
+
+  /** Apply flood fill filter */
+  int ApplyFloodFill(vtkStructuredPoints *inputImage, vtkStructuredPoints *outputImage, vtkIdType seed);
+
+  void EnableSizerContent(wxSizer* sizer, bool enable);
+
 };
 #endif
