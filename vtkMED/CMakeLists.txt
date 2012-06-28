@@ -105,6 +105,9 @@ SET(vtkMED_SRCS
   ######vtkbioeng################################
   vtkMEDCollisionDetectionFilter.cxx
   vtkMEDCollisionDetectionFilter.h
+  
+  vtkMEDRayCastCleaner.cpp
+  vtkMEDRayCastCleaner.h
 )
 
 IF (MAF_USE_ITK)
