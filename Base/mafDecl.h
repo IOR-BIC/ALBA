@@ -268,6 +268,7 @@ EVT_START,
 	MOUSE_DOWN, //(to be removed Marco)
 	MOUSE_MOVE, //(to be removed Marco)
 	MOUSE_UP,   //(to be removed Marco)
+  MOUSE_WHEEL, //(Used by mafGUI to send mouse wheel event to the listener) added by Losi 06/28/2012
    
   ID_TRANSFORM, //added by Stefano. 30-11-2003 
   SHOW_CONTEXTUAL_MENU,	//Added by Paolo 16-9-2003
