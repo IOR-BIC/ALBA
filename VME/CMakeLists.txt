@@ -137,6 +137,9 @@ SET(PROJECT_SRCS
 
   medPipeVolumeSliceNotInterpolated.cpp
   medPipeVolumeSliceNotInterpolated.h
+  
+  medPipeRayCast.cpp
+  medPipeRayCast.h
 )
 
 IF (MAF_USE_ITK)

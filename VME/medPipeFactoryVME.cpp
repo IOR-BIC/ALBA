@@ -65,6 +65,8 @@
 #include "medVisualPipeCollisionDetection.h"
 #include "medPipeVolumeSliceNotInterpolated.h"
 
+#include "medPipeRayCast.h"
+
 #include <string>
 #include <ostream>
 
@@ -149,6 +151,10 @@ medPipeFactoryVME::medPipeFactoryVME()
   mafPlugPipeMacro(mafPipeMeshSlice_BES, "BES: mafPipeMeshSlice_BES.");
 
   mafPlugPipeMacro(medPipeVolumeSliceNotInterpolated, "Pipe for not interpolated and not resampled volume visualization");   
+
+  mafPlugPipeMacro(medPipeRayCast, "Pipe for RayCast Volume rendering of bone-blood-muscle");
+
+
 }
 /*
 //------------------------------------------------------------------------------
