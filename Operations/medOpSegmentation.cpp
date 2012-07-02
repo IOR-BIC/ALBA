@@ -2295,6 +2295,35 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
     //SWITCH
     else switch(e->GetId()) 
     {
+    case MOUSE_WHEEL:
+      {
+        if(m_CurrentOperation == MANUAL_SEGMENTATION && m_ManualSegmentationTools == 0)
+        {
+          if(e->GetArg() < 0)
+          {
+            m_ManualBrushSize++;
+          }
+          else
+          {
+            m_ManualBrushSize--;
+          }
+          m_ManualPER->SetRadius(double(m_ManualBrushSize)/2);
+          UndoBrushPreview();
+          int oldAction = m_ManualSegmentationAction;
+          m_ManualSegmentationAction = MANUAL_SEGMENTATION_SELECT;
+          mafEvent dummyEvent;
+          vtkPoints *dummyPoints = vtkPoints::New();
+          dummyEvent.SetVtkObj(dummyPoints);
+          dummyEvent.SetArg(m_LastMouseMovePointID);
+          OnBrushEvent(&dummyEvent);
+          dummyPoints->Delete();
+          m_View->CameraUpdate();
+          m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
+          m_ManualSegmentationAction = oldAction;
+          break;
+        }
+      }
+      break;
     case ID_BUTTON_NEXT:
       {
         if (m_CurrentOperation < NUMBER_OF_OPERATIONS-1)//if the current operation isn't the last operation
@@ -3432,6 +3461,7 @@ void medOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
    default:
     mafEventMacro(*e);
   }
+  m_GuiDialog->SetFocusIgnoringChildren();
 }
 //------------------------------------------------------------------------
 void medOpSegmentation::OnLoadSegmentationEvent(mafEvent *e)
