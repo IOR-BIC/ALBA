@@ -3328,19 +3328,19 @@ void medOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
 //         wxCursor cursor = wxCursor( wxCURSOR_PENCIL );
 //         m_View->GetWindow()->SetCursor(cursor);
 
-//         EnableSizerContent(m_BucketEditingSizer,false);
-//         EnableSizerContent(m_BrushEditingSizer,true);
-//         m_SegmentationOperationsGui[ID_MANUAL_SEGMENTATION]->Update();
+        EnableSizerContent(m_BucketEditingSizer,false);
+        EnableSizerContent(m_BrushEditingSizer,true);
+        m_SegmentationOperationsGui[ID_MANUAL_SEGMENTATION]->Update();
       }
       else
       {
 //         wxCursor cursor = wxCursor( wxCURSOR_SPRAYCAN );
 //         m_View->GetWindow()->SetCursor(cursor);
 
-//         EnableSizerContent(m_BucketEditingSizer,true);
-//         EnableSizerContent(m_BrushEditingSizer,false);
-//         m_ManualRangeSlider->Enable(m_GlobalFloodFill==TRUE);
-//         m_SegmentationOperationsGui[ID_MANUAL_SEGMENTATION]->Update();
+        EnableSizerContent(m_BucketEditingSizer,true);
+        EnableSizerContent(m_BrushEditingSizer,false);
+        m_ManualRangeSlider->Enable(m_GlobalFloodFill==TRUE);
+        m_SegmentationOperationsGui[ID_MANUAL_SEGMENTATION]->Update();
         UndoBrushPreview();
         OnEventUpdateManualSlice();
       }
