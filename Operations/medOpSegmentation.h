@@ -591,8 +591,8 @@ protected:
   int m_OLdWindowingLow;        //<Windowing original value to restore after exiting operation
   int m_OLdWindowingHi;         //<Windowing original value to restore after exiting operation
 
-  int m_GlobalFloodFill;  //<
-  int m_FloodErease;      //<
+  int m_GlobalFloodFill;  //< global or local bucket tool
+  int m_FloodErease;      //< switch fill/erease for bucket tool
 
   /** Delete children of input vme if they are output of the input volume  */
   void DeleteOutputs(mafNode* vme);

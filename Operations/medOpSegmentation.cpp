@@ -976,6 +976,8 @@ void medOpSegmentation::FloodFill(vtkIdType seed)
     double low, hi;
     m_ManualRangeSlider->GetSubRange(&low,&hi);
 
+    int oldSliceIndex = m_CurrentSliceIndex;
+    wxBusyInfo wait("Please wait...");
     for(int s = m_CurrentSliceIndex; s <= hi; s++)
     {
       vtkStructuredPoints *input = vtkStructuredPoints::New();
@@ -1001,19 +1003,28 @@ void medOpSegmentation::FloodFill(vtkIdType seed)
 
       m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->SetScalars(output->GetPointData()->GetScalars());
       m_ManualVolumeSlice->Update();
-      m_View->VmeShow(m_ManualVolumeSlice,true);
+      //m_View->VmeShow(m_ManualVolumeSlice,true);
 
       CreateRealDrawnImage();
-      m_View->CameraUpdate();
+      //m_View->CameraUpdate();
 
       input->Delete();
       output->Delete();
       if(s < hi)
       {
-        OnEvent(new mafEvent(this,ID_SLICE_NEXT));
+        m_CurrentSliceIndex++;
+        //UndoBrushPreview();
+        ApplyVolumeSliceChanges();  
+        UpdateVolumeSlice();
+        //UpdateSlice();
       }
     }
-    OnEvent(new mafEvent(this,ID_SLICE_SLIDER));
+    m_CurrentSliceIndex = oldSliceIndex;
+    UndoBrushPreview();
+    ApplyVolumeSliceChanges();  
+    UpdateVolumeSlice();
+    UpdateSlice();
+    m_View->CameraUpdate();
   }
   else
   {
@@ -2261,7 +2272,7 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
       m_AutomaticScalarTextMapper->SetInput(text.GetCStr());
       m_View->CameraUpdate();
     }
-    else if (e->GetSender() == m_ManualPER && e->GetId()== MOUSE_MOVE)
+    else if (e->GetSender() == m_ManualPER && e->GetId()== MOUSE_MOVE && m_ManualSegmentationTools == 0)
     {
       UndoBrushPreview();
       if(e->GetDouble() > m_CurrentBrushMoveEventCount && m_ManualSegmentationTools == 0)
@@ -2363,7 +2374,7 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
           {
             UpdateSlice();
           }
-          
+
           if(m_CurrentOperation == MANUAL_SEGMENTATION)
           {
             CreateRealDrawnImage();
@@ -2634,7 +2645,7 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
             FloodFill(seedID);
             CreateRealDrawnImage();
           }
-          
+
           //----------
           else // brush
           {
@@ -4371,8 +4382,8 @@ void medOpSegmentation::UpdateSlice()
   if(m_CurrentOperation == MANUAL_SEGMENTATION)
     UpdateVolumeSlice();
 
-  m_View->CameraUpdate();
-  m_GuiDialog->Update();
+  //m_View->CameraUpdate();
+  //m_GuiDialog->Update();
 }
 
 //----------------------------------------------------------------------------
