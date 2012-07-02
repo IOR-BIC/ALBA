@@ -334,6 +334,7 @@ protected:
   void OnSlider			  (wxCommandEvent &event) { }//@@@ this->OnEvent(mafEvent(this, GetModuleId(event.GetWidgetId()))); }
 	void OnListBox      (wxCommandEvent &event);
   void OnCheckListBox (wxCommandEvent &event);
+  void OnMouseWheel   (wxMouseEvent &event);
 
   bool m_CollaborateStatus;  ///< Flag set to know if the application is in collaborative mode or no.
 

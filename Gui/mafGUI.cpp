@@ -109,6 +109,7 @@ BEGIN_EVENT_TABLE(mafGUI,mafGUIPanel)
     EVT_COMMAND_RANGE( MINID,MAXID,wxEVT_COMMAND_LISTBOX_SELECTED,      mafGUI::OnListBox)
     EVT_COMMAND_RANGE( MINID,MAXID,wxEVT_COMMAND_CHECKLISTBOX_TOGGLED , mafGUI::OnCheckListBox)
 	  EVT_COMMAND_RANGE( MINID,MAXID,wxEVT_COMMAND_SLIDER_UPDATED,				mafGUI::OnSlider)
+    EVT_MOUSEWHEEL(mafGUI::OnMouseWheel)
 END_EVENT_TABLE()
 
 //----------------------------------------------------------------------------
@@ -1534,6 +1535,12 @@ mafGUIRollOut *mafGUI::RollOut(int id, mafString title, mafGUI *roll_gui, bool r
   mafGUIRollOut *roll = new mafGUIRollOut(this, title, roll_gui, w_id, rollOutOpen);
   roll->SetListener(this);
   return roll;
+}
+//----------------------------------------------------------------------------
+void mafGUI::OnMouseWheel(wxMouseEvent &event)
+  //----------------------------------------------------------------------------
+{
+  OnEvent(&mafEvent(this,MOUSE_WHEEL,(long) event.GetWheelRotation()));
 }
 //----------------------------------------------------------------------------
 void mafGUI::OnListBox (wxCommandEvent &event)
