@@ -1280,13 +1280,6 @@ int medOpSegmentation::ApplyFloodFill(vtkStructuredPoints *inputImage, vtkStruct
   vtkMEDBinaryImageFloodFill *filter = vtkMEDBinaryImageFloodFill::New();
   filter->SetInput(inputImage);
   filter->SetSeed(seed);
-
-  m_FloodErease = FALSE;
-  if(m_ManualBucketActions == 1)
-  {
-    m_FloodErease = TRUE;
-  }
-
   
   filter->SetFillErase(m_FloodErease == TRUE);
 
@@ -1660,16 +1653,16 @@ void medOpSegmentation::CreateManualSegmentationGui()
   m_BucketEditingSizer = new wxStaticBoxSizer(wxVERTICAL, currentGui, "Bucket Options");
 
   // BRUSH SHAPE
-  wxString bucketActions[2];
-  bucketActions[0] = wxString("fill");
-  bucketActions[1] = wxString("erase");
-  w_id = currentGui->GetWidgetId(ID_MANUAL_BUCKET_ACTION);
-
-  wxBoxSizer *bucketActionsSizer = new wxBoxSizer(wxHORIZONTAL);
-  wxStaticText *bucketActionsLab = new wxStaticText(currentGui, w_id, "Action");
-
-  wxRadioBox *bucketActionsRadioBox = new wxRadioBox(currentGui, w_id, "",wxDefaultPosition, wxSize(130,-1), 2, bucketActions, 2);
-  bucketActionsRadioBox->SetValidator( mafGUIValidator(currentGui, w_id, bucketActionsRadioBox, &m_ManualBucketActions) );
+//   wxString bucketActions[2];
+//   bucketActions[0] = wxString("fill");
+//   bucketActions[1] = wxString("erase");
+//   w_id = currentGui->GetWidgetId(ID_MANUAL_BUCKET_ACTION);
+// 
+//   wxBoxSizer *bucketActionsSizer = new wxBoxSizer(wxHORIZONTAL);
+//   wxStaticText *bucketActionsLab = new wxStaticText(currentGui, w_id, "Action");
+// 
+//   wxRadioBox *bucketActionsRadioBox = new wxRadioBox(currentGui, w_id, "",wxDefaultPosition, wxSize(130,-1), 2, bucketActions, 2);
+//   bucketActionsRadioBox->SetValidator( mafGUIValidator(currentGui, w_id, bucketActionsRadioBox, &m_ManualBucketActions) );
 
   w_id = currentGui->GetWidgetId(ID_MANUAL_BUCKET_GLOBAL);
   wxCheckBox *globalCheck = new wxCheckBox(currentGui,w_id,"Iterative");
@@ -1682,9 +1675,9 @@ void medOpSegmentation::CreateManualSegmentationGui()
   m_ManualRangeSlider->SetSubRange(1,m_VolumeDimensions[2]);
   /*m_ManualRangeSlider->Enable(false);*/
 
-  bucketActionsSizer->Add(bucketActionsLab,  0, wxRIGHT, 5);
-  bucketActionsSizer->Add(bucketActionsRadioBox,0, wxRIGHT, 2);
-  m_BucketEditingSizer->Add(bucketActionsSizer, 0, wxALL, 1);
+//   bucketActionsSizer->Add(bucketActionsLab,  0, wxRIGHT, 5);
+//   bucketActionsSizer->Add(bucketActionsRadioBox,0, wxRIGHT, 2);
+//   m_BucketEditingSizer->Add(bucketActionsSizer, 0, wxALL, 1);
   m_BucketEditingSizer->Add(globalCheck, 0, wxALL, 1);
   m_BucketEditingSizer->Add(m_ManualRangeSlider, 0, wxALL, 1);
 
@@ -2333,7 +2326,17 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
       }
       //Picking during manual segmentation
       else if(m_CurrentOperation == MANUAL_SEGMENTATION)
-        StartDraw(e, true);
+      {  
+        if(m_ManualSegmentationTools == 1) // bucket
+        {
+          m_FloodErease = TRUE;
+          OnEventFloodFill(e);
+        }
+        else // brush
+        {
+          StartDraw(e, true);
+        }
+      }
     }
     //SWITCH
     else switch(e->GetId()) 
@@ -2647,70 +2650,9 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         {
           if(m_ManualSegmentationTools == 1) // bucket
           {
-            int id;
-            id = e->GetArg();
-            int seed[3];
-            double seedCoords[3];
-            double origin[3];
-            vtkDataSet * dataSet = m_ManualVolumeMask->GetOutput()->GetVTKData();
-            dataSet->GetPoint(id,seedCoords);
-            dataSet->GetPoint(0,origin);
-
-            vtkImageData* im = vtkImageData::SafeDownCast(dataSet);
-            vtkRectilinearGrid* rg = vtkRectilinearGrid::SafeDownCast(dataSet);
-            if(im != NULL)
-            {
-              double spacing[3];
-              im->GetSpacing(spacing);
-              seed[0] = (seedCoords[0] - origin[0]) / spacing[0];
-              seed[1] = (seedCoords[1] - origin[1]) / spacing[1];
-              seed[2] = (seedCoords[2] - origin[2]) / spacing[2];
-            }
-            else if(rg)
-            {
-              vtkDoubleArray* xa = (vtkDoubleArray*)rg->GetXCoordinates();
-              vtkDoubleArray* ya = (vtkDoubleArray*)rg->GetYCoordinates();
-              vtkDoubleArray* za = (vtkDoubleArray*)rg->GetZCoordinates();
-
-              for(int x = 0; x < xa->GetSize(); x++)
-              {
-                if(xa->GetTuple1(x) == seedCoords[0])
-                {
-                  seed[0] = x;
-                  break;
-                }
-              }
-              for(int y = 0; y < ya->GetSize(); y++)
-              {
-                if(ya->GetTuple1(y) == seedCoords[1])
-                {
-                  seed[1] = y;
-                  break;
-                }
-              }
-              for(int z = 0; z < za->GetSize(); z++)
-              {
-                if(za->GetTuple1(z) == seedCoords[2])
-                {
-                  seed[2] = z;
-                  break;
-                }
-              }
-            }
-            double dims[3];
-            dims[0] = m_VolumeDimensions[0];
-            dims[1] = m_VolumeDimensions[1];
-            dims[2] = m_VolumeDimensions[2];
-            dims[m_CurrentSlicePlane] = 1;
-            seed[m_CurrentSlicePlane] = 0;
-
-            // recalculate seed id
-            vtkIdType seedID = seed[0] + seed[1] * dims[0] + seed[2] * dims[1] * dims[0];
-            FloodFill(seedID);
-            CreateRealDrawnImage();
+            m_FloodErease = FALSE;
+            OnEventFloodFill(e);
           }
-
-          //----------
           else // brush
           {
             StartDraw(e, false);
@@ -5225,4 +5167,71 @@ void medOpSegmentation::EnableSizerContent(wxSizer* sizer, bool enable)
       EnableSizerContent(childList.Item(i)->GetData()->GetSizer(),enable);
     }
   }
+}
+
+//----------------------------------------------------------------------------
+void medOpSegmentation::OnEventFloodFill(mafEvent *e)
+//----------------------------------------------------------------------------
+{
+  int id;
+  id = e->GetArg();
+  int seed[3];
+  double seedCoords[3];
+  double origin[3];
+  vtkDataSet * dataSet = m_ManualVolumeMask->GetOutput()->GetVTKData();
+  dataSet->GetPoint(id,seedCoords);
+  dataSet->GetPoint(0,origin);
+
+  vtkImageData* im = vtkImageData::SafeDownCast(dataSet);
+  vtkRectilinearGrid* rg = vtkRectilinearGrid::SafeDownCast(dataSet);
+  if(im != NULL)
+  {
+    double spacing[3];
+    im->GetSpacing(spacing);
+    seed[0] = (seedCoords[0] - origin[0]) / spacing[0];
+    seed[1] = (seedCoords[1] - origin[1]) / spacing[1];
+    seed[2] = (seedCoords[2] - origin[2]) / spacing[2];
+  }
+  else if(rg)
+  {
+    vtkDoubleArray* xa = (vtkDoubleArray*)rg->GetXCoordinates();
+    vtkDoubleArray* ya = (vtkDoubleArray*)rg->GetYCoordinates();
+    vtkDoubleArray* za = (vtkDoubleArray*)rg->GetZCoordinates();
+
+    for(int x = 0; x < xa->GetSize(); x++)
+    {
+      if(xa->GetTuple1(x) == seedCoords[0])
+      {
+        seed[0] = x;
+        break;
+      }
+    }
+    for(int y = 0; y < ya->GetSize(); y++)
+    {
+      if(ya->GetTuple1(y) == seedCoords[1])
+      {
+        seed[1] = y;
+        break;
+      }
+    }
+    for(int z = 0; z < za->GetSize(); z++)
+    {
+      if(za->GetTuple1(z) == seedCoords[2])
+      {
+        seed[2] = z;
+        break;
+      }
+    }
+  }
+  double dims[3];
+  dims[0] = m_VolumeDimensions[0];
+  dims[1] = m_VolumeDimensions[1];
+  dims[2] = m_VolumeDimensions[2];
+  dims[m_CurrentSlicePlane] = 1;
+  seed[m_CurrentSlicePlane] = 0;
+
+  // recalculate seed id
+  vtkIdType seedID = seed[0] + seed[1] * dims[0] + seed[2] * dims[1] * dims[0];
+  FloodFill(seedID);
+  CreateRealDrawnImage();
 }
