@@ -21,9 +21,13 @@ class vtkStructuredPoints;
 class vtkDataArray;
 
 
-/** vtkMedRayCastCleaner: This filter removes border interpolation values from bone boundary
+/** vtkMedRayCastCleaner: This filter prepare a volume for raycast render
+It makes a shift the scalar value from range [x,y] to [0,y-x], because the raycast renderer needs
+unsigned short input.
+
+It removes border interpolation values from bone boundary
 if a blood voxel is in bone boundary the corresponding scalar output contains the bone lower threshold 
-the effect of this filter is like a bone sanding
+the effect of this filter is like a bone sanding.
 */
 //---------------------------------------------------------------------------
 class VTK_vtkMED_EXPORT vtkMEDRayCastCleaner : public vtkStructuredPointsToStructuredPointsFilter
