@@ -2386,7 +2386,6 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
       {
         //if (m_NumSliceSliderEvents == 2)//Validator generate 2 events when the user move the slider REMOVED: GEnerate problems on slice update!
         {
-          mafLogMessage(">> Debug Info: Slice slider update");
           m_NumSliceSliderEvents = 0;
           if (/*m_CurrentSliceIndex != m_OldSliceIndex &&*/ m_CurrentOperation==MANUAL_SEGMENTATION)
           {
@@ -2430,8 +2429,8 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
               {
                 hi = low;
               }
-              m_ManualRangeSlider->SetSubRange(low,hi);
               m_SegmentationOperationsGui[ID_MANUAL_SEGMENTATION]->Update();
+              m_ManualRangeSlider->SetSubRange(low,hi);
             }
           }
         }
@@ -2485,8 +2484,8 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
             {
               hi = low;
             }
-            m_ManualRangeSlider->SetSubRange(low,hi);
             m_SegmentationOperationsGui[ID_MANUAL_SEGMENTATION]->Update();
+            m_ManualRangeSlider->SetSubRange(low,hi);
           }
         }
         break;
@@ -2535,8 +2534,8 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
             {
               hi = low;
             }
-            m_ManualRangeSlider->SetSubRange(low,hi);
             m_SegmentationOperationsGui[ID_MANUAL_SEGMENTATION]->Update();
+            m_ManualRangeSlider->SetSubRange(low,hi);
           }
         }
         break;
@@ -2583,8 +2582,8 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
             {
               hi = low;
             }
-            m_ManualRangeSlider->SetSubRange(low,hi);
             m_SegmentationOperationsGui[ID_MANUAL_SEGMENTATION]->Update();
+            m_ManualRangeSlider->SetSubRange(low,hi);
           }
         }
         break;
