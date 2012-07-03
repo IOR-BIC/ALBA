@@ -615,5 +615,7 @@ protected:
 
   void EnableSizerContent(wxSizer* sizer, bool enable);
 
+  void OnEventFloodFill(mafEvent *e);
+
 };
 #endif
