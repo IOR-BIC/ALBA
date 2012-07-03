@@ -73,8 +73,8 @@ medPipeRayCast::medPipeRayCast(double skinOpacity,double fatMassOpacity,double m
   
   m_OutlineActor    = NULL;
   m_OutlineBox      = NULL;
-	m_OutlineMapper   = NULL;
-  //m_VolumeCaster    = NULL;
+  m_OutlineMapper   = NULL;
+
   m_RayCastCleaner  = NULL;
   m_ResampleFilter  = NULL;
 
@@ -266,8 +266,14 @@ void medPipeRayCast::UpdateFromData()
   //If input is a Rectilinear grid this pipe need a Resample
   if (vtkRectilinearGrid *rgrid = vtkRectilinearGrid::SafeDownCast(dataset))
   {
-    wxBusyCursor wait;
-    wxBusyInfo wait_info(_("Resampling..."));
+    wxBusyInfo *info;
+    wxBusyCursor *wait;
+
+    if (m_Gui!=NULL)
+    {
+      wait = new wxBusyCursor;
+      info = new wxBusyInfo(_("Resampling..."));
+    }
 
     resampled=true;
 
@@ -319,13 +325,25 @@ void medPipeRayCast::UpdateFromData()
     m_ResampleFilter->SetOutput(volume);
     m_ResampleFilter->AutoSpacingOff();
     m_ResampleFilter->Update();
+
+    if(m_Gui!=NULL)
+    {
+      delete wait;
+      delete info;
+    }
   }
   //Else if input is an Structured Point we use it directly
   else 
     volume=vtkImageData::SafeDownCast(dataset);
 
-  wxBusyCursor wait;
-  wxBusyInfo wait_info(_("Volume filtering..."));
+  wxBusyInfo *info;
+  wxBusyCursor *wait;
+
+  if (m_Gui!=NULL)
+  {
+    wait = new wxBusyCursor;
+    info = new wxBusyInfo(_("Volume filtering..."));
+  }
 
   //RayCast Cleaner removes border effects from bones
   //(bone sanding) and produces in output a volume whit unsigned short 
@@ -376,6 +394,11 @@ void medPipeRayCast::UpdateFromData()
   m_Volume->PickableOff();
   m_AssemblyFront->AddPart(m_Volume);
 
+  if(m_Gui!=NULL)
+  {
+    delete wait;
+    delete info;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -406,7 +429,6 @@ void medPipeRayCast::SetRayCastFunctions()
   
   double bloodA,bloodB,bloodDiff,boneA,boneB,muscle,muscleA,muscleB,muscleDiff;
 
-  
   //Muscle point intervals
   muscleDiff=m_MuscleUpperThreshold-m_MuscleLowerThreshold;
   muscle=m_MuscleLowerThreshold+0.5*muscleDiff;
