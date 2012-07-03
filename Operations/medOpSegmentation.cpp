@@ -2421,7 +2421,6 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
             CreateRealDrawnImage();
             if(e->GetSender()!=this)
             {
-              mafLogMessage(">> Debug Info: Range slider update");
               double low,hi;
               m_ManualRangeSlider->GetSubRange(&low,&hi);
               low = m_CurrentSliceIndex;
