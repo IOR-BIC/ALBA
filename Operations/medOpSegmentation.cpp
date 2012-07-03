@@ -2075,6 +2075,7 @@ void medOpSegmentation::OnRefinementStep()
   
   m_View->VmeShow(m_RefinementVolumeMask,true);
   UpdateSlice();
+  
   m_View->CameraUpdate();
   m_GuiDialog->Update();
 }
@@ -2382,8 +2383,9 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
       {
         //if (m_NumSliceSliderEvents == 2)//Validator generate 2 events when the user move the slider REMOVED: GEnerate problems on slice update!
         {
+          mafLogMessage(">> Debug Info: Slice slider update");
           m_NumSliceSliderEvents = 0;
-          if (m_CurrentSliceIndex != m_OldSliceIndex && m_CurrentOperation==MANUAL_SEGMENTATION)
+          if (/*m_CurrentSliceIndex != m_OldSliceIndex &&*/ m_CurrentOperation==MANUAL_SEGMENTATION)
           {
             OnEventUpdateManualSlice();
           }
@@ -2417,6 +2419,7 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
             CreateRealDrawnImage();
             if(e->GetSender()!=this)
             {
+              mafLogMessage(">> Debug Info: Range slider update");
               double low,hi;
               m_ManualRangeSlider->GetSubRange(&low,&hi);
               low = m_CurrentSliceIndex;
@@ -2439,7 +2442,7 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
       {
         if(m_CurrentSliceIndex<m_SliceSlider->GetMax())
           m_CurrentSliceIndex++;
-        if (m_CurrentSliceIndex != m_OldSliceIndex && m_CurrentOperation==MANUAL_SEGMENTATION)
+        if (/*m_CurrentSliceIndex != m_OldSliceIndex &&*/ m_CurrentOperation==MANUAL_SEGMENTATION)
         {
           OnEventUpdateManualSlice();
         }
@@ -2489,7 +2492,7 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
       {
         if(m_CurrentSliceIndex>1)
           m_CurrentSliceIndex--;
-        if (m_CurrentSliceIndex != m_OldSliceIndex && m_CurrentOperation==MANUAL_SEGMENTATION)
+        if (/*m_CurrentSliceIndex != m_OldSliceIndex &&*/ m_CurrentOperation==MANUAL_SEGMENTATION)
         {
           OnEventUpdateManualSlice();
         }
@@ -2537,7 +2540,7 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
       }
     case ID_SLICE_TEXT:
       {
-        if (m_CurrentSliceIndex != m_OldSliceIndex && m_CurrentOperation==MANUAL_SEGMENTATION)
+        if (/*m_CurrentSliceIndex != m_OldSliceIndex &&*/ m_CurrentOperation==MANUAL_SEGMENTATION)
         {
           OnEventUpdateManualSlice();
         }
