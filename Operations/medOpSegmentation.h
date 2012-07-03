@@ -19,6 +19,7 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #include "medVMESegmentationVolume.h"
 #include "medOperationsDefines.h"
 #include "vtkSystemIncludes.h"
+#include "wx/gauge.h"
 
 
 //----------------------------------------------------------------------------
@@ -593,6 +594,8 @@ protected:
 
   int m_GlobalFloodFill;  //< global or local bucket tool
   int m_FloodErease;      //< switch fill/erease for bucket tool
+
+  wxGauge *m_ProgressBar; //< display progress
 
   /** Delete children of input vme if they are output of the input volume  */
   void DeleteOutputs(mafNode* vme);

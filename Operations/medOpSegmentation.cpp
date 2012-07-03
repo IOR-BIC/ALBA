@@ -804,8 +804,15 @@ void medOpSegmentation::CreateOpDialog()
 //   m_LoadSegmentationButton->SetListener(this);
 //   m_LoadSegmentationButton->SetValidator(mafGUIValidator(this,ID_LOAD_SEGMENTATION,m_LoadSegmentationButton));
 
+  m_ProgressBar = new wxGauge(m_Dialog,-1,100,wxDefaultPosition,wxSize(200,10));
+
   hSz2->Add(m_OkButton,0,wxEXPAND | wxALL);
   hSz2->Add(m_CancelButton,0,wxEXPAND | wxALL);
+  wxBoxSizer * hSzPadding = new wxBoxSizer(wxHORIZONTAL);
+  hSzPadding->SetMinSize(510,10);
+  hSz2->Add(hSzPadding,0,wxEXPAND | wxALL);
+  hSz2->Add(m_ProgressBar,0,wxEXPAND | wxALL);
+
   m_Dialog->Add(hSz1);
   m_Dialog->Add(hSz3);
   m_Dialog->Add(hSz2);
@@ -1090,7 +1097,8 @@ bool medOpSegmentation::Refinement()
     inputDataSet->Update();
 
     long progress = 0;
-    mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
+    m_ProgressBar->SetValue(progress);
+    m_ProgressBar->Update();
 
     vtkMAFSmartPointer<vtkUnsignedCharArray> newScalars;
     newScalars->SetName("SCALARS");
@@ -1109,7 +1117,8 @@ bool medOpSegmentation::Refinement()
       for (int i= 0;i<m_VolumeDimensions[2];i++)
       {
         progress = (i*100/m_VolumeDimensions[2]);
-        mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
+        m_ProgressBar->SetValue(progress);
+        m_ProgressBar->Update();
 
         for (int k=0;k<(m_VolumeDimensions[0]*m_VolumeDimensions[1]);k++)
         {
@@ -1218,7 +1227,8 @@ bool medOpSegmentation::Refinement()
 
     m_RefinementVolumeMask->Update();
 
-    mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
+    m_ProgressBar->SetValue(100);
+    m_ProgressBar->Update();
 
     m_View->VmeShow(m_RefinementVolumeMask,true);
     UpdateSlice();
@@ -1658,7 +1668,7 @@ void medOpSegmentation::CreateManualSegmentationGui()
   m_ManualRangeSlider->SetText(1,"Z Axis");  
   m_ManualRangeSlider->SetRange(1,m_VolumeDimensions[2]);
   m_ManualRangeSlider->SetSubRange(1,m_VolumeDimensions[2]);
-  m_ManualRangeSlider->Enable(false);
+  /*m_ManualRangeSlider->Enable(false);*/
 
   bucketActionsSizer->Add(bucketActionsLab,  0, wxRIGHT, 5);
   bucketActionsSizer->Add(bucketActionsRadioBox,0, wxRIGHT, 2);
@@ -3310,15 +3320,15 @@ void medOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
   {
   case ID_MANUAL_BUCKET_GLOBAL:
     {
-      if(m_GlobalFloodFill)
-      {
-        m_ManualRangeSlider->Enable(true);
-      }
-      else
-      {
-        m_ManualRangeSlider->Enable(false);
-      }
-      m_SegmentationOperationsGui[ID_MANUAL_SEGMENTATION]->Update();
+//       if(m_GlobalFloodFill)
+//       {
+//         m_ManualRangeSlider->Enable(true);
+//       }
+//       else
+//       {
+//         m_ManualRangeSlider->Enable(false);
+//       }
+//       m_SegmentationOperationsGui[ID_MANUAL_SEGMENTATION]->Update();
     }
     break;
   case ID_MANUAL_TOOLS:
