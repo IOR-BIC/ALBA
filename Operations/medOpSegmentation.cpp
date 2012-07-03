@@ -1689,8 +1689,8 @@ void medOpSegmentation::CreateManualSegmentationGui()
   /*currentGui->Bool(-1,"Global",&m_GlobalFloodFill,1,"");*/
   currentGui->TwoButtons(ID_MANUAL_UNDO,ID_MANUAL_REDO,"Undo","Redo");
 
-//   EnableSizerContent(m_BucketEditingSizer,false);
-//   EnableSizerContent(m_BrushEditingSizer,true);
+  EnableSizerContent(m_BucketEditingSizer,false);
+  EnableSizerContent(m_BrushEditingSizer,true);
 
   m_SegmentationOperationsGui[MANUAL_SEGMENTATION] = currentGui;
 
@@ -2428,8 +2428,8 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
               {
                 hi = low;
               }
-              m_SegmentationOperationsGui[ID_MANUAL_SEGMENTATION]->Update();
               m_ManualRangeSlider->SetSubRange(low,hi);
+              m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
             }
           }
         }
@@ -2483,8 +2483,8 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
             {
               hi = low;
             }
-            m_SegmentationOperationsGui[ID_MANUAL_SEGMENTATION]->Update();
             m_ManualRangeSlider->SetSubRange(low,hi);
+            m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
           }
         }
         break;
@@ -2533,8 +2533,8 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
             {
               hi = low;
             }
-            m_SegmentationOperationsGui[ID_MANUAL_SEGMENTATION]->Update();
             m_ManualRangeSlider->SetSubRange(low,hi);
+            m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
           }
         }
         break;
@@ -2581,8 +2581,8 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
             {
               hi = low;
             }
-            m_SegmentationOperationsGui[ID_MANUAL_SEGMENTATION]->Update();
             m_ManualRangeSlider->SetSubRange(low,hi);
+            m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
           }
         }
         break;
@@ -3318,37 +3318,37 @@ void medOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
   {
   case ID_MANUAL_BUCKET_GLOBAL:
     {
-//       if(m_GlobalFloodFill)
-//       {
-//         m_ManualRangeSlider->Enable(true);
-//       }
-//       else
-//       {
-//         m_ManualRangeSlider->Enable(false);
-//       }
-//       m_SegmentationOperationsGui[ID_MANUAL_SEGMENTATION]->Update();
+      if(m_GlobalFloodFill)
+      {
+        m_ManualRangeSlider->Enable(true);
+      }
+      else
+      {
+        m_ManualRangeSlider->Enable(false);
+      }
+      m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
     }
     break;
   case ID_MANUAL_TOOLS:
     {
       if(m_ManualSegmentationTools == 0)
       {
-//         wxCursor cursor = wxCursor( wxCURSOR_PENCIL );
-//         m_View->GetWindow()->SetCursor(cursor);
+        wxCursor cursor = wxCursor( wxCURSOR_PENCIL );
+        m_View->GetWindow()->SetCursor(cursor);
 
-//         EnableSizerContent(m_BucketEditingSizer,false);
-//         EnableSizerContent(m_BrushEditingSizer,true);
-//         m_SegmentationOperationsGui[ID_MANUAL_SEGMENTATION]->Update();
+        EnableSizerContent(m_BucketEditingSizer,false);
+        EnableSizerContent(m_BrushEditingSizer,true);
+        m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
       }
       else
       {
-//         wxCursor cursor = wxCursor( wxCURSOR_SPRAYCAN );
-//         m_View->GetWindow()->SetCursor(cursor);
+        wxCursor cursor = wxCursor( wxCURSOR_SPRAYCAN );
+        m_View->GetWindow()->SetCursor(cursor);
 
-//         EnableSizerContent(m_BucketEditingSizer,true);
-//         EnableSizerContent(m_BrushEditingSizer,false);
-//         m_ManualRangeSlider->Enable(m_GlobalFloodFill==TRUE);
-//         m_SegmentationOperationsGui[ID_MANUAL_SEGMENTATION]->Update();
+        EnableSizerContent(m_BucketEditingSizer,true);
+        EnableSizerContent(m_BrushEditingSizer,false);
+        m_ManualRangeSlider->Enable(m_GlobalFloodFill==TRUE);
+        m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
         UndoBrushPreview();
         OnEventUpdateManualSlice();
       }
