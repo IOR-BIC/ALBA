@@ -1689,8 +1689,8 @@ void medOpSegmentation::CreateManualSegmentationGui()
   /*currentGui->Bool(-1,"Global",&m_GlobalFloodFill,1,"");*/
   currentGui->TwoButtons(ID_MANUAL_UNDO,ID_MANUAL_REDO,"Undo","Redo");
 
-//   EnableSizerContent(m_BucketEditingSizer,false);
-//   EnableSizerContent(m_BrushEditingSizer,true);
+  EnableSizerContent(m_BucketEditingSizer,false);
+  EnableSizerContent(m_BrushEditingSizer,true);
 
   m_SegmentationOperationsGui[MANUAL_SEGMENTATION] = currentGui;
 
