@@ -804,8 +804,15 @@ void medOpSegmentation::CreateOpDialog()
 //   m_LoadSegmentationButton->SetListener(this);
 //   m_LoadSegmentationButton->SetValidator(mafGUIValidator(this,ID_LOAD_SEGMENTATION,m_LoadSegmentationButton));
 
+  m_ProgressBar = new wxGauge(m_Dialog,-1,100,wxDefaultPosition,wxSize(200,10));
+
   hSz2->Add(m_OkButton,0,wxEXPAND | wxALL);
   hSz2->Add(m_CancelButton,0,wxEXPAND | wxALL);
+  wxBoxSizer * hSzPadding = new wxBoxSizer(wxHORIZONTAL);
+  hSzPadding->SetMinSize(510,10);
+  hSz2->Add(hSzPadding,0,wxEXPAND | wxALL);
+  hSz2->Add(m_ProgressBar,0,wxEXPAND | wxALL);
+
   m_Dialog->Add(hSz1);
   m_Dialog->Add(hSz3);
   m_Dialog->Add(hSz2);
@@ -973,6 +980,10 @@ void medOpSegmentation::FloodFill(vtkIdType seed)
   int center = seed;
   if(m_GlobalFloodFill == TRUE)
   {
+    long progress = 0;
+    m_ProgressBar->SetValue(progress);
+    m_ProgressBar->Update();
+
     double low, hi;
     m_ManualRangeSlider->GetSubRange(&low,&hi);
 
@@ -980,6 +991,10 @@ void medOpSegmentation::FloodFill(vtkIdType seed)
     wxBusyInfo wait("Please wait...");
     for(int s = m_CurrentSliceIndex; s <= hi; s++)
     {
+      progress = (s*100/abs(hi-low));
+      m_ProgressBar->SetValue(progress);
+      m_ProgressBar->Update();
+
       vtkStructuredPoints *input = vtkStructuredPoints::New();
       double dimensions[3];
       dimensions[0] = m_VolumeDimensions[0];
@@ -1019,12 +1034,15 @@ void medOpSegmentation::FloodFill(vtkIdType seed)
         //UpdateSlice();
       }
     }
+    m_ProgressBar->SetValue(100);
+    m_ProgressBar->Update();
     m_CurrentSliceIndex = oldSliceIndex;
     UndoBrushPreview();
     ApplyVolumeSliceChanges();  
     UpdateVolumeSlice();
     UpdateSlice();
     m_View->CameraUpdate();
+    m_GuiDialog->Update();
   }
   else
   {
@@ -1090,7 +1108,8 @@ bool medOpSegmentation::Refinement()
     inputDataSet->Update();
 
     long progress = 0;
-    mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
+    m_ProgressBar->SetValue(progress);
+    m_ProgressBar->Update();
 
     vtkMAFSmartPointer<vtkUnsignedCharArray> newScalars;
     newScalars->SetName("SCALARS");
@@ -1109,7 +1128,8 @@ bool medOpSegmentation::Refinement()
       for (int i= 0;i<m_VolumeDimensions[2];i++)
       {
         progress = (i*100/m_VolumeDimensions[2]);
-        mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
+        m_ProgressBar->SetValue(progress);
+        m_ProgressBar->Update();
 
         for (int k=0;k<(m_VolumeDimensions[0]*m_VolumeDimensions[1]);k++)
         {
@@ -1218,12 +1238,14 @@ bool medOpSegmentation::Refinement()
 
     m_RefinementVolumeMask->Update();
 
-    mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
+    m_ProgressBar->SetValue(100);
+    m_ProgressBar->Update();
 
     m_View->VmeShow(m_RefinementVolumeMask,true);
     UpdateSlice();
     //m_View->SetSliceAxis(m_CurrentSlicePlane);
     m_View->CameraUpdate();
+    m_GuiDialog->Update();
   }
 
   return true;
@@ -1658,7 +1680,7 @@ void medOpSegmentation::CreateManualSegmentationGui()
   m_ManualRangeSlider->SetText(1,"Z Axis");  
   m_ManualRangeSlider->SetRange(1,m_VolumeDimensions[2]);
   m_ManualRangeSlider->SetSubRange(1,m_VolumeDimensions[2]);
-  m_ManualRangeSlider->Enable(false);
+  /*m_ManualRangeSlider->Enable(false);*/
 
   bucketActionsSizer->Add(bucketActionsLab,  0, wxRIGHT, 5);
   bucketActionsSizer->Add(bucketActionsRadioBox,0, wxRIGHT, 2);
@@ -1870,6 +1892,7 @@ void medOpSegmentation::OnAutomaticStep()
     InitEmptyVolumeSlice();
     UpdateThresholdRealTimePreview();
     m_View->CameraUpdate();
+    m_GuiDialog->Update();
   }
   else
   {
@@ -1985,6 +2008,7 @@ void medOpSegmentation::OnManualStep()
 
   CreateRealDrawnImage();
   m_View->CameraUpdate();
+  m_GuiDialog->Update();
 
   OnEventUpdateManualSlice();
 }
@@ -2051,8 +2075,8 @@ void medOpSegmentation::OnRefinementStep()
   
   m_View->VmeShow(m_RefinementVolumeMask,true);
   UpdateSlice();
-
   m_View->CameraUpdate();
+  m_GuiDialog->Update();
 }
 
 //------------------------------------------------------------------------
@@ -2065,6 +2089,7 @@ void medOpSegmentation::OnLoadStep()
 
   UpdateSlice();
   m_View->CameraUpdate();
+  m_GuiDialog->Update();
 }
 
 //------------------------------------------------------------------------
@@ -2082,6 +2107,8 @@ void medOpSegmentation::OnNextStep()
       InitVolumeSpacing();
       InitGui();
       UpdateSlice();
+      m_View->CameraUpdate();
+      m_GuiDialog->Update();
       UpdateWindowing();
       InitGui();
 
@@ -2098,6 +2125,8 @@ void medOpSegmentation::OnNextStep()
           InitManualVolumeSlice();
           m_View->VmeShow(m_LoadedVolume,false);
           UpdateSlice();
+          m_View->CameraUpdate();
+          m_GuiDialog->Update();
           m_GuiDialog->Enable(ID_BUTTON_PREV,true);
           //next step -> MANUAL_SEGMENTATION
           OnManualStep();
@@ -2126,6 +2155,8 @@ void medOpSegmentation::OnNextStep()
       InitManualVolumeSlice();
       m_View->VmeShow(m_ThresholdVolume,false);
       UpdateSlice();
+      m_View->CameraUpdate();
+      m_GuiDialog->Update();
       m_GuiDialog->Enable(ID_BUTTON_PREV,true);
       //next step -> MANUAL_SEGMENTATION
       OnManualStep();
@@ -2364,15 +2395,21 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
           {
             m_View->VmeShow(m_LoadedVolume,true);
             UpdateSlice();
+            m_View->CameraUpdate();
+            m_GuiDialog->Update();
           }
           else if(m_CurrentOperation==REFINEMENT_SEGMENTATION)
           {
             m_View->VmeShow(m_RefinementVolumeMask,true);
             UpdateSlice();
+            m_View->CameraUpdate();
+            m_GuiDialog->Update();
           }
           else
           {
             UpdateSlice();
+            m_View->CameraUpdate();
+            m_GuiDialog->Update();
           }
 
           if(m_CurrentOperation == MANUAL_SEGMENTATION)
@@ -2414,15 +2451,21 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         {
           m_View->VmeShow(m_LoadedVolume,true);
           UpdateSlice();
+          m_View->CameraUpdate();
+          m_GuiDialog->Update();
         }
         else if(m_CurrentOperation==REFINEMENT_SEGMENTATION)
         {
           m_View->VmeShow(m_RefinementVolumeMask,true);
           UpdateSlice();
+          m_View->CameraUpdate();
+          m_GuiDialog->Update();
         }
         else
         {
           UpdateSlice();
+          m_View->CameraUpdate();
+          m_GuiDialog->Update();
         }
         if(m_CurrentOperation == MANUAL_SEGMENTATION)
         {
@@ -2458,15 +2501,21 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         {
           m_View->VmeShow(m_LoadedVolume,true);
           UpdateSlice();
+          m_View->CameraUpdate();
+          m_GuiDialog->Update();
         }
         else if(m_CurrentOperation==REFINEMENT_SEGMENTATION)
         {
           m_View->VmeShow(m_RefinementVolumeMask,true);
           UpdateSlice();
+          m_View->CameraUpdate();
+          m_GuiDialog->Update();
         }
         else
         {
           UpdateSlice();
+          m_View->CameraUpdate();
+          m_GuiDialog->Update();
         }
         if(m_CurrentOperation == MANUAL_SEGMENTATION)
         {
@@ -2500,15 +2549,21 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         {
           m_View->VmeShow(m_LoadedVolume,true);
           UpdateSlice();
+          m_View->CameraUpdate();
+          m_GuiDialog->Update();
         }
         else if(m_CurrentOperation==REFINEMENT_SEGMENTATION)
         {
           m_View->VmeShow(m_RefinementVolumeMask,true);
           UpdateSlice();
+          m_View->CameraUpdate();
+          m_GuiDialog->Update();
         }
         else
         {
           UpdateSlice();
+          m_View->CameraUpdate();
+          m_GuiDialog->Update();
         }
         if(m_CurrentOperation == MANUAL_SEGMENTATION)
         {
@@ -2544,15 +2599,21 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         {
           m_View->VmeShow(m_LoadedVolume,true);
           UpdateSlice();
+          m_View->CameraUpdate();
+          m_GuiDialog->Update();
         }
         else if(m_CurrentOperation==REFINEMENT_SEGMENTATION)
         {
           m_View->VmeShow(m_RefinementVolumeMask,true);
           UpdateSlice();
+          m_View->CameraUpdate();
+          m_GuiDialog->Update();
         }
         else
         {
           UpdateSlice();
+          m_View->CameraUpdate();
+          m_GuiDialog->Update();
         }
         if(m_CurrentOperation == MANUAL_SEGMENTATION)
         {
@@ -2796,6 +2857,7 @@ void medOpSegmentation::OnEventUpdateThresholdSlice()
   UpdateSlice();
   m_View->VmeShow(m_ThresholdVolumeSlice, true);
   m_View->CameraUpdate();
+  m_GuiDialog->Update();
 }
 
 //------------------------------------------------------------------------
@@ -2808,6 +2870,7 @@ void medOpSegmentation::OnEventUpdateManualSlice()
   UpdateSlice();
   m_View->VmeShow(m_ManualVolumeSlice, true);
   m_View->CameraUpdate();
+  m_GuiDialog->Update();
 }
 
 //------------------------------------------------------------------------
@@ -3266,6 +3329,8 @@ void medOpSegmentation::ReloadUndoRedoState(vtkDataSet *dataSet,UndoRedoState st
     m_CurrentSliceIndex=state.slice;
     //m_View->SetSliceAxis(m_CurrentSlicePlane);
     UpdateSlice();
+    m_View->CameraUpdate();
+    m_GuiDialog->Update();
     InitGui();
     m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
   }
@@ -3310,15 +3375,15 @@ void medOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
   {
   case ID_MANUAL_BUCKET_GLOBAL:
     {
-      if(m_GlobalFloodFill)
-      {
-        m_ManualRangeSlider->Enable(true);
-      }
-      else
-      {
-        m_ManualRangeSlider->Enable(false);
-      }
-      m_SegmentationOperationsGui[ID_MANUAL_SEGMENTATION]->Update();
+//       if(m_GlobalFloodFill)
+//       {
+//         m_ManualRangeSlider->Enable(true);
+//       }
+//       else
+//       {
+//         m_ManualRangeSlider->Enable(false);
+//       }
+//       m_SegmentationOperationsGui[ID_MANUAL_SEGMENTATION]->Update();
     }
     break;
   case ID_MANUAL_TOOLS:
@@ -3399,6 +3464,8 @@ void medOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
           m_CurrentSlicePlane=m_ManualUndoList[numOfChanges-1].plane;
           m_CurrentSliceIndex=m_ManualUndoList[numOfChanges-1].slice;
           UpdateSlice();
+          m_View->CameraUpdate();
+          m_GuiDialog->Update();
         }
         
         //Add current state to Redo-list
@@ -3441,6 +3508,8 @@ void medOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
           m_CurrentSlicePlane=m_ManualRedoList[numOfChanges-1].plane;
           m_CurrentSliceIndex=m_ManualRedoList[numOfChanges-1].slice;
           UpdateSlice();
+          m_View->CameraUpdate();
+          m_GuiDialog->Update();
         }
 
 
@@ -3527,6 +3596,7 @@ void medOpSegmentation::OnLoadSegmentationEvent(mafEvent *e)
         m_View->VmeShow(m_LoadedVolume,true);
         UpdateSlice();
         m_View->CameraUpdate();
+        m_GuiDialog->Update();
       }
     }
     break;
@@ -3598,6 +3668,8 @@ void medOpSegmentation::OnRefinementSegmentationEvent(mafEvent *e)
         m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_REDO, m_RefinementRedoList.size()>0);
 
         UpdateSlice();
+        m_View->CameraUpdate();
+        m_GuiDialog->Update();
       }
       break;
     }
@@ -3632,6 +3704,8 @@ void medOpSegmentation::OnRefinementSegmentationEvent(mafEvent *e)
         m_SegmentationOperationsGui[REFINEMENT_SEGMENTATION]->Enable(ID_REFINEMENT_REDO, m_RefinementRedoList.size()>0);
 
         UpdateSlice();
+        m_View->CameraUpdate();
+        m_GuiDialog->Update();
       }
       break;
     }
