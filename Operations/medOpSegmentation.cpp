@@ -1028,10 +1028,10 @@ void medOpSegmentation::FloodFill(vtkIdType seed)
       if(s < hi)
       {
         m_CurrentSliceIndex++;
-        //UndoBrushPreview();
+        UndoBrushPreview();
         ApplyVolumeSliceChanges();  
         UpdateVolumeSlice();
-        //UpdateSlice();
+        UpdateSlice();
       }
     }
     m_ProgressBar->SetValue(100);
@@ -2380,7 +2380,7 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
       break;
     case ID_SLICE_SLIDER:
       {
-        if (m_NumSliceSliderEvents == 2)//Validator generate 2 events when the user move the slider REMOVED: GEnerate problems on slice update!
+        //if (m_NumSliceSliderEvents == 2)//Validator generate 2 events when the user move the slider REMOVED: GEnerate problems on slice update!
         {
           m_NumSliceSliderEvents = 0;
           if (m_CurrentSliceIndex != m_OldSliceIndex && m_CurrentOperation==MANUAL_SEGMENTATION)
@@ -2429,10 +2429,10 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
             }
           }
         }
-        else
-        {
-          m_NumSliceSliderEvents++;
-        }
+//         else
+//         {
+//           m_NumSliceSliderEvents++;
+//         }
       }
       break;
     case ID_SLICE_NEXT:
