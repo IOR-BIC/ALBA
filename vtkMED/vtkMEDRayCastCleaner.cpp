@@ -15,8 +15,7 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 
 #include "vtkObjectFactory.h"
 #include "vtkStructuredPoints.h"
-#include "vtkUnsignedCharArray.h"
-#include "vtkshortArray.h"
+#include "vtkUnsignedShortArray.h"
 #include "vtkPointData.h"
 #include "vtkMAFSmartPointer.h"
 #include "mafDefines.h"
@@ -45,6 +44,9 @@ vtkMEDRayCastCleaner::~vtkMEDRayCastCleaner()
 { 
 }
 
+//Shift the scalar value from range [x,y] to [0,y-x]
+#define scalarShift(X) (X-range[0])
+
 
 //------------------------------------------------------------------------------
 void vtkMEDRayCastCleaner::Execute()
@@ -52,45 +54,57 @@ void vtkMEDRayCastCleaner::Execute()
 {
   vtkStructuredPoints *outputImage = this->GetOutput();
   this->GetInput()->Update();
-  
+
+  double range[2];
+  double newValue, boneValue;
   //generating a copy of the input 
   outputImage->DeepCopy(this->GetInput());
   outputImage->UpdateData();
   outputImage->Update();
 
-  //getting image dimension for neighbours calculation  
+  //getting image dimension for neighbors calculation  
   outputImage->GetDimensions(VolumeDimension);
   
 
   //Creating a copy of data array 
   //(proximity checks need to be done with unmodified original values)
   vtkDataArray* imgScalars = (vtkDataArray*)outputImage->GetPointData()->GetScalars();
-  vtkShortArray* scalarsCopy;
-  vtkNEW(scalarsCopy);
-
-  scalarsCopy->DeepCopy(imgScalars);
+  vtkUnsignedShortArray * newScalars;
+  vtkNEW(newScalars);
   
-
   int nPoints=outputImage->GetNumberOfPoints();
+
+  imgScalars->GetRange(range);
+  
+  newScalars->SetNumberOfTuples(nPoints);
+  newScalars->SetNumberOfComponents(1);
+  
+  for (int i=0;i<nPoints;i++)
+  {
+    newValue=scalarShift(imgScalars->GetTuple1(i));
+    newScalars->SetTuple1(i,newValue);
+  }
+
+  boneValue= scalarShift(BoneLowerThreshold);
 
   for (int i=0;i<nPoints;i++)
   {
     //this filter removes border interpolation values from bone boundary
     //if i get a blood voxel and a neighbor is a bone I set it's value
     //to bone lower threshold 
-    if (isBlood(scalarsCopy->GetTuple1(i)) && BoneInNeighbors(i,scalarsCopy) )
-      imgScalars->SetTuple1(i, BoneLowerThreshold);
+    if (isBlood(imgScalars->GetTuple1(i)) && BoneInNeighbors(i,imgScalars) )
+      newScalars->SetTuple1(i, boneValue);
   }
   
   //settings new scalar values to output volume
-  outputImage->GetPointData()->SetScalars(imgScalars);
+  outputImage->GetPointData()->SetScalars(newScalars);
   outputImage->GetPointData()->Modified();
   outputImage->GetPointData()->Update();
   outputImage->UpdateData();
   outputImage->Update();
   this->SetOutput(outputImage);
 
-  vtkDEL(scalarsCopy);
+  vtkDEL(newScalars);
 }
 
 #define SP_COORD_TO_ID(x,y,z)  z*(VolumeDimension[0])*(VolumeDimension[1]) + y*(VolumeDimension[0]) + x;
