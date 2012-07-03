@@ -174,6 +174,9 @@ ADD_TEST(mafVMEVolumeLargeTest ${EXECUTABLE_OUTPUT_PATH}/mafVMEVolumeLargeTest)
 ADD_EXECUTABLE(medDataPipeCustomSegmentationVolumeTest  medDataPipeCustomSegmentationVolumeTest.h medDataPipeCustomSegmentationVolumeTest.cpp)
 ADD_TEST(medDataPipeCustomSegmentationVolumeTest ${EXECUTABLE_OUTPUT_PATH}/medDataPipeCustomSegmentationVolumeTest)
 
+ADD_EXECUTABLE(medPipeRayCastTest  medPipeRayCastTest.h medPipeRayCastTest.cpp)
+ADD_TEST(medPipeRayCastTest ${EXECUTABLE_OUTPUT_PATH}/medPipeRayCastTest)
+
 #to be checked
 #ADD_EXECUTABLE(medPipeVolumeVRTest medPipeVolumeVRTest.h medPipeVolumeVRTest.cpp)
 #ADD_TEST(medPipeVolumeVRTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeVolumeVRTest)
