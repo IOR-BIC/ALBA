@@ -46,7 +46,7 @@ public:
 	mafTypeMacro(medPipeRayCast, mafPipe);
 
   /** constructor */
-	medPipeRayCast(double muscleOpacity=0.15,double bloodOpacity=0.8,double boneOpacity=0.2);
+	medPipeRayCast(double skinOpacity=0.2,double fatMassOpacity=0.2,double muscleOpacity=0.2,double bloodOpacity=0.8,double boneOpacity=0.2);
   /** destructor */
 	virtual  ~medPipeRayCast();
 
@@ -92,11 +92,15 @@ protected:
   vtkColorTransferFunction *m_ColorFunction;
 	vtkVolumeRayCastMapper   *m_RayCastMapper;
   vtkMEDRayCastCleaner     *m_RayCastCleaner;
-  vtkImageCast             *m_VolumeCaster;
+  //vtkImageCast             *m_VolumeCaster;
   vtkMAFVolumeResample		 *m_ResampleFilter;	
 	vtkVolume                *m_Volume;
   
 
+  double m_SkinLowerThreshold;
+  double m_SkinUpperThreshold;
+  double m_FatMassLowerThreshold;
+  double m_FatMassUpperThreshold;
   double m_BoneLowerThreshold;
   double m_BloodLowerThreshold;
   double m_BloodUpperThreshold;
@@ -107,11 +111,15 @@ protected:
   vtkPolyDataMapper        *m_OutlineMapper;
   vtkActor                 *m_OutlineActor;
 
+  double m_FatMassOpacity;
+  double m_SkinOpacity;
   double m_MuscleOpacity;
   double m_BoneOpacity;
   double m_BloodOpacity;
 
   int m_OnLoading;
+
+  double m_ScalarRange[2];
 
   bool m_BoundingBoxVisibility;
 

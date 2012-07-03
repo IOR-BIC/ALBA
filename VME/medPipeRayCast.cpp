@@ -59,7 +59,7 @@ mafCxxTypeMacro(medPipeRayCast);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-medPipeRayCast::medPipeRayCast(double muscleOpacity,double bloodOpacity,double boneOpacity) 
+medPipeRayCast::medPipeRayCast(double skinOpacity,double fatMassOpacity,double muscleOpacity,double bloodOpacity,double boneOpacity) 
 : mafPipe()
 //----------------------------------------------------------------------------
 {
@@ -74,18 +74,25 @@ medPipeRayCast::medPipeRayCast(double muscleOpacity,double bloodOpacity,double b
   m_OutlineActor    = NULL;
   m_OutlineBox      = NULL;
 	m_OutlineMapper   = NULL;
-  m_VolumeCaster    = NULL;
+  //m_VolumeCaster    = NULL;
   m_RayCastCleaner  = NULL;
   m_ResampleFilter  = NULL;
 
   //Setting Opacity 
   //Default values 0.15 - 0.8 - 0.2  
+  m_SkinOpacity=skinOpacity;
+  m_FatMassOpacity=fatMassOpacity;
   m_MuscleOpacity=muscleOpacity;
   m_BloodOpacity=bloodOpacity;
   m_BoneOpacity=boneOpacity;
 
-
   //Thresholding values
+  //Skin
+  m_SkinLowerThreshold=-800.0;
+  m_SkinUpperThreshold=-180.0;  
+  //Fat Mass
+  m_FatMassLowerThreshold=-150;
+  m_FatMassUpperThreshold=10;
   //Muscles
   m_MuscleLowerThreshold=10.0;
   m_MuscleUpperThreshold=80.0;
@@ -119,6 +126,10 @@ void medPipeRayCast::Create(mafSceneNode *n)
   dataset->Update();
   m_OnLoading=false;
 
+
+  //Range is used for piecewise function shifts 
+  dataset->GetScalarRange(m_ScalarRange);
+  
   UpdateFromData();
   
   // selection box
@@ -168,7 +179,7 @@ medPipeRayCast::~medPipeRayCast()
   vtkDEL(m_OutlineActor);
   vtkDEL(m_OutlineBox);
 	vtkDEL(m_OutlineMapper);
-  vtkDEL(m_VolumeCaster);
+  vtkDEL(m_RayCastCleaner);
 
 }
 
@@ -189,9 +200,7 @@ void medPipeRayCast::Select(bool sel)
 mafGUI *medPipeRayCast::CreateGui()
 //----------------------------------------------------------------------------
 {
-	double range[2] = {0, 0};
-	m_Vme->GetOutput()->GetVTKData()->GetScalarRange(range);
-
+	
 	assert(m_Gui == NULL);
 	m_Gui = new mafGUI(this);
 	
@@ -201,6 +210,8 @@ mafGUI *medPipeRayCast::CreateGui()
   m_Gui->Label("  RayCast Pipe  ","",true);
   m_Gui->Label("");
   m_Gui->Label("");
+  m_Gui->FloatSlider(ID_OPACITY_SLIDERS,"Skin",&m_SkinOpacity,0.0,1.0);
+  m_Gui->FloatSlider(ID_OPACITY_SLIDERS,"Fat Mass",&m_FatMassOpacity,0.0,1.0);
   m_Gui->FloatSlider(ID_OPACITY_SLIDERS,"Muscle",&m_MuscleOpacity,0.0,1.0);
   m_Gui->FloatSlider(ID_OPACITY_SLIDERS,"Blood",&m_BloodOpacity,0.0,1.0);
   m_Gui->FloatSlider(ID_OPACITY_SLIDERS,"Bone",&m_BoneOpacity,0.0,1.0);
@@ -317,7 +328,8 @@ void medPipeRayCast::UpdateFromData()
   wxBusyInfo wait_info(_("Volume filtering..."));
 
   //RayCast Cleaner removes border effects from bones
-  //(bone sanding)
+  //(bone sanding) and produces in output a volume whit unsigned short 
+  //scalars shifted by - lower range 
   vtkNEW(m_RayCastCleaner);
   m_RayCastCleaner->SetInput(volume);
   m_RayCastCleaner->SetBloodLowerThreshold(m_BloodLowerThreshold);
@@ -326,22 +338,13 @@ void medPipeRayCast::UpdateFromData()
   m_RayCastCleaner->Update();
 
 
-  // Raycast mapper need unsigned short input
-  // So we use a caster
-  if (m_VolumeCaster==NULL)
-    vtkNEW(m_VolumeCaster);
-  m_VolumeCaster->SetInput(vtkImageData::SafeDownCast(m_RayCastCleaner->GetOutput()));
-  m_VolumeCaster->SetClampOverflow(1);
-  m_VolumeCaster->SetOutputScalarTypeToUnsignedShort();
-  m_VolumeCaster->Update();
-
-  //Deleting unnescessary stuff
+  //Deleting unnecessary stuff
   if (resampled)
   {
     vtkDEL(volume);
     vtkDEL(m_ResampleFilter);
   }
-  vtkDEL(m_RayCastCleaner);
+  
 
 
   //Create Raycast Mapper and relative functions  
@@ -357,7 +360,7 @@ void medPipeRayCast::UpdateFromData()
   vtkMAFSmartPointer<vtkVolumeRayCastCompositeFunction> compositeFunction;
   compositeFunction->SetCompositeMethodToClassifyFirst();
   m_RayCastMapper->SetVolumeRayCastFunction(compositeFunction);
-  m_RayCastMapper->SetInput(m_VolumeCaster->GetOutput());
+  m_RayCastMapper->SetInput(m_RayCastCleaner->GetOutput());
   SetRayCastFunctions();
 
   // The property describes how the data will look
@@ -392,6 +395,9 @@ void medPipeRayCast::SetActorVisibility(int visibility)
 }
 
 
+//Shift the scalar value from range [x,y] to [0,y-x]
+#define scalarShift(X) (X-m_ScalarRange[0])
+
 //----------------------------------------------------------------------------
 void medPipeRayCast::SetRayCastFunctions()
 //----------------------------------------------------------------------------
@@ -400,6 +406,7 @@ void medPipeRayCast::SetRayCastFunctions()
   
   double bloodA,bloodB,bloodDiff,boneA,boneB,muscle,muscleA,muscleB,muscleDiff;
 
+  
   //Muscle point intervals
   muscleDiff=m_MuscleUpperThreshold-m_MuscleLowerThreshold;
   muscle=m_MuscleLowerThreshold+0.5*muscleDiff;
@@ -419,37 +426,51 @@ void medPipeRayCast::SetRayCastFunctions()
   //Clear previous opacity settings
   m_OpacityFunction->Initialize();
 
+  //skin opacity
+  m_OpacityFunction->AddPoint(scalarShift(m_SkinLowerThreshold-1.0)   , 0.0);
+  m_OpacityFunction->AddPoint(scalarShift(m_SkinLowerThreshold)       , 0.2*m_SkinOpacity);
+  m_OpacityFunction->AddPoint(scalarShift(m_SkinUpperThreshold)       , 0.2*m_SkinOpacity);
+  m_OpacityFunction->AddPoint(scalarShift(m_SkinUpperThreshold+1)     , 0.0);
+  //fat mass opacity
+  m_OpacityFunction->AddPoint(scalarShift(m_FatMassLowerThreshold-1.0)   , 0.0);
+  m_OpacityFunction->AddPoint(scalarShift(m_FatMassLowerThreshold)       , 0.1*m_FatMassOpacity);
+  m_OpacityFunction->AddPoint(scalarShift(m_FatMassUpperThreshold)       , 0.1*m_FatMassOpacity);
+  m_OpacityFunction->AddPoint(scalarShift(m_FatMassUpperThreshold+1)     , 0.0);
   //muscle opacity
-  m_OpacityFunction->AddPoint(0, 0.0);
-  m_OpacityFunction->AddPoint(m_MuscleLowerThreshold-1.0, 0.0);
-  m_OpacityFunction->AddPoint(m_MuscleLowerThreshold, 0.17*m_MuscleOpacity);
-  m_OpacityFunction->AddPoint(muscle, 0.2*m_MuscleOpacity);
-  m_OpacityFunction->AddPoint(m_MuscleUpperThreshold, 0.17*m_MuscleOpacity);
-  m_OpacityFunction->AddPoint(81, 0.0);
+  m_OpacityFunction->AddPoint(scalarShift(0)                          , 0.0);
+  m_OpacityFunction->AddPoint(scalarShift(m_MuscleLowerThreshold-1.0) , 0.0);
+  m_OpacityFunction->AddPoint(scalarShift(m_MuscleLowerThreshold)     , 0.13*m_MuscleOpacity);
+  m_OpacityFunction->AddPoint(scalarShift(muscle)                     , 0.15*m_MuscleOpacity);
+  m_OpacityFunction->AddPoint(scalarShift(m_MuscleUpperThreshold)     , 0.13*m_MuscleOpacity);
+  m_OpacityFunction->AddPoint(scalarShift(m_MuscleUpperThreshold+1)   , 0.0);
   //blood opacity
-  m_OpacityFunction->AddPoint(m_BloodLowerThreshold, 0.0);
-  //m_OpacityFunction->AddPoint(bloodA, 0.8*m_BloodOpacity);
-  m_OpacityFunction->AddPoint(bloodB, 0.8*m_BloodOpacity);
-  m_OpacityFunction->AddPoint(m_BloodUpperThreshold, 0.0);
+  m_OpacityFunction->AddPoint(scalarShift(m_BloodLowerThreshold)      , 0.0);
+  m_OpacityFunction->AddPoint(scalarShift(bloodB)                     , 0.8*m_BloodOpacity);
+  m_OpacityFunction->AddPoint(scalarShift(m_BloodUpperThreshold)      , 0.0);
   //bone opacity
-  m_OpacityFunction->AddPoint(m_BoneLowerThreshold, 0.0);
-  m_OpacityFunction->AddPoint(boneA, m_BoneOpacity);
+  m_OpacityFunction->AddPoint(scalarShift(m_BoneLowerThreshold)       , 0.0);
+  m_OpacityFunction->AddPoint(scalarShift(boneA)                      , m_BoneOpacity);
 
 
   m_ColorFunction->RemoveAllPoints();
-
+  //skin color
+  m_ColorFunction->AddRGBPoint(scalarShift(m_SkinLowerThreshold)      , 0.80, 0.52, 0.26);
+  m_ColorFunction->AddRGBPoint(scalarShift(m_SkinUpperThreshold)      , 0.80, 0.52, 0.26);
+  //fat mass color
+  m_ColorFunction->AddRGBPoint(scalarShift(m_FatMassLowerThreshold)   , 1.00, 0.98, 0.87);
+  m_ColorFunction->AddRGBPoint(scalarShift(m_FatMassUpperThreshold)   , 1.00, 0.98, 0.87);
   //muscle color
-  m_ColorFunction->AddRGBPoint(m_MuscleLowerThreshold, 0.7, 0.4, 0.42);
-  m_ColorFunction->AddRGBPoint(muscleA, 0.57, 0.33, 0.36);
-  m_ColorFunction->AddRGBPoint(muscleB, 0.3, 0.06, 0.1);
-  m_ColorFunction->AddRGBPoint(m_MuscleUpperThreshold, 0.2, 0.04, 0.04);
+  m_ColorFunction->AddRGBPoint(scalarShift(m_MuscleLowerThreshold)    , 0.70, 0.40, 0.42);
+  m_ColorFunction->AddRGBPoint(scalarShift(muscleA)                   , 0.57, 0.33, 0.36);
+  m_ColorFunction->AddRGBPoint(scalarShift(muscleB)                   , 0.30, 0.06, 0.1);
+  m_ColorFunction->AddRGBPoint(scalarShift(m_MuscleUpperThreshold)    , 0.20, 0.04, 0.04);
   //blood color
-  m_ColorFunction->AddRGBPoint(m_BloodLowerThreshold-1.0, 0.35, 0.07, 0.12);
-  m_ColorFunction->AddRGBPoint(bloodA, 0.65, 0.07, 0.12);
-  m_ColorFunction->AddRGBPoint(m_BloodUpperThreshold,0.6, 0.05, 0.32);
+  m_ColorFunction->AddRGBPoint(scalarShift(m_BloodLowerThreshold-1.0) , 0.35, 0.07, 0.12);
+  m_ColorFunction->AddRGBPoint(scalarShift(bloodA)                    , 0.65, 0.07, 0.12);
+  m_ColorFunction->AddRGBPoint(scalarShift(m_BloodUpperThreshold)     , 0.60, 0.05, 0.32);
   //bone color
-  m_ColorFunction->AddRGBPoint(m_BoneLowerThreshold-1, 0.90,0.87, 0.68);
-  m_ColorFunction->AddRGBPoint(boneB, 1, 0.98, 0.95);
+  m_ColorFunction->AddRGBPoint(scalarShift(m_BoneLowerThreshold-1)    , 0.90, 0.87, 0.68);
+  m_ColorFunction->AddRGBPoint(scalarShift(boneB)                     , 1.00, 0.98, 0.95);
 
 }
 
