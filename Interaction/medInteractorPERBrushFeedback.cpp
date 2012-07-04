@@ -264,7 +264,7 @@ void medInteractorPERBrushFeedback::OnEvent(mafEventBase *event)
             mafEvent pick_event(this,MOUSE_MOVE,p);
             pick_event.SetArg(pid);
             pick_event.SetDouble(m_Count);
-
+            pick_event.SetBool(e->GetModifier(MAF_ALT_KEY) == true);
             mafEventMacro(pick_event);
             p->Delete();
           }

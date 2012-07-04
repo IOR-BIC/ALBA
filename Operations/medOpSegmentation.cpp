@@ -2304,7 +2304,14 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
       {
         m_CurrentBrushMoveEventCount = e->GetDouble();
         int oldAction = m_ManualSegmentationAction;
-        m_ManualSegmentationAction = MANUAL_SEGMENTATION_SELECT;
+        if(e->GetBool())
+        {
+          m_ManualSegmentationAction = MANUAL_SEGMENTATION_ERASE;
+        }
+        else
+        {
+          m_ManualSegmentationAction = MANUAL_SEGMENTATION_SELECT;
+        }
         m_LastMouseMovePointID = e->GetArg();
         OnBrushEvent(e);
         m_ManualSegmentationAction = oldAction;
