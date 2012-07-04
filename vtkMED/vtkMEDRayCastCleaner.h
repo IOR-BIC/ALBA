@@ -72,8 +72,15 @@ private:
   /** Default destructor */
   ~vtkMEDRayCastCleaner();
 
-  /** Return true if a bone voxel is present on point neighbors*/
-  int BoneInNeighbors(int pointID, vtkDataArray* scalars);
+  /** Return 0 if no bone voxel is present on point neighbors
+  If bones are present in voxel neighbors return a value determining 
+  the affinity level of the nearest bone. 
+  The affinity levels are:
+  1 if nearest bone voxel shares a corner
+  2 if nearest bone voxel shares a side
+  3 if nearest bone voxel shares a face
+  */
+  int BoneInNeighborsAffinity(int pointID, vtkDataArray* scalars);
 
   
   /** Return true if scalarValue is in blood range */

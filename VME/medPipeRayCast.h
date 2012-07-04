@@ -65,10 +65,14 @@ public:
   /** Set the visibility of the actor */
   void SetActorVisibility(int visibility);
 
+  /** Set Test Mode On */
+  void TestModeOn(){ m_TestMode=true; };
+
 	/** IDs for the GUI */
 	enum PIPE_ISOSURFACE_WIDGET_ID
 	{
 		ID_OPACITY_SLIDERS = Superclass::ID_LAST,
+    CHANGE_OPACITY,
 		ID_CAMERA_FRONT,
 		ID_CAMERA_BACK,
 		ID_CAMERA_LEFT,
@@ -92,7 +96,6 @@ protected:
   vtkColorTransferFunction *m_ColorFunction;
 	vtkVolumeRayCastMapper   *m_RayCastMapper;
   vtkMEDRayCastCleaner     *m_RayCastCleaner;
-  //vtkImageCast             *m_VolumeCaster;
   vtkMAFVolumeResample		 *m_ResampleFilter;	
 	vtkVolume                *m_Volume;
   
@@ -118,10 +121,12 @@ protected:
   double m_BloodOpacity;
 
   int m_OnLoading;
+  int m_Layer;
 
   double m_ScalarRange[2];
 
   bool m_BoundingBoxVisibility;
+  bool m_TestMode;
 
   mafString m_ExtractIsosurfaceName;
 };  

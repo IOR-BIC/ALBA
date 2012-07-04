@@ -48,6 +48,7 @@ medInteractorSegmentationPicker::medInteractorSegmentationPicker()
 //------------------------------------------------------------------------------
 {
   m_IsPicking = false;
+  m_FullModifiersMode = false;
 }
 
 //------------------------------------------------------------------------------
@@ -79,13 +80,13 @@ void medInteractorSegmentationPicker::OnLeftButtonDown(mafEventInteraction *e)
   }
   else if (mafDeviceButtonsPadMouse *mouse=mafDeviceButtonsPadMouse::SafeDownCast((mafDevice *)e->GetSender()))
   { 
-    if (e->GetModifier(MAF_CTRL_KEY) && e->GetButton() == MAF_LEFT_BUTTON)
+    if (!m_FullModifiersMode && e->GetButton() == MAF_LEFT_BUTTON && e->GetModifiers() == 0 || m_FullModifiersMode && e->GetModifier(MAF_CTRL_KEY) && e->GetButton() == MAF_LEFT_BUTTON)
     {
 	    double mouse_pos[2];
 	    e->Get2DPosition(mouse_pos);
 	    SendPickingInformation(mouse->GetView(), mouse_pos);
     }
-    else if (e->GetModifier(MAF_ALT_KEY) && e->GetButton() == MAF_LEFT_BUTTON)
+    else if (!m_FullModifiersMode && e->GetModifier(MAF_CTRL_KEY) && e->GetButton() == MAF_LEFT_BUTTON || m_FullModifiersMode && e->GetModifier(MAF_ALT_KEY) && e->GetButton() == MAF_LEFT_BUTTON)
     {
       double mouse_pos[2];
       e->Get2DPosition(mouse_pos);
@@ -171,7 +172,7 @@ void medInteractorSegmentationPicker::OnEvent(mafEventBase *event)
   Superclass::OnEvent(event);
   mafEventInteraction *e = (mafEventInteraction *)event;
 
-  if ( m_IsPicking && (e->GetModifier(MAF_CTRL_KEY) || e->GetModifier(MAF_ALT_KEY)) && e->GetButton() == MAF_LEFT_BUTTON)
+  if ( m_IsPicking && (!m_FullModifiersMode && e->GetButton() == MAF_LEFT_BUTTON && e->GetModifiers() == 0 || m_FullModifiersMode && e->GetModifier(MAF_CTRL_KEY) && e->GetButton() == MAF_LEFT_BUTTON || !m_FullModifiersMode && e->GetModifier(MAF_CTRL_KEY) && e->GetButton() == MAF_LEFT_BUTTON || m_FullModifiersMode && e->GetModifier(MAF_ALT_KEY) && e->GetButton() == MAF_LEFT_BUTTON))
   {
     if (mafDeviceButtonsPadMouse *mouse=mafDeviceButtonsPadMouse::SafeDownCast((mafDevice *)event->GetSender()))
     { 

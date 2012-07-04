@@ -44,6 +44,8 @@ vtkMEDRayCastCleaner::~vtkMEDRayCastCleaner()
 { 
 }
 
+#define max(a,b)  (((a) > (b)) ? (a) : (b))
+
 //Shift the scalar value from range [x,y] to [0,y-x]
 #define scalarShift(X) (X-range[0])
 
@@ -85,15 +87,25 @@ void vtkMEDRayCastCleaner::Execute()
     newScalars->SetTuple1(i,newValue);
   }
 
-  boneValue= scalarShift(BoneLowerThreshold);
+ 
 
   for (int i=0;i<nPoints;i++)
   {
     //this filter removes border interpolation values from bone boundary
     //if i get a blood voxel and a neighbor is a bone I set it's value
     //to bone lower threshold 
-    if (isBlood(imgScalars->GetTuple1(i)) && BoneInNeighbors(i,imgScalars) )
-      newScalars->SetTuple1(i, boneValue);
+    if (isBlood(imgScalars->GetTuple1(i)))
+    {
+      int maxSidesInNeighboors=BoneInNeighborsAffinity(i,imgScalars);
+      if (maxSidesInNeighboors)
+      {
+        //If there is a bone neighbors we set a bone value in output depending on 
+        //level of affinity, in this manner if there is a high affinity the output 
+        //voxel has an high level of opacity in raycast pipe
+        boneValue= scalarShift(BoneLowerThreshold*(1.0+(maxSidesInNeighboors*0.02)));
+        newScalars->SetTuple1(i, boneValue);
+      }
+    }
   }
   
   //settings new scalar values to output volume
@@ -110,7 +122,7 @@ void vtkMEDRayCastCleaner::Execute()
 #define SP_COORD_TO_ID(x,y,z)  z*(VolumeDimension[0])*(VolumeDimension[1]) + y*(VolumeDimension[0]) + x;
 
 //----------------------------------------------------------------------------
-int vtkMEDRayCastCleaner::BoneInNeighbors(int pointID, vtkDataArray* scalars )
+int vtkMEDRayCastCleaner::BoneInNeighborsAffinity(int pointID, vtkDataArray* scalars )
 //----------------------------------------------------------------------------
 {
 
@@ -123,6 +135,8 @@ int vtkMEDRayCastCleaner::BoneInNeighbors(int pointID, vtkDataArray* scalars )
   rest=pointID-(z*VolumeDimension[0]*VolumeDimension[1]);
   y=rest/VolumeDimension[0];
   x=rest-(y*VolumeDimension[0]);
+
+  int affinity = 0;
 
   //the neighbors are disposed like a Rubik cube Sub-cubes
   //We need to search the max value only on valid neighbors 
@@ -147,13 +161,20 @@ int vtkMEDRayCastCleaner::BoneInNeighbors(int pointID, vtkDataArray* scalars )
         {
           currentID=SP_COORD_TO_ID(ix,iy,iz);
           if ( (currentID != pointID) && (scalars->GetTuple1(currentID)>=BoneLowerThreshold))
-            return true;
+          {
+            int currAffinity=1;
+            if (x==ix) currAffinity++;
+            if (y==iy) currAffinity++;
+            if (z==iz) currAffinity++;
+            affinity=max(affinity,currAffinity);
+          }
+            
         }
       }
     }
   }
 
-  return false;
+  return affinity;
 }
 
 //----------------------------------------------------------------------------

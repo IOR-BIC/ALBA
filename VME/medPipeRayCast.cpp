@@ -73,8 +73,8 @@ medPipeRayCast::medPipeRayCast(double skinOpacity,double fatMassOpacity,double m
   
   m_OutlineActor    = NULL;
   m_OutlineBox      = NULL;
-	m_OutlineMapper   = NULL;
-  //m_VolumeCaster    = NULL;
+  m_OutlineMapper   = NULL;
+
   m_RayCastCleaner  = NULL;
   m_ResampleFilter  = NULL;
 
@@ -105,6 +105,12 @@ medPipeRayCast::medPipeRayCast(double skinOpacity,double fatMassOpacity,double m
   m_OnLoading=false;
 
   m_BoundingBoxVisibility = true;
+
+  //Set Layers
+  m_Layer=0;
+
+  //Set TestMode
+  m_TestMode=false;
 }
 //----------------------------------------------------------------------------
 void medPipeRayCast::Create(mafSceneNode *n)
@@ -205,11 +211,17 @@ mafGUI *medPipeRayCast::CreateGui()
 	m_Gui = new mafGUI(this);
 	
   //Creating Gui
+  m_Gui->Label("");
+  m_Gui->Label(" Layers ", "", true );
+  m_Gui->Divider(2);
+  //Set Layer type to visualize
+  wxString layersType[4] = {"Default", "Muscular System", "Circulatory System", "Skeleton"};
+  m_Gui->Combo(CHANGE_OPACITY, "", &m_Layer, 4, layersType);
 
+  //Advanced 
   m_Gui->Label("");
-  m_Gui->Label("  RayCast Pipe  ","",true);
-  m_Gui->Label("");
-  m_Gui->Label("");
+  m_Gui->Label(" Advanced ", "", true );
+  m_Gui->Divider(2);
   m_Gui->FloatSlider(ID_OPACITY_SLIDERS,"Skin",&m_SkinOpacity,0.0,1.0);
   m_Gui->FloatSlider(ID_OPACITY_SLIDERS,"Fat Mass",&m_FatMassOpacity,0.0,1.0);
   m_Gui->FloatSlider(ID_OPACITY_SLIDERS,"Muscle",&m_MuscleOpacity,0.0,1.0);
@@ -230,15 +242,46 @@ void medPipeRayCast::OnEvent(mafEventBase *maf_event)
 			{
         //Update functions
 				SetRayCastFunctions();
-        //generate property
-        vtkMAFSmartPointer<vtkVolumeProperty> volumeProperty;
-        volumeProperty->SetColor(m_ColorFunction);
-        volumeProperty->SetScalarOpacity(m_OpacityFunction);
-        m_Volume->SetProperty(volumeProperty);
         m_Vme->ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
 				m_Gui->Update();
 			}
 			break;
+    case CHANGE_OPACITY:
+      {
+        if(m_Layer==0)
+        {
+          m_SkinOpacity = 0.2;
+          m_FatMassOpacity = 0.2;
+          m_MuscleOpacity=0.2;
+          m_BloodOpacity=0.8;
+          m_BoneOpacity=0.2;
+        }
+        if(m_Layer==1)
+        {
+          m_SkinOpacity = 0.0;
+          m_FatMassOpacity = 0.2;
+          m_MuscleOpacity=0.8;
+          m_BloodOpacity=1.0;
+          m_BoneOpacity=0.5;
+        }
+        else if(m_Layer==2)
+        {
+          m_SkinOpacity = m_FatMassOpacity = m_MuscleOpacity = 0.0;
+          m_BloodOpacity=1.0;
+          m_BoneOpacity=0.5;
+        }
+        else if(m_Layer==3)
+        {
+          m_SkinOpacity = m_FatMassOpacity = m_MuscleOpacity = m_BloodOpacity = 0.0;
+          m_BoneOpacity=0.5;
+        }
+        m_Gui->Update();
+
+        //Update functions
+        SetRayCastFunctions();
+        m_Vme->ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
+      }
+      break;
   	  default:
 			break;
 		}
@@ -266,8 +309,14 @@ void medPipeRayCast::UpdateFromData()
   //If input is a Rectilinear grid this pipe need a Resample
   if (vtkRectilinearGrid *rgrid = vtkRectilinearGrid::SafeDownCast(dataset))
   {
-    wxBusyCursor wait;
-    wxBusyInfo wait_info(_("Resampling..."));
+    wxBusyInfo *info;
+    wxBusyCursor *wait;
+
+    if (!m_TestMode)
+    {
+      wait = new wxBusyCursor;
+      info = new wxBusyInfo(_("Resampling..."));
+    }
 
     resampled=true;
 
@@ -319,13 +368,25 @@ void medPipeRayCast::UpdateFromData()
     m_ResampleFilter->SetOutput(volume);
     m_ResampleFilter->AutoSpacingOff();
     m_ResampleFilter->Update();
+
+    if(!m_TestMode)
+    {
+      delete wait;
+      delete info;
+    }
   }
   //Else if input is an Structured Point we use it directly
   else 
     volume=vtkImageData::SafeDownCast(dataset);
 
-  wxBusyCursor wait;
-  wxBusyInfo wait_info(_("Volume filtering..."));
+  wxBusyInfo *info;
+  wxBusyCursor *wait;
+
+  if (!m_TestMode)
+  {
+    wait = new wxBusyCursor;
+    info = new wxBusyInfo(_("Volume filtering..."));
+  }
 
   //RayCast Cleaner removes border effects from bones
   //(bone sanding) and produces in output a volume whit unsigned short 
@@ -361,21 +422,20 @@ void medPipeRayCast::UpdateFromData()
   compositeFunction->SetCompositeMethodToClassifyFirst();
   m_RayCastMapper->SetVolumeRayCastFunction(compositeFunction);
   m_RayCastMapper->SetInput(m_RayCastCleaner->GetOutput());
-  SetRayCastFunctions();
-
-  // The property describes how the data will look
-  vtkMAFSmartPointer<vtkVolumeProperty> volumeProperty;
-  volumeProperty->SetColor(m_ColorFunction);
-  volumeProperty->SetScalarOpacity(m_OpacityFunction);
-
+  
   //Create a empty volume to manage the mapper
   if (m_Volume==NULL)
     vtkNEW(m_Volume);
   m_Volume->SetMapper(m_RayCastMapper);
-  m_Volume->SetProperty(volumeProperty);
+  SetRayCastFunctions();
   m_Volume->PickableOff();
   m_AssemblyFront->AddPart(m_Volume);
 
+  if(!m_TestMode)
+  {
+    delete wait;
+    delete info;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -402,11 +462,8 @@ void medPipeRayCast::SetActorVisibility(int visibility)
 void medPipeRayCast::SetRayCastFunctions()
 //----------------------------------------------------------------------------
 {
-
-  
   double bloodA,bloodB,bloodDiff,boneA,boneB,muscle,muscleA,muscleB,muscleDiff;
 
-  
   //Muscle point intervals
   muscleDiff=m_MuscleUpperThreshold-m_MuscleLowerThreshold;
   muscle=m_MuscleLowerThreshold+0.5*muscleDiff;
@@ -471,6 +528,13 @@ void medPipeRayCast::SetRayCastFunctions()
   //bone color
   m_ColorFunction->AddRGBPoint(scalarShift(m_BoneLowerThreshold-1)    , 0.90, 0.87, 0.68);
   m_ColorFunction->AddRGBPoint(scalarShift(boneB)                     , 1.00, 0.98, 0.95);
+
+  // The property describes how the data will look
+  vtkMAFSmartPointer<vtkVolumeProperty> volumeProperty;
+  volumeProperty->SetColor(m_ColorFunction);
+  volumeProperty->SetScalarOpacity(m_OpacityFunction);
+  //Set property  
+  m_Volume->SetProperty(volumeProperty);
 
 }
 
