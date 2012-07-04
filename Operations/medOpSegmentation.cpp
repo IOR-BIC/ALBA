@@ -1028,10 +1028,10 @@ void medOpSegmentation::FloodFill(vtkIdType seed)
       if(s < hi)
       {
         m_CurrentSliceIndex++;
-        UndoBrushPreview();
+        //UndoBrushPreview();
         ApplyVolumeSliceChanges();  
         UpdateVolumeSlice();
-        UpdateSlice();
+        //UpdateSlice();
       }
     }
     m_ProgressBar->SetValue(100);
@@ -1869,9 +1869,14 @@ void medOpSegmentation::InitRefinementVolumeMask()
 void medOpSegmentation::OnAutomaticStep()
 //------------------------------------------------------------------------
 {
+  m_SegmentationPicker->SetFullModifiersMode(true);
   //gui stuff
   
-  m_SnippetsLabel->SetLabel( _("Left click + Ctrl to select lower threshold.  Left click + Alt to select upper threshold"));
+  m_SnippetsLabel->SetLabel( _(" 'Left Click + Ctrl' to select lower threshold. 'Left Click + Alt' to select upper threshold"));
+  wxFont boldFont = wxFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
+  boldFont.SetWeight(wxBOLD);
+  m_SnippetsLabel->SetFont(boldFont);
+
   m_Dialog->Update();
   UpdateThresholdLabel();
   m_GuiDialog->Enable(ID_AUTO_SEGMENTATION,true);
@@ -1933,10 +1938,12 @@ void medOpSegmentation::OnAutomaticStep()
 void medOpSegmentation::OnManualStep()
 //------------------------------------------------------------------------
 {
+  m_SegmentationPicker->SetFullModifiersMode(false);
+
   //gui stuff
   //set brush cursor - enable drawing
   // brush size slider: min = 1; max = slice size
-  m_SnippetsLabel->SetLabel( _("Left click + Ctrl Draw.  Left click + Alt Erase"));
+  m_SnippetsLabel->SetLabel( _(" 'Left Click' Draw. 'Left Click + Ctrl' Erase"));
 
 //   int maxBrushSize;
 //   maxBrushSize = min(m_VolumeDimensions[0], m_VolumeDimensions[1]);
