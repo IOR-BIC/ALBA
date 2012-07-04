@@ -81,22 +81,22 @@ void vtkMEDRayCastCleanerTest::TestFilter()
 
   printf("a");
 
-  int ok=true;
+  int equalScalars=true;
 
   for (int i=0;i<nPoints;i++)
   {
     if (oldScalars->GetTuple1(i) != newScalars->GetTuple1(i))
     {
-      ok=false;
+      equalScalars=false;
       break;
     }
   }
   
-  CPPUNIT_ASSERT(ok);
+  CPPUNIT_ASSERT(equalScalars);
 
 
   /* 
-  Used to generate initial test file 
+  //Used to generate initial test file 
   
   vtkMAFSmartPointer<vtkStructuredPointsWriter> w;
   mafString outFilename=MED_DATA_ROOT;
