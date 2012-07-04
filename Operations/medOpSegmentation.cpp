@@ -2337,6 +2337,8 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         m_AutomaticThreshold=min(m_AutomaticUpperThreshold,m_AutomaticThreshold);
         m_AutomaticThresholdSlider->SetSubRange(m_AutomaticThreshold,m_AutomaticUpperThreshold);
         UpdateThresholdLabel();
+        UpdateThresholdRealTimePreview();
+        OnEventUpdateThresholdSlice();
       }
       //Picking during manual segmentation
       else if(m_CurrentOperation == MANUAL_SEGMENTATION)
