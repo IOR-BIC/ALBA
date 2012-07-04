@@ -104,6 +104,7 @@ void medPipeRayCastTest::TestPipeExecution()
 
   /////////// Pipe Instance and Creation ///////////
   medPipeRayCast *pipeRayCast = new medPipeRayCast;
+  pipeRayCast->TestModeOn();
   pipeRayCast->Create(sceneNode);
 
   ////////// ACTORS List ///////////////
