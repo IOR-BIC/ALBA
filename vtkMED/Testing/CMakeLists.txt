@@ -176,6 +176,9 @@ ADD_TEST(vtkMEDCollisionDetectionFilterTest ${EXECUTABLE_OUTPUT_PATH}/vtkMEDColl
 ADD_EXECUTABLE(vtkMEDImageFillHolesRemoveIslandsTest vtkMEDImageFillHolesRemoveIslandsTest.h vtkMEDImageFillHolesRemoveIslandsTest.cpp)
 ADD_TEST(vtkMEDImageFillHolesRemoveIslandsTest ${EXECUTABLE_OUTPUT_PATH}/vtkMEDImageFillHolesRemoveIslandsTest)
 
+ADD_EXECUTABLE(vtkMEDRayCastCleanerTest vtkMEDRayCastCleanerTest.h vtkMEDRayCastCleanerTest.cpp)
+ADD_TEST(vtkMEDRayCastCleanerTest ${EXECUTABLE_OUTPUT_PATH}/vtkMEDRayCastCleanerTest)
+
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
 #ENDIF (MAF_USE_WX)

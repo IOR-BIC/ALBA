@@ -92,7 +92,6 @@ protected:
   vtkColorTransferFunction *m_ColorFunction;
 	vtkVolumeRayCastMapper   *m_RayCastMapper;
   vtkMEDRayCastCleaner     *m_RayCastCleaner;
-  //vtkImageCast             *m_VolumeCaster;
   vtkMAFVolumeResample		 *m_ResampleFilter;	
 	vtkVolume                *m_Volume;
   
