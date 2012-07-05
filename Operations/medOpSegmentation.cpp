@@ -848,6 +848,10 @@ void medOpSegmentation::CreateOpDialog()
   mafGetFrame()->GetPosition(&x_pos,&y_pos);
   m_Dialog->GetSize(&w,&h);
   m_Dialog->SetSize(x_pos+5,y_pos+5,w+50,h+50);
+  m_GuiDialog->Update();
+
+  m_ProgressBar->Show(false);
+  m_GuiDialog->Update();
 
   UpdateWindowing();
 
@@ -982,7 +986,9 @@ void medOpSegmentation::FloodFill(vtkIdType seed)
   {
     long progress = 0;
     m_ProgressBar->SetValue(progress);
+    m_ProgressBar->Show(true);
     m_ProgressBar->Update();
+    m_GuiDialog->Update();
 
     double low, hi;
     m_ManualRangeSlider->GetSubRange(&low,&hi);
@@ -1035,6 +1041,7 @@ void medOpSegmentation::FloodFill(vtkIdType seed)
       }
     }
     m_ProgressBar->SetValue(100);
+    m_ProgressBar->Show(false);
     m_ProgressBar->Update();
     m_CurrentSliceIndex = oldSliceIndex;
     UndoBrushPreview();
@@ -1109,7 +1116,9 @@ bool medOpSegmentation::Refinement()
 
     long progress = 0;
     m_ProgressBar->SetValue(progress);
+    m_ProgressBar->Show(true);
     m_ProgressBar->Update();
+    m_GuiDialog->Update();
 
     vtkMAFSmartPointer<vtkUnsignedCharArray> newScalars;
     newScalars->SetName("SCALARS");
@@ -1239,6 +1248,7 @@ bool medOpSegmentation::Refinement()
     m_RefinementVolumeMask->Update();
 
     m_ProgressBar->SetValue(100);
+    m_ProgressBar->Show(false);
     m_ProgressBar->Update();
 
     m_View->VmeShow(m_RefinementVolumeMask,true);
