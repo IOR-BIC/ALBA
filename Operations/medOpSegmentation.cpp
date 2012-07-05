@@ -3165,6 +3165,7 @@ void medOpSegmentation::OnAutomaticChangeThresholdManually(int eventID)
   
   UpdateThresholdLabel();
   UpdateThresholdRealTimePreview();
+  OnEventUpdateThresholdSlice();
   m_View->CameraUpdate();
 }
 
