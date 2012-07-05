@@ -1762,7 +1762,7 @@ void medOpSegmentation::CreateRefinementGui()
   m_RefinementIterative = 0;
   //currentGui->Bool(ID_REFINEMENT_ITERATIVE, mafString("Iterative"), &m_RefinementIterative, 0, mafString("Switch on/off the iterative feature"));
   
-  currentGui->Bool(ID_REFINEMENT_REMOVE_PENINSULA_REGIONS, mafString("Remove peninsula regions"), &m_RemovePeninsulaRegions, 1, mafString("Remove or not peninsula regions"));
+  currentGui->Bool(ID_REFINEMENT_REMOVE_PENINSULA_REGIONS, mafString("Apply to peninsula regions"), &m_RemovePeninsulaRegions, 1, mafString("Apply refinement on peninsula regions"));
 
   currentGui->TwoButtons(ID_REFINEMENT_UNDO, ID_REFINEMENT_REDO, "Undo", "Redo");
 
