@@ -2050,6 +2050,13 @@ void medOpSegmentation::OnManualStep()
   m_View->CameraUpdate();
   m_GuiDialog->Update();
 
+  m_ManualSegmentationTools = 0;
+  m_View->GetWindow()->SetCursor(cursor);
+
+  EnableSizerContent(m_BucketEditingSizer,false);
+  EnableSizerContent(m_BrushEditingSizer,true);
+  m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
+
   OnEventUpdateManualSlice();
 }
 //------------------------------------------------------------------------
