@@ -106,7 +106,7 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkTransform.h"
 #include "vtkWindowedSincPolyDataFilter.h"
-#include "vtkPolyDataNormals.h"
+//#include "vtkPolyDataNormals.h"
 #include "vtkMEDBinaryImageFloodFill.h"
 
 
@@ -523,19 +523,19 @@ void medOpSegmentation::OpDo()
   transformFilter3->Update();
 
   //Flipping normals for better surface view 
-  vtkMAFSmartPointer<vtkPolyDataNormals> normalFilter;
+  /*vtkMAFSmartPointer<vtkPolyDataNormals> normalFilter;
   normalFilter->SetInput(transformFilter3->GetOutput());
   normalFilter->ComputeCellNormalsOn();
   normalFilter->FlipNormalsOn(); 
   normalFilter->SetFeatureAngle(30.0);
   normalFilter->SplittingOff();
   normalFilter->Update();
-
+  */
 
   //Generating Surface VME
   mafNEW(m_OutputSurface);
   m_OutputSurface->SetName(wxString::Format("Segmentation Surface (%s)",m_Volume->GetName()).c_str());
-  m_OutputSurface->SetData(normalFilter->GetOutput(),mafVMEVolumeGray::SafeDownCast(m_Input)->GetTimeStamp());
+  m_OutputSurface->SetData(transformFilter3->GetOutput(),mafVMEVolumeGray::SafeDownCast(m_Input)->GetTimeStamp());
   m_OutputSurface->ReparentTo(m_Input);
   m_OutputSurface->Modified();
 
