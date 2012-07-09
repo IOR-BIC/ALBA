@@ -3600,8 +3600,9 @@ void medOpSegmentation::OnLoadSegmentationEvent(mafEvent *e)
         {
           m_View->VmeAdd(parents.at(parents.size() - (p + 1)));
         }
-        m_View->VmeShow(m_LoadedVolume,true);
+        
         UpdateSlice();
+        m_View->VmeShow(m_LoadedVolume,true);
         m_View->CameraUpdate();
         m_GuiDialog->Update();
       }
