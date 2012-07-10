@@ -1763,7 +1763,7 @@ void medOpSegmentation::CreateManualSegmentationGui()
 
   m_ManualRangeSlider = new mafGUILutSlider(currentGui,-1,wxPoint(0,0),wxSize(195,24));
   m_ManualRangeSlider->SetListener(this);
-  m_ManualRangeSlider->SetText(1,"Z Axis");  
+  m_ManualRangeSlider->SetText(1,"Slices");  
   m_ManualRangeSlider->SetRange(1,m_VolumeDimensions[2]);
   m_ManualRangeSlider->SetSubRange(1,m_VolumeDimensions[2]);
   /*m_ManualRangeSlider->Enable(false);*/
@@ -2711,6 +2711,9 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         if (m_CurrentOperation==MANUAL_SEGMENTATION)
         {
           OnEventUpdateManualSlice();
+          m_ManualRangeSlider->SetText(1,"Slices");  
+          m_ManualRangeSlider->SetRange(1,m_VolumeDimensions[m_CurrentSlicePlane]);
+          m_ManualRangeSlider->SetSubRange(1,m_VolumeDimensions[m_CurrentSlicePlane]);
         }
         else if (m_CurrentOperation==AUTOMATIC_SEGMENTATION)
         {
