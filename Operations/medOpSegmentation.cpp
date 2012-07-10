@@ -1014,6 +1014,9 @@ void medOpSegmentation::FloodFill(vtkIdType seed)
   int center = seed;
   if(m_GlobalFloodFill == TRUE)
   {
+    wxBusyCursor wait_cursor;
+    wxBusyInfo wait(_("Wait! The algorithm could take long time!"));
+
     vtkStructuredPoints *input = vtkStructuredPoints::New();
     int ext[6];
     double low,hi;
