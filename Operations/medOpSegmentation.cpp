@@ -559,9 +559,9 @@ void medOpSegmentation::OpDo()
   //The result tree is Input
   //                     |-Surface
   //                          |-Binary volume
-  m_OutputVolume->ReparentTo(m_OutputSurface);
+  //m_OutputVolume->ReparentTo(m_OutputSurface);
 
-  m_Output=m_OutputSurface;
+  //m_Output=m_OutputSurface;
 
   }
   RemoveVMEs();
@@ -1014,81 +1014,134 @@ void medOpSegmentation::FloodFill(vtkIdType seed)
   int center = seed;
   if(m_GlobalFloodFill == TRUE)
   {
-    long progress = 0;
-    m_ProgressBar->SetValue(progress);
-    m_ProgressBar->Show(true);
-    m_ProgressBar->Update();
-    m_GuiDialog->Update();
+    vtkStructuredPoints *input = vtkStructuredPoints::New();
+    double dimensions[3];
 
-    double low, hi;
-    m_ManualRangeSlider->GetSubRange(&low,&hi);
+    dimensions[0] = m_VolumeDimensions[0];
+    dimensions[1] = m_VolumeDimensions[1];
+    dimensions[2] = m_VolumeDimensions[2];
 
-    int oldSliceIndex = m_CurrentSliceIndex;
-    wxBusyInfo wait("Please wait...");
-    for(int s = m_CurrentSliceIndex; s <= hi; s++)
-    {
-      progress = (s*100/abs(hi-low));
-      m_ProgressBar->SetValue(progress);
-      m_ProgressBar->Update();
+    input->SetExtent(0,dimensions[0]-1,0,dimensions[1]-1,0,dimensions[2]-1);
 
-      vtkStructuredPoints *input = vtkStructuredPoints::New();
-      double dimensions[3];
-      dimensions[0] = m_VolumeDimensions[0];
-      dimensions[1] = m_VolumeDimensions[1];
-      dimensions[2] = m_VolumeDimensions[2];
-      dimensions[m_CurrentSlicePlane] = 1;
-      input->SetExtent(0,dimensions[0]-1,0,dimensions[1]-1,0,dimensions[2]-1);
+    input->SetSpacing(m_VolumeSpacing);
+    input->SetOrigin(0,0,0);
 
-      input->SetSpacing(m_VolumeSpacing);
-      input->SetOrigin(0,0,0);
+    m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->Update();
+    input->SetScalarTypeToUnsignedChar();
+    input->GetPointData()->SetScalars(m_ManualVolumeMask->GetOutput()->GetVTKData()->GetPointData()->GetScalars());
 
-      m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->Update();
-      input->SetScalarTypeToUnsignedChar();
-      input->GetPointData()->SetScalars(m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->GetScalars());
+    vtkStructuredPoints *output = vtkStructuredPoints::New();
+    output->CopyStructure(input);
+    output->DeepCopy(input);
 
-      vtkStructuredPoints *output = vtkStructuredPoints::New();
-      output->CopyStructure(input);
-      output->DeepCopy(input);
+    int center = ApplyFloodFill(input,output,seed);
 
-      center = ApplyFloodFill(input,output,center);
+    m_ManualVolumeMask->GetOutput()->GetVTKData()->GetPointData()->SetScalars(output->GetPointData()->GetScalars());
+    m_ManualVolumeMask->Update();
 
-      m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->SetScalars(output->GetPointData()->GetScalars());
-      m_ManualVolumeSlice->Update();
-      //m_View->VmeShow(m_ManualVolumeSlice,true);
-
-      CreateRealDrawnImage();
-      //m_View->CameraUpdate();
-
-      input->Delete();
-      output->Delete();
-      if(s < hi)
-      {
-        m_CurrentSliceIndex++;
-        //UndoBrushPreview();
-        ApplyVolumeSliceChanges();  
-        UpdateVolumeSlice();
-        //UpdateSlice();
-      }
-    }
-    m_ProgressBar->SetValue(100);
-    m_ProgressBar->Show(false);
-    m_ProgressBar->Update();
-    m_CurrentSliceIndex = oldSliceIndex;
-    UndoBrushPreview();
-    ApplyVolumeSliceChanges();  
-    UpdateVolumeSlice();
     UpdateSlice();
+    m_View->VmeShow(m_ManualVolumeSlice,true);
+
+    CreateRealDrawnImage();
     m_View->CameraUpdate();
-    m_GuiDialog->Update();
+
+    input->Delete();
+    output->Delete();
+//     long progress = 0;
+//     m_ProgressBar->SetValue(progress);
+//     m_ProgressBar->Show(true);
+//     m_ProgressBar->Update();
+//     m_GuiDialog->Update();
+// 
+//     double low, hi;
+//     m_ManualRangeSlider->GetSubRange(&low,&hi);
+// 
+//     int oldSliceIndex = m_CurrentSliceIndex;
+//     wxBusyInfo wait("Please wait...");
+//     for(int s = m_CurrentSliceIndex; s <= hi; s++)
+//     {
+//       progress = (s*100/abs(hi-low));
+//       m_ProgressBar->SetValue(progress);
+//       m_ProgressBar->Update();
+// 
+//       vtkStructuredPoints *input = vtkStructuredPoints::New();
+//       double dimensions[3];
+//       dimensions[0] = m_VolumeDimensions[0];
+//       dimensions[1] = m_VolumeDimensions[1];
+//       dimensions[2] = m_VolumeDimensions[2];
+//       dimensions[m_CurrentSlicePlane] = 1;
+//       input->SetExtent(0,dimensions[0]-1,0,dimensions[1]-1,0,dimensions[2]-1);
+// 
+//       input->SetSpacing(m_VolumeSpacing);
+//       input->SetOrigin(0,0,0);
+// 
+//       m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->Update();
+//       input->SetScalarTypeToUnsignedChar();
+//       input->GetPointData()->SetScalars(m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->GetScalars());
+// 
+//       vtkStructuredPoints *output = vtkStructuredPoints::New();
+//       output->CopyStructure(input);
+//       output->DeepCopy(input);
+// 
+//       center = ApplyFloodFill(input,output,center);
+// 
+//       m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->SetScalars(output->GetPointData()->GetScalars());
+//       m_ManualVolumeSlice->Update();
+//       //m_View->VmeShow(m_ManualVolumeSlice,true);
+// 
+//       CreateRealDrawnImage();
+//       //m_View->CameraUpdate();
+// 
+//       input->Delete();
+//       output->Delete();
+//       if(s < hi)
+//       {
+//         m_CurrentSliceIndex++;
+//         //UndoBrushPreview();
+//         ApplyVolumeSliceChanges();  
+//         UpdateVolumeSlice();
+//         //UpdateSlice();
+//       }
+//     }
+//     m_ProgressBar->SetValue(100);
+//     m_ProgressBar->Show(false);
+//     m_ProgressBar->Update();
+//     m_CurrentSliceIndex = oldSliceIndex;
+//     UndoBrushPreview();
+//     ApplyVolumeSliceChanges();  
+//     UpdateVolumeSlice();
+//     UpdateSlice();
+//     m_View->CameraUpdate();
+//     m_GuiDialog->Update();
   }
   else
   {
     vtkStructuredPoints *input = vtkStructuredPoints::New();
     double dimensions[3];
-    dimensions[0] = m_VolumeDimensions[0];
-    dimensions[1] = m_VolumeDimensions[1];
-    dimensions[2] = m_VolumeDimensions[2];
-    dimensions[m_CurrentSlicePlane] = 1;
+
+
+    switch(m_CurrentSlicePlane)
+    {
+    case XY:
+      {
+        dimensions[0] = m_VolumeDimensions[0];
+        dimensions[1] = m_VolumeDimensions[1];
+        dimensions[2] = 1;
+      } break;
+    case XZ:
+      {
+        dimensions[0] = m_VolumeDimensions[0];
+        dimensions[1] = m_VolumeDimensions[2];
+        dimensions[2] = 1;
+      } break;
+    case YZ:
+      {
+        dimensions[0] = m_VolumeDimensions[1];
+        dimensions[1] = m_VolumeDimensions[2];
+        dimensions[2] = 1;
+      } break;
+    }
+
     input->SetExtent(0,dimensions[0]-1,0,dimensions[1]-1,0,dimensions[2]-1);
 
     input->SetSpacing(m_VolumeSpacing);
@@ -2121,8 +2174,9 @@ void medOpSegmentation::OnRefinementStep()
   InitRefinementVolumeMask();
   
   UpdateSlice();
-  
   m_View->VmeShow(m_RefinementVolumeMask,true);
+  UpdateSlice();
+
   m_View->CameraUpdate();
   m_GuiDialog->Update();
 }
@@ -2460,15 +2514,15 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
           }
           else if(m_CurrentOperation==LOAD_SEGMENTATION)
           {
-            UpdateSlice();
             m_View->VmeShow(m_LoadedVolume,true);
+            UpdateSlice();
             m_View->CameraUpdate();
             m_GuiDialog->Update();
           }
           else if(m_CurrentOperation==REFINEMENT_SEGMENTATION)
           {
-            UpdateSlice();
             m_View->VmeShow(m_RefinementVolumeMask,true);
+            UpdateSlice();
             m_View->CameraUpdate();
             m_GuiDialog->Update();
           }
@@ -2516,15 +2570,15 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         }
         else if(m_CurrentOperation==LOAD_SEGMENTATION)
         {
-          UpdateSlice();
           m_View->VmeShow(m_LoadedVolume,true);
+          UpdateSlice();
           m_View->CameraUpdate();
           m_GuiDialog->Update();
         }
         else if(m_CurrentOperation==REFINEMENT_SEGMENTATION)
         {
-          UpdateSlice();
           m_View->VmeShow(m_RefinementVolumeMask,true);
+          UpdateSlice();
           m_View->CameraUpdate();
           m_GuiDialog->Update();
         }
@@ -2566,15 +2620,15 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         }
         else if(m_CurrentOperation==LOAD_SEGMENTATION)
         {
-          UpdateSlice();
           m_View->VmeShow(m_LoadedVolume,true);
+          UpdateSlice();
           m_View->CameraUpdate();
           m_GuiDialog->Update();
         }
         else if(m_CurrentOperation==REFINEMENT_SEGMENTATION)
         {
-          UpdateSlice();
           m_View->VmeShow(m_RefinementVolumeMask,true);
+          UpdateSlice();
           m_View->CameraUpdate();
           m_GuiDialog->Update();
         }
@@ -2614,15 +2668,15 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         }
         else if(m_CurrentOperation==LOAD_SEGMENTATION)
         {
-          UpdateSlice();
           m_View->VmeShow(m_LoadedVolume,true);
+          UpdateSlice();
           m_View->CameraUpdate();
           m_GuiDialog->Update();
         }
         else if(m_CurrentOperation==REFINEMENT_SEGMENTATION)
         {
-          UpdateSlice();
           m_View->VmeShow(m_RefinementVolumeMask,true);
+          UpdateSlice();
           m_View->CameraUpdate();
           m_GuiDialog->Update();
         }
@@ -2664,15 +2718,15 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
         }
         else if(m_CurrentOperation==LOAD_SEGMENTATION)
         {
-          UpdateSlice();
           m_View->VmeShow(m_LoadedVolume,true);
+          UpdateSlice();
           m_View->CameraUpdate();
           m_GuiDialog->Update();
         }
         else if(m_CurrentOperation==REFINEMENT_SEGMENTATION)
         {
-          UpdateSlice();
           m_View->VmeShow(m_RefinementVolumeMask,true);
+          UpdateSlice();
           m_View->CameraUpdate();
           m_GuiDialog->Update();
         }
@@ -3603,6 +3657,7 @@ void medOpSegmentation::OnLoadSegmentationEvent(mafEvent *e)
         
         UpdateSlice();
         m_View->VmeShow(m_LoadedVolume,true);
+        UpdateSlice();
         m_View->CameraUpdate();
         m_GuiDialog->Update();
       }
@@ -5295,6 +5350,9 @@ void medOpSegmentation::OnEventFloodFill(mafEvent *e)
 
   // recalculate seed id
   vtkIdType seedID = seed[0] + seed[1] * dims[0] + seed[2] * dims[1] * dims[0];
-  FloodFill(seedID);
+  if(m_GlobalFloodFill)
+    FloodFill(id);
+  else
+    FloodFill(seedID);
   CreateRealDrawnImage();
 }
