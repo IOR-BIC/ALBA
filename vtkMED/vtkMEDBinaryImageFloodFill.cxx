@@ -186,33 +186,33 @@ vtkStructuredPoints *vtkMEDBinaryImageFloodFill::FloodFill(vtkStructuredPoints *
 
   // Get the id of the center of the filled region:
   // the center is represented by the point inside the region at the maximum distance
-  SignedMaurerDistanceMap::Pointer distance = SignedMaurerDistanceMap::New();
-  distance->SetInput(connectedThreshold->GetOutput());
-  distance->Update();
-
-  ItkDouble2Vtk::Pointer itkDouble2Vtk = ItkDouble2Vtk::New();
-  itkDouble2Vtk->SetInput(distance->GetOutput());
-  itkDouble2Vtk->Update();
-
-  vtkStructuredPoints *distanceImage = (vtkStructuredPoints *)itkDouble2Vtk->GetOutput();
-  distanceImage->Update();
-  vtkDoubleArray *distanceScalars = (vtkDoubleArray *)distanceImage->GetPointData()->GetScalars();
-
-  // Iterate over scalars and get the id of the minimum
-  double minDistance = VTK_DOUBLE_MAX;
-  for(vtkIdType s = 0; s < distanceScalars->GetNumberOfTuples(); s++)
-  {
-    double curDistance = distanceScalars->GetTuple1(s);
-    if(curDistance < minDistance)
-    {
-      Center = s;
-      minDistance = curDistance;
-    }
-  }
-  if(Center == 0)
-  {
-    Center = Seed;
-  }
+//   SignedMaurerDistanceMap::Pointer distance = SignedMaurerDistanceMap::New();
+//   distance->SetInput(connectedThreshold->GetOutput());
+//   distance->Update();
+// 
+//   ItkDouble2Vtk::Pointer itkDouble2Vtk = ItkDouble2Vtk::New();
+//   itkDouble2Vtk->SetInput(distance->GetOutput());
+//   itkDouble2Vtk->Update();
+// 
+//   vtkStructuredPoints *distanceImage = (vtkStructuredPoints *)itkDouble2Vtk->GetOutput();
+//   distanceImage->Update();
+//   vtkDoubleArray *distanceScalars = (vtkDoubleArray *)distanceImage->GetPointData()->GetScalars();
+// 
+//   // Iterate over scalars and get the id of the minimum
+//   double minDistance = VTK_DOUBLE_MAX;
+//   for(vtkIdType s = 0; s < distanceScalars->GetNumberOfTuples(); s++)
+//   {
+//     double curDistance = distanceScalars->GetTuple1(s);
+//     if(curDistance < minDistance)
+//     {
+//       Center = s;
+//       minDistance = curDistance;
+//     }
+//   }
+//   if(Center == 0)
+//   {
+//     Center = Seed;
+//   }
   return output;
 }
 

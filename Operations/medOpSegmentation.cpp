@@ -1015,13 +1015,23 @@ void medOpSegmentation::FloodFill(vtkIdType seed)
   if(m_GlobalFloodFill == TRUE)
   {
     vtkStructuredPoints *input = vtkStructuredPoints::New();
-    double dimensions[3];
+    int ext[6];
+    double low,hi;
+    m_ManualRangeSlider->GetSubRange(&low,&hi);
+    hi--;
+    low--;
 
-    dimensions[0] = m_VolumeDimensions[0];
-    dimensions[1] = m_VolumeDimensions[1];
-    dimensions[2] = m_VolumeDimensions[2];
+    ext[0] = 0;
+    ext[1] = m_VolumeDimensions[0]-1;
+    ext[2] = 0;
+    ext[3] = m_VolumeDimensions[1]-1;
+    ext[4] = 0;
+    ext[5] = m_VolumeDimensions[2]-1;
 
-    input->SetExtent(0,dimensions[0]-1,0,dimensions[1]-1,0,dimensions[2]-1);
+    ext[m_CurrentSlicePlane * 2] = (int)low;
+    ext[m_CurrentSlicePlane * 2 + 1] = (int)hi;
+
+    input->SetExtent(0,m_VolumeDimensions[0]-1,0,m_VolumeDimensions[1]-1,0,m_VolumeDimensions[2]-1);
 
     input->SetSpacing(m_VolumeSpacing);
     input->SetOrigin(0,0,0);
@@ -1030,13 +1040,39 @@ void medOpSegmentation::FloodFill(vtkIdType seed)
     input->SetScalarTypeToUnsignedChar();
     input->GetPointData()->SetScalars(m_ManualVolumeMask->GetOutput()->GetVTKData()->GetPointData()->GetScalars());
 
+    input->SetUpdateExtent(ext);
+    input->Crop();
+
+    vtkStructuredPointsWriter *w = vtkStructuredPointsWriter::New();
+    w->SetInput(input);
+    w->SetFileName("D:\\MyGit\\data\\flood_fill_3d_input.vtk");
+    w->Update();
+    w->Write();
+
     vtkStructuredPoints *output = vtkStructuredPoints::New();
     output->CopyStructure(input);
     output->DeepCopy(input);
 
     int center = ApplyFloodFill(input,output,seed);
 
-    m_ManualVolumeMask->GetOutput()->GetVTKData()->GetPointData()->SetScalars(output->GetPointData()->GetScalars());
+    w->SetInput(output);
+    w->SetFileName("D:\\MyGit\\data\\flood_fill_3d_output.vtk");
+    w->Update();
+    w->Write();
+
+//     /*m_ManualVolumeMask->GetOutput()->GetVTKData()->GetPointData()->SetScalars(output->GetPointData()->GetScalars());*/
+    vtkUnsignedCharArray* outScalars = (vtkUnsignedCharArray*)m_ManualVolumeMask->GetOutput()->GetVTKData()->GetPointData()->GetScalars();
+    for(int x = ext[0]; x <= ext[1]; x++)
+    {
+      for(int y = ext[2]; y <= ext[3]; y++)
+      {
+        for(int z = ext[4]; z <= ext[5]; z++)
+        {
+          outScalars->SetTuple1(x + y * m_VolumeDimensions[0] + z * m_VolumeDimensions[1] * m_VolumeDimensions[0], output->GetPointData()->GetScalars()->GetTuple1((x-ext[0]) + (y-ext[2]) * (ext[1] - ext[0] + 1) + (z-ext[4]) *  (ext[1] - ext[0] + 1) * (ext[3] - ext[2] + 1)));
+        }
+      }
+    }
+    m_ManualVolumeMask->GetOutput()->GetVTKData()->GetPointData()->SetScalars(outScalars);
     m_ManualVolumeMask->Update();
 
     UpdateSlice();
@@ -1047,72 +1083,6 @@ void medOpSegmentation::FloodFill(vtkIdType seed)
 
     input->Delete();
     output->Delete();
-//     long progress = 0;
-//     m_ProgressBar->SetValue(progress);
-//     m_ProgressBar->Show(true);
-//     m_ProgressBar->Update();
-//     m_GuiDialog->Update();
-// 
-//     double low, hi;
-//     m_ManualRangeSlider->GetSubRange(&low,&hi);
-// 
-//     int oldSliceIndex = m_CurrentSliceIndex;
-//     wxBusyInfo wait("Please wait...");
-//     for(int s = m_CurrentSliceIndex; s <= hi; s++)
-//     {
-//       progress = (s*100/abs(hi-low));
-//       m_ProgressBar->SetValue(progress);
-//       m_ProgressBar->Update();
-// 
-//       vtkStructuredPoints *input = vtkStructuredPoints::New();
-//       double dimensions[3];
-//       dimensions[0] = m_VolumeDimensions[0];
-//       dimensions[1] = m_VolumeDimensions[1];
-//       dimensions[2] = m_VolumeDimensions[2];
-//       dimensions[m_CurrentSlicePlane] = 1;
-//       input->SetExtent(0,dimensions[0]-1,0,dimensions[1]-1,0,dimensions[2]-1);
-// 
-//       input->SetSpacing(m_VolumeSpacing);
-//       input->SetOrigin(0,0,0);
-// 
-//       m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->Update();
-//       input->SetScalarTypeToUnsignedChar();
-//       input->GetPointData()->SetScalars(m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->GetScalars());
-// 
-//       vtkStructuredPoints *output = vtkStructuredPoints::New();
-//       output->CopyStructure(input);
-//       output->DeepCopy(input);
-// 
-//       center = ApplyFloodFill(input,output,center);
-// 
-//       m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->SetScalars(output->GetPointData()->GetScalars());
-//       m_ManualVolumeSlice->Update();
-//       //m_View->VmeShow(m_ManualVolumeSlice,true);
-// 
-//       CreateRealDrawnImage();
-//       //m_View->CameraUpdate();
-// 
-//       input->Delete();
-//       output->Delete();
-//       if(s < hi)
-//       {
-//         m_CurrentSliceIndex++;
-//         //UndoBrushPreview();
-//         ApplyVolumeSliceChanges();  
-//         UpdateVolumeSlice();
-//         //UpdateSlice();
-//       }
-//     }
-//     m_ProgressBar->SetValue(100);
-//     m_ProgressBar->Show(false);
-//     m_ProgressBar->Update();
-//     m_CurrentSliceIndex = oldSliceIndex;
-//     UndoBrushPreview();
-//     ApplyVolumeSliceChanges();  
-//     UpdateVolumeSlice();
-//     UpdateSlice();
-//     m_View->CameraUpdate();
-//     m_GuiDialog->Update();
   }
   else
   {
@@ -5348,8 +5318,19 @@ void medOpSegmentation::OnEventFloodFill(mafEvent *e)
   dims[0] = m_VolumeDimensions[0];
   dims[1] = m_VolumeDimensions[1];
   dims[2] = m_VolumeDimensions[2];
-  dims[m_CurrentSlicePlane] = 1;
-  seed[m_CurrentSlicePlane] = 0;
+
+  if(m_GlobalFloodFill != TRUE)
+  {
+    dims[m_CurrentSlicePlane] = 1;
+    seed[m_CurrentSlicePlane] = 0;
+  }
+  else
+  {
+    double low,hi;
+    m_ManualRangeSlider->GetSubRange(&low,&hi);
+    dims[m_CurrentSlicePlane] = (hi - low) + 1;
+    seed[m_CurrentSlicePlane] = seed[m_CurrentSlicePlane] - (low-1);
+  }
 
   // recalculate seed id
   vtkIdType seedID = seed[0] + seed[1] * dims[0] + seed[2] * dims[1] * dims[0];
