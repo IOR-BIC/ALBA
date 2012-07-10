@@ -2072,14 +2072,14 @@ void medOpSegmentation::OnManualStep()
 
   m_ManualPER->EnableDrawing(true);
 
-  double low,hi;
-  m_ManualRangeSlider->GetSubRange(&low,&hi);
-  low = m_CurrentSliceIndex;
-  if(hi<low)
-  {
-    hi = low;
-  }
-  m_ManualRangeSlider->SetSubRange(low,hi);
+//   double low,hi;
+//   m_ManualRangeSlider->GetSubRange(&low,&hi);
+//   low = m_CurrentSliceIndex;
+//   if(hi<low)
+//   {
+//     hi = low;
+//   }
+//   m_ManualRangeSlider->SetSubRange(low,hi);
 
   m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_PICKING_MODALITY, m_CurrentSlicePlane);
   m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_UNDO, false);
@@ -2536,18 +2536,18 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
           if(m_CurrentOperation == MANUAL_SEGMENTATION)
           {
             CreateRealDrawnImage();
-            if(e->GetSender()!=this)
-            {
-              double low,hi;
-              m_ManualRangeSlider->GetSubRange(&low,&hi);
-              low = m_CurrentSliceIndex;
-              if(hi<low)
-              {
-                hi = low;
-              }
-              m_ManualRangeSlider->SetSubRange(low,hi);
-              m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
-            }
+//             if(e->GetSender()!=this)
+//             {
+//               double low,hi;
+//               m_ManualRangeSlider->GetSubRange(&low,&hi);
+//               low = m_CurrentSliceIndex;
+//               if(hi<low)
+//               {
+//                 hi = low;
+//               }
+//               m_ManualRangeSlider->SetSubRange(low,hi);
+//               m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
+//             }
           }
         }
 //         else
@@ -2842,23 +2842,23 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
             OnEventUpdateThresholdSlice();
           }
         }
-        else if(e->GetSender() == m_ManualRangeSlider)
-        {
-          double low, hi;
-          m_ManualRangeSlider->GetSubRange(&low,&hi);
-
-          m_CurrentSliceIndex = low;
-
-          if(m_CurrentSliceIndex > hi)
-          {
-            m_CurrentSliceIndex = hi;
-          }
-
-          if(m_CurrentSlicePlane = XY)
-          {
-            OnEvent(new mafEvent(this,ID_SLICE_SLIDER));
-          }
-        }
+//         else if(e->GetSender() == m_ManualRangeSlider)
+//         {
+//           double low, hi;
+//           m_ManualRangeSlider->GetSubRange(&low,&hi);
+// 
+//           m_CurrentSliceIndex = low;
+// 
+//           if(m_CurrentSliceIndex > hi)
+//           {
+//             m_CurrentSliceIndex = hi;
+//           }
+// 
+//           if(m_CurrentSlicePlane = XY)
+//           {
+//             OnEvent(new mafEvent(this,ID_SLICE_SLIDER));
+//           }
+//         }
         break;
       }
     case ID_LUT_CHOOSER:
