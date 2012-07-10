@@ -1040,36 +1040,39 @@ void medOpSegmentation::FloodFill(vtkIdType seed)
     input->SetScalarTypeToUnsignedChar();
     input->GetPointData()->SetScalars(m_ManualVolumeMask->GetOutput()->GetVTKData()->GetPointData()->GetScalars());
 
-//     input->SetUpdateExtent(ext);
-//     input->Crop();
-//     input->GetPointData()->Update();
-    input->Update();
+    input->SetUpdateExtent(ext);
+    input->Crop();
+
+    vtkStructuredPointsWriter *w = vtkStructuredPointsWriter::New();
+    w->SetInput(input);
+    w->SetFileName("D:\\MyGit\\data\\flood_fill_3d_input.vtk");
+    w->Update();
+    w->Write();
 
     vtkStructuredPoints *output = vtkStructuredPoints::New();
     output->CopyStructure(input);
     output->DeepCopy(input);
 
-    /*int center = */ApplyFloodFill(input,output,seed);
+    int center = ApplyFloodFill(input,output,seed);
 
-    vtkStructuredPointsWriter *w = vtkStructuredPointsWriter::New();
     w->SetInput(output);
     w->SetFileName("D:\\MyGit\\data\\flood_fill_3d_output.vtk");
     w->Update();
     w->Write();
 
 //     /*m_ManualVolumeMask->GetOutput()->GetVTKData()->GetPointData()->SetScalars(output->GetPointData()->GetScalars());*/
-//     vtkUnsignedCharArray* outScalars = (vtkUnsignedCharArray*)m_ManualVolumeMask->GetOutput()->GetVTKData()->GetPointData()->GetScalars();
-//     for(int x = ext[0]; x <= ext[1]; x++)
-//     {
-//       for(int y = ext[2]; y <= ext[3]; y++)
-//       {
-//         for(int z = ext[4]; z <= ext[5]; z++)
-//         {
-//           outScalars->SetTuple1(x + y * m_VolumeDimensions[0] + z * m_VolumeDimensions[1] * m_VolumeDimensions[0], output->GetPointData()->GetScalars()->GetTuple1((x-ext[0]) + (y-ext[2]) * (ext[1] - ext[0] + 1) + (z-ext[4]) *  (ext[1] - ext[0] + 1) * (ext[3] - ext[2] + 1)));
-//         }
-//       }
-//     }
-    m_ManualVolumeMask->GetOutput()->GetVTKData()->GetPointData()->SetScalars(output->GetPointData()->GetScalars());
+    vtkUnsignedCharArray* outScalars = (vtkUnsignedCharArray*)m_ManualVolumeMask->GetOutput()->GetVTKData()->GetPointData()->GetScalars();
+    for(int x = ext[0]; x <= ext[1]; x++)
+    {
+      for(int y = ext[2]; y <= ext[3]; y++)
+      {
+        for(int z = ext[4]; z <= ext[5]; z++)
+        {
+          outScalars->SetTuple1(x + y * m_VolumeDimensions[0] + z * m_VolumeDimensions[1] * m_VolumeDimensions[0], output->GetPointData()->GetScalars()->GetTuple1((x-ext[0]) + (y-ext[2]) * (ext[1] - ext[0] + 1) + (z-ext[4]) *  (ext[1] - ext[0] + 1) * (ext[3] - ext[2] + 1)));
+        }
+      }
+    }
+    m_ManualVolumeMask->GetOutput()->GetVTKData()->GetPointData()->SetScalars(outScalars);
     m_ManualVolumeMask->Update();
 
     UpdateSlice();
@@ -5328,6 +5331,9 @@ void medOpSegmentation::OnEventFloodFill(mafEvent *e)
 
   // recalculate seed id
   vtkIdType seedID = seed[0] + seed[1] * dims[0] + seed[2] * dims[1] * dims[0];
-  FloodFill(id);
+  if(m_GlobalFloodFill)
+    FloodFill(id);
+  else
+    FloodFill(seedID);
   CreateRealDrawnImage();
 }
