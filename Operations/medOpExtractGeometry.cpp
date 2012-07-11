@@ -193,10 +193,10 @@ void medOpExtractGeometry::CreateExtractSurfaceGui()
   //////////////////////////////////////////////////////////////////////////
   // Surface Processing
   //////////////////////////////////////////////////////////////////////////
-  m_ExtractSurfaceGui->Label(mafString("Surface Processing"), true);
+  m_ExtractSurfaceGui->Label(mafString("Filtering Method"), true);
   m_ExtractSurfaceGui->Divider();
 
-  wxString processingType[3] = {"Poisson", "Fill Holes","No filter"};
+  wxString processingType[3] = {"Poisson", "Taubin and Fill Holes","Taubin"};
   m_ExtractSurfaceGui->Combo(ID_PROCESSING_TYPE, "", &m_ProcessingType, 3, processingType);
 
 
