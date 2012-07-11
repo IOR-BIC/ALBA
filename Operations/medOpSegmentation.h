@@ -611,7 +611,7 @@ protected:
   void FloodFill(vtkIdType seed);
 
   /** Apply flood fill filter */
-  int ApplyFloodFill(vtkStructuredPoints *inputImage, vtkStructuredPoints *outputImage, vtkIdType seed);
+  int ApplyFloodFill(vtkImageData *inputImage, vtkImageData *outputImage, vtkIdType seed);
 
   void EnableSizerContent(wxSizer* sizer, bool enable);
 

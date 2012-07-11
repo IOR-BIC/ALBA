@@ -108,6 +108,7 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #include "vtkWindowedSincPolyDataFilter.h"
 //#include "vtkPolyDataNormals.h"
 #include "vtkMEDBinaryImageFloodFill.h"
+#include "vtkImageClip.h"
 
 
 #define max(a,b)(((a) > (b)) ? (a) : (b))
@@ -1017,7 +1018,15 @@ void medOpSegmentation::FloodFill(vtkIdType seed)
     wxBusyCursor wait_cursor;
     wxBusyInfo wait(_("Wait! The algorithm could take long time!"));
 
-    vtkStructuredPoints *input = vtkStructuredPoints::New();
+    vtkMAFSmartPointer <vtkImageData>dummy;
+    dummy->SetExtent(0,m_VolumeDimensions[0]-1,0,m_VolumeDimensions[1]-1,0,m_VolumeDimensions[2]-1);
+    dummy->SetSpacing(m_VolumeSpacing);
+    dummy->SetOrigin(0,0,0);
+
+    m_ManualVolumeMask->GetOutput()->GetVTKData()->GetPointData()->Update();
+    dummy->SetScalarTypeToUnsignedChar();
+    dummy->GetPointData()->SetScalars(m_ManualVolumeMask->GetOutput()->GetVTKData()->GetPointData()->GetScalars());
+
     int ext[6];
     double low,hi;
     m_ManualRangeSlider->GetSubRange(&low,&hi);
@@ -1034,36 +1043,28 @@ void medOpSegmentation::FloodFill(vtkIdType seed)
     ext[m_CurrentSlicePlane * 2] = (int)low;
     ext[m_CurrentSlicePlane * 2 + 1] = (int)hi;
 
-    input->SetExtent(0,m_VolumeDimensions[0]-1,0,m_VolumeDimensions[1]-1,0,m_VolumeDimensions[2]-1);
+    vtkMAFSmartPointer <vtkImageClip> clipper;
+    clipper->SetInput(dummy);
+    clipper->SetOutputWholeExtent(ext);
+    clipper->SetClipData(TRUE);
+    clipper->Update();
+    vtkImageData *clippedDummy = clipper->GetOutput();
+    clippedDummy->Update();
 
+    vtkMAFSmartPointer <vtkImageData> input;
+    input->SetExtent(0,(ext[1]-ext[0]),0,(ext[3]-ext[2]),0,(ext[5]-ext[4]));
     input->SetSpacing(m_VolumeSpacing);
     input->SetOrigin(0,0,0);
-
-    m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->Update();
+    input->GetPointData()->SetScalars(clippedDummy->GetPointData()->GetScalars());
     input->SetScalarTypeToUnsignedChar();
-    input->GetPointData()->SetScalars(m_ManualVolumeMask->GetOutput()->GetVTKData()->GetPointData()->GetScalars());
+    input->Update();
 
-    input->SetUpdateExtent(ext);
-    input->Crop();
-
-    vtkStructuredPointsWriter *w = vtkStructuredPointsWriter::New();
-    w->SetInput(input);
-    w->SetFileName("D:\\MyGit\\data\\flood_fill_3d_input.vtk");
-    w->Update();
-    w->Write();
-
-    vtkStructuredPoints *output = vtkStructuredPoints::New();
-    output->CopyStructure(input);
-    output->DeepCopy(input);
+    vtkMAFSmartPointer <vtkImageData> output;
 
     int center = ApplyFloodFill(input,output,seed);
 
-    w->SetInput(output);
-    w->SetFileName("D:\\MyGit\\data\\flood_fill_3d_output.vtk");
-    w->Update();
-    w->Write();
+    output->Update();
 
-//     /*m_ManualVolumeMask->GetOutput()->GetVTKData()->GetPointData()->SetScalars(output->GetPointData()->GetScalars());*/
     vtkUnsignedCharArray* outScalars = (vtkUnsignedCharArray*)m_ManualVolumeMask->GetOutput()->GetVTKData()->GetPointData()->GetScalars();
     for(int x = ext[0]; x <= ext[1]; x++)
     {
@@ -1083,9 +1084,6 @@ void medOpSegmentation::FloodFill(vtkIdType seed)
 
     CreateRealDrawnImage();
     m_View->CameraUpdate();
-
-    input->Delete();
-    output->Delete();
   }
   else
   {
@@ -1340,7 +1338,7 @@ bool medOpSegmentation::ApplyRefinementFilter2(vtkStructuredPoints *inputImage, 
 }
 
 //----------------------------------------------------------------------------
-int medOpSegmentation::ApplyFloodFill(vtkStructuredPoints *inputImage, vtkStructuredPoints *outputImage, vtkIdType seed)
+int medOpSegmentation::ApplyFloodFill(vtkImageData *inputImage, vtkImageData *outputImage, vtkIdType seed)
 //----------------------------------------------------------------------------
 {
   vtkMEDBinaryImageFloodFill *filter = vtkMEDBinaryImageFloodFill::New();
@@ -5337,9 +5335,6 @@ void medOpSegmentation::OnEventFloodFill(mafEvent *e)
 
   // recalculate seed id
   vtkIdType seedID = seed[0] + seed[1] * dims[0] + seed[2] * dims[1] * dims[0];
-  if(m_GlobalFloodFill)
-    FloodFill(id);
-  else
-    FloodFill(seedID);
+  FloodFill(seedID);
   CreateRealDrawnImage();
 }
