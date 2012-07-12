@@ -2144,7 +2144,7 @@ void medOpSegmentation::OnRefinementStep()
   InitRefinementVolumeMask();
   
   UpdateSlice();
-  m_View->VmeShow(m_LoadedVolume, true);
+  m_View->VmeShow(m_RefinementVolumeMask, true);
   m_View->CameraUpdate();
   m_GuiDialog->Update();
 }

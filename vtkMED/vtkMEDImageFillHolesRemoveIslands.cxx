@@ -91,7 +91,7 @@ void vtkMEDImageFillHolesRemoveIslands::Execute()
   flood_fill->Update();
 
   // get flood fill scalars
-  vtkUnsignedCharArray* filled_scalars = (vtkUnsignedCharArray*)flood_fill->GetOutput()->GetPointData()->GetScalars();
+  vtkUnsignedCharArray* filled_scalars = (vtkUnsignedCharArray*)input->GetPointData()->GetScalars();
   // get output scalars
   vtkUnsignedCharArray* output_scalars = (vtkUnsignedCharArray*)output->GetPointData()->GetScalars();
 
