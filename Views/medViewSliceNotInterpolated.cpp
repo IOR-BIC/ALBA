@@ -37,7 +37,7 @@ medViewSliceNotInterpolated::medViewSliceNotInterpolated(wxString label /* = "Vi
 /*  m_ViewSlice = NULL;*/
   m_Bounds[0] = m_Bounds[1] = m_Bounds[2] = m_Bounds[3] = m_Bounds[4] = m_Bounds[5] = .0;
   m_SliceAxis = 2;
-  m_CurrentSlice = 0;
+  m_CurrentSlice = VTK_DOUBLE_MAX;
   m_SliceSlider = NULL;
   m_ColorLUT = NULL;
 }
@@ -138,8 +138,20 @@ void medViewSliceNotInterpolated::GetVolumeParameters(mafVMEVolumeGray *volume)
   // Get bounds
   data->GetBounds(m_Bounds);
   // Evaluate the origin from bounds and current slice
-  m_CurrentSlice = m_Bounds[m_SliceAxis * 2];
-
+  if(m_CurrentSlice == VTK_DOUBLE_MAX)
+  {
+    m_CurrentSlice = m_Bounds[m_SliceAxis * 2];
+  }
+  if(m_CurrentSlice < m_Bounds[m_SliceAxis * 2])
+  {
+    m_CurrentSlice = m_Bounds[m_SliceAxis * 2];
+    UpdateSlice();
+  }
+  if(m_CurrentSlice > m_Bounds[m_SliceAxis * 2 + 1])
+  {
+    m_CurrentSlice = m_Bounds[m_SliceAxis * 2 + 1];
+    UpdateSlice();
+  }
 }
 
 //----------------------------------------------------------------------------
