@@ -3324,7 +3324,7 @@ void medOpSegmentation::OnAutomaticSegmentationEvent(mafEvent *e)
       OnChangeThresholdType();
       if (m_AutomaticRanges.size()>0)
         OnAutomaticPreview();
-      m_GuiDialog->Enable(ID_BUTTON_NEXT,m_AutomaticGlobalThreshold==RANGE && m_AutomaticRanges.size()>0);
+      m_GuiDialog->Enable(ID_BUTTON_NEXT,(m_AutomaticGlobalThreshold==RANGE && m_AutomaticRanges.size()>0)||(m_AutomaticGlobalThreshold == FALSE));
     }
     break;
   case ID_AUTOMATIC_UPDATE_RANGE:
