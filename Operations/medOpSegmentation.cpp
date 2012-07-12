@@ -2507,18 +2507,21 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
           if(m_CurrentOperation == MANUAL_SEGMENTATION)
           {
             CreateRealDrawnImage();
-//             if(e->GetSender()!=this)
-//             {
-//               double low,hi;
-//               m_ManualRangeSlider->GetSubRange(&low,&hi);
-//               low = m_CurrentSliceIndex;
-//               if(hi<low)
-//               {
-//                 hi = low;
-//               }
-//               m_ManualRangeSlider->SetSubRange(low,hi);
-//               m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
-//             }
+            if(e->GetSender()!=this)
+            {
+              double low,hi;
+              m_ManualRangeSlider->GetSubRange(&low,&hi);
+              if(hi < m_CurrentSliceIndex)
+              {
+                hi = m_CurrentSliceIndex;
+              }
+              if(low > m_CurrentSliceIndex)
+              {
+                low = m_CurrentSliceIndex;
+              }
+              m_ManualRangeSlider->SetSubRange(low,hi);
+              m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
+            }
           }
         }
 //         else
@@ -2566,10 +2569,13 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
           {
             double low,hi;
             m_ManualRangeSlider->GetSubRange(&low,&hi);
-            low = m_CurrentSliceIndex;
-            if(hi<low)
+            if(hi < m_CurrentSliceIndex)
             {
-              hi = low;
+              hi = m_CurrentSliceIndex;
+            }
+            if(low > m_CurrentSliceIndex)
+            {
+              low = m_CurrentSliceIndex;
             }
             m_ManualRangeSlider->SetSubRange(low,hi);
             m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
@@ -2616,10 +2622,13 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
           {
             double low,hi;
             m_ManualRangeSlider->GetSubRange(&low,&hi);
-            low = m_CurrentSliceIndex;
-            if(hi<low)
+            if(hi < m_CurrentSliceIndex)
             {
-              hi = low;
+              hi = m_CurrentSliceIndex;
+            }
+            if(low > m_CurrentSliceIndex)
+            {
+              low = m_CurrentSliceIndex;
             }
             m_ManualRangeSlider->SetSubRange(low,hi);
             m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
@@ -2664,10 +2673,13 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
           {
             double low,hi;
             m_ManualRangeSlider->GetSubRange(&low,&hi);
-            low = m_CurrentSliceIndex;
-            if(hi<low)
+            if(hi < m_CurrentSliceIndex)
             {
-              hi = low;
+              hi = m_CurrentSliceIndex;
+            }
+            if(low > m_CurrentSliceIndex)
+            {
+              low = m_CurrentSliceIndex;
             }
             m_ManualRangeSlider->SetSubRange(low,hi);
             m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
@@ -2813,23 +2825,25 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
             OnEventUpdateThresholdSlice();
           }
         }
-//         else if(e->GetSender() == m_ManualRangeSlider)
-//         {
-//           double low, hi;
-//           m_ManualRangeSlider->GetSubRange(&low,&hi);
-// 
-//           m_CurrentSliceIndex = low;
-// 
-//           if(m_CurrentSliceIndex > hi)
-//           {
-//             m_CurrentSliceIndex = hi;
-//           }
-// 
-//           if(m_CurrentSlicePlane = XY)
-//           {
-//             OnEvent(new mafEvent(this,ID_SLICE_SLIDER));
-//           }
-//         }
+        else if(e->GetSender() == m_ManualRangeSlider)
+        {
+          double low, hi;
+          m_ManualRangeSlider->GetSubRange(&low,&hi);
+
+          if(m_CurrentSliceIndex > hi)
+          {
+            m_CurrentSliceIndex = hi;
+          }
+          if(m_CurrentSliceIndex < low)
+          {
+            m_CurrentSliceIndex = low;
+          }
+
+          if(m_CurrentSlicePlane = XY)
+          {
+            OnEvent(new mafEvent(this,ID_SLICE_SLIDER));
+          }
+        }
         break;
       }
     case ID_LUT_CHOOSER:
