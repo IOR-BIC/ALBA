@@ -329,7 +329,14 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
             sliceOriginX[x] = 0;
             for(int x2 = 0; x2 < x; x2++)
             {
-              reachedDimension += pieceDimensions[x2][0]-1;
+              if(pieceDimensions[x2][0]%2==0 || pieceDimensions[x2][0] == 1)
+              {
+                reachedDimension += pieceDimensions[x2][0]-1;
+              }
+              else
+              {
+                reachedDimension += pieceDimensions[x2][0];
+              }
               sliceOriginX[x] = CoordsXY[0]->GetTuple1(reachedDimension);//((pieceDimensions[x2][0]-1) * pieceSpacings[x2][0]);
             }
           }
@@ -343,7 +350,14 @@ void vtkMEDVolumeSlicerNotInterpolated::ExecuteInformation()
             int reachedDimension = 0;
             for(int y2 = 0; y2 < y; y2++)
             {
-              reachedDimension += pieceDimensions[y2][1]-1;
+              if(pieceDimensions[y2][1]%2==0 || pieceDimensions[y2][1] == 1)
+              {
+                reachedDimension += pieceDimensions[y2][1]-1;
+              }
+              else
+              {
+                reachedDimension += pieceDimensions[y2][1];
+              }
               sliceOriginY[y] = CoordsXY[1]->GetTuple1(reachedDimension);//((pieceDimensions[y2][1]-1) * pieceSpacings[y2][1]);
             }
           }
