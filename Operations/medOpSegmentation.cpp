@@ -2836,10 +2836,8 @@ void medOpSegmentation::OnEvent(mafEventBase *maf_event)
             m_CurrentSliceIndex = low;
           }
 
-          if(m_CurrentSlicePlane = XY)
-          {
-            OnEvent(new mafEvent(this,ID_SLICE_SLIDER));
-          }
+          OnEvent(new mafEvent(this,ID_SLICE_SLIDER));
+
         }
         break;
       }
