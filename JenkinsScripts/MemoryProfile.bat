@@ -18,7 +18,7 @@ mkdir %HTMLResultsDirectory%
 echo  creating profiling results... 
 
 REM run the memory profile Visual Basic script
-.\JenkinsScripts\MemoryProfile.vbs
+.\source\JenkinsScripts\MemoryProfile.vbs
 echo.
 echo   profiling results created successfully!
 echo.
