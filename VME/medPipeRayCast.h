@@ -14,6 +14,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #define __medPipeRayCast_H__
 
 #include "mafPipe.h"
+#include "medVMEDefines.h"
 
 //----------------------------------------------------------------------------
 // forward refs :
@@ -39,7 +40,7 @@ class vtkMAFVolumeResample;
 It define different levels of density for bone-blood-muscle and set different
 colors for a realistic visualization 
 */
-class MAF_EXPORT medPipeRayCast : public mafPipe 
+class MED_VME_EXPORT medPipeRayCast : public mafPipe 
 {
 public:
   /** RTTI macro */
