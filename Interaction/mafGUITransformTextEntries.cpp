@@ -204,6 +204,7 @@ void mafGUITransformTextEntries::TextEntriesChanged()
   mafEventMacro(e2s);
 }
 
+#define TOLERANCE 1.0e-02
 //----------------------------------------------------------------------------
 void mafGUITransformTextEntries::SetAbsPose(mafMatrix* absPose, mafTimeStamp timeStamp)
 //----------------------------------------------------------------------------
@@ -218,7 +219,19 @@ void mafGUITransformTextEntries::SetAbsPose(mafMatrix* absPose, mafTimeStamp tim
   mafTransform::GetPosition(mflTr->GetMatrix(), m_Position);
   mafTransform::GetOrientation(mflTr->GetMatrix(), m_Orientation);
   mafTransform::GetScale(mflTr->GetMatrix(), m_Scaling);
-  
+
+  // bug #2754: Text boxes show a bad approxiamation of the inserted value 
+  // if the Position or/and Orientation is near to zero but not zero, 
+  // we approximate to zero the new Position or/and Orientation
+  for (int i=0; i<3; i++)
+  {
+    if (m_Position[i]!=0.0 && (m_Position[i] < TOLERANCE && m_Position[i] > - TOLERANCE))
+      m_Position[i] = 0.0;
+    
+    if (m_Orientation[i]!=0.0 && (m_Orientation[i] < TOLERANCE && m_Orientation[i] > - TOLERANCE))
+      m_Orientation[i] = 0.0;  
+  }
+
   if (m_TestMode == false)
   {
     assert(m_Gui);
