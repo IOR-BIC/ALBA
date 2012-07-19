@@ -22,8 +22,6 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 
 
 
-#define PENINSULA_CORNER_MAXIMUM_NUMBER_OF_PIXELS 1
-
 vtkCxxRevisionMacro(vtkMEDRayCastCleaner, "$Revision: 1.0 $");
 vtkStandardNewMacro(vtkMEDRayCastCleaner);
 

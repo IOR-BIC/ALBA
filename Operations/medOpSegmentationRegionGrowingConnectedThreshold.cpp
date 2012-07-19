@@ -4,7 +4,7 @@ Module:    $RCSfile: medOpSegmentationRegionGrowingConnectedThreshold.cpp,v $
 Language:  C++
 Date:      $Date: 2012-03-30 09:56:57 $
 Version:   $Revision: 1.1.2.11 $
-Authors:   Matteo Giacomoni, Alessandro Chiarini, Grazia Di Cosmo
+Authors:   Matteo Giacomoni, Alessandro Chiarini, Grazia Di Cosmo, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2008
 SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
@@ -42,12 +42,7 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #include "vtkImageToStructuredPoints.h"
 #include "medOpVolumeResample.h"
 #include "vtkRectilinearGrid.h"
-#include "vtkMAFContourVolumeMapper.h"
-#include "vtkMEDFillingHole.h"
-#include "vtkTransformPolyDataFilter.h"
-#include "vtkTransform.h"
-#include "vtkWindowedSincPolyDataFilter.h"
-#include "vtkPolyDataNormals.h"
+#include "vtkMEDVolumeToClosedSmoothSurface.h"
 
 
 #define ITK_IMAGE_DIMENSION 3
@@ -324,92 +319,22 @@ void medOpSegmentationRegionGrowingConnectedThreshold::Algorithm()
 
   m_VolumeOut->GetTagArray()->SetTag(mafTagItem("VOLUME_TYPE","BINARY"));
 
-  vtkMAFSmartPointer<vtkMAFContourVolumeMapper> contourVolMapper;
-
-  contourVolMapper->SetInput(m_VolumeOut->GetOutput()->GetVTKData());
-  contourVolMapper->SetContourValue(127.5);
-  contourVolMapper->Update();
-
-  vtkMAFSmartPointer<vtkMEDFillingHole> fillingHoleFilter;
-  fillingHoleFilter->SetInput(contourVolMapper->GetOutput());
-  fillingHoleFilter->SetFillAllHole();  
-  fillingHoleFilter->SetFlatFill();		
-  fillingHoleFilter->Update();
-
-  vtkMAFSmartPointer<vtkWindowedSincPolyDataFilter> smoothFilter;
-
-  double bounds[6];
-  double traslation[3];
-  double scale[3];
-  //Transforming Surface in [-1,1],[-1,1],[-1,1] 
-  //To improve the numerical stability of the solution 
-  fillingHoleFilter->GetOutput()->GetBounds(bounds);
-  GetTransformFactor(true,bounds,scale,traslation);
-  vtkMAFSmartPointer<vtkTransform> transform;
-  transform->PostMultiply();
-  transform->Translate(traslation);
-  transform->Scale(scale);
-  vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformFilter;
-  transformFilter->SetTransform(transform);
-  transformFilter->SetInput(fillingHoleFilter->GetOutput());
-  transformFilter->Update();
-
-  //Taubin Smooth filter apply
-  smoothFilter->SetInput(transformFilter->GetOutput());
-  smoothFilter->SetFeatureAngle(30.0);
-  smoothFilter->SetBoundarySmoothing(0);
-  smoothFilter->SetNonManifoldSmoothing(0);
-  smoothFilter->SetFeatureEdgeSmoothing(0);
-  smoothFilter->SetNumberOfIterations(10);
-  smoothFilter->SetPassBand(0.1);
-  smoothFilter->Update();
-  smoothFilter->GetOutput()->Update();
-
-  //Transforming smoothed output in [-1,1],[-1,1],[-1,1] 
-  //To remove filter scaling/traslation artifact
-  smoothFilter->GetOutput()->GetBounds(bounds);
-  GetTransformFactor(true,bounds,scale,traslation);
-  vtkMAFSmartPointer<vtkTransform> transform2;
-  transform2->PostMultiply();
-  transform2->Translate(traslation);
-  transform2->Scale(scale);
-  vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformFilter2;
-  transformFilter2->SetTransform(transform2);
-  transformFilter2->SetInput(smoothFilter->GetOutput());
-  transformFilter2->Update();
-
-
-  //inverse transform to align outputs to original bounds 
-  fillingHoleFilter->GetOutput()->GetBounds(bounds);
-  GetTransformFactor(false,bounds,scale,traslation);
-  vtkMAFSmartPointer<vtkTransform> transform3;
-  //in this case we need to scale first to obtain the surface 
-  //at the original size and then we translate it to the original pos
-  transform3->PostMultiply();
-  transform3->Scale(scale);
-  transform3->Translate(traslation);
-  vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformFilter3;
-  transformFilter3->SetTransform(transform3);
-  transformFilter3->SetInput(transformFilter2->GetOutput());
-  transformFilter3->Update();
-
-  //Flipping normals for better surface view 
-  vtkMAFSmartPointer<vtkPolyDataNormals> normalFilter;
-  normalFilter->SetInput(transformFilter3->GetOutput());
-  normalFilter->ComputeCellNormalsOn();
-  normalFilter->FlipNormalsOn(); 
-  normalFilter->SetFeatureAngle(30.0);
-  normalFilter->SplittingOff();
-  normalFilter->Update();
-
+  
+  vtkMAFSmartPointer<vtkMEDVolumeToClosedSmoothSurface> volToSurface;
+  volToSurface->SetInput(m_VolumeOut->GetOutput()->GetVTKData());
+  volToSurface->SetContourValue(127.5);
+  volToSurface->Update();
+  vtkPolyData *surface=volToSurface->GetOutput();
 
   //Generating Surface VME
   mafNEW(m_SurfaceOut);
   m_SurfaceOut->SetName("Connected Threshold Surface");
-  m_SurfaceOut->SetData(normalFilter->GetOutput(),mafVMEVolumeGray::SafeDownCast(m_ResampleInput)->GetTimeStamp());
+  m_SurfaceOut->SetData(surface,mafVMEVolumeGray::SafeDownCast(m_ResampleInput)->GetTimeStamp());
   m_SurfaceOut->ReparentTo(m_ResampleInput);
   m_SurfaceOut->Modified();
   m_SurfaceOut->Update();
+
+  vtkDEL(surface);
   
   //Volume output is a child of surface out
   //The result tree is Input
@@ -618,41 +543,3 @@ bool medOpSegmentationRegionGrowingConnectedThreshold::CheckSpacing()
   return true;
 }
 
-//----------------------------------------------------------------------------
-void medOpSegmentationRegionGrowingConnectedThreshold::GetTransformFactor( int toUnity,double *bounds, double *scale, double *traslation )
-//----------------------------------------------------------------------------
-{
-  double size[3];
-
-  //Getting size
-  size[0]=bounds[1]-bounds[0];
-  size[1]=bounds[3]-bounds[2];
-  size[2]=bounds[5]-bounds[4];
-
-  //Generating traslation and scale factors for obtain a [-1,1],[-1,1],[-1,1] cube
-  if (toUnity)
-  {
-    //Translation by -center 
-    traslation[0]=-(bounds[0]+size[0]/2.0);
-    traslation[1]=-(bounds[2]+size[1]/2.0);
-    traslation[2]=-(bounds[4]+size[2]/2.0);
-
-    //Scale by 2/size (2 is because a [-1,1] side has lenght 2)
-    scale[0]=2.0/size[0];
-    scale[1]=2.0/size[1];
-    scale[2]=2.0/size[2];
-  }
-  else 
-  {
-    //Translation by +center 
-    traslation[0]=bounds[0]+size[0]/2.0;
-    traslation[1]=bounds[2]+size[1]/2.0;
-    traslation[2]=bounds[4]+size[2]/2.0;
-
-    //scale by size/2
-    scale[0]=size[0]*0.5;
-    scale[1]=size[1]*0.5;
-    scale[2]=size[2]*0.5;
-  }
-
-}

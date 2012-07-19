@@ -108,6 +108,9 @@ SET(vtkMED_SRCS
   
   vtkMEDRayCastCleaner.cpp
   vtkMEDRayCastCleaner.h
+  
+  vtkMEDVolumeToClosedSmoothSurface.cxx
+  vtkMEDVolumeToClosedSmoothSurface.h
 )
 
 IF (MAF_USE_ITK)
