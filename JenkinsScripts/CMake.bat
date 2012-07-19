@@ -41,6 +41,7 @@ cd Build
 
 cmake.exe  ../Source  -G"Visual Studio 10" ^
   -DBUILD_TESTING:BOOL=ON ^
+  -DBUILD_EXAMPLES:BOOL=OFF ^
   -DBUILD_BASE_TESTING:BOOL=ON ^
   -DDART_TESTING_TIMEOUT:STRING=120 ^
   -DCPPUNIT_INCLUDE_DIR:PATH="C:/cppunit-1.12.0_VS2010_BUILD/cppunit-1.12.0/include" ^
