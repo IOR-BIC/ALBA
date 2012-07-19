@@ -39,14 +39,13 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #include "vtkMEDFixTopology.h"
 #include "vtkImageCast.h"
 #include "vtkImageData.h"
-#include "vtkMAFContourVolumeMapper.h"
+#include "vtkMEDVolumeToClosedSmoothSurface.h"
 #include "vtkMAFSmartPointer.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataConnectivityFilter.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkSmoothPolyDataFilter.h"
-#include "vtkMEDFillingHole.h"
 #include "vtkTriangleFilter.h"
 #include "vtkUnsignedCharArray.h"
 
@@ -94,7 +93,7 @@ mafOp(label)
   m_OriginalData = NULL;
   m_SurfaceData = NULL;
 
-  m_ContourVolumeMapper = NULL;
+  m_SurfaceExtractor = NULL;
 
   m_ScalarRange[0] = m_ScalarRange[1] = 0.0;
   m_VolumeSpacing[0] = m_VolumeSpacing[1] = m_VolumeSpacing[2] = 0;
@@ -111,7 +110,7 @@ medOpExtractGeometry::~medOpExtractGeometry()
   mafDEL(m_SurfaceOutput);
   if(m_ResampledVolume)
     mafDEL(m_ResampledVolume);
-  vtkDEL(m_ContourVolumeMapper);
+  vtkDEL(m_SurfaceExtractor);
 }
 //----------------------------------------------------------------------------
 bool medOpExtractGeometry::Accept(mafNode *node)
@@ -608,12 +607,15 @@ int medOpExtractGeometry::GenerateIsosurface()
 
   // VTKmafContourVolumeMapper
 
-  m_ContourVolumeMapper = vtkMAFContourVolumeMapper::New();
-  m_ContourVolumeMapper->SetInput(m_OriginalData);
-  m_ContourVolumeMapper->AutoLODRenderOn();
-  m_ContourVolumeMapper->AutoLODCreateOn();
+  m_SurfaceExtractor = vtkMEDVolumeToClosedSmoothSurface::New();
+  m_SurfaceExtractor->SetInput(m_OriginalData);
+  m_SurfaceExtractor->AutoLODRenderOn();
+  m_SurfaceExtractor->AutoLODCreateOn();
 
-  m_ContourVolumeMapper->SetEnableContourAnalysis(0);
+  m_SurfaceExtractor->SetEnableContourAnalysis(0);
+
+  m_SurfaceExtractor->SetFillHoles(m_ProcessingType==1);
+  
 
   // IMPORTANT, extract the isosurface from m_ContourVolumeMapper in this way
   // and then call surface->Delete() when the VME is created
@@ -621,16 +623,17 @@ int medOpExtractGeometry::GenerateIsosurface()
   if(m_AutoSurfaceContourValue<0)
   {
     float value = 0.5f * (m_ScalarRange[0] + m_ScalarRange[1]);
-    while (value < m_ScalarRange[1] && m_ContourVolumeMapper->EstimateRelevantVolume(value) > 0.3f)
+    while (value < m_ScalarRange[1] && m_SurfaceExtractor->EstimateRelevantVolume(value) > 0.3f)
       value += 0.05f * (m_ScalarRange[1] + m_ScalarRange[0]) + 1.f;
 
     m_SurfaceContourValue = value;
 
   }
-  m_ContourVolumeMapper->SetContourValue(m_SurfaceContourValue);
-  m_ContourVolumeMapper->Update();
+  m_SurfaceExtractor->SetContourValue(m_SurfaceContourValue);
+
+  m_SurfaceExtractor->Update();
   
-  m_SurfaceData = m_ContourVolumeMapper->GetOutput();
+  m_SurfaceData = m_SurfaceExtractor->GetOutput();
 
   if(m_Connectivity)
     SurfaceConnectivity();
@@ -645,17 +648,7 @@ int medOpExtractGeometry::GenerateIsosurface()
     fixTopologyFilter->Update();
     m_SurfaceData->DeepCopy(fixTopologyFilter->GetOutput());
   }
-  else if (m_ProcessingType==1)
-  {
-    vtkMEDFillingHole *fillingHoleFilter;
-    vtkNEW(fillingHoleFilter);
-    fillingHoleFilter->SetInput(m_ContourVolumeMapper->GetOutput());
-    fillingHoleFilter->SetFillAllHole();  
-    fillingHoleFilter->SetFlatFill();		
-    fillingHoleFilter->Update();
-    m_SurfaceData->DeepCopy(fillingHoleFilter->GetOutput());
-  }
-
+  
   
 
   //////////////////////////////////////////////////////////////////////////

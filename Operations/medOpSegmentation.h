@@ -603,10 +603,6 @@ protected:
   /** Determine if the specified vme is an output of the input volume */
   bool IsOutput(mafNode* vme);
 
-  /** Calculates the scale/traslation to obtain a cube in [-1,1], 
-      If toUnity is set to false returns the inverse factors*/
-  void GetTransformFactor(int toUnity,double *bounds, double *scale, double *traslation);
-
   /** flood fill algorithm */
   void FloodFill(vtkIdType seed);
 
