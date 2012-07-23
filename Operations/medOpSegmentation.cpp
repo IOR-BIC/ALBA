@@ -1729,7 +1729,7 @@ void medOpSegmentation::CreateRefinementGui()
   m_RefinementRegionsSize = 1;
   //currentGui->Integer(ID_REFINEMENT_REGIONS_SIZE, mafString("Size"), &m_RefinementRegionsSize, 0, MAXINT, mafString("Max size of islands/holes to be taken into consideration"));
 
-  int stepsNumber = min(min(m_VolumeDimensions[0],m_VolumeDimensions[1]),m_VolumeDimensions[2]);
+  int stepsNumber = 10;
   int w_id = currentGui->GetWidgetId(ID_MANUAL_REFINEMENT_REGIONS_SIZE);
 
   int text_w   = 45*0.8;
