@@ -1083,7 +1083,7 @@ void medOpSegmentation::FloodFill(vtkIdType seed)
     m_View->VmeShow(m_ManualVolumeSlice,true);
 
     CreateRealDrawnImage();
-    m_View->CameraUpdate();
+    OnEventUpdateManualSlice();
   }
   else
   {
@@ -1130,10 +1130,11 @@ void medOpSegmentation::FloodFill(vtkIdType seed)
 
     m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->SetScalars(output->GetPointData()->GetScalars());
     m_ManualVolumeSlice->Update();
+
     m_View->VmeShow(m_ManualVolumeSlice,true);
 
     CreateRealDrawnImage();
-    m_View->CameraUpdate();
+    OnEventUpdateManualSlice();
 
     input->Delete();
     output->Delete();
@@ -1577,8 +1578,8 @@ void medOpSegmentation::CreateAutoSegmentationGui()
   currentGui->Label(_("Threshold type:"),true);
   currentGui->Radio(ID_AUTOMATIC_GLOBAL_THRESHOLD,"",&m_AutomaticGlobalThreshold,2,choices);
 
-  currentGui->Label("");
-  currentGui->Label("Global range:",true);
+  /*currentGui->Label("");*/
+  /*currentGui->Label("Global range:",true);*/
 //   currentGui->Button(ID_AUTOMATIC_GLOBAL_PREVIEW,_("preview"));
 //   currentGui->Enable(ID_AUTOMATIC_GLOBAL_PREVIEW,m_AutomaticGlobalThreshold==GLOBAL);
   
