@@ -3006,7 +3006,7 @@ void medOpSegmentation::OnAutomaticAddRange()
   UpdateThresholdLabel();
   UpdateThresholdRealTimePreview();
 
-  m_View->CameraUpdate();
+  OnEventUpdateThresholdSlice();
   //OnAutomaticPreview();
 }
 
@@ -3060,8 +3060,8 @@ void medOpSegmentation::OnAutomaticRemoveRange()
 
   UpdateThresholdLabel();
   UpdateThresholdRealTimePreview();
-  m_View->CameraUpdate();
-  OnAutomaticPreview();
+  OnEventUpdateThresholdSlice();
+  //OnAutomaticPreview();
 }
 
 //------------------------------------------------------------------------
@@ -5113,7 +5113,7 @@ void medOpSegmentation::UpdateThresholdRealTimePreview()
     tVol->SetAutomaticSegmentationThresholdModality(medVMESegmentationVolume::RANGE);
     for (int i=0;i<m_AutomaticRanges.size();i++)
     {
-      if(m_CurrentSliceIndex >= m_AutomaticRanges[i].m_StartSlice && m_CurrentSliceIndex <= m_AutomaticRanges[i].m_EndSlice)
+      if(m_CurrentSliceIndex >= m_AutomaticRanges[i].m_StartSlice + 1 && m_CurrentSliceIndex <= m_AutomaticRanges[i].m_EndSlice + 1)
         result = tVol->AddRange(0,1,m_AutomaticRanges[i].m_ThresholdValue,m_AutomaticRanges[i].m_UpperThresholdValue);
       
 //       if (result == MAF_ERROR)
