@@ -1010,7 +1010,7 @@ void medOpSegmentation::FloodFill(vtkIdType seed)
     m_View->VmeShow(m_ManualVolumeSlice,true);
 
     CreateRealDrawnImage();
-    m_View->CameraUpdate();
+    OnEventUpdateManualSlice();
   }
   else
   {
@@ -1057,10 +1057,11 @@ void medOpSegmentation::FloodFill(vtkIdType seed)
 
     m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->SetScalars(output->GetPointData()->GetScalars());
     m_ManualVolumeSlice->Update();
+
     m_View->VmeShow(m_ManualVolumeSlice,true);
 
     CreateRealDrawnImage();
-    m_View->CameraUpdate();
+    OnEventUpdateManualSlice();
 
     input->Delete();
     output->Delete();
@@ -1504,8 +1505,8 @@ void medOpSegmentation::CreateAutoSegmentationGui()
   currentGui->Label(_("Threshold type:"),true);
   currentGui->Radio(ID_AUTOMATIC_GLOBAL_THRESHOLD,"",&m_AutomaticGlobalThreshold,2,choices);
 
-  currentGui->Label("");
-  currentGui->Label("Global range:",true);
+  /*currentGui->Label("");*/
+  /*currentGui->Label("Global range:",true);*/
 //   currentGui->Button(ID_AUTOMATIC_GLOBAL_PREVIEW,_("preview"));
 //   currentGui->Enable(ID_AUTOMATIC_GLOBAL_PREVIEW,m_AutomaticGlobalThreshold==GLOBAL);
   
@@ -2932,7 +2933,7 @@ void medOpSegmentation::OnAutomaticAddRange()
   UpdateThresholdLabel();
   UpdateThresholdRealTimePreview();
 
-  m_View->CameraUpdate();
+  OnEventUpdateThresholdSlice();
   //OnAutomaticPreview();
 }
 
@@ -2986,8 +2987,8 @@ void medOpSegmentation::OnAutomaticRemoveRange()
 
   UpdateThresholdLabel();
   UpdateThresholdRealTimePreview();
-  m_View->CameraUpdate();
-  OnAutomaticPreview();
+  OnEventUpdateThresholdSlice();
+  //OnAutomaticPreview();
 }
 
 //------------------------------------------------------------------------
@@ -3244,8 +3245,10 @@ void medOpSegmentation::OnAutomaticSegmentationEvent(mafEvent *e)
   case ID_AUTOMATIC_GLOBAL_THRESHOLD:
     {
       OnChangeThresholdType();
-      if (m_AutomaticRanges.size()>0)
-        OnAutomaticPreview();
+//       if (m_AutomaticRanges.size()>0 && m_AutomaticGlobalThreshold==RANGE)
+//         OnAutomaticPreview();
+      UpdateThresholdRealTimePreview();
+      OnEventUpdateThresholdSlice();
       m_GuiDialog->Enable(ID_BUTTON_NEXT,(m_AutomaticGlobalThreshold==RANGE && m_AutomaticRanges.size()>0)||(m_AutomaticGlobalThreshold == FALSE));
     }
     break;
@@ -5037,7 +5040,7 @@ void medOpSegmentation::UpdateThresholdRealTimePreview()
     tVol->SetAutomaticSegmentationThresholdModality(medVMESegmentationVolume::RANGE);
     for (int i=0;i<m_AutomaticRanges.size();i++)
     {
-      if(m_CurrentSliceIndex >= m_AutomaticRanges[i].m_StartSlice && m_CurrentSliceIndex <= m_AutomaticRanges[i].m_EndSlice)
+      if(m_CurrentSliceIndex >= m_AutomaticRanges[i].m_StartSlice + 1 && m_CurrentSliceIndex <= m_AutomaticRanges[i].m_EndSlice + 1)
         result = tVol->AddRange(0,1,m_AutomaticRanges[i].m_ThresholdValue,m_AutomaticRanges[i].m_UpperThresholdValue);
       
 //       if (result == MAF_ERROR)
@@ -5053,6 +5056,7 @@ void medOpSegmentation::UpdateThresholdRealTimePreview()
     tVol->SetAutomaticSegmentationThresholdModality(medVMESegmentationVolume::GLOBAL);
     tVol->SetAutomaticSegmentationGlobalThreshold(m_AutomaticThreshold,m_AutomaticUpperThreshold);
   }
+
 
   tVol->GetOutput()->Update();
   tVol->Update();
