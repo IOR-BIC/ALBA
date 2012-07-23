@@ -4,7 +4,7 @@ Module:    $RCSfile: medOpSegmentationRegionGrowingConnectedThreshold.h,v $
 Language:  C++
 Date:      $Date: 2012-04-06 09:21:34 $
 Version:   $Revision: 1.1.2.10 $
-Authors:   Matteo Giacomoni, Alessandro Chiarini, Grazia Di Cosmo
+Authors:   Matteo Giacomoni, Alessandro Chiarini, Grazia Di Cosmo, Gianluigi Crimi
 ==========================================================================
 Copyright (c) 2008
 SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
@@ -106,10 +106,7 @@ protected:
   /** Check the spacing and if is too little and could create some memory problems return false */
   bool CheckSpacing();
 
-  /** Caluclates the scale/traslation to obtain a cube in [-1,1], 
-      If toUnity is set to false returns the inverse factors*/
-  void GetTransformFactor(int toUnity,double *bounds, double *scale, double *traslation);
-
+  
   int m_Lower;
   int m_Upper;
   int m_Replace;

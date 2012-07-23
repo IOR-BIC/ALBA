@@ -108,6 +108,9 @@ SET(vtkMED_SRCS
   
   vtkMEDRayCastCleaner.cpp
   vtkMEDRayCastCleaner.h
+  
+  vtkMEDVolumeToClosedSmoothSurface.cxx
+  vtkMEDVolumeToClosedSmoothSurface.h
 )
 
 IF (MAF_USE_ITK)
@@ -178,6 +181,7 @@ IF(MED_BUILD_MEDDLL)
   SET(vtkMED_LIBS
     ${vtkMED_LIBS}
     GPUAPI
+	vtkMAF
     )
   ENDIF(WIN32)
   SET(BUILD_SHARED_LIBS 1)
