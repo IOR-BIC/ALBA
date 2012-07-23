@@ -926,22 +926,22 @@ void medOpSegmentation::FloodFill(vtkIdType seed)
 {
   UndoBrushPreview();
 
-  UndoRedoState urs;
-  urs.dataArray = vtkUnsignedCharArray::New();
-  urs.dataArray->DeepCopy( m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->GetScalars() );
-  urs.dataArray->SetName("SCALARS");
-  urs.plane=m_CurrentSlicePlane;
-  urs.slice=m_CurrentSliceIndex;
-  m_ManualUndoList.push_back( urs );
-  //On edit a new branch of redo-list starts, i need to clear the redo stack
-  ResetManualRedoList();
-
-  m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_REDO, false);
-  m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_UNDO, m_ManualUndoList.size()>0);
-
   int center = seed;
   if(m_GlobalFloodFill == TRUE)
   {
+    UndoRedoState urs;
+    urs.dataArray = vtkUnsignedCharArray::New();
+    urs.dataArray->DeepCopy( m_ManualVolumeMask->GetOutput()->GetVTKData()->GetPointData()->GetScalars() );
+    urs.dataArray->SetName("SCALARS");
+    urs.plane=-1; // indicate that the undo redo data is global and must be performed on manual volume mask (not slice)
+    urs.slice=-1; // indicate that the undo redo data is global and must be performed on manual volume mask (not slice)
+    m_ManualUndoList.push_back( urs );
+    //On edit a new branch of redo-list starts, i need to clear the redo stack
+    ResetManualRedoList();
+
+    m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_REDO, false);
+    m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_UNDO, m_ManualUndoList.size()>0);
+
     wxBusyCursor wait_cursor;
     wxBusyInfo wait(_("Wait! The algorithm could take long time!"));
 
@@ -1014,6 +1014,18 @@ void medOpSegmentation::FloodFill(vtkIdType seed)
   }
   else
   {
+    UndoRedoState urs;
+    urs.dataArray = vtkUnsignedCharArray::New();
+    urs.dataArray->DeepCopy( m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->GetScalars() );
+    urs.dataArray->SetName("SCALARS");
+    urs.plane=m_CurrentSlicePlane;
+    urs.slice=m_CurrentSliceIndex;
+    m_ManualUndoList.push_back( urs );
+    //On edit a new branch of redo-list starts, i need to clear the redo stack
+    ResetManualRedoList();
+
+    m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_REDO, false);
+    m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_UNDO, m_ManualUndoList.size()>0);
     vtkStructuredPoints *input = vtkStructuredPoints::New();
     double dimensions[3];
 
@@ -3296,49 +3308,63 @@ void medOpSegmentation::OnAutomaticSegmentationEvent(mafEvent *e)
 void medOpSegmentation::ReloadUndoRedoState(vtkDataSet *dataSet,UndoRedoState state)
 //------------------------------------------------------------------------
 { 
-  if (state.plane!=m_CurrentSlicePlane || state.slice!=m_CurrentSliceIndex)
+  if(state.plane==-1 && state.slice == -1)
   {
+    m_ManualVolumeMask->GetOutput()->GetVTKData()->GetPointData()->SetScalars(state.dataArray);
+    m_ManualVolumeMask->Update();
 
-    m_CurrentSlicePlane=state.plane;
-    m_CurrentSliceIndex=state.slice;
-    //m_View->SetSliceAxis(m_CurrentSlicePlane);
     UpdateSlice();
-    m_View->CameraUpdate();
-    m_GuiDialog->Update();
-    InitGui();
-    m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
+    m_View->VmeShow(m_ManualVolumeSlice,true);
+
+    CreateRealDrawnImage();
+    OnEventUpdateManualSlice();
   }
-
-  double focalPoint[3];
-  double scaleFactor;
-  GetCameraAttribute(focalPoint, &scaleFactor);
-  double bounds[4];
-  GetVisualizedBounds(focalPoint, scaleFactor, bounds);
-
-  vtkImageData* undoRedoData = vtkImageData::New();
-  undoRedoData->DeepCopy(dataSet);
-  undoRedoData->Update();
-
-  for(int i = 0; i < undoRedoData->GetPointData()->GetScalars()->GetNumberOfTuples(); i++)
+  else
   {
-    undoRedoData->GetPointData()->GetScalars()->SetTuple1(i,(unsigned char)abs(state.dataArray->GetTuple1(i) - dataSet->GetPointData()->GetScalars()->GetTuple1(i)));
-  }
-  undoRedoData->Update();
+    if (state.plane!=m_CurrentSlicePlane || state.slice!=m_CurrentSliceIndex)
+    {
 
-  dataSet->GetPointData()->SetScalars(state.dataArray);
-  //Show changes
-  m_ManualVolumeSlice->Update();
-  m_View->VmeShow(m_ManualVolumeSlice, true);
+      m_CurrentSlicePlane=state.plane;
+      m_CurrentSliceIndex=state.slice;
+      //m_View->SetSliceAxis(m_CurrentSlicePlane);
+      UpdateSlice();
+      m_View->CameraUpdate();
+      m_GuiDialog->Update();
+      InitGui();
+      m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
+    }
 
-//   if(ResetZoom(undoRedoData,bounds))
-//   {
-//     m_View->SetSliceAxis(m_CurrentSlicePlane);
-//   }
+    double focalPoint[3];
+    double scaleFactor;
+    GetCameraAttribute(focalPoint, &scaleFactor);
+    double bounds[4];
+    GetVisualizedBounds(focalPoint, scaleFactor, bounds);
 
-  //m_View->CameraUpdate();
-  CreateRealDrawnImage();
-  OnEventUpdateManualSlice();
-  undoRedoData->Delete();
+    vtkImageData* undoRedoData = vtkImageData::New();
+    undoRedoData->DeepCopy(dataSet);
+    undoRedoData->Update();
+
+    for(int i = 0; i < undoRedoData->GetPointData()->GetScalars()->GetNumberOfTuples(); i++)
+    {
+      undoRedoData->GetPointData()->GetScalars()->SetTuple1(i,(unsigned char)abs(state.dataArray->GetTuple1(i) - dataSet->GetPointData()->GetScalars()->GetTuple1(i)));
+    }
+    undoRedoData->Update();
+
+    dataSet->GetPointData()->SetScalars(state.dataArray);
+    //Show changes
+    m_ManualVolumeSlice->Update();
+    m_View->VmeShow(m_ManualVolumeSlice, true);
+
+    //   if(ResetZoom(undoRedoData,bounds))
+    //   {
+    //     m_View->SetSliceAxis(m_CurrentSlicePlane);
+    //   }
+
+    //m_View->CameraUpdate();
+    CreateRealDrawnImage();
+    OnEventUpdateManualSlice();
+    undoRedoData->Delete();
+  } 
 }
 
 //------------------------------------------------------------------------
@@ -3432,14 +3458,20 @@ void medOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
 
         //if i changed slice/plane from last edit the redo information
         //are in the plane-slice of last edit (where i saved last undo info).
-        if (m_CurrentSlicePlane!=m_ManualUndoList[numOfChanges-1].plane ||
-            m_CurrentSliceIndex != m_ManualUndoList[numOfChanges-1].slice)
+        if ((m_CurrentSlicePlane!=m_ManualUndoList[numOfChanges-1].plane ||
+            m_CurrentSliceIndex != m_ManualUndoList[numOfChanges-1].slice) &&
+            m_ManualUndoList[numOfChanges-1].plane != -1 &&
+            m_ManualUndoList[numOfChanges-1].slice != -1)
         {
           m_CurrentSlicePlane=m_ManualUndoList[numOfChanges-1].plane;
           m_CurrentSliceIndex=m_ManualUndoList[numOfChanges-1].slice;
           UpdateSlice();
           m_View->CameraUpdate();
           m_GuiDialog->Update();
+        }
+        if(m_ManualUndoList[numOfChanges-1].plane == -1 && m_ManualUndoList[numOfChanges-1].slice == -1)
+        {
+          dataSet = m_ManualVolumeMask->GetOutput()->GetVTKData();
         }
         
         //Add current state to Redo-list
@@ -3448,8 +3480,8 @@ void medOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
         urs.dataArray = vtkUnsignedCharArray::New();
         urs.dataArray->DeepCopy( dataSet->GetPointData()->GetScalars() );
         urs.dataArray->SetName("SCALARS");
-        urs.plane=m_CurrentSlicePlane;
-        urs.slice=m_CurrentSliceIndex;
+        urs.plane=m_ManualUndoList[numOfChanges-1].plane;
+        urs.slice=m_ManualUndoList[numOfChanges-1].slice;
         m_ManualRedoList.push_back(urs);
 
         //Update current slice with Undo-data
@@ -3476,8 +3508,10 @@ void medOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
 
         //if i changed slice/plane from last edit the redo information
         //are in the plane-slice of last edit (where i saved last undo info).
-        if (m_CurrentSlicePlane!=m_ManualRedoList[numOfChanges-1].plane ||
-          m_CurrentSliceIndex != m_ManualRedoList[numOfChanges-1].slice)
+        if ((m_CurrentSlicePlane!=m_ManualRedoList[numOfChanges-1].plane ||
+          m_CurrentSliceIndex != m_ManualRedoList[numOfChanges-1].slice) &&
+          m_ManualRedoList[numOfChanges-1].plane != -1 &&
+          m_ManualRedoList[numOfChanges-1].slice != -1)
         {
           m_CurrentSlicePlane=m_ManualRedoList[numOfChanges-1].plane;
           m_CurrentSliceIndex=m_ManualRedoList[numOfChanges-1].slice;
@@ -3485,7 +3519,10 @@ void medOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
           m_View->CameraUpdate();
           m_GuiDialog->Update();
         }
-
+        if(m_ManualRedoList[numOfChanges-1].plane == -1 && m_ManualRedoList[numOfChanges-1].slice == -1)
+        {
+          dataSet = m_ManualVolumeMask->GetOutput()->GetVTKData();
+        }
 
         //Add current state to Undo-list
         UndoBrushPreview();
@@ -3493,8 +3530,8 @@ void medOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
         urs.dataArray = vtkUnsignedCharArray::New();
         urs.dataArray->DeepCopy( dataSet->GetPointData()->GetScalars() );
         urs.dataArray->SetName("SCALARS");
-        urs.plane=m_CurrentSlicePlane;
-        urs.slice=m_CurrentSliceIndex;
+        urs.plane=m_ManualRedoList[numOfChanges-1].plane;
+        urs.slice=m_ManualRedoList[numOfChanges-1].slice;
         m_ManualUndoList.push_back(urs);
 
         //Update current slice with Redo-data
