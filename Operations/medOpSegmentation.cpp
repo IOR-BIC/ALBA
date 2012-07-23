@@ -547,11 +547,16 @@ void medOpSegmentation::OpUndo()
     m_OutputVolume->ReparentTo(NULL);
     mafDEL(m_OutputVolume);
   }
-  if (m_SegmentatedVolume)
+  if (m_OutputSurface)
   {
-    m_SegmentatedVolume->ReparentTo(NULL);
-    mafDEL(m_SegmentatedVolume);
+    m_OutputSurface->ReparentTo(NULL);
+    mafDEL(m_OutputVolume);
   }
+//   if (m_SegmentatedVolume)
+//   {
+//     m_SegmentatedVolume->ReparentTo(NULL);
+//     mafDEL(m_SegmentatedVolume);
+//   }
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
