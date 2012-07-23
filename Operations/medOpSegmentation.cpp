@@ -3318,8 +3318,10 @@ void medOpSegmentation::OnAutomaticSegmentationEvent(mafEvent *e)
   case ID_AUTOMATIC_GLOBAL_THRESHOLD:
     {
       OnChangeThresholdType();
-      if (m_AutomaticRanges.size()>0)
-        OnAutomaticPreview();
+//       if (m_AutomaticRanges.size()>0 && m_AutomaticGlobalThreshold==RANGE)
+//         OnAutomaticPreview();
+      UpdateThresholdRealTimePreview();
+      OnEventUpdateThresholdSlice();
       m_GuiDialog->Enable(ID_BUTTON_NEXT,(m_AutomaticGlobalThreshold==RANGE && m_AutomaticRanges.size()>0)||(m_AutomaticGlobalThreshold == FALSE));
     }
     break;
@@ -5127,6 +5129,7 @@ void medOpSegmentation::UpdateThresholdRealTimePreview()
     tVol->SetAutomaticSegmentationThresholdModality(medVMESegmentationVolume::GLOBAL);
     tVol->SetAutomaticSegmentationGlobalThreshold(m_AutomaticThreshold,m_AutomaticUpperThreshold);
   }
+
 
   tVol->GetOutput()->Update();
   tVol->Update();
