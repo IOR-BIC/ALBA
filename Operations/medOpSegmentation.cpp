@@ -419,7 +419,18 @@ void medOpSegmentation::OpDo()
 //     }
 
   //Eliminate previous outputs
-  DeleteOutputs(m_Input->GetRoot());
+  //DeleteOutputs(m_Input->GetRoot());
+  //Replace the loaded output
+  if(m_LoadedVolume != NULL)
+  {
+    mafNode *previousSurface = m_LoadedVolume->GetParent();
+    m_LoadedVolume->ReparentTo(NULL);
+    m_LoadedVolume = NULL;
+
+    if(previousSurface != NULL)
+      previousSurface->ReparentTo(NULL);
+  }
+
   m_OutputVolume->SetName(wxString::Format("Segmentation Output (%s)",m_Volume->GetName()).c_str());
   lutPreset(4,m_OutputVolume->GetMaterial()->m_ColorLut);
   m_OutputVolume->GetMaterial()->m_ColorLut->SetTableRange(0,255);
@@ -440,7 +451,7 @@ void medOpSegmentation::OpDo()
     m_OutputVolume->GetTagArray()->SetTag(tag_Nature);
   }
 
-  m_OutputVolume->ReparentTo(m_Volume);
+  //m_OutputVolume->ReparentTo(m_Volume);
    
   m_OutputVolume->GetTagArray()->SetTag(mafTagItem("VOLUME_TYPE","BINARY"));
 
@@ -844,8 +855,14 @@ void medOpSegmentation::DeleteOpDialog()
   }
   if(m_LoadedVolume)
   {
-    m_View->VmeShow(m_LoadedVolume,false);
-    m_View->VmeRemove(m_LoadedVolume);
+    mafNode *parent = m_LoadedVolume;
+
+    while(parent != m_Volume)
+    {
+      m_View->VmeShow(parent,false);
+      m_View->VmeRemove(parent);
+      parent = parent->GetParent();
+    }
   }
 
   //m_Volume->ReparentTo(m_OldVolumeParent);
