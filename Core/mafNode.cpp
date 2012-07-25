@@ -876,7 +876,7 @@ void mafNode::RemoveLink(const char *name)
   mafLinksMap::iterator it=m_Links.find(mafCString(name));
   if (it!=m_Links.end())
   {
-    assert(it->second.m_Node);
+    // assert(it->second.m_Node);
     // detach as observer from the linked node
 	if (it->second.m_Node != NULL)
 	{
@@ -1147,7 +1147,10 @@ int mafNode::InternalRestore(mafStorageElement *node)
           mafID link_node_id, link_node_subid;
           links_vector[i]->GetAttributeAsInteger("NodeId",link_node_id);
           links_vector[i]->GetAttributeAsInteger("NodeSubId",link_node_subid);
-          m_Links[link_name] = mmuNodeLink(link_node_id,NULL,link_node_subid);
+          if(link_node_id != -1 && link_node_subid != -1)
+          {
+            m_Links[link_name] = mmuNodeLink(link_node_id,NULL,link_node_subid);
+          }
         }
 
         // restore children
