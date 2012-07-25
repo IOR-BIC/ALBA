@@ -72,6 +72,7 @@ private:
   vtkImageData *BorderVolumeID;
   vtkRectilinearGrid *BorderVolumeRG;
   double InputBounds[6];
+  double VoxelShift[6];
 
   /** Default constructor */
   vtkMEDVolumeToClosedSmoothSurface();
