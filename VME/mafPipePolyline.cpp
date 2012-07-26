@@ -24,7 +24,6 @@
 //----------------------------------------------------------------------------
 
 #include "mafPipePolyline.h"
-#include "mafPipePolyline.h"
 #include "mafDecl.h"
 #include "mafSceneNode.h"
 #include "mafGUI.h"
@@ -130,6 +129,11 @@ void mafPipePolyline::Create(mafSceneNode *n)
 
 	InitializeFromTag();
 
+  double sr[2] = {0,1};
+  vtkDataArray *scalarArray = data->GetPointData()->GetScalars();
+  if(scalarArray)
+    scalarArray->GetRange(sr);
+
 	vtkNEW(m_Sphere);
 	m_Sphere->SetRadius(m_SphereRadius);
 	m_Sphere->SetPhiResolution(m_SphereResolution);
@@ -141,6 +145,7 @@ void mafPipePolyline::Create(mafSceneNode *n)
 	//m_Glyph->NomalizeScalingOn();
 	//m_Glyph->SetScaleModeToScaleByScalar();
   m_Glyph->SetScaleModeToDataScalingOff();
+  m_Glyph->SetRange(sr);
 
 
   if(m_SplineMode && m_Representation != GLYPH && m_Representation != GLYPH_UNCONNECTED)
@@ -208,18 +213,13 @@ void mafPipePolyline::Create(mafSceneNode *n)
 		m_Mapper->ImmediateModeRenderingOff();
 
 	vtkNEW(m_Table);
-  double sr[2] = {0,1};
-  vtkDataArray *scalarArray = data->GetPointData()->GetScalars();
-  if(scalarArray)
-	  scalarArray->GetRange(sr);
 
 	m_Table->AddRGBPoint(sr[0],0.0,0.0,1.0);
 	m_Table->AddRGBPoint((sr[0]+sr[1])/2,0.0,1.0,0.0);;
 	m_Table->AddRGBPoint(sr[1],1.0,0.0,0.0);
 	m_Table->Build();
 
-	m_Glyph->SetRange(sr);
-	m_Glyph->Update();
+// 	m_Glyph->Update();
 
 	m_Actor = vtkActor::New();
 	m_Actor->SetMapper(m_Mapper);
