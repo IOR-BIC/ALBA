@@ -1147,7 +1147,7 @@ int mafNode::InternalRestore(mafStorageElement *node)
           mafID link_node_id, link_node_subid;
           links_vector[i]->GetAttributeAsInteger("NodeId",link_node_id);
           links_vector[i]->GetAttributeAsInteger("NodeSubId",link_node_subid);
-          if(link_node_id != -1 && link_node_subid != -1)
+          if(!(link_node_id == -1 && link_node_subid == -1))
           {
             m_Links[link_name] = mmuNodeLink(link_node_id,NULL,link_node_subid);
           }
