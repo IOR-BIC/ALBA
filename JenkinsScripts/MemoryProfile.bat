@@ -20,7 +20,8 @@ echo  creating profiling results...
 REM run the memory profile Visual Basic script
 .\source\JenkinsScripts\MemoryProfile.vbs
 
-ren .\build\bin\Debug\MemoryAllocation\XML\MemoryAllocationLog.txt .\build\bin\Debug\MemoryAllocation\XML\%1
+set newFileName=.\build\bin\Debug\MemoryAllocation\XML\%1%
+ren .\build\bin\Debug\MemoryAllocation\XML\MemoryAllocationLog.txt %newFileName%
 echo.
 echo   profiling results created successfully!
 echo.
