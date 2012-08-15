@@ -83,6 +83,9 @@ public:
   /** enable or disable pipe update after inputs matrix changed */
   void EnableUpdate(bool enable){m_EnablePipeUpdate = enable;};
 
+  /** set color for not collision cells */
+  void SetColorForNotCollisionSurface(double rgb[3]);
+
 protected:
 
   /** IDs for the GUI */
@@ -96,6 +99,7 @@ protected:
   /** Creation of the gui that will be attached to visual prop panel.*/
   /*virtual*/ mafGUI  *CreateGui();
 
+  double m_ColorNotCollisionCells[3];
   bool *m_CellToExlude;
   std::vector<vtkActor *> m_SurfacebToCollideActor;
   std::vector<vtkPolyDataMapper *> m_SurfaceToCollideMapper;
