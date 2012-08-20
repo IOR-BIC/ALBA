@@ -770,6 +770,8 @@ void medOpSegmentation::CreateOpDialog()
   m_OkButton->SetListener(this);
   m_OkButton->SetValidator(mafGUIValidator(this,ID_OK,m_OkButton));
 
+  m_OkButton->Enable(m_CurrentOperation != LOAD_SEGMENTATION);
+ 
   m_CancelButton = new mafGUIButton(m_Dialog,ID_CANCEL,_("Cancel"),defPos);
   m_CancelButton->SetListener(this);
   m_CancelButton->SetValidator(mafGUIValidator(this,ID_CANCEL,m_CancelButton));
@@ -2218,6 +2220,8 @@ void medOpSegmentation::OnNextStep()
     }
   }
   m_CurrentOperation++;
+  m_OkButton->Enable(m_CurrentOperation != LOAD_SEGMENTATION);
+  m_Dialog->Update();
 
   int oldSliceIndex = m_CurrentSliceIndex;
 
@@ -2294,9 +2298,10 @@ void medOpSegmentation::OnPreviousStep()
       return;
     }
   }
-    
 
   m_CurrentOperation--;
+  m_OkButton->Enable(m_CurrentOperation != LOAD_SEGMENTATION);
+  m_Dialog->Update();
 
   int oldSliceIndex = m_CurrentSliceIndex;
 
