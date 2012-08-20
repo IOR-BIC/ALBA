@@ -1,13 +1,17 @@
 /*=========================================================================
-Program:   Multimod Application Framework
-Module:    $RCSfile: medViewSlicerTest.cpp,v $
-Language:  C++
-Date:      $Date: 2008-07-24 09:05:18 $
-Version:   $Revision: 1.1 $
-Authors:   Marco Petrone, Stefano Perticoni
-==========================================================================
-Copyright (c) 2002/2004 
-CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2Medical
+ Module: medViewSlicerTest
+ Authors: Marco Petrone, Stefano Perticoni
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #include "mafDefines.h" 

@@ -1,16 +1,18 @@
-/*==============================================================================
+/*=========================================================================
 
-Program:   Multimod Application Framework
-Module:    $RCSfile: vtkMEDExtrudeToCircleTest.h,v $
-Language:  C++
-Date:      $Date: 2008-04-09 11:05:49 $
-Version:   $Revision: 1.2 $
-Authors:   Nigel McFarlane
+ Program: MAF2Medical
+ Module: vtkMEDExtrudeToCircleTest
+ Authors: Nigel McFarlane
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
 
-================================================================================
-Copyright (c) 2008 University of Bedfordshire, UK (www.beds.ac.uk)
-All rights reserved.
-===============================================================================*/
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
 
 #ifndef __CPP_UNIT_vtkMEDExtrudeToCircletest_H__
 #define __CPP_UNIT_vtkMEDExtrudeToCircletest_H__

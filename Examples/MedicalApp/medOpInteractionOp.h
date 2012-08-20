@@ -1,13 +1,17 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: medOpInteractionOp.h,v $
-  Language:  C++
-  Date:      $Date: 2008-04-28 09:02:40 $
-  Version:   $Revision: 1.1 $
-  Authors:   Marco Petrone
-==========================================================================
-  Copyright (c) 2001/2005 
-  CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2Medical
+ Module: medOpInteractionOp
+ Authors: Marco Petrone
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 #ifndef __medOpInteraction_H__
 #define __medOpInteraction_H__

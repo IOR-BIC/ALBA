@@ -1,13 +1,17 @@
 /*=========================================================================
-Program:   Multimod Application Framework
-Module:    $RCSfile: mafViewCT.h,v $
-Language:  C++
-Date:      $Date: 2012-04-06 09:32:07 $
-Version:   $Revision: 1.2.2.4 $
-Authors:   Daniele Giunchi, Matteo Giacomoni
-==========================================================================
-Copyright (c) 2002/2004
-CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2Medical
+ Module: mafViewCT
+ Authors: Daniele Giunchi, Matteo Giacomoni
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #ifndef __mafViewCT_H__

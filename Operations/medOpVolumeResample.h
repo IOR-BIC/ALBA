@@ -1,13 +1,17 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: medOpVolumeResample.h,v $
-  Language:  C++
-  Date:      $Date: 2012-04-06 09:24:52 $
-  Version:   $Revision: 1.3.2.6 $
-  Authors:   Marco Petrone
-==========================================================================
-Copyright (c) 2002/2004
-CINECA - Interuniversity Consortium (www.cineca.it) 
+
+ Program: MAF2Medical
+ Module: medOpVolumeResample
+ Authors: Marco Petrone
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #ifndef __medOpVolumeResample_H__

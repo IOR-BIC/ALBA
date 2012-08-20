@@ -1,13 +1,17 @@
 /*=========================================================================
-Program:   Multimod Application Framework
-Module:    $RCSfile: medInteractorPERScalarInformation.h,v $
-Language:  C++
-Date:      $Date: 2012-04-06 08:39:52 $
-Version:   $Revision: 1.1.2.3 $
-Authors:   Matteo Giacomoni, Gianluigi Crimi
-==========================================================================
-Copyright (c) 2010
-CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2Medical
+ Module: medInteractorPERScalarInformation
+ Authors: Matteo Giacomoni, Gianluigi Crimi
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 #ifndef __medInteractorPERScalarInformation_h
 #define __medInteractorPERScalarInformation_h

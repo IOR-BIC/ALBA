@@ -1,16 +1,18 @@
-/*==============================================================================
+/*=========================================================================
 
-Program:   Multimod Application Framework
-Module:    $RCSfile: vtkMAFMeshCutter_BES.h,v $
-Language:  C++
-Date:      $Date: 2011-05-26 08:33:31 $
-Version:   $Revision: 1.1.2.4 $
-Authors:   Nigel McFarlane
+ Program: MAF2Medical
+ Module: vtkMAFMeshCutter_BES
+ Authors: Nigel McFarlane
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
 
-================================================================================
-Copyright (c) 2007 University of Bedfordshire, UK (www.beds.ac.uk)
-All rights reserved.
-===============================================================================*/
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
 
 
 #ifndef __vtkMAFMeshCutter_h

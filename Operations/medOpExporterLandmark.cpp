@@ -1,13 +1,17 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: medOpExporterLandmark.cpp,v $
-  Language:  C++
-  Date:      $Date: 2011-07-11 16:30:26 $
-  Version:   $Revision: 1.1.2.5 $
-  Authors:   Stefania Paperini , Daniele Giunchi, Simone Brazzale
-==========================================================================
-  Copyright (c) 2001/2005 
-  CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2Medical
+ Module: medOpExporterLandmark
+ Authors: Stefania Paperini , Daniele Giunchi, Simone Brazzale
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #include "mafDefines.h" 

@@ -1,13 +1,17 @@
 /*=========================================================================
-Program:   Multimod Application Framework
-Module:    $RCSfile: medVMEMaps.cpp,v $
-Language:  C++
-Date:      $Date: 2011-05-26 08:30:59 $
-Version:   $Revision: 1.1.2.12 $
-Authors:   Eleonora Mambrini
-==========================================================================
-Copyright (c) 2001/2005 
-CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2Medical
+ Module: medVMEMaps
+ Authors: Eleonora Mambrini
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #include "medDefines.h" 

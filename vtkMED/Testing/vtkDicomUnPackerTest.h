@@ -1,13 +1,17 @@
 /*=========================================================================
-Program:   Multimod Application Framework
-Module:    $RCSfile: vtkDicomUnPackerTest.h,v $
-Language:  C++
-Date:      $Date: 2007-04-17 11:04:58 $
-Version:   $Revision: 1.1 $
-Authors:   Matteo Giacomoni
-==========================================================================
-Copyright (c) 2002/2004 
-CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2Medical
+ Module: vtkDicomUnPackerTest
+ Authors: Matteo Giacomoni
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #ifndef __CPP_UNIT_VTKDICOMUNPACKERTEST_H__

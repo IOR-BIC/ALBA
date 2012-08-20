@@ -1,13 +1,17 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: medOpComputeWrapping.h,v $
-  Language:  C++
-  Date:      $Date: 2012-04-06 09:09:53 $
-  Version:   $Revision: 1.1.2.4 $
-  Authors:   Anupam Agrawal and Hui Wei
-==========================================================================
-Copyright (c) 2002/2004
-CINECA - Interuniversity Consortium (www.cineca.it) 
+
+ Program: MAF2Medical
+ Module: medOpComputeWrapping
+ Authors: Anupam Agrawal and Hui Wei
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #ifndef __medOpComputeWrapping_H__

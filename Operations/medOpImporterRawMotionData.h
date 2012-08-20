@@ -1,13 +1,17 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: medOpImporterRawMotionData.h,v $
-  Language:  C++
-  Date:      $Date: 2010-10-07 06:54:49 $
-  Version:   $Revision: 1.1.2.1 $
-  Authors:   Paolo Quadrani
-==========================================================================
-Copyright (c) 2002/2004
-CINECA - Interuniversity Consortium (www.cineca.it) 
+
+ Program: MAF2Medical
+ Module: medOpImporterRawMotionData
+ Authors: Paolo Quadrani
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #ifndef __medOpImporterRawMotionData_H__

@@ -1,13 +1,17 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: medOpImporterC3D.cpp,v $
-  Language:  C++
-  Date:      $Date: 2008-04-28 08:38:31 $
-  Version:   $Revision: 1.1 $
-  Authors:   Paolo Quadrani - porting Daniele Giunchi
-==========================================================================
-  Copyright (c) 2001/2005 
-  CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2Medical
+ Module: medOpImporterC3D
+ Authors: Paolo Quadrani - porting Daniele Giunchi
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #include "mafDefines.h" 

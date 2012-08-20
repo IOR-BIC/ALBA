@@ -1,14 +1,17 @@
 /*=========================================================================
-Program:   Multimod Application Framework
-Module:    $RCSfile: medOpIterativeRegistration.cpp,v $
-Language:  C++
-Date:      $Date: 2008-07-25 11:12:22 $
-Version:   $Revision: 1.3 $
-Authors:   Stefano Perticoni - porting Daniele Giunchi
-==========================================================================
-Copyright (c) 2002/2004
-CINECA - Interuniversity Consortium (www.cineca.it) 
-SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
+
+ Program: MAF2Medical
+ Module: medOpIterativeRegistration
+ Authors: Stefano Perticoni - porting Daniele Giunchi
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #include "mafDefines.h" 

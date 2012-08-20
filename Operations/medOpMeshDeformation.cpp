@@ -1,13 +1,17 @@
 /*=========================================================================
-Program:   @neufuse
-Module:    $RCSfile: medOpMeshDeformation.cpp,v $
-Language:  C++
-Date:      $Date: 2012-04-06 09:17:01 $
-Version:   $Revision: 1.1.2.3 $
-Authors:   Josef Kohout
-==========================================================================
-Copyright (c) 2007
-SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
+
+ Program: MAF2Medical
+ Module: medOpMeshDeformation
+ Authors: Josef Kohout
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #include "medDefines.h" 

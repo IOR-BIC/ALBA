@@ -1,13 +1,17 @@
 /*=========================================================================
-Program:   Multimod Application Framework
-Module:    $RCSfile: vtkMEDPoissonSurfaceReconstruction.h,v $
-Language:  C++
-Date:      $Date: 2011-09-12 13:51:12 $
-Version:   $Revision: 1.1.2.14 $
-Authors:   Fuli Wu
-==========================================================================
-Copyright (c) 2001/2005 
-CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2Medical
+ Module: vtkMEDPoissonSurfaceReconstruction
+ Authors: Fuli Wu
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #ifndef __vtkMEDPoissonSurfaceReconstruction_h
@@ -76,33 +80,7 @@ private:
 };
 
 
-/*=========================================================================
-Copyright (c) 2006, Michael Kazhdan and Matthew Bolitho
-All rights reserved.
 
-Redistribution and use in source and binary forms, with or without modification,
-are permitted provided that the following conditions are met:
-
-Redistributions of source code must retain the above copyright notice, this list of
-conditions and the following disclaimer. Redistributions in binary form must reproduce
-the above copyright notice, this list of conditions and the following disclaimer
-in the documentation and/or other materials provided with the distribution. 
-
-Neither the name of the Johns Hopkins University nor the names of its contributors
-may be used to endorse or promote products derived from this software without specific
-prior written permission. 
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
-EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
-OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
-SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
-TO, PROCUREMENT OF SUBSTITUTE  GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
-BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
-DAMAGE.
-=========================================================================*/
 
 
 #define PI 3.1415926535897932384
@@ -136,14 +114,10 @@ int Solve(const double* eqns,const double* values,double* solutions,const int& d
 
 void PSR_main();
 
-/*=========================================================================
-Here, for header file definition
-=========================================================================*/
 
 
-/*=========================================================================
-Allocate.h
-=========================================================================*/
+
+
 
 /** 
       class name: AllocatorState
@@ -283,9 +257,7 @@ public:
 	}
 };
 
-/*=========================================================================
-BindaryNode.h
-=========================================================================*/
+
 /**
 class name: BinaryNode
 template class which represent a binary node of a binary tree, infact  the topology of the octree (used inside poisson surface reconstruction) 
@@ -335,9 +307,7 @@ public:
 	  }
 };
 
-/*=========================================================================
-Polynomial.h
-=========================================================================*/
+
 /**
 class name: Polynomial
 Template class that represents a polynomial with a specific degree.
@@ -433,9 +403,7 @@ public:
 	void GetSolutions(const double& c,std::vector<double>& roots,const double& EPS) const;
 };
 
-/*=========================================================================
-PPolynomial.h
-=========================================================================*/
+
 /**
 class name: StartingPolynomial
 */
@@ -562,9 +530,7 @@ public:
 };
 
 
-/*=========================================================================
-FunctionData.h
-=========================================================================*/
+
 template<int Degree,class Real>
 /**
 class name: FunctionData
@@ -621,9 +587,7 @@ public:
 	static inline int SymmetricIndex(const int& i1,const int& i2,int& index);
 };
 
-/*=========================================================================
-Geometry.h
-=========================================================================*/
+
 /** Return a Real random value. */
 template<class Real>
 Real Random(void);
@@ -904,9 +868,7 @@ public:
 };
 
 
-/*=========================================================================
-MarchingCubes.h
-=========================================================================*/
+
 /**
 class name: Square
 Represent a square in a marching square algorithms
@@ -1072,9 +1034,7 @@ public:
 };
 
 
-/*=========================================================================
-MemoryUseage.h
-=========================================================================*/
+
 /**
 className: MemoryInfo
 Used for keeping trace of the physical memory (total and free), swap space (total and free), virtual address space (total and free)
@@ -1127,9 +1087,7 @@ public:
 	} 
 };
 
-/*=========================================================================
-Vector.h
-=========================================================================*/
+
 /**
 class name: Vector
 Define mathematical entity vector, overloading operators.
@@ -1302,9 +1260,7 @@ protected:
 };
 
 
-/*=========================================================================
-SparseMatrix.h
-=========================================================================*/
+
 /**
 class name:  MatrixEntry
 */
@@ -1486,9 +1442,7 @@ public:
 };
 
 
-/*=========================================================================
-Octree.h
-=========================================================================*/
+
 /**
 class name: OctNode
 It represents a node of an octree. An octree is a tree data structure in which each internal node has exactly eight children. 
@@ -1777,9 +1731,7 @@ public:
 };
 
 
-/*=========================================================================
-MultiGridOctreeData.h
-=========================================================================*/
+
 typedef float Real;
 typedef float FunctionDataReal;
 typedef OctNode<class TreeNodeData,Real> TreeOctNode;

@@ -1,13 +1,17 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: medOpExporterVTKXML.cpp,v $
-  Language:  C++
-  Date:      $Date: 2010-12-23 11:28:48 $
-  Version:   $Revision: 1.1.2.3 $
-  Authors:   Paolo Quadrani
-==========================================================================
-  Copyright (c) 2001/2005 
-  CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2Medical
+ Module: medOpExporterVTKXML
+ Authors: Paolo Quadrani
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #include "mafDefines.h" 

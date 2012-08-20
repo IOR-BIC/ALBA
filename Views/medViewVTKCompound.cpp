@@ -1,13 +1,17 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: medViewVTKCompound.cpp,v $
-  Language:  C++
-  Date:      $Date: 2011-01-24 21:23:12 $
-  Version:   $Revision: 1.1.2.6 $
-  Authors:   Eleonora Mambrini
-==========================================================================
-  Copyright (c) 2002/2004
-  CINECA - Interuniversity Consortium (www.cineca.it) 
+
+ Program: MAF2Medical
+ Module: medViewVTKCompound
+ Authors: Eleonora Mambrini
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 

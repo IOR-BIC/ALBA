@@ -1,13 +1,17 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: mafViewSlice.h,v $
-  Language:  C++
-  Date:      $Date: 2012-04-06 09:37:38 $
-  Version:   $Revision: 1.26.2.14 $
-  Authors:   Paolo Quadrani,Stefano Perticoni
-==========================================================================
-  Copyright (c) 2002/2004
-  CINECA - Interuniversity Consortium (www.cineca.it) 
+
+ Program: MAF2Medical
+ Module: mafViewSlice
+ Authors: Paolo Quadrani,Stefano Perticoni
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 #ifndef __mafViewSlice_H__
 #define __mafViewSlice_H__

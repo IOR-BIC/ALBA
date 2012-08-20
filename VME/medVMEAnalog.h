@@ -1,13 +1,17 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: medVMEAnalog.h,v $
-  Language:  C++
-  Date:      $Date: 2012-04-06 10:08:46 $
-  Version:   $Revision: 1.3.2.2 $
-  Authors:   Roberto Mucci
-==========================================================================
-  Copyright (c) 2001/2005 
-  CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2Medical
+ Module: medVMEAnalog
+ Authors: Roberto Mucci
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 #ifndef __medVMEAnalog_h
 #define __medVMEAnalog_h

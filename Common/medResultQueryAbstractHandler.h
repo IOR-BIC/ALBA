@@ -1,13 +1,17 @@
 /*=========================================================================
-Program:   @neufuse
-Module:    $RCSfile: medResultQueryAbstractHandler.h,v $
-Language:  C++
-Date:      $Date: 2012-04-06 08:19:22 $
-Version:   $Revision: 1.1.2.4 $
-Authors:   Daniele Giunchi
-==========================================================================
-Copyright (c) 2008
-SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
+
+ Program: MAF2Medical
+ Module: medResultQueryAbstractHandler
+ Authors: Daniele Giunchi
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #ifndef __medResultQueryAbstractHandler_H__

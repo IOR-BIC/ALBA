@@ -1,14 +1,18 @@
-/*===========================================================================
-Program:   Medical
-Module:    $RCSfile: vtkMEDImageFillHolesRemoveIslands.h,v $
-Language:  C++
-Date:      $Date: 2012-01-23 12:50:32 $
-Version:   $Revision: 1.1.2.2 $
-Authors:   Alberto Losi
-=============================================================================
-Copyright (c) 2010
-SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
-===========================================================================*/
+/*=========================================================================
+
+ Program: MAF2Medical
+ Module: vtkMEDImageFillHolesRemoveIslands
+ Authors: Alberto Losi
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
 
 #ifndef __vtkMEDImageFillHolesRemoveIslands_H__
 #define __vtkMEDImageFillHolesRemoveIslands_H__

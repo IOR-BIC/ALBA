@@ -1,15 +1,18 @@
 /*=========================================================================
-Program:   Multimod Application Framework
-Module:    $RCSfile: vtkMEDPastValuesList.cpp,v $
-Language:  C++
-Date:      $Date: 2011-05-26 08:33:31 $
-Version:   $Revision: 1.2.2.2 $
-Authors:   Nigel McFarlane
 
-================================================================================
-Copyright (c) 2008 University of Bedfordshire, UK (www.beds.ac.uk)
-All rights reserved.
-===============================================================================*/
+ Program: MAF2Medical
+ Module: vtkMEDPastValuesList
+ Authors: Nigel McFarlane
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
 
 #include "vtkMEDPastValuesList.h"
 #include <algorithm>

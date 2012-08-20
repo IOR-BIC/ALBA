@@ -1,13 +1,17 @@
 /*=========================================================================
-Program:   LHP
-Module:    $RCSfile: medOpSegmentation.cpp,v $
-Language:  C++
-Date:      $Date: 2012-03-28 14:35:35 $
-Version:   $Revision: 1.1.2.57 $
-Authors:   Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi, Alberto Losi
-==========================================================================
-Copyright (c) 2007
-SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
+
+ Program: MAF2Medical
+ Module: medOpSegmentation
+ Authors: Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi, Alberto Losi
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #include "medDefines.h" 
