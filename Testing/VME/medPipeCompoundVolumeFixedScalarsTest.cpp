@@ -1,13 +1,17 @@
 /*=========================================================================
-Program:   Multimod Application Framework
-Module:    $RCSfile: medPipeCompoundVolumeFixedScalarsTest.cpp,v $
-Language:  C++
-Date:      $Date: 2010-04-27 08:39:02 $
-Version:   $Revision: 1.1.2.2 $
-Authors:   Eleonora Mambrini
-==========================================================================
-Copyright (c) 2002/2008
-CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2Medical
+ Module: medPipeCompoundVolumeFixedScalarsTest
+ Authors: Eleonora Mambrini
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #include "medDefines.h" 

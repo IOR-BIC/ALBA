@@ -1,16 +1,18 @@
-/*========================================================================= 
-  Program: Multimod Application Framework RELOADED 
-  Module: $RCSfile: vtkMAFFileDataProvider.h,v $ 
-  Language: C++ 
-  Date: $Date: 2011-05-26 08:51:00 $ 
-  Version: $Revision: 1.1.2.4 $ 
-  Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
-  ========================================================================== 
-  Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
-  See the COPYINGS file for license details 
-  =========================================================================
-  This provider keeps large data into an opened file
-  =========================================================================*/
+/*=========================================================================
+
+ Program: MAF2Medical
+ Module: vtkMAFFileDataProvider
+ Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
 
 #ifndef __vtkMAFFileDataProvider_h
 #define __vtkMAFFileDataProvider_h

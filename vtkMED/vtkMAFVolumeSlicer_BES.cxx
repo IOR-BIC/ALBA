@@ -1,12 +1,16 @@
 /*=========================================================================
 
-  Program:   Visualization Toolkit
-  Module:    $RCSfile: vtkMAFVolumeSlicer_BES.cxx,v $
-  Language:  C++
-  Date:      $Date: 2011-07-27 09:05:22 $
-  Version:   $Revision: 1.1.2.9 $
-  Authors:   Alexander Savenko, Josef Kohout (major change)
-  Project:   MultiMod Project (www.ior.it/multimod)
+ Program: MAF2Medical
+ Module: vtkMAFVolumeSlicer_BES
+ Authors: Alexander Savenko, Josef Kohout (major change)
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 //it must be included before gl.h and glu.h

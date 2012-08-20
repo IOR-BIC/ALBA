@@ -1,13 +1,17 @@
 /*=========================================================================
-Program:   LHP
-Module:    $RCSfile: medOpExtractGeometry.h,v $
-Language:  C++
-Date:      $Date: 2012-04-06 09:11:44 $
-Version:   $Revision: 1.1.2.4 $
-Authors:   Eleonora Mambrini, Gianluigi Crimi
-==========================================================================
-Copyright (c) 2007
-SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
+
+ Program: MAF2Medical
+ Module: medOpExtractGeometry
+ Authors: Eleonora Mambrini, Gianluigi Crimi
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #ifndef __medOpExtractGeometry_H__

@@ -1,16 +1,18 @@
-/*==============================================================================
+/*=========================================================================
 
-Program:   Multimod Application Framework
-Module:    $RCSfile: vtkMEDImageUnsharpFilterTest.cpp,v $
-Language:  C++
-Date:      $Date: 2008-10-27 09:36:38 $
-Version:   $Revision: 1.2.2.1 $
-Authors:   Daniele Giunchi
+ Program: MAF2Medical
+ Module: vtkMEDImageUnsharpFilterTest
+ Authors: Daniele Giunchi
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
 
-================================================================================
-Copyright (c) 2007 Cineca, UK (www.cineca.it)
-All rights reserved.
-===============================================================================*/
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
 
 #include "mafDefines.h"
 #include "medDefines.h"

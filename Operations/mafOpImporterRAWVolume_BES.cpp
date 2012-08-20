@@ -1,13 +1,17 @@
 /*=========================================================================
-Program:   Multimod Application Framework
-Module:    $RCSfile: mafOpImporterRAWVolume_BES.cpp,v $
-Language:  C++
-Date:      $Date: 2009-05-14 15:04:48 $
-Version:   $Revision: 1.1.2.1 $
-Authors:   Paolo Quadrani     Silvano Imboden     Josef Kohout
-==========================================================================
-Copyright (c) 2002/2004
-CINECA - Interuniversity Consortium (www.cineca.it) 
+
+ Program: MAF2Medical
+ Module: mafOpImporterRAWVolume_BES
+ Authors: Paolo Quadrani     Silvano Imboden     Josef Kohout
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #include "mafDefines.h" 

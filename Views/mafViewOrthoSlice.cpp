@@ -1,13 +1,17 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
-  Language:  C++
-  Date:      $Date: 2012-03-13 17:05:21 $
-  Version:   $Revision: 1.61.2.22 $
-  Authors:   Stefano Perticoni, Gianluigi Crimi, Grazia Di Cosmo
-==========================================================================
-  Copyright (c) 2002/2004
-  CINECA - Interuniversity Consortium (www.cineca.it) 
+
+ Program: MAF2Medical
+ Module: mafViewOrthoSlice
+ Authors: Stefano Perticoni, Gianluigi Crimi, Grazia Di Cosmo
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 

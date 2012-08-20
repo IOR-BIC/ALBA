@@ -1,13 +1,17 @@
 /*=========================================================================
-Program:   @neufuse
-Module:    $RCSfile: medQueryObject.h,v $
-Language:  C++
-Date:      $Date: 2009-10-30 07:24:41 $
-Version:   $Revision: 1.1.2.2 $
-Authors:   Daniele Giunchi
-==========================================================================
-Copyright (c) 2008
-SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
+
+ Program: MAF2Medical
+ Module: medQueryObject
+ Authors: Daniele Giunchi
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #ifndef __medQueryObject_H__

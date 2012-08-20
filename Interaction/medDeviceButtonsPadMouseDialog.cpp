@@ -1,13 +1,17 @@
 /*=========================================================================
-Program:   VPH2
-Module:    $RCSfile: medDeviceButtonsPadMouseDialog.cpp,v $
-Language:  C++
-Date:      $Date: 2009-07-15 15:23:35 $
-Version:   $Revision: 1.1.2.1 $
-Authors:   Alberto Losi
-==========================================================================
-Copyright (c) 2008
-SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
+
+ Program: MAF2Medical
+ Module: medDeviceButtonsPadMouseDialog
+ Authors: Alberto Losi
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #include "mafDefines.h" 

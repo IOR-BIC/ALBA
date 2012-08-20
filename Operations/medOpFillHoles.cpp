@@ -1,13 +1,17 @@
 /*=========================================================================
-Program:   @neufuse
-Module:    $RCSfile: medOpFillHoles.cpp,v $
-Language:  C++
-Date:      $Date: 2010-12-06 14:12:40 $
-Version:   $Revision: 1.1.2.3 $
-Authors:   Matteo Giacomoni, Josef Kohout
-==========================================================================
-Copyright (c) 2007
-SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
+
+ Program: MAF2Medical
+ Module: medOpFillHoles
+ Authors: Matteo Giacomoni, Josef Kohout
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #include "mafDefines.h" 

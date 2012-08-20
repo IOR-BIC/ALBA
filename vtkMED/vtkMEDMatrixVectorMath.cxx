@@ -1,13 +1,17 @@
 /*=========================================================================
-Program:   vph2
-Module:    $RCSfile: vtkMEDMatrixVectorMath.cxx,v $
-Language:  C++
-Date:      $Date: 2011-09-12 12:57:29 $
-Version:   $Revision: 1.1.2.2 $
-Authors:   Nigel McFarlane
-==========================================================================
-Copyright (c) 2010
-SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
+
+ Program: MAF2Medical
+ Module: vtkMEDMatrixVectorMath
+ Authors: Nigel McFarlane
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 

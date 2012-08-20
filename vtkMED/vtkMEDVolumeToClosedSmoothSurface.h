@@ -1,14 +1,18 @@
-/*==========================================================================
-Program:   Multimod Application Framework
-Module:    $RCSfile: vtkMAFBridgeHoleFilter.h,v $
-Language:  C++
-Date:      $Date: 2009-03-20 16:39:48 $
-Version:   $Revision: 1.1.2.2 $
-Authors:   Gianluigi Crimi
-=============================================================================
-Copyright (c) 2010
-SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
-===========================================================================*/
+/*=========================================================================
+
+ Program: MAF2Medical
+ Module: vtkMEDVolumeToClosedSmoothSurface
+ Authors: Gianluigi Crimi
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
 
 #ifndef __vtkMEDVolumeToClosedSmoothSurface_H__
 #define __vtkMEDVolumeToClosedSmoothSurface_H__

@@ -1,17 +1,18 @@
-/*========================================================================= 
-  Program: Multimod Application Framework RELOADED 
-  Module: $RCSfile: vtkMAFLargeDataProvider.cxx,v $ 
-  Language: C++ 
-  Date: $Date: 2009-09-29 09:33:32 $ 
-  Version: $Revision: 1.1.2.3 $ 
-  Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
-  ========================================================================== 
-  Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
-  See the COPYINGS file for license details 
-  =========================================================================
-  Abstract class - every large data provider (memory mapped, distributed, etc.
-  is supposed to be derived from this class
-  =========================================================================*/
+/*=========================================================================
+
+ Program: MAF2Medical
+ Module: vtkMAFLargeDataProvider
+ Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
 #pragma warning(disable: 4996)	//depricated
 
 #include "vtkMAFLargeDataProvider.h"

@@ -1,13 +1,17 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: medOpComputeInertialTensor.h,v $
-  Language:  C++
-  Date:      $Date: 2012-04-06 09:09:53 $
-  Version:   $Revision: 1.1.2.7 $
-  Authors:   Simone Brazzale , Stefano Perticoni
-==========================================================================
-Copyright (c) 2002/2004
-CINECA - Interuniversity Consortium (www.cineca.it) 
+
+ Program: MAF2Medical
+ Module: medOpComputeInertialTensor
+ Authors: Simone Brazzale , Stefano Perticoni
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #ifndef __medOpComputeInertialTensor_H__

@@ -1,24 +1,18 @@
-/*========================================================================= 
-  Program: Multimod Application Framework RELOADED 
-  Module: $RCSfile: vtkMAFLargeDataProvider.h,v $ 
-  Language: C++ 
-  Date: $Date: 2011-05-26 08:51:00 $ 
-  Version: $Revision: 1.1.2.4 $ 
-  Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
-  ========================================================================== 
-  Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
-  See the COPYINGS file for license details 
-  =========================================================================
-  Abstract class - every large data provider (memory mapped, distributed, etc.
-  is supposed to be derived from this class. It provides access to large data
-  sets for both reading and writing. A large data set comprises of one or
-  more named data arrays (i.e., scalars, vectors, normals, tensors) that
-  are described by descriptors of vtkMAFDataArrayDescriptor class. 
-  The data arrays are stored on the physical medium as it is described by
-  vtkMAFDataArrayLayout. By the default, they are stored sequentially one after 
-  another (components in interleaved mode), there might be an starting offset
-  of the first data array (denoted by HeaderSize)
-  =========================================================================*/
+/*=========================================================================
+
+ Program: MAF2Medical
+ Module: vtkMAFLargeDataProvider
+ Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
 
 #ifndef __vtkMAFLargeDataProvider_h
 #define __vtkMAFLargeDataProvider_h

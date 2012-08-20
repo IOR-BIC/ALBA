@@ -1,13 +1,17 @@
 /*=========================================================================
-Program:   Multimod Application Framework
-Module:    $RCSfile: medGUIDicomSettings.cpp,v $
-Language:  C++
-Date:      $Date: 2012-04-06 08:25:27 $
-Version:   $Revision: 1.7.2.20 $
-Authors:   Matteo Giacomoni, Simone Brazzale
-==========================================================================
-Copyright (c) 2001/2005 
-CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2Medical
+ Module: medGUIDicomSettings
+ Authors: Matteo Giacomoni, Simone Brazzale
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 

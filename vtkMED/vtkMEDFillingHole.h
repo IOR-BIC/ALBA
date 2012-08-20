@@ -1,13 +1,17 @@
 /*=========================================================================
-Program:   Multimod Application Framework
-Module:    $RCSfile: vtkMEDFillingHole.h,v $
-Language:  C++
-Date:      $Date: 2011-05-26 08:33:31 $
-Version:   $Revision: 1.1.2.7 $
-Authors:   Fuli Wu, Josef Kohout
-==========================================================================
-Copyright (c) 2001/2005 
-CINECA - Interuniversity Consortium (www.cineca.it)
+
+ Program: MAF2Medical
+ Module: vtkMEDFillingHole
+ Authors: Fuli Wu, Josef Kohout
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 #ifndef __vtkMEDFillingHole_h
