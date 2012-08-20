@@ -419,7 +419,18 @@ void medOpSegmentation::OpDo()
 //     }
 
   //Eliminate previous outputs
-  DeleteOutputs(m_Input->GetRoot());
+  //DeleteOutputs(m_Input->GetRoot());
+  //Replace the loaded output
+  if(m_LoadedVolume != NULL)
+  {
+    mafNode *previousSurface = m_LoadedVolume->GetParent();
+    m_LoadedVolume->ReparentTo(NULL);
+    m_LoadedVolume = NULL;
+
+    if(previousSurface != NULL)
+      previousSurface->ReparentTo(NULL);
+  }
+
   m_OutputVolume->SetName(wxString::Format("Segmentation Output (%s)",m_Volume->GetName()).c_str());
   lutPreset(4,m_OutputVolume->GetMaterial()->m_ColorLut);
   m_OutputVolume->GetMaterial()->m_ColorLut->SetTableRange(0,255);
@@ -440,7 +451,7 @@ void medOpSegmentation::OpDo()
     m_OutputVolume->GetTagArray()->SetTag(tag_Nature);
   }
 
-  m_OutputVolume->ReparentTo(m_Volume);
+  //m_OutputVolume->ReparentTo(m_Volume);
    
   m_OutputVolume->GetTagArray()->SetTag(mafTagItem("VOLUME_TYPE","BINARY"));
 
@@ -536,11 +547,16 @@ void medOpSegmentation::OpUndo()
     m_OutputVolume->ReparentTo(NULL);
     mafDEL(m_OutputVolume);
   }
-  if (m_SegmentatedVolume)
+  if (m_OutputSurface)
   {
-    m_SegmentatedVolume->ReparentTo(NULL);
-    mafDEL(m_SegmentatedVolume);
+    m_OutputSurface->ReparentTo(NULL);
+    mafDEL(m_OutputVolume);
   }
+//   if (m_SegmentatedVolume)
+//   {
+//     m_SegmentatedVolume->ReparentTo(NULL);
+//     mafDEL(m_SegmentatedVolume);
+//   }
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
@@ -844,8 +860,14 @@ void medOpSegmentation::DeleteOpDialog()
   }
   if(m_LoadedVolume)
   {
-    m_View->VmeShow(m_LoadedVolume,false);
-    m_View->VmeRemove(m_LoadedVolume);
+    mafNode *parent = m_LoadedVolume;
+
+    while(parent != m_Volume)
+    {
+      m_View->VmeShow(parent,false);
+      m_View->VmeRemove(parent);
+      parent = parent->GetParent();
+    }
   }
 
   //m_Volume->ReparentTo(m_OldVolumeParent);
@@ -926,22 +948,22 @@ void medOpSegmentation::FloodFill(vtkIdType seed)
 {
   UndoBrushPreview();
 
-  UndoRedoState urs;
-  urs.dataArray = vtkUnsignedCharArray::New();
-  urs.dataArray->DeepCopy( m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->GetScalars() );
-  urs.dataArray->SetName("SCALARS");
-  urs.plane=m_CurrentSlicePlane;
-  urs.slice=m_CurrentSliceIndex;
-  m_ManualUndoList.push_back( urs );
-  //On edit a new branch of redo-list starts, i need to clear the redo stack
-  ResetManualRedoList();
-
-  m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_REDO, false);
-  m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_UNDO, m_ManualUndoList.size()>0);
-
   int center = seed;
   if(m_GlobalFloodFill == TRUE)
   {
+    UndoRedoState urs;
+    urs.dataArray = vtkUnsignedCharArray::New();
+    urs.dataArray->DeepCopy( m_ManualVolumeMask->GetOutput()->GetVTKData()->GetPointData()->GetScalars() );
+    urs.dataArray->SetName("SCALARS");
+    urs.plane=-1; // indicate that the undo redo data is global and must be performed on manual volume mask (not slice)
+    urs.slice=-1; // indicate that the undo redo data is global and must be performed on manual volume mask (not slice)
+    m_ManualUndoList.push_back( urs );
+    //On edit a new branch of redo-list starts, i need to clear the redo stack
+    ResetManualRedoList();
+
+    m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_REDO, false);
+    m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_UNDO, m_ManualUndoList.size()>0);
+
     wxBusyCursor wait_cursor;
     wxBusyInfo wait(_("Wait! The algorithm could take long time!"));
 
@@ -1010,10 +1032,22 @@ void medOpSegmentation::FloodFill(vtkIdType seed)
     m_View->VmeShow(m_ManualVolumeSlice,true);
 
     CreateRealDrawnImage();
-    m_View->CameraUpdate();
+    OnEventUpdateManualSlice();
   }
   else
   {
+    UndoRedoState urs;
+    urs.dataArray = vtkUnsignedCharArray::New();
+    urs.dataArray->DeepCopy( m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->GetScalars() );
+    urs.dataArray->SetName("SCALARS");
+    urs.plane=m_CurrentSlicePlane;
+    urs.slice=m_CurrentSliceIndex;
+    m_ManualUndoList.push_back( urs );
+    //On edit a new branch of redo-list starts, i need to clear the redo stack
+    ResetManualRedoList();
+
+    m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_REDO, false);
+    m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Enable(ID_MANUAL_UNDO, m_ManualUndoList.size()>0);
     vtkStructuredPoints *input = vtkStructuredPoints::New();
     double dimensions[3];
 
@@ -1057,10 +1091,11 @@ void medOpSegmentation::FloodFill(vtkIdType seed)
 
     m_ManualVolumeSlice->GetOutput()->GetVTKData()->GetPointData()->SetScalars(output->GetPointData()->GetScalars());
     m_ManualVolumeSlice->Update();
+
     m_View->VmeShow(m_ManualVolumeSlice,true);
 
     CreateRealDrawnImage();
-    m_View->CameraUpdate();
+    OnEventUpdateManualSlice();
 
     input->Delete();
     output->Delete();
@@ -1504,8 +1539,8 @@ void medOpSegmentation::CreateAutoSegmentationGui()
   currentGui->Label(_("Threshold type:"),true);
   currentGui->Radio(ID_AUTOMATIC_GLOBAL_THRESHOLD,"",&m_AutomaticGlobalThreshold,2,choices);
 
-  currentGui->Label("");
-  currentGui->Label("Global range:",true);
+  /*currentGui->Label("");*/
+  /*currentGui->Label("Global range:",true);*/
 //   currentGui->Button(ID_AUTOMATIC_GLOBAL_PREVIEW,_("preview"));
 //   currentGui->Enable(ID_AUTOMATIC_GLOBAL_PREVIEW,m_AutomaticGlobalThreshold==GLOBAL);
   
@@ -1716,7 +1751,7 @@ void medOpSegmentation::CreateRefinementGui()
   m_RefinementRegionsSize = 1;
   //currentGui->Integer(ID_REFINEMENT_REGIONS_SIZE, mafString("Size"), &m_RefinementRegionsSize, 0, MAXINT, mafString("Max size of islands/holes to be taken into consideration"));
 
-  int stepsNumber = min(min(m_VolumeDimensions[0],m_VolumeDimensions[1]),m_VolumeDimensions[2]);
+  int stepsNumber = 10;
   int w_id = currentGui->GetWidgetId(ID_MANUAL_REFINEMENT_REGIONS_SIZE);
 
   int text_w   = 45*0.8;
@@ -2932,7 +2967,7 @@ void medOpSegmentation::OnAutomaticAddRange()
   UpdateThresholdLabel();
   UpdateThresholdRealTimePreview();
 
-  m_View->CameraUpdate();
+  OnEventUpdateThresholdSlice();
   //OnAutomaticPreview();
 }
 
@@ -2986,8 +3021,8 @@ void medOpSegmentation::OnAutomaticRemoveRange()
 
   UpdateThresholdLabel();
   UpdateThresholdRealTimePreview();
-  m_View->CameraUpdate();
-  OnAutomaticPreview();
+  OnEventUpdateThresholdSlice();
+  //OnAutomaticPreview();
 }
 
 //------------------------------------------------------------------------
@@ -3244,8 +3279,10 @@ void medOpSegmentation::OnAutomaticSegmentationEvent(mafEvent *e)
   case ID_AUTOMATIC_GLOBAL_THRESHOLD:
     {
       OnChangeThresholdType();
-      if (m_AutomaticRanges.size()>0)
-        OnAutomaticPreview();
+//       if (m_AutomaticRanges.size()>0 && m_AutomaticGlobalThreshold==RANGE)
+//         OnAutomaticPreview();
+      UpdateThresholdRealTimePreview();
+      OnEventUpdateThresholdSlice();
       m_GuiDialog->Enable(ID_BUTTON_NEXT,(m_AutomaticGlobalThreshold==RANGE && m_AutomaticRanges.size()>0)||(m_AutomaticGlobalThreshold == FALSE));
     }
     break;
@@ -3293,49 +3330,63 @@ void medOpSegmentation::OnAutomaticSegmentationEvent(mafEvent *e)
 void medOpSegmentation::ReloadUndoRedoState(vtkDataSet *dataSet,UndoRedoState state)
 //------------------------------------------------------------------------
 { 
-  if (state.plane!=m_CurrentSlicePlane || state.slice!=m_CurrentSliceIndex)
+  if(state.plane==-1 && state.slice == -1)
   {
+    m_ManualVolumeMask->GetOutput()->GetVTKData()->GetPointData()->SetScalars(state.dataArray);
+    m_ManualVolumeMask->Update();
 
-    m_CurrentSlicePlane=state.plane;
-    m_CurrentSliceIndex=state.slice;
-    //m_View->SetSliceAxis(m_CurrentSlicePlane);
     UpdateSlice();
-    m_View->CameraUpdate();
-    m_GuiDialog->Update();
-    InitGui();
-    m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
+    m_View->VmeShow(m_ManualVolumeSlice,true);
+
+    CreateRealDrawnImage();
+    OnEventUpdateManualSlice();
   }
-
-  double focalPoint[3];
-  double scaleFactor;
-  GetCameraAttribute(focalPoint, &scaleFactor);
-  double bounds[4];
-  GetVisualizedBounds(focalPoint, scaleFactor, bounds);
-
-  vtkImageData* undoRedoData = vtkImageData::New();
-  undoRedoData->DeepCopy(dataSet);
-  undoRedoData->Update();
-
-  for(int i = 0; i < undoRedoData->GetPointData()->GetScalars()->GetNumberOfTuples(); i++)
+  else
   {
-    undoRedoData->GetPointData()->GetScalars()->SetTuple1(i,(unsigned char)abs(state.dataArray->GetTuple1(i) - dataSet->GetPointData()->GetScalars()->GetTuple1(i)));
-  }
-  undoRedoData->Update();
+    if (state.plane!=m_CurrentSlicePlane || state.slice!=m_CurrentSliceIndex)
+    {
 
-  dataSet->GetPointData()->SetScalars(state.dataArray);
-  //Show changes
-  m_ManualVolumeSlice->Update();
-  m_View->VmeShow(m_ManualVolumeSlice, true);
+      m_CurrentSlicePlane=state.plane;
+      m_CurrentSliceIndex=state.slice;
+      //m_View->SetSliceAxis(m_CurrentSlicePlane);
+      UpdateSlice();
+      m_View->CameraUpdate();
+      m_GuiDialog->Update();
+      InitGui();
+      m_SegmentationOperationsGui[MANUAL_SEGMENTATION]->Update();
+    }
 
-//   if(ResetZoom(undoRedoData,bounds))
-//   {
-//     m_View->SetSliceAxis(m_CurrentSlicePlane);
-//   }
+    double focalPoint[3];
+    double scaleFactor;
+    GetCameraAttribute(focalPoint, &scaleFactor);
+    double bounds[4];
+    GetVisualizedBounds(focalPoint, scaleFactor, bounds);
 
-  //m_View->CameraUpdate();
-  CreateRealDrawnImage();
-  OnEventUpdateManualSlice();
-  undoRedoData->Delete();
+    vtkImageData* undoRedoData = vtkImageData::New();
+    undoRedoData->DeepCopy(dataSet);
+    undoRedoData->Update();
+
+    for(int i = 0; i < undoRedoData->GetPointData()->GetScalars()->GetNumberOfTuples(); i++)
+    {
+      undoRedoData->GetPointData()->GetScalars()->SetTuple1(i,(unsigned char)abs(state.dataArray->GetTuple1(i) - dataSet->GetPointData()->GetScalars()->GetTuple1(i)));
+    }
+    undoRedoData->Update();
+
+    dataSet->GetPointData()->SetScalars(state.dataArray);
+    //Show changes
+    m_ManualVolumeSlice->Update();
+    m_View->VmeShow(m_ManualVolumeSlice, true);
+
+    //   if(ResetZoom(undoRedoData,bounds))
+    //   {
+    //     m_View->SetSliceAxis(m_CurrentSlicePlane);
+    //   }
+
+    //m_View->CameraUpdate();
+    CreateRealDrawnImage();
+    OnEventUpdateManualSlice();
+    undoRedoData->Delete();
+  } 
 }
 
 //------------------------------------------------------------------------
@@ -3429,14 +3480,20 @@ void medOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
 
         //if i changed slice/plane from last edit the redo information
         //are in the plane-slice of last edit (where i saved last undo info).
-        if (m_CurrentSlicePlane!=m_ManualUndoList[numOfChanges-1].plane ||
-            m_CurrentSliceIndex != m_ManualUndoList[numOfChanges-1].slice)
+        if ((m_CurrentSlicePlane!=m_ManualUndoList[numOfChanges-1].plane ||
+            m_CurrentSliceIndex != m_ManualUndoList[numOfChanges-1].slice) &&
+            m_ManualUndoList[numOfChanges-1].plane != -1 &&
+            m_ManualUndoList[numOfChanges-1].slice != -1)
         {
           m_CurrentSlicePlane=m_ManualUndoList[numOfChanges-1].plane;
           m_CurrentSliceIndex=m_ManualUndoList[numOfChanges-1].slice;
           UpdateSlice();
           m_View->CameraUpdate();
           m_GuiDialog->Update();
+        }
+        if(m_ManualUndoList[numOfChanges-1].plane == -1 && m_ManualUndoList[numOfChanges-1].slice == -1)
+        {
+          dataSet = m_ManualVolumeMask->GetOutput()->GetVTKData();
         }
         
         //Add current state to Redo-list
@@ -3445,8 +3502,8 @@ void medOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
         urs.dataArray = vtkUnsignedCharArray::New();
         urs.dataArray->DeepCopy( dataSet->GetPointData()->GetScalars() );
         urs.dataArray->SetName("SCALARS");
-        urs.plane=m_CurrentSlicePlane;
-        urs.slice=m_CurrentSliceIndex;
+        urs.plane=m_ManualUndoList[numOfChanges-1].plane;
+        urs.slice=m_ManualUndoList[numOfChanges-1].slice;
         m_ManualRedoList.push_back(urs);
 
         //Update current slice with Undo-data
@@ -3473,8 +3530,10 @@ void medOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
 
         //if i changed slice/plane from last edit the redo information
         //are in the plane-slice of last edit (where i saved last undo info).
-        if (m_CurrentSlicePlane!=m_ManualRedoList[numOfChanges-1].plane ||
-          m_CurrentSliceIndex != m_ManualRedoList[numOfChanges-1].slice)
+        if ((m_CurrentSlicePlane!=m_ManualRedoList[numOfChanges-1].plane ||
+          m_CurrentSliceIndex != m_ManualRedoList[numOfChanges-1].slice) &&
+          m_ManualRedoList[numOfChanges-1].plane != -1 &&
+          m_ManualRedoList[numOfChanges-1].slice != -1)
         {
           m_CurrentSlicePlane=m_ManualRedoList[numOfChanges-1].plane;
           m_CurrentSliceIndex=m_ManualRedoList[numOfChanges-1].slice;
@@ -3482,7 +3541,10 @@ void medOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
           m_View->CameraUpdate();
           m_GuiDialog->Update();
         }
-
+        if(m_ManualRedoList[numOfChanges-1].plane == -1 && m_ManualRedoList[numOfChanges-1].slice == -1)
+        {
+          dataSet = m_ManualVolumeMask->GetOutput()->GetVTKData();
+        }
 
         //Add current state to Undo-list
         UndoBrushPreview();
@@ -3490,8 +3552,8 @@ void medOpSegmentation::OnManualSegmentationEvent(mafEvent *e)
         urs.dataArray = vtkUnsignedCharArray::New();
         urs.dataArray->DeepCopy( dataSet->GetPointData()->GetScalars() );
         urs.dataArray->SetName("SCALARS");
-        urs.plane=m_CurrentSlicePlane;
-        urs.slice=m_CurrentSliceIndex;
+        urs.plane=m_ManualRedoList[numOfChanges-1].plane;
+        urs.slice=m_ManualRedoList[numOfChanges-1].slice;
         m_ManualUndoList.push_back(urs);
 
         //Update current slice with Redo-data
@@ -5037,7 +5099,7 @@ void medOpSegmentation::UpdateThresholdRealTimePreview()
     tVol->SetAutomaticSegmentationThresholdModality(medVMESegmentationVolume::RANGE);
     for (int i=0;i<m_AutomaticRanges.size();i++)
     {
-      if(m_CurrentSliceIndex >= m_AutomaticRanges[i].m_StartSlice && m_CurrentSliceIndex <= m_AutomaticRanges[i].m_EndSlice)
+      if(m_CurrentSliceIndex >= m_AutomaticRanges[i].m_StartSlice + 1 && m_CurrentSliceIndex <= m_AutomaticRanges[i].m_EndSlice + 1)
         result = tVol->AddRange(0,1,m_AutomaticRanges[i].m_ThresholdValue,m_AutomaticRanges[i].m_UpperThresholdValue);
       
 //       if (result == MAF_ERROR)
@@ -5053,6 +5115,7 @@ void medOpSegmentation::UpdateThresholdRealTimePreview()
     tVol->SetAutomaticSegmentationThresholdModality(medVMESegmentationVolume::GLOBAL);
     tVol->SetAutomaticSegmentationGlobalThreshold(m_AutomaticThreshold,m_AutomaticUpperThreshold);
   }
+
 
   tVol->GetOutput()->Update();
   tVol->Update();

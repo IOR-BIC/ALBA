@@ -72,9 +72,9 @@ void vtkMEDVolumeToClosedSmoothSurface::GetTransformFactor( int toUnity,double *
   if (toUnity)
   {
     //Translation by -center 
-    traslation[0]=-(bounds[0]+size[0]/2.0);
-    traslation[1]=-(bounds[2]+size[1]/2.0);
-    traslation[2]=-(bounds[4]+size[2]/2.0);
+    traslation[0]=-(bounds[0]+size[0]/3.0);
+    traslation[1]=-(bounds[2]+size[1]/3.0);
+    traslation[2]=-(bounds[4]+size[2]/3.0);
 
     //Scale by 2/size (2 is because a [-1,1] side has lenght 2)
     scale[0]=2.0/size[0];
@@ -84,9 +84,9 @@ void vtkMEDVolumeToClosedSmoothSurface::GetTransformFactor( int toUnity,double *
   else 
   {
     //Translation by +center 
-    traslation[0]=bounds[0]+size[0]/2.0;
-    traslation[1]=bounds[2]+size[1]/2.0;
-    traslation[2]=bounds[4]+size[2]/2.0;
+    traslation[0]=bounds[0]+size[0]/3.0;
+    traslation[1]=bounds[2]+size[1]/3.0;
+    traslation[2]=bounds[4]+size[2]/3.0;
 
     //scale by size/2
     scale[0]=size[0]*0.5;
@@ -174,7 +174,6 @@ vtkPolyData * vtkMEDVolumeToClosedSmoothSurface::GetOutput( int level /*= 0*/, v
 
     //this epsilon is needed to show the surface in first and last slice 
     //this is need because there are some approximation problems
-    double epsilon=1e-5;
     int nPoints;
     vtkPoints *newPoints;
     
@@ -186,33 +185,42 @@ vtkPolyData * vtkMEDVolumeToClosedSmoothSurface::GetOutput( int level /*= 0*/, v
     //new point array whitout border
     newPoints->SetNumberOfPoints(nPoints);
 
+    double limits[6];
+
     
+    limits[0]=InputBounds[0]+VoxelShift[0];
+    limits[1]=InputBounds[1]-VoxelShift[1];
+    limits[2]=InputBounds[2]+VoxelShift[2];
+    limits[3]=InputBounds[3]-VoxelShift[3];
+    limits[4]=InputBounds[4]+VoxelShift[4];
+    limits[5]=InputBounds[5]-VoxelShift[5];
+
     for (int i=0;i<nPoints;i++)
     {
       //X coordinate
       polydata->GetPoint(i,pointCoords);
-      if (pointCoords[0]<InputBounds[0])
-        pointCoords[0]=InputBounds[0]-epsilon;
-      if (pointCoords[0]>InputBounds[1])
-        pointCoords[0]=InputBounds[1]+epsilon;
+      if (pointCoords[0]<limits[0])
+        pointCoords[0]=InputBounds[0]-VoxelShift[0];
+      if (pointCoords[0]>limits[1])
+        pointCoords[0]=InputBounds[1]+VoxelShift[1];
 
       //Y coordinate
-      if (pointCoords[1]<InputBounds[2])
-        pointCoords[1]=InputBounds[2]-epsilon;
-      if (pointCoords[1]>InputBounds[3])
-        pointCoords[1]=InputBounds[3]+epsilon;
+      if (pointCoords[1]<limits[2])
+        pointCoords[1]=InputBounds[2]-VoxelShift[2];
+      if (pointCoords[1]>limits[3])
+        pointCoords[1]=InputBounds[3]+VoxelShift[3];
 
       //Z coordinate
-      if (pointCoords[2]<InputBounds[4])
-        pointCoords[2]=InputBounds[4]-epsilon;
-      if (pointCoords[2]>InputBounds[5])
-        pointCoords[2]=InputBounds[5]+epsilon;
+      if (pointCoords[2]<limits[4])
+        pointCoords[2]=InputBounds[4]-VoxelShift[4];
+      if (pointCoords[2]>limits[5])
+        pointCoords[2]=InputBounds[5]+VoxelShift[5];
 
       newPoints->SetPoint(i,pointCoords);
     }
-
+    
     polydata->SetPoints(newPoints);
-
+    
     vtkDEL(newPoints);
   
   }
@@ -251,7 +259,7 @@ void vtkMEDVolumeToClosedSmoothSurface::Update()
 
       // Stores Input Bounds
       inputVolume->GetBounds(InputBounds);
-
+      
       //Get image data necessary information
       inputVolume->GetSpacing(spacing);
       inputVolume->GetDimensions(inputDimensions);
@@ -267,6 +275,11 @@ void vtkMEDVolumeToClosedSmoothSurface::Update()
       //because we add a voxel outside the volume
       BorderVolumeID->SetOrigin(origin[0]-spacing[0],origin[1]-spacing[1],origin[2]-spacing[2]);
       newPD=BorderVolumeID->GetPointData();
+      
+      //Saving final filter info
+      VoxelShift[0]=VoxelShift[1]=spacing[0]/3.0;
+      VoxelShift[2]=VoxelShift[3]=spacing[1]/3.0;
+      VoxelShift[4]=VoxelShift[5]=spacing[2]/3.0;
       
     }
     //RECTILINEAR GRID
@@ -305,10 +318,12 @@ void vtkMEDVolumeToClosedSmoothSurface::Update()
       newXCoord->SetNumberOfTuples(ncoord+2);
       //The size of the added left voxel  is the same of the first
       newXCoord->SetTuple1(0,inputXCoord->GetTuple1(0)-(inputXCoord->GetTuple1(1)-inputXCoord->GetTuple1(0)));
+      VoxelShift[0]=(inputXCoord->GetTuple1(1)-inputXCoord->GetTuple1(0))/3.0;
       for(int i=0;i<ncoord;i++)
         newXCoord->SetTuple1(i+1,inputXCoord->GetTuple1(i));
       //The size of the added right voxel is the same of the first
       newXCoord->SetTuple1(ncoord+1,inputXCoord->GetTuple1(ncoord-1)+(inputXCoord->GetTuple1(ncoord-1)-inputXCoord->GetTuple1(ncoord-2)));
+      VoxelShift[1]=(inputXCoord->GetTuple1(ncoord-1)-inputXCoord->GetTuple1(ncoord-2))/3.0;
       BorderVolumeRG->SetXCoordinates(newXCoord);
 
       //Create a new coordinate array with two voxel more
@@ -320,9 +335,11 @@ void vtkMEDVolumeToClosedSmoothSurface::Update()
       newYCoord->SetNumberOfTuples(ncoord+2);
       //The size of the added left voxel  is the same of the first
       newYCoord->SetTuple1(0,inputYCoord->GetTuple1(0)-(inputYCoord->GetTuple1(1)-inputYCoord->GetTuple1(0)));
+      VoxelShift[2]=(inputYCoord->GetTuple1(1)-inputYCoord->GetTuple1(0))/3.0;
       for(int i=0;i<ncoord;i++)
         newYCoord->SetTuple1(i+1,inputYCoord->GetTuple1(i));
       newYCoord->SetTuple1(ncoord+1,inputYCoord->GetTuple1(ncoord-1)+(inputYCoord->GetTuple1(ncoord-1)-inputYCoord->GetTuple1(ncoord-2)));
+      VoxelShift[3]=(inputYCoord->GetTuple1(ncoord-1)-inputYCoord->GetTuple1(ncoord-2))/3.0;
       BorderVolumeRG->SetYCoordinates(newYCoord);
 
       //Create a new coordinate array with two voxel more
@@ -334,10 +351,12 @@ void vtkMEDVolumeToClosedSmoothSurface::Update()
       newZCoord->SetNumberOfTuples(ncoord+2);
       //The size of the added left voxel  is the same of the first
       newZCoord->SetTuple1(0,inputZCoord->GetTuple1(0)-(inputZCoord->GetTuple1(1)-inputZCoord->GetTuple1(0)));
+      VoxelShift[4]=(inputZCoord->GetTuple1(1)-inputZCoord->GetTuple1(0))/3.0;
       for(int i=0;i<ncoord;i++)
         newZCoord->SetTuple1(i+1,inputZCoord->GetTuple1(i));
       //The size of the added right voxel is the same of the first
       newZCoord->SetTuple1(ncoord+1,inputZCoord->GetTuple1(ncoord-1)+(inputZCoord->GetTuple1(ncoord-1)-inputZCoord->GetTuple1(ncoord-2)));
+      VoxelShift[5]=(inputZCoord->GetTuple1(ncoord-1)-inputZCoord->GetTuple1(ncoord-2))/3.0;
       BorderVolumeRG->SetZCoordinates(newZCoord);
 
       vtkDEL(newXCoord);

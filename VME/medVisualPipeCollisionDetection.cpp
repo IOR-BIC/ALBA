@@ -40,6 +40,7 @@
 #include "vtkRenderer.h"
 #include "vtkIdList.h"
 #include "vtkProperty.h"
+#include "vtkPolyDataNormals.h"
 
 #include <vector>
 
@@ -59,7 +60,10 @@ medVisualPipeCollisionDetection::medVisualPipeCollisionDetection()
   m_CellToExlude = NULL;
   m_ShowSurfaceToCollide = true;
   m_EnablePipeUpdate = true;
-}
+  m_ColorNotCollisionCells[0] = 0.0;
+  m_ColorNotCollisionCells[1] = 1.0;
+  m_ColorNotCollisionCells[2] = 0.0;
+ }
 //----------------------------------------------------------------------------
 void medVisualPipeCollisionDetection::Create(mafSceneNode *n/*, bool use_axes*/)
 //----------------------------------------------------------------------------
@@ -136,7 +140,7 @@ void medVisualPipeCollisionDetection::Create(mafSceneNode *n/*, bool use_axes*/)
   }
 
   vtkMAFSmartPointer<vtkColorTransferFunction> table;
-  table->AddRGBPoint(0,0,1,0);
+  table->AddRGBPoint(0,m_ColorNotCollisionCells[0],m_ColorNotCollisionCells[1],m_ColorNotCollisionCells[2]);
   table->AddRGBPoint(1,1,0,0);
   table->Build();
 
@@ -372,6 +376,7 @@ void medVisualPipeCollisionDetection::UpdatePipeline(bool force /* = false */)
         polyResult->GetCellData()->AddArray(contactScalars1);
         polyResult->GetCellData()->SetActiveScalars("CONTACT");
         polyResult->Update();
+
         //Add new mapper if a new surface has been added
         if (m_SurfaceToCollideMapper.size() > i)
         {
@@ -382,7 +387,7 @@ void medVisualPipeCollisionDetection::UpdatePipeline(bool force /* = false */)
         {
           //use old mapper if no new surface has been added
           vtkMAFSmartPointer<vtkColorTransferFunction> table;
-          table->AddRGBPoint(0,0,1,0);
+          table->AddRGBPoint(0,m_ColorNotCollisionCells[0],m_ColorNotCollisionCells[1],m_ColorNotCollisionCells[2]);
           table->AddRGBPoint(1,1,0,0);
           table->Build();
           vtkPolyDataMapper *mapper;
@@ -521,5 +526,29 @@ void medVisualPipeCollisionDetection::SetOpacity( double opacity )
   for (int i=0;i<m_SurfacebToCollideActor.size();i++)
   {
     m_SurfacebToCollideActor[i]->GetProperty()->SetOpacity(opacity);
+  }
+}
+
+void medVisualPipeCollisionDetection::SetColorForNotCollisionSurface( double rgb[3] )
+{
+  m_ColorNotCollisionCells[0] = rgb[0];
+  m_ColorNotCollisionCells[1] = rgb[1];
+  m_ColorNotCollisionCells[2] = rgb[2];
+
+  vtkMAFSmartPointer<vtkColorTransferFunction> table;
+  table->AddRGBPoint(0,m_ColorNotCollisionCells[0],m_ColorNotCollisionCells[1],m_ColorNotCollisionCells[2]);
+  table->AddRGBPoint(1,1,0,0);
+  table->Build();
+
+  m_Mapper->SetLookupTable(table);
+
+  for (int i=0;i<m_SurfaceToCollideMapper.size();i++)
+  {
+    vtkMAFSmartPointer<vtkColorTransferFunction> table;
+    table->AddRGBPoint(0,m_ColorNotCollisionCells[0],m_ColorNotCollisionCells[1],m_ColorNotCollisionCells[2]);
+    table->AddRGBPoint(1,1,0,0);
+    table->Build();
+
+    m_SurfaceToCollideMapper[i]->SetLookupTable(table);
   }
 }
