@@ -37,6 +37,7 @@
 #include "mafStorage.h"
 #include "mafTagArray.h"
 #include "mafGUI.h"
+#include <wx/tokenzr.h>
 #include <assert.h>
 
 #ifdef VTK_USE_ANSI_STDLIB
@@ -1275,4 +1276,301 @@ void mafNode::UpdateId()
       SetId(root->GetNextNodeId());
     }
   //}
+}
+
+//-------------------------------------------------------------------------
+mafNode * mafNode::GetByPath( char *path )
+//-------------------------------------------------------------------------
+{
+  wxStringTokenizer tkz(wxT(path), wxT("/"));
+
+  mafNode *currentNode=this;
+  mafNode *tmpParent;
+  wxString tmpString;
+  long tmpIndex;
+  int tmpFound;
+
+  while ( tkz.HasMoreTokens() && currentNode!=NULL )
+  {
+    wxString token = tkz.GetNextToken();
+
+    if (token=="next")
+    {
+      tmpParent=currentNode->GetParent();
+      //Root case: root does not ave next
+      if (tmpParent==NULL) 
+      {
+        mafLogMessage("Node path error: root does not have next");
+        currentNode=NULL;
+        break;
+      }
+      //getting node index
+      tmpIndex=tmpParent->FindNodeIdx(currentNode);
+      //Size check
+      if (tmpIndex==tmpParent->GetNumberOfChildren()-1)
+      {
+        mafLogMessage("Node path error: asked 'next' on last node");
+        currentNode=NULL;
+        break;
+      }
+      //updating current node
+      currentNode=tmpParent->GetChild(tmpIndex+1);
+    }
+    
+    else if (token=="prev")
+	  {
+      tmpParent=currentNode->GetParent();
+      //Root case: root does not ave next
+      if (tmpParent==NULL) 
+      {
+        mafLogMessage("Node path error: root does not have next");
+        currentNode=NULL;
+        break;
+      }
+      //getting node index
+      tmpIndex=tmpParent->FindNodeIdx(currentNode);
+      //Size check
+      if (tmpIndex==0)
+      {
+        mafLogMessage("Node path error: asked 'prec' on first node");
+        currentNode=NULL;
+        break;
+      }
+      //updating current node
+      currentNode=tmpParent->GetChild(tmpIndex-1);
+    }
+
+    else if (token=="firstPair")
+	  {
+      tmpParent=currentNode->GetParent();
+      //Root case: root does not ave next
+      if (tmpParent==NULL) 
+      {
+        mafLogMessage("Node path error: root does not have next");
+        currentNode=NULL;
+        break;
+      }
+      
+      //updating current node
+      currentNode=tmpParent->GetChild(0);
+  	}
+
+    else if (token=="lastPair")
+	  {
+      tmpParent=currentNode->GetParent();
+      //Root case: root does not ave next
+      if (tmpParent==NULL) 
+      {
+        mafLogMessage("Node path error: root does not have next");
+        currentNode=NULL;
+        break;
+      }
+      //updating current node
+      currentNode=tmpParent->GetChild(tmpParent->GetNumberOfChildren()-1);
+	  }
+    
+    else if (token=="firstChild")
+	  {
+      //Root case: root does not ave next
+      if (currentNode->GetNumberOfChildren()==0) 
+      {
+        mafLogMessage("Node path error: asked 'firstChild' on no child node");
+        currentNode=NULL;
+        break;
+      }
+      //updating current node
+      currentNode=currentNode->GetChild(0);
+	  }
+    
+    else if (token=="lastChild")
+    {
+      //Root case: root does not ave next
+      if (currentNode->GetNumberOfChildren()==0) 
+      {
+        mafLogMessage("Node path error: asked 'lastChild' on no child node");
+        currentNode=NULL;
+        break;
+      }
+      //updating current node
+      currentNode=currentNode->GetChild(currentNode->GetNumberOfChildren()-1);
+    }
+    
+    else if (token.StartsWith("pair["))
+	  {
+      //checking match bracket 
+      if (token[token.size()-1] != ']')
+      {
+        mafLogMessage("Node path error: pair[] wrong format");
+        currentNode=NULL;
+        break;
+      }
+
+      //getting the number substring
+      tmpString=token.SubString(5,token.size()-2);
+      
+      tmpParent=currentNode->GetParent();
+      //Root case: root does not ave next
+      if (tmpParent==NULL) 
+      {
+        mafLogMessage("Node path error: root does not have pairs");
+        currentNode=NULL;
+        break;
+      }
+
+      //Number checking
+      if (!tmpString.IsNumber())
+      {
+        mafLogMessage("Node path error: wrong pair[] argument");
+        currentNode=NULL;
+        break;
+      }
+
+      tmpString.ToLong(&tmpIndex);
+
+      //Checking bounds
+      if(tmpIndex < 0 || tmpIndex > tmpParent->GetNumberOfChildren()-1)
+      {
+        mafLogMessage("Node path error: pair[] value outside bounds");
+        currentNode=NULL;
+        break;
+      }
+
+      currentNode=tmpParent->GetChild(tmpIndex);
+  	}
+    
+    else if (token.StartsWith("pair{"))
+  	{
+      //checking match bracket 
+      if (token[token.size()-1] != '}')
+      {
+        mafLogMessage("Node path error: pair{} wrong format");
+        currentNode=NULL;
+        break;
+      }
+
+      //getting the number substring
+      tmpString=token.SubString(5,token.size()-2);
+
+      tmpParent=currentNode->GetParent();
+      //Root case: root does not ave next
+      if (tmpParent==NULL) 
+      {
+        mafLogMessage("Node path error: root does not have pairs");
+        currentNode=NULL;
+        break;
+      }
+
+      tmpFound=false;
+      //node name searching
+      for (mafID i = 0; i < tmpParent->m_Children.size(); i++)
+      {
+        wxString tmp2=tmpParent->m_Children[i]->GetName();
+        if (tmpString == tmpParent->m_Children[i]->GetName())
+        {
+          currentNode=tmpParent->m_Children[i];
+          tmpFound=true;
+        }
+      }
+
+      if (!tmpFound)
+      {
+        mafLogMessage("Node path error: pair{%s}, not found",tmpString);
+        currentNode=NULL;
+        break;
+      }
+	  }
+    
+    else if (token.StartsWith("child["))
+	  {
+      //checking match bracket 
+      if (token[token.size()-1] != ']')
+      {
+        mafLogMessage("Node path error: child[] wrong format");
+        currentNode=NULL;
+        break;
+      }
+
+      //getting the number substring
+      tmpString=token.SubString(6,token.size()-2);
+
+      //Number checking
+      if (!tmpString.IsNumber())
+      {
+        mafLogMessage("Node path error: wrong child[] argument");
+        currentNode=NULL;
+        break;
+      }
+
+      tmpString.ToLong(&tmpIndex);
+
+      //Checking bounds
+      if(tmpIndex < 0 || tmpIndex > currentNode->GetNumberOfChildren()-1)
+      {
+        mafLogMessage("Node path error: child[] value outside bounds");
+        currentNode=NULL;
+        break;
+      }
+
+      currentNode=currentNode->GetChild(tmpIndex);
+
+  	}
+    
+    else if (token.StartsWith("child{"))
+	  {
+      //checking match bracket 
+      if (token[token.size()-1] != '}')
+      {
+        mafLogMessage("Node path error: child{} wrong format");
+        currentNode=NULL;
+        break;
+      }
+
+      //getting the number substring
+      tmpString=token.SubString(6,token.size()-2);
+
+      tmpFound=false;
+      //node name searching
+      for (mafID i = 0; i < currentNode->m_Children.size(); i++)
+      {
+        wxString tmp2=currentNode->m_Children[i]->GetName();
+        if (tmpString == currentNode->m_Children[i]->GetName())
+        {
+          currentNode=currentNode->m_Children[i];
+          tmpFound=true;
+        }
+      }
+
+      if (!tmpFound)
+      {
+        mafLogMessage("Node path error: child{%s}, not found",tmpString);
+        currentNode=NULL;
+        break;
+      }
+	  }
+    
+    else if (token=="root")
+  	{
+      currentNode=currentNode->GetRoot();
+	  }
+
+    else if (token=="..")
+    {
+      currentNode=currentNode->GetParent();
+      if (currentNode==NULL)
+      {
+        mafLogMessage("Node path error: root does not have parent");
+        break;
+      }
+    }
+    else 
+    {
+      currentNode=NULL;
+      mafLogMessage("Node path error: unknow token:%s",token);
+      break;
+    }
+    tmpString=currentNode->GetName();
+
+  } 
+  //While end
+  return currentNode;
 }
