@@ -899,3 +899,160 @@ void mafNodeTest::TestBuildAndDestroyATree()
   mafDEL(na);
   mafDEL(na2);
 }
+
+//----------------------------------------------------------------------------
+void mafNodeTest::TestGetByPath()
+//----------------------------------------------------------------------------
+{
+  mafSmartPointer<mafNodeA> root ;
+  mafSmartPointer<mafNodeA> sideA ;
+  mafSmartPointer<mafNodeA> sideB ;
+  mafSmartPointer<mafNodeA> a1 ;
+  mafSmartPointer<mafNodeA> a2 ;
+  mafSmartPointer<mafNodeA> a3 ;
+  mafSmartPointer<mafNodeA> b1 ;
+  mafSmartPointer<mafNodeA> b2 ;
+  mafSmartPointer<mafNodeA> b3 ;
+
+
+  //setting names
+  root->SetName("root");
+  sideA->SetName("sideA");
+  sideB->SetName("sideB");
+  a1->SetName("a1");
+  a2->SetName("a2");
+  a3->SetName("a3");
+  b1->SetName("b1");
+  b2->SetName("b2");
+  b3->SetName("b3");
+
+
+  //generating structure
+  //             Root
+  //            /    \
+  //       sideA      sideB
+  //      /  |  \    /  |  \
+  //     a1  a2 a3  b1  b2  b3 
+
+  root->AddChild(sideA);
+  root->AddChild(sideB);
+  sideA->AddChild(a1);
+  sideA->AddChild(a2);
+  sideA->AddChild(a3);
+  sideB->AddChild(b1);
+  sideB->AddChild(b2);
+  sideB->AddChild(b3);
+
+  //Tresting wrong keyword
+  result= (root->GetByPath("wrong") == NULL);
+  TEST_RESULT;
+
+
+  //Testing Next
+  result= (root->GetByPath("next") == NULL);
+  TEST_RESULT;
+  result= (sideB->GetByPath("next") == NULL);
+  TEST_RESULT;
+  result= ((mafNodeA *)sideA->GetByPath("next") == (mafNodeA *)(sideB));
+  TEST_RESULT;
+
+  //Testing Prev
+  result= (root->GetByPath("prev") == NULL);
+  TEST_RESULT;
+  result= (sideA->GetByPath("prev") == NULL);
+  TEST_RESULT;
+  result= ((mafNodeA *)sideB->GetByPath("prev") == (mafNodeA *)(sideA));
+  TEST_RESULT;
+
+  //Testing FirstPair
+  result= (root->GetByPath("firstPair") == NULL);
+  TEST_RESULT;
+  result= ((mafNodeA *)a2->GetByPath("firstPair") == (mafNodeA *)(a1));
+  TEST_RESULT;
+
+  //Testing LastChild
+  result= (root->GetByPath("lastPair") == NULL);
+  TEST_RESULT;
+  result= ((mafNodeA *)a2->GetByPath("lastPair") == (mafNodeA *)(a3));
+  TEST_RESULT;
+
+
+  //Testing FirstChild
+  result= (a1->GetByPath("firstChild") == NULL);
+  TEST_RESULT;
+  result= ((mafNodeA *)sideA->GetByPath("firstChild") == (mafNodeA *)(a1));
+  TEST_RESULT;
+
+  //Testing LastChild
+  result= (a1->GetByPath("lastChild") == NULL);
+  TEST_RESULT;
+  result= ((mafNodeA *)sideA->GetByPath("lastChild") == (mafNodeA *)(a3));
+  TEST_RESULT;
+
+  //Testing Pair[]
+  result= ((mafNodeA *)root->GetByPath("pair[2]") == NULL);
+  TEST_RESULT;
+  result= ((mafNodeA *)a1->GetByPath("pair[2") == NULL);
+  TEST_RESULT;
+  result= ((mafNodeA *)a1->GetByPath("pair[two]") == NULL);
+  TEST_RESULT;
+  result= ((mafNodeA *)a1->GetByPath("pair[3]") == NULL);
+  TEST_RESULT;
+  result= ((mafNodeA *)a1->GetByPath("pair[2]") == (mafNodeA *)(a3));
+  TEST_RESULT;
+
+  //Testing Pair{}
+  result= ((mafNodeA *)root->GetByPath("pair{a2}") == NULL);
+  TEST_RESULT;
+  result= ((mafNodeA *)a1->GetByPath("pair{a2") == NULL);
+  TEST_RESULT;
+  result= ((mafNodeA *)a1->GetByPath("pair{a4}") == NULL);
+  TEST_RESULT;
+  result= ((mafNodeA *)a1->GetByPath("pair{a2}") == (mafNodeA *)(a2));
+  TEST_RESULT;
+
+
+  //Testing Child[]
+  result= ((mafNodeA *)sideA->GetByPath("child[2") == NULL);
+  TEST_RESULT;
+  result= ((mafNodeA *)sideA->GetByPath("child[two]") == NULL);
+  TEST_RESULT;
+  result= ((mafNodeA *)sideA->GetByPath("child[3]") == NULL);
+  TEST_RESULT;
+  result= ((mafNodeA *)sideA->GetByPath("child[2]") == (mafNodeA *)(a3));
+  TEST_RESULT;
+
+  //Testing Child{}
+  result= ((mafNodeA *)sideA->GetByPath("child{a2") == NULL);
+  TEST_RESULT;
+  result= ((mafNodeA *)sideA->GetByPath("child{a4}") == NULL);
+  TEST_RESULT;
+  result= ((mafNodeA *)sideA->GetByPath("child{a2}") == (mafNodeA *)(a2));
+  TEST_RESULT;
+
+
+  //Testing ".."
+  result= ((mafNodeA *)root->GetByPath("..") == NULL);
+  TEST_RESULT;
+  result= ((mafNodeA *)a1->GetByPath("..") == (mafNodeA *)(sideA));
+  TEST_RESULT;
+
+
+  //Testing complex paths
+
+  //a1->b3
+  result= ((mafNodeA *)a1->GetByPath("../../child{sideB}/child[2]") == (mafNodeA *)(b3));
+  TEST_RESULT;
+
+  //sideB->a2
+  result= ((mafNodeA *)sideB->GetByPath("prev/child{a2}") == (mafNodeA *)(a2));
+  TEST_RESULT;
+
+  //sideA->b1
+  result= ((mafNodeA *)sideA->GetByPath("lastPair/firstChild") == (mafNodeA *)(b1));
+  TEST_RESULT;
+  
+  //wrong
+  result= ((mafNodeA *)sideA->GetByPath("../../lastChild") == NULL);
+  TEST_RESULT;
+}

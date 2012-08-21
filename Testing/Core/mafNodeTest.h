@@ -84,6 +84,7 @@ public:
   CPPUNIT_TEST(TestRemoveAllChildren);
   CPPUNIT_TEST(TestImport);
   CPPUNIT_TEST(TestBuildAndDestroyATree);
+  CPPUNIT_TEST(TestGetByPath);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -134,6 +135,7 @@ private:
   void TestSetLink();
   void TestSetName();
   void TestBuildAndDestroyATree();
+  void TestGetByPath();
 
   bool result;
 };
@@ -159,6 +161,8 @@ int main( int argc, char* argv[] )
   // Print test in a compiler compatible format.
   CPPUNIT_NS::CompilerOutputter outputter( &result, CPPUNIT_NS::stdCOut() );
   outputter.write(); 
+
+  system("pause");
 
   return result.wasSuccessful() ? 0 : 1;
 }

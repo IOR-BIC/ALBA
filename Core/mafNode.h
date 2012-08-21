@@ -171,6 +171,27 @@ public:
   mafNode *GetFirstChild();
   /** Get the Lase child in the list.*/
   mafNode *GetLastChild();
+
+  /** Get A child by path.
+  The pats are generated from a series of keyword divided by '\'
+  
+  The possible keywords are:
+  next: return the next node at same level
+  prev: return the previous node at same level
+  firstPair: return the first node at same level
+  lastPair: return the last node at same level
+  firstChild: return the first node between children 
+  lastChild: return the last node between children
+  pair[<number>]: return the <number>-th node between pairs
+  pair{<node name>}: return the node named <node name> between pairs
+  child[<number>]: return the <number>-th node between children
+  child{<node name>}: return the node named <node name> between children
+  ..:
+
+  An example path is:
+  "../../child{sideB}/child[2]"
+  */
+  mafNode *GetByPath(char *path);
   
   /** Add a child to this node. Return MAF_OK if success.*/
   virtual int AddChild(mafNode *node);
