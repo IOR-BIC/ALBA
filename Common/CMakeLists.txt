@@ -45,6 +45,22 @@ SET(PROJECT_SRCS
   medVect3d.cpp
   medVect3d.h
   
+  medWizardBlock.cpp
+  medWizardBlock.h
+  
+  medWizard.cpp
+  medWizard.h
+  
+  medWizardManager.cpp
+  medWizardManager.h
+  
+  medWizardOperationBlock.cpp
+  medWizardOperationBlock.h
+  
+  medWizardSelectionBlock.cpp
+  medWizardSelectionBlock.h
+  
+  
 	#### SHOULD BE COMMITTED DOWN ######
 	mafDbg.h
 	mafDataChecksum.h
