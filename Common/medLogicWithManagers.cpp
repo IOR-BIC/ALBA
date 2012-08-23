@@ -29,18 +29,26 @@
 #include "mafViewManager.h"
 #include "mafGUIMDIFrame.h"
 #include "mafOpManager.h"
+#include "medWizardManager.h"
+#include "mafGUIApplicationSettings.h"
 
 //----------------------------------------------------------------------------
 medLogicWithManagers::medLogicWithManagers()
 : mafLogicWithManagers()
 //----------------------------------------------------------------------------
 {
+  m_UseWizardManager  = false;
+
+  m_WizardManager = NULL;
+
 }
+
 //----------------------------------------------------------------------------
 medLogicWithManagers::~medLogicWithManagers()
 //----------------------------------------------------------------------------
 {
 }
+
 //----------------------------------------------------------------------------
 void medLogicWithManagers::ViewContextualMenu(bool vme_menu)
 //----------------------------------------------------------------------------
@@ -57,6 +65,7 @@ void medLogicWithManagers::ViewContextualMenu(bool vme_menu)
   contextMenu->ShowContextualMenu(m_extern_view,v,vme_menu);*/
   cppDEL(contextMenu);
 }
+
 //----------------------------------------------------------------------------
 void medLogicWithManagers::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
@@ -78,6 +87,135 @@ void medLogicWithManagers::OnEvent(mafEventBase *maf_event)
 		default:
 			mafLogicWithManagers::OnEvent(maf_event);
 			break; 
+    //G,G MANAGE WIZARD EVENTS!!!!!!!!!!!!!!!!!!!
+
 		} // end switch case
 	} // end if SafeDowncast
+}
+
+//----------------------------------------------------------------------------
+void medLogicWithManagers::Plug( mafOp *op, wxString menuPath /*= ""*/, bool canUndo /*= true*/, mafGUISettings *setting /*= NULL*/ )
+//----------------------------------------------------------------------------
+{
+  mafLogicWithManagers::Plug(op,menuPath,canUndo,setting);
+
+  if(m_WizardManager) 
+  {
+    m_WizardManager->OpAdd(op, menuPath, canUndo, setting);
+  }
+
+}
+
+//----------------------------------------------------------------------------
+void medLogicWithManagers::Plug( mafView* view, bool visibleInMenu /*= true*/ )
+//----------------------------------------------------------------------------
+{
+  mafLogicWithManagers::Plug(view,visibleInMenu);
+}
+
+//----------------------------------------------------------------------------
+void medLogicWithManagers::Configure()
+//----------------------------------------------------------------------------
+{
+  mafLogicWithManagers::Configure();
+
+  if(m_UseWizardManager)
+  {
+    m_WizardManager = new medWizardManager();
+    m_WizardManager->SetListener(this);
+    m_WizardManager->SetMouse(m_Mouse);
+    m_WizardManager->WarningIfCantUndo(m_ApplicationSettings->GetWarnUserFlag());
+  }
+
+}
+
+//----------------------------------------------------------------------------
+void medLogicWithManagers::Show()
+//----------------------------------------------------------------------------
+{
+  mafLogicWithManagers::Show();
+
+  if(m_WizardManager)
+  {
+    if(m_MenuBar && (m_ImportMenu || m_OpMenu || m_ExportMenu))
+    {
+      m_WizardManager->FillMenu(m_ImportMenu, m_ExportMenu, m_OpMenu);
+      m_WizardManager->SetMenubar(m_MenuBar);
+    }
+    if(m_ToolBar)
+      m_WizardManager->SetToolbar(m_ToolBar);
+  }
+
+}
+
+//----------------------------------------------------------------------------
+void medLogicWithManagers::HandleException()
+//----------------------------------------------------------------------------
+{
+  int answare = wxMessageBox(_("Do you want to try to save the unsaved work ?"), _("Fatal Exception!!"), wxYES_NO|wxCENTER);
+  if(answare == wxYES)
+  {
+    OnFileSaveAs();
+    if (m_OpManager->Running())
+      m_OpManager->StopCurrentOperation();
+    else if (m_WizardManager->Running());
+      m_WizardManager->StopCurrentOperation();
+  }
+  OnQuit();
+}
+
+//----------------------------------------------------------------------------
+void medLogicWithManagers::OnQuit()
+//----------------------------------------------------------------------------
+{
+
+
+
+  if (m_OpManager && m_OpManager->Running())
+  {
+
+    int answer = wxMessageBox
+      (
+      _("There are an running operation, are you sure ?"),
+      _("Confirm"), 
+      wxYES_NO|wxCANCEL|wxICON_QUESTION , m_Win
+      );
+    if(answer == wxYES) 
+      m_OpManager->StopCurrentOperation();
+  }
+
+  else if (m_WizardManager && m_WizardManager->Running())
+  {
+    int answer = wxMessageBox
+      (
+      _("There are an running wizzard, are you sure ?"),
+      _("Confirm"), 
+      wxYES_NO|wxCANCEL|wxICON_QUESTION , m_Win
+      );
+    if(answer == wxYES) 
+      m_WizardManager->StopCurrentOperation();
+  }
+
+  mafLogicWithManagers::OnQuit();
+}
+
+//----------------------------------------------------------------------------
+void medLogicWithManagers::VmeSelect( mafEvent &e )
+//----------------------------------------------------------------------------
+{
+
+}
+
+//----------------------------------------------------------------------------
+void medLogicWithManagers::VmeSelected( mafNode *vme )
+//----------------------------------------------------------------------------
+{
+
+}
+
+//----------------------------------------------------------------------------
+void medLogicWithManagers::ViewSelect()
+//----------------------------------------------------------------------------
+{
+
 }

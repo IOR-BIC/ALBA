@@ -26,12 +26,13 @@
 //----------------------------------------------------------------------------
 // forward reference
 //----------------------------------------------------------------------------
+class medWizardManager;
 
 /**
   Class Name: medLogicWithManagers.
   Class for handle the high level logic of a medical application.
 */
-class MED_COMMON_EXPORT medLogicWithManagers: public mafLogicWithManagers
+class MED_COMMON_EXPORT medLogicWithManagers : public mafLogicWithManagers
 {
 public:
   /** constructor. */
@@ -42,9 +43,44 @@ public:
   /** Process events coming from other objects */ 
 	virtual void OnEvent(mafEventBase *maf_event);
 
+  /**  Plug a new view */
+  virtual void Plug(mafView* view, bool visibleInMenu = true);
+
+  /**  Plug a new operation and its undo flag: if the operation does not support
+  undo the undo flag has no effect */
+	virtual void Plug(mafOp *op, wxString menuPath = "", bool canUndo = true, mafGUISettings *setting = NULL);
+	
+  /** Must be called before Configure */
+  void PlugWizardManager(bool b){m_UseWizardManager=b;};
+
+  /** Configure the application.
+  At this point are plugged all the managers, the side-bar docking panel. 
+  Are plugged also all the setting to the dialogs interface. */
+  virtual void Configure();
+
+  /** Fill the View and operation menu's and set the application stamp to the VMEManager.*/
+  virtual void Show();
+
+  /** Manage application exception and allow to save at least the tree. */
+  virtual void HandleException();
+
 protected:
   /** Show contextual menu for views when right mouse click arrives.*/
   void ViewContextualMenu(bool vme_menu);
 
+  /** Called on Quit event. */
+  virtual void OnQuit();
+
+  /** Respond to a VME_SELECT evt. Instantiate the 'Select' operation. */
+  virtual void VmeSelect(mafEvent &e);
+
+  /** Respond to a VME_SELECTED evt. Update the selection on the tree and view representation. */
+  virtual void VmeSelected(mafNode *vme);
+
+  /** Select a view and update the display list for the tree. */
+  virtual void ViewSelect();
+
+  medWizardManager *m_WizardManager;
+  bool m_UseWizardManager;
 };
 #endif
