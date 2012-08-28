@@ -32,7 +32,7 @@ mafCxxTypeMacro(medWizardOperaiontionBlock);
 
 
 //----------------------------------------------------------------------------
-medWizardOperaiontionBlock::medWizardOperaiontionBlock()
+medWizardOperaiontionBlock::medWizardOperaiontionBlock():medWizardBlock()
 //----------------------------------------------------------------------------
 {
 
@@ -92,7 +92,13 @@ wxString medWizardOperaiontionBlock::GetNextBlock()
   return m_NextBlock;
 }
 
-void medWizardOperaiontionBlock::Execute()
+
+void medWizardOperaiontionBlock::Abort()
+{
+    //Abort The Operation
+}
+
+void medWizardOperaiontionBlock::ExcutionBegin()
 {
   //Ask Wizard for View
 
@@ -102,11 +108,16 @@ void medWizardOperaiontionBlock::Execute()
 
   //Run Operation
 
-  //Hide the required VMEs
- 
 }
 
-void medWizardOperaiontionBlock::Abort()
+void medWizardOperaiontionBlock::ExcutionEnd()
 {
-    //Abort The Operation
+
+  //Hide the required VMEs
+
+}
+
+wxString medWizardOperaiontionBlock::RequiredOperation()
+{
+  return m_Operation;
 }

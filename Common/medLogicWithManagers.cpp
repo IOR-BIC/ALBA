@@ -32,6 +32,11 @@
 #include "medWizardManager.h"
 #include "mafGUIApplicationSettings.h"
 
+#ifdef MAF_USE_VTK
+  #include "mafInteractionManager.h"
+#endif
+
+
 //----------------------------------------------------------------------------
 medLogicWithManagers::medLogicWithManagers()
 : mafLogicWithManagers()
@@ -84,6 +89,36 @@ void medLogicWithManagers::OnEvent(mafEventBase *maf_event)
 				mafLogMessage(wxString::Format("%s",m_Revision.GetCStr()));
 			}
 			break;
+    case MENU_WIZARD:
+      if(m_WizardManager) 
+      {
+        m_WizardManager->WizardRun(e->GetArg());
+        /*
+        if(m_RemoteLogic && m_RemoteLogic->IsSocketConnected() && !m_OpManager->m_FromRemote)
+        {
+          mafEvent re(this, mafOpManager::RUN_OPERATION_EVENT, e->GetArg());
+          re.SetChannel(REMOTE_COMMAND_CHANNEL);
+          m_RemoteLogic->OnEvent(&re);
+        }
+        */
+      }
+      break;
+    case WIZARD_RUN_STARTING:
+      {
+        mafGUIMDIChild *c = (mafGUIMDIChild *)m_Win->GetActiveChild();
+        if (c != NULL)
+          c->SetAllowCloseWindow(false);
+        WizardRunStarting();
+      }
+      break; 
+     case OP_RUN_TERMINATED:
+      {
+        mafGUIMDIChild *c = (mafGUIMDIChild *)m_Win->GetActiveChild();
+        if (c != NULL)
+          c->SetAllowCloseWindow(true);
+        WizardRunTerminated();
+      }
+      break; 
 		default:
 			mafLogicWithManagers::OnEvent(maf_event);
 			break; 
@@ -114,6 +149,16 @@ void medLogicWithManagers::Plug( mafView* view, bool visibleInMenu /*= true*/ )
 }
 
 //----------------------------------------------------------------------------
+void medLogicWithManagers::Plug( medWizard *wizard, wxString menuPath /*= ""*/ )
+//----------------------------------------------------------------------------
+{
+    if(m_WizardManager)
+    {
+      m_WizardManager->WizardAdd(wizard, menuPath);
+    }
+}
+
+//----------------------------------------------------------------------------
 void medLogicWithManagers::Configure()
 //----------------------------------------------------------------------------
 {
@@ -137,9 +182,9 @@ void medLogicWithManagers::Show()
 
   if(m_WizardManager)
   {
-    if(m_MenuBar && (m_ImportMenu || m_OpMenu || m_ExportMenu))
+    if(m_MenuBar)
     {
-      m_WizardManager->FillMenu(m_ImportMenu, m_ExportMenu, m_OpMenu);
+      m_WizardManager->FillMenu(m_WizardMenu);
       m_WizardManager->SetMenubar(m_MenuBar);
     }
     if(m_ToolBar)
@@ -156,9 +201,11 @@ void medLogicWithManagers::HandleException()
   if(answare == wxYES)
   {
     OnFileSaveAs();
+    
     if (m_OpManager->Running())
       m_OpManager->StopCurrentOperation();
-    else if (m_WizardManager->Running());
+    
+    else if (m_WizardManager->Running())
       m_WizardManager->StopCurrentOperation();
   }
   OnQuit();
@@ -169,7 +216,7 @@ void medLogicWithManagers::OnQuit()
 //----------------------------------------------------------------------------
 {
 
-
+  //G,G CONTROLLARE CHIUSURA!!!!
 
   if (m_OpManager && m_OpManager->Running())
   {
@@ -188,7 +235,7 @@ void medLogicWithManagers::OnQuit()
   {
     int answer = wxMessageBox
       (
-      _("There are an running wizzard, are you sure ?"),
+      _("There are an running wizard, are you sure ?"),
       _("Confirm"), 
       wxYES_NO|wxCANCEL|wxICON_QUESTION , m_Win
       );
@@ -204,18 +251,93 @@ void medLogicWithManagers::VmeSelect( mafEvent &e )
 //----------------------------------------------------------------------------
 {
 
+  mafNode *node = NULL;
+
+  if(m_PlugSidebar && (e.GetSender() == this->m_SideBar->GetTree()))
+    node = (mafNode*)e.GetArg();//sender == tree => the node is in e.arg
+  else
+    node = e.GetVme();          //sender == PER  => the node is in e.node  
+
+  if(node == NULL)
+  {
+    //node can be selected by its ID
+    if(m_VMEManager)
+    {
+      long vme_id = e.GetArg();
+      mafVMERoot *root = this->m_VMEManager->GetRoot();
+      if (root)
+      {
+        node = root->FindInTreeById(vme_id);
+        e.SetVme(node);
+      }
+    }
+  }
+
+  if(node != NULL && m_WizardManager)
+    m_WizardManager->OpSelect(node);
+  
+  mafLogicWithManagers::VmeSelect(e);
 }
 
 //----------------------------------------------------------------------------
 void medLogicWithManagers::VmeSelected( mafNode *vme )
 //----------------------------------------------------------------------------
 {
-
+  if(m_WizardManager)  
+    m_WizardManager->VmeSelected(vme);
+  mafLogicWithManagers::VmeSelected(vme);
 }
 
 //----------------------------------------------------------------------------
 void medLogicWithManagers::ViewSelect()
 //----------------------------------------------------------------------------
 {
+  if(m_ViewManager) 
+  {
+    if(m_WizardManager && !m_WizardManager->Running()) 
+    {
+      // needed to update all the operations that will be enabled on View Creation
+      m_WizardManager->VmeSelected(m_WizardManager->GetSelectedVme());
+    }
+  }
+  mafLogicWithManagers::ViewSelect();
+}
+
+void medLogicWithManagers::CreateMenu()
+{
+  mafLogicWithManagers::CreateMenu();
+
+  if (m_UseWizardManager)
+  {
+    m_WizardMenu = new wxMenu;
+    m_MenuBar->Insert(4,m_WizardMenu, _("&Wizard"));
+  }
+}
+
+//----------------------------------------------------------------------------
+void medLogicWithManagers::WizardRunStarting()
+//----------------------------------------------------------------------------
+{
+  EnableMenuAndToolbar(false);
+  // currently mafInteraction is strictly dependent on VTK (marco)
+  #ifdef MAF_USE_VTK
+    if(m_InteractionManager) m_InteractionManager->EnableSelect(false);
+  #endif
+    if(m_SideBar)    m_SideBar->EnableSelect(false);
+
+}
+
+//----------------------------------------------------------------------------
+void medLogicWithManagers::WizardRunTerminated()
+//----------------------------------------------------------------------------
+{
+  EnableMenuAndToolbar(true);
+  // currently mafInteraction is strictly dependent on VTK (marco)
+  #ifdef MAF_USE_VTK
+    if(m_InteractionManager) 
+      m_InteractionManager->EnableSelect(true);
+  #endif
+    if(m_SideBar)
+      m_SideBar->EnableSelect(true);
 
 }

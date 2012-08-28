@@ -32,7 +32,7 @@ mafCxxTypeMacro(medWizardSelectionBlock);
 
 
 //----------------------------------------------------------------------------
-medWizardSelectionBlock::medWizardSelectionBlock()
+medWizardSelectionBlock::medWizardSelectionBlock():medWizardBlock()
 //----------------------------------------------------------------------------
 {
   m_SelectedChoice=0;
@@ -74,34 +74,27 @@ wxString medWizardSelectionBlock::GetNextBlock()
 }
 
 //----------------------------------------------------------------------------
-void medWizardSelectionBlock::Execute()
-//----------------------------------------------------------------------------
-{
-  //Generating Gui
-
-  //Show Modal window
- 
-}
-
-//----------------------------------------------------------------------------
 void medWizardSelectionBlock::SetDescription( char *description )
 //----------------------------------------------------------------------------
 {
   m_Description=description;
 }
 
-//----------------------------------------------------------------------------
-void medWizardSelectionBlock::OnEvent( mafEventBase *maf_event )
-//----------------------------------------------------------------------------
+
+
+void medWizardSelectionBlock::ExcutionBegin()
 {
-    //Manage Events
+  //Generating required wxstring choice array
+  wxString *choices = new wxString[m_Choices.size()];
+
+  for(int i=0;i<m_Choices.size();i++)
+    choices[i]=m_Choices[i].label;
+
+  //Show Modal window
+  m_SelectedChoice = wxGetSingleChoiceIndex(m_Description,m_Title,m_Choices.size(), choices);
+
+  delete choices;  
 }
 
-void medWizardSelectionBlock::Abort()
-{
-  
-  //This function does nothing because selection blocks run in a modal window
-  //so we don't have to manage exteral aborts
 
-}
 

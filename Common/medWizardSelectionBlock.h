@@ -58,14 +58,8 @@ public:
   /** Return the name of the Block witch will be executed after this */
   virtual wxString GetNextBlock();
 
-  /** Execute the block */
-  virtual void Execute();
-
-  /** Manage Events */
-  void OnEvent(mafEventBase *maf_event);
-
-  /** Abort the execution of the block */
-  virtual void Abort();
+  /** Starts the execution of the block */
+  virtual void ExcutionBegin();
 
 private:
 

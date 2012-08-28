@@ -24,19 +24,104 @@
 
 #include "medDecl.h"
 #include "medWizardManager.h"
-#include <math.h>
-
+#include "medWizard.h"
+#include <wx/tokenzr.h>
 
 //----------------------------------------------------------------------------
 medWizardManager::medWizardManager()
 //----------------------------------------------------------------------------
 {
-
+  m_RunningWizard =NULL;
+  m_NumWizard = 0;
+  m_WizardList.clear();
 }
 
 //----------------------------------------------------------------------------
 medWizardManager::~medWizardManager()
 //----------------------------------------------------------------------------
 {
+
+}
+
+void medWizardManager::WizardAdd( medWizard *wizard, wxString menuPath /*= ""*/ )
+{
+  m_WizardList.push_back(wizard);
+  wizard->SetMenuPath(menuPath);
+  wizard->SetId(m_NumWizard);
+  wizard->SetListener(this);
+  m_NumWizard++;
+}
+
+void medWizardManager::FillMenu( wxMenu* wizardMenu )
+{
+  int submenu_id = 1;
+
+  for(int i=0; i<m_NumWizard; i++)
+  {
+    medWizard *wizard = m_WizardList[i];
+    if (wizard->GetMenuPath() != "")
+    {
+      wxMenu *sub_menu = NULL;
+      
+      wxString wizardPath = "";
+      wxStringTokenizer path_tkz(wizard->GetMenuPath(), "/");
+      while ( path_tkz.HasMoreTokens() )
+      {
+        wizardPath = path_tkz.GetNextToken();
+        int item = wizardMenu->FindItem(_(wizardPath));
+        if (item != wxNOT_FOUND)
+        {
+          wxMenuItem *menu_item = wizardMenu->FindItem(item);
+          if (menu_item)
+            sub_menu = menu_item->GetSubMenu();
+        }
+        else
+        {
+          if (sub_menu)
+          {
+            wizardMenu = sub_menu;
+          }
+          sub_menu = new wxMenu;
+          wizardMenu->Append(submenu_id++,_(wizardPath),sub_menu);
+        }
+      }
+
+      if(sub_menu)
+        sub_menu->Append(wizard->GetId(), _(wizard->GetLabel()), _(wizard->GetLabel()));
+      else
+        mafLogMessage(_("error in FillMenu"));
+    }
+    else
+    {
+      wizardMenu->Append(wizard->GetId(), _(wizard->GetLabel()), _(wizard->GetLabel()));
+    }
+  }
+  wxAcceleratorTable accel(MAXOP, m_OpAccelEntries);
+  if (accel.Ok())
+    mafGetFrame()->SetAcceleratorTable(accel);
+
+}
+
+void medWizardManager::WizardRun( int wizardId )
+{
+  int index = wizardId - WIZARD_START;
+  if(index >=0 && index <m_NumWizard) 
+    WizardRun(m_WizardList[index]);
+}
+
+void medWizardManager::WizardRun( medWizard *wizard, void *wizard_param /*= NULL*/ )
+{
+  
+  EnableOp(false);
+
+  m_RunningWizard=wizard;
+  if (wizard_param != NULL)
+  {
+    m_RunningWizard->SetParameters(wizard_param);
+  }
+  
+  Notify(WIZARD_RUN_STARTING);  //SIL. 17-9-2004: - moved here in order to notify which op is started
+
+  m_RunningWizard->Execute();
 
 }

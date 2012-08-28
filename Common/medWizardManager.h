@@ -27,7 +27,7 @@
 //----------------------------------------------------------------------------
 // forward reference
 //----------------------------------------------------------------------------
-
+class medWizard;
 /**
   Class Name: medVect3d.
   Class for handle the high level logic of a medical application.
@@ -42,7 +42,22 @@ public:
   /** Default destructor */
   ~medWizardManager();
 
+  /** Add the Wizard 'op' to the list of available operations. */
+  virtual void WizardAdd(medWizard *wizard, wxString menuPath = "");
 
+  /** Fill the application men with the operations name.	*/
+  virtual void FillMenu(wxMenu* wizardMenu);
+  
+  /** Call this to exec an operation with user interaction and undo/redo services. */
+  virtual void WizardRun(medWizard *wizard, void *wizard_param = NULL);
+
+  /** Run the operation by id. */
+  virtual void WizardRun(int wizardId);
 private:
+
+  int m_NumWizard;
+  std::vector<medWizard *> m_WizardList; ///< List of pointer of plugged wizzard.
+  medWizard *m_RunningWizard;
+
 };
 #endif

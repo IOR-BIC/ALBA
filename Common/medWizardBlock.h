@@ -45,11 +45,11 @@ public:
       "START","END", "ABORT" are reserved. */
   void SetName(char *name);
 
+  /** Get the name of the block */
+  wxString GetName();
+
   /** Return the name of the Block witch will be executed after this */
   virtual wxString GetNextBlock();
-
-  /** Execute the block */
-  virtual void Execute();
 
   /** Abort the execution of the block */
   virtual void Abort();
@@ -57,16 +57,21 @@ public:
   /** Return true if the user has aborted the operation */
   int isAborted();
 
-  /** Manage Events */
-  virtual void OnEvent(mafEventBase *maf_event);
+  /** Starts the execution of the block */
+  virtual void ExcutionBegin();
 
+  /** Ends the execution of the block */
+  virtual void ExcutionEnd();
 
+  /** Returns the name of the operation required by this block 
+      Return an empty string if no operation is required */
+  virtual wxString RequiredOperation();
 
 private:
     
   wxString m_Name;
   wxString m_BlockType;
   int m_Aborted;
-
+  int m_Running;
 };
 #endif

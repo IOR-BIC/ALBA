@@ -39,7 +39,13 @@
 #include "mafPipeFactoryVME.h"
 #include "medPipeFactoryVME.h"
 
-#ifndef _DEBUG
+#define USE_WIZARD
+
+#ifdef USE_WIZARD
+  #include "medWizard.h"
+#endif
+
+#ifndef _GGDEBUG
 //IMPORTERS
 #include "mafOpImporterImage.h"
 #include "mafOpImporterVRML.h"
@@ -64,7 +70,7 @@
 #include "mafOpImporterRAWVolume_BES.h"
 #include "medOpImporterVTK.h"
 #endif
-#ifndef _DEBUG
+#ifndef _GGDEBUG
 //EXPORTERS
 #include "mafOpExporterMSF.h"
 #include "mafOpExporterRAW.h"
@@ -75,7 +81,7 @@
 #include "medOpExporterGRFWS.h"
 #include "medOpExporterMeters.h"
 #endif
-#ifndef _DEBUG
+#ifndef _GGDEBUG
 //OPERATIONS
 #include "mafOp2DMeasure.h"
 #include "mafOpAddLandmark.h"
@@ -141,7 +147,7 @@
 
 #include "mafViewVTK.h"
 
-#ifndef _DEBUG
+#ifndef _GGDEBUG
 //VIEWS
 
 #include "mafViewCompound.h"
@@ -183,6 +189,7 @@ bool exMedicalApp::OnInit()
 	assert(result==MAF_OK);
 
 	m_Logic = new medLogicWithManagers();
+  
 	m_Logic->GetTopWin()->SetTitle("Medical example");
 
 	//m_Logic->PlugTimebar(false);
@@ -193,6 +200,9 @@ bool exMedicalApp::OnInit()
 	//m_Logic->PlugOpManager(false);
 	//m_Logic->PlugViewManager(false);
 	//m_Logic->PlugVMEManager(false);  // the VmeManager at the moment cause 4 leaks of 200+32+24+56 bytes  //SIL. 20-4-2005: 
+#ifdef USE_WIZARD
+  m_Logic->PlugWizardManager(true);
+#endif
 	m_Logic->Configure();
 
 	SetTopWindow(mafGetFrame());  
@@ -200,7 +210,7 @@ bool exMedicalApp::OnInit()
 	//------------------------------------------------------------
 	// Importer Menu':
 	//------------------------------------------------------------
-#ifndef _DEBUG
+#ifndef _GGDEBUG
 	m_Logic->Plug(new mafOpImporterImage("Images"));
 	m_Logic->Plug(new mafOpImporterRAWVolume("RAW Volume"));
 	m_Logic->Plug(new mafOpImporterSTL("STL"));
@@ -231,7 +241,7 @@ bool exMedicalApp::OnInit()
 	//------------------------------------------------------------
 	// Exporter Menu':
 	//------------------------------------------------------------
-#ifndef _DEBUG
+#ifndef _GGDEBUG
 	m_Logic->Plug(new mafOpExporterMSF("MSF"));
 	m_Logic->Plug(new mafOpExporterSTL("STL"));
 	m_Logic->Plug(new mafOpExporterVTK("VTK"));
@@ -246,7 +256,7 @@ bool exMedicalApp::OnInit()
 	//------------------------------------------------------------
 	// Operation Menu':
 	//------------------------------------------------------------
-#ifndef _DEBUG
+#ifndef _GGDEBUG
 	m_Logic->Plug(new mafOp2DMeasure("2D Measure"),"Measure");
 	m_Logic->Plug(new mafOpVOIDensity("VOI Density"),"Measure");
 	m_Logic->Plug(new medOpVolumeMeasure("Volume"),"Measure");
@@ -313,13 +323,23 @@ bool exMedicalApp::OnInit()
 #endif
 	//------------------------------------------------------------
 
+
+#ifdef USE_WIZARD
+  //------------------------------------------------------------
+  // Wizard Menu':
+  //------------------------------------------------------------
+
+  m_Logic->Plug(new medWizard("test"),"");
+  m_Logic->Plug(new medWizard("subTest"),"SubMenu");
+#endif
+
 	//------------------------------------------------------------
 	// View Menu':
 	//------------------------------------------------------------
 	//View VTK
 	m_Logic->Plug(new mafViewVTK("VTK view"));
 
-#ifndef _DEBUG
+#ifndef _GGDEBUG
 
 	//View VTK
 	m_Logic->Plug(new mafViewVTK("VTK view"));

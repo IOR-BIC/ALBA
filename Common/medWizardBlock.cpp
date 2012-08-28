@@ -59,4 +59,38 @@ int medWizardBlock::isAborted()
   return m_Aborted;
 }
 
+wxString medWizardBlock::GetName()
+{
+   return m_Name;
+}
+
+
+//
+
+wxString medWizardBlock::GetNextBlock()
+{
+  return wxString("");
+}
+
+void medWizardBlock::Abort()
+{
+  m_Aborted=true;
+}
+
+
+void medWizardBlock::ExcutionBegin()
+{
+  m_Running=true;
+}
+
+void medWizardBlock::ExcutionEnd()
+{
+  m_Running=false;
+}
+
+wxString medWizardBlock::RequiredOperation()
+{
+  return wxString("");
+}
+
 

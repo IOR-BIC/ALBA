@@ -28,6 +28,7 @@
 //----------------------------------------------------------------------------
 
 class medWizardBlock;
+class mafObserver;
 
 
 /**
@@ -39,7 +40,7 @@ class MED_COMMON_EXPORT medWizard
 public:
 
   /** Default constructor */
-  medWizard();
+  medWizard(const wxString &label);
 
   /** Default destructor */
   ~medWizard();
@@ -50,9 +51,50 @@ public:
   /** Add a new Block to the wizard */
   void AddBlock(medWizardBlock *block);
   
+  /** Sets the menu path */
+  void SetMenuPath(wxString path);
+
+  /** Sets the menu path */
+  wxString GetMenuPath();
+
+  /** Sets The event listener */
+  void SetListener(mafObserver *Listener);
+
+  /** Set the wizard id */
+  void SetId(int id);
+
+  /** Get the wizard id */
+  int GetId();
+
+  /** Return the Menu label of the wizard*/
+  wxString GetLabel();
+
+  /** Initialize wizzard's variables according to the parameter's list. */
+  virtual void SetParameters(void *param) {};
+
 private:
+
+  /** Manages the begin of execution of current block */
+  void BlockExecutionBegin();
+
+  /** Manage the end of execution of current block.
+      Controls if the user aborted the wizard during block execution
+      If necessary starts the execution of next block */
+  void BlockExecutionEnd();
+
+  /** Clean up and abort the wizard */
+  void AbortWizard();
+
+  /** Return a pointer to the wizard  block */
+  medWizardBlock *GetBlockByName(const char *name);
   
   std::vector <medWizardBlock *> m_Blocks;
+  medWizardBlock *m_CurrentBlock; 
+  wxString        m_MenuPath;
+  int							m_Id; ///< Index of the wizard referring to the wizard list.
+  wxString				m_Label; ///< Label of the wizard that will appear on menu.
+  mafObserver    *m_Listener;
+
   
 };
 #endif

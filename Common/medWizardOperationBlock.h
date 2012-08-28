@@ -68,11 +68,18 @@ public:
   /** Execute the block */
   virtual void Execute();
 
-  /** Manage Events */
-  void OnEvent(mafEventBase *maf_event);
-
   /** Abort the execution of the block */
   virtual void Abort();
+
+  /** Starts the execution of the block */
+  virtual void ExcutionBegin();
+  
+  /** Ends the execution of the block */
+  virtual void ExcutionEnd();
+
+    /** Returns the name of the operation required by this block 
+      Return an empty string if no operation is required */
+  virtual wxString RequiredOperation();
 
 private:
 

@@ -27,6 +27,7 @@
 // forward reference
 //----------------------------------------------------------------------------
 class medWizardManager;
+class medWizard;
 
 /**
   Class Name: medLogicWithManagers.
@@ -50,6 +51,9 @@ public:
   undo the undo flag has no effect */
 	virtual void Plug(mafOp *op, wxString menuPath = "", bool canUndo = true, mafGUISettings *setting = NULL);
 	
+  /**  Plug a new wizard */
+	virtual void Plug(medWizard *wizard, wxString menuPath = "");
+	
   /** Must be called before Configure */
   void PlugWizardManager(bool b){m_UseWizardManager=b;};
 
@@ -63,6 +67,7 @@ public:
 
   /** Manage application exception and allow to save at least the tree. */
   virtual void HandleException();
+
 
 protected:
   /** Show contextual menu for views when right mouse click arrives.*/
@@ -80,7 +85,18 @@ protected:
   /** Select a view and update the display list for the tree. */
   virtual void ViewSelect();
 
+  /** Redefined to add View,Op,Import,Export, Wizard menu*/
+  virtual void CreateMenu();
+
+  /** Called when an wizard starts. Disable all menu and lock the Selection */ 
+  virtual void WizardRunStarting();
+
+  /** Called when an wizard stops. Re-enable all menu and unlock the Selection */ 
+  virtual void WizardRunTerminated();
+
   medWizardManager *m_WizardManager;
   bool m_UseWizardManager;
+  wxMenu *m_WizardMenu;
+
 };
 #endif
