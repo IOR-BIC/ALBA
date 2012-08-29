@@ -162,8 +162,6 @@ int main( int argc, char* argv[] )
   CPPUNIT_NS::CompilerOutputter outputter( &result, CPPUNIT_NS::stdCOut() );
   outputter.write(); 
 
-  system("pause");
-
   return result.wasSuccessful() ? 0 : 1;
 }
 #endif
