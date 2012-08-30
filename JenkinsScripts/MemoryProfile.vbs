@@ -18,11 +18,11 @@
    End IF
   End Function
 
-  relativeExePath = ".\Medical_Parabuild\bin\debug\"
+  relativeExePath = ".\build\bin\debug\"
   
   ' create a text log
   Set fso = CreateObject("Scripting.FileSystemObject")
-  Set logFile = fso.CreateTextFile(".\Medical_Parabuild\bin\Debug\MemoryAllocation\XML\MemoryAllocationLog.txt", True)
+  Set logFile = fso.CreateTextFile(".\build\bin\Debug\MemoryAllocation\XML\MemoryAllocationLog.txt", True)
   logFile.WriteLine("** Log file for AQTime memory profiling: **")
   logFile.WriteLine("")
   logFile.Write("Memory profile started on ")
@@ -36,7 +36,7 @@
   intLeakedFiles = 0
 
   ' Path in which create projects; executables are located here (parabuil dependent)  
-  ' Parabuild active directory is the downloaded CVS module name for example OpenMAF
+  ' Parabuild active directory is the downloaded CVS module name for example medical
   
   i = 1
   
@@ -105,7 +105,6 @@
     
       If canProfile = True Then
         logFile.WriteLine("Starting AQTime on: " + exeFileName)
-    
         ' Selects the desired profiler
         If Not IntegrationManager.SelectProfiler("Allocation Profiler") Then 
           'MsgBox "The specified profiler was not found."
