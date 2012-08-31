@@ -311,21 +311,37 @@ void medVisualPipeCollisionDetection::UpdatePipeline(bool force /* = false */)
       m_CollisionFilter->SetMatrix(1,m_Matrix1[i]->GetVTKMatrix());
       m_CollisionFilter->Update();
       //Create the array with correct scalars to view contact cells
+      vtkMAFSmartPointer<vtkPolyData> poly;
+      poly->DeepCopy(vtkPolyData::SafeDownCast(m_SurfacesToCollide[i]->GetOutput()->GetVTKData()));
+      poly->Update();
+      vtkDataArray *array1 = m_CollisionFilter->GetOutput(1)->GetFieldData()->GetArray("ContactCells");
+      vtkDataArray *arrayToExclude1 = poly->GetCellData()->GetArray(m_ScalarNameToExclude.c_str());
       vtkDataArray *array0 = m_CollisionFilter->GetOutput(0)->GetFieldData()->GetArray("ContactCells");
-      vtkDataArray *arrayToExclude = m_Vme->GetOutput()->GetVTKData()->GetCellData()->GetArray(m_ScalarNameToExclude.c_str());
+      vtkDataArray *arrayToExclude0 = m_Vme->GetOutput()->GetVTKData()->GetCellData()->GetArray(m_ScalarNameToExclude.c_str());
       if (array0 != NULL)
       {
         for (int i=0;i<array0->GetNumberOfTuples();i++)
         {
-          if (arrayToExclude)
+          bool exclude = false;
+          if (arrayToExclude0)
           {
             int value = (int)array0->GetTuple1(i);
-            if (arrayToExclude->GetTuple1(value) != TRUE)
+            double test = arrayToExclude0->GetTuple1(value);
+            if (arrayToExclude0->GetTuple1(value) == TRUE)
             {
-              contactScalars0->SetTuple1(value,1.0);
+              //contactScalars0->SetTuple1(value,0.0);
+              exclude = true;
             }
           }
-          else
+          if (arrayToExclude1)
+          {
+            int value = (int)array1->GetTuple1(i);
+            if (arrayToExclude1->GetTuple1(value) == TRUE)
+            {
+              exclude = true;
+            }
+          }
+          if (!exclude)
           {
             int value = (int)array0->GetTuple1(i);
             contactScalars0->SetTuple1(value,1.0);
@@ -335,9 +351,9 @@ void medVisualPipeCollisionDetection::UpdatePipeline(bool force /* = false */)
       //Show the surface to collide with correct scalars
       if (m_ShowSurfaceToCollide)
       {
-        vtkMAFSmartPointer<vtkPolyData> poly;
-        poly->DeepCopy(vtkPolyData::SafeDownCast(m_SurfacesToCollide[i]->GetOutput()->GetVTKData()));
-        poly->Update();
+//         vtkMAFSmartPointer<vtkPolyData> poly;
+//         poly->DeepCopy(vtkPolyData::SafeDownCast(m_SurfacesToCollide[i]->GetOutput()->GetVTKData()));
+//         poly->Update();
         vtkMAFSmartPointer<vtkTransform> t;
         t->SetMatrix(m1->GetVTKMatrix());
         vtkMAFSmartPointer<vtkTransformPolyDataFilter> tpd;
@@ -353,23 +369,33 @@ void medVisualPipeCollisionDetection::UpdatePipeline(bool force /* = false */)
           contactScalars1->SetTuple1(j,0.0);
         }        
 
-        vtkDataArray *array1 = m_CollisionFilter->GetOutput(1)->GetFieldData()->GetArray("ContactCells");
-        vtkDataArray *arrayToExclude = poly->GetCellData()->GetArray(m_ScalarNameToExclude.c_str());
+//         vtkDataArray *array1 = m_CollisionFilter->GetOutput(1)->GetFieldData()->GetArray("ContactCells");
+//         vtkDataArray *arrayToExclude1 = poly->GetCellData()->GetArray(m_ScalarNameToExclude.c_str());
         if (array1 != NULL)
         {
           for (int j=0;j<array1->GetNumberOfTuples();j++)
           {
-            if (arrayToExclude)
+            bool exclude = false;
+            if (arrayToExclude0)
             {
-              int value = (int)array1->GetTuple1(j);
-	            if (arrayToExclude->GetTuple1(value) != TRUE)
-	            {
-		            contactScalars1->SetTuple1(value,1.0);
-	            }
+              int value = (int)array0->GetTuple1(i);
+              if (arrayToExclude0->GetTuple1(value) == TRUE)
+              {
+                //contactScalars0->SetTuple1(value,0.0);
+                exclude = true;
+              }
             }
-            else
+            if (arrayToExclude1)
             {
-              int value = (int)array1->GetTuple1(j);
+              int value = (int)array1->GetTuple1(i);
+              if (arrayToExclude1->GetTuple1(value) == TRUE)
+              {
+                exclude = true;
+              }
+            }
+            if (!exclude)
+            {
+              int value = (int)array0->GetTuple1(i);
               contactScalars1->SetTuple1(value,1.0);
             }
           }
