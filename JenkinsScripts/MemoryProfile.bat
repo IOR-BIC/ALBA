@@ -10,16 +10,17 @@ set XMLResultsDirectory=%ProfilingResultsDirectory%\XML\
 set HTMLResultsDirectory=%ProfilingResultsDirectory%\HTML\
 
 REM delete the directory storing previous results
-rmdir /s /q %ProfilingResultsDirectory%
+REM rmdir /s /q %ProfilingResultsDirectory%
 
 REM create the directory again the directories for storing XML and HTML memory profiling results
-mkdir %XMLResultsDirectory%
-mkdir %HTMLResultsDirectory%
+REM mkdir %XMLResultsDirectory%
+REM mkdir %HTMLResultsDirectory%
 echo  creating profiling results... 
 
 REM run the memory profile Visual Basic script
 .\source\JenkinsScripts\MemoryProfile.vbs
 
+ren .\build\bin\Debug\MemoryAllocation\XML\MemoryAllocationLog.txt %1%
 echo.
 echo   profiling results created successfully!
 echo.
