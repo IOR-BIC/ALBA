@@ -27,7 +27,7 @@
 #include "medGUIContextualMenu.h"
 #include "mafGUIMDIChild.h"
 #include "mafViewManager.h"
-#include "mafGUIMDIFrame.h"
+#include "medGUIMDIFrame.h"
 #include "mafOpManager.h"
 #include "medWizardManager.h"
 #include "mafGUIApplicationSettings.h"
@@ -39,13 +39,12 @@
 
 //----------------------------------------------------------------------------
 medLogicWithManagers::medLogicWithManagers()
-: mafLogicWithManagers()
+: mafLogicWithManagers( new medGUIMDIFrame("maf", wxDefaultPosition, wxSize(800, 600)) )
 //----------------------------------------------------------------------------
 {
   m_UseWizardManager  = false;
-
+  m_WizardRunning = false;
   m_WizardManager = NULL;
-
 }
 
 //----------------------------------------------------------------------------
@@ -111,7 +110,7 @@ void medLogicWithManagers::OnEvent(mafEventBase *maf_event)
         WizardRunStarting();
       }
       break; 
-     case OP_RUN_TERMINATED:
+     case WIZARD_RUN_TERMINATED:
       {
         mafGUIMDIChild *c = (mafGUIMDIChild *)m_Win->GetActiveChild();
         if (c != NULL)
@@ -119,11 +118,15 @@ void medLogicWithManagers::OnEvent(mafEventBase *maf_event)
         WizardRunTerminated();
       }
       break; 
+    case WIZARD_REQUIRED_VIEW:
+       {
+         //G,G Show view!
+       }
+
 		default:
+      //Call parent event manager
 			mafLogicWithManagers::OnEvent(maf_event);
 			break; 
-    //G,G MANAGE WIZARD EVENTS!!!!!!!!!!!!!!!!!!!
-
 		} // end switch case
 	} // end if SafeDowncast
 }
@@ -318,6 +321,8 @@ void medLogicWithManagers::CreateMenu()
 void medLogicWithManagers::WizardRunStarting()
 //----------------------------------------------------------------------------
 {
+  m_WizardRunning=true;
+
   EnableMenuAndToolbar(false);
   // currently mafInteraction is strictly dependent on VTK (marco)
   #ifdef MAF_USE_VTK
@@ -331,6 +336,8 @@ void medLogicWithManagers::WizardRunStarting()
 void medLogicWithManagers::WizardRunTerminated()
 //----------------------------------------------------------------------------
 {
+  m_WizardRunning=false;
+
   EnableMenuAndToolbar(true);
   // currently mafInteraction is strictly dependent on VTK (marco)
   #ifdef MAF_USE_VTK
@@ -340,4 +347,40 @@ void medLogicWithManagers::WizardRunTerminated()
     if(m_SideBar)
       m_SideBar->EnableSelect(true);
 
+}
+
+//----------------------------------------------------------------------------
+void medLogicWithManagers::OpRunStarting()
+//----------------------------------------------------------------------------
+{
+  //If Wizard is running menu are already disabled
+  if (!m_WizardRunning)
+  {
+    EnableMenuAndToolbar(false);
+    // currently mafInteraction is strictly dependent on VTK (marco)
+    #ifdef MAF_USE_VTK
+    if(m_InteractionManager) m_InteractionManager->EnableSelect(false);
+    #endif
+    if(m_SideBar)    m_SideBar->EnableSelect(false);
+  }
+}
+//----------------------------------------------------------------------------
+void medLogicWithManagers::OpRunTerminated()
+//----------------------------------------------------------------------------
+{
+  //If Wizard is running menu must remain disabled on op run terminated
+  if (!m_WizardRunning)
+  {
+    EnableMenuAndToolbar(true);
+    // currently mafInteraction is strictly dependent on VTK (marco)
+    #ifdef MAF_USE_VTK
+    if(m_InteractionManager) 
+      m_InteractionManager->EnableSelect(true);
+    #endif
+    if(m_SideBar)
+      m_SideBar->EnableSelect(true);
+  }
+  //If there are a wizard Running we need to continue execution when operation is terminated
+  else 
+    m_WizardManager->WizardContinue();  
 }

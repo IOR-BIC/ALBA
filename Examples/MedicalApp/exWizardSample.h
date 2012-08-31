@@ -33,6 +33,9 @@ class exWizardSample : public medWizard
 public:
   /** Default constructor */
   exWizardSample(const wxString &label);
+  
+  /** Accept function*/
+  virtual bool Accept(mafNode* vme);
 
 };
 #endif // __medOpInteraction_H__

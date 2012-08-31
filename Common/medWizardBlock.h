@@ -31,20 +31,19 @@
   Class Name: medVect3d.
   Class for handle the high level logic of a medical application.
 */
-class MED_COMMON_EXPORT medWizardBlock : public mafObject
+class MED_COMMON_EXPORT medWizardBlock 
 {
 public:
 
-  /** Default constructor */
-  medWizardBlock();
+  /** Default constructor   
+      Requires the name of the block 
+      "START","END", "ABORT" are reserved. */
+  medWizardBlock(const char *name);
 
   /** Default destructor */
   ~medWizardBlock();
 
-  /** Set the name of the block 
-      "START","END", "ABORT" are reserved. */
-  void SetName(char *name);
-
+  
   /** Get the name of the block */
   wxString GetName();
 
@@ -65,13 +64,24 @@ public:
 
   /** Returns the name of the operation required by this block 
       Return an empty string if no operation is required */
-  virtual wxString RequiredOperation();
+  virtual wxString GetRequiredOperation();
+
+  /** Set the selected VME, this function must be called before execution begin*/
+  void SetSelectedVME(mafNode *node);
+
+  /** Sets The event listener */
+  void SetListener(mafObserver *Listener);
+
+protected:
+  wxString m_Name;
+  wxString m_BlockType;
+  mafNode	*m_SelectedVME; ///< Pointer to the current selected node.
+  int m_Aborted;
+  int m_Running;
+  mafObserver    *m_Listener;
 
 private:
     
-  wxString m_Name;
-  wxString m_BlockType;
-  int m_Aborted;
-  int m_Running;
+  
 };
 #endif

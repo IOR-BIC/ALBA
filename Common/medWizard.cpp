@@ -26,7 +26,7 @@
 #include "medWizard.h"
 #include "mafObserver.h"
 #include "medWizardBlock.h"
-#include <math.h>
+
 
 
 //----------------------------------------------------------------------------
@@ -38,14 +38,26 @@ medWizard::medWizard(const wxString &label)
   m_Listener=NULL;
 }
 
+medWizard::medWizard()
+{
+  
+  m_Label  = "Default Wizard Name";
+  m_CurrentBlock=NULL;
+  m_Listener=NULL;
+}
+
 //----------------------------------------------------------------------------
 medWizard::~medWizard()
 //----------------------------------------------------------------------------
 {
+  for (int i=0;i<m_Blocks.size();i++)
+   delete m_Blocks[i];
   m_Blocks.clear();
 }
 
+//----------------------------------------------------------------------------
 void medWizard::Execute()
+//----------------------------------------------------------------------------
 {
   medWizardBlock *start=GetBlockByName("START");
 
@@ -58,42 +70,59 @@ void medWizard::Execute()
   }
 }
 
+//----------------------------------------------------------------------------
 void medWizard::AddBlock( medWizardBlock *block)
+//----------------------------------------------------------------------------
 {
-  this->m_Blocks.push_back(block);
+  block->SetListener(this);
+  m_Blocks.push_back(block);
 }
 
+//----------------------------------------------------------------------------
 void medWizard::SetMenuPath( wxString path )
+//----------------------------------------------------------------------------
 {
   m_MenuPath=path;
 }
 
+//----------------------------------------------------------------------------
 void medWizard::SetListener( mafObserver *Listener )
+//----------------------------------------------------------------------------
 {
   m_Listener = Listener;
 }
 
+//----------------------------------------------------------------------------
 void medWizard::SetId( int id )
+//----------------------------------------------------------------------------
 {
   m_Id=id;
 }
 
+//----------------------------------------------------------------------------
 wxString medWizard::GetMenuPath()
+//----------------------------------------------------------------------------
 {
   return m_MenuPath;
 }
 
+//----------------------------------------------------------------------------
 int medWizard::GetId()
+//----------------------------------------------------------------------------
 {
   return m_Id;
 }
 
+//----------------------------------------------------------------------------
 wxString medWizard::GetLabel()
+//----------------------------------------------------------------------------
 {
   return m_Label;
 }
 
+//----------------------------------------------------------------------------
 medWizardBlock *medWizard::GetBlockByName(const char *name )
+//----------------------------------------------------------------------------
 {
   for (int i=0;i<m_Blocks.size();i++)
     if (m_Blocks[i]->GetName()==name)
@@ -103,31 +132,42 @@ medWizardBlock *medWizard::GetBlockByName(const char *name )
   return NULL;
 }
 
+//----------------------------------------------------------------------------
+bool medWizard::Accept(mafNode* vme)
+//----------------------------------------------------------------------------
+{
+  return false;
+}
+
+//----------------------------------------------------------------------------
 void medWizard::BlockExecutionBegin()
+//----------------------------------------------------------------------------
 {
   wxString requiredOperation;
+
+  m_CurrentBlock->SetSelectedVME(m_SelectedVME);
+
   m_CurrentBlock->ExcutionBegin();
 
-  //there is a required operation 
-  //We need to ask to the wizard manager for the operation start
-  //the esecution of operation is asyncronous, so we need to suspend the esecution of the block
-  //and wait for operation done event to continue execution
-  
-  if (requiredOperation!="")
-  {
-    //G,G OPERATION EVENT 
-  }
-  else
+  //there is a not a required operation 
+  //The wizard flow continues without interruption and we call BlockExecutionEnd() 
+  //elsewere if we had an operation it is run asynchronous and BlockExecutionEnd() 
+  //will be called my managers after operation stop
+  if (requiredOperation=="")
     BlockExecutionEnd();
   
 }
 
+//----------------------------------------------------------------------------
 void medWizard::AbortWizard()
+//----------------------------------------------------------------------------
 {
 
 }
 
+//----------------------------------------------------------------------------
 void medWizard::BlockExecutionEnd()
+//----------------------------------------------------------------------------
 {
   wxString nextBlock;
 
@@ -143,7 +183,7 @@ void medWizard::BlockExecutionEnd()
 
     if (nextBlock=="END")
     {
-      //G,G End WIZARD EVENY
+      mafEventMacro(mafEvent(this,WIZARD_RUN_TERMINATED));
     }
     else
     {
@@ -159,3 +199,32 @@ void medWizard::BlockExecutionEnd()
     }
   }
 }
+
+//----------------------------------------------------------------------------  
+void medWizard::OnEvent(mafEventBase *maf_event)
+//----------------------------------------------------------------------------  
+{
+
+  //forward up event;
+  mafEventMacro(*maf_event);
+}
+
+
+//----------------------------------------------------------------------------  
+void medWizard::SetSelectedVME( mafNode *node )
+//----------------------------------------------------------------------------  
+{
+  m_SelectedVME=node;
+  if (m_CurrentBlock)
+    m_CurrentBlock->SetSelectedVME(node);
+}
+
+//----------------------------------------------------------------------------  
+void medWizard::ContinueExecution()
+//----------------------------------------------------------------------------  
+{
+  BlockExecutionEnd();
+}
+
+
+

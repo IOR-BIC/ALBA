@@ -21,7 +21,8 @@
 // includes :
 //----------------------------------------------------------------------------
 #include "medCommonDefines.h"
-#include "medWizard.h"
+#include "mafObserver.h"
+#include <vector>
 
 //----------------------------------------------------------------------------
 // forward reference
@@ -29,15 +30,19 @@
 
 class medWizardBlock;
 class mafObserver;
+class mafNode;
 
 
 /**
   Class Name: medVect3d.
   Class for handle the high level logic of a medical application.
 */
-class MED_COMMON_EXPORT medWizard
+class MED_COMMON_EXPORT medWizard : mafObserver
 {
 public:
+
+  /** Default constructor */
+  medWizard();
 
   /** Default constructor */
   medWizard(const wxString &label);
@@ -45,15 +50,15 @@ public:
   /** Default destructor */
   ~medWizard();
 
+  /** Return true for the acceptable vme type.*/
+  virtual bool Accept(mafNode* vme);
+
   /** Execute the wizard */
   void Execute();
 
-  /** Add a new Block to the wizard */
-  void AddBlock(medWizardBlock *block);
-  
   /** Sets the menu path */
   void SetMenuPath(wxString path);
-
+  
   /** Sets the menu path */
   wxString GetMenuPath();
 
@@ -69,9 +74,23 @@ public:
   /** Return the Menu label of the wizard*/
   wxString GetLabel();
 
-  /** Initialize wizzard's variables according to the parameter's list. */
+  /** Initialize wizard's variables according to the parameter's list. */
   virtual void SetParameters(void *param) {};
 
+  /** Set the selected VME, this function must be called before execution begin*/
+  void SetSelectedVME(mafNode *node);
+
+  /** Used to continue wizard execution after operation termination */
+  void ContinueExecution();
+
+protected:
+
+  /** Add a new Block to the wizard 
+      Added blocks will be auto-deleted form the wizard*/
+  void AddBlock(medWizardBlock *block);
+
+  /** Event management */
+  virtual void OnEvent(mafEventBase *maf_event);
 private:
 
   /** Manages the begin of execution of current block */
@@ -94,6 +113,7 @@ private:
   int							m_Id; ///< Index of the wizard referring to the wizard list.
   wxString				m_Label; ///< Label of the wizard that will appear on menu.
   mafObserver    *m_Listener;
+  mafNode        *m_SelectedVME; 
 
   
 };

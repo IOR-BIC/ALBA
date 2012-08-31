@@ -32,54 +32,60 @@
   Class Name: medVect3d.
   Class for handle the high level logic of a medical application.
 */
-class MED_COMMON_EXPORT medWizardOperaiontionBlock : medWizardBlock
+class MED_COMMON_EXPORT medWizardOperaiontionBlock : public medWizardBlock
 {
 public:
-  mafTypeMacro(medWizardOperaiontionBlock, medWizardBlock);
-
+  
   /** Default constructor */
-  medWizardOperaiontionBlock();
+  medWizardOperaiontionBlock(const char *name);
 
   /** Default destructor */
   ~medWizardOperaiontionBlock();
 
   /** Set The name of the operation required view */
-  void RequiredView(char *View);
+  void SetRequiredView(const char *View);
+
+  /** Set The name of the operation required view */
+  wxString GetRequiredView();
 
   /** Set the path for VME selection */
-  void VmeSelect(char *path);
+  void VmeSelect(const char *path);
 
   /** Set the path of the VMEs that is need to show for the operation.
       The path starts from the selected vme. 
       Multiple calls to this funcion correspond on multiple VME show.*/
-  void VmeShow(char *path);
+  void VmeShow(const char *path);
 
   /** Set the path of the VMEs that is need to hide after the operation.
       The path starts from the selected vme.
       Multiple calls to this funcion correspond on multiple VME show*/
-  void VmeHide(char *path);
+  void VmeHide(const char *path);
 
   /** Set name of the Block called after operation. */
-  void SetNextBlock(char *block);
+  void SetNextBlock(const char *block);
 
   /** Return the name of the Block witch will be executed after this */
-  virtual wxString GetNextBlock();
+  wxString GetNextBlock();
 
   /** Execute the block */
-  virtual void Execute();
+  void Execute();
 
   /** Abort the execution of the block */
-  virtual void Abort();
+  void Abort();
 
   /** Starts the execution of the block */
-  virtual void ExcutionBegin();
+  void ExcutionBegin();
   
   /** Ends the execution of the block */
-  virtual void ExcutionEnd();
+  void ExcutionEnd();
 
-    /** Returns the name of the operation required by this block 
-      Return an empty string if no operation is required */
-  virtual wxString RequiredOperation();
+   /** Returns the name of the operation required by this block 
+       Return an empty string if no operation is required */
+   void SetRequiredOperation(const char *name);
+
+   /** Returns the name of the operation required by this block 
+       Return an empty string if no operation is required */
+   wxString GetRequiredOperation();
 
 private:
 

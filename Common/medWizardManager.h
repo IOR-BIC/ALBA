@@ -42,6 +42,9 @@ public:
   /** Default destructor */
   ~medWizardManager();
 
+  /** Event Management */
+  virtual void OnEvent(mafEventBase *maf_event);
+
   /** Add the Wizard 'op' to the list of available operations. */
   virtual void WizardAdd(medWizard *wizard, wxString menuPath = "");
 
@@ -53,7 +56,24 @@ public:
 
   /** Run the operation by id. */
   virtual void WizardRun(int wizardId);
+
+  /** Called on opeation termination to contuinue the workflow*/
+  virtual void WizardContinue();
+
+  /** Record the selected vme and enable the menu_entries relative to the compatible wizard. */
+  virtual void VmeSelected(mafNode* node);
+
+  /** Enable/Disable the men items operation. */
+  virtual void EnableOp(bool CanEnable = true);
+
+  
 private:
+
+  /** Enable/Disable the men items operation. */
+  virtual void EnableWizardMenus(bool CanEnable = true);
+
+
+  virtual void WizzardStop();
 
   int m_NumWizard;
   std::vector<medWizard *> m_WizardList; ///< List of pointer of plugged wizzard.

@@ -24,15 +24,11 @@
 
 #include "medDecl.h"
 #include "medWizardOperationBlock.h"
-#include <math.h>
+#include "mafNode.h"
+#include "mafEvent.h"
 
 //----------------------------------------------------------------------------
-mafCxxTypeMacro(medWizardOperaiontionBlock);
-//----------------------------------------------------------------------------
-
-
-//----------------------------------------------------------------------------
-medWizardOperaiontionBlock::medWizardOperaiontionBlock():medWizardBlock()
+medWizardOperaiontionBlock::medWizardOperaiontionBlock(const char *name):medWizardBlock(name)
 //----------------------------------------------------------------------------
 {
 
@@ -47,21 +43,26 @@ medWizardOperaiontionBlock::~medWizardOperaiontionBlock()
 }
 
 //----------------------------------------------------------------------------
-void medWizardOperaiontionBlock::RequiredView( char *View )
+void medWizardOperaiontionBlock::SetRequiredView( const char *View )
 //----------------------------------------------------------------------------
 {
   m_RequiredView = View;
 }
 
+wxString medWizardOperaiontionBlock::GetRequiredView()
+{
+  return m_RequiredView;
+}
+
 //----------------------------------------------------------------------------
-void medWizardOperaiontionBlock::VmeSelect( char *path )
+void medWizardOperaiontionBlock::VmeSelect( const char *path )
 //----------------------------------------------------------------------------
 {
   m_VmeSelect=path;
 }
 
 //----------------------------------------------------------------------------
-void medWizardOperaiontionBlock::VmeShow( char *path )
+void medWizardOperaiontionBlock::VmeShow( const char *path )
 //----------------------------------------------------------------------------
 {
   wxString wxPath;
@@ -70,7 +71,7 @@ void medWizardOperaiontionBlock::VmeShow( char *path )
 }
 
 //----------------------------------------------------------------------------
-void medWizardOperaiontionBlock::VmeHide( char *path )
+void medWizardOperaiontionBlock::VmeHide( const char *path )
 //----------------------------------------------------------------------------
 {
   wxString wxPath;
@@ -79,7 +80,7 @@ void medWizardOperaiontionBlock::VmeHide( char *path )
 }
 
 //----------------------------------------------------------------------------
-void medWizardOperaiontionBlock::SetNextBlock( char *block )
+void medWizardOperaiontionBlock::SetNextBlock( const char *block )
 //----------------------------------------------------------------------------
 {
   m_NextBlock=block;
@@ -100,24 +101,61 @@ void medWizardOperaiontionBlock::Abort()
 
 void medWizardOperaiontionBlock::ExcutionBegin()
 {
+  mafString tmpStr;
   //Ask Wizard for View
+  if (m_RequiredView!="")
+  {
+    tmpStr=m_RequiredView;
+    mafEventMacro(mafEvent(this,WIZARD_REQUIRED_VIEW,&tmpStr));
+  }
 
   //Select the input VME for the operation
+  if (m_SelectedVME)
+    m_SelectedVME=m_SelectedVME->GetByPath(m_VmeSelect.c_str());
 
+  //////////////////////////  
   //Show the required VMEs
 
-  //Run Operation
+  //If there is no view required we don't show any vme
+  if (m_RequiredView != "")
+  {
+    mafEventMacro(mafEvent(this,VME_SHOW,m_SelectedVME,true));
 
+    for(int i=0;i<m_VmeShow.size();i++)
+    {
+      mafNode *toShow=m_SelectedVME->GetByPath(m_VmeShow[i].c_str());
+      mafEventMacro(mafEvent(this,VME_SHOW,toShow,true));
+    }
+  }
+  
+  //Run Operation
+  if (m_Operation!="")
+  {
+    tmpStr=m_Operation;
+    mafEventMacro(mafEvent(this,WIZARD_RUN_OP,&tmpStr));
+  }
 }
 
 void medWizardOperaiontionBlock::ExcutionEnd()
 {
 
   //Hide the required VMEs
-
+  for(int i=0;i<m_VmeHide.size();i++)
+  {
+    mafNode *toHide=m_SelectedVME->GetByPath(m_VmeHide[i]);
+    mafEventMacro(mafEvent(this,VME_SHOW,toHide,false));
+  }
+  
 }
 
-wxString medWizardOperaiontionBlock::RequiredOperation()
+wxString medWizardOperaiontionBlock::GetRequiredOperation()
 {
   return m_Operation;
 }
+
+void medWizardOperaiontionBlock::SetRequiredOperation( const const char *name )
+{
+  m_Operation=name;
+}
+
+

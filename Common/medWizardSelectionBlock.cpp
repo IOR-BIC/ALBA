@@ -26,13 +26,10 @@
 #include "medWizardSelectionBlock.h"
 
 
-//----------------------------------------------------------------------------
-mafCxxTypeMacro(medWizardSelectionBlock);
-//----------------------------------------------------------------------------
 
 
 //----------------------------------------------------------------------------
-medWizardSelectionBlock::medWizardSelectionBlock():medWizardBlock()
+medWizardSelectionBlock::medWizardSelectionBlock(const char *name):medWizardBlock(name)
 //----------------------------------------------------------------------------
 {
   m_SelectedChoice=0;
@@ -46,14 +43,14 @@ medWizardSelectionBlock::~medWizardSelectionBlock()
 }
 
 //----------------------------------------------------------------------------
-void medWizardSelectionBlock::SetTitle( char *Title )
+void medWizardSelectionBlock::SetWindowTitle( const char *Title )
 //----------------------------------------------------------------------------
 {
   m_Title=Title;
 }
 
 //----------------------------------------------------------------------------
-void medWizardSelectionBlock::AddChoice( char *label, char *block )
+void medWizardSelectionBlock::AddChoice( const char *label, const char *block )
 //----------------------------------------------------------------------------
 {
   blockChoice tmpChoice;
@@ -74,7 +71,7 @@ wxString medWizardSelectionBlock::GetNextBlock()
 }
 
 //----------------------------------------------------------------------------
-void medWizardSelectionBlock::SetDescription( char *description )
+void medWizardSelectionBlock::SetDescription( const char *description )
 //----------------------------------------------------------------------------
 {
   m_Description=description;
@@ -93,7 +90,8 @@ void medWizardSelectionBlock::ExcutionBegin()
   //Show Modal window
   m_SelectedChoice = wxGetSingleChoiceIndex(m_Description,m_Title,m_Choices.size(), choices);
 
-  delete choices;  
+  return;
+  //delete choices;  
 }
 
 

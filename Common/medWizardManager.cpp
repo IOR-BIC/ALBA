@@ -47,7 +47,7 @@ void medWizardManager::WizardAdd( medWizard *wizard, wxString menuPath /*= ""*/ 
 {
   m_WizardList.push_back(wizard);
   wizard->SetMenuPath(menuPath);
-  wizard->SetId(m_NumWizard);
+  wizard->SetId(m_NumWizard+WIZARD_START);
   wizard->SetListener(this);
   m_NumWizard++;
 }
@@ -59,6 +59,7 @@ void medWizardManager::FillMenu( wxMenu* wizardMenu )
   for(int i=0; i<m_NumWizard; i++)
   {
     medWizard *wizard = m_WizardList[i];
+    int GGTEST=wizard->GetId();
     if (wizard->GetMenuPath() != "")
     {
       wxMenu *sub_menu = NULL;
@@ -122,6 +123,85 @@ void medWizardManager::WizardRun( medWizard *wizard, void *wizard_param /*= NULL
   
   Notify(WIZARD_RUN_STARTING);  //SIL. 17-9-2004: - moved here in order to notify which op is started
 
+  m_RunningWizard->SetSelectedVME(m_Selected);
   m_RunningWizard->Execute();
 
 }
+
+void medWizardManager::VmeSelected( mafNode* node )
+{
+  m_Selected=node;
+  if (m_RunningWizard)
+  {
+    m_RunningWizard->SetSelectedVME(node);
+  }
+  else
+  {
+    EnableWizardMenus();
+  }
+}
+
+void medWizardManager::WizzardStop()
+{
+  m_RunningWizard=NULL;
+
+  //STOP EVENT
+}
+
+void medWizardManager::EnableWizardMenus( bool CanEnable /*= true*/ )
+{
+  mafOp *o = NULL;
+  if(m_MenuBar)
+  {
+    for(int i=0; i<m_NumWizard; i++)
+    {
+      medWizard *wizard = m_WizardList[i];
+      if(m_MenuBar->FindItem(wizard->GetId()))
+        m_MenuBar->Enable(wizard->GetId(),CanEnable && wizard->Accept(m_Selected)); 
+    }
+  }
+  if(m_ToolBar) EnableToolbar(CanEnable);
+}
+
+void medWizardManager::OnEvent( mafEventBase *maf_event )
+{
+  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
+  {
+    switch(e->GetId())
+    {
+
+   case WIZARD_RUN_OP:
+     {
+       mafString *tmp=e->GetString();
+       OpRun(*(e->GetString()));
+     }
+    break;
+   case WIZARD_RUN_TERMINATED:
+     {
+       m_RunningWizard=NULL;
+       EnableOp(true);
+       //Forward up event for toolbar activation
+       mafEvent(e);
+     }
+   default:
+     //Call parent event manager
+     mafOpManager::OnEvent(maf_event);
+     break; 
+    } // end switch case
+  }
+}
+
+void medWizardManager::WizardContinue()
+{
+  if (m_RunningWizard)
+    m_RunningWizard->ContinueExecution();
+  else 
+    mafLogMessage("Error no wizard running");
+}
+
+void medWizardManager::EnableOp( bool CanEnable /*= true*/ )
+{
+  //If there are a running wizard all operation must be disabled
+  mafOpManager::EnableOp(CanEnable && !m_RunningWizard);
+}
+

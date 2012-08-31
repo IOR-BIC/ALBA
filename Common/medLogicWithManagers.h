@@ -93,9 +93,16 @@ protected:
 
   /** Called when an wizard stops. Re-enable all menu and unlock the Selection */ 
   virtual void WizardRunTerminated();
+  
+  /** Called when an operation starts. Disable all menu and lock the Selection */ 
+  virtual void OpRunStarting();
+  
+  /** Called when an operation stops. Re-enable all menu and unlock the Selection */ 
+  virtual void OpRunTerminated();
 
   medWizardManager *m_WizardManager;
   bool m_UseWizardManager;
+  bool m_WizardRunning;
   wxMenu *m_WizardMenu;
 
 };

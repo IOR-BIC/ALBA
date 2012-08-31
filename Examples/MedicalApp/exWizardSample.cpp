@@ -30,6 +30,25 @@
 exWizardSample::exWizardSample( const wxString &label ):medWizard(label)
 {
 
-  medWizardSelectionBlock selector()
+  medWizardSelectionBlock *selectorBlock=new medWizardSelectionBlock("START");
+  selectorBlock->SetWindowTitle("Test Selector");
+  selectorBlock->SetDescription("Wizard Selector Test window");
+  selectorBlock->AddChoice("Import VTK","vtkImport");
+  selectorBlock->AddChoice("End Wizard", "END");
 
+  medWizardOperaiontionBlock *opBlock=new medWizardOperaiontionBlock("vtkImport");
+  opBlock->SetRequiredView("IsoSurface");
+  opBlock->VmeSelect("");
+  opBlock->SetRequiredOperation("mafOpImporterVTK");
+  opBlock->VmeHide("");
+  opBlock->SetNextBlock("START");
+
+  AddBlock(selectorBlock);
+  AddBlock(opBlock);
 }
+
+bool exWizardSample::Accept(mafNode* vme)
+{
+  return true;
+}
+

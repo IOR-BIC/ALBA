@@ -29,9 +29,16 @@
 
 
 //----------------------------------------------------------------------------
-medWizardBlock::medWizardBlock()
+medWizardBlock::medWizardBlock(const char *name)
 //----------------------------------------------------------------------------
 {
+  m_Name = name;
+
+  if (m_Name == "END")
+    mafLogMessage("MafWizardBlock: 'END' was reserved");
+  else if (m_Name == "END")
+    mafLogMessage("MafWizardBlock: 'ABORT' was reserved");
+
   m_Aborted=false;
 }
 
@@ -40,18 +47,6 @@ medWizardBlock::~medWizardBlock()
 //----------------------------------------------------------------------------
 {
 
-}
-
-//----------------------------------------------------------------------------
-void medWizardBlock::SetName( char *name )
-//----------------------------------------------------------------------------
-{
-   m_Name = name;
-
-   if (m_Name == "END")
-     mafLogMessage("MafWizardBlock: 'END' was reserved");
-   else if (m_Name == "END")
-     mafLogMessage("MafWizardBlock: 'ABORT' was reserved");
 }
 
 int medWizardBlock::isAborted()
@@ -88,9 +83,21 @@ void medWizardBlock::ExcutionEnd()
   m_Running=false;
 }
 
-wxString medWizardBlock::RequiredOperation()
+wxString medWizardBlock::GetRequiredOperation()
 {
   return wxString("");
+}
+
+void medWizardBlock::SetSelectedVME( mafNode *node )
+{
+  m_SelectedVME=node;
+}
+
+//----------------------------------------------------------------------------
+void medWizardBlock::SetListener( mafObserver *Listener )
+//----------------------------------------------------------------------------
+{
+  m_Listener = Listener;
 }
 
 

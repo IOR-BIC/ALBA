@@ -32,28 +32,26 @@
   Class Name: medVect3d.
   Class for handle the high level logic of a medical application.
 */
-class MED_COMMON_EXPORT medWizardSelectionBlock : medWizardBlock
+class MED_COMMON_EXPORT medWizardSelectionBlock : public medWizardBlock
 {
 public:
 
-  mafTypeMacro(medWizardSelectionBlock, medWizardBlock);
-
   /** Default constructor */
-  medWizardSelectionBlock();
+  medWizardSelectionBlock(const char *name);
 
   /** Default destructor */
   ~medWizardSelectionBlock();
     
   /** Set The title of the selection window */
-  void SetTitle(char *Title);
+  void SetWindowTitle(const char *Title);
 
   /** Set The title of the selection window */
-  void SetDescription(char *description);
+  void SetDescription(const char *description);
 
   /** Add a new choice in the selection.
       The choice is composed by the text showed to the user and the correspondent block
       */
-  void AddChoice(char *label, char *block);
+  void AddChoice(const char *label, const char *block);
 
   /** Return the name of the Block witch will be executed after this */
   virtual wxString GetNextBlock();

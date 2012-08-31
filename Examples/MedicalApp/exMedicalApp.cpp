@@ -43,6 +43,7 @@
 
 #ifdef USE_WIZARD
   #include "medWizard.h"
+  #include "exWizardSample.h"
 #endif
 
 #ifndef _GGDEBUG
@@ -329,8 +330,8 @@ bool exMedicalApp::OnInit()
   // Wizard Menu':
   //------------------------------------------------------------
 
-  m_Logic->Plug(new medWizard("test"),"");
-  m_Logic->Plug(new medWizard("subTest"),"SubMenu");
+  m_Logic->Plug(new exWizardSample("test"),"");
+  //m_Logic->Plug(new medWizard("subTest"),"SubMenu");
 #endif
 
 	//------------------------------------------------------------
