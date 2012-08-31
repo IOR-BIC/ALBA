@@ -1,0 +1,1 @@
+del .\Build\bin\debug\*.exe
