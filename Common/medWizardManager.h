@@ -58,7 +58,7 @@ public:
   virtual void WizardRun(int wizardId);
 
   /** Called on opeation termination to contuinue the workflow*/
-  virtual void WizardContinue();
+  virtual void WizardContinue(int opAborted);
 
   /** Record the selected vme and enable the menu_entries relative to the compatible wizard. */
   virtual void VmeSelected(mafNode* node);
@@ -72,8 +72,11 @@ private:
   /** Enable/Disable the men items operation. */
   virtual void EnableWizardMenus(bool CanEnable = true);
 
-
+  /** Stops the execution of the wizard*/
   virtual void WizzardStop();
+
+  /** Sent a string message to the listener. */
+  virtual void Notify(int msg);
 
   int m_NumWizard;
   std::vector<medWizard *> m_WizardList; ///< List of pointer of plugged wizzard.

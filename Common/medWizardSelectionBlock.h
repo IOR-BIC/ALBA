@@ -59,6 +59,10 @@ public:
   /** Starts the execution of the block */
   virtual void ExcutionBegin();
 
+
+protected:
+
+
 private:
 
   //Choices struct definition

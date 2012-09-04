@@ -51,7 +51,7 @@ medWizard::~medWizard()
 //----------------------------------------------------------------------------
 {
   for (int i=0;i<m_Blocks.size();i++)
-   delete m_Blocks[i];
+    mafDEL(m_Blocks[i]);
   m_Blocks.clear();
 }
 
@@ -149,12 +149,13 @@ void medWizard::BlockExecutionBegin()
 
   m_CurrentBlock->ExcutionBegin();
 
+  requiredOperation=m_CurrentBlock->GetRequiredOperation();
   //there is a not a required operation 
   //The wizard flow continues without interruption and we call BlockExecutionEnd() 
   //elsewere if we had an operation it is run asynchronous and BlockExecutionEnd() 
   //will be called my managers after operation stop
   if (requiredOperation=="")
-    BlockExecutionEnd();
+    ContinueExecution(m_CurrentBlock->isAborted());
   
 }
 
@@ -173,30 +174,23 @@ void medWizard::BlockExecutionEnd()
 
   m_CurrentBlock->ExcutionEnd();
 
-  if (m_CurrentBlock->isAborted())
+  nextBlock=m_CurrentBlock->GetNextBlock();
+
+  if (nextBlock=="END")
   {
-    AbortWizard();
+    mafEventMacro(mafEvent(this,WIZARD_RUN_TERMINATED));
   }
   else
   {
-    nextBlock=m_CurrentBlock->GetNextBlock();
+    m_CurrentBlock=GetBlockByName(nextBlock.c_str());
 
-    if (nextBlock=="END")
+    if (m_CurrentBlock==NULL)
     {
-      mafEventMacro(mafEvent(this,WIZARD_RUN_TERMINATED));
+      mafLogMessage("Wizard Error: undefined block :'%s'",nextBlock.c_str());
+      AbortWizard();
     }
-    else
-    {
-      m_CurrentBlock=GetBlockByName(nextBlock.c_str());
-
-      if (m_CurrentBlock==NULL)
-      {
-        mafLogMessage("Wizard Error: undefined block :'%s'",nextBlock.c_str());
-        AbortWizard();
-      }
-      else 
-        BlockExecutionBegin();
-    }
+    else 
+      BlockExecutionBegin();
   }
 }
 
@@ -220,10 +214,15 @@ void medWizard::SetSelectedVME( mafNode *node )
 }
 
 //----------------------------------------------------------------------------  
-void medWizard::ContinueExecution()
+void medWizard::ContinueExecution(int opAborted)
 //----------------------------------------------------------------------------  
 {
-  BlockExecutionEnd();
+  if (!opAborted)
+    BlockExecutionEnd();
+  else 
+  {
+    mafEventMacro(mafEvent(this,WIZARD_RUN_TERMINATED));
+  }
 }
 
 

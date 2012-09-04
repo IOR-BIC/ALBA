@@ -41,7 +41,7 @@ public:
   medWizardBlock(const char *name);
 
   /** Default destructor */
-  ~medWizardBlock();
+  virtual ~medWizardBlock();
 
   
   /** Get the name of the block */
@@ -72,7 +72,11 @@ public:
   /** Sets The event listener */
   void SetListener(mafObserver *Listener);
 
+  /** Called to clean up memory*/
+  virtual void Delete(){delete this;};
+
 protected:
+
   wxString m_Name;
   wxString m_BlockType;
   mafNode	*m_SelectedVME; ///< Pointer to the current selected node.

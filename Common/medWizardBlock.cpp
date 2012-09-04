@@ -46,7 +46,6 @@ medWizardBlock::medWizardBlock(const char *name)
 medWizardBlock::~medWizardBlock()
 //----------------------------------------------------------------------------
 {
-
 }
 
 int medWizardBlock::isAborted()
@@ -100,4 +99,8 @@ void medWizardBlock::SetListener( mafObserver *Listener )
   m_Listener = Listener;
 }
 
+
+//----------------------------------------------------------------------------
+//void medWizardBlock::Delete()
+//----------------------------------------------------------------------------
 

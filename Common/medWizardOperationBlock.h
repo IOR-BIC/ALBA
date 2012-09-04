@@ -87,6 +87,7 @@ public:
        Return an empty string if no operation is required */
    wxString GetRequiredOperation();
 
+  
 private:
 
   wxString m_Operation;

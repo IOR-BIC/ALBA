@@ -112,6 +112,13 @@ void medWizardOperaiontionBlock::ExcutionBegin()
   //Select the input VME for the operation
   if (m_SelectedVME)
     m_SelectedVME=m_SelectedVME->GetByPath(m_VmeSelect.c_str());
+  
+  if (m_SelectedVME)
+  {
+    mafEventMacro(mafEvent(this,VME_SELECT,m_SelectedVME));
+  }
+  else 
+    mafLogMessage("Wizard Error: unable to select VME, path:\"%s\"",m_VmeSelect.c_str());
 
   //////////////////////////  
   //Show the required VMEs
@@ -124,7 +131,8 @@ void medWizardOperaiontionBlock::ExcutionBegin()
     for(int i=0;i<m_VmeShow.size();i++)
     {
       mafNode *toShow=m_SelectedVME->GetByPath(m_VmeShow[i].c_str());
-      mafEventMacro(mafEvent(this,VME_SHOW,toShow,true));
+      if (toShow != NULL)
+        mafEventMacro(mafEvent(this,VME_SHOW,toShow,true));
     }
   }
   
@@ -157,5 +165,6 @@ void medWizardOperaiontionBlock::SetRequiredOperation( const const char *name )
 {
   m_Operation=name;
 }
+
 
 

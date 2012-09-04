@@ -90,9 +90,15 @@ void medWizardSelectionBlock::ExcutionBegin()
   //Show Modal window
   m_SelectedChoice = wxGetSingleChoiceIndex(m_Description,m_Title,m_Choices.size(), choices);
 
+  if (m_SelectedChoice<0)
+    Abort();
+
+
+  delete[] choices;  
+
   return;
-  //delete choices;  
 }
+
 
 
 

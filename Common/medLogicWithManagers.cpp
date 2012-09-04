@@ -31,6 +31,7 @@
 #include "mafOpManager.h"
 #include "medWizardManager.h"
 #include "mafGUIApplicationSettings.h"
+#include "mafView.h"
 
 #ifdef MAF_USE_VTK
   #include "mafInteractionManager.h"
@@ -51,6 +52,8 @@ medLogicWithManagers::medLogicWithManagers()
 medLogicWithManagers::~medLogicWithManagers()
 //----------------------------------------------------------------------------
 {
+  if(m_WizardManager)
+    delete m_WizardManager;
 }
 
 //----------------------------------------------------------------------------
@@ -120,7 +123,16 @@ void medLogicWithManagers::OnEvent(mafEventBase *maf_event)
       break; 
     case WIZARD_REQUIRED_VIEW:
        {
-         //G,G Show view!
+         mafView *view;
+         const char *viewStr=e->GetString()->GetCStr();
+         
+         view=m_ViewManager->GetFromList(viewStr);
+         if (view)
+           m_ViewManager->Activate(view);
+         else
+           m_ViewManager->ViewCreate(viewStr);
+
+         wxYield();
        }
 
 		default:
@@ -249,38 +261,6 @@ void medLogicWithManagers::OnQuit()
   mafLogicWithManagers::OnQuit();
 }
 
-//----------------------------------------------------------------------------
-void medLogicWithManagers::VmeSelect( mafEvent &e )
-//----------------------------------------------------------------------------
-{
-
-  mafNode *node = NULL;
-
-  if(m_PlugSidebar && (e.GetSender() == this->m_SideBar->GetTree()))
-    node = (mafNode*)e.GetArg();//sender == tree => the node is in e.arg
-  else
-    node = e.GetVme();          //sender == PER  => the node is in e.node  
-
-  if(node == NULL)
-  {
-    //node can be selected by its ID
-    if(m_VMEManager)
-    {
-      long vme_id = e.GetArg();
-      mafVMERoot *root = this->m_VMEManager->GetRoot();
-      if (root)
-      {
-        node = root->FindInTreeById(vme_id);
-        e.SetVme(node);
-      }
-    }
-  }
-
-  if(node != NULL && m_WizardManager)
-    m_WizardManager->OpSelect(node);
-  
-  mafLogicWithManagers::VmeSelect(e);
-}
 
 //----------------------------------------------------------------------------
 void medLogicWithManagers::VmeSelected( mafNode *vme )
@@ -349,38 +329,5 @@ void medLogicWithManagers::WizardRunTerminated()
 
 }
 
-//----------------------------------------------------------------------------
-void medLogicWithManagers::OpRunStarting()
-//----------------------------------------------------------------------------
-{
-  //If Wizard is running menu are already disabled
-  if (!m_WizardRunning)
-  {
-    EnableMenuAndToolbar(false);
-    // currently mafInteraction is strictly dependent on VTK (marco)
-    #ifdef MAF_USE_VTK
-    if(m_InteractionManager) m_InteractionManager->EnableSelect(false);
-    #endif
-    if(m_SideBar)    m_SideBar->EnableSelect(false);
-  }
-}
-//----------------------------------------------------------------------------
-void medLogicWithManagers::OpRunTerminated()
-//----------------------------------------------------------------------------
-{
-  //If Wizard is running menu must remain disabled on op run terminated
-  if (!m_WizardRunning)
-  {
-    EnableMenuAndToolbar(true);
-    // currently mafInteraction is strictly dependent on VTK (marco)
-    #ifdef MAF_USE_VTK
-    if(m_InteractionManager) 
-      m_InteractionManager->EnableSelect(true);
-    #endif
-    if(m_SideBar)
-      m_SideBar->EnableSelect(true);
-  }
-  //If there are a wizard Running we need to continue execution when operation is terminated
-  else 
-    m_WizardManager->WizardContinue();  
-}
+
+

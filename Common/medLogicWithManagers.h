@@ -76,9 +76,7 @@ protected:
   /** Called on Quit event. */
   virtual void OnQuit();
 
-  /** Respond to a VME_SELECT evt. Instantiate the 'Select' operation. */
-  virtual void VmeSelect(mafEvent &e);
-
+  
   /** Respond to a VME_SELECTED evt. Update the selection on the tree and view representation. */
   virtual void VmeSelected(mafNode *vme);
 
@@ -94,12 +92,6 @@ protected:
   /** Called when an wizard stops. Re-enable all menu and unlock the Selection */ 
   virtual void WizardRunTerminated();
   
-  /** Called when an operation starts. Disable all menu and lock the Selection */ 
-  virtual void OpRunStarting();
-  
-  /** Called when an operation stops. Re-enable all menu and unlock the Selection */ 
-  virtual void OpRunTerminated();
-
   medWizardManager *m_WizardManager;
   bool m_UseWizardManager;
   bool m_WizardRunning;
