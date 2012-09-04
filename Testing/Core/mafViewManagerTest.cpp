@@ -42,7 +42,7 @@ public:
 
   mafTypeMacro(mafViewDummy, mafView);
 
-  mafViewDummy(wxString m_Label="");
+  mafViewDummy(wxString label="viewDummy");
   ~mafViewDummy(){m_NodeVector.clear();};
   mafView *Copy(mafObserver *Listener,bool enableLightCopy = false);
   void VmeAdd(mafNode *vme){m_NodeVector.push_back(vme);};
@@ -72,9 +72,8 @@ protected:
 
 mafCxxTypeMacro(mafViewDummy);
 
-mafViewDummy::mafViewDummy(wxString m_Label)
+mafViewDummy::mafViewDummy(wxString label):mafView(label)
 {
-  Superclass;
   m_SelectedVme=NULL;
   m_ShownVme=NULL;
   m_CameraReset=false;
@@ -238,7 +237,7 @@ void mafViewManagerTest::ViewCreateTest()
 
   // Test create by view type name
   // Create a view from the template array
-  mafView *createdView2 = m_Manager->ViewCreate("class mafViewDummy");
+  mafView *createdView2 = m_Manager->ViewCreate("viewDummy");
   CPPUNIT_ASSERT(createdView2->IsA(tempView->GetTypeName())); // check if is of the same type of the template view
   CPPUNIT_ASSERT(m_Manager->GetList()->m_Next == createdView2); // check if the created view is inside the view list
   CPPUNIT_ASSERT(m_EventResult == VIEW_CREATED); // check if the raised event is view creation
@@ -275,8 +274,8 @@ void mafViewManagerTest::GetViewTest()
   mafViewDummy *tempView = new mafViewDummy();
   m_Manager->ViewAdd(tempView, false); // add this view to the template array
 
-  mafView* createdView1 = m_Manager->ViewCreate("class mafViewDummy");
-  mafView* createdView2 = m_Manager->ViewCreate("class mafViewDummy");
+  mafView* createdView1 = m_Manager->ViewCreate("viewDummy");
+  mafView* createdView2 = m_Manager->ViewCreate("viewDummy");
 
   CPPUNIT_ASSERT(m_Manager->GetView(createdView1->m_Id,createdView1->m_Mult) == createdView1); // check that the first view is the same created in the fist position of the view matrix
 
@@ -352,8 +351,8 @@ void mafViewManagerTest::VmeAddTest()
   m_Manager->ViewAdd(tempView, false); // add this view to the template array
 
   // Create some views
-  mafViewDummy *view1 = mafViewDummy::SafeDownCast(m_Manager->ViewCreate("class mafViewDummy"));
-  mafViewDummy *view2 = mafViewDummy::SafeDownCast(m_Manager->ViewCreate("class mafViewDummy"));
+  mafViewDummy *view1 = mafViewDummy::SafeDownCast(m_Manager->ViewCreate("viewDummy"));
+  mafViewDummy *view2 = mafViewDummy::SafeDownCast(m_Manager->ViewCreate("viewDummy"));
 
   mafVMERoot *root;
   mafVMEGeneric *vme;
@@ -395,8 +394,8 @@ void mafViewManagerTest::VmeRemoveTest()
   m_Manager->ViewAdd(tempView, false); // add this view to the template array
 
   // Create some views
-  mafViewDummy *view1 = mafViewDummy::SafeDownCast(m_Manager->ViewCreate("class mafViewDummy"));
-  mafViewDummy *view2 = mafViewDummy::SafeDownCast(m_Manager->ViewCreate("class mafViewDummy"));
+  mafViewDummy *view1 = mafViewDummy::SafeDownCast(m_Manager->ViewCreate("viewDummy"));
+  mafViewDummy *view2 = mafViewDummy::SafeDownCast(m_Manager->ViewCreate("viewDummy"));
 
   mafVMERoot *root;
   mafVMEGeneric *vme;
@@ -436,8 +435,8 @@ void mafViewManagerTest::VmeSelectTest()
   m_Manager->ViewAdd(tempView, false); // add this view to the template array
 
   // Create some views
-  mafViewDummy *view1 = mafViewDummy::SafeDownCast(m_Manager->ViewCreate("class mafViewDummy"));
-  mafViewDummy *view2 = mafViewDummy::SafeDownCast(m_Manager->ViewCreate("class mafViewDummy"));
+  mafViewDummy *view1 = mafViewDummy::SafeDownCast(m_Manager->ViewCreate("viewDummy"));
+  mafViewDummy *view2 = mafViewDummy::SafeDownCast(m_Manager->ViewCreate("viewDummy"));
 
   mafVMERoot *root;
   mafVMEGeneric *vme;
@@ -478,8 +477,8 @@ void mafViewManagerTest::VmeShowTest()
   m_Manager->ViewAdd(tempView, false); // add this view to the template array
 
   // Create some views
-  mafViewDummy *view1 = mafViewDummy::SafeDownCast(m_Manager->ViewCreate("class mafViewDummy"));
-  mafViewDummy *view2 = mafViewDummy::SafeDownCast(m_Manager->ViewCreate("class mafViewDummy"));
+  mafViewDummy *view1 = mafViewDummy::SafeDownCast(m_Manager->ViewCreate("viewDummy"));
+  mafViewDummy *view2 = mafViewDummy::SafeDownCast(m_Manager->ViewCreate("viewDummy"));
 
   mafVMERoot *root;
   mafVMEGeneric *vme;
@@ -521,8 +520,8 @@ void mafViewManagerTest::CameraResetTest()
   m_Manager->ViewAdd(tempView, false); // add this view to the template array
 
   // Create some views
-  mafViewDummy *view1 = mafViewDummy::SafeDownCast(m_Manager->ViewCreate("class mafViewDummy"));
-  mafViewDummy *view2 = mafViewDummy::SafeDownCast(m_Manager->ViewCreate("class mafViewDummy"));
+  mafViewDummy *view1 = mafViewDummy::SafeDownCast(m_Manager->ViewCreate("viewDummy"));
+  mafViewDummy *view2 = mafViewDummy::SafeDownCast(m_Manager->ViewCreate("viewDummy"));
 
   mafVMERoot *root;
   mafVMEGeneric *vme;
@@ -564,8 +563,8 @@ void mafViewManagerTest::CameraUpdateTest()
   m_Manager->ViewAdd(tempView, false); // add this view to the template array
 
   // Create some views
-  mafViewDummy *view1 = mafViewDummy::SafeDownCast(m_Manager->ViewCreate("class mafViewDummy"));
-  mafViewDummy *view2 = mafViewDummy::SafeDownCast(m_Manager->ViewCreate("class mafViewDummy"));
+  mafViewDummy *view1 = mafViewDummy::SafeDownCast(m_Manager->ViewCreate("viewDummy"));
+  mafViewDummy *view2 = mafViewDummy::SafeDownCast(m_Manager->ViewCreate("viewDummy"));
 
   mafVMERoot *root;
   mafVMEGeneric *vme;
@@ -612,8 +611,8 @@ void mafViewManagerTest::PropertyUpdateTest()
   m_Manager->ViewAdd(tempView, false); // add this view to the template array
 
   // Create some views
-  mafViewDummy *view1 = mafViewDummy::SafeDownCast(m_Manager->ViewCreate("class mafViewDummy"));
-  mafViewDummy *view2 = mafViewDummy::SafeDownCast(m_Manager->ViewCreate("class mafViewDummy"));
+  mafViewDummy *view1 = mafViewDummy::SafeDownCast(m_Manager->ViewCreate("viewDummy"));
+  mafViewDummy *view2 = mafViewDummy::SafeDownCast(m_Manager->ViewCreate("viewDummy"));
 
   mafVMERoot *root;
   mafVMEGeneric *vme;
@@ -655,8 +654,8 @@ void mafViewManagerTest::GetCurrentRootTest()
   m_Manager->ViewAdd(tempView, false); // add this view to the template array
 
   // Create some views
-  mafViewDummy *view1 = mafViewDummy::SafeDownCast(m_Manager->ViewCreate("class mafViewDummy"));
-  mafViewDummy *view2 = mafViewDummy::SafeDownCast(m_Manager->ViewCreate("class mafViewDummy"));
+  mafViewDummy *view1 = mafViewDummy::SafeDownCast(m_Manager->ViewCreate("viewDummy"));
+  mafViewDummy *view2 = mafViewDummy::SafeDownCast(m_Manager->ViewCreate("viewDummy"));
 
   mafVMERoot *root;
   mafVMEGeneric *vme;
@@ -695,7 +694,7 @@ void mafViewManagerTest::SetMouseTest()
   m_Manager->ViewAdd(tempView, false); // add this view to the template array
 
   // Create some views
-  mafViewDummy *view1 = mafViewDummy::SafeDownCast(m_Manager->ViewCreate("class mafViewDummy"));
+  mafViewDummy *view1 = mafViewDummy::SafeDownCast(m_Manager->ViewCreate("viewDummy"));
   m_Manager->ViewSelected(view1);
   m_Manager->SetMouse(mouse);
 
@@ -716,8 +715,8 @@ void mafViewManagerTest::CollaborateTest()
   m_Manager->ViewAdd(tempView, false); // add this view to the template array
 
   // Create some views
-  mafViewDummy *view1 = mafViewDummy::SafeDownCast(m_Manager->ViewCreate("class mafViewDummy"));
-  mafViewDummy *view2 = mafViewDummy::SafeDownCast(m_Manager->ViewCreate("class mafViewDummy"));
+  mafViewDummy *view1 = mafViewDummy::SafeDownCast(m_Manager->ViewCreate("viewDummy"));
+  mafViewDummy *view2 = mafViewDummy::SafeDownCast(m_Manager->ViewCreate("viewDummy"));
 
   m_Manager->Collaborate(true);
 
@@ -732,4 +731,28 @@ void mafViewManagerTest::CollaborateTest()
   frame->Show(false);
   frame->Close(true);
   delete frame;
+}
+
+//----------------------------------------------------------------------------
+void mafViewManagerTest::GetFromListTest()
+//----------------------------------------------------------------------------
+{
+  // insert some views in the manager views list
+  mafView *viewA,*viewB,*viewC, *curView ;
+
+  viewA = new mafView("viewA");
+  viewB = new mafView("viewB");
+  viewC = new mafView("viewC");
+
+  m_Manager->ViewInsert(viewA);
+  m_Manager->ViewInsert(viewB);
+  m_Manager->ViewInsert(viewC);
+
+  curView = m_Manager->GetFromList("viewA");
+  CPPUNIT_ASSERT(curView == viewA); 
+  curView = m_Manager->GetFromList("viewB");
+  CPPUNIT_ASSERT(curView == viewB); 
+  curView = m_Manager->GetFromList("viewC");
+  CPPUNIT_ASSERT(curView == viewC); 
+
 }
