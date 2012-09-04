@@ -155,7 +155,7 @@ void medWizard::BlockExecutionBegin()
   //elsewere if we had an operation it is run asynchronous and BlockExecutionEnd() 
   //will be called my managers after operation stop
   if (requiredOperation=="")
-    ContinueExecution(m_CurrentBlock->isAborted());
+    ContinueExecution(m_CurrentBlock->Success());
   
 }
 
@@ -214,10 +214,10 @@ void medWizard::SetSelectedVME( mafNode *node )
 }
 
 //----------------------------------------------------------------------------  
-void medWizard::ContinueExecution(int opAborted)
+void medWizard::ContinueExecution(int opSuccess)
 //----------------------------------------------------------------------------  
 {
-  if (!opAborted)
+  if (opSuccess)
     BlockExecutionEnd();
   else 
   {

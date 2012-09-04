@@ -31,6 +31,13 @@
 medWizardManager::medWizardManager()
 //----------------------------------------------------------------------------
 {
+
+  m_Warn           = true;
+
+  m_ToolBar = NULL;
+  m_MenuBar = NULL;
+  m_Listener = NULL;
+  m_Selected = NULL;
   m_RunningWizard =NULL;
   m_NumWizard = 0;
   m_WizardList.clear();
@@ -45,16 +52,6 @@ medWizardManager::~medWizardManager()
 
   m_WizardList.clear();
   
-  //Clearing operation list without free operations because opManager will have also 
-  //a pointer to the plugged operation and it will delete it
-  //Same thing for standard Op and m_User
-  m_NumOp=0;
-  m_OpList.clear();
-  //m_OpSelect=NULL;
-  //m_OpCut=NULL;
-  //m_OpCopy=NULL;
-  //m_OpPaste=NULL;
-  //m_User=NULL;
 }
 
 void medWizardManager::WizardAdd( medWizard *wizard, wxString menuPath /*= ""*/ )
@@ -111,9 +108,6 @@ void medWizardManager::FillMenu( wxMenu* wizardMenu )
       wizardMenu->Append(wizard->GetId(), _(wizard->GetLabel()), _(wizard->GetLabel()));
     }
   }
-  wxAcceleratorTable accel(MAXOP, m_OpAccelEntries);
-  if (accel.Ok())
-    mafGetFrame()->SetAcceleratorTable(accel);
 
 }
 
@@ -127,7 +121,7 @@ void medWizardManager::WizardRun( int wizardId )
 void medWizardManager::WizardRun( medWizard *wizard, void *wizard_param /*= NULL*/ )
 {
   
-  EnableOp(false);
+  EnableWizardMenus(false);
 
   m_RunningWizard=wizard;
   if (wizard_param != NULL)
@@ -183,60 +177,38 @@ void medWizardManager::OnEvent( mafEventBase *maf_event )
   {
     switch(e->GetId())
     {
-
-    case WIZARD_RUN_OP:
-     {
-       mafString *tmp=e->GetString();
-       OpRun(*(e->GetString()));
-     }
-    break;
     case WIZARD_RUN_TERMINATED:
      {
        m_RunningWizard=NULL;
-       EnableOp(true);
+       EnableWizardMenus();
        //Forward up event for toolbar activation
        Notify(WIZARD_RUN_TERMINATED);
      }
     break;
-    case OP_RUN_OK:
-    {
-      mafOpManager::OnEvent(maf_event);
-      //Continue wizard execution after operation stop
-      WizardContinue(false);
-    }
-    break;
-    case OP_RUN_CANCEL:
-    {
-      mafOpManager::OnEvent(maf_event);
-      //Continue wizard execution after operation cancel
-      WizardContinue(true);
-    }
-    break;
-   default:
-     //Call parent event manager
-     mafOpManager::OnEvent(maf_event);
-     break; 
+    default:
+      mafEventMacro(*e);
+      break;
     } // end switch case
   }
 }
 
-void medWizardManager::WizardContinue(int opAborted)
+void medWizardManager::WizardContinue(int opSuccess)
 {
   if (m_RunningWizard)
-    m_RunningWizard->ContinueExecution(opAborted);
+    m_RunningWizard->ContinueExecution(opSuccess);
   else 
     mafLogMessage("Error no wizard running");
 }
 
-void medWizardManager::EnableOp( bool CanEnable /*= true*/ )
+
+//----------------------------------------------------------------------------
+void medWizardManager::Notify( int msg )
+//----------------------------------------------------------------------------
 {
-  //If there are a running wizard all operation must be disabled
-  mafOpManager::EnableOp(CanEnable && !m_RunningWizard);
+  mafEventMacro(mafEvent(this,msg));  
 }
 
-void medWizardManager::Notify( int msg )
+void medWizardManager::EnableToolbar( bool CanEnable /*= true*/ )
 {
-  //Stopping operation specific notify
-  if (msg != OP_RUN_STARTING && msg!= OP_RUN_TERMINATED)
-    mafOpManager::Notify(msg);
+
 }

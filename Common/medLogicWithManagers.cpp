@@ -131,10 +131,28 @@ void medLogicWithManagers::OnEvent(mafEventBase *maf_event)
            m_ViewManager->Activate(view);
          else
            m_ViewManager->ViewCreate(viewStr);
-
-         wxYield();
        }
-
+    case WIZARD_RUN_OP:
+      {
+        mafString *tmp=e->GetString();
+        m_OpManager->OpRun(*(e->GetString()));
+      }
+    break;
+    case OP_RUN_TERMINATED:
+      {
+        if (m_WizardManager && m_WizardRunning)
+        {
+          m_WizardManager->WizardContinue(e->GetArg());
+        }
+        else
+        {
+          mafGUIMDIChild *c = (mafGUIMDIChild *)m_Win->GetActiveChild();
+          if (c != NULL)
+            c->SetAllowCloseWindow(true);
+          OpRunTerminated();
+        }
+      }
+      break; 
 		default:
       //Call parent event manager
 			mafLogicWithManagers::OnEvent(maf_event);
@@ -148,12 +166,6 @@ void medLogicWithManagers::Plug( mafOp *op, wxString menuPath /*= ""*/, bool can
 //----------------------------------------------------------------------------
 {
   mafLogicWithManagers::Plug(op,menuPath,canUndo,setting);
-
-  if(m_WizardManager) 
-  {
-    m_WizardManager->OpAdd(op, menuPath, canUndo, setting);
-  }
-
 }
 
 //----------------------------------------------------------------------------
@@ -183,7 +195,6 @@ void medLogicWithManagers::Configure()
   {
     m_WizardManager = new medWizardManager();
     m_WizardManager->SetListener(this);
-    m_WizardManager->SetMouse(m_Mouse);
     m_WizardManager->WarningIfCantUndo(m_ApplicationSettings->GetWarnUserFlag());
   }
 
@@ -219,9 +230,6 @@ void medLogicWithManagers::HandleException()
     
     if (m_OpManager->Running())
       m_OpManager->StopCurrentOperation();
-    
-    else if (m_WizardManager->Running())
-      m_WizardManager->StopCurrentOperation();
   }
   OnQuit();
 }
@@ -230,33 +238,8 @@ void medLogicWithManagers::HandleException()
 void medLogicWithManagers::OnQuit()
 //----------------------------------------------------------------------------
 {
-
-  //G,G CONTROLLARE CHIUSURA!!!!
-
-  if (m_OpManager && m_OpManager->Running())
-  {
-
-    int answer = wxMessageBox
-      (
-      _("There are an running operation, are you sure ?"),
-      _("Confirm"), 
-      wxYES_NO|wxCANCEL|wxICON_QUESTION , m_Win
-      );
-    if(answer == wxYES) 
-      m_OpManager->StopCurrentOperation();
-  }
-
-  else if (m_WizardManager && m_WizardManager->Running())
-  {
-    int answer = wxMessageBox
-      (
-      _("There are an running wizard, are you sure ?"),
-      _("Confirm"), 
-      wxYES_NO|wxCANCEL|wxICON_QUESTION , m_Win
-      );
-    if(answer == wxYES) 
-      m_WizardManager->StopCurrentOperation();
-  }
+  if (m_WizardManager && m_WizardRunning)
+    return;
 
   mafLogicWithManagers::OnQuit();
 }
@@ -275,14 +258,6 @@ void medLogicWithManagers::VmeSelected( mafNode *vme )
 void medLogicWithManagers::ViewSelect()
 //----------------------------------------------------------------------------
 {
-  if(m_ViewManager) 
-  {
-    if(m_WizardManager && !m_WizardManager->Running()) 
-    {
-      // needed to update all the operations that will be enabled on View Creation
-      m_WizardManager->VmeSelected(m_WizardManager->GetSelectedVme());
-    }
-  }
   mafLogicWithManagers::ViewSelect();
 }
 

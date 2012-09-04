@@ -32,7 +32,7 @@ class medWizard;
   Class Name: medVect3d.
   Class for handle the high level logic of a medical application.
 */
-class MED_COMMON_EXPORT medWizardManager : public mafOpManager
+class MED_COMMON_EXPORT medWizardManager : mafObserver
 {
 public:
 
@@ -58,20 +58,32 @@ public:
   virtual void WizardRun(int wizardId);
 
   /** Called on opeation termination to contuinue the workflow*/
-  virtual void WizardContinue(int opAborted);
+  virtual void WizardContinue(int opSuccess);
 
   /** Record the selected vme and enable the menu_entries relative to the compatible wizard. */
   virtual void VmeSelected(mafNode* node);
 
   /** Enable/Disable the men items operation. */
-  virtual void EnableOp(bool CanEnable = true);
-
-  
-private:
-
-  /** Enable/Disable the men items operation. */
   virtual void EnableWizardMenus(bool CanEnable = true);
 
+  /** Set a reference to the main toolbar. */
+  virtual void SetToolbar(wxToolBar *tb) {m_ToolBar = tb;};
+
+  /** Set a reference to the main men. */
+  virtual void SetMenubar(wxMenuBar *mb) {m_MenuBar = mb;};
+
+  /** Enable/Disable the toolbar's buttons. */
+  virtual void EnableToolbar(bool CanEnable = true);
+
+  /** Set the event listener */
+  virtual void SetListener(mafObserver *Listener) {m_Listener = Listener;};
+
+  /** Set the flag for warning the user if the operation is undoable. */
+  virtual void WarningIfCantUndo (bool warn) {m_Warn = warn;};
+
+private:
+
+  
   /** Stops the execution of the wizard*/
   virtual void WizzardStop();
 
@@ -81,6 +93,11 @@ private:
   int m_NumWizard;
   std::vector<medWizard *> m_WizardList; ///< List of pointer of plugged wizzard.
   medWizard *m_RunningWizard;
+  wxMenuBar         *m_MenuBar; ///< Pointer to the Application's main menù
+  wxToolBar         *m_ToolBar; ///< Pointer to the application's Toolbal
+  mafObserver       *m_Listener; 
+  mafNode						*m_Selected; ///< Pointer to the current selected node.
+  bool               m_Warn; ///< Flag to warn the user when an operation that can not undo is starting.
 
 };
 #endif

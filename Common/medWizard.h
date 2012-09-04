@@ -81,7 +81,7 @@ public:
   void SetSelectedVME(mafNode *node);
 
   /** Used to continue wizard execution after operation termination */
-  void ContinueExecution(int opAborted);
+  void ContinueExecution(int opSuccess);
 
 protected:
 

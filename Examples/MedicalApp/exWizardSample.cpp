@@ -54,9 +54,7 @@ exWizardSample::exWizardSample( const wxString &label ):medWizard(label)
   AddBlock(selectorBlock);
   AddBlock(opBlock);
   AddBlock(opBlock2);
-  
-  //mafDEL(selectorBlock);
-  //AddBlock(selectorBlock);
+
 
 }
 

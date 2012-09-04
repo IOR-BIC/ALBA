@@ -54,7 +54,7 @@ public:
   virtual void Abort();
 
   /** Return true if the user has aborted the operation */
-  int isAborted();
+  int Success();
 
   /** Starts the execution of the block */
   virtual void ExcutionBegin();
@@ -80,7 +80,7 @@ protected:
   wxString m_Name;
   wxString m_BlockType;
   mafNode	*m_SelectedVME; ///< Pointer to the current selected node.
-  int m_Aborted;
+  int m_Success;
   int m_Running;
   mafObserver    *m_Listener;
 

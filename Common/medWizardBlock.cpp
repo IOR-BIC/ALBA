@@ -39,7 +39,7 @@ medWizardBlock::medWizardBlock(const char *name)
   else if (m_Name == "END")
     mafLogMessage("MafWizardBlock: 'ABORT' was reserved");
 
-  m_Aborted=false;
+  m_Success=true;
 }
 
 //----------------------------------------------------------------------------
@@ -48,9 +48,9 @@ medWizardBlock::~medWizardBlock()
 {
 }
 
-int medWizardBlock::isAborted()
+int medWizardBlock::Success()
 {
-  return m_Aborted;
+  return m_Success;
 }
 
 wxString medWizardBlock::GetName()
@@ -68,7 +68,7 @@ wxString medWizardBlock::GetNextBlock()
 
 void medWizardBlock::Abort()
 {
-  m_Aborted=true;
+  m_Success=false;
 }
 
 
