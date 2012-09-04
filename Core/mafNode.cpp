@@ -1279,7 +1279,7 @@ void mafNode::UpdateId()
 }
 
 //-------------------------------------------------------------------------
-mafNode * mafNode::GetByPath( char *path )
+mafNode * mafNode::GetByPath(const char *path )
 //-------------------------------------------------------------------------
 {
   wxStringTokenizer tkz(wxT(path), wxT("/"));
@@ -1562,6 +1562,12 @@ mafNode * mafNode::GetByPath( char *path )
         break;
       }
     }
+
+    else if (token==".")
+    {
+      //used to point to current node no update required
+    }
+
     else 
     {
       currentNode=NULL;

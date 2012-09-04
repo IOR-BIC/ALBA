@@ -191,7 +191,7 @@ public:
   An example path is:
   "../../child{sideB}/child[2]"
   */
-  mafNode *GetByPath(char *path);
+  mafNode *GetByPath(const char *path);
   
   /** Add a child to this node. Return MAF_OK if success.*/
   virtual int AddChild(mafNode *node);
