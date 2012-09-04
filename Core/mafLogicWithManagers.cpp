@@ -90,8 +90,8 @@
 #include "mafRemoteStorage.h"
 
 //----------------------------------------------------------------------------
-mafLogicWithManagers::mafLogicWithManagers()
-: mafLogicWithGUI()
+mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
+: mafLogicWithGUI(mdiFrame)
 //----------------------------------------------------------------------------
 {
   m_SideBar     = NULL;

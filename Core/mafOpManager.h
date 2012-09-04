@@ -166,7 +166,7 @@ protected:
   virtual bool WarnUser(mafOp *op);
 
 	/** Sent a string message to the listener. */
-  virtual void Notify(int msg);
+  virtual void Notify(int msg, long arg=0L);
 
 	/** Enable/Disable the men items operation. */
   virtual void EnableOp(bool CanEnable = true);

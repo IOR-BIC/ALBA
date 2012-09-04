@@ -1037,6 +1037,9 @@ void mafNodeTest::TestGetByPath()
   result= ((mafNodeA *)a1->GetByPath("..") == (mafNodeA *)(sideA));
   TEST_RESULT;
 
+  //Testing "."
+  result= ((mafNodeA *)a1->GetByPath(".") == (mafNodeA *)(a1));
+  TEST_RESULT;
 
   //Testing complex paths
 
