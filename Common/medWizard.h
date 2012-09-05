@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2Medical
- Module: medVect3d
+ Module: medWizard
  Authors: Gianluigi Crimi
  
  Copyright (c) B3C
@@ -34,8 +34,8 @@ class mafNode;
 
 
 /**
-  Class Name: medVect3d.
-  Class for handle the high level logic of a medical application.
+  Class Name: medWizard.
+  Class for wizard creation each wizard must extend this block
 */
 class MED_COMMON_EXPORT medWizard : mafObserver
 {

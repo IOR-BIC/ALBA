@@ -2,7 +2,7 @@
 
  Program: MAF2Medical
  Module: exMedicalApp
- Authors: Matteo Giacomoni - Daniele Giunchi
+ Authors: Matteo Giacomoni - Daniele Giunchi - Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -39,14 +39,17 @@
 #include "mafPipeFactoryVME.h"
 #include "medPipeFactoryVME.h"
 
+//Comment this line to disable wizard sample
 #define USE_WIZARD
+
+#undef _DEBUG
 
 #ifdef USE_WIZARD
   #include "medWizard.h"
   #include "exWizardSample.h"
 #endif
 
-#ifndef _GGDEBUG
+#ifndef _DEBUG
 //IMPORTERS
 #include "mafOpImporterImage.h"
 #include "mafOpImporterVRML.h"
@@ -71,7 +74,7 @@
 #include "mafOpImporterRAWVolume_BES.h"
 #include "medOpImporterVTK.h"
 #endif
-#ifndef _GGDEBUG
+#ifndef _DEBUG
 //EXPORTERS
 #include "mafOpExporterMSF.h"
 #include "mafOpExporterRAW.h"
@@ -82,7 +85,7 @@
 #include "medOpExporterGRFWS.h"
 #include "medOpExporterMeters.h"
 #endif
-#ifndef _GGDEBUG
+#ifndef _DEBUG
 //OPERATIONS
 #include "mafOp2DMeasure.h"
 #include "mafOpAddLandmark.h"
@@ -148,7 +151,7 @@
 
 #include "mafViewVTK.h"
 
-#ifndef _GGDEBUG
+#ifndef _DEBUG
 //VIEWS
 
 #include "mafViewCompound.h"
@@ -211,7 +214,7 @@ bool exMedicalApp::OnInit()
 	//------------------------------------------------------------
 	// Importer Menu':
 	//------------------------------------------------------------
-#ifndef _GGDEBUG
+#ifndef _DEBUG
 	m_Logic->Plug(new mafOpImporterImage("Images"));
 	m_Logic->Plug(new mafOpImporterRAWVolume("RAW Volume"));
 	m_Logic->Plug(new mafOpImporterSTL("STL"));
@@ -242,7 +245,7 @@ bool exMedicalApp::OnInit()
 	//------------------------------------------------------------
 	// Exporter Menu':
 	//------------------------------------------------------------
-#ifndef _GGDEBUG
+#ifndef _DEBUG
 	m_Logic->Plug(new mafOpExporterMSF("MSF"));
 	m_Logic->Plug(new mafOpExporterSTL("STL"));
 	m_Logic->Plug(new mafOpExporterVTK("VTK"));
@@ -257,7 +260,7 @@ bool exMedicalApp::OnInit()
 	//------------------------------------------------------------
 	// Operation Menu':
 	//------------------------------------------------------------
-#ifndef _GGDEBUG
+#ifndef _DEBUG
 	m_Logic->Plug(new mafOp2DMeasure("2D Measure"),"Measure");
 	m_Logic->Plug(new mafOpVOIDensity("VOI Density"),"Measure");
 	m_Logic->Plug(new medOpVolumeMeasure("Volume"),"Measure");
@@ -330,8 +333,8 @@ bool exMedicalApp::OnInit()
   // Wizard Menu':
   //------------------------------------------------------------
 
-  m_Logic->Plug(new exWizardSample("test"),"");
-  //m_Logic->Plug(new medWizard("subTest"),"SubMenu");
+  //A simple wizard sample
+  m_Logic->Plug(new exWizardSample("import & move loop"),"");
 #endif
 
 	//------------------------------------------------------------
@@ -340,7 +343,7 @@ bool exMedicalApp::OnInit()
 	//View VTK
 	m_Logic->Plug(new mafViewVTK("VTK view"));
 
-#ifndef _GGDEBUG
+#ifndef _DEBUG
 
 	//View VTK
 	m_Logic->Plug(new mafViewVTK("VTK view"));

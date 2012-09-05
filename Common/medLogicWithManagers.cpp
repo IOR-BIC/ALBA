@@ -2,7 +2,7 @@
 
  Program: MAF2Medical
  Module: medLogicWithManagers
- Authors: Matteo Giacomoni
+ Authors: Matteo Giacomoni, Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -43,6 +43,7 @@ medLogicWithManagers::medLogicWithManagers()
 : mafLogicWithManagers( new medGUIMDIFrame("maf", wxDefaultPosition, wxSize(800, 600)) )
 //----------------------------------------------------------------------------
 {
+  //Set default values
   m_UseWizardManager  = false;
   m_WizardRunning = false;
   m_WizardManager = NULL;
@@ -52,6 +53,7 @@ medLogicWithManagers::medLogicWithManagers()
 medLogicWithManagers::~medLogicWithManagers()
 //----------------------------------------------------------------------------
 {
+  //free mem
   if(m_WizardManager)
     delete m_WizardManager;
 }
@@ -67,9 +69,6 @@ void medLogicWithManagers::ViewContextualMenu(bool vme_menu)
   mafGUIMDIChild *c = (mafGUIMDIChild *)m_Win->GetActiveChild();
   if(c != NULL)
     contextMenu->ShowContextualMenu(c,v,vme_menu);
-  /*  else
-  //m_extern_view->ShowContextualMenu(vme_menu);
-  contextMenu->ShowContextualMenu(m_extern_view,v,vme_menu);*/
   cppDEL(contextMenu);
 }
 
@@ -92,21 +91,14 @@ void medLogicWithManagers::OnEvent(mafEventBase *maf_event)
 			}
 			break;
     case MENU_WIZARD:
+      //The event from the application menu
       if(m_WizardManager) 
-      {
         m_WizardManager->WizardRun(e->GetArg());
-        /*
-        if(m_RemoteLogic && m_RemoteLogic->IsSocketConnected() && !m_OpManager->m_FromRemote)
-        {
-          mafEvent re(this, mafOpManager::RUN_OPERATION_EVENT, e->GetArg());
-          re.SetChannel(REMOTE_COMMAND_CHANNEL);
-          m_RemoteLogic->OnEvent(&re);
-        }
-        */
-      }
       break;
     case WIZARD_RUN_STARTING:
       {
+        //Manage start event from the wizard lock window close button
+        //and disabling toolbar
         mafGUIMDIChild *c = (mafGUIMDIChild *)m_Win->GetActiveChild();
         if (c != NULL)
           c->SetAllowCloseWindow(false);
@@ -115,6 +107,8 @@ void medLogicWithManagers::OnEvent(mafEventBase *maf_event)
       break; 
      case WIZARD_RUN_TERMINATED:
       {
+        //Manage end event from the wizard unlock window close button
+        //and enabling toolbar
         mafGUIMDIChild *c = (mafGUIMDIChild *)m_Win->GetActiveChild();
         if (c != NULL)
           c->SetAllowCloseWindow(true);
@@ -123,6 +117,8 @@ void medLogicWithManagers::OnEvent(mafEventBase *maf_event)
       break; 
     case WIZARD_REQUIRED_VIEW:
        {
+         //The wizard requires a specific view
+         //searching on open views or open a new one
          mafView *view;
          const char *viewStr=e->GetString()->GetCStr();
          
@@ -134,16 +130,19 @@ void medLogicWithManagers::OnEvent(mafEventBase *maf_event)
        }
     case WIZARD_RUN_OP:
       {
+        //Running an op required from the wizard
         mafString *tmp=e->GetString();
         m_OpManager->OpRun(*(e->GetString()));
       }
     break;
     case OP_RUN_TERMINATED:
       {
+        //if the operation was started from the wizard we continue the wizard execution
         if (m_WizardManager && m_WizardRunning)
         {
           m_WizardManager->WizardContinue(e->GetArg());
         }
+        //else we manage the operation end by unlock the close button and so on
         else
         {
           mafGUIMDIChild *c = (mafGUIMDIChild *)m_Win->GetActiveChild();
@@ -165,6 +164,7 @@ void medLogicWithManagers::OnEvent(mafEventBase *maf_event)
 void medLogicWithManagers::Plug( mafOp *op, wxString menuPath /*= ""*/, bool canUndo /*= true*/, mafGUISettings *setting /*= NULL*/ )
 //----------------------------------------------------------------------------
 {
+  //plug functions needs to be redefined to avoid overload ambiguity
   mafLogicWithManagers::Plug(op,menuPath,canUndo,setting);
 }
 
@@ -172,6 +172,7 @@ void medLogicWithManagers::Plug( mafOp *op, wxString menuPath /*= ""*/, bool can
 void medLogicWithManagers::Plug( mafView* view, bool visibleInMenu /*= true*/ )
 //----------------------------------------------------------------------------
 {
+  //plug functions needs to be redefined to avoid overload ambiguity
   mafLogicWithManagers::Plug(view,visibleInMenu);
 }
 
@@ -179,10 +180,15 @@ void medLogicWithManagers::Plug( mafView* view, bool visibleInMenu /*= true*/ )
 void medLogicWithManagers::Plug( medWizard *wizard, wxString menuPath /*= ""*/ )
 //----------------------------------------------------------------------------
 {
-    if(m_WizardManager)
-    {
-      m_WizardManager->WizardAdd(wizard, menuPath);
-    }
+  //Plugging the wizard    
+  if(m_WizardManager)
+  {
+    m_WizardManager->WizardAdd(wizard, menuPath);
+  }
+  else 
+  {
+    mafLogMessage("Enable wizard pluggin to plug wizards"); 
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -191,6 +197,7 @@ void medLogicWithManagers::Configure()
 {
   mafLogicWithManagers::Configure();
 
+  //Setting wizard specific data
   if(m_UseWizardManager)
   {
     m_WizardManager = new medWizardManager();
@@ -206,6 +213,7 @@ void medLogicWithManagers::Show()
 {
   mafLogicWithManagers::Show();
 
+  //setting gui pointers to the Wizard Manager
   if(m_WizardManager)
   {
     if(m_MenuBar)
@@ -249,22 +257,18 @@ void medLogicWithManagers::OnQuit()
 void medLogicWithManagers::VmeSelected( mafNode *vme )
 //----------------------------------------------------------------------------
 {
+  //if a wizard manager was plugged we tell it about vme selection
   if(m_WizardManager)  
     m_WizardManager->VmeSelected(vme);
   mafLogicWithManagers::VmeSelected(vme);
 }
 
-//----------------------------------------------------------------------------
-void medLogicWithManagers::ViewSelect()
-//----------------------------------------------------------------------------
-{
-  mafLogicWithManagers::ViewSelect();
-}
 
 void medLogicWithManagers::CreateMenu()
 {
   mafLogicWithManagers::CreateMenu();
 
+  //add the wizard menu between "operation" and "settings"
   if (m_UseWizardManager)
   {
     m_WizardMenu = new wxMenu;
@@ -276,6 +280,7 @@ void medLogicWithManagers::CreateMenu()
 void medLogicWithManagers::WizardRunStarting()
 //----------------------------------------------------------------------------
 {
+  //Disabling menu, toolbars and selection by interacion manager and sidebar
   m_WizardRunning=true;
 
   EnableMenuAndToolbar(false);
@@ -291,6 +296,7 @@ void medLogicWithManagers::WizardRunStarting()
 void medLogicWithManagers::WizardRunTerminated()
 //----------------------------------------------------------------------------
 {
+  //Enabling menu, toolbars and selection by interacion manager and sidebar
   m_WizardRunning=false;
 
   EnableMenuAndToolbar(true);

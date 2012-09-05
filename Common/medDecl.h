@@ -2,7 +2,7 @@
 
  Program: MAF2Medical
  Module: medDecl
- Authors: Matteo Giacomoni
+ Authors: Matteo Giacomoni, Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or

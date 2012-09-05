@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2Medical
- Module: medVect3d
+ Module: medWizardSelectionBlock
  Authors: Gianluigi Crimi
  
  Copyright (c) B3C
@@ -29,8 +29,8 @@
 //----------------------------------------------------------------------------
 
 /**
-  Class Name: medVect3d.
-  Class for handle the high level logic of a medical application.
+  Class Name: medWizardSelectionBlock.
+  Class for create a multiple choice switch inside wizard graph
 */
 class MED_COMMON_EXPORT medWizardSelectionBlock : public medWizardBlock
 {

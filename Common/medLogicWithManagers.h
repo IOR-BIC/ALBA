@@ -2,7 +2,7 @@
 
  Program: MAF2Medical
  Module: medLogicWithManagers
- Authors: Matteo Giacomoni
+ Authors: Matteo Giacomoni, Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -79,9 +79,6 @@ protected:
   
   /** Respond to a VME_SELECTED evt. Update the selection on the tree and view representation. */
   virtual void VmeSelected(mafNode *vme);
-
-  /** Select a view and update the display list for the tree. */
-  virtual void ViewSelect();
 
   /** Redefined to add View,Op,Import,Export, Wizard menu*/
   virtual void CreateMenu();

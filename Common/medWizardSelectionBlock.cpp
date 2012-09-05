@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2Medical
- Module: medVect3d
+ Module: medWizardSelectionBlock
  Authors: Gianluigi Crimi
  
  Copyright (c) B3C
@@ -32,6 +32,7 @@
 medWizardSelectionBlock::medWizardSelectionBlock(const char *name):medWizardBlock(name)
 //----------------------------------------------------------------------------
 {
+  //setting default values
   m_SelectedChoice=0;
 }
 
@@ -39,6 +40,7 @@ medWizardSelectionBlock::medWizardSelectionBlock(const char *name):medWizardBloc
 medWizardSelectionBlock::~medWizardSelectionBlock()
 //----------------------------------------------------------------------------
 {
+  //clearing choices list
   m_Choices.clear();
 }
 
@@ -46,6 +48,7 @@ medWizardSelectionBlock::~medWizardSelectionBlock()
 void medWizardSelectionBlock::SetWindowTitle( const char *Title )
 //----------------------------------------------------------------------------
 {
+  //setting the name of the window title
   m_Title=Title;
 }
 
@@ -53,6 +56,7 @@ void medWizardSelectionBlock::SetWindowTitle( const char *Title )
 void medWizardSelectionBlock::AddChoice( const char *label, const char *block )
 //----------------------------------------------------------------------------
 {
+  //Creating a choice struct and push it in the choices array
   blockChoice tmpChoice;
   tmpChoice.label=label;
   tmpChoice.block=block;
@@ -64,9 +68,12 @@ wxString medWizardSelectionBlock::GetNextBlock()
 //----------------------------------------------------------------------------
 {
   wxString block;
-
-  block=m_Choices[m_SelectedChoice].block;
-  
+  //Return the next block according on user choice
+  if (m_SelectedChoice>=0 || m_SelectedChoice >= m_Choices.size())
+    block=m_Choices[m_SelectedChoice].block;
+  else 
+    //if the selection is outside the range we return a fake block
+    block="Selection problem";
   return block;
 }
 
@@ -74,6 +81,7 @@ wxString medWizardSelectionBlock::GetNextBlock()
 void medWizardSelectionBlock::SetDescription( const char *description )
 //----------------------------------------------------------------------------
 {
+  //set the description showed to the user
   m_Description=description;
 }
 
@@ -90,13 +98,12 @@ void medWizardSelectionBlock::ExcutionBegin()
   //Show Modal window
   m_SelectedChoice = wxGetSingleChoiceIndex(m_Description,m_Title,m_Choices.size(), choices);
 
+  //User has pessed cancel
   if (m_SelectedChoice<0)
     Abort();
 
-
+  //free mem 
   delete[] choices;  
-
-  return;
 }
 
 

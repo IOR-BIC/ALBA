@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2Medical
- Module: medVect3d
+ Module: medWizardBlock
  Authors: Gianluigi Crimi
  
  Copyright (c) B3C
@@ -32,13 +32,13 @@
 medWizardBlock::medWizardBlock(const char *name)
 //----------------------------------------------------------------------------
 {
+
+  //Setting default values
   m_Name = name;
 
   if (m_Name == "END")
     mafLogMessage("MafWizardBlock: 'END' was reserved");
-  else if (m_Name == "END")
-    mafLogMessage("MafWizardBlock: 'ABORT' was reserved");
-
+  
   m_Success=true;
 }
 
@@ -48,47 +48,68 @@ medWizardBlock::~medWizardBlock()
 {
 }
 
+//----------------------------------------------------------------------------
 int medWizardBlock::Success()
+//----------------------------------------------------------------------------
 {
+  //return true if the execution of the block havent problems
   return m_Success;
 }
 
+//----------------------------------------------------------------------------
 wxString medWizardBlock::GetName()
+//----------------------------------------------------------------------------
 {
-   return m_Name;
+  //return the block name
+  return m_Name;
 }
 
 
-//
-
+//----------------------------------------------------------------------------
 wxString medWizardBlock::GetNextBlock()
+//----------------------------------------------------------------------------
 {
-  return wxString("");
+  //You need to add a specified block
+  return wxString("Error, Base block added");
 }
 
+//----------------------------------------------------------------------------
 void medWizardBlock::Abort()
+//----------------------------------------------------------------------------
 {
+  //Set the success to false
   m_Success=false;
 }
 
-
+//----------------------------------------------------------------------------
 void medWizardBlock::ExcutionBegin()
+//----------------------------------------------------------------------------
 {
+  //Starting execution
   m_Running=true;
 }
 
+//----------------------------------------------------------------------------
 void medWizardBlock::ExcutionEnd()
+//----------------------------------------------------------------------------
 {
+  //Stopping execution
   m_Running=false;
 }
 
+//----------------------------------------------------------------------------
 wxString medWizardBlock::GetRequiredOperation()
+//----------------------------------------------------------------------------
 {
+  //No operation required by default 
   return wxString("");
 }
 
+//----------------------------------------------------------------------------
 void medWizardBlock::SetSelectedVME( mafNode *node )
+//----------------------------------------------------------------------------
 {
+  //setting the selected vme
   m_SelectedVME=node;
 }
 
@@ -96,11 +117,8 @@ void medWizardBlock::SetSelectedVME( mafNode *node )
 void medWizardBlock::SetListener( mafObserver *Listener )
 //----------------------------------------------------------------------------
 {
+  //setting the event listener
   m_Listener = Listener;
 }
 
-
-//----------------------------------------------------------------------------
-//void medWizardBlock::Delete()
-//----------------------------------------------------------------------------
 

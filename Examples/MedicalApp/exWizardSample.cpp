@@ -27,38 +27,41 @@
 #include "medWizardOperationBlock.h"
 
 
+//--------------------------------------------------------------------------------
 exWizardSample::exWizardSample( const wxString &label ):medWizard(label)
+//--------------------------------------------------------------------------------
 {
   
-  medWizardSelectionBlock *selectorBlock=new medWizardSelectionBlock("START");
-  selectorBlock->SetWindowTitle("Test Selector");
-  selectorBlock->SetDescription("Wizard Selector Test window");
-  selectorBlock->AddChoice("Import VTK","vtkImport");
-  selectorBlock->AddChoice("End Wizard", "END");
-  
-  medWizardOperaiontionBlock *opBlock=new medWizardOperaiontionBlock("vtkImport");
+  //Start Block (import a VTK file)   
+  medWizardOperaiontionBlock *opBlock=new medWizardOperaiontionBlock("START");
   opBlock->SetRequiredView("");
-  opBlock->VmeShow("lastChild");
-  opBlock->VmeSelect("");
+  opBlock->VmeSelect("root");
   opBlock->SetRequiredOperation("mafOpImporterVTK");
-  opBlock->VmeHide("");
   opBlock->SetNextBlock("opMove");
 
+  //Move block (position the Block)
   medWizardOperaiontionBlock *opBlock2=new medWizardOperaiontionBlock("opMove");
   opBlock2->SetRequiredView("VTK view");
   opBlock2->VmeSelect("lastChild");
   opBlock2->SetRequiredOperation("medOpMove");
-  opBlock2->VmeHide("");
-  opBlock2->SetNextBlock("START");
+  opBlock2->SetNextBlock("Select");
   
+  //Select Block ask user if want to import another file
+  medWizardSelectionBlock *selectorBlock=new medWizardSelectionBlock("Select");
+  selectorBlock->SetWindowTitle("Test Selector");
+  selectorBlock->SetDescription("Wizard Selector Test window");
+  selectorBlock->AddChoice("Import another VTK","START");
+  selectorBlock->AddChoice("End Wizard", "END");
+
+  //add blocks to the wizard
   AddBlock(selectorBlock);
   AddBlock(opBlock);
   AddBlock(opBlock2);
-
-
 }
 
+//--------------------------------------------------------------------------------
 bool exWizardSample::Accept(mafNode* vme)
+//--------------------------------------------------------------------------------
 {
   return true;
 }

@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 
 //----------------------------------------------------------------------------
-// mafGUIMDIFrame
+// medGUIMDIFrame
 //----------------------------------------------------------------------------
 BEGIN_EVENT_TABLE(medGUIMDIFrame, mafGUIMDIFrame)
 		EVT_MENU_RANGE(WIZARD_START,WIZARD_END,medGUIMDIFrame::OnMenuWizard)
@@ -40,17 +40,20 @@ END_EVENT_TABLE()
 medGUIMDIFrame::medGUIMDIFrame(const wxString& title, const wxPoint& pos, const wxSize& size):mafGUIMDIFrame(title, pos, size)
 //----------------------------------------------------------------------------
 {
+  //default constructor
 }
 
 //----------------------------------------------------------------------------
 medGUIMDIFrame::~medGUIMDIFrame()
 //----------------------------------------------------------------------------
 {
+  //default destructor
 }
 
 //----------------------------------------------------------------------------
 void medGUIMDIFrame::OnMenuWizard(wxCommandEvent& e)
 //----------------------------------------------------------------------------
 { 
+  //Tell logic about click on wizard menu
   mafEventMacro(mafEvent(this,MENU_WIZARD,(long)e.GetId()));
 }

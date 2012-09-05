@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2Medical
- Module: medOpInteractionOp
+ Module: exWizard Sample
  Authors: Marco Petrone
  
  Copyright (c) B3C
@@ -38,7 +38,7 @@ public:
   virtual bool Accept(mafNode* vme);
 
 };
-#endif // __medOpInteraction_H__
+#endif // __exWizardSample_H__
 
 
 

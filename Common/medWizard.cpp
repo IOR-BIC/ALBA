@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2Medical
- Module: medVect3d
+ Module: medWizard
  Authors: Gianluigi Crimi
  
  Copyright (c) B3C
@@ -33,14 +33,17 @@
 medWizard::medWizard(const wxString &label)
 //----------------------------------------------------------------------------
 {
+  //Setting default values
   m_Label     = label;
   m_CurrentBlock=NULL;
   m_Listener=NULL;
 }
 
+//----------------------------------------------------------------------------
 medWizard::medWizard()
+//----------------------------------------------------------------------------
 {
-  
+  //Setting default values
   m_Label  = "Default Wizard Name";
   m_CurrentBlock=NULL;
   m_Listener=NULL;
@@ -50,8 +53,10 @@ medWizard::medWizard()
 medWizard::~medWizard()
 //----------------------------------------------------------------------------
 {
+  //Deleting all blocks added to the wizard
   for (int i=0;i<m_Blocks.size();i++)
     mafDEL(m_Blocks[i]);
+  //Clearing blocks array
   m_Blocks.clear();
 }
 
@@ -59,12 +64,14 @@ medWizard::~medWizard()
 void medWizard::Execute()
 //----------------------------------------------------------------------------
 {
+  //The first block is defined by the name "START"
   medWizardBlock *start=GetBlockByName("START");
 
   if (start==NULL)
     mafLogMessage("Wizard Error: Wizard has no starting point");
   else 
   {
+    //setting current block and start execution
     m_CurrentBlock=start;
     BlockExecutionBegin();
   }
@@ -74,6 +81,7 @@ void medWizard::Execute()
 void medWizard::AddBlock( medWizardBlock *block)
 //----------------------------------------------------------------------------
 {
+  //Add a new block to the wizard and setting is listener 
   block->SetListener(this);
   m_Blocks.push_back(block);
 }
@@ -82,6 +90,7 @@ void medWizard::AddBlock( medWizardBlock *block)
 void medWizard::SetMenuPath( wxString path )
 //----------------------------------------------------------------------------
 {
+  //Set the menu path for the wizard 
   m_MenuPath=path;
 }
 
@@ -89,6 +98,7 @@ void medWizard::SetMenuPath( wxString path )
 void medWizard::SetListener( mafObserver *Listener )
 //----------------------------------------------------------------------------
 {
+  //Setting the listener 
   m_Listener = Listener;
 }
 
@@ -96,6 +106,7 @@ void medWizard::SetListener( mafObserver *Listener )
 void medWizard::SetId( int id )
 //----------------------------------------------------------------------------
 {
+  //The id of the wizard
   m_Id=id;
 }
 
@@ -103,6 +114,7 @@ void medWizard::SetId( int id )
 wxString medWizard::GetMenuPath()
 //----------------------------------------------------------------------------
 {
+  //return the menu path
   return m_MenuPath;
 }
 
@@ -110,6 +122,7 @@ wxString medWizard::GetMenuPath()
 int medWizard::GetId()
 //----------------------------------------------------------------------------
 {
+  //return the id
   return m_Id;
 }
 
@@ -117,6 +130,7 @@ int medWizard::GetId()
 wxString medWizard::GetLabel()
 //----------------------------------------------------------------------------
 {
+  //return the label
   return m_Label;
 }
 
@@ -124,6 +138,8 @@ wxString medWizard::GetLabel()
 medWizardBlock *medWizard::GetBlockByName(const char *name )
 //----------------------------------------------------------------------------
 {
+  //search a block in the block list by his name
+  //and return it
   for (int i=0;i<m_Blocks.size();i++)
     if (m_Blocks[i]->GetName()==name)
       return m_Blocks[i];
@@ -136,6 +152,9 @@ medWizardBlock *medWizard::GetBlockByName(const char *name )
 bool medWizard::Accept(mafNode* vme)
 //----------------------------------------------------------------------------
 {
+  //by default accept function return always false
+  //you need to re-write this function in your specific wizard
+  //to enable wizard in menu
   return false;
 }
 
@@ -145,13 +164,14 @@ void medWizard::BlockExecutionBegin()
 {
   wxString requiredOperation;
 
+  //Setting selected vme to the block and execute it
   m_CurrentBlock->SetSelectedVME(m_SelectedVME);
-
   m_CurrentBlock->ExcutionBegin();
 
   requiredOperation=m_CurrentBlock->GetRequiredOperation();
-  //there is a not a required operation 
-  //The wizard flow continues without interruption and we call BlockExecutionEnd() 
+  
+  //if there is a not a required operation 
+  //the wizard flow continues without interruption and we call BlockExecutionEnd() 
   //elsewere if we had an operation it is run asynchronous and BlockExecutionEnd() 
   //will be called my managers after operation stop
   if (requiredOperation=="")
@@ -163,7 +183,7 @@ void medWizard::BlockExecutionBegin()
 void medWizard::AbortWizard()
 //----------------------------------------------------------------------------
 {
-
+  mafEventMacro(mafEvent(this,WIZARD_RUN_TERMINATED,false));
 }
 
 //----------------------------------------------------------------------------
@@ -172,23 +192,27 @@ void medWizard::BlockExecutionEnd()
 {
   wxString nextBlock;
 
+  //Execution End manage the tear down operation required by the block
   m_CurrentBlock->ExcutionEnd();
 
   nextBlock=m_CurrentBlock->GetNextBlock();
 
+  //if the next block is "END" the execution of the wizard is terminated
   if (nextBlock=="END")
   {
-    mafEventMacro(mafEvent(this,WIZARD_RUN_TERMINATED));
+    mafEventMacro(mafEvent(this,WIZARD_RUN_TERMINATED,true));
   }
   else
   {
     m_CurrentBlock=GetBlockByName(nextBlock.c_str());
 
+    //if the next block is undefined we abort the wizard execution
     if (m_CurrentBlock==NULL)
     {
       mafLogMessage("Wizard Error: undefined block :'%s'",nextBlock.c_str());
       AbortWizard();
     }
+    //else we start the execution of the next block to continue wizard flow
     else 
       BlockExecutionBegin();
   }
@@ -198,7 +222,6 @@ void medWizard::BlockExecutionEnd()
 void medWizard::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------  
 {
-
   //forward up event;
   mafEventMacro(*maf_event);
 }
@@ -208,6 +231,7 @@ void medWizard::OnEvent(mafEventBase *maf_event)
 void medWizard::SetSelectedVME( mafNode *node )
 //----------------------------------------------------------------------------  
 {
+  //Selecting VME an (if necessary) setting it to the current block
   m_SelectedVME=node;
   if (m_CurrentBlock)
     m_CurrentBlock->SetSelectedVME(node);
@@ -217,11 +241,14 @@ void medWizard::SetSelectedVME( mafNode *node )
 void medWizard::ContinueExecution(int opSuccess)
 //----------------------------------------------------------------------------  
 {
+  //if last operation has success we continue with the flow of the wizard
   if (opSuccess)
     BlockExecutionEnd();
   else 
   {
-    mafEventMacro(mafEvent(this,WIZARD_RUN_TERMINATED));
+    //if the operation has aborted by the user we abort the entire wizard
+    //this behavior can be updated for error management
+    mafEventMacro(mafEvent(this,WIZARD_RUN_TERMINATED,false));
   }
 }
 

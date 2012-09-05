@@ -28,6 +28,7 @@ PURPOSE.  See the above copyright notice for more information.
   Class Name: medGUIMDIFrame.
   Represents the main frame of a MED Application. On this frame  they'll be plugged  toolbars,  panels, progress bar etc...
   Closing this frame is equal to close the application.
+  This frame extend mafGUIMDIFrame with wizard specific events
 */
 class MED_GUI_EXPORT medGUIMDIFrame : public mafGUIMDIFrame
 {

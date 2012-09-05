@@ -2,7 +2,7 @@
 
  Program: MAF2Medical
  Module: exMedicalApp
- Authors: Matteo Giacomoni - Daniele Giunchi
+ Authors: Matteo Giacomoni - Daniele Giunchi - Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or

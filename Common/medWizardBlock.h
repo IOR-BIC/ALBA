@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2Medical
- Module: medVect3d
+ Module: medWizardBlock
  Authors: Gianluigi Crimi
  
  Copyright (c) B3C
@@ -28,8 +28,8 @@
 //----------------------------------------------------------------------------
 
 /**
-  Class Name: medVect3d.
-  Class for handle the high level logic of a medical application.
+  Class Name: medWizardBlock.
+  Class for the base wizard block, each block on a wizard must extend this block
 */
 class MED_COMMON_EXPORT medWizardBlock 
 {

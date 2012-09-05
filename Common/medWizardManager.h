@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2Medical
- Module: medVect3d
+ Module: medWizardManager
  Authors: Gianluigi Crimi
  
  Copyright (c) B3C
@@ -29,8 +29,9 @@
 //----------------------------------------------------------------------------
 class medWizard;
 /**
-  Class Name: medVect3d.
-  Class for handle the high level logic of a medical application.
+  Class Name: medWizardManager.
+  Class for wizards management 
+  This class creates the menu, starts the wizards and manage wizard related events
 */
 class MED_COMMON_EXPORT medWizardManager : mafObserver
 {

@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2Medical
- Module: medVect3d
+ Module: medWizardOperaiontionBlock
  Authors: Gianluigi Crimi
  
  Copyright (c) B3C
@@ -29,8 +29,14 @@
 //----------------------------------------------------------------------------
 
 /**
-  Class Name: medVect3d.
-  Class for handle the high level logic of a medical application.
+  Class Name: medWizardOperaiontionBlock.
+  Class for operation block inside the wizard 
+  This classes manage all the operation required to run an operation
+  *Open the view Required by the op (if necesary)
+  *Selects the input VME
+  *Show other useful VME
+  *Run the operation
+  *Hide some VME after operation termination
 */
 class MED_COMMON_EXPORT medWizardOperaiontionBlock : public medWizardBlock
 {
@@ -54,12 +60,12 @@ public:
   /** Set the path of the VMEs that is need to show for the operation.
       The path starts from the selected vme. 
       Multiple calls to this funcion correspond on multiple VME show.*/
-  void VmeShow(const char *path);
+  void VmeShowAdd(const char *path);
 
   /** Set the path of the VMEs that is need to hide after the operation.
       The path starts from the selected vme.
       Multiple calls to this funcion correspond on multiple VME show*/
-  void VmeHide(const char *path);
+  void VmeHideAdd(const char *path);
 
   /** Set name of the Block called after operation. */
   void SetNextBlock(const char *block);
@@ -69,9 +75,6 @@ public:
 
   /** Execute the block */
   void Execute();
-
-  /** Abort the execution of the block */
-  void Abort();
 
   /** Starts the execution of the block */
   void ExcutionBegin();
