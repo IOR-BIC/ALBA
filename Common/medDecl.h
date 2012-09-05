@@ -2,7 +2,7 @@
 
  Program: MAF2Medical
  Module: medDecl
- Authors: Matteo Giacomoni
+ Authors: Matteo Giacomoni, Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -20,15 +20,23 @@
 #include "mafDefines.h"
 #include "mafDecl.h"
 
+const int MAXWIZARD = 50; 
 
 enum MED_MAIN_EVENT_ID
 {
   ID_VME_BEHAVIOR_UPDATE = EVT_USER_START,
+  WIZARD_RUN_STARTING,
+  WIZARD_RUN_TERMINATED,
+  WIZARD_REQUIRED_VIEW,
+  WIZARD_RUN_OP,
+  WIZARD_START,
+  WIZARD_END=WIZARD_START+MAXWIZARD,
   MED_EVT_USER_START,
 };
 enum MED_MENU_EVENT_ID
 {
-  MED_MENU_USER_START = MENU_USER_START,
+   MENU_WIZARD = MENU_USER_START,
+   MED_MENU_USER_START,
 };
 
 #endif
