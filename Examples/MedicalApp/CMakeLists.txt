@@ -5,6 +5,8 @@ SET(PROJECT_SRCS
 	exMedicalApp.h
 	medOpInteractionOp.cpp
 	medOpInteractionOp.h
+	exWizardSample.cpp
+	exWizardSample.h
 )
 
 IF (NOT EXECUTABLE_OUTPUT_PATH)

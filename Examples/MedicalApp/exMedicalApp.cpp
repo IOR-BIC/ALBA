@@ -2,7 +2,7 @@
 
  Program: MAF2Medical
  Module: exMedicalApp
- Authors: Matteo Giacomoni - Daniele Giunchi
+ Authors: Matteo Giacomoni - Daniele Giunchi - Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -38,6 +38,16 @@
 #include "mafVMESurface.h"
 #include "mafPipeFactoryVME.h"
 #include "medPipeFactoryVME.h"
+
+//Comment this line to disable wizard sample
+#define USE_WIZARD
+
+#undef _DEBUG
+
+#ifdef USE_WIZARD
+  #include "medWizard.h"
+  #include "exWizardSample.h"
+#endif
 
 #ifndef _DEBUG
 //IMPORTERS
@@ -183,6 +193,7 @@ bool exMedicalApp::OnInit()
 	assert(result==MAF_OK);
 
 	m_Logic = new medLogicWithManagers();
+  
 	m_Logic->GetTopWin()->SetTitle("Medical example");
 
 	//m_Logic->PlugTimebar(false);
@@ -193,6 +204,9 @@ bool exMedicalApp::OnInit()
 	//m_Logic->PlugOpManager(false);
 	//m_Logic->PlugViewManager(false);
 	//m_Logic->PlugVMEManager(false);  // the VmeManager at the moment cause 4 leaks of 200+32+24+56 bytes  //SIL. 20-4-2005: 
+#ifdef USE_WIZARD
+  m_Logic->PlugWizardManager(true);
+#endif
 	m_Logic->Configure();
 
 	SetTopWindow(mafGetFrame());  
@@ -312,6 +326,16 @@ bool exMedicalApp::OnInit()
 #endif
 #endif
 	//------------------------------------------------------------
+
+
+#ifdef USE_WIZARD
+  //------------------------------------------------------------
+  // Wizard Menu':
+  //------------------------------------------------------------
+
+  //A simple wizard sample
+  m_Logic->Plug(new exWizardSample("import & move loop"),"");
+#endif
 
 	//------------------------------------------------------------
 	// View Menu':

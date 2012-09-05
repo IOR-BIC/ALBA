@@ -28,6 +28,8 @@ SET(PROJECT_SRCS
   medGUILutHistogramSwatch.h
   medGUILutHistogramEditor.cpp
   medGUILutHistogramEditor.h
+  medGUIMDIFrame.cpp
+  medGUIMDIFrame.h
   
 )
 

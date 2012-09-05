@@ -1,8 +1,8 @@
 /*=========================================================================
 
  Program: MAF2Medical
- Module: exMedicalApp
- Authors: Matteo Giacomoni - Daniele Giunchi - Gianluigi Crimi
+ Module: exWizard Sample
+ Authors: Marco Petrone
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -13,24 +13,37 @@
  PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#ifndef __exMedicalApp_H__
-#define __exMedicalApp_H__
+#ifndef __exWizardSample_H__
+#define __exWizardSample_H__
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medLogicWithManagers.h" 
+#include "medWizard.h"
+//----------------------------------------------------------------------------
+// Forward Refs:
+//----------------------------------------------------------------------------
+class mafVME;
+class mafVMEGizmo;
+class mmiCompositorMouse;
 
 // ============================================================================
-class exMedicalApp : public wxApp
+class exWizardSample : public medWizard
 // ============================================================================
 {
 public:
-  bool OnInit();
-  int  OnExit();
-protected:
-  medLogicWithManagers *m_Logic;
+  /** Default constructor */
+  exWizardSample(const wxString &label);
+  
+  /** Accept function*/
+  virtual bool Accept(mafNode* vme);
 
-	void OnFatalException();
 };
-DECLARE_APP(exMedicalApp)
-#endif //__exMedicalApp_H__
+#endif // __exWizardSample_H__
+
+
+
+
+
+
+
+
