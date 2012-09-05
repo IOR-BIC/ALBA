@@ -356,7 +356,7 @@ mafView *mafViewManager::ViewCreate(int id)
 	return new_view;
 }
 //----------------------------------------------------------------------------
-mafView *mafViewManager::ViewCreate(wxString type)
+mafView *mafViewManager::ViewCreate(wxString label)
 //----------------------------------------------------------------------------
 {
 	mafView* new_view = NULL;
@@ -366,14 +366,16 @@ mafView *mafViewManager::ViewCreate(wxString type)
   for(; index<m_TemplateNum; index++)
 	{
     // find the template view of the specified type
-    wxString t = typeid(*m_ViewTemplate[index]).name();
-		if(t == type )
+    wxString t = m_ViewTemplate[index]->GetLabel();
+		if(t == label )
 		{
 	    view = m_ViewTemplate[index];
 			break;
 		}
 	}
-  assert(view);
+  
+  if (view==NULL) 
+    return NULL;
 
   // Paolo 2005-04-22
   int view_mult = 0;
@@ -392,7 +394,8 @@ mafView *mafViewManager::ViewCreate(wxString type)
 	m_ViewBeingCreated = NULL;
 
   mafEventMacro(mafEvent(this,VIEW_CREATED,new_view)); // ask Logic to create the frame
-  // don't show the frame
+  
+  new_view->GetFrame()->Show(true); // show the view's frame
 
 	return new_view;
 }
@@ -511,4 +514,15 @@ void mafViewManager::Activate(mafView *view)
   else
     //((mafGUIMDIChild *)view->GetFrame())->Activate();
     ((mafGUIMDIChild *)view->GetFrame())->SetFocus();
+}
+
+//----------------------------------------------------------------------------
+mafView * mafViewManager::GetFromList( const char *label )
+//----------------------------------------------------------------------------
+{
+  mafView *view;
+  for(view = GetList(); view; view=view->m_Next)
+    if (view->GetLabel()==label)
+      break;
+  return view;
 }

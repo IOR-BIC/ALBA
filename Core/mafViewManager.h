@@ -86,7 +86,7 @@ public:
   virtual mafView *ViewCreate(int id);
   
 	/** Create a view given the type. */
-  virtual mafView *ViewCreate(wxString type);
+  virtual mafView *ViewCreate(wxString label);
   
 	/** Insert the view into the view-list, fill the view with the vme tree and select the selected vme. */
   void ViewInsert(mafView *view);
@@ -120,6 +120,9 @@ public:
 
   /** Return the created view-list. */
   mafView *GetList() {return m_ViewList;};
+
+  /** Return a view (defined by label) if is present on open wiews list*/
+  mafView *GetFromList(const char *label);
 
   /** Return the plugged view-list. */
   mafView **GetListTemplate() {return m_ViewTemplate;};

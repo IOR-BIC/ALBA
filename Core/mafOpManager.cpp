@@ -501,7 +501,8 @@ bool mafOpManager::WarnUser(mafOp *op)
 void mafOpManager::OpRun(mafString &op_type, void *op_param)
 //----------------------------------------------------------------------------
 {
-  for (int i=0; i< m_NumOp; i++)
+  int i;
+  for (i=0; i< m_NumOp; i++)
   {
     if (op_type.Equals(m_OpList[i]->GetTypeName()))
     {
@@ -509,6 +510,8 @@ void mafOpManager::OpRun(mafString &op_type, void *op_param)
       break;
     }
   }
+  if (i==m_NumOp)
+    mafLogMessage("Error Op:\"%s\" not found",op_type);
 }
 //----------------------------------------------------------------------------
 void mafOpManager::OpRun(int op_id)
@@ -666,7 +669,8 @@ void mafOpManager::OpRunOk(mafOp *op)
   m_RunningOp = NULL;
   m_NaturalNode = NULL;
 	OpDo(op);
-  Notify(OP_RUN_TERMINATED);
+  //Notify success with "arg" paramerter
+  Notify(OP_RUN_TERMINATED,true);
 	if(m_Context.Caller() == NULL) 	
     EnableOp();
 }
@@ -687,7 +691,8 @@ void mafOpManager::OpRunCancel(mafOp *op)
     m_NaturalNode = NULL;
   }
 
-  Notify(OP_RUN_TERMINATED);
+  //Notify cancel with "arg" paramerter
+  Notify(OP_RUN_TERMINATED,false);
 
 	if(m_Context.Caller() == NULL) 	
     EnableOp();
@@ -955,12 +960,12 @@ void mafOpManager::OpRedo()
 	EnableOp();
 }
 //----------------------------------------------------------------------------
-void mafOpManager::Notify(int msg)   
+void mafOpManager::Notify(int msg, long arg)   
 //----------------------------------------------------------------------------
 {
 	if(m_Context.Caller() == NULL)
 	// not a nested operation - notify logic
-		mafEventMacro(mafEvent(this,msg,m_RunningOp));   //SIL. 17-9-2004: added the m_RunningOp at the event (may be NULL)
+		mafEventMacro(mafEvent(this,msg,m_RunningOp,arg));   //SIL. 17-9-2004: added the m_RunningOp at the event (may be NULL)
 	//else
 	// nested operation - notify caller
 		    // m_Context.Caller()->OnEvent(mafEvent(this,msg));   

@@ -78,7 +78,7 @@ USAGE - member function MUST be called in this order:
 class MAF_EXPORT mafLogicWithManagers: public mafLogicWithGUI
 {
 public:
-               mafLogicWithManagers();
+               mafLogicWithManagers(mafGUIMDIFrame *mdiFrame=NULL);
 	virtual     ~mafLogicWithManagers(); 
 
   enum UPLOAD_FLAGS

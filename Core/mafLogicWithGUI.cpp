@@ -52,10 +52,14 @@
   #include "vtkTimerLog.h"
 #endif
 //----------------------------------------------------------------------------
-mafLogicWithGUI::mafLogicWithGUI()
+mafLogicWithGUI::mafLogicWithGUI(mafGUIMDIFrame *mdiFrame /*=NULL*/)
 //----------------------------------------------------------------------------
 {
-  m_Win = new mafGUIMDIFrame("maf", wxDefaultPosition, wxSize(800, 600));
+  if (mdiFrame==NULL)
+    m_Win = new mafGUIMDIFrame("maf", wxDefaultPosition, wxSize(800, 600));
+  else
+    m_Win = mdiFrame;
+
   m_Win->SetListener(this);
 
   m_ChildFrameStyle = wxCAPTION | wxMAXIMIZE_BOX | wxMINIMIZE_BOX | wxRESIZE_BORDER; //wxTHICK_FRAME; // Default style

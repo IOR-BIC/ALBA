@@ -70,7 +70,7 @@ Proper Initialization must follow this order
 class MAF_EXPORT mafLogicWithGUI: public mafObserver
 {
 public:
-               mafLogicWithGUI();
+               mafLogicWithGUI(mafGUIMDIFrame *mdiFrame=NULL);
 	virtual     ~mafLogicWithGUI(); 
 
 	/** Method that answer at all MAF events. */
