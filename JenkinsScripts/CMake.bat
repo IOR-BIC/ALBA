@@ -322,7 +322,7 @@ cmake.exe  ../Source ^
   -DCMAKE_BACKWARDS_COMPATIBILITY:STRING=2.0 ^
   -DCPPUNIT_INCLUDE_DIR:PATH="C:/cppunit-1.12.0_VS2010_BUILD/cppunit-1.12.0/include" ^
   -DCPPUNIT_LIBRARY:FILEPATH="C:/cppunit-1.12.0_VS2010_BUILD/cppunit-1.12.0/lib/cppunitd.lib"
-  -DMAF_BINARY_PATH:PATH=d:\MAF2Libs\VS2010R_DLL\Build\
+  -DMAF_BINARY_PATH:PATH=d:\MAF2Libs\QA\Build\
 
 cd..
 
