@@ -359,7 +359,9 @@ void mafGizmoAutoscaleHelper::InternalProcessEvents(vtkObject* sender, unsigned 
 				assert(gizmoInterface);
 
 				double bounds[6] = {0,0,0,0,0,0};
-				double lenght = gizmoInterface->GetInput()->GetOutput()->GetVTKData()->GetLength();
+				gizmoInterface->GetInput()->GetOutput()->GetBounds(bounds);
+
+				double lenght = sqrt((bounds[1]-bounds[0])*(bounds[1]-bounds[0]) + (bounds[3]-bounds[2])*(bounds[3]-bounds[2]) + (bounds[5] - bounds[4])*(bounds[5] - bounds[4]) );
 
 				double yRenderWindowPercentage = gizmoInterface->GetRenderWindowHeightPercentage();
 
