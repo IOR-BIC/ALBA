@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: mafNodeTest
- Authors: Paolo Quadrani
+ Authors: Paolo Quadrani, Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -263,11 +263,35 @@ void mafNodeTest::TestFindNodeIdx()
   nc->SetName("node nc");
   na->AddChild(nb);
   na->AddChild(nc);
+  
+  nb->SetVisibleToTraverse(false);
 
   result = na->FindNodeIdx("node nb") == 0;
   TEST_RESULT;
   result = na->FindNodeIdx("node nc") == 1;
   TEST_RESULT;
+
+  //Testing find by visibility
+  result = na->FindNodeIdx("node nb",true) == -1;
+  TEST_RESULT;
+  result = na->FindNodeIdx("node nc",true) == 0;
+  TEST_RESULT;
+
+  ////////////////////////////
+  //Testing overloaded function
+
+  result = na->FindNodeIdx(nb) == 0;
+  TEST_RESULT;
+  result = na->FindNodeIdx(nc) == 1;
+  TEST_RESULT;
+
+  //Testing find by visibility
+  result = na->FindNodeIdx(nb,true) == -1;
+  TEST_RESULT;
+  result = na->FindNodeIdx(nc,true) == 0;
+  TEST_RESULT;
+
+
 }
 //----------------------------------------------------------------------------
 void mafNodeTest::TestGetAttribute()
@@ -287,7 +311,7 @@ void mafNodeTest::TestGetChild()
   nb->SetName("node nb");
   mafSmartPointer<mafNodeA> nc;
   nc->SetName("node nc");
-
+  
   na->AddChild(nb);
   na->AddChild(nc);
   result = na->GetChild(0)->Equals(nb);
@@ -295,6 +319,12 @@ void mafNodeTest::TestGetChild()
 
   result = na->GetChild(1)->Equals(nc);
   TEST_RESULT;
+
+  //Testing by visibility
+  nb->SetVisibleToTraverse(false);
+  result = na->GetChild(0,true)->Equals(nc);
+  TEST_RESULT;
+
 }
 //----------------------------------------------------------------------------
 void mafNodeTest::TestGetFirstChild()
@@ -306,12 +336,19 @@ void mafNodeTest::TestGetFirstChild()
   nb->SetName("node nb");
   mafSmartPointer<mafNodeA> nc;
   nc->SetName("node nc");
-
+  
   na->AddChild(nb);
   na->AddChild(nc);
   mafNode *n = na->GetFirstChild();
   result = n->Equals(nb);
   TEST_RESULT;
+
+  //testing by visibility
+  nb->SetVisibleToTraverse(false);
+  mafNode *nInv = na->GetFirstChild(true);
+  result = nInv->Equals(nc);
+  TEST_RESULT;
+
 }
 //----------------------------------------------------------------------------
 void mafNodeTest::TestGetLastChild()
@@ -690,12 +727,17 @@ void mafNodeTest::TestGetNumberOfChildren()
   na->SetName("root");
   mafSmartPointer<mafNodeA> na2;
   na2->SetName("node na2");
-
+  
   result = na->GetNumberOfChildren() == 0;
   TEST_RESULT;
 
   na2->ReparentTo(na);
   result = na->GetNumberOfChildren() == 1;
+  TEST_RESULT;
+
+  //Testing by visibility
+  na2->SetVisibleToTraverse(false);
+  result = na->GetNumberOfChildren(true) == 0;
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
@@ -926,6 +968,7 @@ void mafNodeTest::TestGetByPath()
   b2->SetName("b2");
   b3->SetName("b3");
 
+  b2->SetVisibleToTraverse(false);
 
   //generating structure
   //             Root
@@ -933,7 +976,8 @@ void mafNodeTest::TestGetByPath()
   //       sideA      sideB
   //      /  |  \    /  |  \
   //     a1  a2 a3  b1  b2  b3 
-
+  //                    ^
+  //                 not visible
   root->AddChild(sideA);
   root->AddChild(sideB);
   sideA->AddChild(a1);
@@ -1043,9 +1087,14 @@ void mafNodeTest::TestGetByPath()
 
   //Testing complex paths
 
-  //a1->b3
-  result= ((mafNodeA *)a1->GetByPath("../../child{sideB}/child[2]") == (mafNodeA *)(b3));
+  //a1->b3 (b2 is not visible)
+  result= ((mafNodeA *)a1->GetByPath("../../child{sideB}/child[1]") == (mafNodeA *)(b3));
   TEST_RESULT;
+
+  //a1->b2 (b2 is not visible)
+  result= ((mafNodeA *)a1->GetByPath("../../child{sideB}/child[1]",false) == (mafNodeA *)(b2));
+  TEST_RESULT;
+
 
   //sideB->a2
   result= ((mafNodeA *)sideB->GetByPath("prev/child{a2}") == (mafNodeA *)(a2));
