@@ -5,7 +5,7 @@ echo  ** coverage profile started **
 echo.
 
 REM BEWARE! These directory names are  referenced in MemoryProfile.vbs script so the not change them
-set ProfilingResultsDirectory=.\build\bin\Debug\CoverageAllocation\
+set ProfilingResultsDirectory=.\build\bin\Debug\Coverage\
 set XMLResultsDirectory=%ProfilingResultsDirectory%\XML\
 set HTMLResultsDirectory=%ProfilingResultsDirectory%\HTML\
 
