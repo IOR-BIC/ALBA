@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: mafNode
- Authors: Marco Petrone
+ Authors: Marco Petrone, Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -219,6 +219,27 @@ unsigned long mafNode::GetNumberOfChildren() const
 }
 
 //-------------------------------------------------------------------------
+unsigned long mafNode::GetNumberOfChildren(bool onlyVisible /*=false*/) 
+//-------------------------------------------------------------------------
+{
+  //This function is redefined because the original is defined const and 
+  //here we call non-const functions
+  if (onlyVisible)
+  {
+    unsigned long visibleNodes=0;
+    //counting visible nodes
+    for (int i=0;i<m_Children.size();i++)
+      if (m_Children[i].GetPointer()->IsVisible())
+        visibleNodes++;
+    return visibleNodes;
+  }
+  else
+  {
+    return m_Children.size();
+  }
+}
+
+//-------------------------------------------------------------------------
 bool mafNode::IsAChild(mafNode *a)
 //-------------------------------------------------------------------------
 {
@@ -226,49 +247,99 @@ bool mafNode::IsAChild(mafNode *a)
 }
 
 //-------------------------------------------------------------------------
-mafNode *mafNode::GetFirstChild()
+mafNode *mafNode::GetFirstChild(bool onlyVisible /*=false*/)
 //-------------------------------------------------------------------------
 {
-  return this->GetChild(0);
+  if (onlyVisible)
+  {
+    //searching for first visible node
+    for (int i=0;i<m_Children.size();i++)
+      if (m_Children[i].GetPointer()->IsVisible())
+        return m_Children[i].GetPointer();
+    //if no visible node was found return NULL
+    return NULL;
+  }
+  else
+  {
+    return this->GetChild(0);
+  }
 }
 
 //-------------------------------------------------------------------------
-mafNode *mafNode::GetLastChild()
+mafNode *mafNode::GetLastChild(bool onlyVisible /*=false*/)
 //-------------------------------------------------------------------------
 {
-  return this->GetChild(this->GetNumberOfChildren()-1);
+  if (onlyVisible)
+  {
+    //searching for last visible node
+    for (int i=m_Children.size()-1;i>=0;i--)
+      if (m_Children[i].GetPointer()->IsVisible())
+        return m_Children[i].GetPointer();
+    //if no visible node was found return NULL
+    return NULL;
+  }
+  else
+  {
+    return this->GetChild(this->GetNumberOfChildren()-1);
+  }
+}
+
+
+
+//-------------------------------------------------------------------------
+mafNode * mafNode::GetChild( mafID idx, bool onlyVisible /*=false*//*=false*/ )
+//-------------------------------------------------------------------------
+{
+  if (onlyVisible)
+  {
+    mafID currentVisible=-1;
+    for (int i=0;i<m_Children.size();i++)
+      if (m_Children[i].GetPointer()->IsVisible())
+      {
+        currentVisible++;
+        if (currentVisible==idx)
+          return m_Children[i].GetPointer();
+      }
+    //if node was found return NULL
+    return NULL;
+  }
+  else
+  {
+    return (idx>=0&&idx<m_Children.size())?m_Children[idx].GetPointer():NULL;
+  }
 }
 
 //-------------------------------------------------------------------------
-mafNode *mafNode::GetChild(mafID idx)
+int mafNode::FindNodeIdx(mafNode *a, bool onlyVisible /*=false*/)
 //-------------------------------------------------------------------------
 {
-  return (idx>=0&&idx<m_Children.size())?m_Children[idx].GetPointer():NULL;
-}
-  
-//-------------------------------------------------------------------------
-int mafNode::FindNodeIdx(mafNode *a)
-//-------------------------------------------------------------------------
-{
+  int nChild=-1;
   for (mafID i=0;i<m_Children.size();i++)
   {
+    //if onlyVisible is true we count only Visible VME 
+    if (!onlyVisible || m_Children[i].GetPointer()->IsVisible())
+      nChild++;
     if (m_Children[i].GetPointer()==a)
 	  {
-	    return i;
+	    return nChild;
 	  }
   }
   return -1;
 }
 
 //-------------------------------------------------------------------------
-int mafNode::FindNodeIdx(const char *name)
+int mafNode::FindNodeIdx(const char *name, bool onlyVisible /*=false*/)
 //-------------------------------------------------------------------------
 {
+  int nChild=-1;
   for (mafID i=0;i<m_Children.size();i++)
   {
+    //if onlyVisible is true we count only Visible VME 
+    if (!onlyVisible || m_Children[i].GetPointer()->IsVisible())
+      nChild++;
     if (mafString::Equals(m_Children[i]->GetName(),name))
 	  {
-	    return i;
+	    return nChild;
 	  }
   }
   return -1;
@@ -368,10 +439,10 @@ void mafNode::RemoveChild(mafNode *node)
 }
 
 //-------------------------------------------------------------------------
-void mafNode::RemoveChild(const mafID idx)
+void mafNode::RemoveChild(const mafID idx,bool onlyVisible /*=false*/)
 //-------------------------------------------------------------------------
 {  
-  mafNode *oldnode=GetChild(idx);
+  mafNode *oldnode=GetChild(idx,onlyVisible);
   if (oldnode)
   {
     oldnode->Shutdown();
@@ -1279,7 +1350,7 @@ void mafNode::UpdateId()
 }
 
 //-------------------------------------------------------------------------
-mafNode * mafNode::GetByPath(const char *path )
+mafNode * mafNode::GetByPath(const char *path,  bool onlyVisible /*=true*/)
 //-------------------------------------------------------------------------
 {
   wxStringTokenizer tkz(wxT(path), wxT("/"));
@@ -1288,7 +1359,6 @@ mafNode * mafNode::GetByPath(const char *path )
   mafNode *tmpParent;
   wxString tmpString;
   long tmpIndex;
-  int tmpFound;
 
   while ( tkz.HasMoreTokens() && currentNode!=NULL )
   {
@@ -1305,16 +1375,16 @@ mafNode * mafNode::GetByPath(const char *path )
         break;
       }
       //getting node index
-      tmpIndex=tmpParent->FindNodeIdx(currentNode);
+      tmpIndex=tmpParent->FindNodeIdx(currentNode,onlyVisible);
       //Size check
-      if (tmpIndex==tmpParent->GetNumberOfChildren()-1)
+      if (tmpIndex==tmpParent->GetNumberOfChildren(onlyVisible)-1)
       {
         mafLogMessage("Node path error: asked 'next' on last node");
         currentNode=NULL;
         break;
       }
       //updating current node
-      currentNode=tmpParent->GetChild(tmpIndex+1);
+      currentNode=tmpParent->GetChild(tmpIndex+1,onlyVisible);
     }
     
     else if (token=="prev")
@@ -1328,7 +1398,7 @@ mafNode * mafNode::GetByPath(const char *path )
         break;
       }
       //getting node index
-      tmpIndex=tmpParent->FindNodeIdx(currentNode);
+      tmpIndex=tmpParent->FindNodeIdx(currentNode,onlyVisible);
       //Size check
       if (tmpIndex==0)
       {
@@ -1337,7 +1407,7 @@ mafNode * mafNode::GetByPath(const char *path )
         break;
       }
       //updating current node
-      currentNode=tmpParent->GetChild(tmpIndex-1);
+      currentNode=tmpParent->GetChild(tmpIndex-1,onlyVisible);
     }
 
     else if (token=="firstPair")
@@ -1352,7 +1422,7 @@ mafNode * mafNode::GetByPath(const char *path )
       }
       
       //updating current node
-      currentNode=tmpParent->GetChild(0);
+      currentNode=tmpParent->GetFirstChild(onlyVisible);
   	}
 
     else if (token=="lastPair")
@@ -1366,33 +1436,33 @@ mafNode * mafNode::GetByPath(const char *path )
         break;
       }
       //updating current node
-      currentNode=tmpParent->GetChild(tmpParent->GetNumberOfChildren()-1);
+      currentNode=tmpParent->GetLastChild(onlyVisible);
 	  }
     
     else if (token=="firstChild")
 	  {
       //Root case: root does not ave next
-      if (currentNode->GetNumberOfChildren()==0) 
+      if (currentNode->GetNumberOfChildren(onlyVisible)==0) 
       {
         mafLogMessage("Node path error: asked 'firstChild' on no child node");
         currentNode=NULL;
         break;
       }
       //updating current node
-      currentNode=currentNode->GetChild(0);
+      currentNode=currentNode->GetFirstChild(onlyVisible);
 	  }
     
     else if (token=="lastChild")
     {
       //Root case: root does not ave next
-      if (currentNode->GetNumberOfChildren()==0) 
+      if (currentNode->GetNumberOfChildren(onlyVisible)==0) 
       {
         mafLogMessage("Node path error: asked 'lastChild' on no child node");
         currentNode=NULL;
         break;
       }
       //updating current node
-      currentNode=currentNode->GetChild(currentNode->GetNumberOfChildren()-1);
+      currentNode=currentNode->GetLastChild(onlyVisible);
     }
     
     else if (token.StartsWith("pair["))
@@ -1428,14 +1498,14 @@ mafNode * mafNode::GetByPath(const char *path )
       tmpString.ToLong(&tmpIndex);
 
       //Checking bounds
-      if(tmpIndex < 0 || tmpIndex > tmpParent->GetNumberOfChildren()-1)
+      if(tmpIndex < 0 || tmpIndex > tmpParent->GetNumberOfChildren(onlyVisible)-1)
       {
         mafLogMessage("Node path error: pair[] value outside bounds");
         currentNode=NULL;
         break;
       }
 
-      currentNode=tmpParent->GetChild(tmpIndex);
+      currentNode=tmpParent->GetChild(tmpIndex,onlyVisible);
   	}
     
     else if (token.StartsWith("pair{"))
@@ -1460,24 +1530,16 @@ mafNode * mafNode::GetByPath(const char *path )
         break;
       }
 
-      tmpFound=false;
-      //node name searching
-      for (mafID i = 0; i < tmpParent->m_Children.size(); i++)
-      {
-        wxString tmp2=tmpParent->m_Children[i]->GetName();
-        if (tmpString == tmpParent->m_Children[i]->GetName())
-        {
-          currentNode=tmpParent->m_Children[i];
-          tmpFound=true;
-        }
-      }
-
-      if (!tmpFound)
+      //getting node index
+      tmpIndex=tmpParent->FindNodeIdx(tmpString,onlyVisible);
+      if (tmpIndex==-1)
       {
         mafLogMessage("Node path error: pair{%s}, not found",tmpString);
         currentNode=NULL;
         break;
       }
+
+      currentNode=tmpParent->GetChild(tmpIndex,onlyVisible);
 	  }
     
     else if (token.StartsWith("child["))
@@ -1504,14 +1566,14 @@ mafNode * mafNode::GetByPath(const char *path )
       tmpString.ToLong(&tmpIndex);
 
       //Checking bounds
-      if(tmpIndex < 0 || tmpIndex > currentNode->GetNumberOfChildren()-1)
+      if(tmpIndex < 0 || tmpIndex > currentNode->GetNumberOfChildren(onlyVisible)-1)
       {
         mafLogMessage("Node path error: child[] value outside bounds");
         currentNode=NULL;
         break;
       }
 
-      currentNode=currentNode->GetChild(tmpIndex);
+      currentNode=currentNode->GetChild(tmpIndex,onlyVisible);
 
   	}
     
@@ -1528,24 +1590,16 @@ mafNode * mafNode::GetByPath(const char *path )
       //getting the number substring
       tmpString=token.SubString(6,token.size()-2);
 
-      tmpFound=false;
-      //node name searching
-      for (mafID i = 0; i < currentNode->m_Children.size(); i++)
+      //getting node index
+      tmpIndex=currentNode->FindNodeIdx(tmpString,onlyVisible);
+      if (tmpIndex==-1)
       {
-        wxString tmp2=currentNode->m_Children[i]->GetName();
-        if (tmpString == currentNode->m_Children[i]->GetName())
-        {
-          currentNode=currentNode->m_Children[i];
-          tmpFound=true;
-        }
-      }
-
-      if (!tmpFound)
-      {
-        mafLogMessage("Node path error: child{%s}, not found",tmpString);
+        mafLogMessage("Node path error: pair{%s}, not found",tmpString);
         currentNode=NULL;
         break;
       }
+
+      currentNode=currentNode->GetChild(tmpIndex,onlyVisible);
 	  }
     
     else if (token=="root")
@@ -1571,7 +1625,7 @@ mafNode * mafNode::GetByPath(const char *path )
     else 
     {
       currentNode=NULL;
-      mafLogMessage("Node path error: unknow token:%s",token);
+      mafLogMessage("Node path error: unknown token:%s",token);
       break;
     }
     tmpString=currentNode->GetName();
