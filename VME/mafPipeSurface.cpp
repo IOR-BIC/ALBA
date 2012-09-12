@@ -54,6 +54,118 @@
 
 #include <vector>
 
+//----------------------------------------------------------------------------------------------------------------------------
+#include "vtkObjectFactory.h"
+#include "vtkCellArray.h"
+
+//BES: 12.9.2012 - this class calculates normals for the given input data
+//but unlike vtkPolyDataNormals, it does not recalculate them when nothing has changed 
+class VTK_GRAPHICS_EXPORT vtkMAFPolyDataNormals : public vtkPolyDataNormals
+{
+public:
+  vtkTypeRevisionMacro(vtkMAFPolyDataNormals, vtkPolyDataNormals);  
+  static vtkMAFPolyDataNormals *New();
+
+protected:
+	unsigned long m_LastUpdateTime;	
+
+protected:
+  vtkMAFPolyDataNormals();
+	
+	//this is update method to avoid recalculation of things
+	/*virtual*/ void UpdateData(vtkDataObject *outputo);
+
+private:
+  vtkMAFPolyDataNormals(const vtkMAFPolyDataNormals&);  // Not implemented.
+  void operator=(const vtkMAFPolyDataNormals&);					// Not implemented.
+};
+
+vtkCxxRevisionMacro(vtkMAFPolyDataNormals, "$Revision: 1.0 $");
+vtkStandardNewMacro(vtkMAFPolyDataNormals);
+
+vtkMAFPolyDataNormals::vtkMAFPolyDataNormals()
+{
+	this->m_LastUpdateTime = 0;
+}
+
+/*virtual*/ void vtkMAFPolyDataNormals::UpdateData(vtkDataObject *output)
+{		
+	//strategy: if our settings has not changed, and our input has the same geometry,
+	//then reuse already calculated normal vectors, otherwise, perform full calculation
+	unsigned long tm = this->GetMTime();	
+	
+	vtkPolyData* input = this->GetInput();
+	if (input->GetPoints() != NULL) {
+		tm += input->GetPoints()->GetMTime();
+	}
+
+	if (input->GetPolys() != NULL) {
+		tm += input->GetPolys()->GetMTime();
+	}
+
+	if (input->GetStrips() != NULL) {
+		tm += input->GetStrips()->GetMTime();
+	}
+
+	vtkPolyData* outp = this->GetOutput();
+	if (outp == NULL || tm > this->m_LastUpdateTime)
+	{
+		//perform full update
+		Superclass::UpdateData(output);		
+	}
+	else
+	{
+		//store already calculated normals
+		vtkDataArray *np, *nc;
+		if (outp->GetPointData() == NULL) {
+			np = NULL;
+		}
+		else 
+		{
+			if (NULL != (np = outp->GetPointData()->GetNormals()))
+				np->Register(this);
+		}
+
+		if (outp->GetCellData() == NULL) {
+			nc = NULL;
+		}
+		else 
+		{
+			if (NULL != (nc = outp->GetCellData()->GetNormals()))
+				nc->Register(this);
+		}
+
+		//perform update that just passes data to output
+		int savePN = this->ComputePointNormals;
+		this->ComputePointNormals = 0;
+
+		int saveCN = this->ComputeCellNormals;
+		this->ComputeCellNormals = 0;
+
+		Superclass::UpdateData(output);		
+
+		this->ComputePointNormals = savePN;
+		this->ComputeCellNormals = saveCN;		
+
+		//and restore our normals
+		if (np != NULL)
+		{
+			outp->GetPointData()->SetNormals(np);
+			np->UnRegister(this);
+		}
+
+		if (nc != NULL)
+		{
+			outp->GetCellData()->SetNormals(nc);
+			nc->UnRegister(this);
+		}							
+	}
+	
+	
+	this->m_LastUpdateTime = tm;
+}
+//----------------------------------------------------------------------------------------------------------------------------
+
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafPipeSurface);
 //----------------------------------------------------------------------------
@@ -141,7 +253,19 @@ void mafPipeSurface::Create(mafSceneNode *n)
   assert(m_SurfaceMaterial);  // all vme that use PipeSurface must have the material correctly set
 
   vtkNEW(m_Mapper);
-  m_Mapper->SetInput(data);
+
+	//BES: 11.9.2012 - VTK rendering core is stupid to calculate normal vectors all the time unless they are specified in the input data
+	//to speed up rendering in time-variant situations (in static, display lists make this problem negligible), we calculate normal vectors here
+	if (data->GetPointData() == NULL || data->GetPointData()->GetNormals() != NULL) 
+		m_Mapper->SetInput(data);
+	else
+	{
+		vtkMAFSmartPointer< vtkMAFPolyDataNormals > normals;
+		normals->SetInput(data);
+		normals->SetComputePointNormals(1);
+		normals->SetComputeCellNormals(0);
+		m_Mapper->SetInput(normals->GetOutput());	
+	}			
   
   //m_RenderingDisplayListFlag = m_Vme->IsAnimated() ? 0 : 1;
   m_RenderingDisplayListFlag = m_Vme->IsAnimated() ? 1 : 0;
@@ -430,6 +554,7 @@ void mafPipeSurface::OnEvent(mafEventBase *maf_event)
 				  m_Gui->Update();
         }
         UpdateScalarsArrayVisualization(dataAttribute);
+				mafEventMacro(mafEvent(this,CAMERA_UPDATE)); //BES 12.9.2012
       }
     	break;
       case ID_LUT:
@@ -521,11 +646,13 @@ void mafPipeSurface::OnEvent(mafEventBase *maf_event)
         m_Gui->Update();
 
         UpdateScalarsArrayVisualization(dataAttribute);
+				mafEventMacro(mafEvent(this,CAMERA_UPDATE)); //BES 12.9.2012
       }
       case ID_SCALARS_ARRAY_SELECTION:
       {
         vtkDataSetAttributes *dataAttribute = GetSelectedDataAttribute(); 
         UpdateScalarsArrayVisualization(dataAttribute);
+				mafEventMacro(mafEvent(this,CAMERA_UPDATE)); //BES 12.9.2012
       }
       break;
       ////
@@ -540,6 +667,7 @@ void mafPipeSurface::OnEvent(mafEventBase *maf_event)
     {
       vtkDataSetAttributes *dataAttribute = GetSelectedDataAttribute(); 
       UpdateScalarsArrayVisualization(dataAttribute);
+			//the caller will cause CAMERA_UPDATE, so not necessary (and even undesirable) to do so here
     }
   }
 }
@@ -573,9 +701,8 @@ void mafPipeSurface::UpdateScalarsArrayVisualization(vtkDataSetAttributes *dataA
     dataAttribute->GetArray(dataAttribute->GetArrayName(m_SelectedScalarsArray))->GetRange(range);
     m_Mapper->SetScalarRange(range);
   }
-  m_Mapper->Modified();
-  m_Mapper->Update();
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+
+  //mafEventMacro(mafEvent(this,CAMERA_UPDATE)); //BES 12.9.2012 - do not call it here since this method is called on VME_TIME_SET  and, thus, this would cause repetitive rendering
 }
 //----------------------------------------------------------------------------
 vtkDataSetAttributes *mafPipeSurface::GetSelectedDataAttribute() // (added by Losi 2011/04/08 to allow scalars array selection)
