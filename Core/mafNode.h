@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: mafNode
- Authors: Marco Petrone
+ Authors: Marco Petrone, Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -165,12 +165,15 @@ public:
   /** Make a copy of the whole subtree and return its pointer */
   mafNode *CopyTree() {return CopyTree(this);}
   
-  /** Return a the pointer to a child given its index */
-  mafNode *GetChild(mafID idx);
-  /** Get the First child in the list.*/
-  mafNode *GetFirstChild();
-  /** Get the Lase child in the list.*/
-  mafNode *GetLastChild();
+  /** Return a the pointer to a child given its index. 
+      If only visible is true return the idx-th visible to traverse node */
+  mafNode *GetChild(mafID idx, bool onlyVisible=false);
+  /** Get the First child in the list.
+      If only visible is true return the first visible to traverse node */
+  mafNode *GetFirstChild(bool onlyVisible=false);
+  /** Get the Lase child in the list.
+      If only visible is true return the last visible to traverse node */
+  mafNode *GetLastChild(bool onlyVisible=false);
 
   /** Get A child by path.
   The pats are generated from a series of keyword divided by '\'
@@ -190,23 +193,27 @@ public:
 
   An example path is:
   "../../child{sideB}/child[2]"
+
+  By default this function search only on visible to traverse nodes
   */
-  mafNode *GetByPath(const char *path);
+  mafNode *GetByPath(const char *path, bool onlyVisible=true);
   
   /** Add a child to this node. Return MAF_OK if success.*/
   virtual int AddChild(mafNode *node);
 
   /** Remove a child node*/
-  virtual void RemoveChild(const mafID idx);
+  virtual void RemoveChild(const mafID idx, bool onlyVisible=false);
   /** Remove a child node*/
   virtual void RemoveChild(mafNode *node);
 
-  /** Find a child given its pointer and return its index. Return -1 in case of not found or failure.*/
-  int FindNodeIdx(mafNode *a);
+  /** Find a child given its pointer and return its index. Return -1 in case of not found or failure.
+      If only visible is true return the idx of visible to traverse nodes subset */
+  int FindNodeIdx(mafNode *a, bool onlyVisible=false);
 
   /** Find a child index given its name. Search is performed only on first level children not
-    in the sub-tree. Return -1 in case of not found or failure.*/
-  int FindNodeIdx(const char *name);
+    in the sub-tree. Return -1 in case of not found or failure.
+    If only visible is true return the idx of visible to traverse nodes subset */
+  int FindNodeIdx(const char *name, bool onlyVisible=false);
 
   /** Find a node in all the subtrees matching the given TagName/TagValue pair.*/
   mafNode *FindInTreeByTag(const char *name,const char *value="",int type=MAF_STRING_TAG); 
@@ -245,8 +252,13 @@ public:
   /** Valid VMEs have m_ID >= 0. The root has m_Id = 0, other VMEs have m_Id > 0.*/
   bool IsValid() {return m_Id >= 0;};
 
-  /** Return the number of children of this node */
+  /** Return the number of children of this node 
+        If only visible is true return the number visible to traverse nodes */
   unsigned long GetNumberOfChildren() const ;
+  
+  /** Return the number of children of this node 
+        If only visible is true return the number visible to traverse nodes */
+  unsigned long GetNumberOfChildren(bool onlyVisible);
   
   /**
   Return the pointer to the parent node (if present)*/
