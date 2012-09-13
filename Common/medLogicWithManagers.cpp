@@ -80,7 +80,7 @@ void medLogicWithManagers::OnEvent(mafEventBase *maf_event)
 	{
 		switch(e->GetId())
 		{
-		case ABOUT_APPLICATION:
+		  case ABOUT_APPLICATION:
 			{
         // trap the ABOUT_APPLICATION event and shows the about window with the application infos
 				wxString message = m_AppTitle.GetCStr();
@@ -89,13 +89,13 @@ void medLogicWithManagers::OnEvent(mafEventBase *maf_event)
 				wxMessageBox(message, "About Application");
 				mafLogMessage(wxString::Format("%s",m_Revision.GetCStr()));
 			}
-			break;
-    case MENU_WIZARD:
+		 break;
+     case MENU_WIZARD:
       //The event from the application menu
       if(m_WizardManager) 
         m_WizardManager->WizardRun(e->GetArg());
-      break;
-    case WIZARD_RUN_STARTING:
+     break;
+     case WIZARD_RUN_STARTING:
       {
         //Manage start event from the wizard lock window close button
         //and disabling toolbar
@@ -104,7 +104,7 @@ void medLogicWithManagers::OnEvent(mafEventBase *maf_event)
           c->SetAllowCloseWindow(false);
         WizardRunStarting();
       }
-      break; 
+     break; 
      case WIZARD_RUN_TERMINATED:
       {
         //Manage end event from the wizard unlock window close button
@@ -113,8 +113,14 @@ void medLogicWithManagers::OnEvent(mafEventBase *maf_event)
         if (c != NULL)
           c->SetAllowCloseWindow(true);
         WizardRunTerminated();
+        UpdateFrameTitle();
       }
-      break; 
+    break; 
+    case WIZARD_UPDATE_WINDOW_TITLE:
+       {
+         UpdateFrameTitle();
+       }
+    break;
     case WIZARD_REQUIRED_VIEW:
        {
          //The wizard requires a specific view
@@ -128,11 +134,28 @@ void medLogicWithManagers::OnEvent(mafEventBase *maf_event)
          else
            m_ViewManager->ViewCreate(viewStr);
        }
+    break;
     case WIZARD_RUN_OP:
       {
         //Running an op required from the wizard
         mafString *tmp=e->GetString();
+        mafLogMessage("wiz starting :%s",tmp->GetCStr());
+        m_CancelledBeforeOpStarting=true;
+        UpdateFrameTitle();
         m_OpManager->OpRun(*(e->GetString()));
+        if (m_CancelledBeforeOpStarting)
+        {
+          m_CancelledBeforeOpStarting=false;
+           m_WizardManager->WizardContinue(false);
+        }
+        
+      }
+    break;
+    case OP_RUN_STARTING:
+      {
+        mafLogMessage("run starting");
+        m_CancelledBeforeOpStarting=false;
+        mafLogicWithManagers::OnEvent(maf_event);
       }
     break;
     case OP_RUN_TERMINATED:
@@ -311,4 +334,17 @@ void medLogicWithManagers::WizardRunTerminated()
 }
 
 
+//----------------------------------------------------------------------------
+void medLogicWithManagers::UpdateFrameTitle()
+//----------------------------------------------------------------------------
+{
+  if (m_WizardRunning)
+  {
+    wxString title(m_AppTitle);
+    title += "   " + m_WizardManager->GetDescription();
+    m_Win->SetTitle(title);
+  }
+  else 
+    mafLogicWithManagers::UpdateFrameTitle();
+}
 
