@@ -75,6 +75,12 @@ public:
   /** Called to clean up memory*/
   virtual void Delete(){delete this;};
 
+  /** Get a Label containing a description of the the current step*/
+  mafString GetDescriptionLabel();
+
+  /** Set a Label containing a description of the the current step*/
+  void SetDescriptionLabel(const char *label);
+
 protected:
 
   wxString m_Name;
@@ -83,6 +89,7 @@ protected:
   int m_Success;
   int m_Running;
   mafObserver    *m_Listener;
+  mafString m_DescriptionLabel;
 
 private:
     

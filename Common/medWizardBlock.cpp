@@ -87,6 +87,9 @@ void medWizardBlock::ExcutionBegin()
 {
   //Starting execution
   m_Running=true;
+  //Setting success to true on starting if some problem occurs this value
+  //will be stetted to false later
+  m_Success=true;
 }
 
 //----------------------------------------------------------------------------
@@ -119,6 +122,22 @@ void medWizardBlock::SetListener( mafObserver *Listener )
 {
   //setting the event listener
   m_Listener = Listener;
+}
+
+//----------------------------------------------------------------------------
+mafString medWizardBlock::GetDescriptionLabel()
+//----------------------------------------------------------------------------
+{
+  //return description label
+  return m_DescriptionLabel;
+}
+
+//----------------------------------------------------------------------------
+void medWizardBlock::SetDescriptionLabel( const char *label)
+//----------------------------------------------------------------------------
+{
+  //setting description label
+  m_DescriptionLabel=label;
 }
 
 

@@ -164,6 +164,8 @@ void medWizard::BlockExecutionBegin()
 {
   wxString requiredOperation;
 
+  mafEventMacro(mafEvent(this,WIZARD_UPDATE_WINDOW_TITLE));
+
   //Setting selected vme to the block and execute it
   m_CurrentBlock->SetSelectedVME(m_SelectedVME);
   m_CurrentBlock->ExcutionBegin();
@@ -252,5 +254,15 @@ void medWizard::ContinueExecution(int opSuccess)
   }
 }
 
+//----------------------------------------------------------------------------
+mafString medWizard::GetDescription()
+  //----------------------------------------------------------------------------
+{
 
+  if (m_CurrentBlock)
+    return mafString("Wizard - ") + m_CurrentBlock->GetDescriptionLabel().GetCStr();
+  else 
+    return mafString("Wizard - No running Block");
+
+}
 
