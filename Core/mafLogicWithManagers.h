@@ -260,7 +260,7 @@ protected:
   void EnableMenuAndToolbar(bool enable);
 
   /** Called after FileOpen or Save operation */
-  void UpdateFrameTitle();
+  virtual void UpdateFrameTitle();
 
   mafSideBar             *m_SideBar;
   mafVMEManager          *m_VMEManager;
