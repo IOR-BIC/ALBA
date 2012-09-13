@@ -158,6 +158,9 @@ SET(PROJECT_SRCS
   
   medOpMergeDicomSeries.cpp
   medOpMergeDicomSeries.h
+ 
+  medOpWizardWait.cpp
+  medOpWizardWait.h
   
 )
   
