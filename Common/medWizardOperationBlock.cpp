@@ -99,8 +99,16 @@ void medWizardOperaiontionBlock::SetNextBlock( const char *block )
 wxString medWizardOperaiontionBlock::GetNextBlock()
 //----------------------------------------------------------------------------
 {
-  //return the name of the next block
-  return m_NextBlock;
+  if (m_Success)
+  {
+    //return the name of the next block
+    return m_NextBlock;
+  }
+  else
+  {
+    //return the name of the abort block;
+    return m_AbortBlock;
+  }
 }
 
 

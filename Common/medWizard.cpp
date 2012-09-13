@@ -248,9 +248,18 @@ void medWizard::ContinueExecution(int opSuccess)
     BlockExecutionEnd();
   else 
   {
-    //if the operation has aborted by the user we abort the entire wizard
-    //this behavior can be updated for error management
-    mafEventMacro(mafEvent(this,WIZARD_RUN_TERMINATED,false));
+    int answare = wxMessageBox(_("Do you want to abort this wizard ?"), _("Wizard Abort"), wxYES_NO|wxCENTER);
+    if(answare == wxYES)
+    {
+      //if the operation has aborted by the user we abort the entire wizard
+      //this behavior can be updated for error management
+      mafEventMacro(mafEvent(this,WIZARD_RUN_TERMINATED,false));
+    }
+    else
+    {
+      m_CurrentBlock->Abort();
+      BlockExecutionEnd();
+    }
   }
 }
 

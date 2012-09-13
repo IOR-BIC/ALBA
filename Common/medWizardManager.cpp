@@ -25,6 +25,7 @@
 #include "medDecl.h"
 #include "medWizardManager.h"
 #include "medWizard.h"
+#include "medOpWizardWait.h"
 #include <wx/tokenzr.h>
 
 //----------------------------------------------------------------------------
@@ -40,6 +41,7 @@ medWizardManager::medWizardManager()
   m_RunningWizard =NULL;
   m_NumWizard = 0;
   m_WizardList.clear();
+  m_WaitOp = new medOpWizardWait;
 }
 
 //----------------------------------------------------------------------------
@@ -52,6 +54,8 @@ medWizardManager::~medWizardManager()
 
   //Clearing wizard list
   m_WizardList.clear();
+
+  delete m_WaitOp;
 }
 
 //----------------------------------------------------------------------------
@@ -222,6 +226,18 @@ void medWizardManager::OnEvent( mafEventBase *maf_event )
        mafEventMacro(*e);
      }
     break;
+    case WIZARD_RUN_OP:
+      {
+        if (*e->GetString()=="pause")
+        {
+          mafEventMacro(mafEvent(this,WIZARD_PAUSE,m_WaitOp));
+        }
+        else
+        {
+          mafEventMacro(*e);
+        }
+      }
+    break;
     default:
       //All event form wizard (like vme select/show, view request, ecc...)
       //will be forwared up to logic
@@ -271,3 +287,4 @@ mafString medWizardManager::GetDescription()
     return mafString("No running wizard");
 
 }
+

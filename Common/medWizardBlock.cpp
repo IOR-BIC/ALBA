@@ -40,6 +40,10 @@ medWizardBlock::medWizardBlock(const char *name)
     mafLogMessage("MafWizardBlock: 'END' was reserved");
   
   m_Success=true;
+
+
+  //by default on abort cancel operation the operation will be recalled
+  m_AbortBlock=name;
 }
 
 //----------------------------------------------------------------------------
@@ -90,12 +94,18 @@ void medWizardBlock::ExcutionBegin()
   //Setting success to true on starting if some problem occurs this value
   //will be stetted to false later
   m_Success=true;
+
+  //Setting the input VME to reselect it on op cancel 
+  m_InputVME=m_SelectedVME;
 }
 
 //----------------------------------------------------------------------------
 void medWizardBlock::ExcutionEnd()
 //----------------------------------------------------------------------------
 {
+  //Setting back the select vme to the input on user abort
+  if (!m_Success)
+     mafEventMacro(mafEvent(this,VME_SELECT,m_InputVME));
   //Stopping execution
   m_Running=false;
 }
@@ -138,6 +148,12 @@ void medWizardBlock::SetDescriptionLabel( const char *label)
 {
   //setting description label
   m_DescriptionLabel=label;
+}
+
+void medWizardBlock::SetOnAbortNextBlock( const char *label )
+{
+  //setting description label
+  m_AbortBlock=label;
 }
 
 

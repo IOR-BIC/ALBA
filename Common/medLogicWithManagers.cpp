@@ -151,6 +151,12 @@ void medLogicWithManagers::OnEvent(mafEventBase *maf_event)
         
       }
     break;
+    case WIZARD_PAUSE:
+      {
+        UpdateFrameTitle();
+        m_OpManager->OpRun(e->GetOp());
+      }
+      break;
     case OP_RUN_STARTING:
       {
         mafLogMessage("run starting");
