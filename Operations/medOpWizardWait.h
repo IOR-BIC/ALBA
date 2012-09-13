@@ -53,8 +53,7 @@ public:
   void OpRun();
   /** Execute the operation. */
   void OpDo();
-
+  void OnEvent(mafEventBase *maf_event);
 protected: 
-  medVMEComputeWrapping *m_Meter;
 };
 #endif

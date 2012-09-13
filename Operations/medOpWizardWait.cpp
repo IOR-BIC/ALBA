@@ -44,7 +44,6 @@ mafOp(label)
 {
   m_OpType	= OPTYPE_OP;
   m_Canundo = true;
-  m_Meter   = NULL;
 }
 //----------------------------------------------------------------------------
 medOpWizardWait::~medOpWizardWait( ) 
@@ -77,12 +76,14 @@ void medOpWizardWait::OpRun()
   m_Gui->Label("");
   m_Gui->Label("");
   m_Gui->Label("");
-  m_Gui->Label("");
+  m_Gui->Label("Go to next Step:");
 
-  m_Gui->Button(wxOK,"To next Step","Go to next Step");
+  m_Gui->Button(wxOK,"To next Step","");
 
   
   m_Gui->Divider();
+
+  ShowGui();
 }
 //----------------------------------------------------------------------------
 void medOpWizardWait::OpDo()
@@ -107,4 +108,5 @@ void medOpWizardWait::OnEvent(mafEventBase *maf_event)
       mafEventMacro(*e);
       break; 
     }
+  }
 }
