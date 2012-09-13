@@ -259,3 +259,15 @@ void medWizardManager::EnableToolbar( bool CanEnable /*= true*/ )
   //Enabling toolbar function 
   //this function will be updated on wizard-toolbar creation
 }
+
+//----------------------------------------------------------------------------
+mafString medWizardManager::GetDescription()
+//----------------------------------------------------------------------------
+{
+
+  if (m_RunningWizard)
+    return m_RunningWizard->GetDescription();
+  else 
+    return mafString("No running wizard");
+
+}

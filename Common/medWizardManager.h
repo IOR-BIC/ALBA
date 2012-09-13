@@ -82,6 +82,9 @@ public:
   /** Set the flag for warning the user if the operation is undoable. */
   virtual void WarningIfCantUndo (bool warn) {m_Warn = warn;};
 
+  /** returns a description about current step in wizard */
+  mafString GetDescription();
+
 private:
 
   

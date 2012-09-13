@@ -89,6 +89,8 @@ void medWizardSelectionBlock::SetDescription( const char *description )
 
 void medWizardSelectionBlock::ExcutionBegin()
 {
+  medWizardBlock::ExcutionBegin();
+
   //Generating required wxstring choice array
   wxString *choices = new wxString[m_Choices.size()];
 
