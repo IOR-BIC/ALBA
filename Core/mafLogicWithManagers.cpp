@@ -1133,7 +1133,11 @@ void mafLogicWithManagers::OnFileHistory(int menuId)
 void mafLogicWithManagers::OnFileSave()
 //----------------------------------------------------------------------------
 {
-  if(m_VMEManager) m_VMEManager->MSFSave();
+  if(m_VMEManager)
+  {
+    m_VMEManager->MSFSave();
+    UpdateFrameTitle();
+  }
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::OnFileSaveAs()
