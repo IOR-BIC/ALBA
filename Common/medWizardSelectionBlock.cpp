@@ -69,7 +69,9 @@ wxString medWizardSelectionBlock::GetNextBlock()
 {
   wxString block;
   //Return the next block according on user choice
-  if (m_SelectedChoice>=0 || m_SelectedChoice >= m_Choices.size())
+  if (!m_Success)
+    block=m_AbortBlock;
+  else if (m_SelectedChoice>=0 || m_SelectedChoice >= m_Choices.size())
     block=m_Choices[m_SelectedChoice].block;
   else 
     //if the selection is outside the range we return a fake block

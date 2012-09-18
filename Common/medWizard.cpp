@@ -170,7 +170,8 @@ void medWizard::BlockExecutionBegin()
   m_CurrentBlock->SetSelectedVME(m_SelectedVME);
   m_CurrentBlock->ExcutionBegin();
 
-  requiredOperation=m_CurrentBlock->GetRequiredOperation();
+  if (m_CurrentBlock)
+    requiredOperation=m_CurrentBlock->GetRequiredOperation();
   
   //if there is a not a required operation 
   //the wizard flow continues without interruption and we call BlockExecutionEnd() 

@@ -82,7 +82,7 @@ public:
   void SetDescriptionLabel(const char *label);
 
   /** Set a Label containing a description of the the current step*/
-  void SetOnAbortNextBlock(const char *label);
+  void SetNextBlockOnAbort(const char *label);
 
 protected:
 

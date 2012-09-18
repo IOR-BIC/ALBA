@@ -150,7 +150,7 @@ void medWizardBlock::SetDescriptionLabel( const char *label)
   m_DescriptionLabel=label;
 }
 
-void medWizardBlock::SetOnAbortNextBlock( const char *label )
+void medWizardBlock::SetNextBlockOnAbort( const char *label )
 {
   //setting description label
   m_AbortBlock=label;
