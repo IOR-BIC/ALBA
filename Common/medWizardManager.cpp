@@ -227,13 +227,29 @@ void medWizardManager::OnEvent( mafEventBase *maf_event )
      }
     break;
     case WIZARD_RUN_OP:
-      {
-        if (*e->GetString()=="pause")
+      { 
+        //Special operation for the wizard
+        mafString opString=*e->GetString();
+        if (opString=="PAUSE")
         {
+          //pause op
           mafEventMacro(mafEvent(this,WIZARD_PAUSE,m_WaitOp));
+        }
+        else if (opString=="SAVE")
+        {
+          //Save msf
+          mafEventMacro(mafEvent(this,MENU_FILE_SAVE));
+          WizardContinue(true);
+        }
+        else if (opString=="SAVE_AS")
+        {
+          //save msf with name
+          mafEventMacro(mafEvent(this,MENU_FILE_SAVEAS));
+          WizardContinue(true);
         }
         else
         {
+          //Run the standard operations
           mafEventMacro(*e);
         }
       }
@@ -280,7 +296,8 @@ void medWizardManager::EnableToolbar( bool CanEnable /*= true*/ )
 mafString medWizardManager::GetDescription()
 //----------------------------------------------------------------------------
 {
-
+  //return the description of the wizard 
+  //used in the main window titlebar
   if (m_RunningWizard)
     return m_RunningWizard->GetDescription();
   else 
