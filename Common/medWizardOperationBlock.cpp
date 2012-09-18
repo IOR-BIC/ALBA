@@ -99,8 +99,16 @@ void medWizardOperaiontionBlock::SetNextBlock( const char *block )
 wxString medWizardOperaiontionBlock::GetNextBlock()
 //----------------------------------------------------------------------------
 {
-  //return the name of the next block
-  return m_NextBlock;
+  if (m_Success)
+  {
+    //return the name of the next block
+    return m_NextBlock;
+  }
+  else
+  {
+    //return the name of the abort block;
+    return m_AbortBlock;
+  }
 }
 
 
@@ -109,6 +117,9 @@ void medWizardOperaiontionBlock::ExcutionBegin()
 //----------------------------------------------------------------------------
 {
   mafString tmpStr;
+
+  medWizardBlock::ExcutionBegin();
+
   ///////////////////////
   //Ask Wizard for View
   if (m_RequiredView!="")
@@ -132,7 +143,7 @@ void medWizardOperaiontionBlock::ExcutionBegin()
   else 
   {
     //If we cannot select the correct vme we need to abort the wizard
-    mafLogMessage("Wizard Error: unable to select VME, path:\"%s\"",m_VmeSelect.c_str());
+    mafLogMessage("Wizard Error: unable to select VME, path:\"%s\" base:\"%s\"",m_VmeSelect.c_str(),m_SelectedVME->GetName());
     Abort();
     //we stop execution now
     return;
@@ -170,6 +181,7 @@ void medWizardOperaiontionBlock::ExcutionBegin()
 void medWizardOperaiontionBlock::ExcutionEnd()
 //----------------------------------------------------------------------------
 {
+  medWizardBlock::ExcutionEnd();
   //////////////////////////  
   //Hide the required VMEs
   for(int i=0;i<m_VmeHide.size();i++)

@@ -83,6 +83,9 @@ public:
   /** Used to continue wizard execution after operation termination */
   void ContinueExecution(int opSuccess);
 
+  /** returns a description about current step in wizard */
+  mafString GetDescription();
+
 protected:
 
   /** Add a new Block to the wizard 

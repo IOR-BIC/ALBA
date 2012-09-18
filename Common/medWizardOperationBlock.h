@@ -83,7 +83,11 @@ public:
   void ExcutionEnd();
 
    /** Returns the name of the operation required by this block 
-       Return an empty string if no operation is required */
+       Return an empty string if no operation is required
+       There are three wizard specificic operation:
+       SAVE Save the msf
+       SAVE_AS Save the msf whit name
+       PAUSE open an operation with only one "next step" button*/
    void SetRequiredOperation(const char *name);
 
    /** Returns the name of the operation required by this block 

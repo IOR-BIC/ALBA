@@ -28,6 +28,7 @@
 // forward reference
 //----------------------------------------------------------------------------
 class medWizard;
+class medOpWizardWait;
 /**
   Class Name: medWizardManager.
   Class for wizards management 
@@ -82,6 +83,9 @@ public:
   /** Set the flag for warning the user if the operation is undoable. */
   virtual void WarningIfCantUndo (bool warn) {m_Warn = warn;};
 
+  /** returns a description about current step in wizard */
+  mafString GetDescription();
+
 private:
 
   
@@ -99,6 +103,6 @@ private:
   mafObserver       *m_Listener; 
   mafNode						*m_Selected; ///< Pointer to the current selected node.
   bool               m_Warn; ///< Flag to warn the user when an operation that can not undo is starting.
-
+  medOpWizardWait   *m_WaitOp;
 };
 #endif
