@@ -2,7 +2,7 @@
 
  Program: MAF2Medical
  Module: medOpComputeWrapping
- Authors: Anupam Agrawal and Hui Wei
+ Authors: Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -30,8 +30,8 @@ class mafGui;
 class mafEvent;
 
 /** 
-  class name: medOpComputeWrapping
-  Operation used to create a medVMEComputeWrapping used to wrap muscle action lines.
+  class name: medOpWizardWait
+  Simple op with only an next-step button create to insert pause during wizards.
 */
 class MED_OPERATION_EXPORT medOpWizardWait: public mafOp
 {
@@ -51,8 +51,8 @@ public:
   bool Accept(mafNode *node);
   /** Builds operation's interface. */
   void OpRun();
-  /** Execute the operation. */
-  void OpDo();
+  
+  /**Event management*/
   void OnEvent(mafEventBase *maf_event);
 protected: 
 };

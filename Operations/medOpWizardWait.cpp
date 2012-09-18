@@ -2,7 +2,7 @@
 
  Program: MAF2Medical
  Module: medOpComputeWrapping
- Authors: Anupam Agrawal and Hui Wei
+ Authors: Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -60,6 +60,7 @@ mafOp* medOpWizardWait::Copy()
 bool medOpWizardWait::Accept(mafNode *node)
 //----------------------------------------------------------------------------
 {
+  //can accept everytime
   return true;
 }
 //----------------------------------------------------------------------------
@@ -78,6 +79,7 @@ void medOpWizardWait::OpRun()
   m_Gui->Label("");
   m_Gui->Label("Go to next Step:");
 
+  //exit op button
   m_Gui->Button(wxOK,"To next Step","");
 
   
@@ -85,12 +87,7 @@ void medOpWizardWait::OpRun()
 
   ShowGui();
 }
-//----------------------------------------------------------------------------
-void medOpWizardWait::OpDo()
-//----------------------------------------------------------------------------
-{
- 
-}
+
 
 //----------------------------------------------------------------------------
 void medOpWizardWait::OnEvent(mafEventBase *maf_event)
@@ -102,6 +99,7 @@ void medOpWizardWait::OnEvent(mafEventBase *maf_event)
     {
     case wxOK:
       {
+        //exit operation
         mafEventMacro(mafEvent(this,OP_RUN_OK));
       }
     default:
