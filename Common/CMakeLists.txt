@@ -62,6 +62,9 @@ SET(PROJECT_SRCS
   medWizardSelectionBlock.cpp
   medWizardSelectionBlock.h
   
+  medWizardTypeCheckBlock.cpp
+  medWizardTypeCheckBlock.h
+  
   
 	#### SHOULD BE COMMITTED DOWN ######
 	mafDbg.h

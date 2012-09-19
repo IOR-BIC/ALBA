@@ -75,14 +75,26 @@ public:
   /** Called to clean up memory*/
   virtual void Delete(){delete this;};
 
+  /** Get a Label containing a description of the the current step*/
+  mafString GetDescriptionLabel();
+
+  /** Set a Label containing a description of the the current step*/
+  void SetDescriptionLabel(const char *label);
+
+  /** Set a Label containing a description of the the current step*/
+  void SetNextBlockOnAbort(const char *label);
+
 protected:
 
   wxString m_Name;
   wxString m_BlockType;
+  wxString m_AbortBlock;
   mafNode	*m_SelectedVME; ///< Pointer to the current selected node.
+  mafNode *m_InputVME; ///< The vme selected on operation start.
   int m_Success;
   int m_Running;
   mafObserver    *m_Listener;
+  mafString m_DescriptionLabel;
 
 private:
     

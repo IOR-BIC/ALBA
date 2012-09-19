@@ -83,19 +83,30 @@ public:
   void ExcutionEnd();
 
    /** Returns the name of the operation required by this block 
-       Return an empty string if no operation is required */
+       Return an empty string if no operation is required
+       There are three wizard specificic operation:
+       SAVE Save the msf
+       SAVE_AS Save the msf whit name
+       PAUSE open an operation with only one "next step" button*/
    void SetRequiredOperation(const char *name);
 
    /** Returns the name of the operation required by this block 
        Return an empty string if no operation is required */
    wxString GetRequiredOperation();
 
+   /** If Set  Auto Show Selected VME to false the selected vme will not 
+       auto showed before operation start*/
+   void SetAutoShowSelectedVME(bool autoShow);
+
+   /** Get Auto Show Selected VME status */
+   bool GetAutoShowSelectedVME();
   
 private:
 
   wxString m_Operation;
   wxString m_RequiredView;
   wxString m_VmeSelect;
+  bool m_AutoShowSelectedVME;
   std::vector < wxString > m_VmeShow;
   std::vector < wxString > m_VmeHide;
   wxString m_NextBlock;

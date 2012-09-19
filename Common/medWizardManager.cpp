@@ -25,6 +25,7 @@
 #include "medDecl.h"
 #include "medWizardManager.h"
 #include "medWizard.h"
+#include "medOpWizardWait.h"
 #include <wx/tokenzr.h>
 
 //----------------------------------------------------------------------------
@@ -40,6 +41,7 @@ medWizardManager::medWizardManager()
   m_RunningWizard =NULL;
   m_NumWizard = 0;
   m_WizardList.clear();
+  m_WaitOp = new medOpWizardWait;
 }
 
 //----------------------------------------------------------------------------
@@ -52,6 +54,8 @@ medWizardManager::~medWizardManager()
 
   //Clearing wizard list
   m_WizardList.clear();
+
+  delete m_WaitOp;
 }
 
 //----------------------------------------------------------------------------
@@ -222,6 +226,34 @@ void medWizardManager::OnEvent( mafEventBase *maf_event )
        mafEventMacro(*e);
      }
     break;
+    case WIZARD_RUN_OP:
+      { 
+        //Special operation for the wizard
+        mafString opString=*e->GetString();
+        if (opString=="PAUSE")
+        {
+          //pause op
+          mafEventMacro(mafEvent(this,WIZARD_PAUSE,m_WaitOp));
+        }
+        else if (opString=="SAVE")
+        {
+          //Save msf
+          mafEventMacro(mafEvent(this,MENU_FILE_SAVE));
+          WizardContinue(true);
+        }
+        else if (opString=="SAVE_AS")
+        {
+          //save msf with name
+          mafEventMacro(mafEvent(this,MENU_FILE_SAVEAS));
+          WizardContinue(true);
+        }
+        else
+        {
+          //Run the standard operations
+          mafEventMacro(*e);
+        }
+      }
+    break;
     default:
       //All event form wizard (like vme select/show, view request, ecc...)
       //will be forwared up to logic
@@ -259,3 +291,17 @@ void medWizardManager::EnableToolbar( bool CanEnable /*= true*/ )
   //Enabling toolbar function 
   //this function will be updated on wizard-toolbar creation
 }
+
+//----------------------------------------------------------------------------
+mafString medWizardManager::GetDescription()
+//----------------------------------------------------------------------------
+{
+  //return the description of the wizard 
+  //used in the main window titlebar
+  if (m_RunningWizard)
+    return m_RunningWizard->GetDescription();
+  else 
+    return mafString("No running wizard");
+
+}
+

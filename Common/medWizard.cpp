@@ -164,11 +164,14 @@ void medWizard::BlockExecutionBegin()
 {
   wxString requiredOperation;
 
+  mafEventMacro(mafEvent(this,WIZARD_UPDATE_WINDOW_TITLE));
+
   //Setting selected vme to the block and execute it
   m_CurrentBlock->SetSelectedVME(m_SelectedVME);
   m_CurrentBlock->ExcutionBegin();
 
-  requiredOperation=m_CurrentBlock->GetRequiredOperation();
+  if (m_CurrentBlock)
+    requiredOperation=m_CurrentBlock->GetRequiredOperation();
   
   //if there is a not a required operation 
   //the wizard flow continues without interruption and we call BlockExecutionEnd() 
@@ -246,11 +249,30 @@ void medWizard::ContinueExecution(int opSuccess)
     BlockExecutionEnd();
   else 
   {
-    //if the operation has aborted by the user we abort the entire wizard
-    //this behavior can be updated for error management
-    mafEventMacro(mafEvent(this,WIZARD_RUN_TERMINATED,false));
+    int answare = wxMessageBox(_("Do you want to abort this wizard ?"), _("Wizard Abort"), wxYES_NO|wxCENTER);
+    if(answare == wxYES)
+    {
+      //if the operation has aborted by the user we abort the entire wizard
+      //this behavior can be updated for error management
+      mafEventMacro(mafEvent(this,WIZARD_RUN_TERMINATED,false));
+    }
+    else
+    {
+      m_CurrentBlock->Abort();
+      BlockExecutionEnd();
+    }
   }
 }
 
+//----------------------------------------------------------------------------
+mafString medWizard::GetDescription()
+  //----------------------------------------------------------------------------
+{
 
+  if (m_CurrentBlock)
+    return mafString("Wizard - ") + m_CurrentBlock->GetDescriptionLabel().GetCStr();
+  else 
+    return mafString("Wizard - No running Block");
+
+}
 

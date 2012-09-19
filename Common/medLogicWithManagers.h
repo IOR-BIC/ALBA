@@ -89,9 +89,13 @@ protected:
   /** Called when an wizard stops. Re-enable all menu and unlock the Selection */ 
   virtual void WizardRunTerminated();
   
+  /** Called after FileOpen or Save operation */
+  virtual void UpdateFrameTitle();
+
   medWizardManager *m_WizardManager;
   bool m_UseWizardManager;
   bool m_WizardRunning;
+  bool m_CancelledBeforeOpStarting;
   wxMenu *m_WizardMenu;
 
 };

@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2Medical
- Module: medWizardSelectionBlock
+ Module: medOpComputeWrapping
  Authors: Gianluigi Crimi
  
  Copyright (c) B3C
@@ -14,7 +14,7 @@
 
 =========================================================================*/
 
-#include "medDefines.h" 
+#include "mafDefines.h" 
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
@@ -22,94 +22,90 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "medDecl.h"
-#include "medWizardSelectionBlock.h"
 
-
-
+#include "medOpWizardWait.h"
+#include "mafDecl.h"
+#include "mafEvent.h"
+#include "mafEvent.h"
+#include "mafGUI.h"
 
 //----------------------------------------------------------------------------
-medWizardSelectionBlock::medWizardSelectionBlock(const char *name):medWizardBlock(name)
+// Constants :
+//----------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
+mafCxxTypeMacro(medOpWizardWait);
+//----------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
+medOpWizardWait::medOpWizardWait(const wxString &label) :
+mafOp(label)
 //----------------------------------------------------------------------------
 {
-  //setting default values
-  m_SelectedChoice=0;
+  m_OpType	= OPTYPE_OP;
+  m_Canundo = true;
 }
-
 //----------------------------------------------------------------------------
-medWizardSelectionBlock::~medWizardSelectionBlock()
+medOpWizardWait::~medOpWizardWait( ) 
 //----------------------------------------------------------------------------
 {
-  //clearing choices list
-  m_Choices.clear();
 }
-
 //----------------------------------------------------------------------------
-void medWizardSelectionBlock::SetWindowTitle( const char *Title )
+mafOp* medOpWizardWait::Copy()   
 //----------------------------------------------------------------------------
 {
-  //setting the name of the window title
-  m_Title=Title;
+	return new medOpWizardWait(m_Label);
 }
-
 //----------------------------------------------------------------------------
-void medWizardSelectionBlock::AddChoice( const char *label, const char *block )
+bool medOpWizardWait::Accept(mafNode *node)
 //----------------------------------------------------------------------------
 {
-  //Creating a choice struct and push it in the choices array
-  blockChoice tmpChoice;
-  tmpChoice.label=label;
-  tmpChoice.block=block;
-  m_Choices.push_back(tmpChoice);
+  //can accept everytime
+  return true;
 }
-
 //----------------------------------------------------------------------------
-wxString medWizardSelectionBlock::GetNextBlock()
-//----------------------------------------------------------------------------
-{
-  wxString block;
-  //Return the next block according on user choice
-  if (!m_Success)
-    block=m_AbortBlock;
-  else if (m_SelectedChoice>=0 || m_SelectedChoice >= m_Choices.size())
-    block=m_Choices[m_SelectedChoice].block;
-  else 
-    //if the selection is outside the range we return a fake block
-    block="Selection problem";
-  return block;
-}
-
-//----------------------------------------------------------------------------
-void medWizardSelectionBlock::SetDescription( const char *description )
+void medOpWizardWait::OpRun()   
 //----------------------------------------------------------------------------
 {
-  //set the description showed to the user
-  m_Description=description;
-}
+  m_Gui = new mafGUI(this);
+  m_Gui->Divider();
+  
+  m_Gui->Label("");
+  m_Gui->Label("");
+  m_Gui->Label("");
+  m_Gui->Label("");
+  m_Gui->Label("");
+  m_Gui->Label("");
+  m_Gui->Label("");
+  m_Gui->Label("Go to next Step:");
 
+  //exit op button
+  m_Gui->Button(wxOK,"To next Step","");
 
+  
+  m_Gui->Divider();
 
-void medWizardSelectionBlock::ExcutionBegin()
-{
-  medWizardBlock::ExcutionBegin();
-
-  //Generating required wxstring choice array
-  wxString *choices = new wxString[m_Choices.size()];
-
-  for(int i=0;i<m_Choices.size();i++)
-    choices[i]=m_Choices[i].label;
-
-  //Show Modal window
-  m_SelectedChoice = wxGetSingleChoiceIndex(m_Description,m_Title,m_Choices.size(), choices);
-
-  //User has pessed cancel
-  if (m_SelectedChoice<0)
-    Abort();
-
-  //free mem 
-  delete[] choices;  
+  ShowGui();
 }
 
 
-
-
+//----------------------------------------------------------------------------
+void medOpWizardWait::OnEvent(mafEventBase *maf_event)
+//----------------------------------------------------------------------------
+{
+  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
+  {
+    switch(e->GetId())
+    {
+    case wxOK:
+      {
+        //exit operation
+        HideGui();
+        mafEventMacro(mafEvent(this,OP_RUN_OK));
+      }
+    default:
+      mafEventMacro(*e);
+      break; 
+    }
+  }
+}
