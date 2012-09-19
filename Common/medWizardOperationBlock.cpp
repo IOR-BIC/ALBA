@@ -32,6 +32,7 @@ medWizardOperaiontionBlock::medWizardOperaiontionBlock(const char *name):medWiza
 //----------------------------------------------------------------------------
 {
   //Default constructor
+  m_AutoShowSelectedVME=true;
 }
 
 //----------------------------------------------------------------------------
@@ -156,7 +157,8 @@ void medWizardOperaiontionBlock::ExcutionBegin()
   if (m_RequiredView != "")
   {
     //Showing input vme to ensure visualization in the operation
-    mafEventMacro(mafEvent(this,VME_SHOW,m_SelectedVME,true));
+    if (m_AutoShowSelectedVME)
+      mafEventMacro(mafEvent(this,VME_SHOW,m_SelectedVME,true));
 
     for(int i=0;i<m_VmeShow.size();i++)
     {
@@ -206,6 +208,20 @@ void medWizardOperaiontionBlock::SetRequiredOperation( const const char *name )
 {
   //set the name of required operation
   m_Operation=name;
+}
+
+//----------------------------------------------------------------------------
+void medWizardOperaiontionBlock::SetAutoShowSelectedVME( bool autoShow )
+//----------------------------------------------------------------------------
+{
+  m_AutoShowSelectedVME=autoShow;
+}
+
+//----------------------------------------------------------------------------
+bool medWizardOperaiontionBlock::GetAutoShowSelectedVME()
+//----------------------------------------------------------------------------
+{
+  return m_AutoShowSelectedVME;
 }
 
 
