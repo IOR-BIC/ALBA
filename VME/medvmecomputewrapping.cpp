@@ -128,9 +128,14 @@ medVMEComputeWrapping::medVMEComputeWrapping()
 	mafDataPipeCustom *dpipe = mafDataPipeCustom::New();
 	dpipe->SetDependOnAbsPose(true);
 	SetDataPipe(dpipe);
-
-	m_LinePatcher->SetInput(m_Goniometer->GetOutput());
-	dpipe->SetInput(m_LinePatcher->GetOutput());	
+	//-------------------------------------------------
+	//
+	// Reoved the line patcher to fix bug 
+	// http://bugzilla.b3c.it/show_bug.cgi?id=2826
+	//
+	//-------------------------------------------------
+	// m_LinePatcher->SetInput(m_Goniometer->GetOutput());
+	dpipe->SetInput(m_Goniometer->GetOutput());	
 }
 //-------------------------------------------------------------------------
 medVMEComputeWrapping::~medVMEComputeWrapping()
