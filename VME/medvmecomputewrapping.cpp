@@ -130,12 +130,13 @@ medVMEComputeWrapping::medVMEComputeWrapping()
 	SetDataPipe(dpipe);
 	//-------------------------------------------------
 	//
-	// Reoved the line patcher to fix bug 
+	// Removed the line patcher to fix bug and set the pipe input to goniometer output
 	// http://bugzilla.b3c.it/show_bug.cgi?id=2826
-	//
+	//  
 	//-------------------------------------------------
 	// m_LinePatcher->SetInput(m_Goniometer->GetOutput());
-	dpipe->SetInput(m_Goniometer->GetOutput());	
+	dpipe->SetInput(m_Goniometer->GetOutput());	 
+
 }
 //-------------------------------------------------------------------------
 medVMEComputeWrapping::~medVMEComputeWrapping()
@@ -4980,6 +4981,7 @@ int medVMEComputeWrapping::InternalStore(mafStorageElement *parent)
 		parent->StoreVectorN("OrderMiddlePointVme",m_OrderMiddlePointsVMEList,m_OrderMiddlePointsVMEList.size());
 
 		parent->StoreInteger("WrapMode", m_WrappedMode1);
+		parent->StoreInteger("WrapMode2", m_WrappedMode2);
 		parent->StoreInteger("WrapSide", m_WrapSide);
 		parent->StoreInteger("WrapReverse", m_WrapReverse);
 		parent->StoreInteger("WrapClass",m_WrappedClass);
@@ -5003,6 +5005,7 @@ int medVMEComputeWrapping::InternalRestore(mafStorageElement *node)
 			node->RestoreVectorN("OrderMiddlePointVme",m_OrderMiddlePointsVMEList,m_OrderMiddlePointsVMEListNumberOfElements);
 
 			node->RestoreInteger("WrapMode", m_WrappedMode1);
+			node->RestoreInteger("WrapMode2", m_WrappedMode2);
 			node->RestoreInteger("WrapSide", m_WrapSide);
 			node->RestoreInteger("WrapReverse", m_WrapReverse);
 			node->RestoreInteger("WrapClass",m_WrappedClass);
@@ -5237,8 +5240,6 @@ mafGUI* medVMEComputeWrapping::CreateGuiForOldMeter( mafGUI *gui ){
 	gui->Combo(ID_WRAPPED_METER_MODE,_("wrap"),&m_WrappedMode2,num_wrap,wrap_choices_string,_("Choose the meter mode"));
 	//m_Gui->Combo(ID_METER_MODE,_("mode"),&(GetMeterAttributes()->m_MeterMode),num_mode,mode_choices_string,_("Choose the meter mode"));
 	gui->Divider();
-
-	m_WrappedMode2 = IOR_AUTOMATED_WRAP;
 
 	mafVME *start_vme = GetStartVME();
 	if (start_vme && start_vme->IsMAFType(mafVMELandmarkCloud))
