@@ -100,6 +100,7 @@ void medOpWizardWait::OnEvent(mafEventBase *maf_event)
     case wxOK:
       {
         //exit operation
+        HideGui();
         mafEventMacro(mafEvent(this,OP_RUN_OK));
       }
     default:
