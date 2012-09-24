@@ -59,10 +59,10 @@ public:
   void MSFNew(bool notify_root_creation = true);
   
 	/** Open the msf filename. */
-	void MSFOpen(mafString filename);
+	int MSFOpen(mafString filename);
   
 	/** Open the msf from file history. */
-  void MSFOpen(int file_id);
+  int MSFOpen(int file_id);
 
   /** Open the compressed zmsf filename. */
   const char *ZIPOpen(mafString filename);
@@ -71,10 +71,10 @@ public:
   void ZIPSave(mafString file = "");
   
 	/** Save the msf tree. */
-  void MSFSave();
+  int MSFSave();
   
 	/** Save the msf tree with different filename. */
-  void MSFSaveAs();
+  int MSFSaveAs();
 
   /** Upload MAF data to the remote host with the given 'remote_file' filename.*/
   void Upload(mafString local_file, mafString remote_file);
