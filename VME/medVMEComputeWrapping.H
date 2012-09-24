@@ -376,6 +376,8 @@ public:
 	int GetNumberExportPoints(){return m_ExportPointList.size();};
 	double GetPointOnPlane(double zL ,double zH,double *point1,double *point2,double *point3,double *output);
 
+	std::vector<int> m_OrderMiddlePointsVMEList; //order list of VME ID
+
 protected:
 	medVMEComputeWrapping();
 
@@ -615,7 +617,6 @@ protected:
 
 	std::vector<double *> m_MiddlePointList; // list of coordinates
 	std::vector<double *> m_ExportPointList; // list of coordinates
-	std::vector<int> m_OrderMiddlePointsVMEList; //order list of VME ID
 	std::vector<mafString> m_OrderMiddlePointsNameVMEList; //order list of VME Name
 	std::vector<mafString> m_TestList;
 	
