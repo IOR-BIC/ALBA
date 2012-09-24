@@ -33,7 +33,7 @@ class mafEvent;
   class name: medOpWizardWait
   Simple op with only an next-step button create to insert pause during wizards.
 */
-class MED_OPERATION_EXPORT medWizardWaitOp: public mafOp
+class MED_COMMON_EXPORT medWizardWaitOp: public mafOp
 {
 public:
   /** constructor */
