@@ -171,15 +171,18 @@ void medWizard::BlockExecutionBegin()
   m_CurrentBlock->ExcutionBegin();
 
   if (m_CurrentBlock)
+  {
     requiredOperation=m_CurrentBlock->GetRequiredOperation();
   
-  //if there is a not a required operation 
-  //the wizard flow continues without interruption and we call BlockExecutionEnd() 
-  //elsewere if we had an operation it is run asynchronous and BlockExecutionEnd() 
-  //will be called my managers after operation stop
-  if (requiredOperation=="")
-    ContinueExecution(m_CurrentBlock->Success());
-  
+    //if there is a not a required operation 
+    //the wizard flow continues without interruption and we call BlockExecutionEnd() 
+    //elsewere if we had an operation it is run asynchronous and BlockExecutionEnd() 
+    //will be called my managers after operation stop
+    if (requiredOperation=="")
+      ContinueExecution(m_CurrentBlock->Success());
+  }
+  else
+    mafLogMessage("Error Unkwon block!");
 }
 
 //----------------------------------------------------------------------------

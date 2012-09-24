@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 
-#include "medOpWizardWait.h"
+#include "medWizardWaitOp.h"
 #include "mafDecl.h"
 #include "mafEvent.h"
 #include "mafEvent.h"
@@ -34,11 +34,11 @@
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mafCxxTypeMacro(medOpWizardWait);
+mafCxxTypeMacro(medWizardWaitOp);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-medOpWizardWait::medOpWizardWait(const wxString &label) :
+medWizardWaitOp::medWizardWaitOp(const wxString &label) :
 mafOp(label)
 //----------------------------------------------------------------------------
 {
@@ -46,25 +46,25 @@ mafOp(label)
   m_Canundo = true;
 }
 //----------------------------------------------------------------------------
-medOpWizardWait::~medOpWizardWait( ) 
+medWizardWaitOp::~medWizardWaitOp( ) 
 //----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
-mafOp* medOpWizardWait::Copy()   
+mafOp* medWizardWaitOp::Copy()   
 //----------------------------------------------------------------------------
 {
-	return new medOpWizardWait(m_Label);
+	return new medWizardWaitOp(m_Label);
 }
 //----------------------------------------------------------------------------
-bool medOpWizardWait::Accept(mafNode *node)
+bool medWizardWaitOp::Accept(mafNode *node)
 //----------------------------------------------------------------------------
 {
   //can accept everytime
   return true;
 }
 //----------------------------------------------------------------------------
-void medOpWizardWait::OpRun()   
+void medWizardWaitOp::OpRun()   
 //----------------------------------------------------------------------------
 {
   m_Gui = new mafGUI(this);
@@ -80,7 +80,7 @@ void medOpWizardWait::OpRun()
   m_Gui->Label("Go to next Step:");
 
   //exit op button
-  m_Gui->Button(wxOK,"To next Step","");
+  m_Gui->TwoButtons(wxOK,wxCANCEL,"To next Step","Cancel");
 
   
   m_Gui->Divider();
@@ -90,7 +90,7 @@ void medOpWizardWait::OpRun()
 
 
 //----------------------------------------------------------------------------
-void medOpWizardWait::OnEvent(mafEventBase *maf_event)
+void medWizardWaitOp::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))

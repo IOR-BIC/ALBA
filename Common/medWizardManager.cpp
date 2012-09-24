@@ -25,7 +25,7 @@
 #include "medDecl.h"
 #include "medWizardManager.h"
 #include "medWizard.h"
-#include "medOpWizardWait.h"
+#include "medWizardWaitOp.h"
 #include <wx/tokenzr.h>
 
 //----------------------------------------------------------------------------
@@ -41,7 +41,7 @@ medWizardManager::medWizardManager()
   m_RunningWizard =NULL;
   m_NumWizard = 0;
   m_WizardList.clear();
-  m_WaitOp = new medOpWizardWait;
+  m_WaitOp = new medWizardWaitOp;
 }
 
 //----------------------------------------------------------------------------
@@ -239,13 +239,21 @@ void medWizardManager::OnEvent( mafEventBase *maf_event )
         {
           //Save msf
           mafEventMacro(mafEvent(this,MENU_FILE_SAVE));
-          WizardContinue(true);
         }
         else if (opString=="SAVE_AS")
         {
           //save msf with name
           mafEventMacro(mafEvent(this,MENU_FILE_SAVEAS));
-          WizardContinue(true);
+        }
+        else if (opString=="OPEN")
+        {
+          //Open MSF
+          mafEventMacro(mafEvent(this,MENU_FILE_OPEN));
+        }
+        else if (opString=="DELETE")
+        {
+          //Delete current VME
+          mafEventMacro(mafEvent(this,WIZARD_OP_DELETE));
         }
         else
         {

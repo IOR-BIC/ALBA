@@ -92,6 +92,17 @@ protected:
   /** Called after FileOpen or Save operation */
   virtual void UpdateFrameTitle();
 
+  /** FILE OPEN evt. handler. 
+  By default (file_to_open = NULL) it ask the user to choose a file to open,
+  otherwise it open the given one.*/
+	virtual void OnFileOpen(const char *file_to_open = NULL);
+ 
+  /** FILE SAVE evt. handler */
+  virtual void OnFileSave();
+  
+  /** FILE SAVEAS evt. handler */
+  virtual void OnFileSaveAs();
+
   medWizardManager *m_WizardManager;
   bool m_UseWizardManager;
   bool m_WizardRunning;

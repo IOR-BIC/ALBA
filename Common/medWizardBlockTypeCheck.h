@@ -14,8 +14,8 @@
 
 =========================================================================*/
 
-#ifndef __medWizardSelectionBlock_H__
-#define __medWizardSelectionBlock_H__
+#ifndef __medWizardBlockTypeCheck_H__
+#define __medWizardBlockTypeCheck_H__
 
 //----------------------------------------------------------------------------
 // includes :
@@ -29,52 +29,57 @@
 //----------------------------------------------------------------------------
 
 /**
-  Class Name: medWizardSelectionBlock.
-  Class for create a multiple choice switch inside wizard graph
+  Class Name: medWizardTypeCheckBlock.
+  Class for create a type check block, if the selected vme is wrong the wizard
+  will be aborted.
 */
-class MED_COMMON_EXPORT medWizardSelectionBlock : public medWizardBlock
+class MED_COMMON_EXPORT medWizardBlockTypeCheck : public medWizardBlock
 {
 public:
 
   /** Default constructor */
-  medWizardSelectionBlock(const char *name);
+  medWizardBlockTypeCheck(const char *name);
 
   /** Default destructor */
-  ~medWizardSelectionBlock();
+  ~medWizardBlockTypeCheck();
     
   /** Set The title of the selection window */
   void SetWindowTitle(const char *Title);
 
+  /** Set the path for VME selection */
+  void VmeSelect(const char *path);
+
   /** Set The title of the selection window */
   void SetDescription(const char *description);
 
-  /** Add a new choice in the selection.
-      The choice is composed by the text showed to the user and the correspondent block
+  /** Add a new accepted type.
+      Uses the string of VME type.
       */
-  void AddChoice(const char *label, const char *block);
+  void AddAcceptedType(const char *label);
+
+  /** Set name of the Block called after wrong check.
+      By default is set to "END" and the wizard will closed on wrong check. */     
+  void SetWrongTypeNextBlock(const char *block);
 
   /** Return the name of the Block witch will be executed after this */
-  virtual wxString GetNextBlock();
+  wxString GetNextBlock();
 
   /** Starts the execution of the block */
   virtual void ExcutionBegin();
-
 
 protected:
 
 
 private:
 
-  //Choices struct definition
-  typedef struct 
-  {
-    wxString label;
-    wxString block;
-  } blockChoice;
-
   wxString m_Title;
   wxString m_Description;
-  std::vector < blockChoice > m_Choices;
-  int m_SelectedChoice;
+
+  wxString m_VmeSelect;
+  
+  std::vector <wxString> m_AcceptedVmes;
+  int m_TestPassed;
+  
+  wxString m_WrongTypeNextBlock;
 };
 #endif

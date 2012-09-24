@@ -70,11 +70,27 @@ wxString medWizardBlock::GetName()
 
 
 //----------------------------------------------------------------------------
+void medWizardBlock::SetNextBlock( const char *block )
+//----------------------------------------------------------------------------
+{
+  //set the name of the block called after block execution
+  m_NextBlock=block;
+}
+
+//----------------------------------------------------------------------------
 wxString medWizardBlock::GetNextBlock()
 //----------------------------------------------------------------------------
 {
-  //You need to add a specified block
-  return wxString("Error, Base block added");
+  if (m_Success)
+  {
+    //return the name of the next block
+    return m_NextBlock;
+  }
+  else
+  {
+    //return the name of the abort block;
+    return m_AbortBlock;
+  }
 }
 
 //----------------------------------------------------------------------------
