@@ -56,14 +56,26 @@ SET(PROJECT_SRCS
   medWizardManager.cpp
   medWizardManager.h
   
-  medWizardOperationBlock.cpp
-  medWizardOperationBlock.h
+  medWizardBlockOperation.cpp
+  medWizardBlockOperation.h
   
-  medWizardSelectionBlock.cpp
-  medWizardSelectionBlock.h
+  medWizardBlockSelection.cpp
+  medWizardBlockSelection.h
   
-  medWizardTypeCheckBlock.cpp
-  medWizardTypeCheckBlock.h
+  medWizardBlockTypeCheck.cpp
+  medWizardBlockTypeCheck.h
+  
+  medWizardBlockVMESelection.cpp
+  medWizardBlockVMESelection.h
+  
+  medWizardBlockInformation.cpp
+  medWizardBlockInformation.h
+
+  medWizardBlockYesNoSelection.cpp
+  medWizardBlockYesNoSelection.h
+  
+  medWizardWaitOp.cpp
+  medWizardWaitOp.h
   
   
 	#### SHOULD BE COMMITTED DOWN ######
@@ -86,7 +98,7 @@ IF(MED_BUILD_MEDDLL)
   ADD_DEFINITIONS(-DMED_COMMON_EXPORTS)
   # Create the library.
   ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
-  TARGET_LINK_LIBRARIES(${PROJECT_NAME} mafDLL)
+  TARGET_LINK_LIBRARIES(${PROJECT_NAME} mafDLL medGui)
 ELSE(MED_BUILD_MEDDLL)
   # Create the library.
   ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})

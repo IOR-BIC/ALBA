@@ -47,6 +47,10 @@ public:
   /** Get the name of the block */
   wxString GetName();
 
+
+  /** Set name of the Block called after operation. */
+  virtual void SetNextBlock(const char *block);
+
   /** Return the name of the Block witch will be executed after this */
   virtual wxString GetNextBlock();
 
@@ -89,6 +93,7 @@ protected:
   wxString m_Name;
   wxString m_BlockType;
   wxString m_AbortBlock;
+  wxString m_NextBlock;
   mafNode	*m_SelectedVME; ///< Pointer to the current selected node.
   mafNode *m_InputVME; ///< The vme selected on operation start.
   int m_Success;

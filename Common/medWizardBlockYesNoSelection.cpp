@@ -23,32 +23,26 @@
 //----------------------------------------------------------------------------
 
 #include "medDecl.h"
-#include "mafNode.h"
-#include "medWizardTypeCheckBlock.h"
+#include "medWizardBlockYesNoSelection.h"
 
 
 
 
 //----------------------------------------------------------------------------
-medWizardTypeCheckBlock::medWizardTypeCheckBlock(const char *name):medWizardBlock(name)
+medWizardBlockYesNoSelection::medWizardBlockYesNoSelection(const char *name):medWizardBlock(name)
 //----------------------------------------------------------------------------
 {
-  //setting default values
-  m_Title="Bad VME type";
-  m_Description="The Vme is of a wrong type,\nWizard will be closed!";
-  m_WrongTypeNextBlock="END"; 
+  m_CancelEnabled=true;
 }
 
 //----------------------------------------------------------------------------
-medWizardTypeCheckBlock::~medWizardTypeCheckBlock()
+medWizardBlockYesNoSelection::~medWizardBlockYesNoSelection()
 //----------------------------------------------------------------------------
 {
-  //clearing choices list
-  m_AcceptedVmes.clear();
 }
 
 //----------------------------------------------------------------------------
-void medWizardTypeCheckBlock::SetWindowTitle( const char *Title )
+void medWizardBlockYesNoSelection::SetWindowTitle( const char *Title )
 //----------------------------------------------------------------------------
 {
   //setting the name of the window title
@@ -56,23 +50,23 @@ void medWizardTypeCheckBlock::SetWindowTitle( const char *Title )
 }
 
 
-
 //----------------------------------------------------------------------------
-wxString medWizardTypeCheckBlock::GetNextBlock()
+wxString medWizardBlockYesNoSelection::GetNextBlock()
 //----------------------------------------------------------------------------
 {
   wxString block;
   //Return the next block according on user choice
-  if (m_TestPassed)
-    block=m_NextBlock;
+  if (!m_Success)
+    block=m_AbortBlock;
+  else if (m_UserYes==wxYES)
+    block=m_YesBlock;
   else 
-    block=m_WrongTypeNextBlock;
-
+    block=m_NoBlock;
   return block;
 }
 
 //----------------------------------------------------------------------------
-void medWizardTypeCheckBlock::SetDescription( const char *description )
+void medWizardBlockYesNoSelection::SetDescription( const char *description )
 //----------------------------------------------------------------------------
 {
   //set the description showed to the user
@@ -80,61 +74,49 @@ void medWizardTypeCheckBlock::SetDescription( const char *description )
 }
 
 
+
 //----------------------------------------------------------------------------
-void medWizardTypeCheckBlock::ExcutionBegin()
+void medWizardBlockYesNoSelection::ExcutionBegin()
 //----------------------------------------------------------------------------
 {
   medWizardBlock::ExcutionBegin();
 
-  m_TestPassed=false;
+  //Show Modal window
+  if (m_CancelEnabled)
+    m_UserYes = wxMessageBox(m_Description,m_Title,wxYES_NO|wxCANCEL|wxYES_DEFAULT|wxICON_QUESTION|wxCENTRE|wxSTAY_ON_TOP);
+  else 
+    m_UserYes = wxMessageBox(m_Description,m_Title,wxYES_NO|wxYES_DEFAULT|wxICON_QUESTION|wxCENTRE|wxSTAY_ON_TOP);
 
-  //Select the input VME for the operation
-  if (m_SelectedVME)
-    m_SelectedVME=m_SelectedVME->GetByPath(m_VmeSelect.c_str());
-  else
-    return;    
+  //User has pessed cancel
+  if (m_UserYes==wxCANCEL)
+    Abort();
 
-  mafEventMacro(mafEvent(this,VME_SELECT,m_SelectedVME));
-
-  for (int i=0;i<m_AcceptedVmes.size();i++)
-    if (m_SelectedVME->IsA(m_AcceptedVmes[i].c_str()))
-      m_TestPassed=true;
-
-  if (!m_TestPassed)
-    //Show Modal window
-    wxMessageBox(m_Description,m_Title, wxOK);
 }
 
 //----------------------------------------------------------------------------
-void medWizardTypeCheckBlock::VmeSelect( const char *path )
+void medWizardBlockYesNoSelection::SetNextBlockOnYes( const char *block )
 //----------------------------------------------------------------------------
 {
-  //Set the path of the vme which was selected before operation start
-  m_VmeSelect=path;
+  //set next block on user yes
+  m_YesBlock=block;
 }
 
-
 //----------------------------------------------------------------------------
-void medWizardTypeCheckBlock::AddAcceptedType( const char *label )
+void medWizardBlockYesNoSelection::SetNextBlockOnNo( const char *block )
 //----------------------------------------------------------------------------
 {
-  wxString accept=label;
-  m_AcceptedVmes.push_back(accept);
+  //set next block on user no
+  m_NoBlock=block;
 }
 
 //----------------------------------------------------------------------------
-void medWizardTypeCheckBlock::SetWrongTypeNextBlock( const char *block )
+void medWizardBlockYesNoSelection::EnableCancelButton( bool cancel/*=true*/ )
 //----------------------------------------------------------------------------
 {
-  m_WrongTypeNextBlock=block;
+  //enable/disable cancel button
+  m_CancelEnabled=cancel;
 }
 
 
 
-//----------------------------------------------------------------------------
-void medWizardTypeCheckBlock::SetNextBlock( const char *block )
-//----------------------------------------------------------------------------
-{
-  //set the name of the block called after block execution
-  m_NextBlock=block;
-}
+

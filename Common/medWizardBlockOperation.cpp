@@ -23,12 +23,12 @@
 //----------------------------------------------------------------------------
 
 #include "medDecl.h"
-#include "medWizardOperationBlock.h"
+#include "medWizardBlockOperation.h"
 #include "mafNode.h"
 #include "mafEvent.h"
 
 //----------------------------------------------------------------------------
-medWizardOperaiontionBlock::medWizardOperaiontionBlock(const char *name):medWizardBlock(name)
+medWizardBlockOperation::medWizardBlockOperation(const char *name):medWizardBlock(name)
 //----------------------------------------------------------------------------
 {
   //Default constructor
@@ -36,7 +36,7 @@ medWizardOperaiontionBlock::medWizardOperaiontionBlock(const char *name):medWiza
 }
 
 //----------------------------------------------------------------------------
-medWizardOperaiontionBlock::~medWizardOperaiontionBlock()
+medWizardBlockOperation::~medWizardBlockOperation()
 //----------------------------------------------------------------------------
 {
   //Clearing the list of to show and to hide VME
@@ -45,7 +45,7 @@ medWizardOperaiontionBlock::~medWizardOperaiontionBlock()
 }
 
 //----------------------------------------------------------------------------
-void medWizardOperaiontionBlock::SetRequiredView( const char *View )
+void medWizardBlockOperation::SetRequiredView( const char *View )
 //----------------------------------------------------------------------------
 {
   //setting required view name 
@@ -53,7 +53,7 @@ void medWizardOperaiontionBlock::SetRequiredView( const char *View )
 }
 
 //----------------------------------------------------------------------------
-wxString medWizardOperaiontionBlock::GetRequiredView()
+wxString medWizardBlockOperation::GetRequiredView()
 //----------------------------------------------------------------------------
 {
   //return the required view
@@ -61,7 +61,7 @@ wxString medWizardOperaiontionBlock::GetRequiredView()
 }
 
 //----------------------------------------------------------------------------
-void medWizardOperaiontionBlock::VmeSelect( const char *path )
+void medWizardBlockOperation::VmeSelect( const char *path )
 //----------------------------------------------------------------------------
 {
   //Set the path of the vme which was selected before operation start
@@ -69,7 +69,7 @@ void medWizardOperaiontionBlock::VmeSelect( const char *path )
 }
 
 //----------------------------------------------------------------------------
-void medWizardOperaiontionBlock::VmeShowAdd( const char *path )
+void medWizardBlockOperation::VmeShowAdd( const char *path )
 //----------------------------------------------------------------------------
 {
   //push back the path of the vme showed before operation start
@@ -79,7 +79,7 @@ void medWizardOperaiontionBlock::VmeShowAdd( const char *path )
 }
 
 //----------------------------------------------------------------------------
-void medWizardOperaiontionBlock::VmeHideAdd( const char *path )
+void medWizardBlockOperation::VmeHideAdd( const char *path )
 //----------------------------------------------------------------------------
 {
   //push back the path of the vme hided after operation end
@@ -88,33 +88,9 @@ void medWizardOperaiontionBlock::VmeHideAdd( const char *path )
   m_VmeHide.push_back(wxPath);
 }
 
-//----------------------------------------------------------------------------
-void medWizardOperaiontionBlock::SetNextBlock( const char *block )
-//----------------------------------------------------------------------------
-{
-  //set the name of the block called after block execution
-  m_NextBlock=block;
-}
 
 //----------------------------------------------------------------------------
-wxString medWizardOperaiontionBlock::GetNextBlock()
-//----------------------------------------------------------------------------
-{
-  if (m_Success)
-  {
-    //return the name of the next block
-    return m_NextBlock;
-  }
-  else
-  {
-    //return the name of the abort block;
-    return m_AbortBlock;
-  }
-}
-
-
-//----------------------------------------------------------------------------
-void medWizardOperaiontionBlock::ExcutionBegin()
+void medWizardBlockOperation::ExcutionBegin()
 //----------------------------------------------------------------------------
 {
   mafString tmpStr;
@@ -180,7 +156,7 @@ void medWizardOperaiontionBlock::ExcutionBegin()
 }
 
 //----------------------------------------------------------------------------
-void medWizardOperaiontionBlock::ExcutionEnd()
+void medWizardBlockOperation::ExcutionEnd()
 //----------------------------------------------------------------------------
 {
   medWizardBlock::ExcutionEnd();
@@ -195,7 +171,7 @@ void medWizardOperaiontionBlock::ExcutionEnd()
 }
 
 //----------------------------------------------------------------------------
-wxString medWizardOperaiontionBlock::GetRequiredOperation()
+wxString medWizardBlockOperation::GetRequiredOperation()
 //----------------------------------------------------------------------------
 {
   //return the name of required operation
@@ -203,7 +179,7 @@ wxString medWizardOperaiontionBlock::GetRequiredOperation()
 }
 
 //----------------------------------------------------------------------------
-void medWizardOperaiontionBlock::SetRequiredOperation( const const char *name )
+void medWizardBlockOperation::SetRequiredOperation( const const char *name )
 //----------------------------------------------------------------------------
 {
   //set the name of required operation
@@ -211,14 +187,14 @@ void medWizardOperaiontionBlock::SetRequiredOperation( const const char *name )
 }
 
 //----------------------------------------------------------------------------
-void medWizardOperaiontionBlock::SetAutoShowSelectedVME( bool autoShow )
+void medWizardBlockOperation::SetAutoShowSelectedVME( bool autoShow )
 //----------------------------------------------------------------------------
 {
   m_AutoShowSelectedVME=autoShow;
 }
 
 //----------------------------------------------------------------------------
-bool medWizardOperaiontionBlock::GetAutoShowSelectedVME()
+bool medWizardBlockOperation::GetAutoShowSelectedVME()
 //----------------------------------------------------------------------------
 {
   return m_AutoShowSelectedVME;

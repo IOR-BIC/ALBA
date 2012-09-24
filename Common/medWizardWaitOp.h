@@ -14,8 +14,8 @@
 
 =========================================================================*/
 
-#ifndef __medOpWizardWait_H__
-#define __medOpmedOpWizardWait_H__
+#ifndef __medWizardWaitOp_H__
+#define __medWizardWaitOp_H__
 
 //----------------------------------------------------------------------------
 // Include:
@@ -33,16 +33,16 @@ class mafEvent;
   class name: medOpWizardWait
   Simple op with only an next-step button create to insert pause during wizards.
 */
-class MED_OPERATION_EXPORT medOpWizardWait: public mafOp
+class MED_OPERATION_EXPORT medWizardWaitOp: public mafOp
 {
 public:
   /** constructor */
-  medOpWizardWait(const wxString &label = "WizardWait");
+  medWizardWaitOp(const wxString &label = "WizardWait");
   /** destructor */
-  ~medOpWizardWait();
+  ~medWizardWaitOp();
 
   /** RTTI macro*/
-  mafTypeMacro(medOpWizardWait, mafOp);
+  mafTypeMacro(medWizardWaitOp, mafOp);
 
   /** clone the object and retrieve a copy*/
   mafOp* Copy();

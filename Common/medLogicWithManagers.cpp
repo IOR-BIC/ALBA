@@ -32,6 +32,8 @@
 #include "medWizardManager.h"
 #include "mafGUIApplicationSettings.h"
 #include "mafView.h"
+#include "mafGUIDialogRemoteFile.h"
+#include "mafGUISettingsStorage.h"
 
 #ifdef MAF_USE_VTK
   #include "mafInteractionManager.h"
@@ -149,6 +151,15 @@ void medLogicWithManagers::OnEvent(mafEventBase *maf_event)
            m_WizardManager->WizardContinue(false);
         }
         
+      }
+    break;
+    case WIZARD_OP_DELETE:
+      {
+        //Running an op required from the wizard
+        m_CancelledBeforeOpStarting=true;
+        UpdateFrameTitle();
+        m_OpManager->OpRun(OP_DELETE);
+        m_WizardManager->WizardContinue(true);
       }
     break;
     case WIZARD_PAUSE:
@@ -354,3 +365,88 @@ void medLogicWithManagers::UpdateFrameTitle()
     mafLogicWithManagers::UpdateFrameTitle();
 }
 
+//----------------------------------------------------------------------------
+void medLogicWithManagers::OnFileOpen(const char *file_to_open)
+  //----------------------------------------------------------------------------
+{
+  if(m_VMEManager)
+  {
+    if(m_VMEManager->AskConfirmAndSave())
+    {
+      wxString file;
+      if (m_StorageSettings->GetStorageType() == mafGUISettingsStorage::HTTP)
+      {
+        if (file_to_open != NULL)
+        {
+          file = file_to_open;
+        }
+        else
+        {
+          mafGUIDialogRemoteFile remoteFile;
+          remoteFile.ShowModal();
+          file = remoteFile.GetFile().GetCStr();
+          mafString protocol;
+          if (IsRemote(file.c_str(),protocol))
+          {
+            m_VMEManager->SetHost(remoteFile.GetHost());
+            m_VMEManager->SetRemotePort(remoteFile.GetPort());//
+            m_VMEManager->SetUser(remoteFile.GetUser());
+            m_VMEManager->SetPassword(remoteFile.GetPassword());
+          }
+        }
+      }
+      else      
+      {
+        wxString wildc    = _("MAF Storage Format file (*.msf)|*.msf|Compressed file (*.zmsf)|*.zmsf");
+        if (file_to_open != NULL)
+        {
+          file = file_to_open;
+        }
+        else
+        {
+          file = mafGetOpenFile("", wildc).c_str();
+        }
+      }
+
+      if(file.IsEmpty() && m_WizardManager && m_WizardRunning)
+        m_WizardManager->WizardContinue(false);
+      else if(file.IsEmpty())
+        return;
+        
+
+      int opened=m_VMEManager->MSFOpen(file);
+      //If there is a wizzard running we need to continue it after open operation
+      if (m_WizardManager && m_WizardRunning)
+        m_WizardManager->WizardContinue(opened!=MAF_ERROR);
+    }
+  }
+}
+
+
+//----------------------------------------------------------------------------
+void medLogicWithManagers::OnFileSave()
+//----------------------------------------------------------------------------
+{
+  if(m_VMEManager)
+  {
+    int saved=m_VMEManager->MSFSave();
+    //If there is a wizard running we need to continue it after save operation
+    if (m_WizardManager && m_WizardRunning)
+      m_WizardManager->WizardContinue(saved!=MAF_ERROR);
+    UpdateFrameTitle();
+  }
+}
+
+//----------------------------------------------------------------------------
+void medLogicWithManagers::OnFileSaveAs()
+//----------------------------------------------------------------------------
+{
+  if(m_VMEManager) 
+  {
+    int saved=m_VMEManager->MSFSaveAs();
+    //If there is a wizard running we need to continue it after save operation
+    if (m_WizardManager && m_WizardRunning)
+      m_WizardManager->WizardContinue(saved!=MAF_ERROR);
+    UpdateFrameTitle();
+  }
+}
