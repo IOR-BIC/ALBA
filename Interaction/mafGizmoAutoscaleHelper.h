@@ -67,7 +67,7 @@ public:
   vtkActor *GetActor() {return m_Actor;};
 
   /** Set the vme to be autoscaled (to be used from the pipe) */
-  void SetVME(mafVME *vme) {m_VME = vme;};
+  void SetVME(mafVME *vme);
   mafVME *GetVME() {return m_VME;};
 
   virtual int DeepCopy(mafGizmoAutoscaleHelper *trans);
@@ -113,6 +113,8 @@ protected:
   bool           m_FollowScale; ///< Flag for enabling the scaling according to camera frustum
   
   mafOBB*       m_Bounds; ///< m_Bounds of the object that should follow the camera
+
+  double m_VMEBounds[6]; ///< Input VME bounds  
 
   float         m_OldViewAngle;
   double        m_OldDistance;

@@ -127,7 +127,7 @@ void mafVMEOutputSurface::Update()
   m_VME->Update();
   if (GetSurfaceData())
   {
-    GetSurfaceData()->Modified();
+    //GetSurfaceData()->Modified();	//BES: 12.9.2012 - I do not see any reason for this except to make troubles during rendering since this forces rerender of everything
     GetSurfaceData()->Update();
     int num = GetSurfaceData()->GetNumberOfPolys();
     m_NumTriangles = num;

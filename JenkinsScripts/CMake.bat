@@ -15,6 +15,7 @@ IF "%1" == "LIB_VS2010_DEBUG_VME_TEST" GOTO LIB_VS2010_DEBUG_VME_TEST
 IF "%1" == "LIB_VS2010_DEBUG_INTERACTION_TEST" GOTO LIB_VS2010_DEBUG_INTERACTION_TEST
 IF "%1" == "LIB_VS2010_DEBUG_DATAPIPES_TEST" GOTO LIB_VS2010_DEBUG_DATAPIPES_TEST
 IF "%1" == "LIB_VS2010_DEBUG_VTKMAF_TEST" GOTO LIB_VS2010_DEBUG_VTKMAF_TEST
+IF "%1" == "STATIC_ANALYSIS" GOTO STATIC_ANALYSIS
 
 REM -----------------------------------------------------------------------------
 :LIB_VS2010_DEBUG
@@ -301,6 +302,29 @@ cmake.exe  ../Source  -G"Visual Studio 10" ^
   
 cd ..
   
+GOTO END
+
+REM -----------------------------------------------------------------------------
+:STATIC_ANALYSIS
+REM ------
+
+:STATIC_ANALYSIS
+
+mkdir Build
+cd Build
+
+cmake.exe  ../Source ^
+  -G"Visual Studio 10" ^
+  -DBUILD_TESTING:BOOL=OFF ^
+  -DMAF_QA:BOOL=ON ^
+  -DBUILD_EXAMPLES:BOOL=OFF ^
+  -DCMAKE_BACKWARDS_COMPATIBILITY:STRING=2.0 ^
+  -DMAF_USE_ITK:BOOL=ON ^
+  -DCPPUNIT_INCLUDE_DIR:PATH="C:/cppunit-1.12.0_VS2010_BUILD/cppunit-1.12.0/include" ^
+  -DCPPUNIT_LIBRARY:FILEPATH="C:/cppunit-1.12.0_VS2010_BUILD/cppunit-1.12.0/lib/cppunitd.lib"
+
+cd..
+
 GOTO END
 
 REM -----------------------------------------------------------------------------

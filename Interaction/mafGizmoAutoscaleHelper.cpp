@@ -358,8 +358,9 @@ void mafGizmoAutoscaleHelper::InternalProcessEvents(vtkObject* sender, unsigned 
 
 				assert(gizmoInterface);
 
-				double bounds[6] = {0,0,0,0,0,0};
-				double lenght = gizmoInterface->GetInput()->GetOutput()->GetVTKData()->GetLength();
+				double lenght = sqrt((self->m_VMEBounds[1]-self->m_VMEBounds[0])*(self->m_VMEBounds[1]-self->m_VMEBounds[0]) 
+					+ (self->m_VMEBounds[3]-self->m_VMEBounds[2])*(self->m_VMEBounds[3]-self->m_VMEBounds[2]) + 
+					(self->m_VMEBounds[5] - self->m_VMEBounds[4])*(self->m_VMEBounds[5] - self->m_VMEBounds[4]) );
 
 				double yRenderWindowPercentage = gizmoInterface->GetRenderWindowHeightPercentage();
 
@@ -378,4 +379,28 @@ void mafGizmoAutoscaleHelper::InternalProcessEvents(vtkObject* sender, unsigned 
 			break;
 		}
 	}
+}
+
+void mafGizmoAutoscaleHelper::SetVME( mafVME *vme )
+{
+	m_VME = vme;
+
+	mafVMEGizmo *vmeGizmo = NULL;
+	vmeGizmo = mafVMEGizmo::SafeDownCast(m_VME);
+
+	if (vmeGizmo == NULL)
+	{
+		return;
+	}
+
+	mafGizmoInterface *gizmoMediator = NULL;
+	gizmoMediator = dynamic_cast<mafGizmoInterface *>(vmeGizmo->GetMediator());
+
+	if (gizmoMediator == NULL)
+	{
+		return;
+	}
+
+	gizmoMediator->GetInput()->GetOutput()->GetBounds(m_VMEBounds);
+
 }

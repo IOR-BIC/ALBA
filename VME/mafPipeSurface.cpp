@@ -51,8 +51,11 @@
 #include "vtkCellData.h"
 #include "vtkArrowSource.h"
 #include "vtkFeatureEdges.h"
+#include "vtkMAFPolyDataNormals.h"
 
 #include <vector>
+
+
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafPipeSurface);
@@ -141,7 +144,19 @@ void mafPipeSurface::Create(mafSceneNode *n)
   assert(m_SurfaceMaterial);  // all vme that use PipeSurface must have the material correctly set
 
   vtkNEW(m_Mapper);
-  m_Mapper->SetInput(data);
+
+	//BES: 11.9.2012 - VTK rendering core is stupid to calculate normal vectors all the time unless they are specified in the input data
+	//to speed up rendering in time-variant situations (in static, display lists make this problem negligible), we calculate normal vectors here
+	if (data->GetPointData() == NULL || data->GetPointData()->GetNormals() != NULL) 
+		m_Mapper->SetInput(data);
+	else
+	{
+		vtkMAFSmartPointer< vtkMAFPolyDataNormals > normals;
+		normals->SetInput(data);
+		normals->SetComputePointNormals(1);
+		normals->SetComputeCellNormals(0);
+		m_Mapper->SetInput(normals->GetOutput());	
+	}			
   
   //m_RenderingDisplayListFlag = m_Vme->IsAnimated() ? 0 : 1;
   m_RenderingDisplayListFlag = m_Vme->IsAnimated() ? 1 : 0;
@@ -430,6 +445,7 @@ void mafPipeSurface::OnEvent(mafEventBase *maf_event)
 				  m_Gui->Update();
         }
         UpdateScalarsArrayVisualization(dataAttribute);
+				mafEventMacro(mafEvent(this,CAMERA_UPDATE)); //BES 12.9.2012
       }
     	break;
       case ID_LUT:
@@ -521,11 +537,13 @@ void mafPipeSurface::OnEvent(mafEventBase *maf_event)
         m_Gui->Update();
 
         UpdateScalarsArrayVisualization(dataAttribute);
+				mafEventMacro(mafEvent(this,CAMERA_UPDATE)); //BES 12.9.2012
       }
       case ID_SCALARS_ARRAY_SELECTION:
       {
         vtkDataSetAttributes *dataAttribute = GetSelectedDataAttribute(); 
         UpdateScalarsArrayVisualization(dataAttribute);
+				mafEventMacro(mafEvent(this,CAMERA_UPDATE)); //BES 12.9.2012
       }
       break;
       ////
@@ -540,6 +558,7 @@ void mafPipeSurface::OnEvent(mafEventBase *maf_event)
     {
       vtkDataSetAttributes *dataAttribute = GetSelectedDataAttribute(); 
       UpdateScalarsArrayVisualization(dataAttribute);
+			//the caller will cause CAMERA_UPDATE, so not necessary (and even undesirable) to do so here
     }
   }
 }
@@ -573,9 +592,8 @@ void mafPipeSurface::UpdateScalarsArrayVisualization(vtkDataSetAttributes *dataA
     dataAttribute->GetArray(dataAttribute->GetArrayName(m_SelectedScalarsArray))->GetRange(range);
     m_Mapper->SetScalarRange(range);
   }
-  m_Mapper->Modified();
-  m_Mapper->Update();
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+
+  //mafEventMacro(mafEvent(this,CAMERA_UPDATE)); //BES 12.9.2012 - do not call it here since this method is called on VME_TIME_SET  and, thus, this would cause repetitive rendering
 }
 //----------------------------------------------------------------------------
 vtkDataSetAttributes *mafPipeSurface::GetSelectedDataAttribute() // (added by Losi 2011/04/08 to allow scalars array selection)

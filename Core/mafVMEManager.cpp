@@ -729,10 +729,16 @@ void mafVMEManager::MSFSave()
 void mafVMEManager::MSFSaveAs()   
 //----------------------------------------------------------------------------
 {
-   m_MSFFile = ""; // set filenames to empty so the MSFSave method will ask for them
-   m_ZipFile = "";
-   m_MakeBakFile = false;
-   MSFSave();
+  mafString oldFileName;
+
+  oldFileName=m_MSFFile;
+  m_MSFFile = ""; // set filenames to empty so the MSFSave method will ask for them
+  m_ZipFile = "";
+  m_MakeBakFile = false;
+  MSFSave();
+  //if the user cancel save operation the name will be empty 
+  if (m_MSFFile=="")
+    m_MSFFile=oldFileName;
 }
 //----------------------------------------------------------------------------
 void mafVMEManager::Upload(mafString local_file, mafString remote_file)
