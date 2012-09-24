@@ -250,15 +250,15 @@ void mafVMEManager::AddCreationDate(mafNode *vme)
 }
 
 //----------------------------------------------------------------------------
-void mafVMEManager::MSFOpen(int file_id)
+int  mafVMEManager::MSFOpen(int file_id)
 //----------------------------------------------------------------------------
 {
   m_FileHistoryIdx = file_id - wxID_FILE1;
 	mafString file = m_FileHistory.GetHistoryFile(m_FileHistoryIdx).c_str(); // get the filename from history
-	MSFOpen(file);
+	return MSFOpen(file);
 }
 //----------------------------------------------------------------------------
-void mafVMEManager::MSFOpen(mafString filename)
+int mafVMEManager::MSFOpen(mafString filename)
 //----------------------------------------------------------------------------
 {
   wxWindowDisabler *disableAll;
@@ -293,7 +293,7 @@ void mafVMEManager::MSFOpen(mafString filename)
       cppDEL(disableAll);
       cppDEL(wait_cursor);
     }
-		return;
+		return MAF_ERROR; 
 	}
 
   MSFNew(false); // insert and select the root - reset m_MSFFile - delete the old storage and create a new one
@@ -338,7 +338,7 @@ void mafVMEManager::MSFOpen(mafString filename)
         cppDEL(disableAll);
         cppDEL(wait_cursor);
       }
-      return;
+      return MAF_ERROR;
     }
     wxSetWorkingDirectory(m_TmpDir.GetCStr());
   }
@@ -415,13 +415,14 @@ void mafVMEManager::MSFOpen(mafString filename)
 		m_Modified = false;
 		m_Storage->Delete();
 		m_Storage = NULL;
+    
 		MSFNew();
     if(!m_TestMode) // Losi 02/16/2010 for test class
     {
       cppDEL(disableAll);
       cppDEL(wait_cursor);
     }
-		return;
+		return MAF_ERROR;
 	}
 	///////////////////////////////////////////////////////////////////////////////// 
   NotifyAdd(root_node); // add the storage root (the tree) with events notification
@@ -451,6 +452,7 @@ void mafVMEManager::MSFOpen(mafString filename)
     cppDEL(disableAll);
     cppDEL(wait_cursor);
   }
+  return res;
 }
 //----------------------------------------------------------------------------
 const char *mafVMEManager::ZIPOpen(mafString filename)
@@ -647,9 +649,11 @@ bool mafVMEManager::MakeZip(const mafString &zipname, wxArrayString *files)
   return zip.Close() && out.Close();
 }
 //----------------------------------------------------------------------------
-void mafVMEManager::MSFSave()
+int mafVMEManager::MSFSave()
 //----------------------------------------------------------------------------
 {
+  int ret=MAF_OK;
+
   if(m_MSFFile.IsEmpty()) 
   {
     // new file to save: ask to the application which is the default
@@ -662,7 +666,7 @@ void mafVMEManager::MSFSave()
     wxString wildc = _("MAF Storage Format file (*.msf)|*.msf|Compressed file (*.zmsf)|*.zmsf");
     mafString file = mafGetSaveFile(m_MSFDir, wildc.c_str()).c_str();
     if(file.IsEmpty())
-      return;
+      return MAF_ERROR;
    
     wxString path, name, ext, file_dir;
     wxSplitPath(file.GetCStr(),&path,&name,&ext);
@@ -710,6 +714,7 @@ void mafVMEManager::MSFSave()
   m_Storage->SetURL(m_MSFFile.GetCStr());
   if (m_Storage->Store() != MAF_OK) // store the tree
   {
+    ret=false;
     mafLogMessage(_("Error during MSF saving"));
   }
   // add the msf (or zmsf) to the history
@@ -724,21 +729,17 @@ void mafVMEManager::MSFSave()
   }
 	m_FileHistory.Save(*m_Config);
   m_Modified = false;
+
+  return ret;
 }
 //----------------------------------------------------------------------------
-void mafVMEManager::MSFSaveAs()   
+int mafVMEManager::MSFSaveAs()   
 //----------------------------------------------------------------------------
 {
-  mafString oldFileName;
-
-  oldFileName=m_MSFFile;
-  m_MSFFile = ""; // set filenames to empty so the MSFSave method will ask for them
-  m_ZipFile = "";
-  m_MakeBakFile = false;
-  MSFSave();
-  //if the user cancel save operation the name will be empty 
-  if (m_MSFFile=="")
-    m_MSFFile=oldFileName;
+   m_MSFFile = ""; // set filenames to empty so the MSFSave method will ask for them
+   m_ZipFile = "";
+   m_MakeBakFile = false;
+   return MSFSave();
 }
 //----------------------------------------------------------------------------
 void mafVMEManager::Upload(mafString local_file, mafString remote_file)
