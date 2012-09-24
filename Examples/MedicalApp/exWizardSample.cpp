@@ -23,8 +23,8 @@
 //----------------------------------------------------------------------------
 
 #include "exWizardSample.h"
-#include "medWizardSelectionBlock.h"
-#include "medWizardOperationBlock.h"
+#include "medWizardBlockSelection.h"
+#include "medWizardBlockOperation.h"
 
 
 //--------------------------------------------------------------------------------
@@ -33,30 +33,37 @@ exWizardSample::exWizardSample( const wxString &label ):medWizard(label)
 {
   
   //Start Block (import a VTK file)   
-  medWizardOperaiontionBlock *opBlock=new medWizardOperaiontionBlock("START");
+  medWizardBlockOperation *opBlock=new medWizardBlockOperation("START");
   opBlock->SetRequiredView("");
   opBlock->VmeSelect("root");
   opBlock->SetRequiredOperation("mafOpImporterVTK");
   opBlock->SetNextBlock("opMove");
 
   //Move block (position the Block)
-  medWizardOperaiontionBlock *opBlock2=new medWizardOperaiontionBlock("opMove");
+  medWizardBlockOperation *opBlock2=new medWizardBlockOperation("opMove");
   opBlock2->SetRequiredView("VTK view");
   opBlock2->VmeSelect("lastChild");
   opBlock2->SetRequiredOperation("medOpMove");
   opBlock2->SetNextBlock("Select");
   
   //Select Block ask user if want to import another file
-  medWizardSelectionBlock *selectorBlock=new medWizardSelectionBlock("Select");
+  medWizardBlockSelection *selectorBlock=new medWizardBlockSelection("Select");
   selectorBlock->SetWindowTitle("Test Selector");
   selectorBlock->SetDescription("Wizard Selector Test window");
-  selectorBlock->AddChoice("Import another VTK","START");
+  selectorBlock->AddChoice("Import another VTK","deleteBlock"); 
   selectorBlock->AddChoice("End Wizard", "END");
+
+  //Move block (position the Block)
+  medWizardBlockOperation *deleteBlock=new medWizardBlockOperation("deleteBlock");
+  deleteBlock->SetRequiredOperation("DELETE");
+  deleteBlock->SetNextBlock("START");
+
 
   //add blocks to the wizard
   AddBlock(selectorBlock);
   AddBlock(opBlock);
   AddBlock(opBlock2);
+  AddBlock(deleteBlock);
 }
 
 //--------------------------------------------------------------------------------

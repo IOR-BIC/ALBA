@@ -14,8 +14,8 @@
 
 =========================================================================*/
 
-#ifndef __medWizardTypeCheckBlock_H__
-#define __medWizardTypeCheckBlock_H__
+#ifndef __medWizardBlockYesNoSelection_H__
+#define __medWizardBlockYesNoSelection_H__
 
 //----------------------------------------------------------------------------
 // includes :
@@ -29,46 +29,42 @@
 //----------------------------------------------------------------------------
 
 /**
-  Class Name: medWizardTypeCheckBlock.
-  Class for create a type check block, if the selected vme is wrong the wizard
-  will be aborted.
+  Class Name: medWizardSelectionBlock.
+  Class for create a multiple choice switch inside wizard graph
 */
-class MED_COMMON_EXPORT medWizardTypeCheckBlock : public medWizardBlock
+class MED_COMMON_EXPORT medWizardBlockYesNoSelection : public medWizardBlock
 {
 public:
 
   /** Default constructor */
-  medWizardTypeCheckBlock(const char *name);
+  medWizardBlockYesNoSelection(const char *name);
 
   /** Default destructor */
-  ~medWizardTypeCheckBlock();
+  ~medWizardBlockYesNoSelection();
     
   /** Set The title of the selection window */
   void SetWindowTitle(const char *Title);
 
-  /** Set the path for VME selection */
-  void VmeSelect(const char *path);
-
   /** Set The title of the selection window */
   void SetDescription(const char *description);
 
-  /** Add a new accepted type.
-      Uses the string of VME type.
-      */
-  void AddAcceptedType(const char *label);
+  /** Set The next block associated to yes user answer */
+  void SetNextBlockOnYes(const char *block);
 
-  /** Set name of the Block called after wrong check.
-      By default is set to "END" and the wizard will closed on wrong check. */     
-  void SetWrongTypeNextBlock(const char *block);
-
-  /** Set name of the Block called after check. */
-  void SetNextBlock(const char *block);
+  /** Set The next block associated to no user answer */
+  void SetNextBlockOnNo(const char *block);
 
   /** Return the name of the Block witch will be executed after this */
-  wxString GetNextBlock();
+  virtual wxString GetNextBlock();
+
+  /** This method has no sense in this class, use AddChoice() instead*/
+  virtual void SetNextBlock(const char *block){};
 
   /** Starts the execution of the block */
   virtual void ExcutionBegin();
+
+  /** Enable or Disable Cancel Button */
+  void EnableCancelButton(bool cancel=true);
 
 protected:
 
@@ -77,13 +73,9 @@ private:
 
   wxString m_Title;
   wxString m_Description;
-
-  wxString m_VmeSelect;
-  
-  std::vector <wxString> m_AcceptedVmes;
-  int m_TestPassed;
-  
-  wxString m_NextBlock;
-  wxString m_WrongTypeNextBlock;
+  wxString m_YesBlock;
+  wxString m_NoBlock;
+  bool m_CancelEnabled;
+  int m_UserYes;
 };
 #endif

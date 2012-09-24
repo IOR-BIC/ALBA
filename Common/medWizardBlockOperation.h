@@ -14,8 +14,8 @@
 
 =========================================================================*/
 
-#ifndef __medWizardOperaiontionBlock_H__
-#define __medWizardOperaiontionBlock_H__
+#ifndef __medWizardBlockOperation_H__
+#define __medWizardBlockOperation_H__
 
 //----------------------------------------------------------------------------
 // includes :
@@ -38,15 +38,15 @@
   *Run the operation
   *Hide some VME after operation termination
 */
-class MED_COMMON_EXPORT medWizardOperaiontionBlock : public medWizardBlock
+class MED_COMMON_EXPORT medWizardBlockOperation : public medWizardBlock
 {
 public:
   
   /** Default constructor */
-  medWizardOperaiontionBlock(const char *name);
+  medWizardBlockOperation(const char *name);
 
   /** Default destructor */
-  ~medWizardOperaiontionBlock();
+  ~medWizardBlockOperation();
 
   /** Set The name of the operation required view */
   void SetRequiredView(const char *View);
@@ -67,11 +67,6 @@ public:
       Multiple calls to this funcion correspond on multiple VME show*/
   void VmeHideAdd(const char *path);
 
-  /** Set name of the Block called after operation. */
-  void SetNextBlock(const char *block);
-
-  /** Return the name of the Block witch will be executed after this */
-  wxString GetNextBlock();
 
   /** Execute the block */
   void Execute();
@@ -86,7 +81,8 @@ public:
        Return an empty string if no operation is required
        There are three wizard specificic operation:
        SAVE Save the msf
-       SAVE_AS Save the msf whit name
+       SAVE_AS Save the msf with name
+       OPEN an msf
        PAUSE open an operation with only one "next step" button*/
    void SetRequiredOperation(const char *name);
 
@@ -109,7 +105,5 @@ private:
   bool m_AutoShowSelectedVME;
   std::vector < wxString > m_VmeShow;
   std::vector < wxString > m_VmeHide;
-  wxString m_NextBlock;
-
 };
 #endif

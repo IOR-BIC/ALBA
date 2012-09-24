@@ -23,64 +23,56 @@
 //----------------------------------------------------------------------------
 
 #include "medDecl.h"
-#include "medWizardSelectionBlock.h"
+#include "mafNode.h"
+#include "medWizardBlockTypeCheck.h"
 
 
 
 
 //----------------------------------------------------------------------------
-medWizardSelectionBlock::medWizardSelectionBlock(const char *name):medWizardBlock(name)
+medWizardBlockTypeCheck::medWizardBlockTypeCheck(const char *name):medWizardBlock(name)
 //----------------------------------------------------------------------------
 {
   //setting default values
-  m_SelectedChoice=0;
+  m_Title="Bad VME type";
+  m_Description="The Vme is of a wrong type,\nWizard will be closed!";
+  m_WrongTypeNextBlock="END"; 
 }
 
 //----------------------------------------------------------------------------
-medWizardSelectionBlock::~medWizardSelectionBlock()
+medWizardBlockTypeCheck::~medWizardBlockTypeCheck()
 //----------------------------------------------------------------------------
 {
   //clearing choices list
-  m_Choices.clear();
+  m_AcceptedVmes.clear();
 }
 
 //----------------------------------------------------------------------------
-void medWizardSelectionBlock::SetWindowTitle( const char *Title )
+void medWizardBlockTypeCheck::SetWindowTitle( const char *Title )
 //----------------------------------------------------------------------------
 {
   //setting the name of the window title
   m_Title=Title;
 }
 
-//----------------------------------------------------------------------------
-void medWizardSelectionBlock::AddChoice( const char *label, const char *block )
-//----------------------------------------------------------------------------
-{
-  //Creating a choice struct and push it in the choices array
-  blockChoice tmpChoice;
-  tmpChoice.label=label;
-  tmpChoice.block=block;
-  m_Choices.push_back(tmpChoice);
-}
+
 
 //----------------------------------------------------------------------------
-wxString medWizardSelectionBlock::GetNextBlock()
+wxString medWizardBlockTypeCheck::GetNextBlock()
 //----------------------------------------------------------------------------
 {
   wxString block;
   //Return the next block according on user choice
-  if (!m_Success)
-    block=m_AbortBlock;
-  else if (m_SelectedChoice>=0 || m_SelectedChoice >= m_Choices.size())
-    block=m_Choices[m_SelectedChoice].block;
+  if (m_TestPassed)
+    block=m_NextBlock;
   else 
-    //if the selection is outside the range we return a fake block
-    block="Selection problem";
+    block=m_WrongTypeNextBlock;
+
   return block;
 }
 
 //----------------------------------------------------------------------------
-void medWizardSelectionBlock::SetDescription( const char *description )
+void medWizardBlockTypeCheck::SetDescription( const char *description )
 //----------------------------------------------------------------------------
 {
   //set the description showed to the user
@@ -88,28 +80,54 @@ void medWizardSelectionBlock::SetDescription( const char *description )
 }
 
 
-
-void medWizardSelectionBlock::ExcutionBegin()
+//----------------------------------------------------------------------------
+void medWizardBlockTypeCheck::ExcutionBegin()
+//----------------------------------------------------------------------------
 {
   medWizardBlock::ExcutionBegin();
 
-  //Generating required wxstring choice array
-  wxString *choices = new wxString[m_Choices.size()];
+  m_TestPassed=false;
 
-  for(int i=0;i<m_Choices.size();i++)
-    choices[i]=m_Choices[i].label;
+  //Select the input VME for the operation
+  if (m_SelectedVME)
+    m_SelectedVME=m_SelectedVME->GetByPath(m_VmeSelect.c_str());
+  else
+    return;    
 
-  //Show Modal window
-  m_SelectedChoice = wxGetSingleChoiceIndex(m_Description,m_Title,m_Choices.size(), choices);
+  mafEventMacro(mafEvent(this,VME_SELECT,m_SelectedVME));
 
-  //User has pessed cancel
-  if (m_SelectedChoice<0)
-    Abort();
+  for (int i=0;i<m_AcceptedVmes.size();i++)
+    if (m_SelectedVME->IsA(m_AcceptedVmes[i].c_str()))
+      m_TestPassed=true;
 
-  //free mem 
-  delete[] choices;  
+  if (!m_TestPassed)
+    //Show Modal window
+    wxMessageBox(m_Description,m_Title, wxOK);
 }
 
+//----------------------------------------------------------------------------
+void medWizardBlockTypeCheck::VmeSelect( const char *path )
+//----------------------------------------------------------------------------
+{
+  //Set the path of the vme which was selected before operation start
+  m_VmeSelect=path;
+}
+
+
+//----------------------------------------------------------------------------
+void medWizardBlockTypeCheck::AddAcceptedType( const char *label )
+//----------------------------------------------------------------------------
+{
+  wxString accept=label;
+  m_AcceptedVmes.push_back(accept);
+}
+
+//----------------------------------------------------------------------------
+void medWizardBlockTypeCheck::SetWrongTypeNextBlock( const char *block )
+//----------------------------------------------------------------------------
+{
+  m_WrongTypeNextBlock=block;
+}
 
 
 

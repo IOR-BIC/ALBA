@@ -56,14 +56,26 @@ SET(PROJECT_SRCS
   medWizardManager.cpp
   medWizardManager.h
   
-  medWizardOperationBlock.cpp
-  medWizardOperationBlock.h
+  medWizardBlockOperation.cpp
+  medWizardBlockOperation.h
   
-  medWizardSelectionBlock.cpp
-  medWizardSelectionBlock.h
+  medWizardBlockSelection.cpp
+  medWizardBlockSelection.h
   
-  medWizardTypeCheckBlock.cpp
-  medWizardTypeCheckBlock.h
+  medWizardBlockTypeCheck.cpp
+  medWizardBlockTypeCheck.h
+  
+  medWizardBlockVMESelection.cpp
+  medWizardBlockVMESelection.h
+  
+  medWizardBlockInformation.cpp
+  medWizardBlockInformation.h
+
+  medWizardBlockYesNoSelection.cpp
+  medWizardBlockYesNoSelection.h
+  
+  medWizardWaitOp.cpp
+  medWizardWaitOp.h
   
   
 	#### SHOULD BE COMMITTED DOWN ######

@@ -28,7 +28,7 @@
 // forward reference
 //----------------------------------------------------------------------------
 class medWizard;
-class medOpWizardWait;
+class medWizardWaitOp;
 /**
   Class Name: medWizardManager.
   Class for wizards management 
@@ -103,6 +103,6 @@ private:
   mafObserver       *m_Listener; 
   mafNode						*m_Selected; ///< Pointer to the current selected node.
   bool               m_Warn; ///< Flag to warn the user when an operation that can not undo is starting.
-  medOpWizardWait   *m_WaitOp;
+  medWizardWaitOp   *m_WaitOp;
 };
 #endif
