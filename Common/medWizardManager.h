@@ -29,6 +29,8 @@
 //----------------------------------------------------------------------------
 class medWizard;
 class medWizardWaitOp;
+class mafGUISettingsDialog;
+class medWizardSettings;
 /**
   Class Name: medWizardManager.
   Class for wizards management 
@@ -86,6 +88,9 @@ public:
   /** returns a description about current step in wizard */
   mafString GetDescription();
 
+  /** Fill the setting dialog with the settings associated to the plugged operations.*/
+  void FillSettingDialog(mafGUISettingsDialog *settingDialog);
+
 private:
 
   
@@ -98,6 +103,7 @@ private:
   int m_NumWizard;
   std::vector<medWizard *> m_WizardList; ///< List of pointer of plugged wizzard.
   medWizard *m_RunningWizard;
+  medWizardSettings *m_Settings;
   wxMenuBar         *m_MenuBar; ///< Pointer to the Application's main menù
   wxToolBar         *m_ToolBar; ///< Pointer to the application's Toolbal
   mafObserver       *m_Listener; 

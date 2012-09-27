@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2Medical
- Module: medWizardOperaiontionBlock
+ Module: medWizardBlockOperation
  Authors: Gianluigi Crimi
  
  Copyright (c) B3C

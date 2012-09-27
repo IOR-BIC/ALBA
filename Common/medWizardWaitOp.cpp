@@ -77,10 +77,10 @@ void medWizardWaitOp::OpRun()
   m_Gui->Label("");
   m_Gui->Label("");
   m_Gui->Label("");
-  m_Gui->Label("Go to next Step:");
+  m_Gui->Label("");
 
   //exit op button
-  m_Gui->TwoButtons(wxOK,wxCANCEL,"To next Step","Cancel");
+  m_Gui->TwoButtons(wxOK,wxCANCEL,"To next step","Cancel");
 
   
   m_Gui->Divider();
@@ -103,6 +103,14 @@ void medWizardWaitOp::OnEvent(mafEventBase *maf_event)
         HideGui();
         mafEventMacro(mafEvent(this,OP_RUN_OK));
       }
+    break;
+    case wxCANCEL:
+      {
+        //exit operation
+        HideGui();
+        mafEventMacro(mafEvent(this,OP_RUN_CANCEL));
+      }
+    break;
     default:
       mafEventMacro(*e);
       break; 

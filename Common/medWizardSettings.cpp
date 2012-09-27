@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2Medical
- Module: medWizardSelectionBlock
+ Module: medOpComputeWrapping
  Authors: Gianluigi Crimi
  
  Copyright (c) B3C
@@ -14,7 +14,8 @@
 
 =========================================================================*/
 
-#include "medDefines.h" 
+
+#include "mafDefines.h"
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
@@ -22,96 +23,85 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "medDecl.h"
-#include "medWizardBlockSelection.h"
-
-
-
+#include "medWizardSettings.h"
+#include <wx/intl.h>
+#include "mafGUI.h"
+#include "mafGUIDialog.h"
 
 //----------------------------------------------------------------------------
-medWizardBlockSelection::medWizardBlockSelection(const char *name):medWizardBlock(name)
+medWizardSettings::medWizardSettings(mafObserver *Listener, const mafString &label):mafGUISettings(Listener, label)
 //----------------------------------------------------------------------------
 {
-  //setting default values
-  m_SelectedChoice=0;
+  //default constructor
+  m_ShowInformationBoxes = true; 
+  InitializeSettings();
 }
 
 //----------------------------------------------------------------------------
-medWizardBlockSelection::~medWizardBlockSelection()
+medWizardSettings::~medWizardSettings() 
 //----------------------------------------------------------------------------
 {
-  //clearing choices list
-  m_Choices.clear();
+  //default destructor
 }
 
 //----------------------------------------------------------------------------
-void medWizardBlockSelection::SetWindowTitle( const char *Title )
+void medWizardSettings::CreateGui()
 //----------------------------------------------------------------------------
 {
-  //setting the name of the window title
-  m_Title=Title;
+
+  //Creating Wizard Setting Gui
+  m_Gui = new mafGUI(this);   
+  m_Gui->Label(_("Wizard Settings"));
+  m_Gui->Label("");
+  m_Gui->Label("");
+  m_Gui->Label("");
+  m_Gui->Bool(WIZARD_SETTINGS_ID,"Show information boxes",&m_ShowInformationBoxes,true);
 }
 
 //----------------------------------------------------------------------------
-void medWizardBlockSelection::AddChoice( const char *label, const char *block )
+void medWizardSettings::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
-  //Creating a choice struct and push it in the choices array
-  blockChoice tmpChoice;
-  tmpChoice.label=label;
-  tmpChoice.block=block;
-  m_Choices.push_back(tmpChoice);
+  switch(maf_event->GetId())
+  {
+    case WIZARD_SETTINGS_ID:
+    {
+      //Save options on user changes
+      m_Config->Write("Wizard_info_boxes",m_ShowInformationBoxes);
+      m_Config->Flush();
+    }
+    break;
+    default:
+      mafEventMacro(*maf_event);
+    break; 
+  }
 }
 
 //----------------------------------------------------------------------------
-wxString medWizardBlockSelection::GetNextBlock()
+void medWizardSettings::InitializeSettings()
 //----------------------------------------------------------------------------
 {
-  wxString block;
-  //Return the next block according on user choice
-  if (!m_Success)
-    block=m_AbortBlock;
-  else if (m_SelectedChoice>=0 || m_SelectedChoice >= m_Choices.size())
-    block=m_Choices[m_SelectedChoice].block;
-  else 
-    //if the selection is outside the range we return a fake block
-    block="Selection problem";
-  return block;
+  //On first run i cannot read configuration
+  if(!m_Config->Read("Wizard_info_boxes", &m_ShowInformationBoxes))
+    //So i will save default value
+    m_Config->Write("Wizard_info_boxes",m_ShowInformationBoxes);
+  m_Config->Flush();
 }
 
 //----------------------------------------------------------------------------
-void medWizardBlockSelection::SetDescription( const char *description )
+void medWizardSettings::SetShowInformationBoxes( int value )
 //----------------------------------------------------------------------------
 {
-  //set the description showed to the user
-  m_Description=description;
+  //Update value and store it to persistent memory
+  m_ShowInformationBoxes=value;
+  m_Config->Write("Wizard_info_boxes",m_ShowInformationBoxes);
+  m_Config->Flush();
 }
 
-
-
 //----------------------------------------------------------------------------
-void medWizardBlockSelection::ExcutionBegin()
+int medWizardSettings::GetShowInformationBoxes()
 //----------------------------------------------------------------------------
 {
-  medWizardBlock::ExcutionBegin();
-
-  //Generating required wxstring choice array
-  wxString *choices = new wxString[m_Choices.size()];
-
-  for(int i=0;i<m_Choices.size();i++)
-    choices[i]=m_Choices[i].label;
-
-  //Show Modal window
-  m_SelectedChoice = wxGetSingleChoiceIndex(m_Description,m_Title,m_Choices.size(), choices);
-
-  //User has pessed cancel
-  if (m_SelectedChoice<0)
-    Abort();
-
-  //free mem 
-  delete[] choices;  
+  //return current settings
+  return m_ShowInformationBoxes;
 }
-
-
-
-

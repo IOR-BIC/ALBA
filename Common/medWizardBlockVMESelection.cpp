@@ -51,26 +51,32 @@ void medWizardBlockVMESelection::SetWindowTitle( const char *Title )
 }
 
 
+//----------------------------------------------------------------------------
 void medWizardBlockVMESelection::ExcutionBegin()
+//----------------------------------------------------------------------------
 {
   mafNode *selVME;
   medWizardBlock::ExcutionBegin();
 
+  //Setting global variable witch can be referred by static function
   globalAccept=m_AcceptedVME;
 
   mafString title = m_Title.c_str();
   mafEvent e(this,VME_CHOOSE);
   e.SetString(&title);
-  e.SetArg((long)(&VMEAccept)); // accept only mafVMEVolumeGray
+  e.SetArg((long)(&VMEAccept)); 
+  // accept only Specified VME
   mafEventMacro(e);
   selVME=e.GetVme();
 
   if(selVME)
   {
+    //Select vme 
     m_SelectedVME=selVME;
     mafEventMacro(mafEvent(this,VME_SELECT,m_SelectedVME));
   }
   else
+    //Abort on user cancel
     Abort();
 }
 
@@ -81,7 +87,9 @@ int medWizardBlockVMESelection::VMEAccept(mafNode *node)
   return (node && node->IsA(globalAccept));
 }
 
+//----------------------------------------------------------------------------
 void medWizardBlockVMESelection::SetAcceptedVME( const char *VME )
+//----------------------------------------------------------------------------
 {
   m_AcceptedVME=VME;
 }

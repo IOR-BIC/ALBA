@@ -77,14 +77,16 @@ SET(PROJECT_SRCS
   medWizardWaitOp.cpp
   medWizardWaitOp.h
   
+  medWizardSettings.cpp
+  medWizardSettings.h
   
-	#### SHOULD BE COMMITTED DOWN ######
-	mafDbg.h
-	mafDataChecksum.h
-	##################################
+  #### SHOULD BE COMMITTED DOWN ######
+  mafDbg.h
+  mafDataChecksum.h
+  ##################################
 	
-	#Removed from vtkMED because it need of MAF Utilities
-	../BES_Beta/vtkMAF/vtkMAFLargeDataSetCallback.cxx
+  #Removed from vtkMED because it need of MAF Utilities
+  ../BES_Beta/vtkMAF/vtkMAFLargeDataSetCallback.cxx
   ../BES_Beta/vtkMAF/vtkMAFLargeDataSetCallback.h
 )
 

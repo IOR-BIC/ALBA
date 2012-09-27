@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2Medical
- Module: medWizardSelectionBlock
+ Module: medWizardBlockTypeCheck
  Authors: Gianluigi Crimi
  
  Copyright (c) B3C

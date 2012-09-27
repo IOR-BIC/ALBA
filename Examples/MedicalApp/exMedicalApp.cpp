@@ -334,7 +334,7 @@ bool exMedicalApp::OnInit()
   //------------------------------------------------------------
 
   //A simple wizard sample
-  m_Logic->Plug(new exWizardSample("import & move loop"),"");
+  m_Logic->Plug(new exWizardSample("Import loop"),"");
 #endif
 
 	//------------------------------------------------------------
