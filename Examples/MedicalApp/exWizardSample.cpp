@@ -25,25 +25,32 @@
 #include "exWizardSample.h"
 #include "medWizardBlockSelection.h"
 #include "medWizardBlockOperation.h"
+#include "medWizardBlockInformation.h"
 
 
 //--------------------------------------------------------------------------------
 exWizardSample::exWizardSample( const wxString &label ):medWizard(label)
 //--------------------------------------------------------------------------------
 {
+
+  medWizardBlockInformation *infoBlock=new medWizardBlockInformation("START");
+  infoBlock->SetBoxLabel("Info");
+  infoBlock->SetDescription("Import Loop:\nYou can import and show a series of VTK files.");
+  infoBlock->SetWindowTitle("information");
+  infoBlock->SetNextBlock("Import");
   
   //Start Block (import a VTK file)   
-  medWizardBlockOperation *opBlock=new medWizardBlockOperation("START");
+  medWizardBlockOperation *opBlock=new medWizardBlockOperation("Import");
   opBlock->SetRequiredView("");
   opBlock->VmeSelect("root");
   opBlock->SetRequiredOperation("mafOpImporterVTK");
-  opBlock->SetNextBlock("opMove");
+  opBlock->SetNextBlock("opPause");
 
   //Move block (position the Block)
-  medWizardBlockOperation *opBlock2=new medWizardBlockOperation("opMove");
+  medWizardBlockOperation *opBlock2=new medWizardBlockOperation("opPause");
   opBlock2->SetRequiredView("VTK view");
   opBlock2->VmeSelect("lastChild");
-  opBlock2->SetRequiredOperation("medOpMove");
+  opBlock2->SetRequiredOperation("PAUSE");
   opBlock2->SetNextBlock("Select");
   
   //Select Block ask user if want to import another file
@@ -56,10 +63,11 @@ exWizardSample::exWizardSample( const wxString &label ):medWizard(label)
   //Move block (position the Block)
   medWizardBlockOperation *deleteBlock=new medWizardBlockOperation("deleteBlock");
   deleteBlock->SetRequiredOperation("DELETE");
-  deleteBlock->SetNextBlock("START");
+  deleteBlock->SetNextBlock("Import");
 
 
   //add blocks to the wizard
+  AddBlock(infoBlock);
   AddBlock(selectorBlock);
   AddBlock(opBlock);
   AddBlock(opBlock2);
