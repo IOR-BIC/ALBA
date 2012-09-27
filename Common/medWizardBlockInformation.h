@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2Medical
- Module: medWizardSelectionBlock
+ Module: medWizardBlockInformation
  Authors: Gianluigi Crimi
  
  Copyright (c) B3C
@@ -32,9 +32,14 @@
   Class Name: medWizardSelectionBlock.
   Class for create a multiple choice switch inside wizard graph
 */
-class MED_COMMON_EXPORT medWizardBlockInformation : public medWizardBlock
+class MED_COMMON_EXPORT medWizardBlockInformation : public medWizardBlock,mafObserver
 {
 public:
+
+  enum WIZARD_INFO
+  {
+    WIZARD_INFO_SHOW_ID = MINID,
+  };
 
   /** Default constructor */
   medWizardBlockInformation(const char *name);
@@ -49,7 +54,8 @@ public:
   void SetDescription(const char *description);
 
   /** Set name of the window image
-      if no image is setted no image will be showed*/
+      if no image is setted no image will be showed
+      The image will be stored in <APP_DIR>\WizardImages\*/
   void SetImage(const char *imageFilename);
 
   /** Set name of the Block called after operation. */
@@ -71,10 +77,13 @@ public:
 
 protected:
 
-
+  /** Event management */
+  virtual void OnEvent(mafEventBase *maf_event);
+  
 private:
 
   bool m_HorizontalImage;
+  int m_ShowBoxes;
   wxString m_Title;
   wxString m_Description;
   wxString m_BoxLabel;
