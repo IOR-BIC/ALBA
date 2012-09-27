@@ -200,6 +200,18 @@ void medLogicWithManagers::OnEvent(mafEventBase *maf_event)
 	} // end if SafeDowncast
 }
 
+
+//----------------------------------------------------------------------------
+void medLogicWithManagers::Init(int argc, char **argv)
+//----------------------------------------------------------------------------
+{
+  if (m_WizardManager)
+    m_WizardManager->FillSettingDialog(m_SettingsDialog);
+  
+  mafLogicWithManagers::Init(argc,argv);
+}
+
+
 //----------------------------------------------------------------------------
 void medLogicWithManagers::Plug( mafOp *op, wxString menuPath /*= ""*/, bool canUndo /*= true*/, mafGUISettings *setting /*= NULL*/ )
 //----------------------------------------------------------------------------
@@ -355,6 +367,7 @@ void medLogicWithManagers::WizardRunTerminated()
 void medLogicWithManagers::UpdateFrameTitle()
 //----------------------------------------------------------------------------
 {
+  //Special Window title management during wizards
   if (m_WizardRunning)
   {
     wxString title(m_AppTitle);
@@ -367,7 +380,7 @@ void medLogicWithManagers::UpdateFrameTitle()
 
 //----------------------------------------------------------------------------
 void medLogicWithManagers::OnFileOpen(const char *file_to_open)
-  //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 {
   if(m_VMEManager)
   {

@@ -68,7 +68,9 @@ public:
   /** Manage application exception and allow to save at least the tree. */
   virtual void HandleException();
 
-
+  /** Program Initialization */
+  virtual void Init(int argc, char **argv);
+  
 protected:
   /** Show contextual menu for views when right mouse click arrives.*/
   void ViewContextualMenu(bool vme_menu);
