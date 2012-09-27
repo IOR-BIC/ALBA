@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2Medical
- Module: medOpComputeWrapping
+ Module: medOpWizardWait
  Authors: Gianluigi Crimi
  
  Copyright (c) B3C
@@ -37,7 +37,7 @@ class MED_COMMON_EXPORT medWizardWaitOp: public mafOp
 {
 public:
   /** constructor */
-  medWizardWaitOp(const wxString &label = "WizardWait");
+  medWizardWaitOp(const wxString &label = "Go to text step\n");
   /** destructor */
   ~medWizardWaitOp();
 
