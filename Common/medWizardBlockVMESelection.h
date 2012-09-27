@@ -54,7 +54,7 @@ public:
 
 
 protected:
-
+  //** VME Accept function */
   static int VMEAccept(mafNode *node);
 
 private:

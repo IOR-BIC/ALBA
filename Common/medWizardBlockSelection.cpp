@@ -89,7 +89,9 @@ void medWizardBlockSelection::SetDescription( const char *description )
 
 
 
+//----------------------------------------------------------------------------
 void medWizardBlockSelection::ExcutionBegin()
+//----------------------------------------------------------------------------
 {
   medWizardBlock::ExcutionBegin();
 
