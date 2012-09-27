@@ -24,8 +24,10 @@
 
 #include "medDecl.h"
 #include "medWizardManager.h"
+#include "medWizardSettings.h"
 #include "medWizard.h"
 #include "medWizardWaitOp.h"
+#include "mafGUISettingsDialog.h"
 #include <wx/tokenzr.h>
 
 //----------------------------------------------------------------------------
@@ -39,6 +41,7 @@ medWizardManager::medWizardManager()
   m_Listener = NULL;
   m_Selected = NULL;
   m_RunningWizard =NULL;
+  m_Settings=new medWizardSettings(this);
   m_NumWizard = 0;
   m_WizardList.clear();
   m_WaitOp = new medWizardWaitOp;
@@ -56,6 +59,17 @@ medWizardManager::~medWizardManager()
   m_WizardList.clear();
 
   delete m_WaitOp;
+  delete m_Settings;
+}
+
+
+//----------------------------------------------------------------------------
+void medWizardManager::FillSettingDialog(mafGUISettingsDialog *settingDialog)
+//----------------------------------------------------------------------------
+{
+  //Fill the settings menu with wizard specific settings
+  if (m_Settings != NULL)
+    settingDialog->AddPage(m_Settings->GetGui(), m_Settings->GetLabel());
 }
 
 //----------------------------------------------------------------------------
@@ -226,6 +240,18 @@ void medWizardManager::OnEvent( mafEventBase *maf_event )
        mafEventMacro(*e);
      }
     break;
+    case WIZARD_INFORMATION_BOX_SHOW_SET:
+      {
+        //update the wizard settings
+        m_Settings->SetShowInformationBoxes(e->GetBool());
+      }
+    break;
+    case WIZARD_INFORMATION_BOX_SHOW_GET:
+      {
+        //get the wizard settings and update the event to inform the caller
+        e->SetBool(m_Settings->GetShowInformationBoxes());
+      }
+    break;
     case WIZARD_RUN_OP:
       { 
         //Special operation for the wizard
@@ -264,7 +290,7 @@ void medWizardManager::OnEvent( mafEventBase *maf_event )
     break;
     default:
       //All event form wizard (like vme select/show, view request, ecc...)
-      //will be forwared up to logic
+      //will be forwarded up to logic
       mafEventMacro(*e);
       break;
     } // end switch case
