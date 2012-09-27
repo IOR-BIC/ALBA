@@ -5187,7 +5187,14 @@ bool medOpSegmentation::SegmentedVolumeAccept(mafNode* node)
     volumeToCheck->GetOutput()->GetBounds(b);
     for(int i = 0; i < 6; i++)
     {
-      if((b[i] != m_CurrentVolumeBounds[i])) // Workaround: vme with children change its bounds
+      char cVolBoundStr[100],bVolBoundStr[100];
+      double cVolBound,bVolBound;
+      sprintf(cVolBoundStr,"%f",m_CurrentVolumeBounds[i]);
+      sprintf(bVolBoundStr,"%f",b[i]);
+      sscanf(cVolBoundStr,"%f",&cVolBound);
+      sscanf(bVolBoundStr,"%f",&bVolBound);
+
+      if((cVolBound != bVolBound)) // Workaround: vme with children change its bounds
       {
         return false;
       }
