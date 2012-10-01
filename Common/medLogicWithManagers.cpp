@@ -145,6 +145,8 @@ void medLogicWithManagers::OnEvent(mafEventBase *maf_event)
         m_CancelledBeforeOpStarting=true;
         UpdateFrameTitle();
         m_OpManager->OpRun(*(e->GetString()));
+        //If the op is started the value of m_CancelledBeforeOpStarting 
+        //is changed by OP_RUN_STARTING event
         if (m_CancelledBeforeOpStarting)
         {
           m_CancelledBeforeOpStarting=false;
@@ -159,6 +161,14 @@ void medLogicWithManagers::OnEvent(mafEventBase *maf_event)
         m_CancelledBeforeOpStarting=true;
         UpdateFrameTitle();
         m_OpManager->OpRun(OP_DELETE);
+        m_WizardManager->WizardContinue(true);
+      }
+    break;
+    case WIZARD_OP_NEW:
+      {
+        //Running an op required from the wizard
+        if(m_VMEManager)
+          m_VMEManager->MSFNew();
         m_WizardManager->WizardContinue(true);
       }
     break;

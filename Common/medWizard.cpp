@@ -30,10 +30,11 @@
 
 
 //----------------------------------------------------------------------------
-medWizard::medWizard(const wxString &label)
+medWizard::medWizard(const wxString &label,  const wxString &name)
 //----------------------------------------------------------------------------
 {
   //Setting default values
+  m_Name=name;
   m_Label     = label;
   m_CurrentBlock=NULL;
   m_Listener=NULL;
@@ -128,10 +129,18 @@ int medWizard::GetId()
 
 //----------------------------------------------------------------------------
 wxString medWizard::GetLabel()
-//----------------------------------------------------------------------------
+  //----------------------------------------------------------------------------
 {
   //return the label
   return m_Label;
+}
+
+//----------------------------------------------------------------------------
+wxString medWizard::GetName()
+//----------------------------------------------------------------------------
+{
+  //return the label
+  return m_Name;
 }
 
 //----------------------------------------------------------------------------
@@ -206,7 +215,25 @@ void medWizard::BlockExecutionEnd()
   //if the next block is "END" the execution of the wizard is terminated
   if (nextBlock=="END")
   {
+    m_CurrentBlock=NULL;
     mafEventMacro(mafEvent(this,WIZARD_RUN_TERMINATED,true));
+  }
+  //If the next block is in the form WIZARD{<name>} We switch to the wizard <name> and execute it
+  else if (nextBlock.StartsWith("WIZARD{"))
+  {
+    m_CurrentBlock=NULL;
+    //checking match bracket 
+    if (nextBlock[nextBlock.size()-1] != '}')
+    {
+      mafLogMessage("WIZARD special keyword error: WIZARD{<name>} wrong format");
+      mafEventMacro(mafEvent(this,WIZARD_RUN_TERMINATED,true));
+    }
+    else 
+    {
+      //getting the wizard substring
+      mafString wizardName = nextBlock.SubString(7,nextBlock.size()-2).c_str();
+      mafEventMacro(mafEvent(this,WIZARD_SWITCH,&wizardName));
+    }
   }
   else
   {
@@ -258,6 +285,7 @@ void medWizard::ContinueExecution(int opSuccess)
       //if the operation has aborted by the user we abort the entire wizard
       //this behavior can be updated for error management
       mafEventMacro(mafEvent(this,WIZARD_RUN_TERMINATED,false));
+      m_CurrentBlock=NULL;
     }
     else
     {

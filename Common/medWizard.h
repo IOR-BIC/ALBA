@@ -45,7 +45,7 @@ public:
   medWizard();
 
   /** Default constructor */
-  medWizard(const wxString &label);
+  medWizard(const wxString &label, const wxString &name="");
 
   /** Default destructor */
   ~medWizard();
@@ -74,6 +74,9 @@ public:
   /** Return the Menu label of the wizard*/
   wxString GetLabel();
 
+  /** Return the name of the wizard*/
+  wxString GetName();
+
   /** Initialize wizard's variables according to the parameter's list. */
   virtual void SetParameters(void *param) {};
 
@@ -85,6 +88,8 @@ public:
 
   /** returns a description about current step in wizard */
   mafString GetDescription();
+
+  
 
 protected:
 
@@ -115,9 +120,8 @@ private:
   wxString        m_MenuPath;
   int							m_Id; ///< Index of the wizard referring to the wizard list.
   wxString				m_Label; ///< Label of the wizard that will appear on menu.
+  wxString				m_Name; ///< Label of the wizard that will appear on menu.
   mafObserver    *m_Listener;
-  mafNode        *m_SelectedVME; 
-
-  
+  mafNode        *m_SelectedVME;   
 };
 #endif
