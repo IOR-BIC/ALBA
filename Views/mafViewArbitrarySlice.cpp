@@ -142,7 +142,6 @@ void mafViewArbitrarySlice::PackageView()
 	//----------------------------------------------------------------------------
 {
 	m_ViewArbitrary = new mafViewVTK("",CAMERA_PERSPECTIVE);
-	//m_ViewArbitrary->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice");
 	m_ViewArbitrary->PlugVisualPipe("mafVMEVolumeGray", "mafPipeBox", MUTEX);
 	m_ViewArbitrary->PlugVisualPipe("mafVMELabeledVolume", "mafPipeBox", MUTEX);
 
@@ -205,8 +204,6 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 			filter->GetOutput()->GetCenter(m_SliceCenterSurface);
 			filter->GetOutput()->GetCenter(m_SliceCenterSurfaceReset);
 
-			//((mafViewSlice*)m_ChildViewList[SLICE_VIEW])->GetRWI()->GetCamera()->ApplyTransform(transform);
-
 			//Create a matrix to permit the reset of the gizmos
 			vtkTransform *TransformReset;
 			vtkNEW(TransformReset);
@@ -225,7 +222,6 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 			m_Slicer->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 0.0));
 			m_Slicer->ReparentTo(mafVME::SafeDownCast(node));
 			m_Slicer->SetPose(m_SliceCenterSurfaceReset,m_SliceAngleReset,0);
-			//m_Slicer->SetName("Slicer");
 			m_Slicer->SetAbsMatrix(*m_MatrixReset);
 			m_Slicer->SetSlicedVMELink(mafVME::SafeDownCast(node));
 			m_Slicer->GetMaterial()->m_ColorLut->DeepCopy(mafVMEVolumeGray::SafeDownCast(m_CurrentVolume)->GetMaterial()->m_ColorLut);
@@ -280,11 +276,7 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 			m_Gui->FitGui();
 			m_Gui->Update();
 
-			//------------------
-			// Bug 2833 fix
-			// http://bugzilla.b3c.it/show_bug.cgi?id=2833
-			//------------------
-			// m_Slicer->SetVisibleToTraverse(false);
+			m_Slicer->SetVisibleToTraverse(false);
 
 			vtkDEL(pts);
 			vtkDEL(pd);
@@ -302,8 +294,6 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 				((mafViewSlice*)m_ChildViewList[SLICE_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
 
 				mafPipeSurface *PipeArbitraryViewSurface = mafPipeSurface::SafeDownCast(((mafViewSlice *)m_ChildViewList[ARBITRARY_VIEW])->GetNodePipe(node));
-				//PipeArbitraryViewSurface->SetSlice(m_SliceCenterSurface);
-				//PipeArbitraryViewSurface->SetNormal(normal);
 				mafPipeSurfaceSlice *PipeSliceViewSurface = mafPipeSurfaceSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe(node));
 
 				double surfaceOriginTranslated[3];
@@ -314,7 +304,6 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 
 				PipeSliceViewSurface->SetSlice(surfaceOriginTranslated);
 				PipeSliceViewSurface->SetNormal(normal);
-				//mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 			}
 		}
 		else if(Vme->IsA("medVMEPolylineEditor"))
@@ -337,7 +326,6 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 				surfaceOriginTranslated[2] = m_SliceCenterSurface[2] + normal[2] * 0.1;
 
 				PipeSliceViewPolylineEditor->SetSlice(surfaceOriginTranslated, normal);        
-				//mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 			}
 		}
 		else if(Vme->IsA("mafVMEMesh"))
@@ -380,7 +368,6 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 
 		if(((mafVME *)Vme)->GetOutput()->IsA("mafVMEOutputVolume"))
 		{
-			//this->GetSceneGraph()->VmeRemove(m_Slicer);
 			m_AttachCamera->SetVme(NULL);
 			m_Slicer->SetBehavior(NULL);
 			m_Slicer->ReparentTo(NULL);
@@ -478,7 +465,6 @@ void mafViewArbitrarySlice::OnEventGizmoTranslate(mafEventBase *maf_event)
 			mafNEW(matrix);
 			matrix->Identity();
 			matrix->SetVTKMatrix(TransformReset->GetMatrix());
-			//m_GizmoRotate->SetAbsPose(matrix);
 
 			//for each surface visualized change the center of the cut plane
 			mafNode *root=m_CurrentVolume->GetRoot();
@@ -586,10 +572,8 @@ void mafViewArbitrarySlice::OnEventGizmoRotate(mafEventBase *maf_event)
 					if(PipeSliceViewSurface)
 					{
 
-						//PipeArbitraryViewSurface->SetNormal(normal);
 						PipeSliceViewSurface->SetNormal(normal);
 
-						//PipeArbitraryViewSurface->SetSlice(m_SliceCenterSurface);
 						PipeSliceViewSurface->SetSlice(surfaceOriginTranslated);
 					}
 				}
@@ -607,10 +591,8 @@ void mafViewArbitrarySlice::OnEventGizmoRotate(mafEventBase *maf_event)
 					if(PipeSliceViewMesh)
 					{
 
-						//PipeArbitraryViewSurface->SetNormal(normal);
 						PipeSliceViewMesh->SetNormal(normal);
 
-						//PipeArbitraryViewSurface->SetSlice(m_SliceCenterSurface);
 						PipeSliceViewMesh->SetSlice(surfaceOriginTranslated);
 					}
 				}
@@ -723,7 +705,6 @@ void mafViewArbitrarySlice::OnEventThis(mafEventBase *maf_event)
 							surfaceOriginTranslated[1] = m_SliceCenterSurfaceReset[1] + normal[1] * 0.1;
 							surfaceOriginTranslated[2] = m_SliceCenterSurfaceReset[2] + normal[2] * 0.1;
 
-							//PipeArbitraryViewSurface->SetSlice(surfaceOriginTranslated);
 							PipeSliceViewSurface->SetSlice(surfaceOriginTranslated);
 						}
 					}
@@ -806,9 +787,12 @@ mafGUI* mafViewArbitrarySlice::CreateGui()
 	m_Gui = new mafGUI(this);
 
 	//combo box to choose the type of gizmo
+	m_Gui->Label("");
+	m_Gui->Label("Choose Gizmo");
 	wxString Text[2]={_("Gizmo Translation"),_("Gizmo Rotation")};
-	m_Gui->Combo(ID_COMBO_GIZMOS,"Gizmo",&m_TypeGizmo,2,Text);
+	m_Gui->Combo(ID_COMBO_GIZMOS,"",&m_TypeGizmo,2,Text);
 
+	m_Gui->Label("");
 	//button to reset at the start position
 	m_Gui->Button(ID_RESET,_("Reset"),"");
 	m_Gui->Divider(2);
@@ -883,6 +867,7 @@ void mafViewArbitrarySlice::CameraUpdate()
 	}
 	for(int i=0; i<m_NumOfChildView; i++)
 	{
+		
 		m_ChildViewList[i]->CameraUpdate();
 	}
 }
