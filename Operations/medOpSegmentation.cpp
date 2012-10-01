@@ -5183,22 +5183,86 @@ bool medOpSegmentation::SegmentedVolumeAccept(mafNode* node)
       return false;
     }
     /* loaded volume must have the same bounds of the input volume */
-    double b[6];
-    volumeToCheck->GetOutput()->GetBounds(b);
-    for(int i = 0; i < 6; i++)
-    {
-      char cVolBoundStr[100],bVolBoundStr[100];
-      double cVolBound,bVolBound;
-      sprintf(cVolBoundStr,"%f",m_CurrentVolumeBounds[i]);
-      sprintf(bVolBoundStr,"%f",b[i]);
-      sscanf(cVolBoundStr,"%f",&cVolBound);
-      sscanf(bVolBoundStr,"%f",&bVolBound);
+    
+    double checkVolBounds[6];
+    int checkVolDim[3];
+    double checkVolSpacing[3];
 
-      if((cVolBound != bVolBound)) // Workaround: vme with children change its bounds
+    volumeToCheck->GetOutput()->GetBounds(checkVolBounds);
+
+    //Vtk save/load system writes outputs to strings so there can be some approximations problem 
+    //that can affect saved versus unsaved data comparison 
+    //For this reason we need to compare data bounds after a conversion to string 
+    if (!vtkImageData::SafeDownCast(volumeToCheck->GetOutput()->GetVTKData()))
+    {
+      //Rectilinear grid: we compare only the bound of the volume
+      for(int i = 0; i < 6; i++)
       {
-        return false;
+        double cVolBound,bVolBound;
+        std::stringstream cVolBoundStr,bVolBoundStr;
+        //We use stringstream to simulate VTK use of filestream
+        cVolBoundStr << m_CurrentVolumeBounds[i];
+        bVolBoundStr << checkVolBounds[i];
+        cVolBoundStr >> cVolBound;
+        bVolBoundStr >> bVolBound;
+      
+        if((cVolBound != bVolBound))
+        {
+          return false;
+        }
       }
     }
+    else
+    {
+      //Image data case: We need to simulate VTK bounds calculus.
+      //VTK does not saves the bound of the volume to disk
+      //it saves origin, spacing, and dimensions (as number of voxels)
+      //Then on loading it recalculate the bounds from this data, and obtain 
+      //an amplification of the approximation error.
+      //In this case we need to simulate this process of error amplification.
+      vtkImageData::SafeDownCast(volumeToCheck->GetOutput()->GetVTKData())->GetDimensions(checkVolDim);
+      vtkImageData::SafeDownCast(volumeToCheck->GetOutput()->GetVTKData())->GetSpacing(checkVolSpacing);
+      for(int i = 0; i < 3; i++)
+      {
+        double cVolBound,bVolBound;
+        std::stringstream cVolBoundStr,bVolBoundStr;
+        cVolBoundStr << m_CurrentVolumeBounds[i];
+        bVolBoundStr << checkVolBounds[i];
+        cVolBoundStr >> cVolBound;
+        bVolBoundStr >> bVolBound;
+
+        if((cVolBound != bVolBound)) 
+        {
+          return false;
+        }
+      }
+      for(int i = 0; i < 3; i++)
+      {
+        double cVolBound,bVolBound,cVolSpacing,bVolSpacing,cVolTot,bVolTot;
+        std::stringstream cVolBoundStr,bVolBoundStr,cVolSpacingStr,bVolSpacingStr;
+        cVolBoundStr << m_CurrentVolumeBounds[i];
+        bVolBoundStr << checkVolBounds[i];
+        cVolBoundStr >> cVolBound;
+        bVolBoundStr >> bVolBound;
+
+        //converting both origin and spacing to strings
+        cVolSpacingStr << m_CurrentVolumeSpacing[i];
+        bVolSpacingStr << checkVolSpacing[i];
+        cVolSpacingStr >> cVolSpacing;
+        bVolSpacingStr >> bVolSpacing;
+
+        cVolTot=cVolBound+cVolSpacing*checkVolDim[i];
+        bVolTot=bVolBound+bVolSpacing*m_CurrentVolumeDimensions[i];
+
+        if((cVolTot != bVolTot || checkVolDim[i] != m_CurrentVolumeDimensions[i])) 
+        {
+          return false;
+        }
+      }
+    }
+   
+
+
     /* scalar range should be 0 - 255 */
     double sr[2];
     volumeToCheck->GetOutput()->Update();
