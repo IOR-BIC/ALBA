@@ -401,6 +401,24 @@ void mafGizmoAutoscaleHelper::SetVME( mafVME *vme )
 		return;
 	}
 
-	gizmoMediator->GetInput()->GetOutput()->GetBounds(m_VMEBounds);
+	mafVME *inputVME = gizmoMediator->GetInput();
 
+	if (inputVME->GetVisibleToTraverse() == false)
+	{
+		// need this to compute the bounds
+		inputVME->SetVisibleToTraverse(true);
+
+		// compute the bounds
+		inputVME->GetOutput()->GetBounds(m_VMEBounds);
+
+		// roll back
+		inputVME->SetVisibleToTraverse(true);
+
+	}
+	else
+	{
+		// simply compute the bounds
+		inputVME->GetOutput()->GetBounds(m_VMEBounds);
+	}
+	
 }
