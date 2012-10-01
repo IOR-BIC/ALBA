@@ -357,6 +357,7 @@ void mafGizmoRotateFan::SetColor(double col[3])
 	m_GizmoFan->GetMaterial()->m_Prop->SetAmbient(0);
 	m_GizmoFan->GetMaterial()->m_Prop->SetDiffuse(1);
 	m_GizmoFan->GetMaterial()->m_Prop->SetSpecular(0);
+	m_GizmoFan->GetMaterial()->m_Prop->SetOpacity(0.1);
 }
 //----------------------------------------------------------------------------
 void mafGizmoRotateFan::SetColor(double colR, double colG, double colB)
