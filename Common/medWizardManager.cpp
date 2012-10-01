@@ -200,6 +200,8 @@ void medWizardManager::WizzardStop()
   //Stopping wizard execution
   m_RunningWizard=NULL;
 
+  EnableWizardMenus();
+
   //notify to to logic
   Notify(WIZARD_RUN_TERMINATED);
 }
@@ -233,11 +235,7 @@ void medWizardManager::OnEvent( mafEventBase *maf_event )
     {
     case WIZARD_RUN_TERMINATED:
      {
-       m_RunningWizard=NULL;
-       EnableWizardMenus();
-       //Forward up event to logic
-       //Used for other menu and toolbar enabling
-       mafEventMacro(*e);
+        WizzardStop();
      }
     break;
     case WIZARD_INFORMATION_BOX_SHOW_SET:
@@ -254,38 +252,20 @@ void medWizardManager::OnEvent( mafEventBase *maf_event )
     break;
     case WIZARD_RUN_OP:
       { 
-        //Special operation for the wizard
-        mafString opString=*e->GetString();
-        if (opString=="PAUSE")
-        {
-          //pause op
-          mafEventMacro(mafEvent(this,WIZARD_PAUSE,m_WaitOp));
-        }
-        else if (opString=="SAVE")
-        {
-          //Save msf
-          mafEventMacro(mafEvent(this,MENU_FILE_SAVE));
-        }
-        else if (opString=="SAVE_AS")
-        {
-          //save msf with name
-          mafEventMacro(mafEvent(this,MENU_FILE_SAVEAS));
-        }
-        else if (opString=="OPEN")
-        {
-          //Open MSF
-          mafEventMacro(mafEvent(this,MENU_FILE_OPEN));
-        }
-        else if (opString=="DELETE")
-        {
-          //Delete current VME
-          mafEventMacro(mafEvent(this,WIZARD_OP_DELETE));
-        }
-        else
-        {
-          //Run the standard operations
-          mafEventMacro(*e);
-        }
+        //call the handler for operations
+        OnRunOp(e);
+      }
+    break;
+    case WIZARD_SWITCH:
+      {
+        int i;
+        wxString wizardName=e->GetString()->GetCStr();
+        for(i=0;i<m_NumWizard;i++)
+          if (wizardName==m_WizardList[i]->GetName())
+            WizardRun(WIZARD_START+i);
+        //If we not found the required wizard we stop the execution of the current
+        if (i==m_NumWizard)
+           WizzardStop();      
       }
     break;
     default:
@@ -337,5 +317,47 @@ mafString medWizardManager::GetDescription()
   else 
     return mafString("No running wizard");
 
+}
+
+//----------------------------------------------------------------------------
+void medWizardManager::OnRunOp(mafEvent *e)
+//----------------------------------------------------------------------------
+{
+  //Special operation for the wizard
+  mafString opString=*e->GetString();
+  if (opString=="PAUSE")
+  {
+    //pause op
+    mafEventMacro(mafEvent(this,WIZARD_PAUSE,m_WaitOp));
+  }
+  else if (opString=="SAVE")
+  {
+    //Save msf
+    mafEventMacro(mafEvent(this,MENU_FILE_SAVE));
+  }
+  else if (opString=="SAVE_AS")
+  {
+    //save msf with name
+    mafEventMacro(mafEvent(this,MENU_FILE_SAVEAS));
+  }
+  else if (opString=="OPEN")
+  {
+    //Open MSF
+    mafEventMacro(mafEvent(this,MENU_FILE_OPEN));
+  }
+  else if (opString=="DELETE")
+  {
+    //Delete current VME
+    mafEventMacro(mafEvent(this,WIZARD_OP_DELETE));
+  }
+  else if (opString=="NEW")
+  {
+    mafEventMacro(mafEvent(this,WIZARD_OP_NEW));
+  }
+  else
+  {
+    //Run the standard operations
+    mafEventMacro(*e);
+  }
 }
 

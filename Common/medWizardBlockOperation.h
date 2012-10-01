@@ -83,6 +83,8 @@ public:
        SAVE Save the msf
        SAVE_AS Save the msf with name
        OPEN an msf
+       DELETE delete a VME (and his children) from tree
+       NEW create a new, empty msf
        PAUSE open an operation with only one "next step" button*/
    void SetRequiredOperation(const char *name);
 

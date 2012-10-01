@@ -117,7 +117,7 @@ void medWizardBlockInformation::ExcutionBegin()
   
   
     //Creating the static text area
-    wxStaticText* guiLabel = new wxStaticText(dialog, -1, m_Description,wxPoint(-1,-1),wxSize(-1,-1),wxALIGN_CENTRE);
+    wxStaticText* guiLabel = new wxStaticText(dialog, -1, m_Description,wxPoint(-1,-1),wxSize(-1,-1),wxALIGN_LEFT);
     wxFont fixedFont= guiLabel->GetFont();
 
     //setting font to fixed size to avoid wx non-sense 
@@ -129,9 +129,10 @@ void medWizardBlockInformation::ExcutionBegin()
     int xsize=0,ysize=0,currentX;
     int x,y;
   
-    x=guiLabel->GetCharWidth();
+
+    x=guiLabel->GetCharWidth()-1;
     y=guiLabel->GetCharHeight();
-  
+    
     //Calculating space required by text area
     while (*charPointer!='\0')
     {
