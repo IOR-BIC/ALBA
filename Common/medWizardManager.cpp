@@ -262,7 +262,10 @@ void medWizardManager::OnEvent( mafEventBase *maf_event )
         wxString wizardName=e->GetString()->GetCStr();
         for(i=0;i<m_NumWizard;i++)
           if (wizardName==m_WizardList[i]->GetName())
+          {
             WizardRun(WIZARD_START+i);
+            break;
+          }
         //If we not found the required wizard we stop the execution of the current
         if (i==m_NumWizard)
            WizzardStop();      
