@@ -262,10 +262,10 @@ void mafSideBar::UpdateVmePanel()
 	      {
 	        m_OldAppendingGUI->Remove(m_CurrentVmeGui);
 	      }
-	      if (m_CurrentPipeGui)
+	      /*if (m_CurrentPipeGui)
 	      {
 	        m_OldAppendingGUI->Remove(m_CurrentPipeGui);
-	      }
+	      }*/
 	    }
 	
 	    if(m_SelectedView)
