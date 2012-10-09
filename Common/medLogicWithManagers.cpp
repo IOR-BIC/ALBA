@@ -178,6 +178,25 @@ void medLogicWithManagers::OnEvent(mafEventBase *maf_event)
         m_OpManager->OpRun(e->GetOp());
       }
       break;
+    case WIZARD_RELOAD_MSF:
+      {
+        UpdateFrameTitle();
+        wxString file;
+        file=m_VMEManager->GetFileName().GetCStr();
+        if(file.IsEmpty())
+        {
+          mafLogMessage ("Reload requested whitout opened MSF");
+          //continue wizard with error
+          m_WizardManager->WizardContinue(false);
+        }
+        else
+        {
+          int opened=m_VMEManager->MSFOpen(file);
+          //continue wizard after open operation
+          m_WizardManager->WizardContinue(opened!=MAF_ERROR);
+        }
+      }
+      break;
     case OP_RUN_STARTING:
       {
         mafLogMessage("run starting");
