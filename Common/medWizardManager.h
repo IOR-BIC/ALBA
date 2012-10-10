@@ -93,7 +93,9 @@ public:
 
 private:
 
-  
+  /**Function called on run op event to manage special cases*/
+  void OnRunOp(mafEvent *e);
+    
   /** Stops the execution of the wizard*/
   virtual void WizzardStop();
 

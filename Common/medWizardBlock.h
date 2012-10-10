@@ -37,7 +37,7 @@ public:
 
   /** Default constructor   
       Requires the name of the block 
-      "START","END", "ABORT" are reserved. */
+      "START","END" are reserved. */
   medWizardBlock(const char *name);
 
   /** Default destructor */
@@ -48,7 +48,12 @@ public:
   wxString GetName();
 
 
-  /** Set name of the Block called after operation. */
+  /** Set name of the Block called after operation. 
+      There are some special blocks:
+      WIZARD{<name>} Switch to the wizard <name> and execute it
+      START Goes to the first block of the wizard
+      END Exits from the wizard
+      */
   virtual void SetNextBlock(const char *block);
 
   /** Return the name of the Block witch will be executed after this */

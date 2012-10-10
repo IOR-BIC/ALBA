@@ -216,6 +216,8 @@ void medOpSegmentationRegionGrowingConnectedThreshold::OpStop(int result)
     if(m_ResampleInput!=NULL && m_ResampleInput!=m_Input)
     {
       mafEventMacro(mafEvent(this,VME_SHOW,m_ResampleInput,false)); 
+      mafEventMacro(mafEvent(this,VME_SELECT,m_ResampleInput,false)); 
+      mafEventMacro(mafEvent(this, VME_SELECT, m_Input, true));
       mafEventMacro(mafEvent(this,VME_SHOW,m_Input,true)); 
       m_ResampleInput->ReparentTo(NULL);
       m_ResampleInput->Update();
@@ -512,6 +514,7 @@ int medOpSegmentationRegionGrowingConnectedThreshold::CreateResample()
 
     // show volume resampled
     mafEventMacro(mafEvent(this, VME_SHOW, m_ResampleInput, true));
+    mafEventMacro(mafEvent(this, VME_SELECT, m_ResampleInput, true));
     mafEventMacro(mafEvent(this, CAMERA_UPDATE));
      
     if(!m_TestMode)

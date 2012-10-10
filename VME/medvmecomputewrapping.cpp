@@ -130,9 +130,11 @@ medVMEComputeWrapping::medVMEComputeWrapping()
 	SetDataPipe(dpipe);
 	//-------------------------------------------------
 	//
-	// Removed the line patcher to fix bug and set the pipe input to goniometer output
+	// Removed (again) the line patcher to fix bug and set the pipe input to goniometer output
 	// http://bugzilla.b3c.it/show_bug.cgi?id=2826
 	//  
+	// Added a screencast to showcase the bug as bug comment
+	// http://www.youtube.com/watch?v=J9XsvXwgHaM
 	//-------------------------------------------------
 	m_LinePatcher->SetInput(m_Goniometer->GetOutput());
 	dpipe->SetInput(m_LinePatcher->GetOutput());	 

@@ -145,6 +145,8 @@ void medLogicWithManagers::OnEvent(mafEventBase *maf_event)
         m_CancelledBeforeOpStarting=true;
         UpdateFrameTitle();
         m_OpManager->OpRun(*(e->GetString()));
+        //If the op is started the value of m_CancelledBeforeOpStarting 
+        //is changed by OP_RUN_STARTING event
         if (m_CancelledBeforeOpStarting)
         {
           m_CancelledBeforeOpStarting=false;
@@ -162,10 +164,37 @@ void medLogicWithManagers::OnEvent(mafEventBase *maf_event)
         m_WizardManager->WizardContinue(true);
       }
     break;
+    case WIZARD_OP_NEW:
+      {
+        //Running an op required from the wizard
+        if(m_VMEManager)
+          m_VMEManager->MSFNew();
+        m_WizardManager->WizardContinue(true);
+      }
+    break;
     case WIZARD_PAUSE:
       {
         UpdateFrameTitle();
         m_OpManager->OpRun(e->GetOp());
+      }
+      break;
+    case WIZARD_RELOAD_MSF:
+      {
+        UpdateFrameTitle();
+        wxString file;
+        file=m_VMEManager->GetFileName().GetCStr();
+        if(file.IsEmpty())
+        {
+          mafLogMessage ("Reload requested whitout opened MSF");
+          //continue wizard with error
+          m_WizardManager->WizardContinue(false);
+        }
+        else
+        {
+          int opened=m_VMEManager->MSFOpen(file);
+          //continue wizard after open operation
+          m_WizardManager->WizardContinue(opened!=MAF_ERROR);
+        }
       }
       break;
     case OP_RUN_STARTING:
