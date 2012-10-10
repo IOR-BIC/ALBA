@@ -134,8 +134,8 @@ medVMEComputeWrapping::medVMEComputeWrapping()
 	// http://bugzilla.b3c.it/show_bug.cgi?id=2826
 	//  
 	//-------------------------------------------------
-	// m_LinePatcher->SetInput(m_Goniometer->GetOutput());
-	dpipe->SetInput(m_Goniometer->GetOutput());	 
+	m_LinePatcher->SetInput(m_Goniometer->GetOutput());
+	dpipe->SetInput(m_LinePatcher->GetOutput());	 
 
 }
 //-------------------------------------------------------------------------
@@ -215,9 +215,10 @@ int medVMEComputeWrapping::DeepCopy(mafNode *a)
 
 		mafDataPipeCustom *dpipe =
 			mafDataPipeCustom::SafeDownCast(GetDataPipe());
+
 		if (dpipe)
 		{
-			dpipe->SetInput(m_Goniometer->GetOutput());
+			dpipe->SetInput(m_LinePatcher->GetOutput());
 		}
 		return MAF_OK;
 	}

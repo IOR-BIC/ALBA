@@ -29,17 +29,17 @@ vtkCxxRevisionMacro(vtkPatchLine, "$Revision: 1.1.2.5 $");
 vtkStandardNewMacro(vtkPatchLine);
 
 void vtkPatchLine::ExecuteData(vtkDataObject *output)
-{
+{	
 	vtkSmartPointer<vtkPolyData> source = this->GetInput();
 	source->Update();
-
+	
 	//Remove duplicate points etc.
 	vtkMAFSmartPointer<vtkCleanPolyData> cleaner = vtkCleanPolyData::New();
 	cleaner->SetInput(source.GetPointer());
 	cleaner->Update();  
 	source = cleaner->GetOutput();
-	source->Register(NULL);          	
-
+	source->Register(NULL);
+	
 	if(source->GetNumberOfPoints() <= 2)
 	{
 		vtkSmartPointer<vtkPolyData> newLine = vtkPolyData::SafeDownCast(output);
@@ -47,7 +47,7 @@ void vtkPatchLine::ExecuteData(vtkDataObject *output)
 		newLine->SetLines(source->GetLines());
 		return;
 	}
-
+	
 	vtkSmartPointer<vtkCellArray> origLines = source->GetLines();
 
 	int nNumPoints = source->GetNumberOfPoints();
@@ -126,13 +126,13 @@ void vtkPatchLine::ExecuteData(vtkDataObject *output)
 	polyLine->GetPointIds()->SetId(0, startingPoint);
 	
 	//Shift i by one so as to accommodate 'startingPoint'
-	for(int i = 0; i < nNumPoints; i++)
+	for(int i = 0; i < nNumPoints-1; i++)
 		polyLine->GetPointIds()->SetId(i+1, segments[polyLine->GetPointIds()->GetId(i)]); //so as to leave out last points in 'segments', which isn't connected to anything
 
 	vtkMAFSmartPointer<vtkCellArray> cells = vtkCellArray::New();
 	cells->InsertNextCell(polyLine->GetPointIds());
 
-	vtkMAFSmartPointer<vtkPolyData> newLine = vtkPolyData::SafeDownCast(output);
+	vtkSmartPointer<vtkPolyData> newLine = vtkPolyData::SafeDownCast(output);
 	newLine->SetPoints(source->GetPoints());
 	newLine->SetLines(cells.GetPointer());
 
