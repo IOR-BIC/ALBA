@@ -357,6 +357,10 @@ void medWizardManager::OnRunOp(mafEvent *e)
   {
     mafEventMacro(mafEvent(this,WIZARD_OP_NEW));
   }
+  else if (opString=="RELOAD")
+  {
+    mafEventMacro(mafEvent(this,WIZARD_RELOAD_MSF));
+  }
   else
   {
     //Run the standard operations
