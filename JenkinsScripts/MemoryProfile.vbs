@@ -81,7 +81,7 @@
     
     ' CURRENT ACTIVE TEST NAME PATTERN
     ' pattern to test all *.exe files
-    If Right(ExeFile, 4) = ".exe" Then 
+    If Right(exeFileName, 4) = ".exe" And InStr(exeFileName,"Test") > 0 Then 
     
       ' Connects to AQtime
       Set AQtimeObject = CreateObject("AQtime.AQtime")
@@ -164,9 +164,9 @@
        'skipping the file 
      End If 
      
-  Else 
-   'MsgBox "skipping the file: " + CStr(exeFileName)  
-  End If 
+    Else 
+      'MsgBox "skipping the file: " + CStr(exeFileName)  
+    End If 
   
   Next 
   
