@@ -59,28 +59,6 @@ public:
   /** Return the name of the Block witch will be executed after this */
   virtual wxString GetNextBlock();
 
-  /** Abort the execution of the block */
-  virtual void Abort();
-
-  /** Return true if the user has aborted the operation */
-  int Success();
-
-  /** Starts the execution of the block */
-  virtual void ExcutionBegin();
-
-  /** Ends the execution of the block */
-  virtual void ExcutionEnd();
-
-  /** Returns the name of the operation required by this block 
-      Return an empty string if no operation is required */
-  virtual wxString GetRequiredOperation();
-
-  /** Set the selected VME, this function must be called before execution begin*/
-  void SetSelectedVME(mafNode *node);
-
-  /** Sets The event listener */
-  void SetListener(mafObserver *Listener);
-
   /** Called to clean up memory*/
   virtual void Delete(){delete this;};
 
@@ -93,7 +71,29 @@ public:
   /** Set a Label containing a description of the the current step*/
   void SetNextBlockOnAbort(const char *label);
 
+  /** Abort the execution of the block */
+  virtual void Abort();
+
 protected:
+
+  /** Starts the execution of the block */
+  virtual void ExcutionBegin();
+
+  /** Ends the execution of the block */
+  virtual void ExcutionEnd();
+
+  /** Set the selected VME, this function must be called before execution begin*/
+  void SetSelectedVME(mafNode *node);
+
+  /** Sets The event listener */
+  void SetListener(mafObserver *Listener);
+
+  /** Return true if the user has aborted the operation */
+  int Success();
+
+  /** Returns the name of the operation required by this block 
+      Return an empty string if no operation is required */
+  virtual wxString GetRequiredOperation();
 
   wxString m_Name;
   wxString m_BlockType;
@@ -107,7 +107,7 @@ protected:
   mafString m_DescriptionLabel;
 
 private:
-    
-  
+
+  friend class medWizard; // class medWizard can now access data directly
 };
 #endif

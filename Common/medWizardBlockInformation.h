@@ -47,35 +47,49 @@ public:
   /** Default destructor */
   ~medWizardBlockInformation();
     
-  /** Set The title of the selection window */
+  /** Set The title of the information window */
   void SetWindowTitle(const char *Title);
 
-  /** Set The title of the selection window */
+  /** Get The title of the information window */
+  wxString GetWindowTitle() {return m_Title;};
+
+  /** Set The description */
   void SetDescription(const char *description);
+
+  /** Get The description */
+  wxString GetDescription() {return m_Description;};
 
   /** Set name of the window image
       if no image is setted no image will be showed
       The image will be stored in <APP_DIR>\WizardImages\*/
   void SetImage(const char *imageFilename);
 
-  /** Set name of the Block called after operation. */
-  void SetNextBlock(const char *block);
-
+  /** return current image filename */
+  wxString GetImage() {return m_ImageFilename;};
+  
   /** Set the description box Label*/
   void SetBoxLabel(const char *label);
 
+  /** Get the description box Label*/
+  wxString GetBoxLabel(){return m_BoxLabel;};
+    
   /** Set Image Position To Top */
   void SetImagePositionToTop();
+
+  /** return true if image Position is set to top */
+  bool GetImagePositionToTop() { return m_HorizontalImage;};
 
   /** Set Image Position To Left */
   void SetImagePositionToLeft();
 
-
-  /** Starts the execution of the block */
-  virtual void ExcutionBegin();
+  /** return true if image Position is set to left */
+  bool GetImagePositionToLeft() { return !m_HorizontalImage;};
 
 
 protected:
+
+  /** Starts the execution of the block */
+  virtual void ExcutionBegin();
 
   /** Event management */
   virtual void OnEvent(mafEventBase *maf_event);

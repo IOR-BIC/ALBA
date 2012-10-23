@@ -80,9 +80,8 @@ void medWizardWaitOp::OpRun()
   m_Gui->Label("");
 
   //exit op button
-  m_Gui->TwoButtons(wxOK,wxCANCEL,"To next step","Cancel");
-
-  
+  m_Gui->TwoButtons(wxCANCEL,wxOK,"Cancel","To next step");
+    
   m_Gui->Divider();
 
   ShowGui();

@@ -57,40 +57,41 @@ public:
   /** Set the path for VME selection */
   void VmeSelect(const char *path);
 
+  /** Get the path for VME selection */
+  wxString GetVmeSelect(){return m_VmeSelect;};
+
   /** Set the path of the VMEs that is need to show for the operation.
       The path starts from the selected vme. 
-      Multiple calls to this funcion correspond on multiple VME show.*/
+      Multiple calls to this function correspond on multiple VME show.*/
   void VmeShowAdd(const char *path);
+
+  /** Returns the list of vme to show */
+  std::vector < wxString > *GetVmeShowList(){return &m_VmeShow;};
 
   /** Set the path of the VMEs that is need to hide after the operation.
       The path starts from the selected vme.
-      Multiple calls to this funcion correspond on multiple VME show*/
+      Multiple calls to this function correspond on multiple VME show*/
   void VmeHideAdd(const char *path);
 
+  /** Returns the list of vme to Hide */
+  std::vector < wxString > *GetVmeHideList(){return &m_VmeHide;};
 
-  /** Execute the block */
-  void Execute();
-
-  /** Starts the execution of the block */
-  void ExcutionBegin();
-  
-  /** Ends the execution of the block */
-  void ExcutionEnd();
-
-   /** Returns the name of the operation required by this block 
-       Return an empty string if no operation is required
-       There are three wizard specificic operation:
-       SAVE Save the msf
-       SAVE_AS Save the msf with name
-       OPEN an msf
-       DELETE delete a VME (and his children) from tree
-       NEW create a new, empty msf
-       PAUSE open an operation with only one "next step" button*/
+  /** Set the name of the operation required by this block 
+      Set to an empty string to obtain only show and selections
+      There are some wizard special operations:
+      SAVE Save the msf
+      SAVE_AS Save the msf with name
+      OPEN an msf
+      DELETE delete a VME (and his children) from tree
+      NEW create a new, empty msf
+      PAUSE open an operation with only one "next step" button
+      RELOAD reload current msf, an msf must be loaded or saved before operation call*/
    void SetRequiredOperation(const char *name);
 
    /** Returns the name of the operation required by this block 
        Return an empty string if no operation is required */
    wxString GetRequiredOperation();
+
 
    /** If Set  Auto Show Selected VME to false the selected vme will not 
        auto showed before operation start*/
@@ -98,6 +99,14 @@ public:
 
    /** Get Auto Show Selected VME status */
    bool GetAutoShowSelectedVME();
+protected:
+
+    
+  /** Starts the execution of the block */
+  void ExcutionBegin();
+
+  /** Ends the execution of the block */
+  void ExcutionEnd();
   
 private:
 

@@ -49,6 +49,7 @@ public:
 
   /** Return true for the acceptable vme type. */
   bool Accept(mafNode *node);
+
   /** Builds operation's interface. */
   void OpRun();
   
