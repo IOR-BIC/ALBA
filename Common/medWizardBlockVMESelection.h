@@ -45,15 +45,21 @@ public:
   /** Set The title of the selection window */
   void SetWindowTitle(const char *Title);
 
+  /** Get The title of the selection window */
+  wxString GetWindowTitle(){return m_Title;};
+
   /** Set The title of the selection window */
   void SetAcceptedVME(const char *VME);
+
+  /** Set The title of the selection window */
+  wxString GetAcceptedVME(){return m_AcceptedVME;};
+
   
-  
+protected:
+
   /** Starts the execution of the block */
   virtual void ExcutionBegin();
 
-
-protected:
   //** VME Accept function */
   static int VMEAccept(mafNode *node);
 

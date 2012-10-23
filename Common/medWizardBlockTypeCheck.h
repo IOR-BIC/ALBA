@@ -30,7 +30,7 @@
 
 /**
   Class Name: medWizardTypeCheckBlock.
-  Class for create a type check block, if the selected vme is wrong the wizard
+  Class for create a type check block, if the selected VME is wrong the wizard
   will be aborted.
 */
 class MED_COMMON_EXPORT medWizardBlockTypeCheck : public medWizardBlock
@@ -43,32 +43,46 @@ public:
   /** Default destructor */
   ~medWizardBlockTypeCheck();
     
-  /** Set The title of the selection window */
+  /** Set The title of the window showed when the type check was not  */
   void SetWindowTitle(const char *Title);
+
+  /** Get The title of the window showed when the type check was not  */
+  wxString GetWindowTitle(){return m_Title;};
 
   /** Set the path for VME selection */
   void VmeSelect(const char *path);
 
+  /** Get the path for VME selection */
+  wxString GetVmeSelect(){return m_VmeSelect;};
+
   /** Set The title of the selection window */
   void SetDescription(const char *description);
+
+  /** Get The title of the selection window */
+  wxString GetDescription(){return m_Description;};
 
   /** Add a new accepted type.
       Uses the string of VME type.
       */
   void AddAcceptedType(const char *label);
 
+  /** Returns the list of accepted types. */
+  std::vector < wxString > *GetAcceptedTypeList(){return &m_AcceptedVmes;};
+
   /** Set name of the Block called after wrong check.
       By default is set to "END" and the wizard will closed on wrong check. */     
   void SetWrongTypeNextBlock(const char *block);
 
+  /** Get name of the Block called after wrong check. */     
+  wxString GetWrongTypeNextBlock(){return m_WrongTypeNextBlock;};
+
   /** Return the name of the Block witch will be executed after this */
   wxString GetNextBlock();
 
+  
+protected:
   /** Starts the execution of the block */
   virtual void ExcutionBegin();
-
-protected:
-
 
 private:
 

@@ -112,6 +112,30 @@ void medWizardBlockSelection::ExcutionBegin()
   delete[] choices;  
 }
 
+//----------------------------------------------------------------------------
+wxString medWizardBlockSelection::GetChoiceLabel( int n )
+//----------------------------------------------------------------------------
+{
+  //Bound check return n-th label if bounds are ok 
+  //or an empty string elsewhere
+  if (n>=0 && n<m_Choices.size())
+    return m_Choices[n].label;
+  else
+    return "";
+}
+
+//----------------------------------------------------------------------------
+wxString medWizardBlockSelection::GetChoiceNextBlock( int n )
+//----------------------------------------------------------------------------
+{
+  //Bound check return n-th label if bounds are ok 
+  //or an empty string elsewhere
+  if (n>=0 && n<m_Choices.size())
+    return m_Choices[n].block;
+  else
+    return "";
+}
+
 
 
 

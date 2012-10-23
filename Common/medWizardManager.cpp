@@ -316,7 +316,7 @@ mafString medWizardManager::GetDescription()
   //return the description of the wizard 
   //used in the main window titlebar
   if (m_RunningWizard)
-    return m_RunningWizard->GetDescription();
+    return m_RunningWizard->GetDescriptionTitle();
   else 
     return mafString("No running wizard");
 

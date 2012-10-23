@@ -49,19 +49,24 @@ public:
   /** Event Management */
   virtual void OnEvent(mafEventBase *maf_event);
 
+
+private:
+
   /** Add the Wizard 'op' to the list of available operations. */
   virtual void WizardAdd(medWizard *wizard, wxString menuPath = "");
 
+  std::vector<medWizard *> GetWizardList(){return m_WizardList;};
+
   /** Fill the application men with the operations name.	*/
   virtual void FillMenu(wxMenu* wizardMenu);
-  
+
   /** Call this to exec an operation with user interaction and undo/redo services. */
   virtual void WizardRun(medWizard *wizard, void *wizard_param = NULL);
 
   /** Run the operation by id. */
   virtual void WizardRun(int wizardId);
 
-  /** Called on opeation termination to contuinue the workflow*/
+  /** Called on operation termination to continue the work flow*/
   virtual void WizardContinue(int opSuccess);
 
   /** Record the selected vme and enable the menu_entries relative to the compatible wizard. */
@@ -85,13 +90,15 @@ public:
   /** Set the flag for warning the user if the operation is undoable. */
   virtual void WarningIfCantUndo (bool warn) {m_Warn = warn;};
 
+  /** Get the flag for warning the user if the operation is undoable. */
+  virtual bool GetWarningIfCantUndo(){return m_Warn;};
+
+
   /** returns a description about current step in wizard */
   mafString GetDescription();
 
   /** Fill the setting dialog with the settings associated to the plugged operations.*/
   void FillSettingDialog(mafGUISettingsDialog *settingDialog);
-
-private:
 
   /**Function called on run op event to manage special cases*/
   void OnRunOp(mafEvent *e);
@@ -112,5 +119,8 @@ private:
   mafNode						*m_Selected; ///< Pointer to the current selected node.
   bool               m_Warn; ///< Flag to warn the user when an operation that can not undo is starting.
   medWizardWaitOp   *m_WaitOp;
+
+  friend class medLogicWithManagers; // class medWizardManager can now access data directly
+  friend class medWizardManagerTest; // for testing 
 };
 #endif

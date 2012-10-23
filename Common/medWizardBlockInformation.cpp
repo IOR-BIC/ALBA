@@ -191,13 +191,6 @@ void medWizardBlockInformation::SetImage( const char *imageFilename )
   m_ImageFilename=imageFilename;
 }
 
-//----------------------------------------------------------------------------
-void medWizardBlockInformation::SetNextBlock( const char *block )
-//----------------------------------------------------------------------------
-{
-  //set the name of the block called after block execution
-  m_NextBlock=block;
-}
 
 //----------------------------------------------------------------------------
 void medWizardBlockInformation::SetBoxLabel( const char *label )

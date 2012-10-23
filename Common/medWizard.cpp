@@ -191,7 +191,7 @@ void medWizard::BlockExecutionBegin()
       ContinueExecution(m_CurrentBlock->Success());
   }
   else
-    mafLogMessage("Error Unkwon block!");
+    mafLogMessage("Error Unknown block!");
 }
 
 //----------------------------------------------------------------------------
@@ -296,8 +296,8 @@ void medWizard::ContinueExecution(int opSuccess)
 }
 
 //----------------------------------------------------------------------------
-mafString medWizard::GetDescription()
-  //----------------------------------------------------------------------------
+mafString medWizard::GetDescriptionTitle()
+//----------------------------------------------------------------------------
 {
 
   if (m_CurrentBlock)

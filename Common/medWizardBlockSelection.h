@@ -45,27 +45,36 @@ public:
   /** Set The title of the selection window */
   void SetWindowTitle(const char *Title);
 
+  /** Get The title of the selection window */
+  wxString GetWindowTitle(){return m_Title;};
+
   /** Set The title of the selection window */
   void SetDescription(const char *description);
+
+  /** Get The title of the selection window */
+  wxString GetDescription(){return m_Description;};
 
   /** Add a new choice in the selection.
       The choice is composed by the text showed to the user and the correspondent block
       */
   void AddChoice(const char *label, const char *block);
 
-  /** Return the name of the Block witch will be executed after this */
-  virtual wxString GetNextBlock();
+  /** Returns the label of the n-th choice*/
+  wxString GetChoiceLabel(int n);
 
+  /** Returns the Next Block of the n-th choice*/
+  wxString GetChoiceNextBlock(int n);
+
+  
   /** This method has no sense in this class, use AddChoice() instead*/
   virtual void SetNextBlock(const char *block){};
 
+protected:
   /** Starts the execution of the block */
   virtual void ExcutionBegin();
 
-
-protected:
-
-
+  /** Return the name of the Block witch will be executed after this */
+  virtual wxString GetNextBlock();
 private:
 
   //Choices struct definition
