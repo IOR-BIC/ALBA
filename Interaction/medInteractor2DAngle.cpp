@@ -1343,7 +1343,7 @@ s = wxString::Format(L"tmp4OLD:%f , %f , %f" , tmp4[0],tmp4[1],tmp4[2]);
 
     mafString ds;
     ds = wxString::Format(_("%.2f") , manualAngle);
-    ds.Append("°");
+    ds.Append("");
     if (!m_TestMode)
     {
       m_MeterVector[m_MeterVector.size()-1]->SetText(ds);
