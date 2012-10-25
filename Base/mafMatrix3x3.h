@@ -130,24 +130,24 @@ public:
   /**
     Convert a quaternion to a 3x3 rotation matrix.  The quaternion
     does not have to be normalized beforehand. */
-  static void mmuQuaternionToMatrix(const double quat[4], double A[3][3]); 
+  static void QuaternionToMatrix(const double quat[4], double A[3][3]); 
   
   /**
     Convert a quaternion to a 3x3 rotation matrix.  The quaternion
     does not have to be normalized beforehand. */
-  void mmuQuaternionToMatrix(const double quat[4]) {mmuQuaternionToMatrix(quat,GetElements());}
+  void QuaternionToMatrix(const double quat[4]) {QuaternionToMatrix(quat,GetElements());}
 
   /**
    Convert a 3x3 matrix into a quaternion.  This will provide the
    best possible answer even if the matrix is not a pure rotation matrix.
    The method used is that of B.K.P. Horn. */
-  static void MatrixTommuQuaternion(const double A[3][3], double quat[4]);
+  static void MatrixToQuaternion(const double A[3][3], double quat[4]);
   
   /**
    Convert a 3x3 matrix into a quaternion.  This will provide the
    best possible answer even if the matrix is not a pure rotation matrix.
    The method used is that of B.K.P. Horn. */
-  void MatrixTommuQuaternion(double quat[4]) {MatrixTommuQuaternion(GetElements(),quat);}
+  void MatrixToQuaternion(double quat[4]) {MatrixToQuaternion(GetElements(),quat);}
   
   /**
     Perform singular value decomposition on a 3x3 matrix.  This is not

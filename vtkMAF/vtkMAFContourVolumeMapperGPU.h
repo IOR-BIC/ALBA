@@ -215,7 +215,7 @@ class name: vtkMAFContourVolumeMapperGPU.
     /** Create Textures for Isosurface */
     int CreateTexturesForIsosurface(const void *dataPointer);
     /** build  Histopyramid and slice sorting */
-    int buildHistopyramid_SliceSorting();
+    int BuildHistopyramidSliceSorting();
     /** Render isosurface on GPU */
     template <typename DataType> void  RenderIsoSurfaceOnGPU(vtkRenderer *renderer, vtkVolume *volume, const DataType *dataPointer);
     /** pad memory */

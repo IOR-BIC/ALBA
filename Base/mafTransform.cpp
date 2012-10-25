@@ -931,7 +931,7 @@ void mafTransform::GetOrientationWXYZ(const mafMatrix &in_matrix, double wxyz[4]
     ortho[2][i] = -ortho[2][i];
     }
 
-  mafMatrix3x3::MatrixTommuQuaternion(ortho, wxyz);
+  mafMatrix3x3::MatrixToQuaternion(ortho, wxyz);
 
   // calc the return value wxyz
  double mag = sqrt(wxyz[1]*wxyz[1] + wxyz[2]*wxyz[2] + wxyz[3]*wxyz[3]);
