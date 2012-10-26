@@ -14,7 +14,7 @@
 
 =========================================================================*/
 
-
+#define GLEW_STATIC
 #include "../GPUAPI/glew/glew.h"
 
 #include <assert.h>
