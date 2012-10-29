@@ -17,6 +17,7 @@
 #define __mafGUILocaleSettings_H__
 
 #include "mafGUISettings.h"
+#include "medGuiDefines.h"
 
 //----------------------------------------------------------------------------
 // forward reference
@@ -26,7 +27,7 @@
   class name :medWizardSettings 
   class that manage wizard specific settings
 */
-class medWizardSettings : public mafGUISettings
+class MED_GUI_EXPORT medWizardSettings : public mafGUISettings
 {
 
   enum WIZARD_SETTINGS
