@@ -23,14 +23,20 @@
 #include "medCommonDefines.h"
 #include "medVect3d.h"
 #include "mafOpManager.h"
+#include "medWizard.h"
 
 //----------------------------------------------------------------------------
 // forward reference
 //----------------------------------------------------------------------------
-class medWizard;
 class medWizardWaitOp;
 class mafGUISettingsDialog;
 class medWizardSettings;
+
+#ifdef MED_COMMON_EXPORTS
+#include "mafDllMacros.h"
+EXPORT_STL_VECTOR(MED_COMMON_EXPORT,medWizard *);
+#endif
+
 /**
   Class Name: medWizardManager.
   Class for wizards management 

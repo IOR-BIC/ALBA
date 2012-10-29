@@ -22,15 +22,20 @@
 //----------------------------------------------------------------------------
 #include "medCommonDefines.h"
 #include "mafObserver.h"
+#include "medWizardBlock.h"
 #include <vector>
 
 //----------------------------------------------------------------------------
 // forward reference
 //----------------------------------------------------------------------------
 
-class medWizardBlock;
 class mafObserver;
 class mafNode;
+
+#ifdef MED_COMMON_EXPORTS
+#include "mafDllMacros.h"
+EXPORT_STL_VECTOR(MED_COMMON_EXPORT,medWizardBlock *);
+#endif
 
 
 /**
