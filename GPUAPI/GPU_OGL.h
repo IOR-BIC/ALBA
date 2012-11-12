@@ -31,7 +31,7 @@
 
 
 #ifdef _WIN32
-//	#define GLEW_STATIC
+	#define GLEW_STATIC
 	#include "glew.h"    //must be included before gl.h and glu.h
 	
 //	#pragma message("Information: application must be linked with the static GLEW library")
