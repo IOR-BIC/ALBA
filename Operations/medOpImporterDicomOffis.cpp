@@ -50,7 +50,6 @@
 
 #include "vtkMAFVolumeResample.h"
 #include "vtkMAFSmartPointer.h"
-#include "vtkDicomUnPacker.h"
 #include "vtkDirectory.h"
 #include "vtkWindowLevelLookupTable.h"
 #include "vtkPlaneSource.h"
@@ -83,6 +82,8 @@
 #include "vtkTextMapper.h"
 #include "vtkTextProperty.h"
 #include "vtkProperty2D.h"
+#include "vtkIntArray.h"
+#include "vtkFloatArray.h"
 
 #include "vtkDataSetWriter.h"
 #include "vtkRectilinearGrid.h"
@@ -3318,57 +3319,32 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 			//if (dcmSmallestImagePixelValue == dcmLargestImagePixelValue)
 			//  dcmRescaleIntercept = 0;
 
-			if(val_long==16 && dcmPixelRepresentation == 0 )
+
+      if(val_long==16 && dcmPixelRepresentation == 0 )
 			{
-				if(dcmSmallestImagePixelValue*dcmRescaleSlope+dcmRescaleIntercept >= VTK_UNSIGNED_SHORT_MIN && dcmLargestImagePixelValue*dcmRescaleSlope+dcmRescaleIntercept <= VTK_UNSIGNED_SHORT_MAX)
-				{
-					dicomSliceVTKImageData->SetScalarType(VTK_UNSIGNED_SHORT);
-				}
-				else if (dcmSmallestImagePixelValue*dcmRescaleSlope+dcmRescaleIntercept >= VTK_SHORT_MIN && dcmLargestImagePixelValue*dcmRescaleSlope+dcmRescaleIntercept <= VTK_SHORT_MAX)
-				{
-					dicomSliceVTKImageData->SetScalarType(VTK_SHORT);
-				}
-				else
-				{
-					if(!this->m_TestMode)
-					{
-						wxLogMessage(wxString::Format("Inconsistent scalar values. Can not import file <%s>",currentSliceABSFileName));
-						errorOccurred = true;
-						continue;
-					}
-				}
+        dicomSliceVTKImageData->SetScalarType(VTK_UNSIGNED_SHORT);
 			}
-			else if(val_long==16 && dcmPixelRepresentation == 1)
+      else if (val_long == 16 && dcmPixelRepresentation == 1)
+      {
+        dicomSliceVTKImageData->SetScalarType(VTK_SHORT);
+      }
+			else if(val_long==8 && dcmPixelRepresentation == 0)
 			{
-				if (dcmSmallestImagePixelValue*dcmRescaleSlope+dcmRescaleIntercept >= VTK_SHORT_MIN && dcmLargestImagePixelValue*dcmRescaleSlope+dcmRescaleIntercept <= VTK_SHORT_MAX)
-				{
-					dicomSliceVTKImageData->SetScalarType(VTK_SHORT);
-				}
-				else
-				{
-					if(!this->m_TestMode)
-					{
-						wxLogMessage(wxString::Format("Inconsistent scalar values. Can not import file <%s>",currentSliceABSFileName));
-						errorOccurred = true;
-						continue;
-					}
-				}
+				dicomSliceVTKImageData->SetScalarType(VTK_UNSIGNED_CHAR);
 			}
-			else if(val_long==16 && dcmPixelRepresentation == 0)
-			{
-				dicomSliceVTKImageData->SetScalarType(VTK_UNSIGNED_SHORT);
-			}
-			else if(val_long==8)
-			{
-				dicomSliceVTKImageData->SetScalarType(VTK_CHAR);
-			}
+      else if(val_long==8 && dcmPixelRepresentation == 1)
+      {
+        dicomSliceVTKImageData->SetScalarType(VTK_CHAR);
+      }
 
 			dicomSliceVTKImageData->AllocateScalars();
 			dicomSliceVTKImageData->GetPointData()->GetScalars()->SetName("Scalars");
 			dicomSliceVTKImageData->Update();
 
 			const Uint16 *dicom_buf_short = NULL; 
-			const Uint8* dicom_buf_char = NULL; 
+			const Uint8* dicom_buf_char = NULL;
+      int min = VTK_INT_MAX;
+      int max = VTK_INT_MIN;
 			if (val_long==16) 
 			{ 
 				dicomDataset->findAndGetUint16Array(DCM_PixelData, dicom_buf_short); 
@@ -3377,8 +3353,17 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 				{ 
 					for(int x=0;x<dcmColumns;x++) 
 					{ 
-						dicomSliceVTKImageData->GetPointData()->GetScalars()->SetTuple1(counter, dicom_buf_short[dcmColumns*y+x]); 
-						counter++; 
+						dicomSliceVTKImageData->GetPointData()->GetScalars()->SetTuple1(counter, dicom_buf_short[dcmColumns*y+x]);
+						counter++;
+
+            if (dicom_buf_short[dcmColumns*y+x] > max)
+            {
+              max = dicom_buf_short[dcmColumns*y+x];
+            }
+            if (dicom_buf_short[dcmColumns*y+x] < min)
+            {
+              min = dicom_buf_short[dcmColumns*y+x];
+            }
 					} 
 				} 
 			} 
@@ -3391,7 +3376,16 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 					for(int x=0;x<dcmColumns;x++) 
 					{ 
 						dicomSliceVTKImageData->GetPointData()->GetScalars()->SetTuple1(counter, dicom_buf_char[dcmColumns*y+x]); 
-						counter++; 
+						counter++;
+
+            if (dicom_buf_char[dcmColumns*y+x] > max)
+            {
+              max = dicom_buf_char[dcmColumns*y+x];
+            }
+            if (dicom_buf_char[dcmColumns*y+x] < min)
+            {
+              min = dicom_buf_char[dcmColumns*y+x];
+            }
 					} 
 				} 
 			} 
@@ -3400,33 +3394,85 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 
 			if (dcmRescaleSlope != 1 || dcmRescaleIntercept != 0)
 			{
+        //If these tags aren't defined it's necessary to compute smallest and largest values
+        if (dcmSmallestImagePixelValue == 0 && dcmLargestImagePixelValue == 0)
+        {
+          dcmSmallestImagePixelValue = min;
+          dcmLargestImagePixelValue = max;
+        }
+
+        vtkDataArray *scalarsRescaled = NULL;
+        int newMaxValue = dcmLargestImagePixelValue*dcmRescaleSlope+dcmRescaleIntercept;
+        int newMinValue = dcmSmallestImagePixelValue*dcmRescaleSlope+dcmRescaleIntercept;
+        if (newMaxValue <= VTK_UNSIGNED_CHAR_MAX && newMinValue >= VTK_UNSIGNED_CHAR_MIN)
+        {
+          scalarsRescaled = vtkUnsignedCharArray::New();
+        }
+        else if (newMaxValue <= VTK_CHAR_MAX && newMinValue >= VTK_CHAR_MIN)
+        {
+          scalarsRescaled = vtkCharArray::New();
+        }
+        else if (newMaxValue <= VTK_UNSIGNED_SHORT_MAX && newMinValue >= VTK_UNSIGNED_SHORT_MIN)
+        {
+          scalarsRescaled = vtkUnsignedShortArray::New();
+        }
+        else if (newMaxValue <= VTK_SHORT_MAX && newMinValue >= VTK_SHORT_MIN)
+        {
+          scalarsRescaled = vtkShortArray::New();
+        }
+
+        if (scalarsRescaled == NULL)
+        {
+          if(!this->m_TestMode)
+					{
+						wxLogMessage(wxString::Format("Inconsistent scalar values. Can not import file <%s>",currentSliceABSFileName));
+						errorOccurred = true;
+						continue;
+					}
+        }
+
+        scalarsRescaled->SetName("Scalars");
+
 				int scalarType = dicomSliceVTKImageData->GetScalarType();
 
 				if (dicomSliceVTKImageData->GetScalarType() == VTK_UNSIGNED_SHORT)
 				{
 					vtkUnsignedShortArray *scalars=vtkUnsignedShortArray::SafeDownCast(dicomSliceVTKImageData->GetPointData()->GetScalars());
+          scalarsRescaled->SetNumberOfTuples(scalars->GetNumberOfTuples());
 					for(int indexScalar=0;indexScalar<dicomSliceVTKImageData->GetPointData()->GetScalars()->GetNumberOfTuples();indexScalar++)
 					{
-						scalars->SetTuple1(indexScalar,scalars->GetTuple1(indexScalar)*dcmRescaleSlope+dcmRescaleIntercept);//modify scalars using slope and intercept
+						scalarsRescaled->SetTuple1(indexScalar,scalars->GetTuple1(indexScalar)*dcmRescaleSlope+dcmRescaleIntercept);//modify scalars using slope and intercept
 					}
 				}
 				else if (dicomSliceVTKImageData->GetScalarType() == VTK_SHORT)
 				{
 					vtkShortArray *scalars=vtkShortArray::SafeDownCast(dicomSliceVTKImageData->GetPointData()->GetScalars());
+          scalarsRescaled->SetNumberOfTuples(scalars->GetNumberOfTuples());
 					for(int indexScalar=0;indexScalar<dicomSliceVTKImageData->GetPointData()->GetScalars()->GetNumberOfTuples();indexScalar++)
 					{
-						scalars->SetTuple1(indexScalar,scalars->GetTuple1(indexScalar)*dcmRescaleSlope+dcmRescaleIntercept);//modify scalars using slope and intercept
+						scalarsRescaled->SetTuple1(indexScalar,scalars->GetTuple1(indexScalar)*dcmRescaleSlope+dcmRescaleIntercept);//modify scalars using slope and intercept
 					}
 				}
 				else if (dicomSliceVTKImageData->GetScalarType() == VTK_CHAR)
 				{
 					vtkCharArray *scalars=vtkCharArray::SafeDownCast(dicomSliceVTKImageData->GetPointData()->GetScalars());
+          scalarsRescaled->SetNumberOfTuples(scalars->GetNumberOfTuples());
 					for(int indexScalar=0;indexScalar<dicomSliceVTKImageData->GetPointData()->GetScalars()->GetNumberOfTuples();indexScalar++)
 					{
-						scalars->SetTuple1(indexScalar,scalars->GetTuple1(indexScalar)*dcmRescaleSlope+dcmRescaleIntercept);//modify scalars using slope and intercept
+						scalarsRescaled->SetTuple1(indexScalar,scalars->GetTuple1(indexScalar)*dcmRescaleSlope+dcmRescaleIntercept);//modify scalars using slope and intercept
 					}
 				}
+        else if (dicomSliceVTKImageData->GetScalarType() == VTK_UNSIGNED_CHAR)
+        {
+          vtkUnsignedCharArray *scalars=vtkUnsignedCharArray::SafeDownCast(dicomSliceVTKImageData->GetPointData()->GetScalars());
+          scalarsRescaled->SetNumberOfTuples(scalars->GetNumberOfTuples());
+          for(int indexScalar=0;indexScalar<dicomSliceVTKImageData->GetPointData()->GetScalars()->GetNumberOfTuples();indexScalar++)
+          {
+            scalarsRescaled->SetTuple1(indexScalar,scalars->GetTuple1(indexScalar)*dcmRescaleSlope+dcmRescaleIntercept);//modify scalars using slope and intercept
+          }
+        }
 
+        dicomSliceVTKImageData->GetPointData()->SetScalars(scalarsRescaled);
 				dicomSliceVTKImageData->Update();
 			}
 
