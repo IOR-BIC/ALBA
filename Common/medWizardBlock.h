@@ -74,6 +74,12 @@ public:
   /** Abort the execution of the block */
   virtual void Abort();
 
+  /** Set the progress associated to this block */
+  void SetBlockProgress(int progress){m_BlockProgress=progress;};
+
+  /** Get the progress associated to this block */
+  int GetBlockProgress(){return m_BlockProgress;};
+
 protected:
 
   /** Starts the execution of the block */
@@ -105,6 +111,7 @@ protected:
   int m_Running;
   mafObserver    *m_Listener;
   mafString m_DescriptionLabel;
+  long m_BlockProgress;
 
 private:
 

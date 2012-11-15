@@ -70,6 +70,12 @@ public:
 
   /** Initialize wizard's variables according to the parameter's list. */
   virtual void SetParameters(void *param) {};
+
+  /** Enable/disable the visualization of the progress bar during the wizard*/
+  void ShowProgressBar(bool show=true){m_ShowProgressBar=show;};
+
+  /** Return true if progress bar show is enabled*/
+  bool GetShowProgressBar(){return m_ShowProgressBar;};
     
 protected:
   /** Return true for the acceptable vme type.*/
@@ -127,6 +133,7 @@ private:
   wxString				m_Name; ///< Label of the wizard that will appear on menu.
   mafObserver    *m_Listener;
   mafNode        *m_SelectedVME;
+  bool            m_ShowProgressBar;
 
   friend class medWizardManager; // class medWizardManager can now access data directly
 };
