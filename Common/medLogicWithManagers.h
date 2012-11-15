@@ -78,6 +78,8 @@ protected:
   /** Called on Quit event. */
   virtual void OnQuit();
 
+  /** Redefined to add Print buttons */
+  virtual void CreateWizardToolbar();
   
   /** Respond to a VME_SELECTED evt. Update the selection on the tree and view representation. */
   virtual void VmeSelected(mafNode *vme);
@@ -108,6 +110,8 @@ protected:
   medWizardManager *m_WizardManager;
   bool m_UseWizardManager;
   bool m_WizardRunning;
+  wxGauge *m_WizardGauge;
+  wxStaticText* m_WizardLabel;
   bool m_CancelledBeforeOpStarting;
   wxMenu *m_WizardMenu;
 
