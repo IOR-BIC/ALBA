@@ -274,6 +274,7 @@ void medWizardManager::OnEvent( mafEventBase *maf_event )
     default:
       //All event form wizard (like vme select/show, view request, ecc...)
       //will be forwarded up to logic
+      e->SetSender(this);
       mafEventMacro(*e);
       break;
     } // end switch case
