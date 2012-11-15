@@ -39,6 +39,9 @@ void medWizardBlockTest::TestSetterGetter()
   block.SetDescriptionLabel("descriptionLabel");
   CPPUNIT_ASSERT(block.GetDescriptionLabel()=="descriptionLabel");
 
+  block.SetBlockProgress(45);
+  CPPUNIT_ASSERT(block.GetBlockProgress()==45);
+
 }
 
 //----------------------------------------------------------------------------

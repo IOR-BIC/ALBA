@@ -39,6 +39,9 @@ void medWizardTest::TestSetterGetter()
 
   wizard.SetMenuPath("TestMenu");
   CPPUNIT_ASSERT(wizard.GetMenuPath()=="TestMenu");
+
+  wizard.ShowProgressBar(true);
+  CPPUNIT_ASSERT(wizard.GetShowProgressBar()==true);
   
 }
 
