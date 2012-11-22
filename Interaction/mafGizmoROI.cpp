@@ -61,7 +61,7 @@ mafGizmoROI::mafGizmoROI(mafVME *input, mafObserver* listener /* = NULL  */, int
   m_EnableMinimumHandleSize = false;
   m_Accumulator = 0.;
   
-  this->m_ActiveGizmoComponent = -1;
+  this->m_ActiveGizmoComponent = 0;
   this->SetModalityToLocal();
 
   for (int i = 0; i < 6; i++)
@@ -74,6 +74,8 @@ mafGizmoROI::mafGizmoROI(mafVME *input, mafObserver* listener /* = NULL  */, int
   } 
 	// create the outline gizmo
 	m_OutlineGizmo = new mafGizmoBoundingBox(input, this,parent);
+
+  UpdateOutlineBounds();
 
 }
 //----------------------------------------------------------------------------
@@ -514,6 +516,7 @@ void mafGizmoROI::UpdateHandlePositions()
 void mafGizmoROI::ShowShadingPlane(bool show)
 //----------------------------------------------------------------------------
 {
+    
   for (int i=0;i<6;i++)
   {
     m_GHandle[i]->ShowShadingPlane(show);
