@@ -198,8 +198,7 @@ void medWizard::BlockExecutionBegin()
     if (requiredOperation=="")
       ContinueExecution(m_CurrentBlock->Success());
   }
-  else
-    mafLogMessage("Error Unknown block!");
+  
 }
 
 //----------------------------------------------------------------------------
