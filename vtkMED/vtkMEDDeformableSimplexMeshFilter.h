@@ -1,11 +1,26 @@
+/*-------------------------------
+* By Xiangyin Ma, Nov 2012
+*-----------------------------------
+*The deforming filter of simplex mesh
+*1. inherite from itk::DeformableSimplexMesh3DFilter
+*2. Keep the internal force/smoothing force unchanged
+*3. Override External force, compute it as displacement vectors along the direction normal to the simplex surface
+*4. Add new force called 'Strut and link length force', to keep the length of the struts and links
+*5. Override the ComputeDisplacement() function
+*   5.1. Use KD tree to calculate the distance from the simplex vertex to the vessel wall
+*        This distance is used to weight the external force and total dispalcement
+*   5.2. Sysnchronize the catheter's pulling over with the expansion of a certain circle of simplex vertices
+*--------------------------------*/
+
 #include "itkDeformableSimplexMesh3DFilter.h"
 #include "itkMesh.h"
 #include "itkConstNeighborhoodIterator.h"
 #include "itkCovariantVector.h"
-#include "StentModelSource.h"
+#include "vtkMEDStentModelSource.h"
 //#include "VesselMeshForTesting.h" 
 #include "kdtree.h"
 #include <assert.h>
+#include "vtkPolyData.h"
 
 
 #include <set>
@@ -15,12 +30,12 @@ using std::vector;
 namespace itk
 {
 template< class TInputMesh, class TOutputMesh >
-class DeformableSimplexMeshFilter001 :
+class DeformableSimplexMeshFilterImpl :
   public DeformableSimplexMesh3DFilter< TInputMesh, TOutputMesh >
 {
 public:
   /** Standard "Self" typedefs. */
-  typedef DeformableSimplexMeshFilter001 Self;
+  typedef DeformableSimplexMeshFilterImpl Self;
 
   /** Standard "Superclass" typedef. */
   typedef  DeformableSimplexMesh3DFilter< TInputMesh, TOutputMesh > Superclass;
@@ -33,7 +48,7 @@ public:
   itkNewMacro(Self);
 
   /** Run-time type information (and related methods). */
-  itkTypeMacro(DeformableSimplexMeshFilter001, DeformableSimplexMesh3DFilter);
+  itkTypeMacro(DeformableSimplexMeshFilterImpl, DeformableSimplexMesh3DFilter);
 
   /** Some typedefs. */
   typedef TInputMesh  InputMeshType;
@@ -45,7 +60,7 @@ public:
   typedef typename Superclass::GradientType           GradientType;
   typedef typename Superclass::GradientImageType      GradientImageType;
 
-  /* Mesh pointer definition. */
+  /** Mesh pointer definition. */
   typedef typename InputMeshType::Pointer  InputMeshPointer;
   typedef typename OutputMeshType::Pointer OutputMeshPointer;
 
@@ -59,16 +74,12 @@ public:
   typedef typename OriginalImageIndexType::IndexValueType ImageIndexValueType;
   typedef typename OriginalImageType::ConstPointer        OriginalImagePointer;
 
-  typedef StentModelSource::Strut          Strut;
+  typedef vtkMEDStentModelSource::Strut          Strut;
   typedef vector<Strut>::const_iterator    StrutIterator;
   typedef itk::Vector< double, 3 >         VectorType;
 
   //typedef VesselMeshForTesting::Point      Point;
   //typedef vector<Point>::const_iterator    PointIterator;
-
-  /** control the range of search for Bresenham at normal line */
-  itkSetMacro(Range, int);
-  itkGetConstMacro(Range, int);
 
   itkSetMacro(StrutLength, double);
   itkGetConstMacro(StrutLength, double);
@@ -81,63 +92,44 @@ public:
   
   void SetStrutLinkIter(StrutIterator StrutStart, StrutIterator StrutEnd,
 	                    StrutIterator LinkStart, StrutIterator LinkEnd);
-
-  //void SetVesselPointsKDTree(PointIterator PointStart, PointIterator PointEnd);
-
-
-  // full segment or half segment direction
-  enum SIDE {
-    // half segment in direction
-    NORMAL,
-    // half segment in -direction
-    INVERSE,
-    // complete segment
-    BOTH
-    };
+ // void SetVesselPointsKDTree(PointIterator PointStart, PointIterator PointEnd);
+  void SetVesselPointsKDTreeFromPolyData(vtkPolyData *surface);
+  void SetCenterLocationIdx(vector<int>::const_iterator centerLocationIndex);
+  void SetCenterLocationIdxRef(vector<int> const&ve);
+  void SetTestValue(int value){this->testValue = value;}
 
 protected:
-  DeformableSimplexMeshFilter001();
-  ~DeformableSimplexMeshFilter001();
-  DeformableSimplexMeshFilter001(const Self &) {}
+  DeformableSimplexMeshFilterImpl();
+  ~DeformableSimplexMeshFilterImpl();
+  DeformableSimplexMeshFilterImpl(const Self &) {}
   void operator=(const Self &){}
-  void PrintSelf(std::ostream & os, Indent indent) const;
-
-  virtual void Initialize();
+ 
   virtual void ComputeDisplacement();
-
-  /**
-   * Compute the external force component
-   */
   virtual void ComputeExternalForce(SimplexMeshGeometry *data);
 
-  /**
-   * Range of search for Bresenham algorithm (normal line at each vertex)
-   */
-  int m_Range;
   double m_StrutLength;
   double m_LinkLength;
-
  
 
 private:
   VectorType ComputeStrutLengthForce(SimplexMeshGeometry *data, int index);
-	//double dist_sq( double *a1, double *a2, int dims );
-  //bool distanceFlag;
+  VectorType ComputeLinkLengthForce(SimplexMeshGeometry *data, int index);
 
   double distanceCoefficient;
 
   // [0],[1] strut neighbor; [2] link neighbor
   int (*StrutNeighbors)[3] ;
-  //double (*VesselPoints)[3];
+
   kdtree *KDTree;
-  double (*closetPoint)[3];
-  double *distance;
+
+  vector<int>::const_iterator centerLocationIdx;
 
   int m_CurIterationNum;
+  int testValue;
 
 }; // end of class
 } // namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "DeformableSimplexMeshFilter001.hxx"
+#include "vtkMEDDeformableSimplexMeshFilterImpl.h"
 #endif
