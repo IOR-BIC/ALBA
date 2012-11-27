@@ -1089,10 +1089,8 @@ bool medDataPipeCustomSegmentationVolume::CheckNumberOfThresholds()
       return true;
     }
   }
-  else
-  {
-    return false;
-  }
+  	
+  return false;  
   //////////////////////////////////////////////////////////////////////////
 }
 //----------------------------------------------------------------------------
