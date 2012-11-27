@@ -735,7 +735,7 @@ static const vtkMarchingCubesTriangleCases* marchingCubesCases = vtkMarchingCube
   }
 
 
-  int vtkMAFContourVolumeMapperGPU::buildHistopyramid_SliceSorting()
+  int vtkMAFContourVolumeMapperGPU::BuildHistopyramidSliceSorting()
   {
     glPushAttrib( GL_VIEWPORT_BIT );
 
@@ -1296,7 +1296,7 @@ static const vtkMarchingCubesTriangleCases* marchingCubesCases = vtkMarchingCube
 
     if (this->ContourValue != this->PrevContourValue || bBuildHp==0 )
     {
-      buildHistopyramid_SliceSorting();
+      BuildHistopyramidSliceSorting();
       this->PrevContourValue=this->ContourValue;
     }
 
