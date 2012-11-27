@@ -374,9 +374,7 @@ void medGizmoCrossRotate::SetRefSys(mafVME *refSys)
 //----------------------------------------------------------------------------
 void medGizmoCrossRotate::SetCircleFanRadius(double radius)
 //----------------------------------------------------------------------------
-{
-	short circleNumber;
-
+{	
 	//  if(m_GRCircle) m_GRCircle->SetRadius(radius);
 	if(m_GizmoCrossRotateFan) m_GizmoCrossRotateFan->SetRadius(radius);
 
