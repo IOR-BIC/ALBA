@@ -44,6 +44,8 @@ medWizardBlock::medWizardBlock(const char *name)
 
   //by default on abort cancel operation the operation will be recalled
   m_AbortBlock=name;
+
+  m_BlockProgress=-1;
 }
 
 //----------------------------------------------------------------------------
@@ -113,6 +115,9 @@ void medWizardBlock::ExcutionBegin()
 
   //Setting the input VME to reselect it on op cancel 
   m_InputVME=m_SelectedVME;
+
+  if (m_BlockProgress>=0)
+    mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,m_BlockProgress));
 }
 
 //----------------------------------------------------------------------------

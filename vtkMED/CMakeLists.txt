@@ -118,6 +118,12 @@ SET(vtkMED_SRCS  ${vtkMED_SRCS}
   mafClassicICPRegistration.cxx
   mafClassicICPRegistration.h
   mafICPUtility.h
+  
+  #for stent
+  vtkMEDDeformableSimplexMeshFilter.h
+  vtkMEDDeformableSimplexMeshFilterImpl.h
+  vtkMEDStentModelSource.cpp
+  vtkMEDStentModelSource.h
 )
 ENDIF (MAF_USE_ITK)
 

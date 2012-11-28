@@ -221,6 +221,37 @@ void medLogicWithManagers::OnEvent(mafEventBase *maf_event)
         }
       }
       break; 
+    case PROGRESSBAR_SHOW:
+     {
+       if (e->GetSender()==m_WizardManager)
+       {
+         m_WizardLabel->Enable();
+         m_WizardGauge->Enable();
+       }
+       else
+         mafLogicWithManagers::OnEvent(maf_event);
+     }
+    break;
+    case PROGRESSBAR_HIDE:
+      {
+        if (e->GetSender()==m_WizardManager)
+        {
+          m_WizardGauge->SetValue(0);
+          m_WizardGauge->Enable(false);
+          m_WizardLabel->Enable(false);
+        }
+        else
+          mafLogicWithManagers::OnEvent(maf_event);
+      }
+    break;
+    case PROGRESSBAR_SET_VALUE:
+      {
+        if (e->GetSender()==m_WizardManager)
+          m_WizardGauge->SetValue(e->GetArg());
+        else
+          mafLogicWithManagers::OnEvent(maf_event);
+      }
+    break;
 		default:
       //Call parent event manager
 			mafLogicWithManagers::OnEvent(maf_event);
@@ -281,6 +312,7 @@ void medLogicWithManagers::Configure()
   //Setting wizard specific data
   if(m_UseWizardManager)
   {
+    CreateWizardToolbar();
     m_WizardManager = new medWizardManager();
     m_WizardManager->SetListener(this);
     m_WizardManager->WarningIfCantUndo(m_ApplicationSettings->GetWarnUserFlag());
@@ -491,4 +523,74 @@ void medLogicWithManagers::OnFileSaveAs()
       m_WizardManager->WizardContinue(saved!=MAF_ERROR);
     UpdateFrameTitle();
   }
+}
+
+//----------------------------------------------------------------------------
+void medLogicWithManagers::CreateWizardToolbar()
+  //----------------------------------------------------------------------------
+{
+ 
+  wxToolBar *serparatorBar = new wxToolBar(m_Win,MENU_VIEW_TOOLBAR,wxPoint(0,0),wxSize(-1,-1),wxTB_FLAT | wxTB_NODIVIDER );
+  serparatorBar->SetMargins(0,0);
+  serparatorBar->SetToolSeparation(2);
+  serparatorBar->SetToolBitmapSize(wxSize(20,20));
+  serparatorBar->AddSeparator();
+  serparatorBar->Update();
+  serparatorBar->Realize();
+
+  m_WizardGauge;
+  m_WizardGauge = new wxGauge(m_Win,-1, 100,wxDefaultPosition,wxDefaultSize,wxGA_SMOOTH);
+  m_WizardGauge->SetForegroundColour( *wxBLUE );
+  m_WizardGauge->Disable();
+
+  
+
+  wxWindow *tmp=new wxWindow(m_Win,-1, wxDefaultPosition,wxSize(50,20));
+  
+  m_WizardLabel = new wxStaticText(tmp, -1, " Wizard\n Progress",wxDefaultPosition,wxDefaultSize,wxALIGN_LEFT);
+  //lab->Show(false);
+  m_WizardLabel->Disable();
+ 
+
+  m_Win->AddDockPane(m_WizardGauge,  wxPaneInfo()
+    .Name("toolbar")
+    .Caption(wxT("ToolBar"))
+    .Top()
+    .Layer(2)
+    .ToolbarPane()
+    .LeftDockable(false)
+    .RightDockable(false)
+    .Floatable(false)
+    .Movable(false)
+    .Gripper(false)
+    );
+  
+
+  m_Win->AddDockPane(tmp,  wxPaneInfo()
+    .Name("toolbar")
+    .Caption(wxT("ToolBar"))
+    .Top()
+    .Layer(2)
+    .ToolbarPane()
+    .LeftDockable(false)
+    .RightDockable(false)
+    .Floatable(false)
+    .Movable(false)
+    .Gripper(false)
+    );
+
+  m_Win->AddDockPane(serparatorBar,  wxPaneInfo()
+    .Name("toolbar")
+    .Caption(wxT("ToolBar"))
+    .Top()
+    .Layer(2)
+    .ToolbarPane()
+    .LeftDockable(false)
+    .RightDockable(false)
+    .Floatable(false)
+    .Movable(false)
+    .Gripper(false)
+    );
+ 
+  m_WizardGauge->Show(false);
 }

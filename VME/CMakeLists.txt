@@ -141,10 +141,7 @@ SET(PROJECT_SRCS
   medPipeRayCast.cpp
   medPipeRayCast.h
   
-   #add for stent
-  StentModelSource.h
-  StentModelSource.cpp
-  DeformableSimplexMeshFilter001.h 
+
 )
 
 IF (MAF_USE_ITK)
@@ -159,8 +156,7 @@ SET(PROJECT_SRCS  ${PROJECT_SRCS}
  #add for stent
   medVMEStent.cpp
   medVMEStent.h
-  kdtree.c
-  kdtree.h   
+  
 )
 ENDIF (MAF_USE_ITK)
 

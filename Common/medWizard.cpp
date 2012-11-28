@@ -38,6 +38,7 @@ medWizard::medWizard(const wxString &label,  const wxString &name)
   m_Label     = label;
   m_CurrentBlock=NULL;
   m_Listener=NULL;
+  m_ShowProgressBar=false;
 }
 
 //----------------------------------------------------------------------------
@@ -72,6 +73,13 @@ void medWizard::Execute()
     mafLogMessage("Wizard Error: Wizard has no starting point");
   else 
   {
+    if (m_ShowProgressBar)
+    {
+      mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
+    }
+    else 
+      mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
+
     //setting current block and start execution
     m_CurrentBlock=start;
     BlockExecutionBegin();
@@ -190,14 +198,16 @@ void medWizard::BlockExecutionBegin()
     if (requiredOperation=="")
       ContinueExecution(m_CurrentBlock->Success());
   }
-  else
-    mafLogMessage("Error Unknown block!");
+  
 }
 
 //----------------------------------------------------------------------------
 void medWizard::AbortWizard()
 //----------------------------------------------------------------------------
 {
+  if (m_ShowProgressBar)
+    mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
+
   mafEventMacro(mafEvent(this,WIZARD_RUN_TERMINATED,false));
 }
 
@@ -216,6 +226,10 @@ void medWizard::BlockExecutionEnd()
   if (nextBlock=="END")
   {
     m_CurrentBlock=NULL;
+
+    if (m_ShowProgressBar)
+      mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
+
     mafEventMacro(mafEvent(this,WIZARD_RUN_TERMINATED,true));
   }
   //If the next block is in the form WIZARD{<name>} We switch to the wizard <name> and execute it
@@ -226,6 +240,10 @@ void medWizard::BlockExecutionEnd()
     if (nextBlock[nextBlock.size()-1] != '}')
     {
       mafLogMessage("WIZARD special keyword error: WIZARD{<name>} wrong format");
+
+      if (m_ShowProgressBar)
+        mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
+
       mafEventMacro(mafEvent(this,WIZARD_RUN_TERMINATED,true));
     }
     else 
@@ -282,6 +300,9 @@ void medWizard::ContinueExecution(int opSuccess)
     int answare = wxMessageBox(_("Do you want to abort this wizard ?"), _("Wizard Abort"), wxYES_NO|wxCENTER);
     if(answare == wxYES)
     {
+      if (m_ShowProgressBar)
+        mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
+
       //if the operation has aborted by the user we abort the entire wizard
       //this behavior can be updated for error management
       mafEventMacro(mafEvent(this,WIZARD_RUN_TERMINATED,false));

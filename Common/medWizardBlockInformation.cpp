@@ -72,7 +72,9 @@ void medWizardBlockInformation::SetDescription( const char *description )
 void medWizardBlockInformation::ExcutionBegin()
 //----------------------------------------------------------------------------
 {
-  //Create event for comunication
+  medWizardBlock::ExcutionBegin();
+
+  //Create event for communication
   mafEvent e=mafEvent(this,WIZARD_INFORMATION_BOX_SHOW_GET);
 
   //Ask upward to the wizard manager if information box shows is enabled

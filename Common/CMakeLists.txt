@@ -88,6 +88,9 @@ SET(PROJECT_SRCS
   #Removed from vtkMED because it need of MAF Utilities
   ../BES_Beta/vtkMAF/vtkMAFLargeDataSetCallback.cxx
   ../BES_Beta/vtkMAF/vtkMAFLargeDataSetCallback.h
+  #stent used tool, to find nearest point
+  kdtree.c
+  kdtree.h
 )
 
 # List libraries that are needed by this project.
