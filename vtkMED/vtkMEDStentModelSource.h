@@ -50,7 +50,7 @@ using std::vector;
 * the control mesh have two more circles of vertices  in each side than the stent.
 *---------------------------------------
 */
-class VTK_vtkMED_EXPORT vtkMEDStentModelSource
+class vtkMEDStentModelSource
 {
 
 public:
