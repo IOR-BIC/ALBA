@@ -34,7 +34,7 @@ void vtkPatchLine::ExecuteData(vtkDataObject *output)
 	source->Update();
 	
 	//Remove duplicate points etc.
-	vtkMAFSmartPointer<vtkCleanPolyData> cleaner = vtkCleanPolyData::New();
+	vtkMAFSmartPointer<vtkCleanPolyData> cleaner;
 	cleaner->SetInput(source.GetPointer());
 	cleaner->Update();  
 	source = cleaner->GetOutput();
@@ -119,7 +119,7 @@ void vtkPatchLine::ExecuteData(vtkDataObject *output)
 		endVertices.erase(bestEnd_it);
 	}
 
-	vtkMAFSmartPointer<vtkPolyLine> polyLine = vtkPolyLine::New();
+	vtkMAFSmartPointer<vtkPolyLine> polyLine;
 	polyLine->GetPointIds()->SetNumberOfIds(nNumPoints);
 
 	//Set starting point of polyline
