@@ -1013,8 +1013,7 @@ void medPipeTensorFieldGlyphs::DoFilter(int mode ,double *rangeValue,double *ran
 
 	vtkDataArray *pointScalarArray = allPoints->GetScalars();
 	int nPoints = old_tensors->GetSize()/old_tensors->GetNumberOfComponents();
-	int idx,num=0 ;
-	double xDvalue,yDvalue,zDvalue;
+	int num=0 ;	
 
 	double dMax=0,dMin=0;//test code
 
@@ -1026,7 +1025,7 @@ void medPipeTensorFieldGlyphs::DoFilter(int mode ,double *rangeValue,double *ran
 	int idxScales = 0;
 
 	double tensorScale;
-	double pointScale = NULL;
+	double pointScale = 0.0;
 
 	double *pCoord;
 	double *aTuple;
@@ -1052,8 +1051,7 @@ void medPipeTensorFieldGlyphs::DoFilter(int mode ,double *rangeValue,double *ran
 			vtkDataArray *zCoord = orgDataR->GetZCoordinates();
 			//-----------test code ------------------
 			orgDataR->GetDimensions(dim);
-			int numberOfTuple = old_scalars->GetNumberOfTuples();//@todo
-			float  fMin,fMax;
+			int numberOfTuple = old_scalars->GetNumberOfTuples();//@todo			
 			if (m_DataScale_Copy != NULL)
 			{
 
@@ -1076,15 +1074,15 @@ void medPipeTensorFieldGlyphs::DoFilter(int mode ,double *rangeValue,double *ran
 								//if (scaleValue>=rangeValue[0] && scaleValue<=rangeValue[1])//in range
 								if (DoCondition(mode,tensorScale,pointScale,rangeValue,rangeValue2))//DoCondition(int mode,double tensorScaleValue,double scaleValue,double *rangeValue1,double *rangeValue2)
 								{
-									pCoord = allPoints->GetTuple(idx);//only init
+									double coord[3];
 
-									pCoord[0] = xCoord->GetTuple1(ix);
-									pCoord[1] = yCoord->GetTuple1(iy);
-									pCoord[2] = zCoord->GetTuple1(iz);
+									coord[0] = xCoord->GetTuple1(ix);
+									coord[1] = yCoord->GetTuple1(iy);
+									coord[2] = zCoord->GetTuple1(iz);
 									
-									points->InsertNextPoint(pCoord);
-									vectors->InsertNextTuple(old_vectors->GetTuple3(idxPoints));
-									scalars->InsertNextTuple((float*)&pointScale);
+									points->InsertNextPoint(coord);
+									vectors->InsertNextTuple(old_vectors->GetTuple3(idxPoints));																		
+									scalars->InsertNextTuple(&pointScale);
 									tensors->InsertNextTuple(old_tensors->GetTuple9(idxPoints));
 									num++;
 								}
