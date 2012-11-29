@@ -28,10 +28,8 @@ OF SUCH DAMAGE.
 #ifndef _KDTREE_H_
 #define _KDTREE_H_
 
-#include "medCommonDefines.h"
-
 #ifdef __cplusplus
-MED_COMMON_EXPORT extern "C" {
+extern "C" {
 #endif
 
 struct kdtree;
