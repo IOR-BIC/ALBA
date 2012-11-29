@@ -95,6 +95,8 @@ void vtkMEDRayCastCleaner::Execute()
     newScalars->SetTuple1(i,newValue);
   }
   
+  //In MR_MODALITY The cleaner just make scalarshift to avoid vtkVolumeRayCastMapper errors
+  //In CT_MODALITY the cleaner remove the blood from bone boundary 
   if (Modality==CT_MODALITY)
   {
     for (int i=0;i<nPoints;i++)
