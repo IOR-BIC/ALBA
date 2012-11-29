@@ -157,6 +157,11 @@ SET(PROJECT_SRCS  ${PROJECT_SRCS}
   medVMEStent.cpp
   medVMEStent.h
   
+  #stent used tool, to find nearest point
+  kdtree.c
+  kdtree.h
+
+  
 )
 ENDIF (MAF_USE_ITK)
 

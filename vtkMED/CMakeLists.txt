@@ -111,6 +111,8 @@ SET(vtkMED_SRCS
   
   vtkMEDVolumeToClosedSmoothSurface.cxx
   vtkMEDVolumeToClosedSmoothSurface.h
+  
+  
 )
 
 IF (MAF_USE_ITK)
@@ -118,12 +120,6 @@ SET(vtkMED_SRCS  ${vtkMED_SRCS}
   mafClassicICPRegistration.cxx
   mafClassicICPRegistration.h
   mafICPUtility.h
-  
-  #for stent
-  vtkMEDDeformableSimplexMeshFilter.h
-  vtkMEDDeformableSimplexMeshFilterImpl.h
-  vtkMEDStentModelSource.cpp
-  vtkMEDStentModelSource.h
 )
 ENDIF (MAF_USE_ITK)
 
@@ -137,7 +133,11 @@ SET(vtkMED_SRCS
   vtkBoundingBox.h
   vtkMEDPastValuesList.cpp
   vtkMEDPastValuesList.h
-  
+  vtkMEDStentModelSource.cpp
+  vtkMEDStentModelSource.h
+  vtkMEDDeformableSimplexMeshFilter.h
+  vtkMEDDeformableSimplexMeshFilterImpl.h
+
   ############# VolumeLarge Files - TO BE COMMITTED DOWN ########
   vtkMAFIdType64.h
   ../BES_Beta/vtkMAF/vtkMAFLargeDataProvider.cxx
