@@ -63,6 +63,18 @@ public:
   /** Get the Blood Upper Threshold */
   vtkGetMacro(BloodUpperThreshold,double);
 
+  /** Set Modality to CT */
+  void SetModalityToCT();
+
+  /** Return true if modality is CT */
+  bool IsModalityCT();
+
+  /** Set Modality to MR */
+  void SetModalityToMR();
+
+  /** Return true if modality is MR */
+  bool IsModalityMR();
+
 protected:
 
   /** Execute this filter */
@@ -95,6 +107,7 @@ private:
   int BoneLowerThreshold;
   int BloodLowerThreshold;
   int BloodUpperThreshold;
+  int Modality;
 };
 
 #endif
