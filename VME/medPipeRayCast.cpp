@@ -526,6 +526,7 @@ void medPipeRayCast::SetRayCastFunctions()
 
   if (m_Modality ==  CT_MODALITY )
   {  
+    /////////////////CT OPACITTY/COLOR VALUES////////////////
     //skin opacity
     m_OpacityFunction->AddPoint(scalarShift(m_SkinLowerThreshold-1.0)   , 0.0);
     m_OpacityFunction->AddPoint(scalarShift(m_SkinLowerThreshold)       , 0.2*m_SkinOpacity);
@@ -572,7 +573,7 @@ void medPipeRayCast::SetRayCastFunctions()
   }
   else
   {
-   
+    /////////////////MR OPACITTY/COLOR VALUES////////////////
     //bone opacity
     m_OpacityFunction->AddPoint(scalarShift(0)       , 0.0);
     m_OpacityFunction->AddPoint(scalarShift(m_BoneLowerThreshold-1)     , 0.0);
@@ -623,24 +624,35 @@ void medPipeRayCast::SetRayCastFunctions()
 
 }
 
+//----------------------------------------------------------------------------
 void medPipeRayCast::DetectModality()
+//----------------------------------------------------------------------------
 {
+  
   mafTagItem *item=NULL;
   wxString tagModality;
 
+  //getting modality tags
   item = m_Vme->GetTagArray()->GetTag("Modality");
   if (item != NULL )
     tagModality = item->GetValue();
 
+  //if modality tag is set to ct we use CT_MODALITY
+  //if modality tag is set to mr we use MR_MODALITY
+  //if both tags are not set we use an heuristic, 
   if (strcmp(tagModality,"CT")==0 || (strcmp(tagModality,"MR")!=0 && m_ScalarRange[0]<0) )
     m_Modality=CT_MODALITY;
   else
     m_Modality=MR_MODALITY;
 }
 
+//----------------------------------------------------------------------------
 void medPipeRayCast::OnPreset()
+//----------------------------------------------------------------------------
 {
   if (m_Modality==CT_MODALITY)
+  {
+    //Setting CT presets opacity values
     switch(m_Preset) 
     {
     case DEFAULT_PRESET:
@@ -667,7 +679,10 @@ void medPipeRayCast::OnPreset()
         m_BoneOpacity=0.5;
       break;
     }
+  }
   else
+  {
+    //Setting MR presets opacity values
     switch(m_Preset) 
     {
       case DEFAULT_PRESET:
@@ -690,27 +705,26 @@ void medPipeRayCast::OnPreset()
         m_BoneOpacity=0.5;
       break;
     }
-
+  }
 }
 
+//----------------------------------------------------------------------------
 void medPipeRayCast::ShowHideSliders()
+//----------------------------------------------------------------------------
 {
   m_CTSliders->Show(m_Modality==CT_MODALITY);
   m_CTSliders->FitGui();
   m_MRSliders->Show(m_Modality==MR_MODALITY);
   m_MRSliders->FitGui();
   m_Gui->FitGui();
-  
 }
 
-
+//----------------------------------------------------------------------------
 void medPipeRayCast::OnChangeModality()
+//----------------------------------------------------------------------------
 {
   SetThresholding();
   UpdateFromData();
   OnPreset();
   ShowHideSliders();
 }
-
-
-
