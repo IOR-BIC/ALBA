@@ -66,6 +66,15 @@ void medPipeRayCastTest::setUp()
   vtkNEW(m_Renderer);
   vtkNEW(m_RenderWindow);
   vtkNEW(m_RenderWindowInteractor);
+
+  ///////////////// render stuff /////////////////////////
+  m_Renderer->SetBackground(0.1, 0.1, 0.1);
+  m_RenderWindow->AddRenderer(m_Renderer);
+  m_RenderWindow->SetSize(320, 240);
+  m_RenderWindow->SetPosition(400,0);
+  m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
+  ///////////// end render stuff /////////////////////////
+
 }
 //----------------------------------------------------------------------------
 void medPipeRayCastTest::tearDown()
@@ -76,18 +85,12 @@ void medPipeRayCastTest::tearDown()
   vtkDEL(m_RenderWindow);
   vtkDEL(m_RenderWindowInteractor);
 }
+
 //----------------------------------------------------------------------------
 void medPipeRayCastTest::TestPipeExecution()
 //----------------------------------------------------------------------------
 {
-  ///////////////// render stuff /////////////////////////
-  m_Renderer->SetBackground(0.1, 0.1, 0.1);
-  m_RenderWindow->AddRenderer(m_Renderer);
-  m_RenderWindow->SetSize(320, 240);
-  m_RenderWindow->SetPosition(400,0);
-  m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
-  ///////////// end render stuff /////////////////////////
-
+  
 
   ////// Create VME (import vtkData) ////////////////////
   vtkDataSetReader *Importer;
@@ -134,6 +137,8 @@ void medPipeRayCastTest::TestPipeExecution()
   // Regression compare test
   CompareImages(0);
 
+  m_Renderer->RemoveVolume(actor);
+
   vtkDEL(actorList);
 
   delete pipeRayCast;
@@ -144,6 +149,72 @@ void medPipeRayCastTest::TestPipeExecution()
 
   delete wxLog::SetActiveTarget(NULL);
 }
+
+//----------------------------------------------------------------------------
+void medPipeRayCastTest::TestPipeExecutionMR()
+  //----------------------------------------------------------------------------
+{
+ 
+
+  ////// Create VME (import vtkData) ////////////////////
+  vtkDataSetReader *Importer;
+  vtkNEW(Importer);
+  mafString filename=MED_DATA_ROOT;
+  filename<<"/VTK_Volumes/volumeRayCastTestMR.vtk";
+  Importer->SetFileName(filename);
+  Importer->Update();
+  mafVMEVolumeGray *volume;
+  mafNEW(volume);
+  volume->SetData((vtkImageData*)Importer->GetOutput(),0.0);
+  volume->GetOutput()->Update();
+  volume->Update();
+
+  //Assembly will be create when instancing mafSceneNode
+  mafSceneNode *sceneNode;
+  sceneNode = new mafSceneNode(NULL,NULL,volume, NULL);
+
+  /////////// Pipe Instance and Creation ///////////
+  medPipeRayCast *pipeRayCast = new medPipeRayCast;
+  pipeRayCast->TestModeOn();
+  pipeRayCast->Create(sceneNode);
+
+  ////////// ACTORS List ///////////////
+  vtkPropCollection *actorList = vtkPropCollection::New();
+  pipeRayCast->GetAssemblyFront()->GetVolumes(actorList);
+
+  actorList->InitTraversal();
+  vtkProp *actor = actorList->GetNextProp();
+  while(actor)
+  {   
+    m_Renderer->AddVolume(actor);
+    m_RenderWindow->Render();
+
+    actor = actorList->GetNextProp();
+  }
+
+  vtkVolume *surfaceActor;
+  surfaceActor = (vtkVolume *) SelectActorToControl(actorList, 0);
+  CPPUNIT_ASSERT(surfaceActor != NULL);
+
+  m_RenderWindow->Render();
+  mafSleep(800);
+  // Regression compare test
+  CompareImages(1);
+
+  m_Renderer->RemoveActor(actor);
+
+  vtkDEL(actorList);
+
+  delete pipeRayCast;
+  delete sceneNode;
+
+  mafDEL(volume);
+  vtkDEL(Importer);
+
+  delete wxLog::SetActiveTarget(NULL);
+}
+
+
 //----------------------------------------------------------------------------
 void medPipeRayCastTest::CompareImages(int scalarIndex)
   //----------------------------------------------------------------------------
@@ -255,9 +326,10 @@ void medPipeRayCastTest::CompareImages(int scalarIndex)
   vtkDEL(w);
   vtkDEL(w2i);
 }
+
 //----------------------------------------------------------------------------
 vtkProp *medPipeRayCastTest::SelectActorToControl(vtkPropCollection *propList, int index)
-  //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 {
   propList->InitTraversal();
   vtkProp *actor = propList->GetNextProp();
