@@ -54,27 +54,31 @@ void vtkMEDRayCastCleanerTest::TestFilter()
 
   vtkStructuredPoints *oldOutput,*newOutput;
 
+  //Loading unfiltered data
   vtkMAFSmartPointer<vtkStructuredPointsReader> r;
   mafString filename=MED_DATA_ROOT;
   filename<<"/VTK_Volumes/volumeRayCastTest.vtk";
   r->SetFileName(filename.GetCStr());
   r->Update();
 
+  //Loading prefiltered data
   vtkMAFSmartPointer<vtkStructuredPointsReader> r2;
   mafString filteredFilename=MED_DATA_ROOT;
   filteredFilename<<"/Test_vtkMEDRayCastCleaner/outputVolume.vtk";
   r2->SetFileName(filteredFilename.GetCStr());
   r2->Update();
 
+  //creating filter
   vtkMAFSmartPointer<vtkMEDRayCastCleaner> filter;
   filter->SetInput(r->GetOutput());
+  filter->SetModalityToCT();
   filter->Update();
   
-
-  
+  //getting output
   oldOutput=r2->GetOutput();
   newOutput=filter->GetOutput();
   
+  //base tests
   CPPUNIT_ASSERT( (oldOutput!= NULL) && (newOutput != NULL));
   CPPUNIT_ASSERT(oldOutput->GetNumberOfPoints() == newOutput->GetNumberOfPoints());
 
@@ -82,11 +86,10 @@ void vtkMEDRayCastCleanerTest::TestFilter()
   vtkDataArray* newScalars = (vtkDataArray*)newOutput->GetPointData()->GetScalars();
 
   int nPoints=newOutput->GetNumberOfPoints();
-
-  printf("a");
-
+    
   int equalScalars=true;
 
+  //scalars compare one by one
   for (int i=0;i<nPoints;i++)
   {
     if (oldScalars->GetTuple1(i) != newScalars->GetTuple1(i))
@@ -113,8 +116,80 @@ void vtkMEDRayCastCleanerTest::TestFilter()
   
 }
 
-void vtkMEDRayCastCleanerTest::TestSetterGetter()
+
+//-------------------------------------------------------------------------
+void vtkMEDRayCastCleanerTest::TestFilterMR()
+//-------------------------------------------------------------------------
 {
+
+  vtkStructuredPoints *oldOutput,*newOutput;
+  
+  //Loading unfiltered data
+  vtkMAFSmartPointer<vtkStructuredPointsReader> r;
+  mafString filename=MED_DATA_ROOT;
+  filename<<"/VTK_Volumes/volumeRayCastTestMR.vtk";
+  r->SetFileName(filename.GetCStr());
+  r->Update();
+
+  //Loading prefiltered data
+  vtkMAFSmartPointer<vtkStructuredPointsReader> r2;
+  mafString filteredFilename=MED_DATA_ROOT;
+  filteredFilename<<"/Test_vtkMEDRayCastCleaner/outputVolumeMR.vtk";
+  r2->SetFileName(filteredFilename.GetCStr());
+  r2->Update();
+  
+  //creating filter
+  vtkMAFSmartPointer<vtkMEDRayCastCleaner> filter;
+  filter->SetInput(r->GetOutput());
+  filter->SetModalityToMR();
+  filter->Update();
+  
+  //getting output
+  oldOutput=r2->GetOutput();
+  newOutput=filter->GetOutput();
+  
+  //base tests
+  CPPUNIT_ASSERT( (oldOutput!= NULL) && (newOutput != NULL));
+  CPPUNIT_ASSERT(oldOutput->GetNumberOfPoints() == newOutput->GetNumberOfPoints());
+
+  vtkDataArray* oldScalars = (vtkDataArray*)oldOutput->GetPointData()->GetScalars();
+  vtkDataArray* newScalars = (vtkDataArray*)newOutput->GetPointData()->GetScalars();
+
+  int nPoints=newOutput->GetNumberOfPoints();
+    
+  int equalScalars=true;
+
+  //scalars compare one by one
+  for (int i=0;i<nPoints;i++)
+  {
+    if (oldScalars->GetTuple1(i) != newScalars->GetTuple1(i))
+    {
+      equalScalars=false;
+      break;
+    }
+  }
+  
+  CPPUNIT_ASSERT(equalScalars);
+     
+  //Used to generate initial test file 
+  /*
+  vtkMAFSmartPointer<vtkStructuredPointsWriter> w;
+  mafString outFilename=MED_DATA_ROOT;
+  outFilename<<"/Test_vtkMEDRayCastCleaner/outputVolumeMR.vtk";
+  w->SetFileName(outFilename.GetCStr());
+  w->SetFileTypeToBinary();
+  w->SetInput(filter->GetOutput());
+  w->Update();
+  */
+  
+}
+
+//-------------------------------------------------------------------------
+void vtkMEDRayCastCleanerTest::TestSetterGetter()
+//-------------------------------------------------------------------------
+{
+
+  //testing setter/getter 
 
   vtkMAFSmartPointer<vtkMEDRayCastCleaner> filter;
   
@@ -126,5 +201,11 @@ void vtkMEDRayCastCleanerTest::TestSetterGetter()
   
   filter->SetBoneLowerThreshold(745.0);
   CPPUNIT_ASSERT(filter->GetBoneLowerThreshold() == 745.0);
+
+  filter->SetModalityToCT();
+  CPPUNIT_ASSERT(filter->IsModalityCT() && !filter->IsModalityMR());
+
+  filter->SetModalityToMR();
+  CPPUNIT_ASSERT(filter->IsModalityMR() && !filter->IsModalityCT());
 
 }
