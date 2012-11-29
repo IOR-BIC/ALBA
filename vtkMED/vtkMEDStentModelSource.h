@@ -1,18 +1,19 @@
-#pragma once
-
-
 /*=========================================================================
-  Program:   MAF2Medical
-  Module:    $RCSfile: StentModelSource.h,v $
-  Language:  C++
-  Date:      $Date: 2012-Nov 10:15:31 $
-  Version:   $Revision: 1.1.2.7 $
-  Authors:   Xiangyin Ma, Hui Wei
-==========================================================================
-Copyright (c) 2001/2005 
-CINECA - Interuniversity Consortium (www.cineca.it)
-=========================================================================*/
 
+ Program: MAF2Medical
+ Module:  vtkMEDStentModelSource.h
+ Authors: Xiangyin Ma, Hui Wei
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+#pragma once
 
 #include <iostream>
 
@@ -27,7 +28,6 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #define VECTORITEM_H
 #include <vector>
 using std::vector;
-#define Pi 3.14159265
 #endif
 /**
 *---------------------------------------
