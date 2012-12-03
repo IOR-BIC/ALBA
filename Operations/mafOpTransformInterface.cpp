@@ -304,4 +304,6 @@ void mafOpTransformInterface::SetRefSysVME(mafVME* refSysVME)
 
   m_RefSysVME = refSysVME;
   RefSysVmeChanged();
+  mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+
 }
