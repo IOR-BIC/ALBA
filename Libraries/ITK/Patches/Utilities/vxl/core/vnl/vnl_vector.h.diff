@@ -1,0 +1,14 @@
+36,37c36,37
+< export template <class T> class vnl_vector;
+< export template <class T> class vnl_matrix;
+---
+> _vcl_export template <class T> class vnl_vector;
+> _vcl_export template <class T> class vnl_matrix;
+534c534
+< export template <class T> vcl_ostream& operator<<(vcl_ostream &, vnl_vector<T> const&);
+---
+> _vcl_export template <class T> vcl_ostream& operator<<(vcl_ostream &, vnl_vector<T> const&);
+537c537
+< export template <class T> vcl_istream& operator>>(vcl_istream &, vnl_vector<T>      &);
+---
+> _vcl_export template <class T> vcl_istream& operator>>(vcl_istream &, vnl_vector<T>      &);

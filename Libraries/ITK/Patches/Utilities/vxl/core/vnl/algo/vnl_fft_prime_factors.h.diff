@@ -1,0 +1,4 @@
+24c24
+< export template <class T>
+---
+> _vcl_export template <class T>
