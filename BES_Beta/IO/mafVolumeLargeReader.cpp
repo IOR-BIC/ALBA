@@ -248,7 +248,7 @@ void mafVolumeLargeReader::SetOutputRLGDataSet(vtkRectilinearGrid* ds)
 		if (m_DataSet->GetScalarPointer() == NULL ||
       (this->IsRectilinearGrid() && m_DataSetRLG->GetPointData()
         ->GetScalars()->GetVoidPointer(0) == NULL))
-			throw std::bad_alloc(_("Out of memory."));
+			throw std::bad_alloc();
 	}
 	catch (std::exception& e)
 	{
