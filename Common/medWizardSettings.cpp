@@ -96,6 +96,7 @@ void medWizardSettings::SetShowInformationBoxes( int value )
   m_ShowInformationBoxes=value;
   m_Config->Write("Wizard_info_boxes",m_ShowInformationBoxes);
   m_Config->Flush();
+  m_Gui->Update();
 }
 
 //----------------------------------------------------------------------------
