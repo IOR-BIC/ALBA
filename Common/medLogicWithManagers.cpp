@@ -360,8 +360,15 @@ void medLogicWithManagers::OnQuit()
 //----------------------------------------------------------------------------
 {
   if (m_WizardManager && m_WizardRunning)
+  {
+    wxMessageBox(_("Please exit wizard before quit."), _("Wizard running"), wxOK|wxCENTER|wxICON_STOP);
     return;
-
+  }
+  if (m_OpManager && m_OpManager->Running())
+  {
+    wxMessageBox(_("Please exit operation before quit."), _("Operation running"), wxOK|wxCENTER|wxICON_STOP);
+    return;
+  }
   mafLogicWithManagers::OnQuit();
 }
 
