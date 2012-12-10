@@ -33,7 +33,8 @@ medWizardSettings::medWizardSettings(mafObserver *Listener, const mafString &lab
 //----------------------------------------------------------------------------
 {
   //default constructor
-  m_ShowInformationBoxes = true; 
+  m_ShowInformationBoxes = true;
+  m_Gui=NULL;
   InitializeSettings();
 }
 
@@ -96,7 +97,8 @@ void medWizardSettings::SetShowInformationBoxes( int value )
   m_ShowInformationBoxes=value;
   m_Config->Write("Wizard_info_boxes",m_ShowInformationBoxes);
   m_Config->Flush();
-  m_Gui->Update();
+  if (m_Gui)
+    m_Gui->Update();
 }
 
 //----------------------------------------------------------------------------
