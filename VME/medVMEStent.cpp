@@ -110,7 +110,7 @@ medVMEStent::medVMEStent()
 	vtkNEW(m_Centerline);
 	mafNEW(m_Transform);
 	
-	m_numberOfCycle = 0;
+	m_NumberOfCycle = 0;
 	m_Stent_Diameter = 2.0;
 	m_Crown_Length = 2.2;
 	m_Strut_Angle = 0.0;
@@ -436,12 +436,12 @@ void medVMEStent::InternalUpdate()
 {
 	 
 	//-------------------------------------
-	if(m_numberOfCycle==0){
+	if(m_NumberOfCycle==0){
 		if(m_Centerline)
 		{	
 
 			m_DeformFlag =0;
-			stentPolyLine = vtkPolyData::New();
+			m_StentPolyLine = vtkPolyData::New();
 			
 			//testStent.setCenterLinePolydata(m_Centerline); //waitting for code updating
 			//--------do some processing between parameters--------
@@ -498,7 +498,7 @@ void medVMEStent::InternalUpdate()
 				vpoints->SetPoint(idx,pp);
 			}
 			vpoints->Squeeze() ;
-			stentPolyLine->SetPoints(vpoints) ;
+			m_StentPolyLine->SetPoints(vpoints) ;
 			vpoints->Delete() ;
 
 			int tindices[2];
@@ -515,12 +515,12 @@ void medVMEStent::InternalUpdate()
 				lines->InsertNextCell(2, tindices);
 			}
 			lines->Squeeze() ;
-			stentPolyLine->SetLines(lines);
+			m_StentPolyLine->SetLines(lines);
 			//---------------Vessel VTK-----
-			stentPolyLine->Modified();
-			stentPolyLine->Update();
+			m_StentPolyLine->Modified();
+			m_StentPolyLine->Update();
 			//------------------output------------------
-			m_PolyData->DeepCopy(stentPolyLine);	
+			m_PolyData->DeepCopy(m_StentPolyLine);	
 			m_PolyData->Modified();
 			m_PolyData->Update();
 			m_AppendPolyData->Update();
@@ -546,18 +546,18 @@ void medVMEStent::DoDeformation(int type)
 		int iteratorNumbers = 128;
 
 
-		if(m_numberOfCycle>iteratorNumbers){
+		if(m_NumberOfCycle>iteratorNumbers){
 			return;
 		}
 		if(type==0){
-			steps = iteratorNumbers - m_numberOfCycle;
+			steps = iteratorNumbers - m_NumberOfCycle;
 		}
 
 		//int iteratorTimes = 1;
 		for(int i=0 ; i<steps ; i++){
 
 			//-----------update visualization-----------
-			moveCatheter(m_numberOfCycle);
+			MoveCatheter(m_NumberOfCycle);
 			
 /*			//-------------deform stent---------
 			deformFilter->SetCurIterationNum(m_numberOfCycle);
@@ -592,7 +592,7 @@ void medVMEStent::DoDeformation(int type)
 */
 			m_AppendPolyData->Update();
 			m_AppendPolys->Update();
-			m_numberOfCycle++;
+			m_NumberOfCycle++;
 
 
 			//-------------update view------------
@@ -633,9 +633,9 @@ void medVMEStent::DoDeformation2(int type){
 		m_DeformFlag = 1;
 }
 
-	moveCatheter(m_numberOfCycle);
-	expandStent(m_numberOfCycle);
-	m_numberOfCycle++;
+	MoveCatheter(m_NumberOfCycle);
+	ExpandStent(m_NumberOfCycle);
+	m_NumberOfCycle++;
 
 	/*for (int i=0;i<cycle;i++)
 	{
@@ -652,9 +652,9 @@ void medVMEStent::DoDeformation2(int type){
 }
 
 /** expand stent in a constrain surface */
-void medVMEStent::expandStent(int numberOfCycle ){
+void medVMEStent::ExpandStent(int numberOfCycle ){
 	//-------------deform stent---------
-	deformFilter->SetCurIterationNum(m_numberOfCycle);
+	deformFilter->SetCurIterationNum(m_NumberOfCycle);
 	deformFilter->Update();
 
 	//------------update stent visualization----------------
@@ -673,19 +673,19 @@ void medVMEStent::expandStent(int numberOfCycle ){
 
 	vpoints->Squeeze();
 
-	stentPolyLine->SetPoints(vpoints);
-	stentPolyLine->Modified();
-	stentPolyLine->Update();
+	m_StentPolyLine->SetPoints(vpoints);
+	m_StentPolyLine->Modified();
+	m_StentPolyLine->Update();
 	vpoints->Delete() ;
 
 	//----new try remove vessel from appendoutput----------
 	//m_PolyData->SetPoints(vpoints);
-	m_PolyData->DeepCopy(stentPolyLine);
+	m_PolyData->DeepCopy(m_StentPolyLine);
 	m_PolyData->Modified();
 	m_PolyData->Update(); 
 }
 /** move catheter so that stent can expand */
-void medVMEStent::moveCatheter(int numberOfCycle ){
+void medVMEStent::MoveCatheter(int numberOfCycle ){
 		
 		static int pointsNumOnCenterLine = 209;
 

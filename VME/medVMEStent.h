@@ -120,14 +120,14 @@ protected:
 
 private:
 	/**  deformation iterator  */
-	int m_numberOfCycle;
-	vtkPolyData *stentPolyLine;  
+	int m_NumberOfCycle;
+	vtkPolyData *m_StentPolyLine;  
 	vector<vector<double>> m_StentCenterLine;
 	vector<vector<double>>::const_iterator m_CenterLineStart;
 	vector<vector<double>>::const_iterator m_CenterLineEnd;
 	vtkPolyData* CreateAConstrainSurface();
-	void moveCatheter(int numberOfCycle);
-	void expandStent(int numberOfCycle);
+	void MoveCatheter(int numberOfCycle);
+	void ExpandStent(int numberOfCycle);
 
 	/** three output in append polydata*/
 	vtkPolyData  *m_PolyData;

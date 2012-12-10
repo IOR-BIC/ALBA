@@ -46,10 +46,10 @@ medOpMMLModelView::medOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, vtk
 	//Model->GetRenderer()->AddActor(TextActor);
 
 	// 2d display by default
-	m_3DDisplay = 0;
+	m_Display3D = 0;
 
 	// 3 landmarks by default for initial mapping
-	m_4Landmarks = 0;
+	m_Landmarks4 = 0;
 
 	//
 	m_Scans = volume;
@@ -662,19 +662,19 @@ bool medOpMMLModelView::MapAtlasToPatient()
 	transm2->Identity();
 	transm2->SetElement(0, 0, p2[0] - p1[0]);
 	transm2->SetElement(0, 1, p3[0] - p1[0]);
-	if (m_4Landmarks == 1)
+	if (m_Landmarks4 == 1)
 		transm2->SetElement(0, 2, p4[0] - p1[0]);
 	else
 		transm2->SetElement(0, 2, (p2[1]-p1[1])*(p3[2]-p1[2])-(p2[2]-p1[2])*(p3[1]-p1[1]));
 	transm2->SetElement(1, 0, p2[1] - p1[1]);
 	transm2->SetElement(1, 1, p3[1] - p1[1]);
-	if (m_4Landmarks == 1)
+	if (m_Landmarks4 == 1)
 		transm2->SetElement(1, 2, p4[1] - p1[1]);
 	else
 		transm2->SetElement(1, 2, (p2[2]-p1[2])*(p3[0]-p1[0])-(p2[0]-p1[0])*(p3[2]-p1[2]));
 	transm2->SetElement(2, 0, p2[2] - p1[2]);
 	transm2->SetElement(2, 1, p3[2] - p1[2]);
-	if (m_4Landmarks == 1)
+	if (m_Landmarks4 == 1)
 		transm2->SetElement(2, 2, p4[2] - p1[2]);
 	else
 		transm2->SetElement(2, 2, (p2[0]-p1[0])*(p3[1]-p1[1])-(p2[1]-p1[1])*(p3[0]-p1[0]));
@@ -684,19 +684,19 @@ bool medOpMMLModelView::MapAtlasToPatient()
 	transm3->Identity();
 	transm3->SetElement(0, 0, a2[0] - a1[0]);
 	transm3->SetElement(0, 1, a3[0] - a1[0]);
-	if (m_4Landmarks == 1)
+	if (m_Landmarks4 == 1)
 		transm3->SetElement(0, 2, a4[0] - a1[0]);
 	else
 		transm3->SetElement(0, 2, (a2[1]-a1[1])*(a3[2]-a1[2])-(a2[2]-a1[2])*(a3[1]-a1[1]));
 	transm3->SetElement(1, 0, a2[1] - a1[1]);
 	transm3->SetElement(1, 1, a3[1] - a1[1]);
-	if (m_4Landmarks == 1)
+	if (m_Landmarks4 == 1)
 		transm3->SetElement(1, 2, a4[1] - a1[1]);
 	else
 		transm3->SetElement(1, 2, (a2[2]-a1[2])*(a3[0]-a1[0])-(a2[0]-a1[0])*(a3[2]-a1[2]));
 	transm3->SetElement(2, 0, a2[2] - a1[2]);
 	transm3->SetElement(2, 1, a3[2] - a1[2]);
-	if (m_4Landmarks == 1)
+	if (m_Landmarks4 == 1)
 		transm3->SetElement(2, 2, a4[2] - a1[2]);
 	else
 		transm3->SetElement(2, 2, (a2[0]-a1[0])*(a3[1]-a1[1])-(a2[1]-a1[1])*(a3[0]-a1[0]));
@@ -732,7 +732,7 @@ bool medOpMMLModelView::MapAtlasToPatient()
 	transf->TransformPoint(a1, newa1); // landmark 1
 	transf->TransformPoint(a2, newa2); // landmark 2
 	transf->TransformPoint(a3, newa3); // landmark 3
-	if (m_4Landmarks == 1)
+	if (m_Landmarks4 == 1)
 		transf->TransformPoint(a4, newa4); // landmark 4
 	transf->Delete();
 
@@ -745,13 +745,13 @@ bool medOpMMLModelView::MapAtlasToPatient()
 		diff1[i] = p1[i] - newa1[i];
 		diff2[i] = p2[i] - newa2[i];
 		diff3[i] = p3[i] - newa3[i];
-		if (m_4Landmarks == 1)
+		if (m_Landmarks4 == 1)
 			diff4[i] = p4[i] - newa4[i];
 	}
 	assert(sqrt(pow(diff1[0], 2.0) + pow(diff1[1], 2.0) + pow(diff1[2], 2.0)) < 0.001);
 	assert(sqrt(pow(diff2[0], 2.0) + pow(diff2[1], 2.0) + pow(diff2[2], 2.0)) < 0.001);
 	assert(sqrt(pow(diff3[0], 2.0) + pow(diff3[1], 2.0) + pow(diff3[2], 2.0)) < 0.001);
-	if (m_4Landmarks == 1)
+	if (m_Landmarks4 == 1)
 		assert(sqrt(pow(diff4[0], 2.0) + pow(diff4[1], 2.0) + pow(diff4[2], 2.0)) < 0.001);
 
 	// transform muscle
@@ -2190,7 +2190,7 @@ float medOpMMLModelView::GetContourAxesLengthScale()
 void medOpMMLModelView::UpdateContourCuttingPlane()
 //----------------------------------------------------------------------------
 {
-	if (m_3DDisplay == 0) // standard display
+	if (m_Display3D == 0) // standard display
 	{
 		// get z level
 		double z = GetCurrentZOfSyntheticScans();
@@ -2324,7 +2324,7 @@ void medOpMMLModelView::UpdateContourAxesTransform()
 void medOpMMLModelView::SetContourAxesVisibility()
 //----------------------------------------------------------------------------
 {
-	if (m_3DDisplay == 1)
+	if (m_Display3D == 1)
 	{
 		GetContourPositiveXAxisActor()->VisibilityOff();
 		GetContourNegativeXAxisActor()->VisibilityOff();
@@ -2417,7 +2417,7 @@ void medOpMMLModelView::UpdateGlobalAxesTransform()
 void medOpMMLModelView::SetGlobalAxesVisibility()
 //----------------------------------------------------------------------------
 {
-	if (m_3DDisplay == 1)
+	if (m_Display3D == 1)
 	{
 		GetPositiveXAxisActor()->VisibilityOff();
 		GetNegativeXAxisActor()->VisibilityOff();
@@ -2943,7 +2943,7 @@ void medOpMMLModelView::Switch3dDisplayOn()
 //----------------------------------------------------------------------------
 {
  	// 3d display flag
- 	m_3DDisplay = 1;
+ 	m_Display3D = 1;
  
  	// interactor style for 3d display
  	m_PRenderWindowInteractor->SetInteractorStyle(GetInteractorStyleTrackballCamera());
@@ -3041,7 +3041,7 @@ void medOpMMLModelView::Switch3dDisplayOn()
 	m_PLandmark3Actor->VisibilityOn();
  	
 	// 4th landmark set up and switch on
- 	if (m_4Landmarks == 1)
+ 	if (m_Landmarks4 == 1)
  	{
 		m_PLandmark4SphereSource->SetRadius(2.0);
 		m_PLandmark4SphereSource->SetThetaResolution(10);
@@ -3144,7 +3144,7 @@ float medOpMMLModelView::GetSyntheticScansLevel()
 void medOpMMLModelView::Set4LandmarksFlag(int n)
 //----------------------------------------------------------------------------
 {
-	m_4Landmarks = n;
+	m_Landmarks4 = n;
 }
 
 //----------------------------------------------------------------------------

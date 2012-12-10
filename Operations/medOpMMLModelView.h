@@ -332,10 +332,10 @@ public:
 	float m_TubeFilterRadius;
 
 	// 3d display flag
-	int m_3DDisplay;
+	int m_Display3D;
 
 	// 4 landmarks flag
-	int m_4Landmarks;
+	int m_Landmarks4;
 
 	// patient scans
 	vtkDataSet* m_Scans;
