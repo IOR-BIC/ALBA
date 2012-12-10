@@ -120,8 +120,8 @@ protected:
 
 private:
 	/**  deformation iterator  */
-	int m_numberOfCycle;
-	vtkPolyData *stentPolyLine;  
+	int m_NumberOfCycle;
+	vtkPolyData *m_StentPolyLine;  
 	vector<vector<double>> m_StentCenterLine;
 	vector<vector<double>>::const_iterator m_CenterLineStart;
 	vector<vector<double>>::const_iterator m_CenterLineEnd;
