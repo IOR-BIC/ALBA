@@ -557,7 +557,7 @@ void medVMEStent::DoDeformation(int type)
 		for(int i=0 ; i<steps ; i++){
 
 			//-----------update visualization-----------
-			moveCatheter(m_NumberOfCycle);
+			MoveCatheter(m_NumberOfCycle);
 			
 /*			//-------------deform stent---------
 			deformFilter->SetCurIterationNum(m_numberOfCycle);
@@ -633,8 +633,8 @@ void medVMEStent::DoDeformation2(int type){
 		m_DeformFlag = 1;
 }
 
-	moveCatheter(m_NumberOfCycle);
-	expandStent(m_NumberOfCycle);
+	MoveCatheter(m_NumberOfCycle);
+	ExpandStent(m_NumberOfCycle);
 	m_NumberOfCycle++;
 
 	/*for (int i=0;i<cycle;i++)
@@ -652,7 +652,7 @@ void medVMEStent::DoDeformation2(int type){
 }
 
 /** expand stent in a constrain surface */
-void medVMEStent::expandStent(int numberOfCycle ){
+void medVMEStent::ExpandStent(int numberOfCycle ){
 	//-------------deform stent---------
 	deformFilter->SetCurIterationNum(m_NumberOfCycle);
 	deformFilter->Update();
@@ -685,7 +685,7 @@ void medVMEStent::expandStent(int numberOfCycle ){
 	m_PolyData->Update(); 
 }
 /** move catheter so that stent can expand */
-void medVMEStent::moveCatheter(int numberOfCycle ){
+void medVMEStent::MoveCatheter(int numberOfCycle ){
 		
 		static int pointsNumOnCenterLine = 209;
 

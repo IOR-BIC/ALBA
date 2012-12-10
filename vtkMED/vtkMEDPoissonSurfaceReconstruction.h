@@ -1739,9 +1739,9 @@ typedef OctNode<class TreeNodeData,Real> TreeOctNode;
 /** class name: RootInfo*/
 class RootInfo{
 public:
-	const TreeOctNode* node;
-	int edgeIndex;
-	long long key;
+	const TreeOctNode* Node;
+	int EdgeIndex;
+	long long Key;
 };
 
 /** class name: VertexData 
