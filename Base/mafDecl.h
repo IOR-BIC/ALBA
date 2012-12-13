@@ -185,7 +185,7 @@ EVT_START,
   VIEW_CREATED,  // from mafViewManager to Logic
   VIEW_DELETE,   // from mafGUIMDIChild to mafViewManager
   VIEW_SELECT,   // from mafGUIMDIChild and mafGUIViewPanel to mafViewManager
-  VIEW_SELECTED, // used to ask to logic if there is at least a view selected.
+  VIEW_SELECTED, // used to ask to logic if there is a view selected and get a pointer to it
   VIEW_CLICKED,  // from mafRWIBase to mafGUIMDIChild and mafGUIViewPanel to mafViewManager
   VIEW_MAXIMIZE, // from mafGUI to mafGUICrossSplitter
   VIEW_RESIZE,   // from anyone that want to block the view's size.
