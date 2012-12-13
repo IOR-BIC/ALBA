@@ -830,6 +830,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       break;
       case VIEW_SELECTED:
         e->SetBool(m_ViewManager->GetSelectedView() != NULL);
+        e->SetView(m_ViewManager->GetSelectedView());
       break;
       case VIEW_SAVE_IMAGE:
       {
