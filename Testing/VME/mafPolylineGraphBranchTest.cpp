@@ -358,7 +358,7 @@ void mafPolylineGraphBranchTest::TestUnsetName()
 
   branch->UnsetName();
   mafString outName = mafString(branch->GetName());
-  CPPUNIT_ASSERT(outName.Compare(mafPolylineGraph::UndefinedName) == 0);
+  CPPUNIT_ASSERT(outName.Compare(mafPolylineGraph::m_UndefinedName) == 0);
 
   cppDEL(branch);
 
