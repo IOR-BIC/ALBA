@@ -281,3 +281,9 @@ double medVect3d::AngleBetweenVectors( medVect3d vect )
   // Return the angle in radians
   return( angle );
 }
+
+double & medVect3d::operator[]( int pos )
+{
+  return *((&this->m_X + pos));
+}
+
