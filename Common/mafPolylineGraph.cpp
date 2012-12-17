@@ -734,14 +734,8 @@ mafPolylineGraph::Branch::Branch(const char *name) : m_OutputPolydataCell(m_Unde
 {
   if (name == NULL)
     name = m_UndefinedName;
-    
-#if defined(_MSC_VER) && _MSC_VER >= 1400
-  m_Name = _strdup(name);
-#else
-  int nLen = (int)strlen(name);
-  m_Name = new char[nLen + 1];
-  strcpy(m_Name, name);
-#endif  
+  
+  m_Name=name;
 
   m_EdgeId.clear() ;
   m_VertexId.clear() ;
@@ -759,13 +753,7 @@ mafPolylineGraph::Branch::Branch(vtkIdType v, const char *name) : m_OutputPolyda
   if (name == NULL)
     name = m_UndefinedName;
 
-#if defined(_MSC_VER) && _MSC_VER >= 1400
-  m_Name = _strdup(name);
-#else
-  int nLen = (int)strlen(name);
-  m_Name = new char[nLen + 1];
-  strcpy(m_Name, name);
-#endif  
+  m_Name=name;
 }
 
 //------------------------------------------------------------------------
@@ -783,13 +771,8 @@ mafPolylineGraph::Branch& mafPolylineGraph::Branch::operator=(const Branch& src)
   m_VertexId = src.m_VertexId;
   m_EdgeId = src.m_EdgeId;
 
-#if defined(_MSC_VER) && _MSC_VER >= 1400
-  m_Name = _strdup(src.m_Name);
-#else
-  int nLen = (int)strlen(src.m_Name);
-  m_Name = new char[nLen + 1];
-  strcpy(m_Name, src.m_Name);
-#endif 
+  m_Name = src.m_Name;
+
   return *this;
 }
 
@@ -800,13 +783,6 @@ mafPolylineGraph::Branch::~Branch()
 {
   m_EdgeId.clear() ;
   m_VertexId.clear() ;
-
-#if defined(_MSC_VER) && _MSC_VER >= 1400
-  free(m_Name);
-#else
-  delete[] m_Name;
-#endif
-  m_Name = NULL;
 }
 
 
@@ -832,7 +808,7 @@ int mafPolylineGraph::Branch::GetNumberOfEdges() const
 const char* mafPolylineGraph::Branch::GetName() const
 //-------------------------------------------------------------------------
 {
-  return m_Name ;
+  return m_Name.c_str();
 }
 
 //-------------------------------------------------------------------------
@@ -840,31 +816,7 @@ const char* mafPolylineGraph::Branch::GetName() const
 void mafPolylineGraph::Branch::SetName(const char *name)
 //-------------------------------------------------------------------------
 {
-#if defined(_MSC_VER) && _MSC_VER >= 1400
-  free(m_Name);
-#else
-  delete[] m_Name;
-#endif
-  
-  if (name == NULL)
-  {
-    #ifndef _DEBUG
-    LogMessage("SetName() called with NULL argument") ;  
-#endif
-    assert(false) ;
-
-    m_Name = NULL;
-  }
-  else
-  {
-#if defined(_MSC_VER) && _MSC_VER >= 1400
-    m_Name = _strdup(name);
-#else
-    int nLen = (int)strlen(name);
-    m_Name = new char[nLen + 1];
-    strcpy(m_Name, name);
-#endif 
-  }
+  m_Name=name;
 }
 
 //-------------------------------------------------------------------------

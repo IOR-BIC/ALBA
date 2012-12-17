@@ -345,7 +345,8 @@ public:
 
     Branch& operator=(const Branch& src);
   private:
-    char* m_Name ;                                        ///< name of branch
+    //char* m_Name ;                                        ///< name of branch
+    wxString m_Name;
     std::vector<vtkIdType> m_VertexId ;                   ///< list by vertices
     std::vector<vtkIdType> m_EdgeId ;                     ///< list by edges
 
