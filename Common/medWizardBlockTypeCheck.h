@@ -79,7 +79,12 @@ public:
   /** Return the name of the Block witch will be executed after this */
   wxString GetNextBlock();
 
+  /** Enable/disable the visualization of error message box*/
+  void EnableErrorMessage(bool enabled) {m_ErrorMessageEnabled=enabled;};
   
+  /** Return true if error message show is enabled*/
+  bool IsErrorMessageEnabled() {return m_ErrorMessageEnabled;};
+
 protected:
   /** Starts the execution of the block */
   virtual void ExcutionBegin();
@@ -90,6 +95,8 @@ private:
   wxString m_Description;
 
   wxString m_VmeSelect;
+
+  int m_ErrorMessageEnabled;
   
   std::vector <wxString> m_AcceptedVmes;
   int m_TestPassed;

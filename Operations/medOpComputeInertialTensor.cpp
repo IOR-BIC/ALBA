@@ -92,7 +92,7 @@ mafOp(label)
 
   m_DefaultDensity = 1.0;
   m_Mass = 0.0;
-  m__Principal_I1 = 0.0;
+  m_Principal_I1 = 0.0;
   m_Principal_I2 = 0.0;
   m_Principal_I3 = 0.0;
   m_Accuracy = 1000;
@@ -243,7 +243,7 @@ void medOpComputeInertialTensor::AddAttributes()
 {
 	//save results in vme attributes
 	std::vector<double> principalInertialTensorComponents;
-	principalInertialTensorComponents.push_back(m__Principal_I1);
+	principalInertialTensorComponents.push_back(m_Principal_I1);
 	principalInertialTensorComponents.push_back(m_Principal_I2);
 	principalInertialTensorComponents.push_back(m_Principal_I3);
 
@@ -732,7 +732,7 @@ int medOpComputeInertialTensor::ComputeInertialTensorUsingGeometry(mafNode* node
   m_InertialTensor[8] += scale * Izz;
 
   // scale the principal inertial tensor components with the density
-  m__Principal_I1 += scale*eval[0];
+  m_Principal_I1 += scale*eval[0];
   m_Principal_I2 += scale*eval[1];
   m_Principal_I3 += scale*eval[2];
 
@@ -992,7 +992,7 @@ int medOpComputeInertialTensor::ComputeInertialTensorUsingMonteCarlo(mafNode* no
   vtkMath::Jacobi(a,eval,v);
 
   // scale the principal inertial tensor
-  m__Principal_I1 += scale*eval[0];
+  m_Principal_I1 += scale*eval[0];
   m_Principal_I2 += scale*eval[1];
   m_Principal_I3 += scale*eval[2];
 

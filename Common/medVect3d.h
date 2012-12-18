@@ -125,6 +125,9 @@ public:
   /** Operator: Sets the values to the division with the scalar*/
   medVect3d operator/=(double val);
 
+  /** Operator: Sets the values to the division with the scalar*/
+  double& operator[](int pos);
+
   /** Returns the angle between two vectors */
   double AngleBetweenVectors( medVect3d vect );
 
