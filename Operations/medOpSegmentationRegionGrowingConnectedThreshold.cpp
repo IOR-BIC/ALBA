@@ -488,7 +488,7 @@ int medOpSegmentationRegionGrowingConnectedThreshold::CreateResample()
     m_Resample->AutoSpacing();
     m_Resample->GetSpacing(m_VolumeSpacing);
       
-    ((mafVME*)m_Input)->GetOutput()->GetVMEBounds(m_VolumeBounds);
+    ((mafVME*)m_Input)->GetOutput()->GetVMELocalBounds(m_VolumeBounds);
     m_Resample->SetBounds(m_VolumeBounds,medOpVolumeResample::CUSTOMBOUNDS);
           
     if (!CheckSpacing())
