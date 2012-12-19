@@ -652,6 +652,7 @@ bool mafVMEManager::MakeZip(const mafString &zipname, wxArrayString *files)
 int mafVMEManager::MSFSave()
 //----------------------------------------------------------------------------
 {
+  wxBusyInfo *wait;
   int ret=MAF_OK;
 
   if(m_MSFFile.IsEmpty()) 
@@ -707,10 +708,9 @@ int mafVMEManager::MSFSave()
     wxRenameFile(m_MSFFile.GetCStr(), bak_filename.GetCStr());  // renaming the founded one
 	}
 	
-  if(!m_TestMode) // Losi 02/16/2010 for test class 
-  {
-	  wxBusyInfo wait(_("Saving MSF: Please wait"));
-  }
+  if(!m_TestMode) 
+    wait=new wxBusyInfo(_("Saving MSF: Please wait"));
+  
   m_Storage->SetURL(m_MSFFile.GetCStr());
   if (m_Storage->Store() != MAF_OK) // store the tree
   {
@@ -730,16 +730,27 @@ int mafVMEManager::MSFSave()
 	m_FileHistory.Save(*m_Config);
   m_Modified = false;
 
+  if(!m_TestMode)
+    delete wait;
+
   return ret;
 }
 //----------------------------------------------------------------------------
 int mafVMEManager::MSFSaveAs()   
 //----------------------------------------------------------------------------
 {
-   m_MSFFile = ""; // set filenames to empty so the MSFSave method will ask for them
-   m_ZipFile = "";
-   m_MakeBakFile = false;
-   return MSFSave();
+  int retValue;
+  mafString oldFileName;
+  oldFileName=m_MSFFile;
+  m_MSFFile = ""; // set filenames to empty so the MSFSave method will ask for them
+  m_ZipFile = "";
+  m_MakeBakFile = false;
+  retValue=MSFSave();
+  //if the user cancel save operation the name will be empty 
+  if (m_MSFFile=="")
+    m_MSFFile=oldFileName;
+  
+  return retValue;
 }
 //----------------------------------------------------------------------------
 void mafVMEManager::Upload(mafString local_file, mafString remote_file)
