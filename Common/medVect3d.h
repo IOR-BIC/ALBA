@@ -29,7 +29,7 @@
 
 /**
   Class Name: medVect3d.
-  Class for handle the high level logic of a medical application.
+  High optimized class for 3-Dimensional vectors management. 
 */
 class MED_COMMON_EXPORT medVect3d
 {
