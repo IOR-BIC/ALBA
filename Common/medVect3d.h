@@ -29,7 +29,7 @@
 
 /**
   Class Name: medVect3d.
-  Class for handle the high level logic of a medical application.
+  High optimized class for 3-Dimensional vectors management. 
 */
 class MED_COMMON_EXPORT medVect3d
 {
@@ -66,16 +66,16 @@ public:
   medVect3d Normal(void);
 
   /** Return the distance between the vectors*/
-  double Distance(medVect3d vector);
+  double Distance(medVect3d &vector);
 
   /** Return the distance2 (quadratic distance) between the vectors*/
-  double Distance2(medVect3d vector);
+  double Distance2(medVect3d &vector);
 
   /** Return the dot product between the vectors */
-  double Dot(medVect3d vector);
+  double Dot(medVect3d &vector);
 
   /** Return the cross product between the vectors */
-  medVect3d Cross(medVect3d vector);
+  medVect3d Cross(medVect3d &vector);
 
   /** Return the Value of the X-element*/
   inline double GetX(){return m_X;};
@@ -99,13 +99,22 @@ public:
   inline double* GetVect(){return (double*)this;};
 
   /** Operator: Return true if the vectors are equals */
-  int operator==(medVect3d vect);
+  int operator==(medVect3d &vect);
+
+  /** Operator: Return true if the vectors are equals */
+  int operator==(double *vect);
+
+  /** Operator: Return the sum of the vectors*/
+  medVect3d operator+(medVect3d &vect);
   
   /** Operator: Return the sum of the vectors*/
-  medVect3d operator+(medVect3d vect);
-  
+  medVect3d operator+(double *vect);
+
   /** Operator: Return the difference of the vectors*/
-  medVect3d operator-(medVect3d vect);
+  medVect3d operator-(medVect3d &vect);
+
+  /** Operator: Return the difference of the vectors*/
+  medVect3d operator-(double *vect);
   
   /** Operator: Return the scalar multiply*/
   medVect3d operator*(double num);
@@ -114,22 +123,29 @@ public:
   medVect3d operator/(double num);
 
   /** Operator: Sets the values to the sum between the vectors*/
-  medVect3d operator+=(medVect3d vect);
+  medVect3d &operator+=(medVect3d &vect);
+
+  /** Operator: Sets the values to the sum between the vectors*/
+  medVect3d &operator+=(double *vect);
 
   /** Operator: Sets the values to the difference between the vectors*/
-  medVect3d operator-=(medVect3d vect);
+  medVect3d &operator-=(medVect3d &vect);
+
+  /** Operator: Sets the values to the difference between the vectors*/
+  medVect3d &operator-=(double *vect);
 
   /** Operator: Sets the values to the product with the scalar*/
-  medVect3d operator*=(double val);
+  medVect3d &operator*=(double val);
 
   /** Operator: Sets the values to the division with the scalar*/
-  medVect3d operator/=(double val);
+  medVect3d &operator/=(double val);
 
-  /** Operator: Sets the values to the division with the scalar*/
+  /** Operator: Gets the vect values with *double style
+      ie: vect[0]==vect.GetX() */
   double& operator[](int pos);
 
   /** Returns the angle between two vectors */
-  double AngleBetweenVectors( medVect3d vect );
+  double AngleBetweenVectors( medVect3d &vect );
 
 private:
 
