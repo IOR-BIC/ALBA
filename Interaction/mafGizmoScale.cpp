@@ -200,9 +200,9 @@ void mafGizmoScale::OnEventGizmoComponents(mafEventBase *maf_event)
           */
 
           // Express VME abs matrix in RefSysVME refsys via mafTransform
-          mafSmartPointer<mafTransformFrame> tr;
-          tr->SetInput(m_InputVME->GetOutput()->GetAbsMatrix());
-          tr->SetTargetFrame(m_RefSysVME->GetOutput()->GetAbsMatrix());
+		  mafSmartPointer<mafTransformFrame> tr;
+		  tr->SetInput(m_InputVME->GetOutput()->GetAbsMatrix());
+		  tr->SetTargetFrame(m_RefSysVME->GetOutput()->GetAbsMatrix());
 
           // update private ivar 
           m_VmeMatrixRelativeToRefSysVME->SetTimeStamp(m_InputVME->GetTimeStamp());
@@ -518,41 +518,40 @@ void mafGizmoScale::SendTransformMatrixFromGui(mafEventBase *maf_event)
   mafMatrix *invOldAbsPose = mafMatrix::New();
   mafMatrix *newAbsPose = mafMatrix::New();
 
-  // position from abs pose
-  double position[3];
-  mafTransform::GetPosition(*this->GetAbsPose(), position);
+  mafTransform::SetOrientation(*newAbsPose, gizmoABSOrientation);
+  mafTransform::SetPosition(*newAbsPose, gizmoABSPosition);
 
-  // orientation from abs pose
-  double orientation[3];
-  mafTransform::GetOrientation(*this->GetAbsPose(), orientation);
+  // Express VME abs matrix in RefSysVME refsys via mafTransform
+  mafSmartPointer<mafTransformFrame> tr;
+  tr->SetInput(m_InputVME->GetOutput()->GetAbsMatrix());
+  tr->SetTargetFrame(m_RefSysVME->GetOutput()->GetAbsMatrix());
 
-  // incoming matrix is an abs scaling matrix
-  newAbsPose->DeepCopy(e->GetMatrix()); // abs scaling from gui
+  mafMatrix *vmeMatrixRelativeToRefSysVME = mafMatrix::New();
+  vmeMatrixRelativeToRefSysVME->SetTimeStamp(m_InputVME->GetTimeStamp());
+  vmeMatrixRelativeToRefSysVME->DeepCopy(&tr->GetMatrix());
 
-  mafTransform::SetOrientation(*newAbsPose, orientation);
-  mafTransform::SetPosition(*newAbsPose, position);
-
-  // premultiply the scaling matrix coming from gui
-  vtkMAFSmartPointer<vtkTransform> tr;
-  tr->SetMatrix(newAbsPose->GetVTKMatrix());
-  tr->Concatenate(e->GetMatrix()->GetVTKMatrix());
-
-  newAbsPose->DeepCopy(tr->GetMatrix());
-
-  invOldAbsPose->DeepCopy(this->GetAbsPose());
-  invOldAbsPose->Invert();
-
-  mafMatrix::Multiply4x4(*newAbsPose, *m_InputVME->GetOutput()->GetAbsMatrix(), *M);
-  // update gizmo abs pose
-  //this->SetAbsPose(newAbsPose, InputVME->GetTimeStamp());
-
-  // update input vme abs pose
+  mafMatrix *refSysVMEAbsMatrix = mafMatrix::New();
+  refSysVMEAbsMatrix->DeepCopy(m_RefSysVME->GetOutput()->GetAbsMatrix());
   
-	m_InputVME->SetAbsMatrix(*M, m_InputVME->GetTimeStamp());
-  m_InputVME->Modified();
+	vtkMAFSmartPointer<vtkTransform> scaleTransform;
+	scaleTransform->PostMultiply();
+	scaleTransform->SetMatrix(vmeMatrixRelativeToRefSysVME->GetVTKMatrix());  
+	scaleTransform->Concatenate(e->GetMatrix()->GetVTKMatrix());
+
+	mafSmartPointer<mafMatrix> scaleTransformMatrix;
+	scaleTransformMatrix->DeepCopy(scaleTransform.GetPointer()->GetMatrix());
+
+	mafSmartPointer<mafTransformFrame> newVmeAbsPoseTransformFrame;
+	newVmeAbsPoseTransformFrame.GetPointer()->SetInput(scaleTransformMatrix);
+	newVmeAbsPoseTransformFrame.GetPointer()->SetInputFrame(refSysVMEAbsMatrix);
+
+	m_InputVME->SetAbsMatrix(newVmeAbsPoseTransformFrame.GetPointer()->GetMatrix() , m_InputVME->GetTimeStamp());
+
+	vmeMatrixRelativeToRefSysVME->Delete();
+	refSysVMEAbsMatrix->Delete();
 
   // notify the listener about changed vme pose
-  SendTransformMatrix(M, ID_TRANSFORM, mafInteractorGenericMouse::MOUSE_MOVE);   
+  SendTransformMatrix(newAbsPose, ID_TRANSFORM, mafInteractorGenericMouse::MOUSE_MOVE);   
 
   mafSmartPointer<mafMatrix> identity;
   identity->Identity();
