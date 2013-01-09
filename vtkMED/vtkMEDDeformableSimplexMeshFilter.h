@@ -89,43 +89,56 @@ public:
 
   itkSetMacro(CurIterationNum, int);
   itkGetConstMacro(CurIterationNum, int);
-  
-  void SetStrutLinkIter(StrutIterator StrutStart, StrutIterator StrutEnd,
-	                    StrutIterator LinkStart, StrutIterator LinkEnd);
- // void SetVesselPointsKDTree(PointIterator PointStart, PointIterator PointEnd);
-  void SetVesselPointsKDTreeFromPolyData(vtkPolyData *surface);
-  void SetCenterLocationIdx(vector<int>::const_iterator centerLocationIndex);
-  void SetCenterLocationIdxRef(vector<int> const&ve);
-  void SetTestValue(int value){this->testValue = value;}
+
+  /*itkSetMacro(m_StrutLength, double);
+  itkGetConstMacro(m_StrutLength, double);
+
+  itkSetMacro(m_LinkLength, double);
+  itkGetConstMacro(m_LinkLength, double);
+
+  itkSetMacro(m_CurIterationNum, int);
+  itkGetConstMacro(m_CurIterationNum, int);
+  */
+	  void SetStrutLinkIter(StrutIterator StrutStart, StrutIterator StrutEnd,
+							StrutIterator LinkStart, StrutIterator LinkEnd);
+
+	  void SetStrutLinkFromCellArray(vtkCellArray *strut,vtkCellArray *link);
+
+	 // void SetVesselPointsKDTree(PointIterator PointStart, PointIterator PointEnd);
+	  void SetVesselPointsKDTreeFromPolyData(vtkPolyData *surface);
+	  void SetCenterLocationIdx(vector<int>::const_iterator centerLocationIndex);
+	  void SetCenterLocationIdxRef(vector<int> const&ve);
+	  void SetTestValue(int value){this->testValue = value;}
 
 protected:
-  DeformableSimplexMeshFilterImpl();
-  ~DeformableSimplexMeshFilterImpl();
-  DeformableSimplexMeshFilterImpl(const Self &) {}
-  void operator=(const Self &){}
- 
-  virtual void ComputeDisplacement();
-  virtual void ComputeExternalForce(SimplexMeshGeometry *data);
+	DeformableSimplexMeshFilterImpl();
+	~DeformableSimplexMeshFilterImpl();
+	DeformableSimplexMeshFilterImpl(const Self &) {}
+	void operator=(const Self &){}
 
-  double m_StrutLength;
-  double m_LinkLength;
+	virtual void ComputeDisplacement();
+	virtual void ComputeExternalForce(SimplexMeshGeometry *data);
+
+	double m_StrutLength;
+	double m_LinkLength;
  
 
 private:
-  VectorType ComputeStrutLengthForce(SimplexMeshGeometry *data, int index);
-  VectorType ComputeLinkLengthForce(SimplexMeshGeometry *data, int index);
+	int m_CurIterationNum;
+	VectorType ComputeStrutLengthForce(SimplexMeshGeometry *data, int index);
+    VectorType ComputeLinkLengthForce(SimplexMeshGeometry *data, int index);
 
-  double distanceCoefficient;
+	double distanceCoefficient;
 
-  // [0],[1] strut neighbor; [2] link neighbor
-  int (*StrutNeighbors)[3] ;
+	// [0],[1] strut neighbor; [2] link neighbor
+	int (*StrutNeighbors)[3] ;
 
-  kdtree *KDTree;
+	kdtree *KDTree;
 
-  vector<int>::const_iterator centerLocationIdx;
+	vector<int>::const_iterator centerLocationIdx;
 
-  int m_CurIterationNum;
-  int testValue;
+
+	int testValue;
 
 }; // end of class
 } // namespace itk

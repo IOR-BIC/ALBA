@@ -1,19 +1,18 @@
-/*=========================================================================
-
- Program: MAF2Medical
- Module:  vtkMEDStentModelSource.h
- Authors: Xiangyin Ma, Hui Wei
- 
- Copyright (c) B3C
- All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
-
- This software is distributed WITHOUT ANY WARRANTY; without even
- the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- PURPOSE.  See the above copyright notice for more information.
-
-=========================================================================*/
 #pragma once
+
+
+/*=========================================================================
+  Program:   MAF2Medical
+  Module:    $RCSfile: StentModelSource.h,v $
+  Language:  C++
+  Date:      $Date: 2012-Nov 10:15:31 $
+  Version:   $Revision: 1.1.2.7 $
+  Authors:   Xiangyin Ma, Hui Wei
+==========================================================================
+Copyright (c) 2001/2005 
+CINECA - Interuniversity Consortium (www.cineca.it)
+=========================================================================*/
+
 
 #include <iostream>
 
@@ -22,13 +21,21 @@
 
 #include "itkSimplexMeshToTriangleMeshFilter.h"
 
-#include "vtkMEDConfigure.h"
-
 #ifndef VECTORITEM_H
 #define VECTORITEM_H
 #include <vector>
+
+
+
 using std::vector;
+  // #define Pi 3.14159265
 #endif
+
+/**----------------------------------------------------------------------------*/
+// forward declarations :
+/**----------------------------------------------------------------------------*/
+class vtkPolyData;
+
 /**
 *---------------------------------------
 * Stent Model Creation
@@ -52,7 +59,7 @@ using std::vector;
 * the control mesh have two more circles of vertices  in each side than the stent.
 *---------------------------------------
 */
-class VTK_vtkMED_EXPORT vtkMEDStentModelSource
+class vtkMEDStentModelSource
 {
 
 public:
@@ -96,7 +103,9 @@ public:
 	void setCrownNumber(int value);
 	void setLinkNumber(int value);
 	void setCenterLine (vector<vector<double>>::const_iterator centerLineStart,
-						vector<vector<double>>::const_iterator centerLindEnd);
+						vector<vector<double>>::const_iterator centerLindEnd, int pointNumber);
+	void setCenterLineFromPolyData(vtkPolyData *polyData);
+	void setTestValue(){};
 	
 	/**----------------------------------------------------------------------------*/
 	//--------getters----------
@@ -124,6 +133,7 @@ public:
 	 /* this information is recorded during the simplex mesh & stent model creation*/
 	 /************************************************************************/
 	vector<int> centerLocationIndex;
+	int computeCrownNumberAfterSetCenterLine();
 
 
 private:
@@ -156,7 +166,7 @@ private:
 
 	double initialStentLength;	
 	double strutLength;
-
+	double centerLineLength;
 	void setStrutAngle(double value); //not needed
 
 

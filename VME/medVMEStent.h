@@ -35,6 +35,7 @@ class vtkPolyData;
 class vtkTransform;
 class vtkAppendPolyData;
 class vtkTubeFilter;
+class vtkCellArray;
 /**----------------------------------------------------------------------------*/
 //--------typedef----------
 /**----------------------------------------------------------------------------*/
@@ -65,6 +66,7 @@ protected:
 	  {
 		
 		CHANGE_VALUE,
+		CHANGE_VALUE_CROWN,
 		STENT_DIAMETER,
 		CROWN_LENGTH,
 		STRUT_ANGLE,
@@ -90,22 +92,27 @@ protected:
 	/** update the output data structure */
 	virtual void InternalUpdate();
 	/** do deformation under the constrain of constrain surface */
-	void DoDeformation(int type);
+	//void DoDeformation(int type);
 	/** do deformation under the constrain of constrain surface */
-	void DoDeformation2(int type);
-	
+	//void DoDeformation2(int type);
+	/** do deformation under the constrain of constrain surface */
+
+
+	/** to update data and view after each deformation */
+	void UpdateViewAfterDeformation();
 	/** Internally used to create a new instance of the GUI.*/
 	virtual mafGUI *CreateGui();
 
 	mafTransform *m_Transform; 
-	double m_StentRadius;
-	vtkPolyData  *m_Centerline; 
-	//vtkPolyData *m_CenterlineModify;//sheathVTK
 
+	//vtkPolyData *m_CenterlineModify;//sheathVTK
+	/**----------- parameters -----------*/
+	double m_StentRadius;
 	/**----------- stent parameters-----------*/
 	/** basic stent  */
 	double m_Stent_Diameter;
 	double m_Crown_Length;
+	int m_Crown_Number;
 	double m_Strut_Angle;
 	double m_Strut_Thickness;
 	int m_Id_Stent_Configuration;
@@ -115,34 +122,54 @@ protected:
 	int m_Link_Alignment;
 	int m_Link_orientation;  
 	/**----------- center line and constrain surface-----------*/
+	vtkPolyData  *m_Centerline; 
+	vtkPolyData  *m_ConstrainSurface;
 	mafString m_CenterLineName;
 	mafString m_ConstrainSurfaceName;
 
 private:
 	/**  deformation iterator  */
-	int m_NumberOfCycle;
-	vtkPolyData *m_StentPolyLine;  
+	int m_numberOfCycle;
+	double m_StrutLength;
+	vtkPolyData *stentPolyLine;  
+	vector<double> m_StentCenterLineSerial;
 	vector<vector<double>> m_StentCenterLine;
-	vector<vector<double>>::const_iterator m_CenterLineStart;
-	vector<vector<double>>::const_iterator m_CenterLineEnd;
+	vector<vector<double>>::const_iterator m_CenterLineStart; //could be remove
+	vector<vector<double>>::const_iterator m_CenterLineEnd;  //could be remove
 	vtkPolyData* CreateAConstrainSurface();
-	void MoveCatheter(int numberOfCycle);
-	void ExpandStent(int numberOfCycle);
+	void moveCatheter(int numberOfCycle);
+	void expandStent(int numberOfCycle);
 
 	/** three output in append polydata*/
 	vtkPolyData  *m_PolyData;
 	vtkPolyData  *m_CatheterPolyData;
-	vtkPolyData  *m_ConstrainSurfaceTmp;
+
 	vtkAppendPolyData *m_AppendPolyData;
 	/** the output of this vme */
 	vtkPolyData *m_AppendPolys;
-
+	
 	vtkPolyData *m_SheathVTK;
 	/** used to create stent */
-	vtkMEDStentModelSource m_StentSource;
+	//vtkMEDStentModelSource m_StentSource;
+	
 	SimplexMeshType::Pointer m_SimplexMesh;
 	/** to check if deformation in progress */
 	int m_DeformFlag ;
+
+	/*from get Strut Length from stentModelSource*/
+	double GetStrutLength(){return m_StrutLength;};
+
+	vtkCellArray *m_StrutArray;
+	vtkCellArray *m_LinkArray;
+	vector<int>::const_iterator m_centerLocationIdx;
+	vector<int> m_centerLocation;
+	/*-------for store vme------*/
+	vector<int> m_VmeLinkedList; //a list of VME ID , centerline first then surface
+
+	void SetCenterLocationIdx(vector<int>::const_iterator centerLocationIndex);//{m_centerLocationIdx = centerLocationIndex;}
+	void SetCenterLocationIdxRef(vector<int> const&ve);
+	int m_CenterLineSetFlag,m_ConstrainSurfaceSetFlag; 
+	int m_ComputedCrownNumber;
 
 public:
 
@@ -152,6 +179,20 @@ public:
   /* destructor */
   virtual ~medVMEStent();
   
+  	/************************************************************************/
+	/* The mesh deformation is constrained by internal forces. The interal force can be scaled via SetAlpha (typical values are 0.01 < alpha < 0.3). 
+	 * The external force is derived from the image one wants to delineate. Therefore an image of type GradientImageType needs to be set by calling SetGradientImage(...). The external forces are scaled via SetBeta (typical values are 0.01 < beta < 1). One still needs to play around with these values.
+
+	 * To control the smoothness of the mesh a rigidity parameter can be adjusted. Low values (1 or 0) allow areas with high curvature. Higher values (around 7 or 8) will make the mesh smoother.
+
+	 * By setting the gamma parameter the regularity of the mesh is controlled. Low values (< 0.03) produce more regular mesh. Higher values ( 0.3 < gamma < 0.2) will allow to move the vertices to regions of higher curvature.
+
+	 *This approach for segmentation follows that of Delingette et al. (1997).                                                                     */
+	/************************************************************************/
+
+	void DoDeformation3(int type);
+
+
   //---------------------------Setter-/-Getter------------------------------------  
   /** Copy the contents of another medVMEStent into this one. */
   virtual int DeepCopy(mafNode *a);
@@ -193,6 +234,13 @@ public:
   /** Precess events coming from other objects */ 
   virtual void OnEvent(mafEventBase *maf_event);
 
+  void SetAndKeepConstrainSurface( mafNode *node );
+
+  void SetAndKeepCenterLine( mafNode *node );
+
+  //void SetAndKeepConstrainSurface( mafVME *vme );
+
+ //void SetAndKeepCenterLine( mafVME *vme );
 
   /**
   Set the Pose matrix of the VME. This function modifies the MatrixVector. You can
@@ -208,12 +256,30 @@ public:
   //------set properties-----------
   void SetCenterLine(vtkPolyData *line);
   void SetConstrainSurface(vtkPolyData *surface);
+   
   void SetStentDiameter(double diameter){m_Stent_Diameter = diameter;}
   void SetStentCrownLength(double crownL){m_Crown_Length = crownL;}
+  void SetStrutThickness(double strutThickness){m_Strut_Thickness = strutThickness; }
   void SetStentConfiguration(int stentCfig){m_Id_Stent_Configuration = stentCfig;}
   void SetLinkLength(double linkLength){m_Link_Length = linkLength;}
   void SetLinkAlignment(int linkAlgn){m_Link_Alignment = linkAlgn;}
   void SetLinkOrientation(int linkOrit){m_Link_orientation = linkOrit;}
+  void SetLinkConnection(int linkConnection){m_Id_Link_Connection = linkConnection;}
+  void SetStentCrownNumber(int crownNumber){m_Crown_Number = crownNumber; }
+  
+  //------get properties-----------
+  vtkPolyData* GetCenterLine(){return m_Centerline;};
+  vtkPolyData* GetConstrainSurface(){return m_ConstrainSurface;};
+
+  double GetStentDiameter(){ return m_Stent_Diameter;}
+  double GetStentCrownLength(){ return m_Crown_Length;}
+  double GetStrutThickness(){ return m_Strut_Thickness;}
+  int GetStentConfiguration(){ return m_Id_Stent_Configuration;}
+  double GetLinkLength(){ return m_Link_Length;}
+  int GetLinkAlignment(){ return m_Link_Alignment;}
+  int GetLinkOrientation(){ return m_Link_orientation;}
+  int GetLinkConnection(){ return m_Id_Link_Connection;}
+  int GetStentCrownNumber(){ return m_Crown_Number ; }
   //--------convert tube strips into triangle polydata 
   vtkPolyData *TubeToPolydata( vtkTubeFilter * sheath );
 };
