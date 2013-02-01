@@ -37,8 +37,9 @@ void vtkPatchLine::ExecuteData(vtkDataObject *output)
 	vtkMAFSmartPointer<vtkCleanPolyData> cleaner;
 	cleaner->SetInput(source.GetPointer());
 	cleaner->Update();  
-	source = cleaner->GetOutput();
-	source->Register(NULL);
+	source = cleaner->GetOutput();	
+	//source->Register(NULL); - not needed, reference is added by SmartPointer
+	cleaner->SetOutput(NULL);
 	
 	if(source->GetNumberOfPoints() <= 2)
 	{
@@ -129,7 +130,7 @@ void vtkPatchLine::ExecuteData(vtkDataObject *output)
 	for(int i = 0; i < nNumPoints-1; i++)
 		polyLine->GetPointIds()->SetId(i+1, segments[polyLine->GetPointIds()->GetId(i)]); //so as to leave out last points in 'segments', which isn't connected to anything
 
-	vtkMAFSmartPointer<vtkCellArray> cells = vtkCellArray::New();
+	vtkMAFSmartPointer<vtkCellArray> cells;
 	cells->InsertNextCell(polyLine->GetPointIds());
 
 	vtkSmartPointer<vtkPolyData> newLine = vtkPolyData::SafeDownCast(output);
