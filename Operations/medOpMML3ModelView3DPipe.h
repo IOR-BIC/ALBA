@@ -159,18 +159,18 @@ private:
 
   // landmarks
   double m_LandmarkSize ;
-  static const int MaxNumberOfLandmarks = 100 ;
+  static const int m_MaxNumberOfLandmarks = 100 ;
   int m_NumberOfLandmarks ;
-  vtkSphereSource *m_LmarkSource[MaxNumberOfLandmarks] ;
-  vtkPolyDataMapper *m_LmarkMapper[MaxNumberOfLandmarks] ;
-  vtkActor *m_LmarkActor[MaxNumberOfLandmarks] ;
+  vtkSphereSource *m_LmarkSource[m_MaxNumberOfLandmarks] ;
+  vtkPolyDataMapper *m_LmarkMapper[m_MaxNumberOfLandmarks] ;
+  vtkActor *m_LmarkActor[m_MaxNumberOfLandmarks] ;
 
   // axis landmarks
-  static const int MaxNumberOfAxisLandmarks = 3 ;
+  static const int m_MaxNumberOfAxisLandmarks = 3 ;
   int m_NumberOfAxisLandmarks ;
-  vtkSphereSource *m_AxisMarkSource[MaxNumberOfAxisLandmarks] ;
-  vtkPolyDataMapper *m_AxisMarkMapper[MaxNumberOfAxisLandmarks] ;
-  vtkActor *m_AxisMarkActor[MaxNumberOfAxisLandmarks] ;
+  vtkSphereSource *m_AxisMarkSource[m_MaxNumberOfAxisLandmarks] ;
+  vtkPolyDataMapper *m_AxisMarkMapper[m_MaxNumberOfAxisLandmarks] ;
+  vtkActor *m_AxisMarkActor[m_MaxNumberOfAxisLandmarks] ;
 
   // axis polyline
   double m_TubeSize ;

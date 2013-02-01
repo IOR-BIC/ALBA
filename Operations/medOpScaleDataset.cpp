@@ -51,9 +51,10 @@
 //----------------------------------------------------------------------------
 enum MAF_TRANSFORM_ID
 {
-	ID_SHOW_GIZMO = MINID,
+  ID_SHOW_GIZMO = MINID,
   ID_RESET,
   ID_ENABLE_SCALING,
+  ID_AUX_REF_SYS
 };
 
 //----------------------------------------------------------------------------
@@ -191,6 +192,16 @@ void medOpScaleDataset::OnEventThis(mafEventBase *maf_event)
     }
     break;
 
+	case ID_AUX_REF_SYS:
+	{
+		mafString s;
+		s << "Choose VME ref sys";
+		mafEvent e(this,VME_CHOOSE, &s);
+		mafEventMacro(e);
+		SetRefSysVME(mafVME::SafeDownCast(e.GetVme()));
+	}
+	break;
+
     default:
     {
       mafEventMacro(*maf_event);
@@ -263,6 +274,11 @@ void medOpScaleDataset::CreateGui()
   
   // add Gui to operation
   m_Gui->AddGui(m_GuiSaveRestorePose->GetGui());
+
+  //--------------------------------- 
+  m_Gui->Divider(2);
+  m_Gui->Label("auxiliary ref sys", true);
+  m_Gui->Button(ID_AUX_REF_SYS,"choose");
 
   if(this->m_RefSysVME == NULL)
   {

@@ -420,7 +420,7 @@ void mafPolylineGraphTest::TestSplitBranchAtEdge()
 
   // check that no. of edges has not changed and that edge is no longer a member of a branch
   CPPUNIT_ASSERT(Graph->GetMaxEdgeId() == ide1) ;
-  CPPUNIT_ASSERT(Graph->GetConstEdgePtr(7)->GetBranchId() == mafPolylineGraph::UndefinedId) ;
+  CPPUNIT_ASSERT(Graph->GetConstEdgePtr(7)->GetBranchId() == mafPolylineGraph::m_UndefinedId) ;
 
   // the graph should still be a connected tree
   CPPUNIT_ASSERT(Graph->IsConnectedTree()) ;
@@ -593,11 +593,11 @@ void mafPolylineGraphTest::TestDeleteBranch()
   CPPUNIT_ASSERT(idb2 == idb1-1) ;
 
   // check that edges 12-16 are no longer members of a branch
-  CPPUNIT_ASSERT(Graph->GetConstEdgePtr(12)->GetBranchId() == mafPolylineGraph::UndefinedId) ;
-  CPPUNIT_ASSERT(Graph->GetConstEdgePtr(13)->GetBranchId() == mafPolylineGraph::UndefinedId) ;
-  CPPUNIT_ASSERT(Graph->GetConstEdgePtr(14)->GetBranchId() == mafPolylineGraph::UndefinedId) ;
-  CPPUNIT_ASSERT(Graph->GetConstEdgePtr(15)->GetBranchId() == mafPolylineGraph::UndefinedId) ;
-  CPPUNIT_ASSERT(Graph->GetConstEdgePtr(16)->GetBranchId() == mafPolylineGraph::UndefinedId) ;
+  CPPUNIT_ASSERT(Graph->GetConstEdgePtr(12)->GetBranchId() == mafPolylineGraph::m_UndefinedId) ;
+  CPPUNIT_ASSERT(Graph->GetConstEdgePtr(13)->GetBranchId() == mafPolylineGraph::m_UndefinedId) ;
+  CPPUNIT_ASSERT(Graph->GetConstEdgePtr(14)->GetBranchId() == mafPolylineGraph::m_UndefinedId) ;
+  CPPUNIT_ASSERT(Graph->GetConstEdgePtr(15)->GetBranchId() == mafPolylineGraph::m_UndefinedId) ;
+  CPPUNIT_ASSERT(Graph->GetConstEdgePtr(16)->GetBranchId() == mafPolylineGraph::m_UndefinedId) ;
 
   // check that branch 5 was correctly overwritten by branch 6
   CPPUNIT_ASSERT(Graph->GetConstBranchPtr(5)->GetNumberOfEdges() == 4) ;
@@ -781,7 +781,7 @@ void mafPolylineGraphTest::TestBranchName()
   // remove name from branch 4
   Graph->UnsetBranchName(4) ;
   i0 = Graph->FindBranchName(name0) ;
-  CPPUNIT_ASSERT(i0 == mafPolylineGraph::UndefinedId) ;
+  CPPUNIT_ASSERT(i0 == mafPolylineGraph::m_UndefinedId) ;
 
   delete Graph ;
 }

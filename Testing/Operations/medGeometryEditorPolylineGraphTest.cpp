@@ -289,6 +289,8 @@ void medGeometryEditorPolylineGraphTest::TestDeletePoint()
 	vtkDEL(output);
 	cppDEL(PolylineGraph);
 	mafDEL(polyline);
+  
+  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void medGeometryEditorPolylineGraphTest::TestSelectBranch()
@@ -308,6 +310,8 @@ void medGeometryEditorPolylineGraphTest::TestSelectBranch()
 
 	cppDEL(PolylineGraph);
 	mafDEL(polyline);
+
+  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void medGeometryEditorPolylineGraphTest::TestInsertPoint()

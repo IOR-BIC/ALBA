@@ -70,9 +70,9 @@ class MED_COMMON_EXPORT mafPolylineGraph
 {
 public:  
   /** consts for undefined index values */
-  const static vtkIdType UndefinedId;
-  const static int UndefinedInt;
-  const static char* UndefinedName;
+  const static vtkIdType m_UndefinedId;
+  const static int m_UndefinedInt;
+  const static char* m_UndefinedName;
 
 public:
   //-----------------------------------------------------------------------------
@@ -168,7 +168,7 @@ public:
   /** Add existing vertex to end of branch. 
   You can optionally specify the edge required to make the join.
   If the edge is omitted, it will be found automatically. */
-  bool AddExistingVertexToBranch(vtkIdType b, vtkIdType v, vtkIdType e = UndefinedId) ;
+  bool AddExistingVertexToBranch(vtkIdType b, vtkIdType v, vtkIdType e = m_UndefinedId) ;
 
   /** Add existing edge to end of branch.
   The edge must share a vertex with the end of the branch, and must not already belong to a branch. 
@@ -345,7 +345,8 @@ public:
 
     Branch& operator=(const Branch& src);
   private:
-    char* m_Name ;                                        ///< name of branch
+    //char* m_Name ;                                        ///< name of branch
+    wxString m_Name;
     std::vector<vtkIdType> m_VertexId ;                   ///< list by vertices
     std::vector<vtkIdType> m_EdgeId ;                     ///< list by edges
 

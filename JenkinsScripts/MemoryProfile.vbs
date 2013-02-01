@@ -132,11 +132,8 @@
         ' Waits until profiling is over
         While IntegrationManager.ProfilingStarted
           ' the Sleep command is needed otherwise the profiler application will hang
-          WScript.Sleep 10000
+          WScript.Sleep 1000
         Wend
-        
-        WScript.Sleep 10000
-        
        
         ' increase the tested files number
         intTestedFiles = intTestedFiles + 1
@@ -158,7 +155,6 @@
         
      ' Closes AQtime
      AQtimeObject.Quit
-     WScript.Sleep 30000
   
      Else 'canProfile
        'skipping the file 

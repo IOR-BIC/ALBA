@@ -37,6 +37,7 @@ medWizardBlockTypeCheck::medWizardBlockTypeCheck(const char *name):medWizardBloc
   m_Title="Bad VME type";
   m_Description="The Vme is of a wrong type,\nWizard will be closed!";
   m_WrongTypeNextBlock="END"; 
+  m_ErrorMessageEnabled=true;
 }
 
 //----------------------------------------------------------------------------
@@ -100,7 +101,7 @@ void medWizardBlockTypeCheck::ExcutionBegin()
     if (m_SelectedVME->IsA(m_AcceptedVmes[i].c_str()))
       m_TestPassed=true;
 
-  if (!m_TestPassed)
+  if (m_ErrorMessageEnabled && !m_TestPassed)
     //Show Modal window
     wxMessageBox(m_Description,m_Title, wxOK);
 }

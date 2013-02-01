@@ -129,7 +129,7 @@ medOpMML3ModelView3DPipe::medOpMML3ModelView3DPipe
   //----------------------------------------------------------------------------
   // landmarks
   //----------------------------------------------------------------------------
-  for (int i = 0 ;  i < MaxNumberOfLandmarks ;  i++){
+  for (int i = 0 ;  i < m_MaxNumberOfLandmarks ;  i++){
     m_LmarkSource[i] = vtkSphereSource::New() ;
     m_LmarkSource[i]->SetThetaResolution(12) ;
     m_LmarkSource[i]->SetPhiResolution(12) ;
@@ -149,7 +149,7 @@ medOpMML3ModelView3DPipe::medOpMML3ModelView3DPipe
   //----------------------------------------------------------------------------
   // axis landmarks
   //----------------------------------------------------------------------------
-  for (int i = 0 ;  i < MaxNumberOfAxisLandmarks ;  i++){
+  for (int i = 0 ;  i < m_MaxNumberOfAxisLandmarks ;  i++){
     m_AxisMarkSource[i] = vtkSphereSource::New() ;
     m_AxisMarkSource[i]->SetThetaResolution(12) ;
     m_AxisMarkSource[i]->SetPhiResolution(12) ;
@@ -341,14 +341,14 @@ medOpMML3ModelView3DPipe::~medOpMML3ModelView3DPipe()
   m_MuscleActor->Delete() ;
 
   // landmarks
-  for (int i = 0 ;  i < MaxNumberOfLandmarks ;  i++){
+  for (int i = 0 ;  i < m_MaxNumberOfLandmarks ;  i++){
     m_LmarkSource[i]->Delete() ;
     m_LmarkMapper[i]->Delete() ; 
     m_LmarkActor[i]->Delete() ; 
   }
 
   // axis landmarks
-  for (int i = 0 ;  i < MaxNumberOfAxisLandmarks ;  i++){
+  for (int i = 0 ;  i < m_MaxNumberOfAxisLandmarks ;  i++){
     m_AxisMarkSource[i]->Delete() ;
     m_AxisMarkMapper[i]->Delete() ; 
     m_AxisMarkActor[i]->Delete() ; 
@@ -502,7 +502,7 @@ void medOpMML3ModelView3DPipe::SetSliceTransform(int i, vtkMatrix4x4 *mat)
 void medOpMML3ModelView3DPipe::AddLandmark(double *pos)
 //------------------------------------------------------------------------------
 {
-  assert(m_NumberOfLandmarks < MaxNumberOfLandmarks) ;
+  assert(m_NumberOfLandmarks < m_MaxNumberOfLandmarks) ;
 
   // set position and make visibile
   int i = m_NumberOfLandmarks ;
@@ -520,7 +520,7 @@ void medOpMML3ModelView3DPipe::AddLandmark(double *pos)
 void medOpMML3ModelView3DPipe::AddAxisLandmark(double *pos)
 //------------------------------------------------------------------------------
 {
-  assert(m_NumberOfAxisLandmarks < MaxNumberOfAxisLandmarks) ;
+  assert(m_NumberOfAxisLandmarks < m_MaxNumberOfAxisLandmarks) ;
 
   // set position and make visibile
   int i = m_NumberOfAxisLandmarks ;
@@ -578,11 +578,11 @@ void medOpMML3ModelView3DPipe::SetLandmarkRadius(double r)
 {
   m_LandmarkSize = r ;
 
-  for (int i = 0 ;  i < MaxNumberOfLandmarks ;  i++){
+  for (int i = 0 ;  i < m_MaxNumberOfLandmarks ;  i++){
     m_LmarkSource[i]->SetRadius(r) ;
   }
 
-  for (int i = 0 ;  i < MaxNumberOfAxisLandmarks ;  i++){
+  for (int i = 0 ;  i < m_MaxNumberOfAxisLandmarks ;  i++){
     m_AxisMarkSource[i]->SetRadius(r) ;
   }
 }

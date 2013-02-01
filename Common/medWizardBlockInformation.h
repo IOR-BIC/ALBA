@@ -85,6 +85,11 @@ public:
   /** return true if image Position is set to left */
   bool GetImagePositionToLeft() { return !m_HorizontalImage;};
 
+  /** Set the images path (default path is <ApplicationDirectory>\WizardImages\) */
+  void SetImagePath(const char *path) {m_ImagesPath=path;};
+
+  /** Get the images path*/
+  wxString GetImagePath() { return m_ImagesPath;};
 
 protected:
 
@@ -102,5 +107,6 @@ private:
   wxString m_Description;
   wxString m_BoxLabel;
   wxString m_ImageFilename;
+  wxString m_ImagesPath;
 };
 #endif

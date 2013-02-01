@@ -39,6 +39,7 @@
 #ifdef MAF_USE_ITK
   #include "mafVMERawMotionData.h"
   #include "medVMEAnalog.h"
+  #include "medVMEStent.h"
 #endif
 
 #include "mafVMEVolumeLarge.h"
@@ -99,6 +100,7 @@ medVMEFactory::medVMEFactory()
 #ifdef MAF_USE_ITK
   mafPlugNodeMacro(mafVMERawMotionData,"VME that is a group for RawMotionData");
   mafPlugNodeMacro(medVMEAnalog,"VME rapresenting EMG scalar data");
+  mafPlugNodeMacro(medVMEStent,"VME representing stent structure");
 #endif
   //mafPlugNodeMacro(mafVMEthing,"VME representing a thing");
   

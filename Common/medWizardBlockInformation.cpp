@@ -41,6 +41,7 @@ medWizardBlockInformation::medWizardBlockInformation(const char *name):medWizard
 {
   //setting image on top by default
   m_HorizontalImage=true;
+  m_ImagesPath=(mafGetApplicationDirectory() + "\\WizardImages\\").c_str();
 }
 
 //----------------------------------------------------------------------------
@@ -107,7 +108,7 @@ void medWizardBlockInformation::ExcutionBegin()
     
       //load and show the image
       previewImage=new wxImage();
-      wxString imgPath=(mafGetApplicationDirectory() + "\\WizardImages\\").c_str();
+      wxString imgPath=m_ImagesPath;
       imgPath=imgPath+m_ImageFilename;
       previewImage->LoadFile(imgPath.c_str(), wxBITMAP_TYPE_ANY );
 

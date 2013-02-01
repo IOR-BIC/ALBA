@@ -156,7 +156,7 @@ protected:
   
   double  m_DefaultDensity;                            // Material density
   double  m_Mass;                               // Material mass
-  double  m__Principal_I1,m_Principal_I2,m_Principal_I3;  // Principal Inertial Tensor components.
+  double  m_Principal_I1,m_Principal_I2,m_Principal_I3;  // Principal Inertial Tensor components.
   
   /* Inertial tensor
   | Ixx  Iyx  Izx |

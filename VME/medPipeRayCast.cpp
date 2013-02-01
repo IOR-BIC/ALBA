@@ -224,8 +224,8 @@ mafGUI *medPipeRayCast::CreateGui()
   
   wxString modalities[2] = {"CT view", "MR view"};
   m_Gui->Combo(ID_CHANGE_MODALITY, "", &m_Modality, 2, modalities);
-
-  m_Gui->Integer(-1,"Modality:",&m_Modality);
+	
+	m_Gui->Label("");
 
   m_CTSliders->FloatSlider(ID_OPACITY_SLIDERS,"Skin",&m_SkinOpacity,0.0,1.0);
   m_CTSliders->FloatSlider(ID_OPACITY_SLIDERS,"Fat Mass",&m_FatMassOpacity,0.0,1.0);

@@ -24,6 +24,72 @@ DeformableSimplexMeshFilterImpl< TInputMesh, TOutputMesh >
 	delete[] StrutNeighbors;
 }
 //---------------------
+/* the difference from SetStrutLinkIter is parameter
+* setting StrutNeighbors: [0],[1] strut neighbor; [2] link neighbor
+* record for every simplex vertex
+* prepare for calculating strut&link length force
+* if the value equals -1, means not applicable
+* here, if the simplex vertex serves as extremity of stent structure, 
+      then it as least has the first two strut neighbor
+* if not, no neighbors
+* if this vertex is also connected to next crown with links, 
+      then it has the third link neighbor
+*/
+template< typename TInputMesh, typename TOutputMesh >
+void DeformableSimplexMeshFilterImpl< TInputMesh, TOutputMesh >
+	::SetStrutLinkFromCellArray(vtkCellArray *strut,vtkCellArray *link){
+
+		//initialization
+		int VertexNumber = this->GetInput(0)->GetPoints()->size();
+		StrutNeighbors = new int[VertexNumber][3];
+		for(int i=0;i<VertexNumber;i++){
+			StrutNeighbors[i][0] = -1;
+			StrutNeighbors[i][1] = -1;
+			StrutNeighbors[i][2] = -1;
+		}
+		
+		
+		//vtkIdType sNum = strut->GetNumberOfCells();
+	    //vtkCell* pCell;
+
+		vtkIdType npts = 0;
+		vtkIdType *pts=0;
+
+		vtkIdType start,end;
+
+
+		/*loop strut first */
+		//set strut neighbor: [0] & [1]
+		for ( strut->InitTraversal(); strut->GetNextCell(npts,pts); ){
+
+			start = pts[0];
+			end = pts[1];
+			if(StrutNeighbors[start][0] == -1)
+				StrutNeighbors[start][0] = end;
+			else 
+				if(StrutNeighbors[start][0]!= end && StrutNeighbors[start][1] == -1)
+					StrutNeighbors[start][1] = end;
+
+			if(StrutNeighbors[end][0] == -1)
+				StrutNeighbors[end][0] = start;
+			else 
+				if(StrutNeighbors[end][0]!= start && StrutNeighbors[end][1] == -1)
+					StrutNeighbors[end][1] = start;
+
+		}
+		/*loop link next*/
+		// set link neighbor: [2]
+		for ( link->InitTraversal(); link->GetNextCell(npts,pts); ){
+			start = pts[0];
+			end = pts[1];
+
+			if(StrutNeighbors[start][2] == -1)
+				StrutNeighbors[start][2] = end;
+			if(StrutNeighbors[end][2] == -1)
+				StrutNeighbors[end][2] = start;		
+		}
+		
+}
 
 /*
 * setting StrutNeighbors: [0],[1] strut neighbor; [2] link neighbor
@@ -209,8 +275,10 @@ DeformableSimplexMeshFilterImpl< TInputMesh, TOutputMesh >
 					+ (pt[1]-data->pos[1])*(pt[1]-data->pos[1])
 					+ (pt[2]-data->pos[2])*(pt[2]-data->pos[2]));
 	distanceCoefficient = dis;
-	if(dis < 0.35)  dis = 0;
-    if(dis >= 0.7) distanceCoefficient = 1;
+	//if(dis < 0.35)  dis = 0;
+    //if(dis >= 0.7) distanceCoefficient = 1;
+	if(dis < 0.1)  dis = 0;
+	if(dis >= 0.3) distanceCoefficient = 1;
 
 
 	//compose the displacement using all the forces together

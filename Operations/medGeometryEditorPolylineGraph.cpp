@@ -639,7 +639,7 @@ int medGeometryEditorPolylineGraph::InsertPoint(double position[3])
 
 	UpdateVMEEditorData(poly);
 
-	delete eList;
+	delete [] eList;
 
 	return MAF_OK;
 
@@ -714,6 +714,8 @@ void medGeometryEditorPolylineGraph::DeleteBranch(vtkIdType branchID)
   }
 
   m_PolylineGraph->MergeSimpleJoinedBranches();
+
+  delete [] vList;
 }
 //----------------------------------------------------------------------------
 void medGeometryEditorPolylineGraph::MovePoint(double newPosition[3],int pointID)
@@ -727,6 +729,7 @@ void medGeometryEditorPolylineGraph::MovePoint(double newPosition[3],int pointID
     p[1]=newPosition[1];
     p[2]=newPosition[2];
 		m_PolylineGraph->SetVertexCoords(m_SelectedPoint,p);
+    delete [] p;
   }
 	else
   {
@@ -736,6 +739,7 @@ void medGeometryEditorPolylineGraph::MovePoint(double newPosition[3],int pointID
     p[1]=newPosition[1];
     p[2]=newPosition[2];
 		m_PolylineGraph->SetVertexCoords(pointID,p);
+    delete [] p;
   }
 
 	SelectPoint(pointID);
@@ -845,12 +849,13 @@ int medGeometryEditorPolylineGraph::DeletePoint(int pointID)
 			for(int i=0;i<num;i++)
 				m_PolylineGraph->AddExistingEdgeToBranch(branch,eList[i]);
 
-			delete eList;
+			delete [] eList;
 		}
 		else
 		{
 			m_PolylineGraph->DeleteBranch(m_PolylineGraph->GetMaxBranchId());
 		}
+   
 
 		vtkMAFSmartPointer<vtkPolyData> poly;
 		m_PolylineGraph->CopyToPolydata(poly);
@@ -948,7 +953,7 @@ void medGeometryEditorPolylineGraph::SelectBranch(double position[3])
 	lines->InsertNextCell(idlist);
 	poly_selected->SetLines(lines);
 	poly_selected->SetPoints(points);
-
+  
 	//All point of poly_selected must have scalar 1.0 in way to color the tubes
 	vtkMAFSmartPointer<vtkCharArray> scalar_sel;
 	scalar_sel->SetNumberOfComponents(1);
@@ -971,7 +976,7 @@ void medGeometryEditorPolylineGraph::SelectBranch(double position[3])
 	m_CurrentBranch = m_PolylineGraph->GetBranchCorrespondingToOutputCell(CellID);
 
 	m_SelectedBranch = m_CurrentBranch;
-
+  
 	mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,false));
 	mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,true));
 }
