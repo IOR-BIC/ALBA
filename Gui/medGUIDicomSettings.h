@@ -127,7 +127,8 @@ public:
 
   enum NAME_COMPOSITOR
   {
-    ID_PATIENT_NAME = 0,
+    ID_SERIES = 0,
+    ID_PATIENT_NAME,
     ID_DESCRIPTION,
     ID_BIRTHDATE,
     ID_NUM_SLICES,
