@@ -236,7 +236,7 @@ void medGUIDicomSettings::OnEvent(mafEventBase *maf_event)
       m_Config->Write("NameCompositorDescription",m_NameCompositorList->IsItemChecked(ID_DESCRIPTION));
       m_Config->Write("NameCompositorBirthdate",m_NameCompositorList->IsItemChecked(ID_BIRTHDATE));
       m_Config->Write("NameCompositorNumSlices",m_NameCompositorList->IsItemChecked(ID_NUM_SLICES));
-      m_Config->Write("NameCompositorNumSlices",m_NameCompositorList->IsItemChecked(ID_SERIES));
+      m_Config->Write("NameCompositorSeries",m_NameCompositorList->IsItemChecked(ID_SERIES));
     }
     break;
 	case ID_AUTO_POS_CROP:
@@ -671,13 +671,13 @@ void medGUIDicomSettings::InitializeSettings()
     m_Config->Write("NameCompositorNumSlices",m_CheckNameCompositor[ID_NUM_SLICES]);
   }
 
-  if(m_Config->Read("NameCompositorNumSlices", &long_item))
+  if(m_Config->Read("NameCompositorSeries", &long_item))
   {
     m_CheckNameCompositor[ID_SERIES] = long_item;
   }
   else
   {
-    m_Config->Write("NameCompositorNumSlices",m_CheckNameCompositor[ID_SERIES]);
+    m_Config->Write("NameCompositorSeries",m_CheckNameCompositor[ID_SERIES]);
   }
 	m_Config->Flush();
 }

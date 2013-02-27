@@ -214,7 +214,7 @@ protected:
   mafGUICheckListBox *m_DicomVmeTypeListBox;
   mafGUICheckListBox *m_NameCompositorList;
 
-  int m_CheckNameCompositor[4];
+  int m_CheckNameCompositor[5];
 	int m_CheckOnOff[7];
   int m_CheckOnOffVmeType[3];
 
