@@ -45,7 +45,9 @@ void medWizardBlockTypeCheckTest::TestSetterGetter()
   block.SetWrongTypeNextBlock("abortBlock");
   CPPUNIT_ASSERT(block.GetWrongTypeNextBlock()=="abortBlock");
 
-  
+  block.EnableErrorMessage(false);
+  CPPUNIT_ASSERT(block.IsErrorMessageEnabled()==false);
+
 }
 
 //----------------------------------------------------------------------------

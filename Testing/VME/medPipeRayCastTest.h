@@ -43,12 +43,14 @@ class medPipeRayCastTest : public CPPUNIT_NS::TestFixture
 
 	CPPUNIT_TEST_SUITE( medPipeRayCastTest );
   CPPUNIT_TEST(TestFixture); // just to test that the fixture has no leaks
-	CPPUNIT_TEST( TestPipeExecution );
-	CPPUNIT_TEST_SUITE_END();
+  CPPUNIT_TEST( TestPipeExecution );
+  CPPUNIT_TEST( TestPipeExecutionMR );
+  CPPUNIT_TEST_SUITE_END();
 
 protected:
   void TestFixture();
-	void TestPipeExecution();
+  void TestPipeExecution();
+  void TestPipeExecutionMR();
 
   vtkRenderer *m_Renderer;
   vtkRenderWindow *m_RenderWindow;

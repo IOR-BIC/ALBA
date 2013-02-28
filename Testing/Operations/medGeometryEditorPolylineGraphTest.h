@@ -45,13 +45,13 @@ public:
 	void tearDown();
 
 	CPPUNIT_TEST_SUITE( medGeometryEditorPolylineGraphTest );
-	CPPUNIT_TEST( TestFixture );
+  CPPUNIT_TEST( TestFixture );
 	CPPUNIT_TEST( TestDynamicAllocation );
 	CPPUNIT_TEST( TestStaticAllocation );
 	CPPUNIT_TEST( TestAddNewVertex1 );
 	CPPUNIT_TEST( TestAddNewVertex2 );
 	CPPUNIT_TEST( TestAddBranch );
-	CPPUNIT_TEST( TestSelectPoint );
+	CPPUNIT_TEST( TestSelectPoint ); 
 	CPPUNIT_TEST( TestDeletePoint );
 	CPPUNIT_TEST( TestSelectBranch );
 	CPPUNIT_TEST( TestInsertPoint );

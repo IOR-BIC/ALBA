@@ -31,12 +31,14 @@ class vtkMEDRayCastCleanerTest : public CPPUNIT_NS::TestFixture
 {
   CPPUNIT_TEST_SUITE( vtkMEDRayCastCleanerTest );
   CPPUNIT_TEST( TestFilter );
+  CPPUNIT_TEST( TestFilterMR );
   CPPUNIT_TEST( TestSetterGetter );
   CPPUNIT_TEST( TestDynamicAllocation );
   CPPUNIT_TEST_SUITE_END();
 
 protected:
   void TestFilter();
+  void TestFilterMR();
   void TestSetterGetter();
   void TestDynamicAllocation();
 };

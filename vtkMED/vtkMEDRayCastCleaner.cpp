@@ -24,7 +24,11 @@
 #include "vtkMAFSmartPointer.h"
 #include "mafDefines.h"
 
-
+enum RAY_CAST_MODALITY
+{
+  CT_MODALITY,
+  MR_MODALITY,
+};
 
 vtkCxxRevisionMacro(vtkMEDRayCastCleaner, "$Revision: 1.0 $");
 vtkStandardNewMacro(vtkMEDRayCastCleaner);
@@ -37,6 +41,8 @@ vtkMEDRayCastCleaner::vtkMEDRayCastCleaner()
   BloodLowerThreshold=200.0;
   BloodUpperThreshold=340.0;
   BoneLowerThreshold=350.0;
+
+  Modality=CT_MODALITY;
 
 }
 
@@ -88,28 +94,31 @@ void vtkMEDRayCastCleaner::Execute()
     newValue=scalarShift(imgScalars->GetTuple1(i));
     newScalars->SetTuple1(i,newValue);
   }
-
- 
-
-  for (int i=0;i<nPoints;i++)
+  
+  //In MR_MODALITY The cleaner just make scalarshift to avoid vtkVolumeRayCastMapper errors
+  //In CT_MODALITY the cleaner remove the blood from bone boundary 
+  if (Modality==CT_MODALITY)
   {
-    //this filter removes border interpolation values from bone boundary
-    //if i get a blood voxel and a neighbor is a bone I set it's value
-    //to bone lower threshold 
-    if (isBlood(imgScalars->GetTuple1(i)))
+    for (int i=0;i<nPoints;i++)
     {
-      int maxSidesInNeighboors=BoneInNeighborsAffinity(i,imgScalars);
-      if (maxSidesInNeighboors)
+      //this filter removes border interpolation values from bone boundary
+      //if i get a blood voxel and a neighbor is a bone I set it's value
+      //to bone lower threshold 
+      if (isBlood(imgScalars->GetTuple1(i)))
       {
-        //If there is a bone neighbors we set a bone value in output depending on 
-        //level of affinity, in this manner if there is a high affinity the output 
-        //voxel has an high level of opacity in raycast pipe
-        boneValue= scalarShift(BoneLowerThreshold*(1.0+(maxSidesInNeighboors*0.02)));
-        newScalars->SetTuple1(i, boneValue);
+        int maxSidesInNeighboors=BoneInNeighborsAffinity(i,imgScalars);
+        if (maxSidesInNeighboors)
+        {
+          //If there is a bone neighbors we set a bone value in output depending on 
+          //level of affinity, in this manner if there is a high affinity the output 
+          //voxel has an high level of opacity in raycast pipe
+          boneValue= scalarShift(BoneLowerThreshold*(1.0+(maxSidesInNeighboors*0.02)));
+          newScalars->SetTuple1(i, boneValue);
+        }
       }
     }
   }
-  
+
   //settings new scalar values to output volume
   outputImage->GetPointData()->SetScalars(newScalars);
   outputImage->GetPointData()->Modified();
@@ -185,4 +194,32 @@ int vtkMEDRayCastCleaner::isBlood( double scalarValue )
 {
   //check if a values is inside blood range
   return (scalarValue >= BloodLowerThreshold && scalarValue <= BloodUpperThreshold);
+}
+
+//----------------------------------------------------------------------------
+void vtkMEDRayCastCleaner::SetModalityToCT()
+//----------------------------------------------------------------------------
+{
+  Modality=CT_MODALITY;
+}
+
+//----------------------------------------------------------------------------
+void vtkMEDRayCastCleaner::SetModalityToMR()
+//----------------------------------------------------------------------------
+{
+  Modality=MR_MODALITY;
+}
+
+//----------------------------------------------------------------------------
+bool vtkMEDRayCastCleaner::IsModalityCT()
+//----------------------------------------------------------------------------
+{
+  return Modality==CT_MODALITY;
+}
+
+//----------------------------------------------------------------------------
+bool vtkMEDRayCastCleaner::IsModalityMR()
+//----------------------------------------------------------------------------
+{
+  return Modality==MR_MODALITY;
 }

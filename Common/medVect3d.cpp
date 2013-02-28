@@ -27,14 +27,6 @@
 #include <math.h>
 
 
-//----------------------------------------------------------------------------
-medVect3d medVect3d::Abs(void)
-//----------------------------------------------------------------------------
-{
-  //Generate a new vector whit the absolute
-  //value of each original element
-  return medVect3d (fabsf(m_X),fabsf(m_Y),fabsf(m_Z));
-}
 
 //----------------------------------------------------------------------------
 medVect3d::medVect3d()
@@ -62,6 +54,15 @@ medVect3d::medVect3d( double *values )
 }
 
 //----------------------------------------------------------------------------
+medVect3d medVect3d::Abs(void)
+//----------------------------------------------------------------------------
+{
+  //Generate a new vector whit the absolute
+  //value of each original element
+  return medVect3d (fabsf(m_X),fabsf(m_Y),fabsf(m_Z));
+}
+
+//----------------------------------------------------------------------------
 void medVect3d::Setzero(void)
 //----------------------------------------------------------------------------
 {
@@ -70,7 +71,7 @@ void medVect3d::Setzero(void)
 }
 
 //----------------------------------------------------------------------------
-int medVect3d::operator==(medVect3d vect)
+int medVect3d::operator==(medVect3d &vect)
 //----------------------------------------------------------------------------
 {
   //return true if each element is equal to each other pair
@@ -78,7 +79,14 @@ int medVect3d::operator==(medVect3d vect)
 }
 
 //----------------------------------------------------------------------------
-medVect3d medVect3d::operator+(medVect3d vect)
+int medVect3d::operator==( double *vect )
+//----------------------------------------------------------------------------
+{
+  return ( (vect[0]==m_X) && (vect[1]==m_Y) && (vect[2]==m_Z) );
+}
+
+//----------------------------------------------------------------------------
+medVect3d medVect3d::operator+(medVect3d &vect)
 //----------------------------------------------------------------------------
 {
   //Generating a new vector witch the sum of each element 
@@ -86,7 +94,15 @@ medVect3d medVect3d::operator+(medVect3d vect)
 }
 
 //----------------------------------------------------------------------------
-medVect3d medVect3d::operator+=(medVect3d vect)
+medVect3d medVect3d::operator+( double *vect )
+//----------------------------------------------------------------------------
+{
+  //Generating a new vector witch the sum of each element 
+  return medVect3d(vect[0] + m_X, vect[1] + m_Y, vect[2] + m_Z);
+}
+
+//----------------------------------------------------------------------------
+medVect3d &medVect3d::operator+=(medVect3d &vect)
 //----------------------------------------------------------------------------
 {
   //assign at each value the sum whit the correspondent element
@@ -98,8 +114,19 @@ medVect3d medVect3d::operator+=(medVect3d vect)
   return *this;
 }
 
+medVect3d &medVect3d::operator+=(double *vect)
+{
+  //assign at each value the sum whit the correspondent element
+  m_X+=vect[0];
+  m_Y+=vect[1];
+  m_Z+=vect[2];
+  //Return a pointer to this object (for concatenating)
+  //i.e. a+=(b+=c)
+  return *this;
+}
+
 //----------------------------------------------------------------------------
-medVect3d medVect3d::operator-=(medVect3d vect)
+medVect3d &medVect3d::operator-=(medVect3d &vect)
 //----------------------------------------------------------------------------
 {
   //assign at each value the difference whit the correspondent element
@@ -112,8 +139,21 @@ medVect3d medVect3d::operator-=(medVect3d vect)
 }
 
 //----------------------------------------------------------------------------
-medVect3d medVect3d::operator*=(double val)
-  //----------------------------------------------------------------------------
+medVect3d & medVect3d::operator-=( double *vect )
+//----------------------------------------------------------------------------
+{
+  //assign at each value the difference whit the correspondent element
+  m_X-=vect[0];
+  m_Y-=vect[1];
+  m_Z-=vect[2];
+  //Return a pointer to this object (for concatenating)
+  //i.e. a-=(b-=c)
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+medVect3d &medVect3d::operator*=(double val)
+//----------------------------------------------------------------------------
 {
   //assign at each value the product whit the correspondent element
   m_X*=val;
@@ -124,7 +164,7 @@ medVect3d medVect3d::operator*=(double val)
   return *this;
 }
 //----------------------------------------------------------------------------
-medVect3d medVect3d::operator/=(double val)
+medVect3d &medVect3d::operator/=(double val)
 //----------------------------------------------------------------------------
 {
   val=1.0/val;
@@ -138,11 +178,19 @@ medVect3d medVect3d::operator/=(double val)
 }
 
 //----------------------------------------------------------------------------
-medVect3d medVect3d::operator-(medVect3d vect)
+medVect3d medVect3d::operator-(medVect3d &vect)
 //----------------------------------------------------------------------------
 {
   //Generating a new vector witch the difference of each element 
   return medVect3d(m_X - vect.m_X, m_Y - vect.m_Y, m_Z - vect.m_Z);
+}
+
+//----------------------------------------------------------------------------
+medVect3d medVect3d::operator-( double *vect )
+//----------------------------------------------------------------------------
+{
+  //Generating a new vector witch the difference of each element 
+  return medVect3d(m_X - vect[0], m_Y - vect[1], m_Z - vect[2]);
 }
 
 //----------------------------------------------------------------------------
@@ -165,7 +213,7 @@ medVect3d medVect3d::operator/(double num)
 
 
 //----------------------------------------------------------------------------
-medVect3d medVect3d::Cross(medVect3d vector)
+medVect3d medVect3d::Cross(medVect3d &vector)
 //----------------------------------------------------------------------------
 {
   //Generating a new vector witch the cross product of the vectors
@@ -216,7 +264,7 @@ medVect3d medVect3d::Normal(void)
 }
 
 //----------------------------------------------------------------------------
-double medVect3d::Dot(medVect3d vector)
+double medVect3d::Dot(medVect3d &vector)
 //----------------------------------------------------------------------------
 {
   //returns the dot product of the vector
@@ -225,7 +273,7 @@ double medVect3d::Dot(medVect3d vector)
 
 
 //----------------------------------------------------------------------------
-double medVect3d::Distance(medVect3d vect)
+double medVect3d::Distance(medVect3d &vect)
 //----------------------------------------------------------------------------
 {
   //calculating the distance between two vector
@@ -235,7 +283,7 @@ double medVect3d::Distance(medVect3d vect)
 }
 
 //----------------------------------------------------------------------------
-double medVect3d::Distance2(medVect3d vect)
+double medVect3d::Distance2(medVect3d &vect)
 //----------------------------------------------------------------------------
 {
   //calculating the quadratic distance between two vector
@@ -259,10 +307,10 @@ void medVect3d::SetValues( double x, double y, double z )
   //update the values
   m_X = x; m_Y = y; m_Z = z;
 }
-
+ 
 //-----------------------------------------------------------------------
-double medVect3d::AngleBetweenVectors( medVect3d vect )
-  //-----------------------------------------------------------------------
+double medVect3d::AngleBetweenVectors( medVect3d &vect )
+//-----------------------------------------------------------------------
 {
   // Get the dot product of the vectors
   double dotProduct = this->Dot(vect);
@@ -281,3 +329,12 @@ double medVect3d::AngleBetweenVectors( medVect3d vect )
   // Return the angle in radians
   return( angle );
 }
+
+//----------------------------------------------------------------------------
+double & medVect3d::operator[]( int pos )
+//----------------------------------------------------------------------------
+{
+  return *((&this->m_X + pos));
+}
+
+

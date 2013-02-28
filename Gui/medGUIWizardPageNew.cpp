@@ -78,7 +78,7 @@ medGUIWizardPageNew::medGUIWizardPageNew(medGUIWizard *wizardParent,long style, 
 	if(style & medUSERWI)
   {
     m_Rwi = new mafRWI(this);
-    m_Rwi->SetSize(0,0,512,512);
+    m_Rwi->SetSize(0,0,512,384);
     m_Rwi->Show(true);
     m_Rwi->CameraSet(CAMERA_CT);
     m_Rwi->CameraUpdate();

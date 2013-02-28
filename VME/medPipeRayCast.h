@@ -35,7 +35,6 @@ class vtkImageCast;
 class vtkPolyDataMapper;
 class vtkOutlineCornerFilter;
 class vtkMEDRayCastCleaner;
-class vtkMAFVolumeResample;
 
 //----------------------------------------------------------------------------
 // mafPipeIsosurface :
@@ -73,19 +72,35 @@ public:
   /** Set Test Mode On */
   void TestModeOn(){ m_TestMode=true; };
 
+  
 	/** IDs for the GUI */
 	enum PIPE_ISOSURFACE_WIDGET_ID
 	{
 		ID_OPACITY_SLIDERS = Superclass::ID_LAST,
-    CHANGE_OPACITY,
+    ID_CHANGE_MODALITY,
+    ID_CHANGE_OPACITY,
 		ID_CAMERA_FRONT,
 		ID_CAMERA_BACK,
 		ID_CAMERA_LEFT,
 		ID_CAMERA_RIGHT,
 		ID_CAMERA_TOP,
 		ID_CAMERA_BOTTOM,
-		ID_LAST
+    ID_LAST
 	};
+
+  enum RAY_CAST_MODALITY
+  {
+    CT_MODALITY,
+    MR_MODALITY,
+  };
+
+  enum PRESETS
+  {
+    DEFAULT_PRESET,
+    MUSCULAR_PRESET,
+    CIRCULATORY_PRESET,
+    SKELETON_PRESET,
+  };
 
 protected:
   /** Create the Gui for the visual pipe that allow the user to change the pipe's parameters.*/
@@ -97,12 +112,26 @@ protected:
   /** Update pipe internal data */
   void UpdateFromData();
 
+  /** Setting Threshold Ranges by modality*/
+  void SetThresholding();
+
+  /** attempt to auto detect modality by VME tags or scalar range*/
+  void DetectModality();
+
+  /** Set default opacity values on preset selection */
+  void OnPreset();
+
+  /** Show and Hides sliders by modality */
+  void ShowHideSliders();
+
+  /** Change view modality */
+  void OnChangeModality();
+
   vtkPiecewiseFunction     *m_OpacityFunction;
   vtkColorTransferFunction *m_ColorFunction;
 	vtkVolumeRayCastMapper   *m_RayCastMapper;
   vtkMEDRayCastCleaner     *m_RayCastCleaner;
-  vtkMAFVolumeResample		 *m_ResampleFilter;	
-	vtkVolume                *m_Volume;
+  vtkVolume                *m_Volume;
   
 
   double m_SkinLowerThreshold;
@@ -110,6 +139,7 @@ protected:
   double m_FatMassLowerThreshold;
   double m_FatMassUpperThreshold;
   double m_BoneLowerThreshold;
+  double m_BoneUpperThreshold;
   double m_BloodLowerThreshold;
   double m_BloodUpperThreshold;
   double m_MuscleLowerThreshold;
@@ -124,15 +154,20 @@ protected:
   double m_MuscleOpacity;
   double m_BoneOpacity;
   double m_BloodOpacity;
+  double m_BloodFocus;
 
   int m_OnLoading;
-  int m_Layer;
+  int m_Preset;
 
   double m_ScalarRange[2];
 
+  mafGUI *m_CTSliders;
+  mafGUI *m_MRSliders;
+  
   bool m_BoundingBoxVisibility;
   bool m_TestMode;
 
   mafString m_ExtractIsosurfaceName;
+  int m_Modality;
 };  
 #endif

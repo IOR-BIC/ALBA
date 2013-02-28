@@ -4487,21 +4487,21 @@ void Octree<Degree>::FaceEdgesFunction::Function(const TreeOctNode* node1,const 
 			for(int k=0;k<3;k++){
 				if(fIndex==Cube::FaceAdjacentToEdges(isoTri[j*3+k],isoTri[j*3+((k+1)%3)])){
 					if(GetRootIndex(node1,isoTri[j*3+k],maxDepth,ri1) && GetRootIndex(node1,isoTri[j*3+((k+1)%3)],maxDepth,ri2)){
-						edges->push_back(std::pair<long long,long long>(ri2.key,ri1.key));
-						iter=vertexCount->find(ri1.key);
+						edges->push_back(std::pair<long long,long long>(ri2.Key,ri1.Key));
+						iter=vertexCount->find(ri1.Key);
 						if(iter==vertexCount->end()){
-							(*vertexCount)[ri1.key].first=ri1;
-							(*vertexCount)[ri1.key].second=0;
+							(*vertexCount)[ri1.Key].first=ri1;
+							(*vertexCount)[ri1.Key].second=0;
 						}
-						iter=vertexCount->find(ri2.key);
+						iter=vertexCount->find(ri2.Key);
 						if(iter==vertexCount->end()){
-							(*vertexCount)[ri2.key].first=ri2;
-							(*vertexCount)[ri2.key].second=0;
+							(*vertexCount)[ri2.Key].first=ri2;
+							(*vertexCount)[ri2.Key].second=0;
 						}
-						(*vertexCount)[ri1.key].second--;
-						(*vertexCount)[ri2.key].second++;
+						(*vertexCount)[ri1.Key].second--;
+						(*vertexCount)[ri2.Key].second++;
 					}
-					else{fprintf(stderr,"Bad Edge 1: %d %d\n",ri1.key,ri2.key);}
+					else{fprintf(stderr,"Bad Edge 1: %d %d\n",ri1.Key,ri2.Key);}
 				}
 			}
 		}
@@ -5298,8 +5298,8 @@ void Octree<Degree>::Validate(TreeOctNode* node,const Real& isoValue,const int& 
 template<int Degree>
 int Octree<Degree>::GetRoot(const RootInfo& ri,const Real& isoValue,Point3D<Real> & position,hash_map<long long,std::pair<Real,Point3D<Real> > >& normalHash,const int& nonLinearFit){
 	int c1,c2;
-	Cube::EdgeCorners(ri.edgeIndex,c1,c2);
-	if(!MarchingCubes::HasEdgeRoots(ri.node->nodeData.mcIndex,ri.edgeIndex)){return 0;}
+	Cube::EdgeCorners(ri.EdgeIndex,c1,c2);
+	if(!MarchingCubes::HasEdgeRoots(ri.Node->nodeData.mcIndex,ri.EdgeIndex)){return 0;}
 
 	long long key;
 	Point3D<Real> n[2];
@@ -5314,9 +5314,9 @@ int Octree<Degree>::GetRoot(const RootInfo& ri,const Real& isoValue,Point3D<Real
 	double x0,x1;
 	Real center,width;
 	Real averageRoot=0;
-	Cube::FactorEdgeIndex(ri.edgeIndex,o,i1,i2);
+	Cube::FactorEdgeIndex(ri.EdgeIndex,o,i1,i2);
 	int idx[3];
-	key=VertexData::CornerIndex(ri.node,c1,fData.depth,idx);
+	key=VertexData::CornerIndex(ri.Node,c1,fData.depth,idx);
 	cnf.index[0]=idx[0]*fData.res;
 	cnf.index[1]=idx[1]*fData.res;
 	cnf.index[2]=idx[2]*fData.res;
@@ -5325,21 +5325,21 @@ int Octree<Degree>::GetRoot(const RootInfo& ri,const Real& isoValue,Point3D<Real
 		cnf.value=0;
 		cnf.normal.coords[0]=cnf.normal.coords[1]=cnf.normal.coords[2]=0;
 		// Careful here as the normal isn't quite accurate... (i.e. postNormalSmooth is ignored)
-		if(this->width<=3){getCornerValueAndNormal(ri.node,c1,cnf.value,cnf.normal);}
+		if(this->width<=3){getCornerValueAndNormal(ri.Node,c1,cnf.value,cnf.normal);}
 		else{TreeOctNode::ProcessPointAdjacentNodes(fData.depth,idx,&tree,this->width,&cnf);}
 		normalHash[key]=std::pair<Real,Point3D<Real> >(cnf.value,cnf.normal);
 	}
 	x0=normalHash[key].first;
 	n[0]=normalHash[key].second;
 
-	key=VertexData::CornerIndex(ri.node,c2,fData.depth,idx);
+	key=VertexData::CornerIndex(ri.Node,c2,fData.depth,idx);
 	cnf.index[0]=idx[0]*fData.res;
 	cnf.index[1]=idx[1]*fData.res;
 	cnf.index[2]=idx[2]*fData.res;
 	if(normalHash.find(key)==normalHash.end()){
 		cnf.value=0;
 		cnf.normal.coords[0]=cnf.normal.coords[1]=cnf.normal.coords[2]=0;
-		if(this->width<=3){getCornerValueAndNormal(ri.node,c2,cnf.value,cnf.normal);}
+		if(this->width<=3){getCornerValueAndNormal(ri.Node,c2,cnf.value,cnf.normal);}
 		else{TreeOctNode::ProcessPointAdjacentNodes(fData.depth,idx,&tree,this->width,&cnf);}
 		normalHash[key]=std::pair<Real,Point3D<Real> >(cnf.value,cnf.normal);
 	}
@@ -5347,7 +5347,7 @@ int Octree<Degree>::GetRoot(const RootInfo& ri,const Real& isoValue,Point3D<Real
 	n[1]=normalHash[key].second;
 
 	Point3D<Real> c;
-	ri.node->centerAndWidth(c,width);
+	ri.Node->centerAndWidth(c,width);
 	center=c.coords[o];
 	for(i=0;i<DIMENSION;i++){
 		n[0].coords[i]*=width;
@@ -5399,7 +5399,7 @@ int Octree<Degree>::GetRoot(const RootInfo& ri,const Real& isoValue,Point3D<Real
 template<int Degree>
 int Octree<Degree>::GetRoot(const RootInfo& ri,const Real& isoValue,const int& maxDepth,Point3D<Real>& position,hash_map<long long,std::pair<Real,Point3D<Real> > >& normals,
 							Point3D<Real>* normal,const int& nonLinearFit){
-	if(!MarchingCubes::HasRoots(ri.node->nodeData.mcIndex)){return 0;}
+	if(!MarchingCubes::HasRoots(ri.Node->nodeData.mcIndex)){return 0;}
 	return GetRoot(ri,isoValue,position,normals,nonLinearFit);
 }
 template<int Degree>
@@ -5450,8 +5450,8 @@ int Octree<Degree>::GetRootIndex(const TreeOctNode* node,const int& edgeIndex,co
 		Cube::FactorEdgeIndex(finestIndex,o,i1,i2);
 		int d,off[3];
 		finest->depthAndOffset(d,off);
-		ri.node=finest;
-		ri.edgeIndex=finestIndex;
+		ri.Node=finest;
+		ri.EdgeIndex=finestIndex;
 		int eIndex[2],offset;
 		offset=BinaryNode<Real>::Index(d,off[o]);
 		switch(o){
@@ -5468,7 +5468,7 @@ int Octree<Degree>::GetRootIndex(const TreeOctNode* node,const int& edgeIndex,co
 					eIndex[1]=BinaryNode<Real>::CornerIndex(maxDepth+1,d,off[1],i2);
 					break;
 		}
-		ri.key = (long long)(o) | (long long)(eIndex[0])<<5 | (long long)(eIndex[1])<<25 | (long long)(offset)<<45;
+		ri.Key = (long long)(o) | (long long)(eIndex[0])<<5 | (long long)(eIndex[1])<<25 | (long long)(offset)<<45;
 		return 1;
 	}
 }
@@ -5519,8 +5519,8 @@ int Octree<Degree>::GetRootIndex(const TreeOctNode* node,const int& edgeIndex,co
 		Cube::FactorEdgeIndex(finestIndex,o,i1,i2);
 		int d,off[3];
 		finest->depthAndOffset(d,off);
-		ri.node=finest;
-		ri.edgeIndex=finestIndex;
+		ri.Node=finest;
+		ri.EdgeIndex=finestIndex;
 		int offset,eIndex[2];
 		offset=BinaryNode<Real>::Index(d,off[o]);
 		switch(o){
@@ -5537,21 +5537,21 @@ int Octree<Degree>::GetRootIndex(const TreeOctNode* node,const int& edgeIndex,co
 					eIndex[1]=BinaryNode<Real>::CornerIndex(maxDepth+1,d,off[1],i2);
 					break;
 		}
-		ri.key= (long long)(o) | (long long)(eIndex[0])<<5 | (long long)(eIndex[1])<<25 | (long long)(offset)<<45;
+		ri.Key= (long long)(o) | (long long)(eIndex[0])<<5 | (long long)(eIndex[1])<<25 | (long long)(offset)<<45;
 		return 1;
 	}
 }
 template<int Degree>
 int Octree<Degree>::GetRootPair(const RootInfo& ri,const int& maxDepth,RootInfo& pair){
-	const TreeOctNode* node=ri.node;
+	const TreeOctNode* node=ri.Node;
 	int c1,c2,c;
-	Cube::EdgeCorners(ri.edgeIndex,c1,c2);
+	Cube::EdgeCorners(ri.EdgeIndex,c1,c2);
 	while(node->parent){
 		c=int(node-node->parent->children);
 		if(c!=c1 && c!=c2){return 0;}
-		if(!MarchingCubes::HasEdgeRoots(node->parent->nodeData.mcIndex,ri.edgeIndex)){
-			if(c==c1){return GetRootIndex(&node->parent->children[c2],ri.edgeIndex,maxDepth,pair);}
-			else{return GetRootIndex(&node->parent->children[c1],ri.edgeIndex,maxDepth,pair);}
+		if(!MarchingCubes::HasEdgeRoots(node->parent->nodeData.mcIndex,ri.EdgeIndex)){
+			if(c==c1){return GetRootIndex(&node->parent->children[c2],ri.EdgeIndex,maxDepth,pair);}
+			else{return GetRootIndex(&node->parent->children[c1],ri.EdgeIndex,maxDepth,pair);}
 		}
 		node=node->parent;
 	}
@@ -5593,7 +5593,7 @@ int Octree<Degree>::SetMCRootPositions(TreeOctNode* node,const int& sDepth,const
 				long long key;
 				eIndex=Cube::EdgeIndex(i,j,k);
 				if(GetRootIndex(node,eIndex,fData.depth,ri)){
-					key=ri.key;
+					key=ri.Key;
 					if(!interiorRoots || IsBoundaryEdge(node,i,j,k,sDepth)){
 						if(boundaryRoots.find(key)==boundaryRoots.end()){
 							GetRoot(ri,isoValue,fData.depth,position,boundaryNormalHash,NULL,nonLinearFit);
@@ -5638,7 +5638,7 @@ int Octree<Degree>::SetBoundaryMCRootPositions(const int& sDepth,const Real& iso
 							long long key;
 							eIndex=Cube::EdgeIndex(i,j,k);
 							if(GetRootIndex(node,eIndex,fData.depth,ri)){
-								key=ri.key;
+								key=ri.Key;
 								if(boundaryRoots.find(key)==boundaryRoots.end()){
 									GetRoot(ri,isoValue,fData.depth,position,boundaryNormalHash,NULL,nonLinearFit);
 									mesh->inCorePoints.push_back(position);
@@ -5685,21 +5685,21 @@ void Octree<Degree>::GetMCIsoEdges(TreeOctNode* node,hash_map<long long,int>& bo
 				for(int k=0;k<3;k++){
 					if(fIndex==Cube::FaceAdjacentToEdges(isoTri[j*3+k],isoTri[j*3+((k+1)%3)])){
 						if(GetRootIndex(node,isoTri[j*3+k],fData.depth,ri1) && GetRootIndex(node,isoTri[j*3+((k+1)%3)],fData.depth,ri2)){
-							edges.push_back(std::pair<long long,long long>(ri1.key,ri2.key));
-							iter=vertexCount.find(ri1.key);
+							edges.push_back(std::pair<long long,long long>(ri1.Key,ri2.Key));
+							iter=vertexCount.find(ri1.Key);
 							if(iter==vertexCount.end()){
-								vertexCount[ri1.key].first=ri1;
-								vertexCount[ri1.key].second=0;
+								vertexCount[ri1.Key].first=ri1;
+								vertexCount[ri1.Key].second=0;
 							}
-							iter=vertexCount.find(ri2.key);
+							iter=vertexCount.find(ri2.Key);
 							if(iter==vertexCount.end()){
-								vertexCount[ri2.key].first=ri2;
-								vertexCount[ri2.key].second=0;
+								vertexCount[ri2.Key].first=ri2;
+								vertexCount[ri2.Key].second=0;
 							}
-							vertexCount[ri1.key].second++;
-							vertexCount[ri2.key].second--;
+							vertexCount[ri1.Key].second++;
+							vertexCount[ri2.Key].second--;
 						}
-						else{fprintf(stderr,"Bad Edge 1: %d %d\n",ri1.key,ri2.key);}
+						else{fprintf(stderr,"Bad Edge 1: %d %d\n",ri1.Key,ri2.Key);}
 					}
 				}
 			}
@@ -5711,11 +5711,11 @@ void Octree<Degree>::GetMCIsoEdges(TreeOctNode* node,hash_map<long long,int>& bo
 		else if(vertexCount[edges[i].first].second){
 			RootInfo ri;
 			GetRootPair(vertexCount[edges[i].first].first,fData.depth,ri);
-			iter=vertexCount.find(ri.key);
+			iter=vertexCount.find(ri.Key);
 			if(iter==vertexCount.end()){printf("Vertex pair not in list\n");}
 			else{
-				edges.push_back(std::pair<long long,long long>(ri.key,edges[i].first));
-				vertexCount[ri.key].second++;
+				edges.push_back(std::pair<long long,long long>(ri.Key,edges[i].first));
+				vertexCount[ri.Key].second++;
 				vertexCount[edges[i].first].second--;
 			}
 		}
@@ -5725,12 +5725,12 @@ void Octree<Degree>::GetMCIsoEdges(TreeOctNode* node,hash_map<long long,int>& bo
 		else if(vertexCount[edges[i].second].second){
 			RootInfo ri;
 			GetRootPair(vertexCount[edges[i].second].first,fData.depth,ri);
-			iter=vertexCount.find(ri.key);
+			iter=vertexCount.find(ri.Key);
 			if(iter==vertexCount.end()){printf("Vertex pair not in list\n");}
 			else{
-				edges.push_back(std::pair<long long,long long>(edges[i].second,ri.key));
+				edges.push_back(std::pair<long long,long long>(edges[i].second,ri.Key));
 				vertexCount[edges[i].second].second++;
-				vertexCount[ri.key].second--;
+				vertexCount[ri.Key].second--;
 			}
 		}
 	}
