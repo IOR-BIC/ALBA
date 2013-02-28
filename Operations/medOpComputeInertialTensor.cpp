@@ -193,7 +193,7 @@ void medOpComputeInertialTensor::OpUndo()
   vme->GetTagArray()->GetTag("INERTIAL_TENSOR_COMPONENTS",m_InertialTensorTag);
   vme->GetTagArray()->GetTag("SURFACE_MASS",m_TagMass);
 
-  vme->GetTagArray()->GetTag("LOCAL_CENTER_OF_MASS_COMPONENTS");
+  vme->GetTagArray()->DeleteTag("LOCAL_CENTER_OF_MASS_COMPONENTS");
   vme->GetTagArray()->DeleteTag("PRINCIPAL_INERTIAL_TENSOR_COMPONENTS");
   vme->GetTagArray()->DeleteTag("INERTIAL_TENSOR_COMPONENTS");
   vme->GetTagArray()->DeleteTag("SURFACE_MASS");

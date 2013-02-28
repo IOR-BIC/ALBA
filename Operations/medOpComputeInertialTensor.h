@@ -167,6 +167,9 @@ protected:
 
   mafTagItem m_PrincipalInertialTensorTag;
   mafTagItem m_TagMass;
+  mafTagItem m_LocalCenterOfMassTag;
+
+  double m_CenterOfMass[3];
 
   int m_MethodToUse;
   int m_Accuracy;
