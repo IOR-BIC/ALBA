@@ -1095,14 +1095,13 @@ int medOpComputeInertialTensor::ComputeInertialTensorFromGroup()
 	  wxString s;
 	  s << "Computing Inertial tensor for: " << childSurface->GetName();
 	  mafLogMessage(s.c_str());      
-	  ComputeInertialTensor(childSurface,i+1,n_of_children - 1);
-
-	  m_CenterOfMass[0] = m_CenterOfMass[0] / n_of_children; 
-	  m_CenterOfMass[1] = m_CenterOfMass[1] / n_of_children;
-	  m_CenterOfMass[2] = m_CenterOfMass[2] / n_of_children;
-
+	  ComputeInertialTensor(childSurface,i+1,n_of_surfaces);
     }
   }
+
+  m_CenterOfMass[0] = m_CenterOfMass[0] / n_of_surfaces; 
+  m_CenterOfMass[1] = m_CenterOfMass[1] / n_of_surfaces;
+  m_CenterOfMass[2] = m_CenterOfMass[2] / n_of_surfaces;
 
   result = OP_RUN_OK;
 
