@@ -106,9 +106,13 @@ public:
 
 	 // void SetVesselPointsKDTree(PointIterator PointStart, PointIterator PointEnd);
 	  void SetVesselPointsKDTreeFromPolyData(vtkPolyData *surface);
+	  /*to check if point touch vessel wall from inside,1 inside ,0,outside */
+	  int isPointInsideVessel(double *stentPoint, double *surfacePoint) ;
+	  double computeDirectionFromPoint2Face(double *stentPoint,vtkIdType p1,vtkIdType p2,vtkIdType p3);
 	  void SetCenterLocationIdx(vector<int>::const_iterator centerLocationIndex);
 	  void SetCenterLocationIdxRef(vector<int> const&ve);
 	  void SetTestValue(int value){this->testValue = value;}
+	  void vectorSubtract(double *endPoint,double *startPoint,double *result);
 
 protected:
 	DeformableSimplexMeshFilterImpl();
@@ -125,6 +129,7 @@ protected:
 
 private:
 	int m_CurIterationNum;
+	vtkPolyData *m_SurfacePoly;
 	VectorType ComputeStrutLengthForce(SimplexMeshGeometry *data, int index);
     VectorType ComputeLinkLengthForce(SimplexMeshGeometry *data, int index);
 
@@ -136,7 +141,7 @@ private:
 	kdtree *KDTree;
 
 	vector<int>::const_iterator centerLocationIdx;
-
+	int isDataChanged ;
 
 	int testValue;
 

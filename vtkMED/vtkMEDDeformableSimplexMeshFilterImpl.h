@@ -1,8 +1,14 @@
 #include "itkDeformableSimplexMesh3DGradientConstraintForceFilter.h"
 #include "itkNumericTraits.h"
 #include "vnl/vnl_math.h"
-
+#include <time.h>
+#include "vtkDoubleArray.h"
+#include "vtkCellData.h"
+#include "vtkMath.h"
 #include <set>
+
+
+
 
 namespace itk
 {
@@ -161,8 +167,14 @@ template< typename TInputMesh, typename TOutputMesh >
 void DeformableSimplexMeshFilterImpl< TInputMesh, TOutputMesh >
 	::SetVesselPointsKDTreeFromPolyData(vtkPolyData *surface){
 
-		vtkIdType num = surface->GetNumberOfPoints();
+		m_SurfacePoly = surface;
 		vtkPoints *points = surface->GetPoints();
+		
+
+		
+	
+		vtkIdType num = surface->GetNumberOfPoints();
+		
 		double p[3];
 		KDTree = kd_create(3);
 		for(vtkIdType i=0;i<num;i++){
@@ -172,6 +184,110 @@ void DeformableSimplexMeshFilterImpl< TInputMesh, TOutputMesh >
 }
 
 
+//1 inside ,0,outside 
+template< typename TInputMesh, typename TOutputMesh >
+int DeformableSimplexMeshFilterImpl< TInputMesh, TOutputMesh >
+	:: isPointInsideVessel(double *stentPoint, double *surfacePoint) 
+{
+	int rtnFlag = 1;//inside
+	//----to have a test-
+	double outPoint[3];
+	//double aPoint[3];
+	//m_SurfacePoly->GetPoint(0,aPoint); X                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+	vtkIdType surPointIndex = m_SurfacePoly->FindPoint(surfacePoint);
+	vtkIdList *apCellIds = vtkIdList::New();
+	vtkIdList *apNPointIds  = vtkIdList::New();
+	m_SurfacePoly->GetPointCells (surPointIndex, apCellIds);
+	vtkIdType cellNumber = apCellIds->GetNumberOfIds();
+
+	vtkIdType cellId,pointId1,pointId2;
+	vtkCell *aCell;
+	vtkIdType pointNumber ;
+	double flag; //flag>0 in surface or <0 outside
+	for(int i=0;i<cellNumber;i++){
+		cellId = apCellIds->GetId(i);
+		aCell = m_SurfacePoly->GetCell(cellId);
+		apNPointIds = aCell->GetPointIds();
+		pointNumber = apNPointIds->GetNumberOfIds();
+		if(pointNumber ==3){
+			flag = computeDirectionFromPoint2Face(stentPoint,apNPointIds->GetId(0),apNPointIds->GetId(1),apNPointIds->GetId(2));
+			if(flag>0){
+				rtnFlag = -1;
+				break;
+			}
+		}
+	}
+
+	//double n1[3],n2[3],point1Coord[3],point2Coord[3];
+	//find cells of a point
+	/*for(int i=0;i<cellNumber;i++){
+		cellId = apCellIds->GetId(i);
+		aCell = surface->GetCell(cellId);
+		vtkIdaCell->GetPointIds(apNPointIds);
+		pointNumber = apNPointIds->GetNumberOfIds();
+		//find points of a cell
+		for(int j=0;j<pointNumber-1;j++){
+			pointId1 = apNPointIds->GetId(j);
+			pointId2 = apNPointIds->GetId(j+1)
+				//computeFacePointDistance(outPoint ,aPoint,pointId1,pointId2);
+			m_SurfacePoly->GetPoint(pointId1,point1Coord);
+			m_SurfacePoly->GetPoint(pointId2,point2Coord);
+			//---------compute distance from stentPoint to face (aPoint,point1Coord, point2Coord);
+		
+		}
+		//last cell
+		pointId1 = apNPointIds->GetId(j);
+		pointId2 = apNPointIds->GetId(0);
+
+	}*/
+		return rtnFlag;
+	//------test finish-----
+}
+template< typename TInputMesh, typename TOutputMesh >
+void DeformableSimplexMeshFilterImpl< TInputMesh, TOutputMesh >
+	::vectorSubtract(double *endPoint,double *startPoint,double *result){
+		result[0] = endPoint[0]-startPoint[0];
+		result[1] = endPoint[1]-startPoint[1];
+		result[2] = endPoint[2]-startPoint[2];
+
+}
+
+template< typename TInputMesh, typename TOutputMesh >
+double DeformableSimplexMeshFilterImpl< TInputMesh, TOutputMesh >
+	::computeDirectionFromPoint2Face(double *stentPoint,vtkIdType p1,vtkIdType p2,vtkIdType p3){
+		double rtn = 0.0;
+		
+		double point1Coord[3],point2Coord[3],point3Coord[3],p1p2[3],p1p3[3],normal[3],p1Stent[3];
+		m_SurfacePoly->GetPoint(p1,point1Coord);
+		m_SurfacePoly->GetPoint(p2,point2Coord);
+		m_SurfacePoly->GetPoint(p3,point3Coord);
+		vectorSubtract(point2Coord, point1Coord, p1p2);
+		vectorSubtract(point3Coord, point1Coord, p1p3);
+		vtkMath::Cross(p1p2,p1p3,normal);
+		vectorSubtract(stentPoint,point1Coord,p1Stent);
+		rtn = vtkMath::Dot(normal,p1Stent);
+		
+		//-----------test------------
+//		| N /p3
+//		|  /
+//	p1	| /_______ p2
+//      \
+//       \
+//        \ sp
+		double n[3],p1S[3];//*p1c,*p2c,*p3c,
+		double p1c[3] = {0,0,0};
+		double p2c[3] =  {2,0,0};
+		double p3c[3] = {0,2,0};
+		double sp[3] =  {2,0,-1};
+		;
+		vectorSubtract(p2c, p1c, p1p2);
+		vectorSubtract(p3c, p1c, p1p3);
+		vtkMath::Cross(p1p2,p1p3,n);
+		vectorSubtract(stentPoint,p1c,p1S);
+		double dot = vtkMath::Dot(n,p1S);
+
+		return rtn;
+}
 //--------------------------
 
 /*
@@ -205,7 +321,10 @@ template< typename TInputMesh, typename TOutputMesh >
 void
 DeformableSimplexMeshFilterImpl< TInputMesh, TOutputMesh >
 ::ComputeDisplacement(){
-  const InputMeshType *inputMesh = this->GetInput(0);
+  //-------------timer--------
+	 time_t t1,t2;
+//-------------timer--------
+	const InputMeshType *inputMesh = this->GetInput(0);
 
   // Filters should not modify their input...
   // There is a design flaw here.
@@ -218,14 +337,18 @@ DeformableSimplexMeshFilterImpl< TInputMesh, TOutputMesh >
   VectorType displacement;
   
   int i = 0;
-  double pt[3];
+  double pt[3]; //point on surface
   double pos[3];
   VectorType StrutLengthForce;
   VectorType LinkLengthForce;
   kdres *nearestPointSet;
   vector<int>::const_iterator centerIdx = centerLocationIdx;
   int catheterConstraint = 1;
-
+  isDataChanged = 0;
+  //-------------timer--------
+  (void) time(&t1);
+  
+  //-------------timer--------
   //for every simplex vertex
   while ( dataIt != this->m_Data->End() )
   {
@@ -247,7 +370,7 @@ DeformableSimplexMeshFilterImpl< TInputMesh, TOutputMesh >
 	*/
 
 
-	if (((*centerIdx)*2+75)< m_CurIterationNum){
+	if (((*centerIdx)*2+75)< m_CurIterationNum){//y:75 can not expend fully //my value:25 too fast//change parameter here
 		dataIt++;
 		centerIdx++;
 		continue;
@@ -269,8 +392,12 @@ DeformableSimplexMeshFilterImpl< TInputMesh, TOutputMesh >
 	pos[0] = data->pos[0];
 	pos[1] = data->pos[1];
 	pos[2] = data->pos[2];
-	nearestPointSet = kd_nearest3(KDTree, pos[0], pos[1], pos[2]);
-	kd_res_item( nearestPointSet, pt );
+	nearestPointSet = kd_nearest3(KDTree, pos[0], pos[1], pos[2]);//pos from simplex mesh
+	kd_res_item( nearestPointSet, pt ); //pt from surface
+
+	int inFlag = isPointInsideVessel(pos,pt);//a point from simplex vertex and a point from surface.
+	double changeFlag =0 ;
+	
 	double dis = sqrt((pt[0]-data->pos[0])*(pt[0]-data->pos[0])
 					+ (pt[1]-data->pos[1])*(pt[1]-data->pos[1])
 					+ (pt[2]-data->pos[2])*(pt[2]-data->pos[2]));
@@ -289,14 +416,21 @@ DeformableSimplexMeshFilterImpl< TInputMesh, TOutputMesh >
 		                      +  distanceCoefficient * (data->externalForce).Get_vnl_vector() 
 							  +  StrutLengthForce.Get_vnl_vector());
 							  //+  LinkLengthForce.Get_vnl_vector());
-    data->pos +=  catheterConstraint*distanceCoefficient * displacement;
-
-
+	changeFlag = inFlag*catheterConstraint*distanceCoefficient;
+	if(changeFlag){
+		isDataChanged ++;
+		data->pos +=  changeFlag * displacement;
+	}
 	nonConstPoints->InsertElement(dataIt.Index(), data->pos);
   
     dataIt++;
 	centerIdx++;
-   }
+   }//end of while
+  //-------------timer--------
+  (void) time(&t2);
+  //-------------timer--------
+  int diff =(int) t2 -t1;
+
 }
 //-------------------------
 

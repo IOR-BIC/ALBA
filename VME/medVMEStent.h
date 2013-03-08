@@ -36,6 +36,7 @@ class vtkTransform;
 class vtkAppendPolyData;
 class vtkTubeFilter;
 class vtkCellArray;
+class vtkPoints;
 /**----------------------------------------------------------------------------*/
 //--------typedef----------
 /**----------------------------------------------------------------------------*/
@@ -80,6 +81,7 @@ protected:
 		ID_CENTERLINE,
 		ID_CONSTRAIN_SURFACE,
 		ID_DEFORMATION,
+		CHANGE_VIEW,
 		ID_LAST
 	  };
     /** store attributes and matrix*/
@@ -126,18 +128,21 @@ protected:
 	vtkPolyData  *m_ConstrainSurface;
 	mafString m_CenterLineName;
 	mafString m_ConstrainSurfaceName;
+	vtkPolyData *m_TestVesselPolyData;
 
 private:
 	/**  deformation iterator  */
-	int m_numberOfCycle;
+	
 	double m_StrutLength;
-	vtkPolyData *stentPolyLine;  
+	vtkPolyData *m_StentPolyLine;  
 	vector<double> m_StentCenterLineSerial;
 	vector<vector<double>> m_StentCenterLine;
 	vector<vector<double>>::const_iterator m_CenterLineStart; //could be remove
 	vector<vector<double>>::const_iterator m_CenterLineEnd;  //could be remove
 	vtkPolyData* CreateAConstrainSurface();
-	void moveCatheter(int numberOfCycle);
+	void moveCatheter(mafTimeStamp currentIter);
+	void createCatheter(vtkPolyData  *centerLine);
+	void createTestVesselPolydata(vtkPolyData  *centerLine);
 	void expandStent(int numberOfCycle);
 
 	/** three output in append polydata*/
@@ -158,6 +163,8 @@ private:
 
 	/*from get Strut Length from stentModelSource*/
 	double GetStrutLength(){return m_StrutLength;};
+	/*if show catheter*/
+	int m_ShowCatheter;
 
 	vtkCellArray *m_StrutArray;
 	vtkCellArray *m_LinkArray;
@@ -170,6 +177,11 @@ private:
 	void SetCenterLocationIdxRef(vector<int> const&ve);
 	int m_CenterLineSetFlag,m_ConstrainSurfaceSetFlag; 
 	int m_ComputedCrownNumber;
+	/*------------pre compute a container to keep all the points of deformation iterator steps  ----------*/
+	void PreComputeStentPointsBySteps(int step);
+	vector<vtkPoints*> m_ItPointsContainer;//keep points for every deform iterator
+	//-------for test
+	int m_numberOfCycle;
 
 public:
 
@@ -178,6 +190,10 @@ public:
   medVMEStent();
   /* destructor */
   virtual ~medVMEStent();
+
+   /** Set the time for this VME.
+  It updates also the VTK representation .*/
+  void SetTimeStamp(mafTimeStamp t);
   
   	/************************************************************************/
 	/* The mesh deformation is constrained by internal forces. The interal force can be scaled via SetAlpha (typical values are 0.01 < alpha < 0.3). 
@@ -191,6 +207,14 @@ public:
 	/************************************************************************/
 
 	void DoDeformation3(int type);
+
+	void DisplayStentExpend( int steps );
+
+	void ResetStentPoints( vtkPoints* currentPoints );
+
+	void DisplayStentExpendByStep(mafTimeStamp t);
+
+	void DisplayCatherter();
 
 
   //---------------------------Setter-/-Getter------------------------------------  

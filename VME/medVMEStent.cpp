@@ -71,7 +71,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 /**------new include */
 #include <iostream>
-
+#include "vtkFloatArray.h"
 #include "vtkPolyData.h"
 #include "vtkPoints.h"
 #include "vtkCellArray.h"
@@ -82,7 +82,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkAppendPolyData.h"
 #include "vtkTubeFilter.h"
 #include "vtkTriangleFilter.h"
-
+#include "mafVMEStorage.h"
+#include <time.h>
 
 
 
@@ -105,6 +106,7 @@ medVMEStent::medVMEStent()
 	
 	vtkNEW(m_PolyData);
 	vtkNEW(m_CatheterPolyData);
+	vtkNEW(m_TestVesselPolyData);
 	//vtkNEW(m_ConstrainSurfaceTmp);
 	
 	vtkNEW(m_AppendPolyData);
@@ -115,7 +117,7 @@ medVMEStent::medVMEStent()
 
 	mafNEW(m_Transform);
 	
-	m_numberOfCycle = 0;
+	
 	m_Stent_Diameter = 2.0;
 	m_Crown_Length = 2.2;
 	m_Crown_Number = 10;
@@ -133,7 +135,9 @@ medVMEStent::medVMEStent()
 	m_ConstrainSurfaceSetFlag = 0;
 	m_ComputedCrownNumber = 0;
 	
-	
+	m_DeformFlag =0;
+	m_ShowCatheter = false;
+	m_numberOfCycle = 0;
 	
 	//mafVMEOutputSurface *output=mafVMEOutputSurface::New(); // an output with no data
 	mafVMEOutputPolyline *output=mafVMEOutputPolyline::New(); // an output with no data
@@ -143,7 +147,7 @@ medVMEStent::medVMEStent()
 	GetMaterial();
 	
 	m_AppendPolyData->AddInput(m_PolyData);
-	//m_AppendPolyData->AddInput(m_CatheterPolyData); temp remove
+	//m_AppendPolyData->AddInput(m_CatheterPolyData); //temp remove add when centerline was set
 	//m_AppendPolyData->AddInput(m_ConstrainSurfaceTmp);
 
 	m_AppendPolys = m_AppendPolyData->GetOutput();
@@ -164,8 +168,19 @@ medVMEStent::~medVMEStent()
 	vtkDEL(m_AppendPolyData);
 	vtkDEL(m_AppendPolys);
 	mafDEL(m_Transform);
+	//--remove stent cache-
+	vector<vtkPoints*>::iterator pointsIter = m_ItPointsContainer.begin();
+	
+	for (; pointsIter!=m_ItPointsContainer.end(); ++pointsIter )
+	{
+		vtkPoints* current = *pointsIter;
+		vtkDEL( current);  
+	}
+	m_ItPointsContainer.clear();
+	
 	SetOutput(NULL);
 }
+
 /**  construct method*/
 //-------------------------------------------------------------------------
 mafVMEOutputPolyline *medVMEStent::GetPolylineOutput()
@@ -174,6 +189,22 @@ mafVMEOutputPolyline *medVMEStent::GetPolylineOutput()
 	return (mafVMEOutputPolyline *)GetOutput();
 	//return (mafVMEOutputPolyline *)m_PolyData;
 }
+
+//-----------------------------------------------------------------------
+void medVMEStent::SetTimeStamp(mafTimeStamp t)
+	//-----------------------------------------------------------------------
+{
+	t = t < 0 ? 0 : t;
+	bool update_vtk_data = t != m_CurrentTime;
+	if (update_vtk_data)
+	{
+		Superclass::SetTimeStamp(t);
+
+		DisplayStentExpendByStep(t);
+
+	}
+}
+
 //-------------------------------------------------------------------------
 /*mafVMEOutputSurface *medVMEStent::GetSurfaceOutput()
 	//-------------------------------------------------------------------------
@@ -216,8 +247,7 @@ int medVMEStent::DeepCopy(mafNode *a)
 	m_Centerline = vtkPolyData::New();
 	m_Centerline->DeepCopy(vmeStent->GetCenterLine());
 
-	//tmp m_Centerline->DeepCopy(vmeStent->GetCenterLine());
-	//tmp m_ConstrainSurface->DeepCopy(vmeStent->GetConstrainSurface());
+
 	/**-------- compute and update---------------*/
 
 	InternalUpdate();
@@ -269,7 +299,7 @@ void medVMEStent::SetMatrix(const mafMatrix &mat)
 bool medVMEStent::IsAnimated()
 //-------------------------------------------------------------------------
 {
-	return false;
+	return true;
 }
 
 //-------------------------------------------------------------------------
@@ -321,6 +351,13 @@ mafGUI* medVMEStent::CreateGui()
 		//m_Gui->Button(ID_CONSTRAIN_SURFACE, &m_ConstrainSurfaceName, _(".."), _("Select the constrain surface for deploying stent"));
 		m_Gui->Button(ID_CONSTRAIN_SURFACE, &m_ConstrainSurfaceName,  _("constrain surface"), _("Select the constrain surface for deploying stent"));
 
+		m_Gui->Divider(2);
+
+		//change Vessel View
+		m_Gui->Bool(CHANGE_VIEW,_("catheter"),&m_ShowCatheter,0,"Show catheter");
+		m_Gui->Enable(CHANGE_VIEW,m_CenterLineSetFlag);
+		
+
 		m_Gui->Button(ID_DEFORMATION, _("deformation"),""  , _(" stent deformation"));
 		m_Gui->Enable(ID_DEFORMATION,(m_CenterLineSetFlag)&&(m_ConstrainSurfaceSetFlag));
 
@@ -332,21 +369,7 @@ mafGUI* medVMEStent::CreateGui()
 	return m_Gui;
 }
 
- /*void medVMEStent::SelectVME(const char *link_name, mafNode *n){
-
-	
-  
-	mafEventMacro(e);
-    vme = (mafVME *)e.GetVme();
-
-    if(vme)
-    {
-      vme->Update();
-      //m_Surface = mafVMESurface::SafeDownCast(vme);
-      //m_Surface->Update(); 
-    }
-	
-}*/
+ 
 
   /** Precess events coming from other objects */ 
 //-------------------------------------------------------------------------
@@ -358,99 +381,94 @@ void medVMEStent::OnEvent(mafEventBase *maf_event)
   {
     switch(e->GetId())
     {
-	
-	 
-	case CHANGE_VALUE:
-	  {  
-		/*if centerline was set compute maximum crownNumber*/
-		 /* if (this->m_Centerline )
-		  {
-			  if( m_Crown_Number >m_ComputedCrownNumber){
-				  m_Crown_Number = m_ComputedCrownNumber;
-			  }
-		  }*/
-		InternalUpdate();
-		m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
-		ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
-		m_Gui->Update();
-		//GetPolylineOutput()->Update();
-		//m_Gui->Update();
-	  }
-	  break;
-	  /*case CHANGE_VALUE_CROWN:{
-		  if (m_CenterLineSetFlag==1)
-		  {
-			  if( m_Crown_Number >m_ComputedCrownNumber){
-				m_Crown_Number = m_ComputedCrownNumber;
-			  }
-		  }
-		  InternalUpdate();
-		  m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
-		  ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
-		  m_Gui->Update();
-			
-
-	 }
-	  break;*/
-	  case ID_CONSTRAIN_SURFACE:
-	  case ID_CENTERLINE:
-	  {
-		
-		 mafVME *vme;
-		 mafNode *node;
-		 mafID button_id = e->GetId(); 
-		 mafString title = mafString("Select a VME:");
-		 mafEvent e(this,VME_CHOOSE);
-		 e.SetString(&title);
-		 //e.SetArg((long)(&aneuOpExtractVesselParameters::SurfaceAccept)); // accept only mafVMESurface
-		 ForwardUpEvent(e);
-		 node = e.GetVme();
-		 vme = (mafVME *)node;
-		 if(vme)
-		{
-			vme->Update();
-			if (button_id == ID_CENTERLINE){
-				m_CenterLineName = vme->GetName();
-				if(vme->IsMAFType(medVMEPolylineGraph))
-				{
-					SetAndKeepCenterLine(node);
-
-				}
-
-			}else if (button_id == ID_CONSTRAIN_SURFACE){
-				
-				SetAndKeepConstrainSurface(node);
-
-
-			}
+		case CHANGE_VALUE:
+		  {  
+			/*if centerline was set compute maximum crownNumber*/
+			 /* if (this->m_Centerline )
+			  {
+				  if( m_Crown_Number >m_ComputedCrownNumber){
+					  m_Crown_Number = m_ComputedCrownNumber;
+				  }
+			  }*/
 			InternalUpdate();
 			m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
 			ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
-			m_Gui->Enable(ID_DEFORMATION,(m_CenterLineSetFlag)&&(m_ConstrainSurfaceSetFlag));
 			m_Gui->Update();
-		}
+			//GetPolylineOutput()->Update();
+			//m_Gui->Update();
+		  }
+		  break;
+	 
+		  case ID_CONSTRAIN_SURFACE:
+		  case ID_CENTERLINE:
+		  {
 		
-	  }	
-	  break;
-	  case ID_DEFORMATION:
-	  {
-			  //DoDeformation2(1);
-		      DoDeformation3(0);
+			 mafVME *vme;
+			 mafNode *node;
+			 mafID button_id = e->GetId(); 
+			 mafString title = mafString("Select a VME:");
+			 mafEvent e(this,VME_CHOOSE);
+			 e.SetString(&title);
+			 //e.SetArg((long)(&aneuOpExtractVesselParameters::SurfaceAccept)); // accept only mafVMESurface
+			 ForwardUpEvent(e);
+			 node = e.GetVme();
+			 vme = (mafVME *)node;
+			 if(vme)
+			{
+				vme->Update();
+				if (button_id == ID_CENTERLINE){
+					m_CenterLineName = vme->GetName();
+					if(vme->IsMAFType(medVMEPolylineGraph))
+					{
+						SetAndKeepCenterLine(node);
+
+					}
+
+				}else if (button_id == ID_CONSTRAIN_SURFACE){
+				
+					SetAndKeepConstrainSurface(node);
+
+
+				}
+				InternalUpdate();
+				m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
+				ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
+				m_Gui->Enable(ID_DEFORMATION,(m_CenterLineSetFlag)&&(m_ConstrainSurfaceSetFlag));
+				m_Gui->Enable(CHANGE_VIEW,m_CenterLineSetFlag);
+				m_Gui->Update();
+			}
+		
+		  }	
+		  break;
+		  case CHANGE_VIEW:{
+			  DisplayCatherter(); //display or remove catherter from output
 			  m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
 			  ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
+		  }	  
+		  break;
+		  case ID_DEFORMATION:
+		  {
+				  //DoDeformation2(1);
+				  DoDeformation3(0);
+				  m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
+				  ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
 
-	  }
-      break;
-      default:
-        mafVME::OnEvent(maf_event);
-    }
-
-
-  }
-  else
-  {
+		  }
+		  break;
+		  default:
+			mafVME::OnEvent(maf_event);
+    }//end of switch
+  }//end of if
+  else{
     Superclass::OnEvent(maf_event);
   }
+/*else if (maf_event->GetChannel()==MCH_DOWN)
+  {
+		//mafTimeStamp t = m_CurrentTime;	 
+		moveCatheter(m_CurrentTime);
+	    m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
+	    ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE)); 
+  }*/  
   
 }
 /** called to prepare the update of the output */
@@ -467,25 +485,14 @@ void medVMEStent::InternalUpdate()
 	//-----------------------------------------------------------------------
 {
 	//-------------------------------------
-	if(m_numberOfCycle==0){
+	if(m_DeformFlag==0 && m_numberOfCycle ==0){//
 		if(m_Centerline)
 		{	
-
-			m_DeformFlag =0;
-			stentPolyLine = vtkPolyData::New();
+			
+			m_StentPolyLine = vtkPolyData::New();
 			
 			//testStent.setCenterLinePolydata(m_Centerline); //waitting for code updating
-			//--------do some processing between parameters--------
-			//1.linkLength > crownLength
-/*
-			//to avoid stent being squeezed when create it
-			if( (m_Id_Stent_Configuration==enumStCfgType::InPhase) && (m_Link_Length<m_Crown_Length)){//inphase
-				m_Link_Length = m_Crown_Length;
-			}else if (  (m_Id_Stent_Configuration==enumStCfgType::OutOfPhase) && (m_Id_Link_Connection==enumLinkConType::valley2valley) && (m_Link_Length< 2*m_Crown_Length) )//outphase
-			{
-				m_Link_Length = 2*m_Crown_Length;
-			}
-*/
+
 			vtkMEDStentModelSource currentStentSource;
 
 			currentStentSource.setStentDiameter(m_Stent_Diameter);// 4.0,m_Stent_Diameter
@@ -517,12 +524,7 @@ void medVMEStent::InternalUpdate()
 
 			m_SimplexMesh = currentStentSource.simplexMesh;
 			m_SimplexMesh->DisconnectPipeline();
-			//-------vessel----------
-			//VesselMeshForTesting testVessel;
-			//testVessel.createVesselMesh();
-			//----------end----------
 
-			//deformFilter->SetVesselPointsKDTree(testVessel.pointList.begin(),testVessel.pointList.end());
 			/*--------------------------   output some parameters for deformation ---------------------*/
 			m_StrutLength = currentStentSource.getStrutLength();
 			m_Link_Length = currentStentSource.getLinkLength();
@@ -533,7 +535,6 @@ void medVMEStent::InternalUpdate()
 
 			static float vertex[3]; 
 			//----------stent VTK---------
-			//wh modified
 			// Create the vtkPoints object and set the number of points
 			vtkPoints* vpoints = vtkPoints::New();
 			vpoints->SetNumberOfPoints(2000);		
@@ -546,7 +547,7 @@ void medVMEStent::InternalUpdate()
 				vpoints->SetPoint(idx,pp);
 			}
 			vpoints->Squeeze() ;
-			stentPolyLine->SetPoints(vpoints) ;
+			m_StentPolyLine->SetPoints(vpoints) ;
 			vpoints->Delete() ;
 
 			int tindices[2];
@@ -573,14 +574,17 @@ void medVMEStent::InternalUpdate()
 				m_LinkArray->InsertNextCell(2,tindices);
 			}
 			lines->Squeeze() ;
-			stentPolyLine->SetLines(lines);
+			m_StentPolyLine->SetLines(lines);
 			//---------------Vessel VTK-----
-			stentPolyLine->Modified();
-			stentPolyLine->Update();
-			//------------------output------------------
-			m_PolyData->DeepCopy(stentPolyLine);	
+			m_StentPolyLine->Modified();
+			m_StentPolyLine->Update();
+
+			//----------------output------------
+			m_PolyData->DeepCopy(m_StentPolyLine);	
 			m_PolyData->Modified();
 			m_PolyData->Update();
+
+
 			m_AppendPolyData->Update();
 			m_AppendPolys->Update();
 			
@@ -593,14 +597,12 @@ void medVMEStent::InternalUpdate()
 
 void medVMEStent::DoDeformation3(int type){
 	int steps = 1;
-	int iteratorNumbers = 20;
+	int iteratorNumbers =300;//20*m_Crown_Number;
 
 
-	if(m_numberOfCycle>iteratorNumbers){
-		return;
-	}
+
 	if(type==0){
-		steps = iteratorNumbers - m_numberOfCycle;
+		steps = iteratorNumbers ;//-m_numberOfCycle ;
 	}
 	if (m_DeformFlag ==0)
 	{
@@ -608,59 +610,168 @@ void medVMEStent::DoDeformation3(int type){
 		//---------------deform settings from here---------------
 		deformFilter->SetInput( m_SimplexMesh );
 		deformFilter->SetGradient( NULL);
-		deformFilter->SetAlpha(0.3);//0.03 (0.01-0.3)
-		deformFilter->SetBeta(0.05);//0.01 (0.01-1)
-		deformFilter->SetIterations(4);
+		deformFilter->SetAlpha(0.4);//0.03 (0.01-0.3)//my version 0.3
+		deformFilter->SetBeta(0.02);//0.01 (0.01-1) //my version 0.05 //b0.3 does not match a0.3, in a mass
+		deformFilter->SetIterations(2); //will effect speed
 		deformFilter->SetRigidity(1); //(1-8 smoother)
 		deformFilter->SetStrutLength(this->GetStrutLength());//(m_StentSource.getStrutLength());
 		deformFilter->SetLinkLength(this->GetLinkLength());//(m_StentSource.getLinkLength());
-		//deformFilter->SetTestValue(321);
-		//deformFilter->SetStrutLinkIter(m_StentSource.strutsList.begin(),m_StentSource.strutsList.end(),m_StentSource.linkList.begin(),m_StentSource.linkList.end());
 		deformFilter->SetStrutLinkFromCellArray(m_StrutArray,m_LinkArray);
 		if (m_ConstrainSurface!=NULL && m_ConstrainSurface->GetNumberOfPoints()>0)
 		{
-			//deformFilter->SetCenterLocationIdx(stentSource.centerLocationIndex.begin());
-			//deformFilter->SetCenterLocationIdxRef(m_StentSource.centerLocationIndex);
-			//deformFilter->SetCenterLocationIdx(m_centerLocationIdx);
-			deformFilter->SetCenterLocationIdx(m_centerLocation.begin());
 			
+			deformFilter->SetCenterLocationIdx(m_centerLocation.begin());
 			deformFilter->SetVesselPointsKDTreeFromPolyData(m_ConstrainSurface);
 		}
-		//int iteratorTimes = 1;
-		for(int i=0 ; i<steps ; i++){
-			moveCatheter(i);
-			expandStent(i);
-			m_numberOfCycle++;
-			UpdateViewAfterDeformation();
-			//-------------update view------------
+		PreComputeStentPointsBySteps(steps);
+		//DisplayStentExpend(steps);
 
-		
-		}//end of for
 
 		m_DeformFlag = 1;
 	}
+	
 }
 
+void medVMEStent::DisplayStentExpend( int steps )
+{
+	vector<vtkPoints*>::iterator pointsIter = m_ItPointsContainer.begin();
+	vtkPoints* currentPoints;
+	for (int i=0; pointsIter!=m_ItPointsContainer.end(); ++pointsIter,i++ )
+	{
+		currentPoints = *pointsIter;
+		ResetStentPoints(currentPoints);
+		if(m_ShowCatheter){
+			moveCatheter(i);
+		}
+		
+	}
+}
+void medVMEStent::DisplayCatherter(){
+
+	if(m_ShowCatheter){//add
+		createCatheter(m_Centerline);
+		m_AppendPolyData->AddInput(m_CatheterPolyData);
+	}else{//remove
+		m_AppendPolyData->RemoveInput(m_CatheterPolyData);
+	}
+	
+
+}
+void medVMEStent::ResetStentPoints( vtkPoints* currentPoints )
+{
+	//---set output---------
+	m_StentPolyLine->SetPoints(currentPoints);
+	m_StentPolyLine->Modified();
+	m_StentPolyLine->Update();
+	//vpoints->Delete() ; ????
+
+	//----new try remove vessel from appendoutput----------
+	m_PolyData->DeepCopy(m_StentPolyLine);
+	m_PolyData->Update(); 
+	//----------
+	m_numberOfCycle++;
+	//UpdateViewAfterDeformation();
+}
 void medVMEStent::UpdateViewAfterDeformation(){
 
-	//m_AppendPolys->Update();//useless
-
-	/*mafEvent ev(this, VME_OUTPUT_DATA_UPDATE);
-	ev.SetId(VME_OUTPUT_DATA_UPDATE);
-	ev.SetArg(0);
-	ForwardUpEvent(ev);
-	ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
-	*/
-	
 	m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);//must update data
 	ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));//must updata camera
+
+
+}
+/*void medVMEStent::DisplayStentExpendByStep(mafTimeStamp t){
 	
+	if(floor(t)<m_ItPointsContainer.size()){
+		if(m_ShowCatheter){
+			moveCatheter(t*2);
+		}
+
+		vtkPoints* oneStepPoints = m_ItPointsContainer[t];
+		ResetStentPoints(oneStepPoints);
+		UpdateViewAfterDeformation();
+	}
+
+}*/
+
+//expend stent and move catheter
+void medVMEStent::DisplayStentExpendByStep(mafTimeStamp t){
+
+
+		if(floor(t)<m_ItPointsContainer.size()){// if stent needs expend
+			vtkPoints* oneStepPoints = m_ItPointsContainer[t];
+			ResetStentPoints(oneStepPoints);
+		}
+
+		//at lease catheter needs update, moveCatheter its self will deside if update needed
+		if(m_ShowCatheter){
+			moveCatheter(t*2);
+		}
+		UpdateViewAfterDeformation();
+
+}
+
+
+/************************************************************************/
+/* be careful, when should ,recompute points.                                                                     */
+/************************************************************************/
+void medVMEStent::PreComputeStentPointsBySteps( int steps){
+	//-------------timer--------
+	time_t t1,t2;
+	(void) time(&t1);
+	//-------------timer--------
+
+
+	m_Gui->Enable(ID_DEFORMATION,false);
+	m_Gui->Update();
+	for (int i=0;i<steps;i++)
+	{
+		//-------one step deformation--------
+		deformFilter->SetCurIterationNum(i);
+		deformFilter->Update();
+		//----------get point set from mesh-----------
+		static float vertex[3]; 
+
+		vtkPoints* vpoints = vtkPoints::New();
+		vpoints->SetNumberOfPoints(2000);		
+		SimplexMeshType::PointsContainer::Pointer sPoints;
+		sPoints = m_SimplexMesh->GetPoints();
+		int tmpIdx = 0;
+		for(SimplexMeshType::PointsContainer::Iterator pointIndex = sPoints->Begin(); pointIndex != sPoints->End(); ++pointIndex)
+		{
+			int idx = pointIndex->Index();
+			vtkFloatingPointType * pp = const_cast<vtkFloatingPointType*>(pointIndex->Value().GetDataPointer());
+
+
+			vpoints->SetPoint(idx,pp);
+			tmpIdx++;
+		}
+
+		vpoints->Squeeze();
+		//---------test---------
+		int numPoints = vpoints->GetNumberOfPoints();
+		double x1Coord[3],x2Coord[3];
+		vpoints->GetPoint(0,x1Coord);
+		vpoints->GetPoint(tmpIdx-1,x2Coord);
+		//---------test end-----
+		m_ItPointsContainer.push_back(vpoints);
+
+
+		//numberOfCycle++;
+	}
+	//-------------timer--------
+	(void) time(&t2);
+	//-------------timer--------
+	int diff =(int) t2 -t1;
+	m_Gui->Enable(ID_DEFORMATION,true);
+	m_Gui->Update();
 
 }
 
 
 
-/** expand stent in a constrain surface */
+/** expand stent in a constrain surface 
+* for this method, only need to change position of every points, since lines was set.
+*/
 void medVMEStent::expandStent(int numberOfCycle ){
 	//-------------deform stent---------
 	deformFilter->SetCurIterationNum(numberOfCycle);
@@ -691,21 +802,64 @@ void medVMEStent::expandStent(int numberOfCycle ){
 	vpoints->GetPoint(tmpIdx-1,x2Coord);
 	//---------test end-----
 	
-	stentPolyLine->SetPoints(vpoints);
-	stentPolyLine->Modified();
-	stentPolyLine->Update();
+	m_StentPolyLine->SetPoints(vpoints);
+	m_StentPolyLine->Modified();
+	m_StentPolyLine->Update();
 	vpoints->Delete() ;
 
 	//----new try remove vessel from appendoutput----------
-	//m_PolyData->SetPoints(vpoints);
-	m_PolyData->DeepCopy(stentPolyLine);
-	//m_PolyData->Modified();
+	m_PolyData->DeepCopy(m_StentPolyLine);
 	m_PolyData->Update(); 
+	
+}
+void medVMEStent::createTestVesselPolydata(vtkPolyData  *centerLine){
+	int test1 = centerLine->GetNumberOfPoints();
+	int test2 = centerLine->GetNumberOfLines();
+	vtkTubeFilter *sheath ;
+	vtkNEW(sheath);
+	//= vtkTubeFilter::New();
+	sheath->SetInput(centerLine);//(m_Centerline);//(m_SheathVTK);
+	sheath->SetRadius(m_StentRadius +5);
+	sheath->SetNumberOfSides(20);
+	sheath->Update();
+
+
+	vtkPolyData *tubePolys = TubeToPolydata(sheath);
+
+	m_TestVesselPolyData->DeepCopy(tubePolys); //important for deforming and expending
+	//m_CatheterPolyData->DeepCopy(m_Centerline);//just for test
+	m_TestVesselPolyData->Update();
+	//m_AppendPolyData->AddInput(m_TestVesselPolyData);//to show vessel
+	int numTmp = m_TestVesselPolyData->GetNumberOfPolys();
+}
+void medVMEStent::createCatheter(vtkPolyData  *centerLine){
+	int test1 = centerLine->GetNumberOfPoints();
+	int test2 = centerLine->GetNumberOfLines();
+	vtkTubeFilter *sheath ;
+	vtkNEW(sheath);
+	//= vtkTubeFilter::New();
+	sheath->SetInput(centerLine);//(m_Centerline);//(m_SheathVTK);
+	sheath->SetRadius(m_StentRadius +0.1);
+	sheath->SetNumberOfSides(40);
+	sheath->Update();
+
+
+	vtkPolyData *tubePolys = TubeToPolydata(sheath);
+
+	m_CatheterPolyData->DeepCopy(tubePolys); //important for deforming and expending
+	//m_CatheterPolyData->DeepCopy(m_Centerline);//just for test
+	m_CatheterPolyData->Update();
+	int numTmp = m_CatheterPolyData->GetNumberOfPolys();
+
+
 }
 /** move catheter so that stent can expand */
-void medVMEStent::moveCatheter(int numberOfCycle ){
+void medVMEStent::moveCatheter(mafTimeStamp currentIter ){
 		
-		static int pointsNumOnCenterLine = 209;
+		vtkPolyData *copyOfCenterLine = vtkNEW(copyOfCenterLine);
+		copyOfCenterLine->DeepCopy(m_Centerline);
+	    
+		static int pointsNumOnCenterLine = copyOfCenterLine->GetNumberOfPoints();
 
 		vtkCellArray *cLines = vtkCellArray::New() ;
 	    cLines->Allocate(300);
@@ -722,20 +876,25 @@ void medVMEStent::moveCatheter(int numberOfCycle ){
 		*
 		*please set this corresponding with the parameters used in the DeformaleSimplexMeshFilter001
 		*-----------*/
-		int m = (numberOfCycle/2+100<pointsNumOnCenterLine-1)?(numberOfCycle/2+100):pointsNumOnCenterLine-1;
-	    for(int i=numberOfCycle/2;i<m;i++){
+		int speed = 4;
+		int m = (currentIter/speed+100<pointsNumOnCenterLine-1)?(currentIter/speed+100):pointsNumOnCenterLine-1;
+	    for(int i=currentIter/speed;i<m;i++){
 			tindices[0] = i;
 			tindices[1] = i+1;
 			cLines->InsertNextCell(2, tindices);
 	   }
 	   cLines->Squeeze() ;
-       m_SheathVTK->SetLines(cLines);
+       copyOfCenterLine->SetLines(cLines);
+	 
+	   // m_SheathVTK->SetPoints(m_Centerline->getpo)
 	  
-	   m_SheathVTK->Modified();
-	   m_SheathVTK->Update();
+	   copyOfCenterLine->Modified();
+	   copyOfCenterLine->Update();
 	   cLines->Delete();
 
-	   vtkTubeFilter *sheath ;
+	   createCatheter(copyOfCenterLine);
+
+	/*   vtkTubeFilter *sheath ;
 	   vtkNEW(sheath);
 	   //= vtkTubeFilter::New();
 	   sheath->SetInput(m_SheathVTK);
@@ -749,7 +908,12 @@ void medVMEStent::moveCatheter(int numberOfCycle ){
 	   m_CatheterPolyData->DeepCopy(tubePolys); //important for deforming and expending
 	   m_CatheterPolyData->Update();
 	   int numTmp = m_CatheterPolyData->GetNumberOfPolys();
+	   */
 }
+
+
+
+
 /*for Catheter moving*/
 void medVMEStent::SetCenterLocationIdxRef(vector<int> const&ve){
 	//m_centerLocationIdx = ve.begin();
@@ -773,15 +937,7 @@ void medVMEStent::SetConstrainSurface(vtkPolyData *surface){
 		}
 	}
 	//vtkNEW(m_ConstrainSurface);
-/*
-	//m_ConstrainSurface = surface;
-	vtkPolyData *newSurface = CreateAConstrainSurface();
-	int num = newSurface->GetNumberOfPoints();
-	m_ConstrainSurfaceTmp->DeepCopy(newSurface) ;
-	m_ConstrainSurfaceTmp->Modified();
-	m_ConstrainSurfaceTmp->Update();
-	num = m_ConstrainSurfaceTmp->GetNumberOfPoints();
-*/
+
 }
 /** create one using the center line */
 vtkPolyData* medVMEStent::CreateAConstrainSurface(){
@@ -820,7 +976,6 @@ vtkPolyData* medVMEStent::CreateAConstrainSurface(){
 
 	vtkTubeFilter *surfaceTube ;
 	vtkNEW(surfaceTube);
-	//= vtkTubeFilter::New();
 	surfaceTube->SetInput(surfacePoly);
 	surfaceTube->SetRadius(m_StentRadius * 2);
 	surfaceTube->SetNumberOfSides(40);
@@ -834,8 +989,6 @@ vtkPolyData* medVMEStent::CreateAConstrainSurface(){
 	vtkIdType number = strips->GetNumberOfCells();
 	int iStrips = tubeStrips->GetNumberOfStrips();
 
-	//tubeFilter->Update();
-	//tubeFilter->get
 	//------------to polydata----------------
 	vtkTriangleFilter *tubeTriangles = vtkTriangleFilter::New();
 	tubeTriangles->SetInput(surfaceTube->GetOutput());
@@ -861,60 +1014,13 @@ void medVMEStent::SetCenterLine(vtkPolyData *line){
 	/**------------convert centerline----------*/
 	if(line){
 		this->m_Centerline = line; //set centerlint
+		int test1 = line->GetNumberOfPoints();
+		int test2 = line->GetNumberOfLines();
 		m_CenterLineSetFlag = 1;//set flag
-
-		/**------------to get start and end------------*/
-/*		int numOfPoints = m_Centerline->GetNumberOfPoints();
-		if(numOfPoints>0){
-			vtkPoints *linePoints = m_Centerline->GetPoints();
-			double p[3];
-			vector<double> vertex;
-			for(vtkIdType i = 0; i < numOfPoints; i++){
-				m_Centerline->GetPoint(i,p);
-				//-----for deformation---
-				vertex.push_back(p[0]);
-				vertex.push_back(p[1]);
-				vertex.push_back(p[2]);
-				m_StentCenterLine.push_back(vertex);
-				vertex.clear();
-				//------for store-----
-				m_StentCenterLineSerial.push_back(p[0]);
-				m_StentCenterLineSerial.push_back(p[1]);
-				m_StentCenterLineSerial.push_back(p[2]);
-				
-			}
-			m_CenterLineStart = m_StentCenterLine.begin();
-	        m_CenterLineEnd = m_StentCenterLine.end();
-		}
-	}
-*/
+		createCatheter(m_Centerline);//create first // if(m_ShowCatheter)		
+		
 	/**------------create catheter------------------*/
-	/*m_SheathVTK = vtkPolyData::New();
-	static float cVertex[3]; //vertex 
-	int tindices[2];//edges
-	vtkPoints *centerPoints = vtkPoints::New();
-	centerPoints->Allocate(300);
-	int pIndex = 0;
-	for(vector<vector<double>>::const_iterator iter = m_CenterLineStart;
-		iter!=m_CenterLineEnd; iter++){
-			cVertex[0] = (*iter)[0];
-			cVertex[1] = (*iter)[1];
-			cVertex[2] = (*iter)[2];
-			centerPoints->InsertPoint(pIndex,cVertex);
-			pIndex++;
-	}
-	centerPoints->Squeeze();
-	m_SheathVTK->SetPoints(centerPoints);	
-	centerPoints->Delete();
-
-	vtkCellArray *cLines = vtkCellArray::New() ;
-	cLines->Allocate(300);
-	for(int i=0;i<pIndex-61;i++){
-		tindices[0] = i;
-		tindices[1] = i+1;
-		cLines->InsertNextCell(2, tindices);
-	}*/
-//-----replace centerline begin----
+/*
 		int pointsNumber = this->m_Centerline ->GetNumberOfPoints();
 		int tindices[2];//edges
 		m_SheathVTK = vtkPolyData::New();
@@ -926,7 +1032,7 @@ void medVMEStent::SetCenterLine(vtkPolyData *line){
 			tindices[1] = i+1;
 			cLines->InsertNextCell(2, tindices);
 		}		
-//-----replace end------
+
 	cLines->Squeeze() ;
 	m_SheathVTK->SetLines(cLines);
 	cLines->Delete();
@@ -935,7 +1041,7 @@ void medVMEStent::SetCenterLine(vtkPolyData *line){
 	vtkTubeFilter *sheath ;
 	vtkNEW(sheath);
 	//= vtkTubeFilter::New();
-	sheath->SetInput(m_SheathVTK);
+	sheath->SetInput(line);//(m_SheathVTK);
 	sheath->SetRadius(m_StentRadius +0.1);
 	sheath->SetNumberOfSides(40);
 	sheath->Update();
@@ -947,27 +1053,10 @@ void medVMEStent::SetCenterLine(vtkPolyData *line){
 	m_CatheterPolyData->Update();
 	int numTmp = m_CatheterPolyData->GetNumberOfPolys();
 	int num2 = m_CatheterPolyData->GetNumberOfPoints();
-	}//end of if line
-	/**------------create surface for constrain---------*/
-
-	/*vtkTubeFilter *constrainTube ;
-	vtkNEW(constrainTube);
-	//= vtkTubeFilter::New();
-	constrainTube->SetInput(m_SheathVTK);
-	constrainTube->SetRadius(m_StentRadius *3);
-	constrainTube->SetNumberOfSides(40);
-	constrainTube->Update();
-
-	vtkPolyData *tubeSurfacePolys = TubeToPolydata(constrainTube);
-	m_ConstrainSurfaceTmp->DeepCopy(tubeSurfacePolys);
-	m_ConstrainSurfaceTmp->Update();           //important for deforming and expending
-	num2 = m_ConstrainSurfaceTmp->GetNumberOfPoints();
-
-	*/
+*/	}//end of if line
+	
 
 }
-
-
 
 /************************************************************************/
 /* store attributes and matrix*/                                                                     
@@ -1016,15 +1105,7 @@ int medVMEStent::InternalStore(mafStorageElement *parent)
 	 //parent->StoreVectorN("VmeLinkedList",m_VmeLinkedList, m_VmeLinkedList.size());
 	 parent->StoreInteger("CenterLineVertex3xNumber",m_StentCenterLineSerial.size());
 	 parent->StoreVectorN("CenterLineVertex",m_StentCenterLineSerial,m_StentCenterLineSerial.size());
-	 /*-------save finished --------*/
-    /*	
-
-	vtkNEW(m_Centerline);
-	vtkNEW(m_ConstrainSurface);
-
-	m_Centerline->DeepCopy(vmeStent->GetCenterLine());
-	m_ConstrainSurface->DeepCopy(vmeStent->GetConstrainSurface());
-*/
+	
     return MAF_OK;
 	}
 
@@ -1070,77 +1151,50 @@ int medVMEStent::InternalRestore(mafStorageElement *node)
 	  //----------------------------
 	  int centerLine3xNumber ;
 	  node->RestoreInteger("CenterLineVertex3xNumber",centerLine3xNumber);
-	  m_StentCenterLineSerial.resize(centerLine3xNumber);
-	  node->RestoreVectorN("CenterLineVertex",m_StentCenterLineSerial,centerLine3xNumber);
-	  //--------recover
-	  vtkPolyData *aLine = vtkPolyData::New();
-	  vtkPoints *centerPoints = vtkPoints::New();
-	  centerPoints->Allocate(300);
-	  static double cVertex[3]; //vertex 
-	  int k=0;
-	  for(int i=0; i<centerLine3xNumber; i+=3)
-	  {   
-		 vector<double> vertex;
-		  for (int j=0; j<3; j++)
-		  {
-			  cVertex[j]= m_StentCenterLineSerial[i+j];
+	  if(centerLine3xNumber >0){
+		  m_StentCenterLineSerial.resize(centerLine3xNumber);
+		  node->RestoreVectorN("CenterLineVertex",m_StentCenterLineSerial,centerLine3xNumber);
+		  //--------recover centerline with lines---------------
+		  vtkPolyData *aLine = vtkPolyData::New();
+		  vtkPoints *centerPoints = vtkPoints::New();
+		  centerPoints->Allocate(300);
+		  static double cVertex[3]; //vertex 
+		  int k=0;
+		  for(int i=0; i<centerLine3xNumber; i+=3)
+		  {   
+			 vector<double> vertex;
+			  for (int j=0; j<3; j++)
+			  {
+				  cVertex[j]= m_StentCenterLineSerial[i+j];
+			  }
+			   centerPoints->InsertPoint(k,cVertex);
+			   k++;
 		  }
-		   centerPoints->InsertPoint(k,cVertex);
-		   k++;
-	  }
-	  centerPoints->Squeeze();
-	  aLine->SetPoints(centerPoints);	
-	  aLine->Update();
-	  m_Centerline = aLine;
-	  this->SetCenterLine(aLine);
+		  centerPoints->Squeeze();
+		  int tindices[2];
+		  vtkCellArray *cLines = vtkCellArray::New() ;
+		  int pointNumber = centerLine3xNumber/3;
+		  cLines->Allocate(pointNumber);
+		  for(int i=0;i<pointNumber-1;i++){
+			  tindices[0] = i;
+			  tindices[1] = i+1;
+			  cLines->InsertNextCell(2, tindices);
+		  }		
 
+		  cLines->Squeeze() ;
+		 // m_SheathVTK->SetLines(cLines);
+		  aLine->SetPoints(centerPoints);
+		  aLine->SetLines(cLines);
+		  aLine->Update();
+		  int test1 = aLine->GetNumberOfPoints();
+		  int test2 = aLine->GetNumberOfPolys();
+		  
+		  //m_Centerline = aLine;
+		  this->SetCenterLine(aLine);
+	  }
 	  /*----------now recompute -----------*/
 	  InternalUpdate();
 	  /*--finished--*/
-
-		//----------recover centerline vme list-------------		
-
-/*			for (mafLinksMap::iterator i = GetLinks()->begin(); i != GetLinks()->end(); ++i)
-			{	
-				if(  (i->first.Equals("CenterLineVME")) && (i->second.m_NodeId == m_VmeLinkedList[0])  ) {
-					//this->SetAndKeepCenterLine( mafVME::SafeDownCast(i->second.m_Node));
-
-					
-					//mafVME *vme = mafVME::SafeDownCast(i->second.m_Node);
-					//	 vtkPolyData *polyLine =vtkPolyData::SafeDownCast(vme->GetOutput()->GetVTKData());
-					//this->SetAndKeepCenterLine(i->second.m_Node);
-				}
-				else if( (i->first.Equals("ConstrainSurfaceVME")) && (i->second.m_NodeId == m_VmeLinkedList[1])) {
-					//this->SetAndKeepConstrainSurface( mafVME::SafeDownCast(i->second.m_Node));
-					this->SetAndKeepConstrainSurface(i->second.m_Node);
-				}
-			}
-*/		
-			//end of map iterator for
-		//---------recover vme finished------------
-
-
-
-
-	  /*-----centerline VME and surface VME*/
-/*	  mafNode *tmpCenterline = GetLink("CenterLineVME");
-	  mafNode *tmpContrainSurface = GetLink("ConstrainSurfaceVME");
-	  if(tmpCenterline){
-		  vtkNEW(m_Centerline);
-		  mafVME *vmeLine = mafVME::SafeDownCast(tmpCenterline);
-		  vtkPolyData *polyLine =vtkPolyData::SafeDownCast( vmeLine->GetOutput()->GetVTKData());
-		  polyLine->Update();
-		  SetCenterLine(polyLine);
-	  }
-	  if(tmpContrainSurface){
-		  vtkNEW(m_ConstrainSurface);
-		  mafVME *vmeLine = mafVME::SafeDownCast(tmpContrainSurface);
-		  vtkPolyData *polySurface =vtkPolyData::SafeDownCast( vmeLine->GetOutput()->GetVTKData());
-		  polySurface->Update();
-		  SetConstrainSurface(polySurface);
-	  }
-*/
-
 
       return MAF_OK;
     }
@@ -1194,14 +1248,16 @@ vtkPolyData* medVMEStent::TubeToPolydata( vtkTubeFilter * sheath )
 	int num1 = tubePolys->GetNumberOfPoints();
 	return tubePolys;
 }
-
+/*-----------the -----------*/
 void medVMEStent::SetAndKeepCenterLine( mafNode * node )
 {
 	if(node){
 		mafVME *vme = mafVME::SafeDownCast(node);
 		vtkPolyData *polyLine =vtkPolyData::SafeDownCast( vme->GetOutput()->GetVTKData());
 		polyLine->Update();
-		this->SetCenterLine(polyLine);
+		vtkPolyData *copyLine = vtkNEW(copyLine);
+		copyLine->DeepCopy(polyLine);
+		this->SetCenterLine(copyLine);
 		SetLink("CenterLineVME", node);
 		this->m_CenterLineName = vme->GetName();
 
@@ -1217,7 +1273,12 @@ void medVMEStent::SetAndKeepConstrainSurface( mafNode * node )
 		vtkPolyData *polySurface = vtkPolyData::SafeDownCast(vme->GetOutput()->GetVTKData());
 		polySurface->Update();
 		vtkIdType pointsNumber = polySurface->GetNumberOfPoints();
-		this->SetConstrainSurface(polySurface);
+		//this->SetConstrainSurface(polySurface);
+		//temp
+		this->createTestVesselPolydata(m_Centerline);
+		this->SetConstrainSurface(m_TestVesselPolyData);
+		//temp finish
+		
 		SetLink("ConstrainSurfaceVME", node);
 		this->m_ConstrainSurfaceName = vme->GetName();
 		//*------------------keep vme id in m_VmeLinkedList -----------------
@@ -1241,171 +1302,17 @@ mmaMaterial *medVMEStent::GetMaterial()
 		material->m_SpecularPower = material->m_Prop->GetSpecularPower();
 		material->m_Prop->SetSpecular(0.4);
 		material->m_SpecularIntensity = material->m_Prop->GetSpecular();
+		material->m_Prop->SetLineWidth(3.0);
 
 		SetAttribute("MaterialAttributes", material);
 	}
 	return material;
 }
-/** Material Attributes*/
-//-------------------------------------------------------------------------
-/*mmaMaterial *medVMEStent::GetMaterial()
-	//-------------------------------------------------------------------------
-{
-	mmaMaterial *material = (mmaMaterial *)GetAttribute("MaterialAttributes");
-	if (material == NULL)
-	{
-		material = mmaMaterial::New();
-		SetAttribute("MaterialAttributes", material);
-		if (m_Output)
-		{
-			((mafVMEOutputPolyline *)m_Output)->SetMaterial(material);
-		}
-	}
-	return material;
-
-}*/
-/*void medVMEStent::SetAndKeepCenterLine( mafVME * vme )
-{
-	vtkPolyData *polyLine =vtkPolyData::SafeDownCast( vme->GetOutput()->GetVTKData());
-	polyLine->Update();
-	this->SetCenterLine(polyLine);
-	SetLink("CenterLineVME", vme);
-	this->m_CenterLineName = vme->GetName();
-
-	//*------------------keep vme id in m_VmeLinkedList -----------------
-	m_VmeLinkedList.insert(m_VmeLinkedList.begin(),vme->GetId());
-}
-
-void medVMEStent::SetAndKeepConstrainSurface( mafVME * vme )
-{
-	vtkPolyData *polySurface = vtkPolyData::SafeDownCast(vme->GetOutput()->GetVTKData());
-	polySurface->Update();
-	vtkIdType pointsNumber = polySurface->GetNumberOfPoints();
-	this->SetConstrainSurface(polySurface);
-	SetLink("ConstrainSurfaceVME", vme);
-	this->m_ConstrainSurfaceName = vme->GetName();
-	//*------------------keep vme id in m_VmeLinkedList -----------------
-	m_VmeLinkedList.insert(m_VmeLinkedList.begin()+1,vme->GetId());
-}
-*/
 
 
 
-/** expand stent in a constrain surface */
-/*
-void medVMEStent::DoDeformation2(int type){
-	//DeformFilterType::Pointer deformFilter;
-	if(m_DeformFlag == 0){
-		deformFilter = DeformFilterType::New();	
-
-		int cycle = 5;
-		//---------------deform from here---------------
-
-		deformFilter->SetInput( m_SimplexMesh );
-		deformFilter->SetGradient( NULL);
-		deformFilter->SetAlpha(0.03);
-		deformFilter->SetBeta(0.01);
-		deformFilter->SetIterations(4);
-		deformFilter->SetRigidity(1);
-		deformFilter->SetStrutLength(m_StentSource.getStrutLength());
-		deformFilter->SetLinkLength(m_StentSource.getLinkLength());
-		deformFilter->SetTestValue(321);
-		deformFilter->SetStrutLinkIter(m_StentSource.strutsList.begin(),m_StentSource.strutsList.end(),m_StentSource.linkList.begin(),m_StentSource.linkList.end());
-		
-		if (m_ConstrainSurface!=NULL && m_ConstrainSurface->GetNumberOfPoints()>0)
-		{
-			//deformFilter->SetCenterLocationIdx(stentSource.centerLocationIndex.begin());
-			deformFilter->SetCenterLocationIdxRef(m_StentSource.centerLocationIndex);
-			deformFilter->SetVesselPointsKDTreeFromPolyData(m_ConstrainSurface);
-		}
-		
-			m_DeformFlag = 1;
-		
-}
-
-	moveCatheter(m_numberOfCycle);
-	expandStent(m_numberOfCycle);
-	m_numberOfCycle++;
 
 
 
-	m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
-	ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
-}
 
-*/
-/** expand stent in a constrain surface */
-//-------------------------------------------------------------------------
-//0 for auto
-//1 for step by step
-/*
-void medVMEStent::DoDeformation(int type)
-	//-------------------------------------------------------------------------
-{
-
-	if(m_PolyData && m_PolyData->GetNumberOfPoints()>0){//stent was created
-
-		int steps = 1;
-		int iteratorNumbers = 128;
-
-
-		if(m_numberOfCycle>iteratorNumbers){
-			return;
-		}
-		if(type==0){
-			steps = iteratorNumbers - m_numberOfCycle;
-		}
-
-		//int iteratorTimes = 1;
-		for(int i=0 ; i<steps ; i++){
-
-			//-----------update visualization-----------
-			moveCatheter(m_numberOfCycle);
-			
-			
-			//-------------deform stent---------
-			//deformFilter->SetCurIterationNum(m_numberOfCycle);
-			//deformFilter->Update();
-
-			//------------update stent visualization----------------
-			//static float vertex[3]; 
-
-			//vtkPoints* vpoints = vtkPoints::New();
-			//vpoints->SetNumberOfPoints(2000);		
-			//SimplexMeshType::PointsContainer::Pointer sPoints;
-			//sPoints = simplexMesh->GetPoints();
-			//for(SimplexMeshType::PointsContainer::Iterator pointIndex = sPoints->Begin(); pointIndex != sPoints->End(); ++pointIndex)
-			//{
-			//	int idx = pointIndex->Index();
-			//	vtkFloatingPointType * pp = const_cast<vtkFloatingPointType*>(pointIndex->Value().GetDataPointer());
-			//	vpoints->SetPoint(idx,pp);
-			//}
-
-			//vpoints->Squeeze();
-	
-			//stentPolyLine->SetPoints(vpoints);
-			//stentPolyLine->Modified();
-			//stentPolyLine->Update();
-			//vpoints->Delete() ;
-
-			//----new try remove vessel from appendoutput----------
-			//m_PolyData->DeepCopy(stentPolyLine);
-			//m_PolyData->Modified();
-			//m_PolyData->Update(); 
-           
-			m_AppendPolyData->Update();
-			m_AppendPolys->Update();
-			m_numberOfCycle++;
-
-
-			//-------------update view------------
-			mafEvent ev(this, CAMERA_UPDATE);
-			ev.SetId(CAMERA_UPDATE);
-			ev.SetArg(0);
-			ForwardUpEvent(ev);
-
-		}//end of for
-		//m_numberOfCycle = 0;
-	}
-}*/
 
