@@ -29,12 +29,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "itkMesh.h"
 #include "itkConstNeighborhoodIterator.h"
 #include "itkCovariantVector.h"
-
 #include "itkSimplexMesh.h"
 #include "itkDefaultDynamicMeshTraits.h"
-
-#include "vtkMEDDeformableSimplexMeshFilter.h"
-
 
 #include "mmuIdFactory.h"
 #include "mafDataVector.h"
@@ -50,27 +46,21 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafVMEOutputSurface.h"
 #include "mafVMEOutputPolyline.h"
 #include "mafDataPipeCustom.h"
-#include "medVMEPolylineGraph.h"
-
+#include "mafVMEStorage.h"
 #include "vtkMAFSmartPointer.h"
-#include "vtkPolyData.h"
-#include "vtkCellArray.h"
+#include "mafGuiDialog.h"
+#include "mafGUIValidator.h"
+
+#include "medVMEPolylineGraph.h"
+#include "vtkMEDDeformableSimplexMeshFilter.h"
+
 #include "vtkBitArray.h"
 #include "vtkPointData.h"
-#include "vtkConeSource.h"
-#include "vtkCylinderSource.h"
-#include "vtkPlaneSource.h"
-#include "vtkCubeSource.h"
-#include "vtkSphereSource.h"
-#include "vtkTriangleFilter.h"
 #include "vtkTransform.h"
 #include "vtkTransformPolyDataFilter.h"
 
-
 #include <vtkSmartPointer.h>
 
-/**------new include */
-#include <iostream>
 #include "vtkFloatArray.h"
 #include "vtkPolyData.h"
 #include "vtkPoints.h"
@@ -82,28 +72,32 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkAppendPolyData.h"
 #include "vtkTubeFilter.h"
 #include "vtkTriangleFilter.h"
-#include "mafVMEStorage.h"
+
+#include <iostream>
 #include <time.h>
 
 
 
-/**----------------------------------------------------------------------------*/
+//----------------------------------------------------------------------------
 // define:
-/**----------------------------------------------------------------------------*/
+//----------------------------------------------------------------------------
 
-typedef itk::DeformableSimplexMeshFilterImpl<SimplexMeshType,SimplexMeshType> DeformFilterType;
-DeformFilterType::Pointer deformFilter;
+//typedef itk::DeformableSimplexMeshFilterImpl<SimplexMeshType,SimplexMeshType> DeformFilterType;
+//DeformFilterType::Pointer m_DeformFilter;
 static int numberOfCycle = 0;
 
 //------------------------------------------------------------------------------
 mafCxxTypeMacro(medVMEStent);
 //------------------------------------------------------------------------------
-/**  construct method*/
+
+//------------------------------------------------------------------------------
+// construct method
 //------------------------------------------------------------------------------
 medVMEStent::medVMEStent()
-//-------------------------------------------------------------------------
+  : m_Alpha_Default(0.4), m_Beta_Default(0.02), m_Gamma_Default(0.05),
+  m_Rigidity_Default(1.0), m_Damping_Default(0.65), m_Epsilon_Default(0.3),
+  m_IterationsPerStep_Default(2), m_NumberOfSteps_Default(300)
 {
-	
 	vtkNEW(m_PolyData);
 	vtkNEW(m_CatheterPolyData);
 	vtkNEW(m_TestVesselPolyData);
@@ -158,11 +152,18 @@ medVMEStent::medVMEStent()
 	dpipe->SetInput(m_AppendPolys);
 	//dpipe->SetInput(m_PolyData); //temp
 	SetDataPipe(dpipe);
+
+  SetDefParamsToDefaults() ;
+
+  m_DeformFilter = DeformFilterType::New() ;
 }
-/**  destruction method*/
+
+
+
+//-------------------------------------------------------------------------
+//  destruction method
 //-------------------------------------------------------------------------
 medVMEStent::~medVMEStent()
-//-------------------------------------------------------------------------
 {
 	vtkDEL(m_PolyData);
 	vtkDEL(m_AppendPolyData);
@@ -179,12 +180,15 @@ medVMEStent::~medVMEStent()
 	m_ItPointsContainer.clear();
 	
 	SetOutput(NULL);
+
+  m_DeformFilter->Delete() ;
 }
 
-/**  construct method*/
+
+
+//-------------------------------------------------------------------------
 //-------------------------------------------------------------------------
 mafVMEOutputPolyline *medVMEStent::GetPolylineOutput()
-	//-------------------------------------------------------------------------
 {
 	return (mafVMEOutputPolyline *)GetOutput();
 	//return (mafVMEOutputPolyline *)m_PolyData;
@@ -357,6 +361,8 @@ mafGUI* medVMEStent::CreateGui()
 		m_Gui->Bool(CHANGE_VIEW,_("catheter"),&m_ShowCatheter,0,"Show catheter");
 		m_Gui->Enable(CHANGE_VIEW,m_CenterLineSetFlag);
 		
+    m_Gui->Button(ID_DEFORMATION_PARAMETERS, _("deform params"),""  , _(" deformation parameters"));
+    m_Gui->Enable(ID_DEFORMATION_PARAMETERS, true);
 
 		m_Gui->Button(ID_DEFORMATION, _("deformation"),""  , _(" stent deformation"));
 		m_Gui->Enable(ID_DEFORMATION,(m_CenterLineSetFlag)&&(m_ConstrainSurfaceSetFlag));
@@ -441,22 +447,57 @@ void medVMEStent::OnEvent(mafEventBase *maf_event)
 		  }	
 		  break;
 		  case CHANGE_VIEW:{
-			  DisplayCatherter(); //display or remove catherter from output
+			  DisplayCatheter(); //display or remove catherter from output
 			  m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
 			  ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
 		  }	  
 		  break;
-		  case ID_DEFORMATION:
-		  {
-				  //DoDeformation2(1);
-				  DoDeformation3(0);
-				  m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
-				  ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
+      case ID_DEFORMATION:
+        {
+          //DoDeformation2(1);
+          DoDeformation3(0);
+          m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
+          ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
 
-		  }
-		  break;
+        }
+        break;
+      case ID_DEFORMATION_PARAMETERS:
+        {
+          SaveDefParams() ;
+
+          // Display dialog for deformation parameters
+          CreateDefParamsDialog() ;  
+          DeleteDefParamsDialog() ;
+        }      
+        break;
+      case ID_DEF_PARAMS_ALPHA:
+      case ID_DEF_PARAMS_BETA:
+      case ID_DEF_PARAMS_GAMMA:
+      case ID_DEF_PARAMS_RIGIDITY:
+      case ID_DEF_PARAMS_DAMPING:
+      case ID_DEF_PARAMS_EPSILON:
+      case ID_DEF_PARAMS_ITS_PER_STEP:
+      case ID_DEF_PARAMS_STEPS:
+        m_DefParamsDlg->TransferDataFromWindow() ;
+        break ;
+      case ID_DEF_PARAMS_RESTORE:
+        SetDefParamsToDefaults() ;
+        m_DefParamsDlg->TransferDataToWindow() ;
+        break ;
+      case ID_DEF_PARAMS_UNDO:
+        SetDefParamsToSaved() ;
+        m_DefParamsDlg->TransferDataToWindow() ;
+        break ;
+      case ID_DEF_PARAMS_OK:
+        m_DefParamsDlg->EndModal(wxID_OK);
+        break ;
+      case ID_DEF_PARAMS_CANCEL:
+        SetDefParamsToSaved() ;
+        m_DefParamsDlg->EndModal(wxID_CANCEL);
+        break ;
 		  default:
-			mafVME::OnEvent(maf_event);
+			  mafVME::OnEvent(maf_event);
+        break ;
     }//end of switch
   }//end of if
   else{
@@ -471,6 +512,11 @@ void medVMEStent::OnEvent(mafEventBase *maf_event)
   }*/  
   
 }
+
+
+
+
+
 /** called to prepare the update of the output */
 //-----------------------------------------------------------------------
 void medVMEStent::InternalPreUpdate()
@@ -594,43 +640,39 @@ void medVMEStent::InternalUpdate()
 
 
 
-
-void medVMEStent::DoDeformation3(int type){
-	int steps = 1;
-	int iteratorNumbers =300;//20*m_Crown_Number;
-
-
-
-	if(type==0){
-		steps = iteratorNumbers ;//-m_numberOfCycle ;
-	}
+//------------------------------------------------------------------------------
+// Set deformation parameters and run filter
+//------------------------------------------------------------------------------
+void medVMEStent::DoDeformation3(int type)
+{
 	if (m_DeformFlag ==0)
 	{
-		deformFilter = DeformFilterType::New();	
-		//---------------deform settings from here---------------
-		deformFilter->SetInput( m_SimplexMesh );
-		deformFilter->SetGradient( NULL);
-		deformFilter->SetAlpha(0.4);//0.03 (0.01-0.3)//my version 0.3
-		deformFilter->SetBeta(0.02);//0.01 (0.01-1) //my version 0.05 //b0.3 does not match a0.3, in a mass
-		deformFilter->SetIterations(2); //will effect speed
-		deformFilter->SetRigidity(1); //(1-8 smoother)
-		deformFilter->SetStrutLength(this->GetStrutLength());//(m_StentSource.getStrutLength());
-		deformFilter->SetLinkLength(this->GetLinkLength());//(m_StentSource.getLinkLength());
-		deformFilter->SetStrutLinkFromCellArray(m_StrutArray,m_LinkArray);
+		m_DeformFilter->SetInput( m_SimplexMesh );
+		m_DeformFilter->SetGradient( NULL);
+		m_DeformFilter->SetAlpha(m_Alpha);//0.03 (0.01-0.3)//my version 0.3
+		m_DeformFilter->SetBeta(m_Beta);//0.01 (0.01-1) //my version 0.05 //b0.3 does not match a0.3, in a mass
+    m_DeformFilter->SetGamma(m_Gamma) ;
+    m_DeformFilter->SetRigidity(m_Rigidity); //(1-8 smoother)
+    m_DeformFilter->SetDamping(m_Damping) ;
+    m_DeformFilter->SetEpsilon(m_Epsilon) ;
+		m_DeformFilter->SetIterations(m_IterationsPerStep); //will effect speed
+		m_DeformFilter->SetStrutLength(this->GetStrutLength());//(m_StentSource.getStrutLength());
+		m_DeformFilter->SetLinkLength(this->GetLinkLength());//(m_StentSource.getLinkLength());
+		m_DeformFilter->SetStrutLinkFromCellArray(m_StrutArray,m_LinkArray);
 		if (m_ConstrainSurface!=NULL && m_ConstrainSurface->GetNumberOfPoints()>0)
-		{
-			
-			deformFilter->SetCenterLocationIdx(m_centerLocation.begin());
-			deformFilter->SetVesselPointsKDTreeFromPolyData(m_ConstrainSurface);
+		{			
+			m_DeformFilter->SetCenterLocationIdx(m_centerLocation.begin());
+			m_DeformFilter->SetVesselPointsKDTreeFromPolyData(m_ConstrainSurface);
 		}
-		PreComputeStentPointsBySteps(steps);
+		PreComputeStentPointsBySteps(m_NumberOfSteps);
 		//DisplayStentExpend(steps);
 
 
 		m_DeformFlag = 1;
 	}
-	
 }
+
+
 
 void medVMEStent::DisplayStentExpend( int steps )
 {
@@ -646,7 +688,10 @@ void medVMEStent::DisplayStentExpend( int steps )
 		
 	}
 }
-void medVMEStent::DisplayCatherter(){
+
+
+
+void medVMEStent::DisplayCatheter(){
 
 	if(m_ShowCatheter){//add
 		createCatheter(m_Centerline);
@@ -657,6 +702,9 @@ void medVMEStent::DisplayCatherter(){
 	
 
 }
+
+
+
 void medVMEStent::ResetStentPoints( vtkPoints* currentPoints )
 {
 	//---set output---------
@@ -672,6 +720,9 @@ void medVMEStent::ResetStentPoints( vtkPoints* currentPoints )
 	m_numberOfCycle++;
 	//UpdateViewAfterDeformation();
 }
+
+
+
 void medVMEStent::UpdateViewAfterDeformation(){
 
 	m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);//must update data
@@ -679,6 +730,9 @@ void medVMEStent::UpdateViewAfterDeformation(){
 
 
 }
+
+
+
 /*void medVMEStent::DisplayStentExpendByStep(mafTimeStamp t){
 	
 	if(floor(t)<m_ItPointsContainer.size()){
@@ -692,6 +746,8 @@ void medVMEStent::UpdateViewAfterDeformation(){
 	}
 
 }*/
+
+
 
 //expend stent and move catheter
 void medVMEStent::DisplayStentExpendByStep(mafTimeStamp t){
@@ -726,8 +782,8 @@ void medVMEStent::PreComputeStentPointsBySteps( int steps){
 	for (int i=0;i<steps;i++)
 	{
 		//-------one step deformation--------
-		deformFilter->SetCurIterationNum(i);
-		deformFilter->Update();
+		m_DeformFilter->SetCurIterationNum(i);
+		m_DeformFilter->Update();
 		//----------get point set from mesh-----------
 		static float vertex[3]; 
 
@@ -774,8 +830,8 @@ void medVMEStent::PreComputeStentPointsBySteps( int steps){
 */
 void medVMEStent::expandStent(int numberOfCycle ){
 	//-------------deform stent---------
-	deformFilter->SetCurIterationNum(numberOfCycle);
-	deformFilter->Update();
+	m_DeformFilter->SetCurIterationNum(numberOfCycle);
+	m_DeformFilter->Update();
 
 	//------------update stent visualization----------------
 	static float vertex[3]; 
@@ -812,6 +868,9 @@ void medVMEStent::expandStent(int numberOfCycle ){
 	m_PolyData->Update(); 
 	
 }
+
+
+
 void medVMEStent::createTestVesselPolydata(vtkPolyData  *centerLine){
 	int test1 = centerLine->GetNumberOfPoints();
 	int test2 = centerLine->GetNumberOfLines();
@@ -832,6 +891,9 @@ void medVMEStent::createTestVesselPolydata(vtkPolyData  *centerLine){
 	//m_AppendPolyData->AddInput(m_TestVesselPolyData);//to show vessel
 	int numTmp = m_TestVesselPolyData->GetNumberOfPolys();
 }
+
+
+
 void medVMEStent::createCatheter(vtkPolyData  *centerLine){
 	int test1 = centerLine->GetNumberOfPoints();
 	int test2 = centerLine->GetNumberOfLines();
@@ -853,6 +915,9 @@ void medVMEStent::createCatheter(vtkPolyData  *centerLine){
 
 
 }
+
+
+
 /** move catheter so that stent can expand */
 void medVMEStent::moveCatheter(mafTimeStamp currentIter ){
 		
@@ -1285,9 +1350,11 @@ void medVMEStent::SetAndKeepConstrainSurface( mafNode * node )
 		m_VmeLinkedList.insert(m_VmeLinkedList.begin()+1,vme->GetId());
 	}
 }
+
+
 //-------------------------------------------------------------------------
-mmaMaterial *medVMEStent::GetMaterial()
-	//-------------------------------------------------------------------------
+//-------------------------------------------------------------------------
+mmaMaterial* medVMEStent::GetMaterial()
 {
 	mmaMaterial *material = (mmaMaterial *)GetAttribute("MaterialAttributes");
 	if (material == NULL)
@@ -1311,7 +1378,194 @@ mmaMaterial *medVMEStent::GetMaterial()
 
 
 
+//-------------------------------------------------------------------------
+// Create deformation parameters dialog
+//-------------------------------------------------------------------------
+void medVMEStent::CreateDefParamsDialog()
+{
+  // create the dialog
+  m_DefParamsDlg = new mafGUIDialog("Deformation Parameters", mafCLOSEWINDOW | mafRESIZABLE); 
 
+  // vertical stacker for the rows of widgets
+  wxBoxSizer *vs1 = new wxBoxSizer(wxVERTICAL);
+
+
+  // alpha
+  wxStaticText* labelAlpha = new wxStaticText(m_DefParamsDlg, wxID_ANY, "Alpha", wxPoint(0,0), wxSize(150,20));
+  wxTextCtrl* txtCtrlAlpha = new wxTextCtrl(m_DefParamsDlg , ID_DEF_PARAMS_ALPHA, "", wxPoint(0,0), wxSize(150,20), wxNO_BORDER);
+  txtCtrlAlpha->SetValidator(mafGUIValidator(this, ID_DEF_PARAMS_ALPHA, txtCtrlAlpha, &m_Alpha)) ;
+
+  wxBoxSizer *alphaBoxSizer = new wxBoxSizer(wxHORIZONTAL);
+  alphaBoxSizer->Add(labelAlpha,0);
+  alphaBoxSizer->Add(txtCtrlAlpha,0);
+  vs1->Add(alphaBoxSizer,0,wxALIGN_CENTER | wxALL, 2);
+
+  // beta
+  wxStaticText* labelBeta = new wxStaticText(m_DefParamsDlg, wxID_ANY, "Beta", wxPoint(0,0), wxSize(150,20));
+  wxTextCtrl* txtCtrlBeta = new wxTextCtrl(m_DefParamsDlg , ID_DEF_PARAMS_BETA, "", wxPoint(0,0), wxSize(150,20), wxNO_BORDER);
+  txtCtrlBeta->SetValidator(mafGUIValidator(this, ID_DEF_PARAMS_BETA, txtCtrlBeta, &m_Beta)) ;
+
+  wxBoxSizer *betaBoxSizer = new wxBoxSizer(wxHORIZONTAL);
+  betaBoxSizer->Add(labelBeta,0);
+  betaBoxSizer->Add(txtCtrlBeta,0);
+  vs1->Add(betaBoxSizer,0,wxALIGN_CENTER | wxALL, 2);
+
+  // gamma
+  wxStaticText* labelGamma = new wxStaticText(m_DefParamsDlg, wxID_ANY, "Gamma", wxPoint(0,0), wxSize(150,20));
+  wxTextCtrl* txtCtrlGamma = new wxTextCtrl(m_DefParamsDlg , ID_DEF_PARAMS_GAMMA, "", wxPoint(0,0), wxSize(150,20), wxNO_BORDER);
+  txtCtrlGamma->SetValidator(mafGUIValidator(this, ID_DEF_PARAMS_GAMMA, txtCtrlGamma, &m_Gamma)) ;
+
+  wxBoxSizer *gammaBoxSizer = new wxBoxSizer(wxHORIZONTAL);
+  gammaBoxSizer->Add(labelGamma,0);
+  gammaBoxSizer->Add(txtCtrlGamma,0);
+  vs1->Add(gammaBoxSizer,0,wxALIGN_CENTER | wxALL, 2);
+
+  // rigidity
+  wxStaticText* labelRigidity = new wxStaticText(m_DefParamsDlg, wxID_ANY, "Rigidity", wxPoint(0,0), wxSize(150,20));
+  wxTextCtrl* txtCtrlRigidity = new wxTextCtrl(m_DefParamsDlg , ID_DEF_PARAMS_RIGIDITY, "", wxPoint(0,0), wxSize(150,20), wxNO_BORDER);
+  txtCtrlRigidity->SetValidator(mafGUIValidator(this, ID_DEF_PARAMS_RIGIDITY, txtCtrlRigidity, &m_Rigidity)) ;
+
+  wxBoxSizer *rigidityBoxSizer = new wxBoxSizer(wxHORIZONTAL);
+  rigidityBoxSizer->Add(labelRigidity,0);
+  rigidityBoxSizer->Add(txtCtrlRigidity,0);
+  vs1->Add(rigidityBoxSizer,0,wxALIGN_CENTER | wxALL, 2);
+
+
+  // damping
+  wxStaticText* labelDamping = new wxStaticText(m_DefParamsDlg, wxID_ANY, "Damping", wxPoint(0,0), wxSize(150,20));
+  wxTextCtrl* txtCtrlDamping = new wxTextCtrl(m_DefParamsDlg , ID_DEF_PARAMS_DAMPING, "", wxPoint(0,0), wxSize(150,20), wxNO_BORDER);
+  txtCtrlDamping->SetValidator(mafGUIValidator(this, ID_DEF_PARAMS_DAMPING, txtCtrlDamping, &m_Damping)) ;
+
+  wxBoxSizer *dampingBoxSizer = new wxBoxSizer(wxHORIZONTAL);
+  dampingBoxSizer->Add(labelDamping,0);
+  dampingBoxSizer->Add(txtCtrlDamping,0);
+  vs1->Add(dampingBoxSizer,0,wxALIGN_CENTER | wxALL, 2);
+
+
+  // epsilon
+  wxStaticText* labelEpsilon = new wxStaticText(m_DefParamsDlg, wxID_ANY, "Epsilon", wxPoint(0,0), wxSize(150,20));
+  wxTextCtrl* txtCtrlEpsilon = new wxTextCtrl(m_DefParamsDlg , ID_DEF_PARAMS_EPSILON, "", wxPoint(0,0), wxSize(150,20), wxNO_BORDER);
+  txtCtrlEpsilon->SetValidator(mafGUIValidator(this, ID_DEF_PARAMS_EPSILON, txtCtrlEpsilon, &m_Epsilon)) ;
+
+  wxBoxSizer *epsilonBoxSizer = new wxBoxSizer(wxHORIZONTAL);
+  epsilonBoxSizer->Add(labelEpsilon,0);
+  epsilonBoxSizer->Add(txtCtrlEpsilon,0);
+  vs1->Add(epsilonBoxSizer,0,wxALIGN_CENTER | wxALL, 2);
+
+
+  // itsPerStep
+  wxStaticText* labelItsPerStep = new wxStaticText(m_DefParamsDlg, wxID_ANY, "Its per step", wxPoint(0,0), wxSize(150,20));
+  wxTextCtrl* txtCtrlItsPerStep = new wxTextCtrl(m_DefParamsDlg , ID_DEF_PARAMS_ITS_PER_STEP, "", wxPoint(0,0), wxSize(150,20), wxNO_BORDER);
+  txtCtrlItsPerStep->SetValidator(mafGUIValidator(this, ID_DEF_PARAMS_ITS_PER_STEP, txtCtrlItsPerStep, &m_IterationsPerStep)) ;
+
+  wxBoxSizer *itsPerStepBoxSizer = new wxBoxSizer(wxHORIZONTAL);
+  itsPerStepBoxSizer->Add(labelItsPerStep,0);
+  itsPerStepBoxSizer->Add(txtCtrlItsPerStep,0);
+  vs1->Add(itsPerStepBoxSizer,0,wxALIGN_CENTER | wxALL, 2);
+
+
+  // steps
+  wxStaticText* labelSteps = new wxStaticText(m_DefParamsDlg, wxID_ANY, "Steps", wxPoint(0,0), wxSize(150,20));
+  wxTextCtrl* txtCtrlSteps = new wxTextCtrl(m_DefParamsDlg , ID_DEF_PARAMS_STEPS, "", wxPoint(0,0), wxSize(150,20), wxNO_BORDER);
+  txtCtrlSteps->SetValidator(mafGUIValidator(this, ID_DEF_PARAMS_STEPS, txtCtrlSteps, &m_NumberOfSteps)) ;
+
+  wxBoxSizer *stepsBoxSizer = new wxBoxSizer(wxHORIZONTAL);
+  stepsBoxSizer->Add(labelSteps,0);
+  stepsBoxSizer->Add(txtCtrlSteps,0);
+  vs1->Add(stepsBoxSizer,0,wxALIGN_CENTER | wxALL, 2);
+
+
+  // restore and undo buttons
+  mafGUIButton* buttonRestore = new mafGUIButton(m_DefParamsDlg, ID_DEF_PARAMS_RESTORE, "Restore", wxPoint(0,0), wxSize(50,20));
+  buttonRestore->SetListener(this);
+
+  mafGUIButton* buttonUndo = new mafGUIButton(m_DefParamsDlg, ID_DEF_PARAMS_UNDO, "Undo", wxPoint(0,0), wxSize(50,20));
+  buttonUndo->SetListener(this);
+
+  wxBoxSizer *restoreBoxSizer = new wxBoxSizer(wxHORIZONTAL);
+  restoreBoxSizer->Add(buttonRestore,0);
+  restoreBoxSizer->Add(buttonUndo,0);
+  vs1->Add(restoreBoxSizer,0,wxALIGN_CENTER | wxALL, 2);
+
+
+  // ok/cancel buttons
+  mafGUIButton* buttonOk = new mafGUIButton(m_DefParamsDlg, ID_DEF_PARAMS_OK, "Ok", wxPoint(0,0), wxSize(50,20));
+  buttonOk->SetListener(this);
+
+  mafGUIButton *buttonCancel = new mafGUIButton(m_DefParamsDlg, ID_DEF_PARAMS_CANCEL, "Cancel", wxPoint(0,0), wxSize(50,20));
+  buttonCancel->SetListener(this);
+
+  wxBoxSizer *okCancelBoxSizer = new wxBoxSizer(wxHORIZONTAL);
+  okCancelBoxSizer->Add(buttonOk,0);
+  okCancelBoxSizer->Add(buttonCancel,0);
+  vs1->Add(okCancelBoxSizer,0,wxALIGN_CENTER | wxALL, 2);
+
+
+  // put the vertical sizer into the dialog and display
+  vs1->Fit(m_DefParamsDlg);	  // fit the window to the min size of the sizer
+  m_DefParamsDlg->Add(vs1) ;  // plug the sizer into the dialog
+  m_DefParamsDlg->ShowModal();
+}
+
+
+//-------------------------------------------------------------------------
+// Delete deformation parameters dialog
+//-------------------------------------------------------------------------
+void medVMEStent::DeleteDefParamsDialog()
+{
+  delete m_DefParamsDlg ;
+}
+
+
+
+//-------------------------------------------------------------------------
+// Restore deformation parameters to defaults
+//-------------------------------------------------------------------------
+void medVMEStent::SetDefParamsToDefaults()
+{
+  m_Alpha = m_Alpha_Default ;
+  m_Beta = m_Beta_Default ;
+  m_Gamma = m_Gamma_Default ;
+  m_Rigidity = m_Rigidity_Default ;
+  m_Damping = m_Damping_Default ;
+  m_Epsilon = m_Epsilon_Default ;
+  m_IterationsPerStep = m_IterationsPerStep_Default ;
+  m_NumberOfSteps = m_NumberOfSteps_Default ;
+
+  SaveDefParams() ;
+}
+
+
+//-------------------------------------------------------------------------
+// Restore deformation parameters to saved values
+//-------------------------------------------------------------------------
+void medVMEStent::SetDefParamsToSaved()
+{
+  m_Alpha = m_Alpha_Saved ;
+  m_Beta = m_Beta_Saved ;
+  m_Gamma = m_Gamma_Saved ;
+  m_Rigidity = m_Rigidity_Saved ;
+  m_Damping = m_Damping_Saved ;
+  m_Epsilon = m_Epsilon_Saved ;
+  m_IterationsPerStep = m_IterationsPerStep_Saved ;
+  m_NumberOfSteps = m_NumberOfSteps_Saved ;
+}
+
+
+//-------------------------------------------------------------------------
+// Save current deformation parameters (in case of undo or cancel)
+//-------------------------------------------------------------------------
+void medVMEStent::SaveDefParams()
+{
+  m_Alpha_Saved = m_Alpha ;
+  m_Beta_Saved = m_Beta ;
+  m_Gamma_Saved = m_Gamma ;
+  m_Rigidity_Saved = m_Rigidity ;
+  m_Damping_Saved = m_Damping ;
+  m_Epsilon_Saved = m_Epsilon ;
+  m_IterationsPerStep_Saved = m_IterationsPerStep ;
+  m_NumberOfSteps_Saved = m_NumberOfSteps ;
+}
 
 
 

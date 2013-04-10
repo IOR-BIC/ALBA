@@ -19,8 +19,11 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "medVMEDefines.h"  //very important for MED_VME_EXPORT
 #include "mafVME.h"
 #include "mafEvent.h"
+#include "mafGuiDialog.h"
+#include "mafGuiButton.h"
 
 #include "vtkMEDStentModelSource.h"
+#include "vtkMEDDeformableSimplexMeshFilter.h"
 
 #include <vector>
 using std::vector;
@@ -61,128 +64,6 @@ constrain surface.
 class MED_VME_EXPORT medVMEStent : public mafVME
 {
 
-protected:
-	 /** for gui control */
-	  enum STENT_WIDGET_ID
-	  {
-		
-		CHANGE_VALUE,
-		CHANGE_VALUE_CROWN,
-		STENT_DIAMETER,
-		CROWN_LENGTH,
-		STRUT_ANGLE,
-		STRUT_THICKNESS,
-		ID_STENT_CONFIGURATION,
-		ID_LINK_CONNECTION,
-		LINK_LENGTH,
-		NUMBER_OF_LINKS,//(along circumference)
-		LINK_ALIGNMENT,
-		LINK_ORIENTATION,
-		ID_CENTERLINE,
-		ID_CONSTRAIN_SURFACE,
-		ID_DEFORMATION,
-		CHANGE_VIEW,
-		ID_LAST
-	  };
-    /** store attributes and matrix*/
-	virtual int InternalStore(mafStorageElement *parent);
-    /** restore attributes and matrix*/
-	virtual int InternalRestore(mafStorageElement *node);
-
-	/** called to prepare the update of the output */
-	virtual void InternalPreUpdate();
-	/** update the output data structure */
-	virtual void InternalUpdate();
-	/** do deformation under the constrain of constrain surface */
-	//void DoDeformation(int type);
-	/** do deformation under the constrain of constrain surface */
-	//void DoDeformation2(int type);
-	/** do deformation under the constrain of constrain surface */
-
-
-	/** to update data and view after each deformation */
-	void UpdateViewAfterDeformation();
-	/** Internally used to create a new instance of the GUI.*/
-	virtual mafGUI *CreateGui();
-
-	mafTransform *m_Transform; 
-
-	//vtkPolyData *m_CenterlineModify;//sheathVTK
-	/**----------- parameters -----------*/
-	double m_StentRadius;
-	/**----------- stent parameters-----------*/
-	/** basic stent  */
-	double m_Stent_Diameter;
-	double m_Crown_Length;
-	int m_Crown_Number;
-	double m_Strut_Angle;
-	double m_Strut_Thickness;
-	int m_Id_Stent_Configuration;
-	/**  stent link  */
-	int m_Id_Link_Connection;
-	double m_Link_Length;
-	int m_Link_Alignment;
-	int m_Link_orientation;  
-	/**----------- center line and constrain surface-----------*/
-	vtkPolyData  *m_Centerline; 
-	vtkPolyData  *m_ConstrainSurface;
-	mafString m_CenterLineName;
-	mafString m_ConstrainSurfaceName;
-	vtkPolyData *m_TestVesselPolyData;
-
-private:
-	/**  deformation iterator  */
-	
-	double m_StrutLength;
-	vtkPolyData *m_StentPolyLine;  
-	vector<double> m_StentCenterLineSerial;
-	vector<vector<double>> m_StentCenterLine;
-	vector<vector<double>>::const_iterator m_CenterLineStart; //could be remove
-	vector<vector<double>>::const_iterator m_CenterLineEnd;  //could be remove
-	vtkPolyData* CreateAConstrainSurface();
-	void moveCatheter(mafTimeStamp currentIter);
-	void createCatheter(vtkPolyData  *centerLine);
-	void createTestVesselPolydata(vtkPolyData  *centerLine);
-	void expandStent(int numberOfCycle);
-
-	/** three output in append polydata*/
-	vtkPolyData  *m_PolyData;
-	vtkPolyData  *m_CatheterPolyData;
-
-	vtkAppendPolyData *m_AppendPolyData;
-	/** the output of this vme */
-	vtkPolyData *m_AppendPolys;
-	
-	vtkPolyData *m_SheathVTK;
-	/** used to create stent */
-	//vtkMEDStentModelSource m_StentSource;
-	
-	SimplexMeshType::Pointer m_SimplexMesh;
-	/** to check if deformation in progress */
-	int m_DeformFlag ;
-
-	/*from get Strut Length from stentModelSource*/
-	double GetStrutLength(){return m_StrutLength;};
-	/*if show catheter*/
-	int m_ShowCatheter;
-
-	vtkCellArray *m_StrutArray;
-	vtkCellArray *m_LinkArray;
-	vector<int>::const_iterator m_centerLocationIdx;
-	vector<int> m_centerLocation;
-	/*-------for store vme------*/
-	vector<int> m_VmeLinkedList; //a list of VME ID , centerline first then surface
-
-	void SetCenterLocationIdx(vector<int>::const_iterator centerLocationIndex);//{m_centerLocationIdx = centerLocationIndex;}
-	void SetCenterLocationIdxRef(vector<int> const&ve);
-	int m_CenterLineSetFlag,m_ConstrainSurfaceSetFlag; 
-	int m_ComputedCrownNumber;
-	/*------------pre compute a container to keep all the points of deformation iterator steps  ----------*/
-	void PreComputeStentPointsBySteps(int step);
-	vector<vtkPoints*> m_ItPointsContainer;//keep points for every deform iterator
-	//-------for test
-	int m_numberOfCycle;
-
 public:
 
   mafTypeMacro(medVMEStent, mafVME);
@@ -214,7 +95,7 @@ public:
 
 	void DisplayStentExpendByStep(mafTimeStamp t);
 
-	void DisplayCatherter();
+	void DisplayCatheter();
 
 
   //---------------------------Setter-/-Getter------------------------------------  
@@ -306,5 +187,180 @@ public:
   int GetStentCrownNumber(){ return m_Crown_Number ; }
   //--------convert tube strips into triangle polydata 
   vtkPolyData *TubeToPolydata( vtkTubeFilter * sheath );
+
+
+protected:
+  /** for gui control */
+  enum STENT_WIDGET_ID
+  {
+    ID = MINID,
+    CHANGE_VALUE,
+    CHANGE_VALUE_CROWN,
+    STENT_DIAMETER,
+    CROWN_LENGTH,
+    STRUT_ANGLE,
+    STRUT_THICKNESS,
+    ID_STENT_CONFIGURATION,
+    ID_LINK_CONNECTION,
+    LINK_LENGTH,
+    NUMBER_OF_LINKS,//(along circumference)
+    LINK_ALIGNMENT,
+    LINK_ORIENTATION,
+    ID_CENTERLINE,
+    ID_CONSTRAIN_SURFACE,
+    ID_DEFORMATION,
+    ID_DEFORMATION_PARAMETERS,
+    ID_DEF_PARAMS_RESTORE,
+    ID_DEF_PARAMS_UNDO,
+    ID_DEF_PARAMS_OK,
+    ID_DEF_PARAMS_CANCEL,
+    ID_DEF_PARAMS_ALPHA,
+    ID_DEF_PARAMS_BETA,
+    ID_DEF_PARAMS_GAMMA,
+    ID_DEF_PARAMS_RIGIDITY,
+    ID_DEF_PARAMS_DAMPING,
+    ID_DEF_PARAMS_EPSILON,
+    ID_DEF_PARAMS_ITS_PER_STEP,
+    ID_DEF_PARAMS_STEPS,
+    CHANGE_VIEW,
+    ID_LAST
+  };
+
+  /** store attributes and matrix*/
+  virtual int InternalStore(mafStorageElement *parent);
+  /** restore attributes and matrix*/
+  virtual int InternalRestore(mafStorageElement *node);
+
+  /** called to prepare the update of the output */
+  virtual void InternalPreUpdate();
+  /** update the output data structure */
+  virtual void InternalUpdate();
+  /** do deformation under the constrain of constrain surface */
+  //void DoDeformation(int type);
+  /** do deformation under the constrain of constrain surface */
+  //void DoDeformation2(int type);
+  /** do deformation under the constrain of constrain surface */
+
+
+  /** to update data and view after each deformation */
+  void UpdateViewAfterDeformation();
+  /** Internally used to create a new instance of the GUI.*/
+  virtual mafGUI *CreateGui();
+
+
+  
+  void CreateDefParamsDialog() ;  ///< Create deformation parameters dialog
+  void DeleteDefParamsDialog() ;  ///< Delete deformation parameters dialog
+
+  mafTransform *m_Transform; 
+
+  //vtkPolyData *m_CenterlineModify;//sheathVTK
+  /**----------- parameters -----------*/
+  double m_StentRadius;
+  /**----------- stent parameters-----------*/
+  /** basic stent  */
+  double m_Stent_Diameter;
+  double m_Crown_Length;
+  int m_Crown_Number;
+  double m_Strut_Angle;
+  double m_Strut_Thickness;
+  int m_Id_Stent_Configuration;
+  /**  stent link  */
+  int m_Id_Link_Connection;
+  double m_Link_Length;
+  int m_Link_Alignment;
+  int m_Link_orientation;  
+  /**----------- center line and constrain surface-----------*/
+  vtkPolyData  *m_Centerline; 
+  vtkPolyData  *m_ConstrainSurface;
+  mafString m_CenterLineName;
+  mafString m_ConstrainSurfaceName;
+  vtkPolyData *m_TestVesselPolyData;
+
+private:
+  double m_StrutLength;
+  vtkPolyData *m_StentPolyLine;  
+  vector<double> m_StentCenterLineSerial;
+  vector<vector<double>> m_StentCenterLine;
+  vector<vector<double>>::const_iterator m_CenterLineStart; //could be remove
+  vector<vector<double>>::const_iterator m_CenterLineEnd;  //could be remove
+  vtkPolyData* CreateAConstrainSurface();
+  void moveCatheter(mafTimeStamp currentIter);
+  void createCatheter(vtkPolyData  *centerLine);
+  void createTestVesselPolydata(vtkPolyData  *centerLine);
+  void expandStent(int numberOfCycle);
+
+  void SetDefParamsToDefaults() ; ///< Restore deformation parameters to defaults
+  void SetDefParamsToSaved() ; ///< Restore deformation parameters to saved values
+  void SaveDefParams() ; ///< Save current deformation parameters (in case of undo or cancel)
+
+  /** three output in append polydata*/
+  vtkPolyData  *m_PolyData;
+  vtkPolyData  *m_CatheterPolyData;
+
+  vtkAppendPolyData *m_AppendPolyData;
+  /** the output of this vme */
+  vtkPolyData *m_AppendPolys;
+
+  vtkPolyData *m_SheathVTK;
+  /** used to create stent */
+  //vtkMEDStentModelSource m_StentSource;
+
+  SimplexMeshType::Pointer m_SimplexMesh;
+  /** to check if deformation in progress */
+  int m_DeformFlag ;
+
+  /*from get Strut Length from stentModelSource*/
+  double GetStrutLength(){return m_StrutLength;};
+  /*if show catheter*/
+  int m_ShowCatheter;
+
+  vtkCellArray *m_StrutArray;
+  vtkCellArray *m_LinkArray;
+  vector<int>::const_iterator m_centerLocationIdx;
+  vector<int> m_centerLocation;
+  /*-------for store vme------*/
+  vector<int> m_VmeLinkedList; //a list of VME ID , centerline first then surface
+
+  void SetCenterLocationIdx(vector<int>::const_iterator centerLocationIndex);//{m_centerLocationIdx = centerLocationIndex;}
+  void SetCenterLocationIdxRef(vector<int> const&ve);
+  int m_CenterLineSetFlag,m_ConstrainSurfaceSetFlag; 
+  int m_ComputedCrownNumber;
+  /*------------pre compute a container to keep all the points of deformation iterator steps  ----------*/
+  void PreComputeStentPointsBySteps(int step);
+  vector<vtkPoints*> m_ItPointsContainer;//keep points for every deform iterator
+  //-------for test
+  int m_numberOfCycle;
+
+  typedef itk::vtkMEDDeformableSimplexMeshFilter<SimplexMeshType,SimplexMeshType> DeformFilterType;
+  DeformFilterType::Pointer m_DeformFilter;
+  
+  // Setting deformation parameters
+  double m_Alpha ; // internal force weight
+  double m_Beta ;  // external for weight
+  double m_Gamma ; // regularity
+  double m_Rigidity ; // smoothness
+  double m_Damping ; // damping
+  double m_Epsilon ; // distance scale for calculating force attracting stent to vessel 
+  int m_IterationsPerStep ; // no. of iterations per step (ie per execution of filter)
+  int m_NumberOfSteps ; // total no. of iterations
+  double m_Alpha_Saved ;
+  double m_Beta_Saved ;
+  double m_Gamma_Saved ;
+  double m_Rigidity_Saved ;
+  double m_Damping_Saved ;
+  double m_Epsilon_Saved ;
+  int m_IterationsPerStep_Saved ;
+  int m_NumberOfSteps_Saved ; 
+  const double m_Alpha_Default ;
+  const double m_Beta_Default ;
+  const double m_Gamma_Default ;
+  const double m_Rigidity_Default ;
+  const double m_Damping_Default ;
+  const double m_Epsilon_Default ;
+  const int m_IterationsPerStep_Default ;
+  const int m_NumberOfSteps_Default ; 
+
+  mafGUIDialog *m_DefParamsDlg ; // dialog for deformation params
 };
 #endif

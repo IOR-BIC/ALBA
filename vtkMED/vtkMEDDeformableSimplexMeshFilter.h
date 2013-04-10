@@ -1,3 +1,7 @@
+
+#ifndef __vtkMEDDeformableSimplexMesh3DFilter_h 
+#define __vtkMEDDeformableSimplexMesh3DFilter_h
+
 /*-------------------------------
 * By Xiangyin Ma, Nov 2012
 *-----------------------------------
@@ -20,134 +24,142 @@
 //#include "VesselMeshForTesting.h" 
 #include "kdtree.h"
 #include <assert.h>
+#include "vtkCellArray.h"
 #include "vtkPolyData.h"
+#include "vtkIdType.h"
 
 
-#include <set>
-#include <vector>
-using std::vector;
+//#include <set>
+//#include <vector>
+//using std::vector;
 
 namespace itk
 {
-template< class TInputMesh, class TOutputMesh >
-class DeformableSimplexMeshFilterImpl :
-  public DeformableSimplexMesh3DFilter< TInputMesh, TOutputMesh >
-{
-public:
-  /** Standard "Self" typedefs. */
-  typedef DeformableSimplexMeshFilterImpl Self;
+  template< class TInputMesh, class TOutputMesh >
+  class vtkMEDDeformableSimplexMeshFilter :
+    public DeformableSimplexMesh3DFilter< TInputMesh, TOutputMesh >
+  {
+  public:
+    /** Standard "Self" typedefs. */
+    typedef vtkMEDDeformableSimplexMeshFilter Self;
 
-  /** Standard "Superclass" typedef. */
-  typedef  DeformableSimplexMesh3DFilter< TInputMesh, TOutputMesh > Superclass;
+    /** Standard "Superclass" typedef. */
+    typedef  DeformableSimplexMesh3DFilter< TInputMesh, TOutputMesh > Superclass;
 
-  /** Smart pointer typedef support */
-  typedef SmartPointer< Self >       Pointer;
-  typedef SmartPointer< const Self > ConstPointer;
+    /** Smart pointer typedef support */
+    typedef SmartPointer< Self >       Pointer;
+    typedef SmartPointer< const Self > ConstPointer;
 
-  /** Method for creation through the object factory. */
-  itkNewMacro(Self);
+    /** Method for creation through the object factory. */
+    itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
-  itkTypeMacro(DeformableSimplexMeshFilterImpl, DeformableSimplexMesh3DFilter);
+    /** Run-time type information (and related methods). */
+    itkTypeMacro(vtkMEDDeformableSimplexMeshFilter, DeformableSimplexMesh3DFilter);
 
-  /** Some typedefs. */
-  typedef TInputMesh  InputMeshType;
-  typedef TOutputMesh OutputMeshType;
+    /** Some typedefs. */
+    typedef TInputMesh  InputMeshType;
+    typedef TOutputMesh OutputMeshType;
 
-  typedef typename Superclass::PointType              PointType;
-  typedef typename Superclass::GradientIndexType      GradientIndexType;
-  typedef typename Superclass::GradientIndexValueType GradientIndexValueType;
-  typedef typename Superclass::GradientType           GradientType;
-  typedef typename Superclass::GradientImageType      GradientImageType;
+    typedef typename Superclass::PointType              PointType;
+    typedef typename Superclass::GradientIndexType      GradientIndexType;
+    typedef typename Superclass::GradientIndexValueType GradientIndexValueType;
+    typedef typename Superclass::GradientType           GradientType;
+    typedef typename Superclass::GradientImageType      GradientImageType;
 
-  /** Mesh pointer definition. */
-  typedef typename InputMeshType::Pointer  InputMeshPointer;
-  typedef typename OutputMeshType::Pointer OutputMeshPointer;
+    /** Mesh pointer definition. */
+    typedef typename InputMeshType::Pointer  InputMeshPointer;
+    typedef typename OutputMeshType::Pointer OutputMeshPointer;
 
-  typedef typename InputMeshType::PixelType PixelType;
+    typedef typename InputMeshType::PixelType PixelType;
 
-  typedef Image< PixelType, 3 >                        GradientIntensityImageType;
-  typedef typename GradientIntensityImageType::Pointer GradientIntensityImagePointer;
+    typedef Image< PixelType, 3 >                        GradientIntensityImageType;
+    typedef typename GradientIntensityImageType::Pointer GradientIntensityImagePointer;
 
-  typedef Image< float, 3 >                               OriginalImageType;
-  typedef typename OriginalImageType::IndexType           OriginalImageIndexType;
-  typedef typename OriginalImageIndexType::IndexValueType ImageIndexValueType;
-  typedef typename OriginalImageType::ConstPointer        OriginalImagePointer;
+    typedef Image< float, 3 >                               OriginalImageType;
+    typedef typename OriginalImageType::IndexType           OriginalImageIndexType;
+    typedef typename OriginalImageIndexType::IndexValueType ImageIndexValueType;
+    typedef typename OriginalImageType::ConstPointer        OriginalImagePointer;
 
-  typedef vtkMEDStentModelSource::Strut          Strut;
-  typedef vector<Strut>::const_iterator    StrutIterator;
-  typedef itk::Vector< double, 3 >         VectorType;
+    typedef vtkMEDStentModelSource::Strut          Strut;
+    typedef vector<Strut>::const_iterator    StrutIterator;
+    typedef itk::Vector< double, 3 >         VectorType;
 
-  //typedef VesselMeshForTesting::Point      Point;
-  //typedef vector<Point>::const_iterator    PointIterator;
+    //typedef VesselMeshForTesting::Point      Point;
+    //typedef vector<Point>::const_iterator    PointIterator;
 
-  itkSetMacro(StrutLength, double);
-  itkGetConstMacro(StrutLength, double);
+    itkSetMacro(StrutLength, double);
+    itkGetConstMacro(StrutLength, double);
 
-  itkSetMacro(LinkLength, double);
-  itkGetConstMacro(LinkLength, double);
+    itkSetMacro(LinkLength, double);
+    itkGetConstMacro(LinkLength, double);
 
-  itkSetMacro(CurIterationNum, int);
-  itkGetConstMacro(CurIterationNum, int);
+    itkSetMacro(CurIterationNum, int);
+    itkGetConstMacro(CurIterationNum, int);
 
-  /*itkSetMacro(m_StrutLength, double);
-  itkGetConstMacro(m_StrutLength, double);
+    itkSetMacro(Epsilon, double);
+    itkGetConstMacro(Epsilon, double);
 
-  itkSetMacro(m_LinkLength, double);
-  itkGetConstMacro(m_LinkLength, double);
+    /*itkSetMacro(m_StrutLength, double);
+    itkGetConstMacro(m_StrutLength, double);
 
-  itkSetMacro(m_CurIterationNum, int);
-  itkGetConstMacro(m_CurIterationNum, int);
-  */
-	  void SetStrutLinkIter(StrutIterator StrutStart, StrutIterator StrutEnd,
-							StrutIterator LinkStart, StrutIterator LinkEnd);
+    itkSetMacro(m_LinkLength, double);
+    itkGetConstMacro(m_LinkLength, double);
 
-	  void SetStrutLinkFromCellArray(vtkCellArray *strut,vtkCellArray *link);
+    itkSetMacro(m_CurIterationNum, int);
+    itkGetConstMacro(m_CurIterationNum, int);
+    */
+    void SetStrutLinkIter(StrutIterator StrutStart, StrutIterator StrutEnd,
+      StrutIterator LinkStart, StrutIterator LinkEnd);
 
-	 // void SetVesselPointsKDTree(PointIterator PointStart, PointIterator PointEnd);
-	  void SetVesselPointsKDTreeFromPolyData(vtkPolyData *surface);
-	  /*to check if point touch vessel wall from inside,1 inside ,0,outside */
-	  int isPointInsideVessel(double *stentPoint, double *surfacePoint) ;
-	  double computeDirectionFromPoint2Face(double *stentPoint,vtkIdType p1,vtkIdType p2,vtkIdType p3);
-	  void SetCenterLocationIdx(vector<int>::const_iterator centerLocationIndex);
-	  void SetCenterLocationIdxRef(vector<int> const&ve);
-	  void SetTestValue(int value){this->testValue = value;}
-	  void vectorSubtract(double *endPoint,double *startPoint,double *result);
+    void SetStrutLinkFromCellArray(vtkCellArray *strut,vtkCellArray *link);
 
-protected:
-	DeformableSimplexMeshFilterImpl();
-	~DeformableSimplexMeshFilterImpl();
-	DeformableSimplexMeshFilterImpl(const Self &) {}
-	void operator=(const Self &){}
+    // void SetVesselPointsKDTree(PointIterator PointStart, PointIterator PointEnd);
+    void SetVesselPointsKDTreeFromPolyData(vtkPolyData *surface);
+    /*to check if point touch vessel wall from inside,1 inside ,0,outside */
+    int isPointInsideVessel(double *stentPoint, double *surfacePoint) ;
+    double computeDirectionFromPoint2Face(double *stentPoint,vtkIdType p1,vtkIdType p2,vtkIdType p3);
+    void SetCenterLocationIdx(vector<int>::const_iterator centerLocationIndex);
+    void SetCenterLocationIdxRef(vector<int> const&ve);
+    void SetTestValue(int value){this->testValue = value;}
+    void vectorSubtract(double *endPoint,double *startPoint,double *result);
 
-	virtual void ComputeDisplacement();
-	virtual void ComputeExternalForce(SimplexMeshGeometry *data);
+  protected:
+    vtkMEDDeformableSimplexMeshFilter();
+    ~vtkMEDDeformableSimplexMeshFilter();
+    vtkMEDDeformableSimplexMeshFilter(const Self &) {}
+    void operator=(const Self &){}
 
-	double m_StrutLength;
-	double m_LinkLength;
- 
+    virtual void ComputeDisplacement();
+    virtual void ComputeExternalForce(SimplexMeshGeometry *data);
 
-private:
-	int m_CurIterationNum;
-	vtkPolyData *m_SurfacePoly;
-	VectorType ComputeStrutLengthForce(SimplexMeshGeometry *data, int index);
+    double m_StrutLength;
+    double m_LinkLength;
+
+
+  private:
+    VectorType ComputeStrutLengthForce(SimplexMeshGeometry *data, int index);
     VectorType ComputeLinkLengthForce(SimplexMeshGeometry *data, int index);
 
-	double distanceCoefficient;
+    int m_CurIterationNum;
+    vtkPolyData *m_SurfacePoly;
 
-	// [0],[1] strut neighbor; [2] link neighbor
-	int (*StrutNeighbors)[3] ;
+    double m_Epsilon ; // distance parameter, defines "near distance" when approaching target
 
-	kdtree *KDTree;
+    double distanceCoefficient;
 
-	vector<int>::const_iterator centerLocationIdx;
-	int isDataChanged ;
+    // [0],[1] strut neighbor; [2] link neighbor
+    int (*StrutNeighbors)[3] ;
 
-	int testValue;
+    kdtree *KDTree;
 
-}; // end of class
+    vector<int>::const_iterator centerLocationIdx;
+    int isDataChanged ;
+
+    int testValue;
+
+  }; // end of class
 } // namespace itk
 
-#ifndef ITK_MANUAL_INSTANTIATION
 #include "vtkMEDDeformableSimplexMeshFilterImpl.h"
+
 #endif
