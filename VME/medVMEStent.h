@@ -1,10 +1,10 @@
 /*=========================================================================
-  Program:   MAF2Medical
-  Module:    $RCSfile: medVMEStent.h,v $
-  Language:  C++
-  Date:      $Date: 2012-10-23 10:15:31 $
-  Version:   $Revision: 1.1.2.7 $
-  Authors:   Hui Wei
+Program:   MAF2Medical
+Module:    $RCSfile: medVMEStent.h,v $
+Language:  C++
+Date:      $Date: 2012-10-23 10:15:31 $
+Version:   $Revision: 1.1.2.7 $
+Authors:   Hui Wei
 ==========================================================================
 Copyright (c) 2001/2005 
 CINECA - Interuniversity Consortium (www.cineca.it)
@@ -17,29 +17,33 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // Include:
 /**----------------------------------------------------------------------------*/
 #include "medVMEDefines.h"  //very important for MED_VME_EXPORT
+
+#include "mafNode.h"
 #include "mafVME.h"
 #include "mafEvent.h"
 #include "mafGuiDialog.h"
 #include "mafGuiButton.h"
+#include "mmaMaterial.h"
+#include "mafVMEOutputSurface.h"
+#include "mafVMEOutputPolyline.h"
 
 #include "vtkMEDStentModelSource.h"
 #include "vtkMEDDeformableSimplexMeshFilter.h"
 
+#include "vtkPolyData.h"
+#include "vtkAppendPolyData.h"
+#include "vtkTubeFilter.h"
+#include "vtkCellArray.h"
+#include "vtkPoints.h"
+
 #include <vector>
-using std::vector;
+
+
 /**----------------------------------------------------------------------------*/
 // forward declarations :
 /**----------------------------------------------------------------------------*/
-class mafNode;
-class mmaMaterial;
-class mafVMEOutputSurface;
-class mafVMEOutputPolyline;
-class vtkPolyData;
-class vtkTransform;
-class vtkAppendPolyData;
-class vtkTubeFilter;
-class vtkCellArray;
-class vtkPoints;
+
+
 /**----------------------------------------------------------------------------*/
 //--------typedef----------
 /**----------------------------------------------------------------------------*/
@@ -55,15 +59,23 @@ typedef vtkMEDStentModelSource::LinkOrientationType           enumLinkOrtType;
 
 typedef vector<Strut>::const_iterator    StrutIterator;
 
-/**
-this class create a stent based on some basic parameters. 
-It also can be depolyed to a curve line as its centerline.
-After it was given an constrain surface, it can expand inside this
-constrain surface.
-*/
+//-----------------------------------------------------------------------------
+/// medVMEStent. \n
+/// This class creates a stent based on some basic parameters. \n 
+/// The stent can be positioned along a centerline and deployed (expanded) \n
+/// onto the constraint surface of the surrounding blood vessel.
+/// The deployment is not visualised live - the stent positions are recorded \n
+/// during the deformation.  The visualisation is reconstructed afterwards, \n
+/// invoked and controlled by the dialog slider.
+//
+// The stent deformation is performed by DoDeformation3() and 
+// PreComputerStentPointsBySteps(), using vtkMEDDeformableSimplexMeshFilter.
+// Deployment visualisation is controlled by the dialog slider.
+// The slider invokes the VME method SetTimeStamp() which calculates the visualisation,
+// including the position of the catheter sheath.
+//-----------------------------------------------------------------------------
 class MED_VME_EXPORT medVMEStent : public mafVME
 {
-
 public:
 
   mafTypeMacro(medVMEStent, mafVME);
@@ -72,30 +84,33 @@ public:
   /* destructor */
   virtual ~medVMEStent();
 
-   /** Set the time for this VME.
-  It updates also the VTK representation .*/
+  /// Set the time for this VME. \n
+  /// It also updates the VTK representation. \n
+  /// Overrides base class method, and invoked by dialog slider.
   void SetTimeStamp(mafTimeStamp t);
-  
-  	/************************************************************************/
-	/* The mesh deformation is constrained by internal forces. The interal force can be scaled via SetAlpha (typical values are 0.01 < alpha < 0.3). 
-	 * The external force is derived from the image one wants to delineate. Therefore an image of type GradientImageType needs to be set by calling SetGradientImage(...). The external forces are scaled via SetBeta (typical values are 0.01 < beta < 1). One still needs to play around with these values.
 
-	 * To control the smoothness of the mesh a rigidity parameter can be adjusted. Low values (1 or 0) allow areas with high curvature. Higher values (around 7 or 8) will make the mesh smoother.
+  /************************************************************************/
+  /* The mesh deformation is constrained by internal forces. The internal force can be scaled via SetAlpha (typical values are 0.01 < alpha < 0.3). 
+  * The external force is derived from the image one wants to delineate. Therefore an image of type GradientImageType needs to be set by calling SetGradientImage(...). The external forces are scaled via SetBeta (typical values are 0.01 < beta < 1). One still needs to play around with these values.
 
-	 * By setting the gamma parameter the regularity of the mesh is controlled. Low values (< 0.03) produce more regular mesh. Higher values ( 0.3 < gamma < 0.2) will allow to move the vertices to regions of higher curvature.
+  * To control the smoothness of the mesh a rigidity parameter can be adjusted. Low values (1 or 0) allow areas with high curvature. Higher values (around 7 or 8) will make the mesh smoother.
 
-	 *This approach for segmentation follows that of Delingette et al. (1997).                                                                     */
-	/************************************************************************/
+  * By setting the gamma parameter the regularity of the mesh is controlled. Low values (< 0.03) produce more regular mesh. Higher values ( 0.3 < gamma < 0.2) will allow to move the vertices to regions of higher curvature.
 
-	void DoDeformation3(int type);
+  *This approach for segmentation follows that of Delingette et al. (1997).                                                                     */
+  /************************************************************************/
 
-	void DisplayStentExpend( int steps );
+  /// Deform the stent
+  void DoDeformation3(int type);
 
-	void ResetStentPoints( vtkPoints* currentPoints );
+  void DisplayStentExpand( int steps );
 
-	void DisplayStentExpendByStep(mafTimeStamp t);
+  void ResetStentPoints( vtkPoints* currentPoints );
 
-	void DisplayCatheter();
+  /// expand stent and move catheter
+  void DisplayStentExpandByStep(mafTimeStamp t);
+
+  void DisplayCatheter();
 
 
   //---------------------------Setter-/-Getter------------------------------------  
@@ -103,7 +118,7 @@ public:
   virtual int DeepCopy(mafNode *a);
   /** Compare with another mafVMESurfaceParametric. */
   virtual bool Equals(mafVME *vme);
-  
+
   /** Return the suggested pipe-typename for the visualization of this vme */
   //virtual mafString GetVisualPipe() {return mafString("mafPipeSurface");};
   //mafVMEOutputSurface *GetSurfaceOutput();//return the right type of output 
@@ -112,10 +127,10 @@ public:
   virtual mafString GetVisualPipe() {return mafString("mafPipePolyline");};
   mafVMEOutputPolyline *GetPolylineOutput(); //return the right type of output 
 
- // vtkPolyData *GetPolyData(){InternalUpdate();return m_PolyData;};
+  // vtkPolyData *GetPolyData(){InternalUpdate();return m_PolyData;};
   /** the append polydata */
   vtkPolyData *GetPolyData();//{ InternalUpdate();return  m_PolyData;};// m_AppendPolyData->GetOutput(); };
-  
+
   /** Get the vtkPolyData generated from the model */
   //vtkPolyData  *GetVtkPolyData(){InternalUpdate();return m_PolyData;};
 
@@ -135,7 +150,7 @@ public:
 
   /** return an xpm-icon that can be used to represent this node */
   static char ** GetIcon();
-	
+
   /** Precess events coming from other objects */ 
   virtual void OnEvent(mafEventBase *maf_event);
 
@@ -145,7 +160,7 @@ public:
 
   //void SetAndKeepConstrainSurface( mafVME *vme );
 
- //void SetAndKeepCenterLine( mafVME *vme );
+  //void SetAndKeepCenterLine( mafVME *vme );
 
   /**
   Set the Pose matrix of the VME. This function modifies the MatrixVector. You can
@@ -153,15 +168,15 @@ public:
   the MatrixVector creates a new KeyMatrix on the fly. When getting, the matrix vector
   interpolates on the fly according to the matrix interpolator.*/
   virtual void SetMatrix(const mafMatrix &mat);
-  
+
   /**
   select center line or constrain surface 
   */
-    void SetStentLink(const char *link_name, mafNode *ns);
+  void SetStentLink(const char *link_name, mafNode *ns);
   //------set properties-----------
   void SetCenterLine(vtkPolyData *line);
   void SetConstrainSurface(vtkPolyData *surface);
-   
+
   void SetStentDiameter(double diameter){m_Stent_Diameter = diameter;}
   void SetStentCrownLength(double crownL){m_Crown_Length = crownL;}
   void SetStrutThickness(double strutThickness){m_Strut_Thickness = strutThickness; }
@@ -171,7 +186,7 @@ public:
   void SetLinkOrientation(int linkOrit){m_Link_orientation = linkOrit;}
   void SetLinkConnection(int linkConnection){m_Id_Link_Connection = linkConnection;}
   void SetStentCrownNumber(int crownNumber){m_Crown_Number = crownNumber; }
-  
+
   //------get properties-----------
   vtkPolyData* GetCenterLine(){return m_Centerline;};
   vtkPolyData* GetConstrainSurface(){return m_ConstrainSurface;};
@@ -244,13 +259,12 @@ protected:
 
   /** to update data and view after each deformation */
   void UpdateViewAfterDeformation();
+
   /** Internally used to create a new instance of the GUI.*/
   virtual mafGUI *CreateGui();
 
-
-  
-  void CreateDefParamsDialog() ;  ///< Create deformation parameters dialog
-  void DeleteDefParamsDialog() ;  ///< Delete deformation parameters dialog
+  void CreateDefParamsDialog() ; ///< Create deformation parameters dialog
+  void DeleteDefParamsDialog() ; ///< Delete deformation parameters dialog
 
   mafTransform *m_Transform; 
 
@@ -258,6 +272,7 @@ protected:
   /**----------- parameters -----------*/
   double m_StentRadius;
   /**----------- stent parameters-----------*/
+
   /** basic stent  */
   double m_Stent_Diameter;
   double m_Crown_Length;
@@ -265,11 +280,13 @@ protected:
   double m_Strut_Angle;
   double m_Strut_Thickness;
   int m_Id_Stent_Configuration;
+
   /**  stent link  */
   int m_Id_Link_Connection;
   double m_Link_Length;
   int m_Link_Alignment;
   int m_Link_orientation;  
+
   /**----------- center line and constrain surface-----------*/
   vtkPolyData  *m_Centerline; 
   vtkPolyData  *m_ConstrainSurface;
@@ -278,13 +295,9 @@ protected:
   vtkPolyData *m_TestVesselPolyData;
 
 private:
-  double m_StrutLength;
-  vtkPolyData *m_StentPolyLine;  
-  vector<double> m_StentCenterLineSerial;
-  vector<vector<double>> m_StentCenterLine;
-  vector<vector<double>>::const_iterator m_CenterLineStart; //could be remove
-  vector<vector<double>>::const_iterator m_CenterLineEnd;  //could be remove
   vtkPolyData* CreateAConstrainSurface();
+
+  /// move catheter so that stent can expand
   void moveCatheter(mafTimeStamp currentIter);
   void createCatheter(vtkPolyData  *centerLine);
   void createTestVesselPolydata(vtkPolyData  *centerLine);
@@ -293,6 +306,23 @@ private:
   void SetDefParamsToDefaults() ; ///< Restore deformation parameters to defaults
   void SetDefParamsToSaved() ; ///< Restore deformation parameters to saved values
   void SaveDefParams() ; ///< Save current deformation parameters (in case of undo or cancel)
+
+  /*from get Strut Length from stentModelSource*/
+  double GetStrutLength(){return m_StrutLength;};
+
+  void SetCenterLocationIdx(vector<int>::const_iterator centerLocationIndex);//{m_centerLocationIdx = centerLocationIndex;}
+  void SetCenterLocationIdxRef(vector<int> const&ve);
+
+  /// Run filter for no. of steps. \n
+  /// Store stent position at each step for later display.
+  void PreComputeStentPointsBySteps(int steps);
+
+  double m_StrutLength;
+  vtkPolyData *m_StentPolyLine;  
+  vector<double> m_StentCenterLineSerial;
+  vector<vector<double>> m_StentCenterLine;
+  vector<vector<double>>::const_iterator m_CenterLineStart; //could be remove
+  vector<vector<double>>::const_iterator m_CenterLineEnd;  //could be remove
 
   /** three output in append polydata*/
   vtkPolyData  *m_PolyData;
@@ -310,8 +340,6 @@ private:
   /** to check if deformation in progress */
   int m_DeformFlag ;
 
-  /*from get Strut Length from stentModelSource*/
-  double GetStrutLength(){return m_StrutLength;};
   /*if show catheter*/
   int m_ShowCatheter;
 
@@ -319,23 +347,28 @@ private:
   vtkCellArray *m_LinkArray;
   vector<int>::const_iterator m_centerLocationIdx;
   vector<int> m_centerLocation;
+
   /*-------for store vme------*/
   vector<int> m_VmeLinkedList; //a list of VME ID , centerline first then surface
 
-  void SetCenterLocationIdx(vector<int>::const_iterator centerLocationIndex);//{m_centerLocationIdx = centerLocationIndex;}
-  void SetCenterLocationIdxRef(vector<int> const&ve);
   int m_CenterLineSetFlag,m_ConstrainSurfaceSetFlag; 
   int m_ComputedCrownNumber;
-  /*------------pre compute a container to keep all the points of deformation iterator steps  ----------*/
-  void PreComputeStentPointsBySteps(int step);
-  vector<vtkPoints*> m_ItPointsContainer;//keep points for every deform iterator
+
+  vector<vtkPoints*> m_ItPointsContainer; // store points at each step 
+
+
   //-------for test
   int m_numberOfCycle;
 
   typedef itk::vtkMEDDeformableSimplexMeshFilter<SimplexMeshType,SimplexMeshType> DeformFilterType;
   DeformFilterType::Pointer m_DeformFilter;
-  
-  // Setting deformation parameters
+
+
+  //-----------------------------------
+  // Dialog and variable for deformation parameters
+  //-----------------------------------
+  mafGUIDialog *m_DefParamsDlg ; // dialog for deformation params
+
   double m_Alpha ; // internal force weight
   double m_Beta ;  // external for weight
   double m_Gamma ; // regularity
@@ -360,7 +393,5 @@ private:
   const double m_Epsilon_Default ;
   const int m_IterationsPerStep_Default ;
   const int m_NumberOfSteps_Default ; 
-
-  mafGUIDialog *m_DefParamsDlg ; // dialog for deformation params
 };
 #endif

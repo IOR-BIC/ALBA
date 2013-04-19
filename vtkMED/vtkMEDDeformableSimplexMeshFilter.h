@@ -2,19 +2,28 @@
 #ifndef __vtkMEDDeformableSimplexMesh3DFilter_h 
 #define __vtkMEDDeformableSimplexMesh3DFilter_h
 
-/*-------------------------------
-* By Xiangyin Ma, Nov 2012
-*-----------------------------------
-*The deforming filter of simplex mesh
-*1. inherite from itk::DeformableSimplexMesh3DFilter
-*2. Keep the internal force/smoothing force unchanged
-*3. Override External force, compute it as displacement vectors along the direction normal to the simplex surface
-*4. Add new force called 'Strut and link length force', to keep the length of the struts and links
-*5. Override the ComputeDisplacement() function
-*   5.1. Use KD tree to calculate the distance from the simplex vertex to the vessel wall
-*        This distance is used to weight the external force and total dispalcement
-*   5.2. Sysnchronize the catheter's pulling over with the expansion of a certain circle of simplex vertices
-*--------------------------------*/
+//-------------------------------
+// By Xiangyin Ma, Nov 2012
+//-----------------------------------
+
+//-----------------------------------------------------------------------------
+/// vtkMEDDeformableSimplexMesh3DFilter \n
+/// The deforming filter of simplex mesh. \n
+/// 1. inherited from itk::DeformableSimplexMesh3DFilter \n
+/// 2. Keep the internal force/smoothing force unchanged \n
+/// 3. Override External force, compute it as displacement vectors \n 
+///    along the direction normal to the simplex surface \n
+/// 4. Add new force called 'Strut and link length force',  \n
+/// to keep the length of the struts and links \n
+/// 5. Override the ComputeDisplacement() function \n
+///    5.1. Use KD tree to calculate the distance from the simplex vertex to \n
+///         the vessel wall \n
+///         This distance is used to weight the external force and total \n
+///         displacement \n
+///    5.2. Synchronize the catheter's pulling over  \n
+///         with the expansion of a certain circle of simplex vertices \n
+//-----------------------------------------------------------------------------
+
 
 #include "itkDeformableSimplexMesh3DFilter.h"
 #include "itkMesh.h"
@@ -28,10 +37,6 @@
 #include "vtkPolyData.h"
 #include "vtkIdType.h"
 
-
-//#include <set>
-//#include <vector>
-//using std::vector;
 
 namespace itk
 {
@@ -99,15 +104,6 @@ namespace itk
     itkSetMacro(Epsilon, double);
     itkGetConstMacro(Epsilon, double);
 
-    /*itkSetMacro(m_StrutLength, double);
-    itkGetConstMacro(m_StrutLength, double);
-
-    itkSetMacro(m_LinkLength, double);
-    itkGetConstMacro(m_LinkLength, double);
-
-    itkSetMacro(m_CurIterationNum, int);
-    itkGetConstMacro(m_CurIterationNum, int);
-    */
     void SetStrutLinkIter(StrutIterator StrutStart, StrutIterator StrutEnd,
       StrutIterator LinkStart, StrutIterator LinkEnd);
 
@@ -120,7 +116,7 @@ namespace itk
     double computeDirectionFromPoint2Face(double *stentPoint,vtkIdType p1,vtkIdType p2,vtkIdType p3);
     void SetCenterLocationIdx(vector<int>::const_iterator centerLocationIndex);
     void SetCenterLocationIdxRef(vector<int> const&ve);
-    void SetTestValue(int value){this->testValue = value;}
+    void SetTestValue(int value){this->m_TestValue = value;}
     void vectorSubtract(double *endPoint,double *startPoint,double *result);
 
   protected:
@@ -141,25 +137,25 @@ namespace itk
     VectorType ComputeLinkLengthForce(SimplexMeshGeometry *data, int index);
 
     int m_CurIterationNum;
-    vtkPolyData *m_SurfacePoly;
+    vtkPolyData *m_SurfacePoly; // pointer set from outside - not allocated here
 
     double m_Epsilon ; // distance parameter, defines "near distance" when approaching target
 
-    double distanceCoefficient;
+    double m_DistanceCoefficient;
 
     // [0],[1] strut neighbor; [2] link neighbor
-    int (*StrutNeighbors)[3] ;
+    int (*m_StrutNeighbours)[3] ;
 
-    kdtree *KDTree;
+    kdtree *m_KDTree;
 
-    vector<int>::const_iterator centerLocationIdx;
-    int isDataChanged ;
+    vector<int>::const_iterator m_CenterLocationIdx;
+    int m_IsDataChanged ;
 
-    int testValue;
+    int m_TestValue;
 
   }; // end of class
 } // namespace itk
 
-#include "vtkMEDDeformableSimplexMeshFilterImpl.h"
+#include "vtkMEDDeformableSimplexMeshFilter.txx"
 
 #endif
