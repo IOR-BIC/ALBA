@@ -61,6 +61,9 @@ public:
   /** Remove the item from the list. */
   bool DeleteItem(long item_id);
 
+  /**Deselect an item from the list. */
+  void DeselectItem(long item_id); 
+
   /** Set the item's label. */
   bool SetItemLabel(long item_id, wxString label);
 

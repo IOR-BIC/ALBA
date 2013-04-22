@@ -96,6 +96,12 @@ bool mafGUIListCtrl::DeleteItem  (long item_id)
   return true;
 }
 //----------------------------------------------------------------------------
+void mafGUIListCtrl::DeselectItem(long item_id)
+//----------------------------------------------------------------------------
+{
+   m_List->SetItemState(item_id,0,wxLIST_STATE_SELECTED);
+}
+//----------------------------------------------------------------------------
 bool mafGUIListCtrl::SetItemLabel (long item_id, wxString label)
 //----------------------------------------------------------------------------
 {
