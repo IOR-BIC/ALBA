@@ -43,7 +43,7 @@ class vtkTransform;
 class MAF_EXPORT mafGizmoTranslateAxis: public mafGizmoInterface 
 {
 public:
-           mafGizmoTranslateAxis(mafVME *input, mafObserver *listener = NULL);
+           mafGizmoTranslateAxis(mafVME *input, mafObserver *listener = NULL, mafString name = "");
   virtual ~mafGizmoTranslateAxis(); 
   
   /** 

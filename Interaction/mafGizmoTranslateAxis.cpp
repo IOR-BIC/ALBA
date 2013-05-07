@@ -49,7 +49,7 @@
 #include "vtkProperty.h"
 
 //----------------------------------------------------------------------------
-mafGizmoTranslateAxis::mafGizmoTranslateAxis(mafVME *input, mafObserver *listener)
+mafGizmoTranslateAxis::mafGizmoTranslateAxis(mafVME *input, mafObserver *listener, mafString name)
 //----------------------------------------------------------------------------
 {
   m_ConeLength = 0.5;
@@ -74,13 +74,21 @@ mafGizmoTranslateAxis::mafGizmoTranslateAxis(mafVME *input, mafObserver *listene
   //-----------------
   // cylinder gizmo
   m_CylGizmo = mafVMEGizmo::New();
-  m_CylGizmo->SetName("CylGizmo");
+  if(name.Equals("")) {
+      m_CylGizmo->SetName("CylGizmo");
+  } else {
+	  m_CylGizmo->SetName(name);
+  }
   m_CylGizmo->SetData(m_RotatePDF[CYLINDER]->GetOutput());
   m_CylGizmo->SetMediator(m_Listener);
 
   // cone gizmo
-  m_ConeGizmo = mafVMEGizmo::New();  
-  m_ConeGizmo->SetName("ConeGizmo");
+  m_ConeGizmo = mafVMEGizmo::New();
+  if(name.Equals("")) {
+      m_ConeGizmo->SetName("ConeGizmo");
+  } else {
+     m_ConeGizmo->SetName(name);
+  }
   m_ConeGizmo->SetData(m_RotatePDF[CONE]->GetOutput());
   m_ConeGizmo->SetMediator(m_Listener);
 
