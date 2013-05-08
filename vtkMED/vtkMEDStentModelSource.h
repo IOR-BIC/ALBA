@@ -104,6 +104,8 @@ public:
 	void setLinkNumber(int value);
 	void setCenterLine (vector<vector<double>>::const_iterator centerLineStart,
 						vector<vector<double>>::const_iterator centerLindEnd, int pointNumber);
+
+  /// Set the center line of the stent from the given line.
 	void setCenterLineFromPolyData(vtkPolyData *polyData);
 	void setTestValue(){};
 	

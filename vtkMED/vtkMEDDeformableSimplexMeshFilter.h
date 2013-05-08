@@ -92,17 +92,20 @@ namespace itk
     //typedef VesselMeshForTesting::Point      Point;
     //typedef vector<Point>::const_iterator    PointIterator;
 
-    itkSetMacro(StrutLength, double);
-    itkGetConstMacro(StrutLength, double);
+    /// Nested helper class
+    class CatheterCalculator ;
 
-    itkSetMacro(LinkLength, double);
-    itkGetConstMacro(LinkLength, double);
+    void SetStrutLength(double len) {m_StrutLength = len ;}
+    double GetStrutLength() const {return m_StrutLength ;}
 
-    itkSetMacro(CurIterationNum, int);
-    itkGetConstMacro(CurIterationNum, int);
+    void SetLinkLength(double len) {m_LinkLength = len ;}
+    double GetLinkLength() const {return m_LinkLength ;}
 
-    itkSetMacro(Epsilon, double);
-    itkGetConstMacro(Epsilon, double);
+    void SetCurrentStepNum(double n) {m_CurrentStepNum = n ;}
+    int GetCurrentStepNum() const {return m_CurrentStepNum ;}
+
+    void SetEpsilon(double len) {m_Epsilon = len ;}
+    double GetEpsilon() const {return m_Epsilon ;}
 
     void SetStrutLinkIter(StrutIterator StrutStart, StrutIterator StrutEnd,
       StrutIterator LinkStart, StrutIterator LinkEnd);
@@ -118,6 +121,13 @@ namespace itk
     void SetCenterLocationIdxRef(vector<int> const&ve);
     void SetTestValue(int value){this->m_TestValue = value;}
     void vectorSubtract(double *endPoint,double *startPoint,double *result);
+
+
+    /// Get catheter position calculator
+    const CatheterCalculator* GetCatheterCalculator() const {return m_CatheterCalculator ;}
+
+    /// Get catheter position calculator
+    CatheterCalculator* GetCatheterCalculator() {return m_CatheterCalculator ;}
 
   protected:
     vtkMEDDeformableSimplexMeshFilter();
@@ -136,7 +146,7 @@ namespace itk
     VectorType ComputeStrutLengthForce(SimplexMeshGeometry *data, int index);
     VectorType ComputeLinkLengthForce(SimplexMeshGeometry *data, int index);
 
-    int m_CurIterationNum;
+    int m_CurrentStepNum;
     vtkPolyData *m_SurfacePoly; // pointer set from outside - not allocated here
 
     double m_Epsilon ; // distance parameter, defines "near distance" when approaching target
@@ -144,7 +154,7 @@ namespace itk
     double m_DistanceCoefficient;
 
     // [0],[1] strut neighbor; [2] link neighbor
-    int (*m_StrutNeighbours)[3] ;
+    int (*m_StrutNeighbors)[3] ;
 
     kdtree *m_KDTree;
 
@@ -153,9 +163,98 @@ namespace itk
 
     int m_TestValue;
 
+    CatheterCalculator* m_CatheterCalculator ;
+
   }; // end of class
+
+
+
+
+  //-----------------------------------------------------------------------------
+  // CatheterCalculator
+  // Helper class which calculates catheter position per step
+  //-----------------------------------------------------------------------------
+  template< class TInputMesh, class TOutputMesh >
+  class vtkMEDDeformableSimplexMeshFilter<TInputMesh, TOutputMesh > 
+    ::CatheterCalculator
+  {
+  public:
+    /// Constructor
+    CatheterCalculator() : m_StartPos(0.0), m_Speed(1.0), m_PauseType(PAUSE_NONE), m_CenterLine(NULL) {}
+
+    /// Set start position of catheter
+    void SetStartPos(double pos) {m_StartPos = pos;}
+
+    /// Set speed of catheter withdrawal in mm/step
+    void SetSpeed(double speed) {m_Speed = speed ;}
+
+    /// Set no pause
+    void SetPauseToNone() {m_PauseType = PAUSE_NONE ;}
+
+    /// Set pause of length len at position start + p
+    void SetPauseAtPosition(double p, double len) ;
+
+    /// Set pause of length len at time t
+    void SetPauseAtTime(double t, double len) ;
+
+    /// Calculate position at time t
+    double CalculatePosition(double t) const ;
+
+    /// Set center line
+    void SetCenterLine(vtkPolyData* centerLine) ;
+
+    /// Get position of vertex along center line. \n
+    /// If the index is outside the range, the position is extrapolated.
+    double GetVertexPosition(int idx) const ;
+
+    /// Is center line vertex still inside the catheter at time t.
+    bool IsVertexInsideCatheter(int idx, double t) const ;
+
+    /// Get index of first vertex which is still inside the catheter at time t. \n
+    /// ie return the vertex which corresponds to the catheter position. \n
+    /// Returns number larger than range if none found.
+    int GetFirstVertexInsideCatheter(double t) const ;
+
+    /// Create truncated center line, ie the part which is inside the catheter \n
+    /// at time t, and which generates the catheter polydata. \n
+    /// Returns true if successful.
+    bool CreateTruncatedCenterLine(vtkPolyData* truncLine, double t) const ;
+
+    /// Create subset of center line between vertices idFirst and idLast inclusive. \n
+    /// Static utility which does not require any parameters set. \n
+    /// Returns true if successful.
+    bool static CreateTruncatedCenterLine(vtkPolyData* inputLine, vtkPolyData* truncLine, int idFirst, int idLast) ;
+
+  private:
+    double m_StartPos ;
+    double m_Speed ;
+
+    enum{
+      PAUSE_NONE = 0,
+      PAUSE_AT_POSITION,
+      PAUSE_AT_TIME
+    };
+
+    int m_PauseType ;
+    double m_PauseLength ;
+    double m_PauseAtPosition ; // pause position relative to start
+    double m_PauseAtTime ;
+
+    vtkPolyData* m_CenterLine ;
+    std::vector<double> m_VertexPositions ;  // cache distances of vertices along center line
+  } ;
+
+
 } // namespace itk
 
+
+
+
+
+
+
 #include "vtkMEDDeformableSimplexMeshFilter.txx"
+
+
 
 #endif

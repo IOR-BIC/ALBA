@@ -22,31 +22,29 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafVME.h"
 #include "mafEvent.h"
 #include "mafGuiDialog.h"
-#include "mafGuiButton.h"
+#include "mafGUIFloatSlider.h"
 #include "mmaMaterial.h"
 #include "mafVMEOutputSurface.h"
 #include "mafVMEOutputPolyline.h"
+#include "mafRWI.h"
 
 #include "vtkMEDStentModelSource.h"
 #include "vtkMEDDeformableSimplexMeshFilter.h"
+#include "medVMEStentDeploymentVisualPipe.h"
 
 #include "vtkPolyData.h"
 #include "vtkAppendPolyData.h"
 #include "vtkTubeFilter.h"
+#include "vtkTriangleFilter.h"
 #include "vtkCellArray.h"
 #include "vtkPoints.h"
 
 #include <vector>
 
 
-/**----------------------------------------------------------------------------*/
-// forward declarations :
-/**----------------------------------------------------------------------------*/
 
 
-/**----------------------------------------------------------------------------*/
-//--------typedef----------
-/**----------------------------------------------------------------------------*/
+//--------typedefs----------
 typedef itk::DefaultDynamicMeshTraits<double, 3, 3, double, double> MeshTraits;
 typedef itk::SimplexMesh<double,3,MeshTraits>           SimplexMeshType;
 typedef SimplexMeshType::NeighborListType               NeighborsListType;
@@ -56,23 +54,22 @@ typedef vtkMEDStentModelSource::Strut                         Strut;
 typedef vtkMEDStentModelSource::StentConfigurationType        enumStCfgType;
 typedef vtkMEDStentModelSource::LinkConnectionType            enumLinkConType;
 typedef vtkMEDStentModelSource::LinkOrientationType           enumLinkOrtType;
-
 typedef vector<Strut>::const_iterator    StrutIterator;
+
 
 //-----------------------------------------------------------------------------
 /// medVMEStent. \n
-/// This class creates a stent based on some basic parameters. \n 
-/// The stent can be positioned along a centerline and deployed (expanded) \n
-/// onto the constraint surface of the surrounding blood vessel.
-/// The deployment is not visualised live - the stent positions are recorded \n
-/// during the deformation.  The visualisation is reconstructed afterwards, \n
-/// invoked and controlled by the dialog slider.
+/// This class describes a stent based on some basic parameters. \n
+/// The stent is associated with an "active vessel" surface a, center line \n
+/// and a catheter sheath.  Deformation consists of withdrawing the sheath \n
+/// and allowing the stent to expand onto the inner surface of the vessel. \n
+/// The deformation is not visualised live - the stent positions are recorded \n
+/// during the deformation, and an animated visualisation is reconstructed \n
+/// afterwards, controlled by a slider.
 //
 // The stent deformation is performed by DoDeformation3() and 
 // PreComputerStentPointsBySteps(), using vtkMEDDeformableSimplexMeshFilter.
-// Deployment visualisation is controlled by the dialog slider.
-// The slider invokes the VME method SetTimeStamp() which calculates the visualisation,
-// including the position of the catheter sheath.
+// An ITK simplex mesh acts as a control mesh.
 //-----------------------------------------------------------------------------
 class MED_VME_EXPORT medVMEStent : public mafVME
 {
@@ -87,10 +84,10 @@ public:
   /// Set the time for this VME. \n
   /// It also updates the VTK representation. \n
   /// Overrides base class method, and invoked by dialog slider.
-  void SetTimeStamp(mafTimeStamp t);
+  //void SetTimeStamp(mafTimeStamp t);
 
   /************************************************************************/
-  /* The mesh deformation is constrained by internal forces. The internal force can be scaled via SetAlpha (typical values are 0.01 < alpha < 0.3). 
+  /* The mesh deformation is constrainted by internal forces. The internal force can be scaled via SetAlpha (typical values are 0.01 < alpha < 0.3). 
   * The external force is derived from the image one wants to delineate. Therefore an image of type GradientImageType needs to be set by calling SetGradientImage(...). The external forces are scaled via SetBeta (typical values are 0.01 < beta < 1). One still needs to play around with these values.
 
   * To control the smoothness of the mesh a rigidity parameter can be adjusted. Low values (1 or 0) allow areas with high curvature. Higher values (around 7 or 8) will make the mesh smoother.
@@ -105,12 +102,14 @@ public:
 
   void DisplayStentExpand( int steps );
 
+  /// Set stent points to current and update
   void ResetStentPoints( vtkPoints* currentPoints );
 
-  /// expand stent and move catheter
-  void DisplayStentExpandByStep(mafTimeStamp t);
+  /// Display stent and catheter for given step
+  void DisplayStentExpandByStep(int step);
 
-  void DisplayCatheter();
+  /// Add or remove catheter display
+  void ToggleDisplayCatheter();
 
 
   //---------------------------Setter-/-Getter------------------------------------  
@@ -127,16 +126,16 @@ public:
   virtual mafString GetVisualPipe() {return mafString("mafPipePolyline");};
   mafVMEOutputPolyline *GetPolylineOutput(); //return the right type of output 
 
-  // vtkPolyData *GetPolyData(){InternalUpdate();return m_PolyData;};
+  // vtkPolyData *GetPolyData(){InternalUpdate();return m_StentPolyData;};
   /** the append polydata */
-  vtkPolyData *GetPolyData();//{ InternalUpdate();return  m_PolyData;};// m_AppendPolyData->GetOutput(); };
+  vtkPolyData *GetPolyData();//{ InternalUpdate();return  m_StentPolyData;};// m_AppendPolyData->GetOutput(); };
 
   /** Get the vtkPolyData generated from the model */
-  //vtkPolyData  *GetVtkPolyData(){InternalUpdate();return m_PolyData;};
+  //vtkPolyData  *GetVtkPolyData(){InternalUpdate();return m_StentPolyData;};
 
   /**
   Return the list of timestamps for this VME. Timestamps list is 
-  obtained merging timestamps for matrixes and VME items*/
+  obtained merging timestamps for matrices and VME items*/
   virtual void GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes);
 
   /** return always false since (currently) the slicer is not an animated VME (position 
@@ -154,11 +153,11 @@ public:
   /** Precess events coming from other objects */ 
   virtual void OnEvent(mafEventBase *maf_event);
 
-  void SetAndKeepConstrainSurface( mafNode *node );
+  void SetAndKeepConstraintSurface( mafNode *node );
 
   void SetAndKeepCenterLine( mafNode *node );
 
-  //void SetAndKeepConstrainSurface( mafVME *vme );
+  //void SetAndKeepConstraintSurface( mafVME *vme );
 
   //void SetAndKeepCenterLine( mafVME *vme );
 
@@ -170,12 +169,12 @@ public:
   virtual void SetMatrix(const mafMatrix &mat);
 
   /**
-  select center line or constrain surface 
+  select center line or constraint surface 
   */
   void SetStentLink(const char *link_name, mafNode *ns);
   //------set properties-----------
   void SetCenterLine(vtkPolyData *line);
-  void SetConstrainSurface(vtkPolyData *surface);
+  void SetConstraintSurface(vtkPolyData *surface);
 
   void SetStentDiameter(double diameter){m_Stent_Diameter = diameter;}
   void SetStentCrownLength(double crownL){m_Crown_Length = crownL;}
@@ -188,8 +187,8 @@ public:
   void SetStentCrownNumber(int crownNumber){m_Crown_Number = crownNumber; }
 
   //------get properties-----------
-  vtkPolyData* GetCenterLine(){return m_Centerline;};
-  vtkPolyData* GetConstrainSurface(){return m_ConstrainSurface;};
+  vtkPolyData* GetCenterLine(){return m_VesselCenterLine;};
+  vtkPolyData* GetConstraintSurface(){return m_ConstraintSurface;};
 
   double GetStentDiameter(){ return m_Stent_Diameter;}
   double GetStentCrownLength(){ return m_Crown_Length;}
@@ -209,8 +208,7 @@ protected:
   enum STENT_WIDGET_ID
   {
     ID = MINID,
-    CHANGE_VALUE,
-    CHANGE_VALUE_CROWN,
+    CHANGED_STENT_PARAM,
     STENT_DIAMETER,
     CROWN_LENGTH,
     STRUT_ANGLE,
@@ -222,7 +220,7 @@ protected:
     LINK_ALIGNMENT,
     LINK_ORIENTATION,
     ID_CENTERLINE,
-    ID_CONSTRAIN_SURFACE,
+    ID_CONSTRAINT_SURFACE,
     ID_DEFORMATION,
     ID_DEFORMATION_PARAMETERS,
     ID_DEF_PARAMS_RESTORE,
@@ -237,7 +235,23 @@ protected:
     ID_DEF_PARAMS_EPSILON,
     ID_DEF_PARAMS_ITS_PER_STEP,
     ID_DEF_PARAMS_STEPS,
-    CHANGE_VIEW,
+    ID_DEF_PARAMS_CATHETER_SPEED,
+    ID_DEF_PARAMS_PAUSE_CHKBOX,
+    ID_DEF_PARAMS_PAUSE_POSITION,
+    ID_DEF_PARAMS_PAUSE_DURATION,
+    DISPLAY_CATHETER,
+    DEPLOYMENT_MODE_POSITION,
+    DEPLOYMENT_MODE_DEFORM,
+    ID_DEPLOY_CTRL_SLIDER,
+    ID_DEPLOY_CTRL_TXT,
+    ID_DEPLOY_CTRL_DEC1,
+    ID_DEPLOY_CTRL_INC1,
+    ID_DEPLOY_SHOW_VESSEL_CHKBOX,
+    ID_DEPLOY_SHOW_CENTERLINE_CHKBOX,
+    ID_DEPLOY_SHOW_CATHETER_CHKBOX,
+    ID_DEPLOY_SHOW_STENT_CHKBOX,
+    ID_DEPLOY_CTRL_OK,
+    ID_DEPLOY_CTRL_CANCEL,
     ID_LAST
   };
 
@@ -248,13 +262,15 @@ protected:
 
   /** called to prepare the update of the output */
   virtual void InternalPreUpdate();
-  /** update the output data structure */
+
+  /// Create polydata stent from current parameters and update
   virtual void InternalUpdate();
-  /** do deformation under the constrain of constrain surface */
+
+  /** do deformation under the constraint of constraint surface */
   //void DoDeformation(int type);
-  /** do deformation under the constrain of constrain surface */
+  /** do deformation under the constraint of constraint surface */
   //void DoDeformation2(int type);
-  /** do deformation under the constrain of constrain surface */
+  /** do deformation under the constraint of constraint surface */
 
 
   /** to update data and view after each deformation */
@@ -266,40 +282,15 @@ protected:
   void CreateDefParamsDialog() ; ///< Create deformation parameters dialog
   void DeleteDefParamsDialog() ; ///< Delete deformation parameters dialog
 
-  mafTransform *m_Transform; 
-
-  //vtkPolyData *m_CenterlineModify;//sheathVTK
-  /**----------- parameters -----------*/
-  double m_StentRadius;
-  /**----------- stent parameters-----------*/
-
-  /** basic stent  */
-  double m_Stent_Diameter;
-  double m_Crown_Length;
-  int m_Crown_Number;
-  double m_Strut_Angle;
-  double m_Strut_Thickness;
-  int m_Id_Stent_Configuration;
-
-  /**  stent link  */
-  int m_Id_Link_Connection;
-  double m_Link_Length;
-  int m_Link_Alignment;
-  int m_Link_orientation;  
-
-  /**----------- center line and constrain surface-----------*/
-  vtkPolyData  *m_Centerline; 
-  vtkPolyData  *m_ConstrainSurface;
-  mafString m_CenterLineName;
-  mafString m_ConstrainSurfaceName;
-  vtkPolyData *m_TestVesselPolyData;
+  void CreateDeployCtrlDialog() ; ///< Create deployment control dialog
+  void DeleteDeployCtrlDialog() ; ///< Delete deployment control dialog
+  void UpdateDeploymentSliderRange() ; ///< Update range of slider
+  void ClampSliderPos() ; ///< clamp position to range of slider
 
 private:
-  vtkPolyData* CreateAConstrainSurface();
+  void CreateCatheter(vtkPolyData  *centerLine); ///< Create the catheter
+  void MoveCatheter(int step); ///< Move the catheter
 
-  /// move catheter so that stent can expand
-  void moveCatheter(mafTimeStamp currentIter);
-  void createCatheter(vtkPolyData  *centerLine);
   void createTestVesselPolydata(vtkPolyData  *centerLine);
   void expandStent(int numberOfCycle);
 
@@ -317,22 +308,48 @@ private:
   /// Store stent position at each step for later display.
   void PreComputeStentPointsBySteps(int steps);
 
-  double m_StrutLength;
-  vtkPolyData *m_StentPolyLine;  
+  /// Find the tagged center line vme. \n
+  /// Returns NULL if failed.
+  mafNode* FindTaggedCenterLineVME(mafNode* inputNode) ;
+
+  /// Find the tagged constraintt surface vme. \n
+  /// Returns NULL if failed.
+  mafNode* FindTaggedVesselVME(mafNode* inputNode) ;
+
+  mafTransform *m_Transform; // Nigel: do we need this?
+
+
+  // basic stent parameters */
+  double m_Stent_Radius;
+  double m_Stent_Diameter;
+  double m_Crown_Length;
+  int m_Crown_Number;
+  double m_Strut_Angle;
+  double m_Strut_Thickness;
+  int m_Id_Stent_Configuration;
+  double m_StrutLength; // one length for all struts - may not work for all designs
+  int m_Id_Link_Connection;
+  double m_Link_Length;
+  int m_Link_Alignment;
+  int m_Link_orientation;  
+
+  // vessel
+  vtkPolyData *m_VesselCenterLine ;
+  vtkPolyData *m_ConstraintSurface;
+  vtkPolyData *m_TestVesselPolyData;
+  mafString m_VesselCenterLineName;
+  mafString m_ConstraintSurfaceName;
+ 
+  // stent
+  vtkPolyData *m_StentPolyData;
+  vtkPolyData *m_StentCenterLine ;
   vector<double> m_StentCenterLineSerial;
-  vector<vector<double>> m_StentCenterLine;
-  vector<vector<double>>::const_iterator m_CenterLineStart; //could be remove
-  vector<vector<double>>::const_iterator m_CenterLineEnd;  //could be remove
+  int m_StentStartPosId ; // init position - id along vessel center line
 
-  /** three output in append polydata*/
-  vtkPolyData  *m_PolyData;
-  vtkPolyData  *m_CatheterPolyData;
+  // collected visual output
+  vtkAppendPolyData *m_AppendPolyData; // collects components into one polydata for view
+  vtkPolyData *m_AppendPolys; // pointer to append output
 
-  vtkAppendPolyData *m_AppendPolyData;
-  /** the output of this vme */
-  vtkPolyData *m_AppendPolys;
-
-  vtkPolyData *m_SheathVTK;
   /** used to create stent */
   //vtkMEDStentModelSource m_StentSource;
 
@@ -349,9 +366,10 @@ private:
   vector<int> m_centerLocation;
 
   /*-------for store vme------*/
-  vector<int> m_VmeLinkedList; //a list of VME ID , centerline first then surface
+  vector<int> m_VmeIdList; //a list of VME ID , centerline first then surface
 
-  int m_CenterLineSetFlag,m_ConstrainSurfaceSetFlag; 
+  int m_VesselCenterLineSetFlag ;
+  int m_ConstraintSurfaceSetFlag; 
   int m_ComputedCrownNumber;
 
   vector<vtkPoints*> m_ItPointsContainer; // store points at each step 
@@ -360,14 +378,28 @@ private:
   //-------for test
   int m_numberOfCycle;
 
+
+
+  //-------------------------------------------------
+  // Catheter
+  //-------------------------------------------------
+  vtkPolyData* m_CatheterCenterLine ; // center line about which catheter is generated
+  vtkTubeFilter* m_CatheterTubeFilter ;
+  vtkPolyData* m_CatheterPolyData ;  // just ptr to m_CatheterTubeFilter->GetOutput()
+
+
+  //-------------------------------------------------
+  // Deformation filter
+  //-------------------------------------------------
   typedef itk::vtkMEDDeformableSimplexMeshFilter<SimplexMeshType,SimplexMeshType> DeformFilterType;
   DeformFilterType::Pointer m_DeformFilter;
 
 
-  //-----------------------------------
-  // Dialog and variable for deformation parameters
-  //-----------------------------------
+  //-------------------------------------------------
+  // Dialog and variables for deformation parameters
+  //-------------------------------------------------
   mafGUIDialog *m_DefParamsDlg ; // dialog for deformation params
+  wxCheckBox *m_PauseChkBox ;    // check box for catheter pause
 
   double m_Alpha ; // internal force weight
   double m_Beta ;  // external for weight
@@ -377,6 +409,10 @@ private:
   double m_Epsilon ; // distance scale for calculating force attracting stent to vessel 
   int m_IterationsPerStep ; // no. of iterations per step (ie per execution of filter)
   int m_NumberOfSteps ; // total no. of iterations
+  double m_CatheterSpeed ;
+  int m_CatheterPauseOn ;
+  double m_CatheterPausePosition ;
+  double m_CatheterPauseDuration ;
   double m_Alpha_Saved ;
   double m_Beta_Saved ;
   double m_Gamma_Saved ;
@@ -385,6 +421,10 @@ private:
   double m_Epsilon_Saved ;
   int m_IterationsPerStep_Saved ;
   int m_NumberOfSteps_Saved ; 
+  double m_CatheterSpeed_Saved ;
+  int m_CatheterPauseOn_Saved ;
+  double m_CatheterPausePosition_Saved ;
+  double m_CatheterPauseDuration_Saved ;
   const double m_Alpha_Default ;
   const double m_Beta_Default ;
   const double m_Gamma_Default ;
@@ -393,5 +433,30 @@ private:
   const double m_Epsilon_Default ;
   const int m_IterationsPerStep_Default ;
   const int m_NumberOfSteps_Default ; 
+  const double m_CatheterSpeed_Default ;
+  const int m_CatheterPauseOn_Default ;
+  const double m_CatheterPausePosition_Default ;
+  const double m_CatheterPauseDuration_Default ;
+
+
+  //-------------------------------------------------
+  // Dialog and variables for deployment control
+  //-------------------------------------------------
+  mafGUIDialog *m_DeployCtrlDlg ; // dialog for deployment control
+  mafRWI* m_DeployRwi ; // render window
+  mafGUIFloatSlider *m_DeploymentSlider ; // slider to control deployment (position and deformation)
+  double m_SliderPos ;
+  int m_DeploymentMode ;  // slider used for positioning or deforming
+  wxCheckBox *m_ShowVesselChkBox ;      
+  wxCheckBox *m_ShowCenterLineChkBox ;  
+  wxCheckBox *m_ShowCatheterChkBox ;    
+  wxCheckBox *m_ShowStentChkBox ;
+  int m_DeployDlg_ShowVessel ;
+  int m_DeployDlg_ShowCenterLine ;
+  int m_DeployDlg_ShowCatheter ;
+  int m_DeployDlg_ShowStent ;
+
+  medVMEStentDeploymentVisualPipe* m_DeploymentVisualPipe ;
+
 };
 #endif

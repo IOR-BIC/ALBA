@@ -24,10 +24,12 @@ namespace itk
   template< typename TInputMesh, typename TOutputMesh >
   vtkMEDDeformableSimplexMeshFilter< TInputMesh, TOutputMesh >
     ::vtkMEDDeformableSimplexMeshFilter()
-    : m_Epsilon(0.3), m_StrutNeighbours(NULL)
+    : m_Epsilon(0.3), m_StrutNeighbors(NULL)
   {
     m_DistanceCoefficient = 1;
-    m_CurIterationNum = 0;
+    m_CurrentStepNum = 0;
+
+    m_CatheterCalculator = new CatheterCalculator ;
   }
 
 
@@ -39,15 +41,17 @@ namespace itk
   vtkMEDDeformableSimplexMeshFilter< TInputMesh, TOutputMesh >
     ::~vtkMEDDeformableSimplexMeshFilter()
   {
-    if (m_StrutNeighbours != NULL)
-      delete[] m_StrutNeighbours;
+    if (m_StrutNeighbors != NULL)
+      delete[] m_StrutNeighbors;
+
+    delete m_CatheterCalculator ;
   }
 
 
 
   //----------------------------------------------------------------------------
   // The difference from SetStrutLinkIter is parameter
-  // setting m_StrutNeighbours: [0],[1] strut neighbor; [2] link neighbor
+  // setting m_StrutNeighbors: [0],[1] strut neighbor; [2] link neighbor
   // record for every simplex vertex
   // prepare for calculating strut&link length force
   // if the value equals -1, means not applicable
@@ -63,11 +67,11 @@ namespace itk
   {
       //initialization
       int VertexNumber = this->GetInput(0)->GetPoints()->size();
-      m_StrutNeighbours = new int[VertexNumber][3];
+      m_StrutNeighbors = new int[VertexNumber][3];
       for(int i=0;i<VertexNumber;i++){
-        m_StrutNeighbours[i][0] = -1;
-        m_StrutNeighbours[i][1] = -1;
-        m_StrutNeighbours[i][2] = -1;
+        m_StrutNeighbors[i][0] = -1;
+        m_StrutNeighbors[i][1] = -1;
+        m_StrutNeighbors[i][2] = -1;
       }
 
 
@@ -86,17 +90,17 @@ namespace itk
 
         start = pts[0];
         end = pts[1];
-        if(m_StrutNeighbours[start][0] == -1)
-          m_StrutNeighbours[start][0] = end;
+        if(m_StrutNeighbors[start][0] == -1)
+          m_StrutNeighbors[start][0] = end;
         else 
-          if(m_StrutNeighbours[start][0]!= end && m_StrutNeighbours[start][1] == -1)
-            m_StrutNeighbours[start][1] = end;
+          if(m_StrutNeighbors[start][0]!= end && m_StrutNeighbors[start][1] == -1)
+            m_StrutNeighbors[start][1] = end;
 
-        if(m_StrutNeighbours[end][0] == -1)
-          m_StrutNeighbours[end][0] = start;
+        if(m_StrutNeighbors[end][0] == -1)
+          m_StrutNeighbors[end][0] = start;
         else 
-          if(m_StrutNeighbours[end][0]!= start && m_StrutNeighbours[end][1] == -1)
-            m_StrutNeighbours[end][1] = start;
+          if(m_StrutNeighbors[end][0]!= start && m_StrutNeighbors[end][1] == -1)
+            m_StrutNeighbors[end][1] = start;
 
       }
       /*loop link next*/
@@ -105,10 +109,10 @@ namespace itk
         start = pts[0];
         end = pts[1];
 
-        if(m_StrutNeighbours[start][2] == -1)
-          m_StrutNeighbours[start][2] = end;
-        if(m_StrutNeighbours[end][2] == -1)
-          m_StrutNeighbours[end][2] = start;		
+        if(m_StrutNeighbors[start][2] == -1)
+          m_StrutNeighbors[start][2] = end;
+        if(m_StrutNeighbors[end][2] == -1)
+          m_StrutNeighbors[end][2] = start;		
       }
 
   }
@@ -116,7 +120,7 @@ namespace itk
 
 
   //----------------------------------------------------------------------------
-  // setting m_StrutNeighbours: [0],[1] strut neighbor; [2] link neighbor
+  // setting m_StrutNeighbors: [0],[1] strut neighbor; [2] link neighbor
   // record for every simplex vertex
   // prepare for calculating strut&link length force
   // if the value equals -1, means not applicable
@@ -133,35 +137,35 @@ namespace itk
   {
       //initialization
       int VertexNumber = this->GetInput(0)->GetPoints()->size();
-      m_StrutNeighbours = new int[VertexNumber][3];
+      m_StrutNeighbors = new int[VertexNumber][3];
       for(int i=0;i<VertexNumber;i++){
-        m_StrutNeighbours[i][0] = -1;
-        m_StrutNeighbours[i][1] = -1;
-        m_StrutNeighbours[i][2] = -1;
+        m_StrutNeighbors[i][0] = -1;
+        m_StrutNeighbors[i][1] = -1;
+        m_StrutNeighbors[i][2] = -1;
       }
 
       // set strut neighbor: [0] & [1]
       for(StrutIterator iter = StrutStart; iter !=StrutEnd; iter++){
-        if(m_StrutNeighbours[iter->startVertex][0] == -1)
-          m_StrutNeighbours[iter->startVertex][0] = iter->endVertex;
+        if(m_StrutNeighbors[iter->startVertex][0] == -1)
+          m_StrutNeighbors[iter->startVertex][0] = iter->endVertex;
         else 
-          if(m_StrutNeighbours[iter->startVertex][0]!= iter->endVertex
-            &&m_StrutNeighbours[iter->startVertex][1] == -1)
-            m_StrutNeighbours[iter->startVertex][1] = iter->endVertex;
+          if(m_StrutNeighbors[iter->startVertex][0]!= iter->endVertex
+            &&m_StrutNeighbors[iter->startVertex][1] == -1)
+            m_StrutNeighbors[iter->startVertex][1] = iter->endVertex;
 
-        if(m_StrutNeighbours[iter->endVertex][0] == -1)
-          m_StrutNeighbours[iter->endVertex][0] = iter->startVertex;
+        if(m_StrutNeighbors[iter->endVertex][0] == -1)
+          m_StrutNeighbors[iter->endVertex][0] = iter->startVertex;
         else 
-          if(m_StrutNeighbours[iter->endVertex][0]!= iter->startVertex
-            &&m_StrutNeighbours[iter->endVertex][1] == -1)
-            m_StrutNeighbours[iter->endVertex][1] = iter->startVertex;
+          if(m_StrutNeighbors[iter->endVertex][0]!= iter->startVertex
+            &&m_StrutNeighbors[iter->endVertex][1] == -1)
+            m_StrutNeighbors[iter->endVertex][1] = iter->startVertex;
       }
       // set link neighbor: [2]
       for(StrutIterator iter = LinkStart; iter !=LinkEnd; iter++){
-        if(m_StrutNeighbours[iter->startVertex][2] == -1)
-          m_StrutNeighbours[iter->startVertex][2] = iter->endVertex;
-        if(m_StrutNeighbours[iter->endVertex][2] == -1)
-          m_StrutNeighbours[iter->endVertex][2] = iter->startVertex;
+        if(m_StrutNeighbors[iter->startVertex][2] == -1)
+          m_StrutNeighbors[iter->startVertex][2] = iter->endVertex;
+        if(m_StrutNeighbors[iter->endVertex][2] == -1)
+          m_StrutNeighbors[iter->endVertex][2] = iter->startVertex;
       } 
   }
 
@@ -208,7 +212,7 @@ namespace itk
   {
     int rtnFlag = 1;//inside
     //----to have a test-
-    double outPoint[3];
+    //double outPoint[3];
     //double aPoint[3];
     //m_SurfacePoly->GetPoint(0,aPoint); X                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
     vtkIdType surPointIndex = m_SurfacePoly->FindPoint(surfacePoint);
@@ -217,7 +221,8 @@ namespace itk
     m_SurfacePoly->GetPointCells (surPointIndex, apCellIds);
     vtkIdType cellNumber = apCellIds->GetNumberOfIds();
 
-    vtkIdType cellId,pointId1,pointId2;
+    //vtkIdType pointId1, pointId2 ;
+    vtkIdType cellId ;
     vtkCell *aCell;
     vtkIdType pointNumber ;
     double flag; //flag>0 in surface or <0 outside
@@ -360,58 +365,54 @@ namespace itk
     // There is a design flaw here.
     InputPointsContainer *nonConstPoints = const_cast< InputPointsContainer * >( inputMesh->GetPoints() );
 
-    typename GeometryMapType::Iterator dataIt = this->m_Data->Begin();
-
     SimplexMeshGeometry *data;
     VectorType displacement;
 
-    int i = 0;
     double pt[3]; //point on surface
     double pos[3];
     VectorType StrutLengthForce;
     VectorType LinkLengthForce;
     kdres *nearestPointSet;
-    vector<int>::const_iterator centerIdx = m_CenterLocationIdx;
-    int catheterConstraint = 1;
     m_IsDataChanged = 0;
 
     //-------------timer--------
     (void) time(&t1);
     //-------------timer--------
 
-    // Loop for every simplex vertex
-    while ( dataIt != this->m_Data->End() )
-    {
+
+    //--------------------------------------------------------------------------
+    // Determine for each vertex whether it is constrained by the catheter.
+    // Constrained vertices are those inside the catether and their neighbors.
+    //--------------------------------------------------------------------------
+    int constrained[10000] ;
+    vector<int>::const_iterator centerIdx = m_CenterLocationIdx ;
+    GeometryMapType::Iterator dataIt ;
+    int i ;
+    for (dataIt = m_Data->Begin(), centerIdx = m_CenterLocationIdx, i = 0 ;  dataIt != m_Data->End() ;  dataIt++, centerIdx++, i++){
       data = dataIt.Value();
 
-      /*Synchronize the catheter's pulling over with the expansion of a certain circle of simplex vertices
-      *centerIdx indicates the centerline position of the current vertex
-      *(*centerIdx)*x > m_CurIterationNum
-      * here the x should be set as the same as the catheter's pulling speed
-      * the speed we use is after x iteration the catheter's start position is located on the next center point
-      *
-      * ((*centerIdx)*x + y )< m_CurIterationNum)
-      * here the number means for a vertex, 
-      * a total of y iterations will be carried out on it since it start to expansion
-      * as it is a progressive expansion, 
-      * vertice on one side will reach the vessel wall far earlier that another side
-      *
-      * choose your own x and y parameters here
-      */
+      // Create table showing whether vertices are constrained by catheter
+      if (m_CatheterCalculator->IsVertexInsideCatheter(*centerIdx, m_CurrentStepNum)){
+        // constrain point and its neighbors
+        constrained[i] = 1 ;
+        for (int j = 0 ;  j < 3 ;  j++){
+          int id = m_StrutNeighbors[i][j] ;
+          if (id > 0)
+            constrained[id] = 1 ;
+        }
+      }      
+      else
+        constrained[i] = 0 ;
+    }
 
 
-      if (((*centerIdx)*2+10000)< m_CurIterationNum){
-        dataIt++;
-        centerIdx++;
-        continue;
-      }
+    //--------------------------------------------------------------------------
+    // Loop for every simplex vertex
+    //--------------------------------------------------------------------------
+    for (dataIt = m_Data->Begin(), centerIdx = m_CenterLocationIdx, i = 0 ;  dataIt != m_Data->End() ;  dataIt++, centerIdx++, i++){
+      data = dataIt.Value();
 
-      if((*centerIdx)*2 > m_CurIterationNum ){
-        catheterConstraint = 0;
-      }
-      else{
-        catheterConstraint = 1;
-      }	
+      int constraintFlag = constrained[i] ? 0 : 1 ;  // 0 if contrained, else 1
 
       //compute internal,external and length force
       this->ComputeInternalForce(data);
@@ -448,16 +449,15 @@ namespace itk
         +  m_DistanceCoefficient * (data->externalForce).Get_vnl_vector() 
         +  StrutLengthForce.Get_vnl_vector());
       //+  LinkLengthForce.Get_vnl_vector());
-      changeFlag = inFlag*catheterConstraint*m_DistanceCoefficient;
+
+      changeFlag = inFlag*constraintFlag*m_DistanceCoefficient;
       if(changeFlag){
-        m_IsDataChanged ++;
+        m_IsDataChanged++;
         data->pos +=  changeFlag * displacement;
       }
       nonConstPoints->InsertElement(dataIt.Index(), data->pos);
 
-      dataIt++;
-      centerIdx++;
-    }//end of while
+    }//end of loop over vertices
     //-------------timer--------
     (void) time(&t2);
     //-------------timer--------
@@ -496,8 +496,8 @@ namespace itk
 
       int n = 0;
       //m_StrutLength is the reference length of the strut
-      if(m_StrutNeighbours[index][0] != -1 ) { //&& m_StrutNeighbours[index][0] < index ){ //!= -1){
-        neighbor = this->m_Data->GetElement(m_StrutNeighbours[index][0])->pos;
+      if(m_StrutNeighbors[index][0] != -1 ) { //&& m_StrutNeighbors[index][0] < index ){ //!= -1){
+        neighbor = this->m_Data->GetElement(m_StrutNeighbors[index][0])->pos;
         curLength= sqrt((data->pos[0]-neighbor[0])*(data->pos[0]-neighbor[0])
           +(data->pos[1]-neighbor[1])*(data->pos[1]-neighbor[1])
           +(data->pos[2]-neighbor[2])*(data->pos[2]-neighbor[2]));
@@ -507,8 +507,8 @@ namespace itk
         n++;
       }
 
-      if(m_StrutNeighbours[index][1] != -1 ) { //&& m_StrutNeighbours[index][1] < index ) { //!= -1){
-        neighbor = this->m_Data->GetElement(m_StrutNeighbours[index][1])->pos;
+      if(m_StrutNeighbors[index][1] != -1 ) { //&& m_StrutNeighbors[index][1] < index ) { //!= -1){
+        neighbor = this->m_Data->GetElement(m_StrutNeighbors[index][1])->pos;
         curLength= sqrt((data->pos[0]-neighbor[0])*(data->pos[0]-neighbor[0])
           +(data->pos[1]-neighbor[1])*(data->pos[1]-neighbor[1])
           +(data->pos[2]-neighbor[2])*(data->pos[2]-neighbor[2]));
@@ -540,9 +540,9 @@ namespace itk
     lengthForce.Fill(0);
     PointType neighbor;
     double curLength;
-    //if(m_StrutNeighbours[index][2] != -1 && m_StrutNeighbours[index][2] < index ) {
-    if(m_StrutNeighbours[index][2] != -1 ) {
-      neighbor = this->m_Data->GetElement(m_StrutNeighbours[index][2])->pos;
+    //if(m_StrutNeighbors[index][2] != -1 && m_StrutNeighbors[index][2] < index ) {
+    if(m_StrutNeighbors[index][2] != -1 ) {
+      neighbor = this->m_Data->GetElement(m_StrutNeighbors[index][2])->pos;
       curLength= sqrt((data->pos[0]-neighbor[0])*(data->pos[0]-neighbor[0])
         +(data->pos[1]-neighbor[1])*(data->pos[1]-neighbor[1])
         +(data->pos[2]-neighbor[2])*(data->pos[2]-neighbor[2]));
@@ -552,6 +552,226 @@ namespace itk
     }
     return lengthForce;
   }
-}
+
+
+  //----------------------------------------------------------------------------
+  // Catheter calculator:
+  // Set pause at position
+  //----------------------------------------------------------------------------
+  template< typename TInputMesh, typename TOutputMesh >
+  void vtkMEDDeformableSimplexMeshFilter<TInputMesh, TOutputMesh >::
+    CatheterCalculator::SetPauseAtPosition(double p, double len)
+  {
+    m_PauseType = PAUSE_AT_POSITION;
+    m_PauseLength = len ;  
+    m_PauseAtPosition = p;
+    m_PauseAtTime = p / m_Speed ;
+  }
+ 
+
+  //----------------------------------------------------------------------------
+  // Catheter calculator:
+  // Set pause at time
+  //----------------------------------------------------------------------------
+  template< typename TInputMesh, typename TOutputMesh >
+  void vtkMEDDeformableSimplexMeshFilter<TInputMesh, TOutputMesh >::
+    CatheterCalculator::SetPauseAtTime(double t, double len)
+  {
+    m_PauseType = PAUSE_AT_POSITION;
+    m_PauseLength = len ;  
+    m_PauseAtTime = t ;
+    m_PauseAtPosition = m_Speed * t ;
+  }
+ 
+
+  //----------------------------------------------------------------------------
+  // Catheter calculator:
+  // Calculate position at time t
+  //----------------------------------------------------------------------------
+  template< typename TInputMesh, typename TOutputMesh >
+  double vtkMEDDeformableSimplexMeshFilter<TInputMesh, TOutputMesh >::
+    CatheterCalculator::CalculatePosition(double t) const
+  {
+    switch(m_PauseType){
+    case PAUSE_NONE:
+      return m_StartPos + m_Speed * t ;
+      break ;
+    case PAUSE_AT_TIME:
+    case PAUSE_AT_POSITION:
+      if (t < m_PauseAtTime)
+        return m_StartPos + m_Speed * t ;
+      else if (t < m_PauseAtTime + m_PauseLength)
+        return m_StartPos + m_PauseAtPosition ;
+      else
+        return m_StartPos + m_Speed * (t - m_PauseLength) ;
+      break ;
+    default:
+      // can't happen
+      return -10000.0 ;
+    }
+  }
+
+
+  //----------------------------------------------------------------------------
+  // Catheter calculator:
+  // Set the center line and cache the positions of the vertices along the line
+  //----------------------------------------------------------------------------
+  template< typename TInputMesh, typename TOutputMesh >
+  void vtkMEDDeformableSimplexMeshFilter<TInputMesh, TOutputMesh >::
+    CatheterCalculator::SetCenterLine(vtkPolyData* centerLine) 
+  {
+    m_CenterLine = centerLine ;
+
+    m_VertexPositions.clear() ;
+    int n = m_CenterLine->GetPoints()->GetNumberOfPoints() ;
+    for (int i = 0 ;  i < n ;  i++){
+      double xold[3], x[3] ;
+      if (i == 0){
+        m_CenterLine->GetPoint(i,xold) ;
+        m_VertexPositions.push_back(0.0) ;
+      }
+      else{
+        m_CenterLine->GetPoint(i,x) ;
+        double r2 = 0.0 ;
+        for (int j = 0 ;  j < 3 ;  j++){
+          r2 += (x[j]-xold[j])*(x[j]-xold[j]) ;
+          xold[j] = x[j] ;
+        }
+        double dist = m_VertexPositions[i-1] + sqrt(r2) ;
+        m_VertexPositions.push_back(dist) ;       
+      }
+    }
+  }
+
+
+
+  //----------------------------------------------------------------------------
+  // Catheter calculator:
+  // Get position of vertex along center line
+  //----------------------------------------------------------------------------
+  template< typename TInputMesh, typename TOutputMesh >
+  double vtkMEDDeformableSimplexMeshFilter<TInputMesh, TOutputMesh >::
+    CatheterCalculator::GetVertexPosition(int idx) const
+  {
+    int n = m_CenterLine->GetPoints()->GetNumberOfPoints() ;
+
+    if (idx < 0){
+      double dv = m_VertexPositions[0] - m_VertexPositions[1] ;
+      return m_VertexPositions[0] - (double)idx * dv ;
+    }
+    else if (idx >= n){
+      double dv = m_VertexPositions[n-1] - m_VertexPositions[n-2] ;
+      return m_VertexPositions[n-1] + (double)idx * dv ;
+    }
+    else
+      return m_VertexPositions.at(idx) ;
+  }
+
+
+
+  //----------------------------------------------------------------------------
+  // Catheter calculator:
+  // Is center line vertex still inside the catheter at time t.
+  //----------------------------------------------------------------------------
+  template< typename TInputMesh, typename TOutputMesh >
+  bool vtkMEDDeformableSimplexMeshFilter<TInputMesh, TOutputMesh >::
+    CatheterCalculator::IsVertexInsideCatheter(int idx, double t) const
+  {
+    double cathPos = CalculatePosition(t) ;
+    double vertPos = GetVertexPosition(idx) ;
+    return cathPos <= vertPos ;
+  }
+
+
+
+  //----------------------------------------------------------------------------
+  // Catheter calculator:
+  // Get index of first vertex which is still inside the catheter at time t.
+  // ie return the vertex which corresponds to the catheter position.
+  //----------------------------------------------------------------------------
+  template< typename TInputMesh, typename TOutputMesh >
+  int vtkMEDDeformableSimplexMeshFilter<TInputMesh, TOutputMesh >::
+    CatheterCalculator::GetFirstVertexInsideCatheter(double t) const
+  {
+    int n = m_CenterLine->GetPoints()->GetNumberOfPoints() ;
+    for (int i = 0 ;  i < n ;  i++){
+      if (IsVertexInsideCatheter(i,t))
+        return i ;
+    }
+
+    return n+1000 ;
+  }
+
+
+
+
+  //-----------------------------------------------------------------------------
+  // Create truncated center line, ie the part which is
+  // inside the catheter at time t.
+  // Returns true if successful.
+  //-----------------------------------------------------------------------------
+  template< typename TInputMesh, typename TOutputMesh >
+  bool vtkMEDDeformableSimplexMeshFilter<TInputMesh, TOutputMesh >::
+    CatheterCalculator::CreateTruncatedCenterLine(vtkPolyData* truncLine, double t) const 
+  {
+    if (m_CenterLine == NULL)
+      return false ;
+
+    int n = m_CenterLine->GetPoints()->GetNumberOfPoints() ;
+    int istart = GetFirstVertexInsideCatheter(t) ;
+
+    bool ok = CreateTruncatedCenterLine(m_CenterLine, truncLine, istart, n-1) ;
+    return ok ;
+  }
+
+
+
+  //-----------------------------------------------------------------------------
+  // Create subset of center line between vertices idFirst and idLast inclusive.
+  // Static utility which does not require any parameters set.
+  // Returns true if successful.
+  //-----------------------------------------------------------------------------
+  template< typename TInputMesh, typename TOutputMesh >
+  bool vtkMEDDeformableSimplexMeshFilter<TInputMesh, TOutputMesh >::
+    CatheterCalculator::CreateTruncatedCenterLine(vtkPolyData* inputLine, vtkPolyData* truncLine, int idFirst, int idLast)
+  {
+    truncLine->Initialize() ;
+
+    if (inputLine == NULL)
+      return false ;
+
+    int n = inputLine->GetPoints()->GetNumberOfPoints() ;
+    int i0 = std::max(0, idFirst) ;
+    int i1 = std::min(n-1, idLast) ;
+    int m = i1-i0+1 ;
+    if (m < 2)
+      return false ;
+
+    vtkPoints *points = vtkPoints::New() ;
+    vtkCellArray *lines = vtkCellArray::New() ;
+
+    // copy points
+    for (int i = i0 ;  i <= i1 ;  i++){
+      double x[3] ;
+      inputLine->GetPoint(i, x) ;
+      points->InsertNextPoint(x) ;
+    }
+
+    // create polyline cell
+    int *ids = new int[m] ;
+    for (int i = 0 ;  i < m ;  i++)
+      ids[i] = i ;
+    lines->InsertNextCell(m, ids) ;
+    delete [] ids ;
+
+    truncLine->SetPoints(points) ;
+    truncLine->SetLines(lines) ;
+    points->Delete() ;
+    lines->Delete() ;
+
+    return true ;
+  }
+
+} // itk namespace
 
 #endif
