@@ -142,7 +142,12 @@ MENU_SETTINGS_START,
 MENU_SETTINGS_END,
 MENU_HELP_START,
   ABOUT_APPLICATION,
+  HELP_HOME,
 MENU_HELP_END,
+GUI_HELP_START,
+  GET_BUILD_HELP_GUI, // sent from op, views or vme's to know if we are building the help gui in the application
+  OPEN_HELP_PAGE, // sent from an op, a view or a vme to open the corresponding help page
+GUI_HELP_END,
 COLLABORATION_EVENT_BEGIN,
   COLLABORATE_ENABLE,
   SEND_VIEW_LAYOUT,
