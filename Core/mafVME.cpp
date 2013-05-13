@@ -864,6 +864,11 @@ mafGUI *mafVME::CreateGui()
   m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
   m_Gui->SetListener(this);
 
+  mafEvent buildHelpGui;
+  buildHelpGui.SetSender(this);
+  buildHelpGui.SetId(GET_BUILD_HELP_GUI);
+  ForwardUpEvent(buildHelpGui);
+
   mafString anim_text;
   anim_text = _("not animated");
   if (IsAnimated())

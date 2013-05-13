@@ -42,6 +42,7 @@ class mafDeviceButtonsPadMouse;
 class mafGUISettingsDialog;
 class mafGUIApplicationLayoutSettings;
 class mafGUISettings;
+class mafGUISettingsHelp;
 class mafUser;
 
 //----------------------------------------------------------------------------
@@ -289,8 +290,9 @@ protected:
   bool m_UseInteractionManager;
   mafGUISettingsDialog *m_SettingsDialog;
   mafGUIApplicationLayoutSettings *m_ApplicationLayoutSettings;
+  mafGUISettingsHelp *m_HelpSettings;
 
-	mafString m_Revision;
+  mafString m_Revision;
 
   mafUser *m_User; ///< Applications' user
 };
