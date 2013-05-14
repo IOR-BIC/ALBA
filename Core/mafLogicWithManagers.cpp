@@ -1045,7 +1045,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 			break;
 
 			case GET_BUILD_HELP_GUI:
-			{
+			{	
 				int buildGui = -1;
 				buildGui = m_HelpSettings->GetBuildHelpGui();
 				e->SetArg(buildGui);
@@ -1054,7 +1054,9 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 
 			case OPEN_HELP_PAGE:
 			{
-				
+				// open help for entity
+				wxString entity = e->GetString()->GetCStr();
+				m_HelpSettings->OpenHelpPage("mafVMESurface");
 			}
 			break;
 

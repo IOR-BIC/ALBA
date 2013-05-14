@@ -28,11 +28,14 @@
 #include "mafDecl.h"
 #include "mafGUI.h"
 
+#include <iostream>
+#include <fstream>
+
 mafGUISettingsHelp::mafGUISettingsHelp(mafObserver *Listener, const mafString &label):
 mafGUISettings(Listener, label)
 {
   m_BuildHelpGui = false;
-   
+  m_HelpFileName = "UNDEFINED";   
   InitializeSettings();
 }
 
@@ -45,6 +48,9 @@ void mafGUISettingsHelp::CreateGui()
   m_Gui = new mafGUI(this);
   m_Gui->Label(_("Help Settings"));
   m_Gui->Label(_(""));
+  m_Gui->Label(_("Help file name"));
+  m_Gui->String(ID_HELP_FILE_NAME ,_(""),&m_HelpFileName);
+  m_Gui->Label(_(""));
   m_Gui->Label(_("build the help gui"));
   m_Gui->Bool(ID_BUILD_HELP_GUI ,_(""),&m_BuildHelpGui,1);
   m_Gui->Divider(2);
@@ -54,6 +60,7 @@ void mafGUISettingsHelp::CreateGui()
 void mafGUISettingsHelp::EnableItems( bool enable )
 {
   m_Gui->Enable(ID_BUILD_HELP_GUI, enable);
+  m_Gui->Enable(ID_HELP_FILE_NAME, enable);
 }
 
 void mafGUISettingsHelp::OnEvent(mafEventBase *maf_event)
@@ -65,6 +72,12 @@ void mafGUISettingsHelp::OnEvent(mafEventBase *maf_event)
 		m_Config->Write("m_BuildHelpGui",m_BuildHelpGui);
     }
     break;
+
+	case ID_HELP_FILE_NAME:
+	{
+		m_Config->Write("m_HelpFileName",m_HelpFileName);
+	}
+	break;
 
 	default:
       mafEventMacro(*maf_event);
@@ -86,6 +99,47 @@ void mafGUISettingsHelp::InitializeSettings()
   {
     m_Config->Write("m_BuildHelpGui",m_BuildHelpGui);
   }
+
+  wxString stringItem;
+
+  if(m_Config->Read("m_HelpFileName", &stringItem))
+  {
+	  m_HelpFileName = stringItem;
+  }
+  else
+  {
+	  m_Config->Write("m_HelpFileName",m_HelpFileName);
+  }
   
   m_Config->Flush();
+}
+
+void mafGUISettingsHelp::OpenHelpPage( wxString entity )
+{
+	std::string helpFileName = m_HelpFileName;
+	assert(wxFileExists(helpFileName.c_str()));
+	
+	std::ifstream csvFile(helpFileName.c_str());
+	std::string line;
+	while(std::getline(csvFile,line))
+	{
+		std::stringstream  lineStream(line);
+		
+		std::string currentLineEntityName;
+		std::getline(lineStream,currentLineEntityName,',');
+		wxString trimmedCurrentLineEntityName = wxString(currentLineEntityName.c_str()).Trim().Trim(false);
+		
+		std::string currentLineHelpLink;
+		std::getline(lineStream,currentLineHelpLink,',');
+		wxString trimmedCurrentLineHelpLink = wxString(currentLineHelpLink.c_str()).Trim().Trim(false);
+
+		if (entity == trimmedCurrentLineEntityName)
+		{
+			wxLaunchDefaultBrowser(trimmedCurrentLineHelpLink);
+			return;
+		}
+	}
+	
+	wxMessageBox("No help available for this entry");
+	
 }

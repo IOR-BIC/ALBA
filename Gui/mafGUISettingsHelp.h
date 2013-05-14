@@ -35,6 +35,7 @@ public:
   enum HELP_SETTINGS_WIDGET_ID
   {
     ID_BUILD_HELP_GUI = MINID,
+	ID_HELP_FILE_NAME,
   };
 
   /** Answer to the messages coming from interface. */
@@ -46,6 +47,8 @@ public:
   /** Get python.exe interpreter used at runtime*/
   bool GetBuildHelpGui(){return m_BuildHelpGui;};
 
+  void OpenHelpPage( wxString entity );
+
 protected:
   /** Create the GUI for the setting panel.*/
   void CreateGui();
@@ -55,8 +58,9 @@ protected:
 
   /** Used to enable/disable gui items*/
   void EnableItems(bool enable);
-
-  int m_BuildHelpGui;
   
+  int m_BuildHelpGui;
+  wxString m_HelpFileName;
+
 };
 #endif
