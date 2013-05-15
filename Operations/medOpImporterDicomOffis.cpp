@@ -2774,8 +2774,18 @@ void medOpImporterDicomOffis::Crop()
   {
     bool separator = false;
     m_VolumeName = "";
+    if (((medGUIDicomSettings*)GetSetting())->GetEnabledCustomName(medGUIDicomSettings::ID_SERIES))
+    {
+      wxString  seriesName = m_SeriesListbox->GetString(m_SeriesListbox->GetSelection());
+      m_VolumeName = seriesName;
+      separator = true;
+    }
     if (((medGUIDicomSettings*)GetSetting())->GetEnabledCustomName(medGUIDicomSettings::ID_PATIENT_NAME))
     {
+      if (separator)
+      {
+        m_VolumeName << "_";
+      }
       m_VolumeName << m_SelectedSeriesSlicesList->Item(0)->GetData()->GetPatientName();
       separator = true;
     }

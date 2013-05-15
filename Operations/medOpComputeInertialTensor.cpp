@@ -110,6 +110,10 @@ mafOp(label)
   m_InertialTensor[7] = 0;
   m_InertialTensor[8] = 0;
 
+  m_CenterOfMass[0] = 0;
+  m_CenterOfMass[1] = 0;
+  m_CenterOfMass[2] = 0;
+
   m_MethodToUse = GEOMETRY;
 }
 //----------------------------------------------------------------------------
@@ -144,7 +148,16 @@ void medOpComputeInertialTensor::OpDo()
 //----------------------------------------------------------------------------
 {
   mafVME* vme = (mafVME*) m_Input;
-  
+
+
+  if (!vme->GetTagArray()->IsTagPresent("LOCAL_CENTER_OF_MASS_COMPONENTS"))
+  {
+	  if (m_LocalCenterOfMassTag.GetNumberOfComponents()>0)
+	  {
+		  vme->GetTagArray()->SetTag(m_LocalCenterOfMassTag);
+	  }
+  }
+
   if (!vme->GetTagArray()->IsTagPresent("PRINCIPAL_INERTIAL_TENSOR_COMPONENTS"))
   {
     if (m_PrincipalInertialTensorTag.GetNumberOfComponents()>0)
@@ -175,10 +188,12 @@ void medOpComputeInertialTensor::OpUndo()
 //----------------------------------------------------------------------------
 {
   mafVME* vme = (mafVME*) m_Input;
+  vme->GetTagArray()->GetTag("LOCAL_CENTER_OF_MASS_COMPONENTS",m_LocalCenterOfMassTag);
   vme->GetTagArray()->GetTag("PRINCIPAL_INERTIAL_TENSOR_COMPONENTS",m_PrincipalInertialTensorTag);
   vme->GetTagArray()->GetTag("INERTIAL_TENSOR_COMPONENTS",m_InertialTensorTag);
   vme->GetTagArray()->GetTag("SURFACE_MASS",m_TagMass);
 
+  vme->GetTagArray()->DeleteTag("LOCAL_CENTER_OF_MASS_COMPONENTS");
   vme->GetTagArray()->DeleteTag("PRINCIPAL_INERTIAL_TENSOR_COMPONENTS");
   vme->GetTagArray()->DeleteTag("INERTIAL_TENSOR_COMPONENTS");
   vme->GetTagArray()->DeleteTag("SURFACE_MASS");
@@ -241,7 +256,17 @@ void medOpComputeInertialTensor::OnEvent(mafEventBase *maf_event)
 void medOpComputeInertialTensor::AddAttributes()
 //----------------------------------------------------------------------------
 {
-	//save results in vme attributes
+	std::vector<double> localCenterOfMassComponents;
+	localCenterOfMassComponents.push_back(m_CenterOfMass[0]);
+	localCenterOfMassComponents.push_back(m_CenterOfMass[1]);
+	localCenterOfMassComponents.push_back(m_CenterOfMass[2]);
+
+	mafTagItem tagLocalCenterOfMass;
+	tagLocalCenterOfMass.SetName("LOCAL_CENTER_OF_MASS_COMPONENTS");
+	tagLocalCenterOfMass.SetNumberOfComponents(localCenterOfMassComponents.size());
+	tagLocalCenterOfMass.SetComponents(localCenterOfMassComponents);
+	m_Input->GetTagArray()->SetTag(tagLocalCenterOfMass);
+
 	std::vector<double> principalInertialTensorComponents;
 	principalInertialTensorComponents.push_back(m_Principal_I1);
 	principalInertialTensorComponents.push_back(m_Principal_I2);
@@ -265,10 +290,10 @@ void medOpComputeInertialTensor::AddAttributes()
 	tagInertialTensor.SetComponents(inertialTensorComponents);
 	m_Input->GetTagArray()->SetTag(tagInertialTensor);
 
-	mafTagItem tagm;
-	tagm.SetName("SURFACE_MASS");
-	tagm.SetValue(m_Mass);
-	m_Input->GetTagArray()->SetTag(tagm);
+	mafTagItem tagMass;
+	tagMass.SetName("SURFACE_MASS");
+	tagMass.SetValue(m_Mass);
+	m_Input->GetTagArray()->SetTag(tagMass);
 
 	if (m_Input->IsA("mafVMEGroup")) 
 	{
@@ -664,6 +689,10 @@ int medOpComputeInertialTensor::ComputeInertialTensorUsingGeometry(mafNode* node
   double Cy = _Cy * rr;
   double Cz = _Cz * rr;
 
+  m_CenterOfMass[0] += Cx;
+  m_CenterOfMass[1] += Cy;
+  m_CenterOfMass[2] += Cz;
+
   // Mass
   double m = _m / 6;
 
@@ -875,6 +904,10 @@ int medOpComputeInertialTensor::ComputeInertialTensorUsingMonteCarlo(mafNode* no
   com[1] /= pcom;
   com[2] /= pcom;
 
+  m_CenterOfMass[0] += com[0];
+  m_CenterOfMass[1] += com[1];
+  m_CenterOfMass[2] += com[2];
+
   if (!m_TestMode)
   {
     mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,50.0));
@@ -1062,10 +1095,13 @@ int medOpComputeInertialTensor::ComputeInertialTensorFromGroup()
 	  wxString s;
 	  s << "Computing Inertial tensor for: " << childSurface->GetName();
 	  mafLogMessage(s.c_str());      
-	  ComputeInertialTensor(childSurface,i+1,n_of_children - 1);
-
+	  ComputeInertialTensor(childSurface,i+1,n_of_surfaces);
     }
   }
+
+  m_CenterOfMass[0] = m_CenterOfMass[0] / n_of_surfaces; 
+  m_CenterOfMass[1] = m_CenterOfMass[1] / n_of_surfaces;
+  m_CenterOfMass[2] = m_CenterOfMass[2] / n_of_surfaces;
 
   result = OP_RUN_OK;
 

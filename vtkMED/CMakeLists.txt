@@ -136,7 +136,7 @@ SET(vtkMED_SRCS
   vtkMEDStentModelSource.cpp
   vtkMEDStentModelSource.h
   vtkMEDDeformableSimplexMeshFilter.h
-  vtkMEDDeformableSimplexMeshFilterImpl.h
+  vtkMEDDeformableSimplexMeshFilter.txx
 
   ############# VolumeLarge Files - TO BE COMMITTED DOWN ########
   vtkMAFIdType64.h

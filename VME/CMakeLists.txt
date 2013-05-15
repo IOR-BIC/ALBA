@@ -156,7 +156,9 @@ SET(PROJECT_SRCS  ${PROJECT_SRCS}
  #add for stent
   medVMEStent.cpp
   medVMEStent.h
-  
+  medVMEStentDeploymentVisualPipe.cpp
+  medVMEStentDeploymentVisualPipe.h
+
   #stent used tool, to find nearest point
   kdtree.c
   kdtree.h

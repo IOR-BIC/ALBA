@@ -21,12 +21,9 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 #include "itkSimplexMeshToTriangleMeshFilter.h"
 
-#include "vtkMEDConfigure.h"
-
 #ifndef VECTORITEM_H
 #define VECTORITEM_H
 #include <vector>
-
 
 
 
@@ -62,7 +59,7 @@ class vtkPolyData;
 * the control mesh have two more circles of vertices  in each side than the stent.
 *---------------------------------------
 */
-class VTK_vtkMED_EXPORT vtkMEDStentModelSource
+class vtkMEDStentModelSource
 {
 
 public:
@@ -107,6 +104,8 @@ public:
 	void setLinkNumber(int value);
 	void setCenterLine (vector<vector<double>>::const_iterator centerLineStart,
 						vector<vector<double>>::const_iterator centerLindEnd, int pointNumber);
+
+  /// Set the center line of the stent from the given line.
 	void setCenterLineFromPolyData(vtkPolyData *polyData);
 	void setTestValue(){};
 	
