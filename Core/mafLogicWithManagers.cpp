@@ -1056,7 +1056,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 			{
 				// open help for entity
 				wxString entity = e->GetString()->GetCStr();
-				m_HelpSettings->OpenHelpPage("mafVMESurface");
+				m_HelpSettings->OpenHelpPage(entity);
 			}
 			break;
 

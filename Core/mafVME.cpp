@@ -48,13 +48,6 @@
 mafCxxAbstractTypeMacro(mafVME)
 //-------------------------------------------------------------------------
 
-/** IDs for the GUI */
-enum VME_WIDGET_ID
-{
-	ID_HELP = MINID,
-	ID_LAST
-};
-
 //-------------------------------------------------------------------------
 mafVME::mafVME()
 //-------------------------------------------------------------------------
@@ -778,25 +771,7 @@ void mafVME::OnEvent(mafEventBase *maf_event)
 {
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
-    switch (e->GetId())
-    {
-		case ID_HELP:
-			{
-
-				mafEvent helpEvent;
-				helpEvent.SetSender(this);
-				mafString vmeTypeName = this->GetTypeName();
-				helpEvent.SetString(&vmeTypeName);
-				helpEvent.SetId(OPEN_HELP_PAGE);
-				ForwardUpEvent(helpEvent);
-			}
-    	break;
-
-		default:
-			{
-				Superclass::OnEvent(maf_event);
-			}
-    }
+	Superclass::OnEvent(maf_event);
   }
   else if (maf_event->GetId() == mafVMEItem::VME_ITEM_DATA_MODIFIED)
   {
@@ -888,16 +863,6 @@ mafGUI *mafVME::CreateGui()
 {
   m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
   m_Gui->SetListener(this);
-
-  mafEvent buildHelpGui;
-  buildHelpGui.SetSender(this);
-  buildHelpGui.SetId(GET_BUILD_HELP_GUI);
-  ForwardUpEvent(buildHelpGui);
-
-  if (buildHelpGui.GetArg() == true)
-  {
-	m_Gui->Button(ID_HELP, "Help","");	
-  }
 
   mafString anim_text;
   anim_text = _("not animated");
