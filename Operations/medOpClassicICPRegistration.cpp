@@ -89,6 +89,7 @@ enum
 	ID_CHOOSE = MINID,
 	ID_CONVERGENCE,
 	ID_FILE,
+	ID_HELP,
 };
 //----------------------------------------------------------------------------
 void medOpClassicICPRegistration::CreateGui()
@@ -103,6 +104,17 @@ void medOpClassicICPRegistration::CreateGui()
 	
 	m_Gui = new mafGUI(this);
 	m_Gui->SetListener(this);
+
+	mafEvent buildHelpGui;
+	buildHelpGui.SetSender(this);
+	buildHelpGui.SetId(GET_BUILD_HELP_GUI);
+	mafEventMacro(buildHelpGui);
+
+	if (buildHelpGui.GetArg() == true)
+	{
+		m_Gui->Button(ID_HELP, "Help","");	
+	}
+
 	m_Gui->Label("");
 	m_Gui->Label(_("source:"),true);
 	m_Gui->Label(&m_InputName);
@@ -144,6 +156,18 @@ void medOpClassicICPRegistration::OnEvent(mafEventBase *maf_event)
 			case wxCANCEL:
 				OpStop(OP_RUN_CANCEL);        
 			break;
+			
+			case ID_HELP:
+				{
+					mafEvent helpEvent;
+					helpEvent.SetSender(this);
+					mafString operationLabel = this->m_Label;
+					helpEvent.SetString(&operationLabel);
+					helpEvent.SetId(OPEN_HELP_PAGE);
+					mafEventMacro(helpEvent);
+				}
+			break;
+
 			default:
 				mafEventMacro(*e);
 			break; 
