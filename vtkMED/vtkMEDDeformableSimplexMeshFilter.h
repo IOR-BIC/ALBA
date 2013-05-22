@@ -29,13 +29,16 @@
 #include "itkMesh.h"
 #include "itkConstNeighborhoodIterator.h"
 #include "itkCovariantVector.h"
-#include "vtkMEDStentModelSource.h"
-//#include "VesselMeshForTesting.h" 
+#include "itkCellInterface.h"
 #include "kdtree.h"
 #include <assert.h>
 #include "vtkCellArray.h"
 #include "vtkPolyData.h"
 #include "vtkIdType.h"
+
+#include "vtkMEDStentModelSource.h"
+
+#include <ostream>
 
 
 namespace itk
@@ -92,8 +95,9 @@ namespace itk
     //typedef VesselMeshForTesting::Point      Point;
     //typedef vector<Point>::const_iterator    PointIterator;
 
-    /// Nested helper class
+    /// Nested helper classes
     class CatheterCalculator ;
+    class DeformationHistory ;
 
     void SetStrutLength(double len) {m_StrutLength = len ;}
     double GetStrutLength() const {return m_StrutLength ;}
@@ -114,8 +118,10 @@ namespace itk
 
     // void SetVesselPointsKDTree(PointIterator PointStart, PointIterator PointEnd);
     void SetVesselPointsKDTreeFromPolyData(vtkPolyData *surface);
-    /*to check if point touch vessel wall from inside,1 inside ,0,outside */
-    int isPointInsideVessel(double *stentPoint, double *surfacePoint) ;
+
+    /// Check if point is inside the vessel: 1 inside, outside
+    int IsPointInsideVessel(double *stentPoint, double *surfacePoint) ;
+
     double computeDirectionFromPoint2Face(double *stentPoint,vtkIdType p1,vtkIdType p2,vtkIdType p3);
     void SetCenterLocationIdx(vector<int>::const_iterator centerLocationIndex);
     void SetCenterLocationIdxRef(vector<int> const&ve);
@@ -129,6 +135,11 @@ namespace itk
     /// Get catheter position calculator
     CatheterCalculator* GetCatheterCalculator() {return m_CatheterCalculator ;}
 
+    /// Get deformation info
+    const DeformationHistory* GetDeformationHistory() {return m_DeformationHistory ;}
+
+    void SetMinDistanceToVessel(double dist) {m_MinDistanceToVessel = dist ;}
+
   protected:
     vtkMEDDeformableSimplexMeshFilter();
     ~vtkMEDDeformableSimplexMeshFilter();
@@ -141,10 +152,13 @@ namespace itk
     double m_StrutLength;
     double m_LinkLength;
 
-
   private:
     VectorType ComputeStrutLengthForce(SimplexMeshGeometry *data, int index);
     VectorType ComputeLinkLengthForce(SimplexMeshGeometry *data, int index);
+
+    /// Is point x above cell (triangle only). \n
+    /// 1 for above, 0 for in, -1 for below
+    int IsPointAboveCell(vtkPolyData *polydata, int cellId, const double x[3]) const ;
 
     int m_CurrentStepNum;
     vtkPolyData *m_SurfacePoly; // pointer set from outside - not allocated here
@@ -163,7 +177,10 @@ namespace itk
 
     int m_TestValue;
 
+    double m_MinDistanceToVessel ; // buffer distance to vessel wall at which stent should stop
+
     CatheterCalculator* m_CatheterCalculator ;
+    DeformationHistory* m_DeformationHistory ;
 
   }; // end of class
 
@@ -171,8 +188,8 @@ namespace itk
 
 
   //-----------------------------------------------------------------------------
-  // CatheterCalculator
-  // Helper class which calculates catheter position per step
+  /// CatheterCalculator. \n
+  /// Helper class which calculates catheter position per step.
   //-----------------------------------------------------------------------------
   template< class TInputMesh, class TOutputMesh >
   class vtkMEDDeformableSimplexMeshFilter<TInputMesh, TOutputMesh > 
@@ -245,15 +262,125 @@ namespace itk
   } ;
 
 
+
+
+  //-----------------------------------------------------------------------------
+  /// DeformationHistory. \n
+  /// Helper class which saves deformation history for debugging purposes.
+  //-----------------------------------------------------------------------------
+  template< class TInputMesh, class TOutputMesh >
+  class vtkMEDDeformableSimplexMeshFilter<TInputMesh, TOutputMesh > 
+    ::DeformationHistory
+  {
+  public:
+    typedef std::vector<int> intList ;
+    typedef std::vector<double> doubleList ;
+
+    /// Constructor
+    DeformationHistory() {} 
+
+    /// Clear data
+    void Clear() {m_IsInside.clear() ;  m_DistToTarget.clear() ;  m_Length.clear() ;}
+
+    /// Save inside/outside status of point. \n
+    /// outside = 0, inside = 1
+    void SaveInside(int step, int isInside) ; 
+
+    /// Save target distance of point
+    void SaveDistToTarget(int step, double dist) ;
+
+    /// Save lengths of cells
+    void SaveLengthsOfCells(int step, const vtkMEDStentModelSource::SimplexMeshType *mesh) ;
+
+    /// Print self
+    void PrintSelf(ostream& os, int offset = 0) const ;
+
+
+  private:
+    /// Save cell length
+    void SaveCellLength(int step, double length) ;
+
+    // indexing is vector[ptId][step] or vector[cellId][step]
+    std::vector<intList> m_IsInside ; // for each point: outside (0) or inside (1).  0 = inside, 1 = outside
+    std::vector<doubleList> m_DistToTarget ; // for each point: distance to target
+    std::vector<doubleList> m_Length ; // for each cell: length
+  } ;
+
+
+
+  //---------------------------------------------------------------------------
+  // Is point x above cell (triangle only). \n
+  // 1 for above, 0 for in, -1 for below
+  //---------------------------------------------------------------------------
+  template< typename TInputMesh, typename TOutputMesh >
+  int vtkMEDDeformableSimplexMeshFilter<TInputMesh, TOutputMesh >
+    ::IsPointAboveCell(vtkPolyData *polydata, int cellId, const double x[3]) const
+  {
+    // check that cell is triangle
+    vtkIdList *ids = vtkIdList::New() ;
+    polydata->GetCellPoints(cellId, ids) ;
+    int n = ids->GetNumberOfIds() ;
+    assert(n == 3) ;
+    
+    // get normal of cell
+    double p0[3], p1[3], p2[3], a[3], b[3], xp[3], s[3] ;
+    polydata->GetPoint(ids->GetId(0), p0) ;
+    polydata->GetPoint(ids->GetId(1), p1) ;
+    polydata->GetPoint(ids->GetId(2), p2) ;
+    for (int j = 0 ;  j < 3 ;  j++){
+      a[j] = p1[j]-p0[j] ;
+      b[j] = p2[j]-p0[j] ;
+      xp[j] = x[j] - p0[j] ;
+      vtkMath::Cross(a,b,s) ;
+    }
+
+    ids->Delete() ;
+
+    // get dot product with normal and return sign
+    double z = vtkMath::Dot(xp,s) ;
+    if (z > m_MinDistanceToVessel)
+      return 1 ;
+    else if (z < -m_MinDistanceToVessel)
+      return -1 ;
+    else
+      return 0 ;
+  }
+
+
+
+  //---------------------------------------------------------------------------
+  // Is point inside the vessel.  1 inside, 0 outside 
+  //---------------------------------------------------------------------------
+  template< typename TInputMesh, typename TOutputMesh >
+  int vtkMEDDeformableSimplexMeshFilter< TInputMesh, TOutputMesh >
+    ::IsPointInsideVessel(double *stentPoint, double *surfacePoint) 
+  {
+    int ptId = m_SurfacePoly->FindPoint(surfacePoint) ;
+    vtkIdList *cellNeighbours = vtkIdList::New() ;
+    m_SurfacePoly->GetPointCells(ptId, cellNeighbours) ;
+    int inside = 1 ;
+    for (int i = 0 ;  i < cellNeighbours->GetNumberOfIds() && inside == 1 ;  i++){
+      int cellId = cellNeighbours->GetId(i) ;
+      int aboveCell = IsPointAboveCell(m_SurfacePoly, cellId, stentPoint) ;
+      // Point is outside if it is outside with respect to any one of the cells.
+      // This should be ok as long as the vessel surface is concave.
+      if ((aboveCell == 0) || (aboveCell == 1))
+        inside = 0 ;
+    }
+
+    cellNeighbours->Delete() ;
+    return inside ;
+  }
+
 } // namespace itk
 
 
 
 
-
-
-
 #include "vtkMEDDeformableSimplexMeshFilter.txx"
+
+
+
 
 
 
