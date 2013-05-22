@@ -54,7 +54,8 @@ enum MAF_TRANSFORM_ID
   ID_SHOW_GIZMO = MINID,
   ID_RESET,
   ID_ENABLE_SCALING,
-  ID_AUX_REF_SYS
+  ID_AUX_REF_SYS,
+  ID_HELP,
 };
 
 //----------------------------------------------------------------------------
@@ -171,6 +172,17 @@ void medOpScaleDataset::OnEventThis(mafEventBase *maf_event)
 {
   switch(maf_event->GetId())
 	{
+      case ID_HELP:
+	  {
+		  mafEvent helpEvent;
+		  helpEvent.SetSender(this);
+		  mafString operationLabel = this->m_Label;
+		  helpEvent.SetString(&operationLabel);
+		  helpEvent.SetId(OPEN_HELP_PAGE);
+		  mafEventMacro(helpEvent);
+	  }
+	  break;
+
     case ID_RESET:
   	{ 
       Reset();
@@ -253,6 +265,16 @@ void medOpScaleDataset::CreateGui()
 //----------------------------------------------------------------------------
 {
   m_Gui = new mafGUI(this);
+
+  mafEvent buildHelpGui;
+  buildHelpGui.SetSender(this);
+  buildHelpGui.SetId(GET_BUILD_HELP_GUI);
+  mafEventMacro(buildHelpGui);
+
+  if (buildHelpGui.GetArg() == true)
+  {
+	  m_Gui->Button(ID_HELP, "Help","");	
+  }
 
   m_Gui->Divider(2);
   m_Gui->Label("gizmo interaction", true);

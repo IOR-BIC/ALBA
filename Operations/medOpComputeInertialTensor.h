@@ -146,6 +146,7 @@ protected:
 	  ID_ACCURACY,
 	  ID_VTKCOMP,
     MINID,
+	ID_HELP,
   };	
 
   enum COMPUTATION_METHOD
