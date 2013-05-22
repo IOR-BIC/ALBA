@@ -111,7 +111,7 @@ medVMEStent::medVMEStent()
   m_DeploymentMode(DEPLOYMENT_MODE_DEFORM),
   m_DefParamsDlg(NULL), m_DeployCtrlDlg(NULL),
   m_DeploymentVisualPipe(NULL),
-  m_StentStartPosId(30)
+  m_StentStartPosId(30), m_StentTubeRadius(0.0)
 {
   m_StentPolyData = vtkPolyData::New() ;
   m_TestVesselPolyData = vtkPolyData::New() ;
@@ -198,14 +198,10 @@ medVMEStent::~medVMEStent()
   m_ConstraintSurface->Delete() ;
 
   mafDEL(m_Transform);
-  //--remove stent cache-
-  vector<vtkPoints*>::iterator pointsIter = m_ItPointsContainer.begin();
 
-  for (; pointsIter!=m_ItPointsContainer.end(); ++pointsIter )
-  {
-    vtkPoints* current = *pointsIter;
-    vtkDEL( current);  
-  }
+  //--remove stent points cache-
+  for (int i = 0 ;  i < (int)m_ItPointsContainer.size() ;  i++)
+    m_ItPointsContainer[i]->Delete() ;
   m_ItPointsContainer.clear();
 
   m_CatheterCenterLine->Delete() ;
@@ -794,13 +790,20 @@ void medVMEStent::DoDeformation3(int type)
     else
       m_DeformFilter->GetCatheterCalculator()->SetPauseToNone() ;
 
+    // set tolerance equal to tube radius
+    m_DeformFilter->SetMinDistanceToVessel(m_StentTubeRadius) ;
 
     // Compute the deformation
     PreComputeStentPointsBySteps(m_NumberOfSteps); //run filter for specified no. of steps
-    //DisplayStentExpand(steps);
 
     m_DeformFlag = 1;
   }
+
+  // dump deformation history
+  fstream thing ;
+  thing.open("thing.csv", thing.out) ;
+  m_DeformFilter->GetDeformationHistory()->PrintSelf(thing) ;
+  thing.close() ;
 }
 
 
@@ -894,9 +897,10 @@ void medVMEStent::DisplayStentExpandByStep(int step)
 
 
 
-/************************************************************************/
-/* be careful, when should ,recompute points.                                                                     */
-/************************************************************************/
+//-----------------------------------------------------------------------------
+/// Run filter for no. of steps.
+/// Store stent position at each step for later display.
+//-----------------------------------------------------------------------------
 void medVMEStent::PreComputeStentPointsBySteps( int steps){
   //-------------timer--------
   time_t t1,t2;
@@ -909,32 +913,18 @@ void medVMEStent::PreComputeStentPointsBySteps( int steps){
 
   for (int i=0; i<steps; i++)
   {
-    //-------one step deformation--------
+    // one step deformation
     m_DeformFilter->SetCurrentStepNum(i); // used to synchronize expansion with catheter
     m_DeformFilter->Update();
 
-    //----------get point set from mesh-----------
-    static float vertex[3]; 
-    vtkPoints* vpoints = vtkPoints::New();
-    vpoints->SetNumberOfPoints(2000);		
-    SimplexMeshType::PointsContainer::Pointer sPoints;
-    sPoints = m_SimplexMesh->GetPoints();
-    int tmpIdx = 0;
-    for(SimplexMeshType::PointsContainer::Iterator pointIndex = sPoints->Begin(); pointIndex != sPoints->End(); ++pointIndex)
-    {
-      int idx = pointIndex->Index();
-      vtkFloatingPointType * pp = const_cast<vtkFloatingPointType*>(pointIndex->Value().GetDataPointer());
-      vpoints->SetPoint(idx,pp);
-      tmpIdx++;
+    // get point set from mesh and save
+    vtkPoints* vpoints = vtkPoints::New(); // n.b. deleted in destructor with m_ItPointsContainer
+    for (int j = 0 ;  j < m_SimplexMesh->GetNumberOfPoints() ;  j++){
+      PointType pt ;
+      m_SimplexMesh->GetPoint(j,&pt) ;
+      double *x = pt.GetDataPointer() ;
+      vpoints->InsertNextPoint(x) ;
     }
-    vpoints->Squeeze();
-
-    //---------test---------
-    int numPoints = vpoints->GetNumberOfPoints();
-    double x1Coord[3],x2Coord[3];
-    vpoints->GetPoint(0,x1Coord);
-    vpoints->GetPoint(tmpIdx-1,x2Coord);
-    //---------test end-----
 
     // Save current point set for later display
     m_ItPointsContainer.push_back(vpoints);
@@ -1709,7 +1699,7 @@ void medVMEStent::CreateDeployCtrlDialog()
   m_DeploymentVisualPipe->SetCenterLine(m_VesselCenterLine) ;
   m_DeploymentVisualPipe->SetVessel(m_TestVesselPolyData) ;
   m_DeploymentVisualPipe->SetStent(m_StentPolyData) ;
-  m_DeploymentVisualPipe->SetStentTubeRadius(0.08) ;
+  m_DeploymentVisualPipe->SetStentTubeRadius(m_StentTubeRadius) ;
   m_DeployRwi->m_RenFront->ResetCamera() ;
   m_DeploymentVisualPipe->ResetCameraPosition() ;
   m_DeploymentVisualPipe->Render() ;

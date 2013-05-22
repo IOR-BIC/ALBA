@@ -180,8 +180,14 @@ void medWizardBlockInformation::ExcutionBegin()
 
     mainVertSizer->Add(buttonSizer,0,wxALL,5);
     dialog->Add(mainVertSizer,0,wxALL);
-
+	
+	dialog->Fit();
     //show dialog
+	wxSize s = mafGetFrame()->GetSize();
+	wxPoint p = mafGetFrame()->GetPosition();
+	int posX = p.x + s.GetWidth() * .5 - dialog->GetSize().GetWidth() * .5 ;
+	int posY = p.y + s.GetHeight() * .5 - dialog->GetSize().GetHeight() * .5;
+	dialog->SetPosition(wxPoint(posX, posY));
     dialog->ShowModal();
   }
 }

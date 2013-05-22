@@ -11,21 +11,28 @@
 #include "vtkMEDPolyDataNavigator.h"
 #include "vtkPointData.h"
 #include "vtkCellData.h"
-#include "vtkDataArray.h"
 #include "vtkCleanPolyData.h"
 #include "vtkMath.h"
+
+#include "vtkDataArray.h"
+#include "vtkUnsignedCharArray.h"
+#include "vtkIntArray.h"
+#include "vtkDoubleArray.h"
+#include "vtkFloatArray.h"
 
 #include <vector>
 #include <map>
 #include <set>
 #include <ostream>
+#include <algorithm>
 #include <assert.h>
+#include <fstream>
 
 
 
 //------------------------------------------------------------------------------
 // standard macros
-vtkCxxRevisionMacro(vtkMEDPolyDataNavigator, "$Revision: 1.1.2.2 $");
+vtkCxxRevisionMacro(vtkMEDPolyDataNavigator, "$Revision: 1.1.2.7 $");
 vtkStandardNewMacro(vtkMEDPolyDataNavigator);
 //------------------------------------------------------------------------------
 
@@ -41,8 +48,8 @@ vtkMEDPolyDataNavigator::vtkMEDPolyDataNavigator()
 
 //------------------------------------------------------------------------------
 // Destructor
-vtkMEDPolyDataNavigator::~vtkMEDPolyDataNavigator()
 //------------------------------------------------------------------------------
+vtkMEDPolyDataNavigator::~vtkMEDPolyDataNavigator()
 {
 }
 
@@ -53,8 +60,8 @@ vtkMEDPolyDataNavigator::~vtkMEDPolyDataNavigator()
 //------------------------------------------------------------------------------
 // Insert id into list before location i.
 // Analagous to insert() method on std::vector.
-void vtkMEDPolyDataNavigator::InsertIdIntoList(int i, int id, vtkIdList *idList) const
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::InsertIdIntoList(int i, int id, vtkIdList *idList) const
 {
   assert (i < idList->GetNumberOfIds()) ;
 
@@ -79,8 +86,8 @@ void vtkMEDPolyDataNavigator::InsertIdIntoList(int i, int id, vtkIdList *idList)
 //------------------------------------------------------------------------------
 // Delete last entry in id list.
 // Crazy but there's no other way to do it.
-void vtkMEDPolyDataNavigator::DeleteLastId(vtkIdList *idList) const
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::DeleteLastId(vtkIdList *idList) const
 {
   vtkIdList *tempList = vtkIdList::New() ;
   tempList->Initialize() ;
@@ -90,10 +97,27 @@ void vtkMEDPolyDataNavigator::DeleteLastId(vtkIdList *idList) const
     tempList->InsertNextId(idList->GetId(i)) ;
 
   // copy id's back again
-  idList->Reset() ;
-  for (int i = 0 ;  i < tempList->GetNumberOfIds() ;  i++)
-    idList->InsertNextId(tempList->GetId(i)) ;
+  idList->DeepCopy(tempList) ;
 
+  tempList->Delete() ;
+}
+
+
+
+//------------------------------------------------------------------------------
+// Reverse entries in id list
+//------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::ReverseIdList(vtkIdList *idList) const
+{
+  int n = idList->GetNumberOfIds() ;
+
+  // copy backwards to temp list 
+  vtkIdList *tempList = vtkIdList::New() ;
+  tempList->Initialize() ;
+  for (int i = n-1 ;  i >= 0 ;  i--)
+    tempList->InsertNextId(idList->GetId(i)) ;
+
+  // copy id's back again
   idList->DeepCopy(tempList) ;
 
   tempList->Delete() ;
@@ -104,8 +128,8 @@ void vtkMEDPolyDataNavigator::DeleteLastId(vtkIdList *idList) const
 
 //------------------------------------------------------------------------------
 // Append id list: idList = idList + addList
-void vtkMEDPolyDataNavigator::AppendIdList(vtkIdList *idList,  vtkIdList *addList,  bool includeFirstId,  bool includeLastId) const
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::AppendIdList(vtkIdList *idList,  vtkIdList *addList,  bool includeFirstId,  bool includeLastId) const
 {
   int istart, ilast ;
 
@@ -129,8 +153,8 @@ void vtkMEDPolyDataNavigator::AppendIdList(vtkIdList *idList,  vtkIdList *addLis
 
 //------------------------------------------------------------------------------
 // Get the id's which are in both lists
-void vtkMEDPolyDataNavigator::GetIdsInBothLists(vtkIdList *idlist0,  vtkIdList *idlist1,  vtkIdList *idlist_out) const
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::GetIdsInBothLists(vtkIdList *idlist0,  vtkIdList *idlist1,  vtkIdList *idlist_out) const
 {
   idlist_out->Initialize() ;
 
@@ -152,8 +176,8 @@ void vtkMEDPolyDataNavigator::GetIdsInBothLists(vtkIdList *idlist0,  vtkIdList *
 // If istart is set, the search range is istart to n-1 inclusive.
 // Use istart for finding a next occurrence, or whether a second occurrence exists.
 // Returns -1 if not found
-int vtkMEDPolyDataNavigator::FindIdInList(vtkIdList *idList,  int id,  int istart) const
 //------------------------------------------------------------------------------
+int vtkMEDPolyDataNavigator::FindIdInList(vtkIdList *idList,  int id,  int istart) const
 {
   for (int i = istart ;  i < idList->GetNumberOfIds() ;  i++){
     if (idList->GetId(i) == id)
@@ -172,8 +196,8 @@ int vtkMEDPolyDataNavigator::FindIdInList(vtkIdList *idList,  int id,  int istar
 //------------------------------------------------------------------------------
 // Replace idold with idnew in idList. \n
 // Returns index of id, -1 if not found.
-int vtkMEDPolyDataNavigator::FindAndReplaceIdInList(vtkIdList *idList,  int idold,  int idnew) const 
 //------------------------------------------------------------------------------
+int vtkMEDPolyDataNavigator::FindAndReplaceIdInList(vtkIdList *idList,  int idold,  int idnew) const 
 {
   for (int i = 0 ;  i < idList->GetNumberOfIds() ;  i++){
     if (idList->GetId(i) == idold){
@@ -192,8 +216,8 @@ int vtkMEDPolyDataNavigator::FindAndReplaceIdInList(vtkIdList *idList,  int idol
 // Find the index of a consecutive pair of id's in a list.
 // Returns the index of the first of the pair to be found.
 // Returns -1 if not found
-int vtkMEDPolyDataNavigator::FindIdPairFirstId(vtkIdList *idList,  int id0,  int id1) const
 //------------------------------------------------------------------------------
+int vtkMEDPolyDataNavigator::FindIdPairFirstId(vtkIdList *idList,  int id0,  int id1) const
 {
   int n = idList->GetNumberOfIds() ;
   for (int i = 0 ;  i < n ;  i++){
@@ -215,8 +239,8 @@ int vtkMEDPolyDataNavigator::FindIdPairFirstId(vtkIdList *idList,  int id0,  int
 // Returns the index of the second of the pair to be found.
 // Returning the second id is most convenient if you want to insert an id between the pair.
 // Returns -1 if not found
-int vtkMEDPolyDataNavigator::FindIdPairSecondId(vtkIdList *idList,  int id0,  int id1) const
 //------------------------------------------------------------------------------
+int vtkMEDPolyDataNavigator::FindIdPairSecondId(vtkIdList *idList,  int id0,  int id1) const
 {
   int n = idList->GetNumberOfIds() ;
   for (int i = 0 ;  i < n ;  i++){
@@ -236,8 +260,8 @@ int vtkMEDPolyDataNavigator::FindIdPairSecondId(vtkIdList *idList,  int id0,  in
 //------------------------------------------------------------------------------
 // Insert id between consecutive pair of id's in a list. \n
 // Returns -1 if not found
-int vtkMEDPolyDataNavigator::InsertIdBetweenIds(vtkIdList *idList,  int id0,  int id1, int idNew) const
 //------------------------------------------------------------------------------
+int vtkMEDPolyDataNavigator::InsertIdBetweenIds(vtkIdList *idList,  int id0,  int id1, int idNew) const
 {
   int i = FindIdPairSecondId(idList, id0, id1) ;
   if (i == -1)
@@ -261,8 +285,8 @@ int vtkMEDPolyDataNavigator::InsertIdBetweenIds(vtkIdList *idList,  int id0,  in
 // Backwards direction:
 // If i0 >= i1, you get i0...i1, counting backwards.
 // If i0 < i1,  you get i0...0, n-1...i1.
-void vtkMEDPolyDataNavigator::GetPartOfIdList(vtkIdList *idList,  vtkIdList *idListOut,  int i0,  int i1,  bool forwards) const
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::GetPartOfIdList(vtkIdList *idList,  vtkIdList *idListOut,  int i0,  int i1,  bool forwards) const
 {
   idListOut->Initialize() ;
   int n = idList->GetNumberOfIds() ;
@@ -299,8 +323,8 @@ void vtkMEDPolyDataNavigator::GetPartOfIdList(vtkIdList *idList,  vtkIdList *idL
 
 //------------------------------------------------------------------------------
 // Initialize list to 3 triangle ids
-void vtkMEDPolyDataNavigator::InitListToTriangle(vtkIdList *list, int id0, int id1, int id2) const
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::InitListToTriangle(vtkIdList *list, int id0, int id1, int id2) const
 {
   list->Initialize() ;
   list->InsertNextId(id0) ;
@@ -310,10 +334,37 @@ void vtkMEDPolyDataNavigator::InitListToTriangle(vtkIdList *list, int id0, int i
 
 
 
+
 //------------------------------------------------------------------------------
-// Copy id map to vtkIdList
-void vtkMEDPolyDataNavigator::CopyIdSetToList(IdSet idSet, vtkIdList *idList) const
+// Copy vtkIdList to id set
+// NB if an id appears twice in the id list, it will only copy once to the map.
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::CopyListToIdSet(vtkIdList *idList, IdSet& idSet) const
+{
+  idSet.clear() ;
+  AddListToIdSet(idList, idSet) ;
+}
+
+
+
+//------------------------------------------------------------------------------
+// Add vtkIdList to id set
+// NB if an id appears twice in the id list, it will only copy once to the map.
+//------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::AddListToIdSet(vtkIdList *idList, IdSet& idSet) const
+{
+  int n = idList->GetNumberOfIds() ;
+  for (int i = 0 ;  i < n ;  i++){
+    int id = idList->GetId(i) ;
+    this->AddUniqueIdToSet(idSet, id) ;
+  }
+}
+
+
+//------------------------------------------------------------------------------
+// Copy id set to vtkIdList
+//------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::CopyIdSetToList(const IdSet& idSet, vtkIdList *idList) const
 {
   idList->Initialize() ;
 
@@ -325,9 +376,29 @@ void vtkMEDPolyDataNavigator::CopyIdSetToList(IdSet idSet, vtkIdList *idList) co
 
 
 //------------------------------------------------------------------------------
-// Cyclic shift id list
-void vtkMEDPolyDataNavigator::CyclicShiftIdList(vtkIdList *idList, int nsteps) const
+// Get ids in the range (0,n-1) which are not in the list.
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::GetIdsNotInList(vtkIdList* idsIn, vtkIdList* idsOut, int n)
+{
+  // copy list to set for efficient searching
+  IdSet idSetIn ;
+  CopyListToIdSet(idsIn, idSetIn) ;
+
+  idsOut->Reset() ;
+  for (int i = 0 ;  i < n ;  i++){
+    IdSet::iterator pos ;
+    pos = idSetIn.find(i) ;
+    if (pos == idSetIn.end())
+      idsOut->InsertNextId(i) ;
+  }
+}
+
+
+
+//------------------------------------------------------------------------------
+// Cyclic shift id list
+//------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::CyclicShiftIdList(vtkIdList *idList, int nsteps) const
 {
   vtkIdList *temp = vtkIdList::New() ;
 
@@ -346,11 +417,66 @@ void vtkMEDPolyDataNavigator::CyclicShiftIdList(vtkIdList *idList, int nsteps) c
 
 
 
+//------------------------------------------------------------------------------
+// Copy vector to id list
+//------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::CopyVectorToList(const std::vector<int>& vlist, vtkIdList* idList, bool append) const
+{
+  if (!append)
+    idList->Reset() ;
+
+  int n = (int)vlist.size() ;
+  for (int i = 0 ;  i < n ;  i++)
+    idList->InsertNextId(vlist.back()) ;
+}
+
+
+
+//------------------------------------------------------------------------------
+// Copy id list to vector
+//------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::CopyListToVector(vtkIdList* idList, std::vector<int>& vlist, bool append) const
+{
+  if (!append)
+    vlist.clear() ;
+
+  int n = idList->GetNumberOfIds() ;
+  for (int i = 0 ;  i < n ;  i++)
+    vlist.push_back(idList->GetId(i)) ;
+}
+
+
+
+//------------------------------------------------------------------------------
+// Set id list to all points (0,1,2...npts-1)
+//------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::SetIdListToAllPoints(vtkPolyData *polydata, vtkIdList *list) const
+{
+  int n = polydata->GetPoints()->GetNumberOfPoints() ;
+  list->SetNumberOfIds(n) ;
+  for (int i = 0 ;  i < n-1 ;  i++)
+    list->SetId(i,i) ;
+}
+
+
+
+//------------------------------------------------------------------------------
+// Set id list to all cells (0,1,2...ncells-1)
+//------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::SetIdListToAllCells(vtkPolyData *polydata, vtkIdList *list) const
+{
+  int n = polydata->GetNumberOfCells() ;
+  list->SetNumberOfIds(n) ;
+  for (int i = 0 ;  i < n-1 ;  i++)
+    list->SetId(i,i) ;
+}
+
+
 
 //------------------------------------------------------------------------------
 // Print id list
-void vtkMEDPolyDataNavigator::PrintIdList(vtkIdList *idList, ostream& os) const
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::PrintIdList(vtkIdList *idList, ostream& os) const
 {
   for (int i = 0 ;  i < idList->GetNumberOfIds() ;  i++){
     os << idList->GetId(i) << " " ;
@@ -364,12 +490,11 @@ void vtkMEDPolyDataNavigator::PrintIdList(vtkIdList *idList, ostream& os) const
 
 
 
-
 //------------------------------------------------------------------------------
 // Add edge to list if it is not already in the list
 // NB This is stupendously inefficient if there are a lot of edges !
-void vtkMEDPolyDataNavigator::AddUniqueEdge(const Edge& edge, EdgeVector& edgeList) const
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::AddUniqueEdge(const Edge& edge, EdgeVector& edgeList) const
 {
   // search list and return if the requested edge is found
   for (int i = 0 ;  i < (int)edgeList.size() ;  i++){
@@ -384,8 +509,8 @@ void vtkMEDPolyDataNavigator::AddUniqueEdge(const Edge& edge, EdgeVector& edgeLi
 
 //------------------------------------------------------------------------------
 // Add edge to multimap if not already present.
-void vtkMEDPolyDataNavigator::AddUniqueEdge(const Edge& edge, EdgeMultiMap& edgeMap) const
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::AddUniqueEdge(const Edge& edge, EdgeMultiMap& edgeMap) const
 {
   typedef EdgeMultiMap::iterator Mit ;
   typedef std::pair<Mit,Mit> MitRange ;
@@ -410,8 +535,8 @@ void vtkMEDPolyDataNavigator::AddUniqueEdge(const Edge& edge, EdgeMultiMap& edge
 
 //------------------------------------------------------------------------------
 // Copy edge multimap to vector
-void vtkMEDPolyDataNavigator::CopyEdgeMapToVector(EdgeMultiMap& edgeMap, EdgeVector& edges) const
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::CopyEdgeMapToVector(EdgeMultiMap& edgeMap, EdgeVector& edges) const
 {
   edges.clear() ;
 
@@ -423,11 +548,10 @@ void vtkMEDPolyDataNavigator::CopyEdgeMapToVector(EdgeMultiMap& edgeMap, EdgeVec
 
 
 
-
 //------------------------------------------------------------------------------
 // Get number of points on cell
-int vtkMEDPolyDataNavigator::GetNumberOfPointsOnCell(vtkPolyData *polydata, int cellId) const
 //------------------------------------------------------------------------------
+int vtkMEDPolyDataNavigator::GetNumberOfPointsOnCell(vtkPolyData *polydata, int cellId) const
 {
   vtkIdList *ids = vtkIdList::New() ;
   polydata->GetCellPoints(cellId, ids) ;
@@ -439,9 +563,23 @@ int vtkMEDPolyDataNavigator::GetNumberOfPointsOnCell(vtkPolyData *polydata, int 
 
 
 //------------------------------------------------------------------------------
-// Get edges of cell
-void vtkMEDPolyDataNavigator::GetCellEdges(vtkPolyData *polydata, int cellId, EdgeVector& edges) const
+// Get points on cell with coords (cf polydata->GetCellPoints())
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::GetCellPointsWithCoords(vtkPolyData *polydata, int cellId, vtkIdList* ptIds, double (*coords)[3])
+{
+  polydata->GetCellPoints(cellId, ptIds) ;
+  for (int i = 0 ;  i < ptIds->GetNumberOfIds() ;  i++){
+    int id = ptIds->GetId(i) ;
+    polydata->GetPoint(id, coords[i]) ;
+  }
+}
+
+
+
+//------------------------------------------------------------------------------
+// Get edges of cell
+//------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::GetCellEdges(vtkPolyData *polydata, int cellId, EdgeVector& edges) const
 {
   edges.clear() ;
 
@@ -467,8 +605,8 @@ void vtkMEDPolyDataNavigator::GetCellEdges(vtkPolyData *polydata, int cellId, Ed
 
 //-----------------------------------------------------------------------------
 // Get list of cells on edge
-void vtkMEDPolyDataNavigator::GetCellNeighboursOfEdge(vtkPolyData *polydata, const Edge& edge, vtkIdList *idList) const
 //-----------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::GetCellNeighboursOfEdge(vtkPolyData *polydata, const Edge& edge, vtkIdList *idList) const
 {
   idList->Initialize() ;
 
@@ -490,8 +628,8 @@ void vtkMEDPolyDataNavigator::GetCellNeighboursOfEdge(vtkPolyData *polydata, con
 
 //------------------------------------------------------------------------------
 /// Get number of cells on an edge
-int vtkMEDPolyDataNavigator::GetNumberOfCellsOnEdge(vtkPolyData *polydata, const Edge& edge) const
 //------------------------------------------------------------------------------
+int vtkMEDPolyDataNavigator::GetNumberOfCellsOnEdge(vtkPolyData *polydata, const Edge& edge) const
 {
   // list cell neighbours of both endpoints of edge 
   vtkIdList *CellsOnPt0 = vtkIdList::New() ;
@@ -515,8 +653,8 @@ int vtkMEDPolyDataNavigator::GetNumberOfCellsOnEdge(vtkPolyData *polydata, const
 
 //-----------------------------------------------------------------------------
 // Get adjacent points on a cell, ie those joined to it by edges
-void vtkMEDPolyDataNavigator::GetAdjacentPointsOnCell(vtkPolyData *polydata, int cellId, int ptId, int& ptId0, int& ptId1) const
 //-----------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::GetAdjacentPointsOnCell(vtkPolyData *polydata, int cellId, int ptId, int& ptId0, int& ptId1) const
 {
   vtkIdList *ptsOnCell = vtkIdList::New() ;
   polydata->GetCellPoints(cellId, ptsOnCell) ;
@@ -557,8 +695,8 @@ void vtkMEDPolyDataNavigator::GetAdjacentPointsOnCell(vtkPolyData *polydata, int
 
 //-----------------------------------------------------------------------------
 // Get all points on cells around a point.
-void vtkMEDPolyDataNavigator::GetPointsOnCellNeighbours(vtkPolyData *polydata, int ptId, vtkIdList *idList) const
 //-----------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::GetPointsOnCellNeighbours(vtkPolyData *polydata, int ptId, vtkIdList *idList) const
 {
   idList->Initialize() ;
 
@@ -588,8 +726,8 @@ void vtkMEDPolyDataNavigator::GetPointsOnCellNeighbours(vtkPolyData *polydata, i
 //-----------------------------------------------------------------------------
 // Get point neighbours of point which are joined by edges.
 // If the cells are triangles, this is the same as GetPointsOnCellNeighbours().
-void vtkMEDPolyDataNavigator::GetPointNeighboursOfPoint(vtkPolyData *polydata, int ptId, vtkIdList *idList) const
 //-----------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::GetPointNeighboursOfPoint(vtkPolyData *polydata, int ptId, vtkIdList *idList) const
 {
   idList->Initialize() ;
 
@@ -619,8 +757,8 @@ void vtkMEDPolyDataNavigator::GetPointNeighboursOfPoint(vtkPolyData *polydata, i
 
 //------------------------------------------------------------------------------
 // Get the edges of the cells around a point
-void vtkMEDPolyDataNavigator::GetEdgesAroundPointInclusive(vtkPolyData *polydata, int ptId, EdgeVector& edges) const
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::GetEdgesAroundPointInclusive(vtkPolyData *polydata, int ptId, EdgeVector& edges) const
 {
   edges.clear() ;
 
@@ -645,8 +783,8 @@ void vtkMEDPolyDataNavigator::GetEdgesAroundPointInclusive(vtkPolyData *polydata
 
 //------------------------------------------------------------------------------
 // Get the edges of the cells around a point, excluding those which touch the point itself
-void vtkMEDPolyDataNavigator::GetEdgesAroundPointExclusive(vtkPolyData *polydata, int ptId, EdgeVector& edges) const
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::GetEdgesAroundPointExclusive(vtkPolyData *polydata, int ptId, EdgeVector& edges) const
 {
   edges.clear() ;
 
@@ -673,8 +811,8 @@ void vtkMEDPolyDataNavigator::GetEdgesAroundPointExclusive(vtkPolyData *polydata
 
 //------------------------------------------------------------------------------
 // Get the points in the cells around the edge, excluding those in the edge
-void vtkMEDPolyDataNavigator::GetPointsAroundEdgeExclusive(vtkPolyData *polydata, const Edge& edge, vtkIdList *idList) const
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::GetPointsAroundEdgeExclusive(vtkPolyData *polydata, const Edge& edge, vtkIdList *idList) const
 {
   idList->Initialize() ;
 
@@ -703,8 +841,8 @@ void vtkMEDPolyDataNavigator::GetPointsAroundEdgeExclusive(vtkPolyData *polydata
 //------------------------------------------------------------------------------
 // Get the edges on the cells on each side of the edge.
 // This does not consider edges which are joined only through the end vertices.
-void vtkMEDPolyDataNavigator::GetEdgesAroundEdge(vtkPolyData *polydata, const Edge& edge, EdgeVector& edges) const
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::GetEdgesAroundEdge(vtkPolyData *polydata, const Edge& edge, EdgeVector& edges) const
 {
   vtkIdList *cellIds = vtkIdList::New() ;
   EdgeVector edgesOnCellList ;
@@ -731,8 +869,8 @@ void vtkMEDPolyDataNavigator::GetEdgesAroundEdge(vtkPolyData *polydata, const Ed
 
 //------------------------------------------------------------------------------
 // Get list of all edges in polydata
-void vtkMEDPolyDataNavigator::GetAllEdges(vtkPolyData *polydata, EdgeVector& edges) const
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::GetAllEdges(vtkPolyData *polydata, EdgeVector& edges) const
 {
   edges.clear() ;
 
@@ -750,8 +888,8 @@ void vtkMEDPolyDataNavigator::GetAllEdges(vtkPolyData *polydata, EdgeVector& edg
 
 //------------------------------------------------------------------------------
 // Get list of all edges in polydata, in the form of a multimap for quick search
-void vtkMEDPolyDataNavigator::GetAllEdges(vtkPolyData *polydata, EdgeMultiMap& edges) const
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::GetAllEdges(vtkPolyData *polydata, EdgeMultiMap& edges) const
 {
   edges.clear() ;
 
@@ -770,8 +908,8 @@ void vtkMEDPolyDataNavigator::GetAllEdges(vtkPolyData *polydata, EdgeMultiMap& e
 
 //------------------------------------------------------------------------------
 // Get list of all edges on list of cells
-void vtkMEDPolyDataNavigator::GetEdgesOnListOfCells(vtkPolyData *polydata, vtkIdList *cellList, EdgeVector& edges) const
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::GetEdgesOnListOfCells(vtkPolyData *polydata, vtkIdList *cellList, EdgeVector& edges) const
 {
   edges.clear() ;
 
@@ -787,8 +925,8 @@ void vtkMEDPolyDataNavigator::GetEdgesOnListOfCells(vtkPolyData *polydata, vtkId
 
 //------------------------------------------------------------------------------
 // Get list of all edges on list of cells, in the form of a multimap for quick search
-void vtkMEDPolyDataNavigator::GetEdgesOnListOfCells(vtkPolyData *polydata, vtkIdList *cellList, EdgeMultiMap& edges) const
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::GetEdgesOnListOfCells(vtkPolyData *polydata, vtkIdList *cellList, EdgeMultiMap& edges) const
 {
   edges.clear() ;
 
@@ -804,11 +942,41 @@ void vtkMEDPolyDataNavigator::GetEdgesOnListOfCells(vtkPolyData *polydata, vtkId
 
 
 
+//------------------------------------------------------------------------------
+// Get list of all points on list of edges
+//------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::GetPointsOnListOfEdges(vtkPolyData *polydata, const EdgeVector& edgeList, vtkIdList* ptList) const
+{
+  ptList->Initialize() ;
+
+  // get points in set form and copy to list
+  IdSet ptSet ;
+  GetPointsOnListOfEdges(polydata, edgeList, ptSet) ;
+  CopyIdSetToList(ptSet, ptList) ;
+}
+
+
+
+//------------------------------------------------------------------------------
+// Get list of all points on list of edges, in the form of a set for quick search
+//------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::GetPointsOnListOfEdges(vtkPolyData *polydata, const EdgeVector& edgelist, IdSet& ptSet) const
+{
+  ptSet.clear() ;
+
+  for (int i = 0 ;  i < (int)edgelist.size() ;  i++){
+    Edge edge = edgelist[i] ;
+    AddUniqueIdToSet(ptSet, edge.GetId0()) ;
+    AddUniqueIdToSet(ptSet, edge.GetId1()) ;
+  }
+}
+
+
 
 //------------------------------------------------------------------------------
 // Get list of all cells on list of edges
-void vtkMEDPolyDataNavigator::GetCellsOnListOfEdges(vtkPolyData *polydata, EdgeVector& edgeList, vtkIdList* cellList) const
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::GetCellsOnListOfEdges(vtkPolyData *polydata, const EdgeVector& edgeList, vtkIdList* cellList) const
 {
   cellList->Initialize() ;
 
@@ -822,15 +990,15 @@ void vtkMEDPolyDataNavigator::GetCellsOnListOfEdges(vtkPolyData *polydata, EdgeV
 
 //------------------------------------------------------------------------------
 // Get list of all cells on list of edges, in the form of a set for quick search
-void vtkMEDPolyDataNavigator::GetCellsOnListOfEdges(vtkPolyData *polydata, EdgeVector& edgelist, IdSet& cellSet) const
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::GetCellsOnListOfEdges(vtkPolyData *polydata, const EdgeVector& edgelist, IdSet& cellSet) const
 {
   cellSet.clear() ;
 
   vtkIdList* cellNeighbours = vtkIdList::New() ;
 
   for (int i = 0 ;  i < (int)edgelist.size() ;  i++){
-    Edge edge = edgelist.at(i) ;
+    Edge edge = edgelist[i] ;
     GetCellNeighboursOfEdge(polydata, edge, cellNeighbours) ;
     for (int j = 0 ;  j < cellNeighbours->GetNumberOfIds() ;  j++)
       AddUniqueIdToSet(cellSet, cellNeighbours->GetId(j)) ;
@@ -842,9 +1010,44 @@ void vtkMEDPolyDataNavigator::GetCellsOnListOfEdges(vtkPolyData *polydata, EdgeV
 
 
 //------------------------------------------------------------------------------
-// Get the edge connected neighbours of a cell
-void vtkMEDPolyDataNavigator::GetCellsOnCell_EdgeConnected(vtkPolyData *polydata, int cellId,  vtkIdList *idList) const
+// Get list of all cells on list of points
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::GetCellsOnListOfPoints(vtkPolyData *polydata, vtkIdList *ptIds, vtkIdList* cellList) const
+{
+  cellList->Initialize() ;
+
+  // get cells in set form and copy to list
+  IdSet cellSet ;
+  GetCellsOnListOfPoints(polydata, ptIds, cellSet) ;
+  CopyIdSetToList(cellSet, cellList) ;
+}
+
+
+
+//------------------------------------------------------------------------------
+// Get list of all cells on list of points, in the form of a set for quick search
+//------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::GetCellsOnListOfPoints(vtkPolyData *polydata, vtkIdList *ptIds, IdSet& cellSet) const
+{
+  cellSet.clear() ;
+
+  vtkIdList* cellNeighbours = vtkIdList::New() ;
+
+  for (int i = 0 ;  i < ptIds->GetNumberOfIds() ;  i++){
+    polydata->GetPointCells(ptIds->GetId(i), cellNeighbours) ;
+    for (int j = 0 ;  j < cellNeighbours->GetNumberOfIds() ;  j++)
+      AddUniqueIdToSet(cellSet, cellNeighbours->GetId(j)) ;
+  }
+
+  cellNeighbours->Delete() ;
+}
+
+
+
+//------------------------------------------------------------------------------
+// Get the edge connected neighbours of a cell
+//------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::GetCellsOnCell_EdgeConnected(vtkPolyData *polydata, int cellId,  vtkIdList *idList) const
 {
   idList->Initialize() ;
 
@@ -870,14 +1073,86 @@ void vtkMEDPolyDataNavigator::GetCellsOnCell_EdgeConnected(vtkPolyData *polydata
 
 
 
+//------------------------------------------------------------------------------
+// Get edge connected neighbours of list of cells
+//------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::GetCellsOnListOfCells_EdgeConnected(vtkPolyData *polydata, vtkIdList* cellsIn, vtkIdList* cellsOut)
+{
+  IdSet cellsInSet, cellsOutSet ;
+  CopyListToIdSet(cellsIn, cellsInSet) ;
+
+  GetCellsOnListOfCells_EdgeConnected(polydata, cellsInSet, cellsOutSet) ;
+
+  CopyIdSetToList(cellsOutSet, cellsOut) ;
+}
+
+
+
+//------------------------------------------------------------------------------
+// Get edge connected neighbours of list of cells
+//------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::GetCellsOnListOfCells_EdgeConnected(vtkPolyData *polydata, IdSet& cellsIn, IdSet& cellsOut)
+{
+  cellsOut.clear() ;
+
+  vtkIdList* tmp = vtkIdList::New() ;
+
+  IdSet::iterator pos ;
+  for (pos = cellsIn.begin() ;  pos != cellsIn.end() ;  pos++){
+    int cellId = *pos ;
+
+    GetCellsOnCell_EdgeConnected(polydata, cellId, tmp) ;
+    for (int j = 0 ;  j < tmp->GetNumberOfIds() ;  j++){
+      int newCellId = tmp->GetId(j) ;
+
+      IdSet::iterator posFound = cellsIn.find(newCellId) ;
+      if (posFound == cellsIn.end())
+        AddUniqueIdToSet(cellsOut, newCellId) ;
+    }
+  }
+
+  tmp->Delete() ;
+}
+
+
+
+//------------------------------------------------------------------------------
+// Find edge in list.  Returns -1 if not found
+//------------------------------------------------------------------------------
+int vtkMEDPolyDataNavigator::FindEdgeInList(Edge& edge, EdgeVector& edgeList) const
+{
+  for (int i = 0 ;  i < (int)edgeList.size() ;  i++){
+    if (edge == edgeList[i])
+      return i ;
+  }
+  return -1 ;
+}
+
+
+
+
+//------------------------------------------------------------------------------
+// Find point on a cell
+// Returns -1 if not found
+int vtkMEDPolyDataNavigator::FindIndexOfPointOnCell(vtkPolyData *polydata, int cellId, int ptId) const
+  //------------------------------------------------------------------------------
+{
+  vtkIdList *idlist = vtkIdList::New() ;
+
+  polydata->GetCellPoints(cellId, idlist) ;
+  int index = FindIdInList(idlist, ptId) ;
+
+  idlist->Delete() ;
+  return index ;
+}
+
 
 
 //------------------------------------------------------------------------------
 // Is point on a cell
-bool vtkMEDPolyDataNavigator::IsPointOnCell(vtkPolyData *polydata, int cellId, int ptId) const
 //------------------------------------------------------------------------------
+bool vtkMEDPolyDataNavigator::IsPointOnCell(vtkPolyData *polydata, int cellId, int ptId) const
 {
-
   vtkIdList *idlist = vtkIdList::New() ;
 
   polydata->GetCellPoints(cellId, idlist) ;
@@ -891,8 +1166,8 @@ bool vtkMEDPolyDataNavigator::IsPointOnCell(vtkPolyData *polydata, int cellId, i
 
 //------------------------------------------------------------------------------
 // Is edge on a cell
-bool vtkMEDPolyDataNavigator::IsEdgeOnCell(vtkPolyData *polydata, int cellId, const Edge& edge) const
 //------------------------------------------------------------------------------
+bool vtkMEDPolyDataNavigator::IsEdgeOnCell(vtkPolyData *polydata, int cellId, const Edge& edge) const
 {
   EdgeVector cellEdges ;
   GetCellEdges(polydata, cellId, cellEdges) ;
@@ -907,11 +1182,70 @@ bool vtkMEDPolyDataNavigator::IsEdgeOnCell(vtkPolyData *polydata, int cellId, co
 
 
 //------------------------------------------------------------------------------
+// Is proposed edge a point-pair across this cell, joining non-adjacent points.
+// Can only be true for quads or higher.
+//------------------------------------------------------------------------------
+bool vtkMEDPolyDataNavigator::IsEdgeAcrossCell(vtkPolyData *polydata, int cellId, const Edge& edge) const
+{
+  vtkIdList *cellPts = vtkIdList::New() ;
+  polydata->GetCellPoints(cellId, cellPts) ;
+  int n = cellPts->GetNumberOfIds() ;
+  int index0 = FindIdInList(cellPts, edge.GetId0()) ;
+  int index1 = FindIdInList(cellPts, edge.GetId1()) ;
+  cellPts->Delete() ;
+
+  if (n < 4)
+    return false ;
+
+  if ((index0 == -1) || (index1 == -1))
+    return false ;
+
+  if ((index1 == index0) || (index1 == Modulo(index0+1, n)) || (index1 == Modulo(index0-1, n)))
+    return false ;
+
+  return true ;
+}
+
+
+
+
+//------------------------------------------------------------------------------
+// Is point in list of edges
+//------------------------------------------------------------------------------
+bool vtkMEDPolyDataNavigator::IsPointInEdgeList(int ptId, EdgeVector& edges)
+{
+  bool found = false ;
+  for (int i = 0 ;  i < (int)edges.size() && !found ;  i++)
+    found = edges[i].ContainsPoint(ptId) ;
+  return found ;
+}
+
+
+//------------------------------------------------------------------------------
+// Is point in list of edges
+//------------------------------------------------------------------------------
+bool vtkMEDPolyDataNavigator::IsPointInEdgeList(int ptId, EdgeVector& edges, int& whichEdge)
+{
+  bool found = false ;
+  whichEdge = -1 ;
+  for (int i = 0 ;  i < (int)edges.size() && !found ;  i++){
+    if (edges[i].ContainsPoint(ptId)){
+      whichEdge = i ;
+      found = true ;
+    }
+  }
+
+  return found ;
+}
+
+
+
+//------------------------------------------------------------------------------
 // Find point on cell which is opposite to the edge.
 // If cell is not a triangle, returns the first non-edge point found.
 // Returns -1 if none found.
-int vtkMEDPolyDataNavigator::GetPointOnCellOppositeToEdge(vtkPolyData *polydata, int cellId, const Edge& edge) const
 //------------------------------------------------------------------------------
+int vtkMEDPolyDataNavigator::GetPointOnCellOppositeToEdge(vtkPolyData *polydata, int cellId, const Edge& edge) const
 {
   int id = -1 ;
 
@@ -932,8 +1266,8 @@ int vtkMEDPolyDataNavigator::GetPointOnCellOppositeToEdge(vtkPolyData *polydata,
 
 //------------------------------------------------------------------------------
 // Get cell which containing both edges
-int vtkMEDPolyDataNavigator::GetCellWithTwoEdges(vtkPolyData *polydata, const Edge& edge0,  const Edge& edge1) const
 //------------------------------------------------------------------------------
+int vtkMEDPolyDataNavigator::GetCellWithTwoEdges(vtkPolyData *polydata, const Edge& edge0,  const Edge& edge1) const
 {
   int id ;
 
@@ -963,8 +1297,8 @@ int vtkMEDPolyDataNavigator::GetCellWithTwoEdges(vtkPolyData *polydata, const Ed
 
 //------------------------------------------------------------------------------
 // Get cell containing edge and point
-int vtkMEDPolyDataNavigator::GetCellWithEdgeAndPoint(vtkPolyData *polydata, const Edge& edge, int ptId) const
 //------------------------------------------------------------------------------
+int vtkMEDPolyDataNavigator::GetCellWithEdgeAndPoint(vtkPolyData *polydata, const Edge& edge, int ptId) const
 {
   int id ;
 
@@ -997,8 +1331,8 @@ int vtkMEDPolyDataNavigator::GetCellWithEdgeAndPoint(vtkPolyData *polydata, cons
 //------------------------------------------------------------------------------
 /// Get cell containing all three points
 /// Returns -1 if other than one cell found
-int vtkMEDPolyDataNavigator::GetCellWithThreePoints(vtkPolyData *polydata, int ptId0, int ptId1, int ptId2) const
 //------------------------------------------------------------------------------
+int vtkMEDPolyDataNavigator::GetCellWithThreePoints(vtkPolyData *polydata, int ptId0, int ptId1, int ptId2) const
 {
   int id ;
 
@@ -1035,8 +1369,8 @@ int vtkMEDPolyDataNavigator::GetCellWithThreePoints(vtkPolyData *polydata, int p
 
 //------------------------------------------------------------------------------
 // List cells in polydata with a given number of points
-void vtkMEDPolyDataNavigator::GetCellsWithNumberOfPoints(vtkPolyData *polydata,  int n,  vtkIdList *cellIds) const
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::GetCellsWithNumberOfPoints(vtkPolyData *polydata,  int n,  vtkIdList *cellIds) const
 {
   cellIds->Initialize() ;
 
@@ -1056,16 +1390,17 @@ void vtkMEDPolyDataNavigator::GetCellsWithNumberOfPoints(vtkPolyData *polydata, 
 
 //------------------------------------------------------------------------------
 // Get center of cell
-void vtkMEDPolyDataNavigator::GetCenterOfCell(vtkPolyData *polydata, int cellId, double x[3]) const
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::GetCenterOfCell(vtkPolyData *polydata, int cellId, double x[3]) const
 {
   vtkIdList *idsOnCell = vtkIdList::New() ;
   polydata->GetCellPoints(cellId, idsOnCell) ;
+  int n = idsOnCell->GetNumberOfIds() ;
 
   for (int j = 0 ;  j < 3 ;  j++)
     x[j] = 0.0 ;
 
-  for (int i = 0 ;  i < idsOnCell->GetNumberOfIds() ;  i++){
+  for (int i = 0 ;  i < n ;  i++){
     int ptId = idsOnCell->GetId(i) ;
     double *xpt = polydata->GetPoint(ptId) ;
     for (int j = 0 ;  j < 3 ;  j++)
@@ -1073,7 +1408,7 @@ void vtkMEDPolyDataNavigator::GetCenterOfCell(vtkPolyData *polydata, int cellId,
   }
 
   for (int j = 0 ;  j < 3 ;  j++)
-    x[j] /= (double)(idsOnCell->GetNumberOfIds()) ;
+    x[j] /= (double)n ;
 
   idsOnCell->Delete() ;
 }
@@ -1087,8 +1422,8 @@ void vtkMEDPolyDataNavigator::GetCenterOfCell(vtkPolyData *polydata, int cellId,
 // Useful for triangulating a cell.
 // tol is the tolerance for colinearity in degrees.
 // NB The output is the indices of the points on the cell, not the polydata id's.
-void vtkMEDPolyDataNavigator::GetPointsOnStraightSidesOfCell(vtkPolyData *polydata, int cellId, vtkIdList *ptIdsOnCell, double tol) const
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::GetPointsOnStraightSidesOfCell(vtkPolyData *polydata, int cellId, vtkIdList *ptIdsOnCell, double tol) const
 {
   double tolRad = 3.14159/180.0 * tol ;
 
@@ -1140,18 +1475,63 @@ void vtkMEDPolyDataNavigator::GetPointsOnStraightSidesOfCell(vtkPolyData *polyda
     if (colin)
       ptIdsOnCell->InsertNextId(ib) ;
   }
+
+  allIds->Delete() ;
 }
 
+
+
+//------------------------------------------------------------------------------
+// Get edges on boundary of polydata
+//------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::GetEdgesOnBoundary(vtkPolyData *polydata, EdgeVector& edges) const
+{
+  edges.clear() ;
+
+  EdgeVector allEdges ;
+  GetAllEdges(polydata, allEdges) ;
+
+  for (int i = 0 ;  i < (int)allEdges.size() ;  i++){
+    Edge edge = allEdges[i] ;
+    int n = GetNumberOfCellsOnEdge(polydata, edge) ;
+    if (n == 1)
+      edges.push_back(edge) ;
+  }
+}
+
+
+
+//------------------------------------------------------------------------------
+// Get points on boundary of polydata
+//------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::GetPointsOnBoundary(vtkPolyData *polydata, vtkIdList* ptIds) const
+{
+  EdgeVector edges ;
+  GetEdgesOnBoundary(polydata, edges) ;
+  GetPointsOnListOfEdges(polydata, edges, ptIds) ;
+}
+
+
+
+//------------------------------------------------------------------------------
+// Get cells on boundary of polydata
+//------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::GetCellsOnBoundary(vtkPolyData *polydata, vtkIdList* cellIds) const
+{
+  EdgeVector edges ;
+  GetEdgesOnBoundary(polydata, edges) ;
+  GetCellsOnListOfEdges(polydata, edges, cellIds) ;
+}
 
 
 
 //------------------------------------------------------------------------------
 // Get points with a given scalar value. \n
-// Useful for listing labelled cells.
-void vtkMEDPolyDataNavigator::GetPointsWithScalarValue(vtkPolyData *polydata, char* scalarName, int component, double value, vtkIdList *pts)
+// Useful for listing labelled points.
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::GetPointsWithScalarValue(vtkPolyData *polydata, char* scalarName, int component, double value, vtkIdList *pts)
 {
-  pts->Initialize() ;
+  pts->Reset() ;
 
   // find array with given name
   vtkDataArray *array = polydata->GetPointData()->GetScalars(scalarName) ;
@@ -1166,13 +1546,75 @@ void vtkMEDPolyDataNavigator::GetPointsWithScalarValue(vtkPolyData *polydata, ch
 }
 
 
+//------------------------------------------------------------------------------
+// Get cells with a given scalar value. \n
+// Useful for listing labelled cells.
+//------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::GetCellsWithScalarValue(vtkPolyData *polydata, char* scalarName, int component, double value, vtkIdList *pts)
+{
+  pts->Reset() ;
+
+  // find array with given name
+  vtkDataArray *array = polydata->GetCellData()->GetScalars(scalarName) ;
+  if (array == NULL)
+    return ;
+
+  for (int i = 0 ;  i < array->GetNumberOfTuples() ;  i++){
+    double thisValue = array->GetComponent(i, component) ;
+    if (thisValue == value)
+      pts->InsertNextId(i) ;
+  }
+}
+
+
+
+//------------------------------------------------------------------------------
+// Set list of points to a given scalar value. \n
+// Useful for labelling points.
+//------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::SetPointsToScalarValue(vtkPolyData *polydata, char* scalarName, int component, double value, vtkIdList *pts)
+{
+  // find array with given name
+  vtkDataArray *array = polydata->GetPointData()->GetScalars(scalarName) ;
+  if (array == NULL)
+    return ;
+
+  for (int i = 0 ;  i < pts->GetNumberOfIds() ;  i++){
+    int id = pts->GetId(i) ;
+    array->SetComponent(id, component, value) ;
+  }
+
+  array->Modified() ; // Essential because SetComponent() does not do it.
+}
+
+
+
+//------------------------------------------------------------------------------
+// Set list of cells to a given scalar value. \n
+// Useful for labelling cells.
+//------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::SetCellsToScalarValue(vtkPolyData *polydata, char* scalarName, int component, double value, vtkIdList* cells)
+{
+  // find array with given name
+  vtkDataArray *array = polydata->GetCellData()->GetScalars(scalarName) ;
+  if (array == NULL)
+    return ;
+
+  for (int i = 0 ;  i < cells->GetNumberOfIds() ;  i++){
+    int id = cells->GetId(i) ;
+    array->SetComponent(id, component, value) ;
+  }
+
+  array->Modified() ; // Essential because SetComponent() does not do it.
+}
+
 
 
 //------------------------------------------------------------------------------
 // PrintCell.
 // NB Needs BuildCells().
-void vtkMEDPolyDataNavigator::PrintCell(vtkPolyData *polydata, int cellId, ostream& os) const
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::PrintCell(vtkPolyData *polydata, int cellId, ostream& os) const
 {
   os << "cell " << cellId << ": " ;
 
@@ -1213,8 +1655,8 @@ void vtkMEDPolyDataNavigator::PrintCell(vtkPolyData *polydata, int cellId, ostre
 
 //------------------------------------------------------------------------------
 // Print all cells in polydata.
-void vtkMEDPolyDataNavigator::PrintCells(vtkPolyData *polydata, ostream& os)  const
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::PrintCells(vtkPolyData *polydata, ostream& os)  const
 {
   os << "number of cells = " << polydata->GetNumberOfCells() << std::endl ;
   for (int i = 0 ;  i < polydata->GetNumberOfCells() ;  i++)
@@ -1227,8 +1669,8 @@ void vtkMEDPolyDataNavigator::PrintCells(vtkPolyData *polydata, ostream& os)  co
 
 //------------------------------------------------------------------------------
 // Print attribute structure of polydata
-void vtkMEDPolyDataNavigator::PrintAttributeData(vtkPolyData *polydata, ostream& os,  bool printTuples)  const
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::PrintAttributeData(vtkPolyData *polydata, ostream& os,  bool printTuples)  const
 {
   //----------------------------------------------------------------------------
   // Point data
@@ -1348,14 +1790,29 @@ void vtkMEDPolyDataNavigator::PrintAttributeData(vtkPolyData *polydata, ostream&
 
 
 
+//------------------------------------------------------------------------------
+// Print bounds of polydata
+//------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::PrintBounds(vtkPolyData *polydata, ostream& os) const
+{
+  double b[6] ;
+  polydata->GetBounds(b) ;
+
+  os << "bounds\n" ;
+  os << b[0] << " " << b[1] << "\t" << "(size " << b[1]-b[0] << ")" << "\n" ;
+  os << b[2] << " " << b[3] << "\t" << "(size " << b[3]-b[2] << ")" << "\n" ;
+  os << b[4] << " " << b[5] << "\t" << "(size " << b[5]-b[4] << ")" << "\n" ;
+  os << "\n" ;
+}
+
 
 
 //------------------------------------------------------------------------------
 // Copy point data to the end of the attribute list,
 // increasing the no. of tuples by one.
 // The attributes are copied from the point id0.
-void vtkMEDPolyDataNavigator::CopyPointData(vtkPolyData *polydata,  int id0) const
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::CopyPointData(vtkPolyData *polydata,  int id0) const
 {
   vtkPointData *pd = polydata->GetPointData() ;
   int numberOfPtArrays = pd->GetNumberOfArrays() ;
@@ -1378,8 +1835,8 @@ void vtkMEDPolyDataNavigator::CopyPointData(vtkPolyData *polydata,  int id0) con
 // Copy point data to the end of the attribute list,
 // increasing the no. of tuples by one.
 // The attributes are interpolated between the points id0 and id1.
-void vtkMEDPolyDataNavigator::CopyPointData(vtkPolyData *polydata,  int id0, int id1, double lambda) const
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::CopyPointData(vtkPolyData *polydata,  int id0, int id1, double lambda) const
 {
   vtkPointData *pd = polydata->GetPointData() ;
   int numberOfPtArrays = pd->GetNumberOfArrays() ;
@@ -1406,8 +1863,8 @@ void vtkMEDPolyDataNavigator::CopyPointData(vtkPolyData *polydata,  int id0, int
 //------------------------------------------------------------------------------
 // Copy cell data to the end of the attribute list,
 // increasing the no. of tuples by one.
-void vtkMEDPolyDataNavigator::CopyCellData(vtkPolyData *polydata,  int cellId) const
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::CopyCellData(vtkPolyData *polydata,  int cellId) const
 {
   vtkCellData *cd = polydata->GetCellData() ;
   int numberOfCellArrays = cd->GetNumberOfArrays() ;
@@ -1430,21 +1887,35 @@ void vtkMEDPolyDataNavigator::CopyCellData(vtkPolyData *polydata,  int cellId) c
 
 //------------------------------------------------------------------------------
 // Delete tuples from cell attributes.
-void vtkMEDPolyDataNavigator::DeleteCellTuples(vtkPolyData *polydata, vtkIdList *cellIds)  const
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::DeleteCellTuples(vtkPolyData *polydata, vtkIdList *cellIds)  const
 {
+  vtkCellData *oldCellData = polydata->GetCellData() ;
+  int numberOfCellArrays = oldCellData->GetNumberOfArrays() ;
+  int ncellsOld = oldCellData->GetNumberOfTuples() ;
+  int ncellsToDelete = cellIds->GetNumberOfIds() ;
+
+  if (numberOfCellArrays == 0)
+    return ;
+
+  // make array labelling cells to keep
+  int *keep = new int[ncellsOld] ;
+  for (int i = 0 ;  i < ncellsOld ;  i++)
+    keep[i] = 1 ;
+  for (int i = 0 ;  i < ncellsToDelete ;  i++){
+    int id = cellIds->GetId(i) ;
+    assert(id < ncellsOld) ;
+    keep[id] = 0 ;
+  }
+
   // copy cell data to new array and empty it of existing tuples.
   vtkCellData *newCellData = vtkCellData::New() ;
   newCellData->DeepCopy(polydata->GetCellData()) ;
   newCellData->SetNumberOfTuples(0) ;
 
-  vtkCellData *oldCellData = polydata->GetCellData() ;
-  int numberOfCellArrays = oldCellData->GetNumberOfArrays() ;
-
-  // copy all tuples to new list which are not in the list of cells
-  for (int j = 0 ;  j < oldCellData->GetNumberOfTuples() ;  j++){
-    if (this->NotInList(j, cellIds)){
-
+  // copy all tuples to new list which are to keep
+  for (int j = 0 ;  j < ncellsOld ;  j++){
+    if (keep[j] == 1){
       for (int i = 0 ;  i < numberOfCellArrays ;  i++){
         vtkDataArray *daOld = oldCellData->GetArray(i) ;
         vtkDataArray *daNew = newCellData->GetArray(i) ;
@@ -1460,14 +1931,139 @@ void vtkMEDPolyDataNavigator::DeleteCellTuples(vtkPolyData *polydata, vtkIdList 
   }
 
   oldCellData->DeepCopy(newCellData) ;
+  delete [] keep ;
+  newCellData->Delete() ;
 }
 
 
 
 //------------------------------------------------------------------------------
-// Set cell to degenerate empty cell
-void vtkMEDPolyDataNavigator::SetCellToEmpty(vtkPolyData *polydata, int cellId) const
+// Create new attibute array
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::CreatePointDataArray(vtkPolyData *polydata, char* name, int numberOfComponents, int dataType) const
+{
+  vtkDataArray* scalars ;
+
+  switch(dataType){
+  case VTK_UNSIGNED_CHAR:
+    {
+      vtkUnsignedCharArray* array = vtkUnsignedCharArray::New() ;
+      scalars = array ;
+      break ;
+    }
+  case VTK_INT:
+    {
+      vtkIntArray* array = vtkIntArray::New() ;
+      scalars = array ;
+      break ;
+    }
+  case VTK_DOUBLE:
+    {
+      vtkDoubleArray* array = vtkDoubleArray::New() ;
+      scalars = array ;
+      break ;
+    }
+  case VTK_FLOAT:
+    {
+      vtkFloatArray* array = vtkFloatArray::New() ;
+      scalars = array ;
+      break ;
+    }
+  default:
+    return ;
+  }
+
+  int n = polydata->GetPoints()->GetNumberOfPoints() ;
+  int m = numberOfComponents ;
+
+  scalars->SetNumberOfComponents(m) ;
+  scalars->SetNumberOfTuples(n) ;  
+  scalars->SetName(name) ;
+
+  double* tuple = new double[m] ;
+  for (int j = 0 ;  j < m ;  j++)
+    tuple[j] = 255.0 ;
+
+  for (int i = 0 ;  i < n ;  i++)
+    scalars->SetTuple(i,tuple) ;
+
+  polydata->GetPointData()->SetScalars(scalars) ;
+  scalars->Delete() ;
+
+  delete [] tuple ;
+}
+
+
+
+
+
+
+
+//------------------------------------------------------------------------------
+// Create new attibute array
+//------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::CreateCellDataArray(vtkPolyData *polydata, char* name, int numberOfComponents, int dataType) const
+{
+//  vtkDataArray* scalars ;
+
+ /* switch(dataType){
+  case VTK_UNSIGNED_CHAR:
+    { */
+      vtkUnsignedCharArray* scalars = vtkUnsignedCharArray::New() ;
+      //scalars = array ;
+/*      break ;
+    }
+  case VTK_INT:
+    {
+      vtkIntArray* array = vtkIntArray::New() ;
+      scalars = array ;
+      break ;
+    }
+  case VTK_DOUBLE:
+    {
+      vtkDoubleArray* array = vtkDoubleArray::New() ;
+      scalars = array ;
+      break ;
+    }
+  case VTK_FLOAT:
+    {
+      vtkFloatArray* array = vtkFloatArray::New() ;
+      scalars = array ;
+      break ;
+    }
+  default:
+    return ;
+  }
+  */
+  int n = polydata->GetNumberOfCells() ;
+  int m = numberOfComponents ;
+
+  scalars->SetNumberOfComponents(m) ;
+  scalars->SetNumberOfTuples(n) ;  
+  scalars->SetName(name) ;
+  
+  double* tuple = new double[m] ;
+  for (int j = 0 ;  j < m ;  j++)
+    tuple[j] = 255.0 ;
+
+  for (int i = 0 ;  i < n ;  i++)
+    scalars->SetTuple(i,tuple) ;
+
+  polydata->GetCellData()->SetScalars(scalars) ;
+  scalars->Delete() ;
+
+  delete [] tuple ;
+}
+
+
+
+
+
+
+//------------------------------------------------------------------------------
+// Set cell to degenerate empty cell
+//------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::SetCellToEmpty(vtkPolyData *polydata, int cellId) const
 {
   polydata->ReplaceCell(cellId, 0, NULL) ;
 }
@@ -1476,11 +2072,11 @@ void vtkMEDPolyDataNavigator::SetCellToEmpty(vtkPolyData *polydata, int cellId) 
 
 
 //------------------------------------------------------------------------------
-// Delete list of cells. \n
+// Delete list of cells.
 // cf polydata->DeleteCell(), which labels the cell, but does not actually remove it.
-/// The corresponding attribute data is also deleted.
-void vtkMEDPolyDataNavigator::DeleteCells(vtkPolyData *polydata, vtkIdList *idList) const
+// The corresponding attribute data is also deleted.
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::DeleteCells(vtkPolyData *polydata, vtkIdList *idList) const
 {
   // This needs valid links, and doesn't build them itself.
   polydata->BuildCells() ;
@@ -1543,8 +2139,8 @@ void vtkMEDPolyDataNavigator::DeleteCells(vtkPolyData *polydata, vtkIdList *idLi
 // Returns the id of the created point.
 // This only creates a point - it does not add it to a cell.
 // This can be called successively, but you must delete or rebuild the cells and links when finished.
-int vtkMEDPolyDataNavigator::CreateNewPoint(vtkPolyData *polydata,  int id0) const
 //------------------------------------------------------------------------------
+int vtkMEDPolyDataNavigator::CreateNewPoint(vtkPolyData *polydata,  int id0) const
 {
   // add new point
   double x0[3] ;
@@ -1569,8 +2165,8 @@ int vtkMEDPolyDataNavigator::CreateNewPoint(vtkPolyData *polydata,  int id0) con
 // Lambda is the interpolation weight, where 0 <= lambda <= 1.
 // This only creates a point - it does not add it to a cell.
 // This can be called successively, but you must delete or rebuild the cells and links when finished.
-int vtkMEDPolyDataNavigator::CreateNewPoint(vtkPolyData *polydata,  int id0, int id1, double lambda) const
 //------------------------------------------------------------------------------
+int vtkMEDPolyDataNavigator::CreateNewPoint(vtkPolyData *polydata,  int id0, int id1, double lambda) const
 {
   // add new point
   double x0[3], x1[3], x[3] ;
@@ -1594,11 +2190,11 @@ int vtkMEDPolyDataNavigator::CreateNewPoint(vtkPolyData *polydata,  int id0, int
 
 //------------------------------------------------------------------------------
 // Create a new cell, adding tuples to the attribute data if necessary.
-/// The attribute data is copied from cellId.
+// The attribute data is copied from cellId.
 // Returns the id of the created cell.
 // This can be called successively, but you must delete or rebuild the cells and links when finished.
-int vtkMEDPolyDataNavigator::CreateNewCell(vtkPolyData *polydata,  int copyScalarsCellId,  vtkIdList *ids) const
 //------------------------------------------------------------------------------
+int vtkMEDPolyDataNavigator::CreateNewCell(vtkPolyData *polydata,  int copyScalarsCellId,  vtkIdList *ids) const
 {
   int idnew = polydata->GetPolys()->InsertNextCell(ids) ; // insert new cell
   CopyCellData(polydata, copyScalarsCellId) ;             // copy attribute data
@@ -1610,10 +2206,10 @@ int vtkMEDPolyDataNavigator::CreateNewCell(vtkPolyData *polydata,  int copyScala
 
 
 //------------------------------------------------------------------------------
-/// Copy cells to the end of the polydata. \n
-/// The cell attributes are also copied.
-void vtkMEDPolyDataNavigator::CopyCells(vtkPolyData *polydata,  vtkIdList *cellIds,  vtkIdList *newCellIds)  const
+// Copy cells to the end of the polydata. \n
+// The cell attributes are also copied.
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::CopyCells(vtkPolyData *polydata,  vtkIdList *cellIds,  vtkIdList *newCellIds)  const
 {
   // create array of id lists to store the point ids
   int n = cellIds->GetNumberOfIds() ;
@@ -1655,8 +2251,8 @@ void vtkMEDPolyDataNavigator::CopyCells(vtkPolyData *polydata,  vtkIdList *cellI
 // This creates a new point on the midpoint of each edge.  
 // The id's of the new points are returned in newPtIds.
 // All cells on each edge will gain the new point, so triangles will become quads.
-void vtkMEDPolyDataNavigator::AddPointsToEdges(vtkPolyData *polydata, EdgeVector edges, vtkIdList *newPtIds)  const
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::AddPointsToEdges(vtkPolyData *polydata, const EdgeVector& edges, vtkIdList *newPtIds)  const
 {
   //----------------------------------------------------------------------------
   // Get all the cells which use the edges
@@ -1728,7 +2324,105 @@ void vtkMEDPolyDataNavigator::AddPointsToEdges(vtkPolyData *polydata, EdgeVector
   //----------------------------------------------------------------------------
   for (int i = 0 ;  i < ncells ; i++)
     CreateNewCell(polydata, allCellsOnEdges->GetId(i), idsOfPtsOnCell[i]) ;
-  
+
+  this->DeleteCells(polydata, allCellsOnEdges) ;
+
+
+
+  // Free allocated memory
+  allCellsOnEdges->Delete() ;
+  for (int i = 0 ;  i < ncells ; i++)
+    idsOfPtsOnCell[i]->Delete() ;
+  delete [] idsOfPtsOnCell ;
+
+
+  // rebuild the links because we have changed the polydata
+  polydata->DeleteCells() ;
+  polydata->DeleteLinks() ;
+
+}
+
+
+
+//------------------------------------------------------------------------------
+// Add new points to edges. \n
+// This creates a new point on each edge, at an interpolated position lambda \n
+// The id's of the new points are returned in newPtIds. \n
+// All cells on each edge will gain the new point, so triangles will become quads.
+//------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::AddPointsToEdges(vtkPolyData *polydata, const EdgeVector& edges, std::vector<double> lambda, vtkIdList *newPtIds)  const
+{
+  //----------------------------------------------------------------------------
+  // Get all the cells which use the edges
+  // and list the id's of the cells as editable vtkIdList's 
+  //----------------------------------------------------------------------------
+  vtkIdList *allCellsOnEdges = vtkIdList::New() ;
+  GetCellsOnListOfEdges(polydata, edges, allCellsOnEdges) ;
+
+  int ncells = allCellsOnEdges->GetNumberOfIds() ;
+  vtkIdList **idsOfPtsOnCell = new (vtkIdList * [ncells]) ;
+  for (int i = 0 ;  i < ncells ; i++)
+    idsOfPtsOnCell[i] = vtkIdList::New() ;
+
+  for (int i = 0 ;  i < ncells ; i++)
+    polydata->GetCellPoints(allCellsOnEdges->GetId(i), idsOfPtsOnCell[i]) ;
+
+
+
+  //----------------------------------------------------------------------------
+  // Create new points on the edges
+  //----------------------------------------------------------------------------
+  newPtIds->Initialize() ;
+  int nedges = (int)edges.size() ;
+  for (int i = 0 ;  i < nedges ;  i++){
+    int id0 = edges.at(i).GetId0() ;
+    int id1 = edges.at(i).GetId1() ;
+    int idNew = CreateNewPoint(polydata, id0, id1, lambda.at(i)) ;
+    newPtIds->InsertNextId(idNew) ;
+  }
+
+
+  //----------------------------------------------------------------------------
+  // For each edge, add the new point id to the editable cells.
+  //----------------------------------------------------------------------------
+  vtkIdList *cellsOnThisEdge = vtkIdList::New() ;
+  for (int i = 0 ;  i < nedges ;  i++){
+    GetCellNeighboursOfEdge(polydata, edges.at(i), cellsOnThisEdge) ;
+
+    int id0 = edges.at(i).GetId0() ;
+    int id1 = edges.at(i).GetId1() ;
+    int idnew = newPtIds->GetId(i) ;
+
+    for (int j = 0 ;  j < cellsOnThisEdge->GetNumberOfIds() ;  j++){
+      int cellId = cellsOnThisEdge->GetId(j) ;
+
+      // find the array id of this cell id
+      bool found = false ;
+      int k = -1 ;
+      for (int ii = 0 ;  ii < ncells && !found ;  ii++){
+        int thisId = allCellsOnEdges->GetId(ii) ;
+        if (thisId == cellId){
+          k = ii ;
+          found = true ;
+        }
+      }
+      assert(found) ;
+
+      this->InsertIdBetweenIds(idsOfPtsOnCell[k], id0, id1, idnew) ;
+    }
+  }
+  cellsOnThisEdge->Delete() ;
+
+
+
+
+  //----------------------------------------------------------------------------
+  // Copy the modified editable cells to new polydata cells
+  // and delete original cells
+  //----------------------------------------------------------------------------
+  for (int i = 0 ;  i < ncells ; i++)
+    CreateNewCell(polydata, allCellsOnEdges->GetId(i), idsOfPtsOnCell[i]) ;
+
   this->DeleteCells(polydata, allCellsOnEdges) ;
 
 
@@ -1748,33 +2442,37 @@ void vtkMEDPolyDataNavigator::AddPointsToEdges(vtkPolyData *polydata, EdgeVector
 
 
 
-
-
 //------------------------------------------------------------------------------
 // Change a point id in a cell.
 // This searches for idold in the cell and replaces it with idnew.
-// This can (probably) be called successively, but you must delete or rebuild the cells and links when finished.
+// Returns true if a change was made.
+// This can be called successively, but you must delete or rebuild the cells and links when finished.
 // NB The methods ReplaceCellPoint() and ReplaceLinkedCell() don't seem to work.
-void vtkMEDPolyDataNavigator::ChangePointIdInCell(vtkPolyData *polydata, int cellId,  int idold, int idnew) const
 //------------------------------------------------------------------------------
+bool vtkMEDPolyDataNavigator::ChangePointIdInCell(vtkPolyData *polydata, int cellId,  int idold, int idnew) const
 {
+  bool changedCell = false ;
+
   vtkCell *cell = polydata->GetCell(cellId) ; // probably very inefficient !
   int n = cell->GetNumberOfPoints() ;
 
   int *ptIds = new int[n] ;
   for (int i = 0 ;  i < n ;  i++){
     int id = cell->GetPointId(i) ;
-    if (id == idold)
+    if (id == idold){
       ptIds[i] = idnew ;
+      changedCell = true ;
+    }
     else
       ptIds[i] = id ;
   }
 
-  polydata->ReplaceCell(cellId, n, ptIds) ;
+  if (changedCell)
+    polydata->ReplaceCell(cellId, n, ptIds) ;
 
   delete [] ptIds ;
+  return changedCell ;
 }
-
 
 
 
@@ -1782,8 +2480,8 @@ void vtkMEDPolyDataNavigator::ChangePointIdInCell(vtkPolyData *polydata, int cel
 // Split cells.
 // The edges are the point-pairs which must be connected across each cell.
 // The cells must be quads or greater.
-void vtkMEDPolyDataNavigator::SplitCells(vtkPolyData *polydata,  vtkIdList *cellIds,  EdgeVector edges) const
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::SplitCells(vtkPolyData *polydata,  vtkIdList *cellIds,  const EdgeVector& edges) const
 {
   vtkIdList *cellPts = vtkIdList::New() ;
   vtkIdList *cellPts0 = vtkIdList::New() ;
@@ -1833,8 +2531,8 @@ void vtkMEDPolyDataNavigator::SplitCells(vtkPolyData *polydata,  vtkIdList *cell
 // Quads will be split into two triangles.
 // Cells greater than quads will be split in half.
 // The cells must be quads or greater.
-void vtkMEDPolyDataNavigator::SplitCells(vtkPolyData *polydata,  vtkIdList *cellIds,  vtkIdList *ptIds) const
 //------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::SplitCells(vtkPolyData *polydata,  vtkIdList *cellIds,  vtkIdList *ptIds) const
 {
   EdgeVector edges ;
 
@@ -1868,6 +2566,204 @@ void vtkMEDPolyDataNavigator::SplitCells(vtkPolyData *polydata,  vtkIdList *cell
 
 
 //------------------------------------------------------------------------------
+// Split cells. 
+// Many cutting lines per cell, defined by list of point pairs. 
+// This does not create new points nor affect neighbouring cells. 
+// The edges are the point-pairs which must be connected across each cell. 
+// The cells must be quads or greater.  For triangles, add the extra points first, then split.
+//------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::SplitCells(vtkPolyData *polydata,  vtkIdList *cellIds,  std::vector<EdgeVector>& edgeLists) const
+{
+  const int MaxSubCells = 10 ;
+
+  // allocate list of subcells
+  std::vector<vtkIdList*> subCells ;
+  for (int i = 0 ;  i < MaxSubCells ;  i++){
+    vtkIdList* tmp = vtkIdList::New() ;
+    tmp->Initialize() ;
+    subCells.push_back(tmp) ;
+  }
+
+  for (int i = 0 ;  i < cellIds->GetNumberOfIds() ;  i++){
+    int numSubCells ;
+    bool ok = FindSubCellsOfCell(polydata, i, edgeLists[i], subCells, MaxSubCells, numSubCells) ;
+    assert(ok) ;
+
+    // create new cells from the list of subcells
+    for (int j = 0 ;  j < numSubCells ;  j++)
+      CreateNewCell(polydata, cellIds->GetId(i), subCells[j]) ;
+  }
+
+  // delete the invalid links
+  polydata->DeleteCells() ;
+  polydata->DeleteLinks() ;
+
+  // delete the original cells
+  this->DeleteCells(polydata, cellIds) ;
+
+  // free allocated memory
+  for (int i = 0 ;  i < MaxSubCells ;  i++)
+    subCells[i]->Delete() ;
+}
+
+
+
+//------------------------------------------------------------------------------
+// Find the subcells of a cell which is transected by a list of point pairs. \n
+// Subcells returned as a vector of vtkIdList pointers. (Must be pre-allocated). \n
+// This does not affect the polydata.
+// Returns true if sucessful.
+//------------------------------------------------------------------------------
+bool vtkMEDPolyDataNavigator::FindSubCellsOfCell(
+  vtkPolyData *polydata, int cellId, 
+  const EdgeVector& edges, 
+  std::vector<vtkIdList*>& outputCells, 
+  int maxSubCells, int& numOutputCells) const
+{
+  numOutputCells = 0 ;
+
+  //----------------------------------------------
+  // init list of input cell points
+  //----------------------------------------------
+  vtkIdList* inputCellIds = vtkIdList::New() ;
+
+  if ((int)edges.size() == 0)
+    return false ;
+
+  polydata->GetCellPoints(cellId, inputCellIds) ;
+
+  int n = inputCellIds->GetNumberOfIds() ;
+  assert(n >= 4) ;
+
+
+  //---------------------------------------------------------------------
+  // empty output lists of any previous data
+  //---------------------------------------------------------------------
+  for (int i = 0 ;  i < maxSubCells ;  i++)
+    outputCells[i]->Reset() ;
+
+
+  //---------------------------------------------------------------------
+  // Go round cell, counting how many edges are on each point
+  //---------------------------------------------------------------------
+  int *count = new int[n] ;
+  for (int i = 0 ;  i < n ;  i++){
+    count[i] = 0 ;
+    int ptId = inputCellIds->GetId(i) ;
+    for (int j = 0 ;  j < (int)edges.size() ;  j++){
+      if (edges[j].ContainsPoint(ptId))
+        count[i]++ ;
+    }
+  }
+
+  // Set start point to first which is not joined to an edge
+  int startPtCellIndex = -1 ;
+  bool found = false ;
+  for (int i = 0 ;  i < n && !found ;  i++){
+    if (count[i] == 0){
+      startPtCellIndex = i ;
+      found = true ;
+    }
+  }
+
+  if (!found){
+    // couldn't find start point - possibly due to crossed edges
+    inputCellIds->Delete() ;
+    delete [] count ;
+    return false ;
+  }
+
+
+  //---------------------------------------------------------------------
+  // Go round the input cell in opposite directions, left and right, from the start point.
+  // Each list stops when it reaches a point connected to an edge.
+  // The left and right points should now match an edge in the list, asuming the edges don't cross.
+  // The left and right lists then form a subcell.
+  // Continue until the lists meet.
+  //---------------------------------------------------------------------
+
+  vtkIdList* leftList = vtkIdList::New() ;
+  vtkIdList* rightList = vtkIdList::New() ;
+  leftList->Initialize() ;
+  rightList->Initialize() ;
+
+  bool ok = true ;
+  bool finished = false ;
+
+  // these variables mark where each side has got up to
+  int leftIndex = Modulo(startPtCellIndex,n) ;
+  int rightIndex = Modulo(startPtCellIndex-1,n) ;
+
+  for (int subCellId = 0 ;  !finished && ok && subCellId < maxSubCells ;  subCellId++){
+    int i, j, leftPtId, rightPtId ;
+    bool istop, jstop ;
+
+    // create the left list
+    leftList->Reset() ;
+    for (i = 0, istop = false ;  i < n && !istop && !finished;  i++){
+      int ii = Modulo(leftIndex+i,n) ;
+      leftList->InsertNextId(ii) ;
+
+      if ((count[ii] > 0) || (ii == rightIndex)){
+        leftIndex = ii ;
+        leftPtId = inputCellIds->GetId(ii) ;
+        count[ii]-- ;
+        istop = true ;
+      }
+    }
+
+    finished = (leftIndex == rightIndex) ;
+
+    // create the right list 
+    rightList->Reset() ;
+    for (j = 0, jstop = false ;  j < n && !jstop && !finished ;  j++){
+      int jj = Modulo(rightIndex-j,n) ;
+      rightList->InsertNextId(jj) ;
+
+      if ((count[jj] > 0)|| (jj == leftIndex)){
+        rightIndex = jj ;
+        rightPtId = inputCellIds->GetId(jj) ;
+        count[jj]-- ;
+        jstop = true ;
+      }
+    }
+
+    finished = (leftIndex == rightIndex) ;
+
+    // error check - should not exceed max no. of subcells
+    ok &= (subCellId < maxSubCells) ;
+
+    // error check - ends should belong to an edge which is actually in the list
+    if (!finished){
+      Edge testEdge(leftPtId, rightPtId) ;
+      bool foundTestEdge = false ;
+      for (int i = 0 ;  i < (int)edges.size() && !foundTestEdge ;  i++)
+        foundTestEdge = edges[i] == testEdge ;
+
+      ok &= foundTestEdge ;
+    }
+
+    if (ok){
+      // copy the left and right lists to the current sub cell
+      vtkIdList* outputSubCell = outputCells[subCellId] ;
+      ReverseIdList(rightList) ;
+      outputSubCell->Initialize() ;
+      this->AppendIdList(outputSubCell, leftList) ;
+      this->AppendIdList(outputSubCell, rightList) ;
+      numOutputCells++ ;
+    }
+  }
+
+  inputCellIds->Delete() ;
+  delete [] count ;
+  leftList->Delete() ;
+  rightList->Delete() ;
+  return ok ;
+}
+
+
+
+//------------------------------------------------------------------------------
 // Subdivide triangular cells. \n
 // Each listed cell is split into 4, \n
 // and the neighbours of the listed cells are triangulated as required.
@@ -1890,14 +2786,15 @@ void vtkMEDPolyDataNavigator::SubdivideCells(vtkPolyData *polydata,  vtkIdList *
   newPtIds->Delete() ;
 
 
-
   //----------------------------------------------------------------------------
   // relocate the modified cells
   //----------------------------------------------------------------------------
   cellIds->Initialize() ;
   for (int i = 0 ;  i < polydata->GetNumberOfCells() ;  i++){
-    if (GetNumberOfPointsOnCell(polydata, i) > 3)
+    if (GetNumberOfPointsOnCell(polydata, i) > 3){
+      int n = GetNumberOfPointsOnCell(polydata, i) ;
       cellIds->InsertNextId(i) ;
+    }
   }
 
 
@@ -1915,7 +2812,7 @@ void vtkMEDPolyDataNavigator::SubdivideCells(vtkPolyData *polydata,  vtkIdList *
 
   vtkIdList *subvidedCells = vtkIdList::New() ;
   vtkIdList *idsOfNewCells = vtkIdList::New() ;
- 
+
   for (int i = 0 ;  i < cellIds->GetNumberOfIds() ;  i++){
     int cellId = cellIds->GetId(i) ;
 
@@ -1924,8 +2821,9 @@ void vtkMEDPolyDataNavigator::SubdivideCells(vtkPolyData *polydata,  vtkIdList *
 
     // Get the list of points added to the sides of the original triangle
     // (These points are indices on the cell, not polydata id's)
+    // Note the angular tolerance - cell mustn't be too sharp
     sidePtsOnCell->Initialize() ;
-    GetPointsOnStraightSidesOfCell(polydata, cellId, sidePtsOnCell, 10.0) ;
+    GetPointsOnStraightSidesOfCell(polydata, cellId, sidePtsOnCell, 0.001) ;
 
     int nPts = allPtsOnCell->GetNumberOfIds() ;
     int nSidePts = sidePtsOnCell->GetNumberOfIds() ;
@@ -2063,6 +2961,19 @@ void vtkMEDPolyDataNavigator::SubdivideCells(vtkPolyData *polydata,  vtkIdList *
 
 
 
+//------------------------------------------------------------------------------
+// Subdivide all cells in mesh (triangles only)
+// Each cell is split into 4.
+//------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::SubdivideAllCells(vtkPolyData *polydata) const
+{
+  vtkIdList *cellIds = vtkIdList::New() ;
+  SetIdListToAllCells(polydata, cellIds) ;
+  SubdivideCells(polydata, cellIds) ;
+  cellIds->Delete() ;
+}
+
+
 
 //------------------------------------------------------------------------------
 // Merge points.
@@ -2072,7 +2983,7 @@ void vtkMEDPolyDataNavigator::SubdivideCells(vtkPolyData *polydata,  vtkIdList *
 //  0.5 sets the new point to half-way between the two.
 //------------------------------------------------------------------------------
 void vtkMEDPolyDataNavigator::MergePoints(vtkPolyData *polydata, vtkIdList *idsIn0,  vtkIdList *idsIn1,  
-                                           vtkIdList *idsOut,  double lambda) const
+  vtkIdList *idsOut,  double lambda) const
 {
   //----------------------------------------------------------------------------
   // Check the input data
@@ -2198,10 +3109,11 @@ void vtkMEDPolyDataNavigator::MergePoints(vtkPolyData *polydata, vtkIdList *idsI
 
 
 
+
 //------------------------------------------------------------------------------
 // Modulo operator, same as % but works correctly on negative values of n as well
-int vtkMEDPolyDataNavigator::Modulo(int n, int m) const
 //------------------------------------------------------------------------------
+int vtkMEDPolyDataNavigator::Modulo(int n, int m) const
 {
   if (n >= 0)
     return n % m ;
@@ -2211,26 +3123,43 @@ int vtkMEDPolyDataNavigator::Modulo(int n, int m) const
 
 
 
+
+
 //------------------------------------------------------------------------------
-// Equals operator for Edge helper class
-bool vtkMEDPolyDataNavigator::Edge::operator==(const Edge& edge) const
+// Edge:
+// Are edges joined by at least one point
 //------------------------------------------------------------------------------
+bool vtkMEDPolyDataNavigator::Edge::IsJoined(const Edge& edge) const
 {
   return (
-    ((edge.Id0 == Id0) && (edge.Id1 == Id1)) || 
-    ((edge.Id0 == Id1) && (edge.Id1 == Id0))
+    ((edge.m_Id0 == m_Id0) || (edge.m_Id1 == m_Id1)) || 
+    ((edge.m_Id0 == m_Id1) || (edge.m_Id1 == m_Id0))
     );
 } 
 
 
 //------------------------------------------------------------------------------
-// Not equals operator for Edge helper class
-bool vtkMEDPolyDataNavigator::Edge::operator!=(const Edge& edge) const
+// Edge:
+// Equals operator
 //------------------------------------------------------------------------------
+bool vtkMEDPolyDataNavigator::Edge::operator==(const Edge& edge) const
+{
+  return (
+    ((edge.m_Id0 == m_Id0) && (edge.m_Id1 == m_Id1)) || 
+    ((edge.m_Id0 == m_Id1) && (edge.m_Id1 == m_Id0))
+    );
+} 
+
+
+//------------------------------------------------------------------------------
+// Edge:
+// Not equals operator
+//------------------------------------------------------------------------------
+bool vtkMEDPolyDataNavigator::Edge::operator!=(const Edge& edge) const
 {
   return !(
-    ((edge.Id0 == Id0) && (edge.Id1 == Id1)) || 
-    ((edge.Id0 == Id1) && (edge.Id1 == Id0))
+    ((edge.m_Id0 == m_Id0) && (edge.m_Id1 == m_Id1)) || 
+    ((edge.m_Id0 == m_Id1) && (edge.m_Id1 == m_Id0))
     );
 } 
 

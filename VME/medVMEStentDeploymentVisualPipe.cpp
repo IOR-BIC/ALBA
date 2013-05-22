@@ -68,6 +68,7 @@ medVMEStentDeploymentVisualPipe::medVMEStentDeploymentVisualPipe(vtkRenderer *re
   m_VesselActor->SetMapper(m_VesselMapper) ;
   m_VesselActor->GetProperty()->SetColor(0, 1, 0) ;
   m_VesselActor->GetProperty()->SetOpacity(0.2) ;
+  //m_VesselActor->GetProperty()->SetRepresentationToWireframe() ;
   m_VesselActor->SetVisibility(0) ;
   m_Renderer->AddActor(m_VesselActor) ;
 

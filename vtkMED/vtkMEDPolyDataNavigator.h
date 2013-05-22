@@ -13,8 +13,6 @@
 #include <assert.h>
 
 
-
-
 //------------------------------------------------------------------------------
 /// vtkMEDPolyDataNavigator. \n
 /// Useful methods for navigating and editing vtkPolyData and vtkIdList. \n\n
@@ -42,9 +40,9 @@
 // Therefore methods which change the polydata should finish by deleting the invalid links,
 // or carry a warning that the user should do it.
 //
-// Version: Nigel McFarlane 8.7.11
+// Version: Nigel McFarlane 21.5.13
 //------------------------------------------------------------------------------
-class VTK_vtkMED_EXPORT vtkMEDPolyDataNavigator : public vtkObject
+class VTK_GRAPHICS_EXPORT vtkMEDPolyDataNavigator : public vtkObject
 {
 public:
   static vtkMEDPolyDataNavigator *New();
@@ -81,6 +79,9 @@ public:
 
   /// Delete last entry in id list
   void DeleteLastId(vtkIdList *idList) const ;
+
+  /// Reverse entries in id list
+  void ReverseIdList(vtkIdList *idList) const ;
 
   /// Append id list: idList = idList + addList. \n
   /// Note the flags which allow you to omit the first and last ids.
@@ -131,11 +132,35 @@ public:
   /// This is efficient if there are a lot of id's.
   inline void AddUniqueIdToSet(IdSet& idSet, int id) const {idSet.insert(id);}
 
-  /// Copy id map to vtkIdList
-  void CopyIdSetToList(IdSet idSet, vtkIdList *idList) const ;
+  /// Copy vtkIdList to id set. \n
+  /// NB if an id appears twice in the id list, it will only copy once to the map.
+  void vtkMEDPolyDataNavigator::CopyListToIdSet(vtkIdList *idList, IdSet& idSet) const ;
+
+  /// Add vtkIdList to id set. \n
+  /// NB if an id appears twice in the id list, it will only copy once to the map. \n
+  /// This is a good way to remove duplicate ids from a list.
+  void vtkMEDPolyDataNavigator::AddListToIdSet(vtkIdList *idList, IdSet& idSet) const ;
+
+  /// Copy id set to vtkIdList
+  void CopyIdSetToList(const IdSet& idSet, vtkIdList *idList) const ;
+
+  /// Get ids in the range (0,n-1) which are not in the list.
+  void GetIdsNotInList(vtkIdList* idsIn, vtkIdList* idsOut, int n) ;
 
   /// Cyclic shift id list
   void CyclicShiftIdList(vtkIdList *idList, int nsteps) const ;
+
+  /// Copy vector to id list
+  void CopyVectorToList(const std::vector<int>& vlist, vtkIdList* idList, bool append) const ;
+
+  /// Copy id list to vector
+  void CopyListToVector(vtkIdList* idList, std::vector<int>& vlist, bool append) const ;
+
+  /// Set id list to all points (0,1,2...npts-1)
+  void SetIdListToAllPoints(vtkPolyData *polydata, vtkIdList *list) const ;
+
+  /// Set id list to all cells (0,1,2...ncells-1)
+  void SetIdListToAllCells(vtkPolyData *polydata, vtkIdList *list) const ;
 
   /// Print id list
   void PrintIdList(vtkIdList *idList, ostream& os) const ;
@@ -147,7 +172,7 @@ public:
   //----------------------------------------------------------------------------
 
   /// Add edge to list if not already present. \n
-  /// NB This is stupendously inefficient if there are a lot of edges ! \n
+  /// NB This is stupendously inefficient if there are a lot of edges !
   void AddUniqueEdge(const Edge& edge, EdgeVector& edgeList) const ; 
 
   /// Add edge to multimap if not already present. \n
@@ -155,11 +180,15 @@ public:
   void AddUniqueEdge(const Edge& edge, EdgeMultiMap& edgeMap) const ; 
 
   /// Copy edge multimap to vector
+  // (NB Can't declare const EdgeMultiMap& for some reason)
   void CopyEdgeMapToVector(EdgeMultiMap& edgeMap, EdgeVector& edges) const ;
 
-  /// Get number of points on cell
+  /// Get number of points on cell. \n
   /// This is not very efficient, so not recommended to call a large number of times.
   int GetNumberOfPointsOnCell(vtkPolyData *polydata, int cellId) const ;
+
+  /// Get points on cell with coords (cf polydata->GetCellPoints())
+  void GetCellPointsWithCoords(vtkPolyData *polydata, int cellId, vtkIdList* ptIds, double (*coords)[3]) ;
 
   /// Get edges of cell.
   void GetCellEdges(vtkPolyData *polydata, int cellId, EdgeVector& edges) const ;
@@ -205,14 +234,39 @@ public:
   /// Get list of all edges on list of cells, in the form of a multimap for quick search
   void GetEdgesOnListOfCells(vtkPolyData *polydata, vtkIdList *cellList, EdgeMultiMap& edges) const ;
 
+  /// Get list of all points on list of edges
+  void GetPointsOnListOfEdges(vtkPolyData *polydata, const EdgeVector& edgeList, vtkIdList* ptList) const ;
+
+  /// Get list of all points on list of edges, in the form of a set for quick search
+  void GetPointsOnListOfEdges(vtkPolyData *polydata, const EdgeVector& edgelist, IdSet& ptSet) const ;
+
   /// Get list of all cells on list of edges
-  void GetCellsOnListOfEdges(vtkPolyData *polydata, EdgeVector& edgeList, vtkIdList* cellList) const ;
+  void GetCellsOnListOfEdges(vtkPolyData *polydata, const EdgeVector& edgeList, vtkIdList* cellList) const ;
 
   /// Get list of all cells on list of edges, in the form of a set for quick search
-  void GetCellsOnListOfEdges(vtkPolyData *polydata, EdgeVector& edgelist, IdSet& cellSet) const ;
+  void GetCellsOnListOfEdges(vtkPolyData *polydata, const EdgeVector& edgelist, IdSet& cellSet) const ;
+
+  /// Get list of all cells on list of points
+  void GetCellsOnListOfPoints(vtkPolyData *polydata, vtkIdList *ptIds, vtkIdList* cellList) const ;
+
+  /// Get list of all cells on list of points, in the form of a set for quick search
+  void GetCellsOnListOfPoints(vtkPolyData *polydata, vtkIdList *ptIds, IdSet& cellSet) const ;
 
   /// Get the edge connected neighbours of a cell
   void GetCellsOnCell_EdgeConnected(vtkPolyData *polydata, int cellId,  vtkIdList *idList) const ;
+
+  /// Get edge connected neighbours of list of cells
+  void GetCellsOnListOfCells_EdgeConnected(vtkPolyData *polydata, vtkIdList* cellsIn, vtkIdList* cellsOut) ;
+
+  /// Get edge connected neighbours of list of cells
+  void GetCellsOnListOfCells_EdgeConnected(vtkPolyData *polydata, IdSet& cellsIn, IdSet& cellsOut) ;
+
+  /// Find edge in list.  Returns -1 if not found.
+  int FindEdgeInList(Edge& edge, EdgeVector& edgeList) const ;
+
+  /// Find index of point on a cell
+  /// Returns - 1 if not found
+  int FindIndexOfPointOnCell(vtkPolyData *polydata, int cellId, int ptId) const ;
 
   /// Is point on a cell
   bool IsPointOnCell(vtkPolyData *polydata, int cellId, int ptId) const ;
@@ -220,20 +274,30 @@ public:
   /// Is edge on a cell
   bool IsEdgeOnCell(vtkPolyData *polydata, int cellId, const Edge& edge) const ;
 
+  /// Is proposed edge a point-pair across this cell, joining non-adjacent points. \n
+  /// Can only be true for quads or higher.
+  bool IsEdgeAcrossCell(vtkPolyData *polydata, int cellId, const Edge& edge) const ;
+
+  /// Is point in list of edges
+  bool IsPointInEdgeList(int ptId, EdgeVector& edges) ;
+
+  /// Is point in list of edges
+  bool IsPointInEdgeList(int ptId, EdgeVector& edges, int& whichEdge) ;
+
   /// Find point on cell which is opposite to the edge. \n
   /// If cell is not a triangle, returns the first non-edge point found. \n
   /// Returns -1 if none found.
   int GetPointOnCellOppositeToEdge(vtkPolyData *polydata, int cellId, const Edge& edge) const ;
 
-  /// Get cell which containing both edges
+  /// Get cell which contains both edges. \n
   /// Returns -1 if other than one cell found
   int GetCellWithTwoEdges(vtkPolyData *polydata, const Edge& edge0,  const Edge& edge1)  const ;
 
-  /// Get cell containing edge and point
+  /// Get cell containing edge and point. \n
   /// Returns -1 if other than one cell found
   int GetCellWithEdgeAndPoint(vtkPolyData *polydata, const Edge& edge, int ptId)  const ;
 
-  /// Get cell containing all three points
+  /// Get cell containing all three points \n
   /// Returns -1 if other than one cell found
   int GetCellWithThreePoints(vtkPolyData *polydata, int ptId0, int ptId1, int ptId2)  const ;
 
@@ -250,9 +314,30 @@ public:
   /// NB The output is the indices of the points on the cell, not the polydata id's.
   void GetPointsOnStraightSidesOfCell(vtkPolyData *polydata, int cellId, vtkIdList *ptIds, double tol) const ;
 
+  /// Get edges on boundary of polydata
+  void GetEdgesOnBoundary(vtkPolyData *polydata, EdgeVector& edges) const ;
+
+  /// Get points on boundary of polydata
+  void GetPointsOnBoundary(vtkPolyData *polydata, vtkIdList* ptIds) const ;
+
+  /// Get cells on boundary of polydata
+  void GetCellsOnBoundary(vtkPolyData *polydata, vtkIdList* cellIds) const ;
+
   /// Get points with a given scalar value. \n
-  /// Useful for listing labelled cells.
+  /// Useful for listing labelled points.
   void GetPointsWithScalarValue(vtkPolyData *polydata, char* scalarName, int component, double value, vtkIdList *pts) ;
+
+  /// Get cells with a given scalar value. \n
+  /// Useful for listing labelled cells.
+  void GetCellsWithScalarValue(vtkPolyData *polydata, char* scalarName, int component, double value, vtkIdList *cells) ;
+
+  /// Set list of points to a given scalar value. \n
+  /// Useful for labelling points.
+  void SetPointsToScalarValue(vtkPolyData *polydata, char* scalarName, int component, double value, vtkIdList *pts) ;
+
+  /// Set list of cells to a given scalar value. \n
+  /// Useful for labelling cells.
+  void SetCellsToScalarValue(vtkPolyData *polydata, char* scalarName, int component, double value, vtkIdList *cells) ;
 
   /// PrintCell. \n
   /// NB This depends on BuildCells()
@@ -263,6 +348,9 @@ public:
 
   /// Print attribute structure of polydata
   void PrintAttributeData(vtkPolyData *polydata, ostream& os, bool printTuples = false)  const ;
+
+  /// Print bounds of polydata
+  void PrintBounds(vtkPolyData *polydata, ostream& os) const ;
 
 
   //----------------------------------------------------------------------------
@@ -286,6 +374,11 @@ public:
   /// Delete tuples from cell attributes. \n
   void DeleteCellTuples(vtkPolyData *polydata, vtkIdList *cellIds)  const ;
 
+  /// Create new attibute array
+  void CreatePointDataArray(vtkPolyData *polydata, char* name, int numberOfComponents, int dataType) const ;
+
+  /// Create new attibute array
+  void CreateCellDataArray(vtkPolyData *polydata, char* name, int numberOfComponents, int dataType) const ;
 
 
   //----------------------------------------------------------------------------
@@ -330,32 +423,53 @@ public:
   /// This creates a new point on the midpoint of each edge. \n
   /// The id's of the new points are returned in newPtIds. \n
   /// All cells on each edge will gain the new point, so triangles will become quads.
-  void AddPointsToEdges(vtkPolyData *polydata, EdgeVector edges, vtkIdList *newPtIds)  const ;
+  void AddPointsToEdges(vtkPolyData *polydata, const EdgeVector& edges, vtkIdList *newPtIds)  const ;
+
+  /// Add new points to edges. \n
+  /// This creates a new point on each edge, at an interpolated position lambda \n
+  /// The id's of the new points are returned in newPtIds. \n
+  /// All cells on each edge will gain the new point, so triangles will become quads.
+  void AddPointsToEdges(vtkPolyData *polydata, const EdgeVector& edges, std::vector<double> lambda, vtkIdList *newPtIds)  const ;
 
   /// Change a point id in a cell. \n
   /// This searches for idold in the cell and replaces it with idnew. \n
-  /// This can (probably) be called successively, but you must delete or rebuild the cells and links when finished.
-  void ChangePointIdInCell(vtkPolyData *polydata, int cellId,  int idold, int idnew) const ;
+  /// Returns true if a change was made. \n
+  /// This can be called successively, but you must delete or rebuild the cells and links when finished.
+  bool ChangePointIdInCell(vtkPolyData *polydata, int cellId,  int idold, int idnew) const ;
 
   /// Split cells. \n
+  /// One cutting line per cell, defined by two given points. \n
   /// This does not create new points nor affect neighbouring cells. \n
   /// The edges are the point-pairs which must be connected across each cell. \n
-  /// The cells must be quads or greater.
-  void SplitCells(vtkPolyData *polydata,  vtkIdList *cellIds,  EdgeVector edges) const ;
+  /// The cells must be quads or greater.  For triangles, add the extra points first, then split.
+  void SplitCells(vtkPolyData *polydata,  vtkIdList *cellIds,  const EdgeVector& edges) const ;
 
   /// Split cells. \n
+  /// One cutting line per cell, defined by a single given point to the opposite point. \n
   /// This does not create new points nor affect neighbouring cells. \n
   /// Each cell is split along a new edge from the given point to the opposite point. \n
   /// Quads will be split into two triangles. \n
   /// Cells greater than quads will be split in half. \n
-  /// The cells must be quads or greater.
+  /// The cells must be quads or greater.  For triangles, add the extra points first, then split.
   void SplitCells(vtkPolyData *polydata,  vtkIdList *cellIds,  vtkIdList *ptIds) const ;
+
+  /// Split cells. \n
+  /// Many cutting lines per cell, defined by list of point pairs. \n
+  /// This does not create new points nor affect neighbouring cells. \n
+  /// The edges are the point-pairs which must be connected across each cell. \n
+  /// The cells must be quads or greater.  For triangles, add the extra points first, then split.
+  /// (This has not been tested)
+  void SplitCells(vtkPolyData *polydata,  vtkIdList *cellIds,  std::vector<EdgeVector>& edgeLists) const ;
 
   /// Subdivide triangular cells. \n
   /// Each listed cell is split into 4, \n
   /// and the neighbours of the listed cells are triangulated as required. \n
   /// The list of input cellId's is overwritten by the list of new cells.
   void SubdivideCells(vtkPolyData *polydata,  vtkIdList *cellIds) const ;
+
+  /// Subdivide all cells in mesh (triangles only). \n
+  /// Each cell is split into 4.
+  void SubdivideAllCells(vtkPolyData *polydata) const ;
 
   /// Merge points. \n
   /// The points in the input lists are merged and assigned the new ids in the output list. \n
@@ -366,13 +480,23 @@ public:
 
 
 
+
   //----------------------------------------------------------------------------
   /// protected methods
   //----------------------------------------------------------------------------
 
-  protected:
-    vtkMEDPolyDataNavigator() ; ///< constructor
-    ~vtkMEDPolyDataNavigator() ; ///< deconstructor
+protected:
+  vtkMEDPolyDataNavigator() ; ///< constructor
+  ~vtkMEDPolyDataNavigator() ; ///< deconstructor
+
+  /// Find the subcells of a cell which is transected by a list of point pairs. \n
+  /// Subcells returned as a vector of vtkIdList pointers. (Must be pre-allocated). \n
+  /// This does not affect the polydata.
+  /// Returns true if sucessful.
+  bool FindSubCellsOfCell(vtkPolyData *polydata, int cellId, const EdgeVector& edges, 
+    std::vector<vtkIdList*>& outputCells, 
+    int maxSubCells, int& numOutputCells) const ;
+
 
 } ;
 
@@ -388,22 +512,24 @@ public:
 class vtkMEDPolyDataNavigator::Edge
 {
 public:
-  Edge(int id0, int id1) : Id0(id0), Id1(id1) {} ///< constructor
-  int GetId0() const {return Id0 ;} ///< get id0
-  int GetId1() const {return Id1 ;} ///< get id1
-  void SetId0(int id0) {Id0 = id0 ;} ///< set id0
-  void SetId1(int id1) {Id1 = id1 ;} ///< set id1
-  int GetOtherId(int id) const {if (id == Id0) return Id1 ; else if (id == Id1) return Id0 ; else return -1 ;}
-  bool ContainsPoint(int id) const {return ((Id0 == id) || (Id1 == id)) ;} ///< does edge contain point
-  bool IsSameDirection(const Edge& edge) const {return (Id0 == edge.Id0) && (Id1 == edge.Id1) ;} ///< is edge same direction as this one
-  bool IsReversed(const Edge& edge) const {return (Id0 == edge.Id1) && (Id1 == edge.Id0) ;} ///< is edge reverse of this one
-  void Reverse() {std::swap(Id0,Id1) ;} ///< reverse direction (swap end points)
-  void PrintSelf(ostream& os, vtkIndent indent) const {os << Id0 << " " << Id1 << std::endl ;} ///< print self
+  Edge(int id0, int id1) : m_Id0(id0), m_Id1(id1) {} ///< constructor
+  int GetId0() const {return m_Id0 ;} ///< get id0
+  int GetId1() const {return m_Id1 ;} ///< get id1
+  void SetId0(int id0) {m_Id0 = id0 ;} ///< set id0
+  void SetId1(int id1) {m_Id1 = id1 ;} ///< set id1
+  int GetOtherId(int id) const {if (id == m_Id0) return m_Id1 ; else if (id == m_Id1) return m_Id0 ; else return -1 ;}
+  bool ContainsPoint(int id) const {return ((m_Id0 == id) || (m_Id1 == id)) ;} ///< does edge contain point
+  bool IsSameDirection(const Edge& edge) const {return (m_Id0 == edge.m_Id0) && (m_Id1 == edge.m_Id1) ;} ///< is edge same direction as this one
+  bool IsReversed(const Edge& edge) const {return (m_Id0 == edge.m_Id1) && (m_Id1 == edge.m_Id0) ;} ///< is edge reverse of this one
+  bool IsJoined(const Edge& edge) const ; ///< Are edges joined by at least one point
+  bool IsValid() const {return ((m_Id0>=0)&&(m_Id1>=0));} ///< Does edge contain valid data
+  void Reverse() {std::swap(m_Id0,m_Id1) ;} ///< reverse direction (swap end points)
+  void PrintSelf(ostream& os, vtkIndent indent) const {os << m_Id0 << " " << m_Id1 << std::endl ;} ///< print self
   bool operator==(const Edge& edge) const ; ///< equals operator
   bool operator!=(const Edge& edge) const ; ///< not equals operator
 private:
-  vtkIdType Id0 ;   ///< id of endpoint 0
-  vtkIdType Id1 ;   ///< id of endpoint 1
+  vtkIdType m_Id0 ;   ///< id of endpoint 0
+  vtkIdType m_Id1 ;   ///< id of endpoint 1
 };
 
 

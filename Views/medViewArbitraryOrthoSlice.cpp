@@ -89,6 +89,7 @@ const int BOUND_1=1;
 #include "vtkStructuredPoints.h"
 #include "vtkDataSetWriter.h"
 #include "vtkUnsignedShortArray.h"
+#include "vtkShortArray.h"
 #include "vtkLineSource.h"
 #include "vtkMatrix4x4.h"
 #include "vtkBMPWriter.h"
@@ -2452,6 +2453,7 @@ void medViewArbitraryOrthoSlice::ShowSlicers( mafVME * vmeVolume, bool show )
 	// m_GuiGizmos->AddGui(m_GizmoZView->m_GizmoCrossTranslate->GetGui());
 	// m_GuiGizmos->AddGui(m_GizmoZView->m_GizmoCrossRotate->GetGui());
 	m_GuiGizmos->Update();
+	if(m_Gui == NULL) CreateGui();
 	m_Gui->AddGui(m_GuiGizmos);
 	m_Gui->FitGui();
 	m_Gui->Update();
@@ -3280,7 +3282,10 @@ void medViewArbitraryOrthoSlice::AccumulateTextures( mafVMESlicer *inSlicer, dou
 	scalarsAccumulationTargetTexture->DeepCopy(slicerTexture);	
 
 	// add the texture up scalars
-	vtkUnsignedShortArray *targetScalars = vtkUnsignedShortArray::SafeDownCast( scalarsAccumulationTargetTexture->GetPointData()->GetScalars());
+	vtkDataArray *targetScalars = vtkUnsignedShortArray::SafeDownCast( scalarsAccumulationTargetTexture->GetPointData()->GetScalars());
+	if(targetScalars == NULL) {
+	    targetScalars = vtkShortArray::SafeDownCast( scalarsAccumulationTargetTexture->GetPointData()->GetScalars());
+	}
 	assert(targetScalars);
 
 	assert(targetScalars->GetNumberOfComponents() == 1);
@@ -3352,14 +3357,15 @@ void medViewArbitraryOrthoSlice::AccumulateTextures( mafVMESlicer *inSlicer, dou
 		vtkImageData *currentTexture = inSlicer->GetSurfaceOutput()->GetMaterial()->GetMaterialTexture();
 		assert(currentTexture);
 
-		vtkUnsignedShortArray *currentSliceScalars = vtkUnsignedShortArray::SafeDownCast(currentTexture->GetPointData()->GetScalars());
-
+		vtkDataArray *currentSliceScalars = vtkUnsignedShortArray::SafeDownCast(currentTexture->GetPointData()->GetScalars());
+		if(currentSliceScalars == NULL) {
+	    currentSliceScalars = vtkShortArray::SafeDownCast( scalarsAccumulationTargetTexture->GetPointData()->GetScalars());
+	}
 
 		// add the scalars to the target texture
 		for (int scalarId = 0; scalarId < numberOfTuples; scalarId++)
 		{
-
-			unsigned short valueToAdd = currentSliceScalars->GetValue(scalarId);
+			int valueToAdd = currentSliceScalars->GetTuple1(scalarId);
 			scalarsAccumulatorVector[scalarId] += valueToAdd;
 		}
 
@@ -3377,8 +3383,8 @@ void medViewArbitraryOrthoSlice::AccumulateTextures( mafVMESlicer *inSlicer, dou
 	for (int scalarId = 0; scalarId < numberOfTuples; scalarId++)
 	{
 		double oldValue = scalarsAccumulatorVector[scalarId];
-		unsigned short newValue = oldValue / numberOfSlicesToAccumulate;
-		targetScalars->SetValue(scalarId, newValue);
+		int newValue = oldValue / numberOfSlicesToAccumulate;
+		targetScalars->SetTuple1(scalarId, newValue);
 	}
 
 

@@ -455,6 +455,7 @@ private:
   int m_DeployDlg_ShowCenterLine ;
   int m_DeployDlg_ShowCatheter ;
   int m_DeployDlg_ShowStent ;
+  double m_StentTubeRadius ;
 
   medVMEStentDeploymentVisualPipe* m_DeploymentVisualPipe ;
 
