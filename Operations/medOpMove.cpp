@@ -67,7 +67,8 @@ enum MAF_TRANSFORM_ID
   ID_ROLLOUT_GIZMO_TRANSLATE,
   ID_ROLLOUT_GIZMO_ROTATE,
   ID_ROLLOUT_GIZMO_SCALE,
-  ID_ROLLOUT_SAVE_POS
+  ID_ROLLOUT_SAVE_POS,
+  ID_HELP,
 };
 
 //----------------------------------------------------------------------------
@@ -233,7 +234,18 @@ void medOpMove::OnEventThis(mafEventBase *maf_event)
 {
   switch(maf_event->GetId())
 	{
-    case ID_SHOW_GIZMO:
+	  case ID_HELP:
+	  {
+		  mafEvent helpEvent;
+		  helpEvent.SetSender(this);
+		  mafString operationLabel = this->m_Label;
+		  helpEvent.SetString(&operationLabel);
+		  helpEvent.SetId(OPEN_HELP_PAGE);
+		  mafEventMacro(helpEvent);
+	  }
+	  break;
+    
+	case ID_SHOW_GIZMO:
     {
       // update gizmo choose gui
       m_Gui->Enable(ID_CHOOSE_GIZMO_COMBO, m_UseGizmo ? true : false);
@@ -512,7 +524,17 @@ void medOpMove::CreateGui()
 //----------------------------------------------------------------------------
 {
   m_Gui = new mafGUI(this);
-  
+
+  mafEvent buildHelpGui;
+  buildHelpGui.SetSender(this);
+  buildHelpGui.SetId(GET_BUILD_HELP_GUI);
+  mafEventMacro(buildHelpGui);
+
+  if (buildHelpGui.GetArg() == true)
+  {
+	  m_Gui->Button(ID_HELP, "Help","");	
+  }
+
   // enable/disable gizmo interaction
   m_Gui->Label("interaction modality", true);
   wxString interactionModality[2] = {"mouse", "gizmo"};
