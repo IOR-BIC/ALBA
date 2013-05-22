@@ -129,6 +129,16 @@ void mafOpApplyTrajectory::CreateGui()
   wxString pgd_wildc	= "txt (*.txt)|*.txt";
 
   m_Gui = new mafGUI(this);
+  
+  mafEvent buildHelpGui;
+  buildHelpGui.SetSender(this);
+  buildHelpGui.SetId(GET_BUILD_HELP_GUI);
+  mafEventMacro(buildHelpGui);
+
+  if (buildHelpGui.GetArg() == true)
+  {
+	  m_Gui->Button(ID_HELP, "Help","");	
+  }
 
   m_Gui->Divider(0);
   m_Gui->Label("Load trajectories");
@@ -202,7 +212,19 @@ void mafOpApplyTrajectory::OnEvent(mafEventBase *maf_event)
   {
     switch(e->GetId())
     {
-    case wxOK:
+	
+	case ID_HELP:
+		{
+			mafEvent helpEvent;
+			helpEvent.SetSender(this);
+			mafString operationLabel = this->m_Label;
+			helpEvent.SetString(&operationLabel);
+			helpEvent.SetId(OPEN_HELP_PAGE);
+			mafEventMacro(helpEvent);
+		}
+	break;
+    
+	case wxOK:
       {
         if (!m_VME && m_File.Compare("")==0)
         {

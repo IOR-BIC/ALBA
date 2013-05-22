@@ -106,6 +106,7 @@ enum VOI_DENSITY_WIDGET_ID
 	ID_MAX_SCALAR,
 	ID_STANDARD_DEVIATION,
 	ID_VOXEL_LIST,
+	ID_HELP,
 };
 //----------------------------------------------------------------------------
 void mafOpVOIDensity::OpRun()   
@@ -117,6 +118,16 @@ void mafOpVOIDensity::OpRun()
 		// setup Gui
 		m_Gui = new mafGUI(this);
 		m_Gui->SetListener(this);
+
+		mafEvent buildHelpGui;
+		buildHelpGui.SetSender(this);
+		buildHelpGui.SetId(GET_BUILD_HELP_GUI);
+		mafEventMacro(buildHelpGui);
+
+		if (buildHelpGui.GetArg() == true)
+		{
+			m_Gui->Button(ID_HELP, "Help","");	
+		}
 
 		m_Gui->Divider();
 		m_Gui->Button(ID_CHOOSE_SURFACE,_("VOI surface"));
@@ -161,6 +172,17 @@ void mafOpVOIDensity::OnEvent(mafEventBase *maf_event)
 	{
 		switch(e->GetId())
 		{
+			case ID_HELP:
+			{
+				mafEvent helpEvent;
+				helpEvent.SetSender(this);
+				mafString operationLabel = this->m_Label;
+				helpEvent.SetString(&operationLabel);
+				helpEvent.SetId(OPEN_HELP_PAGE);
+				mafEventMacro(helpEvent);
+			}
+			break;
+
 			case ID_CHOOSE_SURFACE:
 			{
 				mafString title = _("VOI surface");

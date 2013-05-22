@@ -111,6 +111,7 @@ enum FILTER_SURFACE_ID
 	ID_PREVIEW,
 	ID_CLEAR,
 	ID_RESET_NORMALS,
+	ID_HELP,
 };
 //----------------------------------------------------------------------------
 void mafOpFilterSurface::OpRun()   
@@ -134,6 +135,16 @@ void mafOpFilterSurface::CreateGui()
 {
   // interface:
   m_Gui = new mafGUI(this);
+
+  mafEvent buildHelpGui;
+  buildHelpGui.SetSender(this);
+  buildHelpGui.SetId(GET_BUILD_HELP_GUI);
+  mafEventMacro(buildHelpGui);
+
+  if (buildHelpGui.GetArg() == true)
+  {
+	  m_Gui->Button(ID_HELP, "Help","");	
+  }
 
   m_Gui->Label("");
   m_Gui->Label("smooth",true);
@@ -197,7 +208,18 @@ void mafOpFilterSurface::OnEvent(mafEventBase *maf_event)
   {
     switch(e->GetId())
     {	
-      case ID_CLEAN:
+	  case ID_HELP:
+	  {
+			mafEvent helpEvent;
+			helpEvent.SetSender(this);
+			mafString operationLabel = this->m_Label;
+			helpEvent.SetString(&operationLabel);
+			helpEvent.SetId(OPEN_HELP_PAGE);
+			mafEventMacro(helpEvent);
+	  }
+	  break;
+      
+	  case ID_CLEAN:
         OnClean();
       break;
       case ID_VTK_CONNECT:
