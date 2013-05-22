@@ -120,6 +120,7 @@ enum LABEL_EXTRACTOR_WIDGET_ID
   ID_STD_DEVIATION_AFTER,
   ID_LABELS,
 	ID_NAME,
+	ID_HELP,
 };
 
 //-----------------------------------------------------------------------
@@ -144,7 +145,17 @@ void mafOpLabelExtractor::OpRun()
 	m_Gui = new mafGUI(this);
 	m_Gui->SetListener(this);
 
-	m_Gui->Bool(ID_SMOOTH,_("smooth"),&m_SmoothVolume,0,_("gaussian smooth for extracting big surface"));
+	mafEvent buildHelpGui;
+	buildHelpGui.SetSender(this);
+	buildHelpGui.SetId(GET_BUILD_HELP_GUI);
+	mafEventMacro(buildHelpGui);
+
+	if (buildHelpGui.GetArg() == true)
+	{
+		m_Gui->Button(ID_HELP, "Help","");	
+	}
+
+  m_Gui->Bool(ID_SMOOTH,_("smooth"),&m_SmoothVolume,0,_("gaussian smooth for extracting big surface"));
   m_Gui->Divider(2);
   m_Gui->Float(ID_RADIUS_FACTOR,_("rad. factor"),&m_RadiusFactor,0.1,MAXFLOAT,0,2,_("max distance to consider for the smooth."));
   m_Gui->Vector(ID_STD_DEVIATION,_("std dev."),m_StdDev, 0.1, MAXFLOAT,2,_("standard deviation for the smooth."));
@@ -233,6 +244,18 @@ void mafOpLabelExtractor::OnEvent(mafEventBase *maf_event)
   {
     switch(e->GetId())
     {
+
+	    case ID_HELP:
+		{
+			mafEvent helpEvent;
+			helpEvent.SetSender(this);
+			mafString operationLabel = this->m_Label;
+			helpEvent.SetString(&operationLabel);
+			helpEvent.SetId(OPEN_HELP_PAGE);
+			mafEventMacro(helpEvent);
+		}
+		break;
+
 		  case wxOK:
 			  ExtractLabel();
 			  if(((mafVME *)m_Input)->GetOutput()->GetVTKData() != NULL)
