@@ -181,6 +181,8 @@ medVMEStent::medVMEStent()
   // NB smart itk pointer - don't delete
   m_DeformFilter = DeformFilterType::New() ; 
 
+  m_StrutArray = vtkCellArray::New() ;
+  m_LinkArray = vtkCellArray::New() ;
 }
 
 
@@ -209,6 +211,9 @@ medVMEStent::~medVMEStent()
 
   if (m_DeploymentVisualPipe != NULL)
     delete m_DeploymentVisualPipe ;
+
+  m_StrutArray->Delete() ;
+  m_LinkArray->Delete() ;
 
   SetOutput(NULL);
 }
@@ -259,7 +264,7 @@ int medVMEStent::DeepCopy(mafNode *a)
     medVMEStent *vmeStent =medVMEStent::SafeDownCast(a);
     m_Transform->SetMatrix(vmeStent->m_Transform->GetMatrix());
 
-    GetMaterial();
+    //GetMaterial();
 
     //copy a attributes to this object
     /** basic stent  */
@@ -277,11 +282,8 @@ int medVMEStent::DeepCopy(mafNode *a)
     m_VesselCenterLineName = vmeStent->m_VesselCenterLineName;
     m_ConstraintSurfaceName = vmeStent->m_ConstraintSurfaceName;
 
-    vtkNEW(m_VesselCenterLine);
-    vtkNEW(m_ConstraintSurface);
-
-    m_VesselCenterLine = vtkPolyData::New();
-    m_VesselCenterLine->DeepCopy(vmeStent->GetCenterLine());
+    m_VesselCenterLine->DeepCopy(vmeStent->m_VesselCenterLine);
+    m_ConstraintSurface->DeepCopy(vmeStent->m_ConstraintSurface);
 
 
     /**-------- compute and update---------------*/
@@ -719,10 +721,8 @@ void medVMEStent::InternalUpdate()
       vtkCellArray *lines = vtkCellArray::New() ;
       lines->Allocate(2000) ;  
 
-      m_StrutArray = vtkCellArray::New();
-      m_LinkArray = vtkCellArray::New();
-
-
+      m_StrutArray->Initialize() ;
+      m_LinkArray->Initialize() ;
       m_StrutArray->Allocate(2000);
       m_LinkArray->Allocate(2000);
 
@@ -1069,7 +1069,7 @@ void medVMEStent::SetConstraintSurface(vtkPolyData *surface){
 //-----------------------------------------------------------------------
 void medVMEStent::SetCenterLine(vtkPolyData *line){
   if(line){
-    this->m_VesselCenterLine = line; //set centerline
+    m_VesselCenterLine->DeepCopy(line) ; //set centerline
     m_VesselCenterLineSetFlag = 1; //set flag
 
     CreateCatheter(m_VesselCenterLine);		
@@ -1206,12 +1206,15 @@ int medVMEStent::InternalRestore(mafStorageElement *node)
         // m_SheathVTK->SetLines(cLines);
         aLine->SetPoints(centerPoints);
         aLine->SetLines(cLines);
+        centerPoints->Delete() ;
+        cLines->Delete() ;
         aLine->Update();
         int test1 = aLine->GetNumberOfPoints();
         int test2 = aLine->GetNumberOfPolys();
 
         //m_VesselCenterLine = aLine;
         this->SetCenterLine(aLine);
+        aLine->Delete() ;
       }
       /*----------now recompute -----------*/
       InternalUpdate();
@@ -1290,9 +1293,7 @@ void medVMEStent::SetAndKeepCenterLine( mafNode * node )
     mafVME *vme = mafVME::SafeDownCast(node);
     vtkPolyData *polyLine =vtkPolyData::SafeDownCast( vme->GetOutput()->GetVTKData());
     polyLine->Update();
-    vtkPolyData *copyLine = vtkNEW(copyLine);
-    copyLine->DeepCopy(polyLine);
-    this->SetCenterLine(copyLine);
+    this->SetCenterLine(polyLine);
     SetLink("CenterLineVME", node);  // mafNode method - link to another node.
     this->m_VesselCenterLineName = vme->GetName();
 
