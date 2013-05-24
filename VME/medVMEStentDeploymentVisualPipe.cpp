@@ -33,7 +33,8 @@ medVMEStentDeploymentVisualPipe::medVMEStentDeploymentVisualPipe(vtkRenderer *re
   m_DefinedCatheter(0), m_CatheterPolydata(NULL), m_VisibilityCatheter(0),
   m_DefinedCenterLine(0), m_CenterLinePolydata(NULL), m_VisibilityCenterLine(0),
   m_DefinedVessel(0), m_VesselPolydata(NULL), m_VisibilityVessel(0),
-  m_DefinedStent(0), m_StentPolydata(NULL), m_VisibilityStent(0), m_StentTubeRadius(0.1)
+  m_DefinedStent(0), m_StentPolydata(NULL), m_VisibilityStent(0), m_StentTubeRadius(0.1),
+  m_VesselOpacity(0.2)
 {
   // catheter pipeline
   m_CatheterDepthSort = vtkDepthSortPolyData::New() ;  // <--------- start of pipeline
@@ -67,8 +68,7 @@ medVMEStentDeploymentVisualPipe::medVMEStentDeploymentVisualPipe(vtkRenderer *re
   m_VesselActor = vtkActor::New() ;
   m_VesselActor->SetMapper(m_VesselMapper) ;
   m_VesselActor->GetProperty()->SetColor(0, 1, 0) ;
-  m_VesselActor->GetProperty()->SetOpacity(0.2) ;
-  //m_VesselActor->GetProperty()->SetRepresentationToWireframe() ;
+  m_VesselActor->GetProperty()->SetOpacity(m_VesselOpacity) ;
   m_VesselActor->SetVisibility(0) ;
   m_Renderer->AddActor(m_VesselActor) ;
 
@@ -263,6 +263,28 @@ void medVMEStentDeploymentVisualPipe::SetStentTubeRadius(double rad)
 {
   m_StentTubeRadius = rad ;
   Render() ;
+}
+
+
+
+//------------------------------------------------------------------------------
+// Set vessel wireframe on
+//------------------------------------------------------------------------------
+void medVMEStentDeploymentVisualPipe::SetWireframeOn()
+{
+  m_VesselActor->GetProperty()->SetRepresentationToWireframe() ;
+  m_VesselActor->GetProperty()->SetOpacity(1.0) ;
+}
+
+
+
+//------------------------------------------------------------------------------
+// Set vessel wireframe off
+//------------------------------------------------------------------------------
+void medVMEStentDeploymentVisualPipe::SetWireframeOff()
+{
+  m_VesselActor->GetProperty()->SetRepresentationToSurface() ;
+  m_VesselActor->GetProperty()->SetOpacity(m_VesselOpacity) ;
 }
 
 

@@ -70,6 +70,12 @@ public:
   /// Set stent tube Radius
   void SetStentTubeRadius(double rad) ;
 
+  /// Set vessel wireframe on
+  void SetWireframeOn() ;
+
+  /// Set vessel wireframe off
+  void SetWireframeOff() ;
+
   /// Reset the camera position. \n
   /// Don't forget to call renderer->ResetCamera() before the first call.
   void ResetCameraPosition() ;
@@ -114,6 +120,7 @@ private:
   vtkDepthSortPolyData *m_VesselDepthSort ;
   vtkPolyDataMapper *m_VesselMapper ;
   vtkActor *m_VesselActor ;
+  double m_VesselOpacity ;
 
   // stent pipeline
   int m_DefinedStent ;
