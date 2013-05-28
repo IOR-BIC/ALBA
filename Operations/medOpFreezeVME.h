@@ -2,7 +2,7 @@
 
  Program: MAF2Medical
  Module: medOpFreezeVME
- Authors: Daniele Giunchi
+ Authors: Daniele Giunchi , Stefano Perticoni
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or

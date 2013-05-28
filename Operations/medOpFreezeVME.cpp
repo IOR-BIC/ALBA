@@ -1,16 +1,16 @@
 /*=========================================================================
 
- Program: MAF2Medical
- Module: medOpFreezeVME
- Authors: Daniele Giunchi
- 
- Copyright (c) B3C
- All rights reserved. See Copyright.txt or
- http://www.scsitaly.com/Copyright.htm for details.
+Program: MAF2Medical
+Module: medOpFreezeVME
+Authors: Daniele Giunchi , Stefano Perticoni
 
- This software is distributed WITHOUT ANY WARRANTY; without even
- the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- PURPOSE.  See the above copyright notice for more information.
+Copyright (c) B3C
+All rights reserved. See Copyright.txt or
+http://www.scsitaly.com/Copyright.htm for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 
@@ -52,6 +52,7 @@
 
 #include "vtkPolyData.h"
 #include "vtkImageData.h"
+#include "medVMEComputeWrapping.H"
 
 
 
@@ -62,297 +63,320 @@ mafCxxTypeMacro(medOpFreezeVME);
 //----------------------------------------------------------------------------
 medOpFreezeVME::medOpFreezeVME(wxString label) :
 mafOp(label)
-//----------------------------------------------------------------------------
+	//----------------------------------------------------------------------------
 {
-  m_OpType  = OPTYPE_OP;
+	m_OpType  = OPTYPE_OP;
 	m_Canundo = true;
 	m_InputPreserving = true;
-  
+
 }
 //----------------------------------------------------------------------------
 medOpFreezeVME::~medOpFreezeVME( ) 
-//----------------------------------------------------------------------------
+	//----------------------------------------------------------------------------
 {
-  
+
 }
 //----------------------------------------------------------------------------
 bool medOpFreezeVME::Accept(mafNode *node)
-//----------------------------------------------------------------------------
+	//----------------------------------------------------------------------------
 {
-  return (node->IsMAFType(mafVME) && 
-          !node->IsMAFType(mafVMEGenericAbstract) && 
-          !node->IsMAFType(mafVMERoot) &&
-          //!node->IsMAFType(mafVMERefSys) &&
-          !node->IsMAFType(mafVMEVolume) ); //return if is a procedural vme
+	return (node->IsMAFType(mafVME) && 
+		!node->IsMAFType(mafVMEGenericAbstract) && 
+		!node->IsMAFType(mafVMERoot) &&
+		//!node->IsMAFType(mafVMERefSys) &&
+		!node->IsMAFType(mafVMEVolume) ); //return if is a procedural vme
 }
 //----------------------------------------------------------------------------
 mafOp* medOpFreezeVME::Copy()   
-//----------------------------------------------------------------------------
+	//----------------------------------------------------------------------------
 {
-  medOpFreezeVME *cp = new medOpFreezeVME(m_Label);
-  return cp;
+	medOpFreezeVME *cp = new medOpFreezeVME(m_Label);
+	return cp;
 }
 //----------------------------------------------------------------------------
 void medOpFreezeVME::OpRun()   
-//----------------------------------------------------------------------------
+	//----------------------------------------------------------------------------
 {
-  if(!m_TestMode)
-  {
-    m_Gui = new mafGUI(this);
-    ShowGui();
-  }
+	if(!m_TestMode)
+	{
+		m_Gui = new mafGUI(this);
+		ShowGui();
+	}
 
 	//control the output and create the right vme
 	mafVME *vme = mafVME::SafeDownCast(m_Input);
-  vme->Update();
-  mafVMEOutput *output = vme->GetOutput();
-  output->Update();
-	
+	vme->Update();
+	mafVMEOutput *output = vme->GetOutput();
+	output->Update();
+
 	if(vtkImageData *imageData = vtkImageData::SafeDownCast(output->GetVTKData()))
 	{
-    if(medVMELabeledVolume *labeledVolume = medVMELabeledVolume::SafeDownCast(vme))
-    {
-      mmaMaterial *material = (mmaMaterial *)labeledVolume->GetAttribute("MaterialAttributes");
+		if(medVMELabeledVolume *labeledVolume = medVMELabeledVolume::SafeDownCast(vme))
+		{
+			mmaMaterial *material = (mmaMaterial *)labeledVolume->GetAttribute("MaterialAttributes");
 
-      mafSmartPointer<mafVMEVolumeGray> newVolume;
-      newVolume->SetName(labeledVolume->GetName());
-      newVolume->SetData(imageData,labeledVolume->GetTimeStamp());
-      newVolume->Update();
+			mafSmartPointer<mafVMEVolumeGray> newVolume;
+			newVolume->SetName(labeledVolume->GetName());
+			newVolume->SetData(imageData,labeledVolume->GetTimeStamp());
+			newVolume->Update();
 
-      if(material)
-      {
-        newVolume->GetMaterial()->DeepCopy(material);
-        newVolume->GetMaterial()->UpdateProp();
-      }
+			if(material)
+			{
+				newVolume->GetMaterial()->DeepCopy(material);
+				newVolume->GetMaterial()->UpdateProp();
+			}
 
-      newVolume->SetMatrix(*labeledVolume->GetOutput()->GetMatrix());
-      m_Output=newVolume;
-      if (m_Output)
-      {
-        m_Output->ReparentTo(m_Input->GetParent());
-        if(!m_TestMode)
-          OpStop(OP_RUN_OK);
-      }
-    }
-	}
-  else
-	if(vtkRectilinearGrid *rectilinearGrid = vtkRectilinearGrid::SafeDownCast(output->GetVTKData()))
-	{
-    if(medVMELabeledVolume *labeledVolume = medVMELabeledVolume::SafeDownCast(vme))
-    {
-      mmaMaterial *material = (mmaMaterial *)labeledVolume->GetAttribute("MaterialAttributes");
-
-      mafSmartPointer<mafVMEVolumeGray> newVolume;
-      newVolume->SetName(labeledVolume->GetName());
-      newVolume->SetData(rectilinearGrid,labeledVolume->GetTimeStamp());
-      newVolume->Update();
-
-      if(material)
-      {
-        newVolume->GetMaterial()->DeepCopy(material);
-        newVolume->GetMaterial()->UpdateProp();
-      }
-
-      newVolume->SetMatrix(*labeledVolume->GetOutput()->GetMatrix());
-      m_Output=newVolume;
-      if (m_Output)
-      {
-        m_Output->ReparentTo(m_Input->GetParent());
-        if(!m_TestMode)
-          OpStop(OP_RUN_OK);
-      }
-    }
+			newVolume->SetMatrix(*labeledVolume->GetOutput()->GetMatrix());
+			m_Output=newVolume;
+			if (m_Output)
+			{
+				m_Output->ReparentTo(m_Input->GetParent());
+				if(!m_TestMode)
+					OpStop(OP_RUN_OK);
+			}
+		}
 	}
 	else
-	if(vtkPolyData *polyData = vtkPolyData::SafeDownCast(output->GetVTKData()))
-	{
-		if(mafVMEPolylineSpline *vmeSpline = mafVMEPolylineSpline::SafeDownCast(vme))
-	  {
-	  	mmaMaterial *material = vmeSpline->GetMaterial();
-	  	
-	  	mafSmartPointer<mafVMEPolyline> newPolyline;
-			newPolyline->SetName(vmeSpline->GetName());
-			newPolyline->SetData(polyData,vmeSpline->GetTimeStamp());
-			newPolyline->Update();
-
-      if(material)
-      {
-			  newPolyline->GetMaterial()->DeepCopy(material);
-        newPolyline->GetMaterial()->UpdateProp();
-      }
-			newPolyline->SetMatrix(*vmeSpline->GetOutput()->GetMatrix());
-			m_Output=newPolyline;
-      if (m_Output)
-      {
-        m_Output->ReparentTo(m_Input->GetParent());
-        if(!m_TestMode)
-          OpStop(OP_RUN_OK);
-      }
-	  }
-	  else if(mafVMESurfaceParametric *vmeSurface = mafVMESurfaceParametric::SafeDownCast(vme))
+		if(vtkRectilinearGrid *rectilinearGrid = vtkRectilinearGrid::SafeDownCast(output->GetVTKData()))
 		{
-			mmaMaterial *material = vmeSurface->GetMaterial();
-			
-			mafSmartPointer<mafVMESurface> newSurface;
-			newSurface->SetName(vmeSurface->GetName());
-			newSurface->SetData(polyData,vmeSurface->GetTimeStamp());
-			newSurface->Update();
+			if(medVMELabeledVolume *labeledVolume = medVMELabeledVolume::SafeDownCast(vme))
+			{
+				mmaMaterial *material = (mmaMaterial *)labeledVolume->GetAttribute("MaterialAttributes");
 
-      if(material)
-      {
-        newSurface->GetMaterial()->DeepCopy(material);
-        newSurface->GetMaterial()->UpdateProp();
-      }
-      
-      newSurface->SetMatrix(*vmeSurface->GetOutput()->GetMatrix());
-			m_Output=newSurface;
-      if (m_Output)
-      {
-        m_Output->ReparentTo(m_Input->GetParent());
-        if(!m_TestMode)
-          OpStop(OP_RUN_OK);
-      }
+				mafSmartPointer<mafVMEVolumeGray> newVolume;
+				newVolume->SetName(labeledVolume->GetName());
+				newVolume->SetData(rectilinearGrid,labeledVolume->GetTimeStamp());
+				newVolume->Update();
+
+				if(material)
+				{
+					newVolume->GetMaterial()->DeepCopy(material);
+					newVolume->GetMaterial()->UpdateProp();
+				}
+
+				newVolume->SetMatrix(*labeledVolume->GetOutput()->GetMatrix());
+				m_Output=newVolume;
+				if (m_Output)
+				{
+					m_Output->ReparentTo(m_Input->GetParent());
+					if(!m_TestMode)
+						OpStop(OP_RUN_OK);
+				}
+			}
 		}
-		else if(mafVMEMeter *meter = mafVMEMeter::SafeDownCast(vme))
-		{
-			mmaMaterial *material = meter->GetMaterial();
-			
-			mafSmartPointer<mafVMEPolyline> newPolyline;
-			newPolyline->SetName(meter->GetName());
-			newPolyline->SetData(polyData,meter->GetTimeStamp());
-			newPolyline->Update();
+		else
+			if(vtkPolyData *polyData = vtkPolyData::SafeDownCast(output->GetVTKData()))
+			{
+				if(mafVMEPolylineSpline *vmeSpline = mafVMEPolylineSpline::SafeDownCast(vme))
+				{
+					mmaMaterial *material = vmeSpline->GetMaterial();
 
-      if(material)
-      {
-        newPolyline->GetMaterial()->DeepCopy(material);
-        newPolyline->GetMaterial()->UpdateProp();
-      }
-			
-      newPolyline->SetMatrix(*meter->GetOutput()->GetMatrix());
-      m_Output=newPolyline;
-      if (m_Output)
-      {
-        m_Output->ReparentTo(m_Input->GetParent());
-        if(!m_TestMode)
-          OpStop(OP_RUN_OK);
-      }
-		}
-    else if(mafVMERefSys *refsys = mafVMERefSys::SafeDownCast(vme))
-    {
-      mmaMaterial *material = refsys->GetMaterial();
+					mafSmartPointer<mafVMEPolyline> newPolyline;
+					newPolyline->SetName(vmeSpline->GetName());
+					newPolyline->SetData(polyData,vmeSpline->GetTimeStamp());
+					newPolyline->Update();
 
-      mafSmartPointer<mafVMESurface> surface;
-      surface->SetName(refsys->GetName());
-      surface->SetData(polyData,refsys->GetTimeStamp());
-      surface->Update();
+					if(material)
+					{
+						newPolyline->GetMaterial()->DeepCopy(material);
+						newPolyline->GetMaterial()->UpdateProp();
+					}
+					newPolyline->SetMatrix(*vmeSpline->GetOutput()->GetMatrix());
+					m_Output=newPolyline;
+					if (m_Output)
+					{
+						m_Output->ReparentTo(m_Input->GetParent());
+						if(!m_TestMode)
+							OpStop(OP_RUN_OK);
+					}
+				}
+				else if(mafVMESurfaceParametric *vmeSurface = mafVMESurfaceParametric::SafeDownCast(vme))
+				{
+					mmaMaterial *material = vmeSurface->GetMaterial();
 
-      if(material)
-      {
-        surface->GetMaterial()->DeepCopy(material);
-        surface->GetMaterial()->UpdateProp();
-      }
+					mafSmartPointer<mafVMESurface> newSurface;
+					newSurface->SetName(vmeSurface->GetName());
+					newSurface->SetData(polyData,vmeSurface->GetTimeStamp());
+					newSurface->Update();
 
-      surface->SetMatrix(*refsys->GetOutput()->GetMatrix());
-      m_Output=surface;
-      if (m_Output)
-      {
-        m_Output->ReparentTo(m_Input->GetParent());
-        if(!m_TestMode)
-          OpStop(OP_RUN_OK);
-      }
-    }
-    else if(mafVMESlicer *slicer = mafVMESlicer::SafeDownCast(vme))
-    {
-      mmaMaterial *material = slicer->GetMaterial();
+					if(material)
+					{
+						newSurface->GetMaterial()->DeepCopy(material);
+						newSurface->GetMaterial()->UpdateProp();
+					}
 
-      mafSmartPointer<mafVMESurface> newSurface;
-      newSurface->SetName(slicer->GetName());
-      newSurface->SetData(polyData,slicer->GetTimeStamp());
-			vtkMAFSmartPointer<vtkImageData> text;
-			text->DeepCopy(slicer->GetSurfaceOutput()->GetTexture());
-      newSurface->GetSurfaceOutput()->SetTexture(text);
-      newSurface->Update();
+					newSurface->SetMatrix(*vmeSurface->GetOutput()->GetMatrix());
+					m_Output=newSurface;
+					if (m_Output)
+					{
+						m_Output->ReparentTo(m_Input->GetParent());
+						if(!m_TestMode)
+							OpStop(OP_RUN_OK);
+					}
+				}
+				else if(mafVMEMeter *meter = mafVMEMeter::SafeDownCast(vme))
+				{
+					mmaMaterial *material = meter->GetMaterial();
 
-      if(material)
-      {
-        newSurface->GetMaterial()->DeepCopy(material);
-        newSurface->GetMaterial()->SetMaterialTexture(newSurface->GetSurfaceOutput()->GetTexture());
-        newSurface->GetMaterial()->UpdateProp();
-      }
+					mafSmartPointer<mafVMEPolyline> newPolyline;
+					newPolyline->SetName(meter->GetName());
+					newPolyline->SetData(polyData,meter->GetTimeStamp());
+					newPolyline->Update();
 
-      newSurface->SetMatrix(*slicer->GetOutput()->GetMatrix());
-      m_Output=newSurface;
-      if (m_Output)
-      {
-        m_Output->ReparentTo(m_Input->GetParent());
-        if(!m_TestMode)
-          OpStop(OP_RUN_OK);
-      }
-      
-    }
-    else if(mafVMEProber *prober = mafVMEProber::SafeDownCast(vme))
-    {
-      mmaMaterial *material = prober->GetMaterial();
+					if(material)
+					{
+						newPolyline->GetMaterial()->DeepCopy(material);
+						newPolyline->GetMaterial()->UpdateProp();
+					}
 
-      mafSmartPointer<mafVMESurface> newSurface;
-      newSurface->SetName(prober->GetName());
-      newSurface->SetData(polyData,prober->GetTimeStamp());
-      newSurface->Update();
+					newPolyline->SetMatrix(*meter->GetOutput()->GetMatrix());
+					m_Output=newPolyline;
+					if (m_Output)
+					{
+						m_Output->ReparentTo(m_Input->GetParent());
+						if(!m_TestMode)
+							OpStop(OP_RUN_OK);
+					}
+				}
+				else if(mafVMERefSys *refsys = mafVMERefSys::SafeDownCast(vme))
+				{
+					mmaMaterial *material = refsys->GetMaterial();
 
-      if(material)
-      {
-        newSurface->GetMaterial()->DeepCopy(material);
-        newSurface->GetMaterial()->UpdateProp();
-      }
+					mafSmartPointer<mafVMESurface> surface;
+					surface->SetName(refsys->GetName());
+					surface->SetData(polyData,refsys->GetTimeStamp());
+					surface->Update();
 
-      newSurface->SetMatrix(*prober->GetOutput()->GetMatrix());
-      m_Output=newSurface;
-      if (m_Output)
-      {
-        m_Output->ReparentTo(m_Input->GetParent());
-        if(!m_TestMode)
-          OpStop(OP_RUN_OK);
-      }
-    }
-		else if(medVMEWrappedMeter *wrappedMeter = medVMEWrappedMeter::SafeDownCast(vme))
-		{
-			mmaMaterial *material = wrappedMeter->GetMaterial();
-			
-			mafSmartPointer<mafVMEPolyline> newPolyline;
-			newPolyline->SetName(wrappedMeter->GetName());
-			newPolyline->SetData(polyData,wrappedMeter->GetTimeStamp());
-			newPolyline->Update();
+					if(material)
+					{
+						surface->GetMaterial()->DeepCopy(material);
+						surface->GetMaterial()->UpdateProp();
+					}
 
-      if(material)
-      {
-        newPolyline->GetMaterial()->DeepCopy(material);
-        newPolyline->GetMaterial()->UpdateProp();
-      }
-			
-      newPolyline->SetMatrix(*wrappedMeter->GetOutput()->GetMatrix());
-      m_Output=newPolyline;
-      if (m_Output)
-      {
-        m_Output->ReparentTo(m_Input->GetParent());
-        if(!m_TestMode)
-          OpStop(OP_RUN_OK);
-      }
-		}
+					surface->SetMatrix(*refsys->GetOutput()->GetMatrix());
+					m_Output=surface;
+					if (m_Output)
+					{
+						m_Output->ReparentTo(m_Input->GetParent());
+						if(!m_TestMode)
+							OpStop(OP_RUN_OK);
+					}
+				}
+				else if(mafVMESlicer *slicer = mafVMESlicer::SafeDownCast(vme))
+				{
+					mmaMaterial *material = slicer->GetMaterial();
 
-    else
-      OpStop(OP_RUN_CANCEL);
-		
-	}
-	else
-	  OpStop(OP_RUN_CANCEL);
+					mafSmartPointer<mafVMESurface> newSurface;
+					newSurface->SetName(slicer->GetName());
+					newSurface->SetData(polyData,slicer->GetTimeStamp());
+					vtkMAFSmartPointer<vtkImageData> text;
+					text->DeepCopy(slicer->GetSurfaceOutput()->GetTexture());
+					newSurface->GetSurfaceOutput()->SetTexture(text);
+					newSurface->Update();
 
-	
+					if(material)
+					{
+						newSurface->GetMaterial()->DeepCopy(material);
+						newSurface->GetMaterial()->SetMaterialTexture(newSurface->GetSurfaceOutput()->GetTexture());
+						newSurface->GetMaterial()->UpdateProp();
+					}
+
+					newSurface->SetMatrix(*slicer->GetOutput()->GetMatrix());
+					m_Output=newSurface;
+					if (m_Output)
+					{
+						m_Output->ReparentTo(m_Input->GetParent());
+						if(!m_TestMode)
+							OpStop(OP_RUN_OK);
+					}
+
+				}
+				else if(mafVMEProber *prober = mafVMEProber::SafeDownCast(vme))
+				{
+					mmaMaterial *material = prober->GetMaterial();
+
+					mafSmartPointer<mafVMESurface> newSurface;
+					newSurface->SetName(prober->GetName());
+					newSurface->SetData(polyData,prober->GetTimeStamp());
+					newSurface->Update();
+
+					if(material)
+					{
+						newSurface->GetMaterial()->DeepCopy(material);
+						newSurface->GetMaterial()->UpdateProp();
+					}
+
+					newSurface->SetMatrix(*prober->GetOutput()->GetMatrix());
+					m_Output=newSurface;
+					if (m_Output)
+					{
+						m_Output->ReparentTo(m_Input->GetParent());
+						if(!m_TestMode)
+							OpStop(OP_RUN_OK);
+					}
+				}
+				else if(medVMEWrappedMeter *wrappedMeter = medVMEWrappedMeter::SafeDownCast(vme))
+				{
+					mmaMaterial *material = wrappedMeter->GetMaterial();
+
+					mafSmartPointer<mafVMEPolyline> newPolyline;
+					newPolyline->SetName(wrappedMeter->GetName());
+					newPolyline->SetData(polyData,wrappedMeter->GetTimeStamp());
+					newPolyline->Update();
+
+					if(material)
+					{
+						newPolyline->GetMaterial()->DeepCopy(material);
+						newPolyline->GetMaterial()->UpdateProp();
+					}
+
+					newPolyline->SetMatrix(*wrappedMeter->GetOutput()->GetMatrix());
+					m_Output=newPolyline;
+					if (m_Output)
+					{
+						m_Output->ReparentTo(m_Input->GetParent());
+						if(!m_TestMode)
+							OpStop(OP_RUN_OK);
+					}
+				}
+				else if(medVMEComputeWrapping *wrappedMeter = medVMEComputeWrapping::SafeDownCast(vme))
+				{
+					mmaMaterial *material = wrappedMeter->GetMaterial();
+
+					mafSmartPointer<mafVMEPolyline> newPolyline;
+					newPolyline->SetName(wrappedMeter->GetName());
+					newPolyline->SetData(polyData,wrappedMeter->GetTimeStamp());
+					newPolyline->Update();
+
+					if(material)
+					{
+						newPolyline->GetMaterial()->DeepCopy(material);
+						newPolyline->GetMaterial()->UpdateProp();
+					}
+
+					newPolyline->SetMatrix(*wrappedMeter->GetOutput()->GetMatrix());
+					m_Output=newPolyline;
+					if (m_Output)
+					{
+						m_Output->ReparentTo(m_Input->GetParent());
+						if(!m_TestMode)
+							OpStop(OP_RUN_OK);
+					}
+				}
+				else
+					OpStop(OP_RUN_CANCEL);
+
+			}
+			else
+				OpStop(OP_RUN_CANCEL);
+
+
 }
 //----------------------------------------------------------------------------
 void medOpFreezeVME::OpDo()   
-//----------------------------------------------------------------------------
+	//----------------------------------------------------------------------------
 {
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 
 
