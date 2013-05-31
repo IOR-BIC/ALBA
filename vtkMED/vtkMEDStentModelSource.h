@@ -1,4 +1,17 @@
-#pragma once
+/*=========================================================================
+Program:   MAF2Medical
+Module:    $RCSfile: medVMEStentModelSource.h,v $
+Language:  C++
+Date:      $Date: 2012-10-23 10:15:31 $
+Version:   $Revision: 1.1.2.7 $
+Authors:   Hui Wei
+==========================================================================
+Copyright (c) 2013
+University of Bedfordshire, UK
+=========================================================================*/
+
+#ifndef __medVMEStentModelSource_h 
+#define __medVMEStentModelSource_h
 
 
 /*=========================================================================
@@ -55,7 +68,7 @@ class vtkPolyData;
 *   thus the control mesh is available.
 *4: connect a subset of vertices to form the struts and links
 *---
-* To adpat different configuration of stent, 
+* To adapt different configuration of stent, 
 * the control mesh have two more circles of vertices  in each side than the stent.
 *---------------------------------------
 */
@@ -86,8 +99,9 @@ public:
 	enum StentConfigurationType {InPhase, OutOfPhase};
 	enum LinkOrientationType {None, PositiveOne, NegativeOne};
 
-	vtkMEDStentModelSource(void);
-	~vtkMEDStentModelSource(void);
+	vtkMEDStentModelSource(void); ///< Constructor
+	~vtkMEDStentModelSource(void); ///< Destructor
+
 	/**----------------------------------------------------------------------------*/
 	//--------setters----------
 	/**----------------------------------------------------------------------------*/
@@ -139,11 +153,16 @@ public:
 
 
 private:
+  /// Allocate or reallocate centerline. \n
+  /// This may destroy any existing data.
+  void AllocateCentreLine(int n) ;
+
 	/* stent parameters */
 	double stentDiameter;
 	double crownLength;
+  double strutLength;
 	double strutAngle;
-    double linkLength;
+  double linkLength;
 	int strutsNumber;
 	int crownNumber;
 	int linkNumber;
@@ -163,11 +182,12 @@ private:
 
 
 	double (*centerLine)[3];
+  int m_NumberOfPointsAllocatedToCenterLine ;
+
 	int nCenterVertex;
 	int nCrownSimplex;
 
 	double initialStentLength;	
-	double strutLength;
 	double centerLineLength;
 	void setStrutAngle(double value); //not needed
 
@@ -181,3 +201,6 @@ private:
 	/** used to calculate stent length */
 	double calculateDistanceBetweenCrown();
 };
+
+
+#endif
