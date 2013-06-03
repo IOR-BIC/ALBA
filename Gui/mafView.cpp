@@ -108,6 +108,7 @@ void mafView::OnEvent(mafEventBase *maf_event)
 		helpEvent.SetId(OPEN_HELP_PAGE);
 		mafEventMacro(helpEvent);
 	  }
+	  break;
 
       default:
         mafEventMacro(*maf_event);
