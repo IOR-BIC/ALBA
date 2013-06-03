@@ -442,7 +442,9 @@ void mafLogicWithManagers::CreateMenu()
 
 	wxMenu    *help_menu = new wxMenu;
 	help_menu->Append(ABOUT_APPLICATION,_("About"));
-  m_MenuBar->Append(help_menu, _("&Help"));
+	help_menu->Append(HELP_HOME, _("Help"));
+
+	m_MenuBar->Append(help_menu, _("&Help"));
 
   m_Win->SetMenuBar(m_MenuBar);
 
@@ -1043,6 +1045,15 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 				wxMessageBox(message, "About Application");
 			}
 			break;
+
+			case HELP_HOME:
+				{
+					if (m_HelpSettings)
+					{
+						m_HelpSettings->OpenHelpPage("HELP_HOME");
+					}	
+				}
+				break;
 
 			case GET_BUILD_HELP_GUI:
 			{	
