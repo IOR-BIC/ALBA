@@ -166,6 +166,7 @@ public:
   {
     ID_FIRST = MINID,
     ID_PRINT_INFO,
+	ID_HELP,
     ID_LAST
   };
 
