@@ -1058,8 +1058,15 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 			case GET_BUILD_HELP_GUI:
 			{	
 				int buildGui = -1;
-				buildGui = m_HelpSettings->GetBuildHelpGui();
-				e->SetArg(buildGui);
+				if (m_HelpSettings == NULL)
+				{
+					buildGui = false;
+					e->SetArg(buildGui);
+				}
+				else
+				{
+					buildGui = m_HelpSettings->GetBuildHelpGui();
+				}
 			}
 			break;
 
