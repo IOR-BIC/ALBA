@@ -133,7 +133,9 @@ void mafGUISettingsHelp::OpenHelpPage( wxString entity )
 		std::getline(lineStream,currentLineHelpLink,',');
 		wxString trimmedCurrentLineHelpLink = wxString(currentLineHelpLink.c_str()).Trim().Trim(false);
 
-		if (entity == trimmedCurrentLineEntityName)
+		entity.Replace("\t","");
+
+		if (strcmp(entity.c_str() , trimmedCurrentLineEntityName.c_str()) == 0)
 		{
 			wxLaunchDefaultBrowser(trimmedCurrentLineHelpLink);
 			return;

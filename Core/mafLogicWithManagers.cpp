@@ -1067,6 +1067,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 				{
 					buildGui = m_HelpSettings->GetBuildHelpGui();
 				}
+				e->SetArg(buildGui);
 			}
 			break;
 
