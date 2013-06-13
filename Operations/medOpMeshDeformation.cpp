@@ -317,9 +317,26 @@ void medOpMeshDeformation::CreateOpDialog()
   sbSizer2 = new wxStaticBoxSizer( new wxStaticBox( m_Dialog, wxID_ANY, 
     wxT("Create Control Curves") ), wxVERTICAL );
 
+  mafEvent buildHelpGui;
+  buildHelpGui.SetSender(this);
+  buildHelpGui.SetId(GET_BUILD_HELP_GUI);
+  mafEventMacro(buildHelpGui);
+
+  wxButton* helpButton = NULL;
+
+  if (buildHelpGui.GetArg() == true)
+  {
+	  helpButton = new wxButton( m_Dialog, ID_HELP_BUTTON, wxT("Help"), wxDefaultPosition, wxDefaultSize, 0 );
+  }
+  
   m_BttnGenCurves = new wxButton( m_Dialog, ID_CREATE_CURVES, wxT("Generate Curves"), 
     wxDefaultPosition, wxDefaultSize, 0 );
   m_BttnGenCurves->SetToolTip( wxT("Automatically creates all control curves for the mesh.") );
+
+  if (helpButton != NULL)
+  {
+	  sbSizer2->Add(helpButton, 0 , wxALL, 5);
+  }
 
   sbSizer2->Add( m_BttnGenCurves, 0, wxALL, 5 );
 
@@ -574,6 +591,8 @@ void medOpMeshDeformation::CreateOpDialog()
   bSizer1->Add( bSizer19, 0, wxEXPAND, 5 );
 #pragma endregion //wxFormBuilder
 
+  helpButton->SetValidator(mafGUIValidator(this, ID_HELP_BUTTON, helpButton));
+
   //validators for Create Control Curves
   m_BttnGenCurves->SetValidator(mafGUIValidator(this, ID_CREATE_CURVES, m_BttnGenCurves));
   bttnSelOC->SetValidator(mafGUIValidator(this, ID_SELECT_OC, bttnSelOC));
@@ -649,6 +668,17 @@ void medOpMeshDeformation::OnEvent(mafEventBase *maf_event)
   {
     switch(e->GetId())
     {
+	case ID_HELP_BUTTON:
+		{
+			mafEvent helpEvent;
+			helpEvent.SetSender(this);
+			mafString operationLabel = this->m_Label;
+			helpEvent.SetString(&operationLabel);
+			helpEvent.SetId(OPEN_HELP_PAGE);
+			mafEventMacro(helpEvent);
+		}
+		break;
+
     case ID_CREATE_CURVES:
       OnCreateCurves();
       break;
