@@ -35,7 +35,8 @@ mafGUISettingsHelp::mafGUISettingsHelp(mafObserver *Listener, const mafString &l
 mafGUISettings(Listener, label)
 {
   m_BuildHelpGui = false;
-  m_HelpFileName = "UNDEFINED";   
+  m_HelpFileName = mafGetApplicationDirectory().c_str();
+  m_HelpFileName.Append("\\Help\\Help.txt");   
   InitializeSettings();
 }
 
