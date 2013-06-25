@@ -263,6 +263,7 @@ void medVMEStentDeploymentVisualPipe::ShowStent(int visibility)
 void medVMEStentDeploymentVisualPipe::SetStentTubeRadius(double rad)
 {
   m_StentTubeRadius = rad ;
+  m_StentTubeFilter->SetRadius(rad) ;
   Render() ;
 }
 
