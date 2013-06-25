@@ -48,12 +48,13 @@ public:
   /** RTTI macro. */
   mafTypeMacro(mafViewGlobalSliceCompound, medViewCompoundWindowing);
 
-
   /** Redefine this method to package the compounded view */
   virtual void PackageView();
 
   /** Function that clones instance of the object. */
   virtual mafView *Copy(mafObserver *Listener, bool lightCopyEnabled = false);
+
+  void	OnEvent(mafEventBase *maf_event);
 
 protected:
   /**

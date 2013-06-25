@@ -83,6 +83,7 @@ public:
     ID_RESET_SLICES,
     ID_ENABLE_GPU,
     ID_TRILINEAR_INTERPOLATION,
+	ID_HELP,
     ID_LAST
   };
 

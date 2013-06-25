@@ -55,6 +55,7 @@ protected:
     ID_RESET = MINID,
     ID_UNDO,
     ID_PREVIEW,
+	ID_HELP_BUTTON,
     ID_CREATE_CURVES,
     ID_SELECT_OC,
     ID_SELECT_DC,

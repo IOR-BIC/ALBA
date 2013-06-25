@@ -56,6 +56,7 @@ public:
 	{
 		ID_COMBO_GIZMOS = Superclass::ID_LAST,
 		ID_RESET,
+		ID_HELP,
 		ID_LAST,
 	};
 

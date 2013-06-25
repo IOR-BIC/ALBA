@@ -606,6 +606,18 @@ void mafViewRXCT::OnEvent(mafEventBase *maf_event)
         OnEventRangeModified(maf_event);
       }
       break;
+
+	  case ID_HELP:
+	  {
+		mafEvent helpEvent;
+		helpEvent.SetSender(this);
+		mafString viewLabel = this->m_Label;
+		helpEvent.SetString(&viewLabel);
+		helpEvent.SetId(OPEN_HELP_PAGE);
+		mafEventMacro(helpEvent);
+	  }
+	  break;
+
       case ID_SNAP:
       {
         OnEventSnapModality();
@@ -728,7 +740,17 @@ mafGUI* mafViewRXCT::CreateGui()
 {
   assert(m_Gui == NULL);
   m_Gui = new mafGUI(this);
-  
+
+  mafEvent buildHelpGui;
+  buildHelpGui.SetSender(this);
+  buildHelpGui.SetId(GET_BUILD_HELP_GUI);
+  mafEventMacro(buildHelpGui);
+
+  if (buildHelpGui.GetArg() == true)
+  {
+	  m_Gui->Button(ID_HELP, "Help","");	
+  }
+
   wxString m_Choices[2];
   m_Choices[0]="Right";
   m_Choices[1]="Left";
