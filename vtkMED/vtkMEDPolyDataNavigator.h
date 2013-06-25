@@ -40,7 +40,7 @@
 // Therefore methods which change the polydata should finish by deleting the invalid links,
 // or carry a warning that the user should do it.
 //
-// Version: Nigel McFarlane 21.5.13
+// Version: Nigel McFarlane 24.6.13
 //------------------------------------------------------------------------------
 class VTK_GRAPHICS_EXPORT vtkMEDPolyDataNavigator : public vtkObject
 {
@@ -72,6 +72,12 @@ public:
 
   /// Is id not in list
   inline bool NotInList(int id,  vtkIdList *idlist) const {return (idlist->IsId(id) < 0) ;}
+
+  /// Is id in set.
+  inline bool InSet(int id,  const IdSet& idSet) const ;
+
+  /// Is id not in set
+  inline bool NotInSet(int id,  const IdSet& idSet) const ;
 
   /// Insert id into list before location i. \n
   /// Analogous to insert() method on std::vector.
@@ -339,6 +345,9 @@ public:
   /// Useful for labelling cells.
   void SetCellsToScalarValue(vtkPolyData *polydata, char* scalarName, int component, double value, vtkIdList *cells) ;
 
+  /// Get points with no cell neighbours
+  void GetPointsWithNoCells(vtkPolyData *polydata, vtkIdList *pts) const ;
+
   /// PrintCell. \n
   /// NB This depends on BuildCells()
   void PrintCell(vtkPolyData *polydata, int cellId, ostream& os)  const ;
@@ -374,10 +383,13 @@ public:
   /// Delete tuples from cell attributes. \n
   void DeleteCellTuples(vtkPolyData *polydata, vtkIdList *cellIds)  const ;
 
-  /// Create new attibute array
+  /// Delete tuples from point attributes. \n
+  void DeletePointTuples(vtkPolyData *polydata, vtkIdList *ptIds)  const ;
+
+  /// Create new attribute array
   void CreatePointDataArray(vtkPolyData *polydata, char* name, int numberOfComponents, int dataType) const ;
 
-  /// Create new attibute array
+  /// Create new attribute array
   void CreateCellDataArray(vtkPolyData *polydata, char* name, int numberOfComponents, int dataType) const ;
 
 
@@ -392,6 +404,16 @@ public:
   /// cf polydata->DeleteCell(), which labels the cell, but does not actually remove it. \n
   /// The corresponding attribute data is also deleted.
   void DeleteCells(vtkPolyData *polydata, vtkIdList *idList)  const ;
+
+  /// Delete list of points. \n
+  /// The corresponding attribute data is also deleted. \n
+  /// NB Only use this for points which form a block at the end of the polydata, \n
+  /// and which are not members of cells, else cells will contain invalid id's.
+  void DeletePoints(vtkPolyData *polydata, vtkIdList *idList)  const ;
+
+  /// Move id's of points to end of polydata. \n
+  /// Corresponding cells and attributes are also changed.
+  void MovePointIdsToEnd(vtkPolyData *polydata, vtkIdList *idList)  const ;
 
   /// Create a new point, adding tuples to the attribute data if necessary. \n
   /// The position and scalars are copied from id0. \n
@@ -478,6 +500,10 @@ public:
   ///  0.5 sets the new point to half-way between the two.
   void MergePoints(vtkPolyData *polydata, vtkIdList *idsIn0,  vtkIdList *idsIn1,  vtkIdList *idsOut,  double lambda) const ;
 
+  /// Remove isolated points which are not part of cells. \n
+  /// This does not remove points which are vertex cells. \n
+  /// This only works if the points are a block at the end !! \n
+  void RemovePointsWithNoCells(vtkPolyData *polydata) const ;
 
 
 

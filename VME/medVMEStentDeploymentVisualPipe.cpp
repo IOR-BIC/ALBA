@@ -22,6 +22,7 @@ University of Bedfordshire UK
 #include "vtkCamera.h"
 #include "vtkDepthSortPolyData.h"
 #include "vtkTubeFilter.h"
+#include "vtkIdList.h"
 
 
 
@@ -289,6 +290,30 @@ void medVMEStentDeploymentVisualPipe::SetWireframeOff()
 
 
 
+//-------------------------------------------------------------------------
+// Get the highest index of the valid points,
+// ie points which are members of cells.
+/// Needed because the stent contains unused and undefined points.
+//-------------------------------------------------------------------------
+int medVMEStentDeploymentVisualPipe::GetHighestValidPointIndex(vtkPolyData *pd) const
+{
+  vtkIdList *ptIds = vtkIdList::New() ;
+  int ncells = pd->GetNumberOfCells() ;
+  int idLast = -1 ;
+  for (int i = 0 ;  i < ncells ;  i++){
+    pd->GetCellPoints(i, ptIds) ;
+    for (int j = 0 ;  j < ptIds->GetNumberOfIds() ;  j++){
+      int id = ptIds->GetId(j) ;
+      if (id > idLast)
+        idLast = id ;
+    }
+  }
+  ptIds->Delete() ;
+  return idLast ;
+}
+
+
+
 //------------------------------------------------------------------------------
 // Reset the camera position
 //------------------------------------------------------------------------------
@@ -297,21 +322,21 @@ void medVMEStentDeploymentVisualPipe::ResetCameraPosition()
   // select available polydata for setting the camera
   vtkPolyData *selectedPolydata ;
   vtkActor *selectedActor ;
-  if (m_DefinedCenterLine){
-    selectedPolydata = m_CenterLinePolydata ;
-    selectedActor = m_CenterLineActor ;
-  }
-  else if (m_DefinedCatheter){
-    selectedPolydata = m_CatheterPolydata ;
-    selectedActor = m_CatheterActor ;
+  if (m_DefinedStent){
+    selectedPolydata = m_StentPolydata ;
+    selectedActor = m_StentActor ;
   }
   else if (m_DefinedVessel){
     selectedPolydata = m_VesselPolydata ;
     selectedActor = m_VesselActor ;
   }
-  else if (m_DefinedStent){
-    selectedPolydata = m_StentPolydata ;
-    selectedActor = m_StentActor ;
+  else if (m_DefinedCatheter){
+    selectedPolydata = m_CatheterPolydata ;
+    selectedActor = m_CatheterActor ;
+  }
+  else if (m_DefinedCenterLine){
+    selectedPolydata = m_CenterLinePolydata ;
+    selectedActor = m_CenterLineActor ;
   }
   else
     return ;
@@ -324,6 +349,10 @@ void medVMEStentDeploymentVisualPipe::ResetCameraPosition()
   siz[1] = bounds[3] - bounds[2] ;
   siz[2] = bounds[5] - bounds[4] ;
 
+  // save center position
+  for (int j = 0 ;  j < 3 ;  j++)
+    m_CenterOld[j] = center[j] ;
+
   // find longest axis
   int longestAxis ;
   if ((siz[0] >= siz[1]) && (siz[0] >= siz[2]))
@@ -335,36 +364,89 @@ void medVMEStentDeploymentVisualPipe::ResetCameraPosition()
 
   // find whether item points left or right
   int direc ;
-  double x0[3], xn[3] ;
-  int n = selectedPolydata->GetPoints()->GetNumberOfPoints() ;
+  double x0[3], xLast[3] ;
+  int idLast = GetHighestValidPointIndex(selectedPolydata) ;
   selectedPolydata->GetPoint(0, x0) ;
-  selectedPolydata->GetPoint(n-1, xn) ;
-  if (x0[longestAxis] < xn[longestAxis])
+  selectedPolydata->GetPoint(idLast, xLast) ;
+  if (x0[longestAxis] < xLast[longestAxis])
     direc = 1 ;
   else
     direc = -1 ;
 
-  m_Renderer->GetActiveCamera()->SetFocalPoint(x0) ;
+  double focalPt[3] ;
+  for (int j = 0 ;  j < 3 ;  j++)
+    focalPt[j] = 0.9*x0[j] + 0.1*xLast[j] ;
+
+  m_Renderer->GetActiveCamera()->SetFocalPoint(focalPt) ;
 
   // This sets the camera view so that the longest axis is horizontal
-  double r = 0.5*direc*siz[longestAxis] ;
+  double r = direc*siz[longestAxis] ;
   switch(longestAxis){
   case 0:
-    m_Renderer->GetActiveCamera()->SetPosition(center[0], center[1], center[2]+r) ;
+    m_Renderer->GetActiveCamera()->SetPosition(focalPt[0], focalPt[1], focalPt[2]+r) ;
     m_Renderer->GetActiveCamera()->SetViewUp(0,1,0) ;
     break ;
   case 1:
-    m_Renderer->GetActiveCamera()->SetPosition(center[0]+r, center[1], center[2]) ;
+    m_Renderer->GetActiveCamera()->SetPosition(focalPt[0]+r, focalPt[1], focalPt[2]) ;
     m_Renderer->GetActiveCamera()->SetViewUp(0,0,1) ;
     break ;
   case 2:
-    m_Renderer->GetActiveCamera()->SetPosition(center[0]-r, center[1], center[2]) ;
+    m_Renderer->GetActiveCamera()->SetPosition(focalPt[0]-r, focalPt[1], focalPt[2]) ;
     m_Renderer->GetActiveCamera()->SetViewUp(0,1,0) ;
     break ;
   }
 
   m_Renderer->ResetCameraClippingRange() ;
 }
+
+
+
+//------------------------------------------------------------------------------
+// Reset the camera focal point
+//------------------------------------------------------------------------------
+void medVMEStentDeploymentVisualPipe::ResetCameraFocalPoint()
+{
+  // select available polydata for setting the camera
+  vtkPolyData *selectedPolydata ;
+  vtkActor *selectedActor ;
+  if (m_DefinedStent){
+    selectedPolydata = m_StentPolydata ;
+    selectedActor = m_StentActor ;
+  }
+  else if (m_DefinedVessel){
+    selectedPolydata = m_VesselPolydata ;
+    selectedActor = m_VesselActor ;
+  }
+  else if (m_DefinedCatheter){
+    selectedPolydata = m_CatheterPolydata ;
+    selectedActor = m_CatheterActor ;
+  }
+  else if (m_DefinedCenterLine){
+    selectedPolydata = m_CenterLinePolydata ;
+    selectedActor = m_CenterLineActor ;
+  }
+  else
+    return ;
+
+  // move camera focal point and position by the change in center position
+  double focalPt[3], cameraPos[3] ;
+  double *center = selectedActor->GetCenter() ;
+  m_Renderer->GetActiveCamera()->GetFocalPoint(focalPt) ;
+  m_Renderer->GetActiveCamera()->GetPosition(cameraPos) ;
+  for (int j = 0 ;  j < 3 ;  j++){
+    focalPt[j] += 0.9*(center[j] - m_CenterOld[j]) ;
+    cameraPos[j] += 0.9*(center[j] - m_CenterOld[j]) ;
+  }
+  m_Renderer->GetActiveCamera()->SetFocalPoint(focalPt) ;
+  m_Renderer->GetActiveCamera()->SetPosition(cameraPos) ;
+
+  m_Renderer->ResetCameraClippingRange() ;
+
+  // save center position
+  for (int j = 0 ;  j < 3 ;  j++)
+    m_CenterOld[j] = center[j] ;
+}
+
 
 
 

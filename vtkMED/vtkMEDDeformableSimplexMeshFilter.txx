@@ -317,6 +317,7 @@ namespace itk
     kdres *nearestPointSet;
     m_IsDataChanged = 0;
 
+
     //-------------timer--------
     (void) time(&t1);
     //-------------timer--------
@@ -326,10 +327,13 @@ namespace itk
     // Determine for each vertex whether it is constrained by the catheter.
     // Constrained vertices are those inside the catether and their neighbors.
     //--------------------------------------------------------------------------
-    int constrained[10000] ;
+    int constrained[5000] ;
+    int i ;
+    for (int i = 0 ;  i < 5000 ;  i++)
+      constrained[i] = 0 ;
+
     vector<int>::const_iterator centerIdx = m_CenterLocationIdx ;
     GeometryMapType::Iterator dataIt ;
-    int i ;
     for (dataIt = m_Data->Begin(), centerIdx = m_CenterLocationIdx, i = 0 ;  dataIt != m_Data->End() ;  dataIt++, centerIdx++, i++){
       data = dataIt.Value();
 
@@ -343,8 +347,6 @@ namespace itk
             constrained[id] = 1 ;
         }
       }      
-      else
-        constrained[i] = 0 ;
     }
 
 
@@ -371,7 +373,7 @@ namespace itk
       else
         m_DistanceCoefficient = dist/m_Epsilon ;
 
-      int inFlag = IsPointInsideVessel(pos,pt);//a point from simplex vertex and a point from surface.
+      int inFlag = IsPointInsideVessel2(pos,pt);//a point from simplex vertex and a point from surface.
 
       //compute internal,external and length force
       this->ComputeInternalForce(data);
@@ -401,7 +403,9 @@ namespace itk
     }//end of loop over vertices
 
     // save deformation info
-    m_DeformationHistory->SaveLengthsOfCells(m_CurrentStepNum, inputMesh) ;
+    //m_DeformationHistory->SaveLengthsOfCells(m_CurrentStepNum, inputMesh) ;
+    int n = inputMesh->GetNumberOfCells() ;
+
 
     //-------------timer--------
     (void) time(&t2);
@@ -786,7 +790,9 @@ namespace itk
   void vtkMEDDeformableSimplexMeshFilter<TInputMesh, TOutputMesh >::
     DeformationHistory::SaveLengthsOfCells(int step, const vtkMEDStentModelSource::SimplexMeshType *mesh)
   {
-    for (int i = 0 ;  i < mesh->GetNumberOfCells() ;  i++){
+    int n = mesh->GetNumberOfCells() ;
+
+    for (int i = 0 ;  i < n ;  i++){
       vtkMEDStentModelSource::CellAutoPointer cellPtr ;
       mesh->GetCell(i, cellPtr) ;
       CellInterface<PixelType, vtkMEDStentModelSource::SimplexMeshType::CellTraits>::PointIdConstIterator ptIdIterator = cellPtr->GetPointIds() ;
@@ -829,7 +835,7 @@ namespace itk
   {
     int nsteps = (int)m_DistToTarget.size() ;
     assert((int)m_IsInside.size() == nsteps);
-    assert((int)m_Length.size() == nsteps);
+    //assert((int)m_Length.size() == nsteps);
     if (nsteps == 0){
       os << "Deformation info: no steps\n" ;
       return ;
@@ -841,11 +847,11 @@ namespace itk
       return ;
     }
 
-    int nCellIds = (int)m_Length[0].size() ;
-    if (nCellIds == 0){
-      os << "Deformation info: no cell ids\n" ;
-      return ;
-    }
+    //int nCellIds = (int)m_Length[0].size() ;
+    //if (nCellIds == 0){
+    //  os << "Deformation info: no cell ids\n" ;
+    //  return ;
+    //}
 
     os << "Distance to target and in/out\n" ;
     os << " , " ;
@@ -873,7 +879,8 @@ namespace itk
     }
     os << "\n" ;
 
-    os << "Length of cell\n" ;
+    
+    /* os << "Length of cell\n" ;
     os << " , " ;
     for (int id = 0 ;  id < nCellIds ;  id++)
       os << id << ", " ;
@@ -884,7 +891,7 @@ namespace itk
         os << m_Length[step][id] << ", " ;
       os << "\n" ;
     }
-    os << "\n" ;
+    os << "\n" ; */
   }
 
 } // itk namespace

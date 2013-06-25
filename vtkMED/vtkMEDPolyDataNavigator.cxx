@@ -54,6 +54,26 @@ vtkMEDPolyDataNavigator::~vtkMEDPolyDataNavigator()
 }
 
 
+//------------------------------------------------------------------------------
+// Is id in set
+//------------------------------------------------------------------------------
+bool vtkMEDPolyDataNavigator::InSet(int id,  const IdSet& idSet) const
+{
+  IdSet::const_iterator pos = idSet.find(id) ;
+  return pos != idSet.end() ;
+}
+
+
+
+//------------------------------------------------------------------------------
+// Is id not in set
+//------------------------------------------------------------------------------
+bool vtkMEDPolyDataNavigator::NotInSet(int id,  const IdSet& idSet) const
+{
+  IdSet::const_iterator pos = idSet.find(id) ;
+  return pos == idSet.end() ;
+
+}
 
 
 
@@ -1611,6 +1631,24 @@ void vtkMEDPolyDataNavigator::SetCellsToScalarValue(vtkPolyData *polydata, char*
 
 
 //------------------------------------------------------------------------------
+// Get points with no cell neighbours
+//------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::GetPointsWithNoCells(vtkPolyData *polydata, vtkIdList *pts) const
+{
+  pts->Initialize() ;
+  vtkIdList *cellNeighs = vtkIdList::New() ;
+  int n = polydata->GetPoints()->GetNumberOfPoints() ;
+  for (int i = 0 ;  i < n ;  i++){
+    polydata->GetPointCells(i, cellNeighs) ;
+    if (cellNeighs->GetNumberOfIds() == 0)
+      pts->InsertNextId(i) ;
+  }
+  cellNeighs->Delete() ;
+}
+
+
+
+//------------------------------------------------------------------------------
 // PrintCell.
 // NB Needs BuildCells().
 //------------------------------------------------------------------------------
@@ -1658,10 +1696,19 @@ void vtkMEDPolyDataNavigator::PrintCell(vtkPolyData *polydata, int cellId, ostre
 //------------------------------------------------------------------------------
 void vtkMEDPolyDataNavigator::PrintCells(vtkPolyData *polydata, ostream& os)  const
 {
-  os << "number of cells = " << polydata->GetNumberOfCells() << std::endl ;
+  os << "number of points = " << polydata->GetPoints()->GetNumberOfPoints() << "\n\n" ;
+
+  os << "number of cells = " << polydata->GetNumberOfCells() << "\n" ;
   for (int i = 0 ;  i < polydata->GetNumberOfCells() ;  i++)
     PrintCell(polydata, i, os) ;
-  os << std::endl ;
+  os << "\n" ;
+
+  vtkIdList *ptsNoCells = vtkIdList::New() ;
+  GetPointsWithNoCells(polydata, ptsNoCells) ;
+  os << "points with no cells\n" ;
+  PrintIdList(ptsNoCells, os) ;
+  os << "\n" ;
+  ptsNoCells->Delete() ;
 }
 
 
@@ -1937,6 +1984,59 @@ void vtkMEDPolyDataNavigator::DeleteCellTuples(vtkPolyData *polydata, vtkIdList 
 
 
 
+
+//------------------------------------------------------------------------------
+// Delete tuples from point attributes.
+//------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::DeletePointTuples(vtkPolyData *polydata, vtkIdList *ptIds)  const
+{
+  vtkPointData *oldPtData = polydata->GetPointData() ;
+  int numberOfPtArrays = oldPtData->GetNumberOfArrays() ;
+  int nptsOld = oldPtData->GetNumberOfTuples() ;
+  int nptsToDelete = ptIds->GetNumberOfIds() ;
+
+  if (numberOfPtArrays == 0)
+    return ;
+
+  // make array labelling pts to keep
+  int *keep = new int[nptsOld] ;
+  for (int i = 0 ;  i < nptsOld ;  i++)
+    keep[i] = 1 ;
+  for (int i = 0 ;  i < nptsToDelete ;  i++){
+    int id = ptIds->GetId(i) ;
+    assert(id < nptsOld) ;
+    keep[id] = 0 ;
+  }
+
+  // copy cell data to new array and empty it of existing tuples.
+  vtkPointData *newPtData = vtkPointData::New() ;
+  newPtData->DeepCopy(polydata->GetPointData()) ;
+  newPtData->SetNumberOfTuples(0) ;
+
+  // copy all tuples to new list which are to keep
+  for (int j = 0 ;  j < nptsOld ;  j++){
+    if (keep[j] == 1){
+      for (int i = 0 ;  i < numberOfPtArrays ;  i++){
+        vtkDataArray *daOld = oldPtData->GetArray(i) ;
+        vtkDataArray *daNew = newPtData->GetArray(i) ;
+
+        int numberOfComponents = daOld->GetNumberOfComponents() ;
+        double tuple[9] ;
+        for (int k = 0 ;  k < numberOfComponents ;  k++)
+          tuple[k] = daOld->GetComponent(j, k) ;
+
+        daNew->InsertNextTuple(tuple) ;
+      }
+    }
+  }
+
+  oldPtData->DeepCopy(newPtData) ;
+  delete [] keep ;
+  newPtData->Delete() ;
+}
+
+
+
 //------------------------------------------------------------------------------
 // Create new attibute array
 //------------------------------------------------------------------------------
@@ -2130,6 +2230,38 @@ void vtkMEDPolyDataNavigator::DeleteCells(vtkPolyData *polydata, vtkIdList *idLi
 }
 
 
+
+//------------------------------------------------------------------------------
+// Delete list of points.
+// The corresponding attribute data is also deleted.
+// NB Only use this for points which form a block at the end of the polydata,
+// and which are not members of cells, else cells will contain invalid id's.
+//------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::DeletePoints(vtkPolyData *polydata, vtkIdList *idList)  const
+{
+  int n = polydata->GetPoints()->GetNumberOfPoints() ;
+  int m = idList->GetNumberOfIds() ;
+
+  // check that id's are a contiguous block at the end: n-m to n-1
+  for (int i = 0 ;  i < m ;  i++)
+    assert(idList->GetId(i) == n-m+i) ;
+
+  // copy the points without the end block
+  vtkPoints* newPts = vtkPoints::New() ;
+  for (int i = 0 ;  i < n-m ;  i++){
+    double x[3] ;
+    polydata->GetPoint(i, x) ;
+    newPts->InsertNextPoint(x) ;
+  }
+  polydata->SetPoints(newPts) ;
+
+  // delete the attribute data
+  DeletePointTuples(polydata, idList) ;
+
+  // Delete the invalid links and cells
+  polydata->DeleteCells() ;
+  polydata->DeleteLinks() ;
+}
 
 
 
@@ -3105,6 +3237,19 @@ void vtkMEDPolyDataNavigator::MergePoints(vtkPolyData *polydata, vtkIdList *idsI
   //----------------------------------------------------------------------------
   cellsToModify->Delete() ;
 
+}
+
+
+//------------------------------------------------------------------------------
+// Remove isolated points which are not part of cells.
+// This does not remove points which are vertex cells.
+//------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::RemovePointsWithNoCells(vtkPolyData *polydata) const
+{
+  vtkIdList *ptsNoCells = vtkIdList::New() ;
+  GetPointsWithNoCells(polydata, ptsNoCells) ;
+  DeletePoints(polydata, ptsNoCells) ; // only works if points form a block at the end!
+  ptsNoCells->Delete() ;
 }
 
 

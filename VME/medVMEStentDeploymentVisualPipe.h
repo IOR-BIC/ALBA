@@ -80,6 +80,9 @@ public:
   /// Don't forget to call renderer->ResetCamera() before the first call.
   void ResetCameraPosition() ;
 
+  /// Reset the camera focal point
+  void ResetCameraFocalPoint() ;
+
   /// Update and render
   void Render() ;
 
@@ -88,6 +91,10 @@ private:
   // Update the visibility of the components
   void UpdateVisibility() ;
 
+  /// Get the highest index of the valid points, \n
+  /// ie points which are members of cells. \n
+  /// Needed because the stent contains unused and undefined points.
+  int GetHighestValidPointIndex(vtkPolyData *pd) const ;
 
   //----------------------------------------------------------------------------
   // Member variables
@@ -131,6 +138,8 @@ private:
   vtkPolyDataMapper *m_StentMapper ;
   vtkActor *m_StentActor ;
 
+  // saved position of stent (or other principal item) in view
+  double m_CenterOld[3] ;
 } ;
 
 
