@@ -40,7 +40,7 @@
 // Therefore methods which change the polydata should finish by deleting the invalid links,
 // or carry a warning that the user should do it.
 //
-// Version: Nigel McFarlane 24.6.13
+// Version: Nigel McFarlane 28.6.13
 //------------------------------------------------------------------------------
 class VTK_GRAPHICS_EXPORT vtkMEDPolyDataNavigator : public vtkObject
 {
@@ -140,12 +140,12 @@ public:
 
   /// Copy vtkIdList to id set. \n
   /// NB if an id appears twice in the id list, it will only copy once to the map.
-  void vtkMEDPolyDataNavigator::CopyListToIdSet(vtkIdList *idList, IdSet& idSet) const ;
+  void CopyListToIdSet(vtkIdList *idList, IdSet& idSet) const ;
 
   /// Add vtkIdList to id set. \n
   /// NB if an id appears twice in the id list, it will only copy once to the map. \n
   /// This is a good way to remove duplicate ids from a list.
-  void vtkMEDPolyDataNavigator::AddListToIdSet(vtkIdList *idList, IdSet& idSet) const ;
+  void AddListToIdSet(vtkIdList *idList, IdSet& idSet) const ;
 
   /// Copy id set to vtkIdList
   void CopyIdSetToList(const IdSet& idSet, vtkIdList *idList) const ;
