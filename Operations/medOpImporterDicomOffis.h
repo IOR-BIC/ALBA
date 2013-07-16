@@ -210,6 +210,9 @@ protected:
 	/** Build the list of dicom filer recognized. */
 	bool BuildDicomFileList(const char *dicomDirABSPath);
 
+	/** Read the list of dicom files recognized. */
+	bool ReadDicomFileList(mafString& currentSliceABSDirName);
+
 	/** Check if dicom dataset contains rotations */
 	bool IsRotated( double dcmImageOrientationPatient[6] );
 
