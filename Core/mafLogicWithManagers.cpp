@@ -75,6 +75,7 @@
 #include "mafGUISettingsTimeBar.h"
 #include "mafRemoteLogic.h"
 #include "mafGUISettingsDialog.h"
+#include  "mafGUISettingsHelp.h"
 
 #ifdef WIN32
   #include "mafDeviceClientMAF.h"
@@ -128,7 +129,9 @@ mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
 
   m_ApplicationLayoutSettings = NULL;
 
-	m_Revision = _("0.1");
+  m_HelpSettings = NULL;
+
+  m_Revision = _("0.1");
 
   m_User = new mafUser();
 
@@ -140,6 +143,7 @@ mafLogicWithManagers::~mafLogicWithManagers()
   // Managers are destruct in the OnClose
   cppDEL(m_User);
   cppDEL(m_ApplicationLayoutSettings);
+  cppDEL(m_HelpSettings);
   cppDEL(m_PrintSupport);
   cppDEL(m_SettingsDialog); 
 }
@@ -229,6 +233,9 @@ void mafLogicWithManagers::Configure()
   }
 
   m_SettingsDialog->AddPage( m_Win->GetDockSettingGui(), _("User Interface Preferences"));
+
+  m_HelpSettings = new mafGUISettingsHelp(this);
+  m_SettingsDialog->AddPage(m_HelpSettings->GetGui(), m_HelpSettings->GetLabel());
 
 // currently mafInteraction is strictly dependent on VTK (marco)
 #ifdef MAF_USE_VTK
@@ -435,7 +442,9 @@ void mafLogicWithManagers::CreateMenu()
 
 	wxMenu    *help_menu = new wxMenu;
 	help_menu->Append(ABOUT_APPLICATION,_("About"));
-  m_MenuBar->Append(help_menu, _("&Help"));
+	help_menu->Append(HELP_HOME, _("Help"));
+
+	m_MenuBar->Append(help_menu, _("&Help"));
 
   m_Win->SetMenuBar(m_MenuBar);
 
@@ -830,6 +839,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       break;
       case VIEW_SELECTED:
         e->SetBool(m_ViewManager->GetSelectedView() != NULL);
+        e->SetView(m_ViewManager->GetSelectedView());
       break;
       case VIEW_SAVE_IMAGE:
       {
@@ -1035,6 +1045,40 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 				wxMessageBox(message, "About Application");
 			}
 			break;
+
+			case HELP_HOME:
+				{
+					if (m_HelpSettings)
+					{
+						m_HelpSettings->OpenHelpPage("HELP_HOME");
+					}	
+				}
+				break;
+
+			case GET_BUILD_HELP_GUI:
+			{	
+				int buildGui = -1;
+				if (m_HelpSettings == NULL)
+				{
+					buildGui = false;
+					e->SetArg(buildGui);
+				}
+				else
+				{
+					buildGui = m_HelpSettings->GetBuildHelpGui();
+				}
+				e->SetArg(buildGui);
+			}
+			break;
+
+			case OPEN_HELP_PAGE:
+			{
+				// open help for entity
+				wxString entity = e->GetString()->GetCStr();
+				m_HelpSettings->OpenHelpPage(entity);
+			}
+			break;
+
       default:
         mafLogicWithGUI::OnEvent(maf_event);
       break; 

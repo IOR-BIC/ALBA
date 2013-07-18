@@ -52,7 +52,7 @@
 #include "vtkProperty.h"
 
 //----------------------------------------------------------------------------
-mafGizmoRotateCircle::mafGizmoRotateCircle(mafVME *input, mafObserver *listener)
+mafGizmoRotateCircle::mafGizmoRotateCircle(mafVME *input, mafObserver *listener, mafString name)
 //----------------------------------------------------------------------------
 {
   this->SetIsActive(false);
@@ -80,7 +80,7 @@ mafGizmoRotateCircle::mafGizmoRotateCircle(mafVME *input, mafObserver *listener)
   //-----------------
   // build the circle gizmo
   m_GizmoCircle = mafVMEGizmo::New();
-  m_GizmoCircle->SetName("circle");
+  m_GizmoCircle->SetName(name);
   m_GizmoCircle->SetData(m_RotatePDF->GetOutput());
   m_GizmoCircle->SetMediator(m_Listener);
 

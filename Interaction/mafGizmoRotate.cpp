@@ -56,16 +56,21 @@ mafGizmoRotate::mafGizmoRotate(mafVME* input, mafObserver *listener, bool buildG
 
   for (int i = 0; i < 3; i++)
   {
+
     // create the fan and send events to this
     m_GRFan[i] = new mafGizmoRotateFan(input, this);
     m_GRFan[i]->SetAxis(i);
-	  m_GRFan[i]->SetMediator(this);
+	m_GRFan[i]->SetMediator(this);
 
     // Create mafGizmoRotateCircle and send events to the corresponding fan
-    m_GRCircle[i] = new mafGizmoRotateCircle(input, m_GRFan[i]);
-	  m_GRCircle[i]->SetAxis(i);
-	  m_GRCircle[i]->SetMediator(this);
-
+	
+	mafString name("Circle");
+	if(i == 0) name.Append("X");
+	else if(i == 1) name.Append("Y");
+	else if(i == 2) name.Append("Z");
+    m_GRCircle[i] = new mafGizmoRotateCircle(input, m_GRFan[i], name);
+	m_GRCircle[i]->SetAxis(i);
+	m_GRCircle[i]->SetMediator(this);
   }
 
   SetAlwaysVisible(true);

@@ -98,6 +98,18 @@ void mafView::OnEvent(mafEventBase *maf_event)
         mafLogMessage("[VIEW PRINTOUT:]\n%s\n", ss1.str()); 
       }
       break;
+		
+	  case ID_HELP:
+	  {
+		mafEvent helpEvent;
+		helpEvent.SetSender(this);
+		mafString viewLabel = this->m_Label;
+		helpEvent.SetString(&viewLabel);
+		helpEvent.SetId(OPEN_HELP_PAGE);
+		mafEventMacro(helpEvent);
+	  }
+	  break;
+
       default:
         mafEventMacro(*maf_event);
     }
@@ -124,6 +136,16 @@ mafGUI* mafView::CreateGui()
   
   if((*GetMAFExpertMode()) == TRUE) 
     m_Gui->Button(ID_PRINT_INFO, type_name, "", "Print view debug information");
+
+  mafEvent buildHelpGui;
+  buildHelpGui.SetSender(this);
+  buildHelpGui.SetId(GET_BUILD_HELP_GUI);
+  mafEventMacro(buildHelpGui);
+
+  if (buildHelpGui.GetArg() == true)
+  {
+	  m_Gui->Button(ID_HELP, "Help","");	
+  }
 
   return m_Gui;
 }

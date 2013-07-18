@@ -385,6 +385,7 @@ public:
   {
     ID_NAME = MINID,
     ID_PRINT_INFO,
+	ID_HELP,
     ID_LAST
   };
 

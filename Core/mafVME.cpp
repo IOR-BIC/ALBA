@@ -784,7 +784,7 @@ void mafVME::OnEvent(mafEventBase *maf_event)
 {
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
-    Superclass::OnEvent(maf_event);
+	Superclass::OnEvent(maf_event);
   }
   else if (maf_event->GetId() == mafVMEItem::VME_ITEM_DATA_MODIFIED)
   {
@@ -891,8 +891,9 @@ mafGUI *mafVME::CreateGui()
   {
     anim_text = _("animated");
   }
+  
   m_Gui->Label(anim_text);
-	m_Gui->Divider();
+  m_Gui->Divider();
 
   return m_Gui;
 }
