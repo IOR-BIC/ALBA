@@ -38,7 +38,7 @@ typedef vtkMEDStentModelSource::Strut                         Strut;
 typedef vtkMEDStentModelSource::StentConfigurationType        enumStCfgType;
 typedef vtkMEDStentModelSource::LinkConnectionType            enumLinkConType;
 typedef vtkMEDStentModelSource::LinkOrientationType           enumLinkOrtType;
-typedef vector<Strut>::const_iterator    StrutIterator;
+typedef std::vector<Strut>::const_iterator    StrutIterator;
 typedef itk::vtkMEDDeformableSimplexMeshFilter<SimplexMeshType,SimplexMeshType> DeformFilterType;
 
 
