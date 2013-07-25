@@ -24,6 +24,7 @@
 
 #include "wx/listimpl.cpp"
 #include "wx/busyinfo.h"
+#include <wx/listctrl.h>
 
 #include "medOpImporterDicomOffis.h"
 
@@ -94,6 +95,12 @@
 #include "vtkImageFlip.h"
 
 #include "vtkMath.h"
+
+#include "windows.h"
+
+
+
+
 
 #define round(x) (x<0?ceil((x)-0.5):floor((x)+0.5))
 
@@ -250,7 +257,8 @@ mafOp(label)
 	m_NumberOfStudies = 0;
 	m_NumberOfSlices = -1;
 	m_StudyListbox = NULL;
-	m_SeriesListbox = NULL;
+//	m_SeriesListbox = NULL;
+	m_SeriesListctrl = NULL;
 	m_SelectedSeriesSlicesList = NULL;
 
 	m_DicomDirectoryABSFileName = "";
@@ -277,6 +285,7 @@ mafOp(label)
 	m_ConstantRotation = true;
 	m_ZCrop = true;
 	m_SideToBeDragged = 0; 
+	m_mem_is_almost_full = false;
 
 	m_GizmoStatus = GIZMO_NOT_EXIST;
 
@@ -595,8 +604,10 @@ void medOpImporterDicomOffis::Destroy()
 	if(m_DicomInteractor)
 		m_Mouse->RemoveObserver(m_DicomInteractor);
 
-	if(!this->m_TestMode)
-		m_SeriesListbox->Clear();
+	if(!this->m_TestMode) {
+//		m_SeriesListbox->Clear();
+		m_SeriesListctrl->ClearAll();
+	}
 
 	std::map<std::vector<mafString>,medDicomSeriesSliceList*>::iterator it;
 	for ( it=m_SeriesIDToSlicesListMap.begin() ; it != m_SeriesIDToSlicesListMap.end(); it++ )
@@ -1183,7 +1194,7 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
 
 		if(!this->m_TestMode)
 		{
-			progress = count * 100 / m_DICOMDirectoryReader->GetNumberOfFiles();
+			progress = count * 100 / (m_ZCropBounds[1]+1); //m_DICOMDirectoryReader->GetNumberOfFiles();
 			mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
 		}
 	}
@@ -2086,11 +2097,12 @@ void medOpImporterDicomOffis::CreateLoadPage()
 	}
 
 	m_StudyListbox = m_LoadGuiUnderLeft->ListBox(ID_STUDY_SELECT,_("study"),80,"",wxLB_HSCROLL,190);
-	m_SeriesListbox = m_LoadGuiUnderCenter->ListBox(ID_SERIES_SELECT,_("series"),80,"",wxLB_HSCROLL|wxLB_SORT,190);
+//	m_StudyListctrl = m_LoadGuiUnderLeft->ListCtrl(ID_STUDY_SELECT,_("study"),80,"",wxLC_LIST|wxLC_SINGLE_SEL|wxLC_SORT_ASCENDING,190);
 
-  
+	// m_SeriesListbox = m_LoadGuiUnderCenter->ListBox(ID_SERIES_SELECT,_("series"),80,"",wxLB_HSCROLL|wxLB_SORT,190);
+	m_SeriesListctrl = m_LoadGuiUnderCenter->ListCtrl(ID_SERIES_SELECT,_("series"),80,"",wxLC_LIST|wxLC_SINGLE_SEL|wxLC_SORT_ASCENDING,190);
 
-	m_LoadGuiLeft->FitGui();
+  	m_LoadGuiLeft->FitGui();
 	m_LoadGuiUnderLeft->FitGui();
 	m_LoadGuiUnderCenter->FitGui();
 	m_LoadPage->AddGuiLowerLeft(m_LoadGuiLeft);
@@ -2325,6 +2337,7 @@ bool medOpImporterDicomOffis::OpenDir()
 		if(m_NumberOfStudies>0)
 		{
 			m_StudyListbox->SetSelection(FIRST_SELECTION);
+//			m_StudyListctrl->SetItemState(FIRST_SELECTION, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 
 			UpdateStudyListBox();
 
@@ -2703,8 +2716,8 @@ void medOpImporterDicomOffis::OnUndoCrop()
 	m_CropPage->GetRWI()->CameraUpdate();
 	m_BuildPage->GetRWI()->CameraReset(boundsCamera);
 	m_BuildPage->GetRWI()->CameraUpdate();
-  m_ReferenceSystemPage->GetRWI()->CameraReset(boundsCamera);
-  m_ReferenceSystemPage->GetRWI()->CameraUpdate();
+    m_ReferenceSystemPage->GetRWI()->CameraReset(boundsCamera);
+    m_ReferenceSystemPage->GetRWI()->CameraUpdate();
 	m_CropActor->VisibilityOn();
 	m_CropExecuted=false;
 }
@@ -2759,9 +2772,23 @@ void medOpImporterDicomOffis::Crop()
 
   if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::TRADITIONAL)
   {
-	  wxString  seriesName = m_SeriesListbox->GetString(m_SeriesListbox->GetSelection());
-		m_VolumeName = seriesName.Mid(0,seriesName.find_last_of('_'));
-		m_VolumeName.Append(wxString::Format("_%ix%ix%i", (int)pixelDimX, (int)pixelDimY, cropInterval));
+	  //---------------------------------------------------------------
+	  long item = -1;
+	  long myitem = 0;
+	  for ( ;; )
+	  {
+		  myitem = item;
+		  item = m_SeriesListctrl->GetNextItem(item,wxLIST_NEXT_ALL,wxLIST_STATE_SELECTED);
+		  if ( item == -1 )
+			  break;
+	  }
+	  //string selected from the listctrl
+	  wxString seriesName = m_SeriesListctrl->GetItemText(myitem);
+	  //---------------------------------------------------------------
+
+//	  wxString  seriesName = m_SeriesListbox->GetString(m_SeriesListbox->GetSelection());
+      m_VolumeName = seriesName.Mid(0,seriesName.find_last_of('_'));
+	  m_VolumeName.Append(wxString::Format("_%ix%ix%i", (int)pixelDimX, (int)pixelDimY, cropInterval));
   }
   else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::DESCRIPTION_DATE)
   {
@@ -2775,7 +2802,22 @@ void medOpImporterDicomOffis::Crop()
     m_VolumeName = "";
     if (((medGUIDicomSettings*)GetSetting())->GetEnabledCustomName(medGUIDicomSettings::ID_SERIES))
     {
-      wxString  seriesName = m_SeriesListbox->GetString(m_SeriesListbox->GetSelection());
+		//---------------------------------------------------------------
+		long item = -1;
+		long myitem = 0;
+		for ( ;; )
+		{
+			myitem = item;
+			item = m_SeriesListctrl->GetNextItem(item,wxLIST_NEXT_ALL,wxLIST_STATE_SELECTED);
+			if ( item == -1 )
+				break;
+		}
+		//---------------------------------------------------------------
+		//string selected from the listctrl
+		wxString seriesName = m_SeriesListctrl->GetItemText(myitem);
+		//---------------------------------------------------------------
+
+//      wxString  seriesName = m_SeriesListbox->GetString(m_SeriesListbox->GetSelection());
       m_VolumeName = seriesName;
       separator = true;
     }
@@ -2968,12 +3010,15 @@ void medOpImporterDicomOffis::FillStudyListBox(mafString studyUID)
 //----------------------------------------------------------------------------
 {
 	bool newStudy = true;
-	int studyConuter = m_StudyListbox->GetCount();
+	int studyCounter = m_StudyListbox->GetCount();
+//	int studyCounter = m_StudyListctrl->GetItemCount();
 	mafString studyName = "study_";
-	studyName.Append(wxString::Format("%i", studyConuter));
-	for (int n = 0; n < m_StudyListbox->GetCount(); n++)
+	studyName.Append(wxString::Format("%i", studyCounter));
+	for (int n = 0; n < studyCounter; n++)
 	{
 		mafString *st = (mafString *)m_StudyListbox->GetClientData(n);
+	//	mafString *st = (mafString *)m_StudyListctrl->GetItemData(n);
+
 		m_SelectedSeriesID.at(0) = st->GetCStr();
 		if (m_SelectedSeriesID.at(0).Compare(studyUID) == 0)
 		{
@@ -2984,8 +3029,15 @@ void medOpImporterDicomOffis::FillStudyListBox(mafString studyUID)
 	if (newStudy)
 	{ 
 		m_StudyListbox->Append(studyName.GetCStr());
+	//	m_StudyListctrl->InsertItem(0,studyName.GetCStr());
+
 		mafString *ms = new mafString(studyUID.GetCStr());
-		m_StudyListbox->SetClientData(studyConuter, (void *) ms);
+		
+		//conversione from mafstring* (pointer) to long
+//		long idstudy =  (long) ms;
+
+		m_StudyListbox->SetClientData(studyCounter, (void *) ms);
+//	    m_StudyListctrl->SetItemData(studyCounter,idstudy);
 	}
 }
 
@@ -2994,10 +3046,16 @@ void medOpImporterDicomOffis::UpdateStudyListBox()
 //----------------------------------------------------------------------------
 {
 	for (int n = 0; n < m_StudyListbox->GetCount(); n++)
+//	for (int n = 0; n < m_StudyListctrl->GetItemCount(); n++)
 	{
 		int counter = 0;
+
 		mafString study = m_StudyListbox->GetString(n);
+//		mafString study = m_StudyListctrl->GetItemText(n);
+		
 		mafString *st = (mafString *)m_StudyListbox->GetClientData(n);
+//		mafString *st = (mafString *)m_StudyListctrl->GetItemData(n);
+
 		m_SelectedSeriesID.at(0) = st->GetCStr();
 
 		std::map<std::vector<mafString>,medDicomSeriesSliceList*>::iterator it;
@@ -3013,7 +3071,11 @@ void medOpImporterDicomOffis::UpdateStudyListBox()
 				}
 			}
 		}
-		m_StudyListbox->SetString(n, study.Append(wxString::Format("_%i", counter)).GetCStr());
+
+		study.Append(wxString::Format("_%i", counter));
+		m_StudyListbox->SetString(n, study.GetCStr());
+//		m_StudyListctrl->SetItemText((long)n,study.GetCStr());
+
 	}
 }
 
@@ -3022,7 +3084,9 @@ void medOpImporterDicomOffis::FillSeriesListBox()
 //----------------------------------------------------------------------------
 {
 	int counter = 0;
-	m_SeriesListbox->Clear();
+//	m_SeriesListbox->Clear();
+	m_SeriesListctrl->ClearAll();
+
 	std::map<std::vector<mafString>,medDicomSeriesSliceList*>::iterator it;
 	for ( it=m_SeriesIDToSlicesListMap.begin() ; it != m_SeriesIDToSlicesListMap.end(); it++ )
 	{
@@ -3058,11 +3122,19 @@ void medOpImporterDicomOffis::FillSeriesListBox()
           seriesName.Append(wxString::Format("x%i", numberOfImages));
         }
 
-        m_SeriesListbox->Append(seriesName.GetCStr());
-        m_SeriesListbox->SetClientData(counter,(void *)m_SeriesIDToSlicesListMap[m_SelectedSeriesID]/*filesList*/); 
+//      m_SeriesListbox->Append(seriesName.GetCStr());
+//      m_SeriesListbox->SetClientData(counter,(void *)m_SeriesIDToSlicesListMap[m_SelectedSeriesID]/*filesList*/); 
+//      wxColour itemREDcolour = wxColour(255,1,1);
 
-        
-        counter++;
+//      TODO
+		m_SeriesListctrl->InsertItem((long)counter,seriesName.GetCStr());
+//		m_SeriesListctrl->SetClientData((void *)m_SeriesIDToSlicesListMap[m_SelectedSeriesID]/*filesList*/);
+		long ptclientdata = (long) m_SeriesIDToSlicesListMap[m_SelectedSeriesID];
+		m_SeriesListctrl->SetItemData(counter,ptclientdata);
+		wxColour itemREDcolour = wxColour(255,1,1);
+		if(numberOfImages < 6) m_SeriesListctrl->SetItemTextColour((long)counter,itemREDcolour);
+
+		counter++;
 			}
 		} 
 	}
@@ -3371,8 +3443,8 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 					}
 
 					mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
-          cppDEL(wait);
-          cppDEL(busyInfo);
+                    cppDEL(wait);
+                    cppDEL(busyInfo);
 
 				}
 			}
@@ -3394,7 +3466,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
       
     }
     
-    cppDEL(busyInfo);
+        cppDEL(busyInfo);
 		return true;
 	}
 }
@@ -3442,7 +3514,29 @@ bool medOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 	time_t start,end;
 
     for (int i=0; i < m_DICOMDirectoryReader->GetNumberOfFiles(); i++) {
-	
+
+	MEMORYSTATUSEX memInfo;
+	memInfo.dwLength = sizeof(MEMORYSTATUSEX);
+	GlobalMemoryStatusEx(&memInfo);
+	DWORDLONG totalVirtualMem = memInfo.ullTotalPageFile;
+	DWORDLONG physMemUsed = memInfo.ullTotalPhys - memInfo.ullAvailPhys;
+
+	if(!this->m_TestMode)
+	{
+		if(physMemUsed > 0.6*memInfo.ullTotalPhys && !(m_mem_is_almost_full==true) ) {
+		  int answer = wxMessageBox( "The allocated memory is the 60% of the physical memory! Do you want to continue?", "Warning", wxYES_NO, NULL);
+		  if (answer == wxNO)
+		  {
+			 return true;
+		  }
+		  else if (answer == wxYES)
+		  {
+			 m_mem_is_almost_full=true;
+		  }
+		}
+	}
+
+
 	time(&start);
 
 	//int nfiles = m_DICOMDirectoryReader->GetNumberOfFiles();
@@ -3546,7 +3640,6 @@ bool medOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 
 		// width
 		int dcmColumns = val_long;
-
 		dicomDataset->findAndGetLongInt(DCM_Rows, val_long);
 
 		// height
@@ -4245,7 +4338,8 @@ void medOpImporterDicomOffis::ResetStructure()
 	{
 		EnableSliceSlider(false);
 		EnableTimeSlider(false);
-		m_SeriesListbox->Clear();
+//		m_SeriesListbox->Clear();
+		m_SeriesListctrl->ClearAll();
 	}
 
 	std::map<std::vector<mafString>,medDicomSeriesSliceList*>::iterator it;
@@ -4260,7 +4354,9 @@ void medOpImporterDicomOffis::ResetStructure()
 	if(!this->m_TestMode)
 	{
 		m_StudyListbox->Clear();
-		m_SeriesListbox->Clear();
+//		m_StudyListctrl->ClearAll();
+//		m_SeriesListbox->Clear();
+		m_SeriesListctrl->ClearAll();
 	}
 	m_NumberOfStudies		= 0;
 	m_NumberOfSlices	= 0;
@@ -4956,11 +5052,27 @@ void medOpImporterDicomOffis::OnSwapReferenceSystemSelected()
 void medOpImporterDicomOffis::OnStudySelect()
 {
 	mafString *st = (mafString *)m_StudyListbox->GetClientData(m_StudyListbox->GetSelection());
+
+	////---------------------------------------------------------------
+	//long item = -1;
+	//long myitem = 0;
+	//for ( ;; )
+	//{
+	//	myitem = item;
+	//	item = m_StudyListctrl->GetNextItem(item,wxLIST_NEXT_ALL,wxLIST_STATE_SELECTED);
+	//	if ( item == -1 )
+	//		break;
+	//}
+	////---------------------------------------------------------------
+	//mafString *st = (mafString *)m_StudyListctrl->GetItemData(myitem);
+
 	m_SelectedSeriesID.at(0) = st->GetCStr();
 	if (m_SelectedSeriesID.at(0).Compare(m_StudyListbox->GetString(m_StudyListbox->GetSelection())) != 0)
+//	if (m_SelectedSeriesID.at(0).Compare(m_StudyListctrl->GetItemText(myitem)) != 0)
 	{
 		FillSeriesListBox();
-		m_SeriesListbox->SetSelection(FIRST_SELECTION);
+		m_SeriesListctrl->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+//		m_SeriesListbox->SetSelection(FIRST_SELECTION);
 		OnEvent(&mafEvent(this, ID_SERIES_SELECT));
 	}
 }
@@ -4992,10 +5104,30 @@ void medOpImporterDicomOffis::GetDicomRange(double *range)
 void medOpImporterDicomOffis::OnSeriesSelect()
 {
 	mafString *st = (mafString *)m_StudyListbox->GetClientData(m_StudyListbox->GetSelection());
+
+	////---------------------------------------------------------------
+	long item = -1;
+	long myitem = 0;
+	for ( ;; )
+	{
+		myitem = item;
+		item = m_SeriesListctrl->GetNextItem(item,wxLIST_NEXT_ALL,wxLIST_STATE_SELECTED);
+		if ( item == -1 )
+			break;
+	}
+	////---------------------------------------------------------------
+	//mafString *st = (mafString *)m_StudyListctrl->GetItemData(myitem);
+
 	m_SelectedSeriesID.at(0) = st->GetCStr();
-	wxString  seriesName = m_SeriesListbox->GetString(m_SeriesListbox->GetSelection());
+
+//  string selected from the listbox
+//	wxString seriesName = m_SeriesListbox->GetString(m_SeriesListbox->GetSelection());
+
+//  string selected from the listctrl
+	wxString seriesName = m_SeriesListctrl->GetItemText(myitem);
 
 	mafString tmp;
+
 
   if(((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::TRADITIONAL)
   {
