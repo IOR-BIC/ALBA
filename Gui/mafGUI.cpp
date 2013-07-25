@@ -107,6 +107,7 @@ static wxPoint dp = wxDefaultPosition;
 //----------------------------------------------------------------------------
 BEGIN_EVENT_TABLE(mafGUI,mafGUIPanel)
     EVT_COMMAND_RANGE( MINID,MAXID,wxEVT_COMMAND_LISTBOX_SELECTED,      mafGUI::OnListBox)
+	EVT_COMMAND_RANGE( MINID,MAXID,wxEVT_COMMAND_LIST_ITEM_SELECTED,    mafGUI::OnListCtrl)
     EVT_COMMAND_RANGE( MINID,MAXID,wxEVT_COMMAND_CHECKLISTBOX_TOGGLED , mafGUI::OnCheckListBox)
 	  EVT_COMMAND_RANGE( MINID,MAXID,wxEVT_COMMAND_SLIDER_UPDATED,				mafGUI::OnSlider)
     EVT_MOUSEWHEEL(mafGUI::OnMouseWheel)
@@ -1389,6 +1390,36 @@ wxListBox *mafGUI::ListBox(int id,wxString label,int height, wxString tooltip, l
 	return lb;
 }
 //----------------------------------------------------------------------------
+wxListCtrl *mafGUI::ListCtrl(int id,wxString label,int height, wxString tooltip, long lbox_style , int width) //<*> togliere direction
+//----------------------------------------------------------------------------
+{
+	if(width<0)
+		width = (label == "") ? FW : DW;
+	int w_id = GetWidgetId(id);
+	wxListCtrl *lb = new wxListCtrl(this, w_id,dp,wxSize(width ,height),lbox_style | m_EntryStyle);  // wxSUNKEN_BORDER non funzia - aggiunge anche il bordino nero
+	lb->SetValidator( mafGUIValidator(this,w_id,lb) );
+	lb->SetFont(m_Font);
+	if(tooltip != "") lb->SetToolTip(tooltip);
+	if(label == "")
+	{
+		Add(lb,0,wxALL, M); 
+	}
+	else
+	{
+		wxStaticText *lab = new wxStaticText(this, GetWidgetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
+		if(m_UseBackgroundColor) 
+			lab->SetBackgroundColour(m_BackgroundColor);
+		lab->SetFont(m_Font);
+		if(tooltip != "")	
+			lab->SetToolTip(tooltip);
+		wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
+		sizer->Add( lab,  0, wxRIGHT, LM);
+		sizer->Add( lb	, 0, wxRIGHT, HM);
+		Add(sizer,0,wxALL, M);
+	}
+	return lb;
+}
+//----------------------------------------------------------------------------
 wxGrid *mafGUI::Grid(int id, wxString label,int height, int row, int cols, wxString tooltip) //<*> le griglie mettono le scrollbar alla vfc
 //----------------------------------------------------------------------------//    inoltre ListBox,CheckListBoz e Grid possono avere le scrollbar   
 {                                                                             //    che stanno male quando anche il GuiHolder ha la scrollbar
@@ -1550,6 +1581,15 @@ void mafGUI::OnListBox (wxCommandEvent &event)
   ((mafGUIValidator *)lb->GetValidator())->TransferFromWindow();
   OnEvent(&mafEvent(this, event.GetId(),(long) event.GetInt()));
 }
+//----------------------------------------------------------------------------
+void mafGUI::OnListCtrl (wxCommandEvent &event)
+//----------------------------------------------------------------------------
+{
+	wxListCtrl *lb = (wxListCtrl *)event.GetEventObject();
+	((mafGUIValidator *)lb->GetValidator())->TransferFromWindow();
+	OnEvent(&mafEvent(this, event.GetId(),(long) event.GetInt()));
+}
+//----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
 void mafGUI::OnCheckListBox (wxCommandEvent &event)
 //----------------------------------------------------------------------------
