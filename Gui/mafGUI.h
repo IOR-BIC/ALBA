@@ -20,6 +20,7 @@
 //----------------------------------------------------------------------------
 
 #include "wx/grid.h"
+#include "wx/listctrl.h"
 #include "mafDecl.h"
 #include "mafGUIPanel.h"
 #include "mafEvent.h"
@@ -242,6 +243,9 @@ public:
   /** Listbox widget. */
 	wxListBox *ListBox(int id, wxString label = "", int height = 60, wxString tooltip = "", long lbox_style = 0, int width = -1);
 
+  /** ListCtrl widget. */
+	wxListCtrl *ListCtrl(int id, wxString label = "", int height = 60, wxString tooltip = "", long lbox_style = 0, int width = -1);
+
   /** Grid widget. */
 	wxGrid *Grid(int id, wxString label = "", int height = 60, int row = 2,int cols = 2, wxString tooltip = "");
 
@@ -332,7 +336,8 @@ protected:
   int GetModuleId(int w_id)   {assert(w_id > 0 && w_id <= (*GetMAFWidgetId())); return  m_WidgetTableID[w_id - MINID];};
 
   void OnSlider			  (wxCommandEvent &event) { }//@@@ this->OnEvent(mafEvent(this, GetModuleId(event.GetWidgetId()))); }
-	void OnListBox      (wxCommandEvent &event);
+  void OnListBox      (wxCommandEvent &event);
+  void OnListCtrl      (wxCommandEvent &event);
   void OnCheckListBox (wxCommandEvent &event);
   void OnMouseWheel   (wxMouseEvent &event);
 

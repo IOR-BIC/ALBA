@@ -19,6 +19,7 @@
 // Include:
 //----------------------------------------------------------------------------
 #include <wx/validate.h>
+#include "wx/listctrl.h"
 #include "mafDecl.h"
 #include "mafString.h"
 
@@ -48,6 +49,7 @@ enum VALIDATOR_MODES
   VAL_RADIOBOX,
   VAL_COMBOBOX,
   VAL_LISTBOX,
+  VAL_LISTCTRL,
   VAL_BUTTON,
   VAL_FILEOPEN,
   VAL_FILESAVE,
@@ -75,6 +77,7 @@ public:
   mafGUIValidator (mafObserver* listener,int mid,wxRadioBox   *win,   int*   var);
   mafGUIValidator (mafObserver* listener,int mid,wxComboBox   *win,   int*   var);
   mafGUIValidator (mafObserver* listener,int mid,wxListBox    *win);
+  mafGUIValidator (mafObserver* listener,int mid,wxListCtrl   *win);
   mafGUIValidator (mafObserver* listener,int mid,wxButton     *win);
   mafGUIValidator (mafObserver* listener,int mid,wxButton     *win,mafString* var, wxTextCtrl* lab, bool openfile, const mafString wildcard); // FileOpen/Save
   mafGUIValidator (mafObserver* listener,int mid,wxButton     *win,mafString* var, wxTextCtrl* lab); // DirOpen
@@ -120,6 +123,7 @@ protected:
   wxComboBox     *m_ComboBox;
   wxButton       *m_Button;
   wxListBox      *m_ListBox;
+  wxListCtrl     *m_ListCtrl;
                         // associated variable (one of these)
   float      *m_FloatVar;
   double     *m_DoubleVar;
