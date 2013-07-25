@@ -706,6 +706,7 @@ bool mafGUIValidator::TransferToWindow(void)
 		{
 			m_ListCtrl->SetItemState(m_WidgetData.iValue, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 		}
+	break;
     case VAL_RADIOBOX:
       m_RadioBox->SetSelection(*m_IntVar);
     break;
