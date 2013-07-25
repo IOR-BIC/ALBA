@@ -210,6 +210,9 @@ protected:
 	/** Build the list of dicom filer recognized. */
 	bool BuildDicomFileList(const char *dicomDirABSPath);
 
+	/** Read the list of dicom files recognized. */
+	bool ReadDicomFileList(mafString& currentSliceABSDirName);
+
 	/** Check if dicom dataset contains rotations */
 	bool IsRotated( double dcmImageOrientationPatient[6] );
 
@@ -324,7 +327,7 @@ protected:
 	mafString m_SurgeonName;
 	mafString	m_Identifier;
 	mafString m_PatientPosition;
-  mafString m_VolumeName;
+    mafString m_VolumeName;
 
 	int				m_BuildStepValue;
 	int				m_DicomReaderModality; ///<Type DICOM Read from file
@@ -351,7 +354,9 @@ protected:
 	int				 m_NumberOfStudies; ///<Number of study present in the DICOM directory
 	int				 m_NumberOfSlices;
 	wxListBox	*m_StudyListbox;
-	wxListBox	*m_SeriesListbox;
+//	wxListCtrl  *m_StudyListctrl;
+//	wxListBox	*m_SeriesListbox;
+	wxListCtrl  *m_SeriesListctrl;
 
 	int           m_ZCropBounds[2];
 	int						m_CurrentSlice;
@@ -379,6 +384,7 @@ protected:
 	bool m_ApplyRotation; //<<< true il current series contains rotated slices
 	bool m_ConstantRotation;
 	bool m_ZCrop;
+	bool m_mem_is_almost_full;
 
 	int m_ResampleFlag;
 	int m_DiscardPosition;
