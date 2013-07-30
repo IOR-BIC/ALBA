@@ -2096,11 +2096,12 @@ void medOpImporterDicomOffis::CreateLoadPage()
 		m_TimeScannerLoadPage->SetPageSize(1);
 	}
 
-	m_StudyListbox = m_LoadGuiUnderLeft->ListBox(ID_STUDY_SELECT,_("study"),80,"",wxLB_HSCROLL,190);
+	m_StudyListbox  = m_LoadGuiUnderLeft->ListBox(ID_STUDY_SELECT,_("study"),80,"",wxLB_HSCROLL,190);
 //	m_StudyListctrl = m_LoadGuiUnderLeft->ListCtrl(ID_STUDY_SELECT,_("study"),80,"",wxLC_LIST|wxLC_SINGLE_SEL|wxLC_SORT_ASCENDING,190);
 
-	// m_SeriesListbox = m_LoadGuiUnderCenter->ListBox(ID_SERIES_SELECT,_("series"),80,"",wxLB_HSCROLL|wxLB_SORT,190);
-	m_SeriesListctrl = m_LoadGuiUnderCenter->ListCtrl(ID_SERIES_SELECT,_("series"),80,"",wxLC_LIST|wxLC_SINGLE_SEL|wxLC_SORT_ASCENDING,190);
+//  m_SeriesListbox  = m_LoadGuiUnderCenter->ListBox(ID_SERIES_SELECT,_("series"),80,"",wxLB_HSCROLL|wxLB_SORT,190);
+//	m_SeriesListctrl = m_LoadGuiUnderCenter->ListCtrl(ID_SERIES_SELECT,_("series"),80,"",wxLC_REPORT|wxLC_SINGLE_SEL|wxLC_SORT_ASCENDING,190);
+	m_SeriesListctrl = m_LoadGuiUnderCenter->ListCtrl(ID_SERIES_SELECT,_("series"),80,"",wxLC_SMALL_ICON|wxLC_SINGLE_SEL,190);
 
   	m_LoadGuiLeft->FitGui();
 	m_LoadGuiUnderLeft->FitGui();
@@ -2117,6 +2118,19 @@ void medOpImporterDicomOffis::CreateLoadPage()
 		m_LoadPage->GetRWI()->m_RenFront->AddActor(m_TextActor);
 	}
 }
+
+int wxCALLBACK _myCompareFunction(long item1, long item2, long WXUNUSED(sortData))
+{
+	// inverse the order
+	if (item1 < item2)
+		return -1;
+	if (item1 > item2)
+		return 1;
+
+	return 0;
+}
+
+
 //----------------------------------------------------------------------------
 void medOpImporterDicomOffis::CreateCropPage()
 //----------------------------------------------------------------------------
@@ -3097,6 +3111,8 @@ void medOpImporterDicomOffis::FillSeriesListBox()
 			if (m_SeriesIDToSlicesListMap.find(m_SelectedSeriesID) != m_SeriesIDToSlicesListMap.end())
 			{
 				m_SelectedSeriesSlicesList = m_SeriesIDToSlicesListMap[m_SelectedSeriesID];
+				bool spacing_is_uniform = m_SeriesIDToNonUniformSpacing[m_SelectedSeriesID];
+				int idser = m_SeriesIDstringToSeriesIDint[m_SelectedSeriesID];
 				int numberOfImages = 0;
 
 				int numberOfTimeFrames = ((medDicomSlice *)m_SelectedSeriesSlicesList->Item(0)->GetData())->GetDcmCardiacNumberOfImages();
@@ -3104,6 +3120,7 @@ void medOpImporterDicomOffis::FillSeriesListBox()
 					numberOfImages = m_SelectedSeriesSlicesList->GetCount() / numberOfTimeFrames;
 				else
 					numberOfImages = m_SelectedSeriesSlicesList->GetCount();
+
 
         mafString seriesName;
 
@@ -3127,17 +3144,24 @@ void medOpImporterDicomOffis::FillSeriesListBox()
 //      wxColour itemREDcolour = wxColour(255,1,1);
 
 //      TODO
-		m_SeriesListctrl->InsertItem((long)counter,seriesName.GetCStr());
+		m_SeriesListctrl->InsertItem((long) counter,seriesName.GetCStr());
 //		m_SeriesListctrl->SetClientData((void *)m_SeriesIDToSlicesListMap[m_SelectedSeriesID]/*filesList*/);
 		long ptclientdata = (long) m_SeriesIDToSlicesListMap[m_SelectedSeriesID];
-		m_SeriesListctrl->SetItemData(counter,ptclientdata);
+
+		m_SeriesListctrl->SetItemData((long) counter,(long) idser);
 		wxColour itemREDcolour = wxColour(255,1,1);
-		if(numberOfImages < 6) m_SeriesListctrl->SetItemTextColour((long)counter,itemREDcolour);
+		if(numberOfImages < 6 || spacing_is_uniform == false) 
+		{
+			m_SeriesListctrl->SetItemTextColour((long) counter,itemREDcolour);
+		}
+		if(spacing_is_uniform == false)
 
 		counter++;
 			}
 		} 
 	}
+
+	m_SeriesListctrl->SortItems(_myCompareFunction, 0);
 }
 
 //----------------------------------------------------------------------------
@@ -3485,6 +3509,11 @@ bool medOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 	double dcmTriggerTime = -1.0;
 	double dcmImageOrientationPatient[6] = {0.0,0.0,0.0,0.0,0.0,0.0};
 	double dcmImagePositionPatient[3] = {0.0,0.0,0.0};
+	double dcmImagePositionPatient_old[3] = {0.0,0.0,0.0};
+	double spacing = 0.0;
+	double spacing_old = 0.0;
+	bool spacing_is_uniform = true;
+	int nnufcounter = 0;
 	bool enableToRead = true; //true for test mode
 	bool errorOccurred = false;
 	double lastDistance = 0;
@@ -3648,6 +3677,8 @@ bool medOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 		dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[0],0);
 		dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[1],1);
 		dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[2],2);
+
+		spacing = sqrt(vtkMath::Distance2BetweenPoints(dcmImagePositionPatient,dcmImagePositionPatient_old));
 
 		//Position Check
 		int useDefaultPos=false;
@@ -3980,6 +4011,11 @@ bool medOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 				}
 			}
 
+			if( fabs(spacing - spacing_old) > 1.e-15 && seriesExist) 
+			{ 
+				spacing_is_uniform = false;
+			}
+
 			// if the series does not exists already
 			if (!seriesExist)
 			{
@@ -4045,6 +4081,9 @@ bool medOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 				m_SeriesIDToSlicesListMap.insert\
 					(std::pair<std::vector<mafString>,medDicomSeriesSliceList*>\
 					(seriesId,dicomSeries));
+
+				m_SeriesIDToNonUniformSpacing.insert(std::pair<std::vector<mafString>,bool>(seriesId,spacing_is_uniform));
+				m_SeriesIDstringToSeriesIDint.insert(std::pair<std::vector<mafString>,int>(seriesId,seriesCounter));
 
 				if (!this->m_TestMode)
 				{
@@ -4114,6 +4153,7 @@ bool medOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 					new medDicomSlice(m_CurrentSliceABSFileName,dcmImagePositionPatient, \
 					dcmImageOrientationPatient, dicomSliceVTKImageData,description,date,patientName,birthdate));
 
+				m_SeriesIDToNonUniformSpacing.at(seriesId) = spacing_is_uniform;
 
 			}
 		}
@@ -4147,10 +4187,18 @@ bool medOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 				}
 			}
 
+			if (nnufcounter == 0) spacing_is_uniform = true;
+
+			if( fabs(spacing - spacing_old) > 1.e-7 && nnufcounter>0 && spacing_is_uniform == true ) 
+			{ 
+				spacing_is_uniform = false;
+			}
+
 			// if series does not exists already
 			if (!seriesExist)
 			{
 				m_NumberOfStudies++;
+				nnufcounter=0;
 
 				bool containsRotations = currentSliceIsRotated;
 				m_SeriesIDContainsRotationsMap[seriesId] = containsRotations;
@@ -4244,6 +4292,10 @@ bool medOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 				m_SeriesIDToSlicesListMap.insert\
 					(std::pair<std::vector<mafString>,medDicomSeriesSliceList*>\
 					(seriesId,dicomSeries));
+
+				m_SeriesIDToNonUniformSpacing.insert(std::pair<std::vector<mafString>,bool>(seriesId,spacing_is_uniform));
+				m_SeriesIDstringToSeriesIDint.insert(std::pair<std::vector<mafString>,int>(seriesId,seriesCounter));
+
 				if (!this->m_TestMode)
 				{
 					FillStudyListBox(seriesId.at(0));
@@ -4251,7 +4303,7 @@ bool medOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 			}
 			else // if series exists already
 			{
-
+				nnufcounter++;
 				bool currentSeriesContainsRotations = m_SeriesIDContainsRotationsMap[seriesId];
 
 				if (currentSliceIsRotated && !currentSeriesContainsRotations)
@@ -4288,6 +4340,8 @@ bool medOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 				m_SeriesIDToSlicesListMap[seriesId]->Append\
 					(new medDicomSlice(m_CurrentSliceABSFileName,dcmImagePositionPatient,dcmImageOrientationPatient ,\
 					dicomSliceVTKImageData,description,date,patientName,birthdate,dcmInstanceNumber,dcmCardiacNumberOfImages,dcmTriggerTime));
+
+				m_SeriesIDToNonUniformSpacing.at(seriesId) = spacing_is_uniform;
 			}
 		}
 
@@ -4305,6 +4359,12 @@ bool medOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 		dicomImg.clear();
 		seriesId.clear();
 	}
+
+	for (int i=0;i<3;++i)
+	{
+		dcmImagePositionPatient_old[i] = dcmImagePositionPatient[i];
+	}
+	spacing_old = spacing;
 
 	lastFileName = m_CurrentSliceABSFileName;
 
@@ -5071,7 +5131,7 @@ void medOpImporterDicomOffis::OnStudySelect()
 //	if (m_SelectedSeriesID.at(0).Compare(m_StudyListctrl->GetItemText(myitem)) != 0)
 	{
 		FillSeriesListBox();
-		m_SeriesListctrl->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+		m_SeriesListctrl->SetItemState(FIRST_SELECTION, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 //		m_SeriesListbox->SetSelection(FIRST_SELECTION);
 		OnEvent(&mafEvent(this, ID_SERIES_SELECT));
 	}
