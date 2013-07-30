@@ -1,7 +1,7 @@
 
 
-#ifndef __vtkMEDDeformableSimplexMesh3DFilter_txx
-#define __vtkMEDDeformableSimplexMesh3DFilter_txx
+#ifndef __vtkMEDDeformableSimplexMesh3DFilter_Impl_h
+#define __vtkMEDDeformableSimplexMesh3DFilter_Impl_h
 
 #include "itkDeformableSimplexMesh3DGradientConstraintForceFilter.h"
 #include "itkNumericTraits.h"
@@ -272,14 +272,14 @@ namespace itk
   //----------------------------------------------------------------------------
   template< typename TInputMesh, typename TOutputMesh >
   void vtkMEDDeformableSimplexMeshFilter< TInputMesh, TOutputMesh >
-    ::SetCenterLocationIdx(vector<int>::const_iterator centerLocationIndex){
+    ::SetCenterLocationIdx(std::vector<int>::const_iterator centerLocationIndex){
       m_CenterLocationIdx = centerLocationIndex;
   }
 
   template< typename TInputMesh, typename TOutputMesh >
   void
     vtkMEDDeformableSimplexMeshFilter< TInputMesh, TOutputMesh >
-    ::SetCenterLocationIdxRef(vector<int> const&ve){
+    ::SetCenterLocationIdxRef(std::vector<int> const&ve){
       m_CenterLocationIdx = ve.begin();
   }
 
@@ -332,7 +332,7 @@ namespace itk
     for (int i = 0 ;  i < 5000 ;  i++)
       constrained[i] = 0 ;
 
-    vector<int>::const_iterator centerIdx = m_CenterLocationIdx ;
+    std::vector<int>::const_iterator centerIdx = m_CenterLocationIdx ;
     GeometryMapType::Iterator dataIt ;
     for (dataIt = m_Data->Begin(), centerIdx = m_CenterLocationIdx, i = 0 ;  dataIt != m_Data->End() ;  dataIt++, centerIdx++, i++){
       data = dataIt.Value();

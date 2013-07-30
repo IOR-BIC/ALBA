@@ -326,17 +326,17 @@ void medVMEStent::InternalUpdate()
 
     if(m_CenterLine != NULL && linePointNumber>0){
       m_StentSource->setCenterLineFromPolyData(m_StentCenterLine); 
-      m_ComputedCrownNumber = m_StentSource->computeCrownNumberAfterSetCenterLine();
-      if (m_Crown_Number>m_ComputedCrownNumber)
-      {
-        m_Crown_Number = m_ComputedCrownNumber;
-      }
+      //m_ComputedCrownNumber = m_StentSource->computeCrownNumberAfterSetCenterLine();
+      //if (m_Crown_Number>m_ComputedCrownNumber)
+      //{
+      //  m_Crown_Number = m_ComputedCrownNumber;
+      //}
     }
     m_StentSource->setCrownNumber(m_Crown_Number);
 
     m_StentSource->createStent();
 
-    m_SimplexMesh = m_StentSource->simplexMesh;
+    m_SimplexMesh = m_StentSource->GetSimplexMesh();
     m_SimplexMesh->DisconnectPipeline();
 
     m_Strut_Length = m_StentSource->getStrutLength();
@@ -388,12 +388,12 @@ void medVMEStent::UpdateStentPolydataFromSimplex()
     vtkCellArray *lines = vtkCellArray::New() ;
     lines->Allocate(2000) ;  
 
-    for(StrutIterator iter = m_StentSource->strutsList.begin(); iter !=m_StentSource->strutsList.end(); iter++){
+    for(StrutIterator iter = m_StentSource->GetStrutsList().begin(); iter !=m_StentSource->GetStrutsList().end(); iter++){
       tindices[0] = iter->startVertex;
       tindices[1] = iter->endVertex;
       lines->InsertNextCell(2, tindices);
     }
-    for(StrutIterator iter = m_StentSource->linkList.begin(); iter !=m_StentSource->linkList.end(); iter++){
+    for(StrutIterator iter = m_StentSource->GetLinksList().begin(); iter !=m_StentSource->GetLinksList().end(); iter++){
       tindices[0] = iter->startVertex;
       tindices[1] = iter->endVertex;
       lines->InsertNextCell(2, tindices);
@@ -871,12 +871,12 @@ void medVMEStent::PartialInitDefFilterFromStentModel()
   vtkCellArray* strutArray = vtkCellArray::New() ;
   vtkCellArray* linkArray = vtkCellArray::New() ;
 
-  for(StrutIterator iter = m_StentSource->strutsList.begin(); iter != m_StentSource->strutsList.end(); iter++){
+  for(StrutIterator iter = m_StentSource->GetStrutsList().begin(); iter != m_StentSource->GetStrutsList().end(); iter++){
     tindices[0] = iter->startVertex;
     tindices[1] = iter->endVertex;
     strutArray->InsertNextCell(2,tindices);
   }
-  for(StrutIterator iter = m_StentSource->linkList.begin(); iter != m_StentSource->linkList.end(); iter++){
+  for(StrutIterator iter = m_StentSource->GetLinksList().begin(); iter != m_StentSource->GetLinksList().end(); iter++){
     tindices[0] = iter->startVertex;
     tindices[1] = iter->endVertex;
     linkArray->InsertNextCell(2,tindices);

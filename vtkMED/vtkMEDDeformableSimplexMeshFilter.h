@@ -40,6 +40,7 @@
 #include "vtkMEDStentModelSource.h"
 
 #include <ostream>
+#include <vector>
 
 
 namespace itk
@@ -90,11 +91,11 @@ namespace itk
     typedef typename OriginalImageType::ConstPointer        OriginalImagePointer;
 
     typedef vtkMEDStentModelSource::Strut          Strut;
-    typedef vector<Strut>::const_iterator    StrutIterator;
+    typedef std::vector<Strut>::const_iterator    StrutIterator;
     typedef itk::Vector< double, 3 >         VectorType;
 
     //typedef VesselMeshForTesting::Point      Point;
-    //typedef vector<Point>::const_iterator    PointIterator;
+    //typedef std::vector<Point>::const_iterator    PointIterator;
 
     /// Nested helper classes
     class CatheterCalculator ;
@@ -129,8 +130,8 @@ namespace itk
     int IsPointInsideVessel2(double *stentPoint, double *surfacePoint) ;
 
     double computeDirectionFromPoint2Face(double *stentPoint,vtkIdType p1,vtkIdType p2,vtkIdType p3);
-    void SetCenterLocationIdx(vector<int>::const_iterator centerLocationIndex);
-    void SetCenterLocationIdxRef(vector<int> const&ve);
+    void SetCenterLocationIdx(std::vector<int>::const_iterator centerLocationIndex);
+    void SetCenterLocationIdxRef(std::vector<int> const&ve);
     void SetTestValue(int value){this->m_TestValue = value;}
     void vectorSubtract(double *endPoint,double *startPoint,double *result);
 
@@ -179,7 +180,7 @@ namespace itk
 
     kdtree *m_KDTree;
 
-    vector<int>::const_iterator m_CenterLocationIdx;
+    std::vector<int>::const_iterator m_CenterLocationIdx;
     int m_IsDataChanged ;
 
     int m_TestValue;
@@ -405,7 +406,7 @@ namespace itk
 
 
 
-#include "vtkMEDDeformableSimplexMeshFilter.txx"
+#include "vtkMEDDeformableSimplexMeshFilter_Impl.h"
 
 
 
