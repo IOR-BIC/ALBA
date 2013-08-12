@@ -344,6 +344,10 @@ protected:
 
 	std::map<std::vector<mafString>,medDicomSeriesSliceList*> m_SeriesIDToSlicesListMap; ///< StudyUID-SeriesUIDWithPlanesNumber-SeriesUIDWithoutPlanesNumber vector to slices list map 
 
+	std::map<std::vector<mafString>,bool> m_SeriesIDToNonUniformSpacing;
+
+	std::map<std::vector<mafString>,int> m_SeriesIDstringToSeriesIDint;
+
 	std::map<std::vector<mafString>,medDicomCardiacMRIHelper*> m_SeriesIDToCardiacMRIHelperMap; ///< StudyUID-SeriesUIDWithPlanesNumber-SeriesUIDWithoutPlanesNumber vector to slices list map 
 
 	std::map<std::vector<mafString>,bool> m_SeriesIDContainsRotationsMap; ///< StudyUID-SeriesUIDWithPlanesNumber-SeriesUIDWithoutPlanesNumber vector to boolean map 
