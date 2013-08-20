@@ -101,7 +101,9 @@ public:
   void SetLinkOrientation(int linkOrit) {m_Link_orientation = linkOrit;}
   void SetLinkConnection(int linkConnection) {m_Id_Link_Connection = linkConnection;}
   void SetStentCrownNumber(int crownNumber) {m_Crown_Number = crownNumber; }
-
+  void SetStrutsNumber(int strutsNumber){m_Struts_Number = strutsNumber;}
+  void SetLinkNumber(int linkNumber){m_Link_Number = linkNumber;}
+  
   double GetStentRadius() const {return m_Stent_Diameter/2.0;}
   double GetStentDiameter() const {return m_Stent_Diameter;}
   double GetStentCrownLength() const {return m_Crown_Length;}
@@ -219,14 +221,17 @@ private:
   double m_Stent_Diameter;
   double m_Crown_Length;
   int m_Crown_Number;
+  int m_Struts_Number;
   double m_Strut_Angle;
   double m_Strut_Thickness;
   double m_Strut_Length; 
   double m_Link_Length;
   int m_Link_Alignment;
-  int m_Link_orientation;  
+  int m_Link_orientation;
+  int m_Link_Number;
   int m_Id_Link_Connection;
   int m_Id_Stent_Configuration;
+  int m_Id_Stent_Type;
   int m_ComputedCrownNumber;
   bool m_StentParamsModified ;
 
