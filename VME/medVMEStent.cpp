@@ -48,6 +48,10 @@ University of Bedfordshire, UK
 #include <iostream>
 #include <time.h>
 
+#ifndef M_PI
+#define _USE_MATH_DEFINES
+#endif
+
 
 
 //----------------------------------------------------------------------------
@@ -77,10 +81,11 @@ medVMEStent::medVMEStent()
   m_StentCenterLine = vtkPolyData::New() ;
   m_VesselSurface = vtkPolyData::New() ;
 
+  m_Struts_Number = 16 ;
   m_Stent_Diameter = 2.0 ;
   m_Crown_Length = 2.2;
   m_Crown_Number = 10;
-  m_Strut_Angle = 0.0;
+  m_Strut_Angle = 60.0;
   m_Strut_Thickness = 0.0;
   m_Id_Stent_Configuration = 1; /* 1.outofphase, 0.InPhase;  enumStCfgType */
   m_Id_Link_Connection = 2; /* 0.peak2valley;enumLinkConType {peak2valley, valley2peak, peak2peak, valley2valley} */
@@ -160,7 +165,7 @@ int medVMEStent::DeepCopy(mafNode *a)
     m_VesselSurface->DeepCopy(vmeStent->m_VesselSurface);
 
     m_StentStartPosId = vmeStent->m_StentStartPosId ;
- 
+
     m_CenterLineSetFlag = vmeStent->m_CenterLineSetFlag ;
     m_VesselSurfaceSetFlag = vmeStent->m_VesselSurfaceSetFlag ;
 
@@ -168,7 +173,7 @@ int medVMEStent::DeepCopy(mafNode *a)
     m_StentCenterLineModified = true ;
     m_SimplexMeshModified = true ;
     InternalUpdate();
-   
+
     return MAF_OK;
   }  
   return MAF_ERROR;
@@ -186,11 +191,11 @@ mafGUI* medVMEStent::CreateGui()
   {
     m_Gui->Label("Stent");
 
-	//wxString stentType[3] = {"normal", "ABBott","Bard"};
-	//m_Gui->Combo(CHANGE_STENT_TYPE, "Type", &m_Id_Stent_Type, 3, stentType);
-	
-	
-	m_Gui->Double(CHANGED_STENT_PARAM,_("Diameter"), &m_Stent_Diameter, 0, 10000,-1,_("The length of the stent (mm)"));
+    //wxString stentType[3] = {"normal", "ABBott","Bard"};
+    //m_Gui->Combo(CHANGE_STENT_TYPE, "Type", &m_Id_Stent_Type, 3, stentType);
+
+
+    m_Gui->Double(CHANGED_STENT_PARAM,_("Diameter"), &m_Stent_Diameter, 0, 10000,-1,_("The length of the stent (mm)"));
     m_Gui->Double(CHANGED_STENT_PARAM,_("Crown Len"), &m_Crown_Length, 0, 10000,-1,_("The length of the Crown (mm)"));
     m_Gui->Integer(CHANGED_STENT_PARAM,_("Crown num"), &m_Crown_Number, 0, 10000,-1,_("The number of the Crowns"));
     //m_Gui->Double(CHANGED_STENT_PARAM,_("Angle"), &m_Strut_Angle,0,360,-1,_("strut angle (deg)"));
@@ -236,27 +241,27 @@ void medVMEStent::OnEvent(mafEventBase *maf_event)
   {
     switch(e->GetId())
     {
-	/*case CHANGED_STENT_TYPE:
-		{  
-			m_StentParamsModified = true ;
-			m_StentLengthModified = true ;
+      /*case CHANGED_STENT_TYPE:
+      {  
+      m_StentParamsModified = true ;
+      m_StentLengthModified = true ;
 
-			InternalUpdate();
-			m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
-			ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
-			m_Gui->Update();
-		}
-		break;*/
+      InternalUpdate();
+      m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
+      ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
+      m_Gui->Update();
+      }
+      break;*/
     case CHANGED_STENT_PARAM:
       {  
         m_StentParamsModified = true ;
         m_StentLengthModified = true ;
-		//SetFixedParameterForSpecialStent();
+        //SetFixedParameterForSpecialStent();
         InternalUpdate();
         m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
         ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
         m_Gui->Update();
-       }
+      }
       break;
     case ID_CONSTRAINT_SURFACE:
       {
@@ -337,8 +342,11 @@ void medVMEStent::InternalUpdate()
 
     m_StentSource->setLinkLength(m_Link_Length);
     m_StentSource->setLinkAlignment(m_Link_Alignment);
-	m_StentSource->setStrutsNumber(m_Struts_Number);
-	
+    m_StentSource->setStrutsNumber(m_Struts_Number);
+
+    if (m_Strut_Angle > 0.0)
+      m_StentSource->setStrutAngle(m_Strut_Angle) ; // set angle and calc strut length
+
     int linePointNumber = m_CenterLine->GetNumberOfPoints();
 
     if(m_CenterLine != NULL && linePointNumber>0){
@@ -350,15 +358,18 @@ void medVMEStent::InternalUpdate()
       //}
     }
     m_StentSource->setCrownNumber(m_Crown_Number);
-	//---------weih modify---------
+
+    //---------weih modify---------
     //m_StentSource->createStent();
-	if(m_StentSource->getInphaseShort()==1){
-		m_StentSource->createStentInphaseShort();
-	}else if(m_StentSource->getStentType()==2){
-		m_StentSource->createStentBardHelical();
-	}else{
-		m_StentSource->createStent();
-	}
+    if(m_StentSource->getInphaseShort()==1){
+      m_StentSource->createStentInphaseShort();
+    }
+    else if(m_StentSource->getStentType()==2){
+      m_StentSource->createStentBardHelical();
+    }
+    else{
+      m_StentSource->createStent();
+    }
 
     m_SimplexMesh = m_StentSource->GetSimplexMesh();
     m_SimplexMesh->DisconnectPipeline();
@@ -378,33 +389,38 @@ void medVMEStent::InternalUpdate()
   //m_SimplexMeshModified = IsSimplexMeshModified() ;
   if (m_SimplexMeshModified){
     m_StentPolyData->Initialize() ;
-    UpdateStentPolydataFromSimplex() ;
+    UpdateStentPolydataFromSimplex() ; // change here to _ViewAsSimplex() to see simplex mesh
     m_SimplexMeshModified = false ;
     this->Modified() ;
   }
 }
 
+
+
 //------------------------------------------------------------------------------
 // Give ABBoTT and BARD stent fixed parameter
 //------------------------------------------------------------------------------
 /*void medVMEStent::SetFixedParameterForSpecialStent(){
-	if(m_Id_Stent_Type==1){//ABBOTT
-		m_Stent->SetStentDiameter(8);
+if(m_Id_Stent_Type==1){//ABBOTT
+m_Stent->SetStentDiameter(8);
 
-		m_Stent->SetStentCrownLength(3.8);
-		m_Stent->SetStentConfiguration(0);//0 in phase, 1 out of phase
-		m_Stent->SetLinkConnection(0);//0.peak2valley;enumLinkConType {peak2valley, valley2peak, peak2peak, valley2valley} 
-		m_Stent->SetLinkLength(2.2); //6 longer than 3.8 or 2.2 shorter than 3.8
+m_Stent->SetStentCrownLength(3.8);
+m_Stent->SetStentConfiguration(0);//0 in phase, 1 out of phase
+m_Stent->SetLinkConnection(0);//0.peak2valley;enumLinkConType {peak2valley, valley2peak, peak2peak, valley2valley} 
+m_Stent->SetLinkLength(2.2); //6 longer than 3.8 or 2.2 shorter than 3.8
 
-		m_Stent->SetLinkAlignment(0);//0,1,2
-		m_Stent->SetLinkOrientation(0);//0,1,-1
+m_Stent->SetLinkAlignment(0);//0,1,2
+m_Stent->SetLinkOrientation(0);//0,1,-1
 
-		m_Stent->SetStrutsNumber(6);
-		m_Stent->SetLinkNumber(3);
-	}else if(m_Id_Stent_Type==2){//BARD
+m_Stent->SetStrutsNumber(6);
+m_Stent->SetLinkNumber(3);
+}else if(m_Id_Stent_Type==2){//BARD
 
-	}
+}
 }*/
+
+
+
 //------------------------------------------------------------------------------
 // Update stent polydata from simplex
 //------------------------------------------------------------------------------
@@ -416,13 +432,13 @@ void medVMEStent::UpdateStentPolydataFromSimplex()
 
     SimplexMeshType::PointsContainer::Pointer sPoints;
     sPoints = m_SimplexMesh->GetPoints();
-	int pointCount =0;
+    int pointCount =0;
     for(SimplexMeshType::PointsContainer::Iterator pointIndex = sPoints->Begin(); pointIndex != sPoints->End(); ++pointIndex)
     {
       int idx = pointIndex->Index();
       vtkFloatingPointType * pp = pointIndex->Value().GetDataPointer();
       vpoints->SetPoint(idx,pp);
-	  pointCount++;
+      pointCount++;
     }
     vpoints->Squeeze() ;
     m_StentPolyData->SetPoints(vpoints) ;
@@ -433,71 +449,71 @@ void medVMEStent::UpdateStentPolydataFromSimplex()
     vtkCellArray *lines = vtkCellArray::New() ;
     lines->Allocate(20000) ;  
 
-	int tindices2[4],tindices3[4],tindicsShort[2];//--------for ABBOTT
-	double middlePoints[4][3];//[3];
+    int tindices2[4],tindices3[4],tindicsShort[2];//--------for ABBOTT
+    double middlePoints[4][3];//[3];
 
-	for(StrutIterator iter = m_StentSource->GetStrutsList().begin(); iter !=m_StentSource->GetStrutsList().end(); ){//iter++){
-		if(m_StentSource->getInphaseShort()==1){//ABBOTT
-			tindices2[0]=iter->startVertex;
-			tindices2[1]=iter->endVertex;
-			//lines->InsertNextCell(2,tindices);
-			iter++;
-			tindices2[2] = iter->startVertex;
-			tindices2[3] = iter->endVertex;
-			//mafLogMessage("tindices2: [%i, %i, %i, %i]",tindices2[0],tindices2[1],tindices2[2],tindices2[3] );
-			//                 13
-			//input 3 points  0/\2 get 4 points of middles
-			
-			m_StentSource->getShortStrutsLines(tindices2,middlePoints);//middlePoints);//tindices2,
-			//                 /     \
-			// middle poins:  0-1     2-3 
-			//               /         \
+    for(StrutIterator iter = m_StentSource->GetStrutsList().begin(); iter !=m_StentSource->GetStrutsList().end(); ){//iter++){
+      if(m_StentSource->getInphaseShort()==1){//ABBOTT
+        tindices2[0]=iter->startVertex;
+        tindices2[1]=iter->endVertex;
+        //lines->InsertNextCell(2,tindices);
+        iter++;
+        tindices2[2] = iter->startVertex;
+        tindices2[3] = iter->endVertex;
+        //mafLogMessage("tindices2: [%i, %i, %i, %i]",tindices2[0],tindices2[1],tindices2[2],tindices2[3] );
+        //                 13
+        //input 3 points  0/\2 get 4 points of middles
 
-			for(int i=0;i<4;i++){//add 4 points
-				vpoints->SetPoint(pointCount,middlePoints[i]);
-				pointCount++;
-			}
+        m_StentSource->getShortStrutsLines(tindices2,middlePoints);//middlePoints);//tindices2,
+        //                 /     \
+        // middle poins:  0-1     2-3 
+        //               /         \
 
-			//----------left arm------------
-			tindicsShort[0]=tindices2[0];//pointCount-1-3;
-			tindicsShort[1]=pointCount-1-2;//pointCount-1-2;
-			lines->InsertNextCell(2,tindicsShort);
+        for(int i=0;i<4;i++){//add 4 points
+          vpoints->SetPoint(pointCount,middlePoints[i]);
+          pointCount++;
+        }
 
-			tindicsShort[0]=pointCount-1-2;
-			tindicsShort[1]=pointCount-1-3;
-			lines->InsertNextCell(2,tindicsShort);
-			
-			tindicsShort[0]=pointCount-1-3;
-			tindicsShort[1]=tindices2[1];
-			lines->InsertNextCell(2,tindicsShort);
-			//-----------right arm---------------
-			tindicsShort[0]=tindices2[2];//pointCount-1-3;
-			tindicsShort[1]=pointCount-1;//pointCount-1-2;
-			lines->InsertNextCell(2,tindicsShort);
+        //----------left arm------------
+        tindicsShort[0]=tindices2[0];//pointCount-1-3;
+        tindicsShort[1]=pointCount-1-2;//pointCount-1-2;
+        lines->InsertNextCell(2,tindicsShort);
 
-			tindicsShort[0]=pointCount-1;
-			tindicsShort[1]=pointCount-1-1;
-			lines->InsertNextCell(2,tindicsShort);
+        tindicsShort[0]=pointCount-1-2;
+        tindicsShort[1]=pointCount-1-3;
+        lines->InsertNextCell(2,tindicsShort);
 
-			tindicsShort[0]=pointCount-1-1;
-			tindicsShort[1]=tindices2[3];
-			lines->InsertNextCell(2,tindicsShort);
-			
-			//lines->InsertNextCell(2,tindices);
-			iter++;
+        tindicsShort[0]=pointCount-1-3;
+        tindicsShort[1]=tindices2[1];
+        lines->InsertNextCell(2,tindicsShort);
+        //-----------right arm---------------
+        tindicsShort[0]=tindices2[2];//pointCount-1-3;
+        tindicsShort[1]=pointCount-1;//pointCount-1-2;
+        lines->InsertNextCell(2,tindicsShort);
+
+        tindicsShort[0]=pointCount-1;
+        tindicsShort[1]=pointCount-1-1;
+        lines->InsertNextCell(2,tindicsShort);
+
+        tindicsShort[0]=pointCount-1-1;
+        tindicsShort[1]=tindices2[3];
+        lines->InsertNextCell(2,tindicsShort);
+
+        //lines->InsertNextCell(2,tindices);
+        iter++;
 
 
-		}else{
-			tindices[0] = iter->startVertex;
-			tindices[1] = iter->endVertex;
-			lines->InsertNextCell(2, tindices);
-			iter++;
-		}
+      }else{
+        tindices[0] = iter->startVertex;
+        tindices[1] = iter->endVertex;
+        lines->InsertNextCell(2, tindices);
+        iter++;
+      }
 
-		/*tindices[0] = iter->startVertex;
-		tindices[1] = iter->endVertex;
-		lines->InsertNextCell(2, tindices);
-		iter++;*/
+      /*tindices[0] = iter->startVertex;
+      tindices[1] = iter->endVertex;
+      lines->InsertNextCell(2, tindices);
+      iter++;*/
     }
     for(StrutIterator iter = m_StentSource->GetLinksList().begin(); iter !=m_StentSource->GetLinksList().end(); iter++){
       tindices[0] = iter->startVertex;
@@ -618,6 +634,20 @@ void medVMEStent::SetVesselSurface(mafNode* node)
     SetVesselSurface(polySurface) ;
   }
 }
+
+
+
+//------------------------------------------------------------------------------
+// Set strut angle (degrees)
+// Also calculates strut length, but must set crown length first.
+//------------------------------------------------------------------------------
+void medVMEStent::SetStrutAngle(double theta)
+{
+  m_Strut_Angle = theta ;
+  double angleRad = M_PI * theta / 180.0 ;
+  m_Strut_Length = m_Crown_Length / cos(angleRad/2.0) ;
+}
+
 
 
 //------------------------------------------------------------------------------
@@ -1009,4 +1039,15 @@ bool medVMEStent::IsSimplexMeshModified()
   }
   else
     return false ;
+}
+
+
+//-------------------------------------------------------------------------
+// Do one step of the deformation filter
+//-------------------------------------------------------------------------
+void medVMEStent::DoDeformationStep() 
+{
+  m_DeformFilter->Update() ;  
+  m_SimplexMeshModified = true ;  
+  UpdateStentPolydataFromSimplex() ;
 }

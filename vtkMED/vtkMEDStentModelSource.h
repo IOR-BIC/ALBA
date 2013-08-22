@@ -83,7 +83,6 @@ public:
   /**----------------------------------------------------------------------------*/
   void setStentDiameter(double value);
   void setCrownLength(double value);
-  //void setStrutAngle(double value); //move to private section
   void setLinkLength(double value);
   void setStrutsNumber(int value);
   void setLinkConnection(LinkConnectionType value);
@@ -104,6 +103,12 @@ public:
   void setTestValue(){};
   void setStentType(int value);
 
+  /// Set angle and calc strut length. \n
+  /// Input argument is degrees, but stored internally as radians. \n
+  /// Must set crown length first.
+  void setStrutAngle(double thetaDegr); 
+
+
   /**----------------------------------------------------------------------------*/
   //--------getters----------
   /**----------------------------------------------------------------------------*/
@@ -117,13 +122,17 @@ public:
   int getInphaseShort();
   int getStentType();
 
-  /**-------create a stent from exist parameters ------------*/
-  void createStent();
-  void createStentInphaseShort();
-  void createStentBard();
-  void createStentBardHelical();
-
   inline SimplexMeshType::Pointer GetSimplexMesh() {return m_SimplexMesh ;}
+
+
+  //-----------------------
+  // Create stents
+  //-----------------------
+  void createStent(); ///< Beds original example stent
+  void createStentInphaseShort();  ///< Abbott inphase, short links
+  void createStentBard(); ///< No use!
+  void createStentBardHelical(); ///< Bard helical
+
 
   struct Strut{
     PointIdentifier startVertex;
@@ -150,55 +159,47 @@ private:
   /// This may destroy any existing data.
   void AllocateCentreLine(int n) ;
 
-  /* create simplex mesh*/
+  //-----------------------
+  // Beds example stent
+  //-----------------------
   void createStentSimplexMesh();
-  /* create struts*/
   void createStruts();
-  /* create links between crown*/
   void createLinks();
-  /* prepare a default center line */
-  void init();
-  //---------short begin--------------
-  /*methods for in phase link length< crown length*/
-  /* create simplex mesh*/
-  //void createStentSimplexMeshShort();
-  /* create struts*/
+  void init();  ///< prepare a default center line
+
+
+  //------------------------------
+  // Abbott in-phase, short links
+  // link < crown length
+  //------------------------------
   void createStrutsShort();
-  /* create links between crown*/
   void createLinksShort();
-  /* prepare a default center line */
   void initShort();
 
-  //----------short over--------------
-  //----------Bard stent----------#
+
+  //-----------------------
+  // Bard stent
+  //-----------------------
   void createBardStentSimplexMesh();
-  /* create struts*/
   void createBardStruts();
-
   void getUVVector( double * UVector, double * normalCircle, double * VVector );
-
   void getBardNormalCircle( double *startPoint, double *endPoint, double *samplePoint,double theta);
   void initBard();
 
 
-  //---------Bard helical----------
-
+  //-----------------------
+  // Bard helical stent
+  //-----------------------
   void initBardHelical();
   void createBardHelicalStentSimplexMesh();
   void createBardHelicalStentSimplexMesh2();
   void createBardStruts2();
   void createBardLinks();
-
   void NeighborLRDown( int i, int sampleNumberPerCircle, int j );
-
   void NeighborUpRL( int i, int sampleNumberPerCircle, int j );
-
   void createBardHelicalStruts();
 
-  //---------Bard helical-----------
 
-
-  void setStrutAngle(double value); //not needed
 
 
 
@@ -218,7 +219,7 @@ private:
   double m_StentDiameter;
   double m_CrownLength;
   double m_StrutLength;
-  double m_StrutAngle;
+  double m_StrutAngle;  ///< angle in radians
   double m_LinkLength;
   int m_strutsNumber;
   int m_CrownNumber;

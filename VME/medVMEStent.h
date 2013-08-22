@@ -103,6 +103,10 @@ public:
   void SetStentCrownNumber(int crownNumber) {m_Crown_Number = crownNumber; }
   void SetStrutsNumber(int strutsNumber){m_Struts_Number = strutsNumber;}
   void SetLinkNumber(int linkNumber){m_Link_Number = linkNumber;}
+
+  /// Set strut angle in degrees.  \n
+  /// Also calculates strut length, but must set crown length first.
+  void SetStrutAngle(double theta) ; 
   
   double GetStentRadius() const {return m_Stent_Diameter/2.0;}
   double GetStentDiameter() const {return m_Stent_Diameter;}
@@ -113,8 +117,9 @@ public:
   int GetLinkAlignment() const {return m_Link_Alignment;}
   int GetLinkOrientation() const {return m_Link_orientation;}
   int GetLinkConnection() const {return m_Id_Link_Connection;}
-  int GetStentCrownNumber() const {return m_Crown_Number ; }
-  double GetStrutLength(){return m_Strut_Length;};
+  int GetStentCrownNumber() const {return m_Crown_Number ;}
+  double GetStrutLength() const {return m_Strut_Length ;}
+  double GetStrutAngle() const {return m_Strut_Angle ;}
 
   vtkPolyData* GetVesselCenterLine() {return m_CenterLine;} ///< get vessel centerline
   vtkPolyData* GetVesselCenterLineLong() {return m_CenterLineLong;} ///< get long extrapolated vessel centerline
@@ -141,7 +146,7 @@ public:
   static void CreateTruncatedLine(vtkPolyData* lineIn, vtkPolyData* lineOut, int id0, int id1) ;
 
   /// Do one step of the deformation filter
-  void DoDeformationStep() {m_DeformFilter->Update() ;  m_SimplexMeshModified = true ;  UpdateStentPolydataFromSimplex() ;}
+  void DoDeformationStep() ;
 
 private:
   enum STENT_WIDGET_ID
@@ -195,7 +200,9 @@ private:
   /// Update stent polydata from simplex
   void UpdateStentPolydataFromSimplex() ;
 
-  /// Copy simplex directly to polydata
+  /// Copy simplex directly to polydata. \n
+  /// Replacing UpdateStentPolydataFromSimplex() everywhere with this version \n
+  /// will show the simplex instead of the derived stent polydata.
   void UpdateStentPolydataFromSimplex_ViewAsSimplex() ;
 
   /// Create long vessel centerline
@@ -217,12 +224,11 @@ private:
   bool IsSimplexMeshModified() ;
 
   // basic stent parameters */
-  double m_Stent_Radius;
   double m_Stent_Diameter;
   double m_Crown_Length;
   int m_Crown_Number;
   int m_Struts_Number;
-  double m_Strut_Angle;
+  double m_Strut_Angle; ///< angle in degrees
   double m_Strut_Thickness;
   double m_Strut_Length; 
   double m_Link_Length;
