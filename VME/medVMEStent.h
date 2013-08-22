@@ -97,9 +97,9 @@ public:
   void SetStentMaterial(wxString *Material) {m_Material = Material;}
   void SetStentDeliverySystem(double delsys) {m_DeliverySystem = delsys;}
   void SetStentDiameter(double d) {m_Stent_Diameter = d;}
+  void SetStentDLength(double length) {m_Stent_Length = length; } 
   void SetStentCrownLength(double crownL) {m_Crown_Length = crownL;}
   void SetStrutThickness(double strutThickness) {m_Strut_Thickness = strutThickness; }
-  void SetStentDLength(double length) {m_Stent_Length = length; } 
   void SetStentConfiguration(int stentCfig) {m_Id_Stent_Configuration = stentCfig;}
   void SetLinkLength(double linkLength) {m_Link_Length = linkLength;}
   void SetLinkAlignment(int linkAlgn) {m_Link_Alignment = linkAlgn;}
@@ -115,9 +115,9 @@ public:
   double GetStentDeliverySystem() const {return m_DeliverySystem;};
   double GetStentRadius() const {return m_Stent_Diameter/2.0;}
   double GetStentDiameter() const {return m_Stent_Diameter;}
+  double GetStentDLength() const {return m_Stent_Length;}  
   double GetStentCrownLength() const {return m_Crown_Length;}
   double GetStrutThickness() const {return m_Strut_Thickness;}
-  double GetStentDLength() const {return m_Stent_Length;}  //1
   int GetStentConfiguration() const {return m_Id_Stent_Configuration;}
   double GetLinkLength() const {return m_Link_Length;}
   int GetLinkAlignment() const {return m_Link_Alignment;}
