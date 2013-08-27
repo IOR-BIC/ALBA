@@ -216,6 +216,10 @@ private:
   /// will show the simplex instead of the derived stent polydata.
   void UpdateStentPolydataFromSimplex_ViewAsSimplex() ;
 
+  /// Calculate extra mid-points on struts of Abbott stent polydata. \n
+  /// Input is a pair of adjacent struts - output is four midpoints.
+  void CalculateMidPointsFromPairOfStruts(const double strutEndPts[4][3], double midPts[4][3]) const ;
+
   /// Create long vessel centerline
   void CreateLongVesselCenterLine() ;
 

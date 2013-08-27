@@ -32,6 +32,7 @@ University of Bedfordshire, UK
 #include "vtkMEDDeformableSimplexMeshFilter.h"
 #include "vtkMEDMatrixVectorMath.h"
 #include "vtkMEDPolyDataNavigator.h"
+#include "vtkMEDMatrixVectorMath.h"
 #include "medVMEStent.h"
 
 #include "vtkPointData.h"
@@ -449,72 +450,70 @@ void medVMEStent::UpdateStentPolydataFromSimplex()
     vtkCellArray *lines = vtkCellArray::New() ;
     lines->Allocate(20000) ;  
 
-    int tindices2[4],tindices3[4],tindicsShort[2];//--------for ABBOTT
-    double middlePoints[4][3];//[3];
+    for(StrutIterator iter = m_StentSource->GetStrutsList().begin(); iter !=m_StentSource->GetStrutsList().end(); iter++){//iter++){
+      if(m_StentSource->getInphaseShort()==1){
+        // Abbott stent
+        int tindices2[4] ;
+        double endPoints[4][3], midPoints[4][3];
 
-    for(StrutIterator iter = m_StentSource->GetStrutsList().begin(); iter !=m_StentSource->GetStrutsList().end(); ){//iter++){
-      if(m_StentSource->getInphaseShort()==1){//ABBOTT
         tindices2[0]=iter->startVertex;
         tindices2[1]=iter->endVertex;
-        //lines->InsertNextCell(2,tindices);
+        vpoints->GetPoint(tindices2[0], endPoints[0]) ;
+        vpoints->GetPoint(tindices2[1], endPoints[1]) ;
+
         iter++;
         tindices2[2] = iter->startVertex;
         tindices2[3] = iter->endVertex;
-        //mafLogMessage("tindices2: [%i, %i, %i, %i]",tindices2[0],tindices2[1],tindices2[2],tindices2[3] );
-        //                 13
-        //input 3 points  0/\2 get 4 points of middles
+        vpoints->GetPoint(tindices2[2], endPoints[2]) ;
+        vpoints->GetPoint(tindices2[3], endPoints[3]) ;
 
-        m_StentSource->getShortStrutsLines(tindices2,middlePoints);//middlePoints);//tindices2,
-        //                 /     \
-        // middle poins:  0-1     2-3 
-        //               /         \
+        CalculateMidPointsFromPairOfStruts(endPoints, midPoints) ;
 
-        for(int i=0;i<4;i++){//add 4 points
-          vpoints->SetPoint(pointCount,middlePoints[i]);
+        // add the 4 new midpoints
+        int newPtIds[4] ;
+        for(int i=0;i<4;i++){
+          newPtIds[i] = vpoints->InsertNextPoint(midPoints[i]);
           pointCount++;
         }
 
         //----------left arm------------
-        tindicsShort[0]=tindices2[0];//pointCount-1-3;
-        tindicsShort[1]=pointCount-1-2;//pointCount-1-2;
-        lines->InsertNextCell(2,tindicsShort);
+        int tindicesShort[2] ;
+        tindicesShort[0]=tindices2[0];
+        tindicesShort[1]=newPtIds[0] ;
+        lines->InsertNextCell(2,tindicesShort);
 
-        tindicsShort[0]=pointCount-1-2;
-        tindicsShort[1]=pointCount-1-3;
-        lines->InsertNextCell(2,tindicsShort);
+        tindicesShort[0]=newPtIds[0];
+        tindicesShort[1]=newPtIds[1];
+        lines->InsertNextCell(2,tindicesShort);
 
-        tindicsShort[0]=pointCount-1-3;
-        tindicsShort[1]=tindices2[1];
-        lines->InsertNextCell(2,tindicsShort);
+        tindicesShort[0]=newPtIds[1];
+        tindicesShort[1]=tindices2[1];
+        lines->InsertNextCell(2,tindicesShort);
+
         //-----------right arm---------------
-        tindicsShort[0]=tindices2[2];//pointCount-1-3;
-        tindicsShort[1]=pointCount-1;//pointCount-1-2;
-        lines->InsertNextCell(2,tindicsShort);
+        tindicesShort[0]=tindices2[2];
+        tindicesShort[1]=newPtIds[2] ;
+        lines->InsertNextCell(2,tindicesShort);
 
-        tindicsShort[0]=pointCount-1;
-        tindicsShort[1]=pointCount-1-1;
-        lines->InsertNextCell(2,tindicsShort);
+        tindicesShort[0]=newPtIds[2];
+        tindicesShort[1]=newPtIds[3];
+        lines->InsertNextCell(2,tindicesShort);
 
-        tindicsShort[0]=pointCount-1-1;
-        tindicsShort[1]=tindices2[3];
-        lines->InsertNextCell(2,tindicsShort);
-
-        //lines->InsertNextCell(2,tindices);
-        iter++;
-
-
-      }else{
+        tindicesShort[0]=newPtIds[3];
+        tindicesShort[1]=tindices2[3];
+        lines->InsertNextCell(2,tindicesShort);
+      }
+      else{
+        // Simple stent with straight struts
         tindices[0] = iter->startVertex;
         tindices[1] = iter->endVertex;
         lines->InsertNextCell(2, tindices);
         iter++;
       }
-
-      /*tindices[0] = iter->startVertex;
-      tindices[1] = iter->endVertex;
-      lines->InsertNextCell(2, tindices);
-      iter++;*/
     }
+
+
+    // Do the cells for the links
     for(StrutIterator iter = m_StentSource->GetLinksList().begin(); iter !=m_StentSource->GetLinksList().end(); iter++){
       tindices[0] = iter->startVertex;
       tindices[1] = iter->endVertex;
@@ -527,6 +526,61 @@ void medVMEStent::UpdateStentPolydataFromSimplex()
     m_StentPolyData->Modified();
     m_SimplexMeshModified = false ;
   }
+}
+
+
+
+//------------------------------------------------------------------------------
+// Calculate extra mid-points on struts of Abbott stent polydata.
+// Input is a pair of adjacent struts - output is four midpoints.
+//------------------------------------------------------------------------------
+void medVMEStent::CalculateMidPointsFromPairOfStruts(const double strutEndPts[4][3], double midPts[4][3]) const
+{
+  const double LengthFactor = 0.01 ;
+
+  vtkMEDMatrixVectorMath *math = vtkMEDMatrixVectorMath::New() ;
+  math->SetHomogeneous(false) ;
+
+  // calc exact midpoints m[2] of struts
+  double m[2][3] ;
+  for (int i = 0 ;  i < 2 ;  i++)
+    math->MeanVector(strutEndPts[2*i], strutEndPts[2*i+1], m[i]) ;
+
+  // calc directions v[2] and magnitudes r[2] of struts
+  double v[2][3], r[2], rsq[2] ; 
+  for (int i = 0 ;  i < 2 ;  i++){
+    math->SubtractVectors(strutEndPts[2*i+1], strutEndPts[2*i], v[i]) ;
+    r[i] = math->MagnitudeOfVector(v[i]) ;
+    rsq[i] = r[i]*r[i] ;
+  }
+
+  // calc vector directions dm[2] from each midpoint to opposite midpoint
+  double dm[2][3] ;
+  math->SubtractVectors(m[1], m[0], dm[0]) ;
+  math->SubtractVectors(m[0], m[1], dm[1]) ;
+
+  // calc dot products of m and v
+  double dprod[2] ;
+  for (int i = 0 ;  i < 2 ;  i++)
+    dprod[i] = math->DotProduct(dm[i], v[i]) ;
+ 
+  // Calc small displacement vectors a[2][3] from midpoints.
+  // Each displacement vector must be normal to strut and coplanar with strut and opposite midpoint.
+  // Thus a = dprod*v - rsq*dm
+  double a[2][3] ; // displacement vectors
+  for (int i = 0 ;  i < 2 ;  i++){
+    math->MultiplyVectorByScalar(dprod[i], v[i], a[i]) ;
+    math->SubtractMultipleOfVector(a[i], rsq[i], dm[i], a[i]) ;
+    math->NormalizeVector(a[i]) ;
+  }
+
+  // Add displacements to midpoints to calc output midpoints
+  for (int i = 0 ;  i < 2 ;  i++){
+    math->SubtractMultipleOfVector(m[i], LengthFactor*r[i], a[i], midPts[2*i]) ;
+    math->AddMultipleOfVector(m[i], LengthFactor*r[i], a[i], midPts[2*i+1]) ;
+  }
+
+  math->Delete() ;
 }
 
 
@@ -581,6 +635,9 @@ void medVMEStent::UpdateStentPolydataFromSimplex_ViewAsSimplex()
     m_SimplexMeshModified = false ;
   }
 }
+
+
+
 
 
 //-----------------------------------------------------------------------

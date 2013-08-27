@@ -34,7 +34,7 @@ medVMEStentDeploymentVisualPipe::medVMEStentDeploymentVisualPipe(vtkRenderer *re
   m_DefinedCatheter(0), m_CatheterPolydata(NULL), m_VisibilityCatheter(0),
   m_DefinedCenterLine(0), m_CenterLinePolydata(NULL), m_VisibilityCenterLine(0),
   m_DefinedVessel(0), m_VesselPolydata(NULL), m_VisibilityVessel(0),
-  m_DefinedStent(0), m_StentPolydata(NULL), m_VisibilityStent(0), m_StentTubeRadius(0.1),
+  m_DefinedStent(0), m_StentPolydata(NULL), m_VisibilityStent(0), m_StentTubeRadius(0.06),
   m_VesselOpacity(0.2)
 {
   // catheter pipeline
