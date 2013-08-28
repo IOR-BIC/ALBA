@@ -44,6 +44,7 @@ public:
     ID_USERNAME,
     ID_PASSWORD,
     ID_ANONYMOUS_USER,
+	ID_SAVE_FOLDER,
     /*ID_SRB_HOST_NAME,
     ID_SRB_SERVER_DN,
     ID_SRB_DOMAIN,
@@ -88,6 +89,9 @@ public:
 
   /** Set the cache folder.*/
   void SetCacheFolder(mafString cache_folder);
+
+  /** Return the path for the default save folder.*/
+  mafString &GetDefaultSaveFolder() {return m_SaveFolder;};
 
   /** Return the path for the remote host name.*/
   mafString &GetRemoteHostName() {return m_RemoteHostName;};
@@ -183,6 +187,7 @@ protected:
   int       m_AnonymousFalg;
   int       m_Port;
   mafString m_CacheFolder;
+  mafString m_SaveFolder;
   mafString m_RemoteHostName;
   mafString m_UserName;
   mafString m_Password;

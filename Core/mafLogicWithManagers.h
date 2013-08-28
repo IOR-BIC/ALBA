@@ -203,6 +203,9 @@ protected:
   Example: dragging a VTK file over the application cause the application to inport it through the importer.*/
   virtual void ImportExternalFile(mafString &filename);
 
+  /* Set the file extension */
+  void SetFileExtension(mafString &extension) {m_Extension = extension;};
+
   /** Respond to a VME_SELECT evt. Instantiate the 'Select' operation. */
 	virtual void VmeSelect(mafEvent &e);
 	/** Respond to a VME_SELECTED evt. Update the selection on the tree and view representation. */
@@ -269,7 +272,7 @@ protected:
   mafOpManager           *m_OpManager;
   mafInteractionManager  *m_InteractionManager;
   mafRemoteLogic         *m_RemoteLogic;
-
+  
   mafGUIMaterialChooser  *m_MaterialChooser;
   mafPrintSupport     *m_PrintSupport;
 
@@ -293,6 +296,7 @@ protected:
   mafGUISettingsHelp *m_HelpSettings;
 
   mafString m_Revision;
+  mafString m_Extension;
 
   mafUser *m_User; ///< Applications' user
 };
