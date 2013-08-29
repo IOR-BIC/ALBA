@@ -1143,3 +1143,26 @@ void medVMEStent::DoDeformationStep()
   UpdateStentPolydataFromSimplex() ;  
   UpdateStentPolydataFromSimplex_ViewAsSimplex() ;
 }
+
+
+
+//-------------------------------------------------------------------------
+/// Crimp the stent to a smaller diameter. \n
+/// The input params are for the expanded stent, \n
+/// so this should be the last step when the stent is created. \n
+/// This changes the diameter, strut angle and crown length, \n
+/// keeping the strut length const.
+//-------------------------------------------------------------------------
+void medVMEStent::CrimpStent(double crimpedDiameter)
+{
+  m_Stent_Diameter = crimpedDiameter ;
+  
+  double r = crimpedDiameter/2.0 ;
+  double alpha = 2.0*M_PI / m_Struts_Number ;
+  double s = 2.0*r*sin(alpha/2.0) ;
+  double c = sqrt(m_Strut_Length*m_Strut_Length - (s*s)/4.0) ;
+  double theta = 2.0*acos(c/m_Strut_Length) ;
+
+  m_Crown_Length = c ;
+  m_Strut_Angle = theta ;
+}

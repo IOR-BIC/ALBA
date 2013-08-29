@@ -161,6 +161,13 @@ public:
   /// Do one step of the deformation filter
   void DoDeformationStep() ;
 
+  /// Crimp the stent to a smaller diameter. \n
+  /// The input params are for the expanded stent, \n
+  /// so this should be the last step when the stent is created. \n
+  /// This changes the diameter, strut angle and crown length, \n
+  /// keeping the strut length const.
+  void CrimpStent(double crimpedDiameter) ;
+
 private:
   enum STENT_WIDGET_ID
   {
