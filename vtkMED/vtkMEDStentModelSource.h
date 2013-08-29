@@ -103,10 +103,9 @@ public:
   void setTestValue(){};
   void setStentType(int value);
 
-  /// Set angle and calc strut length. \n
-  /// Input argument is degrees, but stored internally as radians. \n
+  /// Set angle and calc strut length. Argument is radians. \n
   /// Must set crown length first.
-  void setStrutAngle(double thetaDegr); 
+  void setStrutAngle(double theta); 
 
 
   /**----------------------------------------------------------------------------*/

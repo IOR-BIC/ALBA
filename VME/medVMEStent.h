@@ -66,6 +66,7 @@ public:
   mafString GetVisualPipe() {return mafString("mafPipePolyline");}; ///< Get pipe name
   mafVMEOutputPolyline *GetPolylineOutput(); ///< return the right type of output 
   vtkPolyData *GetStentPolyData(); ///< Get stent polydata
+  vtkPolyData *GetSimplexPolyData(); ///< Get simplex polydata
 
   void OnEvent(mafEventBase *maf_event); ///< Event handler
 
@@ -109,10 +110,11 @@ public:
   void SetStrutsNumber(int strutsNumber){m_Struts_Number = strutsNumber;}
   void SetLinkNumber(int linkNumber){m_Link_Number = linkNumber;}
   
-  /// Set strut angle in degrees.  \n
-  /// Also calculates strut length, but must set crown length first.
-  void SetStrutAngle(double theta) ; 
+  /// calculate strut angle, given diameter, crown length and struts-per-crown.
+  void CalcStrutAngle() ; 
   
+  /// calculate strut length, given strut angle and crown length.
+  void CalcStrutLength() ; 
 
   wxString* GetStentCompanyName() const {return m_CompanyName;};
   wxString* GetStentModelName() const {return m_ModelName;};
@@ -248,7 +250,7 @@ private:
   double m_Crown_Length;
   int m_Crown_Number;
   int m_Struts_Number;
-  double m_Strut_Angle; ///< angle in degrees
+  double m_Strut_Angle; ///< angle in radians
   double m_Strut_Thickness;
   double m_Strut_Length; 
   double m_Stent_Length; 
@@ -281,6 +283,9 @@ private:
   bool m_StentCenterLineModified ;
   int m_StentLength ;
   bool m_StentLengthModified ; // need to recalculate length of stent
+
+  // simplex
+  vtkPolyData *m_SimplexPolyData; // polydata visualisation of simplex mesh
 
   // Deformation filter
   SimplexMeshType::Pointer m_SimplexMesh;

@@ -76,6 +76,7 @@ medVMEStent::medVMEStent()
   m_StentSource = new vtkMEDStentModelSource ;
 
   m_StentPolyData = vtkPolyData::New() ;
+  m_SimplexPolyData = vtkPolyData::New() ;
 
   m_CenterLine = vtkPolyData::New() ;
   m_CenterLineLong = vtkPolyData::New() ;
@@ -122,6 +123,7 @@ medVMEStent::~medVMEStent()
   delete m_StentSource ;
 
   m_StentPolyData->Delete() ;
+  m_SimplexPolyData->Delete() ;
   m_CenterLine->Delete() ;
   m_CenterLineLong->Delete() ;
   m_StentCenterLine->Delete() ;
@@ -390,7 +392,9 @@ void medVMEStent::InternalUpdate()
   //m_SimplexMeshModified = IsSimplexMeshModified() ;
   if (m_SimplexMeshModified){
     m_StentPolyData->Initialize() ;
-    UpdateStentPolydataFromSimplex() ; // change here to _ViewAsSimplex() to see simplex mesh
+    m_SimplexPolyData->Initialize() ;
+    UpdateStentPolydataFromSimplex() ; 
+    UpdateStentPolydataFromSimplex_ViewAsSimplex() ; 
     m_SimplexMeshModified = false ;
     this->Modified() ;
   }
@@ -524,7 +528,7 @@ void medVMEStent::UpdateStentPolydataFromSimplex()
     lines->Delete() ;
 
     m_StentPolyData->Modified();
-    m_SimplexMeshModified = false ;
+    //m_SimplexMeshModified = false ; // wait until simplex version is called before false
   }
 }
 
@@ -580,6 +584,15 @@ void medVMEStent::CalculateMidPointsFromPairOfStruts(const double strutEndPts[4]
     math->AddMultipleOfVector(m[i], LengthFactor*r[i], a[i], midPts[2*i+1]) ;
   }
 
+  // Debugging: get actual angle between struts
+  double dotV = math->DotProduct(v[0], v[1]) ;
+  double costheta = dotV / (r[0]*r[1]) ;
+  double thetadeg = 180/M_PI * acos(costheta) ;
+  ofstream thing ;
+  thing.open("theta.txt", thing.app) ;
+  thing << thetadeg << "\n" ;
+  thing.close() ;
+
   math->Delete() ;
 }
 
@@ -604,7 +617,7 @@ void medVMEStent::UpdateStentPolydataFromSimplex_ViewAsSimplex()
       vpoints->SetPoint(idx,pp);
     }
     vpoints->Squeeze() ;
-    m_StentPolyData->SetPoints(vpoints) ;
+    m_SimplexPolyData->SetPoints(vpoints) ;
     vpoints->Delete() ;
 
 
@@ -628,10 +641,10 @@ void medVMEStent::UpdateStentPolydataFromSimplex_ViewAsSimplex()
       }
     }
     cells->Squeeze() ;
-    m_StentPolyData->SetLines(cells) ;
+    m_SimplexPolyData->SetLines(cells) ;
     cells->Delete() ;
 
-    m_StentPolyData->Modified();
+    m_SimplexPolyData->Modified();
     m_SimplexMeshModified = false ;
   }
 }
@@ -695,20 +708,31 @@ void medVMEStent::SetVesselSurface(mafNode* node)
 
 
 //------------------------------------------------------------------------------
-// Set strut angle (degrees)
-// Also calculates strut length, but must set crown length first.
+// Calc strut angle
 //------------------------------------------------------------------------------
-void medVMEStent::SetStrutAngle(double theta)
+void medVMEStent::CalcStrutAngle()
 {
-  m_Strut_Angle = theta ;
-  double angleRad = M_PI * theta / 180.0 ;
-  m_Strut_Length = m_Crown_Length / cos(angleRad/2.0) ;
+  double r = m_Stent_Diameter/2.0 ;
+  double alpha = 2.0*M_PI / (double)m_Struts_Number ;
+  double s = 2.0*r*sin(alpha/2.0) ;
+  double t = s / (2.0 * m_Crown_Length) ;
+  m_Strut_Angle = 2.0*atan(t) ;
 }
 
 
 
 //------------------------------------------------------------------------------
-// update data and return append polydata                                                                    
+// Calc strut length
+//------------------------------------------------------------------------------
+void medVMEStent::CalcStrutLength()
+{
+  m_Strut_Length = 0.99 * m_Crown_Length / cos(m_Strut_Angle/2.0) ;
+}
+
+
+
+//------------------------------------------------------------------------------
+// update data and return polydata                                                                    
 //------------------------------------------------------------------------------
 vtkPolyData* medVMEStent::GetStentPolyData()
 { 
@@ -716,6 +740,16 @@ vtkPolyData* medVMEStent::GetStentPolyData()
   return m_StentPolyData ;
 }
 
+
+
+//------------------------------------------------------------------------------
+// update data and return polydata                                                                    
+//------------------------------------------------------------------------------
+vtkPolyData* medVMEStent::GetSimplexPolyData()
+{ 
+  InternalUpdate();
+  return m_SimplexPolyData ;
+}
 
 
 //-------------------------------------------------------------------------
@@ -1106,5 +1140,6 @@ void medVMEStent::DoDeformationStep()
 {
   m_DeformFilter->Update() ;  
   m_SimplexMeshModified = true ;  
-  UpdateStentPolydataFromSimplex() ;
+  UpdateStentPolydataFromSimplex() ;  
+  UpdateStentPolydataFromSimplex_ViewAsSimplex() ;
 }
