@@ -584,15 +584,6 @@ void medVMEStent::CalculateMidPointsFromPairOfStruts(const double strutEndPts[4]
     math->AddMultipleOfVector(m[i], LengthFactor*r[i], a[i], midPts[2*i+1]) ;
   }
 
-  // Debugging: get actual angle between struts
-  double dotV = math->DotProduct(v[0], v[1]) ;
-  double costheta = dotV / (r[0]*r[1]) ;
-  double thetadeg = 180/M_PI * acos(costheta) ;
-  ofstream thing ;
-  thing.open("theta.txt", thing.app) ;
-  thing << thetadeg << "\n" ;
-  thing.close() ;
-
   math->Delete() ;
 }
 

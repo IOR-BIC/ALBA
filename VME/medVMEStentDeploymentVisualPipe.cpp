@@ -66,6 +66,9 @@ medVMEStentDeploymentVisualPipe::medVMEStentDeploymentVisualPipe(vtkRenderer *re
 
   m_VesselMapper = vtkPolyDataMapper::New() ;
   m_VesselMapper->SetInput(m_VesselDepthSort->GetOutput()) ;
+  m_VesselMapper->SetScalarModeToUsePointData() ;
+  m_VesselMapper->ScalarVisibilityOn() ;
+
   m_VesselActor = vtkActor::New() ;
   m_VesselActor->SetMapper(m_VesselMapper) ;
   m_VesselActor->GetProperty()->SetColor(0, 1, 0) ;
