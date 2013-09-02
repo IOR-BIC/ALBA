@@ -155,6 +155,9 @@ public:
   void MAFExpertModeOff(){(*GetMAFExpertMode())= FALSE;};
   void SetMAFExpertMode(int value){(*GetMAFExpertMode()) = value;};
 
+  /* Set the file extension */
+  void SetFileExtension(mafString &extension) {m_Extension = extension;};
+
 protected:
   //---------------------------------------------------------
   // Description:
@@ -203,12 +206,9 @@ protected:
   Example: dragging a VTK file over the application cause the application to inport it through the importer.*/
   virtual void ImportExternalFile(mafString &filename);
 
-  /* Set the file extension */
-  void SetFileExtension(mafString &extension) {m_Extension = extension;};
-
   /** Respond to a VME_SELECT evt. Instantiate the 'Select' operation. */
 	virtual void VmeSelect(mafEvent &e);
-	/** Respond to a VME_SELECTED evt. Update the selection on the tree and view representation. */
+  /** Respond to a VME_SELECTED evt. Update the selection on the tree and view representation. */
 	virtual void VmeSelected(mafNode *vme);
   /** Respond to a VME_DCLICKED evt. Manage the 'Double click' on Selected VME. */
   virtual void VmeDoubleClicked(mafEvent &e);
