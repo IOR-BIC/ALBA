@@ -478,7 +478,7 @@ void medLogicWithManagers::OnFileOpen(const char *file_to_open)
       }
       else      
       {
-        wxString wildc    = _("MAF Storage Format file (*.msf)|*.msf|Compressed file (*.zmsf)|*.zmsf");
+        wxString wildc    = _("MAF Storage Format file (*." + m_Extension + ")|*." + m_Extension +"|Compressed file (*.z" + m_Extension + ")|*.z" + m_Extension + "");
         if (file_to_open != NULL)
         {
           file = file_to_open;
@@ -510,6 +510,9 @@ void medLogicWithManagers::OnFileSave()
 {
   if(m_VMEManager)
   {
+	mafString save_default_folder = m_StorageSettings->GetDefaultSaveFolder();
+	save_default_folder.ParsePathName();
+	m_VMEManager->SetDirName(save_default_folder);
     int saved=m_VMEManager->MSFSave();
     //If there is a wizard running we need to continue it after save operation
     if (m_WizardManager && m_WizardRunning)
@@ -524,6 +527,9 @@ void medLogicWithManagers::OnFileSaveAs()
 {
   if(m_VMEManager) 
   {
+	mafString save_default_folder = m_StorageSettings->GetDefaultSaveFolder();
+	save_default_folder.ParsePathName();
+	m_VMEManager->SetDirName(save_default_folder);
     int saved=m_VMEManager->MSFSaveAs();
     //If there is a wizard running we need to continue it after save operation
     if (m_WizardManager && m_WizardRunning)
