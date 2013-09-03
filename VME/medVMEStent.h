@@ -66,6 +66,7 @@ public:
   mafString GetVisualPipe() {return mafString("mafPipePolyline");}; ///< Get pipe name
   mafVMEOutputPolyline *GetPolylineOutput(); ///< return the right type of output 
   vtkPolyData *GetStentPolyData(); ///< Get stent polydata
+  vtkPolyData *GetSimplexPolyData(); ///< Get simplex polydata
 
   void OnEvent(mafEventBase *maf_event); ///< Event handler
 
@@ -109,6 +110,12 @@ public:
   void SetStrutsNumber(int strutsNumber){m_Struts_Number = strutsNumber;}
   void SetLinkNumber(int linkNumber){m_Link_Number = linkNumber;}
   
+  /// calculate strut angle, given diameter, crown length and struts-per-crown.
+  void CalcStrutAngle() ; 
+  
+  /// calculate strut length, given strut angle and crown length.
+  void CalcStrutLength() ; 
+
   wxString* GetStentCompanyName() const {return m_CompanyName;};
   wxString* GetStentModelName() const {return m_ModelName;};
   wxString* GetStentMaterial() const {return m_Material;};
@@ -123,8 +130,9 @@ public:
   int GetLinkAlignment() const {return m_Link_Alignment;}
   int GetLinkOrientation() const {return m_Link_orientation;}
   int GetLinkConnection() const {return m_Id_Link_Connection;}
-  int GetStentCrownNumber() const {return m_Crown_Number ; }
-  double GetStrutLength(){return m_Strut_Length;};
+  int GetStentCrownNumber() const {return m_Crown_Number ;}
+  double GetStrutLength() const {return m_Strut_Length ;}
+  double GetStrutAngle() const {return m_Strut_Angle ;}
 
   vtkPolyData* GetVesselCenterLine() {return m_CenterLine;} ///< get vessel centerline
   vtkPolyData* GetVesselCenterLineLong() {return m_CenterLineLong;} ///< get long extrapolated vessel centerline
@@ -151,7 +159,14 @@ public:
   static void CreateTruncatedLine(vtkPolyData* lineIn, vtkPolyData* lineOut, int id0, int id1) ;
 
   /// Do one step of the deformation filter
-  void DoDeformationStep() {m_DeformFilter->Update() ;  m_SimplexMeshModified = true ;  UpdateStentPolydataFromSimplex() ;}
+  void DoDeformationStep() ;
+
+  /// Crimp the stent to a smaller diameter. \n
+  /// The input params are for the expanded stent, \n
+  /// so this should be the last step when the stent is created. \n
+  /// This changes the diameter, strut angle and crown length, \n
+  /// keeping the strut length const.
+  void CrimpStent(double crimpedDiameter) ;
 
 private:
   enum STENT_WIDGET_ID
@@ -205,8 +220,14 @@ private:
   /// Update stent polydata from simplex
   void UpdateStentPolydataFromSimplex() ;
 
-  /// Copy simplex directly to polydata
+  /// Copy simplex directly to polydata. \n
+  /// Replacing UpdateStentPolydataFromSimplex() everywhere with this version \n
+  /// will show the simplex instead of the derived stent polydata.
   void UpdateStentPolydataFromSimplex_ViewAsSimplex() ;
+
+  /// Calculate extra mid-points on struts of Abbott stent polydata. \n
+  /// Input is a pair of adjacent struts - output is four midpoints.
+  void CalculateMidPointsFromPairOfStruts(const double strutEndPts[4][3], double midPts[4][3]) const ;
 
   /// Create long vessel centerline
   void CreateLongVesselCenterLine() ;
@@ -231,12 +252,12 @@ private:
   wxString *m_ModelName;
   wxString *m_Material;
   double m_DeliverySystem;
-  double m_Stent_Radius;
+  
   double m_Stent_Diameter;
   double m_Crown_Length;
   int m_Crown_Number;
   int m_Struts_Number;
-  double m_Strut_Angle;
+  double m_Strut_Angle; ///< angle in radians
   double m_Strut_Thickness;
   double m_Strut_Length; 
   double m_Stent_Length; 
@@ -269,6 +290,9 @@ private:
   bool m_StentCenterLineModified ;
   int m_StentLength ;
   bool m_StentLengthModified ; // need to recalculate length of stent
+
+  // simplex
+  vtkPolyData *m_SimplexPolyData; // polydata visualisation of simplex mesh
 
   // Deformation filter
   SimplexMeshType::Pointer m_SimplexMesh;

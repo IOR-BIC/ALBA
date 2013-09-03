@@ -70,6 +70,12 @@ public:
   /// Set stent tube Radius
   void SetStentTubeRadius(double rad) ;
 
+  /// Set the simplex
+  void SetSimplex(vtkPolyData *simplex) ;
+
+  /// Show simplex
+  void ShowSimplex(int visibility) ;
+
   /// Set vessel wireframe on
   void SetWireframeOn() ;
 
@@ -137,6 +143,14 @@ private:
   vtkTubeFilter *m_StentTubeFilter ;
   vtkPolyDataMapper *m_StentMapper ;
   vtkActor *m_StentActor ;
+
+  // simplex pipeline (for debugging)
+  int m_DefinedSimplex ;
+  int m_VisibilitySimplex ;
+  vtkPolyData *m_SimplexPolydata ;
+  vtkTubeFilter *m_SimplexTubeFilter ;
+  vtkPolyDataMapper *m_SimplexMapper ;
+  vtkActor *m_SimplexActor ;
 
   // saved position of stent (or other principal item) in view
   double m_CenterOld[3] ;

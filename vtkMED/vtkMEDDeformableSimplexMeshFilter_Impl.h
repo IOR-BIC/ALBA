@@ -329,12 +329,18 @@ namespace itk
     //--------------------------------------------------------------------------
     int constrained[5000] ;
     int i ;
-    for (int i = 0 ;  i < 5000 ;  i++)
+    for (i = 0 ;  i < 5000 ;  i++)
       constrained[i] = 0 ;
+
+    ofstream thing ;
+    thing.open("thing.txt", thing.out) ;
 
     std::vector<int>::const_iterator centerIdx = m_CenterLocationIdx ;
     GeometryMapType::Iterator dataIt ;
     for (dataIt = m_Data->Begin(), centerIdx = m_CenterLocationIdx, i = 0 ;  dataIt != m_Data->End() ;  dataIt++, centerIdx++, i++){
+      thing << i << " " ;
+      if (i % 10 == 9)
+        thing << "\n" ;
       data = dataIt.Value();
 
       // Create table showing whether vertices are constrained by catheter
@@ -349,6 +355,7 @@ namespace itk
       }      
     }
 
+    thing.close() ;
 
     //--------------------------------------------------------------------------
     // Loop for every simplex vertex

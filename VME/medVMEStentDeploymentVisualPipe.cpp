@@ -34,7 +34,7 @@ medVMEStentDeploymentVisualPipe::medVMEStentDeploymentVisualPipe(vtkRenderer *re
   m_DefinedCatheter(0), m_CatheterPolydata(NULL), m_VisibilityCatheter(0),
   m_DefinedCenterLine(0), m_CenterLinePolydata(NULL), m_VisibilityCenterLine(0),
   m_DefinedVessel(0), m_VesselPolydata(NULL), m_VisibilityVessel(0),
-  m_DefinedStent(0), m_StentPolydata(NULL), m_VisibilityStent(0), m_StentTubeRadius(0.1),
+  m_DefinedStent(0), m_StentPolydata(NULL), m_VisibilityStent(0), m_StentTubeRadius(0.06),
   m_VesselOpacity(0.2)
 {
   // catheter pipeline
@@ -66,6 +66,9 @@ medVMEStentDeploymentVisualPipe::medVMEStentDeploymentVisualPipe(vtkRenderer *re
 
   m_VesselMapper = vtkPolyDataMapper::New() ;
   m_VesselMapper->SetInput(m_VesselDepthSort->GetOutput()) ;
+  m_VesselMapper->SetScalarModeToUsePointData() ;
+  m_VesselMapper->ScalarVisibilityOn() ;
+
   m_VesselActor = vtkActor::New() ;
   m_VesselActor->SetMapper(m_VesselMapper) ;
   m_VesselActor->GetProperty()->SetColor(0, 1, 0) ;
@@ -86,6 +89,21 @@ medVMEStentDeploymentVisualPipe::medVMEStentDeploymentVisualPipe(vtkRenderer *re
   m_StentActor->GetProperty()->SetColor(1, 1, 1) ;
   m_StentActor->SetVisibility(0) ;
   m_Renderer->AddActor(m_StentActor) ;
+
+
+  // simplex pipeline
+  m_SimplexTubeFilter = vtkTubeFilter::New() ;  // <--------- start of pipeline
+  m_SimplexTubeFilter->SetNumberOfSides(12) ;
+  m_SimplexTubeFilter->SetRadius(m_StentTubeRadius/3.0) ;
+
+  m_SimplexMapper = vtkPolyDataMapper::New() ;
+  m_SimplexMapper->SetInput(m_SimplexTubeFilter->GetOutput()) ;
+  m_SimplexActor = vtkActor::New() ;
+  m_SimplexActor->SetMapper(m_SimplexMapper) ;
+  m_SimplexActor->GetProperty()->SetColor(1, 0, 0) ;
+  m_SimplexActor->SetVisibility(0) ;
+  m_Renderer->AddActor(m_SimplexActor) ;
+
 }
 
 
@@ -113,6 +131,11 @@ medVMEStentDeploymentVisualPipe::~medVMEStentDeploymentVisualPipe()
   m_StentTubeFilter->Delete() ;
   m_StentMapper->Delete() ;
   m_StentActor->Delete() ;
+
+  // simplex
+  m_SimplexTubeFilter->Delete() ;
+  m_SimplexMapper->Delete() ;
+  m_SimplexActor->Delete() ;
 }
 
 
@@ -126,6 +149,7 @@ void medVMEStentDeploymentVisualPipe::UpdateVisibility()
   m_CenterLineActor->SetVisibility(m_VisibilityCenterLine && m_Visibility) ;
   m_VesselActor->SetVisibility(m_VisibilityVessel && m_Visibility) ;
   m_StentActor->SetVisibility(m_VisibilityStent && m_Visibility) ;
+  m_SimplexActor->SetVisibility(m_VisibilitySimplex && m_Visibility) ;
 }
 
 
@@ -265,6 +289,36 @@ void medVMEStentDeploymentVisualPipe::SetStentTubeRadius(double rad)
   m_StentTubeRadius = rad ;
   m_StentTubeFilter->SetRadius(rad) ;
   Render() ;
+}
+
+
+
+
+//------------------------------------------------------------------------------
+// Set the stent
+//------------------------------------------------------------------------------
+void medVMEStentDeploymentVisualPipe::SetSimplex(vtkPolyData *stent)
+{
+  // input pipeline
+  m_SimplexPolydata = stent ;
+  m_SimplexTubeFilter->SetInput(m_SimplexPolydata) ;
+
+  m_DefinedSimplex = 1 ;
+  m_VisibilitySimplex = 1 ;
+  UpdateVisibility() ;
+}
+
+
+
+//------------------------------------------------------------------------------
+// Show stent
+//------------------------------------------------------------------------------
+void medVMEStentDeploymentVisualPipe::ShowSimplex(int visibility)
+{
+  if (m_DefinedSimplex){
+    m_VisibilitySimplex = visibility ;
+    UpdateVisibility() ;
+  }
 }
 
 
