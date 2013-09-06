@@ -1022,7 +1022,7 @@ int medOpImporterDicomOffis::BuildOutputVMEImagesFromDicomCineMRI()
 int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
 	//----------------------------------------------------------------------------
 {
-
+	bool sliceskippedistrue = true;
 	std::map <mafString,int> dcm_dim;
 	dcm_dim = m_SeriesIDstringToSeriesDimensionMap[m_SelectedSeriesID];
 
@@ -1062,11 +1062,6 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
 	}
 	// x dimension
 	dim_img_check[0] = atoi(bufx);
-
-
-
-
-
 
 	int step;
 	if(m_BuildStepValue == 0)
@@ -1108,7 +1103,15 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
 			if ( ( (dim_img[0] != dim_img_check[0]) && (dim_img[0] != dim_img_check[1]) ) ||  
 				( (dim_img[1] != dim_img_check[1]) && (dim_img[1] != dim_img_check[0]) ) )
 				{
-					wxMessageBox("A slice have different dimensions! This slice will be skipped!");
+					if(sliceskippedistrue) {
+						sliceskippedistrue = false;
+					    int result = wxMessageBox(_("Some slices have different dimension! They will be skipped! Do you want to continue?"),"",wxOK|wxCENTRE|wxCANCEL);
+					    if (result == wxCANCEL) {
+                            return OP_RUN_CANCEL;
+					    }
+					}
+
+					//wxMessageBox("Some slices have different dimension! They will be skipped!");
 					mafLogMessage("SLICE SKIPPED: %d",count);
 					numSliceToSkip++;
 					sliceToSkip[count] = true;
