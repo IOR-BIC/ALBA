@@ -681,8 +681,7 @@ int mafVMEManager::MSFSave()
 
     if(!wxFileExists(file.GetCStr()))
 		{
-//			file_dir = path + "/" + name;  Why "+ name"?
-			file_dir = path;
+			file_dir = path + "/" + name;  //Put the file in a folder with the same name
 			if(!wxDirExists(file_dir))
 				wxMkdir(file_dir);
       //if (ext == "zmsf")
