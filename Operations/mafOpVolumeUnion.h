@@ -32,13 +32,16 @@ class vtkProbeFilter;
 class vtkRectilinearGrid;
 class vtkProbeFilter;
 class vtkStructuredPoints;
-class mafVMEVolumeGray;  //Gray or more general?
+class mafVMEVolume;  
 
 //----------------------------------------------------------------------------
 // mafOpVolumeUnion :
 //----------------------------------------------------------------------------
-/** 
-Build a vme gray volume as the union of two subvolumes  
+/*
+Build a VME rectilinear grid volume as the union of two given rectilinear grid subvolumes.
+The user must specify:
+ - the two input volumes
+ - the resolution of the VME output volume
 */
 
 class MAF_EXPORT mafOpVolumeUnion: public mafOp
@@ -55,32 +58,27 @@ public:
 
   mafOp* Copy();
 
-	/*virtual*/ bool Accept(mafNode* node);
-	/*virtual*/ void OpRun();	
+  /*virtual*/ bool Accept(mafNode* node);
+  /*virtual*/ void OpRun();	
 	
-	/** Makes the undo for the operation. */
-	/*virtual*/ void OpUndo();
+  /** Makes the undo for the operation. */
+  /*virtual*/ void OpUndo();
 
   /*virtual*/ void OpDo();
 
   /*virtual*/ void CreateGui(); 
 
  protected:
- //  void UpdateGui();
   ///*virtual*/ void OpStop(int result);	
 
   void BuildVolumeUnion();
 
   bool VmeChoose(mafString title,mafEvent *e);
   
-//  vtkRectilinearGrid *m_InputRG;    ///< Pointer for Rectilinear Grid volume
-  vtkRectilinearGrid *m_VolUnionRG; ///< Pointer for Rectilinear Grid volume union
-  //vtkStructuredPoints *m_InputSP; ///< Pointer for Structured Points volume
-
   double resolutionXYZ[3];
-
   bool vme_is_selected;
 
+  vtkRectilinearGrid *m_VolUnionRG; ///< Pointer for Rectilinear Grid volume union
   mafVMEVolume *m_FirstVMEVolume;
   mafVMEVolume *m_SecondVMEVolume;
 

@@ -50,8 +50,6 @@
 mafCxxTypeMacro(mafOpVolumeUnion);
 //----------------------------------------------------------------------------
 
-// Posso unire solo volume che sono del tipo vtkRectilinearGrid (cioè parallelepipedi)
-
 //----------------------------------------------------------------------------
 mafOpVolumeUnion::mafOpVolumeUnion(const wxString &label)
 : mafOp(label)
@@ -64,7 +62,6 @@ mafOpVolumeUnion::mafOpVolumeUnion(const wxString &label)
 	m_FirstVMEVolume = NULL;
 	m_SecondVMEVolume = NULL;
 
-//	m_InputRG = NULL;
 	m_VolUnionRG = NULL;
 
 	resolutionXYZ[0] = 150;
@@ -78,7 +75,6 @@ mafOpVolumeUnion::mafOpVolumeUnion(const wxString &label)
 mafOpVolumeUnion::~mafOpVolumeUnion()
 //----------------------------------------------------------------------------
 {
-	//vtkDEL(m_InputRG);
 	if(m_VolUnionRG) vtkDEL(m_VolUnionRG);
 }
 
@@ -94,7 +90,7 @@ bool mafOpVolumeUnion::Accept(mafNode* node)
 {
 	mafEvent e(this,VIEW_SELECTED);
 	mafEventMacro(e);
-	return (node && node->IsA("mafVMEVolumeGray") /*&& e.GetBool()*/);
+	return (node && node->IsA("mafVMEVolumeGray"));
 }
 //----------------------------------------------------------------------------
 void mafOpVolumeUnion::OpRun()   
@@ -104,12 +100,8 @@ void mafOpVolumeUnion::OpRun()
     mafEventMacro(e);
 
 	m_FirstVMEVolume = mafVMEVolume::SafeDownCast(m_Input);
-	//mafVME* volume = mafVME::SafeDownCast(m_Input);
 	m_FirstVMEVolume->Update();
 
-//	if (volume->GetOutput()->GetVTKData()->IsA("vtkStructuredPoints"))
-//  {
-//  }	
 	if ( !(m_FirstVMEVolume->GetOutput()->GetVTKData()->IsA("vtkRectilinearGrid")) )
 	{
 		wxMessageBox("The input VME has not a VTK RectilinearGrid data!");
@@ -137,21 +129,21 @@ void mafOpVolumeUnion::BuildVolumeUnion()
 
 	//Input data(first volume)
 	vtkMAFSmartPointer<vtkRectilinearGrid> rgrid_firstvol;
-	rgrid_firstvol = vtkRectilinearGrid::SafeDownCast(m_FirstVMEVolume->GetVolumeOutput()->GetVTKData());
+	rgrid_firstvol->DeepCopy(vtkRectilinearGrid::SafeDownCast(m_FirstVMEVolume->GetVolumeOutput()->GetVTKData()));
 	rgrid_firstvol->Update();
 
 	double orig_firstvol[3];
 	double orient_firstvol[3];
 	m_FirstVMEVolume->GetVolumeOutput()->GetPose(orig_firstvol, orient_firstvol, 0);
 
+	//Input data(second volume)
+	vtkMAFSmartPointer<vtkRectilinearGrid> rgrid_secondvol;
+	rgrid_secondvol->DeepCopy(vtkRectilinearGrid::SafeDownCast(m_SecondVMEVolume->GetVolumeOutput()->GetVTKData()));
+	rgrid_secondvol->Update();
+
 	double orig_secondvol[3];
 	double orient_secondvol[3];
 	m_SecondVMEVolume->GetVolumeOutput()->GetPose(orig_secondvol, orient_secondvol, 0);
-
-	//Input data(second volume)
-	vtkMAFSmartPointer<vtkRectilinearGrid> rgrid_secondvol;
-	rgrid_secondvol = vtkRectilinearGrid::SafeDownCast(m_SecondVMEVolume->GetVolumeOutput()->GetVTKData());
-	rgrid_secondvol->Update();
 
 	// dim input vol
 	int dim_firstvol[3];
@@ -161,10 +153,8 @@ void mafOpVolumeUnion::BuildVolumeUnion()
 
 	//input bounds
 	double bounds_firstvol[6];
-	//rgrid_firstvol->GetBounds(bounds_firstvol);
 	m_FirstVMEVolume->GetVolumeOutput()->GetBounds(bounds_firstvol);
 	double bounds_secondvol[6];
-	//rgrid_secondvol->GetBounds(bounds_secondvol);
 	m_SecondVMEVolume->GetVolumeOutput()->GetBounds(bounds_secondvol);
 
 	// we have to know if the two volumes interpenetrate or not
@@ -193,12 +183,9 @@ void mafOpVolumeUnion::BuildVolumeUnion()
 	bounds[3] = ( bounds_firstvol[3] > bounds_secondvol[3] )?bounds_firstvol[3]:bounds_secondvol[3];
 	bounds[5] = ( bounds_firstvol[5] > bounds_secondvol[5] )?bounds_firstvol[5]:bounds_secondvol[5];
 
-	//Input data(first volume)
+	//Input data for the probe filter operation
 	vtkMAFSmartPointer<vtkRectilinearGrid> rgrid_totvol;
 	int resolution[3];
-	//resolution[0] = 150;
-	//resolution[1] = 150;
-	//resolution[2] = 150;
 	resolution[0] = (int)(resolutionXYZ[0]);
 	resolution[1] = (int)(resolutionXYZ[1]);
 	resolution[2] = (int)(resolutionXYZ[2]);
@@ -238,7 +225,7 @@ void mafOpVolumeUnion::BuildVolumeUnion()
 	}
 
 
-	//Traslation of the coordinates
+	//Translation of the coordinates
 	vtkDataArray *daVector_firstvol[3];
 
 	daVector_firstvol[0] = rgrid_firstvol->GetXCoordinates();
@@ -262,8 +249,6 @@ void mafOpVolumeUnion::BuildVolumeUnion()
 
 	//----
 
-
-
 	// projection of the rgrid_firstvol selected into the rgrid_totvol
 	vtkMAFSmartPointer<vtkProbeFilter> sampleVolume1;
 	sampleVolume1->SetInput(rgrid_totvol);
@@ -282,7 +267,7 @@ void mafOpVolumeUnion::BuildVolumeUnion()
 	}
 	
 
-	//Traslation of the coordinates
+	//Translation of the coordinates
 	vtkDataArray *daVector_secondvol[3];
 
 	daVector_secondvol[0] = rgrid_secondvol->GetXCoordinates();
@@ -306,8 +291,6 @@ void mafOpVolumeUnion::BuildVolumeUnion()
 
 	//----
 
-
-
 	// projection of the rgrid_secondvol selected into the rgrid_totvol
 	vtkMAFSmartPointer<vtkProbeFilter> sampleVolume2;
 	sampleVolume2->SetInput(rgrid_totvol);
@@ -325,54 +308,33 @@ void mafOpVolumeUnion::BuildVolumeUnion()
 		}
 	}
 	
-
-	// Now I sum the two outputs into the total volume and after that I copy the result deeply into the m_VolUnionRG
 	//Output volume
+	//Coordinates
 	m_VolUnionRG = vtkRectilinearGrid::New();
 	m_VolUnionRG->SetDimensions(resolution[0],resolution[1],resolution[2]);
 	m_VolUnionRG->SetXCoordinates(rgrid_totvol->GetXCoordinates());
 	m_VolUnionRG->SetYCoordinates(rgrid_totvol->GetYCoordinates());
 	m_VolUnionRG->SetZCoordinates(rgrid_totvol->GetZCoordinates());
-	//int upd_extent[6];
-	//upd_extent[0]=0;  upd_extent[1]=resolution[0]-1;
-	//upd_extent[2]=0;  upd_extent[3]=resolution[1]-1;
-	//upd_extent[4]=0;  upd_extent[5]=resolution[2]-1;
-
-	//m_VolUnionRG->SetExtent(upd_extent);
 	m_VolUnionRG->Update();
 
-	//PointData
+	//Scalars
 	vtkDataArray* rgarray_VolUnionRG= vtkDataArray::CreateDataArray(sampleVolume1->GetOutput()->GetPointData()->GetScalars()->GetDataType());
 	rgarray_VolUnionRG->Allocate(resolution[0]*resolution[1]*resolution[2]);
 	rgarray_VolUnionRG->SetNumberOfComponents(1);
 	rgarray_VolUnionRG->SetNumberOfTuples(resolution[0]*resolution[1]*resolution[2]);
 
-
-	//vtkMAFSmartPointer<vtkUnsignedShortArrayArray> rgarray_VolUnionRG;
-	//rgarray_VolUnionRG->SetNumberOfValues(resolution[0]*resolution[1]*resolution[2]);
-
-	//vtkIntArray *rgarray_sampleVolume1 = vtkIntArray::SafeDownCast(sampleVolume1->GetOutput()->GetPointData()->GetScalars());
-	//vtkIntArray *rgarray_sampleVolume2 = vtkIntArray::SafeDownCast(sampleVolume2->GetOutput()->GetPointData()->GetScalars());
 	vtkDataArray *rgarray_sampleVolume1 = sampleVolume1->GetOutput()->GetPointData()->GetScalars();
 	vtkDataArray *rgarray_sampleVolume2 = sampleVolume2->GetOutput()->GetPointData()->GetScalars();
 
-
+	// Sum the two probe-filter outputs into the total volume 
 	for(int i=0; i<resolution[0]*resolution[1]*resolution[2]; i++) {
 		double val_sampleVolume1 = rgarray_sampleVolume1->GetComponent(i, 0);
 		double val_sampleVolume2 = rgarray_sampleVolume2->GetComponent(i, 0);
-		//Valutare se l'operazione di somma produce un buon risultato; nella zona dove non c'è sovrapposizione si dimezza il valore del colore
-		double val_union = ((val_sampleVolume1 + val_sampleVolume2)/2.);
+		double val_union = (val_sampleVolume1 + val_sampleVolume2);
 		rgarray_VolUnionRG->SetComponent(i,0,val_union);
-
-	 //   int val_sampleVolume1 = rgarray_sampleVolume1->GetTuple(i);
-		//int val_sampleVolume2 = rgarray_sampleVolume2->GetValue(i);
-		//int val_union = (int)((val_sampleVolume1 + val_sampleVolume2)/2);
-	 //   rgarray_VolUnionRG->SetValue(i,val_union);
 	}
 
 	m_VolUnionRG->GetPointData()->SetScalars(rgarray_VolUnionRG);
-
-	//m_VolUnionRG->DeepCopy(vtkRectilinearGrid::SafeDownCast(sampleVolume1->GetOutput()));
     m_VolUnionRG->Update();
 
 	if(!this->m_TestMode)
@@ -402,11 +364,8 @@ void mafOpVolumeUnion::OpDo()
 	if(m_VolUnionRG) {
 		((mafVMEVolume*)m_Input)->GetOutput()->GetVTKData()->SetUpdateExtentToWholeExtent();
 		((mafVMEVolume*)m_Input)->SetData(m_VolUnionRG,((mafVME*)m_Input)->GetTimeStamp());
-		((mafVMEVolume*)m_Input)->GetOutput()->GetVTKData()->SetUpdateExtentToWholeExtent();
 	}
-//	else if(m_OutputRG)
-//		((mafVMEVolume*)m_Input)->SetData(m_OutputRG,((mafVME*)m_Input)->GetTimeStamp());
-//
+
 	((mafVMEVolume*)m_Input)->GetOutput()->Update();
 	((mafVMEVolume*)m_Input)->Update();
 
@@ -417,9 +376,7 @@ void mafOpVolumeUnion::OpUndo()
 {
 	if(m_FirstVMEVolume->GetOutput()->GetVTKData())
 		((mafVMEVolume*)m_Input)->SetData(m_FirstVMEVolume->GetOutput()->GetVTKData(),((mafVME*)m_Input)->GetTimeStamp());
-//	else if(m_InputRG)
-//		((mafVMEVolume*)m_Input)->SetData(m_InputRG,((mafVME*)m_Input)->GetTimeStamp());
-//
+
 	((mafVMEVolume*)m_Input)->GetOutput()->Update();
 	((mafVMEVolume*)m_Input)->Update();
 
@@ -480,7 +437,7 @@ void mafOpVolumeUnion::CreateGui()
 	resolutionXYZ[0] = dimXYZ[0];
 	resolutionXYZ[1] = dimXYZ[1];
 	resolutionXYZ[2] = dimXYZ[2];
-    m_Gui->VectorN(ID_RESOLUTION, _("Resolution"), resolutionXYZ, 3, -1000, 1000);
+    m_Gui->VectorN(ID_RESOLUTION, _("Resolution"), resolutionXYZ, 3, 30, 1000);
 
 	m_Gui->Label("");
 	m_Gui->OkCancel();
@@ -514,6 +471,11 @@ void mafOpVolumeUnion::OnEvent(mafEventBase *maf_event)
 					mafString title = "Choose Union Volume";
 					bool selOK = VmeChoose(title,e);
 					if(selOK) {
+						if ( !(m_SecondVMEVolume->GetOutput()->GetVTKData()->IsA("vtkRectilinearGrid")) )
+						{
+							wxMessageBox("The second input VME has not a VTK RectilinearGrid data!");
+							OpStop(OP_RUN_CANCEL);
+						}
 					    if(m_Input == m_SecondVMEVolume)
 					    {
 					 	     mafMessage(_("Can't operate over the same VME"));
