@@ -124,7 +124,7 @@ void mafOpVolumeUnion::BuildVolumeUnion()
 	{
 		wait = new wxBusyInfo("Build Volume Union: please wait...");
 		mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
-		mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
+		mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE, progress));
 	}
 
 	//Input data(first volume)
@@ -216,15 +216,15 @@ void mafOpVolumeUnion::BuildVolumeUnion()
 
 	if(!this->m_TestMode)
 	{
-		for(int i=1; i<3; i++) 
+		for(int i=1; i<21; i++) 
 		{
 			progress++;
-			for(int jj=0; jj<100000000; jj++) ;	 // I need this do-nothing loop to update slowly the progress bar 
+			Sleep(150); // Workaround: I need this sleep function to update slowly the progress bar 
 			mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
 		}	
 	}
-
-
+	 
+	 
 	//Translation of the coordinates
 	vtkDataArray *daVector_firstvol[3];
 
@@ -249,6 +249,7 @@ void mafOpVolumeUnion::BuildVolumeUnion()
 
 	//----
 
+	
 	// projection of the rgrid_firstvol selected into the rgrid_totvol
 	vtkMAFSmartPointer<vtkProbeFilter> sampleVolume1;
 	sampleVolume1->SetInput(rgrid_totvol);
@@ -256,12 +257,13 @@ void mafOpVolumeUnion::BuildVolumeUnion()
 	sampleVolume1->SetSource(rgrid_firstvol);
 	sampleVolume1->Update();
 
+
 	if(!this->m_TestMode)
 	{
-		for(int i=3; i<51; i++) 
+		for(int i=21; i<61; i++) 
 		{
 			progress++;
-			for(int jj=0; jj<100000000; jj++) ;	    
+			Sleep(150);
 		    mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
 		}
 	}
@@ -300,10 +302,10 @@ void mafOpVolumeUnion::BuildVolumeUnion()
 
 	if(!this->m_TestMode)
 	{
-		for(int i=51; i<99; i++) 
+		for(int i=61; i<99; i++) 
 		{
 			progress++;
-			for(int jj=0; jj<100000000; jj++) ;
+			Sleep(150);
 			mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
 		}
 	}
@@ -339,10 +341,10 @@ void mafOpVolumeUnion::BuildVolumeUnion()
 
 	if(!this->m_TestMode)
 	{
-		for(int i=99; i<100; i++) 
+		for(int i=99; i<101; i++) 
 		{
 			progress++;
-			for(int jj=0; jj<100000000; jj++) ;
+			Sleep(150);
 			mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
 		}
 	}
