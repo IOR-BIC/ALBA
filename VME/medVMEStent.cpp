@@ -353,7 +353,7 @@ void medVMEStent::InternalUpdate()
     int linePointNumber = m_CenterLine->GetNumberOfPoints();
 
     if(m_CenterLine != NULL && linePointNumber>0){
-      m_StentSource->setCenterLineFromPolyData(m_StentCenterLine); 
+      m_StentSource->setCenterLineFromPolyData(m_StentCenterLine);
       //m_ComputedCrownNumber = m_StentSource->computeCrownNumberAfterSetCenterLine();
       //if (m_Crown_Number>m_ComputedCrownNumber)
       //{

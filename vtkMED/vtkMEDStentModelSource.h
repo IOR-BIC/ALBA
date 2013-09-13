@@ -92,12 +92,12 @@ public:
   void setCrownNumber(int value);
   void setLinkNumber(int value);
   void setLinkInterlace(int value);
-  void setCenterLine (std::vector<std::vector<double> >::const_iterator m_CenterLineStart,
-    std::vector<std::vector<double> >::const_iterator centerLindEnd, int pointNumber);
-  void setCenterLineForInphaseShort(std::vector<std::vector<double> >::const_iterator m_CenterLineStart,
-    std::vector<std::vector<double> >::const_iterator centerLindEnd, int pointNumber);
-  void setCenterLineForBardHelical(std::vector<std::vector<double> >::const_iterator m_CenterLineStart,
-    std::vector<std::vector<double> >::const_iterator centerLindEnd);
+  void setCenterLine (std::vector<std::vector<double> >::const_iterator centerLineStart,
+    std::vector<std::vector<double> >::const_iterator centerLineEnd, int pointNumber);
+  void setCenterLineForInphaseShort(std::vector<std::vector<double> >::const_iterator centerLineStart,
+    std::vector<std::vector<double> >::const_iterator centerLineEnd, int pointNumber);
+  void setCenterLineForBardHelical(std::vector<std::vector<double> >::const_iterator centerLineStart,
+    std::vector<std::vector<double> >::const_iterator centerLineEnd);
   /// Set the center line of the stent from the given line.
   void setCenterLineFromPolyData(vtkPolyData *polyData);
   void setTestValue(){};
@@ -204,7 +204,15 @@ private:
 
   //bool crownAdded;
 
+  /// Find sampling point on segment of center line. \n
+  /// Original recursive version (deprecated).
   void calculateSamplingPoint(double *preSamplePoint, double* samplePoint, 
+    double distance, double* left, double* right);
+
+  /// Find sampling point on segment of center line. \n
+  /// Direct calculation. \n
+  /// Returns false if intersection point is outside the line segment.
+  bool calculateSamplingPoint2(double *preSamplePoint, double* samplePoint, 
     double distance, double* left, double* right);
 
   /** used to calculate stent length */
