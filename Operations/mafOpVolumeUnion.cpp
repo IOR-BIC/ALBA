@@ -64,11 +64,19 @@ mafOpVolumeUnion::mafOpVolumeUnion(const wxString &label)
 
 	m_VolUnionRG = NULL;
 
-	resolutionXYZ[0] = 150;
-	resolutionXYZ[1] = 150;
-	resolutionXYZ[2] = 150;
+	m_resolutionXYZ[0] = 150;
+	m_resolutionXYZ[1] = 150;
+	m_resolutionXYZ[2] = 150;
 
-	vme_is_selected = false;
+	m_spacingXYZ[0] = 1.;
+	m_spacingXYZ[1] = 1.;
+	m_spacingXYZ[2] = 1.;
+
+	m_bounds[0] = 0.; m_bounds[1] = 1.;
+	m_bounds[2] = 0.; m_bounds[3] = 1.;
+	m_bounds[4] = 0.; m_bounds[5] = 1.;
+
+	m_vme_is_selected = false;
 
 }
 //----------------------------------------------------------------------------
@@ -129,6 +137,7 @@ void mafOpVolumeUnion::BuildVolumeUnion()
 
 	//Input data(first volume)
 	vtkMAFSmartPointer<vtkRectilinearGrid> rgrid_firstvol;
+	m_FirstVMEVolume->Update();
 	rgrid_firstvol->DeepCopy(vtkRectilinearGrid::SafeDownCast(m_FirstVMEVolume->GetVolumeOutput()->GetVTKData()));
 	rgrid_firstvol->Update();
 
@@ -138,6 +147,7 @@ void mafOpVolumeUnion::BuildVolumeUnion()
 
 	//Input data(second volume)
 	vtkMAFSmartPointer<vtkRectilinearGrid> rgrid_secondvol;
+	m_SecondVMEVolume->Update();
 	rgrid_secondvol->DeepCopy(vtkRectilinearGrid::SafeDownCast(m_SecondVMEVolume->GetVolumeOutput()->GetVTKData()));
 	rgrid_secondvol->Update();
 
@@ -171,24 +181,12 @@ void mafOpVolumeUnion::BuildVolumeUnion()
 		wxMessageBox("The two solids interpenetrate each other!");
 	}
 
-	//computation of the bounds of the total union volume
-	double bounds[6];
-	//lower bounds
-	bounds[0] = ( bounds_firstvol[0] < bounds_secondvol[0] )?bounds_firstvol[0]:bounds_secondvol[0];
-	bounds[2] = ( bounds_firstvol[2] < bounds_secondvol[2] )?bounds_firstvol[2]:bounds_secondvol[2];
-	bounds[4] = ( bounds_firstvol[4] < bounds_secondvol[4] )?bounds_firstvol[4]:bounds_secondvol[4];
-
-	//upper bounds
-	bounds[1] = ( bounds_firstvol[1] > bounds_secondvol[1] )?bounds_firstvol[1]:bounds_secondvol[1];
-	bounds[3] = ( bounds_firstvol[3] > bounds_secondvol[3] )?bounds_firstvol[3]:bounds_secondvol[3];
-	bounds[5] = ( bounds_firstvol[5] > bounds_secondvol[5] )?bounds_firstvol[5]:bounds_secondvol[5];
-
 	//Input data for the probe filter operation
 	vtkMAFSmartPointer<vtkRectilinearGrid> rgrid_totvol;
 	int resolution[3];
-	resolution[0] = (int)(resolutionXYZ[0]);
-	resolution[1] = (int)(resolutionXYZ[1]);
-	resolution[2] = (int)(resolutionXYZ[2]);
+	resolution[0] = (int)(m_resolutionXYZ[0]);
+	resolution[1] = (int)(m_resolutionXYZ[1]);
+	resolution[2] = (int)(m_resolutionXYZ[2]);
 
 	rgrid_totvol->SetDimensions(resolution[0],resolution[1],resolution[2]);
 	
@@ -202,8 +200,7 @@ void mafOpVolumeUnion::BuildVolumeUnion()
 	{
 		for (int valueId = 0; valueId<resolution[arrayId]; valueId++)
 		{
-			double spacing = (bounds[2*arrayId+1] - bounds[2*arrayId])/((double)(resolution[arrayId]-1));
-			double Val = bounds[2*arrayId] + spacing*((double)(valueId));
+			double Val = m_bounds[2*arrayId] + m_spacingXYZ[arrayId]*((double)(valueId));
 			daVector[arrayId]->SetValue(valueId, Val);
 		}
 	}
@@ -392,7 +389,8 @@ enum VOLUME_UNION_WIDGET_ID
 {
   ID_RESOLUTION,
   ID_HELP,
-  ID_VOL_SELECT
+  ID_VOL_SELECT,
+  ID_SPACING
 };
 
 //----------------------------------------------------------------------------
@@ -412,6 +410,16 @@ bool mafOpVolumeUnion::VmeChoose(mafString title,mafEvent *e)
 	}
 }
 
+//----------------------------------------------------------------------------
+void mafOpVolumeUnion::UpdateGUI() {
+
+	m_spacingXYZ[0] = (fabs(m_bounds[1] - m_bounds[0]))/(m_resolutionXYZ[0]-1.);
+	m_spacingXYZ[1] = (fabs(m_bounds[3] - m_bounds[2]))/(m_resolutionXYZ[1]-1.);
+	m_spacingXYZ[2] = (fabs(m_bounds[5] - m_bounds[4]))/(m_resolutionXYZ[2]-1.);
+
+	m_Gui->Update();
+}
+//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 void mafOpVolumeUnion::CreateGui() 
@@ -436,10 +444,19 @@ void mafOpVolumeUnion::CreateGui()
 
 	int dimXYZ[3];
 	m_FirstVMEVolume->GetVolumeOutput()->GetRectilinearData()->GetDimensions(dimXYZ);
-	resolutionXYZ[0] = dimXYZ[0];
-	resolutionXYZ[1] = dimXYZ[1];
-	resolutionXYZ[2] = dimXYZ[2];
-    m_Gui->VectorN(ID_RESOLUTION, _("Resolution"), resolutionXYZ, 3, 30, 1000);
+	m_resolutionXYZ[0] = dimXYZ[0];
+	m_resolutionXYZ[1] = dimXYZ[1];
+	m_resolutionXYZ[2] = dimXYZ[2];
+	m_Gui->VectorN(ID_RESOLUTION, _("Resolution"), m_resolutionXYZ, 3, 30, 1000);
+
+	m_Gui->Label("");
+
+    m_FirstVMEVolume->GetVolumeOutput()->GetRectilinearData()->GetBounds(m_bounds);
+	m_spacingXYZ[0] = (fabs(m_bounds[1] - m_bounds[0]))/(m_resolutionXYZ[0]-1.);
+	m_spacingXYZ[1] = (fabs(m_bounds[3] - m_bounds[2]))/(m_resolutionXYZ[1]-1.);
+	m_spacingXYZ[2] = (fabs(m_bounds[5] - m_bounds[4]))/(m_resolutionXYZ[2]-1.);
+    m_Gui->VectorN(ID_SPACING, _("Spacing"), m_spacingXYZ, 3, 1.e-08, 10000,4,"The spacing is computed as the ratio between the length side and the resolution");
+	m_Gui->Enable(ID_SPACING,false);
 
 	m_Gui->Label("");
 	m_Gui->OkCancel();
@@ -457,7 +474,6 @@ void mafOpVolumeUnion::OnEvent(mafEventBase *maf_event)
 	{
 		switch(e->GetId())
 		{
-
 			case ID_HELP:
 			{
 				mafEvent helpEvent;
@@ -466,6 +482,11 @@ void mafOpVolumeUnion::OnEvent(mafEventBase *maf_event)
 				helpEvent.SetString(&operationLabel);
 				helpEvent.SetId(OPEN_HELP_PAGE);
 				mafEventMacro(helpEvent);
+			}
+			break;
+			case ID_RESOLUTION:
+			{
+				UpdateGUI();
 			}
 			break;
 			case ID_VOL_SELECT:
@@ -483,26 +504,53 @@ void mafOpVolumeUnion::OnEvent(mafEventBase *maf_event)
 					 	     mafMessage(_("Can't operate over the same VME"));
 						     return;
 					    }
-					    vme_is_selected = true;
+					    m_vme_is_selected = true;
+
 					    int dimXYZ_firstvolume[3];
+						m_FirstVMEVolume->Update();
+						m_FirstVMEVolume->GetVolumeOutput()->Update();
+						m_FirstVMEVolume->GetVolumeOutput()->GetRectilinearData()->UpdateData();
 					    m_FirstVMEVolume->GetVolumeOutput()->GetRectilinearData()->GetDimensions(dimXYZ_firstvolume);
 					    int dimXYZ_secondvolume[3];
+						m_SecondVMEVolume->Update();
+						m_SecondVMEVolume->GetVolumeOutput()->Update();
+						m_SecondVMEVolume->GetVolumeOutput()->GetRectilinearData()->UpdateData();
 					    m_SecondVMEVolume->GetVolumeOutput()->GetRectilinearData()->GetDimensions(dimXYZ_secondvolume);
 
-					    resolutionXYZ[0] = std::max(dimXYZ_firstvolume[0],dimXYZ_secondvolume[0]);
-					    resolutionXYZ[1] = std::max(dimXYZ_firstvolume[1],dimXYZ_secondvolume[1]);
-					    resolutionXYZ[2] = std::max(dimXYZ_firstvolume[2],dimXYZ_secondvolume[2]);
+					    m_resolutionXYZ[0] = std::max(dimXYZ_firstvolume[0],dimXYZ_secondvolume[0]);
+					    m_resolutionXYZ[1] = std::max(dimXYZ_firstvolume[1],dimXYZ_secondvolume[1]);
+					    m_resolutionXYZ[2] = std::max(dimXYZ_firstvolume[2],dimXYZ_secondvolume[2]);
+
+						double bounds_firstvol[6];
+						m_FirstVMEVolume->GetVolumeOutput()->GetBounds(bounds_firstvol);
+						double bounds_secondvol[6];
+						m_SecondVMEVolume->GetVolumeOutput()->GetBounds(bounds_secondvol);
+
+						//computation of the bounds of the total union volume
+						//lower bounds
+						m_bounds[0] = ( bounds_firstvol[0] < bounds_secondvol[0] )?bounds_firstvol[0]:bounds_secondvol[0];
+						m_bounds[2] = ( bounds_firstvol[2] < bounds_secondvol[2] )?bounds_firstvol[2]:bounds_secondvol[2];
+						m_bounds[4] = ( bounds_firstvol[4] < bounds_secondvol[4] )?bounds_firstvol[4]:bounds_secondvol[4];
+
+						//upper bounds
+						m_bounds[1] = ( bounds_firstvol[1] > bounds_secondvol[1] )?bounds_firstvol[1]:bounds_secondvol[1];
+						m_bounds[3] = ( bounds_firstvol[3] > bounds_secondvol[3] )?bounds_firstvol[3]:bounds_secondvol[3];
+						m_bounds[5] = ( bounds_firstvol[5] > bounds_secondvol[5] )?bounds_firstvol[5]:bounds_secondvol[5];
+
+						m_spacingXYZ[0] = (fabs(m_bounds[1] - m_bounds[0]))/(m_resolutionXYZ[0]-1.);
+						m_spacingXYZ[1] = (fabs(m_bounds[3] - m_bounds[2]))/(m_resolutionXYZ[1]-1.);
+						m_spacingXYZ[2] = (fabs(m_bounds[5] - m_bounds[4]))/(m_resolutionXYZ[2]-1.);
 
 					    m_Gui->Update();
 				    }
 					else {
-						vme_is_selected = false;
+						m_vme_is_selected = false;
 						break;
 					}
 				}
 				break;
 			case wxOK:
-				    if(!vme_is_selected) {
+				    if(!m_vme_is_selected) {
 						wxMessageBox("Please select the second volume for the volume union operation!");
 						break;
 					}

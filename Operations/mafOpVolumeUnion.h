@@ -73,10 +73,14 @@ public:
 
   void BuildVolumeUnion();
 
+  void UpdateGUI();
+
   bool VmeChoose(mafString title,mafEvent *e);
   
-  double resolutionXYZ[3];
-  bool vme_is_selected;
+  double m_bounds[6];
+  double m_resolutionXYZ[3];
+  double m_spacingXYZ[3];
+  bool m_vme_is_selected;
 
   vtkRectilinearGrid *m_VolUnionRG; ///< Pointer for Rectilinear Grid volume union
   mafVMEVolume *m_FirstVMEVolume;
