@@ -93,9 +93,9 @@ public:
   /// Set the vessel surface
   void SetVesselSurface(vtkPolyData *surface);
 
-  void SetStentCompanyName(wxString *CompanyName) {m_CompanyName = CompanyName;}
-  void SetStentModelName(wxString *ModelName) {m_ModelName = ModelName;}
-  void SetStentMaterial(wxString *Material) {m_Material = Material;}
+  void SetStentCompanyName(wxString CompanyName) {m_CompanyName = CompanyName;}
+  void SetStentModelName(wxString ModelName) {m_ModelName = ModelName;}
+  void SetStentMaterial(wxString Material) {m_Material = Material;}
   void SetStentDeliverySystem(double delsys) {m_DeliverySystem = delsys;}
   void SetStentDiameter(double d) {m_Stent_Diameter = d;}
   void SetStentDLength(double length) {m_Stent_Length = length; } 
@@ -116,9 +116,9 @@ public:
   /// calculate strut length, given strut angle and crown length.
   void CalcStrutLength() ; 
 
-  wxString* GetStentCompanyName() const {return m_CompanyName;};
-  wxString* GetStentModelName() const {return m_ModelName;};
-  wxString* GetStentMaterial() const {return m_Material;};
+  wxString GetStentCompanyName() const {return m_CompanyName;};
+  wxString GetStentModelName() const {return m_ModelName;};
+  wxString GetStentMaterial() const {return m_Material;};
   double GetStentDeliverySystem() const {return m_DeliverySystem;};
   double GetStentRadius() const {return m_Stent_Diameter/2.0;}
   double GetStentDiameter() const {return m_Stent_Diameter;}
@@ -248,9 +248,9 @@ private:
   bool IsSimplexMeshModified() ;
 
   // basic stent parameters */
-  wxString *m_CompanyName;
-  wxString *m_ModelName;
-  wxString *m_Material;
+  wxString m_CompanyName;
+  wxString m_ModelName;
+  wxString m_Material;
   double m_DeliverySystem;
   
   double m_Stent_Diameter;
