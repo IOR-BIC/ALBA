@@ -202,7 +202,8 @@ namespace itk
     m_KDTree = kd_create(3);
     for(vtkIdType i=0;i<num;i++){
       points->GetPoint(i,p);
-      assert(kd_insert3(m_KDTree,p[0],p[1],p[2],0)==0);
+      bool ok = (kd_insert3(m_KDTree,p[0],p[1],p[2],0)==0) ;
+      assert(ok);
     }
   }
 
@@ -332,15 +333,9 @@ namespace itk
     for (i = 0 ;  i < 5000 ;  i++)
       constrained[i] = 0 ;
 
-    ofstream thing ;
-    thing.open("thing.txt", thing.out) ;
-
     std::vector<int>::const_iterator centerIdx = m_CenterLocationIdx ;
     GeometryMapType::Iterator dataIt ;
     for (dataIt = m_Data->Begin(), centerIdx = m_CenterLocationIdx, i = 0 ;  dataIt != m_Data->End() ;  dataIt++, centerIdx++, i++){
-      thing << i << " " ;
-      if (i % 10 == 9)
-        thing << "\n" ;
       data = dataIt.Value();
 
       // Create table showing whether vertices are constrained by catheter
@@ -354,8 +349,6 @@ namespace itk
         }
       }      
     }
-
-    thing.close() ;
 
     //--------------------------------------------------------------------------
     // Loop for every simplex vertex
