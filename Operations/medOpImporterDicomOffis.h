@@ -162,6 +162,7 @@ protected:
 		ID_VOLUME_SIDE,
 		ID_VME_TYPE,
 		ID_SORT_AXIS,
+		ID_SHOW_SP,
 		ID_RS_SELECT,
 		ID_RS_SWAP,
 		ID_RS_SWAPALL,
@@ -330,6 +331,8 @@ protected:
 	mafString m_PatientPosition;
 	mafString m_VolumeName;
 
+	int m_Showspacing;
+
 	int				m_BuildStepValue;
 	int				m_DicomReaderModality; ///<Type DICOM Read from file
 	long		  m_HighBit; ///<High bit DICOM Read from file
@@ -346,8 +349,6 @@ protected:
 	std::vector<mafString> m_SelectedSeriesID; ///< Selected StudyUID-SeriesUIDWithPlanesNumber-SeriesUIDWithoutPlanesNumber vector
 
 	std::map<std::vector<mafString>,medDicomSeriesSliceList*> m_SeriesIDToSlicesListMap; ///< StudyUID-SeriesUIDWithPlanesNumber-SeriesUIDWithoutPlanesNumber vector to slices list map 
-
-	std::map<std::vector<mafString>,bool> m_SeriesIDToNonUniformSpacing;
 
 	std::map<std::vector<mafString>,int> m_SeriesIDstringToSeriesIDint;
 
