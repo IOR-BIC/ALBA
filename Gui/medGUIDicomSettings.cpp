@@ -36,7 +36,11 @@ mafGUISettings(Listener, label)
 {
 	// m_Dictionary = "";
 
-  m_CheckNameCompositor[ID_PATIENT_NAME] = m_CheckNameCompositor[ID_BIRTHDATE] = m_CheckNameCompositor[ID_NUM_SLICES] = m_CheckNameCompositor[ID_DESCRIPTION] = m_CheckNameCompositor[ID_SERIES] = TRUE;
+  m_CheckNameCompositor[ID_PATIENT_NAME] = TRUE;
+  m_CheckNameCompositor[ID_BIRTHDATE] = FALSE;
+  m_CheckNameCompositor[ID_NUM_SLICES] = TRUE;
+  m_CheckNameCompositor[ID_DESCRIPTION] = TRUE; 
+  m_CheckNameCompositor[ID_SERIES] = TRUE;
 
 	m_CheckOnOff[0] = m_CheckOnOff[1] = m_CheckOnOff[2] = m_CheckOnOff[3] = m_CheckOnOff[4] = m_CheckOnOff[5] = m_CheckOnOff[6] = TRUE;
 
@@ -134,12 +138,11 @@ void medGUIDicomSettings::CreateGui()
   wxString outputNameTypeChoices[3] = {_("Traditional format"),_("Format : 'description_date'"),_("Custom")};
   m_Gui->Radio(ID_OUTPUT_NAME,_("Output name"),&m_OutputNameType,3,outputNameTypeChoices);
   m_NameCompositorList = m_Gui->CheckList(ID_NAME_COMPOSITOR,"");
-   m_NameCompositorList->AddItem(ID_NUM_SLICES,_("Series"),m_CheckNameCompositor[ID_SERIES]);
-  m_NameCompositorList->AddItem(ID_PATIENT_NAME,_("Patient Name"),m_CheckNameCompositor[ID_PATIENT_NAME]);
+ // m_NameCompositorList->AddItem(ID_SERIES,_("Series"),m_CheckNameCompositor[ID_SERIES]);
   m_NameCompositorList->AddItem(ID_DESCRIPTION,_("Description"),m_CheckNameCompositor[ID_DESCRIPTION]);
+  m_NameCompositorList->AddItem(ID_PATIENT_NAME,_("Patient Name"),m_CheckNameCompositor[ID_PATIENT_NAME]);
   m_NameCompositorList->AddItem(ID_BIRTHDATE,_("Birthdate"),m_CheckNameCompositor[ID_BIRTHDATE]);
   m_NameCompositorList->AddItem(ID_NUM_SLICES,_("Num. Slices"),m_CheckNameCompositor[ID_NUM_SLICES]);
-
   m_NameCompositorList->Enable(m_OutputNameType == CUSTOM);
 
   m_Gui->Divider(1);
@@ -230,13 +233,13 @@ void medGUIDicomSettings::OnEvent(mafEventBase *maf_event)
       m_CheckNameCompositor[ID_DESCRIPTION] = m_NameCompositorList->IsItemChecked(ID_DESCRIPTION);
       m_CheckNameCompositor[ID_BIRTHDATE] = m_NameCompositorList->IsItemChecked(ID_BIRTHDATE);
       m_CheckNameCompositor[ID_NUM_SLICES] = m_NameCompositorList->IsItemChecked(ID_NUM_SLICES);
-      m_CheckNameCompositor[ID_SERIES] = m_NameCompositorList->IsItemChecked(ID_SERIES);
+  //    m_CheckNameCompositor[ID_SERIES] = m_NameCompositorList->IsItemChecked(ID_SERIES);
 
       m_Config->Write("NameCompositorPatientName",m_NameCompositorList->IsItemChecked(ID_PATIENT_NAME));
       m_Config->Write("NameCompositorDescription",m_NameCompositorList->IsItemChecked(ID_DESCRIPTION));
       m_Config->Write("NameCompositorBirthdate",m_NameCompositorList->IsItemChecked(ID_BIRTHDATE));
       m_Config->Write("NameCompositorNumSlices",m_NameCompositorList->IsItemChecked(ID_NUM_SLICES));
-      m_Config->Write("NameCompositorSeries",m_NameCompositorList->IsItemChecked(ID_SERIES));
+  //    m_Config->Write("NameCompositorSeries",m_NameCompositorList->IsItemChecked(ID_SERIES));
     }
     break;
 	case ID_AUTO_POS_CROP:
@@ -671,14 +674,14 @@ void medGUIDicomSettings::InitializeSettings()
     m_Config->Write("NameCompositorNumSlices",m_CheckNameCompositor[ID_NUM_SLICES]);
   }
 
-  if(m_Config->Read("NameCompositorSeries", &long_item))
-  {
-    m_CheckNameCompositor[ID_SERIES] = long_item;
-  }
-  else
-  {
-    m_Config->Write("NameCompositorSeries",m_CheckNameCompositor[ID_SERIES]);
-  }
+  //if(m_Config->Read("NameCompositorSeries", &long_item))
+  //{
+  //  m_CheckNameCompositor[ID_SERIES] = long_item;
+  //}
+  //else
+  //{
+  //  m_Config->Write("NameCompositorSeries",m_CheckNameCompositor[ID_SERIES]);
+  //}
 	m_Config->Flush();
 }
 //----------------------------------------------------------------------------
@@ -847,7 +850,7 @@ void medGUIDicomSettings::SetLastDicomDir( wxString lastDicomDir )
 
 int medGUIDicomSettings::GetEnabledCustomName( int type )
 {
-  if (type >= ID_PATIENT_NAME && type<=ID_NUM_SLICES)
+  if (type >= ID_DESCRIPTION && type<=ID_NUM_SLICES)
   {
     return m_CheckNameCompositor[type];
   }

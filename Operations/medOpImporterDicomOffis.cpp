@@ -3035,10 +3035,10 @@ void medOpImporterDicomOffis::Crop()
 	}
 	else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::CUSTOM)
 	{
-		bool separator = false;
+		//bool separator = false;
 		m_VolumeName = "";
-		if (((medGUIDicomSettings*)GetSetting())->GetEnabledCustomName(medGUIDicomSettings::ID_SERIES))
-		{
+		//if (((medGUIDicomSettings*)GetSetting())->GetEnabledCustomName(medGUIDicomSettings::ID_SERIES))
+		//{
 			//---------------------------------------------------------------
 			long item = -1;
 			long myitem = 0;
@@ -3056,44 +3056,44 @@ void medOpImporterDicomOffis::Crop()
 
 			//      wxString  seriesName = m_SeriesListbox->GetString(m_SeriesListbox->GetSelection());
 			m_VolumeName = seriesName;
-			separator = true;
-		}
-		if (((medGUIDicomSettings*)GetSetting())->GetEnabledCustomName(medGUIDicomSettings::ID_PATIENT_NAME))
-		{
-			if (separator)
-			{
-				m_VolumeName << "_";
-			}
-			m_VolumeName << m_SelectedSeriesSlicesList->Item(0)->GetData()->GetPatientName();
-			separator = true;
-		}
-		if (((medGUIDicomSettings*)GetSetting())->GetEnabledCustomName(medGUIDicomSettings::ID_DESCRIPTION))
-		{
-			if (separator)
-			{
-				m_VolumeName << "_";
-			}
-			m_VolumeName << m_SelectedSeriesSlicesList->Item(0)->GetData()->GetDescription();
-			separator = true;
-		}
-		if (((medGUIDicomSettings*)GetSetting())->GetEnabledCustomName(medGUIDicomSettings::ID_BIRTHDATE))
-		{
-			if (separator)
-			{
-				m_VolumeName << "_";
-			}
-			m_VolumeName << m_SelectedSeriesSlicesList->Item(0)->GetData()->GetPatientBirthday();
-			separator = true;
-		}
+		//	separator = true;
+		//}
+		//if (((medGUIDicomSettings*)GetSetting())->GetEnabledCustomName(medGUIDicomSettings::ID_PATIENT_NAME))
+		//{
+		//	if (separator)
+		//	{
+		//		m_VolumeName << "_";
+		//	}
+		//	m_VolumeName << m_SelectedSeriesSlicesList->Item(0)->GetData()->GetPatientName();
+		//	separator = true;
+		//}
+		//if (((medGUIDicomSettings*)GetSetting())->GetEnabledCustomName(medGUIDicomSettings::ID_DESCRIPTION))
+		//{
+		//	if (separator)
+		//	{
+		//		m_VolumeName << "_";
+		//	}
+		//	m_VolumeName << m_SelectedSeriesSlicesList->Item(0)->GetData()->GetDescription();
+		//	separator = true;
+		//}
+		//if (((medGUIDicomSettings*)GetSetting())->GetEnabledCustomName(medGUIDicomSettings::ID_BIRTHDATE))
+		//{
+		//	if (separator)
+		//	{
+		//		m_VolumeName << "_";
+		//	}
+		//	m_VolumeName << m_SelectedSeriesSlicesList->Item(0)->GetData()->GetPatientBirthday();
+		//	separator = true;
+		//}
 		if (((medGUIDicomSettings*)GetSetting())->GetEnabledCustomName(medGUIDicomSettings::ID_NUM_SLICES))
 		{
-			if (separator)
-			{
-				m_VolumeName << "_";
-			}
+//			if (separator)
+//			{
+//				m_VolumeName << "_";
+//			}
 			/*wxString  seriesName = m_SeriesListbox->GetString(m_SeriesListbox->GetSelection());*/
 			m_VolumeName.Append(wxString::Format("_%ix%ix%i", (int)pixelDimX, (int)pixelDimY, cropInterval));
-			separator = true;
+		//	separator = true;
 		}
 	}
 }
@@ -3342,7 +3342,7 @@ void medOpImporterDicomOffis::FillSeriesListBox()
 					numberOfImages = m_SelectedSeriesSlicesList->GetCount();
 
 
-				mafString seriesName;
+				mafString seriesName = "";
 
 				if(((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::TRADITIONAL)
 				{
@@ -3355,8 +3355,52 @@ void medOpImporterDicomOffis::FillSeriesListBox()
 				}
 				else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::CUSTOM)
 				{
-					seriesName = m_SelectedSeriesID.at(2);
-					seriesName.Append(wxString::Format("x%i", numberOfImages));
+					bool separator = false;
+					seriesName << m_SelectedSeriesID.at(2);
+					seriesName << "x_";
+					//if (((medGUIDicomSettings*)GetSetting())->GetEnabledCustomName(medGUIDicomSettings::ID_SERIES))
+					//{
+					//    seriesName << m_SelectedSeriesID.at(2);
+					//    seriesName.Append(wxString::Format("x%i", numberOfImages));
+					//	separator = true;
+					//}
+					if (((medGUIDicomSettings*)GetSetting())->GetEnabledCustomName(medGUIDicomSettings::ID_DESCRIPTION))
+					{
+						if (separator)
+						{
+							seriesName << "_";
+						}
+						seriesName << m_SelectedSeriesSlicesList->Item(0)->GetData()->GetDescription();
+						separator = true;
+					}
+					if (((medGUIDicomSettings*)GetSetting())->GetEnabledCustomName(medGUIDicomSettings::ID_PATIENT_NAME))
+					{
+						if (separator)
+						{
+							seriesName << "_";
+						}
+						seriesName << m_SelectedSeriesSlicesList->Item(0)->GetData()->GetPatientName();
+						separator = true;
+					}
+					if (((medGUIDicomSettings*)GetSetting())->GetEnabledCustomName(medGUIDicomSettings::ID_BIRTHDATE))
+					{
+						if (separator)
+						{
+							seriesName << "_";
+						}
+						seriesName << m_SelectedSeriesSlicesList->Item(0)->GetData()->GetPatientBirthday();
+						separator = true;
+					}
+					//if (((medGUIDicomSettings*)GetSetting())->GetEnabledCustomName(medGUIDicomSettings::ID_NUM_SLICES))
+					//{
+					//  //  if (separator)
+					////	{
+					//		seriesName << "_";
+					////	}
+					////	///*wxString  seriesName = m_SeriesListbox->GetString(m_SeriesListbox->GetSelection());*/
+					//	seriesName.Append(wxString::Format("_%ix%ix%i", (int)pixelDimX, (int)pixelDimY, numberOfImages));
+					//	//separator = true;
+					//}
 				}
 
 				//      m_SeriesListbox->Append(seriesName.GetCStr());
@@ -4275,7 +4319,9 @@ bool medOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 						}
 						else
 						{
-							seriesName.Append(wxString::Format("%i_%ix%i",seriesCounter, dcmRows, dcmColumns));
+							//seriesName.Append(wxString::Format("%i_%ix%i",seriesCounter, dcmRows, dcmColumns));
+							seriesName.Append(wxString::Format("%i",seriesCounter));
+							//seriesName.Append(description);
 						}
 					}
 					else
@@ -4498,7 +4544,9 @@ bool medOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 					}
 					else//CUSTOM
 					{
-						seriesName.Append(wxString::Format("%i_%ix%i",seriesCounter, dcmRows, dcmColumns));
+						//seriesName.Append(wxString::Format("%i_%ix%i",seriesCounter, dcmRows, dcmColumns));
+						//seriesName.Append(description);
+						seriesName.Append(wxString::Format("%i",seriesCounter));
 					}
 
 					seriesId.push_back(seriesName);
@@ -5430,7 +5478,7 @@ void medOpImporterDicomOffis::OnSeriesSelect()
 	}
 	else
 	{
-		tmp = seriesName.SubString(0, seriesName.find_last_of("x")-1);
+		tmp = seriesName.SubString(0, seriesName.find_first_of("x")-1);
 	}
 	m_SelectedSeriesID.at(2) = tmp;
 

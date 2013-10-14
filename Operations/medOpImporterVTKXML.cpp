@@ -115,7 +115,12 @@ mafOp* medOpImporterVTKXML::Copy()
 void medOpImporterVTKXML::OpRun()   
 //----------------------------------------------------------------------------
 {
-  mafString wildc = "vtk xml Data (*.vtp)|*.vtp";
+  mafString wildc = "vtk xml ImageData (*.vti)|*.vti ";
+  wildc += "|vtk xml PolyData (*.vtp)|*.vtp";
+  wildc += "|vtk xml StructuredGrid (*.vts)|*.vts";
+  wildc += "|vtk xml RectilinearGrid (*.vtr)|*.vtr";
+  wildc += "|vtk xml UnstructuredGrid (*.vtu)|*.vtu";
+
   mafString f;
   if (m_File.IsEmpty())
   {
