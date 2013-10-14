@@ -127,11 +127,12 @@ public:
 
   enum NAME_COMPOSITOR
   {
-    ID_SERIES = 0,
+//    ID_SERIES = 0,
+	ID_DESCRIPTION = 0,
     ID_PATIENT_NAME,
-    ID_DESCRIPTION,
     ID_BIRTHDATE,
     ID_NUM_SLICES,
+	ID_SERIES
   };
 
 	/** Answer to the messages coming from interface. */
