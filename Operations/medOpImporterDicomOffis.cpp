@@ -2675,7 +2675,10 @@ void medOpImporterDicomOffis::ReadDicom()
         m_Showspacing = 0;
 	}
 
-	GuiUpdate();
+	if (!this->m_TestMode)
+	{
+	    GuiUpdate();
+	}
 
 
 	m_NumberOfTimeFrames = ((medDicomSlice *)m_SelectedSeriesSlicesList->\
