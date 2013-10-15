@@ -135,7 +135,7 @@ void medGUIDicomSettings::CreateGui()
 	m_Gui->Divider(1);
 
 
-  wxString outputNameTypeChoices[3] = {_("Traditional format"),_("Format : 'description_date'"),_("Custom")};
+  wxString outputNameTypeChoices[3] = {_("Traditional format"),_("Format : 'description_numslices'"),_("Custom")};
   m_Gui->Radio(ID_OUTPUT_NAME,_("Output name"),&m_OutputNameType,3,outputNameTypeChoices);
   m_NameCompositorList = m_Gui->CheckList(ID_NAME_COMPOSITOR,"");
  // m_NameCompositorList->AddItem(ID_SERIES,_("Series"),m_CheckNameCompositor[ID_SERIES]);

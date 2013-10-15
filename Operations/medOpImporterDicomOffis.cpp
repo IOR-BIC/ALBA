@@ -1335,6 +1335,7 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
 			}
 		}
 		rg_out->Modified();
+		delete guiAdv;
 	}
 	m_Volume->SetDataByDetaching(rg_out,0);
 
@@ -2333,7 +2334,8 @@ void medOpImporterDicomOffis::CreateBuildPage()
 	{
 		m_BuildGuiUnderLeft->String(ID_VOLUME_NAME," VME name",&m_VolumeName);
 	}
-	else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::DESCRIPTION_DATE)
+//	else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::DESCRIPTION_DATE)
+	else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::DESCRIPTION_NUMSLICES)
 	{
 		/*m_VolumeName = m_SelectedSeriesSlicesList->Item(0)->GetData()->GetDescription();
 		m_VolumeName << "_";
@@ -3030,11 +3032,13 @@ void medOpImporterDicomOffis::Crop()
 		m_VolumeName = seriesName.Mid(0,seriesName.find_last_of('_'));
 		m_VolumeName.Append(wxString::Format("_%ix%ix%i", (int)pixelDimX, (int)pixelDimY, cropInterval));
 	}
-	else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::DESCRIPTION_DATE)
+	//else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::DESCRIPTION_DATE)
+	else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::DESCRIPTION_NUMSLICES)
 	{
 		m_VolumeName = m_SelectedSeriesSlicesList->Item(0)->GetData()->GetDescription();
-		m_VolumeName << "_";
-		m_VolumeName << m_SelectedSeriesSlicesList->Item(0)->GetData()->GetDate();
+		/*m_VolumeName << "_";
+		m_VolumeName << m_SelectedSeriesSlicesList->Item(0)->GetData()->GetDate();*/
+		m_VolumeName.Append(wxString::Format("_%ix%ix%i", (int)pixelDimX, (int)pixelDimY, cropInterval));
 	}
 	else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::CUSTOM)
 	{
@@ -3352,9 +3356,11 @@ void medOpImporterDicomOffis::FillSeriesListBox()
 					seriesName = m_SelectedSeriesID.at(2);
 					seriesName.Append(wxString::Format("x%i", numberOfImages));
 				}
-				else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::DESCRIPTION_DATE)
+				//else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::DESCRIPTION_DATE)
+				else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::DESCRIPTION_NUMSLICES)
 				{
 					seriesName = m_SelectedSeriesID.at(2);
+					seriesName.Append(wxString::Format("x%i", numberOfImages));
 				}
 				else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::CUSTOM)
 				{
@@ -4315,9 +4321,11 @@ bool medOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 						{
 							seriesName.Append(wxString::Format("%i_%ix%i",seriesCounter, dcmRows, dcmColumns));
 						}
-						else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::DESCRIPTION_DATE)
+					//	else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::DESCRIPTION_DATE)
+						else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::DESCRIPTION_NUMSLICES)
 						{
-							seriesName = (wxString::Format("%s_%s_%d",description,date,seriesIndex));
+							//seriesName = (wxString::Format("%s_%s_%d",description,date,seriesIndex));
+							seriesName = (wxString::Format("%s_%ix%i",description,dcmRows,dcmColumns));
 							seriesIndex++;
 						}
 						else
@@ -4540,9 +4548,11 @@ bool medOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 					{
 						seriesName.Append(wxString::Format("%i_%ix%i",seriesCounter, dcmRows, dcmColumns));
 					}
-					else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::DESCRIPTION_DATE)
+					//else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::DESCRIPTION_DATE)
+					else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::DESCRIPTION_NUMSLICES)
 					{
-						seriesName = (wxString::Format("%s_%s_%d",description,date,seriesIndex));
+						//seriesName = (wxString::Format("%s_%s_%d",description,date,seriesIndex));
+						seriesName = (wxString::Format("%s_%ix%i",description,dcmRows,dcmColumns));
 						seriesIndex++;
 					}
 					else//CUSTOM
@@ -5475,9 +5485,11 @@ void medOpImporterDicomOffis::OnSeriesSelect()
 	{
 		tmp = seriesName.SubString(0, seriesName.find_last_of("x")-1);
 	}
-	else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::DESCRIPTION_DATE)
+	//else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::DESCRIPTION_DATE)
+	else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::DESCRIPTION_NUMSLICES)
 	{
-		tmp = seriesName;
+		//tmp = seriesName;
+		tmp = seriesName.SubString(0, seriesName.find_last_of("x")-1);
 	}
 	else
 	{
