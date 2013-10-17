@@ -64,6 +64,9 @@ SET(PROJECT_SRCS
   
   medWizardBlockTypeCheck.cpp
   medWizardBlockTypeCheck.h
+
+  medWizardBlockFileExistCheck.cpp
+  medWizardBlockFileExistCheck.h
   
   medWizardBlockVMESelection.cpp
   medWizardBlockVMESelection.h
