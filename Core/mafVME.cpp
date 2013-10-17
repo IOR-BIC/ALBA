@@ -195,10 +195,12 @@ int mafVME::SetParent(mafNode *parent)
 }
 
 //-------------------------------------------------------------------------
-void mafVME::SetTimeStamp(mafTimeStamp t)
+//Set the time for this VME (not for the whole tree) without notifying listeners. 
+//This method is called by SetTimeStamp method (that also notifies listeners).
+/*virtual*/ void mafVME::InternalSetTimeStamp(mafTimeStamp t)
 //-------------------------------------------------------------------------
 {
-  if (t<0)
+	 if (t<0)
     t=0;
 
   m_CurrentTime = t;
@@ -217,6 +219,13 @@ void mafVME::SetTimeStamp(mafTimeStamp t)
     m_AbsMatrixPipe->SetTimeStamp(t);
 
   Modified();
+}
+
+//-------------------------------------------------------------------------
+void mafVME::SetTimeStamp(mafTimeStamp t)
+//-------------------------------------------------------------------------
+{
+	InternalSetTimeStamp(t);
 
   // TODO: consider if to add a flag to disable event issuing
   GetEventSource()->InvokeEvent(this,VME_TIME_SET);
@@ -233,8 +242,12 @@ mafTimeStamp mafVME::GetTimeStamp()
 void mafVME::SetTreeTime(mafTimeStamp t)
 //-------------------------------------------------------------------------
 {
-  SetTimeStamp(t);
-  ForwardDownEvent(&mafEventBase(this,VME_TIME_SET,&t));
+	//BES: 26.11.2012 - avoid calling SetTimeStamp because it notifies our listeners
+	//before all VMEs are correctly set, which would cause time inconsistency between VMEs
+  this->OnEvent(&mafEventBase(this,VME_TIME_SET,&t, MCH_DOWN));
+
+	//now all VMEs have consistent times, so notify our listeners
+	this->OnEvent(&mafEventBase(this,VME_TIME_SET, NULL, MCH_DOWN));
 }
 
 //-------------------------------------------------------------------------
@@ -780,15 +793,23 @@ void mafVME::OnEvent(mafEventBase *maf_event)
   }
   else if (maf_event->GetChannel()==MCH_DOWN)
   {
-    switch (maf_event->GetId())
-    {
-      case VME_TIME_SET:
-        SetTimeStamp(*((mafTimeStamp *)maf_event->GetData()));
-        Superclass::OnEvent(maf_event);
-      break;
-			default:
-				Superclass::OnEvent(maf_event);
-    }
+		switch (maf_event->GetId())
+		{
+		case VME_TIME_SET:
+			{
+				mafTimeStamp* pTS = ((mafTimeStamp *)maf_event->GetData());
+				if (pTS != NULL) {	//valid timestamp passed, change the current time of this VME
+					InternalSetTimeStamp(*pTS);
+				} 
+				else {	//no valid timestamp passed, so this is notification that time has been changed, notify our listeners						
+					GetEventSource()->InvokeEvent(this,VME_TIME_SET);
+				}
+				break;
+			}			
+		}
+
+		//Forward the event to our children (default behaviour of mafNode, which is our parent)
+		Superclass::OnEvent(maf_event);
   }
   else if (maf_event->GetChannel()==MCH_UP)
   {

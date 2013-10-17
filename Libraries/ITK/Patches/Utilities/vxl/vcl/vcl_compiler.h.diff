@@ -1,0 +1,6 @@
+261c261,263
+< # define export /* ignore */
+---
+> # define _vcl_export /* ignore */
+> #else
+> # define _vcl_export export

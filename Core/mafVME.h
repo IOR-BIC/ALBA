@@ -96,8 +96,8 @@ public:
    Set the time for this VME (not for the whole tree). Normally time 
    of the tree is set by sending an event with id VME_TIME_SET */
   virtual void SetTimeStamp(mafTimeStamp t);
-  virtual mafTimeStamp GetTimeStamp();
-  
+  virtual mafTimeStamp GetTimeStamp();  
+
   /**
     Set/Get CurrentTime for this VME and all subtree. Normally time 
     of the tree is set by sending an event with id VME_TIME_SET*/
@@ -260,6 +260,10 @@ protected:
 
   /** update the output data structure */
   virtual void InternalUpdate() {}
+
+	/** Set the time for this VME (not for the whole tree) without notifying listeners. 
+	This method is called by SetTimeStamp method (that also notifies listeners). */
+	virtual void InternalSetTimeStamp(mafTimeStamp t);
 
   /** 
     Set the output and connect it to the VME. This is automatically called

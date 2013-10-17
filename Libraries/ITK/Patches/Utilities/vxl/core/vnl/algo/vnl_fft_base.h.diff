@@ -1,0 +1,4 @@
+17c17
+< export template <int D, class T>
+---
+> _vcl_export template <int D, class T>

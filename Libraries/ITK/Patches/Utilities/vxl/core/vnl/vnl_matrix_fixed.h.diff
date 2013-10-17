@@ -1,0 +1,6 @@
+35,36c35,36
+< export template <class T, unsigned int n> class vnl_vector_fixed;
+< export template <class T, unsigned int num_rows, unsigned int num_cols> class vnl_matrix_fixed;
+---
+> _vcl_export template <class T, unsigned int n> class vnl_vector_fixed;
+> _vcl_export template <class T, unsigned int num_rows, unsigned int num_cols> class vnl_matrix_fixed;
