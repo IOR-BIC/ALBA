@@ -56,6 +56,7 @@ enum HIGHEST_EVENT_ID
   mafEvent::mafEvent(void *sender, int id, bool             b,        long arg)							{ Init(sender, id, arg); m_Bool =b;                             Initialized();}
   mafEvent::mafEvent(void *sender, int id, double           f,        long arg)             { Init(sender, id, arg); m_Double=f;                            Initialized();}
   mafEvent::mafEvent(void *sender, int id, mafString        *s,       long arg)							{ Init(sender, id, arg); m_MAFString =s;                        Initialized();}
+  mafEvent::mafEvent(void *sender, int id, mafString       *s, int x, int y, int width, int height,  long arg)  { Init(sender, id, arg); m_MAFString =s; m_x = x; m_y = y; m_width = width; m_height = height;   Initialized();}
   mafEvent::mafEvent(void *sender, int id, mafView          *view,    wxWindow *win)				{ Init(sender, id, 0);   m_View =view; m_Win  =win;             Initialized();}
   mafEvent::mafEvent(void *sender, int id, mafNode          *vme,     bool b,long arg)			{ Init(sender, id, arg); m_Vme  =vme; m_Bool = b;               Initialized();}
   mafEvent::mafEvent(void *sender, int id, mafOp            *op,      long arg)							{ Init(sender, id, arg);   m_Op   =op;                          Initialized();}
@@ -95,6 +96,10 @@ void mafEvent::Log()
   if(m_Double)  s << " double= " << m_Double;
   if(m_MAFString) s << " string= "<< *m_MAFString;
   if(m_View)   s << " view= "  << (long)m_View<<" : " << m_View->GetLabel();
+  if(m_x)      s << " x= " << m_x;
+  if(m_y)      s << " y= " << m_y;
+  if(m_width)  s << " width= " << m_width;
+  if(m_height) s << " height= " << m_height;
   if(m_Vme)    s << " vme= "   << (long)m_Vme <<" : " << m_Vme->GetName();
   if(m_Op)     s << " op= "    << (long)m_Op  <<" : " << m_Op->m_Label;
 #ifdef MAF_USE_WX
@@ -123,6 +128,10 @@ mafEvent* mafEvent::Copy()
   e->m_Vme			= m_Vme;
   e->m_Op		    = m_Op;
   e->m_MafObject= m_MafObject;
+  e->m_x = m_x;
+  e->m_y = m_y;
+  e->m_width = m_width;
+  e->m_height = m_height;
   e->m_WidgetData.dType = m_WidgetData.dType;
   e->m_WidgetData.dValue= m_WidgetData.dValue;
   e->m_WidgetData.fValue= m_WidgetData.fValue;
@@ -158,6 +167,10 @@ void mafEvent::DeepCopy(const mafEventBase *maf_event)
   m_Matrix  = ((mafEvent *)maf_event)->GetMatrix();
   m_OldMatrix = ((mafEvent *)maf_event)->GetOldMatrix();
   m_MafObject = ((mafEvent *)maf_event)->GetMafObject();
+  m_x         = ((mafEvent *)maf_event)->GetX();
+  m_y         = ((mafEvent *)maf_event)->GetY();
+  m_width     = ((mafEvent *)maf_event)->GetWidth();
+  m_height    = ((mafEvent *)maf_event)->GetHeight();
   ((mafEvent *)maf_event)->GetWidgetData(m_WidgetData);
 #ifdef MAF_USE_WX
   m_WxObj   = ((mafEvent *)maf_event)->GetWxObj();
@@ -203,6 +216,10 @@ void mafEvent::Init(void *sender, int id, long arg)
   m_MafObject = NULL;
   m_Matrix = NULL;
   m_OldMatrix= NULL;
+  m_x = 0;
+  m_y = 0;
+  m_width = 0;
+  m_height = 0;
 #ifdef MAF_USE_WX
   m_Win    = NULL;
   m_UpdateUIEvent   = NULL;

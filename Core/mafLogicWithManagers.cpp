@@ -795,6 +795,18 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       case VIEW_CREATED:
         ViewCreated(e->GetView());
       break;
+	  case VIEW_RESIZE:
+		  {
+			  mafView *view;
+			  const char *viewStr=e->GetString()->GetCStr();
+			  view=m_ViewManager->GetFromList(viewStr);
+			  if(view) 
+			  {
+				  view->GetFrame()->SetSize(e->GetWidth(),e->GetHeight());
+				  view->GetFrame()->SetPosition(wxPoint(e->GetX(),e->GetY()));
+			  }
+		  }
+	  break;
       case VIEW_DELETE:
       {
 
