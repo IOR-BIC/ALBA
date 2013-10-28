@@ -33,6 +33,11 @@ medWizardBlockOperation::medWizardBlockOperation(const char *name):medWizardBloc
 {
   //Default constructor
   m_AutoShowSelectedVME=true;
+  m_isresized = false;
+  m_x = 0.;
+  m_y = 0.;
+  m_width = 0.85;
+  m_height = 0.35;
 }
 
 //----------------------------------------------------------------------------
@@ -58,6 +63,17 @@ wxString medWizardBlockOperation::GetRequiredView()
 {
   //return the required view
   return m_RequiredView;
+}
+
+//----------------------------------------------------------------------------
+void medWizardBlockOperation::ResizeView(double x, double y, double width, double height)
+{
+	m_isresized = true;
+	
+	m_x = x;
+	m_y = y;
+	m_width = width;
+	m_height = height;
 }
 
 //----------------------------------------------------------------------------
@@ -104,6 +120,15 @@ void medWizardBlockOperation::ExcutionBegin()
     //send up the event in order to open/select the required view
     tmpStr=m_RequiredView;
     mafEventMacro(mafEvent(this,WIZARD_REQUIRED_VIEW,&tmpStr));
+	if(m_isresized) 
+	{
+		wxSize mafframesize = mafGetFrame()->GetSize();
+		int x = m_x*mafframesize.GetWidth();
+		int y = m_y*mafframesize.GetHeight();
+		int width = m_width*mafframesize.GetWidth();
+		int height = m_height*mafframesize.GetHeight();
+	    mafEventMacro(mafEvent(this,VIEW_RESIZE,&tmpStr,x,y,width,height));
+	}
   }
 
   ///////////////////////
