@@ -69,6 +69,8 @@ mafGUISettings(Listener, label)
   m_DicomFolder = "UNEDFINED_DicomFolder";
   m_UseDefaultDicomFolder = FALSE;
 
+  m_DCM_ImagePositionPatientchoice = 0;
+
   m_Config->SetPath("Importer Dicom"); // Regiser key path Added by Losi 15.11.2009
 	InitializeSettings();
 }
@@ -101,6 +103,10 @@ void medGUIDicomSettings::CreateGui()
 
   m_Gui->Bool(ID_PERCENTAGE_DISTANCE_TOLERANCE,_("Percentage distance tolerance"),&m_PercentageTolerance,1);
   m_Gui->Double(ID_PERCENTAGE_TOLERANCE,_("Value"),&m_PercentageDistanceTolerance,0,MAXDOUBLE,2,"Value in percentage");
+
+  wxString DCM_IMGchoices[2]={_("Skip All"),_("Set Default position")};
+  m_Gui->Label("Dicom image position patient exception handling");
+  m_Gui->Combo(ID_DCM_POSITION_PATIENT_CHOICE,_("        "),&m_DCM_ImagePositionPatientchoice,2,DCM_IMGchoices);
 
   m_Gui->Divider();
   m_Gui->Divider(1);
@@ -334,6 +340,11 @@ void medGUIDicomSettings::OnEvent(mafEventBase *maf_event)
       m_NameCompositorList->Enable(m_OutputNameType == CUSTOM);
     }
     break;
+  case ID_DCM_POSITION_PATIENT_CHOICE:
+	{
+        m_Config->Write("DCM_ImagePositionPatientchoice",m_DCM_ImagePositionPatientchoice);
+	}
+	break;
 	default:
 		mafEventMacro(*maf_event);
 		break; 
@@ -628,6 +639,16 @@ void medGUIDicomSettings::InitializeSettings()
   {
     m_Config->Write("UseDefaultDicomFolder",m_UseDefaultDicomFolder);
   }
+
+  if(m_Config->Read("DCM_ImagePositionPatientchoice", &long_item))
+  {
+	  m_DCM_ImagePositionPatientchoice=long_item;
+  }
+  else
+  {
+	  m_Config->Write("DCM_ImagePositionPatientchoice",m_UseDefaultDicomFolder);
+  }
+
 
 //   if(m_Config->Read("NameCompositorPatientName", &long_item))
 //   {

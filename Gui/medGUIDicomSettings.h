@@ -79,6 +79,7 @@ public:
     ID_DICOM_FOLDER,
     ID_USE_DEFAULT_DICOM_FOLDER,
     ID_NAME_COMPOSITOR,
+	ID_DCM_POSITION_PATIENT_CHOICE
 	};
   
   /** Type VMEs*/
@@ -201,6 +202,9 @@ public:
   /** Return if an element of custom name chack list is checked */
   int GetEnabledCustomName(int type);
 
+  /** Return the DCM_ImagePositionPatient choice */
+  int GetDCMImagePositionPatientExceptionHandling(){return m_DCM_ImagePositionPatientchoice;};
+
 protected:
 	/** Create the GUI for the setting panel.*/
 	void CreateGui();
@@ -242,6 +246,7 @@ protected:
   mafString m_DicomFolder;
   double m_ScalarDistanceTolerance;
   double m_PercentageDistanceTolerance;
+  int m_DCM_ImagePositionPatientchoice;
 
   friend class medGUIDicomSettingsTest;
 };

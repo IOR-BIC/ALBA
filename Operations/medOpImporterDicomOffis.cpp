@@ -3951,37 +3951,24 @@ bool medOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 
 			if( dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[2]).bad() && !m_SkipAllNoPosition)
 			{
-				//Skip all not selected
-				std::ostringstream stringStream;
-				stringStream << "Cannot read dicom tag DCM_ImagePositionPatient. Asking..."<< std::endl;          
-				mafLogMessage(stringStream.str().c_str());
+				int img_pos_result = ((medGUIDicomSettings*)GetSetting())->GetDCMImagePositionPatientExceptionHandling();
 
-				wxString choices[] = {"Skip Image", "Set Default position", "Skip All"};
-
-				int img_pos_result = wxGetSingleChoiceIndex("Cannot read dicom tag DCM_ImagePositionPatient.\n","",3, choices);
-
-				if (img_pos_result == -1) //cancel
-				{
-					//				delete busyInfo;
-					mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
-					return false;
-				}
-				else if (img_pos_result == 0) //skip
+				if (img_pos_result == 0) //skip all
 				{
 					errorOccurred = true;
 					sliceNum--;
-					continue;
-				}
-				else if (img_pos_result == 1)  //default position
-				{
-					useDefaultPos=true;
-				}
-				else //Skip all
-				{
-					errorOccurred = true;
-					sliceNum--;
+					std::ostringstream stringStream;
+					stringStream << "Cannot read dicom tag DCM_ImagePositionPatient. Skip all."<< std::endl; 
+				    mafLogMessage(stringStream.str().c_str());
 					m_SkipAllNoPosition=true;
 					continue;
+				}
+				else  //default position
+				{
+					useDefaultPos=true;
+					std::ostringstream stringStream;
+					stringStream << "Cannot read dicom tag DCM_ImagePositionPatient. Use default position."<< std::endl; 
+					mafLogMessage(stringStream.str().c_str());
 				}
 			}
 			else if (dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[2]).bad()) 
