@@ -34,6 +34,7 @@ University of Bedfordshire, UK
 #include "vtkMEDPolyDataNavigator.h"
 #include "vtkMEDMatrixVectorMath.h"
 #include "medVMEStent.h"
+#include "mafStorageElement.h"
 
 #include "vtkPointData.h"
 #include "vtkTransform.h"
@@ -328,6 +329,49 @@ void medVMEStent::Initialize()
 }
 
 
+//-----------------------------------------------------------------------
+int medVMEStent::InternalStore(mafStorageElement *parent)
+	//-----------------------------------------------------------------------
+{  
+	if (Superclass::InternalStore(parent)==MAF_OK)
+	{
+		if (parent->StoreDouble("StentLength",m_Stent_Length) != MAF_OK) return MAF_ERROR; 
+		if (parent->StoreDouble("StrutThickness",m_Strut_Thickness) != MAF_OK) return MAF_ERROR;  
+		if (parent->StoreDouble("StentDiameter",m_Stent_Diameter) != MAF_OK) return MAF_ERROR; 
+		if (parent->StoreDouble("DeliverySystem",m_DeliverySystem) != MAF_OK) return MAF_ERROR; 
+		if (parent->StoreText("Material",m_Material) != MAF_OK) return MAF_ERROR;
+		if (parent->StoreText("ModelName",m_ModelName) != MAF_OK) return MAF_ERROR;
+		if (parent->StoreText("CompanyName",m_CompanyName) != MAF_OK) return MAF_ERROR;
+		return MAF_OK;
+	}
+	return MAF_ERROR;
+}
+
+
+//-----------------------------------------------------------------------
+int medVMEStent::InternalRestore(mafStorageElement *node)
+	//-----------------------------------------------------------------------
+{
+	if (Superclass::InternalRestore(node)==MAF_OK)
+	{	    
+		mafString material;
+		mafString modelname;
+		mafString companyname;
+	    if (node->RestoreDouble("StentLength",m_Stent_Length) != MAF_OK) return MAF_ERROR;
+		if (node->RestoreDouble("StrutThickness",m_Strut_Thickness) != MAF_OK) return MAF_ERROR;  
+		if (node->RestoreDouble("StentDiameter",m_Stent_Diameter) != MAF_OK) return MAF_ERROR; 
+		if (node->RestoreDouble("DeliverySystem",m_DeliverySystem) != MAF_OK) return MAF_ERROR; 
+		if (node->RestoreText("Material",material) != MAF_OK) return MAF_ERROR;
+		m_Material = material;
+		if (node->RestoreText("ModelName",modelname) != MAF_OK) return MAF_ERROR;
+		m_ModelName = modelname;
+		if (node->RestoreText("CompanyName",companyname) != MAF_OK) return MAF_ERROR;
+		m_CompanyName = companyname;
+	    return MAF_OK;
+	}
+	return MAF_ERROR;
+}
+
 
 //-----------------------------------------------------------------------
 // update stent after a change in the parameters.
@@ -339,7 +383,7 @@ void medVMEStent::InternalUpdate()
     m_StentSource->setCrownLength(m_Crown_Length);
     m_StentSource->setCrownNumber(m_Crown_Number);
 
-    m_StentSource->setStentConfiguration((enumStCfgType)m_Id_Stent_Configuration);
+	m_StentSource->setStentConfiguration((enumStCfgType)m_Id_Stent_Configuration);
     m_StentSource->setLinkConnection((enumLinkConType) m_Id_Link_Connection);
     m_StentSource->setLinkOrientation( (enumLinkOrtType)m_Link_orientation);
 

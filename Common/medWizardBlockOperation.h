@@ -51,8 +51,11 @@ public:
   /** Set The name of the operation required view */
   void SetRequiredView(const char *View);
 
-  /** Set The name of the operation required view */
+  /** Get The name of the operation required view */
   wxString GetRequiredView();
+
+  /** Resize and reposition the View */
+  void ResizeView(double x, double y, double width, double height);
 
   /** Set the path for VME selection */
   void VmeSelect(const char *path);
@@ -116,5 +119,10 @@ private:
   bool m_AutoShowSelectedVME;
   std::vector < wxString > m_VmeShow;
   std::vector < wxString > m_VmeHide;
+  bool m_isresized;
+  double m_x;
+  double m_y;
+  double m_width;
+  double m_height;
 };
 #endif

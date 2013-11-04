@@ -1,8 +1,8 @@
 /*=========================================================================
 
  Program: MAF2Medical
- Module: medWizardSelectionBlock
- Authors: Gianluigi Crimi
+ Module: medWizardBlockFileExistCheck
+ Authors: Simone Bnà
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -24,24 +24,24 @@
 
 #include "medDecl.h"
 #include "mafNode.h"
-#include "medWizardBlockTypeCheck.h"
+#include "medWizardBlockFileExistCheck.h"
 
 
 
 
 //----------------------------------------------------------------------------
-medWizardBlockTypeCheck::medWizardBlockTypeCheck(const char *name):medWizardBlock(name)
+medWizardBlockFileExistCheck::medWizardBlockFileExistCheck(const char *name):medWizardBlock(name)
 //----------------------------------------------------------------------------
 {
   //setting default values
-  m_Title="Bad VME type";
-  m_Description="The Vme is of a wrong type,\nWizard will be closed!";
+  m_Title="Check File exist";
+  m_Description="Check if the file exist!";
   m_WrongTypeNextBlock="END"; 
   m_ErrorMessageEnabled=true;
 }
 
 //----------------------------------------------------------------------------
-medWizardBlockTypeCheck::~medWizardBlockTypeCheck()
+medWizardBlockFileExistCheck::~medWizardBlockFileExistCheck()
 //----------------------------------------------------------------------------
 {
   //clearing choices list
@@ -49,7 +49,7 @@ medWizardBlockTypeCheck::~medWizardBlockTypeCheck()
 }
 
 //----------------------------------------------------------------------------
-void medWizardBlockTypeCheck::SetWindowTitle( const char *Title )
+void medWizardBlockFileExistCheck::SetWindowTitle( const char *Title )
 //----------------------------------------------------------------------------
 {
   //setting the name of the window title
@@ -59,7 +59,7 @@ void medWizardBlockTypeCheck::SetWindowTitle( const char *Title )
 
 
 //----------------------------------------------------------------------------
-wxString medWizardBlockTypeCheck::GetNextBlock()
+wxString medWizardBlockFileExistCheck::GetNextBlock()
 //----------------------------------------------------------------------------
 {
   wxString block;
@@ -73,7 +73,7 @@ wxString medWizardBlockTypeCheck::GetNextBlock()
 }
 
 //----------------------------------------------------------------------------
-void medWizardBlockTypeCheck::SetDescription( const char *description )
+void medWizardBlockFileExistCheck::SetDescription( const char *description )
 //----------------------------------------------------------------------------
 {
   //set the description showed to the user
@@ -82,7 +82,7 @@ void medWizardBlockTypeCheck::SetDescription( const char *description )
 
 
 //----------------------------------------------------------------------------
-void medWizardBlockTypeCheck::ExcutionBegin()
+void medWizardBlockFileExistCheck::ExcutionBegin()
 //----------------------------------------------------------------------------
 {
   medWizardBlock::ExcutionBegin();
@@ -93,21 +93,23 @@ void medWizardBlockTypeCheck::ExcutionBegin()
   if (m_SelectedVME)
     m_SelectedVME=m_SelectedVME->GetByPath(m_VmeSelect.c_str());
   else
-    return;  
+    return; 
 
-  mafEventMacro(mafEvent(this,VME_SELECT,m_SelectedVME));
+  if (m_SelectedVME) {
+    mafEventMacro(mafEvent(this,VME_SELECT,m_SelectedVME));
   
-  for (int i=0;i<m_AcceptedVmes.size();i++)
-    if (m_SelectedVME->IsA(m_AcceptedVmes[i].c_str()))
-      m_TestPassed=true;
+    for (int i=0;i<m_AcceptedVmes.size();i++)
+      if (m_SelectedVME->IsA(m_AcceptedVmes[i].c_str()))
+        m_TestPassed=true;
+  }
 
-  if (m_ErrorMessageEnabled && !m_TestPassed)
-    //Show Modal window
-    wxMessageBox(m_Description,m_Title, wxOK);
+  //if (m_ErrorMessageEnabled && !m_TestPassed)
+  //  //Show Modal window
+  //  wxMessageBox(m_Description,m_Title, wxOK);
 }
 
 //----------------------------------------------------------------------------
-void medWizardBlockTypeCheck::VmeSelect( const char *path )
+void medWizardBlockFileExistCheck::VmeSelect( const char *path )
 //----------------------------------------------------------------------------
 {
   //Set the path of the vme which was selected before operation start
@@ -116,7 +118,7 @@ void medWizardBlockTypeCheck::VmeSelect( const char *path )
 
 
 //----------------------------------------------------------------------------
-void medWizardBlockTypeCheck::AddAcceptedType( const char *label )
+void medWizardBlockFileExistCheck::AddAcceptedType( const char *label )
 //----------------------------------------------------------------------------
 {
   wxString accept=label;
@@ -124,11 +126,8 @@ void medWizardBlockTypeCheck::AddAcceptedType( const char *label )
 }
 
 //----------------------------------------------------------------------------
-void medWizardBlockTypeCheck::SetWrongTypeNextBlock( const char *block )
+void medWizardBlockFileExistCheck::SetWrongTypeNextBlock( const char *block )
 //----------------------------------------------------------------------------
 {
   m_WrongTypeNextBlock=block;
 }
-
-
-

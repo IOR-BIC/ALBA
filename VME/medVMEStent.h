@@ -191,6 +191,9 @@ private:
   /// Create the VME GUI.
   mafGUI *CreateGui();
 
+  virtual int InternalStore(mafStorageElement *parent);
+  virtual int InternalRestore(mafStorageElement *node);
+
   /// Find or select the associated center line vme. \n
   /// Adds tag if not already present. \n
   /// Does nothing and returns true if vme already found. \n
