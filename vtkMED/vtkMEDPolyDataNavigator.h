@@ -40,7 +40,7 @@
 // Therefore methods which change the polydata should finish by deleting the invalid links,
 // or carry a warning that the user should do it.
 //
-// Version: Nigel McFarlane 28.6.13
+// Version: Nigel McFarlane 17.10.13
 //------------------------------------------------------------------------------
 class VTK_GRAPHICS_EXPORT vtkMEDPolyDataNavigator : public vtkObject
 {

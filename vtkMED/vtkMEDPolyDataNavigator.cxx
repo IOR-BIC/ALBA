@@ -1720,6 +1720,13 @@ void vtkMEDPolyDataNavigator::PrintCells(vtkPolyData *polydata, ostream& os)  co
 void vtkMEDPolyDataNavigator::PrintAttributeData(vtkPolyData *polydata, ostream& os,  bool printTuples)  const
 {
   //----------------------------------------------------------------------------
+  // Points and cells
+  //----------------------------------------------------------------------------
+  os << "no of pts " << polydata->GetPoints()->GetNumberOfPoints() << "\n" ;
+  os << "no of cells " << polydata->GetNumberOfCells() << "\n" ;
+
+
+  //----------------------------------------------------------------------------
   // Point data
   //----------------------------------------------------------------------------
   vtkPointData *PD = polydata->GetPointData() ;
