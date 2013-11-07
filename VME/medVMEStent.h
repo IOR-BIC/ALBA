@@ -98,7 +98,7 @@ public:
   void SetStentMaterial(wxString Material) {m_Material = Material;}
   void SetStentDeliverySystem(double delsys) {m_DeliverySystem = delsys;}
   void SetStentDiameter(double d) {m_Stent_Diameter = d;}
-  void SetStentDLength(double length) {m_Stent_Length = length; } 
+  void SetStentDLength(double length) {m_Stent_DLength = length; } 
   void SetStentCrownLength(double crownL) {m_Crown_Length = crownL;}
   void SetStrutThickness(double strutThickness) {m_Strut_Thickness = strutThickness; }
   void SetStentConfiguration(int stentCfig) {m_Id_Stent_Configuration = stentCfig;}
@@ -122,7 +122,7 @@ public:
   double GetStentDeliverySystem() const {return m_DeliverySystem;};
   double GetStentRadius() const {return m_Stent_Diameter/2.0;}
   double GetStentDiameter() const {return m_Stent_Diameter;}
-  double GetStentDLength() const {return m_Stent_Length;}  
+  double GetStentDLength() const {return m_Stent_DLength;}  
   double GetStentCrownLength() const {return m_Crown_Length;}
   double GetStrutThickness() const {return m_Strut_Thickness;}
   int GetStentConfiguration() const {return m_Id_Stent_Configuration;}
@@ -258,19 +258,19 @@ private:
   
   double m_Stent_Diameter;
   double m_Crown_Length;
-  int m_Crown_Number;
-  int m_Struts_Number;
-  double m_Strut_Angle; ///< angle in radians
-  double m_Strut_Thickness;
   double m_Strut_Length; 
-  double m_Stent_Length; 
+  double m_Strut_Angle; ///< angle in radians
   double m_Link_Length;
-  int m_Link_Alignment;
-  int m_Link_orientation;
+  int m_Struts_Number;
+  int m_Crown_Number;
   int m_Link_Number;
+  int m_Id_Stent_Type;
   int m_Id_Link_Connection;
   int m_Id_Stent_Configuration;
-  int m_Id_Stent_Type;
+  int m_Link_orientation;
+  int m_Link_Alignment;
+  double m_Strut_Thickness;
+  double m_Stent_DLength; 
   int m_ComputedCrownNumber;
   bool m_StentParamsModified ;
 

@@ -149,38 +149,62 @@ mafVMEOutputPolyline *medVMEStent::GetPolylineOutput()
 //-------------------------------------------------------------------------
 int medVMEStent::DeepCopy(mafNode *a)
 { 
-  if (Superclass::DeepCopy(a)==MAF_OK)
-  {
-    medVMEStent *vmeStent = medVMEStent::SafeDownCast(a);
+  // NB: this does not do a base class copy -
+  // it is unnecessary and causes conflict.
 
-    m_Stent_Diameter = vmeStent->m_Stent_Diameter ;
-    m_Crown_Length = vmeStent->m_Crown_Length ;
-    m_Crown_Number = vmeStent->m_Crown_Number ;
-    m_Strut_Angle = vmeStent->m_Strut_Angle ;
-    m_Strut_Thickness = vmeStent->m_Strut_Thickness ;
-    m_Strut_Length = vmeStent->m_Strut_Length ;
-    m_Link_Length = vmeStent->m_Link_Length;
-    m_Link_Alignment = vmeStent->m_Link_Alignment;
-    m_Link_orientation = vmeStent->m_Link_orientation;
-    m_Id_Link_Connection = vmeStent->m_Id_Link_Connection;
-    m_Id_Stent_Configuration = vmeStent->m_Id_Stent_Configuration ;
+  medVMEStent *vmeStent = medVMEStent::SafeDownCast(a);
 
-    m_CenterLine->DeepCopy(vmeStent->m_CenterLine);
-    m_VesselSurface->DeepCopy(vmeStent->m_VesselSurface);
+  // parameters
+  m_CompanyName = vmeStent->m_CompanyName ;
+  m_ModelName = vmeStent->m_ModelName ;
+  m_Material = vmeStent->m_Material ;
+  m_DeliverySystem = vmeStent->m_DeliverySystem ;
+  m_Stent_Diameter = vmeStent->m_Stent_Diameter ;
+  m_Crown_Length = vmeStent->m_Crown_Length ;
+  m_Strut_Length = vmeStent->m_Strut_Length ;
+  m_Strut_Angle = vmeStent->m_Strut_Angle ;
+  m_Link_Length = vmeStent->m_Link_Length;
+  m_Struts_Number = vmeStent->m_Struts_Number ;
+  m_Crown_Number = vmeStent->m_Crown_Number ;
+  m_Link_Number = vmeStent->m_Link_Number ;
+  m_Id_Stent_Type = vmeStent->m_Id_Stent_Type ;
+  m_Id_Link_Connection = vmeStent->m_Id_Link_Connection;
+  m_Id_Stent_Configuration = vmeStent->m_Id_Stent_Configuration ;
+  m_Link_orientation = vmeStent->m_Link_orientation;
+  m_Link_Alignment = vmeStent->m_Link_Alignment;
+  m_Strut_Thickness = vmeStent->m_Strut_Thickness ;
+  m_Stent_DLength = vmeStent->m_Stent_DLength ;
+  m_ComputedCrownNumber = vmeStent->m_ComputedCrownNumber ;
+  m_StentParamsModified = true ;
 
-    m_StentStartPosId = vmeStent->m_StentStartPosId ;
+  // vessel
+  m_VesselVME = vmeStent->m_VesselVME ;
+  SetVesselSurface(vmeStent->m_VesselVME) ;
 
-    m_CenterLineSetFlag = vmeStent->m_CenterLineSetFlag ;
-    m_VesselSurfaceSetFlag = vmeStent->m_VesselSurfaceSetFlag ;
+  // vessel centerline
+  m_StentStartPosId = vmeStent->m_StentStartPosId ;
+  m_CenterLineVME = vmeStent->m_CenterLineVME ;
+  SetVesselCenterLine(vmeStent->m_CenterLineVME) ;
 
-    m_StentParamsModified = true ;
-    m_StentCenterLineModified = true ;
-    m_SimplexMeshModified = true ;
-    InternalUpdate();
+  // stent
+  m_StentPolyData->DeepCopy(vmeStent->m_StentPolyData) ;
+  m_StentCenterLine->DeepCopy(vmeStent->m_StentCenterLine);
+  m_StentCenterLineModified = true ;
+  m_StentLength = vmeStent->m_StentLength ;
+  m_StentLengthModified = vmeStent->m_StentLengthModified ;
 
-    return MAF_OK;
-  }  
-  return MAF_ERROR;
+  // simplex
+  m_SimplexPolyData->DeepCopy(vmeStent->m_SimplexPolyData) ;
+
+  // deformation filter
+  m_SimplexMeshModified = true ;
+
+  InternalUpdate();
+
+  // Update resets stent, so copy polydata position again
+  m_StentPolyData->DeepCopy(vmeStent->m_StentPolyData) ;
+
+  return MAF_OK;
 }
 
 
@@ -335,7 +359,7 @@ int medVMEStent::InternalStore(mafStorageElement *parent)
 {  
 	if (Superclass::InternalStore(parent)==MAF_OK)
 	{
-		if (parent->StoreDouble("StentLength",m_Stent_Length) != MAF_OK) return MAF_ERROR; 
+		if (parent->StoreDouble("StentLength",m_Stent_DLength) != MAF_OK) return MAF_ERROR; 
 		if (parent->StoreDouble("StrutThickness",m_Strut_Thickness) != MAF_OK) return MAF_ERROR;  
 		if (parent->StoreDouble("StentDiameter",m_Stent_Diameter) != MAF_OK) return MAF_ERROR; 
 		if (parent->StoreDouble("DeliverySystem",m_DeliverySystem) != MAF_OK) return MAF_ERROR; 
@@ -357,7 +381,7 @@ int medVMEStent::InternalRestore(mafStorageElement *node)
 		mafString material;
 		mafString modelname;
 		mafString companyname;
-	    if (node->RestoreDouble("StentLength",m_Stent_Length) != MAF_OK) return MAF_ERROR;
+	    if (node->RestoreDouble("StentLength",m_Stent_DLength) != MAF_OK) return MAF_ERROR;
 		if (node->RestoreDouble("StrutThickness",m_Strut_Thickness) != MAF_OK) return MAF_ERROR;  
 		if (node->RestoreDouble("StentDiameter",m_Stent_Diameter) != MAF_OK) return MAF_ERROR; 
 		if (node->RestoreDouble("DeliverySystem",m_DeliverySystem) != MAF_OK) return MAF_ERROR; 
