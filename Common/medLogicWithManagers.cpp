@@ -221,6 +221,12 @@ void medLogicWithManagers::OnEvent(mafEventBase *maf_event)
         }
       }
       break; 
+	case MENU_VIEW_TOOLBAR:
+		m_Win->ShowDockPane("wizardgauge",!m_Win->DockPaneIsShown("wizardgauge") );
+		m_Win->ShowDockPane("tmpwithtest",!m_Win->DockPaneIsShown("tmpwithtest") );
+		m_Win->ShowDockPane("separator",!m_Win->DockPaneIsShown("separator") );
+		mafLogicWithManagers::OnEvent(maf_event);
+		break;
     case PROGRESSBAR_SHOW:
      {
        if (e->GetSender()==m_WizardManager)
@@ -543,7 +549,7 @@ void medLogicWithManagers::CreateWizardToolbar()
   //----------------------------------------------------------------------------
 {
  
-  wxToolBar *serparatorBar = new wxToolBar(m_Win,MENU_VIEW_TOOLBAR,wxPoint(0,0),wxSize(-1,-1),wxTB_FLAT | wxTB_NODIVIDER );
+  wxToolBar *serparatorBar = new wxToolBar(m_Win,-1,wxPoint(0,0),wxSize(-1,-1),wxTB_FLAT | wxTB_NODIVIDER );
   serparatorBar->SetMargins(0,0);
   serparatorBar->SetToolSeparation(2);
   serparatorBar->SetToolBitmapSize(wxSize(20,20));
@@ -566,8 +572,8 @@ void medLogicWithManagers::CreateWizardToolbar()
  
 
   m_Win->AddDockPane(m_WizardGauge,  wxPaneInfo()
-    .Name("toolbar")
-    .Caption(wxT("ToolBar"))
+    .Name("wizardgauge")
+    //.Caption(wxT("ToolBar1"))
     .Top()
     .Layer(2)
     .ToolbarPane()
@@ -580,8 +586,8 @@ void medLogicWithManagers::CreateWizardToolbar()
   
 
   m_Win->AddDockPane(tmp,  wxPaneInfo()
-    .Name("toolbar")
-    .Caption(wxT("ToolBar"))
+    .Name("tmpwithtest")
+    //.Caption(wxT("ToolBar2"))
     .Top()
     .Layer(2)
     .ToolbarPane()
@@ -593,8 +599,8 @@ void medLogicWithManagers::CreateWizardToolbar()
     );
 
   m_Win->AddDockPane(serparatorBar,  wxPaneInfo()
-    .Name("toolbar")
-    .Caption(wxT("ToolBar"))
+    .Name("separator")
+    //.Caption(wxT("ToolBar3"))
     .Top()
     .Layer(2)
     .ToolbarPane()
