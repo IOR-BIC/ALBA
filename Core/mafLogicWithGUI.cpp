@@ -183,6 +183,16 @@ void mafLogicWithGUI::OnEvent(mafEventBase *maf_event)
     case MENU_FILE_QUIT:
       OnQuit();		
       break; 
+    //resize view
+	case TILE_WINDOW_CASCADE:
+		m_Win->Cascade();
+		break;
+	case TILE_WINDOW_HORIZONTALLY:
+      m_Win->Tile(wxHORIZONTAL);
+	  break;
+	case TILE_WINDOW_VERTICALLY:
+	  m_Win->Tile(wxVERTICAL);
+	  break;
       // ###############################################################
       // commands related to the Dockable Panes
     case MENU_VIEW_LOGBAR:

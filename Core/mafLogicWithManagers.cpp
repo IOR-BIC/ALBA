@@ -797,7 +797,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       break;
 	  case VIEW_RESIZE:
 		  {
-			  mafView *view;
+			  mafView *view = NULL;
 			  const char *viewStr=e->GetString()->GetCStr();
 			  view=m_ViewManager->GetFromList(viewStr);
 			  if(view) 
@@ -811,7 +811,8 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       {
 
         if(m_PlugSidebar)
-          this->m_SideBar->ViewDeleted(e->GetView());
+		   this->m_SideBar->ViewDeleted(e->GetView());
+
 #ifdef MAF_USE_VTK
         // currently mafInteraction is strictly dependent on VTK (marco)
         if(m_InteractionManager)

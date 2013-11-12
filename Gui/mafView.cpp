@@ -278,4 +278,4 @@ void mafView::SetNormal(double normal[3])// const
   m_Normal[0] = normal[0];
   m_Normal[1] = normal[1];
   m_Normal[2] = normal[2];
-}
+}
