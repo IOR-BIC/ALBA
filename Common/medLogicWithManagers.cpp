@@ -137,6 +137,21 @@ void medLogicWithManagers::OnEvent(mafEventBase *maf_event)
            m_ViewManager->ViewCreate(viewStr);
        }
     break;
+	case WIZARD_DELETE_VIEW:
+		{
+			mafView *view;
+			const char *viewStr=e->GetString()->GetCStr();
+
+			view=m_ViewManager->GetFromList(viewStr);
+			if (view) 
+			{
+				mafGUIMDIChild *c = (mafGUIMDIChild *)view->GetFrame();
+				m_ViewManager->ViewDelete(view);
+				if (c != NULL)
+					c->Destroy();
+			}
+		}
+	break;
     case WIZARD_RUN_OP:
       {
         //Running an op required from the wizard

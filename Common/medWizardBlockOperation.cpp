@@ -33,11 +33,15 @@ medWizardBlockOperation::medWizardBlockOperation(const char *name):medWizardBloc
 {
   //Default constructor
   m_AutoShowSelectedVME=true;
-  m_isresized = false;
+  m_windowhastoberesized = false;
+  m_windowhastobetiled = false;
+  m_tile_windows = "";
   m_x = 0.;
   m_y = 0.;
   m_width = 0.85;
   m_height = 0.35;
+  m_viewtodelete = "";
+  m_viewhastobedeleted = false;
 }
 
 //----------------------------------------------------------------------------
@@ -58,6 +62,14 @@ void medWizardBlockOperation::SetRequiredView( const char *View )
 }
 
 //----------------------------------------------------------------------------
+void medWizardBlockOperation::SetViewToDelete( const char *View )
+	//----------------------------------------------------------------------------
+{
+  m_viewhastobedeleted = true;
+  m_viewtodelete = View;
+}
+
+//----------------------------------------------------------------------------
 wxString medWizardBlockOperation::GetRequiredView()
 //----------------------------------------------------------------------------
 {
@@ -68,12 +80,19 @@ wxString medWizardBlockOperation::GetRequiredView()
 //----------------------------------------------------------------------------
 void medWizardBlockOperation::ResizeView(double x, double y, double width, double height)
 {
-	m_isresized = true;
+	m_windowhastoberesized = true;
 	
 	m_x = x;
 	m_y = y;
 	m_width = width;
 	m_height = height;
+}
+
+//----------------------------------------------------------------------------
+void medWizardBlockOperation::TileWindows( const char *tile_windows )
+{
+   m_windowhastobetiled = true;
+   m_tile_windows = tile_windows;
 }
 
 //----------------------------------------------------------------------------
@@ -120,14 +139,34 @@ void medWizardBlockOperation::ExcutionBegin()
     //send up the event in order to open/select the required view
     tmpStr=m_RequiredView;
     mafEventMacro(mafEvent(this,WIZARD_REQUIRED_VIEW,&tmpStr));
-	if(m_isresized) 
+	if(m_windowhastoberesized) 
 	{
 		wxSize mafframesize = mafGetFrame()->GetSize();
 		int x = m_x*mafframesize.GetWidth();
 		int y = m_y*mafframesize.GetHeight();
 		int width = m_width*mafframesize.GetWidth();
 		int height = m_height*mafframesize.GetHeight();
-	    mafEventMacro(mafEvent(this,VIEW_RESIZE,&tmpStr,x,y,width,height));
+
+	    mafEventMacro(mafEvent(this,VIEW_RESIZE,&tmpStr,x,y,width,height));	
+	}
+	if(m_windowhastobetiled)
+	{
+		if(!m_tile_windows.Compare("Tile_window_horizontally")) 
+		{
+	        mafEventMacro(mafEvent(this,TILE_WINDOW_HORIZONTALLY));
+		}
+		else if (!m_tile_windows.Compare("Tile_window_vertically")) 
+		{
+			mafEventMacro(mafEvent(this,TILE_WINDOW_VERTICALLY));
+		}
+		else if (!m_tile_windows.Compare("Tile_window_cascade"))
+		{
+			mafEventMacro(mafEvent(this,TILE_WINDOW_CASCADE));
+		}
+		else 
+		{
+	      mafLogMessage("The selected tile window modality does not exist!");
+		}
 	}
   }
 
@@ -192,7 +231,12 @@ void medWizardBlockOperation::ExcutionEnd()
     mafNode *toHide=m_SelectedVME->GetByPath(m_VmeHide[i]);
     mafEventMacro(mafEvent(this,VME_SHOW,toHide,false));
   }
-  
+
+  if(m_viewhastobedeleted) 
+  {
+      mafEventMacro(mafEvent(this,WIZARD_DELETE_VIEW,&m_viewtodelete));
+  }
+ 
 }
 
 //----------------------------------------------------------------------------
