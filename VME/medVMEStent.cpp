@@ -72,7 +72,9 @@ medVMEStent::medVMEStent()
   : m_StentStartPosId(0), 
   m_VesselVME(NULL), m_CenterLineVME(NULL),
   m_StentParamsModified(true), m_StentCenterLineModified(true),
-  m_SimplexMeshModified(true), m_StentLengthModified(true)
+  m_SimplexMeshModified(true), m_StentLengthModified(true),
+  m_DeployedPolydataVME(NULL), m_VesselNodeID(-1), m_CenterLineNodeID(-1),
+  m_DeployedPolydataNodeID(-1)
 {
   m_StentSource = new vtkMEDStentModelSource ;
 
@@ -92,15 +94,18 @@ medVMEStent::medVMEStent()
   m_Strut_Thickness = 0.0;
   m_Id_Stent_Configuration = 1; /* 1.outofphase, 0.InPhase;  enumStCfgType */
   m_Id_Link_Connection = 2; /* 0.peak2valley;enumLinkConType {peak2valley, valley2peak, peak2peak, valley2valley} */
-  m_Link_orientation = 0;
+  m_Link_Orientation = 0;
   m_Link_Length = 1.0;
   m_Link_Alignment = 0;
   m_ComputedCrownNumber = 0;
 
   m_StentStartPosId = 0 ;
 
-  m_CenterLineSetFlag = 0; 
-  m_VesselSurfaceSetFlag = 0;
+  m_CenterLineDefined = false ; 
+  m_VesselSurfaceDefined = false ;
+  m_CenterLineVMEDefined = false ; 
+  m_VesselVMEDefined = false ;
+  m_DeployedPolydataStatus = DEPLOYED_PD_NONE ;
 
   mafVMEOutputPolyline *output = mafVMEOutputPolyline::New(); // output with no data.  Deleted by Maf.
   SetOutput(output);
@@ -144,70 +149,6 @@ mafVMEOutputPolyline *medVMEStent::GetPolylineOutput()
 
 
 
-//-------------------------------------------------------------------------
-// Deep Copy
-//-------------------------------------------------------------------------
-int medVMEStent::DeepCopy(mafNode *a)
-{ 
-  // NB: this does not do a base class copy -
-  // it is unnecessary and causes conflict.
-
-  medVMEStent *vmeStent = medVMEStent::SafeDownCast(a);
-
-  // parameters
-  m_CompanyName = vmeStent->m_CompanyName ;
-  m_ModelName = vmeStent->m_ModelName ;
-  m_Material = vmeStent->m_Material ;
-  m_DeliverySystem = vmeStent->m_DeliverySystem ;
-  m_Stent_Diameter = vmeStent->m_Stent_Diameter ;
-  m_Crown_Length = vmeStent->m_Crown_Length ;
-  m_Strut_Length = vmeStent->m_Strut_Length ;
-  m_Strut_Angle = vmeStent->m_Strut_Angle ;
-  m_Link_Length = vmeStent->m_Link_Length;
-  m_Struts_Number = vmeStent->m_Struts_Number ;
-  m_Crown_Number = vmeStent->m_Crown_Number ;
-  m_Link_Number = vmeStent->m_Link_Number ;
-  m_Id_Stent_Type = vmeStent->m_Id_Stent_Type ;
-  m_Id_Link_Connection = vmeStent->m_Id_Link_Connection;
-  m_Id_Stent_Configuration = vmeStent->m_Id_Stent_Configuration ;
-  m_Link_orientation = vmeStent->m_Link_orientation;
-  m_Link_Alignment = vmeStent->m_Link_Alignment;
-  m_Strut_Thickness = vmeStent->m_Strut_Thickness ;
-  m_Stent_DLength = vmeStent->m_Stent_DLength ;
-  m_ComputedCrownNumber = vmeStent->m_ComputedCrownNumber ;
-  m_StentParamsModified = true ;
-
-  // vessel
-  m_VesselVME = vmeStent->m_VesselVME ;
-  SetVesselSurface(vmeStent->m_VesselVME) ;
-
-  // vessel centerline
-  m_StentStartPosId = vmeStent->m_StentStartPosId ;
-  m_CenterLineVME = vmeStent->m_CenterLineVME ;
-  SetVesselCenterLine(vmeStent->m_CenterLineVME) ;
-
-  // stent
-  m_StentPolyData->DeepCopy(vmeStent->m_StentPolyData) ;
-  m_StentCenterLine->DeepCopy(vmeStent->m_StentCenterLine);
-  m_StentCenterLineModified = true ;
-  m_StentLength = vmeStent->m_StentLength ;
-  m_StentLengthModified = vmeStent->m_StentLengthModified ;
-
-  // simplex
-  m_SimplexPolyData->DeepCopy(vmeStent->m_SimplexPolyData) ;
-
-  // deformation filter
-  m_SimplexMeshModified = true ;
-
-  InternalUpdate();
-
-  // Update resets stent, so copy polydata position again
-  m_StentPolyData->DeepCopy(vmeStent->m_StentPolyData) ;
-
-  return MAF_OK;
-}
-
-
 
 //-------------------------------------------------------------------------
 // Internally used to create a new instance of the GUI.
@@ -243,7 +184,7 @@ mafGUI* medVMEStent::CreateGui()
 
     m_Gui->Divider(2);
     wxString linkOrientation[3] = {"+0", "+1","-1"};
-    m_Gui->Combo(CHANGED_STENT_PARAM, "Orientation", &m_Link_orientation, 3, linkOrientation);	  
+    m_Gui->Combo(CHANGED_STENT_PARAM, "Orientation", &m_Link_Orientation, 3, linkOrientation);	  
 
     m_Gui->Divider(2);
 
@@ -336,13 +277,13 @@ void medVMEStent::Initialize()
 {
   mafNode *node ;
 
-  m_VesselSurfaceSetFlag = 0 ;
   node = FindOrSelectVesselVME(this) ;
+  assert(node != NULL) ;
   m_VesselVME = mafVME::SafeDownCast(node) ;
   SetVesselSurface(node);
 
-  m_CenterLineSetFlag = 0 ;
   node = FindOrSelectCenterLineVME(this) ;
+  assert(node != NULL) ;
   m_CenterLineVME = mafVME::SafeDownCast(node) ;
   SetVesselCenterLine(node);
 
@@ -353,47 +294,194 @@ void medVMEStent::Initialize()
 }
 
 
-//-----------------------------------------------------------------------
-int medVMEStent::InternalStore(mafStorageElement *parent)
-	//-----------------------------------------------------------------------
-{  
-	if (Superclass::InternalStore(parent)==MAF_OK)
-	{
-		if (parent->StoreDouble("StentLength",m_Stent_DLength) != MAF_OK) return MAF_ERROR; 
-		if (parent->StoreDouble("StrutThickness",m_Strut_Thickness) != MAF_OK) return MAF_ERROR;  
-		if (parent->StoreDouble("StentDiameter",m_Stent_Diameter) != MAF_OK) return MAF_ERROR; 
-		if (parent->StoreDouble("DeliverySystem",m_DeliverySystem) != MAF_OK) return MAF_ERROR; 
-		if (parent->StoreText("Material",m_Material) != MAF_OK) return MAF_ERROR;
-		if (parent->StoreText("ModelName",m_ModelName) != MAF_OK) return MAF_ERROR;
-		if (parent->StoreText("CompanyName",m_CompanyName) != MAF_OK) return MAF_ERROR;
-		return MAF_OK;
-	}
-	return MAF_ERROR;
+
+
+//-------------------------------------------------------------------------
+// Deep Copy
+//-------------------------------------------------------------------------
+int medVMEStent::DeepCopy(mafNode *a)
+{ 
+  // NB: this does not do a base class copy -
+  // it is unnecessary and causes conflict.
+
+  medVMEStent *vmeStent = medVMEStent::SafeDownCast(a);
+
+  // parameters
+  m_CompanyName = vmeStent->m_CompanyName ;
+  m_ModelName = vmeStent->m_ModelName ;
+  m_Material = vmeStent->m_Material ;
+  m_DeliverySystem = vmeStent->m_DeliverySystem ;
+  m_Stent_Diameter = vmeStent->m_Stent_Diameter ;
+  m_Crown_Length = vmeStent->m_Crown_Length ;
+  m_Strut_Length = vmeStent->m_Strut_Length ;
+  m_Strut_Angle = vmeStent->m_Strut_Angle ;
+  m_Link_Length = vmeStent->m_Link_Length;
+  m_Struts_Number = vmeStent->m_Struts_Number ;
+  m_Crown_Number = vmeStent->m_Crown_Number ;
+  m_Link_Number = vmeStent->m_Link_Number ;
+  m_Id_Stent_Type = vmeStent->m_Id_Stent_Type ;
+  m_Id_Link_Connection = vmeStent->m_Id_Link_Connection;
+  m_Id_Stent_Configuration = vmeStent->m_Id_Stent_Configuration ;
+  m_Link_Orientation = vmeStent->m_Link_Orientation;
+  m_Link_Alignment = vmeStent->m_Link_Alignment;
+  m_Strut_Thickness = vmeStent->m_Strut_Thickness ;
+  m_Stent_DLength = vmeStent->m_Stent_DLength ;
+  m_ComputedCrownNumber = vmeStent->m_ComputedCrownNumber ;
+  m_StentParamsModified = true ;
+
+  // vessel
+  m_VesselVME = vmeStent->m_VesselVME ;
+  SetVesselSurface(vmeStent->m_VesselVME) ;
+
+  // vessel centerline
+  m_StentStartPosId = vmeStent->m_StentStartPosId ;
+  m_CenterLineVME = vmeStent->m_CenterLineVME ;
+  SetVesselCenterLine(vmeStent->m_CenterLineVME) ;
+
+  // stent
+  m_StentPolyData->DeepCopy(vmeStent->m_StentPolyData) ;
+  m_StentCenterLine->DeepCopy(vmeStent->m_StentCenterLine);
+  m_StentCenterLineModified = true ;
+  m_StentLength = vmeStent->m_StentLength ;
+  m_StentLengthModified = vmeStent->m_StentLengthModified ;
+
+  // simplex
+  m_SimplexPolyData->DeepCopy(vmeStent->m_SimplexPolyData) ;
+
+  // deformation filter
+  m_SimplexMeshModified = true ;
+
+  // deployed stent polydata
+  m_DeployedPolydataVME = vmeStent->m_DeployedPolydataVME ;
+  m_DeployedPolydataNodeID = vmeStent->m_DeployedPolydataNodeID ;
+  m_DeployedPolydataStatus = vmeStent->m_DeployedPolydataStatus ;
+
+
+  InternalUpdate();
+
+  // Update resets stent, so copy polydata position again
+  m_StentPolyData->DeepCopy(vmeStent->m_StentPolyData) ;
+
+  return MAF_OK;
 }
 
 
+
+
+//-----------------------------------------------------------------------
+// Internal store - called when saving to msf
+//-----------------------------------------------------------------------
+int medVMEStent::InternalStore(mafStorageElement *node)
+{  
+  if (Superclass::InternalStore(node)==MAF_OK)
+  {
+    // parameters
+    if (node->StoreText("ModelName",m_ModelName) != MAF_OK) return MAF_ERROR;
+    if (node->StoreText("CompanyName",m_CompanyName) != MAF_OK) return MAF_ERROR;
+    if (node->StoreText("Material",m_Material) != MAF_OK) return MAF_ERROR;
+    if (node->StoreDouble("DeliverySystem",m_DeliverySystem) != MAF_OK) return MAF_ERROR; 
+    if (node->StoreDouble("Diameter",m_Stent_Diameter) != MAF_OK) return MAF_ERROR; 
+    if (node->StoreDouble("CrownLength",m_Crown_Length) != MAF_OK) return MAF_ERROR; 
+    if (node->StoreDouble("StrutLength",m_Strut_Length) != MAF_OK) return MAF_ERROR; 
+    if (node->StoreDouble("StrutAngle",m_Strut_Angle) != MAF_OK) return MAF_ERROR; 
+    if (node->StoreDouble("LinkLength",m_Link_Length) != MAF_OK) return MAF_ERROR; 
+    if (node->StoreInteger("NumberOfStruts",m_Struts_Number) != MAF_OK) return MAF_ERROR; 
+    if (node->StoreInteger("NumberOfCrowns",m_Crown_Number) != MAF_OK) return MAF_ERROR; 
+    if (node->StoreInteger("NumberOfLinks",m_Link_Number) != MAF_OK) return MAF_ERROR; 
+    if (node->StoreInteger("IdStentType",m_Id_Stent_Type) != MAF_OK) return MAF_ERROR; 
+    if (node->StoreInteger("IdLinkConnection",m_Id_Link_Connection) != MAF_OK) return MAF_ERROR; 
+    if (node->StoreInteger("IdStentConfig",m_Id_Stent_Configuration) != MAF_OK) return MAF_ERROR; 
+    if (node->StoreInteger("LinkOrientation",m_Link_Orientation) != MAF_OK) return MAF_ERROR; 
+    if (node->StoreInteger("LinkAlignment",m_Link_Alignment) != MAF_OK) return MAF_ERROR; 
+    if (node->StoreDouble("StrutThickness",m_Strut_Thickness) != MAF_OK) return MAF_ERROR;  
+    if (node->StoreDouble("DLength",m_Stent_DLength) != MAF_OK) return MAF_ERROR; 
+    if (node->StoreInteger("ComputedNumberOfCrowns",m_ComputedCrownNumber) != MAF_OK) return MAF_ERROR; 
+
+    // vessel
+    if (node->StoreInteger("VesselNodeId", m_VesselNodeID) != MAF_OK) return MAF_ERROR; 
+
+    // center line
+    if (node->StoreInteger("CenterLineNodeId", m_CenterLineNodeID) != MAF_OK) return MAF_ERROR; 
+    if (node->StoreInteger("StartPos", m_StentStartPosId) != MAF_OK) return MAF_ERROR; 
+
+    // stent
+    if (node->StoreInteger("StentLength", m_StentLength) != MAF_OK) return MAF_ERROR; 
+
+    // deployed stent polydata
+    if (node->StoreInteger("DeployedPDStatus", m_DeployedPolydataStatus) != MAF_OK) return MAF_ERROR; 
+    if (node->StoreInteger("DeployedPDNodeId", m_DeployedPolydataNodeID) != MAF_OK) return MAF_ERROR; 
+
+    return MAF_OK;
+  }
+  return MAF_ERROR;
+}
+
+
+
+//-----------------------------------------------------------------------
+// Internal restore - called when restoring from msf
 //-----------------------------------------------------------------------
 int medVMEStent::InternalRestore(mafStorageElement *node)
-	//-----------------------------------------------------------------------
 {
-	if (Superclass::InternalRestore(node)==MAF_OK)
-	{	    
-		mafString material;
-		mafString modelname;
-		mafString companyname;
-	    if (node->RestoreDouble("StentLength",m_Stent_DLength) != MAF_OK) return MAF_ERROR;
-		if (node->RestoreDouble("StrutThickness",m_Strut_Thickness) != MAF_OK) return MAF_ERROR;  
-		if (node->RestoreDouble("StentDiameter",m_Stent_Diameter) != MAF_OK) return MAF_ERROR; 
-		if (node->RestoreDouble("DeliverySystem",m_DeliverySystem) != MAF_OK) return MAF_ERROR; 
-		if (node->RestoreText("Material",material) != MAF_OK) return MAF_ERROR;
-		m_Material = material;
-		if (node->RestoreText("ModelName",modelname) != MAF_OK) return MAF_ERROR;
-		m_ModelName = modelname;
-		if (node->RestoreText("CompanyName",companyname) != MAF_OK) return MAF_ERROR;
-		m_CompanyName = companyname;
-	    return MAF_OK;
-	}
-	return MAF_ERROR;
+  if (Superclass::InternalRestore(node)==MAF_OK)
+  {	    
+    // parameters
+    mafString material;
+    mafString modelname;
+    mafString companyname;
+    if (node->RestoreText("ModelName",modelname) != MAF_OK) return MAF_ERROR;
+    m_ModelName = modelname;
+    if (node->RestoreText("CompanyName",companyname) != MAF_OK) return MAF_ERROR;
+    m_CompanyName = companyname;
+    if (node->RestoreText("Material",material) != MAF_OK) return MAF_ERROR;
+    m_Material = material;
+    if (node->RestoreDouble("DeliverySystem",m_DeliverySystem) != MAF_OK) return MAF_ERROR; 
+    if (node->RestoreDouble("Diameter",m_Stent_Diameter) != MAF_OK) return MAF_ERROR; 
+    if (node->RestoreDouble("CrownLength",m_Crown_Length) != MAF_OK) return MAF_ERROR; 
+    if (node->RestoreDouble("StrutLength",m_Strut_Length) != MAF_OK) return MAF_ERROR; 
+    if (node->RestoreDouble("StrutAngle",m_Strut_Angle) != MAF_OK) return MAF_ERROR; 
+    if (node->RestoreDouble("LinkLength",m_Link_Length) != MAF_OK) return MAF_ERROR; 
+    if (node->RestoreInteger("NumberOfStruts",m_Struts_Number) != MAF_OK) return MAF_ERROR; 
+    if (node->RestoreInteger("NumberOfCrowns",m_Crown_Number) != MAF_OK) return MAF_ERROR; 
+    if (node->RestoreInteger("NumberOfLinks",m_Link_Number) != MAF_OK) return MAF_ERROR; 
+    if (node->RestoreInteger("IdStentType",m_Id_Stent_Type) != MAF_OK) return MAF_ERROR; 
+    if (node->RestoreInteger("IdLinkConnection",m_Id_Link_Connection) != MAF_OK) return MAF_ERROR; 
+    if (node->RestoreInteger("IdStentConfig",m_Id_Stent_Configuration) != MAF_OK) return MAF_ERROR; 
+    if (node->RestoreInteger("LinkOrientation",m_Link_Orientation) != MAF_OK) return MAF_ERROR; 
+    if (node->RestoreInteger("LinkAlignment",m_Link_Alignment) != MAF_OK) return MAF_ERROR; 
+    if (node->RestoreDouble("StrutThickness",m_Strut_Thickness) != MAF_OK) return MAF_ERROR;  
+    if (node->RestoreDouble("DLength",m_Stent_DLength) != MAF_OK) return MAF_ERROR; 
+    if (node->RestoreInteger("ComputedNumberOfCrowns",m_ComputedCrownNumber) != MAF_OK) return MAF_ERROR; 
+    m_StentParamsModified = true ;
+
+    // vessel
+    if (node->RestoreInteger("VesselNodeId", m_VesselNodeID) != MAF_OK) return MAF_ERROR; 
+
+    // vessel centerline
+    if (node->RestoreInteger("StartPos", m_StentStartPosId) != MAF_OK) return MAF_ERROR; 
+    if (node->RestoreInteger("CenterLineNodeId", m_CenterLineNodeID) != MAF_OK) return MAF_ERROR; 
+
+    // stent
+    if (node->RestoreInteger("StentLength", m_StentLength) != MAF_OK) return MAF_ERROR; 
+    m_StentCenterLineModified = true ;
+    m_StentLengthModified = true ;
+
+    // deformation filter
+    m_SimplexMeshModified = true ;
+
+    // deployed stent polydata
+    if (node->RestoreInteger("DeployedPDStatus", m_DeployedPolydataStatus) != MAF_OK) return MAF_ERROR; 
+    if (node->RestoreInteger("DeployedPDNodeId", m_DeployedPolydataNodeID) != MAF_OK) return MAF_ERROR; 
+    if (m_DeployedPolydataStatus == DEPLOYED_PD_OK)
+      m_DeployedPolydataStatus = DEPLOYED_PD_NOT_LOADED ;
+
+    // NB The vme tree is not accessible from here, so the rest of the 
+    // initialization with the vessel and center line vme's is 
+    // completed in InternalUpdate().
+
+    return MAF_OK;
+  }
+  return MAF_ERROR;
 }
 
 
@@ -402,14 +490,28 @@ int medVMEStent::InternalRestore(mafStorageElement *node)
 //-----------------------------------------------------------------------
 void medVMEStent::InternalUpdate()
 {
+  if (!m_VesselVMEDefined || !m_VesselSurfaceDefined){
+    mafNode* node = FindOrSelectVesselVME(this) ;
+    assert(node != NULL) ;
+    m_VesselVME = mafVME::SafeDownCast(node) ;
+    SetVesselSurface(node);
+  }
+
+  if (!m_CenterLineVMEDefined || !m_CenterLineDefined){
+    mafNode* node = FindOrSelectCenterLineVME(this) ;
+    assert(node != NULL) ;
+    m_CenterLineVME = mafVME::SafeDownCast(node) ;
+    SetVesselCenterLine(node);
+  }
+
   if(m_StentParamsModified || m_StentCenterLineModified){	
     m_StentSource->setStentDiameter(m_Stent_Diameter);
     m_StentSource->setCrownLength(m_Crown_Length);
     m_StentSource->setCrownNumber(m_Crown_Number);
 
-	m_StentSource->setStentConfiguration((enumStCfgType)m_Id_Stent_Configuration);
+    m_StentSource->setStentConfiguration((enumStCfgType)m_Id_Stent_Configuration);
     m_StentSource->setLinkConnection((enumLinkConType) m_Id_Link_Connection);
-    m_StentSource->setLinkOrientation( (enumLinkOrtType)m_Link_orientation);
+    m_StentSource->setLinkOrientation( (enumLinkOrtType)m_Link_Orientation);
 
     m_StentSource->setLinkLength(m_Link_Length);
     m_StentSource->setLinkAlignment(m_Link_Alignment);
@@ -457,13 +559,21 @@ void medVMEStent::InternalUpdate()
     this->Modified() ;
   }
 
-  //m_SimplexMeshModified = IsSimplexMeshModified() ;
   if (m_SimplexMeshModified){
     m_StentPolyData->Initialize() ;
     m_SimplexPolyData->Initialize() ;
+
     UpdateStentPolydataFromSimplex() ; 
     UpdateStentPolydataFromSimplex_ViewAsSimplex() ; 
     m_SimplexMeshModified = false ;
+    this->Modified() ;
+  }
+
+  if (m_DeployedPolydataStatus == DEPLOYED_PD_NOT_LOADED){
+    mafNode* node = FindNodeWithId(m_DeployedPolydataNodeID) ;
+    assert(node != NULL) ;
+    m_DeployedPolydataVME = mafVMEPolyline::SafeDownCast(node) ;
+    this->SetDeployedPolydataVME(node) ;
     this->Modified() ;
   }
 }
@@ -635,7 +745,7 @@ void medVMEStent::CalculateMidPointsFromPairOfStruts(const double strutEndPts[4]
   double dprod[2] ;
   for (int i = 0 ;  i < 2 ;  i++)
     dprod[i] = math->DotProduct(dm[i], v[i]) ;
- 
+
   // Calc small displacement vectors a[2][3] from midpoints.
   // Each displacement vector must be normal to strut and coplanar with strut and opposite midpoint.
   // Thus a = dprod*v - rsq*dm
@@ -720,7 +830,7 @@ void medVMEStent::SetVesselCenterLine(vtkPolyData *line){
     m_CenterLine->DeepCopy(line) ; 
     CreateLongVesselCenterLine() ;
     CreateStentCenterLine() ;
-    m_CenterLineSetFlag = 1; 
+    m_CenterLineDefined = true ; 
 
     m_StentLengthModified = true ;
   }
@@ -734,6 +844,8 @@ void medVMEStent::SetVesselCenterLine(mafNode* node)
 {
   if(node){
     mafVME *vme = mafVME::SafeDownCast(node);
+    m_CenterLineNodeID = vme->GetId() ;
+    m_CenterLineVMEDefined = true ;
     vtkPolyData *polyLine =vtkPolyData::SafeDownCast( vme->GetOutput()->GetVTKData());
     polyLine->Update();
     SetVesselCenterLine(polyLine);
@@ -747,7 +859,7 @@ void medVMEStent::SetVesselCenterLine(mafNode* node)
 void medVMEStent::SetVesselSurface(vtkPolyData *surface){
   if(surface){
     m_VesselSurface->DeepCopy(surface);
-    m_VesselSurfaceSetFlag = 1;
+    m_VesselSurfaceDefined = true;
   }
 }
 
@@ -758,6 +870,8 @@ void medVMEStent::SetVesselSurface(mafNode* node)
 {
   if(node){
     mafVME *vme = mafVME::SafeDownCast(node);
+    m_VesselNodeID = vme->GetId() ;
+    m_VesselVMEDefined = true ;
     vtkPolyData *polySurface = vtkPolyData::SafeDownCast(vme->GetOutput()->GetVTKData());
     polySurface->Update();
     SetVesselSurface(polySurface) ;
@@ -842,7 +956,7 @@ mafNode* medVMEStent::FindTaggedCenterLineVME(mafNode* inputNode)
 
 
 //-------------------------------------------------------------------------
-// Find the tagged vesselt surface vme.
+// Find the tagged vessel surface vme.
 // Returns NULL if failed.
 //-------------------------------------------------------------------------
 mafNode* medVMEStent::FindTaggedVesselVME(mafNode* inputNode)
@@ -879,24 +993,37 @@ mafNode* medVMEStent::FindTaggedVesselVME(mafNode* inputNode)
 //-------------------------------------------------------------------------
 mafNode* medVMEStent::FindOrSelectCenterLineVME(mafNode* inputNode)
 {
+  // search for id
+  if (m_CenterLineNodeID != -1){
+    mafNode *node = FindNodeWithId(m_CenterLineNodeID) ;
+    if (node != NULL)
+      return node ;
+  }
+
   // search for tagged vme
   mafNode *node = FindTaggedCenterLineVME(inputNode) ;
-
   if (node != NULL)
-    mafLogMessage("Found centerline ok\n") ;
-  else{
-    // can't find tagged vme so launch user select
-    mafEvent e(this, VME_CHOOSE) ;
-    mafString title = _("Select centerline vme");
-    e.SetString(&title);
-    ForwardUpEvent(e);
-    node = e.GetVme();
+    return node ;
 
-    if (node != NULL){
-      mafLogMessage("Adding tag to centerline vme...\n") ;
-      mafVME* vme = mafVME::SafeDownCast(node) ;
-      vme->GetTagArray()->SetTag("RT3S_CENTER_LINE","Polyline");
-    }
+
+  // can't find tagged vme so launch user select
+  mafEvent e(this, VME_CHOOSE) ;
+  mafString title = _("Select centerline vme");
+  e.SetString(&title);
+  ForwardUpEvent(e);
+  node = e.GetVme();
+
+  if (node != NULL){
+    mafLogMessage("Adding tag to centerline vme...\n") ;
+    mafVME* vme = mafVME::SafeDownCast(node) ;
+    vme->GetTagArray()->SetTag("RT3S_CENTER_LINE","Polyline");
+  }
+
+  if (node == NULL){
+    // can't find so invalidate flags
+    m_CenterLineDefined = false ;
+    m_CenterLineVMEDefined = false ;
+    m_CenterLineNodeID = -1 ;
   }
 
   return node ;
@@ -910,24 +1037,36 @@ mafNode* medVMEStent::FindOrSelectCenterLineVME(mafNode* inputNode)
 //-------------------------------------------------------------------------
 mafNode* medVMEStent::FindOrSelectVesselVME(mafNode* inputNode)
 {
+  // search for id
+  if (m_VesselNodeID != -1){
+    mafNode *node = FindNodeWithId(m_VesselNodeID) ;
+    if (node != NULL)
+      return node ;
+  }
+
   // search for tagged vme
   mafNode *node = FindTaggedVesselVME(inputNode) ;
-
   if (node != NULL)
-    mafLogMessage("Found vessel ok\n") ;
-  else{
-    // can't find tagged vme so launch user select
-    mafEvent e(this, VME_CHOOSE) ;
-    mafString title = _("Select vessel vme");
-    e.SetString(&title);
-    ForwardUpEvent(e);
-    node = e.GetVme();
+    return node ;
 
-    if (node != NULL){
-      mafLogMessage("Adding tag to vessel vme...\n") ;
-      mafVME* vme = mafVME::SafeDownCast(node) ;
-      vme->GetTagArray()->SetTag("RT3S_VESSEL","Surface");
-    }
+  // can't find tagged vme so launch user select
+  mafEvent e(this, VME_CHOOSE) ;
+  mafString title = _("Select vessel vme");
+  e.SetString(&title);
+  ForwardUpEvent(e);
+  node = e.GetVme();
+
+  if (node != NULL){
+    mafLogMessage("Adding tag to vessel vme...\n") ;
+    mafVME* vme = mafVME::SafeDownCast(node) ;
+    vme->GetTagArray()->SetTag("RT3S_VESSEL","Surface");
+  }
+
+  if (node == NULL){
+    // can't find so invalidate flags
+    m_VesselSurfaceDefined = false ;
+    m_VesselVMEDefined = false ;
+    m_VesselNodeID = -1 ;
   }
 
   return node ;
@@ -1206,16 +1345,16 @@ void medVMEStent::DoDeformationStep()
 
 
 //-------------------------------------------------------------------------
-/// Crimp the stent to a smaller diameter. \n
-/// The input params are for the expanded stent, \n
-/// so this should be the last step when the stent is created. \n
-/// This changes the diameter, strut angle and crown length, \n
-/// keeping the strut length const.
+// Crimp the stent to a smaller diameter. \n
+// The input params are for the expanded stent, \n
+// so this should be the last step when the stent is created. \n
+// This changes the diameter, strut angle and crown length, \n
+// keeping the strut length const.
 //-------------------------------------------------------------------------
 void medVMEStent::CrimpStent(double crimpedDiameter)
 {
   m_Stent_Diameter = crimpedDiameter ;
-  
+
   double r = crimpedDiameter/2.0 ;
   double alpha = 2.0*M_PI / m_Struts_Number ;
   double s = 2.0*r*sin(alpha/2.0) ;
@@ -1224,4 +1363,68 @@ void medVMEStent::CrimpStent(double crimpedDiameter)
 
   m_Crown_Length = c ;
   m_Strut_Angle = theta ;
+}
+
+
+
+//-------------------------------------------------------------------------
+// Search parent and siblings for node with given id
+//-------------------------------------------------------------------------
+mafNode* medVMEStent::FindNodeWithId(mafID id)
+{
+  if (id == -1)
+    return NULL ;
+
+  mafNode* parent = this->GetParent() ;
+  if (parent->GetId() == id)
+    return parent ;
+
+  for (int i = 0 ;  i < parent->GetNumberOfChildren() ;  i++){
+    mafNode* child = parent->GetChild(i) ;
+    if (child->GetId() == id)
+      return child ;
+
+    for (int j = 0 ;  j < child->GetNumberOfChildren() ;  j++){
+      mafNode* grChild = child->GetChild(j) ;
+      if (grChild->GetId() == id)
+        return grChild ;
+    }
+  }
+
+  return NULL ;
+}
+
+
+
+//-------------------------------------------------------------------------
+// Set stent polydata. \n
+// Normally this is generated internally, but this allows an external op \n
+// to impose a temporary position on the output polydata.
+//-------------------------------------------------------------------------
+void medVMEStent::SetStentPolyData(vtkPolyData* pd)
+{
+  int n1 = m_StentPolyData->GetPoints()->GetNumberOfPoints() ;
+  int n2 = pd->GetPoints()->GetNumberOfPoints() ;
+  assert(n2 == n1) ;
+
+  for (int i = 0 ;  i < n1 ;  i++){
+    double x[3] ;
+    pd->GetPoint(i, x) ;
+    m_StentPolyData->GetPoints()->SetPoint(i, x) ;
+  }
+}
+
+
+
+//-------------------------------------------------------------------------
+// Set the deployed polydata vme.
+//-------------------------------------------------------------------------
+void medVMEStent::SetDeployedPolydataVME(mafNode* inputNode)
+{
+  m_DeployedPolydataVME = mafVMEPolyline::SafeDownCast(inputNode) ;
+  m_DeployedPolydataNodeID = inputNode->GetId() ;
+  vtkPolyData *pd = vtkPolyData::SafeDownCast(m_DeployedPolydataVME->GetOutput()->GetVTKData()) ;
+  pd->Update() ;
+  SetStentPolyData(pd) ;
+  m_DeployedPolydataStatus = DEPLOYED_PD_OK ;
 }

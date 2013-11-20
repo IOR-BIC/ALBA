@@ -18,6 +18,8 @@ University of Bedfordshire, UK
 #include "mafNode.h"
 #include "mafVME.h"
 #include "mafVMEGeneric.h"
+#include "mafVMESurface.h"
+#include "mafVMEPolyline.h"
 #include "mafEvent.h"
 #include "mmaMaterial.h"
 #include "mafVMEOutputPolyline.h"
@@ -52,6 +54,10 @@ typedef itk::vtkMEDDeformableSimplexMeshFilter<SimplexMeshType,SimplexMeshType> 
 /// The output is the stent polydata.
 /// This also contains a simplex mesh of the stent and a customised \n
 /// deformation filter which can be used by an external op to deform the stent.
+//
+// Note that the stent position requires a vessel and a center line.
+// Some applications set the polydata directly and some load it from
+// the corresponding vme's.
 //-----------------------------------------------------------------------------
 class MED_VME_EXPORT medVMEStent : public mafVMEGeneric
 {
@@ -66,6 +72,12 @@ public:
   mafString GetVisualPipe() {return mafString("mafPipePolyline");}; ///< Get pipe name
   mafVMEOutputPolyline *GetPolylineOutput(); ///< return the right type of output 
   vtkPolyData *GetStentPolyData(); ///< Get stent polydata
+
+  /// Set stent polydata. \n
+  /// Normally this is generated internally, but this allows an external op \n
+  /// to impose a temporary position on the output polydata.
+  void SetStentPolyData(vtkPolyData* pd) ;
+
   vtkPolyData *GetSimplexPolyData(); ///< Get simplex polydata
 
   void OnEvent(mafEventBase *maf_event); ///< Event handler
@@ -75,23 +87,26 @@ public:
   /// the vessel and the centerline.
   void Initialize() ;
 
+  /// Set the vessel centerline and derive the stent centerline
+  void SetVesselCenterLine(vtkPolyData *line);
+
+  /// Set the vessel surface
+  void SetVesselSurface(vtkPolyData *surface);
+
   /// Get the vessel vme
   mafVME* GetVesselVME() {return m_VesselVME ;}
 
   /// Get the centerline vme
   mafVME* GetCenterLineVME() {return m_CenterLineVME ;}
 
+  /// Set the deployed polydata vme.
+  void SetDeployedPolydataVME(mafNode* inputNode) ;
+
   /// Set the start position of the stent. \n
   /// The position is the id along the centerline.
   void SetStentStartPos(int startId) ;
 
   void SetStentLink(const char *link_name, mafNode *ns);
-
-  /// Set the vessel centerline and derive the stent centerline
-  void SetVesselCenterLine(vtkPolyData *line);
-
-  /// Set the vessel surface
-  void SetVesselSurface(vtkPolyData *surface);
 
   void SetStentCompanyName(wxString CompanyName) {m_CompanyName = CompanyName;}
   void SetStentModelName(wxString ModelName) {m_ModelName = ModelName;}
@@ -104,7 +119,7 @@ public:
   void SetStentConfiguration(int stentCfig) {m_Id_Stent_Configuration = stentCfig;}
   void SetLinkLength(double linkLength) {m_Link_Length = linkLength;}
   void SetLinkAlignment(int linkAlgn) {m_Link_Alignment = linkAlgn;}
-  void SetLinkOrientation(int linkOrit) {m_Link_orientation = linkOrit;}
+  void SetLinkOrientation(int linkOrit) {m_Link_Orientation = linkOrit;}
   void SetLinkConnection(int linkConnection) {m_Id_Link_Connection = linkConnection;}
   void SetStentCrownNumber(int crownNumber) {m_Crown_Number = crownNumber; }
   void SetStrutsNumber(int strutsNumber){m_Struts_Number = strutsNumber;}
@@ -128,7 +143,7 @@ public:
   int GetStentConfiguration() const {return m_Id_Stent_Configuration;}
   double GetLinkLength() const {return m_Link_Length;}
   int GetLinkAlignment() const {return m_Link_Alignment;}
-  int GetLinkOrientation() const {return m_Link_orientation;}
+  int GetLinkOrientation() const {return m_Link_Orientation;}
   int GetLinkConnection() const {return m_Id_Link_Connection;}
   int GetStentCrownNumber() const {return m_Crown_Number ;}
   double GetStrutLength() const {return m_Strut_Length ;}
@@ -197,13 +212,13 @@ private:
   /// Find or select the associated center line vme. \n
   /// Adds tag if not already present. \n
   /// Does nothing and returns true if vme already found. \n
-  /// Returns false if failed.
+  /// Returns NULL if failed.
   mafNode* FindOrSelectCenterLineVME(mafNode* inputNode) ;
 
   /// Find or select the associated vessel surface vme. \n
   /// Adds tag if not already present. \n
   /// Does nothing and returns true if vme already found. \n
-  /// Returns false if failed.
+  /// Returns NULL if failed.
   mafNode* FindOrSelectVesselVME(mafNode* inputNode) ;
 
   /// Find the tagged center line vme. \n
@@ -250,6 +265,10 @@ private:
   /// Has the simplex mesh been modified since the last call
   bool IsSimplexMeshModified() ;
 
+  /// Search parent and siblings for node with given id. \n
+  /// Returns NULL if failed.
+  mafNode* FindNodeWithId(mafID id) ;
+
   // basic stent parameters */
   wxString m_CompanyName;
   wxString m_ModelName;
@@ -267,7 +286,7 @@ private:
   int m_Id_Stent_Type;
   int m_Id_Link_Connection;
   int m_Id_Stent_Configuration;
-  int m_Link_orientation;
+  int m_Link_Orientation;
   int m_Link_Alignment;
   double m_Strut_Thickness;
   double m_Stent_DLength; 
@@ -276,14 +295,18 @@ private:
 
   // vessel  
   mafVME* m_VesselVME ;
+  int m_VesselNodeID ;        // for store and restore
   vtkPolyData *m_VesselSurface;
-  int m_VesselSurfaceSetFlag; 
+  bool m_VesselSurfaceDefined; 
+  bool m_VesselVMEDefined ;
   
   // vessel centerline
   mafVME* m_CenterLineVME ;
+  int m_CenterLineNodeID ;
   vtkPolyData *m_CenterLine ;
   vtkPolyData *m_CenterLineLong ;
-  int m_CenterLineSetFlag ;
+  bool m_CenterLineDefined ;
+  bool m_CenterLineVMEDefined ;
  
   // stent
   vtkMEDStentModelSource *m_StentSource;
@@ -301,6 +324,20 @@ private:
   SimplexMeshType::Pointer m_SimplexMesh;
   bool m_SimplexMeshModified ;
   DeformFilterType::Pointer m_DeformFilter;
+
+
+  // Deployed stent polydata vme.
+  // This is needed for storing and restoring the deployed position.
+  mafVMEPolyline *m_DeployedPolydataVME ; 
+  int m_DeployedPolydataNodeID ;
+
+  // Possible states regarding deployed polydata
+  enum{
+    DEPLOYED_PD_NONE,       // stent has no deployed polydata
+    DEPLOYED_PD_NOT_LOADED, // stent has associated polydata but is not loaded
+    DEPLOYED_PD_OK          // deployed polydata has been loaded.
+  };
+  int m_DeployedPolydataStatus ;
 };
 
 #endif
