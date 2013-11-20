@@ -57,6 +57,12 @@ public:
   /** Resize and reposition the View */
   void ResizeView(double x, double y, double width, double height);
 
+  /** Tile windows horizontally, vertically or in cascade mode */
+  void TileWindows( const char *tile_windows );
+
+  /** Set The name of the required view to delete*/
+  void SetViewToDelete(const char *View);
+
   /** Set the path for VME selection */
   void VmeSelect(const char *path);
 
@@ -119,7 +125,11 @@ private:
   bool m_AutoShowSelectedVME;
   std::vector < wxString > m_VmeShow;
   std::vector < wxString > m_VmeHide;
-  bool m_isresized;
+  mafString m_viewtodelete;
+  bool m_viewhastobedeleted;
+  mafString m_tile_windows;
+  bool m_windowhastoberesized;
+  bool m_windowhastobetiled;
   double m_x;
   double m_y;
   double m_width;
