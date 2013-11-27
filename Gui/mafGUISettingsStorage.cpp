@@ -248,6 +248,15 @@ void mafGUISettingsStorage::InitializeSettings()
   {
     m_Config->Write("User",m_UserName.GetCStr());
   }
+  
+  if(m_Config->Read("SaveFolder", &string_item))
+  {
+    m_SaveFolder = string_item.c_str();
+  }
+  else
+  {
+    m_Config->Write("SaveFolder",m_SaveFolder.GetCStr());
+  }
 
 
     //--------------------SRB--------------------//
