@@ -22,6 +22,8 @@ SET(vtkMED_SRCS
   vtkTriangleQualityRatio.h
   vtkMAFCellLocator.cxx
   vtkMAFCellLocator.h
+  vtkMEDAddScalarsFilter.cxx
+  vtkMEDAddScalarsFilter.h
   vtkMEDExtrudeToCircle.cxx
   vtkMEDExtrudeToCircle.h
   vtkMEDFillingHole.cxx
@@ -40,6 +42,10 @@ SET(vtkMED_SRCS
   vtkMEDPolyDataNavigator.cxx
   vtkMEDRegionGrowingLocalGlobalThreshold.cxx
   vtkMEDRegionGrowingLocalGlobalThreshold.h
+  vtkMEDHalfTubeRemoval.cxx
+  vtkMEDHalfTubeRemoval.h
+  vtkMEDSubdividePolylines.cxx
+  vtkMEDSubdividePolylines.h
   vtkBox.cxx
   vtkBox.h
   vtkMaskPolyDataFilter.cxx

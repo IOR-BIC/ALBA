@@ -46,12 +46,14 @@ vtkMEDPolyDataNavigator::vtkMEDPolyDataNavigator()
 }
 
 
+
 //------------------------------------------------------------------------------
 // Destructor
 //------------------------------------------------------------------------------
 vtkMEDPolyDataNavigator::~vtkMEDPolyDataNavigator()
 {
 }
+
 
 
 //------------------------------------------------------------------------------
@@ -489,6 +491,48 @@ void vtkMEDPolyDataNavigator::SetIdListToAllCells(vtkPolyData *polydata, vtkIdLi
   list->SetNumberOfIds(n) ;
   for (int i = 0 ;  i < n-1 ;  i++)
     list->SetId(i,i) ;
+}
+
+
+
+//------------------------------------------------------------------------------
+// Get min id in list
+//------------------------------------------------------------------------------
+int vtkMEDPolyDataNavigator::GetMinIdInList(vtkIdList *list) const
+{
+  int n = list->GetNumberOfIds() ;
+  if (n == 0)
+    return -1 ;
+
+  int idmin = list->GetId(0) ;
+  for (int i = 0 ;  i < n ;  i++){
+    int id = list->GetId(i) ;
+    if (id < idmin)
+      idmin = id ;
+  }
+
+  return idmin ;
+}
+
+
+
+//------------------------------------------------------------------------------
+// Get max id in list
+//------------------------------------------------------------------------------
+int vtkMEDPolyDataNavigator::GetMaxIdInList(vtkIdList *list) const
+{
+  int n = list->GetNumberOfIds() ;
+  if (n == 0)
+    return -1 ;
+
+  int idmax = list->GetId(0) ;
+  for (int i = 0 ;  i < n ;  i++){
+    int id = list->GetId(i) ;
+    if (id > idmax)
+      idmax = id ;
+  }
+
+  return idmax ;
 }
 
 
@@ -1649,6 +1693,27 @@ void vtkMEDPolyDataNavigator::GetPointsWithNoCells(vtkPolyData *polydata, vtkIdL
 
 
 //------------------------------------------------------------------------------
+// Get length of edge
+//------------------------------------------------------------------------------
+double vtkMEDPolyDataNavigator::GetLengthOfEdge(vtkPolyData *polydata, const Edge edge) const
+{
+  int id0 = edge.GetId0() ;
+  int id1 = edge.GetId1() ;
+
+  double x0[3], x1[3] ;
+  polydata->GetPoint(id0, x0) ;
+  polydata->GetPoint(id1, x1) ;
+
+  double dx = x1[0] - x0[0] ;
+  double dy = x1[1] - x0[1] ;
+  double dz = x1[2] - x0[2] ;
+  double r = sqrt(dx*dx + dy*dy + dz*dz) ;
+  return r ;
+}
+
+
+
+//------------------------------------------------------------------------------
 // PrintCell.
 // NB Needs BuildCells().
 //------------------------------------------------------------------------------
@@ -2045,7 +2110,7 @@ void vtkMEDPolyDataNavigator::DeletePointTuples(vtkPolyData *polydata, vtkIdList
 
 
 //------------------------------------------------------------------------------
-// Create new attibute array
+// Create new attribute array
 //------------------------------------------------------------------------------
 void vtkMEDPolyDataNavigator::CreatePointDataArray(vtkPolyData *polydata, char* name, int numberOfComponents, int dataType) const
 {
@@ -2107,7 +2172,7 @@ void vtkMEDPolyDataNavigator::CreatePointDataArray(vtkPolyData *polydata, char* 
 
 
 //------------------------------------------------------------------------------
-// Create new attibute array
+// Create new attribute array
 //------------------------------------------------------------------------------
 void vtkMEDPolyDataNavigator::CreateCellDataArray(vtkPolyData *polydata, char* name, int numberOfComponents, int dataType) const
 {
@@ -2203,13 +2268,28 @@ void vtkMEDPolyDataNavigator::DeleteCells(vtkPolyData *polydata, vtkIdList *idLi
   //----------------------------------------------------------------------------
   // Copy the unmarked cells from the polydata to a new cell array
   //----------------------------------------------------------------------------
-  vtkCellArray *copyCells = vtkCellArray::New() ;
+  vtkCellArray *copyPolys = vtkCellArray::New() ;
+  vtkCellArray *copyLines = vtkCellArray::New() ;
+  vtkCellArray *copyVerts = vtkCellArray::New() ;
   vtkIdList *tmp = vtkIdList::New() ;
 
   for (int i = 0 ;  i < polydata->GetNumberOfCells() ;  i++){
-    if (polydata->GetCellType(i) != VTK_EMPTY_CELL){
+    int cellType = polydata->GetCellType(i) ;
+    if (cellType != VTK_EMPTY_CELL){
       polydata->GetCellPoints(i, tmp) ;
-      copyCells->InsertNextCell(tmp) ;   
+      switch(cellType){
+      case VTK_VERTEX:
+        copyVerts->InsertNextCell(tmp) ;
+        break ;
+      case VTK_LINE:
+        copyLines->InsertNextCell(tmp) ;
+        break ;
+      case VTK_POLYGON:
+      default:
+        // assume cell is poly by default
+        copyPolys->InsertNextCell(tmp) ;
+        break ;
+      }
     }
   }
 
@@ -2217,10 +2297,19 @@ void vtkMEDPolyDataNavigator::DeleteCells(vtkPolyData *polydata, vtkIdList *idLi
 
 
   //----------------------------------------------------------------------------
-  // Replace the polydata cells with the new array
+  // Replace the polydata cells with the new arrays
   //----------------------------------------------------------------------------
-  polydata->SetPolys(copyCells) ;
-  copyCells->Delete() ;
+  if (copyVerts->GetNumberOfCells() > 0)
+    polydata->SetVerts(copyVerts) ;
+  if (copyLines->GetNumberOfCells() > 0)
+    polydata->SetLines(copyLines) ;
+  if (copyPolys->GetNumberOfCells() > 0)
+    polydata->SetPolys(copyPolys) ;
+
+  copyVerts->Delete() ;
+  copyLines->Delete() ;
+  copyPolys->Delete() ;
+
 
 
   //----------------------------------------------------------------------------
@@ -2264,6 +2353,118 @@ void vtkMEDPolyDataNavigator::DeletePoints(vtkPolyData *polydata, vtkIdList *idL
 
   // delete the attribute data
   DeletePointTuples(polydata, idList) ;
+
+  // Delete the invalid links and cells
+  polydata->DeleteCells() ;
+  polydata->DeleteLinks() ;
+}
+
+
+
+
+//------------------------------------------------------------------------------
+// Swap the id's of two points. \n
+// Can call consecutively but must delete or rebuild links when finished.
+// (Actually the points don't move but we exchange their data).
+//------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::SwapPointIds(vtkPolyData *polydata, int id0, int id1) const
+{
+  // swap the positions
+  double x0[3], x1[3] ;
+  polydata->GetPoint(id0, x0) ;
+  polydata->GetPoint(id1, x1) ;
+  polydata->GetPoints()->SetPoint(id0, x1) ;
+  polydata->GetPoints()->SetPoint(id1, x0) ;
+
+
+  // swap the point attribute data
+  vtkPointData *pd = polydata->GetPointData() ;
+  int numberOfPtArrays = pd->GetNumberOfArrays() ;
+  for (int i = 0 ;  i < numberOfPtArrays ;  i++){
+    vtkDataArray *da = pd->GetArray(i) ;
+    int numberOfComponents = da->GetNumberOfComponents() ;
+
+    double t0[9], t1[9] ;
+    for (int j = 0 ;  j < numberOfComponents ;  j++){
+      t0[j] = da->GetComponent(id0, j) ;
+      t1[j] = da->GetComponent(id1, j) ;
+      da->SetComponent(id0, j, t1[j]) ;
+      da->SetComponent(id1, j, t0[j]) ;
+    }
+  }
+
+
+  // change the id's on any cells belonging to the points
+  vtkIdList* idlist = vtkIdList::New() ;
+
+  polydata->GetPointCells(id0, idlist) ;
+  for (int i = 0 ;  i < idlist->GetNumberOfIds() ;  i++){
+    int cellId = idlist->GetId(i) ;
+    ChangePointIdInCell(polydata, cellId, id0, id1) ;
+  }
+
+  polydata->GetPointCells(id1, idlist) ;
+  for (int i = 0 ;  i < idlist->GetNumberOfIds() ;  i++){
+    int cellId = idlist->GetId(i) ;
+    ChangePointIdInCell(polydata, cellId, id1, id0) ;
+  }
+
+  idlist->Delete() ;
+}
+
+
+
+//------------------------------------------------------------------------------
+// Move id's of points to end of polydata. \n
+// Corresponding cells and attributes are also changed.
+//------------------------------------------------------------------------------
+void vtkMEDPolyDataNavigator::MovePointIdsToEnd(vtkPolyData *polydata, vtkIdList *idList)  const
+{
+  int n = polydata->GetPoints()->GetNumberOfPoints() ;
+  int m = idList->GetNumberOfIds() ;
+
+  // Problem is to move m id's into the range n-m to n-1 incl.
+  // id's which are outside this range must move in.
+  // id's inside the range but not in the list must move out.
+  // We assume that the list contains no repeats.
+  int idmin = GetMinIdInList(idList) ;
+  int idmax = GetMaxIdInList(idList) ;
+  if ((idmin == n-m) && (idmax == n-1)){
+    // no need to do anything
+    return ;
+  }
+
+  // list id's which are to move in
+  std::vector<int> idsInBound ;
+  for (int i = 0 ;  i < m ;  i++){
+    int id = idList->GetId(i) ;
+    if (id < n-m)
+      idsInBound.push_back(id) ;
+  }
+
+  // list id's which are to move out
+  // note that we copy the list to a set for efficient searching
+  IdSet idset ;
+  std::vector<int> idsOutBound ;
+  CopyListToIdSet(idList, idset) ;
+  for (int id = n-m ;  id < n ;  id++){
+    if (this->NotInSet(id, idset))
+      idsOutBound.push_back(id) ;
+  }
+
+  // check that inbound and outbound lists are same size
+  int numInBound = (int)idsInBound.size() ;
+  int numOutBound = (int)idsOutBound.size() ;
+  if (numInBound != numOutBound)
+    assert(false) ;
+
+  // swap lists in pairs
+  for (int i = 0 ;  i < numInBound ;  i++)
+    SwapPointIds(polydata, idsInBound[i], idsOutBound[i]) ;
+
+  // list is no longer valid to set points to n-m to n-1
+  for (int i = 0 ;  i < m ;  i++)
+    idList->SetId(i, i+n-m) ;
 
   // Delete the invalid links and cells
   polydata->DeleteCells() ;
@@ -3255,8 +3456,13 @@ void vtkMEDPolyDataNavigator::RemovePointsWithNoCells(vtkPolyData *polydata) con
 {
   vtkIdList *ptsNoCells = vtkIdList::New() ;
   GetPointsWithNoCells(polydata, ptsNoCells) ;
-  DeletePoints(polydata, ptsNoCells) ; // only works if points form a block at the end!
+  MovePointIdsToEnd(polydata, ptsNoCells) ; // DeletePoints() needs points at the end
+  DeletePoints(polydata, ptsNoCells) ;
   ptsNoCells->Delete() ;
+
+  // Delete the invalid links and cells
+  polydata->DeleteCells() ;
+  polydata->DeleteLinks() ;
 }
 
 
