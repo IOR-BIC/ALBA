@@ -13,6 +13,8 @@
 #include <assert.h>
 
 
+
+
 //------------------------------------------------------------------------------
 /// vtkMEDPolyDataNavigator. \n
 /// Useful methods for navigating and editing vtkPolyData and vtkIdList. \n\n
@@ -40,7 +42,7 @@
 // Therefore methods which change the polydata should finish by deleting the invalid links,
 // or carry a warning that the user should do it.
 //
-// Version: Nigel McFarlane 17.10.13
+// Version: Nigel McFarlane 5.12.13
 //------------------------------------------------------------------------------
 class VTK_GRAPHICS_EXPORT vtkMEDPolyDataNavigator : public vtkObject
 {
@@ -167,6 +169,12 @@ public:
 
   /// Set id list to all cells (0,1,2...ncells-1)
   void SetIdListToAllCells(vtkPolyData *polydata, vtkIdList *list) const ;
+
+  /// Get min id in list
+  int GetMinIdInList(vtkIdList *list) const ;
+
+  /// Get max id in list
+  int GetMaxIdInList(vtkIdList *list) const ;
 
   /// Print id list
   void PrintIdList(vtkIdList *idList, ostream& os) const ;
@@ -348,6 +356,9 @@ public:
   /// Get points with no cell neighbours
   void GetPointsWithNoCells(vtkPolyData *polydata, vtkIdList *pts) const ;
 
+  /// Get length of edge
+  double GetLengthOfEdge(vtkPolyData *polydata, const Edge edge) const ;
+
   /// PrintCell. \n
   /// NB This depends on BuildCells()
   void PrintCell(vtkPolyData *polydata, int cellId, ostream& os)  const ;
@@ -401,6 +412,7 @@ public:
   void SetCellToEmpty(vtkPolyData *polydata, int cellId) const ;
 
   /// Delete list of cells. \n
+  /// Supports cell types verts, lines and polys. \n
   /// cf polydata->DeleteCell(), which labels the cell, but does not actually remove it. \n
   /// The corresponding attribute data is also deleted.
   void DeleteCells(vtkPolyData *polydata, vtkIdList *idList)  const ;
@@ -410,6 +422,10 @@ public:
   /// NB Only use this for points which form a block at the end of the polydata, \n
   /// and which are not members of cells, else cells will contain invalid id's.
   void DeletePoints(vtkPolyData *polydata, vtkIdList *idList)  const ;
+
+  /// Swap the id's of two points. \n
+  /// Can call consecutively but must delete or rebuild links when finished.
+  void SwapPointIds(vtkPolyData *polydata, int id0, int id1) const ;
 
   /// Move id's of points to end of polydata. \n
   /// Corresponding cells and attributes are also changed.
@@ -501,8 +517,7 @@ public:
   void MergePoints(vtkPolyData *polydata, vtkIdList *idsIn0,  vtkIdList *idsIn1,  vtkIdList *idsOut,  double lambda) const ;
 
   /// Remove isolated points which are not part of cells. \n
-  /// This does not remove points which are vertex cells. \n
-  /// This only works if the points are a block at the end !! \n
+  /// This does not remove points which are vertex cells.
   void RemovePointsWithNoCells(vtkPolyData *polydata) const ;
 
 
