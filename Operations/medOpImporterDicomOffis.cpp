@@ -4046,7 +4046,11 @@ bool medOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 			//if (dcmSmallestImagePixelValue == dcmLargestImagePixelValue)
 			//  dcmRescaleIntercept = 0;
 
+      const char *dcmModality = "?";
+			dicomDataset->findAndGetString(DCM_Modality,dcmModality);
 
+      long rappresentationMax;
+      long rappresentationMin;
 			if(val_long==16 && dcmPixelRepresentation == 0 )
 			{
 				dicomSliceVTKImageData->SetScalarType(VTK_UNSIGNED_SHORT);
@@ -4054,6 +4058,10 @@ bool medOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 			else if (val_long == 16 && dcmPixelRepresentation == 1)
 			{
 				dicomSliceVTKImageData->SetScalarType(VTK_SHORT);
+
+        rappresentationMax = VTK_SHORT_MAX;
+        rappresentationMin = VTK_SHORT_MIN;
+
 			}
 			else if(val_long==8 && dcmPixelRepresentation == 0)
 			{
@@ -4072,6 +4080,15 @@ bool medOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 			const Uint8* dicom_buf_char = NULL;
 			int min = VTK_INT_MAX;
 			int max = VTK_INT_MIN;
+
+      long paddingValue = 0;
+      if (dicomDataset->findAndGetLongInt(DCM_PixelPaddingValue,paddingValue).bad())
+      {
+        paddingValue = 0;
+      }
+      
+
+
 			if (val_long==16) 
 			{ 
 				dicomDataset->findAndGetUint16Array(DCM_PixelData, dicom_buf_short); 
@@ -4080,8 +4097,14 @@ bool medOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 				{ 
 					for(int x=0;x<dcmColumns;x++) 
 					{ 
+            
 						dicomSliceVTKImageData->GetPointData()->GetScalars()->SetTuple1(counter, dicom_buf_short[dcmColumns*y+x]);
 						counter++;
+
+            if (paddingValue != 0 && paddingValue ==  dicom_buf_short[dcmColumns*y+x])
+            {
+              continue;
+            }
 
 						if (dicom_buf_short[dcmColumns*y+x] > max)
 						{
@@ -4092,6 +4115,7 @@ bool medOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 							min = dicom_buf_short[dcmColumns*y+x];
 						}
 					} 
+
 				} 
 			} 
 			else 
@@ -4105,6 +4129,10 @@ bool medOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 						dicomSliceVTKImageData->GetPointData()->GetScalars()->SetTuple1(counter, dicom_buf_char[dcmColumns*y+x]); 
 						counter++;
 
+            if (paddingValue != 0 && paddingValue ==  dicom_buf_char[dcmColumns*y+x])
+            {
+              continue;
+            }
 						if (dicom_buf_char[dcmColumns*y+x] > max)
 						{
 							max = dicom_buf_char[dcmColumns*y+x];
@@ -4115,7 +4143,48 @@ bool medOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 						}
 					} 
 				} 
-			} 
+			}
+
+      long correction = 0;
+      if (strcmp((char *)dcmModality, "CT" ) != 0 && paddingValue != 0)
+      {
+        if (val_long==16) 
+			  { 
+				  dicomDataset->findAndGetUint16Array(DCM_PixelData, dicom_buf_short); 
+				  int counter=0; 
+				  for(int y=0;y<dcmRows;y++) 
+				  { 
+					  for(int x=0;x<dcmColumns;x++) 
+					  { 
+              long value = dicom_buf_short[dcmColumns*y+x];
+              if (value == paddingValue)
+              {
+                dicomSliceVTKImageData->GetPointData()->GetScalars()->SetTuple1(counter, min);
+              }
+						  counter++;
+					  } 
+
+				  } 
+			  } 
+			  else 
+			  { 
+				  dicomDataset->findAndGetUint8Array(DCM_PixelData, dicom_buf_char); 
+				  int counter=0; 
+				  for(int y=0;y<dcmRows;y++) 
+				  { 
+					  for(int x=0;x<dcmColumns;x++) 
+					  { 
+              long value = dicom_buf_short[dcmColumns*y+x];
+              if (value == paddingValue)
+              {
+						    dicomSliceVTKImageData->GetPointData()->GetScalars()->SetTuple1(counter, min); 
+              }
+              counter++;
+						 
+					  } 
+				  } 
+			  }
+      }
 
 			dicomSliceVTKImageData->Update();
 
@@ -4205,10 +4274,6 @@ bool medOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 
 				vtkDEL(scalarsRescaled);
 			}
-
-
-			const char *dcmModality = "?";
-			dicomDataset->findAndGetString(DCM_Modality,dcmModality);
 
 			const char *dcmPatientPosition = "?";
 			dicomDataset->findAndGetString(DCM_PatientPosition,dcmPatientPosition);
@@ -5228,6 +5293,10 @@ void medOpImporterDicomOffis::RescaleTo16Bit(vtkImageData *dataSet)
 	{
 		double value = dataSet->GetPointData()->GetScalars()->GetTuple1(i);
 		value = (value - m_RescaleIntercept) * ((double)VTK_UNSIGNED_SHORT_MAX) / (4095.);
+    if (value < -1024)
+    {
+      value = -1024.0;
+    }
 		newScalars->InsertNextTuple1(value);
 	}
 	dataSet->GetPointData()->SetScalars(newScalars);
