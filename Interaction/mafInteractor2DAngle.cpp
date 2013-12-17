@@ -48,6 +48,7 @@
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkPoints.h"
 #include "vtkPolyData.h"
+#include "vtkRendererCollection.h"
 
 
 
@@ -111,6 +112,10 @@ mafInteractor2DAngle::mafInteractor2DAngle()
   m_Clockwise = false;
 	m_RegisterMeasure = false;
   m_MeasureType = ANGLE_BETWEEN_POINTS;
+
+  m_Color[0] = 0.0;
+  m_Color[1] = 1.0;
+  m_Color[2] = 0.0;
 
   
   m_Angle = 0;
@@ -183,6 +188,30 @@ void mafInteractor2DAngle::OnLeftButtonDown(mafEventInteraction *e)
   }
   m_CurrentRwi = m_Mouse->GetRWI();
   m_CurrentRenderer = m_Mouse->GetRenderer();
+
+  if (m_CurrentRenderer->GetLayer() != 1)//Frontal Render
+  {
+	  vtkRendererCollection *rc = m_Mouse->GetRenderer()->GetRenderWindow()->GetRenderers();;
+	  if(rc)
+	  {
+	    rc->InitTraversal();
+	    
+	    vtkRenderer *ren = NULL;
+	    do 
+	    {
+		    ren = rc->GetNextItem();
+		    if(ren)
+		    {
+		      if (ren->GetLayer() == 1)//Frontal Render
+		      {
+		        m_CurrentRenderer = ren;
+	          break;
+	        }
+		    }
+	    } while (ren);
+	  }
+  }
+
   m_ParallelView = m_CurrentRenderer->GetActiveCamera()->GetParallelProjection() != 0;
   if (m_ParallelView)
   {
@@ -272,6 +301,30 @@ void mafInteractor2DAngle::DrawMeasureTool(double x, double y)
   
   m_CurrentRwi = m_Mouse->GetRWI();
   m_CurrentRenderer = m_Mouse->GetRenderer();
+
+  if (m_CurrentRenderer->GetLayer() != 1)//Frontal Render
+  {
+	  vtkRendererCollection *rc = m_Mouse->GetRenderer()->GetRenderWindow()->GetRenderers();;
+	  if(rc)
+	  {
+	    rc->InitTraversal();
+	    
+	    vtkRenderer *ren = NULL;
+	    do 
+	    {
+		    ren = rc->GetNextItem();
+		    if(ren)
+		    {
+		      if (ren->GetLayer() == 1)//Frontal Render
+		      {
+		        m_CurrentRenderer = ren;
+	          break;
+	        }
+		    }
+	    } while (ren);
+	  }
+  }
+
 	if (m_CurrentRenderer == NULL || (m_DisableUndoAndOkCancel && counter == 2 && m_CurrentRenderer != m_PreviousRenderer ))	{return;}
 
 	double wp[4], p[3];
@@ -457,7 +510,7 @@ void mafInteractor2DAngle::DrawMeasureTool(double x, double y)
     m_LineActorVector1.push_back(NULL);
     m_LineActorVector1[m_LineActorVector1.size()-1] = vtkActor2D::New();
     m_LineActorVector1[m_LineActorVector1.size()-1]->SetMapper(m_LineMapperVector1[m_LineMapperVector1.size()-1]);
-    m_LineActorVector1[m_LineActorVector1.size()-1]->GetProperty()->SetColor(0.0,1.0,0.0);
+    m_LineActorVector1[m_LineActorVector1.size()-1]->GetProperty()->SetColor(m_Color);
     m_CurrentRenderer->AddActor2D(m_LineActorVector1[m_LineActorVector1.size()-1]);
 
     // persistent LINE2
@@ -480,7 +533,7 @@ void mafInteractor2DAngle::DrawMeasureTool(double x, double y)
     m_LineActorVector2.push_back(NULL);
     m_LineActorVector2[m_LineActorVector2.size()-1] = vtkActor2D::New();
     m_LineActorVector2[m_LineActorVector2.size()-1]->SetMapper(m_LineMapperVector2[m_LineMapperVector2.size()-1]);
-    m_LineActorVector2[m_LineActorVector2.size()-1]->GetProperty()->SetColor(0.0,1.0,0.0);
+    m_LineActorVector2[m_LineActorVector2.size()-1]->GetProperty()->SetColor(m_Color);
     m_CurrentRenderer->AddActor2D(m_LineActorVector2[m_LineActorVector2.size()-1]);
 
     //measure , measure type vectors
@@ -1451,4 +1504,11 @@ void mafInteractor2DAngle::ShowAllMeasures( bool show )
   {
     m_CurrentRenderer->GetRenderWindow()->Render();
   }
+}
+
+void mafInteractor2DAngle::SetColor(double r,double g,double b)
+{
+  m_Color[0] = r;
+  m_Color[1] = g;
+  m_Color[2] = b;
 }

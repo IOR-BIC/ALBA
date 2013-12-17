@@ -151,6 +151,10 @@ mafInteractor2DDistance::mafInteractor2DDistance()
   m_MeasureType = DISTANCE_BETWEEN_POINTS;
 
   m_Distance = 0;
+
+  m_Color[0] = 0.0;
+  m_Color[1] = 1.0;
+  m_Color[2] = 0.0;
   
 }
 //----------------------------------------------------------------------------
@@ -645,7 +649,7 @@ void mafInteractor2DDistance::DrawMeasureTool(double x, double y)
     m_LineActorVector1.push_back(NULL);
     m_LineActorVector1[m_LineActorVector1.size()-1] = vtkActor2D::New();
     m_LineActorVector1[m_LineActorVector1.size()-1]->SetMapper(m_LineMapperVector1[m_LineMapperVector1.size()-1]);
-    m_LineActorVector1[m_LineActorVector1.size()-1]->GetProperty()->SetColor(0.0,1.0,0.0);
+    m_LineActorVector1[m_LineActorVector1.size()-1]->GetProperty()->SetColor(m_Color);
     m_CurrentRenderer->AddActor2D(m_LineActorVector1[m_LineActorVector1.size()-1]);
 
 		// glyph to emulate a arrow
@@ -717,7 +721,7 @@ void mafInteractor2DDistance::DrawMeasureTool(double x, double y)
     m_LineActorVector2.push_back(NULL);
     m_LineActorVector2[m_LineActorVector2.size()-1] = vtkActor2D::New();
     m_LineActorVector2[m_LineActorVector2.size()-1]->SetMapper(m_LineMapperVector2[m_LineMapperVector2.size()-1]);
-    m_LineActorVector2[m_LineActorVector2.size()-1]->GetProperty()->SetColor(0.0,1.0,0.0);
+    m_LineActorVector2[m_LineActorVector2.size()-1]->GetProperty()->SetColor(m_Color);
     m_CurrentRenderer->AddActor2D(m_LineActorVector2[m_LineActorVector2.size()-1]);
 
     //measure , measure type vectors
@@ -1128,4 +1132,11 @@ void mafInteractor2DDistance::ShowAllMeasures( bool show )
   {
     m_CurrentRenderer->GetRenderWindow()->Render();
   }
+}
+
+void mafInteractor2DDistance::SetColor(double r,double g,double b)
+{
+  m_Color[0] = r;
+  m_Color[1] = g;
+  m_Color[2] = b;
 }
