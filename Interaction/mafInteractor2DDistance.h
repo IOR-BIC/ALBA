@@ -146,6 +146,8 @@ public:
   /** return the current rwi */
   mafRWIBase *GetCurrentRwi();
 
+  void SetColor(double r,double g,double b);
+
 protected:
 	mafInteractor2DDistance();
 	virtual ~mafInteractor2DDistance();
@@ -235,6 +237,8 @@ protected:
   
 	double  m_PickedPoint[3]; ///< 3D position of the picked point; used to assign position to the m_ProbingLine
 	mafVME *m_ProbedVME; ///< VME probed by the m_ProbingLine
+
+  double m_Color[3];
    
 
 private:
