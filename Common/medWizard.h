@@ -109,6 +109,8 @@ protected:
   /** Set the selected VME, this function must be called before execution begin*/
   void SetSelectedVME(mafNode *node);
 
+  mafObserver    *m_Listener;
+
 private:
 
   /** Manages the begin of execution of current block */
@@ -131,7 +133,6 @@ private:
   int							m_Id; ///< Index of the wizard referring to the wizard list.
   wxString				m_Label; ///< Label of the wizard that will appear on menu.
   wxString				m_Name; ///< Label of the wizard that will appear on menu.
-  mafObserver    *m_Listener;
   mafNode        *m_SelectedVME;
   bool            m_ShowProgressBar;
 
