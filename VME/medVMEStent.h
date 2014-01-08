@@ -113,6 +113,7 @@ public:
   void SetStentMaterial(wxString Material) {m_Material = Material;}
   void SetStentDeliverySystem(double delsys) {m_DeliverySystem = delsys;}
   void SetStentDiameter(double d) {m_Stent_Diameter = d;}
+  void SetStentDBDiameter(double d) {m_Stent_DBDiameter = d;}
   void SetStentDLength(double length) {m_Stent_DLength = length; } 
   void SetStentCrownLength(double crownL) {m_Crown_Length = crownL;}
   void SetStrutThickness(double strutThickness) {m_Strut_Thickness = strutThickness; }
@@ -137,6 +138,7 @@ public:
   double GetStentDeliverySystem() const {return m_DeliverySystem;};
   double GetStentRadius() const {return m_Stent_Diameter/2.0;}
   double GetStentDiameter() const {return m_Stent_Diameter;}
+  double GetStentDBDiameter() const {return m_Stent_DBDiameter;}
   double GetStentDLength() const {return m_Stent_DLength;}  
   double GetStentCrownLength() const {return m_Crown_Length;}
   double GetStrutThickness() const {return m_Strut_Thickness;}
@@ -276,6 +278,7 @@ private:
   double m_DeliverySystem;
   
   double m_Stent_Diameter;
+  double m_Stent_DBDiameter;
   double m_Crown_Length;
   double m_Strut_Length; 
   double m_Strut_Angle; ///< angle in radians

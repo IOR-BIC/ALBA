@@ -88,6 +88,7 @@ medVMEStent::medVMEStent()
 
   m_Struts_Number = 16 ;
   m_Stent_Diameter = 2.0 ;
+  m_Stent_DBDiameter = 5.0 ;
   m_Crown_Length = 2.2;
   m_Crown_Number = 10;
   m_Strut_Angle = 60.0;
@@ -312,6 +313,7 @@ int medVMEStent::DeepCopy(mafNode *a)
   m_Material = vmeStent->m_Material ;
   m_DeliverySystem = vmeStent->m_DeliverySystem ;
   m_Stent_Diameter = vmeStent->m_Stent_Diameter ;
+  m_Stent_DBDiameter = vmeStent->m_Stent_DBDiameter ;
   m_Crown_Length = vmeStent->m_Crown_Length ;
   m_Strut_Length = vmeStent->m_Strut_Length ;
   m_Strut_Angle = vmeStent->m_Strut_Angle ;
@@ -381,6 +383,7 @@ int medVMEStent::InternalStore(mafStorageElement *node)
     if (node->StoreText("Material",m_Material) != MAF_OK) return MAF_ERROR;
     if (node->StoreDouble("DeliverySystem",m_DeliverySystem) != MAF_OK) return MAF_ERROR; 
     if (node->StoreDouble("Diameter",m_Stent_Diameter) != MAF_OK) return MAF_ERROR; 
+	if (node->StoreDouble("DBDiameter",m_Stent_DBDiameter) != MAF_OK) return MAF_ERROR;
     if (node->StoreDouble("CrownLength",m_Crown_Length) != MAF_OK) return MAF_ERROR; 
     if (node->StoreDouble("StrutLength",m_Strut_Length) != MAF_OK) return MAF_ERROR; 
     if (node->StoreDouble("StrutAngle",m_Strut_Angle) != MAF_OK) return MAF_ERROR; 
@@ -437,6 +440,7 @@ int medVMEStent::InternalRestore(mafStorageElement *node)
     m_Material = material;
     if (node->RestoreDouble("DeliverySystem",m_DeliverySystem) != MAF_OK) return MAF_ERROR; 
     if (node->RestoreDouble("Diameter",m_Stent_Diameter) != MAF_OK) return MAF_ERROR; 
+	if (node->RestoreDouble("DBDiameter",m_Stent_DBDiameter) != MAF_OK) return MAF_ERROR;
     if (node->RestoreDouble("CrownLength",m_Crown_Length) != MAF_OK) return MAF_ERROR; 
     if (node->RestoreDouble("StrutLength",m_Strut_Length) != MAF_OK) return MAF_ERROR; 
     if (node->RestoreDouble("StrutAngle",m_Strut_Angle) != MAF_OK) return MAF_ERROR; 
@@ -954,7 +958,6 @@ mafNode* medVMEStent::FindTaggedCenterLineVME(mafNode* inputNode)
 }
 
 
-
 //-------------------------------------------------------------------------
 // Find the tagged vessel surface vme.
 // Returns NULL if failed.
@@ -1004,7 +1007,6 @@ mafNode* medVMEStent::FindOrSelectCenterLineVME(mafNode* inputNode)
   mafNode *node = FindTaggedCenterLineVME(inputNode) ;
   if (node != NULL)
     return node ;
-
 
   // can't find tagged vme so launch user select
   mafEvent e(this, VME_CHOOSE) ;
