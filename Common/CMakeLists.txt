@@ -70,6 +70,9 @@ SET(PROJECT_SRCS
   
   medWizardBlockVMESelection.cpp
   medWizardBlockVMESelection.h
+
+  medWizardBlockVMEFindOrSelection.cpp
+  medWizardBlockVMEFindOrSelection.h
   
   medWizardBlockInformation.cpp
   medWizardBlockInformation.h
