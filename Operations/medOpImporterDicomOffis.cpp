@@ -493,15 +493,15 @@ int medOpImporterDicomOffis::RunWizard()
 				{
 					if(!this->m_TestMode)
 					{
-						int answer = wxMessageBox( "Dicom dataset contains rotated images - Apply rotation?", "Warning", wxYES_NO, NULL);
-						if (answer == wxNO)
-						{
-							m_ApplyRotation = false;
-						}
-						else if (answer == wxYES)
-						{
+						//int answer = wxMessageBox( "Dicom dataset contains rotated images - Apply rotation?", "Warning", wxYES_NO, NULL);
+						//if (answer == wxNO)
+						//{
+						//	m_ApplyRotation = false;
+						//}
+						//else if (answer == wxYES)
+						//{
 							m_ApplyRotation = true;
-						}
+						//}
 					}
 				}
 
@@ -555,15 +555,15 @@ int medOpImporterDicomOffis::RunWizard()
 				{
 					if(!this->m_TestMode)
 					{
-						int answer = wxMessageBox( "Dicom dataset contains rotated images - Apply rotation?", "Warning", wxYES_NO, NULL);
-						if (answer == wxNO)
-						{
-							m_ApplyRotation = false;
-						}
-						else if (answer == wxYES)
-						{
+						//int answer = wxMessageBox( "Dicom dataset contains rotated images - Apply rotation?", "Warning", wxYES_NO, NULL);
+						//if (answer == wxNO)
+						//{
+						//	m_ApplyRotation = false;
+						//}
+						//else if (answer == wxYES)
+						//{
 							m_ApplyRotation = true;
-						}
+						//}
 					}
 				}
 
