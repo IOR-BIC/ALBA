@@ -92,6 +92,8 @@ void medWizardBlockInformation::ExcutionBegin()
 
     wxBoxSizer *mainVertSizer = new wxBoxSizer(wxVERTICAL);
     mafGUIDialog *dialog=new mafGUIDialog(m_Title,mafRESIZABLE);
+	wxColour col(232, 249, 253);
+	dialog->SetBackgroundColour(col);
     wxBoxSizer * mainInfoSizer;
   
     //Setting the frames order base
@@ -124,8 +126,8 @@ void medWizardBlockInformation::ExcutionBegin()
     wxFont fixedFont= guiLabel->GetFont();
 
     //setting font to fixed size to avoid wx non-sense 
-    fixedFont.SetFamily(wxFONTFAMILY_MODERN);
-    fixedFont.SetFaceName("Courier");
+    fixedFont.SetFamily(wxFONTFAMILY_DECORATIVE);
+    //fixedFont.SetFaceName("Courier");
     guiLabel->SetFont(fixedFont);
     
     const char *charPointer=m_Description.c_str();
