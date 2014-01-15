@@ -83,6 +83,7 @@ public:
   bool m_vme_is_selected;
 
   vtkRectilinearGrid *m_VolUnionRG; ///< Pointer for Rectilinear Grid volume union
+  vtkStructuredPoints *m_VolUnionRGstr;
   mafVMEVolume *m_FirstVMEVolume;
   mafVMEVolume *m_SecondVMEVolume;
 
