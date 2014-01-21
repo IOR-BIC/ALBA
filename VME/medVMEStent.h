@@ -27,6 +27,7 @@ University of Bedfordshire, UK
 #include "vtkMEDDeformableSimplexMeshFilter.h"
 #include "vtkPolyData.h"
 #include "vtkCellArray.h"
+#include "vtkIdList.h"
 
 
 
@@ -158,7 +159,13 @@ public:
 
   /// Get the approximate length of the stent. \n
   /// This the no. of centerline vertices from end to end.
-  int GetStentLength() ;
+  int CalcStentLengthVerts() ;
+
+  /// Get the current length of the stent in mm
+  double CalcStentLengthMM() ;
+
+  /// Measure the current diameter of the stent in mm
+  double CalcStentDiameterMM() ;
 
   /// Get the simplex mesh
   SimplexMeshType::Pointer GetSimplexMesh() {return m_SimplexMesh ;}
@@ -255,10 +262,39 @@ private:
   /// Create stent centerline from long vessel centerline and start pos
   void CreateStentCenterLine() ;
 
+  /// Get list of valid point id's, \n
+  /// ie points which are members of cells. \n
+  /// Needed because the stent contains unused and undefined points.
+  void GetValidPointIds(vtkPolyData* pd, vtkIdList* ids) const ;
+
   /// Get the highest index of the valid points, \n
   /// ie points which are members of cells. \n
   /// Needed because the stent contains unused and undefined points.
   int GetHighestValidPointIndex(vtkPolyData *pd) const ;
+
+  /// Calculate arc lengths of points along a center line.
+  void CalcArcLengthsOfPoints(vtkPolyData *pd, double* arcLengths) const ;
+
+  /// Calc arc length along center line given id position (id, lambda) \n
+  /// where the position is a fraction lambda along the next segment id to id+1. \n
+  /// This assumes that the pd is a monotonic curve of points.
+  double CalcArclengthFromIdPosition(vtkPolyData *pd, int id, double lambda) const ;
+
+  /// Calc id position (id, lambda) along center line given arc length \n
+  /// where the position is a fraction lambda along the next segment id to id+1. \n
+  /// This assumes that the pd is a monotonic curve of points.
+  void CalcIdPositionFromArcLength(vtkPolyData *pd, double arclen, int& id, double& lambda) const ;
+
+  /// Calc coord position along center line given id position (id, lambda) \n
+  /// where the position is a fraction lambda along the next segment id to id+1. \n
+  /// This assumes that the pd is a monotonic curve of points.
+  void CalcCoordsFromIdPosition(vtkPolyData *pd, int id, double lambda, double* x) const ;
+
+  /// Find nearest point id on center line.
+  void FindNearestPointOnCenterLine(double* p0, vtkPolyData *pd, int& id, double& distSq) const ;
+
+  /// Find nearest point (id, lambda) on center line. \n
+  void FindNearestPointOnCenterLine(double* p0, vtkPolyData *pd, int& id, double& lambda, double& distSq) const ;
 
   /// Partially initialize the deformation filter. \n
   /// This copies information from the stent model to the filter.

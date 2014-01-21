@@ -35,6 +35,7 @@ University of Bedfordshire, UK
 #include "vtkMEDMatrixVectorMath.h"
 #include "medVMEStent.h"
 #include "mafStorageElement.h"
+#include "vtkMEDPolyDataNavigator.h"
 
 #include "vtkPointData.h"
 #include "vtkTransform.h"
@@ -44,6 +45,7 @@ University of Bedfordshire, UK
 #include "vtkPoints.h"
 #include "vtkCellArray.h"
 #include "vtkAppendPolyData.h"
+#include "vtkIdList.h"
 
 #include "itkCellInterface.h"
 
@@ -88,7 +90,7 @@ medVMEStent::medVMEStent()
 
   m_Struts_Number = 16 ;
   m_Stent_Diameter = 2.0 ;
-  m_Stent_DBDiameter = 5.0 ;
+  m_Stent_DBDiameter = 5.0 ; // Saves original DB diameter for reporting, so not lost when crimped.
   m_Crown_Length = 2.2;
   m_Crown_Number = 10;
   m_Strut_Angle = 60.0;
@@ -383,7 +385,7 @@ int medVMEStent::InternalStore(mafStorageElement *node)
     if (node->StoreText("Material",m_Material) != MAF_OK) return MAF_ERROR;
     if (node->StoreDouble("DeliverySystem",m_DeliverySystem) != MAF_OK) return MAF_ERROR; 
     if (node->StoreDouble("Diameter",m_Stent_Diameter) != MAF_OK) return MAF_ERROR; 
-	if (node->StoreDouble("DBDiameter",m_Stent_DBDiameter) != MAF_OK) return MAF_ERROR;
+    if (node->StoreDouble("DBDiameter",m_Stent_DBDiameter) != MAF_OK) return MAF_ERROR;
     if (node->StoreDouble("CrownLength",m_Crown_Length) != MAF_OK) return MAF_ERROR; 
     if (node->StoreDouble("StrutLength",m_Strut_Length) != MAF_OK) return MAF_ERROR; 
     if (node->StoreDouble("StrutAngle",m_Strut_Angle) != MAF_OK) return MAF_ERROR; 
@@ -440,7 +442,7 @@ int medVMEStent::InternalRestore(mafStorageElement *node)
     m_Material = material;
     if (node->RestoreDouble("DeliverySystem",m_DeliverySystem) != MAF_OK) return MAF_ERROR; 
     if (node->RestoreDouble("Diameter",m_Stent_Diameter) != MAF_OK) return MAF_ERROR; 
-	if (node->RestoreDouble("DBDiameter",m_Stent_DBDiameter) != MAF_OK) return MAF_ERROR;
+    if (node->RestoreDouble("DBDiameter",m_Stent_DBDiameter) != MAF_OK) return MAF_ERROR;
     if (node->RestoreDouble("CrownLength",m_Crown_Length) != MAF_OK) return MAF_ERROR; 
     if (node->RestoreDouble("StrutLength",m_Strut_Length) != MAF_OK) return MAF_ERROR; 
     if (node->RestoreDouble("StrutAngle",m_Strut_Angle) != MAF_OK) return MAF_ERROR; 
@@ -573,7 +575,8 @@ void medVMEStent::InternalUpdate()
     this->Modified() ;
   }
 
-  if (m_DeployedPolydataStatus == DEPLOYED_PD_NOT_LOADED){
+
+  if (m_DeployedPolydataStatus != DEPLOYED_PD_NONE){
     mafNode* node = FindNodeWithId(m_DeployedPolydataNodeID) ;
     assert(node != NULL) ;
     m_DeployedPolydataVME = mafVMEPolyline::SafeDownCast(node) ;
@@ -1217,6 +1220,33 @@ void medVMEStent::CreateStentCenterLine()
 
 
 //-------------------------------------------------------------------------
+// Get list of valid point id's, \n
+// ie points which are members of cells. \n
+// Needed because the stent contains unused and undefined points.
+//-------------------------------------------------------------------------
+void medVMEStent::GetValidPointIds(vtkPolyData* pd, vtkIdList* idList) const
+{
+  vtkMEDPolyDataNavigator* nav = vtkMEDPolyDataNavigator::New() ;
+  vtkMEDPolyDataNavigator::IdSet idSet ; // copy to set first to efficiently remove duplicate ids
+  vtkIdList* cellPtIds = vtkIdList::New() ;
+
+  int ncells = pd->GetNumberOfCells() ;
+  for (int i = 0 ;  i < ncells ;  i++){
+    pd->GetCellPoints(i, cellPtIds) ;
+    for (int j = 0 ;  j < cellPtIds->GetNumberOfIds() ;  j++){
+      int id = cellPtIds->GetId(j) ;
+      nav->AddUniqueIdToSet(idSet, id) ;  
+    }
+  }
+
+  nav->CopyIdSetToList(idSet, idList) ;
+  nav->Delete() ;
+  cellPtIds->Delete() ;
+}
+
+
+
+//-------------------------------------------------------------------------
 // Get the highest index of the valid points,
 // ie points which are members of cells.
 /// Needed because the stent contains unused and undefined points.
@@ -1224,15 +1254,12 @@ void medVMEStent::CreateStentCenterLine()
 int medVMEStent::GetHighestValidPointIndex(vtkPolyData *pd) const
 {
   vtkIdList *ptIds = vtkIdList::New() ;
-  int ncells = pd->GetNumberOfCells() ;
+  GetValidPointIds(pd, ptIds) ;
   int idLast = -1 ;
-  for (int i = 0 ;  i < ncells ;  i++){
-    pd->GetCellPoints(i, ptIds) ;
-    for (int j = 0 ;  j < ptIds->GetNumberOfIds() ;  j++){
-      int id = ptIds->GetId(j) ;
-      if (id > idLast)
-        idLast = id ;
-    }
+  for (int i = 0 ;  i < ptIds->GetNumberOfIds() ;  i++){
+    int id = ptIds->GetId(i) ;
+    if (id > idLast)
+      idLast = id ;
   }
   ptIds->Delete() ;
   return idLast ;
@@ -1244,12 +1271,9 @@ int medVMEStent::GetHighestValidPointIndex(vtkPolyData *pd) const
 // Get the approximate length of the stent.
 // This is the no. of centerline vertices from end to end.
 //-------------------------------------------------------------------------
-int medVMEStent::GetStentLength()
+int medVMEStent::CalcStentLengthVerts()
 {
   if (m_StentLengthModified){
-    vtkMEDMatrixVectorMath *matVecMath = vtkMEDMatrixVectorMath::New() ;
-    matVecMath->SetHomogeneous(false) ;
-
     // Get the nearest point on the centerline to the last point on the stent.
     // The stent contains undefined points(!) so we need the last valid one,
     // ie the highest pt id which is part of a cell.
@@ -1257,26 +1281,311 @@ int medVMEStent::GetStentLength()
 
     double xlast[3] ;
     m_StentPolyData->GetPoint(idLast, xlast) ;
-
-    int n = m_StentCenterLine->GetPoints()->GetNumberOfPoints() ;
     int inear = -1 ;
     double r2near = 1.0E6 ;
-    for (int i = 0 ;  i < n ;  i++){
-      double x[3] ;
-      m_StentCenterLine->GetPoint(i, x) ;
-      double r2 = matVecMath->DistanceSquared(x, xlast) ;
-      if ((i == 0) || (r2 < r2near)){
-        r2near = r2 ;
-        inear = i ;
-      }
-    }
-
+    FindNearestPointOnCenterLine(xlast, m_StentCenterLine, inear, r2near) ;
     m_StentLength = inear ;
     m_StentLengthModified = false ;
-    matVecMath->Delete() ;
   }
 
   return m_StentLength ;
+}
+
+
+
+//-------------------------------------------------------------------------
+// Measure the current length of the stent in mm
+//-------------------------------------------------------------------------
+double medVMEStent::CalcStentLengthMM()
+{
+  vtkIdList* validPts = vtkIdList::New() ;
+  GetValidPointIds(m_StentPolyData, validPts) ;
+
+  // get points with min and max projection on center line.
+  int idMin = -1 ;
+  int idMax = -1 ;
+  double lambdaMin = 0.0 ;
+  double lambdaMax = 0.0 ;
+  int n = validPts->GetNumberOfIds() ;
+  for (int i = 0 ;  i < n ;  i++){
+    double p[3] ;
+    int idStent = validPts->GetId(i) ;
+    m_StentPolyData->GetPoints()->GetPoint(idStent, p) ;
+
+    int id ;
+    double lambda, rsq ;
+    FindNearestPointOnCenterLine(p, m_StentCenterLine, id, lambda, rsq) ;
+
+    if ((i == 0) || (id < idMin) || ((id == idMin) && (lambda < lambdaMin))){
+      idMin = id ;
+      lambdaMin = lambda ;
+    }
+
+    if ((i == 0) || (id > idMax) || ((id == idMax) && (lambda > lambdaMax))){
+      idMax = id ;
+      lambdaMax = lambda ;
+    }
+  }
+
+  vtkMEDMatrixVectorMath* matMath = vtkMEDMatrixVectorMath::New() ;
+  matMath->SetHomogeneous(false) ;
+  double xMin[3], xMax[3] ;
+  CalcCoordsFromIdPosition(m_CenterLine, idMin, lambdaMin, xMin) ;
+  CalcCoordsFromIdPosition(m_CenterLine, idMax, lambdaMax, xMax) ;
+  double r = matMath->Distance(xMin, xMax) ;
+
+  validPts->Delete() ;
+  matMath->Delete() ;
+
+  return r ;
+}
+
+
+//-------------------------------------------------------------------------
+// Measure the current diameter of the stent in mm
+//-------------------------------------------------------------------------
+double medVMEStent::CalcStentDiameterMM()
+{
+  vtkIdList* validPts = vtkIdList::New() ;
+  GetValidPointIds(m_StentPolyData, validPts) ;
+
+  // get points with min and max projection on center line.
+  double sumrsq = 0.0 ;
+  int n = validPts->GetNumberOfIds() ;
+  for (int i = 0 ;  i < n ;  i++){
+    double p[3] ;
+    int idStent = validPts->GetId(i) ;
+    m_StentPolyData->GetPoints()->GetPoint(idStent, p) ;
+
+    int id ;
+    double lambda, rsq ;
+    FindNearestPointOnCenterLine(p, m_StentCenterLine, id, lambda, rsq) ;
+    sumrsq += rsq ;
+  }
+
+  double diam = 2.0*sqrt(sumrsq / (double)n) ;
+
+  validPts->Delete() ;
+  return diam ;
+}
+
+
+
+//-------------------------------------------------------------------------
+// Calculate arc lengths of points along a center line.
+//-------------------------------------------------------------------------
+void medVMEStent::CalcArcLengthsOfPoints(vtkPolyData *pd, double* arcLengths) const
+{
+  int n = pd->GetPoints()->GetNumberOfPoints() ;
+
+  vtkMEDMatrixVectorMath* matMath = vtkMEDMatrixVectorMath::New() ;
+  matMath->SetHomogeneous(false) ;
+
+  double x0[3], x1[3] ;
+  arcLengths[0] = 0.0 ;
+  pd->GetPoints()->GetPoint(0, x0) ;
+  for (int i = 1 ;  i < n ;  i++){
+    pd->GetPoints()->GetPoint(i-1, x0) ;
+    pd->GetPoints()->GetPoint(i, x1) ;
+    double di = matMath->Distance(x0, x1) ;
+    arcLengths[i] = arcLengths[i-1]+di ;
+  }
+
+  matMath->Delete() ;
+}
+
+
+
+//-------------------------------------------------------------------------
+// Calc arc length along center line given id position (id, lambda)
+// where the position is a fraction lambda along the next segment id to id+1.
+// This assumes that the pd is a monotonic curve of points.
+//-------------------------------------------------------------------------
+double medVMEStent::CalcArclengthFromIdPosition(vtkPolyData *pd, int id, double lambda) const
+{
+  int n = pd->GetPoints()->GetNumberOfPoints() ;
+  assert((id >= 0) && (id < n)) ;
+
+  double* arcLengths = new double[n+1] ; 
+  CalcArcLengthsOfPoints(pd, arcLengths) ;
+  arcLengths[n] = arcLengths[n-1] ;
+
+  double arclen = (1.0-lambda)*arcLengths[id] + lambda*arcLengths[id+1] ;
+
+  delete [] arcLengths ;
+  return arclen ;
+}
+
+
+
+//-------------------------------------------------------------------------
+// Calc id position (id, lambda) along center line given arc length
+// where the position is a fraction lambda along the next segment id to id+1.
+// This assumes that the pd is a monotonic curve of points.
+//-------------------------------------------------------------------------
+void medVMEStent::CalcIdPositionFromArcLength(vtkPolyData *pd, double arclen, int& id, double& lambda) const
+{
+  int n = pd->GetPoints()->GetNumberOfPoints() ;
+
+  double* arcLengths = new double[n+1] ; 
+  CalcArcLengthsOfPoints(pd, arcLengths) ;
+  arcLengths[n] = arcLengths[n-1] ;
+
+  // find first point where arc length >= arclen
+  int idfound = -1 ;
+  for (int i = 1 ;  i < n && idfound != -1 ;  i++){
+    if (arcLengths[i] >= arclen)
+      idfound = i ;
+  }
+
+  if (idfound != -1){
+    if (arcLengths[idfound] == arclen){
+      // return exact match
+      id = idfound ;
+      lambda = 0.0 ;
+    }
+    else{
+      id = idfound-1 ;
+      lambda = (arclen-arcLengths[id])/(arcLengths[id+1] - arcLengths[id]) ;
+    }
+  }
+  else{
+    // not found - return last point
+    id = n-1 ;
+    lambda = 0.0 ;
+  }
+
+  delete [] arcLengths ;
+}
+
+
+
+
+//-------------------------------------------------------------------------
+// Calc coord position along center line given id position (id, lambda)
+// where the position is a fraction lambda along the next segment id to id+1.
+// This assumes that the pd is a monotonic curve of points.
+//-------------------------------------------------------------------------
+void medVMEStent::CalcCoordsFromIdPosition(vtkPolyData *pd, int id, double lambda, double* x) const
+{
+  int n = pd->GetPoints()->GetNumberOfPoints() ;
+  assert((id >= 0) && (id < n)) ;
+  assert((id < n-1) || (lambda == 0.0)) ;
+
+  if (lambda == 0.0){
+    pd->GetPoints()->GetPoint(id, x) ;
+    return ;
+  }
+  else{
+    vtkMEDMatrixVectorMath* matMath = vtkMEDMatrixVectorMath::New() ;
+    matMath->SetHomogeneous(false) ;
+    double x0[3], x1[3] ;
+    pd->GetPoints()->GetPoint(id, x0) ;
+    pd->GetPoints()->GetPoint(id+1, x1) ;
+    matMath->InterpolateVectors(lambda, x0, x1, x) ;
+    matMath->Delete() ;
+    return ;
+  }
+}
+ 
+
+
+//-------------------------------------------------------------------------
+// Find nearest point id on center line.
+//-------------------------------------------------------------------------
+void medVMEStent::FindNearestPointOnCenterLine(double* p0, vtkPolyData *pd, int& id, double& distSq) const
+{
+  int n = pd->GetPoints()->GetNumberOfPoints() ;
+
+  vtkMEDMatrixVectorMath* matMath = vtkMEDMatrixVectorMath::New() ;
+  matMath->SetHomogeneous(false) ;
+
+  // find nearest id point
+  int imin = -1 ;
+  distSq = -1.0 ;
+  double x[3] ;
+  for (int i = 0 ;  i < n ;  i++){
+    pd->GetPoints()->GetPoint(i, x) ;
+    double di2 = matMath->DistanceSquared(p0, x) ;
+    if ((i == 0) || (di2 < distSq)){
+      imin = i ;
+      distSq = di2 ;
+    }
+  }
+
+  id = imin ;
+  matMath->Delete() ;
+}
+
+
+
+//-------------------------------------------------------------------------
+// Find nearest point (id, lambda) on center line.
+//-------------------------------------------------------------------------
+void medVMEStent::FindNearestPointOnCenterLine(double* p0, vtkPolyData *pd, int& id, double& lambda, double& distSq) const
+{
+  int n = pd->GetPoints()->GetNumberOfPoints() ;
+
+  vtkMEDMatrixVectorMath* matMath = vtkMEDMatrixVectorMath::New() ;
+  matMath->SetHomogeneous(false) ;
+
+  FindNearestPointOnCenterLine(p0, pd, id, distSq) ; // nearest actual point
+
+  // search lambda to the left
+  double xl[3], xm[3], xr[3], laml, lamr ;
+  double distSql = -1.0 ;
+  double distSqr = -1.0 ;
+  pd->GetPoints()->GetPoint(id, xm) ;
+  if (id > 0){
+    double dp[3], dx[3] ;
+    pd->GetPoints()->GetPoint(id-1, xl) ;
+    matMath->SubtractVectors(p0, xl, dp) ; // dp = p0-xl
+    matMath->SubtractVectors(xm, xl, dx) ; // dx = xm-xl
+    double dotpp = matMath->DotProduct(dp,dp) ;
+    double dotxx = matMath->DotProduct(dx,dx) ;
+    double dotpx = matMath->DotProduct(dp,dx) ;
+    laml = dotpx / dotxx ;
+    if ((laml > 0.0) && (laml <= 1.0))
+      distSql = dotpp - laml*laml*dotxx ;
+  }
+
+  // search lambda to the right
+  if (id < n-1){
+    double dp[3], dx[3] ;
+    pd->GetPoints()->GetPoint(id+1, xr) ;
+    matMath->SubtractVectors(p0, xm, dp) ; // dp = p0-xm
+    matMath->SubtractVectors(xr, xm, dx) ; // dx = xr-xm
+    double dotpp = matMath->DotProduct(dp,dp) ;
+    double dotxx = matMath->DotProduct(dx,dx) ;
+    double dotpx = matMath->DotProduct(dp,dx) ;
+    lamr = dotpx / dotxx ;
+    if ((lamr >= 0.0) && (lamr < 1.0))
+      distSqr = dotpp - lamr*lamr*dotxx ;
+  }
+  
+  // decide which side to choose
+  bool choosel = (distSql != -1) ;
+  bool chooser = (distSqr != -1) ;
+  if (choosel && chooser){
+    choosel = (distSql < distSqr) ;
+    chooser = !choosel ;
+  }
+
+  if (choosel){
+    id -= 1 ;
+    lambda = laml ;
+    distSq = distSql ;
+  }
+  else if (chooser){
+    lambda = lamr ;
+    distSq = distSqr ;
+  }
+  else{
+    // choose neither side but keep original point
+    lambda = 0.0 ;
+  }
+
+  matMath->Delete() ;
 }
 
 
