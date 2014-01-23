@@ -330,14 +330,7 @@ void medLogicWithManagers::Configure()
 {
   mafLogicWithManagers::Configure();
 
-  //Setting wizard specific data
-  if(m_UseWizardManager)
-  {
-    CreateWizardToolbar();
-    m_WizardManager = new medWizardManager();
-    m_WizardManager->SetListener(this);
-    m_WizardManager->WarningIfCantUndo(m_ApplicationSettings->GetWarnUserFlag());
-  }
+  ConfigureWizardManager();
 
 }
 
@@ -627,4 +620,16 @@ void medLogicWithManagers::CreateWizardToolbar()
     );
  
   m_WizardGauge->Show(false);
+}
+
+void medLogicWithManagers::ConfigureWizardManager()
+{
+  //Setting wizard specific data
+  if(m_UseWizardManager)
+  {
+    CreateWizardToolbar();
+    m_WizardManager = new medWizardManager();
+    m_WizardManager->SetListener(this);
+    m_WizardManager->WarningIfCantUndo(m_ApplicationSettings->GetWarnUserFlag());
+  }
 }
