@@ -126,6 +126,7 @@ public:
   void SetStentCrownNumber(int crownNumber) {m_Crown_Number = crownNumber; }
   void SetStrutsNumber(int strutsNumber){m_Struts_Number = strutsNumber;}
   void SetLinkNumber(int linkNumber){m_Link_Number = linkNumber;}
+  void SetStentType(int type){m_Stent_Type = type;}
   
   /// calculate strut angle, given diameter, crown length and struts-per-crown.
   void CalcStrutAngle() ; 
@@ -151,6 +152,9 @@ public:
   int GetStentCrownNumber() const {return m_Crown_Number ;}
   double GetStrutLength() const {return m_Strut_Length ;}
   double GetStrutAngle() const {return m_Strut_Angle ;}
+  int GetStrutNumber() const {return m_Struts_Number;}
+  int GetLinkNumber() const {return m_Link_Number;}
+  double GetStentType() const {return m_Stent_Type;}
 
   vtkPolyData* GetVesselCenterLine() {return m_CenterLine;} ///< get vessel centerline
   vtkPolyData* GetVesselCenterLineLong() {return m_CenterLineLong;} ///< get long extrapolated vessel centerline
@@ -254,7 +258,7 @@ private:
 
   /// Calculate extra mid-points on struts of Abbott stent polydata. \n
   /// Input is a pair of adjacent struts - output is four midpoints.
-  void CalculateMidPointsFromPairOfStruts(const double strutEndPts[4][3], double midPts[4][3]) const ;
+  void CalculateMidPointsFromPairOfStruts(const double strutEndPts[4][3], double midPts[4][3],bool isLinkPoint,double strutLinkPts[2][3]) const ;
 
   /// Create long vessel centerline
   void CreateLongVesselCenterLine() ;
@@ -316,7 +320,10 @@ private:
   double m_Stent_Diameter;
   double m_Stent_DBDiameter;
   double m_Crown_Length;
-  double m_Strut_Length; 
+  double m_Strut_Length; 	
+  double m_Stent_DLength;
+  double m_Stent_Length;
+
   double m_Strut_Angle; ///< angle in radians
   double m_Link_Length;
   int m_Struts_Number;
@@ -328,7 +335,6 @@ private:
   int m_Link_Orientation;
   int m_Link_Alignment;
   double m_Strut_Thickness;
-  double m_Stent_DLength; 
   int m_ComputedCrownNumber;
   bool m_StentParamsModified ;
 
@@ -355,7 +361,8 @@ private:
   bool m_StentCenterLineModified ;
   int m_StentLength ;
   bool m_StentLengthModified ; // need to recalculate length of stent
-
+  int m_Stent_Type;//2 Bard 1 Abbort
+  
   // simplex
   vtkPolyData *m_SimplexPolyData; // polydata visualisation of simplex mesh
 

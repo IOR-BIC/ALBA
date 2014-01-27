@@ -83,6 +83,7 @@ public:
   //--------setters----------
   /**----------------------------------------------------------------------------*/
   void setStentDiameter(double value);
+  void setStentDLength(double length) {m_Stent_Length = length; } 
   void setCrownLength(double value);
   void setLinkLength(double value);
   void setStrutsNumber(int value);
@@ -121,6 +122,7 @@ public:
   int getLinkInterlace();
   int getInphaseShort();
   int getStentType();
+  double getStentDLength() const {return m_Stent_Length;}  
 
   inline SimplexMeshType::Pointer GetSimplexMesh() {return m_SimplexMesh ;}
 
@@ -225,6 +227,7 @@ private:
 
   /* stent parameters */
   double m_StentDiameter;
+  double m_Stent_Length; 
   double m_CrownLength;
   double m_StrutLength;
   double m_StrutAngle;  ///< angle in radians

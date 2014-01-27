@@ -512,8 +512,9 @@ void medVMEStent::InternalUpdate()
 
   if(m_StentParamsModified || m_StentCenterLineModified){	
     m_StentSource->setStentDiameter(m_Stent_Diameter);
+	m_StentSource->setStentDLength(m_Stent_DLength);//weih14 @todo
     m_StentSource->setCrownLength(m_Crown_Length);
-    m_StentSource->setCrownNumber(m_Crown_Number);
+    //m_StentSource->setCrownNumber(m_Crown_Number);
 
     m_StentSource->setStentConfiguration((enumStCfgType)m_Id_Stent_Configuration);
     m_StentSource->setLinkConnection((enumLinkConType) m_Id_Link_Connection);
@@ -522,6 +523,7 @@ void medVMEStent::InternalUpdate()
     m_StentSource->setLinkLength(m_Link_Length);
     m_StentSource->setLinkAlignment(m_Link_Alignment);
     m_StentSource->setStrutsNumber(m_Struts_Number);
+	m_StentSource->setStentType(m_Stent_Type);//weih14 add
 
     if (m_Strut_Angle > 0.0)
       m_StentSource->setStrutAngle(m_Strut_Angle) ; // set angle and calc strut length
@@ -536,7 +538,7 @@ void medVMEStent::InternalUpdate()
       //  m_Crown_Number = m_ComputedCrownNumber;
       //}
     }
-    m_StentSource->setCrownNumber(m_Crown_Number);
+    //m_StentSource->setCrownNumber(m_Crown_Number);
 
     //---------weih modify---------
     //m_StentSource->createStent();
@@ -549,6 +551,7 @@ void medVMEStent::InternalUpdate()
     else{
       m_StentSource->createStent();
     }
+	m_Crown_Number = m_StentSource->getCrownNumber();
 
     m_SimplexMesh = m_StentSource->GetSimplexMesh();
     m_SimplexMesh->DisconnectPipeline();
@@ -617,6 +620,9 @@ m_Stent->SetLinkNumber(3);
 void medVMEStent::UpdateStentPolydataFromSimplex()
 {
   if (m_SimplexMeshModified){
+
+   double aVetex[3],bVetex[3];
+   
     vtkPoints* vpoints = vtkPoints::New();
     vpoints->SetNumberOfPoints(2000);		
 
@@ -637,13 +643,14 @@ void medVMEStent::UpdateStentPolydataFromSimplex()
 
     int tindices[2];
     vtkCellArray *lines = vtkCellArray::New() ;
-    lines->Allocate(20000) ;  
+    lines->Allocate(200000) ;  
 
     for(StrutIterator iter = m_StentSource->GetStrutsList().begin(); iter !=m_StentSource->GetStrutsList().end(); iter++){//iter++){
       if(m_StentSource->getInphaseShort()==1){
         // Abbott stent
-        int tindices2[4] ;
-        double endPoints[4][3], midPoints[4][3];
+        int tindices2[4],tindices3[2] ;
+		bool isLinkPoint = false;
+        double endPoints[4][3], midPoints[4][3], strutLinkPoints[2][3];
 
         tindices2[0]=iter->startVertex;
         tindices2[1]=iter->endVertex;
@@ -656,48 +663,105 @@ void medVMEStent::UpdateStentPolydataFromSimplex()
         vpoints->GetPoint(tindices2[2], endPoints[2]) ;
         vpoints->GetPoint(tindices2[3], endPoints[3]) ;
 
-        CalculateMidPointsFromPairOfStruts(endPoints, midPoints) ;
+		//------points tindices2[1] and tindices2[3] should be the  same points
+		//if(tindices2[1] is link points then calculate strutLink points)
+
+		// Do the cells for the links
+		for(StrutIterator iter2 = m_StentSource->GetLinksList().begin(); iter2 !=m_StentSource->GetLinksList().end(); iter2++){
+			tindices3[0] = iter2->startVertex;
+			tindices3[1] = iter2->endVertex;
+			if(tindices3[1] == tindices2[1] ){// end data of link should be the same as end of strut
+				isLinkPoint = true;
+				break;
+			}
+			//lines->InsertNextCell(2, tindices);
+		}
+        CalculateMidPointsFromPairOfStruts(endPoints, midPoints,isLinkPoint,strutLinkPoints) ;
 
         // add the 4 new midpoints
-        int newPtIds[4] ;
-        for(int i=0;i<4;i++){
-          newPtIds[i] = vpoints->InsertNextPoint(midPoints[i]);
+        int newPtIds[6] ;
+        for(int i=0;i<6;i++){
+			if(i<4){//first 4 points for mid points, last two for strutlink points
+          		newPtIds[i] = vpoints->InsertNextPoint(midPoints[i]);
+			}else{
+				if(isLinkPoint){
+					newPtIds[i] = vpoints->InsertNextPoint(strutLinkPoints[i-4]);// index is 0 or 1
+				}
+			}
           pointCount++;
         }
 
-        //----------left arm------------
+		//check if this strut has a link
+
+        //----------left arm----------
         int tindicesShort[2] ;
         tindicesShort[0]=tindices2[0];
-        tindicesShort[1]=newPtIds[0] ;
+		tindicesShort[1]=newPtIds[1] ;
+       // tindicesShort[1]=newPtIds[0] ;
         lines->InsertNextCell(2,tindicesShort);
 
-        tindicesShort[0]=newPtIds[0];
+        tindicesShort[0]=newPtIds[0];              //\_
         tindicesShort[1]=newPtIds[1];
         lines->InsertNextCell(2,tindicesShort);
 
-        tindicesShort[0]=newPtIds[1];
-        tindicesShort[1]=tindices2[1];
-        lines->InsertNextCell(2,tindicesShort);
+        if(isLinkPoint){                                  //  \_
+			 tindicesShort[0]=newPtIds[0];	               //   \_|
+			 tindicesShort[1]=newPtIds[5];
+			 lines->InsertNextCell(2,tindicesShort);
+			 
+			 tindicesShort[0]=newPtIds[5];	              //_    
+        	 tindicesShort[1]=tindices2[1];
+        	 lines->InsertNextCell(2,tindicesShort);
 
+		}else{
+			tindicesShort[0]=newPtIds[0];              //\_    //tindicesShort[0]=newPtIds[1];  
+			tindicesShort[1]=tindices2[1];             //  \
+
+			lines->InsertNextCell(2,tindicesShort);
+		}
         //-----------right arm---------------
         tindicesShort[0]=tindices2[2];
-        tindicesShort[1]=newPtIds[2] ;
+		tindicesShort[1]=newPtIds[3] ;
+        //tindicesShort[1]=newPtIds[2] ;
         lines->InsertNextCell(2,tindicesShort);
 
         tindicesShort[0]=newPtIds[2];
         tindicesShort[1]=newPtIds[3];
         lines->InsertNextCell(2,tindicesShort);
 
-        tindicesShort[0]=newPtIds[3];
-        tindicesShort[1]=tindices2[3];
-        lines->InsertNextCell(2,tindicesShort);
-      }
+
+		 if(isLinkPoint){    
+			 tindicesShort[0]=newPtIds[2];	               //   \_|
+			 tindicesShort[1]=newPtIds[4];
+			 lines->InsertNextCell(2,tindicesShort);
+
+			 tindicesShort[0]=newPtIds[4];	              //_    
+			 tindicesShort[1]=tindices2[1];
+			 lines->InsertNextCell(2,tindicesShort);
+
+		 }else{
+			 tindicesShort[0]=newPtIds[2];              //\_    //tindicesShort[0]=newPtIds[1];  
+			 tindicesShort[1]=tindices2[1];             //  \
+
+			 lines->InsertNextCell(2,tindicesShort);
+		 }
+
+		//----------for strut link points
+		if(isLinkPoint){
+			tindicesShort[0]=newPtIds[4];//--
+			tindicesShort[1]=newPtIds[5];
+			lines->InsertNextCell(2,tindicesShort);
+		}
+      }//endof if inphaseShort
       else{
         // Simple stent with straight struts
         tindices[0] = iter->startVertex;
         tindices[1] = iter->endVertex;
         lines->InsertNextCell(2, tindices);
         iter++;
+		tindices[0] = iter->startVertex;
+		tindices[1] = iter->endVertex;
+		lines->InsertNextCell(2,tindices);
       }
     }
 
@@ -706,6 +770,13 @@ void medVMEStent::UpdateStentPolydataFromSimplex()
     for(StrutIterator iter = m_StentSource->GetLinksList().begin(); iter !=m_StentSource->GetLinksList().end(); iter++){
       tindices[0] = iter->startVertex;
       tindices[1] = iter->endVertex;
+
+	  //vpoints->GetPoint(tindices[0] , aVetex);//for test
+	  //vpoints->GetPoint(tindices[1] , bVetex);
+	  //if (aVetex[0]>m_Crown_Length*5 && aVetex[0]<m_Crown_Length*8 &&bVetex[0]>m_Crown_Length*5 && bVetex[0]<m_Crown_Length*8){//one middle ring
+		  lines->InsertNextCell(2,tindices);
+	  //}
+
       lines->InsertNextCell(2, tindices);
     }
     lines->Squeeze() ;
@@ -722,16 +793,20 @@ void medVMEStent::UpdateStentPolydataFromSimplex()
 //------------------------------------------------------------------------------
 // Calculate extra mid-points on struts of Abbott stent polydata.
 // Input is a pair of adjacent struts - output is four midpoints.
+//strutLinkPts is the output, used to simulate structure like "\_|_/" for link node
+//calculate for each pair of strut
 //------------------------------------------------------------------------------
+/*
 void medVMEStent::CalculateMidPointsFromPairOfStruts(const double strutEndPts[4][3], double midPts[4][3]) const
 {
-  const double LengthFactor = 0.01 ;
+  const double LengthFactor = 0.025 ;
+  const double LengthLinkFactor = 0.025;
 
   vtkMEDMatrixVectorMath *math = vtkMEDMatrixVectorMath::New() ;
   math->SetHomogeneous(false) ;
 
   // calc exact midpoints m[2] of struts
-  double m[2][3] ;
+  double m[2][3] ;//compute two mid points
   for (int i = 0 ;  i < 2 ;  i++)
     math->MeanVector(strutEndPts[2*i], strutEndPts[2*i+1], m[i]) ;
 
@@ -768,11 +843,53 @@ void medVMEStent::CalculateMidPointsFromPairOfStruts(const double strutEndPts[4]
     math->SubtractMultipleOfVector(m[i], LengthFactor*r[i], a[i], midPts[2*i]) ;
     math->AddMultipleOfVector(m[i], LengthFactor*r[i], a[i], midPts[2*i+1]) ;
   }
-
+  if(isLinkPoint){
+  //get a pair of strut link points for a strut
+	if(strutEndPts[1][0]==strutEndPts[3][0]){//strutEndPts[1] and strutEndPts[3] should be the same points
+		math->SubtractMultipleOfVector(strutEndPts[1],LengthLinkFactor*r[0],a[0],strutLinkPts[0]);
+		math->AddMultipleOfVector(strutEndPts[1], LengthLinkFactor*r[0], a[0], strutLinkPts[1]) ;
+	}
+  }
   math->Delete() ;
+}*/
+
+void medVMEStent::CalculateMidPointsFromPairOfStruts(const double strutEndPts[4][3], double midPts[4][3], bool isLinkPoint, double strutLinkPts[2][3]) const
+{
+	const double LengthFactor = 0.2 ;
+	const double LengthLinkFactor = 0.2;
+
+	vtkMEDMatrixVectorMath *math = vtkMEDMatrixVectorMath::New();
+	math->SetHomogeneous(false) ;
+
+	// calc exact midpoints m[2] of struts
+	double m[2][3] ;//compute two mid points
+	math->MeanVector(strutEndPts[0], strutEndPts[1], m[0]) ;
+	math->MeanVector(strutEndPts[2], strutEndPts[3], m[1]) ;
+
+	double dv[2][3];  //    0                  \     / 2
+	                  // midpts[0],[1]    m[0]  \   / m[1]  midpts[2][3]  
+	                  //                       1 \|/ 3
+	math->SubtractVectors(m[1], m[0], dv[0]) ;// ->
+	math->SubtractVectors(m[0], m[1], dv[1]) ;// <-
+
+	math->NormalizeVector(dv[0]); //->
+	math->NormalizeVector(dv[1]); //<-
+	//m[0]+LengthFactor*dv[0] = midPts[0]
+	math->CopyVector(m[0],midPts[0]);
+	math->CopyVector(m[1],midPts[2]);
+	//math->AddMultipleOfVector(m[0],LengthFactor,dv[0],midPts[0]);
+	math->AddMultipleOfVector(m[0],LengthFactor,dv[1],midPts[1]);
+	//math->AddMultipleOfVector(m[1],LengthFactor,dv[0],midPts[2]);
+	math->AddMultipleOfVector(m[1],LengthFactor,dv[0],midPts[3]);
+
+	
+
+	if(isLinkPoint){
+		math->AddMultipleOfVector(strutEndPts[1],LengthLinkFactor,dv[0],strutLinkPts[0]);
+		math->AddMultipleOfVector(strutEndPts[1],LengthLinkFactor,dv[1],strutLinkPts[1]);
+
+	}
 }
-
-
 
 
 //------------------------------------------------------------------------------
