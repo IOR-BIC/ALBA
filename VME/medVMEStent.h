@@ -115,7 +115,7 @@ public:
   void SetStentDeliverySystem(double delsys) {m_DeliverySystem = delsys;}
   void SetStentDiameter(double d) {m_Stent_Diameter = d;}
   void SetStentDBDiameter(double d) {m_Stent_DBDiameter = d;}
-  void SetStentDLength(double length) {m_Stent_DLength = length; } 
+  void SetStentDLength(double length) {m_Stent_DBLength = length; } 
   void SetStentCrownLength(double crownL) {m_Crown_Length = crownL;}
   void SetStrutThickness(double strutThickness) {m_Strut_Thickness = strutThickness; }
   void SetStentConfiguration(int stentCfig) {m_Id_Stent_Configuration = stentCfig;}
@@ -127,10 +127,10 @@ public:
   void SetStrutsNumber(int strutsNumber){m_Struts_Number = strutsNumber;}
   void SetLinkNumber(int linkNumber){m_Link_Number = linkNumber;}
   void SetStentType(int type){m_Stent_Type = type;}
-  
+
   /// calculate strut angle, given diameter, crown length and struts-per-crown.
   void CalcStrutAngle() ; 
-  
+
   /// calculate strut length, given strut angle and crown length.
   void CalcStrutLength() ; 
 
@@ -141,7 +141,7 @@ public:
   double GetStentRadius() const {return m_Stent_Diameter/2.0;}
   double GetStentDiameter() const {return m_Stent_Diameter;}
   double GetStentDBDiameter() const {return m_Stent_DBDiameter;}
-  double GetStentDLength() const {return m_Stent_DLength;}  
+  double GetStentDLength() const {return m_Stent_DBLength;}  
   double GetStentCrownLength() const {return m_Crown_Length;}
   double GetStrutThickness() const {return m_Strut_Thickness;}
   int GetStentConfiguration() const {return m_Id_Stent_Configuration;}
@@ -316,13 +316,12 @@ private:
   wxString m_ModelName;
   wxString m_Material;
   double m_DeliverySystem;
-  
+
   double m_Stent_Diameter;
   double m_Stent_DBDiameter;
+  double m_Stent_DBLength;
   double m_Crown_Length;
   double m_Strut_Length; 	
-  double m_Stent_DLength;
-  double m_Stent_Length;
 
   double m_Strut_Angle; ///< angle in radians
   double m_Link_Length;
@@ -338,13 +337,16 @@ private:
   int m_ComputedCrownNumber;
   bool m_StentParamsModified ;
 
+  int m_Stent_Type; // 2 Bard 1 Abbott
+
+
   // vessel  
   mafVME* m_VesselVME ;
   int m_VesselNodeID ;        // for store and restore
   vtkPolyData *m_VesselSurface;
   bool m_VesselSurfaceDefined; 
   bool m_VesselVMEDefined ;
-  
+
   // vessel centerline
   mafVME* m_CenterLineVME ;
   int m_CenterLineNodeID ;
@@ -352,7 +354,7 @@ private:
   vtkPolyData *m_CenterLineLong ;
   bool m_CenterLineDefined ;
   bool m_CenterLineVMEDefined ;
- 
+
   // stent
   vtkMEDStentModelSource *m_StentSource;
   vtkPolyData *m_StentPolyData;
@@ -361,8 +363,7 @@ private:
   bool m_StentCenterLineModified ;
   int m_StentLength ;
   bool m_StentLengthModified ; // need to recalculate length of stent
-  int m_Stent_Type;//2 Bard 1 Abbort
-  
+
   // simplex
   vtkPolyData *m_SimplexPolyData; // polydata visualisation of simplex mesh
 
