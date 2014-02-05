@@ -42,7 +42,7 @@ mafGUISettings(Listener, label)
   m_Port = 21;
   m_RemoteStorageType = 0;
   m_CacheFolder = wxGetCwd().c_str();
-
+  m_SaveFolder = mafGetApplicationDirectory().c_str();
 
  /* m_SRBRemoteHostName = "";
   m_SRBDomain = "";
@@ -70,6 +70,10 @@ void mafGUISettingsStorage::CreateGui()
   //m_Gui->Bool(ID_SINGLE_FILE, _("single file mode"), &m_SingleFileFlag,1);
   //m_Gui->Divider(2);
   m_Gui->Radio(ID_STORAGE_TYPE,_("Storage type"),&m_RemoteStorageType, 2, remoteStorageArray,1,_("Choose the remote storage you want to use."));
+  //
+  m_Gui->Label(_("Default settings for Local storage"));
+  m_Gui->DirOpen(ID_SAVE_FOLDER,_("save folder"),&m_SaveFolder,_("set the default save folder"));
+  //
   m_Gui->Label(_("Default settings for HTTP storage"));
   m_Gui->Bool(ID_ANONYMOUS_USER,_("anonymous connection"),&m_AnonymousFalg,1);
   m_Gui->String(ID_HOST_NAME,"host",&m_RemoteHostName);
@@ -105,6 +109,7 @@ void mafGUISettingsStorage::EnableItems()
   m_Gui->Enable(ID_USERNAME,m_RemoteStorageType == HTTP && m_AnonymousFalg == 0);
   m_Gui->Enable(ID_PASSWORD,m_RemoteStorageType == HTTP && m_AnonymousFalg == 0);
 
+  m_Gui->Enable(ID_SAVE_FOLDER,m_RemoteStorageType == LOCAL);
 
   //--------------------SRB--------------------//
   /*m_Gui->Enable(ID_SRB_HOST_NAME,m_RemoteStorageType == SRB);
@@ -128,6 +133,9 @@ void mafGUISettingsStorage::OnEvent(mafEventBase *maf_event)
     case ID_CACHE_FOLDER:
       m_Config->Write("CacheFolder",m_CacheFolder.GetCStr());
     break;
+	case ID_SAVE_FOLDER:
+		m_Config->Write("SaveFolder",m_SaveFolder.GetCStr());
+	break;
     case ID_STORAGE_TYPE:
       m_Config->Write("RemoteStorageType",m_RemoteStorageType);
     break;
@@ -239,6 +247,15 @@ void mafGUISettingsStorage::InitializeSettings()
   else
   {
     m_Config->Write("User",m_UserName.GetCStr());
+  }
+  
+  if(m_Config->Read("SaveFolder", &string_item))
+  {
+    m_SaveFolder = string_item.c_str();
+  }
+  else
+  {
+    m_Config->Write("SaveFolder",m_SaveFolder.GetCStr());
   }
 
 

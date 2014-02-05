@@ -151,6 +151,10 @@ mafInteractor2DDistance::mafInteractor2DDistance()
   m_MeasureType = DISTANCE_BETWEEN_POINTS;
 
   m_Distance = 0;
+
+  m_Color[0] = 0.0;
+  m_Color[1] = 1.0;
+  m_Color[2] = 0.0;
   
 }
 //----------------------------------------------------------------------------
@@ -297,6 +301,7 @@ void mafInteractor2DDistance::OnLeftButtonUp(mafEventInteraction *e)
 
   if(m_ParallelView)
   {
+    e->Get2DPosition(pos_2d);
     DrawMeasureTool(pos_2d[0], pos_2d[1]);
     if(m_EndMeasure)
     {
@@ -445,7 +450,37 @@ void mafInteractor2DDistance::DrawMeasureTool(double x, double y)
 		{
 			//m_EndMeasure = true;
       m_PreviousRenderer = m_CurrentRenderer;
-			counter++;
+      m_Line2->SetPoint1(p);
+      m_Line2->SetPoint2(p);
+      m_Line2->Update();
+      m_CurrentRenderer->AddActor2D(m_LineActor2);
+      m_EndMeasure = true;
+      counter++;
+
+      if (counter < 2)
+      {
+        double tmp_pos[3];
+        m_Line->GetPoint2(tmp_pos);
+        mafString ds;
+        ds = wxString::Format(_("%.2f") , m_Distance);
+        m_MeterVector[m_MeterVector.size()-1]->SetText(ds);
+        m_MeterVector[m_MeterVector.size()-1]->SetTextPosition(tmp_pos);
+        m_DisableUndoAndOkCancel = true;
+      }
+      else
+      {
+        double tmp_pos[3];
+        m_Line2->GetPoint2(tmp_pos);
+        mafString ds;
+        ds = wxString::Format(_("%.2f") , m_Distance);
+        m_MeterVector[m_MeterVector.size()-1]->SetText(ds);
+        m_MeterVector[m_MeterVector.size()-1]->SetTextPosition(tmp_pos);
+        m_DisableUndoAndOkCancel = false;
+      }
+
+      m_CurrentRenderer->AddActor2D(m_MeterVector[m_MeterVector.size()-1]);
+
+      m_LastRenderer->GetRenderWindow()->Render(); 
 		}
 		else
 		{
@@ -465,11 +500,11 @@ void mafInteractor2DDistance::DrawMeasureTool(double x, double y)
 	// add the  second line for the distance between lines mode
 	else if(counter == 2 && m_MeasureType == DISTANCE_BETWEEN_POINTS)
 	{
-		m_Line2->SetPoint1(p);
-		m_Line2->SetPoint2(p);
-		m_Line2->Update();
-		m_CurrentRenderer->AddActor2D(m_LineActor2);
-		counter++;
+// 		m_Line2->SetPoint1(p);
+// 		m_Line2->SetPoint2(p);
+// 		m_Line2->Update();
+// 		m_CurrentRenderer->AddActor2D(m_LineActor2);
+// 		counter++;
 	}
 	else if(counter == 2 && m_DraggingLine)
 	{
@@ -497,7 +532,7 @@ void mafInteractor2DDistance::DrawMeasureTool(double x, double y)
 		m_Line2->SetPoint2(p);
 		m_Line2->Update();
 	}
-	else if(counter == 3 && m_MeasureType == DISTANCE_BETWEEN_POINTS)
+	else if(counter == 2 && m_MeasureType == DISTANCE_BETWEEN_POINTS)
 	{
 		m_EndMeasure = true;
 	}
@@ -515,28 +550,28 @@ void mafInteractor2DDistance::DrawMeasureTool(double x, double y)
   // text in Render Window (if series for writing text)
   if(m_MeasureType == DISTANCE_BETWEEN_POINTS)
   {    
-    if (counter < 3)
-		{
-			double tmp_pos[3];
-			m_Line->GetPoint2(tmp_pos);
-			mafString ds;
-      ds = wxString::Format(_("%.2f") , m_Distance);
-		  m_MeterVector[m_MeterVector.size()-1]->SetText(ds);
-			m_MeterVector[m_MeterVector.size()-1]->SetTextPosition(tmp_pos);
-      m_DisableUndoAndOkCancel = true;
-		}
-		else
-		{
-			double tmp_pos[3];
-			m_Line2->GetPoint2(tmp_pos);
-			mafString ds;
-      ds = wxString::Format(_("%.2f") , m_Distance);
-		  m_MeterVector[m_MeterVector.size()-1]->SetText(ds);
-			m_MeterVector[m_MeterVector.size()-1]->SetTextPosition(tmp_pos);
-      m_DisableUndoAndOkCancel = false;
-		}
-
-    m_CurrentRenderer->AddActor2D(m_MeterVector[m_MeterVector.size()-1]);
+//     if (counter < 2)
+//     {
+//       double tmp_pos[3];
+//       m_Line->GetPoint2(tmp_pos);
+//       mafString ds;
+//       ds = wxString::Format(_("%.2f") , m_Distance);
+//       m_MeterVector[m_MeterVector.size()-1]->SetText(ds);
+//       m_MeterVector[m_MeterVector.size()-1]->SetTextPosition(tmp_pos);
+//       m_DisableUndoAndOkCancel = true;
+//     }
+//     else
+//     {
+//       double tmp_pos[3];
+//       m_Line2->GetPoint2(tmp_pos);
+//       mafString ds;
+//       ds = wxString::Format(_("%.2f") , m_Distance);
+//       m_MeterVector[m_MeterVector.size()-1]->SetText(ds);
+//       m_MeterVector[m_MeterVector.size()-1]->SetTextPosition(tmp_pos);
+//       m_DisableUndoAndOkCancel = false;
+//     }
+// 
+//     m_CurrentRenderer->AddActor2D(m_MeterVector[m_MeterVector.size()-1]);
   }
   else if (m_MeasureType == DISTANCE_BETWEEN_LINES && counter > 2)
   {
@@ -614,7 +649,7 @@ void mafInteractor2DDistance::DrawMeasureTool(double x, double y)
     m_LineActorVector1.push_back(NULL);
     m_LineActorVector1[m_LineActorVector1.size()-1] = vtkActor2D::New();
     m_LineActorVector1[m_LineActorVector1.size()-1]->SetMapper(m_LineMapperVector1[m_LineMapperVector1.size()-1]);
-    m_LineActorVector1[m_LineActorVector1.size()-1]->GetProperty()->SetColor(0.0,1.0,0.0);
+    m_LineActorVector1[m_LineActorVector1.size()-1]->GetProperty()->SetColor(m_Color);
     m_CurrentRenderer->AddActor2D(m_LineActorVector1[m_LineActorVector1.size()-1]);
 
 		// glyph to emulate a arrow
@@ -686,7 +721,7 @@ void mafInteractor2DDistance::DrawMeasureTool(double x, double y)
     m_LineActorVector2.push_back(NULL);
     m_LineActorVector2[m_LineActorVector2.size()-1] = vtkActor2D::New();
     m_LineActorVector2[m_LineActorVector2.size()-1]->SetMapper(m_LineMapperVector2[m_LineMapperVector2.size()-1]);
-    m_LineActorVector2[m_LineActorVector2.size()-1]->GetProperty()->SetColor(0.0,1.0,0.0);
+    m_LineActorVector2[m_LineActorVector2.size()-1]->GetProperty()->SetColor(m_Color);
     m_CurrentRenderer->AddActor2D(m_LineActorVector2[m_LineActorVector2.size()-1]);
 
     //measure , measure type vectors
@@ -1097,4 +1132,11 @@ void mafInteractor2DDistance::ShowAllMeasures( bool show )
   {
     m_CurrentRenderer->GetRenderWindow()->Render();
   }
+}
+
+void mafInteractor2DDistance::SetColor(double r,double g,double b)
+{
+  m_Color[0] = r;
+  m_Color[1] = g;
+  m_Color[2] = b;
 }

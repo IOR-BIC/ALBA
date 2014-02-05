@@ -59,6 +59,7 @@ public:
   mafEvent(void *sender, int id, bool             b,       long arg=0);
   mafEvent(void *sender, int id, double           f,       long arg=0);
   mafEvent(void *sender, int id, mafString       *s,       long arg=0);
+  mafEvent(void *sender, int id, mafString       *s, int x, int y, int width, int height,  long arg=0);
   mafEvent(void *sender, int id, mafNode         *vme,     bool b=false, long arg=0);
   mafEvent(void *sender, int id, mafView         *view,    wxWindow *win=NULL);
   mafEvent(void *sender, int id, mafOp					 *op,      long arg=0);
@@ -79,6 +80,11 @@ public:
   mafMatrix*        GetMatrix()    {return m_Matrix;};
   mafMatrix*        GetOldMatrix() {return m_OldMatrix;};
   mafObject*        GetMafObject() {return m_MafObject;}
+
+  int GetX() {return m_x;};
+  int GetY() {return m_y;};
+  int GetWidth() {return m_width;};
+  int GetHeight() {return m_height;};
 
   /** set call data, data sent by sender (event's invoker) to all observers. 
   Be aware that the vmeVector argument will be empty after the Set */
@@ -115,6 +121,11 @@ protected:
   mafObject       *m_MafObject;
   std::vector<mafNode*> m_VmeVector;
   WidgetDataType   m_WidgetData;
+
+  int m_x;
+  int m_y;
+  int m_width;
+  int m_height;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #ifdef MAF_USE_WX

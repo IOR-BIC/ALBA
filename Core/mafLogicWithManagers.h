@@ -155,6 +155,9 @@ public:
   void MAFExpertModeOff(){(*GetMAFExpertMode())= FALSE;};
   void SetMAFExpertMode(int value){(*GetMAFExpertMode()) = value;};
 
+  /* Set the file extension */
+  void SetFileExtension(mafString &extension) {m_Extension = extension;};
+
 protected:
   //---------------------------------------------------------
   // Description:
@@ -205,7 +208,7 @@ protected:
 
   /** Respond to a VME_SELECT evt. Instantiate the 'Select' operation. */
 	virtual void VmeSelect(mafEvent &e);
-	/** Respond to a VME_SELECTED evt. Update the selection on the tree and view representation. */
+  /** Respond to a VME_SELECTED evt. Update the selection on the tree and view representation. */
 	virtual void VmeSelected(mafNode *vme);
   /** Respond to a VME_DCLICKED evt. Manage the 'Double click' on Selected VME. */
   virtual void VmeDoubleClicked(mafEvent &e);
@@ -269,7 +272,7 @@ protected:
   mafOpManager           *m_OpManager;
   mafInteractionManager  *m_InteractionManager;
   mafRemoteLogic         *m_RemoteLogic;
-
+  
   mafGUIMaterialChooser  *m_MaterialChooser;
   mafPrintSupport     *m_PrintSupport;
 
@@ -293,6 +296,7 @@ protected:
   mafGUISettingsHelp *m_HelpSettings;
 
   mafString m_Revision;
+  mafString m_Extension;
 
   mafUser *m_User; ///< Applications' user
 };

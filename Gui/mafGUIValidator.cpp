@@ -65,6 +65,7 @@ void mafGUIValidator::Init(mafObserver* listener, int mid, wxControl *win)
   m_Button     = NULL;
   m_StaticText = NULL;
   m_ListBox    = NULL;
+  m_ListCtrl   = NULL;
 
   m_FloatVar    = NULL;
 	m_DoubleVar   = NULL;
@@ -159,6 +160,9 @@ bool mafGUIValidator::IsValid()
     case VAL_LISTBOX:
       if ( !(m_ListBox && m_ListBox->IsKindOf(CLASSINFO(wxListBox)))  ) return false;
     break;
+	case VAL_LISTCTRL:
+	  if ( !(m_ListCtrl && m_ListCtrl->IsKindOf(CLASSINFO(wxListCtrl)))  ) return false;
+	break;
     case VAL_BUTTON:
       if ( !(m_Button && m_Button->IsKindOf(CLASSINFO(wxButton)))  ) return false;
     break;
@@ -199,6 +203,7 @@ bool mafGUIValidator::Copy(const mafGUIValidator& val)
   m_RadioBox        = val.m_RadioBox; 
   m_ComboBox        = val.m_ComboBox;
   m_ListBox         = val.m_ListBox;
+  m_ListCtrl        = val.m_ListCtrl;
   m_Button          = val.m_Button;
   m_StaticText      = val.m_StaticText; 
 
@@ -396,6 +401,17 @@ mafGUIValidator::mafGUIValidator(mafObserver* listener,int mid,wxListBox *win)
   m_WidgetData.dType = INT_DATA;
   assert(IsValid());
 }
+//----------------------------------------------------------------------------
+mafGUIValidator::mafGUIValidator(mafObserver* listener,int mid,wxListCtrl *win)
+//----------------------------------------------------------------------------
+{
+	Init(listener,mid,win);  
+	m_Mode      = VAL_LISTCTRL;
+	m_ListCtrl   = win;
+	m_WidgetData.dType = INT_DATA;
+	assert(IsValid());
+}
+//----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
 mafGUIValidator::mafGUIValidator(mafObserver* listener, int mid, wxRadioBox *win,   int*   var) //RadioBox                     
 //----------------------------------------------------------------------------
@@ -685,6 +701,12 @@ bool mafGUIValidator::TransferToWindow(void)
         m_ListBox->SetSelection(m_WidgetData.iValue,true);
       }
     break;
+	case VAL_LISTCTRL:
+	if (m_ListCtrl->GetItemCount()>0)
+		{
+			m_ListCtrl->SetItemState(m_WidgetData.iValue, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+		}
+	break;
     case VAL_RADIOBOX:
       m_RadioBox->SetSelection(*m_IntVar);
     break;
@@ -750,6 +772,7 @@ bool mafGUIValidator::TransferFromWindow(void)
   long   ival;
   double dval;
   double f2d;
+  long itemIndex = -1;
 
   switch (m_Mode) 
 	{
@@ -857,6 +880,14 @@ bool mafGUIValidator::TransferFromWindow(void)
     case VAL_LISTBOX:
       m_WidgetData.iValue = m_ListBox->GetSelection();
     break;
+	case VAL_LISTCTRL:
+	  for (;;) 
+	  {
+		  m_WidgetData.iValue = itemIndex;
+		  itemIndex = m_ListCtrl->GetNextItem(itemIndex,wxLIST_NEXT_ALL,wxLIST_STATE_SELECTED);
+		  if (itemIndex == -1) break;
+	  }
+	break;
     case VAL_RADIOBOX:
 			*m_IntVar = m_RadioBox->GetSelection();
       m_WidgetData.iValue = *m_IntVar;

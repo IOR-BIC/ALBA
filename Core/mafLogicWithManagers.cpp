@@ -133,6 +133,8 @@ mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
 
   m_Revision = _("0.1");
 
+  m_Extension = "msf";
+
   m_User = new mafUser();
 
 }
@@ -176,6 +178,7 @@ void mafLogicWithManagers::Configure()
     m_VMEManager->SetPassword(m_StorageSettings->GetPassword());
     m_VMEManager->SetLocalCacheFolder(m_StorageSettings->GetCacheFolder());
     m_VMEManager->SetListener(this); 
+	m_VMEManager->SetFileExtension(m_Extension);
     //m_VMEManager->SetSingleBinaryFile(m_StorageSettings->GetSingleFileStatus()!= 0);
   }
 
@@ -463,9 +466,9 @@ void mafLogicWithManagers::CreateToolbar()
   m_ToolBar->SetMargins(0,0);
   m_ToolBar->SetToolSeparation(2);
   m_ToolBar->SetToolBitmapSize(wxSize(20,20));
-  m_ToolBar->AddTool(MENU_FILE_NEW,mafPictureFactory::GetPictureFactory()->GetBmp("FILE_NEW"),    _("new msf storage file"));
-  m_ToolBar->AddTool(MENU_FILE_OPEN,mafPictureFactory::GetPictureFactory()->GetBmp("FILE_OPEN"),  _("open msf storage file"));
-  m_ToolBar->AddTool(MENU_FILE_SAVE,mafPictureFactory::GetPictureFactory()->GetBmp("FILE_SAVE"),  _("save current msf storage file"));
+  m_ToolBar->AddTool(MENU_FILE_NEW,mafPictureFactory::GetPictureFactory()->GetBmp("FILE_NEW"),    _("new " + m_Extension + " storage file"));
+  m_ToolBar->AddTool(MENU_FILE_OPEN,mafPictureFactory::GetPictureFactory()->GetBmp("FILE_OPEN"),  _("open " + m_Extension + " storage file"));
+  m_ToolBar->AddTool(MENU_FILE_SAVE,mafPictureFactory::GetPictureFactory()->GetBmp("FILE_SAVE"),  _("save current " + m_Extension + " storage file"));
   m_ToolBar->AddSeparator();
 
   m_ToolBar->AddTool(MENU_FILE_PRINT,mafPictureFactory::GetPictureFactory()->GetBmp("PRINT"),  _("print the selected view"));
@@ -792,11 +795,24 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       case VIEW_CREATED:
         ViewCreated(e->GetView());
       break;
+	  case VIEW_RESIZE:
+		  {
+			  mafView *view = NULL;
+			  const char *viewStr=e->GetString()->GetCStr();
+			  view=m_ViewManager->GetFromList(viewStr);
+			  if(view) 
+			  {
+				  view->GetFrame()->SetSize(e->GetWidth(),e->GetHeight());
+				  view->GetFrame()->SetPosition(wxPoint(e->GetX(),e->GetY()));
+			  }
+		  }
+	  break;
       case VIEW_DELETE:
       {
 
         if(m_PlugSidebar)
-          this->m_SideBar->ViewDeleted(e->GetView());
+		   this->m_SideBar->ViewDeleted(e->GetView());
+
 #ifdef MAF_USE_VTK
         // currently mafInteraction is strictly dependent on VTK (marco)
         if(m_InteractionManager)
@@ -1142,7 +1158,9 @@ void mafLogicWithManagers::OnFileOpen(const char *file_to_open)
       }
       else      
       {
-		    wxString wildc    = _("MAF Storage Format file (*.msf)|*.msf|Compressed file (*.zmsf)|*.zmsf");
+		    wxString wildc = _("MAF Storage Format file (*." + m_Extension + ")|*." + m_Extension 
+				                   +"|Compressed file (*.z" + m_Extension + ")|*.z" + m_Extension + "");
+		    //wxString wildc    = _("MAF Storage Format file (*.msf)|*.msf|Compressed file (*.zmsf)|*.zmsf");
         if (file_to_open != NULL)
         {
           file = file_to_open;
@@ -1179,6 +1197,9 @@ void mafLogicWithManagers::OnFileSave()
 {
   if(m_VMEManager)
   {
+	mafString save_default_folder = m_StorageSettings->GetDefaultSaveFolder();
+	save_default_folder.ParsePathName();
+	m_VMEManager->SetDirName(save_default_folder);
     m_VMEManager->MSFSave();
     UpdateFrameTitle();
   }
@@ -1189,6 +1210,9 @@ void mafLogicWithManagers::OnFileSaveAs()
 {
   if(m_VMEManager) 
   {
+	mafString save_default_folder = m_StorageSettings->GetDefaultSaveFolder();
+	save_default_folder.ParsePathName();
+	m_VMEManager->SetDirName(save_default_folder);
     m_VMEManager->MSFSaveAs();
     UpdateFrameTitle();
   }

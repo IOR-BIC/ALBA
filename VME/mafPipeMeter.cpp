@@ -254,7 +254,13 @@ mafGUI *mafPipeMeter::CreateGui()
   m_Gui->Double(ID_TUBE_RADIUS,"radius",&meter_attrib->m_TubeRadius,0);
   m_Gui->Bool(ID_TUBE_CAPPING,"capping",&meter_attrib->m_Capping);
   m_Gui->Combo(ID_METER_MEASURE_TYPE,"",&meter_attrib->m_MeasureType,num_choices,type_measure_string);
-  m_Gui->Double(ID_INIT_MEASURE,"init",&meter_attrib->m_InitMeasure,0);
+  m_Gui->Double(ID_INIT_MEASURE,"abs. init",&meter_attrib->m_InitMeasure,0); 
+  //Kewei Duan: 
+  //This is the solution to bug raised by Danielle Ascani.
+  //"init" is updated by "absolute init" to avoid misunderstanding from users from GUI design perspective.
+  //because there are two measure modes, users will get confused what to fill here under different modes
+  //It is nonsense to fill in a 0 in relative mode as initial value. 
+  //13/12/2013
   m_Gui->Bool(ID_GENERATE_EVENT,"gen. event",&meter_attrib->m_GenerateEvent);
   m_Gui->Double(ID_DELTA_PERCENT,"delta %",&meter_attrib->m_DeltaPercent,0);
 
@@ -302,7 +308,18 @@ void mafPipeMeter::OnEvent(mafEventBase *maf_event)
         m_MeterVME->GetDataPipe()->Update();
       case ID_INIT_MEASURE:
       {
-        meter_attrib->m_DistanceRange[0] = meter_attrib->m_InitMeasure;
+		  if(meter_attrib->m_MeasureType == mafVMEMeter::ABSOLUTE_MEASURE){
+              meter_attrib->m_DistanceRange[0] = meter_attrib->m_InitMeasure;
+		      meter_attrib->m_DistanceRange[1] = meter_attrib->m_InitMeasure * (1.0 + meter_attrib->m_DeltaPercent / 100.0);
+		  }else if(meter_attrib->m_MeasureType == mafVMEMeter::RELATIVE_MEASURE){
+		      meter_attrib->m_DistanceRange[0] = 0;
+		      meter_attrib->m_DistanceRange[1] = meter_attrib->m_InitMeasure * (1.0 + meter_attrib->m_DeltaPercent / 100.0)-meter_attrib->m_InitMeasure;
+		  } 
+		  //Kewei Duan: Updated. 
+		  //This is the solution to bug raised by Danielle Ascani.
+		  //Absolute and relative modes should be considered seperately 
+		  //in this event.
+		  //13/12/2013 
         m_Gui->Update();
         m_MeterVME->Modified();
         m_MeterVME->GetDataPipe()->Update();
@@ -310,9 +327,18 @@ void mafPipeMeter::OnEvent(mafEventBase *maf_event)
       break;
       case ID_DELTA_PERCENT:
       {
-        double value;
-        value = meter_attrib->m_InitMeasure * (1.0 + meter_attrib->m_DeltaPercent / 100.0);
-        meter_attrib->m_DistanceRange[1] = value;
+		if(meter_attrib->m_MeasureType == mafVMEMeter::ABSOLUTE_MEASURE){
+              meter_attrib->m_DistanceRange[0] = meter_attrib->m_InitMeasure;
+		      meter_attrib->m_DistanceRange[1] = meter_attrib->m_InitMeasure * (1.0 + meter_attrib->m_DeltaPercent / 100.0);
+		  }else if(meter_attrib->m_MeasureType == mafVMEMeter::RELATIVE_MEASURE){
+		      meter_attrib->m_DistanceRange[0] = 0;
+		      meter_attrib->m_DistanceRange[1] = meter_attrib->m_InitMeasure * (1.0 + meter_attrib->m_DeltaPercent / 100.0)-meter_attrib->m_InitMeasure;
+		  } 
+		  //Kewei Duan: Updated. 
+		  //This is the solution to bug raised by Danielle Ascani.
+		  //Absolute and relative modes should be considered seperately 
+		  //in this event.
+		  //13/12/2013
         m_Gui->Update();
         m_MeterVME->Modified();
         m_MeterVME->GetDataPipe()->Update();

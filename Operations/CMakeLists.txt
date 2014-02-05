@@ -47,6 +47,8 @@ IF (MAF_USE_VTK)
     mafOpCreateSpline.h
     mafOpCreateVolume.cpp
     mafOpCreateVolume.h
+	mafOpVolumeUnion.cpp
+    mafOpVolumeUnion.h
     mafOpRemoveCells.cpp
     mafOpRemoveCells.h
     mafOpEditMetadata.cpp

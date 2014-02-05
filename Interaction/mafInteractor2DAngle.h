@@ -131,6 +131,8 @@ public:
   /** return the current rwi */
   mafRWIBase *GetCurrentRwi();
 
+  void SetColor(double r,double g,double b);
+
 protected:
 	mafInteractor2DAngle();
 	virtual ~mafInteractor2DAngle();
@@ -205,6 +207,8 @@ protected:
   double m_AbsoluteAngle ;
 	double  m_PickedPoint[3]; ///< 3D position of the picked point; used to assign position to the m_ProbingLine
 	mafVME *m_ProbedVME; ///< VME probed by the m_ProbingLine
+
+  double m_Color[3];
   
 private:
 	mafInteractor2DAngle(const mafInteractor2DAngle&);   // Not implemented.
