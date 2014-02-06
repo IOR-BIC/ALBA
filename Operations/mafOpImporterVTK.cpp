@@ -29,7 +29,8 @@
 #include "mafVME.h"
 #include "mafVMEGeneric.h"
 #include "mafVMEImage.h"
-#include "mafVMEPointSet.h"
+//#include "mafVMEPointSet.h"
+#include "mafVMELandmarkCloud.h"
 #include "mafVMEPolyline.h"
 #include "mafVMESurface.h"
 #include "mafVMEVolumeGray.h"
@@ -60,7 +61,8 @@ mafOp(label)
 	m_Canundo = true;
 	m_File    = "";
 
-  m_VmePointSet = NULL;
+  //m_VmePointSet = NULL;
+  m_VmeLandmarkCloud = NULL;
   m_VmePolyLine = NULL;
   m_VmeSurface  = NULL;
   m_VmeGrayVol  = NULL;
@@ -74,7 +76,8 @@ mafOp(label)
 mafOpImporterVTK::~mafOpImporterVTK()
 //----------------------------------------------------------------------------
 {
-  mafDEL(m_VmePointSet);
+  //mafDEL(m_VmePointSet);
+  mafDEL(m_VmeLandmarkCloud);
   mafDEL(m_VmePolyLine);
   mafDEL(m_VmeSurface);
   mafDEL(m_VmeGrayVol);
@@ -162,16 +165,21 @@ int mafOpImporterVTK::ImportVTK()
     vtkDataSet *data = vtkDataSet::SafeDownCast(preader->GetOutputs()[0]);
     if (data)
     {
-      mafNEW(m_VmePointSet);
+	  mafNEW(m_VmeLandmarkCloud);
+      //mafNEW(m_VmePointSet);
       mafNEW(m_VmePolyLine);
       mafNEW(m_VmeSurface);
       mafNEW(m_VmeGrayVol);
       mafNEW(m_VmeRGBVol);
       mafNEW(m_VmeMesh);
       mafNEW(m_VmeGeneric);
-      if (m_VmePointSet->SetDataByDetaching(data,0) == MAF_OK)
+      //if (m_VmePointSet->SetDataByDetaching(data,0) == MAF_OK)
+      //{
+      //  m_Output = m_VmePointSet;
+      //}
+	  if (m_VmeLandmarkCloud->SetDataByDetaching(data,0) == MAF_OK)
       {
-        m_Output = m_VmePointSet;
+        m_Output = m_VmeLandmarkCloud;
       }
       else if (m_VmePolyLine->SetDataByDetaching(data,0) == MAF_OK)
       {
