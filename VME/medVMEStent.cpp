@@ -314,6 +314,7 @@ int medVMEStent::DeepCopy(mafNode *a)
   m_ModelName = vmeStent->m_ModelName ;
   m_Material = vmeStent->m_Material ;
   m_DeliverySystem = vmeStent->m_DeliverySystem ;
+  m_Stent_Type = vmeStent->m_Stent_Type ;
   m_Stent_Diameter = vmeStent->m_Stent_Diameter ;
   m_Stent_DBDiameter = vmeStent->m_Stent_DBDiameter ;
   m_Crown_Length = vmeStent->m_Crown_Length ;
@@ -323,7 +324,6 @@ int medVMEStent::DeepCopy(mafNode *a)
   m_Struts_Number = vmeStent->m_Struts_Number ;
   m_Crown_Number = vmeStent->m_Crown_Number ;
   m_Link_Number = vmeStent->m_Link_Number ;
-  m_Id_Stent_Type = vmeStent->m_Id_Stent_Type ;
   m_Id_Link_Connection = vmeStent->m_Id_Link_Connection;
   m_Id_Stent_Configuration = vmeStent->m_Id_Stent_Configuration ;
   m_Link_Orientation = vmeStent->m_Link_Orientation;
@@ -384,6 +384,7 @@ int medVMEStent::InternalStore(mafStorageElement *node)
     if (node->StoreText("CompanyName",m_CompanyName) != MAF_OK) return MAF_ERROR;
     if (node->StoreText("Material",m_Material) != MAF_OK) return MAF_ERROR;
     if (node->StoreDouble("DeliverySystem",m_DeliverySystem) != MAF_OK) return MAF_ERROR; 
+    if (node->StoreInteger("StentType",m_Stent_Type) != MAF_OK) return MAF_ERROR; 
     if (node->StoreDouble("Diameter",m_Stent_Diameter) != MAF_OK) return MAF_ERROR; 
     if (node->StoreDouble("DBDiameter",m_Stent_DBDiameter) != MAF_OK) return MAF_ERROR;
     if (node->StoreDouble("CrownLength",m_Crown_Length) != MAF_OK) return MAF_ERROR; 
@@ -393,7 +394,6 @@ int medVMEStent::InternalStore(mafStorageElement *node)
     if (node->StoreInteger("NumberOfStruts",m_Struts_Number) != MAF_OK) return MAF_ERROR; 
     if (node->StoreInteger("NumberOfCrowns",m_Crown_Number) != MAF_OK) return MAF_ERROR; 
     if (node->StoreInteger("NumberOfLinks",m_Link_Number) != MAF_OK) return MAF_ERROR; 
-    if (node->StoreInteger("IdStentType",m_Id_Stent_Type) != MAF_OK) return MAF_ERROR; 
     if (node->StoreInteger("IdLinkConnection",m_Id_Link_Connection) != MAF_OK) return MAF_ERROR; 
     if (node->StoreInteger("IdStentConfig",m_Id_Stent_Configuration) != MAF_OK) return MAF_ERROR; 
     if (node->StoreInteger("LinkOrientation",m_Link_Orientation) != MAF_OK) return MAF_ERROR; 
@@ -441,6 +441,7 @@ int medVMEStent::InternalRestore(mafStorageElement *node)
     if (node->RestoreText("Material",material) != MAF_OK) return MAF_ERROR;
     m_Material = material;
     if (node->RestoreDouble("DeliverySystem",m_DeliverySystem) != MAF_OK) return MAF_ERROR; 
+    if (node->RestoreInteger("StentType",m_Stent_Type) != MAF_OK) return MAF_ERROR; 
     if (node->RestoreDouble("Diameter",m_Stent_Diameter) != MAF_OK) return MAF_ERROR; 
     if (node->RestoreDouble("DBDiameter",m_Stent_DBDiameter) != MAF_OK) return MAF_ERROR;
     if (node->RestoreDouble("CrownLength",m_Crown_Length) != MAF_OK) return MAF_ERROR; 
@@ -450,7 +451,6 @@ int medVMEStent::InternalRestore(mafStorageElement *node)
     if (node->RestoreInteger("NumberOfStruts",m_Struts_Number) != MAF_OK) return MAF_ERROR; 
     if (node->RestoreInteger("NumberOfCrowns",m_Crown_Number) != MAF_OK) return MAF_ERROR; 
     if (node->RestoreInteger("NumberOfLinks",m_Link_Number) != MAF_OK) return MAF_ERROR; 
-    if (node->RestoreInteger("IdStentType",m_Id_Stent_Type) != MAF_OK) return MAF_ERROR; 
     if (node->RestoreInteger("IdLinkConnection",m_Id_Link_Connection) != MAF_OK) return MAF_ERROR; 
     if (node->RestoreInteger("IdStentConfig",m_Id_Stent_Configuration) != MAF_OK) return MAF_ERROR; 
     if (node->RestoreInteger("LinkOrientation",m_Link_Orientation) != MAF_OK) return MAF_ERROR; 
@@ -519,6 +519,7 @@ void medVMEStent::InternalUpdate()
     m_StentSource->setStentConfiguration((enumStCfgType)m_Id_Stent_Configuration);
     m_StentSource->setLinkConnection((enumLinkConType) m_Id_Link_Connection);
     m_StentSource->setLinkOrientation( (enumLinkOrtType)m_Link_Orientation);
+    m_StentSource->setLinkNumber(m_Link_Number); // Hui suggestion to fix Maris link positions 7/2/14
 
     m_StentSource->setLinkLength(m_Link_Length);
     m_StentSource->setLinkAlignment(m_Link_Alignment);
@@ -950,7 +951,16 @@ void medVMEStent::UpdateStentPolydataFromSimplex_ViewAsSimplex()
 // Set the vessel centerline and derive the stent centerline 
 //-----------------------------------------------------------------------
 void medVMEStent::SetVesselCenterLine(vtkPolyData *line){
-  if(line){
+  if (line == NULL)
+    return ;
+
+  bool needsUpdate ;
+  if (m_CenterLineDefined)
+    needsUpdate = (line->GetMTime() > m_CenterLine->GetMTime()) ;
+  else
+    needsUpdate = true ;
+
+  if (needsUpdate){
     m_CenterLine->DeepCopy(line) ; 
     CreateLongVesselCenterLine() ;
     CreateStentCenterLine() ;
