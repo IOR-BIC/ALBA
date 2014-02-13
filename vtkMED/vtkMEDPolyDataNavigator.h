@@ -44,7 +44,7 @@
 //
 // Version: Nigel McFarlane 5.12.13
 //------------------------------------------------------------------------------
-class VTK_GRAPHICS_EXPORT vtkMEDPolyDataNavigator : public vtkObject
+class VTK_vtkMED_EXPORT vtkMEDPolyDataNavigator : public vtkObject
 {
 public:
   static vtkMEDPolyDataNavigator *New();

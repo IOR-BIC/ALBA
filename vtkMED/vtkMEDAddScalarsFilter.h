@@ -27,7 +27,7 @@ University of Bedfordshire
 //
 // Version 26.11.13
 //------------------------------------------------------------------------------
-class VTK_GRAPHICS_EXPORT vtkMEDAddScalarsFilter : public vtkPolyDataToPolyDataFilter
+class VTK_vtkMED_EXPORT vtkMEDAddScalarsFilter : public vtkPolyDataToPolyDataFilter
 {
 public:
   vtkTypeRevisionMacro(vtkMEDAddScalarsFilter,vtkPolyDataToPolyDataFilter);
