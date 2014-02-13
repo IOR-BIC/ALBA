@@ -34,7 +34,7 @@ University of Bedfordshire
 //
 // Version 25.11.13
 //------------------------------------------------------------------------------
-class VTK_GRAPHICS_EXPORT vtkMEDSubdividePolylines : public vtkPolyDataToPolyDataFilter
+class VTK_vtkMED_EXPORT vtkMEDSubdividePolylines : public vtkPolyDataToPolyDataFilter
 {
 public:
   vtkTypeRevisionMacro(vtkMEDSubdividePolylines,vtkPolyDataToPolyDataFilter);

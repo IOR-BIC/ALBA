@@ -33,7 +33,7 @@ University of Bedfordshire
 //
 // Version 5.12.13
 //------------------------------------------------------------------------------
-class VTK_GRAPHICS_EXPORT vtkMEDHalfTubeRemoval : public vtkPolyDataToPolyDataFilter
+class VTK_vtkMED_EXPORT vtkMEDHalfTubeRemoval : public vtkPolyDataToPolyDataFilter
 {
 public:
   vtkTypeRevisionMacro(vtkMEDHalfTubeRemoval,vtkPolyDataToPolyDataFilter);
