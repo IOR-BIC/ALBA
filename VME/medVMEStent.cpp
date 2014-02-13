@@ -775,7 +775,7 @@ void medVMEStent::UpdateStentPolydataFromSimplex()
       //vpoints->GetPoint(tindices[0] , aVetex);//for test
       //vpoints->GetPoint(tindices[1] , bVetex);
       //if (aVetex[0]>m_Crown_Length*5 && aVetex[0]<m_Crown_Length*8 &&bVetex[0]>m_Crown_Length*5 && bVetex[0]<m_Crown_Length*8){//one middle ring
-      lines->InsertNextCell(2,tindices);
+      //lines->InsertNextCell(2,tindices);
       //}
 
       lines->InsertNextCell(2, tindices);
@@ -1501,7 +1501,7 @@ double medVMEStent::CalcStentDiameterMM()
 //-------------------------------------------------------------------------
 // Calculate arc lengths of points along a center line.
 //-------------------------------------------------------------------------
-void medVMEStent::CalcArcLengthsOfPoints(vtkPolyData *pd, double* arcLengths) const
+void medVMEStent::CalcArcLengthsOfPoints(vtkPolyData *pd, double* arcLengths) 
 {
   int n = pd->GetPoints()->GetNumberOfPoints() ;
 
@@ -1528,7 +1528,7 @@ void medVMEStent::CalcArcLengthsOfPoints(vtkPolyData *pd, double* arcLengths) co
 // where the position is a fraction lambda along the next segment id to id+1.
 // This assumes that the pd is a monotonic curve of points.
 //-------------------------------------------------------------------------
-double medVMEStent::CalcArclengthFromIdPosition(vtkPolyData *pd, int id, double lambda) const
+double medVMEStent::CalcArclengthFromIdPosition(vtkPolyData *pd, int id, double lambda) 
 {
   int n = pd->GetPoints()->GetNumberOfPoints() ;
   assert((id >= 0) && (id < n)) ;
@@ -1550,7 +1550,7 @@ double medVMEStent::CalcArclengthFromIdPosition(vtkPolyData *pd, int id, double 
 // where the position is a fraction lambda along the next segment id to id+1.
 // This assumes that the pd is a monotonic curve of points.
 //-------------------------------------------------------------------------
-void medVMEStent::CalcIdPositionFromArcLength(vtkPolyData *pd, double arclen, int& id, double& lambda) const
+void medVMEStent::CalcIdPositionFromArcLength(vtkPolyData *pd, double arclen, int& id, double& lambda) 
 {
   int n = pd->GetPoints()->GetNumberOfPoints() ;
 
@@ -1593,7 +1593,7 @@ void medVMEStent::CalcIdPositionFromArcLength(vtkPolyData *pd, double arclen, in
 // where the position is a fraction lambda along the next segment id to id+1.
 // This assumes that the pd is a monotonic curve of points.
 //-------------------------------------------------------------------------
-void medVMEStent::CalcCoordsFromIdPosition(vtkPolyData *pd, int id, double lambda, double* x) const
+void medVMEStent::CalcCoordsFromIdPosition(vtkPolyData *pd, int id, double lambda, double* x) 
 {
   int n = pd->GetPoints()->GetNumberOfPoints() ;
   assert((id >= 0) && (id < n)) ;
@@ -1620,7 +1620,7 @@ void medVMEStent::CalcCoordsFromIdPosition(vtkPolyData *pd, int id, double lambd
 //-------------------------------------------------------------------------
 // Find nearest point id on center line.
 //-------------------------------------------------------------------------
-void medVMEStent::FindNearestPointOnCenterLine(double* p0, vtkPolyData *pd, int& id, double& distSq) const
+void medVMEStent::FindNearestPointOnCenterLine(double* p0, vtkPolyData *pd, int& id, double& distSq) 
 {
   int n = pd->GetPoints()->GetNumberOfPoints() ;
 
@@ -1649,7 +1649,7 @@ void medVMEStent::FindNearestPointOnCenterLine(double* p0, vtkPolyData *pd, int&
 //-------------------------------------------------------------------------
 // Find nearest point (id, lambda) on center line.
 //-------------------------------------------------------------------------
-void medVMEStent::FindNearestPointOnCenterLine(double* p0, vtkPolyData *pd, int& id, double& lambda, double& distSq) const
+void medVMEStent::FindNearestPointOnCenterLine(double* p0, vtkPolyData *pd, int& id, double& lambda, double& distSq) 
 {
   int n = pd->GetPoints()->GetNumberOfPoints() ;
 

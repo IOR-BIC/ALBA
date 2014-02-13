@@ -196,6 +196,31 @@ public:
   /// keeping the strut length const.
   void CrimpStent(double crimpedDiameter) ;
 
+
+  /// Calculate arc lengths of points along a center line.
+  static void CalcArcLengthsOfPoints(vtkPolyData *pd, double* arcLengths) ;
+
+  /// Calc arc length along center line given id position (id, lambda) \n
+  /// where the position is a fraction lambda along the next segment id to id+1. \n
+  /// This assumes that the pd is a monotonic curve of points.
+  static double CalcArclengthFromIdPosition(vtkPolyData *pd, int id, double lambda) ;
+
+  /// Calc id position (id, lambda) along center line given arc length \n
+  /// where the position is a fraction lambda along the next segment id to id+1. \n
+  /// This assumes that the pd is a monotonic curve of points.
+  static void CalcIdPositionFromArcLength(vtkPolyData *pd, double arclen, int& id, double& lambda) ;
+
+  /// Calc coord position along center line given id position (id, lambda) \n
+  /// where the position is a fraction lambda along the next segment id to id+1. \n
+  /// This assumes that the pd is a monotonic curve of points.
+  static void CalcCoordsFromIdPosition(vtkPolyData *pd, int id, double lambda, double* x) ;
+
+  /// Find nearest point id on center line.
+  static void FindNearestPointOnCenterLine(double* p0, vtkPolyData *pd, int& id, double& distSq) ;
+
+  /// Find nearest point (id, lambda) on center line. \n
+  static void FindNearestPointOnCenterLine(double* p0, vtkPolyData *pd, int& id, double& lambda, double& distSq) ;
+
 private:
   enum STENT_WIDGET_ID
   {
@@ -276,29 +301,6 @@ private:
   /// Needed because the stent contains unused and undefined points.
   int GetHighestValidPointIndex(vtkPolyData *pd) const ;
 
-  /// Calculate arc lengths of points along a center line.
-  void CalcArcLengthsOfPoints(vtkPolyData *pd, double* arcLengths) const ;
-
-  /// Calc arc length along center line given id position (id, lambda) \n
-  /// where the position is a fraction lambda along the next segment id to id+1. \n
-  /// This assumes that the pd is a monotonic curve of points.
-  double CalcArclengthFromIdPosition(vtkPolyData *pd, int id, double lambda) const ;
-
-  /// Calc id position (id, lambda) along center line given arc length \n
-  /// where the position is a fraction lambda along the next segment id to id+1. \n
-  /// This assumes that the pd is a monotonic curve of points.
-  void CalcIdPositionFromArcLength(vtkPolyData *pd, double arclen, int& id, double& lambda) const ;
-
-  /// Calc coord position along center line given id position (id, lambda) \n
-  /// where the position is a fraction lambda along the next segment id to id+1. \n
-  /// This assumes that the pd is a monotonic curve of points.
-  void CalcCoordsFromIdPosition(vtkPolyData *pd, int id, double lambda, double* x) const ;
-
-  /// Find nearest point id on center line.
-  void FindNearestPointOnCenterLine(double* p0, vtkPolyData *pd, int& id, double& distSq) const ;
-
-  /// Find nearest point (id, lambda) on center line. \n
-  void FindNearestPointOnCenterLine(double* p0, vtkPolyData *pd, int& id, double& lambda, double& distSq) const ;
 
   /// Partially initialize the deformation filter. \n
   /// This copies information from the stent model to the filter.
