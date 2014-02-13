@@ -311,11 +311,14 @@ private:
   /// Returns NULL if failed.
   mafNode* FindNodeWithId(mafID id) ;
 
+
   // basic stent parameters */
   wxString m_CompanyName;
   wxString m_ModelName;
   wxString m_Material;
   double m_DeliverySystem;
+
+  int m_Stent_Type; // 1 Abbott 2 Bard, else Medtronic
 
   double m_Stent_Diameter;
   double m_Stent_DBDiameter;
@@ -328,7 +331,6 @@ private:
   int m_Struts_Number;
   int m_Crown_Number;
   int m_Link_Number;
-  int m_Id_Stent_Type;
   int m_Id_Link_Connection;
   int m_Id_Stent_Configuration;
   int m_Link_Orientation;
@@ -337,7 +339,6 @@ private:
   int m_ComputedCrownNumber;
   bool m_StentParamsModified ;
 
-  int m_Stent_Type; // 2 Bard 1 Abbott
 
 
   // vessel  

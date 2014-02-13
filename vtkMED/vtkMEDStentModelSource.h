@@ -208,11 +208,6 @@ private:
   //bool crownAdded;
 
   /// Find sampling point on segment of center line. \n
-  /// Original recursive version (deprecated).
-  void calculateSamplingPoint(double *preSamplePoint, double* samplePoint, 
-    double distance, double* left, double* right);
-
-  /// Find sampling point on segment of center line. \n
   /// Direct calculation. \n
   /// Returns false if intersection point is outside the line segment.
   bool calculateSamplingPoint2(double *preSamplePoint, double* samplePoint, 
