@@ -1,6 +1,6 @@
 /*=========================================================================
 Program:   Multimod Application Framework
-Module:    $RCSfile: vtkMAFBridgeHoleFilter.h,v $
+Module:    $RCSfile: vtkMEDSubdividePolylines.h,v $
 Language:  C++
 Date:      $Date: 2009-03-20 16:39:48 $
 Version:   $Revision: 1.1.2.2 $
@@ -32,7 +32,7 @@ University of Bedfordshire
 /// NB This is meant to be applied to polyline data. If there are cells
 /// with more than 2 vertices, their edges will also be subdivided.
 //
-// Version 25.11.13
+// Version 19.2.14
 //------------------------------------------------------------------------------
 class VTK_vtkMED_EXPORT vtkMEDSubdividePolylines : public vtkPolyDataToPolyDataFilter
 {

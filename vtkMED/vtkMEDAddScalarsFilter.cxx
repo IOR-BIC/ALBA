@@ -17,6 +17,7 @@ University of Bedfordshire
 #include "vtkUnsignedCharArray.h"
 #include "vtkPointData.h"
 #include "vtkCellData.h"
+#include "vtkIdList.h"
 #include "assert.h"
 
 
@@ -100,6 +101,106 @@ void vtkMEDAddScalarsFilter::SetColor(double col[3], double alpha)
 
 
 
+
+//------------------------------------------------------------------------------
+// set color of cell, range 0-255
+//------------------------------------------------------------------------------
+void vtkMEDAddScalarsFilter::SetColorOfCell(int cellId, double r, double g, double b)
+{
+  SetColorOfCell(cellId, r, g, b, 255) ;
+}
+
+
+
+//------------------------------------------------------------------------------
+// set color of cell, range 0-255
+//------------------------------------------------------------------------------
+void vtkMEDAddScalarsFilter::SetColorOfCell(int cellId, double col[3])
+{
+  SetColorOfCell(cellId, col[0], col[1], col[2]) ;
+}
+
+
+
+//------------------------------------------------------------------------------
+// set color of cell, range 0-255
+//------------------------------------------------------------------------------
+void vtkMEDAddScalarsFilter::SetColorOfCell(int cellId, double r, double g, double b, double alpha)
+{
+  if (m_AttribMode == CELL_SCALARS){
+    Color newcol(cellId, r, g, b, alpha) ;
+    m_UserColors.push_back(newcol) ;
+  }
+  else{
+    m_Input = this->GetInput() ;
+    m_Input->Update() ;
+    vtkIdList* idlist = vtkIdList::New() ;
+    m_Input->GetCellPoints(cellId, idlist) ;
+    for (int j = 0 ;  j < idlist->GetNumberOfIds() ;  j++){
+      int ptId = idlist->GetId(j) ;
+      Color newcol(ptId, r, g, b, alpha) ;
+      m_UserColors.push_back(newcol) ;
+    }
+  }
+
+  this->Modified() ;
+}
+
+
+
+//------------------------------------------------------------------------------
+// set color of cell, range 0-255
+//------------------------------------------------------------------------------
+void vtkMEDAddScalarsFilter::SetColorOfCell(int cellId, double col[3], double alpha)
+{
+  SetColorOfCell(cellId, col[0], col[1], col[2], alpha) ;
+}
+
+
+
+//------------------------------------------------------------------------------
+// set color of point, range 0-255
+//------------------------------------------------------------------------------
+void vtkMEDAddScalarsFilter::SetColorOfPoint(int ptId, double r, double g, double b)
+{
+  SetColorOfPoint(ptId, r, g, b, 255) ;
+}
+
+
+
+//------------------------------------------------------------------------------
+// set color of point, range 0-255
+//------------------------------------------------------------------------------
+void vtkMEDAddScalarsFilter::SetColorOfPoint(int ptId, double col[3])
+{
+  SetColorOfPoint(ptId, col[0], col[1], col[2]) ;
+}
+
+
+
+//------------------------------------------------------------------------------
+// set color of point, range 0-255
+//------------------------------------------------------------------------------
+void vtkMEDAddScalarsFilter::SetColorOfPoint(int ptId, double r, double g, double b, double alpha)
+{
+  assert(m_AttribMode == POINT_SCALARS) ;
+  Color newcol(ptId, r, g, b, alpha) ;
+  m_UserColors.push_back(newcol) ;
+  this->Modified() ;
+}
+
+
+
+//------------------------------------------------------------------------------
+// set color of point, range 0-255
+//------------------------------------------------------------------------------
+void vtkMEDAddScalarsFilter::SetColorOfPoint(int ptId, double col[3], double alpha)
+{
+  SetColorOfPoint(ptId, col[0], col[1], col[2], alpha) ;
+}
+
+
+
 //------------------------------------------------------------------------------
 // Set the name
 //------------------------------------------------------------------------------
@@ -139,13 +240,11 @@ void vtkMEDAddScalarsFilter::Execute()
     n = m_Output->GetPoints()->GetNumberOfPoints() ;
     scalars->SetNumberOfTuples(n) ;
     m_Output->GetPointData()->SetScalars(scalars) ;
-    scalars->Delete() ;
   }
   else if (m_AttribMode == CELL_SCALARS){
     n = m_Output->GetNumberOfCells() ;
     scalars->SetNumberOfTuples(n) ;
     m_Output->GetCellData()->SetScalars(scalars) ;
-    scalars->Delete() ;
   }
   else{
     // error: unknown mode
@@ -160,7 +259,34 @@ void vtkMEDAddScalarsFilter::Execute()
   for (int i = 0 ;  i < n ;  i++)
     scalars->SetTuple(i, m_Color) ;
 
+
+
+  // add user-defined colors of individual points or cells
+  if (m_AttribMode == POINT_SCALARS){
+    for (int i = 0 ;  i < (int)m_UserColors.size() ;  i++){
+      int id = m_UserColors[i].id ;
+      assert(id < scalars->GetNumberOfTuples()) ;
+      scalars->SetTuple(id, m_UserColors[i].col) ;
+    }
+  }
+  else if (m_AttribMode == CELL_SCALARS){
+    for (int i = 0 ;  i < (int)m_UserColors.size() ;  i++){
+      int id = m_UserColors[i].id ;
+      assert(id < scalars->GetNumberOfTuples()) ;
+      scalars->SetTuple(id, m_UserColors[i].col) ;
+    }
+  }
+  else{
+    // error: unknown mode
+    scalars->Delete() ;
+    return ;
+  }
+
+
+  // clean up and exit
+  scalars->Delete() ;
 }
+
 
 
 

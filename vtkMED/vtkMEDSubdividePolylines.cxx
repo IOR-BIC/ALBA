@@ -1,6 +1,6 @@
 /*=========================================================================
 Program:   Multimod Application Framework
-Module:    $RCSfile: vtkMAFBridgeHoleFilter.cxx,v $
+Module:    $RCSfile: vtkMEDSubdividePolylines.cxx,v $
 Language:  C++
 Date:      $Date: 2009-10-08 13:44:29 $
 Version:   $Revision: 1.1.2.5 $
@@ -53,7 +53,7 @@ vtkMEDSubdividePolylines::~vtkMEDSubdividePolylines()
 //------------------------------------------------------------------------------
 void vtkMEDSubdividePolylines::Execute()
 {
-  vtkDebugMacro(<< "Executing vtkMEDAreaWeightedNormals Filter") ;
+  vtkDebugMacro(<< "Executing vtkMEDSubdividePolylines Filter") ;
 
   // pointers to input and output
   m_Input = this->GetInput() ;
@@ -85,22 +85,9 @@ void vtkMEDSubdividePolylines::Execute()
     lambda.push_back(thisvector) ;
   }
 
-  // lay out all lambdas and their edges in a long vector
-  vtkMEDPolyDataNavigator::EdgeVector allEdges ;
-  std::vector<double> allLambdas ;
-  for (int i = 0 ;  i < (int)edges.size() ;  i++){
-    vtkMEDPolyDataNavigator::Edge edge = edges[i] ;
-    for (int j = 0 ;  j < (int)lambda[i].size() ;  j++){
-      allEdges.push_back(edge) ;
-      allLambdas.push_back(lambda[i][j]) ;
-    }
-  }
-
   // do the subdivision
-  vtkIdList* newPtIds = vtkIdList::New() ;
-  m_Nav->AddPointsToEdges(m_Output, allEdges, allLambdas, newPtIds) ;
-
-  newPtIds->Delete() ;
+  std::vector<std::vector<int> > newPtIds ;
+  m_Nav->AddPointsToEdges(m_Output, edges, lambda, newPtIds) ;
 }
 
 

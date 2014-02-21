@@ -1,3 +1,16 @@
+/*=========================================================================
+Program:   Multimod Application Framework
+Module:    $RCSfile: vtkMEDPolyDataNavigator.h,v $
+Language:  C++
+Date:      $Date: 2009-03-20 16:39:48 $
+Version:   $Revision: 1.1.2.2 $
+Authors:   Nigel McFarlane
+==========================================================================
+Copyright (c) 2012
+University of Bedfordshire
+=========================================================================*/
+
+
 #ifndef __vtkMEDPolyDataNavigator_h
 #define __vtkMEDPolyDataNavigator_h
 
@@ -42,7 +55,7 @@
 // Therefore methods which change the polydata should finish by deleting the invalid links,
 // or carry a warning that the user should do it.
 //
-// Version: Nigel McFarlane 5.12.13
+// Version: Nigel McFarlane 19.2.14
 //------------------------------------------------------------------------------
 class VTK_vtkMED_EXPORT vtkMEDPolyDataNavigator : public vtkObject
 {
@@ -179,6 +192,9 @@ public:
   /// Print id list
   void PrintIdList(vtkIdList *idList, ostream& os) const ;
 
+  /// Print id list
+  void PrintIdListCSV(vtkIdList *idList, ostream& os) const ;
+
 
 
   //----------------------------------------------------------------------------
@@ -196,6 +212,13 @@ public:
   /// Copy edge multimap to vector
   // (NB Can't declare const EdgeMultiMap& for some reason)
   void CopyEdgeMapToVector(EdgeMultiMap& edgeMap, EdgeVector& edges) const ;
+
+  /// Copy edge vector to edge multimap. \n
+  /// Multiple occurrences of edges are only copied once into the map.
+  void CopyVectorToEdgeMap(const EdgeVector& edges, EdgeMultiMap& edgeMap) const ;
+
+  /// Is edge in edge map
+  bool IsEdgeInMap(const EdgeMultiMap& edgeMap, const Edge& edge) const ;
 
   /// Get number of points on cell. \n
   /// This is not very efficient, so not recommended to call a large number of times.
@@ -363,8 +386,15 @@ public:
   /// NB This depends on BuildCells()
   void PrintCell(vtkPolyData *polydata, int cellId, ostream& os)  const ;
 
+  /// PrintCell. \n
+  /// NB This depends on BuildCells()
+  void PrintCellCSV(vtkPolyData *polydata, int cellId, ostream& os)  const ;
+
   /// Print all cells in polydata. \n
   void PrintCells(vtkPolyData *polydata, ostream& os)  const ;
+
+  /// Print all cells in polydata. \n
+  void PrintCellsCSV(vtkPolyData *polydata, ostream& os)  const ;
 
   /// Print attribute structure of polydata
   void PrintAttributeData(vtkPolyData *polydata, ostream& os, bool printTuples = false)  const ;
@@ -458,16 +488,31 @@ public:
   void CopyCells(vtkPolyData *polydata,  vtkIdList *cellIds,  vtkIdList *newCellIds)  const ;
 
   /// Add new points to edges. \n
-  /// This creates a new point on the midpoint of each edge. \n
+  /// A single point is placed at the midpoint of each edge. \n
+  /// Each edge should occur only once in the list. \n
   /// The id's of the new points are returned in newPtIds. \n
-  /// All cells on each edge will gain the new point, so triangles will become quads.
+  /// All cells on each edge will gain the new point, so triangles will become quads. \n
+  /// This method does not change the id's of the cells.
   void AddPointsToEdges(vtkPolyData *polydata, const EdgeVector& edges, vtkIdList *newPtIds)  const ;
 
   /// Add new points to edges. \n
-  /// This creates a new point on each edge, at an interpolated position lambda \n
+  /// Each point is placed on edge[i] at interpolated position lambda[i][j]. \n
+  /// Each edge should occur only once in the list. \n
   /// The id's of the new points are returned in newPtIds. \n
-  /// All cells on each edge will gain the new point, so triangles will become quads.
-  void AddPointsToEdges(vtkPolyData *polydata, const EdgeVector& edges, std::vector<double> lambda, vtkIdList *newPtIds)  const ;
+  /// All cells on each edge will gain the new points, so triangles will become quads. \n
+  /// This method does not change the id's of the cells.
+  void AddPointsToEdges(
+    vtkPolyData *polydata, const EdgeVector& edges, 
+    const std::vector<std::vector<double> >& lambda, 
+    std::vector<std::vector<int> >& newPtIds)  const ;
+
+  /// Add new points to edges. \n
+  /// Each point i is placed on edge[i] at interpolated position lambda[i]. \n
+  /// This might not work if edges occur more than once in the list. \n
+  /// The id's of the new points are returned in newPtIds. \n
+  /// All cells on each edge will gain the new points, so triangles will become quads. \n
+  /// This method does not change the id's of the cells.
+  void AddPointsToEdges(vtkPolyData *polydata, const EdgeVector& edges, const std::vector<double>& lambda, vtkIdList *newPtIds)  const ;
 
   /// Change a point id in a cell. \n
   /// This searches for idold in the cell and replaces it with idnew. \n
@@ -565,6 +610,7 @@ public:
   bool IsJoined(const Edge& edge) const ; ///< Are edges joined by at least one point
   bool IsValid() const {return ((m_Id0>=0)&&(m_Id1>=0));} ///< Does edge contain valid data
   void Reverse() {std::swap(m_Id0,m_Id1) ;} ///< reverse direction (swap end points)
+  int GenerateKey() const ; /// Calculate a key for locating edge in a map
   void PrintSelf(ostream& os, vtkIndent indent) const {os << m_Id0 << " " << m_Id1 << std::endl ;} ///< print self
   bool operator==(const Edge& edge) const ; ///< equals operator
   bool operator!=(const Edge& edge) const ; ///< not equals operator

@@ -23,13 +23,14 @@
 #include "vtkMEDMatrixVectorMath.h"
 #include <cmath>
 #include <ostream>
+#include "assert.h"
 
 
 
 
 //------------------------------------------------------------------------------
 // standard macros
-vtkCxxRevisionMacro(vtkMEDMatrixVectorMath, "$Revision: 1.1.2.2 $");
+vtkCxxRevisionMacro(vtkMEDMatrixVectorMath, "$Revision: 1.0 $");
 vtkStandardNewMacro(vtkMEDMatrixVectorMath);
 //------------------------------------------------------------------------------
 
@@ -38,7 +39,7 @@ vtkStandardNewMacro(vtkMEDMatrixVectorMath);
 //------------------------------------------------------------------------------
 // Constructor
 //------------------------------------------------------------------------------
-vtkMEDMatrixVectorMath::vtkMEDMatrixVectorMath() : Homogeneous(false)
+vtkMEDMatrixVectorMath::vtkMEDMatrixVectorMath() : m_homogeneous(false)
 {
 }
 
@@ -46,7 +47,7 @@ vtkMEDMatrixVectorMath::vtkMEDMatrixVectorMath() : Homogeneous(false)
 //------------------------------------------------------------------------------
 // Destructor
 vtkMEDMatrixVectorMath::~vtkMEDMatrixVectorMath()
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
 }
 
@@ -56,7 +57,7 @@ vtkMEDMatrixVectorMath::~vtkMEDMatrixVectorMath()
 //------------------------------------------------------------------------------
 // Divide vector by homogeneous coord
 void vtkMEDMatrixVectorMath::DivideVectorByHomoCoord(double *a) const 
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   for (int i = 0 ;  i < 3 ;  i++)
     a[i] /= a[3] ;
@@ -67,12 +68,27 @@ void vtkMEDMatrixVectorMath::DivideVectorByHomoCoord(double *a) const
 //------------------------------------------------------------------------------
 // Set vector to zero
 void vtkMEDMatrixVectorMath::SetVectorToZero(double *a) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   for (int i = 0 ;  i < 3 ;  i++)
     a[i] = 0.0 ;
 
-  if (Homogeneous)
+  if (m_homogeneous)
+    a[3] = 1.0 ;
+}
+
+
+
+//------------------------------------------------------------------------------
+// Set vector
+void vtkMEDMatrixVectorMath::SetVector(double *a, double a0, double a1, double a2) const
+  //------------------------------------------------------------------------------
+{
+  a[0] = a0 ;
+  a[1] = a1 ;
+  a[2] = a2 ;
+ 
+  if (m_homogeneous)
     a[3] = 1.0 ;
 }
 
@@ -81,7 +97,7 @@ void vtkMEDMatrixVectorMath::SetVectorToZero(double *a) const
 //------------------------------------------------------------------------------
 // Magnitude of vector.
 double vtkMEDMatrixVectorMath::MagnitudeOfVector(const double *a) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   int i ;
   double sumsq ;
@@ -98,7 +114,7 @@ double vtkMEDMatrixVectorMath::MagnitudeOfVector(const double *a) const
 //------------------------------------------------------------------------------
 // Normalize vector
 void vtkMEDMatrixVectorMath::NormalizeVector(double *a) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   double norm = MagnitudeOfVector(a) ;
   for (int i = 0 ;  i < 3 ;  i++)
@@ -110,13 +126,13 @@ void vtkMEDMatrixVectorMath::NormalizeVector(double *a) const
 //------------------------------------------------------------------------------
 // Normalize vector
 void vtkMEDMatrixVectorMath::NormalizeVector(const double *a, double *b) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   double norm = MagnitudeOfVector(a) ;
   for (int i = 0 ;  i < 3 ;  i++)
     b[i] = a[i] / norm ;
 
-  if (Homogeneous)
+  if (m_homogeneous)
     b[3] = 1.0 ;
 }
 
@@ -125,7 +141,7 @@ void vtkMEDMatrixVectorMath::NormalizeVector(const double *a, double *b) const
 //------------------------------------------------------------------------------
 // Invert vector (multiply by -1)
 void vtkMEDMatrixVectorMath::InvertVector(double *a) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   for (int i = 0 ;  i < 3 ;  i++)
     a[i] *= -1.0 ;
@@ -136,12 +152,12 @@ void vtkMEDMatrixVectorMath::InvertVector(double *a) const
 //------------------------------------------------------------------------------
 // Invert vector (multiply by -1)
 void vtkMEDMatrixVectorMath::InvertVector(const double *a, double *b) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   for (int i = 0 ;  i < 3 ;  i++)
     b[i] = -a[i] ;
 
-  if (Homogeneous)
+  if (m_homogeneous)
     b[3] = 1.0 ;
 }
 
@@ -150,12 +166,12 @@ void vtkMEDMatrixVectorMath::InvertVector(const double *a, double *b) const
 //------------------------------------------------------------------------------
 // Multiply vector by scalar
 void vtkMEDMatrixVectorMath::MultiplyVectorByScalar(double s, const double *a, double *b) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   for (int i = 0 ;  i < 3 ;  i++)
     b[i] = s*a[i] ;
 
-  if (Homogeneous)
+  if (m_homogeneous)
     b[3] = 1.0 ;
 }
 
@@ -163,36 +179,36 @@ void vtkMEDMatrixVectorMath::MultiplyVectorByScalar(double s, const double *a, d
 //------------------------------------------------------------------------------
 // Divide vector by scalar
 void vtkMEDMatrixVectorMath::DivideVectorByScalar(double s, const double *a, double *b) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   for (int i = 0 ;  i < 3 ;  i++)
     b[i] = a[i] / s ;
 
-  if (Homogeneous)
+  if (m_homogeneous)
     b[3] = 1.0 ;
 }
 
 //------------------------------------------------------------------------------
 // Add vectors: a + b = c 
 void vtkMEDMatrixVectorMath::AddVectors(const double *a, const double *b, double *c) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   for (int i = 0 ;  i < 3 ;  i++)
     c[i] = a[i] + b[i] ;
 
-  if (Homogeneous)
+  if (m_homogeneous)
     c[3] = 1.0 ;
 }
 
 //------------------------------------------------------------------------------
 // Subtract vectors: a - b = c 
 void vtkMEDMatrixVectorMath::SubtractVectors(const double *a, const double *b, double *c) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   for (int i = 0 ;  i < 3 ;  i++)
     c[i] = a[i] - b[i] ;
 
-  if (Homogeneous)
+  if (m_homogeneous)
     c[3] = 1.0 ;
 }
 
@@ -202,12 +218,12 @@ void vtkMEDMatrixVectorMath::SubtractVectors(const double *a, const double *b, d
 //------------------------------------------------------------------------------
 // Add multiple of vector: a + s*b = c
 void vtkMEDMatrixVectorMath::AddMultipleOfVector(const double *a, double s, const double *b, double *c) const 
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   for (int i = 0 ;  i < 3 ;  i++)
     c[i] = a[i] + s*b[i] ;
 
-  if (Homogeneous)
+  if (m_homogeneous)
     c[3] = 1.0 ;
 }
 
@@ -215,12 +231,12 @@ void vtkMEDMatrixVectorMath::AddMultipleOfVector(const double *a, double s, cons
 //------------------------------------------------------------------------------
 // Subtract multiple of vector: a - s*b = c
 void vtkMEDMatrixVectorMath::SubtractMultipleOfVector(const double *a, double s, const double *b, double *c) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   for (int i = 0 ;  i < 3 ;  i++)
     c[i] = a[i] - s*b[i] ;
 
-  if (Homogeneous)
+  if (m_homogeneous)
     c[3] = 1.0 ;
 }
 
@@ -231,12 +247,12 @@ void vtkMEDMatrixVectorMath::SubtractMultipleOfVector(const double *a, double s,
 // If s = 0, c = a
 // If s = 1, c = b
 void vtkMEDMatrixVectorMath::InterpolateVectors(double s, const double *a, const double *b, double *c) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   for (int i = 0 ;  i < 3 ;  i++)
     c[i] = a[i] + s*(b[i]-a[i]) ;
 
-  if (Homogeneous)
+  if (m_homogeneous)
     c[3] = 1.0 ;
 }
 
@@ -244,7 +260,7 @@ void vtkMEDMatrixVectorMath::InterpolateVectors(double s, const double *a, const
 //------------------------------------------------------------------------------
 // Dot product
 double vtkMEDMatrixVectorMath::DotProduct(const double *a, const double *b) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   int i ;
   double dotprod ;
@@ -259,13 +275,13 @@ double vtkMEDMatrixVectorMath::DotProduct(const double *a, const double *b) cons
 //------------------------------------------------------------------------------
 // Vector Product a^b = c
 void vtkMEDMatrixVectorMath::VectorProduct(const double *a, const double *b, double *c) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   c[0] =   a[1]*b[2] - a[2]*b[1] ;
   c[1] = -(a[0]*b[2] - a[2]*b[0]) ;
   c[2] =   a[0]*b[1] - a[1]*b[0] ;
 
-  if (Homogeneous)
+  if (m_homogeneous)
     c[3] = 1.0 ;
 }
 
@@ -273,12 +289,12 @@ void vtkMEDMatrixVectorMath::VectorProduct(const double *a, const double *b, dou
 //------------------------------------------------------------------------------
 // Copy vector: b = a
 void vtkMEDMatrixVectorMath::CopyVector(const double *a, double *b) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   for (int i = 0 ;  i < 3 ;  i++)
     b[i] = a[i] ;
 
-  if (Homogeneous)
+  if (m_homogeneous)
     b[3] = 1.0 ;
 }
 
@@ -287,7 +303,7 @@ void vtkMEDMatrixVectorMath::CopyVector(const double *a, double *b) const
 //------------------------------------------------------------------------------
 // Are vectors equal.
 bool vtkMEDMatrixVectorMath::Equals(const double *a, const double *b, double tol) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   bool eq0 = ((a[0] > b[0]-tol) && (a[0] < b[0]+tol)) ;
   bool eq1 = ((a[1] > b[1]-tol) && (a[1] < b[1]+tol)) ;
@@ -302,7 +318,7 @@ bool vtkMEDMatrixVectorMath::Equals(const double *a, const double *b, double tol
 // u, v and w form a right handed coordinate system.
 // The vectors are not normalised.
 void vtkMEDMatrixVectorMath::CalculateNormalsToU(const double *u,  double *v,  double *w) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   double x = u[0] ;
   double y = u[1] ;
@@ -319,21 +335,21 @@ void vtkMEDMatrixVectorMath::CalculateNormalsToU(const double *u,  double *v,  d
 
   // create vector v which is normal to the u axis
   switch(minComponent){
-    case 0:
-      v[0] = -(y*y + z*z) ;
-      v[1] = x*y ;
-      v[2] = x*z ;
-      break ;
-    case 1:
-      v[0] = y*x ;
-      v[1] = -(x*x + z*z) ;
-      v[2] = y*z ;
-      break ;
-    case 2:
-      v[0] = z*x ;
-      v[1] = z*y ;
-      v[2] = -(x*x + y*y) ;
-      break ;
+  case 0:
+    v[0] = -(y*y + z*z) ;
+    v[1] = x*y ;
+    v[2] = x*z ;
+    break ;
+  case 1:
+    v[0] = y*x ;
+    v[1] = -(x*x + z*z) ;
+    v[2] = y*z ;
+    break ;
+  case 2:
+    v[0] = z*x ;
+    v[1] = z*y ;
+    v[2] = -(x*x + y*y) ;
+    break ;
   }
 
   // third vector is cross product w = u ^ v
@@ -342,7 +358,7 @@ void vtkMEDMatrixVectorMath::CalculateNormalsToU(const double *u,  double *v,  d
   w[2] = u[0]*v[1] - u[1]*v[0] ;
 
 
-  if (Homogeneous){
+  if (m_homogeneous){
     v[3] = 1.0 ;
     w[3] = 1.0 ;
   }
@@ -355,7 +371,7 @@ void vtkMEDMatrixVectorMath::CalculateNormalsToU(const double *u,  double *v,  d
 // u, v and w form a right handed coordinate system.
 // The vectors are not normalised.
 void vtkMEDMatrixVectorMath::CalculateNormalsToV(double *u,  const double *v,  double *w) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   double x = v[0] ;
   double y = v[1] ;
@@ -372,21 +388,21 @@ void vtkMEDMatrixVectorMath::CalculateNormalsToV(double *u,  const double *v,  d
 
   // create vector u which is normal to the v axis
   switch(minComponent){
-    case 0:
-      u[0] = -(y*y + z*z) ;
-      u[1] = x*y ;
-      u[2] = x*z ;
-      break ;
-    case 1:
-      u[0] = y*x ;
-      u[1] = -(x*x + z*z) ;
-      u[2] = y*z ;
-      break ;
-    case 2:
-      u[0] = z*x ;
-      u[1] = z*y ;
-      u[2] = -(x*x + y*y) ;
-      break ;
+  case 0:
+    u[0] = -(y*y + z*z) ;
+    u[1] = x*y ;
+    u[2] = x*z ;
+    break ;
+  case 1:
+    u[0] = y*x ;
+    u[1] = -(x*x + z*z) ;
+    u[2] = y*z ;
+    break ;
+  case 2:
+    u[0] = z*x ;
+    u[1] = z*y ;
+    u[2] = -(x*x + y*y) ;
+    break ;
   }
 
   // third vector is cross product w = u ^ v
@@ -395,7 +411,7 @@ void vtkMEDMatrixVectorMath::CalculateNormalsToV(double *u,  const double *v,  d
   w[2] = u[0]*v[1] - u[1]*v[0] ;
 
 
-  if (Homogeneous){
+  if (m_homogeneous){
     u[3] = 1.0 ;
     w[3] = 1.0 ;
   }
@@ -408,7 +424,7 @@ void vtkMEDMatrixVectorMath::CalculateNormalsToV(double *u,  const double *v,  d
 // u, v and w form a right handed coordinate system.
 // The vectors are not normalised.
 void vtkMEDMatrixVectorMath::CalculateNormalsToW(double *u,  double *v,  const double *w) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   double x = w[0] ;
   double y = w[1] ;
@@ -425,21 +441,21 @@ void vtkMEDMatrixVectorMath::CalculateNormalsToW(double *u,  double *v,  const d
 
   // create vector v which is normal to the w axis
   switch(minComponent){
-    case 0:
-      v[0] = -(y*y + z*z) ;
-      v[1] = x*y ;
-      v[2] = x*z ;
-      break ;
-    case 1:
-      v[0] = y*x ;
-      v[1] = -(x*x + z*z) ;
-      v[2] = y*z ;
-      break ;
-    case 2:
-      v[0] = z*x ;
-      v[1] = z*y ;
-      v[2] = -(x*x + y*y) ;
-      break ;
+  case 0:
+    v[0] = -(y*y + z*z) ;
+    v[1] = x*y ;
+    v[2] = x*z ;
+    break ;
+  case 1:
+    v[0] = y*x ;
+    v[1] = -(x*x + z*z) ;
+    v[2] = y*z ;
+    break ;
+  case 2:
+    v[0] = z*x ;
+    v[1] = z*y ;
+    v[2] = -(x*x + y*y) ;
+    break ;
   }
 
   // third vector is cross product u = v ^ w
@@ -448,7 +464,7 @@ void vtkMEDMatrixVectorMath::CalculateNormalsToW(double *u,  double *v,  const d
   u[2] = v[0]*w[1] - v[1]*w[0] ;
 
 
-  if (Homogeneous){
+  if (m_homogeneous){
     u[3] = 1.0 ;
     v[3] = 1.0 ;
   }
@@ -459,7 +475,7 @@ void vtkMEDMatrixVectorMath::CalculateNormalsToW(double *u,  double *v,  const d
 //------------------------------------------------------------------------------
 // Distance between two vectors
 double vtkMEDMatrixVectorMath::Distance(const double *a,  const double *b) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   double dx = a[0]-b[0] ;
   double dy = a[1]-b[1] ;
@@ -471,7 +487,7 @@ double vtkMEDMatrixVectorMath::Distance(const double *a,  const double *b) const
 //------------------------------------------------------------------------------
 // Distance squared between two vectors
 double vtkMEDMatrixVectorMath::DistanceSquared(const double *a,  const double *b) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   double dx = a[0]-b[0] ;
   double dy = a[1]-b[1] ;
@@ -483,7 +499,7 @@ double vtkMEDMatrixVectorMath::DistanceSquared(const double *a,  const double *b
 //------------------------------------------------------------------------------
 // Mean of two vectors
 void vtkMEDMatrixVectorMath::MeanVector(const double *a0, const double *a1, double *b) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   for (int i = 0 ;  i < 3 ;  i++)
     b[i] = (a0[i] + a1[i]) / 2.0 ;
@@ -493,7 +509,7 @@ void vtkMEDMatrixVectorMath::MeanVector(const double *a0, const double *a1, doub
 //------------------------------------------------------------------------------
 // Mean of three vectors
 void vtkMEDMatrixVectorMath::MeanVector(const double *a0, const double *a1, const double *a2, double *b) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   for (int i = 0 ;  i < 3 ;  i++)
     b[i] = (a0[i] + a1[i] + a2[i]) / 3.0 ;
@@ -503,7 +519,7 @@ void vtkMEDMatrixVectorMath::MeanVector(const double *a0, const double *a1, cons
 //------------------------------------------------------------------------------
 // Mean of four vectors
 void vtkMEDMatrixVectorMath::MeanVector(const double *a0, const double *a1, const double *a2, const double *a3, double *b) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   for (int i = 0 ;  i < 3 ;  i++)
     b[i] = (a0[i] + a1[i] + a2[i] + a3[i]) / 4.0 ;
@@ -514,7 +530,7 @@ void vtkMEDMatrixVectorMath::MeanVector(const double *a0, const double *a1, cons
 //------------------------------------------------------------------------------
 // Copy homo 4 vector to 3 vector
 void vtkMEDMatrixVectorMath::CopyHomoVectorToVector(const double *aHomo, double *a) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   if (aHomo[3] == 1.0){
     a[0] = aHomo[0] ;
@@ -532,7 +548,7 @@ void vtkMEDMatrixVectorMath::CopyHomoVectorToVector(const double *aHomo, double 
 //------------------------------------------------------------------------------
 // Copy 3 vector to homo 4 vector
 void vtkMEDMatrixVectorMath::CopyVectorToHomoVector(const double *a, double *aHomo) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   aHomo[0] = a[0] ;
   aHomo[1] = a[1] ;
@@ -545,9 +561,9 @@ void vtkMEDMatrixVectorMath::CopyVectorToHomoVector(const double *a, double *aHo
 //------------------------------------------------------------------------------
 // Print vector
 void vtkMEDMatrixVectorMath::PrintVector(std::ostream& os, const double *a) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
-  if (Homogeneous){
+  if (m_homogeneous){
     os << a[0] << "\t" << a[1] << "\t" << a[2] << "\t" << a[3] << std::endl ;
   }
   else{
@@ -561,11 +577,11 @@ void vtkMEDMatrixVectorMath::PrintVector(std::ostream& os, const double *a) cons
 
 
 //------------------------------------------------------------------------------
-/// Copy matrix
-void vtkMEDMatrixVectorMath::CopyMatrix(const double *A, double *B)
+// Copy matrix
 //------------------------------------------------------------------------------
+void vtkMEDMatrixVectorMath::CopyMatrix(const double *A, double *B)
 {
-  if (Homogeneous){
+  if (m_homogeneous){
     for (int k = 0 ;  k < 16 ;  k++)
       B[k] = A[k] ;
   }
@@ -578,9 +594,27 @@ void vtkMEDMatrixVectorMath::CopyMatrix(const double *A, double *B)
 
 
 //------------------------------------------------------------------------------
-/// Copy matrix
-void vtkMEDMatrixVectorMath::CopyMatrix3x3(const double A[3][3], double B[3][3])
+// Copy matrix A[9] to homo matrix B[16]
 //------------------------------------------------------------------------------
+void vtkMEDMatrixVectorMath::CopyMatrixToHomoMatrix(const double *A, double *B)
+{
+  bool hsave = m_homogeneous ;
+  SetHomogeneous(true) ;
+  SetMatrixToZero(B) ;
+
+  int kb[9] = {0,1,2,4,5,6,8,9,10} ;
+  for (int ka = 0 ;  ka < 9 ;  ka++)
+    B[kb[ka]] = A[ka] ;
+
+  SetHomogeneous(hsave) ;
+}
+
+
+
+//------------------------------------------------------------------------------
+// Copy matrix
+void vtkMEDMatrixVectorMath::CopyMatrix3x3(const double A[3][3], double B[3][3])
+  //------------------------------------------------------------------------------
 {
   for (int i = 0 ;  i < 3 ;  i++)
     for (int j = 0 ;  j < 3 ;  j++)
@@ -589,9 +623,9 @@ void vtkMEDMatrixVectorMath::CopyMatrix3x3(const double A[3][3], double B[3][3])
 
 
 //------------------------------------------------------------------------------
-/// Copy matrix
+// Copy matrix
 void vtkMEDMatrixVectorMath::CopyMatrix4x4(const double A[4][4], double B[4][4])
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   for (int i = 0 ;  i < 4 ;  i++)
     for (int j = 0 ;  j < 4 ;  j++)
@@ -603,7 +637,7 @@ void vtkMEDMatrixVectorMath::CopyMatrix4x4(const double A[4][4], double B[4][4])
 //------------------------------------------------------------------------------
 // Divide matrix by homogeneous coord
 void vtkMEDMatrixVectorMath::DivideMatrixByHomoCoord(double *A) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   for (int k = 0 ;  k < 15 ;  k++)
     A[k] /= A[15] ;
@@ -615,7 +649,7 @@ void vtkMEDMatrixVectorMath::DivideMatrixByHomoCoord(double *A) const
 //------------------------------------------------------------------------------
 // Divide matrix by homogeneous coord
 void vtkMEDMatrixVectorMath::DivideMatrixByHomoCoord(double A[4][4]) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   for (int i = 0 ;  i < 4 ;  i++)
     for (int j = 0 ;  j < 4 ; j++)
@@ -628,9 +662,9 @@ void vtkMEDMatrixVectorMath::DivideMatrixByHomoCoord(double A[4][4]) const
 //------------------------------------------------------------------------------
 // Set matrix to zero
 void vtkMEDMatrixVectorMath::SetMatrixToZero(double *A) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
-  if (Homogeneous){
+  if (m_homogeneous){
     for (int k = 0 ;  k < 16 ;  k++)
       A[k] = 0.0 ;
     A[15] = 1.0 ;
@@ -647,7 +681,7 @@ void vtkMEDMatrixVectorMath::SetMatrixToZero(double *A) const
 //------------------------------------------------------------------------------
 // Set matrix to zero
 void vtkMEDMatrixVectorMath::SetMatrixToZero3x3(double A[3][3]) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   for (int i = 0 ;  i < 3 ;  i++)
     for (int j = 0 ;  j < 3 ;  j++)
@@ -659,7 +693,7 @@ void vtkMEDMatrixVectorMath::SetMatrixToZero3x3(double A[3][3]) const
 //------------------------------------------------------------------------------
 // Set matrix to zero (except for homogeneous A[3][3] = 1)
 void vtkMEDMatrixVectorMath::SetMatrixToZero4x4(double A[4][4]) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   for (int i = 0 ;  i < 4 ;  i++)
     for (int j = 0 ;  j < 4 ;  j++)
@@ -672,9 +706,9 @@ void vtkMEDMatrixVectorMath::SetMatrixToZero4x4(double A[4][4]) const
 //------------------------------------------------------------------------------
 // Set matrix to identity
 void vtkMEDMatrixVectorMath::SetMatrixToIdentity(double *A) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
-  if (Homogeneous){
+  if (m_homogeneous){
     for (int k = 0 ;  k < 16 ;  k++)
       A[k] = 0.0 ;
     A[0] = 1.0 ;
@@ -698,11 +732,11 @@ void vtkMEDMatrixVectorMath::SetMatrixToIdentity(double *A) const
 //------------------------------------------------------------------------------
 // Set matrix to identity
 void vtkMEDMatrixVectorMath::SetMatrixToIdentity3x3(double A[3][3]) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   SetMatrixToZero3x3(A) ;
   for (int i = 0 ;  i < 3 ;  i++)
-      A[i][i] = 1.0 ;
+    A[i][i] = 1.0 ;
 }
 
 
@@ -710,7 +744,7 @@ void vtkMEDMatrixVectorMath::SetMatrixToIdentity3x3(double A[3][3]) const
 //------------------------------------------------------------------------------
 // Set matrix to identity 
 void vtkMEDMatrixVectorMath::SetMatrixToIdentity4x4(double A[4][4]) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   SetMatrixToZero4x4(A) ;
   for (int i = 0 ;  i < 4 ;  i++)
@@ -719,15 +753,157 @@ void vtkMEDMatrixVectorMath::SetMatrixToIdentity4x4(double A[4][4]) const
 
 
 
+//------------------------------------------------------------------------------
+void vtkMEDMatrixVectorMath::SetMatrixToRotateAboutX(double *A, double theta) const
+  //------------------------------------------------------------------------------
+{
+  SetMatrixToIdentity(A) ;
+  double s = (double)sin(theta);
+  double c = (double)cos(theta);
+
+  if (m_homogeneous){
+    A[5] = c;
+    A[9] = -s;
+    A[6] = s;
+    A[10] = c;
+  }
+  else{
+    A[4] = c;
+    A[7] = -s;
+    A[5] = s;
+    A[8] = c;
+  }
+}
+
+
+
+//------------------------------------------------------------------------------
+void vtkMEDMatrixVectorMath::SetMatrixToRotateAboutY(double *A, double theta) const
+  //------------------------------------------------------------------------------
+{
+  SetMatrixToIdentity(A) ;
+  double s = (double)sin(theta);
+  double c = (double)cos(theta);
+
+  if (m_homogeneous){
+    A[0] = c;
+    A[8] = s;
+    A[2] = -s;
+    A[10] = c;
+  }
+  else{
+    A[0] = c;
+    A[6] = s;
+    A[2] = -s;
+    A[8] = c;
+  }
+}
+
+
+
+//------------------------------------------------------------------------------
+void vtkMEDMatrixVectorMath::SetMatrixToRotateAboutZ(double *A, double theta) const
+  //------------------------------------------------------------------------------
+{
+  SetMatrixToIdentity(A) ;
+  double s = (double)sin(theta);
+  double c = (double)cos(theta);
+
+  if (m_homogeneous){
+    A[0] = c;
+    A[4] = -s;
+    A[1] = s;
+    A[5] = c;
+  }
+  else{
+    A[0] = c;
+    A[3] = -s;
+    A[1] = s;
+    A[4] = c;
+  }
+}
+
+
+
+//------------------------------------------------------------------------------
+// Set matrix to rotation about arbitrary axis
+// Rodrigues formula is Q = I + sW + (1-c)W^2
+void vtkMEDMatrixVectorMath::SetMatrixToRotateAboutAxis(double *Q, const double *w, double theta) const
+  //------------------------------------------------------------------------------
+{
+  SetMatrixToIdentity(Q) ;
+  double s = sin(theta) ;
+  double c = cos(theta) ;
+
+  // Get W matrix, equivalent to vector product with w.
+  double W[16], Wsq[16] ;
+  SetMatrixToVectorProductTransform(W, w) ;
+  MultiplyMatrixByMatrix(W, W, Wsq) ; // W squared
+
+  // Construct Q using Rodrigues formula
+  if (m_homogeneous){
+    for (int i = 0 ;  i < 11;  i++)
+      Q[i] += s*W[i] + (1.0-c)*Wsq[i] ;
+  }
+  else{
+    for (int i = 0 ;  i < 9;  i++)
+      Q[i] += s*W[i] + (1.0-c)*Wsq[i] ;
+  }
+}
+
+
+
+//------------------------------------------------------------------------------
+// Set matrix to translate by t (homo only)
+//------------------------------------------------------------------------------
+void vtkMEDMatrixVectorMath::SetMatrixToTranslate(double *A, const double *t) const
+{
+  SetMatrixToIdentity(A) ;
+
+  if (m_homogeneous){
+    A[12] = t[0] ;
+    A[13] = t[1] ;
+    A[14] = t[2] ;
+  }
+}
+
+
+
+//------------------------------------------------------------------------------
+// Set matrix to transform corresponding to vector product by u
+//------------------------------------------------------------------------------
+void vtkMEDMatrixVectorMath::SetMatrixToVectorProductTransform(double *A, const double *u) const
+{
+  SetMatrixToZero(A) ;
+
+  if (m_homogeneous){
+    A[1] = u[2] ;
+    A[2] = -u[1] ;
+    A[4] = -u[2] ;
+    A[6] = u[0] ;
+    A[8] = u[1] ;
+    A[9] = -u[0] ;
+  }
+  else{
+    A[1] = u[2] ;
+    A[2] = -u[1] ;
+    A[3] = -u[2] ;
+    A[5] = u[0] ;
+    A[6] = u[1] ;
+    A[7] = -u[0] ;
+  }
+}
+
+
 
 //------------------------------------------------------------------------------
 // Set matrix row to vector (columns 0-2 only) 
 void vtkMEDMatrixVectorMath::SetMatrixRowToVector(double *A, int rowId, const double *u) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   int k, j ;
 
-  if (Homogeneous){
+  if (m_homogeneous){
     for (j = 0, k = rowId ;  j < 3 ;  j++, k+=3)
       A[k] = u[j] ;
   }
@@ -743,7 +919,7 @@ void vtkMEDMatrixVectorMath::SetMatrixRowToVector(double *A, int rowId, const do
 //------------------------------------------------------------------------------
 // Set matrix row to vector
 void vtkMEDMatrixVectorMath::SetMatrixRowToVector3x3(double A[3][3], int rowId, const double *u) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   for (int j = 0 ;  j < 3 ;  j++)
     A[rowId][j] = u[j] ;
@@ -754,7 +930,7 @@ void vtkMEDMatrixVectorMath::SetMatrixRowToVector3x3(double A[3][3], int rowId, 
 //------------------------------------------------------------------------------
 // Set matrix row  to vector (columns 0-2 only)
 void vtkMEDMatrixVectorMath::SetMatrixRowToVector4x4(double A[4][4], int rowId, const double *u) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   for (int j = 0 ;  j < 3 ;  j++)
     A[rowId][j] = u[j] ;
@@ -766,11 +942,11 @@ void vtkMEDMatrixVectorMath::SetMatrixRowToVector4x4(double A[4][4], int rowId, 
 //------------------------------------------------------------------------------
 // Set matrix column to vector (rows 0-2 only)
 void vtkMEDMatrixVectorMath::SetMatrixColumnToVector(double *A, int colId, const double *u) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   int k, i ;
 
-  if (Homogeneous){
+  if (m_homogeneous){
     for (i = 0, k = 4*colId ;  i < 3 ;  i++, k++)
       A[k] = u[i] ;
   }
@@ -785,7 +961,7 @@ void vtkMEDMatrixVectorMath::SetMatrixColumnToVector(double *A, int colId, const
 //------------------------------------------------------------------------------
 // Set matrix column to vector
 void vtkMEDMatrixVectorMath::SetMatrixColumnToVector3x3(double A[3][3], int colId, const double *u) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   for (int i = 0 ;  i < 3 ;  i++)
     A[i][colId] = u[i] ;
@@ -796,7 +972,7 @@ void vtkMEDMatrixVectorMath::SetMatrixColumnToVector3x3(double A[3][3], int colI
 //------------------------------------------------------------------------------
 // Set matrix column to vector (rows 0-2 only)
 void vtkMEDMatrixVectorMath::SetMatrixColumnToVector4x4(double A[4][4], int colId, const double *u) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   for (int i = 0 ;  i < 3 ;  i++)
     A[i][colId] = u[i] ;
@@ -808,7 +984,7 @@ void vtkMEDMatrixVectorMath::SetMatrixColumnToVector4x4(double A[4][4], int colI
 //------------------------------------------------------------------------------
 // Set matrix rows to vectors (columns and rows 0-2 only)
 void vtkMEDMatrixVectorMath::SetMatrixRowsToVectors(double *A, const double *u, const double *v, const double *w) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   SetMatrixRowToVector(A, 0, u) ;
   SetMatrixRowToVector(A, 1, v) ;
@@ -821,7 +997,7 @@ void vtkMEDMatrixVectorMath::SetMatrixRowsToVectors(double *A, const double *u, 
 //------------------------------------------------------------------------------
 // Set matrix rows to vectors (columns and rows 0-2 only)
 void vtkMEDMatrixVectorMath::SetMatrixRowsToVectors3x3(double A[3][3], const double *u, const double *v, const double *w) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   SetMatrixRowToVector3x3(A, 0, u) ;
   SetMatrixRowToVector3x3(A, 1, v) ;
@@ -833,7 +1009,7 @@ void vtkMEDMatrixVectorMath::SetMatrixRowsToVectors3x3(double A[3][3], const dou
 //------------------------------------------------------------------------------
 // Set matrix rows to vectors (columns and rows 0-2 only)
 void vtkMEDMatrixVectorMath::SetMatrixRowsToVectors4x4(double A[4][4], const double *u, const double *v, const double *w) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   SetMatrixRowToVector4x4(A, 0, u) ;
   SetMatrixRowToVector4x4(A, 1, v) ;
@@ -843,7 +1019,7 @@ void vtkMEDMatrixVectorMath::SetMatrixRowsToVectors4x4(double A[4][4], const dou
 //------------------------------------------------------------------------------
 // Set matrix columns to vectors (columns and rows 0-2 only)
 void vtkMEDMatrixVectorMath::SetMatrixColumnsToVectors(double *A, const double *u, const double *v, const double *w) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   SetMatrixColumnToVector(A, 0, u) ;
   SetMatrixColumnToVector(A, 1, v) ;
@@ -854,7 +1030,7 @@ void vtkMEDMatrixVectorMath::SetMatrixColumnsToVectors(double *A, const double *
 //------------------------------------------------------------------------------
 // Set matrix columns to vectors (columns and rows 0-2 only)
 void vtkMEDMatrixVectorMath::SetMatrixColumnsToVectors3x3(double A[3][3], const double *u, const double *v, const double *w) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   SetMatrixColumnToVector3x3(A, 0, u) ;
   SetMatrixColumnToVector3x3(A, 1, v) ;
@@ -865,7 +1041,7 @@ void vtkMEDMatrixVectorMath::SetMatrixColumnsToVectors3x3(double A[3][3], const 
 //------------------------------------------------------------------------------
 // Set matrix columns to vectors (columns and rows 0-2 only)
 void vtkMEDMatrixVectorMath::SetMatrixColumnsToVectors4x4(double A[4][4], const double *u, const double *v, const double *w) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   SetMatrixColumnToVector4x4(A, 0, u) ;
   SetMatrixColumnToVector4x4(A, 1, v) ;
@@ -882,9 +1058,9 @@ void vtkMEDMatrixVectorMath::SetMatrixColumnsToVectors4x4(double A[4][4], const 
 // The homogeneous definition does not commute, 
 // so S(A)*x != S(A*x) and A*S(B) != S(A)*B.
 void vtkMEDMatrixVectorMath::MultiplyMatrixByScalar(double s, const double *A, double *B) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
-  if (Homogeneous){
+  if (m_homogeneous){
     for (int k = 0 ;  k < 12 ;  k++)
       B[k] = s*A[k] ;
   }
@@ -899,7 +1075,7 @@ void vtkMEDMatrixVectorMath::MultiplyMatrixByScalar(double s, const double *A, d
 //------------------------------------------------------------------------------
 // Multiply matrix by scalar
 void vtkMEDMatrixVectorMath::MultiplyMatrixByScalar3x3(double s, const double A[3][3], double B[3][3]) const   
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   for (int i = 0 ;  i < 3 ;  i++)
     for (int j = 0 ;  j < 3 ;  j++)
@@ -916,7 +1092,7 @@ void vtkMEDMatrixVectorMath::MultiplyMatrixByScalar3x3(double s, const double A[
 // The homogeneous definition does not commute, 
 // so S(A)*x != S(A*x) and A*S(B) != S(A)*B.
 void vtkMEDMatrixVectorMath::MultiplyMatrixByScalar4x4(double s, const double A[4][4], double B[3][3]) const   
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   for (int i = 0 ;  i < 4 ;  i++)
     for (int j = 0 ;  j < 3 ;  j++)
@@ -933,9 +1109,9 @@ void vtkMEDMatrixVectorMath::MultiplyMatrixByScalar4x4(double s, const double A[
 // The homogeneous definition does not commute, 
 // so S(A)*x != S(A*x) and A*S(B) != S(A)*B.
 void vtkMEDMatrixVectorMath::DivideMatrixByScalar(double s, const double *A, double *B) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
-  if (Homogeneous){
+  if (m_homogeneous){
     for (int k = 0 ;  k < 12 ;  k++)
       B[k] = A[k]/s ;
   }
@@ -950,7 +1126,7 @@ void vtkMEDMatrixVectorMath::DivideMatrixByScalar(double s, const double *A, dou
 //------------------------------------------------------------------------------
 // Divide matrix by scalar.
 void vtkMEDMatrixVectorMath::DivideMatrixByScalar3x3(double s, const double A[3][3], double B[3][3]) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   for (int i = 0 ;  i < 3 ;  i++)
     for (int j = 0 ;  j < 3 ;  j++)
@@ -967,7 +1143,7 @@ void vtkMEDMatrixVectorMath::DivideMatrixByScalar3x3(double s, const double A[3]
 // The homogeneous definition does not commute, 
 // so S(A)*x != S(A*x) and A*S(B) != S(A)*B.
 void vtkMEDMatrixVectorMath::DivideMatrixByScalar4x4(double s, const double A[4][4], double B[4][4]) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   for (int i = 0 ;  i < 4 ;  i++)
     for (int j = 0 ;  j < 3 ;  j++)
@@ -981,11 +1157,11 @@ void vtkMEDMatrixVectorMath::DivideMatrixByScalar4x4(double s, const double A[4]
 // no. of scalars must equal no. of columns (3 or 4)
 // This is useful for multiplying column eigenvectors by eigenvalues
 void vtkMEDMatrixVectorMath::MultiplyColumnsByScalars(const double *s, const double *A, double *B) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   int k = 0 ;
 
-  if (Homogeneous){
+  if (m_homogeneous){
     for (int j = 0 ;  j < 4 ;  j++)
       for (int i = 0 ;  i < 4 ;  i++, k++)
         B[k] = s[j]*A[k] ;
@@ -1005,7 +1181,7 @@ void vtkMEDMatrixVectorMath::MultiplyColumnsByScalars(const double *s, const dou
 // no. of scalars must equal 3
 // This is useful for multiplying column eigenvectors by eigenvalues
 void vtkMEDMatrixVectorMath::MultiplyColumnsByScalars3x3(const double *s, const double A[3][3], double B[3][3]) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   for (int i = 0 ;  i < 3 ;  i++){
     for (int j = 0 ;  j < 3 ;  j++){
@@ -1020,7 +1196,7 @@ void vtkMEDMatrixVectorMath::MultiplyColumnsByScalars3x3(const double *s, const 
 // no. of scalars must equal 4
 // This is useful for multiplying column eigenvectors by eigenvalues
 void vtkMEDMatrixVectorMath::MultiplyColumnsByScalars4x4(const double *s, const double A[4][4], double B[4][4]) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   for (int i = 0 ;  i < 4 ;  i++){
     for (int j = 0 ;  j < 4 ;  j++){
@@ -1035,10 +1211,10 @@ void vtkMEDMatrixVectorMath::MultiplyColumnsByScalars4x4(const double *s, const 
 // Multiply matrix rows by scalars
 // no. of scalars must equal no. of rows (3 or 4)
 void vtkMEDMatrixVectorMath::MultiplyRowsByScalars(const double *s, const double *A, double *B) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   int k = 0 ;
-  if (Homogeneous){
+  if (m_homogeneous){
     for (int j = 0 ;  j < 4 ;  j++)
       for (int i = 0 ;  i < 4 ;  i++, k++)
         B[k] = s[i]*A[k] ;
@@ -1057,7 +1233,7 @@ void vtkMEDMatrixVectorMath::MultiplyRowsByScalars(const double *s, const double
 // Multiply matrix rows by scalars
 // no. of scalars must equal 3
 void vtkMEDMatrixVectorMath::MultiplyRowsByScalars3x3(const double *s, const double A[3][3], double B[3][3]) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   for (int i = 0 ;  i < 3 ;  i++)
     for (int j = 0 ;  j < 3 ;  j++)
@@ -1069,7 +1245,7 @@ void vtkMEDMatrixVectorMath::MultiplyRowsByScalars3x3(const double *s, const dou
 // Multiply matrix rows by scalars
 // no. of scalars must equal 4
 void vtkMEDMatrixVectorMath::MultiplyRowsByScalars4x4(const double *s, const double A[4][4], double B[4][4]) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   for (int i = 0 ;  i < 4 ;  i++)
     for (int j = 0 ;  j < 4 ;  j++)
@@ -1080,9 +1256,9 @@ void vtkMEDMatrixVectorMath::MultiplyRowsByScalars4x4(const double *s, const dou
 //------------------------------------------------------------------------------
 // Multiply vector by matrix
 void vtkMEDMatrixVectorMath::MultiplyMatrixByVector(const double *A, const double *v, double *Av) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
-  if (Homogeneous){
+  if (m_homogeneous){
     Av[0] = A[0]*v[0] + A[4]*v[1] + A[8]*v[2] + A[12]*v[3] ;
     Av[1] = A[1]*v[0] + A[5]*v[1] + A[9]*v[2] + A[13]*v[3] ;
     Av[2] = A[2]*v[0] + A[6]*v[1] + A[10]*v[2] + A[14]*v[3] ;
@@ -1100,7 +1276,7 @@ void vtkMEDMatrixVectorMath::MultiplyMatrixByVector(const double *A, const doubl
 //------------------------------------------------------------------------------
 // Multiply vector by matrix
 void vtkMEDMatrixVectorMath::MultiplyMatrixByVector3x3(const double A[3][3], const double *v, double *Av) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   for (int i = 0 ;  i < 3 ;  i++)
     Av[i] = 0.0 ;
@@ -1116,7 +1292,7 @@ void vtkMEDMatrixVectorMath::MultiplyMatrixByVector3x3(const double A[3][3], con
 //------------------------------------------------------------------------------
 // Multiply vector by matrix
 void vtkMEDMatrixVectorMath::MultiplyMatrixByVector4x4(const double A[4][4], const double *v, double *Av) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   for (int i = 0 ;  i < 4 ;  i++)
     Av[i] = 0.0 ;
@@ -1131,10 +1307,15 @@ void vtkMEDMatrixVectorMath::MultiplyMatrixByVector4x4(const double A[4][4], con
 
 //------------------------------------------------------------------------------
 // Multiply matrix by matrix
-void vtkMEDMatrixVectorMath::MultiplyMatrixByMatrix(const double *A, const double *B, double *AB) const
 //------------------------------------------------------------------------------
+void vtkMEDMatrixVectorMath::MultiplyMatrixByMatrix(const double *A, const double *B, double *AB) const
 {
-  if (Homogeneous){
+  if ((AB == A) || (AB == B)){
+    // output can't be same as input
+    assert(false) ;
+  }
+
+  if (m_homogeneous){
     AB[0] =  A[0]*B[0] + A[4]*B[1] + A[8]*B[2] + A[12]*B[3] ;
     AB[1] =  A[1]*B[0] + A[5]*B[1] + A[9]*B[2] + A[13]*B[3] ;
     AB[2] =  A[2]*B[0] + A[6]*B[1] + A[10]*B[2] + A[14]*B[3] ;
@@ -1173,9 +1354,9 @@ void vtkMEDMatrixVectorMath::MultiplyMatrixByMatrix(const double *A, const doubl
 
 
 //------------------------------------------------------------------------------
-/// Multiply matrix by matrix
+// Multiply matrix by matrix
 void vtkMEDMatrixVectorMath::MultiplyMatrixByMatrix3x3(const double A[3][3], const double B[3][3], double AB[3][3]) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   int jj ;
 
@@ -1188,9 +1369,9 @@ void vtkMEDMatrixVectorMath::MultiplyMatrixByMatrix3x3(const double A[3][3], con
 
 
 //------------------------------------------------------------------------------
-/// Multiply matrix by matrix
+// Multiply matrix by matrix
 void vtkMEDMatrixVectorMath::MultiplyMatrixByMatrix4x4(const double A[4][4], const double B[4][4], double AB[4][4]) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   int jj ;
 
@@ -1206,7 +1387,7 @@ void vtkMEDMatrixVectorMath::MultiplyMatrixByMatrix4x4(const double A[4][4], con
 //------------------------------------------------------------------------------
 // Multiply 3 vector by homo 4x4 matrix
 void vtkMEDMatrixVectorMath::MultiplyHomoMatrixBy3Vector(const double *A, const double v[3], double Av[3]) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   double vhomo[4], Avhomo[4] ;
   CopyVectorToHomoVector(v, vhomo) ;
@@ -1218,7 +1399,7 @@ void vtkMEDMatrixVectorMath::MultiplyHomoMatrixBy3Vector(const double *A, const 
 //------------------------------------------------------------------------------
 // Multiply 3 vector by homo 4x4 matrix
 void vtkMEDMatrixVectorMath::MultiplyHomoMatrixBy3Vector(const double A[4][4], const double v[3], double Av[3]) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   double vhomo[4], Avhomo[4] ;
   CopyVectorToHomoVector(v, vhomo) ;
@@ -1228,15 +1409,94 @@ void vtkMEDMatrixVectorMath::MultiplyHomoMatrixBy3Vector(const double A[4][4], c
 
 
 
+
+
+//------------------------------------------------------------------------------
+// Rotate vector about x
+//------------------------------------------------------------------------------
+void vtkMEDMatrixVectorMath::RotateVectorAboutX(const double *a, double *b, double theta) const
+{
+  double A[16] ;
+  SetMatrixToRotateAboutX(A, theta) ;
+  MultiplyMatrixByVector(A, a, b) ;
+}
+
+
+//------------------------------------------------------------------------------
+// Rotate vector about y
+//------------------------------------------------------------------------------
+void vtkMEDMatrixVectorMath::RotateVectorAboutY(const double *a, double *b, double theta) const
+{
+  double A[16] ;
+  SetMatrixToRotateAboutY(A, theta) ;
+  MultiplyMatrixByVector(A, a, b) ;
+
+}
+
+
+//------------------------------------------------------------------------------
+// Rotate vector about z
+//------------------------------------------------------------------------------
+void vtkMEDMatrixVectorMath::RotateVectorAboutZ(const double *a, double *b, double theta) const
+{
+  double A[16] ;
+  SetMatrixToRotateAboutZ(A, theta) ;
+  MultiplyMatrixByVector(A, a, b) ;
+
+}
+
+
+//------------------------------------------------------------------------------
+// Rotate vector about arbitrary axis w
+//------------------------------------------------------------------------------
+void vtkMEDMatrixVectorMath::RotateVectorAboutAxis(const double *a, double *b, const double *w, double theta) const
+{
+  double Q[16] ;
+  SetMatrixToRotateAboutAxis(Q, w, theta) ;
+  MultiplyMatrixByVector(Q, a, b) ;
+}
+
+
+
+//------------------------------------------------------------------------------
+// Find nearest point on line. \n
+// Returns rsq and lambda, where rsq is the squared distance, and \n
+// lambda is the position along the line segment.
+//------------------------------------------------------------------------------
+void vtkMEDMatrixVectorMath::FindNearestPointOnLine(const double x[3], const double p0[3], const double p1[3], double& rsq, double& lambda)
+{
+  bool saveHomo = m_homogeneous ;
+  SetHomogeneous(false) ;
+
+  // unit vector along line
+  double u[3] ;
+  SubtractVectors(p1, p0, u) ;
+  NormalizeVector(u) ;
+
+  double dx[3] ;
+  SubtractVectors(x, p0, dx) ;
+  double m1 = MagnitudeOfVector(dx) ; // dist x to p0
+  double m2 = DotProduct(dx,u) ;      // dist dx.u to p0
+  rsq = m1*m1 - m2*m2 ;
+
+  double m3 = Distance(p1,p0) ; // dist p1 to p0
+  lambda = m2/m3 ;
+
+  SetHomogeneous(saveHomo) ;
+}
+
+
+
+
 //------------------------------------------------------------------------------
 // Transpose the matrix
-void vtkMEDMatrixVectorMath::Transpose(const double *A,  double *AT) const
 //------------------------------------------------------------------------------
+void vtkMEDMatrixVectorMath::Transpose(const double *A,  double *AT) const
 {
   int k = 0 ;
   double temp[16] ;
 
-  if (Homogeneous){
+  if (m_homogeneous){
     for (int j = 0 ;  j < 4 ;  j++)
       for (int i = 0 ;  i < 4 ;  i++, k++)
         temp[k] = A[j+4*i] ;
@@ -1256,8 +1516,8 @@ void vtkMEDMatrixVectorMath::Transpose(const double *A,  double *AT) const
 
 //------------------------------------------------------------------------------
 // Transpose the matrix
-void vtkMEDMatrixVectorMath::Transpose3x3(const double A[3][3],  double AT[3][3]) const
 //------------------------------------------------------------------------------
+void vtkMEDMatrixVectorMath::Transpose3x3(const double A[3][3],  double AT[3][3]) const
 {
   for (int i = 0 ;  i < 3 ;  i++)
     for (int j = 0 ;  j < 3 ;  j++)
@@ -1267,8 +1527,8 @@ void vtkMEDMatrixVectorMath::Transpose3x3(const double A[3][3],  double AT[3][3]
 
 //------------------------------------------------------------------------------
 // Transpose the matrix
-void vtkMEDMatrixVectorMath::Transpose4x4(const double A[4][4],  double AT[4][4]) const
 //------------------------------------------------------------------------------
+void vtkMEDMatrixVectorMath::Transpose4x4(const double A[4][4],  double AT[4][4]) const
 {
   for (int i = 0 ;  i < 4 ;  i++)
     for (int j = 0 ;  j < 4 ;  j++)
@@ -1280,10 +1540,10 @@ void vtkMEDMatrixVectorMath::Transpose4x4(const double A[4][4],  double AT[4][4]
 
 //------------------------------------------------------------------------------
 // Get pointer to column
-double *vtkMEDMatrixVectorMath::GetColumn(double *A, int col) const
 //------------------------------------------------------------------------------
+double *vtkMEDMatrixVectorMath::GetColumn(double *A, int col) const
 {
-  if (Homogeneous)
+  if (m_homogeneous)
     return A + 3*col ;
   else
     return A + 4*col ;
@@ -1292,10 +1552,10 @@ double *vtkMEDMatrixVectorMath::GetColumn(double *A, int col) const
 
 //------------------------------------------------------------------------------
 // Print matrix
-void vtkMEDMatrixVectorMath::PrintMatrix(std::ostream& os, const double *A) const
 //------------------------------------------------------------------------------
+void vtkMEDMatrixVectorMath::PrintMatrix(std::ostream& os, const double *A) const
 {
-  if (Homogeneous){
+  if (m_homogeneous){
     os << A[0] << "\t" << A[4] << "\t" << A[8] << "\t" << A[12] << std::endl ;
     os << A[1] << "\t" << A[5] << "\t" << A[9] << "\t" << A[13] << std::endl ;
     os << A[2] << "\t" << A[6] << "\t" << A[10] << "\t" << A[14] << std::endl ;
@@ -1312,9 +1572,9 @@ void vtkMEDMatrixVectorMath::PrintMatrix(std::ostream& os, const double *A) cons
 
 
 //------------------------------------------------------------------------------
-/// print matrix
+// print matrix
 void vtkMEDMatrixVectorMath::PrintMatrix3x3(std::ostream& os, const double A[3][3]) const     
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   for (int i = 0 ;  i < 3 ;  i++){
     for (int j = 0 ;  j < 3 ;  j++)
@@ -1327,9 +1587,9 @@ void vtkMEDMatrixVectorMath::PrintMatrix3x3(std::ostream& os, const double A[3][
 
 
 //------------------------------------------------------------------------------
-/// print matrix
+// print matrix
 void vtkMEDMatrixVectorMath::PrintMatrix4x4(std::ostream& os, const double A[4][4]) const     
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   for (int i = 0 ;  i < 4 ;  i++){
     for (int j = 0 ;  j < 4 ;  j++)
@@ -1344,11 +1604,11 @@ void vtkMEDMatrixVectorMath::PrintMatrix4x4(std::ostream& os, const double A[4][
 //------------------------------------------------------------------------------
 // Transpose 2D array
 void vtkMEDMatrixVectorMath::Transpose2DArray(const double arr1[3][3], double arr2[3][3]) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   double temp[4][4] ;
 
-  if (Homogeneous){
+  if (m_homogeneous){
     for (int i = 0 ;  i < 4 ;  i++)
       for (int j = 0 ;  j < 4 ;  j++)
         temp[i][j] = arr1[j][i] ;
@@ -1370,7 +1630,7 @@ void vtkMEDMatrixVectorMath::Transpose2DArray(const double arr1[3][3], double ar
 //------------------------------------------------------------------------------
 // copy 2D array to matrix
 void vtkMEDMatrixVectorMath::Copy2DArrayToMatrix3x3(const double arr2d[3][3],  double *A) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   int k = 0 ;
   for (int j = 0 ;  j < 3 ;  j++)
@@ -1381,7 +1641,7 @@ void vtkMEDMatrixVectorMath::Copy2DArrayToMatrix3x3(const double arr2d[3][3],  d
 //------------------------------------------------------------------------------
 // copy 2D array to matrix
 void vtkMEDMatrixVectorMath::Copy2DArrayToMatrix4x4(const double arr2d[4][4],  double *A) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   int k = 0 ;
   for (int j = 0 ;  j < 4 ;  j++)
@@ -1392,7 +1652,7 @@ void vtkMEDMatrixVectorMath::Copy2DArrayToMatrix4x4(const double arr2d[4][4],  d
 //------------------------------------------------------------------------------
 // copy matrix to 2D array
 void vtkMEDMatrixVectorMath::CopyMatrixTo2DArray3x3(const double *A,  double arr2d[3][3]) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   int k = 0 ;
   for (int j = 0 ;  j < 3 ;  j++)
@@ -1403,7 +1663,7 @@ void vtkMEDMatrixVectorMath::CopyMatrixTo2DArray3x3(const double *A,  double arr
 //------------------------------------------------------------------------------
 // copy matrix to 2D array
 void vtkMEDMatrixVectorMath::CopyMatrixTo2DArray4x4(const double *A,  double arr2d[4][4]) const
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
 {
   int k = 0 ;
   for (int j = 0 ;  j < 4 ;  j++)

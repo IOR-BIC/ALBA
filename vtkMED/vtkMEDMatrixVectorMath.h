@@ -62,7 +62,7 @@ public:
 
   /// Set to false for non-homogeneous 3x3 (default), \n
   /// set to true for homogeneous 4x4
-  void SetHomogeneous(bool homogeneous) {Homogeneous = homogeneous ;}
+  void SetHomogeneous(bool homogeneous) {m_homogeneous = homogeneous ;}
 
 
   //----------------------------------------------------------------------------
@@ -74,6 +74,9 @@ public:
 
   /// Set vector to zero
   void SetVectorToZero(double *a)  const ;
+
+  /// Set vector
+  void SetVector(double *a, double a0, double a1, double a2) const ;
 
   /// Magnitude of vector.
   double MagnitudeOfVector(const double *a) const ;
@@ -162,6 +165,25 @@ public:
   /// Copy 3 vector to homo 4 vector
   void CopyVectorToHomoVector(const double *a, double *aHomo) const ;
 
+  /// Rotate vector about x
+  void RotateVectorAboutX(const double *a, double *b, double theta) const ;
+
+  /// Rotate vector about y
+  void RotateVectorAboutY(const double *a, double *b, double theta) const ;
+
+  /// Rotate vector about z
+  void RotateVectorAboutZ(const double *a, double *b, double theta) const ;
+
+  /// Rotate vector about arbitrary axis w. \n
+  /// NB this is inefficient if the rotation is to be repeated. \n
+  /// Instead use SetMatrixToRotateAboutAxis() to get a reusable rotation matrix.
+  void RotateVectorAboutAxis(const double *a, double *b, const double *w, double theta) const ;
+
+  /// Find nearest point on line. \n
+  /// Returns rsq and lambda, where rsq is the squared distance, and \n
+  /// lambda is the position along the line segment.
+  void FindNearestPointOnLine(const double x[3], const double p0[3], const double p1[3], double& rsq, double& lambda) ;
+
   /// print vector
   void PrintVector(std::ostream& os, const double *a) const ;    
 
@@ -173,6 +195,9 @@ public:
 
   /// Copy matrix
   void CopyMatrix(const double *A, double *B) ;
+
+  /// Copy matrix A[9] to homo matrix B[16]
+  void CopyMatrixToHomoMatrix(const double *A, double *B) ;
 
   /// Copy matrix
   void CopyMatrix3x3(const double A[3][3], double B[3][3]) ;
@@ -203,6 +228,28 @@ public:
 
   /// Set matrix to identity 
   void SetMatrixToIdentity4x4(double A[4][4]) const ;
+
+  /// Set matrix to rotation about x
+  void SetMatrixToRotateAboutX(double *A, double theta) const ;
+
+  /// Set matrix to rotation about y
+  void SetMatrixToRotateAboutY(double *A, double theta) const ;
+
+  /// Set matrix to rotation about z
+  void SetMatrixToRotateAboutZ(double *A, double theta) const ;
+
+  /// Set matrix to rotation about arbitrary axis
+  /// Rodrigues formula is Q = I + sW + (1-c)W^2
+  void SetMatrixToRotateAboutAxis(double *Q, const double *w, double theta) const ;
+
+  /// Set matrix to translate by t (homo only)
+  void SetMatrixToTranslate(double *A, const double *t) const ;
+
+  /// Set matrix to transform corresponding to vector product by u
+  /// A =  0  -uz  uy
+  ///      uz  0  -ux
+  ///     -uy  ux  0
+  void SetMatrixToVectorProductTransform(double *A, const double *u) const ;
 
   /// Set matrix row to vector (columns 0-2 only)
   void SetMatrixRowToVector(double *A, int rowId, const double *u) const ;
@@ -384,7 +431,7 @@ protected:
   vtkMEDMatrixVectorMath() ;  ///< constructor
   ~vtkMEDMatrixVectorMath() ; ///< deconstructor
 
-  bool Homogeneous ;  ///< flag which switches homogeneous mode on or off
+  bool m_homogeneous ;  ///< flag which switches homogeneous mode on or off
 
 } ;
 
