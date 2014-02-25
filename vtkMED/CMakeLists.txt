@@ -46,6 +46,8 @@ SET(vtkMED_SRCS
   vtkMEDHalfTubeRemoval.h
   vtkMEDSubdividePolylines.cxx
   vtkMEDSubdividePolylines.h
+  vtkMEDLandmarkCloudPolydataFilter.cxx
+  vtkMEDLandmarkCloudPolydataFilter.h
   vtkBox.cxx
   vtkBox.h
   vtkMaskPolyDataFilter.cxx
