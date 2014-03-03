@@ -21,9 +21,6 @@ University of Bedfordshire, UK
 #include <vector>
 #include <iostream>
 
-// #define Pi 3.14159265
-
-
 
 /**
 *---------------------------------------
