@@ -1560,7 +1560,7 @@ void medVMEStent::CalcIdPositionFromArcLength(vtkPolyData *pd, double arclen, in
 
   // find first point where arc length >= arclen
   int idfound = -1 ;
-  for (int i = 1 ;  i < n && idfound != -1 ;  i++){
+  for (int i = 1 ;  i < n && idfound == -1 ;  i++){
     if (arcLengths[i] >= arclen)
       idfound = i ;
   }

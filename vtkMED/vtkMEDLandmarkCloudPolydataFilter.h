@@ -29,7 +29,7 @@ University of Bedfordshire
 /// The landmarks are associated with points on the polydata. \n
 /// Useful for marking polydata points.
 //
-// Version: Nigel McFarlane 16.1.14
+// Version: Nigel McFarlane 6.3.14
 //------------------------------------------------------------------------------
 class VTK_vtkMED_EXPORT vtkMEDLandmarkCloudPolydataFilter : public vtkPolyDataToPolyDataFilter 
 {
