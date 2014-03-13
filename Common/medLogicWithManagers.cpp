@@ -35,6 +35,10 @@
 #include "mafGUIDialogRemoteFile.h"
 #include "mafGUISettingsStorage.h"
 
+#include "mafViewCompound.h"
+#include "mafRWIBase.h"
+#include <wx/dir.h>
+
 #ifdef MAF_USE_VTK
   #include "mafInteractionManager.h"
 #endif
@@ -92,6 +96,118 @@ void medLogicWithManagers::OnEvent(mafEventBase *maf_event)
 				mafLogMessage(wxString::Format("%s",m_Revision.GetCStr()));
 			}
 		 break;
+		 case MENU_FILE_SNAPSHOT:
+			  {
+				  mafString msfFilename = m_VMEManager->GetFileName();
+				  if (msfFilename.IsEmpty())
+				  {
+					  mafString dirName = mafGetApplicationDirectory().c_str();
+					  dirName << "\\data\\msf\\";
+
+					  m_VMEManager->SetDirName(dirName);
+					  this->OnFileSaveAs();
+					  this->OnEvent((mafEventBase*)&mafEvent(this,CAMERA_UPDATE));
+					  msfFilename = m_VMEManager->GetFileName();
+				  }
+
+				  wxString path, name, ext;
+				  wxSplitPath(msfFilename.GetCStr(),&path,&name,&ext);
+				  wxString imagesDirectoryName = path;
+				  imagesDirectoryName += "/images";
+				  if (!::wxDirExists(imagesDirectoryName))
+				  {
+					  ::wxMkdir(imagesDirectoryName);
+				  }
+
+				  wxDir imagesDirectory(imagesDirectoryName);
+				  wxString filename;
+				  int i = 0;
+				  bool cont = imagesDirectory.GetFirst(&filename);
+				  while ( cont )
+				  {
+					  i++;
+					  cont = imagesDirectory.GetNext(&filename);
+				  }
+
+				  if (e->GetString() && !(e->GetString()->IsEmpty()))
+				  {
+					  mafString *imageFileName = new mafString();
+					  imageFileName->Append(imagesDirectoryName.c_str());
+					  imageFileName->Append("/");
+					  imageFileName->Append(e->GetString()->GetCStr());
+					  imageFileName->Append(wxString::Format("_%d",i));
+					  imageFileName->Append(".png");
+
+					  /*mafRWIBase::SafeDownCast(e->GetVtkObj())->SaveImage(imageFileName);*/
+					  e->SetString(imageFileName);
+
+					  wxString path,name,ext;
+					  wxSplitPath(imageFileName->GetCStr(),&path,&name,&ext);
+					  wxString oldWD = wxGetWorkingDirectory();
+					  wxSetWorkingDirectory(path);
+					  wxString command = "START  ";
+					  command = command + name+"."+ext;
+					  wxExecute( command );
+					  wxSetWorkingDirectory(oldWD);
+
+
+				  }
+				  else
+				  {
+					  wxString imageFileName = "";
+					  mafViewCompound *v = mafViewCompound::SafeDownCast(m_ViewManager->GetSelectedView());
+					  if (v)
+					  {
+						  imageFileName = imagesDirectoryName;
+						  imageFileName << "/";
+						  wxString tmpImageFile;
+						  tmpImageFile << v->GetLabel();
+						  tmpImageFile << i;
+						  tmpImageFile << ".png";
+
+						  tmpImageFile.Replace(" ","_");
+
+						  imageFileName << tmpImageFile;
+
+						  v->GetRWI()->SaveAllImages(imageFileName,v, m_ApplicationSettings->GetImageTypeId());
+
+						  wxMessageBox(_("Snapshot saved!"));
+					  }
+					  else
+					  {
+						  mafView *v = m_ViewManager->GetSelectedView();
+
+						  imageFileName = imagesDirectoryName;
+						  imageFileName << "/";
+						  wxString tmpImageFile;
+						  tmpImageFile << v->GetLabel();
+						  tmpImageFile << i;
+						  tmpImageFile << ".png";
+
+						  tmpImageFile.Replace(" ","_");
+
+						  imageFileName << tmpImageFile;
+
+						  if (v)
+						  {
+							  v->GetRWI()->SaveImage(imageFileName);
+							  wxMessageBox(_("Snapshot saved!"));
+						  }
+					  }
+
+					  wxString path,name,ext;
+					  wxSplitPath(imageFileName,&path,&name,&ext);
+					  wxString oldWD = wxGetWorkingDirectory();
+					  wxSetWorkingDirectory(path);
+					  wxString command = "START  ";
+					  command = command + name+"."+ext;
+					  wxShell( command );
+					  wxSetWorkingDirectory(oldWD);
+				  }
+
+				  OnEvent(&mafEvent(this,WIZARD_RUN_CONTINUE,true));
+			  }
+		break;
      case MENU_WIZARD:
       //The event from the application menu
       if(m_WizardManager) 
@@ -117,7 +233,13 @@ void medLogicWithManagers::OnEvent(mafEventBase *maf_event)
         WizardRunTerminated();
         UpdateFrameTitle();
       }
-    break; 
+    break;
+	 case WIZARD_RUN_CONTINUE:
+	 {
+		 if (m_WizardManager && m_WizardRunning)
+			 m_WizardManager->WizardContinue(e->GetBool());
+	 }
+	 break;
     case WIZARD_UPDATE_WINDOW_TITLE:
        {
          UpdateFrameTitle();

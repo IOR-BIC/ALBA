@@ -362,6 +362,10 @@ void medWizardManager::OnRunOp(mafEvent *e)
   {
     mafEventMacro(mafEvent(this,WIZARD_RELOAD_MSF));
   }
+  else if (opString=="SNAPSHOT")
+  {
+    mafEventMacro(mafEvent(this,MENU_FILE_SNAPSHOT));
+  }
   else
   {
     //Run the standard operations
