@@ -292,7 +292,7 @@ double vtkMEDLandmarkCloudPolydataFilter::GetRadius() const
 void vtkMEDLandmarkCloudPolydataFilter::SetColor(double col[3])
 {
   for (int i = 0  ;  i < GetNumberOfLandmarks() ;  i++)
-    SetColor(col) ;
+    SetColor(i,col) ;
 }
 
 
@@ -304,7 +304,7 @@ void vtkMEDLandmarkCloudPolydataFilter::SetColor(double r, double g, double b)
 {
 
   for (int i = 0  ;  i < GetNumberOfLandmarks() ;  i++)
-    SetColor(r,g,b) ;
+    SetColor(i,r,g,b) ;
 }
 
 
