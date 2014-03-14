@@ -44,6 +44,8 @@ SET(vtkMED_SRCS
   vtkMEDRegionGrowingLocalGlobalThreshold.h
   vtkMEDHalfTubeRemoval.cxx
   vtkMEDHalfTubeRemoval.h
+  vtkMEDInteractorStyleEnableRotation.cxx
+  vtkMEDInteractorStyleEnableRotation.h
   vtkMEDSubdividePolylines.cxx
   vtkMEDSubdividePolylines.h
   vtkMEDLandmarkCloudPolydataFilter.cxx

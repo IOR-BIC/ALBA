@@ -222,7 +222,7 @@ void vtkMEDAddScalarsFilter::SetName(char* name)
 //------------------------------------------------------------------------------
 void vtkMEDAddScalarsFilter::Execute()
 {
-  vtkDebugMacro(<< "Executing nmcfAreaWeightedNormals Filter") ;
+  vtkDebugMacro(<< "Executing vtkMEDAddScalarsFilter") ;
 
   // pointers to input and output
   m_Input = this->GetInput() ;

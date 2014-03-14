@@ -111,7 +111,6 @@ protected:
   };
 
   std::vector<Color> m_UserColors ; // remembers user-defined colors of individual points or cells
-
 };
 
 #endif
