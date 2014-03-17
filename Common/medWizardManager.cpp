@@ -364,7 +364,7 @@ void medWizardManager::OnRunOp(mafEvent *e)
   }
   else if (opString=="SNAPSHOT")
   {
-    mafEventMacro(mafEvent(this,MENU_FILE_SNAPSHOT));
+    mafEventMacro(mafEvent(this,MENU_FILE_SNAPSHOT,true));
   }
   else
   {
