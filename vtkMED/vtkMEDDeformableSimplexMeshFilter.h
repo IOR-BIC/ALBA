@@ -123,11 +123,15 @@ namespace itk
 
     /// Check if point is inside the vessel: 1 inside, outside \n
     /// This version uses the surrounding cells of the nearest point.
-    int IsPointInsideVessel1(double *stentPoint, double *surfacePoint) ;
+    int IsPointInsideVessel1(const double *stentPoint, double *surfacePoint) const ;
 
     /// Check if point is inside the vessel: 1 inside, outside. \n
     /// This version uses the polydata normals.
-    int IsPointInsideVessel2(double *stentPoint, double *surfacePoint) ;
+    int IsPointInsideVessel2(const double *stentPoint, double *surfacePoint) const ;
+
+    /// Check if point is inside the vessel: 1 inside, outside. \n
+    /// This version uses the polydata normals.
+    int IsPointInsideVessel2(const double *stentPoint, int surfacePtId) const ;
 
     double computeDirectionFromPoint2Face(double *stentPoint,vtkIdType p1,vtkIdType p2,vtkIdType p3);
     void SetCenterLocationIdx(std::vector<int>::const_iterator centerLocationIndex);
@@ -361,7 +365,7 @@ namespace itk
   //---------------------------------------------------------------------------
   template< typename TInputMesh, typename TOutputMesh >
   int vtkMEDDeformableSimplexMeshFilter< TInputMesh, TOutputMesh >
-    ::IsPointInsideVessel1(double *stentPoint, double *surfacePoint) 
+    ::IsPointInsideVessel1(const double *stentPoint, double *surfacePoint) const
   {
     int ptId = m_SurfacePoly->FindPoint(surfacePoint) ;
     vtkIdList *cellNeighbours = vtkIdList::New() ;
@@ -387,10 +391,33 @@ namespace itk
   //---------------------------------------------------------------------------
   template< typename TInputMesh, typename TOutputMesh >
   int vtkMEDDeformableSimplexMeshFilter< TInputMesh, TOutputMesh >
-    ::IsPointInsideVessel2(double *stentPoint, double *surfacePoint) 
+    ::IsPointInsideVessel2(const double *stentPoint, double *surfacePoint) const
   {
     int ptId = m_SurfacePoly->FindPoint(surfacePoint) ;
     double *norm = m_SurfacePoly->GetPointData()->GetNormals()->GetTuple3(ptId) ;
+    double dprod = 0.0 ;
+    for (int j = 0 ;  j < 3 ;  j++)
+      dprod += (surfacePoint[j] - stentPoint[j]) * norm[j] ;
+
+    if (dprod < -m_MinDistanceToVessel)
+      return 1 ;
+    else
+      return 0 ;
+  }
+
+
+
+
+  //---------------------------------------------------------------------------
+  // Is point inside the vessel.  1 inside, 0 outside 
+  //---------------------------------------------------------------------------
+  template< typename TInputMesh, typename TOutputMesh >
+  int vtkMEDDeformableSimplexMeshFilter< TInputMesh, TOutputMesh >
+    ::IsPointInsideVessel2(const double *stentPoint, int surfacePtId) const
+  {
+    double surfacePoint[3] ;
+    m_SurfacePoly->GetPoint(surfacePtId, surfacePoint) ;
+    double *norm = m_SurfacePoly->GetPointData()->GetNormals()->GetTuple3(surfacePtId) ;
     double dprod = 0.0 ;
     for (int j = 0 ;  j < 3 ;  j++)
       dprod += (surfacePoint[j] - stentPoint[j]) * norm[j] ;

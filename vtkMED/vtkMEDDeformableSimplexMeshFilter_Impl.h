@@ -311,12 +311,15 @@ namespace itk
     SimplexMeshGeometry *data;
     VectorType displacement;
 
-    double pt[3]; //point on surface
-    double pos[3];
     VectorType StrutLengthForce;
     VectorType LinkLengthForce;
     kdres *nearestPointSet;
     m_IsDataChanged = 0;
+
+    double surfacePt[5000][3]; //point on surface
+    static int surfacePtId[5000] ; // static cache of surface points
+
+    static double pos[3];
 
 
     //-------------timer--------
@@ -325,8 +328,8 @@ namespace itk
 
 
     //--------------------------------------------------------------------------
-    // Determine for each vertex whether it is constrained by the catheter.
-    // Constrained vertices are those inside the catether and their neighbors.
+    // Determine for each vertex whether it is currently constrained by the catheter.
+    // Constrained vertices are those inside the catheter and their neighbors.
     //--------------------------------------------------------------------------
     int constrained[5000] ;
     int i ;
@@ -361,19 +364,23 @@ namespace itk
       pos[0] = data->pos[0];
       pos[1] = data->pos[1];
       pos[2] = data->pos[2];
-      nearestPointSet = kd_nearest3(m_KDTree, pos[0], pos[1], pos[2]); //pos from simplex mesh
-      kd_res_item( nearestPointSet, pt ); // nearest pt from surface
+
+      if (m_CurrentStepNum % 5 == 0){
+        nearestPointSet = kd_nearest3(m_KDTree, pos[0], pos[1], pos[2]); //pos from simplex mesh
+        kd_res_item( nearestPointSet, surfacePt[i] ); // nearest pt from surface
+        surfacePtId[i] = m_SurfacePoly->FindPoint(surfacePt[i]) ; // cache the id of the point
+      }
 
       // set the distance-dependent weight
-      double dist = sqrt((pt[0]-data->pos[0])*(pt[0]-data->pos[0])
-        + (pt[1]-data->pos[1])*(pt[1]-data->pos[1])
-        + (pt[2]-data->pos[2])*(pt[2]-data->pos[2]));
+      double dist = sqrt((surfacePt[i][0]-data->pos[0])*(surfacePt[i][0]-data->pos[0])
+        + (surfacePt[i][1]-data->pos[1])*(surfacePt[i][1]-data->pos[1])
+        + (surfacePt[i][2]-data->pos[2])*(surfacePt[i][2]-data->pos[2]));
       if (dist >= m_Epsilon)
         m_DistanceCoefficient = 1.0 ;
       else
         m_DistanceCoefficient = dist/m_Epsilon ;
 
-      int inFlag = IsPointInsideVessel2(pos,pt);//a point from simplex vertex and a point from surface.
+      int inFlag = IsPointInsideVessel2(pos, surfacePtId[i]); //a point from simplex vertex and a point from surface.
 
       //compute internal,external and length force
       this->ComputeInternalForce(data);
