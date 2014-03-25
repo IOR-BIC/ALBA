@@ -67,8 +67,6 @@ protected:
   //** VME Accept function */
   static int VMEAccept(mafNode *node);
 
-private:
-
   wxString m_AcceptedVME;
   wxString m_Title;
   wxString m_Description;

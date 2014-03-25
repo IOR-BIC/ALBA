@@ -96,6 +96,11 @@ void medLogicWithManagers::OnEvent(mafEventBase *maf_event)
 				mafLogMessage(wxString::Format("%s",m_Revision.GetCStr()));
 			}
 		 break;
+		 case ID_GET_FILENAME:
+			  {
+				  e->SetString(&(m_VMEManager->GetFileName()));
+			  }
+			  break;
 		 case MENU_FILE_SNAPSHOT:
 			  {
 				  mafString msfFilename = m_VMEManager->GetFileName();
