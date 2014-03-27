@@ -639,7 +639,7 @@ void mafInteractor2DAngle::UndoMeasure()
     m_FlagMeasureType.pop_back();
 
     
-    if (m_FlagMeasureType[m_FlagMeasureType.size()-1] == ID_RESULT_ANGLE)
+    if (m_FlagMeasureType.size()>0 && m_FlagMeasureType[m_FlagMeasureType.size()-1] == ID_RESULT_ANGLE)
     {
       m_Angle = m_Measure[m_Measure.size()-1];
     }
