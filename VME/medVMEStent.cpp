@@ -622,8 +622,12 @@ void medVMEStent::UpdateStentPolydataFromSimplex()
 {
   if (m_SimplexMeshModified){
 
-    double aVetex[3],bVetex[3];
+    //double aVetex[3],bVetex[3];
 
+
+    //----------------------------------------
+    // copy the simplex vertices to vtkPoints
+    //----------------------------------------
     vtkPoints* vpoints = vtkPoints::New();
     vpoints->SetNumberOfPoints(40000);		
 
@@ -642,6 +646,7 @@ void medVMEStent::UpdateStentPolydataFromSimplex()
     vpoints->Delete() ;
 
 
+
     int tindices[2];
     vtkCellArray *lines = vtkCellArray::New() ;
     lines->Allocate(40000) ;  
@@ -649,7 +654,7 @@ void medVMEStent::UpdateStentPolydataFromSimplex()
     for(StrutIterator iter = m_StentSource->GetStrutsList().begin(); iter !=m_StentSource->GetStrutsList().end(); iter++){//iter++){
       if(m_StentSource->getInphaseShort()==1){
         // Abbott stent
-        int tindices2[4],tindices3[2] ;
+        int tindices2[4], tindices3[2] ;
         bool isLinkPoint = false;
         double endPoints[4][3], midPoints[4][3], strutLinkPoints[2][3];
 
@@ -791,69 +796,10 @@ void medVMEStent::UpdateStentPolydataFromSimplex()
 
 
 
+
 //------------------------------------------------------------------------------
-// Calculate extra mid-points on struts of Abbott stent polydata.
-// Input is a pair of adjacent struts - output is four midpoints.
-//strutLinkPts is the output, used to simulate structure like "\_|_/" for link node
-//calculate for each pair of strut
+// Calculate mid-points of pair of struts
 //------------------------------------------------------------------------------
-/*
-void medVMEStent::CalculateMidPointsFromPairOfStruts(const double strutEndPts[4][3], double midPts[4][3]) const
-{
-const double LengthFactor = 0.025 ;
-const double LengthLinkFactor = 0.025;
-
-vtkMEDMatrixVectorMath *math = vtkMEDMatrixVectorMath::New() ;
-math->SetHomogeneous(false) ;
-
-// calc exact midpoints m[2] of struts
-double m[2][3] ;//compute two mid points
-for (int i = 0 ;  i < 2 ;  i++)
-math->MeanVector(strutEndPts[2*i], strutEndPts[2*i+1], m[i]) ;
-
-// calc directions v[2] and magnitudes r[2] of struts
-double v[2][3], r[2], rsq[2] ; 
-for (int i = 0 ;  i < 2 ;  i++){
-math->SubtractVectors(strutEndPts[2*i+1], strutEndPts[2*i], v[i]) ;
-r[i] = math->MagnitudeOfVector(v[i]) ;
-rsq[i] = r[i]*r[i] ;
-}
-
-// calc vector directions dm[2] from each midpoint to opposite midpoint
-double dm[2][3] ;
-math->SubtractVectors(m[1], m[0], dm[0]) ;
-math->SubtractVectors(m[0], m[1], dm[1]) ;
-
-// calc dot products of m and v
-double dprod[2] ;
-for (int i = 0 ;  i < 2 ;  i++)
-dprod[i] = math->DotProduct(dm[i], v[i]) ;
-
-// Calc small displacement vectors a[2][3] from midpoints.
-// Each displacement vector must be normal to strut and coplanar with strut and opposite midpoint.
-// Thus a = dprod*v - rsq*dm
-double a[2][3] ; // displacement vectors
-for (int i = 0 ;  i < 2 ;  i++){
-math->MultiplyVectorByScalar(dprod[i], v[i], a[i]) ;
-math->SubtractMultipleOfVector(a[i], rsq[i], dm[i], a[i]) ;
-math->NormalizeVector(a[i]) ;
-}
-
-// Add displacements to midpoints to calc output midpoints
-for (int i = 0 ;  i < 2 ;  i++){
-math->SubtractMultipleOfVector(m[i], LengthFactor*r[i], a[i], midPts[2*i]) ;
-math->AddMultipleOfVector(m[i], LengthFactor*r[i], a[i], midPts[2*i+1]) ;
-}
-if(isLinkPoint){
-//get a pair of strut link points for a strut
-if(strutEndPts[1][0]==strutEndPts[3][0]){//strutEndPts[1] and strutEndPts[3] should be the same points
-math->SubtractMultipleOfVector(strutEndPts[1],LengthLinkFactor*r[0],a[0],strutLinkPts[0]);
-math->AddMultipleOfVector(strutEndPts[1], LengthLinkFactor*r[0], a[0], strutLinkPts[1]) ;
-}
-}
-math->Delete() ;
-}*/
-
 void medVMEStent::CalculateMidPointsFromPairOfStruts(const double strutEndPts[4][3], double midPts[4][3], bool isLinkPoint, double strutLinkPts[2][3]) const
 {
   const double LengthFactor = 0.2 ;
@@ -863,34 +809,32 @@ void medVMEStent::CalculateMidPointsFromPairOfStruts(const double strutEndPts[4]
   math->SetHomogeneous(false) ;
 
   // calc exact midpoints m[2] of struts
-  double m[2][3] ;//compute two mid points
+  double m[2][3] ; //compute two mid points
   math->MeanVector(strutEndPts[0], strutEndPts[1], m[0]) ;
   math->MeanVector(strutEndPts[2], strutEndPts[3], m[1]) ;
 
-  double dv[2][3];  //    0                  \     / 2
+  double dv[2][3];  
+  //                     0 \     / 2
   // midpts[0],[1]    m[0]  \   / m[1]  midpts[2][3]  
   //                       1 \|/ 3
-  math->SubtractVectors(m[1], m[0], dv[0]) ;// ->
-  math->SubtractVectors(m[0], m[1], dv[1]) ;// <-
+  math->SubtractVectors(m[1], m[0], dv[0]) ;
+  math->SubtractVectors(m[0], m[1], dv[1]) ;
 
-  math->NormalizeVector(dv[0]); //->
-  math->NormalizeVector(dv[1]); //<-
-  //m[0]+LengthFactor*dv[0] = midPts[0]
+  math->NormalizeVector(dv[0]); 
+  math->NormalizeVector(dv[1]); 
+  
   math->CopyVector(m[0],midPts[0]);
   math->CopyVector(m[1],midPts[2]);
-  //math->AddMultipleOfVector(m[0],LengthFactor,dv[0],midPts[0]);
-  math->AddMultipleOfVector(m[0],LengthFactor,dv[1],midPts[1]);
-  //math->AddMultipleOfVector(m[1],LengthFactor,dv[0],midPts[2]);
+  
+  math->AddMultipleOfVector(m[0],LengthFactor,dv[1],midPts[1]); 
   math->AddMultipleOfVector(m[1],LengthFactor,dv[0],midPts[3]);
-
-
 
   if(isLinkPoint){
     math->AddMultipleOfVector(strutEndPts[1],LengthLinkFactor,dv[0],strutLinkPts[0]);
     math->AddMultipleOfVector(strutEndPts[1],LengthLinkFactor,dv[1],strutLinkPts[1]);
-
   }
 }
+
 
 
 //------------------------------------------------------------------------------

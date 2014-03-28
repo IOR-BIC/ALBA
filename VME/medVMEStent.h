@@ -282,8 +282,10 @@ private:
   void UpdateStentPolydataFromSimplex_ViewAsSimplex() ;
 
   /// Calculate extra mid-points on struts of Abbott stent polydata. \n
-  /// Input is a pair of adjacent struts - output is four midpoints.
-  void CalculateMidPointsFromPairOfStruts(const double strutEndPts[4][3], double midPts[4][3],bool isLinkPoint,double strutLinkPts[2][3]) const ;
+  /// Input is a pair of adjacent struts: strutEndPts[0,1] and strutEndPts[2,3]. \n
+  /// Output is four corresponding midPts, two per strut. \n
+  /// Additional output is two strutLinkPts, which form the squared end of some of the Abbott struts.
+  void CalculateMidPointsFromPairOfStruts(const double strutEndPts[4][3], double midPts[4][3], bool isLinkPoint, double strutLinkPts[2][3]) const ;
 
   /// Create long vessel centerline
   void CreateLongVesselCenterLine() ;
