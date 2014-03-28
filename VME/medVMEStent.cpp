@@ -590,28 +590,22 @@ void medVMEStent::InternalUpdate()
 }
 
 
-
+/*
 //------------------------------------------------------------------------------
-// Give ABBoTT and BARD stent fixed parameter
+// Update stent polydata from simplex
 //------------------------------------------------------------------------------
-/*void medVMEStent::SetFixedParameterForSpecialStent(){
-if(m_Id_Stent_Type==1){//ABBOTT
-m_Stent->SetStentDiameter(8);
-
-m_Stent->SetStentCrownLength(3.8);
-m_Stent->SetStentConfiguration(0);//0 in phase, 1 out of phase
-m_Stent->SetLinkConnection(0);//0.peak2valley;enumLinkConType {peak2valley, valley2peak, peak2peak, valley2valley} 
-m_Stent->SetLinkLength(2.2); //6 longer than 3.8 or 2.2 shorter than 3.8
-
-m_Stent->SetLinkAlignment(0);//0,1,2
-m_Stent->SetLinkOrientation(0);//0,1,-1
-
-m_Stent->SetStrutsNumber(6);
-m_Stent->SetLinkNumber(3);
-}else if(m_Id_Stent_Type==2){//BARD
-
+void medVMEStent::UpdateStentPolydataFromSimplex()
+{
+if (m_SimplexMeshModified){
+if(m_StentSource->getInphaseShort()==1)
+UpdateStentPolydataFromSimplex_Abbott() ;
+else
+UpdateStentPolydataFromSimplex_Simple() ;
 }
-}*/
+
+// NB Don't set m_SimplexMeshModified = false here - wait until simplex version is called.
+}
+*/
 
 
 
@@ -621,10 +615,6 @@ m_Stent->SetLinkNumber(3);
 void medVMEStent::UpdateStentPolydataFromSimplex()
 {
   if (m_SimplexMeshModified){
-
-    //double aVetex[3],bVetex[3];
-
-
     //----------------------------------------
     // copy the simplex vertices to vtkPoints
     //----------------------------------------
@@ -655,15 +645,14 @@ void medVMEStent::UpdateStentPolydataFromSimplex()
       if(m_StentSource->getInphaseShort()==1){
         // Abbott stent
         int tindices2[4], tindices3[2] ;
-        bool isLinkPoint = false;
         double endPoints[4][3], midPoints[4][3], strutLinkPoints[2][3];
 
         tindices2[0]=iter->startVertex;
         tindices2[1]=iter->endVertex;
         vpoints->GetPoint(tindices2[0], endPoints[0]) ;
         vpoints->GetPoint(tindices2[1], endPoints[1]) ;
-
         iter++;
+
         tindices2[2] = iter->startVertex;
         tindices2[3] = iter->endVertex;
         vpoints->GetPoint(tindices2[2], endPoints[2]) ;
@@ -673,6 +662,7 @@ void medVMEStent::UpdateStentPolydataFromSimplex()
         //if(tindices2[1] is link points then calculate strutLink points)
 
         // Do the cells for the links
+        bool isLinkPoint = false;
         for(StrutIterator iter2 = m_StentSource->GetLinksList().begin(); iter2 !=m_StentSource->GetLinksList().end(); iter2++){
           tindices3[0] = iter2->startVertex;
           tindices3[1] = iter2->endVertex;
@@ -796,6 +786,199 @@ void medVMEStent::UpdateStentPolydataFromSimplex()
 
 
 
+//------------------------------------------------------------------------------
+// Update stent polydata from simplex
+//------------------------------------------------------------------------------
+void medVMEStent::UpdateStentPolydataFromSimplex_Simple()
+{
+  if (m_SimplexMeshModified){
+    //----------------------------------------
+    // copy the simplex vertices to vtkPoints
+    //----------------------------------------
+    vtkPoints* vpoints = vtkPoints::New();
+    vpoints->SetNumberOfPoints(40000);		
+
+    SimplexMeshType::PointsContainer::Pointer sPoints;
+    sPoints = m_SimplexMesh->GetPoints();
+    int pointCount =0;
+    for(SimplexMeshType::PointsContainer::Iterator pointIndex = sPoints->Begin(); pointIndex != sPoints->End(); ++pointIndex){
+      int idx = pointIndex->Index();
+      vtkFloatingPointType * pp = pointIndex->Value().GetDataPointer();
+      vpoints->SetPoint(idx,pp);
+      pointCount++;
+    }
+    vpoints->Squeeze() ;
+    m_StentPolyData->SetPoints(vpoints) ;
+    vpoints->Delete() ;
+
+
+    int tindices[2];
+    vtkCellArray *lines = vtkCellArray::New() ;
+    lines->Allocate(40000) ;  
+
+    // strut cells (in pairs)
+    for(StrutIterator iter = m_StentSource->GetStrutsList().begin(); iter !=m_StentSource->GetStrutsList().end(); iter++){
+      // Simple stent with straight struts
+      tindices[0] = iter->startVertex;
+      tindices[1] = iter->endVertex;
+      lines->InsertNextCell(2, tindices);
+
+      iter++;
+      tindices[0] = iter->startVertex;
+      tindices[1] = iter->endVertex;
+      lines->InsertNextCell(2,tindices);
+    }
+
+    // link cells
+    for(StrutIterator iter = m_StentSource->GetLinksList().begin(); iter !=m_StentSource->GetLinksList().end(); iter++){
+      tindices[0] = iter->startVertex;
+      tindices[1] = iter->endVertex;
+      lines->InsertNextCell(2, tindices);
+    }
+
+    lines->Squeeze() ;
+    m_StentPolyData->SetLines(lines);
+    lines->Delete() ;
+
+    m_StentPolyData->Modified();
+  }
+}
+
+
+
+
+//------------------------------------------------------------------------------
+// Update stent polydata from simplex
+//------------------------------------------------------------------------------
+void medVMEStent::UpdateStentPolydataFromSimplex_Abbott()
+{
+  if (m_SimplexMeshModified){
+    //----------------------------------------
+    // copy the simplex vertices to vtkPoints
+    //----------------------------------------
+    vtkPoints* vpoints = vtkPoints::New();
+    vpoints->SetNumberOfPoints(40000);		
+
+    SimplexMeshType::PointsContainer::Pointer sPoints;
+    sPoints = m_SimplexMesh->GetPoints();
+    int pointCount =0;
+    for(SimplexMeshType::PointsContainer::Iterator pointIndex = sPoints->Begin(); pointIndex != sPoints->End(); ++pointIndex){
+      int idx = pointIndex->Index();
+      vtkFloatingPointType * pp = pointIndex->Value().GetDataPointer();
+      vpoints->SetPoint(idx,pp);
+      pointCount++;
+    }
+
+    vpoints->Squeeze() ;
+    m_StentPolyData->SetPoints(vpoints) ;
+    vpoints->Delete() ;
+
+
+    //----------------------------------------
+    // Strut cells
+    //----------------------------------------
+    vtkCellArray *lines = vtkCellArray::New() ;
+    lines->Allocate(40000) ;  
+
+    for(StrutIterator iter = m_StentSource->GetStrutsList().begin(); iter !=m_StentSource->GetStrutsList().end(); iter++){
+      // Get points corresponding to pair of struts
+      int tindices_struts[4], tindices_link[2] ;
+      double endPoints[4][3], midPoints[4][3], strutLinkPoints[2][3];
+
+      tindices_struts[0]=iter->startVertex;
+      tindices_struts[1]=iter->endVertex;
+      vpoints->GetPoint(tindices_struts[0], endPoints[0]) ;
+      vpoints->GetPoint(tindices_struts[1], endPoints[1]) ;
+      iter++;
+
+      tindices_struts[2] = iter->startVertex;
+      tindices_struts[3] = iter->endVertex;
+      vpoints->GetPoint(tindices_struts[2], endPoints[2]) ;
+      vpoints->GetPoint(tindices_struts[3], endPoints[3]) ;
+
+      // Does this strut pair have a link ?
+      // Points tindices_struts[1] and tindices_struts[3] should be the  same points
+      // If tindices2[1] is link points then calculate strutLink points
+      bool isLinkPoint = false;
+      for(StrutIterator iter2 = m_StentSource->GetLinksList().begin(); iter2 !=m_StentSource->GetLinksList().end(); iter2++){
+        tindices_link[0] = iter2->startVertex;
+        tindices_link[1] = iter2->endVertex;
+        if (tindices_link[1] == tindices_struts[1]){ // end data of link should be the same as end of strut
+          isLinkPoint = true;
+          break;
+        }
+      }
+
+      CalculateMidPointsFromPairOfStruts(endPoints, midPoints, isLinkPoint, strutLinkPoints) ;
+
+      // add the 4 new midpoints
+      int newPtIds[6] ;
+      newPtIds[0] = vpoints->InsertNextPoint(midPoints[0]);
+      newPtIds[1] = vpoints->InsertNextPoint(midPoints[1]);
+      newPtIds[2] = vpoints->InsertNextPoint(midPoints[2]);
+      newPtIds[3] = vpoints->InsertNextPoint(midPoints[3]);
+      pointCount += 4 ;
+      if (isLinkPoint){
+        // add squared ends if link point
+        newPtIds[4] = vpoints->InsertNextPoint(strutLinkPoints[0]);
+        newPtIds[5] = vpoints->InsertNextPoint(strutLinkPoints[1]);
+        pointCount += 2 ;
+      }
+
+      // Construct and insert pair of strut cells
+      if (isLinkPoint){
+        int t[5] ;
+        t[0] = tindices_struts[0] ;
+        t[1] = newPtIds[4] ;
+        t[2] = newPtIds[0] ;
+        t[3] = newPtIds[1] ;
+        t[4] = tindices_struts[1] ;
+        lines->InsertNextCell(5, t);
+
+        t[0] = tindices_struts[2] ;
+        t[1] = newPtIds[5] ;
+        t[2] = newPtIds[2] ;
+        t[3] = newPtIds[3] ;
+        t[4] = tindices_struts[3] ;
+        lines->InsertNextCell(5, t);
+      }
+      else{
+        int t[4] ;
+        t[0] = tindices_struts[0] ;
+        t[1] = newPtIds[0] ;
+        t[2] = newPtIds[1] ;
+        t[3] = tindices_struts[1] ;
+        lines->InsertNextCell(5, t);
+
+        t[0] = tindices_struts[2] ;
+        t[1] = newPtIds[2] ;
+        t[2] = newPtIds[3] ;
+        t[3] = tindices_struts[3] ;
+        lines->InsertNextCell(4, t);
+      }
+    } // for struts
+
+
+    //----------------------------------------
+    // Link cells
+    //----------------------------------------
+    for(StrutIterator iter = m_StentSource->GetLinksList().begin(); iter !=m_StentSource->GetLinksList().end(); iter++){
+      int tindices[2];
+      tindices[0] = iter->startVertex;
+      tindices[1] = iter->endVertex;
+      lines->InsertNextCell(2, tindices);
+    }
+
+    lines->Squeeze() ;
+    m_StentPolyData->SetLines(lines);
+    lines->Delete() ;
+
+    m_StentPolyData->Modified();
+  }
+}
+
+
+
 
 //------------------------------------------------------------------------------
 // Calculate mid-points of pair of struts
@@ -822,10 +1005,10 @@ void medVMEStent::CalculateMidPointsFromPairOfStruts(const double strutEndPts[4]
 
   math->NormalizeVector(dv[0]); 
   math->NormalizeVector(dv[1]); 
-  
+
   math->CopyVector(m[0],midPts[0]);
   math->CopyVector(m[1],midPts[2]);
-  
+
   math->AddMultipleOfVector(m[0],LengthFactor,dv[1],midPts[1]); 
   math->AddMultipleOfVector(m[1],LengthFactor,dv[0],midPts[3]);
 

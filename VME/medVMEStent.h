@@ -276,6 +276,12 @@ private:
   /// Update stent polydata from simplex
   void UpdateStentPolydataFromSimplex() ;
 
+  /// Update stent polydata from simplex - Abbott stent
+  void UpdateStentPolydataFromSimplex_Abbott() ;
+
+  /// Update stent polydata from simplex - simple stent
+  void UpdateStentPolydataFromSimplex_Simple() ;
+
   /// Copy simplex directly to polydata. \n
   /// Replacing UpdateStentPolydataFromSimplex() everywhere with this version \n
   /// will show the simplex instead of the derived stent polydata.
