@@ -273,7 +273,7 @@ private:
   /// update stent after a change in the parameters.
   void InternalUpdate();
 
-  /// Update stent polydata from simplex
+  /// Update stent polydata from simplex.
   void UpdateStentPolydataFromSimplex() ;
 
   /// Update stent polydata from simplex - Abbott stent

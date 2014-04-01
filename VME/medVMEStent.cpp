@@ -592,7 +592,7 @@ void medVMEStent::InternalUpdate()
 
 /*
 //------------------------------------------------------------------------------
-// Update stent polydata from simplex
+// Update stent polydata from simplex 
 //------------------------------------------------------------------------------
 void medVMEStent::UpdateStentPolydataFromSimplex()
 {

@@ -21,6 +21,8 @@ University of Bedfordshire
 #include "vtkMEDPolyDataNavigator.h"
 #include "vtkMEDHalfTubeRemoval.h"
 
+#include "assert.h"
+
 vtkCxxRevisionMacro(vtkMEDHalfTubeRemoval, "$Revision: 1.61 $");
 vtkStandardNewMacro(vtkMEDHalfTubeRemoval);
 
@@ -187,6 +189,11 @@ void vtkMEDHalfTubeRemoval::SetViewingPositionAuto(double pos[3], double focus[3
   m_Input = this->GetInput() ;
   m_Input->Update() ;
 
+  if (m_CenterLine == NULL){
+    std::cout << "vtkMEDHalfTubeRemoval: undefined center line\n" ;
+    assert(false) ;
+  }
+
   double r, b[6], s[3], c[3] ;
   m_Input->GetBounds(b) ;
   s[0] = b[1]-b[0] ;
@@ -204,10 +211,10 @@ void vtkMEDHalfTubeRemoval::SetViewingPositionAuto(double pos[3], double focus[3
   // check that the sense points left to right
   vtkMEDMatrixVectorMath* mvec = vtkMEDMatrixVectorMath::New() ;
   mvec->SetHomogeneous(false) ;
-  int n = m_Input->GetPoints()->GetNumberOfPoints() ;
+  int n = m_CenterLine->GetPoints()->GetNumberOfPoints() ;
   double p0[3], pn[3] ;
-  m_Input->GetPoint(0, p0) ;
-  m_Input->GetPoint(n-1, pn) ;
+  m_CenterLine->GetPoint(0, p0) ;
+  m_CenterLine->GetPoint(n-1, pn) ;
   double p0u = mvec->DotProduct(p0, u) ;
   double pnu = mvec->DotProduct(pn, u) ;
   if (p0u > pnu){
@@ -219,7 +226,7 @@ void vtkMEDHalfTubeRemoval::SetViewingPositionAuto(double pos[3], double focus[3
   for (int j = 0 ;  j < 3 ;  j++){
     focus[j] = c[j] ;
     upVector[j] = v[j] ;
-    pos[j] = focus[j] - 2.0*r*w[j] ;
+    pos[j] = focus[j] + 2.0*r*w[j] ;
   }
 
   this->SetCameraPos(pos) ;
