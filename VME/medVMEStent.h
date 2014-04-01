@@ -63,6 +63,14 @@ typedef itk::vtkMEDDeformableSimplexMeshFilter<SimplexMeshType,SimplexMeshType> 
 class MED_VME_EXPORT medVMEStent : public mafVMEGeneric
 {
 public:
+  /// Risk categories
+  enum{
+    LOW = 0,
+    AVG,
+    HIGH,
+    VHIGH
+  };
+
   mafTypeMacro(medVMEStent, mafVMEGeneric);
 
   medVMEStent(); ///< Constructor
@@ -220,6 +228,12 @@ public:
 
   /// Find nearest point (id, lambda) on center line. \n
   static void FindNearestPointOnCenterLine(double* p0, vtkPolyData *pd, int& id, double& lambda, double& distSq) ;
+
+  /// Set the max risk (LOW, AVG, HIGH, VHIGH)
+  void SetMaxRisk(int risk) {m_MaxRisk = risk ;  this->Modified() ;}
+
+  /// Get the max risk (LOW, AVG, HIGH, VHIGH)
+  int GetMaxRisk(int risk) const {return m_MaxRisk ;}
 
 private:
   enum STENT_WIDGET_ID
@@ -396,6 +410,10 @@ private:
     DEPLOYED_PD_OK          // deployed polydata has been loaded.
   };
   int m_DeployedPolydataStatus ;
+
+  // Max risk: LOW, AVG etc.  
+  // Stored here where risk op can save it and reporter op can access it.
+  int m_MaxRisk ; 
 };
 
 #endif
