@@ -55,7 +55,7 @@ University of Bedfordshire
 // Therefore methods which change the polydata should finish by deleting the invalid links,
 // or carry a warning that the user should do it.
 //
-// Version: Nigel McFarlane 19.2.14
+// Version: Nigel McFarlane 2.4.14
 //------------------------------------------------------------------------------
 class VTK_vtkMED_EXPORT vtkMEDPolyDataNavigator : public vtkObject
 {
@@ -79,8 +79,8 @@ public:
   /// id list methods
   //----------------------------------------------------------------------------
 
-  /// Modulo operator, same as % but works correctly on negative values of n as well
-  int Modulo(int n, int m) const ;
+  /// Modulo operator, same as % but works correctly on negative values of i as well
+  int Modulo(int i, int n) const ;
 
   /// Is id in list
   inline bool InList(int id,  vtkIdList *idlist) const {return (idlist->IsId(id) >= 0) ;}

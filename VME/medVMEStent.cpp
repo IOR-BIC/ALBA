@@ -590,29 +590,29 @@ void medVMEStent::InternalUpdate()
 }
 
 
-/*
+
 //------------------------------------------------------------------------------
 // Update stent polydata from simplex 
 //------------------------------------------------------------------------------
 void medVMEStent::UpdateStentPolydataFromSimplex()
 {
-if (m_SimplexMeshModified){
-if(m_StentSource->getInphaseShort()==1)
-UpdateStentPolydataFromSimplex_Abbott() ;
-else
-UpdateStentPolydataFromSimplex_Simple() ;
+  if (m_SimplexMeshModified){
+    if(m_StentSource->getInphaseShort()==1)
+      UpdateStentPolydataFromSimplex_Abbott() ;
+    else
+      UpdateStentPolydataFromSimplex_Simple() ;
+  }
+
+  // NB Don't set m_SimplexMeshModified = false here - wait until simplex version is called.
 }
 
-// NB Don't set m_SimplexMeshModified = false here - wait until simplex version is called.
-}
-*/
 
 
 
 //------------------------------------------------------------------------------
 // Update stent polydata from simplex
 //------------------------------------------------------------------------------
-void medVMEStent::UpdateStentPolydataFromSimplex()
+void medVMEStent::UpdateStentPolydataFromSimplex_old()
 {
   if (m_SimplexMeshModified){
     //----------------------------------------
@@ -807,9 +807,8 @@ void medVMEStent::UpdateStentPolydataFromSimplex_Simple()
       vpoints->SetPoint(idx,pp);
       pointCount++;
     }
+
     vpoints->Squeeze() ;
-    m_StentPolyData->SetPoints(vpoints) ;
-    vpoints->Delete() ;
 
 
     int tindices[2];
@@ -836,6 +835,13 @@ void medVMEStent::UpdateStentPolydataFromSimplex_Simple()
       lines->InsertNextCell(2, tindices);
     }
 
+
+    //----------------------------------------
+    // Add points and cells to polydata
+    //----------------------------------------
+    m_StentPolyData->SetPoints(vpoints) ;
+    vpoints->Delete() ;
+
     lines->Squeeze() ;
     m_StentPolyData->SetLines(lines);
     lines->Delete() ;
@@ -856,6 +862,8 @@ void medVMEStent::UpdateStentPolydataFromSimplex_Abbott()
     //----------------------------------------
     // copy the simplex vertices to vtkPoints
     //----------------------------------------
+    m_SimplexMesh->Update() ;
+
     vtkPoints* vpoints = vtkPoints::New();
     vpoints->SetNumberOfPoints(40000);		
 
@@ -870,9 +878,6 @@ void medVMEStent::UpdateStentPolydataFromSimplex_Abbott()
     }
 
     vpoints->Squeeze() ;
-    m_StentPolyData->SetPoints(vpoints) ;
-    vpoints->Delete() ;
-
 
     //----------------------------------------
     // Strut cells
@@ -929,30 +934,30 @@ void medVMEStent::UpdateStentPolydataFromSimplex_Abbott()
       if (isLinkPoint){
         int t[5] ;
         t[0] = tindices_struts[0] ;
-        t[1] = newPtIds[4] ;
+        t[1] = newPtIds[1] ;
         t[2] = newPtIds[0] ;
-        t[3] = newPtIds[1] ;
+        t[3] = newPtIds[5] ;
         t[4] = tindices_struts[1] ;
         lines->InsertNextCell(5, t);
 
         t[0] = tindices_struts[2] ;
-        t[1] = newPtIds[5] ;
+        t[1] = newPtIds[3] ;
         t[2] = newPtIds[2] ;
-        t[3] = newPtIds[3] ;
+        t[3] = newPtIds[4] ;
         t[4] = tindices_struts[3] ;
         lines->InsertNextCell(5, t);
       }
       else{
         int t[4] ;
         t[0] = tindices_struts[0] ;
-        t[1] = newPtIds[0] ;
-        t[2] = newPtIds[1] ;
+        t[1] = newPtIds[1] ;
+        t[2] = newPtIds[0] ;
         t[3] = tindices_struts[1] ;
-        lines->InsertNextCell(5, t);
+        lines->InsertNextCell(4, t);
 
         t[0] = tindices_struts[2] ;
-        t[1] = newPtIds[2] ;
-        t[2] = newPtIds[3] ;
+        t[1] = newPtIds[3] ;
+        t[2] = newPtIds[2] ;
         t[3] = tindices_struts[3] ;
         lines->InsertNextCell(4, t);
       }
@@ -968,6 +973,13 @@ void medVMEStent::UpdateStentPolydataFromSimplex_Abbott()
       tindices[1] = iter->endVertex;
       lines->InsertNextCell(2, tindices);
     }
+
+
+    //----------------------------------------
+    // Add points and cells to polydata
+    //----------------------------------------
+    m_StentPolyData->SetPoints(vpoints) ;
+    vpoints->Delete() ;
 
     lines->Squeeze() ;
     m_StentPolyData->SetLines(lines);

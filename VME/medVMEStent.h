@@ -288,6 +288,9 @@ private:
   void InternalUpdate();
 
   /// Update stent polydata from simplex.
+  void UpdateStentPolydataFromSimplex_old() ;
+
+  /// Update stent polydata from simplex.
   void UpdateStentPolydataFromSimplex() ;
 
   /// Update stent polydata from simplex - Abbott stent

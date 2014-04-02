@@ -707,10 +707,29 @@ void vtkMEDPolyDataNavigator::GetCellEdges(vtkPolyData *polydata, int cellId, Ed
 
   // Put the points in the list of edges
   int n = ptIds->GetNumberOfIds() ;
-  for (int i = 0 ;  i < n ;  i++){
-    int id0 = ptIds->GetId(i) ;
-    int id1 = ptIds->GetId((i+1)%n) ;
-    edges.push_back(Edge(id0,id1)) ;
+  int cellType = polydata->GetCellType(cellId) ;
+  switch(cellType){  
+  case VTK_EMPTY_CELL:
+  case VTK_VERTEX:
+    return ;
+  case VTK_LINE:
+  case VTK_POLY_LINE:
+    for (int i = 0 ;  i < n-1 ;  i++){
+      int id0 = ptIds->GetId(i) ;
+      int id1 = ptIds->GetId(i+1) ;
+      edges.push_back(Edge(id0,id1)) ;
+    }
+    break ;
+  case VTK_TRIANGLE:
+  case VTK_POLYGON:
+    for (int i = 0 ;  i < n ;  i++){
+      int id0 = ptIds->GetId(i) ;
+      int id1 = ptIds->GetId((i+1)%n) ;
+      edges.push_back(Edge(id0,id1)) ;
+    }
+    break ;
+  default:
+    return ;
   }
 
   ptIds->Delete() ;
@@ -3732,12 +3751,12 @@ void vtkMEDPolyDataNavigator::RemovePointsWithNoCells(vtkPolyData *polydata) con
 //------------------------------------------------------------------------------
 // Modulo operator, same as % but works correctly on negative values of n as well
 //------------------------------------------------------------------------------
-int vtkMEDPolyDataNavigator::Modulo(int n, int m) const
+int vtkMEDPolyDataNavigator::Modulo(int i, int n) const
 {
-  if (n >= 0)
-    return n % m ;
+  if (i >= 0)
+    return i % n ;
   else
-    return m - (-n % m) ;
+    return (n-1) - (-(i+1) % n) ;
 }
 
 
