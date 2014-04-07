@@ -233,7 +233,7 @@ public:
   void SetMaxRisk(int risk) {m_MaxRisk = risk ;  this->Modified() ;}
 
   /// Get the max risk (LOW, AVG, HIGH, VHIGH)
-  int GetMaxRisk(int risk) const {return m_MaxRisk ;}
+  int GetMaxRisk() const {return m_MaxRisk ;}
 
 private:
   enum STENT_WIDGET_ID
