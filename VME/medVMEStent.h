@@ -115,6 +115,8 @@ public:
   /// The position is the id along the centerline.
   void SetStentStartPos(int startId) ;
 
+  int GetStentStartPos() { return m_StentStartPosId; };
+
   void SetStentLink(const char *link_name, mafNode *ns);
 
   void SetStentCompanyName(wxString CompanyName) {m_CompanyName = CompanyName;}
