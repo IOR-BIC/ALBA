@@ -131,7 +131,7 @@ public:
   void SetLinkAlignment(int linkAlgn) {m_Link_Alignment = linkAlgn;}
   void SetLinkOrientation(int linkOrit) {m_Link_Orientation = linkOrit;}
   void SetLinkConnection(int linkConnection) {m_Id_Link_Connection = linkConnection;}
-  void SetStentCrownNumber(int crownNumber) {m_Crown_Number = crownNumber; }
+  void SetNumberOfCrowns(int crownNumber) {m_NumberOfCrowns = crownNumber; }
   void SetStrutsNumber(int strutsNumber){m_Struts_Number = strutsNumber;}
   void SetLinkNumber(int linkNumber){m_Link_Number = linkNumber;}
   void SetStentType(int type){m_Stent_Type = type;}
@@ -157,7 +157,7 @@ public:
   int GetLinkAlignment() const {return m_Link_Alignment;}
   int GetLinkOrientation() const {return m_Link_Orientation;}
   int GetLinkConnection() const {return m_Id_Link_Connection;}
-  int GetStentCrownNumber() const {return m_Crown_Number ;}
+  int GetNumberOfCrowns() const {return m_NumberOfCrowns ;}
   double GetStrutLength() const {return m_Strut_Length ;}
   double GetStrutAngle() const {return m_Strut_Angle ;}
   int GetStrutNumber() const {return m_Struts_Number;}
@@ -234,6 +234,13 @@ public:
 
   /// Get the max risk (LOW, AVG, HIGH, VHIGH)
   int GetMaxRisk() const {return m_MaxRisk ;}
+
+  /// Get number of units in stent. \n
+  /// This includes partial units at the end, if the no. of crowns is odd.
+  int GetNumberOfUnits() ;
+
+  /// Get length of unit
+  double GetLengthOfUnit() ;
 
 private:
   enum STENT_WIDGET_ID
@@ -356,7 +363,7 @@ private:
   double m_Strut_Angle; ///< angle in radians
   double m_Link_Length;
   int m_Struts_Number;
-  int m_Crown_Number;
+  int m_NumberOfCrowns;
   int m_Link_Number;
   int m_Id_Link_Connection;
   int m_Id_Stent_Configuration;

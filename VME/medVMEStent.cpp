@@ -92,7 +92,7 @@ medVMEStent::medVMEStent()
   m_Stent_Diameter = 2.0 ;
   m_Stent_DBDiameter = 5.0 ; // Saves original DB diameter for reporting, so not lost when crimped.
   m_Crown_Length = 2.2;
-  m_Crown_Number = 10;
+  m_NumberOfCrowns = 10;
   m_Strut_Angle = 60.0;
   m_Strut_Thickness = 0.0;
   m_Id_Stent_Configuration = 1; /* 1.outofphase, 0.InPhase;  enumStCfgType */
@@ -169,7 +169,7 @@ mafGUI* medVMEStent::CreateGui()
 
     m_Gui->Double(CHANGED_STENT_PARAM,_("Diameter"), &m_Stent_Diameter, 0, 10000,-1,_("The length of the stent (mm)"));
     m_Gui->Double(CHANGED_STENT_PARAM,_("Crown Len"), &m_Crown_Length, 0, 10000,-1,_("The length of the Crown (mm)"));
-    m_Gui->Integer(CHANGED_STENT_PARAM,_("Crown num"), &m_Crown_Number, 0, 10000,-1,_("The number of the Crowns"));
+    m_Gui->Integer(CHANGED_STENT_PARAM,_("Crown num"), &m_NumberOfCrowns, 0, 10000,-1,_("The number of the Crowns"));
     //m_Gui->Double(CHANGED_STENT_PARAM,_("Angle"), &m_Strut_Angle,0,360,-1,_("strut angle (deg)"));
     //m_Gui->Double(CHANGED_STENT_PARAM,_("Thickness"), &m_Strut_Thickness,0,10,-1,_("strut thickness (mm)"));
 
@@ -322,7 +322,7 @@ int medVMEStent::DeepCopy(mafNode *a)
   m_Strut_Angle = vmeStent->m_Strut_Angle ;
   m_Link_Length = vmeStent->m_Link_Length;
   m_Struts_Number = vmeStent->m_Struts_Number ;
-  m_Crown_Number = vmeStent->m_Crown_Number ;
+  m_NumberOfCrowns = vmeStent->m_NumberOfCrowns ;
   m_Link_Number = vmeStent->m_Link_Number ;
   m_Id_Link_Connection = vmeStent->m_Id_Link_Connection;
   m_Id_Stent_Configuration = vmeStent->m_Id_Stent_Configuration ;
@@ -392,7 +392,7 @@ int medVMEStent::InternalStore(mafStorageElement *node)
     if (node->StoreDouble("StrutAngle",m_Strut_Angle) != MAF_OK) return MAF_ERROR; 
     if (node->StoreDouble("LinkLength",m_Link_Length) != MAF_OK) return MAF_ERROR; 
     if (node->StoreInteger("NumberOfStruts",m_Struts_Number) != MAF_OK) return MAF_ERROR; 
-    if (node->StoreInteger("NumberOfCrowns",m_Crown_Number) != MAF_OK) return MAF_ERROR; 
+    if (node->StoreInteger("NumberOfCrowns",m_NumberOfCrowns) != MAF_OK) return MAF_ERROR; 
     if (node->StoreInteger("NumberOfLinks",m_Link_Number) != MAF_OK) return MAF_ERROR; 
     if (node->StoreInteger("IdLinkConnection",m_Id_Link_Connection) != MAF_OK) return MAF_ERROR; 
     if (node->StoreInteger("IdStentConfig",m_Id_Stent_Configuration) != MAF_OK) return MAF_ERROR; 
@@ -449,7 +449,7 @@ int medVMEStent::InternalRestore(mafStorageElement *node)
     if (node->RestoreDouble("StrutAngle",m_Strut_Angle) != MAF_OK) return MAF_ERROR; 
     if (node->RestoreDouble("LinkLength",m_Link_Length) != MAF_OK) return MAF_ERROR; 
     if (node->RestoreInteger("NumberOfStruts",m_Struts_Number) != MAF_OK) return MAF_ERROR; 
-    if (node->RestoreInteger("NumberOfCrowns",m_Crown_Number) != MAF_OK) return MAF_ERROR; 
+    if (node->RestoreInteger("NumberOfCrowns",m_NumberOfCrowns) != MAF_OK) return MAF_ERROR; 
     if (node->RestoreInteger("NumberOfLinks",m_Link_Number) != MAF_OK) return MAF_ERROR; 
     if (node->RestoreInteger("IdLinkConnection",m_Id_Link_Connection) != MAF_OK) return MAF_ERROR; 
     if (node->RestoreInteger("IdStentConfig",m_Id_Stent_Configuration) != MAF_OK) return MAF_ERROR; 
@@ -514,7 +514,7 @@ void medVMEStent::InternalUpdate()
     m_StentSource->setStentDiameter(m_Stent_Diameter);
     m_StentSource->setStentDLength(m_Stent_DBLength);//weih14 @todo
     m_StentSource->setCrownLength(m_Crown_Length);
-    //m_StentSource->setCrownNumber(m_Crown_Number);
+    //m_StentSource->setCrownNumber(m_NumberOfCrowns);
 
     m_StentSource->setStentConfiguration((enumStCfgType)m_Id_Stent_Configuration);
     m_StentSource->setLinkConnection((enumLinkConType) m_Id_Link_Connection);
@@ -534,12 +534,12 @@ void medVMEStent::InternalUpdate()
     if(m_CenterLine != NULL && linePointNumber>0){
       m_StentSource->setCenterLineFromPolyData(m_StentCenterLine);
       //m_ComputedCrownNumber = m_StentSource->computeCrownNumberAfterSetCenterLine();
-      //if (m_Crown_Number>m_ComputedCrownNumber)
+      //if (m_NumberOfCrowns>m_ComputedCrownNumber)
       //{
-      //  m_Crown_Number = m_ComputedCrownNumber;
+      //  m_NumberOfCrowns = m_ComputedCrownNumber;
       //}
     }
-    //m_StentSource->setCrownNumber(m_Crown_Number);
+    //m_StentSource->setCrownNumber(m_NumberOfCrowns);
 
     //---------weih modify---------
     //m_StentSource->createStent();
@@ -552,7 +552,7 @@ void medVMEStent::InternalUpdate()
     else{
       m_StentSource->createStent();
     }
-    m_Crown_Number = m_StentSource->getCrownNumber();
+    m_NumberOfCrowns = m_StentSource->getCrownNumber();
 
     m_SimplexMesh = m_StentSource->GetSimplexMesh();
     m_SimplexMesh->DisconnectPipeline();
@@ -2004,4 +2004,52 @@ void medVMEStent::SetDeployedPolydataVME(mafNode* inputNode)
   pd->Update() ;
   SetStentPolyData(pd) ;
   m_DeployedPolydataStatus = DEPLOYED_PD_OK ;
+}
+
+
+
+//-------------------------------------------------------------------------
+// Get number of units in stent. \n
+// This includes partial units at the end, if the no. of crowns is odd.
+//-------------------------------------------------------------------------
+int medVMEStent::GetNumberOfUnits()
+{
+  int n ;
+
+  wxString model = GetStentModelName() ;
+  if (model == "MARIS PLUS"){
+    // Maris unit is HL-C-L-C-HL
+    n = (m_NumberOfCrowns + 1)/2 ; // +1 to include partial unit of no. of crowns is odd.
+  }
+  else if (model == "ABSOLUTE PRO"){
+    // Abbott stent is PC-L-C-L-PC where PC is part-crown.  Crowns overlap.
+    n = (m_NumberOfCrowns + 1)/2 ; // +1 to include partial unit of no. of crowns is odd.
+  }
+  else
+    n = 0 ;
+
+  return n ;
+}
+
+
+//-------------------------------------------------------------------------
+// Get length of unit
+//-------------------------------------------------------------------------
+double medVMEStent::GetLengthOfUnit()
+{
+  double len ;
+
+  wxString model = GetStentModelName() ;
+  if (model == "MARIS PLUS"){
+    // Maris unit is HL-C-L-C-HL where HL is half-link
+    len = 2.0*m_Crown_Length + 2.0*m_Link_Length ;
+  }
+  else if (model == "ABSOLUTE PRO"){
+    // Abbott stent is PC-L-C-L-PC where PC is part-crown.  Crowns overlap.
+    len = 2.0*m_Link_Length ;
+  }
+  else
+    len = 0.0 ;
+
+  return len ;
 }
