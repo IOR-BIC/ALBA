@@ -103,6 +103,8 @@ medVMEStent::medVMEStent()
   m_ComputedCrownNumber = 0;
 
   m_StentStartPosId = 0 ;
+  m_MaxRisk = 0;
+  m_FatigueBending = 0.;
 
   m_CenterLineDefined = false ; 
   m_VesselSurfaceDefined = false ;

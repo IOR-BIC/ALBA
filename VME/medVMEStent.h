@@ -237,6 +237,48 @@ public:
   /// Get the max risk (LOW, AVG, HIGH, VHIGH)
   int GetMaxRisk() const {return m_MaxRisk ;}
 
+  /** Set the Fatigue Bending */
+  void SetFatigueBending(const double fatiguebending) { m_FatigueBending = fatiguebending; };
+
+  /** Get the Fatigue Bending */
+  double GetFatigueBending() const {return m_FatigueBending; };
+
+  /** Set the tube initial stretching */
+  void SetTubeInitialStretching(const std::vector<double>& tubeinitialstretching) { m_TubeInitialStretching = tubeinitialstretching; };
+
+  /** Get the tube initial stretching */
+  const std::vector<double>& GetTubeInitialStretching() const { return m_TubeInitialStretching; };
+
+  /** Get the tube initial stretching in the id-th stent unit */
+  const double GetTubeInitialStretchingPerUnit(unsigned stentunitid) const { return m_TubeInitialStretching.at(stentunitid); };
+
+  /** Set the tube final stretching */
+  void SetTubeFinalStretching(const std::vector<double>& tubefinalstretching) { m_TubeFinalStretching = tubefinalstretching; };
+  
+  /** Get the tube final stretching in the id-th stent unit */
+  const double GetTubeFinalStretchingPerUnit(unsigned stentunitid) const { return m_TubeFinalStretching.at(stentunitid); };
+  
+  /** Get the tube final stretching */
+  const std::vector<double>& GetTubeFinalStretching() const { return m_TubeFinalStretching; };
+
+  /** Set the tube young modulus */
+  void SetTubeYoungModulus(const std::vector<double>& tubeyoungmodulus) { m_TubeYoungModulus = tubeyoungmodulus; };
+
+  /** Get the tube young modulus in the id-th stent unit */
+  const double GetTubeYoungModulusPerUnit(unsigned stentunitid) const { return m_TubeYoungModulus.at(stentunitid); };
+
+  /** Get the tube young modulus */
+  const std::vector<double>& GetTubeYoungModulus() const { return m_TubeYoungModulus; };
+
+  /** Set the tube diameter */
+  void SetTubeDiameter(const std::vector<double>& tubediameter) { m_TubeDiameter = tubediameter; };
+
+  /** Get the tube diameter in the id-th stent unit */
+  const double GetTubeDiameterPerUnit(unsigned stentunitid) const { return m_TubeDiameter.at(stentunitid); };
+
+  /** Get the tube diameter */
+  const std::vector<double>& GetTubeDiameter() const { return m_TubeDiameter; };
+
   /// Get number of units in stent. \n
   /// This includes partial units at the end, if the no. of crowns is odd.
   int GetNumberOfUnits() ;
@@ -425,7 +467,15 @@ private:
 
   // Max risk: LOW, AVG etc.  
   // Stored here where risk op can save it and reporter op can access it.
-  int m_MaxRisk ; 
+  int m_MaxRisk ;
+
+  //Fatigue Input Parameters
+  double m_FatigueBending;
+  std::vector<double> m_TubeInitialStretching;
+  std::vector<double> m_TubeFinalStretching;
+  std::vector<double> m_TubeYoungModulus;
+  std::vector<double> m_TubeDiameter;
+
 };
 
 #endif
