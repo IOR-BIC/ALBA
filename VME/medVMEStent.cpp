@@ -403,6 +403,13 @@ int medVMEStent::InternalStore(mafStorageElement *node)
     if (node->StoreDouble("StrutThickness",m_Strut_Thickness) != MAF_OK) return MAF_ERROR;  
     if (node->StoreDouble("DLength",m_Stent_DBLength) != MAF_OK) return MAF_ERROR; 
     if (node->StoreInteger("ComputedNumberOfCrowns",m_ComputedCrownNumber) != MAF_OK) return MAF_ERROR; 
+	//
+	if (node->StoreInteger("MaxRisk",m_MaxRisk) != MAF_OK) return MAF_ERROR;
+	if (node->StoreDouble("FatigueBending",m_FatigueBending) != MAF_OK) return MAF_ERROR;
+	if (node->StoreVectorN("TubeInitialStretching",m_TubeInitialStretching,m_TubeInitialStretching.size()) != MAF_OK) return MAF_ERROR;
+	if (node->StoreVectorN("TubeFinalStretching",m_TubeFinalStretching,m_TubeFinalStretching.size()) != MAF_OK) return MAF_ERROR;
+	if (node->StoreVectorN("TubeYoungModulus",m_TubeYoungModulus,m_TubeYoungModulus.size()) != MAF_OK) return MAF_ERROR;
+	if (node->StoreVectorN("TubeDiameter",m_TubeDiameter,m_TubeDiameter.size()) != MAF_OK) return MAF_ERROR;
 
     // vessel
     if (node->StoreInteger("VesselNodeId", m_VesselNodeID) != MAF_OK) return MAF_ERROR; 
@@ -462,6 +469,7 @@ int medVMEStent::InternalRestore(mafStorageElement *node)
     if (node->RestoreInteger("ComputedNumberOfCrowns",m_ComputedCrownNumber) != MAF_OK) return MAF_ERROR; 
     m_StentParamsModified = true ;
 
+
     // vessel
     if (node->RestoreInteger("VesselNodeId", m_VesselNodeID) != MAF_OK) return MAF_ERROR; 
 
@@ -482,6 +490,22 @@ int medVMEStent::InternalRestore(mafStorageElement *node)
     if (node->RestoreInteger("DeployedPDNodeId", m_DeployedPolydataNodeID) != MAF_OK) return MAF_ERROR; 
     if (m_DeployedPolydataStatus == DEPLOYED_PD_OK)
       m_DeployedPolydataStatus = DEPLOYED_PD_NOT_LOADED ;
+
+	//
+	if(m_DeployedPolydataStatus == DEPLOYED_PD_NOT_LOADED)
+	{
+		m_TubeInitialStretching.resize(GetNumberOfUnits());
+		m_TubeFinalStretching.resize(GetNumberOfUnits());
+		m_TubeYoungModulus.resize(GetNumberOfUnits());
+		m_TubeDiameter.resize(GetNumberOfUnits());
+		if (node->RestoreInteger("MaxRisk",m_MaxRisk) != MAF_OK) return MAF_ERROR;
+		if (node->RestoreDouble("FatigueBending",m_FatigueBending) != MAF_OK) return MAF_ERROR;
+		if (node->RestoreVectorN("TubeInitialStretching",m_TubeInitialStretching,GetNumberOfUnits()) != MAF_OK) return MAF_ERROR;
+		if (node->RestoreVectorN("TubeFinalStretching",m_TubeFinalStretching,GetNumberOfUnits()) != MAF_OK) return MAF_ERROR;
+		if (node->RestoreVectorN("TubeYoungModulus",m_TubeYoungModulus,GetNumberOfUnits()) != MAF_OK) return MAF_ERROR;
+		if (node->RestoreVectorN("TubeDiameter",m_TubeDiameter,GetNumberOfUnits()) != MAF_OK) return MAF_ERROR;
+	}
+
 
     // NB The vme tree is not accessible from here, so the rest of the 
     // initialization with the vessel and center line vme's is 
