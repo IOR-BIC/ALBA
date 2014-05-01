@@ -164,7 +164,7 @@ public:
   double GetStrutAngle() const {return m_Strut_Angle ;}
   int GetStrutNumber() const {return m_Struts_Number;}
   int GetLinkNumber() const {return m_Link_Number;}
-  double GetStentType() const {return m_Stent_Type;}
+  int GetStentType() const {return m_Stent_Type;}
 
   vtkPolyData* GetVesselCenterLine() {return m_CenterLine;} ///< get vessel centerline
   vtkPolyData* GetVesselCenterLineLong() {return m_CenterLineLong;} ///< get long extrapolated vessel centerline

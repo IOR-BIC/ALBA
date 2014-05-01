@@ -2042,17 +2042,24 @@ int medVMEStent::GetNumberOfUnits()
 {
   int n ;
 
-  wxString model = GetStentModelName() ;
-  if (model == "MARIS PLUS"){
-    // Maris unit is HL-C-L-C-HL
-    n = (m_NumberOfCrowns + 1)/2 ; // +1 to include partial unit of no. of crowns is odd.
-  }
-  else if (model == "ABSOLUTE PRO"){
-    // Abbott stent is PC-L-C-L-PC where PC is part-crown.  Crowns overlap.
-    n = (m_NumberOfCrowns + 1)/2 ; // +1 to include partial unit of no. of crowns is odd.
-  }
-  else
+  switch(GetStentType()){
+  case 0:
+    // Maris stent is C-L-C-HL
+    //                      HL-C-L-C-HL
+    //                               HL-C-L-C-HL
+    //                                        HL-C-L-C (even) or HL-C (odd)
+    n = (m_NumberOfCrowns + 1)/2 ; // +1 to include partial unit if no. of crowns is odd.
+    break ;
+  case 1:
+    // Abbott is C-L-PC
+    //               PC-L-C-L-PC
+    //                        PC-L-C-L-PC
+    //                                 PC-L (even) or PC-L-C-L (odd)
+    n = (m_NumberOfCrowns + 2)/2 ;
+    break ;
+  default:
     n = 0 ;
+  }
 
   return n ;
 }
