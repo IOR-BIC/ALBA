@@ -46,6 +46,7 @@ University of Bedfordshire, UK
 #include "vtkCellArray.h"
 #include "vtkAppendPolyData.h"
 #include "vtkIdList.h"
+#include "vtkCellData.h"
 
 #include "itkCellInterface.h"
 
@@ -88,7 +89,7 @@ medVMEStent::medVMEStent()
   m_StentCenterLine = vtkPolyData::New() ;
   m_VesselSurface = vtkPolyData::New() ;
 
-  m_Struts_Number = 16 ;
+  m_StrutPairsPerCrown = 16 ;
   m_Stent_Diameter = 2.0 ;
   m_Stent_DBDiameter = 5.0 ; // Saves original DB diameter for reporting, so not lost when crimped.
   m_Crown_Length = 2.2;
@@ -323,7 +324,7 @@ int medVMEStent::DeepCopy(mafNode *a)
   m_Strut_Length = vmeStent->m_Strut_Length ;
   m_Strut_Angle = vmeStent->m_Strut_Angle ;
   m_Link_Length = vmeStent->m_Link_Length;
-  m_Struts_Number = vmeStent->m_Struts_Number ;
+  m_StrutPairsPerCrown = vmeStent->m_StrutPairsPerCrown ;
   m_NumberOfCrowns = vmeStent->m_NumberOfCrowns ;
   m_Link_Number = vmeStent->m_Link_Number ;
   m_Id_Link_Connection = vmeStent->m_Id_Link_Connection;
@@ -393,7 +394,7 @@ int medVMEStent::InternalStore(mafStorageElement *node)
     if (node->StoreDouble("StrutLength",m_Strut_Length) != MAF_OK) return MAF_ERROR; 
     if (node->StoreDouble("StrutAngle",m_Strut_Angle) != MAF_OK) return MAF_ERROR; 
     if (node->StoreDouble("LinkLength",m_Link_Length) != MAF_OK) return MAF_ERROR; 
-    if (node->StoreInteger("NumberOfStruts",m_Struts_Number) != MAF_OK) return MAF_ERROR; 
+    if (node->StoreInteger("NumberOfStruts",m_StrutPairsPerCrown) != MAF_OK) return MAF_ERROR; 
     if (node->StoreInteger("NumberOfCrowns",m_NumberOfCrowns) != MAF_OK) return MAF_ERROR; 
     if (node->StoreInteger("NumberOfLinks",m_Link_Number) != MAF_OK) return MAF_ERROR; 
     if (node->StoreInteger("IdLinkConnection",m_Id_Link_Connection) != MAF_OK) return MAF_ERROR; 
@@ -457,7 +458,7 @@ int medVMEStent::InternalRestore(mafStorageElement *node)
     if (node->RestoreDouble("StrutLength",m_Strut_Length) != MAF_OK) return MAF_ERROR; 
     if (node->RestoreDouble("StrutAngle",m_Strut_Angle) != MAF_OK) return MAF_ERROR; 
     if (node->RestoreDouble("LinkLength",m_Link_Length) != MAF_OK) return MAF_ERROR; 
-    if (node->RestoreInteger("NumberOfStruts",m_Struts_Number) != MAF_OK) return MAF_ERROR; 
+    if (node->RestoreInteger("NumberOfStruts",m_StrutPairsPerCrown) != MAF_OK) return MAF_ERROR; 
     if (node->RestoreInteger("NumberOfCrowns",m_NumberOfCrowns) != MAF_OK) return MAF_ERROR; 
     if (node->RestoreInteger("NumberOfLinks",m_Link_Number) != MAF_OK) return MAF_ERROR; 
     if (node->RestoreInteger("IdLinkConnection",m_Id_Link_Connection) != MAF_OK) return MAF_ERROR; 
@@ -549,7 +550,7 @@ void medVMEStent::InternalUpdate()
 
     m_StentSource->setLinkLength(m_Link_Length);
     m_StentSource->setLinkAlignment(m_Link_Alignment);
-    m_StentSource->setStrutsNumber(m_Struts_Number);
+    m_StentSource->setStrutsNumber(m_StrutPairsPerCrown);
     m_StentSource->setStentType(m_Stent_Type);//weih14 add
 
     if (m_Strut_Angle > 0.0)
@@ -634,7 +635,7 @@ void medVMEStent::UpdateStentPolydataFromSimplex()
 
 
 
-
+/*
 //------------------------------------------------------------------------------
 // Update stent polydata from simplex
 //------------------------------------------------------------------------------
@@ -809,7 +810,7 @@ void medVMEStent::UpdateStentPolydataFromSimplex_old()
     //m_SimplexMeshModified = false ; // wait until simplex version is called before false
   }
 }
-
+*/
 
 
 //------------------------------------------------------------------------------
@@ -872,6 +873,39 @@ void medVMEStent::UpdateStentPolydataFromSimplex_Simple()
     m_StentPolyData->SetLines(lines);
     lines->Delete() ;
 
+
+    //----------------------------------------
+    // Add rank scalar to polydata
+    //----------------------------------------
+    int ncells = m_StentPolyData->GetNumberOfCells() ;
+    vtkIntArray* rankScalar = vtkIntArray::New() ;
+    rankScalar->SetName("Rank") ;
+    rankScalar->SetNumberOfComponents(1) ;
+    rankScalar->SetNumberOfTuples(ncells) ;
+
+    int numStruts = m_NumberOfCrowns * 2*m_StrutPairsPerCrown ;
+    int rank = 0 ;
+    int cellIdStruts = 0 ;
+    int cellIdLinks = numStruts ;
+    for (int i = 0 ;  i < m_NumberOfCrowns ;  i++){
+      for (int j = 0 ;  j < 2*m_StrutPairsPerCrown && cellIdStruts < ncells ;  j++){
+        rankScalar->SetTuple1(cellIdStruts, rank) ;
+        cellIdStruts++ ;
+        rank++ ;
+      }
+
+      if (i == m_NumberOfCrowns-1)
+        continue ; // no links after last crown
+
+      for (int j = 0 ;  j < m_Link_Number && cellIdLinks < ncells ;  j++){
+        rankScalar->SetTuple1(cellIdLinks, rank) ;
+        cellIdLinks++ ;
+        rank++ ;
+      }
+    }
+
+    m_StentPolyData->GetCellData()->AddArray(rankScalar) ; 
+    rankScalar->Delete() ;
     m_StentPolyData->Modified();
   }
 }
@@ -1010,6 +1044,40 @@ void medVMEStent::UpdateStentPolydataFromSimplex_Abbott()
     lines->Squeeze() ;
     m_StentPolyData->SetLines(lines);
     lines->Delete() ;
+
+
+    //----------------------------------------
+    // Add rank scalar to polydata
+    //----------------------------------------
+    int ncells = m_StentPolyData->GetNumberOfCells() ;
+    vtkIntArray* rankScalar = vtkIntArray::New() ;
+    rankScalar->SetName("Rank") ;
+    rankScalar->SetNumberOfComponents(1) ;
+    rankScalar->SetNumberOfTuples(ncells) ;
+
+    int numStruts = m_NumberOfCrowns * 2*m_StrutPairsPerCrown ;
+    int rank = 0 ;
+    int cellIdStruts = 0 ;
+    int cellIdLinks = numStruts ;
+    for (int i = 0 ;  i < m_NumberOfCrowns ;  i++){
+      for (int j = 0 ;  j < 2*m_StrutPairsPerCrown && cellIdStruts < ncells ;  j++){
+        rankScalar->SetTuple1(cellIdStruts, rank) ;
+        cellIdStruts++ ;
+        rank++ ;
+      }
+
+      if (i == 0)
+        continue ; // no links between crowns 0 and 1
+
+      for (int j = 0 ;  j < m_Link_Number && cellIdLinks < ncells ;  j++){
+        rankScalar->SetTuple1(cellIdLinks, rank) ;
+        cellIdLinks++ ;
+        rank++ ;
+      }
+    }
+
+    m_StentPolyData->GetCellData()->AddArray(rankScalar) ;
+    rankScalar->Delete() ;
 
     m_StentPolyData->Modified();
   }
@@ -1185,7 +1253,7 @@ void medVMEStent::SetVesselSurface(mafNode* node)
 void medVMEStent::CalcStrutAngle()
 {
   double r = m_Stent_Diameter/2.0 ;
-  double alpha = 2.0*M_PI / (double)m_Struts_Number ;
+  double alpha = 2.0*M_PI / (double)m_StrutPairsPerCrown ;
   double s = 2.0*r*sin(alpha/2.0) ;
   double t = s / (2.0 * m_Crown_Length) ;
   m_Strut_Angle = 2.0*atan(t) ;
@@ -1959,7 +2027,7 @@ void medVMEStent::CrimpStent(double crimpedDiameter)
   m_Stent_Diameter = crimpedDiameter ;
 
   double r = crimpedDiameter/2.0 ;
-  double alpha = 2.0*M_PI / m_Struts_Number ;
+  double alpha = 2.0*M_PI / m_StrutPairsPerCrown ;
   double s = 2.0*r*sin(alpha/2.0) ;
   double c = sqrt(m_Strut_Length*m_Strut_Length - (s*s)/4.0) ;
   double theta = 2.0*acos(c/m_Strut_Length) ;
