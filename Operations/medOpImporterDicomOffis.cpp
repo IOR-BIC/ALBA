@@ -1345,28 +1345,29 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
 		m_SelectedSeriesSlicesList->Item(m_ZCropBounds[0])->GetData()->GetDcmImageOrientationPatient(orientation);
 
 		//transform direction cosines to be used to set vtkMatrix
-		/* [ orientation[0]  orientation[1]  orientation[2]  -dst_pos_x ] 
-		[ orientation[3]  orientation[4]  orientation[5]  -dst_pos_y ]
-		[ dst_nrm_dircos_x  dst_nrm_dircos_y  dst_nrm_dircos_z  -dst_pos_z ]
-		[ 0                 0                 0                 1          ]*/
+		/*
+		[ orientation[0] orientation[3] dst_nrm_dircos_x  0 ] 
+		[ orientation[1] orientation[4] dst_nrm_dircos_y  0 ]
+		[ orientation[2] orientation[5] dst_nrm_dircos_z  0 ]
+		[ 0                 0                 0           1 ]*/
 
 		double dst_nrm_dircos_x = orientation[1] * orientation[5] - orientation[2] * orientation[4]; 
-		double dst_nrm_dircos_y = orientation[2] * orientation[2] - orientation[0] * orientation[5]; 
+		double dst_nrm_dircos_y = orientation[2] * orientation[3] - orientation[0] * orientation[5];
 		double dst_nrm_dircos_z = orientation[0] * orientation[4] - orientation[1] * orientation[3]; 
 
 		vtkMatrix4x4 *mat = vtkMatrix4x4::New();
 		mat->Identity();
 
 		mat->SetElement(0,0,orientation[0]);
-		mat->SetElement(1,0,orientation[3]);
-		mat->SetElement(2,0,dst_nrm_dircos_x);
+		mat->SetElement(1,0,orientation[1]);
+		mat->SetElement(2,0,orientation[2]);
 		mat->SetElement(3,0,0);
-		mat->SetElement(0,1,orientation[1]);
+		mat->SetElement(0,1,orientation[3]);
 		mat->SetElement(1,1,orientation[4]);
-		mat->SetElement(2,1,dst_nrm_dircos_y);
+		mat->SetElement(2,1,orientation[5]);
 		mat->SetElement(3,1,0);
-		mat->SetElement(0,2,orientation[2]);
-		mat->SetElement(1,2,orientation[5]);
+		mat->SetElement(0,2,dst_nrm_dircos_x);
+		mat->SetElement(1,2,dst_nrm_dircos_y);
 		mat->SetElement(2,2,dst_nrm_dircos_z);
 		mat->SetElement(3,2,0);
 		mat->SetElement(3,3,1);
@@ -2115,29 +2116,33 @@ vtkPolyData* medOpImporterDicomOffis::ExtractPolyData(int ts, int silceId)
 
 	if (m_ApplyRotation)
 	{
-		double orientation[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+		double orientation[6] = {0.0,0.0,0.0,0.0,0.0,0.0};
 		m_SelectedSeriesSlicesList->Item(currImageId)->GetData()->GetDcmImageOrientationPatient(orientation);
 
 		//transform direction cosines to be used to set vtkMatrix
-		/* [ orientation[0]  orientation[1]  orientation[2]  -dst_pos_x ] 
-		[ orientation[3]  orientation[4]  orientation[5]  -dst_pos_y ]
-		[ dst_nrm_dircos_x  dst_nrm_dircos_y  dst_nrm_dircos_z  -dst_pos_z ]
-		[ 0                 0                 0                 1          ]*/
+		/*
+		[ orientation[0] orientation[3] dst_nrm_dircos_x  0 ] 
+		[ orientation[1] orientation[4] dst_nrm_dircos_y  0 ]
+		[ orientation[2] orientation[5] dst_nrm_dircos_z  0 ]
+		[ 0                 0                 0           1 ]*/
 
 		double dst_nrm_dircos_x = orientation[1] * orientation[5] - orientation[2] * orientation[4]; 
-		double dst_nrm_dircos_y = orientation[2] * orientation[2] - orientation[0] * orientation[5]; 
+		double dst_nrm_dircos_y = orientation[2] * orientation[3] - orientation[0] * orientation[5];
 		double dst_nrm_dircos_z = orientation[0] * orientation[4] - orientation[1] * orientation[3]; 
 
+		vtkMatrix4x4 *mat = vtkMatrix4x4::New();
+		mat->Identity();
+
 		mat->SetElement(0,0,orientation[0]);
-		mat->SetElement(1,0,orientation[3]);
-		mat->SetElement(2,0,dst_nrm_dircos_x);
+		mat->SetElement(1,0,orientation[1]);
+		mat->SetElement(2,0,orientation[2]);
 		mat->SetElement(3,0,0);
-		mat->SetElement(0,1,orientation[1]);
+		mat->SetElement(0,1,orientation[3]);
 		mat->SetElement(1,1,orientation[4]);
-		mat->SetElement(2,1,dst_nrm_dircos_y);
+		mat->SetElement(2,1,orientation[5]);
 		mat->SetElement(3,1,0);
-		mat->SetElement(0,2,orientation[2]);
-		mat->SetElement(1,2,orientation[5]);
+		mat->SetElement(0,2,dst_nrm_dircos_x);
+		mat->SetElement(1,2,dst_nrm_dircos_y);
 		mat->SetElement(2,2,dst_nrm_dircos_z);
 		mat->SetElement(3,2,0);
 		mat->SetElement(3,3,1);
