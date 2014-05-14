@@ -134,7 +134,7 @@ public:
   void SetLinkOrientation(int linkOrit) {m_Link_Orientation = linkOrit;}
   void SetLinkConnection(int linkConnection) {m_Id_Link_Connection = linkConnection;}
   void SetNumberOfCrowns(int crownNumber) {m_NumberOfCrowns = crownNumber; }
-  void SetStrutsNumber(int strutsNumber){m_Struts_Number = strutsNumber;}
+  void SetStrutsNumber(int strutsNumber){m_StrutPairsPerCrown = strutsNumber;}
   void SetLinkNumber(int linkNumber){m_Link_Number = linkNumber;}
   void SetStentType(int type){m_Stent_Type = type;}
 
@@ -162,7 +162,7 @@ public:
   int GetNumberOfCrowns() const {return m_NumberOfCrowns ;}
   double GetStrutLength() const {return m_Strut_Length ;}
   double GetStrutAngle() const {return m_Strut_Angle ;}
-  int GetStrutNumber() const {return m_Struts_Number;}
+  int GetStrutNumber() const {return m_StrutPairsPerCrown;}
   int GetLinkNumber() const {return m_Link_Number;}
   int GetStentType() const {return m_Stent_Type;}
 
@@ -339,7 +339,7 @@ private:
   void InternalUpdate();
 
   /// Update stent polydata from simplex.
-  void UpdateStentPolydataFromSimplex_old() ;
+  //void UpdateStentPolydataFromSimplex_old() ;
 
   /// Update stent polydata from simplex.
   void UpdateStentPolydataFromSimplex() ;
@@ -406,7 +406,7 @@ private:
 
   double m_Strut_Angle; ///< angle in radians
   double m_Link_Length;
-  int m_Struts_Number;
+  int m_StrutPairsPerCrown;
   int m_NumberOfCrowns;
   int m_Link_Number;
   int m_Id_Link_Connection;
