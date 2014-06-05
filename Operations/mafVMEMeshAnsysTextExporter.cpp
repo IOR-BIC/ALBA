@@ -131,10 +131,6 @@ int mafVMEMeshAnsysTextExporter::WriteNodesFile( vtkUnstructuredGrid *inputUGrid
   int columnsNumber;
   int rowsNumber = inputUGrid->GetNumberOfPoints();
   columnsNumber = 4; // point ID + point coordinates
-
-  // create a matrix
-  vnl_matrix<double>  PointsMatrix;
-  PointsMatrix.set_size(rowsNumber,columnsNumber);
   
   vtkPoints *pointsToBeExported = NULL;
 
@@ -172,33 +168,23 @@ int mafVMEMeshAnsysTextExporter::WriteNodesFile( vtkUnstructuredGrid *inputUGrid
 
   double pointCoordinates[3] = {-9999, -9999, -9999};
 
+	FILE *file=fopen(outputFileName,"w");
+
   for (int rowID = 0 ; rowID < rowsNumber ; rowID++)
   {
     pointsToBeExported->GetPoint(rowID, pointCoordinates);
 
-    enum {x = 1, y, z};
+		fprintf(file, "%d ", nodesIDArray->GetValue(rowID));
 
-    int pointID = rowID + 1; // this is +1 fortran offset
-    PointsMatrix(rowID, pointIDColumn) = nodesIDArray->GetValue(rowID);
-    PointsMatrix(rowID, x) = pointCoordinates[0];
-    PointsMatrix(rowID, y) = pointCoordinates[1];
-    PointsMatrix(rowID, z) = pointCoordinates[2];
+		fprintf(file, "%f ", pointCoordinates[0]);
+		fprintf(file, "%f ", pointCoordinates[1]);
+		fprintf(file, "%f ", pointCoordinates[2]);
+		fprintf(file, "\n");	
   }
 
-  cout << PointsMatrix;
-
-  assert(PointsMatrix.rows() == rowsNumber);
-  assert(PointsMatrix.columns() == columnsNumber);
-
-  // write nodes matrix to disk...
-  vcl_ofstream output;
-
-  vcl_string fileName = outputFileName;
-
-  output.open(fileName.c_str());
-  output << PointsMatrix;
-  output.close();
-
+	fclose(file);
+	
+  
   // clean up
   vtkDEL(inUGDeepCopy);
   vtkDEL(transform);
@@ -226,10 +212,6 @@ int mafVMEMeshAnsysTextExporter::WriteElementsFile( vtkUnstructuredGrid *inputUG
   //  1   3   3   3   0   1      5     2     4     3    11    10    14    13    9    12
   int offset = 6;  
   int columnsNumber = offset + numberOfPointsPerCell;
-
-  // create a matrix
-  vnl_matrix<double>  ElementsMatrix;
-  ElementsMatrix.set_size(rowsNumber,columnsNumber);
 
   // read all the elements with their attribute data in memory (vnl_matrix)
 
@@ -368,69 +350,37 @@ int mafVMEMeshAnsysTextExporter::WriteElementsFile( vtkUnstructuredGrid *inputUG
     realArray = syntheticRealArray;
   }
 
-  // fill the matrix
-  int cellIDColumn = 0;
-  int MATERIALColumn = 1;
-  int TYPEColumn = 2;
-  int REALColumn = 3;
-  int ESYSColumn = 4;
-  int COMPColumn = 5;
-  int firstPointIDCol = 6;
-  int fortranOffset = 1;
 
+
+	FILE *file=fopen(outputFileName,"w");
+
+	
   for (int rowID = 0 ; rowID < rowsNumber ; rowID++)
   {
-    // write element ID into matrix
-    int id = elementIdArray->GetValue(rowID);
-    ElementsMatrix(rowID, cellIDColumn) = id;
+		int esys = 0;// <TODO!!!!!> this seems to be always 0... to be supported in the future anyway
+		int comp = 1;// <TODO!!!!!> this seems to be always 1... to be supported in the future anyway
 
-    // type
-    int type = typeArray->GetValue(rowID);
-    ElementsMatrix(rowID, TYPEColumn) = type;
-
-    // material
-    int material = materialArray->GetValue(rowID);
-    ElementsMatrix(rowID, MATERIALColumn) = material;
-
-    // real
-    int real = realArray->GetValue(rowID);
-    ElementsMatrix(rowID, REALColumn) = real;
-
-    // esys
-    int esys = 0;// <TODO!!!!!> this seems to be always 0... to be supported in the future anyway
-    ElementsMatrix(rowID, ESYSColumn) = esys;
-
-    // comp
-    int comp = 1;// <TODO!!!!!> this seems to be always 1... to be supported in the future anyway
-    ElementsMatrix(rowID, COMPColumn) = comp;
+    fprintf(file, "%d ", elementIdArray->GetValue(rowID));
+		fprintf(file, "%d ", materialArray->GetValue(rowID));
+		fprintf(file, "%d ", typeArray->GetValue(rowID));
+		fprintf(file, "%d ", realArray->GetValue(rowID));
+		fprintf(file, "%d ", esys);
+		fprintf(file, "%d ", comp);
 
     // get the ith cell from input mesh
     vtkCell *currentCell = inputUGrid->GetCell(rowID);
 
     // get the old id list
     vtkIdList *idList = currentCell->GetPointIds();
-    int currentID = 0;
 
-    for (int column = firstPointIDCol; column < firstPointIDCol + numberOfPointsPerCell;column++)
-    {
-      ElementsMatrix(rowID,column) = vtkPointIdAnsysPointsIdMap[idList->GetId(currentID)];
-      //  + fortranOffset; 
-      // this is +1 fortran offset;to be eventually replaced with pointID from fieldData...
-      currentID++;
-    }  
+    for (int currentID = 0; currentID < numberOfPointsPerCell;currentID++)
+			fprintf(file, "%d ",  vtkPointIdAnsysPointsIdMap[idList->GetId(currentID)]);
+
+		fprintf(file,"\n");
   }
 
-  cout << ElementsMatrix;
+	fclose(file);
 
-  // write elements matrix to disk...
-  vcl_ofstream output;
-
-  vcl_string fileName = outputFileName;
-
-  output.open(fileName.c_str());
-  output << ElementsMatrix;
-  output.close();
-    
   vtkDEL(syntheticNodesIDArray);
   nodesIDArray = NULL;
   
@@ -447,7 +397,6 @@ int mafVMEMeshAnsysTextExporter::WriteElementsFile( vtkUnstructuredGrid *inputUG
   realArray = NULL;
 
   return MAF_OK;
- 
 }
 
 void mafVMEMeshAnsysTextExporter::WriteMaterialsFile( vtkUnstructuredGrid *inputUGrid, const char *outputFileName )
