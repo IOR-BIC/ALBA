@@ -893,7 +893,7 @@ void mafInteractor2DDistance::UndoMeasure()
     m_Measure.pop_back();
     m_FlagMeasureType.pop_back();
 
-    if(m_FlagMeasureType[m_FlagMeasureType.size()-1] == ID_RESULT_MEASURE)
+    if(m_FlagMeasureType.size()>0 && m_FlagMeasureType[m_FlagMeasureType.size()-1] == ID_RESULT_MEASURE)
     {
       m_Distance = m_Measure[m_Measure.size()-1];
     }
