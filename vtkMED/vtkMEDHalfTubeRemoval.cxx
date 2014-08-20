@@ -22,6 +22,7 @@ University of Bedfordshire
 #include "vtkMEDHalfTubeRemoval.h"
 
 #include "assert.h"
+#include <algorithm>
 
 vtkCxxRevisionMacro(vtkMEDHalfTubeRemoval, "$Revision: 1.61 $");
 vtkStandardNewMacro(vtkMEDHalfTubeRemoval);

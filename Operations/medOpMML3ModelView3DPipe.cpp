@@ -40,7 +40,7 @@
 #include "vtkWindowLevelLookupTable.h"
 
 #include <ostream>
-
+#include <algorithm>
 
 
 
