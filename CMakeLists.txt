@@ -65,6 +65,21 @@ IF(WIN32)
 ENDIF(WIN32)
 
 #-----------------------------------------------------------------------------
+# This enables support for Visual Studio Edit & Continue, OpenMP, and parallel compilation
+#-----------------------------------------------------------------------------
+IF (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
+	#Add OpenMP Support
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /openmp")
+
+	#Add support for Edit & Continue
+	SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /ZI")
+	IF (NOT ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 17.0)
+		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+	ENDIF (NOT ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 17.0)
+ENDIF (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
+
+
+#-----------------------------------------------------------------------------
 # Options for MAF building
 #-----------------------------------------------------------------------------
 #Remove temporarily the BUILD_SHARED_LIBS because it is not possible to switch the compilation to dynamic.

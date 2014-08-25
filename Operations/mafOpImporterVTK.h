@@ -26,7 +26,8 @@
 // forward references :
 //----------------------------------------------------------------------------
 class mafNode;
-class mafVMEPointSet;
+class mafVMELandmarkCloud;
+//class mafVMEPointSet;
 class mafVMEPolyline;
 class mafVMESurface;
 class mafVMEVolumeGray;
@@ -67,7 +68,8 @@ protected:
   wxString m_File;
   wxString m_FileDir;
   
-  mafVMEPointSet   *m_VmePointSet;
+  mafVMELandmarkCloud *m_VmeLandmarkCloud;
+  //mafVMEPointSet   *m_VmePointSet;
   mafVMEPolyline   *m_VmePolyLine;
   mafVMESurface    *m_VmeSurface;
   mafVMEVolumeGray *m_VmeGrayVol;
