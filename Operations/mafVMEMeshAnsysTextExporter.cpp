@@ -430,11 +430,7 @@ void mafVMEMeshAnsysTextExporter::WriteMaterialsFile( vtkUnstructuredGrid *input
     A fake temporary material with ID = 1 will be created in order to export the data.");
 
     // write fake material to disk...
-    vcl_ofstream output;
-
-    vcl_string fileName = outputFileName;
-  
-    output.open(fileName.c_str());
+    vcl_ostringstream output;
 
     int fakeMaterialID = 1;
     double fakeMaterialTemperature = 0.0000; 
@@ -449,9 +445,14 @@ void mafVMEMeshAnsysTextExporter::WriteMaterialsFile( vtkUnstructuredGrid *input
     output << fakeMaterialPropertyName << " = " << fakeMaterialPropertyValue << std::endl;
     output   << std::endl;
 
-    cout << output;
-    output.close();
+    cout << output.str();
+    
+	vcl_ofstream outputf;
+	vcl_string fileName = outputFileName;
 
+	outputf.open(fileName.c_str());
+	outputf << output.str();
+	outputf.close();
   }
   
   else
@@ -484,12 +485,8 @@ void mafVMEMeshAnsysTextExporter::WriteMaterialsFile( vtkUnstructuredGrid *input
     // write each material
     //
     // write elements matrix to disk...
-    vcl_ofstream output;
-
-    vcl_string fileName = outputFileName;
-
-    output.open(fileName.c_str());
-
+    vcl_ostringstream output;
+    
     // for each material
     for (int i = 0; i < numberOfMaterials; i++)
     {
@@ -510,12 +507,13 @@ void mafVMEMeshAnsysTextExporter::WriteMaterialsFile( vtkUnstructuredGrid *input
       output << std::endl;
     }  
 
-    cout << output;
-    output.close();
+    cout << output.str();
 
-  }
-
-  
+	vcl_ofstream outputf;
+	vcl_string fileName = outputFileName;
+	outputf.open(fileName.c_str());
+    outputf.close();
+  }  
 }
 
 

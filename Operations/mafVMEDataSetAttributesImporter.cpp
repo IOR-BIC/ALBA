@@ -290,7 +290,7 @@ int mafVMEDataSetAttributesImporter::Read()
         ithAttributesFileStream.close();
         vtkGenericWarningMacro("Number of nodes is  different from number of results!" << endl 
           << "nodes:" << numNodes << endl << "results:" << tmpAttributesMatrix.rows() << endl );
-        vtkGenericWarningMacro(<< vcl_cerr);
+        //vtkGenericWarningMacro(<< vcl_cerr);	//BES: 15.8.2014 - this does not work (and won't compile with VS 2013)
         return MAF_ERROR;
       }
     }
