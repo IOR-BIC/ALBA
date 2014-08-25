@@ -189,7 +189,7 @@ void medOpExporterMeters::Export()
 
   m_OutputFile.open(m_File, std::ios::out);
 
-  if (m_OutputFile == NULL) {
+  if (m_OutputFile.fail()) {
     wxMessageBox("Error opening configuration file");
     return ;
   }

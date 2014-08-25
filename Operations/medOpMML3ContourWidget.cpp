@@ -31,6 +31,7 @@
 #include "medOpMML3ContourWidget.h"
 #include "medOpMML3ModelView.h"
 #include "medOpMML3ParameterView.h"
+#include <algorithm>
 
 
 vtkCxxRevisionMacro(medOpMML3ContourWidget, "$Revision: 1.1.2.2 $");
