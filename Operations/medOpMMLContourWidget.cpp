@@ -43,7 +43,7 @@
 #include "vtkSphereSource.h"
 #include "vtkTransform.h"
 #include "vtkProperty2D.h"
-
+#include <algorithm>
 
 vtkCxxRevisionMacro(medOpMMLContourWidget, "$Revision: 1.3 $");
 vtkStandardNewMacro(medOpMMLContourWidget);

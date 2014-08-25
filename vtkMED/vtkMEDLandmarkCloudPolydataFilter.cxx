@@ -20,6 +20,7 @@ University of Bedfordshire
 
 #include "vtkMEDLandmarkCloudPolydataFilter.h"
 #include "vtkMEDAddScalarsFilter.h"
+#include <algorithm>
 
 
 vtkCxxRevisionMacro(vtkMEDLandmarkCloudPolydataFilter, "$Revision: 1.61 $");
