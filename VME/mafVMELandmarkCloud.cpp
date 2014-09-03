@@ -144,7 +144,7 @@ int mafVMELandmarkCloud::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
   assert(data);
   vtkPolyData *polydata = vtkPolyData::SafeDownCast(data);
 
-  if (Superclass::SetData(polydata,t,mode)==MAF_OK)
+  if (polydata != NULL && Superclass::SetData(polydata,t,mode)==MAF_OK)
   {
     int oldnum = GetNumberOfLandmarks();
     if (polydata->GetNumberOfPoints() != oldnum)
