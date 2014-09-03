@@ -512,6 +512,7 @@ void mafVMEMeshAnsysTextExporter::WriteMaterialsFile( vtkUnstructuredGrid *input
 	vcl_ofstream outputf;
 	vcl_string fileName = outputFileName;
 	outputf.open(fileName.c_str());
+	outputf << output.str();
     outputf.close();
   }  
 }
