@@ -10,5 +10,6 @@ FOREACH(PROGRAM dcm2xml dcmconv dcmcrle dcmdrle dcmdump dcmgpdir dcmodify dump2d
   ADD_DEPENDENCIES(${PROGRAM}ex BUILD_Offis_LIBRARY)
 ENDFOREACH(PROGRAM)
 
+ADD_DEPENDENCIES(dcmftestex BUILD_Offis_LIBRARY)
 TARGET_LINK_LIBRARIES(dcmftestex ofstd ${ZLIB_LIBS})
 TARGET_LINK_LIBRARIES(xml2dcmex ${LIBXML_LIBS})
