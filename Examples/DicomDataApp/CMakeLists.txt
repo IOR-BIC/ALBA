@@ -7,9 +7,9 @@ ADD_EXECUTABLE(dcmodifyex dcmodify mdfconen mdfdsman)
 # make sure executables are linked to the corresponding libraries
 FOREACH(PROGRAM dcm2xml dcmconv dcmcrle dcmdrle dcmdump dcmgpdir dcmodify dump2dcm xml2dcm pdf2dcm)
   TARGET_LINK_LIBRARIES(${PROGRAM}ex netapi32 wsock32 ofstd dcmdata ${ZLIB_LIBS})
-  ADD_DEPENDENCIES(${PROGRAM}ex BUILD_Offis_LIBRARY)
+  ADD_DEPENDENCIES(${PROGRAM}ex BUILD_Offis_LIBRARY BUILD_BTK_LIBRARY)
 ENDFOREACH(PROGRAM)
 
-ADD_DEPENDENCIES(dcmftestex BUILD_Offis_LIBRARY)
+ADD_DEPENDENCIES(dcmftestex BUILD_Offis_LIBRARY BUILD_BTK_LIBRARY)
 TARGET_LINK_LIBRARIES(dcmftestex ofstd ${ZLIB_LIBS})
 TARGET_LINK_LIBRARIES(xml2dcmex ${LIBXML_LIBS})
