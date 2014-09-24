@@ -1,0 +1,31 @@
+690c690
+< #if defined WIN64
+---
+> #if (defined(WIN64) || defined(_WIN64))
+692,701c692,699
+< #else
+< 
+<     //
+<     //  InterlockedCompareExchange is only supported on Windows 98,
+<     //  Windows NT 4.0, and newer -- not on Windows 95...
+<     //  If you are willing to give up Win95 support change this to #if 0
+<     //  otherwise we are back to using assembler.
+<     //  (But only if building with compilers that support inline assembler.)
+<     //
+<     #if (defined(_MSC_VER) || defined(__BCPLUSPLUS__)) && !defined(XERCES_NO_ASM)
+---
+> #elif (defined(_MSC_VER) || defined(__BCPLUSPLUS__)) && !defined(XERCES_NO_ASM)
+> 		//
+> 		//  InterlockedCompareExchange is only supported on Windows 98,
+> 		//  Windows NT 4.0, and newer -- not on Windows 95...
+> 		//  If you are willing to give up Win95 support change this to #if 0
+> 		//  otherwise we are back to using assembler.
+> 		//  (But only if building with compilers that support inline assembler.)
+> 		//
+714c712
+<     #else
+---
+> #else
+722,723d719
+< 
+<     #endif
