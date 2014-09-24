@@ -1,0 +1,54 @@
+153a154,156
+> #if (defined(WIN64) || defined(_WIN64))
+> 			hRootKey = (HKEY)((unsigned int)aStdKeys[ui].hkey & 0xffffffff);
+> #else
+154a158
+> #endif
+170c174
+<   return (wxRegKey::StdKey)(int)hRootKey;
+---
+>   return (wxRegKey::StdKey)ui;
+174a179,181
+> #if (defined(WIN64) || defined(_WIN64))
+> 	hkey = (HKEY)((unsigned int)hkey & 0xffffffff);
+> #endif
+191,192c198,202
+<   m_hRootKey = (WXHKEY) aStdKeys[HKCR].hkey;
+< 
+---
+> #if (defined(WIN64) || defined(_WIN64))
+>   m_hRootKey = (WXHKEY)((unsigned int)aStdKeys[HKCR].hkey & 0xffffffff);
+> #else
+> 	m_hRootKey = (WXHKEY) aStdKeys[HKCR].hkey;
+> #endif
+198,199c208,212
+<   m_hRootKey  = (WXHKEY) aStdKeys[ExtractKeyName(m_strKey)].hkey;
+< 
+---
+> #if (defined(WIN64) || defined(_WIN64))
+>   m_hRootKey  = (WXHKEY) ((unsigned int)aStdKeys[ExtractKeyName(m_strKey)].hkey & 0xffffffff);
+> #else
+> 	m_hRootKey  = (WXHKEY) aStdKeys[ExtractKeyName(m_strKey)].hkey;
+> #endif
+206a220
+> #if (defined(WIN64) || defined(_WIN64))
+207a222,224
+> #else
+> 	m_hRootKey  = (WXHKEY) aStdKeys[keyParent].hkey & 0xffffffff;
+> #endif
+246c263,267
+<   m_hRootKey = (WXHKEY) aStdKeys[ExtractKeyName(m_strKey)].hkey;
+---
+> #if (defined(WIN64) || defined(_WIN64))
+>   m_hRootKey = (WXHKEY) ((unsigned int)aStdKeys[ExtractKeyName(m_strKey)].hkey & 0xffffffff);
+> #else
+> 	m_hRootKey = (WXHKEY) aStdKeys[ExtractKeyName(m_strKey)].hkey;
+> #endif
+256c277,281
+<   m_hRootKey = (WXHKEY) aStdKeys[keyParent].hkey;
+---
+> #if (defined(WIN64) || defined(_WIN64))
+>   m_hRootKey = (WXHKEY) ((unsigned int)aStdKeys[keyParent].hkey & 0xffffffff);
+> #else
+> 	m_hRootKey = (WXHKEY) aStdKeys[keyParent].hkey;
+> #endif
