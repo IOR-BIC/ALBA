@@ -231,6 +231,11 @@ void medOpComputeInertialTensor::OnEvent(mafEventBase *maf_event)
           result = ComputeInertialTensorFromGroup();
         }
 
+				//Rescaling Center Of Mass
+				m_CenterOfMass[0] = m_CenterOfMass[0] / m_Mass; 
+				m_CenterOfMass[1] = m_CenterOfMass[1] / m_Mass;
+				m_CenterOfMass[2] = m_CenterOfMass[2] / m_Mass;
+
         if (result==OP_RUN_CANCEL)
         {
           OpStop(result);
@@ -708,11 +713,7 @@ int medOpComputeInertialTensor::ComputeInertialTensorUsingGeometry(mafNode* node
   double Cx = _Cx * rr;
   double Cy = _Cy * rr;
   double Cz = _Cz * rr;
-
-  m_CenterOfMass[0] += Cx;
-  m_CenterOfMass[1] += Cy;
-  m_CenterOfMass[2] += Cz;
-
+	  
   // Mass
   double m = _m / 6;
 
@@ -787,6 +788,10 @@ int medOpComputeInertialTensor::ComputeInertialTensorUsingGeometry(mafNode* node
 
   // store the mass for later use
   double mass = scale * m;
+
+	m_CenterOfMass[0] += Cx * mass;
+	m_CenterOfMass[1] += Cy * mass;
+	m_CenterOfMass[2] += Cz * mass;
 
   pair<mafNode* , double> nodeMassPair(node , mass);
 
@@ -924,10 +929,6 @@ int medOpComputeInertialTensor::ComputeInertialTensorUsingMonteCarlo(mafNode* no
   com[1] /= pcom;
   com[2] /= pcom;
 
-  m_CenterOfMass[0] += com[0];
-  m_CenterOfMass[1] += com[1];
-  m_CenterOfMass[2] += com[2];
-
   if (!m_TestMode)
   {
     mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,50.0));
@@ -1011,19 +1012,19 @@ int medOpComputeInertialTensor::ComputeInertialTensorUsingMonteCarlo(mafNode* no
   // NB: the scale factor should be used when the mass is measured using VTK method (vtk compatibility) rather than MC method. 
   //     in this case also the tensor components need to be rescaled by the ratio mass_VTK/mass_MC.
   double scale = 1.0;
+	double mass;
   double mc_mass = hycube_m * poly_hycube_mratio;
   if (!m_Vtkcomp)
   {
-    m_Mass += mc_mass;
+     mass = mc_mass;
   }
   else
   {
-    double vtk_mass = GetSurfaceMassFromVTK(node);
-
-    m_Mass += vtk_mass;
-
-    scale = vtk_mass/mc_mass;
+    mass = GetSurfaceMassFromVTK(node);
+    scale = mass/mc_mass;
   }
+
+	m_Mass+=mass;
 
   // fill final inertia tensor
   a[0][0] = hycube_m*ph_t11ratio;
@@ -1059,6 +1060,10 @@ int medOpComputeInertialTensor::ComputeInertialTensorUsingMonteCarlo(mafNode* no
   m_InertialTensor[6] += scale * a[2][0];
   m_InertialTensor[7] += scale * a[2][1];
   m_InertialTensor[8] += scale * a[2][2];
+
+	m_CenterOfMass[0] += com[0] * mass;
+	m_CenterOfMass[1] += com[1] * mass;
+	m_CenterOfMass[2] += com[2] * mass;
 
   if(!m_TestMode)
   {
@@ -1118,10 +1123,6 @@ int medOpComputeInertialTensor::ComputeInertialTensorFromGroup()
 	  ComputeInertialTensor(childSurface,i+1,n_of_surfaces);
     }
   }
-
-  m_CenterOfMass[0] = m_CenterOfMass[0] / n_of_surfaces; 
-  m_CenterOfMass[1] = m_CenterOfMass[1] / n_of_surfaces;
-  m_CenterOfMass[2] = m_CenterOfMass[2] / n_of_surfaces;
 
   result = OP_RUN_OK;
 
