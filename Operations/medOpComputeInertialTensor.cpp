@@ -43,6 +43,11 @@ using namespace std;
 #include "vtkMassProperties.h"
 #include "vtkGeometryFilter.h"
 #include "vtkMAFCellLocator.h"
+#include "vtkTransformPolyDataFilter.h"
+#include "vtkMAFSmartPointer.h"
+#include "vtkTransformPolyDataFilter.h"
+#include "vtkTransform.h"
+
 
 #include "mafDecl.h"
 #include "mafEvent.h"
@@ -51,6 +56,7 @@ using namespace std;
 #include "mafVMESurface.h"
 #include "mafVMEOutput.h"
 #include "mafTagArray.h"
+
 
 //----------------------------------------------------------------------------
 // Defines :
@@ -584,16 +590,22 @@ int medOpComputeInertialTensor::ComputeInertialTensorUsingGeometry(mafNode* node
   {
     return result;
   }
-  
-  // get surface
-  mafVMESurface* surf = (mafVMESurface*) node;
-  if (surf->GetOutput() == NULL || surf->GetOutput()->GetVTKData() == NULL)
-    return result;
-  surf->GetOutput()->Update();
-  surf->GetOutput()->GetVTKData()->Update();
+   
+	// get surface
+	mafVMESurface* surf = (mafVMESurface*) node;
+	if (surf->GetOutput() == NULL || surf->GetOutput()->GetVTKData() == NULL)
+		return result;
+	surf->GetOutput()->Update();
+	surf->GetOutput()->GetVTKData()->Update();
+	
+	vtkMAFSmartPointer<vtkTransformPolyDataFilter> tranformFilter;
+  tranformFilter->SetInput((vtkPolyData *)surf->GetOutput()->GetVTKData());
+  tranformFilter->SetTransform(surf->GetOutput()->GetTransform()->GetVTKTransform());
+  tranformFilter->Update();
 
-  // get dataset
-  vtkDataSet* ds = surf->GetOutput()->GetVTKData();
+	// get dataset
+	vtkDataSet* ds = tranformFilter->GetOutput();
+
   int npoints = ds->GetNumberOfPoints();
   int ncells = ds->GetNumberOfCells();
 
@@ -841,6 +853,14 @@ int medOpComputeInertialTensor::ComputeInertialTensorUsingMonteCarlo(mafNode* no
   surf->GetOutput()->Update();
   surf->GetOutput()->GetVTKData()->Update();
 
+	vtkMAFSmartPointer<vtkTransformPolyDataFilter> tranformFilter;
+	tranformFilter->SetInput((vtkPolyData *)surf->GetOutput()->GetVTKData());
+	tranformFilter->SetTransform(surf->GetOutput()->GetTransform()->GetVTKTransform());
+	tranformFilter->Update();
+
+	// get dataset
+	vtkDataSet* ds = tranformFilter->GetOutput();
+
   // wx stuff
   wxBusyInfo *wait;
   wxString str("Computing inertial tensor: surface ");
@@ -855,19 +875,14 @@ int medOpComputeInertialTensor::ComputeInertialTensorUsingMonteCarlo(mafNode* no
   }
   
   // get dataset
-  vtkDataSet* ds = surf->GetOutput()->GetVTKData();
   vtkGeometryFilter* gfilter = vtkGeometryFilter::New();
   gfilter->SetInput(ds);
   gfilter->Update();
   vtkPolyData* pd = gfilter->GetOutput();
 
-  // get vme bounds
-  double vme_bounds[6];
-  surf->GetOutput()->GetBounds(vme_bounds);
-
-  // get dataset bounds
-  double ds_bounds[6];
-  ds->GetBounds(ds_bounds);
+  // get bounds
+  double bounds[6];
+  ds->GetBounds(bounds);
   
   // initialize points for Monte Carlo method
   double pint = 0; // this is the counter for the internal points
@@ -901,15 +916,15 @@ int medOpComputeInertialTensor::ComputeInertialTensorUsingMonteCarlo(mafNode* no
   for (int i=0; i<m_Accuracy; i++)
   {
     // get random point
-    double x = vtkMath::Random(vme_bounds[0],vme_bounds[1]);
-    double y = vtkMath::Random(vme_bounds[2],vme_bounds[3]);
-    double z = vtkMath::Random(vme_bounds[4],vme_bounds[5]);
+    double x = vtkMath::Random(bounds[0],bounds[1]);
+    double y = vtkMath::Random(bounds[2],bounds[3]);
+    double z = vtkMath::Random(bounds[4],bounds[5]);
     
     // refer points to the center of the bounding box for vtk calculations
     double p[3];
-    p[0] = x - (vme_bounds[0] - ds_bounds[0]);
-    p[1] = y - (vme_bounds[2] - ds_bounds[2]);
-    p[2] = z - (vme_bounds[4] - ds_bounds[4]);
+    p[0] = x;
+    p[1] = y;
+    p[2] = z;
     
     // is it inside surface? (the algorithm assumes the surface is closed)
     if (IsInsideSurface(pd,p))
@@ -939,15 +954,15 @@ int medOpComputeInertialTensor::ComputeInertialTensorUsingMonteCarlo(mafNode* no
   for (int i=0; i<m_Accuracy; i++)
   {
     // get random point
-    double x = vtkMath::Random(vme_bounds[0],vme_bounds[1]);
-    double y = vtkMath::Random(vme_bounds[2],vme_bounds[3]);
-    double z = vtkMath::Random(vme_bounds[4],vme_bounds[5]);
+    double x = vtkMath::Random(bounds[0],bounds[1]);
+    double y = vtkMath::Random(bounds[2],bounds[3]);
+    double z = vtkMath::Random(bounds[4],bounds[5]);
     
     // refer points to the center of the bounding box for vtk calculations
     double p[3];
-    p[0] = x - (vme_bounds[0] - ds_bounds[0]);
-    p[1] = y - (vme_bounds[2] - ds_bounds[2]);
-    p[2] = z - (vme_bounds[4] - ds_bounds[4]);
+    p[0] = x;
+    p[1] = y;
+    p[2] = z;
 
     // is it inside surface? (the algorithm assumes the surface is closed)
     if (IsInsideSurface(pd,p))
@@ -984,7 +999,7 @@ int medOpComputeInertialTensor::ComputeInertialTensorUsingMonteCarlo(mafNode* no
   ai2[1] = ai1[2];
 
   // get hypercube volume and mass
-  double hycube_v = abs(ds_bounds[1]-ds_bounds[0]) * abs(ds_bounds[3]-ds_bounds[2]) * abs(ds_bounds[5]-ds_bounds[4]);
+  double hycube_v = abs(bounds[1]-bounds[0]) * abs(bounds[3]-bounds[2]) * abs(bounds[5]-bounds[4]);
   
   double density = GetDensity(node);
 
