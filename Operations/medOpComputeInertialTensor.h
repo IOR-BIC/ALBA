@@ -111,50 +111,18 @@ protected:
   /** Create the dialog interface for the importer. */
   virtual void CreateGui();
 
-  /** Get surface volume. */
-  double GetSurfaceVolume(mafNode* node);
-
-  /** Get surface area. */
-  double GetSurfaceArea(mafNode* node);
-
-  /** Get surface mass using volume. */
-  double GetSurfaceMassFromVolume(mafNode* node);
-
-  /** Get surface mass using area. */
-  double GetSurfaceMassFromArea(mafNode* node);
-
-  /** Compute mass using both surface and volume. (VTK method, most accurate)*/
-  double GetSurfaceMassFromVTK(mafNode* node);
-
-  /** Get if a point is inside or outside a surface */
-  int IsInsideSurface(vtkPolyData* surface, double x[3]);
-
-  /** Calculate inertial tensor using Monte Carlo approach.
-      This algorithm requires time and resources but is efficient for complex surfaces.
-  */
-  int ComputeInertialTensorUsingMonteCarlo(mafNode* node, int current_node = 1, int n_of_nodes = 1);
-
-  /** Calculate inertial tensor using geometry.
-      This algorithm is fast but 
-  */
-  int ComputeInertialTensorUsingGeometry(mafNode* node, int current_node = 1, int n_of_nodes = 1);
- 
   
+  
+
   enum GUI_METHOD_ID
   {
-    ID_COMBO = MINID,
-	  ID_ACCURACY,
+	  ID_ACCURACY = MINID,
 	  ID_VTKCOMP,
     MINID,
-	ID_HELP,
+		ID_HELP,
   };	
 
-  enum COMPUTATION_METHOD
-  {
-    MONTE_CARLO = 0,
-    GEOMETRY,
-  };	
-  
+   
   double  m_DefaultDensity;                            // Material density
   double  m_Mass;                               // Material mass
   double  m_Principal_I1,m_Principal_I2,m_Principal_I3;  // Principal Inertial Tensor components.
@@ -172,9 +140,7 @@ protected:
 
   double m_CenterOfMass[3];
 
-  int m_MethodToUse;
   int m_Accuracy;
-  int m_Vtkcomp;
 
   vector<pair<mafNode * , double>> m_NodeMassPairVector;
 
