@@ -121,6 +121,8 @@ mafOp(label)
 medOpComputeInertialTensor::~medOpComputeInertialTensor( ) 
 //----------------------------------------------------------------------------
 {
+	m_LocalInertiaTensors.clear();
+	m_NodeMassPairVector.clear();
 }
 //----------------------------------------------------------------------------
 mafOp* medOpComputeInertialTensor::Copy()   
@@ -231,12 +233,7 @@ void medOpComputeInertialTensor::OnEvent(mafEventBase *maf_event)
         {
           result = ComputeInertialTensorFromGroup();
         }
-
-				//Rescaling Center Of Mass
-				m_CenterOfMass[0] = m_CenterOfMass[0] / m_Mass; 
-				m_CenterOfMass[1] = m_CenterOfMass[1] / m_Mass;
-				m_CenterOfMass[2] = m_CenterOfMass[2] / m_Mass;
-
+				
         if (result==OP_RUN_CANCEL)
         {
           OpStop(result);
@@ -357,7 +354,7 @@ void medOpComputeInertialTensor::CreateGui()
 
 
 //----------------------------------------------------------------------------
-int medOpComputeInertialTensor::ComputeInertialTensor(mafNode* node, int current_node, int n_of_nodes)
+int medOpComputeInertialTensor::ComputeLocalInertialTensor(mafNode* node, int current_node, int n_of_nodes)
 //----------------------------------------------------------------------------
 {
   //tensor components
@@ -378,13 +375,13 @@ int medOpComputeInertialTensor::ComputeInertialTensor(mafNode* node, int current
 
   if (!node->IsMAFType(mafVMESurface))
   {
-    return result;
+    return OP_RUN_CANCEL;
   }
    
 	// get surface
 	mafVMESurface* surf = (mafVMESurface*) node;
 	if (surf->GetOutput() == NULL || surf->GetOutput()->GetVTKData() == NULL)
-		return result;
+		return OP_RUN_CANCEL;
 	surf->GetOutput()->Update();
 	surf->GetOutput()->GetVTKData()->Update();
 	
@@ -401,7 +398,7 @@ int medOpComputeInertialTensor::ComputeInertialTensor(mafNode* node, int current
 
   if (ncells==0)
   {
-    return result;
+    return OP_RUN_CANCEL;
   }
 
   // wx stuff
@@ -420,19 +417,16 @@ int medOpComputeInertialTensor::ComputeInertialTensor(mafNode* node, int current
   // initialize variables
   int pId, qId, rId;
   double p[3],q[3],r[3];
-  double *a[3], a0[3], a1[3], a2[3], *v[3], v0[3], v1[3], v2[3];
 
-  double _xx=0; double _yy=0; double _zz=0;
-  double _yx=0; double _zx=0; double _zy=0;
-  double _Cx=0; double _Cy=0; double _Cz=0;
-  double _m=0;
+	LocalInertiaTensor lit; 
   
-  a[0] = a0; a[1] = a1; a[2] = a2;
-  for (int i=0; i<3; i++ )
-    {
-    a0[i] = a1[i] = a2[i] = 0.0;
-    }
+  lit._xx=0; lit._yy=0; lit._zz=0;
+  lit._yx=0; lit._zx=0; lit._zy=0;
+  lit._Cx=0; lit._Cy=0; lit._Cz=0;
+  lit._m=0;
+	lit._node=node;
   
+ 
   // loop through cells
   for (int i=0; i<ncells;i++)
   {
@@ -479,27 +473,27 @@ int medOpComputeInertialTensor::ComputeInertialTensor(mafNode* node, int current
       double z3=r[2];
 
       // Signed volume of this tetrahedron.
-      double v = x1*y2*z3 + y1*z2*x3 + x2*y3*z1 -
+      double vol = x1*y2*z3 + y1*z2*x3 + x2*y3*z1 -
                   (x3*y2*z1 + x2*y1*z3 + y3*z2*x1);
         
       // Contribution to the mass
-      _m += v;
+      lit._m += vol;
 
       // Contribution to the centroid
       double x4 = x1 + x2 + x3;           
-      _Cx += (v * x4);
+      lit._Cx += (vol * x4);
       double y4 = y1 + y2 + y3;           
-      _Cy += (v * y4);
+      lit._Cy += (vol * y4);
       double z4 = z1 + z2 + z3;           
-      _Cz += (v * z4);
+      lit._Cz += (vol * z4);
 
       // Contribution to moment of inertia 
-      _xx += v * (x1*x1 + x2*x2 + x3*x3 + x4*x4);
-      _yy += v * (y1*y1 + y2*y2 + y3*y3 + y4*y4);
-      _zz += v * (z1*z1 + z2*z2 + z3*z3 + z4*z4);
-      _yx += v * (y1*x1 + y2*x2 + y3*x3 + y4*x4);
-      _zx += v * (z1*x1 + z2*x2 + z3*x3 + z4*x4);
-      _zy += v * (z1*y1 + z2*y2 + z3*y3 + z4*y4);
+      lit._xx += vol * (x1*x1 + x2*x2 + x3*x3 + x4*x4);
+      lit._yy += vol * (y1*y1 + y2*y2 + y3*y3 + y4*y4);
+      lit._zz += vol * (z1*z1 + z2*z2 + z3*z3 + z4*z4);
+      lit._yx += vol * (y1*x1 + y2*x2 + y3*x3 + y4*x4);
+      lit._zx += vol * (z1*x1 + z2*x2 + z3*x3 + z4*x4);
+      lit._zy += vol * (z1*y1 + z2*y2 + z3*y3 + z4*y4);
 
       if (!m_TestMode)
       {
@@ -509,107 +503,141 @@ int medOpComputeInertialTensor::ComputeInertialTensor(mafNode* node, int current
     } // end foreach triangle
   }// end foreach cell
 
-  // Centroid.  
-  // The case _m = 0 needs to be addressed here.
-  double rr = 1.0 / (4 * _m);
-  double Cx = _Cx * rr;
-  double Cy = _Cy * rr;
-  double Cz = _Cz * rr;
-	  
-  // Mass
-  double m = _m / 6;
+	lit._density = GetDensity(node);
 
-  // Moment of inertia about the centroid.
-  rr = 1.0 / 120;
-  double Iyx = _yx * rr - m * Cy*Cx;
-  double Izx = _zx * rr - m * Cz*Cx;
-  double Izy = _zy * rr - m * Cz*Cy;
+	if (lit._density == DENSITY_NOT_FOUND)
+	{
 
-  _xx = _xx * rr - m * Cx*Cx;
-  _yy = _yy * rr - m * Cy*Cy;
-  _zz = _zz * rr - m * Cz*Cz;
+		lit._density = m_DefaultDensity;
 
-  double Ixx = _yy + _zz;
-  double Iyy = _zz + _xx;
-  double Izz = _xx + _yy;  
+		std::ostringstream stringStream;
+		stringStream << DENSITY_TAG_NAME.c_str() << " tag not found. Using default density value ie " << lit._density << std::endl;          			
+		mafLogMessage(stringStream.str().c_str());
 
-  // Fill matrix 
-  a0[0] = Ixx; a0[1] = Iyx; a0[2] = Izx;
-  a1[0] = Iyx; a1[1] = Iyy; a1[2] = Izy;
-  a2[0] = Izx; a2[1] = Izy; a2[2] = Izz;
+	}
+	else
+	{
+		std::ostringstream stringStream;
+		stringStream << DENSITY_TAG_NAME.c_str() << " tag found. Using value " << lit._density << std::endl;          			
+		mafLogMessage(stringStream.str().c_str());
+	}
 
+	m_LocalInertiaTensors.push_back(lit);
 
-  // by the spectral theorem, since the moment of inertia tensor is real and symmetric, there exists a Cartesian coordinate system in which it is diagonal,
-  // the coordinate axes are called the principal axes and the constants I1, I2 and I3 are called the principal moments of inertia. 
-  // extract eigenvalues from jacobian matorix (inertial tensor components referred to principal axes).
-  double eval[3];
-  v[0] = v0; v[1] = v1; v[2] = v2; 
-  vtkMath::Jacobi(a,eval,v);
+	if(!m_TestMode)
+	{
+		mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
+		wxSetCursor(wxCursor(wxCURSOR_DEFAULT));
+		cppDEL(wait);
+	}
+	
+	return OP_RUN_OK;
+}
+//----------------------------------------------------------------------------
+void medOpComputeInertialTensor::ComputeGlobalInertiaTensor()
+//----------------------------------------------------------------------------
+{
+	double *a[3], a0[3], a1[3], a2[3], *v[3], v0[3], v1[3], v2[3];
+	a[0] = a0; a[1] = a1; a[2] = a2;
+	for (int i=0; i<3; i++ )
+	{
+		a0[i] = a1[i] = a2[i] = 0.0;
+	}
 
-  // scale by the density
+	//Calculating Center Of Mass
+	for (int i=0;i<m_LocalInertiaTensors.size();i++)
+	{
+		LocalInertiaTensor lit=m_LocalInertiaTensors[i];
+		
+		// Centroid.  
+		// The case _m = 0 needs to be addressed here.
+		double rr = 1.0 / (4 * lit._m);
+		double Cx = lit._Cx * rr;
+		double Cy = lit._Cy * rr;
+		double Cz = lit._Cz * rr;
 
-  double density = GetDensity(node);
+		// Mass
+		double m = lit._m / 6;
+
+		// store the mass for later use
+		double mass = lit._density * m;
+
+		m_CenterOfMass[0] += Cx * mass;
+		m_CenterOfMass[1] += Cy * mass;
+		m_CenterOfMass[2] += Cz * mass;
+
+		pair<mafNode* , double> nodeMassPair(lit._node , mass);
+		m_NodeMassPairVector.push_back(nodeMassPair);
+
+		m_Mass += mass;
+	}
   
-  if (density == DENSITY_NOT_FOUND)
-  {
+	//Rescaling Center Of Mass
+	m_CenterOfMass[0] /= m_Mass; 
+	m_CenterOfMass[1] /= m_Mass;
+	m_CenterOfMass[2] /= m_Mass;
 
-	  density = m_DefaultDensity;
+	//simple address global center of mass
+	double gCx=m_CenterOfMass[0];
+	double gCy=m_CenterOfMass[1];
+	double gCz=m_CenterOfMass[2];
 
-	  std::ostringstream stringStream;
-	  stringStream << DENSITY_TAG_NAME.c_str() << " tag not found. Using default density value ie " << density << std::endl;          			
-	  mafLogMessage(stringStream.str().c_str());
-	  
-  }
-  else
-  {
-	  std::ostringstream stringStream;
-	  stringStream << DENSITY_TAG_NAME.c_str() << " tag found. Using value " << density << std::endl;          			
-	  mafLogMessage(stringStream.str().c_str());
+	//Calculating Global Inertia Tensor
+	for (int i=0;i<m_LocalInertiaTensors.size();i++)
+	{
+		LocalInertiaTensor lit=m_LocalInertiaTensors[i];
 
-  }
+		// Mass
+		double m = lit._m / 6;
 
-  double scale = density;
+		// Moment of inertia about the center of mass.
+		double rr = 1.0 / 120;
+		double Iyx = lit._yx * rr - m * gCy*gCx;
+		double Izx = lit._zx * rr - m * gCz*gCx;
+		double Izy = lit._zy * rr - m * gCz*gCy;
 
-  // scale the inertial tensor with the density
-  m_InertialTensor[0] += scale * Ixx;
-  m_InertialTensor[1] += scale * Iyx;
-  m_InertialTensor[2] += scale * Izx;
+		double _xx = lit._xx * rr - m * gCx*gCx;
+		double _yy = lit._yy * rr - m * gCy*gCy;
+		double _zz = lit._zz * rr - m * gCz*gCz;
 
-  m_InertialTensor[3] += scale * Iyx;
-  m_InertialTensor[4] += scale * Iyy;
-  m_InertialTensor[5] += scale * Izy;
+		double Ixx = _yy + _zz;
+		double Iyy = _zz + _xx;
+		double Izz = _xx + _yy;  
 
-  m_InertialTensor[6] += scale * Izx;
-  m_InertialTensor[7] += scale * Izy;
-  m_InertialTensor[8] += scale * Izz;
+		// Fill matrix 
+		a0[0] = Ixx; a0[1] = Iyx; a0[2] = Izx;
+		a1[0] = Iyx; a1[1] = Iyy; a1[2] = Izy;
+		a2[0] = Izx; a2[1] = Izy; a2[2] = Izz;
 
-  // scale the principal inertial tensor components with the density
-  m_Principal_I1 += scale*eval[0];
-  m_Principal_I2 += scale*eval[1];
-  m_Principal_I3 += scale*eval[2];
 
-  // store the mass for later use
-  double mass = scale * m;
+		// by the spectral theorem, since the moment of inertia tensor is real and symmetric, there exists a Cartesian coordinate system in which it is diagonal,
+		// the coordinate axes are called the principal axes and the constants I1, I2 and I3 are called the principal moments of inertia. 
+		// extract eigenvalues from jacobian matorix (inertial tensor components referred to principal axes).
+		double eval[3];
+		v[0] = v0; v[1] = v1; v[2] = v2; 
+		vtkMath::Jacobi(a,eval,v);
 
-	m_CenterOfMass[0] += Cx * mass;
-	m_CenterOfMass[1] += Cy * mass;
-	m_CenterOfMass[2] += Cz * mass;
+		// scale by the density
+		double scale = lit._density;
 
-  pair<mafNode* , double> nodeMassPair(node , mass);
+		// scale the inertial tensor with the density
+		m_InertialTensor[0] += scale * Ixx;
+		m_InertialTensor[1] += scale * Iyx;
+		m_InertialTensor[2] += scale * Izx;
 
-  m_NodeMassPairVector.push_back(nodeMassPair);
+		m_InertialTensor[3] += scale * Iyx;
+		m_InertialTensor[4] += scale * Iyy;
+		m_InertialTensor[5] += scale * Izy;
 
-  m_Mass += mass;
+		m_InertialTensor[6] += scale * Izx;
+		m_InertialTensor[7] += scale * Izy;
+		m_InertialTensor[8] += scale * Izz;
 
-  if(!m_TestMode)
-  {
-    mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
-    wxSetCursor(wxCursor(wxCURSOR_DEFAULT));
-    cppDEL(wait);
-  }
-
-  result = OP_RUN_OK;
-  return result;
+		// scale the principal inertial tensor components with the density
+		m_Principal_I1 += scale*eval[0];
+		m_Principal_I2 += scale*eval[1];
+		m_Principal_I3 += scale*eval[2];
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -655,16 +683,21 @@ int medOpComputeInertialTensor::ComputeInertialTensorFromGroup()
 	  wxString s;
 	  s << "Computing Inertial tensor for: " << childSurface->GetName();
 	  mafLogMessage(s.c_str());      
-	  ComputeInertialTensor(childSurface,i+1,n_of_surfaces);
+	  ComputeLocalInertialTensor(childSurface,i+1,n_of_surfaces);
     }
   }
+
+	//merge local calculation to the global inertia tensor
+	ComputeGlobalInertiaTensor();
 
   result = OP_RUN_OK;
 
   return result;
 }
 
+//----------------------------------------------------------------------------
 double medOpComputeInertialTensor::GetDensity( mafNode* node)
+//----------------------------------------------------------------------------
 {
 	double density = DENSITY_NOT_FOUND;
 
@@ -682,7 +715,9 @@ double medOpComputeInertialTensor::GetDensity( mafNode* node)
 	}
 }
 
+//----------------------------------------------------------------------------
 double medOpComputeInertialTensor::GetMass( mafNode* node)
+//----------------------------------------------------------------------------
 {
 	double mass = SURFACE_MASS_NOT_FOUND;
 
@@ -702,12 +737,28 @@ double medOpComputeInertialTensor::GetMass( mafNode* node)
 	}
 }
 
+//----------------------------------------------------------------------------
 double medOpComputeInertialTensor::GetDefaultDensity()
+//----------------------------------------------------------------------------
 {
 	return m_DefaultDensity;
 }
 
+//----------------------------------------------------------------------------
 void medOpComputeInertialTensor::SetDefaultDensity( double val )
+//----------------------------------------------------------------------------
 {
 	m_DefaultDensity = val;
+}
+
+//----------------------------------------------------------------------------
+int medOpComputeInertialTensor::ComputeInertialTensor(mafNode* node)
+//----------------------------------------------------------------------------
+{
+	 int result = ComputeLocalInertialTensor(node);
+	 if (result!=OP_RUN_CANCEL)
+	 {
+		 ComputeGlobalInertiaTensor();
+	 }
+	 return result;
 }
