@@ -88,8 +88,8 @@ public:
   /** Return the default density value used for computation */
   double GetDefaultDensity();
 
-  /** Calculate inertial tensor components from a surface and store them in the input vme. */
-  int ComputeInertialTensor(mafNode* node, int current_node = 1, int n_of_nodes = 1);
+	/** Calculate inertial tensor components from a surface */
+	int ComputeInertialTensor(mafNode* node);
 
   /** Calculate inertial tensor components from a group of surfaces and store them in the input vme. */
   int ComputeInertialTensorFromGroup();
@@ -100,8 +100,23 @@ public:
   /** Get the VME mass from the "SURFACE_MASS" tag if existent otherwise returns: */  enum {SURFACE_MASS_NOT_FOUND = -1};
   static double GetMass( mafNode* node);
 
-protected: 
+protected:
 
+	typedef struct locInTensor{
+		double _xx; double _yy; double _zz;
+		double _yx; double _zx; double _zy;
+		double _Cx; double _Cy; double _Cz;
+		double _m; 
+		double _density;
+		mafNode *_node;
+	} LocalInertiaTensor;
+
+	/** Computes Inertial tensor referred to a single node, and fill m_LocalInertiaTensors vector */
+	int ComputeLocalInertialTensor(mafNode* node, int current_node = 1, int n_of_nodes = 1);
+
+	/** Uses m_LocalInertiaTensors partial data to calculate the inertia tensor of the total system */
+	void ComputeGlobalInertiaTensor();
+	
 	/** Get the VME density from the "DENSITY" tag if existent otherwise returns: */  enum {DENSITY_NOT_FOUND = -1};
 	double GetDensity( mafNode* node);
 	
@@ -111,50 +126,17 @@ protected:
   /** Create the dialog interface for the importer. */
   virtual void CreateGui();
 
-  /** Get surface volume. */
-  double GetSurfaceVolume(mafNode* node);
-
-  /** Get surface area. */
-  double GetSurfaceArea(mafNode* node);
-
-  /** Get surface mass using volume. */
-  double GetSurfaceMassFromVolume(mafNode* node);
-
-  /** Get surface mass using area. */
-  double GetSurfaceMassFromArea(mafNode* node);
-
-  /** Compute mass using both surface and volume. (VTK method, most accurate)*/
-  double GetSurfaceMassFromVTK(mafNode* node);
-
-  /** Get if a point is inside or outside a surface */
-  int IsInsideSurface(vtkPolyData* surface, double x[3]);
-
-  /** Calculate inertial tensor using Monte Carlo approach.
-      This algorithm requires time and resources but is efficient for complex surfaces.
-  */
-  int ComputeInertialTensorUsingMonteCarlo(mafNode* node, int current_node = 1, int n_of_nodes = 1);
-
-  /** Calculate inertial tensor using geometry.
-      This algorithm is fast but 
-  */
-  int ComputeInertialTensorUsingGeometry(mafNode* node, int current_node = 1, int n_of_nodes = 1);
- 
+  vector <LocalInertiaTensor> m_LocalInertiaTensors;
   
   enum GUI_METHOD_ID
   {
-    ID_COMBO = MINID,
-	  ID_ACCURACY,
+	  ID_ACCURACY = MINID,
 	  ID_VTKCOMP,
     MINID,
-	ID_HELP,
+		ID_HELP,
   };	
 
-  enum COMPUTATION_METHOD
-  {
-    MONTE_CARLO = 0,
-    GEOMETRY,
-  };	
-  
+   
   double  m_DefaultDensity;                            // Material density
   double  m_Mass;                               // Material mass
   double  m_Principal_I1,m_Principal_I2,m_Principal_I3;  // Principal Inertial Tensor components.
@@ -172,9 +154,9 @@ protected:
 
   double m_CenterOfMass[3];
 
-  int m_MethodToUse;
+
+
   int m_Accuracy;
-  int m_Vtkcomp;
 
   vector<pair<mafNode * , double>> m_NodeMassPairVector;
 
