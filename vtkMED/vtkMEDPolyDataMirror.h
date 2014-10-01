@@ -33,25 +33,25 @@ public:
 
   static vtkMEDPolyDataMirror *New();
   
-  void SetMirrorXCoordinate(int value){MirrorXCoordinate = value;};
+  void SetMirrorXCoordinate(int value){MirrorXCoordinate = value; Modified();};
   int GetMirrorXCoordinate(){return MirrorXCoordinate;};
-  void MirrorXCoordinateOn(){MirrorXCoordinate = 1;}
-  void MirrorXCoordinateOff(){MirrorXCoordinate = 0;}
+  void MirrorXCoordinateOn(){MirrorXCoordinate = 1; Modified();}
+  void MirrorXCoordinateOff(){MirrorXCoordinate = 0; Modified();}
 
-  void SetMirrorYCoordinate(int value){MirrorYCoordinate = value;};
+  void SetMirrorYCoordinate(int value){MirrorYCoordinate = value; Modified();};
   int GetMirrorYCoordinate(){return MirrorYCoordinate;};
-  void MirrorYCoordinateOn(){MirrorYCoordinate = 1;}
-  void MirrorYCoordinateOff(){MirrorYCoordinate = 0;}
+  void MirrorYCoordinateOn(){MirrorYCoordinate = 1; Modified();}
+  void MirrorYCoordinateOff(){MirrorYCoordinate = 0; Modified();}
 
-  void SetMirrorZCoordinate(int value){MirrorZCoordinate = value;};
+  void SetMirrorZCoordinate(int value){MirrorZCoordinate = value; Modified();};
   int GetMirrorZCoordinate(){return MirrorZCoordinate;};
-  void MirrorZCoordinateOn(){MirrorZCoordinate = 1;}
-  void MirrorZCoordinateOff(){MirrorZCoordinate = 0;}
+  void MirrorZCoordinateOn(){MirrorZCoordinate = 1; Modified();}
+  void MirrorZCoordinateOff(){MirrorZCoordinate = 0; Modified();}
 
-  void SetFlipNormals(int value){FlipNormals = value;};
+  void SetFlipNormals(int value){FlipNormals = value; Modified();};
   int GetFlipNormals(){return FlipNormals;};
-  void FlipNormalsOn(){FlipNormals = 1;}
-  void FlipNormalsOff(){FlipNormals = 0;}
+  void FlipNormalsOn(){FlipNormals = 1; Modified();}
+  void FlipNormalsOff(){FlipNormals = 0; Modified();}
 
 protected:
   vtkMEDPolyDataMirror();
