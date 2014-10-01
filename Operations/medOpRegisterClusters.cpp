@@ -1110,6 +1110,7 @@ void medOpRegisterClusters::OnChooseVme(mafNode *vme)
 	if (source != NULL)
 	{	
 		CreateMatches();	//make sure, we have matches
+		InitializeWeights();
 		
 		int number = source->GetNumberOfLandmarks();
 		for (int i = 0; i < number; i++)
