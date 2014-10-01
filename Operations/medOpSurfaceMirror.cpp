@@ -153,21 +153,9 @@ void medOpSurfaceMirror::OpRun()
 	}
 
   m_MirrorFilter = vtkMEDPolyDataMirror::New();
-  //mafProgressMacro(mirrorFilter,"mirroring surface");
   m_MirrorFilter->SetInput(m_InputPolydata);
-  m_MirrorFilter->SetMirrorXCoordinate(m_MirrorX);
-  m_MirrorFilter->SetMirrorYCoordinate(m_MirrorY);
-  m_MirrorFilter->SetMirrorZCoordinate(m_MirrorZ);
-  //m_MirrorFilter->SetFlipNormals(m_FlipNormals);
-  m_MirrorFilter->Update();
-	
-  m_OutputPolydata->DeepCopy(m_MirrorFilter->GetOutput());
-  m_OutputPolydata->Update();
 
-  ((mafVMESurface *)m_Input)->SetData(m_OutputPolydata,((mafVME *)m_Input)->GetTimeStamp());
-
-
-	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+  Preview();
 }
 //----------------------------------------------------------------------------
 void medOpSurfaceMirror::OpDo()
