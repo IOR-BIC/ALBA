@@ -95,6 +95,11 @@ enum VTK_EXPORTER_ID
 void mafOpExporterVTK::OpRun()   
 //----------------------------------------------------------------------------
 {
+// bug #2880 export LM in VTK 
+  if(m_Input->IsA("mafVMELandmarkCloud")) 
+  {
+    ((mafVMELandmarkCloud *)m_Input)->Close();
+  }
   vtkDataSet *inputData = ((mafVME *)m_Input)->GetOutput()->GetVTKData();
   assert(inputData);
 
