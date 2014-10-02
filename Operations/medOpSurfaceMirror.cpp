@@ -229,7 +229,11 @@ void medOpSurfaceMirror::OpStop(int result)
 void medOpSurfaceMirror::Preview()  
 //----------------------------------------------------------------------------
 {
-	wxBusyCursor wait;
+	wxBusyCursor *wait=NULL;
+	if(!m_TestMode)
+	{
+		wait=new wxBusyCursor();
+	}
 
   m_MirrorFilter->SetMirrorXCoordinate(m_MirrorX);
   m_MirrorFilter->SetMirrorYCoordinate(m_MirrorY);
@@ -244,4 +248,7 @@ void medOpSurfaceMirror::Preview()
 
 
   mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+
+	if (wait)
+		delete wait;
 }
