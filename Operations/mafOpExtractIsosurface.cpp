@@ -278,6 +278,8 @@ void mafOpExtractIsosurface::CreateOpDialog()
   if (buildHelpGui.GetArg() == true)
   {
 	  b_help = new mafGUIButton(m_Dialog, ID_HELP_BUTTON, "Help", p, wxSize(80, 20));
+	  // help validator
+	  b_help->SetValidator( mafGUIValidator(this, ID_HELP_BUTTON,b_help));
   }
 
   // iso interface
@@ -325,10 +327,6 @@ void mafOpExtractIsosurface::CreateOpDialog()
   wxStaticText *lab_multi_contours  = new wxStaticText(m_Dialog,   -1, "range: ");
   wxTextCtrl *text_min_range = new wxTextCtrl(m_Dialog, ID_MIN_RANGE, "", p,wxSize(50, 16));
   wxTextCtrl *text_max_range = new wxTextCtrl(m_Dialog, ID_MAX_RANGE, "", p,wxSize(50, 16));
-
-  // help validator
-  //b_help->SetValidator( mafGUIValidator(this, ID_HELP_BUTTON,b_help)); Removed by Kewei Duan. It will cause the crush in BuilderM2O. Removed for now.
-
 
   // iso interface validator
   text->SetValidator(mafGUIValidator(this,ID_ISO,text,&m_IsoValue,m_MinDensity,m_MaxDensity));
