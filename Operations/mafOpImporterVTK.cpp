@@ -65,6 +65,7 @@ mafOp(label)
   m_VmeLandmarkCloud = NULL;
   m_VmePolyLine = NULL;
   m_VmeSurface  = NULL;
+  m_VmeImage    = NULL;
   m_VmeGrayVol  = NULL;
   m_VmeRGBVol  = NULL;
   m_VmeMesh     = NULL;
@@ -80,6 +81,7 @@ mafOpImporterVTK::~mafOpImporterVTK()
   mafDEL(m_VmeLandmarkCloud);
   mafDEL(m_VmePolyLine);
   mafDEL(m_VmeSurface);
+  mafDEL(m_VmeImage);
   mafDEL(m_VmeGrayVol);
   mafDEL(m_VmeRGBVol);
   mafDEL(m_VmeMesh);
@@ -169,6 +171,7 @@ int mafOpImporterVTK::ImportVTK()
       //mafNEW(m_VmePointSet);
       mafNEW(m_VmePolyLine);
       mafNEW(m_VmeSurface);
+	  mafNEW(m_VmeImage);
       mafNEW(m_VmeGrayVol);
       mafNEW(m_VmeRGBVol);
       mafNEW(m_VmeMesh);
@@ -189,6 +192,10 @@ int mafOpImporterVTK::ImportVTK()
       {
         m_Output = m_VmeSurface;
       }
+	  else if (m_VmeImage->SetDataByDetaching(data,0) == MAF_OK)
+	  {
+		  m_Output = m_VmeImage;
+	  }
       else if (m_VmeGrayVol->SetDataByDetaching(data,0) == MAF_OK)
       {
         m_Output = m_VmeGrayVol;

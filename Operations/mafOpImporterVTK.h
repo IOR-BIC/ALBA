@@ -34,6 +34,7 @@ class mafVMEVolumeGray;
 class mafVMEVolumeRGB;
 class mafVMEMesh;
 class mafVMEGeneric;
+class mafVMEImage;
 
 //----------------------------------------------------------------------------
 // mafOpImporterVTK :
@@ -72,6 +73,7 @@ protected:
   //mafVMEPointSet   *m_VmePointSet;
   mafVMEPolyline   *m_VmePolyLine;
   mafVMESurface    *m_VmeSurface;
+  mafVMEImage      *m_VmeImage;
   mafVMEVolumeGray *m_VmeGrayVol;
   mafVMEVolumeRGB *m_VmeRGBVol;
   mafVMEMesh       *m_VmeMesh;  

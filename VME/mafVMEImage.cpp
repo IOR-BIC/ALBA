@@ -77,6 +77,11 @@ int mafVMEImage::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
   assert(data);
   if (data->IsA("vtkImageData"))
   {
+    int dimensions[3];
+    vtkImageData::SafeDownCast(data)->GetDimensions(dimensions);
+	if( dimensions[0] != 1 && dimensions[1] != 1 && dimensions[2] != 1 ) {
+		return MAF_ERROR;
+	}
     return Superclass::SetData(data,t,mode);
   }
   
