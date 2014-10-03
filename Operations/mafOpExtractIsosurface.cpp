@@ -327,7 +327,7 @@ void mafOpExtractIsosurface::CreateOpDialog()
   wxTextCtrl *text_max_range = new wxTextCtrl(m_Dialog, ID_MAX_RANGE, "", p,wxSize(50, 16));
 
   // help validator
-  b_help->SetValidator( mafGUIValidator(this, ID_HELP_BUTTON,b_help));
+  //b_help->SetValidator( mafGUIValidator(this, ID_HELP_BUTTON,b_help)); Removed by Kewei Duan. It will cause the crush in BuilderM2O. Removed for now.
 
 
   // iso interface validator
