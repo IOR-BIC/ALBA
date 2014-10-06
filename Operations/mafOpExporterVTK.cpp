@@ -197,11 +197,11 @@ void mafOpExporterVTK::SaveVTKData()
 {
   wxBusyCursor *busyCursor = NULL;
 
-  if (m_TestMode == true)
+  if (m_TestMode == false)
   {
     busyCursor = new wxBusyCursor();
   }
-  else if (m_TestMode == false)
+  else 
   {
     std::ostringstream stringStream;
     stringStream << "cannot render busy cursor..."  << std::endl;
