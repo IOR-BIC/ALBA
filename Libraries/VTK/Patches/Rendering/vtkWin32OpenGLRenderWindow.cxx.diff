@@ -9,6 +9,6 @@
 > #if (defined(WIN64) || defined(_WIN64))
 > 				this->ApplicationInstance = (HINSTANCE)vtkGetWindowLong(this->ParentId,GWLP_HINSTANCE);
 > #else
-> 				this->ApplicationInstance  = (HINSTANCE)GetWindowLongPtr(wnd, GWLP_HINSTANCE)
+> 				this->ApplicationInstance = (HINSTANCE)vtkGetWindowLong(this->ParentId,GWL_HINSTANCE);
 > #endif
 > 			}

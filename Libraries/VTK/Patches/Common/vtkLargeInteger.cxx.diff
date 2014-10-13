@@ -4,7 +4,7 @@
 > #if (defined(WIN64) || defined(_WIN64))
 > 	const unsigned int BIT_INCREMENT = 64;
 > #else
-> 	const unsigned int BIT_INCREMENT = 32
+> 	const unsigned int BIT_INCREMENT = 32;
 > #endif
 86a91,107
 > 
