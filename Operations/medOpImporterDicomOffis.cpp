@@ -4933,11 +4933,19 @@ void medOpImporterDicomOffis::GenerateSliceTexture(int imageID)
 
 		m_CropPlane->Update();
 		m_CropPlane->GetOutput()->GetBounds(crop_bounds);
+				
+		//Align cropBounds to current grid
+		crop_bounds[0]=round(crop_bounds[0]/spacing[0])*spacing[0];
+		crop_bounds[1]=round(crop_bounds[1]/spacing[0])*spacing[0];
+		crop_bounds[2]=round(crop_bounds[2]/spacing[1])*spacing[1];
+		crop_bounds[3]=round(crop_bounds[3]/spacing[1])*spacing[1];
 
 		crop_bounds[0]+=Origin[0];
 		crop_bounds[1]+=Origin[0];
 		crop_bounds[2]+=Origin[1];
 		crop_bounds[3]+=Origin[1];
+
+
 
 		crop_bounds[4] = m_SliceBounds[4];
 		crop_bounds[5] = m_SliceBounds[5];
