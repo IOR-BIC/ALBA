@@ -1,0 +1,31 @@
+#ifndef __medDefines_h
+#define __medDefines_h
+
+#include "mafDefines.h"
+
+// #if @MED_BUILD_MEDDLL@
+// # define MED_SHARED
+// // # define MED_EXPORTS
+// #endif
+
+//--------------------------------------------------------------------------
+// For WIN32 dynamic linking
+//--------------------------------------------------------------------------
+// #if defined(_WIN32) && defined(MED_SHARED)
+// # if defined(MED_EXPORTS)
+// #  define MED_EXPORT __declspec( dllexport ) 
+// # else
+// #  define MED_EXPORT __declspec( dllimport ) 
+// # endif
+// #else
+// # define MED_EXPORT
+// #endif
+
+//--------------------------------------------------------------------------
+// Data root used to reach data for testing
+//--------------------------------------------------------------------------
+#define MED_DATA_ROOT "@MED_DATA_ROOT@"
+
+#cmakedefine MED_USE_BTK
+
+#endif // __medDefines_h

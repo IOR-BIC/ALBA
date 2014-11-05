@@ -1,0 +1,463 @@
+#
+# Copyright and description to be placed here
+#
+
+PROJECT(medDLL)
+
+ADD_DEFINITIONS(-DMED_EXPORTS)
+
+#LINK_LIBRARIES(glu32 opengl32 vtkHybrid vtkIO vtkRendering vtkGraphics vtkFiltering vtkImaging vtkCommon vtkftgl vtkfreetype XercesC curl Crypto vtkMAF GPUAPI mafDLL)
+LINK_LIBRARIES(mafDLL vtkMED)
+###############################################
+#COMMON
+###############################################
+SET(COMMON_SRCS
+  ../Common/mafGizmoSlice.cpp
+  ../Common/mafGizmoSlice.h
+  ../Common/mmiInfoImage.cpp
+  ../Common/mmiInfoImage.h
+  ../Common/mmiSelectPoint.cpp
+  ../Common/mmiSelectPoint.h
+  ../Common/medLogicWithManagers.cpp
+  ../Common/medLogicWithManagers.h
+  ../Common/medGeometryEditorPolylineGraph.cpp
+  ../Common/medGeometryEditorPolylineGraph.h
+  ../Common/medDecl.h
+  ../Common/medCurvilinearAbscissaOnSkeletonHelper.cpp
+  ../Common/medCurvilinearAbscissaOnSkeletonHelper.h
+  ../Common/medGizmoInteractionDebugger.cpp
+  ../Common/medGizmoInteractionDebugger.h
+  ../Common/medRelationalDatabaseAbstractConnector.cpp
+  ../Common/medRelationalDatabaseAbstractConnector.h
+  ../Common/medResultQueryAbstractHandler.cpp
+  ../Common/medResultQueryAbstractHandler.h
+  ../Common/medQueryObject.h
+	../Common/mafDbg.h
+	../Common/mafDataChecksum.h
+  ../Common/medHTMLTemplateParser.cpp
+  ../Common/medHTMLTemplateParser.h
+  ../Common/medHTMLTemplateParserBlock.cpp
+  ../Common/medHTMLTemplateParserBlock.h
+	
+	../BES_Beta/vtkMAF/vtkMAFLargeDataSetCallback.cxx
+  ../BES_Beta/vtkMAF/vtkMAFLargeDataSetCallback.h
+	
+)
+
+###############################################
+#GUI
+###############################################
+SET(GUI_SRCS
+  ../Gui/medGUILandmark.cpp
+  ../Gui/medGUILandmark.h
+  ../Gui/medGUIWizard.cpp
+  ../Gui/medGUIWizard.h
+  ../Gui/medGUIWizardPage.cpp
+  ../Gui/medGUIWizardPage.h
+  ../Gui/medGUIWizardPageNew.cpp
+  ../Gui/medGUIWizardPageNew.h
+  ../Gui/medGUIDicomSettings.cpp
+  ../Gui/medGUIDicomSettings.h
+  ../Gui/medGUIContextualMenu.cpp
+  ../Gui/medGUIContextualMenu.h
+  ../Gui/medGUISettingsAdvanced.cpp
+  ../Gui/medGUISettingsAdvanced.h
+  ../Gui/medGUIDynamicVP.cpp
+  ../Gui/medGUIDynamicVP.h
+)
+
+###############################################
+#VME
+###############################################
+SET(VME_SRCS
+  ../VME/medVMEFactory.cpp 
+  ../VME/medVMEFactory.h
+  ../VME/medVMELabeledVolume.cpp
+  ../VME/medVMELabeledVolume.h
+  ../VME/medPipeFactoryVME.cpp
+  ../VME/medPipeFactoryVME.h
+  ../VME/medPipeVolumeMIP.cpp
+  ../VME/medPipeVolumeMIP.h
+  ../VME/medPipeDensityDistance.cpp
+  ../VME/medPipeDensityDistance.h
+  ../VME/medPipeTrajectories.cpp
+  ../VME/medPipeTrajectories.h
+  ../VME/medPipeVolumeDRR.cpp
+  ../VME/medPipeVolumeDRR.h
+  ../VME/medPipeVolumeVR.cpp
+  ../VME/medPipeVolumeVR.h
+  ../VME/mafPolylineGraph.cpp
+  ../VME/mafPolylineGraph.h
+  ../VME/medVMEPolylineGraph.cpp
+  ../VME/medVMEPolylineGraph.h
+  ../VME/medVMEPolylineEditor.cpp
+  ../VME/medVMEPolylineEditor.h
+  ../VME/medPipePolylineGraphEditor.cpp
+  ../VME/medPipePolylineGraphEditor.h
+  ../VME/medVMEOutputPolylineEditor.cpp
+  ../VME/medVMEOutputPolylineEditor.h
+  ../VME/medVMEMaps.cpp
+  ../VME/medVMEMaps.h
+  ../VME/medVMEWrappedMeter.cpp
+  ../VME/medVMEWrappedMeter.h
+  ../VME/medVMEOutputWrappedMeter.cpp
+  ../VME/medVMEOutputWrappedMeter.h
+  ../VME/medPipeWrappedMeter.cpp
+  ../VME/medPipeWrappedMeter.h
+  ../VME/medVMESurfaceEditor.cpp
+  ../VME/medVMESurfaceEditor.h
+  ../VME/medPipeSurfaceEditor.cpp
+  ../VME/medPipeSurfaceEditor.h
+  ../VME/medVMEOutputSurfaceEditor.cpp
+  ../VME/medVMEOutputSurfaceEditor.h
+  ../VME/medVisualPipeSlicerSlice.cpp
+  ../VME/medVisualPipeSlicerSlice.h  
+  ../VME/medVisualPipePolylineGraph.cpp
+  ../VME/medVisualPipePolylineGraph.h
+  ../VME/medVMEComputeWrapping.h
+  ../VME/medVMEComputeWrapping.cpp
+  ../VME/medPipeComputeWrapping.h
+  ../VME/medPipeComputeWrapping.cpp
+  ../VME/medVMEOutputComputeWrapping.cpp
+  ../VME/medVMEOutputComputeWrapping.h 
+  ../VME/medPipeVectorField.cpp
+  ../VME/medPipeVectorField.h
+  ../VME/medPipeVectorFieldMapWithArrows.cpp
+  ../VME/medPipeVectorFieldMapWithArrows.h
+  ../VME/medPipeVectorFieldGlyphs.cpp
+  ../VME/medPipeVectorFieldGlyphs.h
+  ../VME/medPipeVectorFieldSurface.cpp
+  ../VME/medPipeVectorFieldSurface.h
+  ../VME/medPipeVectorFieldSlice.cpp
+  ../VME/medPipeVectorFieldSlice.h
+  ../VME/medPipeTensorField.cpp
+  ../VME/medPipeTensorField.h
+  ../VME/medPipeTensorFieldGlyphs.cpp
+  ../VME/medPipeTensorFieldGlyphs.h
+  ../VME/medPipeTensorFieldSurface.cpp
+  ../VME/medPipeTensorFieldSurface.h
+  ../VME/medPipeTensorFieldSlice.cpp
+  ../VME/medPipeTensorFieldSlice.h
+  ../VME/medPipeCompound.cpp
+  ../VME/medPipeCompound.h
+  ../VME/medPipeCompoundVolume.cpp
+  ../VME/medPipeCompoundVolume.h
+  ../VME/medPipeCompoundVolumeFixedScalars.cpp
+  ../VME/medPipeCompoundVolumeFixedScalars.h
+  ../VME/medVMESegmentationVolume.cpp
+  ../VME/medVMESegmentationVolume.h
+  ../VME/medDataPipeCustomSegmentationVolume.cpp
+  ../VME/medDataPipeCustomSegmentationVolume.h
+  ../VME/medAttributeSegmentationVolume.cpp
+  ../VME/medAttributeSegmentationVolume.h
+  ../VME/mafPipeSlice.cpp
+  ../VME/mafPipeSlice.h
+  ../VME/mafPipeMeshSlice_BES.cpp
+  ../VME/mafPipeMeshSlice_BES.h
+  ../VME/mafPipePolylineSlice_BES.cpp
+  ../VME/mafPipePolylineSlice_BES.h
+  ../VME/mafPipeSurfaceSlice_BES.cpp
+  ../VME/mafPipeSurfaceSlice_BES.h
+  ../VME/mafPipeVolumeSlice_BES.cpp
+  ../VME/mafPipeVolumeSlice_BES.h
+  ../VME/medVisualPipeCollisionDetection.cpp
+  ../VME/medVisualPipeCollisionDetection.h
+  ../BES_Beta/IO/mafBrickedFile.cpp
+  ../BES_Beta/IO/mafBrickedFile.h
+  ../BES_Beta/IO/mafBrickedFileReader.cpp
+  ../BES_Beta/IO/mafBrickedFileReader.h
+  ../BES_Beta/IO/mafBrickedFileWriter.cpp
+  ../BES_Beta/IO/mafBrickedFileWriter.h
+  ../BES_Beta/IO/mafVolumeLargeReader.cpp
+  ../BES_Beta/IO/mafVolumeLargeReader.h
+  ../BES_Beta/IO/mafVolumeLargeWriter.cpp
+  ../BES_Beta/IO/mafVolumeLargeWriter.h
+  ../VME/mafVMEVolumeLarge.cpp
+  ../VME/mafVMEVolumeLarge.h
+  ../VME/mafVMEVolumeLargeUtils.cpp
+  ../VME/mafVMEVolumeLargeUtils.h  
+  ../VME/medPipeVolumeSliceBlend.cpp
+  ../VME/medPipeVolumeSliceBlend.h
+)
+IF (MAF_USE_ITK)
+  SET(VME_SRCS  
+    ${VME_SRCS}
+    ../VME/mafVMERawMotionData.cpp
+    ../VME/mafVMERawMotionData.h
+    ../VME/medPipeGraph.cpp
+    ../VME/medPipeGraph.h
+    ../VME/medVMEAnalog.cpp
+    ../VME/medVMEAnalog.h
+  )
+ENDIF (MAF_USE_ITK)
+###############################################
+#VIEWS
+###############################################
+SET(VIEWS_SRCS
+  
+  ../Views/mafViewArbitrarySlice.cpp
+  ../Views/mafViewArbitrarySlice.h
+  ../Views/mafViewOrthoSlice.cpp
+  ../Views/mafViewOrthoSlice.h
+  ../Views/mafViewRX.cpp
+  ../Views/mafViewRX.h
+  ../Views/mafViewRXCT.cpp
+  ../Views/mafViewRXCT.h
+  ../Views/mafViewSlice.cpp
+  ../Views/mafViewSlice.h
+  ../Views/mafViewGlobalSlice.cpp
+  ../Views/mafViewGlobalSlice.h
+  ../Views/mafViewGlobalSliceCompound.cpp
+  ../Views/mafViewGlobalSliceCompound.h
+  ../Views/mafViewImage.cpp
+  ../Views/mafViewImage.h
+  ../Views/mafViewSingleSlice.cpp
+  ../Views/mafViewSingleSlice.h
+  ../Views/mafViewSingleSliceCompound.cpp
+  ../Views/mafViewSingleSliceCompound.h
+  ../Views/mafViewRXCompound.cpp
+  ../Views/mafViewRXCompound.h
+  ../Views/mafView3D.cpp
+  ../Views/mafView3D.h
+  ../Views/mafViewImageCompound.cpp
+  ../Views/mafViewImageCompound.h
+  ../Views/mafViewCT.cpp
+  ../Views/mafViewCT.h
+  ../Views/medViewCompoundWindowing.cpp
+  ../Views/medViewCompoundWindowing.h
+  ../Views/medViewVTKCompound.cpp
+  ../Views/medViewVTKCompound.h
+  ../Views/medViewSlicer.cpp
+  ../VIews/medViewSlicer.h
+  ../Views/medViewSliceOnCurve.cpp
+  ../Views/medViewSliceOnCurve.h
+  ../Views/medViewSliceOnCurveCompound.cpp
+  ../Views/medViewSliceOnCurveCompound.h
+  ../Views/medViewSliceGlobal.cpp
+  ../Views/medViewSliceGlobal.h
+  ../Views/medViewArbitraryOrthoSlice.cpp
+  ../Views/medViewArbitraryOrthoSlice.h
+  ../Views/medViewSliceBlendRX.cpp
+  ../Views/medViewSliceBlendRX.h
+  ../Views/medViewSliceBlend.cpp
+  ../Views/medViewSliceBlend.h
+)
+###############################################
+#INTERACTION
+###############################################
+SET(INTERACTION_SRCS
+  ../Interaction/medInteractorDICOMImporter.h
+  ../Interaction/medInteractorDICOMImporter.cpp
+  ../Interaction/medInteractor2DAngle.cpp
+  ../Interaction/medInteractor2DAngle.h
+  ../Interaction/medInteractor2DDistance.cpp
+  ../Interaction/medInteractor2DDistance.h
+  ../Interaction/medInteractor2DIndicator.cpp
+  ../Interaction/medInteractor2DIndicator.h
+  ../Interaction/mmiVTKPicker.cpp
+  ../Interaction/mmiVTKPicker.h
+  ../Interaction/medGizmoPolylineGraph.cpp
+  ../Interaction/medGizmoPolylineGraph.h
+  ../Interaction/medDeviceButtonsPadMouseDialog.h
+  ../Interaction/medDeviceButtonsPadMouseDialog.cpp
+  ../Interaction/medGUITransformSliders.cpp
+  ../Interaction/medGUITransformSliders.h  
+  ../Interaction/mafGizmoROI_BES.cpp
+  ../Interaction/mafGizmoROI_BES.h  
+  ../Interaction/medGizmoCrossRotateTranslate.cpp
+  ../Interaction/medGizmoCrossRotateTranslate.h	  
+  ../Interaction/medGizmoCrossRotate.cpp
+  ../Interaction/medGizmoCrossRotate.h
+  ../Interaction/medGizmoCrossRotateAxis.cpp
+  ../Interaction/medGizmoCrossRotateAxis.h
+  ../Interaction/medGizmoCrossRotateFan.cpp
+  ../Interaction/medGizmoCrossRotateFan.h
+  ../Interaction/medGizmoCrossTranslate.cpp
+  ../Interaction/medGizmoCrossTranslate.h
+  ../Interaction/medGizmoCrossTranslateAxis.cpp
+  ../Interaction/medGizmoCrossTranslateAxis.h
+  ../Interaction/medGizmoCrossTranslatePlane.cpp
+  ../Interaction/medGizmoCrossTranslatePlane.h
+  ../Interaction/medInteractorPicker.cpp
+  ../Interaction/medInteractorPicker.h
+)
+###############################################
+#OPERATIONS
+###############################################
+SET(OPERATIONS_SRCS
+  ../Operations/medOpCreateLabeledVolume.cpp
+  ../Operations/medOpCreateLabeledVolume.h
+  ../Operations/medOpImporterLandmark.cpp
+  ../Operations/medOpImporterLandmark.h
+  ../Operations/medOpImporterLandmarkTXT.cpp
+  ../Operations/medOpImporterLandmarkTXT.h
+  ../Operations/medOpImporterLandmarkWS.cpp
+  ../Operations/medOpImporterLandmarkWS.h
+  ../Operations/medOpMatrixVectorMath.cpp
+  ../Operations/medOpMatrixVectorMath.h
+  ../Operations/medOpMML.cpp
+  ../Operations/medOpMML.h
+  ../Operations/medOpMMLContourWidget.cpp
+  ../Operations/medOpMMLContourWidget.h
+  ../Operations/medOpMMLModelView.cpp
+  ../Operations/medOpMMLModelView.h
+  ../Operations/medOpMMLParameterView.cpp
+  ../Operations/medOpMMLParameterView.h
+  ../Operations/medOpMML3.cpp
+  ../Operations/medOpMML3.h
+  ../Operations/medOpMML3ContourWidget.cpp
+  ../Operations/medOpMML3ContourWidget.h
+  ../Operations/medOpMML3GlobalRegistration.cpp
+  ../Operations/medOpMML3GlobalRegistration.h
+  ../Operations/medOpMML3ModelView.cpp
+  ../Operations/medOpMML3ModelView.h
+  ../Operations/medOpMML3ModelView2DPipe.cpp
+  ../Operations/medOpMML3ModelView2DPipe.h
+  ../Operations/medOpMML3ModelView3DPipe.cpp
+  ../Operations/medOpMML3ModelView3DPipe.h
+  ../Operations/medOpMML3NonUniformSlicePipe.cpp
+  ../Operations/medOpMML3NonUniformSlicePipe.h
+  ../Operations/medOpMML3ParameterView.cpp
+  ../Operations/medOpMML3ParameterView.h
+  ../Operations/medOpRegisterClusters.cpp
+  ../Operations/medOpRegisterClusters.h
+  ../Operations/medOpVolumeMeasure.cpp
+  ../Operations/medOpVolumeMeasure.h
+  ../Operations/medOpImporterRAWImages.cpp
+  ../Operations/medOpImporterRAWImages.h
+  ../Operations/medOpMeshQuality.cpp
+  ../Operations/medOpMeshQuality.h
+  ../Operations/medOpCropDeformableROI.cpp
+  ../Operations/medOpCropDeformableROI.h
+  ../Operations/medOpFlipNormals.cpp
+  ../Operations/medOpFlipNormals.h
+  ../Operations/medOpExtrusionHoles.cpp
+  ../Operations/medOpExtrusionHoles.h
+  ../Operations/medOpVolumeResample.cpp
+  ../Operations/medOpVolumeResample.h
+  ../Operations/medOpSplitSurface.cpp
+  ../Operations/medOpSplitSurface.h
+  ../Operations/medOpInteractiveClipSurface.cpp
+  ../Operations/medOpInteractiveClipSurface.h
+  ../Operations/medOpCreateEditSkeleton.cpp
+  ../Operations/medOpCreateEditSkeleton.h
+  ../Operations/medOpCreateSurface.cpp
+  ../Operations/medOpCreateSurface.h
+  ../Operations/medOpMove.cpp
+  ../Operations/medOpMove.h
+  ../Operations/medOpScaleDataset.cpp
+  ../Operations/medOpScaleDataset.h
+  ../Operations/medOpCreateWrappedMeter.cpp
+  ../Operations/medOpCreateWrappedMeter.h
+  ../Operations/medOpComputeWrapping.h
+  ../Operations/medOpComputeWrapping.cpp  
+  ../Operations/medOpComputeInertialTensor.h
+  ../Operations/medOpComputeInertialTensor.cpp  
+  ../Operations/medOpExporterWrappedMeter.cpp
+  ../Operations/medOpExporterWrappedMeter.h
+  ../Operations/medOpLabelizeSurface.cpp
+  ../Operations/medOpLabelizeSurface.h
+  ../Operations/medOp2DMeasure.cpp
+  ../Operations/medOp2DMeasure.h
+  ../Operations/medOpFreezeVME.cpp
+  ../Operations/medOpFreezeVME.h
+  ../Operations/medOpIterativeRegistration.cpp
+  ../Operations/medOpIterativeRegistration.h
+  ../Operations/medOpSmoothSurface.cpp
+  ../Operations/medOpSmoothSurface.h
+  ../Operations/medOpCleanSurface.cpp
+  ../Operations/medOpCleanSurface.h
+  ../Operations/medOpTriangulateSurface.cpp
+  ../Operations/medOpTriangulateSurface.h
+  ../Operations/medOpSurfaceMirror.cpp
+  ../Operations/medOpSurfaceMirror.h
+  ../Operations/medOpImporterVTK.cpp
+  ../Operations/medOpImporterVTK.h
+  ../Operations/medOpImporterVTKXML.cpp
+  ../Operations/medOpImporterVTKXML.h
+  ../Operations/medOpExporterVTKXML.cpp
+  ../Operations/medOpExporterVTKXML.h
+  ../Operations/medOpSubdivide.cpp
+  ../Operations/medOpSubdivide.h
+  ../Operations/medOpFillHoles.cpp
+  ../Operations/medOpFillHoles.h
+  ../Operations/medOpMeshDeformation.cpp
+  ../Operations/medOpMeshDeformation.h
+  ../Operations/medOpMakeVMETimevarying.cpp
+  ../Operations/medOpMakeVMETimevarying.h
+  ../Operations/medOpSegmentationRegionGrowingConnectedThreshold.cpp
+  ../Operations/medOpSegmentationRegionGrowingConnectedThreshold.h
+  ../Operations/mafOpImporterBBF.cpp
+  ../Operations/mafOpImporterBBF.h
+  ../Operations/mafOpImporterRAWVolume_BES.cpp
+  ../Operations/mafOpImporterRAWVolume_BES.h  
+  ../Operations/medOpSegmentationRegionGrowingLocalAndGlobalThreshold.cpp
+  ../Operations/medOpSegmentationRegionGrowingLocalAndGlobalThreshold.h
+  ../Operations/medOpEqualizeHistogram.cpp
+  ../Operations/medOpEqualizeHistogram.h
+  ../Operations/medOpExporterAnalogWS.cpp
+  ../Operations/medOpExporterAnalogWS.h
+  ../Operations/medOpExporterGRFWS.cpp
+  ../Operations/medOpExporterGRFWS.h
+  ../Operations/medOpExporterLandmarkWS.cpp
+  ../Operations/medOpExporterLandmarkWS.h
+  ../Operations/medOpExtractGeometry.cpp
+  ../Operations/medOpExtractGeometry.h
+)
+  
+IF (MED_USE_Offis)
+  SET(OPERATIONS_SRCS 
+    ${OPERATIONS_SRCS}
+    ../Operations/medOpImporterDicomOffis.h
+    ../Operations/medOpImporterDicomOffis.cpp
+  
+    ../Operations/medDicomCardiacMRIHelper.cpp
+    ../Operations/medDicomCardiacMRIHelper.h
+   )
+ENDIF (MED_USE_Offis)
+
+  
+IF (MAF_USE_ITK)
+  SET(OPERATIONS_SRCS  
+    ${OPERATIONS_SRCS}
+    ../Operations/itkRawMotionImporterUtility.cxx
+    ../Operations/itkRawMotionImporterUtility.h
+    ../Operations/medOpImporterMotionData.h
+    ../Operations/medOpExporterLandmark.cpp
+    ../Operations/medOpExporterLandmark.h
+    ../Operations/medOpClassicICPRegistration.cpp
+    ../Operations/medOpClassicICPRegistration.h
+    ../Operations/medOpImporterC3D.cpp
+    ../Operations/medOpImporterC3D.h
+    ../Operations/medOpImporterGRFWS.cpp
+    ../Operations/medOpImporterGRFWS.h
+    ../Operations/medOpImporterAnalogWS.cpp
+    ../Operations/medOpImporterAnalogWS.h
+    ../Operations/medOpSmoothSurfaceCells.cpp
+    ../Operations/medOpSmoothSurfaceCells.h
+    ../Operations/medOpExporterMeters.cpp
+    ../Operations/medOpExporterMeters.h
+    ../Operations/medOpInteractionDebugger.cpp
+    ../Operations/medOpInteractionDebugger.h
+  )
+ENDIF (MAF_USE_ITK)
+###############################################
+SET(PROJECT_SRCS
+  ${COMMON_SRCS}
+  ${GUI_SRCS}
+  ${VME_SRCS}
+  ${VIEWS_SRCS}
+  ${INTERACTION_SRCS}
+  ${OPERATIONS_SRCS}
+)
+
+SET(BUILD_SHARED_LIBS 1)
+
+IF (MED_USE_Offis)
+  LINK_LIBRARIES(${Offis_LIBS})
+ENDIF (MED_USE_Offis)
+
+# Create the library.
+ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS} )
+
