@@ -1,0 +1,7 @@
+113a114,119
+> 
+> #if defined(_MSC_VER) && (_MSC_VER >= 1500)
+> 	AllocatorWithCleanup () {};
+> 	template <class U> AllocatorWithCleanup(const AllocatorWithCleanup<U> &) {};
+> #endif 
+> 
