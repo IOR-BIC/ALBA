@@ -69,6 +69,7 @@ void mafOpExporterVTKTest::setUp()
 //----------------------------------------------------------------------------
 {
   m_ExporterVTK = new mafOpExporterVTK("VTK");
+	m_ExporterVTK->TestModeOn();
 }
 //----------------------------------------------------------------------------
 void mafOpExporterVTKTest::tearDown()
