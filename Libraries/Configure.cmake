@@ -35,7 +35,13 @@ ELSE (${CMAKE_GENERATOR} STREQUAL "Visual Studio 6")
   OPTION(MAF_USE_CRYPTO "Find and Link the CRYPTO library." ON)
 ENDIF (${CMAKE_GENERATOR} STREQUAL "Visual Studio 6")
 
-
+# options for Offis and BTK from MAF2Medical
+OPTION(MED_USE_Offis "Find and Link the Offis library." ON)
+IF (${CMAKE_GENERATOR} STREQUAL "Visual Studio 9 2008" OR ${CMAKE_GENERATOR} STREQUAL "Visual Studio 10" OR ${CMAKE_GENERATOR} STREQUAL "Visual Studio 10 Win64")
+  OPTION(MED_USE_BTK "Find and Link the BTK library." ON)
+ELSE (${CMAKE_GENERATOR} STREQUAL "Visual Studio 9 2008" OR ${CMAKE_GENERATOR} STREQUAL "Visual Studio 10" OR ${CMAKE_GENERATOR} STREQUAL "Visual Studio 10 Win64")
+  SET(MED_USE_BTK OFF)
+ENDIF (${CMAKE_GENERATOR} STREQUAL "Visual Studio 9 2008" OR ${CMAKE_GENERATOR} STREQUAL "Visual Studio 10" OR ${CMAKE_GENERATOR} STREQUAL "Visual Studio 10 Win64")
 
 #
 # configure CMake modules for MFL
@@ -90,6 +96,20 @@ ENDIF(MAF_USE_CURL)
 IF (MAF_USE_CRYPTO)
   MFL_SUBPROJECT(CRYPTO CRYPTO)
 ENDIF(MAF_USE_CRYPTO)
+
+#
+# Offis Library
+#
+IF (MED_USE_Offis)
+  MFL_SUBPROJECT(Offis Offis)
+ENDIF(MED_USE_Offis)
+
+#
+# BTK Library
+#
+IF (MED_USE_BTK)
+  MFL_SUBPROJECT(BTK BTK)
+ENDIF(MED_USE_BTK)
 
 #
 # wxMozilla Library

@@ -12,10 +12,10 @@
 
 
 
-IF (${CMAKE_GENERATOR} STREQUAL "Visual Studio 9 2008" OR ${CMAKE_GENERATOR} STREQUAL "Visual Studio 10")
+IF (${CMAKE_GENERATOR} STREQUAL "Visual Studio 9 2008" OR ${CMAKE_GENERATOR} STREQUAL "Visual Studio 10" OR ${CMAKE_GENERATOR} STREQUAL "Visual Studio 10 Win64")
   OPTION(MAF_USE_CRYPTO "Find and Link the CRYPTO library." ON)
-INCLUDE (${MFL_SOURCE_PATH}/modules/PackagesMacro.cmake)
-INCLUDE (${MFL_SOURCE_PATH}/modules/PatchMacro.cmake)
+INCLUDE (${MFL_SOURCE_DIR}/modules/PackagesMacro.cmake)
+INCLUDE (${MFL_SOURCE_DIR}/modules/PatchMacro.cmake)
 
 # this is to build BTK inside the MAF tree
 IF (EXISTS "${BTK_SOURCE_DIR}/Sources")   
@@ -31,8 +31,10 @@ IF (EXISTS "${BTK_SOURCE_DIR}/Packages")
   SET (BTK_Extension_PACKAGE_PATH "${BTK_SOURCE_DIR}/Packages")
   ##The macro must run only one time
   SET (BTK_SOURCE_PATH "${BTK_BINARY_DIR}/Sources/BTK")
+  SET (BTK_PATCH_PATH "${BTK_SOURCE_DIR}/Patches")
   IF (NOT EXISTS "${BTK_SOURCE_PATH}")
 	  FIND_AND_UNPACK_PACKAGE (BTK ${BTK_PACKAGE_PATH} "${BTK_BINARY_DIR}/Sources" ${BTK_SOURCE_PATH})
+	  FIND_AND_APPLAY_PATCHES (BTK ${BTK_PATCH_PATH} "${BTK_SOURCE_PATH}")
   ENDIF (NOT EXISTS "${BTK_SOURCE_PATH}")
 ENDIF (EXISTS "${BTK_SOURCE_DIR}/Packages")
 
@@ -125,4 +127,4 @@ IF (DEBUG_MESSAGES)
   							"${var} \"${${var}}\"\n")
   ENDFOREACH(var ${VARS})
 ENDIF (DEBUG_MESSAGES)
-ENDIF (${CMAKE_GENERATOR} STREQUAL "Visual Studio 9 2008" OR ${CMAKE_GENERATOR} STREQUAL "Visual Studio 10")
+ENDIF (${CMAKE_GENERATOR} STREQUAL "Visual Studio 9 2008" OR ${CMAKE_GENERATOR} STREQUAL "Visual Studio 10" OR ${CMAKE_GENERATOR} STREQUAL "Visual Studio 10 Win64")

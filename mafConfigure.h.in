@@ -39,6 +39,8 @@
 #cmakedefine MAF_USE_CRYPTO
 #cmakedefine MAF_USE_CURL
 #cmakedefine MAF_USE_WXMOZILLA
+#cmakedefine MED_USE_BTK
+#cmakedefine MED_USE_Offis
 
 //--------------------------------------------------------------------------
 // MAF Versioning

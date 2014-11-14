@@ -12,8 +12,8 @@
 
 
 
-INCLUDE (${MFL_SOURCE_PATH}/modules/PackagesMacro.cmake)
-INCLUDE (${MFL_SOURCE_PATH}/modules/PatchMacro.cmake)
+INCLUDE (${MFL_SOURCE_DIR}/modules/PackagesMacro.cmake)
+INCLUDE (${MFL_SOURCE_DIR}/modules/PatchMacro.cmake)
 
 # this is to build Offis inside the MAF tree
 IF (EXISTS "${Offis_SOURCE_DIR}/Sources")   
