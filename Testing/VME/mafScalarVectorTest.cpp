@@ -57,8 +57,8 @@ void mafScalarVectorTest::tearDown()
 void mafScalarVectorTest::TestDynamicAllocation()
 //----------------------------------------------------------------------------
 {
-  m_ScalarVector = mafScalarVector::New();
-  mafDEL(m_ScalarVector);
+  mafScalarVector* ScalarVector = mafScalarVector::New();
+  mafDEL(ScalarVector);
 }
 //----------------------------------------------------------------------------
 void mafScalarVectorTest::TestGetScalarVector()

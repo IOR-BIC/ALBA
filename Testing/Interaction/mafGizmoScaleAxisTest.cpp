@@ -248,6 +248,7 @@ void mafGizmoScaleAxisTest::TestShow()
   CPPUNIT_ASSERT(gizmoScaleAxis->m_Show == true);
 
   cppDEL(gizmoScaleAxis);
+  cppDEL(listener);
 }
 
 void mafGizmoScaleAxisTest::TestSetGetAbsPose()

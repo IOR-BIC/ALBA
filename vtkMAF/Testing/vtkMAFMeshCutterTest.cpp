@@ -428,12 +428,12 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8()
 //------------------------------------------------------------------------------
 {
   // set filename
-  std::ostrstream fname ;
+  std::ostringstream fname ;
   fname << MAF_DATA_ROOT << "/FEM/vtk/hex8" << ".vtk" << std::ends ;
 
   // read the data
   vtkUnstructuredGridReader *reader = vtkUnstructuredGridReader::New();
-  reader->SetFileName(fname.str());
+  reader->SetFileName(fname.str().c_str());
   
   // set the implicit function which defines the cut
   vtkTransform *T = vtkTransform::New();
@@ -529,12 +529,12 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8_VerticalCut1()
 //------------------------------------------------------------------------------
 {
   // set filename
-  std::ostrstream fname ;
+  std::ostringstream fname ;
   fname << MAF_DATA_ROOT << "/FEM/vtk/hex8" << ".vtk" << std::ends ;
 
   // read the data
   vtkUnstructuredGridReader *reader = vtkUnstructuredGridReader::New();
-  reader->SetFileName(fname.str());
+  reader->SetFileName(fname.str().c_str());
 
   // set the implicit function which defines the cut
   vtkTransform *T = vtkTransform::New();
@@ -630,12 +630,12 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8_VerticalCut2()
 //------------------------------------------------------------------------------
 {
   // set filename
-  std::ostrstream fname ;
+  std::ostringstream fname ;
   fname << MAF_DATA_ROOT << "/FEM/vtk/hex8" << ".vtk" << std::ends ;
 
   // read the data
   vtkUnstructuredGridReader *reader = vtkUnstructuredGridReader::New();
-  reader->SetFileName(fname.str());
+  reader->SetFileName(fname.str().c_str());
 
   // set the implicit function which defines the cut
   vtkTransform *T = vtkTransform::New();
@@ -731,12 +731,12 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8_FaceInPlane()
 //------------------------------------------------------------------------------
 {
   // set filename
-  std::ostrstream fname ;
+  std::ostringstream fname ;
   fname << MAF_DATA_ROOT << "/FEM/vtk/hex8" << ".vtk" << std::ends ;
 
   // read the data
   vtkUnstructuredGridReader *reader = vtkUnstructuredGridReader::New();
-  reader->SetFileName(fname.str());
+  reader->SetFileName(fname.str().c_str());
 
   // set the implicit function which defines the cut
   vtkTransform *T = vtkTransform::New();
@@ -832,12 +832,12 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8_IncludesEdge1()
 //------------------------------------------------------------------------------
 {
   // set filename
-  std::ostrstream fname ;
+  std::ostringstream fname ;
   fname << MAF_DATA_ROOT << "/FEM/vtk/hex8" << ".vtk" << std::ends ;
 
   // read the data
   vtkUnstructuredGridReader *reader = vtkUnstructuredGridReader::New();
-  reader->SetFileName(fname.str());
+  reader->SetFileName(fname.str().c_str());
 
   // set the implicit function which defines the cut
   vtkTransform *T = vtkTransform::New();
@@ -940,12 +940,12 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8_IncludesEdge2()
 //------------------------------------------------------------------------------
 {
   // set filename
-  std::ostrstream fname ;
+  std::ostringstream fname ;
   fname << MAF_DATA_ROOT << "/FEM/vtk/hex8" << ".vtk" << std::ends ;
 
   // read the data
   vtkUnstructuredGridReader *reader = vtkUnstructuredGridReader::New();
-  reader->SetFileName(fname.str());
+  reader->SetFileName(fname.str().c_str());
 
   // set the implicit function which defines the cut
   vtkTransform *T = vtkTransform::New();
@@ -1048,12 +1048,12 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8_IncludesCorner()
 //------------------------------------------------------------------------------
 {
   // set filename
-  std::ostrstream fname ;
+  std::ostringstream fname ;
   fname << MAF_DATA_ROOT << "/FEM/vtk/hex8" << ".vtk" << std::ends ;
 
   // read the data
   vtkUnstructuredGridReader *reader = vtkUnstructuredGridReader::New();
-  reader->SetFileName(fname.str());
+  reader->SetFileName(fname.str().c_str());
 
   // set the implicit function which defines the cut
   vtkTransform *T = vtkTransform::New();
@@ -1154,12 +1154,12 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8_EdgeOnly()
 //------------------------------------------------------------------------------
 {
   // set filename
-  std::ostrstream fname ;
+  std::ostringstream fname ;
   fname << MAF_DATA_ROOT << "/FEM/vtk/hex8" << ".vtk" << std::ends ;
 
   // read the data
   vtkUnstructuredGridReader *reader = vtkUnstructuredGridReader::New();
-  reader->SetFileName(fname.str());
+  reader->SetFileName(fname.str().c_str());
 
   // set the implicit function which defines the cut
   vtkTransform *T = vtkTransform::New();
@@ -1205,12 +1205,12 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8_CornerOnly()
 //------------------------------------------------------------------------------
 {
   // set filename
-  std::ostrstream fname ;
+  std::ostringstream fname ;
   fname << MAF_DATA_ROOT << "/FEM/vtk/hex8" << ".vtk" << std::ends ;
 
   // read the data
   vtkUnstructuredGridReader *reader = vtkUnstructuredGridReader::New();
-  reader->SetFileName(fname.str());
+  reader->SetFileName(fname.str().c_str());
 
   // set the implicit function which defines the cut
   vtkTransform *T = vtkTransform::New();
@@ -1256,12 +1256,12 @@ void vtkMAFMeshCutterTest::TestGetOutputTet4()
 //------------------------------------------------------------------------------
 {
   // set filename
-  std::ostrstream fname ;
+  std::ostringstream fname ;
   fname << MAF_DATA_ROOT << "/FEM/vtk/tet4" << ".vtk" << std::ends ;
 
   // read the data
   vtkUnstructuredGridReader *reader = vtkUnstructuredGridReader::New();
-  reader->SetFileName(fname.str());
+  reader->SetFileName(fname.str().c_str());
 
   // set the implicit function which defines the cut
   vtkTransform *T = vtkTransform::New();
@@ -1359,12 +1359,12 @@ void vtkMAFMeshCutterTest::TestUpdateChangeCutFunction()
   std::cout << "  cutting plane position 1..." << std::endl ;
 
   // set filename
-  std::ostrstream fname ;
+  std::ostringstream fname ;
   fname << MAF_DATA_ROOT << "/FEM/vtk/hex8" << ".vtk" << std::ends ;
 
   // read the data
   vtkUnstructuredGridReader *reader = vtkUnstructuredGridReader::New();
-  reader->SetFileName(fname.str());
+  reader->SetFileName(fname.str().c_str());
 
   // set the implicit function which defines the cut
   vtkTransform *T = vtkTransform::New();
@@ -1537,12 +1537,12 @@ void vtkMAFMeshCutterTest::TestUpdateChangeInput()
   std::cout << " running hex8 data..." << std::endl ;
 
   // set filename
-  std::ostrstream fname1 ;
+  std::ostringstream fname1 ;
   fname1 << MAF_DATA_ROOT << "/FEM/vtk/hex8" << ".vtk" << std::ends ;
 
   // read the data
   vtkUnstructuredGridReader *reader = vtkUnstructuredGridReader::New();
-  reader->SetFileName(fname1.str());
+  reader->SetFileName(fname1.str().c_str());
 
   // set the implicit function which defines the cut
   vtkTransform *T = vtkTransform::New();
@@ -1628,11 +1628,11 @@ void vtkMAFMeshCutterTest::TestUpdateChangeInput()
   std::cout << " running tet4 data..." << std::endl ;
 
   // set filename
-  std::ostrstream fname2 ;
+  std::ostringstream fname2 ;
   fname2 << MAF_DATA_ROOT << "/FEM/vtk/tet4" << ".vtk" << std::ends ;
 
   // read the data
-  reader->SetFileName(fname2.str());
+  reader->SetFileName(fname2.str().c_str());
 
   // force update so that the output is there
   MeshCutter->Update();

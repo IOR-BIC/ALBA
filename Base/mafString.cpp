@@ -33,7 +33,7 @@ mafString::~mafString()
   if (m_CStr)
   {
     if (m_Size>0)
-      delete m_CStr;
+      delete[] m_CStr;
 
     m_CStr=NULL;
     m_ConstCStr=NULL;
