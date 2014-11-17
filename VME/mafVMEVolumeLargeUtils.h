@@ -17,7 +17,7 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "medVMEDefines.h"
-#include "../BES_Beta/vtkMAF/vtkMafFile.h"
+#include "vtkMafFile.h"
 #include "vtkMAFIdType64.h"
 
 //----------------------------------------------------------------------------

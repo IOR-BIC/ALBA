@@ -109,6 +109,16 @@ INCLUDE (${CMAKE_ROOT}/Modules/FindThreads.cmake)
 CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/mafConfigure.h.in
              ${PROJECT_BINARY_DIR}/mafConfigure.h
              @ONLY)
+			 
+# Create the header to configure the classes. (from MED)
+CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/medDefines.h.in ${PROJECT_BINARY_DIR}/medDefines.h @ONLY)
+
+CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/Common/medCommonDefines.h.in ${PROJECT_BINARY_DIR}/medCommonDefines.h @ONLY)
+CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/Gui/medGuiDefines.h.in ${PROJECT_BINARY_DIR}/medGuiDefines.h @ONLY)
+CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/Operations/medOperationsDefines.h.in ${PROJECT_BINARY_DIR}/medOperationsDefines.h @ONLY)
+CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/Views/medViewsDefines.h.in ${PROJECT_BINARY_DIR}/medViewsDefines.h @ONLY)
+CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/Interaction/medInteractionDefines.h.in ${PROJECT_BINARY_DIR}/medInteractionDefines.h @ONLY)
+CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/VME/medVMEDefines.h.in ${PROJECT_BINARY_DIR}/medVMEDefines.h @ONLY)
 
 #-----------------------------------------------------------------------------
 # Check if MFL is inside the MAF tree.
@@ -143,13 +153,14 @@ IF (MAF_CAN_BUILD)
   INCLUDE_DIRECTORIES(BEFORE ".")
 
   ###############add all subdirs but "modules"
-  SET(INCLUDE_DIRS "${MAF_BINARY_DIR}" "${MAF_SOURCE_DIR}/Base" "${MAF_BINARY_DIR}/Interaction" "${MAF_SOURCE_DIR}/Interaction" "${MAF_SOURCE_DIR}/Interaction/Drivers" 
-              "${MAF_SOURCE_DIR}/Core" "${MAF_SOURCE_DIR}/Gui" "${MAF_SOURCE_DIR}/IO" "${MAF_SOURCE_DIR}/Operations" "${MAF_SOURCE_DIR}/VME" 
-              "${MAF_SOURCE_DIR}/VME/DataPipes" "${MAF_SOURCE_DIR}/vtkMAF" "${MAF_BINARY_DIR}/vtkMAF" "${MAF_SOURCE_DIR}/GPUAPI" 
+  SET(INCLUDE_DIRS "${MAF_BINARY_DIR}" "${MAF_SOURCE_DIR}/Base" "${MAF_SOURCE_DIR}/Common" "${MAF_BINARY_DIR}/Interaction" "${MAF_SOURCE_DIR}/Interaction" "${MAF_SOURCE_DIR}/Interaction/Drivers" 
+              "${MAF_SOURCE_DIR}/Core" "${MAF_SOURCE_DIR}/Gui" "${MAF_SOURCE_DIR}/IO" "${MAF_SOURCE_DIR}/Operations" "${MAF_SOURCE_DIR}/VME" "${MAF_SOURCE_DIR}/Views"
+              "${MAF_SOURCE_DIR}/VME/DataPipes" "${MAF_SOURCE_DIR}/vtkMAF" "${MAF_SOURCE_DIR}/vtkMED" "${MAF_BINARY_DIR}/vtkMAF" "${MAF_BINARY_DIR}/vtkMED" "${MAF_SOURCE_DIR}/GPUAPI" 
               "${MAF_SOURCE_DIR}/GPUAPI/GLEW" "${MAF_SOURCE_DIR}/GPUAPI/FBO")
-  SET(INCLUDE_DIRS ${INCLUDE_DIRS} "${MAF_SOURCE_DIR}/mafDLL")
+  SET(INCLUDE_DIRS ${INCLUDE_DIRS} "${MAF_SOURCE_DIR}/mafDLL" "${MAF_BINARY_DIR}/Libraries/ITK/Sources/InsightToolkit-3.0.1/Wrapping/WrapITK/ExternalProjects/ItkVtkGlue/src")
   
   INCLUDE_DIRECTORIES(${INCLUDE_DIRS})
+  
 
 IF(WIN32)
 	LINK_DIRECTORIES(${MAF_SOURCE_DIR}/GPUAPI/GLEW)
@@ -208,8 +219,11 @@ ENDIF(WIN32)
     SUBDIRS (IO)
     SUBDIRS (Core)
     IF (MAF_USE_VTK)
+	  SUBDIRS (Common)
       SUBDIRS (vtkMAF)
+	  SUBDIRS (vtkMED)
       SUBDIRS (VME)
+	  SUBDIRS (Views)
       SUBDIRS (Operations)
     ENDIF (MAF_USE_VTK)
     

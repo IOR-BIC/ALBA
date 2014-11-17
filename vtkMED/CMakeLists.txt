@@ -60,22 +60,22 @@ SET(vtkMED_SRCS
   vtkPatchLine.cpp
   
   ############# VolumeLarge Files - TO BE COMMITTED DOWN ########
-  ../BES_Beta/vtkMAF/vtkMAFDataArrayDescriptor.cxx
-  ../BES_Beta/vtkMAF/vtkMAFDataArrayDescriptor.h
-  ../BES_Beta/vtkMAF/vtkMAFFileDataProvider.cxx
-  ../BES_Beta/vtkMAF/vtkMAFFileDataProvider.h
-  ../BES_Beta/vtkMAF/vtkMAFLargeImageData.cxx
-  ../BES_Beta/vtkMAF/vtkMAFLargeImageData.h
-  ../BES_Beta/vtkMAF/vtkMAFLargeImageReader.cxx
-  ../BES_Beta/vtkMAF/vtkMAFLargeImageReader.h
-  ../BES_Beta/vtkMAF/vtkMAFLargeImageSource.cxx
-  ../BES_Beta/vtkMAF/vtkMAFLargeImageSource.h
-  ../BES_Beta/vtkMAF/vtkMAFFile.cxx
-  ../BES_Beta/vtkMAF/vtkMAFFile.h	
-  ../BES_Beta/vtkMAF/vtkMAFDataArrayLayout.cpp
-  ../BES_Beta/vtkMAF/vtkMAFDataArrayLayout.h
-  ../BES_Beta/vtkMAF/vtkMAFMultiFileDataProvider.cpp
-  ../BES_Beta/vtkMAF/vtkMAFMultiFileDataProvider.h
+  vtkMAFDataArrayDescriptor.cxx
+  vtkMAFDataArrayDescriptor.h
+  vtkMAFFileDataProvider.cxx
+  vtkMAFFileDataProvider.h
+  vtkMAFLargeImageData.cxx
+  vtkMAFLargeImageData.h
+  vtkMAFLargeImageReader.cxx
+  vtkMAFLargeImageReader.h
+  vtkMAFLargeImageSource.cxx
+  vtkMAFLargeImageSource.h
+  vtkMAFFile.cxx
+  vtkMAFFile.h	
+  vtkMAFDataArrayLayout.cpp
+  vtkMAFDataArrayLayout.h
+  vtkMAFMultiFileDataProvider.cpp
+  vtkMAFMultiFileDataProvider.h
   ###############################################################
   
   ########## Should be committed down ###########
@@ -150,10 +150,10 @@ SET(vtkMED_SRCS
 
   ############# VolumeLarge Files - TO BE COMMITTED DOWN ########
   vtkMAFIdType64.h
-  ../BES_Beta/vtkMAF/vtkMAFLargeDataProvider.cxx
-  ../BES_Beta/vtkMAF/vtkMAFLargeDataProvider.h
-  ../BES_Beta/vtkMAF/vtkMAFLargeDataSet.cxx
-  ../BES_Beta/vtkMAF/vtkMAFLargeDataSet.h
+  vtkMAFLargeDataProvider.cxx
+  vtkMAFLargeDataProvider.h
+  vtkMAFLargeDataSet.cxx
+  vtkMAFLargeDataSet.h
   ###############################################################
 )
 

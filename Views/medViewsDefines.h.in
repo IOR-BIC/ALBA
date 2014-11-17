@@ -1,7 +1,7 @@
 #ifndef __medViewsDefines_h
 #define __medViewsDefines_h
 
-#if @MED_BUILD_MEDDLL@
+#if @MAF_BUILD_MAFDLL@
 # define MED_SHARED
 #endif
 //--------------------------------------------------------------------------

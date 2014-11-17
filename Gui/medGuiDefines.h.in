@@ -1,7 +1,7 @@
 #ifndef __medGuiDefines_h
 #define __medGuiDefines_h
 
-#if @MED_BUILD_MEDDLL@
+#if @MAF_BUILD_MAFDLL@
 # define MED_SHARED
 #endif
 

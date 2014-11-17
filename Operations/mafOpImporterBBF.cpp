@@ -31,7 +31,7 @@
 
 #include "mafTagArray.h"
 //#include "vtkDataSet.h"
-#include "../BES_Beta/IO/mafVolumeLargeReader.h"
+#include "mafVolumeLargeReader.h"
 #include "mafVMEVolumeLarge.h"
 
 //----------------------------------------------------------------------------

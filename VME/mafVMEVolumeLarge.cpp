@@ -44,9 +44,9 @@ June 9-11, 2008, Manchester, UK, p. 1-8
 
 #include "mafGizmoROI_BES.h"
 #ifndef VME_VOLUME_LARGE_EXCLUDE_CROP
-#include "../BES_Beta/vtkMAF/vtkMAFLargeImageData.h"
-#include "../BES_Beta/vtkMAF/vtkMAFFileDataProvider.h"
-//#include "../vtkMAF/vtkMAFMemMapFileDataProvider.h"
+#include "vtkMAFLargeImageData.h"
+#include "vtkMAFFileDataProvider.h"
+//#include "vtkMAFMemMapFileDataProvider.h"
 #endif
 
 #include <stack>

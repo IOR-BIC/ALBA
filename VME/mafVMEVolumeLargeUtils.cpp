@@ -26,9 +26,9 @@
 #include "mafEventIO.h"
 #include "mafVMEVolumeGray.h"
 
-#include "../BES_Beta/vtkMAF/vtkMAFDataArrayDescriptor.h"
-#include "../BES_Beta/vtkMAF/vtkMAFLargeImageData.h"
-#include "../BES_Beta/IO/mafVolumeLargeWriter.h"
+#include "vtkMAFDataArrayDescriptor.h"
+#include "vtkMAFLargeImageData.h"
+#include "mafVolumeLargeWriter.h"
 
 
 /*static*/ bool mafVMEVolumeLargeUtils::IsVolumeLarge(

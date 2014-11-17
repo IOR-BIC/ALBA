@@ -139,6 +139,53 @@ SET(PROJECT_SRCS
   mafInteractorSelectCell.h
   mafInteractorSER.cpp
   mafInteractorSER.h
+  ######################
+  medInteractorPicker.cpp
+  medInteractorPicker.h
+  medInteractorDICOMImporter.h
+  medInteractorDICOMImporter.cpp  
+  medInteractor2DAngle.cpp
+  medInteractor2DAngle.h
+  medInteractor2DDistance.cpp
+  medInteractor2DDistance.h
+  medInteractor2DIndicator.cpp
+  medInteractor2DIndicator.h
+  medInteractorSegmentationPicker.cpp
+  medInteractorSegmentationPicker.h 
+  medInteractorPERScalarInformation.cpp
+  medInteractorPERScalarInformation.h
+  medInteractorPERBrushFeedback.cpp
+  medInteractorPERBrushFeedback.h
+  mmiVTKPicker.cpp
+  mmiVTKPicker.h
+  medGizmoPolylineGraph.cpp
+  medGizmoPolylineGraph.h
+  medDeviceButtonsPadMouseDialog.h
+  medDeviceButtonsPadMouseDialog.cpp
+  medGUITransformSliders.cpp
+  medGUITransformSliders.h
+  
+  ##### Introduced with VolumeLarge - to be committed down ###
+  # mafGizmoROI_BES.cpp
+  # mafGizmoROI_BES.h  
+  ############################################################
+
+  medGizmoCrossRotateTranslate.cpp
+  medGizmoCrossRotateTranslate.h
+	  
+  medGizmoCrossRotate.cpp
+  medGizmoCrossRotate.h
+  medGizmoCrossRotateAxis.cpp
+  medGizmoCrossRotateAxis.h
+  medGizmoCrossRotateFan.cpp
+  medGizmoCrossRotateFan.h
+
+  medGizmoCrossTranslate.cpp
+  medGizmoCrossTranslate.h
+  medGizmoCrossTranslateAxis.cpp
+  medGizmoCrossTranslateAxis.h
+  medGizmoCrossTranslatePlane.cpp
+  medGizmoCrossTranslatePlane.h
 )
 
 ## SIL == removed under Linux - since it requires mafDrivers - which seems to be Win32 only
@@ -198,6 +245,8 @@ SET(PROJECT_LIBS mafBase mafIO mafGui vtkMAF)
 # Create the library.
 ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
+
+ADD_DEPENDENCIES(${PROJECT_NAME} medCommon mafVME vtkMED)
 
 IF (MAF_USE_WX)
   ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_WXWIN_LIBRARY)

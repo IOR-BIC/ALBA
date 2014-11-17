@@ -64,12 +64,12 @@
 #include "vtkDoubleArray.h"
 
 #ifdef VME_VOLUME_LARGE
-#include "../BES_Beta/IO/mafVolumeLargeWriter.h"
-#include "../BES_Beta/vtkMAF/vtkMAFLargeImageReader.h"
-#include "../BES_Beta/vtkMAF/vtkMAFLargeImageData.h"
-#include "../BES_Beta/vtkMAF/vtkMAFLargeDataSetCallback.h"
-#include "../BES_Beta/vtkMAF/vtkMAFFileDataProvider.h"
-#include "../BES_Beta/vtkMAF/vtkMAFMultiFileDataProvider.h"
+#include "mafVolumeLargeWriter.h"
+#include "vtkMAFLargeImageReader.h"
+#include "vtkMAFLargeImageData.h"
+#include "vtkMAFLargeDataSetCallback.h"
+#include "vtkMAFFileDataProvider.h"
+#include "vtkMAFMultiFileDataProvider.h"
 #endif // VME_VOLUME_LARGE
 
 #include "mafMemDbg.h"

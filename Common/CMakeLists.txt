@@ -92,8 +92,8 @@ SET(PROJECT_SRCS
   ##################################
 	
   #Removed from vtkMED because it need of MAF Utilities
-  ../BES_Beta/vtkMAF/vtkMAFLargeDataSetCallback.cxx
-  ../BES_Beta/vtkMAF/vtkMAFLargeDataSetCallback.h
+  vtkMAFLargeDataSetCallback.cxx
+  vtkMAFLargeDataSetCallback.h
 )
 
 # List libraries that are needed by this project.
@@ -101,16 +101,16 @@ SET(PROJECT_LIBS "mafVME" "mafInteraction")
 
 SET(PROJECT_LIBS ${PROJECT_LIBS} vtkMED)
 
-IF(MED_BUILD_MEDDLL)
+IF(MAF_BUILD_MAFDLL)
   SET(BUILD_SHARED_LIBS 1)
   ADD_DEFINITIONS(-DMED_COMMON_EXPORTS)
   # Create the library.
   ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
   TARGET_LINK_LIBRARIES(${PROJECT_NAME} mafDLL medGui)
-ELSE(MED_BUILD_MEDDLL)
+ELSE(MAF_BUILD_MAFDLL)
   # Create the library.
   ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
   TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
-ENDIF (MED_BUILD_MEDDLL)
+ENDIF (MAF_BUILD_MAFDLL)
 
 ADD_DEPENDENCIES(${PROJECT_NAME} vtkMED)

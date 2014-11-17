@@ -35,15 +35,15 @@ ELSE (WIN32)
 ENDIF (WIN32)
 
 
-IF(MED_BUILD_MEDDLL)
+IF(MAF_BUILD_MAFDLL)
   SET(PROJECT_LIBS
-  medOperations medGui medViews medVME medInteraction
+  mafOperations mafGui medViews mafVME mafInteraction
 )
-ELSE(MED_BUILD_MEDDLL)
+ELSE(MAF_BUILD_MAFDLL)
   SET(PROJECT_LIBS
-  medOperations medGui medViews medVME medInteraction mafVME mafOperations vtkMAF GPUAPI
+  mafOperations mafGui medViews mafVME mafInteraction vtkMAF GPUAPI
 )
-ENDIF (MED_BUILD_MEDDLL)
+ENDIF(MAF_BUILD_MAFDLL)
 
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
 IF (WIN32)
