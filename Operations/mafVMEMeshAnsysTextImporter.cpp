@@ -38,6 +38,8 @@
 
 #include "mafVMEMesh.h"
 #include "mafTagArray.h"
+#include "mafGui.h"
+#include "mafGUIDialog.h"
 
 
 // vcl includes
@@ -47,6 +49,10 @@
 #include <vcl_map.h>
 #include <vcl_vector.h>
 #include <vcl_algorithm.h>
+
+
+#define MIN( x, y ) ( (x) < (y) ? (x) : (y) )
+#define MAX( x, y ) ( (x) > (y) ? (x) : (y) )
 
 //----------------------------------------------------------------------------
 /*
@@ -80,7 +86,6 @@ mafVMEMeshAnsysTextImporter::mafVMEMeshAnsysTextImporter()
   m_MeshType = UNKNOWN;
   
   m_Output = NULL;
-
 }
 //----------------------------------------------------------------------------
 mafVMEMeshAnsysTextImporter::~mafVMEMeshAnsysTextImporter()
@@ -154,7 +159,9 @@ int mafVMEMeshAnsysTextImporter::Read()
   return MAF_OK;
 }
 
+//----------------------------------------------------------------------------
 int mafVMEMeshAnsysTextImporter::ParseNodesFile(vtkUnstructuredGrid *grid)
+//----------------------------------------------------------------------------
 {
   if (strcmp(m_NodesFileName, "") == 0)
   {
@@ -257,7 +264,9 @@ void mafVMEMeshAnsysTextImporter::AddIntArrayToUnstructuredGridCellData( vtkUnst
   
   vtkDEL(array);
 }
+//----------------------------------------------------------------------------
 int mafVMEMeshAnsysTextImporter::ParseElementsFile(vtkUnstructuredGrid *grid)
+//----------------------------------------------------------------------------
 {
   if (strcmp(m_ElementsFileName, "") == 0)
   {
@@ -363,6 +372,7 @@ int mafVMEMeshAnsysTextImporter::ParseElementsFile(vtkUnstructuredGrid *grid)
 
 //----------------------------------------------------------------------------
 int mafVMEMeshAnsysTextImporter::ParseMaterialsFile(vtkUnstructuredGrid *grid, const char *matfilename)
+//----------------------------------------------------------------------------
 {
   if (strcmp(matfilename, "") == 0)
   {
@@ -370,167 +380,215 @@ int mafVMEMeshAnsysTextImporter::ParseMaterialsFile(vtkUnstructuredGrid *grid, c
     return -1;
   }
 
-// read materials from file
-vcl_ifstream input;
+	// read materials from file
+	vcl_ifstream input;
 
-/*
+	/*
 
- Example Material text field
+	 Example Material text field
 
- MATERIAL NUMBER =      1 EVALUATED AT TEMPERATURE OF   0.0000    
- EX   =   18304.    
- DENS =   1.2747    
- PRXY =  0.30000  
+	 MATERIAL NUMBER =      1 EVALUATED AT TEMPERATURE OF   0.0000    
+	 EX   =   18304.    
+	 DENS =   1.2747    
+	 PRXY =  0.30000  
 
- material: (index, map(string, double))
+	 material: (index, map(string, double))
 
-*/
-// used by loops;
-int i = 0;
+	*/
 
-vcl_string tmpstr;
-// material prop numerical value
-double value;
-// first read values holder
-vcl_vector<double> tmp_vec;
+	vcl_string startStr;
+	vcl_string tmpStr;
 
-// holds material properties name; first element is "material_id"
-vcl_vector<vcl_string> mat_name_vec;
-mat_name_vec.push_back("material_id");
+	// material prop numerical value
+	double value;
 
-// number of material properties
-int num_prop = 0;
-// number of materials
-int num_mat = 0;
+	// materials properties vector [loc_num_prop x num_mat];
+	typedef vcl_vector<double> row_vector;
+	vcl_vector<row_vector> mat_prop_values_vec;
+	vcl_vector<row_vector> mat_prop_ids_vec;
+	row_vector mat_prop_values_min_vec;
+	row_vector mat_prop_values_max_vec;
 
-// materials properties vector [num_prop x num_mat];
-typedef vcl_vector<double> row_vector;
-vcl_vector<row_vector> mat_prop_vec;
 
-/*
+	// holds material properties name; first element is "material_id"
+	vcl_vector<vcl_string> mat_prop_name_vec;
+	mat_prop_name_vec.push_back("material_id");
+	//id props does not need min max, pushing back for other props align
+	mat_prop_values_min_vec.push_back(0);
+	mat_prop_values_max_vec.push_back(0);
 
-  mat_prop_vec[0] .... mat_prop_vec[n-1]
-      
-        matID_0               EX_0
-        matID_1               EX_1
-         ...                 ...
-        matID_n-1             EX_n-1
 
-*/
+	// number of material properties
+	int num_prop = 1;
+	// number of materials
+	int num_mat = 0;
+	
 
-input.open(matfilename, ios::out);
+	/*
+		mat_name_vec: ["material_id", "EX", "NUX", "DENS"]
+		mat_prop_values_min_vec[min(matID), min(EX), min(NUX), min(DENS)]
+		mat_prop_values_max_vec[max(matID), max(EX), max(NUX), max(DENS)]
 
-if (input.is_open())
-{
-  
-  // skip first line characters until "=" is encountered
-  input.ignore(INT_MAX, '=');
-  // save the material id
-  int material_id;
-  input >> material_id;
-  tmp_vec.push_back(material_id);
-  // skip the rest of the line
-  input.ignore(INT_MAX, '\n');
+		mat_prop_value_vec[0] .... mat_prop_value_vec[n-1]
+					matID												matID
+					EX													EX
+					NUX													DENS
 
-  // the first string encountered should be the first material prop name...
-  // read until an empty line is found
+		mat_prop_value_vec[0] .... mat_prop_value_vec[n-1]
+					0														0
+					1														1
+					2														3
+	*/
 
-  //tmpstr should be EX the first step
-  while (input >> tmpstr)
-  {
-    // if we found the second material break...
-    if (tmpstr == "MATERIAL")
-    {
-      break;
-    }
-    // while tmpstr is not "MATERIAL
-    const char *name = tmpstr.c_str();
-    // prop names in mat_name_vec;
-    mat_name_vec.push_back(tmpstr);
-  
-    //         =       value
-    input >> tmpstr >> value;
-    // keeping track of numerical value
-    tmp_vec.push_back(value);
+	input.open(matfilename, ios::out);
 
-    // skip tokens after first string until the first newline
-    input.ignore(INT_MAX, '\n');
-  }
+	if (input.is_open())
+	{
+		int propPos;
 
-  num_prop = mat_name_vec.size();
+		//reading materials
+		while (input >> startStr)
+		{
+			if (startStr == "MATERIAL")
+			{
+				//found new material
+				int material_id;
 
-  int i;
-  for (i = 0; i < num_prop; i++)
-  {
-  vcl_vector<double> tmp;
-  tmp.push_back(tmp_vec[i]);
-  mat_prop_vec.push_back(tmp);
-  }
+				// skip first line characters until "=" is encountered
+				input.ignore(INT_MAX, '=');
+				input >> material_id;
+				row_vector matValueVector;
+				row_vector matPropIdVector;
+				matValueVector.push_back(material_id);
+				matPropIdVector.push_back(0);
+				mat_prop_values_vec.push_back(matValueVector);
+				mat_prop_ids_vec.push_back(matPropIdVector);
+				num_mat++;
+			}
+			else 
+			{
+				//         =        5
+				input >> tmpStr >> value;
 
-  // this should be field 2 of materials file
-  while (input >> tmpstr)
-  {
-  
-    // skip first line characters until "=" is encountered
-    input.ignore(INT_MAX, '=');
-    // save the material id
-    int material_id;
-    input >> material_id;
-    mat_prop_vec[0].push_back(material_id);
-    // skip the rest of the line
-    input.ignore(INT_MAX, '\n');
-  
-    for (i = 1; i < num_prop; i++)
-    {
-      //         DENS       =        5
-      input >> tmpstr >> tmpstr >> value;
-      mat_prop_vec[i].push_back(value);
-      input.ignore(INT_MAX, '\n');
-    }
+				//Search Property name
+				for(propPos=num_prop-1;propPos>=0;propPos--)
+				{
+					if (startStr == mat_prop_name_vec[propPos])
+						break;
+				}
 
-    // next line should be the materials line, we ignore it;
-    input.ignore(INT_MAX, '\n');
-  }
+				//Property name not found add new prop
+				if (propPos < 0)
+				{
+					mat_prop_name_vec.push_back(startStr);
+					mat_prop_values_min_vec.push_back(value);
+					mat_prop_values_max_vec.push_back(value);
+					num_prop++;
+					propPos=num_prop-1;
+				}
 
-  // all the materials vector should have the same length
-  // equals to the number of materials
-  num_mat  = mat_prop_vec[0].size();
+				mat_prop_values_min_vec[propPos]=MIN(value,mat_prop_values_min_vec[propPos]);
+				mat_prop_values_max_vec[propPos]=MAX(value,mat_prop_values_max_vec[propPos]);
+				mat_prop_values_vec[num_mat-1].push_back(value);
+				mat_prop_ids_vec[num_mat-1].push_back(propPos);				
+			}
 
-  vtkFieldData *fdata = vtkFieldData::New();
-  
-  // TO BE PORTED... THIS SHOULD BE NOT NEEDED BY vtk 4.4
-  //fdata->SetNumberOfArrays(num_prop);
+			// next line should be the materials line, we ignore it;
+			input.ignore(INT_MAX, '\n');
+		}
+				
+		vtkFieldData *fdata = vtkFieldData::New();
+  		
+		// create field data data array
+		for (int propIndex = 0; propIndex < num_prop; propIndex++)
+		{
+			int assignToAll=false;
+			double assignValue=0;
 
-  // create field data data array
-  for (i = 0; i < num_prop; i++)
-  {
-    // create the ith data array
-    vtkDoubleArray *darr = vtkDoubleArray::New();
-    darr->SetName(mat_name_vec[i].c_str());
-    darr->SetNumberOfValues(num_mat);
+
+			// create the ith data array
+			vtkDoubleArray *darr = vtkDoubleArray::New();
+			darr->SetName(mat_prop_name_vec[propIndex].c_str());
+			darr->SetNumberOfValues(num_mat);
     
-    for (int j = 0; j < num_mat; j++)
-    {
-      // fill ith data array with jth value 
-      darr->InsertValue(j, mat_prop_vec[i][j]);
-    }
-    // add the ith data array to the field data
-    fdata->AddArray(darr);
+			for (int j = 0; j < num_mat; j++)
+			{
+				//Search Property id
+				for(propPos=mat_prop_ids_vec[j].size()-1;propPos>=0;propPos--)
+				{
+					if (mat_prop_ids_vec[j][propPos]==propIndex)
+					{
+						//assign prop value
+						value=mat_prop_values_vec[j][propPos];
+						break;
+					}
+				}
 
-    //clean up
-    darr->Delete();
-  }
+				//Property id not found assign default value ask value to the user
+				if (propPos < 0)
+				{
+					//If user does not have already select "Apply to all" for this property we ask him the value for current material
+					if (!assignToAll)
+					{
+						//setting default value to the min of the range
+						assignValue=MIN(value,mat_prop_values_min_vec[propIndex]);
+						
+						//Create strings for GUI
+						mafString matLabel;
+						mafString rangeLabel;
+						mafString applyLabel;
+						matLabel.Printf(" Material N. %d has no property %s defined", (int)mat_prop_values_vec[j][0], mat_prop_name_vec[propIndex].c_str());
+						rangeLabel.Printf(" %s current Range is (%.4f,%.4f)",mat_prop_name_vec[propIndex].c_str(), mat_prop_values_min_vec[propIndex], mat_prop_values_max_vec[propIndex]);
+						applyLabel.Printf("Apply to all %s",mat_prop_name_vec[propIndex].c_str());
+															
+						//Create GUI
+						mafGUI *dialogGui;
+						dialogGui = new mafGUI(NULL);
+						dialogGui->Label(matLabel,"",true);
+						dialogGui->Label("");
+						dialogGui->Label(rangeLabel,"");
+						dialogGui->Label("");
+						dialogGui->Label("Please Insert property value");
+						dialogGui->Double(-1,_("Value: "), &assignValue);
+						dialogGui->Bool(-1,applyLabel, &assignToAll,true);
+						dialogGui->FitGui();
 
-  grid->SetFieldData(fdata);
-  fdata->Delete();
+						//Create and show dialog
+						mafGUIDialog *dialog;
+						dialog = new mafGUIDialog("Unkonwn Property Value", mafRESIZABLE | mafOK);
+						dialog->Add(dialogGui);
+						dialog->SetMinSize(wxSize(320,100));
+						dialog->Fit();
+						dialog->ShowModal();
 
-  return 0;
-}
-else
-{
-   mafErrorMacro("File:" << matfilename << "does not exist" << endl << "Not building attribute data from materials id." << endl);
-	 return -1;
-}
+						//Updating current property range
+						mat_prop_values_min_vec[propIndex]=MIN(value,mat_prop_values_min_vec[propIndex]);
+						mat_prop_values_max_vec[propIndex]=MAX(value,mat_prop_values_max_vec[propIndex]);
+					}
+					//updating property value
+					value=assignValue;
+				}
+
+				// fill ith data array with jth value 
+				darr->InsertValue(j, value);
+			}
+			// add the ith data array to the field data
+			fdata->AddArray(darr);
+
+			//clean up
+			darr->Delete();
+		}
+
+		grid->SetFieldData(fdata);
+		fdata->Delete();
+
+		return 0;
+	}
+	else
+	{
+		 mafErrorMacro("File:" << matfilename << "does not exist" << endl << "Not building attribute data from materials id." << endl);
+		 return -1;
+	}
 
 }
 
@@ -621,7 +679,9 @@ int mafVMEMeshAnsysTextImporter::GetElementType()
   
 }
 
+//----------------------------------------------------------------------------
 int mafVMEMeshAnsysTextImporter::ReadMatrix(vnl_matrix<double> &M, const char *fname)
+//----------------------------------------------------------------------------
 {
   vcl_ifstream v_raw_matrix(fname, std::ios::in);
 
@@ -635,7 +695,9 @@ int mafVMEMeshAnsysTextImporter::ReadMatrix(vnl_matrix<double> &M, const char *f
   return 1;
 }
 
+//----------------------------------------------------------------------------
 void mafVMEMeshAnsysTextImporter::FEMDataToCellData( vtkUnstructuredGrid *input, vtkUnstructuredGrid *output  )
+//----------------------------------------------------------------------------
 {
 
   if ( input == NULL || output == NULL )
@@ -752,7 +814,9 @@ void mafVMEMeshAnsysTextImporter::FEMDataToCellData( vtkUnstructuredGrid *input,
   }  
 }
 
+//----------------------------------------------------------------------------
 int mafVMEMeshAnsysTextImporter::GetMeshType()
+//----------------------------------------------------------------------------
 {
   GetElementType();
   return m_MeshType;
