@@ -86,6 +86,138 @@ SET(vtkMAF_SRCS
   vtkMAFXYPlotActor.h
   vtkMAFPolyDataNormals.cxx
   vtkMAFPolyDataNormals.h
+  ####################### from vtkMED
+  vtkDicomUnPacker.cxx
+  vtkDicomUnPacker.h
+  vtkImageUnPacker.cxx
+  vtkImageUnPacker.h
+  vtkPackedImage.cxx
+  vtkPackedImage.h
+  vtkXRayVolumeMapper.cxx
+  vtkXRayVolumeMapper.h
+  vtkWeightedLandmarkTransform.cxx
+  vtkWeightedLandmarkTransform.h
+  vtkTriangleQualityRatio.cxx
+  vtkTriangleQualityRatio.h
+  vtkMAFCellLocator.cxx
+  vtkMAFCellLocator.h
+  vtkMEDAddScalarsFilter.cxx
+  vtkMEDAddScalarsFilter.h
+  vtkMEDExtrudeToCircle.cxx
+  vtkMEDExtrudeToCircle.h
+  vtkMEDFillingHole.cxx
+  vtkMEDFillingHole.h
+  vtkMEDFixTopology.cxx
+  vtkMEDFixTopology.h
+  vtkMEDImageUnsharpFilter.cxx
+  vtkMEDImageUnsharpFilter.h
+  vtkMEDMatrixVectorMath.h
+  vtkMEDMatrixVectorMath.cxx
+  vtkMEDPoissonSurfaceReconstruction.cxx
+  vtkMEDPoissonSurfaceReconstruction.h
+  vtkMEDPolyDataMirror.cxx
+  vtkMEDPolyDataMirror.h
+  vtkMEDPolyDataNavigator.h
+  vtkMEDPolyDataNavigator.cxx
+  vtkMEDRegionGrowingLocalGlobalThreshold.cxx
+  vtkMEDRegionGrowingLocalGlobalThreshold.h
+  vtkMEDHalfTubeRemoval.cxx
+  vtkMEDHalfTubeRemoval.h
+  vtkMEDInteractorStyleEnableRotation.cxx
+  vtkMEDInteractorStyleEnableRotation.h
+  vtkMEDSubdividePolylines.cxx
+  vtkMEDSubdividePolylines.h
+  vtkMEDLandmarkCloudPolydataFilter.cxx
+  vtkMEDLandmarkCloudPolydataFilter.h
+  vtkBox.cxx
+  vtkBox.h
+  vtkMaskPolyDataFilter.cxx
+  vtkMaskPolyDataFilter.h
+  vtkHoleConnectivity.cxx
+  vtkHoleConnectivity.h
+  vtkPatchLine.h
+  vtkPatchLine.cpp
+  
+  ############# VolumeLarge Files - TO BE COMMITTED DOWN ########
+  vtkMAFDataArrayDescriptor.cxx
+  vtkMAFDataArrayDescriptor.h
+  vtkMAFFileDataProvider.cxx
+  vtkMAFFileDataProvider.h
+  vtkMAFLargeImageData.cxx
+  vtkMAFLargeImageData.h
+  vtkMAFLargeImageReader.cxx
+  vtkMAFLargeImageReader.h
+  vtkMAFLargeImageSource.cxx
+  vtkMAFLargeImageSource.h
+  vtkMAFFile.cxx
+  vtkMAFFile.h	
+  vtkMAFDataArrayLayout.cpp
+  vtkMAFDataArrayLayout.h
+  vtkMAFMultiFileDataProvider.cpp
+  vtkMAFMultiFileDataProvider.h
+  ###############################################################
+  
+  ########## Should be committed down ###########
+  vtkMAFVolumeRayCastMapper.cxx
+  vtkMAFVolumeRayCastMapper.h
+  vtkMAFVolumeTextureMapper2D.cxx
+  vtkMAFVolumeTextureMapper2D.h
+  vtkMAFVolumeSlicer_BES.cxx
+  vtkMAFVolumeSlicer_BES.h
+  vtkMAFMeshCutter_BES.cxx 
+  vtkMAFMeshCutter_BES.h  	
+  ###############################################
+  
+  ########## Probably could be committed down ###
+  vtkMEDPolyDataDeformation.cpp
+  vtkMEDPolyDataDeformation.h
+  vtkMEDPolyDataDeformation_M1.cpp
+  vtkMEDPolyDataDeformation_M1.h
+  vtkMEDPolyDataDeformation_M2.cpp
+  vtkMEDPolyDataDeformation_M2.h  
+  ###############################################
+    
+
+  
+  vtkMEDErythrocyteSource.cpp
+  vtkMEDErythrocyteSource.h
+  
+  vtkMEDImageFillHolesRemoveIslands.cxx
+  vtkMEDImageFillHolesRemoveIslands.h
+  
+  vtkMEDVolumeSlicerNotInterpolated.cxx
+  vtkMEDVolumeSlicerNotInterpolated.h
+
+  vtkMEDBinaryImageFloodFill.cxx
+  vtkMEDBinaryImageFloodFill.h
+  
+  ######vtkbioeng################################
+  vtkMEDCollisionDetectionFilter.cxx
+  vtkMEDCollisionDetectionFilter.h
+  
+  vtkMEDRayCastCleaner.cpp
+  vtkMEDRayCastCleaner.h
+  
+  vtkMEDVolumeToClosedSmoothSurface.cxx
+  vtkMEDVolumeToClosedSmoothSurface.h
+  
+  ################################
+  vtkBoundingBox.cxx
+  vtkBoundingBox.h
+  vtkMEDPastValuesList.cpp
+  vtkMEDPastValuesList.h
+  vtkMEDStentModelSource.cpp
+  vtkMEDStentModelSource.h
+  vtkMEDDeformableSimplexMeshFilter.h
+  vtkMEDDeformableSimplexMeshFilter_Impl.h
+
+  ############# VolumeLarge Files - TO BE COMMITTED DOWN ########
+  vtkMAFIdType64.h
+  vtkMAFLargeDataProvider.cxx
+  vtkMAFLargeDataProvider.h
+  vtkMAFLargeDataSet.cxx
+  vtkMAFLargeDataSet.h
+  ###############################################################
 )
 
 IF(WIN32)
@@ -96,6 +228,13 @@ SET(vtkMAF_SRCS
   )
 ENDIF(WIN32)
 
+IF (MAF_USE_ITK)
+SET(vtkMAF_SRCS  ${vtkMAF_SRCS}
+  mafClassicICPRegistration.cxx
+  mafClassicICPRegistration.h
+  mafICPUtility.h
+)
+ENDIF (MAF_USE_ITK)
 
 # List the kits from VTK that are needed by this project.
 SET(vtkMAF_LIBS
@@ -180,6 +319,7 @@ IF(VTK_FOUND)
   CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/vtkMAFConfigure.h.in
                  ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Configure.h
                  @ONLY IMMEDIATE)
+				 
 
   # Create the instantiator for these classes.
   SET(VTK_USE_INSTANTIATOR_NEW 1)
@@ -247,16 +387,16 @@ IF(VTK_FOUND)
   ENDIF(VTK_WRAP_JAVA)
   
   # build testing if necessary
-  OPTION(BUILD_TESTING "Build the testing tree." OFF)
-  IF (BUILD_TESTING)
-    IF (NOT MAKECOMMAND)
-      INCLUDE (${CMAKE_ROOT}/Modules/Dart.cmake)
-      ENABLE_TESTING()
-    ENDIF (NOT MAKECOMMAND)
+  #OPTION(BUILD_TESTING "Build the testing tree." OFF)
+  #IF (BUILD_TESTING)
+  #  IF (NOT MAKECOMMAND)
+  #    INCLUDE (${CMAKE_ROOT}/Modules/Dart.cmake)
+  #    ENABLE_TESTING()
+  #  ENDIF (NOT MAKECOMMAND)
     
-    OPTION(BUILD_vtkMAF_TESTING "Enable building of testing for vtkMAF classes" ON)
-    IF (BUILD_vtkMAF_TESTING)
-      SUBDIRS(Testing)
-    ENDIF (BUILD_vtkMAF_TESTING)
-  ENDIF (BUILD_TESTING)
+  #  OPTION(BUILD_vtkMAF_TESTING "Enable building of testing for vtkMAF classes" ON)
+  #  IF (BUILD_vtkMAF_TESTING)
+  #    SUBDIRS(Testing)
+  #  ENDIF (BUILD_vtkMAF_TESTING)
+  #ENDIF (BUILD_TESTING)
 ENDIF(VTK_FOUND)

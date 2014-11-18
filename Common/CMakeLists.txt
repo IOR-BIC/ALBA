@@ -2,7 +2,7 @@
 # Copyright and description to be placed here
 #
 
-PROJECT(medCommon)
+PROJECT(mafCommon)
 
 # Set your list of sources here.
 SET(PROJECT_SRCS
@@ -99,7 +99,7 @@ SET(PROJECT_SRCS
 # List libraries that are needed by this project.
 SET(PROJECT_LIBS "mafVME" "mafInteraction")
 
-SET(PROJECT_LIBS ${PROJECT_LIBS} vtkMED)
+SET(PROJECT_LIBS ${PROJECT_LIBS} vtkMAF)
 
 IF(MAF_BUILD_MAFDLL)
   SET(BUILD_SHARED_LIBS 1)
@@ -113,4 +113,4 @@ ELSE(MAF_BUILD_MAFDLL)
   TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
 ENDIF (MAF_BUILD_MAFDLL)
 
-ADD_DEPENDENCIES(${PROJECT_NAME} vtkMED)
+ADD_DEPENDENCIES(${PROJECT_NAME} vtkMAF)

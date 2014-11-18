@@ -155,7 +155,7 @@ IF (MAF_CAN_BUILD)
   ###############add all subdirs but "modules"
   SET(INCLUDE_DIRS "${MAF_BINARY_DIR}" "${MAF_SOURCE_DIR}/Base" "${MAF_SOURCE_DIR}/Common" "${MAF_BINARY_DIR}/Interaction" "${MAF_SOURCE_DIR}/Interaction" "${MAF_SOURCE_DIR}/Interaction/Drivers" 
               "${MAF_SOURCE_DIR}/Core" "${MAF_SOURCE_DIR}/Gui" "${MAF_SOURCE_DIR}/IO" "${MAF_SOURCE_DIR}/Operations" "${MAF_SOURCE_DIR}/VME" "${MAF_SOURCE_DIR}/Views"
-              "${MAF_SOURCE_DIR}/VME/DataPipes" "${MAF_SOURCE_DIR}/vtkMAF" "${MAF_SOURCE_DIR}/vtkMED" "${MAF_BINARY_DIR}/vtkMAF" "${MAF_BINARY_DIR}/vtkMED" "${MAF_SOURCE_DIR}/GPUAPI" 
+              "${MAF_SOURCE_DIR}/VME/DataPipes" "${MAF_SOURCE_DIR}/vtkMAF" "${MAF_BINARY_DIR}/vtkMAF"  "${MAF_SOURCE_DIR}/GPUAPI" 
               "${MAF_SOURCE_DIR}/GPUAPI/GLEW" "${MAF_SOURCE_DIR}/GPUAPI/FBO")
   SET(INCLUDE_DIRS ${INCLUDE_DIRS} "${MAF_SOURCE_DIR}/mafDLL" "${MAF_BINARY_DIR}/Libraries/ITK/Sources/InsightToolkit-3.0.1/Wrapping/WrapITK/ExternalProjects/ItkVtkGlue/src")
   
@@ -221,7 +221,6 @@ ENDIF(WIN32)
     IF (MAF_USE_VTK)
 	  SUBDIRS (Common)
       SUBDIRS (vtkMAF)
-	  SUBDIRS (vtkMED)
       SUBDIRS (VME)
 	  SUBDIRS (Views)
       SUBDIRS (Operations)

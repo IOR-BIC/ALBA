@@ -37,11 +37,11 @@ ENDIF (WIN32)
 
 IF(MAF_BUILD_MAFDLL)
   SET(PROJECT_LIBS
-  mafOperations mafGui medViews mafVME mafInteraction
+  mafOperations mafGui mafViews mafVME mafInteraction
 )
 ELSE(MAF_BUILD_MAFDLL)
   SET(PROJECT_LIBS
-  mafOperations mafGui medViews mafVME mafInteraction vtkMAF GPUAPI
+  mafOperations mafGui mafViews mafVME mafInteraction vtkMAF GPUAPI
 )
 ENDIF(MAF_BUILD_MAFDLL)
 

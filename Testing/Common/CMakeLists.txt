@@ -1,10 +1,10 @@
 PROJECT (MedicalCommon_TEST)
 
-IF(MED_BUILD_MEDDLL)
-  LINK_LIBRARIES(medCommon medVME)
-ELSE(MED_BUILD_MEDDLL)
-  LINK_LIBRARIES(medVME medCommon)
-ENDIF (MED_BUILD_MEDDLL)
+IF(MAF_BUILD_MAFDLL)
+  LINK_LIBRARIES(mafVME mafCommon)
+ELSE(MAF_BUILD_MAFDLL)
+  LINK_LIBRARIES(mafVME mafCommon)
+ENDIF(MAF_BUILD_MAFDLL)
 
 #-----------------------------------------------------------------------------
 # tests using cppunit testing framework
@@ -83,8 +83,8 @@ ADD_TEST(medWizardTest   ${EXECUTABLE_OUTPUT_PATH}/medWizardTest )
 #ENDIF (MAF_USE_WX)
 
 # VTK specific classes
-IF (MAF_USE_VTK)
-ENDIF (MAF_USE_VTK)  
+#IF (MAF_USE_VTK)
+#ENDIF (MAF_USE_VTK)  
 
 # classes using VTK+wxWidgets
 #IF (MAF_USE_WX AND MAF_USE_VTK)
