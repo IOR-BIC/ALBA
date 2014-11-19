@@ -562,8 +562,8 @@ int mafVMEMeshAnsysTextImporter::ParseMaterialsFile(vtkUnstructuredGrid *grid, c
 						dialog->ShowModal();
 
 						//Updating current property range
-						mat_prop_values_min_vec[propIndex]=MIN(value,mat_prop_values_min_vec[propIndex]);
-						mat_prop_values_max_vec[propIndex]=MAX(value,mat_prop_values_max_vec[propIndex]);
+						mat_prop_values_min_vec[propIndex]=MIN(assignValue,mat_prop_values_min_vec[propIndex]);
+						mat_prop_values_max_vec[propIndex]=MAX(assignValue,mat_prop_values_max_vec[propIndex]);
 					}
 					//updating property value
 					value=assignValue;
