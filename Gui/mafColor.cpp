@@ -138,8 +138,8 @@ void mafColor::RGBToHSV(int r, int g, int b, int *h, int *s, int *v)
 
    float delta = max - min;
    float H;
-   
-        if (max == r) H = 0 + (g-b)/delta;
+			if (delta == 0) H = 0;
+	 else if (max == r) H = 0 + (g-b)/delta;
    else if (max == g) H = 2 + (b-r)/delta;
    else if (max == b) H = 4 + (r-g)/delta;
 

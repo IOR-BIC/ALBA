@@ -23,6 +23,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 #include "mafGUILutPreset.h"
+#include "vtkMAFSmartPointer.h"
 
 void lutVolRenGreen(vtkLookupTable *lut);
 void lutVolRenGlow(vtkLookupTable *lut);
@@ -43,8 +44,9 @@ void lutPureBlue(vtkLookupTable *lut);
 void lutMinMax(vtkLookupTable *lut);
 void lutVolRenRGB(vtkLookupTable *lut);
 void lutVolRenTwoLev(vtkLookupTable *lut);
+void defaultBlueToRed(vtkLookupTable *lut);
 
-const int lutPresetNum = 19;
+const int lutPresetNum = 20;
 
 //---------------------------------------------------------------------
 wxString LutNames[lutPresetNum] = 
@@ -68,8 +70,10 @@ wxString LutNames[lutPresetNum] =
 "volren Glow",
 "volren Green",
 "volren RGB",
-"volren Two Level"
+"volren Two Level",
+"default blue to red"
 };
+
 //---------------------------------------------------------------------
 void lutPreset(int idx, vtkLookupTable *lut)
 //---------------------------------------------------------------------
@@ -94,8 +98,9 @@ void lutPreset(int idx, vtkLookupTable *lut)
   case 15: lutVolRenGlow(lut);     break;  
   case 16: lutVolRenGreen(lut);    break;  
   case 17: lutVolRenRGB(lut);      break;  
-  case 18: lutVolRenTwoLev(lut);   break;  
-  default: lutDefault(lut);        break;  
+	case 18: lutVolRenTwoLev(lut);   break;  
+	case 19: defaultBlueToRed(lut);   break;  
+	default: lutDefault(lut);        break;  
   }
 }
 
@@ -2053,6 +2058,22 @@ void lutDefault(vtkLookupTable *lut)
     lut->SetTableValue(i, c.m_Red/255.0, c.m_Green/255.0, c.m_Blue/255.0, 1);
   }
 };
+
+//---------------------------------------------------------------------
+void defaultBlueToRed(vtkLookupTable *lut)
+//---------------------------------------------------------------------
+{
+	mafColor c;
+
+	lut->SetNumberOfTableValues(256);
+	for(int i=0; i<256; i++)
+	{
+
+		int h = ((255-i)*240.0)/255.0;
+		c.SetHSV(h,255,255);
+		lut->SetTableValue(i, c.m_Red/255.0, c.m_Green/255.0, c.m_Blue/255.0, 1);
+	}
+};
 //---------------------------------------------------------------------
 void lutMinMax(vtkLookupTable *lut)
 //---------------------------------------------------------------------
@@ -2721,3 +2742,38 @@ void lutVolRenTwoLev(vtkLookupTable *lut)
     lut->SetTableValue(i, v[k]/255.0, v[k+1]/255.0, v[k+2]/255.0, v[k+3]/255.0);
   }
 };
+
+bool lutEquals(vtkLookupTable *a, vtkLookupTable *b)
+{
+	double aColor[4],bColor[4];
+	int aNValues=a->GetNumberOfTableValues();
+
+	if (aNValues != b->GetNumberOfTableValues())
+		return false;
+
+	for(int i=0;i<aNValues;i++)
+	{
+		a->GetTableValue(i,aColor);
+		b->GetTableValue(i,bColor);
+		if ((aColor[0] != bColor[0]) || (aColor[1] != bColor[1]) || (aColor[2] != bColor[2]) || (aColor[3] != bColor[3]))
+			return false;
+	}
+
+	return true;
+}
+
+int presetsIdxByLut(vtkLookupTable *lut)
+{
+	//creating a temp lut
+	vtkMAFSmartPointer<vtkLookupTable> tmpTable;
+
+	//searching between lut presets
+	for (int i=0;i<lutPresetNum;i++)
+	{
+		lutPreset(i,tmpTable);
+		//if lut is equivalent return preset index
+		if (lutEquals(tmpTable,lut))
+			return i;
+	}
+	return -1;
+}
