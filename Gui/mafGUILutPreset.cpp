@@ -44,8 +44,9 @@ void lutPureBlue(vtkLookupTable *lut);
 void lutMinMax(vtkLookupTable *lut);
 void lutVolRenRGB(vtkLookupTable *lut);
 void lutVolRenTwoLev(vtkLookupTable *lut);
+void defaultBlueToRed(vtkLookupTable *lut);
 
-const int lutPresetNum = 19;
+const int lutPresetNum = 20;
 
 //---------------------------------------------------------------------
 wxString LutNames[lutPresetNum] = 
@@ -69,7 +70,8 @@ wxString LutNames[lutPresetNum] =
 "volren Glow",
 "volren Green",
 "volren RGB",
-"volren Two Level"
+"volren Two Level",
+"default blue to red"
 };
 
 //---------------------------------------------------------------------
@@ -96,8 +98,9 @@ void lutPreset(int idx, vtkLookupTable *lut)
   case 15: lutVolRenGlow(lut);     break;  
   case 16: lutVolRenGreen(lut);    break;  
   case 17: lutVolRenRGB(lut);      break;  
-  case 18: lutVolRenTwoLev(lut);   break;  
-  default: lutDefault(lut);        break;  
+	case 18: lutVolRenTwoLev(lut);   break;  
+	case 19: defaultBlueToRed(lut);   break;  
+	default: lutDefault(lut);        break;  
   }
 }
 
@@ -2054,6 +2057,22 @@ void lutDefault(vtkLookupTable *lut)
     c.SetHSV(h,255,255);
     lut->SetTableValue(i, c.m_Red/255.0, c.m_Green/255.0, c.m_Blue/255.0, 1);
   }
+};
+
+//---------------------------------------------------------------------
+void defaultBlueToRed(vtkLookupTable *lut)
+//---------------------------------------------------------------------
+{
+	mafColor c;
+
+	lut->SetNumberOfTableValues(256);
+	for(int i=0; i<256; i++)
+	{
+
+		int h = ((255-i)*240.0)/255.0;
+		c.SetHSV(h,255,255);
+		lut->SetTableValue(i, c.m_Red/255.0, c.m_Green/255.0, c.m_Blue/255.0, 1);
+	}
 };
 //---------------------------------------------------------------------
 void lutMinMax(vtkLookupTable *lut)

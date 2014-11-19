@@ -116,7 +116,7 @@ mafGUILutEditor::mafGUILutEditor(wxWindow* parent, wxWindowID id, const wxPoint&
 	wxArrayString presetsLutNames;
 	presetsLutNames.Add("Current Lut");
 
-	for (int id = 0; id < lutPresetNum-1; id++) 
+	for (int id = 0; id < lutPresetNum; id++) 
 	{ 
 		presetsLutNames.Add(LutNames[id]);
 	}
