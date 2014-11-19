@@ -237,7 +237,6 @@ void mafGizmoRotateFanTest::RenderData( vtkDataSet *data )
   
   mapper->Delete();
   actor->Delete();
-
 } 
   
 

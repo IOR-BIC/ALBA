@@ -8,6 +8,7 @@
 
 =========================================================================*/
 #include "vtkObjectFactory.h"
+#include <sstream>
 
 #include "vtkMAFTransferFunction2D.h"
 
@@ -648,7 +649,7 @@ static const char *endString   = "end of vtk volume property 2\n";
 char *vtkMAFTransferFunction2D::SaveToString() 
 //-----------------------------------------------------------------
 {
-  strstream stream;
+  std::stringstream stream;
   stream << startString;
   // save transfer function
   for (int wi = 0; wi < this->GetNumberOfWidgets(); wi++) 
@@ -666,9 +667,9 @@ char *vtkMAFTransferFunction2D::SaveToString()
   }
   stream << endString;
 
-  char *string = new char[stream.pcount() + 64];
-  strncpy(string, stream.str(), stream.pcount());
-  string[stream.pcount()] = '\0';
+  char *string = new char[stream.str().size() + 64];
+  strncpy(string, stream.str().c_str(), stream.str().size());
+  string[stream.str().size()] = '\0';
   return string;
 }
 

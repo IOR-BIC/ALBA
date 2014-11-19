@@ -116,4 +116,5 @@ void mafGUIGizmoInterfaceTest::TestGetTestMode()
 	bool testMode = dummyGizmoInterface->GetTestMode();
 	CPPUNIT_ASSERT(testMode = true);
 
+	cppDEL(dummyGizmoInterface);
 }
