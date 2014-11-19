@@ -52,7 +52,7 @@ void medVMESegmentationVolumeTest::setUp()
   mafNEW(m_Volume);
   m_Volume->ReparentTo(m_Storage->GetRoot());
   vtkMAFSmartPointer<vtkDataSetReader> r;
-  mafString filename=MED_DATA_ROOT;
+  mafString filename=MAF_DATA_ROOT;
   filename<<"/VTK_Volumes/volumeSP.vtk";
   r->SetFileName(filename);
   r->Update();
@@ -62,7 +62,7 @@ void medVMESegmentationVolumeTest::setUp()
   m_VolumeRG = NULL;
   mafNEW(m_VolumeRG);
   m_VolumeRG->ReparentTo(m_Storage->GetRoot());
-  filename=MED_DATA_ROOT;
+  filename=MAF_DATA_ROOT;
   filename<<"/VTK_Volumes/volumeRG.vtk";
   r->SetFileName(filename);
   r->Update();
@@ -72,7 +72,7 @@ void medVMESegmentationVolumeTest::setUp()
   m_VolumeManualMask = NULL;
   mafNEW(m_VolumeManualMask);
   m_VolumeManualMask->ReparentTo(m_Volume);
-  filename=MED_DATA_ROOT;
+  filename=MAF_DATA_ROOT;
   filename<<"/VTK_Volumes/manualMask.vtk";
   r->SetFileName(filename);
   r->Update();
@@ -82,7 +82,7 @@ void medVMESegmentationVolumeTest::setUp()
   m_VolumeRefinementMask = NULL;
   mafNEW(m_VolumeRefinementMask);
   m_VolumeRefinementMask->ReparentTo(m_Volume);
-  filename=MED_DATA_ROOT;
+  filename=MAF_DATA_ROOT;
   filename<<"/VTK_Volumes/refinementMask.vtk";
   r->SetFileName(filename);
   r->Update();

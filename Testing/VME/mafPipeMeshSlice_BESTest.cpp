@@ -122,7 +122,7 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution()
   storage->GetRoot()->SetName("root");
   storage->GetRoot()->Initialize();
   mafOpImporterVTK *Importer=new mafOpImporterVTK("importer");
-  mafString filename=MED_DATA_ROOT;
+  mafString filename=MAF_DATA_ROOT;
   filename<<"/FEM/pipemesh/hex8.vtk";
   Importer->TestModeOn();
   Importer->SetFileName(filename);
@@ -267,7 +267,7 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_Wireframe()
   storage->GetRoot()->SetName("root");
   storage->GetRoot()->Initialize();
   mafOpImporterVTK *Importer=new mafOpImporterVTK("importer");
-  mafString filename=MED_DATA_ROOT;
+  mafString filename=MAF_DATA_ROOT;
   filename<<"/FEM/pipemesh/hex8.vtk";
   Importer->TestModeOn();
   Importer->SetFileName(filename);
@@ -414,7 +414,7 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_WiredActorVisibility()
   storage->GetRoot()->SetName("root");
   storage->GetRoot()->Initialize();
   mafOpImporterVTK *Importer=new mafOpImporterVTK("importer");
-  mafString filename=MED_DATA_ROOT;
+  mafString filename=MAF_DATA_ROOT;
   filename<<"/FEM/pipemesh/hex8.vtk";
   Importer->TestModeOn();
   Importer->SetFileName(filename);
@@ -562,7 +562,7 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_FlipNormal()
   storage->GetRoot()->SetName("root");
   storage->GetRoot()->Initialize();
   mafOpImporterVTK *Importer=new mafOpImporterVTK("importer");
-  mafString filename=MED_DATA_ROOT;
+  mafString filename=MAF_DATA_ROOT;
   filename<<"/FEM/pipemesh/hex8.vtk";
   Importer->TestModeOn();
   Importer->SetFileName(filename);
@@ -710,7 +710,7 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_UseVTKProperty()
   storage->GetRoot()->SetName("root");
   storage->GetRoot()->Initialize();
   mafOpImporterVTK *Importer=new mafOpImporterVTK("importer");
-  mafString filename=MED_DATA_ROOT;
+  mafString filename=MAF_DATA_ROOT;
   filename<<"/FEM/pipemesh/hex8.vtk";
   Importer->TestModeOn();
   Importer->SetFileName(filename);
@@ -858,7 +858,7 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_Thickness_PickActor()
   storage->GetRoot()->SetName("root");
   storage->GetRoot()->Initialize();
   mafOpImporterVTK *Importer=new mafOpImporterVTK("importer");
-  mafString filename=MED_DATA_ROOT;
+  mafString filename=MAF_DATA_ROOT;
   filename<<"/FEM/pipemesh/hex8.vtk";
   Importer->TestModeOn();
   Importer->SetFileName(filename);
@@ -1000,7 +1000,7 @@ void mafPipeMeshSlice_BESTest::CompareImages(int scalarIndex)
   name = name.substr(0, pointIndex);
 
 
-  mafString controlOriginFile=MED_DATA_ROOT;
+  mafString controlOriginFile=MAF_DATA_ROOT;
   controlOriginFile<<"/FEM/pipemesh/";
   controlOriginFile<<name.c_str();
   controlOriginFile<<"_";
@@ -1024,7 +1024,7 @@ void mafPipeMeshSlice_BESTest::CompareImages(int scalarIndex)
   vtkJPEGWriter *w;
   vtkNEW(w);
   w->SetInput(w2i->GetOutput());
-  mafString imageFile=MED_DATA_ROOT;
+  mafString imageFile=MAF_DATA_ROOT;
 
   if(!controlStream)
   {
@@ -1058,7 +1058,7 @@ void mafPipeMeshSlice_BESTest::CompareImages(int scalarIndex)
   //read original Image
   vtkJPEGReader *rO;
   vtkNEW(rO);
-  mafString imageFileOrig=MED_DATA_ROOT;
+  mafString imageFileOrig=MAF_DATA_ROOT;
   imageFileOrig<<"/FEM/pipemesh/";
   imageFileOrig<<name.c_str();
   imageFileOrig<<"_";

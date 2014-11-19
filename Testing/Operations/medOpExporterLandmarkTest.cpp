@@ -58,10 +58,10 @@ void medOpExporterLandmarkTest::TestOnVmeRawMotionData()
 	mafNEW(vmeRawMotionData);
 
   // try to set this data to the volume
-  mafString filename=MED_DATA_ROOT;
+  mafString filename=MAF_DATA_ROOT;
   filename<<"/RAW_MAL/Fprg3bsi_NOT_USED.man";
 
-  mafString fileDict=MED_DATA_ROOT;
+  mafString fileDict=MAF_DATA_ROOT;
   fileDict<<"/RAW_MAL/DICT_FPRG3BSL_421_NOT_USED.TXT";
 
   vmeRawMotionData->DictionaryOn();
@@ -74,7 +74,7 @@ void medOpExporterLandmarkTest::TestOnVmeRawMotionData()
 	//Initialize exporter
 	medOpExporterLandmark *exporter=new medOpExporterLandmark("test exporter");
 	exporter->SetInput(vmeRawMotionData);
-	mafString fileExp=MED_DATA_ROOT;
+	mafString fileExp=MAF_DATA_ROOT;
   fileExp<<"/RAW_MAL/Export.txt";
   exporter->TestModeOn();
 	exporter->SetFileName(fileExp);
@@ -161,7 +161,7 @@ void medOpExporterLandmarkTest::TestOnLandmarkImporter()
 	medOpImporterLandmark *importer=new medOpImporterLandmark("importer");
 	importer->TestModeOn();
 
-	mafString filename=MED_DATA_ROOT;
+	mafString filename=MAF_DATA_ROOT;
 	filename<<"/RAW_MAL/cloud_to_be_imported";
 	importer->SetFileName(filename.GetCStr());
 	importer->Read();
@@ -170,7 +170,7 @@ void medOpExporterLandmarkTest::TestOnLandmarkImporter()
 	//Initialize exporter
 	medOpExporterLandmark *exporter=new medOpExporterLandmark("test exporter");
 	exporter->SetInput(node);
-	mafString fileExp=MED_DATA_ROOT;
+	mafString fileExp=MAF_DATA_ROOT;
 	fileExp<<"/RAW_MAL/Export2.txt";
 	exporter->TestModeOn();
 	exporter->SetFileName(fileExp);
@@ -253,7 +253,7 @@ void medOpExporterLandmarkTest::TestMultipleExports()
 	medOpImporterLandmark *importer=new medOpImporterLandmark("importer");
 	importer->TestModeOn();
 
-	mafString filename=MED_DATA_ROOT;
+	mafString filename=MAF_DATA_ROOT;
 	filename<<"/RAW_MAL/cloud_to_be_imported";
 	importer->SetFileName(filename.GetCStr());
 	importer->Read();
@@ -264,7 +264,7 @@ void medOpExporterLandmarkTest::TestMultipleExports()
   medOpImporterLandmark *importer2=new medOpImporterLandmark("importer");
 	importer2->TestModeOn();
 
-	mafString filename2=MED_DATA_ROOT;
+	mafString filename2=MAF_DATA_ROOT;
 	filename2<<"/RAW_MAL/cloud_NOT_TAGGED";
 	importer2->SetFileName(filename2.GetCStr());
 	importer2->ReadWithoutTag();
@@ -291,13 +291,13 @@ void medOpExporterLandmarkTest::TestMultipleExports()
 	
   CPPUNIT_ASSERT(exporter->Accept(group));
 
-  mafString fileExp=MED_DATA_ROOT;
+  mafString fileExp=MAF_DATA_ROOT;
 	fileExp<<"/RAW_MAL/";
   exporter->SetDirName(fileExp);
 	exporter->OpRun();
   
   // Test second LC
-	fileExp=MED_DATA_ROOT;
+	fileExp=MAF_DATA_ROOT;
 	fileExp<<"/RAW_MAL/LC_SET_";
   fileExp<<node2->GetName();
   fileExp<<".txt";
@@ -364,7 +364,7 @@ void medOpExporterLandmarkTest::TestMultipleExports()
 	coord.clear();
 
   // Test third LC
-  fileExp=MED_DATA_ROOT;
+  fileExp=MAF_DATA_ROOT;
 	fileExp<<"/RAW_MAL/LC_SET_";
   fileExp<<node3->GetName();
   fileExp<<"_renamed_1.txt";

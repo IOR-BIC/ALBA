@@ -71,7 +71,7 @@ void medVMESurfaceEditorTest::TestSetData()
 
   //import surface
   mafOpImporterVTK *importer1=new mafOpImporterVTK("importer");
-  mafString filename=MED_DATA_ROOT;
+  mafString filename=MAF_DATA_ROOT;
   filename<<"/Test_SurfaceEditor/surface.vtk";
   importer1->TestModeOn();
   importer1->SetFileName(filename);

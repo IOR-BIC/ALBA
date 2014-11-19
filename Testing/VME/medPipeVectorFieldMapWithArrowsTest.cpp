@@ -191,7 +191,7 @@ void medPipeVectorFieldMapWithArrowsTest::CompareImage()
   int pointIndex =  name.find_last_of('.');
   name = name.substr(0, pointIndex);
 
-  mafString controlOriginFile=MED_DATA_ROOT;
+  mafString controlOriginFile=MAF_DATA_ROOT;
   controlOriginFile<<"/Test_PipeVectorFieldMapWithArrows/";
   controlOriginFile<<name.c_str();
   controlOriginFile<<"_";
@@ -213,7 +213,7 @@ void medPipeVectorFieldMapWithArrowsTest::CompareImage()
   vtkJPEGWriter *w;
   vtkNEW(w);
   w->SetInput(w2i->GetOutput());
-  mafString imageFile=MED_DATA_ROOT;
+  mafString imageFile=MAF_DATA_ROOT;
 
   if(!controlStream)
   {
@@ -246,7 +246,7 @@ void medPipeVectorFieldMapWithArrowsTest::CompareImage()
   //read original Image
   vtkJPEGReader *rO;
   vtkNEW(rO);
-  mafString imageFileOrig=MED_DATA_ROOT;
+  mafString imageFileOrig=MAF_DATA_ROOT;
   imageFileOrig<<"/Test_PipeVectorFieldMapWithArrows/";
   imageFileOrig<<name.c_str();
   imageFileOrig<<"_";

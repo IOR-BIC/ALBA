@@ -76,7 +76,7 @@ void medOpComputeInertialTensorTest::TestAddAttributes()
   // import VTK  
   medOpImporterVTK *importer=new medOpImporterVTK("importerVTK");
   importer->TestModeOn();
-  mafString fileName=MED_DATA_ROOT;
+  mafString fileName=MAF_DATA_ROOT;
   fileName<<"/Surface/sphere.vtk";
   importer->SetFileName(fileName);
   importer->ImportVTK();
@@ -107,7 +107,7 @@ void medOpComputeInertialTensorTest::TestComputeInertialTensorFromDefaultValue()
   // import VTK  
   medOpImporterVTK *importer=new medOpImporterVTK("importerVTK");
   importer->TestModeOn();
-  mafString fileName=MED_DATA_ROOT;
+  mafString fileName=MAF_DATA_ROOT;
   fileName<<"/Surface/sphere.vtk";
   importer->SetFileName(fileName);
   importer->ImportVTK();
@@ -161,7 +161,7 @@ void medOpComputeInertialTensorTest::TestComputeInertialTensorFromGroupFromDefau
   // import VTK  
   medOpImporterVTK *importer=new medOpImporterVTK("importerVTK");
   importer->TestModeOn();
-  mafString fileName=MED_DATA_ROOT;
+  mafString fileName=MAF_DATA_ROOT;
   fileName<<"/Surface/sphere.vtk";
   importer->SetFileName(fileName);
   importer->ImportVTK();
@@ -261,7 +261,7 @@ void medOpComputeInertialTensorTest::TestOpDoUndo()
   // import VTK  
   medOpImporterVTK *importer=new medOpImporterVTK("importerVTK");
   importer->TestModeOn();
-  mafString fileName=MED_DATA_ROOT;
+  mafString fileName=MAF_DATA_ROOT;
   fileName<<"/Surface/sphere.vtk";
   importer->SetFileName(fileName);
   importer->ImportVTK();
@@ -303,7 +303,7 @@ void medOpComputeInertialTensorTest::TestComputeInertialTensorFromDENSITYTag()
 	// import VTK  
 	medOpImporterVTK *importer=new medOpImporterVTK("importerVTK");
 	importer->TestModeOn();
-	mafString fileName=MED_DATA_ROOT;
+	mafString fileName=MAF_DATA_ROOT;
 	fileName<<"/Surface/sphere.vtk";
 	importer->SetFileName(fileName);
 	importer->ImportVTK();
@@ -364,7 +364,7 @@ void medOpComputeInertialTensorTest::TestComputeInertialTensorFromGroupFromDENSI
 	// import VTK  
 	medOpImporterVTK *importer=new medOpImporterVTK("importerVTK");
 	importer->TestModeOn();
-	mafString fileName=MED_DATA_ROOT;
+	mafString fileName=MAF_DATA_ROOT;
 	fileName<<"/Surface/sphere.vtk";
 	importer->SetFileName(fileName);
 	importer->ImportVTK();

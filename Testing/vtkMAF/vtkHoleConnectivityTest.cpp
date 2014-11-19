@@ -82,7 +82,7 @@ void vtkHoleConnectivityTest::TestSetGetPoint()
 void vtkHoleConnectivityTest::TestExecution()
 //-------------------------------------------------------------------------
 {
-  mafString surfaceFile=MED_DATA_ROOT;
+  mafString surfaceFile=MAF_DATA_ROOT;
   surfaceFile<<"/Test_HoleConnectivity/test.vtk";
 
   vtkMAFSmartPointer<vtkPolyDataReader> preader;

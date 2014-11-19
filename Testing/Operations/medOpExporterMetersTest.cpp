@@ -79,7 +79,7 @@ void medOpExporterMetersTest::TestOnMetersImporter()
   medOpImporterLandmark *importer=new medOpImporterLandmark("importer");
   importer->TestModeOn();
   //importer->SetInput(storage->GetRoot());
-  mafString filename=MED_DATA_ROOT;
+  mafString filename=MAF_DATA_ROOT;
   filename<<"/RAW_MAL/cloud_to_be_imported";
   importer->SetFileName(filename.GetCStr());
   importer->Read();
@@ -169,7 +169,7 @@ void medOpExporterMetersTest::TestOnMetersImporter()
   //Inizialize exporter
   medOpExporterMeters *exporter=new medOpExporterMeters("test exporter");
   exporter->SetInput(wrappedMeterManual);
-  mafString fileExp=MED_DATA_ROOT;
+  mafString fileExp=MAF_DATA_ROOT;
   fileExp<<"/RAW_MAL/ExportMeters.txt";
   exporter->TestModeOn();
   exporter->SetFileName(fileExp);

@@ -222,7 +222,7 @@ void medOpEqualizeHistogramTest::TestOpExecute()
   importerVTK->TestModeOn();
   importerVTK->SetInput(storage->GetRoot());
 
-  mafString absPathFilename=MED_DATA_ROOT;
+  mafString absPathFilename=MAF_DATA_ROOT;
   absPathFilename<<"/Test_VolumeResample/";
   absPathFilename.Append("volumeRG_dim_10_10_10_bounds_1_10_1_10_1_10.vtk");
   importerVTK->SetFileName(absPathFilename);
@@ -280,7 +280,7 @@ void medOpEqualizeHistogramTest::TestOpUndo()
   importerVTK->TestModeOn();
   importerVTK->SetInput(storage->GetRoot());
 
-  mafString absPathFilename=MED_DATA_ROOT;
+  mafString absPathFilename=MAF_DATA_ROOT;
   absPathFilename<<"/Test_VolumeResample/";
   absPathFilename.Append("volumeRG_dim_10_10_10_bounds_1_10_1_10_1_10.vtk");
   importerVTK->SetFileName(absPathFilename);

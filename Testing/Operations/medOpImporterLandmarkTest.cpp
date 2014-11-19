@@ -43,7 +43,7 @@ void medOpImporterLandmarkTest::Test()
 	medOpImporterLandmark *importer=new medOpImporterLandmark("importer");
 	importer->TestModeOn();
 
-	mafString filename=MED_DATA_ROOT;
+	mafString filename=MAF_DATA_ROOT;
   filename<<"/RAW_MAL/cloud_to_be_imported";
 	importer->SetFileName(filename.GetCStr());
 	importer->Read();
@@ -72,7 +72,7 @@ void medOpImporterLandmarkTest::TestTimeVariant()
 {
 	medOpImporterLandmark *importer=new medOpImporterLandmark("importer");
 	importer->TestModeOn();
-	mafString filename=MED_DATA_ROOT;
+	mafString filename=MAF_DATA_ROOT;
   filename<<"/RAW_MAL/Export.txt";
 	importer->SetFileName(filename.GetCStr());
 	importer->Read();
@@ -105,7 +105,7 @@ void medOpImporterLandmarkTest::TestUnTag()
 {
 	medOpImporterLandmark *importer=new medOpImporterLandmark("importer");
 	importer->TestModeOn();
-	mafString filename=MED_DATA_ROOT;
+	mafString filename=MAF_DATA_ROOT;
   filename<<"/RAW_MAL/cloud_NOT_TAGGED";
 	importer->SetFileName(filename.GetCStr());
 	importer->ReadWithoutTag();

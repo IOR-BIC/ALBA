@@ -144,7 +144,7 @@ void medDicomSliceTest::TestGetVTKImageData()
   //Using the default constructor
   medDicomSlice *sliceDicom = new medDicomSlice();
   vtkMAFSmartPointer<vtkImageReader> reader;
-  mafString fileName=MED_DATA_ROOT;
+  mafString fileName=MAF_DATA_ROOT;
   fileName<<"/VTK_Volumes/volume.vtk";
   reader->SetFileName(fileName.GetCStr());
   reader->Update();

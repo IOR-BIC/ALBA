@@ -63,7 +63,7 @@ void medOpExporterAnalogWSTest::TestWrite()
 {
 	medOpExporterAnalogWS *Exporter = new medOpExporterAnalogWS("Exporter");
 	Exporter->TestModeOn();
-	mafString filename=MED_DATA_ROOT;
+	mafString filename=MAF_DATA_ROOT;
   filename<<"/Test_ExporterAnalogWS/test_Analog.csv";
 	Exporter->SetFileName(filename.GetCStr());
   

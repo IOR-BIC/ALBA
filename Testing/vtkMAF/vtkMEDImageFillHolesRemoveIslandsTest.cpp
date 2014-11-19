@@ -123,7 +123,7 @@ void vtkMEDImageFillHolesRemoveIslandsTest::TestRemoveIslands()
 void vtkMEDImageFillHolesRemoveIslandsTest::TestAlgorithm()
 //--------------------------------------------
 {
-  mafString filename = MED_DATA_ROOT;
+  mafString filename = MAF_DATA_ROOT;
   filename<<"/Test_ImageFillHolesRemoveIslands/test.bmp";
 
   //load an image

@@ -57,7 +57,7 @@ void mafOpImporterBBFTest::TestImport()
 {
 	mafOpImporterBBF *importer=new mafOpImporterBBF("importer");
 	importer->TestModeOn();
-	mafString filename=MED_DATA_ROOT;
+	mafString filename=MAF_DATA_ROOT;
   filename<<"/Test_ImporterBBF/prova_upload_vme_1_01.bbf";
 	importer->SetFileName(filename.GetCStr());
 	CPPUNIT_ASSERT(importer->ImportBBF() == MAF_OK);

@@ -50,7 +50,7 @@ void vtkMEDFillingHoleTest::TestSetFillAHole()
 //-------------------------------------------------------------------------
 {
   vtkMAFSmartPointer<vtkPolyDataReader> r;
-  mafString filename=MED_DATA_ROOT;
+  mafString filename=MAF_DATA_ROOT;
   filename<<"/Tes_vtkMEDFillingHole/SphereWithHoles.vtk";
   r->SetFileName(filename.GetCStr());
   r->Update();
@@ -95,7 +95,7 @@ void vtkMEDFillingHoleTest::TestSetFillAllHole()
 //-------------------------------------------------------------------------
 {
   vtkMAFSmartPointer<vtkPolyDataReader> r;
-  mafString filename=MED_DATA_ROOT;
+  mafString filename=MAF_DATA_ROOT;
   filename<<"/Tes_vtkMEDFillingHole/SphereWithHoles.vtk";
   r->SetFileName(filename.GetCStr());
   r->Update();
@@ -129,7 +129,7 @@ void vtkMEDFillingHoleTest::TestGetLastPatch()
 //-------------------------------------------------------------------------
 {
   vtkMAFSmartPointer<vtkPolyDataReader> r;
-  mafString filename=MED_DATA_ROOT;
+  mafString filename=MAF_DATA_ROOT;
   filename<<"/Tes_vtkMEDFillingHole/SphereWithHoles.vtk";
   r->SetFileName(filename.GetCStr());
   r->Update();

@@ -42,7 +42,7 @@
 void medOpLabelizeSurfaceTest::Test()
 //----------------------------------------------------------------------------
 {
-	mafString filename=MED_DATA_ROOT;
+	mafString filename=MAF_DATA_ROOT;
 	filename<<"/Surface/Sphere.vtk";
 	vtkMAFSmartPointer<vtkPolyDataReader> reader;
 	reader->SetFileName(filename.GetCStr());

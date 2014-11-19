@@ -80,7 +80,7 @@ void medOpFillHolesTest::TestOpRun()
   medOpImporterVTK *importerVTK = new medOpImporterVTK("importerVTK");
   importerVTK->TestModeOn();
 
-  mafString absPathFilename=MED_DATA_ROOT;
+  mafString absPathFilename=MAF_DATA_ROOT;
   absPathFilename<<"/Tes_vtkMEDFillingHole/SphereWithHoles.vtk";
   importerVTK->SetFileName(absPathFilename);
   importerVTK->OpRun();

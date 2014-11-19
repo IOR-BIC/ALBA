@@ -101,7 +101,7 @@ void mafPipePolylineSlice_BESTest::TestPipeExecution()
 
   ////// Create VME (import vtkData) ////////////////////
   vtkMAFSmartPointer<vtkDataSetReader> importer;
-  mafString filename=MED_DATA_ROOT;
+  mafString filename=MAF_DATA_ROOT;
   filename<<"/Test_PipePolylineSlice_BES/polydata.vtk";
   importer->SetFileName(filename);
   importer->Update();
@@ -221,7 +221,7 @@ void mafPipePolylineSlice_BESTest::CompareImages(int testIndex)
   int pointIndex =  name.find_last_of('.');
   name = name.substr(0, pointIndex);
 
-  mafString controlOriginFile=MED_DATA_ROOT;
+  mafString controlOriginFile=MAF_DATA_ROOT;
   controlOriginFile<<"/Test_PipePolylineSlice_BES/";
   controlOriginFile<<name.c_str();
   controlOriginFile<<"_";
@@ -245,7 +245,7 @@ void mafPipePolylineSlice_BESTest::CompareImages(int testIndex)
   vtkJPEGWriter *w;
   vtkNEW(w);
   w->SetInput(w2i->GetOutput());
-  mafString imageFile=MED_DATA_ROOT;
+  mafString imageFile=MAF_DATA_ROOT;
 
   if(!controlStream)
   {
@@ -279,7 +279,7 @@ void mafPipePolylineSlice_BESTest::CompareImages(int testIndex)
   //read original Image
   vtkJPEGReader *rO;
   vtkNEW(rO);
-  mafString imageFileOrig=MED_DATA_ROOT;
+  mafString imageFileOrig=MAF_DATA_ROOT;
   imageFileOrig<<"/Test_PipePolylineSlice_BES/";
   imageFileOrig<<name.c_str();
   imageFileOrig<<"_";

@@ -70,7 +70,7 @@ void medOpExtrusionHolesTest::TestExtractFreeEdge()
 	mafOpImporterVTK *importer=new mafOpImporterVTK("importer");
 	importer->TestModeOn();
 	importer->SetInput(root);
-	mafString filename=MED_DATA_ROOT;
+	mafString filename=MAF_DATA_ROOT;
 	filename<<"/Extrusion/extrusion_cube.vtk";
 	importer->SetFileName(filename.GetCStr());
 	importer->OpRun();
@@ -108,7 +108,7 @@ void medOpExtrusionHolesTest::TestExtrude()
 	mafOpImporterVTK *importer=new mafOpImporterVTK("importer");
 	importer->TestModeOn();
 	importer->SetInput(root);
-	mafString filename=MED_DATA_ROOT;
+	mafString filename=MAF_DATA_ROOT;
 	filename<<"/Extrusion/extrusion_cube.vtk";
 	importer->SetFileName(filename.GetCStr());
 	importer->OpRun();

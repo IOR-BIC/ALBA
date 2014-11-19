@@ -466,7 +466,7 @@ void medOpExporterWrappedMeter::Test()
 	medOpImporterLandmark *importer=new medOpImporterLandmark("importer");
 	importer->TestModeOn();
 	//importer->SetInput(storage->GetRoot());
-	//mafString filename=MED_DATA_ROOT;
+	//mafString filename=MAF_DATA_ROOT;
 	mafString filename = "C:\\MAF\\Medical\\Testing\\unittestData\\RAW_MAL\\cloud_to_be_imported";
 	//filename<<"../unittestData";
 	//filename<<"/RAW_MAL/cloud_to_be_imported";
@@ -515,7 +515,7 @@ void medOpExporterWrappedMeter::Test()
 	//Inizialize exporter
 	medOpExporterWrappedMeter *exporter=new medOpExporterWrappedMeter("test exporter");
 	exporter->SetInput(wrappedMeter);
-	mafString fileExp=MED_DATA_ROOT;
+	mafString fileExp=MAF_DATA_ROOT;
 	fileExp<<"/RAW_MAL/ExportWrappedMeter.txt";
 	exporter->TestModeOn();
 	exporter->SetFileName(fileExp);

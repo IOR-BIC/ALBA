@@ -43,7 +43,7 @@ void medDataPipeCustomSegmentationVolumeTest::setUp()
   vtkRectilinearGridReader *readerRG;
   
   vtkNEW(readerSP);
-  mafString filename = MED_DATA_ROOT;
+  mafString filename = MAF_DATA_ROOT;
   filename << "/Test_DataPipeCustomSegmentationVolume/VolumeSP.vtk";
   readerSP->SetFileName(filename.GetCStr());
   readerSP->Update();
@@ -56,7 +56,7 @@ void medDataPipeCustomSegmentationVolumeTest::setUp()
   vtkDEL(readerSP);
 
   vtkNEW(readerRG);
-  filename = MED_DATA_ROOT;
+  filename = MAF_DATA_ROOT;
   filename << "/Test_DataPipeCustomSegmentationVolume/VolumeRG.vtk";
   readerRG->SetFileName(filename.GetCStr());
   readerRG->Update();

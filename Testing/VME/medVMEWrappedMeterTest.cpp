@@ -193,7 +193,7 @@ void medVMEWrappedMeterTest::TestWithGenericLandmark()
 	medOpImporterLandmark *importer=new medOpImporterLandmark("importer");
 	importer->TestModeOn();
 	importer->SetInput(storage->GetRoot());
-	mafString filename=MED_DATA_ROOT;
+	mafString filename=MAF_DATA_ROOT;
 	filename<<"/RAW_MAL/cloud_to_be_imported";
 	importer->SetFileName(filename.GetCStr());
 	importer->Read();
@@ -251,7 +251,7 @@ void medVMEWrappedMeterTest::TestWithGenericLandmarkWithMiddlePoints()
 	medOpImporterLandmark *importer=new medOpImporterLandmark("importer");
 	importer->TestModeOn();
 	importer->SetInput(storage->GetRoot());
-	mafString filename=MED_DATA_ROOT;
+	mafString filename=MAF_DATA_ROOT;
 	filename<<"/RAW_MAL/cloud_to_be_imported";
 	importer->SetFileName(filename.GetCStr());
 	importer->Read();
@@ -462,7 +462,7 @@ void medVMEWrappedMeterTest::TestLineDistanceWithLandmark()
 	medOpImporterLandmark *importer=new medOpImporterLandmark("importer");
 	importer->TestModeOn();
 	importer->SetInput(storage->GetRoot());
-	mafString filename=MED_DATA_ROOT;
+	mafString filename=MAF_DATA_ROOT;
 	filename<<"/RAW_MAL/cloud_to_be_imported";
 	importer->SetFileName(filename.GetCStr());
 	importer->Read();
@@ -514,7 +514,7 @@ void medVMEWrappedMeterTest::TestLineAngleWithLandmark()
 	medOpImporterLandmark *importer=new medOpImporterLandmark("importer");
 	importer->TestModeOn();
 	importer->SetInput(storage->GetRoot());
-	mafString filename=MED_DATA_ROOT;
+	mafString filename=MAF_DATA_ROOT;
 	filename<<"/RAW_MAL/cloud_to_be_imported";
 	importer->SetFileName(filename.GetCStr());
 	importer->Read();

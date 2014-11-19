@@ -56,14 +56,14 @@ void vtkMEDRayCastCleanerTest::TestFilter()
 
   //Loading unfiltered data
   vtkMAFSmartPointer<vtkStructuredPointsReader> r;
-  mafString filename=MED_DATA_ROOT;
+  mafString filename=MAF_DATA_ROOT;
   filename<<"/VTK_Volumes/volumeRayCastTest.vtk";
   r->SetFileName(filename.GetCStr());
   r->Update();
 
   //Loading prefiltered data
   vtkMAFSmartPointer<vtkStructuredPointsReader> r2;
-  mafString filteredFilename=MED_DATA_ROOT;
+  mafString filteredFilename=MAF_DATA_ROOT;
   filteredFilename<<"/Test_vtkMEDRayCastCleaner/outputVolume.vtk";
   r2->SetFileName(filteredFilename.GetCStr());
   r2->Update();
@@ -106,7 +106,7 @@ void vtkMEDRayCastCleanerTest::TestFilter()
   //Used to generate initial test file 
   
   vtkMAFSmartPointer<vtkStructuredPointsWriter> w;
-  mafString outFilename=MED_DATA_ROOT;
+  mafString outFilename=MAF_DATA_ROOT;
   outFilename<<"/Test_vtkMEDRayCastCleaner/outputVolume.vtk";
   w->SetFileName(outFilename.GetCStr());
   w->SetFileTypeToBinary();
@@ -126,14 +126,14 @@ void vtkMEDRayCastCleanerTest::TestFilterMR()
   
   //Loading unfiltered data
   vtkMAFSmartPointer<vtkStructuredPointsReader> r;
-  mafString filename=MED_DATA_ROOT;
+  mafString filename=MAF_DATA_ROOT;
   filename<<"/VTK_Volumes/volumeRayCastTestMR.vtk";
   r->SetFileName(filename.GetCStr());
   r->Update();
 
   //Loading prefiltered data
   vtkMAFSmartPointer<vtkStructuredPointsReader> r2;
-  mafString filteredFilename=MED_DATA_ROOT;
+  mafString filteredFilename=MAF_DATA_ROOT;
   filteredFilename<<"/Test_vtkMEDRayCastCleaner/outputVolumeMR.vtk";
   r2->SetFileName(filteredFilename.GetCStr());
   r2->Update();
@@ -174,7 +174,7 @@ void vtkMEDRayCastCleanerTest::TestFilterMR()
   //Used to generate initial test file 
   /*
   vtkMAFSmartPointer<vtkStructuredPointsWriter> w;
-  mafString outFilename=MED_DATA_ROOT;
+  mafString outFilename=MAF_DATA_ROOT;
   outFilename<<"/Test_vtkMEDRayCastCleaner/outputVolumeMR.vtk";
   w->SetFileName(outFilename.GetCStr());
   w->SetFileTypeToBinary();

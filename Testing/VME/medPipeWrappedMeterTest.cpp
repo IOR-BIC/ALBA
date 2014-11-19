@@ -194,7 +194,7 @@ void medPipeWrappedMeterTest::CompareImages(int testIndex)
   int pointIndex =  name.find_last_of('.');
   name = name.substr(0, pointIndex);
 
-  mafString controlOriginFile=MED_DATA_ROOT;
+  mafString controlOriginFile=MAF_DATA_ROOT;
   controlOriginFile<<"/Test_PipeMeter/";
   controlOriginFile<<name.c_str();
   controlOriginFile<<"_";

@@ -206,7 +206,7 @@ void medPipeTensorFieldSliceTest::CompareImages(int testIndex)
   int pointIndex =  name.find_last_of('.');
   name = name.substr(0, pointIndex);
 
-  mafString controlOriginFile=MED_DATA_ROOT;
+  mafString controlOriginFile=MAF_DATA_ROOT;
   controlOriginFile<<"/Test_PipeTensorFieldSlice/";
   controlOriginFile<<name.c_str();
   controlOriginFile<<"_";
@@ -230,7 +230,7 @@ void medPipeTensorFieldSliceTest::CompareImages(int testIndex)
   vtkJPEGWriter *w;
   vtkNEW(w);
   w->SetInput(w2i->GetOutput());
-  mafString imageFile=MED_DATA_ROOT;
+  mafString imageFile=MAF_DATA_ROOT;
 
   if(!controlStream)
   {
@@ -264,7 +264,7 @@ void medPipeTensorFieldSliceTest::CompareImages(int testIndex)
   //read original Image
   vtkJPEGReader *rO;
   vtkNEW(rO);
-  mafString imageFileOrig=MED_DATA_ROOT;
+  mafString imageFileOrig=MAF_DATA_ROOT;
   imageFileOrig<<"/Test_PipeTensorFieldSlice/";
   imageFileOrig<<name.c_str();
   imageFileOrig<<"_";

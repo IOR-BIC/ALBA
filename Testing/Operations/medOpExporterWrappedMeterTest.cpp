@@ -134,7 +134,7 @@ medOpImporterLandmark *importer=new medOpImporterLandmark("importer");
 importer->TestModeOn();
 // importer->SetInput(storage->GetRoot());
 
-mafString filename=MED_DATA_ROOT;
+mafString filename=MAF_DATA_ROOT;
 filename<<"/RAW_MAL/cloud_to_be_imported";
 
 
@@ -178,7 +178,7 @@ controlValues[6] = l3[0];controlValues[7] = l3[1];controlValues[8] = l3[2];
 //Inizialize exporter
 medOpExporterWrappedMeter *exporter=new medOpExporterWrappedMeter("test exporter");
 exporter->SetInput(wrappedMeter);
-mafString fileExp=MED_DATA_ROOT;
+mafString fileExp=MAF_DATA_ROOT;
 fileExp<<"/RAW_MAL/ExportWrappedMeter.txt";
 exporter->TestModeOn();
 exporter->SetFileName(fileExp);

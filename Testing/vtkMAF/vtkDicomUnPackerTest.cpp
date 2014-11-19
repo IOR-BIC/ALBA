@@ -44,10 +44,10 @@ void vtkDicomUnPackerTest::ReadTest()
 {
 	//Inizialize DICOM DIRECTORY
 	vtkMAFSmartPointer<vtkDirectory> DicomDirectory;
-	mafString DicomPath=MED_DATA_ROOT;
+	mafString DicomPath=MAF_DATA_ROOT;
 	DicomPath<<"/DicomUnpacker/TestDicomUnpacker";
 	DicomDirectory->Open(DicomPath);
-  mafString DictonaryFilename=MED_DATA_ROOT;  
+  mafString DictonaryFilename=MAF_DATA_ROOT;  
 	DictonaryFilename<<"/Dictionaries/dicom3.dic";
 	int NumberOfImage = 0;
 	double MinScalar = 9999.0;

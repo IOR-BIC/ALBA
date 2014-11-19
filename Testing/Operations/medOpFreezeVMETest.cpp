@@ -253,7 +253,7 @@ void medOpFreezeVMETest::TestFreezeVMESlicer()
 	mafOpImporterVTK *importer=new mafOpImporterVTK("importer");
 	importer->TestModeOn();
 	importer->SetInput(root);
-	mafString filename=MED_DATA_ROOT;
+	mafString filename=MAF_DATA_ROOT;
 	filename<<"/VTK_Volumes/volume.vtk";
 	importer->SetFileName(filename.GetCStr());
 	importer->OpRun();
@@ -332,7 +332,7 @@ void medOpFreezeVMETest::TestFreezeVMEProber()
 	mafOpImporterVTK *importer=new mafOpImporterVTK("importer");
 	importer->TestModeOn();
 	importer->SetInput(root);
-	mafString filename=MED_DATA_ROOT;
+	mafString filename=MAF_DATA_ROOT;
 	filename<<"/VTK_Volumes/volume.vtk";
 	importer->SetFileName(filename.GetCStr());
 	importer->OpRun();

@@ -27,7 +27,7 @@
 #include <cppunit/config/SourcePrefix.h>
 
 #include "mafOpImporterRAWVolume_BES.h"
-#include "../BES_Beta/vtkMAF/vtkMAFLargeImageData.h"
+#include "vtkMAFLargeImageData.h"
 
 #include "mafVMEVolumeLargeTest.h"
 #include "mafVMEVolumeLarge.h"
@@ -67,7 +67,7 @@ void mafVMEVolumeLargeTest::TestGetIcon()
 void mafVMEVolumeLargeTest::TestSetLargeData()
 //---------------------------------------------------------
 {
-//   mafString filename = MED_DATA_ROOT;
+//   mafString filename = MAF_DATA_ROOT;
 //   filename << "/Test_VolumeLarge/testVolume.raw";
 // 
 //   mafOpImporterRAWVolume_BES *importer = new mafOpImporterRAWVolume_BES();
@@ -86,8 +86,8 @@ void mafVMEVolumeLargeTest::TestSetLargeData()
 //   mafDEL(volume);
 //   cppDEL(importer);
 
-  mafString filename = MED_DATA_ROOT;
-  mafString dirname = MED_DATA_ROOT;
+  mafString filename = MAF_DATA_ROOT;
+  mafString dirname = MAF_DATA_ROOT;
 
   filename << "/Test_VolumeLarge/testVolume.bbf";
   dirname << "/Test_VolumeLarge/";
@@ -120,7 +120,7 @@ void mafVMEVolumeLargeTest::TestSetLargeData()
 void mafVMEVolumeLargeTest::TestSetGetFileNameTest()
 //---------------------------------------------------------
 {
-  mafString filename = MED_DATA_ROOT;
+  mafString filename = MAF_DATA_ROOT;
   filename << "/Test_VolumeLarge/";
 
   mafVMEVolumeLarge *volume = NULL;

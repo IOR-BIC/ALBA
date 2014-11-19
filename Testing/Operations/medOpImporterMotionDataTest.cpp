@@ -61,9 +61,9 @@ void medopImporterMotionDataTest::TestOnRawMotionData()
   medOpImporterMotionData<mafVMERawMotionData> *importer = new medOpImporterMotionData<mafVMERawMotionData>("Raw Motion Data", "RAW Motion Data (*.MAN)|*.MAN", "Dictionary (*.txt)|*.txt");
   importer->TestModeOn();
 
-  mafString filename=MED_DATA_ROOT;
+  mafString filename=MAF_DATA_ROOT;
   filename<<"/RAW_MAL/Fprg3bsi_NOT_USED.man";
-  mafString fileDict=MED_DATA_ROOT;
+  mafString fileDict=MAF_DATA_ROOT;
   fileDict<<"/RAW_MAL/DICT_FPRG3BSL_421_NOT_USED.TXT";
   importer->SetFileName(filename.GetCStr());
   importer->SetDictionaryName(fileDict.GetCStr());

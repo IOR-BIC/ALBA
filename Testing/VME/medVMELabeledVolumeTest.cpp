@@ -71,7 +71,7 @@ void medVMELabeledVolumeTest::TestVolumeCopy()
 {
   mafSmartPointer<mafVMERoot> root;
 
-  mafString filename_volume=MED_DATA_ROOT;
+  mafString filename_volume=MAF_DATA_ROOT;
   filename_volume<<"/VTK_Volumes/LabeledVolumeTest.vtk";
 
   vtkMAFSmartPointer<vtkRectilinearGridReader>volumeReader;
@@ -111,7 +111,7 @@ void medVMELabeledVolumeTest::TestGenerateLabeledVolume()
 {
   mafSmartPointer<mafVMERoot> root;
 
-  mafString filename_volume=MED_DATA_ROOT;
+  mafString filename_volume=MAF_DATA_ROOT;
   filename_volume<<"/VTK_Volumes/LabeledVolumeTest.vtk";
 
   vtkMAFSmartPointer<vtkRectilinearGridReader>volumeReader;
@@ -172,7 +172,7 @@ void medVMELabeledVolumeTest::TestRemoveLabelTag()
 {
   mafSmartPointer<mafVMERoot> root;
 
-  mafString filename_volume=MED_DATA_ROOT;
+  mafString filename_volume=MAF_DATA_ROOT;
   filename_volume<<"/VTK_Volumes/LabeledVolumeTest.vtk";
 
   vtkMAFSmartPointer<vtkRectilinearGridReader>volumeReader;
@@ -219,7 +219,7 @@ void medVMELabeledVolumeTest::TestSetLabelTag()
 {
   mafSmartPointer<mafVMERoot> root;
 
-  mafString filename_volume=MED_DATA_ROOT;
+  mafString filename_volume=MAF_DATA_ROOT;
   filename_volume<<"/VTK_Volumes/LabeledVolumeTest.vtk";
 
   vtkMAFSmartPointer<vtkRectilinearGridReader>volumeReader;
@@ -285,7 +285,7 @@ void medVMELabeledVolumeTest::TestDeepCopy()
 {
   mafSmartPointer<mafVMERoot> root;
 
-  mafString filename_volume=MED_DATA_ROOT;
+  mafString filename_volume=MAF_DATA_ROOT;
   filename_volume<<"/VTK_Volumes/LabeledVolumeTest.vtk";
 
   vtkMAFSmartPointer<vtkRectilinearGridReader>volumeReader;

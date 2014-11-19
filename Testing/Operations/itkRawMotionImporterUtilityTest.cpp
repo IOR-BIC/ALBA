@@ -70,7 +70,7 @@ void itkRawMotionImporterUtilityTest::TestReadMatrix()
     RES_ERROR = 1,
   };
 
-  mafString matrixFile = MED_DATA_ROOT;
+  mafString matrixFile = MAF_DATA_ROOT;
   matrixFile << "/Matrix/TestMatrix001.txt";
   vnl_matrix<double> mat;
   itkRawMotionImporterUtility *rMIU=new itkRawMotionImporterUtility();

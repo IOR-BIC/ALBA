@@ -44,7 +44,7 @@ void medOpImporterLandmarkWSTest::TestWSImporter()
 {
 	medOpImporterLandmarkWS *importer=new medOpImporterLandmarkWS("importer");
 	importer->TestModeOn();
-	mafString filename=MED_DATA_ROOT;
+	mafString filename=MAF_DATA_ROOT;
   filename<<"/AL_FileTXT/pbCV1b05al.csv";
 	importer->SetFileName(filename.GetCStr());
 	importer->Read();
@@ -59,7 +59,7 @@ void medOpImporterLandmarkWSTest::TestVisibility()
 {
   medOpImporterLandmarkWS *importer=new medOpImporterLandmarkWS("importer");
   importer->TestModeOn();
-  mafString filename=MED_DATA_ROOT;
+  mafString filename=MAF_DATA_ROOT;
   filename<<"/AL_FileTXT/pbCV1b05al.csv";
   importer->SetFileName(filename.GetCStr());
   importer->Read();
@@ -77,7 +77,7 @@ void medOpImporterLandmarkWSTest::TestCoordinates()
 {
   medOpImporterLandmarkWS *importer=new medOpImporterLandmarkWS("importer");
   importer->TestModeOn();
-  mafString filename=MED_DATA_ROOT;
+  mafString filename=MAF_DATA_ROOT;
   filename<<"/AL_FileTXT/pbCV1b05al.csv";
   importer->SetFileName(filename.GetCStr());
   importer->Read();

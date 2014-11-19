@@ -114,7 +114,7 @@ void mafPipeVolumeSlice_BESTest::TestPipeExecution()
   ////// Create VME (import vtkData) ////////////////////
   vtkStructuredPointsReader *importer;
   vtkNEW(importer);
-  mafString filename1=MED_DATA_ROOT;
+  mafString filename1=MAF_DATA_ROOT;
   filename1<<"/Test_PipeVolumeSlice_BES/VolumeSP.vtk";
   importer->SetFileName(filename1.GetCStr());
   importer->Update();
@@ -233,7 +233,7 @@ void mafPipeVolumeSlice_BESTest::CompareImages(int imageIndex)
 
 
 
-  mafString controlOriginFile=MED_DATA_ROOT;
+  mafString controlOriginFile=MAF_DATA_ROOT;
   controlOriginFile<<"/Test_PipeVolumeSlice_BES/";
   controlOriginFile<<name.c_str();
   controlOriginFile<<"_";
@@ -257,7 +257,7 @@ void mafPipeVolumeSlice_BESTest::CompareImages(int imageIndex)
   vtkJPEGWriter *w;
   vtkNEW(w);
   w->SetInput(w2i->GetOutput());
-  mafString imageFile=MED_DATA_ROOT;
+  mafString imageFile=MAF_DATA_ROOT;
 
   if(!controlStream)
   {
@@ -292,7 +292,7 @@ void mafPipeVolumeSlice_BESTest::CompareImages(int imageIndex)
   //read original Image
   vtkJPEGReader *rO;
   vtkNEW(rO);
-  mafString imageFileOrig=MED_DATA_ROOT;
+  mafString imageFileOrig=MAF_DATA_ROOT;
   imageFileOrig<<"/Test_PipeVolumeSlice_BES/";
   imageFileOrig<<name.c_str();
   imageFileOrig<<"_";
@@ -354,7 +354,7 @@ void mafPipeVolumeSlice_BESTest::TestPipeExecution_SetSliceOpacity()
   ////// Create VME (import vtkData) ////////////////////
   vtkStructuredPointsReader *importer;
   vtkNEW(importer);
-  mafString filename1=MED_DATA_ROOT;
+  mafString filename1=MAF_DATA_ROOT;
   filename1<<"/Test_PipeVolumeSlice_BES/VolumeSP.vtk";
   importer->SetFileName(filename1.GetCStr());
   importer->Update();
@@ -487,7 +487,7 @@ void mafPipeVolumeSlice_BESTest::TestPipeExecution_SetLutRange()
   ////// Create VME (import vtkData) ////////////////////
   vtkStructuredPointsReader *importer;
   vtkNEW(importer);
-  mafString filename1=MED_DATA_ROOT;
+  mafString filename1=MAF_DATA_ROOT;
   filename1<<"/Test_PipeVolumeSlice_BES/VolumeSP.vtk";
   importer->SetFileName(filename1.GetCStr());
   importer->Update();
@@ -623,7 +623,7 @@ void mafPipeVolumeSlice_BESTest::TestPipeExecution_SetColorLookupTable()
   ////// Create VME (import vtkData) ////////////////////
   vtkStructuredPointsReader *importer;
   vtkNEW(importer);
-  mafString filename1=MED_DATA_ROOT;
+  mafString filename1=MAF_DATA_ROOT;
   filename1<<"/Test_PipeVolumeSlice_BES/VolumeSP.vtk";
   importer->SetFileName(filename1.GetCStr());
   importer->Update();
@@ -755,7 +755,7 @@ void mafPipeVolumeSlice_BESTest::TestPipeExecution_TicksOnOff()
   ////// Create VME (import vtkData) ////////////////////
   vtkStructuredPointsReader *importer;
   vtkNEW(importer);
-  mafString filename1=MED_DATA_ROOT;
+  mafString filename1=MAF_DATA_ROOT;
   filename1<<"/Test_PipeVolumeSlice_BES/VolumeSP.vtk";
   importer->SetFileName(filename1.GetCStr());
   importer->Update();

@@ -83,7 +83,7 @@ void medOpVolumeResampleTest::TestResampleInternal( const char *inFileName, cons
   importerVTK->TestModeOn();
   importerVTK->SetInput(storage->GetRoot());
 
-  mafString absPathFilename=MED_DATA_ROOT;
+  mafString absPathFilename=MAF_DATA_ROOT;
   absPathFilename<<"/Test_VolumeResample/";
   absPathFilename.Append(inFileName);
   importerVTK->SetFileName(absPathFilename);
@@ -159,7 +159,7 @@ void medOpVolumeResampleTest::WriteVTKDatasetToFile( vtkDataSet * outputVolumeVT
   writer->SetInput(outputVolumeVTKData);
 
   string fullPathOutputFilename;
-  fullPathOutputFilename.append(MED_DATA_ROOT);
+  fullPathOutputFilename.append(MAF_DATA_ROOT);
   fullPathOutputFilename.append("/Test_VolumeResample/");
   fullPathOutputFilename.append(outputFilename);
   if (DEBUG_MODE)

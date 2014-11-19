@@ -63,7 +63,7 @@ void medAttributeSegmentationVolumeTest::TestSetAutomaticSegmentationThresholdMo
   volume->SetParent(storage->GetRoot());
   mafSmartPointer<medAttributeSegmentationVolume> attribute;
   volume->SetAttribute("SegmentationVolumeData",attribute);
-  mafString fileName = MED_DATA_ROOT;
+  mafString fileName = MAF_DATA_ROOT;
   fileName << "/Test_AttributeSegmentationVolume/SavedMSF.msf";
   storage->SetURL(fileName);
   //////////////////////////////////////////////////////////////////////////
@@ -107,7 +107,7 @@ void medAttributeSegmentationVolumeTest::TestSetAutomaticSegmentationGlobalThres
   volume->SetParent(storage->GetRoot());
   mafSmartPointer<medAttributeSegmentationVolume> attribute;
   volume->SetAttribute("SegmentationVolumeData",attribute);
-  mafString fileName = MED_DATA_ROOT;
+  mafString fileName = MAF_DATA_ROOT;
   fileName << "/Test_AttributeSegmentationVolume/SavedMSF.msf";
   storage->SetURL(fileName);
   //////////////////////////////////////////////////////////////////////////
@@ -149,7 +149,7 @@ void medAttributeSegmentationVolumeTest::TestAddRange()
   volume->SetParent(storage->GetRoot());
   mafSmartPointer<medAttributeSegmentationVolume> attribute;
   volume->SetAttribute("SegmentationVolumeData",attribute);
-  mafString fileName = MED_DATA_ROOT;
+  mafString fileName = MAF_DATA_ROOT;
   fileName << "/Test_AttributeSegmentationVolume/SavedMSF.msf";
   storage->SetURL(fileName);
   //////////////////////////////////////////////////////////////////////////
@@ -200,7 +200,7 @@ void medAttributeSegmentationVolumeTest::TestUpdateRange()
   volume->SetParent(storage->GetRoot());
   mafSmartPointer<medAttributeSegmentationVolume> attribute;
   volume->SetAttribute("SegmentationVolumeData",attribute);
-  mafString fileName = MED_DATA_ROOT;
+  mafString fileName = MAF_DATA_ROOT;
   fileName << "/Test_AttributeSegmentationVolume/SavedMSF.msf";
   storage->SetURL(fileName);
   //////////////////////////////////////////////////////////////////////////
@@ -251,7 +251,7 @@ void medAttributeSegmentationVolumeTest::TestDeleteRange()
   volume->SetParent(storage->GetRoot());
   mafSmartPointer<medAttributeSegmentationVolume> attribute;
   volume->SetAttribute("SegmentationVolumeData",attribute);
-  mafString fileName = MED_DATA_ROOT;
+  mafString fileName = MAF_DATA_ROOT;
   fileName << "/Test_AttributeSegmentationVolume/SavedMSF.msf";
   storage->SetURL(fileName);
   //////////////////////////////////////////////////////////////////////////
@@ -298,7 +298,7 @@ void medAttributeSegmentationVolumeTest::TestRemoveAllRanges()
   volume->SetParent(storage->GetRoot());
   mafSmartPointer<medAttributeSegmentationVolume> attribute;
   volume->SetAttribute("SegmentationVolumeData",attribute);
-  mafString fileName = MED_DATA_ROOT;
+  mafString fileName = MAF_DATA_ROOT;
   fileName << "/Test_AttributeSegmentationVolume/SavedMSF.msf";
   storage->SetURL(fileName);
   //////////////////////////////////////////////////////////////////////////
@@ -344,7 +344,7 @@ void medAttributeSegmentationVolumeTest::TestGetNumberOfRanges()
   volume->SetParent(storage->GetRoot());
   mafSmartPointer<medAttributeSegmentationVolume> attribute;
   volume->SetAttribute("SegmentationVolumeData",attribute);
-  mafString fileName = MED_DATA_ROOT;
+  mafString fileName = MAF_DATA_ROOT;
   fileName << "/Test_AttributeSegmentationVolume/SavedMSF.msf";
   storage->SetURL(fileName);
   //////////////////////////////////////////////////////////////////////////
@@ -384,7 +384,7 @@ void medAttributeSegmentationVolumeTest::TestSetRegionGrowingUpperThreshold()
   volume->SetParent(storage->GetRoot());
   mafSmartPointer<medAttributeSegmentationVolume> attribute;
   volume->SetAttribute("SegmentationVolumeData",attribute);
-  mafString fileName = MED_DATA_ROOT;
+  mafString fileName = MAF_DATA_ROOT;
   fileName << "/Test_AttributeSegmentationVolume/SavedMSF.msf";
   storage->SetURL(fileName);
   //////////////////////////////////////////////////////////////////////////
@@ -426,7 +426,7 @@ void medAttributeSegmentationVolumeTest::TestSetRegionGrowingLowerThreshold()
   volume->SetParent(storage->GetRoot());
   mafSmartPointer<medAttributeSegmentationVolume> attribute;
   volume->SetAttribute("SegmentationVolumeData",attribute);
-  mafString fileName = MED_DATA_ROOT;
+  mafString fileName = MAF_DATA_ROOT;
   fileName << "/Test_AttributeSegmentationVolume/SavedMSF.msf";
   storage->SetURL(fileName);
   //////////////////////////////////////////////////////////////////////////
@@ -468,7 +468,7 @@ void medAttributeSegmentationVolumeTest::TestAddSeed()
   volume->SetParent(storage->GetRoot());
   mafSmartPointer<medAttributeSegmentationVolume> attribute;
   volume->SetAttribute("SegmentationVolumeData",attribute);
-  mafString fileName = MED_DATA_ROOT;
+  mafString fileName = MAF_DATA_ROOT;
   fileName << "/Test_AttributeSegmentationVolume/SavedMSF.msf";
   storage->SetURL(fileName);
   //////////////////////////////////////////////////////////////////////////
@@ -527,7 +527,7 @@ void medAttributeSegmentationVolumeTest::TestDeleteSeed()
   volume->SetParent(storage->GetRoot());
   mafSmartPointer<medAttributeSegmentationVolume> attribute;
   volume->SetAttribute("SegmentationVolumeData",attribute);
-  mafString fileName = MED_DATA_ROOT;
+  mafString fileName = MAF_DATA_ROOT;
   fileName << "/Test_AttributeSegmentationVolume/SavedMSF.msf";
   storage->SetURL(fileName);
   //////////////////////////////////////////////////////////////////////////
@@ -582,7 +582,7 @@ void medAttributeSegmentationVolumeTest::TestGetNumberOfSeeds()
   volume->SetParent(storage->GetRoot());
   mafSmartPointer<medAttributeSegmentationVolume> attribute;
   volume->SetAttribute("SegmentationVolumeData",attribute);
-  mafString fileName = MED_DATA_ROOT;
+  mafString fileName = MAF_DATA_ROOT;
   fileName << "/Test_AttributeSegmentationVolume/SavedMSF.msf";
   storage->SetURL(fileName);
   //////////////////////////////////////////////////////////////////////////
@@ -627,7 +627,7 @@ void medAttributeSegmentationVolumeTest::TestRemoveAllSeeds()
   volume->SetParent(storage->GetRoot());
   mafSmartPointer<medAttributeSegmentationVolume> attribute;
   volume->SetAttribute("SegmentationVolumeData",attribute);
-  mafString fileName = MED_DATA_ROOT;
+  mafString fileName = MAF_DATA_ROOT;
   fileName << "/Test_AttributeSegmentationVolume/SavedMSF.msf";
   storage->SetURL(fileName);
   //////////////////////////////////////////////////////////////////////////

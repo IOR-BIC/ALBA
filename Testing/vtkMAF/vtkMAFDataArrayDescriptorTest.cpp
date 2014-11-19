@@ -24,7 +24,7 @@
 
 #include "vtkMAFDataArrayDescriptorTest.h"
 
-#include "../BES_Beta/vtkMAF/vtkMAFDataArrayDescriptor.h"
+#include "vtkMAFDataArrayDescriptor.h"
 
 #include "vtkMAFSmartPointer.h"
 

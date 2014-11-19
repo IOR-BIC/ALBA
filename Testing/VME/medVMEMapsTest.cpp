@@ -105,7 +105,7 @@ void medVMEMapsTest::CreateVMEMaps()
 {
   vtkDataSetReader *Importer;
   vtkNEW(Importer);
-  mafString filename=MED_DATA_ROOT;
+  mafString filename=MAF_DATA_ROOT;
   filename<<"/VTK_Volumes/volume.vtk";
   Importer->SetFileName(filename);
   Importer->Update();

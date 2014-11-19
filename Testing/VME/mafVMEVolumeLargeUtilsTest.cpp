@@ -36,7 +36,7 @@ void mafVMEVolumeLargeUtilsTest::setUp()
 {
   vtkObject::SetGlobalWarningDisplay(false);
 
-  m_TestFilePath = MED_DATA_ROOT;
+  m_TestFilePath = MAF_DATA_ROOT;
   m_TestFilePath << "/Test_VMEVolumeLargeUtils/";
   m_TestFilePath << "volume_1.vtk";
 }

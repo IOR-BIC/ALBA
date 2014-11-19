@@ -119,7 +119,7 @@ void medOpImporterDicomOffisTest::TestSetDirName()
 void medOpImporterDicomOffisTest::TestCreateVolume() 
 //-----------------------------------------------------------
 {
-  mafString dirName=MED_DATA_ROOT;
+  mafString dirName=MAF_DATA_ROOT;
   dirName<<"/Dicom/";
 
   wxDir dir(dirName.GetCStr());
@@ -178,7 +178,7 @@ void medOpImporterDicomOffisTest::TestCompareDicomImage()
 {
   double pixelValue = 0;
   std::vector<double> pixelVector;
-  mafString dirName=MED_DATA_ROOT;
+  mafString dirName=MAF_DATA_ROOT;
   dirName<<"/Dicom/";
 
   wxDir dir(dirName.GetCStr());

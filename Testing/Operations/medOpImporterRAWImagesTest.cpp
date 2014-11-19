@@ -43,14 +43,14 @@ void medOpImporterRAWImagesTest::Test()
 	medOpImporterRAWImages *Importer=new medOpImporterRAWImages("importer");
 	Importer->TestModeOn();
   Importer->SetInput(Storage->GetRoot());
-	mafString Directory=MED_DATA_ROOT;
+	mafString Directory=MAF_DATA_ROOT;
   Directory<<"/RAW_Images";
 	Importer->CreatePipeline();
 	Importer->SetRawDirectory(Directory);
 	Importer->OnOpenDir();
 	Importer->SetSigned(true);
 	Importer->SetDataType(2);
-	mafString FileZ=MED_DATA_ROOT;
+	mafString FileZ=MAF_DATA_ROOT;
 	FileZ<<"/RAW_Images/IMG.txt";
 	Importer->SetCoordFile(FileZ.GetCStr());
 	mafString Prefix="IMG_512x512_";

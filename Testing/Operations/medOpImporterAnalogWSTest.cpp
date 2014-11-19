@@ -56,7 +56,7 @@ void medOpImporterAnalogWSTest::TestRead()
 {
 	medOpImporterAnalogWS *importer=new medOpImporterAnalogWS("importer");
 	importer->TestModeOn();
-	mafString filename=MED_DATA_ROOT;
+	mafString filename=MAF_DATA_ROOT;
   filename<<"/Test_ImporterAnalogWS/pbCV1b06emg_ridotto.csv";
 	importer->SetFileName(filename.GetCStr());
 	importer->Read();

@@ -51,7 +51,7 @@
 #include "mafConfigure.h"
 
 
-//#define TESTDATA MED_DATA_ROOT"/FEM/ANSYS"
+//#define TESTDATA MAF_DATA_ROOT"/FEM/ANSYS"
 #define FTOL 0.0000001
 
 static const bool renderingOn = false ;  // switch interactive rendering on
@@ -439,7 +439,7 @@ void vtkMAFMeshCutter_BESTest::TestGetOutputHex8()
 {
   // set filename
   std::ostrstream fname ;
-  fname << MED_DATA_ROOT << "/FEM/vtk/hex8" << ".vtk" << std::ends ;
+  fname << MAF_DATA_ROOT << "/FEM/vtk/hex8" << ".vtk" << std::ends ;
 
   // read the data
   vtkUnstructuredGridReader *reader = vtkUnstructuredGridReader::New();
@@ -540,7 +540,7 @@ void vtkMAFMeshCutter_BESTest::TestGetOutputHex8_VerticalCut1()
 {
   // set filename
   std::ostrstream fname ;
-  fname << MED_DATA_ROOT << "/FEM/vtk/hex8" << ".vtk" << std::ends ;
+  fname << MAF_DATA_ROOT << "/FEM/vtk/hex8" << ".vtk" << std::ends ;
 
   // read the data
   vtkUnstructuredGridReader *reader = vtkUnstructuredGridReader::New();
@@ -641,7 +641,7 @@ void vtkMAFMeshCutter_BESTest::TestGetOutputHex8_VerticalCut2()
 {
   // set filename
   std::ostrstream fname ;
-  fname << MED_DATA_ROOT << "/FEM/vtk/hex8" << ".vtk" << std::ends ;
+  fname << MAF_DATA_ROOT << "/FEM/vtk/hex8" << ".vtk" << std::ends ;
 
   // read the data
   vtkUnstructuredGridReader *reader = vtkUnstructuredGridReader::New();
@@ -742,7 +742,7 @@ void vtkMAFMeshCutter_BESTest::TestGetOutputHex8_FaceInPlane()
 {
   // set filename
   std::ostrstream fname ;
-  fname << MED_DATA_ROOT << "/FEM/vtk/hex8" << ".vtk" << std::ends ;
+  fname << MAF_DATA_ROOT << "/FEM/vtk/hex8" << ".vtk" << std::ends ;
 
   // read the data
   vtkUnstructuredGridReader *reader = vtkUnstructuredGridReader::New();
@@ -843,7 +843,7 @@ void vtkMAFMeshCutter_BESTest::TestGetOutputHex8_IncludesEdge1()
 {
   // set filename
   std::ostrstream fname ;
-  fname << MED_DATA_ROOT << "/FEM/vtk/hex8" << ".vtk" << std::ends ;
+  fname << MAF_DATA_ROOT << "/FEM/vtk/hex8" << ".vtk" << std::ends ;
 
   // read the data
   vtkUnstructuredGridReader *reader = vtkUnstructuredGridReader::New();
@@ -951,7 +951,7 @@ void vtkMAFMeshCutter_BESTest::TestGetOutputHex8_IncludesEdge2()
 {
   // set filename
   std::ostrstream fname ;
-  fname << MED_DATA_ROOT << "/FEM/vtk/hex8" << ".vtk" << std::ends ;
+  fname << MAF_DATA_ROOT << "/FEM/vtk/hex8" << ".vtk" << std::ends ;
 
   // read the data
   vtkUnstructuredGridReader *reader = vtkUnstructuredGridReader::New();
@@ -1059,7 +1059,7 @@ void vtkMAFMeshCutter_BESTest::TestGetOutputHex8_IncludesCorner()
 {
   // set filename
   std::ostrstream fname ;
-  fname << MED_DATA_ROOT << "/FEM/vtk/hex8" << ".vtk" << std::ends ;
+  fname << MAF_DATA_ROOT << "/FEM/vtk/hex8" << ".vtk" << std::ends ;
 
   // read the data
   vtkUnstructuredGridReader *reader = vtkUnstructuredGridReader::New();
@@ -1165,7 +1165,7 @@ void vtkMAFMeshCutter_BESTest::TestGetOutputHex8_EdgeOnly()
 {
   // set filename
   std::ostrstream fname ;
-  fname << MED_DATA_ROOT << "/FEM/vtk/hex8" << ".vtk" << std::ends ;
+  fname << MAF_DATA_ROOT << "/FEM/vtk/hex8" << ".vtk" << std::ends ;
 
   // read the data
   vtkUnstructuredGridReader *reader = vtkUnstructuredGridReader::New();
@@ -1216,7 +1216,7 @@ void vtkMAFMeshCutter_BESTest::TestGetOutputHex8_CornerOnly()
 {
   // set filename
   std::ostrstream fname ;
-  fname << MED_DATA_ROOT << "/FEM/vtk/hex8" << ".vtk" << std::ends ;
+  fname << MAF_DATA_ROOT << "/FEM/vtk/hex8" << ".vtk" << std::ends ;
 
   // read the data
   vtkUnstructuredGridReader *reader = vtkUnstructuredGridReader::New();
@@ -1267,7 +1267,7 @@ void vtkMAFMeshCutter_BESTest::TestGetOutputTet4()
 {
   // set filename
   std::ostrstream fname ;
-  fname << MED_DATA_ROOT << "/FEM/vtk/tet4" << ".vtk" << std::ends ;
+  fname << MAF_DATA_ROOT << "/FEM/vtk/tet4" << ".vtk" << std::ends ;
 
   // read the data
   vtkUnstructuredGridReader *reader = vtkUnstructuredGridReader::New();
@@ -1370,7 +1370,7 @@ void vtkMAFMeshCutter_BESTest::TestUpdateChangeCutFunction()
 
   // set filename
   std::ostrstream fname ;
-  fname << MED_DATA_ROOT << "/FEM/vtk/hex8" << ".vtk" << std::ends ;
+  fname << MAF_DATA_ROOT << "/FEM/vtk/hex8" << ".vtk" << std::ends ;
 
   // read the data
   vtkUnstructuredGridReader *reader = vtkUnstructuredGridReader::New();
@@ -1548,7 +1548,7 @@ void vtkMAFMeshCutter_BESTest::TestUpdateChangeInput()
 
   // set filename
   std::ostrstream fname1 ;
-  fname1 << MED_DATA_ROOT << "/FEM/vtk/hex8" << ".vtk" << std::ends ;
+  fname1 << MAF_DATA_ROOT << "/FEM/vtk/hex8" << ".vtk" << std::ends ;
 
   // read the data
   vtkUnstructuredGridReader *reader = vtkUnstructuredGridReader::New();
@@ -1639,7 +1639,7 @@ void vtkMAFMeshCutter_BESTest::TestUpdateChangeInput()
 
   // set filename
   std::ostrstream fname2 ;
-  fname2 << MED_DATA_ROOT << "/FEM/vtk/tet4" << ".vtk" << std::ends ;
+  fname2 << MAF_DATA_ROOT << "/FEM/vtk/tet4" << ".vtk" << std::ends ;
 
   // read the data
   reader->SetFileName(fname2.str());

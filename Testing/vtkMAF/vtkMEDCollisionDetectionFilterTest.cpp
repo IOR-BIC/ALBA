@@ -290,7 +290,7 @@ void vtkMEDCollisionDetectionFilterTest::CompareImages(int index , wxString fold
   int pointIndex =  name.find_last_of('.');
   name = name.substr(0, pointIndex);
 
-  wxString controlOriginFile=MED_DATA_ROOT;
+  wxString controlOriginFile=MAF_DATA_ROOT;
   controlOriginFile << "/";
   controlOriginFile << folder;
   controlOriginFile << "/";
@@ -313,7 +313,7 @@ void vtkMEDCollisionDetectionFilterTest::CompareImages(int index , wxString fold
   //write comparing image
   vtkMAFSmartPointer<vtkJPEGWriter> w;
   w->SetInput(w2i->GetOutput());
-  wxString imageFile=MED_DATA_ROOT;
+  wxString imageFile=MAF_DATA_ROOT;
 
   if(!controlStream)
   {
@@ -347,7 +347,7 @@ void vtkMEDCollisionDetectionFilterTest::CompareImages(int index , wxString fold
 
   //read original Image
   vtkMAFSmartPointer<vtkJPEGReader> rO;
-  wxString imageFileOrig=MED_DATA_ROOT;
+  wxString imageFileOrig=MAF_DATA_ROOT;
   imageFileOrig << "/";
   imageFileOrig << folder;
   imageFileOrig << "/";

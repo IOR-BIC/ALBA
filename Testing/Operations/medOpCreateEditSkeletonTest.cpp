@@ -71,7 +71,7 @@ void medOpCreateEditSkeletonTest::TestOpRun()
   // import VTK  
   medOpImporterVTK *importer=new medOpImporterVTK("importerVTK");
   importer->TestModeOn();
-  mafString fileName=MED_DATA_ROOT;
+  mafString fileName=MAF_DATA_ROOT;
   fileName<<"/PolylineGraph/PolylineGraph.vtk";
   importer->SetFileName(fileName);
   importer->ImportVTK();

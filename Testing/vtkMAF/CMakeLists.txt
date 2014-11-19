@@ -13,7 +13,7 @@ PROJECT (vtkMAF_TEST)
 IF(MAF_BUILD_MAFDLL)
   LINK_LIBRARIES(mafDLL)
 ELSE(MAF_BUILD_MAFDLL)
-  LINK_LIBRARIES(vtkMED vtkGraphics vtkRendering mafCommon)
+  LINK_LIBRARIES(vtkMAF vtkGraphics vtkRendering mafCommon)
 ENDIF (MAF_BUILD_MAFDLL)
 
 

@@ -58,7 +58,7 @@ void medHTMLTemplateParserTest::TestSetWriteTemplateFile()
 //----------------------------------------------------------------------------
 {
   medHTMLTemplateParser *testBlock;
-  wxString root=MED_DATA_ROOT;
+  wxString root=MAF_DATA_ROOT;
   wxString OutputFileString, OutputString;
   wxString RightString="MAF TEMPLATE OUTPUT TEST";
   int cmpValue;

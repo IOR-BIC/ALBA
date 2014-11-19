@@ -56,7 +56,7 @@ void medOpExporterLandmarkWSTest::TestOnLandmarkImporter()
   medOpImporterLandmark *importer=new medOpImporterLandmark("importer");
 	importer->TestModeOn();
 
-	mafString filename=MED_DATA_ROOT;
+	mafString filename=MAF_DATA_ROOT;
 	filename<<"/RAW_MAL/cloud_to_be_imported";
 	importer->SetFileName(filename.GetCStr());
 	importer->Read();
@@ -65,7 +65,7 @@ void medOpExporterLandmarkWSTest::TestOnLandmarkImporter()
 	// Initialize and execute exporter
 	medOpExporterLandmarkWS *exporter=new medOpExporterLandmarkWS("test exporter");
 	exporter->SetInput(node);
-	mafString fileExp=MED_DATA_ROOT;
+	mafString fileExp=MAF_DATA_ROOT;
 	fileExp<<"/RAW_MAL/ExportWS.csv";
 	exporter->TestModeOn();
 	exporter->SetFileName(fileExp);
@@ -75,7 +75,7 @@ void medOpExporterLandmarkWSTest::TestOnLandmarkImporter()
   medOpImporterLandmarkWS *importerWS=new medOpImporterLandmarkWS("importer");
 	importerWS->TestModeOn();
 
-	filename=MED_DATA_ROOT;
+	filename=MAF_DATA_ROOT;
 	filename<<"/RAW_MAL/ExportWS.csv";
 	importerWS->SetFileName(filename.GetCStr());
 	importerWS->Read();

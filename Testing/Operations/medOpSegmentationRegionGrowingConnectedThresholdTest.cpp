@@ -124,7 +124,7 @@ void medOpSegmentationRegionGrowingConnectedThresholdTest::TestAlgorithm()
 {
   //Read the data of input and use it as input of the operation
   vtkMAFSmartPointer<vtkDataSetReader> r;
-  mafString fileNameIn = MED_DATA_ROOT;
+  mafString fileNameIn = MAF_DATA_ROOT;
   fileNameIn<<"/VTK_Volumes/volume.vtk";
   r->SetFileName(fileNameIn.GetCStr());
   r->Update();
@@ -196,7 +196,7 @@ void medOpSegmentationRegionGrowingConnectedThresholdTest::TestAlgorithm()
 
   //Write the result of the itk filter
   RealWriterType::Pointer writer = RealWriterType::New();
-  mafString fileNameOut = MED_DATA_ROOT;
+  mafString fileNameOut = MAF_DATA_ROOT;
   fileNameOut<<"/VTK_Volumes/Segmentation.vtk";
   writer->SetFileName( fileNameOut.GetCStr() );
   writer->SetInput(connectedThreshold->GetOutput());
@@ -242,7 +242,7 @@ void medOpSegmentationRegionGrowingConnectedThresholdTest::TestAlgorithmRG()
   importerVTK->TestModeOn();
   importerVTK->SetInput(storage->GetRoot());
 
-  mafString absPathFilename=MED_DATA_ROOT;
+  mafString absPathFilename=MAF_DATA_ROOT;
   absPathFilename<<"/VTK_Volumes/";
   absPathFilename.Append("LabeledVolumeTest.vtk");
   importerVTK->SetFileName(absPathFilename);
@@ -272,7 +272,7 @@ void medOpSegmentationRegionGrowingConnectedThresholdTest::TestAlgorithmRG()
 
   //read the result expected
   vtkMAFSmartPointer<vtkDataSetReader> outputRead;
-  mafString fileNameOut = MED_DATA_ROOT;
+  mafString fileNameOut = MAF_DATA_ROOT;
   fileNameOut<<"/VTK_Volumes/ConnectedThreshold.vtk";
   outputRead->SetFileName(fileNameOut.GetCStr());
   outputRead->Update();

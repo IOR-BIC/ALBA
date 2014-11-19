@@ -96,7 +96,7 @@ void vtkMAFVolumeTextureMapper2DTest::TestPipeExecution()
   ////// import vtkData ////////////////////
   vtkDataSetReader *Importer;
   vtkNEW(Importer);
-  mafString filename=MED_DATA_ROOT;
+  mafString filename=MAF_DATA_ROOT;
   filename<<"/VTK_Volumes/volume.vtk";
   Importer->SetFileName(filename);
   Importer->Update();
@@ -197,7 +197,7 @@ void vtkMAFVolumeTextureMapper2DTest::CompareImages(int scalarIndex)
   int pointIndex =  name.find_last_of('.');
   name = name.substr(0, pointIndex);
 
-  mafString controlOriginFile=MED_DATA_ROOT;
+  mafString controlOriginFile=MAF_DATA_ROOT;
   controlOriginFile<<"/Test_vtkMAFVolumeTextureMapper2D/";
   controlOriginFile<<name.c_str();
   controlOriginFile<<"_";
@@ -221,7 +221,7 @@ void vtkMAFVolumeTextureMapper2DTest::CompareImages(int scalarIndex)
   vtkJPEGWriter *w;
   vtkNEW(w);
   w->SetInput(w2i->GetOutput());
-  mafString imageFile=MED_DATA_ROOT;
+  mafString imageFile=MAF_DATA_ROOT;
 
   if(!controlStream)
   {
@@ -256,7 +256,7 @@ void vtkMAFVolumeTextureMapper2DTest::CompareImages(int scalarIndex)
   //read original Image
   vtkJPEGReader *rO;
   vtkNEW(rO);
-  mafString imageFileOrig=MED_DATA_ROOT;
+  mafString imageFileOrig=MAF_DATA_ROOT;
   imageFileOrig<<"/Test_vtkMAFVolumeTextureMapper2D/";
   imageFileOrig<<name.c_str();
   imageFileOrig<<"_";

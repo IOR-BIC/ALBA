@@ -44,7 +44,7 @@ void medOpImporterLandmarkTXTTest::TestTXTImporter()
 {
 	medOpImporterLandmarkTXT *importer=new medOpImporterLandmarkTXT("importer");
 	importer->TestModeOn();
-	mafString filename=MED_DATA_ROOT;
+	mafString filename=MAF_DATA_ROOT;
   filename<<"/AL_FileTXT/cammino02.txt";
 	importer->SetFileName(filename.GetCStr());
   importer->SetSkipColumn(1);
@@ -60,7 +60,7 @@ void medOpImporterLandmarkTXTTest::TestVisibility()
 {
   medOpImporterLandmarkTXT *importer=new medOpImporterLandmarkTXT("importer");
   importer->TestModeOn();
-  mafString filename=MED_DATA_ROOT;
+  mafString filename=MAF_DATA_ROOT;
   filename<<"/AL_FileTXT/cammino02.txt";
   importer->SetFileName(filename.GetCStr());
   importer->SetSkipColumn(1);
@@ -79,7 +79,7 @@ void medOpImporterLandmarkTXTTest::TestCoordinates()
 {
   medOpImporterLandmarkTXT *importer=new medOpImporterLandmarkTXT("importer");
   importer->TestModeOn();
-  mafString filename=MED_DATA_ROOT;
+  mafString filename=MAF_DATA_ROOT;
   filename<<"/AL_FileTXT/cammino02.txt";
   importer->SetFileName(filename.GetCStr());
   importer->SetSkipColumn(1);

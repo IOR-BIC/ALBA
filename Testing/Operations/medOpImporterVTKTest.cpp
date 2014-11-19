@@ -92,7 +92,7 @@ void medOpImporterVTKTest::TestImportVTKPolylineGraph()
 {
   medOpImporterVTK *importer=new medOpImporterVTK();
   importer->TestModeOn();
-  mafString fileName=MED_DATA_ROOT;
+  mafString fileName=MAF_DATA_ROOT;
   fileName<<"/PolylineGraph/PolylineGraph.vtk";
   importer->SetFileName(fileName);
   importer->ImportVTK();
@@ -123,7 +123,7 @@ void medOpImporterVTKTest::TestImportVTKVolumeSP()
 {
   medOpImporterVTK *importer=new medOpImporterVTK();
   importer->TestModeOn();
-  mafString fileName=MED_DATA_ROOT;
+  mafString fileName=MAF_DATA_ROOT;
   fileName<<"/VTK_Volumes/volume.vtk";
   importer->SetFileName(fileName);
   importer->ImportVTK();
@@ -153,7 +153,7 @@ void medOpImporterVTKTest::TestImportVTKVolumeRG()
 {
   medOpImporterVTK *importer=new medOpImporterVTK();
   importer->TestModeOn();
-  mafString fileName=MED_DATA_ROOT;
+  mafString fileName=MAF_DATA_ROOT;
   fileName<<"/VTK_Volumes/volumeRG.vtk";
   importer->SetFileName(fileName);
   importer->ImportVTK();
@@ -183,7 +183,7 @@ void medOpImporterVTKTest::TestImportVTKSurface()
 {
   medOpImporterVTK *importer=new medOpImporterVTK();
   importer->TestModeOn();
-  mafString fileName=MED_DATA_ROOT;
+  mafString fileName=MAF_DATA_ROOT;
   fileName<<"/Surface/sphere.vtk";
   importer->SetFileName(fileName);
   importer->ImportVTK();
@@ -213,7 +213,7 @@ void medOpImporterVTKTest::TestImportVTKMesh()
 {
   medOpImporterVTK *importer=new medOpImporterVTK();
   importer->TestModeOn();
-  mafString fileName=MED_DATA_ROOT;
+  mafString fileName=MAF_DATA_ROOT;
   fileName<<"/FEM/tet4.vtk";
   importer->SetFileName(fileName);
   importer->ImportVTK();
@@ -243,7 +243,7 @@ void medOpImporterVTKTest::TestImportVTKPointSet()
 {
   medOpImporterVTK *importer=new medOpImporterVTK();
   importer->TestModeOn();
-  mafString fileName=MED_DATA_ROOT;
+  mafString fileName=MAF_DATA_ROOT;
   fileName<<"/PointSet/pointset.vtk";
   importer->SetFileName(fileName);
   importer->ImportVTK();

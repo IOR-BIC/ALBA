@@ -58,7 +58,7 @@ void medOpImporterGRFWSTest::TestRead()
 {
 	medOpImporterGRFWS *importer=new medOpImporterGRFWS("importer");
 	importer->TestModeOn();
-	mafString filename=MED_DATA_ROOT;
+	mafString filename=MAF_DATA_ROOT;
   filename<<"/Test_ImporterGRF/TestPbCV1b06grf.txt";
 	importer->SetFileName(filename.GetCStr());
 	importer->Read();

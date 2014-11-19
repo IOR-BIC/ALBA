@@ -44,10 +44,10 @@ void mafVMERawMotionDataTest::Test()
   // try to set this data to the volume
   int returnValue = 1;
 
-  mafString filename=MED_DATA_ROOT;
+  mafString filename=MAF_DATA_ROOT;
   filename<<"/RAW_MAL/Fprg3bsi_NOT_USED.man";
 
-  mafString fileDict=MED_DATA_ROOT;
+  mafString fileDict=MAF_DATA_ROOT;
   fileDict<<"/RAW_MAL/DICT_FPRG3BSL_421_NOT_USED.TXT";
 
   vmeRawMotionData->DictionaryOn();

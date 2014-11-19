@@ -61,7 +61,7 @@ void mafOpImporterRAWVolume_BESTest::TestImport()
   mafOpImporterRAWVolume_BES *Importer=new mafOpImporterRAWVolume_BES("importer");
   Importer->TestModeOn();
   Importer->SetInput(Storage->GetRoot());
-  mafString Filename=MED_DATA_ROOT;
+  mafString Filename=MAF_DATA_ROOT;
   Filename<<"/RAW_Volume/Volume.raw";
   Importer->SetFileName(Filename.GetCStr());
   int Dimensions[3]={512,512,5};

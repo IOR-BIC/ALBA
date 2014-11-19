@@ -66,7 +66,7 @@ void medOpExporterGRFWSTest::TestWrite()
 {
 	medOpExporterGRFWS *Exporter = new medOpExporterGRFWS("Exporter");
 	Exporter->TestModeOn();
-	mafString filename=MED_DATA_ROOT;
+	mafString filename=MAF_DATA_ROOT;
   filename << "/Test_ExporterGRFWS/test_GRF.csv";
   Exporter->SetFileName(filename.GetCStr());
   
@@ -233,7 +233,7 @@ void medOpExporterGRFWSTest::TestWriteFast()
 {
   medOpExporterGRFWS *Exporter = new medOpExporterGRFWS("Exporter");
   Exporter->TestModeOn();
-  mafString filename=MED_DATA_ROOT;
+  mafString filename=MAF_DATA_ROOT;
   filename << "/Test_ExporterGRFWS/test_GRF_Fast.csv";
   Exporter->SetFileName(filename.GetCStr());
 
@@ -427,7 +427,7 @@ void medOpExporterGRFWSTest::TestWriteSingleVector()
 {
 	medOpExporterGRFWS *Exporter = new medOpExporterGRFWS("Exporter");
 	Exporter->TestModeOn();
-	mafString filename=MED_DATA_ROOT;
+	mafString filename=MAF_DATA_ROOT;
   filename << "/Test_ExporterGRFWS/test_GRF_Single.csv";
   Exporter->SetFileName(filename.GetCStr());
   
@@ -517,7 +517,7 @@ void medOpExporterGRFWSTest::TestWriteSingleVectorFast()
 {
   medOpExporterGRFWS *Exporter = new medOpExporterGRFWS("Exporter");
 	Exporter->TestModeOn();
-	mafString filename=MED_DATA_ROOT;
+	mafString filename=MAF_DATA_ROOT;
   filename << "/Test_ExporterGRFWS/test_GRF_Single_Fast.csv";
   Exporter->SetFileName(filename.GetCStr());
   
