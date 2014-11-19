@@ -90,6 +90,7 @@ protected:
 
   mafLUTLibrary *m_UserLutLibrary;
   wxComboBox   *m_UserPresetCombo;
+	wxComboBox   *m_PresetCombo;
   vtkLookupTable *m_ExternalLut;  ///< Given lut that will be modified by "ok" or "apply"
   vtkLookupTable *m_Lut;          ///< Internal lut -- initialized in SetLut
   DECLARE_EVENT_TABLE()

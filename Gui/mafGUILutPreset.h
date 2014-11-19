@@ -26,8 +26,11 @@ extern const int lutPresetNum;
 /** names of the available LUT presets */
 extern wxString LutNames[];
 
-/** initalize a given LUT with the idx.th preset */
+/** initialize a given LUT with the idx.th preset */
 MAF_EXPORT extern void lutPreset(int idx, vtkLookupTable *lut);
+
+/** Given a lut return the index of the relative presets, -1 if the lut was not found in presets */
+MAF_EXPORT int presetsIdxByLut(vtkLookupTable *lut);
 
 #endif
 
