@@ -137,7 +137,7 @@ void mafGUILocaleSettings::InitializeSettings()
   wxString prefix;
   char *tmp = wxGetWorkingDirectory();
   prefix = tmp;
-  delete[] tmp;
+  delete tmp;
   prefix += "\\Language\\";
   m_Locale.Init(m_Language);
   m_Locale.AddCatalogLookupPathPrefix(prefix);
