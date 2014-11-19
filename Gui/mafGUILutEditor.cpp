@@ -113,6 +113,15 @@ mafGUILutEditor::mafGUILutEditor(wxWindow* parent, wxWindowID id, const wxPoint&
   m_UserLutLibrary->SetDir(m_UserLutLibraryDir.c_str());
   m_UserLutLibrary->Load();
 
+	wxArrayString presetsLutNames;
+	presetsLutNames.Add("Current Lut");
+
+	for (int id = 0; id < lutPresetNum; id++) 
+	{ 
+		presetsLutNames.Add(LutNames[id]);
+	}
+
+
   int userLutPresetNum = m_UserLutLibrary->GetNumberOfLuts();
   
   std::vector<std::string> lutNames;
@@ -138,15 +147,15 @@ mafGUILutEditor::mafGUILutEditor(wxWindow* parent, wxWindowID id, const wxPoint&
   wxStaticText *lab;
   wxTextCtrl   *text;
   wxTextCtrl   *text2;
-  wxComboBox   *combo;
   mafGUIButton    *butt;
   
   lab = new wxStaticText(this, -1, _("Presets LUT"), dp, wxSize(LW,LH), wxALIGN_RIGHT );
-	combo = new wxComboBox  (this, ID_PRESET, "", dp, wxSize(DW,-1), lutPresetNum, LutNames, wxCB_READONLY);
+	m_PresetCombo = new wxComboBox(this, ID_PRESET, "", dp, wxSize(DW,-1), lutPresetNum+1, presetsLutNames.GetStringArray(), wxCB_READONLY);
   sz = new wxBoxSizer(wxHORIZONTAL);
   sz->Add( lab,  1, wxRIGHT, LM);
-	sz->Add( combo,0, wxRIGHT, HM);
-  combo->SetValidator( mafGUIValidator(this,ID_PRESET,combo,&m_Preset) );
+	sz->Add( m_PresetCombo,0, wxRIGHT, HM);
+  m_PresetCombo->SetValidator( mafGUIValidator(this,ID_PRESET,m_PresetCombo,&m_Preset) );
+	
 	sizer->Add(sz,0,wxALL, M); 
 
 	lab = new wxStaticText (this, -1, _("number of entries [1..256]"), dp, wxSize(LW,LH), wxALIGN_RIGHT );
@@ -307,9 +316,16 @@ mafGUILutEditor::~mafGUILutEditor()
 void mafGUILutEditor::UpdateLut()
 //----------------------------------------------------------------------------
 {
-  lutPreset(m_Preset, m_Lut);
-  m_Lut->Build();
-  UpdateWidgetsOnLutChange();
+	if(m_Preset>0)
+	{
+		lutPreset(m_Preset-1, m_Lut);
+	}
+	else
+	{
+		CopyLut(m_ExternalLut,m_Lut);
+	}
+	m_Lut->Build();
+	UpdateWidgetsOnLutChange();
 }
 //----------------------------------------------------------------------------
 void mafGUILutEditor::OnEvent(mafEventBase *maf_event)
@@ -479,6 +495,9 @@ void mafGUILutEditor::SetLut(vtkLookupTable *lut)
     m_NumEntry      = m_Lut->GetNumberOfTableValues();
   }
 
+	int lutPos=presetsIdxByLut(m_Lut);
+	m_Preset=lutPos+1;
+	
   m_LutWidget->SetLut(m_Lut);
   m_LutSwatch->SetLut(m_Lut);
   TransferDataToWindow();
