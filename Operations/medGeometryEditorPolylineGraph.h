@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafObserver.h"
 #include "mafPolylineGraph.h"
 #include "vtkSystemIncludes.h"
@@ -49,7 +49,7 @@ class vtkPolyData;
   It creates ISA, can add, insert, remove, move point in the polyline graph,
   it can also add, remove branch in which points are.
 */
-class MED_OPERATION_EXPORT medGeometryEditorPolylineGraph: public mafObserver 
+class MAF_EXPORT medGeometryEditorPolylineGraph: public mafObserver 
 {
 public:
   /** contructor*/

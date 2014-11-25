@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 #include "mafString.h"
 #include "mafVME.h"
@@ -44,7 +44,7 @@ It returns a timevaryng VME representing the object in different (user defined) 
 */
 
 //----------------------------------------------------------------------------
-class MED_OPERATION_EXPORT medOpMakeVMETimevarying: public mafOp
+class MAF_EXPORT medOpMakeVMETimevarying: public mafOp
 //----------------------------------------------------------------------------
 {
 public:

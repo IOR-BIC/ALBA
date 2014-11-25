@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medViewsDefines.h"
+#include "mafDefines.h"
 #include "mafViewCompound.h"
 #include "mafSceneNode.h"
 #include "vtkPoints.h"
@@ -44,7 +44,7 @@ class vtkTextMapper;
 //----------------------------------------------------------------------------
 /** 
 This compound view is made of four child views used to analyze different orthogonal slices of the volume*/
-class MED_VIEWS_EXPORT medViewSliceOnCurve: public mafViewCompound
+class MAF_EXPORT medViewSliceOnCurve: public mafViewCompound
 {
 public:
 

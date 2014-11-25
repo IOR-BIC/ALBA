@@ -19,7 +19,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medViewsDefines.h"
+#include "mafDefines.h"
 #include "mafViewVTK.h"
 #include "mafMatrix.h"
 
@@ -38,7 +38,7 @@ mafViewRX is a View that visualize volume as projection along x or y axis and
 initialize the visual pipe according to the camera position that is passed through constructor
 \sa mafViewVTK
 */
-class MED_VIEWS_EXPORT mafViewRX: public mafViewVTK
+class MAF_EXPORT mafViewRX: public mafViewVTK
 {
 public:
   /** constructor */

@@ -17,14 +17,14 @@
 #ifndef __medInteractorSegmentationPicker_h
 #define __medInteractorSegmentationPicker_h
 
-#include "medInteractionDefines.h"
+#include "mafDefines.h"
 #include "mafInteractorCameraMove.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
 
-class MED_INTERACTION_EXPORT medInteractorSegmentationPicker : public mafInteractorCameraMove
+class MAF_EXPORT medInteractorSegmentationPicker : public mafInteractorCameraMove
 {
 public:
   enum GUI_IDS

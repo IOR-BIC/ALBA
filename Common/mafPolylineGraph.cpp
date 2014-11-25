@@ -20,7 +20,7 @@ hack for mafLogMessage was used.
 //would lead into application crash!
 //#include "mafDefines.h"
 
-#include "medDefines.h"
+#include "mafDefines.h"
 #include "mafPolylineGraph.h"
 #include "vtkPolydata.h"
 #include "vtkPoints.h"

@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 
 // vtk includes
 #include "vtkRenderer.h"
@@ -42,7 +42,7 @@
 /// Helper class for medOpMML3. \n
 /// Visual pipe for displaying plot of parameter value against slice number.
 //----------------------------------------------------------------------------
-class MED_OPERATION_EXPORT medOpMML3ParameterView  
+class MAF_EXPORT medOpMML3ParameterView  
 {
 public:
 	medOpMML3ParameterView( vtkRenderWindow *rw, vtkRenderer *ren );

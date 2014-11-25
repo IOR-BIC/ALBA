@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "mafPipe.h"
 
 //----------------------------------------------------------------------------
@@ -39,7 +39,7 @@ class mafGUIFloatSlider;
 className: medPipeVolumeDRR
 Pipe which uses BES vtkXRayVolumeMapper.
 */
-class MED_VME_EXPORT medPipeVolumeDRR : public mafPipe
+class MAF_EXPORT medPipeVolumeDRR : public mafPipe
 {
 public:
   /** RTTI macro*/

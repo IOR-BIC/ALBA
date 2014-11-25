@@ -18,7 +18,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "mafVMEOutputPolyline.h"
 
 //----------------------------------------------------------------------------
@@ -30,7 +30,7 @@ class mafGUI;
   medVMEOutputWrappedMeter is the output produced by a node generating an output
   with a VTK dataset.
 */
-class MED_VME_EXPORT medVMEOutputWrappedMeter : public mafVMEOutputPolyline
+class MAF_EXPORT medVMEOutputWrappedMeter : public mafVMEOutputPolyline
 {
 public:
   medVMEOutputWrappedMeter();

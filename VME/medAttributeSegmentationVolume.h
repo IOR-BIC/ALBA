@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "mafAttribute.h"
 #include <vector>
 
@@ -32,7 +32,7 @@
 // medAttributeSegmentationVolume:
 //----------------------------------------------------------------------------
 /**  */  
-class MED_VME_EXPORT medAttributeSegmentationVolume : public mafAttribute
+class MAF_EXPORT medAttributeSegmentationVolume : public mafAttribute
 {
 public:
   /** constructor. */

@@ -15,7 +15,7 @@ Datasets in VTK-Based Visualisation Systems.
 In: Proceedings of EG UK Theory and Practice of Computer Graphics (TP.CG. 2008), 
 June 9-11, 2008, Manchester, UK, p. 1-8
 =========================================================================*/
-#include "medDefines.h" 
+#include "mafDefines.h" 
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.

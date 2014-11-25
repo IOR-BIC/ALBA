@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -40,7 +40,7 @@ class mafString;
   surfaces using the iterative closest point (ICP) algorithm.
 */
 
-class MED_OPERATION_EXPORT medOpClassicICPRegistration: public mafOp
+class MAF_EXPORT medOpClassicICPRegistration: public mafOp
 {
 public:
   /** constructor */

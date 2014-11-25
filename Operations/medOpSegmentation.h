@@ -21,7 +21,7 @@
 #include "mafMatrix.h"
 #include "mafNode.h"
 #include "medVMESegmentationVolume.h"
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "vtkSystemIncludes.h"
 #include "wx/gauge.h"
 
@@ -85,7 +85,7 @@ User can select:
 - segmentation refinement
 or he can load a previous segmentation.
 */
-class MED_OPERATION_EXPORT medOpSegmentation: public mafOp
+class MAF_EXPORT medOpSegmentation: public mafOp
 {
 
 public:

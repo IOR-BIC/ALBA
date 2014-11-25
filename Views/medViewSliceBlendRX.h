@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medViewsDefines.h"
+#include "mafDefines.h"
 #include "mafViewCompound.h"
 #include "mafSceneNode.h"
 
@@ -40,7 +40,7 @@ class mafGizmoSlice;
 //----------------------------------------------------------------------------
 /** 
 This view features one Rx views and one Slice Blend view.*/
-class MED_VIEWS_EXPORT medViewSliceBlendRX: public mafViewCompound
+class MAF_EXPORT medViewSliceBlendRX: public mafViewCompound
 {
 public:
   

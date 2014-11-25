@@ -14,7 +14,7 @@
 
 =========================================================================*/
 
-#include "medDefines.h"
+#include "mafDefines.h"
 
 #include "mmiSelectPoint.h"
 #include "mafDeviceButtonsPadMouse.h"

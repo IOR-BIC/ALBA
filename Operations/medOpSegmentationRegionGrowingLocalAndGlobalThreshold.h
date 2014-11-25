@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -36,7 +36,7 @@ class vtkImageData;
 /** 
 class name : medOpSegmentationRegionGrowingLocalAndGlobalThreshold
 */
-class MED_OPERATION_EXPORT medOpSegmentationRegionGrowingLocalAndGlobalThreshold: public mafOp
+class MAF_EXPORT medOpSegmentationRegionGrowingLocalAndGlobalThreshold: public mafOp
 {
 public:
 

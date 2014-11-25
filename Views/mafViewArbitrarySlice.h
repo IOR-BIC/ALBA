@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notice for more information.
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medViewsDefines.h"
+#include "mafDefines.h"
 #include "medViewCompoundWindowing.h"
 
 //----------------------------------------------------------------------------
@@ -46,7 +46,7 @@ The left view features a rotation and a translation gizmos which can be used to 
 The right view camera is always facing the slice.
 */
 
-class MED_VIEWS_EXPORT mafViewArbitrarySlice: public medViewCompoundWindowing
+class MAF_EXPORT mafViewArbitrarySlice: public medViewCompoundWindowing
 {
 public:
 	/** constructor*/

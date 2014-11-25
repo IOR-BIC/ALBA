@@ -16,7 +16,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "medPipeTensorField.h"
 #include <wx/listctrl.h>
 
@@ -46,7 +46,7 @@ class vtkFloatArray;
 class name: medPipeTensorFieldGlyphs
 Class for Volumes with compound pipes which show tensor field using glyphs.
  */
-class MED_VME_EXPORT medPipeTensorFieldGlyphs : public medPipeTensorField
+class MAF_EXPORT medPipeTensorFieldGlyphs : public medPipeTensorField
 {
 public:
   /** RTTI macro*/

@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "mafPipe.h"
 
 //----------------------------------------------------------------------------
@@ -47,7 +47,7 @@ class vtkImageCast;
 className: medPipeVolumeMIP
 Pipe which uses vtkVolumeRayCastMIPFunction with vtkMAFVolumeRayCastMapper and predefined Transfer Functions. 
 */
-class MED_VME_EXPORT medPipeVolumeMIP : public mafPipe
+class MAF_EXPORT medPipeVolumeMIP : public mafPipe
 {
 public:
   /** RTTI macro */

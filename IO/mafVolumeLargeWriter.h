@@ -14,14 +14,14 @@
 #ifndef __mafVolumeLargeWriter__
 #define __mafVolumeLargeWriter__
 
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "mafObject.h"
 #include "mafString.h"
 #include "mafObserver.h"
 #include "vtkMAFLargeImageData.h"
 #include "vtkDoubleArray.h"
 
-class MED_VME_EXPORT mafVolumeLargeWriter : public mafObject
+class MAF_EXPORT mafVolumeLargeWriter : public mafObject
 {
 public:
 	mafTypeMacro(mafVolumeLargeWriter, mafObject);

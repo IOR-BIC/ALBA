@@ -17,7 +17,7 @@
 #ifndef __medGUIContextualMenu_H__
 #define __medGUIContextualMenu_H__
 
-#include "medCommonDefines.h"
+#include "mafDefines.h"
 
 //----------------------------------------------------------------------------
 // forward references;
@@ -31,7 +31,7 @@ class mafObserver;
   Represents the contexctual menu' which compares when click right button 
   over a viewport.
 */
-class MED_COMMON_EXPORT medGUIContextualMenu : public wxMenu
+class MAF_EXPORT medGUIContextualMenu : public wxMenu
 {
 public:
   /** constructor. */

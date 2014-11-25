@@ -19,7 +19,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 #include "vtkAppendPolyData.h"
 #include "vtkFeatureEdges.h"
@@ -51,7 +51,7 @@ Perform extrusion of holes in a surface.
 CTRL modifier must be used in order to select a hole in render window while
 performing mouse dragging.
 */
-class MED_OPERATION_EXPORT medOpExtrusionHoles: public mafOp
+class MAF_EXPORT medOpExtrusionHoles: public mafOp
 {
 public:
 	medOpExtrusionHoles(const wxString &label = "Extrude Holes");

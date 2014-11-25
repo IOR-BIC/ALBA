@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medInteractionDefines.h"
+#include "mafDefines.h"
 #include "mafObserver.h"
 #include "mafGUITransformInterface.h"
 
@@ -41,7 +41,7 @@ class mafGUIFloatSlider;
 
 A GUI component with sliders widgets for transform operations.
 */
-class MED_INTERACTION_EXPORT medGUITransformSliders : public mafGUITransformInterface
+class MAF_EXPORT medGUITransformSliders : public mafGUITransformInterface
 {
 public:
 

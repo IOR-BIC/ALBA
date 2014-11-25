@@ -17,7 +17,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medGuiDefines.h"
+#include "mafDefines.h"
 #include "mafEvent.h"
 #include "mafObserver.h"
 #include "mafGUIPanel.h"
@@ -49,7 +49,7 @@ mafEvent::GetArg). medGUIDynamicVP can be configured so it does not contain
 neither close button nor create combo nor any other widget. In such a
 special mode, the construction of visual pipe is governed by the caller.*/
 //----------------------------------------------------------------------------
-class MED_GUI_EXPORT medGUIDynamicVP: public mafGUIPanel, public mafObserver
+class MAF_EXPORT medGUIDynamicVP: public mafGUIPanel, public mafObserver
 {
 public:  
   enum PLAYER_WIDGET_ID

@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // includes :
 //----------------------------------------------------------------------------
-#include "medCommonDefines.h"
+#include "mafDefines.h"
 #include "mafObserver.h"
 #include "medWizardBlock.h"
 #include <vector>
@@ -32,9 +32,9 @@
 class mafObserver;
 class mafNode;
 
-#ifdef MED_COMMON_EXPORTS
+#ifdef MAF_EXPORT
 #include "mafDllMacros.h"
-EXPORT_STL_VECTOR(MED_COMMON_EXPORT,medWizardBlock *);
+EXPORT_STL_VECTOR(MAF_EXPORT,medWizardBlock *);
 #endif
 
 
@@ -42,7 +42,7 @@ EXPORT_STL_VECTOR(MED_COMMON_EXPORT,medWizardBlock *);
   Class Name: medWizard.
   Class for wizard creation each wizard must extend this block
 */
-class MED_COMMON_EXPORT medWizard : mafObserver
+class MAF_EXPORT medWizard : mafObserver
 {
 public:
 

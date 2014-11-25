@@ -18,7 +18,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medGuiDefines.h"
+#include "mafDefines.h"
 #include "wx/wizard.h"
 #include "mafEvent.h"
 #include "mafObserver.h"
@@ -47,7 +47,7 @@ enum DIALOG_EXSTYLES
   - lower right
   - lower center
 */
-class MED_GUI_EXPORT medGUIWizardPage : public wxWizardPageSimple, public mafObserver  
+class MAF_EXPORT medGUIWizardPage : public wxWizardPageSimple, public mafObserver  
 {
 public:
   /** constructor. */

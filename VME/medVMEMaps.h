@@ -18,7 +18,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "mafVME.h"
 
 //----------------------------------------------------------------------------
@@ -41,7 +41,7 @@ class vtkLookupTable;
 VME with input a surface and a volume, and producing a distance/density scalar surface.  
 */
 
-class MED_VME_EXPORT medVMEMaps : public mafVME
+class MAF_EXPORT medVMEMaps : public mafVME
 {
 public:
   

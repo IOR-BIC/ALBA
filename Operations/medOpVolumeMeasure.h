@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 #include "mafVMESurface.h"
 #include "mafVMESurfaceParametric.h"
@@ -48,7 +48,7 @@ of the divergence theorem. The general assumption here is
 that the model is of closed surface.
 */
 
-class MED_OPERATION_EXPORT medOpVolumeMeasure: public mafOp
+class MAF_EXPORT medOpVolumeMeasure: public mafOp
 {
 public:
              

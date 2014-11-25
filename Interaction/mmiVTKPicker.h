@@ -17,7 +17,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medInteractionDefines.h"
+#include "mafDefines.h"
 #include "mafInteractorCameraMove.h"
 
 //----------------------------------------------------------------------------
@@ -52,7 +52,7 @@ Bool = true
 VtkObj = reference to vtkPoints containing the new position of
 point picked during CTRL + left mouse down  
 */
-class MED_INTERACTION_EXPORT mmiVTKPicker : public mafInteractorCameraMove
+class MAF_EXPORT mmiVTKPicker : public mafInteractorCameraMove
 {
 public:
   /** RTTI macro */

@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // includes :
 //----------------------------------------------------------------------------
-#include "medCommonDefines.h"
+#include "mafDefines.h"
 #include "medWizardBlock.h"
 #include <vector>
 
@@ -32,7 +32,7 @@
   Class Name: medWizardTypeFileExistCheck.
   Class for create a file exist check block
 */
-class MED_COMMON_EXPORT medWizardBlockFileExistCheck : public medWizardBlock
+class MAF_EXPORT medWizardBlockFileExistCheck : public medWizardBlock
 {
 public:
 

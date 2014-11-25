@@ -13,7 +13,7 @@ University of Bedfordshire, UK
 #ifndef __medVMEStent_h 
 #define __medVMEStent_h
 
-#include "medVMEDefines.h"  //very important for MED_VME_EXPORT
+#include "mafDefines.h"  //very important for MAF_EXPORT
 
 #include "mafNode.h"
 #include "mafVME.h"
@@ -60,7 +60,7 @@ typedef itk::vtkMEDDeformableSimplexMeshFilter<SimplexMeshType,SimplexMeshType> 
 // Some applications set the polydata directly and some load it from
 // the corresponding vme's.
 //-----------------------------------------------------------------------------
-class MED_VME_EXPORT medVMEStent : public mafVMEGeneric
+class MAF_EXPORT medVMEStent : public mafVMEGeneric
 {
 public:
   /// Risk categories

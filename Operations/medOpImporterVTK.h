@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOpImporterVTK.h"
 
 //----------------------------------------------------------------------------
@@ -32,7 +32,7 @@ class medVMEPolylineGraph;
 class name: medOpImporterVTK
 The same importer of the MAF , but polylines are stored inside 
 the medVMEPolylineGraph instead mafVMEPolyline*/
-class MED_OPERATION_EXPORT medOpImporterVTK: public mafOpImporterVTK 
+class MAF_EXPORT medOpImporterVTK: public mafOpImporterVTK 
 {
 public:
   /** constructor */

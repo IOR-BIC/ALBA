@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medCommonDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -33,7 +33,7 @@ class mafEvent;
   class name: medOpWizardWait
   Simple op with only an next-step button create to insert pause during wizards.
 */
-class MED_COMMON_EXPORT medWizardWaitOp: public mafOp
+class MAF_EXPORT medWizardWaitOp: public mafOp
 {
 public:
   /** constructor */

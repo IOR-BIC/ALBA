@@ -19,7 +19,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "mafVMEGeneric.h"
 
 //----------------------------------------------------------------------------
@@ -27,7 +27,7 @@
 //----------------------------------------------------------------------------
 class vtkPolyData;
 
-class MED_VME_EXPORT medVMEPolylineGraph : public mafVMEGeneric
+class MAF_EXPORT medVMEPolylineGraph : public mafVMEGeneric
 {
 public:
 	mafTypeMacro(medVMEPolylineGraph, mafVMEGeneric);

@@ -15,7 +15,6 @@
 =========================================================================*/
 
 #include "mafDefines.h"
-#include "medDefines.h"
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.

@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "mafPipe.h"
 
 //----------------------------------------------------------------------------
@@ -42,7 +42,7 @@ class vtkActor2D;
 //----------------------------------------------------------------------------
 // medVisualPipePolylineGraph :
 //----------------------------------------------------------------------------
-class MED_VME_EXPORT medVisualPipePolylineGraph : public mafPipe
+class MAF_EXPORT medVisualPipePolylineGraph : public mafPipe
 {
 public:
   mafTypeMacro(medVisualPipePolylineGraph,mafPipe);

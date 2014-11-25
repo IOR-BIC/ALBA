@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -47,7 +47,7 @@ class vtkLookupTable;
 // medOpLabelizeSurface :
 //----------------------------------------------------------------------------
 /** */
-class MED_OPERATION_EXPORT medOpLabelizeSurface: public mafOp
+class MAF_EXPORT medOpLabelizeSurface: public mafOp
 {
 public:
 	medOpLabelizeSurface(const wxString &label = "ClipSurface");

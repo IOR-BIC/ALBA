@@ -17,7 +17,7 @@
 #ifndef __medGUILutHistogramEditor_H__
 #define __medGUILutHistogramEditor_H__
 
-#include "medGuiDefines.h"
+#include "mafDefines.h"
 #include "mafEvent.h"
 #include "mafLUTLibrary.h"
 
@@ -43,7 +43,7 @@ class mafGUIFloatSlider;
 class mafGUILutSlider;
 class mafGUIHistogramWidget;
 
-class MED_GUI_EXPORT medGUILutHistogramEditor: public mafGUIDialog
+class MAF_EXPORT medGUILutHistogramEditor: public mafGUIDialog
 {
 public:
   enum LUT_EDITOR_WIDGET_ID

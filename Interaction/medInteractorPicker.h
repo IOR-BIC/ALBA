@@ -17,7 +17,7 @@
 #ifndef __medInteractorPicker_h
 #define __medInteractorPicker_h
 
-#include "medInteractionDefines.h"
+#include "mafDefines.h"
 #include "mafInteractorCameraMove.h"
 
 //----------------------------------------------------------------------------
@@ -37,7 +37,7 @@ CTRL + Left Mouse button => send picked vme abs coordinates to the listener
 
 @sa medViewArbitraryOrthoSlice as an example on how to use this picker
 */
-class MED_INTERACTION_EXPORT medInteractorPicker : public mafInteractorCameraMove
+class MAF_EXPORT medInteractorPicker : public mafInteractorCameraMove
 {
 public:
   mafTypeMacro(medInteractorPicker,mafInteractorCameraMove);

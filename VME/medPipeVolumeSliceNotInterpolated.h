@@ -17,7 +17,7 @@
 #ifndef __medPipeVolumeSliceNotInterpolated_H__
 #define __medPipeVolumeSliceNotInterpolated_H__
 
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "mafPipeSlice.h"
 
 class vtkMEDVolumeSlicerNotInterpolated;
@@ -34,7 +34,7 @@ class vtkActor;
 class vtkPolyData;
 
 //----------------------------------------------------------------------------
-class MED_VME_EXPORT medPipeVolumeSliceNotInterpolated : public mafPipeSlice
+class MAF_EXPORT medPipeVolumeSliceNotInterpolated : public mafPipeSlice
 //----------------------------------------------------------------------------
 {
 public:

@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "mafPipe.h"
 
 #include <vector>
@@ -38,7 +38,7 @@ class vtkIdList;
 //----------------------------------------------------------------------------
 // mafPipeSurface :
 //----------------------------------------------------------------------------
-class MED_VME_EXPORT medVisualPipeCollisionDetection : public mafPipe
+class MAF_EXPORT medVisualPipeCollisionDetection : public mafPipe
 {
 public:
   mafTypeMacro(medVisualPipeCollisionDetection,mafPipe);

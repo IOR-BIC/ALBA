@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // includes :
 //----------------------------------------------------------------------------
-#include "medCommonDefines.h"
+#include "mafDefines.h"
 #include "mafEvent.h"
 
 //----------------------------------------------------------------------------
@@ -31,7 +31,7 @@
   Class Name: medWizardBlock.
   Class for the base wizard block, each block on a wizard must extend this block
 */
-class MED_COMMON_EXPORT medWizardBlock 
+class MAF_EXPORT medWizardBlock 
 {
 public:
 

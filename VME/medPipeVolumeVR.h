@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "mafPipe.h"
 
 //----------------------------------------------------------------------------
@@ -42,7 +42,7 @@ class vtkImageResample;
 className: medPipeVolumeVR
 Pipe which uses vtkMAFVolumeTextureMapper2D and different Piecewise and ColorTransfer Functions.
 */
-class MED_VME_EXPORT medPipeVolumeVR : public mafPipe
+class MAF_EXPORT medPipeVolumeVR : public mafPipe
 {
 public:
   /** RTTI macro */

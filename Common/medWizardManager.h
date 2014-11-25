@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // includes :
 //----------------------------------------------------------------------------
-#include "medCommonDefines.h"
+#include "mafDefines.h"
 #include "medVect3d.h"
 #include "mafOpManager.h"
 #include "medWizard.h"
@@ -32,9 +32,9 @@ class medWizardWaitOp;
 class mafGUISettingsDialog;
 class medWizardSettings;
 
-#ifdef MED_COMMON_EXPORTS
+#ifdef MAF_EXPORTS
 #include "mafDllMacros.h"
-EXPORT_STL_VECTOR(MED_COMMON_EXPORT,medWizard *);
+EXPORT_STL_VECTOR(MAF_EXPORT,medWizard *);
 #endif
 
 /**
@@ -42,7 +42,7 @@ EXPORT_STL_VECTOR(MED_COMMON_EXPORT,medWizard *);
   Class for wizards management 
   This class creates the menu, starts the wizards and manage wizard related events
 */
-class MED_COMMON_EXPORT medWizardManager : mafObserver
+class MAF_EXPORT medWizardManager : mafObserver
 {
 public:
 

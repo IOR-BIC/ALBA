@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "mafPipe.h"
 
 //----------------------------------------------------------------------------
@@ -44,7 +44,7 @@ class mafLODActor;
 //----------------------------------------------------------------------------
 // medPipeVolumeSliceBlend :
 //----------------------------------------------------------------------------
-class MED_VME_EXPORT medPipeVolumeSliceBlend : public mafPipe
+class MAF_EXPORT medPipeVolumeSliceBlend : public mafPipe
 {
 public:
   mafTypeMacro(medPipeVolumeSliceBlend,mafPipe);

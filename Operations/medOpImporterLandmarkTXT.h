@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -38,7 +38,7 @@ this class provides the landmark importing written in the following format:
 2) Ignore the first n columns specified by user
 3) the first element of each line is Time, then x y z x1 y1 z1 ecco
 */
-class MED_OPERATION_EXPORT medOpImporterLandmarkTXT : public mafOp
+class MAF_EXPORT medOpImporterLandmarkTXT : public mafOp
 {
 public:
   /** object constructor */

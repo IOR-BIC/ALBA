@@ -17,7 +17,7 @@
 #ifndef __medInteractor2DAngle_h
 #define __medInteractor2DAngle_h
 
-#include "medInteractionDefines.h"
+#include "mafDefines.h"
 #include "mafInteractorPER.h"
 #include "mafEvent.h"
 #include "vtkMAFTextActorMeter.h"
@@ -47,7 +47,7 @@ the histogram of the probed points on VME. This interactor works in renderwindow
 maintaining measure persistence at button up
 */
 //----------------------------------------------------------------------------
-class MED_INTERACTION_EXPORT medInteractor2DAngle : public mafInteractorPER
+class MAF_EXPORT medInteractor2DAngle : public mafInteractorPER
 	//----------------------------------------------------------------------------
 {
 public:

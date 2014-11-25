@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 #include "mafVMELandmarkCloud.h"
 
@@ -35,7 +35,7 @@
 Each raw represents a landmark and contains the (x,y,z) coordinate.
 The exporter can be performed on a single Landmark Cloud or on a tree containing many of them.
 In the latter case the operation exports all the LCs in the input VME sub-tree. */
-class MED_OPERATION_EXPORT medOpExporterLandmark: public mafOp
+class MAF_EXPORT medOpExporterLandmark: public mafOp
 {
 public:
 	medOpExporterLandmark(const wxString &label = "Landmark Exporter");

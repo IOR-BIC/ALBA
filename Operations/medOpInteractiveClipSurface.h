@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 #include "mafNode.h"
 #include "mafVMESurface.h"
@@ -56,7 +56,7 @@ class vtkMAFClipSurfaceBoundingBox;
 // medOpInteractiveClipSurface :
 //----------------------------------------------------------------------------
 /** */
-class MED_OPERATION_EXPORT medOpInteractiveClipSurface: public mafOp
+class MAF_EXPORT medOpInteractiveClipSurface: public mafOp
 {
 public:
   medOpInteractiveClipSurface(const wxString &label = "medOpInteractiveClipSurface");

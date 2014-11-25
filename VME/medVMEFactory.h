@@ -18,7 +18,7 @@
 //----------------------------------------------------------------------------
 // includes :
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "mafVMEFactory.h"
 #include "mafVME.h"
 
@@ -29,7 +29,7 @@
   a mafNodeFactory this last does not need to be crated: you should create one or the other but
   not both since the Instance would be overwritten and thus the Plug*<> methods would always
   plug inside one of the two. */
-class MED_VME_EXPORT medVMEFactory : public mafVMEFactory
+class MAF_EXPORT medVMEFactory : public mafVMEFactory
 {
 public: 
   /** RTTI Macro */

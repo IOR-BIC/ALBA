@@ -19,7 +19,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medInteractionDefines.h"
+#include "mafDefines.h"
 #include "mafDeviceButtonsPadMouse.h"
 
 //----------------------------------------------------------------------------
@@ -43,7 +43,7 @@ set the desired view.
 (An operation using this class is vph2OpAnnulusIdentification)
 */
 //----------------------------------------------------------------------------
-class MED_INTERACTION_EXPORT medDeviceButtonsPadMouseDialog : public  mafDeviceButtonsPadMouse
+class MAF_EXPORT medDeviceButtonsPadMouseDialog : public  mafDeviceButtonsPadMouse
 //----------------------------------------------------------------------------
 {
 public:

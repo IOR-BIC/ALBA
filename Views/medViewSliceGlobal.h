@@ -19,7 +19,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medViewsDefines.h"
+#include "mafDefines.h"
 #include "mafViewSlice.h"
 
 //----------------------------------------------------------------------------
@@ -38,7 +38,7 @@ This is an experimental component with rotated volumes interaction
 and visualization enabled.
 */
 
-class MED_VIEWS_EXPORT medViewSliceGlobal: public mafViewSlice
+class MAF_EXPORT medViewSliceGlobal: public mafViewSlice
 {
 public:
   medViewSliceGlobal(wxString label = "Slice", int camera_position = CAMERA_CT, bool show_axes = false, bool show_grid = false, bool show_ruler = false, int stereo = 0,bool showTICKs=false,bool textureInterpolate=true);

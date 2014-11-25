@@ -41,6 +41,9 @@
 #cmakedefine MAF_USE_WXMOZILLA
 #cmakedefine MED_USE_BTK
 #cmakedefine MED_USE_Offis
+// special defined for mafInteraction modules
+#cmakedefine MAF_USE_P5_GLOVE
+#cmakedefine MAF_USE_WIIMOTE
 
 //--------------------------------------------------------------------------
 // MAF Versioning

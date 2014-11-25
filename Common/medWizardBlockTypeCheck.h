@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // includes :
 //----------------------------------------------------------------------------
-#include "medCommonDefines.h"
+#include "mafDefines.h"
 #include "medWizardBlock.h"
 #include <vector>
 
@@ -33,7 +33,7 @@
   Class for create a type check block, if the selected VME is wrong the wizard
   will be aborted.
 */
-class MED_COMMON_EXPORT medWizardBlockTypeCheck : public medWizardBlock
+class MAF_EXPORT medWizardBlockTypeCheck : public medWizardBlock
 {
 public:
 

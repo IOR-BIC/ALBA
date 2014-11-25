@@ -30,7 +30,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "mafVME.h"
 #include "medVMEOutputComputeWrapping.h"
 #include "mafEvent.h"
@@ -58,7 +58,7 @@ class vtkCellArray;
 class mafGUIRollOut;
 /** medVMEComputeWrapping - 
 */
-class MED_VME_EXPORT medVMEComputeWrapping : public mafVME
+class MAF_EXPORT medVMEComputeWrapping : public mafVME
 {
 
 

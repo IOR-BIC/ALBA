@@ -14,7 +14,7 @@
 
 =========================================================================*/
 
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 #include "vtkDirectory.h"
 
@@ -26,7 +26,7 @@ Merge dicom series located in the same folder; this operation was implemented to
 "\\HD01\Public\Dati\Dicom Regression\NIG004_MAGLU_SA" and "\\HD01\Public\Dati\Dicom Regression\NIG009-PAVVI_SA"
 WARNING: This operation will be removed and integrated in the importer dicom operation as an optiona functionality
 */
-class MED_OPERATION_EXPORT medOpMergeDicomSeries : public mafOp
+class MAF_EXPORT medOpMergeDicomSeries : public mafOp
 {
 public:
 	/** constructor */

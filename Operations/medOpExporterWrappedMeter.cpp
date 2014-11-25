@@ -14,7 +14,7 @@
 
 =========================================================================*/
 
-#include "medDefines.h"
+#include "mafDefines.h"
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
@@ -33,7 +33,7 @@
 #include "medVMEComputeWrapping.h"
 
 #include "medOpImporterLandmark.h"
-#include "medDefines.h"
+#include "mafDefines.h"
 #include "mafVMELandmarkCloud.h"
 #include "mafVMERoot.h"
 #include "medVMEWrappedMeter.h"

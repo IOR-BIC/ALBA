@@ -17,7 +17,7 @@
 #ifndef __medOpMeshDeformation_H__
 #define __medOpMeshDeformation_H__
 
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 #include "mmiVTKPicker.h"
 
@@ -44,7 +44,7 @@ class vtkCellPicker;
 // medOpMeshDeformation :
 //----------------------------------------------------------------------------
 /** */
-class MED_OPERATION_EXPORT medOpMeshDeformation: public mafOp
+class MAF_EXPORT medOpMeshDeformation: public mafOp
 {
 protected:
   //----------------------------------------------------------------------------

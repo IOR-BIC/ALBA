@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Includes :
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -33,7 +33,7 @@ class mafGUIHistogramWidget;
 /** 
 class name : medOpEqualizeHistogram
 */
-class MED_OPERATION_EXPORT medOpEqualizeHistogram: public mafOp
+class MAF_EXPORT medOpEqualizeHistogram: public mafOp
 {
 public:
 

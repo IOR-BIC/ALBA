@@ -17,7 +17,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medCommonDefines.h"
+#include "mafDefines.h"
 #include "vtkCommand.h"
 
 //----------------------------------------------------------------------------
@@ -26,7 +26,7 @@
 class mafObserver;
 
 //this class handles events produced by LargeDataSet
-class MED_COMMON_EXPORT vtkMAFLargeDataSetCallback : public vtkCommand
+class MAF_EXPORT vtkMAFLargeDataSetCallback : public vtkCommand
 {
   //vtkTypeMacro(vtkMAFLargeDataSetCallback,vtkCommand);
 

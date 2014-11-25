@@ -31,7 +31,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medInteractionDefines.h"
+#include "mafDefines.h"
 #include "mafVMESurface.h"
 #include "mafGizmoInterface.h"
 
@@ -50,7 +50,7 @@ class medGizmoCrossRotate;
  Input must be a mafVMESlicer slicing a mafVMEVolumeGray (TO IMPROVE)
  Movement is costrained inside the sliced volume.
 */
-class MED_INTERACTION_EXPORT medGizmoCrossRotateTranslate : mafGizmoInterface
+class MAF_EXPORT medGizmoCrossRotateTranslate : mafGizmoInterface
 {
 public:
 	

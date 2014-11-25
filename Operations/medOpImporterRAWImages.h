@@ -19,7 +19,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 #include "mafEvent.h"
 #include "mafString.h"
@@ -64,7 +64,7 @@ class vtkMAFLargeImageReader;
 Every file is a single slice of the volume data.
 In the directory must be present only raw slices.
 If the first slice is not 0, the slice offset (m_offset) must be setted. */
-class MED_OPERATION_EXPORT medOpImporterRAWImages: public mafOp
+class MAF_EXPORT medOpImporterRAWImages: public mafOp
 {
 public:
   medOpImporterRAWImages(wxString label="RAWImporterImage");

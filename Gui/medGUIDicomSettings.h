@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medGuiDefines.h"
+#include "mafDefines.h"
 #include "mafGUISettings.h"
 
 //----------------------------------------------------------------------------
@@ -43,7 +43,7 @@ class mafGUICheckListBox;
   - resample volume
   - rescale to 16Bit
 */
-class MED_GUI_EXPORT medGUIDicomSettings : public mafGUISettings
+class MAF_EXPORT medGUIDicomSettings : public mafGUISettings
 {
 public:
   /** constructor.*/

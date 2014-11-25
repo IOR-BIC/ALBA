@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "mafPipe.h"
 
 //----------------------------------------------------------------------------
@@ -43,7 +43,7 @@ class vtkSphereSource;
 //----------------------------------------------------------------------------
 // medVisualPipeSlicerSlice :
 //----------------------------------------------------------------------------
-class MED_VME_EXPORT medVisualPipeSlicerSlice : public mafPipe
+class MAF_EXPORT medVisualPipeSlicerSlice : public mafPipe
 {
 public:
   mafTypeMacro(medVisualPipeSlicerSlice,mafPipe);

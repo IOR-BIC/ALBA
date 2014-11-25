@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -35,7 +35,7 @@ class mafVMEGroup;
 class name: medOpImporterGRFWS
 Importer for ground reactions force, used in motion analysis
 */
-class MED_OPERATION_EXPORT medOpImporterGRFWS : public mafOp
+class MAF_EXPORT medOpImporterGRFWS : public mafOp
 {
 public:
   /** constructor */

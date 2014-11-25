@@ -19,7 +19,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medViewsDefines.h"
+#include "mafDefines.h"
 #include "mafViewVTK.h"
 #include "mafMatrix.h"
 #include <vector>
@@ -50,7 +50,7 @@ initialize the visual pipe according to the camera position that is passed throu
 Rotated volumes interaction and visualizationo is supported by this component.
 */
 
-class MED_VIEWS_EXPORT mafViewSlice: public mafViewVTK
+class MAF_EXPORT mafViewSlice: public mafViewVTK
 {
 public:
   mafViewSlice(wxString label = "Slice", int camera_position = CAMERA_CT, bool show_axes = false, bool show_grid = false, bool show_ruler = false, int stereo = 0,bool showTICKs=false,bool textureInterpolate=true);

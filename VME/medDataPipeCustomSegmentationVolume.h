@@ -19,7 +19,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "mafDataPipeCustom.h"
 #include <vector>
 
@@ -30,7 +30,7 @@ class vtkRectilinearGrid;
 class vtkStructuredPoints;
 
 /** */
-class MED_VME_EXPORT medDataPipeCustomSegmentationVolume : public mafDataPipeCustom
+class MAF_EXPORT medDataPipeCustomSegmentationVolume : public mafDataPipeCustom
 {
 public:
   mafTypeMacro(medDataPipeCustomSegmentationVolume,mafDataPipe);

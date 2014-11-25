@@ -21,7 +21,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medCommonDefines.h"
+#include "mafDefines.h"
 #include "mafGizmoInterface.h"
 #include "mafMatrix.h"
 #include "medCurvilinearAbscissaOnSkeletonHelper.h"
@@ -50,7 +50,7 @@ class medCurvilinearAbscissaOnSkeletonHelper;
 refactored incrementally to ease interaction stuff debug.
 See also medOpInteractionDebugger */
 
-class MED_COMMON_EXPORT medGizmoInteractionDebugger : public mafGizmoInterface
+class MAF_EXPORT medGizmoInteractionDebugger : public mafGizmoInterface
 {
 public:
 

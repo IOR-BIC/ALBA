@@ -49,14 +49,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //-----------------------------------------------
 // Include:
 //-----------------------------------------------
-#include "medCommonDefines.h"
+#include "mafDefines.h"
 #include <vnl/vnl_matrix.h>
 
 /**
   Class Name: itkRawMotionImporterUtility.
   Utility class for reading matrix from file.  Depends from vnl library.
 */
-class MED_COMMON_EXPORT itkRawMotionImporterUtility
+class MAF_EXPORT itkRawMotionImporterUtility
 {
 public:
   /** constructor. */

@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -38,7 +38,7 @@ class name: medOpImporterC3D
 Import C3D file inside a landmark cloud. C3D is a standard format file
 for movement analysis data. http://www.c3d.org/
 */
-class MED_OPERATION_EXPORT medOpImporterC3D: public mafOp
+class MAF_EXPORT medOpImporterC3D: public mafOp
 {
 public:
   /** constructor */

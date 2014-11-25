@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medCommonDefines.h"
+#include "mafDefines.h"
 #include "mafObject.h"
 #include "medQueryObject.h"
 #include <vector>
@@ -41,7 +41,7 @@ typedef std::vector<std::vector<medQueryObject *> >   WebRowSetQueryObjectsTable
   class name: medResultQueryAbstractHandler
   Interface for handle results from a query to a database
 */
-class MED_COMMON_EXPORT medResultQueryAbstractHandler : public mafObject
+class MAF_EXPORT medResultQueryAbstractHandler : public mafObject
 {
 public:
   /** constructor */

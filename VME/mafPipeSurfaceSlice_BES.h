@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "mafPipeSlice.h"
 #include "mafVMEImage.h"
 
@@ -44,7 +44,7 @@ class vtkMAFToLinearTransform;
   Visual pipe that allow to visualize a surface polydata sliced according to 
   a slicing plain. The result effect is the contour of the surface cut by the plain.
 */
-class MED_VME_EXPORT mafPipeSurfaceSlice_BES : public mafPipeSlice
+class MAF_EXPORT mafPipeSurfaceSlice_BES : public mafPipeSlice
 {
 public:
   /** RTTI Macro */

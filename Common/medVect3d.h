@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // includes :
 //----------------------------------------------------------------------------
-#include "medCommonDefines.h"
+#include "mafDefines.h"
 #include "medVect3d.h"
 
 //----------------------------------------------------------------------------
@@ -31,7 +31,7 @@
   Class Name: medVect3d.
   High optimized class for 3-Dimensional vectors management. 
 */
-class MED_COMMON_EXPORT medVect3d
+class MAF_EXPORT medVect3d
 {
 public:
 

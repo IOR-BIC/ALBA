@@ -19,7 +19,7 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "wx/wizard.h"
-#include "medGuiDefines.h"
+#include "mafDefines.h"
 #include "mafEvent.h"
 #include "mafObserver.h"
 #include "mafRWI.h"
@@ -56,7 +56,7 @@ enum GUI_WIZARD_WIDGET_ID
   - lower center
   - lower center bottom
 */
-class MED_GUI_EXPORT medGUIWizardPageNew : public wxWizardPageSimple, public mafObserver  
+class MAF_EXPORT medGUIWizardPageNew : public wxWizardPageSimple, public mafObserver  
 {
 public:
   /** construct. */

@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medInteractionDefines.h"
+#include "mafDefines.h"
 #include "mafGizmoInterface.h"
 #include "mafMatrix.h"
 #include "mafInteractorGenericMouse.h"
@@ -50,7 +50,7 @@ class medCurvilinearAbscissaOnSkeletonHelper;
 refactored incrementally to ease interaction stuff debug.
 See also medOpInteractionDebugger */
 
-class MED_INTERACTION_EXPORT medGizmoPolylineGraph : public mafGizmoInterface
+class MAF_EXPORT medGizmoPolylineGraph : public mafGizmoInterface
 {
 public:
   /** The only way to construct correctly the instance */

@@ -19,7 +19,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medViewsDefines.h"
+#include "mafDefines.h"
 #include "mafViewVTK.h"
 #include <vector>
 
@@ -40,7 +40,7 @@ mafViewSingleSlice is a View that visualize volume as slices and
 initialize the visual pipe according to the camera position that is passed through constructor
 \sa mafViewVTK
 */
-class MED_VIEWS_EXPORT mafViewSingleSlice: public mafViewVTK
+class MAF_EXPORT mafViewSingleSlice: public mafViewVTK
 {
 public:
   mafViewSingleSlice(wxString label = "Slice", int camera_position = CAMERA_CT, bool show_axes = false, bool show_grid = false, bool show_ruler = false, int stereo = 0, bool show_orientation = false);

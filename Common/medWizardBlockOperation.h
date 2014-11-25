@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // includes :
 //----------------------------------------------------------------------------
-#include "medCommonDefines.h"
+#include "mafDefines.h"
 #include "medWizardBlock.h"
 
 
@@ -38,7 +38,7 @@
   *Run the operation
   *Hide some VME after operation termination
 */
-class MED_COMMON_EXPORT medWizardBlockOperation : public medWizardBlock
+class MAF_EXPORT medWizardBlockOperation : public medWizardBlock
 {
 public:
   

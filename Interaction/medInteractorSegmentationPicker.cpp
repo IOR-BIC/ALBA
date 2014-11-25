@@ -14,7 +14,7 @@
 
 =========================================================================*/
 
-#include "medDefines.h"
+#include "mafDefines.h"
 #include "medInteractorSegmentationPicker.h"
 
 #include "mafView.h"

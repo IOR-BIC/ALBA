@@ -17,7 +17,7 @@
 #ifndef __medOpExporterWrappedMeter_H__
 #define __medOpExporterWrappedMeter_H__
 
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 #include <vnl/vnl_matrix.h>
 #include "wx/busyinfo.h"
@@ -36,7 +36,7 @@ class mafEvent;
 class name: medOpExporterWrappedMeter
    This class provides the functionality for exporting medVMEWrappedMeter, writing all in a txt file.
 */
-class MED_OPERATION_EXPORT medOpExporterWrappedMeter: public mafOp
+class MAF_EXPORT medOpExporterWrappedMeter: public mafOp
 {
 public:
   /** object constructor */

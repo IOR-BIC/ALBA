@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medViewsDefines.h"
+#include "mafDefines.h"
 #include "medViewCompoundWindowing.h"
 
 //----------------------------------------------------------------------------
@@ -37,7 +37,7 @@ class mafGUIFloatSlider;
   Class Name: mafViewGlobalSliceCompound.
   Class that contain mafViewGlobalSlice in order to add gui view widget like windowing buttons.
 */
-class MED_VIEWS_EXPORT mafViewGlobalSliceCompound: public medViewCompoundWindowing
+class MAF_EXPORT mafViewGlobalSliceCompound: public medViewCompoundWindowing
 {
 public:
   /** constructor .*/

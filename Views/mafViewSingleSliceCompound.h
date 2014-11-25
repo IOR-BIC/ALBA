@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medViewsDefines.h"
+#include "mafDefines.h"
 #include "medViewCompoundWindowing.h"
 
 //----------------------------------------------------------------------------
@@ -39,7 +39,7 @@ class vtkLookupTable;
   Class Name: mafViewSingleSliceCompound.
   Class that contain mafViewSingleSlice in order to add gui view widget like windowing buttons.
 */
-class MED_VIEWS_EXPORT mafViewSingleSliceCompound: public medViewCompoundWindowing
+class MAF_EXPORT mafViewSingleSliceCompound: public medViewCompoundWindowing
 {
 public:
   /** constructor */

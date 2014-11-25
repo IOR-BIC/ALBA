@@ -19,7 +19,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medViewsDefines.h"
+#include "mafDefines.h"
 #include "mafViewVTK.h"
 #include <vector>
 
@@ -39,7 +39,7 @@ mafViewImage is a View that visualize volume as slices and
 initialize the visual pipe according to the camera position that is passed through constructor
 \sa mafViewVTK
 */
-class MED_VIEWS_EXPORT mafViewImage: public mafViewVTK
+class MAF_EXPORT mafViewImage: public mafViewVTK
 {
 public:
   mafViewImage(wxString label = "Image", int camera_position = CAMERA_FRONT, bool show_axes = false, bool show_grid = false, bool show_ruler = false, int stereo = 0);

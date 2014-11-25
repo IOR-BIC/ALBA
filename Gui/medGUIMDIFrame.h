@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notice for more information.
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medGuiDefines.h"
+#include "mafDefines.h"
 #include "mafGUIMDIFrame.h"
 //----------------------------------------------------------------------------
 // forward reference
@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notice for more information.
   Closing this frame is equal to close the application.
   This frame extend mafGUIMDIFrame with wizard specific events
 */
-class MED_GUI_EXPORT medGUIMDIFrame : public mafGUIMDIFrame
+class MAF_EXPORT medGUIMDIFrame : public mafGUIMDIFrame
 {
  public:
   /** constructor. */

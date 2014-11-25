@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Includes :
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -32,7 +32,7 @@ class vtkPolyData;
 // medOpSubdivide :
 //----------------------------------------------------------------------------
 /** Apply vtkLinearSubdivideFilter to a VME Surface*/
-class MED_OPERATION_EXPORT medOpSubdivide: public mafOp
+class MAF_EXPORT medOpSubdivide: public mafOp
 {
 public:
 	medOpSubdivide(const wxString &label = "Subdivide");

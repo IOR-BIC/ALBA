@@ -16,7 +16,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "medPipeTensorField.h"
 
 //----------------------------------------------------------------------------
@@ -34,7 +34,7 @@ class vtkStructuredPoints;
 /** Displays the surface of input VME (even, if it is volume),
 using color mapping according to X,Y,Z or magnitude of associated
 tensor field (selected in the gui). */
-class MED_VME_EXPORT medPipeTensorFieldSurface : public medPipeTensorField
+class MAF_EXPORT medPipeTensorFieldSurface : public medPipeTensorField
 {
 public:
   mafTypeMacro(medPipeTensorFieldSurface, medPipeTensorField);

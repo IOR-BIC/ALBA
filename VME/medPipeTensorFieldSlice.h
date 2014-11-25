@@ -16,7 +16,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "medPipeTensorFieldSurface.h"
 #include "mafPipeSlice.h"
 
@@ -34,7 +34,7 @@ Displays slice of input VME colored according to X,Y,Z component
 or magnitude of the associated tensor field. 
 Note: this class should be derived from mafPipeSlice, but
 it would lead into multiple inheritance, which causes lot of troubles*/
-class MED_VME_EXPORT medPipeTensorFieldSlice : public medPipeTensorFieldSurface
+class MAF_EXPORT medPipeTensorFieldSlice : public medPipeTensorFieldSurface
 {
 public:
   /** RTTI macro */

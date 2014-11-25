@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "mafPipe.h"
 
 //----------------------------------------------------------------------------
@@ -40,7 +40,7 @@ class mafGUIMaterialButton;
 className: medPipeWrappedMeter
 Pipe for visualizing wrapped meters. Gives the possibility to change representation just like classical meter pipe.
 */
-class MED_VME_EXPORT medPipeWrappedMeter : public mafPipe
+class MAF_EXPORT medPipeWrappedMeter : public mafPipe
 {
 public:
   /** RTTI macro */

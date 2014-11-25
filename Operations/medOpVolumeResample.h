@@ -21,7 +21,7 @@ using namespace std;
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -39,7 +39,7 @@ class mafGizmoROI;
 class mafVMESurface;
 
 //----------------------------------------------------------------------------
-class MED_OPERATION_EXPORT medOpVolumeResample: public mafOp
+class MAF_EXPORT medOpVolumeResample: public mafOp
 {
 public:
              

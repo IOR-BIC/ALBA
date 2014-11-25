@@ -19,7 +19,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medCommonDefines.h"
+#include "mafDefines.h"
 #include "mafInteractorPER.h"
 
 //----------------------------------------------------------------------------
@@ -28,7 +28,7 @@
 
 /** Class implementing image info reporting on status bar when not interacting.
 */
-class MED_COMMON_EXPORT mmiInfoImage : public mafInteractorPER
+class MAF_EXPORT mmiInfoImage : public mafInteractorPER
 {
 public: 
   mafTypeMacro(mmiInfoImage,mafInteractorPER);

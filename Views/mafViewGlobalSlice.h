@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medViewsDefines.h"
+#include "mafDefines.h"
 #include "mafViewVTK.h"
 #include <vector>
 
@@ -47,7 +47,7 @@ class vtkActor;
   the 3d world.
 */
 
-class MED_VIEWS_EXPORT mafViewGlobalSlice: public mafViewVTK
+class MAF_EXPORT mafViewGlobalSlice: public mafViewVTK
 {
 public:
   /** constructor. */

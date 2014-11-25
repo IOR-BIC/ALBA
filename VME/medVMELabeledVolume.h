@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "mafVME.h"
 
 //----------------------------------------------------------------------------
@@ -51,7 +51,7 @@ class mmaVolumeMaterial;
 /** mafVmeDataLabeledVolume - Volume with interface to assign labels to certain portions of a volume, identified by
 scalar thresholds  */
 
-class MED_VME_EXPORT medVMELabeledVolume : public mafVME
+class MAF_EXPORT medVMELabeledVolume : public mafVME
 {
 public:	
 

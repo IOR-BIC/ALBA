@@ -18,7 +18,7 @@
 //----------------------------------------------------------------------------
 // includes :
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "mafPipeFactoryVME.h"
 
 //----------------------------------------------------------------------------
@@ -30,7 +30,7 @@
   this factory must be of type medPipeFactoryVME to be able to retrieve the list of pipes plugged
   in the factory. Also when using mafPlugPipe<pipe_type> the pipe icon is plugged inside the
   the MAF picture factory. */
-class MED_VME_EXPORT medPipeFactoryVME : public mafPipeFactoryVME
+class MAF_EXPORT medPipeFactoryVME : public mafPipeFactoryVME
 {
 public: 
   mafTypeMacro(medPipeFactoryVME,mafPipeFactoryVME);

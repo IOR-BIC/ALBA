@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medInteractionDefines.h"
+#include "mafDefines.h"
 #include "mafInteractorCameraMove.h"
 #include "mafMTime.h"
 
@@ -53,7 +53,7 @@ mafEventMacro(mafEvent(this, event_id, position_point.GetPointer()));
 @sa medOpImporterDicomOffis where this class is used in the Dicom importer wizard dialog
 
 */
-class MED_INTERACTION_EXPORT medInteractorDICOMImporter : public mafInteractorCameraMove
+class MAF_EXPORT medInteractorDICOMImporter : public mafInteractorCameraMove
 {
 public:
   mafTypeMacro(medInteractorDICOMImporter,mafInteractorCameraMove);

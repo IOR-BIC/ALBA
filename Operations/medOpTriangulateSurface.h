@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -33,7 +33,7 @@ class mafEvent;
 // medOpSmoothSurface :
 //----------------------------------------------------------------------------
 /** */
-class MED_OPERATION_EXPORT medOpTriangulateSurface: public mafOp
+class MAF_EXPORT medOpTriangulateSurface: public mafOp
 {
 public:
 	medOpTriangulateSurface(const wxString &label = "FilterSurface");

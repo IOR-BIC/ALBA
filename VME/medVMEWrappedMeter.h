@@ -18,7 +18,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "mafVME.h"
 #include "medVMEOutputWrappedMeter.h"
 #include "mafEvent.h"
@@ -42,7 +42,7 @@ class vtkPoints;
 
 /** medVMEWrappedMeter - 
 */
-class MED_VME_EXPORT medVMEWrappedMeter : public mafVME
+class MAF_EXPORT medVMEWrappedMeter : public mafVME
 {
 public:
   MAF_ID_DEC(LENGTH_THRESHOLD_EVENT);

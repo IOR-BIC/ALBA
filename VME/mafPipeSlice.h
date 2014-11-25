@@ -21,7 +21,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "mafPipe.h"
 
 //----------------------------------------------------------------------------
@@ -33,7 +33,7 @@ class vtkActor;
 /**
 class name : mafPipeSlice
 */
-class MED_VME_EXPORT mafPipeSlice : public mafPipe
+class MAF_EXPORT mafPipeSlice : public mafPipe
 {
 public:
   /** RTTI macro */

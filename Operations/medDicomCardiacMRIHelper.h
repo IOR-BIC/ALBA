@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "vnl/vnl_matrix.h"
 #include "vnl/vnl_vector.h"
 #include <vector>
@@ -59,7 +59,7 @@ helper->ParseDicomDirectory();
 cout << helper->GetFileNumberForPlaneIFrameJ();
 
 */
-class MED_OPERATION_EXPORT medDicomCardiacMRIHelper
+class MAF_EXPORT medDicomCardiacMRIHelper
 {
 public:
 

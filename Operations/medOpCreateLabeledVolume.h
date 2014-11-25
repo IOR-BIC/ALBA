@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -36,7 +36,7 @@ class mafEvent;
 class name medOpCreateLabeledVolume
 Create a medVMELabeledVolume.
 */
-class MED_OPERATION_EXPORT medOpCreateLabeledVolume: public mafOp
+class MAF_EXPORT medOpCreateLabeledVolume: public mafOp
 {
 public:
   /** constructor */

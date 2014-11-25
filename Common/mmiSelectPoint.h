@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medCommonDefines.h"
+#include "mafDefines.h"
 #include "mafInteractorCameraMove.h"
 #include "mafMTime.h"
 
@@ -52,7 +52,7 @@ pointFromEvent->GetPoint(0,pointCoordinates);
 int cellID = e->GetArg();
 
 */
-class MED_COMMON_EXPORT mmiSelectPoint : public mafInteractorCameraMove
+class MAF_EXPORT mmiSelectPoint : public mafInteractorCameraMove
 {
 public:
 	mafTypeMacro(mmiSelectPoint,mafInteractorCameraMove);

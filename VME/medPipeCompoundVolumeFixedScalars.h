@@ -16,13 +16,13 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "medPipeCompoundVolume.h"
 
 /** Scalar visual pipe is fixed and cannot be changed. Vector visual pipe
 and tensor visual pipe can be changed but only one change is available.
 This class serves for a backward compatibility. */
-class MED_VME_EXPORT medPipeCompoundVolumeFixedScalars : public medPipeCompoundVolume
+class MAF_EXPORT medPipeCompoundVolumeFixedScalars : public medPipeCompoundVolume
 {
 public:
   /** RTTI macro */
@@ -68,7 +68,7 @@ protected:
 };
 
 /** Override for Isosurface */
-class MED_VME_EXPORT medPipeCompoundVolumeIsosurface : public medPipeCompoundVolumeFixedScalars
+class MAF_EXPORT medPipeCompoundVolumeIsosurface : public medPipeCompoundVolumeFixedScalars
 {
 public:
   /** RTTI macro */
@@ -82,7 +82,7 @@ protected:
 };
 
 /** Override for MIP */
-class MED_VME_EXPORT medPipeCompoundVolumeDRR : public medPipeCompoundVolumeFixedScalars
+class MAF_EXPORT medPipeCompoundVolumeDRR : public medPipeCompoundVolumeFixedScalars
 {
 public:
   /** RTTI macro */
@@ -96,7 +96,7 @@ protected:
 };
 
 /** Override for MIP */
-class MED_VME_EXPORT medPipeCompoundVolumeMIP : public medPipeCompoundVolumeFixedScalars
+class MAF_EXPORT medPipeCompoundVolumeMIP : public medPipeCompoundVolumeFixedScalars
 {
 public:
   /** RTTI macro */
@@ -110,7 +110,7 @@ protected:
 };
 
 /** Override for VR */
-class MED_VME_EXPORT medPipeCompoundVolumeVR : public medPipeCompoundVolumeFixedScalars
+class MAF_EXPORT medPipeCompoundVolumeVR : public medPipeCompoundVolumeFixedScalars
 {
 public:
   /** RTTI macro */

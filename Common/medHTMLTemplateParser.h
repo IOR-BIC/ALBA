@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medCommonDefines.h"
+#include "mafDefines.h"
 #include "medHTMLTemplateParserBlock.h"
 
 /**
@@ -32,7 +32,7 @@
     [MAFLoop loopName] [/MAFLoop loopName] 
     [MAFIf ifName] [MAFElse ifName] [/MAFIf ifName] (else is optional)*
 */
-class MED_COMMON_EXPORT medHTMLTemplateParser : public medHTMLTemplateParserBlock
+class MAF_EXPORT medHTMLTemplateParser : public medHTMLTemplateParserBlock
 {
 public:
   

@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -34,7 +34,7 @@ class mafEvent;
   class name: medOpCreateWrappedMeter
   Operation that create a medVMEWrappedMeter for wrap muscle action lines.
 */
-class MED_OPERATION_EXPORT medOpCreateWrappedMeter: public mafOp
+class MAF_EXPORT medOpCreateWrappedMeter: public mafOp
 {
 public:
   /** constructor */

@@ -18,7 +18,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medGuiDefines.h"
+#include "mafDefines.h"
 #include "wx/wizard.h"
 #include "mafEvent.h"
 #include "mafObserver.h"
@@ -32,7 +32,7 @@
   This class is the container of wizard pages in order to handle typical gui wizard widget.
   It can set first page and enable changing pages.
 */
-class MED_GUI_EXPORT medGUIWizard : public wxWizard, public mafObserver  
+class MAF_EXPORT medGUIWizard : public wxWizard, public mafObserver  
 {
 public:
   /** constructor. */

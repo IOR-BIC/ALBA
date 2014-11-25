@@ -15,7 +15,7 @@
 #define __mafVolumeLargeReader__
 
 #include "mafobject.h"
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "mafString.h"
 #include "mafObserver.h"
 #include "mafMTime.h"
@@ -23,7 +23,7 @@
 #include "mafBrickedFileReader.h"
 
 //this is similar to vtkImageMultipleInputOutputFilter 
-class MED_VME_EXPORT mafVolumeLargeReader : public mafObject, mafTimeStamped
+class MAF_EXPORT mafVolumeLargeReader : public mafObject, mafTimeStamped
 {
 public:
 	mafTypeMacro(mafVolumeLargeReader, mafObject);

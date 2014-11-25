@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // includes :
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOpTransformInterface.h"
 
 //----------------------------------------------------------------------------
@@ -41,7 +41,7 @@ Scale vme data set
 Scale vme dataset using the scaling gizmo or gui text entries
 */
 
-class MED_OPERATION_EXPORT medOpScaleDataset : public mafOpTransformInterface
+class MAF_EXPORT medOpScaleDataset : public mafOpTransformInterface
 {
 public:
   medOpScaleDataset(const wxString &label = "Scale Dataset");

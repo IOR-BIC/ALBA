@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medCommonDefines.h" //important: mafDefines should always be included as first
+#include "mafDefines.h" //important: mafDefines should always be included as first
 #include <vector>
 
 //----------------------------------------------------------------------------
@@ -50,7 +50,7 @@ class wxString;
  class name: medHTMLTemplateParserBlock
     sub-class for Template parsing used by medHTMLTemplateParser
 */
-class MED_COMMON_EXPORT medHTMLTemplateParserBlock
+class MAF_EXPORT medHTMLTemplateParserBlock
 {
 
   

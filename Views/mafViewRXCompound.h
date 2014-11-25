@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medViewsDefines.h"
+#include "mafDefines.h"
 #include "mafViewCompound.h"
 #include "mafSceneNode.h"
 
@@ -38,7 +38,7 @@ class mafGUILutSlider;
 //----------------------------------------------------------------------------
 /** 
 This view features two Rx views and one compound view made of six CT slices.*/
-class MED_VIEWS_EXPORT mafViewRXCompound: public mafViewCompound
+class MAF_EXPORT mafViewRXCompound: public mafViewCompound
 {
 public:
   mafViewRXCompound(wxString label = "View RXCT");

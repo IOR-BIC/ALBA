@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -40,7 +40,7 @@ class vtkCallbackCommand;
 /**
 class name: medOpImporterVTKXMLXML
 Operation to importer VTK XML format (.vtp extension)*/
-class MED_OPERATION_EXPORT medOpImporterVTKXML: public mafOp 
+class MAF_EXPORT medOpImporterVTKXML: public mafOp 
 {
 public:
   /** constructor */

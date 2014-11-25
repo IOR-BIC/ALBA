@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medViewsDefines.h"
+#include "mafDefines.h"
 #include "medViewCompoundWindowing.h"
 
 //----------------------------------------------------------------------------
@@ -44,7 +44,7 @@ class mafGUILutSwatch;
 //----------------------------------------------------------------------------
 /** 
   This compound view is made of four child views used to analyze different orthogonal slices of the volume*/
-class MED_VIEWS_EXPORT medViewSlicer: public medViewCompoundWindowing
+class MAF_EXPORT medViewSlicer: public medViewCompoundWindowing
 {
 public:
   medViewSlicer(wxString label = "View Arbitrary Slice", bool show_ruler = false);

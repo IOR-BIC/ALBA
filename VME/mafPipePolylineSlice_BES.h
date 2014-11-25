@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "mafPipeSlice.h"
 
 //----------------------------------------------------------------------------
@@ -44,7 +44,7 @@ class vtkAppendPolyData;
   class name: mafPipePolylineSlice_BES.
   Pipe which manage the visualisation of the section of a polyline.
 */
-class MED_VME_EXPORT mafPipePolylineSlice_BES : public mafPipeSlice
+class MAF_EXPORT mafPipePolylineSlice_BES : public mafPipeSlice
 {
 public:
   /** RTTI Macro*/

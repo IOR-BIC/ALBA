@@ -29,7 +29,7 @@ class mafVMEVolumeGray;
 class mafGUILutSwatch;
 
 //----------------------------------------------------------------------------
-class MED_VIEWS_EXPORT medViewSliceNotInterpolatedCompound : public medViewCompoundWindowing
+class MAF_EXPORT medViewSliceNotInterpolatedCompound : public medViewCompoundWindowing
 //----------------------------------------------------------------------------
 {
 public:

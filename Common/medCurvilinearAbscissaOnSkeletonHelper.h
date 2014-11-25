@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medCommonDefines.h"
+#include "mafDefines.h"
 #include "vtkIdList.h"
 
 //----------------------------------------------------------------------------
@@ -33,7 +33,7 @@ class medVMEPolylineGraph;
 
 /** Decorate input vme with curvilinear abscissa interface for medVMEPolylineGraph 
  constrained interaction */
-class MED_COMMON_EXPORT medCurvilinearAbscissaOnSkeletonHelper : mafObserver
+class MAF_EXPORT medCurvilinearAbscissaOnSkeletonHelper : mafObserver
 {
 public:
 

@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medCommonDefines.h"
+#include "mafDefines.h"
 #include "mafGizmoInterface.h"
 #include "mafMatrix.h"
 
@@ -38,7 +38,7 @@ class vtkDoubleArray;
 local coordinates.
 @sa mafViewRXCT, mafViewOrthoSlice for usage examples: these views act as mediators between gizmo slices
 */
-class MED_COMMON_EXPORT mafGizmoSlice : public mafGizmoInterface
+class MAF_EXPORT mafGizmoSlice : public mafGizmoInterface
 {
 public:
 

@@ -18,7 +18,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "mafVMEScalarMatrix.h"
 
 //----------------------------------------------------------------------------
@@ -28,7 +28,7 @@ class mafVMEOutputScalarMatrix;
 
 
 /** VME child of mafVMEScalarMatrix, for EMG data. Refactor CreateGui and Print methods not to show parameters used for VTK representation */
-class MED_VME_EXPORT medVMEAnalog : public mafVMEScalarMatrix
+class MAF_EXPORT medVMEAnalog : public mafVMEScalarMatrix
 {
 public:
   mafTypeMacro(medVMEAnalog, mafVMEScalarMatrix);

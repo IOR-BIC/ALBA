@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medGuiDefines.h"
+#include "mafDefines.h"
 #include "mafVME.h"
 #include "mafEvent.h"
 
@@ -46,7 +46,7 @@ class mafVMELandmarkCloud;
   - Code cleaning and improve documentation
 */
 
-class MED_GUI_EXPORT medGUILandmark : public mafObserver
+class MAF_EXPORT medGUILandmark : public mafObserver
 {
 public:
   /** constructor */

@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // includes :
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOpTransformInterface.h"
 
 //----------------------------------------------------------------------------
@@ -41,7 +41,7 @@ class mafNode;
 Transform a vme using constrains 
 */
 
-class MED_OPERATION_EXPORT medOpMove : public mafOpTransformInterface
+class MAF_EXPORT medOpMove : public mafOpTransformInterface
 {
 public:
   medOpMove(const wxString &label = "Move\tCtrl+T");

@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medViewsDefines.h"
+#include "mafDefines.h"
 #include "mafViewCompound.h"
 #include "medViewCompoundWindowing.h"
 
@@ -45,7 +45,7 @@ class vtkWindowLevelLookupTable;
   Class that contain mafViewVTK. Derived by medViewCompoundWindowing in order to add gui view widget like windowing buttons.
 
 */
-class MED_VIEWS_EXPORT medViewVTKCompound: public medViewCompoundWindowing
+class MAF_EXPORT medViewVTKCompound: public medViewCompoundWindowing
 {
 public:
   /** constructor. */

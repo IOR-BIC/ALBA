@@ -19,14 +19,14 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "mafVMEGeneric.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
 
-class MED_VME_EXPORT medVMEPolylineEditor : public mafVMEGeneric
+class MAF_EXPORT medVMEPolylineEditor : public mafVMEGeneric
 {
 public:
 	mafTypeMacro(medVMEPolylineEditor, mafVMEGeneric);

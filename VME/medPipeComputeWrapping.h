@@ -18,7 +18,7 @@
 #define __medPipeComputeWrapping_H__
 
 #include "mafPipe.h"
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 //----------------------------------------------------------------------------
 // forward refs :
 //----------------------------------------------------------------------------
@@ -35,7 +35,7 @@ class mafGUIMaterialButton;
 //----------------------------------------------------------------------------
 // medPipeComputeWrapping :
 //----------------------------------------------------------------------------
-class MED_VME_EXPORT medPipeComputeWrapping : public mafPipe
+class MAF_EXPORT medPipeComputeWrapping : public mafPipe
 {
 public:
   mafTypeMacro(medPipeComputeWrapping,mafPipe);

@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medGuiDefines.h"
+#include "mafDefines.h"
 #include "mafGUISettings.h"
 
 //----------------------------------------------------------------------------
@@ -35,7 +35,7 @@
   Represents advanced settings which can be modified accessing to option menu.
   - conversion units 
 */
-class MED_GUI_EXPORT medGUISettingsAdvanced : public mafGUISettings
+class MAF_EXPORT medGUISettingsAdvanced : public mafGUISettings
 {
 public:
   /** constructor.  */

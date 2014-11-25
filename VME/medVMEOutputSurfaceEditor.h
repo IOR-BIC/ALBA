@@ -19,7 +19,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "mafVMEOutputSurface.h"
 
 //----------------------------------------------------------------------------
@@ -27,7 +27,7 @@
 //----------------------------------------------------------------------------
 class vtkPolyData;
 
-class MED_VME_EXPORT medVMEOutputSurfaceEditor : public mafVMEOutputSurface
+class MAF_EXPORT medVMEOutputSurfaceEditor : public mafVMEOutputSurface
 {
 public:
 	medVMEOutputSurfaceEditor();

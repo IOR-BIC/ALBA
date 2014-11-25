@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notice for more information.
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 #include "vtkImageData.h"
 #include <map>
@@ -62,7 +62,7 @@ class medDicomSeriesSliceList;
 Perform DICOM importer.
 From a DICOM dataset return a VME Volume, a VME Image or a VME Mesh.
 */
-class MED_OPERATION_EXPORT medOpImporterDicomOffis : public mafOp
+class MAF_EXPORT medOpImporterDicomOffis : public mafOp
 {
 public:
 	/** constructor */
@@ -427,7 +427,7 @@ We are using Image Position (Patient) (0020,0032) dicom tag to set dicom slice p
 See here for the motivation behind this decision:
 http://www.cmake.org/pipermail/insight-users/2005-September/014711.html
 */
-class MED_OPERATION_EXPORT medDicomSlice
+class MAF_EXPORT medDicomSlice
 {
 public:
 	/** Enumerate reference system modalities */

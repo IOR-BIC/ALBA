@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 #include "vtkPoints.h"
 #include "mafVMEPolyline.h"
@@ -35,7 +35,7 @@ class medGizmoInteractionDebugger;
 
 /** Facility for medical interaction stuff debug:  this class should be expanded and
 refactored incrementally to ease interaction stuff debug */
-class MED_OPERATION_EXPORT medOpInteractionDebugger: public mafOp
+class MAF_EXPORT medOpInteractionDebugger: public mafOp
 {
 public:
 	medOpInteractionDebugger(const wxString &label = "medOpInteractionDebugger");

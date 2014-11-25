@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -32,7 +32,7 @@ class mafVMESurface;
 // medOpCreateSurface :
 //----------------------------------------------------------------------------
 /**Convert a Parametric Surface into a Normal Surface*/
-class MED_OPERATION_EXPORT medOpCreateSurface: public mafOp
+class MAF_EXPORT medOpCreateSurface: public mafOp
 {
 public:
 

@@ -16,7 +16,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "mafPipe.h"
 #include "medGUIDynamicVP.h"
 
@@ -37,7 +37,7 @@ class mafGUIFloatSlider;
     Pipe which works as a container of other pipes.
 */
 
-class MED_VME_EXPORT medPipeCompound : public mafPipe
+class MAF_EXPORT medPipeCompound : public mafPipe
 {
 public:
   /** RTTI Macro */

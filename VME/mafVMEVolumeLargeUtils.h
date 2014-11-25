@@ -16,7 +16,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "vtkMafFile.h"
 #include "vtkMAFIdType64.h"
 
@@ -30,7 +30,7 @@ class mafString;
   class name: mafVMEVolumeLargeUtils
   the class that gather several static methods usefull for import a large volume dataset.
 */
-class MED_VME_EXPORT mafVMEVolumeLargeUtils
+class MAF_EXPORT mafVMEVolumeLargeUtils
 {
 public:
   /** Returns the size of the given file in bytes */

@@ -19,14 +19,14 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "mafVMESurface.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
 
-class MED_VME_EXPORT medVMESurfaceEditor : public mafVMESurface
+class MAF_EXPORT medVMESurfaceEditor : public mafVMESurface
 {
 public:
 	mafTypeMacro(medVMESurfaceEditor, mafVMESurface);

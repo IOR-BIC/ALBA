@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include <ostream>
 
 
@@ -45,7 +45,7 @@
 /// Matrix convention in this code: i is the row, j is the column, and k is the 1D array index. \n
 /// The output matrix can be the same as the input unless stated otherwise. \n
 //------------------------------------------------------------------------------
-class MED_OPERATION_EXPORT medOpMatrixVectorMath{
+class MAF_EXPORT medOpMatrixVectorMath{
 public:
   /// Constructor.
   medOpMatrixVectorMath(bool homogeneous = false) : m_Homogeneous(homogeneous) {}

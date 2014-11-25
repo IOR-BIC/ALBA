@@ -21,7 +21,7 @@
 // Includes :
 //----------------------------------------------------------------------------
 #include "mafOp.h"
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -36,7 +36,7 @@ class vtkImageData;
 class vtkMEDVolumeToClosedSmoothSurface;
 class vtkPolyData;
 
-class MED_OPERATION_EXPORT medOpExtractGeometry: public mafOp
+class MAF_EXPORT medOpExtractGeometry: public mafOp
 {
 public:
   //----------------------------------------------------------------------------

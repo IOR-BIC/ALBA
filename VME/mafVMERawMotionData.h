@@ -18,7 +18,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "mafVMEGroup.h"
 #include <fstream>
 //----------------------------------------------------------------------------
@@ -28,7 +28,7 @@ class mafVMELandmarkCloud;
 
 /** mafVMERawMotionData - 
 */
-class MED_VME_EXPORT mafVMERawMotionData : public mafVMEGroup  
+class MAF_EXPORT mafVMERawMotionData : public mafVMEGroup  
 {
 public:
 

@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 #include "vtkIdList.h"
 
@@ -51,7 +51,7 @@ CTRL modifier must be used in order to select cells in render window while
 performing mouse dragging.
 This operation assumes that input polygonal data is made of triangles only.
 */
-class MED_OPERATION_EXPORT medOpSmoothSurfaceCells: public mafOp
+class MAF_EXPORT medOpSmoothSurfaceCells: public mafOp
 {
 public:
 

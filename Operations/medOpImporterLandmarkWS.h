@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -35,7 +35,7 @@ class mafEvent;
 for any single frame that composes the marker trajectory. Particularly, this file is produced by means of 
 Vicon Workstation© employed in Human Movement Analysis.*/
 
-class MED_OPERATION_EXPORT medOpImporterLandmarkWS : public mafOp
+class MAF_EXPORT medOpImporterLandmarkWS : public mafOp
 {
 public:
 	medOpImporterLandmarkWS(wxString label);

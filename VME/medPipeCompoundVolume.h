@@ -16,11 +16,11 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "medPipeCompound.h"
 
 /** General class for Volumes with compound pipes */
-class MED_VME_EXPORT medPipeCompoundVolume : public medPipeCompound
+class MAF_EXPORT medPipeCompoundVolume : public medPipeCompound
 {
 public:
   mafTypeMacro(medPipeCompoundVolume, medPipeCompound);

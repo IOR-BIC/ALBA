@@ -16,7 +16,7 @@
 #ifndef __medInteractorPERScalarInformation_h
 #define __medInteractorPERScalarInformation_h
 
-#include "medInteractionDefines.h"
+#include "mafDefines.h"
 #include "mafInteractorPER.h"
 
 //----------------------------------------------------------------------------
@@ -25,7 +25,7 @@
 
 /** Class implementing image info reporting on status bar when not interacting.
 */
-class MED_INTERACTION_EXPORT medInteractorPERScalarInformation : public mafInteractorPER
+class MAF_EXPORT medInteractorPERScalarInformation : public mafInteractorPER
 {
 public: 
   mafTypeMacro(medInteractorPERScalarInformation,mafInteractorPER);

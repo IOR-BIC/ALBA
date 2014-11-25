@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "mafPipe.h"
 #include "mafVMEImage.h"
 #include "mafVMEVolume.h"
@@ -47,7 +47,7 @@ class mafVMEVolume;
 //----------------------------------------------------------------------------
 // mafPipeSurface :
 //----------------------------------------------------------------------------
-class MED_VME_EXPORT medPipeDensityDistance : public mafPipe
+class MAF_EXPORT medPipeDensityDistance : public mafPipe
 {
 public:
   mafTypeMacro(medPipeDensityDistance,mafPipe);

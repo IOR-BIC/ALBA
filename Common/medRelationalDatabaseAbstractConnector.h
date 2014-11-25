@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medCommonDefines.h"
+#include "mafDefines.h"
 #include "mafObject.h"
 #include "medResultQueryAbstractHandler.h"
 
@@ -45,7 +45,7 @@ struct medRelationalDatabaseInformation
   class that handle all the process of connection, retrieving data executing query
   ad by medResultQueryAbstractHandler load them
 */
-class MED_COMMON_EXPORT medRelationalDatabaseAbstractConnector : public mafObject
+class MAF_EXPORT medRelationalDatabaseAbstractConnector : public mafObject
 {
 public:
   /** constructor */

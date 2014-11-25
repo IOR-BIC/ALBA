@@ -22,7 +22,6 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 #include "mafDefines.h" 
-#include "medDefines.h" 
 
 #include <cppunit/config/SourcePrefix.h>
 

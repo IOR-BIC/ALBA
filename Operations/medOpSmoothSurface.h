@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -37,7 +37,7 @@ class name:  medOpSmoothSurface.
 Class which supplies the possibility to smooth a surface, giving a number of iteration of smooth, clear the result or
 preview the output.
 */
-class MED_OPERATION_EXPORT medOpSmoothSurface: public mafOp
+class MAF_EXPORT medOpSmoothSurface: public mafOp
 {
 public:
   /** object constructor */

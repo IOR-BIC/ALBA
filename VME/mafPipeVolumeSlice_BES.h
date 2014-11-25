@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "mafPipeSlice.h"
 
 //----------------------------------------------------------------------------
@@ -49,7 +49,7 @@ class name: mafPipeVolumeSlice_BES
   of the volume data. The visual pipe can also render 3 different slices centered in a origin point
   and oriented along 3 different axes.
 */
-class MED_VME_EXPORT mafPipeVolumeSlice_BES : public mafPipeSlice
+class MAF_EXPORT mafPipeVolumeSlice_BES : public mafPipeSlice
 {
 public:
   /** RTTI Macro */

@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -35,7 +35,7 @@ class vtkPolyData;
 class name: medOpCreateEditSkeleton
 Class for creating and editing the skeleton polyline.
 */
-class MED_OPERATION_EXPORT medOpCreateEditSkeleton: public mafOp
+class MAF_EXPORT medOpCreateEditSkeleton: public mafOp
 {
 public:
   /** constructor */

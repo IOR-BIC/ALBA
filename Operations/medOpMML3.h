@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 #include "mafDefines.h"
 
@@ -99,7 +99,7 @@
 // vtkPlane/vtkCutter requires an inverse transform.
 //
 //------------------------------------------------------------------------------
-class MED_OPERATION_EXPORT medOpMML3: public mafOp
+class MAF_EXPORT medOpMML3: public mafOp
 {
 public:
   medOpMML3(const wxString &label); ///< constructor

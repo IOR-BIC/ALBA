@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "medPipeVectorFieldSurface.h"
 
 //----------------------------------------------------------------------------
@@ -44,7 +44,7 @@ NB: The pipe supports time-varying VME, but to update correctly scalars and vect
 NB: The pipe looks for scalar and vectors in the point data; if it finds them, only point data fields are displayed! If they are not found, the pipe looks to the cell data.
 TO DO: Implement a way to display both cell data and point data.
 */
-class MED_VME_EXPORT medPipeVectorFieldMapWithArrows : public medPipeVectorField
+class MAF_EXPORT medPipeVectorFieldMapWithArrows : public medPipeVectorField
 {
 public:
   mafTypeMacro(medPipeVectorFieldMapWithArrows, medPipeVectorField);

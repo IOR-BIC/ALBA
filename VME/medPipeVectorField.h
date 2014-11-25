@@ -16,7 +16,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "mafPipe.h"
 
 //----------------------------------------------------------------------------
@@ -26,7 +26,7 @@ class mafGUI;
 
 
 /** General class for vector fields, contains useful stuff  */
-class MED_VME_EXPORT medPipeVectorField : public mafPipe
+class MAF_EXPORT medPipeVectorField : public mafPipe
 {
 public:
   mafAbstractTypeMacro(medPipeVectorField, mafPipe);

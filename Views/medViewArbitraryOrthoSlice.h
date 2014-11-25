@@ -86,7 +86,7 @@ It is possible to export arbitrary volume slices as image files.
 
 */
 
-class MED_VIEWS_EXPORT medViewArbitraryOrthoSlice: public medViewCompoundWindowing
+class MAF_EXPORT medViewArbitraryOrthoSlice: public medViewCompoundWindowing
 {
 
 	/*

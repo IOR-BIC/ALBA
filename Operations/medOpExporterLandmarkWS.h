@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -32,7 +32,7 @@ class mafVMELandmarkCloud;
 /** 
 class name: medOpExporterLandmarkWS
 /** Export trajectories in a cvs file */
-class MED_OPERATION_EXPORT medOpExporterLandmarkWS : public mafOp
+class MAF_EXPORT medOpExporterLandmarkWS : public mafOp
 {
 public:
 	medOpExporterLandmarkWS(const wxString &label = "Trajectories Exporter");

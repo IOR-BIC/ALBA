@@ -16,7 +16,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "medPipeVectorField.h"
 #include <wx/listctrl.h>
 
@@ -44,7 +44,7 @@ class vtkRectilinearGrid;
 class vtkFloatArray;
 
 /** General class for Volumes with compound pipes */
-class MED_VME_EXPORT medPipeVectorFieldGlyphs : public medPipeVectorField
+class MAF_EXPORT medPipeVectorFieldGlyphs : public medPipeVectorField
 {
 public:
   mafTypeMacro(medPipeVectorFieldGlyphs, medPipeVectorField);

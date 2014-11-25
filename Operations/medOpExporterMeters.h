@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 #include <fstream>
 #include <map>
@@ -42,7 +42,7 @@ class mafEvent;
     class name: medOpExporterMeters
    This class provides the functionality for exporting medVMEWrappedMeter, writing all in a txt file.
 */
-class MED_OPERATION_EXPORT medOpExporterMeters: public mafOp
+class MAF_EXPORT medOpExporterMeters: public mafOp
 {
 public:
   /** object constructor */

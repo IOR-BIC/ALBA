@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medViewsDefines.h"
+#include "mafDefines.h"
 #include "mafViewCompound.h"
 
 //----------------------------------------------------------------------------
@@ -35,7 +35,7 @@ class mafViewVTK;
 //----------------------------------------------------------------------------
 /**
 This view features two Rx views and one compound view made of six CT slices.*/
-class MED_VIEWS_EXPORT mafViewCT : public mafViewCompound
+class MAF_EXPORT mafViewCT : public mafViewCompound
 {
 public:
   /** constructor */

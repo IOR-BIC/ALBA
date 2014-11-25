@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -37,7 +37,7 @@ class vtkMEDPolyDataMirror;
 class name: medOpSurfaceMirror
 Operation which permits to create a copy of the surface which is "mirrored" respect  xy,yz or xz plane.
 */
-class MED_OPERATION_EXPORT medOpSurfaceMirror: public mafOp
+class MAF_EXPORT medOpSurfaceMirror: public mafOp
 {
 public:
   /** constructor */

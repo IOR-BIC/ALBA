@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // includes :
 //----------------------------------------------------------------------------
-#include "medCommonDefines.h"
+#include "mafDefines.h"
 #include "mafLogicWithManagers.h"
 
 //----------------------------------------------------------------------------
@@ -33,7 +33,7 @@ class medWizard;
   Class Name: medLogicWithManagers.
   Class for handle the high level logic of a medical application.
 */
-class MED_COMMON_EXPORT medLogicWithManagers : public mafLogicWithManagers
+class MAF_EXPORT medLogicWithManagers : public mafLogicWithManagers
 {
 public:
   /** constructor. */

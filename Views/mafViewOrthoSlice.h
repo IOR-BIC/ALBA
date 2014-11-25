@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medViewsDefines.h"
+#include "mafDefines.h"
 #include "mafViewCompound.h"
 
 //----------------------------------------------------------------------------
@@ -43,7 +43,7 @@ This compound view is made of four child views used to analyze different orthogo
 slices of the volume. This is an experimental component with rotated volumes interaction
 and visualization enabled.
 */
-class MED_VIEWS_EXPORT mafViewOrthoSlice: public mafViewCompound
+class MAF_EXPORT mafViewOrthoSlice: public mafViewCompound
 {
 public:
   /** constructor */

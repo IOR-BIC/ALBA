@@ -16,7 +16,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "mafPipe.h"
 
 //----------------------------------------------------------------------------
@@ -29,7 +29,7 @@ class mafGUI;
 class name:  medPipeTensorField
 General class for tensor fields, contains useful stuff 
  */
-class MED_VME_EXPORT medPipeTensorField : public mafPipe
+class MAF_EXPORT medPipeTensorField : public mafPipe
 {
 public:
   /** RTTI macro*/

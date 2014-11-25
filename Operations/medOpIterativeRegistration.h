@@ -21,7 +21,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -46,7 +46,7 @@ class vtkMatrix4x4;
   - Code cleaning and improve documentation
 */
 
-class MED_OPERATION_EXPORT medOpIterativeRegistration : public mafOp
+class MAF_EXPORT medOpIterativeRegistration : public mafOp
 {
   public:
     medOpIterativeRegistration(wxString label = "Iterative Registration");

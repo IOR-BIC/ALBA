@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medViewsDefines.h"
+#include "mafDefines.h"
 #include "mafViewCompound.h"
 #include "mafSceneNode.h"
 
@@ -42,7 +42,7 @@ This view features two Rx views and one compound view made of six CT slices.
 This is an experimental component with rotated volumes interaction
 and visualization enabled.*/
 
-class MED_VIEWS_EXPORT mafViewRXCT : public mafViewCompound
+class MAF_EXPORT mafViewRXCT : public mafViewCompound
 {
 public:
   /** constructor */

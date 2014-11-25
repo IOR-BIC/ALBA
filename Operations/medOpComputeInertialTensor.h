@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 #include "mafVME.h"
 #include "mafTagItem.h"
@@ -53,7 +53,7 @@ class vtkCell;
   Density for each VME will be read from the "DENSITY" tag: if this tag is not found the Default density value will be used. 
 	
 */
-class MED_OPERATION_EXPORT medOpComputeInertialTensor: public mafOp
+class MAF_EXPORT medOpComputeInertialTensor: public mafOp
 {
 public:
   /** constructor */

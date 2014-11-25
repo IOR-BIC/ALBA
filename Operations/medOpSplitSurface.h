@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 #include "mafNode.h"
 #include "mafVMESurface.h"
@@ -51,7 +51,7 @@ class vtkMAFClipSurfaceBoundingBox;
 // medOpSplitSurface :
 //----------------------------------------------------------------------------
 /** */
-class MED_OPERATION_EXPORT medOpSplitSurface: public mafOp
+class MAF_EXPORT medOpSplitSurface: public mafOp
 {
 public:
   medOpSplitSurface(const wxString &label = "ClipSurface");

@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 #include "medVMEAnalog.h"
 
@@ -33,7 +33,7 @@ class medVMEAnalog;
 /** 
 class name: medOpExporterAnalogWS
 /** Export analog signals from a medVMEAnalog VME */
-class MED_OPERATION_EXPORT medOpExporterAnalogWS : public mafOp
+class MAF_EXPORT medOpExporterAnalogWS : public mafOp
 {
 public:
 	medOpExporterAnalogWS(const wxString &label = "Analog Exporter");

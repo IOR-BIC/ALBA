@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 #include "mafVMEVector.h"
 #include "mafVMESurface.h"
@@ -52,7 +52,7 @@ typedef struct {
 class name: medOpExporterGRFWS
 Exporterr for ground reactions force, used in motion analysis
 */
-class MED_OPERATION_EXPORT medOpExporterGRFWS : public mafOp
+class MAF_EXPORT medOpExporterGRFWS : public mafOp
 {
 public:
 	medOpExporterGRFWS(const wxString &label = "GRF Exporter");

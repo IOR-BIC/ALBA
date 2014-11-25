@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "mafPipeSlice.h"
 
 //----------------------------------------------------------------------------
@@ -39,7 +39,7 @@ class vtkPlane;
 //----------------------------------------------------------------------------
 // medPipePolylineGraphEditor :
 //----------------------------------------------------------------------------
-class MED_VME_EXPORT medPipePolylineGraphEditor : public mafPipeSlice
+class MAF_EXPORT medPipePolylineGraphEditor : public mafPipeSlice
 {
 public:
 	mafTypeMacro(medPipePolylineGraphEditor,mafPipe);

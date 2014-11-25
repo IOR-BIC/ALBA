@@ -14,7 +14,7 @@
 
 =========================================================================*/
 
-#include "medDefines.h"
+#include "mafDefines.h"
 
 #include "medViewSliceNotInterpolatedCompound.h"
 #include "medPipeVolumeSliceNotInterpolated.h"

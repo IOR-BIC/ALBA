@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 #include "mafVME.h"
 #include "mafVMEOutput.h"
@@ -40,7 +40,7 @@ class mafVMESurface;
   class name: medOpCropDeformableROI
    Operation that use m_MaskPolydataFilter, cropping  a volume with a output surface of a vme.
 */
-class MED_OPERATION_EXPORT medOpCropDeformableROI: public mafOp
+class MAF_EXPORT medOpCropDeformableROI: public mafOp
 {
 public:
   /** construct */

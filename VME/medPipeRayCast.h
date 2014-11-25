@@ -18,7 +18,7 @@
 #define __medPipeRayCast_H__
 
 #include "mafPipe.h"
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 
 //----------------------------------------------------------------------------
 // forward refs :
@@ -43,7 +43,7 @@ class vtkMEDRayCastCleaner;
 It define different levels of density for bone-blood-muscle and set different
 colors for a realistic visualization 
 */
-class MED_VME_EXPORT medPipeRayCast : public mafPipe 
+class MAF_EXPORT medPipeRayCast : public mafPipe 
 {
 public:
   /** RTTI macro */

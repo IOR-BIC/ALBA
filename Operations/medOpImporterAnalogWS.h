@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 #include <vnl\vnl_matrix.h>
 
@@ -34,7 +34,7 @@ class medVMEAnalog;
 // medOpImporterAnalogWS :
 //----------------------------------------------------------------------------
 /** Import analog signals in a medVMEAnalog VME*/
-class MED_OPERATION_EXPORT medOpImporterAnalogWS : public mafOp
+class MAF_EXPORT medOpImporterAnalogWS : public mafOp
 {
 public:
 	medOpImporterAnalogWS(const wxString &label = "Analog Importer");

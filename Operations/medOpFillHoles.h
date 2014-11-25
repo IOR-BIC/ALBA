@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -45,7 +45,7 @@ class vtkGlyph3D;
    class name: medOpFillHoles
    Operation which takes in input a polydata and retrieve the same polydata with filled hole.
 */
-class MED_OPERATION_EXPORT medOpFillHoles: public mafOp
+class MAF_EXPORT medOpFillHoles: public mafOp
 {
 public:
   /** constructor*/

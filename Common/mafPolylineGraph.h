@@ -17,7 +17,7 @@ to use in VTK filters (=> wxString was replaced by char*)*/
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medCommonDefines.h"
+#include "mafDefines.h"
 #include "vtkPolydata.h"
 #include <ostream>
 #include <vector>
@@ -66,7 +66,7 @@ Adding and deleting items from branches has no effect on the graph connectivity.
 */
 
 //----------------------------------------------------------------------------
-class MED_COMMON_EXPORT mafPolylineGraph
+class MAF_EXPORT mafPolylineGraph
 {
 public:  
   /** consts for undefined index values */
@@ -231,7 +231,7 @@ public:
   The ith edge joins this vertex to the ith vertex neighbour. 
   Coordinates are optional */
   //----------------------------------------------------------------------------
-  class MED_COMMON_EXPORT Vertex{
+  class MAF_EXPORT Vertex{
   public:
     Vertex() ;                   ///< constructor
     Vertex(double *coords) ;     ///< constructor
@@ -266,7 +266,7 @@ public:
   The edge can have a weight, and can be directed.
   The edge can optionally be a member of a branch. */
   //----------------------------------------------------------------------------
-  class MED_COMMON_EXPORT Edge{
+  class MAF_EXPORT Edge{
   public:
     Edge() ;                                     ///< constructor
     Edge(vtkIdType v0, vtkIdType v1) ;           ///< constructor with end vertices
@@ -309,7 +309,7 @@ public:
   The sequence is stored as a list of vertices and a list of edges. 
   The branch can optionally have a name */
   //----------------------------------------------------------------------------
-  class MED_COMMON_EXPORT Branch{
+  class MAF_EXPORT Branch{
   public:
     Branch(const char* name = NULL) ;                                     ///< constructor: empty branch with optional name
     explicit Branch(vtkIdType startvertex, const char* name = NULL) ; ///< constructor: branch with initial vertex and optional name

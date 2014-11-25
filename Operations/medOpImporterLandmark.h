@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -41,7 +41,7 @@ this class provides the landmark importing written in the following format:
 3) the line with landmark data are:
      nameOfLandmark x y z
 */
-class MED_OPERATION_EXPORT medOpImporterLandmark : public mafOp
+class MAF_EXPORT medOpImporterLandmark : public mafOp
 {
 public:
   /** object cosntructor */

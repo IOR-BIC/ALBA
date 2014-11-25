@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -33,7 +33,7 @@ class mafEvent;
   class name: medOpCleanSurface
     Operation that apply cvtkCleanPolyData Filter to the input surface.  
 */
-class MED_OPERATION_EXPORT medOpCleanSurface: public mafOp
+class MAF_EXPORT medOpCleanSurface: public mafOp
 {
 public:
   /** constructor */

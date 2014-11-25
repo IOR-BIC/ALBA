@@ -19,7 +19,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 #include "mafEvent.h"
 #include "mafString.h"
@@ -53,7 +53,7 @@ class vtkPlaneSource;
   class name: mafOpImporterRAWVolume_BES
   This importer imports Large Volume. It uses mafVMEVolumeLargeUtils made by BES.
 */
-class MED_OPERATION_EXPORT mafOpImporterRAWVolume_BES: public mafOp
+class MAF_EXPORT mafOpImporterRAWVolume_BES: public mafOp
 {	
 public:
 

@@ -17,7 +17,7 @@
 
 #define TestingVersion
 
-#include "medDefines.h"
+#include "mafDefines.h"
 
 #include <wx/slider.h>
 #include <wx/defs.h>

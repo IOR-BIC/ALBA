@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -38,7 +38,7 @@ class vtkSphereSource;
 // medOpSegmentationRegionGrowingConnectedThreshold :
 //----------------------------------------------------------------------------
 /** */
-class MED_OPERATION_EXPORT medOpSegmentationRegionGrowingConnectedThreshold: public mafOp
+class MAF_EXPORT medOpSegmentationRegionGrowingConnectedThreshold: public mafOp
 {
 public:
   medOpSegmentationRegionGrowingConnectedThreshold(wxString label = "Connected Threshold");

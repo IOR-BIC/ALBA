@@ -16,7 +16,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "medPipeVectorField.h"
 
 //----------------------------------------------------------------------------
@@ -33,7 +33,7 @@ class vtkScalarBarActor;
 /** Displays the surface of input VME (even, if it is volume),
 using color mapping according to X,Y,Z or magnitude of associated
 vector field (selected in the gui). */
-class MED_VME_EXPORT medPipeVectorFieldSurface : public medPipeVectorField
+class MAF_EXPORT medPipeVectorFieldSurface : public medPipeVectorField
 {
 public:
   mafTypeMacro(medPipeVectorFieldSurface, medPipeVectorField);

@@ -17,7 +17,7 @@
 #ifndef __mafGUILutSwatch_H__
 #define __mafGUILutSwatch_H__
 
-#include "medGuiDefines.h"
+#include "mafDefines.h"
 #include "mafEvent.h"
 #include "vtkLookupTable.h"
 //----------------------------------------------------------------------------
@@ -28,7 +28,7 @@ class vtkDataSet;
 class mmaVolumeMaterial;
 class mafGUI;
 
-class MED_GUI_EXPORT medGUILutHistogramSwatch: public wxPanel
+class MAF_EXPORT medGUILutHistogramSwatch: public wxPanel
 {
 public:
   /** constructor. */

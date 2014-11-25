@@ -17,7 +17,7 @@
 #ifndef __medOpMML_H__
 #define __medOpMML_H__
 
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
@@ -56,7 +56,7 @@ class mafGUIButton;
 // The inputs are a volume (the patient data) and a surface (the model).
 //----------------------------------------------------------------------------
 
-class MED_OPERATION_EXPORT medOpMML: public mafOp
+class MAF_EXPORT medOpMML: public mafOp
 {
 public:
   void ApplyInverseRegistrationOps();

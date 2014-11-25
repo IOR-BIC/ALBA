@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 
 //----------------------------------------------------------------------------
@@ -44,7 +44,7 @@ class name: medOpMeshQuality
 
 Check the quality of the mesh, using an algorithm for checking the ratio of each triangle and then giving statistics about that.
  */
-class MED_OPERATION_EXPORT medOpMeshQuality: public mafOp
+class MAF_EXPORT medOpMeshQuality: public mafOp
 {
 public:
 	medOpMeshQuality(const wxString &label = "Check Mesh Quality");

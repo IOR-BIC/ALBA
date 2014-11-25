@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 #include "mafString.h"
 
@@ -33,7 +33,7 @@
 // medOpFreezeVME :
 //----------------------------------------------------------------------------
 /** This operation coverts a procedural vme in the corresponding version not procedural*/
-class MED_OPERATION_EXPORT medOpFreezeVME: public mafOp
+class MAF_EXPORT medOpFreezeVME: public mafOp
 {
 public:
 	medOpFreezeVME(wxString label = "Freeze VME");

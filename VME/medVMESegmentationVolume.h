@@ -19,7 +19,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "mafVME.h"
 #include "mafVMEVolumeGray.h"
 
@@ -31,7 +31,7 @@ class mmaVolumeMaterial;
 class medDataPipeCustomSegmentationVolume;
 class medAttributeSegmentationVolume;
 
-class MED_VME_EXPORT medVMESegmentationVolume : public mafVME
+class MAF_EXPORT medVMESegmentationVolume : public mafVME
 {
 public:
   mafTypeMacro(medVMESegmentationVolume, mafVME);

@@ -16,7 +16,7 @@
 #ifndef __medInteractorPERBrushFeedback_h
 #define __medInteractorPERBrushFeedback_h
 
-#include "medInteractionDefines.h"
+#include "mafDefines.h"
 #include "mafInteractorPER.h"
 
 class vtkActor2D;
@@ -34,7 +34,7 @@ class vtkSphereSource;
 
 /** Segmentation Editing Interactor
 */
-class MED_INTERACTION_EXPORT medInteractorPERBrushFeedback : public mafInteractorPER
+class MAF_EXPORT medInteractorPERBrushFeedback : public mafInteractorPER
 {
 public: 
   

@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "mafPipeSlice.h"
 
 //----------------------------------------------------------------------------
@@ -49,7 +49,7 @@ class vtkPolyDataNormals;
   class name : mafPipeMeshSlice_BES
   Pipe for sliceing a mesh, modified by University of Bedfordshire.
 */
-class MED_VME_EXPORT mafPipeMeshSlice_BES : public mafPipeSlice
+class MAF_EXPORT mafPipeMeshSlice_BES : public mafPipeSlice
 {
 public:
   /** RTTI macro*/

@@ -21,7 +21,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "mafGizmoInterface.h"
 #include "mafGizmoHandle.h"
 
@@ -77,7 +77,7 @@ In order to use it in your client create an instance of it and ask for the regio
 @sa mafGizmoHandle mafGizmoBoundingBox
 */
 
-class MED_VME_EXPORT mafGizmoROI_BES: public mafGizmoInterface
+class MAF_EXPORT mafGizmoROI_BES: public mafGizmoInterface
 {
 public:
   //BES: backward compatibility

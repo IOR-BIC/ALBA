@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "mafPipe.h"
 #include "mafEvent.h"
 
@@ -40,7 +40,7 @@ class vtkRectilinearGrid;
 class name medPipeGraph.
 Visual pipe to visualize graphs of analog signals. 
 */
-class MED_VME_EXPORT medPipeGraph : public mafPipe
+class MAF_EXPORT medPipeGraph : public mafPipe
 {
 public:
   /** RTTI Macro */

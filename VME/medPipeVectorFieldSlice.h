@@ -16,7 +16,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medVMEDefines.h"
+#include "mafDefines.h"
 #include "medPipeVectorFieldSurface.h"
 #include "mafPipeSlice.h"
 
@@ -31,7 +31,7 @@ class vtkPlane;
 or magnitude of the associated vector field. 
 Note: this class should be derived from mafPipeSlice, but
 it would lead into multiple inheritance, which causes lot of troubles*/
-class MED_VME_EXPORT medPipeVectorFieldSlice : public medPipeVectorFieldSurface
+class MAF_EXPORT medPipeVectorFieldSlice : public medPipeVectorFieldSurface
 {
 public:
   mafTypeMacro(medPipeVectorFieldSlice, medPipeVectorFieldSurface);

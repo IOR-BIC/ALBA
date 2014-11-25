@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // includes :
 //----------------------------------------------------------------------------
-#include "medCommonDefines.h"
+#include "mafDefines.h"
 #include "medWizardBlock.h"
 #include <vector>
 
@@ -32,7 +32,7 @@
   Class Name: medWizardBlockVMEFindOrSelection.
   Class for create a multiple choice switch inside wizard graph
 */
-class MED_COMMON_EXPORT medWizardBlockVMEFindOrSelection : public medWizardBlock
+class MAF_EXPORT medWizardBlockVMEFindOrSelection : public medWizardBlock
 {
 public:
 

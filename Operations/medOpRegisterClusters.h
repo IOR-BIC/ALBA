@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "medOperationsDefines.h"
+#include "mafDefines.h"
 #include "mafOp.h"
 #include "mafVMELandmarkCloud.h"
 #include "mafVMEGroup.h"
@@ -53,7 +53,7 @@ may have also specified weights of their importance (unreliable landmarks should
 Several transformation modes are available: RIGID, SIMILARITY and AFFINE -- see below. 
 Optionally, some mafVMESurface follower of the source landmark cloud can be also specified,
 in which case the operation deep copies this follower as a child of the resulting (registered) landmark cloud.*/
-class MED_OPERATION_EXPORT medOpRegisterClusters: public mafOp
+class MAF_EXPORT medOpRegisterClusters: public mafOp
 {
 public:
 	//----------------------------------------------------------------------------
