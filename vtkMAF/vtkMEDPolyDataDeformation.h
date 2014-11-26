@@ -42,7 +42,7 @@
 #ifndef vtkMEDPolyDataDeformation_h__
 #define vtkMEDPolyDataDeformation_h__
 
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 
 #include <vector>
 #include <list>
@@ -65,10 +65,10 @@ class vtkCellLocator;
 
 // class CSkeletonEdge;
 // class CSkeletonVertex;
-// EXPORT_STL_VECTOR(VTK_vtkMAF_EXPORT,CSkeletonEdge*);
-// EXPORT_STL_VECTOR(VTK_vtkMAF_EXPORT,CSkeletonVertex*);
+// EXPORT_STL_VECTOR(MAF_EXPORT,CSkeletonEdge*);
+// EXPORT_STL_VECTOR(MAF_EXPORT,CSkeletonVertex*);
 
-class VTK_vtkMAF_EXPORT vtkMEDPolyDataDeformation : public vtkPolyDataToPolyDataFilter
+class MAF_EXPORT vtkMEDPolyDataDeformation : public vtkPolyDataToPolyDataFilter
 {
 
 public:
@@ -109,7 +109,7 @@ protected:
   typedef vtkstd::vector< CMeshVertexParametrization > CMeshVertex;
 
   //internal structure for one vertex in the skeleton
-  class VTK_vtkMAF_EXPORT CSkeletonVertex
+  class MAF_EXPORT CSkeletonVertex
   {
   public:
     int Id;             //<ID of this point
@@ -176,7 +176,7 @@ protected:
   };
   
   //internal structure for one edge in the skeleton
-  class VTK_vtkMAF_EXPORT CSkeletonEdge
+  class MAF_EXPORT CSkeletonEdge
   {
   public:
     int Id;                     //<ID of this edge
@@ -217,7 +217,7 @@ protected:
   };
 
   //Internal data structure to encapsulates one skeleton
-  class VTK_vtkMAF_EXPORT CSkeleton
+  class MAF_EXPORT CSkeleton
   {
   public:
 
@@ -263,7 +263,7 @@ protected:
 #pragma region Munkres
   //This class was adopted from John Weaver code (GNU - see below) and thoroughly modified 
   template <class T>
-  class VTK_vtkMAF_EXPORT CMatrix 
+  class MAF_EXPORT CMatrix 
   {
   public:
     /** Constructor. */

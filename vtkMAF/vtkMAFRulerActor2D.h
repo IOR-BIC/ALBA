@@ -36,7 +36,7 @@
 
 #define DEFAULT_GRID_COLOR 0.5
 
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 
 #include "vtkActor.h"
 #include "vtkActor2D.h"
@@ -54,7 +54,7 @@ class vtkPoints;
 # define NUM_LAB 30
 
 //-----------------------------------------------------------------------------
-class VTK_vtkMAF_EXPORT vtkMAFRulerActor2D : public vtkActor2D
+class MAF_EXPORT vtkMAFRulerActor2D : public vtkActor2D
 //-----------------------------------------------------------------------------
 {
  public:

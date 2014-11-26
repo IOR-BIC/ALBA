@@ -14,7 +14,7 @@ University of Bedfordshire
 #ifndef __vtkMEDPolyDataNavigator_h
 #define __vtkMEDPolyDataNavigator_h
 
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 #include "vtkObject.h"
 #include "vtkPolyData.h"
 #include "vtkIdType.h"
@@ -57,7 +57,7 @@ University of Bedfordshire
 //
 // Version: Nigel McFarlane 2.4.14
 //------------------------------------------------------------------------------
-class VTK_vtkMAF_EXPORT vtkMEDPolyDataNavigator : public vtkObject
+class MAF_EXPORT vtkMEDPolyDataNavigator : public vtkObject
 {
 public:
   static vtkMEDPolyDataNavigator *New();

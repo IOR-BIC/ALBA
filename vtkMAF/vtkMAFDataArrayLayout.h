@@ -20,7 +20,7 @@
 #include "vtkObject.h"
 #include "vtkMAFIdType64.h"
 
-class VTK_vtkMAF_EXPORT vtkMAFDataArrayLayout : public vtkObject 
+class MAF_EXPORT vtkMAFDataArrayLayout : public vtkObject 
 {
 public:
   vtkTypeRevisionMacro(vtkMAFDataArrayLayout,vtkObject);

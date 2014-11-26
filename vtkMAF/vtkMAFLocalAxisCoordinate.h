@@ -16,7 +16,7 @@
 #ifndef __vtkMAFLocalAxisCoordinate_h
 #define __vtkMAFLocalAxisCoordinate_h
 
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 
 #include "vtkCoordinate.h"
 #include "vtkProp3D.h"
@@ -28,7 +28,7 @@ class vtkViewport;
 /**
 class name: vtkMAFLocalAxisCoordinate.
 */
-class VTK_vtkMAF_EXPORT vtkMAFLocalAxisCoordinate : public vtkCoordinate
+class MAF_EXPORT vtkMAFLocalAxisCoordinate : public vtkCoordinate
 {
 public:
   //vtkTypeRevisionMacro(vtkMAFLocalAxisCoordinate,vtkCoordinate);

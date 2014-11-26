@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 #include "vtkstd/vector"
 #include "vtkCellArray.h"
 #include "vtkPointLocator.h"
@@ -37,7 +37,7 @@
   class name: vtkMEDFillingHole
   Filter which fill holes of a vtkPolydata
 */
-class VTK_vtkMAF_EXPORT vtkMEDFillingHole : public vtkPolyDataToPolyDataFilter
+class MAF_EXPORT vtkMEDFillingHole : public vtkPolyDataToPolyDataFilter
 {
 public:
 #pragma region Nested classes
@@ -71,7 +71,7 @@ public:
     Nested Triangle class 
     Each triangle has three edges and three vertices.
     */
-  class VTK_vtkMAF_EXPORT CTriangle
+  class MAF_EXPORT CTriangle
     {
     public:
       bool  BDeleted;
@@ -94,7 +94,7 @@ public:
   Nested Edge class 
   Normally, each edge has two neighbor triangles. Two vertices consist of an edge.
   */
-  class VTK_vtkMAF_EXPORT CEdge
+  class MAF_EXPORT CEdge
     {
     public:
       bool  BBoundary;

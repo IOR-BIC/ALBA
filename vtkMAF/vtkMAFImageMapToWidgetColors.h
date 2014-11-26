@@ -25,7 +25,7 @@
 //------------------------------------------------------------------------------
 // Includes:
 //------------------------------------------------------------------------------
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 
 #include "vtkImageMapToColors.h"
 #include "vtkMAFTransferFunction2D.h"
@@ -37,7 +37,7 @@ class vtkDataObject;
 class vtkImageData;
 
 
-class VTK_vtkMAF_EXPORT vtkMAFImageMapToWidgetColors : public vtkImageMapToColors 
+class MAF_EXPORT vtkMAFImageMapToWidgetColors : public vtkImageMapToColors 
 {
 public:
   static vtkMAFImageMapToWidgetColors *New();

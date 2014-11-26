@@ -38,7 +38,7 @@
 #ifndef __mafClassicICPRegistration_h
 #define __mafClassicICPRegistration_h
 
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 
 //vtk include
 #include <vtkLinearTransform.h>
@@ -61,7 +61,7 @@ class mafICPUtility;
   that modify one surface to best match the other (in a least square sense).
   This has to be iterated to get proper convergence of the surfaces.
 */
-class VTK_vtkMAF_EXPORT mafClassicICPRegistration : public vtkIterativeClosestPointTransform
+class MAF_EXPORT mafClassicICPRegistration : public vtkIterativeClosestPointTransform
 {
 public:
   static mafClassicICPRegistration *New();

@@ -283,7 +283,7 @@ IF(MAF_BUILD_MAFDLL)
   ENDIF(WIN32)
   SET(BUILD_SHARED_LIBS 1)
   SET(VTKLOCAL_BUILD_SHARED_LIBS_CONFIG 1)
-  ADD_DEFINITIONS(-DVTK_vtkMAF_EXPORTS)
+  ADD_DEFINITIONS(-DMAF_EXPORTS)
 ELSE(MAF_BUILD_MAFDLL)
   SET(BUILD_SHARED_LIBS 0)
   SET(VTKLOCAL_BUILD_SHARED_LIBS_CONFIG 0)
@@ -316,18 +316,18 @@ IF(VTK_FOUND)
   ENDIF (EXISTS ${VTK_DIR}/bin)
 
   # Create the header to configure the classes.
-  CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/vtkMAFConfigure.h.in
-                 ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Configure.h
-                 @ONLY IMMEDIATE)
+  # CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/mafConfigure.h.in
+  #                ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Configure.h
+  #                @ONLY IMMEDIATE)
 				 
 
   # Create the instantiator for these classes.
   SET(VTK_USE_INSTANTIATOR_NEW 1)
   VTK_MAKE_INSTANTIATOR2("${PROJECT_NAME}Instantiator" vtkMAFInstantiator_SRCS
                          ${vtkMAF_SRCS}
-                         EXPORT_MACRO "VTK_${PROJECT_NAME}_EXPORT"
+                         EXPORT_MACRO "MAF_EXPORT"
                          HEADER_LOCATION ${PROJECT_BINARY_DIR}
-                         INCLUDES "${PROJECT_NAME}Configure.h")
+                         INCLUDES "mafConfigure.h")
 
   # Create the library.
   ADD_LIBRARY(${PROJECT_NAME} ${vtkMAF_SRCS} ${vtkMAFInstantiator_SRCS})

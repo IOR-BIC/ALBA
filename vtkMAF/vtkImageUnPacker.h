@@ -22,13 +22,13 @@
 #include "vtkImageSource.h"
 #include "vtkPackedImage.h"
 
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 
 #ifndef VTK_IMG_PACK_NONE
   #define VTK_IMG_PACK_NONE 0
 #endif
 
-class VTK_vtkMAF_EXPORT vtkImageUnPacker : public vtkImageSource
+class MAF_EXPORT vtkImageUnPacker : public vtkImageSource
 {
 public:
   static vtkImageUnPacker *New();

@@ -36,11 +36,11 @@ ELSE (${CMAKE_GENERATOR} STREQUAL "Visual Studio 6")
 ENDIF (${CMAKE_GENERATOR} STREQUAL "Visual Studio 6")
 
 # options for Offis and BTK from MAF2Medical
-OPTION(MED_USE_Offis "Find and Link the Offis library." ON)
+OPTION(MAF_USE_OFFIS "Find and Link the Offis library." ON)
 IF (${CMAKE_GENERATOR} STREQUAL "Visual Studio 9 2008" OR ${CMAKE_GENERATOR} STREQUAL "Visual Studio 10" OR ${CMAKE_GENERATOR} STREQUAL "Visual Studio 10 Win64")
-  OPTION(MED_USE_BTK "Find and Link the BTK library." ON)
+  OPTION(MAF_USE_BTK "Find and Link the BTK library." ON)
 ELSE (${CMAKE_GENERATOR} STREQUAL "Visual Studio 9 2008" OR ${CMAKE_GENERATOR} STREQUAL "Visual Studio 10" OR ${CMAKE_GENERATOR} STREQUAL "Visual Studio 10 Win64")
-  SET(MED_USE_BTK OFF)
+  SET(MAF_USE_BTK OFF)
 ENDIF (${CMAKE_GENERATOR} STREQUAL "Visual Studio 9 2008" OR ${CMAKE_GENERATOR} STREQUAL "Visual Studio 10" OR ${CMAKE_GENERATOR} STREQUAL "Visual Studio 10 Win64")
 
 #
@@ -100,16 +100,16 @@ ENDIF(MAF_USE_CRYPTO)
 #
 # Offis Library
 #
-IF (MED_USE_Offis)
+IF (MAF_USE_OFFIS)
   MFL_SUBPROJECT(Offis Offis)
-ENDIF(MED_USE_Offis)
+ENDIF(MAF_USE_OFFIS)
 
 #
 # BTK Library
 #
-IF (MED_USE_BTK)
+IF (MAF_USE_BTK)
   MFL_SUBPROJECT(BTK BTK)
-ENDIF(MED_USE_BTK)
+ENDIF(MAF_USE_BTK)
 
 #
 # wxMozilla Library

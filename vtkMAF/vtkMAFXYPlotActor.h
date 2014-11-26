@@ -17,7 +17,7 @@
 #ifndef __vtkMAFXYPlotActor_h
 #define __vtkMAFXYPlotActor_h
 
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 
 #define VTK_XYPLOT_INDEX                 0
 #define VTK_XYPLOT_ARC_LENGTH            1
@@ -52,7 +52,7 @@ class vtkTextProperty;
     The original vtk class have some problems when a line intersect the render area, but both
     ending points are outside that area. In this case the original class will render bad lines.
 */
-class VTK_vtkMAF_EXPORT vtkMAFXYPlotActor : public vtkActor2D
+class MAF_EXPORT vtkMAFXYPlotActor : public vtkActor2D
 {
 public:
   vtkTypeRevisionMacro(vtkMAFXYPlotActor,vtkActor2D);

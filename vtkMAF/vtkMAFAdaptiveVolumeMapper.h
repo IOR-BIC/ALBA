@@ -82,7 +82,7 @@ namespace vtkMAFAdaptiveVolumeMapperNamespace
 //------------------------------------------------------------------------------
 // Includes:
 //------------------------------------------------------------------------------
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 
 //------------------------------------------------------------------------------
 // forward declarations
@@ -92,7 +92,7 @@ class vtkVolumeProperty;
 /**
 class name: vtkMAFAdaptiveVolumeMapper.
 */
-class VTK_vtkMAF_EXPORT vtkMAFAdaptiveVolumeMapper : public vtkVolumeMapper 
+class MAF_EXPORT vtkMAFAdaptiveVolumeMapper : public vtkVolumeMapper 
 {
 public:
   /** create an instance of the object */

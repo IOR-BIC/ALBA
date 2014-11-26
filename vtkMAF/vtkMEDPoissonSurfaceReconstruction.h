@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 #include "vtkPolyData.h"
 #include "vtkCellArray.h"
 #include "vtkPointData.h"
@@ -42,7 +42,7 @@ class name: vtkMEDPoissonSurfaceReconstruction
 This class implement Poisson Surface Reconstruction method.
 A paper can be viewed here: research.microsoft.com/en-us/um/people/hoppe/poissonrecon.pdf
 */
-class VTK_vtkMAF_EXPORT vtkMEDPoissonSurfaceReconstruction : public vtkDataSetToPolyDataFilter
+class MAF_EXPORT vtkMEDPoissonSurfaceReconstruction : public vtkDataSetToPolyDataFilter
 {
 public:
   /** create instance of the object */
@@ -717,7 +717,7 @@ public:
 class name: TriangulationEdge
 Edge created by triangulation
 */
-class VTK_vtkMAF_EXPORT TriangulationEdge
+class MAF_EXPORT TriangulationEdge
 {
 public:
   /** Constructor. */
@@ -730,7 +730,7 @@ public:
 class name: TriangulationTriangle
 Triangle created by triangulation
 */
-class VTK_vtkMAF_EXPORT TriangulationTriangle
+class MAF_EXPORT TriangulationTriangle
 {
 public:
   /** Constructor. */
@@ -1450,7 +1450,7 @@ Octrees are most often used to partition a three dimensional space by recursivel
 Octrees are the three-dimensional analog of quadtrees.
 */
 template<class NodeData,class Real=float>
-class VTK_vtkMAF_EXPORT OctNode
+class MAF_EXPORT OctNode
 {
 private:
 	static int UseAlloc;
@@ -1770,7 +1770,7 @@ public:
 	static long long CenterIndex(const TreeOctNode* node,const int& maxDepth);
 };
 /** class name: SortedTreeNodes */
-class VTK_vtkMAF_EXPORT SortedTreeNodes{
+class MAF_EXPORT SortedTreeNodes{
 public:
 	TreeOctNode** treeNodes;
 	int *nodeCount;
@@ -1785,7 +1785,7 @@ public:
 /** class name: TreeNodeData
     index, weight and values associated with every tree node
 */
-class VTK_vtkMAF_EXPORT TreeNodeData{
+class MAF_EXPORT TreeNodeData{
 public:
 	static int UseIndex;
 	union{

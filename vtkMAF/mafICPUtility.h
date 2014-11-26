@@ -23,7 +23,7 @@
 //system includes
 #include <fstream>
 
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 
 #include "vtkObject.h"
 
@@ -44,7 +44,7 @@
   class name: mafICPUtility
   Implementation of the ICP algorithm utility.
 */
-class VTK_vtkMAF_EXPORT mafICPUtility : public vtkObject
+class MAF_EXPORT mafICPUtility : public vtkObject
 {
 public:
   static mafICPUtility *New();

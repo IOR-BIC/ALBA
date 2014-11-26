@@ -29,7 +29,7 @@ class vtkGenericCell;
 class vtkIdList;
 class vtkMAFLargeDataProvider;
 
-class VTK_vtkMAF_EXPORT vtkMAFLargeDataSet : public vtkDataObject
+class MAF_EXPORT vtkMAFLargeDataSet : public vtkDataObject
 {
 public:
 	vtkTypeRevisionMacro(vtkMAFLargeDataSet,vtkDataObject);

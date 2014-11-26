@@ -20,13 +20,13 @@
 #ifndef __vtkMEDImageUnsharpFilter_h
 #define __vtkMEDImageUnsharpFilter_h
 
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 #include "vtkImageToImageFilter.h"
 /**
 class name : vtkMEDImageUnsharpFilter.
 Filter for applying unsharp to an image
 */
-class VTK_vtkMAF_EXPORT vtkMEDImageUnsharpFilter : public vtkImageToImageFilter
+class MAF_EXPORT vtkMEDImageUnsharpFilter : public vtkImageToImageFilter
 {
 public:
   /** RTTI macro*/

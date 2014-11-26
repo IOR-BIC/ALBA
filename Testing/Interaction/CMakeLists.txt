@@ -110,6 +110,20 @@ IF (WIN32)
   SET_TARGET_PROPERTIES(mafGizmoRotateTest PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)
 
+############ mafGizmoSliceTest
+ADD_EXECUTABLE(mafGizmoSliceTest mafGizmoSliceTest.h mafGizmoSliceTest.cpp)
+ADD_TEST(mafGizmoSliceTest  ${EXECUTABLE_OUTPUT_PATH}/mafGizmoSliceTest)
+IF (WIN32)
+  SET_TARGET_PROPERTIES(mafGizmoSliceTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
+
+############ medGizmoInteractionDebuggerTest
+ADD_EXECUTABLE(medGizmoInteractionDebuggerTest  medGizmoInteractionDebuggerTest.h medGizmoInteractionDebuggerTest.cpp)
+ADD_TEST(medGizmoInteractionDebuggerTest   ${EXECUTABLE_OUTPUT_PATH}/medGizmoInteractionDebuggerTest )
+IF (WIN32)
+  SET_TARGET_PROPERTIES(medGizmoInteractionDebuggerTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
+
 ############ mafGizmoInterfaceTest
 ADD_EXECUTABLE(mafGizmoInterfaceTest mafGizmoInterfaceTest.h mafGizmoInterfaceTest.cpp)
 ADD_TEST(mafGizmoInterfaceTest ${EXECUTABLE_OUTPUT_PATH}/mafGizmoInterfaceTest)

@@ -35,10 +35,10 @@
 #include "vtkPolyData.h"
 #include "vtkMath.h"
 #include "vtkPolygon.h"
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 //#include "vtkSVTKWin32Header.h"
 
-class VTK_vtkMAF_EXPORT vtkMaskPolyDataFilter : public vtkDataSetToDataSetFilter
+class MAF_EXPORT vtkMaskPolyDataFilter : public vtkDataSetToDataSetFilter
 {
 public:
   

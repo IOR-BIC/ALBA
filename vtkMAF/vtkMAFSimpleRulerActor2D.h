@@ -36,7 +36,7 @@
 
 #define DEFAULT_GRID_COLOR 0.5
 
-#include "vtkMAFConfigure.h" //??
+#include "mafConfigure.h" 
 
 #include "vtkActor.h"
 #include "vtkActor2D.h"
@@ -52,7 +52,7 @@ Camera must be in ParallelProjection and aligned with world axis
 */
 
 //-----------------------------------------------------------------------------
-class VTK_vtkMAF_EXPORT vtkMAFSimpleRulerActor2D : public vtkActor2D
+class MAF_EXPORT vtkMAFSimpleRulerActor2D : public vtkActor2D
 //-----------------------------------------------------------------------------
 {
  public:

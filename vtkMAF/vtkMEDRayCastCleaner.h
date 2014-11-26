@@ -17,7 +17,7 @@
 #ifndef __vtkMEDRayCastCleaner_H__
 #define __vtkMEDRayCastCleaner_H__
 
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 #include "vtkStructuredPointsToStructuredPointsFilter.h"
 
 class vtkImageData;
@@ -34,7 +34,7 @@ if a blood voxel is in bone boundary the corresponding scalar output contains th
 the effect of this filter is like a bone sanding.
 */
 //---------------------------------------------------------------------------
-class VTK_vtkMAF_EXPORT vtkMEDRayCastCleaner : public vtkStructuredPointsToStructuredPointsFilter
+class MAF_EXPORT vtkMEDRayCastCleaner : public vtkStructuredPointsToStructuredPointsFilter
 //---------------------------------------------------------------------------
 {
 public:

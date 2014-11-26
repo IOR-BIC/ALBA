@@ -27,7 +27,7 @@ under MAF (www.openmaf.org)
 #ifndef __vtkBoundingBox_h
 #define __vtkBoundingBox_h
 #include "vtkSystemIncludes.h"
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 /**
 class name: vtkBoundingBox.
 Fast Simple Class for dealing with 3D bounds.
@@ -35,7 +35,7 @@ vtkBoundingBox maintains a 3D axis aligned bounding box.  It is very
 lite weight and many of the member functions are in-lined so its very fast
 It is not derived from vtkObject so it can be allocated on the stack
 */
-class VTK_vtkMAF_EXPORT vtkBoundingBox 
+class MAF_EXPORT vtkBoundingBox 
 {
 public:
   // Description:

@@ -17,7 +17,7 @@ under _WIN32 (although they are supported for _WIN64)
 #ifndef vtkMAFFile_h__
 #define vtkMAFFile_h__
 
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 
 #include <stdio.h>
 #include <errno.h>
@@ -30,7 +30,7 @@ under _WIN32 (although they are supported for _WIN64)
 #pragma once
 
 //This is nothrow version
-class VTK_vtkMAF_EXPORT vtkMAFFile : public vtkObject
+class MAF_EXPORT vtkMAFFile : public vtkObject
 {
 protected:
 #ifdef _WIN32
@@ -181,7 +181,7 @@ inline long long vtkMAFFile::GetCurrentPos() throw(...)
 
 
 //This class is vtkMAFFile that throws exceptions when something goes wrong  
-class VTK_vtkMAF_EXPORT vtkMAFFile2 : public vtkMAFFile
+class MAF_EXPORT vtkMAFFile2 : public vtkMAFFile
 {
 public:
   vtkTypeRevisionMacro(vtkMAFFile2, vtkMAFFile);

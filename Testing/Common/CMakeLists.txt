@@ -10,9 +10,6 @@ ENDIF(MAF_BUILD_MAFDLL)
 # tests using cppunit testing framework
 #----------------------------------------------------------------------------
 
-ADD_EXECUTABLE(mafDataChecksumTest mafDataChecksumTest.h mafDataChecksumTest.cpp)
-ADD_TEST(mafDataChecksumTest  ${EXECUTABLE_OUTPUT_PATH}/mafDataChecksumTest)
-
 ADD_EXECUTABLE(medQueryObjectTest medQueryObjectTest.h medQueryObjectTest.cpp)
 ADD_TEST(medQueryObjectTest  ${EXECUTABLE_OUTPUT_PATH}/medQueryObjectTest)
 
@@ -25,20 +22,11 @@ ADD_TEST(medRelationalDatabaseAbstractConnectorTest  ${EXECUTABLE_OUTPUT_PATH}/m
 ADD_EXECUTABLE(medCurvilinearAbscissaOnSkeletonHelperTest medCurvilinearAbscissaOnSkeletonHelperTest.h medCurvilinearAbscissaOnSkeletonHelperTest.cpp)
 ADD_TEST(medCurvilinearAbscissaOnSkeletonHelperTest  ${EXECUTABLE_OUTPUT_PATH}/medCurvilinearAbscissaOnSkeletonHelperTest)
 
-ADD_EXECUTABLE(mafGizmoSliceTest mafGizmoSliceTest.h mafGizmoSliceTest.cpp)
-ADD_TEST(mafGizmoSliceTest  ${EXECUTABLE_OUTPUT_PATH}/mafGizmoSliceTest)
-
-ADD_EXECUTABLE(medGizmoInteractionDebuggerTest  medGizmoInteractionDebuggerTest.h medGizmoInteractionDebuggerTest.cpp)
-ADD_TEST(medGizmoInteractionDebuggerTest   ${EXECUTABLE_OUTPUT_PATH}/medGizmoInteractionDebuggerTest )
-
 ADD_EXECUTABLE(medHTMLTemplateParserTest  medHTMLTemplateParserTest.h medHTMLTemplateParserTest.cpp)
 ADD_TEST(medHTMLTemplateParserTest   ${EXECUTABLE_OUTPUT_PATH}/medHTMLTemplateParserTest )
 
 ADD_EXECUTABLE(medHTMLTemplateParserBlockTest  medHTMLTemplateParserBlockTest.h medHTMLTemplateParserBlockTest.cpp)
 ADD_TEST(medHTMLTemplateParserBlockTest   ${EXECUTABLE_OUTPUT_PATH}/medHTMLTemplateParserBlockTest )
-
-ADD_EXECUTABLE(medVect3dTest  medVect3dTest.h medVect3dTest.cpp)
-ADD_TEST(medVect3dTest   ${EXECUTABLE_OUTPUT_PATH}/medVect3dTest )
 
 ADD_EXECUTABLE(medWizardBlockInformationTest  medWizardBlockInformationTest.cpp  medWizardBlockInformationTest.h)
 ADD_TEST(medWizardBlockInformationTest   ${EXECUTABLE_OUTPUT_PATH}/medWizardBlockInformationTest )

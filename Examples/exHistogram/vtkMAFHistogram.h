@@ -29,7 +29,7 @@
 
 #define DEFAULT_HISTOGRAM_COLOR 0.5
 
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 #include "vtkActor2D.h"
 #include "vtkImageData.h"
 

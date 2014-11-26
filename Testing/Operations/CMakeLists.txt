@@ -488,7 +488,7 @@ ADD_EXECUTABLE(medOpExtractGeometryTest medOpExtractGeometryTest.h medOpExtractG
 ADD_TEST(medOpExtractGeometryTest ${EXECUTABLE_OUTPUT_PATH}/medOpExtractGeometryTest)
 
 
-IF (MED_USE_Offis)
+IF (MAF_USE_OFFIS)
 
 ADD_EXECUTABLE(medOpImporterDicomOffisTest medOpImporterDicomOffisTest.h medOpImporterDicomOffisTest.cpp)
 ADD_TEST(medOpImporterDicomOffisTest ${EXECUTABLE_OUTPUT_PATH}/medOpImporterDicomOffisTest)
@@ -497,7 +497,7 @@ ADD_TEST(medOpImporterDicomOffisTest ${EXECUTABLE_OUTPUT_PATH}/medOpImporterDico
 ADD_EXECUTABLE(medDicomCardiacMRIHelperTest medDicomCardiacMRIHelperTest.h medDicomCardiacMRIHelperTest.cpp)
 ADD_TEST(medDicomCardiacMRIHelperTest ${EXECUTABLE_OUTPUT_PATH}/medDicomCardiacMRIHelperTest)
 
-ENDIF (MED_USE_Offis)
+ENDIF (MAF_USE_OFFIS)
 
 ADD_EXECUTABLE(itkRawMotionImporterUtilityTest itkRawMotionImporterUtilityTest.h itkRawMotionImporterUtilityTest.cpp)
 ADD_TEST(itkRawMotionImporterUtilityTest ${EXECUTABLE_OUTPUT_PATH}/itkRawMotionImporterUtilityTest)

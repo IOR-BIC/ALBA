@@ -31,7 +31,7 @@
 #ifndef __vtkMAFVolumeSlicer_BES_h
 #define __vtkMAFVolumeSlicer_BES_h
 
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 #include "vtkDataSetToDataSetFilter.h"
 #include "vtkImageData.h"
 #include "vtkPolyData.h"
@@ -51,7 +51,7 @@ class mafGPUOGL;
 #endif
 
 
-class VTK_vtkMAF_EXPORT vtkMAFVolumeSlicer_BES : public vtkDataSetToDataSetFilter {
+class MAF_EXPORT vtkMAFVolumeSlicer_BES : public vtkDataSetToDataSetFilter {
 public:
   static vtkMAFVolumeSlicer_BES *New();
   vtkTypeRevisionMacro(vtkMAFVolumeSlicer_BES, vtkDataSetToDataSetFilter);

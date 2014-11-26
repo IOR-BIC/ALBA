@@ -31,7 +31,7 @@ University of Bedfordshire
 //
 // Version: Nigel McFarlane 6.3.14
 //------------------------------------------------------------------------------
-class VTK_vtkMAF_EXPORT vtkMEDLandmarkCloudPolydataFilter : public vtkPolyDataToPolyDataFilter 
+class MAF_EXPORT vtkMEDLandmarkCloudPolydataFilter : public vtkPolyDataToPolyDataFilter 
 {
 public:
   void PrintSelf(ostream& os, vtkIndent indent) const {}

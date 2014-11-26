@@ -21,7 +21,7 @@
 #include "vtkPolyDataToPolyDataFilter.h"
 #include "vtkPolyData.h"
 #include "vtkMatrix4x4.h"
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 #include <iostream>
 
 
@@ -30,7 +30,7 @@
 /// Extrusion filter based on vtkLinearExtrusionFilter. \n
 /// This creates an extrusion terminating in a circle.
 //------------------------------------------------------------------------------
-class VTK_vtkMAF_EXPORT vtkMEDExtrudeToCircle : public vtkPolyDataToPolyDataFilter
+class MAF_EXPORT vtkMEDExtrudeToCircle : public vtkPolyDataToPolyDataFilter
 {
 public:
   //----------------------------------------------------------------------------

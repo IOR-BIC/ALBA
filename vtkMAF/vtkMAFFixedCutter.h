@@ -17,14 +17,14 @@
 #ifndef __vtkMAFFixedCutter_h
 #define __vtkMAFFixedCutter_h
 
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 #include "vtkCutter.h"
 /**
 class name:  vtkMAFFixedCutter
 specialization of vtkCutter in which after execution if the number of points is zero, it will added one point
 that is the center of the input.
 */
-class VTK_vtkMAF_EXPORT vtkMAFFixedCutter : public vtkCutter
+class MAF_EXPORT vtkMAFFixedCutter : public vtkCutter
 {
 public:
   vtkTypeRevisionMacro(vtkMAFFixedCutter,vtkCutter);

@@ -13,7 +13,7 @@ University of Bedfordshire, UK
 #ifndef __medVMEStentModelSource_h 
 #define __medVMEStentModelSource_h
 
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 #include "itkSimplexMesh.h"
 #include "itkDefaultDynamicMeshTraits.h"
 #include "itkSimplexMeshToTriangleMeshFilter.h"
@@ -45,7 +45,7 @@ University of Bedfordshire, UK
 * the control mesh have two more circles of vertices  in each side than the stent.
 *---------------------------------------
 */
-class VTK_vtkMAF_EXPORT vtkMEDStentModelSource
+class MAF_EXPORT vtkMEDStentModelSource
 {
 
 public:

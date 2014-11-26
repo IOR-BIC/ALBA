@@ -17,7 +17,7 @@
 #ifndef __vtkMEDImageFillHolesRemoveIslands_H__
 #define __vtkMEDImageFillHolesRemoveIslands_H__
 
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 #include "vtkStructuredPointsToStructuredPointsFilter.h"
 
 class vtkImageData;
@@ -31,7 +31,7 @@ vtkMEDImageFillHolesRemoveIslands is a vtkStructuredPointsToStructuredPointsFilt
 that must be a binary image represented by a vtkUCharArray with values of 0 or 255 only.
 */
 //---------------------------------------------------------------------------
-class VTK_vtkMAF_EXPORT vtkMEDImageFillHolesRemoveIslands : public vtkStructuredPointsToStructuredPointsFilter
+class MAF_EXPORT vtkMEDImageFillHolesRemoveIslands : public vtkStructuredPointsToStructuredPointsFilter
 //---------------------------------------------------------------------------
 {
 public:

@@ -17,7 +17,7 @@
 #ifndef __vtkMEDVolumeToClosedSmoothSurface_H__
 #define __vtkMEDVolumeToClosedSmoothSurface_H__
 
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 #include "vtkMAFContourVolumeMapper.h"
 #include "vtkMatrix4x4.h"
 class vtkImageData;
@@ -32,7 +32,7 @@ This method does NOT use a fill holes procedure (witch is really slow) and creat
 whit an 1-voxel border of the input volume to obtain the same effect of fill holes in a faster way
 */
 //---------------------------------------------------------------------------
-class VTK_vtkMAF_EXPORT vtkMEDVolumeToClosedSmoothSurface : public vtkMAFContourVolumeMapper
+class MAF_EXPORT vtkMEDVolumeToClosedSmoothSurface : public vtkMAFContourVolumeMapper
 //---------------------------------------------------------------------------
 {
 public:

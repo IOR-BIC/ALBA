@@ -34,9 +34,9 @@ under MAF (www.openmaf.org)
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 #include "vtkImplicitFunction.h"
-#include "vtkMAFConfigure.h"
+
 
 //----------------------------------------------------------------------------
 // Forward declarations:
@@ -46,7 +46,7 @@ class vtkBoundingBox;
 class name: vtkBox.
 Optimized box ,which intersect method taken from Graphic Gems vol I.
 */
-class VTK_vtkMAF_EXPORT vtkBox : public vtkImplicitFunction
+class MAF_EXPORT vtkBox : public vtkImplicitFunction
 {
 public:
   /** RTTI macro */

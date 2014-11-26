@@ -37,7 +37,7 @@
 //------------------------------------------------------------------------------
 // Includes:
 //------------------------------------------------------------------------------
-#include "vtkMAFConfigure.h" //??
+#include "mafConfigure.h" 
 #include "vtkActor.h"
 #include "vtkActor2D.h"
 #include "vtkTextActor.h"
@@ -55,7 +55,7 @@ class vtkMAFTextActorMeter:
   Camera must be in ParallelProjection and aligned with world axis.
 */
 //-----------------------------------------------------------------------------
-class VTK_vtkMAF_EXPORT vtkMAFTextActorMeter : public vtkActor2D
+class MAF_EXPORT vtkMAFTextActorMeter : public vtkActor2D
 //-----------------------------------------------------------------------------
 {
  public:

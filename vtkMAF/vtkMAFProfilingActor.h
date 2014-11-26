@@ -34,7 +34,7 @@
 #ifndef __vtkMAFProfilingActor_h
 #define __vtkMAFProfilingActor_h
 
-#include "vtkMAFConfigure.h" //??
+#include "mafConfigure.h" 
 
 
 #include "vtkTextActor.h"
@@ -49,7 +49,7 @@ class name: vtkMAFProfilingActor
 an actor displaying the frame per second value and the time elapsed between
 last render and previous render.
 */
-class VTK_vtkMAF_EXPORT vtkMAFProfilingActor : public vtkActor2D
+class MAF_EXPORT vtkMAFProfilingActor : public vtkActor2D
 {
  public:
   /** RTTI Macro */

@@ -20,7 +20,7 @@
 #ifndef __vtkMAFCellsFilter_h
 #define __vtkMAFCellsFilter_h
 
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 #include "vtkPolyDataToPolyDataFilter.h"
 #include "vtkIdList.h"
 #include "vtkCharArray.h"
@@ -37,7 +37,7 @@ class name : vtkMAFCellsFilter.
  @sa
  vtkMAFRemoveCellsFilter
 */ 
-class VTK_vtkMAF_EXPORT vtkMAFCellsFilter : public vtkPolyDataToPolyDataFilter
+class MAF_EXPORT vtkMAFCellsFilter : public vtkPolyDataToPolyDataFilter
 {
 
 public:

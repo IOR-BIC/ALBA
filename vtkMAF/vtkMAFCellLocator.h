@@ -16,16 +16,16 @@
 #ifndef vtkMAFCellLocator_h__
 #define vtkMAFCellLocator_h__
 
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 #include "vtkCellLocator.h"
-#include "vtkMAFConfigure.h"
+
 
 /**
     class name: vtkMAFCellLocator
     Spatial search object to quickly locate cells in 3D.
 */
 
-class VTK_vtkMAF_EXPORT vtkMAFCellLocator : public vtkCellLocator
+class MAF_EXPORT vtkMAFCellLocator : public vtkCellLocator
 {
 
 public:

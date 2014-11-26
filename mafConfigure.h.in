@@ -39,8 +39,8 @@
 #cmakedefine MAF_USE_CRYPTO
 #cmakedefine MAF_USE_CURL
 #cmakedefine MAF_USE_WXMOZILLA
-#cmakedefine MED_USE_BTK
-#cmakedefine MED_USE_Offis
+#cmakedefine MAF_USE_BTK
+#cmakedefine MAF_USE_OFFIS
 // special defined for mafInteraction modules
 #cmakedefine MAF_USE_P5_GLOVE
 #cmakedefine MAF_USE_WIIMOTE

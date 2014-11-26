@@ -17,7 +17,7 @@
 #ifndef __vtkMEDPastValuesList_h
 #define __vtkMEDPastValuesList_h
 
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 #include <ostream>
 
 
@@ -28,7 +28,7 @@ It is a push-only stack with a maxiumum of n values.
 Values are pushed onto the top of the list.  
 Values which fall of the bottom of the list are lost 
 */
-class VTK_vtkMAF_EXPORT vtkMEDPastValuesList
+class MAF_EXPORT vtkMEDPastValuesList
 {
 public:
   /** construct class with max no. of past values */

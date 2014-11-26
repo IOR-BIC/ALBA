@@ -18,13 +18,13 @@
 #ifndef vtkMAFVolumeRayCastMapper_h__
 #define vtkMAFVolumeRayCastMapper_h__
 
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 #include "vtkOpenGLVolumeRayCastMapper.h"
 
 class vtkRenderer;
 class vtkVolume;
 
-class VTK_vtkMAF_EXPORT vtkMAFVolumeRayCastMapper : public vtkOpenGLVolumeRayCastMapper
+class MAF_EXPORT vtkMAFVolumeRayCastMapper : public vtkOpenGLVolumeRayCastMapper
 {
 protected:
   unsigned long LastCheckSum;   //<Here is stored CheckSum used to detect if Casting needs to be reexecuted

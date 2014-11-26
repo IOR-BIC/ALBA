@@ -21,7 +21,7 @@
 // Include :
 //----------------------------------------------------------------------------
 #include "vtkObject.h"
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -34,7 +34,7 @@ class vtkPolyData;
     qualityLocal = 2.0 * sqrt(3.0)/0.5 * perimeter * longestEdge / area;
     and assign each value as a scalar to the correspondent triangle.
 */
-class VTK_vtkMAF_EXPORT vtkTriangleQualityRatio : public vtkObject 
+class MAF_EXPORT vtkTriangleQualityRatio : public vtkObject 
 {
 
 public:

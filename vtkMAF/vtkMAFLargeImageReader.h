@@ -16,10 +16,10 @@
 
 #pragma warning(disable: 4068)	//VS2003 does not support regions
 
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 #include "vtkMAFLargeImageSource.h"
 
-class VTK_vtkMAF_EXPORT vtkMAFLargeImageReader : public vtkMAFLargeImageSource
+class MAF_EXPORT vtkMAFLargeImageReader : public vtkMAFLargeImageSource
 {
 protected:
 	//Sample rate (in x,y and z) denotes the quality of the snapshot on output

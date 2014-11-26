@@ -61,7 +61,7 @@ Then Render()
 #include <GL/gl.h>
 #endif
 
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 
 //------------------------------------------------------------------------------
 // Forward declarations
@@ -73,7 +73,7 @@ class ListOfPolyline2DAdv;
 /**
 class name: vtkMAFContourVolumeMapperAdv.
 */
-class VTK_vtkMAF_EXPORT vtkMAFContourVolumeMapperAdv : public vtkMAFContourVolumeMapper 
+class MAF_EXPORT vtkMAFContourVolumeMapperAdv : public vtkMAFContourVolumeMapper 
 {
 public:
   /** create an instance of the object */

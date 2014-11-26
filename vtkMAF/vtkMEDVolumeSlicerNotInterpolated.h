@@ -18,7 +18,7 @@
 #define __vtkMEDVolumeSlicerNotInterpolated_H__
 
 #include "vtkImageData.h"
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 #include "vtkDataSetToImageFilter.h"
 #include "vtkRectilinearGrid.h"
 
@@ -27,7 +27,7 @@
 class vtkDoubleArray;
 
 //----------------------------------------------------------------------------
-class VTK_vtkMAF_EXPORT vtkMEDVolumeSlicerNotInterpolated : public vtkDataSetToImageFilter
+class MAF_EXPORT vtkMEDVolumeSlicerNotInterpolated : public vtkDataSetToImageFilter
 //----------------------------------------------------------------------------
 {
 public:

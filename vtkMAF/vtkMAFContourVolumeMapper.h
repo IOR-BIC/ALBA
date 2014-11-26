@@ -62,7 +62,7 @@ Then Render()
 #include <GL/gl.h>
 #endif
 
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 
 //------------------------------------------------------------------------------
 // Forward declarations
@@ -133,7 +133,7 @@ using namespace vtkMAFContourVolumeMapperNamespace ;
 /**
 class name: vtkMAFContourVolumeMapper.
 */
-class VTK_vtkMAF_EXPORT vtkMAFContourVolumeMapper : public vtkVolumeMapper 
+class MAF_EXPORT vtkMAFContourVolumeMapper : public vtkVolumeMapper 
 {
 public:
   /** create an instance of the object */

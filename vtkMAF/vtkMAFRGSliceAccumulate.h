@@ -51,13 +51,13 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include <memory.h>
 
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 #include <vtkRectilinearGridSource.h>
 #include "vtkRectilinearGrid.h"
 #include <vtkStructuredPoints.h>
 #include <vtkImageData.h>
 
-class VTK_vtkMAF_EXPORT vtkMAFRGSliceAccumulate : public vtkRectilinearGridSource
+class MAF_EXPORT vtkMAFRGSliceAccumulate : public vtkRectilinearGridSource
 {
 public:
   vtkTypeRevisionMacro(vtkMAFRGSliceAccumulate,vtkRectilinearGridSource);

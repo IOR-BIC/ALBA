@@ -20,13 +20,13 @@ under MAF (www.openmaf.org)
 #define __vtkHoleConnectivity_h
 
 #include "vtkPolyDataToPolyDataFilter.h"
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 /**
   class name: vtkHoleConnectivity
   This filter uses vtkPolyDataConnectivityFilter in order to extract the Closest Point Region
   after pass it the coordinates of the point.
 */
-class VTK_vtkMAF_EXPORT vtkHoleConnectivity : public vtkPolyDataToPolyDataFilter
+class MAF_EXPORT vtkHoleConnectivity : public vtkPolyDataToPolyDataFilter
 {
 public:
 

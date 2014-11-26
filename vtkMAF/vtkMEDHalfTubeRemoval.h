@@ -14,7 +14,7 @@ University of Bedfordshire
 #ifndef __vtkMEDHalfTubeRemoval_h
 #define __vtkMEDHalfTubeRemoval_h
 
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 #include "vtkPolyDataToPolyDataFilter.h"
 #include "vtkPolyData.h"
 #include "vtkMEDPolyDataNavigator.h"
@@ -33,7 +33,7 @@ University of Bedfordshire
 //
 // Version 5.12.13
 //------------------------------------------------------------------------------
-class VTK_vtkMAF_EXPORT vtkMEDHalfTubeRemoval : public vtkPolyDataToPolyDataFilter
+class MAF_EXPORT vtkMEDHalfTubeRemoval : public vtkPolyDataToPolyDataFilter
 {
 public:
   vtkTypeRevisionMacro(vtkMEDHalfTubeRemoval,vtkPolyDataToPolyDataFilter);

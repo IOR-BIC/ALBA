@@ -14,7 +14,7 @@ University of Bedfordshire
 #ifndef __vtkMEDSubdividePolylines_h
 #define __vtkMEDSubdividePolylines_h
 
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 #include "vtkPolyDataToPolyDataFilter.h"
 #include "vtkPolyData.h"
 #include "vtkMEDPolyDataNavigator.h"
@@ -34,7 +34,7 @@ University of Bedfordshire
 //
 // Version 19.2.14
 //------------------------------------------------------------------------------
-class VTK_vtkMAF_EXPORT vtkMEDSubdividePolylines : public vtkPolyDataToPolyDataFilter
+class MAF_EXPORT vtkMEDSubdividePolylines : public vtkPolyDataToPolyDataFilter
 {
 public:
   vtkTypeRevisionMacro(vtkMEDSubdividePolylines,vtkPolyDataToPolyDataFilter);

@@ -17,10 +17,10 @@
 #ifndef __vtkMAFPolyDataToSinglePolyLine_h
 #define __vtkMAFPolyDataToSinglePolyLine_h
 
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 #include "vtkPolyDataToPolyDataFilter.h"
 //----------------------------------------------------------------------------
-class VTK_vtkMAF_EXPORT vtkMAFPolyDataToSinglePolyLine : public vtkPolyDataToPolyDataFilter
+class MAF_EXPORT vtkMAFPolyDataToSinglePolyLine : public vtkPolyDataToPolyDataFilter
 //----------------------------------------------------------------------------
 {
 public:

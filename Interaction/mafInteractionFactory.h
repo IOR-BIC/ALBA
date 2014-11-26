@@ -19,7 +19,7 @@
 // includes :
 //----------------------------------------------------------------------------
 #include "mafObjectFactory.h"
-#include "mafInteractionConfigure.h"
+#include "mafConfigure.h"
 #include <set>
 
 /** to be used internally for plugging default devices --- calls a member function directly */

@@ -267,7 +267,7 @@ IF (MAF_USE_VTK)
   )
 ENDIF (MAF_USE_VTK)
 
-IF (MED_USE_Offis)
+IF (MAF_USE_OFFIS)
 SET(PROJECT_SRCS ${PROJECT_SRCS}
     medOpImporterDicomOffis.h
     medOpImporterDicomOffis.cpp
@@ -275,7 +275,7 @@ SET(PROJECT_SRCS ${PROJECT_SRCS}
     medDicomCardiacMRIHelper.cpp
     medDicomCardiacMRIHelper.h
    )
-ENDIF (MED_USE_Offis)
+ENDIF (MAF_USE_OFFIS)
 
 IF (MAF_USE_ITK)
   SET(PROJECT_SRCS

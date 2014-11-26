@@ -29,7 +29,7 @@ class vtkTimeStamp;
 
 #pragma warning(disable: 4068)	//Unknown pragma: VC 2003 does not support regions
 
-class VTK_vtkMAF_EXPORT vtkMAFLargeDataProvider : public vtkObject
+class MAF_EXPORT vtkMAFLargeDataProvider : public vtkObject
 {	
 protected:
   //Data Array Layout Descriptor

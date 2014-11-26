@@ -22,7 +22,7 @@
 // includes:
 //---------------------------------------------
 #include "vtkUnstructuredGridToPolyDataFilter.h"
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 #include "assert.h"
 #include <vector>
 #include <map>
@@ -57,7 +57,7 @@ edges cut by the plane, although their endpoints are.
 3) No cells of lower order than triangles are created.
 Therefore if the plane cuts exactly through an isolated edge or vertex, the output
 polydata will contain the points, but no cell will be created.*/
-class VTK_vtkMAF_EXPORT vtkMAFMeshCutter_BES : public vtkUnstructuredGridToPolyDataFilter
+class MAF_EXPORT vtkMAFMeshCutter_BES : public vtkUnstructuredGridToPolyDataFilter
 {
 public:
   /** RTTI macro*/

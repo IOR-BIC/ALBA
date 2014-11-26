@@ -9,7 +9,7 @@
 #ifndef __vtkWeightedLandmarkTransform_h
 #define __vtkWeightedLandmarkTransform_h
 
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 #include "vtkLandmarkTransform.h"
 
 
@@ -20,7 +20,7 @@
     class name: vtkWeightedLandmarkTransform
     It handle landmark transform using weights which be associated to each landmark.
  */  
-class VTK_vtkMAF_EXPORT vtkWeightedLandmarkTransform : public vtkLandmarkTransform
+class MAF_EXPORT vtkWeightedLandmarkTransform : public vtkLandmarkTransform
 {
 public:
   /** construct the object */
