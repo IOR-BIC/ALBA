@@ -9,27 +9,27 @@ SET(PROJECT_SRCS
 
   itkRawMotionImporterUtility.cxx
   itkRawMotionImporterUtility.h
-  medGUIContextualMenu.cpp
-  medGUIContextualMenu.h
+  #medGUIContextualMenu.cpp
+  #medGUIContextualMenu.h
   mafPolylineGraph.cpp
   mafPolylineGraph.h
-  mafGizmoSlice.cpp
-  mafGizmoSlice.h
-  mmiInfoImage.cpp
-  mmiInfoImage.h
-  mmiSelectPoint.cpp
-  mmiSelectPoint.h
-  medLogicWithManagers.cpp
-  medLogicWithManagers.h
+  #mafGizmoSlice.cpp
+  #mafGizmoSlice.h
+  #mmiInfoImage.cpp
+  #mmiInfoImage.h
+  #mmiSelectPoint.cpp
+  #mmiSelectPoint.h
+  #medLogicWithManagers.cpp
+  #medLogicWithManagers.h
   
 
   # medGeometryEditorPolylineGraph.cpp
   # medGeometryEditorPolylineGraph.h
-  medDecl.h
+  #medDecl.h
   medCurvilinearAbscissaOnSkeletonHelper.cpp
   medCurvilinearAbscissaOnSkeletonHelper.h
-  medGizmoInteractionDebugger.cpp
-  medGizmoInteractionDebugger.h
+  #medGizmoInteractionDebugger.cpp
+  #medGizmoInteractionDebugger.h
 
   medRelationalDatabaseAbstractConnector.cpp
   medRelationalDatabaseAbstractConnector.h
@@ -44,8 +44,8 @@ SET(PROJECT_SRCS
   medHTMLTemplateParserBlock.cpp
   medHTMLTemplateParserBlock.h
   
-  medVect3d.cpp
-  medVect3d.h
+  #medVect3d.cpp
+  #medVect3d.h
   
   medWizardBlock.cpp
   medWizardBlock.h
@@ -87,13 +87,13 @@ SET(PROJECT_SRCS
   medWizardSettings.h
   
   #### SHOULD BE COMMITTED DOWN ######
-  mafDbg.h
-  mafDataChecksum.h
+  #mafDbg.h
+  #mafDataChecksum.h
   ##################################
 	
   #Removed from vtkMED because it need of MAF Utilities
-  vtkMAFLargeDataSetCallback.cxx
-  vtkMAFLargeDataSetCallback.h
+  #vtkMAFLargeDataSetCallback.cxx
+  #vtkMAFLargeDataSetCallback.h
 )
 
 # List libraries that are needed by this project.

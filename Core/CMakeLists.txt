@@ -103,6 +103,8 @@ IF (MAF_USE_VTK)
   mafLODActor.h
   mafLogicWithManagers.cpp
   mafLogicWithManagers.h
+  medLogicWithManagers.cpp
+  medLogicWithManagers.h
   mafPipe.cpp
   mafPipe.h
   mafPipeBox.cpp
@@ -145,7 +147,8 @@ IF (MAF_USE_VTK)
 ENDIF (MAF_USE_VTK)
 
 # List libraries that are needed by this project.
-SET(PROJECT_LIBS mafBase mafIO mafGui mafInteraction mafOperations curl)
+#SET(PROJECT_LIBS mafBase mafIO mafGui mafInteraction mafOperations curl)
+SET(PROJECT_LIBS mafBase curl)
 
 IF (MAF_USE_VTK)
   SET(PROJECT_LIBS ${PROJECT_LIBS} vtkCommon)

@@ -138,7 +138,7 @@ SET(vtkMAF_SRCS
   vtkPatchLine.h
   vtkPatchLine.cpp
   
-  ############# VolumeLarge Files - TO BE COMMITTED DOWN ########
+  ############# VolumeLarge Files ########
   vtkMAFDataArrayDescriptor.cxx
   vtkMAFDataArrayDescriptor.h
   vtkMAFFileDataProvider.cxx
@@ -155,9 +155,16 @@ SET(vtkMAF_SRCS
   vtkMAFDataArrayLayout.h
   vtkMAFMultiFileDataProvider.cpp
   vtkMAFMultiFileDataProvider.h
+  vtkMAFIdType64.h
+  vtkMAFLargeDataProvider.cxx
+  vtkMAFLargeDataProvider.h
+  vtkMAFLargeDataSet.cxx
+  vtkMAFLargeDataSet.h
+  vtkMAFLargeDataSetCallback.cxx
+  vtkMAFLargeDataSetCallback.h
   ###############################################################
   
-  ########## Should be committed down ###########
+  #####################################################
   vtkMAFVolumeRayCastMapper.cxx
   vtkMAFVolumeRayCastMapper.h
   vtkMAFVolumeTextureMapper2D.cxx
@@ -168,7 +175,7 @@ SET(vtkMAF_SRCS
   vtkMAFMeshCutter_BES.h  	
   ###############################################
   
-  ########## Probably could be committed down ###
+  ###############################################
   vtkMEDPolyDataDeformation.cpp
   vtkMEDPolyDataDeformation.h
   vtkMEDPolyDataDeformation_M1.cpp
@@ -211,13 +218,6 @@ SET(vtkMAF_SRCS
   vtkMEDDeformableSimplexMeshFilter.h
   vtkMEDDeformableSimplexMeshFilter_Impl.h
 
-  ############# VolumeLarge Files - TO BE COMMITTED DOWN ########
-  vtkMAFIdType64.h
-  vtkMAFLargeDataProvider.cxx
-  vtkMAFLargeDataProvider.h
-  vtkMAFLargeDataSet.cxx
-  vtkMAFLargeDataSet.h
-  ###############################################################
 )
 
 IF(WIN32)

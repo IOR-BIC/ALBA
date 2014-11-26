@@ -140,8 +140,8 @@ SET(PROJECT_SRCS
   medGUIWizardPageNew.h
   medGUIDicomSettings.cpp
   medGUIDicomSettings.h
-  # medGUIContextualMenu.cpp
-  # medGUIContextualMenu.h
+  medGUIContextualMenu.cpp
+  medGUIContextualMenu.h
   medGUISettingsAdvanced.cpp
   medGUISettingsAdvanced.h
   medGUIDynamicVP.cpp

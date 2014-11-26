@@ -72,6 +72,10 @@ SET(PROJECT_SRCS
   mafGizmoTranslateAxis.h
   mafGizmoTranslatePlane.cpp
   mafGizmoTranslatePlane.h
+  mafGizmoSlice.cpp
+  mafGizmoSlice.h
+  medGizmoInteractionDebugger.cpp
+  medGizmoInteractionDebugger.h
   mafGUIGizmoInterface.cpp
   mafGUIGizmoInterface.h
   mafGUIGizmoRotate.cpp
@@ -158,6 +162,10 @@ SET(PROJECT_SRCS
   medInteractorPERBrushFeedback.h
   mmiVTKPicker.cpp
   mmiVTKPicker.h
+  mmiInfoImage.cpp
+  mmiInfoImage.h
+  mmiSelectPoint.cpp
+  mmiSelectPoint.h
   medGizmoPolylineGraph.cpp
   medGizmoPolylineGraph.h
   medDeviceButtonsPadMouseDialog.h
