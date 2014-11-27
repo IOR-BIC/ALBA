@@ -16,6 +16,10 @@ IF(CMAKE_VERSION VERSION_LESS 2.8)
 MESSAGE (FATAL_ERROR "CMAKE version must be greater than 2.8")
 ENDIF (CMAKE_VERSION VERSION_LESS 2.8)
 
+IF(COMMAND cmake_policy)
+    cmake_policy(SET CMP0003 NEW)
+ENDIF(COMMAND cmake_policy)
+
 PROJECT (MAF)
 
 IF(MSVC AND NOT (${CMAKE_VERSION} VERSION_LESS 2.8.11))
@@ -119,16 +123,6 @@ CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/mafConfigure.h.in
              ${PROJECT_BINARY_DIR}/mafConfigure.h
              @ONLY)
 			 
-# Create the header to configure the classes. (from MED)
-#CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/mafDefines.h.in ${PROJECT_BINARY_DIR}/mafDefines.h @ONLY)
-
-#CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/Common/mafDefines.h.in ${PROJECT_BINARY_DIR}/mafDefines.h @ONLY)
-#CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/Gui/mafDefines.h.in ${PROJECT_BINARY_DIR}/mafDefines.h @ONLY)
-#CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/Operations/mafDefines.h.h.in ${PROJECT_BINARY_DIR}/mafDefines.h.h @ONLY)
-#CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/Views/mafDefines.h.in ${PROJECT_BINARY_DIR}/mafDefines.h @ONLY)
-#CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/Interaction/mafDefines.h.in ${PROJECT_BINARY_DIR}/mafDefines.h @ONLY)
-#CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/VME/mafDefines.h.in ${PROJECT_BINARY_DIR}/mafDefines.h @ONLY)
-
 #-----------------------------------------------------------------------------
 # Check if MFL is inside the MAF tree.
 #-----------------------------------------------------------------------------
@@ -260,6 +254,10 @@ ENDIF(WIN32)
   CMAKE_EXPORT_BUILD_SETTINGS(
   ${MAF_BINARY_DIR}/MAFBuildSettings.cmake
   )
+  
+  IF(NOT (${CMAKE_VERSION} VERSION_LESS 3.0))
+    cmake_policy(SET CMP0033 OLD)
+  ENDIF(NOT (${CMAKE_VERSION} VERSION_LESS 3.0))
   
   EXPORT_LIBRARY_DEPENDENCIES(
   ${MAF_BINARY_DIR}/MAFLibraryDepends.cmake

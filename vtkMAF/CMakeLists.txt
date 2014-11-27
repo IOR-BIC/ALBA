@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 1.6)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 # Set the project/library name here.  Classes should be declared as
 # "class vtkMAF_EXPORT vtkFoo", where vtkMAF is the name of the
