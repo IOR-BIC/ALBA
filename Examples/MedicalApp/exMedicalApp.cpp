@@ -45,7 +45,7 @@
 #undef _DEBUG
 
 #ifdef USE_WIZARD
-  #include "medWizard.h"
+  #include "mafWizard.h"
   #include "exWizardSample.h"
 #endif
 
@@ -163,8 +163,8 @@
 #include "mafViewSingleSliceCompound.h"
 #include "mafViewImageCompound.h"
 #include "mafView3D.h"
-#include "medViewArbitraryOrthoSlice.h"
-#include "medViewSliceOnCurveCompound.h"
+#include "mafViewArbitraryOrthoSlice.h"
+#include "mafViewSliceOnCurveCompound.h"
 #endif
 //--------------------------------------------------------------------------------
 // Create the Application
@@ -383,11 +383,11 @@ bool exMedicalApp::OnInit()
 	mafView3D *v3d=new mafView3D("3D");
 	m_Logic->Plug(v3d);
 	//View Arbitrary Orthoslice
-	medViewArbitraryOrthoSlice *varbitraryortho=new medViewArbitraryOrthoSlice("Arbitrary Orthoslice");
+	mafViewArbitraryOrthoSlice *varbitraryortho=new mafViewArbitraryOrthoSlice("Arbitrary Orthoslice");
 	varbitraryortho->PackageView();
 	m_Logic->Plug(varbitraryortho);
 	//View Slice On Curve
-	medViewSliceOnCurveCompound *vsliceoncurve=new medViewSliceOnCurveCompound("Slice On Curve");
+	mafViewSliceOnCurveCompound *vsliceoncurve=new mafViewSliceOnCurveCompound("Slice On Curve");
 	vsliceoncurve->PackageView();
 	m_Logic->Plug(vsliceoncurve);
 #endif

@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: mafViewGlobalSliceCompound
  Authors: Eleonora Mambrini
  
@@ -21,7 +21,7 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "mafDefines.h"
-#include "medViewCompoundWindowing.h"
+#include "mafViewCompoundWindowing.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -37,7 +37,7 @@ class mafGUIFloatSlider;
   Class Name: mafViewGlobalSliceCompound.
   Class that contain mafViewGlobalSlice in order to add gui view widget like windowing buttons.
 */
-class MAF_EXPORT mafViewGlobalSliceCompound: public medViewCompoundWindowing
+class MAF_EXPORT mafViewGlobalSliceCompound: public mafViewCompoundWindowing
 {
 public:
   /** constructor .*/
@@ -46,7 +46,7 @@ public:
   virtual ~mafViewGlobalSliceCompound(); 
 
   /** RTTI macro. */
-  mafTypeMacro(mafViewGlobalSliceCompound, medViewCompoundWindowing);
+  mafTypeMacro(mafViewGlobalSliceCompound, mafViewCompoundWindowing);
 
   /** Redefine this method to package the compounded view */
   virtual void PackageView();

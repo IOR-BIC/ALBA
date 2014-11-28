@@ -40,7 +40,7 @@ class mafGizmoTranslate;
 class mafGizmoRotate;
 class mafGizmoScale;
 
-class medCurvilinearAbscissaOnSkeletonHelper;
+class mafCurvilinearAbscissaOnSkeletonHelper;
 
 class vtkPlane;
 class vtkPolyData;
@@ -191,7 +191,7 @@ protected:
 	mafGizmoRotate			*m_GizmoRotate;
 	mafGizmoScale				*m_GizmoScale;
 
-  medCurvilinearAbscissaOnSkeletonHelper *m_CASH;
+  mafCurvilinearAbscissaOnSkeletonHelper *m_CASH;
   
   mafVME *m_ConstrainMedVMEPolylineGraph;
 

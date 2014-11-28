@@ -1,6 +1,6 @@
 /*=========================================================================
 
-Program: MAF2Medical
+Program: MAF2
 Module: mafViewArbitrarySlice
 Authors: Eleonora Mambrini , Stefano Perticoni
 
@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notice for more information.
 // Include:
 //----------------------------------------------------------------------------
 #include "mafDefines.h"
-#include "medViewCompoundWindowing.h"
+#include "mafViewCompoundWindowing.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -46,7 +46,7 @@ The left view features a rotation and a translation gizmos which can be used to 
 The right view camera is always facing the slice.
 */
 
-class MAF_EXPORT mafViewArbitrarySlice: public medViewCompoundWindowing
+class MAF_EXPORT mafViewArbitrarySlice: public mafViewCompoundWindowing
 {
 public:
 	/** constructor*/
@@ -56,7 +56,7 @@ public:
 	virtual ~mafViewArbitrarySlice(); 
 
 	/** RTTI macro.*/
-	mafTypeMacro(mafViewArbitrarySlice, medViewCompoundWindowing);
+	mafTypeMacro(mafViewArbitrarySlice, mafViewCompoundWindowing);
 
 	enum ID_GUI
 	{

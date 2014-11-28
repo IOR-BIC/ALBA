@@ -164,7 +164,7 @@ void medGUIContextualMenu::OnContextualViewMenu(wxCommandEvent& event)
 	{
 		case CONTEXTUAL_MENU_HIDE_VME:
 		{
-      if (mafViewVTK::SafeDownCast(m_ViewActive) || m_ViewActive->IsA("medViewVTKCompound")) // added  || medViewVTKCompound::SafeDownCast(m_ViewActive) by Losi 07/07/2010 fix bug #2190
+      if (mafViewVTK::SafeDownCast(m_ViewActive) || m_ViewActive->IsA("mafViewVTKCompound")) // added  || mafViewVTKCompound::SafeDownCast(m_ViewActive) by Losi 07/07/2010 fix bug #2190
       {
         bool pipe_created = false;
         bool mutex = false;

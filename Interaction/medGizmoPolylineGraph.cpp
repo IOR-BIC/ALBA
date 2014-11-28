@@ -53,7 +53,7 @@
 #include "medVMEPolylineGraph.h"
 #include "mafPolylineGraph.h"
 #include "vtkIdList.h"
-#include "medCurvilinearAbscissaOnSkeletonHelper.h"
+#include "mafCurvilinearAbscissaOnSkeletonHelper.h"
 
 #include "mafMemDbg.h"
 
@@ -86,7 +86,7 @@ medGizmoPolylineGraph::medGizmoPolylineGraph(mafNode* imputVme, mafObserver *lis
   CreateVMEGizmo();
   CreateInteractor();
 
-  m_CurvilinearAbscissaHelper = new medCurvilinearAbscissaOnSkeletonHelper( m_VmeGizmo, NULL, m_TestMode);
+  m_CurvilinearAbscissaHelper = new mafCurvilinearAbscissaOnSkeletonHelper( m_VmeGizmo, NULL, m_TestMode);
 }
 
 //------------------------------------------------------------------------

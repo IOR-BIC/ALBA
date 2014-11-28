@@ -1,6 +1,6 @@
 /*=========================================================================
 
-Program: MAF2Medical
+Program: MAF2
 Module: mafViewArbitrarySlice
 Authors: Eleonora Mambrini , Stefano Perticoni
 
@@ -100,7 +100,7 @@ enum AXIS_ID
 
 //----------------------------------------------------------------------------
 mafViewArbitrarySlice::mafViewArbitrarySlice(wxString label, bool show_ruler)
-	: medViewCompoundWindowing(label, 1, 2)
+	: mafViewCompoundWindowing(label, 1, 2)
 	//----------------------------------------------------------------------------
 {
 	m_ViewArbitrary   = NULL;

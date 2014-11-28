@@ -54,7 +54,7 @@ class mafNode;
 
 class mmiSelectPoint;
 
-class medViewSliceGlobal;
+class mafViewSliceGlobal;
 class medVMESegmentationVolume;
 class mafVMESurface;
 
@@ -71,7 +71,7 @@ class vtkPolyDataMapper;
 class vtkActor;
 class vtkStructuredPoints;
 class vtkUnsignedCharArray;
-class medViewSliceNotInterpolated;
+class mafViewSliceNotInterpolated;
 class wxStaticBoxSizer;
 
 //----------------------------------------------------------------------------
@@ -359,7 +359,7 @@ protected:
   int m_NumSliceSliderEvents;         //<Number of events raised by the slider in a single interaction
   int m_CurrentOperation;             //<Current step
   mafGUIDialog* m_Dialog;             //<Dialog - GUI
-  medViewSliceNotInterpolated* m_View;                 //<Rendering Slice view
+  mafViewSliceNotInterpolated* m_View;                 //<Rendering Slice view
   mafGUIButton* m_OkButton;           //<Button -GUI
   mafGUIButton* m_CancelButton;       //<Button -GUI
   mafGUIButton* m_LoadSegmentationButton; //<Button -GUI

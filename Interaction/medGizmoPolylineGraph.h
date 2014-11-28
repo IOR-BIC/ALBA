@@ -24,7 +24,7 @@
 #include "mafGizmoInterface.h"
 #include "mafMatrix.h"
 #include "mafInteractorGenericMouse.h"
-#include "medCurvilinearAbscissaOnSkeletonHelper.h"
+#include "mafCurvilinearAbscissaOnSkeletonHelper.h"
 
 //---------------------------------------------------------------------------
 // forward refs:
@@ -44,7 +44,7 @@ class vtkAppendPolyData;
 class vtkTransformPolyDataFilter;
 
 class medVMEPolylineGraph;
-class medCurvilinearAbscissaOnSkeletonHelper;
+class mafCurvilinearAbscissaOnSkeletonHelper;
 
 /** Gizmo Helper Object for interaction stuff debug: this class should be expanded and
 refactored incrementally to ease interaction stuff debug.
@@ -155,7 +155,7 @@ protected:
   bool m_TestMode; //< if true don't visualize gui
  
   
-  medCurvilinearAbscissaOnSkeletonHelper *m_CurvilinearAbscissaHelper;
+  mafCurvilinearAbscissaOnSkeletonHelper *m_CurvilinearAbscissaHelper;
 
   enum CONSTRAINT_MODALITY_ID
   {

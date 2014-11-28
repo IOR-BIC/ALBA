@@ -44,7 +44,7 @@ bool DEBUG_MODE = true;
 #include "mafAbsMatrixPipe.h"
 #include "mafTransform.h"
 #include "mafRefSys.h"
-#include "medCurvilinearAbscissaOnSkeletonHelper.h"
+#include "mafCurvilinearAbscissaOnSkeletonHelper.h"
 #include "medVMEPolylineGraph.h"
 
 #include "vtkProperty.h"
@@ -192,7 +192,7 @@ void medOpInteractiveClipSurface::OpRun()
 		BuildTransformGizmos();
     
     assert(m_CASH == NULL);
-    m_CASH = new medCurvilinearAbscissaOnSkeletonHelper(m_ImplicitPlaneVMEGizmo, this) ;
+    m_CASH = new mafCurvilinearAbscissaOnSkeletonHelper(m_ImplicitPlaneVMEGizmo, this) ;
 
 		//Enable & show Gizmos
 		ChangeGizmo();

@@ -24,7 +24,7 @@
 #include "mafDefines.h"
 #include "mafGizmoInterface.h"
 #include "mafMatrix.h"
-#include "medCurvilinearAbscissaOnSkeletonHelper.h"
+#include "mafCurvilinearAbscissaOnSkeletonHelper.h"
 
 //---------------------------------------------------------------------------
 // forward refs:
@@ -44,7 +44,7 @@ class vtkPlaneSource;
 class vtkAppendPolyData;
 
 class medVMEPolylineGraph;
-class medCurvilinearAbscissaOnSkeletonHelper;
+class mafCurvilinearAbscissaOnSkeletonHelper;
 
 /** Gizmo Helper Object for interaction stuff debug: this class should be expanded and
 refactored incrementally to ease interaction stuff debug.
@@ -114,7 +114,7 @@ protected:
   vtkPlaneSource *m_PlaneSource;
   vtkAppendPolyData *m_AppendPolyData;
   
-  medCurvilinearAbscissaOnSkeletonHelper *m_CurvilinearAbscissaHelper;
+  mafCurvilinearAbscissaOnSkeletonHelper *m_CurvilinearAbscissaHelper;
 
   enum CONSTRAINT_MODALITY_ID
   {

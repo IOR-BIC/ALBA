@@ -59,7 +59,7 @@
 #include "mmaMaterial.h"
 
 #include "medDeviceButtonsPadMouseDialog.h"
-#include "medViewSliceGlobal.h"
+#include "mafViewSliceGlobal.h"
 #include "medVMESegmentationVolume.h"
 
 #include "medInteractorPERScalarInformation.h"
@@ -100,7 +100,7 @@
 #include "mafVMEItemVTK.h"
 #include "mafTransformFrame.h"
 #include "medOpVolumeResample.h"
-#include "medViewSliceNotInterpolated.h"
+#include "mafViewSliceNotInterpolated.h"
 #include "mafTagItem.h"
 #include "mafNode.h"
 
@@ -647,7 +647,7 @@ void medOpSegmentation::CreateOpDialog()
   mafSetFrame(m_Dialog);
 
   //Create rendering view   
-  m_View = new medViewSliceNotInterpolated("Volume Slice");  
+  m_View = new mafViewSliceNotInterpolated("Volume Slice");  
   m_View->Create();
   m_View->GetGui();
 

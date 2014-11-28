@@ -35,30 +35,28 @@ SET(PROJECT_SRCS
   mafViewImageCompound.h
   mafViewCT.cpp
   mafViewCT.h
-  medViewCompoundWindowing.cpp
-  medViewCompoundWindowing.h
-  medViewVTKCompound.cpp
-  medViewVTKCompound.h
-  #medViewEmgGraph.cpp
-  #medViewEmgGraph.h
-  medViewSlicer.cpp
-  medViewSlicer.h
-  medViewSliceOnCurve.cpp
-  medViewSliceOnCurve.h
-  medViewSliceOnCurveCompound.cpp
-  medViewSliceOnCurveCompound.h
-  medViewSliceGlobal.cpp
-  medViewSliceGlobal.h
-  medViewArbitraryOrthoSlice.cpp
-  medViewArbitraryOrthoSlice.h
-  medViewSliceBlendRX.cpp
-  medViewSliceBlendRX.h
-  medViewSliceBlend.cpp
-  medViewSliceBlend.h
-  medViewSliceNotInterpolated.cpp
-  medViewSliceNotInterpolated.h
-  medViewSliceNotInterpolatedCompound.cpp
-  medViewSliceNotInterpolatedCompound.h
+  mafViewCompoundWindowing.cpp
+  mafViewCompoundWindowing.h
+  mafViewVTKCompound.cpp
+  mafViewVTKCompound.h
+  mafViewSlicer.cpp
+  mafViewSlicer.h
+  mafViewSliceOnCurve.cpp
+  mafViewSliceOnCurve.h
+  mafViewSliceOnCurveCompound.cpp
+  mafViewSliceOnCurveCompound.h
+  mafViewSliceGlobal.cpp
+  mafViewSliceGlobal.h
+  mafViewArbitraryOrthoSlice.cpp
+  mafViewArbitraryOrthoSlice.h
+  mafViewSliceBlendRX.cpp
+  mafViewSliceBlendRX.h
+  mafViewSliceBlend.cpp
+  mafViewSliceBlend.h
+  mafViewSliceNotInterpolated.cpp
+  mafViewSliceNotInterpolated.h
+  mafViewSliceNotInterpolatedCompound.cpp
+  mafViewSliceNotInterpolatedCompound.h
 )
 
 # List libraries that are needed by this project.

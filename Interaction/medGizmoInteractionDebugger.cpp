@@ -54,7 +54,7 @@ const bool DEBUG_MODE = true;
 #include "medVMEPolylineGraph.h"
 #include "mafPolylineGraph.h"
 #include "vtkIdList.h"
-#include "medCurvilinearAbscissaOnSkeletonHelper.h"
+#include "mafCurvilinearAbscissaOnSkeletonHelper.h"
 
 const double defaultLineLength = 50;
  
@@ -97,7 +97,7 @@ void medGizmoInteractionDebugger::Constructor(mafNode *imputVme, mafObserver *li
 
   CreateVMEGizmo();
 
-  m_CurvilinearAbscissaHelper = new medCurvilinearAbscissaOnSkeletonHelper( m_VmeGizmo, this , testMode);
+  m_CurvilinearAbscissaHelper = new mafCurvilinearAbscissaOnSkeletonHelper( m_VmeGizmo, this , testMode);
 }
 //----------------------------------------------------------------------------
 void medGizmoInteractionDebugger::Destructor()

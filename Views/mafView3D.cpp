@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: mafView3D
  Authors: Matteo Giacomoni - Daniele Giunchi
  

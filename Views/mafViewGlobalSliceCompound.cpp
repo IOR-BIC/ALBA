@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: mafViewGlobalSliceCompound
  Authors: Eleonora Mambrini
  
@@ -66,7 +66,7 @@ mafCxxTypeMacro(mafViewGlobalSliceCompound);
 
 //----------------------------------------------------------------------------
 mafViewGlobalSliceCompound::mafViewGlobalSliceCompound( wxString label, int num_row, int num_col)
-: medViewCompoundWindowing(label,num_row,num_col)
+: mafViewCompoundWindowing(label,num_row,num_col)
 //----------------------------------------------------------------------------
 {
 	/*m_LutWidget = NULL;

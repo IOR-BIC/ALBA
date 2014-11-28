@@ -26,8 +26,8 @@
 //----------------------------------------------------------------------------
 // forward reference
 //----------------------------------------------------------------------------
-class medWizardManager;
-class medWizard;
+class mafWizardManager;
+class mafWizard;
 
 /**
   Class Name: medLogicWithManagers.
@@ -52,7 +52,7 @@ public:
 	virtual void Plug(mafOp *op, wxString menuPath = "", bool canUndo = true, mafGUISettings *setting = NULL);
 	
   /**  Plug a new wizard */
-	virtual void Plug(medWizard *wizard, wxString menuPath = "");
+	virtual void Plug(mafWizard *wizard, wxString menuPath = "");
 	
   /** Must be called before Configure */
   void PlugWizardManager(bool b){m_UseWizardManager=b;};
@@ -109,7 +109,7 @@ protected:
 
   virtual void ConfigureWizardManager();
 
-  medWizardManager *m_WizardManager;
+  mafWizardManager *m_WizardManager;
   bool m_UseWizardManager;
   bool m_WizardRunning;
   wxGauge *m_WizardGauge;

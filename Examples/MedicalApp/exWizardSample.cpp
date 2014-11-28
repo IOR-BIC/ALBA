@@ -23,17 +23,17 @@
 //----------------------------------------------------------------------------
 
 #include "exWizardSample.h"
-#include "medWizardBlockSelection.h"
-#include "medWizardBlockOperation.h"
-#include "medWizardBlockInformation.h"
+#include "mafWizardBlockSelection.h"
+#include "mafWizardBlockOperation.h"
+#include "mafWizardBlockInformation.h"
 
 
 //--------------------------------------------------------------------------------
-exWizardSample::exWizardSample( const wxString &label ):medWizard(label)
+exWizardSample::exWizardSample( const wxString &label ):mafWizard(label)
 //--------------------------------------------------------------------------------
 {
 
-  medWizardBlockInformation *infoBlock=new medWizardBlockInformation("START");
+  mafWizardBlockInformation *infoBlock=new mafWizardBlockInformation("START");
   infoBlock->SetBoxLabel("Info");
   infoBlock->SetDescription("Import Loop:\nYou can import and show a series of VTK files.");
   infoBlock->SetWindowTitle("information");
@@ -41,7 +41,7 @@ exWizardSample::exWizardSample( const wxString &label ):medWizard(label)
   infoBlock->SetBlockProgress(10);
   
   //Start Block (import a VTK file)   
-  medWizardBlockOperation *opBlock=new medWizardBlockOperation("Import");
+  mafWizardBlockOperation *opBlock=new mafWizardBlockOperation("Import");
   opBlock->SetRequiredView("");
   opBlock->VmeSelect("root");
   opBlock->SetRequiredOperation("mafOpImporterVTK");
@@ -49,7 +49,7 @@ exWizardSample::exWizardSample( const wxString &label ):medWizard(label)
   opBlock->SetBlockProgress(25);
 
   //Move block (position the Block)
-  medWizardBlockOperation *opBlock2=new medWizardBlockOperation("opPause");
+  mafWizardBlockOperation *opBlock2=new mafWizardBlockOperation("opPause");
   opBlock2->SetRequiredView("VTK view");
   opBlock2->VmeSelect("lastChild");
   opBlock2->SetRequiredOperation("PAUSE");
@@ -57,7 +57,7 @@ exWizardSample::exWizardSample( const wxString &label ):medWizard(label)
   opBlock2->SetBlockProgress(75);
   
   //Select Block ask user if want to import another file
-  medWizardBlockSelection *selectorBlock=new medWizardBlockSelection("Select");
+  mafWizardBlockSelection *selectorBlock=new mafWizardBlockSelection("Select");
   selectorBlock->SetWindowTitle("Test Selector");
   selectorBlock->SetDescription("Wizard Selector Test window");
   selectorBlock->AddChoice("Import another VTK","deleteBlock"); 
@@ -65,7 +65,7 @@ exWizardSample::exWizardSample( const wxString &label ):medWizard(label)
   selectorBlock->SetBlockProgress(100);
 
   //Move block (position the Block)
-  medWizardBlockOperation *deleteBlock=new medWizardBlockOperation("deleteBlock");
+  mafWizardBlockOperation *deleteBlock=new mafWizardBlockOperation("deleteBlock");
   deleteBlock->SetRequiredOperation("DELETE");
   deleteBlock->SetNextBlock("Import");
 

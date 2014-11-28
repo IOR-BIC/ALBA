@@ -1,4 +1,4 @@
-PROJECT (MedicalViews_TEST)
+PROJECT (mafViews_TEST)
 
 IF(MAF_BUILD_MAFDLL)
   LINK_LIBRARIES(mafViews)
@@ -52,23 +52,23 @@ ADD_TEST(mafViewImageCompoundTest ${EXECUTABLE_OUTPUT_PATH}/mafViewImageCompound
 ADD_EXECUTABLE(mafViewCTTest mafViewCTTest.h mafViewCTTest.cpp)
 ADD_TEST(mafViewCTTest ${EXECUTABLE_OUTPUT_PATH}/mafViewCTTest)
 
-ADD_EXECUTABLE(medViewSlicerTest medViewSlicerTest.h medViewSlicerTest.cpp)
-ADD_TEST(medViewSlicerTest ${EXECUTABLE_OUTPUT_PATH}/medViewSlicerTest)
+ADD_EXECUTABLE(mafViewSlicerTest mafViewSlicerTest.h mafViewSlicerTest.cpp)
+ADD_TEST(mafViewSlicerTest ${EXECUTABLE_OUTPUT_PATH}/mafViewSlicerTest)
 
-ADD_EXECUTABLE(medViewVTKCompoundTest medViewVTKCompoundTest.h medViewVTKCompoundTest.cpp)
-ADD_TEST(medViewVTKCompoundTest ${EXECUTABLE_OUTPUT_PATH}/medViewVTKCompoundTest)
+ADD_EXECUTABLE(mafViewVTKCompoundTest mafViewVTKCompoundTest.h mafViewVTKCompoundTest.cpp)
+ADD_TEST(mafViewVTKCompoundTest ${EXECUTABLE_OUTPUT_PATH}/mafViewVTKCompoundTest)
 
-ADD_EXECUTABLE(medViewSliceOnCurveCompoundTest medViewSliceOnCurveCompoundTest.h medViewSliceOnCurveCompoundTest.cpp)
-ADD_TEST(medViewSliceOnCurveCompoundTest ${EXECUTABLE_OUTPUT_PATH}/medViewSliceOnCurveCompoundTest)
+ADD_EXECUTABLE(mafViewSliceOnCurveCompoundTest mafViewSliceOnCurveCompoundTest.h mafViewSliceOnCurveCompoundTest.cpp)
+ADD_TEST(mafViewSliceOnCurveCompoundTest ${EXECUTABLE_OUTPUT_PATH}/mafViewSliceOnCurveCompoundTest)
 
-ADD_EXECUTABLE(medViewSliceOnCurveTest medViewSliceOnCurveTest.h medViewSliceOnCurveTest.cpp)
-ADD_TEST(medViewSliceOnCurveTest ${EXECUTABLE_OUTPUT_PATH}/medViewSliceOnCurveTest)
+ADD_EXECUTABLE(mafViewSliceOnCurveTest mafViewSliceOnCurveTest.h mafViewSliceOnCurveTest.cpp)
+ADD_TEST(mafViewSliceOnCurveTest ${EXECUTABLE_OUTPUT_PATH}/mafViewSliceOnCurveTest)
 
-ADD_EXECUTABLE(medViewSliceGlobalTest medViewSliceGlobalTest.h medViewSliceGlobalTest.cpp)
-ADD_TEST(medViewSliceGlobalTest ${EXECUTABLE_OUTPUT_PATH}/medViewSliceGlobalTest)
+ADD_EXECUTABLE(mafViewSliceGlobalTest mafViewSliceGlobalTest.h mafViewSliceGlobalTest.cpp)
+ADD_TEST(mafViewSliceGlobalTest ${EXECUTABLE_OUTPUT_PATH}/mafViewSliceGlobalTest)
 
-ADD_EXECUTABLE(medViewCompoundWindowingTest medViewCompoundWindowingTest.h medViewCompoundWindowingTest.cpp)
-ADD_TEST(medViewCompoundWindowingTest ${EXECUTABLE_OUTPUT_PATH}/medViewCompoundWindowingTest)
+ADD_EXECUTABLE(mafViewCompoundWindowingTest mafViewCompoundWindowingTest.h mafViewCompoundWindowingTest.cpp)
+ADD_TEST(mafViewCompoundWindowingTest ${EXECUTABLE_OUTPUT_PATH}/mafViewCompoundWindowingTest)
 
 # wxWidgets specific classes
 #IF (MAF_USE_WX)

@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: mafViewSingleSliceCompound
  Authors: Eleonora Mambrini
  
@@ -21,7 +21,7 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "mafDefines.h"
-#include "medViewCompoundWindowing.h"
+#include "mafViewCompoundWindowing.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -39,7 +39,7 @@ class vtkLookupTable;
   Class Name: mafViewSingleSliceCompound.
   Class that contain mafViewSingleSlice in order to add gui view widget like windowing buttons.
 */
-class MAF_EXPORT mafViewSingleSliceCompound: public medViewCompoundWindowing
+class MAF_EXPORT mafViewSingleSliceCompound: public mafViewCompoundWindowing
 {
 public:
   /** constructor */
@@ -48,7 +48,7 @@ public:
   virtual ~mafViewSingleSliceCompound(); 
 
   /** RTTI macro*/
-  mafTypeMacro(mafViewSingleSliceCompound, medViewCompoundWindowing);
+  mafTypeMacro(mafViewSingleSliceCompound, mafViewCompoundWindowing);
 
 
   /** Redefine this method to package the compounded view */

@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: mafViewSingleSliceCompound
  Authors: Eleonora Mambrini
  
@@ -61,7 +61,7 @@ mafCxxTypeMacro(mafViewSingleSliceCompound);
 
 //----------------------------------------------------------------------------
 mafViewSingleSliceCompound::mafViewSingleSliceCompound( wxString label, int num_row, int num_col)
-: medViewCompoundWindowing(label,num_row,num_col)
+: mafViewCompoundWindowing(label,num_row,num_col)
 //----------------------------------------------------------------------------
 {
 	/*m_LutWidget = NULL;

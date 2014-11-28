@@ -35,7 +35,7 @@ Right Mouse button  => camera zoom
 
 CTRL + Left Mouse button => send picked vme abs coordinates to the listener
 
-@sa medViewArbitraryOrthoSlice as an example on how to use this picker
+@sa mafViewArbitraryOrthoSlice as an example on how to use this picker
 */
 class MAF_EXPORT medInteractorPicker : public mafInteractorCameraMove
 {

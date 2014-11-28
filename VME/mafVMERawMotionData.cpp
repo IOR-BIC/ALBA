@@ -31,7 +31,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkCommand.h"
 
-#include "itkRawMotionImporterUtility.h"
+#include "mafItkRawMotionImporterUtility.h"
 #include <iostream>
 #include <string>
 
@@ -84,7 +84,7 @@ int mafVMERawMotionData::Read()
 //----------------------------------------------------------------------------
 {
 		
-  itkRawMotionImporterUtility utils;
+  mafItkRawMotionImporterUtility utils;
 
   vnl_matrix<double> M;
 

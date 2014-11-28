@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: mafViewOrthoSlice
  Authors: Stefano Perticoni, Gianluigi Crimi, Grazia Di Cosmo
  

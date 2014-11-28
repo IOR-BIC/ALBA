@@ -185,11 +185,11 @@ IF (WIN32)
   SET_TARGET_PROPERTIES(mafDataChecksumTest PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)
 
-############ medVect3dTest
-ADD_EXECUTABLE(medVect3dTest  medVect3dTest.h medVect3dTest.cpp)
-ADD_TEST(medVect3dTest   ${EXECUTABLE_OUTPUT_PATH}/medVect3dTest )
+############ mafVect3dTest
+ADD_EXECUTABLE(mafVect3dTest  mafVect3dTest.h mafVect3dTest.cpp)
+ADD_TEST(mafVect3dTest   ${EXECUTABLE_OUTPUT_PATH}/mafVect3dTest )
 IF (WIN32)
-  SET_TARGET_PROPERTIES(medVect3dTest PROPERTIES LINK_FLAGS "/MANIFEST")
+  SET_TARGET_PROPERTIES(mafVect3dTest PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)
 
 #-----------------------------------------------------------------------------

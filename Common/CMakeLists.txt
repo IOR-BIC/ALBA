@@ -7,93 +7,68 @@ PROJECT(mafCommon)
 # Set your list of sources here.
 SET(PROJECT_SRCS
 
-  itkRawMotionImporterUtility.cxx
-  itkRawMotionImporterUtility.h
-  #medGUIContextualMenu.cpp
-  #medGUIContextualMenu.h
+  mafItkRawMotionImporterUtility.cxx
+  mafItkRawMotionImporterUtility.h
+  
   mafPolylineGraph.cpp
   mafPolylineGraph.h
-  #mafGizmoSlice.cpp
-  #mafGizmoSlice.h
-  #mmiInfoImage.cpp
-  #mmiInfoImage.h
-  #mmiSelectPoint.cpp
-  #mmiSelectPoint.h
-  #medLogicWithManagers.cpp
-  #medLogicWithManagers.h
   
+  mafCurvilinearAbscissaOnSkeletonHelper.cpp
+  mafCurvilinearAbscissaOnSkeletonHelper.h
+  
+  mafRelationalDatabaseAbstractConnector.cpp
+  mafRelationalDatabaseAbstractConnector.h
+  
+  mafResultQueryAbstractHandler.cpp
+  mafResultQueryAbstractHandler.h
+  
+  mafQueryObject.h
+  
+  mafHTMLTemplateParser.cpp
+  mafHTMLTemplateParser.h
+  
+  mafHTMLTemplateParserBlock.cpp
+  mafHTMLTemplateParserBlock.h
+  
+  mafWizardBlock.cpp
+  mafWizardBlock.h
+  
+  mafWizard.cpp
+  mafWizard.h
+  
+  mafWizardManager.cpp
+  mafWizardManager.h
+  
+  mafWizardBlockOperation.cpp
+  mafWizardBlockOperation.h
+  
+  mafWizardBlockSelection.cpp
+  mafWizardBlockSelection.h
+  
+  mafWizardBlockTypeCheck.cpp
+  mafWizardBlockTypeCheck.h
 
-  # medGeometryEditorPolylineGraph.cpp
-  # medGeometryEditorPolylineGraph.h
-  #medDecl.h
-  medCurvilinearAbscissaOnSkeletonHelper.cpp
-  medCurvilinearAbscissaOnSkeletonHelper.h
-  #medGizmoInteractionDebugger.cpp
-  #medGizmoInteractionDebugger.h
+  mafWizardBlockFileExistCheck.cpp
+  mafWizardBlockFileExistCheck.h
+  
+  mafWizardBlockVMESelection.cpp
+  mafWizardBlockVMESelection.h
 
-  medRelationalDatabaseAbstractConnector.cpp
-  medRelationalDatabaseAbstractConnector.h
+  mafWizardBlockVMEFindOrSelection.cpp
+  mafWizardBlockVMEFindOrSelection.h
+  
+  mafWizardBlockInformation.cpp
+  mafWizardBlockInformation.h
 
-  medResultQueryAbstractHandler.cpp
-  medResultQueryAbstractHandler.h
+  mafWizardBlockYesNoSelection.cpp
+  mafWizardBlockYesNoSelection.h
   
-  medQueryObject.h
+  mafWizardWaitOp.cpp
+  mafWizardWaitOp.h
   
-  medHTMLTemplateParser.cpp
-  medHTMLTemplateParser.h
-  medHTMLTemplateParserBlock.cpp
-  medHTMLTemplateParserBlock.h
+  mafWizardSettings.cpp
+  mafWizardSettings.h
   
-  #medVect3d.cpp
-  #medVect3d.h
-  
-  medWizardBlock.cpp
-  medWizardBlock.h
-  
-  medWizard.cpp
-  medWizard.h
-  
-  medWizardManager.cpp
-  medWizardManager.h
-  
-  medWizardBlockOperation.cpp
-  medWizardBlockOperation.h
-  
-  medWizardBlockSelection.cpp
-  medWizardBlockSelection.h
-  
-  medWizardBlockTypeCheck.cpp
-  medWizardBlockTypeCheck.h
-
-  medWizardBlockFileExistCheck.cpp
-  medWizardBlockFileExistCheck.h
-  
-  medWizardBlockVMESelection.cpp
-  medWizardBlockVMESelection.h
-
-  medWizardBlockVMEFindOrSelection.cpp
-  medWizardBlockVMEFindOrSelection.h
-  
-  medWizardBlockInformation.cpp
-  medWizardBlockInformation.h
-
-  medWizardBlockYesNoSelection.cpp
-  medWizardBlockYesNoSelection.h
-  
-  medWizardWaitOp.cpp
-  medWizardWaitOp.h
-  
-  medWizardSettings.cpp
-  medWizardSettings.h
-  
-  #### SHOULD BE COMMITTED DOWN ######
-  #mafDbg.h
-  #mafDataChecksum.h
-  ##################################
-	
-  #Removed from vtkMED because it need of MAF Utilities
-  #vtkMAFLargeDataSetCallback.cxx
-  #vtkMAFLargeDataSetCallback.h
 )
 
 # List libraries that are needed by this project.
@@ -106,7 +81,7 @@ IF(MAF_BUILD_MAFDLL)
   ADD_DEFINITIONS(-DMAF_EXPORTS)
   # Create the library.
   ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
-  TARGET_LINK_LIBRARIES(${PROJECT_NAME} mafDLL medGui)
+  TARGET_LINK_LIBRARIES(${PROJECT_NAME} mafDLL mafGui)
 ELSE(MAF_BUILD_MAFDLL)
   # Create the library.
   ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})

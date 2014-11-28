@@ -29,7 +29,7 @@
 #include "mafViewManager.h"
 #include "medGUIMDIFrame.h"
 #include "mafOpManager.h"
-#include "medWizardManager.h"
+#include "mafWizardManager.h"
 #include "mafGUIApplicationSettings.h"
 #include "mafView.h"
 #include "mafGUIDialogRemoteFile.h"
@@ -437,7 +437,7 @@ void medLogicWithManagers::Plug( mafView* view, bool visibleInMenu /*= true*/ )
 }
 
 //----------------------------------------------------------------------------
-void medLogicWithManagers::Plug( medWizard *wizard, wxString menuPath /*= ""*/ )
+void medLogicWithManagers::Plug( mafWizard *wizard, wxString menuPath /*= ""*/ )
 //----------------------------------------------------------------------------
 {
   //Plugging the wizard    
@@ -755,7 +755,7 @@ void medLogicWithManagers::ConfigureWizardManager()
   if(m_UseWizardManager)
   {
     CreateWizardToolbar();
-    m_WizardManager = new medWizardManager();
+    m_WizardManager = new mafWizardManager();
     m_WizardManager->SetListener(this);
     m_WizardManager->WarningIfCantUndo(m_ApplicationSettings->GetWarnUserFlag());
   }
