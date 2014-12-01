@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: AllocatorTest
  Authors: Daniele Giunchi
  
@@ -25,7 +25,7 @@
 #include <cppunit/config/SourcePrefix.h>
 #include "AllocatorTest.h"
 
-#include "vtkMEDPoissonSurfaceReconstruction.h"
+#include "vtkMAFPoissonSurfaceReconstruction.h"
 
 class P3D{
 public:

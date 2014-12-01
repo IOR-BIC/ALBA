@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: PPolynomialTest
  Authors: Roberto Mucci
  
@@ -25,8 +25,8 @@
 #include <cppunit/config/SourcePrefix.h>
 #include "PPolynomialTest.h"
 
-#include "vtkMEDPoissonSurfaceReconstruction.h"
-#include "vtkMEDPoissonSurfaceReconstruction.cxx"
+#include "vtkMAFPoissonSurfaceReconstruction.h"
+#include "vtkMAFPoissonSurfaceReconstruction.cxx"
 
 //-------------------------------------------------------------------------
 void PPolynomialTest::TestAllMethods()

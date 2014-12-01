@@ -40,10 +40,10 @@
 #include "vtkStructuredPoints.h"
 #include "vtkCleanPolyData.h"
 #include "vtkDecimatePro.h"
-#include "vtkMEDFixTopology.h"
+#include "vtkMAFFixTopology.h"
 #include "vtkImageCast.h"
 #include "vtkImageData.h"
-#include "vtkMEDVolumeToClosedSmoothSurface.h"
+#include "vtkMAFVolumeToClosedSmoothSurface.h"
 #include "vtkMAFSmartPointer.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
@@ -611,7 +611,7 @@ int medOpExtractGeometry::GenerateIsosurface()
 
   // VTKmafContourVolumeMapper
 
-  m_SurfaceExtractor = vtkMEDVolumeToClosedSmoothSurface::New();
+  m_SurfaceExtractor = vtkMAFVolumeToClosedSmoothSurface::New();
   m_SurfaceExtractor->SetInput(m_OriginalData);
   m_SurfaceExtractor->AutoLODRenderOn();
   m_SurfaceExtractor->AutoLODCreateOn();
@@ -647,7 +647,7 @@ int medOpExtractGeometry::GenerateIsosurface()
 
   if (m_ProcessingType==0)
   {
-    vtkMAFSmartPointer<vtkMEDFixTopology> fixTopologyFilter;
+    vtkMAFSmartPointer<vtkMAFFixTopology> fixTopologyFilter;
     fixTopologyFilter->SetInput(m_SurfaceData);
     fixTopologyFilter->Update();
     m_SurfaceData->DeepCopy(fixTopologyFilter->GetOutput());

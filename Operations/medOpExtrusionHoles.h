@@ -41,7 +41,7 @@ class vtkSphereSource;
 class vtkGlyph3D;
 class vtkAppendPolyData;
 class vtkPlaneSource;
-class vtkMEDExtrudeToCircle;
+class vtkMAFExtrudeToCircle;
 
 //----------------------------------------------------------------------------
 // medOpExtrusionHoles :
@@ -123,7 +123,7 @@ protected:
 
 	vtkFeatureEdges						*m_ExtractFreeEdges;
 	vtkHoleConnectivity				*m_ExtractHole;
-	vtkMEDExtrudeToCircle	    *m_ExtrusionFilter;
+	vtkMAFExtrudeToCircle	    *m_ExtrusionFilter;
 
 	vtkSphereSource				*m_Sphere;
 	vtkGlyph3D						*m_Glyph;

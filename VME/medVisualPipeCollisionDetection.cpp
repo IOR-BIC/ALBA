@@ -32,7 +32,7 @@
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkMAFAssembly.h"
-#include "vtkMEDCollisionDetectionFilter.h"
+#include "vtkMAFCollisionDetectionFilter.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkActor.h"

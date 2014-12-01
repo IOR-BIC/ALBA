@@ -29,13 +29,13 @@ University of Bedfordshire, UK
 #include "mafGUI.h"
 #include "mafVME.h"
 #include "mafNode.h"
-#include "vtkMEDDeformableSimplexMeshFilter.h"
-#include "vtkMEDMatrixVectorMath.h"
-#include "vtkMEDPolyDataNavigator.h"
-#include "vtkMEDMatrixVectorMath.h"
+#include "vtkMAFDeformableSimplexMeshFilter.h"
+#include "vtkMAFMatrixVectorMath.h"
+#include "vtkMAFPolyDataNavigator.h"
+#include "vtkMAFMatrixVectorMath.h"
 #include "medVMEStent.h"
 #include "mafStorageElement.h"
-#include "vtkMEDPolyDataNavigator.h"
+#include "vtkMAFPolyDataNavigator.h"
 
 #include "vtkPointData.h"
 #include "vtkTransform.h"
@@ -79,7 +79,7 @@ medVMEStent::medVMEStent()
   m_DeployedPolydataVME(NULL), m_VesselNodeID(-1), m_CenterLineNodeID(-1),
   m_DeployedPolydataNodeID(-1)
 {
-  m_StentSource = new vtkMEDStentModelSource ;
+  m_StentSource = new vtkMAFStentModelSource ;
 
   m_StentPolyData = vtkPolyData::New() ;
   m_SimplexPolyData = vtkPolyData::New() ;
@@ -1094,7 +1094,7 @@ void medVMEStent::CalculateMidPointsFromPairOfStruts(const double strutEndPts[4]
   const double LengthFactor = 0.2 ;
   const double LengthLinkFactor = 0.2;
 
-  vtkMEDMatrixVectorMath *math = vtkMEDMatrixVectorMath::New();
+  vtkMAFMatrixVectorMath *math = vtkMAFMatrixVectorMath::New();
   math->SetHomogeneous(false) ;
 
   // calc exact midpoints m[2] of struts
@@ -1474,7 +1474,7 @@ void medVMEStent::CreateExtrapolatedLine(vtkPolyData* lineIn, vtkPolyData* lineO
   int n = lineIn->GetPoints()->GetNumberOfPoints() ;
   int m = (int)(extrapFactor*(double)n + 0.5) ;
 
-  vtkMEDMatrixVectorMath *matVecMath = vtkMEDMatrixVectorMath::New() ;
+  vtkMAFMatrixVectorMath *matVecMath = vtkMAFMatrixVectorMath::New() ;
   matVecMath->SetHomogeneous(false) ;
 
   double x0[3], x1[3], x2[3], xnext[3] ;
@@ -1586,8 +1586,8 @@ void medVMEStent::CreateStentCenterLine()
 //-------------------------------------------------------------------------
 void medVMEStent::GetValidPointIds(vtkPolyData* pd, vtkIdList* idList) const
 {
-  vtkMEDPolyDataNavigator* nav = vtkMEDPolyDataNavigator::New() ;
-  vtkMEDPolyDataNavigator::IdSet idSet ; // copy to set first to efficiently remove duplicate ids
+  vtkMAFPolyDataNavigator* nav = vtkMAFPolyDataNavigator::New() ;
+  vtkMAFPolyDataNavigator::IdSet idSet ; // copy to set first to efficiently remove duplicate ids
   vtkIdList* cellPtIds = vtkIdList::New() ;
 
   int ncells = pd->GetNumberOfCells() ;
@@ -1687,7 +1687,7 @@ double medVMEStent::CalcStentLengthMM()
     }
   }
 
-  vtkMEDMatrixVectorMath* matMath = vtkMEDMatrixVectorMath::New() ;
+  vtkMAFMatrixVectorMath* matMath = vtkMAFMatrixVectorMath::New() ;
   matMath->SetHomogeneous(false) ;
   double xMin[3], xMax[3] ;
   CalcCoordsFromIdPosition(m_CenterLine, idMin, lambdaMin, xMin) ;
@@ -1738,7 +1738,7 @@ void medVMEStent::CalcArcLengthsOfPoints(vtkPolyData *pd, double* arcLengths)
 {
   int n = pd->GetPoints()->GetNumberOfPoints() ;
 
-  vtkMEDMatrixVectorMath* matMath = vtkMEDMatrixVectorMath::New() ;
+  vtkMAFMatrixVectorMath* matMath = vtkMAFMatrixVectorMath::New() ;
   matMath->SetHomogeneous(false) ;
 
   double x0[3], x1[3] ;
@@ -1837,7 +1837,7 @@ void medVMEStent::CalcCoordsFromIdPosition(vtkPolyData *pd, int id, double lambd
     return ;
   }
   else{
-    vtkMEDMatrixVectorMath* matMath = vtkMEDMatrixVectorMath::New() ;
+    vtkMAFMatrixVectorMath* matMath = vtkMAFMatrixVectorMath::New() ;
     matMath->SetHomogeneous(false) ;
     double x0[3], x1[3] ;
     pd->GetPoints()->GetPoint(id, x0) ;
@@ -1857,7 +1857,7 @@ void medVMEStent::FindNearestPointOnCenterLine(double* p0, vtkPolyData *pd, int&
 {
   int n = pd->GetPoints()->GetNumberOfPoints() ;
 
-  vtkMEDMatrixVectorMath* matMath = vtkMEDMatrixVectorMath::New() ;
+  vtkMAFMatrixVectorMath* matMath = vtkMAFMatrixVectorMath::New() ;
   matMath->SetHomogeneous(false) ;
 
   // find nearest id point
@@ -1886,7 +1886,7 @@ void medVMEStent::FindNearestPointOnCenterLine(double* p0, vtkPolyData *pd, int&
 {
   int n = pd->GetPoints()->GetNumberOfPoints() ;
 
-  vtkMEDMatrixVectorMath* matMath = vtkMEDMatrixVectorMath::New() ;
+  vtkMAFMatrixVectorMath* matMath = vtkMAFMatrixVectorMath::New() ;
   matMath->SetHomogeneous(false) ;
 
   FindNearestPointOnCenterLine(p0, pd, id, distSq) ; // nearest actual point

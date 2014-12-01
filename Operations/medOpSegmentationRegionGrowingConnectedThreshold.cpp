@@ -46,7 +46,7 @@
 #include "vtkImageToStructuredPoints.h"
 #include "medOpVolumeResample.h"
 #include "vtkRectilinearGrid.h"
-#include "vtkMEDVolumeToClosedSmoothSurface.h"
+#include "vtkMAFVolumeToClosedSmoothSurface.h"
 
 
 #define ITK_IMAGE_DIMENSION 3
@@ -326,7 +326,7 @@ void medOpSegmentationRegionGrowingConnectedThreshold::Algorithm()
   m_VolumeOut->GetTagArray()->SetTag(mafTagItem("VOLUME_TYPE","BINARY"));
 
   
-  vtkMAFSmartPointer<vtkMEDVolumeToClosedSmoothSurface> volToSurface;
+  vtkMAFSmartPointer<vtkMAFVolumeToClosedSmoothSurface> volToSurface;
   volToSurface->SetInput(m_VolumeOut->GetOutput()->GetVTKData());
   volToSurface->SetContourValue(127.5);
   volToSurface->Update();

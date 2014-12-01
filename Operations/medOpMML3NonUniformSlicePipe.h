@@ -25,7 +25,7 @@
 #include "vtkActor2D.h"
 #include "vtkRenderer.h"
 #include "vtkSphereSource.h"
-#include "vtkMEDMatrixVectorMath.h"
+#include "vtkMAFMatrixVectorMath.h"
 
 #include <vector>
 
@@ -93,7 +93,7 @@ private:
   vtkPolyData *m_SliceLinesPolydata ;
   vtkActor2D *m_SliceLinesActor ;   // lines showing slice positions
 
-  vtkMEDMatrixVectorMath *m_Math ;
+  vtkMAFMatrixVectorMath *m_Math ;
 } ;
 
 

@@ -35,7 +35,7 @@
 #include "vtkPoints.h"
 #include "vtkCellArray.h"
 
-#include "vtkMEDMatrixVectorMath.h"
+#include "vtkMAFMatrixVectorMath.h"
 #include "medOpMML3NonUniformSlicePipe.h"
 
 #include <vector>
@@ -52,7 +52,7 @@ medOpMML3NonUniformSlicePipe::medOpMML3NonUniformSlicePipe(vtkPolyData *surface,
 : m_Renderer(renderer), m_NumberOfSections(numberOfSections), m_NumberOfSlices(0)
 //------------------------------------------------------------------------------
 {
-  m_Math = vtkMEDMatrixVectorMath::New() ;
+  m_Math = vtkMAFMatrixVectorMath::New() ;
 
   // default values for end-of-axis landmarks
   m_AxisStart[0] = 100.0 ;

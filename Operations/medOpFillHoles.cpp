@@ -52,7 +52,7 @@
 #include "vtkSphereSource.h"
 #include "vtkProperty.h"
 #include "vtkAppendPolyData.h"
-#include "vtkMEDFillingHole.h"
+#include "vtkMAFFillingHole.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(medOpFillHoles);
@@ -390,7 +390,7 @@ void medOpFillHoles::Fill()
   }
 
 	//fill the boundary polydata
-	vtkMEDFillingHole *fillingHoleFilter;
+	vtkMAFFillingHole *fillingHoleFilter;
 	vtkNEW(fillingHoleFilter);
 	//fillingHoleFilter->SetInput(m_ResultPolydata);
   fillingHoleFilter->SetInput(m_VTKResult[m_VTKResult.size()-1]);

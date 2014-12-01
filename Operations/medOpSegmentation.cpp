@@ -88,7 +88,7 @@
 #include "vtkConnectivityFilter.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkPointData.h"
-#include "vtkMEDImageFillHolesRemoveIslands.h"
+#include "vtkMAFImageFillHolesRemoveIslands.h"
 
 #include "itkImage.h"
 #include "itkImageToVTKImageFilter.h"
@@ -105,8 +105,8 @@
 #include "mafNode.h"
 
 
-#include "vtkMEDVolumeToClosedSmoothSurface.h"
-#include "vtkMEDBinaryImageFloodFill.h"
+#include "vtkMAFVolumeToClosedSmoothSurface.h"
+#include "vtkMAFBinaryImageFloodFill.h"
 #include "vtkImageClip.h"
 
 
@@ -465,7 +465,7 @@ void medOpSegmentation::OpDo()
   wxBusyInfo wait(_("Wait! Generating Surface Output"));
 
   
-  vtkMAFSmartPointer<vtkMEDVolumeToClosedSmoothSurface> volToSurface;
+  vtkMAFSmartPointer<vtkMAFVolumeToClosedSmoothSurface> volToSurface;
   volToSurface->SetInput(m_OutputVolume->GetOutput()->GetVTKData());
   volToSurface->SetContourValue(127.5);
   volToSurface->Update();
@@ -1285,7 +1285,7 @@ bool medOpSegmentation::Refinement()
 bool medOpSegmentation::ApplyRefinementFilter2(vtkStructuredPoints *inputImage, vtkStructuredPoints *outputImage)
 //----------------------------------------------------------------------------
 {
-  vtkMEDImageFillHolesRemoveIslands *filter = vtkMEDImageFillHolesRemoveIslands::New();
+  vtkMAFImageFillHolesRemoveIslands *filter = vtkMAFImageFillHolesRemoveIslands::New();
   filter->SetInput(inputImage);
   filter->SetEdgeSize(m_RefinementRegionsSize);
   filter->SetRemovePeninsulaRegions(m_RemovePeninsulaRegions == TRUE);
@@ -1308,7 +1308,7 @@ bool medOpSegmentation::ApplyRefinementFilter2(vtkStructuredPoints *inputImage, 
 int medOpSegmentation::ApplyFloodFill(vtkImageData *inputImage, vtkImageData *outputImage, vtkIdType seed)
 //----------------------------------------------------------------------------
 {
-  vtkMEDBinaryImageFloodFill *filter = vtkMEDBinaryImageFloodFill::New();
+  vtkMAFBinaryImageFloodFill *filter = vtkMAFBinaryImageFloodFill::New();
   filter->SetInput(inputImage);
   filter->SetSeed(seed);
   

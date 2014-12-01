@@ -33,7 +33,7 @@ class mafVMESurface;
 class mafVMEVolumeGray;
 
 class vtkImageData;
-class vtkMEDVolumeToClosedSmoothSurface;
+class vtkMAFVolumeToClosedSmoothSurface;
 class vtkPolyData;
 
 class MAF_EXPORT medOpExtractGeometry: public mafOp
@@ -146,7 +146,7 @@ protected:
 
   double m_VolumeSpacing[3];
 
-  vtkMEDVolumeToClosedSmoothSurface *m_SurfaceExtractor;
+  vtkMAFVolumeToClosedSmoothSurface *m_SurfaceExtractor;
   
   double m_ScalarRange[2];
 

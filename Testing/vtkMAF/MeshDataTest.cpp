@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: MeshDataTest
  Authors: Roberto Mucci
  
@@ -25,7 +25,7 @@
 #include <cppunit/config/SourcePrefix.h>
 #include "MeshDataTest.h"
 
-#include "vtkMEDExtrudeToCircle.h"
+#include "vtkMAFExtrudeToCircle.h"
 
 
 
@@ -33,14 +33,14 @@
 void MeshDataTest::TestDynamicAllocation()
 //-------------------------------------------------------------------------
 {
-  vtkMEDExtrudeToCircle::MeshData *mesh = new vtkMEDExtrudeToCircle::MeshData();
+  vtkMAFExtrudeToCircle::MeshData *mesh = new vtkMAFExtrudeToCircle::MeshData();
 }
 
 //-------------------------------------------------------------------------
 void MeshDataTest::TestAllocateVertices()
 //-------------------------------------------------------------------------
 {
-  vtkMEDExtrudeToCircle::MeshData *mesh = new vtkMEDExtrudeToCircle::MeshData();
+  vtkMAFExtrudeToCircle::MeshData *mesh = new vtkMAFExtrudeToCircle::MeshData();
   mesh->AllocateRings(1);
   mesh->Ring->AllocateVertices(5);
   delete mesh;

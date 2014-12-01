@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: MemoryInfoTest
  Authors: Daniele Giunchi
  
@@ -25,7 +25,7 @@
 #include <cppunit/config/SourcePrefix.h>
 #include "MemoryInfoTest.h"
 
-#include "vtkMEDPoissonSurfaceReconstruction.h"
+#include "vtkMAFPoissonSurfaceReconstruction.h"
 
 //-------------------------------------------------------------------------
 void MemoryInfoTest::TestDynamicAllocation()

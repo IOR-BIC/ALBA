@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: CoredPointIndexTest
  Authors: Matteo Giacomoni
  
@@ -25,7 +25,7 @@
 #include <cppunit/config/SourcePrefix.h>
 #include "CoredPointIndexTest.h"
 
-#include "vtkMEDPoissonSurfaceReconstruction.h"
+#include "vtkMAFPoissonSurfaceReconstruction.h"
 
 #define TOLLERANCE 0.0001
 

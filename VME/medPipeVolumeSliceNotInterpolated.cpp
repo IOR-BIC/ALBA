@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include "medPipeVolumeSliceNotInterpolated.h"
-#include "vtkMEDVolumeSlicerNotInterpolated.h"
+#include "vtkMAFVolumeSlicerNotInterpolated.h"
 #include "mafVME.h"
 #include "mafEventSource.h"
 #include "mafGUI.h"
@@ -61,7 +61,7 @@ medPipeVolumeSliceNotInterpolated::medPipeVolumeSliceNotInterpolated()
 //----------------------------------------------------------------------------
 {
   // Initialize attributes
-  m_SliceAxis = vtkMEDVolumeSlicerNotInterpolated::SLICE_Z;
+  m_SliceAxis = vtkMAFVolumeSlicerNotInterpolated::SLICE_Z;
   m_Bounds[0] = m_Bounds[1] = m_Bounds[2] = m_Bounds[3] = m_Bounds[4] = m_Bounds[5] = 0;
   m_CurrentSlice = 0.;
   m_SliceSlider = NULL;
@@ -388,21 +388,21 @@ void medPipeVolumeSliceNotInterpolated::CreateImageDummyData()
 
   switch(m_SliceAxis)
   {
-  case vtkMEDVolumeSlicerNotInterpolated::SLICE_Z:
+  case vtkMAFVolumeSlicerNotInterpolated::SLICE_Z:
     {
       pts->InsertNextPoint(bounds[0],bounds[2],bounds[4] + 0.01);
       pts->InsertNextPoint(bounds[1],bounds[2],bounds[4] + 0.01);
       pts->InsertNextPoint(bounds[1],bounds[3],bounds[4] + 0.01);
       pts->InsertNextPoint(bounds[0],bounds[3],bounds[4] + 0.01);
     }break;
-  case vtkMEDVolumeSlicerNotInterpolated::SLICE_Y:
+  case vtkMAFVolumeSlicerNotInterpolated::SLICE_Y:
     {
       pts->InsertNextPoint(bounds[0],bounds[2] + 0.01,bounds[4]);
       pts->InsertNextPoint(bounds[1],bounds[2] + 0.01,bounds[4]);
       pts->InsertNextPoint(bounds[1],bounds[2] + 0.01,bounds[5]);
       pts->InsertNextPoint(bounds[0],bounds[2] + 0.01,bounds[5]);
     }break;
-  case vtkMEDVolumeSlicerNotInterpolated::SLICE_X:
+  case vtkMAFVolumeSlicerNotInterpolated::SLICE_X:
     {
       pts->InsertNextPoint(bounds[0] - 0.01,bounds[2],bounds[4]);
       pts->InsertNextPoint(bounds[0] - 0.01,bounds[3],bounds[4]);
@@ -610,7 +610,7 @@ void medPipeVolumeSliceNotInterpolated::CreateSlice()
   m_Origin[m_SliceAxis] = m_CurrentSlice;
 
   // Create the slicer and set its attributes
-  m_Slicer = vtkMEDVolumeSlicerNotInterpolated::New();
+  m_Slicer = vtkMAFVolumeSlicerNotInterpolated::New();
   UpdateSlice();
 }
 

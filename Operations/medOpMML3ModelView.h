@@ -36,7 +36,7 @@
 #include "vtkInteractorStyleTrackballCamera.h"
 #include "vtkInteractorStyleImage.h"
 
-#include "vtkMEDMatrixVectorMath.h"
+#include "vtkMAFMatrixVectorMath.h"
 #include "medOpMML3ModelView2DPipe.h"
 #include "medOpMML3ModelView3DPipe.h"
 
@@ -496,7 +496,7 @@ protected:
   double m_NormalMidPoint[3] ;  // value at axis mid point
   double m_NormalEnd[3] ;       // value at alpha = 1.0, not value of last slice
 
-  vtkMEDMatrixVectorMath *m_Math ; 
+  vtkMAFMatrixVectorMath *m_Math ; 
 };
 
 #endif 

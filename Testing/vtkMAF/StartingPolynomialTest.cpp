@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: StartingPolynomialTest
  Authors: Roberto Mucci
  
@@ -25,8 +25,8 @@
 #include <cppunit/config/SourcePrefix.h>
 #include "StartingPolynomialTest.h"
 
-#include "vtkMEDPoissonSurfaceReconstruction.h"
-#include "vtkMEDPoissonSurfaceReconstruction.cxx"
+#include "vtkMAFPoissonSurfaceReconstruction.h"
+#include "vtkMAFPoissonSurfaceReconstruction.cxx"
 
 //-------------------------------------------------------------------------
 void StartingPolynomialTest::TestAllMethods()

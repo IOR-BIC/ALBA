@@ -34,7 +34,7 @@ class vtkVolumeRayCastMapper;
 class vtkImageCast;
 class vtkPolyDataMapper;
 class vtkOutlineCornerFilter;
-class vtkMEDRayCastCleaner;
+class vtkMAFRayCastCleaner;
 
 //----------------------------------------------------------------------------
 // mafPipeIsosurface :
@@ -130,7 +130,7 @@ protected:
   vtkPiecewiseFunction     *m_OpacityFunction;
   vtkColorTransferFunction *m_ColorFunction;
 	vtkVolumeRayCastMapper   *m_RayCastMapper;
-  vtkMEDRayCastCleaner     *m_RayCastCleaner;
+  vtkMAFRayCastCleaner     *m_RayCastCleaner;
   vtkVolume                *m_Volume;
   
 

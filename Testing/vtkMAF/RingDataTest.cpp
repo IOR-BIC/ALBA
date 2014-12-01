@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: RingDataTest
  Authors: Roberto Mucci
  
@@ -25,7 +25,7 @@
 #include <cppunit/config/SourcePrefix.h>
 #include "RingDataTest.h"
 
-#include "vtkMEDExtrudeToCircle.h"
+#include "vtkMAFExtrudeToCircle.h"
 
 
 
@@ -33,14 +33,14 @@
 void RingDataTest::TestDynamicAllocation()
 //-------------------------------------------------------------------------
 {
-  vtkMEDExtrudeToCircle::RingData *ring = new vtkMEDExtrudeToCircle::RingData();
+  vtkMAFExtrudeToCircle::RingData *ring = new vtkMAFExtrudeToCircle::RingData();
 }
 
 //-------------------------------------------------------------------------
 void RingDataTest::TestAllocateVertices()
 //-------------------------------------------------------------------------
 {
-  vtkMEDExtrudeToCircle::RingData *ring = new vtkMEDExtrudeToCircle::RingData();
+  vtkMAFExtrudeToCircle::RingData *ring = new vtkMAFExtrudeToCircle::RingData();
   ring->AllocateVertices(5);
   delete ring;
 }

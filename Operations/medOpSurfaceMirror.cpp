@@ -35,7 +35,7 @@
 #include "mafVMELandmarkCloud.h"
 
 #include "vtkPolyData.h"
-#include "vtkMEDPolyDataMirror.h"
+#include "vtkMAFPolyDataMirror.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(medOpSurfaceMirror);
@@ -152,7 +152,7 @@ void medOpSurfaceMirror::OpRun()
 		ShowGui();
 	}
 
-  m_MirrorFilter = vtkMEDPolyDataMirror::New();
+  m_MirrorFilter = vtkMAFPolyDataMirror::New();
   m_MirrorFilter->SetInput(m_InputPolydata);
 
   Preview();

@@ -45,7 +45,7 @@
 #include "vtkTextureMapToPlane.h"
 #include "vtkCleanPolyData.h"
 #include "vtkTriangleFilter.h"
-#include "vtkMEDExtrudeToCircle.h"
+#include "vtkMAFExtrudeToCircle.h"
 #include "vtkMath.h"
 #include "vtkCell.h"
 

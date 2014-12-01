@@ -51,7 +51,7 @@
 #include "vtkImageCast.h"
 #include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"
-#include "vtkMEDRayCastCleaner.h"
+#include "vtkMAFRayCastCleaner.h"
 #include "vtkMAFVolumeResample.h"
 #include "vtkPointData.h"
 #include "vtkDataArray.h"

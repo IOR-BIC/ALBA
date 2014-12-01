@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: CSkeletonEdgeTest
  Authors: Eleonora Mambrini
  
@@ -24,23 +24,23 @@
 
 #include <cppunit/config/SourcePrefix.h>
 #include "vtkMath.h"
-#include "vtkMEDPolyDataDeformation.h"
+#include "vtkMAFPolyDataDeformation.h"
 #include "CSkeletonEdgeTest.h"
 
 //-------------------------------------------------------------------------
 void CSkeletonEdgeTest::TestDynamicAllocation()
 //-------------------------------------------------------------------------
 {
-  vtkMEDPolyDataDeformation::CSkeletonEdge *edge1 = new vtkMEDPolyDataDeformation::CSkeletonEdge();
+  vtkMAFPolyDataDeformation::CSkeletonEdge *edge1 = new vtkMAFPolyDataDeformation::CSkeletonEdge();
 
-  vtkMEDPolyDataDeformation::CSkeletonVertex *v1, *v2;
+  vtkMAFPolyDataDeformation::CSkeletonVertex *v1, *v2;
   double coords1[3], coords2[3];
   coords1[0] = coords1[1] = coords1[2] = 0.0;
   coords2[0] = coords2[1] = coords2[2] = 1.0;
 
-  v1 = new vtkMEDPolyDataDeformation::CSkeletonVertex(coords1);
-  v2 = new vtkMEDPolyDataDeformation::CSkeletonVertex(coords2);
-  vtkMEDPolyDataDeformation::CSkeletonEdge *edge2 = new vtkMEDPolyDataDeformation::CSkeletonEdge(v1,v2);
+  v1 = new vtkMAFPolyDataDeformation::CSkeletonVertex(coords1);
+  v2 = new vtkMAFPolyDataDeformation::CSkeletonVertex(coords2);
+  vtkMAFPolyDataDeformation::CSkeletonEdge *edge2 = new vtkMAFPolyDataDeformation::CSkeletonEdge(v1,v2);
  
   delete edge1;
   delete edge2;
@@ -51,7 +51,7 @@ void CSkeletonEdgeTest::TestDynamicAllocation()
 void CSkeletonEdgeTest::TestGetLength()
 //-------------------------------------------------------------------------
 {
-  vtkMEDPolyDataDeformation::CSkeletonEdge *edge = new vtkMEDPolyDataDeformation::CSkeletonEdge();
+  vtkMAFPolyDataDeformation::CSkeletonEdge *edge = new vtkMAFPolyDataDeformation::CSkeletonEdge();
   
   CPPUNIT_ASSERT(edge->GetLength() == 0.0);
 
@@ -59,9 +59,9 @@ void CSkeletonEdgeTest::TestGetLength()
   coords1[0] = coords1[1] = coords1[2] = 0.0;
   coords2[0] = coords2[1] = coords2[2] = 1.0;
 
-  vtkMEDPolyDataDeformation::CSkeletonVertex *v1, *v2;
-  v1 = new vtkMEDPolyDataDeformation::CSkeletonVertex(coords1);
-  v2 = new vtkMEDPolyDataDeformation::CSkeletonVertex(coords2);
+  vtkMAFPolyDataDeformation::CSkeletonVertex *v1, *v2;
+  v1 = new vtkMAFPolyDataDeformation::CSkeletonVertex(coords1);
+  v2 = new vtkMAFPolyDataDeformation::CSkeletonVertex(coords2);
 
   edge->Verts[0] = v1;
   edge->Verts[1] = v2;
@@ -78,15 +78,15 @@ void CSkeletonEdgeTest::TestGetLength()
 void CSkeletonEdgeTest::TestGetNumberOfConnectedEdges()
 //-------------------------------------------------------------------------
 {
-  vtkMEDPolyDataDeformation::CSkeletonEdge *edge = new vtkMEDPolyDataDeformation::CSkeletonEdge();
+  vtkMAFPolyDataDeformation::CSkeletonEdge *edge = new vtkMAFPolyDataDeformation::CSkeletonEdge();
 
   double coords1[3], coords2[3];
   coords1[0] = coords1[1] = coords1[2] = 0.0;
   coords2[0] = coords2[1] = coords2[2] = 1.0;
 
-  vtkMEDPolyDataDeformation::CSkeletonVertex *v1, *v2;
-  v1 = new vtkMEDPolyDataDeformation::CSkeletonVertex(coords1);
-  v2 = new vtkMEDPolyDataDeformation::CSkeletonVertex(coords2);
+  vtkMAFPolyDataDeformation::CSkeletonVertex *v1, *v2;
+  v1 = new vtkMAFPolyDataDeformation::CSkeletonVertex(coords1);
+  v2 = new vtkMAFPolyDataDeformation::CSkeletonVertex(coords2);
 
   edge->Verts[0] = v1;
   edge->Verts[1] = v2;
@@ -102,15 +102,15 @@ void CSkeletonEdgeTest::TestGetNumberOfConnectedEdges()
 void CSkeletonEdgeTest::TestIsInternal()
 //-------------------------------------------------------------------------
 {
-  vtkMEDPolyDataDeformation::CSkeletonEdge *edge = new vtkMEDPolyDataDeformation::CSkeletonEdge();
+  vtkMAFPolyDataDeformation::CSkeletonEdge *edge = new vtkMAFPolyDataDeformation::CSkeletonEdge();
 
   double coords1[3], coords2[3];
   coords1[0] = coords1[1] = coords1[2] = 0.0;
   coords2[0] = coords2[1] = coords2[2] = 1.0;
 
-  vtkMEDPolyDataDeformation::CSkeletonVertex *v1, *v2;
-  v1 = new vtkMEDPolyDataDeformation::CSkeletonVertex(coords1);
-  v2 = new vtkMEDPolyDataDeformation::CSkeletonVertex(coords2);
+  vtkMAFPolyDataDeformation::CSkeletonVertex *v1, *v2;
+  v1 = new vtkMAFPolyDataDeformation::CSkeletonVertex(coords1);
+  v2 = new vtkMAFPolyDataDeformation::CSkeletonVertex(coords2);
 
   edge->Verts[0] = v1;
   edge->Verts[1] = v2;

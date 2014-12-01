@@ -39,7 +39,7 @@
 
 #include "vtkMath.h"
 #include "vtkMAFSmartPointer.h"
-#include "vtkMEDRegionGrowingLocalGlobalThreshold.h"
+#include "vtkMAFRegionGrowingLocalGlobalThreshold.h"
 #include "vtkImageData.h"
 #include "vtkPointData.h"
 #include "vtkStructuredPoints.h"
@@ -285,7 +285,7 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::RegionGrowing()
   
   //Apply the region growing filter
   mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
-  vtkMAFSmartPointer<vtkMEDRegionGrowingLocalGlobalThreshold> localFilter;
+  vtkMAFSmartPointer<vtkMAFRegionGrowingLocalGlobalThreshold> localFilter;
   localFilter->SetInput(imageData);
   localFilter->SetLowerLabel(m_LowerLabel);
   localFilter->SetLowerThreshold(m_Threshold);

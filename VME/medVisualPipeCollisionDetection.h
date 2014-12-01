@@ -30,7 +30,7 @@
 //----------------------------------------------------------------------------
 class mafVME;
 class mafMatrix;
-class vtkMEDCollisionDetectionFilter;
+class vtkMAFCollisionDetectionFilter;
 class vtkActor;
 class vtkPolyDataMapper;
 class vtkIdList;
@@ -110,7 +110,7 @@ protected:
   std::vector<mafVME *> m_SurfacesToCollide;
   vtkPolyDataMapper *m_Mapper;
   vtkActor *m_Actor;
-  vtkMEDCollisionDetectionFilter *m_CollisionFilter;
+  vtkMAFCollisionDetectionFilter *m_CollisionFilter;
   mafMatrix *m_Matrix0;
   std::vector<mafMatrix *> m_Matrix1;
   bool m_ShowSurfaceToCollide;

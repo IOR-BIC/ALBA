@@ -28,7 +28,7 @@
 #include "vtkLookupTable.h"
 #include "mafGUILutSwatch.h"
 #include "wx\sizer.h"
-#include "vtkMEDVolumeSlicerNotInterpolated.h"
+#include "vtkMAFVolumeSlicerNotInterpolated.h"
 
 mafCxxTypeMacro(mafViewSliceNotInterpolated);
 
@@ -228,15 +228,15 @@ void mafViewSliceNotInterpolated::SetSliceAxis()
 
   switch(m_SliceAxis)
   {
-  case vtkMEDVolumeSlicerNotInterpolated::SLICE_X:
+  case vtkMAFVolumeSlicerNotInterpolated::SLICE_X:
     {
       m_CameraPositionId = CAMERA_OS_X;
     } break;
-  case vtkMEDVolumeSlicerNotInterpolated::SLICE_Y:
+  case vtkMAFVolumeSlicerNotInterpolated::SLICE_Y:
     {
       m_CameraPositionId = CAMERA_OS_Y;
     } break;
-  case vtkMEDVolumeSlicerNotInterpolated::SLICE_Z:
+  case vtkMAFVolumeSlicerNotInterpolated::SLICE_Z:
     {
       m_CameraPositionId = CAMERA_OS_Z;
     } break;

@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: CoredEdgeIndexTest
  Authors: Matteo Giacomoni
  
@@ -25,7 +25,7 @@
 #include <cppunit/config/SourcePrefix.h>
 #include "CoredEdgeIndexTest.h"
 
-#include "vtkMEDPoissonSurfaceReconstruction.h"
+#include "vtkMAFPoissonSurfaceReconstruction.h"
 
 //-------------------------------------------------------------------------
 void CoredEdgeIndexTest::TestDynamicAllocation()

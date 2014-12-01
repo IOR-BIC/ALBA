@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: VertexDataTest
  Authors: Roberto Mucci
  
@@ -25,7 +25,7 @@
 #include <cppunit/config/SourcePrefix.h>
 #include "VertexDataTest.h"
 
-#include "vtkMEDExtrudeToCircle.h"
+#include "vtkMAFExtrudeToCircle.h"
 
 
 
@@ -33,7 +33,7 @@
 void VertexDataTest::TestDynamicAllocation()
 //-------------------------------------------------------------------------
 {
-  vtkMEDExtrudeToCircle::VertexData *vertex = new vtkMEDExtrudeToCircle::VertexData();
+  vtkMAFExtrudeToCircle::VertexData *vertex = new vtkMAFExtrudeToCircle::VertexData();
   delete vertex;
 }
 
@@ -44,7 +44,7 @@ void VertexDataTest::TestCylCoord()
   double rIn = 2.5;
   double phiIn = 5;
   double zIn = 10.2;
-  vtkMEDExtrudeToCircle::VertexData *vertex = new vtkMEDExtrudeToCircle::VertexData();
+  vtkMAFExtrudeToCircle::VertexData *vertex = new vtkMAFExtrudeToCircle::VertexData();
   vertex->SetCylCoords(rIn, phiIn, zIn);
   double r, phi, z;
   vertex->GetCylCoords(&r, &phi, &z);
@@ -59,7 +59,7 @@ void VertexDataTest::TestCartCoords()
   double xIn = 2.5;
   double yIn = 5;
   double zIn = 10.2;
-  vtkMEDExtrudeToCircle::VertexData *vertex = new vtkMEDExtrudeToCircle::VertexData();
+  vtkMAFExtrudeToCircle::VertexData *vertex = new vtkMAFExtrudeToCircle::VertexData();
   vertex->SetCartCoords(xIn, yIn, zIn);
   double x[3];
   vertex->GetCartCoords(x);
@@ -72,7 +72,7 @@ void VertexDataTest::TestId()
 //-------------------------------------------------------------------------
 {
   int idIn = 5;
-  vtkMEDExtrudeToCircle::VertexData *vertex = new vtkMEDExtrudeToCircle::VertexData();
+  vtkMAFExtrudeToCircle::VertexData *vertex = new vtkMAFExtrudeToCircle::VertexData();
   vertex->SetId(idIn);
   int id = vertex->GetId();
   CPPUNIT_ASSERT(idIn == id);

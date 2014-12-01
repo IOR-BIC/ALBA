@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: TreeNodeDataTest
  Authors: Eleonora Mambrini
  
@@ -24,7 +24,7 @@
 
 #include <cppunit/config/SourcePrefix.h>
 #include "mafString.h"
-#include "vtkMEDPoissonSurfaceReconstruction.h"
+#include "vtkMAFPoissonSurfaceReconstruction.h"
 #include "TreeNodeDataTest.h"
 
 #include "vtkMAFSmartPointer.h"

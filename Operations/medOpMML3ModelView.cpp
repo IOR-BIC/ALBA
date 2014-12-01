@@ -20,7 +20,7 @@
 #include "medOpMML3ModelView.h"
 #include "medOpMML3ModelView2DPipe.h"
 #include "medOpMML3ModelView3DPipe.h"
-#include "vtkMEDMatrixVectorMath.h"
+#include "vtkMAFMatrixVectorMath.h"
 
 #include "vtkMath.h"
 #include "vtkInteractorStyleImage.h"
@@ -42,7 +42,7 @@ medOpMML3ModelView::medOpMML3ModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
 : m_RenderWindow(rw), m_Renderer(ren), m_MuscleInput(muscleIn),  m_MuscleOutput(muscleOut),
 m_Scans(volume), m_NumberOfScans(numberOfScans), m_Landmarks4(0), m_ScalingOccured(false), m_ScansGrain(1)
 { 
-  m_Math = vtkMEDMatrixVectorMath::New() ;
+  m_Math = vtkMAFMatrixVectorMath::New() ;
 
   //----------------------------------------------------------------------------
   // Set up slices and their pose matrices

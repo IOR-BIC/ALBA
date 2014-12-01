@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: CMatrixTest
  Authors: Matteo Giacomoni
  
@@ -25,33 +25,33 @@
 #include <cppunit/config/SourcePrefix.h>
 #include "CMatrixTest.h"
 
-#include "vtkMEDPolyDataDeformation.h"
+#include "vtkMAFPolyDataDeformation.h"
 
 //-------------------------------------------------------------------------
 void CMatrixTest::TestDynamicAllocation()
 //-------------------------------------------------------------------------
 {
-  vtkMEDPolyDataDeformation::CMatrix<double> *M1 = new vtkMEDPolyDataDeformation::CMatrix<double>(2,2);
+  vtkMAFPolyDataDeformation::CMatrix<double> *M1 = new vtkMAFPolyDataDeformation::CMatrix<double>(2,2);
   delete M1;
-  vtkMEDPolyDataDeformation::CMatrix<int> *M2 = new vtkMEDPolyDataDeformation::CMatrix<int>(2,2);
+  vtkMAFPolyDataDeformation::CMatrix<int> *M2 = new vtkMAFPolyDataDeformation::CMatrix<int>(2,2);
   delete M2;
 }
 //-------------------------------------------------------------------------
 void CMatrixTest::TestStaticAllocation()
 //-------------------------------------------------------------------------
 {
-  vtkMEDPolyDataDeformation::CMatrix<double> M1(2,2);
-  vtkMEDPolyDataDeformation::CMatrix<int> M2(2,2);
+  vtkMAFPolyDataDeformation::CMatrix<double> M1(2,2);
+  vtkMAFPolyDataDeformation::CMatrix<int> M2(2,2);
 }
 //-------------------------------------------------------------------------
 void CMatrixTest::TestGetNumberOfColumns()
 //-------------------------------------------------------------------------
 {
-  vtkMEDPolyDataDeformation::CMatrix<double> *M1 = new vtkMEDPolyDataDeformation::CMatrix<double>(15,22);
+  vtkMAFPolyDataDeformation::CMatrix<double> *M1 = new vtkMAFPolyDataDeformation::CMatrix<double>(15,22);
   CPPUNIT_ASSERT(M1->GetNumberOfColumns() == 22);
   delete M1;
 
-  vtkMEDPolyDataDeformation::CMatrix<int> *M2 = new vtkMEDPolyDataDeformation::CMatrix<int>(18,7);
+  vtkMAFPolyDataDeformation::CMatrix<int> *M2 = new vtkMAFPolyDataDeformation::CMatrix<int>(18,7);
   CPPUNIT_ASSERT(M2->GetNumberOfColumns() == 7);
   delete M2;
 }
@@ -59,11 +59,11 @@ void CMatrixTest::TestGetNumberOfColumns()
 void CMatrixTest::TestGetNumberOfRows()
 //-------------------------------------------------------------------------
 {
-  vtkMEDPolyDataDeformation::CMatrix<double> *M1 = new vtkMEDPolyDataDeformation::CMatrix<double>(15,22);
+  vtkMAFPolyDataDeformation::CMatrix<double> *M1 = new vtkMAFPolyDataDeformation::CMatrix<double>(15,22);
   CPPUNIT_ASSERT(M1->GetNumberOfRows() == 15);
   delete M1;
 
-  vtkMEDPolyDataDeformation::CMatrix<int> *M2 = new vtkMEDPolyDataDeformation::CMatrix<int>(18,7);
+  vtkMAFPolyDataDeformation::CMatrix<int> *M2 = new vtkMAFPolyDataDeformation::CMatrix<int>(18,7);
   CPPUNIT_ASSERT(M2->GetNumberOfRows() == 18);
   delete M2;
 }
@@ -71,11 +71,11 @@ void CMatrixTest::TestGetNumberOfRows()
 void CMatrixTest::TestGetMinSize()
 //-------------------------------------------------------------------------
 {
-  vtkMEDPolyDataDeformation::CMatrix<double> *M1 = new vtkMEDPolyDataDeformation::CMatrix<double>(15,22);
+  vtkMAFPolyDataDeformation::CMatrix<double> *M1 = new vtkMAFPolyDataDeformation::CMatrix<double>(15,22);
   CPPUNIT_ASSERT(M1->GetMinSize() == 15);
   delete M1;
 
-  vtkMEDPolyDataDeformation::CMatrix<int> *M2 = new vtkMEDPolyDataDeformation::CMatrix<int>(18,7);
+  vtkMAFPolyDataDeformation::CMatrix<int> *M2 = new vtkMAFPolyDataDeformation::CMatrix<int>(18,7);
   CPPUNIT_ASSERT(M2->GetMinSize() == 7);
   delete M2;
 }
@@ -83,7 +83,7 @@ void CMatrixTest::TestGetMinSize()
 void CMatrixTest::TestOperator()
 //-------------------------------------------------------------------------
 {
-  vtkMEDPolyDataDeformation::CMatrix<double> *M1 = new vtkMEDPolyDataDeformation::CMatrix<double>(15,22);
+  vtkMAFPolyDataDeformation::CMatrix<double> *M1 = new vtkMAFPolyDataDeformation::CMatrix<double>(15,22);
   (*M1)(0,1) = 5.0;
   CPPUNIT_ASSERT( (*M1)(0,1) == 5.0 );
   delete M1;

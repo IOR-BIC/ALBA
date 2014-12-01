@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: CSkeletonVertexTest
  Authors: Eleonora Mambrini
  
@@ -24,19 +24,19 @@
 
 #include <cppunit/config/SourcePrefix.h>
 #include "vtkMath.h"
-#include "vtkMEDPolyDataDeformation.h"
+#include "vtkMAFPolyDataDeformation.h"
 #include "CSkeletonVertexTest.h"
 
 //-------------------------------------------------------------------------
 void CSkeletonVertexTest::TestDynamicAllocation()
 //-------------------------------------------------------------------------
 {
-  vtkMEDPolyDataDeformation::CSkeletonVertex *v1, *v2;
+  vtkMAFPolyDataDeformation::CSkeletonVertex *v1, *v2;
   double coords[3];
   coords[0] = coords[1] = coords[2] = 0.0;
 
-  v1 = new vtkMEDPolyDataDeformation::CSkeletonVertex();
-  v2 = new vtkMEDPolyDataDeformation::CSkeletonVertex(coords);
+  v1 = new vtkMAFPolyDataDeformation::CSkeletonVertex();
+  v2 = new vtkMAFPolyDataDeformation::CSkeletonVertex(coords);
 
   delete v1;
   delete v2;
@@ -49,13 +49,13 @@ void CSkeletonVertexTest::TestGetDegree()
   coords1[0] = coords1[1] = coords1[2] = 0.0;
   coords2[0] = coords2[1] = coords2[2] = 1.0;
 
-  vtkMEDPolyDataDeformation::CSkeletonVertex *vertex1 = new vtkMEDPolyDataDeformation::CSkeletonVertex(coords1);
-  vtkMEDPolyDataDeformation::CSkeletonVertex *vertex2 = new vtkMEDPolyDataDeformation::CSkeletonVertex(coords2);
+  vtkMAFPolyDataDeformation::CSkeletonVertex *vertex1 = new vtkMAFPolyDataDeformation::CSkeletonVertex(coords1);
+  vtkMAFPolyDataDeformation::CSkeletonVertex *vertex2 = new vtkMAFPolyDataDeformation::CSkeletonVertex(coords2);
 
   CPPUNIT_ASSERT(vertex1->GetDegree() == 0);
 
-  vtkMEDPolyDataDeformation::CSkeletonEdge *e1;
-  e1 = new vtkMEDPolyDataDeformation::CSkeletonEdge(vertex1, vertex2);
+  vtkMAFPolyDataDeformation::CSkeletonEdge *e1;
+  e1 = new vtkMAFPolyDataDeformation::CSkeletonEdge(vertex1, vertex2);
 
   vertex1->OneRingEdges.push_back(e1);
 
@@ -75,8 +75,8 @@ void CSkeletonVertexTest::TestGetNumberOfJoinedVertices()
   coords1[0] = coords1[1] = coords1[2] = 0.0;
   coords2[0] = coords2[1] = coords2[2] = 1.0;
 
-  vtkMEDPolyDataDeformation::CSkeletonVertex *vertex1 = new vtkMEDPolyDataDeformation::CSkeletonVertex(coords1);
-  vtkMEDPolyDataDeformation::CSkeletonVertex *vertex2 = new vtkMEDPolyDataDeformation::CSkeletonVertex(coords2);
+  vtkMAFPolyDataDeformation::CSkeletonVertex *vertex1 = new vtkMAFPolyDataDeformation::CSkeletonVertex(coords1);
+  vtkMAFPolyDataDeformation::CSkeletonVertex *vertex2 = new vtkMAFPolyDataDeformation::CSkeletonVertex(coords2);
 
   CPPUNIT_ASSERT(vertex1->GetNumberOfJoinedVertices() == 0);
   CPPUNIT_ASSERT(vertex2->GetNumberOfJoinedVertices() == 0);
@@ -99,7 +99,7 @@ void CSkeletonVertexTest::TestIsInPositiveHalfspace()
   coords1[0] = coords1[1] = coords1[2] = 0.0;
   coords2[0] = coords2[1] = coords2[2] = 1.0;
 
-  vtkMEDPolyDataDeformation::CSkeletonVertex *vertex1 = new vtkMEDPolyDataDeformation::CSkeletonVertex(coords1);
+  vtkMAFPolyDataDeformation::CSkeletonVertex *vertex1 = new vtkMAFPolyDataDeformation::CSkeletonVertex(coords1);
 
   CPPUNIT_ASSERT(vertex1->IsInPositiveHalfspace(coords1));
   CPPUNIT_ASSERT(vertex1->IsInPositiveHalfspace(coords2));

@@ -23,8 +23,8 @@ University of Bedfordshire, UK
 #include "mafEvent.h"
 #include "mmaMaterial.h"
 #include "mafVMEOutputPolyline.h"
-#include "vtkMEDStentModelSource.h"
-#include "vtkMEDDeformableSimplexMeshFilter.h"
+#include "vtkMAFStentModelSource.h"
+#include "vtkMAFDeformableSimplexMeshFilter.h"
 #include "vtkPolyData.h"
 #include "vtkCellArray.h"
 #include "vtkIdList.h"
@@ -37,12 +37,12 @@ typedef itk::SimplexMesh<double,3,MeshTraits>           SimplexMeshType;
 //typedef SimplexMeshType::NeighborListType               NeighborsListType;
 //typedef itk::SimplexMeshGeometry::IndexArray            IndexArray;
 //typedef SimplexMeshType::PointType                      PointType;
-typedef vtkMEDStentModelSource::Strut                         Strut;
-typedef vtkMEDStentModelSource::StentConfigurationType        enumStCfgType;
-typedef vtkMEDStentModelSource::LinkConnectionType            enumLinkConType;
-typedef vtkMEDStentModelSource::LinkOrientationType           enumLinkOrtType;
+typedef vtkMAFStentModelSource::Strut                         Strut;
+typedef vtkMAFStentModelSource::StentConfigurationType        enumStCfgType;
+typedef vtkMAFStentModelSource::LinkConnectionType            enumLinkConType;
+typedef vtkMAFStentModelSource::LinkOrientationType           enumLinkOrtType;
 typedef std::vector<Strut>::const_iterator    StrutIterator;
-typedef itk::vtkMEDDeformableSimplexMeshFilter<SimplexMeshType,SimplexMeshType> DeformFilterType;
+typedef itk::vtkMAFDeformableSimplexMeshFilter<SimplexMeshType,SimplexMeshType> DeformFilterType;
 
 
 
@@ -435,7 +435,7 @@ private:
   bool m_CenterLineVMEDefined ;
 
   // stent
-  vtkMEDStentModelSource *m_StentSource;
+  vtkMAFStentModelSource *m_StentSource;
   vtkPolyData *m_StentPolyData;
   vtkPolyData *m_StentCenterLine ;
   int m_StentStartPosId ; // init position - id along vessel center line

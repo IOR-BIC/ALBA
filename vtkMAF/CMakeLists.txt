@@ -86,7 +86,7 @@ SET(vtkMAF_SRCS
   vtkMAFXYPlotActor.h
   vtkMAFPolyDataNormals.cxx
   vtkMAFPolyDataNormals.h
-  ####################### from vtkMED
+  ####################### from vtkMAF
   vtkDicomUnPacker.cxx
   vtkDicomUnPacker.h
   vtkImageUnPacker.cxx
@@ -101,34 +101,34 @@ SET(vtkMAF_SRCS
   vtkTriangleQualityRatio.h
   vtkMAFCellLocator.cxx
   vtkMAFCellLocator.h
-  vtkMEDAddScalarsFilter.cxx
-  vtkMEDAddScalarsFilter.h
-  vtkMEDExtrudeToCircle.cxx
-  vtkMEDExtrudeToCircle.h
-  vtkMEDFillingHole.cxx
-  vtkMEDFillingHole.h
-  vtkMEDFixTopology.cxx
-  vtkMEDFixTopology.h
-  vtkMEDImageUnsharpFilter.cxx
-  vtkMEDImageUnsharpFilter.h
-  vtkMEDMatrixVectorMath.h
-  vtkMEDMatrixVectorMath.cxx
-  vtkMEDPoissonSurfaceReconstruction.cxx
-  vtkMEDPoissonSurfaceReconstruction.h
-  vtkMEDPolyDataMirror.cxx
-  vtkMEDPolyDataMirror.h
-  vtkMEDPolyDataNavigator.h
-  vtkMEDPolyDataNavigator.cxx
-  vtkMEDRegionGrowingLocalGlobalThreshold.cxx
-  vtkMEDRegionGrowingLocalGlobalThreshold.h
-  vtkMEDHalfTubeRemoval.cxx
-  vtkMEDHalfTubeRemoval.h
-  vtkMEDInteractorStyleEnableRotation.cxx
-  vtkMEDInteractorStyleEnableRotation.h
-  vtkMEDSubdividePolylines.cxx
-  vtkMEDSubdividePolylines.h
-  vtkMEDLandmarkCloudPolydataFilter.cxx
-  vtkMEDLandmarkCloudPolydataFilter.h
+  vtkMAFAddScalarsFilter.cxx
+  vtkMAFAddScalarsFilter.h
+  vtkMAFExtrudeToCircle.cxx
+  vtkMAFExtrudeToCircle.h
+  vtkMAFFillingHole.cxx
+  vtkMAFFillingHole.h
+  vtkMAFFixTopology.cxx
+  vtkMAFFixTopology.h
+  vtkMAFImageUnsharpFilter.cxx
+  vtkMAFImageUnsharpFilter.h
+  vtkMAFMatrixVectorMath.h
+  vtkMAFMatrixVectorMath.cxx
+  vtkMAFPoissonSurfaceReconstruction.cxx
+  vtkMAFPoissonSurfaceReconstruction.h
+  vtkMAFPolyDataMirror.cxx
+  vtkMAFPolyDataMirror.h
+  vtkMAFPolyDataNavigator.h
+  vtkMAFPolyDataNavigator.cxx
+  vtkMAFRegionGrowingLocalGlobalThreshold.cxx
+  vtkMAFRegionGrowingLocalGlobalThreshold.h
+  vtkMAFHalfTubeRemoval.cxx
+  vtkMAFHalfTubeRemoval.h
+  vtkMAFInteractorStyleEnableRotation.cxx
+  vtkMAFInteractorStyleEnableRotation.h
+  vtkMAFSubdividePolylines.cxx
+  vtkMAFSubdividePolylines.h
+  vtkMAFLandmarkCloudPolydataFilter.cxx
+  vtkMAFLandmarkCloudPolydataFilter.h
   vtkBox.cxx
   vtkBox.h
   vtkMaskPolyDataFilter.cxx
@@ -176,47 +176,47 @@ SET(vtkMAF_SRCS
   ###############################################
   
   ###############################################
-  vtkMEDPolyDataDeformation.cpp
-  vtkMEDPolyDataDeformation.h
-  vtkMEDPolyDataDeformation_M1.cpp
-  vtkMEDPolyDataDeformation_M1.h
-  vtkMEDPolyDataDeformation_M2.cpp
-  vtkMEDPolyDataDeformation_M2.h  
+  vtkMAFPolyDataDeformation.cpp
+  vtkMAFPolyDataDeformation.h
+  vtkMAFPolyDataDeformation_M1.cpp
+  vtkMAFPolyDataDeformation_M1.h
+  vtkMAFPolyDataDeformation_M2.cpp
+  vtkMAFPolyDataDeformation_M2.h  
   ###############################################
     
 
   
-  vtkMEDErythrocyteSource.cpp
-  vtkMEDErythrocyteSource.h
+  vtkMAFErythrocyteSource.cpp
+  vtkMAFErythrocyteSource.h
   
-  vtkMEDImageFillHolesRemoveIslands.cxx
-  vtkMEDImageFillHolesRemoveIslands.h
+  vtkMAFImageFillHolesRemoveIslands.cxx
+  vtkMAFImageFillHolesRemoveIslands.h
   
-  vtkMEDVolumeSlicerNotInterpolated.cxx
-  vtkMEDVolumeSlicerNotInterpolated.h
+  vtkMAFVolumeSlicerNotInterpolated.cxx
+  vtkMAFVolumeSlicerNotInterpolated.h
 
-  vtkMEDBinaryImageFloodFill.cxx
-  vtkMEDBinaryImageFloodFill.h
+  vtkMAFBinaryImageFloodFill.cxx
+  vtkMAFBinaryImageFloodFill.h
   
   ######vtkbioeng################################
-  vtkMEDCollisionDetectionFilter.cxx
-  vtkMEDCollisionDetectionFilter.h
+  vtkMAFCollisionDetectionFilter.cxx
+  vtkMAFCollisionDetectionFilter.h
   
-  vtkMEDRayCastCleaner.cpp
-  vtkMEDRayCastCleaner.h
+  vtkMAFRayCastCleaner.cpp
+  vtkMAFRayCastCleaner.h
   
-  vtkMEDVolumeToClosedSmoothSurface.cxx
-  vtkMEDVolumeToClosedSmoothSurface.h
+  vtkMAFVolumeToClosedSmoothSurface.cxx
+  vtkMAFVolumeToClosedSmoothSurface.h
   
   ################################
   vtkBoundingBox.cxx
   vtkBoundingBox.h
-  vtkMEDPastValuesList.cpp
-  vtkMEDPastValuesList.h
-  vtkMEDStentModelSource.cpp
-  vtkMEDStentModelSource.h
-  vtkMEDDeformableSimplexMeshFilter.h
-  vtkMEDDeformableSimplexMeshFilter_Impl.h
+  vtkMAFPastValuesList.cpp
+  vtkMAFPastValuesList.h
+  vtkMAFStentModelSource.cpp
+  vtkMAFStentModelSource.h
+  vtkMAFDeformableSimplexMeshFilter.h
+  vtkMAFDeformableSimplexMeshFilter_Impl.h
 
 )
 

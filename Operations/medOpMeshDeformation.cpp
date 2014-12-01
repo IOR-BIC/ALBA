@@ -58,9 +58,9 @@
 #include "vtkCellPicker.h"
 
 #include "vtkMath.h"
-#include "vtkMEDPolyDataDeformation.h"
-#include "vtkMEDPolyDataDeformation_M1.h"
-#include "vtkMEDPolyDataDeformation_M2.h"
+#include "vtkMAFPolyDataDeformation.h"
+#include "vtkMAFPolyDataDeformation_M1.h"
+#include "vtkMAFPolyDataDeformation_M2.h"
 
 #ifdef DEBUG_medOpMeshDeformation
 #include "vtkCharArray.h"
@@ -2211,13 +2211,13 @@ void medOpMeshDeformation::DeformMesh()
   switch (m_DeformationMode)
   {
   case DEM_BLANCO:
-    DeformMeshT< vtkMEDPolyDataDeformation_M1 >(); 
+    DeformMeshT< vtkMAFPolyDataDeformation_M1 >(); 
     break;
   case DEM_SEPPLANES:
-    DeformMeshT< vtkMEDPolyDataDeformation_M2 >(); 
+    DeformMeshT< vtkMAFPolyDataDeformation_M2 >(); 
     break;
   default:
-    DeformMeshT< vtkMEDPolyDataDeformation >(); 
+    DeformMeshT< vtkMAFPolyDataDeformation >(); 
     break;
   }
 }

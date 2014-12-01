@@ -20,7 +20,7 @@
 #include "mafDefines.h"
 #include "mafPipeSlice.h"
 
-class vtkMEDVolumeSlicerNotInterpolated;
+class vtkMAFVolumeSlicerNotInterpolated;
 class mafGUI;
 class vtkLookupTable;
 class vtkImageData;
@@ -89,7 +89,7 @@ protected:
   mafGUIFloatSlider *m_SliceSlider;                       //> Slice coordinate slider
   vtkLookupTable  *m_ColorLUT;                            //> Lookup table to display slice
   vtkLookupTable *m_VolumeLUT;                            //> Input volume lookup table
-  vtkMEDVolumeSlicerNotInterpolated * m_Slicer;           //> Not interpolated slicer
+  vtkMAFVolumeSlicerNotInterpolated * m_Slicer;           //> Not interpolated slicer
   std::vector<vtkImageData *>m_SlicerOutputImageData;     //> Image data from the slicer
   std::vector<vtkImageData *> m_SlicerImageDataToRender;  //> Image data to be rendered
   std::vector<vtkImageMapToColors *>m_ImageMapToColors;   //> Filter that map colors on image data
