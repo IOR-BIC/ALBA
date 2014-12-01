@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: medVMEOutputComputeWrapping
  Authors: Anupam Agrawal and Hui Wei
  

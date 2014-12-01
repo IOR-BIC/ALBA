@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: medOpIterativeRegistration
  Authors: Stefano Perticoni
  
@@ -29,7 +29,7 @@
 //----------------------------------------------------------------------------
 class mafVME;
 class mafEvent; 
-class medGUILandmark;
+class mafGUILandmark;
 class vtkPoints;
 class vtkMatrix4x4;
 
@@ -103,7 +103,7 @@ class MAF_EXPORT medOpIterativeRegistration : public mafOp
     mafVME *m_SourceVME;
     mafVME *m_TargetVME;
  
-    medGUILandmark *m_GuiLandmark[2];
+    mafGUILandmark *m_GuiLandmark[2];
 
     mafString m_SourceVmeName;
     mafString m_TargetVmeName;

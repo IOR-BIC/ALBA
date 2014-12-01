@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: medOpFillHoles
  Authors: Matteo Giacomoni, Josef Kohout
  

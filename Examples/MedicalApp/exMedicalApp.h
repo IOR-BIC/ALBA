@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: exMedicalApp
  Authors: Matteo Giacomoni - Daniele Giunchi - Gianluigi Crimi
  

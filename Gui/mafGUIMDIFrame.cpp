@@ -108,8 +108,10 @@ BEGIN_EVENT_TABLE(mafGUIMDIFrame, wxMDIParentFrame)
     EVT_UPDATE_UI_RANGE(OP_START,OP_END,mafGUIMDIFrame::OnUpdateUI)
     EVT_SIZE(mafGUIMDIFrame::OnSize) //SIL. 23-may-2006 : 
 
-    EVT_IDLE(mafGUIMDIFrame::OnIdle)  
+    EVT_IDLE(mafGUIMDIFrame::OnIdle) 
 END_EVENT_TABLE()
+
+
 
 //----------------------------------------------------------------------------
 mafGUIMDIFrame::mafGUIMDIFrame(const wxString& title, const wxPoint& pos, const wxSize& size)

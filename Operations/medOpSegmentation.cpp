@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: medOpSegmentation
  Authors: Eleonora Mambrini - Matteo Giacomoni, Gianluigi Crimi, Alberto Losi
  
@@ -36,7 +36,7 @@
 #include "mafGUIFloatSlider.h"
 #include "mafGUILutPreset.h"
 #include "mafGUILutSlider.h"
-#include "medGUILutHistogramSwatch.h"
+#include "mafGUILutHistogramSwatch.h"
 #include "mafGUIRollOut.h"
 #include "mafGUIValidator.h"
 #include "mafInteractor.h"
@@ -748,7 +748,7 @@ void medOpSegmentation::CreateOpDialog()
   m_OLdWindowingLow = data[0];
   m_OLdWindowingHi = data[1];
 
-  m_LutWidget = new medGUILutHistogramSwatch(m_GuiDialog,m_GuiDialog->GetWidgetId(ID_LUT_CHOOSER), "LUT", m_Volume->GetOutput()->GetVTKData(), m_Volume->GetMaterial(),wxSize(135,18) );
+  m_LutWidget = new mafGUILutHistogramSwatch(m_GuiDialog,m_GuiDialog->GetWidgetId(ID_LUT_CHOOSER), "LUT", m_Volume->GetOutput()->GetVTKData(), m_Volume->GetMaterial(),wxSize(135,18) );
   m_LutWidget->SetEditable(true);
 
   /////////////////////////////////////////////////////

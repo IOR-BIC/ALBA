@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: mafClassicICPRegistration
  Authors: Stefania Paperini paperini@tecno.ior.it
  

@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: medLogicWithManagers
  Authors: Matteo Giacomoni, Gianluigi Crimi
  
@@ -24,7 +24,7 @@
 
 #include "medDecl.h"
 #include "medLogicWithManagers.h"
-#include "medGUIContextualMenu.h"
+#include "mafGUIContextualMenu.h"
 #include "mafGUIMDIChild.h"
 #include "mafViewManager.h"
 #include "medGUIMDIFrame.h"
@@ -69,7 +69,7 @@ void medLogicWithManagers::ViewContextualMenu(bool vme_menu)
 //----------------------------------------------------------------------------
 {
   // Create and visualize the contextual menu for the active vme
-  medGUIContextualMenu *contextMenu = new medGUIContextualMenu();
+  mafGUIContextualMenu *contextMenu = new mafGUIContextualMenu();
   contextMenu->SetListener(this);
   mafView *v = m_ViewManager->GetSelectedView();
   mafGUIMDIChild *c = (mafGUIMDIChild *)m_Win->GetActiveChild();

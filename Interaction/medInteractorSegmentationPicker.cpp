@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: medInteractorSegmentationPicker
  Authors: Matteo Giacomoni, Gianluigi Crimi
  

@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: mafGizmoROI_BES
  Authors: Stefano Perticoni, Josef Kohout
  

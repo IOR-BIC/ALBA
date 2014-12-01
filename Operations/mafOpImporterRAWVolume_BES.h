@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: mafOpImporterRAWVolume_BES
  Authors: Paolo Quadrani     Silvano Imboden     Josef Kohout
  

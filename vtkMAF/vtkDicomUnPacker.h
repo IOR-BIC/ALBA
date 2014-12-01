@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: vtkDicomUnPacker
  Authors: Marco Petrone m.petrone@cineca.it, Paolo Quadrani p.quadrani@cineca.it
  

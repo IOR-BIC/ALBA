@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: medInteractorDICOMImporter
  Authors: Paolo Quadrani , Stefano Perticoni
  

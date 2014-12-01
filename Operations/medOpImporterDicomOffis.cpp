@@ -1,6 +1,6 @@
 /*=========================================================================
 
-Program: MAF2Medical
+Program: MAF2
 Module: medOpImporterDicomOffis
 Authors: Matteo Giacomoni, Roberto Mucci , Stefano Perticoni, Gianluigi Crimi
 
@@ -28,7 +28,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "medOpImporterDicomOffis.h"
 
-#include "medGUIWizardPageNew.h"
+#include "mafGUIWizardPageNew.h"
 #include "mafGUIValidator.h"
 #include "mafDeviceButtonsPadMouse.h"
 #include "medInteractorDICOMImporter.h"
@@ -37,9 +37,9 @@ PURPOSE.  See the above copyright notice for more information.
 #include "mafVMEImage.h"
 #include "mafVMEVolumeGray.h"
 #include "mafGUICheckListBox.h"
-#include "medGUIDicomSettings.h"
+#include "mafGUIDicomSettings.h"
 #include "mafGUIButton.h"
-#include "medGUISettingsAdvanced.h"
+#include "mafGUISettingsAdvanced.h"
 #include "mafVMEItemVTK.h"
 #include "mafDataVector.h"
 #include "mafTransform.h"
@@ -359,15 +359,15 @@ mafOp *medOpImporterDicomOffis::Copy()
 void medOpImporterDicomOffis::OpRun()
 	//----------------------------------------------------------------------------
 {
-	m_BuildStepValue = ((medGUIDicomSettings*)GetSetting())->GetBuildStep();
-	m_DiscardPosition = ((medGUIDicomSettings*)GetSetting())->EnableDiscardPosition();
-	m_ResampleFlag = ((medGUIDicomSettings*)GetSetting())->EnableResampleVolume();
-	m_RescaleTo16Bit = ((medGUIDicomSettings*)GetSetting())->EnableRescaleTo16Bit();
+	m_BuildStepValue = ((mafGUIDicomSettings*)GetSetting())->GetBuildStep();
+	m_DiscardPosition = ((mafGUIDicomSettings*)GetSetting())->EnableDiscardPosition();
+	m_ResampleFlag = ((mafGUIDicomSettings*)GetSetting())->EnableResampleVolume();
+	m_RescaleTo16Bit = ((mafGUIDicomSettings*)GetSetting())->EnableRescaleTo16Bit();
 
 	CreateGui();
 	CreateSliceVTKPipeline();
 
-	m_Wizard = new medGUIWizard(_("DICOM Importer"));
+	m_Wizard = new mafGUIWizard(_("DICOM Importer"));
 	m_Wizard->SetListener(this);
 
 	CreateLoadPage();
@@ -392,10 +392,10 @@ void medOpImporterDicomOffis::OpRun()
 		{	
 			bool useDefaultFolder = false;
 			wxString lastDicomDir = "";
-			if (((medGUIDicomSettings*)GetSetting())->GetUseDefaultDicomFolder() == TRUE && ((medGUIDicomSettings*)GetSetting())->GetDefaultDicomFolder() != "UNEDFINED_DicomFolder")
+			if (((mafGUIDicomSettings*)GetSetting())->GetUseDefaultDicomFolder() == TRUE && ((mafGUIDicomSettings*)GetSetting())->GetDefaultDicomFolder() != "UNEDFINED_DicomFolder")
 			{
 
-				lastDicomDir = ((medGUIDicomSettings*)GetSetting())->GetDefaultDicomFolder().GetCStr();
+				lastDicomDir = ((mafGUIDicomSettings*)GetSetting())->GetDefaultDicomFolder().GetCStr();
 
 				//Check if default folder exist
 				if (::wxDirExists(lastDicomDir))
@@ -404,9 +404,9 @@ void medOpImporterDicomOffis::OpRun()
 				}
 
 			}
-			else if (((medGUIDicomSettings*)GetSetting())->GetLastDicomDir() != "UNEDFINED_m_LastDicomDir")
+			else if (((mafGUIDicomSettings*)GetSetting())->GetLastDicomDir() != "UNEDFINED_m_LastDicomDir")
 			{
-				lastDicomDir = ((medGUIDicomSettings*)GetSetting())->GetLastDicomDir();
+				lastDicomDir = ((mafGUIDicomSettings*)GetSetting())->GetLastDicomDir();
 			}
 			else if (lastDicomDir == "UNEDFINED_m_LastDicomDir")
 			{
@@ -425,7 +425,7 @@ void medOpImporterDicomOffis::OpRun()
 				if (ret_code == wxID_OK)
 				{
 					wxString path = dialog.GetPath();
-					((medGUIDicomSettings*)GetSetting())->SetLastDicomDir(path);
+					((mafGUIDicomSettings*)GetSetting())->SetLastDicomDir(path);
 					m_DicomDirectoryABSFileName = path.c_str();
 					GuiUpdate();
 					result = OpenDir();
@@ -532,7 +532,7 @@ int medOpImporterDicomOffis::RunWizard()
 					if(wait) delete wait;
 				}
 
-				if(m_DicomReaderModality != medGUIDicomSettings::ID_CMRI_MODALITY)
+				if(m_DicomReaderModality != mafGUIDicomSettings::ID_CMRI_MODALITY)
 					result = BuildOutputVMEGrayVolumeFromDicom();
 				else
 					result = BuildOutputVMEGrayVolumeFromDicomCineMRI();
@@ -543,7 +543,7 @@ int medOpImporterDicomOffis::RunWizard()
 			{
 
 
-				if(m_DicomReaderModality != medGUIDicomSettings::ID_CMRI_MODALITY)
+				if(m_DicomReaderModality != mafGUIDicomSettings::ID_CMRI_MODALITY)
 					result = BuildOutputVMEMeshFromDicom();
 				else
 					result = BuildOutputVMEMeshFromDicomCineMRI();
@@ -568,7 +568,7 @@ int medOpImporterDicomOffis::RunWizard()
 				}
 
 
-				if(m_DicomReaderModality != medGUIDicomSettings::ID_CMRI_MODALITY)
+				if(m_DicomReaderModality != mafGUIDicomSettings::ID_CMRI_MODALITY)
 					result = BuildOutputVMEImagesFromDicom();
 				else
 					result = BuildOutputVMEImagesFromDicomCineMRI();
@@ -633,7 +633,7 @@ void medOpImporterDicomOffis::Destroy()
 	if(m_LoadPage)
 	{
 		m_LoadPage->GetRWI()->m_RenFront->RemoveActor(m_SliceActor);
-		if(((medGUIDicomSettings*)GetSetting())->EnableVisualizationPosition())
+		if(((mafGUIDicomSettings*)GetSetting())->EnableVisualizationPosition())
 		{
 			m_LoadPage->GetRWI()->m_RenFront->RemoveActor(m_TextActor);
 		}
@@ -642,7 +642,7 @@ void medOpImporterDicomOffis::Destroy()
 	if(m_CropPage)
 	{
 		m_CropPage->GetRWI()->m_RenFront->RemoveActor(m_CropActor);  
-		if(((medGUIDicomSettings*)GetSetting())->EnableVisualizationPosition())
+		if(((mafGUIDicomSettings*)GetSetting())->EnableVisualizationPosition())
 		{
 			m_LoadPage->GetRWI()->m_RenFront->RemoveActor(m_TextActor);
 		}
@@ -651,7 +651,7 @@ void medOpImporterDicomOffis::Destroy()
 	if(m_BuildPage)
 	{
 		m_BuildPage->GetRWI()->m_RenFront->RemoveActor(m_SliceActor);
-		if(((medGUIDicomSettings*)GetSetting())->EnableVisualizationPosition())
+		if(((mafGUIDicomSettings*)GetSetting())->EnableVisualizationPosition())
 		{
 			m_LoadPage->GetRWI()->m_RenFront->RemoveActor(m_TextActor);
 		}
@@ -660,7 +660,7 @@ void medOpImporterDicomOffis::Destroy()
 	if(m_ReferenceSystemPage)
 	{
 		m_ReferenceSystemPage->GetRWI()->m_RenFront->RemoveActor(m_SliceActor);
-		if(((medGUIDicomSettings*)GetSetting())->EnableVisualizationPosition())
+		if(((mafGUIDicomSettings*)GetSetting())->EnableVisualizationPosition())
 		{
 			m_BuildPage->GetRWI()->m_RenFront->RemoveActor(m_TextActor);
 		}
@@ -748,13 +748,13 @@ int medOpImporterDicomOffis::BuildOutputVMEImagesFromDicom()
 		if(!this->m_TestMode)
 		{
 			double scaleFactor;
-			medGUISettingsAdvanced *guiAdv = new medGUISettingsAdvanced(this);
+			mafGUISettingsAdvanced *guiAdv = new mafGUISettingsAdvanced(this);
 
-			if(guiAdv->GetConversionType() == medGUIDicomSettings::NONE)
+			if(guiAdv->GetConversionType() == mafGUIDicomSettings::NONE)
 			{
 				scaleFactor = 1.0;
 			}
-			else if(guiAdv->GetConversionType() == medGUIDicomSettings::mm2m)
+			else if(guiAdv->GetConversionType() == mafGUIDicomSettings::mm2m)
 			{
 				scaleFactor = 0.001;
 			}
@@ -786,7 +786,7 @@ int medOpImporterDicomOffis::BuildOutputVMEImagesFromDicom()
 
 		if(!this->m_TestMode)
 		{
-			if(((medGUIDicomSettings*)GetSetting())->EnableChangeSide())
+			if(((mafGUIDicomSettings*)GetSetting())->EnableChangeSide())
 			{
 				mafTagItem tagSide;
 				tagSide.SetName("VOLUME_SIDE");
@@ -916,13 +916,13 @@ int medOpImporterDicomOffis::BuildOutputVMEImagesFromDicomCineMRI()
 			if(!this->m_TestMode)
 			{
 				double scaleFactor;
-				medGUISettingsAdvanced *guiAdv = new medGUISettingsAdvanced(this);
+				mafGUISettingsAdvanced *guiAdv = new mafGUISettingsAdvanced(this);
 
-				if(guiAdv->GetConversionType() == medGUIDicomSettings::NONE)
+				if(guiAdv->GetConversionType() == mafGUIDicomSettings::NONE)
 				{
 					scaleFactor = 1.0;
 				}
-				else if(guiAdv->GetConversionType() == medGUIDicomSettings::mm2m)
+				else if(guiAdv->GetConversionType() == mafGUIDicomSettings::mm2m)
 				{
 					scaleFactor = 0.001;
 				}
@@ -990,7 +990,7 @@ int medOpImporterDicomOffis::BuildOutputVMEImagesFromDicomCineMRI()
 
 			if(!this->m_TestMode)
 			{
-				if(((medGUIDicomSettings*)GetSetting())->EnableChangeSide())
+				if(((mafGUIDicomSettings*)GetSetting())->EnableChangeSide())
 				{
 					mafTagItem tagSide;
 					tagSide.SetName("VOLUME_SIDE");
@@ -1311,14 +1311,14 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
 
 	if(!this->m_TestMode)
 	{
-		medGUISettingsAdvanced *guiAdv = new medGUISettingsAdvanced(this);
+		mafGUISettingsAdvanced *guiAdv = new mafGUISettingsAdvanced(this);
 
 		double scaleFactor;
-		if(guiAdv->GetConversionType() == medGUIDicomSettings::NONE)
+		if(guiAdv->GetConversionType() == mafGUIDicomSettings::NONE)
 		{
 			scaleFactor = 1.0;
 		}
-		else if(guiAdv->GetConversionType() == medGUIDicomSettings::mm2m)
+		else if(guiAdv->GetConversionType() == mafGUIDicomSettings::mm2m)
 		{
 			scaleFactor = 0.001;
 		}
@@ -1399,7 +1399,7 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
 
 	if(!this->m_TestMode)
 	{
-		if(((medGUIDicomSettings*)GetSetting())->EnableChangeSide())
+		if(((mafGUIDicomSettings*)GetSetting())->EnableChangeSide())
 		{
 			mafTagItem tagSide;
 			tagSide.SetName("VOLUME_SIDE");
@@ -1728,14 +1728,14 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 
 		if(!this->m_TestMode)
 		{
-			medGUISettingsAdvanced *guiAdv = new medGUISettingsAdvanced(this);
+			mafGUISettingsAdvanced *guiAdv = new mafGUISettingsAdvanced(this);
 
 			double scaleFactor;
-			if(guiAdv->GetConversionType() == medGUIDicomSettings::NONE)
+			if(guiAdv->GetConversionType() == mafGUIDicomSettings::NONE)
 			{
 				scaleFactor = 1.0;
 			}
-			else if(guiAdv->GetConversionType() == medGUIDicomSettings::mm2m)
+			else if(guiAdv->GetConversionType() == mafGUIDicomSettings::mm2m)
 			{
 				scaleFactor = 0.001;
 			}
@@ -1824,7 +1824,7 @@ int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 
 	if(!this->m_TestMode)
 	{
-		if(((medGUIDicomSettings*)GetSetting())->EnableChangeSide())
+		if(((mafGUIDicomSettings*)GetSetting())->EnableChangeSide())
 		{
 			mafTagItem tagSide;
 			tagSide.SetName("VOLUME_SIDE");
@@ -2172,13 +2172,13 @@ vtkPolyData* medOpImporterDicomOffis::ExtractPolyData(int ts, int silceId)
 void medOpImporterDicomOffis::CreateLoadPage()
 	//----------------------------------------------------------------------------
 {
-	m_LoadPage = new medGUIWizardPageNew(m_Wizard,medUSEGUI|medUSERWI);
+	m_LoadPage = new mafGUIWizardPageNew(m_Wizard,medUSEGUI|medUSERWI);
 	m_LoadGuiLeft = new mafGUI(this);
 	m_LoadGuiUnderLeft = new mafGUI(this);
 	m_LoadGuiUnderCenter = new mafGUI(this);
 	m_Showspacing = 0;
 	m_LoadGuiCenter = new mafGUI(this);
-	if(((medGUIDicomSettings*)GetSetting())->GetShowAdvancedOptionSorting() == TRUE)
+	if(((mafGUIDicomSettings*)GetSetting())->GetShowAdvancedOptionSorting() == TRUE)
 	{
 		wxString choices[3] = {_("X"),_("Y"),_("Z")};
 		m_LoadGuiCenter->Radio(ID_SORT_AXIS,_("Sort type:"),&m_SortAxes,3,choices);
@@ -2187,9 +2187,9 @@ void medOpImporterDicomOffis::CreateLoadPage()
 		m_LoadGuiCenter->Label("");
 	}
 
-	m_SliceScannerLoadPage=m_LoadGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_CurrentSlice,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice() != FALSE);
+	m_SliceScannerLoadPage=m_LoadGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_CurrentSlice,"",((mafGUIDicomSettings*)GetSetting())->EnableNumberOfSlice() != FALSE);
 	m_SliceScannerLoadPage->SetPageSize(1);
-	if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
+	if(((mafGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
 	{
 		m_TimeScannerLoadPage=m_LoadGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,VTK_INT_MAX);
 		m_TimeScannerLoadPage->SetPageSize(1);
@@ -2212,7 +2212,7 @@ void medOpImporterDicomOffis::CreateLoadPage()
 
 	m_LoadPage->GetRWI()->m_RwiBase->SetMouse(m_Mouse);
 	m_LoadPage->GetRWI()->m_RenFront->AddActor(m_SliceActor);
-	if(((medGUIDicomSettings*)GetSetting())->EnableVisualizationPosition())
+	if(((mafGUIDicomSettings*)GetSetting())->EnableVisualizationPosition())
 	{
 		m_LoadPage->GetRWI()->m_RenFront->AddActor(m_TextActor);
 	}
@@ -2234,21 +2234,21 @@ int wxCALLBACK _myCompareFunction(long item1, long item2, long WXUNUSED(sortData
 void medOpImporterDicomOffis::CreateCropPage()
 	//----------------------------------------------------------------------------
 {
-	m_ZCrop = ((medGUIDicomSettings*)GetSetting())->EnableZCrop() != FALSE;
-	m_CropPage = new medGUIWizardPageNew(m_Wizard,medUSEGUI|medUSERWI,m_ZCrop);
+	m_ZCrop = ((mafGUIDicomSettings*)GetSetting())->EnableZCrop() != FALSE;
+	m_CropPage = new mafGUIWizardPageNew(m_Wizard,medUSEGUI|medUSERWI,m_ZCrop);
 	m_CropPage->SetListener(this);
 	m_CropGuiLeft = new mafGUI(this);
 	m_CropGuiCenter = new mafGUI(this);
 
-	m_SliceScannerCropPage=m_CropGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,VTK_INT_MAX,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice() != FALSE);
+	m_SliceScannerCropPage=m_CropGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,VTK_INT_MAX,"",((mafGUIDicomSettings*)GetSetting())->EnableNumberOfSlice() != FALSE);
 	m_SliceScannerCropPage->SetPageSize(1);
-	if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
+	if(((mafGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
 	{
 		m_TimeScannerCropPage=m_CropGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,VTK_INT_MAX);
 		m_TimeScannerCropPage->SetPageSize(1);
 	}
 
-	if(((medGUIDicomSettings*)GetSetting())->EnableChangeSide())
+	if(((mafGUIDicomSettings*)GetSetting())->EnableChangeSide())
 	{
 		wxString sideChoices[3] = {_("non-valid"),_("Left"),_("Right")};
 		m_CropGuiCenter->Combo(ID_VOLUME_SIDE,_("volume side"),&m_VolumeSide,3,sideChoices);
@@ -2262,7 +2262,7 @@ void medOpImporterDicomOffis::CreateCropPage()
 	m_CropPage->GetRWI()->m_RwiBase->SetMouse(m_Mouse);
 	m_CropPage->GetRWI()->m_RenFront->AddActor(m_SliceActor);
 	m_CropPage->GetRWI()->m_RenFront->AddActor(m_CropActor);
-	if(((medGUIDicomSettings*)GetSetting())->EnableVisualizationPosition())
+	if(((mafGUIDicomSettings*)GetSetting())->EnableVisualizationPosition())
 	{
 		m_CropPage->GetRWI()->m_RenFront->AddActor(m_TextActor);
 	}
@@ -2271,27 +2271,27 @@ void medOpImporterDicomOffis::CreateCropPage()
 void medOpImporterDicomOffis::CreateBuildPage()
 	//----------------------------------------------------------------------------
 {
-	m_BuildPage = new medGUIWizardPageNew(m_Wizard,medUSEGUI|medUSERWI);
+	m_BuildPage = new mafGUIWizardPageNew(m_Wizard,medUSEGUI|medUSERWI);
 	m_BuildGuiLeft = new mafGUI(this);
 	m_BuildGuiUnderLeft = new mafGUI(this);
 	m_BuildGuiCenter = new mafGUI(this);
 
-	m_SliceScannerBuildPage=m_BuildGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,VTK_INT_MAX,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice() != FALSE);
+	m_SliceScannerBuildPage=m_BuildGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,VTK_INT_MAX,"",((mafGUIDicomSettings*)GetSetting())->EnableNumberOfSlice() != FALSE);
 	m_SliceScannerBuildPage->SetPageSize(1);
 
 	m_TimeScannerBuildPage=m_BuildGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,VTK_INT_MAX);
 	m_TimeScannerBuildPage->SetPageSize(1);
 
 	m_BuildGuiCenter->Divider();
-	if(((medGUIDicomSettings*)GetSetting())->AutoVMEType())
-		m_OutputType = ((medGUIDicomSettings*)GetSetting())->GetVMEType(); 
+	if(((mafGUIDicomSettings*)GetSetting())->AutoVMEType())
+		m_OutputType = ((mafGUIDicomSettings*)GetSetting())->GetVMEType(); 
 	else
 	{
 		// Handles various types of Vme selected in the DICOM Advanced Settings:
 		// If the user launch an event by changing the radio button the right value is adjusted later on. (Brazzale, 27.07.2010)
-		bool type_volume = ((medGUIDicomSettings*)GetSetting())->EnableToRead("VOLUME");
-		bool type_mesh = ((medGUIDicomSettings*)GetSetting())->EnableToRead("MESH");
-		bool type_image = ((medGUIDicomSettings*)GetSetting())->EnableToRead("IMAGE");
+		bool type_volume = ((mafGUIDicomSettings*)GetSetting())->EnableToRead("VOLUME");
+		bool type_mesh = ((mafGUIDicomSettings*)GetSetting())->EnableToRead("MESH");
+		bool type_image = ((mafGUIDicomSettings*)GetSetting())->EnableToRead("IMAGE");
 		wxString typeArrayVolumeMeshImage[3] = {_("Volume"),_("Mesh"),_("Image")};    
 		wxString typeArrayImageVolume[2] = {_("Image"),_("Volume")};
 		wxString typeArrayMeshImage[2] = {_("Mesh"),_("Image")};
@@ -2335,19 +2335,19 @@ void medOpImporterDicomOffis::CreateBuildPage()
 
 	}
 
-	if(((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::TRADITIONAL)
+	if(((mafGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == mafGUIDicomSettings::TRADITIONAL)
 	{
 		m_BuildGuiUnderLeft->String(ID_VOLUME_NAME," VME name",&m_VolumeName);
 	}
-//	else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::DESCRIPTION_DATE)
-	else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::DESCRIPTION_NUMSLICES)
+//	else if (((mafGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == mafGUIDicomSettings::DESCRIPTION_DATE)
+	else if (((mafGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == mafGUIDicomSettings::DESCRIPTION_NUMSLICES)
 	{
 		/*m_VolumeName = m_SelectedSeriesSlicesList->Item(0)->GetData()->GetDescription();
 		m_VolumeName << "_";
 		m_VolumeName << m_SelectedSeriesSlicesList->Item(0)->GetData()->GetDate();*/
 		m_BuildGuiUnderLeft->String(ID_VOLUME_NAME," VME name",&m_VolumeName);
 	}
-	else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::CUSTOM)
+	else if (((mafGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == mafGUIDicomSettings::CUSTOM)
 	{
 		m_BuildGuiUnderLeft->String(ID_VOLUME_NAME," VME name",&m_VolumeName);
 	}
@@ -2360,7 +2360,7 @@ void medOpImporterDicomOffis::CreateBuildPage()
 
 	m_BuildPage->GetRWI()->m_RwiBase->SetMouse(m_Mouse);
 	m_BuildPage->GetRWI()->m_RenFront->AddActor(m_SliceActor);
-	if(((medGUIDicomSettings*)GetSetting())->EnableVisualizationPosition())
+	if(((mafGUIDicomSettings*)GetSetting())->EnableVisualizationPosition())
 	{
 		m_BuildPage->GetRWI()->m_RenFront->AddActor(m_TextActor);
 	}
@@ -2369,12 +2369,12 @@ void medOpImporterDicomOffis::CreateBuildPage()
 void medOpImporterDicomOffis::CreateReferenceSystemPage()
 	//----------------------------------------------------------------------------
 {
-	m_ReferenceSystemPage = new medGUIWizardPageNew(m_Wizard,medUSEGUI|medUSERWI);
+	m_ReferenceSystemPage = new mafGUIWizardPageNew(m_Wizard,medUSEGUI|medUSERWI);
 	m_ReferenceSystemGuiLeft = new mafGUI(this);
 	m_ReferenceSystemGuiUnderLeft = new mafGUI(this);
 	//m_ReferenceSystemGuiCenter = new mafGUI(this);
 
-	m_SliceScannerReferenceSystemPage=m_ReferenceSystemGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,VTK_INT_MAX,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice() != FALSE);
+	m_SliceScannerReferenceSystemPage=m_ReferenceSystemGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,VTK_INT_MAX,"",((mafGUIDicomSettings*)GetSetting())->EnableNumberOfSlice() != FALSE);
 	m_SliceScannerReferenceSystemPage->SetPageSize(1);
 
 	m_TimeScannerReferenceSystemPage=m_ReferenceSystemGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,VTK_INT_MAX);
@@ -2397,7 +2397,7 @@ void medOpImporterDicomOffis::CreateReferenceSystemPage()
 
 	m_ReferenceSystemPage->GetRWI()->m_RwiBase->SetMouse(m_Mouse);
 	m_ReferenceSystemPage->GetRWI()->m_RenFront->AddActor(m_SliceActor);
-	if(((medGUIDicomSettings*)GetSetting())->EnableVisualizationPosition())
+	if(((mafGUIDicomSettings*)GetSetting())->EnableVisualizationPosition())
 	{
 		m_ReferenceSystemPage->GetRWI()->m_RenFront->AddActor(m_TextActor);
 	}
@@ -2459,7 +2459,7 @@ bool medOpImporterDicomOffis::OpenDir()
 
 			OnEvent(&mafEvent(this, ID_STUDY_SELECT));
 
-			if(((medGUIDicomSettings*)GetSetting())->AutoCropPosition())
+			if(((mafGUIDicomSettings*)GetSetting())->AutoCropPosition())
 			{
 				AutoPositionCropPlane();
 			}
@@ -2632,7 +2632,7 @@ void medOpImporterDicomOffis::ReadDicom()
 	// to work
 	// but it is braking CineMRI p09 p20 and SE10 CineMRI reading so i set it to
 	// enable for modality other than cine MRI
-	if (m_DicomReaderModality != medGUIDicomSettings::ID_CMRI_MODALITY)
+	if (m_DicomReaderModality != mafGUIDicomSettings::ID_CMRI_MODALITY)
 	{
 		switch (m_SortAxes)
 		{
@@ -2691,7 +2691,7 @@ void medOpImporterDicomOffis::ReadDicom()
 	m_NumberOfTimeFrames = ((medDicomSlice *)m_SelectedSeriesSlicesList->\
 		Item(0)->GetData())->GetDcmCardiacNumberOfImages();
 
-	if(m_DicomReaderModality == medGUIDicomSettings::ID_CMRI_MODALITY) //If cMRI
+	if(m_DicomReaderModality == mafGUIDicomSettings::ID_CMRI_MODALITY) //If cMRI
 		m_NumberOfSlices = m_SelectedSeriesSlicesList->GetCount() / m_NumberOfTimeFrames;
 	else
 		m_NumberOfSlices = m_SelectedSeriesSlicesList->GetCount();
@@ -2767,7 +2767,7 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
 		{
 		case ID_SORT_AXIS:
 			{
-				if (m_DicomReaderModality != medGUIDicomSettings::ID_CMRI_MODALITY)
+				if (m_DicomReaderModality != mafGUIDicomSettings::ID_CMRI_MODALITY)
 				{
 					switch (m_SortAxes)
 					{
@@ -2805,7 +2805,7 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
 			break;
 		case ID_VOLUME_SIDE:
 			{
-				if(((medGUIDicomSettings*)GetSetting())->AutoCropPosition())
+				if(((mafGUIDicomSettings*)GetSetting())->AutoCropPosition())
 					AutoPositionCropPlane();
 			}
 			break;
@@ -2815,12 +2815,12 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
 				OnRangeModified();
 			}
 			break;
-		case medGUIWizard::MED_WIZARD_CHANGE_PAGE:
+		case mafGUIWizard::MED_WIZARD_CHANGE_PAGE:
 			{
 				OnWizardChangePage(e);
 			}
 			break;
-		case medGUIWizard::MED_WIZARD_CHANGED_PAGE:
+		case mafGUIWizard::MED_WIZARD_CHANGED_PAGE:
 			{
 				/* This is a ack, beacouse that "genius" of wx  send the change event 
 				before page show, so we need to duplicate the code here in order to 
@@ -2882,7 +2882,7 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
 		case ID_VME_TYPE:
 			{
 				OnVmeTypeSelected();
-				if (m_Wizard->GetCurrentPage()==m_BuildPage && m_OutputType == medGUIDicomSettings::ID_IMAGE)//Check the type to determine the next step
+				if (m_Wizard->GetCurrentPage()==m_BuildPage && m_OutputType == mafGUIDicomSettings::ID_IMAGE)//Check the type to determine the next step
 				{
 					m_Wizard->SetButtonString("Reference >");
 					m_ReferenceSystemPage->UpdateActor();
@@ -3017,7 +3017,7 @@ void medOpImporterDicomOffis::Crop()
 	double pixelDimY = diffy/spacing[0] + 1;
 
 
-	if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::TRADITIONAL)
+	if (((mafGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == mafGUIDicomSettings::TRADITIONAL)
 	{
 		//---------------------------------------------------------------
 		long item = -1;
@@ -3037,19 +3037,19 @@ void medOpImporterDicomOffis::Crop()
 		m_VolumeName = seriesName.Mid(0,seriesName.find_last_of('_'));
 		m_VolumeName.Append(wxString::Format("_%ix%ix%i", (int)pixelDimX, (int)pixelDimY, cropInterval));
 	}
-	//else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::DESCRIPTION_DATE)
-	else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::DESCRIPTION_NUMSLICES)
+	//else if (((mafGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == mafGUIDicomSettings::DESCRIPTION_DATE)
+	else if (((mafGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == mafGUIDicomSettings::DESCRIPTION_NUMSLICES)
 	{
 		m_VolumeName = m_SelectedSeriesSlicesList->Item(0)->GetData()->GetDescription();
 		/*m_VolumeName << "_";
 		m_VolumeName << m_SelectedSeriesSlicesList->Item(0)->GetData()->GetDate();*/
 		m_VolumeName.Append(wxString::Format("_%ix%ix%i", (int)pixelDimX, (int)pixelDimY, cropInterval));
 	}
-	else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::CUSTOM)
+	else if (((mafGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == mafGUIDicomSettings::CUSTOM)
 	{
 		//bool separator = false;
 		m_VolumeName = "";
-		//if (((medGUIDicomSettings*)GetSetting())->GetEnabledCustomName(medGUIDicomSettings::ID_SERIES))
+		//if (((mafGUIDicomSettings*)GetSetting())->GetEnabledCustomName(mafGUIDicomSettings::ID_SERIES))
 		//{
 			//---------------------------------------------------------------
 			long item = -1;
@@ -3070,7 +3070,7 @@ void medOpImporterDicomOffis::Crop()
 			m_VolumeName = seriesName;
 		//	separator = true;
 		//}
-		//if (((medGUIDicomSettings*)GetSetting())->GetEnabledCustomName(medGUIDicomSettings::ID_PATIENT_NAME))
+		//if (((mafGUIDicomSettings*)GetSetting())->GetEnabledCustomName(mafGUIDicomSettings::ID_PATIENT_NAME))
 		//{
 		//	if (separator)
 		//	{
@@ -3079,7 +3079,7 @@ void medOpImporterDicomOffis::Crop()
 		//	m_VolumeName << m_SelectedSeriesSlicesList->Item(0)->GetData()->GetPatientName();
 		//	separator = true;
 		//}
-		//if (((medGUIDicomSettings*)GetSetting())->GetEnabledCustomName(medGUIDicomSettings::ID_DESCRIPTION))
+		//if (((mafGUIDicomSettings*)GetSetting())->GetEnabledCustomName(mafGUIDicomSettings::ID_DESCRIPTION))
 		//{
 		//	if (separator)
 		//	{
@@ -3088,7 +3088,7 @@ void medOpImporterDicomOffis::Crop()
 		//	m_VolumeName << m_SelectedSeriesSlicesList->Item(0)->GetData()->GetDescription();
 		//	separator = true;
 		//}
-		//if (((medGUIDicomSettings*)GetSetting())->GetEnabledCustomName(medGUIDicomSettings::ID_BIRTHDATE))
+		//if (((mafGUIDicomSettings*)GetSetting())->GetEnabledCustomName(mafGUIDicomSettings::ID_BIRTHDATE))
 		//{
 		//	if (separator)
 		//	{
@@ -3097,7 +3097,7 @@ void medOpImporterDicomOffis::Crop()
 		//	m_VolumeName << m_SelectedSeriesSlicesList->Item(0)->GetData()->GetPatientBirthday();
 		//	separator = true;
 		//}
-		if (((medGUIDicomSettings*)GetSetting())->GetEnabledCustomName(medGUIDicomSettings::ID_NUM_SLICES))
+		if (((mafGUIDicomSettings*)GetSetting())->GetEnabledCustomName(mafGUIDicomSettings::ID_NUM_SLICES))
 		{
 //			if (separator)
 //			{
@@ -3192,7 +3192,7 @@ void medOpImporterDicomOffis::EnableSliceSlider(bool enable)
 void medOpImporterDicomOffis::EnableTimeSlider(bool enable)
 	//----------------------------------------------------------------------------
 {
-	if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
+	if(((mafGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
 	{
 		m_LoadGuiLeft->Enable(ID_SCAN_TIME,enable);
 		m_BuildGuiLeft->Enable(ID_SCAN_TIME,enable);
@@ -3356,29 +3356,29 @@ void medOpImporterDicomOffis::FillSeriesListBox()
 
 				mafString seriesName = "";
 
-				if(((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::TRADITIONAL)
+				if(((mafGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == mafGUIDicomSettings::TRADITIONAL)
 				{
 					seriesName = m_SelectedSeriesID.at(2);
 					seriesName.Append(wxString::Format("x%i", numberOfImages));
 				}
-				//else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::DESCRIPTION_DATE)
-				else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::DESCRIPTION_NUMSLICES)
+				//else if (((mafGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == mafGUIDicomSettings::DESCRIPTION_DATE)
+				else if (((mafGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == mafGUIDicomSettings::DESCRIPTION_NUMSLICES)
 				{
 					seriesName = m_SelectedSeriesID.at(2);
 					seriesName.Append(wxString::Format("x%i", numberOfImages));
 				}
-				else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::CUSTOM)
+				else if (((mafGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == mafGUIDicomSettings::CUSTOM)
 				{
 					bool separator = false;
 					seriesName << m_SelectedSeriesID.at(2);
 					seriesName << "x_";
-					//if (((medGUIDicomSettings*)GetSetting())->GetEnabledCustomName(medGUIDicomSettings::ID_SERIES))
+					//if (((mafGUIDicomSettings*)GetSetting())->GetEnabledCustomName(mafGUIDicomSettings::ID_SERIES))
 					//{
 					//    seriesName << m_SelectedSeriesID.at(2);
 					//    seriesName.Append(wxString::Format("x%i", numberOfImages));
 					//	separator = true;
 					//}
-					if (((medGUIDicomSettings*)GetSetting())->GetEnabledCustomName(medGUIDicomSettings::ID_DESCRIPTION))
+					if (((mafGUIDicomSettings*)GetSetting())->GetEnabledCustomName(mafGUIDicomSettings::ID_DESCRIPTION))
 					{
 						if (separator)
 						{
@@ -3387,7 +3387,7 @@ void medOpImporterDicomOffis::FillSeriesListBox()
 						seriesName << m_SelectedSeriesSlicesList->Item(0)->GetData()->GetDescription();
 						separator = true;
 					}
-					if (((medGUIDicomSettings*)GetSetting())->GetEnabledCustomName(medGUIDicomSettings::ID_PATIENT_NAME))
+					if (((mafGUIDicomSettings*)GetSetting())->GetEnabledCustomName(mafGUIDicomSettings::ID_PATIENT_NAME))
 					{
 						if (separator)
 						{
@@ -3396,7 +3396,7 @@ void medOpImporterDicomOffis::FillSeriesListBox()
 						seriesName << m_SelectedSeriesSlicesList->Item(0)->GetData()->GetPatientName();
 						separator = true;
 					}
-					if (((medGUIDicomSettings*)GetSetting())->GetEnabledCustomName(medGUIDicomSettings::ID_BIRTHDATE))
+					if (((mafGUIDicomSettings*)GetSetting())->GetEnabledCustomName(mafGUIDicomSettings::ID_BIRTHDATE))
 					{
 						if (separator)
 						{
@@ -3405,7 +3405,7 @@ void medOpImporterDicomOffis::FillSeriesListBox()
 						seriesName << m_SelectedSeriesSlicesList->Item(0)->GetData()->GetPatientBirthday();
 						separator = true;
 					}
-					//if (((medGUIDicomSettings*)GetSetting())->GetEnabledCustomName(medGUIDicomSettings::ID_NUM_SLICES))
+					//if (((mafGUIDicomSettings*)GetSetting())->GetEnabledCustomName(mafGUIDicomSettings::ID_NUM_SLICES))
 					//{
 					//  //  if (separator)
 					////	{
@@ -3799,14 +3799,14 @@ bool medOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 
 	if(!this->m_TestMode)
 	{
-		enableScalarTolerance = ((medGUIDicomSettings*)GetSetting())->EnableScalarTolerance() != FALSE;
-		enablePercentageTolerance = ((medGUIDicomSettings*)GetSetting())->EnablePercentageTolerance() != FALSE;
+		enableScalarTolerance = ((mafGUIDicomSettings*)GetSetting())->EnableScalarTolerance() != FALSE;
+		enablePercentageTolerance = ((mafGUIDicomSettings*)GetSetting())->EnablePercentageTolerance() != FALSE;
 
 		if (enableScalarTolerance)
-			scalarTolerance = ((medGUIDicomSettings*)GetSetting())->GetScalarTolerance();
+			scalarTolerance = ((mafGUIDicomSettings*)GetSetting())->GetScalarTolerance();
 
 		if (enablePercentageTolerance)
-			percentageTolerance = ((medGUIDicomSettings*)GetSetting())->GetPercentageTolerance();
+			percentageTolerance = ((mafGUIDicomSettings*)GetSetting())->GetPercentageTolerance();
 	}
 
 	m_DicomReaderModality = -1;
@@ -3956,7 +3956,7 @@ bool medOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 
 			if( dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[2]).bad() && !m_SkipAllNoPosition)
 			{
-				int img_pos_result = ((medGUIDicomSettings*)GetSetting())->GetDCMImagePositionPatientExceptionHandling();
+				int img_pos_result = ((mafGUIDicomSettings*)GetSetting())->GetDCMImagePositionPatientExceptionHandling();
 
 				if (img_pos_result == 0) //skip all
 				{
@@ -4306,7 +4306,7 @@ bool medOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 
 			if (!this->m_TestMode)
 			{
-				enableToRead = ((medGUIDicomSettings*)GetSetting())->EnableToRead((char*)dcmModality);
+				enableToRead = ((mafGUIDicomSettings*)GetSetting())->EnableToRead((char*)dcmModality);
 			}
 
 			//------------------------
@@ -4374,12 +4374,12 @@ bool medOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 
 					if (!this->m_TestMode)
 					{
-						if(((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::TRADITIONAL)
+						if(((mafGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == mafGUIDicomSettings::TRADITIONAL)
 						{
 							seriesName.Append(wxString::Format("%i_%ix%i",seriesCounter, dcmRows, dcmColumns));
 						}
-					//	else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::DESCRIPTION_DATE)
-						else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::DESCRIPTION_NUMSLICES)
+					//	else if (((mafGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == mafGUIDicomSettings::DESCRIPTION_DATE)
+						else if (((mafGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == mafGUIDicomSettings::DESCRIPTION_NUMSLICES)
 						{
 							//seriesName = (wxString::Format("%s_%s_%d",description,date,seriesIndex));
 							seriesName = (wxString::Format("%s_%ix%i",description,dcmRows,dcmColumns));
@@ -4566,9 +4566,9 @@ bool medOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 					{
 						if (m_DicomReaderModality==-1)
 						{  
-							m_DicomReaderModality=medGUIDicomSettings::ID_CMRI_MODALITY;              
+							m_DicomReaderModality=mafGUIDicomSettings::ID_CMRI_MODALITY;              
 						}
-						else if(m_DicomReaderModality!=medGUIDicomSettings::ID_CMRI_MODALITY)
+						else if(m_DicomReaderModality!=mafGUIDicomSettings::ID_CMRI_MODALITY)
 						{
 							if(!this->m_TestMode)
 							{
@@ -4582,8 +4582,8 @@ bool medOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 					else
 					{
 						if (m_DicomReaderModality==-1)
-							m_DicomReaderModality=medGUIDicomSettings::ID_MRI_MODALITY;
-						else if(m_DicomReaderModality!=medGUIDicomSettings::ID_MRI_MODALITY)
+							m_DicomReaderModality=mafGUIDicomSettings::ID_MRI_MODALITY;
+						else if(m_DicomReaderModality!=mafGUIDicomSettings::ID_MRI_MODALITY)
 						{
 							if(!this->m_TestMode)
 							{
@@ -4601,12 +4601,12 @@ bool medOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 					dicomDataset->findAndGetString(DCM_SeriesDescription,description);
 					dicomDataset->findAndGetString(DCM_PatientsName,patientName);
 
-					if(((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::TRADITIONAL)
+					if(((mafGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == mafGUIDicomSettings::TRADITIONAL)
 					{
 						seriesName.Append(wxString::Format("%i_%ix%i",seriesCounter, dcmRows, dcmColumns));
 					}
-					//else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::DESCRIPTION_DATE)
-					else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::DESCRIPTION_NUMSLICES)
+					//else if (((mafGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == mafGUIDicomSettings::DESCRIPTION_DATE)
+					else if (((mafGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == mafGUIDicomSettings::DESCRIPTION_NUMSLICES)
 					{
 						//seriesName = (wxString::Format("%s_%s_%d",description,date,seriesIndex));
 						seriesName = (wxString::Format("%s_%ix%i",description,dcmRows,dcmColumns));
@@ -4787,9 +4787,9 @@ void medOpImporterDicomOffis::ResetSliders()
 		m_LoadPage->RemoveGuiLowerLeft(m_LoadGuiLeft);
 		delete m_LoadGuiLeft;
 		m_LoadGuiLeft = new mafGUI(this);
-		m_SliceScannerLoadPage=m_LoadGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_NumberOfSlices-1,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice() != FALSE);
+		m_SliceScannerLoadPage=m_LoadGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_NumberOfSlices-1,"",((mafGUIDicomSettings*)GetSetting())->EnableNumberOfSlice() != FALSE);
 		m_SliceScannerLoadPage->SetPageSize(1);
-		if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
+		if(((mafGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
 		{
 			m_TimeScannerLoadPage=m_LoadGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,max(m_NumberOfTimeFrames - 1,0));
 			m_TimeScannerLoadPage->SetPageSize(1);
@@ -4803,9 +4803,9 @@ void medOpImporterDicomOffis::ResetSliders()
 		m_CropPage->RemoveGuiLowerLeft(m_CropGuiLeft);
 		delete m_CropGuiLeft;
 		m_CropGuiLeft = new mafGUI(this);
-		m_SliceScannerCropPage=m_CropGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_NumberOfSlices-1,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice() != FALSE);
+		m_SliceScannerCropPage=m_CropGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_NumberOfSlices-1,"",((mafGUIDicomSettings*)GetSetting())->EnableNumberOfSlice() != FALSE);
 		m_SliceScannerCropPage->SetPageSize(1);
-		if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
+		if(((mafGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
 		{
 			m_TimeScannerCropPage=m_CropGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,max(m_NumberOfTimeFrames - 1,0));
 			m_TimeScannerCropPage->SetPageSize(1);
@@ -4820,9 +4820,9 @@ void medOpImporterDicomOffis::ResetSliders()
 		m_BuildPage->RemoveGuiLowerLeft(m_BuildGuiLeft);
 		delete m_BuildGuiLeft;
 		m_BuildGuiLeft = new mafGUI(this);
-		m_SliceScannerBuildPage=m_BuildGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_NumberOfSlices-1,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice() != FALSE);
+		m_SliceScannerBuildPage=m_BuildGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_NumberOfSlices-1,"",((mafGUIDicomSettings*)GetSetting())->EnableNumberOfSlice() != FALSE);
 		m_SliceScannerBuildPage->SetPageSize(1);
-		if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
+		if(((mafGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
 		{
 			m_TimeScannerBuildPage=m_BuildGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,max(m_NumberOfTimeFrames - 1,0));
 			m_TimeScannerBuildPage->SetPageSize(1);
@@ -4836,9 +4836,9 @@ void medOpImporterDicomOffis::ResetSliders()
 		m_ReferenceSystemPage->RemoveGuiLowerLeft(m_ReferenceSystemGuiLeft);
 		delete m_ReferenceSystemGuiLeft;
 		m_ReferenceSystemGuiLeft = new mafGUI(this);
-		m_SliceScannerReferenceSystemPage=m_ReferenceSystemGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_NumberOfSlices-1,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice() != FALSE);
+		m_SliceScannerReferenceSystemPage=m_ReferenceSystemGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_NumberOfSlices-1,"",((mafGUIDicomSettings*)GetSetting())->EnableNumberOfSlice() != FALSE);
 		m_SliceScannerReferenceSystemPage->SetPageSize(1);
-		if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
+		if(((mafGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
 		{
 			m_TimeScannerReferenceSystemPage=m_ReferenceSystemGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,max(m_NumberOfTimeFrames - 1,0));
 			m_TimeScannerReferenceSystemPage->SetPageSize(1);
@@ -4851,7 +4851,7 @@ void medOpImporterDicomOffis::ResetSliders()
 int medOpImporterDicomOffis::GetSliceIDInSeries(int timeId, int heigthId)
 	//----------------------------------------------------------------------------
 {
-	if (m_DicomReaderModality != medGUIDicomSettings::ID_CMRI_MODALITY)
+	if (m_DicomReaderModality != mafGUIDicomSettings::ID_CMRI_MODALITY)
 		return heigthId;
 
 	if (this->m_TestMode)
@@ -5419,11 +5419,11 @@ int CompareImageNumber(const medDicomSlice **arg1,const medDicomSlice **arg2)
 void medOpImporterDicomOffis::OnVmeTypeSelected()
 {
 	// Adjust radio button value to match the right case. (Brazzale, 27.07.2010)
-	bool type_volume = ((medGUIDicomSettings*)GetSetting())->EnableToRead("VOLUME");
-	bool type_mesh = ((medGUIDicomSettings*)GetSetting())->EnableToRead("MESH");
-	bool type_image = ((medGUIDicomSettings*)GetSetting())->EnableToRead("IMAGE");
+	bool type_volume = ((mafGUIDicomSettings*)GetSetting())->EnableToRead("VOLUME");
+	bool type_mesh = ((mafGUIDicomSettings*)GetSetting())->EnableToRead("MESH");
+	bool type_image = ((mafGUIDicomSettings*)GetSetting())->EnableToRead("IMAGE");
 
-	if(!((medGUIDicomSettings*)GetSetting())->AutoVMEType())
+	if(!((mafGUIDicomSettings*)GetSetting())->AutoVMEType())
 	{
 		if (type_volume && !type_mesh && type_image)
 		{
@@ -5550,12 +5550,12 @@ void medOpImporterDicomOffis::OnSeriesSelect()
 	mafString tmp;
 
 
-	if(((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::TRADITIONAL)
+	if(((mafGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == mafGUIDicomSettings::TRADITIONAL)
 	{
 		tmp = seriesName.SubString(0, seriesName.find_last_of("x")-1);
 	}
-	//else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::DESCRIPTION_DATE)
-	else if (((medGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == medGUIDicomSettings::DESCRIPTION_NUMSLICES)
+	//else if (((mafGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == mafGUIDicomSettings::DESCRIPTION_DATE)
+	else if (((mafGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == mafGUIDicomSettings::DESCRIPTION_NUMSLICES)
 	{
 		//tmp = seriesName;
 		tmp = seriesName.SubString(0, seriesName.find_last_of("x")-1);
@@ -5593,7 +5593,7 @@ void medOpImporterDicomOffis::OnSeriesSelect()
 		m_DicomReaderModality=-1;
 		if(numberOfImages>1)
 		{
-			m_DicomReaderModality=medGUIDicomSettings::ID_CMRI_MODALITY;
+			m_DicomReaderModality=mafGUIDicomSettings::ID_CMRI_MODALITY;
 			EnableTimeSlider(true);
 		}
 	}
@@ -5605,7 +5605,7 @@ void medOpImporterDicomOffis::OnSeriesSelect()
 	m_TotalDicomSubRange[1]=m_TotalDicomRange[1];
 	CameraReset();
 
-	if(((medGUIDicomSettings*)GetSetting())->AutoCropPosition())
+	if(((mafGUIDicomSettings*)GetSetting())->AutoCropPosition())
 	{
 		AutoPositionCropPlane();
 	}
@@ -5669,7 +5669,7 @@ void medOpImporterDicomOffis::OnWizardChangePage( mafEvent * e )
 			else
 				m_OutputType = 2;
 
-			if (/*m_Wizard->GetCurrentPage()==m_BuildPage &&*/ m_OutputType == medGUIDicomSettings::ID_IMAGE)//Check the type to determine the next step
+			if (/*m_Wizard->GetCurrentPage()==m_BuildPage &&*/ m_OutputType == mafGUIDicomSettings::ID_IMAGE)//Check the type to determine the next step
 			{
 				m_Wizard->SetButtonString("Reference >");
 				m_ReferenceSystemPage->UpdateActor();
@@ -6225,7 +6225,7 @@ void medDicomSlice::GetOrientation( vtkMatrix4x4 * matrix )
 
 void medOpImporterDicomOffis::UpdateReferenceSystemPageConnection()
 {
-	if(m_OutputType == medGUIDicomSettings::ID_IMAGE)
+	if(m_OutputType == mafGUIDicomSettings::ID_IMAGE)
 	{
 		m_BuildPage->SetNextPage(m_ReferenceSystemPage);
 	}

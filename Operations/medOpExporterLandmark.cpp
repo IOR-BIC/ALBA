@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: medOpExporterLandmark
  Authors: Stefania Paperini , Daniele Giunchi, Simone Brazzale
  

@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: vtkMEDRayCastCleaner
  Authors: Gianluigi Crimi, Grazia Di Cosmo
  

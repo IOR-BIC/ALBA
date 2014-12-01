@@ -18,7 +18,7 @@
 //----------------------------------------------------------------------------
 #include "mafDefines.h"
 #include "mafPipe.h"
-#include "medGUIDynamicVP.h"
+#include "mafGUIDynamicVP.h"
 
 //----------------------------------------------------------------------------
 // forward refs :
@@ -56,7 +56,7 @@ protected:
     bool bVMEOutput;                    ///<true, if szClassName is class name of VME output instead of VME
     const char* szClassName;            ///<class name of VME or VME output that is processed using this page, NULL if everything should be processed
     
-    const medGUIDynamicVP::SUPPORTED_VP_ENTRY* pPipes;  ///<list of available pipes
+    const mafGUIDynamicVP::SUPPORTED_VP_ENTRY* pPipes;  ///<list of available pipes
     int nDefaultPipeIndex;      ///<which pipe is constructed upon "AddNewPage" operation
     const char* szDefaultName;  ///<name of page upon "AddNewPage" operation
 
@@ -74,7 +74,7 @@ protected:
   mafSceneNode* m_SceneNode;  ///<current scene node to be used  
   wxBoxSizer* m_SbMainSizer;  ///<gui main container, can include either m_Notebook or m_FirstPage
   wxNotebook* m_Notebook;     ///<gui container for pages
-  medGUIDynamicVP* m_FirstPage; ///<reference to the only one page (if not included in the notebook)
+  mafGUIDynamicVP* m_FirstPage; ///<reference to the only one page (if not included in the notebook)
   wxString m_FirstPageName;     ///<name of the only page (if not included in the notebook)
 
 public:
@@ -105,7 +105,7 @@ protected:
   virtual void CreatePages();
 
   /** Creates a new page for the specified group. */
-  virtual medGUIDynamicVP* CreateNewPage(const PAGE_GROUP& group);
+  virtual mafGUIDynamicVP* CreateNewPage(const PAGE_GROUP& group);
 
   /** Handles the change of name on the current page. */
   virtual void OnChangeName();

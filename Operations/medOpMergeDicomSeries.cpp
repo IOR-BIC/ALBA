@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: medOpMergeDicomSeries
  Authors: Alberto Losi
  
@@ -25,7 +25,7 @@
 #include "wx/busyinfo.h"
 
 #include "medOpMergeDicomSeries.h"
-#include "medGUIDicomSettings.h"
+#include "mafGUIDicomSettings.h"
 #include "vtkDicomUnPacker.h"
 
 //BES: 4.7.2009 - VS 2008 cannot compile it due to the following error
@@ -90,7 +90,7 @@ void medOpMergeDicomSeries::OpRun()
 		if (m_DicomDirectoryABSFileName == "")
 		{	
       // Get the selected dicom directory
-			wxString lastDicomDir = ((medGUIDicomSettings*)GetSetting())->GetLastDicomDir();
+			wxString lastDicomDir = ((mafGUIDicomSettings*)GetSetting())->GetLastDicomDir();
 
 			if (lastDicomDir == "UNEDFINED_m_LastDicomDir")
 			{
@@ -104,7 +104,7 @@ void medOpMergeDicomSeries::OpRun()
 			if (ret_code == wxID_OK)
 			{
 				wxString path = dialog.GetPath();
-				((medGUIDicomSettings*)GetSetting())->SetLastDicomDir(path);
+				((mafGUIDicomSettings*)GetSetting())->SetLastDicomDir(path);
 				m_DicomDirectoryABSFileName = path.c_str();
 
         m_DicomSeriesInstanceUID = wxGetNumberFromUser(_("Series number"),_("Insert the series  ID for the output merged series"),"Input",999,0,999);

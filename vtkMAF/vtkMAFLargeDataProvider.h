@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: vtkMAFLargeDataProvider
  Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
  

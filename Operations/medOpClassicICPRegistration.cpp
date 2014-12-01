@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: medOpClassicICPRegistration
  Authors: Stefania Paperini, Stefano Perticoni, porting Matteo Giacomoni
  

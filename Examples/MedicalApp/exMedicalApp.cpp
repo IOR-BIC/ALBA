@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: exMedicalApp
  Authors: Matteo Giacomoni - Daniele Giunchi - Gianluigi Crimi
  
@@ -63,7 +63,7 @@
 #include "medOpImporterAnalogWS.h"
 #include "medOpImporterGRFWS.h"
 #endif
-#include "medGUIDicomSettings.h"
+#include "mafGUIDicomSettings.h"
 #include "medOpImporterDicomOffis.h"
 #include "medOpImporterLandmark.h"
 #include "medOpImporterLandmarkTXT.h"
@@ -226,7 +226,7 @@ bool exMedicalApp::OnInit()
 #ifdef MAF_USE_ITK
 	m_Logic->Plug(new mafOpImporterASCII("ASCII"));
 #endif
-	medGUIDicomSettings *dicomSettings=new medGUIDicomSettings(NULL,"DICOM");
+	mafGUIDicomSettings *dicomSettings=new mafGUIDicomSettings(NULL,"DICOM");
 	m_Logic->Plug(new medOpImporterDicomOffis("DICOM"),"DICOM Suite",true,dicomSettings);
 	m_Logic->Plug(new medOpImporterLandmark("Landmark"),"Landmark Suite");
 	m_Logic->Plug(new medOpImporterLandmarkTXT("Landmark TXT"),"Landmark Suite");

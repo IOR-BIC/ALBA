@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: medOpSegmentation
  Authors: Eleonora Mambrini, Gianluigi Crimi, Alberto Losi
  
@@ -37,7 +37,7 @@ class mafGUIDialog;
 class mafGUIButton;
 class mafGUI;
 class mafGUILutSlider;
-class medGUILutHistogramSwatch;
+class mafGUILutHistogramSwatch;
 class mafGUIRollOut;
 class mafGUIFloatSlider;
 class mafInteractorPicker;
@@ -364,7 +364,7 @@ protected:
   mafGUIButton* m_CancelButton;       //<Button -GUI
   mafGUIButton* m_LoadSegmentationButton; //<Button -GUI
   mafGUI* m_GuiDialog;                  //Dialog - GUI
-  medGUILutHistogramSwatch	*m_LutWidget; //<LUT widget
+  mafGUILutHistogramSwatch	*m_LutWidget; //<LUT widget
   mafGUILutSlider *m_LutSlider;         //<LUT Slider
   vtkLookupTable *m_ColorLUT;           //<Lookup table for LUT widget
   vtkLookupTable *m_SegmentationColorLUT; //<Lookup table for segmented volume

@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: medOpSurfaceMirror
  Authors: Paolo Quadrani - porting  Daniele Giunchi
  

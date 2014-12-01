@@ -1,6 +1,6 @@
 /*=========================================================================
 
-Program: MAF2Medical
+Program: MAF2
 Module: medOpImporterDicomOffis
 Authors: Matteo Giacomoni, Roberto Mucci , Stefano Perticoni, Gianluigi Crimi
 
@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkImageData.h"
 #include <map>
 #include "medDicomCardiacMRIHelper.h"
-#include "medGUIWizard.h"
+#include "mafGUIWizard.h"
 #include "vtkMatrix4x4.h"
 
 
@@ -34,7 +34,7 @@ PURPOSE.  See the above copyright notice for more information.
 //----------------------------------------------------------------------------
 class medDicomSlice;
 class medInteractorDICOMImporter;
-class medGUIWizardPageNew;
+class mafGUIWizardPageNew;
 class mafString;
 class mafTagArray;
 class mafVMEImage;
@@ -143,7 +143,7 @@ protected:
 
 	enum DICOM_IMPORTER_GUI_ID
 	{
-		ID_FIRST = medGUIWizard::ID_LAST,
+		ID_FIRST = mafGUIWizard::ID_LAST,
 		ID_STUDY_SELECT,
 		ID_SERIES_SELECT,
 		ID_CROP,
@@ -300,11 +300,11 @@ protected:
 
 	medInteractorDICOMImporter *m_DicomInteractor;
 
-	medGUIWizard			*m_Wizard;
-	medGUIWizardPageNew	*m_LoadPage;
-	medGUIWizardPageNew	*m_CropPage;
-	medGUIWizardPageNew	*m_BuildPage;
-	medGUIWizardPageNew	*m_ReferenceSystemPage; ///< Wizard step to choose reference system
+	mafGUIWizard			*m_Wizard;
+	mafGUIWizardPageNew	*m_LoadPage;
+	mafGUIWizardPageNew	*m_CropPage;
+	mafGUIWizardPageNew	*m_BuildPage;
+	mafGUIWizardPageNew	*m_ReferenceSystemPage; ///< Wizard step to choose reference system
 	mafVMEMesh        *m_Mesh;
 	mafVMEGroup       *m_ImagesGroup;
 

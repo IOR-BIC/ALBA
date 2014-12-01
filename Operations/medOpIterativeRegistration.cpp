@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: medOpIterativeRegistration
  Authors: Stefano Perticoni - porting Daniele Giunchi
  
@@ -26,7 +26,7 @@
 #include <wx/busyinfo.h>
 
 #include "medOpIterativeRegistration.h"
-#include "medGUILandmark.h"
+#include "mafGUILandmark.h"
 
 
 #include "mafEvent.h" 
@@ -231,14 +231,14 @@ void medOpIterativeRegistration::CreateGui()
   // source gui
   m_Gui->Divider(2);
   m_Gui->Label("source landmark:", true);
-  m_GuiLandmark[SOURCE] = new medGUILandmark(m_SourceVME, this);
+  m_GuiLandmark[SOURCE] = new mafGUILandmark(m_SourceVME, this);
   m_GuiLandmark[SOURCE]->SetLMCloudName("source_lc");
   m_Gui->AddGui(m_GuiLandmark[SOURCE]->GetGui());
 
   // target gui
   m_Gui->Divider(2);
   m_Gui->Label("target landmark:", true);
-  m_GuiLandmark[TARGET] = new medGUILandmark(m_TargetVME, this);
+  m_GuiLandmark[TARGET] = new mafGUILandmark(m_TargetVME, this);
   m_GuiLandmark[TARGET]->SetLMCloudName("target_lc");
   m_Gui->AddGui(m_GuiLandmark[TARGET]->GetGui());
 
@@ -274,7 +274,7 @@ void medOpIterativeRegistration::OnEventThis(mafEventBase *maf_event)
     case ID_CHOOSE_TARGET:
     {
       mafString title = _("Choose target vme");
-      mafEvent e(this,VME_CHOOSE,&title,(long)&medGUILandmark::VmeAccept);
+      mafEvent e(this,VME_CHOOSE,&title,(long)&mafGUILandmark::VmeAccept);
       mafEventMacro(e); 
       m_TargetVME = mafVME::SafeDownCast(e.GetVme());
       if (m_TargetVME)
@@ -326,7 +326,7 @@ void medOpIterativeRegistration::OnEventGuiSource(mafEventBase *maf_event)
   {
     case VME_PICKED:
     {
-      if (m_GuiLandmark[TARGET]->GetGuiStatus() == medGUILandmark::ENABLED)
+      if (m_GuiLandmark[TARGET]->GetGuiStatus() == mafGUILandmark::ENABLED)
       {
         m_Gui->Enable(ID_REGISTER, true);
         assert(m_GuiLandmark[SOURCE]->GetLandmarkCLoud()->GetNumberOfLandmarks() ==
@@ -351,7 +351,7 @@ void medOpIterativeRegistration::OnEventGuiTarget(mafEventBase *maf_event)
   {
     case VME_PICKED:
     {
-      if (m_GuiLandmark[SOURCE]->GetGuiStatus() == medGUILandmark::ENABLED)
+      if (m_GuiLandmark[SOURCE]->GetGuiStatus() == mafGUILandmark::ENABLED)
       {
         m_Gui->Enable(ID_REGISTER, true);
         assert(m_GuiLandmark[SOURCE]->GetLandmarkCLoud()->GetNumberOfLandmarks() ==

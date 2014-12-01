@@ -1,5 +1,5 @@
 /*=========================================================================
-Program:   MAF2Medical
+Program:   MAF2
 Module:    $RCSfile: medVMEStent.cpp,v $
 Language:  C++
 Date:      $Date: 2012-10-23 10:15:31 $

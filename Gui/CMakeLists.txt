@@ -130,26 +130,26 @@ SET(PROJECT_SRCS
   mafGUIComboBox.h
   mafGUISettingsHelp.h
   mafGUISettingsHelp.cpp
-  medGUILandmark.cpp
-  medGUILandmark.h
-  medGUIWizard.cpp
-  medGUIWizard.h
-  medGUIWizardPage.cpp
-  medGUIWizardPage.h
-  medGUIWizardPageNew.cpp
-  medGUIWizardPageNew.h
-  medGUIDicomSettings.cpp
-  medGUIDicomSettings.h
-  medGUIContextualMenu.cpp
-  medGUIContextualMenu.h
-  medGUISettingsAdvanced.cpp
-  medGUISettingsAdvanced.h
-  medGUIDynamicVP.cpp
-  medGUIDynamicVP.h
-  medGUILutHistogramSwatch.cpp
-  medGUILutHistogramSwatch.h
-  medGUILutHistogramEditor.cpp
-  medGUILutHistogramEditor.h
+  mafGUILandmark.cpp
+  mafGUILandmark.h
+  mafGUIWizard.cpp
+  mafGUIWizard.h
+  mafGUIWizardPage.cpp
+  mafGUIWizardPage.h
+  mafGUIWizardPageNew.cpp
+  mafGUIWizardPageNew.h
+  mafGUIDicomSettings.cpp
+  mafGUIDicomSettings.h
+  mafGUIContextualMenu.cpp
+  mafGUIContextualMenu.h
+  mafGUISettingsAdvanced.cpp
+  mafGUISettingsAdvanced.h
+  mafGUIDynamicVP.cpp
+  mafGUIDynamicVP.h
+  mafGUILutHistogramSwatch.cpp
+  mafGUILutHistogramSwatch.h
+  mafGUILutHistogramEditor.cpp
+  mafGUILutHistogramEditor.h
   medGUIMDIFrame.cpp
   medGUIMDIFrame.h
 )

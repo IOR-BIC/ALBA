@@ -46,7 +46,7 @@
 #include "mafGUI.h"
 #include "mafGUIValidator.h"
 
-#include "medGUIDynamicVP.h"
+#include "mafGUIDynamicVP.h"
 
 #include "wx/busyinfo.h"
 #include "wx/notebook.h"
@@ -204,15 +204,15 @@ void medPipeCompound::OnEvent(mafEventBase *maf_event)
       //this was sent from some page (i.e., pipe update, etc.)
       switch (e->GetArg())
       {
-      case medGUIDynamicVP::ID_NAME:
+      case mafGUIDynamicVP::ID_NAME:
         OnChangeName();
         break;
 
-      case medGUIDynamicVP::ID_CREATE_VP:
+      case mafGUIDynamicVP::ID_CREATE_VP:
         OnCreateVP();
         break;
 
-      case medGUIDynamicVP::ID_CLOSE_VP:
+      case mafGUIDynamicVP::ID_CLOSE_VP:
         OnCloseVP();
         break;
       }
@@ -248,7 +248,7 @@ void medPipeCompound::OnEvent(mafEventBase *maf_event)
       continue;  //this group is not valid for the current VME
     
     //so let us create new page
-    medGUIDynamicVP* newpage = CreateNewPage(group);
+    mafGUIDynamicVP* newpage = CreateNewPage(group);
     
     wxString szName = wxString(newpage->GetName());
     if (group.bNameCanBeChanged)
@@ -266,29 +266,29 @@ void medPipeCompound::OnEvent(mafEventBase *maf_event)
 
 //------------------------------------------------------------------------
 // Creates a new page for the specified group.
-/*virtual*/ medGUIDynamicVP* medPipeCompound::CreateNewPage(const PAGE_GROUP& group)
+/*virtual*/ mafGUIDynamicVP* medPipeCompound::CreateNewPage(const PAGE_GROUP& group)
 //------------------------------------------------------------------------
 {
   long GUIStyle = 0;
   if (!group.bNameCanBeChanged)
-    GUIStyle = medGUIDynamicVP::GS_NO_NAME;
+    GUIStyle = mafGUIDynamicVP::GS_NO_NAME;
 
   //check if it makes sense to display change "VP"
   if (group.bVPCanBeChanged && group.nDefaultPipeIndex >= 0)
   {
     if (group.pPipes[1].szClassName == NULL)
-      GUIStyle |= medGUIDynamicVP::GS_NO_CREATE_VP;
+      GUIStyle |= mafGUIDynamicVP::GS_NO_CREATE_VP;
   }
   else if (!group.bVPCanBeChanged)
   {
-    GUIStyle |= medGUIDynamicVP::GS_NO_CREATE_VP;
+    GUIStyle |= mafGUIDynamicVP::GS_NO_CREATE_VP;
     _ASSERT(group.nDefaultPipeIndex >= 0);
   }
 
   if (!group.bPageCanBeClosed || group.nDefaultPipeIndex < 0)
-    GUIStyle |= medGUIDynamicVP::GS_NO_CLOSE_VP;
+    GUIStyle |= mafGUIDynamicVP::GS_NO_CLOSE_VP;
 
-  medGUIDynamicVP* newpage = new medGUIDynamicVP(m_Notebook, ID_TABCTRL, GUIStyle);
+  mafGUIDynamicVP* newpage = new mafGUIDynamicVP(m_Notebook, ID_TABCTRL, GUIStyle);
   newpage->SetListener(this);
   newpage->SetSceneNode(m_SceneNode);    
   newpage->SetVPipesList(group.pPipes);    
@@ -312,7 +312,7 @@ void medPipeCompound::OnEvent(mafEventBase *maf_event)
     int nCurSel = m_Notebook->GetSelection();
     _ASSERT_RET(nCurSel >= 0);
 
-    medGUIDynamicVP* page = (medGUIDynamicVP*)m_Notebook->GetCurrentPage();  
+    mafGUIDynamicVP* page = (mafGUIDynamicVP*)m_Notebook->GetCurrentPage();  
     _ASSERT_RET(page != NULL);
 
     m_Notebook->SetPageText(nCurSel, page->GetName());
@@ -343,8 +343,8 @@ void medPipeCompound::OnEvent(mafEventBase *maf_event)
   int nCurSel = m_FirstPage != NULL ? 0 : m_Notebook->GetSelection();
   _ASSERT_RET(nCurSel >= 0);
 
-  medGUIDynamicVP* page = m_FirstPage != NULL ? m_FirstPage : 
-    (medGUIDynamicVP*)m_Notebook->GetCurrentPage();  
+  mafGUIDynamicVP* page = m_FirstPage != NULL ? m_FirstPage : 
+    (mafGUIDynamicVP*)m_Notebook->GetCurrentPage();  
   _ASSERT_RET(page != NULL);
 
   int nGroupId = m_PagesGroupIndex[nCurSel];  
@@ -368,13 +368,13 @@ void medPipeCompound::OnEvent(mafEventBase *maf_event)
   //modify styles
   long GUINewStyle = 0;
   if (!group.bPageCanBeClosed)
-    GUINewStyle = medGUIDynamicVP::GS_NO_CLOSE_VP;
+    GUINewStyle = mafGUIDynamicVP::GS_NO_CLOSE_VP;
 
   if (!group.bNameCanBeChanged || group.bNameSingleChange)
-    GUINewStyle |= medGUIDynamicVP::GS_NO_NAME;
+    GUINewStyle |= mafGUIDynamicVP::GS_NO_NAME;
 
   if (group.bVPSingleChange)
-    GUINewStyle |= medGUIDynamicVP::GS_NO_CREATE_VP;
+    GUINewStyle |= mafGUIDynamicVP::GS_NO_CREATE_VP;
   page->SetGUIStyle(GUINewStyle);
   
   //now check, if we can add new "new" page
@@ -386,7 +386,7 @@ void medPipeCompound::OnEvent(mafEventBase *maf_event)
     if (bIsNewPage)
     {
       //so let us create new page
-      medGUIDynamicVP* newpage = CreateNewPage(group);
+      mafGUIDynamicVP* newpage = CreateNewPage(group);
 
       wxString szName = wxString(newpage->GetName());
       if (group.bNameCanBeChanged)
@@ -451,7 +451,7 @@ void medPipeCompound::OnEvent(mafEventBase *maf_event)
   if (m_FirstPage == NULL)
   {
     //there is only one page available in the notebook
-    m_FirstPage = (medGUIDynamicVP*)m_Notebook->GetPage(0);
+    m_FirstPage = (mafGUIDynamicVP*)m_Notebook->GetPage(0);
     m_FirstPageName = m_Notebook->GetPageText(0);
     m_Notebook->RemovePage(0);
 

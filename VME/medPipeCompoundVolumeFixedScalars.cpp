@@ -20,7 +20,7 @@
 
 #include "medDecl.h"
 #include "medPipeCompoundVolumeFixedScalars.h"
-#include "medGUIDynamicVP.h"
+#include "mafGUIDynamicVP.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(medPipeCompoundVolumeFixedScalars);
@@ -94,11 +94,11 @@ mafCxxTypeMacro(medPipeCompoundVolumeVR);
     return NULL; //we have no scalar pipe by the default
 
   //scalar page is always the first one (if it exists)
-  medGUIDynamicVP* page = NULL;
+  mafGUIDynamicVP* page = NULL;
   if (m_FirstPage != NULL)
     page = m_FirstPage;
   else if (m_Notebook && m_Notebook->GetPageCount() > 0)
-    page = (medGUIDynamicVP*)m_Notebook->GetPage(0);
+    page = (mafGUIDynamicVP*)m_Notebook->GetPage(0);
     
   mafPipe* pipe;
   if (page == NULL || (pipe = page->GetCurrentVisualPipe()) == NULL)

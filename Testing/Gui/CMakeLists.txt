@@ -45,21 +45,21 @@ IF (WIN32)
   SET_TARGET_PROPERTIES(mafAttachCameraTest PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)
 
-############# added from medical
-ADD_EXECUTABLE(medGUISettingsAdvancedTest medGUISettingsAdvancedTest.h medGUISettingsAdvancedTest.cpp)
-ADD_TEST(medGUISettingsAdvancedTest ${EXECUTABLE_OUTPUT_PATH}/medGUISettingsAdvancedTest)
+############# 
+ADD_EXECUTABLE(mafGUISettingsAdvancedTest mafGUISettingsAdvancedTest.h mafGUISettingsAdvancedTest.cpp)
+ADD_TEST(mafGUISettingsAdvancedTest ${EXECUTABLE_OUTPUT_PATH}/mafGUISettingsAdvancedTest)
 
-ADD_EXECUTABLE(medGUIDicomSettingsTest medGUIDicomSettingsTest.h medGUIDicomSettingsTest.cpp)
-ADD_TEST(medGUIDicomSettingsTest ${EXECUTABLE_OUTPUT_PATH}/medGUIDicomSettingsTest)
+ADD_EXECUTABLE(mafGUIDicomSettingsTest mafGUIDicomSettingsTest.h mafGUIDicomSettingsTest.cpp)
+ADD_TEST(mafGUIDicomSettingsTest ${EXECUTABLE_OUTPUT_PATH}/mafGUIDicomSettingsTest)
 
-ADD_EXECUTABLE(medGUIWizardTest medGUIWizardTest.h medGUIWizardTest.cpp)
-ADD_TEST(medGUIWizardTest ${EXECUTABLE_OUTPUT_PATH}/medGUIWizardTest)
+ADD_EXECUTABLE(mafGUIWizardTest mafGUIWizardTest.h mafGUIWizardTest.cpp)
+ADD_TEST(mafGUIWizardTest ${EXECUTABLE_OUTPUT_PATH}/mafGUIWizardTest)
 
-ADD_EXECUTABLE(medGUIWizardPageTest medGUIWizardPageTest.h medGUIWizardPageTest.cpp)
-ADD_TEST(medGUIWizardPageTest ${EXECUTABLE_OUTPUT_PATH}/medGUIWizardPageTest)
+ADD_EXECUTABLE(mafGUIWizardPageTest mafGUIWizardPageTest.h mafGUIWizardPageTest.cpp)
+ADD_TEST(mafGUIWizardPageTest ${EXECUTABLE_OUTPUT_PATH}/mafGUIWizardPageTest)
 
-ADD_EXECUTABLE(medGUILandmarkTest medGUILandmarkTest.h medGUILandmarkTest.cpp)
-ADD_TEST(medGUILandmarkTest ${EXECUTABLE_OUTPUT_PATH}/medGUILandmarkTest)
+ADD_EXECUTABLE(mafGUILandmarkTest mafGUILandmarkTest.h mafGUILandmarkTest.cpp)
+ADD_TEST(mafGUILandmarkTest ${EXECUTABLE_OUTPUT_PATH}/mafGUILandmarkTest)
 
-ADD_EXECUTABLE(medGUIWizardPageNewTest medGUIWizardPageNewTest.h medGUIWizardPageNewTest.cpp)
-ADD_TEST(medGUIWizardPageNewTest ${EXECUTABLE_OUTPUT_PATH}/medGUIWizardPageNewTest)
+ADD_EXECUTABLE(mafGUIWizardPageNewTest mafGUIWizardPageNewTest.h mafGUIWizardPageNewTest.cpp)
+ADD_TEST(mafGUIWizardPageNewTest ${EXECUTABLE_OUTPUT_PATH}/mafGUIWizardPageNewTest)

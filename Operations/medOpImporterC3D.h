@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: medOpImporterC3D
  Authors: Paolo Quadrani - porting Daniele Giunchi
  

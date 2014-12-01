@@ -27,9 +27,9 @@ public:
 
 protected:
   ///default volume pipes to be used with the 
-  static const medGUIDynamicVP::SUPPORTED_VP_ENTRY m_ScalarVolumeVP[];
-  static const medGUIDynamicVP::SUPPORTED_VP_ENTRY m_VectorVolumeVP[];
-  static const medGUIDynamicVP::SUPPORTED_VP_ENTRY m_TensorVolumeVP[];
+  static const mafGUIDynamicVP::SUPPORTED_VP_ENTRY m_ScalarVolumeVP[];
+  static const mafGUIDynamicVP::SUPPORTED_VP_ENTRY m_VectorVolumeVP[];
+  static const mafGUIDynamicVP::SUPPORTED_VP_ENTRY m_TensorVolumeVP[];
 
 public:	
   medPipeCompoundVolume() {
@@ -50,7 +50,7 @@ protected:
   /** Creates page groups for the given pipes with default new page name szPageName.
   If pPipes is NULL the operation does nothing and returns false. */
   virtual bool CreatePageGroups(const char* szPageName, 
-    const medGUIDynamicVP::SUPPORTED_VP_ENTRY* pPipes);
+    const mafGUIDynamicVP::SUPPORTED_VP_ENTRY* pPipes);
 
   /** Called from CreatePageGroups to create groups for scalars. */
   virtual bool CreateScalarPageGroups();
@@ -63,25 +63,25 @@ protected:
 
   /** Returns visual pipes available for the volume.
   To be overriden in inherited classes to support different things. */
-  inline virtual const medGUIDynamicVP::SUPPORTED_VP_ENTRY* GetScalarVisualPipes() {
+  inline virtual const mafGUIDynamicVP::SUPPORTED_VP_ENTRY* GetScalarVisualPipes() {
     return m_ScalarVolumeVP;  //default
   }
 
   /** Returns visual pipes available for the volume.
   To be overriden in inherited classes to support different things. */
-  inline virtual const medGUIDynamicVP::SUPPORTED_VP_ENTRY* GetVectorVisualPipes() {
+  inline virtual const mafGUIDynamicVP::SUPPORTED_VP_ENTRY* GetVectorVisualPipes() {
     return m_VectorVolumeVP;  //default
   }
 
   /** Returns visual pipes available for the volume.
   To be overriden in inherited classes to support different things. */
-  inline virtual const medGUIDynamicVP::SUPPORTED_VP_ENTRY* GetTensorVisualPipes() {
+  inline virtual const mafGUIDynamicVP::SUPPORTED_VP_ENTRY* GetTensorVisualPipes() {
     return m_TensorVolumeVP;  //default is no tensor pipe
   }
 
   /** Helper that gets the index of pipe in pList, or -1 if no such pipe is available */
   int GetVisualPipeIndex(const char* pipe_classname, 
-    const medGUIDynamicVP::SUPPORTED_VP_ENTRY* pList);
+    const mafGUIDynamicVP::SUPPORTED_VP_ENTRY* pList);
 
 };
 #endif // medPipeCompoundVolume_h__

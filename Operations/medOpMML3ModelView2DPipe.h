@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: medOpMML3ModelView2DPipe
  Authors: Nigel McFarlane
  

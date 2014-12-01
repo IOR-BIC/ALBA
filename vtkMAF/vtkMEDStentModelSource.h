@@ -1,5 +1,5 @@
 /*=========================================================================
-Program:   MAF2Medical
+Program:   MAF2
 Module:    $RCSfile: StentModelSource.h,v $
 Language:  C++
 Date:      $Date: 2012-Nov 10:15:31 $

@@ -27,7 +27,7 @@
 
 
 ///visual pipes for volumes
-/*static*/ const medGUIDynamicVP::SUPPORTED_VP_ENTRY 
+/*static*/ const mafGUIDynamicVP::SUPPORTED_VP_ENTRY 
   medPipeCompoundVolume::m_ScalarVolumeVP[] = 
 {
   {"mafPipeIsosurface", "iso-surface"},
@@ -38,7 +38,7 @@
 };
 
 ///visual pipes for volumes
-/*static*/ const medGUIDynamicVP::SUPPORTED_VP_ENTRY 
+/*static*/ const mafGUIDynamicVP::SUPPORTED_VP_ENTRY 
 medPipeCompoundVolume::m_VectorVolumeVP[] = 
 {
   {"medPipeVectorFieldGlyphs", "glyphs"},  
@@ -48,7 +48,7 @@ medPipeCompoundVolume::m_VectorVolumeVP[] =
 };
 
 ///visual pipes for volumes
-/*static*/ const medGUIDynamicVP::SUPPORTED_VP_ENTRY 
+/*static*/ const mafGUIDynamicVP::SUPPORTED_VP_ENTRY 
 medPipeCompoundVolume::m_TensorVolumeVP[] = 
 {
   {"medPipeTensorFieldGlyphs", "glyphs"},  
@@ -175,7 +175,7 @@ mafCxxTypeMacro(medPipeCompoundVolume);
 //Creates page groups for the given pipes with default new page name szPageName.
 //If pPipes is NULL the operation does nothing.
 /*virtual*/bool medPipeCompoundVolume::CreatePageGroups(const char* szPageName, 
-                         const medGUIDynamicVP::SUPPORTED_VP_ENTRY* pPipes)
+                         const mafGUIDynamicVP::SUPPORTED_VP_ENTRY* pPipes)
 //------------------------------------------------------------------------
 {
   if (pPipes == NULL)
@@ -203,7 +203,7 @@ mafCxxTypeMacro(medPipeCompoundVolume);
 //------------------------------------------------------------------------
 //Helper that gets the index of pipe in pList, or -1 if no such pipe is available
 int medPipeCompoundVolume::GetVisualPipeIndex(
-  const char* pipe_classname, const medGUIDynamicVP::SUPPORTED_VP_ENTRY* pList)
+  const char* pipe_classname, const mafGUIDynamicVP::SUPPORTED_VP_ENTRY* pList)
 //------------------------------------------------------------------------
 {
   if (pList == NULL || pipe_classname == NULL)

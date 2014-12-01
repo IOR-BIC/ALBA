@@ -159,11 +159,12 @@ protected:
   /** Send an event to open the msf or zip file. */
   void OnDropFile(wxDropFilesEvent &event);
 
-	/** Redraw widgets on interface. */
+  /** Redraw widgets on interface. */
   void LayoutWindow();
 
-	/** Create the status bar on main application frame. */
+  /** Create the status bar on main application frame. */
   void CreateStatusbar();
+  
 
   mafObserver *m_Listener;
 

@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: medPipeRayCast
  Authors: Gianluigi Crimi  -  Grazia Di Cosmo
  
