@@ -48,7 +48,7 @@ class mafCurvilinearAbscissaOnSkeletonHelper;
 
 /** Gizmo Helper Object for interaction stuff debug: this class should be expanded and
 refactored incrementally to ease interaction stuff debug.
-See also medOpInteractionDebugger */
+See also mafOpInteractionDebugger */
 
 class MAF_EXPORT medGizmoInteractionDebugger : public mafGizmoInterface
 {

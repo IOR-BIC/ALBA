@@ -60,16 +60,16 @@
 #include "mafOpImporterMesh.h"
 #ifdef MAF_USE_ITK
 #include "mafOpImporterASCII.h"
-#include "medOpImporterAnalogWS.h"
-#include "medOpImporterGRFWS.h"
+#include "mafOpImporterAnalogWS.h"
+#include "mafOpImporterGRFWS.h"
 #endif
 #include "mafGUIDicomSettings.h"
-#include "medOpImporterDicomOffis.h"
-#include "medOpImporterLandmark.h"
-#include "medOpImporterLandmarkTXT.h"
-#include "medOpImporterLandmarkWS.h"
-#include "medOpImporterRAWImages.h"
-#include "medOpImporterC3D.h"
+#include "mafOpImporterDicomOffis.h"
+#include "mafOpImporterLandmark.h"
+#include "mafOpImporterLandmarkTXT.h"
+#include "mafOpImporterLandmarkWS.h"
+#include "mafOpImporterRAWImages.h"
+#include "mafOpImporterC3D.h"
 #include "mafOpImporterBBF.h"
 #include "mafOpImporterRAWVolume_BES.h"
 #include "medOpImporterVTK.h"
@@ -80,14 +80,14 @@
 #include "mafOpExporterRAW.h"
 #include "mafOpExporterSTL.h"
 #include "mafOpExporterVTK.h"
-#include "medOpExporterLandmark.h"
-#include "medOpExporterWrappedMeter.h"
-#include "medOpExporterGRFWS.h"
-#include "medOpExporterMeters.h"
+#include "mafOpExporterLandmark.h"
+#include "mafOpExporterWrappedMeter.h"
+#include "mafOpExporterGRFWS.h"
+#include "mafOpExporterMeters.h"
 #endif
 #ifndef _DEBUG
 //OPERATIONS
-#include "mafOp2DMeasure.h"
+#include "medOp2DMeasure.h"
 #include "mafOpAddLandmark.h"
 #include "mafOpClipSurface.h"
 #include "mafOpCreateGroup.h"
@@ -103,50 +103,50 @@
 #include "mafOpFilterVolume.h"
 #include "mafOpMAFTransform.h"
 #include "mafOpReparentTo.h"
-#include "mafOpVolumeResample.h"
+#include "medOpVolumeResample.h"
 #include "mafOpDecimateSurface.h"
 #include "mafOpConnectivitySurface.h"
 #include "mafOpBooleanSurface.h"
 #include "mafOpEditNormals.h"
 #include "mafOpCreateSurfaceParametric.h"
 #include "mafOpVOIDensity.h"
-#include "medOpScaleDataset.h"
-#include "medOpMove.h"
+#include "mafOpScaleDataset.h"
+#include "mafOpMove.h"
 #ifdef MAF_USE_ITK
-#include "medOpClassicICPRegistration.h"
+#include "mafOpClassicICPRegistration.h"
 #endif
-#include "medOpCropDeformableROI.h"
-#include "medOpMML.h"
-#include "medOpMeshQuality.h"
-#include "medOpVolumeMeasure.h"
-#include "medOpRegisterClusters.h"
-#include "medOpFlipNormals.h"
+#include "mafOpCropDeformableROI.h"
+#include "mafOpMML.h"
+#include "mafOpMeshQuality.h"
+#include "mafOpVolumeMeasure.h"
+#include "mafOpRegisterClusters.h"
+#include "mafOpFlipNormals.h"
 #include "mafOpCreateSpline.h"
 #include "mafOpRemoveCells.h"
-#include "medOpExtrusionHoles.h"
-#include "medOpCreateLabeledVolume.h"
-#include "medOpSplitSurface.h"
-#include "medOpInteractiveClipSurface.h"
-#include "medOpCreateEditSkeleton.h"
-#include "medOpCreateSurface.h"
-#include "medOpCreateWrappedMeter.h"
-#include "medOpComputeWrapping.h"
-#include "medOpLabelizeSurface.h"
-#include "medOpFreezeVME.h"
-#include "medOpIterativeRegistration.h"
-#include "medOpCleanSurface.h"
-#include "medOpSmoothSurface.h"
-#include "medOpTriangulateSurface.h"
-#include "medOpSurfaceMirror.h"
-#include "medOpSubdivide.h"
-#include "medOpFillHoles.h"
-#include "medOpMeshDeformation.h"
-#include "medOpMakeVMETimevarying.h"
-#include "medOpSmoothSurfaceCells.h"
-#include "medOpEqualizeHistogram.h"
-#include "medOpMML3.h"
-#include "medOpSegmentationRegionGrowingConnectedThreshold.h"
-#include "medOpSegmentationRegionGrowingLocalAndGlobalThreshold.h"
+#include "mafOpExtrusionHoles.h"
+#include "mafOpCreateLabeledVolume.h"
+#include "mafOpSplitSurface.h"
+#include "mafOpInteractiveClipSurface.h"
+#include "mafOpCreateEditSkeleton.h"
+#include "mafOpCreateSurface.h"
+#include "mafOpCreateWrappedMeter.h"
+#include "mafOpComputeWrapping.h"
+#include "mafOpLabelizeSurface.h"
+#include "mafOpFreezeVME.h"
+#include "mafOpIterativeRegistration.h"
+#include "mafOpCleanSurface.h"
+#include "mafOpSmoothSurface.h"
+#include "mafOpTriangulateSurface.h"
+#include "mafOpSurfaceMirror.h"
+#include "mafOpSubdivide.h"
+#include "mafOpFillHoles.h"
+#include "mafOpMeshDeformation.h"
+#include "mafOpMakeVMETimevarying.h"
+#include "mafOpSmoothSurfaceCells.h"
+#include "mafOpEqualizeHistogram.h"
+#include "mafOpMML3.h"
+#include "mafOpSegmentationRegionGrowingConnectedThreshold.h"
+#include "mafOpSegmentationRegionGrowingLocalAndGlobalThreshold.h"
 #endif
 
 #include "mafViewVTK.h"
@@ -227,16 +227,16 @@ bool exMedicalApp::OnInit()
 	m_Logic->Plug(new mafOpImporterASCII("ASCII"));
 #endif
 	mafGUIDicomSettings *dicomSettings=new mafGUIDicomSettings(NULL,"DICOM");
-	m_Logic->Plug(new medOpImporterDicomOffis("DICOM"),"DICOM Suite",true,dicomSettings);
-	m_Logic->Plug(new medOpImporterLandmark("Landmark"),"Landmark Suite");
-	m_Logic->Plug(new medOpImporterLandmarkTXT("Landmark TXT"),"Landmark Suite");
-	m_Logic->Plug(new medOpImporterLandmarkWS("Landmark WS"),"Landmark Suite");
-	m_Logic->Plug(new medOpImporterC3D("C3D"),"Landmark Suite");
+	m_Logic->Plug(new mafOpImporterDicomOffis("DICOM"),"DICOM Suite",true,dicomSettings);
+	m_Logic->Plug(new mafOpImporterLandmark("Landmark"),"Landmark Suite");
+	m_Logic->Plug(new mafOpImporterLandmarkTXT("Landmark TXT"),"Landmark Suite");
+	m_Logic->Plug(new mafOpImporterLandmarkWS("Landmark WS"),"Landmark Suite");
+	m_Logic->Plug(new mafOpImporterC3D("C3D"),"Landmark Suite");
 #ifdef MAF_USE_ITK
-	m_Logic->Plug(new medOpImporterAnalogWS("EMG"));
-	m_Logic->Plug(new medOpImporterGRFWS("GRF"));
+	m_Logic->Plug(new mafOpImporterAnalogWS("EMG"));
+	m_Logic->Plug(new mafOpImporterGRFWS("GRF"));
 #endif
-	m_Logic->Plug(new medOpImporterRAWImages("RAW Images"));
+	m_Logic->Plug(new mafOpImporterRAWImages("RAW Images"));
 	m_Logic->Plug(new mafOpImporterBBF());
 	m_Logic->Plug(new mafOpImporterRAWVolume_BES());
 #endif
@@ -250,10 +250,10 @@ bool exMedicalApp::OnInit()
 	m_Logic->Plug(new mafOpExporterSTL("STL"));
 	m_Logic->Plug(new mafOpExporterVTK("VTK"));
 	m_Logic->Plug(new mafOpExporterRAW("Raw"));
-	m_Logic->Plug(new medOpExporterLandmark("Landmark"));
-	m_Logic->Plug(new medOpExporterWrappedMeter());
-	m_Logic->Plug(new medOpExporterGRFWS());
-	m_Logic->Plug(new medOpExporterMeters());
+	m_Logic->Plug(new mafOpExporterLandmark("Landmark"));
+	m_Logic->Plug(new mafOpExporterWrappedMeter());
+	m_Logic->Plug(new mafOpExporterGRFWS());
+	m_Logic->Plug(new mafOpExporterMeters());
 #endif
 	//------------------------------------------------------------
 
@@ -261,10 +261,10 @@ bool exMedicalApp::OnInit()
 	// Operation Menu':
 	//------------------------------------------------------------
 #ifndef _DEBUG
-	m_Logic->Plug(new mafOp2DMeasure("2D Measure"),"Measure");
+	m_Logic->Plug(new medOp2DMeasure("2D Measure"),"Measure");
 	m_Logic->Plug(new mafOpVOIDensity("VOI Density"),"Measure");
-	m_Logic->Plug(new medOpVolumeMeasure("Volume"),"Measure");
-	m_Logic->Plug(new medOpMeshQuality("Mesh Quality"),"Measure");
+	m_Logic->Plug(new mafOpVolumeMeasure("Volume"),"Measure");
+	m_Logic->Plug(new mafOpMeshQuality("Mesh Quality"),"Measure");
 
 	m_Logic->Plug(new mafOpAddLandmark("Add Landmark"),_("Create"));
 	m_Logic->Plug(new mafOpCreateGroup("Group"),_("Create"));
@@ -275,14 +275,14 @@ bool exMedicalApp::OnInit()
 	m_Logic->Plug(new mafOpExtractIsosurface("Extract Isosurface"),_("Create"));
 	m_Logic->Plug(new mafOpCreateSurfaceParametric("Parametric Surface"),_("Create"));
 	m_Logic->Plug(new mafOpCreateSpline("Spline"),_("Create"));
-	m_Logic->Plug(new medOpCreateLabeledVolume(),_("Create"));
-	m_Logic->Plug(new medOpCreateEditSkeleton(),_("Create"));
-	m_Logic->Plug(new medOpCreateSurface(),_("Create"));
-	m_Logic->Plug(new medOpCreateWrappedMeter(),_("Create"));
-	m_Logic->Plug(new medOpComputeWrapping("Computing Wrapping"),_("Create"));
-	m_Logic->Plug(new medOpFreezeVME(),_("Create"));
-	m_Logic->Plug(new medOpSegmentationRegionGrowingConnectedThreshold(),_("Create"));
-	m_Logic->Plug(new medOpSegmentationRegionGrowingLocalAndGlobalThreshold(),_("Create"));
+	m_Logic->Plug(new mafOpCreateLabeledVolume(),_("Create"));
+	m_Logic->Plug(new mafOpCreateEditSkeleton(),_("Create"));
+	m_Logic->Plug(new mafOpCreateSurface(),_("Create"));
+	m_Logic->Plug(new mafOpCreateWrappedMeter(),_("Create"));
+	m_Logic->Plug(new mafOpComputeWrapping("Computing Wrapping"),_("Create"));
+	m_Logic->Plug(new mafOpFreezeVME(),_("Create"));
+	m_Logic->Plug(new mafOpSegmentationRegionGrowingConnectedThreshold(),_("Create"));
+	m_Logic->Plug(new mafOpSegmentationRegionGrowingLocalAndGlobalThreshold(),_("Create"));
 
 	m_Logic->Plug(new mafOpClipSurface("Clip Surface"),_("Modify"));
 	m_Logic->Plug(new mafOpFilterSurface("Filter Surface"),_("Modify"));
@@ -294,35 +294,35 @@ bool exMedicalApp::OnInit()
 	m_Logic->Plug(new mafOpExplodeCollapse("Explode/Collapse cloud"),_("Modify"));
 	m_Logic->Plug(new mafOpMAFTransform("Transform"),_("Modify"));
 	m_Logic->Plug(new mafOpReparentTo("Reparent to..."),_("Modify"));
-	m_Logic->Plug(new mafOpVolumeResample("Resample Volume"),_("Modify"));
+	m_Logic->Plug(new medOpVolumeResample("Resample Volume"),_("Modify"));
 	m_Logic->Plug(new mafOpCrop("Crop Volume"),_("Modify"));
 	m_Logic->Plug(new mafOpBooleanSurface("Boolean Surface"),_("Modify"));
-	m_Logic->Plug(new medOpMML("MML"),_("Modify"));
-	m_Logic->Plug(new medOpMML3("MML 3"),_("Modify"));
-	m_Logic->Plug(new medOpCropDeformableROI("Crop ROI"),_("Modify"));
-	m_Logic->Plug(new medOpFlipNormals("Flip Normals"),_("Modify"));
+	m_Logic->Plug(new mafOpMML("MML"),_("Modify"));
+	m_Logic->Plug(new mafOpMML3("MML 3"),_("Modify"));
+	m_Logic->Plug(new mafOpCropDeformableROI("Crop ROI"),_("Modify"));
+	m_Logic->Plug(new mafOpFlipNormals("Flip Normals"),_("Modify"));
 	m_Logic->Plug(new mafOpRemoveCells("Remove Cells"),_("Modify"));
-	m_Logic->Plug(new medOpExtrusionHoles(),_("Modify"));
-	m_Logic->Plug(new medOpScaleDataset("Scale Dataset"),_("Modify"));
-	m_Logic->Plug(new medOpMove("Move"),_("Modify"));    
-	m_Logic->Plug(new medOpSplitSurface(),_("Modify"));
-	m_Logic->Plug(new medOpInteractiveClipSurface(),_("Modify"));
-	m_Logic->Plug(new medOpLabelizeSurface(),_("Modify"));
-	m_Logic->Plug(new medOpSmoothSurface(),_("Modify"));
-	m_Logic->Plug(new medOpCleanSurface(),_("Modify"));
-	m_Logic->Plug(new medOpTriangulateSurface(),_("Modify"));
-	m_Logic->Plug(new medOpSurfaceMirror(),_("Modify"));
-	m_Logic->Plug(new medOpSubdivide(),_("Modify"));
-	m_Logic->Plug(new medOpFillHoles(),_("Modify"));
-	m_Logic->Plug(new medOpMeshDeformation(),_("Modify"));
-	m_Logic->Plug(new medOpMakeVMETimevarying(),_("Modify"));
-	m_Logic->Plug(new medOpEqualizeHistogram(),_("Modify"));
-	m_Logic->Plug(new medOpSmoothSurfaceCells(),_("Modify"));
+	m_Logic->Plug(new mafOpExtrusionHoles(),_("Modify"));
+	m_Logic->Plug(new mafOpScaleDataset("Scale Dataset"),_("Modify"));
+	m_Logic->Plug(new mafOpMove("Move"),_("Modify"));    
+	m_Logic->Plug(new mafOpSplitSurface(),_("Modify"));
+	m_Logic->Plug(new mafOpInteractiveClipSurface(),_("Modify"));
+	m_Logic->Plug(new mafOpLabelizeSurface(),_("Modify"));
+	m_Logic->Plug(new mafOpSmoothSurface(),_("Modify"));
+	m_Logic->Plug(new mafOpCleanSurface(),_("Modify"));
+	m_Logic->Plug(new mafOpTriangulateSurface(),_("Modify"));
+	m_Logic->Plug(new mafOpSurfaceMirror(),_("Modify"));
+	m_Logic->Plug(new mafOpSubdivide(),_("Modify"));
+	m_Logic->Plug(new mafOpFillHoles(),_("Modify"));
+	m_Logic->Plug(new mafOpMeshDeformation(),_("Modify"));
+	m_Logic->Plug(new mafOpMakeVMETimevarying(),_("Modify"));
+	m_Logic->Plug(new mafOpEqualizeHistogram(),_("Modify"));
+	m_Logic->Plug(new mafOpSmoothSurfaceCells(),_("Modify"));
 
-	m_Logic->Plug(new medOpIterativeRegistration(),_("Register"));
-	m_Logic->Plug(new medOpRegisterClusters("Clusters"),_("Register"));
+	m_Logic->Plug(new mafOpIterativeRegistration(),_("Register"));
+	m_Logic->Plug(new mafOpRegisterClusters("Clusters"),_("Register"));
 #ifdef MAF_USE_ITK
-	m_Logic->Plug(new medOpClassicICPRegistration("Surface"),_("Register"));
+	m_Logic->Plug(new mafOpClassicICPRegistration("Surface"),_("Register"));
 #endif
 #endif
 	//------------------------------------------------------------

@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2Medical
- Module: itkRawMotionImporterUtilityTest
+ Module: mafItkRawMotionImporterUtilityTest
  Authors: Daniele Giunchi
  
  Copyright (c) B3C
@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include "itkRawMotionImporterUtilityTest.h"
-#include "itkRawMotionImporterUtility.h"
+#include "mafItkRawMotionImporterUtility.h"
 #include "mafString.h"
 
 #include "vnl/vnl_matrix.h"
@@ -37,30 +37,30 @@
 //3.0 3.1 3.2 3.3
 
 //----------------------------------------------------------------------------
-void itkRawMotionImporterUtilityTest::TestFixture()
+void mafItkRawMotionImporterUtilityTest::TestFixture()
 //----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
-void itkRawMotionImporterUtilityTest::setUp()
+void mafItkRawMotionImporterUtilityTest::setUp()
 //----------------------------------------------------------------------------
 {
   m_Result = false;
 }
 //----------------------------------------------------------------------------
-void itkRawMotionImporterUtilityTest::tearDown()
+void mafItkRawMotionImporterUtilityTest::tearDown()
 //----------------------------------------------------------------------------
 {
 }
 //-----------------------------------------------------------
-void itkRawMotionImporterUtilityTest::TestDynamicAllocation() 
+void mafItkRawMotionImporterUtilityTest::TestDynamicAllocation() 
 //-----------------------------------------------------------
 {
-  itkRawMotionImporterUtility *rMIU=new itkRawMotionImporterUtility();
+  mafItkRawMotionImporterUtility *rMIU=new mafItkRawMotionImporterUtility();
   delete rMIU;
 }
 //-----------------------------------------------------------
-void itkRawMotionImporterUtilityTest::TestReadMatrix() 
+void mafItkRawMotionImporterUtilityTest::TestReadMatrix() 
 //-----------------------------------------------------------
 {
   enum ID_RESULT
@@ -72,7 +72,7 @@ void itkRawMotionImporterUtilityTest::TestReadMatrix()
   mafString matrixFile = MAF_DATA_ROOT;
   matrixFile << "/Matrix/TestMatrix001.txt";
   vnl_matrix<double> mat;
-  itkRawMotionImporterUtility *rMIU=new itkRawMotionImporterUtility();
+  mafItkRawMotionImporterUtility *rMIU=new mafItkRawMotionImporterUtility();
   int res = rMIU->ReadMatrix(mat,matrixFile);
 
   m_Result = res == RES_OK;

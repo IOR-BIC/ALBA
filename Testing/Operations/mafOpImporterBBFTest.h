@@ -14,8 +14,8 @@
 
 =========================================================================*/
 
-#ifndef CPP_UNIT_medOpImporterAnalogWSTest_H
-#define CPP_UNIT_medOpImporterAnalogWSTest_H
+#ifndef CPP_UNIT_mafOpImporterAnalogWSTest_H
+#define CPP_UNIT_mafOpImporterAnalogWSTest_H
 
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/BriefTestProgressListener.h>

@@ -392,189 +392,189 @@ IF (MAF_USE_ITK)
   ENDIF (WIN32)
 
 ########### from medical
-  ADD_EXECUTABLE(medOpExporterLandmarkTest medOpExporterLandmarkTest.h medOpExporterLandmarkTest.cpp)
-  ADD_TEST(medOpExporterLandmarkTest ${EXECUTABLE_OUTPUT_PATH}/medOpExporterLandmarkTest)
+  ADD_EXECUTABLE(mafOpExporterLandmarkTest mafOpExporterLandmarkTest.h mafOpExporterLandmarkTest.cpp)
+  ADD_TEST(mafOpExporterLandmarkTest ${EXECUTABLE_OUTPUT_PATH}/mafOpExporterLandmarkTest)
 
-  ADD_EXECUTABLE(medOpImporterLandmarkTest medOpImporterLandmarkTest.h medOpImporterLandmarkTest.cpp)
-  ADD_TEST(medOpImporterLandmarkTest ${EXECUTABLE_OUTPUT_PATH}/medOpImporterLandmarkTest)
+  ADD_EXECUTABLE(mafOpImporterLandmarkTest mafOpImporterLandmarkTest.h mafOpImporterLandmarkTest.cpp)
+  ADD_TEST(mafOpImporterLandmarkTest ${EXECUTABLE_OUTPUT_PATH}/mafOpImporterLandmarkTest)
   
-  ADD_EXECUTABLE(medOpImporterGRFWSTest medOpImporterGRFWSTest.h medOpImporterGRFWSTest.cpp)
-  ADD_TEST(medOpImporterGRFWSTest ${EXECUTABLE_OUTPUT_PATH}/medOpImporterGRFWSTest) 
+  ADD_EXECUTABLE(mafOpImporterGRFWSTest mafOpImporterGRFWSTest.h mafOpImporterGRFWSTest.cpp)
+  ADD_TEST(mafOpImporterGRFWSTest ${EXECUTABLE_OUTPUT_PATH}/mafOpImporterGRFWSTest) 
   
-  ADD_EXECUTABLE(medOpImporterAnalogWSTest medOpImporterAnalogWSTest.h medOpImporterAnalogWSTest.cpp)
+  ADD_EXECUTABLE(mafOpImporterAnalogWSTest mafOpImporterAnalogWSTest.h mafOpImporterAnalogWSTest.cpp)
   
-  ADD_TEST(medOpImporterAnalogWSTest ${EXECUTABLE_OUTPUT_PATH}/medOpImporterAnalogWSTest)
+  ADD_TEST(mafOpImporterAnalogWSTest ${EXECUTABLE_OUTPUT_PATH}/mafOpImporterAnalogWSTest)
 ENDIF (MAF_USE_ITK)
 
-ADD_EXECUTABLE(medGeometryEditorPolylineGraphTest medGeometryEditorPolylineGraphTest.h medGeometryEditorPolylineGraphTest.cpp)
-ADD_TEST(medGeometryEditorPolylineGraphTest  ${EXECUTABLE_OUTPUT_PATH}/medGeometryEditorPolylineGraphTest)
+ADD_EXECUTABLE(mafGeometryEditorPolylineGraphTest mafGeometryEditorPolylineGraphTest.h mafGeometryEditorPolylineGraphTest.cpp)
+ADD_TEST(mafGeometryEditorPolylineGraphTest  ${EXECUTABLE_OUTPUT_PATH}/mafGeometryEditorPolylineGraphTest)
 
-ADD_EXECUTABLE(medOpMatrixVectorMathTest medOpMatrixVectorMathTest.h medOpMatrixVectorMathTest.cpp)
-ADD_TEST(medOpMatrixVectorMathTest ${EXECUTABLE_OUTPUT_PATH}/medOpMatrixVectorMathTest)
+ADD_EXECUTABLE(mafOpMatrixVectorMathTest mafOpMatrixVectorMathTest.h mafOpMatrixVectorMathTest.cpp)
+ADD_TEST(mafOpMatrixVectorMathTest ${EXECUTABLE_OUTPUT_PATH}/mafOpMatrixVectorMathTest)
 
-ADD_EXECUTABLE(medOpVolumeMeasureTest medOpVolumeMeasureTest.h medOpVolumeMeasureTest.cpp)
-ADD_TEST(medOpVolumeMeasureTest ${EXECUTABLE_OUTPUT_PATH}/medOpVolumeMeasureTest)
+ADD_EXECUTABLE(mafOpVolumeMeasureTest mafOpVolumeMeasureTest.h mafOpVolumeMeasureTest.cpp)
+ADD_TEST(mafOpVolumeMeasureTest ${EXECUTABLE_OUTPUT_PATH}/mafOpVolumeMeasureTest)
 
-ADD_EXECUTABLE(medOpImporterRAWImagesTest medOpImporterRAWImagesTest.h medOpImporterRAWImagesTest.cpp)
-ADD_TEST(medOpImporterRAWImagesTest ${EXECUTABLE_OUTPUT_PATH}/medOpImporterRAWImagesTest)
+ADD_EXECUTABLE(mafOpImporterRAWImagesTest mafOpImporterRAWImagesTest.h mafOpImporterRAWImagesTest.cpp)
+ADD_TEST(mafOpImporterRAWImagesTest ${EXECUTABLE_OUTPUT_PATH}/mafOpImporterRAWImagesTest)
 
-ADD_EXECUTABLE(medOpImporterLandmarkTXTTest medOpImporterLandmarkTXTTest.h medOpImporterLandmarkTXTTest.cpp)
-ADD_TEST(medOpImporterLandmarkTXTTest ${EXECUTABLE_OUTPUT_PATH}/medOpImporterLandmarkTXTTest)
+ADD_EXECUTABLE(mafOpImporterLandmarkTXTTest mafOpImporterLandmarkTXTTest.h mafOpImporterLandmarkTXTTest.cpp)
+ADD_TEST(mafOpImporterLandmarkTXTTest ${EXECUTABLE_OUTPUT_PATH}/mafOpImporterLandmarkTXTTest)
 
-ADD_EXECUTABLE(medOpImporterLandmarkWSTest medOpImporterLandmarkWSTest.h medOpImporterLandmarkWSTest.cpp)
-ADD_TEST(medOpImporterLandmarkWSTest ${EXECUTABLE_OUTPUT_PATH}/medOpImporterLandmarkWSTest)
+ADD_EXECUTABLE(mafOpImporterLandmarkWSTest mafOpImporterLandmarkWSTest.h mafOpImporterLandmarkWSTest.cpp)
+ADD_TEST(mafOpImporterLandmarkWSTest ${EXECUTABLE_OUTPUT_PATH}/mafOpImporterLandmarkWSTest)
   
-ADD_EXECUTABLE(medOpExtrusionHolesTest medOpExtrusionHolesTest.h medOpExtrusionHolesTest.cpp)
-ADD_TEST(medOpExtrusionHolesTest ${EXECUTABLE_OUTPUT_PATH}/medOpExtrusionHolesTest)
+ADD_EXECUTABLE(mafOpExtrusionHolesTest mafOpExtrusionHolesTest.h mafOpExtrusionHolesTest.cpp)
+ADD_TEST(mafOpExtrusionHolesTest ${EXECUTABLE_OUTPUT_PATH}/mafOpExtrusionHolesTest)
 
-ADD_EXECUTABLE(medOpExporterWrappedMeterTest medOpExporterWrappedMeterTest.h medOpExporterWrappedMeterTest.cpp)
-ADD_TEST(medOpExporterWrappedMeterTest ${EXECUTABLE_OUTPUT_PATH}/medOpExporterWrappedMeterTest)
+ADD_EXECUTABLE(mafOpExporterWrappedMeterTest mafOpExporterWrappedMeterTest.h mafOpExporterWrappedMeterTest.cpp)
+ADD_TEST(mafOpExporterWrappedMeterTest ${EXECUTABLE_OUTPUT_PATH}/mafOpExporterWrappedMeterTest)
 
-ADD_EXECUTABLE(medOpFreezeVMETest medOpFreezeVMETest.h medOpFreezeVMETest.cpp)
-ADD_TEST(medOpFreezeVMETest ${EXECUTABLE_OUTPUT_PATH}/medOpFreezeVMETest)
+ADD_EXECUTABLE(mafOpFreezeVMETest mafOpFreezeVMETest.h mafOpFreezeVMETest.cpp)
+ADD_TEST(mafOpFreezeVMETest ${EXECUTABLE_OUTPUT_PATH}/mafOpFreezeVMETest)
 
-ADD_EXECUTABLE(medOpLabelizeSurfaceTest medOpLabelizeSurfaceTest.h medOpLabelizeSurfaceTest.cpp)
-ADD_TEST(medOpLabelizeSurfaceTest ${EXECUTABLE_OUTPUT_PATH}/medOpLabelizeSurfaceTest)
+ADD_EXECUTABLE(mafOpLabelizeSurfaceTest mafOpLabelizeSurfaceTest.h mafOpLabelizeSurfaceTest.cpp)
+ADD_TEST(mafOpLabelizeSurfaceTest ${EXECUTABLE_OUTPUT_PATH}/mafOpLabelizeSurfaceTest)
 
-ADD_EXECUTABLE(medOpCleanSurfaceTest medOpCleanSurfaceTest.h medOpCleanSurfaceTest.cpp)
-ADD_TEST(medOpCleanSurfaceTest ${EXECUTABLE_OUTPUT_PATH}/medOpCleanSurfaceTest)
+ADD_EXECUTABLE(mafOpCleanSurfaceTest mafOpCleanSurfaceTest.h mafOpCleanSurfaceTest.cpp)
+ADD_TEST(mafOpCleanSurfaceTest ${EXECUTABLE_OUTPUT_PATH}/mafOpCleanSurfaceTest)
 
-ADD_EXECUTABLE(medOpSmoothSurfaceTest medOpSmoothSurfaceTest.h medOpSmoothSurfaceTest.cpp)
-ADD_TEST(medOpSmoothSurfaceTest ${EXECUTABLE_OUTPUT_PATH}/medOpSmoothSurfaceTest)
+ADD_EXECUTABLE(mafOpSmoothSurfaceTest mafOpSmoothSurfaceTest.h mafOpSmoothSurfaceTest.cpp)
+ADD_TEST(mafOpSmoothSurfaceTest ${EXECUTABLE_OUTPUT_PATH}/mafOpSmoothSurfaceTest)
 
-ADD_EXECUTABLE(medOpTriangulateSurfaceTest medOpTriangulateSurfaceTest.h medOpTriangulateSurfaceTest.cpp)
-ADD_TEST(medOpTriangulateSurfaceTest ${EXECUTABLE_OUTPUT_PATH}/medOpTriangulateSurfaceTest)
+ADD_EXECUTABLE(mafOpTriangulateSurfaceTest mafOpTriangulateSurfaceTest.h mafOpTriangulateSurfaceTest.cpp)
+ADD_TEST(mafOpTriangulateSurfaceTest ${EXECUTABLE_OUTPUT_PATH}/mafOpTriangulateSurfaceTest)
 
-ADD_EXECUTABLE(medOpSurfaceMirrorTest medOpSurfaceMirrorTest.h medOpSurfaceMirrorTest.cpp)
-ADD_TEST(medOpSurfaceMirrorTest ${EXECUTABLE_OUTPUT_PATH}/medOpSurfaceMirrorTest)
+ADD_EXECUTABLE(mafOpSurfaceMirrorTest mafOpSurfaceMirrorTest.h mafOpSurfaceMirrorTest.cpp)
+ADD_TEST(mafOpSurfaceMirrorTest ${EXECUTABLE_OUTPUT_PATH}/mafOpSurfaceMirrorTest)
 
 ADD_EXECUTABLE(medOpImporterVTKTest medOpImporterVTKTest.h medOpImporterVTKTest.cpp)
 ADD_TEST(medOpImporterVTKTest ${EXECUTABLE_OUTPUT_PATH}/medOpImporterVTKTest)
 
-ADD_EXECUTABLE(medOpExporterMetersTest medOpExporterMetersTest.h medOpExporterMetersTest.cpp)
-ADD_TEST(medOpExporterMetersTest ${EXECUTABLE_OUTPUT_PATH}/medOpExporterMetersTest)
+ADD_EXECUTABLE(mafOpExporterMetersTest mafOpExporterMetersTest.h mafOpExporterMetersTest.cpp)
+ADD_TEST(mafOpExporterMetersTest ${EXECUTABLE_OUTPUT_PATH}/mafOpExporterMetersTest)
 
-ADD_EXECUTABLE(medOpSubdivideTest medOpSubdivideTest.h medOpSubdivideTest.cpp)
-ADD_TEST(medOpSubdivideTest ${EXECUTABLE_OUTPUT_PATH}/medOpSubdivideTest)
+ADD_EXECUTABLE(mafOpSubdivideTest mafOpSubdivideTest.h mafOpSubdivideTest.cpp)
+ADD_TEST(mafOpSubdivideTest ${EXECUTABLE_OUTPUT_PATH}/mafOpSubdivideTest)
 
-ADD_EXECUTABLE(medOpCreateSurfaceTest medOpCreateSurfaceTest.h medOpCreateSurfaceTest.cpp)
-ADD_TEST(medOpCreateSurfaceTest ${EXECUTABLE_OUTPUT_PATH}/medOpCreateSurfaceTest)
+ADD_EXECUTABLE(mafOpCreateSurfaceTest mafOpCreateSurfaceTest.h mafOpCreateSurfaceTest.cpp)
+ADD_TEST(mafOpCreateSurfaceTest ${EXECUTABLE_OUTPUT_PATH}/mafOpCreateSurfaceTest)
 
 ADD_EXECUTABLE(medOpVolumeResampleTest medOpVolumeResampleTest.h medOpVolumeResampleTest.cpp)
 ADD_TEST(medOpVolumeResampleTest ${EXECUTABLE_OUTPUT_PATH}/medOpVolumeResampleTest)
 
-ADD_EXECUTABLE(medOpSegmentationRegionGrowingConnectedThresholdTest medOpSegmentationRegionGrowingConnectedThresholdTest.h medOpSegmentationRegionGrowingConnectedThresholdTest.cpp)
-ADD_TEST(medOpSegmentationRegionGrowingConnectedThresholdTest ${EXECUTABLE_OUTPUT_PATH}/medOpSegmentationRegionGrowingConnectedThresholdTest)
+ADD_EXECUTABLE(mafOpSegmentationRegionGrowingConnectedThresholdTest mafOpSegmentationRegionGrowingConnectedThresholdTest.h mafOpSegmentationRegionGrowingConnectedThresholdTest.cpp)
+ADD_TEST(mafOpSegmentationRegionGrowingConnectedThresholdTest ${EXECUTABLE_OUTPUT_PATH}/mafOpSegmentationRegionGrowingConnectedThresholdTest)
 
-ADD_EXECUTABLE(medOpScaleDatasetTest medOpScaleDatasetTest.h medOpScaleDatasetTest.cpp)
-ADD_TEST(medOpScaleDatasetTest ${EXECUTABLE_OUTPUT_PATH}/medOpScaleDatasetTest)
+ADD_EXECUTABLE(mafOpScaleDatasetTest mafOpScaleDatasetTest.h mafOpScaleDatasetTest.cpp)
+ADD_TEST(mafOpScaleDatasetTest ${EXECUTABLE_OUTPUT_PATH}/mafOpScaleDatasetTest)
 
-ADD_EXECUTABLE(medOpCreateLabeledVolumeTest medOpCreateLabeledVolumeTest.h medOpCreateLabeledVolumeTest.cpp)
-ADD_TEST(medOpCreateLabeledVolumeTest ${EXECUTABLE_OUTPUT_PATH}/medOpCreateLabeledVolumeTest)
+ADD_EXECUTABLE(mafOpCreateLabeledVolumeTest mafOpCreateLabeledVolumeTest.h mafOpCreateLabeledVolumeTest.cpp)
+ADD_TEST(mafOpCreateLabeledVolumeTest ${EXECUTABLE_OUTPUT_PATH}/mafOpCreateLabeledVolumeTest)
 
-ADD_EXECUTABLE(medOpComputeWrappingTest medOpComputeWrappingTest.h medOpComputeWrappingTest.cpp)
-ADD_TEST(medOpComputeWrappingTest ${EXECUTABLE_OUTPUT_PATH}/medOpComputeWrappingTest)
+ADD_EXECUTABLE(mafOpComputeWrappingTest mafOpComputeWrappingTest.h mafOpComputeWrappingTest.cpp)
+ADD_TEST(mafOpComputeWrappingTest ${EXECUTABLE_OUTPUT_PATH}/mafOpComputeWrappingTest)
 
-ADD_EXECUTABLE(medOpComputeInertialTensorTest medOpComputeInertialTensorTest.h medOpComputeInertialTensorTest.cpp)
-ADD_TEST(medOpComputeInertialTensorTest ${EXECUTABLE_OUTPUT_PATH}/medOpComputeInertialTensorTest)
+ADD_EXECUTABLE(mafOpComputeInertialTensorTest mafOpComputeInertialTensorTest.h mafOpComputeInertialTensorTest.cpp)
+ADD_TEST(mafOpComputeInertialTensorTest ${EXECUTABLE_OUTPUT_PATH}/mafOpComputeInertialTensorTest)
 
-ADD_EXECUTABLE(medOpSplitSurfaceTest medOpSplitSurfaceTest.h medOpSplitSurfaceTest.cpp)
-ADD_TEST(medOpSplitSurfaceTest ${EXECUTABLE_OUTPUT_PATH}/medOpSplitSurfaceTest)
+ADD_EXECUTABLE(mafOpSplitSurfaceTest mafOpSplitSurfaceTest.h mafOpSplitSurfaceTest.cpp)
+ADD_TEST(mafOpSplitSurfaceTest ${EXECUTABLE_OUTPUT_PATH}/mafOpSplitSurfaceTest)
 
-ADD_EXECUTABLE(medOpMML3Test medOpMML3Test.h medOpMML3Test.cpp)
-ADD_TEST(medOpMML3Test ${EXECUTABLE_OUTPUT_PATH}/medOpMML3Test)
+ADD_EXECUTABLE(mafOpMML3Test mafOpMML3Test.h mafOpMML3Test.cpp)
+ADD_TEST(mafOpMML3Test ${EXECUTABLE_OUTPUT_PATH}/mafOpMML3Test)
 
-ADD_EXECUTABLE(medOpExtractGeometryTest medOpExtractGeometryTest.h medOpExtractGeometryTest.cpp)
-ADD_TEST(medOpExtractGeometryTest ${EXECUTABLE_OUTPUT_PATH}/medOpExtractGeometryTest)
+ADD_EXECUTABLE(mafOpExtractGeometryTest mafOpExtractGeometryTest.h mafOpExtractGeometryTest.cpp)
+ADD_TEST(mafOpExtractGeometryTest ${EXECUTABLE_OUTPUT_PATH}/mafOpExtractGeometryTest)
 
 
 IF (MAF_USE_OFFIS)
 
-ADD_EXECUTABLE(medOpImporterDicomOffisTest medOpImporterDicomOffisTest.h medOpImporterDicomOffisTest.cpp)
-ADD_TEST(medOpImporterDicomOffisTest ${EXECUTABLE_OUTPUT_PATH}/medOpImporterDicomOffisTest)
+ADD_EXECUTABLE(mafOpImporterDicomOffisTest mafOpImporterDicomOffisTest.h mafOpImporterDicomOffisTest.cpp)
+ADD_TEST(mafOpImporterDicomOffisTest ${EXECUTABLE_OUTPUT_PATH}/mafOpImporterDicomOffisTest)
 
 
-ADD_EXECUTABLE(medDicomCardiacMRIHelperTest medDicomCardiacMRIHelperTest.h medDicomCardiacMRIHelperTest.cpp)
-ADD_TEST(medDicomCardiacMRIHelperTest ${EXECUTABLE_OUTPUT_PATH}/medDicomCardiacMRIHelperTest)
+ADD_EXECUTABLE(mafDicomCardiacMRIHelperTest mafDicomCardiacMRIHelperTest.h mafDicomCardiacMRIHelperTest.cpp)
+ADD_TEST(mafDicomCardiacMRIHelperTest ${EXECUTABLE_OUTPUT_PATH}/mafDicomCardiacMRIHelperTest)
 
 ENDIF (MAF_USE_OFFIS)
 
 ADD_EXECUTABLE(itkRawMotionImporterUtilityTest itkRawMotionImporterUtilityTest.h itkRawMotionImporterUtilityTest.cpp)
 ADD_TEST(itkRawMotionImporterUtilityTest ${EXECUTABLE_OUTPUT_PATH}/itkRawMotionImporterUtilityTest)
 
-ADD_EXECUTABLE(medOpMakeVMETimevaryingTest medOpMakeVMETimevaryingTest.h medOpMakeVMETimevaryingTest.cpp)
-ADD_TEST(medOpMakeVMETimevaryingTest ${EXECUTABLE_OUTPUT_PATH}/medOpMakeVMETimevaryingTest)
+ADD_EXECUTABLE(mafOpMakeVMETimevaryingTest mafOpMakeVMETimevaryingTest.h mafOpMakeVMETimevaryingTest.cpp)
+ADD_TEST(mafOpMakeVMETimevaryingTest ${EXECUTABLE_OUTPUT_PATH}/mafOpMakeVMETimevaryingTest)
 
-ADD_EXECUTABLE(medOpEqualizeHistogramTest medOpEqualizeHistogramTest.h medOpEqualizeHistogramTest.cpp)
-ADD_TEST(medOpEqualizeHistogramTest ${EXECUTABLE_OUTPUT_PATH}/medOpEqualizeHistogramTest)
+ADD_EXECUTABLE(mafOpEqualizeHistogramTest mafOpEqualizeHistogramTest.h mafOpEqualizeHistogramTest.cpp)
+ADD_TEST(mafOpEqualizeHistogramTest ${EXECUTABLE_OUTPUT_PATH}/mafOpEqualizeHistogramTest)
 
-ADD_EXECUTABLE(medOpCreateWrappedMeterTest medOpCreateWrappedMeterTest.h medOpCreateWrappedMeterTest.cpp)
-ADD_TEST(medOpCreateWrappedMeterTest ${EXECUTABLE_OUTPUT_PATH}/medOpCreateWrappedMeterTest)
+ADD_EXECUTABLE(mafOpCreateWrappedMeterTest mafOpCreateWrappedMeterTest.h mafOpCreateWrappedMeterTest.cpp)
+ADD_TEST(mafOpCreateWrappedMeterTest ${EXECUTABLE_OUTPUT_PATH}/mafOpCreateWrappedMeterTest)
 
-ADD_EXECUTABLE(medOpFlipNormalsTest medOpFlipNormalsTest.h medOpFlipNormalsTest.cpp)
-ADD_TEST(medOpFlipNormalsTest ${EXECUTABLE_OUTPUT_PATH}/medOpFlipNormalsTest)
+ADD_EXECUTABLE(mafOpFlipNormalsTest mafOpFlipNormalsTest.h mafOpFlipNormalsTest.cpp)
+ADD_TEST(mafOpFlipNormalsTest ${EXECUTABLE_OUTPUT_PATH}/mafOpFlipNormalsTest)
 
-ADD_EXECUTABLE(medOpSmoothSurfaceCellsTest medOpSmoothSurfaceCellsTest.h medOpSmoothSurfaceCellsTest.cpp)
-ADD_TEST(medOpSmoothSurfaceCellsTest ${EXECUTABLE_OUTPUT_PATH}/medOpSmoothSurfaceCellsTest)
+ADD_EXECUTABLE(mafOpSmoothSurfaceCellsTest mafOpSmoothSurfaceCellsTest.h mafOpSmoothSurfaceCellsTest.cpp)
+ADD_TEST(mafOpSmoothSurfaceCellsTest ${EXECUTABLE_OUTPUT_PATH}/mafOpSmoothSurfaceCellsTest)
 
-ADD_EXECUTABLE(medOpMeshQualityTest medOpMeshQualityTest.h medOpMeshQualityTest.cpp)
-ADD_TEST(medOpMeshQualityTest ${EXECUTABLE_OUTPUT_PATH}/medOpMeshQualityTest)
+ADD_EXECUTABLE(mafOpMeshQualityTest mafOpMeshQualityTest.h mafOpMeshQualityTest.cpp)
+ADD_TEST(mafOpMeshQualityTest ${EXECUTABLE_OUTPUT_PATH}/mafOpMeshQualityTest)
 
 ADD_EXECUTABLE(mafOpImporterBBFTest mafOpImporterBBFTest.h mafOpImporterBBFTest.cpp)
 ADD_TEST(mafOpImporterBBFTest ${EXECUTABLE_OUTPUT_PATH}/mafOpImporterBBFTest)
 
-ADD_EXECUTABLE(medOpCropDeformableROITest medOpCropDeformableROITest.h medOpCropDeformableROITest.cpp)
-ADD_TEST(medOpCropDeformableROITest ${EXECUTABLE_OUTPUT_PATH}/medOpCropDeformableROITest)
+ADD_EXECUTABLE(mafOpCropDeformableROITest mafOpCropDeformableROITest.h mafOpCropDeformableROITest.cpp)
+ADD_TEST(mafOpCropDeformableROITest ${EXECUTABLE_OUTPUT_PATH}/mafOpCropDeformableROITest)
 
 ADD_EXECUTABLE(mafOpImporterRAWVolume_BESTest mafOpImporterRAWVolume_BESTest.h mafOpImporterRAWVolume_BESTest.cpp)
 ADD_TEST(mafOpImporterRAWVolume_BESTest ${EXECUTABLE_OUTPUT_PATH}/mafOpImporterRAWVolume_BESTest)
 
-ADD_EXECUTABLE(medOpMoveTest medOpMoveTest.h medOpMoveTest.cpp)
-ADD_TEST(medOpMoveTest ${EXECUTABLE_OUTPUT_PATH}/medOpMoveTest)
+ADD_EXECUTABLE(mafOpMoveTest mafOpMoveTest.h mafOpMoveTest.cpp)
+ADD_TEST(mafOpMoveTest ${EXECUTABLE_OUTPUT_PATH}/mafOpMoveTest)
 
-ADD_EXECUTABLE(medOpExporterAnalogWSTest medOpExporterAnalogWSTest.h medOpExporterAnalogWSTest.cpp)
-ADD_TEST(medOpExporterAnalogWSTest ${EXECUTABLE_OUTPUT_PATH}/medOpExporterAnalogWSTest)
+ADD_EXECUTABLE(mafOpExporterAnalogWSTest mafOpExporterAnalogWSTest.h mafOpExporterAnalogWSTest.cpp)
+ADD_TEST(mafOpExporterAnalogWSTest ${EXECUTABLE_OUTPUT_PATH}/mafOpExporterAnalogWSTest)
 
-ADD_EXECUTABLE(medOpExporterGRFWSTest medOpExporterGRFWSTest.h medOpExporterGRFWSTest.cpp)
-ADD_TEST(medOpExporterGRFWSTest ${EXECUTABLE_OUTPUT_PATH}/medOpExporterGRFWSTest)
+ADD_EXECUTABLE(mafOpExporterGRFWSTest mafOpExporterGRFWSTest.h mafOpExporterGRFWSTest.cpp)
+ADD_TEST(mafOpExporterGRFWSTest ${EXECUTABLE_OUTPUT_PATH}/mafOpExporterGRFWSTest)
 
-ADD_EXECUTABLE(medOpExporterLandmarkWSTest medOpExporterLandmarkWSTest.h medOpExporterLandmarkWSTest.cpp)
-ADD_TEST(medOpExporterLandmarkWSTest ${EXECUTABLE_OUTPUT_PATH}/medOpExporterLandmarkWSTest)
+ADD_EXECUTABLE(mafOpExporterLandmarkWSTest mafOpExporterLandmarkWSTest.h mafOpExporterLandmarkWSTest.cpp)
+ADD_TEST(mafOpExporterLandmarkWSTest ${EXECUTABLE_OUTPUT_PATH}/mafOpExporterLandmarkWSTest)
 
-ADD_EXECUTABLE(medDicomSliceTest  medDicomSliceTest.h medDicomSliceTest.cpp)
-ADD_TEST(medDicomSliceTest ${EXECUTABLE_OUTPUT_PATH}/medDicomSliceTest)
+ADD_EXECUTABLE(mafDicomSliceTest  mafDicomSliceTest.h mafDicomSliceTest.cpp)
+ADD_TEST(mafDicomSliceTest ${EXECUTABLE_OUTPUT_PATH}/mafDicomSliceTest)
 
-ADD_EXECUTABLE(medOpImporterC3DTest  medOpImporterC3DTest.h medOpImporterC3DTest.cpp)
-ADD_TEST(medOpImporterC3DTest ${EXECUTABLE_OUTPUT_PATH}/medOpImporterC3DTest)
+ADD_EXECUTABLE(mafOpImporterC3DTest  mafOpImporterC3DTest.h mafOpImporterC3DTest.cpp)
+ADD_TEST(mafOpImporterC3DTest ${EXECUTABLE_OUTPUT_PATH}/mafOpImporterC3DTest)
 
-ADD_EXECUTABLE(medOpImporterMotionDataTest  medOpImporterMotionDataTest.h medOpImporterMotionDataTest.cpp)
-ADD_TEST(medOpImporterMotionDataTest ${EXECUTABLE_OUTPUT_PATH}/medOpImporterMotionDataTest)
+ADD_EXECUTABLE(mafOpImporterMotionDataTest  mafOpImporterMotionDataTest.h mafOpImporterMotionDataTest.cpp)
+ADD_TEST(mafOpImporterMotionDataTest ${EXECUTABLE_OUTPUT_PATH}/mafOpImporterMotionDataTest)
 
-ADD_EXECUTABLE(medOpFillHolesTest  medOpFillHolesTest.h medOpFillHolesTest.cpp)
-ADD_TEST(medOpFillHolesTest ${EXECUTABLE_OUTPUT_PATH}/medOpFillHolesTest)
+ADD_EXECUTABLE(mafOpFillHolesTest  mafOpFillHolesTest.h mafOpFillHolesTest.cpp)
+ADD_TEST(mafOpFillHolesTest ${EXECUTABLE_OUTPUT_PATH}/mafOpFillHolesTest)
 
-ADD_EXECUTABLE(medOpImporterVTKXMLTest  medOpImporterVTKXMLTest.h medOpImporterVTKXMLTest.cpp)
-ADD_TEST(medOpImporterVTKXMLTest ${EXECUTABLE_OUTPUT_PATH}/medOpImporterVTKXMLTest)
+ADD_EXECUTABLE(mafOpImporterVTKXMLTest  mafOpImporterVTKXMLTest.h mafOpImporterVTKXMLTest.cpp)
+ADD_TEST(mafOpImporterVTKXMLTest ${EXECUTABLE_OUTPUT_PATH}/mafOpImporterVTKXMLTest)
 
-ADD_EXECUTABLE(medOpInteractiveClipSurfaceTest  medOpInteractiveClipSurfaceTest.h medOpInteractiveClipSurfaceTest.cpp)
-ADD_TEST(medOpInteractiveClipSurfaceTest ${EXECUTABLE_OUTPUT_PATH}/medOpInteractiveClipSurfaceTest)
+ADD_EXECUTABLE(mafOpInteractiveClipSurfaceTest  mafOpInteractiveClipSurfaceTest.h mafOpInteractiveClipSurfaceTest.cpp)
+ADD_TEST(mafOpInteractiveClipSurfaceTest ${EXECUTABLE_OUTPUT_PATH}/mafOpInteractiveClipSurfaceTest)
 
-ADD_EXECUTABLE(medOpCreateEditSkeletonTest  medOpCreateEditSkeletonTest.h medOpCreateEditSkeletonTest.cpp)
-ADD_TEST(medOpCreateEditSkeletonTest ${EXECUTABLE_OUTPUT_PATH}/medOpCreateEditSkeletonTest)
+ADD_EXECUTABLE(mafOpCreateEditSkeletonTest  mafOpCreateEditSkeletonTest.h mafOpCreateEditSkeletonTest.cpp)
+ADD_TEST(mafOpCreateEditSkeletonTest ${EXECUTABLE_OUTPUT_PATH}/mafOpCreateEditSkeletonTest)
 
-ADD_EXECUTABLE(medOpRegisterClustersTest  medOpRegisterClustersTest.h medOpRegisterClustersTest.cpp)
-ADD_TEST(medOpRegisterClustersTest ${EXECUTABLE_OUTPUT_PATH}/medOpRegisterClustersTest)
+ADD_EXECUTABLE(mafOpRegisterClustersTest  mafOpRegisterClustersTest.h mafOpRegisterClustersTest.cpp)
+ADD_TEST(mafOpRegisterClustersTest ${EXECUTABLE_OUTPUT_PATH}/mafOpRegisterClustersTest)
 
-ADD_EXECUTABLE(medOpClassicICPRegistrationTest  medOpClassicICPRegistrationTest.h medOpClassicICPRegistrationTest.cpp)
-ADD_TEST(medOpClassicICPRegistrationTest ${EXECUTABLE_OUTPUT_PATH}/medOpClassicICPRegistrationTest)
+ADD_EXECUTABLE(mafOpClassicICPRegistrationTest  mafOpClassicICPRegistrationTest.h mafOpClassicICPRegistrationTest.cpp)
+ADD_TEST(mafOpClassicICPRegistrationTest ${EXECUTABLE_OUTPUT_PATH}/mafOpClassicICPRegistrationTest)
 
-ADD_EXECUTABLE(medOpMML3ParameterViewTest  medOpMML3ParameterViewTest.h medOpMML3ParameterViewTest.cpp)
-ADD_TEST(medOpMML3ParameterViewTest ${EXECUTABLE_OUTPUT_PATH}/medOpMML3ParameterViewTest)
+ADD_EXECUTABLE(mafOpMML3ParameterViewTest  mafOpMML3ParameterViewTest.h mafOpMML3ParameterViewTest.cpp)
+ADD_TEST(mafOpMML3ParameterViewTest ${EXECUTABLE_OUTPUT_PATH}/mafOpMML3ParameterViewTest)
 
-ADD_EXECUTABLE(medOpInteractionDebuggerTest  medOpInteractionDebuggerTest.h medOpInteractionDebuggerTest.cpp)
-ADD_TEST(medOpInteractionDebuggerTest ${EXECUTABLE_OUTPUT_PATH}/medOpInteractionDebuggerTest)
+ADD_EXECUTABLE(mafOpInteractionDebuggerTest  mafOpInteractionDebuggerTest.h mafOpInteractionDebuggerTest.cpp)
+ADD_TEST(mafOpInteractionDebuggerTest ${EXECUTABLE_OUTPUT_PATH}/mafOpInteractionDebuggerTest)
 
-ADD_EXECUTABLE(medOpIterativeRegistrationTest  medOpIterativeRegistrationTest.h medOpIterativeRegistrationTest.cpp)
-ADD_TEST(medOpIterativeRegistrationTest ${EXECUTABLE_OUTPUT_PATH}/medOpIterativeRegistrationTest)
+ADD_EXECUTABLE(mafOpIterativeRegistrationTest  mafOpIterativeRegistrationTest.h mafOpIterativeRegistrationTest.cpp)
+ADD_TEST(mafOpIterativeRegistrationTest ${EXECUTABLE_OUTPUT_PATH}/mafOpIterativeRegistrationTest)
 
 

@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: medOpInteractionOp
+ Module: mafOpInteractionOp
  Authors: Marco Petrone
  
  Copyright (c) B3C
@@ -44,7 +44,7 @@ exWizardSample::exWizardSample( const wxString &label ):mafWizard(label)
   mafWizardBlockOperation *opBlock=new mafWizardBlockOperation("Import");
   opBlock->SetRequiredView("");
   opBlock->VmeSelect("root");
-  opBlock->SetRequiredOperation("mafOpImporterVTK");
+  opBlock->SetRequiredOperation("medOpImporterVTK");
   opBlock->SetNextBlock("opPause");
   opBlock->SetBlockProgress(25);
 

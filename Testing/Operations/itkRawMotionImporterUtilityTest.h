@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2Medical
- Module: itkRawMotionImporterUtilityTest
+ Module: mafItkRawMotionImporterUtilityTest
  Authors: Daniele Giunchi
  
  Copyright (c) B3C
@@ -14,8 +14,8 @@
 
 =========================================================================*/
 
-#ifndef CPP_UNIT_itkRawMotionImporterUtilityTest_H
-#define CPP_UNIT_itkRawMotionImporterUtilityTest_H
+#ifndef CPP_UNIT_mafItkRawMotionImporterUtilityTest_H
+#define CPP_UNIT_mafItkRawMotionImporterUtilityTest_H
 
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/BriefTestProgressListener.h>
@@ -26,7 +26,7 @@
 #include <cppunit/TestRunner.h>
 
 
-class itkRawMotionImporterUtilityTest : public CPPUNIT_NS::TestFixture
+class mafItkRawMotionImporterUtilityTest : public CPPUNIT_NS::TestFixture
 {
 public: 
   // CPPUNIT fixture: executed before each test
@@ -35,7 +35,7 @@ public:
   // CPPUNIT fixture: executed after each test
   void tearDown();
 
-  CPPUNIT_TEST_SUITE( itkRawMotionImporterUtilityTest );
+  CPPUNIT_TEST_SUITE( mafItkRawMotionImporterUtilityTest );
   CPPUNIT_TEST( TestDynamicAllocation );
   CPPUNIT_TEST( TestReadMatrix );
   CPPUNIT_TEST_SUITE_END();
@@ -65,7 +65,7 @@ main( int argc, char* argv[] )
 
   // Add the top suite to the test runner
   CPPUNIT_NS::TestRunner runner;
-  runner.addTest( itkRawMotionImporterUtilityTest::suite());
+  runner.addTest( mafItkRawMotionImporterUtilityTest::suite());
   runner.run( controller );
 
   // Print test in a compiler compatible format.

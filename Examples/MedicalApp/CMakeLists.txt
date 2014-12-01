@@ -3,8 +3,8 @@ PROJECT (exMedical)
 SET(PROJECT_SRCS 
 	exMedicalApp.cpp
 	exMedicalApp.h
-	medOpInteractionOp.cpp
-	medOpInteractionOp.h
+	mafOpInteractionOp.cpp
+	mafOpInteractionOp.h
 	exWizardSample.cpp
 	exWizardSample.h
 )

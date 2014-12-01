@@ -111,169 +111,169 @@ IF (MAF_USE_VTK)
 	mafOpGarbageCollectMSFDir.h
 	###############################
 	
-	  medGeometryEditorPolylineGraph.cpp
-  medGeometryEditorPolylineGraph.h
-  medOpCreateLabeledVolume.cpp
-  medOpCreateLabeledVolume.h
-  medOpImporterLandmark.cpp
-  medOpImporterLandmark.h
-  medOpImporterLandmarkTXT.cpp
-  medOpImporterLandmarkTXT.h
-  medOpImporterLandmarkWS.cpp
-  medOpImporterLandmarkWS.h
+	  mafGeometryEditorPolylineGraph.cpp
+  mafGeometryEditorPolylineGraph.h
+  mafOpCreateLabeledVolume.cpp
+  mafOpCreateLabeledVolume.h
+  mafOpImporterLandmark.cpp
+  mafOpImporterLandmark.h
+  mafOpImporterLandmarkTXT.cpp
+  mafOpImporterLandmarkTXT.h
+  mafOpImporterLandmarkWS.cpp
+  mafOpImporterLandmarkWS.h
 
-  medOpMatrixVectorMath.cpp
-  medOpMatrixVectorMath.h
+  mafOpMatrixVectorMath.cpp
+  mafOpMatrixVectorMath.h
 
-  medOpMML.cpp
-  medOpMML.h
-  medOpMMLContourWidget.cpp
-  medOpMMLContourWidget.h
-  medOpMMLModelView.cpp
-  medOpMMLModelView.h
-  medOpMMLParameterView.cpp
-  medOpMMLParameterView.h
+  mafOpMML.cpp
+  mafOpMML.h
+  mafOpMMLContourWidget.cpp
+  mafOpMMLContourWidget.h
+  mafOpMMLModelView.cpp
+  mafOpMMLModelView.h
+  mafOpMMLParameterView.cpp
+  mafOpMMLParameterView.h
 
-  medOpMML3.cpp
-  medOpMML3.h
-  medOpMML3ContourWidget.cpp
-  medOpMML3ContourWidget.h
-  medOpMML3GlobalRegistration.cpp
-  medOpMML3GlobalRegistration.h
-  medOpMML3ModelView.cpp
-  medOpMML3ModelView.h
-  medOpMML3ModelView2DPipe.cpp
-  medOpMML3ModelView2DPipe.h
-  medOpMML3ModelView3DPipe.cpp
-  medOpMML3ModelView3DPipe.h
-  medOpMML3NonUniformSlicePipe.cpp
-  medOpMML3NonUniformSlicePipe.h
-  medOpMML3ParameterView.cpp
-  medOpMML3ParameterView.h
+  mafOpMML3.cpp
+  mafOpMML3.h
+  mafOpMML3ContourWidget.cpp
+  mafOpMML3ContourWidget.h
+  mafOpMML3GlobalRegistration.cpp
+  mafOpMML3GlobalRegistration.h
+  mafOpMML3ModelView.cpp
+  mafOpMML3ModelView.h
+  mafOpMML3ModelView2DPipe.cpp
+  mafOpMML3ModelView2DPipe.h
+  mafOpMML3ModelView3DPipe.cpp
+  mafOpMML3ModelView3DPipe.h
+  mafOpMML3NonUniformSlicePipe.cpp
+  mafOpMML3NonUniformSlicePipe.h
+  mafOpMML3ParameterView.cpp
+  mafOpMML3ParameterView.h
 
-  medOpRegisterClusters.cpp
-  medOpRegisterClusters.h
-  medOpVolumeMeasure.cpp
-  medOpVolumeMeasure.h
-  medOpImporterRAWImages.cpp
-  medOpImporterRAWImages.h
-  medOpMeshQuality.cpp
-  medOpMeshQuality.h
-  medOpCropDeformableROI.cpp
-  medOpCropDeformableROI.h
-  medOpFlipNormals.cpp
-  medOpFlipNormals.h
-  medOpExtrusionHoles.cpp
-  medOpExtrusionHoles.h
+  mafOpRegisterClusters.cpp
+  mafOpRegisterClusters.h
+  mafOpVolumeMeasure.cpp
+  mafOpVolumeMeasure.h
+  mafOpImporterRAWImages.cpp
+  mafOpImporterRAWImages.h
+  mafOpMeshQuality.cpp
+  mafOpMeshQuality.h
+  mafOpCropDeformableROI.cpp
+  mafOpCropDeformableROI.h
+  mafOpFlipNormals.cpp
+  mafOpFlipNormals.h
+  mafOpExtrusionHoles.cpp
+  mafOpExtrusionHoles.h
   medOpVolumeResample.cpp
   medOpVolumeResample.h
-  medOpSplitSurface.cpp
-  medOpSplitSurface.h
-  medOpInteractiveClipSurface.cpp
-  medOpInteractiveClipSurface.h
-  medOpCreateEditSkeleton.cpp
-  medOpCreateEditSkeleton.h
-  medOpCreateSurface.cpp
-  medOpCreateSurface.h
-  medOpMove.cpp
-  medOpMove.h
-  medOpScaleDataset.cpp
-  medOpScaleDataset.h
+  mafOpSplitSurface.cpp
+  mafOpSplitSurface.h
+  mafOpInteractiveClipSurface.cpp
+  mafOpInteractiveClipSurface.h
+  mafOpCreateEditSkeleton.cpp
+  mafOpCreateEditSkeleton.h
+  mafOpCreateSurface.cpp
+  mafOpCreateSurface.h
+  mafOpMove.cpp
+  mafOpMove.h
+  mafOpScaleDataset.cpp
+  mafOpScaleDataset.h
 
-  medOpCreateWrappedMeter.cpp
-  medOpSegmentation.cpp
-  medOpSegmentation.h
-  medOpExtractGeometry.cpp
-  medOpExtractGeometry.h
+  mafOpCreateWrappedMeter.cpp
+  mafOpSegmentation.cpp
+  mafOpSegmentation.h
+  mafOpExtractGeometry.cpp
+  mafOpExtractGeometry.h
   
-  medOpCreateWrappedMeter.cpp
-  medOpCreateWrappedMeter.h
+  mafOpCreateWrappedMeter.cpp
+  mafOpCreateWrappedMeter.h
   
-  medOpComputeWrapping.h
-  medOpComputeWrapping.cpp  
+  mafOpComputeWrapping.h
+  mafOpComputeWrapping.cpp  
   
-  medOpComputeInertialTensor.h
-  medOpComputeInertialTensor.cpp  
+  mafOpComputeInertialTensor.h
+  mafOpComputeInertialTensor.cpp  
   
-  medOpExporterWrappedMeter.cpp
-  medOpExporterWrappedMeter.h
+  mafOpExporterWrappedMeter.cpp
+  mafOpExporterWrappedMeter.h
 
-  medOpLabelizeSurface.cpp
-  medOpLabelizeSurface.h
+  mafOpLabelizeSurface.cpp
+  mafOpLabelizeSurface.h
   medOp2DMeasure.cpp
   medOp2DMeasure.h
   
-  medOpFreezeVME.cpp
-  medOpFreezeVME.h
+  mafOpFreezeVME.cpp
+  mafOpFreezeVME.h
   
-  medOpIterativeRegistration.cpp
-  medOpIterativeRegistration.h
+  mafOpIterativeRegistration.cpp
+  mafOpIterativeRegistration.h
   
-  medOpSmoothSurface.cpp
-  medOpSmoothSurface.h
+  mafOpSmoothSurface.cpp
+  mafOpSmoothSurface.h
   
-  medOpCleanSurface.cpp
-  medOpCleanSurface.h
+  mafOpCleanSurface.cpp
+  mafOpCleanSurface.h
   
-  medOpTriangulateSurface.cpp
-  medOpTriangulateSurface.h
+  mafOpTriangulateSurface.cpp
+  mafOpTriangulateSurface.h
 
-  medOpSurfaceMirror.cpp
-  medOpSurfaceMirror.h
+  mafOpSurfaceMirror.cpp
+  mafOpSurfaceMirror.h
   
   medOpImporterVTK.cpp
   medOpImporterVTK.h
   
-  medOpImporterVTKXML.cpp
-  medOpImporterVTKXML.h
+  mafOpImporterVTKXML.cpp
+  mafOpImporterVTKXML.h
   
-  medOpExporterVTKXML.cpp
-  medOpExporterVTKXML.h
+  mafOpExporterVTKXML.cpp
+  mafOpExporterVTKXML.h
 
-  medOpSubdivide.cpp
-  medOpSubdivide.h
+  mafOpSubdivide.cpp
+  mafOpSubdivide.h
     
-  medOpFillHoles.cpp
-  medOpFillHoles.h
-  medOpMeshDeformation.cpp
-  medOpMeshDeformation.h
+  mafOpFillHoles.cpp
+  mafOpFillHoles.h
+  mafOpMeshDeformation.cpp
+  mafOpMeshDeformation.h
   
-  medOpMakeVMETimevarying.cpp
-  medOpMakeVMETimevarying.h
-  medOpSegmentationRegionGrowingConnectedThreshold.cpp
-  medOpSegmentationRegionGrowingConnectedThreshold.h
+  mafOpMakeVMETimevarying.cpp
+  mafOpMakeVMETimevarying.h
+  mafOpSegmentationRegionGrowingConnectedThreshold.cpp
+  mafOpSegmentationRegionGrowingConnectedThreshold.h
   #### VolumeLarge - TO BE COMMITTED DOWN    ####
   mafOpImporterBBF.cpp
   mafOpImporterBBF.h
   mafOpImporterRAWVolume_BES.cpp
   mafOpImporterRAWVolume_BES.h  
   ###############################################
-  medOpSegmentationRegionGrowingLocalAndGlobalThreshold.cpp
-  medOpSegmentationRegionGrowingLocalAndGlobalThreshold.h
+  mafOpSegmentationRegionGrowingLocalAndGlobalThreshold.cpp
+  mafOpSegmentationRegionGrowingLocalAndGlobalThreshold.h
   
-  medOpEqualizeHistogram.cpp
-  medOpEqualizeHistogram.h
+  mafOpEqualizeHistogram.cpp
+  mafOpEqualizeHistogram.h
   
-  medOpExporterAnalogWS.cpp
-  medOpExporterAnalogWS.h
-  medOpExporterGRFWS.cpp
-  medOpExporterGRFWS.h
-  medOpExporterLandmarkWS.cpp
-  medOpExporterLandmarkWS.h
+  mafOpExporterAnalogWS.cpp
+  mafOpExporterAnalogWS.h
+  mafOpExporterGRFWS.cpp
+  mafOpExporterGRFWS.h
+  mafOpExporterLandmarkWS.cpp
+  mafOpExporterLandmarkWS.h
   
-  medOpMergeDicomSeries.cpp
-  medOpMergeDicomSeries.h
+  mafOpMergeDicomSeries.cpp
+  mafOpMergeDicomSeries.h
   
   )
 ENDIF (MAF_USE_VTK)
 
 IF (MAF_USE_OFFIS)
 SET(PROJECT_SRCS ${PROJECT_SRCS}
-    medOpImporterDicomOffis.h
-    medOpImporterDicomOffis.cpp
+    mafOpImporterDicomOffis.h
+    mafOpImporterDicomOffis.cpp
   
-    medDicomCardiacMRIHelper.cpp
-    medDicomCardiacMRIHelper.h
+    mafDicomCardiacMRIHelper.cpp
+    mafDicomCardiacMRIHelper.h
    )
 ENDIF (MAF_USE_OFFIS)
 
@@ -304,23 +304,23 @@ IF (MAF_USE_ITK)
 	##########################################
 	# itkRawMotionImporterUtility.cxx
     # itkRawMotionImporterUtility.h
-    medOpImporterMotionData.h
-    medOpExporterLandmark.cpp
-    medOpExporterLandmark.h
-    medOpClassicICPRegistration.cpp
-    medOpClassicICPRegistration.h
-    medOpImporterC3D.cpp
-    medOpImporterC3D.h
-    medOpImporterGRFWS.cpp
-    medOpImporterGRFWS.h
-    medOpImporterAnalogWS.cpp
-    medOpImporterAnalogWS.h
-    medOpSmoothSurfaceCells.cpp
-    medOpSmoothSurfaceCells.h
-    medOpExporterMeters.cpp
-    medOpExporterMeters.h
-    medOpInteractionDebugger.cpp
-    medOpInteractionDebugger.h
+    mafOpImporterMotionData.h
+    mafOpExporterLandmark.cpp
+    mafOpExporterLandmark.h
+    mafOpClassicICPRegistration.cpp
+    mafOpClassicICPRegistration.h
+    mafOpImporterC3D.cpp
+    mafOpImporterC3D.h
+    mafOpImporterGRFWS.cpp
+    mafOpImporterGRFWS.h
+    mafOpImporterAnalogWS.cpp
+    mafOpImporterAnalogWS.h
+    mafOpSmoothSurfaceCells.cpp
+    mafOpSmoothSurfaceCells.h
+    mafOpExporterMeters.cpp
+    mafOpExporterMeters.h
+    mafOpInteractionDebugger.cpp
+    mafOpInteractionDebugger.h
   )
 ENDIF (MAF_USE_ITK)
 

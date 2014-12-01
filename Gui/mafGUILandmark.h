@@ -37,10 +37,10 @@ class mafVMELandmark;
 class mafVMELandmarkCloud;
  
 //----------------------------------------------------------------------------
-/** Pluggable component for medOpIterativeRegistration operation
+/** Pluggable component for mafOpIterativeRegistration operation
 
   @sa
-  - medOpIterativeRegistration 
+  - mafOpIterativeRegistration 
  
   @todo
   - Code cleaning and improve documentation
