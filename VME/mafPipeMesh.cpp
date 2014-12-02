@@ -307,19 +307,18 @@ mafGUI *mafPipeMesh::CreateGui()
 	assert(m_Gui == NULL);
 	m_Gui = new mafGUI(this);
   m_Gui->Bool(ID_WIREFRAME,_("Wireframe"), &m_Wireframe, 1);
-  m_Gui->Bool(ID_WIRED_ACTOR_VISIBILITY,_("Border Elem."), &m_BorderElementsWiredActor, 1);
+  m_Gui->Bool(ID_WIRED_ACTOR_VISIBILITY,_("Element Edges"), &m_BorderElementsWiredActor, 1);
   
-  
-  m_Gui->Bool(ID_USE_VTK_PROPERTY,"property",&m_UseVTKProperty, 1);
+  m_Gui->Divider(2);
+  m_Gui->Bool(ID_USE_VTK_PROPERTY,"Property",&m_UseVTKProperty, 1);
   m_MaterialButton = new mafGUIMaterialButton(m_Vme,this);
   m_Gui->AddGui(m_MaterialButton->GetGui());
   m_MaterialButton->Enable(m_UseVTKProperty != 0);
 
-  m_Gui->Combo(ID_SCALARS,"",&m_ScalarIndex,m_NumberOfArrays,m_ScalarsInComboBoxNames);	
-  
-
-  m_Gui->Bool(ID_SCALAR_MAP_ACTIVE,_("enable scalar field mapping"), &m_ScalarMapActive, 1);
-  m_Gui->Lut(ID_LUT,"lut",m_Table);
+  m_Gui->Divider(2);
+	m_Gui->Bool(ID_SCALAR_MAP_ACTIVE,_("Enable scalar field mapping"), &m_ScalarMapActive, 1);
+	m_Gui->Combo(ID_SCALARS,"",&m_ScalarIndex,m_NumberOfArrays,m_ScalarsInComboBoxNames);	
+  m_Gui->Lut(ID_LUT,"Lut",m_Table);
 
   m_Gui->Enable(ID_SCALARS, m_ScalarMapActive != 0);
   m_Gui->Enable(ID_LUT, m_ScalarMapActive != 0);
