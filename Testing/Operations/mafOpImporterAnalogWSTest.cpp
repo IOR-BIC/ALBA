@@ -27,7 +27,7 @@
 #include <vnl/vnl_vector.h>
 
 #include "mafString.h"
-#include "medVMEAnalog.h"
+#include "mafVMEAnalog.h"
 #include "mafVMEOutputScalarMatrix.h"
 
 #include <string>
@@ -60,7 +60,7 @@ void mafOpImporterAnalogWSTest::TestRead()
 	importer->SetFileName(filename.GetCStr());
 	importer->Read();
 
-  medVMEAnalog *analogScalar = (medVMEAnalog *)importer->GetOutput();
+  mafVMEAnalog *analogScalar = (mafVMEAnalog *)importer->GetOutput();
   analogScalar->Update();
 
   //check time vector

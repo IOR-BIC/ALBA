@@ -18,7 +18,7 @@
 #define __mafOpMML3ContourWidget_h
 
 #include "mafDefines.h"
-#include "medDecl.h"
+#include "mafDecl.h"
 
 #include "vtkPolyDataSourceWidget.h"
 #include "vtkTubeFilter.h"

@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include "mafAttributeSegmentationVolume.h"
-#include "medDecl.h"
+#include "mafDecl.h"
 #include "mafEvent.h"
 
 #include "mafStorageElement.h"

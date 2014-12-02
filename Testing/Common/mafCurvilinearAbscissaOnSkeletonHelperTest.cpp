@@ -29,7 +29,7 @@
 #include "vtkCellArray.h"
 
 #include "mafCurvilinearAbscissaOnSkeletonHelperTest.h"
-#include "medVMEPolylineGraph.h"
+#include "mafVMEPolylineGraph.h"
 #include "mafEvent.h"
 #include "mafVME.h"
 #include "mafCurvilinearAbscissaOnSkeletonHelper.h"
@@ -67,7 +67,7 @@ void mafCurvilinearAbscissaOnSkeletonHelperTest::TestSetGetConstraintPolylineGra
   mafCurvilinearAbscissaOnSkeletonHelper *helper = new mafCurvilinearAbscissaOnSkeletonHelper(NULL,NULL,true);
 
   //// Create and set the polyline graph
-  medVMEPolylineGraph *input;
+  mafVMEPolylineGraph *input;
   mafNEW(input);
 
   vtkPolyData *polyline;
@@ -120,7 +120,7 @@ void mafCurvilinearAbscissaOnSkeletonHelperTest::SetGetCurvilinearAbscissa()
   mafCurvilinearAbscissaOnSkeletonHelper *helper = new mafCurvilinearAbscissaOnSkeletonHelper(input_vme,NULL,true);
 
   //// Create and set the polyline graph
-  medVMEPolylineGraph *input;
+  mafVMEPolylineGraph *input;
   mafNEW(input);
 
   vtkPolyData *polyline;
@@ -175,7 +175,7 @@ void mafCurvilinearAbscissaOnSkeletonHelperTest::SetGetActiveBranchId()
   mafCurvilinearAbscissaOnSkeletonHelper *helper = new mafCurvilinearAbscissaOnSkeletonHelper(input_vme,NULL,true);
 
   //// Create and set the polyline graph
-  medVMEPolylineGraph *input;
+  mafVMEPolylineGraph *input;
   mafNEW(input);
 
   vtkPolyData *polyline;
@@ -231,7 +231,7 @@ void mafCurvilinearAbscissaOnSkeletonHelperTest::TestMoveOnSkeleton()
   mafCurvilinearAbscissaOnSkeletonHelper *helper = new mafCurvilinearAbscissaOnSkeletonHelper(input_vme,NULL,true);
 
   //// Create and set the polyline graph
-  medVMEPolylineGraph *input;
+  mafVMEPolylineGraph *input;
   mafNEW(input);
 
   vtkPolyData *polyline;

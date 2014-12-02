@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include "mafOpSubdivide.h"
-#include "medDecl.h"
+#include "mafDecl.h"
 #include "mafEvent.h"
 #include "mafGUI.h"
 

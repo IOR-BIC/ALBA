@@ -26,7 +26,7 @@
 
 #include "mafVMEGroup.h"
 #include "mafVMEVolumeGray.h"
-#include "medVMEPolylineGraph.h"
+#include "mafVMEPolylineGraph.h"
 #include "mafVMESurface.h"
 #include "vtkMAFSmartPointer.h"
 #include "mafVMERoot.h"
@@ -51,7 +51,7 @@ void mafOpMoveTest::TestAccept()
 {
   mafSmartPointer<mafVMEGroup> group;
   mafSmartPointer<mafVMEVolumeGray> volume;
-  mafSmartPointer<medVMEPolylineGraph> polyline;
+  mafSmartPointer<mafVMEPolylineGraph> polyline;
   mafSmartPointer<mafVMESurface> surface;
   mafSmartPointer<mafVMERoot> root;
   mafSmartPointer<mafVMEExternalData> external;

@@ -25,7 +25,7 @@
 #include "mafOpSegmentationRegionGrowingLocalAndGlobalThreshold.h"
 #include "wx/busyinfo.h"
 
-#include "medDecl.h"
+#include "mafDecl.h"
 #include "mafGUI.h"
 #include "mafNode.h"
 #include "mafVMEVolumeGray.h"

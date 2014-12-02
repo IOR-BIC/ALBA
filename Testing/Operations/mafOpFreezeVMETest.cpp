@@ -29,7 +29,7 @@
 #include "mafVMERoot.h"
 #include "mafVMESurface.h"
 #include "mafVMEPolyline.h"
-#include "medVMEWrappedMEter.h"
+#include "mafVMEWrappedMEter.h"
 #include "mafVMEMeter.h"
 #include "mafVMESurfaceParametric.h"
 #include "mafVMEVolumeGray.h"
@@ -202,7 +202,7 @@ void mafOpFreezeVMETest::TestFreezeVMEWrappedMeter()
 	mafOpFreezeVME *freezeOp=new mafOpFreezeVME("freeze");
 	freezeOp->TestModeOn();
 	
-	medVMEWrappedMeter *wrappedMeter;
+	mafVMEWrappedMeter *wrappedMeter;
 	mafNEW(wrappedMeter);
 
 	wrappedMeter->SetMeterLink("StartVME",vmeParametricSurfaceSTART);

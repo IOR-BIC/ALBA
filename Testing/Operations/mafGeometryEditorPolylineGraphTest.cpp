@@ -25,7 +25,7 @@
 #include "mafGeometryEditorPolylineGraphTest.h"
 #include "mafGeometryEditorPolylineGraph.h"
 
-#include "medVMEPolylineGraph.h"
+#include "mafVMEPolylineGraph.h"
 
 #include "vtkPolyData.h"
 #include "vtkCellArray.h"
@@ -191,7 +191,7 @@ void mafGeometryEditorPolylineGraphTest::TestAddNewVertex1()
 void mafGeometryEditorPolylineGraphTest::TestAddNewVertex2()
 //----------------------------------------------------------------------------
 {
-	medVMEPolylineGraph *polyline;
+	mafVMEPolylineGraph *polyline;
 	mafNEW(polyline);
 	polyline->SetData(m_Graph,0.0);
 	polyline->GetOutput()->GetVTKData()->Update();
@@ -248,7 +248,7 @@ void mafGeometryEditorPolylineGraphTest::TestAddBranch()
 void mafGeometryEditorPolylineGraphTest::TestSelectPoint()
 //----------------------------------------------------------------------------
 {
-	medVMEPolylineGraph *polyline;
+	mafVMEPolylineGraph *polyline;
 	mafNEW(polyline);
 	polyline->SetData(m_Graph,0.0);
 	polyline->GetOutput()->GetVTKData()->Update();
@@ -272,7 +272,7 @@ void mafGeometryEditorPolylineGraphTest::TestSelectPoint()
 void mafGeometryEditorPolylineGraphTest::TestDeletePoint()
 //----------------------------------------------------------------------------
 {
-	medVMEPolylineGraph *polyline;
+	mafVMEPolylineGraph *polyline;
 	mafNEW(polyline);
 	polyline->SetData(m_Graph,0.0);
 	polyline->GetOutput()->GetVTKData()->Update();
@@ -296,7 +296,7 @@ void mafGeometryEditorPolylineGraphTest::TestDeletePoint()
 void mafGeometryEditorPolylineGraphTest::TestSelectBranch()
 //----------------------------------------------------------------------------
 {
-	medVMEPolylineGraph *polyline;
+	mafVMEPolylineGraph *polyline;
 	mafNEW(polyline);
 	polyline->SetData(m_Graph,0.0);
 	polyline->GetOutput()->GetVTKData()->Update();
@@ -317,7 +317,7 @@ void mafGeometryEditorPolylineGraphTest::TestSelectBranch()
 void mafGeometryEditorPolylineGraphTest::TestInsertPoint()
 //----------------------------------------------------------------------------
 {
-	medVMEPolylineGraph *polyline;
+	mafVMEPolylineGraph *polyline;
 	mafNEW(polyline);
 	polyline->SetData(m_Graph,0.0);
 	polyline->GetOutput()->GetVTKData()->Update();

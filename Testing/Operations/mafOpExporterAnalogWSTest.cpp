@@ -34,7 +34,7 @@
 
 #include "mafString.h"
 #include "mafTagArray.h"
-#include "medVMEAnalog.h"
+#include "mafVMEAnalog.h"
 #include "mafVMEOutputScalarMatrix.h"
 
 #include <string>
@@ -91,7 +91,7 @@ void mafOpExporterAnalogWSTest::TestWrite()
   emgScalar.set_row(2,v_second_channel);
   emgScalar.set_row(3,v_third_channel);
   
-  medVMEAnalog* analog_test;
+  mafVMEAnalog* analog_test;
   mafNEW(analog_test);
   analog_test->SetData(emgScalar,-1);
   analog_test->Update();

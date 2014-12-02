@@ -28,7 +28,7 @@
 #include "mafVMEStorage.h"
 #include "mafVMERoot.h"
 #include "mafVMEVolumeGray.h"
-#include "medVMEPolylineGraph.h"
+#include "mafVMEPolylineGraph.h"
 
 #include "vtkDataSet.h"
 #include "vtkPolyData.h"
@@ -50,7 +50,7 @@ void mafOpCreateEditSkeletonTest::TestAccept()
 {
   mafOpCreateEditSkeleton *op=new mafOpCreateEditSkeleton();
   mafVMEVolumeGray *volume;
-  medVMEPolylineGraph* graph;
+  mafVMEPolylineGraph* graph;
   mafNEW(volume);
   mafNEW(graph);
   graph->ReparentTo(volume);
@@ -75,7 +75,7 @@ void mafOpCreateEditSkeletonTest::TestOpRun()
   fileName<<"/PolylineGraph/PolylineGraph.vtk";
   importer->SetFileName(fileName);
   importer->ImportVTK();
-  medVMEPolylineGraph *graph=medVMEPolylineGraph::SafeDownCast(importer->GetOutput());
+  mafVMEPolylineGraph *graph=mafVMEPolylineGraph::SafeDownCast(importer->GetOutput());
   graph->GetOutput()->GetVTKData()->Update();
   
   CPPUNIT_ASSERT(graph!=NULL);
@@ -94,7 +94,7 @@ void mafOpCreateEditSkeletonTest::TestOpRun()
   create->OpRun();
   create->OpDo();
 
-  medVMEPolylineGraph* output = (medVMEPolylineGraph*) create->GetInput();
+  mafVMEPolylineGraph* output = (mafVMEPolylineGraph*) create->GetInput();
   int nOfPoints_after = output->GetOutput()->GetVTKData()->GetNumberOfPoints();
 
   // op does nothing: input must be same output.
@@ -108,7 +108,7 @@ void mafOpCreateEditSkeletonTest::TestOpRun()
   recreate->OpRun();
   recreate->OpDo();
 
-  output = (medVMEPolylineGraph*) recreate->GetInput()->GetChild(0);
+  output = (mafVMEPolylineGraph*) recreate->GetInput()->GetChild(0);
   nOfPoints_after =  output->GetOutput()->GetVTKData()->GetNumberOfPoints();
 
   // op does nothing: input must be same output.

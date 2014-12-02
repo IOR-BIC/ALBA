@@ -24,7 +24,7 @@
 
 #include "mafGizmoCrossRotateTranslate.h"
 
-#include "medDecl.h"
+#include "mafDecl.h"
 
 #include "mafGizmoCrossTranslate.h"
 #include "mafGizmoCrossRotate.h"

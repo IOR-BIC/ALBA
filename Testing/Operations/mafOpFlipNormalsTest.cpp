@@ -26,7 +26,7 @@
 
 #include "mafVMEGroup.h"
 #include "mafVMEVolumeGray.h"
-#include "medVMEPolylineGraph.h"
+#include "mafVMEPolylineGraph.h"
 #include "mafVMESurface.h"
 
 #include "vtkMAFSmartPointer.h"
@@ -54,7 +54,7 @@ void mafOpFlipNormalsTest::TestAccept()
 {
   mafSmartPointer<mafVMEGroup> group;
   mafSmartPointer<mafVMEVolumeGray> volume;
-  mafSmartPointer<medVMEPolylineGraph> polyline;
+  mafSmartPointer<mafVMEPolylineGraph> polyline;
   mafSmartPointer<mafVMESurface> surface;
 
   mafOpFlipNormals *flip = new mafOpFlipNormals();

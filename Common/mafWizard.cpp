@@ -22,7 +22,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "medDecl.h"
+#include "mafDecl.h"
 #include "mafWizard.h"
 #include "mafObserver.h"
 #include "mafWizardBlock.h"

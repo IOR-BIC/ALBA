@@ -29,7 +29,7 @@
 #include "mafOpImporterLandmark.h"
 #include "mafVMELandmarkCloud.h"
 #include "mafVMELandmark.h"
-#include "medVMEWrappedMeter.h"
+#include "mafVMEWrappedMeter.h"
 #include "mafVMEMeter.h"
 #include "mafVMEStorage.h"
 #include "mafVMERoot.h"
@@ -88,7 +88,7 @@ void mafOpExporterMetersTest::TestOnMetersImporter()
   storage->GetRoot()->AddChild(cloud);
   //cloud->SetParent(storage->GetRoot());
 
-  medVMEWrappedMeter *wrappedMeterManual;
+  mafVMEWrappedMeter *wrappedMeterManual;
   mafNEW(wrappedMeterManual);
   wrappedMeterManual->SetMeterLink("StartVME",cloud->GetLandmark(0));
   wrappedMeterManual->SetMeterLink("EndVME1",cloud->GetLandmark(1));
@@ -124,12 +124,12 @@ void mafOpExporterMetersTest::TestOnMetersImporter()
   vmeParametricSurfaceWrapped->Update();
 
   //automatic meter
-  medVMEWrappedMeter *wrappedMeterAutomatic;
+  mafVMEWrappedMeter *wrappedMeterAutomatic;
   mafNEW(wrappedMeterAutomatic);
   wrappedMeterAutomatic->SetMeterLink("StartVME",cloud->GetLandmark(0));
   wrappedMeterAutomatic->SetMeterLink("EndVME1",cloud->GetLandmark(1));
   wrappedMeterAutomatic->SetMeterLink("WrappedVME",vmeParametricSurfaceWrapped);
-  wrappedMeterAutomatic->SetWrappedMode(medVMEWrappedMeter::AUTOMATED_WRAP);
+  wrappedMeterAutomatic->SetWrappedMode(mafVMEWrappedMeter::AUTOMATED_WRAP);
   storage->GetRoot()->AddChild(wrappedMeterAutomatic);
   wrappedMeterAutomatic->GetOutput()->GetVTKData()->Update();
   wrappedMeterAutomatic->SetName("TestAutomaticWrappedMeter");

@@ -26,7 +26,7 @@
 #include "mafOpCreateLabeledVolume.h"
 
 #include "mafVMEVolumeGray.h"
-#include "medVMELabeledVolume.h"
+#include "mafVMELabeledVolume.h"
 #include "vtkMAFSmartPointer.h"
 #include "mafSmartPointer.h"
 
@@ -69,8 +69,8 @@ void mafOpCreateLabeledVolumeTest::TestOpRun()
   create->SetInput(volume);
   create->OpRun();
 
-  medVMELabeledVolume *labeledvolume = NULL;
-	labeledvolume = medVMELabeledVolume::SafeDownCast(create->GetOutput());
+  mafVMELabeledVolume *labeledvolume = NULL;
+	labeledvolume = mafVMELabeledVolume::SafeDownCast(create->GetOutput());
   
   CPPUNIT_ASSERT(labeledvolume != NULL);
 

@@ -32,7 +32,7 @@
 #include "mafOpInteractionDebuggerTest.h"
 #include "mafOpInteractionDebugger.h"
 #include "mafVMEGeneric.h"
-#include "medVMEPolylineGraph.h"
+#include "mafVMEPolylineGraph.h"
 #include "mafOp.h"
 
 //-----------------------------------------------------------
@@ -99,7 +99,7 @@ void mafOpInteractionDebuggerTest::TestConstrainAccept()
   mafOpInteractionDebugger *debugger = new mafOpInteractionDebugger();
   mafVMEGeneric *vme;
   mafNEW(vme);
-  medVMEPolylineGraph *plgraph;
+  mafVMEPolylineGraph *plgraph;
   mafNEW(plgraph);
 
   CPPUNIT_ASSERT(debugger->ConstrainAccept(NULL) == false);

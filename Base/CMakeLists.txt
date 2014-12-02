@@ -12,7 +12,6 @@ SET(PROJECT_SRCS
 mafBase.h
 mafDecl.cpp
 mafDecl.h
-medDecl.h
 mafDbg.h
 mafDataChecksum.h
 mafDefines.cpp

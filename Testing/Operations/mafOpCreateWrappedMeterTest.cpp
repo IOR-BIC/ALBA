@@ -28,7 +28,7 @@
 #include "mafVMEImage.h"
 #include "mafVMEVolumeGray.h"
 
-#include "medVMEWrappedMeter.h"
+#include "mafVMEWrappedMeter.h"
 
 
 //-----------------------------------------------------------
@@ -81,8 +81,8 @@ void mafOpCreateWrappedMeterTest::TestOpExecute()
   m_OpCreateWrappedMeter->OpRun();
   m_OpCreateWrappedMeter->OpDo();
 
-  medVMEWrappedMeter *result;
-  result = medVMEWrappedMeter::SafeDownCast(m_OpCreateWrappedMeter->GetOutput());
+  mafVMEWrappedMeter *result;
+  result = mafVMEWrappedMeter::SafeDownCast(m_OpCreateWrappedMeter->GetOutput());
 
   CPPUNIT_ASSERT(result);
   CPPUNIT_ASSERT(result->GetParent()==volume);

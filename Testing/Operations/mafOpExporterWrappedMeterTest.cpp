@@ -25,7 +25,7 @@
 #include "mafOpExporterWrappedMeterTest.h"
 #include "mafOpExporterWrappedMeter.h"
 
-#include "medVMEComputeWrapping.h"
+#include "mafVMEComputeWrapping.h"
 #include "mafVMELandmarkCloud.h"
 #include "mafVMELandmark.h"
 #include "mafOpImporterLandmark.h"

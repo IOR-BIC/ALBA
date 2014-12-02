@@ -81,7 +81,7 @@ void mafOpFillHolesTest::TestOpRun()
   importerVTK->TestModeOn();
 
   mafString absPathFilename=MAF_DATA_ROOT;
-  absPathFilename<<"/Tes_vtkMEDFillingHole/SphereWithHoles.vtk";
+  absPathFilename<<"/Test_vtkMAFFillingHole/SphereWithHoles.vtk";
   importerVTK->SetFileName(absPathFilename);
   importerVTK->OpRun();
 

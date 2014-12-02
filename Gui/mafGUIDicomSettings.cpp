@@ -25,7 +25,7 @@
 
 #include "mafGUIDicomSettings.h"
 
-#include "medDecl.h"
+#include "mafDecl.h"
 #include "mafGUI.h"
 #include "mafGUICheckListBox.h"
 

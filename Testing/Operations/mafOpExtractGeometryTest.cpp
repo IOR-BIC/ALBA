@@ -26,7 +26,7 @@
 #include "mafOpExtractGeometry.h"
 
 #include "mafVMEVolumeGray.h"
-#include "medVMEComputeWrapping.h"
+#include "mafVMEComputeWrapping.h"
 #include "vtkMAFSmartPointer.h"
 #include "mafSmartPointer.h"
 

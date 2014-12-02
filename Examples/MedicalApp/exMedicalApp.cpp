@@ -24,7 +24,7 @@
 //----------------------------------------------------------------------------
 
 #include "exMedicalApp.h"
-#include "medDecl.h"
+#include "mafDecl.h"
 
 #include "mafVMEFactory.h"
 #include "medVMEFactory.h"

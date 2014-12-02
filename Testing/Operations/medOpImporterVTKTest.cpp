@@ -27,7 +27,7 @@
 
 #include "medOpImporterVTK.h"
 #include "mafVMEGroup.h"
-#include "medVMEPolylineGraph.h"
+#include "mafVMEPolylineGraph.h"
 #include "mafVMEVolumeGray.h"
 #include "mafVMESurface.h"
 #include "mafVMEMesh.h"
@@ -95,7 +95,7 @@ void medOpImporterVTKTest::TestImportVTKPolylineGraph()
   fileName<<"/PolylineGraph/PolylineGraph.vtk";
   importer->SetFileName(fileName);
   importer->ImportVTK();
-  medVMEPolylineGraph *polylineGraph=medVMEPolylineGraph::SafeDownCast(importer->GetOutput());
+  mafVMEPolylineGraph *polylineGraph=mafVMEPolylineGraph::SafeDownCast(importer->GetOutput());
   
   CPPUNIT_ASSERT(polylineGraph!=NULL);
 

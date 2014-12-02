@@ -24,7 +24,7 @@
 #include <cppunit/TestResult.h>
 #include <cppunit/TestResultCollector.h>
 #include <cppunit/TestRunner.h>
-#include "medVMEPolylineGraph.h"
+#include "mafVMEPolylineGraph.h"
 #include "mafVMESurface.h"
 #include "mafVMERoot.h"
 
@@ -48,7 +48,7 @@ protected:
 	void TestFixture();
 	void TestConstructorDestructor();
 	
-	medVMEPolylineGraph *m_PolylineGraph;
+	mafVMEPolylineGraph *m_PolylineGraph;
 	mafVMESurface *m_GizmoInputSurface;
 	mafVMERoot *m_Root;
 
