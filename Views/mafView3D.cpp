@@ -35,9 +35,9 @@
 #include "mafVMESurface.h"
 #include "mafVMESurfaceParametric.h"
 #include "mafPipeIsosurface.h"
-#include "medPipeVolumeDRR.h"
-#include "medPipeVolumeVR.h"
-#include "medPipeVolumeMIP.h"
+#include "mafPipeVolumeDRR.h"
+#include "mafPipeVolumeVR.h"
+#include "mafPipeVolumeMIP.h"
 #include "mafPipePolyline.h"
 #include "mafVMEPolyline.h"
 #include "mafGUIFloatSlider.h"
@@ -104,17 +104,17 @@ void mafView3D::OnEvent(mafEventBase *maf_event)
     {
 		case ID_RESAMPLE_FACTOR:
 			{
-				medPipeVolumeDRR *pipeDDR=medPipeVolumeDRR::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
+				mafPipeVolumeDRR *pipeDDR=mafPipeVolumeDRR::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
 				if(pipeDDR)
 				{
 					pipeDDR->SetResampleFactor(m_ResampleFactor);
 				}
-				medPipeVolumeVR *pipeVR=medPipeVolumeVR::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
+				mafPipeVolumeVR *pipeVR=mafPipeVolumeVR::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
 				if(pipeVR)
 				{
 					pipeVR->SetResampleFactor(m_ResampleFactor);
 				}
-				medPipeVolumeMIP *pipeMIP=medPipeVolumeMIP::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
+				mafPipeVolumeMIP *pipeMIP=mafPipeVolumeMIP::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
 				if(pipeMIP)
 				{
 					pipeMIP->SetResampleFactor(m_ResampleFactor);
@@ -155,7 +155,7 @@ void mafView3D::OnEvent(mafEventBase *maf_event)
 			break;
 		case ID_VOLUME_COLOR:
 			{
-				medPipeVolumeDRR *pipe=medPipeVolumeDRR::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
+				mafPipeVolumeDRR *pipe=mafPipeVolumeDRR::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
 				if(pipe)
 				{
           pipe->SetColor(m_VolumeColor);
@@ -166,7 +166,7 @@ void mafView3D::OnEvent(mafEventBase *maf_event)
 		case ID_EXPOSURE_CORRECTION_L:
 		case ID_EXPOSURE_CORRECTION_H:
 			{
-				medPipeVolumeDRR *pipe=medPipeVolumeDRR::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
+				mafPipeVolumeDRR *pipe=mafPipeVolumeDRR::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
 				if(pipe)
 				{
 					pipe->SetExposureCorrection(m_ExposureCorrection);
@@ -176,7 +176,7 @@ void mafView3D::OnEvent(mafEventBase *maf_event)
 			break;
 		case ID_GAMMA:
 			{
-				medPipeVolumeDRR *pipe=medPipeVolumeDRR::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
+				mafPipeVolumeDRR *pipe=mafPipeVolumeDRR::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
 				if(pipe)
 				{
 					pipe->SetGamma(m_Gamma);
@@ -186,7 +186,7 @@ void mafView3D::OnEvent(mafEventBase *maf_event)
 			break;
 		case ID_CAMERA_ANGLE:
 			{
-				medPipeVolumeDRR *pipe=medPipeVolumeDRR::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
+				mafPipeVolumeDRR *pipe=mafPipeVolumeDRR::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
 				if(pipe)
 				{
 					pipe->SetCameraAngle(m_CameraAngle);
@@ -196,7 +196,7 @@ void mafView3D::OnEvent(mafEventBase *maf_event)
 			break;
 		case ID_CAMERA_POSITION:
 			{
-				medPipeVolumeDRR *pipe=medPipeVolumeDRR::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
+				mafPipeVolumeDRR *pipe=mafPipeVolumeDRR::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
 				if(pipe)
 				{
 					pipe->SetCameraPosition(m_CameraPositionDRR);
@@ -206,7 +206,7 @@ void mafView3D::OnEvent(mafEventBase *maf_event)
 			break;
 		case ID_CAMERA_FOCUS:
 			{
-				medPipeVolumeDRR *pipe=medPipeVolumeDRR::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
+				mafPipeVolumeDRR *pipe=mafPipeVolumeDRR::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
 				if(pipe)
 				{
 					pipe->SetCameraFocus(m_CameraFocus);
@@ -216,7 +216,7 @@ void mafView3D::OnEvent(mafEventBase *maf_event)
 			break;
 		case ID_CAMERA_ROLL:
 			{
-				medPipeVolumeDRR *pipe=medPipeVolumeDRR::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
+				mafPipeVolumeDRR *pipe=mafPipeVolumeDRR::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
 				if(pipe)
 				{
 					pipe->SetCameraRoll(m_CameraRoll);
@@ -246,15 +246,15 @@ void mafView3D::OnEvent(mafEventBase *maf_event)
 					}
           else if(m_Choose == ID_PIPE_MIP)
           {
-            this->PlugVisualPipe("mafVMEVolumeGray","medPipeVolumeMIP");
+            this->PlugVisualPipe("mafVMEVolumeGray","mafPipeVolumeMIP");
           }
 					else if(m_Choose == ID_PIPE_DRR)
           {
-						this->PlugVisualPipe("mafVMEVolumeGray","medPipeVolumeDRR");
+						this->PlugVisualPipe("mafVMEVolumeGray","mafPipeVolumeDRR");
           }
           else if(m_Choose == ID_PIPE_VR)
           {
-            this->PlugVisualPipe("mafVMEVolumeGray","medPipeVolumeVR");
+            this->PlugVisualPipe("mafVMEVolumeGray","mafPipeVolumeVR");
           }
 					this->VmeShow(TempVolume,true);
 				}
@@ -312,21 +312,21 @@ void mafView3D::VmeCreatePipe(mafNode *vme)
       pipe->SetListener(this);
       mafSceneNode *n = m_Sg->Vme2Node(vme);
       assert(n && !n->m_Pipe);
-			if(pipe_name == "medPipeVolumeDRR")
+			if(pipe_name == "mafPipeVolumeDRR")
 			{
-				((medPipeVolumeDRR *)pipe)->SetResampleFactor(m_ResampleFactor);
+				((mafPipeVolumeDRR *)pipe)->SetResampleFactor(m_ResampleFactor);
 			}
-			if(pipe_name == "medPipeVolumeVR")
+			if(pipe_name == "mafPipeVolumeVR")
 			{
-				((medPipeVolumeVR *)pipe)->SetResampleFactor(m_ResampleFactor);
+				((mafPipeVolumeVR *)pipe)->SetResampleFactor(m_ResampleFactor);
 			}
       if(pipe_name == "mafPipeIsosurface")
       {
         ((mafPipeIsosurface *)pipe)->EnableBoundingBoxVisibility(false);
       }
-			if(pipe_name == "medPipeVolumeMIP")
+			if(pipe_name == "mafPipeVolumeMIP")
 			{
-				((medPipeVolumeMIP *)pipe)->SetResampleFactor(m_ResampleFactor);
+				((mafPipeVolumeMIP *)pipe)->SetResampleFactor(m_ResampleFactor);
 			}
       pipe->Create(n);
       n->m_Pipe = (mafPipe*)pipe;

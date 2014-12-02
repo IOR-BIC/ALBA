@@ -117,11 +117,11 @@ IF (WIN32)
   SET_TARGET_PROPERTIES(mafGizmoSliceTest PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)
 
-############ medGizmoInteractionDebuggerTest
-ADD_EXECUTABLE(medGizmoInteractionDebuggerTest  medGizmoInteractionDebuggerTest.h medGizmoInteractionDebuggerTest.cpp)
-ADD_TEST(medGizmoInteractionDebuggerTest   ${EXECUTABLE_OUTPUT_PATH}/medGizmoInteractionDebuggerTest )
+############ mafGizmoInteractionDebuggerTest
+ADD_EXECUTABLE(mafGizmoInteractionDebuggerTest  mafGizmoInteractionDebuggerTest.h mafGizmoInteractionDebuggerTest.cpp)
+ADD_TEST(mafGizmoInteractionDebuggerTest   ${EXECUTABLE_OUTPUT_PATH}/mafGizmoInteractionDebuggerTest )
 IF (WIN32)
-  SET_TARGET_PROPERTIES(medGizmoInteractionDebuggerTest PROPERTIES LINK_FLAGS "/MANIFEST")
+  SET_TARGET_PROPERTIES(mafGizmoInteractionDebuggerTest PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)
 
 ############ mafGizmoInterfaceTest
@@ -379,17 +379,17 @@ ENDIF (WIN32)
 
 ############### from medical
 
-############ medGizmoPolylineGraphTest
-ADD_EXECUTABLE(medGizmoPolylineGraphTest medGizmoPolylineGraphTest.h medGizmoPolylineGraphTest.cpp)
-ADD_TEST(medGizmoPolylineGraphTest ${EXECUTABLE_OUTPUT_PATH}/medGizmoPolylineGraphTest)
+############ mafGizmoPolylineGraphTest
+ADD_EXECUTABLE(mafGizmoPolylineGraphTest mafGizmoPolylineGraphTest.h mafGizmoPolylineGraphTest.cpp)
+ADD_TEST(mafGizmoPolylineGraphTest ${EXECUTABLE_OUTPUT_PATH}/mafGizmoPolylineGraphTest)
 
-############ medDeviceButtonsPadMouseDialogTest
-ADD_EXECUTABLE(medDeviceButtonsPadMouseDialogTest medDeviceButtonsPadMouseDialogTest.h medDeviceButtonsPadMouseDialogTest.cpp)
-ADD_TEST(medDeviceButtonsPadMouseDialogTest ${EXECUTABLE_OUTPUT_PATH}/medDeviceButtonsPadMouseDialogTest)
+############ mafDeviceButtonsPadMouseDialogTest
+ADD_EXECUTABLE(mafDeviceButtonsPadMouseDialogTest mafDeviceButtonsPadMouseDialogTest.h mafDeviceButtonsPadMouseDialogTest.cpp)
+ADD_TEST(mafDeviceButtonsPadMouseDialogTest ${EXECUTABLE_OUTPUT_PATH}/mafDeviceButtonsPadMouseDialogTest)
 
-############ medGUITransformSlidersTest
-ADD_EXECUTABLE(medGUITransformSlidersTest medGUITransformSlidersTest.h medGUITransformSlidersTest.cpp)
-ADD_TEST(medGUITransformSlidersTest ${EXECUTABLE_OUTPUT_PATH}/medGUITransformSlidersTest)
+############ mafGUITransformSlidersTest
+ADD_EXECUTABLE(mafGUITransformSlidersTest mafGUITransformSlidersTest.h mafGUITransformSlidersTest.cpp)
+ADD_TEST(mafGUITransformSlidersTest ${EXECUTABLE_OUTPUT_PATH}/mafGUITransformSlidersTest)
 
 ############ mmiVTKPickerTest
 ADD_EXECUTABLE(mmiVTKPickerTest mmiVTKPickerTest.h mmiVTKPickerTest.cpp)
@@ -404,9 +404,9 @@ ADD_TEST(mmiSelectPointTest ${EXECUTABLE_OUTPUT_PATH}/mmiSelectPointTest)
 ADD_EXECUTABLE(mmiInfoImageTest mmiInfoImageTest.h mmiInfoImageTest.cpp)
 ADD_TEST(mmiInfoImageTest ${EXECUTABLE_OUTPUT_PATH}/mmiInfoImageTest)
 
-############ medInteractorDICOMImporterTest
-ADD_EXECUTABLE(medInteractorDICOMImporterTest medInteractorDICOMImporterTest.h medInteractorDICOMImporterTest.cpp)
-ADD_TEST(medInteractorDICOMImporterTest ${EXECUTABLE_OUTPUT_PATH}/medInteractorDICOMImporterTest)
+############ mafInteractorDICOMImporterTest
+ADD_EXECUTABLE(mafInteractorDICOMImporterTest mafInteractorDICOMImporterTest.h mafInteractorDICOMImporterTest.cpp)
+ADD_TEST(mafInteractorDICOMImporterTest ${EXECUTABLE_OUTPUT_PATH}/mafInteractorDICOMImporterTest)
 
 ############ medInteractor2DDistanceTest
 ADD_EXECUTABLE(medInteractor2DDistanceTest medInteractor2DDistanceTest.h medInteractor2DDistanceTest.cpp)

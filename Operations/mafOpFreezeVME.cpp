@@ -41,8 +41,8 @@ PURPOSE.  See the above copyright notice for more information.
 #include "mafVMEMeter.h"
 #include "mafVMESlicer.h"
 #include "mafVMEProber.h"
-#include "medVMEWrappedMeter.h"
-#include "medVMELabeledVolume.h"
+#include "mafVMEWrappedMeter.h"
+#include "mafVMELabeledVolume.h"
 
 #include "vtkRectilinearGrid.h"
 #include "mmaMaterial.h"
@@ -52,7 +52,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "vtkPolyData.h"
 #include "vtkImageData.h"
-#include "medVMEComputeWrapping.H"
+#include "mafVMEComputeWrapping.H"
 
 
 
@@ -111,7 +111,7 @@ void mafOpFreezeVME::OpRun()
 
 	if(vtkImageData *imageData = vtkImageData::SafeDownCast(output->GetVTKData()))
 	{
-		if(medVMELabeledVolume *labeledVolume = medVMELabeledVolume::SafeDownCast(vme))
+		if(mafVMELabeledVolume *labeledVolume = mafVMELabeledVolume::SafeDownCast(vme))
 		{
 			mmaMaterial *material = (mmaMaterial *)labeledVolume->GetAttribute("MaterialAttributes");
 
@@ -139,7 +139,7 @@ void mafOpFreezeVME::OpRun()
 	else
 		if(vtkRectilinearGrid *rectilinearGrid = vtkRectilinearGrid::SafeDownCast(output->GetVTKData()))
 		{
-			if(medVMELabeledVolume *labeledVolume = medVMELabeledVolume::SafeDownCast(vme))
+			if(mafVMELabeledVolume *labeledVolume = mafVMELabeledVolume::SafeDownCast(vme))
 			{
 				mmaMaterial *material = (mmaMaterial *)labeledVolume->GetAttribute("MaterialAttributes");
 
@@ -315,7 +315,7 @@ void mafOpFreezeVME::OpRun()
 							OpStop(OP_RUN_OK);
 					}
 				}
-				else if(medVMEWrappedMeter *wrappedMeter = medVMEWrappedMeter::SafeDownCast(vme))
+				else if(mafVMEWrappedMeter *wrappedMeter = mafVMEWrappedMeter::SafeDownCast(vme))
 				{
 					mmaMaterial *material = wrappedMeter->GetMaterial();
 

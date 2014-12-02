@@ -59,7 +59,7 @@ mafOpExporterAnalogWS::~mafOpExporterAnalogWS()
 bool mafOpExporterAnalogWS::Accept(mafNode *node)
 //----------------------------------------------------------------------------
 {
-  return (node && node->IsA("medVMEAnalog"));
+  return (node && node->IsA("mafVMEAnalog"));
 }
 //----------------------------------------------------------------------------
 mafOp* mafOpExporterAnalogWS::Copy()   
@@ -101,7 +101,7 @@ void mafOpExporterAnalogWS::Write()
 	  mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
   }
   
-  m_Analog = medVMEAnalog::SafeDownCast(m_Input);
+  m_Analog = mafVMEAnalog::SafeDownCast(m_Input);
   mafTagItem *tag_sig = m_Analog->GetTagArray()->GetTag("SIGNALS_NAME");
   int n_sig = tag_sig->GetComponents()->size();
 

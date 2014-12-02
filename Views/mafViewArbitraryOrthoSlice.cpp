@@ -25,7 +25,7 @@ const int BOUND_1=1;
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "medGizmoCrossRotateTranslate.h"
+#include "mafGizmoCrossRotateTranslate.h"
 #include "mafGUI.h"
 #include "medDecl.h"
 #include "mafViewArbitraryOrthoSlice.h"
@@ -41,8 +41,8 @@ const int BOUND_1=1;
 #include "mafPipeSurfaceTextured.h"
 #include "mafVMEVolumeGray.h"
 #include "mafVMESurface.h"
-#include "medGizmoCrossTranslate.h"
-#include "medGizmoCrossRotate.h"
+#include "mafGizmoCrossTranslate.h"
+#include "mafGizmoCrossRotate.h"
 #include "mafSceneGraph.h"
 #include "mafEvent.h"
 #include "mafAbsMatrixPipe.h"
@@ -60,7 +60,7 @@ const int BOUND_1=1;
 #include "mafGUILutSwatch.h"
 #include "mafPipeMesh.h"
 #include "mafPipeMeshSlice.h"
-#include "medPipePolylineGraphEditor.h"
+#include "mafPipePolylineGraphEditor.h"
 
 #include "vtkTransform.h"
 #include "vtkLookupTable.h"
@@ -448,9 +448,9 @@ void mafViewArbitraryOrthoSlice::VmeShow(mafNode *node, bool show)
 			// ShowVMESurfacesAndLandmarks(node);
 
 		}
-		else if(vme->IsA("medVMEPolylineEditor"))
+		else if(vme->IsA("mafVMEPolylineEditor"))
 		{
-			ShowMedVMEPolylineEditor(node);
+			ShowmafVMEPolylineEditor(node);
 		}
 		else if(vme->IsA("mafVMEMesh"))
 		{
@@ -464,7 +464,7 @@ void mafViewArbitraryOrthoSlice::VmeShow(mafNode *node, bool show)
 	}
 	else//if show==false
 	{
-		if(vme->IsA("medVMEPolylineGraphEditor"))
+		if(vme->IsA("mafVMEPolylineGraphEditor"))
 		{
 			m_CurrentPolylineGraphEditor = NULL;
 		}
@@ -647,7 +647,7 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossTranslateZNormalView(mafEventB
 					double normal[3];
 					((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
 
-					medPipePolylineGraphEditor *PipeSliceViewPolylineEditor = medPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe((mafNode*)m_CurrentPolylineGraphEditor));
+					mafPipePolylineGraphEditor *PipeSliceViewPolylineEditor = mafPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe((mafNode*)m_CurrentPolylineGraphEditor));
 					PipeSliceViewPolylineEditor->SetModalitySlice();
 
 					double surfaceOriginTranslated[3];
@@ -772,7 +772,7 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossRotateZNormalView(mafEventBase
 					double normal[3];
 					((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
 
-					medPipePolylineGraphEditor *PipeSliceViewPolylineEditor = medPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe((mafNode*)m_CurrentPolylineGraphEditor));
+					mafPipePolylineGraphEditor *PipeSliceViewPolylineEditor = mafPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe((mafNode*)m_CurrentPolylineGraphEditor));
 					PipeSliceViewPolylineEditor->SetModalitySlice();
 
 					double surfaceOriginTranslated[3];
@@ -883,7 +883,7 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossRotateYNormalView(mafEventBase
 					double normal[3];
 					((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
 
-					medPipePolylineGraphEditor *PipeSliceViewPolylineEditor = medPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe((mafNode*)m_CurrentPolylineGraphEditor));
+					mafPipePolylineGraphEditor *PipeSliceViewPolylineEditor = mafPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe((mafNode*)m_CurrentPolylineGraphEditor));
 					PipeSliceViewPolylineEditor->SetModalitySlice();
 
 					double surfaceOriginTranslated[3];
@@ -994,7 +994,7 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossTranslateYNormalView(mafEventB
 					double normal[3];
 					((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
 
-					medPipePolylineGraphEditor *PipeSliceViewPolylineEditor = medPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe((mafNode*)m_CurrentPolylineGraphEditor));
+					mafPipePolylineGraphEditor *PipeSliceViewPolylineEditor = mafPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe((mafNode*)m_CurrentPolylineGraphEditor));
 					PipeSliceViewPolylineEditor->SetModalitySlice();
 
 					double surfaceOriginTranslated[3];
@@ -1106,7 +1106,7 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossRotateXNormalView(mafEventBase
 					double normal[3];
 					((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
 
-					medPipePolylineGraphEditor *PipeSliceViewPolylineEditor = medPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe((mafNode*)m_CurrentPolylineGraphEditor));
+					mafPipePolylineGraphEditor *PipeSliceViewPolylineEditor = mafPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe((mafNode*)m_CurrentPolylineGraphEditor));
 					PipeSliceViewPolylineEditor->SetModalitySlice();
 
 					double surfaceOriginTranslated[3];
@@ -1213,7 +1213,7 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossTranslateXNormalView(mafEventB
 					double normal[3];
 					((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
 
-					medPipePolylineGraphEditor *PipeSliceViewPolylineEditor = medPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe((mafNode*)m_CurrentPolylineGraphEditor));
+					mafPipePolylineGraphEditor *PipeSliceViewPolylineEditor = mafPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe((mafNode*)m_CurrentPolylineGraphEditor));
 					PipeSliceViewPolylineEditor->SetModalitySlice();
 
 					double surfaceOriginTranslated[3];
@@ -1991,17 +1991,17 @@ void mafViewArbitraryOrthoSlice::ShowMafVMEVolume( mafVME * vme, bool show )
 	VolumeWindowing(vmeVolume);
 }
 
-void mafViewArbitraryOrthoSlice::ShowMedVMEPolylineEditor( mafNode * node )
+void mafViewArbitraryOrthoSlice::ShowmafVMEPolylineEditor( mafNode * node )
 {
 	//a surface is visible only if there is a volume in the view
 	if(m_CurrentVolume)
 	{
-		m_CurrentPolylineGraphEditor = (medVMEPolylineEditor*)node;
+		m_CurrentPolylineGraphEditor = (mafVMEPolylineEditor*)node;
 
 		double normal[3];
 		((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
 
-		medPipePolylineGraphEditor *PipeSliceViewPolylineEditor = medPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe(node));
+		mafPipePolylineGraphEditor *PipeSliceViewPolylineEditor = mafPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe(node));
 		PipeSliceViewPolylineEditor->SetModalitySlice();
 
 		double surfaceOriginTranslated[3];
@@ -2251,7 +2251,7 @@ void mafViewArbitraryOrthoSlice::OnResetMafVMEMesh( mafNode * node )
 	}
 }
 
-void mafViewArbitraryOrthoSlice::OnResetMedVMEPolylineEditor()
+void mafViewArbitraryOrthoSlice::OnResetmafVMEPolylineEditor()
 {
 	//a surface is visible only if there is a volume in the view
 	if(m_CurrentVolume)
@@ -2260,7 +2260,7 @@ void mafViewArbitraryOrthoSlice::OnResetMedVMEPolylineEditor()
 		double normal[3];
 		((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
 
-		medPipePolylineGraphEditor *PipeSliceViewPolylineEditor = medPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe((mafNode*)m_CurrentPolylineGraphEditor));
+		mafPipePolylineGraphEditor *PipeSliceViewPolylineEditor = mafPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe((mafNode*)m_CurrentPolylineGraphEditor));
 		PipeSliceViewPolylineEditor->SetModalitySlice();
 
 		double surfaceOriginTranslated[3];
@@ -2398,51 +2398,51 @@ void mafViewArbitraryOrthoSlice::ShowSlicers( mafVME * vmeVolume, bool show )
 
 	ResetCameraToSlices();
 
-	m_GizmoZView = new medGizmoCrossRotateTranslate();
-	m_GizmoZView->Create(m_SlicerZ, this, true, medGizmoCrossRotateTranslate::Z);
+	m_GizmoZView = new mafGizmoCrossRotateTranslate();
+	m_GizmoZView->Create(m_SlicerZ, this, true, mafGizmoCrossRotateTranslate::Z);
 	m_GizmoZView->SetName("m_GizmoZView");
 	m_GizmoZView->SetInput(m_SlicerZ);
 	m_GizmoZView->SetRefSys(m_SlicerZ);
 	m_GizmoZView->SetAbsPose(m_SlicerZResetMatrix);
 
-	m_GizmoZView->SetColor(medGizmoCrossRotateTranslate::GREW, medGizmoCrossRotateTranslate::GREEN);
-	m_GizmoZView->SetColor(medGizmoCrossRotateTranslate::GTAEW, medGizmoCrossRotateTranslate::GREEN);
-	m_GizmoZView->SetColor(medGizmoCrossRotateTranslate::GTPEW, medGizmoCrossRotateTranslate::GREEN);
-	m_GizmoZView->SetColor(medGizmoCrossRotateTranslate::GRNS, medGizmoCrossRotateTranslate::RED);
-	m_GizmoZView->SetColor(medGizmoCrossRotateTranslate::GTANS, medGizmoCrossRotateTranslate::RED);
-	m_GizmoZView->SetColor(medGizmoCrossRotateTranslate::GTPNS, medGizmoCrossRotateTranslate::RED);
+	m_GizmoZView->SetColor(mafGizmoCrossRotateTranslate::GREW, mafGizmoCrossRotateTranslate::GREEN);
+	m_GizmoZView->SetColor(mafGizmoCrossRotateTranslate::GTAEW, mafGizmoCrossRotateTranslate::GREEN);
+	m_GizmoZView->SetColor(mafGizmoCrossRotateTranslate::GTPEW, mafGizmoCrossRotateTranslate::GREEN);
+	m_GizmoZView->SetColor(mafGizmoCrossRotateTranslate::GRNS, mafGizmoCrossRotateTranslate::RED);
+	m_GizmoZView->SetColor(mafGizmoCrossRotateTranslate::GTANS, mafGizmoCrossRotateTranslate::RED);
+	m_GizmoZView->SetColor(mafGizmoCrossRotateTranslate::GTPNS, mafGizmoCrossRotateTranslate::RED);
 
 	m_GizmoZView->Show(true);
 
-	m_GizmoYView = new medGizmoCrossRotateTranslate();
-	m_GizmoYView->Create(m_SlicerY, this, true, medGizmoCrossRotateTranslate::Y);
+	m_GizmoYView = new mafGizmoCrossRotateTranslate();
+	m_GizmoYView->Create(m_SlicerY, this, true, mafGizmoCrossRotateTranslate::Y);
 	m_GizmoYView->SetName("m_GizmoYView");
 	m_GizmoYView->SetInput(m_SlicerY);
 	m_GizmoYView->SetRefSys(m_SlicerY);
 	m_GizmoYView->SetAbsPose(m_SlicerYResetMatrix);
 
-	m_GizmoYView->SetColor(medGizmoCrossRotateTranslate::GREW, medGizmoCrossRotateTranslate::BLUE);
-	m_GizmoYView->SetColor(medGizmoCrossRotateTranslate::GTAEW, medGizmoCrossRotateTranslate::BLUE);
-	m_GizmoYView->SetColor(medGizmoCrossRotateTranslate::GTPEW, medGizmoCrossRotateTranslate::BLUE);
-	m_GizmoYView->SetColor(medGizmoCrossRotateTranslate::GRNS, medGizmoCrossRotateTranslate::RED);
-	m_GizmoYView->SetColor(medGizmoCrossRotateTranslate::GTANS, medGizmoCrossRotateTranslate::RED);
-	m_GizmoYView->SetColor(medGizmoCrossRotateTranslate::GTPNS, medGizmoCrossRotateTranslate::RED);
+	m_GizmoYView->SetColor(mafGizmoCrossRotateTranslate::GREW, mafGizmoCrossRotateTranslate::BLUE);
+	m_GizmoYView->SetColor(mafGizmoCrossRotateTranslate::GTAEW, mafGizmoCrossRotateTranslate::BLUE);
+	m_GizmoYView->SetColor(mafGizmoCrossRotateTranslate::GTPEW, mafGizmoCrossRotateTranslate::BLUE);
+	m_GizmoYView->SetColor(mafGizmoCrossRotateTranslate::GRNS, mafGizmoCrossRotateTranslate::RED);
+	m_GizmoYView->SetColor(mafGizmoCrossRotateTranslate::GTANS, mafGizmoCrossRotateTranslate::RED);
+	m_GizmoYView->SetColor(mafGizmoCrossRotateTranslate::GTPNS, mafGizmoCrossRotateTranslate::RED);
 
 	m_GizmoYView->Show(true);
 
-	m_GizmoXView = new medGizmoCrossRotateTranslate();
-	m_GizmoXView->Create(m_SlicerX, this, true, medGizmoCrossRotateTranslate::X);
+	m_GizmoXView = new mafGizmoCrossRotateTranslate();
+	m_GizmoXView->Create(m_SlicerX, this, true, mafGizmoCrossRotateTranslate::X);
 	m_GizmoXView->SetName("m_GizmoXView");
 	m_GizmoXView->SetInput(m_SlicerX);
 	m_GizmoXView->SetRefSys(m_SlicerX);
 	m_GizmoXView->SetAbsPose(m_SlicerXResetMatrix);
 
-	m_GizmoXView->SetColor(medGizmoCrossRotateTranslate::GREW, medGizmoCrossRotateTranslate::GREEN);
-	m_GizmoXView->SetColor(medGizmoCrossRotateTranslate::GTAEW, medGizmoCrossRotateTranslate::GREEN);
-	m_GizmoXView->SetColor(medGizmoCrossRotateTranslate::GTPEW, medGizmoCrossRotateTranslate::GREEN);
-	m_GizmoXView->SetColor(medGizmoCrossRotateTranslate::GRNS, medGizmoCrossRotateTranslate::BLUE);
-	m_GizmoXView->SetColor(medGizmoCrossRotateTranslate::GTANS, medGizmoCrossRotateTranslate::BLUE);
-	m_GizmoXView->SetColor(medGizmoCrossRotateTranslate::GTPNS, medGizmoCrossRotateTranslate::BLUE);
+	m_GizmoXView->SetColor(mafGizmoCrossRotateTranslate::GREW, mafGizmoCrossRotateTranslate::GREEN);
+	m_GizmoXView->SetColor(mafGizmoCrossRotateTranslate::GTAEW, mafGizmoCrossRotateTranslate::GREEN);
+	m_GizmoXView->SetColor(mafGizmoCrossRotateTranslate::GTPEW, mafGizmoCrossRotateTranslate::GREEN);
+	m_GizmoXView->SetColor(mafGizmoCrossRotateTranslate::GRNS, mafGizmoCrossRotateTranslate::BLUE);
+	m_GizmoXView->SetColor(mafGizmoCrossRotateTranslate::GTANS, mafGizmoCrossRotateTranslate::BLUE);
+	m_GizmoXView->SetColor(mafGizmoCrossRotateTranslate::GTPNS, mafGizmoCrossRotateTranslate::BLUE);
 
 	m_GizmoXView->Show(true);
 
@@ -2723,8 +2723,8 @@ bool mafViewArbitraryOrthoSlice::BelongsToZNormalGizmo( mafVME * vme )
 	mafObserver *mediator = NULL;
 	mediator = gizmo->GetMediator();
 
-	medGizmoCrossTranslate *translate = NULL;
-	translate = dynamic_cast<medGizmoCrossTranslate *>(mediator);
+	mafGizmoCrossTranslate *translate = NULL;
+	translate = dynamic_cast<mafGizmoCrossTranslate *>(mediator);
 
 	std::ostringstream stringStream;
 	stringStream << "Gizmo name: " << vme->GetName() << std::endl;        
@@ -2736,8 +2736,8 @@ bool mafViewArbitraryOrthoSlice::BelongsToZNormalGizmo( mafVME * vme )
 		return true;
 	}
 
-	medGizmoCrossRotate *rotate = NULL;
-	rotate = dynamic_cast<medGizmoCrossRotate *>(mediator);
+	mafGizmoCrossRotate *rotate = NULL;
+	rotate = dynamic_cast<mafGizmoCrossRotate *>(mediator);
 
 	if (rotate && rotate->GetName().Equals("m_GizmoZView"))
 	{
@@ -2759,8 +2759,8 @@ bool mafViewArbitraryOrthoSlice::BelongsToXNormalGizmo( mafVME * vme )
 	mafObserver *mediator = NULL;
 	mediator = gizmo->GetMediator();
 
-	medGizmoCrossTranslate *translate = NULL;
-	translate = dynamic_cast<medGizmoCrossTranslate *>(mediator);
+	mafGizmoCrossTranslate *translate = NULL;
+	translate = dynamic_cast<mafGizmoCrossTranslate *>(mediator);
 
 	std::ostringstream stringStream;
 	stringStream << "Gizmo name: " << vme->GetName() << std::endl;        
@@ -2772,8 +2772,8 @@ bool mafViewArbitraryOrthoSlice::BelongsToXNormalGizmo( mafVME * vme )
 		return true;
 	}
 
-	medGizmoCrossRotate *rotate = NULL;
-	rotate = dynamic_cast<medGizmoCrossRotate *>(mediator);
+	mafGizmoCrossRotate *rotate = NULL;
+	rotate = dynamic_cast<mafGizmoCrossRotate *>(mediator);
 
 	if (rotate && rotate->GetName().Equals("m_GizmoXView"))
 	{
@@ -2792,8 +2792,8 @@ bool mafViewArbitraryOrthoSlice::BelongsToYNormalGizmo( mafVME * vme )
 	mafObserver *mediator = NULL;
 	mediator = gizmo->GetMediator();
 
-	medGizmoCrossTranslate *translate = NULL;
-	translate = dynamic_cast<medGizmoCrossTranslate *>(mediator);
+	mafGizmoCrossTranslate *translate = NULL;
+	translate = dynamic_cast<mafGizmoCrossTranslate *>(mediator);
 
 	std::ostringstream stringStream;
 	stringStream << "Gizmo name: " << vme->GetName() << std::endl;        
@@ -2805,8 +2805,8 @@ bool mafViewArbitraryOrthoSlice::BelongsToYNormalGizmo( mafVME * vme )
 		return true;
 	}
 
-	medGizmoCrossRotate *rotate = NULL;
-	rotate = dynamic_cast<medGizmoCrossRotate *>(mediator);
+	mafGizmoCrossRotate *rotate = NULL;
+	rotate = dynamic_cast<mafGizmoCrossRotate *>(mediator);
 
 	if (rotate && rotate->GetName().Equals("m_GizmoYView"))
 	{
@@ -2855,7 +2855,7 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossRTXNormalView( mafEventBase * 
 	}
 }
 
-void mafViewArbitraryOrthoSlice::PostMultiplyEventMatrixToGizmoCross( mafEventBase * inputEvent , medGizmoCrossRotateTranslate *targetGizmo )
+void mafViewArbitraryOrthoSlice::PostMultiplyEventMatrixToGizmoCross( mafEventBase * inputEvent , mafGizmoCrossRotateTranslate *targetGizmo )
 {
 	mafEvent *e = mafEvent::SafeDownCast(inputEvent);
 
@@ -4558,7 +4558,7 @@ void mafViewArbitraryOrthoSlice::UpdateWindowing(bool enable,mafNode *node)
 
 void mafViewArbitraryOrthoSlice::MyMethod( medInteractorPicker * picker, double * pickedPointCoordinates )
 {
-	medGizmoCrossRotateTranslate *gizmo = NULL;
+	mafGizmoCrossRotateTranslate *gizmo = NULL;
 
 	if (picker == m_XSlicerPicker)
 	{
@@ -4667,7 +4667,7 @@ void mafViewArbitraryOrthoSlice::SaveSlicesFromRenderWindowToFile(int chooseExpo
 
 	mafVMESlicer *currentSlicer = NULL;
 
-	medGizmoCrossRotateTranslate *crossGizmo[3] = {m_GizmoXView, m_GizmoYView, m_GizmoZView};
+	mafGizmoCrossRotateTranslate *crossGizmo[3] = {m_GizmoXView, m_GizmoYView, m_GizmoZView};
 
 	// hide the cross from all views before exporting
 

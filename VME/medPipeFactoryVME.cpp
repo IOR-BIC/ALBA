@@ -29,25 +29,25 @@
 #include "mafIndent.h"
 
 #include "mafPipe.h"
-#include "medPipeVolumeMIP.h"
-#include "medPipeVolumeDRR.h"
-#include "medPipeVolumeVR.h"
-#include "medPipeTrajectories.h"
+#include "mafPipeVolumeMIP.h"
+#include "mafPipeVolumeDRR.h"
+#include "mafPipeVolumeVR.h"
+#include "mafPipeTrajectories.h"
 
-#include "medPipeWrappedMeter.h"
-#include "medPipeSurfaceEditor.h"
-#include "medVisualPipeSlicerSlice.h"
-#include "medVisualPipePolylineGraph.h"
+#include "mafPipeWrappedMeter.h"
+#include "mafPipeSurfaceEditor.h"
+#include "mafVisualPipeSlicerSlice.h"
+#include "mafVisualPipePolylineGraph.h"
 
 
 
-#include "medPipeDensityDistance.h"
+#include "mafPipeDensityDistance.h"
 
 #ifdef MAF_USE_ITK  
-  #include "medPipeGraph.h"
+  #include "mafPipeGraph.h"
 #endif
 
-#include "medPipePolylineGraphEditor.h"
+#include "mafPipePolylineGraphEditor.h"
 
 //TODO: commit down to openMAF
 #include "mafPipeMeshSlice_BES.h"
@@ -56,20 +56,20 @@
 #include "mafPipeVolumeSlice_BES.h"
 ///////
 
-#include "medPipeCompoundVolume.h"
-#include "medPipeCompoundVolumeFixedScalars.h"
-#include "medPipeVectorFieldGlyphs.h"
-#include "medPipeVectorFieldSurface.h"
-#include "medPipeVectorFieldMapWithArrows.h"
-#include "medPipeVectorFieldSlice.h"
-#include "medPipeTensorFieldGlyphs.h"
-#include "medPipeTensorFieldSurface.h"
-#include "medPipeTensorFieldSlice.h"
-#include "medPipeVolumeSliceBlend.h"
-#include "medVisualPipeCollisionDetection.h"
-#include "medPipeVolumeSliceNotInterpolated.h"
+#include "mafPipeCompoundVolume.h"
+#include "mafPipeCompoundVolumeFixedScalars.h"
+#include "mafPipeVectorFieldGlyphs.h"
+#include "mafPipeVectorFieldSurface.h"
+#include "mafPipeVectorFieldMapWithArrows.h"
+#include "mafPipeVectorFieldSlice.h"
+#include "mafPipeTensorFieldGlyphs.h"
+#include "mafPipeTensorFieldSurface.h"
+#include "mafPipeTensorFieldSlice.h"
+#include "mafPipeVolumeSliceBlend.h"
+#include "mafVisualPipeCollisionDetection.h"
+#include "mafPipeVolumeSliceNotInterpolated.h"
 
-#include "medPipeRayCast.h"
+#include "mafPipeRayCast.h"
 
 #include <string>
 #include <ostream>
@@ -108,44 +108,44 @@ medPipeFactoryVME::medPipeFactoryVME()
   //
   // Plug here Pipes in this factory
   //
-  mafPlugPipeMacro(medPipeVolumeMIP, "Pipe for render vtk volumes with MIP ray cast method.");
-  mafPlugPipeMacro(medPipeVolumeDRR, "Pipe for render vtk volumes with XRay cast method.");
+  mafPlugPipeMacro(mafPipeVolumeMIP, "Pipe for render vtk volumes with MIP ray cast method.");
+  mafPlugPipeMacro(mafPipeVolumeDRR, "Pipe for render vtk volumes with XRay cast method.");
 
-	mafPlugPipeMacro(medPipeVolumeVR, "Pipe for render vtk volumes with Volume Rendere cast method.");
+	mafPlugPipeMacro(mafPipeVolumeVR, "Pipe for render vtk volumes with Volume Rendere cast method.");
 
-	mafPlugPipeMacro(medPipeDensityDistance, "Pipe for visualize the value of scalars on a surface.");
+	mafPlugPipeMacro(mafPipeDensityDistance, "Pipe for visualize the value of scalars on a surface.");
 
-  mafPlugPipeMacro(medPipeTrajectories, "Pipe to render animated Landmark trajectories in a time interval.");
-	mafPlugPipeMacro(medPipePolylineGraphEditor, "Pipe to Visualize Polyline/Graph in way to edit them.");
+  mafPlugPipeMacro(mafPipeTrajectories, "Pipe to render animated Landmark trajectories in a time interval.");
+	mafPlugPipeMacro(mafPipePolylineGraphEditor, "Pipe to Visualize Polyline/Graph in way to edit them.");
 
-	mafPlugPipeMacro(medPipeWrappedMeter, "Pipe to Visualize Wrapped Meter");
-	mafPlugPipeMacro(medPipeSurfaceEditor, "Pipe to Visualize Surface in way to edit them.");
+	mafPlugPipeMacro(mafPipeWrappedMeter, "Pipe to Visualize Wrapped Meter");
+	mafPlugPipeMacro(mafPipeSurfaceEditor, "Pipe to Visualize Surface in way to edit them.");
 
-  mafPlugPipeMacro(medVisualPipeSlicerSlice, "Pipe to Visualize Slicer as borders cutted from a plane.");
+  mafPlugPipeMacro(mafVisualPipeSlicerSlice, "Pipe to Visualize Slicer as borders cutted from a plane.");
 
-  mafPlugPipeMacro(medVisualPipePolylineGraph, "Pipe to Visualize Polyline and Graph.");
+  mafPlugPipeMacro(mafVisualPipePolylineGraph, "Pipe to Visualize Polyline and Graph.");
 
 
 #ifdef MAF_USE_ITK  
 
-  mafPlugPipeMacro(medPipeGraph, "Pipe to plot scalar graphics.");
+  mafPlugPipeMacro(mafPipeGraph, "Pipe to plot scalar graphics.");
 
 #endif
 
-  mafPlugPipeMacro(medPipeCompoundVolume, "Compound pipe for rendering volumes.");
-  mafPlugPipeMacro(medPipeCompoundVolumeIsosurface,"Compound Pipe for render vtk volumes as a iso-surface");
-  mafPlugPipeMacro(medPipeCompoundVolumeMIP, "Compound pipe for render vtk volumes with MIP ray cast method.");
-  mafPlugPipeMacro(medPipeCompoundVolumeDRR, "Compound pipe for render vtk volumes with XRay cast method.");
-  mafPlugPipeMacro(medPipeCompoundVolumeVR, "Compound pipe for render vtk volumes with Volume Rendere cast method.");
-  mafPlugPipeMacro(medPipeVectorFieldGlyphs, "Pipe for rendering of vector fields using various glyphs.");
-  mafPlugPipeMacro(medPipeVectorFieldSurface, "Pipe for rendering of vector fields using color mapping on the object surface.");
-  mafPlugPipeMacro(medPipeVectorFieldMapWithArrows, "Pipe for rendering of vector and scalar fields using colored arrows mapping on the object surface.");
-  mafPlugPipeMacro(medPipeVectorFieldSlice, "Pipe for rendering of vector fields using color mapping on the slice of the object.");
-  mafPlugPipeMacro(medPipeTensorFieldGlyphs, "Pipe for rendering of tensor fields using glyphs.");
-  mafPlugPipeMacro(medPipeTensorFieldSurface, "Pipe for rendering of tensor fields using color mapping on the object surface.");
-  mafPlugPipeMacro(medPipeTensorFieldSlice, "Pipe for rendering of tensor fields using color mapping on the slice of the object.");
-  mafPlugPipeMacro(medPipeVolumeSliceBlend, "Pipe for rendering volume with 2 slices with opacity.");
-  mafPlugPipeMacro(medVisualPipeCollisionDetection, "Pipe for visualization of collision between 2 surfaces.");
+  mafPlugPipeMacro(mafPipeCompoundVolume, "Compound pipe for rendering volumes.");
+  mafPlugPipeMacro(mafPipeCompoundVolumeIsosurface,"Compound Pipe for render vtk volumes as a iso-surface");
+  mafPlugPipeMacro(mafPipeCompoundVolumeMIP, "Compound pipe for render vtk volumes with MIP ray cast method.");
+  mafPlugPipeMacro(mafPipeCompoundVolumeDRR, "Compound pipe for render vtk volumes with XRay cast method.");
+  mafPlugPipeMacro(mafPipeCompoundVolumeVR, "Compound pipe for render vtk volumes with Volume Rendere cast method.");
+  mafPlugPipeMacro(mafPipeVectorFieldGlyphs, "Pipe for rendering of vector fields using various glyphs.");
+  mafPlugPipeMacro(mafPipeVectorFieldSurface, "Pipe for rendering of vector fields using color mapping on the object surface.");
+  mafPlugPipeMacro(mafPipeVectorFieldMapWithArrows, "Pipe for rendering of vector and scalar fields using colored arrows mapping on the object surface.");
+  mafPlugPipeMacro(mafPipeVectorFieldSlice, "Pipe for rendering of vector fields using color mapping on the slice of the object.");
+  mafPlugPipeMacro(mafPipeTensorFieldGlyphs, "Pipe for rendering of tensor fields using glyphs.");
+  mafPlugPipeMacro(mafPipeTensorFieldSurface, "Pipe for rendering of tensor fields using color mapping on the object surface.");
+  mafPlugPipeMacro(mafPipeTensorFieldSlice, "Pipe for rendering of tensor fields using color mapping on the slice of the object.");
+  mafPlugPipeMacro(mafPipeVolumeSliceBlend, "Pipe for rendering volume with 2 slices with opacity.");
+  mafPlugPipeMacro(mafVisualPipeCollisionDetection, "Pipe for visualization of collision between 2 surfaces.");
 
 
   //BES: 16.4.2008 - these pipes are to be committed down (without _BES suffix) to openMAF in the future
@@ -154,9 +154,9 @@ medPipeFactoryVME::medPipeFactoryVME()
   mafPlugPipeMacro(mafPipePolylineSlice_BES, "BES: mafPipePolylineSlice_BES.");
   mafPlugPipeMacro(mafPipeMeshSlice_BES, "BES: mafPipeMeshSlice_BES.");
 
-  mafPlugPipeMacro(medPipeVolumeSliceNotInterpolated, "Pipe for not interpolated and not resampled volume visualization");   
+  mafPlugPipeMacro(mafPipeVolumeSliceNotInterpolated, "Pipe for not interpolated and not resampled volume visualization");   
 
-  mafPlugPipeMacro(medPipeRayCast, "Pipe for RayCast Volume rendering of bone-blood-muscle");
+  mafPlugPipeMacro(mafPipeRayCast, "Pipe for RayCast Volume rendering of bone-blood-muscle");
 
 
 }

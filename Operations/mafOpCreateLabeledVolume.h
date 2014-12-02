@@ -26,7 +26,7 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class medVMELabeledVolume;
+class mafVMELabeledVolume;
 class mafGui;
 class mafEvent;
 //----------------------------------------------------------------------------
@@ -34,7 +34,7 @@ class mafEvent;
 //----------------------------------------------------------------------------
 /** 
 class name mafOpCreateLabeledVolume
-Create a medVMELabeledVolume.
+Create a mafVMELabeledVolume.
 */
 class MAF_EXPORT mafOpCreateLabeledVolume: public mafOp
 {
@@ -60,6 +60,6 @@ public:
   /*virtual*/ void OpDo();
 
 protected: 
-  medVMELabeledVolume *m_LabeledVolume;
+  mafVMELabeledVolume *m_LabeledVolume;
 };
 #endif

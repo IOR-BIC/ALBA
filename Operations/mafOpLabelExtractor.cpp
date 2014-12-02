@@ -167,7 +167,7 @@ void mafOpLabelExtractor::OpRun()
   m_Gui->Divider(2);
   m_Gui->Divider();
 
-  if (m_Input->IsA("medVMELabeledVolume"))
+  if (m_Input->IsA("mafVMELabeledVolume"))
   {
     m_LabelCheckBox = m_Gui->CheckList(ID_LABELS,_("Labels"),360,_("Chose label to extract"));
 
@@ -383,7 +383,7 @@ void mafOpLabelExtractor::ExtractLabel()
 {
   mafVME *vme = NULL;
   
-  if (m_Input->IsA("medVMELabeledVolume"))
+  if (m_Input->IsA("mafVMELabeledVolume"))
   {
     UpdateDataLabel();
   }
@@ -495,7 +495,7 @@ void mafOpLabelExtractor::ExtractLabel()
     m_OutputData = sp->NewInstance();
     m_OutputData->DeepCopy(sp);
 
-    if (m_Input->IsA("medVMELabeledVolume"))
+    if (m_Input->IsA("mafVMELabeledVolume"))
     {
       GenerateLabeledVolume();
     }

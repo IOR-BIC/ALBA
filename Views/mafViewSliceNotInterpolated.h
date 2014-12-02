@@ -23,7 +23,7 @@
 class wxBoxSizer;
 class mafGUIFloatSlider;
 class vtkLookupTable;
-class medPipeVolumeSliceNotInterpolated;
+class mafPipeVolumeSliceNotInterpolated;
 class mafVMEVolumeGray;
 class mafGUILutSwatch;
 
@@ -91,7 +91,7 @@ protected:
   double m_CurrentSlice;                          //> Current slice coordinate
   mafGUIFloatSlider *m_SliceSlider;               //> Slice coordinate slider
   mafGUILutSwatch *m_LutSwatch;                   //> Lut swatch widget
-  std::map<mafNode*,medPipeVolumeSliceNotInterpolated*> m_PipesSlice; //> Slice visual pipe
+  std::map<mafNode*,mafPipeVolumeSliceNotInterpolated*> m_PipesSlice; //> Slice visual pipe
   vtkLookupTable *m_ColorLUT;
 
 private:

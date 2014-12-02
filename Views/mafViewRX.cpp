@@ -38,7 +38,7 @@ const bool DEBUG_MODE = false;
 #include "mafVMELandmark.h"
 #include "mafVMESlicer.h"
 #include "mafPipeSurfaceSlice.h"
-#include "medVisualPipeSlicerSlice.h"
+#include "mafVisualPipeSlicerSlice.h"
 #include "mafVMEVolumeGray.h"
 #include "mafAbsMatrixPipe.h"
 #include "mafTransform.h"
@@ -173,7 +173,7 @@ void mafViewRX::VmeCreatePipe(mafNode *vme)
         ((mafPipeSurfaceSlice *)pipe)->SetNormal(normal);
 
       }
-      else if(pipe_name.Equals("medVisualPipeSlicerSlice"))
+      else if(pipe_name.Equals("mafVisualPipeSlicerSlice"))
       {
         double normal[3];
         switch(m_CameraPositionId)
@@ -237,9 +237,9 @@ void mafViewRX::VmeCreatePipe(mafNode *vme)
           positionSlice2[2] = (b[5]+b[4])/2;
         }
 
-        ((medVisualPipeSlicerSlice *)pipe)->SetSlice1(positionSlice1);
-        ((medVisualPipeSlicerSlice *)pipe)->SetSlice2(positionSlice2);
-        ((medVisualPipeSlicerSlice *)pipe)->SetNormal(normal);
+        ((mafVisualPipeSlicerSlice *)pipe)->SetSlice1(positionSlice1);
+        ((mafVisualPipeSlicerSlice *)pipe)->SetSlice2(positionSlice2);
+        ((mafVisualPipeSlicerSlice *)pipe)->SetNormal(normal);
         
 
       }
@@ -315,7 +315,7 @@ void mafViewRX::VmeShow(mafNode *vme, bool show)
   mafViewVTK::VmeShow(vme,show);
   mafSceneNode *SN = this->GetSceneGraph()->Vme2Node(vme);
   
-  medVisualPipeSlicerSlice *pipeSlicer = medVisualPipeSlicerSlice::SafeDownCast(SN->m_Pipe);
+  mafVisualPipeSlicerSlice *pipeSlicer = mafVisualPipeSlicerSlice::SafeDownCast(SN->m_Pipe);
   if(pipeSlicer)
   {
     pipeSlicer->SetThickness(3);

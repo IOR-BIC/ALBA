@@ -10,8 +10,8 @@ Copyright (c) 2013
 University of Bedfordshire, UK
 =========================================================================*/
 
-#ifndef __medVMEStentModelSource_h 
-#define __medVMEStentModelSource_h
+#ifndef __mafVMEStentModelSource_h 
+#define __mafVMEStentModelSource_h
 
 #include "mafConfigure.h"
 #include "itkSimplexMesh.h"

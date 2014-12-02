@@ -28,7 +28,7 @@
 //----------------------------------------------------------------------------
 class mafString;
 class mafVMEPointSet;
-class medVMEPolylineGraph;
+class mafVMEPolylineGraph;
 class mafVMESurface;
 class mafVMEVolumeGray;
 class mafVMEVolumeRGB;
@@ -81,7 +81,7 @@ protected:
   mafString m_FileDir;
 
   mafVMEPointSet *m_VmePointSet;
-  medVMEPolylineGraph *m_VmePolyLine;
+  mafVMEPolylineGraph *m_VmePolyLine;
   mafVMESurface *m_VmeSurface;
   mafVMEVolumeGray *m_VmeGrayVol;
   mafVMEVolumeRGB *m_VmeRGBVol;

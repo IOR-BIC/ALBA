@@ -28,12 +28,12 @@
 // forward references :
 //----------------------------------------------------------------------------
 
-class medVMEAnalog;
+class mafVMEAnalog;
 
 //----------------------------------------------------------------------------
 // mafOpImporterAnalogWS :
 //----------------------------------------------------------------------------
-/** Import analog signals in a medVMEAnalog VME*/
+/** Import analog signals in a mafVMEAnalog VME*/
 class MAF_EXPORT mafOpImporterAnalogWS : public mafOp
 {
 public:
@@ -61,7 +61,7 @@ public:
   2) Read the second line containing the Frequency
   2) Ignore 2 lines
   3) the first element of each line is sample, then n scalar values
-  4) Put the values in a medVMEAnalog item 
+  4) Put the values in a mafVMEAnalog item 
   */
   void Read();
 
@@ -70,7 +70,7 @@ public:
 
 
 protected:
-  medVMEAnalog *m_EmgScalar;
+  mafVMEAnalog *m_EmgScalar;
   vnl_matrix<double> m_EmgMatrix;
   wxString m_FileDir;
 	wxString m_File;

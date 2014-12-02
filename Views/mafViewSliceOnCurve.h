@@ -27,7 +27,7 @@
 #ifdef GIZMO_PATH
   #include "mafGizmoPath.h"
 #else
-  #include "../Interaction/medGizmoPolylineGraph.h"
+  #include "../Interaction/mafGizmoPolylineGraph.h"
 #endif
 
 //----------------------------------------------------------------------------
@@ -121,7 +121,7 @@ protected:
   double m_GizmoPos;		//< Position on the polyline (0 - 1)
   double m_GizmoLength;	//< Length of the polyline
 #else
-  medGizmoPolylineGraph* m_Gizmo;
+  mafGizmoPolylineGraph* m_Gizmo;
 #endif
 
   int m_SliceCameraAutoFocus;      //< non-zero, if the camera in the slice view should be focused on the current position on the curve

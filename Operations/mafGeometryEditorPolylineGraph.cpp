@@ -27,8 +27,8 @@
 #include "medDecl.h"
 
 #include "mafGUI.h"
-#include "medVMEPolylineEditor.h"
-#include "medVMEPolylineGraph.h"
+#include "mafVMEPolylineEditor.h"
+#include "mafVMEPolylineGraph.h"
 #include "mafInteractorPicker.h"
 
 #include "vtkMAFSmartPointer.h"
@@ -48,7 +48,7 @@
 #include "vtkCellLocator.h"
 
 //----------------------------------------------------------------------------
-mafGeometryEditorPolylineGraph::mafGeometryEditorPolylineGraph(mafVME *input, mafObserver *listener,medVMEPolylineGraph *polyline,bool testMode)
+mafGeometryEditorPolylineGraph::mafGeometryEditorPolylineGraph(mafVME *input, mafObserver *listener,mafVMEPolylineGraph *polyline,bool testMode)
 //----------------------------------------------------------------------------
 {
 	m_PolylineGraph = new mafPolylineGraph;

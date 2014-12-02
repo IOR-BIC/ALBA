@@ -31,7 +31,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "mafGUIWizardPageNew.h"
 #include "mafGUIValidator.h"
 #include "mafDeviceButtonsPadMouse.h"
-#include "medInteractorDICOMImporter.h"
+#include "mafInteractorDICOMImporter.h"
 #include "mafTagArray.h"
 #include "mafRWI.h"
 #include "mafVMEImage.h"

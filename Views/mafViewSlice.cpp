@@ -46,7 +46,7 @@ const bool DEBUG_MODE = false;
 #include "mafRWI.h"
 #include "mafSceneGraph.h"
 #include "mafAttachCamera.h"
-#include "medPipePolylineGraphEditor.h"
+#include "mafPipePolylineGraphEditor.h"
 #include "mafTransform.h"
 #include "mafAbsMatrixPipe.h"
 
@@ -353,14 +353,14 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
           else if(pipe->IsA("mafPipePolylineSlice_BES")){
             m_CurrentPolyline.push_back(n);        
           }
-          else if(pipe->IsA("medPipePolylineGraphEditor"))
+          else if(pipe->IsA("mafPipePolylineGraphEditor"))
           {
             m_CurrentPolylineGraphEditor.push_back(n);
 
             if(m_CameraPositionId==CAMERA_OS_P)
-              ((medPipePolylineGraphEditor *)pipe)->SetModalityPerspective();
+              ((mafPipePolylineGraphEditor *)pipe)->SetModalityPerspective();
             else
-              ((medPipePolylineGraphEditor *)pipe)->SetModalitySlice();				
+              ((mafPipePolylineGraphEditor *)pipe)->SetModalitySlice();				
           }
           else if(pipe->IsA("mafPipeMeshSlice_BES"))  {
             m_CurrentMesh.push_back(n);        

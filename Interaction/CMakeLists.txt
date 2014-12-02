@@ -74,8 +74,8 @@ SET(PROJECT_SRCS
   mafGizmoTranslatePlane.h
   mafGizmoSlice.cpp
   mafGizmoSlice.h
-  medGizmoInteractionDebugger.cpp
-  medGizmoInteractionDebugger.h
+  mafGizmoInteractionDebugger.cpp
+  mafGizmoInteractionDebugger.h
   mafGUIGizmoInterface.cpp
   mafGUIGizmoInterface.h
   mafGUIGizmoRotate.cpp
@@ -146,54 +146,54 @@ SET(PROJECT_SRCS
   ######################
   medInteractorPicker.cpp
   medInteractorPicker.h
-  medInteractorDICOMImporter.h
-  medInteractorDICOMImporter.cpp  
+  mafInteractorDICOMImporter.h
+  mafInteractorDICOMImporter.cpp  
   medInteractor2DAngle.cpp
   medInteractor2DAngle.h
   medInteractor2DDistance.cpp
   medInteractor2DDistance.h
   medInteractor2DIndicator.cpp
   medInteractor2DIndicator.h
-  medInteractorSegmentationPicker.cpp
-  medInteractorSegmentationPicker.h 
-  medInteractorPERScalarInformation.cpp
-  medInteractorPERScalarInformation.h
-  medInteractorPERBrushFeedback.cpp
-  medInteractorPERBrushFeedback.h
+  mafInteractorSegmentationPicker.cpp
+  mafInteractorSegmentationPicker.h 
+  mafInteractorPERScalarInformation.cpp
+  mafInteractorPERScalarInformation.h
+  mafInteractorPERBrushFeedback.cpp
+  mafInteractorPERBrushFeedback.h
   mmiVTKPicker.cpp
   mmiVTKPicker.h
   mmiInfoImage.cpp
   mmiInfoImage.h
   mmiSelectPoint.cpp
   mmiSelectPoint.h
-  medGizmoPolylineGraph.cpp
-  medGizmoPolylineGraph.h
-  medDeviceButtonsPadMouseDialog.h
-  medDeviceButtonsPadMouseDialog.cpp
-  medGUITransformSliders.cpp
-  medGUITransformSliders.h
+  mafGizmoPolylineGraph.cpp
+  mafGizmoPolylineGraph.h
+  mafDeviceButtonsPadMouseDialog.h
+  mafDeviceButtonsPadMouseDialog.cpp
+  mafGUITransformSliders.cpp
+  mafGUITransformSliders.h
   
   ##### Introduced with VolumeLarge - to be committed down ###
   # mafGizmoROI_BES.cpp
   # mafGizmoROI_BES.h  
   ############################################################
 
-  medGizmoCrossRotateTranslate.cpp
-  medGizmoCrossRotateTranslate.h
+  mafGizmoCrossRotateTranslate.cpp
+  mafGizmoCrossRotateTranslate.h
 	  
-  medGizmoCrossRotate.cpp
-  medGizmoCrossRotate.h
-  medGizmoCrossRotateAxis.cpp
-  medGizmoCrossRotateAxis.h
-  medGizmoCrossRotateFan.cpp
-  medGizmoCrossRotateFan.h
+  mafGizmoCrossRotate.cpp
+  mafGizmoCrossRotate.h
+  mafGizmoCrossRotateAxis.cpp
+  mafGizmoCrossRotateAxis.h
+  mafGizmoCrossRotateFan.cpp
+  mafGizmoCrossRotateFan.h
 
-  medGizmoCrossTranslate.cpp
-  medGizmoCrossTranslate.h
-  medGizmoCrossTranslateAxis.cpp
-  medGizmoCrossTranslateAxis.h
-  medGizmoCrossTranslatePlane.cpp
-  medGizmoCrossTranslatePlane.h
+  mafGizmoCrossTranslate.cpp
+  mafGizmoCrossTranslate.h
+  mafGizmoCrossTranslateAxis.cpp
+  mafGizmoCrossTranslateAxis.h
+  mafGizmoCrossTranslatePlane.cpp
+  mafGizmoCrossTranslatePlane.h
 )
 
 ## SIL == removed under Linux - since it requires mafDrivers - which seems to be Win32 only

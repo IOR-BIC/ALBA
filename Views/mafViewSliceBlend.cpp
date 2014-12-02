@@ -43,9 +43,9 @@
 #include "mafAttachCamera.h"
 #include "mafGUIFloatSlider.h"
 #include "mafGUILutSlider.h"
-#include "medPipePolylineGraphEditor.h"
+#include "mafPipePolylineGraphEditor.h"
 #include "mafViewSliceBlend.h"
-#include "medPipeVolumeSliceBlend.h"
+#include "mafPipeVolumeSliceBlend.h"
 
 #include "vtkDataSet.h"
 #include "vtkMAFRayCast3DPicker.h"
@@ -169,8 +169,8 @@ void mafViewSliceBlend::VmeCreatePipe(mafNode *vme)
     if (pipe)
     {
       pipe->SetListener(this);
-      // Initialize medPipeVolumeSliceBlend
-      if (pipe_name.Equals("medPipeVolumeSliceBlend"))
+      // Initialize mafPipeVolumeSliceBlend
+      if (pipe_name.Equals("mafPipeVolumeSliceBlend"))
       {
         m_CurrentVolume = n;
         if (m_AttachCamera)
@@ -201,14 +201,14 @@ void mafViewSliceBlend::VmeCreatePipe(mafNode *vme)
         if (m_SliceInitialized)
         {
           //If slice position is already set
-          ((medPipeVolumeSliceBlend *)pipe)->InitializeSliceParameters(slice_mode,m_Slice1,m_Slice2,false);
+          ((mafPipeVolumeSliceBlend *)pipe)->InitializeSliceParameters(slice_mode,m_Slice1,m_Slice2,false);
         }
         else
         {
           //If slice position isn't already set
-          ((medPipeVolumeSliceBlend *)pipe)->InitializeSliceParameters(slice_mode,false);
+          ((mafPipeVolumeSliceBlend *)pipe)->InitializeSliceParameters(slice_mode,false);
         }
-        ((medPipeVolumeSliceBlend *)pipe)->SetSliceOpacity(m_Opacity);
+        ((mafPipeVolumeSliceBlend *)pipe)->SetSliceOpacity(m_Opacity);
       }
       pipe->Create(n);
       n->m_Pipe = (mafPipe*)pipe;
@@ -313,8 +313,8 @@ void mafViewSliceBlend::OnEvent(mafEventBase *maf_event)
     {
     case ID_OPACITY:
       {
-        medPipeVolumeSliceBlend *pipe = (medPipeVolumeSliceBlend *)m_CurrentVolume->m_Pipe;
-        //Set new opacity for the pipe medPipeVolumeSliceBlend
+        mafPipeVolumeSliceBlend *pipe = (mafPipeVolumeSliceBlend *)m_CurrentVolume->m_Pipe;
+        //Set new opacity for the pipe mafPipeVolumeSliceBlend
         pipe->SetSliceOpacity(m_Opacity);
         CameraUpdate();
       }
@@ -338,9 +338,9 @@ void mafViewSliceBlend::SetLutRange(double low_val, double high_val)
   if(!m_CurrentVolume) 
     return;
   mafString pipe_name = m_CurrentVolume->m_Pipe->GetTypeName();
-  if (pipe_name.Equals("medPipeVolumeSliceBlend"))
+  if (pipe_name.Equals("mafPipeVolumeSliceBlend"))
   {
-    medPipeVolumeSliceBlend *pipe = (medPipeVolumeSliceBlend *)m_CurrentVolume->m_Pipe;
+    mafPipeVolumeSliceBlend *pipe = (mafPipeVolumeSliceBlend *)m_CurrentVolume->m_Pipe;
     pipe->SetLutRange(low_val, high_val); 
   }
 }
@@ -354,9 +354,9 @@ void mafViewSliceBlend::SetSliceLocalOrigin(double origin0[3],double origin1[3])
     memcpy(m_Slice1,origin0,sizeof(origin0));
     memcpy(m_Slice2,origin1,sizeof(origin1));
     mafString pipe_name = m_CurrentVolume->m_Pipe->GetTypeName();
-    if (pipe_name.Equals("medPipeVolumeSliceBlend"))
+    if (pipe_name.Equals("mafPipeVolumeSliceBlend"))
     {
-      medPipeVolumeSliceBlend *pipe = (medPipeVolumeSliceBlend *)m_CurrentVolume->m_Pipe;
+      mafPipeVolumeSliceBlend *pipe = (mafPipeVolumeSliceBlend *)m_CurrentVolume->m_Pipe;
       //Set origin0 for slice 0
       pipe->SetSlice(0,origin0);
       //Set origin1 for slice 1
@@ -379,9 +379,9 @@ void mafViewSliceBlend::SetSlice(int nSlice,double pos[3])
     else if(nSlice==1)
       memcpy(m_Slice2,pos,sizeof(m_Slice2));
     mafString pipe_name = m_CurrentVolume->m_Pipe->GetTypeName();
-    if (pipe_name.Equals("medPipeVolumeSliceBlend"))
+    if (pipe_name.Equals("mafPipeVolumeSliceBlend"))
     {
-      medPipeVolumeSliceBlend *pipe = (medPipeVolumeSliceBlend *)m_CurrentVolume->m_Pipe;
+      mafPipeVolumeSliceBlend *pipe = (mafPipeVolumeSliceBlend *)m_CurrentVolume->m_Pipe;
       pipe->SetSlice(nSlice,pos);
     }
   }
@@ -518,7 +518,7 @@ void mafViewSliceBlend::VmeShow(mafNode *node, bool show)
 void mafViewSliceBlend::VmeRemove(mafNode *vme)
 //----------------------------------------------------------------------------
 {
-  if(vme->IsA("mafVMEPolyline")||vme->IsA("mafVMESurface")||vme->IsA("medVMEPolylineEditor"))
+  if(vme->IsA("mafVMEPolyline")||vme->IsA("mafVMESurface")||vme->IsA("mafVMEPolylineEditor"))
   {
     //remove surfaces from surfaces list
     this->UpdateSurfacesList(vme);

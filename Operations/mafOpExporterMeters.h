@@ -40,7 +40,7 @@ class mafEvent;
 //----------------------------------------------------------------------------
 /** 
     class name: mafOpExporterMeters
-   This class provides the functionality for exporting medVMEWrappedMeter, writing all in a txt file.
+   This class provides the functionality for exporting mafVMEWrappedMeter, writing all in a txt file.
 */
 class MAF_EXPORT mafOpExporterMeters: public mafOp
 {

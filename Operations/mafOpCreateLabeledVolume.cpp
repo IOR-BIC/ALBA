@@ -28,7 +28,7 @@
 #include "mafEvent.h"
 #include "mafVMEVolumeGray.h"
 
-#include "medVMELabeledVolume.h"
+#include "mafVMELabeledVolume.h"
 
 //----------------------------------------------------------------------------
 // Constants :

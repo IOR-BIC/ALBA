@@ -30,7 +30,7 @@
 #include "mafGUI.h"
 
 #include "mafTagArray.h"
-#include "medVMEAnalog.h"
+#include "mafVMEAnalog.h"
 
 #include <iostream>
 

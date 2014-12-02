@@ -26,7 +26,7 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class medVMEWrappedMeter;
+class mafVMEWrappedMeter;
 class mafGui;
 class mafEvent;
 //----------------------------------------------------------------------------
@@ -34,7 +34,7 @@ class mafEvent;
 //----------------------------------------------------------------------------
 /** 
 class name: mafOpExporterWrappedMeter
-   This class provides the functionality for exporting medVMEWrappedMeter, writing all in a txt file.
+   This class provides the functionality for exporting mafVMEWrappedMeter, writing all in a txt file.
 */
 class MAF_EXPORT mafOpExporterWrappedMeter: public mafOp
 {

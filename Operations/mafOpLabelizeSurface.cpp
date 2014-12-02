@@ -39,7 +39,7 @@
 #include "mafNode.h"
 #include "mafVMESurface.h"
 #include "mafVMEGizmo.h"
-#include "medVMESurfaceEditor.h"
+#include "mafVMESurfaceEditor.h"
 
 #include "vtkPlane.h"
 #include "vtkPlaneSource.h"

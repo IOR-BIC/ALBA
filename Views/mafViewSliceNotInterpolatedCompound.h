@@ -24,7 +24,7 @@
 class wxBoxSizer;
 class mafGUIFloatSlider;
 class vtkLookupTable;
-class medPipeVolumeSliceNotInterpolated;
+class mafPipeVolumeSliceNotInterpolated;
 class mafVMEVolumeGray;
 class mafGUILutSwatch;
 

@@ -58,12 +58,12 @@
 #include "mmaVolumeMaterial.h"
 #include "mmaMaterial.h"
 
-#include "medDeviceButtonsPadMouseDialog.h"
+#include "mafDeviceButtonsPadMouseDialog.h"
 #include "mafViewSliceGlobal.h"
-#include "medVMESegmentationVolume.h"
+#include "mafVMESegmentationVolume.h"
 
-#include "medInteractorPERScalarInformation.h"
-#include "medInteractorSegmentationPicker.h"
+#include "mafInteractorPERScalarInformation.h"
+#include "mafInteractorSegmentationPicker.h"
 
 #include "vtkDoubleArray.h"
 #include "vtkMath.h"
@@ -96,7 +96,7 @@
 #include "itkVotingBinaryHoleFillingImageFilter.h"
 #include "itkVotingBinaryIterativeHoleFillingImageFilter.h"
 
-#include "medInteractorPERBrushFeedback.h"
+#include "mafInteractorPERBrushFeedback.h"
 #include "mafVMEItemVTK.h"
 #include "mafTransformFrame.h"
 #include "medOpVolumeResample.h"
@@ -2367,7 +2367,7 @@ void mafOpSegmentation::OnEvent(mafEventBase *maf_event)
       m_View->CameraUpdate();
       UndoBrushPreview(); // Undo is execute twice to ensure no spot are left by the brush
     }
-    else if (e->GetSender() == m_SegmentationPicker && e->GetId()== medInteractorSegmentationPicker::VME_ALT_PICKED)
+    else if (e->GetSender() == m_SegmentationPicker && e->GetId()== mafInteractorSegmentationPicker::VME_ALT_PICKED)
     {
       //Picking during automatic segmentation
       if (m_CurrentOperation==AUTOMATIC_SEGMENTATION)
@@ -3045,7 +3045,7 @@ void mafOpSegmentation::UpdateThresholdVolumeData()
   if (m_AutomaticGlobalThreshold == RANGE)
   {
     int result;
-    m_SegmentatedVolume->SetAutomaticSegmentationThresholdModality(medVMESegmentationVolume::RANGE);
+    m_SegmentatedVolume->SetAutomaticSegmentationThresholdModality(mafVMESegmentationVolume::RANGE);
     for (int i=0;i<m_AutomaticRanges.size();i++)
     {
       result = m_SegmentatedVolume->AddRange(m_AutomaticRanges[i].m_StartSlice,m_AutomaticRanges[i].m_EndSlice,m_AutomaticRanges[i].m_ThresholdValue,m_AutomaticRanges[i].m_UpperThresholdValue);
@@ -3057,7 +3057,7 @@ void mafOpSegmentation::UpdateThresholdVolumeData()
   }
   else
   {
-    m_SegmentatedVolume->SetAutomaticSegmentationThresholdModality(medVMESegmentationVolume::GLOBAL);
+    m_SegmentatedVolume->SetAutomaticSegmentationThresholdModality(mafVMESegmentationVolume::GLOBAL);
     m_SegmentatedVolume->SetAutomaticSegmentationGlobalThreshold(m_AutomaticThreshold,m_AutomaticUpperThreshold);
   }
 
@@ -3788,8 +3788,8 @@ void mafOpSegmentation::InitializeViewSlice()
 
   // slicing the volume
   vtkDataSet *dataSet = ((mafVME *)m_Volume)->GetOutput()->GetVTKData();
-  m_View->PlugVisualPipe("mafVMEVolumeGray","medPipeVolumeSliceNotInterpolated");
-  m_View->PlugVisualPipe("medVMESegmentationVolume","medPipeVolumeSliceNotInterpolated");
+  m_View->PlugVisualPipe("mafVMEVolumeGray","mafPipeVolumeSliceNotInterpolated");
+  m_View->PlugVisualPipe("mafVMESegmentationVolume","mafPipeVolumeSliceNotInterpolated");
   m_View->PlugVisualPipe("mafVMEImage","mafPipeImage3D");
   m_View->PlugVisualPipe("mafVMESurface","mafPipeSurfaceSlice");
  
@@ -4167,8 +4167,8 @@ void mafOpSegmentation::InitializeInteractors()
   m_SER->SetListener(this);
 
   //Create a Mouse device
-  mafPlugDevice<medDeviceButtonsPadMouseDialog>("Mouse");
-  m_DialogMouse = (medDeviceButtonsPadMouseDialog *)m_DeviceManager->AddDevice("medDeviceButtonsPadMouseDialog",false); // add as persistent device
+  mafPlugDevice<mafDeviceButtonsPadMouseDialog>("Mouse");
+  m_DialogMouse = (mafDeviceButtonsPadMouseDialog *)m_DeviceManager->AddDevice("mafDeviceButtonsPadMouseDialog",false); // add as persistent device
   assert(m_DialogMouse);
   m_DialogMouse->SetName("DialogMouse");
 
@@ -5091,7 +5091,7 @@ void mafOpSegmentation::UpdateThresholdRealTimePreview()
 //   m_OldAutomaticThreshold = m_AutomaticThreshold;
 //   m_OldAutomaticUpperThreshold = m_AutomaticUpperThreshold;
   
-  medVMESegmentationVolume *tVol;
+  mafVMESegmentationVolume *tVol;
   mafNEW(tVol);
 
   tVol->SetVolumeLink(m_EmptyVolumeSlice);
@@ -5105,7 +5105,7 @@ void mafOpSegmentation::UpdateThresholdRealTimePreview()
   if (m_AutomaticGlobalThreshold == RANGE)
   {
     int result;
-    tVol->SetAutomaticSegmentationThresholdModality(medVMESegmentationVolume::RANGE);
+    tVol->SetAutomaticSegmentationThresholdModality(mafVMESegmentationVolume::RANGE);
     for (int i=0;i<m_AutomaticRanges.size();i++)
     {
       if(m_CurrentSliceIndex >= m_AutomaticRanges[i].m_StartSlice + 1 && m_CurrentSliceIndex <= m_AutomaticRanges[i].m_EndSlice + 1)
@@ -5121,7 +5121,7 @@ void mafOpSegmentation::UpdateThresholdRealTimePreview()
   }
   else
   {
-    tVol->SetAutomaticSegmentationThresholdModality(medVMESegmentationVolume::GLOBAL);
+    tVol->SetAutomaticSegmentationThresholdModality(mafVMESegmentationVolume::GLOBAL);
     tVol->SetAutomaticSegmentationGlobalThreshold(m_AutomaticThreshold,m_AutomaticUpperThreshold);
   }
 

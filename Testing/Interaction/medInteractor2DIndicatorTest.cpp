@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: medInteractor2DIndicatorTest
  Authors: Matteo Giacomoni
  

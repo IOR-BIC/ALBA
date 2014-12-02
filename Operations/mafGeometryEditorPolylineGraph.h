@@ -29,8 +29,8 @@
 // forward references :
 //----------------------------------------------------------------------------
 class mafVME;
-class medVMEPolylineEditor;
-class medVMEPolylineGraph;
+class mafVMEPolylineEditor;
+class mafVMEPolylineGraph;
 class mafPolylineGraph;
 class mafGUI;
 class mafInteractorPicker;
@@ -53,7 +53,7 @@ class MAF_EXPORT mafGeometryEditorPolylineGraph: public mafObserver
 {
 public:
   /** contructor*/
-	mafGeometryEditorPolylineGraph(mafVME *input=NULL, mafObserver *listener = NULL, medVMEPolylineGraph *polyline=NULL,bool testMode=false);
+	mafGeometryEditorPolylineGraph(mafVME *input=NULL, mafObserver *listener = NULL, mafVMEPolylineGraph *polyline=NULL,bool testMode=false);
 	virtual ~mafGeometryEditorPolylineGraph(); 
 
   enum EDITOR_GRAPH_ID
@@ -171,8 +171,8 @@ protected:
 	mafInteractorPicker *m_Picker;
 	mafInteractor *m_OldBehavior;
 
-	medVMEPolylineEditor			*m_VMEPolylineEditor;
-	medVMEPolylineEditor			*m_VMEPolylineSelection;///<VME that show the selection
+	mafVMEPolylineEditor			*m_VMEPolylineEditor;
+	mafVMEPolylineEditor			*m_VMEPolylineSelection;///<VME that show the selection
 	mafPolylineGraph					*m_PolylineGraph;
 
 	mafGUI	*m_Gui;

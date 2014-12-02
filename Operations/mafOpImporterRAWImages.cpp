@@ -38,7 +38,7 @@
 #include "mafRWI.h"
 #include "mafGUIDialogPreview.h"
 #include "mafDeviceButtonsPadMouse.h"
-#include "medInteractorDICOMImporter.h"
+#include "mafInteractorDICOMImporter.h"
 #include "mafTagArray.h"
 #include "mafVMEVolumeGray.h"
 #include "mafVMEVolumeRGB.h"

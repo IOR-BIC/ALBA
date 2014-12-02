@@ -34,11 +34,11 @@ See the COPYINGS file for license details
 #include "mafSceneGraph.h"
 #include "mafVMEPolyline.h"
 #include "mafVMEOutputPolyline.h"
-#include "medVMEPolylineGraph.h"
+#include "mafVMEPolylineGraph.h"
 
-#include "medPipeVolumeDRR.h"
-#include "medPipeVolumeMIP.h"
-#include "medPipeVolumeVR.h"
+#include "mafPipeVolumeDRR.h"
+#include "mafPipeVolumeMIP.h"
+#include "mafPipeVolumeVR.h"
 #include "mafPipeIsosurface.h"
 
 #include "vtkDataSet.h"
@@ -74,9 +74,9 @@ mafCxxTypeMacro(mafViewSliceOnCurve);
 //3D volume pipes to be plugged
 /*static*/ const mafViewSliceOnCurve::VPIPE_ENTRY mafViewSliceOnCurve::m_VolumePipes[] = 
 {
-  {"medPipeVolumeDRR", "DRR"},
-  {"medPipeVolumeMIP", "MIP"},
-  {"medPipeVolumeVR", "VR"},
+  {"mafPipeVolumeDRR", "DRR"},
+  {"mafPipeVolumeMIP", "MIP"},
+  {"mafPipeVolumeVR", "VR"},
   {"mafPipeIsosurface", "ISO"},
   {NULL, NULL},  
 };
@@ -187,7 +187,7 @@ void mafViewSliceOnCurve::VmeShow(mafNode *node, bool show)
 
   if (((mafVME *)node)->GetOutput()->IsA("mafVMEOutputPolyline"))
   {
-    //some polyline curve, e.g., mafVMEPolyLine or medVMEPolyLineGraph
+    //some polyline curve, e.g., mafVMEPolyLine or mafVMEPolylineGraph
     if (show)
     {
       //we may have only one curve => we will need to hide them
@@ -538,7 +538,7 @@ void mafViewSliceOnCurve::OnEvent(mafEventBase *maf_event)
     return; //already constructed  
 
   mafVMEPolyline* polyline = mafVMEPolyline::SafeDownCast(node);
-  medVMEPolylineGraph* polyline_gr = medVMEPolylineGraph::SafeDownCast(node);
+  mafVMEPolylineGraph* polyline_gr = mafVMEPolylineGraph::SafeDownCast(node);
 
   if (polyline == NULL && polyline_gr == NULL)
   {
@@ -595,8 +595,8 @@ void mafViewSliceOnCurve::OnEvent(mafEventBase *maf_event)
   m_Gizmo->SetColor(clr);
   m_Gizmo->SetConstraintPolyline((mafVME*)m_CurrentPolyLineGizmo);    
 #else
-  m_Gizmo = medGizmoPolylineGraph::New((mafVME*)m_CurrentPolyLine, this);
-  m_Gizmo->SetConstraintPolylineGraph((medVMEPolylineGraph*)m_CurrentPolyLineGizmo);
+  m_Gizmo = mafGizmoPolylineGraph::New((mafVME*)m_CurrentPolyLine, this);
+  m_Gizmo->SetConstraintPolylineGraph((mafVMEPolylineGraph*)m_CurrentPolyLineGizmo);
 #endif
 
   m_ChildViewList[POLYLINE_VIEW]->VmeShow(m_Gizmo->GetOutput(), true);
@@ -793,7 +793,7 @@ void mafViewSliceOnCurve::SetSlicePosition(double abscisa, vtkIdType branchId)
     {
       mafViewVTK* v = ((mafViewVTK*)vws[MAIN_VIEW]);
       v->PlugVisualPipe("mafVMEVolumeGray", m_VolumePipes[m_VolumePipeConfiguration].szClassName, MUTEX);	
-      v->PlugVisualPipe("medVMELabeledVolume", m_VolumePipes[m_VolumePipeConfiguration].szClassName, MUTEX);
+      v->PlugVisualPipe("mafVMELabeledVolume", m_VolumePipes[m_VolumePipeConfiguration].szClassName, MUTEX);
       v->PlugVisualPipe("mafVMEVolumeRGB", m_VolumePipes[m_VolumePipeConfiguration].szClassName, MUTEX);
       v->PlugVisualPipe("mafVMEVolumeLarge", m_VolumePipes[m_VolumePipeConfiguration].szClassName, MUTEX);
     }
@@ -802,7 +802,7 @@ void mafViewSliceOnCurve::SetSlicePosition(double abscisa, vtkIdType branchId)
     {	
       mafViewVTK* vs = ((mafViewVTK*)vws[SLICE_VIEW]);
       vs->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice_BES", MUTEX);
-      vs->PlugVisualPipe("medVMELabeledVolume", "mafPipeVolumeSlice_BES", MUTEX);
+      vs->PlugVisualPipe("mafVMELabeledVolume", "mafPipeVolumeSlice_BES", MUTEX);
       vs->PlugVisualPipe("mafVMEVolumeRGB", "mafPipeVolumeSlice_BES", MUTEX);
       vs->PlugVisualPipe("mafVMEVolumeLarge", "mafPipeVolumeSlice_BES", MUTEX);
     }
@@ -851,7 +851,7 @@ void mafViewSliceOnCurve::SetSlicePosition(double abscisa, vtkIdType branchId)
     {	
       mafViewVTK* vs = ((mafViewVTK*)vws[POLYLINE_VIEW]);
       vs->PlugVisualPipe("mafVMEPolyline", "mafPipePolyline", MUTEX);	  
-      vs->PlugVisualPipe("medVMEPolylineGraph", "medVisualPipePolylineGraph", MUTEX);	
+      vs->PlugVisualPipe("mafVMEPolylineGraph", "mafVisualPipePolylineGraph", MUTEX);	
     }
   }
 }

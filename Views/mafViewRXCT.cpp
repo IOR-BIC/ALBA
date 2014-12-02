@@ -39,7 +39,7 @@
 #include "mafVMEVolume.h"
 #include "mafVMESurface.h"
 #include "mafVMESurfaceParametric.h"
-#include "medVisualPipeSlicerSlice.h"
+#include "mafVisualPipeSlicerSlice.h"
 #include "mafDeviceButtonsPadMouse.h"
 
 #include "vtkDataSet.h"
@@ -524,12 +524,12 @@ void mafViewRXCT::OnEventSetThickness()
     mafPipe *p=((mafViewSlice *)((mafViewCompound *)m_ChildViewList[2])->GetSubView(0))->GetNodePipe(node);
     ((mafPipeSurfaceSlice *)p)->SetThickness(m_Border);
 
-    if(medVisualPipeSlicerSlice *pipe = medVisualPipeSlicerSlice::SafeDownCast(m_ChildViewList[RX_FRONT_VIEW]->GetNodePipe(node)))
+    if(mafVisualPipeSlicerSlice *pipe = mafVisualPipeSlicerSlice::SafeDownCast(m_ChildViewList[RX_FRONT_VIEW]->GetNodePipe(node)))
     {
       pipe->SetThickness(m_Border);
     }
 
-    if(medVisualPipeSlicerSlice *pipe = medVisualPipeSlicerSlice::SafeDownCast(m_ChildViewList[RX_SIDE_VIEW]->GetNodePipe(node)))
+    if(mafVisualPipeSlicerSlice *pipe = mafVisualPipeSlicerSlice::SafeDownCast(m_ChildViewList[RX_SIDE_VIEW]->GetNodePipe(node)))
     {
       pipe->SetThickness(m_Border);
     }
@@ -842,10 +842,10 @@ void mafViewRXCT::PackageView()
     // create to the child view
     m_ViewsRX[v] = new mafViewRX("RX child view", cam_pos[v]);
     m_ViewsRX[v]->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeProjected",MUTEX);
-    m_ViewsRX[v]->PlugVisualPipe("medVMELabeledVolume", "mafPipeVolumeProjected",MUTEX);
-    m_ViewsRX[v]->PlugVisualPipe("mafVMESlicer", "medVisualPipeSlicerSlice",MUTEX);
+    m_ViewsRX[v]->PlugVisualPipe("mafVMELabeledVolume", "mafPipeVolumeProjected",MUTEX);
+    m_ViewsRX[v]->PlugVisualPipe("mafVMESlicer", "mafVisualPipeSlicerSlice",MUTEX);
     m_ViewsRX[v]->PlugVisualPipe("mafVMEVolumeLarge", "mafPipeVolumeProjected",MUTEX);
-    m_ViewsRX[v]->PlugVisualPipe("medVMESegmentationVolume", "mafPipeVolumeProjected",MUTEX);
+    m_ViewsRX[v]->PlugVisualPipe("mafVMESegmentationVolume", "mafPipeVolumeProjected",MUTEX);
     
     PlugChildView(m_ViewsRX[v]);
   }
@@ -853,7 +853,7 @@ void mafViewRXCT::PackageView()
   m_ViewCTCompound = new mafViewCompound("CT view",3,2);
   mafViewSlice *vs = new mafViewSlice("Slice view", CAMERA_CT);
   vs->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice_BES",MUTEX);
-  vs->PlugVisualPipe("medVMELabeledVolume", "mafPipeVolumeSlice_BES",MUTEX);
+  vs->PlugVisualPipe("mafVMELabeledVolume", "mafPipeVolumeSlice_BES",MUTEX);
   vs->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice",MUTEX);
   vs->PlugVisualPipe("mafVMEPolyline", "mafPipePolylineSlice",MUTEX);
   vs->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice",MUTEX);
@@ -864,7 +864,7 @@ void mafViewRXCT::PackageView()
   vs->PlugVisualPipe("mafVMEMeter", "mafPipePolylineSlice",MUTEX);
   vs->PlugVisualPipe("mafVMEWrappedMeter", "mafPipePolylineSlice",MUTEX);
   vs->PlugVisualPipe("mafVMEVolumeLarge", "mafPipeVolumeSlice_BES",MUTEX);
-  vs->PlugVisualPipe("medVMESegmentationVolume", "mafPipeVolumeSlice_BES",MUTEX);
+  vs->PlugVisualPipe("mafVMESegmentationVolume", "mafPipeVolumeSlice_BES",MUTEX);
  
   m_ViewCTCompound->PlugChildView(vs);
   PlugChildView(m_ViewCTCompound);

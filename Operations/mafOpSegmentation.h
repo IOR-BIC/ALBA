@@ -20,7 +20,7 @@
 #include "mafOp.h"
 #include "mafMatrix.h"
 #include "mafNode.h"
-#include "medVMESegmentationVolume.h"
+#include "mafVMESegmentationVolume.h"
 #include "mafDefines.h"
 #include "vtkSystemIncludes.h"
 #include "wx/gauge.h"
@@ -30,7 +30,7 @@
 // forward references :
 //----------------------------------------------------------------------------
 class mafAction;
-class medDeviceButtonsPadMouseDialog;
+class mafDeviceButtonsPadMouseDialog;
 class mafDeviceManager;
 class mafEvent;
 class mafGUIDialog;
@@ -55,13 +55,13 @@ class mafNode;
 class mmiSelectPoint;
 
 class mafViewSliceGlobal;
-class medVMESegmentationVolume;
+class mafVMESegmentationVolume;
 class mafVMESurface;
 
-class medInteractorPERScalarInformation;
+class mafInteractorPERScalarInformation;
 
-class medInteractorSegmentationPicker;
-class medInteractorPERBrushFeedback;
+class mafInteractorSegmentationPicker;
+class mafInteractorPERBrushFeedback;
 
 class vtkLookupTable;
 class vtkActor2D;
@@ -212,8 +212,8 @@ public:
   /** Makes the undo for the operation. */
   void OpUndo();
 
-  /** Return true if node is of type medVMESegmentationVolume. */
-  static bool SegmentationVolumeAccept(mafNode* node) {return(node != NULL  && node->IsMAFType(medVMESegmentationVolume));};
+  /** Return true if node is of type mafVMESegmentationVolume. */
+  static bool SegmentationVolumeAccept(mafNode* node) {return(node != NULL  && node->IsMAFType(mafVMESegmentationVolume));};
 
   /** Return true if node is of type mafVMEVolume. */
   static bool SegmentedVolumeAccept(mafNode* node);
@@ -376,7 +376,7 @@ protected:
   wxComboBox *m_OperationsList;         //<List if operations (not used)
   mafInteractor *m_OldBehavior;         //<Old volume behavior
   mafNode *m_OldVolumeParent;           //<Old volume parent
-  medDeviceButtonsPadMouseDialog* m_DialogMouse; //<Dialog mouse
+  mafDeviceButtonsPadMouseDialog* m_DialogMouse; //<Dialog mouse
   mafDeviceManager *m_DeviceManager;    //<Device manager
   mafInteractorSER *m_SER;              //<Static event router                        
   mafMatrix m_Matrix;                   //<Volume initial matrix
@@ -388,7 +388,7 @@ protected:
   mafVMEVolumeGray *m_OutputVolume;     //<Output volume
   mafVMESurface *m_OutputSurface;          //<Output Surface
   wxStaticText *m_SnippetsLabel;        //<Suggestion labels - GUI
-  medInteractorSegmentationPicker *m_SegmentationPicker; //<Segmentation picker for interaction
+  mafInteractorSegmentationPicker *m_SegmentationPicker; //<Segmentation picker for interaction
 
   //////////////////////////////////////////////////////////////////////////
   //Manual segmentation stuff
@@ -454,7 +454,7 @@ protected:
   std::vector<UndoRedoState> m_ManualUndoList;  //< Undo stack
   std::vector<UndoRedoState> m_ManualRedoList;  // Redo stack
   bool m_PickingStarted;                        //<Determine if picking has started
-  medInteractorPERBrushFeedback *m_ManualPER;   //<Dynamic event router
+  mafInteractorPERBrushFeedback *m_ManualPER;   //<Dynamic event router
   double m_CurrentBrushMoveEventCount;          //<Id for mouse move event raised by the brush
   vtkUnsignedCharArray *m_RealDrawnImage;       //<Real drawn image used in brush preview
   int m_LastMouseMovePointID;                   //<Last point id in mouse move event
@@ -514,7 +514,7 @@ protected:
   /** Update threshold real-time preview*/
   void UpdateThresholdRealTimePreview();
 
-  medVMESegmentationVolume *m_SegmentatedVolume; //<Segmentation volume
+  mafVMESegmentationVolume *m_SegmentatedVolume; //<Segmentation volume
   int m_AutomaticGlobalThreshold;   //<Global threshold range lower bound
   double m_AutomaticThreshold;      //<Global threshold range lower bound
   double m_AutomaticUpperThreshold; //<Global threshold range upper bound
@@ -540,7 +540,7 @@ protected:
   vtkTextMapper *m_AutomaticSliceTextMapper;    //<Text mapper for slice visualization
   vtkActor2D *m_AutomaticSliceTextActor;        //<Text mapper for slice visualization
 
-  medInteractorPERScalarInformation *m_AutomaticPER; //<Interactor for scalar value visualization on mouse move
+  mafInteractorPERScalarInformation *m_AutomaticPER; //<Interactor for scalar value visualization on mouse move
   //////////////////////////////////////////////////////////////////////////
 
   //////////////////////////////////////////////////////////////////////////

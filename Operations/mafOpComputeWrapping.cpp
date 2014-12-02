@@ -27,7 +27,7 @@
 #include "mafDecl.h"
 #include "mafEvent.h"
 
-#include "medVMEComputeWrapping.h"
+#include "mafVMEComputeWrapping.h"
 
 //----------------------------------------------------------------------------
 // Constants :

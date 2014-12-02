@@ -43,7 +43,7 @@
 #include "mafGizmoSlice.h"
 #include "mafVMEGizmo.h"
 #include "mafPipeSurfaceSlice.h"
-#include "medVisualPipeSlicerSlice.h"
+#include "mafVisualPipeSlicerSlice.h"
 #include "mafPipePolylineSlice.h"
 #include "mafPipePolyline.h"
 #include "mafDeviceButtonsPadMouse.h"
@@ -472,10 +472,10 @@ void mafViewOrthoSlice::PackageView()
   {
     m_Views[v] = new mafViewSlice(viewName[v], cam_pos[v],false,false,false,0,TICKs[v]);
     m_Views[v]->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice_BES", MUTEX);    
-    m_Views[v]->PlugVisualPipe("medVMELabeledVolume", "mafPipeVolumeSlice_BES", MUTEX);
+    m_Views[v]->PlugVisualPipe("mafVMELabeledVolume", "mafPipeVolumeSlice_BES", MUTEX);
     m_Views[v]->PlugVisualPipe("mafVMEVolumeLarge", "mafPipeVolumeSlice_BES", MUTEX);   //BES: 3.11.2009
 		m_Views[v]->PlugVisualPipe("mafVMEImage", "mafPipeBox", NON_VISIBLE);
-    m_Views[v]->PlugVisualPipe("medVMESegmentationVolume", "mafPipeVolumeSlice_BES", MUTEX);
+    m_Views[v]->PlugVisualPipe("mafVMESegmentationVolume", "mafPipeVolumeSlice_BES", MUTEX);
     // plug surface slice visual pipe in not perspective views
     if (v != PERSPECTIVE_VIEW)
     {
@@ -678,15 +678,15 @@ void mafViewOrthoSlice::OnEventSetThickness()
 			pipe->SetThickness(m_Border);
 		}
 
-		if(medVisualPipeSlicerSlice *pipe = medVisualPipeSlicerSlice::SafeDownCast(m_ChildViewList[CHILD_XN_VIEW]->GetNodePipe(node)))
+		if(mafVisualPipeSlicerSlice *pipe = mafVisualPipeSlicerSlice::SafeDownCast(m_ChildViewList[CHILD_XN_VIEW]->GetNodePipe(node)))
 		{
 			pipe->SetThickness(m_Border);
 		}
-		if(medVisualPipeSlicerSlice *pipe = medVisualPipeSlicerSlice::SafeDownCast(m_ChildViewList[CHILD_YN_VIEW]->GetNodePipe(node)))
+		if(mafVisualPipeSlicerSlice *pipe = mafVisualPipeSlicerSlice::SafeDownCast(m_ChildViewList[CHILD_YN_VIEW]->GetNodePipe(node)))
 		{
 			pipe->SetThickness(m_Border);
 		}
-		if(medVisualPipeSlicerSlice *pipe = medVisualPipeSlicerSlice::SafeDownCast(m_ChildViewList[CHILD_ZN_VIEW]->GetNodePipe(node)))
+		if(mafVisualPipeSlicerSlice *pipe = mafVisualPipeSlicerSlice::SafeDownCast(m_ChildViewList[CHILD_ZN_VIEW]->GetNodePipe(node)))
 		{
 			pipe->SetThickness(m_Border);
 		}

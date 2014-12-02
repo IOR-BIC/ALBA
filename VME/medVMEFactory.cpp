@@ -26,20 +26,20 @@
 
 #include "mafVersion.h"
 
-#include "medVMEWrappedMeter.h"
-#include "medVMEPolylineGraph.h"
-#include "medVMEPolylineEditor.h"
-#include "medVMEMaps.h"
+#include "mafVMEWrappedMeter.h"
+#include "mafVMEPolylineGraph.h"
+#include "mafVMEPolylineEditor.h"
+#include "mafVMEMaps.h"
 
-#include "medVMESurfaceEditor.h"
-#include "medVMELabeledVolume.h"
-#include "medVMESegmentationVolume.h"
-#include "medAttributeSegmentationVolume.h"
+#include "mafVMESurfaceEditor.h"
+#include "mafVMELabeledVolume.h"
+#include "mafVMESegmentationVolume.h"
+#include "mafAttributeSegmentationVolume.h"
 
 #ifdef MAF_USE_ITK
   #include "mafVMERawMotionData.h"
-  #include "medVMEAnalog.h"
-  #include "medVMEStent.h"
+  #include "mafVMEAnalog.h"
+  #include "mafVMEStent.h"
 #endif
 
 #include "mafVMEVolumeLarge.h"
@@ -87,20 +87,20 @@ medVMEFactory::medVMEFactory()
   
 #endif
   //mafPlugObjectMacro(mmaObject,"Object attributes");
-  mafPlugObjectMacro(medAttributeSegmentationVolume,"Segmentation Volume attributes");
+  mafPlugObjectMacro(mafAttributeSegmentationVolume,"Segmentation Volume attributes");
 
-  mafPlugNodeMacro(medVMEWrappedMeter,"Generalized VME Meter with wrapping geometry");
-  mafPlugNodeMacro(medVMEPolylineGraph,"VME for Graph and Polyline");
-	mafPlugNodeMacro(medVMEPolylineEditor,"VME for Editing Graph and Polyline");
- 	mafPlugNodeMacro(medVMESurfaceEditor,"VME for Editing Surface");
-  mafPlugNodeMacro(medVMELabeledVolume,"VME representing a label put on a volume");
-  mafPlugNodeMacro(medVMEMaps, "VME representing density-distace surface scalars");
-  mafPlugNodeMacro(medVMESegmentationVolume, "VME for Segmented Volume");
+  mafPlugNodeMacro(mafVMEWrappedMeter,"Generalized VME Meter with wrapping geometry");
+  mafPlugNodeMacro(mafVMEPolylineGraph,"VME for Graph and Polyline");
+	mafPlugNodeMacro(mafVMEPolylineEditor,"VME for Editing Graph and Polyline");
+ 	mafPlugNodeMacro(mafVMESurfaceEditor,"VME for Editing Surface");
+  mafPlugNodeMacro(mafVMELabeledVolume,"VME representing a label put on a volume");
+  mafPlugNodeMacro(mafVMEMaps, "VME representing density-distace surface scalars");
+  mafPlugNodeMacro(mafVMESegmentationVolume, "VME for Segmented Volume");
 
 #ifdef MAF_USE_ITK
   mafPlugNodeMacro(mafVMERawMotionData,"VME that is a group for RawMotionData");
-  mafPlugNodeMacro(medVMEAnalog,"VME rapresenting EMG scalar data");
-  mafPlugNodeMacro(medVMEStent,"VME representing stent structure");
+  mafPlugNodeMacro(mafVMEAnalog,"VME rapresenting EMG scalar data");
+  mafPlugNodeMacro(mafVMEStent,"VME representing stent structure");
 #endif
   //mafPlugNodeMacro(mafVMEthing,"VME representing a thing");
   

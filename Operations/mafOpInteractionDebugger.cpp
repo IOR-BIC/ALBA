@@ -48,8 +48,8 @@
 #include "vtkCellArray.h"
 #include "vtkPolyData.h"
 #include "vtkMath.h"
-#include "medGizmoInteractionDebugger.h"
-#include "medVMEPolylineGraph.h"
+#include "mafGizmoInteractionDebugger.h"
+#include "mafVMEPolylineGraph.h"
 
 // Operation constants
 enum Mesh_Importer_ID
@@ -99,7 +99,7 @@ void mafOpInteractionDebugger::OpRun()
 
 void mafOpInteractionDebugger::CreateGui()
 {  
-  this->AddMEDVMEPolylineGraphTestConstrain1ToTree();
+  this->AddmafVMEPolylineGraphTestConstrain1ToTree();
   this->AddMEDGizmoDebuggerToTree();
 
   m_Gui = new mafGUI(this);
@@ -333,12 +333,12 @@ void mafOpInteractionDebugger::AddMAFVMEPolylineTestConstrain1ToTree()
 
 }
 
-void mafOpInteractionDebugger::AddMEDVMEPolylineGraphTestConstrain1ToTree()
+void mafOpInteractionDebugger::AddmafVMEPolylineGraphTestConstrain1ToTree()
 {
   vtkMAFSmartPointer<vtkPolyData> pd;
   BuildGraph1(pd);
 
-  medVMEPolylineGraph *polyline;
+  mafVMEPolylineGraph *polyline;
   mafNEW(polyline);
   
   polyline->SetData(pd, -1);
@@ -407,13 +407,13 @@ void mafOpInteractionDebugger::AddMEDGizmoDebuggerToTree()
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 
   // build constrained gizmo
-  m_GizmoDebugger = new medGizmoInteractionDebugger(vmeRoot, this, "test gizmo path");
+  m_GizmoDebugger = new mafGizmoInteractionDebugger(vmeRoot, this, "test gizmo path");
 
   m_GizmoDebugger->SetGizmoLength(2);
 
-  if (constraint->IsA("medVMEPolylineGraph"))
+  if (constraint->IsA("mafVMEPolylineGraph"))
   {
-    medVMEPolylineGraph *polylineGraph = medVMEPolylineGraph::SafeDownCast(constraint);
+    mafVMEPolylineGraph *polylineGraph = mafVMEPolylineGraph::SafeDownCast(constraint);
     m_GizmoDebugger->SetConstraintPolylineGraph(polylineGraph);
   } 
   else
@@ -436,7 +436,7 @@ void mafOpInteractionDebugger::OnChooseConstrainVme( mafNode *vme )
   mafEventMacro(mafEvent(this,VME_SHOW, m_Constrain, true));
 
   m_GizmoDebugger->SetGizmoLength(2);
-  m_GizmoDebugger->SetConstraintPolylineGraph(medVMEPolylineGraph::SafeDownCast(m_Constrain));
+  m_GizmoDebugger->SetConstraintPolylineGraph(mafVMEPolylineGraph::SafeDownCast(m_Constrain));
   m_GizmoDebugger->SetCurvilinearAbscissa(m_ActiveBranchId, 0.0);
   m_GizmoDebugger->Show(true);
   

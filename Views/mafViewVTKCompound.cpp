@@ -42,7 +42,7 @@
 #include "mafVMEOutputImage.h"
 #include "mafVME.h"
 
-#include "medPipeVectorFieldMapWithArrows.h"
+#include "mafPipeVectorFieldMapWithArrows.h"
 
 #include "vtkLookupTable.h"
 #include "vtkWindowLevelLookupTable.h"
@@ -157,7 +157,7 @@ void mafViewVTKCompound::CameraUpdate()
 //-------------------------------------------------------------------------
 {
   // Added patch to update scalar and vector attributes while changing timeframe with the timebar 
-  // (valid only for medPipeVectorFieldMapWithArrows).
+  // (valid only for mafPipeVectorFieldMapWithArrows).
   mafSceneGraph* sg = GetSceneGraph();
 
   // Do it for each node attached to the view
@@ -170,9 +170,9 @@ void mafViewVTKCompound::CameraUpdate()
 
       assert(vme);
       mafPipe* maf_pipe = (mafPipe*)GetNodePipe(vme);
-      if (maf_pipe && strcmp(maf_pipe->GetTypeName(),"medPipeVectorFieldMapWithArrows")==0)
+      if (maf_pipe && strcmp(maf_pipe->GetTypeName(),"mafPipeVectorFieldMapWithArrows")==0)
       {
-        medPipeVectorFieldMapWithArrows* pipe = (medPipeVectorFieldMapWithArrows*)maf_pipe;
+        mafPipeVectorFieldMapWithArrows* pipe = (mafPipeVectorFieldMapWithArrows*)maf_pipe;
         if (pipe) {
           pipe->UpdateVTKPipe();
         }

@@ -17,7 +17,7 @@
 #include "mafDefines.h"
 
 #include "mafViewSliceNotInterpolated.h"
-#include "medPipeVolumeSliceNotInterpolated.h"
+#include "mafPipeVolumeSliceNotInterpolated.h"
 #include "mafNode.h"
 #include "mafViewVTK.h"
 #include "mafGUI.h"
@@ -56,7 +56,7 @@ mafViewSliceNotInterpolated::~mafViewSliceNotInterpolated()
 void mafViewSliceNotInterpolated::PackageView()
 //----------------------------------------------------------------------------
 {
-  PlugVisualPipe("mafVMEVolumeGray", "medPipeVolumeSliceNotInterpolated");
+  PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSliceNotInterpolated");
 }
 
 //----------------------------------------------------------------------------
@@ -68,7 +68,7 @@ mafView *mafViewSliceNotInterpolated::Copy(mafObserver *Listener, bool lightCopy
   mafViewSliceNotInterpolated *v = new mafViewSliceNotInterpolated(m_Label);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
-  v->PlugVisualPipe("mafVMEVolumeGray", "medPipeVolumeSliceNotInterpolated");
+  v->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSliceNotInterpolated");
   v->Create();
   return v;
 }
@@ -100,7 +100,7 @@ void mafViewSliceNotInterpolated::VmeShow(mafNode *node, bool show)
     if(show)
     {
       // Get the volume visual pipe
-      m_PipesSlice[node] = medPipeVolumeSliceNotInterpolated::SafeDownCast(this->GetNodePipe(node));
+      m_PipesSlice[node] = mafPipeVolumeSliceNotInterpolated::SafeDownCast(this->GetNodePipe(node));
       assert(m_PipesSlice[node]);
       // Get the vme parameters (bounds and lut)
       GetVolumeParameters(volume);
@@ -170,7 +170,7 @@ void mafViewSliceNotInterpolated::OnEvent(mafEventBase * event)
     case ID_LUT:
       {
         // Set the pipe lut
-        for(std::map<mafNode*,medPipeVolumeSliceNotInterpolated*>::iterator it = m_PipesSlice.begin(); it != m_PipesSlice.end(); it++)
+        for(std::map<mafNode*,mafPipeVolumeSliceNotInterpolated*>::iterator it = m_PipesSlice.begin(); it != m_PipesSlice.end(); it++)
         {
           it->second->SetLut(m_ColorLUT);
         }
@@ -185,7 +185,7 @@ void mafViewSliceNotInterpolated::OnEvent(mafEventBase * event)
     case ID_SLICE:
       {
         // Update the pipe
-        for(std::map<mafNode*,medPipeVolumeSliceNotInterpolated*>::iterator it = m_PipesSlice.begin(); it != m_PipesSlice.end(); it++)
+        for(std::map<mafNode*,mafPipeVolumeSliceNotInterpolated*>::iterator it = m_PipesSlice.begin(); it != m_PipesSlice.end(); it++)
         {
           it->second->SetSlice(m_CurrentSlice,m_SliceAxis);
         }
@@ -195,7 +195,7 @@ void mafViewSliceNotInterpolated::OnEvent(mafEventBase * event)
       {
         Superclass::OnEvent(event);
         // Set the pipe lut
-        for(std::map<mafNode*,medPipeVolumeSliceNotInterpolated*>::iterator it = m_PipesSlice.begin(); it != m_PipesSlice.end(); it++)
+        for(std::map<mafNode*,mafPipeVolumeSliceNotInterpolated*>::iterator it = m_PipesSlice.begin(); it != m_PipesSlice.end(); it++)
         {
           it->second->SetLut(m_ColorLUT);
         }
@@ -277,7 +277,7 @@ void mafViewSliceNotInterpolated::UpdateSlice()
 //----------------------------------------------------------------------------
 {
   // Update the pipe
-  for(std::map<mafNode*,medPipeVolumeSliceNotInterpolated*>::iterator it = m_PipesSlice.begin(); it != m_PipesSlice.end(); it++)
+  for(std::map<mafNode*,mafPipeVolumeSliceNotInterpolated*>::iterator it = m_PipesSlice.begin(); it != m_PipesSlice.end(); it++)
   {
     it->second->SetSlice(m_CurrentSlice,m_SliceAxis);
   }

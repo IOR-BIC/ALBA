@@ -49,92 +49,92 @@ SET(PROJECT_SRCS
   ###############
   medVMEFactory.cpp 
   medVMEFactory.h
-  medVMELabeledVolume.cpp
-  medVMELabeledVolume.h
+  mafVMELabeledVolume.cpp
+  mafVMELabeledVolume.h
   medPipeFactoryVME.cpp
   medPipeFactoryVME.h
 
-  medPipeVolumeMIP.cpp
-  medPipeVolumeMIP.h
-  medPipeDensityDistance.cpp
-  medPipeDensityDistance.h
-  medPipeTrajectories.cpp
-  medPipeTrajectories.h
-  medPipeVolumeDRR.cpp
-  medPipeVolumeDRR.h
-  medPipeVolumeVR.cpp
-  medPipeVolumeVR.h
+  mafPipeVolumeMIP.cpp
+  mafPipeVolumeMIP.h
+  mafPipeDensityDistance.cpp
+  mafPipeDensityDistance.h
+  mafPipeTrajectories.cpp
+  mafPipeTrajectories.h
+  mafPipeVolumeDRR.cpp
+  mafPipeVolumeDRR.h
+  mafPipeVolumeVR.cpp
+  mafPipeVolumeVR.h
 
   # mafPolylineGraph.cpp
   # mafPolylineGraph.h
-  medVMEPolylineGraph.cpp
-  medVMEPolylineGraph.h
-  medVMEPolylineEditor.cpp
-  medVMEPolylineEditor.h
-  medPipePolylineGraphEditor.cpp
-  medPipePolylineGraphEditor.h
-  medVMEOutputPolylineEditor.cpp
-  medVMEOutputPolylineEditor.h
-  medVMEMaps.cpp
-  medVMEMaps.h
+  mafVMEPolylineGraph.cpp
+  mafVMEPolylineGraph.h
+  mafVMEPolylineEditor.cpp
+  mafVMEPolylineEditor.h
+  mafPipePolylineGraphEditor.cpp
+  mafPipePolylineGraphEditor.h
+  mafVMEOutputPolylineEditor.cpp
+  mafVMEOutputPolylineEditor.h
+  mafVMEMaps.cpp
+  mafVMEMaps.h
   
-  medVMEWrappedMeter.cpp
-  medVMEWrappedMeter.h
-  medVMEOutputWrappedMeter.cpp
-  medVMEOutputWrappedMeter.h
-  medPipeWrappedMeter.cpp
-  medPipeWrappedMeter.h
+  mafVMEWrappedMeter.cpp
+  mafVMEWrappedMeter.h
+  mafVMEOutputWrappedMeter.cpp
+  mafVMEOutputWrappedMeter.h
+  mafPipeWrappedMeter.cpp
+  mafPipeWrappedMeter.h
 
-  medVMESurfaceEditor.cpp
-  medVMESurfaceEditor.h
-  medPipeSurfaceEditor.cpp
-  medPipeSurfaceEditor.h
-  medVMEOutputSurfaceEditor.cpp
-  medVMEOutputSurfaceEditor.h
+  mafVMESurfaceEditor.cpp
+  mafVMESurfaceEditor.h
+  mafPipeSurfaceEditor.cpp
+  mafPipeSurfaceEditor.h
+  mafVMEOutputSurfaceEditor.cpp
+  mafVMEOutputSurfaceEditor.h
   
-  medVisualPipeSlicerSlice.cpp
-  medVisualPipeSlicerSlice.h
+  mafVisualPipeSlicerSlice.cpp
+  mafVisualPipeSlicerSlice.h
   
-  medVisualPipePolylineGraph.cpp
-  medVisualPipePolylineGraph.h
+  mafVisualPipePolylineGraph.cpp
+  mafVisualPipePolylineGraph.h
 
-  medVMEComputeWrapping.h
-  medVMEComputeWrapping.cpp
-  medPipeComputeWrapping.h
-  medPipeComputeWrapping.cpp
-  medVMEOutputComputeWrapping.cpp
-  medVMEOutputComputeWrapping.h 
+  mafVMEComputeWrapping.h
+  mafVMEComputeWrapping.cpp
+  mafPipeComputeWrapping.h
+  mafPipeComputeWrapping.cpp
+  mafVMEOutputComputeWrapping.cpp
+  mafVMEOutputComputeWrapping.h 
   
-  medPipeVectorField.cpp
-  medPipeVectorField.h
-  medPipeVectorFieldMapWithArrows.cpp
-  medPipeVectorFieldMapWithArrows.h
-  medPipeVectorFieldGlyphs.cpp
-  medPipeVectorFieldGlyphs.h
-  medPipeVectorFieldSurface.cpp
-  medPipeVectorFieldSurface.h
-  medPipeVectorFieldSlice.cpp
-  medPipeVectorFieldSlice.h
-  medPipeTensorField.cpp
-  medPipeTensorField.h
-  medPipeTensorFieldGlyphs.cpp
-  medPipeTensorFieldGlyphs.h
-  medPipeTensorFieldSurface.cpp
-  medPipeTensorFieldSurface.h
-  medPipeTensorFieldSlice.cpp
-  medPipeTensorFieldSlice.h
-  medPipeCompound.cpp
-  medPipeCompound.h
-  medPipeCompoundVolume.cpp
-  medPipeCompoundVolume.h
-  medPipeCompoundVolumeFixedScalars.cpp
-  medPipeCompoundVolumeFixedScalars.h
-  medVMESegmentationVolume.cpp
-  medVMESegmentationVolume.h
-  medDataPipeCustomSegmentationVolume.cpp
-  medDataPipeCustomSegmentationVolume.h
-  medAttributeSegmentationVolume.cpp
-  medAttributeSegmentationVolume.h
+  mafPipeVectorField.cpp
+  mafPipeVectorField.h
+  mafPipeVectorFieldMapWithArrows.cpp
+  mafPipeVectorFieldMapWithArrows.h
+  mafPipeVectorFieldGlyphs.cpp
+  mafPipeVectorFieldGlyphs.h
+  mafPipeVectorFieldSurface.cpp
+  mafPipeVectorFieldSurface.h
+  mafPipeVectorFieldSlice.cpp
+  mafPipeVectorFieldSlice.h
+  mafPipeTensorField.cpp
+  mafPipeTensorField.h
+  mafPipeTensorFieldGlyphs.cpp
+  mafPipeTensorFieldGlyphs.h
+  mafPipeTensorFieldSurface.cpp
+  mafPipeTensorFieldSurface.h
+  mafPipeTensorFieldSlice.cpp
+  mafPipeTensorFieldSlice.h
+  mafPipeCompound.cpp
+  mafPipeCompound.h
+  mafPipeCompoundVolume.cpp
+  mafPipeCompoundVolume.h
+  mafPipeCompoundVolumeFixedScalars.cpp
+  mafPipeCompoundVolumeFixedScalars.h
+  mafVMESegmentationVolume.cpp
+  mafVMESegmentationVolume.h
+  mafDataPipeCustomSegmentationVolume.cpp
+  mafDataPipeCustomSegmentationVolume.h
+  mafAttributeSegmentationVolume.cpp
+  mafAttributeSegmentationVolume.h
   
   
   ### TO BE COMMITTED DOWN ###
@@ -171,17 +171,17 @@ SET(PROJECT_SRCS
   mafVMEVolumeLargeUtils.h  
   ###############################################################
 
-  medPipeVolumeSliceBlend.cpp
-  medPipeVolumeSliceBlend.h
+  mafPipeVolumeSliceBlend.cpp
+  mafPipeVolumeSliceBlend.h
 
-  medVisualPipeCollisionDetection.cpp
-  medVisualPipeCollisionDetection.h
+  mafVisualPipeCollisionDetection.cpp
+  mafVisualPipeCollisionDetection.h
 
-  medPipeVolumeSliceNotInterpolated.cpp
-  medPipeVolumeSliceNotInterpolated.h
+  mafPipeVolumeSliceNotInterpolated.cpp
+  mafPipeVolumeSliceNotInterpolated.h
   
-  medPipeRayCast.cpp
-  medPipeRayCast.h
+  mafPipeRayCast.cpp
+  mafPipeRayCast.h
 )
 
 IF (MAF_USE_CRYPTO)
@@ -296,14 +296,14 @@ IF (MAF_USE_VTK)
   ###########
   mafVMERawMotionData.cpp
   mafVMERawMotionData.h
-  medPipeGraph.cpp
-  medPipeGraph.h
-  medVMEAnalog.cpp
-  medVMEAnalog.h
+  mafPipeGraph.cpp
+  mafPipeGraph.h
+  mafVMEAnalog.cpp
+  mafVMEAnalog.h
   
  #add for stent
-  medVMEStent.cpp
-  medVMEStent.h
+  mafVMEStent.cpp
+  mafVMEStent.h
 
   #stent used tool, to find nearest point
   kdtree.c

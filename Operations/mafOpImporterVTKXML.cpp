@@ -25,7 +25,7 @@
 #include "mafOpImporterVTKXML.h"
 #include <wx/busyinfo.h>
 
-#include "medVMEPolylineGraph.h"
+#include "mafVMEPolylineGraph.h"
 
 #include "mafVMEGeneric.h"
 #include "mafVMEImage.h"

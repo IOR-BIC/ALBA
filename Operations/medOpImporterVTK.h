@@ -26,12 +26,12 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class medVMEPolylineGraph;
+class mafVMEPolylineGraph;
 
 /**
 class name: medOpImporterVTK
 The same importer of the MAF , but polylines are stored inside 
-the medVMEPolylineGraph instead mafVMEPolyline*/
+the mafVMEPolylineGraph instead mafVMEPolyline*/
 class MAF_EXPORT medOpImporterVTK: public mafOpImporterVTK 
 {
 public:
@@ -55,6 +55,6 @@ public:
 
 protected:
 
-  medVMEPolylineGraph   *m_VmePolyLine;
+  mafVMEPolylineGraph   *m_VmePolyLine;
 };
 #endif

@@ -26,7 +26,7 @@
 #include <wx/busyinfo.h>
 
 #include "mafVME.h"
-#include "medVMEPolylineGraph.h"
+#include "mafVMEPolylineGraph.h"
 
 #include "mafTagArray.h"
 

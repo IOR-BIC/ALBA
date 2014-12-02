@@ -37,7 +37,7 @@ class mafAttachCamera;
 class mafGUI;
 class mafGUILutSlider;
 class mafGUILutSwatch;
-class medVMEPolylineEditor;
+class mafVMEPolylineEditor;
 
 /** 
 Class Name: mafViewArbitrarySlice.
@@ -137,7 +137,7 @@ protected:
 
 	mafGUI				*m_GuiGizmos;
 
-	medVMEPolylineEditor *m_CurrentPolylineGraphEditor;
+	mafVMEPolylineEditor *m_CurrentPolylineGraphEditor;
 
 	int m_TrilinearInterpolationOn;
 };

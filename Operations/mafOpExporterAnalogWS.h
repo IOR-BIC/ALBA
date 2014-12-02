@@ -22,17 +22,17 @@
 //----------------------------------------------------------------------------
 #include "mafDefines.h"
 #include "mafOp.h"
-#include "medVMEAnalog.h"
+#include "mafVMEAnalog.h"
 
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
 
-class medVMEAnalog;
+class mafVMEAnalog;
 
 /** 
 class name: mafOpExporterAnalogWS
-/** Export analog signals from a medVMEAnalog VME */
+/** Export analog signals from a mafVMEAnalog VME */
 class MAF_EXPORT mafOpExporterAnalogWS : public mafOp
 {
 public:
@@ -79,7 +79,7 @@ public:
   void SetFileName(const char *file_name){m_File = file_name;};
 
 protected:
-  medVMEAnalog* m_Analog;
+  mafVMEAnalog* m_Analog;
 	wxString m_File;
 };
 #endif

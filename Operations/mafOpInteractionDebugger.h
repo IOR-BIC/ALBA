@@ -14,8 +14,8 @@
 
 =========================================================================*/
 
-#ifndef __medGizmoInteractionDebugger_H__
-#define __medGizmoInteractionDebugger_H__
+#ifndef __mafGizmoInteractionDebugger_H__
+#define __mafGizmoInteractionDebugger_H__
 
 //----------------------------------------------------------------------------
 // Include :
@@ -24,14 +24,14 @@
 #include "mafOp.h"
 #include "vtkPoints.h"
 #include "mafVMEPolyline.h"
-#include "medVMEPolylineGraph.h"
+#include "mafVMEPolylineGraph.h"
 
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
 class mafVME;
 class mafEvent;
-class medGizmoInteractionDebugger;
+class mafGizmoInteractionDebugger;
 
 /** Facility for medical interaction stuff debug:  this class should be expanded and
 refactored incrementally to ease interaction stuff debug */
@@ -55,7 +55,7 @@ public:
 
 	
   static bool ConstrainAccept(mafNode* node) {return (node != NULL && \
-    (node->IsMAFType(medVMEPolylineGraph))) ;};
+    (node->IsMAFType(mafVMEPolylineGraph))) ;};
 
   void OpDo();
 
@@ -75,9 +75,9 @@ private:
 	void AddMAFVMEPolylineTestConstrain3ToTree();
   void AddMEDGizmoDebuggerToTree();
 	void BuildGraph1( vtkPolyData *inputPolyData );
-	void AddMEDVMEPolylineGraphTestConstrain1ToTree();
+	void AddmafVMEPolylineGraphTestConstrain1ToTree();
   void RemoveTestConstraintGraph1FromTree();
-  medGizmoInteractionDebugger *m_GizmoDebugger;
+  mafGizmoInteractionDebugger *m_GizmoDebugger;
   mafVME *m_Constrain;
 
   vtkIdType m_ActiveBranchId;

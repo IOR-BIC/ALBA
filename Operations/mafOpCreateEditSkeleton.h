@@ -27,7 +27,7 @@
 // forward references :
 //----------------------------------------------------------------------------
 class mafVME;
-class medVMEPolylineGraph;
+class mafVMEPolylineGraph;
 class mafGeometryEditorPolylineGraph;
 class vtkPolyData;
 
@@ -71,7 +71,7 @@ protected:
   /** Internally used to create a new instance of the GUI.*/
 	void CreateGui();
 
-	medVMEPolylineGraph	*m_Skeleton;
+	mafVMEPolylineGraph	*m_Skeleton;
 	vtkPolyData					*m_ResultPolydata;
 
 	mafGeometryEditorPolylineGraph *m_Editor;

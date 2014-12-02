@@ -31,8 +31,8 @@
 #include "mafVMERoot.h"
 #include "mafVMEMeter.h"
 #include "mafVMEOutputMeter.h"
-#include "medVMEWrappedMeter.h"
-#include "medVMEOutputWrappedMeter.h"
+#include "mafVMEWrappedMeter.h"
+#include "mafVMEOutputWrappedMeter.h"
 #include "mafNodeIterator.h"
 
 #include "vtkDataSet.h"
@@ -83,7 +83,7 @@ bool mafOpExporterMeters::Accept(mafNode *node)
 { 
   bool inputVMEAccepted = false;
 
-  if (node->IsA("medVMEWrappedMeter"))
+  if (node->IsA("mafVMEWrappedMeter"))
   {
     inputVMEAccepted = true;
   }
@@ -233,7 +233,7 @@ void mafOpExporterMeters::ExportTypeOfMeters()
     {
       m_Meters.push_back(node);
     }
-    else if((m_ExportRadio == VME_WRAPPED_METERS || m_ExportRadio == VME_ALL_METERS) && node->IsA("medVMEWrappedMeter"))
+    else if((m_ExportRadio == VME_WRAPPED_METERS || m_ExportRadio == VME_ALL_METERS) && node->IsA("mafVMEWrappedMeter"))
     {
       m_Meters.push_back(node);
     }
@@ -281,7 +281,7 @@ void mafOpExporterMeters::ExportMeter()
       {
         ExportClassicMeterCoordinates(i,j);
       }
-      else if(medVMEWrappedMeter::SafeDownCast(m_CurrentVme))
+      else if(mafVMEWrappedMeter::SafeDownCast(m_CurrentVme))
       {
         ExportWrappedMeterCoordinates(i,j);
       }
@@ -335,7 +335,7 @@ void mafOpExporterMeters::ExportWrappedMeterCoordinates(int index, int indexTime
   int wrappedModality;
 
   //wrapped meter
-  medVMEWrappedMeter *vmeWrappedMeter =  medVMEWrappedMeter::SafeDownCast(m_CurrentVme);
+  mafVMEWrappedMeter *vmeWrappedMeter =  mafVMEWrappedMeter::SafeDownCast(m_CurrentVme);
   vmeWrappedMeter->GetOutput()->GetVTKData()->Modified();
   vmeWrappedMeter->GetOutput()->GetVTKData()->Update();
   vmeWrappedMeter->Modified();
@@ -346,20 +346,20 @@ void mafOpExporterMeters::ExportWrappedMeterCoordinates(int index, int indexTime
   if(indexTime == 0)
   {
     vnl_matrix<double> M;
-    if(wrappedModality == medVMEWrappedMeter::AUTOMATED_WRAP)
+    if(wrappedModality == mafVMEWrappedMeter::AUTOMATED_WRAP)
     {
       M.set_size(12, m_Times.size());
     }
     else
     {
-      int numberOfRows = 6 + 3*medVMEWrappedMeter::SafeDownCast(m_CurrentVme)->GetNumberMiddlePoints();
+      int numberOfRows = 6 + 3*mafVMEWrappedMeter::SafeDownCast(m_CurrentVme)->GetNumberMiddlePoints();
       M.set_size(numberOfRows, m_Times.size());
     }
     m_MetersCoordinatesList.push_back(M);
   }
 
   
-  if(wrappedModality == medVMEWrappedMeter::AUTOMATED_WRAP)
+  if(wrappedModality == mafVMEWrappedMeter::AUTOMATED_WRAP)
   {
     //origin
     double *value = vmeWrappedMeter->GetStartPointCoordinate();
@@ -382,7 +382,7 @@ void mafOpExporterMeters::ExportWrappedMeterCoordinates(int index, int indexTime
     m_MetersCoordinatesList[index].put(10,indexTime,value[1]);
     m_MetersCoordinatesList[index].put(11,indexTime,value[2]);
   }
-  else // wrappedModality == medVMEWrappedMeter::MANUAL_WRAP
+  else // wrappedModality == mafVMEWrappedMeter::MANUAL_WRAP
   {
     //origin
     double *value = vmeWrappedMeter->GetStartPointCoordinate();
@@ -469,7 +469,7 @@ bool mafOpExporterMeters::ControlExportChoose()
   {
   case VME_SELECTED_METER:
     {
-      control = (mafVMEMeter::SafeDownCast(m_Input) || medVMEWrappedMeter::SafeDownCast(m_Input));
+      control = (mafVMEMeter::SafeDownCast(m_Input) || mafVMEWrappedMeter::SafeDownCast(m_Input));
       if(control == false)
       {
         wxMessageBox("Current Vme is not a meter");

@@ -35,7 +35,7 @@
 #include "mafVMEVolume.h"
 #include "mafVMESurface.h"
 #include "mafViewSliceBlend.h"
-#include "medPipeVolumeSliceBlend.h"
+#include "mafPipeVolumeSliceBlend.h"
 
 #include "vtkDataSet.h"
 #include "vtkLookupTable.h"
@@ -258,7 +258,7 @@ void mafViewSliceBlendRX::PackageView()
   PlugChildView(m_ViewsRX);
   //Create a mafViewSliceBlend
   m_ViewSliceBlend = new mafViewSliceBlend("Blend",CAMERA_BLEND);
-  m_ViewSliceBlend->PlugVisualPipe("mafVMEVolumeGray","medPipeVolumeSliceBlend",MUTEX);
+  m_ViewSliceBlend->PlugVisualPipe("mafVMEVolumeGray","mafPipeVolumeSliceBlend",MUTEX);
 
   PlugChildView(m_ViewSliceBlend);
 }
@@ -293,8 +293,8 @@ void mafViewSliceBlendRX::LayoutSubViewCustom(int width, int height)
 void mafViewSliceBlendRX::GizmoCreate()
 //----------------------------------------------------------------------------
 {
-  // Retrieve medPipeVolumeSliceBlend to obtain slices positions
-  medPipeVolumeSliceBlend *p = medPipeVolumeSliceBlend::SafeDownCast(m_ChildViewList[BLEND_VIEW]->GetNodePipe(m_CurrentVolume));
+  // Retrieve mafPipeVolumeSliceBlend to obtain slices positions
+  mafPipeVolumeSliceBlend *p = mafPipeVolumeSliceBlend::SafeDownCast(m_ChildViewList[BLEND_VIEW]->GetNodePipe(m_CurrentVolume));
 
   if (p == NULL)
   {

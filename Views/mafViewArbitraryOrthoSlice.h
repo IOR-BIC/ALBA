@@ -63,8 +63,8 @@ class mafAttachCamera;
 class mafGUI;
 class mafGUILutSlider;
 class mafGUILutSwatch;
-class medVMEPolylineEditor;
-class medGizmoCrossRotateTranslate;
+class mafVMEPolylineEditor;
+class mafGizmoCrossRotateTranslate;
 
 /**
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -81,7 +81,7 @@ An RX projection can be performed on each axis (currently available for structur
 
 It is possible to export arbitrary volume slices as image files.
 
-@sa medGizmoCrossRotateTranslate , mafVMESlicer
+@sa mafGizmoCrossRotateTranslate , mafVMESlicer
 
 
 */
@@ -288,7 +288,7 @@ protected:
 
 	void ShowMafVMEMesh( mafNode * node );
 
-	void ShowMedVMEPolylineEditor( mafNode * node );
+	void ShowmafVMEPolylineEditor( mafNode * node );
 
 	/* Update slicer settings according to m_CurrentVolume*/
 	void UpdateSlicerZBehavior();
@@ -333,7 +333,7 @@ protected:
 
 	void RestoreCameraParametersForAllSubviews();
 
-	void OnResetMedVMEPolylineEditor();
+	void OnResetmafVMEPolylineEditor();
 	void OnResetMafVMEMesh( mafNode * node );
 	void OnResetSurfaceAndLandmark( mafNode * node );
 
@@ -361,7 +361,7 @@ protected:
 	/**	This function is called when a translate gizmo is moved*/
 	void OnEventGizmoCrossTranslateZNormalView(mafEventBase *maf_event);
 
-	void PostMultiplyEventMatrixToGizmoCross( mafEventBase * inputEvent , medGizmoCrossRotateTranslate *targetGizmo);
+	void PostMultiplyEventMatrixToGizmoCross( mafEventBase * inputEvent , mafGizmoCrossRotateTranslate *targetGizmo);
 
 	/** Recalculate the RX projection for the three slicers and display it */
 	void UpdateAllViewsThickness();
@@ -470,7 +470,7 @@ protected:
 	int m_ShowGizmo;
 	mafGUI				*m_GuiGizmos;
 
-	medVMEPolylineEditor *m_CurrentPolylineGraphEditor;
+	mafVMEPolylineEditor *m_CurrentPolylineGraphEditor;
 	mafVMESurface *m_XCameraConeVME;
 	mafVMESurface *m_YCameraConeVME;
 	mafVMESurface *m_ZCameraConeVME;
@@ -487,9 +487,9 @@ protected:
 	double m_YCameraViewUpForReset[3];
 	double m_ZCameraViewUpForReset[3];
 
-	medGizmoCrossRotateTranslate *m_GizmoZView;
-	medGizmoCrossRotateTranslate *m_GizmoYView;
-	medGizmoCrossRotateTranslate *m_GizmoXView;
+	mafGizmoCrossRotateTranslate *m_GizmoZView;
+	mafGizmoCrossRotateTranslate *m_GizmoYView;
+	mafGizmoCrossRotateTranslate *m_GizmoXView;
 
 	enum AXIS {X = 0, Y = 1, Z = 2};
 

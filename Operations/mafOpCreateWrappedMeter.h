@@ -26,13 +26,13 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class medVMEWrappedMeter;
+class mafVMEWrappedMeter;
 class mafGui;
 class mafEvent;
 
 /** 
   class name: mafOpCreateWrappedMeter
-  Operation that create a medVMEWrappedMeter for wrap muscle action lines.
+  Operation that create a mafVMEWrappedMeter for wrap muscle action lines.
 */
 class MAF_EXPORT mafOpCreateWrappedMeter: public mafOp
 {
@@ -56,6 +56,6 @@ public:
   void OpDo();
 
 protected: 
-  medVMEWrappedMeter *m_Meter;
+  mafVMEWrappedMeter *m_Meter;
 };
 #endif

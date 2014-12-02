@@ -25,7 +25,7 @@
 #include "mafNode.h"
 #include "mafVMESurface.h"
 
-#include "medVMEPolylineGraph.h"
+#include "mafVMEPolylineGraph.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -107,7 +107,7 @@ public:
 	vtkPolyData *GetResultPolyData(){return m_ResultPolyData[m_ResultPolyData.size()-1];};
 
   static bool ConstrainAccept(mafNode* node) {return (node != NULL && \
-    (node->IsMAFType(medVMEPolylineGraph))) ;};
+    (node->IsMAFType(mafVMEPolylineGraph))) ;};
 
 protected: 
 	virtual void OpStop(int result);
@@ -193,7 +193,7 @@ protected:
 
   mafCurvilinearAbscissaOnSkeletonHelper *m_CASH;
   
-  mafVME *m_ConstrainMedVMEPolylineGraph;
+  mafVME *m_ConstrainmafVMEPolylineGraph;
 
   int m_ActiveBranchId;
 

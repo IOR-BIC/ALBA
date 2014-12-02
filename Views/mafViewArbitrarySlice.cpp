@@ -56,7 +56,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "mafGUILutSwatch.h"
 #include "mafPipeMesh.h"
 #include "mafPipeMeshSlice.h"
-#include "medPipePolylineGraphEditor.h"
+#include "mafPipePolylineGraphEditor.h"
 
 #include "vtkTransform.h"
 #include "vtkLookupTable.h"
@@ -306,17 +306,17 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 				PipeSliceViewSurface->SetNormal(normal);
 			}
 		}
-		else if(Vme->IsA("medVMEPolylineEditor"))
+		else if(Vme->IsA("mafVMEPolylineEditor"))
 		{
 			//a surface is visible only if there is a volume in the view
 			if(m_CurrentVolume)
 			{
-				m_CurrentPolylineGraphEditor = (medVMEPolylineEditor*)node;
+				m_CurrentPolylineGraphEditor = (mafVMEPolylineEditor*)node;
 
 				double normal[3];
 				((mafViewSlice*)m_ChildViewList[SLICE_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
 
-				medPipePolylineGraphEditor *PipeSliceViewPolylineEditor = medPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe(node));
+				mafPipePolylineGraphEditor *PipeSliceViewPolylineEditor = mafPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe(node));
 				PipeSliceViewPolylineEditor->SetModalitySlice();
 
 				double surfaceOriginTranslated[3];
@@ -361,7 +361,7 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 	}
 	else//if show=false
 	{
-		if(Vme->IsA("medVMEPolylineGraphEditor"))
+		if(Vme->IsA("mafVMEPolylineGraphEditor"))
 		{
 			m_CurrentPolylineGraphEditor = NULL;
 		}
@@ -514,7 +514,7 @@ void mafViewArbitrarySlice::OnEventGizmoTranslate(mafEventBase *maf_event)
 					double normal[3];
 					((mafViewSlice*)m_ChildViewList[SLICE_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
 
-					medPipePolylineGraphEditor *PipeSliceViewPolylineEditor = medPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe((mafNode*)m_CurrentPolylineGraphEditor));
+					mafPipePolylineGraphEditor *PipeSliceViewPolylineEditor = mafPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe((mafNode*)m_CurrentPolylineGraphEditor));
 					PipeSliceViewPolylineEditor->SetModalitySlice();
 
 					double surfaceOriginTranslated[3];
@@ -607,7 +607,7 @@ void mafViewArbitrarySlice::OnEventGizmoRotate(mafEventBase *maf_event)
 					double normal[3];
 					((mafViewSlice*)m_ChildViewList[SLICE_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
 
-					medPipePolylineGraphEditor *PipeSliceViewPolylineEditor = medPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe((mafNode*)m_CurrentPolylineGraphEditor));
+					mafPipePolylineGraphEditor *PipeSliceViewPolylineEditor = mafPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe((mafNode*)m_CurrentPolylineGraphEditor));
 					PipeSliceViewPolylineEditor->SetModalitySlice();
 
 					double surfaceOriginTranslated[3];
@@ -749,7 +749,7 @@ void mafViewArbitrarySlice::OnEventThis(mafEventBase *maf_event)
 						double normal[3];
 						((mafViewSlice*)m_ChildViewList[SLICE_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
 
-						medPipePolylineGraphEditor *PipeSliceViewPolylineEditor = medPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe((mafNode*)m_CurrentPolylineGraphEditor));
+						mafPipePolylineGraphEditor *PipeSliceViewPolylineEditor = mafPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe((mafNode*)m_CurrentPolylineGraphEditor));
 						PipeSliceViewPolylineEditor->SetModalitySlice();
 
 						double surfaceOriginTranslated[3];

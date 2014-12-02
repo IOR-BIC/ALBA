@@ -31,7 +31,7 @@ class mafGizmoTranslate;
 class mafGizmoRotate;
 class mafGizmoScale;
 class mafVMESurface;
-class medVMESurfaceEditor;
+class mafVMESurfaceEditor;
 class mafInteractorCompositorMouse;
 class mafInteractorGenericMouse;
 class vtkPlane;
@@ -121,7 +121,7 @@ protected:
 	int   m_UseGizmo;
 
 	mafVMESurface				*m_InputSurface;
-	medVMESurfaceEditor *m_VmeEditor;
+	mafVMESurfaceEditor *m_VmeEditor;
 
 	mafVMEGizmo				*m_ImplicitPlaneGizmo;
 	vtkPlane					*m_ClipperPlane;

@@ -34,11 +34,11 @@ See the COPYINGS file for license details
 #include "mafSceneGraph.h"
 #include "mafVMEPolyline.h"
 #include "mafVMEOutputPolyline.h"
-#include "medVMEPolylineGraph.h"
+#include "mafVMEPolylineGraph.h"
 
-#include "medPipeVolumeDRR.h"
-#include "medPipeVolumeMIP.h"
-#include "medPipeVolumeVR.h"
+#include "mafPipeVolumeDRR.h"
+#include "mafPipeVolumeMIP.h"
+#include "mafPipeVolumeVR.h"
 #include "mafPipeIsosurface.h"
 
 #include "vtkDataSet.h"
@@ -166,7 +166,7 @@ void mafViewSliceOnCurveCompound::VmeShow(mafNode *node, bool show)
 
   if (((mafVME *)node)->GetOutput()->IsA("mafVMEOutputPolyline"))
   {
-    //some polyline curve, e.g., mafVMEPolyLine or medVMEPolyLineGraph
+    //some polyline curve, e.g., mafVMEPolyLine or mafVMEPolylineGraph
     if (show)
     {
       //we may have only one curve => we will need to hide them
@@ -525,7 +525,7 @@ void mafViewSliceOnCurveCompound::OnEvent(mafEventBase *maf_event)
     return; //already constructed  
 
   mafVMEPolyline* polyline = mafVMEPolyline::SafeDownCast(node);
-  medVMEPolylineGraph* polyline_gr = medVMEPolylineGraph::SafeDownCast(node);
+  mafVMEPolylineGraph* polyline_gr = mafVMEPolylineGraph::SafeDownCast(node);
 
   if (polyline == NULL && polyline_gr == NULL)
   {
@@ -582,8 +582,8 @@ void mafViewSliceOnCurveCompound::OnEvent(mafEventBase *maf_event)
   m_Gizmo->SetColor(clr);
   m_Gizmo->SetConstraintPolyline((mafVME*)m_CurrentPolyLineGizmo);    
 #else
-  m_Gizmo = medGizmoPolylineGraph::New((mafVME*)m_CurrentPolyLine, this);
-  m_Gizmo->SetConstraintPolylineGraph((medVMEPolylineGraph*)m_CurrentPolyLineGizmo);
+  m_Gizmo = mafGizmoPolylineGraph::New((mafVME*)m_CurrentPolyLine, this);
+  m_Gizmo->SetConstraintPolylineGraph((mafVMEPolylineGraph*)m_CurrentPolyLineGizmo);
 #endif
 
   m_ChildViewList[POLYLINE_VIEW]->VmeShow(m_Gizmo->GetOutput(), true);
@@ -780,7 +780,7 @@ void mafViewSliceOnCurveCompound::SetSlicePosition(double abscisa, vtkIdType bra
     {
       mafViewVTK* v = ((mafViewVTK*)vws[MAIN_VIEW]);
       v->PlugVisualPipe("mafVMEVolumeGray", GetVolumePipesDesc()[m_VolumePipeConfiguration].szClassName, MUTEX);	
-      v->PlugVisualPipe("medVMELabeledVolume", GetVolumePipesDesc()[m_VolumePipeConfiguration].szClassName, MUTEX);
+      v->PlugVisualPipe("mafVMELabeledVolume", GetVolumePipesDesc()[m_VolumePipeConfiguration].szClassName, MUTEX);
       v->PlugVisualPipe("mafVMEVolumeRGB", GetVolumePipesDesc()[m_VolumePipeConfiguration].szClassName, MUTEX);
       v->PlugVisualPipe("mafVMEVolumeLarge", GetVolumePipesDesc()[m_VolumePipeConfiguration].szClassName, MUTEX);
     }
@@ -790,7 +790,7 @@ void mafViewSliceOnCurveCompound::SetSlicePosition(double abscisa, vtkIdType bra
         mafViewVTK* vs = ((mafViewVTK*)vws[SLICE_VIEW]);
 
         vs->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice_BES", MUTEX);
-        vs->PlugVisualPipe("medVMELabeledVolume", "mafPipeVolumeSlice_BES", MUTEX);
+        vs->PlugVisualPipe("mafVMELabeledVolume", "mafPipeVolumeSlice_BES", MUTEX);
         vs->PlugVisualPipe("mafVMEVolumeRGB", "mafPipeVolumeSlice_BES", MUTEX);
         vs->PlugVisualPipe("mafVMEVolumeLarge", "mafPipeVolumeSlice_BES", MUTEX);
     }
@@ -839,7 +839,7 @@ void mafViewSliceOnCurveCompound::SetSlicePosition(double abscisa, vtkIdType bra
     {	
       mafViewVTK* vs = ((mafViewVTK*)vws[POLYLINE_VIEW]);
       vs->PlugVisualPipe("mafVMEPolyline", "mafPipePolyline", MUTEX);	  
-      vs->PlugVisualPipe("medVMEPolylineGraph", "medVisualPipePolylineGraph", MUTEX);	
+      vs->PlugVisualPipe("mafVMEPolylineGraph", "mafVisualPipePolylineGraph", MUTEX);	
     }
   }
 }
@@ -953,7 +953,7 @@ const char** mafViewSliceOnCurveCompound::GetLayoutsNames()
 
 const mafViewSliceOnCurveCompound::VPIPE_ENTRY* mafViewSliceOnCurveCompound::GetVolumePipesDesc()
 {
-  static const mafViewSliceOnCurveCompound::VPIPE_ENTRY volumePipes[] = {{"medPipeVolumeDRR", "DRR"},{"medPipeVolumeMIP", "MIP"},{"medPipeVolumeVR", "VR"},{"mafPipeIsosurface", "ISO"},{NULL, NULL},};
+  static const mafViewSliceOnCurveCompound::VPIPE_ENTRY volumePipes[] = {{"mafPipeVolumeDRR", "DRR"},{"mafPipeVolumeMIP", "MIP"},{"mafPipeVolumeVR", "VR"},{"mafPipeIsosurface", "ISO"},{NULL, NULL},};
   return volumePipes;
 }
 

@@ -40,7 +40,7 @@
 #include "mafNode.h"
 #include "mafVME.h"
 #include "mafVMEPolyLine.h"
-#include "medVMEPolyLineGraph.h"
+#include "mafVMEPolylineGraph.h"
 #include "mafPolylineGraph.h"
 
 #include "vtkRenderWindow.h"
@@ -1488,7 +1488,7 @@ void mafOpMeshDeformation::OnEvent(mafEventBase *maf_event)
 
       for (int j = 0; j < nCount; j++)
       {
-        medVMEPolylineGraph* vme;
+        mafVMEPolylineGraph* vme;
         mafNEW(vme);
 
         wxString szOldName;

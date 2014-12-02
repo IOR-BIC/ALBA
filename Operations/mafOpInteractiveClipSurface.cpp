@@ -45,7 +45,7 @@ bool DEBUG_MODE = true;
 #include "mafTransform.h"
 #include "mafRefSys.h"
 #include "mafCurvilinearAbscissaOnSkeletonHelper.h"
-#include "medVMEPolylineGraph.h"
+#include "mafVMEPolylineGraph.h"
 
 #include "vtkProperty.h"
 #include "vtkTransform.h"
@@ -111,7 +111,7 @@ mafOp(label)
   m_Canundo = NULL;
   
   m_CASH = NULL;
-  m_ConstrainMedVMEPolylineGraph = NULL;
+  m_ConstrainmafVMEPolylineGraph = NULL;
   m_ActiveBranchId = NULL;
 
 }
@@ -251,7 +251,7 @@ void mafOpInteractiveClipSurface::CreateGui()
   m_Gui->Divider();
   m_Gui->Divider(2);
 
-  m_Gui->Button(ID_CHOOSE_CONSTRAINT_VME, "choose curve", "", "medVMEPolylineGraph constrain");
+  m_Gui->Button(ID_CHOOSE_CONSTRAINT_VME, "choose curve", "", "mafVMEPolylineGraph constrain");
   m_Gui->Divider();
   m_Gui->AddGui(m_CASH->GetGui());
   m_CASH->EnableWidgets(false);
@@ -399,7 +399,7 @@ void mafOpInteractiveClipSurface::OnUseGizmo()
 	m_Gui->Enable(ID_CHOOSE_GIZMO, m_ClipModality == mafOpInteractiveClipSurface::MODE_IMPLICIT_FUNCTION  && m_UseGizmo);    				
 	ChangeGizmo();
 	m_Gui->Enable(ID_CHOOSE_CONSTRAINT_VME, m_UseGizmo?false:true);
-	m_CASH->EnableWidgets(!m_UseGizmo && m_ConstrainMedVMEPolylineGraph ? true : false);
+	m_CASH->EnableWidgets(!m_UseGizmo && m_ConstrainmafVMEPolylineGraph ? true : false);
 
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
@@ -1011,11 +1011,11 @@ void mafOpInteractiveClipSurface::SetImplicitPlanePosition(mafMatrix &matrix)
 
 void mafOpInteractiveClipSurface::OnChooseConstrainVme( mafNode *vme )
 {
-  m_ConstrainMedVMEPolylineGraph = mafVME::SafeDownCast(vme);
-  assert(m_ConstrainMedVMEPolylineGraph);
+  m_ConstrainmafVMEPolylineGraph = mafVME::SafeDownCast(vme);
+  assert(m_ConstrainmafVMEPolylineGraph);
 
   
-  m_CASH->SetConstraintPolylineGraph(medVMEPolylineGraph::SafeDownCast(m_ConstrainMedVMEPolylineGraph));
+  m_CASH->SetConstraintPolylineGraph(mafVMEPolylineGraph::SafeDownCast(m_ConstrainmafVMEPolylineGraph));
   m_CASH->SetCurvilinearAbscissa(m_ActiveBranchId, 0.0);
   m_CASH->EnableWidgets(true)  ;
   mafEventMacro(mafEvent(this, CAMERA_UPDATE));

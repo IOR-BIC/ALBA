@@ -29,9 +29,9 @@
 class mafEvent;
 class mafVME;
 class mafPolylineGraph;
-class medVMEPolylineGraph;
+class mafVMEPolylineGraph;
 
-/** Decorate input vme with curvilinear abscissa interface for medVMEPolylineGraph 
+/** Decorate input vme with curvilinear abscissa interface for mafVMEPolylineGraph 
  constrained interaction */
 class MAF_EXPORT mafCurvilinearAbscissaOnSkeletonHelper : mafObserver
 {
@@ -41,10 +41,10 @@ public:
   mafCurvilinearAbscissaOnSkeletonHelper(mafVME *inputVME, mafObserver *listener = NULL, bool testMode = false);
  
   /** Set the polyline graph constraint */
-  void SetConstraintPolylineGraph(medVMEPolylineGraph* constraintPolylineGraph);
+  void SetConstraintPolylineGraph(mafVMEPolylineGraph* constraintPolylineGraph);
   
   /** Get the polyline graph constraint */
-  medVMEPolylineGraph *GetSetConstraintPolylineGraph() {return m_ConstraintVMEPolylineGraph;};
+  mafVMEPolylineGraph *GetSetConstraintPolylineGraph() {return m_ConstraintVMEPolylineGraph;};
 
   /** Set the curvilinear abscissa value s on branchId branch, return MAF_OK or MAF_ERROR */
   int SetCurvilinearAbscissa( vtkIdType branchId, double s );
@@ -85,7 +85,7 @@ public:
 
 private:
   
-  void GetAbsPose( medVMEPolylineGraph *inputConstrainVMEGraph, vtkIdType inBranchId, double s, mafMatrix &moverOutputAbsPose );
+  void GetAbsPose( mafVMEPolylineGraph *inputConstrainVMEGraph, vtkIdType inBranchId, double s, mafMatrix &moverOutputAbsPose );
   void MoveOnSkeletonInternal( vtkIdType inBranchId, double inS, double inMoveAbsVector[3], vtkIdType &outputBranch, double &outputS, mafMatrix &outputGizmoAbsMatrix );  
   void ComputeLocalPointPositionBetweenVerticesForSkeletonBranch( double distP0s, int idP0, int idP1, double pOut[3] );
   double CheckS( vtkIdType inputBranchId, double inS );
@@ -95,7 +95,7 @@ private:
   void FindPerpendicularVersorsToSegment( int idP0, int idP1, double viewUp[3], double normal[3] );
   
   mafVME *m_InputVME;
-  medVMEPolylineGraph *m_ConstraintVMEPolylineGraph; 
+  mafVMEPolylineGraph *m_ConstraintVMEPolylineGraph; 
   mafPolylineGraph *m_ConstraintPolylineGraph;
   vtkIdType m_ActiveBranchId;
   double m_CurvilinearAbscissa;    

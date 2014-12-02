@@ -17,7 +17,7 @@
 #include "mafDefines.h"
 
 #include "mafViewSliceNotInterpolatedCompound.h"
-#include "medPipeVolumeSliceNotInterpolated.h"
+#include "mafPipeVolumeSliceNotInterpolated.h"
 #include "mafNode.h"
 #include "mafViewVTK.h"
 #include "mafGUI.h"

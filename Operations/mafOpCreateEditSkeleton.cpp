@@ -29,7 +29,7 @@
 
 #include "mafVME.h"
 #include "mafVMEVolumeGray.h"
-#include "medVMEPolylineGraph.h"
+#include "mafVMEPolylineGraph.h"
 #include "mafGeometryEditorPolylineGraph.h"
 #include "mafTagArray.h"
 
@@ -71,7 +71,7 @@ mafOp* mafOpCreateEditSkeleton::Copy()
 bool mafOpCreateEditSkeleton::Accept(mafNode* vme)
 //----------------------------------------------------------------------------
 {
-	return (vme != NULL && (vme->IsMAFType(mafVMEVolumeGray)||(vme->IsMAFType(medVMEPolylineGraph)&&vme->GetParent()->IsMAFType(mafVMEVolumeGray))));
+	return (vme != NULL && (vme->IsMAFType(mafVMEVolumeGray)||(vme->IsMAFType(mafVMEPolylineGraph)&&vme->GetParent()->IsMAFType(mafVMEVolumeGray))));
 }
 //----------------------------------------------------------------------------
 void mafOpCreateEditSkeleton::OpRun()
@@ -81,8 +81,8 @@ void mafOpCreateEditSkeleton::OpRun()
 
 	if(m_Input->IsMAFType(mafVMEVolumeGray))
     m_Editor = new mafGeometryEditorPolylineGraph(mafVME::SafeDownCast(m_Input), this, 0, this->m_TestMode);
-	else if(m_Input->IsMAFType(medVMEPolylineGraph) && m_Input->GetParent()->IsMAFType(mafVMEVolumeGray))
-    m_Editor = new mafGeometryEditorPolylineGraph(mafVME::SafeDownCast(m_Input->GetParent()), this,medVMEPolylineGraph::SafeDownCast(m_Input),this->m_TestMode);
+	else if(m_Input->IsMAFType(mafVMEPolylineGraph) && m_Input->GetParent()->IsMAFType(mafVMEVolumeGray))
+    m_Editor = new mafGeometryEditorPolylineGraph(mafVME::SafeDownCast(m_Input->GetParent()), this,mafVMEPolylineGraph::SafeDownCast(m_Input),this->m_TestMode);
 	else
     OpStop(OP_RUN_CANCEL);
 
@@ -118,9 +118,9 @@ void mafOpCreateEditSkeleton::OpDo()
 
 		m_Skeleton->ReparentTo(m_Input);
 	}
-	else if(m_Input->IsMAFType(medVMEPolylineGraph))
+	else if(m_Input->IsMAFType(mafVMEPolylineGraph))
 	{
-		medVMEPolylineGraph::SafeDownCast(m_Input)->SetData(m_ResultPolydata,((mafVME*)m_Input)->GetTimeStamp());
+		mafVMEPolylineGraph::SafeDownCast(m_Input)->SetData(m_ResultPolydata,((mafVME*)m_Input)->GetTimeStamp());
 	}
 	
 	mafEventMacro(mafEvent(this,CAMERA_UPDATE));

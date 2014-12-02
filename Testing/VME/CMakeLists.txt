@@ -500,41 +500,41 @@ ENDIF (WIN32)
 ADD_EXECUTABLE(mafPolylineGraphTest mafPolylineGraphTest.h mafPolylineGraphTest.cpp)
 ADD_TEST(mafPolylineGraphTest  ${EXECUTABLE_OUTPUT_PATH}/mafPolylineGraphTest)
 
-ADD_EXECUTABLE(medVMEWrappedMeterTest medVMEWrappedMeterTest.h medVMEWrappedMeterTest.cpp)
-ADD_TEST(medVMEWrappedMeterTest  ${EXECUTABLE_OUTPUT_PATH}/medVMEWrappedMeterTest)
+ADD_EXECUTABLE(mafVMEWrappedMeterTest mafVMEWrappedMeterTest.h mafVMEWrappedMeterTest.cpp)
+ADD_TEST(mafVMEWrappedMeterTest  ${EXECUTABLE_OUTPUT_PATH}/mafVMEWrappedMeterTest)
 
-ADD_EXECUTABLE(medVMELabeledVolumeTest medVMELabeledVolumeTest.h medVMELabeledVolumeTest.cpp)
-ADD_TEST(medVMELabeledVolumeTest  ${EXECUTABLE_OUTPUT_PATH}/medVMELabeledVolumeTest)
+ADD_EXECUTABLE(mafVMELabeledVolumeTest mafVMELabeledVolumeTest.h mafVMELabeledVolumeTest.cpp)
+ADD_TEST(mafVMELabeledVolumeTest  ${EXECUTABLE_OUTPUT_PATH}/mafVMELabeledVolumeTest)
 
-ADD_EXECUTABLE(medPipeVolumeMIPTest medPipeVolumeMIPTest.h medPipeVolumeMIPTest.cpp)
-ADD_TEST(medPipeVolumeMIPTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeVolumeMIPTest)
+ADD_EXECUTABLE(mafPipeVolumeMIPTest mafPipeVolumeMIPTest.h mafPipeVolumeMIPTest.cpp)
+ADD_TEST(mafPipeVolumeMIPTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipeVolumeMIPTest)
 
 ADD_EXECUTABLE(medPipeFactoryVMETest medPipeFactoryVMETest.h medPipeFactoryVMETest.cpp)
 ADD_TEST(medPipeFactoryVMETest  ${EXECUTABLE_OUTPUT_PATH}/medPipeFactoryVMETest)
 
-ADD_EXECUTABLE(medPipeVolumeDRRTest medPipeVolumeDRRTest.h medPipeVolumeDRRTest.cpp)
-ADD_TEST(medPipeVolumeDRRTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeVolumeDRRTest)
+ADD_EXECUTABLE(mafPipeVolumeDRRTest mafPipeVolumeDRRTest.h mafPipeVolumeDRRTest.cpp)
+ADD_TEST(mafPipeVolumeDRRTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipeVolumeDRRTest)
 
-ADD_EXECUTABLE(medVMEAnalogTest medVMEAnalogTest.h medVMEAnalogTest.cpp)
-ADD_TEST(medVMEAnalogTest  ${EXECUTABLE_OUTPUT_PATH}/medVMEAnalogTest)
+ADD_EXECUTABLE(mafVMEAnalogTest mafVMEAnalogTest.h mafVMEAnalogTest.cpp)
+ADD_TEST(mafVMEAnalogTest  ${EXECUTABLE_OUTPUT_PATH}/mafVMEAnalogTest)
 
 ADD_EXECUTABLE(medVMEFactoryTest medVMEFactoryTest.h medVMEFactoryTest.cpp)
 ADD_TEST(medVMEFactoryTest  ${EXECUTABLE_OUTPUT_PATH}/medVMEFactoryTest)
 
-ADD_EXECUTABLE(medVMEOutputSurfaceEditorTest medVMEOutputSurfaceEditorTest.h medVMEOutputSurfaceEditorTest.cpp)
-ADD_TEST(medVMEOutputSurfaceEditorTest  ${EXECUTABLE_OUTPUT_PATH}/medVMEOutputSurfaceEditorTest)
+ADD_EXECUTABLE(mafVMEOutputSurfaceEditorTest mafVMEOutputSurfaceEditorTest.h mafVMEOutputSurfaceEditorTest.cpp)
+ADD_TEST(mafVMEOutputSurfaceEditorTest  ${EXECUTABLE_OUTPUT_PATH}/mafVMEOutputSurfaceEditorTest)
 
-ADD_EXECUTABLE(medVMEOutputPolylineEditorTest medVMEOutputPolylineEditorTest.h medVMEOutputPolylineEditorTest.cpp)
-ADD_TEST(medVMEOutputPolylineEditorTest  ${EXECUTABLE_OUTPUT_PATH}/medVMEOutputPolylineEditorTest)
+ADD_EXECUTABLE(mafVMEOutputPolylineEditorTest mafVMEOutputPolylineEditorTest.h mafVMEOutputPolylineEditorTest.cpp)
+ADD_TEST(mafVMEOutputPolylineEditorTest  ${EXECUTABLE_OUTPUT_PATH}/mafVMEOutputPolylineEditorTest)
 
-ADD_EXECUTABLE(medVMESurfaceEditorTest medVMESurfaceEditorTest.h medVMESurfaceEditorTest.cpp)
-ADD_TEST(medVMESurfaceEditorTest  ${EXECUTABLE_OUTPUT_PATH}/medVMESurfaceEditorTest)
+ADD_EXECUTABLE(mafVMESurfaceEditorTest mafVMESurfaceEditorTest.h mafVMESurfaceEditorTest.cpp)
+ADD_TEST(mafVMESurfaceEditorTest  ${EXECUTABLE_OUTPUT_PATH}/mafVMESurfaceEditorTest)
 
-ADD_EXECUTABLE(medPipePolylineGraphEditorTest medPipePolylineGraphEditorTest.h medPipePolylineGraphEditorTest.cpp)
-ADD_TEST(medPipePolylineGraphEditorTest  ${EXECUTABLE_OUTPUT_PATH}/medPipePolylineGraphEditorTest)
+ADD_EXECUTABLE(mafPipePolylineGraphEditorTest mafPipePolylineGraphEditorTest.h mafPipePolylineGraphEditorTest.cpp)
+ADD_TEST(mafPipePolylineGraphEditorTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipePolylineGraphEditorTest)
 
-ADD_EXECUTABLE(medVMEPolylineEditorTest medVMEPolylineEditorTest.h medVMEPolylineEditorTest.cpp)
-ADD_TEST(medVMEPolylineEditorTest  ${EXECUTABLE_OUTPUT_PATH}/medVMEPolylineEditorTest)
+ADD_EXECUTABLE(mafVMEPolylineEditorTest mafVMEPolylineEditorTest.h mafVMEPolylineEditorTest.cpp)
+ADD_TEST(mafVMEPolylineEditorTest  ${EXECUTABLE_OUTPUT_PATH}/mafVMEPolylineEditorTest)
 
 ADD_EXECUTABLE(mafPipeMeshSlice_BESTest mafPipeMeshSlice_BESTest.h mafPipeMeshSlice_BESTest.cpp)
 ADD_TEST(mafPipeMeshSlice_BESTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipeMeshSlice_BESTest)
@@ -545,11 +545,11 @@ ADD_TEST(mafPipeSurfaceSlice_BESTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipeSurfaceSl
 ADD_EXECUTABLE(mafPipeVolumeSlice_BESTest mafPipeVolumeSlice_BESTest.h mafPipeVolumeSlice_BESTest.cpp)
 ADD_TEST(mafPipeVolumeSlice_BESTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipeVolumeSlice_BESTest)
 
-ADD_EXECUTABLE(medVMEMapsTest medVMEMapsTest.h medVMEMapsTest.cpp)
-ADD_TEST(medVMEMapsTest  ${EXECUTABLE_OUTPUT_PATH}/medVMEMapsTest)
+ADD_EXECUTABLE(mafVMEMapsTest mafVMEMapsTest.h mafVMEMapsTest.cpp)
+ADD_TEST(mafVMEMapsTest  ${EXECUTABLE_OUTPUT_PATH}/mafVMEMapsTest)
 
-ADD_EXECUTABLE(medPipeTrajectoriesTest medPipeTrajectoriesTest.h medPipeTrajectoriesTest.cpp)
-ADD_TEST(medPipeTrajectoriesTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeTrajectoriesTest)
+ADD_EXECUTABLE(mafPipeTrajectoriesTest mafPipeTrajectoriesTest.h mafPipeTrajectoriesTest.cpp)
+ADD_TEST(mafPipeTrajectoriesTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipeTrajectoriesTest)
 
 ADD_EXECUTABLE(mafPipeSliceTest mafPipeSliceTest.h mafPipeSliceTest.cpp)
 ADD_TEST(mafPipeSliceTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipeSliceTest)
@@ -557,86 +557,86 @@ ADD_TEST(mafPipeSliceTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipeSliceTest)
 ADD_EXECUTABLE(mafPipePolylineSlice_BESTest mafPipePolylineSlice_BESTest.h mafPipePolylineSlice_BESTest.cpp)
 ADD_TEST(mafPipePolylineSlice_BESTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipePolylineSlice_BESTest)
 
-ADD_EXECUTABLE(medPipeWrappedMeterTest medPipeWrappedMeterTest.h medPipeWrappedMeterTest.cpp)
-ADD_TEST(medPipeWrappedMeterTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeWrappedMeterTest)
+ADD_EXECUTABLE(mafPipeWrappedMeterTest mafPipeWrappedMeterTest.h mafPipeWrappedMeterTest.cpp)
+ADD_TEST(mafPipeWrappedMeterTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipeWrappedMeterTest)
 
-ADD_EXECUTABLE(medVMEOutputWrappedMeterTest medVMEOutputWrappedMeterTest.h medVMEOutputWrappedMeterTest.cpp)
-ADD_TEST(medVMEOutputWrappedMeterTest  ${EXECUTABLE_OUTPUT_PATH}/medVMEOutputWrappedMeterTest)
+ADD_EXECUTABLE(mafVMEOutputWrappedMeterTest mafVMEOutputWrappedMeterTest.h mafVMEOutputWrappedMeterTest.cpp)
+ADD_TEST(mafVMEOutputWrappedMeterTest  ${EXECUTABLE_OUTPUT_PATH}/mafVMEOutputWrappedMeterTest)
 
-ADD_EXECUTABLE(medPipeDensityDistanceTest medPipeDensityDistanceTest.h medPipeDensityDistanceTest.cpp)
-ADD_TEST(medPipeDensityDistanceTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeDensityDistanceTest)
+ADD_EXECUTABLE(mafPipeDensityDistanceTest mafPipeDensityDistanceTest.h mafPipeDensityDistanceTest.cpp)
+ADD_TEST(mafPipeDensityDistanceTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipeDensityDistanceTest)
 
-ADD_EXECUTABLE(medVMEPolylineGraphTest medVMEPolylineGraphTest.h medVMEPolylineGraphTest.cpp)
-ADD_TEST(medVMEPolylineGraphTest  ${EXECUTABLE_OUTPUT_PATH}/medVMEPolylineGraphTest)
+ADD_EXECUTABLE(mafVMEPolylineGraphTest mafVMEPolylineGraphTest.h mafVMEPolylineGraphTest.cpp)
+ADD_TEST(mafVMEPolylineGraphTest  ${EXECUTABLE_OUTPUT_PATH}/mafVMEPolylineGraphTest)
 
-ADD_EXECUTABLE(medPipeGraphTest medPipeGraphTest.h medPipeGraphTest.cpp)
-ADD_TEST(medPipeGraphTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeGraphTest)
+ADD_EXECUTABLE(mafPipeGraphTest mafPipeGraphTest.h mafPipeGraphTest.cpp)
+ADD_TEST(mafPipeGraphTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipeGraphTest)
 
-ADD_EXECUTABLE(medVMESegmentationVolumeTest medVMESegmentationVolumeTest.h medVMESegmentationVolumeTest.cpp)
-ADD_TEST(medVMESegmentationVolumeTest  ${EXECUTABLE_OUTPUT_PATH}/medVMESegmentationVolumeTest)
+ADD_EXECUTABLE(mafVMESegmentationVolumeTest mafVMESegmentationVolumeTest.h mafVMESegmentationVolumeTest.cpp)
+ADD_TEST(mafVMESegmentationVolumeTest  ${EXECUTABLE_OUTPUT_PATH}/mafVMESegmentationVolumeTest)
 
-ADD_EXECUTABLE(medPipeCompoundTest medPipeCompoundTest.h medPipeCompoundTest.cpp)
-ADD_TEST(medPipeCompoundTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeCompoundTest)
+ADD_EXECUTABLE(mafPipeCompoundTest mafPipeCompoundTest.h mafPipeCompoundTest.cpp)
+ADD_TEST(mafPipeCompoundTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipeCompoundTest)
 
-ADD_EXECUTABLE(medPipeCompoundVolumeTest medPipeCompoundVolumeTest.h medPipeCompoundVolumeTest.cpp)
-ADD_TEST(medPipeCompoundVolumeTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeCompoundVolumeTest)
+ADD_EXECUTABLE(mafPipeCompoundVolumeTest mafPipeCompoundVolumeTest.h mafPipeCompoundVolumeTest.cpp)
+ADD_TEST(mafPipeCompoundVolumeTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipeCompoundVolumeTest)
 
-ADD_EXECUTABLE(medPipeCompoundVolumeFixedScalarsTest medPipeCompoundVolumefixedScalarsTest.h medPipeCompoundVolumeFixedScalarsTest.cpp)
-ADD_TEST(medPipeCompoundVolumeFixedScalarsTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeCompoundVolumeFixedScalarsTest)
+ADD_EXECUTABLE(mafPipeCompoundVolumeFixedScalarsTest mafPipeCompoundVolumefixedScalarsTest.h mafPipeCompoundVolumeFixedScalarsTest.cpp)
+ADD_TEST(mafPipeCompoundVolumeFixedScalarsTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipeCompoundVolumeFixedScalarsTest)
 
-ADD_EXECUTABLE(medVisualPipePolylineGraphTest medVisualPipePolylineGraphTest.h medVisualPipePolylineGraphTest.cpp)
-ADD_TEST(medVisualPipePolylineGraphTest  ${EXECUTABLE_OUTPUT_PATH}/medVisualPipePolylineGraphTest)
+ADD_EXECUTABLE(mafVisualPipePolylineGraphTest mafVisualPipePolylineGraphTest.h mafVisualPipePolylineGraphTest.cpp)
+ADD_TEST(mafVisualPipePolylineGraphTest  ${EXECUTABLE_OUTPUT_PATH}/mafVisualPipePolylineGraphTest)
 
-ADD_EXECUTABLE(medPipeSurfaceEditorTest medPipeSurfaceEditorTest.h medPipeSurfaceEditorTest.cpp)
-ADD_TEST(medPipeSurfaceEditorTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeSurfaceEditorTest)
+ADD_EXECUTABLE(mafPipeSurfaceEditorTest mafPipeSurfaceEditorTest.h mafPipeSurfaceEditorTest.cpp)
+ADD_TEST(mafPipeSurfaceEditorTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipeSurfaceEditorTest)
 
-ADD_EXECUTABLE(medPipeTensorFieldSurfaceTest medPipeTensorFieldSurfaceTest.h medPipeTensorFieldSurfaceTest.cpp)
-ADD_TEST(medPipeTensorFieldSurfaceTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeTensorFieldSurfaceTest)
+ADD_EXECUTABLE(mafPipeTensorFieldSurfaceTest mafPipeTensorFieldSurfaceTest.h mafPipeTensorFieldSurfaceTest.cpp)
+ADD_TEST(mafPipeTensorFieldSurfaceTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipeTensorFieldSurfaceTest)
 
-ADD_EXECUTABLE(medPipeVectorFieldSurfaceTest medPipeVectorFieldSurfaceTest.h medPipeVectorFieldSurfaceTest.cpp)
-ADD_TEST(medPipeVectorFieldSurfaceTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeVectorFieldSurfaceTest)
+ADD_EXECUTABLE(mafPipeVectorFieldSurfaceTest mafPipeVectorFieldSurfaceTest.h mafPipeVectorFieldSurfaceTest.cpp)
+ADD_TEST(mafPipeVectorFieldSurfaceTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipeVectorFieldSurfaceTest)
 
-ADD_EXECUTABLE(medPipeVectorFieldGlyphsTest medPipeVectorFieldGlyphsTest.h medPipeVectorFieldGlyphsTest.cpp)
-ADD_TEST(medPipeVectorFieldGlyphsTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeVectorFieldGlyphsTest)
+ADD_EXECUTABLE(mafPipeVectorFieldGlyphsTest mafPipeVectorFieldGlyphsTest.h mafPipeVectorFieldGlyphsTest.cpp)
+ADD_TEST(mafPipeVectorFieldGlyphsTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipeVectorFieldGlyphsTest)
 
-ADD_EXECUTABLE(medPipeVectorFieldMapWithArrowsTest medPipeVectorFieldMapWithArrowsTest.h medPipeVectorFieldMapWithArrowsTest.cpp)
-ADD_TEST(medPipeVectorFieldMapWithArrowsTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeVectorFieldMapWithArrowsTest)
+ADD_EXECUTABLE(mafPipeVectorFieldMapWithArrowsTest mafPipeVectorFieldMapWithArrowsTest.h mafPipeVectorFieldMapWithArrowsTest.cpp)
+ADD_TEST(mafPipeVectorFieldMapWithArrowsTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipeVectorFieldMapWithArrowsTest)
 
-ADD_EXECUTABLE(medAttributeSegmentationVolumeTest medAttributeSegmentationVolumeTest.h medAttributeSegmentationVolumeTest.cpp)
-ADD_TEST(medAttributeSegmentationVolumeTest  ${EXECUTABLE_OUTPUT_PATH}/medAttributeSegmentationVolumeTest)
+ADD_EXECUTABLE(mafAttributeSegmentationVolumeTest mafAttributeSegmentationVolumeTest.h mafAttributeSegmentationVolumeTest.cpp)
+ADD_TEST(mafAttributeSegmentationVolumeTest  ${EXECUTABLE_OUTPUT_PATH}/mafAttributeSegmentationVolumeTest)
 
-ADD_EXECUTABLE(medPipeTensorFieldSliceTest medPipeTensorFieldSliceTest.h medPipeTensorFieldSliceTest.cpp)
-ADD_TEST(medPipeTensorFieldSliceTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeTensorFieldSliceTest)
+ADD_EXECUTABLE(mafPipeTensorFieldSliceTest mafPipeTensorFieldSliceTest.h mafPipeTensorFieldSliceTest.cpp)
+ADD_TEST(mafPipeTensorFieldSliceTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipeTensorFieldSliceTest)
 
-ADD_EXECUTABLE(medPipeVectorFieldSliceTest medPipeVectorFieldSliceTest.h medPipeVectorFieldSliceTest.cpp)
-ADD_TEST(medPipeVectorFieldSliceTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeVectorFieldSliceTest)
+ADD_EXECUTABLE(mafPipeVectorFieldSliceTest mafPipeVectorFieldSliceTest.h mafPipeVectorFieldSliceTest.cpp)
+ADD_TEST(mafPipeVectorFieldSliceTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipeVectorFieldSliceTest)
 
-ADD_EXECUTABLE(medPipeTensorFieldGlyphsTest medPipeTensorFieldGlyphsTest.h medPipeTensorFieldGlyphsTest.cpp)
-ADD_TEST(medPipeTensorFieldGlyphsTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeTensorFieldGlyphsTest)
+ADD_EXECUTABLE(mafPipeTensorFieldGlyphsTest mafPipeTensorFieldGlyphsTest.h mafPipeTensorFieldGlyphsTest.cpp)
+ADD_TEST(mafPipeTensorFieldGlyphsTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipeTensorFieldGlyphsTest)
 
-ADD_EXECUTABLE(medVMEOutputComputeWrappingTest medVMEOutputComputeWrappingTest.h medVMEOutputComputeWrappingTest.cpp)
-ADD_TEST(medVMEOutputComputeWrappingTest  ${EXECUTABLE_OUTPUT_PATH}/medVMEOutputComputeWrappingTest)
+ADD_EXECUTABLE(mafVMEOutputComputeWrappingTest mafVMEOutputComputeWrappingTest.h mafVMEOutputComputeWrappingTest.cpp)
+ADD_TEST(mafVMEOutputComputeWrappingTest  ${EXECUTABLE_OUTPUT_PATH}/mafVMEOutputComputeWrappingTest)
 
-ADD_EXECUTABLE(medPipeTensorFieldTest medPipeTensorFieldTest.h medPipeTensorFieldTest.cpp)
-ADD_TEST(medPipeTensorFieldTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeTensorFieldTest)
+ADD_EXECUTABLE(mafPipeTensorFieldTest mafPipeTensorFieldTest.h mafPipeTensorFieldTest.cpp)
+ADD_TEST(mafPipeTensorFieldTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipeTensorFieldTest)
 
-ADD_EXECUTABLE(medPipeVectorFieldTest medPipeVectorFieldTest.h medPipeVectorFieldTest.cpp)
-ADD_TEST(medPipeVectorFieldTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeVectorFieldTest)
+ADD_EXECUTABLE(mafPipeVectorFieldTest mafPipeVectorFieldTest.h mafPipeVectorFieldTest.cpp)
+ADD_TEST(mafPipeVectorFieldTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipeVectorFieldTest)
 
-ADD_EXECUTABLE(medVisualPipeSlicerSliceTest  medVisualPipeSlicerSliceTest.h medVisualPipeSlicerSliceTest.cpp)
-ADD_TEST(medVisualPipeSlicerSliceTest ${EXECUTABLE_OUTPUT_PATH}/medVisualPipeSlicerSliceTest)
+ADD_EXECUTABLE(mafVisualPipeSlicerSliceTest  mafVisualPipeSlicerSliceTest.h mafVisualPipeSlicerSliceTest.cpp)
+ADD_TEST(mafVisualPipeSlicerSliceTest ${EXECUTABLE_OUTPUT_PATH}/mafVisualPipeSlicerSliceTest)
 
-ADD_EXECUTABLE(medPipeCompoundVolumeVRTest  medPipeCompoundVolumeVRTest.h medPipeCompoundVolumeVRTest.cpp)
-ADD_TEST(medPipeCompoundVolumeVRTest ${EXECUTABLE_OUTPUT_PATH}/medPipeCompoundVolumeVRTest)
+ADD_EXECUTABLE(mafPipeCompoundVolumeVRTest  mafPipeCompoundVolumeVRTest.h mafPipeCompoundVolumeVRTest.cpp)
+ADD_TEST(mafPipeCompoundVolumeVRTest ${EXECUTABLE_OUTPUT_PATH}/mafPipeCompoundVolumeVRTest)
 
-ADD_EXECUTABLE(medPipeCompoundVolumeMIPTest  medPipeCompoundVolumeMIPTest.h medPipeCompoundVolumeMIPTest.cpp)
-ADD_TEST(medPipeCompoundVolumeMIPTest ${EXECUTABLE_OUTPUT_PATH}/medPipeCompoundVolumeMIPTest)
+ADD_EXECUTABLE(mafPipeCompoundVolumeMIPTest  mafPipeCompoundVolumeMIPTest.h mafPipeCompoundVolumeMIPTest.cpp)
+ADD_TEST(mafPipeCompoundVolumeMIPTest ${EXECUTABLE_OUTPUT_PATH}/mafPipeCompoundVolumeMIPTest)
 
-ADD_EXECUTABLE(medPipeCompoundVolumeDRRTest  medPipeCompoundVolumeDRRTest.h medPipeCompoundVolumeDRRTest.cpp)
-ADD_TEST(medPipeCompoundVolumeDRRTest ${EXECUTABLE_OUTPUT_PATH}/medPipeCompoundVolumeDRRTest)
+ADD_EXECUTABLE(mafPipeCompoundVolumeDRRTest  mafPipeCompoundVolumeDRRTest.h mafPipeCompoundVolumeDRRTest.cpp)
+ADD_TEST(mafPipeCompoundVolumeDRRTest ${EXECUTABLE_OUTPUT_PATH}/mafPipeCompoundVolumeDRRTest)
 
-ADD_EXECUTABLE(medPipeCompoundVolumeIsosurfaceTest  medPipeCompoundVolumeIsosurfaceTest.h medPipeCompoundVolumeIsosurfaceTest.cpp)
-ADD_TEST(medPipeCompoundVolumeIsosurfaceTest ${EXECUTABLE_OUTPUT_PATH}/medPipeCompoundVolumeIsosurfaceTest)
+ADD_EXECUTABLE(mafPipeCompoundVolumeIsosurfaceTest  mafPipeCompoundVolumeIsosurfaceTest.h mafPipeCompoundVolumeIsosurfaceTest.cpp)
+ADD_TEST(mafPipeCompoundVolumeIsosurfaceTest ${EXECUTABLE_OUTPUT_PATH}/mafPipeCompoundVolumeIsosurfaceTest)
 
 ADD_EXECUTABLE(mafVMEVolumeLargeUtilsTest  mafVMEVolumeLargeUtilsTest.h mafVMEVolumeLargeUtilsTest.cpp)
 ADD_TEST(mafVMEVolumeLargeUtilsTest ${EXECUTABLE_OUTPUT_PATH}/mafVMEVolumeLargeUtilsTest)
@@ -653,11 +653,11 @@ ADD_TEST(mafPolylineGraphBranchTest ${EXECUTABLE_OUTPUT_PATH}/mafPolylineGraphBr
 ADD_EXECUTABLE(mafVMEVolumeLargeTest  mafVMEVolumeLargeTest.h mafVMEVolumeLargeTest.cpp)
 ADD_TEST(mafVMEVolumeLargeTest ${EXECUTABLE_OUTPUT_PATH}/mafVMEVolumeLargeTest)
 
-ADD_EXECUTABLE(medDataPipeCustomSegmentationVolumeTest  medDataPipeCustomSegmentationVolumeTest.h medDataPipeCustomSegmentationVolumeTest.cpp)
-ADD_TEST(medDataPipeCustomSegmentationVolumeTest ${EXECUTABLE_OUTPUT_PATH}/medDataPipeCustomSegmentationVolumeTest)
+ADD_EXECUTABLE(mafDataPipeCustomSegmentationVolumeTest  mafDataPipeCustomSegmentationVolumeTest.h mafDataPipeCustomSegmentationVolumeTest.cpp)
+ADD_TEST(mafDataPipeCustomSegmentationVolumeTest ${EXECUTABLE_OUTPUT_PATH}/mafDataPipeCustomSegmentationVolumeTest)
 
-ADD_EXECUTABLE(medPipeRayCastTest  medPipeRayCastTest.h medPipeRayCastTest.cpp)
-ADD_TEST(medPipeRayCastTest ${EXECUTABLE_OUTPUT_PATH}/medPipeRayCastTest)
+ADD_EXECUTABLE(mafPipeRayCastTest  mafPipeRayCastTest.h mafPipeRayCastTest.cpp)
+ADD_TEST(mafPipeRayCastTest ${EXECUTABLE_OUTPUT_PATH}/mafPipeRayCastTest)
  
 
 #-----------------------------------------------------------------------------

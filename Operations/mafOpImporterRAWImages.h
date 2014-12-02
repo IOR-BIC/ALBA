@@ -49,7 +49,7 @@ class mafRWI;
 class vtkWindowLevelLookupTable;
 class mafGUIDialogPreview;
 class vtkTexture;
-class medInteractorDICOMImporter;
+class mafInteractorDICOMImporter;
 class mafString;
 class mafVMEVolumeGray;
 class mafVMEVolumeRGB;
@@ -215,7 +215,7 @@ protected:
   mafGUIDialogPreview	*m_Dialog;
   mafGUI* m_GuiSlider;
 
-  medInteractorDICOMImporter *m_DicomInteractor;
+  mafInteractorDICOMImporter *m_DicomInteractor;
 
   mafVMEVolumeGray  *m_VolumeGray;
   mafVMEVolumeRGB   *m_VolumeRGB;

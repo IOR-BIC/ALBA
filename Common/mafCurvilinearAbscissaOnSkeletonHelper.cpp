@@ -27,7 +27,7 @@ const bool DEBUG_MODE = true;
 #include <math.h>
 
 #include "mafGUI.h"
-#include "medGizmoInteractionDebugger.h"
+#include "mafGizmoInteractionDebugger.h"
 #include "mafDecl.h"
 #include "mafEvent.h"
 #include "mmaMaterial.h"
@@ -53,7 +53,7 @@ const bool DEBUG_MODE = true;
 #include "vtkTransform.h"
 
 // new stuff
-#include "medVMEPolylineGraph.h"
+#include "mafVMEPolylineGraph.h"
 #include "mafPolylineGraph.h"
 #include "vtkIdList.h"
 
@@ -385,7 +385,7 @@ mafCurvilinearAbscissaOnSkeletonHelper::~mafCurvilinearAbscissaOnSkeletonHelper(
   cppDEL(m_ConstraintPolylineGraph);
 }
 
-void mafCurvilinearAbscissaOnSkeletonHelper::SetConstraintPolylineGraph( medVMEPolylineGraph* constraintPolylineGraph )
+void mafCurvilinearAbscissaOnSkeletonHelper::SetConstraintPolylineGraph( mafVMEPolylineGraph* constraintPolylineGraph )
 {
   assert(constraintPolylineGraph);
   m_ConstraintVMEPolylineGraph = constraintPolylineGraph;
@@ -475,7 +475,7 @@ int mafCurvilinearAbscissaOnSkeletonHelper::SetCurvilinearAbscissa( vtkIdType br
   return MAF_OK;
 }
 
-void mafCurvilinearAbscissaOnSkeletonHelper::GetAbsPose( medVMEPolylineGraph *inputConstrainVMEGraph, vtkIdType inBranchId, double s, mafMatrix &moverOutputAbsPose )
+void mafCurvilinearAbscissaOnSkeletonHelper::GetAbsPose( mafVMEPolylineGraph *inputConstrainVMEGraph, vtkIdType inBranchId, double s, mafMatrix &moverOutputAbsPose )
 {
 
   std::ostringstream stringStream;

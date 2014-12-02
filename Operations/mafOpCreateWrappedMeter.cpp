@@ -27,7 +27,7 @@
 #include "mafDecl.h"
 #include "mafEvent.h"
 
-#include "medVMEWrappedMeter.h"
+#include "mafVMEWrappedMeter.h"
 
 //----------------------------------------------------------------------------
 // Constants :

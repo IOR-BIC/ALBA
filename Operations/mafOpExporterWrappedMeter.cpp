@@ -28,15 +28,15 @@
 #include "mafEvent.h"
 #include "mafGUI.h"
 
-#include "medVMEWrappedMeter.h"
-#include "medVMEOutputWrappedMeter.h"
-#include "medVMEComputeWrapping.h"
+#include "mafVMEWrappedMeter.h"
+#include "mafVMEOutputWrappedMeter.h"
+#include "mafVMEComputeWrapping.h"
 
 #include "mafOpImporterLandmark.h"
 #include "mafDefines.h"
 #include "mafVMELandmarkCloud.h"
 #include "mafVMERoot.h"
-#include "medVMEWrappedMeter.h"
+#include "mafVMEWrappedMeter.h"
 #include "mafVMELandmarkCloud.h"
 #include "mafVMELandmark.h"
 #include "vtkDataSet.h"
@@ -348,9 +348,9 @@ void mafOpExporterWrappedMeter::WriteOnFile()
 	
 }
 
-/*medVMEWrappedMeter *vmeWrappedMeter =  medVMEWrappedMeter::SafeDownCast(m_Input);
+/*mafVMEWrappedMeter *vmeWrappedMeter =  mafVMEWrappedMeter::SafeDownCast(m_Input);
 vmeWrappedMeter->Update();
-medVMEOutputWrappedMeter *out_wm = medVMEOutputWrappedMeter::SafeDownCast(vmeWrappedMeter->GetOutput());
+mafVMEOutputWrappedMeter *out_wm = mafVMEOutputWrappedMeter::SafeDownCast(vmeWrappedMeter->GetOutput());
 out_wm->Update();*/
 /*
 //----------------------------------------------------------------------------
@@ -361,7 +361,7 @@ void mafOpExporterWrappedMeter::ExportWrappedMeterCoordinates()
 
   medVMEComputeWrapping *vmeMeter = medVMEComputeWrapping::SafeDownCast(m_Input);
   vmeMeter->Update();
-  medVMEOutputComputeWrapping *out_cm = medVMEOutputComputeWrapping::SafeDownCast(vmeMeter->GetOutput());
+  mafVMEOutputComputeWrapping *out_cm = mafVMEOutputComputeWrapping::SafeDownCast(vmeMeter->GetOutput());
   out_cm->Update();
 
   std::ofstream outputFile(m_File, std::ios::out);
@@ -434,7 +434,7 @@ void mafOpExporterWrappedMeter::ExportWrappedMeterCoordinates()
 
 }
 */
-/*if(vmeWrappedMeter->GetWrappedMode() == medVMEWrappedMeter::MANUAL_WRAP)
+/*if(vmeWrappedMeter->GetWrappedMode() == mafVMEWrappedMeter::MANUAL_WRAP)
 {
 for(int i=0; i<vmeWrappedMeter->GetNumberMiddlePoints();i++)
 {
@@ -443,7 +443,7 @@ outputFile << vmeWrappedMeter->GetMiddlePointCoordinate(i)[0] << '\t'
 << vmeWrappedMeter->GetMiddlePointCoordinate(i)[2] << std::endl;
 }
 }
-else if(vmeWrappedMeter->GetWrappedMode() == medVMEWrappedMeter::AUTOMATED_WRAP)
+else if(vmeWrappedMeter->GetWrappedMode() == mafVMEWrappedMeter::AUTOMATED_WRAP)
 {
 outputFile << vmeWrappedMeter->GetWrappedGeometryTangent1()[0] << '\t'
 << vmeWrappedMeter->GetWrappedGeometryTangent1()[1] << '\t'

@@ -33,7 +33,7 @@ PURPOSE.  See the above copyright notice for more information.
 // forward references :
 //----------------------------------------------------------------------------
 class mafDicomSlice;
-class medInteractorDICOMImporter;
+class mafInteractorDICOMImporter;
 class mafGUIWizardPageNew;
 class mafString;
 class mafTagArray;
@@ -298,7 +298,7 @@ protected:
 	vtkTextMapper	*m_TextMapper;
 	wxString m_Text;
 
-	medInteractorDICOMImporter *m_DicomInteractor;
+	mafInteractorDICOMImporter *m_DicomInteractor;
 
 	mafGUIWizard			*m_Wizard;
 	mafGUIWizardPageNew	*m_LoadPage;
