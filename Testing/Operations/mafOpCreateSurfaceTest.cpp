@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: mafOpCreateSurfaceTest
  Authors: Alessandro Chiarini , Matteo Giacomoni
  

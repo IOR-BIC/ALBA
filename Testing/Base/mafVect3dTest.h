@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: mafVect3dTest
  Authors: Grazia Di Cosmo
  

@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2Medical
+ Program: MAF2
  Module: mafViewSlicerTest
  Authors: Marco Petrone, Stefano Perticoni
  
