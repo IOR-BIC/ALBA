@@ -361,28 +361,34 @@ void mafPipeMeshSlice::UpdateProperty(bool fromTag)
 mafGUI *mafPipeMeshSlice::CreateGui()
 //----------------------------------------------------------------------------
 {
-	assert(m_Gui == NULL);
-	m_Gui = new mafGUI(this);
-  m_Gui->Bool(ID_WIREFRAME,_("Wireframe"), &m_Wireframe, 1);
-  m_Gui->Bool(ID_WIRED_ACTOR_VISIBILITY,_("Border Elem."), &m_BorderElementsWiredActor, 1);
-  
-  m_Gui->Bool(ID_USE_VTK_PROPERTY,"property",&m_UseVTKProperty , 1);
-  m_MaterialButton = new mafGUIMaterialButton(m_Vme,this);
-  m_Gui->AddGui(m_MaterialButton->GetGui());
-  m_MaterialButton->Enable(m_UseVTKProperty != 0);
+	  m_Gui = new mafGUI(this);
+		m_Gui->Bool(ID_WIREFRAME,_("Wireframe"), &m_Wireframe, 1);
+		m_Gui->FloatSlider(ID_BORDER_CHANGE,_("Thickness"),&m_Border,1.0,5.0);
+		m_Gui->Enable(ID_BORDER_CHANGE,m_Wireframe);
+		m_Gui->Divider(2);
 
-  m_Gui->Combo(ID_SCALARS,"",&m_ScalarIndex,m_NumberOfArrays,m_ScalarsName);	
-  
+		m_Gui->Bool(ID_WIRED_ACTOR_VISIBILITY,_("Element Edges"), &m_BorderElementsWiredActor, 1);
+		
+		m_Gui->Divider(2);
+		m_Gui->Bool(ID_USE_VTK_PROPERTY,"Property",&m_UseVTKProperty, 1);
+		m_MaterialButton = new mafGUIMaterialButton(m_Vme,this);
+		m_Gui->AddGui(m_MaterialButton->GetGui());
+		m_MaterialButton->Enable(m_UseVTKProperty != 0);
 
-  m_Gui->Bool(ID_SCALAR_MAP_ACTIVE,_("enable scalar field mapping"), &m_ScalarMapActive, 1);
-  m_Gui->Lut(ID_LUT,"lut",m_Table);
+		m_Gui->Divider(2);
+		m_Gui->Bool(ID_SCALAR_MAP_ACTIVE,_("Enable scalar field mapping"), &m_ScalarMapActive, 1);
+		m_Gui->Combo(ID_SCALARS,"",&m_ScalarIndex,m_NumberOfArrays,m_ScalarsName);	
+		m_Gui->Lut(ID_LUT,"Lut",m_Table);
 
-  m_Gui->Enable(ID_SCALARS, m_ScalarMapActive != 0);
-  m_Gui->Enable(ID_LUT, m_ScalarMapActive != 0);
-  m_Gui->FloatSlider(ID_BORDER_CHANGE,_("Border"),&m_Border,1.0,5.0);
-  m_Gui->Divider();
-  m_Gui->Update();
-	return m_Gui;
+		m_Gui->Enable(ID_SCALARS, m_ScalarMapActive != 0);
+		m_Gui->Enable(ID_LUT, m_ScalarMapActive != 0);
+		
+
+		m_Gui->Divider();
+		m_Gui->Label("");
+		m_Gui->Update();
+		return m_Gui;
+
 }
 //----------------------------------------------------------------------------
 void mafPipeMeshSlice::OnEvent(mafEventBase *maf_event)
@@ -558,6 +564,8 @@ void mafPipeMeshSlice::SetWireframeOn()
   m_Actor->Modified();
   m_ActorWired->SetVisibility(0);
   m_ActorWired->Modified();
+	m_Gui->Enable(ID_BORDER_CHANGE,true);
+	m_Gui->Enable(ID_WIRED_ACTOR_VISIBILITY,false);
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
@@ -566,8 +574,10 @@ void mafPipeMeshSlice::SetWireframeOff()
 {
   m_Actor->GetProperty()->SetRepresentationToSurface();
   m_Actor->Modified();
-  m_ActorWired->SetVisibility(1);
+  m_ActorWired->SetVisibility(m_BorderElementsWiredActor);
   m_ActorWired->Modified();
+	m_Gui->Enable(ID_BORDER_CHANGE,false);
+	m_Gui->Enable(ID_WIRED_ACTOR_VISIBILITY,true);
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
