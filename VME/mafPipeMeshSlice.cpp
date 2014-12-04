@@ -295,6 +295,8 @@ void mafPipeMeshSlice::ExecutePipe()
   m_OutlineActor->PickableOff();
   m_OutlineActor->SetProperty(m_OutlineProperty);
 
+	m_ActorWired->SetProperty(m_OutlineProperty);
+
   m_AssemblyFront->AddPart(m_OutlineActor);
 
   m_VTKTransform->Delete();
