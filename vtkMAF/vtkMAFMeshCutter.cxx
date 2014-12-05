@@ -109,7 +109,6 @@ void vtkMAFMeshCutter::SetCutFunction(vtkPlane *P)
 //------------------------------------------------------------------------------
 {
   CutFunction = P;
-	CalculateLocalCutCoord();
 }
 
 //------------------------------------------------------------------------------
@@ -885,6 +884,9 @@ void vtkMAFMeshCutter::CreateSlice()
   int i ;
   vtkIdList *polygon = vtkIdList::New() ;
   vtkCellArray *cells = vtkCellArray::New() ;
+	
+	//update local cut coordinates
+	CalculateLocalCutCoord();
 
   FindPointsInPlane() ;           // this finds the points where the mesh intersects the plane
 
