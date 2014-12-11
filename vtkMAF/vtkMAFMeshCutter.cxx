@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: vtkMAFMeshCutter
- Authors: Nigel McFarlane
+ Authors: Nigel McFarlane, Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -28,8 +28,12 @@
 #include "vtkPolyData.h"
 #include "vtkIdType.h"
 #include "vtkIdList.h"
+#include "vtkMatrix4x4.h"
 
 #include <ostream>
+#include "mafDefines.h"
+#include "vtkMAFToLinearTransform.h"
+#include "vtkTransform.h"
 
 
 
@@ -104,7 +108,7 @@ void vtkMAFMeshCutter::Execute()
 void vtkMAFMeshCutter::SetCutFunction(vtkPlane *P)
 //------------------------------------------------------------------------------
 {
-  CutFunction = P ;
+  CutFunction = P;
 }
 
 //------------------------------------------------------------------------------
@@ -323,7 +327,7 @@ int vtkMAFMeshCutter::GetIntersectionOfEdgeWithPlane(const Edge& edge, double *c
   UnstructGrid->GetPoint(edge.id0, p0) ;
   UnstructGrid->GetPoint(edge.id1, p1) ;
 
-  return GetIntersectionOfLineWithPlane(p0, p1, CutFunction->GetOrigin(), CutFunction->GetNormal(), coords, lambda) ;
+  return GetIntersectionOfLineWithPlane(p0, p1, CutTranformedOrigin, CutTranformedNormal, coords, lambda) ;
 }
 
 //-----------------------------------------------------------------------------
@@ -704,10 +708,9 @@ bool vtkMAFMeshCutter::ConstructCellSlicePolygon(vtkIdType cellid, vtkIdList *po
   }
 
   // find the normal and compare it with the normal of the cutting plane
-  double normply[3], normpln[3] ;
+  double normply[3];
   CalculatePolygonNormal(polygon, normply) ;
-  CutFunction->GetNormal(normpln) ;
-  double dotprod = normply[0]*normpln[0] + normply[1]*normpln[1] + normply[2]*normpln[2] ;
+  double dotprod = normply[0]*CutTranformedNormal[0] + normply[1]*CutTranformedNormal[1] + normply[2]*CutTranformedNormal[2] ;
 
   if (dotprod < 0.0){
     // polygon is winding the wrong way - need to reverse it
@@ -881,6 +884,9 @@ void vtkMAFMeshCutter::CreateSlice()
   int i ;
   vtkIdList *polygon = vtkIdList::New() ;
   vtkCellArray *cells = vtkCellArray::New() ;
+	
+	//update local cut coordinates
+	CalculateLocalCutCoord();
 
   FindPointsInPlane() ;           // this finds the points where the mesh intersects the plane
 
@@ -922,8 +928,8 @@ void vtkMAFMeshCutter::PrintSelf(ostream& os, vtkIndent indent)
 
   // print cutting plane
   os << indent << "cutting plane..." << std::endl ;
-  double *po = CutFunction->GetOrigin() ;
-  double *pn = CutFunction->GetNormal() ;
+  double *po = CutTranformedOrigin ;
+  double *pn = CutTranformedNormal ;
   os << indent << "origin: " << po[0] << " " << po[1] << " " << po[2] << std::endl ;
   os << indent << "normal: " << pn[0] << " " << pn[1] << " " << pn[2] << std::endl ;
   os << indent << std::endl ;
@@ -971,4 +977,47 @@ void vtkMAFMeshCutter::PrintSelf(ostream& os, vtkIndent indent)
   os << "polydata..." << std::endl ;
   Polydata->PrintSelf(os, indent) ;
 
+}
+
+void vtkMAFMeshCutter::ToRotationMatrix(vtkMatrix4x4 *matrix)
+{
+	//remove translation components
+	matrix->SetElement(0,3,0);
+	matrix->SetElement(1,3,0);
+	matrix->SetElement(2,3,0);
+}
+
+void vtkMAFMeshCutter::CalculateLocalCutCoord()
+{
+	//Getting Mesh coordinates
+	vtkLinearTransform *trans=vtkLinearTransform::SafeDownCast(CutFunction->GetTransform());
+	if(trans)
+	{
+		double origin[4],normal[4];
+		vtkMatrix4x4 *inverse;
+		vtkNEW(inverse);
+		//Getting slicing transform matrix
+		trans->GetMatrix(inverse);
+		//Inverting matrix to obtain slice to mesh transform matrix
+		inverse->Invert();
+
+		//vtkMatrix4x4 MultiplyPoint requires a 4d vector with last element set to 1
+		origin[3]=normal[3]=1;
+		CutFunction->GetNormal(normal);
+		CutFunction->GetOrigin(origin);
+
+		//Getting mesh local origin
+		inverse->MultiplyPoint(origin,CutTranformedOrigin);
+
+		//Isolate rotation matrix
+		ToRotationMatrix(inverse);
+		//Using rotation matrix to calculate mesh local normal
+		inverse->MultiplyPoint(normal,CutTranformedNormal);
+	}
+	else
+	{
+		//No Transform found -> copy origin and normal
+		CutFunction->GetNormal(CutTranformedNormal);
+		CutFunction->GetOrigin(CutTranformedOrigin);
+	}
 }
