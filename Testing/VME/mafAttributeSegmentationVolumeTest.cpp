@@ -28,7 +28,7 @@
 #include "mafVMESegmentationVolume.h"
 #include "mafVMEStorage.h"
 #include "mafVMERoot.h"
-#include "medVMEFactory.h"
+#include "mafVMEFactory.h"
 
 //----------------------------------------------------------------------------
 void mafAttributeSegmentationVolumeTest::setUp()
@@ -54,7 +54,7 @@ void mafAttributeSegmentationVolumeTest::TestDynamicAllocation()
 void mafAttributeSegmentationVolumeTest::TestSetAutomaticSegmentationThresholdModality()
 //---------------------------------------------------------
 {
-  medVMEFactory::Initialize();
+  mafVMEFactory::Initialize();
   mafVMEStorage *storage = mafVMEStorage::New();
   storage->GetRoot()->SetName("root");
   storage->GetRoot()->Initialize();
@@ -98,7 +98,7 @@ void mafAttributeSegmentationVolumeTest::TestSetAutomaticSegmentationThresholdMo
 void mafAttributeSegmentationVolumeTest::TestSetAutomaticSegmentationGlobalThreshold()
 //---------------------------------------------------------
 {
-  medVMEFactory::Initialize();
+  mafVMEFactory::Initialize();
   mafVMEStorage *storage = mafVMEStorage::New();
   storage->GetRoot()->SetName("root");
   storage->GetRoot()->Initialize();
@@ -140,7 +140,7 @@ void mafAttributeSegmentationVolumeTest::TestSetAutomaticSegmentationGlobalThres
 void mafAttributeSegmentationVolumeTest::TestAddRange()
 //---------------------------------------------------------
 {
-  medVMEFactory::Initialize();
+  mafVMEFactory::Initialize();
   mafVMEStorage *storage = mafVMEStorage::New();
   storage->GetRoot()->SetName("root");
   storage->GetRoot()->Initialize();
@@ -191,7 +191,7 @@ void mafAttributeSegmentationVolumeTest::TestAddRange()
 void mafAttributeSegmentationVolumeTest::TestUpdateRange()
 //---------------------------------------------------------
 {
-  medVMEFactory::Initialize();
+  mafVMEFactory::Initialize();
   mafVMEStorage *storage = mafVMEStorage::New();
   storage->GetRoot()->SetName("root");
   storage->GetRoot()->Initialize();
@@ -242,7 +242,7 @@ void mafAttributeSegmentationVolumeTest::TestUpdateRange()
 void mafAttributeSegmentationVolumeTest::TestDeleteRange()
 //---------------------------------------------------------
 {
-  medVMEFactory::Initialize();
+  mafVMEFactory::Initialize();
   mafVMEStorage *storage = mafVMEStorage::New();
   storage->GetRoot()->SetName("root");
   storage->GetRoot()->Initialize();
@@ -289,7 +289,7 @@ void mafAttributeSegmentationVolumeTest::TestDeleteRange()
 void mafAttributeSegmentationVolumeTest::TestRemoveAllRanges()
 //---------------------------------------------------------
 {
-  medVMEFactory::Initialize();
+  mafVMEFactory::Initialize();
   mafVMEStorage *storage = mafVMEStorage::New();
   storage->GetRoot()->SetName("root");
   storage->GetRoot()->Initialize();
@@ -335,7 +335,7 @@ void mafAttributeSegmentationVolumeTest::TestRemoveAllRanges()
 void mafAttributeSegmentationVolumeTest::TestGetNumberOfRanges()
 //---------------------------------------------------------
 {
-  medVMEFactory::Initialize();
+  mafVMEFactory::Initialize();
   mafVMEStorage *storage = mafVMEStorage::New();
   storage->GetRoot()->SetName("root");
   storage->GetRoot()->Initialize();
@@ -375,7 +375,7 @@ void mafAttributeSegmentationVolumeTest::TestGetNumberOfRanges()
 void mafAttributeSegmentationVolumeTest::TestSetRegionGrowingUpperThreshold()
 //---------------------------------------------------------
 {
-  medVMEFactory::Initialize();
+  mafVMEFactory::Initialize();
   mafVMEStorage *storage = mafVMEStorage::New();
   storage->GetRoot()->SetName("root");
   storage->GetRoot()->Initialize();
@@ -417,7 +417,7 @@ void mafAttributeSegmentationVolumeTest::TestSetRegionGrowingUpperThreshold()
 void mafAttributeSegmentationVolumeTest::TestSetRegionGrowingLowerThreshold()
 //---------------------------------------------------------
 {
-  medVMEFactory::Initialize();
+  mafVMEFactory::Initialize();
   mafVMEStorage *storage = mafVMEStorage::New();
   storage->GetRoot()->SetName("root");
   storage->GetRoot()->Initialize();
@@ -459,7 +459,7 @@ void mafAttributeSegmentationVolumeTest::TestSetRegionGrowingLowerThreshold()
 void mafAttributeSegmentationVolumeTest::TestAddSeed()
 //---------------------------------------------------------
 {
-  medVMEFactory::Initialize();
+  mafVMEFactory::Initialize();
   mafVMEStorage *storage = mafVMEStorage::New();
   storage->GetRoot()->SetName("root");
   storage->GetRoot()->Initialize();
@@ -518,7 +518,7 @@ void mafAttributeSegmentationVolumeTest::TestAddSeed()
 void mafAttributeSegmentationVolumeTest::TestDeleteSeed()
 //---------------------------------------------------------
 {
-  medVMEFactory::Initialize();
+  mafVMEFactory::Initialize();
   mafVMEStorage *storage = mafVMEStorage::New();
   storage->GetRoot()->SetName("root");
   storage->GetRoot()->Initialize();
@@ -573,7 +573,7 @@ void mafAttributeSegmentationVolumeTest::TestDeleteSeed()
 void mafAttributeSegmentationVolumeTest::TestGetNumberOfSeeds()
 //---------------------------------------------------------
 {
-  medVMEFactory::Initialize();
+  mafVMEFactory::Initialize();
   mafVMEStorage *storage = mafVMEStorage::New();
   storage->GetRoot()->SetName("root");
   storage->GetRoot()->Initialize();
@@ -618,7 +618,7 @@ void mafAttributeSegmentationVolumeTest::TestGetNumberOfSeeds()
 void mafAttributeSegmentationVolumeTest::TestRemoveAllSeeds()
 //---------------------------------------------------------
 {
-  medVMEFactory::Initialize();
+  mafVMEFactory::Initialize();
   mafVMEStorage *storage = mafVMEStorage::New();
   storage->GetRoot()->SetName("root");
   storage->GetRoot()->Initialize();
