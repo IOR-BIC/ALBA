@@ -47,13 +47,8 @@ SET(PROJECT_SRCS
   mafVMEScalar.cpp
   mafVMEScalar.h
   ###############
-  medVMEFactory.cpp 
-  medVMEFactory.h
   mafVMELabeledVolume.cpp
   mafVMELabeledVolume.h
-  medPipeFactoryVME.cpp
-  medPipeFactoryVME.h
-
   mafPipeVolumeMIP.cpp
   mafPipeVolumeMIP.h
   mafPipeDensityDistance.cpp

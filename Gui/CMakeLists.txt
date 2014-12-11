@@ -150,8 +150,6 @@ SET(PROJECT_SRCS
   mafGUILutHistogramSwatch.h
   mafGUILutHistogramEditor.cpp
   mafGUILutHistogramEditor.h
-  medGUIMDIFrame.cpp
-  medGUIMDIFrame.h
 )
 
 IF (MAF_USE_CURL)

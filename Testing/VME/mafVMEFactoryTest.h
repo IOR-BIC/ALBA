@@ -30,12 +30,14 @@
 class mafVMEFactoryTest : public CPPUNIT_NS::TestFixture
 {
   CPPUNIT_TEST_SUITE( mafVMEFactoryTest );
+    CPPUNIT_TEST( TestGetInstance );
   CPPUNIT_TEST( Initialize_CreateVMEInstance );
 	CPPUNIT_TEST( TestGetMAFSourceVersion );
 	CPPUNIT_TEST( TestGetDescription );
   CPPUNIT_TEST_SUITE_END();
 
   protected:
+    void TestGetInstance();
     void Initialize_CreateVMEInstance();
 		void TestGetMAFSourceVersion();
 		void TestGetDescription();

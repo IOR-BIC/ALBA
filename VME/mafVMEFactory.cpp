@@ -65,9 +65,29 @@
 #include "mafTagArray.h"
 #include "mafVMEItemVTK.h"
 
+
+#include "mafVMEWrappedMeter.h"
+#include "mafVMEPolylineGraph.h"
+#include "mafVMEPolylineEditor.h"
+#include "mafVMEMaps.h"
+
+#include "mafVMESurfaceEditor.h"
+#include "mafVMELabeledVolume.h"
+#include "mafVMESegmentationVolume.h"
+#include "mafAttributeSegmentationVolume.h"
+
+#ifdef MAF_USE_ITK
+#include "mafVMERawMotionData.h"
+#include "mafVMEAnalog.h"
+#include "mafVMEStent.h"
+#endif
+
+#include "mafVMEVolumeLarge.h"
+
 #include "mafIndent.h"
 #include <string>
 #include <ostream>
+
 
 mafCxxTypeMacro(mafVMEFactory);
 
@@ -145,6 +165,28 @@ mafVMEFactory::mafVMEFactory()
 #endif
   mafPlugNodeMacro(mafVMESlicer,"VME representing a slice of a volume");
   mafPlugNodeMacro(mafVMEVector,"VME representing aa applyed vector");
+
+
+  //mafPlugObjectMacro(mmaObject,"Object attributes");
+  mafPlugObjectMacro(mafAttributeSegmentationVolume,"Segmentation Volume attributes");
+
+  mafPlugNodeMacro(mafVMEWrappedMeter,"Generalized VME Meter with wrapping geometry");
+  mafPlugNodeMacro(mafVMEPolylineGraph,"VME for Graph and Polyline");
+  mafPlugNodeMacro(mafVMEPolylineEditor,"VME for Editing Graph and Polyline");
+  mafPlugNodeMacro(mafVMESurfaceEditor,"VME for Editing Surface");
+  mafPlugNodeMacro(mafVMELabeledVolume,"VME representing a label put on a volume");
+  mafPlugNodeMacro(mafVMEMaps, "VME representing density-distace surface scalars");
+  mafPlugNodeMacro(mafVMESegmentationVolume, "VME for Segmented Volume");
+
+#ifdef MAF_USE_ITK
+  mafPlugNodeMacro(mafVMERawMotionData,"VME that is a group for RawMotionData");
+  mafPlugNodeMacro(mafVMEAnalog,"VME rapresenting EMG scalar data");
+  mafPlugNodeMacro(mafVMEStent,"VME representing stent structure");
+#endif
+  //mafPlugNodeMacro(mafVMEthing,"VME representing a thing");
+
+  //TODO: to be committed down
+  mafPlugNodeMacro(mafVMEVolumeLarge, "VME storing large volume datasets with one scalar component");
 }
 
 //------------------------------------------------------------------------------

@@ -126,7 +126,7 @@ private:
   bool               m_Warn; ///< Flag to warn the user when an operation that can not undo is starting.
   mafWizardWaitOp   *m_WaitOp;
 
-  friend class medLogicWithManagers; // class mafWizardManager can now access data directly
+  friend class mafLogicWithManagers; // class mafWizardManager can now access data directly
   friend class mafWizardManagerTest; // for testing 
 };
 #endif

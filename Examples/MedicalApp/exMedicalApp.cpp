@@ -27,7 +27,6 @@
 #include "mafDecl.h"
 
 #include "mafVMEFactory.h"
-#include "medVMEFactory.h"
 #include "mafPics.h"
 #include "mafGUIMDIFrame.h"
 
@@ -37,7 +36,7 @@
 #include "mafVMERoot.h"
 #include "mafVMESurface.h"
 #include "mafPipeFactoryVME.h"
-#include "medPipeFactoryVME.h"
+
 
 //Comment this line to disable wizard sample
 #define USE_WIZARD
@@ -185,14 +184,14 @@ bool exMedicalApp::OnInit()
 	mafADDPIC(MDICHILD_ICON);
 
 	int result;
-	result = medVMEFactory::Initialize();
+	result = mafVMEFactory::Initialize();
 	assert(result==MAF_OK);
 
 	// Initialize and Fill of PipeFactory -- could be a SideEffect of the node plug
-	result = medPipeFactoryVME::Initialize();
+	result = mafPipeFactoryVME::Initialize();
 	assert(result==MAF_OK);
 
-	m_Logic = new medLogicWithManagers();
+	m_Logic = new mafLogicWithManagers();
   
 	m_Logic->GetTopWin()->SetTitle("Medical example");
 

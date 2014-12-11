@@ -44,6 +44,9 @@ class mafGUIApplicationLayoutSettings;
 class mafGUISettings;
 class mafGUISettingsHelp;
 class mafUser;
+//
+class mafWizardManager;
+class mafWizard;
 
 //----------------------------------------------------------------------------
 // mafLogicWithManagers :
@@ -122,6 +125,12 @@ public:
 
   /** Must be called before Configure */
   void PlugInteractionManger(bool b){m_UseInteractionManager=b;}
+
+  /** Must be called before Configure */
+  void PlugWizardManager(bool b){m_UseWizardManager=b;};
+
+  /**  Plug a new wizard */
+  virtual void Plug(mafWizard *wizard, wxString menuPath = "");
 
   /** Fill the View and operation menu's and set the application stamp to the VMEManager.*/
   virtual void Show();
@@ -266,6 +275,23 @@ protected:
   /** Called after FileOpen or Save operation */
   virtual void UpdateFrameTitle();
 
+  //-------------------
+
+
+  /** to be added */
+  virtual void ConfigureWizardManager();
+
+  /** Called when an wizard starts. Disable all menu and lock the Selection */ 
+  virtual void WizardRunStarting();
+
+  /** Called when an wizard stops. Re-enable all menu and unlock the Selection */ 
+  virtual void WizardRunTerminated();
+
+  /** Redefined to add Print buttons */
+  virtual void CreateWizardToolbar();
+
+
+
   mafSideBar             *m_SideBar;
   mafVMEManager          *m_VMEManager;
   mafViewManager         *m_ViewManager;
@@ -299,5 +325,13 @@ protected:
   mafString m_Extension;
 
   mafUser *m_User; ///< Applications' user
+
+  mafWizardManager *m_WizardManager;
+  bool m_UseWizardManager;
+  bool m_WizardRunning;
+  wxGauge *m_WizardGauge;
+  wxStaticText* m_WizardLabel;
+  bool m_CancelledBeforeOpStarting;
+  wxMenu *m_WizardMenu;
 };
 #endif

@@ -3,7 +3,7 @@ PROJECT (mafVME_TEST)
 IF(MAF_BUILD_MAFDLL)
   LINK_LIBRARIES(mafDLL)
 ELSE(MAF_BUILD_MAFDLL)
-  LINK_LIBRARIES(mafVME mafDataPipes GPUAPI vtkRendering vtkGraphics mafCommon mafOperations)
+  LINK_LIBRARIES(mafVME mafDataPipes GPUAPI vtkRendering vtkGraphics) # mafCommon mafOperations)
 ENDIF (MAF_BUILD_MAFDLL)
  
 #-----------------------------------------------------------------------------
@@ -509,17 +509,11 @@ ADD_TEST(mafVMELabeledVolumeTest  ${EXECUTABLE_OUTPUT_PATH}/mafVMELabeledVolumeT
 ADD_EXECUTABLE(mafPipeVolumeMIPTest mafPipeVolumeMIPTest.h mafPipeVolumeMIPTest.cpp)
 ADD_TEST(mafPipeVolumeMIPTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipeVolumeMIPTest)
 
-ADD_EXECUTABLE(medPipeFactoryVMETest medPipeFactoryVMETest.h medPipeFactoryVMETest.cpp)
-ADD_TEST(medPipeFactoryVMETest  ${EXECUTABLE_OUTPUT_PATH}/medPipeFactoryVMETest)
-
 ADD_EXECUTABLE(mafPipeVolumeDRRTest mafPipeVolumeDRRTest.h mafPipeVolumeDRRTest.cpp)
 ADD_TEST(mafPipeVolumeDRRTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipeVolumeDRRTest)
 
 ADD_EXECUTABLE(mafVMEAnalogTest mafVMEAnalogTest.h mafVMEAnalogTest.cpp)
 ADD_TEST(mafVMEAnalogTest  ${EXECUTABLE_OUTPUT_PATH}/mafVMEAnalogTest)
-
-ADD_EXECUTABLE(medVMEFactoryTest medVMEFactoryTest.h medVMEFactoryTest.cpp)
-ADD_TEST(medVMEFactoryTest  ${EXECUTABLE_OUTPUT_PATH}/medVMEFactoryTest)
 
 ADD_EXECUTABLE(mafVMEOutputSurfaceEditorTest mafVMEOutputSurfaceEditorTest.h mafVMEOutputSurfaceEditorTest.cpp)
 ADD_TEST(mafVMEOutputSurfaceEditorTest  ${EXECUTABLE_OUTPUT_PATH}/mafVMEOutputSurfaceEditorTest)

@@ -69,6 +69,14 @@ mafVMECustom::~mafVMECustom()
   
 }
 //-------------------------------------------------------------------------
+void mafVMEFactoryTest::TestGetInstance()
+//-------------------------------------------------------------------------
+{
+  mafVMEFactory *vme_factory = NULL;
+  vme_factory = (mafVMEFactory*) mafVMEFactory::GetInstance();
+  CPPUNIT_ASSERT(vme_factory != NULL);
+}
+//-------------------------------------------------------------------------
 void mafVMEFactoryTest::Initialize_CreateVMEInstance()
 //-------------------------------------------------------------------------
 {
@@ -93,7 +101,7 @@ void mafVMEFactoryTest::Initialize_CreateVMEInstance()
 
   std::vector<std::string> vmes = vme_factory->GetNodeNames();
   int s1 = vmes.size();
-  CPPUNIT_ASSERT(s1 == 25); //24 VMES are registered in constructor actually, 
+  CPPUNIT_ASSERT(s1 == 36); //24 VMES are registered in constructor actually, 
                             //please modify also the test when (un)plugged inside maf and update this number
            
   // test factory contents
@@ -101,7 +109,7 @@ void mafVMEFactoryTest::Initialize_CreateVMEInstance()
   mafPlugNode<mafVMECustom>("a custom vme"); // plug a vme in the main node factory again
   vmes = vme_factory->GetNodeNames();
   s1 = vmes.size();
-  CPPUNIT_ASSERT(s1 == 25);
+  CPPUNIT_ASSERT(s1 == 36);
 
   bool found=false;
   for (int i=0;i<vmes.size();i++)

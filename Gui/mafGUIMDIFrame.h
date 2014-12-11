@@ -165,6 +165,9 @@ protected:
   /** Create the status bar on main application frame. */
   void CreateStatusbar();
   
+  /** Send the 'Wizard' men event. */
+  void OnMenuWizard(wxCommandEvent& e);
+
 
   mafObserver *m_Listener;
 

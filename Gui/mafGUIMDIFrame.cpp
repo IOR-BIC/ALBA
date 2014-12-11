@@ -100,6 +100,7 @@ class mafGUIMDIFrameCallback : public vtkCommand
 BEGIN_EVENT_TABLE(mafGUIMDIFrame, wxMDIParentFrame)
     EVT_CLOSE(mafGUIMDIFrame::OnCloseWindow)
     EVT_DROP_FILES(mafGUIMDIFrame::OnDropFile)
+	EVT_MENU_RANGE(WIZARD_START,WIZARD_END,mafGUIMDIFrame::OnMenuWizard)
     EVT_MENU_RANGE(MENU_START,MENU_END,mafGUIMDIFrame::OnMenu)
 		EVT_MENU_RANGE(OP_START,OP_END,mafGUIMDIFrame::OnMenuOp)
     EVT_MENU_RANGE(VIEW_START,VIEW_END,mafGUIMDIFrame::OnMenuView)
@@ -175,6 +176,13 @@ mafGUIMDIFrame::~mafGUIMDIFrame()
   cppDEL(m_DockSettings);
 
   mafSetFrame(NULL);
+}
+//----------------------------------------------------------------------------
+void mafGUIMDIFrame::OnMenuWizard(wxCommandEvent& e)
+	//----------------------------------------------------------------------------
+{ 
+	//Tell logic about click on wizard menu
+	mafEventMacro(mafEvent(this,MENU_WIZARD,(long)e.GetId()));
 }
 //----------------------------------------------------------------------------
 void mafGUIMDIFrame::OnMenu(wxCommandEvent& e)

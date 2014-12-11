@@ -18,7 +18,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "medLogicWithManagers.h" 
+#include "mafLogicWithManagers.h" 
 
 // ============================================================================
 class exMedicalApp : public wxApp
@@ -28,7 +28,7 @@ public:
   bool OnInit();
   int  OnExit();
 protected:
-  medLogicWithManagers *m_Logic;
+  mafLogicWithManagers *m_Logic;
 
 	void OnFatalException();
 };
