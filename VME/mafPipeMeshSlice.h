@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: mafPipeMeshSlice
- Authors: Daniele Giunchi , Stefano Perticoni
+ Authors: Daniele Giunchi , Stefano Perticoni, Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -130,6 +130,12 @@ public:
 
   /** Set the normal of the slice*/
 	void SetNormal(double *Normal);
+
+  /** Set the lookup table */
+	void SetLookupTable(vtkLookupTable *table);
+  
+  /** Gets the lookup table*/
+	vtkLookupTable *GetLookupTable(){return m_Table;};
 
 protected:
 	mmaMaterial             *m_MeshMaterial;

@@ -385,7 +385,12 @@ void mafGUILutEditor::OnEvent(mafEventBase *maf_event)
         int id = m_UserPresetCombo->GetSelection();
         wxString sel = m_UserPresetCombo->GetString(id) ;
         mafLogMessage(sel.c_str());
-        m_Lut->DeepCopy(m_UserLutLibrary->GetLutByName(sel.c_str()));
+				double range[2];
+				range[0]=m_Lut->GetRange()[0];
+				range[1]=m_Lut->GetRange()[1];
+				m_Lut->DeepCopy(m_UserLutLibrary->GetLutByName(sel.c_str()));
+				m_Lut->SetRange(range);
+				
         m_NewUserLutName = sel.c_str();
         UpdateWidgetsOnLutChange();
       }
