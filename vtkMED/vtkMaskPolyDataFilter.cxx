@@ -128,14 +128,16 @@ void vtkMaskPolyDataFilter::Execute()
 
 	float *tuple=new float[numcomp];
 
+	int oldProgress=0;
 	int progress=0;
 
 	for (i = 0; i < numPts && !abortExecute; i++) 
 	{
 		progress=((float)i*100/(float)numPts);
 
-		if ((progress%2)==0)
+		if (progress!=oldProgress)
 		{
+			oldProgress=progress;
 			this->UpdateProgress((float)progress/100.0);
 			abortExecute = this->GetAbortExecute();
 		}
