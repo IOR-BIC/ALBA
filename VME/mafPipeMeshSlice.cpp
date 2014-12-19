@@ -166,7 +166,7 @@ void mafPipeMeshSlice::ExecutePipe()
     mesh_output->Update();
     data = vtkUnstructuredGrid::SafeDownCast(mesh_output->GetVTKData());
     data->Update();
-    m_MeshMaterial = mesh_output->GetMaterial();
+    m_MeshMaterial = (mmaMaterial *)m_Vme->GetAttribute("MaterialAttributes");
   }
 
   CreateFieldDataControlArrays();
@@ -603,8 +603,9 @@ void mafPipeMeshSlice::SetWireframeOn()
 //----------------------------------------------------------------------------
 {
 	m_Wireframe=true;
-  m_Actor->GetProperty()->SetRepresentationToWireframe();
-  m_Actor->Modified();
+	m_Actor->GetProperty()->SetRepresentationToWireframe();
+	m_MeshMaterial->m_Representation=m_Actor->GetProperty()->GetRepresentation();
+	m_Actor->Modified();
   m_ActorWired->SetVisibility(0);
   m_ActorWired->Modified();
 	if(m_Gui)
@@ -620,7 +621,8 @@ void mafPipeMeshSlice::SetWireframeOff()
 //----------------------------------------------------------------------------
 {
 	m_Wireframe=false;
-  m_Actor->GetProperty()->SetRepresentationToSurface();
+	m_Actor->GetProperty()->SetRepresentationToSurface();
+	m_MeshMaterial->m_Representation=m_Actor->GetProperty()->GetRepresentation();
   m_Actor->Modified();
   m_ActorWired->SetVisibility(m_BorderElementsWiredActor);
   m_ActorWired->Modified();

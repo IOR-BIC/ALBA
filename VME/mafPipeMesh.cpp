@@ -129,10 +129,7 @@ void mafPipeMesh::ExecutePipe()
 	assert(data);
 	data->Update();
 
-	m_MeshMaterial = mesh_output->GetMaterial();
-  //m_MeshMaterial->m_MaterialType = mmaMaterial::USE_LOOKUPTABLE;
-
-  
+	m_MeshMaterial = (mmaMaterial *)m_Vme->GetAttribute("MaterialAttributes");
 
   m_PointCellArraySeparation = data->GetPointData()->GetNumberOfArrays();
   m_NumberOfArrays = m_PointCellArraySeparation + data->GetCellData()->GetNumberOfArrays();
@@ -488,8 +485,9 @@ void mafPipeMesh::SetWireframeOn()
 //----------------------------------------------------------------------------
 {
 	m_Wireframe = true;
-  m_Actor->GetProperty()->SetRepresentationToWireframe();
-  m_Actor->Modified();
+	m_Actor->GetProperty()->SetRepresentationToWireframe();
+  m_MeshMaterial->m_Representation=m_Actor->GetProperty()->GetRepresentation();
+	m_Actor->Modified();
 	m_ActorWired->SetVisibility(0);
 	m_ActorWired->Modified();
 	if(m_Gui)
@@ -505,7 +503,8 @@ void mafPipeMesh::SetWireframeOff()
 //----------------------------------------------------------------------------
 {
 	m_Wireframe = false;
-  m_Actor->GetProperty()->SetRepresentationToSurface();
+	m_Actor->GetProperty()->SetRepresentationToSurface();
+	m_MeshMaterial->m_Representation=m_Actor->GetProperty()->GetRepresentation();
   m_Actor->Modified();
 	m_ActorWired->SetVisibility(m_BorderElementsWiredActor);
 	m_ActorWired->Modified();
