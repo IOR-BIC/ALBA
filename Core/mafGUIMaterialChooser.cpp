@@ -709,7 +709,7 @@ void mafGUIMaterialChooser::SelectMaterial(mmaMaterial *m)
     m_Opacity					  = m_Property->GetOpacity(); 
     m_MaterialName      = m_ChoosedMaterial->m_MaterialName;
 
-    m_Wire = m_Property->GetRepresentation() == 1;
+    m_Wire = m_Property->GetRepresentation() == VTK_WIREFRAME;
     if (m_Wire)
     {
       m_Sphere->SetThetaResolution(10);

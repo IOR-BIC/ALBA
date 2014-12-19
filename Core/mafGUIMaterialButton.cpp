@@ -103,7 +103,6 @@ void mafGUIMaterialButton::OnEvent(mafEventBase *maf_event)
       case ID_MATERIAL:
         mafEventMacro(mafEvent(this,VME_CHOOSE_MATERIAL,m_Vme));
         m_MaterialLabel->SetLabel(m_Material->m_MaterialName.GetCStr());
-        cppDEL(m_Material->m_Icon);
         UpdateMaterialIcon();
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       break;
@@ -116,12 +115,12 @@ void mafGUIMaterialButton::OnEvent(mafEventBase *maf_event)
 void mafGUIMaterialButton::UpdateMaterialIcon() 
 //----------------------------------------------------------------------------
 {
-	if(m_Material->m_Icon == NULL)
-	{
-		m_Material->MakeIcon();
-		m_MaterialButton->SetBitmapLabel(*m_Material->m_Icon);
-    m_MaterialButton->Refresh();
-	}
+	cppDEL(m_Material->m_Icon);
+	
+	m_Material->MakeIcon();
+	m_MaterialButton->SetBitmapLabel(*m_Material->m_Icon);
+  m_MaterialButton->Refresh();
+
   m_Gui->Update();
 }
 //----------------------------------------------------------------------------

@@ -282,8 +282,11 @@ void mafGUILutWidget::ShadeSelectionInHSV()
   {
     if(m_LutEntry[i].m_Selected)
     {
+			double r,g,b,a;
       float t = (1.0*counter)/num;
       m_LutEntry[i].m_Color = mafColor::InterpolateHSV(c1,c2,t);
+			m_LutEntry[i].m_Color.GetFloatRGB(&r,&g,&b,&a);
+			m_Lut->SetTableValue(i,r,g,b,a);
       DrawEntry(i);
       counter++;
     }
@@ -308,8 +311,11 @@ void mafGUILutWidget::ShadeSelectionInRGB()
   {
     if(m_LutEntry[i].m_Selected)
     {
+			double r,g,b,a;
       float t = (1.0*counter)/num;
       m_LutEntry[i].m_Color = mafColor::InterpolateRGB(c1,c2,t);
+			m_LutEntry[i].m_Color.GetFloatRGB(&r,&g,&b,&a);
+			m_Lut->SetTableValue(i,r,g,b,a);
       DrawEntry(i);
       counter++;
     }

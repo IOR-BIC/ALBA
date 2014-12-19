@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: mafPipeMesh
- Authors: Daniele Giunchi , Stefano Perticoni
+ Authors: Daniele Giunchi , Stefano Perticoni, Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -90,6 +90,7 @@ mafPipeMesh::mafPipeMesh()
   m_UseVTKProperty  = 1;
 
   m_BorderElementsWiredActor = 1;
+	m_Border = 1;
 }
 //----------------------------------------------------------------------------
 void mafPipeMesh::Create(mafSceneNode *n)
@@ -128,10 +129,7 @@ void mafPipeMesh::ExecutePipe()
 	assert(data);
 	data->Update();
 
-	m_MeshMaterial = mesh_output->GetMaterial();
-  //m_MeshMaterial->m_MaterialType = mmaMaterial::USE_LOOKUPTABLE;
-
-  
+	m_MeshMaterial = (mmaMaterial *)m_Vme->GetAttribute("MaterialAttributes");
 
   m_PointCellArraySeparation = data->GetPointData()->GetNumberOfArrays();
   m_NumberOfArrays = m_PointCellArraySeparation + data->GetCellData()->GetNumberOfArrays();
@@ -306,10 +304,15 @@ mafGUI *mafPipeMesh::CreateGui()
 {
 	assert(m_Gui == NULL);
 	m_Gui = new mafGUI(this);
-  m_Gui->Bool(ID_WIREFRAME,_("Wireframe"), &m_Wireframe, 1);
-  m_Gui->Bool(ID_WIRED_ACTOR_VISIBILITY,_("Element Edges"), &m_BorderElementsWiredActor, 1);
   
-  m_Gui->Divider(2);
+	m_Gui->Bool(ID_WIREFRAME,_("Wireframe"), &m_Wireframe, 1);
+	m_Gui->FloatSlider(ID_BORDER_CHANGE,_("Thickness"),&m_Border,1.0,5.0);
+	m_Gui->Enable(ID_BORDER_CHANGE,m_Wireframe);
+	m_Gui->Divider(2);
+
+	m_Gui->Bool(ID_WIRED_ACTOR_VISIBILITY,_("Element Edges"), &m_BorderElementsWiredActor, 1);
+		
+	m_Gui->Divider(2);
   m_Gui->Bool(ID_USE_VTK_PROPERTY,"Property",&m_UseVTKProperty, 1);
   m_MaterialButton = new mafGUIMaterialButton(m_Vme,this);
   m_Gui->AddGui(m_MaterialButton->GetGui());
@@ -342,6 +345,13 @@ void mafPipeMesh::OnEvent(mafEventBase *maf_event)
             SetWireframeOff();
           else
             SetWireframeOn();
+          
+          if(m_Gui)
+          {
+   					m_MaterialButton->UpdateMaterialIcon();
+   					m_MaterialButton->GetGui()->Update();
+   					m_Gui->Update();
+          }
         }
         break;
       case ID_WIRED_ACTOR_VISIBILITY:
@@ -371,57 +381,86 @@ void mafPipeMesh::OnEvent(mafEventBase *maf_event)
           double sr[2];
           m_Table->GetTableRange(sr);
           m_Mapper->SetScalarRange(sr);
+					mafEventMacro(mafEvent(this,CAMERA_UPDATE));
         }
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
         break;
       case ID_SCALAR_MAP_ACTIVE:
         {
+					m_Mapper->SetScalarVisibility(m_ScalarMapActive);
+				
+					if(m_Gui)
+					{
+						m_Gui->Enable(ID_SCALARS, m_ScalarMapActive != 0);
+						m_Gui->Enable(ID_LUT, m_ScalarMapActive != 0);
+						m_Gui->Update();
+					}
+	
+					UpdateActiveScalarsInVMEDataVectorItems();
 
-            for (int i=0;i<m_NumberOfArrays;i++)
-            {
-              if (m_Vme->GetOutput()->GetVTKData()->GetPointData()->GetScalars() && strcmp(m_Vme->GetOutput()->GetVTKData()->GetPointData()->GetScalars()->GetName(),m_ScalarsVTKName[i]) == 0 )
-              {
-                m_ScalarIndex = i;
-                m_ActiveScalarType = POINT_TYPE;
-                break;
-              }
-              else if (m_Vme->GetOutput()->GetVTKData()->GetCellData()->GetScalars() && strcmp(m_Vme->GetOutput()->GetVTKData()->GetCellData()->GetScalars()->GetName(),m_ScalarsVTKName[i]) == 0 )
-              {
-                m_ScalarIndex = i;
-                m_ActiveScalarType = CELL_TYPE;
-                break;
-              }
-            }
+					if(m_Wireframe == 0) 
+						SetWireframeOff();
+					else
+						SetWireframeOn();
 
-          if(m_ScalarMapActive)
-            m_Mapper->ScalarVisibilityOn();
-          else
-            m_Mapper->ScalarVisibilityOff();
-
-          m_Gui->Enable(ID_SCALARS, m_ScalarMapActive != 0);
-          m_Gui->Enable(ID_LUT, m_ScalarMapActive != 0);
-          m_Gui->Update();
-
-          UpdateActiveScalarsInVMEDataVectorItems();
           mafEventMacro(mafEvent(this,CAMERA_UPDATE));
         }
         break;
       case ID_USE_VTK_PROPERTY:
-        if (m_UseVTKProperty != 0)
-        {
-          m_Actor->SetProperty(m_MeshMaterial->m_Prop);
-          //m_MeshMaterial->m_MaterialType = mmaMaterial::USE_VTK_PROPERTY;
-        }
-        else
-        {
-          m_Actor->SetProperty(NULL);
-          //m_MeshMaterial->m_MaterialType = mmaMaterial::USE_LOOKUPTABLE;
-        }
-        m_MaterialButton->Enable(m_UseVTKProperty != 0);
-        m_MaterialButton->UpdateMaterialIcon();
-        m_Gui->Update();
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-        break;
+				{
+					if (m_UseVTKProperty != 0)
+					{
+						m_Actor->SetProperty(m_MeshMaterial->m_Prop);
+						//m_MeshMaterial->m_MaterialType = mmaMaterial::USE_VTK_PROPERTY;
+					}
+					else
+					{
+						m_Actor->SetProperty(NULL);
+						//m_MeshMaterial->m_MaterialType = mmaMaterial::USE_LOOKUPTABLE;
+					}
+
+					if(m_Wireframe == 0) 
+						SetWireframeOff();
+					else
+						SetWireframeOn();
+
+					if(m_Gui)
+					{
+						m_MaterialButton->Enable(m_UseVTKProperty != 0);
+						m_MaterialButton->UpdateMaterialIcon();
+						m_Gui->Update();
+					}
+					mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+				}
+				break;
+			case ID_BORDER_CHANGE:
+				{
+					m_Actor->GetProperty()->SetLineWidth(m_Border);
+					m_Actor->Modified();
+					mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+
+					m_MaterialButton->UpdateMaterialIcon();
+					m_MaterialButton->GetGui()->Update();
+					m_Gui->Update();
+				}
+				break;
+			case VME_CHOOSE_MATERIAL:
+				{
+					mafEventMacro(*e);
+					mmaMaterial *material = (mmaMaterial *)m_Vme->GetAttribute("MaterialAttributes");
+					if(material && material->m_Prop )
+					{
+						bool newWireframe=(material->m_Prop->GetRepresentation() == VTK_WIREFRAME);
+						if (newWireframe!=m_Wireframe)
+						{
+							m_Wireframe=newWireframe;
+							if(m_Wireframe == 0) 
+								SetWireframeOff();
+							else
+								SetWireframeOn();
+						}
+					}
+				}
+				break;
 			default:
 				mafEventMacro(*e);
 				break;
@@ -445,16 +484,36 @@ void mafPipeMesh::SetActorPicking(int enable)
 void mafPipeMesh::SetWireframeOn()
 //----------------------------------------------------------------------------
 {
-  m_Actor->GetProperty()->SetRepresentationToWireframe();
-  m_Actor->Modified();
+	m_Wireframe = true;
+	m_Actor->GetProperty()->SetRepresentationToWireframe();
+  m_MeshMaterial->m_Representation=m_Actor->GetProperty()->GetRepresentation();
+	m_Actor->Modified();
+	m_ActorWired->SetVisibility(0);
+	m_ActorWired->Modified();
+	if(m_Gui)
+	{ 
+		m_Gui->Enable(ID_BORDER_CHANGE,true);
+		m_Gui->Enable(ID_WIRED_ACTOR_VISIBILITY,false);
+		m_Gui->Update();
+	}
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
 void mafPipeMesh::SetWireframeOff()
 //----------------------------------------------------------------------------
 {
-  m_Actor->GetProperty()->SetRepresentationToSurface();
+	m_Wireframe = false;
+	m_Actor->GetProperty()->SetRepresentationToSurface();
+	m_MeshMaterial->m_Representation=m_Actor->GetProperty()->GetRepresentation();
   m_Actor->Modified();
+	m_ActorWired->SetVisibility(m_BorderElementsWiredActor);
+	m_ActorWired->Modified();
+	if(m_Gui)
+	{
+		m_Gui->Enable(ID_BORDER_CHANGE,false);
+		m_Gui->Enable(ID_WIRED_ACTOR_VISIBILITY,true);
+		m_Gui->Update();
+	}
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
@@ -640,3 +699,38 @@ void mafPipeMesh::CreateFieldDataControlArrays()
   delete []tempScalarsPointsName;
 
 }
+
+//----------------------------------------------------------------------------
+void mafPipeMesh::SetLookupTable(vtkLookupTable *table)
+//----------------------------------------------------------------------------
+{
+	if(m_Table==NULL || table==NULL ) return;
+
+	int n = table->GetNumberOfTableValues();
+	if(n>256) n=256;
+	m_Table->SetNumberOfTableValues(n);
+	m_Table->SetRange(table->GetRange());
+	for(int i=0; i<n; i++)
+	{
+		double *rgba;
+		rgba = table->GetTableValue(i);
+		m_Table->SetTableValue(i,rgba[0],rgba[1],rgba[2],rgba[3]);
+	}
+}
+
+//----------------------------------------------------------------------------
+double mafPipeMesh::GetThickness()
+//----------------------------------------------------------------------------
+{
+	return m_Border;
+}
+//----------------------------------------------------------------------------
+void mafPipeMesh::SetThickness(double thickness)
+//----------------------------------------------------------------------------
+{
+	m_Border=thickness;
+	m_Actor->GetProperty()->SetLineWidth(m_Border);
+	m_Actor->Modified();
+	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+}
+
