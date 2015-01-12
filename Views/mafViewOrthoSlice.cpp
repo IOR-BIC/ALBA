@@ -52,6 +52,7 @@
 #include "vtkPointData.h"
 #include "vtkPoints.h"
 #include "vtkCamera.h"
+#include "mafPipeMeshSlice.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafViewOrthoSlice);
@@ -148,7 +149,11 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
   // Disable ChildView XN, YN and ZN when no Volume is selected
   if (m_CurrentVolume != NULL)
  	  for(int j=1; j<m_NumOfChildView; j++) 
+		{
       m_ChildViewList[j]->VmeShow(node, show);
+			if(show && j==YN_VIEW && mafPipeMeshSlice::SafeDownCast(m_ChildViewList[j]->GetNodePipe(node)))
+				mafPipeMeshSlice::SafeDownCast(m_ChildViewList[j]->GetNodePipe(node))->SetFlipNormalOff();
+		}
   
 	if (((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume"))
 	{
@@ -182,6 +187,8 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
       for(int j=1; j<m_NumOfChildView; j++)
       {
         m_ChildViewList[j]->VmeShow(m_VMElist[i], show);
+				if(show && j==YN_VIEW && mafPipeMeshSlice::SafeDownCast(m_ChildViewList[j]->GetNodePipe(m_VMElist[i])))
+					 mafPipeMeshSlice::SafeDownCast(m_ChildViewList[j]->GetNodePipe(m_VMElist[i]))->SetFlipNormalOff();
         ApplyViewSettings(m_VMElist[i]);
       }
 	}
