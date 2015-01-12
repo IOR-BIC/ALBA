@@ -47,17 +47,29 @@ mafGUIMaterialButton::mafGUIMaterialButton(mafVME *vme, mafObserver *listener)
 //----------------------------------------------------------------------------
 {
 	m_Listener = listener;
-  m_Vme      = vme;
 
-  m_Material = (mmaMaterial *)m_Vme->GetAttribute("MaterialAttributes");
-  if (m_Material == NULL)
-  {
-    m_Material = mmaMaterial::New();
-    m_Vme->SetAttribute("MaterialAttributes", m_Material);
-  }
+	SetVME(vme);
 
 	CreateGui();
 }
+
+
+void mafGUIMaterialButton::SetVME(mafVME *vme)
+{
+	m_Vme = vme;
+
+	if(m_Vme)
+	{
+		m_Material = (mmaMaterial *)m_Vme->GetAttribute("MaterialAttributes");
+		if (m_Material == NULL)
+		{
+			m_Material = mmaMaterial::New();
+			m_Vme->SetAttribute("MaterialAttributes", m_Material);
+		}
+	}
+}
+
+
 //----------------------------------------------------------------------------
 mafGUIMaterialButton::~mafGUIMaterialButton()
 //----------------------------------------------------------------------------
