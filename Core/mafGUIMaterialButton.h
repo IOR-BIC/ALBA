@@ -56,6 +56,8 @@ public:
 
   mmaMaterial *GetMaterial() {return m_Material;};
 
+	void SetVME(mafVME *vme);
+
 protected:
 	/** Create the GUI for the materials */
 	void CreateGui();

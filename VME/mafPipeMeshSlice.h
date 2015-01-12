@@ -37,6 +37,7 @@ class mafGUIMaterialButton;
 class vtkMAFMeshCutter;
 class vtkPlane;
 class vtkPolyDataNormals;
+class mafGUILutSwatch;
 
 //----------------------------------------------------------------------------
 // mafPipeMeshSlice :
@@ -154,6 +155,8 @@ protected:
   vtkPlane				        *m_Plane;
   vtkMAFMeshCutter		    *m_Cutter;
   vtkPolyDataNormals *m_NormalFilter;
+
+	mafGUILutSwatch *m_LutSwatch;
   
 
   void CreateFieldDataControlArrays();

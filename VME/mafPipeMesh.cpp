@@ -86,6 +86,10 @@ mafPipeMesh::mafPipeMesh()
 	m_ScalarsVTKName = NULL;
   m_MaterialButton = NULL;
 
+	m_ActorWired			= NULL;
+	m_MapperWired			= NULL;
+	m_Axes						= NULL;
+
   m_ScalarMapActive = 0;
   m_UseVTKProperty  = 1;
 
@@ -223,6 +227,13 @@ void mafPipeMesh::ExecutePipe()
   m_ActorWired->SetMapper(m_MapperWired);
   m_ActorWired->GetProperty()->SetRepresentationToWireframe();
 
+	mmaMaterial *material = (mmaMaterial *)m_Vme->GetAttribute("MaterialAttributes");
+	
+	if(material && material->m_Prop )
+		m_Wireframe=(material->m_Prop->GetRepresentation() == VTK_WIREFRAME);
+	
+	if(m_Wireframe)
+		SetWiredActorVisibilityOff();
   
  // m_ActorWired->GetProperty()->SetLineWidth(3);
   //m_ActorWired->SetScale(1.1);
@@ -259,9 +270,12 @@ void mafPipeMesh::AddActorsToAssembly(vtkMAFAssembly *assembly)
 void mafPipeMesh::RemoveActorsFromAssembly(vtkMAFAssembly *assembly)
 //----------------------------------------------------------------------------
 {
-	assembly->RemovePart(m_Actor);
-  assembly->RemovePart(m_ActorWired);
-	assembly->RemovePart(m_OutlineActor);
+	if(assembly)
+	{
+		assembly->RemovePart(m_Actor);
+		assembly->RemovePart(m_ActorWired);
+		assembly->RemovePart(m_OutlineActor);
+	}
 }
 //----------------------------------------------------------------------------
 mafPipeMesh::~mafPipeMesh()
@@ -311,7 +325,8 @@ mafGUI *mafPipeMesh::CreateGui()
 	m_Gui->Divider(2);
 
 	m_Gui->Bool(ID_WIRED_ACTOR_VISIBILITY,_("Element Edges"), &m_BorderElementsWiredActor, 1);
-		
+	m_Gui->Enable(ID_WIRED_ACTOR_VISIBILITY,!m_Wireframe);
+
 	m_Gui->Divider(2);
   m_Gui->Bool(ID_USE_VTK_PROPERTY,"Property",&m_UseVTKProperty, 1);
   m_MaterialButton = new mafGUIMaterialButton(m_Vme,this);
@@ -321,7 +336,7 @@ mafGUI *mafPipeMesh::CreateGui()
   m_Gui->Divider(2);
 	m_Gui->Bool(ID_SCALAR_MAP_ACTIVE,_("Enable scalar field mapping"), &m_ScalarMapActive, 1);
 	m_Gui->Combo(ID_SCALARS,"",&m_ScalarIndex,m_NumberOfArrays,m_ScalarsInComboBoxNames);	
-  m_Gui->Lut(ID_LUT,"Lut",m_Table);
+  m_LutSwatch=m_Gui->Lut(ID_LUT,"Lut",m_Table);
 
   m_Gui->Enable(ID_SCALARS, m_ScalarMapActive != 0);
   m_Gui->Enable(ID_LUT, m_ScalarMapActive != 0);
@@ -633,7 +648,6 @@ void mafPipeMesh::UpdateVisualizationWithNewSelectedScalars()
   m_Table->SetHueRange(0.667, 0.0);
   
   m_MeshMaterial->m_ColorLut->DeepCopy(m_Table);
-  m_MeshMaterial->UpdateProp();
   m_MeshMaterial->UpdateFromLut();
 
 

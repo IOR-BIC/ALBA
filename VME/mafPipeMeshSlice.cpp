@@ -265,6 +265,15 @@ void mafPipeMeshSlice::ExecutePipe()
   m_ActorWired->SetMapper(m_MapperWired);
   m_ActorWired->GetProperty()->SetRepresentationToWireframe();
 
+	mmaMaterial *material = (mmaMaterial *)m_Vme->GetAttribute("MaterialAttributes");
+
+	if(material && material->m_Prop )
+		m_Wireframe=(material->m_Prop->GetRepresentation() == VTK_WIREFRAME);
+
+	if(m_Wireframe)
+		SetWiredActorVisibilityOff();
+
+
   //m_Actor->GetProperty()->SetLineWidth (1);
   
 
@@ -362,6 +371,7 @@ mafGUI *mafPipeMeshSlice::CreateGui()
 		m_Gui->Divider(2);
 
 		m_Gui->Bool(ID_WIRED_ACTOR_VISIBILITY,_("Element Edges"), &m_BorderElementsWiredActor, 1);
+		m_Gui->Enable(ID_WIRED_ACTOR_VISIBILITY,!m_Wireframe);
 		
 		m_Gui->Divider(2);
 		m_Gui->Bool(ID_USE_VTK_PROPERTY,"Property",&m_UseVTKProperty, 1);
@@ -372,7 +382,8 @@ mafGUI *mafPipeMeshSlice::CreateGui()
 		m_Gui->Divider(2);
 		m_Gui->Bool(ID_SCALAR_MAP_ACTIVE,_("Enable scalar field mapping"), &m_ScalarMapActive, 1);
 		m_Gui->Combo(ID_SCALARS,"",&m_ScalarIndex,m_NumberOfArrays,m_ScalarsName);	
-		m_Gui->Lut(ID_LUT,"Lut",m_Table);
+		m_LutSwatch=m_Gui->Lut(ID_LUT,"Lut",m_Table);
+
 
 		m_Gui->Enable(ID_SCALARS, m_ScalarMapActive != 0);
 		m_Gui->Enable(ID_LUT, m_ScalarMapActive != 0);
