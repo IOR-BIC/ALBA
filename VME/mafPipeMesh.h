@@ -33,6 +33,7 @@ class mafAxes;
 class mafParabolicMeshToLinearMeshFilter;
 class vtkLookupTable;
 class mafGUIMaterialButton;
+class mafGUILutSwatch;
 
 //----------------------------------------------------------------------------
 // mafPipeMesh :
@@ -132,6 +133,8 @@ protected:
 	vtkActor                *m_OutlineActor;
 	mafAxes                 *m_Axes;
   vtkLookupTable          *m_Table;
+
+	mafGUILutSwatch *m_LutSwatch;
 
   void CreateFieldDataControlArrays();
 	
