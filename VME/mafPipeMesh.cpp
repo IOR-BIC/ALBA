@@ -535,6 +535,7 @@ void mafPipeMesh::SetWireframeOff()
 void mafPipeMesh::SetWiredActorVisibilityOn()
 //----------------------------------------------------------------------------
 {
+	m_BorderElementsWiredActor=1;
   m_ActorWired->SetVisibility(1);
   m_ActorWired->Modified();
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
@@ -543,6 +544,7 @@ void mafPipeMesh::SetWiredActorVisibilityOn()
 void mafPipeMesh::SetWiredActorVisibilityOff()
 //----------------------------------------------------------------------------
 {
+	m_BorderElementsWiredActor=0;
   m_ActorWired->SetVisibility(0);
   m_ActorWired->Modified();
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
