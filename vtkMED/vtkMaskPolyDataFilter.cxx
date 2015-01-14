@@ -110,7 +110,7 @@ void vtkMaskPolyDataFilter::Execute()
 
 	Mask->GetBounds(bounds);
 
-	double *weights=new double[3];    
+	double *weights=new double[4];    
 	cellIds->SetNumberOfIds(Mask->GetMaxCellSize());
 
 	if ( numPts < 1 )
