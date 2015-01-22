@@ -124,14 +124,20 @@ void mafGUITreeContextualMenu::CreateContextualMenu(mafGUICheckTree *tree, mafVi
         numOfChild = ((mafViewCompound *)m_ViewActive)->GetNumberOfSubView();
       }
 
-      for(int i=0;i<numOfChild && m_SceneGraph==NULL ;i++) {
-        if(mafViewCompound::SafeDownCast(m_ViewActive)) {
-          m_SceneGraph = ((mafViewCompound *)m_ViewActive)->GetSubView(i)->GetSceneGraph();
-        }
-        else {
-          m_SceneGraph = ((mafViewVTK *)m_ViewActive)->GetSceneGraph();
-        }
-      }
+			if(numOfChild!=0)
+			{
+				for(int i=0;i<numOfChild && m_SceneGraph==NULL ;i++) 
+				{
+					if(mafViewCompound::SafeDownCast(m_ViewActive)) 
+					{
+	          m_SceneGraph = ((mafViewCompound *)m_ViewActive)->GetSubView(i)->GetSceneGraph();
+		      }
+			  }
+			}
+			else
+			{
+				m_SceneGraph = ((mafViewVTK *)m_ViewActive)->GetSceneGraph();
+			}
 
       if (m_SceneGraph != NULL)
       {
