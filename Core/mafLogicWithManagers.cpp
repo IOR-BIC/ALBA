@@ -859,20 +859,17 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       break;
       case VIEW_SAVE_IMAGE:
       {
-				if(e->GetBool())
-				{
-          mafViewCompound *v = mafViewCompound::SafeDownCast(m_ViewManager->GetSelectedView());
+				mafViewCompound *v = mafViewCompound::SafeDownCast(m_ViewManager->GetSelectedView());
+        if (v && e->GetBool())
+        {
+          v->GetRWI()->SaveAllImages(v->GetLabel(),v, m_ApplicationSettings->GetImageTypeId());
+        }
+        else
+        {
+          mafView *v = m_ViewManager->GetSelectedView();
           if (v)
           {
-            v->GetRWI()->SaveAllImages(v->GetLabel(),v, m_ApplicationSettings->GetImageTypeId());
-          }
-          else
-          {
-            mafView *v = m_ViewManager->GetSelectedView();
-            if (v)
-            {
-              v->GetRWI()->SaveImage(v->GetLabel());
-            }
+            v->GetRWI()->SaveImage(v->GetLabel());
           }
         }
       }
