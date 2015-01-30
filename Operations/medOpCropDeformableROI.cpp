@@ -193,7 +193,7 @@ void medOpCropDeformableROI::Algorithm(mafVME *vme)
     }
 		if(!m_Surface)
 			return;
-    	  mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,m_MaskPolydataFilter));
+    mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,m_MaskPolydataFilter));
 
     m_Surface->Update();
 		m_MaskPolydataFilter->SetMask(vtkPolyData::SafeDownCast(m_Surface->GetOutput()->GetVTKData()));
