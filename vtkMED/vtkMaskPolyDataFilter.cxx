@@ -60,7 +60,6 @@ vtkMaskPolyDataFilter::vtkMaskPolyDataFilter(vtkPolyData *mask)
 //  this->GenerateMaskScalars = 0;
   this->Distance = 0;
   this->InsideOut = 0;
-  this->MaximumDistance = sqrt(1.0e29) / 3.0;
   this->FillValue=0.0;
 }
 
@@ -88,7 +87,7 @@ void vtkMaskPolyDataFilter::Execute()
 	double  closestPoint[3];
 	double *currentPoint,*x1;
 	x1 = new double[3];
-	double maxDistance2, distance; 
+	double distance; 
 	double distance2;
 	double dot, n[3];
 	vtkCell *cell;
@@ -126,12 +125,9 @@ void vtkMaskPolyDataFilter::Execute()
 	// Create objects to hold output of contour operation
 	//
 	output->DeepCopy(input);
-	//output->DeepCopy(input);	
 
 	outPointData->DeepCopy(inPointData);
 	outCellData->DeepCopy(inCellData);
-
-	//outSc = outPD->GetScalars();
 
 	int numcomp=outPointData->GetScalars()->GetNumberOfComponents();
 
@@ -157,7 +153,6 @@ void vtkMaskPolyDataFilter::Execute()
 			abortExecute = this->GetAbortExecute();
 		}
 
-		maxDistance2 = (this->MaximumDistance) * (this->MaximumDistance);
 		dot=1;
 		currentPoint = output->GetPoint(i);
 
@@ -268,12 +263,6 @@ void vtkMaskPolyDataFilter::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Mask Function: " << this->GetMask() << "\n";
 
   os << indent << "Distance: " << this->Distance << "\n";
-
-//  os << indent << "InsideOut: " << (this->GenerateMaskScalars ? "On\n" : "Off\n");
-
-//  os << indent << "Generate Mask Scalars: " << (this->GenerateMaskScalars ? "On\n" : "Off\n");
-
-  os << indent << "Maximum Distance: " << this->MaximumDistance << "\n";
 
 }
 

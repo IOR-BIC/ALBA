@@ -74,20 +74,6 @@ public:
   Specify the polygonal dataset to perform the masking.*/
   void SetMask(vtkPolyData *mask) {this->SetNthInput(1, mask);};
   vtkPolyData *GetMask() { return (vtkPolyData *)(this->Inputs[1]);};
-  
-  /**
-  If this flag is enabled, then the output scalar values will be
-  generated from distances, and not the input scalar data.*/
-/*  vtkSetMacro(GenerateMaskScalars,int);
-  vtkGetMacro(GenerateMaskScalars,int);
-  vtkBooleanMacro(GenerateMaskScalars,int);
- */
-  
-  /**
-  Set / get the distance away from input geometry to
-  sample. */
-  vtkSetMacro(MaximumDistance,double);
-  vtkGetMacro(MaximumDistance,double);
 
   /**
   Set / get the fill value*/
@@ -115,7 +101,6 @@ protected:
   double Distance; 
   double FillValue;
   int InsideOut;
-  double MaximumDistance;   
 };
 
 #endif
