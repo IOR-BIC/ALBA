@@ -89,12 +89,12 @@ void vtkMAFHistogramTest::TestHistogramPointRepresentation()
   m_TestNumber = ID_HISTOGRAM_POINT_REPRESENTATION_TEST;
 
   // set filename
-  std::ostrstream fname ;
+  std::ostringstream fname ;
   fname << MAF_DATA_ROOT << "/VTK_Volumes/CropTestVolumeSP" << ".vtk" << std::ends ;
 
   // read the data
   vtkDataSetReader *reader = vtkDataSetReader::New();
-  reader->SetFileName(fname.str());
+  reader->SetFileName(fname.str().c_str());
 
   vtkMAFHistogram *actor;
   actor = vtkMAFHistogram::New();
@@ -117,12 +117,12 @@ void vtkMAFHistogramTest::TestHistogramLineRepresentation()
   m_TestNumber = ID_HISTOGRAM_LINE_REPRESENTATION_TEST;
 
   // set filename
-  std::ostrstream fname ;
+  std::ostringstream fname ;
   fname << MAF_DATA_ROOT << "/VTK_Volumes/CropTestVolumeSP" << ".vtk" << std::ends ;
 
   // read the data
   vtkDataSetReader *reader = vtkDataSetReader::New();
-  reader->SetFileName(fname.str());
+  reader->SetFileName(fname.str().c_str());
 
   vtkMAFHistogram *actor;
   actor = vtkMAFHistogram::New();
@@ -145,12 +145,12 @@ void vtkMAFHistogramTest::TestHistogramBarRepresentation()
   m_TestNumber = ID_HISTOGRAM_BAR_REPRESENTATION_TEST;
 
   // set filename
-  std::ostrstream fname ;
+  std::ostringstream fname ;
   fname << MAF_DATA_ROOT << "/VTK_Volumes/CropTestVolumeSP" << ".vtk" << std::ends ;
 
   // read the data
   vtkDataSetReader *reader = vtkDataSetReader::New();
-  reader->SetFileName(fname.str());
+  reader->SetFileName(fname.str().c_str());
 
   vtkMAFHistogram *actor;
   actor = vtkMAFHistogram::New();
@@ -173,12 +173,12 @@ void vtkMAFHistogramTest::TestHistogramLogaritmicProperties()
   m_TestNumber = ID_HISTOGRAM_LOGARITMIC_PROPERTIES_TEST;
 
   // set filename
-  std::ostrstream fname ;
+  std::ostringstream fname ;
   fname << MAF_DATA_ROOT << "/VTK_Volumes/CropTestVolumeSP" << ".vtk" << std::ends ;
 
   // read the data
   vtkDataSetReader *reader = vtkDataSetReader::New();
-  reader->SetFileName(fname.str());
+  reader->SetFileName(fname.str().c_str());
 
   vtkMAFHistogram *actor;
   actor = vtkMAFHistogram::New();
@@ -204,12 +204,12 @@ void vtkMAFHistogramTest::TestHistogramScaleFactorColorProperties()
   m_TestNumber = ID_HISTOGRAM_SCALE_COLOR_PROPERTIES;
 
   // set filename
-  std::ostrstream fname ;
+  std::ostringstream fname ;
   fname << MAF_DATA_ROOT << "/VTK_Volumes/CropTestVolumeSP" << ".vtk" << std::ends ;
 
   // read the data
   vtkDataSetReader *reader = vtkDataSetReader::New();
-  reader->SetFileName(fname.str());
+  reader->SetFileName(fname.str().c_str());
 
   vtkMAFHistogram *actor;
   actor = vtkMAFHistogram::New();
@@ -237,12 +237,12 @@ void vtkMAFHistogramTest::TestHistogramGetAttributesAndUpdateLines()
   m_TestNumber = ID_HISTOGRAM_GET_ATTRIBUTES_AND_UPDATE_LINES;
 
   // set filename
-  std::ostrstream fname ;
+  std::ostringstream fname ;
   fname << MAF_DATA_ROOT << "/VTK_Volumes/CropTestVolumeSP" << ".vtk" << std::ends ;
 
   // read the data
   vtkDataSetReader *reader = vtkDataSetReader::New();
-  reader->SetFileName(fname.str());
+  reader->SetFileName(fname.str().c_str());
 
   vtkMAFHistogram *actor;
   actor = vtkMAFHistogram::New();

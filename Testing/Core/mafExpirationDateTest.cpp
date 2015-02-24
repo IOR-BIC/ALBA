@@ -72,6 +72,7 @@ void mafExpirationDateTest::TestDynamicAllocation()
   cppDEL(e2);
   cppDEL(e3);
   cppDEL(e4);
+  cppDEL(e5);
 }
 //----------------------------------------------------------------------------
 void mafExpirationDateTest::TestHasExpired()

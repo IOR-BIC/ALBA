@@ -51,7 +51,6 @@ mafVMEOutputImage::~mafVMEOutputImage()
 {
   if(m_Material)
   {
-    vtkDEL(m_Material->m_ColorLut);
     delete m_Material;
   }
 }
@@ -83,6 +82,7 @@ mmaMaterial *mafVMEOutputImage::GetMaterial()
   lut->SetValueRange(1., 1.);
   lut->Build();
 
+  vtkDEL(m_Material->m_ColorLut);
   m_Material->m_ColorLut = lut;
 
   return m_Material;
