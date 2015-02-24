@@ -1,1 +1,0 @@
-copy d:\MAF2Libs\VS2010R_DLL\Build\bin\Release\*.dll .\Build\bin\release\

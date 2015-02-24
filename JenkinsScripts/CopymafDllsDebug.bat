@@ -1,1 +1,0 @@
-copy d:\MAF2Libs\VS2010D_DLL\Build\bin\Debug\*.dll .\Build\bin\debug\

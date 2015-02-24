@@ -1,1 +1,0 @@
-copy .\openMAF_ITK_Parabuild\bin\debug\*.dll .\Medical_Parabuild\bin\debug\
