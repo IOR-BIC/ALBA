@@ -33,6 +33,7 @@ class mafAxes;
 class mafParabolicMeshToLinearMeshFilter;
 class vtkLookupTable;
 class mafGUIMaterialButton;
+class mafGUILutSwatch;
 
 //----------------------------------------------------------------------------
 // mafPipeMesh :
@@ -60,6 +61,7 @@ public:
 		ID_LAST = Superclass::ID_LAST,
     ID_WIREFRAME,
     ID_WIRED_ACTOR_VISIBILITY,
+		ID_BORDER_CHANGE,
     ID_SCALARS,
     ID_LUT,
     ID_SCALAR_MAP_ACTIVE,
@@ -107,6 +109,18 @@ public:
   /** Set VTK Property to visualize the material of vme*/
   void SetUseVTKProperty(int value){m_UseVTKProperty = value;};
 
+  /** Set the lookup table */
+	void SetLookupTable(vtkLookupTable *table);
+  
+  /** Gets the lookup table*/
+	vtkLookupTable *GetLookupTable(){return m_Table;};
+
+	/**Return the thickness of the border*/	
+	double GetThickness();
+
+	/**Set the thickness value*/
+	void SetThickness(double thickness);
+
 protected:
 
 	mmaMaterial             *m_MeshMaterial;
@@ -119,6 +133,8 @@ protected:
 	vtkActor                *m_OutlineActor;
 	mafAxes                 *m_Axes;
   vtkLookupTable          *m_Table;
+
+	mafGUILutSwatch *m_LutSwatch;
 
   void CreateFieldDataControlArrays();
 	
@@ -143,6 +159,7 @@ protected:
   int                      m_BorderElementsWiredActor;
   int                      m_ScalarMapActive;
   int                      m_UseVTKProperty;
+	double				           m_Border;
 
   /** Create the Gui for the visual pipe that allow the user to change the pipe's parameters.*/
 	virtual mafGUI  *CreateGui();

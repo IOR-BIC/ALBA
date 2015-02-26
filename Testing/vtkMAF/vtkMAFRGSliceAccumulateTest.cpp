@@ -58,6 +58,7 @@ void vtkMAFRGSliceAccumulateTest::TestSetSlice()
   slice1->SetOrigin(0.0,0.0,1.0);
   slice1->SetSpacing(1.0,1.0,1.0);
   slice1->SetDimensions(10,10,1);
+  double orientation[6] = {1.,0.,0.,0.,1.,0.};
   vtkMAFSmartPointer<vtkFloatArray> scalar1;
   float value = 0.0;
   for(int i=0;i<100;i++)
@@ -102,9 +103,9 @@ void vtkMAFRGSliceAccumulateTest::TestSetSlice()
 
   vtkMAFSmartPointer<vtkMAFRGSliceAccumulate> accumulate;
   accumulate->SetNumberOfSlices(3);
-  accumulate->SetSlice(0,slice1);
-  accumulate->SetSlice(1,slice2);
-  accumulate->SetSlice(2,slice3);
+  accumulate->SetSlice(0,slice1,orientation);
+  accumulate->SetSlice(1,slice2,orientation);
+  accumulate->SetSlice(2,slice3,orientation);
   accumulate->Update();
 
   vtkRectilinearGrid *output = accumulate->GetOutput();

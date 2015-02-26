@@ -169,14 +169,6 @@ void mafGUILutWidget::DrawEntry(int idx)
   
   dc2.Blit(x0, y0, w, h, &dc1, 0, 0);
 
-
-  // here LUT is kept in sync
-  if(m_Lut)
-  {
-    double r,g,b,a;
-    m_LutEntry[idx].m_Color.GetFloatRGB(&r,&g,&b,&a);
-    m_Lut->SetTableValue(idx,r,g,b,a);
-  }
 }
 //----------------------------------------------------------------------------
 void mafGUILutWidget::DrawSelection()
@@ -247,7 +239,16 @@ void mafGUILutWidget::SetSelectionColor(mafColor col)
   {
     if(m_LutEntry[i].m_Selected)
     {
-      m_LutEntry[i].m_Color = col;
+			 m_LutEntry[i].m_Color = col;
+			
+			 // here LUT is kept in sync
+			if(m_Lut)
+			{
+				double r,g,b,a;
+				m_LutEntry[i].m_Color.GetFloatRGB(&r,&g,&b,&a);
+				m_Lut->SetTableValue(i,r,g,b,a);
+			}
+     
       DrawEntry(i);
     }
   }
@@ -281,8 +282,11 @@ void mafGUILutWidget::ShadeSelectionInHSV()
   {
     if(m_LutEntry[i].m_Selected)
     {
+			double r,g,b,a;
       float t = (1.0*counter)/num;
       m_LutEntry[i].m_Color = mafColor::InterpolateHSV(c1,c2,t);
+			m_LutEntry[i].m_Color.GetFloatRGB(&r,&g,&b,&a);
+			m_Lut->SetTableValue(i,r,g,b,a);
       DrawEntry(i);
       counter++;
     }
@@ -307,8 +311,11 @@ void mafGUILutWidget::ShadeSelectionInRGB()
   {
     if(m_LutEntry[i].m_Selected)
     {
+			double r,g,b,a;
       float t = (1.0*counter)/num;
       m_LutEntry[i].m_Color = mafColor::InterpolateRGB(c1,c2,t);
+			m_LutEntry[i].m_Color.GetFloatRGB(&r,&g,&b,&a);
+			m_Lut->SetTableValue(i,r,g,b,a);
       DrawEntry(i);
       counter++;
     }

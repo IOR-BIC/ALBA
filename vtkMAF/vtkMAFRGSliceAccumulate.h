@@ -72,13 +72,13 @@ public:
   {
 	  AddSlice((vtkImageData *)slice);
   }
-  
+   
   /**
   Set the slice into the RectilinearGrid*/
-  void SetSlice(int ,vtkImageData *);
-  void SetSlice(int slice_num, vtkStructuredPoints * slice)
+  void SetSlice(int ,vtkImageData *, double* orientation);
+  void SetSlice(int slice_num, vtkStructuredPoints * slice, double* orientation)
   {
-	  SetSlice(slice_num, (vtkImageData *)slice);
+	  SetSlice(slice_num, (vtkImageData *)slice, orientation);
   }
   
   /**
@@ -119,6 +119,7 @@ protected:
   int Dimensions[3];
   double Spacing[3];
   double Origin[3];
+  double m_rotationmatrix[3][3];
   int DataType;
 	int BuildingAxes;
 

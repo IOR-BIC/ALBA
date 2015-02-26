@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: vtkMAFMeshCutter
- Authors: Nigel McFarlane
+ Authors: Nigel McFarlane, Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -31,6 +31,7 @@
 class vtkPlane;
 class vtkIdList;
 class vtkCell;
+class vtkMatrix4x4;
 
 /** vtkMAFMeshCutter - vtk filter which cuts a finite element mesh (unstructured grid) with a plane.
 This is very similar to vtkCutter().
@@ -192,6 +193,13 @@ protected:
   /** do the whole thing */
   void CreateSlice() ;
 
+	/** Uses transform matrix to calculate the local cutting coord*/
+	void CalculateLocalCutCoord();
+
+	/** Modify input matrix to kept only rotational parts*/
+	void ToRotationMatrix(vtkMatrix4x4 *matrix);
+
+
   // This table maps each output point to the input points or point which created it.
   // if mtype = POINT_TO_POINT this maps the point idout to the intersected point id0
   // if   "   = POINT_TO_EDGE   "   "     "    "   idout  "  "  intersected edge (id0,id1)
@@ -221,6 +229,12 @@ protected:
 
   // cutting function
   vtkPlane *CutFunction ;
+
+	//Cutting Transformed Normal
+	double CutTranformedNormal[4];
+
+	//Cutting Transformed Origin
+	double CutTranformedOrigin[4];
 
   // input and output
   vtkUnstructuredGrid *UnstructGrid ;
