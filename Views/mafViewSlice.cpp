@@ -687,15 +687,7 @@ void mafViewSlice::SetSlice(double* Origin, double* Normal)
 			this->UpdateText();
 		}
 	}
-        
-  //BES 1.5.2008 - I don't understand why GetViewPlaneNormal is used
-  //so I leave it untouched
-  double normal[3];
-  if (Normal != NULL)
-    memcpy(normal,Normal,sizeof(m_Slice));
-  else
-  this->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
-	
+ 
   double coord[3];
   coord[0]=Origin[0];
   coord[1]=Origin[1];
@@ -708,7 +700,7 @@ void mafViewSlice::SetSlice(double* Origin, double* Normal)
     {
       mafPipeSlice* pipe = mafPipeSlice::SafeDownCast(m_CurrentSurface.at(i)->m_Pipe);
       if (pipe != NULL){
-        pipe->SetSlice(coord, normal); 
+        pipe->SetSlice(coord, m_SliceNormal); 
       }
       else
       {
@@ -717,7 +709,7 @@ void mafViewSlice::SetSlice(double* Origin, double* Normal)
         if (pipe != NULL) 
         {
           pipe->SetSlice(coord); 
-          pipe->SetNormal(normal); 
+          pipe->SetNormal(m_SliceNormal); 
         }
       }
     }
@@ -730,7 +722,7 @@ void mafViewSlice::SetSlice(double* Origin, double* Normal)
     {
       mafPipeSlice* pipe = mafPipeSlice::SafeDownCast(m_CurrentPolyline.at(i)->m_Pipe);
       if (pipe != NULL){
-        pipe->SetSlice(coord, normal); 
+        pipe->SetSlice(coord, m_SliceNormal); 
       }
       else
       {
@@ -739,7 +731,7 @@ void mafViewSlice::SetSlice(double* Origin, double* Normal)
         if (pipe != NULL) 
         {
           pipe->SetSlice(coord); 
-          pipe->SetNormal(normal); 
+          pipe->SetNormal(m_SliceNormal); 
         }
       }
     }
@@ -751,7 +743,7 @@ void mafViewSlice::SetSlice(double* Origin, double* Normal)
     {
       mafPipeSlice* pipe = mafPipeSlice::SafeDownCast(m_CurrentPolylineGraphEditor.at(i)->m_Pipe);
       if (pipe != NULL){
-        pipe->SetSlice(coord, normal); 
+        pipe->SetSlice(coord, m_SliceNormal); 
       }
     }   
 	}
@@ -762,7 +754,7 @@ void mafViewSlice::SetSlice(double* Origin, double* Normal)
     {
       mafPipeSlice* pipe = mafPipeSlice::SafeDownCast(m_CurrentMesh.at(i)->m_Pipe);
       if (pipe != NULL){
-        pipe->SetSlice(coord, normal); 
+        pipe->SetSlice(coord, m_SliceNormal); 
       }
       else
       {
@@ -771,7 +763,7 @@ void mafViewSlice::SetSlice(double* Origin, double* Normal)
         if (pipe != NULL) 
         {
           pipe->SetSlice(coord); 
-          pipe->SetNormal(normal); 
+          pipe->SetNormal(m_SliceNormal); 
         }
       }
     }   
