@@ -348,6 +348,7 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 
 				PipeSliceViewMesh->SetSlice(surfaceOriginTranslated);
 				PipeSliceViewMesh->SetNormal(normal);
+				PipeSliceViewMesh->SetFlipNormalOff();
 			}
 		}
 
