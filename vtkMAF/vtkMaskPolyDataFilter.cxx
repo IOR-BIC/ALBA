@@ -334,7 +334,7 @@ void vtkMaskPolyDataFilter::UpdateCurrentSliceMask(double z)
 				pointUnderBound=true;
 			if(point[2]>=z)
 				pointOverBound=true;
-			if(pointUnderBound && pointUnderBound)
+			if(pointUnderBound && pointOverBound)
 				break;
 		}
 
