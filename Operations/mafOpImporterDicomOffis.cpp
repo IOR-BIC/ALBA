@@ -1279,7 +1279,10 @@ int mafOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
 			}
 		}
 
-		accumulate->SetSlice(s_count,m_SliceTexture->GetInput());
+		double orientation[6] = {1.0,0.0,0.0,0.0,1.0,0.0};
+		m_SelectedSeriesSlicesList->Item(m_ZCropBounds[0])->GetData()->GetDcmImageOrientationPatient(orientation);
+
+		accumulate->SetSlice(s_count,m_SliceTexture->GetInput(), orientation);
 		s_count++;
 
 		if(!this->m_TestMode)
@@ -1339,9 +1342,10 @@ int mafOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
 	}
 	m_Volume->SetDataByDetaching(rg_out,0);
 
-	if (m_SeriesIDContainsRotationsMap[m_SelectedSeriesID] == true && m_ApplyRotation)
-	{
-		double orientation[6] = {0.0,0.0,0.0,0.0,0.0,0.0};
+	//if (m_SeriesIDContainsRotationsMap[m_SelectedSeriesID] == true && m_ApplyRotation)
+	//{
+
+		double orientation[6] = {1.0,0.0,0.0,0.0,1.0,0.0};
 		m_SelectedSeriesSlicesList->Item(m_ZCropBounds[0])->GetData()->GetDcmImageOrientationPatient(orientation);
 
 		//transform direction cosines to be used to set vtkMatrix
@@ -1376,7 +1380,7 @@ int mafOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
 		boxPose->SetMatrix(mat);     
 		boxPose->Update();
 		m_Volume->SetAbsMatrix(boxPose->GetMatrix());
-	}
+	//}
 
 	if(m_ResampleFlag == TRUE)
 	{
@@ -1716,7 +1720,10 @@ int mafOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 			}
 			double id = currentMapElement->second;
 			double z = currentMapElement->first;
-			accumulator->SetSlice(i, imageDataVector[currentMapElement->second]);
+
+			double orientation[6] = {1.0,0.0,0.0,0.0,1.0,0.0};
+			m_SelectedSeriesSlicesList->Item(m_ZCropBounds[0])->GetData()->GetDcmImageOrientationPatient(orientation);
+			accumulator->SetSlice(i, imageDataVector[currentMapElement->second],orientation);
 			i++;
 		}
 
