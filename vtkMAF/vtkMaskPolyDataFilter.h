@@ -5,7 +5,7 @@
   Language:  C++
   Date:      2001/01
   Version:   1.1
-  Author:    Roberto Gori(r.gori@cineca.it), patched by Marco Petrone (m.petroen@cineca.it)
+  Author:    Roberto Gori(r.gori@cineca.it), patched by Marco Petrone (m.petroen@cineca.it), Gianluigi Crimi
 
 
 =========================================================================*/
@@ -93,7 +93,13 @@ public:
   Set / get the fill value*/
   vtkSetMacro(FillValue,double);
   vtkGetMacro(FillValue,double);
- 
+	
+	/** Creates the current slice mask, used for algorithm optimization */
+	void InitCurrentSliceMask();
+
+	/** Updates the current slice mask depending on z value, after the call on this function
+	    the current slice mask will contains only cells that intersect current z-plane */
+	void UpdateCurrentSliceMask(double z);
   
 protected:
   vtkMaskPolyDataFilter(vtkPolyData *cf=NULL);
@@ -104,10 +110,11 @@ protected:
 
   void Execute();
   vtkPolyData *Mask;
+	vtkPolyData *CurrentSliceMask;
+	vtkIdType *IdConversionTable;
   double Distance; 
   double FillValue;
   int InsideOut;
-//  int GenerateMaskScalars;
   double MaximumDistance;   
 };
 

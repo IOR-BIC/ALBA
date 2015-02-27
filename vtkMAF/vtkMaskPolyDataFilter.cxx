@@ -39,10 +39,12 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 #include <math.h>
+#include "mafDefines.h"
 #include "vtkMaskPolyDataFilter.h"
 #include "vtkPointData.h"
 #include "vtkCellData.h"
 #include "vtkObjectFactory.h"
+#include "vtkCellArray.h"
 
 vtkStandardNewMacro(vtkMaskPolyDataFilter);
 
@@ -51,6 +53,7 @@ vtkStandardNewMacro(vtkMaskPolyDataFilter);
 // generating mask scalars turned off.
 vtkMaskPolyDataFilter::vtkMaskPolyDataFilter(vtkPolyData *mask)
 {
+	this->CurrentSliceMask=NULL;
   this->SetMask(mask);
 //  this->GenerateMaskScalars = 0;
   this->Distance = 0;
@@ -61,6 +64,8 @@ vtkMaskPolyDataFilter::vtkMaskPolyDataFilter(vtkPolyData *mask)
 
 vtkMaskPolyDataFilter::~vtkMaskPolyDataFilter()
 {
+	vtkDEL(this->CurrentSliceMask);
+	delete [] IdConversionTable;
   this->SetMask(NULL);  
 }
 
@@ -75,8 +80,8 @@ void vtkMaskPolyDataFilter::Execute()
 	vtkDataSet *output = this->GetOutput();
 	vtkDataSet *input = this->GetInput();
 	int numPts=input->GetNumberOfPoints();
-	vtkPointData *inPD=input->GetPointData(), *outPD=output->GetPointData();
-	vtkCellData *inCD=input->GetCellData(), *outCD=output->GetCellData();
+	vtkPointData *inPointData=input->GetPointData(), *outPointData=output->GetPointData();
+	vtkCellData *inCellData=input->GetCellData(), *outCellData=output->GetCellData();
 	int idx, cellId, subId;
 	double  closestPoint[3];
 	double *x,*x1;
@@ -88,6 +93,8 @@ void vtkMaskPolyDataFilter::Execute()
 	vtkIdList *cellIds = vtkIdList::New();
 	double pcoords[3];
 	double bounds[6];
+	double currentZ=VTK_DOUBLE_MIN;
+	
 	//  vtkDebugMacro(<< "Executing MaskPolyDataFilter");
 
 	//
@@ -99,12 +106,12 @@ void vtkMaskPolyDataFilter::Execute()
 		return;
 	}
 
-	vtkPolyData *mask=this->GetMask();
+	Mask=this->GetMask();
 
-	mask->GetBounds(bounds);
+	Mask->GetBounds(bounds);
 
-	double *weights=new double[3];    
-	cellIds->SetNumberOfIds(mask->GetMaxCellSize());
+	double *weights=new double[4];    
+	cellIds->SetNumberOfIds(Mask->GetMaxCellSize());
 
 	if ( numPts < 1 )
 	{
@@ -119,20 +126,23 @@ void vtkMaskPolyDataFilter::Execute()
 	output->DeepCopy(input);
 	//output->DeepCopy(input);	
 
-	outPD->DeepCopy(inPD);
-	outCD->DeepCopy(inCD);
+	outPointData->DeepCopy(inPointData);
+	outCellData->DeepCopy(inCellData);
 
 	//outSc = outPD->GetScalars();
 
-	int numcomp=outPD->GetScalars()->GetNumberOfComponents();
+	int numcomp=outPointData->GetScalars()->GetNumberOfComponents();
 
 	float *tuple=new float[numcomp];
 
 	int oldProgress=0;
 	int progress=0;
 
+	InitCurrentSliceMask();
+
 	for (i = 0; i < numPts && !abortExecute; i++) 
 	{
+		
 		progress=((float)i*100/(float)numPts);
 
 		if (progress!=oldProgress)
@@ -164,27 +174,33 @@ void vtkMaskPolyDataFilter::Execute()
 				{
 					tuple[n]=this->FillValue;
 				}
-				outPD->GetScalars()->SetTuple(i,tuple);
+				outPointData->GetScalars()->SetTuple(i,tuple);
 				// done: go to next point
 				continue;
 			}
 		}
 		// at this point the cell is inside the bounds
+		
+		if(currentZ!=x[2])
+		{
+			currentZ=x[2];
+			UpdateCurrentSliceMask(currentZ);
+		}
 
 		// Find the closest point in the PolyData
-		idx = mask->FindPoint(x);
+		idx = CurrentSliceMask->FindPoint(x);
 
 		if (idx >= 0) 
 		{
 			// find the cells containing the found point
-			mask->GetPointCells(idx, cellIds);
+			CurrentSliceMask->GetPointCells(idx, cellIds);
 
 			// examine the each cell to find the closest point to the x point
 			for (j=0; j < cellIds->GetNumberOfIds(); j++) 
 			{
 				// extract the cell
 				cellId = cellIds->GetId(j);
-				cell = mask->GetCell(cellId);
+				cell = CurrentSliceMask->GetCell(cellId);
 				// find the distance of the cell from the x point
 				cell->EvaluatePosition(x, x1, subId, pcoords, distance2, weights);
 
@@ -222,7 +238,7 @@ void vtkMaskPolyDataFilter::Execute()
 				{
 					tuple[n]=this->FillValue;
 				}
-				outPD->GetScalars()->SetTuple(i,tuple);
+				outPointData->GetScalars()->SetTuple(i,tuple);
 			}
 		}
 		else
@@ -233,7 +249,7 @@ void vtkMaskPolyDataFilter::Execute()
 				{
 					tuple[n]=this->FillValue;
 				}
-				outPD->GetScalars()->SetTuple(i,tuple);
+				outPointData->GetScalars()->SetTuple(i,tuple);
 			}
 		}  
 	}
@@ -244,7 +260,8 @@ void vtkMaskPolyDataFilter::Execute()
 	// points using mask geometry.
 	//
 
-	//delete [] weights;
+	delete [] x1;
+	delete [] weights;
 	delete tuple;
 	cellIds->Delete();
 }
@@ -265,4 +282,96 @@ void vtkMaskPolyDataFilter::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "Maximum Distance: " << this->MaximumDistance << "\n";
 
+}
+
+void vtkMaskPolyDataFilter::InitCurrentSliceMask()
+{
+	//Creating current slice mask
+	vtkNEW(CurrentSliceMask);
+	//init data by coping mask data
+	CurrentSliceMask->DeepCopy(Mask);
+	CurrentSliceMask->Update();
+	//allocating memory for id conversion table
+	IdConversionTable= new vtkIdType[Mask->GetNumberOfPoints()];
+}
+
+void vtkMaskPolyDataFilter::UpdateCurrentSliceMask(double z)
+{
+	int nPoints=Mask->GetNumberOfPoints();
+	vtkIdType *cellIds;
+	
+	//generate points
+	vtkPoints *new_points;
+	vtkNEW(new_points);
+	//generate polydata structure
+	vtkCellArray * new_cells;
+	vtkNEW(new_cells);
+
+
+	//reset conversion table values
+	memset(IdConversionTable,-1,sizeof(vtkIdType)*nPoints);
+	
+	int cellId, pointOverBound, pointUnderBound, cellNPoints, addedPoints;
+	cellId=addedPoints=0;
+
+	vtkCellArray *polys;
+	polys=Mask->GetPolys();
+	int nCell=polys->GetNumberOfCells();
+	
+	//Searching cells that intersect current z-plane
+	for(int i=0;i<nCell;i++)
+	{
+		polys->GetCell(cellId,cellNPoints,cellIds);
+		cellId+=cellNPoints+1;
+		pointOverBound=pointUnderBound=0;
+	
+		//If there is at least one point under current z value and a point over
+		//the cell will intersect the plane
+		for(int j=0;j<cellNPoints;j++)
+		{
+			double *point=Mask->GetPoint(cellIds[j]);
+			if(point[2]<=z)
+				pointUnderBound=true;
+			if(point[2]>=z)
+				pointOverBound=true;
+			if(pointUnderBound && pointUnderBound)
+				break;
+		}
+
+		if(pointOverBound && pointUnderBound)
+		{
+			//the current cell is intersecating the plane adding it to the new cells
+			new_cells->InsertNextCell(cellNPoints);
+
+			//We relocate the cell points in order to obtain an output with only required points
+			for(int j=0;j<cellNPoints;j++)
+			{
+				//get the Mask point Id
+				int pointId=cellIds[j];
+				
+				//if the conversion table of that point is < 0 the point is not inserted to the new points
+				if(IdConversionTable[pointId]<0)
+				{
+					//inserting the point in the new points structure
+					new_points->InsertNextPoint(Mask->GetPoint(pointId));
+					//updating conversion table for next operations
+					IdConversionTable[pointId]=addedPoints;
+					addedPoints++;
+				}
+				//insert point in the cell
+				new_cells->InsertCellPoint(IdConversionTable[pointId]);
+			}
+		}
+	}
+
+	//deleting current links to rebuild structures
+	CurrentSliceMask->DeleteCells();
+	CurrentSliceMask->DeleteLinks();
+
+	CurrentSliceMask->SetPolys(new_cells);
+	vtkDEL(new_cells);
+	CurrentSliceMask->SetPoints(new_points);
+	vtkDEL(new_points);
+
+	CurrentSliceMask->Update();
 }
