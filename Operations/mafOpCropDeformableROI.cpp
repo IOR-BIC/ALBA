@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program: MAF2
+ Program: MAF2Medical
  Module: mafOpCropDeformableROI
  Authors: Matteo Giacomoni - Daniele Giunchi
  
@@ -37,6 +37,9 @@
 #include "vtkRectilinearGrid.h"
 #include "vtkImageData.h"
 #include "vtkStructuredPoints.h"
+#include "vtkTransform.h"
+#include "vtkTransformFilter.h"
+#include "wx\busyinfo.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafOpCropDeformableROI);
@@ -55,10 +58,8 @@ mafOp(label)
 
 	m_Distance = 0.0;
 	m_InsideOut = 0;
-	m_MaxDistance = sqrt(1.0e29)/3.0;
 	m_FillValue = 0.0;
 	m_PNode = NULL;
-  m_Surface = NULL;
 }
 //----------------------------------------------------------------------------
 mafOpCropDeformableROI::~mafOpCropDeformableROI()
@@ -67,8 +68,6 @@ mafOpCropDeformableROI::~mafOpCropDeformableROI()
 	vtkDEL(m_MaskPolydataFilter);
 	mafDEL(m_ResultVme);
 
-  if(mafVMESurfaceParametric::SafeDownCast(m_Input))
-    mafDEL(m_Surface);
 }
 //----------------------------------------------------------------------------
 bool mafOpCropDeformableROI::Accept(mafNode *node)
@@ -87,8 +86,7 @@ mafOp *mafOpCropDeformableROI::Copy()
 //----------------------------------------------------------------------------
 enum FILTER_SURFACE_ID
 {
-	ID_CHOOSE_MASK = MINID,
-	ID_DISTANCE,
+	ID_DISTANCE  = MINID,
 	ID_FILL_VALUE,
 	ID_MAX_DISTANCE,
 	ID_INSIDE_OUT,
@@ -97,26 +95,18 @@ enum FILTER_SURFACE_ID
 void mafOpCropDeformableROI::OpRun()   
 //----------------------------------------------------------------------------
 {
-	mafNEW(m_ResultVme);
-	m_ResultVme->DeepCopy(m_Input);
+	//Create GUI 
+	CreateGui();
 
-	vtkNEW(m_MaskPolydataFilter);
+	//Select mask surface for the operation
+	MaskSelection();
 
-	// interface:
-	m_Gui = new mafGUI(this);
-
-	m_Gui->Button(ID_CHOOSE_MASK,_("Choose mask"));
-
-	m_Gui->Double(ID_DISTANCE,_("distance"),&m_Distance,0.0);
-	m_Gui->Double(ID_FILL_VALUE,_("fill value"),&m_FillValue);
-	m_Gui->Double(ID_MAX_DISTANCE,_("max dist."),&m_MaxDistance,0.0);
-	m_Gui->Bool(ID_INSIDE_OUT,_("mask inside out"),&m_InsideOut);
-
-	m_Gui->OkCancel();
-
-	m_Gui->Divider();
-
-	ShowGui();
+	//If a surface is selected show GUI 
+	//else stop operation (cannot run without surface)
+	if (m_PNode)
+		ShowGui();
+	else 
+		OpStop(OP_RUN_CANCEL);
 }
 //----------------------------------------------------------------------------
 void mafOpCropDeformableROI::OpDo()
@@ -139,22 +129,9 @@ void mafOpCropDeformableROI::OnEvent(mafEventBase *maf_event)
 		mafNode *n=NULL;
 		switch(e->GetId())
 		{	
-		case ID_CHOOSE_MASK:
-			{
-				mafString title = _("Choose mask");
-				e->SetId(VME_CHOOSE);
-        e->SetArg((long)&mafOpCropDeformableROI::OutputSurfaceAccept);
-				e->SetString(&title);
-				mafEventMacro(*e);
-				m_PNode = e->GetVme();
-			}
-			break;
 		case wxOK:
-			if(m_PNode!=NULL)
-				{
-					Algorithm(mafVME::SafeDownCast(m_PNode));
-				}
-
+			//Run algorithm and stop operation
+			Algorithm(mafVME::SafeDownCast(m_PNode));
 			OpStop(OP_RUN_OK);        
 			break;
 		case wxCANCEL:
@@ -176,27 +153,82 @@ void mafOpCropDeformableROI::Algorithm(mafVME *vme)
 {
 	if(vme)
 	{
+		wxBusyInfo *busyInfo=NULL;;
+		if(GetTestMode() == false)
+		{
+				busyInfo = new wxBusyInfo("Please Wait...");
+		}
+		vtkPolyData *maskPolydata=NULL;
+		vtkPolyData *transformedMaskPolydata=NULL;
+		vtkTransform *transform = NULL;
+		vtkTransformFilter *transformFilter = NULL;
+
+
+		vme->Update();
+
+		if(mafVMESurface::SafeDownCast(vme))
+		{
+			maskPolydata=(vtkPolyData *)(mafVMESurface::SafeDownCast(vme)->GetOutput()->GetVTKData());
+		}
+		if (mafVMESurfaceParametric::SafeDownCast(vme))
+		{
+			maskPolydata = (vtkPolyData *)(mafVMESurfaceParametric::SafeDownCast(vme)->GetSurfaceOutput()->GetVTKData());
+		}
+		
+		if(!maskPolydata)
+			return;
+
+
+		
+		mafNEW(m_ResultVme);
+		m_ResultVme->DeepCopy(m_Input);
+		mafString resultName = "Masked ";
+		resultName+=m_Input->GetName();
+		m_ResultVme->SetName(resultName);
+
+		vtkPolyData *Mask;
+
+		mafMatrix identityMatrix;
+		mafMatrix maskABSMatrix = mafVME::SafeDownCast(vme)->GetAbsMatrixPipe()->GetMatrix();
+		mafMatrix volumeABSMatrix = mafVME::SafeDownCast(m_Input)->GetAbsMatrixPipe()->GetMatrix();
+
+		bool isMaskMatrixIdentity = maskABSMatrix.Equals(&identityMatrix);
+		bool isVolumeMatrixIdentity = volumeABSMatrix.Equals(&identityMatrix);
+
+		if (isMaskMatrixIdentity && isVolumeMatrixIdentity)
+			transformedMaskPolydata=maskPolydata;
+		else
+		{		
+			// if VME matrix is not identity apply it to dataset
+			mafMatrix meshVolumeAlignMatrix;
+
+			//Calculate align matrix 
+			volumeABSMatrix.Invert();
+			mafMatrix::Multiply4x4(volumeABSMatrix,maskABSMatrix,meshVolumeAlignMatrix);
+
+			// apply abs matrix to geometry
+			transform = vtkTransform::New();
+			transform->SetMatrix(meshVolumeAlignMatrix.GetVTKMatrix());
+
+			// to delete
+			transformFilter = vtkTransformFilter::New();
+			
+			transformFilter->SetInput(maskPolydata);
+			transformFilter->SetTransform(transform);
+			transformFilter->Update();
+
+			transformedMaskPolydata=transformFilter->GetPolyDataOutput();
+		}
+
+
+		vtkNEW(m_MaskPolydataFilter);
 		mafVMEVolumeGray *volume = mafVMEVolumeGray::SafeDownCast(m_Input);
 		m_MaskPolydataFilter->SetInput(volume->GetOutput()->GetVTKData());
 		m_MaskPolydataFilter->SetDistance(m_Distance);
 		m_MaskPolydataFilter->SetFillValue(m_FillValue);
-		m_MaskPolydataFilter->SetMaximumDistance(m_MaxDistance);
-		m_MaskPolydataFilter->SetFillValue(m_FillValue);
 		m_MaskPolydataFilter->SetInsideOut(m_InsideOut);
-		
-    if(m_Surface = mafVMESurface::SafeDownCast(vme));
-    else
-    {
-      mafNEW(m_Surface);
-      vtkPolyData *poly = (vtkPolyData *)(mafVMESurfaceParametric::SafeDownCast(vme)->GetSurfaceOutput()->GetVTKData());
-      m_Surface->SetData(poly,0);
-    }
-		if(!m_Surface)
-			return;
-    	  mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,m_MaskPolydataFilter));
-
-    m_Surface->Update();
-		m_MaskPolydataFilter->SetMask(vtkPolyData::SafeDownCast(m_Surface->GetOutput()->GetVTKData()));
+		m_MaskPolydataFilter->SetMask(transformedMaskPolydata);
+    mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,m_MaskPolydataFilter));
 		m_MaskPolydataFilter->Update();
 
 		if(vtkRectilinearGrid::SafeDownCast(m_MaskPolydataFilter->GetOutput()))
@@ -206,5 +238,41 @@ void mafOpCropDeformableROI::Algorithm(mafVME *vme)
 	
 		m_ResultVme->Modified();
 		m_ResultVme->Update();
+
+		vtkDEL(transform);
+		vtkDEL(transformFilter);
+		cppDEL(busyInfo);
 	}
+}
+
+void mafOpCropDeformableROI::CreateGui()
+{
+
+	// interface:
+	m_Gui = new mafGUI(this);
+
+	m_Gui->Label("");
+	m_Gui->Label("");
+	m_Gui->Double(ID_DISTANCE,_("Distance"),&m_Distance,0.0);
+	m_Gui->Double(ID_FILL_VALUE,_("Fill value"),&m_FillValue);
+	m_Gui->Bool(ID_INSIDE_OUT,_("Mask inside"),&m_InsideOut);
+	m_Gui->Label("");
+	m_Gui->Label("");
+	m_Gui->Divider(1);
+	m_Gui->OkCancel();
+
+	m_Gui->Divider();
+}
+
+void mafOpCropDeformableROI::MaskSelection()
+{
+	mafEvent *e; 
+	e = new mafEvent();
+	mafString title = _("Choose mask");
+	e->SetId(VME_CHOOSE);
+	e->SetArg((long)&mafOpCropDeformableROI::OutputSurfaceAccept);
+	e->SetString(&title);
+	mafEventMacro(*e);
+	m_PNode = e->GetVme();
+	delete e;
 }

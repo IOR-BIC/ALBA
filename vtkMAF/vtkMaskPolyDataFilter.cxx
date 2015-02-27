@@ -45,6 +45,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkCellData.h"
 #include "vtkObjectFactory.h"
 #include "vtkCellArray.h"
+#include "vtkMAFSmartPointer.h"
+#include "vtkCellLocator.h"
 
 vtkStandardNewMacro(vtkMaskPolyDataFilter);
 
@@ -58,7 +60,6 @@ vtkMaskPolyDataFilter::vtkMaskPolyDataFilter(vtkPolyData *mask)
 //  this->GenerateMaskScalars = 0;
   this->Distance = 0;
   this->InsideOut = 0;
-  this->MaximumDistance = sqrt(1.0e29) / 3.0;
   this->FillValue=0.0;
 }
 
@@ -84,9 +85,9 @@ void vtkMaskPolyDataFilter::Execute()
 	vtkCellData *inCellData=input->GetCellData(), *outCellData=output->GetCellData();
 	int idx, cellId, subId;
 	double  closestPoint[3];
-	double *x,*x1;
+	double *currentPoint,*x1;
 	x1 = new double[3];
-	double maxDistance2, distance; 
+	double distance; 
 	double distance2;
 	double dot, n[3];
 	vtkCell *cell;
@@ -124,12 +125,9 @@ void vtkMaskPolyDataFilter::Execute()
 	// Create objects to hold output of contour operation
 	//
 	output->DeepCopy(input);
-	//output->DeepCopy(input);	
 
 	outPointData->DeepCopy(inPointData);
 	outCellData->DeepCopy(inCellData);
-
-	//outSc = outPD->GetScalars();
 
 	int numcomp=outPointData->GetScalars()->GetNumberOfComponents();
 
@@ -139,6 +137,9 @@ void vtkMaskPolyDataFilter::Execute()
 	int progress=0;
 
 	InitCurrentSliceMask();
+
+
+	vtkMAFSmartPointer<vtkCellLocator> cellLocator;
 
 	for (i = 0; i < numPts && !abortExecute; i++) 
 	{
@@ -152,14 +153,15 @@ void vtkMaskPolyDataFilter::Execute()
 			abortExecute = this->GetAbortExecute();
 		}
 
-		maxDistance2 = (this->MaximumDistance) * (this->MaximumDistance);
 		dot=1;
-		x = output->GetPoint(i);
+		currentPoint = output->GetPoint(i);
+
+
 
 		// use XNOR table to exclude points that not respect the InsideOut and bounding box condition
 		// i.e. if InsideOut is 1 points inside the sourface must be sets to the FillValue, so points upside the bounding 
 		// box should be skipped
-		if ( (x[0] <= bounds[0]) || (x[0] >= bounds[1]) || (x[1] <= bounds[2]) || (x[1] >= bounds[3]) || (x[2] <= bounds[4]) || (x[2] >= bounds[5])) 
+		if ( (currentPoint[0] <= bounds[0]) || (currentPoint[0] >= bounds[1]) || (currentPoint[1] <= bounds[2]) || (currentPoint[1] >= bounds[3]) || (currentPoint[2] <= bounds[4]) || (currentPoint[2] >= bounds[5])) 
 		{
 			//the point is outside the mask's bounds
 			if (this->InsideOut)
@@ -181,49 +183,35 @@ void vtkMaskPolyDataFilter::Execute()
 		}
 		// at this point the cell is inside the bounds
 		
-		if(currentZ!=x[2])
+		if(currentZ!=currentPoint[2])
 		{
-			currentZ=x[2];
+			currentZ=currentPoint[2];
 			UpdateCurrentSliceMask(currentZ);
+			cellLocator->SetDataSet(CurrentSliceMask);
+			cellLocator->BuildLocator();
+			cellLocator->Update();
 		}
+				
 
-		// Find the closest point in the PolyData
-		idx = CurrentSliceMask->FindPoint(x);
+		cellLocator->FindClosestPoint(currentPoint, closestPoint, cellId, subId, distance2);
 
-		if (idx >= 0) 
+
+		if (cellId >= 0) 
 		{
-			// find the cells containing the found point
-			CurrentSliceMask->GetPointCells(idx, cellIds);
-
-			// examine the each cell to find the closest point to the x point
-			for (j=0; j < cellIds->GetNumberOfIds(); j++) 
-			{
-				// extract the cell
-				cellId = cellIds->GetId(j);
+			
 				cell = CurrentSliceMask->GetCell(cellId);
-				// find the distance of the cell from the x point
-				cell->EvaluatePosition(x, x1, subId, pcoords, distance2, weights);
-
-				// Find the point at minimum distance
-				if (distance2 < maxDistance2) {
-					maxDistance2 = distance2;
 					// Find the normal  
-					vtkPolygon::ComputeNormal(cell->Points,n);	  
-					for (k=0; k<3; k++) {	    	   
-						closestPoint[k]=x1[k];
-					}	  
-				}
-			}
-
-			// Vector from x to x1
-			for (k=0; k<3; k++) 
-				x1[k] = x[k] - closestPoint[k];
+				vtkPolygon::ComputeNormal(cell->Points,n);	  
+	
+				// Vector from x to x1
+				for (k=0; k<3; k++) 
+					x1[k] = currentPoint[k] - closestPoint[k];
 
 			// Projection of the distance vector on the normal
 			dot = vtkMath::Dot(x1,n);     
 		} 
 
-		distance = sqrt(maxDistance2);
+		distance = sqrt(distance2);
 
 		// find if the x point is inside or outside of the polygon: sign of the distance
 		if (dot < 0) {
@@ -275,12 +263,6 @@ void vtkMaskPolyDataFilter::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Mask Function: " << this->GetMask() << "\n";
 
   os << indent << "Distance: " << this->Distance << "\n";
-
-//  os << indent << "InsideOut: " << (this->GenerateMaskScalars ? "On\n" : "Off\n");
-
-//  os << indent << "Generate Mask Scalars: " << (this->GenerateMaskScalars ? "On\n" : "Off\n");
-
-  os << indent << "Maximum Distance: " << this->MaximumDistance << "\n";
 
 }
 

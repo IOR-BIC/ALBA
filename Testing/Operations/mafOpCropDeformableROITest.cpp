@@ -46,7 +46,6 @@ public:
   
   void SetDistance(double d);
   void SetInsideOut(int i);
-  void SetMaxDistance(double d);
   void SetFillValue(double fillValue);
 
   void OpExecute();
@@ -82,12 +81,6 @@ void OpCropDeformableROIDummy::SetInsideOut(int i)
   m_InsideOut = i;
 }
 
-//----------------------------------------------------------------------------
-void OpCropDeformableROIDummy::SetMaxDistance(double d)
-//----------------------------------------------------------------------------
-{
-  m_MaxDistance = d;
-}
 
 //----------------------------------------------------------------------------
 mafVMEVolumeGray *OpCropDeformableROIDummy::GetResult()
@@ -147,7 +140,6 @@ void mafOpCropDeformableROITest::TestOpExecute()
 {
   double distance = 0.0;
   int insideOut = 0;
-  double maxDistance = sqrt(1.0e29)/3.0;
   double fillValue = 0.0;
 
   // mask surface
@@ -182,8 +174,6 @@ void mafOpCropDeformableROITest::TestOpExecute()
   filter->SetInput(volume->GetOutput()->GetVTKData());
   filter->SetDistance(distance);
   filter->SetFillValue(fillValue);
-  filter->SetMaximumDistance(maxDistance);
-  filter->SetFillValue(fillValue);
   filter->SetInsideOut(insideOut);
 
   vtkPolyData *polyData;
@@ -200,7 +190,6 @@ void mafOpCropDeformableROITest::TestOpExecute()
   op->SetDistance(distance);
   op->SetFillValue(fillValue);
   op->SetInsideOut(insideOut);
-  op->SetMaxDistance(maxDistance);
 
   //set mask
   op->SetMask(mafNode::SafeDownCast(surface));

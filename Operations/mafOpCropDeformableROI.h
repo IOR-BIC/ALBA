@@ -77,16 +77,20 @@ protected:
   /** use  vtkMaskPolydataFilter to  achieve the output */
 	void Algorithm(mafVME *vme);
 
+  /** Select a surface as volume masking */
+	void MaskSelection();
+
+  /** Creates operation GUI*/
+	void CreateGui();
+
 	vtkMaskPolyDataFilter *m_MaskPolydataFilter;
 
 	double m_Distance;
 	double m_FillValue;
 	int		m_InsideOut;
-	double	m_MaxDistance;
 	mafNode *m_PNode;
 
 	mafVMEVolumeGray *m_ResultVme;
-  mafVMESurface    *m_Surface;
 
 };
 #endif
