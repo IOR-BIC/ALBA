@@ -30,20 +30,20 @@
 
 
 //----------------------------------------------------------------------------
-void mafHTMLTemplateParserTest::setUp()
+void mafHTMLTemplateParserBlockTest::setUp()
 //----------------------------------------------------------------------------
 {
 
 }
 
 //----------------------------------------------------------------------------
-void mafHTMLTemplateParserTest::tearDown()
+void mafHTMLTemplateParserBlockTest::tearDown()
 //----------------------------------------------------------------------------
 {
 }
 
 //----------------------------------------------------------------------------
-void mafHTMLTemplateParserTest::TestConstructorDestuctor()
+void mafHTMLTemplateParserBlockTest::TestConstructorDestuctor()
 //----------------------------------------------------------------------------
 {
   mafHTMLTemplateParserBlock *testBlock;
@@ -53,7 +53,7 @@ void mafHTMLTemplateParserTest::TestConstructorDestuctor()
 }
 
 //----------------------------------------------------------------------------
-void mafHTMLTemplateParserTest::TestAddGetVar()
+void mafHTMLTemplateParserBlockTest::TestAddGetVar()
 //----------------------------------------------------------------------------
 {
   mafHTMLTemplateParserBlock *testBlock;
@@ -93,7 +93,7 @@ void mafHTMLTemplateParserTest::TestAddGetVar()
 }
 
 //----------------------------------------------------------------------------
-void mafHTMLTemplateParserTest::TestPushGetNthVar()
+void mafHTMLTemplateParserBlockTest::TestPushGetNthVar()
 //----------------------------------------------------------------------------
 {
   mafHTMLTemplateParserBlock *testBlock;
@@ -166,7 +166,7 @@ void mafHTMLTemplateParserTest::TestPushGetNthVar()
 }
 
 //----------------------------------------------------------------------------
-void mafHTMLTemplateParserTest::TestAddGetBlock()
+void mafHTMLTemplateParserBlockTest::TestAddGetBlock()
 //----------------------------------------------------------------------------
 {
   mafHTMLTemplateParserBlock *testBlock;
@@ -186,7 +186,7 @@ void mafHTMLTemplateParserTest::TestAddGetBlock()
 }
 
 //----------------------------------------------------------------------------
-void mafHTMLTemplateParserTest::TestPushGetNthBlock()
+void mafHTMLTemplateParserBlockTest::TestPushGetNthBlock()
 //----------------------------------------------------------------------------
 {
 
@@ -219,7 +219,7 @@ void mafHTMLTemplateParserTest::TestPushGetNthBlock()
 }
 
 //----------------------------------------------------------------------------
-void mafHTMLTemplateParserTest::TestSetGetIfCondition()
+void mafHTMLTemplateParserBlockTest::TestSetGetIfCondition()
 //----------------------------------------------------------------------------
 {
   mafHTMLTemplateParserBlock *testBlock;
@@ -239,7 +239,7 @@ void mafHTMLTemplateParserTest::TestSetGetIfCondition()
 }
 
 //----------------------------------------------------------------------------
-void mafHTMLTemplateParserTest::TestSetGetNloop()
+void mafHTMLTemplateParserBlockTest::TestSetGetNloop()
 //----------------------------------------------------------------------------
 {
 
