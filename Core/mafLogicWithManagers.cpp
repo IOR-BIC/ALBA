@@ -1418,7 +1418,6 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 				m_Win->ShowDockPane("wizardgauge",!m_Win->DockPaneIsShown("wizardgauge") );
 				m_Win->ShowDockPane("tmpwithtest",!m_Win->DockPaneIsShown("tmpwithtest") );
 				m_Win->ShowDockPane("separator",!m_Win->DockPaneIsShown("separator") );
-				//mafLogicWithManagers::OnEvent(maf_event);
 				mafLogicWithGUI::OnEvent(maf_event);
 				break;
 			case PROGRESSBAR_SHOW:
@@ -1429,7 +1428,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 						m_WizardGauge->Enable();
 					}
 					else
-						mafLogicWithManagers::OnEvent(maf_event);
+						mafLogicWithGUI::OnEvent(maf_event);
 				}
 				break;
 			case PROGRESSBAR_HIDE:
@@ -1441,7 +1440,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 						m_WizardLabel->Enable(false);
 					}
 					else
-						mafLogicWithManagers::OnEvent(maf_event);
+						mafLogicWithGUI::OnEvent(maf_event);
 				}
 				break;
 			case PROGRESSBAR_SET_VALUE:
@@ -1449,7 +1448,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 					if (e->GetSender()==m_WizardManager)
 						m_WizardGauge->SetValue(e->GetArg());
 					else
-						mafLogicWithManagers::OnEvent(maf_event);
+						mafLogicWithGUI::OnEvent(maf_event);
 				}
 				break;
 
