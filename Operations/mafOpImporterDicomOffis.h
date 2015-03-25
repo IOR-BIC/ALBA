@@ -42,7 +42,7 @@ class mafVMEVolumeGray;
 class mafGUICheckListBox;
 class mafVMEMesh;
 class vtkDirectory;
-class vtkWindowLevelLookupTable;
+class vtkLookupTable;
 class vtkPlaneSource;
 class vtkPolyDataMapper;
 class vtkTexture;
@@ -284,7 +284,7 @@ protected:
 	void ApplyReferenceSystem();
 
 	vtkDirectory			*m_DICOMDirectoryReader; 
-	vtkWindowLevelLookupTable	*m_SliceLookupTable;
+	vtkLookupTable	*m_SliceLookupTable;
 	vtkPlaneSource		*m_SlicePlane;
 	vtkPolyDataMapper	*m_SliceMapper;
 	vtkTexture				*m_SliceTexture;
@@ -648,6 +648,12 @@ public:
 		return m_SwapReferenceSystem;
 	};
 
+	/** Get the DCM modality */
+	mafString GetDcmModality(){return m_DcmModality;};
+
+	/** Set the DCM modality */
+	void SetDcmModality(mafString dcmModality){m_DcmModality=dcmModality;};
+
 protected:
 	double m_DcmImagePositionPatient[3];
 	double m_DcmImagePositionPatientOriginal[3];
@@ -657,6 +663,7 @@ protected:
 	mafString m_Date;
 	mafString m_PatientName;
 	mafString m_PatientBirthdate;
+	mafString m_DcmModality;
 
 	double m_DcmTriggerTime;
 	int m_DcmInstanceNumber;

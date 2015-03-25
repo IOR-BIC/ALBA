@@ -43,7 +43,6 @@
 #include "vtkTexture.h"
 
 #include "vtkLookupTable.h"
-#include "vtkWindowLevelLookupTable.h"
 #include "vtkDataSet.h"
 
 //----------------------------------------------------------------------------
@@ -115,7 +114,7 @@ void mafViewImageCompound::OnEvent(mafEventBase *maf_event)
 		case ID_RANGE_MODIFIED:
 			{
 				//Windowing
-				if(mafVMEImage::SafeDownCast(GetSceneGraph()->GetSelectedVme()))
+				if(m_CurrentImage)
 				{
 					double low, hi;
 					m_LutSlider->GetSubRange(&low,&hi);
@@ -166,12 +165,13 @@ void mafViewImageCompound::VmeShow(mafNode *node, bool show)
 	for(int i=0; i<this->GetNumberOfSubView(); i++)
     m_ChildViewList[i]->VmeShow(node, show);
 
-	if(GetSceneGraph()->GetSelectedVme()==node)
+	if (node->IsA("mafVMEImage"))
 	{
-    mafPipeImage3D *pipe = (mafPipeImage3D *)m_ChildViewList[ID_VIEW_IMAGE]->GetNodePipe(node);
-		UpdateWindowing(show && pipe && pipe->IsGrayImage(),node);
+		m_CurrentImage=mafVMEImage::SafeDownCast(node);
+		mafPipeImage3D *pipe = (mafPipeImage3D *)m_ChildViewList[ID_VIEW_IMAGE]->GetNodePipe(node);
+		UpdateWindowing(show && pipe && pipe->IsGrayImage());
 	}
-
+	
 	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
@@ -191,23 +191,22 @@ void mafViewImageCompound::VmeSelect(mafNode *node, bool select)
     m_ChildViewList[i]->VmeSelect(node, select);
 
   mafPipeImage3D *pipe = (mafPipeImage3D *)m_ChildViewList[ID_VIEW_IMAGE]->GetNodePipe(node);
-	UpdateWindowing(node->IsA("mafVMEImage") && select && pipe && pipe->IsGrayImage(),node);
+
 }
 //----------------------------------------------------------------------------
-void mafViewImageCompound::UpdateWindowing(bool enable,mafNode *node)
+void mafViewImageCompound::UpdateWindowing(bool enable)
 //----------------------------------------------------------------------------
 {
-	if(enable)
+	if(enable && m_CurrentImage)
 	{
 		EnableWidgets(enable);
-		mafVMEImage *image=mafVMEImage::SafeDownCast(node);
+		
 		double sr[2];
-		image->GetOutput()->GetVTKData()->GetScalarRange(sr);
+		m_CurrentImage->GetOutput()->GetVTKData()->GetScalarRange(sr);
 
-    m_ColorLUT = ((mafPipeImage3D *)m_ChildViewList[ID_VIEW_IMAGE]->GetNodePipe(node))->GetLUT();;
+    m_ColorLUT = ((mafPipeImage3D *)m_ChildViewList[ID_VIEW_IMAGE]->GetNodePipe(m_CurrentImage))->GetLUT();;
 
     m_ColorLUT->SetRange(sr);
-    m_ColorLUT->Build();
       
     m_LutWidget->SetLut(m_ColorLUT);
 		m_LutWidget->Enable(true);
@@ -220,4 +219,16 @@ void mafViewImageCompound::UpdateWindowing(bool enable,mafNode *node)
 		m_LutSlider->SetRange(-100,100);
 		m_LutSlider->SetSubRange(-100,100);
 	}
+}
+
+void mafViewImageCompound::VmeRemove(mafNode *node)
+{
+	Superclass::VmeRemove(node);
+		
+	if (m_CurrentImage == node)
+	{
+		m_CurrentImage = NULL;
+		UpdateWindowing(false);
+	}
+
 }

@@ -34,7 +34,7 @@ class mafGUILutSlider;
 class mafGUILutSwatch;
 class mafGUIFloatSlider;
 class vtkLookupTable;
-class vtkWindowLevelLookupTable;
+class mafVMEImage;
 
 /**
   Class Name: mafViewImageCompound.
@@ -76,6 +76,9 @@ public:
   /** Function called when select a vme different from selected one.*/
 	virtual void VmeSelect(mafNode *node, bool select);
 
+	/** Function called on VME remove */
+	virtual void VmeRemove(mafNode *node);
+
 protected:
   /**
   Internally used to create a new instance of the GUI. This function should be
@@ -90,13 +93,15 @@ protected:
 	void EnableWidgets(bool enable);
 
   /** Update lutslider with correct values in case of bool variable is true, otherwise disable the widget. */
-	void UpdateWindowing(bool enable,mafNode *node);
+	void UpdateWindowing(bool enable);
 
 	mafViewImage	*m_ViewImage;
+
+	mafVMEImage *m_CurrentImage;
 
 	mafGUILutSwatch		*m_LutWidget; ///< LUT widget in view side panel 
 	mafGUILutSlider		*m_LutSlider;
 
-	vtkWindowLevelLookupTable	*m_ColorLUT;
+	vtkLookupTable	*m_ColorLUT;
 };
 #endif
