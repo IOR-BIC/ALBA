@@ -42,7 +42,7 @@ mafGUISettings(Listener, label)
   m_CheckNameCompositor[ID_DESCRIPTION] = TRUE; 
   m_CheckNameCompositor[ID_SERIES] = TRUE;
 
-	m_CheckOnOff[0] = m_CheckOnOff[1] = m_CheckOnOff[2] = m_CheckOnOff[3] = m_CheckOnOff[4] = m_CheckOnOff[5] = m_CheckOnOff[6] = TRUE;
+	m_CheckOnOff[0] = m_CheckOnOff[1] = m_CheckOnOff[2] = m_CheckOnOff[3] = m_CheckOnOff[4] = m_CheckOnOff[5] = m_CheckOnOff[6] = m_CheckOnOff[7] = TRUE;
 
   m_CheckOnOffVmeType[0] = m_CheckOnOffVmeType[2] = TRUE;
   m_CheckOnOffVmeType[1] = FALSE;
@@ -137,9 +137,11 @@ void mafGUIDicomSettings::CreateGui()
   m_DicomModalityListBox->AddItem(ID_OT_MODALITY,_("OT"),m_CheckOnOff[4] != 0);
   m_DicomModalityListBox->AddItem(ID_CR_MODALITY,_("CR"),m_CheckOnOff[5] != 0);
   m_DicomModalityListBox->AddItem(ID_DX_MODALITY,_("DX"),m_CheckOnOff[6] != 0);
+	m_DicomModalityListBox->AddItem(ID_RF_MODALITY,_("RF"),m_CheckOnOff[7] != 0);
   
 	m_Gui->Divider(1);
 
+	
 
   wxString outputNameTypeChoices[3] = {_("Traditional format"),_("Format : 'description_numslices'"),_("Custom")};
   m_Gui->Radio(ID_OUTPUT_NAME,_("Output name"),&m_OutputNameType,3,outputNameTypeChoices);
@@ -211,7 +213,8 @@ void mafGUIDicomSettings::OnEvent(mafEventBase *maf_event)
       m_CheckOnOff[ID_XA_MODALITY] = m_DicomModalityListBox->IsItemChecked(ID_XA_MODALITY);
       m_CheckOnOff[ID_CR_MODALITY] = m_DicomModalityListBox->IsItemChecked(ID_CR_MODALITY);
       m_CheckOnOff[ID_OT_MODALITY] = m_DicomModalityListBox->IsItemChecked(ID_OT_MODALITY);
-      m_CheckOnOff[ID_DX_MODALITY] = m_DicomModalityListBox->IsItemChecked(ID_DX_MODALITY);
+			m_CheckOnOff[ID_DX_MODALITY] = m_DicomModalityListBox->IsItemChecked(ID_DX_MODALITY);
+			m_CheckOnOff[ID_RF_MODALITY] = m_DicomModalityListBox->IsItemChecked(ID_RF_MODALITY);
 
 			m_Config->Write("EnableReadCT",m_DicomModalityListBox->IsItemChecked(ID_CT_MODALITY));
 			m_Config->Write("EnableReadSC",m_DicomModalityListBox->IsItemChecked(ID_SC_MODALITY));
@@ -220,6 +223,7 @@ void mafGUIDicomSettings::OnEvent(mafEventBase *maf_event)
       m_Config->Write("EnableReadCR",m_DicomModalityListBox->IsItemChecked(ID_CR_MODALITY));
       m_Config->Write("EnableReadOT",m_DicomModalityListBox->IsItemChecked(ID_OT_MODALITY));
       m_Config->Write("EnableReadDX",m_DicomModalityListBox->IsItemChecked(ID_DX_MODALITY));
+			m_Config->Write("EnableReadRF",m_DicomModalityListBox->IsItemChecked(ID_RF_MODALITY));
 		}
 		break;
   case ID_VME_TYPE:
@@ -505,6 +509,15 @@ void mafGUIDicomSettings::InitializeSettings()
     m_Config->Write("EnableReadDX",m_CheckOnOff[6]);
   }
 
+	if(m_Config->Read("EnableReadRF", &long_item))
+	{
+		m_CheckOnOff[7]=long_item;
+	}
+	else
+	{
+		m_Config->Write("EnableReadRF",m_CheckOnOff[7]);
+	}
+
   if(m_Config->Read("EnableTypeVolume", &long_item))
 	{
 		m_CheckOnOffVmeType[0]=long_item;
@@ -744,6 +757,11 @@ void mafGUIDicomSettings::SetEnableToRead(char* type,bool enable)
     m_CheckOnOff[ID_DX_MODALITY] = enable;
     m_Config->Write("EnableReadDX",m_CheckOnOff[ID_DX_MODALITY]);
   }
+	if (strcmp( type, "RF" ) == 0)
+	{	
+		m_CheckOnOff[ID_RF_MODALITY] = enable;
+		m_Config->Write("EnableReadRF",m_CheckOnOff[ID_RF_MODALITY]);
+	}
 
   if (strcmp( type, "VOLUME" ) == 0)
   {	
@@ -781,7 +799,7 @@ bool mafGUIDicomSettings::EnableToRead(char* type)
 		{
 			return true;
 		}
-		if (strcmp( type, "MR" ) == 0 && (m_DicomModalityListBox->IsItemChecked(ID_MRI_MODALITY)||m_DicomModalityListBox->IsItemChecked(ID_CMRI_MODALITY)))
+		if (strcmp( type, "MR" ) == 0 && (m_DicomModalityListBox->IsItemChecked(ID_MRI_MODALITY)))
 		{	
 			return true;
 		}
@@ -793,10 +811,14 @@ bool mafGUIDicomSettings::EnableToRead(char* type)
 	  {	
 	    return true;
 	  }
-    if (strcmp( type, "DX" ) == 0 && (m_DicomModalityListBox->IsItemChecked(ID_DX_MODALITY)))
-    {	
-      return true;
-    }
+		if (strcmp( type, "DX" ) == 0 && (m_DicomModalityListBox->IsItemChecked(ID_DX_MODALITY)))
+		{	
+			return true;
+		}
+		if (strcmp( type, "RF" ) == 0 && (m_DicomModalityListBox->IsItemChecked(ID_RF_MODALITY)))
+		{	
+			return true;
+		}
 
     if (strcmp( type, "VOLUME" ) == 0 && (m_DicomVmeTypeListBox->IsItemChecked(ID_VOLUME)))
 	  {	
@@ -839,10 +861,14 @@ bool mafGUIDicomSettings::EnableToRead(char* type)
     {	
       return true;
     }
-    if (strcmp( type, "DX" ) == 0 && m_CheckOnOff[ID_DX_MODALITY])
-    {	
-      return true;
-    }
+		if (strcmp( type, "DX" ) == 0 && m_CheckOnOff[ID_DX_MODALITY])
+		{	
+			return true;
+		} 
+		if (strcmp( type, "RF" ) == 0 && m_CheckOnOff[ID_RF_MODALITY])
+		{	
+			return true;
+		}
     
     if (strcmp( type, "VOLUME" ) == 0 && m_CheckOnOffVmeType[ID_VOLUME])
     {	

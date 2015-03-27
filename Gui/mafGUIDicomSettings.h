@@ -100,6 +100,10 @@ public:
     ID_OT_MODALITY,
     ID_CR_MODALITY,
     ID_DX_MODALITY,
+		ID_RF_MODALITY,
+
+		//CMRI Is used for time varying MRI, this id is used in mafOpImporterDicomOffis but is not stored anywhere 
+		//If you need to add more modality add these before this one.
 		ID_CMRI_MODALITY,
 	};
 
@@ -221,7 +225,7 @@ protected:
   mafGUICheckListBox *m_NameCompositorList;
 
   int m_CheckNameCompositor[5];
-	int m_CheckOnOff[7];
+	int m_CheckOnOff[8];
   int m_CheckOnOffVmeType[3];
 
   int m_OutputType;
