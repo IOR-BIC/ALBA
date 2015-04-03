@@ -1,6 +1,23 @@
-#include "mafVME.h"
+/*=========================================================================
+
+ Program: MAF2
+ Module: mafViewPlotTest
+ Authors: Gianluigi Crimi
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+
+
+#include "VMEPoseTest.h"
 #include "mafVMERoot.h"
-#include "mafVMEGenericAbstract.h"
+#include <cppunit/config/SourcePrefix.h>
 #include "mafVMEOutputVTK.h"
 #include "mafMatrixPipe.h"
 #include "mafTransform.h"
@@ -15,33 +32,19 @@
 //-------------------------------------------------------------------------
 // VMETest BEGIN
 //-------------------------------------------------------------------------
-/** a simple VME created just for testing purposes. */
-class mafVMETest : public mafVMEGenericAbstract
-{
-public:
-  mafTypeMacro(mafVMETest, mafVMEGenericAbstract);
-
-protected:
-  mafVMETest();
-  virtual ~mafVMETest();
-
-private:
-  mafVMETest(const mafVMETest&); // Not implemented
-  void operator=(const mafVMETest&); // Not implemented
-};
 
 //-------------------------------------------------------------------------
-mafCxxTypeMacro(mafVMETest);
+mafCxxTypeMacro(mafVMETestHelper);
 //-------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------
-mafVMETest::mafVMETest()
+mafVMETestHelper::mafVMETestHelper()
 //-------------------------------------------------------------------------
 {
   SetOutput(mafVMEOutputVTK::New());
 }
 //-------------------------------------------------------------------------
-mafVMETest::~mafVMETest()
+mafVMETestHelper::~mafVMETestHelper()
 //-------------------------------------------------------------------------
 {
 }
@@ -52,13 +55,13 @@ mafVMETest::~mafVMETest()
 
 
 //-------------------------------------------------------------------------
-int main()
+void VMEPoseTest::VmePoseMainTest()
 //-------------------------------------------------------------------------
 {
   // create a small tree
-  mafVMETest *vme1=mafVMETest::New();
-  mafVMETest *vme2=mafVMETest::New();
-  mafVMETest *vme3=mafVMETest::New();
+  mafVMETestHelper *vme1=mafVMETestHelper::New();
+  mafVMETestHelper *vme2=mafVMETestHelper::New();
+  mafVMETestHelper *vme3=mafVMETestHelper::New();
   mafSmartPointer<mafVMERoot> root;
 
  
@@ -118,13 +121,13 @@ int main()
     vme3_pose_test.SetOrientation(j*10,j*10,j*10);
     vme3_pose_test.SetTimeStamp(j);
 
-    MAF_TEST(root_pose==root_pose_result.GetMatrix());
-    MAF_TEST(vme1_pose==vme1_pose_test.GetMatrix());
-    MAF_TEST(vme2_pose==vme2_pose_test.GetMatrix())
-    MAF_TEST(vme3_pose==vme3_pose_test.GetMatrix())
-    MAF_TEST(vme1_abspose==vme1_abspose_test.GetMatrix());
-    MAF_TEST(vme2_abspose==vme2_abspose_test.GetMatrix())
-    MAF_TEST(vme3_abspose==vme3_abspose_test.GetMatrix())
+    CPPUNIT_ASSERT(root_pose==root_pose_result.GetMatrix());
+    CPPUNIT_ASSERT(vme1_pose==vme1_pose_test.GetMatrix());
+    CPPUNIT_ASSERT(vme2_pose==vme2_pose_test.GetMatrix());
+    CPPUNIT_ASSERT(vme3_pose==vme3_pose_test.GetMatrix());
+    CPPUNIT_ASSERT(vme1_abspose==vme1_abspose_test.GetMatrix());
+    CPPUNIT_ASSERT(vme2_abspose==vme2_abspose_test.GetMatrix());
+    CPPUNIT_ASSERT(vme3_abspose==vme3_abspose_test.GetMatrix());
   }
 
    std::vector<mafTimeStamp> tvector;
@@ -132,19 +135,18 @@ int main()
 
   for (int n=0;n<10;n++)
   {
-    MAF_TEST(tvector[n]==n);
+    CPPUNIT_ASSERT(tvector[n]==n);
   }
 
   mafTimeStamp tree_tbounds[2];
   root->GetOutput()->GetTimeBounds(tree_tbounds);
-  MAF_TEST(mafEquals(tree_tbounds[0],0.0));
-  MAF_TEST(mafEquals(tree_tbounds[1],9.0));
+  CPPUNIT_ASSERT(mafEquals(tree_tbounds[0],0.0));
+  CPPUNIT_ASSERT(mafEquals(tree_tbounds[1],9.0));
 
   std::cerr<<"Test completed successfully!"<<std::endl;
 
   mafDEL(vme1);
   mafDEL(vme2);
   mafDEL(vme3);
-
-  return MAF_OK;
 }
+

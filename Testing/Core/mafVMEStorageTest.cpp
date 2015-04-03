@@ -24,6 +24,7 @@
 //----------------------------------------------------------------------------
 
 #include <cppunit/config/SourcePrefix.h>
+#include "mafCoreTests.h"
 #include "mafVMEStorageTest.h"
 
 #include "mafVMEFactory.h"
@@ -189,26 +190,6 @@ int play_tree(mafVMERoot *m_StorageRoot)
 mafCxxTypeMacro(mafClientData);
 //-------------------------------------------------------------------------
 
-//-------------------------------------------------------------------------
-bool RemoveDir(const char *dirName)
-//-------------------------------------------------------------------------
-{
-  wxArrayString filenameArray;
-  wxDir::GetAllFiles(dirName,&filenameArray);
-  for (int index = 0; index < filenameArray.size(); index++)
-  {
-    wxRemoveFile(filenameArray.Item(index));
-  }
-
-  bool result = TRUE;
-
-  result = wxRmdir(dirName);
-  if (result == false)
-  {
-    return false;
-  }
-  return true;
-}
 
 //----------------------------------------------------------------------------
 void mafVMEStorageTest::TestFixture()

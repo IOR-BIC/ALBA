@@ -25,6 +25,7 @@
 
 #include <cppunit/config/SourcePrefix.h>
 #include "mafRootTest.h"
+#include "mafCoreTests.h"
 
 #include "mafSmartPointer.h"
 #include "mafRoot.h"
@@ -34,19 +35,6 @@
 #include "mafVMERoot.h"
 
 #include <iostream>
-
-//-------------------------------------------------------------------------
-/** class for testing re-parenting. */
-class mafNodeA: public mafNode
-  //-------------------------------------------------------------------------
-{
-public:
-  mafTypeMacro(mafNodeA,mafNode);
-};
-
-//-------------------------------------------------------------------------
-mafCxxTypeMacro(mafNodeA)
-//-------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------
 /** class for testing allocation */
@@ -154,7 +142,7 @@ void mafRootTest::CanReparentToTest()
   //root parent can not be reparented
   TEST_RESULT(result);
 
-  mafNodeA *n =  mafNodeA::New();
+  mafNodeHelper *n =  mafNodeHelper::New();
   result = (false == r->CanReparentTo(n));
 
   TEST_RESULT(result);
@@ -179,7 +167,7 @@ void mafRootTest::SafeDownCastTest()
   //----------------- end test comment
 
   //bad cast
-  mafNodeA *n =  mafNodeA::New();
+  mafNodeHelper *n =  mafNodeHelper::New();
   rp = (mafRootA *)mafRoot::SafeDownCast((mafObject *)n);
   result = (rp == NULL);
  

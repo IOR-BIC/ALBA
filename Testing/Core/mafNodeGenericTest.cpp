@@ -16,6 +16,7 @@
 
 
 #include "mafDefines.h" 
+#include "mafCoreTests.h"
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
@@ -31,18 +32,6 @@
 
 #define TEST_RESULT CPPUNIT_ASSERT(result);
 
-//-------------------------------------------------------------------------
-/** class for testing re-parenting. */
-class mafNodeTest: public mafNode
-  //-------------------------------------------------------------------------
-{
-public:
-  mafTypeMacro(mafNodeTest,mafNode);
-};
-
-//-------------------------------------------------------------------------
-mafCxxTypeMacro(mafNodeTest);
-//-------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 void mafNodeGenericTest::TestFixture()
@@ -77,7 +66,7 @@ void mafNodeGenericTest::TestCleanTree()
   ta->SetName("My Attribute");
   node->SetAttribute("My Attribute", ta);
   
-  mafSmartPointer<mafNodeTest> na;
+  mafSmartPointer<mafNodeHelper> na;
 
   na->ReparentTo(node);
   node->CleanTree();

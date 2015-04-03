@@ -1,7 +1,23 @@
-#include "mafVME.h"
+/*=========================================================================
+
+ Program: MAF2
+ Module: mafViewPlotTest
+ Authors: Gianluigi Crimi
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+
+
+#include "VMEDataTest.h"
+#include <cppunit/config/SourcePrefix.h>
 #include "mafVMERoot.h"
-#include "mafVMEOutput.h"
-#include "mafMatrixPipe.h"
 #include "mafTransform.h"
 #include "mafSmartPointer.h"
 #include "mafIndent.h"
@@ -12,107 +28,22 @@
 // abs matrix pipe.
 
 //-------------------------------------------------------------------------
-// VMETestOutput BEGIN
-//-------------------------------------------------------------------------
-/** Simple VME output concrete class for test purposes.
-  */
-class mafVMETestOutput : public mafVMEOutput
-{
-public:
-  mafTypeMacro(mafVMETestOutput,mafVMEOutput)
-
-  //virtual void Update();
-    
-protected:
-  mafVMETestOutput(){}; // to be allocated with New()
-  virtual ~mafVMETestOutput(){}; // to be deleted with Delete()
-
-private:
-  mafVMETestOutput(const mafVMETestOutput&); // Not implemented
-  void operator=(const mafVMETestOutput&); // Not implemented
-};
-
-mafCxxTypeMacro(mafVMETestOutput)
-
-//-------------------------------------------------------------------------
-// VMETest BEGIN
-//-------------------------------------------------------------------------
-/** a simple VME created just for testing purposes.
-    This VME stores pose matrices and data at integral time stamps. The data
-    is represented by a single float number representing the extent of a symmetric
-    object.*/
-class mafVMETest : public mafVME
-{
-public:
-  mafTypeMacro(mafVMETest,mafVME);
-
-  /** print a dump of this object */
-  virtual void Print(std::ostream& os, const int tabs=0);
-
-  /**
-    Compare two VME. Two VME are considered equivalent if they have equivalent 
-    items, TagArrays, MatrixVectors, Name and Type. */
-  virtual bool Equals(mafVME *vme);
- 
-  /**
-    Set the Pose matrix of the VME. This function modifies the MatrixVector. You can
-    set or get the Pose for a specified time. When setting, if the time does not exist
-    the MatrixVector creates a new KeyMatrix on the fly. When getting, the matrix vector
-    interpolates on the fly according to the matrix interpolator.*/
-  void SetMatrix(const mafMatrix &mat);
-
-  /** Set the data inside the internal data vector */
-  void SetData(const double data, mafTimeStamp t) {m_DataVector[t]=data;}
-
-  /**
-    Return the list of timestamps for this VME. Timestamps list is 
-    obtained merging timestamps for matrixes and VME items*/
-  virtual void GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes);
-
-  std::vector<mafSmartPointer<mafMatrix> > &GetMatrixVector() {return m_MatrixVector;}
-
-protected:
-  mafVMETest();
-
-  std::vector<mafSmartPointer<mafMatrix> > m_MatrixVector;
-  std::vector<double>                      m_DataVector;
-};
-
-//-------------------------------------------------------------------------
-mafCxxTypeMacro(mafVMETest);
+mafCxxTypeMacro(mafVMETestOutputHelper)
 //-------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------
-// VMETestOutput END
-//-------------------------------------------------------------------------
-
-
-//-------------------------------------------------------------------------
-// MatrixPipeTest BEGIN
-//-------------------------------------------------------------------------
-/** simple matrix pipe to produce output data! */
-class MAF_EXPORT mafMatrixPipeTest:public mafMatrixPipe
-{
-public:
-  mafTypeMacro(mafMatrixPipeTest,mafMatrixPipe);
-
-  /** This DataPipe accepts only VME's with internal DataArray. */
-  virtual bool Accept(mafVME *vme) {return Superclass::Accept(vme)&&vme->IsMAFType(mafVMETest);}
-
-protected:
-  /** update the output matrix */
-  virtual void InternalUpdate();  
-};
-
-//-------------------------------------------------------------------------
-mafCxxTypeMacro(mafMatrixPipeTest);
+mafCxxTypeMacro(mafVMETestHelper);
 //-------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------
-void mafMatrixPipeTest::InternalUpdate()
+mafCxxTypeMacro(mafMatrixPipeTestHelper);
+//-------------------------------------------------------------------------
+
+//-------------------------------------------------------------------------
+void mafMatrixPipeTestHelper::InternalUpdate()
 //-------------------------------------------------------------------------
 {
-  mafVMETest *vme=(mafVMETest *)m_VME;
+  mafVMETestHelper *vme=(mafVMETestHelper *)m_VME;
   unsigned long index=(GetTimeStamp()<vme->GetMatrixVector().size())?GetTimeStamp():vme->GetMatrixVector().size()-1;
   m_Matrix->DeepCopy(vme->GetMatrixVector()[index]);
 }
@@ -122,7 +53,7 @@ void mafMatrixPipeTest::InternalUpdate()
 //-------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------
-void mafVMETest::Print(std::ostream& os, const int tabs)
+void mafVMETestHelper::Print(std::ostream& os, const int tabs)
 //-------------------------------------------------------------------------
 {
   Superclass::Print(os,tabs);
@@ -149,12 +80,12 @@ void mafVMETest::Print(std::ostream& os, const int tabs)
 }
 
 //-------------------------------------------------------------------------
-bool mafVMETest::Equals(mafVME *vme)
+bool mafVMETestHelper::Equals(mafVME *vme)
 //-------------------------------------------------------------------------
 {
   if (Superclass::Equals(vme))
   {
-    mafVMETest *vme_test=mafVMETest::SafeDownCast(vme);
+    mafVMETestHelper *vme_test=mafVMETestHelper::SafeDownCast(vme);
     assert(vme);
     int i;
     for (i=0;i<m_MatrixVector.size();i++)
@@ -176,7 +107,7 @@ bool mafVMETest::Equals(mafVME *vme)
 }
 
 //-------------------------------------------------------------------------
-void mafVMETest::SetMatrix(const mafMatrix &mat)
+void mafVMETestHelper::SetMatrix(const mafMatrix &mat)
 //-------------------------------------------------------------------------
 {
   if (m_MatrixVector.size()<=mat.GetTimeStamp()) // make the vector fit the requested size
@@ -187,7 +118,7 @@ void mafVMETest::SetMatrix(const mafMatrix &mat)
 }
 
 //-------------------------------------------------------------------------
-void mafVMETest::GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes)
+void mafVMETestHelper::GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes)
 //-------------------------------------------------------------------------
 {
   kframes.clear();
@@ -199,12 +130,12 @@ void mafVMETest::GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes)
 }
 
 //-------------------------------------------------------------------------
-mafVMETest::mafVMETest()
+mafVMETestHelper::mafVMETestHelper()
 //-------------------------------------------------------------------------
 {
-  m_Output = mafVMETestOutput::New();
+  m_Output = mafVMETestOutputHelper::New();
   m_Output->SetVME(this);
-  SetMatrixPipe(mafMatrixPipeTest::New());
+  SetMatrixPipe(mafMatrixPipeTestHelper::New());
   //
 }
 
@@ -214,7 +145,7 @@ mafVMETest::mafVMETest()
 
 
 //-------------------------------------------------------------------------
-int main()
+void VMEDataTest::VmeDataMainTest()
 //-------------------------------------------------------------------------
 {
   // create a small tree
@@ -279,16 +210,14 @@ int main()
     vme3_pose_test.SetOrientation(j*10,j*10,j*10);
     vme3_pose_test.SetTimeStamp(j);
 
-    MAF_TEST(root_pose==root_pose_result.GetMatrix());
-    MAF_TEST(vme1_pose==vme1_pose_test.GetMatrix());
-    MAF_TEST(vme2_pose==vme2_pose_test.GetMatrix())
-    MAF_TEST(vme3_pose==vme3_pose_test.GetMatrix())
-    MAF_TEST(vme1_abspose==vme1_abspose_test.GetMatrix());
-    MAF_TEST(vme2_abspose==vme2_abspose_test.GetMatrix())
-    MAF_TEST(vme3_abspose==vme3_abspose_test.GetMatrix())
+    CPPUNIT_ASSERT(root_pose==root_pose_result.GetMatrix());
+    CPPUNIT_ASSERT(vme1_pose==vme1_pose_test.GetMatrix());
+    CPPUNIT_ASSERT(vme2_pose==vme2_pose_test.GetMatrix())
+    CPPUNIT_ASSERT(vme3_pose==vme3_pose_test.GetMatrix())
+    CPPUNIT_ASSERT(vme1_abspose==vme1_abspose_test.GetMatrix());
+    CPPUNIT_ASSERT(vme2_abspose==vme2_abspose_test.GetMatrix())
+    CPPUNIT_ASSERT(vme3_abspose==vme3_abspose_test.GetMatrix())
   }
 
-  std::cerr<<"Test completed successfully!"<<std::endl;
-
-  return MAF_OK;
 }
+
