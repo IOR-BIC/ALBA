@@ -136,7 +136,7 @@ void mafVMEManagerTest::tearDown()
 //----------------------------------------------------------------------------
 {
   cppDEL(m_App);  // Destroy the application
-  delete wxLog::SetActiveTarget(NULL);
+	wxAppConsole::SetInstance(NULL);
 }
 //----------------------------------------------------------------------------
 void mafVMEManagerTest::TestDynamicAllocation()

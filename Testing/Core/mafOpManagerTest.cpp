@@ -51,7 +51,6 @@ void mafOpManagerTest::tearDown()
 {
   cppDEL(m_OpManager);
 
-  delete wxLog::SetActiveTarget(NULL);
 }
 //------------------------------------------------------------------------------
 void mafOpManagerTest::TestDynamicAllocation()

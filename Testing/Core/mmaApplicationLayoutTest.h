@@ -25,6 +25,8 @@
 #include <cppunit/TestResultCollector.h>
 #include <cppunit/TestRunner.h>
 
+class TestApp;
+
 /** Test for mafMatrix; Use this suite to trace memory problems */
 class mmaApplicationLayoutTest : public CPPUNIT_NS::TestFixture
 {
@@ -55,6 +57,8 @@ private:
   void TestDeepCopy();
   void TestClearLayout();
 
+
+	TestApp *m_App;
   wxFrame *m_Toplevel;
   bool result;
 };

@@ -48,6 +48,7 @@ void mafUserTest::tearDown()
 //----------------------------------------------------------------------------
 {
   cppDEL(m_App);  // Destroy the application
+	wxAppConsole::SetInstance(NULL);
 }
 //----------------------------------------------------------------------------
 void mafUserTest::TestStaticAllocation()

@@ -54,8 +54,6 @@ void mafOpCutTest::tearDown()
 //----------------------------------------------------------------------------
 {
   mafDEL(m_OpCut);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafOpCutTest::TestOpDo()
