@@ -29,13 +29,16 @@
 
 class mafCoreFactoryTest : public CPPUNIT_NS::TestFixture
 {
+public:
+	void tearDown();
+
   CPPUNIT_TEST_SUITE( mafCoreFactoryTest );
 	CPPUNIT_TEST( TestStaticAllocation );
 	CPPUNIT_TEST( TestDynamicAllocation );
   CPPUNIT_TEST( TestGetSourceVersion );
   CPPUNIT_TEST( TestGetDescription );
-
-  // These tests play with the factory to check that everything is working as expected: 
+	
+	// These tests play with the factory to check that everything is working as expected: 
   CPPUNIT_TEST( TestCreateInstance );
 	CPPUNIT_TEST( TestGetRegisteredFactories );
 	CPPUNIT_TEST( TestRegisterFactory );
@@ -67,7 +70,6 @@ class mafCoreFactoryTest : public CPPUNIT_NS::TestFixture
   void TestGetArgs();
   void TestReHash();
   void TestCreateAllInstance();
-  
 };
 
 

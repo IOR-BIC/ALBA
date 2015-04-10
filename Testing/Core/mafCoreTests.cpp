@@ -180,6 +180,9 @@ int
 	// Add the top suite to the test runner
 	CPPUNIT_NS::TestRunner runner;
 
+	//this test must be run first because manages factories
+	runner.addTest( mafCoreFactoryTest::suite());
+
 	runner.addTest( vtkMAFAssemblyTest::suite());
 	runner.addTest( mafAbsMatrixPipeTest::suite());
 	runner.addTest( mmaVolumeMaterialTest::suite());
@@ -229,7 +232,6 @@ int
   runner.addTest( mafExpirationDateTest::suite());
 	runner.addTest( mafEventIOTest::suite());
 	runner.addTest( mafDataPipeTest::suite());
-	runner.addTest( mafCoreFactoryTest::suite());
 	runner.addTest( mafAxesTest::suite());
   runner.addTest( mafAttributeTraceabilityTest::suite());
 	runner.addTest( mafAttributeTest::suite());
