@@ -37,13 +37,13 @@
 #define TEST_RESULT CPPUNIT_ASSERT(m_Result);
 
 /** a vme test  class used to test event reception. */
-class mafVMETestClass: public mafVMEScalarMatrix
+class mafVMEScalarMatrixTestClass: public mafVMEScalarMatrix
 {
 public:
   /* constructor */
-	mafVMETestClass(const char *name=NULL):Name(name) {}
+	mafVMEScalarMatrixTestClass(const char *name=NULL):Name(name) {}
   /** RTTI macro */
-	mafTypeMacro(mafVMETestClass,mafVMEScalarMatrix);
+	mafTypeMacro(mafVMEScalarMatrixTestClass,mafVMEScalarMatrix);
 
   /** process events */
 	virtual void OnEvent(mafEventBase *event) {Name = "CATCHED";};
@@ -52,7 +52,7 @@ public:
 };
 
 //-------------------------------------------------------------------------
-mafCxxTypeMacro(mafVMETestClass)
+mafCxxTypeMacro(mafVMEScalarMatrixTestClass)
 //-------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
@@ -83,7 +83,7 @@ void mafDataPipeInterpolatorScalarMatrixTest::TestDynamicAllocation()
 void mafDataPipeInterpolatorScalarMatrixTest::TestAccept()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafVMETestClass> matrixTest;
+  mafSmartPointer<mafVMEScalarMatrixTestClass> matrixTest;
   matrixTest->SetData(m_DataMatrix, 0.);
 
   mafSmartPointer<mafDataPipeInterpolatorScalarMatrix> di;
@@ -100,7 +100,7 @@ void mafDataPipeInterpolatorScalarMatrixTest::TestOnEvent()
 {
   //catch events inside vme : VME_OUTPUT_DATA_PREUPDATE, VME_OUTPUT_DATA_UPDATE
 
-  mafSmartPointer<mafVMETestClass> matrixTest1;
+  mafSmartPointer<mafVMEScalarMatrixTestClass> matrixTest1;
 
   mafSmartPointer<mafDataPipeInterpolatorScalarMatrix> smi;
   smi->SetVME(matrixTest1);
@@ -108,7 +108,7 @@ void mafDataPipeInterpolatorScalarMatrixTest::TestOnEvent()
   m_Result = matrixTest1->Name.Equals("CATCHED");
   TEST_RESULT;
 
-  mafSmartPointer<mafVMETestClass> matrixTest2;
+  mafSmartPointer<mafVMEScalarMatrixTestClass> matrixTest2;
   smi->SetVME(matrixTest2);
   smi->OnEvent(&mafEvent(NULL,VME_OUTPUT_DATA_UPDATE)); 
 
@@ -121,7 +121,7 @@ void mafDataPipeInterpolatorScalarMatrixTest::TestOnEvent()
 void mafDataPipeInterpolatorScalarMatrixTest::TestGetScalarData()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafVMETestClass> matrixTest;
+  mafSmartPointer<mafVMEScalarMatrixTestClass> matrixTest;
 
   matrixTest->SetData(m_DataMatrix, 0.0);
   matrixTest->Update();
@@ -159,7 +159,7 @@ void mafDataPipeInterpolatorScalarMatrixTest::TestGetScalarData()
 void mafDataPipeInterpolatorScalarMatrixTest::TestGetCurrentItem()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafVMETestClass> matrixTest;
+  mafSmartPointer<mafVMEScalarMatrixTestClass> matrixTest;
   
   int numberOfRows = m_DataMatrix.rows();
   int numberOfCols = m_DataMatrix.columns();
