@@ -22,6 +22,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 #include "medInteractor2DDistanceTest.h"
+#include "mafInteractionTests.h"
 
 #include "medInteractor2DDistance.h"
 #include "mafGUIFrame.h"
@@ -32,34 +33,6 @@
 
 #define EPSILON 0.001
 
-//----------------------------------------------------------------------------
-class DummyObserver : public mafObserver
-  //----------------------------------------------------------------------------
-{
-public:
-
-  DummyObserver() 
-  {
-    m_LastReceivedEventID = -1;
-  };
-  ~DummyObserver()
-  {
-  };
-
-  void	DummyObserver::OnEvent(mafEventBase *maf_event)
-  {
-    m_LastReceivedEventID =  maf_event->GetId();
-  }
-
-  int DummyObserver::GetLastReceivedEventID()
-  {
-    return m_LastReceivedEventID;
-  }
-
-protected:
-
-  int m_LastReceivedEventID;
-};
 //-----------------------------------------------------------
 void medInteractor2DDistanceTest::setUp()
 //-----------------------------------------------------------

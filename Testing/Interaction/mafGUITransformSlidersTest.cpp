@@ -15,6 +15,7 @@
 =========================================================================*/
 
 #include "mafDefines.h"
+#include "mafInteractionTests.h"
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
@@ -30,34 +31,7 @@
 
 #define EPSILON 0.001
 
-//----------------------------------------------------------------------------
-class DummyObserver : public mafObserver
-//----------------------------------------------------------------------------
-{
-public:
 
-  DummyObserver() 
-  {
-    m_LastReceivedEventID = -1;
-  };
-  ~DummyObserver()
-  {
-  };
-
-  void	DummyObserver::OnEvent(mafEventBase *maf_event)
-  {
-    m_LastReceivedEventID =  maf_event->GetId();
-  }
-
-  int DummyObserver::GetLastReceivedEventID()
-  {
-    return m_LastReceivedEventID;
-  }
-
-protected:
-
-  int m_LastReceivedEventID;
-};
 //-----------------------------------------------------------
 void mafGUITransformSlidersTest::setUp()
 //-----------------------------------------------------------

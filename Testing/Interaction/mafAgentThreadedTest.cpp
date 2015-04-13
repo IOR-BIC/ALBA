@@ -15,7 +15,8 @@
 =========================================================================*/
 
 
-#include "mafDefines.h" 
+#include "mafDefines.h"
+#include "mafInteractionTests.h"
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
@@ -109,9 +110,4 @@ void mafAgentThreadedTest::TestAsyncInvokeEvent()
 
   cppDEL(dummyEvent);
   mafDEL(agentThreaded);
-}
-
-void	DummyObserver::OnEvent(mafEventBase *maf_event)
-{
-  mafLogMessage("\nEntering DummyObserver::OnEvent...\n");
 }
