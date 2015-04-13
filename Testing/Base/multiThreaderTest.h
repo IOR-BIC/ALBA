@@ -1,8 +1,8 @@
 /*=========================================================================
 
  Program: MAF2
- Module: mafObserversListTest
- Authors: Daniele Giunchi
+ Module: multiThreaderTest
+ Authors: Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -14,8 +14,8 @@
 
 =========================================================================*/
 
-#ifndef __CPP_UNIT_mafObserversListTEST_H__
-#define __CPP_UNIT_mafObserversListTEST_H__
+#ifndef __CPP_UNIT_VMEPoseTest_H__
+#define __CPP_UNIT_VMEPoseTest_H__
 
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/BriefTestProgressListener.h>
@@ -24,20 +24,18 @@
 #include <cppunit/TestResult.h>
 #include <cppunit/TestResultCollector.h>
 #include <cppunit/TestRunner.h>
+#include "mafVME.h"
+#include "mafVMEGenericAbstract.h"
 
 
-
-class mafObserversListTest : public CPPUNIT_NS::TestFixture
+class multiThreaderTest : public CPPUNIT_NS::TestFixture
 {
-  CPPUNIT_TEST_SUITE( mafObserversListTest );
-	CPPUNIT_TEST( TestStaticAllocation );
-	CPPUNIT_TEST( TestDynamicAllocation );
+  CPPUNIT_TEST_SUITE( multiThreaderTest );
+  CPPUNIT_TEST( MultiThreaderMainTest );
   CPPUNIT_TEST_SUITE_END();
 
-  protected:
-  void TestStaticAllocation();
-  void TestDynamicAllocation();
+protected:
+  void MultiThreaderMainTest();
 };
-
 
 #endif

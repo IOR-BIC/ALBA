@@ -1,3 +1,20 @@
+/*=========================================================================
+
+ Program: MAF2
+ Module: multiThreaderTest
+ Authors: Gianluigi Crimi
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+
+#include "multiThreaderTest.h"
 #include "mafMultiThreader.h"
 #include "mafMutexLock.h"
 
@@ -12,7 +29,9 @@ public:
   mafMutexLock lock;
 };
 
+//----------------------------------------------------------------------------
 static void ThreadFunction(mmuThreadInfoStruct *data)
+//----------------------------------------------------------------------------
 {
   assert(data);
   test_data *mydata=(test_data *)(data->m_UserData);
@@ -24,7 +43,9 @@ static void ThreadFunction(mmuThreadInfoStruct *data)
   std::cerr<<"Thread "<<mydata->thread_id<<" (ID="<<data->m_ThreadID<<") is dying\n";
 }
 
-int main()
+//----------------------------------------------------------------------------
+void multiThreaderTest::MultiThreaderMainTest()
+//----------------------------------------------------------------------------
 {  
   mafMultiThreader threader;
   test_data data[8];
@@ -41,14 +62,14 @@ int main()
   
   for (i=0;i<8;i++)
   {
-    MAF_TEST(data[i].flag==1);
+    CPPUNIT_ASSERT(data[i].flag==1);
     data[i].lock.Unlock();
   }
   mafSleep(2000); // wait 2secs for all threads to complete their work
   
   for (i=0;i<8;i++)
   {
-    MAF_TEST(data[i].flag==2);
+    CPPUNIT_ASSERT(data[i].flag==2);
   }
   std::cerr<<"Gate2\n";
   for (i=0;i<8;i++)
@@ -57,14 +78,5 @@ int main()
   }
   mafSleep(2000); // wait 2secs for all threads to complete their work
 
-  /*for (int i=0;i<8;i++)
-  {
-    // close threads
-    threader.TerminateThread(data[i].thread_id);
-  }*/
-
   std::cerr<<"Test completed successfully!"<<std::endl;
-
-  return MAF_OK;
-  
 }

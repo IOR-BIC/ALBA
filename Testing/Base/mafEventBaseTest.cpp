@@ -24,6 +24,7 @@
 //----------------------------------------------------------------------------
 
 #include <cppunit/config/SourcePrefix.h>
+#include "mafBaseTests.h"
 #include "mafEventBaseTest.h"
 
 #include "mafReferenceCounted.h"
@@ -33,14 +34,6 @@
 #include <iostream>
 #include <utility>
 
-//creation of test object
-class mafTestObject: public mafReferenceCounted
-{
-public:
-  mafTypeMacro(mafTestObject,mafReferenceCounted);
-};
-
-mafCxxTypeMacro(mafTestObject);
 
 //----------------------------------------------------------------------------
 void mafEventBaseTest::TestFixture()
