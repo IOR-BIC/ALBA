@@ -42,14 +42,14 @@
 #include "mafVMEStorage.h"
 #include "mafVMERoot.h"
 
-class DerivedTestClass: public mafOpEqualizeHistogram
+class OpEqualizeHistogramDerivedTestClass: public mafOpEqualizeHistogram
 {
 public:
 
-  DerivedTestClass(const wxString &label = "Equalize Histogram");
-  virtual ~DerivedTestClass();
+  OpEqualizeHistogramDerivedTestClass(const wxString &label = "Equalize Histogram");
+  virtual ~OpEqualizeHistogramDerivedTestClass();
 
-  mafTypeMacro(DerivedTestClass, mafOpEqualizeHistogram);
+  mafTypeMacro(OpEqualizeHistogramDerivedTestClass, mafOpEqualizeHistogram);
 
   void ExecuteOpRun();
   void ExecuteAlgorithm();
@@ -62,11 +62,11 @@ protected:
 };
 
 //----------------------------------------------------------------------------
-mafCxxTypeMacro(DerivedTestClass);
+mafCxxTypeMacro(OpEqualizeHistogramDerivedTestClass);
 //----------------------------------------------------------------------------*/
 
 //----------------------------------------------------------------------------
-DerivedTestClass::DerivedTestClass(const wxString &label) :
+OpEqualizeHistogramDerivedTestClass::OpEqualizeHistogramDerivedTestClass(const wxString &label) :
 mafOpEqualizeHistogram(label)
 //---------------------------------------------------------------------------*/
 {
@@ -74,34 +74,34 @@ mafOpEqualizeHistogram(label)
 }
 
 //----------------------------------------------------------------------------
-DerivedTestClass::~DerivedTestClass()
+OpEqualizeHistogramDerivedTestClass::~OpEqualizeHistogramDerivedTestClass()
 //----------------------------------------------------------------------------*/
 {
   cppDEL(op);
   mafDEL(m_VolumeOutput);
 }
 //----------------------------------------------------------------------------
-mafVMEVolumeGray *DerivedTestClass::GetVolumeOutput()
+mafVMEVolumeGray *OpEqualizeHistogramDerivedTestClass::GetVolumeOutput()
 //----------------------------------------------------------------------------*/
 { 
   return m_VolumeOutput;
 }
 
 //----------------------------------------------------------------------------
-void DerivedTestClass::ExecuteAlgorithm()
+void OpEqualizeHistogramDerivedTestClass::ExecuteAlgorithm()
 //----------------------------------------------------------------------------
 {
   Superclass::Algorithm();
 }
 
 //----------------------------------------------------------------------------
-void DerivedTestClass::ExecuteOpStop()
+void OpEqualizeHistogramDerivedTestClass::ExecuteOpStop()
 //----------------------------------------------------------------------------
 {
   Superclass::OpStop(OP_RUN_OK);
 }
 //----------------------------------------------------------------------------
-void DerivedTestClass::ExecuteOpRun()
+void OpEqualizeHistogramDerivedTestClass::ExecuteOpRun()
 //----------------------------------------------------------------------------
 {
   m_VolumeInput = mafVMEVolumeGray::SafeDownCast(m_Input);
@@ -189,7 +189,7 @@ void mafOpEqualizeHistogramTest::TestAccept()
 //-----------------------------------------------------------
 {
 
-  DerivedTestClass *m_OpEqualizeHistogram = new DerivedTestClass();
+  OpEqualizeHistogramDerivedTestClass *m_OpEqualizeHistogram = new OpEqualizeHistogramDerivedTestClass();
 
   mafVMEVolumeGray *volume;
   mafNEW(volume);
@@ -211,7 +211,7 @@ void mafOpEqualizeHistogramTest::TestAccept()
 void mafOpEqualizeHistogramTest::TestOpExecute()
 //-----------------------------------------------------------
 {
-  DerivedTestClass *m_OpEqualizeHistogram = new DerivedTestClass();
+  OpEqualizeHistogramDerivedTestClass *m_OpEqualizeHistogram = new OpEqualizeHistogramDerivedTestClass();
 
   mafVMEStorage *storage = mafVMEStorage::New();
   storage->GetRoot()->SetName("root");
@@ -269,7 +269,7 @@ void mafOpEqualizeHistogramTest::TestOpUndo()
 //-----------------------------------------------------------
 {
 
-  DerivedTestClass *m_OpEqualizeHistogram = new DerivedTestClass();
+  OpEqualizeHistogramDerivedTestClass *m_OpEqualizeHistogram = new OpEqualizeHistogramDerivedTestClass();
 
   mafVMEStorage *storage = mafVMEStorage::New();
   storage->GetRoot()->SetName("root");

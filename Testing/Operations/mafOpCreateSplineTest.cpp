@@ -22,6 +22,7 @@
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
+#include "mafOperationsTests.h"
 
 #include <cppunit/config/SourcePrefix.h>
 #include "mafOpCreateSplineTest.h"
@@ -30,52 +31,6 @@
 #include "mafOpCreateSpline.h"
 
 #define TEST_RESULT CPPUNIT_ASSERT(result);
-
-//----------------------------------------------------------------------------
-class DummyVme : public mafVME
-//----------------------------------------------------------------------------
-{
-public:
-  DummyVme(){};
-  ~DummyVme(){};
-
-  mafTypeMacro(DummyVme,mafVME);
-
-  /*virtual*/ void SetMatrix(const mafMatrix &mat){};
-  /*virtual*/ void GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes){};
-
-protected:
-private:
-};
-
-mafCxxTypeMacro(DummyVme);
-
-//----------------------------------------------------------------------------
-class DummyObserver : public mafObserver
-  //----------------------------------------------------------------------------
-{
-public:
-
-  DummyObserver() {m_DummyVme = new DummyVme();};
-  ~DummyObserver() {delete m_DummyVme;};
-
-  /*virtual*/ void OnEvent(mafEventBase *maf_event);
-
-protected:
-  DummyVme *m_DummyVme;
-};
-//----------------------------------------------------------------------------
-void DummyObserver::OnEvent(mafEventBase *maf_event)
-//----------------------------------------------------------------------------
-{
-  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
-  {
-    if(e->GetId() == VME_REMOVE)
-    {
-      e->GetVme()->ReparentTo(NULL);
-    }
-  }
-}
 
 //----------------------------------------------------------------------------
 void mafOpCreateSplineTest::TestFixture()

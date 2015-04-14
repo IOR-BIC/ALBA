@@ -49,8 +49,6 @@ typedef medOpVolumeResample movr;
 
 using namespace std;
 
-bool DEBUG_MODE = true;
-
 
 void medOpVolumeResampleTest::TestSetBounds()
 {
@@ -162,10 +160,8 @@ void medOpVolumeResampleTest::WriteVTKDatasetToFile( vtkDataSet * outputVolumeVT
   fullPathOutputFilename.append(MAF_DATA_ROOT);
   fullPathOutputFilename.append("/Test_VolumeResample/");
   fullPathOutputFilename.append(outputFilename);
-  if (DEBUG_MODE)
-  {
-    cout << fullPathOutputFilename;
-  }
+
+  cout << fullPathOutputFilename;
 
   writer->SetFileName(fullPathOutputFilename.c_str());
   writer->SetFileTypeToASCII();

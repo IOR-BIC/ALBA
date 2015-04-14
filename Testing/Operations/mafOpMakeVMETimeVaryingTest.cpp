@@ -38,14 +38,14 @@
 
 const int ITEMSNUMBER = 4;
 
-class DerivedTestClass: public mafOpMakeVMETimevarying
+class OpMakeVMETimevaryingDerivedTestClass: public mafOpMakeVMETimevarying
 {
 public:
 
-  DerivedTestClass(const wxString &label = "Make Timevariyng VME",bool showShadingPlane = false){};
-  virtual ~DerivedTestClass(){};
+  OpMakeVMETimevaryingDerivedTestClass(const wxString &label = "Make Timevariyng VME",bool showShadingPlane = false){};
+  virtual ~OpMakeVMETimevaryingDerivedTestClass(){};
 
-  mafTypeMacro(DerivedTestClass, mafOpMakeVMETimevarying);
+  mafTypeMacro(OpMakeVMETimevaryingDerivedTestClass, mafOpMakeVMETimevarying);
 
   bool AcceptTimeStamp(double timestamp){return Superclass::AcceptTimeStamp(timestamp);};
   bool AcceptVME(mafVME * vme){return Superclass::AcceptVME(vme);};
@@ -56,7 +56,7 @@ public:
 };
 
 //----------------------------------------------------------------------------
-mafCxxTypeMacro(DerivedTestClass);
+mafCxxTypeMacro(OpMakeVMETimevaryingDerivedTestClass);
 //----------------------------------------------------------------------------
 
 //-----------------------------------------------------------
@@ -93,7 +93,7 @@ void mafOpMakeVMETimevaryingTest::TestOpExecute()
 //-----------------------------------------------------------
 {
 
-  DerivedTestClass *op = new DerivedTestClass();
+  OpMakeVMETimevaryingDerivedTestClass *op = new OpMakeVMETimevaryingDerivedTestClass();
 
   vtkImageData *imageData[ITEMSNUMBER];
   mafVMEImage *images[ITEMSNUMBER];

@@ -24,6 +24,8 @@
 //----------------------------------------------------------------------------
 
 #include <cppunit/config/SourcePrefix.h>
+#include "mafOperationsTests.h"
+
 #include "mafOpImporterVTKTest.h"
 
 #include "mafString.h"
@@ -32,24 +34,6 @@
 
 #define TEST_RESULT CPPUNIT_ASSERT(result);
 
-//----------------------------------------------------------------------------
-class DummyVme : public mafVME
-//----------------------------------------------------------------------------
-{
-public:
-  DummyVme(){};
-  ~DummyVme(){};
-
-  mafTypeMacro(DummyVme,mafVME);
-
-  /*virtual*/ void SetMatrix(const mafMatrix &mat){};
-  /*virtual*/ void GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes){};
-
-protected:
-private:
-};
-
-mafCxxTypeMacro(DummyVme);
 
 //----------------------------------------------------------------------------
 void mafOpImporterVTKTest::TestFixture()

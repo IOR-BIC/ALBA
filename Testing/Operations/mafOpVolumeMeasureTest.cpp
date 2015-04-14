@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: mafOpSmoothSurfaceCells
+ Module: mafOpVolumeMeasureTest
  Authors: Daniele Giunchi
  
  Copyright (c) B3C
@@ -33,7 +33,7 @@
 #include <assert.h>
 
 //-----------------------------------------------------------
-void mafOpSmoothSurfaceCells::Test() 
+void mafOpVolumeMeasureTest::Test() 
 //-----------------------------------------------------------
 {
   vtkCubeSource *cube = vtkCubeSource::New();
