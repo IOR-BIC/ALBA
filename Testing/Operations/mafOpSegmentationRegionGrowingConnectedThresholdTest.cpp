@@ -99,24 +99,30 @@ void mafOpSegmentationRegionGrowingConnectedThresholdTest::CompareImageData(vtkI
   CPPUNIT_ASSERT( imITK->GetNumberOfPoints() == imOP->GetNumberOfPoints() );
   CPPUNIT_ASSERT( imITK->GetNumberOfCells() == imOP->GetNumberOfCells() );
 
+	bool sameTuple=true;
+
   if ( imITK->GetPointData()->GetScalars() != NULL && imOP->GetPointData()->GetScalars() != NULL )
   {
     for (int i=0;i<imITK->GetNumberOfPoints();i++)
     {
-      CPPUNIT_ASSERT( imITK->GetPointData()->GetScalars()->GetTuple1(i) == imOP->GetPointData()->GetScalars()->GetTuple1(i) );
+      if( imITK->GetPointData()->GetScalars()->GetTuple1(i) != imOP->GetPointData()->GetScalars()->GetTuple1(i) )
+				sameTuple=false;
     }
   }
   else if ( imITK->GetCellData()->GetScalars() != NULL && imOP->GetCellData()->GetScalars() != NULL )
   {
     for (int i=0;i<imITK->GetNumberOfCells();i++)
     {
-      CPPUNIT_ASSERT( imITK->GetCellData()->GetScalars()->GetTuple1(i) == imOP->GetCellData()->GetScalars()->GetTuple1(i) );
+      if (imITK->GetCellData()->GetScalars()->GetTuple1(i) != imOP->GetCellData()->GetScalars()->GetTuple1(i) )
+				sameTuple=false;
     }
   }
   else
   {
-    CPPUNIT_ASSERT( false );//There aren't any scalars
+    sameTuple = false;//There aren't any scalars
   }
+
+	CPPUNIT_ASSERT(sameTuple);
 }
 //----------------------------------------------------------------------------
 void mafOpSegmentationRegionGrowingConnectedThresholdTest::TestAlgorithm()

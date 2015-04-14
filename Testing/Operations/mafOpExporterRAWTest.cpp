@@ -135,10 +135,16 @@ void mafOpExporterRAWTest::Test()
 	CPPUNIT_ASSERT(DataImported->GetPointData()->GetScalars()->GetDataType()==VTK_SHORT);
 	ScalarsImported=(vtkShortArray*)(DataImported->GetPointData()->GetScalars());
 	ScalarsExported=(vtkShortArray*)(DataExported->GetPointData()->GetScalars());
+
+	bool sameScalars=true;
 	for(long i=0;i<DataImported->GetNumberOfPoints();i++)
 	{
-		CPPUNIT_ASSERT(ScalarsImported->GetValue(i)==ScalarsExported->GetValue(i));
+		if(ScalarsImported->GetValue(i)!=ScalarsExported->GetValue(i))
+			sameScalars=false;
 	}
+
+	CPPUNIT_ASSERT(sameScalars);
+
 
   DataExported = NULL;
   DataImported = NULL;
@@ -259,10 +265,15 @@ void mafOpExporterRAWTest::TestRG()
 	CPPUNIT_ASSERT(DataImported->GetPointData()->GetScalars()->GetDataType()==VTK_SHORT);
 	ScalarsImported=(vtkShortArray*)(DataImported->GetPointData()->GetScalars());
 	ScalarsExported=(vtkShortArray*)(DataExported->GetPointData()->GetScalars());
+	
+	bool sameScalars=true;
 	for(long i=0;i<DataImported->GetNumberOfPoints();i++)
 	{
-		CPPUNIT_ASSERT(ScalarsImported->GetValue(i)==ScalarsExported->GetValue(i));
+		if(ScalarsImported->GetValue(i)!=ScalarsExported->GetValue(i))
+			sameScalars=false;
 	}
+
+	CPPUNIT_ASSERT(sameScalars);
 
   DataExported = NULL;
   DataImported = NULL;

@@ -291,15 +291,20 @@ void mafOpFreezeVMETest::TestFreezeVMESlicer()
 
 	CPPUNIT_ASSERT(sliceSurface &&  numSrc == numDst && numCellSrc == numCellDst);
 
+	bool sameValues=true;
+
 	for(int i=0; i< sliceSurface->GetSurfaceOutput()->GetTexture()->GetDimensions()[0]; i++)
 	{
 		for(int j=0; j< sliceSurface->GetSurfaceOutput()->GetTexture()->GetDimensions()[1]; j++)
 		{
 			int value1 = sliceSurface->GetSurfaceOutput()->GetTexture()->GetPointData()->GetScalars()->GetTuple1(i+i*j);
 			int value2 = slicer->GetSurfaceOutput()->GetTexture()->GetPointData()->GetScalars()->GetTuple1(i+i*j);
-			CPPUNIT_ASSERT(value1 == value2);
+			if(value1 != value2)
+				sameValues=false;
 		}
 	}
+
+	CPPUNIT_ASSERT(sameValues);
 
 	delete wxLog::SetActiveTarget(NULL);
 
