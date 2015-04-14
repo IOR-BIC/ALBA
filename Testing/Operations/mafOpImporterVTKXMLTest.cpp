@@ -42,6 +42,8 @@
 void mafOpImporterVTKXMLTest::setUp() 
 //-----------------------------------------------------------
 {
+	//required by the importer
+	vtkObject::GlobalWarningDisplayOn();
 }
 //-----------------------------------------------------------
 void mafOpImporterVTKXMLTest::tearDown() 
@@ -90,6 +92,7 @@ void mafOpImporterVTKXMLTest::TestImportVTKPolylineGraph()
 //-----------------------------------------------------------
 {
   mafOpImporterVTKXML *importer=new mafOpImporterVTKXML();
+	
   importer->TestModeOn();
   mafString fileName=MAF_DATA_ROOT;
   fileName<<"/VTKXML/PolylineGraph.vtp";
