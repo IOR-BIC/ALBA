@@ -82,9 +82,17 @@ void mafVMEFactoryTest::Initialize_CreateVMEInstance()
 {
   // this custom factory needs only to be initialized
   CPPUNIT_ASSERT(mafVMEFactory::Initialize()==MAF_OK);
-  
+  mafNodeFactory *vmeFactory=mafVMEFactory::GetInstance();
+
   std::list<mafObjectFactory *> list=mafObjectFactory::GetRegisteredFactories();
-  CPPUNIT_ASSERT(list.size()==1);
+
+	bool found=false;
+	for ( std::list<mafObjectFactory*>::iterator i = list.begin();i != list.end(); ++i )
+	{
+		if((*i)==vmeFactory)
+			found = true;
+	}
+	CPPUNIT_ASSERT(found);
 
   mafVMEFactory *vme_factory = NULL;
   vme_factory = (mafVMEFactory*) mafVMEFactory::GetInstance();
@@ -111,7 +119,7 @@ void mafVMEFactoryTest::Initialize_CreateVMEInstance()
   s1 = vmes.size();
   CPPUNIT_ASSERT(s1 == 36);
 
-  bool found=false;
+  found=false;
   for (int i=0;i<vmes.size();i++)
   {
 		std::string test;
