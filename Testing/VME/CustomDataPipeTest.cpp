@@ -1,5 +1,20 @@
-// Test mafVMEGeneric class
+/*=========================================================================
 
+ Program: MAF2
+ Module: multiThreaderTest
+ Authors: Gianluigi Crimi
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+// Test mafVMEGeneric class
+#include "CustomDataPipeTest.h"
 #include "mafVME.h"
 #include "mafDataPipeCustom.h"
 #include "mafVMEOutputSurface.h"
@@ -99,7 +114,7 @@ void mafTestVME::InternalUpdate()
   m_Cone->SetRadius(m_Radius);
 }
 //-------------------------------------------------------------------------
-int main()
+void CustomDataPipeTest::CustomDataPipeMainTest()
 //-------------------------------------------------------------------------
 {
   // create a small tree with a root, a volume and a slicer 
@@ -108,39 +123,38 @@ int main()
 
   vtkDataSet *data=vme->GetOutput()->GetVTKData();
 
-  MAF_TEST(data->IsA("vtkPolyData"));
+  CPPUNIT_ASSERT(data->IsA("vtkPolyData"));
 
   vtkPolyData *surface=(vtkPolyData *)data;
 
-  MAF_TEST(vme->m_PreUpdateConunter==1);
-  MAF_TEST(vme->m_UpdateConunter==0);
+  CPPUNIT_ASSERT(vme->m_PreUpdateConunter==1);
+  CPPUNIT_ASSERT(vme->m_UpdateConunter==0);
 
 
   surface->Update();
-  MAF_TEST(vme->m_PreUpdateConunter==1);
-  MAF_TEST(vme->m_UpdateConunter==1);
-  MAF_TEST(vme->m_Sphere->GetRadius()==1);
-  MAF_TEST(vme->m_Cone->GetRadius()==1);
+  CPPUNIT_ASSERT(vme->m_PreUpdateConunter==1);
+  CPPUNIT_ASSERT(vme->m_UpdateConunter==1);
+  CPPUNIT_ASSERT(vme->m_Sphere->GetRadius()==1);
+  CPPUNIT_ASSERT(vme->m_Cone->GetRadius()==1);
 
   vme->SetRadius(2);
   surface->Update();
-  MAF_TEST(vme->m_PreUpdateConunter==2);
-  MAF_TEST(vme->m_UpdateConunter==2);
+  CPPUNIT_ASSERT(vme->m_PreUpdateConunter==2);
+  CPPUNIT_ASSERT(vme->m_UpdateConunter==2);
 
   vme->SetTypeToSphere();
-  MAF_TEST(vme->GetOutput()->GetVTKData()==surface);
-  MAF_TEST(vme->m_PreUpdateConunter==3);
-  MAF_TEST(vme->m_UpdateConunter==2);
+  CPPUNIT_ASSERT(vme->GetOutput()->GetVTKData()==surface);
+  CPPUNIT_ASSERT(vme->m_PreUpdateConunter==3);
+  CPPUNIT_ASSERT(vme->m_UpdateConunter==2);
   
   surface->Update();
-  MAF_TEST(vme->m_PreUpdateConunter==3);
-  MAF_TEST(vme->m_UpdateConunter==3);
+  CPPUNIT_ASSERT(vme->m_PreUpdateConunter==3);
+  CPPUNIT_ASSERT(vme->m_UpdateConunter==3);
   
   surface->Update();
-  MAF_TEST(vme->m_PreUpdateConunter==3);
-  MAF_TEST(vme->m_UpdateConunter==3);
+  CPPUNIT_ASSERT(vme->m_PreUpdateConunter==3);
+  CPPUNIT_ASSERT(vme->m_UpdateConunter==3);
   
   std::cerr<<"Test completed successfully!"<<std::endl;
 
-  return MAF_OK;
 }

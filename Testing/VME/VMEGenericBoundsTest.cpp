@@ -1,4 +1,21 @@
+/*=========================================================================
+
+ Program: MAF2
+ Module: multiThreaderTest
+ Authors: Gianluigi Crimi
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
 // Test mafVMEGeneric class
+#include "VMEGenericBoundsTest.h"
+#include "mafVMETests.h"
 
 #include "mafVMEGeneric.h"
 #include "mafVMERoot.h"
@@ -38,25 +55,9 @@
   #define SLEEP(a) usleep(a*10)
 #endif
 
-/** attribute class for attaching vtkActor to VME */
-class mafClientData : public mafAttribute
-{
-public:
-  mafTypeMacro(mafClientData,mafAttribute);
-
-  vtkMAFAutoPointer<vtkAssembly> m_Prop3D;
-
-  virtual void DeepCopy(const mafAttribute *a) {Superclass::DeepCopy(a); m_Prop3D=((mafClientData *)a)->m_Prop3D;}
-  virtual bool Equals(const mafAttribute *a) const {return Superclass::Equals(a)&&m_Prop3D==((mafClientData *)a)->m_Prop3D;}
-};
 
 //-------------------------------------------------------------------------
-mafCxxTypeMacro(mafClientData);
-//-------------------------------------------------------------------------
-
-
-//-------------------------------------------------------------------------
-int main()
+void VMEGenericBoundsTest::VMEGenericBoundsMainTest()
 //-------------------------------------------------------------------------
 {
   // create a small tree with 
@@ -177,34 +178,34 @@ int main()
       // Local VME bounds
       for (int j=0;j<6;j++)
       {
-        MAF_TEST(local_bounds0.m_Bounds[j]==cube_bounds[i].m_Bounds[j]);
-        MAF_TEST(local_bounds1.m_Bounds[j]==cube_bounds[i].m_Bounds[j]);
-        MAF_TEST(local_bounds2.m_Bounds[j]==cube_bounds[i].m_Bounds[j]);
+        CPPUNIT_ASSERT(local_bounds0.m_Bounds[j]==cube_bounds[i].m_Bounds[j]);
+        CPPUNIT_ASSERT(local_bounds1.m_Bounds[j]==cube_bounds[i].m_Bounds[j]);
+        CPPUNIT_ASSERT(local_bounds2.m_Bounds[j]==cube_bounds[i].m_Bounds[j]);
       }
       
       if (i<50)
       {
         // VME bounds
-        MAF_TEST(bounds0.m_Bounds[0]==cube_bounds[i].m_Bounds[0]);
-        MAF_TEST(bounds0.m_Bounds[1]==cube_bounds[i].m_Bounds[1]);
-        MAF_TEST(bounds0.m_Bounds[2]==cube_bounds[i].m_Bounds[2]);
-        MAF_TEST(bounds0.m_Bounds[3]==cube_bounds[i].m_Bounds[3]);
-        MAF_TEST(bounds0.m_Bounds[4]==cube_bounds[i].m_Bounds[4]);
-        MAF_TEST(bounds0.m_Bounds[5]==cube_bounds[i].m_Bounds[5]);
+        CPPUNIT_ASSERT(bounds0.m_Bounds[0]==cube_bounds[i].m_Bounds[0]);
+        CPPUNIT_ASSERT(bounds0.m_Bounds[1]==cube_bounds[i].m_Bounds[1]);
+        CPPUNIT_ASSERT(bounds0.m_Bounds[2]==cube_bounds[i].m_Bounds[2]);
+        CPPUNIT_ASSERT(bounds0.m_Bounds[3]==cube_bounds[i].m_Bounds[3]);
+        CPPUNIT_ASSERT(bounds0.m_Bounds[4]==cube_bounds[i].m_Bounds[4]);
+        CPPUNIT_ASSERT(bounds0.m_Bounds[5]==cube_bounds[i].m_Bounds[5]);
 
-        MAF_TEST(bounds1.m_Bounds[0]==cube_bounds[i].m_Bounds[0]+i);
-        MAF_TEST(bounds1.m_Bounds[1]==cube_bounds[i].m_Bounds[1]+i);
-        MAF_TEST(bounds1.m_Bounds[2]==cube_bounds[i].m_Bounds[2]);
-        MAF_TEST(bounds1.m_Bounds[3]==cube_bounds[i].m_Bounds[3]);
-        MAF_TEST(bounds1.m_Bounds[4]==cube_bounds[i].m_Bounds[4]);
-        MAF_TEST(bounds1.m_Bounds[5]==cube_bounds[i].m_Bounds[5]);
+        CPPUNIT_ASSERT(bounds1.m_Bounds[0]==cube_bounds[i].m_Bounds[0]+i);
+        CPPUNIT_ASSERT(bounds1.m_Bounds[1]==cube_bounds[i].m_Bounds[1]+i);
+        CPPUNIT_ASSERT(bounds1.m_Bounds[2]==cube_bounds[i].m_Bounds[2]);
+        CPPUNIT_ASSERT(bounds1.m_Bounds[3]==cube_bounds[i].m_Bounds[3]);
+        CPPUNIT_ASSERT(bounds1.m_Bounds[4]==cube_bounds[i].m_Bounds[4]);
+        CPPUNIT_ASSERT(bounds1.m_Bounds[5]==cube_bounds[i].m_Bounds[5]);
 
-        MAF_TEST(bounds2.m_Bounds[0]==cube_bounds[i].m_Bounds[0]-i);
-        MAF_TEST(bounds2.m_Bounds[1]==cube_bounds[i].m_Bounds[1]-i);
-        MAF_TEST(bounds2.m_Bounds[2]==cube_bounds[i].m_Bounds[2]);
-        MAF_TEST(bounds2.m_Bounds[3]==cube_bounds[i].m_Bounds[3]);
-        MAF_TEST(bounds2.m_Bounds[4]==cube_bounds[i].m_Bounds[4]);
-        MAF_TEST(bounds2.m_Bounds[5]==cube_bounds[i].m_Bounds[5]);
+        CPPUNIT_ASSERT(bounds2.m_Bounds[0]==cube_bounds[i].m_Bounds[0]-i);
+        CPPUNIT_ASSERT(bounds2.m_Bounds[1]==cube_bounds[i].m_Bounds[1]-i);
+        CPPUNIT_ASSERT(bounds2.m_Bounds[2]==cube_bounds[i].m_Bounds[2]);
+        CPPUNIT_ASSERT(bounds2.m_Bounds[3]==cube_bounds[i].m_Bounds[3]);
+        CPPUNIT_ASSERT(bounds2.m_Bounds[4]==cube_bounds[i].m_Bounds[4]);
+        CPPUNIT_ASSERT(bounds2.m_Bounds[5]==cube_bounds[i].m_Bounds[5]);
 
         // tree bounds
         mafOBB tree_bounds,test_tree_bounds;
@@ -216,31 +217,31 @@ int main()
         test_tree_bounds.m_Bounds[5]=cube_bounds[i].m_Bounds[5];
 
         root->GetOutput()->GetBounds(tree_bounds);
-        //MAF_TEST(tree_bounds.Equals(test_tree_bounds));
+        //CPPUNIT_ASSERT(tree_bounds.Equals(test_tree_bounds));
       }
       else
       {
         // VME bounds
-        MAF_TEST(bounds0.m_Bounds[0]==cube_bounds[i].m_Bounds[0]);
-        MAF_TEST(bounds0.m_Bounds[1]==cube_bounds[i].m_Bounds[1]);
-        MAF_TEST(bounds0.m_Bounds[2]==cube_bounds[i].m_Bounds[2]+i-50);
-        MAF_TEST(bounds0.m_Bounds[3]==cube_bounds[i].m_Bounds[3]+i-50);
-        MAF_TEST(bounds0.m_Bounds[4]==cube_bounds[i].m_Bounds[4]);
-        MAF_TEST(bounds0.m_Bounds[5]==cube_bounds[i].m_Bounds[5]);
+        CPPUNIT_ASSERT(bounds0.m_Bounds[0]==cube_bounds[i].m_Bounds[0]);
+        CPPUNIT_ASSERT(bounds0.m_Bounds[1]==cube_bounds[i].m_Bounds[1]);
+        CPPUNIT_ASSERT(bounds0.m_Bounds[2]==cube_bounds[i].m_Bounds[2]+i-50);
+        CPPUNIT_ASSERT(bounds0.m_Bounds[3]==cube_bounds[i].m_Bounds[3]+i-50);
+        CPPUNIT_ASSERT(bounds0.m_Bounds[4]==cube_bounds[i].m_Bounds[4]);
+        CPPUNIT_ASSERT(bounds0.m_Bounds[5]==cube_bounds[i].m_Bounds[5]);
 
-        MAF_TEST(bounds1.m_Bounds[0]==cube_bounds[i].m_Bounds[0]+50);
-        MAF_TEST(bounds1.m_Bounds[1]==cube_bounds[i].m_Bounds[1]+50);
-        MAF_TEST(bounds1.m_Bounds[2]==cube_bounds[i].m_Bounds[2]+i-50);
-        MAF_TEST(bounds1.m_Bounds[3]==cube_bounds[i].m_Bounds[3]+i-50);
-        MAF_TEST(bounds1.m_Bounds[4]==cube_bounds[i].m_Bounds[4]);
-        MAF_TEST(bounds1.m_Bounds[5]==cube_bounds[i].m_Bounds[5]);
+        CPPUNIT_ASSERT(bounds1.m_Bounds[0]==cube_bounds[i].m_Bounds[0]+50);
+        CPPUNIT_ASSERT(bounds1.m_Bounds[1]==cube_bounds[i].m_Bounds[1]+50);
+        CPPUNIT_ASSERT(bounds1.m_Bounds[2]==cube_bounds[i].m_Bounds[2]+i-50);
+        CPPUNIT_ASSERT(bounds1.m_Bounds[3]==cube_bounds[i].m_Bounds[3]+i-50);
+        CPPUNIT_ASSERT(bounds1.m_Bounds[4]==cube_bounds[i].m_Bounds[4]);
+        CPPUNIT_ASSERT(bounds1.m_Bounds[5]==cube_bounds[i].m_Bounds[5]);
 
-        MAF_TEST(bounds2.m_Bounds[0]==cube_bounds[i].m_Bounds[0]-50);
-        MAF_TEST(bounds2.m_Bounds[1]==cube_bounds[i].m_Bounds[1]-50);
-        MAF_TEST(bounds2.m_Bounds[2]==cube_bounds[i].m_Bounds[2]+i-50);
-        MAF_TEST(bounds2.m_Bounds[3]==cube_bounds[i].m_Bounds[3]+i-50);
-        MAF_TEST(bounds2.m_Bounds[4]==cube_bounds[i].m_Bounds[4]);
-        MAF_TEST(bounds2.m_Bounds[5]==cube_bounds[i].m_Bounds[5]);
+        CPPUNIT_ASSERT(bounds2.m_Bounds[0]==cube_bounds[i].m_Bounds[0]-50);
+        CPPUNIT_ASSERT(bounds2.m_Bounds[1]==cube_bounds[i].m_Bounds[1]-50);
+        CPPUNIT_ASSERT(bounds2.m_Bounds[2]==cube_bounds[i].m_Bounds[2]+i-50);
+        CPPUNIT_ASSERT(bounds2.m_Bounds[3]==cube_bounds[i].m_Bounds[3]+i-50);
+        CPPUNIT_ASSERT(bounds2.m_Bounds[4]==cube_bounds[i].m_Bounds[4]);
+        CPPUNIT_ASSERT(bounds2.m_Bounds[5]==cube_bounds[i].m_Bounds[5]);
 
 
         // tree bounds
@@ -253,7 +254,7 @@ int main()
         test_tree_bounds.m_Bounds[5]=cube_bounds[i].m_Bounds[5];
 
         root->GetOutput()->GetBounds(tree_bounds);
-        MAF_TEST(tree_bounds.Equals(test_tree_bounds));
+        CPPUNIT_ASSERT(tree_bounds.Equals(test_tree_bounds));
       }
     }
     else
@@ -261,32 +262,32 @@ int main()
       // Local VME bounds
       for (int j=0;j<6;j++)
       {
-        MAF_TEST(local_bounds0.m_Bounds[j]==cube_bounds[i].m_Bounds[j]);
-        MAF_TEST(local_bounds1.m_Bounds[j]==cube_bounds[i].m_Bounds[j]);
-        MAF_TEST(local_bounds2.m_Bounds[j]==cube_bounds[i].m_Bounds[j]);
+        CPPUNIT_ASSERT(local_bounds0.m_Bounds[j]==cube_bounds[i].m_Bounds[j]);
+        CPPUNIT_ASSERT(local_bounds1.m_Bounds[j]==cube_bounds[i].m_Bounds[j]);
+        CPPUNIT_ASSERT(local_bounds2.m_Bounds[j]==cube_bounds[i].m_Bounds[j]);
       }
 
       // VME bounds
-      MAF_TEST(bounds0.m_Bounds[0]==cube_bounds[i].m_Bounds[0]);
-      MAF_TEST(bounds0.m_Bounds[1]==cube_bounds[i].m_Bounds[1]);
-      MAF_TEST(bounds0.m_Bounds[2]==cube_bounds[i].m_Bounds[2]+100-50);
-      MAF_TEST(bounds0.m_Bounds[3]==cube_bounds[i].m_Bounds[3]+100-50);
-      MAF_TEST(bounds0.m_Bounds[4]==cube_bounds[i].m_Bounds[4]);
-      MAF_TEST(bounds0.m_Bounds[5]==cube_bounds[i].m_Bounds[5]);
+      CPPUNIT_ASSERT(bounds0.m_Bounds[0]==cube_bounds[i].m_Bounds[0]);
+      CPPUNIT_ASSERT(bounds0.m_Bounds[1]==cube_bounds[i].m_Bounds[1]);
+      CPPUNIT_ASSERT(bounds0.m_Bounds[2]==cube_bounds[i].m_Bounds[2]+100-50);
+      CPPUNIT_ASSERT(bounds0.m_Bounds[3]==cube_bounds[i].m_Bounds[3]+100-50);
+      CPPUNIT_ASSERT(bounds0.m_Bounds[4]==cube_bounds[i].m_Bounds[4]);
+      CPPUNIT_ASSERT(bounds0.m_Bounds[5]==cube_bounds[i].m_Bounds[5]);
 
-      MAF_TEST(bounds1.m_Bounds[0]==cube_bounds[i].m_Bounds[0]+50);
-      MAF_TEST(bounds1.m_Bounds[1]==cube_bounds[i].m_Bounds[1]+50);
-      MAF_TEST(bounds1.m_Bounds[2]==cube_bounds[i].m_Bounds[2]+100-50);
-      MAF_TEST(bounds1.m_Bounds[3]==cube_bounds[i].m_Bounds[3]+100-50);
-      MAF_TEST(bounds1.m_Bounds[4]==cube_bounds[i].m_Bounds[4]);
-      MAF_TEST(bounds1.m_Bounds[5]==cube_bounds[i].m_Bounds[5]);
+      CPPUNIT_ASSERT(bounds1.m_Bounds[0]==cube_bounds[i].m_Bounds[0]+50);
+      CPPUNIT_ASSERT(bounds1.m_Bounds[1]==cube_bounds[i].m_Bounds[1]+50);
+      CPPUNIT_ASSERT(bounds1.m_Bounds[2]==cube_bounds[i].m_Bounds[2]+100-50);
+      CPPUNIT_ASSERT(bounds1.m_Bounds[3]==cube_bounds[i].m_Bounds[3]+100-50);
+      CPPUNIT_ASSERT(bounds1.m_Bounds[4]==cube_bounds[i].m_Bounds[4]);
+      CPPUNIT_ASSERT(bounds1.m_Bounds[5]==cube_bounds[i].m_Bounds[5]);
 
-      MAF_TEST(bounds2.m_Bounds[0]==cube_bounds[i].m_Bounds[0]-50);
-      MAF_TEST(bounds2.m_Bounds[1]==cube_bounds[i].m_Bounds[1]-50);
-      MAF_TEST(bounds2.m_Bounds[2]==cube_bounds[i].m_Bounds[2]+100-50);
-      MAF_TEST(bounds2.m_Bounds[3]==cube_bounds[i].m_Bounds[3]+100-50);
-      MAF_TEST(bounds2.m_Bounds[4]==cube_bounds[i].m_Bounds[4]);
-      MAF_TEST(bounds2.m_Bounds[5]==cube_bounds[i].m_Bounds[5]);
+      CPPUNIT_ASSERT(bounds2.m_Bounds[0]==cube_bounds[i].m_Bounds[0]-50);
+      CPPUNIT_ASSERT(bounds2.m_Bounds[1]==cube_bounds[i].m_Bounds[1]-50);
+      CPPUNIT_ASSERT(bounds2.m_Bounds[2]==cube_bounds[i].m_Bounds[2]+100-50);
+      CPPUNIT_ASSERT(bounds2.m_Bounds[3]==cube_bounds[i].m_Bounds[3]+100-50);
+      CPPUNIT_ASSERT(bounds2.m_Bounds[4]==cube_bounds[i].m_Bounds[4]);
+      CPPUNIT_ASSERT(bounds2.m_Bounds[5]==cube_bounds[i].m_Bounds[5]);
     } 
   }
   
@@ -328,9 +329,9 @@ int main()
       else
       {
         vtkDataSet *data=vme->GetOutput()->GetVTKData();
-        MAF_TEST(data!=NULL);
+        CPPUNIT_ASSERT(data!=NULL);
 
-        MAF_TEST(data->IsA("vtkPolyData")!=0);
+        CPPUNIT_ASSERT(data->IsA("vtkPolyData")!=0);
 
         vtkDataSetMapper *mapper=vtkDataSetMapper::New();
 
@@ -349,13 +350,13 @@ int main()
         attr->m_Prop3D=vmeasm;
         vme->SetAttribute("ClientData",attr);
 
-        MAF_TEST(vme->GetAttribute("ClientData")==attr.GetPointer());
+        CPPUNIT_ASSERT(vme->GetAttribute("ClientData")==attr.GetPointer());
 
         mafClientData *pattr=mafClientData::SafeDownCast(vme->GetParent()->GetAttribute("ClientData"));
         vtkAssembly *pvmeasm=pattr->m_Prop3D;
       
-        MAF_TEST(pvmeasm!=NULL);
-        MAF_TEST(pvmeasm->IsA("vtkAssembly")!=0);
+        CPPUNIT_ASSERT(pvmeasm!=NULL);
+        CPPUNIT_ASSERT(pvmeasm->IsA("vtkAssembly")!=0);
         pvmeasm->AddPart(vmeasm);
       }
     }
@@ -404,10 +405,10 @@ int main()
 
   int treeTimesStamps=vtitle->GetNumberOfTimeStamps();
 
-  //MAF_TEST(treeTimesStamps==376);
+  //CPPUNIT_ASSERT(treeTimesStamps==376);
 
   // time bases for data and matrixes do not overlap
-  MAF_TEST(sphereAllTimeStamps==150);
+  CPPUNIT_ASSERT(sphereAllTimeStamps==150);
 
   cerr << "Tree TBounds = [" << treeTimeBounds[0] <<"," << treeTimeBounds[1] << "]\n";
   cerr << "Title TBounds = [" << vtitleTimeBounds[0] <<"," << vtitleTimeBounds[1] << "]\n";
@@ -421,8 +422,8 @@ int main()
   vcone->GetDataVector()->GetTimeStamps(dataTimeStamps);
   vcone->GetMatrixVector()->GetTimeStamps(matrixTimeStamps);
 
-  MAF_TEST(dataTimeStamps.size()==data_time_stamps.size());
-  MAF_TEST(matrixTimeStamps.size()==matrix_time_stamps.size());
+  CPPUNIT_ASSERT(dataTimeStamps.size()==data_time_stamps.size());
+  CPPUNIT_ASSERT(matrixTimeStamps.size()==matrix_time_stamps.size());
 
   cerr << "VME-Cone data_time_stamps={";
   for (int n=0;n<dataTimeStamps.size();n++)
@@ -431,7 +432,7 @@ int main()
 
     mafTimeStamp t2=data_time_stamps[n];
 
-    //MAF_TEST(t1==t2);
+    //CPPUNIT_ASSERT(t1==t2);
     cerr << t1 ;
 
     if (n<dataTimeStamps.size()-1)
@@ -449,7 +450,7 @@ int main()
 
     mafTimeStamp t2=matrix_time_stamps[m];
 
-    MAF_TEST(t1==t2);
+    CPPUNIT_ASSERT(t1==t2);
 
     cerr << t1 ;
 
@@ -534,7 +535,7 @@ int main()
 
   rootAsm->GetBounds(asmBounds);
 
-  MAF_TEST(treeBounds.Equals(asmBounds)!=0);
+  CPPUNIT_ASSERT(treeBounds.Equals(asmBounds)!=0);
 
   renderer->AddActor(tree4DBoundsActor);
 
@@ -574,7 +575,7 @@ int main()
 
     asmBoundsBox->SetBounds(asmBounds);    
 
-    //MAF_TEST(treeBounds.Equals(asmBounds));
+    //CPPUNIT_ASSERT(treeBounds.Equals(asmBounds));
   
   }
 
@@ -586,7 +587,7 @@ int main()
   for (node=iter->GetFirstNode();node;node=iter->GetNextNode())
   {
     mafVME *vme=mafVME::SafeDownCast(node);
-    MAF_TEST(vme);
+    CPPUNIT_ASSERT(vme);
     vme->RemoveAttribute("ClientData");
   }
 
@@ -617,5 +618,4 @@ int main()
   */
   std::cerr<<"Test completed successfully!"<<std::endl;
 
-  return MAF_OK;
 }

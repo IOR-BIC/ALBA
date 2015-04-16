@@ -14,8 +14,8 @@
 
 =========================================================================*/
 
-#ifndef __CPP_UNIT_VMEPoseTest_H__
-#define __CPP_UNIT_VMEPoseTest_H__
+#ifndef __CPP_UNIT_multiThreaderTest_H__
+#define __CPP_UNIT_multiThreaderTest_H__
 
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/BriefTestProgressListener.h>

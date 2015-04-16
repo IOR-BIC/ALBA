@@ -1,3 +1,19 @@
+/*=========================================================================
+
+ Program: MAF2
+ Module: multiThreaderTest
+ Authors: Gianluigi Crimi
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+#include "VMEGenericPoseTest.h"
 #include "mafVMEGeneric.h"
 #include "mafVMERoot.h"
 #include "mafVMEOutput.h"
@@ -10,7 +26,7 @@
 // this test does not perform any test on serialization and data, it tests matrix pipe and
 // abs matrix pipe.
 //-------------------------------------------------------------------------
-int main()
+void  VMEGenericPoseTest::VMEGenericPoseMainTest()
 //-------------------------------------------------------------------------
 {
   // create a small tree
@@ -75,16 +91,15 @@ int main()
     vme3_pose_test.SetOrientation(j*10,j*10,j*10);
     vme3_pose_test.SetTimeStamp(j);
 
-    MAF_TEST(root_pose==root_pose_result.GetMatrix());
-    MAF_TEST(vme1_pose==vme1_pose_test.GetMatrix());
-    MAF_TEST(vme2_pose==vme2_pose_test.GetMatrix())
-    MAF_TEST(vme3_pose==vme3_pose_test.GetMatrix())
-    MAF_TEST(vme1_abspose==vme1_abspose_test.GetMatrix());
-    MAF_TEST(vme2_abspose==vme2_abspose_test.GetMatrix())
-    MAF_TEST(vme3_abspose==vme3_abspose_test.GetMatrix())
+    CPPUNIT_ASSERT(root_pose==root_pose_result.GetMatrix());
+    CPPUNIT_ASSERT(vme1_pose==vme1_pose_test.GetMatrix());
+    CPPUNIT_ASSERT(vme2_pose==vme2_pose_test.GetMatrix());
+    CPPUNIT_ASSERT(vme3_pose==vme3_pose_test.GetMatrix());
+    CPPUNIT_ASSERT(vme1_abspose==vme1_abspose_test.GetMatrix());
+    CPPUNIT_ASSERT(vme2_abspose==vme2_abspose_test.GetMatrix());
+    CPPUNIT_ASSERT(vme3_abspose==vme3_abspose_test.GetMatrix());
   }
   
   std::cerr<<"Test completed successfully!"<<std::endl;
 
-  return MAF_OK;
 }

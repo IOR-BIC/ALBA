@@ -1,8 +1,8 @@
 /*=========================================================================
 
  Program: MAF2
- Module: mafVMESurfaceEditorTest
- Authors: Roberto Mucci
+ Module: CustomDataPipeTest
+ Authors: Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -14,8 +14,8 @@
 
 =========================================================================*/
 
-#ifndef __CPP_UNIT_mafVMESurfaceEditorTest_H__
-#define __CPP_UNIT_mafVMESurfaceEditorTest_H__
+#ifndef __CPP_UNIT_CustomDataPipeTest_H__
+#define __CPP_UNIT_CustomDataPipeTest_H__
 
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/BriefTestProgressListener.h>
@@ -24,28 +24,17 @@
 #include <cppunit/TestResult.h>
 #include <cppunit/TestResultCollector.h>
 #include <cppunit/TestRunner.h>
+#include "mafVME.h"
 
 
-class mafVMESurfaceEditorTest : public CPPUNIT_NS::TestFixture
+class CustomDataPipeTest : public CPPUNIT_NS::TestFixture
 {
-public: 
-  // CPPUNIT fixture: executed before each test
-  void setUp();
-
-  // CPPUNIT fixture: executed after each test
-  void tearDown();
-
-  CPPUNIT_TEST_SUITE( mafVMESurfaceEditorTest );
-  CPPUNIT_TEST( TestDynamicAllocation );
-  CPPUNIT_TEST( TestSetData );
-  CPPUNIT_TEST( TestSetGetVisualPipe );
+  CPPUNIT_TEST_SUITE( CustomDataPipeTest );
+  CPPUNIT_TEST( CustomDataPipeMainTest );
   CPPUNIT_TEST_SUITE_END();
 
-  protected:
-    void TestDynamicAllocation();
-    void TestSetData();
-    void TestSetGetVisualPipe();
-    bool m_Result;
+protected:
+  void CustomDataPipeMainTest();
 };
 
 #endif

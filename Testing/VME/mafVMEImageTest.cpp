@@ -24,6 +24,7 @@
 //----------------------------------------------------------------------------
 
 #include <cppunit/config/SourcePrefix.h>
+#include "mafVMETests.h"
 
 #include "mafVMEImageTest.h"
 #include <wx/dir.h>
@@ -62,22 +63,6 @@
 #include <iostream>
 #include <set>
 
-/** attribute class for attaching vtkActor to VME */
-class mafClientData : public mafAttribute
-{
-public:
-  mafTypeMacro(mafClientData,mafAttribute);
-
-  vtkMAFAutoPointer<vtkAssembly> m_Prop3D;
-
-  virtual void DeepCopy(const mafAttribute *a) {Superclass::DeepCopy(a); m_Prop3D=((mafClientData *)a)->m_Prop3D;}
-  virtual bool Equals(const mafAttribute *a) const {return Superclass::Equals(a)&&m_Prop3D==((mafClientData *)a)->m_Prop3D;}
-};
-
-// Need this to resolve lnk2019 error
-//-------------------------------------------------------------------------
-mafCxxTypeMacro(mafClientData);
-//-------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 void mafVMEImageTest::setUp()
