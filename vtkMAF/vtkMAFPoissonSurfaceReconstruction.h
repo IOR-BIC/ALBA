@@ -1097,76 +1097,195 @@ class Vector
 {
 public:
   /** constructor */
-	Vector();
+	Vector(){
+		m_N = 0;
+		m_pV = 0;
+	};
   /** overloaded constructor */
-	Vector( const Vector<T>& V );
+	Vector( const Vector<T>& V ){
+		m_N = 0;
+		m_pV = 0;
+		Resize(V.m_N);
+		memcpy( m_pV, V.m_pV, m_N*sizeof(T) );
+	};
   /** overloaded constructor */
-	Vector( size_t N );
+	Vector( size_t N ){
+		m_N=0;
+		m_pV=0;
+		Resize(N);
+	};
   /** overloaded constructor */
-	Vector( size_t N, T* pV );
+	Vector( size_t N, T* pV ){
+		Resize(N);
+		memcpy( m_pV, pV, N*sizeof(T) );
+	};
   /** destructor */
-	~Vector();
+	~Vector(){Resize(0);};
 
   /** overload operator ()*/
-	const T& operator () (size_t i) const;
+	const T& operator () (size_t i) const{
+		assert( i < m_N );
+		return m_pV[i];
+	};
   /** overload operator ()*/
-	T& operator () (size_t i);
+	T& operator () (size_t i){
+		return m_pV[i];
+	};
   /** overload operator []*/
-	const T& operator [] (size_t i) const;
+	const T& operator [] (size_t i) const{
+		return m_pV[i];
+	};
   /** overload operator []*/
-	T& operator [] (size_t i);
+	T& operator [] (size_t i){
+		return m_pV[i];
+	};
 
   /** set elements to zero */
-	void SetZero();
+	void SetZero(){for (size_t i=0; i<m_N; i++){m_pV[i] = T(0);}};
 
   /** return dimension of vector */
-	size_t Dimensions() const;
+	size_t Dimensions() const{return m_N;};
   /** resize vector */
-	void Resize( size_t N );
+	void Resize( size_t N ){
+		if(m_N!=N){
+			if(m_N){delete[] m_pV;}
+			m_pV=NULL;
+			m_N = N;
+			if(N){m_pV = new T[N];}
+		}
+		memset( m_pV, 0, N*sizeof(T) );
+	};
 
   /** operload operator for math operations */
-	Vector operator * (const T& A) const;
+	Vector operator * (const T& A) const{
+		Vector V(*this);
+		for (size_t i=0; i<m_N; i++)
+			V.m_pV[i] *= A;
+		return V;
+	};
   /** operload operator for math operations */
-	Vector operator / (const T& A) const;
+	Vector operator / (const T& A) const{
+		Vector V(*this);
+		for (size_t i=0; i<m_N; i++)
+			V.m_pV[i] /= A;
+		return V;
+	};
   /** operload operator for math operations */
-	Vector operator - (const Vector& V) const;
+	Vector operator - (const Vector& V0) const{
+		Vector<T> V(m_N);
+		for (size_t i=0; i<m_N; i++)
+			V.m_pV[i] = m_pV[i] - V0.m_pV[i];
+
+		return V;
+	};
   /** operload operator for math operations */
-	Vector operator + (const Vector& V) const;
+	Vector operator + (const Vector& V0) const{
+		Vector<T> V(m_N);
+		for (size_t i=0; i<m_N; i++)
+			V.m_pV[i] = m_pV[i] + V0.m_pV[i];
+
+		return V;
+	};
 
   /** operload operator for math operations */
-	Vector& operator *= (const T& A);
+	Vector& operator *= (const T& A){
+		for (size_t i=0; i<m_N; i++)
+			m_pV[i] *= A;
+		return *this;
+	};
   /** operload operator for math operations */
-	Vector& operator /= (const T& A);
+	Vector& operator /= (const T& A){
+		for (size_t i=0; i<m_N; i++)
+			m_pV[i] /= A;
+		return *this;
+	};
   /** operload operator for math operations */
-	Vector& operator += (const Vector& V);
+	Vector& operator += (const Vector& V){
+		for (size_t i=0; i<m_N; i++)
+			m_pV[i] += V.m_pV[i];
+
+		return *this;
+	};
   /** operload operator for math operations */
-	Vector& operator -= (const Vector& V);
+	Vector& operator -= (const Vector& V){
+		for (size_t i=0; i<m_N; i++)
+			m_pV[i] -= V.m_pV[i];
+
+		return *this;
+	};
 
   /** add a scaled vector */
-	Vector& AddScaled(const Vector& V,const T& scale);
+	Vector& AddScaled(const Vector& V,const T& scale){
+		for (size_t i=0; i<m_N; i++)
+			m_pV[i] += V.m_pV[i]*scale;
+
+		return *this;
+	};
   /** subtract a scaled vector*/
-	Vector& SubtractScaled(const Vector& V,const T& scale);
+	Vector& SubtractScaled(const Vector& V,const T& scale){
+		for (size_t i=0; i<m_N; i++)
+			m_pV[i] -= V.m_pV[i]*scale;
+
+		return *this;
+	};
   /** return the result of a sum of scaled vectors */
-	static void Add(const Vector& V1,const T& scale1,const Vector& V2,const T& scale2,Vector& Out);
+	static void Add(const Vector& V1,const T& scale1,const Vector& V2,const T& scale2,Vector& Out){
+		for (size_t i=0; i<V1.m_N; i++)
+			Out.m_pV[i]=V1.m_pV[i]*scale1+V2.m_pV[i]*scale2;
+	};
   /** return the result of a sum of a non-scaled vector  and a scaled one*/
-	static void Add(const Vector& V1,const T& scale1,const Vector& V2,Vector& Out);
+	static void Add(const Vector& V1,const T& scale1,const Vector& V2,Vector& Out){
+		for (size_t i=0; i<V1.m_N; i++)
+			Out.m_pV[i]=V1.m_pV[i]*scale1+V2.m_pV[i];
+	};
 
   /** operload operator for math operations */
-	Vector operator - () const;
+	Vector operator - () const{
+		Vector<T> V(m_N);
+
+		for (size_t i=0; i<m_N; i++)
+			V.m_pV[i] = -m_pV[i];
+
+		return V;
+	};
 
   /** operload operator for assignment */
-	Vector& operator = (const Vector& V);
+	Vector& operator = (const Vector& V){
+		Resize(V.m_N);
+		memcpy( m_pV, V.m_pV, m_N*sizeof(T) );
+		return *this;
+	};
 
   /** define dot product */
-	T Dot( const Vector& V ) const;
+	T Dot( const Vector& V ) const{
+		T V0 = T();
+		for (size_t i=0; i<m_N; i++)
+			V0 += m_pV[i]*V.m_pV[i];
+
+		return V0;
+	};
  
   /** define lenght of a vector */
-	T Length() const;
+	T Length() const{
+		T N = T();
+		for (size_t i = 0; i<m_N; i++)
+			N += m_pV[i]*m_pV[i];
+		return sqrt(N);	
+	};
 
   /** calculate norm */
-	T Norm( size_t Ln ) const;
+	T Norm( size_t Ln ) const{
+		T N = T();
+		for (size_t i = 0; i<m_N; i++)
+			N += pow(m_pV[i], (T)Ln);
+		return pow(N, (T)1.0/Ln);	
+	};
   /** normalize the vector*/
-	void Normalize();
+	void Normalize(){
+		T N = 1.0f/Norm(2);
+		for (size_t i = 0; i<m_N; i++)
+			m_pV[i] *= N;
+	};
 
 	T* m_pV;
 protected:
