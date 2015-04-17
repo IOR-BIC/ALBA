@@ -1376,7 +1376,7 @@ public:
 		return V;
 	};
   /** operload operator for math operations */
-	NVector operator - (const NVector& V) const{
+	NVector operator - (const NVector& V0) const{
 		NVector<T,Dim> V(m_N);
 		for (size_t i=0; i<m_N*Dim; i++)
 			V.m_pV[i] = m_pV[i] - V0.m_pV[i];
@@ -1384,7 +1384,7 @@ public:
 		return V;
 	};
   /** operload operator for math operations */
-	NVector operator + (const NVector& V) const{
+	NVector operator + (const NVector& V0) const{
 		NVector<T,Dim> V(m_N);
 		for (size_t i=0; i<m_N*Dim; i++)
 			V.m_pV[i] = m_pV[i] + V0.m_pV[i];
@@ -1538,70 +1538,245 @@ private:
 public:
 	static Allocator<MatrixEntry<T> > Allocator;
   /** return  allocator for sparse matrix  */
-	static int UseAllocator(void);
+	static int UseAllocator(void){return UseAlloc;};
   /**  use allocator , allocating block size */
-	static void SetAllocator(const int& blockSize);
+	static void SetAllocator(const int& blockSize){
+		if(blockSize>0){
+			UseAlloc=1;
+			Allocator.Set(blockSize);
+		}
+		else{UseAlloc=0;}
+	};
 
 	int rows;
 	int* rowSizes;
 	MatrixEntry<T>** m_ppElements;
 
   /** constructor */
-	SparseMatrix();
+	SparseMatrix(){
+		rows=0;
+		rowSizes=NULL;
+		m_ppElements=NULL;
+	};
   /** overloaded constructor */
-	SparseMatrix( int rows );
+	SparseMatrix( int rows ){Resize(rows);};
   /** resize the matrix*/
-	void Resize( int rows );
+	void Resize( int r ){
+		int i;
+		if(rows>0){
+			if(!UseAlloc){for(i=0;i<rows;i++){if(rowSizes[i]){free(m_ppElements[i]);}}}
+			free(m_ppElements);
+			free(rowSizes);
+		}
+		rows=r;
+		if(r){
+			rowSizes=(int*)malloc(sizeof(int)*r);
+			memset(rowSizes,0,sizeof(int)*r);
+			m_ppElements=(MatrixEntry<T>**)malloc(sizeof(MatrixEntry<T>*)*r);
+		}
+	}
+;
   /** change row size */
-	void SetRowSize( int row , int count );
+	void SetRowSize( int row , int count ){
+		if(row>=0 && row<rows){
+			if(UseAlloc){m_ppElements[row]=Allocator.NewElements(count);}
+			else{
+				if(rowSizes[row]){free(m_ppElements[row]);}
+				if(count>0){m_ppElements[row]=(MatrixEntry<T>*)malloc(sizeof(MatrixEntry<T>)*count);}
+			}
+			rowSizes[row]=count;
+		}
+	};
   /** retrieve total number of entries summing each rowsize*/
-	int Entries(void);
+	int Entries(void){
+		int e=0;
+		for(int i=0;i<rows;i++){e+=int(rowSizes[i]);}
+		return e;
+	};
 
   /** overloaded constructor */
-	SparseMatrix( const SparseMatrix& M );
+	SparseMatrix( const SparseMatrix& M ){
+		Resize(M.rows);
+		for (int i=0; i<rows; i++){
+			SetRowSize(i,M.rowSizes[i]);
+			for(int j=0;j<rowSizes[i];j++){m_ppElements[i][j]=M.m_ppElements[i][j];}
+		}
+	};
   /** destructor */
-	~SparseMatrix();
+	~SparseMatrix(){Resize(0);};
 
   /** set elements to zero */
-	void SetZero();
+	void SetZero(){
+		Resize(this->m_N, this->m_M);
+	};
   /** set matrix as identity */
-	void SetIdentity();
+	void SetIdentity(){
+		SetZero();
+		for(int ij=0; ij < Min( this->Rows(), this->Columns() ); ij++)
+			(*this)(ij,ij) = T(1);
+	};
 
   /** operload operator for math operations */
-	SparseMatrix<T>& operator = (const SparseMatrix<T>& M);
+	SparseMatrix<T>& operator = (const SparseMatrix<T>& M){
+		Resize(M.rows);
+		for (int i=0; i<rows; i++){
+			SetRowSize(i,M.rowSizes[i]);
+			for (int j=0; j<rowSizes[i]; j++){m_ppElements[i][j]=M.m_ppElements[i][j];}
+		}
+		return *this;
+	};
 
   /** operload operator for math operations */
-	SparseMatrix<T> operator * (const T& V) const;
+	SparseMatrix<T> operator * (const T& V) const{
+		SparseMatrix<T> M(*this);
+		M *= V;
+		return M;
+	};
   /** operload operator for math operations */
-	SparseMatrix<T>& operator *= (const T& V);
+	SparseMatrix<T>& operator *= (const T& V){
+		for (int i=0; i<this->rows; i++)
+		{
+			for(int ii=0;ii<rowSizes[i];ii++)
+			{
+				m_ppElements[i][ii].Value*=V;
+			}
+		}
+		return *this;
+	};
 
   /** operload operator for math operations */
-	SparseMatrix<T> operator * (const SparseMatrix<T>& M) const;
+	SparseMatrix<T> operator * (const SparseMatrix<T>& M) const{
+		return Multiply(M);
+	};
   /** multiplication with another sparse matrix */
-	SparseMatrix<T> Multiply( const SparseMatrix<T>& M ) const;
+	SparseMatrix<T> Multiply( const SparseMatrix<T>& M ) const{
+		SparseMatrix<T> R( this->Rows(), M.Columns() );
+		for(int i=0; i<R.Rows(); i++){
+			for(int ii=0;ii<m_ppElements[i].size();ii++){
+				int N=m_ppElements[i][ii].N;
+				T Value=m_ppElements[i][ii].Value;
+				for(int jj=0;jj<M.m_ppElements[N].size();jj++){
+					R(i,M.m_ppElements[N][jj].N) += Value * M.m_ppElements[N][jj].Value;
+				}
+			}
+		}
+		return R;		
+	};
   /** multiplication with another transpose sparse matrix */
 	SparseMatrix<T> MultiplyTranspose( const SparseMatrix<T>& Mt ) const;
 
   /** operload operator for math operations */
 	template<class T2>
-	Vector<T2> operator * (const Vector<T2>& V) const;
+	Vector<T2> operator * (const Vector<T2>& V) const{
+		return Multiply(V);
+	};
   /** Multiply with a vector and return the result */
 	template<class T2>
-	Vector<T2> Multiply( const Vector<T2>& V ) const;
+	Vector<T2> Multiply( const Vector<T2>& V ) const{
+		Vector<T2> R( rows );
+
+		for (int i=0; i<rows; i++)
+		{
+			T2 temp=T2();
+			for(int ii=0;ii<rowSizes[i];ii++){
+				temp+=m_ppElements[i][ii].Value * V.m_pV[m_ppElements[i][ii].N];
+			}
+			R(i)=temp;
+		}
+		return R;
+	}
+;
 	template<class T2>
   /** Multiply sparse matrix and vector and retrieve result */
-	void Multiply( const Vector<T2>& In, Vector<T2>& Out ) const;
+	void Multiply( const Vector<T2>& In, Vector<T2>& Out ) const{
+		for (int i=0; i<rows; i++){
+			T2 temp=T2();
+			for(int j=0;j<rowSizes[i];j++){temp+=m_ppElements[i][j].Value * In.m_pV[m_ppElements[i][j].N];}
+			Out.m_pV[i]=temp;
+		}
+	};
 
   /** transpose sparse matrix*/
-	SparseMatrix<T> Transpose() const;
+	SparseMatrix<T> Transpose() const{
+		SparseMatrix<T> M( Columns(), Rows() );
+
+		for (int i=0; i<Rows(); i++)
+		{
+			for(int ii=0;ii<m_ppElements[i].size();ii++){
+				M(m_ppElements[i][ii].N,i) = m_ppElements[i][ii].Value;
+			}
+		}
+		return M;
+	};
   /** Solve for x s.t. M(x)=b by solving for x s.t. M^tM(x)=M^t(b) */
-	static int Solve			(const SparseMatrix<T>& M,const Vector<T>& b,const int& iters,Vector<T>& solution,const T eps=1e-8);
+	static int Solve			(const SparseMatrix<T>& M,const Vector<T>& b,const int& iters,Vector<T>& solution,const T eps=1e-8){
+		SparseMatrix mTranspose=M.Transpose();
+		Vector<T> bb=mTranspose*b;
+		Vector<T> d,r,Md;
+		T alpha,beta,rDotR;
+		int i;
+
+		solution.Resize(M.Columns());
+		solution.SetZero();
+
+		d=r=bb;
+		rDotR=r.Dot(r);
+
+		for(i=0;i<iters && rDotR>eps;i++){
+			T temp;
+			Md=mTranspose*(M*d);
+			alpha=rDotR/d.Dot(Md);
+			solution+=d*alpha;
+			r-=Md*alpha;
+			temp=r.Dot(r);
+			beta=temp/rDotR;
+			rDotR=temp;
+			d=r+d*beta;
+		}
+		return i;
+	};
 
   /** reduced as symmetric sparse matrix and solve*/
 	template<class T2>
-	static int SolveSymmetric	(const SparseMatrix<T>& M,const Vector<T2>& b,const int& iters,Vector<T2>& solution,const T2 eps=1e-8,const int& reset=1);
+	static int SolveSymmetric	(const SparseMatrix<T>& M,const Vector<T2>& b,const int& iters,Vector<T2>& solution,const T2 eps=1e-8,const int& reset=1){
+		Vector<T2> d,r,Md;
+		T2 alpha,beta,rDotR;
+		Md.Resize(b.Dimensions());
+		if(reset){
+			solution.Resize(b.Dimensions());
+			solution.SetZero();
+		}
+		d=r=b-M.Multiply(solution);
+		rDotR=r.Dot(r);
+		if(b.Dot(b)<=eps){
+			solution.SetZero();
+			return 0;
+		}
+
+		int i;
+		for(i=0;i<iters;i++){
+			T2 temp;
+			M.Multiply(d,Md);
+			temp=d.Dot(Md);
+			if(temp<=eps){break;}
+			alpha=rDotR/temp;
+			r.SubtractScaled(Md,alpha);
+			temp=r.Dot(r);
+			if(temp/b.Dot(b)<=eps){break;}
+			beta=temp/rDotR;
+			solution.AddScaled(d,alpha);
+			if(beta<=eps){break;}
+			rDotR=temp;
+			Vector<T2>::Add(d,beta,r,d);
+		}
+		return i;
+	};
 
 };
+
+template<class T> int SparseMatrix<T>::UseAlloc=0;
+template<class T> Allocator<MatrixEntry<T> > SparseMatrix<T>::Allocator;
+
 /**
 class name:  SparseNMatrix
 template class that introduce (from SparseMAtrix) dimensionality
