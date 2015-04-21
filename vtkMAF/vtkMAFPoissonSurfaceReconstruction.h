@@ -436,100 +436,364 @@ public:
 	StartingPolynomial<Degree>* polys;
 
   /** Constructor. */
-	PPolynomial(void);
+	PPolynomial(void){
+		polyCount=0;
+		polys=NULL;
+	};
   /** Constructor. */
-	PPolynomial(const PPolynomial<Degree>& p);
+	PPolynomial(const PPolynomial<Degree>& p){
+		polyCount=0;
+		polys=NULL;
+		set(p.polyCount);
+		memcpy(polys,p.polys,sizeof(StartingPolynomial<Degree>)*p.polyCount);
+	};
   /** Destructor. */
-	~PPolynomial(void);
+	~PPolynomial(void){
+		if(polyCount){free(polys);}
+		polyCount=0;
+		polys=NULL;
+	};
 
   /** Overload operator, according to the operation over coefficients. */
-	PPolynomial& operator = (const PPolynomial& p);
+	PPolynomial& operator = (const PPolynomial& p){
+		set(p.polyCount);
+		memcpy(polys,p.polys,sizeof(StartingPolynomial<Degree>)*p.polyCount);
+		return *this;
+	};
 
   /** Return the size of polynomial object. */
-	int size(void) const;
+	int size(void) const{return int(sizeof(StartingPolynomial<Degree>)*polyCount);};
 
   /** Free polynomials, allocate memory and set size starting polynomial.*/ 
-	void set(const size_t& size);
+	void set(const size_t& size){
+		if(polyCount){free(polys);}
+		polyCount=0;
+		polys=NULL;
+		polyCount=size;
+		if(size){
+			polys=(StartingPolynomial<Degree>*)malloc(sizeof(StartingPolynomial<Degree>)*size);
+			memset(polys,0,sizeof(StartingPolynomial<Degree>)*size);
+		}
+	};
 	/** Set sps as polynomials: this method will sort the elements in sps. */
-	void set(StartingPolynomial<Degree>* sps,const int& count);
+	void set(StartingPolynomial<Degree>* sps,const int& count){
+		int i,c=0;
+		set(count);
+		qsort(sps,count,sizeof(StartingPolynomial<Degree>),StartingPolynomial<Degree>::Compare);
+		for(i=0;i<count;i++){
+			if(!c || sps[i].start!=polys[c-1].start){polys[c++]=sps[i];}
+			else{polys[c-1].p+=sps[i].p;}
+		}
+		reset(c);
+	};
   /** Reallocate memory for newsize polys. */
-	void reset(const size_t& newSize);
+	void reset(const size_t& newSize){
+		polyCount=newSize;
+		polys=(StartingPolynomial<Degree>*)realloc(polys,sizeof(StartingPolynomial<Degree>)*newSize);
+	};
 
 
   /** Overload operator, return the sum of polys coefficients with index t.*/
-	double operator()(const double& t) const;
+	double operator()(const double& t) const{
+		double v=0;
+		for(int i=0;i<int(polyCount) && t>polys[i].start;i++){v+=polys[i].p(t);}
+		return v;
+	};
   /** Compute integral within integration range tMin and tMax, return the sum of integrals of polynomials. */
-	double integral(const double& tMin,const double& tMax) const;
+	double integral(const double& tMin,const double& tMax) const{
+		int m=1;
+		double start,end,s,v=0;
+		start=tMin;
+		end=tMax;
+		if(tMin>tMax){
+			m=-1;
+			start=tMax;
+			end=tMin;
+		}
+		for(int i=0;i<int(polyCount) && polys[i].start<end;i++){
+			if(start<polys[i].start){s=polys[i].start;}
+			else{s=start;}
+			v+=polys[i].p.Integral(s,end);
+		}
+		return v*m;
+	};
   /** Compute integral */
-	double Integral(void) const;
+	double Integral(void) const{return integral(polys[0].start,polys[polyCount-1].start);};
 
   /** Overload operator, according to the operation over polys. */
 	template<int Degree2>
-	PPolynomial<Degree>& operator = (const PPolynomial<Degree2>& p);
+	PPolynomial<Degree>& operator = (const PPolynomial<Degree2>& p){
+		set(p.polyCount);
+		for(int i=0;i<int(polyCount);i++){
+			polys[i].start=p.polys[i].start;
+			polys[i].p=p.polys[i].p;
+		}
+		return *this;
+	};
 
   /** Combinate polynomials (sorting according to start value).*/
-	PPolynomial  operator + (const PPolynomial& p) const;
+	PPolynomial  operator + (const PPolynomial& p) const{
+		PPolynomial q;
+		int i,j;
+		size_t idx=0;
+		q.set(polyCount+p.polyCount);
+		i=j=-1;
+
+		while(idx<q.polyCount){
+			if		(j>=int(p.polyCount)-1)				{q.polys[idx]=  polys[++i];}
+			else if	(i>=int(  polyCount)-1)				{q.polys[idx]=p.polys[++j];}
+			else if(polys[i+1].start<p.polys[j+1].start){q.polys[idx]=  polys[++i];}
+			else										{q.polys[idx]=p.polys[++j];}
+			//		if(idx && polys[idx].start==polys[idx-1].start)	{polys[idx-1].p+=polys[idx].p;}
+			//		else{idx++;}
+			idx++;
+		}
+		return q;
+	};
   /** Combinate polynomials (sorting according to start value). p polys with negative sign.*/
-	PPolynomial  operator - (const PPolynomial& p) const;
+	PPolynomial  operator - (const PPolynomial& p) const{
+		PPolynomial q;
+		int i,j;
+		size_t idx=0;
+		q.set(polyCount+p.polyCount);
+		i=j=-1;
+
+		while(idx<q.polyCount){
+			if		(j>=int(p.polyCount)-1)				{q.polys[idx]=  polys[++i];}
+			else if	(i>=int(  polyCount)-1)				{q.polys[idx].start=p.polys[++j].start;q.polys[idx].p=p.polys[j].p*(-1.0);}
+			else if(polys[i+1].start<p.polys[j+1].start){q.polys[idx]=  polys[++i];}
+			else										{q.polys[idx].start=p.polys[++j].start;q.polys[idx].p=p.polys[j].p*(-1.0);}
+			//		if(idx && polys[idx].start==polys[idx-1].start)	{polys[idx-1].p+=polys[idx].p;}
+			//		else{idx++;}
+			idx++;
+		}
+		return q;
+	};
 
   /** Combinate polys according to multiplicative operation. */
 	template<int Degree2>
-	PPolynomial<Degree+Degree2> operator * (const Polynomial<Degree2>& p) const;
+	PPolynomial<Degree+Degree2> operator * (const Polynomial<Degree2>& p) const{
+		PPolynomial<Degree+Degree2> q;
+		q.set(polyCount);
+		for(int i=0;i<int(polyCount);i++){
+			q.polys[i].start=polys[i].start;
+			q.polys[i].p=polys[i].p*p;
+		}
+		return q;
+	};
 
   /** Combinate polys according to multiplicative operation. 
   A new polynomial is computed with the multiplication beetwen original polys member 
   and each member of the poly parameter./ */
 	template<int Degree2>
-	PPolynomial<Degree+Degree2> operator * (const PPolynomial<Degree2>& p) const;
+	PPolynomial<Degree+Degree2> operator * (const PPolynomial<Degree2>& p) const{
+		PPolynomial<Degree+Degree2> q;
+		StartingPolynomial<Degree+Degree2> *sp;
+		int i,j,spCount=int(polyCount*p.polyCount);
+
+		sp=(StartingPolynomial<Degree+Degree2>*)malloc(sizeof(StartingPolynomial<Degree+Degree2>)*spCount);
+		for(i=0;i<int(polyCount);i++){
+			for(j=0;j<int(p.polyCount);j++){
+				sp[i*p.polyCount+j]=polys[i]*p.polys[j];
+			}
+		}
+		q.set(sp,spCount);
+		free(sp);
+		return q;
+	};
 
 
   /** Overload operator, according to the operation over polys. */
-	PPolynomial& operator += (const double& s);
+	PPolynomial& operator += (const double& s){polys[0].p+=s;};
   /** Overload operator, according to the operation over polys. */
-	PPolynomial& operator -= (const double& s);
+	PPolynomial& operator -= (const double& s){polys[0].p-=s;};
   /** Overload operator, according to the operation over polys. */
-	PPolynomial& operator *= (const double& s);
+	PPolynomial& operator *= (const double& s){
+		for(int i=0;i<int(polyCount);i++){polys[i].p*=s;}
+		return *this;
+	};
   /** Overload operator, according to the operation over polys. */
-	PPolynomial& operator /= (const double& s);
+	PPolynomial& operator /= (const double& s){
+		for(size_t i=0;i<polyCount;i++){polys[i].p/=s;}
+		return *this;
+	};
   /** Overload operator, according to the operation over polys. */
-	PPolynomial  operator +  (const double& s) const;
+	PPolynomial  operator +  (const double& s) const{
+		PPolynomial q=*this;
+		q+=s;
+		return q;
+	};
   /** Overload operator, according to the operation over polys. */
-	PPolynomial  operator -  (const double& s) const;
+	PPolynomial  operator -  (const double& s) const{
+		PPolynomial q=*this;
+		q-=s;
+		return q;
+	};
   /** Overload operator, according to the operation over polys. */
-	PPolynomial  operator *  (const double& s) const
-  /** Overload operator, according to the operation over polys. */;
-	PPolynomial  operator /  (const double& s) const;
+	PPolynomial  operator *  (const double& s) const{
+		PPolynomial q=*this;
+		q*=s;
+		return q;
+	};
+  /** Overload operator, according to the operation over polys. */
+	PPolynomial  operator /  (const double& s) const{
+		PPolynomial q=*this;
+		q/=s;
+		return q;
+	};
 
   /** Add operation with scaled polynomials. */
-	PPolynomial& addScaled(const PPolynomial& poly,const double& scale);
+	PPolynomial& addScaled(const PPolynomial& poly,const double& scale){
+		int i,j;
+		StartingPolynomial<Degree>* oldPolys=polys;
+		size_t idx=0,cnt=0,oldPolyCount=polyCount;
+		polyCount=0;
+		polys=NULL;
+		set(oldPolyCount+p.polyCount);
+		i=j=-1;
+		while(cnt<polyCount){
+			if		(j>=int( p.polyCount)-1)				{polys[idx]=oldPolys[++i];}
+			else if	(i>=int(oldPolyCount)-1)				{polys[idx].start= p.polys[++j].start;polys[idx].p=p.polys[j].p*scale;}
+			else if	(oldPolys[i+1].start<p.polys[j+1].start){polys[idx]=oldPolys[++i];}
+			else											{polys[idx].start= p.polys[++j].start;polys[idx].p=p.polys[j].p*scale;}
+			if(idx && polys[idx].start==polys[idx-1].start)	{polys[idx-1].p+=polys[idx].p;}
+			else{idx++;}
+			cnt++;
+		}
+		free(oldPolys);
+		reset(idx);
+		return *this;
+	};
 
   /** Scale operation on every polynomial. */
-	PPolynomial scale(const double& s) const;
+	PPolynomial scale(const double& s) const{
+		PPolynomial q;
+		q.set(polyCount);
+		for(size_t i=0;i<polyCount;i++){q.polys[i]=polys[i].scale(s);}
+		return q;
+	};
   /** Shift operation on every polynomial. */
-	PPolynomial shift(const double& t) const;
+	PPolynomial shift(const double& s) const{
+		PPolynomial q;
+		q.set(polyCount);
+		for(size_t i=0;i<polyCount;i++){q.polys[i]=polys[i].shift(s);}
+		return q;
+	};
 
    /** calculate derivative on polys. */
-	PPolynomial<Degree-1> derivative(void) const;
+	PPolynomial<Degree-1> derivative(void) const{
+		PPolynomial<Degree-1> q;
+		q.set(polyCount);
+		for(size_t i=0;i<polyCount;i++){
+			q.polys[i].start=polys[i].start;
+			q.polys[i].p=polys[i].p.Derivative();
+		}
+		return q;
+	};
    /** calculate integral on polys.  */
-	PPolynomial<Degree+1> integral(void) const;
+	PPolynomial<Degree+1> integral(void) const{
+		int i;
+		PPolynomial<Degree+1> q;
+		q.set(polyCount);
+		for(i=0;i<int(polyCount);i++){
+			q.polys[i].start=polys[i].start;
+			q.polys[i].p=polys[i].p.Integral();
+			q.polys[i].p-=q.polys[i].p(q.polys[i].start);
+		}
+		return q;
+	};
 
   /** solve polynomials. */
-	void getSolutions(const double& c,std::vector<double>& roots,const double& EPS,const double& min=-DBL_MAX,const double& max=DBL_MAX) const;
+	void getSolutions(const double& c,std::vector<double>& roots,const double& EPS,const double& min=-DBL_MAX,const double& max=DBL_MAX) const{
+		Polynomial<Degree> p;
+		std::vector<double> tempRoots;
+
+		p.SetZero();
+		for(size_t i=0;i<polyCount;i++){
+			p+=polys[i].p;
+			if(polys[i].start>max){break;}
+			if(i<polyCount-1 && polys[i+1].start<min){continue;}
+			p.GetSolutions(c,tempRoots,EPS);
+			for(size_t j=0;j<tempRoots.size();j++){
+				if(tempRoots[j]>polys[i].start && (i+1==polyCount || tempRoots[j]<=polys[i+1].start)){
+					if(tempRoots[j]>min && tempRoots[j]<max){roots.push_back(tempRoots[j]);}
+				}
+			}
+		}
+	};
 
   /** print method. */
-	void printnl(void) const;
+	void printnl(void) const{
+		Polynomial<Degree> p;
+
+		if(!polyCount){
+			Polynomial<Degree> p;
+			printf("[-Infinity,Infinity]\n");
+		}
+		else{
+			for(size_t i=0;i<polyCount;i++){
+				printf("[");
+				if		(polys[i  ].start== DBL_MAX){printf("Infinity,");}
+				else if	(polys[i  ].start==-DBL_MAX){printf("-Infinity,");}
+				else								{printf("%f,",polys[i].start);}
+				if(i+1==polyCount)					{printf("Infinity]\t");}
+				else if (polys[i+1].start== DBL_MAX){printf("Infinity]\t");}
+				else if	(polys[i+1].start==-DBL_MAX){printf("-Infinity]\t");}
+				else								{printf("%f]\t",polys[i+1].start);}
+				p=p+polys[i].p;
+				p.Printnl();
+			}
+		}
+		printf("\n");
+	};
 
   /** Compute moving average. */
-	PPolynomial<Degree+1> MovingAverage(const double& radius);
+	PPolynomial<Degree+1> MovingAverage(const double& radius){
+		PPolynomial<Degree+1> A;
+		Polynomial<Degree+1> p;
+		StartingPolynomial<Degree+1>* sps;
+
+		sps=(StartingPolynomial<Degree+1>*)malloc(sizeof(StartingPolynomial<Degree+1>)*polyCount*2);
+
+		for(int i=0;i<int(polyCount);i++){
+			sps[2*i  ].start=polys[i].start-radius;
+			sps[2*i+1].start=polys[i].start+radius;
+			p=polys[i].p.Integral()-polys[i].p.Integral()(polys[i].start);
+			sps[2*i  ].p=p.Shift(-radius);
+			sps[2*i+1].p=p.Shift( radius)*-1;
+		}
+		A.set(sps,int(polyCount*2));
+		free(sps);
+		return A*1.0/(2*radius);
+	}
+;
 
   /** Return two polynomials forming a constant function with width as constanct value. */
-	static PPolynomial ConstantFunction(const double& width=0.5);
+	static PPolynomial ConstantFunction(const double& radius=0.5){
+		if(Degree<0){
+			fprintf(stderr,"Could not set degree %d polynomial as constant\n",Degree);
+			exit(0);
+		}
+		PPolynomial q;
+		q.set(2);
+
+		q.polys[0].start=-radius;
+		q.polys[1].start= radius;
+
+		q.polys[0].p.coefficients[0]= 1.0;
+		q.polys[1].p.coefficients[0]=-1.0;
+		return q;
+	};
   /** Compute gaussian approximation. */
-	static PPolynomial GaussianApproximation(const double& width=0.5);
+	static PPolynomial GaussianApproximation(const double& width=0.5){return PPolynomial<Degree-1>::GaussianApproximation().MovingAverage(width);};
 //	void write(FILE* fp,const int& samples,const double& min,const double& max) const;
 };
 
-
+template<>
+PPolynomial<0> PPolynomial<0>::GaussianApproximation(const double& width)
+{
+	return ConstantFunction(width);
+}
 
 template<int Degree,class Real>
 /**
@@ -609,11 +873,11 @@ Point3D<Real> RandomSpherePoint(void);
 
 /** Return distance beetwen origin and a 3d point. */
 template<class Real>
-double Length(const Point3D<Real>& p);
+double Length(const Point3D<Real>& p){return sqrt(SquareLength(p));};
 
 /** Return square distance beetwen origin and a 3d point. */
 template<class Real>
-double SquareLength(const Point3D<Real>& p);
+double SquareLength(const Point3D<Real>& p){return p.coords[0]*p.coords[0]+p.coords[1]*p.coords[1]+p.coords[2]*p.coords[2];};
 
 /** Return distance beetwen two 3d points. */
 template<class Real>
@@ -625,7 +889,11 @@ double SquareDistance(const Point3D<Real>& p1,const Point3D<Real>& p2);
 
 /** Cross product beetwen two 3d points: thrid input parameter will save resulting point. */
 template <class Real>
-void CrossProduct(const Point3D<Real>& p1,const Point3D<Real>& p2,Point3D<Real>& p);
+void CrossProduct(const Point3D<Real>& p1,const Point3D<Real>& p2,Point3D<Real>& p){
+	p.coords[0]= p1.coords[1]*p2.coords[2]-p1.coords[2]*p2.coords[1];
+	p.coords[1]=-p1.coords[0]*p2.coords[2]+p1.coords[2]*p2.coords[0];
+	p.coords[2]= p1.coords[0]*p2.coords[1]-p1.coords[1]*p2.coords[0];
+};
 
 /**
 class name: Edge
