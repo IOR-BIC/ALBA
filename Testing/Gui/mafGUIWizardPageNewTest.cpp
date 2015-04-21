@@ -24,40 +24,12 @@
 //----------------------------------------------------------------------------
 
 #include <cppunit/config/SourcePrefix.h>
+#include "mafGuiTests.h"
 #include "mafGUIWizardPageNewTest.h"
 #include "mafGUIWizard.h"
 #include "mafGUIFrame.h"
 #include "mafGUIWizardPageNew.h"
 #include "wx/module.h"
-
-// ===============================================================================
-// Helper class used to build a fake application needed by the wxConfig
-// to store settings into the registry with the same name of the application
-// ===============================================================================
-class TestApp : public wxApp
-// ===============================================================================
-{
-public:
-  bool OnInit();
-  int  OnExit();
-};
-DECLARE_APP(TestApp)
-
-IMPLEMENT_APP(TestApp)
-//--------------------------------------------------------------------------------
-bool TestApp::OnInit()
-//--------------------------------------------------------------------------------
-{
-  return TRUE;
-}
-//--------------------------------------------------------------------------------
-int TestApp::OnExit()
-//--------------------------------------------------------------------------------
-{
-  wxApp::CleanUp();
-  return 0;
-}
-// ===============================================================================
 
 #define TEST_RESULT CPPUNIT_ASSERT(m_Result)
 

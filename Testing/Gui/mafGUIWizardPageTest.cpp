@@ -24,40 +24,13 @@
 //----------------------------------------------------------------------------
 
 #include <cppunit/config/SourcePrefix.h>
+#include "mafGuiTests.h"
 #include "mafGUIWizardPageTest.h"
 #include "mafGUIWizard.h"
 #include "mafGUIFrame.h"
 #include "mafGUIWizardPage.h"
 #include "wx/module.h"
 
-// ===============================================================================
-// Helper class used to build a fake application needed by the wxConfig
-// to store settings into the registry with the same name of the application
-// ===============================================================================
-class TestApp : public wxApp
-// ===============================================================================
-{
-public:
-  bool OnInit();
-  int  OnExit();
-};
-DECLARE_APP(TestApp)
-
-IMPLEMENT_APP(TestApp)
-//--------------------------------------------------------------------------------
-bool TestApp::OnInit()
-//--------------------------------------------------------------------------------
-{
-  return TRUE;
-}
-//--------------------------------------------------------------------------------
-int TestApp::OnExit()
-//--------------------------------------------------------------------------------
-{
-  wxApp::CleanUp();
-  return 0;
-}
-// ===============================================================================
 
 #define TEST_RESULT CPPUNIT_ASSERT(m_Result)
 
@@ -70,7 +43,7 @@ void mafGUIWizardPageTest::setUp()
 //   m_App->argc = 0;        // set the number of input argument to 0
 //   m_App->argv = NULL;     // set to NULL the input argument's parameters
 //   wxTheApp->SetAppName("mafGUIWizardTest"); // Set the name for the application
-
+	wxAppConsole::SetInstance(NULL);
   m_Win = new mafGUIFrame("testGui", wxDefaultPosition, wxSize(800, 600));
   wxModule::RegisterModules();
   wxModule::InitializeModules();

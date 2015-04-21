@@ -28,38 +28,24 @@ ENDIF (MAF_BUILD_MAFDLL)
 #SUBDIRS(18_testView)
 #SUBDIRS(19_testVMEChooser)
 
+
 #-----------------------------------------------------------------------------
 # tests using cppunit testing framework
 #-----------------------------------------------------------------------------
-############ mafGUISettingsStorageTest
-ADD_EXECUTABLE(mafGUISettingsStorageTest mafGUISettingsStorageTest.h mafGUISettingsStorageTest.cpp)
-ADD_TEST(mafGUISettingsStorageTest ${EXECUTABLE_OUTPUT_PATH}/mafGUISettingsStorageTest)
+SET(PROJECT_SRCS 
+	mafGuiTests.h mafGuiTests.cpp
+	mafGUISettingsStorageTest.h mafGUISettingsStorageTest.cpp
+	mafAttachCameraTest.h mafAttachCameraTest.cpp
+	mafGUISettingsAdvancedTest.h mafGUISettingsAdvancedTest.cpp
+	mafGUIDicomSettingsTest.h mafGUIDicomSettingsTest.cpp
+	mafGUIWizardTest.h mafGUIWizardTest.cpp
+	mafGUIWizardPageTest.h mafGUIWizardPageTest.cpp
+	mafGUILandmarkTest.h mafGUILandmarkTest.cpp
+	mafGUIWizardPageNewTest.h mafGUIWizardPageNewTest.cpp
+)
+
+ADD_EXECUTABLE(mafGuiTests ${PROJECT_SRCS})
+ADD_TEST(mafGuiTests  ${EXECUTABLE_OUTPUT_PATH}/mafGuiTests)
 IF (WIN32)
-  SET_TARGET_PROPERTIES(mafGUISettingsStorageTest PROPERTIES LINK_FLAGS "/MANIFEST")
+  SET_TARGET_PROPERTIES(mafGuiTests PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)
-
-############ mafAttachCameraTest
-ADD_EXECUTABLE(mafAttachCameraTest mafAttachCameraTest.h mafAttachCameraTest.cpp)
-ADD_TEST(mafAttachCameraTest ${EXECUTABLE_OUTPUT_PATH}/mafAttachCameraTest)
-IF (WIN32)
-  SET_TARGET_PROPERTIES(mafAttachCameraTest PROPERTIES LINK_FLAGS "/MANIFEST")
-ENDIF (WIN32)
-
-############# 
-ADD_EXECUTABLE(mafGUISettingsAdvancedTest mafGUISettingsAdvancedTest.h mafGUISettingsAdvancedTest.cpp)
-ADD_TEST(mafGUISettingsAdvancedTest ${EXECUTABLE_OUTPUT_PATH}/mafGUISettingsAdvancedTest)
-
-ADD_EXECUTABLE(mafGUIDicomSettingsTest mafGUIDicomSettingsTest.h mafGUIDicomSettingsTest.cpp)
-ADD_TEST(mafGUIDicomSettingsTest ${EXECUTABLE_OUTPUT_PATH}/mafGUIDicomSettingsTest)
-
-ADD_EXECUTABLE(mafGUIWizardTest mafGUIWizardTest.h mafGUIWizardTest.cpp)
-ADD_TEST(mafGUIWizardTest ${EXECUTABLE_OUTPUT_PATH}/mafGUIWizardTest)
-
-ADD_EXECUTABLE(mafGUIWizardPageTest mafGUIWizardPageTest.h mafGUIWizardPageTest.cpp)
-ADD_TEST(mafGUIWizardPageTest ${EXECUTABLE_OUTPUT_PATH}/mafGUIWizardPageTest)
-
-ADD_EXECUTABLE(mafGUILandmarkTest mafGUILandmarkTest.h mafGUILandmarkTest.cpp)
-ADD_TEST(mafGUILandmarkTest ${EXECUTABLE_OUTPUT_PATH}/mafGUILandmarkTest)
-
-ADD_EXECUTABLE(mafGUIWizardPageNewTest mafGUIWizardPageNewTest.h mafGUIWizardPageNewTest.cpp)
-ADD_TEST(mafGUIWizardPageNewTest ${EXECUTABLE_OUTPUT_PATH}/mafGUIWizardPageNewTest)
