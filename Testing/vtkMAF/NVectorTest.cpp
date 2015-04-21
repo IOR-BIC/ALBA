@@ -26,7 +26,6 @@
 #include "NVectorTest.h"
 
 #include "vtkMAFPoissonSurfaceReconstruction.h"
-#include "vtkMAFPoissonSurfaceReconstruction.cxx"
 
 //-------------------------------------------------------------------------
 void NVectorTest::TestDynamicAllocation()

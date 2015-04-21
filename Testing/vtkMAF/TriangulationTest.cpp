@@ -26,7 +26,6 @@
 #include "TriangulationTest.h"
 
 #include "vtkMAFPoissonSurfaceReconstruction.h"
-#include "vtkMAFPoissonSurfaceReconstruction.cxx"
 
 //-------------------------------------------------------------------------
 void TriangulationTest::TestConstructorDestructor()

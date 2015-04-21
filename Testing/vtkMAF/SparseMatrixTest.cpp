@@ -26,7 +26,6 @@
 #include "SparseMatrixTest.h"
 
 #include "vtkMAFPoissonSurfaceReconstruction.h"
-#include "vtkMAFPoissonSurfaceReconstruction.cxx"
 
 //-------------------------------------------------------------------------
 void SparseMatrixTest::TestDynamicAllocation()

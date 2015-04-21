@@ -26,7 +26,6 @@
 #include "SquareTest.h"
 
 #include "vtkMAFPoissonSurfaceReconstruction.h"
-#include "vtkMAFPoissonSurfaceReconstruction.cxx"
 
 //-------------------------------------------------------------------------
 void SquareTest::TestCornerIndex()

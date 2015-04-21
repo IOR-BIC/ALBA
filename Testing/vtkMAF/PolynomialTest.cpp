@@ -26,7 +26,6 @@
 #include "PolynomialTest.h"
 
 #include "vtkMAFPoissonSurfaceReconstruction.h"
-#include "vtkMAFPoissonSurfaceReconstruction.cxx"
 
 //-------------------------------------------------------------------------
 void PolynomialTest::TestAllMethods()

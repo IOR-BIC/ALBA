@@ -26,7 +26,6 @@
 #include "CubeTest.h"
 
 #include "vtkMAFPoissonSurfaceReconstruction.h"
-#include "vtkMAFPoissonSurfaceReconstruction.cxx"
 
 //-------------------------------------------------------------------------
 void CubeTest::TestCornerIndex()
