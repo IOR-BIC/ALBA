@@ -318,89 +318,252 @@ public:
 	double coefficients[Degree+1];
 
   /** constructor */
-	Polynomial(void);
+	Polynomial(void){memset(coefficients,0,sizeof(double)*(Degree+1));};
   /** copy constructor */
 	template<int Degree2>
-	Polynomial(const Polynomial<Degree2>& P);
+	Polynomial(const Polynomial<Degree2>& P){
+		memset(coefficients,0,sizeof(double)*(Degree+1));
+		for(int i=0;i<=Degree && i<=Degree2;i++){coefficients[i]=P.coefficients[i];}
+	};
   /** overload operator () which retrieves  the sum of the product of the coefficients*/
-	double operator()(const double& t) const;
+	double operator()(const double& t) const{
+		double temp=1;
+		double v=0;
+		for(int i=0;i<=Degree;i++){
+			v+=temp*coefficients[i];
+			temp*=t;
+		}
+		return v;
+	};
   /** calculate integral */
-	double Integral(const double& tMin,const double& tMax) const;
+	double Integral(const double& tMin,const double& tMax) const{
+		double v=0;
+		double t1,t2;
+		t1=tMin;
+		t2=tMax;
+		for(int i=0;i<=Degree;i++){
+			v+=coefficients[i]*(t2-t1)/(i+1);
+			if(t1!=-DBL_MAX && t1!=DBL_MAX){t1*=tMin;}
+			if(t2!=-DBL_MAX && t2!=DBL_MAX){t2*=tMax;}
+		}
+		return v;
+	}
+;
 
   /** operator== overload , checking coefficients */
-	int operator == (const Polynomial& p) const;
+	int operator == (const Polynomial& p) const{
+		for(int i=0;i<=Degree;i++){if(coefficients[i]!=p.coefficients[i]){return 0;}}
+		return 1;
+	};
   /** operator!= overload, checking coefficients */
-	int operator != (const Polynomial& p) const;
+	int operator != (const Polynomial& p) const{
+		for(int i=0;i<=Degree;i++){if(coefficients[i]==p.coefficients[i]){return 0;}}
+		return 1;
+	};
   /** check if all coefficients are zero*/
-	int IsZero(void) const;
+	int IsZero(void) const{
+		for(int i=0;i<=Degree;i++){if(coefficients[i]!=0){return 0;}}
+		return 1;
+	};
   /** set  all coefficients as zero*/
-	void SetZero(void);
+	void SetZero(void){memset(coefficients,0,sizeof(double)*(Degree+1));};
 
   /** overload operator, according to the operation over coefficients */
 	template<int Degree2>
-	Polynomial& operator  = (const Polynomial<Degree2> &p);
+	Polynomial& operator  = (const Polynomial<Degree2> &p){
+		int d=Degree<Degree2?Degree:Degree2;
+		memset(coefficients,0,sizeof(double)*(Degree+1));
+		memcpy(coefficients,p.coefficients,sizeof(double)*(d+1));
+		return *this;
+	};
   /** overload operator, according to the operation over coefficients */
-	Polynomial& operator += (const Polynomial& p);
+	Polynomial& operator += (const Polynomial& p){
+		for(int i=0;i<=Degree;i++){coefficients[i]+=p.coefficients[i];}
+		return *this;
+	};
   /** overload operator, according to the operation over coefficients */
-	Polynomial& operator -= (const Polynomial& p);
+	Polynomial& operator -= (const Polynomial& p){
+		for(int i=0;i<=Degree;i++){coefficients[i]-=p.coefficients[i];}
+		return *this;
+	};
   /** overload operator, according to the operation over coefficients */
-	Polynomial  operator -  (void) const;
+	Polynomial  operator -  (void) const{
+		Polynomial q=*this;
+		for(int i=0;i<=Degree;i++){q.coefficients[i]=-q.coefficients[i];}
+		return q;
+	};
   /** overload operator, according to the operation over coefficients */
-	Polynomial  operator +  (const Polynomial& p) const;
+	Polynomial  operator +  (const Polynomial& p) const{
+		Polynomial q;
+		for(int i=0;i<=Degree;i++){q.coefficients[i]=(coefficients[i]+p.coefficients[i]);}
+		return q;
+	};
   /** overload operator, according to the operation over coefficients */
-	Polynomial  operator -  (const Polynomial& p) const;
+	Polynomial  operator -  (const Polynomial& p) const{
+		Polynomial q;
+		for(int i=0;i<=Degree;i++)	{q.coefficients[i]=coefficients[i]-p.coefficients[i];}
+		return q;
+	};
   /** overload operator, according to the operation over coefficients */
 	template<int Degree2>
-	Polynomial<Degree+Degree2>  operator *  (const Polynomial<Degree2>& p) const;
+	Polynomial<Degree+Degree2>  operator *  (const Polynomial<Degree2>& p) const{
+		Polynomial<Degree+Degree2> q;
+		for(int i=0;i<=Degree;i++){for(int j=0;j<=Degree2;j++){q.coefficients[i+j]+=coefficients[i]*p.coefficients[j];}}
+		return q;
+	};
 
   /** overload operator, according to the operation over coefficients */
-	Polynomial& operator += (const double& s);
+	Polynomial& operator += (const double& s){
+		coefficients[0]+=s;
+		return *this;
+	};
   /** overload operator, according to the operation over coefficients */
-	Polynomial& operator -= (const double& s);
+	Polynomial& operator -= (const double& s){
+		coefficients[0]-=s;
+		return *this;
+	};
   /** overload operator, according to the operation over coefficients */
-	Polynomial& operator *= (const double& s);
+	Polynomial& operator *= (const double& s){
+		for(int i=0;i<=Degree;i++){coefficients[i]*=s;}
+		return *this;
+	};
   /** overload operator, according to the operation over coefficients */
-	Polynomial& operator /= (const double& s);
+	Polynomial& operator /= (const double& s){
+		for(int i=0;i<=Degree;i++){coefficients[i]/=s;}
+		return *this;
+	};
   /** overload operator, according to the operation over coefficients */
-	Polynomial  operator +  (const double& s) const;
+	Polynomial  operator +  (const double& s) const{
+		Polynomial<Degree> q=*this;
+		q.coefficients[0]+=s;
+		return q;
+	};
   /** overload operator, according to the operation over coefficients */
-	Polynomial  operator -  (const double& s) const;
+	Polynomial  operator -  (const double& s) const{
+		Polynomial q=*this;
+		q.coefficients[0]-=s;
+		return q;
+	};
   /** overload operator, according to the operation over coefficients */
-	Polynomial  operator *  (const double& s) const;
+	Polynomial  operator *  (const double& s) const{
+		Polynomial q;
+		for(int i=0;i<=Degree;i++){q.coefficients[i]=coefficients[i]*s;}
+		return q;
+	};
   /** overload operator, according to the operation over coefficients */
-	Polynomial  operator /  (const double& s) const;
+	Polynomial  operator /  (const double& s) const{
+		Polynomial q(degree());
+		for(int i=0;i<=Degree;i++){q.coefficients[i]=coefficients[i]/s;}
+		return q;
+	};
 
   /** overload operator, according to the operation over coefficients */
-	Polynomial Scale(const double& s) const;
+	Polynomial Scale(const double& s) const{
+		Polynomial q=*this;
+		double s2=1.0;
+		for(int i=0;i<=Degree;i++){
+			q.coefficients[i]*=s2;
+			s2/=s;
+		}
+		return q;
+	};
   /** overload operator, according to the operation over coefficients */
-	Polynomial Shift(const double& t) const;
+	Polynomial Shift(const double& t) const{
+		Polynomial<Degree> q;
+		for(int i=0;i<=Degree;i++){
+			double temp=1;
+			for(int j=i;j>=0;j--){
+				q.coefficients[j]+=coefficients[i]*temp;
+				temp*=-t*j;
+				temp/=(i-j+1);
+			}
+		}
+		return q;
+	};
 
   /** calculate derivative */
-	Polynomial<Degree-1> Derivative(void) const;
+	Polynomial<Degree-1> Derivative(void) const{
+		Polynomial<Degree-1> p;
+		for(int i=0;i<Degree;i++){p.coefficients[i]=coefficients[i+1]*(i+1);}
+		return p;
+	};
   /** calculate integral */
-	Polynomial<Degree+1> Integral(void) const;
+	Polynomial<Degree+1> Integral(void) const{
+		Polynomial<Degree+1> p;
+		p.coefficients[0]=0;
+		for(int i=0;i<=Degree;i++){p.coefficients[i+1]=coefficients[i]/(i+1);}
+		return p;
+	};
 
   /** print representation of polynomial */
-	void Printnl(void) const;
+	void Printnl(void) const{
+		for(int j=0;j<=Degree;j++){
+			printf("%6.4f x^%d ",coefficients[j],j);
+			if(j<Degree && coefficients[j+1]>=0){printf("+");}
+		}
+		printf("\n");
+	};
 
   /** overload operator, according to the operation over coefficients */
-	Polynomial& AddScaled(const Polynomial& p,const double& scale);
+	Polynomial& AddScaled(const Polynomial& p,const double& s){
+		for(int i=0;i<=Degree;i++){coefficients[i]+=p.coefficients[i]*s;}
+		return *this;
+	};
 
   /** overload operator, according to the operation over coefficients */
-	static void Negate(const Polynomial& in,Polynomial& out);
+	static void Negate(const Polynomial& in,Polynomial& out){
+		out=in;
+		for(int i=0;i<=Degree;i++){out.coefficients[i]=-out.coefficients[i];}
+	};
   /** overload operator, according to the operation over coefficients */
-	static void Subtract(const Polynomial& p1,const Polynomial& p2,Polynomial& q);
+	static void Subtract(const Polynomial& p1,const Polynomial& p2,Polynomial& q){
+		for(int i=0;i<=Degree;i++){q.coefficients[i]=p1.coefficients[i]-p2.coefficients[i];}
+	};
   /** overload operator, according to the operation over coefficients */
-	static void Scale(const Polynomial& p,const double& w,Polynomial& q);
+	static void Scale(const Polynomial& p,const double& w,Polynomial& q){
+		for(int i=0;i<=Degree;i++){q.coefficients[i]=p.coefficients[i]*w;}
+	};
   /** overload operator, according to the operation over coefficients */
-	static void AddScaled(const Polynomial& p1,const double& w1,const Polynomial& p2,const double& w2,Polynomial& q);
+	static void AddScaled(const Polynomial& p1,const double& w1,const Polynomial& p2,const double& w2,Polynomial& q){
+		for(int i=0;i<=Degree;i++){q.coefficients[i]=p1.coefficients[i]*w1+p2.coefficients[i]*w2;}
+	};
   /** overload operator, according to the operation over coefficients */
-	static void AddScaled(const Polynomial& p1,const Polynomial& p2,const double& w2,Polynomial& q);
+	static void AddScaled(const Polynomial& p1,const Polynomial& p2,const double& w2,Polynomial& q){
+		for(int i=0;i<=Degree;i++){q.coefficients[i]=p1.coefficients[i]+p2.coefficients[i]*w2;}
+	};
   /** overload operator, according to the operation over coefficients */
-	static void AddScaled(const Polynomial& p1,const double& w1,const Polynomial& p2,Polynomial& q);
+	static void AddScaled(const Polynomial& p1,const double& w1,const Polynomial& p2,Polynomial& q){
+		for(int i=0;i<=Degree;i++){q.coefficients[i]=p1.coefficients[i]*w1+p2.coefficients[i];}
+	};
 
   /** calculate roots */
-	void GetSolutions(const double& c,std::vector<double>& roots,const double& EPS) const;
+void GetSolutions(const double& c,std::vector<double>& roots,const double& EPS) const{
+	double r[4][2];
+	int rCount=0;
+	roots.clear();
+	switch(Degree){
+	case 1:
+		rCount=Factor(coefficients[1],coefficients[0]-c,r,EPS);
+		break;
+	case 2:
+		rCount=Factor(coefficients[2],coefficients[1],coefficients[0]-c,r,EPS);
+		break;
+	case 3:
+		rCount=Factor(coefficients[3],coefficients[2],coefficients[1],coefficients[0]-c,r,EPS);
+		break;
+		//	case 4:
+		//		rCount=Factor(coefficients[4],coefficients[3],coefficients[2],coefficients[1],coefficients[0]-c,r,EPS);
+		//		break;
+	default:
+		printf("Can't solve polynomial of degree: %d\n",Degree);
+	}
+	for(int i=0;i<rCount;i++){
+		if(fabs(r[i][1])<=EPS){
+			roots.push_back(r[i][0]);
+			//printf("%d] %f\t%f\n",i,r[i][0],(*this)(r[i][0])-c);
+		}
+	}
+};
 };
 
 
