@@ -109,6 +109,9 @@ void mafPipeImage3D::Create(mafSceneNode *n)
   {
     mafVMEOutputImage *output = (mafVMEOutputImage *)m_Vme->GetOutput();
     m_ImageLUT = output->GetMaterial()->m_ColorLut;
+		double sr[2];
+		output->GetVTKData()->GetScalarRange(sr);
+		m_ImageLUT->SetRange(sr);
     m_ImageTexture->SetLookupTable(m_ImageLUT);
     m_ImageTexture->MapColorScalarsThroughLookupTableOn();
   }
