@@ -980,6 +980,8 @@ void mafGUIDicomSettingsTest::TestEnableToRead()
   TEST_RESULT;
   m_Result = settings->EnableToRead("SC");
   TEST_RESULT;
+	m_Result = settings->EnableToRead("RF");
+	TEST_RESULT;
   //////////////////////////////////////////////////////////////////////////
   //Test read value
   //////////////////////////////////////////////////////////////////////////
@@ -1012,6 +1014,11 @@ void mafGUIDicomSettingsTest::TestEnableToRead()
   settings->InitializeSettings();
   m_Result = !settings->EnableToRead("SC");
   TEST_RESULT;
+
+	config->Write("EnableReadRF",FALSE);
+	settings->InitializeSettings();
+	m_Result = !settings->EnableToRead("RF");
+	TEST_RESULT;
   //////////////////////////////////////////////////////////////////////////
   //Test write value
   //////////////////////////////////////////////////////////////////////////
@@ -1038,6 +1045,10 @@ void mafGUIDicomSettingsTest::TestEnableToRead()
   settings->SetEnableToRead("SC",true);
   config->Read("EnableReadSC",&m_Result);
   TEST_RESULT;
+
+	settings->SetEnableToRead("RF",true);
+	config->Read("EnableReadRF",&m_Result);
+	TEST_RESULT;
   //////////////////////////////////////////////////////////////////////////
 
   cppDEL(config);

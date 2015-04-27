@@ -25,6 +25,7 @@
 //----------------------------------------------------------------------------
 class vtkDataSet;
 class vtkImageData;
+class mmaMaterial;
 
 /** mafVMEImage - a VME featuring an internal array for matrices and VTK datasets.
   mafVMEImage is a specialized VME inheriting the VME-Generic features to internally
@@ -54,6 +55,9 @@ public:
     /** return the right type of output */  
     virtual mafVMEOutput *GetOutput();
 
+		/** Return pointer to material attribute. */
+		mmaMaterial *GetMaterial();
+
     /** Return the suggested pipe-typename for the visualization of this vme */
     virtual mafString GetVisualPipe() {return mafString("mafPipeImage3D");};
 
@@ -66,6 +70,9 @@ protected:
 private:
   mafVMEImage(const mafVMEImage&); // Not implemented
   void operator=(const mafVMEImage&); // Not implemented
+
+	/** used to initialize and create the material attribute if not yet present */
+	virtual int InternalInitialize();
   
   /** private to avoid calling by external classes */
   virtual int SetData(vtkDataSet *data, mafTimeStamp t, int mode=MAF_VME_COPY_DATA);

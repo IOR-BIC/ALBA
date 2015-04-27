@@ -27,7 +27,7 @@
 //----------------------------------------------------------------------------
 class vtkPlaneSource;
 class vtkTexture;
-class vtkWindowLevelLookupTable;
+class vtkLookupTable;
 class vtkPolyDataMapper;
 class vtkActor;
 class vtkProperty;
@@ -64,14 +64,14 @@ public:
   bool IsGrayImage();
 
   /** Return the current lookup table*/
-  vtkWindowLevelLookupTable *GetLUT(){return m_ImageLUT;};
+  vtkLookupTable *GetLUT(){return m_ImageLUT;};
 
   vtkProperty *GetProperty();
 
 protected:
   vtkPlaneSource			      *m_ImagePlane;
   vtkTexture						    *m_ImageTexture;
-  vtkWindowLevelLookupTable *m_ImageLUT;
+  vtkLookupTable						*m_ImageLUT;
 
   vtkPolyDataMapper			 *m_ImageMapper;
   vtkActor               *m_ImageActor;

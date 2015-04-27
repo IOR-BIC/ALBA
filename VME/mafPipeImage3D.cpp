@@ -99,22 +99,6 @@ void mafPipeImage3D::Create(mafSceneNode *n)
   m_ImagePlane->SetPoint1(b[1],b[2],b[4]);
   m_ImagePlane->SetPoint2(b[0],b[3],b[4]);
 
-  double w,l, range[2];
-  image_data->GetScalarRange(range);
-  w = range[1] - range[0];
-  l = (range[1] + range[0]) * .5;
-
-  /*m_ImageLUT = vtkWindowLevelLookupTable::New();
-  m_ImageLUT->SetWindow(w);
-  m_ImageLUT->SetLevel(l);
-  m_ImageLUT->InverseVideoOn();
-  m_ImageLUT->Build();*/
-
-  /*mafVMEOutputImage *output = (mafVMEOutputImage *)m_Vme->GetOutput();
-  m_ImageLUT = (vtkWindowLevelLookupTable *)output->GetMaterial()->m_ColorLut;
-  m_ImageLUT->SetWindow(w);
-  m_ImageLUT->SetLevel(l);*/
-
   m_ImageTexture = vtkTexture::New();
   m_ImageTexture->RepeatOff();
   m_ImageTexture->InterpolateOn();
@@ -124,9 +108,7 @@ void mafPipeImage3D::Create(mafSceneNode *n)
   if(IsGrayImage())
   {
     mafVMEOutputImage *output = (mafVMEOutputImage *)m_Vme->GetOutput();
-    m_ImageLUT = (vtkWindowLevelLookupTable *)output->GetMaterial()->m_ColorLut;
-    m_ImageLUT->SetWindow(w);
-    m_ImageLUT->SetLevel(l);
+    m_ImageLUT = output->GetMaterial()->m_ColorLut;
     m_ImageTexture->SetLookupTable(m_ImageLUT);
     m_ImageTexture->MapColorScalarsThroughLookupTableOn();
   }

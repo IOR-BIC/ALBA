@@ -99,6 +99,8 @@ PURPOSE.  See the above copyright notice for more information.
 #include "windows.h"
 #include <algorithm>
 
+#include "mmaMaterial.h"
+#include "mafGUILutPreset.h"
 
 
 
@@ -773,7 +775,9 @@ int mafOpImporterDicomOffis::BuildOutputVMEImagesFromDicom()
 		image->SetData(im,0);
 		image->GetTagArray()->DeepCopy(m_TagArray);
 
-
+		
+		image->GetMaterial()->m_ColorLut->DeepCopy(m_SliceTexture->GetLookupTable());
+		
 		mafTagItem tag_Nature;
 		tag_Nature.SetName("VME_NATURE");
 		tag_Nature.SetValue("NATURAL");
@@ -4410,6 +4414,8 @@ bool mafOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 						(m_CurrentSliceABSFileName,dcmImagePositionPatient, dcmImageOrientationPatient, \
 						dicomSliceVTKImageData,description,date,patientName,birthdate));
 
+					((mafDicomSlice *)dicomSeries->Last()->GetData())->SetDcmModality(dcmModality);
+
 					m_SeriesIDToSlicesListMap.insert\
 						(std::pair<std::vector<mafString>,medDicomSeriesSliceList*>\
 						(seriesId,dicomSeries));
@@ -4489,6 +4495,9 @@ bool mafOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 					m_SeriesIDToSlicesListMap[seriesId]->Append(\
 						new mafDicomSlice(m_CurrentSliceABSFileName,dcmImagePositionPatient, \
 						dcmImageOrientationPatient, dicomSliceVTKImageData,description,date,patientName,birthdate));
+
+					((mafDicomSlice *)m_SeriesIDToSlicesListMap[seriesId]->Last()->GetData())->SetDcmModality(dcmModality);
+
 
 					mafString dimname;
 					dimname.Append(wxString::Format("%ix%ix",dcmRows, dcmColumns));
@@ -4631,6 +4640,7 @@ bool mafOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 					dicomSeries->Append(new mafDicomSlice\
 						(m_CurrentSliceABSFileName,dcmImagePositionPatient, dcmImageOrientationPatient, \
 						dicomSliceVTKImageData,description,date,patientName,birthdate, dcmInstanceNumber, dcmCardiacNumberOfImages, dcmTriggerTime));
+					((mafDicomSlice *)dicomSeries->Last()->GetData())->SetDcmModality(dcmModality);
 
 					m_SeriesIDToSlicesListMap.insert\
 						(std::pair<std::vector<mafString>,medDicomSeriesSliceList*>\
@@ -4687,6 +4697,7 @@ bool mafOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 					m_SeriesIDToSlicesListMap[seriesId]->Append\
 						(new mafDicomSlice(m_CurrentSliceABSFileName,dcmImagePositionPatient,dcmImageOrientationPatient ,\
 						dicomSliceVTKImageData,description,date,patientName,birthdate,dcmInstanceNumber,dcmCardiacNumberOfImages,dcmTriggerTime));
+					((mafDicomSlice *)m_SeriesIDToSlicesListMap[seriesId]->Last()->GetData())->SetDcmModality(dcmModality);
 
 					mafString dimname;
 					dimname.Append(wxString::Format("%ix%ix",dcmRows, dcmColumns));
@@ -4921,10 +4932,10 @@ void mafOpImporterDicomOffis::GenerateSliceTexture(int imageID)
 
 
 	double Origin[3];
-	m_SelectedSeriesSlicesList->Item(imageID)->GetData()->GetVTKImageData()->GetOrigin(Origin);
+	slice->GetVTKImageData()->GetOrigin(Origin);
 
 	double orientation[6] = {0.0,0.0,0.0,0.0,0.0,0.0};
-	m_SelectedSeriesSlicesList->Item(imageID)->GetData()->GetDcmImageOrientationPatient(orientation);
+	slice->GetDcmImageOrientationPatient(orientation);
 	m_Text.append(wxString::Format("Orientation: %f, %f, %f, %f, %f, %f \nPosition: %f, %f, %f",orientation[0], orientation[1], orientation[2], orientation[3], orientation[4], orientation[5], Origin[0], Origin[1], Origin[2]));
 	m_TextMapper->SetInput(m_Text.c_str());
 	m_TextMapper->Modified();
@@ -4936,7 +4947,7 @@ void mafOpImporterDicomOffis::GenerateSliceTexture(int imageID)
 	if (m_CropFlag) 
 	{
 		// this condition is entered even if no crop is performed (?)
-		m_SelectedSeriesSlicesList->Item(imageID)->GetData()->GetVTKImageData()->GetSpacing(spacing);
+		slice->GetVTKImageData()->GetSpacing(spacing);
 
 		m_CropPlane->Update();
 		m_CropPlane->GetOutput()->GetBounds(crop_bounds);
@@ -4992,7 +5003,7 @@ void mafOpImporterDicomOffis::GenerateSliceTexture(int imageID)
 		probe->SetInput(clip);
 
 		vtkImageData *imageData = NULL;
-		imageData = m_SelectedSeriesSlicesList->Item(imageID)->GetData()->GetVTKImageData();
+		imageData = slice->GetVTKImageData();
 		assert(imageData != NULL);
 
 		imageData->GetOrigin(origin);
@@ -5010,7 +5021,7 @@ void mafOpImporterDicomOffis::GenerateSliceTexture(int imageID)
 		//rescale to 16 bit
 		if(m_RescaleTo16Bit == TRUE && m_HighBit == 11)
 		{
-			RescaleTo16Bit(m_SelectedSeriesSlicesList->Item(imageID)->GetData()->GetVTKImageData());
+			RescaleTo16Bit(slice->GetVTKImageData());
 		}
 		m_SliceTexture->SetInput((vtkImageData *)probe->GetOutput());
 	} 
@@ -5019,17 +5030,23 @@ void mafOpImporterDicomOffis::GenerateSliceTexture(int imageID)
 		//rescale to 16 bit
 		if(m_RescaleTo16Bit == TRUE && m_HighBit == 11)
 		{
-			RescaleTo16Bit(m_SelectedSeriesSlicesList->Item(imageID)->GetData()->GetVTKImageData());
+			RescaleTo16Bit(slice->GetVTKImageData());
 		}
 
-		m_SelectedSeriesSlicesList->Item(imageID)->GetData()->GetVTKImageData()->GetScalarRange(range);
-		m_SliceTexture->SetInput(m_SelectedSeriesSlicesList->Item(imageID)->GetData()->GetVTKImageData());
+		slice->GetVTKImageData()->GetScalarRange(range);
+		m_SliceTexture->SetInput(slice->GetVTKImageData());
 	}
 
 	m_SliceTexture->Modified();
+	
+	
+	//Invert grayscale for CR images
+	if(!slice->GetDcmModality().Equals("CR"))
+		lutPreset(4,m_SliceLookupTable);
+	else
+		lutPreset(20,m_SliceLookupTable);
+
 	m_SliceLookupTable->SetTableRange(range);
-	m_SliceLookupTable->SetWindow(range[1] - range[0]);
-	m_SliceLookupTable->SetLevel((range[1] + range[0]) / 2.0);
 	m_SliceLookupTable->Build();
 
 	m_SliceTexture->MapColorScalarsThroughLookupTableOn();

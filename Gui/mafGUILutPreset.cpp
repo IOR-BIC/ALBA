@@ -45,8 +45,10 @@ void lutMinMax(vtkLookupTable *lut);
 void lutVolRenRGB(vtkLookupTable *lut);
 void lutVolRenTwoLev(vtkLookupTable *lut);
 void defaultBlueToRed(vtkLookupTable *lut);
+void lutGrayReversed(vtkLookupTable *lut);
 
-const int lutPresetNum = 20;
+
+const int lutPresetNum = 21;
 
 //---------------------------------------------------------------------
 wxString LutNames[lutPresetNum] = 
@@ -71,7 +73,8 @@ wxString LutNames[lutPresetNum] =
 "volren Green",
 "volren RGB",
 "volren Two Level",
-"default blue to red"
+"default blue to red",
+"gray reversed"
 };
 
 //---------------------------------------------------------------------
@@ -99,7 +102,8 @@ void lutPreset(int idx, vtkLookupTable *lut)
   case 16: lutVolRenGreen(lut);    break;  
   case 17: lutVolRenRGB(lut);      break;  
 	case 18: lutVolRenTwoLev(lut);   break;  
-	case 19: defaultBlueToRed(lut);   break;  
+	case 19: defaultBlueToRed(lut);  break;  
+	case 20: lutGrayReversed(lut);			 break;
 	default: lutDefault(lut);        break;  
   }
 }
@@ -2118,6 +2122,18 @@ void lutGray(vtkLookupTable *lut)
     lut->SetTableValue(i, i/128.0, i/128.0, i/128.0, 1);
   }
 };
+
+//---------------------------------------------------------------------
+void lutGrayReversed(vtkLookupTable *lut)
+	//---------------------------------------------------------------------
+{
+	lut->SetNumberOfTableValues(128);
+	for(int i=0; i<128; i++)
+	{
+		lut->SetTableValue(127-i, i/128.0, i/128.0, i/128.0, 1);
+	}
+};
+
 //---------------------------------------------------------------------
 void lutPureRed(vtkLookupTable *lut)
 //---------------------------------------------------------------------
