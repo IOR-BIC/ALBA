@@ -29,7 +29,7 @@
 
 #define DEFAULT_HISTOGRAM_COLOR 0.5
 
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 #include "vtkActor2D.h"
 #include "vtkImageData.h"
 #include "vtkDataArray.h"
@@ -53,7 +53,7 @@ class Name: vtkMAFHistogram
 This class handles a group of actors in order to generate an histogram.
 There are three representation: POINT, LINE, BAR.
 */
-class VTK_vtkMAF_EXPORT vtkMAFHistogram : public vtkActor2D
+class MAF_EXPORT vtkMAFHistogram : public vtkActor2D
 
 {
  public:

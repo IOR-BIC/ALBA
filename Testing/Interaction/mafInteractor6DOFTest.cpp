@@ -33,18 +33,18 @@
 #include "mafDeviceButtonsPadTracker.h"
 
 //----------------------------------------------------------------------------
-class mafInteractorDummy : public mafInteractor6DOF // concrete class for test
+class mafInteractor6DOFDummy : public mafInteractor6DOF // concrete class for test
 //----------------------------------------------------------------------------
 {
 public:
 
-  mafInteractorDummy(){};
-  ~mafInteractorDummy(){};
+  mafInteractor6DOFDummy(){};
+  ~mafInteractor6DOFDummy(){};
 
-  mafTypeMacro(mafInteractorDummy,mafInteractor6DOF);
+  mafTypeMacro(mafInteractor6DOFDummy,mafInteractor6DOF);
 };
 
-mafCxxTypeMacro(mafInteractorDummy);
+mafCxxTypeMacro(mafInteractor6DOFDummy);
 
 //----------------------------------------------------------------------------
 void mafInteractor6DOFTest::setUp()
@@ -67,13 +67,13 @@ void mafInteractor6DOFTest::TestFixture()
 void mafInteractor6DOFTest::TestConstructorDestructor()
 //----------------------------------------------------------------------------
 {
-  mafInteractorDummy *interactor = mafInteractorDummy::New();
+  mafInteractor6DOFDummy *interactor = mafInteractor6DOFDummy::New();
   cppDEL(interactor);
 }
 
 void mafInteractor6DOFTest::TestStartStopInteraction()
 {
-	mafInteractorDummy *interactor = mafInteractorDummy::New();
+	mafInteractor6DOFDummy *interactor = mafInteractor6DOFDummy::New();
 
 	mafDeviceButtonsPadTracker *tracker;
 	mafNEW(tracker);
@@ -95,7 +95,7 @@ void mafInteractor6DOFTest::TestStartStopInteraction()
 
 void mafInteractor6DOFTest::TestSetGetTrackerPoseMatrix()
 {
-	mafInteractorDummy *interactor = mafInteractorDummy::New();
+	mafInteractor6DOFDummy *interactor = mafInteractor6DOFDummy::New();
 
 	mafMatrix *matrix = NULL;
 
@@ -118,7 +118,7 @@ void mafInteractor6DOFTest::TestSetGetTrackerPoseMatrix()
 
 void mafInteractor6DOFTest::TestTrackerSnapshot()
 {
-	mafInteractorDummy *interactor = mafInteractorDummy::New();
+	mafInteractor6DOFDummy *interactor = mafInteractor6DOFDummy::New();
 
 	mafMatrix *dummyMatrix = mafMatrix::New();
 	dummyMatrix->SetElement(0,3, 15);
@@ -140,7 +140,7 @@ void mafInteractor6DOFTest::TestTrackerSnapshot()
 
 void mafInteractor6DOFTest::TestUpdateDeltaTransform()
 {
-	mafInteractorDummy *interactor = mafInteractorDummy::New();
+	mafInteractor6DOFDummy *interactor = mafInteractor6DOFDummy::New();
 	
 	// mostly a test for leaks...
 	interactor->UpdateDeltaTransform();
@@ -151,7 +151,7 @@ void mafInteractor6DOFTest::TestUpdateDeltaTransform()
 
 void mafInteractor6DOFTest::TestSetGetTracker()
 {
-	mafInteractorDummy *interactor = mafInteractorDummy::New();
+	mafInteractor6DOFDummy *interactor = mafInteractor6DOFDummy::New();
 	CPPUNIT_ASSERT(interactor->GetTracker() == NULL);
 
 	mafDeviceButtonsPadTracker *dummyTracker;
@@ -166,7 +166,7 @@ void mafInteractor6DOFTest::TestSetGetTracker()
 
 void mafInteractor6DOFTest::TestSetGetIgnoreTriggerEvents()
 {
-	mafInteractorDummy *interactor = mafInteractorDummy::New();
+	mafInteractor6DOFDummy *interactor = mafInteractor6DOFDummy::New();
 
 	CPPUNIT_ASSERT( interactor->GetIgnoreTriggerEvents() == false);
 	interactor->SetIgnoreTriggerEvents(true);
@@ -176,7 +176,7 @@ void mafInteractor6DOFTest::TestSetGetIgnoreTriggerEvents()
 
 void mafInteractor6DOFTest::TestIgnoreTriggerEventsOnOff()
 {
-	mafInteractorDummy *interactor = mafInteractorDummy::New();
+	mafInteractor6DOFDummy *interactor = mafInteractor6DOFDummy::New();
 
 	CPPUNIT_ASSERT( interactor->GetIgnoreTriggerEvents() == false);
 	interactor->IgnoreTriggerEventsOn();
@@ -192,7 +192,7 @@ void mafInteractor6DOFTest::TestIgnoreTriggerEventsOnOff()
 
 void mafInteractor6DOFTest::TestSetRenderer()
 {
-	mafInteractorDummy *interactor = mafInteractorDummy::New();
+	mafInteractor6DOFDummy *interactor = mafInteractor6DOFDummy::New();
 	vtkRenderer *dummyRenderer = vtkRenderer::New();
 
 	CPPUNIT_ASSERT(interactor->GetRenderer() == NULL);
@@ -206,7 +206,7 @@ void mafInteractor6DOFTest::TestSetRenderer()
 
 void mafInteractor6DOFTest::TestHideShowAvatar()
 {
-	mafInteractorDummy *interactor = mafInteractorDummy::New();
+	mafInteractor6DOFDummy *interactor = mafInteractor6DOFDummy::New();
 	
 	// test for leaks and crashes...
 	interactor->ShowAvatar();

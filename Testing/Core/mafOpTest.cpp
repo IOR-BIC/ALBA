@@ -24,6 +24,7 @@
 //----------------------------------------------------------------------------
 
 #include <cppunit/config/SourcePrefix.h>
+#include "mafCoreTests.h"
 #include "mafOpTest.h"
 
 #include "mafSmartPointer.h"
@@ -35,21 +36,6 @@
 #include <iostream>
 #define TEST_RESULT CPPUNIT_ASSERT(result);
 
-//-------------------------------------------------------------------------
-/** class for testing re-parenting. */
-class mafOpDummy: public mafOp
-//-------------------------------------------------------------------------
-{
-public:
-  mafOpDummy(wxString label = "DummyOp",  bool canundo = false, int opType = OPTYPE_OP, bool inputPreserving = false);
-};
-mafOpDummy::mafOpDummy(wxString label,  bool canundo, int opType, bool inputPreserving)
-{
-  
-  m_Canundo = canundo;
-  m_OpType = opType;
-  m_InputPreserving = inputPreserving;
-}
 
 //----------------------------------------------------------------------------
 void mafOpTest::TestFixture()
@@ -93,8 +79,8 @@ void mafOpTest::TestSetListener()
 void mafOpTest::TestOnEvent()
 //----------------------------------------------------------------------------
 {
-  mafOpDummy *op;
-  op = new mafOpDummy("DummyTest");
+  mafOpDummyHelper *op;
+  op = new mafOpDummyHelper("DummyTest");
   op->SetListener(m_Op);
   mafEvent a;
   op->OnEvent(&a);
@@ -108,8 +94,8 @@ void mafOpTest::TestOnEvent()
 void mafOpTest::TestGetType()
 //----------------------------------------------------------------------------
 {
-  mafOpDummy *op;
-  op = new mafOpDummy("DummyTest");
+  mafOpDummyHelper *op;
+  op = new mafOpDummyHelper("DummyTest");
 
   result = op->GetType() == OPTYPE_OP;
 
@@ -211,8 +197,8 @@ void mafOpTest::TestAccept()
 void mafOpTest::TestCanUndo()
 //----------------------------------------------------------------------------
 {
-  mafOpDummy *op;
-  op = new mafOpDummy("DummyTest",true);
+  mafOpDummyHelper *op;
+  op = new mafOpDummyHelper("DummyTest",true);
   result = op->CanUndo();
   TEST_RESULT
   op->Delete();
@@ -221,8 +207,8 @@ void mafOpTest::TestCanUndo()
 void mafOpTest::TestIsInputPreserving()
 //----------------------------------------------------------------------------
 {
-  mafOpDummy *op;
-  op = new mafOpDummy("DummyTest",true,OPTYPE_OP,true);
+  mafOpDummyHelper *op;
+  op = new mafOpDummyHelper("DummyTest",true,OPTYPE_OP,true);
   result = op->CanUndo();
   TEST_RESULT
   op->Delete();

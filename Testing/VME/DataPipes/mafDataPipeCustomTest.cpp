@@ -24,6 +24,7 @@
 //----------------------------------------------------------------------------
 
 #include <cppunit/config/SourcePrefix.h>
+#include "mafDataPipesTests.h"
 #include "mafDataPipeCustomTest.h"
 
 #include "mafDataPipeCustom.h"
@@ -42,21 +43,6 @@
 #define TEST_RESULT CPPUNIT_ASSERT(result);
 #define EPSILON 0.1
 
-/** a vme test  class used to test event reception. */
-class mafVMETestClass: public mafVMESurface
-{
-public:
-	mafVMETestClass(const char *name=NULL):Name(name) {}
-	mafTypeMacro(mafVMETestClass,mafVMESurface);
-
-	virtual void OnEvent(mafEventBase *event) {Name = "CATCHED";};
-
-	mafString     Name;
-};
-
-//-------------------------------------------------------------------------
-mafCxxTypeMacro(mafVMETestClass)
-//-------------------------------------------------------------------------
 
 
 //----------------------------------------------------------------------------
@@ -91,7 +77,7 @@ void mafDataPipeCustomTest::TestOnEvent()
 {
   //catch events inside vme : VME_OUTPUT_DATA_PREUPDATE, VME_OUTPUT_DATA_UPDATE
 
-  mafSmartPointer<mafVMETestClass> surfaceTest1;
+  mafSmartPointer<mafVMESurfaceTestClass> surfaceTest1;
 
   mafSmartPointer<mafDataPipeCustom> di;
   di->SetVME(surfaceTest1);
@@ -100,7 +86,7 @@ void mafDataPipeCustomTest::TestOnEvent()
   result = surfaceTest1->Name.Equals("CATCHED");
   TEST_RESULT;
 
-  mafSmartPointer<mafVMETestClass> surfaceTest2;
+  mafSmartPointer<mafVMESurfaceTestClass> surfaceTest2;
   di->SetVME(surfaceTest2);
   di->OnEvent(&mafEvent(di->GetVTKDataPipe(),VME_OUTPUT_DATA_UPDATE)); //sender must be datapipe
 
@@ -183,7 +169,7 @@ void mafDataPipeCustomTest::TestUpdate()
 void mafDataPipeCustomTest::TestUpdateBounds()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafVMETestClass> surfaceTest;
+  mafSmartPointer<mafVMESurfaceTestClass> surfaceTest;
   vtkMAFSmartPointer<vtkSphereSource> sphere;
   sphere->SetThetaResolution(100);
   sphere->SetPhiResolution(100);

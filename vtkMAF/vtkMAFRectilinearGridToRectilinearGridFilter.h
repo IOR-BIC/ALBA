@@ -50,7 +50,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #ifndef __vtkMAFRectilinearGridToRectilinearGridFilter_h
 #define __vtkMAFRectilinearGridToRectilinearGridFilter_h
 
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 #include "vtkRectilinearGridSource.h"
 #include "vtkRectilinearGrid.h"
 /**
@@ -58,7 +58,7 @@ class name: vtkMAFRectilinearGridToRectilinearGridFilter
  vtkMAFRectilinearGridToRectilinearGridFilter is a filter whose subclasses take as
  input rectilinear grid datasets and generate polygonal data on output.
 */
-class VTK_vtkMAF_EXPORT vtkMAFRectilinearGridToRectilinearGridFilter : public vtkRectilinearGridSource
+class MAF_EXPORT vtkMAFRectilinearGridToRectilinearGridFilter : public vtkRectilinearGridSource
 {
 public:
   /** create an instance of the object */

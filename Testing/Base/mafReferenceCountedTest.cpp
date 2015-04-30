@@ -24,6 +24,7 @@
 //----------------------------------------------------------------------------
 
 #include <cppunit/config/SourcePrefix.h>
+#include "mafBaseTests.h"
 #include "mafReferenceCountedTest.h"
 
 #include "mafSmartPointer.h"
@@ -36,17 +37,7 @@
 This object set an external flag when allocated and reset it when deallocated,
 this way I can test when it's really deallocated.
 */
-//----------------------------------------------------------------------------
-class mafFooObject: public mafReferenceCounted
-//----------------------------------------------------------------------------
-{
-public:
-  mafTypeMacro(mafFooObject,mafReferenceCounted);
-  mafFooObject():Flag(NULL) {}
-  ~mafFooObject() {if (Flag) *Flag=false;}
-  int *Flag;
-};
-mafCxxTypeMacro(mafFooObject);
+
 
 /** 
 this creates an object, set its internal flag, increase the reference

@@ -24,24 +24,13 @@
 //----------------------------------------------------------------------------
 
 #include <cppunit/config/SourcePrefix.h>
+#include "mafCoreTests.h"
 #include "mafNodeRootTest.h"
 
 #include "mafNodeRoot.h"
 
 #define TEST_RESULT CPPUNIT_ASSERT(result);
 
-//-------------------------------------------------------------------------
-/** class for testing re-parenting. */
-class mafNodeTest: public mafNode
-  //-------------------------------------------------------------------------
-{
-public:
-  mafTypeMacro(mafNodeTest,mafNode);
-};
-
-//-------------------------------------------------------------------------
-mafCxxTypeMacro(mafNodeTest);
-//-------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 void mafNodeRootTest::TestFixture()
@@ -72,7 +61,7 @@ void mafNodeRootTest::TestCleanTree()
 {
   mafNodeRoot *root = mafNodeRoot::New();
   
-  mafSmartPointer<mafNodeTest> na;
+  mafSmartPointer<mafNodeHelper> na;
 
   na->ReparentTo(root);
   root->CleanTree();

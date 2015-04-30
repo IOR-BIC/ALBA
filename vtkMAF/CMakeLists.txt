@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 1.6)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 # Set the project/library name here.  Classes should be declared as
 # "class vtkMAF_EXPORT vtkFoo", where vtkMAF is the name of the
@@ -86,6 +86,138 @@ SET(vtkMAF_SRCS
   vtkMAFXYPlotActor.h
   vtkMAFPolyDataNormals.cxx
   vtkMAFPolyDataNormals.h
+  ####################### from vtkMAF
+  vtkDicomUnPacker.cxx
+  vtkDicomUnPacker.h
+  vtkImageUnPacker.cxx
+  vtkImageUnPacker.h
+  vtkPackedImage.cxx
+  vtkPackedImage.h
+  vtkXRayVolumeMapper.cxx
+  vtkXRayVolumeMapper.h
+  vtkWeightedLandmarkTransform.cxx
+  vtkWeightedLandmarkTransform.h
+  vtkTriangleQualityRatio.cxx
+  vtkTriangleQualityRatio.h
+  vtkMAFCellLocator.cxx
+  vtkMAFCellLocator.h
+  vtkMAFAddScalarsFilter.cxx
+  vtkMAFAddScalarsFilter.h
+  vtkMAFExtrudeToCircle.cxx
+  vtkMAFExtrudeToCircle.h
+  vtkMAFFillingHole.cxx
+  vtkMAFFillingHole.h
+  vtkMAFFixTopology.cxx
+  vtkMAFFixTopology.h
+  vtkMAFImageUnsharpFilter.cxx
+  vtkMAFImageUnsharpFilter.h
+  vtkMAFMatrixVectorMath.h
+  vtkMAFMatrixVectorMath.cxx
+  vtkMAFPoissonSurfaceReconstruction.cxx
+  vtkMAFPoissonSurfaceReconstruction.h
+  vtkMAFPolyDataMirror.cxx
+  vtkMAFPolyDataMirror.h
+  vtkMAFPolyDataNavigator.h
+  vtkMAFPolyDataNavigator.cxx
+  vtkMAFRegionGrowingLocalGlobalThreshold.cxx
+  vtkMAFRegionGrowingLocalGlobalThreshold.h
+  vtkMAFHalfTubeRemoval.cxx
+  vtkMAFHalfTubeRemoval.h
+  vtkMAFInteractorStyleEnableRotation.cxx
+  vtkMAFInteractorStyleEnableRotation.h
+  vtkMAFSubdividePolylines.cxx
+  vtkMAFSubdividePolylines.h
+  vtkMAFLandmarkCloudPolydataFilter.cxx
+  vtkMAFLandmarkCloudPolydataFilter.h
+  vtkBox.cxx
+  vtkBox.h
+  vtkMaskPolyDataFilter.cxx
+  vtkMaskPolyDataFilter.h
+  vtkHoleConnectivity.cxx
+  vtkHoleConnectivity.h
+  vtkPatchLine.h
+  vtkPatchLine.cpp
+  
+  ############# VolumeLarge Files ########
+  vtkMAFDataArrayDescriptor.cxx
+  vtkMAFDataArrayDescriptor.h
+  vtkMAFFileDataProvider.cxx
+  vtkMAFFileDataProvider.h
+  vtkMAFLargeImageData.cxx
+  vtkMAFLargeImageData.h
+  vtkMAFLargeImageReader.cxx
+  vtkMAFLargeImageReader.h
+  vtkMAFLargeImageSource.cxx
+  vtkMAFLargeImageSource.h
+  vtkMAFFile.cxx
+  vtkMAFFile.h	
+  vtkMAFDataArrayLayout.cpp
+  vtkMAFDataArrayLayout.h
+  vtkMAFMultiFileDataProvider.cpp
+  vtkMAFMultiFileDataProvider.h
+  vtkMAFIdType64.h
+  vtkMAFLargeDataProvider.cxx
+  vtkMAFLargeDataProvider.h
+  vtkMAFLargeDataSet.cxx
+  vtkMAFLargeDataSet.h
+  vtkMAFLargeDataSetCallback.cxx
+  vtkMAFLargeDataSetCallback.h
+  ###############################################################
+  
+  #####################################################
+  vtkMAFVolumeRayCastMapper.cxx
+  vtkMAFVolumeRayCastMapper.h
+  vtkMAFVolumeTextureMapper2D.cxx
+  vtkMAFVolumeTextureMapper2D.h
+  vtkMAFVolumeSlicer_BES.cxx
+  vtkMAFVolumeSlicer_BES.h
+  vtkMAFMeshCutter_BES.cxx 
+  vtkMAFMeshCutter_BES.h  	
+  ###############################################
+  
+  ###############################################
+  vtkMAFPolyDataDeformation.cpp
+  vtkMAFPolyDataDeformation.h
+  vtkMAFPolyDataDeformation_M1.cpp
+  vtkMAFPolyDataDeformation_M1.h
+  vtkMAFPolyDataDeformation_M2.cpp
+  vtkMAFPolyDataDeformation_M2.h  
+  ###############################################
+    
+
+  
+  vtkMAFErythrocyteSource.cpp
+  vtkMAFErythrocyteSource.h
+  
+  vtkMAFImageFillHolesRemoveIslands.cxx
+  vtkMAFImageFillHolesRemoveIslands.h
+  
+  vtkMAFVolumeSlicerNotInterpolated.cxx
+  vtkMAFVolumeSlicerNotInterpolated.h
+
+  vtkMAFBinaryImageFloodFill.cxx
+  vtkMAFBinaryImageFloodFill.h
+  
+  ######vtkbioeng################################
+  vtkMAFCollisionDetectionFilter.cxx
+  vtkMAFCollisionDetectionFilter.h
+  
+  vtkMAFRayCastCleaner.cpp
+  vtkMAFRayCastCleaner.h
+  
+  vtkMAFVolumeToClosedSmoothSurface.cxx
+  vtkMAFVolumeToClosedSmoothSurface.h
+  
+  ################################
+  vtkBoundingBox.cxx
+  vtkBoundingBox.h
+  vtkMAFPastValuesList.cpp
+  vtkMAFPastValuesList.h
+  vtkMAFStentModelSource.cpp
+  vtkMAFStentModelSource.h
+  vtkMAFDeformableSimplexMeshFilter.h
+  vtkMAFDeformableSimplexMeshFilter_Impl.h
+
 )
 
 IF(WIN32)
@@ -96,6 +228,13 @@ SET(vtkMAF_SRCS
   )
 ENDIF(WIN32)
 
+IF (MAF_USE_ITK)
+SET(vtkMAF_SRCS  ${vtkMAF_SRCS}
+  mafClassicICPRegistration.cxx
+  mafClassicICPRegistration.h
+  mafICPUtility.h
+)
+ENDIF (MAF_USE_ITK)
 
 # List the kits from VTK that are needed by this project.
 SET(vtkMAF_LIBS
@@ -144,7 +283,7 @@ IF(MAF_BUILD_MAFDLL)
   ENDIF(WIN32)
   SET(BUILD_SHARED_LIBS 1)
   SET(VTKLOCAL_BUILD_SHARED_LIBS_CONFIG 1)
-  ADD_DEFINITIONS(-DVTK_vtkMAF_EXPORTS)
+  ADD_DEFINITIONS(-DMAF_EXPORTS)
 ELSE(MAF_BUILD_MAFDLL)
   SET(BUILD_SHARED_LIBS 0)
   SET(VTKLOCAL_BUILD_SHARED_LIBS_CONFIG 0)
@@ -177,17 +316,18 @@ IF(VTK_FOUND)
   ENDIF (EXISTS ${VTK_DIR}/bin)
 
   # Create the header to configure the classes.
-  CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/vtkMAFConfigure.h.in
-                 ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Configure.h
-                 @ONLY IMMEDIATE)
+  # CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/mafConfigure.h.in
+  #                ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Configure.h
+  #                @ONLY IMMEDIATE)
+				 
 
   # Create the instantiator for these classes.
   SET(VTK_USE_INSTANTIATOR_NEW 1)
   VTK_MAKE_INSTANTIATOR2("${PROJECT_NAME}Instantiator" vtkMAFInstantiator_SRCS
                          ${vtkMAF_SRCS}
-                         EXPORT_MACRO "VTK_${PROJECT_NAME}_EXPORT"
+                         EXPORT_MACRO "MAF_EXPORT"
                          HEADER_LOCATION ${PROJECT_BINARY_DIR}
-                         INCLUDES "${PROJECT_NAME}Configure.h")
+                         INCLUDES "mafConfigure.h")
 
   # Create the library.
   ADD_LIBRARY(${PROJECT_NAME} ${vtkMAF_SRCS} ${vtkMAFInstantiator_SRCS})
@@ -247,16 +387,16 @@ IF(VTK_FOUND)
   ENDIF(VTK_WRAP_JAVA)
   
   # build testing if necessary
-  OPTION(BUILD_TESTING "Build the testing tree." OFF)
-  IF (BUILD_TESTING)
-    IF (NOT MAKECOMMAND)
-      INCLUDE (${CMAKE_ROOT}/Modules/Dart.cmake)
-      ENABLE_TESTING()
-    ENDIF (NOT MAKECOMMAND)
+  #OPTION(BUILD_TESTING "Build the testing tree." OFF)
+  #IF (BUILD_TESTING)
+  #  IF (NOT MAKECOMMAND)
+  #    INCLUDE (${CMAKE_ROOT}/Modules/Dart.cmake)
+  #    ENABLE_TESTING()
+  #  ENDIF (NOT MAKECOMMAND)
     
-    OPTION(BUILD_vtkMAF_TESTING "Enable building of testing for vtkMAF classes" ON)
-    IF (BUILD_vtkMAF_TESTING)
-      SUBDIRS(Testing)
-    ENDIF (BUILD_vtkMAF_TESTING)
-  ENDIF (BUILD_TESTING)
+  #  OPTION(BUILD_vtkMAF_TESTING "Enable building of testing for vtkMAF classes" ON)
+  #  IF (BUILD_vtkMAF_TESTING)
+  #    SUBDIRS(Testing)
+  #  ENDIF (BUILD_vtkMAF_TESTING)
+  #ENDIF (BUILD_TESTING)
 ENDIF(VTK_FOUND)

@@ -16,7 +16,20 @@ IF(CMAKE_VERSION VERSION_LESS 2.8)
 MESSAGE (FATAL_ERROR "CMAKE version must be greater than 2.8")
 ENDIF (CMAKE_VERSION VERSION_LESS 2.8)
 
+IF(COMMAND cmake_policy)
+    cmake_policy(SET CMP0003 NEW)
+ENDIF(COMMAND cmake_policy)
+
 PROJECT (MAF)
+
+IF(MSVC AND NOT (${CMAKE_VERSION} VERSION_LESS 2.8.11))
+		# set stack reserved size to ~10MB
+		# CMake previously automatically set this value for MSVC builds, but the
+		# behavior was changed in CMake 2.8.11 (Issue 12437) to use the MSVC default
+		# value (1 MB) which is not enough for us. Test mafOpExporterGRFWSTest fails 
+		# due to stackoverflow 
+		SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /STACK:10000000")
+ENDIF()
 
 #-----------------------------------------------------------------------------
 # Macro for DEBUG logging
@@ -109,7 +122,7 @@ INCLUDE (${CMAKE_ROOT}/Modules/FindThreads.cmake)
 CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/mafConfigure.h.in
              ${PROJECT_BINARY_DIR}/mafConfigure.h
              @ONLY)
-
+			 
 #-----------------------------------------------------------------------------
 # Check if MFL is inside the MAF tree.
 #-----------------------------------------------------------------------------
@@ -143,13 +156,14 @@ IF (MAF_CAN_BUILD)
   INCLUDE_DIRECTORIES(BEFORE ".")
 
   ###############add all subdirs but "modules"
-  SET(INCLUDE_DIRS "${MAF_BINARY_DIR}" "${MAF_SOURCE_DIR}/Base" "${MAF_BINARY_DIR}/Interaction" "${MAF_SOURCE_DIR}/Interaction" "${MAF_SOURCE_DIR}/Interaction/Drivers" 
-              "${MAF_SOURCE_DIR}/Core" "${MAF_SOURCE_DIR}/Gui" "${MAF_SOURCE_DIR}/IO" "${MAF_SOURCE_DIR}/Operations" "${MAF_SOURCE_DIR}/VME" 
-              "${MAF_SOURCE_DIR}/VME/DataPipes" "${MAF_SOURCE_DIR}/vtkMAF" "${MAF_BINARY_DIR}/vtkMAF" "${MAF_SOURCE_DIR}/GPUAPI" 
+  SET(INCLUDE_DIRS "${MAF_BINARY_DIR}" "${MAF_SOURCE_DIR}/Base" "${MAF_SOURCE_DIR}/Common" "${MAF_BINARY_DIR}/Interaction" "${MAF_SOURCE_DIR}/Interaction" "${MAF_SOURCE_DIR}/Interaction/Drivers" 
+              "${MAF_SOURCE_DIR}/Core" "${MAF_SOURCE_DIR}/Gui" "${MAF_SOURCE_DIR}/IO" "${MAF_SOURCE_DIR}/Operations" "${MAF_SOURCE_DIR}/VME" "${MAF_SOURCE_DIR}/Views"
+              "${MAF_SOURCE_DIR}/VME/DataPipes" "${MAF_SOURCE_DIR}/vtkMAF" "${MAF_BINARY_DIR}/vtkMAF"  "${MAF_SOURCE_DIR}/GPUAPI" 
               "${MAF_SOURCE_DIR}/GPUAPI/GLEW" "${MAF_SOURCE_DIR}/GPUAPI/FBO")
-  SET(INCLUDE_DIRS ${INCLUDE_DIRS} "${MAF_SOURCE_DIR}/mafDLL")
+  SET(INCLUDE_DIRS ${INCLUDE_DIRS} "${MAF_SOURCE_DIR}/mafDLL" "${MAF_BINARY_DIR}/Libraries/ITK/Sources/InsightToolkit-3.0.1/Wrapping/WrapITK/ExternalProjects/ItkVtkGlue/src")
   
   INCLUDE_DIRECTORIES(${INCLUDE_DIRS})
+  
 
 IF(WIN32)
 	LINK_DIRECTORIES(${MAF_SOURCE_DIR}/GPUAPI/GLEW)
@@ -208,8 +222,10 @@ ENDIF(WIN32)
     SUBDIRS (IO)
     SUBDIRS (Core)
     IF (MAF_USE_VTK)
+	  SUBDIRS (Common)
       SUBDIRS (vtkMAF)
       SUBDIRS (VME)
+	  SUBDIRS (Views)
       SUBDIRS (Operations)
     ENDIF (MAF_USE_VTK)
     
@@ -238,6 +254,10 @@ ENDIF(WIN32)
   CMAKE_EXPORT_BUILD_SETTINGS(
   ${MAF_BINARY_DIR}/MAFBuildSettings.cmake
   )
+  
+  IF(NOT (${CMAKE_VERSION} VERSION_LESS 3.0))
+    cmake_policy(SET CMP0033 OLD)
+  ENDIF(NOT (${CMAKE_VERSION} VERSION_LESS 3.0))
   
   EXPORT_LIBRARY_DEPENDENCIES(
   ${MAF_BINARY_DIR}/MAFLibraryDepends.cmake

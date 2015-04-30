@@ -24,6 +24,7 @@
 //----------------------------------------------------------------------------
 
 #include <cppunit/config/SourcePrefix.h>
+#include "mafDataPipesTests.h"
 #include "vtkMAFDataPipeTest.h"
 
 #include "vtkMAFDataPipe.h"
@@ -36,21 +37,7 @@
 
 #define TEST_RESULT CPPUNIT_ASSERT(result);
 
-/** a vme test  class used to test event reception. */
-class mafVMETestClass: public mafVMESurface
-{
-public:
-	mafVMETestClass(const char *name=NULL):Name(name) {}
-	mafTypeMacro(mafVMETestClass,mafVMESurface);
 
-	virtual void OnEvent(mafEventBase *event) {Name = "CATCHED";};
-
-	mafString     Name;
-};
-
-//-------------------------------------------------------------------------
-mafCxxTypeMacro(mafVMETestClass)
-//-------------------------------------------------------------------------
 
 
 //----------------------------------------------------------------------------
@@ -180,7 +167,7 @@ void vtkMAFDataPipeTest::TestUpdateInformation()
 {
 	//catch event inside vme
 
-	mafVMETestClass *vmeTest;
+	mafVMESurfaceTestClass *vmeTest;
 	mafNEW(vmeTest);
 
 	vtkMAFSmartPointer<vtkMAFDataPipe> vdp;

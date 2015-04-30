@@ -18,6 +18,17 @@ SET(PROJECT_SRCS
   mafStorageElement.h
   mmuDOMTreeErrorReporter.h
   mmuDOMTreeErrorReporter.cpp
+  #######################
+  mafBrickedFile.cpp
+  mafBrickedFile.h
+  mafBrickedFileReader.cpp
+  mafBrickedFileReader.h
+  mafBrickedFileWriter.cpp
+  mafBrickedFileWriter.h
+  mafVolumeLargeReader.cpp
+  mafVolumeLargeReader.h
+  mafVolumeLargeWriter.cpp
+  mafVolumeLargeWriter.h
 )
 
 # IO classes for VTK related objects

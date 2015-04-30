@@ -23,9 +23,9 @@
 #define PointLocator vtkPointLocator
 #include "vtkPointLocator.h"
 
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 
-class VTK_vtkMAF_EXPORT vtkMAFImplicitPolyData : public vtkImplicitFunction
+class MAF_EXPORT vtkMAFImplicitPolyData : public vtkImplicitFunction
 {
 public:
   static vtkMAFImplicitPolyData *New();

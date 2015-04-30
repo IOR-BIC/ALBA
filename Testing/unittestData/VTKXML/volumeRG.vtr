@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<VTKFile type="RectilinearGrid" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+  <RectilinearGrid WholeExtent="0 9 0 9 0 9">
+  <Piece Extent="0 9 0 9 0 9">
+    <PointData Scalars="scalars">
+      <DataArray type="Int16" Name="scalars" format="binary" RangeMin="1" RangeMax="10">
+        AQAAAACAAADQBwAAMwAAAA==eJztzwkRACAMwDDGD/4FI2B1QC8KEiWSChroYIAJFtjggAvywocPHz58+Pjn8QCJ4xV9
+      </DataArray>
+    </PointData>
+    <CellData>
+    </CellData>
+    <Coordinates>
+      <DataArray type="Float64" Name="Array 0B93EA40" format="binary" RangeMin="1" RangeMax="10">
+        AQAAAACAAABQAAAAJwAAAA==eJxjYACBD/YMEOAAoTigtACUFoHSElBaBkorQGklKK3iAAC0AwQ2
+      </DataArray>
+      <DataArray type="Float64" Name="Array 0B6D8FF8" format="binary" RangeMin="1" RangeMax="10">
+        AQAAAACAAABQAAAAJwAAAA==eJxjYACBD/YMEOAAoTigtACUFoHSElBaBkorQGklKK3iAAC0AwQ2
+      </DataArray>
+      <DataArray type="Float64" Name="Array 0ADF6248" format="binary" RangeMin="1" RangeMax="10">
+        AQAAAACAAABQAAAAJwAAAA==eJxjYACBD/YMEOAAoTigtACUFoHSElBaBkorQGklKK3iAAC0AwQ2
+      </DataArray>
+    </Coordinates>
+  </Piece>
+  </RectilinearGrid>
+</VTKFile>

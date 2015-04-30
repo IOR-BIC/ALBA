@@ -12,6 +12,8 @@ SET(PROJECT_SRCS
 mafBase.h
 mafDecl.cpp
 mafDecl.h
+mafDbg.h
+mafDataChecksum.h
 mafDefines.cpp
 mafDefines.h
 mafDirectory.cpp
@@ -35,6 +37,8 @@ mafMatrix.cpp
 mafMatrix.h
 mafMatrix3x3.cpp
 mafMatrix3x3.h
+mafVect3d.cpp
+mafVect3d.h
 mafMultiThreader.h
 mafMultiThreader.cpp
 mafMutexLock.cpp

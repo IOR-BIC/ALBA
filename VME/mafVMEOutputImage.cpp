@@ -25,6 +25,7 @@
 
 
 #include "mafVMEOutputImage.h"
+#include "mafVMEImage.h"
 #include "mafVME.h"
 #include "mmaMaterial.h"
 #include "mafDataPipe.h"
@@ -49,10 +50,6 @@ mafVMEOutputImage::mafVMEOutputImage()
 mafVMEOutputImage::~mafVMEOutputImage()
 //-------------------------------------------------------------------------
 {
-  if(m_Material)
-  {
-    delete m_Material;
-  }
 }
 
 //-------------------------------------------------------------------------
@@ -66,26 +63,12 @@ vtkImageData *mafVMEOutputImage::GetImageData()
 mmaMaterial *mafVMEOutputImage::GetMaterial()
 //-------------------------------------------------------------------------
 {
-  // if the VME set the material directly in the output return it
-  if (m_Material)
-    return  m_Material;
+	// if the VME set the material directly in the output return it
+	if (m_Material)
+		return  m_Material;
 
-  m_Material = new mmaMaterial();
-
-  vtkWindowLevelLookupTable* lut = vtkWindowLevelLookupTable::New();
-
-  double range[2];
-  ((vtkDataSet *)GetVTKData())->GetScalarRange(range);
-  lut->SetTableRange(range[0], range[1]); // min and max of the data in tCoord
-  lut->SetHueRange(0., 0.5);
-  lut->SetSaturationRange(1., 1.);
-  lut->SetValueRange(1., 1.);
-  lut->Build();
-
-  vtkDEL(m_Material->m_ColorLut);
-  m_Material->m_ColorLut = lut;
-
-  return m_Material;
+	// search for a material attribute in the VME connected to this output
+	return GetVME() ? ((mafVMEImage *)GetVME())->GetMaterial(): NULL;
 }
 //-------------------------------------------------------------------------
 void mafVMEOutputImage::SetMaterial(mmaMaterial *material)

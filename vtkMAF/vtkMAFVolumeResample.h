@@ -31,7 +31,7 @@
 #ifndef __vtkMAFVolumeResample_h
 #define __vtkMAFVolumeResample_h
 
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 #include "vtkDataSetToDataSetFilter.h"
 #include "vtkImageData.h"
 
@@ -39,7 +39,7 @@
 class vtkRectilinearGrid;
 
 
-class VTK_vtkMAF_EXPORT vtkMAFVolumeResample: public vtkDataSetToDataSetFilter {
+class MAF_EXPORT vtkMAFVolumeResample: public vtkDataSetToDataSetFilter {
 public:
   static vtkMAFVolumeResample*New();
   vtkTypeRevisionMacro(vtkMAFVolumeResample, vtkDataSetToDataSetFilter);

@@ -17,7 +17,7 @@
 #ifndef __vtkMAFRayCast3DPicker_h
 #define __vtkMAFRayCast3DPicker_h
 
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 #include "vtkAbstractPropPicker.h"
 
 class vtkAbstractMapper3D;
@@ -46,7 +46,7 @@ class vtkGenericCell;
   @todo
   - rewrite all documentation!!!
 */
-class VTK_vtkMAF_EXPORT vtkMAFRayCast3DPicker : public vtkAbstractPropPicker
+class MAF_EXPORT vtkMAFRayCast3DPicker : public vtkAbstractPropPicker
 {
 public:
   static vtkMAFRayCast3DPicker *New();

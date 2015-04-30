@@ -17,7 +17,7 @@
 #ifndef __vtkMAFGlobalAxisCoordinate_h
 #define __vtkMAFGlobalAxisCoordinate_h
 
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 
 #include "vtkCoordinate.h"
 #include "vtkProp3D.h"
@@ -32,7 +32,7 @@ class vtkCamera;
 /**
 class name: vtkMAFGlobalAxisCoordinate.
 */
-class VTK_vtkMAF_EXPORT  vtkMAFGlobalAxisCoordinate : public vtkCoordinate
+class MAF_EXPORT  vtkMAFGlobalAxisCoordinate : public vtkCoordinate
 {
 public:
   //vtkTypeRevisionMacro(vtkMAFGlobalAxisCoordinate,vtkCoordinate);

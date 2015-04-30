@@ -1,3 +1,20 @@
+/*=========================================================================
+
+ Program: MAF2
+ Module: mafEventTest
+ Authors: Gianluigi Crimi
+ 
+ Copyright (c) B3C
+ All rights reserved. See Copyright.txt or
+ http://www.scsitaly.com/Copyright.htm for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+#include "mafEventTest.h"
+#include "mafBaseTests.h"
 #include "mafEventBase.h"
 #include "mafReferenceCounted.h"
 #include <iostream>
@@ -5,15 +22,8 @@
 
 using namespace std;
 
-class mafTestObject: public mafReferenceCounted
-{
-public:
-  mafTypeMacro(mafTestObject,mafReferenceCounted);
-};
 
-mafCxxTypeMacro(mafTestObject);
-
-int main()
+void mafEventTest::MafEventTestMainTest()
 {  
   typedef pair<int,const char *> test_type;
   test_type test_data(10,"ciao");
@@ -22,29 +32,28 @@ int main()
 
   // test constructor
   mafEventBase event_a(&test_object,5,&test_data);
-  MAF_TEST(event_a.GetId()==5);
-  MAF_TEST(event_a.GetSender()==&test_object);
-  MAF_TEST(event_a.GetData()==&test_data);
-  MAF_TEST(event_a.GetSource()==NULL);
+  CPPUNIT_ASSERT(event_a.GetId()==5);
+  CPPUNIT_ASSERT(event_a.GetSender()==&test_object);
+  CPPUNIT_ASSERT(event_a.GetData()==&test_data);
+  CPPUNIT_ASSERT(event_a.GetSource()==NULL);
 
 
   // test copy constructor
   mafEventBase event_b=event_a;
-  MAF_TEST(event_b.GetId()==event_a.GetId());
-  MAF_TEST(event_b.GetSender()==event_a.GetSender());
-  MAF_TEST(event_b.GetData()==event_a.GetData());
-  MAF_TEST(event_b.GetSource()==event_a.GetSource());
+  CPPUNIT_ASSERT(event_b.GetId()==event_a.GetId());
+  CPPUNIT_ASSERT(event_b.GetSender()==event_a.GetSender());
+  CPPUNIT_ASSERT(event_b.GetData()==event_a.GetData());
+  CPPUNIT_ASSERT(event_b.GetSource()==event_a.GetSource());
 
   // test Set functions
   mafEventBase event_c;
   event_c.SetSender(&test_object);
   event_c.SetId(5);
   event_c.SetData(&test_data);
-  MAF_TEST(event_c.GetId()==event_a.GetId());
-  MAF_TEST(event_c.GetSender()==event_a.GetSender());
-  MAF_TEST(event_c.GetData()==event_a.GetData());
+  CPPUNIT_ASSERT(event_c.GetId()==event_a.GetId());
+  CPPUNIT_ASSERT(event_c.GetSender()==event_a.GetSender());
+  CPPUNIT_ASSERT(event_c.GetData()==event_a.GetData());
   
   cout<<"Test completed successfully!"<<endl;
 
-  return MAF_OK;
 }

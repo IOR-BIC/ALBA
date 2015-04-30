@@ -2,6 +2,7 @@ SUBDIRS(exInteraction)
 SUBDIRS(exOperations)
 SUBDIRS(exVMEMan)
 SUBDIRS(exViewVTK)
+SUBDIRS(MedicalApp)
 
 IF (EXISTS ${MAF_SOURCE_DIR}/Examples/exRuler)
   SUBDIRS(exRuler)

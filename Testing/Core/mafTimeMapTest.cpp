@@ -26,7 +26,7 @@
 #include <cppunit/config/SourcePrefix.h>
 #include "mafTimeMapTest.h"
 
-#include "mmuTimeSet.cpp"
+#include "mmuTimeSet.h"
 #include "mafReferenceCounted.h"
 #include "mafTimeMap.h"
 #include "mafTimeMap.txx"

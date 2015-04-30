@@ -28,7 +28,7 @@
 #define __vtkMAFExtendedGlyph3D_h
 
 #include "vtkDataSetToPolyDataFilter.h"
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 
 #define VTK_SCALE_BY_SCALAR 0
 #define VTK_SCALE_BY_VECTOR 1
@@ -47,7 +47,7 @@
 #define VTK_INDEXING_BY_SCALAR 1
 #define VTK_INDEXING_BY_VECTOR 2
 
-class VTK_vtkMAF_EXPORT vtkMAFExtendedGlyph3D : public vtkDataSetToPolyDataFilter
+class MAF_EXPORT vtkMAFExtendedGlyph3D : public vtkDataSetToPolyDataFilter
 {
 public:
   vtkTypeRevisionMacro(vtkMAFExtendedGlyph3D,vtkDataSetToPolyDataFilter);

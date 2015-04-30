@@ -30,7 +30,7 @@
 #include "vtkMatrix4x4.h"
 #include "vtkTransform.h"
 
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 
 /**
 Class Name:vtkMAFDistanceFilter.
@@ -42,7 +42,7 @@ from isosurfaces of defined value obtained by interpolating into the source data
 For example, we can compute distances on a geometry
 (specified as Input) from an isosurface in a volume (Source).
 */
-class VTK_vtkMAF_EXPORT vtkMAFDistanceFilter : public vtkDataSetToDataSetFilter {
+class MAF_EXPORT vtkMAFDistanceFilter : public vtkDataSetToDataSetFilter {
   public:
     /** create an instance of the object */
     static vtkMAFDistanceFilter *New();

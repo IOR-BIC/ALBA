@@ -29,13 +29,16 @@
 
 class mafCoreFactoryTest : public CPPUNIT_NS::TestFixture
 {
+public:
+	void tearDown();
+
   CPPUNIT_TEST_SUITE( mafCoreFactoryTest );
 	CPPUNIT_TEST( TestStaticAllocation );
 	CPPUNIT_TEST( TestDynamicAllocation );
   CPPUNIT_TEST( TestGetSourceVersion );
   CPPUNIT_TEST( TestGetDescription );
-
-  // These tests play with the factory to check that everything is working as expected: 
+	
+	// These tests play with the factory to check that everything is working as expected: 
   CPPUNIT_TEST( TestCreateInstance );
 	CPPUNIT_TEST( TestGetRegisteredFactories );
 	CPPUNIT_TEST( TestRegisterFactory );
@@ -67,34 +70,9 @@ class mafCoreFactoryTest : public CPPUNIT_NS::TestFixture
   void TestGetArgs();
   void TestReHash();
   void TestCreateAllInstance();
-  
 };
 
 
-int
-main( int argc, char* argv[] )
-{
-  // Create the event manager and test controller
-  CPPUNIT_NS::TestResult controller;
 
-  // Add a listener that colllects test result
-  CPPUNIT_NS::TestResultCollector result;
-  controller.addListener( &result );        
-
-  // Add a listener that print dots as test run.
-  CPPUNIT_NS::BriefTestProgressListener progress;
-  controller.addListener( &progress );      
-
-  // Add the top suite to the test runner
-  CPPUNIT_NS::TestRunner runner;
-  runner.addTest( mafCoreFactoryTest::suite());
-  runner.run( controller );
-
-  // Print test in a compiler compatible format.
-  CPPUNIT_NS::CompilerOutputter outputter( &result, CPPUNIT_NS::stdCOut() );
-  outputter.write(); 
-
-  return result.wasSuccessful() ? 0 : 1;
-}
 
 #endif

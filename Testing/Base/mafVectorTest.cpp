@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include <cppunit/config/SourcePrefix.h>
-
+#include "mafBaseTests.h"
 #include "mafVector.txx"
 #include "mafVectorTest.h"
 #include "mafReferenceCounted.h"
@@ -33,20 +33,6 @@
 #include <iostream>
 #include <utility>
 
-/**
- This object set a flag when allocated and reset it when deallocated,
- this way I can test when it's really deallocated.
-*/
-class mafTestObject: public mafReferenceCounted
-{
-public:
-  mafTypeMacro(mafTestObject,mafReferenceCounted);
-  mafTestObject():Number(NULL) {}
-  ~mafTestObject() {if (Number) *Number=0;}
-  int  *Number;
-};
-
-mafCxxTypeMacro(mafTestObject);
 
 //----------------------------------------------------------------------------
 void mafVectorTest::TestFixture()

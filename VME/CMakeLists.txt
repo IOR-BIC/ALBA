@@ -46,6 +46,137 @@ SET(PROJECT_SRCS
   mafVMEOutputScalar.h
   mafVMEScalar.cpp
   mafVMEScalar.h
+  ###############
+  mafVMELabeledVolume.cpp
+  mafVMELabeledVolume.h
+  mafPipeVolumeMIP.cpp
+  mafPipeVolumeMIP.h
+  mafPipeDensityDistance.cpp
+  mafPipeDensityDistance.h
+  mafPipeTrajectories.cpp
+  mafPipeTrajectories.h
+  mafPipeVolumeDRR.cpp
+  mafPipeVolumeDRR.h
+  mafPipeVolumeVR.cpp
+  mafPipeVolumeVR.h
+
+  # mafPolylineGraph.cpp
+  # mafPolylineGraph.h
+  mafVMEPolylineGraph.cpp
+  mafVMEPolylineGraph.h
+  mafVMEPolylineEditor.cpp
+  mafVMEPolylineEditor.h
+  mafPipePolylineGraphEditor.cpp
+  mafPipePolylineGraphEditor.h
+  mafVMEOutputPolylineEditor.cpp
+  mafVMEOutputPolylineEditor.h
+  mafVMEMaps.cpp
+  mafVMEMaps.h
+  
+  mafVMEWrappedMeter.cpp
+  mafVMEWrappedMeter.h
+  mafVMEOutputWrappedMeter.cpp
+  mafVMEOutputWrappedMeter.h
+  mafPipeWrappedMeter.cpp
+  mafPipeWrappedMeter.h
+
+  mafVMESurfaceEditor.cpp
+  mafVMESurfaceEditor.h
+  mafPipeSurfaceEditor.cpp
+  mafPipeSurfaceEditor.h
+  mafVMEOutputSurfaceEditor.cpp
+  mafVMEOutputSurfaceEditor.h
+  
+  mafVisualPipeSlicerSlice.cpp
+  mafVisualPipeSlicerSlice.h
+  
+  mafVisualPipePolylineGraph.cpp
+  mafVisualPipePolylineGraph.h
+
+  mafVMEComputeWrapping.h
+  mafVMEComputeWrapping.cpp
+  mafPipeComputeWrapping.h
+  mafPipeComputeWrapping.cpp
+  mafVMEOutputComputeWrapping.cpp
+  mafVMEOutputComputeWrapping.h 
+  
+  mafPipeVectorField.cpp
+  mafPipeVectorField.h
+  mafPipeVectorFieldMapWithArrows.cpp
+  mafPipeVectorFieldMapWithArrows.h
+  mafPipeVectorFieldGlyphs.cpp
+  mafPipeVectorFieldGlyphs.h
+  mafPipeVectorFieldSurface.cpp
+  mafPipeVectorFieldSurface.h
+  mafPipeVectorFieldSlice.cpp
+  mafPipeVectorFieldSlice.h
+  mafPipeTensorField.cpp
+  mafPipeTensorField.h
+  mafPipeTensorFieldGlyphs.cpp
+  mafPipeTensorFieldGlyphs.h
+  mafPipeTensorFieldSurface.cpp
+  mafPipeTensorFieldSurface.h
+  mafPipeTensorFieldSlice.cpp
+  mafPipeTensorFieldSlice.h
+  mafPipeCompound.cpp
+  mafPipeCompound.h
+  mafPipeCompoundVolume.cpp
+  mafPipeCompoundVolume.h
+  mafPipeCompoundVolumeFixedScalars.cpp
+  mafPipeCompoundVolumeFixedScalars.h
+  mafVMESegmentationVolume.cpp
+  mafVMESegmentationVolume.h
+  mafDataPipeCustomSegmentationVolume.cpp
+  mafDataPipeCustomSegmentationVolume.h
+  mafAttributeSegmentationVolume.cpp
+  mafAttributeSegmentationVolume.h
+  
+  
+  ### TO BE COMMITTED DOWN ###
+  mafPipeSlice.cpp
+  mafPipeSlice.h
+  ############################
+  
+  mafGizmoROI_BES.cpp
+  mafGizmoROI_BES.h
+  mafPipeMeshSlice_BES.cpp
+  mafPipeMeshSlice_BES.h
+  mafPipePolylineSlice_BES.cpp
+  mafPipePolylineSlice_BES.h
+  mafPipeSurfaceSlice_BES.cpp
+  mafPipeSurfaceSlice_BES.h
+  mafPipeVolumeSlice_BES.cpp
+  mafPipeVolumeSlice_BES.h
+  
+  ############# VolumeLarge Files - TO BE COMMITTED DOWN ########
+  # the following files has been moved to mafIO
+  #../BES_Beta/IO/mafBrickedFile.cpp    
+  #../BES_Beta/IO/mafBrickedFile.h
+  #../BES_Beta/IO/mafBrickedFileReader.cpp
+  #../BES_Beta/IO/mafBrickedFileReader.h
+  #../BES_Beta/IO/mafBrickedFileWriter.cpp
+  #../BES_Beta/IO/mafBrickedFileWriter.h
+  #../BES_Beta/IO/mafVolumeLargeReader.cpp
+  #../BES_Beta/IO/mafVolumeLargeReader.h
+  #../BES_Beta/IO/mafVolumeLargeWriter.cpp
+  #../BES_Beta/IO/mafVolumeLargeWriter.h
+  mafVMEVolumeLarge.cpp
+  mafVMEVolumeLarge.h
+  mafVMEVolumeLargeUtils.cpp
+  mafVMEVolumeLargeUtils.h  
+  ###############################################################
+
+  mafPipeVolumeSliceBlend.cpp
+  mafPipeVolumeSliceBlend.h
+
+  mafVisualPipeCollisionDetection.cpp
+  mafVisualPipeCollisionDetection.h
+
+  mafPipeVolumeSliceNotInterpolated.cpp
+  mafPipeVolumeSliceNotInterpolated.h
+  
+  mafPipeRayCast.cpp
+  mafPipeRayCast.h
 )
 
 IF (MAF_USE_CRYPTO)
@@ -157,6 +288,21 @@ IF (MAF_USE_VTK)
   mafVMEVolumeRGB.h
   mmaMeter.cpp
   mmaMeter.h
+  ###########
+  mafVMERawMotionData.cpp
+  mafVMERawMotionData.h
+  mafPipeGraph.cpp
+  mafPipeGraph.h
+  mafVMEAnalog.cpp
+  mafVMEAnalog.h
+  
+ #add for stent
+  mafVMEStent.cpp
+  mafVMEStent.h
+
+  #stent used tool, to find nearest point
+  kdtree.c
+  kdtree.h
   )
 ENDIF (MAF_USE_VTK)
 

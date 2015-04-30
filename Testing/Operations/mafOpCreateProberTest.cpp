@@ -24,6 +24,9 @@
 //----------------------------------------------------------------------------
 
 #include <cppunit/config/SourcePrefix.h>
+#include "mafOperationsTests.h"
+
+
 #include "mafOpCreateProberTest.h"
 
 #include "mafVMEProber.h"
@@ -31,50 +34,6 @@
 
 #define TEST_RESULT CPPUNIT_ASSERT(result);
 
-//----------------------------------------------------------------------------
-class DummyVme : public mafVME
-//----------------------------------------------------------------------------
-{
-public:
-  DummyVme(){};
-  ~DummyVme(){};
-
-  mafTypeMacro(DummyVme,mafVME);
-
-  /*virtual*/ void SetMatrix(const mafMatrix &mat){};
-  /*virtual*/ void GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes){};
-protected:
-private:
-};
-
-mafCxxTypeMacro(DummyVme);
-
-//----------------------------------------------------------------------------
-class DummyObserver : public mafObserver
-//----------------------------------------------------------------------------
-{
-public:
-
-  DummyObserver() {};
-  ~DummyObserver() {};
-
-  /*virtual*/ void OnEvent(mafEventBase *maf_event);
-
-protected:
-};
-
-//----------------------------------------------------------------------------
-void DummyObserver::OnEvent(mafEventBase *maf_event)
-//----------------------------------------------------------------------------
-{
-  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
-  {
-    if(e->GetId() == VME_REMOVE)
-    {
-      e->GetVme()->ReparentTo(NULL);
-    }
-  }
-}
 //----------------------------------------------------------------------------
 void mafOpCreateProberTest::TestFixture()
 //----------------------------------------------------------------------------

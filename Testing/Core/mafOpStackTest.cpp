@@ -22,6 +22,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
+#include "mafCoreTests.h"
 #include <cppunit/config/SourcePrefix.h>
 #include "mafOpStackTest.h"
 
@@ -30,21 +31,6 @@
 
 #define TEST_RESULT CPPUNIT_ASSERT(result);
 
-//-------------------------------------------------------------------------
-/** class for testing re-parenting. */
-class mafOpDummy: public mafOp
-//-------------------------------------------------------------------------
-{
-public:
-  mafOpDummy(wxString label = "DummyOp",  bool canundo = false, int opType = OPTYPE_OP, bool inputPreserving = false);
-};
-mafOpDummy::mafOpDummy(wxString label,  bool canundo, int opType, bool inputPreserving)
-{
-
-  m_Canundo = canundo;
-  m_OpType = opType;
-  m_InputPreserving = inputPreserving;
-}
 
 //----------------------------------------------------------------------------
 void mafOpStackTest::TestFixture()
@@ -85,7 +71,7 @@ void mafOpStackTest::TestIsEmpty()
 
   TEST_RESULT;
 
-  mafOpDummy *op = new mafOpDummy();
+  mafOpDummyHelper *op = new mafOpDummyHelper();
   stack.Push(op);
 
   result = !stack.IsEmpty();
@@ -102,7 +88,7 @@ void mafOpStackTest::TestPush()
 
   TEST_RESULT;
 
-  mafOpDummy *op = new mafOpDummy();
+  mafOpDummyHelper *op = new mafOpDummyHelper();
   stack.Push(op);
 
   result = !stack.IsEmpty();
@@ -115,9 +101,9 @@ void mafOpStackTest::TestPop()
 {
   mafOpStack stack;
 
-  mafOpDummy *op1 = new mafOpDummy();
+  mafOpDummyHelper *op1 = new mafOpDummyHelper();
   stack.Push(op1);
-  mafOpDummy *op2 = new mafOpDummy();
+  mafOpDummyHelper *op2 = new mafOpDummyHelper();
   stack.Push(op2);
 
   result = op2 == stack.Pop();
@@ -132,7 +118,7 @@ void mafOpStackTest::TestClear()
 {
   mafOpStack stack;
 
-  mafOpDummy *op = new mafOpDummy();
+  mafOpDummyHelper *op = new mafOpDummyHelper();
   stack.Push(op);
 
   stack.Clear();

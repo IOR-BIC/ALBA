@@ -62,7 +62,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #define __vtkMAFProjectRG_h
 
 #include "vtkMAFRectilinearGridToRectilinearGridFilter.h"
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 
 #define VTK_PROJECT_FROM_X 1
 #define VTK_PROJECT_FROM_Y 2
@@ -83,7 +83,7 @@ Class Name: vtkMAFProjectRG.
  Typical applications of this filter are to produce an image from a volume
  for image processing or visualization.
 */
-class VTK_vtkMAF_EXPORT vtkMAFProjectRG : public vtkMAFRectilinearGridToRectilinearGridFilter
+class MAF_EXPORT vtkMAFProjectRG : public vtkMAFRectilinearGridToRectilinearGridFilter
 {
 public:
   /** RTTI Macro */
