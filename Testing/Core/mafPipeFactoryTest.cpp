@@ -101,7 +101,14 @@ void mafPipeFactoryTest::TestGetInstance_Initialize_CreatePipeInstance_RegisterN
   CPPUNIT_ASSERT(mafPipeFactory::Initialize()==MAF_OK);
 
   std::list<mafObjectFactory *> list=mafObjectFactory::GetRegisteredFactories();
-  CPPUNIT_ASSERT(list.size()==1);
+
+	bool found=false;
+	for ( std::list<mafObjectFactory*>::iterator i = list.begin();i != list.end(); ++i )
+	{
+		if((*i)==pipe_factory)
+			found = true;
+	}
+	CPPUNIT_ASSERT(found);
 
   mafPlugTestPipe<mafPipeCustom>("a custom pipe"); // plug a pipe in the main node factory
 
@@ -122,7 +129,7 @@ void mafPipeFactoryTest::TestGetInstance_Initialize_CreatePipeInstance_RegisterN
   int s = pipes.size();
   CPPUNIT_ASSERT(s == 2); // one pipe is plugged by default (mafPipeBox), 
                         
-  bool found=false;
+  found=false;
   for (int i=0;i<pipes.size();i++)
   {
 		std::string test;

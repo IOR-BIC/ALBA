@@ -26,7 +26,7 @@
 #include <cppunit/config/SourcePrefix.h>
 #include "mafTimeMapScalarTest.h"
 
-#include "mmuTimeSet.cpp"
+#include "mmuTimeSet.h"
 #include "mafTimeMapScalar.txx"
 
 #include <iostream>

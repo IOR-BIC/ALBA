@@ -24,6 +24,7 @@
 //----------------------------------------------------------------------------
 
 #include <cppunit/config/SourcePrefix.h>
+#include "mafCoreTests.h"
 #include "mafOpCutTest.h"
 
 #include "mafOpSelect.h"
@@ -37,44 +38,6 @@
 
 #include <vector>
 
-//----------------------------------------------------------------------------
-class DummyObserver : public mafObserver
-//----------------------------------------------------------------------------
-{
-public:
-
-  DummyObserver() {};
-  ~DummyObserver();
-
-  virtual void OnEvent(mafEventBase *maf_event);
-
-  mafEvent* GetEvent(int i){return m_ListEvent[i];};
-
-protected:
-
-  std::vector<mafEvent*> m_ListEvent;
-};
-
-//----------------------------------------------------------------------------
-void DummyObserver::OnEvent(mafEventBase *maf_event)
-//----------------------------------------------------------------------------
-{
-  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
-  {
-    mafEvent *eventToCopy = new mafEvent(e->GetSender(),e->GetId(),e->GetVme());
-    m_ListEvent.push_back(eventToCopy);
-  }
-}
-//----------------------------------------------------------------------------
-DummyObserver::~DummyObserver()
-//----------------------------------------------------------------------------
-{
-  for(int i=0;i<m_ListEvent.size();i++)
-  {
-    delete m_ListEvent[i];
-  }
-  m_ListEvent.clear();
-}
 //----------------------------------------------------------------------------
 void mafOpCutTest::TestFixture()
 //----------------------------------------------------------------------------
@@ -91,8 +54,6 @@ void mafOpCutTest::tearDown()
 //----------------------------------------------------------------------------
 {
   mafDEL(m_OpCut);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafOpCutTest::TestOpDo()

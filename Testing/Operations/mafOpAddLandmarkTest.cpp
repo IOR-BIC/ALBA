@@ -24,6 +24,8 @@
 //----------------------------------------------------------------------------
 
 #include <cppunit/config/SourcePrefix.h>
+#include "mafOperationsTests.h"
+
 #include "mafOpAddLandmarkTest.h"
 
 #include "mafOpAddLandmark.h"
@@ -40,35 +42,6 @@
 
 #define TEST_RESULT CPPUNIT_ASSERT(m_Result)
 #define TOLERANCE 1.0e-3
-
-//----------------------------------------------------------------------------
-class DummyObserver : public mafObserver
-  //----------------------------------------------------------------------------
-{
-public:
-
-  DummyObserver() {};
-  ~DummyObserver(){};
-
-  virtual void OnEvent(mafEventBase *maf_event);
-
-protected:
-
-};
-//----------------------------------------------------------------------------
-void DummyObserver::OnEvent(mafEventBase *maf_event)
-//----------------------------------------------------------------------------
-{
-  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
-  {
-    //mafEvent *eventToCopy = new mafEvent(e->GetSender(),e->GetId(),e->GetVme());
-
-    if (e->GetId() == VME_REMOVE)
-    {
-      e->GetVme()->ReparentTo(NULL);
-    }
-  }
-}
 
 //----------------------------------------------------------------------------
 void mafOpAddLandmarkTest::TestFixture()

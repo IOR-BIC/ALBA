@@ -63,7 +63,7 @@ Then Render()
 #include <GL/gl.h>
 #endif
 
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 /**
 namespace name: Baoquan
 */
@@ -139,7 +139,7 @@ Class Name: Idepth.
 /**
 class name: vtkMAFContourVolumeMapperGPU.
 */
-  class VTK_vtkMAF_EXPORT vtkMAFContourVolumeMapperGPU : public vtkVolumeMapper 
+  class MAF_EXPORT vtkMAFContourVolumeMapperGPU : public vtkVolumeMapper 
   {
   public:
 

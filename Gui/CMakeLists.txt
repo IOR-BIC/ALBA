@@ -130,6 +130,26 @@ SET(PROJECT_SRCS
   mafGUIComboBox.h
   mafGUISettingsHelp.h
   mafGUISettingsHelp.cpp
+  mafGUILandmark.cpp
+  mafGUILandmark.h
+  mafGUIWizard.cpp
+  mafGUIWizard.h
+  mafGUIWizardPage.cpp
+  mafGUIWizardPage.h
+  mafGUIWizardPageNew.cpp
+  mafGUIWizardPageNew.h
+  mafGUIDicomSettings.cpp
+  mafGUIDicomSettings.h
+  mafGUIContextualMenu.cpp
+  mafGUIContextualMenu.h
+  mafGUISettingsAdvanced.cpp
+  mafGUISettingsAdvanced.h
+  mafGUIDynamicVP.cpp
+  mafGUIDynamicVP.h
+  mafGUILutHistogramSwatch.cpp
+  mafGUILutHistogramSwatch.h
+  mafGUILutHistogramEditor.cpp
+  mafGUILutHistogramEditor.h
 )
 
 IF (MAF_USE_CURL)

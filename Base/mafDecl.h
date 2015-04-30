@@ -39,7 +39,8 @@ class wxWindow;
 //const int MAXWIDGET = 200; 
 const int MAXWIDGET = 4096;
 const int MAXOP = 200; 
-const int MAXVIEW = 200; 
+const int MAXVIEW = 200;
+const int MAXWIZARD = 50;  
 
 // extern MAF_EXPORT int MAFExpertMode; ///< Flag to turn On/Off detailed debug information or GUI widgets
 
@@ -397,6 +398,37 @@ ID_GUI_UPDATE,
 
 MAF_BASE_ID ///< base numeric ID used by mafIdFactory. This must be the LAST ONE!!!
 };
+
+enum MED_MAIN_EVENT_ID
+{
+  ID_VME_BEHAVIOR_UPDATE = EVT_USER_START,
+  MENU_FILE_SNAPSHOT,
+  ID_GET_FILENAME,
+  WIZARD_RUN_STARTING,
+  WIZARD_RUN_CONTINUE,
+  WIZARD_RUN_TERMINATED,
+  WIZARD_REQUIRED_VIEW,
+  WIZARD_DELETE_VIEW,
+  WIZARD_RUN_OP,
+  WIZARD_UPDATE_WINDOW_TITLE,
+  WIZARD_PAUSE,
+  WIZARD_OP_DELETE,
+  WIZARD_OP_NEW,
+  WIZARD_SWITCH,
+  WIZARD_RELOAD_MSF,
+  WIZARD_INFORMATION_BOX_SHOW_SET,
+  WIZARD_INFORMATION_BOX_SHOW_GET,
+  WIZARD_START,
+  WIZARD_END=WIZARD_START+MAXWIZARD,
+  MED_EVT_USER_START,
+};
+
+enum MED_MENU_EVENT_ID
+{
+   MENU_WIZARD = MENU_USER_START,
+   MED_MENU_USER_START,
+};
+
 /** @} */
 
 //----------------------------------------------------------------------------

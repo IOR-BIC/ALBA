@@ -22,7 +22,7 @@
 //-----------------------------------------------------------------------------
 // Includes:
 //-----------------------------------------------------------------------------
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 #include "vtkActor.h"
 #include "vtkTextActor.h"
 
@@ -53,7 +53,7 @@ is called to compute ClippingRange.
 (sorry)
 */
 //-----------------------------------------------------------------------------
-class VTK_vtkMAF_EXPORT vtkMAFGridActor : public vtkActor
+class MAF_EXPORT vtkMAFGridActor : public vtkActor
 //-----------------------------------------------------------------------------
 {
  public:

@@ -24,6 +24,7 @@
 //----------------------------------------------------------------------------
 
 #include <cppunit/config/SourcePrefix.h>
+#include "mafInteractionTests.h"
 
 #include "mafGUIGizmoTranslateTest.h"
 #include "mafVMESurface.h"
@@ -33,16 +34,6 @@
 #include "vtkSphereSource.h"
 
 #include <iostream>
-
-void	DummyObserver::OnEvent(mafEventBase *maf_event)
-{
-  m_LastReceivedEventID =  maf_event->GetId();
-}
-
-int DummyObserver::GetLastReceivedEventID()
-{
-  return m_LastReceivedEventID;
-}
 
 //----------------------------------------------------------------------------
 void mafGUIGizmoTranslateTest::TestFixture()

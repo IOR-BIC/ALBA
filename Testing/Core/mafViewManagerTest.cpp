@@ -169,7 +169,6 @@ void mafViewManagerTest::tearDown()
 //----------------------------------------------------------------------------
 {
   cppDEL(m_Manager);
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafViewManagerTest::TestDynamicAllocation()

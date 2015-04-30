@@ -28,10 +28,10 @@ but unlike vtkPolyDataNormals, it does not recalculate them when nothing has cha
 
 #include "vtkObjectFactory.h"
 #include "vtkCellArray.h"
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 
 
-class VTK_vtkMAF_EXPORT  vtkMAFPolyDataNormals : public vtkPolyDataNormals
+class MAF_EXPORT  vtkMAFPolyDataNormals : public vtkPolyDataNormals
 {
 public:
   vtkTypeRevisionMacro(vtkMAFPolyDataNormals, vtkPolyDataNormals);  

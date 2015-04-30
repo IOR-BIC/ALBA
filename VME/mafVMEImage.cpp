@@ -33,6 +33,7 @@
 #include "mafAbsMatrixPipe.h"
 #include "vtkDataSet.h"
 #include "vtkImageData.h"
+#include "mmaMaterial.h"
 //-------------------------------------------------------------------------
 mafCxxTypeMacro(mafVMEImage)
 //-------------------------------------------------------------------------
@@ -94,4 +95,35 @@ char** mafVMEImage::GetIcon()
 {
   #include "mafVMEImage.xpm"
   return mafVMEImage_xpm;
+}
+
+//-------------------------------------------------------------------------
+int mafVMEImage::InternalInitialize()
+//-------------------------------------------------------------------------
+{
+	if (Superclass::InternalInitialize()==MAF_OK)
+	{
+		// force material allocation
+		GetMaterial();
+		return MAF_OK;
+	}
+	return MAF_ERROR;
+}
+
+//-------------------------------------------------------------------------
+mmaMaterial *mafVMEImage::GetMaterial()
+//-------------------------------------------------------------------------
+{
+  mmaMaterial *material = (mmaMaterial *)GetAttribute("MaterialAttributes");
+  if (material == NULL)
+  {
+    material = mmaMaterial::New();
+		material->m_MaterialType=mmaMaterial::USE_LOOKUPTABLE;
+		    
+    SetAttribute("MaterialAttributes", material);
+		GetOutput();
+    
+		((mafVMEOutputImage *)m_Output)->SetMaterial(material);
+  }
+  return material;
 }

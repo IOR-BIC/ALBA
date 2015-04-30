@@ -56,7 +56,7 @@
 #define __vtkMAFDOFMatrix_h
 
 #include "vtkObject.h"
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 
 class vtkDoubleArray;
 
@@ -72,7 +72,7 @@ BOUNDS:     free movement in a given interval
 SNAP_STEP:  snap by a given step
 SNAP_ARRAY: snap on a given array of positions
 */
-class VTK_vtkMAF_EXPORT vtkMAFDOFMatrix : public vtkObject
+class MAF_EXPORT vtkMAFDOFMatrix : public vtkObject
 {
   
 public:

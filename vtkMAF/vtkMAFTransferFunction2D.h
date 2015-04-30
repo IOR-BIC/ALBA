@@ -29,7 +29,7 @@
 #include "vtkVolumeProperty.h"
 #include "vtkImageMapToColors.h"
 
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 
 #define VTK_TRANSFER_FUNCTION_2D 20
 
@@ -60,7 +60,7 @@ struct tfWidget {
   void   SetGradientRange(double from, double to, double center) { Range[1][0] = from; Range[1][1] = to; Range[1][2] = center; }
 
   bool   Inside(double val, double grad) const { return (val >= this->Range[0][0] && val <= this->Range[0][1] && grad >= this->Range[1][0] && grad <= this->Range[1][1]); }
-  VTK_vtkMAF_EXPORT double  Attenuation(double val, double grad) const;
+  MAF_EXPORT double  Attenuation(double val, double grad) const;
 
   void   Update();
   };
@@ -68,7 +68,7 @@ struct tfWidget {
 
 #define MAX_NUMBER_OF_WIDGETS 16
 
-class VTK_vtkMAF_EXPORT vtkMAFTransferFunction2D : public vtkDataObject {
+class MAF_EXPORT vtkMAFTransferFunction2D : public vtkDataObject {
   public:
     static vtkMAFTransferFunction2D *New();
     vtkTypeRevisionMacro(vtkMAFTransferFunction2D,vtkDataObject);
@@ -171,7 +171,7 @@ class VTK_vtkMAF_EXPORT vtkMAFTransferFunction2D : public vtkDataObject {
 };
 
 
-class VTK_vtkMAF_EXPORT vtkVolumeProperty2 : public vtkVolumeProperty {
+class MAF_EXPORT vtkVolumeProperty2 : public vtkVolumeProperty {
   public:
     static vtkVolumeProperty2 *New();
     vtkTypeRevisionMacro(vtkVolumeProperty2, vtkVolumeProperty);

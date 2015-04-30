@@ -25,10 +25,8 @@
 
 #include <cppunit/config/SourcePrefix.h>
 #include "mafNodeIteratorTest.h"
-
+#include "mafCoreTests.h"
 #include "mafSmartPointer.h"
-//#include "mafTagArray.h"
-//#include "mafTagItem.h"
 #include "mafNodeRoot.h"
 #include "mafNode.h"
 #include "mafNodeIterator.h"
@@ -40,31 +38,7 @@
 
 #define TEST_RESULT CPPUNIT_ASSERT(result);
 
-//-------------------------------------------------------------------------
-/** class for testing re-parenting. */
-class mafNodeB: public mafNode
-  //-------------------------------------------------------------------------
-{
-public:
-  mafTypeMacro(mafNodeB,mafNode);
-};
 
-//-------------------------------------------------------------------------
-mafCxxTypeMacro(mafNodeB)
-//-------------------------------------------------------------------------
-
-//-------------------------------------------------------------------------
-/** class for testing re-parenting. */
-class mafNodeA: public mafNode
-  //-------------------------------------------------------------------------
-{
-public:
-  mafTypeMacro(mafNodeA,mafNode);
-};
-
-//-------------------------------------------------------------------------
-mafCxxTypeMacro(mafNodeA);
-//-------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 void mafNodeIteratorTest::TestFixture()

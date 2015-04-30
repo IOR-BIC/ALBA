@@ -31,7 +31,7 @@
 #ifndef __vtkMAFVolumeSlicer_h
 #define __vtkMAFVolumeSlicer_h
 
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 #include "vtkDataSetToDataSetFilter.h"
 #include "vtkImageData.h"
 #include "vtkPolyData.h"
@@ -42,7 +42,7 @@
 class vtkRectilinearGrid;
 class vtkLinearTransform;
 
-class VTK_vtkMAF_EXPORT vtkMAFVolumeSlicer : public vtkDataSetToDataSetFilter {
+class MAF_EXPORT vtkMAFVolumeSlicer : public vtkDataSetToDataSetFilter {
 public:
   static vtkMAFVolumeSlicer *New();
   vtkTypeRevisionMacro(vtkMAFVolumeSlicer, vtkDataSetToDataSetFilter);

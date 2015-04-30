@@ -1,0 +1,4 @@
+40c40
+<   #if defined _M_IX86
+---
+>   #if defined _M_IX86 || defined _M_X64

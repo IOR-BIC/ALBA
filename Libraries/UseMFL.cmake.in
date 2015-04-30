@@ -18,6 +18,7 @@ SET(MAF_USE_VCOLLIDE @MAF_USE_VCOLLIDE@)
 SET(MAF_USE_XercesC @MAF_USE_XercesC@)
 SET(MAF_USE_CURL @MAF_USE_CURL@)
 SET(MAF_USE_CRYPTO @MAF_USE_CRYPTO@)
+SET(MAF_USE_OFFIS @MAF_USE_OFFIS@)
 
 # path to MFL binary directory
 SET (MFL_BINARY_PATH @MFL_BINARY_DIR@)
@@ -115,6 +116,33 @@ IF (MAF_USE_CRYPTO)
     INCLUDE (${CRYPTO_USE_FILE}) # currently only local library is supported
   ENDIF (CRYPTO_USE_FILE)
 ENDIF (MAF_USE_CRYPTO)
+
+#
+# Offis library
+#
+IF (MAF_USE_OFFIS)
+  SET (Offis_POSSIBLE_ROOT_PATHS @MFL_BINARY_DIR@/Offis/Build @MFL_SOURCE_DIR@/Offis/Sources)
+  FIND_FILE(Offis_USE_FILE UseOffis.cmake ${Offis_POSSIBLE_ROOT_PATHS})
+  FIND_PATH(Offis_BINARY_PATH UseOffis.cmake ${Offis_POSSIBLE_ROOT_PATHS})
+  IF (Offis_USE_FILE)
+    INCLUDE (${Offis_USE_FILE}) # currently only local library is supported
+  ENDIF (Offis_USE_FILE)
+ENDIF (MAF_USE_OFFIS)
+
+#
+# BTK library
+#
+IF (${CMAKE_GENERATOR} STREQUAL "Visual Studio 9 2008" OR ${CMAKE_GENERATOR} STREQUAL "Visual Studio 10" OR ${CMAKE_GENERATOR} STREQUAL "Visual Studio 10 Win64")
+  SET(MAF_USE_BTK @MAF_USE_BTK@)
+  IF (MAF_USE_BTK)
+    SET (BTK_POSSIBLE_ROOT_PATHS @MFL_BINARY_DIR@/BTK/Build @MFL_SOURCE_DIR@/BTK/Sources)
+    FIND_FILE(BTK_USE_FILE UseBTK.cmake ${BTK_POSSIBLE_ROOT_PATHS})
+    FIND_PATH(BTK_BINARY_PATH UseBTK.cmake ${BTK_POSSIBLE_ROOT_PATHS})
+    IF (BTK_USE_FILE)
+      INCLUDE (${BTK_USE_FILE}) # currently only local library is supported
+    ENDIF (BTK_USE_FILE)
+  ENDIF (MAF_USE_BTK)
+ENDIF (${CMAKE_GENERATOR} STREQUAL "Visual Studio 9 2008" OR ${CMAKE_GENERATOR} STREQUAL "Visual Studio 10" OR ${CMAKE_GENERATOR} STREQUAL "Visual Studio 10 Win64")
 
 #
 # wxMozilla library

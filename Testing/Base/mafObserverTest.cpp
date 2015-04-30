@@ -38,14 +38,7 @@
 #include <iostream>
 #include <utility>
 
-//creation of test object
-class mafTestObject: public mafReferenceCounted
-{
-public:
-  mafTypeMacro(mafTestObject,mafReferenceCounted);
-};
 
-mafCxxTypeMacro(mafTestObject);
 
 /** a subject class, i.e. a class with a couple of event source members observer class. */
 class mafSubjectTestClass: public mafObject

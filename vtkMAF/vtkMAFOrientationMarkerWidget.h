@@ -17,7 +17,7 @@
 #define __vtkMAFOrientationMarkerWidget_h
 
 #include "vtkInteractorObserver.h"
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 
 class vtkActor2D;
 class vtkPolyData;
@@ -84,7 +84,7 @@ vtkInteractorObserver vtkXYPlotWidget vtkScalarBarWidget vtkAxesActor
 vtkAnnotatedCubeActor
 
 */
-class VTK_vtkMAF_EXPORT vtkMAFOrientationMarkerWidget : public vtkInteractorObserver
+class MAF_EXPORT vtkMAFOrientationMarkerWidget : public vtkInteractorObserver
 {
 public:
   static vtkMAFOrientationMarkerWidget* New();

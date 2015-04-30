@@ -24,6 +24,7 @@
 //----------------------------------------------------------------------------
 
 #include "mafGizmoScaleIsotropicTest.h"
+#include "mafInteractionTests.h"
 
 #include <cppunit/config/SourcePrefix.h>
 #include <iostream>
@@ -53,29 +54,6 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkDataSetMapper.h"
 
-/** testing facility to receive events */
-class mockListener : public mafObserver 
-{
-public:
-  mockListener() : m_Listener(NULL), m_Event(NULL), m_Id(-1) {}
-  virtual ~mockListener() {}
-
-  /** Set the event receiver object*/
-  void  SetListener(mafObserver *Listener) {m_Listener = Listener;};
-
-  /** Events handling*/        
-  void OnEvent(mafEventBase *maf_event) {m_Id = maf_event->GetId(); m_Event = *maf_event;};
-
-  mafEventBase *GetEvent() {return &m_Event;};
-
-private:
-  /**
-  Register the event receiver object*/
-  mafObserver *m_Listener;
-
-  mafEventBase m_Event;
-  mafID m_Id;
-};
 
 void mafGizmoScaleIsotropicTest::setUp()
 {

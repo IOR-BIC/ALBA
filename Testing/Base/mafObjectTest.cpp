@@ -25,6 +25,7 @@
 
 #include <cppunit/config/SourcePrefix.h>
 
+#include "mafBaseTests.h"
 #include "mafObject.h"
 #include "mafObjectTest.h"
 #include "vtkMAFSmartPointer.h"
@@ -34,14 +35,7 @@
 #include <iostream>
 #include <utility>
 
-//creation of test object
-class mafTestObject: public mafObject
-{
-public:
-  mafTypeMacro(mafTestObject,mafObject);
-};
 
-mafCxxTypeMacro(mafTestObject);
 
 //----------------------------------------------------------------------------
 void mafObjectTest::TestFixture()

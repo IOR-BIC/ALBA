@@ -35,12 +35,12 @@
 #ifndef __vtkMAFRemoveCellsFilter_h
 #define __vtkMAFRemoveCellsFilter_h
 
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 #include "vtkMAFCellsFilter.h"
 
 class vtkLookupTable;
 
-class VTK_vtkMAF_EXPORT vtkMAFRemoveCellsFilter : public vtkMAFCellsFilter
+class MAF_EXPORT vtkMAFRemoveCellsFilter : public vtkMAFCellsFilter
 {
 public:
   // Description:

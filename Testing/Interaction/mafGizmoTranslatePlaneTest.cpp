@@ -24,6 +24,7 @@
 //----------------------------------------------------------------------------
 
 #include "mafGizmoTranslatePlaneTest.h"
+#include "mafInteractionTests.h"
 
 #include <cppunit/config/SourcePrefix.h>
 #include <iostream>
@@ -55,27 +56,6 @@
 #include "vtkDataSetMapper.h"
 #include "vtkLineSource.h"
 #include "vtkPlaneSource.h"
-
-/** testing facility to receive events */
-class mockListener : public mafObserver 
-{
-public:
-
-  /** Set the event receiver object*/
-  void  SetListener(mafObserver *Listener) {m_Listener = Listener;};
-
-  /** Events handling*/        
-  virtual void OnEvent(mafEventBase *maf_event) {m_Event = maf_event;};
-
-  mafEventBase *GetEvent() {return m_Event;};
-
-private:
-  /**
-  Register the event receiver object*/
-  mafObserver *m_Listener;
-
-  mafEventBase *m_Event;
-};
 
 void mafGizmoTranslatePlaneTest::setUp()
 {

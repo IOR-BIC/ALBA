@@ -24,6 +24,7 @@
 //----------------------------------------------------------------------------
 
 #include <cppunit/config/SourcePrefix.h>
+#include "mafCoreTests.h"
 #include "mafVMEStorageTest2.h"
 
 #include "mafVMEFactory.h"
@@ -41,7 +42,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkMAFSmartPointer.h"
 
-#include <wx/dir.h>
+
 
 #include <iostream>
 
@@ -51,26 +52,7 @@ const char *storage1Dir = "storage1Dir";
 // file must have an extension otherwise store will fail!
 const char *storage1MSF = "storage1.msf";
 
-bool RemoveDir(const char *dirName)
-{
-  wxArrayString filenameArray;
-  wxDir::GetAllFiles(dirName,&filenameArray);
-  for (int index = 0; index < filenameArray.size(); index++)
-  {
-    wxRemoveFile(filenameArray.Item(index));
-  }
 
-  bool result = TRUE;
-
-  result = wxRmdir(dirName);
-  if (result == false)
-  {
-    return false;
-  }
-
-  return true;
-
-}
 
 //----------------------------------------------------------------------------
 void mafVMEStorageTest2::TestFixture()

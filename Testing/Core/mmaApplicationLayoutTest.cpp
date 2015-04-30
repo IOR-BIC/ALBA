@@ -24,6 +24,7 @@
 //----------------------------------------------------------------------------
 
 #include <cppunit/config/SourcePrefix.h>
+#include "mafCoreTests.h"
 #include "mmaApplicationLayoutTest.h"
 
 #include "mafSmartPointer.h"
@@ -45,14 +46,19 @@ void mmaApplicationLayoutTest::TestFixture()
 void mmaApplicationLayoutTest::setUp()
 //----------------------------------------------------------------------------
 {
-  m_Toplevel = new wxFrame(NULL,-1,"Title");
+	m_App = new TestApp();  // Instantiate the application class
+	m_App->argc = 0;        // set the number of input argument to 0
+	m_App->argv = NULL;     // set to NULL the input argument's parameters
+
+  m_Toplevel = new wxFrame(m_App->GetTopWindow(),-1,"Title");
   result = false;
 }
 //----------------------------------------------------------------------------
 void mmaApplicationLayoutTest::tearDown()
 //----------------------------------------------------------------------------
 {
-  cppDEL(m_Toplevel);
+	cppDEL(m_App);  // Destroy the application
+	wxAppConsole::SetInstance(NULL);
 }
 //----------------------------------------------------------------------------
 void mmaApplicationLayoutTest::TestDynamicAllocation()

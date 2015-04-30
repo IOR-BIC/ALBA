@@ -23,6 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include <cppunit/config/SourcePrefix.h>
+#include "mafBaseTests.h"
 #include "mafObjectFactoryTest.h"
 
 #include "mafObject.h"
@@ -47,16 +48,6 @@ public:
 
 mafCxxTypeMacro(mafDummyFactory);
 
-/** a mafObject to be placed in the factory. */
-class mafFooObject: public mafObject
-{
-public:
-  mafTypeMacro(mafFooObject,mafObject);
-  mafFooObject() {}
-  void Print(std::ostream &out) {out<<"Foo";}
-};
-
-mafCxxTypeMacro(mafFooObject);
 
 /** a mafObject to be placed in the factory. */
 class mafDummyObject: public mafObject

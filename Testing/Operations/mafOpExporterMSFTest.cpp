@@ -24,6 +24,8 @@
 //----------------------------------------------------------------------------
 
 #include <cppunit/config/SourcePrefix.h>
+#include "mafOperationsTests.h"
+
 #include "mafOpExporterMSFTest.h"
 
 #include "mafOpExporterMSF.h"
@@ -34,24 +36,6 @@
 #include "mafVMEGroup.h"
 
 
-//----------------------------------------------------------------------------
-class DummyVme : public mafVME
-//----------------------------------------------------------------------------
-{
-public:
-  DummyVme(){};
-  ~DummyVme(){};
-
-  mafTypeMacro(DummyVme,mafVME);
-
-  /*virtual*/ void SetMatrix(const mafMatrix &mat){};
-  /*virtual*/ void GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes){};
-
-protected:
-private:
-};
-
-mafCxxTypeMacro(DummyVme);
 
 //----------------------------------------------------------------------------
 void mafOpExporterMSFTest::TestFixture()

@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "vtkMAFConfigure.h"
+#include "mafConfigure.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataToPolyDataFilter.h"
 
@@ -33,7 +33,7 @@
   Class used for clip an input surface with a box generated with the extrusion for example of a plane.
   The ClipInside flag is used to retrieve one of the two parts in which the input surface is clipped.
 */
-class VTK_vtkMAF_EXPORT vtkMAFClipSurfaceBoundingBox : public vtkPolyDataToPolyDataFilter 
+class MAF_EXPORT vtkMAFClipSurfaceBoundingBox : public vtkPolyDataToPolyDataFilter 
 {
 
 public:

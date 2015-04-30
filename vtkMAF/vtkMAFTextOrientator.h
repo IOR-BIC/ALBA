@@ -35,7 +35,7 @@
 #define __vtkMAFTextOrientator_h
 
 
-#include "vtkMAFConfigure.h" //??
+#include "mafConfigure.h" 
 
 
 #include "vtkActor2D.h"
@@ -55,7 +55,7 @@ class name: vtkMAFTextOrientator
 an actor displaying world X and Y axes as an Actor2D.
 Camera must be in ParallelProjection and aligned with world axis
 */
-class VTK_vtkMAF_EXPORT vtkMAFTextOrientator : public vtkActor2D
+class MAF_EXPORT vtkMAFTextOrientator : public vtkActor2D
 {
  public:
   /** RTTI Macro */

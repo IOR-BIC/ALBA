@@ -24,6 +24,8 @@
 //----------------------------------------------------------------------------
 
 #include <cppunit/config/SourcePrefix.h>
+#include "mafOperationsTests.h"
+
 #include "mafOpCreateSlicerTest.h"
 
 #include "mafVMEOutputNULL.h"
@@ -31,70 +33,6 @@
 #include "mafOpCreateSlicer.h"
 
 #define TEST_RESULT CPPUNIT_ASSERT(result);
-
-//----------------------------------------------------------------------------
-class DummyVme : public mafVME
-//----------------------------------------------------------------------------
-{
-public:
-  DummyVme(){};
-  ~DummyVme(){};
-
-  mafTypeMacro(DummyVme,mafVME);
-
-  /*virtual*/ void SetMatrix(const mafMatrix &mat){};
-  /*virtual*/ void GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes){};
-  /*virtual*/ mafVMEOutput *GetOutput();
-
-protected:
-private:
-};
-
-//-------------------------------------------------------------------------
-mafVMEOutput *DummyVme::GetOutput()
-//-------------------------------------------------------------------------
-{
-  // allocate the right type of output on demand
-  if (m_Output==NULL)
-  {
-    SetOutput(mafVMEOutputNULL::New()); // create the output
-  }
-  return m_Output;
-}
-
-
-mafCxxTypeMacro(DummyVme);
-
-//----------------------------------------------------------------------------
-class DummyObserver : public mafObserver
-//----------------------------------------------------------------------------
-{
-public:
-
-  DummyObserver() {m_DummyVme = new DummyVme();};
-  ~DummyObserver() {delete m_DummyVme;};
-
-  /*virtual*/ void OnEvent(mafEventBase *maf_event);
-
-protected:
-  DummyVme *m_DummyVme;
-};
-//----------------------------------------------------------------------------
-void DummyObserver::OnEvent(mafEventBase *maf_event)
-//----------------------------------------------------------------------------
-{
-  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
-  {
-    if(e->GetId() == VME_REMOVE)
-    {
-      e->GetVme()->ReparentTo(NULL);
-    }
-    else if (e->GetId() == VME_CHOOSE)
-    {
-      e->SetVme(m_DummyVme);
-    }
-  }
-}
 
 //----------------------------------------------------------------------------
 void mafOpCreateSlicerTest::TestFixture()

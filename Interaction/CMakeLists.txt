@@ -72,6 +72,10 @@ SET(PROJECT_SRCS
   mafGizmoTranslateAxis.h
   mafGizmoTranslatePlane.cpp
   mafGizmoTranslatePlane.h
+  mafGizmoSlice.cpp
+  mafGizmoSlice.h
+  mafGizmoInteractionDebugger.cpp
+  mafGizmoInteractionDebugger.h
   mafGUIGizmoInterface.cpp
   mafGUIGizmoInterface.h
   mafGUIGizmoRotate.cpp
@@ -139,6 +143,57 @@ SET(PROJECT_SRCS
   mafInteractorSelectCell.h
   mafInteractorSER.cpp
   mafInteractorSER.h
+  ######################
+  medInteractorPicker.cpp
+  medInteractorPicker.h
+  mafInteractorDICOMImporter.h
+  mafInteractorDICOMImporter.cpp  
+  medInteractor2DAngle.cpp
+  medInteractor2DAngle.h
+  medInteractor2DDistance.cpp
+  medInteractor2DDistance.h
+  medInteractor2DIndicator.cpp
+  medInteractor2DIndicator.h
+  mafInteractorSegmentationPicker.cpp
+  mafInteractorSegmentationPicker.h 
+  mafInteractorPERScalarInformation.cpp
+  mafInteractorPERScalarInformation.h
+  mafInteractorPERBrushFeedback.cpp
+  mafInteractorPERBrushFeedback.h
+  mmiVTKPicker.cpp
+  mmiVTKPicker.h
+  mmiInfoImage.cpp
+  mmiInfoImage.h
+  mmiSelectPoint.cpp
+  mmiSelectPoint.h
+  mafGizmoPolylineGraph.cpp
+  mafGizmoPolylineGraph.h
+  mafDeviceButtonsPadMouseDialog.h
+  mafDeviceButtonsPadMouseDialog.cpp
+  mafGUITransformSliders.cpp
+  mafGUITransformSliders.h
+  
+  ##### Introduced with VolumeLarge - to be committed down ###
+  # mafGizmoROI_BES.cpp
+  # mafGizmoROI_BES.h  
+  ############################################################
+
+  mafGizmoCrossRotateTranslate.cpp
+  mafGizmoCrossRotateTranslate.h
+	  
+  mafGizmoCrossRotate.cpp
+  mafGizmoCrossRotate.h
+  mafGizmoCrossRotateAxis.cpp
+  mafGizmoCrossRotateAxis.h
+  mafGizmoCrossRotateFan.cpp
+  mafGizmoCrossRotateFan.h
+
+  mafGizmoCrossTranslate.cpp
+  mafGizmoCrossTranslate.h
+  mafGizmoCrossTranslateAxis.cpp
+  mafGizmoCrossTranslateAxis.h
+  mafGizmoCrossTranslatePlane.cpp
+  mafGizmoCrossTranslatePlane.h
 )
 
 ## SIL == removed under Linux - since it requires mafDrivers - which seems to be Win32 only
@@ -199,9 +254,11 @@ SET(PROJECT_LIBS mafBase mafIO mafGui vtkMAF)
 ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
 
+ADD_DEPENDENCIES(${PROJECT_NAME} mafCommon mafVME vtkMAF)
+
 IF (MAF_USE_WX)
   ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_WXWIN_LIBRARY)
 ENDIF (MAF_USE_WX)
 
-CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/mafInteractionConfigure.h.in ${PROJECT_BINARY_DIR}/mafInteractionConfigure.h IMMEDIATE)
+#CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/mafInteractionConfigure.h.in ${PROJECT_BINARY_DIR}/mafInteractionConfigure.h IMMEDIATE)
 
