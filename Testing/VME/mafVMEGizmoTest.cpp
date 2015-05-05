@@ -241,9 +241,7 @@ void mafVMEGizmoTest::TestGizmoVisualizatioAlone()
   mapper->SetInput(gizmo->GetSurfaceOutput()->GetVTKData());
   
   renWin->Render();
-  Sleep(500);
-
-  CPPUNIT_ASSERT(true);
+  
 }
 
 //----------------------------------------------------------------------------

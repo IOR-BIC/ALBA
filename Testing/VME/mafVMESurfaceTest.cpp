@@ -145,8 +145,6 @@ void mafVMESurfaceTest::TestVMESurfaceVisualization()
   mapper->SetInput(sphereSurfaceVME->GetSurfaceOutput()->GetVTKData());
 
   renWin->Render();
-  Sleep(500);
-
   CPPUNIT_ASSERT(true);
 }
 

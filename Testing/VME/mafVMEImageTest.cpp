@@ -151,9 +151,6 @@ void mafVMEImageTest::TestVMEImageVisualization()
   mapper->SetScalarRange(scalars->GetRange());
 
   renWin->Render();
-  Sleep(500);
-
-  CPPUNIT_ASSERT(true);
   delete wxLog::SetActiveTarget(NULL);
 }
 

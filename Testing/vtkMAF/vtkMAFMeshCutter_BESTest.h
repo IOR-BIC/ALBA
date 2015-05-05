@@ -57,7 +57,6 @@ class vtkMAFMeshCutter_BESTest : public CPPUNIT_NS::TestFixture
     CPPUNIT_TEST( TestGetOutputTet4 );
     CPPUNIT_TEST( TestUpdateChangeCutFunction );
     CPPUNIT_TEST( TestUpdateChangeInput );
-    CPPUNIT_TEST( TestWait ) ;
     CPPUNIT_TEST_SUITE_END();
 
   protected:
@@ -76,7 +75,6 @@ class vtkMAFMeshCutter_BESTest : public CPPUNIT_NS::TestFixture
     void TestGetOutputTet4();
     void TestUpdateChangeCutFunction();
     void TestUpdateChangeInput() ;
-    void TestWait() {Sleep(5000);} ; // empty test to generate pause
 
     // return true if v = (1-lambda)*v0 + lambda*v1
     bool ColinearVectors(double *v, double *v0, double *v1, double lambda, double ftol) ;
