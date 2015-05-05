@@ -92,6 +92,7 @@ void mafOpEditNormalsTest::Test()
 
 	vtkFloatArray *pointNormals2=vtkFloatArray::SafeDownCast(resultPolydata2->GetPointData()->GetNormals());
 
+	bool normalBetweenEpsilon=true;
 	float *v1,*v2;
   for(int i=0; i< pointNormals1->GetSize(); i++)
 	{
@@ -107,9 +108,14 @@ void mafOpEditNormalsTest::Test()
 		vtkMath::Normalize(norm1);
 		vtkMath::Normalize(norm2);
 		double result = vtkMath::Dot(norm1,norm2);
-		CPPUNIT_ASSERT( result+EPSILON >= -1 || result-EPSILON <= -1 );
+		if( !(result+EPSILON >= -1 || result-EPSILON <= -1) )
+		{
+			normalBetweenEpsilon==false;
+			break;
+		}
 	}
-	
+	CPPUNIT_ASSERT( normalBetweenEpsilon);
+
 	mafDEL(editNormals1);
 	mafDEL(editNormals2);
 }
@@ -208,12 +214,18 @@ void mafOpEditNormalsTest::TestUndo2()
 	vtkFloatArray *pointNormalsOriginal2=vtkFloatArray::SafeDownCast(originalPolydata->GetPointData()->GetNormals());
 
 	float *v1,*v2;
+	bool vectorEquals=true;
 	for(int i=0; i< pointNormalsResult2->GetSize(); i++)
 	{
 		v1=pointNormalsResult2->GetPointer(i);
 		v2=pointNormalsOriginal2->GetPointer(i);
-		CPPUNIT_ASSERT(v1[0] == v2[0] && v1[1] == v2[1] && v1[2] == v2[2]);
+		if(v1[0] != v2[0] || v1[1] != v2[1] || v1[2] != v2[2])
+		{
+			vectorEquals=false;
+			break;
+		}
 	}
+	CPPUNIT_ASSERT(vectorEquals);
 
 	mafDEL(editNormals1);
 	mafDEL(editNormals2);
