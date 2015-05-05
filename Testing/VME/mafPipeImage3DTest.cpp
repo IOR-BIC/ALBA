@@ -147,7 +147,6 @@ void mafPipeImage3DTest::TestPipeRGBImageExecution()
 
   m_RenderWindow->Render();
 	printf("\n-> RGB <-\n");
-  mafSleep(800);
   CompareImages(0);
 
 	CPPUNIT_ASSERT(!pipeImage3D->IsGrayImage());
@@ -224,7 +223,6 @@ void mafPipeImage3DTest::TestPipeGrayImageExecution()
 
 	m_RenderWindow->Render();
 	printf("\n-> Gray <-\n");
-	mafSleep(800);
 	CompareImages(1);
 
 	CPPUNIT_ASSERT(pipeImage3D->IsGrayImage());

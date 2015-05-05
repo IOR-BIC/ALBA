@@ -55,8 +55,6 @@ void mafGizmoHandleTest::setUp()
 
 void mafGizmoHandleTest::tearDown()
 {
-  mafSleep(500);
-
   mafDEL(m_GizmoInputSurface);
   mafDEL(m_Root); 
 }

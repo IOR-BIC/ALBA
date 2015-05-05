@@ -139,7 +139,6 @@ void mafPipeVolumeProjectedTest::TestPipeExecution()
 
     m_Renderer->ResetCamera();
     m_RenderWindow->Render();
-    mafSleep(800);
     CompareImages(camera);
 
     m_Renderer->RemoveAllProps();

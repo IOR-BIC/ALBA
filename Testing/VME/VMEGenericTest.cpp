@@ -397,7 +397,6 @@ void VMEGenericTest::VMEGenericMainTest()
     renderer->GetActiveCamera()->Azimuth(-1);
     renderer->ResetCameraClippingRange();
     renWin->Render();
-    mafSleep(10);
   }
 
   //--------------------------------------------------------------------------
@@ -554,8 +553,6 @@ void VMEGenericTest::VMEGenericMainTest()
 
   renderer->AddActor(tree4DBoundsActor);
 
-  //mafSleep(500);
-
   //renderer->ResetCamera();
   renWin->Render();
 
@@ -575,8 +572,6 @@ void VMEGenericTest::VMEGenericMainTest()
     renderer->ResetCameraClippingRange();
     renderer->GetActiveCamera()->Azimuth(1);
     renWin->Render();
-
-    mafSleep(10);
 
     root->GetOutput()->GetBounds(treeBounds);
     //vtitle->GetOutput()->GetBounds(treeBounds);

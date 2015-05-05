@@ -201,7 +201,6 @@ void mafPipeVolumeSlice_BESTest::TestPipeExecution()
 
       m_RenderWindow->Render();
       printf("\n Visualization: %s \n", strings);
-      mafSleep(1000);
       CompareImages(3*direction+i);
     }
 
@@ -448,7 +447,6 @@ void mafPipeVolumeSlice_BESTest::TestPipeExecution_SetSliceOpacity()
 
       m_RenderWindow->Render();
       printf("\n Visualization: %s \n", strings);
-      mafSleep(1000);
       CompareImages(ID_TEST_PIPEEXECUTION_SLICEOPACITY + 3*direction+i);
     }
 
@@ -583,7 +581,6 @@ void mafPipeVolumeSlice_BESTest::TestPipeExecution_SetLutRange()
 
       m_RenderWindow->Render();
       printf("\n Visualization: %s \n", strings);
-      mafSleep(1000);
       CompareImages(ID_TEST_PIPEEXECUTION_LUTRANGE + 3*direction+i);
     }
 
@@ -715,7 +712,6 @@ void mafPipeVolumeSlice_BESTest::TestPipeExecution_SetColorLookupTable()
 
       m_RenderWindow->Render();
       printf("\n Visualization: %s \n", strings);
-      mafSleep(1000);
       CompareImages(ID_TEST_PIPEEXECUTION_COLORLOOKUPTABLE + 3*direction+i);
     }
 
@@ -831,7 +827,6 @@ void mafPipeVolumeSlice_BESTest::TestPipeExecution_TicksOnOff()
 
       m_RenderWindow->Render();
       printf("\n Visualization: %s \n", strings);
-      mafSleep(1000);
       CompareImages(ID_TEST_PIPEEXECUTION_TICKS + showticks*3 +i);
     }
 

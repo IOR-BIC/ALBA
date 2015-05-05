@@ -60,8 +60,6 @@ void mafAttachCameraTest::setUp()
 
 void mafAttachCameraTest::tearDown()
 {
-  mafSleep(500);
-
   m_Renderer->Delete();
   m_RenderWindow->Delete();
   m_RenderWindowInteractor->Delete();

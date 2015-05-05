@@ -65,8 +65,6 @@ void mafGizmoRotateFanTest::setUp()
 
 void mafGizmoRotateFanTest::tearDown()
 {
-  mafSleep(500);
-
   m_Renderer->Delete();
   m_RenderWindow->Delete();
   m_RenderWindowInteractor->Delete();
@@ -108,12 +106,8 @@ void mafGizmoRotateFanTest::TestConstructor()
   
   RenderData(m_GizmoInputSurface->GetOutput()->GetVTKData());
   RenderGizmo(gizmoRotateFan);
-  mafSleep(500);
-
-  // m_RenderWindowInteractor->Start();
 
   cppDEL(gizmoRotateFan);
-
 }
 
 

@@ -65,8 +65,6 @@ void mafGizmoTranslatePlaneTest::setUp()
 
 void mafGizmoTranslatePlaneTest::tearDown()
 {
-  mafSleep(500);
-
   m_Renderer->Delete();
   m_RenderWindow->Delete();
   m_RenderWindowInteractor->Delete();
@@ -114,15 +112,12 @@ void mafGizmoTranslatePlaneTest::TestConstructor()
   RenderData(m_GizmoInputSurface->GetOutput()->GetVTKData());
   
   RenderGizmo(gizmoTranslatePlane);
-  mafSleep(500);
 
   gizmoTranslatePlane->SetPlane(mafGizmoTranslatePlane::XZ);
   RenderGizmo(gizmoTranslatePlane);
-  mafSleep(500);
   
   gizmoTranslatePlane->SetPlane(mafGizmoTranslatePlane::YZ);
   RenderGizmo(gizmoTranslatePlane);
-  mafSleep(500);
 
   // m_RenderWindowInteractor->Start();
 

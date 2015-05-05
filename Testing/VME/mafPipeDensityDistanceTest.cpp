@@ -145,7 +145,6 @@ void mafPipeDensityDistanceTest::TestPipeExecution()
   CPPUNIT_ASSERT(cloudActor != NULL);
 
   m_RenderWindow->Render();
-  mafSleep(800);
   CompareImages(0);
   vtkDEL(actorList);
 

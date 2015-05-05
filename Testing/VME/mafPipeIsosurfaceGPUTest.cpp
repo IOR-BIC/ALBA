@@ -151,7 +151,6 @@ void mafPipeIsosurfaceGPUTest::TestPipeExecutionCountour()
     
     printf("\n Visualization: \n");
     CompareImages(v + ID_CONTOUR_COMPARING);
-    mafSleep(1000);
 
     m_Renderer->RemoveAllProps();
     //vtkDEL(actorList);
@@ -238,7 +237,6 @@ void mafPipeIsosurfaceGPUTest::TestPipeExecutionOpacity()
 
     printf("\n Visualization: \n");
     CompareImages(v + ID_OPACITY_COMPARING);
-    mafSleep(1000);
 
     m_Renderer->RemoveAllProps();
     //vtkDEL(actorList);
@@ -329,8 +327,6 @@ void mafPipeIsosurfaceGPUTest::TestExtractIsosurface()
     isoSurface->Update();
 
     CPPUNIT_ASSERT(isoSurface && isoSurface->GetNumberOfPoints() != 0);
-
-    mafSleep(1000);
 
     m_Renderer->RemoveAllProps();
     //vtkDEL(actorList);

@@ -114,9 +114,6 @@ void mafOpRemoveCellsTest::RenderData( vtkPolyData *data )
   renderWindow->Render();
 
   renderWindowInteractor->Start();
-
-  mafSleep(1000);
-
 }
 
 void mafOpRemoveCellsTest::TestRemoveCells()

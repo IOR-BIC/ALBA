@@ -189,7 +189,6 @@ void mafPipePointSetTest::TestPipeExecution()
 		m_RenderWindow->Render();
 		printf("\n Visualization: azimut->%d elev->%d  - %s \n", i, j, i>15?"selected":"NOT selected");
 		CompareImages(i);
-		mafSleep(600);
 	}
   //m_RenderWindowInteractor->Start();
   

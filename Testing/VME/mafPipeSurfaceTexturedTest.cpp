@@ -210,9 +210,7 @@ void mafPipeSurfaceTexturedTest::TestPipeTextureExecution()
 
     m_RenderWindow->Render();
 	  printf("\n Visualizzazione: %s \n", strings[i]);
-    mafSleep(800);
     CompareImages(i);
-
   }
 
   vtkDEL(actorList);
@@ -312,7 +310,6 @@ void mafPipeSurfaceTexturedTest::TestPipeClassicExecution()
 
 		m_RenderWindow->Render();
 		printf("\n Visualizzazione: %s \n", strings[i-SCALAR_TEST]);
-		mafSleep(800);
 		CompareImages(i);
 
 		if(i == SCALAR_TEST)

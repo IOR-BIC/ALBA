@@ -296,7 +296,6 @@ void mafPipeVolumeDRRTest::TestPipeExecution()
 
     m_RenderWindow->Render();
     printf("\n Visualizzazione: %s \n", strings[i]);
-    mafSleep(800);
     CompareImages(i);
 
     if(i == COLOR_TEST)

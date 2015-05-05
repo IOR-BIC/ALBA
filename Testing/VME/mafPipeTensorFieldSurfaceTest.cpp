@@ -130,7 +130,6 @@ void mafPipeTensorFieldSurfaceTest::TestCreate()
 
 
   //renderWindow->Render();
-  //mafSleep(800);
   //CompareImages(0);
 
   delete pipe;

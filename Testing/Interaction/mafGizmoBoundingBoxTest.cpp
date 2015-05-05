@@ -63,8 +63,6 @@ void mafGizmoBoundingBoxTest::setUp()
 
 void mafGizmoBoundingBoxTest::tearDown()
 {
-  mafSleep(500);
-
   m_Renderer->Delete();
   m_RenderWindow->Delete();
   m_RenderWindowInteractor->Delete();
@@ -110,8 +108,6 @@ void mafGizmoBoundingBoxTest::TestConstructor()
   
   RenderData(m_GizmoInputSurface->GetOutput()->GetVTKData());
   RenderGizmo(gizmoBoundingBox);
-  mafSleep(500);
-
   // m_RenderWindowInteractor->Start();
 
   cppDEL(gizmoBoundingBox);
