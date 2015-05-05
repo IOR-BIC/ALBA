@@ -97,11 +97,17 @@ void mafVMELabeledVolumeTest::TestVolumeCopy()
 
   //Check if the mafVMELabeledVolume without labels has all the scalars set to 0.
   int not = labelScalars->GetNumberOfTuples();
+	bool sameScalars=true;
   for ( int i = 0; i < not; i++ )
   {
     double labelValue = labelScalars->GetComponent( i, 0 );
-    CPPUNIT_ASSERT(labelValue == OUTRANGE_SCALAR);
+    if (labelValue != OUTRANGE_SCALAR)
+		{
+			sameScalars=false;
+			break;
+		}
   }
+	CPPUNIT_ASSERT(sameScalars);
 }
 
 //---------------------------------------------------------------
@@ -150,19 +156,29 @@ void mafVMELabeledVolumeTest::TestGenerateLabeledVolume()
   //Check if the mafVMELabeledVolume with one label has the correct scalars
   int not = volumeScalars->GetNumberOfTuples();
   double labelValue, volumeValue;
+	bool sameScalars=true;
   for ( int i = 0; i < not; i++ )
   {
     volumeValue = volumeScalars->GetComponent( i, 0 );
     labelValue = labelScalars->GetComponent( i, 0 );
     if ( volumeValue >= min && volumeValue <= max )
     { 
-      CPPUNIT_ASSERT(labelValue == newValue);
+      if(labelValue != newValue)
+			{
+				sameScalars=false;
+				break;
+			}
     }
     else
     {
-      CPPUNIT_ASSERT(labelValue == OUTRANGE_SCALAR);
+      if(labelValue != OUTRANGE_SCALAR)
+			{
+				sameScalars=false;
+				break;
+			}
     }
   }
+	CPPUNIT_ASSERT(sameScalars);
 }
 
 //---------------------------------------------------------------
@@ -205,11 +221,18 @@ void mafVMELabeledVolumeTest::TestRemoveLabelTag()
 
   //Check if the mafVMELabeledVolume without labels has all the scalars set to 0.
   int not = labelScalars->GetNumberOfTuples();
+	bool sameScalars=true;
   for ( int i = 0; i < not; i++ )
   {
     double labelValue = labelScalars->GetComponent( i, 0 );
-    CPPUNIT_ASSERT(labelValue == OUTRANGE_SCALAR);
-  }
+		if (labelValue != OUTRANGE_SCALAR)
+		{
+			sameScalars=false;
+			break;
+		}
+	}
+	CPPUNIT_ASSERT(sameScalars);
+
 }
 
 //---------------------------------------------------------------
@@ -264,19 +287,29 @@ void mafVMELabeledVolumeTest::TestSetLabelTag()
   //Check if the mafVMELabeledVolume with one label has the correct scalars
   int not = volumeScalars->GetNumberOfTuples();
   double labelValue, volumeValue;
+	bool sameValues=true;
   for ( int i = 0; i < not; i++ )
   {
     volumeValue = volumeScalars->GetComponent( i, 0 );
     labelValue = labelScalars->GetComponent( i, 0 );
     if ( volumeValue >= min && volumeValue <= max )
     { 
-      CPPUNIT_ASSERT(labelValue == newValue);
+      if(labelValue != newValue)
+			{
+				sameValues=false;
+				break;
+			}
     }
     else
     {
-      CPPUNIT_ASSERT(labelValue == OUTRANGE_SCALAR);
+      if (labelValue != OUTRANGE_SCALAR)
+			{
+				sameValues=false;
+				break;
+			}
     }
   }
+	CPPUNIT_ASSERT(sameValues);
 }
 //---------------------------------------------------------------
 void mafVMELabeledVolumeTest::TestDeepCopy()
@@ -345,11 +378,17 @@ void mafVMELabeledVolumeTest::TestDeepCopy()
   //Check if the labeled volume and its copy have the same scalars
   int not = labelScalars->GetNumberOfTuples();
   double labelValue, labelCopiedValue;
+	bool sameValues=true;
   for ( int i = 0; i < not; i++ )
   {
     labelCopiedValue = labelCopiedScalars->GetComponent( i, 0 );
     labelValue = labelScalars->GetComponent( i, 0 );
     
-    CPPUNIT_ASSERT(labelValue == labelCopiedValue);
+    if(labelValue != labelCopiedValue)
+		{
+			sameValues=false;
+			break;
+		}
   }
+	CPPUNIT_ASSERT(sameValues);
 }
