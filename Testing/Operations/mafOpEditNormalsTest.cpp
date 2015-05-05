@@ -218,7 +218,7 @@ void mafOpEditNormalsTest::TestUndo2()
 	
 	float *v1,*v2;
 	bool vectorEquals=true;
-	for(int i=0; i< pointNormalsResult2->GetSize(); i++)
+	for(int i=0; i< pointNormalsResult2->GetSize()-1; i++)
 	{
 		v1=pointNormalsResult2->GetPointer(i);
 		v2=pointNormalsOriginal2->GetPointer(i);
