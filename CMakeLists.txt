@@ -12,6 +12,8 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
 
 PROJECT (MAF)
 
+
+
 IF(CMAKE_VERSION VERSION_LESS 2.8)
 MESSAGE (FATAL_ERROR "CMAKE version must be greater than 2.8")
 ENDIF (CMAKE_VERSION VERSION_LESS 2.8)
@@ -20,7 +22,22 @@ IF(COMMAND cmake_policy)
     cmake_policy(SET CMP0003 NEW)
 ENDIF(COMMAND cmake_policy)
 
-PROJECT (MAF)
+#-----------------------------------------------------------------------------
+# This enables support for Visual Studio: Edit & Continue, OpenMP, and parallel compilation
+#-----------------------------------------------------------------------------
+IF (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
+	#Add OpenMP Support
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /openmp")
+
+	#Add support for Edit & Continue
+	SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /ZI")
+	IF (NOT ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 17.0)
+		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+		SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /SAFESEH:NO")
+	ENDIF (NOT ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 17.0)
+ENDIF (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
+
+
 
 IF(MSVC AND NOT (${CMAKE_VERSION} VERSION_LESS 2.8.11))
 		# set stack reserved size to ~10MB
