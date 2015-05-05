@@ -723,6 +723,13 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_UseVTKProperty()
   mesh->Update();
 
 
+	//Setting standard material to avoid random color selection
+	mesh->GetMaterial()->m_Diffuse[0]=0.3;
+	mesh->GetMaterial()->m_Diffuse[1]=0.6;
+	mesh->GetMaterial()->m_Diffuse[2]=0.9;
+	mesh->GetMaterial()->UpdateProp();
+
+
   double center[3];
   mesh->GetOutput()->GetVTKData()->GetCenter(center);
 

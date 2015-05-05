@@ -112,6 +112,12 @@ void mafPipePolylineSlice_BESTest::TestPipeExecution()
   polyline->GetMaterial()->m_MaterialType = mmaMaterial::USE_LOOKUPTABLE;
   polyline->Update();
 
+	//Setting standard material to avoid random color selection
+	polyline->GetMaterial()->m_Diffuse[0]=0.3;
+	polyline->GetMaterial()->m_Diffuse[1]=0.6;
+	polyline->GetMaterial()->m_Diffuse[2]=0.9;
+	polyline->GetMaterial()->UpdateProp();
+
   //Assembly will be create when instancing mafSceneNode
   mafSceneNode *sceneNode;
   sceneNode = new mafSceneNode(NULL,NULL,polyline, NULL);

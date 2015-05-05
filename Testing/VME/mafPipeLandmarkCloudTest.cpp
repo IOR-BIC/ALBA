@@ -100,6 +100,13 @@ void mafPipeLandmarkCloudTest::TestPipeExecution()
 
   cloud->GetOutput()->GetVTKData()->Update();
   cloud->GetOutput()->Update();
+
+	//Setting standard material to avoid random color selection
+	cloud->GetMaterial()->m_Diffuse[0]=0.3;
+	cloud->GetMaterial()->m_Diffuse[1]=0.6;
+	cloud->GetMaterial()->m_Diffuse[2]=0.9;
+	cloud->GetMaterial()->UpdateProp();
+
   cloud->Update();
 
   vtkMAFSmartPointer<vtkDoubleArray> scalars;

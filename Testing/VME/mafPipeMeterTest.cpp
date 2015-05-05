@@ -131,6 +131,11 @@ void mafPipeMeterTest::TestPipeExecution()
   meter->Modified();
   meter->Update();
 
+	//Setting standard material to avoid random color selection
+	meter->GetMaterial()->m_Diffuse[0]=0.3;
+	meter->GetMaterial()->m_Diffuse[1]=0.6;
+	meter->GetMaterial()->m_Diffuse[2]=0.9;
+	meter->GetMaterial()->UpdateProp();
 
   //Assembly will be create when instancing mafSceneNode
   mafSceneNode *sceneNode;

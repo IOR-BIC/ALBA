@@ -40,6 +40,7 @@
 #include "mafVMERoot.h"
 #include "mafVMEVolumeGray.h"
 #include "mafVMESlicer.h"
+#include "mmaMaterial.h"
 
 //----------------------------------------------------------------------------
 void mafVisualPipeSlicerSliceTest::TestFixture()
@@ -100,6 +101,13 @@ void mafVisualPipeSlicerSliceTest::TestPipeExecution()
 
 	mafVMESlicer *slicer;
 	mafNEW(slicer);
+
+	//Setting standard material to avoid random color selection
+	slicer->GetMaterial()->m_Diffuse[0]=0.3;
+	slicer->GetMaterial()->m_Diffuse[1]=0.6;
+	slicer->GetMaterial()->m_Diffuse[2]=0.9;
+	slicer->GetMaterial()->UpdateProp();
+
 	slicer->ReparentTo(volume);
   slicer->SetSlicedVMELink(volume);
 

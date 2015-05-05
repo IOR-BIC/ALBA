@@ -96,6 +96,13 @@ void mafPipeTrajectoriesTest::TestPipeExecution()
 
   ////// Create VME ////////////////////
   mafSmartPointer<mafVMELandmarkCloud> cloud;
+	
+	//Setting standard material to avoid random color selection
+	cloud->GetMaterial()->m_Diffuse[0]=0.3;
+	cloud->GetMaterial()->m_Diffuse[1]=0.6;
+	cloud->GetMaterial()->m_Diffuse[2]=0.9;
+	cloud->GetMaterial()->UpdateProp();
+
   cloud->AppendLandmark(0.0,0.0,0.0,"first");
   double x = 0;
   double y = 0;
