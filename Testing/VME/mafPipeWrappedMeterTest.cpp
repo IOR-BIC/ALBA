@@ -104,7 +104,7 @@ void mafPipeWrappedMeterTest::TestPipeExecution()
   ///////////// end render stuff /////////////////////////
 
 
-  ////// Create VME ////////////////////
+  ////// Create support VMEs ////////////////////
   mafVMESurfaceParametric *vmeParametricSurfaceSTART;
   mafNEW(vmeParametricSurfaceSTART);	
   vmeParametricSurfaceSTART->GetOutput()->GetVTKData()->Update();
@@ -123,6 +123,7 @@ void mafPipeWrappedMeterTest::TestPipeExecution()
   matrix->SetElement(1,3,3); //set a translation value on x axis of 3.0
 
 
+	////// Create VME meter ////////////////////
   mafSmartPointer<mafVMEWrappedMeter> meter;
   meter->SetMeterLink("StartVME",vmeParametricSurfaceSTART);
   meter->SetMeterLink("EndVME1",vmeParametricSurfaceEND1);
@@ -131,6 +132,12 @@ void mafPipeWrappedMeterTest::TestPipeExecution()
   meter->Modified();
   meter->Update();
 
+	//Setting standard material to avoid random color selection
+	meter->GetMaterial()->m_Diffuse[0]=0.3;
+	meter->GetMaterial()->m_Diffuse[1]=0.6;
+	meter->GetMaterial()->m_Diffuse[2]=0.9;
+	meter->GetMaterial()->UpdateProp();
+	
 
   //Assembly will be create when instancing mafSceneNode
   mafSceneNode *sceneNode;
@@ -150,10 +157,7 @@ void mafPipeWrappedMeterTest::TestPipeExecution()
   while(actor)
   {   
     m_Renderer->AddActor(actor);
-    m_RenderWindow->Render();
-
     actor = actorList->GetNextProp();
-    break;
   }
 
   vtkActor *vectorActor;

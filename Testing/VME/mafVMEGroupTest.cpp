@@ -62,6 +62,7 @@ void mafVMEGroupTest::Test()
 	group->AddChild(surface);
 	CPPUNIT_ASSERT(group->GetNumberOfChildren()==1);
 
+	root->RemoveAllChildren();
 	vtkDEL(sphereSource);
 	mafDEL(surface);
 	mafDEL(group);

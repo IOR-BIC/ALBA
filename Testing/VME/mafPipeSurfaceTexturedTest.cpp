@@ -257,6 +257,13 @@ void mafPipeSurfaceTexturedTest::TestPipeClassicExecution()
 	surface->SetData((vtkPolyData*)Importer->GetOutput(),0.0);
 	surface->GetOutput()->Update();
 	surface->GetMaterial();
+	
+	//Setting standard material to avoid random color selection
+	surface->GetMaterial()->m_Diffuse[0]=0.3;
+	surface->GetMaterial()->m_Diffuse[1]=0.6;
+	surface->GetMaterial()->m_Diffuse[2]=0.9;
+	surface->GetMaterial()->UpdateProp();
+
 	surface->GetMaterial()->m_MaterialType = mmaMaterial::USE_LOOKUPTABLE;
 	surface->Update();
 
