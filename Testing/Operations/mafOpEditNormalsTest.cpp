@@ -110,7 +110,7 @@ void mafOpEditNormalsTest::Test()
 		double result = vtkMath::Dot(norm1,norm2);
 		if( !(result+EPSILON >= -1 || result-EPSILON <= -1) )
 		{
-			normalBetweenEpsilon==false;
+			normalBetweenEpsilon=false;
 			break;
 		}
 	}
