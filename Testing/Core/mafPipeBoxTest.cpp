@@ -154,7 +154,6 @@ void mafPipeBoxTest::TestPipe3DExecution()
 
   m_RenderWindow->Render();
   printf("\n Visualization: %s \n", strings);
-  mafSleep(500);
   CompareImages(strings);
 
   vtkDEL(actorList);
@@ -241,7 +240,6 @@ void mafPipeBoxTest::TestPipe3DSubtreeExecution()
 
   m_RenderWindow->Render();
   printf("\n Visualization: %s \n", strings);
-  mafSleep(500);
   CompareImages(strings);
 
   vtkDEL(actorList);
@@ -321,7 +319,6 @@ void mafPipeBoxTest::TestPipe4DExecution()
 
   m_RenderWindow->Render();
   printf("\n Visualization: %s \n", strings);
-  mafSleep(500);
   CompareImages(strings);
 
   vtkDEL(actorList);
@@ -421,7 +418,6 @@ void mafPipeBoxTest::TestPipe4DSubtreeExecution()
 
   m_RenderWindow->Render();
   printf("\n Visualization: %s \n", strings);
-  mafSleep(500);
   CompareImages(strings);
 
   vtkDEL(actorList);

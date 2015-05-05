@@ -57,7 +57,6 @@ mafRemoteStorage::~mafRemoteStorage()
 //------------------------------------------------------------------------------
 {
   mafEventMacro(mafEvent(this,DEVICE_REMOVE,m_RemoteFileManager));
-  mafSleep(100);
   mafDEL(m_RemoteFileManager);
 }
 //------------------------------------------------------------------------------

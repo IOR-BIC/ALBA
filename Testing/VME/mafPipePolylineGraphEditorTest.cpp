@@ -280,7 +280,6 @@ void mafPipePolylineGraphEditorTest::TestPipeExecution()
     m_Renderer->ResetCamera();
     m_RenderWindow->Render();
     printf("\n Visualizzazione: %s \n", strings[i]);
-    mafSleep(800);
     CompareImages(i);
 
   }

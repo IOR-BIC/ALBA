@@ -308,10 +308,7 @@ void mafVMEDataSetAttributesImporterTest::RenderData( vtkUnstructuredGrid *data,
   // remove comment below for user interaction...
   // renderWindowInteractor->Start();
 
-  mafSleep(500);
-
   mafDEL(linearizationFilter);
-
 }
   
 

@@ -63,8 +63,6 @@ void mafGizmoPolylineGraphTest::setUp()
 
 void mafGizmoPolylineGraphTest::tearDown()
 {
-  mafSleep(500);
-
   m_Renderer->Delete();
   m_RenderWindow->Delete();
   m_RenderWindowInteractor->Delete();
@@ -107,7 +105,6 @@ void mafGizmoPolylineGraphTest::TestConstructor()
   mafGizmoPolylineGraph *gizmoPolylineGraph = mafGizmoPolylineGraph::New((mafVME*)m_GizmoInputSurface, NULL,"",false,true);
   RenderData(m_GizmoInputSurface->GetOutput()->GetVTKData());
   RenderGizmo(gizmoPolylineGraph);
-  mafSleep(500);
 
   // m_RenderWindowInteractor->Start();
 
@@ -132,7 +129,6 @@ void mafGizmoPolylineGraphTest::TestSetGizmoLength()
 
   RenderData(m_GizmoInputSurface->GetOutput()->GetVTKData());
   RenderGizmo(gizmoPolylineGraph);
-  mafSleep(500);
 
   gizmoPolylineGraph->Delete();
 }

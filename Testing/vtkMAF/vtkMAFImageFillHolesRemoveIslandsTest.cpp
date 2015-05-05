@@ -86,7 +86,6 @@ void vtkMAFImageFillHolesRemoveIslandsTest::RenderData(vtkActor *actor)
 
   //renderWindowInteractor->Start();
   CompareImages(renderWindow);
-  mafSleep(2000);
 
   renderWindowInteractor->Delete();
   renderWindow->Delete();

@@ -210,9 +210,7 @@ void mafPipeSurfaceTexturedTest::TestPipeTextureExecution()
 
     m_RenderWindow->Render();
 	  printf("\n Visualizzazione: %s \n", strings[i]);
-    mafSleep(800);
     CompareImages(i);
-
   }
 
   vtkDEL(actorList);
@@ -257,6 +255,13 @@ void mafPipeSurfaceTexturedTest::TestPipeClassicExecution()
 	surface->SetData((vtkPolyData*)Importer->GetOutput(),0.0);
 	surface->GetOutput()->Update();
 	surface->GetMaterial();
+	
+	//Setting standard material to avoid random color selection
+	surface->GetMaterial()->m_Diffuse[0]=0.3;
+	surface->GetMaterial()->m_Diffuse[1]=0.6;
+	surface->GetMaterial()->m_Diffuse[2]=0.9;
+	surface->GetMaterial()->UpdateProp();
+
 	surface->GetMaterial()->m_MaterialType = mmaMaterial::USE_LOOKUPTABLE;
 	surface->Update();
 
@@ -305,7 +310,6 @@ void mafPipeSurfaceTexturedTest::TestPipeClassicExecution()
 
 		m_RenderWindow->Render();
 		printf("\n Visualizzazione: %s \n", strings[i-SCALAR_TEST]);
-		mafSleep(800);
 		CompareImages(i);
 
 		if(i == SCALAR_TEST)

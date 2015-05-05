@@ -167,7 +167,6 @@ int play_tree(mafVMERoot *m_StorageRoot)
     if (t==100)
     {
       step = -1;
-      mafSleep(500);
       continue;
     }
 
@@ -176,10 +175,7 @@ int play_tree(mafVMERoot *m_StorageRoot)
 
     renderer->ResetCameraClippingRange();
     renWin->Render();
-    mafSleep(10);
   }
-
-  mafSleep(1000);
 
   iter->Delete();
 

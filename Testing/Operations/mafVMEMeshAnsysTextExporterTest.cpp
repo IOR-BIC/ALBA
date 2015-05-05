@@ -322,7 +322,6 @@ void mafVMEMeshAnsysTextExporterTest::RenderData(  vtkUnstructuredGrid *data, in
   // remove comment below for user interaction...
   // renderWindowInteractor->Start();
 
-  mafSleep(500);
 }
   
 int mafVMEMeshAnsysTextExporterTest::GetRowsNumber(vtkUnstructuredGrid *inputUGrid)

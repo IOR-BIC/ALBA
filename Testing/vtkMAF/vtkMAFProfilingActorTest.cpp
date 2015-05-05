@@ -110,11 +110,7 @@ void vtkMAFProfilingActorTest::TestRenderOverlay()
   renderWindow->Render();
   profActor->FPSUpdate(renderer);
   CompareImages(renderWindow, 0);
-#ifdef WIN32
-  Sleep(2000);
-#else
-  usleep(2000*1000);
-#endif
+
   profActor->Delete();
 
   renderer->Delete();
@@ -138,11 +134,7 @@ void vtkMAFProfilingActorTest::TestRenderOpaqueGeometry()
   renderWindow->Render();
   profActor->FPSUpdate(renderer);
   CompareImages(renderWindow, 1);
-#ifdef WIN32
-  Sleep(2000);
-#else
-  usleep(2000*1000);
-#endif
+
   profActor->Delete();
 
   renderer->Delete();
@@ -167,7 +159,6 @@ void vtkMAFProfilingActorTest::TestRenderTranslucentGeometry()
   //renderWindow->Render();
 
   //CompareImages(renderWindow);
-  //mafSleep(2000);
 
   renderer->Delete();
   renderWindow->Delete();

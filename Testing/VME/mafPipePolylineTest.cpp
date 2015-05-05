@@ -348,7 +348,6 @@ void mafPipePolylineTest::TestPipeExecution()
     }
 
     //CompareImages(i);
-    //mafSleep(1800);
   }
 
   vtkDEL(actorList);

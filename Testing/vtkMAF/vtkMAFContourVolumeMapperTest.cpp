@@ -201,11 +201,6 @@ void vtkMAFContourVolumeMapperTest::TestRectilinearGrid()
   mapper->Delete();
 
   // this seems to enable leaks printing!
-#ifdef WIN32
-  Sleep(2000);
-#else
-  usleep(2000*1000);
-#endif
 }
 
 
@@ -325,11 +320,6 @@ void vtkMAFContourVolumeMapperTest::TestImageData()
   mapper->Delete();
 
   // this seems to enable leaks printing!
-#ifdef WIN32
-  Sleep(2000);
-#else
-  usleep(2000*1000);
-#endif
 }
 
 

@@ -329,9 +329,6 @@ void mafVMEStorageTest2::TestRestoreOnSameStorage()
   CPPUNIT_ASSERT(shouldBeTheVTKSphere->GetNumberOfPoints());
 
   CPPUNIT_ASSERT(shouldBeTheVTKSphere->GetNumberOfCells() == m_SphereSource->GetOutput()->GetNumberOfCells());
-  
-  mafSleep(1000);
-
 }
 
 void mafVMEStorageTest2::TestStoreRestoreTagArray()

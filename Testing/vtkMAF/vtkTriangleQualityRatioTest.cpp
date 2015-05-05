@@ -185,6 +185,4 @@ void vtkTriangleQualityRatioTest::RenderData(vtkPolyData *data)
   
   // remove comment below for user interaction...
   // renderWindowInteractor->Start();
-
-  mafSleep(500);
 }

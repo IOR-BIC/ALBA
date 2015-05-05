@@ -74,8 +74,6 @@ void mafCoreFactoryTest::TestStaticAllocation()
 //------------------------------------------------------------------------------
 {
 	mafDummyFactory factory;
-
-  mafSleep(1000);
 }
 //------------------------------------------------------------------------------
 void mafCoreFactoryTest::TestDynamicAllocation()
@@ -83,8 +81,6 @@ void mafCoreFactoryTest::TestDynamicAllocation()
 {
 	mafDummyFactory *factory=new mafDummyFactory();
 	delete factory;
-
-  mafSleep(1000);
 }
 //------------------------------------------------------------------------------
 void mafCoreFactoryTest::TestCreateInstance()
@@ -127,11 +123,6 @@ void mafCoreFactoryTest::TestCreateInstance()
   // cleanup factory products
   foo->Delete();
   dummy->Delete();
-
-	
-
-  mafSleep(1000);
-
 }
 
 //------------------------------------------------------------------------------
@@ -148,10 +139,6 @@ void mafCoreFactoryTest::TestGetSourceVersion()
   version.Erase(15);
 
   CPPUNIT_ASSERT(mafString::Compare(version,"maf version 2.2") == 0);
-
-  
-
-  mafSleep(1000);
 }
 
 
@@ -168,10 +155,6 @@ void mafCoreFactoryTest::TestGetDescription()
   mafString description = factory->GetDescription();
 
   CPPUNIT_ASSERT(mafString::Compare(description, "Factory Dummy") == 0);
-
-  
-
-  mafSleep(1000);
 }
 
 //------------------------------------------------------------------------------
@@ -191,10 +174,6 @@ void mafCoreFactoryTest::TestRegisterFactory()
 
 	std::list<mafObjectFactory *> list=mafObjectFactory::GetRegisteredFactories();
 	CPPUNIT_ASSERT(list.size()==2);
-
-	
-
-	mafSleep(1000);
 }
 //------------------------------------------------------------------------------
 void mafCoreFactoryTest::TestUnRegisterAllFactories()
@@ -221,8 +200,6 @@ void mafCoreFactoryTest::TestUnRegisterAllFactories()
 	{
 		CPPUNIT_ASSERT((*i)==third_factory);
 	}
-
-	mafSleep(1000);
 }
 //------------------------------------------------------------------------------
 void mafCoreFactoryTest::TestGetRegisteredFactories()
@@ -252,8 +229,6 @@ void mafCoreFactoryTest::TestGetRegisteredFactories()
 			break;
 		}
 	}
-
-	mafSleep(1000);
 }
 //------------------------------------------------------------------------------
 mafObject* FunctionDummy(){return new mafDummyObject();};
@@ -287,8 +262,6 @@ void mafCoreFactoryTest::TestRegisterOverride()
     std::string st=(*i);
     CPPUNIT_ASSERT(st.compare("ClassTest")==0);
   }
-
-  mafSleep(1000);
 }
 //------------------------------------------------------------------------------
 void mafCoreFactoryTest::TestRegisterNewObject()
@@ -305,8 +278,6 @@ void mafCoreFactoryTest::TestRegisterNewObject()
     std::string st=(*i);
     CPPUNIT_ASSERT(st.compare("mafDummyObject")==0);
   }
-
-  mafSleep(1000);
 }
 //------------------------------------------------------------------------------
 void mafCoreFactoryTest::TestDisable()
@@ -326,8 +297,6 @@ void mafCoreFactoryTest::TestDisable()
     bool val=(*i);
     CPPUNIT_ASSERT(val==FALSE);
   }
-
-  mafSleep(1000);
 }
 //------------------------------------------------------------------------------
 void mafCoreFactoryTest::TestSetEnableFlag()
@@ -346,8 +315,6 @@ void mafCoreFactoryTest::TestSetEnableFlag()
   flag=factory->GetEnableFlag(mafDummyObject::GetStaticTypeName(),mafDummyObject::GetStaticTypeName());
 
   CPPUNIT_ASSERT(flag==true);
-
-  mafSleep(1000);
 }
 //------------------------------------------------------------------------------
 void mafCoreFactoryTest::TestUnRegisterFactory()
@@ -371,7 +338,6 @@ void mafCoreFactoryTest::TestUnRegisterFactory()
     CPPUNIT_ASSERT((*i)==second_factory);
   }
 
-  mafSleep(1000);
 }
 //------------------------------------------------------------------------------
 void mafCoreFactoryTest::TestGetArgs()
@@ -384,8 +350,6 @@ void mafCoreFactoryTest::TestGetArgs()
   mafReferenceCounted *args=factory->GetArgs("Test");
 
   CPPUNIT_ASSERT(args==NULL);
-
-  mafSleep(1000);
 }
 //------------------------------------------------------------------------------
 void mafCoreFactoryTest::TestReHash()
@@ -407,8 +371,6 @@ void mafCoreFactoryTest::TestReHash()
   {
     CPPUNIT_ASSERT((*i)==second_factory);
   }
-
-  mafSleep(1000);
 }
 //------------------------------------------------------------------------------
 void mafCoreFactoryTest::TestCreateAllInstance()
@@ -429,8 +391,6 @@ void mafCoreFactoryTest::TestCreateAllInstance()
   {
     mafDummyObject::SafeDownCast(*i)->Delete();
   }
-
-  mafSleep(1000);
 }
 
 void mafCoreFactoryTest::tearDown()

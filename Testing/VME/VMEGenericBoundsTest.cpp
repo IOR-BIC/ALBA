@@ -48,12 +48,6 @@
 
 #include <iostream>
 
-#ifdef WIN32
-  #define SLEEP(a) Sleep(a)
-#else
-  #include <unistd.h>
-  #define SLEEP(a) usleep(a*10)
-#endif
 
 
 //-------------------------------------------------------------------------

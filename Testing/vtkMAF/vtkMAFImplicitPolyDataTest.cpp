@@ -75,11 +75,6 @@ void vtkMAFImplicitPolyDataTest::RenderData( vtkPolyData *data )
 
   renderWindowInteractor->Start();
 
-#ifdef WIN32
-  Sleep(1000);
-#else
-  usleep(1000*1000);
-#endif
 }
 
 void vtkMAFImplicitPolyDataTest::TestClipSphere1PolydataWithSphere2PolydataUsedAsImplicitFunction()

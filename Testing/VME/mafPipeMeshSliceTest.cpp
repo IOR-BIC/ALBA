@@ -216,7 +216,6 @@ void mafPipeMeshSliceTest::TestPipeExecution()
     ProceduralControl(controlValues, meshActor);
     m_RenderWindow->Render();
 		printf("\n Visualizzazione: %s \n", strings[arrayIndex]);
-    mafSleep(500);
     CompareImages(arrayIndex);
   }
 

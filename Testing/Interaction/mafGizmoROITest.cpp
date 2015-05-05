@@ -64,8 +64,6 @@ void mafGizmoROITest::setUp()
 
 void mafGizmoROITest::tearDown()
 {
-  mafSleep(500);
-
   m_Renderer->Delete();
   m_RenderWindow->Delete();
   m_RenderWindowInteractor->Delete();
@@ -110,8 +108,6 @@ void mafGizmoROITest::TestConstructor()
   
   RenderData(m_GizmoInputSurface->GetOutput()->GetVTKData());
   RenderGizmo(gizmoROI);
-  mafSleep(500);
-
   // m_RenderWindowInteractor->Start();
 
   cppDEL(gizmoROI);

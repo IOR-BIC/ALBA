@@ -85,8 +85,6 @@ void mafLODActorTest::RenderData(mafLODActor *actor)
 	actor->Register(renderer);
   renderWindow->Render();
 
-  //renderWindowInteractor->Start();
-  mafSleep(2000);
   renderer->RemoveAllProps();
   renderWindow->RemoveRenderer(renderer);
   renderWindowInteractor->SetRenderWindow(NULL);

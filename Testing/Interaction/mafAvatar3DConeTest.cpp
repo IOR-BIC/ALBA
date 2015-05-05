@@ -105,7 +105,6 @@ void mafAvatar3DConeTest::TestPick()
 
   CPPUNIT_ASSERT(0 == avatar->Pick(identity)); // no actors picked!!!
 
-  mafSleep(800);
   // Add an actor to the scene
 
   vtkMAFSmartPointer<vtkDiskSource> disk;
@@ -124,8 +123,6 @@ void mafAvatar3DConeTest::TestPick()
   m_Renderer->Render();
 
   CPPUNIT_ASSERT(1 == avatar->Pick(identity));
-
-  mafSleep(800);
 
   CompareImages();
 

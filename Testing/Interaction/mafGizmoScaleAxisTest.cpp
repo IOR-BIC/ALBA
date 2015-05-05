@@ -65,8 +65,6 @@ void mafGizmoScaleAxisTest::setUp()
 
 void mafGizmoScaleAxisTest::tearDown()
 {
-  mafSleep(500);
-
   m_Renderer->Delete();
   m_RenderWindow->Delete();
   m_RenderWindowInteractor->Delete();
@@ -115,15 +113,12 @@ void mafGizmoScaleAxisTest::TestConstructor()
   
   RenderData(m_GizmoInputSurface->GetOutput()->GetVTKData());
   RenderGizmo(gizmoScaleAxis);
-  mafSleep(500);
 
   gizmoScaleAxis->SetAxis(mafInteractorConstraint::Y);
   RenderGizmo(gizmoScaleAxis);
-  mafSleep(500);
 
   gizmoScaleAxis->SetAxis(mafInteractorConstraint::Z);
   RenderGizmo(gizmoScaleAxis);
-  mafSleep(500);
 
   // m_RenderWindowInteractor->Start();
 

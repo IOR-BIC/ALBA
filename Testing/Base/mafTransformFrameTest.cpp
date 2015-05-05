@@ -430,7 +430,7 @@ void mafTransformFrameTest::TestMatrixTransformationFromInputFrameToTargetFrameW
   // remove the following comment for user interaction
   // iren->Start();
 
-  mafSleep(200);
+  //mafSleep(200);
 
   cerr << std::endl;
   cerr << "#### cone pose in input ref sys ####" << std::endl;

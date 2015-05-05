@@ -146,7 +146,6 @@ void vtkMAFCollisionDetectionFilterTest::Test()
     m_RenderWindow->Render();
     CompareImages(index,"Test_vtkMAFCollisionDetectionFilter");
     index++;
-    mafSleep(20);
   }
 }
 //-------------------------------------------------------------------------
@@ -243,7 +242,6 @@ void vtkMAFCollisionDetectionFilterTest::TestChangingMatrix()
     m_RenderWindow->Render();
     CompareImages(index,"Test_vtkMAFCollisionDetectionFilter");
     index++;
-    mafSleep(20);
   }
 
   for (int i=0;i<10;i++)
@@ -270,7 +268,6 @@ void vtkMAFCollisionDetectionFilterTest::TestChangingMatrix()
       m_RenderWindow->Render();
       CompareImages(index,"Test_vtkMAFCollisionDetectionFilter");
       index++;
-      mafSleep(20);
     }
 
     m3->Delete();

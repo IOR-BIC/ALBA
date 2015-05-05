@@ -159,7 +159,6 @@ void mafPipeVectorFieldMapWithArrowsTest::TestCreate()
   }
 
   m_RenderWindow->Render();
-  mafSleep(2000);
   CompareImage();
 
   vtkDEL(actorList);

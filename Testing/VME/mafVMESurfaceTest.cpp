@@ -145,8 +145,6 @@ void mafVMESurfaceTest::TestVMESurfaceVisualization()
   mapper->SetInput(sphereSurfaceVME->GetSurfaceOutput()->GetVTKData());
 
   renWin->Render();
-  Sleep(500);
-
   CPPUNIT_ASSERT(true);
 }
 
@@ -249,7 +247,6 @@ int mafVMESurfaceTest::PlayTree(mafVMERoot *root, bool ignoreVisibleToTraverse)
     if (t==10)
     {
       step=-1;
-      mafSleep(500);
       continue;
     }
 
@@ -258,10 +255,7 @@ int mafVMESurfaceTest::PlayTree(mafVMERoot *root, bool ignoreVisibleToTraverse)
 
     renderer->ResetCameraClippingRange();
     renWin->Render();
-    mafSleep(10);
   }
-
-  mafSleep(1000);
 
   // this destroy m_VmeRoot also... 
   iter->Delete();

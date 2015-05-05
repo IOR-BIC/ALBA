@@ -177,7 +177,6 @@ void mafPipeVolumeSliceTest::TestPipeExecution()
 	
 	    m_RenderWindow->Render();
 	    printf("\n Visualization: %s \n", strings);
-	    mafSleep(1000);
 	    CompareImages(3*direction+i);
 	  }
 

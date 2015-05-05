@@ -125,7 +125,14 @@ void mafPipePointSetTest::TestPipeExecution()
   pointsetInput->SetData(delaunay->GetOutput(),0);
   pointsetInput->GetOutput()->GetVTKData()->Update();
   pointsetInput->GetOutput()->Update();
-  pointsetInput->Update();
+	
+	//Setting standard material to avoid random color selection
+	pointsetInput->GetMaterial()->m_Diffuse[0]=0.3;
+	pointsetInput->GetMaterial()->m_Diffuse[1]=0.6;
+	pointsetInput->GetMaterial()->m_Diffuse[2]=0.9;
+	pointsetInput->GetMaterial()->UpdateProp();
+  
+	pointsetInput->Update();
 
   ///////////////// render stuff /////////////////////////
 
@@ -182,7 +189,6 @@ void mafPipePointSetTest::TestPipeExecution()
 		m_RenderWindow->Render();
 		printf("\n Visualization: azimut->%d elev->%d  - %s \n", i, j, i>15?"selected":"NOT selected");
 		CompareImages(i);
-		mafSleep(600);
 	}
   //m_RenderWindowInteractor->Start();
   

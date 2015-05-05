@@ -72,12 +72,6 @@ void vtkMAFRemoveCellsFilterTest::RenderData( vtkPolyData *data )
 
   renderWindowInteractor->Start();
 
-#ifdef WIN32
-  Sleep(1000);
-#else
-  usleep(1000*1000);
-#endif
-
 }
 
 void vtkMAFRemoveCellsFilterTest::TestRemoveMarkedCells()
