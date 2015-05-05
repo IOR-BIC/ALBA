@@ -116,7 +116,6 @@ void mafPipeScalarMatrixTest::TestPipeExecution()
   mafPipeScalarMatrix *pipe = new mafPipeScalarMatrix();
   pipe->Create(sceneNode);
   m_RenderWindow->Render();
-  mafSleep(800);
 
   CompareImages();
 

@@ -177,9 +177,7 @@ void mafPipeTensorFieldSliceTest::TestCreate()
     actor = actorList->GetNextProp();
   }
 
-  //m_RenderWindowInteractor->Start();
-  //mafSleep(800);
-  CompareImages(0);
+   CompareImages(0);
 
   delete pipe;
   sceneNode->m_RenFront = NULL;

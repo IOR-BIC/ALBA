@@ -172,10 +172,7 @@ void mafPipeSurfaceSliceTest::TestCloudClosePipeExecution()
     m_RenderWindow->Render();
 
     CompareImages(i);
-    mafSleep(2000);
   }
-
-  mafSleep(2000);
 
   vtkDEL(actorList);
 
@@ -249,8 +246,6 @@ void mafPipeSurfaceSliceTest::TestCloudOpenPipeExecution()
   m_Renderer->ResetCamera(bounds);
   m_RenderWindow->Render();
 
-  mafSleep(2000);
-
   double origins[3][NUM_OF_CENTERS] = {{0.0,0.0,0.0},{5.0,5.0,-5.0},{0.0,0.0,5.0}};
   for(int i=6;i<6+NUM_OF_CENTERS;i++)
   {
@@ -272,7 +267,6 @@ void mafPipeSurfaceSliceTest::TestCloudOpenPipeExecution()
     m_RenderWindow->Render();
 
     CompareImages(i);
-    mafSleep(2000);
   }
 
 
@@ -345,8 +339,6 @@ void mafPipeSurfaceSliceTest::TestSurfacePipeExecution()
   m_Renderer->ResetCamera(bounds);
   m_RenderWindow->Render();
 
-  mafSleep(2000);
-
   double origins[3][NUM_OF_CENTERS] = {0.0,0.0,0.0,0.0,0.0,7.0,0.0,0.0,-3.0};
   for(int i=0;i<NUM_OF_CENTERS;i++)
   {
@@ -368,7 +360,6 @@ void mafPipeSurfaceSliceTest::TestSurfacePipeExecution()
     m_RenderWindow->Render();
 
     CompareImages(i);
-    mafSleep(2000);
   }
 
   vtkDEL(actorList);

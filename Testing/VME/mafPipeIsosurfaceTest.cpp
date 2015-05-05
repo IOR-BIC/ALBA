@@ -144,7 +144,6 @@ void mafPipeIsosurfaceTest::TestPipeExecution()
     
     printf("\n Visualization: \n");
     CompareImages(v);
-    mafSleep(1000);
 
     m_Renderer->RemoveAllProps();
     //vtkDEL(actorList);

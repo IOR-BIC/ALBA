@@ -161,7 +161,6 @@ void mafPipePolylineSliceTest::TestPipeExecution()
         actor = actorList->GetNextProp();
       }
       CompareImages(i);
-      mafSleep(800);
       m_Renderer->RemoveAllProps();
     }
     else if(i == TEST_THICKNESS)
@@ -180,10 +179,8 @@ void mafPipePolylineSliceTest::TestPipeExecution()
         actor = actorList->GetNextProp();
       }
       CompareImages(i);
-      mafSleep(800);   
 
-      m_Renderer->RemoveAllProps();
-      
+			m_Renderer->RemoveAllProps();
     }
     else if(i == TEST_SPLINE)
     {
@@ -202,9 +199,8 @@ void mafPipePolylineSliceTest::TestPipeExecution()
         actor = actorList->GetNextProp();
       }
       CompareImages(i);
-      mafSleep(800);
 
-      m_Renderer->RemoveAllProps();
+			m_Renderer->RemoveAllProps();
     }
   }
 

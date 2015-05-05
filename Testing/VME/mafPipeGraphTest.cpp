@@ -167,7 +167,6 @@ void mafPipeGraphTest::TestPipeExecution()
   graphActor = (vtkActor *) SelectActorToControl(actorList, 0);
   CPPUNIT_ASSERT(graphActor != NULL);
   m_RenderWindow->Render();
-  mafSleep(800);
   CompareImages(0);
  
   delete pipe;

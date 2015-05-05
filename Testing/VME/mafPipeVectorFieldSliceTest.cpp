@@ -173,7 +173,6 @@ void mafPipeVectorFieldSliceTest::TestCreate()
   }
 
   //m_RenderWindow->Render();
-  //mafSleep(2000);
   CompareImage();
 
   delete pipe;

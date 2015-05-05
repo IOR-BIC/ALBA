@@ -152,8 +152,6 @@ void mafPipeLandmarkCloudTest::TestPipeExecution()
 
   m_Renderer->ResetCamera();
 
-  mafSleep(3000);
-
   CompareImages(0);
 
   m_Renderer->RemoveAllProps();
@@ -177,8 +175,6 @@ void mafPipeLandmarkCloudTest::TestPipeExecution()
   }
 
   m_Renderer->ResetCamera();
-
-  mafSleep(3000);
 
   CompareImages(1);
 
@@ -204,8 +200,6 @@ void mafPipeLandmarkCloudTest::TestPipeExecution()
   }
 
   m_Renderer->ResetCamera();
-
-  mafSleep(3000);
 
   CompareImages(2);
 

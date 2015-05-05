@@ -276,7 +276,6 @@ void vtkMAFAssemblyTest::RenderOpaqueGeometryTest()
   CPPUNIT_ASSERT(assembly->RenderOpaqueGeometry((vtkViewport*)renderer) == 1);
   render_window->Render();
   CompareImages(render_window, 1);
-  mafSleep(2000);
 
   assembly->ReleaseGraphicsResources(render_window);
   assembly->RemovePart(sphere1);
@@ -359,9 +358,8 @@ void vtkMAFAssemblyTest::RenderTranslucentGeometry()
   CPPUNIT_ASSERT(assembly->RenderTranslucentGeometry((vtkViewport*)renderer) == 1);
   render_window->Render();
   CompareImages(render_window, 1);
-  mafSleep(2000);
 
-  assembly->ReleaseGraphicsResources(render_window);
+	assembly->ReleaseGraphicsResources(render_window);
   assembly->RemovePart(sphere1);
   assembly->RemovePart(sphere2);
 

@@ -167,7 +167,6 @@ void vtkMAFProfilingActorTest::TestRenderTranslucentGeometry()
   //renderWindow->Render();
 
   //CompareImages(renderWindow);
-  //mafSleep(2000);
 
   renderer->Delete();
   renderWindow->Delete();

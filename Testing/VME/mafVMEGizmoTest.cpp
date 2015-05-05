@@ -151,7 +151,6 @@ int mafVMEGizmoTest::PlayTree(mafVMERoot *root, bool ignoreVisibleToTraverse)
     if (t==10)
     {
       step=-1;
-      mafSleep(500);
       continue;
     }
 
@@ -160,10 +159,8 @@ int mafVMEGizmoTest::PlayTree(mafVMERoot *root, bool ignoreVisibleToTraverse)
 
     renderer->ResetCameraClippingRange();
     renWin->Render();
-    mafSleep(10);
   }
 
-  mafSleep(1000);
 
   // this destroy m_VmeRoot also... 
   iter->Delete();

@@ -64,8 +64,6 @@ void mafGizmoRotateCircleTest::setUp()
 
 void mafGizmoRotateCircleTest::tearDown()
 {
-  mafSleep(500);
-
   m_Renderer->Delete();
   m_RenderWindow->Delete();
   m_RenderWindowInteractor->Delete();
@@ -114,15 +112,12 @@ void mafGizmoRotateCircleTest::TestConstructor()
   
   RenderData(m_GizmoInputSurface->GetOutput()->GetVTKData());
   RenderGizmo(gizmoRotateCircle);
-  mafSleep(500);
 
   gizmoRotateCircle->SetAxis(mafInteractorConstraint::Y);
   RenderGizmo(gizmoRotateCircle);
-  mafSleep(500);
 
   gizmoRotateCircle->SetAxis(mafInteractorConstraint::Z);
   RenderGizmo(gizmoRotateCircle);
-  mafSleep(500);
   
   // remove this comment to enable render window interaction
   // m_RenderWindowInteractor->Start();

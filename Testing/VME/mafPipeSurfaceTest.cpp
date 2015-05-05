@@ -213,7 +213,6 @@ void mafPipeSurfaceTest::TestPipeExecution()
 
     m_RenderWindow->Render();
 	  printf("\n Visualizzazione: %s \n", strings[i]);
-    mafSleep(800);
     CompareImages(i);
 
     if(i == EDGE_TEST)

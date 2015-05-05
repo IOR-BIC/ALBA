@@ -63,8 +63,6 @@ void mafGizmoScaleIsotropicTest::setUp()
 
 void mafGizmoScaleIsotropicTest::tearDown()
 {
-  mafSleep(500);
-
   m_Renderer->Delete();
   m_RenderWindow->Delete();
   m_RenderWindowInteractor->Delete();
@@ -112,7 +110,6 @@ void mafGizmoScaleIsotropicTest::TestConstructor()
   
   RenderData(m_GizmoInputSurface->GetOutput()->GetVTKData());
   RenderGizmo(gizmoScaleIsotropic);
-  mafSleep(500);
 
   // remove this comment to enable interaction
   // m_RenderWindowInteractor->Start();

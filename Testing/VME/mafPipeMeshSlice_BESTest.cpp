@@ -228,7 +228,6 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution()
     ProceduralControl(controlValues, meshActor);
     m_RenderWindow->Render();
 		printf("\n Visualizzazione: %s \n", strings[arrayIndex]);
-    mafSleep(500);
     CompareImages(ID_TEST_PIPEEXECUTION+arrayIndex);
   }
 
@@ -375,7 +374,6 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_Wireframe()
     ProceduralControl(controlValues, meshActor);
     m_RenderWindow->Render();
     printf("\n Visualizzazione: %s \n", strings[arrayIndex]);
-    mafSleep(500);
     CompareImages(ID_TEST_PIPEEXECUTION_WIREFRAME+arrayIndex);
   }
 
@@ -523,7 +521,6 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_WiredActorVisibility()
     ProceduralControl(controlValues, meshActor);
     m_RenderWindow->Render();
     printf("\n Visualizzazione: %s \n", strings[arrayIndex]);
-    mafSleep(500);
     CompareImages(ID_TEST_PIPEEXECUTION_WIRED_ACTOR_VISIBILITY+arrayIndex);
   }
 
@@ -671,7 +668,6 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_FlipNormal()
     ProceduralControl(controlValues, meshActor);
     m_RenderWindow->Render();
     printf("\n Visualizzazione: %s \n", strings[arrayIndex]);
-    mafSleep(500);
     CompareImages(ID_TEST_PIPEEXECUTION_FLIP_NORMAL+arrayIndex);
   }
 
@@ -826,7 +822,6 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_UseVTKProperty()
     ProceduralControl(controlValues, meshActor);
     m_RenderWindow->Render();
     printf("\n Visualizzazione: %s \n", strings[arrayIndex]);
-    mafSleep(500);
     CompareImages(ID_TEST_PIPEEXECUTION_USE_VTK_PROPERTY+arrayIndex);
   }
 
@@ -979,7 +974,6 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_Thickness_PickActor()
     ProceduralControl(controlValues, meshActor);
     m_RenderWindow->Render();
     printf("\n Visualizzazione: %s \n", strings[arrayIndex]);
-    mafSleep(500);
     CompareImages(ID_TEST_PIPEEXECUTION_THICKNESS+arrayIndex);
   }
 

@@ -317,8 +317,6 @@ void mafVMEMeshAnsysTextImporterTest::RenderData(  vtkUnstructuredGrid *data, in
   
   // remove comment below for user interaction...
   // renderWindowInteractor->Start();
-
-  mafSleep(500);
 }
   
 

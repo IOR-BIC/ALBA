@@ -152,7 +152,6 @@ void mafPipeGizmoTest::TestPipeExecution()
   CPPUNIT_ASSERT(surfaceActor != NULL);
 
   m_RenderWindow->Render();
-  mafSleep(800);
   CompareImages(0);
   
 

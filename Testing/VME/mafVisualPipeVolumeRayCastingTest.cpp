@@ -146,10 +146,8 @@ void mafVisualPipeVolumeRayCastingTest::TestPipeExecution()
   m_Renderer->ResetCamera();
   m_RenderWindow->Render();
 
-  mafSleep(800);
   CompareImages(1);
-
-
+	
   vtkDEL(actorList);
 
   delete pipe;

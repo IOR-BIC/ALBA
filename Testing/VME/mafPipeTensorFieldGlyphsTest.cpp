@@ -177,8 +177,6 @@ void mafPipeTensorFieldGlyphsTest::TestCreate()
     actor = actorList->GetNextProp();
   }
 
-  //m_RenderWindowInteractor->Start();
-  //mafSleep(800);
   CompareImage();
 
   delete pipe;

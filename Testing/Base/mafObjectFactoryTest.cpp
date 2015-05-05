@@ -65,8 +65,6 @@ void mafObjectFactoryTest::TestStaticAllocation()
 //------------------------------------------------------------------------------
 {
 	mafDummyFactory factory;
-
-  mafSleep(1000);
 }
 //------------------------------------------------------------------------------
 void mafObjectFactoryTest::TestDynamicAllocation()
@@ -74,8 +72,6 @@ void mafObjectFactoryTest::TestDynamicAllocation()
 {
 	mafDummyFactory *factory=new mafDummyFactory();
 	delete factory;
-
-  mafSleep(1000);
 }
 //------------------------------------------------------------------------------
 void mafObjectFactoryTest::TestCreateInstance()
@@ -120,9 +116,6 @@ void mafObjectFactoryTest::TestCreateInstance()
   dummy->Delete();
 
 	mafObjectFactory::UnRegisterAllFactories();
-
-  mafSleep(1000);
-
 }
 //------------------------------------------------------------------------------
 void mafObjectFactoryTest::TestRegisterFactory()
@@ -143,8 +136,6 @@ void mafObjectFactoryTest::TestRegisterFactory()
 	CPPUNIT_ASSERT(list.size()==2);
 
 	mafObjectFactory::UnRegisterAllFactories();
-
-	mafSleep(1000);
 }
 //------------------------------------------------------------------------------
 void mafObjectFactoryTest::TestUnRegisterAllFactories()
@@ -173,8 +164,6 @@ void mafObjectFactoryTest::TestUnRegisterAllFactories()
 	}
 
 	mafObjectFactory::UnRegisterAllFactories();
-
-	mafSleep(1000);
 }
 //------------------------------------------------------------------------------
 void mafObjectFactoryTest::TestGetRegisteredFactories()
@@ -206,8 +195,6 @@ void mafObjectFactoryTest::TestGetRegisteredFactories()
 	}
 
 	mafObjectFactory::UnRegisterAllFactories();
-
-	mafSleep(1000);
 }
 //------------------------------------------------------------------------------
 mafObject* FunctionDummy(){return new mafDummyObject();};
@@ -243,8 +230,6 @@ void mafObjectFactoryTest::TestRegisterOverride()
   }
 
   mafObjectFactory::UnRegisterAllFactories();
-
-  mafSleep(1000);
 }
 //------------------------------------------------------------------------------
 void mafObjectFactoryTest::TestRegisterNewObject()
@@ -263,8 +248,6 @@ void mafObjectFactoryTest::TestRegisterNewObject()
   }
 
   mafObjectFactory::UnRegisterAllFactories();
-
-  mafSleep(1000);
 }
 //------------------------------------------------------------------------------
 void mafObjectFactoryTest::TestDisable()
@@ -286,8 +269,6 @@ void mafObjectFactoryTest::TestDisable()
   }
 
   mafObjectFactory::UnRegisterAllFactories();
-
-  mafSleep(1000);
 }
 //------------------------------------------------------------------------------
 void mafObjectFactoryTest::TestSetEnableFlag()
@@ -308,8 +289,6 @@ void mafObjectFactoryTest::TestSetEnableFlag()
   CPPUNIT_ASSERT(flag==true);
 
   mafObjectFactory::UnRegisterAllFactories();
-
-  mafSleep(1000);
 }
 //------------------------------------------------------------------------------
 void mafObjectFactoryTest::TestUnRegisterFactory()
@@ -334,8 +313,6 @@ void mafObjectFactoryTest::TestUnRegisterFactory()
   }
 
   mafObjectFactory::UnRegisterAllFactories();
-
-  mafSleep(1000);
 }
 //------------------------------------------------------------------------------
 void mafObjectFactoryTest::TestGetArgs()
@@ -350,8 +327,6 @@ void mafObjectFactoryTest::TestGetArgs()
   CPPUNIT_ASSERT(args==NULL);
 
   mafObjectFactory::UnRegisterAllFactories();
-
-  mafSleep(1000);
 }
 //------------------------------------------------------------------------------
 void mafObjectFactoryTest::TestReHash()
@@ -375,8 +350,6 @@ void mafObjectFactoryTest::TestReHash()
   }
 
   mafObjectFactory::UnRegisterAllFactories();
-
-  mafSleep(1000);
 }
 //------------------------------------------------------------------------------
 void mafObjectFactoryTest::TestCreateAllInstance()
@@ -399,6 +372,4 @@ void mafObjectFactoryTest::TestCreateAllInstance()
   }
 
   mafObjectFactory::UnRegisterAllFactories();
-
-  mafSleep(1000);
 }

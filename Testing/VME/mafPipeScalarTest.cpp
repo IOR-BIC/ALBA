@@ -139,27 +139,19 @@ void mafPipeScalarTest::TestPipeExecution()
   CPPUNIT_ASSERT(surfaceActor != NULL);
 
   m_RenderWindow->Render();
-  mafSleep(800);
   CompareImages(0);
-  mafSleep(800);
   
   m_Renderer->GetActiveCamera()->Azimuth(30);
   m_RenderWindow->Render();
-  mafSleep(800);
   CompareImages(1);
-  mafSleep(800);
   
   m_Renderer->GetActiveCamera()->Azimuth(60);
   m_RenderWindow->Render();
-  mafSleep(800);
   CompareImages(2);
-  mafSleep(800);
   
   m_Renderer->GetActiveCamera()->Azimuth(90);
   m_RenderWindow->Render();
-  mafSleep(800);
   CompareImages(3);
-  mafSleep(800);
   
   vtkDEL(actorList);
 

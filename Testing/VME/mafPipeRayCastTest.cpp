@@ -132,7 +132,6 @@ void mafPipeRayCastTest::TestPipeExecution()
   CPPUNIT_ASSERT(surfaceActor != NULL);
 
   m_RenderWindow->Render();
-  mafSleep(800);
   // Regression compare test
   CompareImages(0);
 
@@ -196,7 +195,6 @@ void mafPipeRayCastTest::TestPipeExecutionMR()
   CPPUNIT_ASSERT(surfaceActor != NULL);
 
   m_RenderWindow->Render();
-  mafSleep(800);
   // Regression compare test
   CompareImages(1);
 
