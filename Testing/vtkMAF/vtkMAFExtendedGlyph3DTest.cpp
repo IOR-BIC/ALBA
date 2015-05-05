@@ -337,11 +337,6 @@ void vtkMAFExtendedGlyph3DTest::TestSetScaling()
 
   m_TestNumber = ID_EXECUTION_TEST + TestNumber;
   CompareImages();
-#ifdef WIN32
-  Sleep(2000);
-#else
-  usleep(2000*1000);
-#endif
 
   filter->ScalingOn();
   filter->Update();
@@ -353,11 +348,6 @@ void vtkMAFExtendedGlyph3DTest::TestSetScaling()
   TestNumber++;
   m_TestNumber = ID_EXECUTION_TEST + TestNumber;
   CompareImages();
-#ifdef WIN32
-  Sleep(2000);
-#else
-  usleep(2000*1000);
-#endif
 
   actor->Delete();
   mapper->Delete();
@@ -405,11 +395,6 @@ void vtkMAFExtendedGlyph3DTest::TestSetScaleFactor()
 
   m_TestNumber = ID_EXECUTION_TEST + TestNumber;
   CompareImages();
-#ifdef WIN32
-  Sleep(2000);
-#else
-  usleep(2000*1000);
-#endif
 
   actor->Delete();
   mapper->Delete();
@@ -536,11 +521,7 @@ void vtkMAFExtendedGlyph3DTest::TestSetScalarVisibility()
 
   m_TestNumber = ID_EXECUTION_TEST + TestNumber;
   CompareImages();
-#ifdef WIN32
-  Sleep(2000);
-#else
-  usleep(2000*1000);
-#endif
+
   actor->Delete();
   mapper->Delete();
 
@@ -591,11 +572,6 @@ void vtkMAFExtendedGlyph3DTest::TestSetOrient()
 
   m_TestNumber = ID_EXECUTION_TEST + TestNumber;
   CompareImages();
-#ifdef WIN32
-  Sleep(2000);
-#else
-  usleep(2000*1000);
-#endif
 
   actor->Delete();
   mapper->Delete();
@@ -652,11 +628,6 @@ void vtkMAFExtendedGlyph3DTest::TestSetClamping()
 
   m_TestNumber = ID_EXECUTION_TEST + TestNumber;
   CompareImages();
-#ifdef WIN32
-  Sleep(2000);
-#else
-  usleep(2000*1000);
-#endif
 
   filter->SetRange(12.0,20.0);
 
@@ -672,11 +643,6 @@ void vtkMAFExtendedGlyph3DTest::TestSetClamping()
   TestNumber++;
   m_TestNumber = ID_EXECUTION_TEST + TestNumber;
   CompareImages();
-#ifdef WIN32
-  Sleep(2000);
-#else
-  usleep(2000*1000);
-#endif
 
   actor->Delete();
   mapper->Delete();

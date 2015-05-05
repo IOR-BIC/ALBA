@@ -66,11 +66,6 @@ void vtkMAFTextOrientatorTest::RenderData(vtkActor2D *actor)
 
   //renderWindowInteractor->Start();
   CompareImages(renderWindow);
-#ifdef WIN32
-  Sleep(2000);
-#else
-  usleep(2000*1000);
-#endif
 
 }
 //------------------------------------------------------------------

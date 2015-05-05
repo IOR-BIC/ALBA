@@ -86,7 +86,7 @@ void mafOpOpenExternalFileTest::TestImporter()
   long pid = externalFile->GetPid();
 
   //wait for application to open the file and then kill the application
-  Sleep(3000);
+  Sleep(500);
   wxKill(pid);
   
   mafDEL(externalFile);
