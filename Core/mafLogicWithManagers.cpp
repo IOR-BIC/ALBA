@@ -475,7 +475,7 @@ void mafLogicWithManagers::CreateMenu()
   edit_menu->Append(OP_UNDO,   _("Undo  \tCtrl+Z"));
   edit_menu->Append(OP_REDO,   _("Redo  \tCtrl+Shift+Z"));
   edit_menu->AppendSeparator();
-  edit_menu->Append(OP_DELETE, _("Delete"));
+  edit_menu->Append(OP_DELETE, _("Delete  \tDel"));
   edit_menu->Append(OP_CUT,   _("Cut   \tCtrl+Shift+X"));
   edit_menu->Append(OP_COPY,  _("Copy  \tCtrl+Shift+C"));
   edit_menu->Append(OP_PASTE, _("Paste \tCtrl+Shift+V"));
