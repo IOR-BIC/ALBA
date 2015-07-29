@@ -810,12 +810,10 @@ void mafRWIBase::SaveImage(mafString filename, int magnification , int forceExte
 
   }
 
-  GetRenderWindow()->OffScreenRenderingOn();
   vtkMAFSmartPointer<vtkWindowToImageFilter> w2i;
   w2i->SetInput(GetRenderWindow());
   w2i->SetMagnification(magnification);
   w2i->Update();
-  GetRenderWindow()->OffScreenRenderingOff();
   
   wxSplitPath(filename.GetCStr(),&path,&name,&ext);
   ext.MakeLower();
