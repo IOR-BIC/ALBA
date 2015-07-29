@@ -67,7 +67,7 @@ mafTransformBase.h
 mafTransformFrame.cpp
 mafTransformFrame.h
 mafVector.h
-mafVector.txx
+mafVector.cpp
 mafVersion.h
 mmuIdFactory.cpp
 mmuIdFactory.h

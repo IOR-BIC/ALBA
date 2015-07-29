@@ -24,7 +24,7 @@
 
 #include <cppunit/config/SourcePrefix.h>
 #include "mafBaseTests.h"
-#include "mafVector.txx"
+#include "mafVector.cpp"
 #include "mafVectorTest.h"
 #include "mafReferenceCounted.h"
 #include "mafSmartPointer.h"

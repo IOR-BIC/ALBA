@@ -11,7 +11,7 @@
 =========================================================================*/
 
 #ifdef WIN32
-  #include "mafTimeMapWIN.txx"
+  #include "mafTimeMapWIN.cpp"
 #else
-  #include "mafTimeMapUX.txx"
+  #include "mafTimeMapUX.cpp"
 #endif

@@ -21,7 +21,7 @@
 #include "mafObject.h"
 #include "mafNode.h"
 #include "mafVector.h"
-#include "mafVector.txx"
+#include "mafVector.cpp"
 #include "mafEventSource.h"
 
 template class MAF_EXPORT mafVector<mafID>;
