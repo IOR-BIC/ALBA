@@ -26,7 +26,7 @@
 
 
 #include "mafNodeIterator.h"
-#include "mafVector.cpp"
+#include "mafVector.h"
 
 mafCxxTypeMacro(mafNodeIterator)
 
