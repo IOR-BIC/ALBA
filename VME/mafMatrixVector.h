@@ -18,7 +18,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafTimeMap.cpp"
+#include "mafTimeMap.h"
 #include "mafStorable.h"
 #include "mafStorageElement.h"
 #include "mafMatrix.h"
