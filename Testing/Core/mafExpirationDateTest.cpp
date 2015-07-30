@@ -83,7 +83,7 @@ void mafExpirationDateTest::TestHasExpired()
   result = e1.HasExpired();
   CPPUNIT_ASSERT(result == true);
 
-  mafExpirationDate e2 = mafExpirationDate("2015-06-10"); 
+  mafExpirationDate e2 = mafExpirationDate("2035-06-10"); 
   result = e2.HasExpired();
   CPPUNIT_ASSERT(result == false);
 
@@ -91,11 +91,11 @@ void mafExpirationDateTest::TestHasExpired()
   result = e3.HasExpired();
   CPPUNIT_ASSERT(result == true);
 
-  mafExpirationDate e4 = mafExpirationDate("2015-10-10"); 
+  mafExpirationDate e4 = mafExpirationDate("2035-10-10"); 
   result = e4.HasExpired();
   CPPUNIT_ASSERT(result == false);
 
-  mafExpirationDate e5 = mafExpirationDate("2016-10-10"); 
+  mafExpirationDate e5 = mafExpirationDate("2036-10-10"); 
   result = e5.HasExpired();
   CPPUNIT_ASSERT(result == false);
 

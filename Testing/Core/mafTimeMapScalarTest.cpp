@@ -27,7 +27,7 @@
 #include "mafTimeMapScalarTest.h"
 
 #include "mmuTimeSet.h"
-#include "mafTimeMapScalar.txx"
+#include "mafTimeMapScalar.h"
 
 #include <iostream>
 

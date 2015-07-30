@@ -29,7 +29,6 @@
 #include "mmuTimeSet.h"
 #include "mafReferenceCounted.h"
 #include "mafTimeMap.h"
-#include "mafTimeMap.txx"
 #include "mafSmartPointer.h"
 
 #include <iostream>
