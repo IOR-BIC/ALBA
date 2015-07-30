@@ -20,7 +20,6 @@
 //----------------------------------------------------------------------------
 #include "mmuIdFactory.h"
 #include "mafTimeMap.h"
-#include "mafTimeMap.cpp"
 #include "mafStorable.h"
 #include "mafTimeStamped.h"
 #include "mafEventSender.h"

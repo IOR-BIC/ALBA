@@ -21,7 +21,6 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "mafTimeMapScalar.h"
-#include "mafTimeMapScalar.cpp"
 #include "mafStorable.h"
 #include "mafStorageElement.h"
 
