@@ -35,14 +35,14 @@ void mafOpCopyTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafOpCopyTest::setUp()
+void mafOpCopyTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   m_OpCopy=new mafOpCopy("COPY");
   m_OpCopy->ClipboardClear(); //m_Clipboard is a static variable, so is necessary reinitialize before any test
 }
 //----------------------------------------------------------------------------
-void mafOpCopyTest::tearDown()
+void mafOpCopyTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   mafDEL(m_OpCopy);

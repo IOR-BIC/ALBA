@@ -29,15 +29,6 @@
 #include "mafDeviceButtonsPadMouse.h"
 #include "vtkRenderer.h"
 
-void mafAvatar2DTest::setUp()
-{
-
-}
-
-void mafAvatar2DTest::tearDown()
-{
-
-}
 
 void mafAvatar2DTest::TestFixture()
 {

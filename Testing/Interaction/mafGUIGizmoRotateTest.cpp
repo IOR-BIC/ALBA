@@ -43,7 +43,7 @@ void mafGUIGizmoRotateTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafGUIGizmoRotateTest::setUp()
+void mafGUIGizmoRotateTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   m_VMECube = mafVMESurface::New();
@@ -53,7 +53,7 @@ void mafGUIGizmoRotateTest::setUp()
   m_VMECube->SetData(m_VTKCube->GetOutput(), -1);  
 }
 //----------------------------------------------------------------------------
-void mafGUIGizmoRotateTest::tearDown()
+void mafGUIGizmoRotateTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   mafDEL(m_VMECube);

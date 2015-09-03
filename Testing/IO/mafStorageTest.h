@@ -17,46 +17,25 @@
 #ifndef __CPP_UNIT_mafStorageTest_H__
 #define __CPP_UNIT_mafStorageTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
-class mafStorageTest : public CPPUNIT_NS::TestFixture
+class mafStorageTest : public mafTest
 {
 public:
 
-  // CPPUNIT fixture: executed before each test
-  void setUp();
-
-  // CPPUNIT fixture: executed after each test
-  void tearDown();
-
+  
 	CPPUNIT_TEST_SUITE( mafStorageTest );
 
   CPPUNIT_TEST( SetGetURLTest );
-
   CPPUNIT_TEST( ForceGetParserURLTest );
-
   CPPUNIT_TEST( StoreTest );
-
   CPPUNIT_TEST( RestoreTest );
-
   CPPUNIT_TEST( SetGetDocumentTest );
-
   CPPUNIT_TEST( GetTmpFileTest );
-
   CPPUNIT_TEST( ReleaseTmpFileTest );
-
   CPPUNIT_TEST( IsFileInDirectoryTest );
-
   CPPUNIT_TEST( SetGetTmpFolderTest );
-
   CPPUNIT_TEST( SetGetErrorCodeTest );
-
   CPPUNIT_TEST( NeedsUpgradeTest );
 
 	CPPUNIT_TEST_SUITE_END();
@@ -64,31 +43,18 @@ public:
 protected:
 
   void SetGetURLTest();
-
   void ForceGetParserURLTest();
-
   void StoreTest();
-
   void RestoreTest();
-
   void SetGetDocumentTest();
-
   // void ResolveInputURLTest(); Not implemented in the tested class
-
   // void StoreToURLTest(); Not implemented in the tested class
-
   // void ReleaseURL(); Not implemented in the tested class
-
-  void GetTmpFileTest();
-
+	void GetTmpFileTest();
   void ReleaseTmpFileTest();
-
   void IsFileInDirectoryTest();
-
   void SetGetTmpFolderTest();
-
   void SetGetErrorCodeTest();
-
   void NeedsUpgradeTest();
 };
 

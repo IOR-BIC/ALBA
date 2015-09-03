@@ -57,13 +57,13 @@
 #include "vtkLineSource.h"
 #include "vtkPlaneSource.h"
 
-void mafGizmoTranslatePlaneTest::setUp()
+void mafGizmoTranslatePlaneTest::BeforeTest()
 {
   CreateRenderStuff();
 	CreateTestData();
 }
 
-void mafGizmoTranslatePlaneTest::tearDown()
+void mafGizmoTranslatePlaneTest::AfterTest()
 {
   m_Renderer->Delete();
   m_RenderWindow->Delete();

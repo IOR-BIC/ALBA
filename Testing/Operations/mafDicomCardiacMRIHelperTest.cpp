@@ -33,15 +33,6 @@
 #include <map>
 #include "mafDicomCardiacMRIHelper.h"
 
-void mafDicomCardiacMRIHelperTest::setUp() 
-{
-
-}
-
-void mafDicomCardiacMRIHelperTest::tearDown() 
-{
-
-}
 
 void mafDicomCardiacMRIHelperTest::TestConstructorDestructor() 
 {

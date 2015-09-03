@@ -49,14 +49,14 @@ void mafOpExporterVTKTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafOpExporterVTKTest::setUp()
+void mafOpExporterVTKTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   m_ExporterVTK = new mafOpExporterVTK("VTK");
 	m_ExporterVTK->TestModeOn();
 }
 //----------------------------------------------------------------------------
-void mafOpExporterVTKTest::tearDown()
+void mafOpExporterVTKTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   mafDEL(m_ExporterVTK);

@@ -42,7 +42,7 @@
 #include "vtkPolyData.h"
 #include "vtkDataSet.h"
 
-void mafOpRemoveCellsTest::setUp()
+void mafOpRemoveCellsTest::BeforeTest()
 {
   //Create storage
   
@@ -71,7 +71,7 @@ void mafOpRemoveCellsTest::setUp()
   
 }
 
-void mafOpRemoveCellsTest::tearDown()
+void mafOpRemoveCellsTest::AfterTest()
 {
   mafDEL(m_Storage);
 }

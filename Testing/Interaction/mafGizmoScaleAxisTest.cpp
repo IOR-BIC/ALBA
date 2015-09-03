@@ -57,13 +57,13 @@
 #include "vtkDataSetMapper.h"
 
 
-void mafGizmoScaleAxisTest::setUp()
+void mafGizmoScaleAxisTest::BeforeTest()
 {
   CreateRenderStuff();
 	CreateTestData();
 }
 
-void mafGizmoScaleAxisTest::tearDown()
+void mafGizmoScaleAxisTest::AfterTest()
 {
   m_Renderer->Delete();
   m_RenderWindow->Delete();

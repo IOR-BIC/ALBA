@@ -35,15 +35,6 @@
 #include "vtkImageData.h"
 #include "vtkImplicitBoolean.h"
 
-void vtkMAFImplicitPolyDataTest::setUp()
-{
- 
-}
-
-void vtkMAFImplicitPolyDataTest::tearDown()
-{
-
-}
 
 void vtkMAFImplicitPolyDataTest::TestFixture()
 {

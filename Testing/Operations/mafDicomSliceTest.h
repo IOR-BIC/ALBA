@@ -17,25 +17,12 @@
 #ifndef CPP_UNIT_mafDicomSliceTest_H
 #define CPP_UNIT_mafDicomSliceTest_H
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
-
-class mafDicomSliceTest : public CPPUNIT_NS::TestFixture
+class mafDicomSliceTest : public mafTest
 {
 
 public:
-  // CPPUNIT fixture: executed before each test
-  void setUp();
-
-  // CPPUNIT fixture: executed after each test
-  void tearDown();
-
   CPPUNIT_TEST_SUITE( mafDicomSliceTest );
   CPPUNIT_TEST( TestDynamicAllocation );
   CPPUNIT_TEST( TestGetSliceABSFileName );

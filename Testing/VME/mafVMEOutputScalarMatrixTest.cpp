@@ -44,7 +44,7 @@ void mafVMEOutputScalarMatrixTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafVMEOutputScalarMatrixTest::setUp()
+void mafVMEOutputScalarMatrixTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
 	m_Result = false;
@@ -52,11 +52,7 @@ void mafVMEOutputScalarMatrixTest::setUp()
   in_data.fill(1.0);
   in_data[5][10] = 0.0;
 }
-//----------------------------------------------------------------------------
-void mafVMEOutputScalarMatrixTest::tearDown()
-//----------------------------------------------------------------------------
-{
-}
+
 //----------------------------------------------------------------------------
 void mafVMEOutputScalarMatrixTest::TestDynamicAllocation()
 //----------------------------------------------------------------------------

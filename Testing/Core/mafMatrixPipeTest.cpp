@@ -42,7 +42,7 @@ void mafMatrixPipeTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafMatrixPipeTest::setUp()
+void mafMatrixPipeTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   m_SurfaceTest = NULL;
@@ -50,7 +50,7 @@ void mafMatrixPipeTest::setUp()
   result = false;
 }
 //----------------------------------------------------------------------------
-void mafMatrixPipeTest::tearDown()
+void mafMatrixPipeTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   mafDEL(m_SurfaceTest);

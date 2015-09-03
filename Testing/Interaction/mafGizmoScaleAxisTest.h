@@ -17,14 +17,7 @@
 #ifndef __CPP_UNIT_mafGizmoScaleAxisTest_H__
 #define __CPP_UNIT_mafGizmoScaleAxisTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
-
+#include "mafTest.h"
 #include "mafGizmoScaleAxis.h"
 #include "mafVMESurface.h"
 #include "mafVMERoot.h"
@@ -33,15 +26,15 @@
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 
-class mafGizmoScaleAxisTest : public CPPUNIT_NS::TestFixture
+class mafGizmoScaleAxisTest : public mafTest
 {
   public:
   
-  // CPPUNIT fixture: executed before each test
-  void setUp();
+  // Executed before each test
+  void BeforeTest();
 
-  // CPPUNIT fixture: executed after each test
-  void tearDown();
+  // Executed after each test
+  void AfterTest();
 
   CPPUNIT_TEST_SUITE( mafGizmoScaleAxisTest );
   CPPUNIT_TEST( TestFixture );

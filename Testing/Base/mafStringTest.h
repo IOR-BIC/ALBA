@@ -17,17 +17,10 @@
 #ifndef __CPP_UNIT_MAFSTRINGTEST_H__
 #define __CPP_UNIT_MAFSTRINGTEST_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
 
-
-class mafStringTest : public CPPUNIT_NS::TestFixture
+class mafStringTest : public mafTest
 {
   CPPUNIT_TEST_SUITE( mafStringTest );
   CPPUNIT_TEST( Test );

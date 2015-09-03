@@ -138,18 +138,17 @@ void mafGeometryEditorPolylineGraphTest::CreateExampleGraph()
 
 }
 //----------------------------------------------------------------------------
-void mafGeometryEditorPolylineGraphTest::setUp()
+void mafGeometryEditorPolylineGraphTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
 	m_Graph = vtkPolyData::New() ;
 	CreateExampleGraph();
 }
 //----------------------------------------------------------------------------
-void mafGeometryEditorPolylineGraphTest::tearDown()
+void mafGeometryEditorPolylineGraphTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-	m_Graph->Delete() ;
-	m_Graph = NULL ;
+	mafDEL(m_Graph);
 }
 //----------------------------------------------------------------------------
 void mafGeometryEditorPolylineGraphTest::TestFixture()

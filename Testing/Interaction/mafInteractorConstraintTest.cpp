@@ -29,16 +29,6 @@
 #include <iostream>
 
 
-void mafInteractorConstraintTest::setUp()
-{
-
-}
-
-void mafInteractorConstraintTest::tearDown()
-{
-
-}
-
 void mafInteractorConstraintTest::TestFixture()
 {
 

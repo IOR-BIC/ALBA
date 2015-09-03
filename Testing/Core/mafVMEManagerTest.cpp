@@ -117,27 +117,16 @@ void mafVMEManagerTest::TestFixture()
   cppDEL(m_Config); // remove leaks (here the manager is not instantiated and m_Config was not destroyed)
 }
 //----------------------------------------------------------------------------
-void mafVMEManagerTest::setUp()
+void mafVMEManagerTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  m_App = new TestApp();  // Instantiate the application class
-  m_App->argc = 0;        // set the number of input argument to 0
-  m_App->argv = NULL;     // set to NULL the input argument's parameters
-  wxTheApp->SetAppName("mafVMEManagerTest"); // Set the name for the application
-
   // create a wxConfig
   m_Config = new wxFileConfig("mafVMEManagerTest");
   wxConfigBase::Set(m_Config);
 
   int result = mafVMEFactory::Initialize();
 }
-//----------------------------------------------------------------------------
-void mafVMEManagerTest::tearDown()
-//----------------------------------------------------------------------------
-{
-  cppDEL(m_App);  // Destroy the application
-	wxAppConsole::SetInstance(NULL);
-}
+
 //----------------------------------------------------------------------------
 void mafVMEManagerTest::TestDynamicAllocation()
 //----------------------------------------------------------------------------

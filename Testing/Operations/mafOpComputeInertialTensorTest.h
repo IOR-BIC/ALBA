@@ -17,16 +17,9 @@
 #ifndef CPP_UNIT_mafOpComputeInertialTensorTest_H
 #define CPP_UNIT_mafOpComputeInertialTensorTest_H
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
-
-class mafOpComputeInertialTensorTest : public CPPUNIT_NS::TestFixture
+class mafOpComputeInertialTensorTest : public mafTest
 {
   CPPUNIT_TEST_SUITE( mafOpComputeInertialTensorTest );
   CPPUNIT_TEST( TestDynamicAllocation );

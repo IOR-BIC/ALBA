@@ -49,12 +49,12 @@
 #include "vtkTubeFilter.h"
 
 
-void mafGizmoInterfaceTest::setUp()
+void mafGizmoInterfaceTest::BeforeTest()
 {
   CreateTestData();
 }
 
-void mafGizmoInterfaceTest::tearDown()
+void mafGizmoInterfaceTest::AfterTest()
 {
    mafDEL(m_GizmoInputSurface);
    mafDEL(m_Root); 

@@ -46,16 +46,6 @@
 
 #define RENDER_DATA 0 //set 1 to see actor in vtk render window
 
-
-void mafLODActorTest::setUp()
-{
-}
-
-void mafLODActorTest::tearDown()
-{
-}
-
-
 void mafLODActorTest::TestFixture()
 {
 }

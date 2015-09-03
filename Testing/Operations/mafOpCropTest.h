@@ -17,15 +17,9 @@
 #ifndef CPP_UNIT_MMOCROPTEST_H
 #define CPP_UNIT_MMOCROPTEST_H
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
-class mafOpCropTest : public CPPUNIT_NS::TestFixture
+class mafOpCropTest : public mafTest
 {
   CPPUNIT_TEST_SUITE( mafOpCropTest );
 	CPPUNIT_TEST( DynamicAllocation );

@@ -27,16 +27,6 @@
 #include "mafDeviceButtonsPadTest.h"
 #include "mafDeviceButtonsPad.h"
 
-void mafDeviceButtonsPadTest::setUp()
-{
-
-}
-
-void mafDeviceButtonsPadTest::tearDown()
-{
-
-}
-
 
 void mafDeviceButtonsPadTest::TestConstructorDestructor()
 {

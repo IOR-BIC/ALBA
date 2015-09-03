@@ -29,15 +29,6 @@
 #include "mafDeviceButtonsPadTracker.h"
 #include "vtkCamera.h"
 
-void mafInteractor6DOFCameraMoveTest::setUp()
-{
-
-}
-
-void mafInteractor6DOFCameraMoveTest::tearDown()
-{
-
-}
 
 void mafInteractor6DOFCameraMoveTest::TestFixture()
 {

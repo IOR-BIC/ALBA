@@ -41,16 +41,14 @@ void mafOpImporterVTKTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafOpImporterVTKTest::setUp()
+void mafOpImporterVTKTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  result = false;
-
   m_ImporterVTK = new mafOpImporterVTK();
   m_ImporterVTK->TestModeOn();
 }
 //----------------------------------------------------------------------------
-void mafOpImporterVTKTest::tearDown()
+void mafOpImporterVTKTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   mafDEL(m_ImporterVTK);

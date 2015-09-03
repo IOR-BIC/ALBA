@@ -64,14 +64,13 @@ void mafEventSenderTest::TestInvokeEvent()
 
 }
 
-void mafEventSenderTest::setUp()
+void mafEventSenderTest::BeforeTest()
 {
   m_Sender = new mafEventSender();
-
   m_DummyObserver = new DummyObserver();
 }
 
-void mafEventSenderTest::tearDown()
+void mafEventSenderTest::AfterTest()
 {
   cppDEL(m_Sender);
 	cppDEL(m_DummyObserver);

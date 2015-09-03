@@ -40,15 +40,13 @@ void mafOpCreateProberTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafOpCreateProberTest::setUp()
+void mafOpCreateProberTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  result = false;
-
-  m_CreateProber = new mafOpCreateProber();
+	m_CreateProber = new mafOpCreateProber();
 }
 //----------------------------------------------------------------------------
-void mafOpCreateProberTest::tearDown()
+void mafOpCreateProberTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   cppDEL(m_CreateProber);

@@ -28,15 +28,6 @@
 #include "vtkMAFExtrudeToCircle.h"
 #include "mafConfigure.h"
 
-void vtkMAFExtrudeToCircleVertexDataTest::setUp()
-{
-
-}
-
-void vtkMAFExtrudeToCircleVertexDataTest::tearDown()
-{
-  
-}
 
 void vtkMAFExtrudeToCircleVertexDataTest::TestFixture()
 {

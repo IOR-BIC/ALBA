@@ -149,7 +149,7 @@ void vtkMAFCollisionDetectionFilterTest::Test()
   }
 }
 //-------------------------------------------------------------------------
-void vtkMAFCollisionDetectionFilterTest::setUp()
+void vtkMAFCollisionDetectionFilterTest::BeforeTest()
 //-------------------------------------------------------------------------
 {
   vtkNEW(m_Renderer);
@@ -162,7 +162,7 @@ void vtkMAFCollisionDetectionFilterTest::setUp()
   m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
 }
 //-------------------------------------------------------------------------
-void vtkMAFCollisionDetectionFilterTest::tearDown()
+void vtkMAFCollisionDetectionFilterTest::AfterTest()
 //-------------------------------------------------------------------------
 {
   m_Renderer->RemoveAllProps();

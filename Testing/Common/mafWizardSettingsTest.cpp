@@ -33,24 +33,14 @@
 
 #define TEST_RESULT CPPUNIT_ASSERT(m_Result)
 
-//----------------------------------------------------------------------------
-void mafWizardSettingsTest::setUp()
-//----------------------------------------------------------------------------
-{
-  m_App = new TestApp();  // Instantiate the application class
-  m_App->argc = 0;        // set the number of input argument to 0
-  m_App->argv = NULL;     // set to NULL the input argument's parameters
-  wxTheApp->SetAppName("mafGUISettingsAdvancedTest"); // Set the name for the application
-}
 
 //----------------------------------------------------------------------------
-void mafWizardSettingsTest::tearDown()
+void mafWizardSettingsTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   wxConfig *config = new wxConfig(wxEmptyString);
   config->DeleteAll();
   cppDEL(config);
-  cppDEL(m_App);
 }
 
 //---------------------------------------------------------

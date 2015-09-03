@@ -55,7 +55,7 @@ void mafTransformFrameTest::TestFixture()
 }
 
 //----------------------------------------------------------------------------
-void mafTransformFrameTest::setUp()
+void mafTransformFrameTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   //create input frame transform
@@ -98,7 +98,7 @@ void mafTransformFrameTest::setUp()
 }
 
 //----------------------------------------------------------------------------
-void mafTransformFrameTest::tearDown()
+void mafTransformFrameTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   vtkDEL(m_InputFrameMatrix);

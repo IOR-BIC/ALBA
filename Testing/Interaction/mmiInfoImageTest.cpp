@@ -32,16 +32,6 @@
 #include "mafDeviceButtonsPadMouse.h"
 #include "mafVMESurface.h"
 
-void mmiInfoImageTest::setUp()
-{
-  
-}
-
-void mmiInfoImageTest::tearDown()
-{
-
-}
-
 void mmiInfoImageTest::TestFixture()
 {
 	

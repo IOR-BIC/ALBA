@@ -33,26 +33,15 @@
 #include "mafGUILandmarkTest.h"
 #include "mafGUIWizardPageNewTest.h"
 
+#include <cppunit/BriefTestProgressListener.h>
+#include <cppunit/CompilerOutputter.h>
+#include <cppunit/extensions/TestFactoryRegistry.h>
+#include <cppunit/TestResultCollector.h>
+#include <cppunit/TestRunner.h>
 
-IMPLEMENT_APP(TestApp)
-//--------------------------------------------------------------------------------
-bool TestApp::OnInit()
-//--------------------------------------------------------------------------------
-{
-	return TRUE;
-}
-//--------------------------------------------------------------------------------
-int TestApp::OnExit()
-//--------------------------------------------------------------------------------
-{
-	wxApp::CleanUp();
-	return 0;
-}
-// ===============================================================================
 
 //Main Test Executor
-int
-	main( int argc, char* argv[] )
+int main( int argc, char* argv[] )
 {
 
 	// Create the event manager and test controller

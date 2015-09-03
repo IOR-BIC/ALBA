@@ -119,7 +119,7 @@ void mafTestAgent::OnEvent(mafEventBase *event)
 }
 
 
-void mafAgentTest::setUp()
+void mafAgentTest::BeforeTest()
 {
   m_Source = mafTestAgent::New(); // used just a m_Source for events
   m_Source->SetName("m_Source");
@@ -133,10 +133,9 @@ void mafAgentTest::setUp()
   m_Sink3->SetName("m_Sink3");
   m_Sink4 = mafTestAgent::New();
   m_Sink4->SetName("m_Sink4");
-
 }
 
-void mafAgentTest::tearDown()
+void mafAgentTest::AfterTest()
 {
   mafDEL(m_Source);
   mafDEL(m_Router);

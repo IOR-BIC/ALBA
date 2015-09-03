@@ -27,21 +27,13 @@
 #include "mafDeviceButtonsPadMouseTest.h"
 #include "mafDeviceButtonsPadMouse.h"
 
-void mafDeviceButtonsPadMouseTest::setUp()
-{
-
-}
-
-void mafDeviceButtonsPadMouseTest::tearDown()
-{
-
-}
-
+//----------------------------------------------------------------------------
 void mafDeviceButtonsPadMouseTest::TestFixture()
 {
 
 }
 
+//----------------------------------------------------------------------------
 void mafDeviceButtonsPadMouseTest::TestConstructorDestructor()
 {
   mafDeviceButtonsPadMouse *buttonsPadMouse = mafDeviceButtonsPadMouse::New();
@@ -49,6 +41,7 @@ void mafDeviceButtonsPadMouseTest::TestConstructorDestructor()
   buttonsPadMouse->Delete();
 }
 
+//----------------------------------------------------------------------------
 void mafDeviceButtonsPadMouseTest::TestSetGetLastPosition()
 {
   mafDeviceButtonsPadMouse *buttonsPadMouse = mafDeviceButtonsPadMouse::New();
@@ -68,6 +61,7 @@ void mafDeviceButtonsPadMouseTest::TestSetGetLastPosition()
   buttonsPadMouse->Delete();
 }
 
+//----------------------------------------------------------------------------
 void mafDeviceButtonsPadMouseTest::TestGetRenderer()
 {
   mafDeviceButtonsPadMouse *buttonsPadMouse = mafDeviceButtonsPadMouse::New();
@@ -81,6 +75,7 @@ void mafDeviceButtonsPadMouseTest::TestGetRenderer()
   buttonsPadMouse->Delete();
 }
 
+//----------------------------------------------------------------------------
 void mafDeviceButtonsPadMouseTest::TestGetView()
 {
   mafDeviceButtonsPadMouse *buttonsPadMouse = mafDeviceButtonsPadMouse::New();
@@ -94,6 +89,7 @@ void mafDeviceButtonsPadMouseTest::TestGetView()
   buttonsPadMouse->Delete();
 }
 
+//----------------------------------------------------------------------------
 void mafDeviceButtonsPadMouseTest::TestGetInteractor()
 {
   mafDeviceButtonsPadMouse *buttonsPadMouse = mafDeviceButtonsPadMouse::New();
@@ -107,6 +103,7 @@ void mafDeviceButtonsPadMouseTest::TestGetInteractor()
   buttonsPadMouse->Delete();
 }
 
+//----------------------------------------------------------------------------
 void mafDeviceButtonsPadMouseTest::TestGetRWI()
 {
   mafDeviceButtonsPadMouse *buttonsPadMouse = mafDeviceButtonsPadMouse::New();
@@ -120,6 +117,7 @@ void mafDeviceButtonsPadMouseTest::TestGetRWI()
   buttonsPadMouse->Delete();
 }
 
+//----------------------------------------------------------------------------
 void mafDeviceButtonsPadMouseTest::TestSetUpdateRWIDuringMotion()
 {
   mafDeviceButtonsPadMouse *buttonsPadMouse = mafDeviceButtonsPadMouse::New();
@@ -139,6 +137,7 @@ void mafDeviceButtonsPadMouseTest::TestSetUpdateRWIDuringMotion()
   buttonsPadMouse->Delete();
 }
 
+//----------------------------------------------------------------------------
 void mafDeviceButtonsPadMouseTest::TestUpdateRWIDuringMotionOnOff()
 {
   mafDeviceButtonsPadMouse *buttonsPadMouse = mafDeviceButtonsPadMouse::New();
@@ -158,6 +157,7 @@ void mafDeviceButtonsPadMouseTest::TestUpdateRWIDuringMotionOnOff()
   buttonsPadMouse->Delete();
 }
 
+//----------------------------------------------------------------------------
 void mafDeviceButtonsPadMouseTest::TestIsUpdateRWIDuringMotion()
 {
   mafDeviceButtonsPadMouse *buttonsPadMouse = mafDeviceButtonsPadMouse::New();
@@ -173,6 +173,7 @@ void mafDeviceButtonsPadMouseTest::TestIsUpdateRWIDuringMotion()
   buttonsPadMouse->Delete();
 }
 
+//----------------------------------------------------------------------------
 void mafDeviceButtonsPadMouseTest::TestDisplayToNormalizedDisplay()
 {
   mafDeviceButtonsPadMouse *buttonsPadMouse = mafDeviceButtonsPadMouse::New();
@@ -187,6 +188,7 @@ void mafDeviceButtonsPadMouseTest::TestDisplayToNormalizedDisplay()
   buttonsPadMouse->Delete();
 }
 
+//----------------------------------------------------------------------------
 void mafDeviceButtonsPadMouseTest::TestNormalizedDisplayToDisplay()
 {
   mafDeviceButtonsPadMouse *buttonsPadMouse = mafDeviceButtonsPadMouse::New();
@@ -201,6 +203,7 @@ void mafDeviceButtonsPadMouseTest::TestNormalizedDisplayToDisplay()
   buttonsPadMouse->Delete();
 }
 
+//----------------------------------------------------------------------------
 void mafDeviceButtonsPadMouseTest::TestCollaborate()
 {
   mafDeviceButtonsPadMouse *buttonsPadMouse = mafDeviceButtonsPadMouse::New();

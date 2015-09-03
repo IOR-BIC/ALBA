@@ -17,16 +17,9 @@
 #ifndef __CPP_UNIT_VMEGenericBoundsTest_H__
 #define __CPP_UNIT_VMEGenericBoundsTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
-
-class VMEGenericBoundsTest : public CPPUNIT_NS::TestFixture
+class VMEGenericBoundsTest : public mafTest
 {
   CPPUNIT_TEST_SUITE( VMEGenericBoundsTest );
   CPPUNIT_TEST( VMEGenericBoundsMainTest );

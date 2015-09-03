@@ -41,10 +41,9 @@
 #include "vtkAxes.h"
 #include "vtkTubeFilter.h"
 
-void mafGizmoInteractionDebuggerTest::setUp()
+void mafGizmoInteractionDebuggerTest::BeforeTest()
 {
 	//// Create the polyline graph constrain
-
 	m_PolylineGraph =NULL;
 	mafNEW(m_PolylineGraph);
 
@@ -113,12 +112,11 @@ void mafGizmoInteractionDebuggerTest::setUp()
 
 }
 
-void mafGizmoInteractionDebuggerTest::tearDown()
+void mafGizmoInteractionDebuggerTest::AfterTest()
 {
 	mafDEL(m_PolylineGraph);
 	mafDEL(m_GizmoInputSurface);
 	mafDEL(m_Root); 
-
 }
 
 void mafGizmoInteractionDebuggerTest::TestFixture()

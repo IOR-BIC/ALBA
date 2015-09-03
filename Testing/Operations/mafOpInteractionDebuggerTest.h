@@ -17,24 +17,13 @@
 #ifndef CPP_UNIT_mafOpInteractionDebuggerTest_H
 #define CPP_UNIT_mafOpInteractionDebuggerTest_H
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 using namespace std;
  
-class mafOpInteractionDebuggerTest : public CPPUNIT_NS::TestFixture
+class mafOpInteractionDebuggerTest : public mafTest
 {
 
 public:
-  // CPPUNIT fixture: executed before each test
-  void setUp();
-
-  // CPPUNIT fixture: executed after each test
-  void tearDown();
 
   CPPUNIT_TEST_SUITE( mafOpInteractionDebuggerTest );
   CPPUNIT_TEST( TestDynamicAllocation );

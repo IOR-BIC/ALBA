@@ -49,12 +49,12 @@
 #include "vtkAxes.h"
 #include "vtkTubeFilter.h"
 
-void mafGizmoTranslateTest::setUp()
+void mafGizmoTranslateTest::BeforeTest()
 {
   CreateTestData();
 }
 
-void mafGizmoTranslateTest::tearDown()
+void mafGizmoTranslateTest::AfterTest()
 {
    mafDEL(m_GizmoInputSurface);
    mafDEL(m_Root); 

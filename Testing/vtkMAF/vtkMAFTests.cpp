@@ -108,6 +108,11 @@
 #include "vtkMAFImageFillHolesRemoveIslandsTest.h"
 #include "vtkMAFRayCastCleanerTest.h"
 
+#include <cppunit/BriefTestProgressListener.h>
+#include <cppunit/CompilerOutputter.h>
+#include <cppunit/extensions/TestFactoryRegistry.h>
+#include <cppunit/TestResultCollector.h>
+#include <cppunit/TestRunner.h>
 
 //Main Test Executor
 int

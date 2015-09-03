@@ -16,7 +16,7 @@ void ExampleTestCase::anotherExample()
   CPPUNIT_ASSERT (1 == 2);
 }
 
-void ExampleTestCase::setUp()
+void ExampleTestCase::BeforeTest()
 {
   m_value1 = 2.0;
   m_value2 = 3.0;

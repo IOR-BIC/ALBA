@@ -61,7 +61,7 @@ void mafPipeTensorFieldGlyphsTest::TestFixture()
 }
 
 //----------------------------------------------------------------------------
-void mafPipeTensorFieldGlyphsTest::setUp()
+void mafPipeTensorFieldGlyphsTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   vtkNEW(m_Renderer);
@@ -70,7 +70,7 @@ void mafPipeTensorFieldGlyphsTest::setUp()
 }
 
 //----------------------------------------------------------------------------
-void mafPipeTensorFieldGlyphsTest::tearDown()
+void mafPipeTensorFieldGlyphsTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   vtkDEL(m_Renderer);

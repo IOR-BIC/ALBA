@@ -17,26 +17,13 @@
 #ifndef __CPP_UNIT_mafDeviceButtonsPadMouseRemoteTest_H__
 #define __CPP_UNIT_mafDeviceButtonsPadMouseRemoteTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
-class mafDeviceButtonsPadMouseRemoteTest : public CPPUNIT_NS::TestFixture
+class mafDeviceButtonsPadMouseRemoteTest : public mafTest
 {
   public:
   
-  /** CPPUNIT fixture: executed before each test */
-  void setUp();
-
-  /** CPPUNIT fixture: executed after each test */
-  void tearDown();
-
   CPPUNIT_TEST_SUITE( mafDeviceButtonsPadMouseRemoteTest );
-
     CPPUNIT_TEST(TestFixture);
     CPPUNIT_TEST(TestConstructorDestructor);
     CPPUNIT_TEST(TestOnEventMouse2DMove);
@@ -46,7 +33,6 @@ class mafDeviceButtonsPadMouseRemoteTest : public CPPUNIT_NS::TestFixture
     CPPUNIT_TEST(TestOnEventViewSelect);
     CPPUNIT_TEST(TestOnEventViewDelete);
     CPPUNIT_TEST(TestOnEventMouseCharEvent);
-
   CPPUNIT_TEST_SUITE_END();
 
   protected:

@@ -39,7 +39,7 @@
 #include "vtkWindowToImageFilter.h"
 
 //----------------------------------------------------------------------------
-void mafOpMML3ParameterViewTest::setUp()
+void mafOpMML3ParameterViewTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   vtkNEW(m_RenderWindow);
@@ -51,7 +51,7 @@ void mafOpMML3ParameterViewTest::setUp()
   m_RenderWindow->SetPosition(400,0);
 }
 //----------------------------------------------------------------------------
-void mafOpMML3ParameterViewTest::tearDown()
+void mafOpMML3ParameterViewTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   vtkDEL(m_RenderWindow);

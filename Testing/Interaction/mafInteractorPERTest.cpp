@@ -31,15 +31,6 @@
 #include "mafVMESurface.h"
 #include "vtkCamera.h"
 
-void mafInteractorPERTest::setUp()
-{
-
-}
-
-void mafInteractorPERTest::tearDown()
-{
-
-}
 
 void mafInteractorPERTest::TestFixture()
 {

@@ -74,7 +74,7 @@ void mafPipePolylineGraphEditorTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafPipePolylineGraphEditorTest::setUp()
+void mafPipePolylineGraphEditorTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   vtkNEW(m_Polydata);
@@ -83,7 +83,7 @@ void mafPipePolylineGraphEditorTest::setUp()
   vtkNEW(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
-void mafPipePolylineGraphEditorTest::tearDown()
+void mafPipePolylineGraphEditorTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   vtkDEL(m_Polydata);

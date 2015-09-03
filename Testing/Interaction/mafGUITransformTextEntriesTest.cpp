@@ -41,7 +41,7 @@ void mafGUITransformTextEntriesTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafGUITransformTextEntriesTest::setUp()
+void mafGUITransformTextEntriesTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   m_VMESphere = mafVMESurface::New();
@@ -49,10 +49,9 @@ void mafGUITransformTextEntriesTest::setUp()
   
   m_VTKSphere = vtkSphereSource::New();
   m_VMESphere->SetData(m_VTKSphere->GetOutput(), -1);
-  
 }
 //----------------------------------------------------------------------------
-void mafGUITransformTextEntriesTest::tearDown()
+void mafGUITransformTextEntriesTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   mafDEL(m_VMESphere);

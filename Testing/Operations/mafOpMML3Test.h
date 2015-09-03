@@ -17,18 +17,12 @@
 #ifndef __CPP_UNIT_mafOpMML3Test_H__
 #define __CPP_UNIT_mafOpMML3Test_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
 #include "vtkDataSet.h"
 #include "vtkTransform.h"
 
-class mafOpMML3Test : public CPPUNIT_NS::TestFixture
+class mafOpMML3Test : public mafTest
 {
 public:
   CPPUNIT_TEST_SUITE( mafOpMML3Test );

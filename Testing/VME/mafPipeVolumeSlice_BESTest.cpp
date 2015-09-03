@@ -67,7 +67,7 @@ void mafPipeVolumeSlice_BESTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafPipeVolumeSlice_BESTest::setUp()
+void mafPipeVolumeSlice_BESTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   vtkNEW(m_Renderer);
@@ -75,7 +75,7 @@ void mafPipeVolumeSlice_BESTest::setUp()
   vtkNEW(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
-void mafPipeVolumeSlice_BESTest::tearDown()
+void mafPipeVolumeSlice_BESTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   vtkDEL(m_Renderer);

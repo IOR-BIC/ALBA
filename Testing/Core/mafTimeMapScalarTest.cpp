@@ -47,14 +47,13 @@ void mafTimeMapScalarTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafTimeMapScalarTest::setUp()
+void mafTimeMapScalarTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   m_SVector = new mafTestSVector();
-  result = false;
 }
 //----------------------------------------------------------------------------
-void mafTimeMapScalarTest::tearDown()
+void mafTimeMapScalarTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   cppDEL(m_SVector);

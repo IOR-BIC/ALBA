@@ -17,24 +17,15 @@
 #ifndef __CPP_UNIT_mafVMEScalarTest_H__
 #define __CPP_UNIT_mafVMEScalarTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
 /** Test for mafVMEScalarMatrix.*/
-class mafVMEScalarTest : public CPPUNIT_NS::TestFixture
+class mafVMEScalarTest : public mafTest
 {
 public: 
 
-  // CPPUNIT fixture: executed before each test
-  void setUp();
-
-  // CPPUNIT fixture: executed after each test
-  void tearDown();
+  // Executed before each test
+  void BeforeTest();
 
   CPPUNIT_TEST_SUITE( mafVMEScalarTest );
   CPPUNIT_TEST( TestFixture ); // just to test that the fixture has no leaks

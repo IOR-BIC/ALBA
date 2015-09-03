@@ -58,7 +58,7 @@ void mafPipeRayCastTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafPipeRayCastTest::setUp()
+void mafPipeRayCastTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   // Create rendering window
@@ -76,7 +76,7 @@ void mafPipeRayCastTest::setUp()
 
 }
 //----------------------------------------------------------------------------
-void mafPipeRayCastTest::tearDown()
+void mafPipeRayCastTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   // Free memory

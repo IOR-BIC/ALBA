@@ -137,6 +137,11 @@
 #include "mafOpInteractionDebuggerTest.h"
 #include "mafOpIterativeRegistrationTest.h"
 
+#include <cppunit/BriefTestProgressListener.h>
+#include <cppunit/CompilerOutputter.h>
+#include <cppunit/extensions/TestFactoryRegistry.h>
+#include <cppunit/TestResultCollector.h>
+#include <cppunit/TestRunner.h>
 
 //-------------------------------------------------------------------------
 mafCxxTypeMacro(DummyVme);

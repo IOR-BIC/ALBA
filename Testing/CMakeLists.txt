@@ -13,6 +13,20 @@ IF (CPPUNIT_FOUND)
 ELSE (CPPUNIT_FOUND)
   MESSAGE("Cppunit library not found! Please fill the corresponding cache entries")
 ENDIF (CPPUNIT_FOUND)
+
+PROJECT(mafTests)
+
+DBG_MESSAGE("Configuring project mafTESTS")
+
+# Set your list of sources here.
+SET(PROJECT_SRCS
+  mafTest.cpp mafTest.h
+	)
+	
+# Create the library.
+ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
+
   
 OPTION(BUILD_BASE_TESTING "Enable building of testing for BASE classes" OFF)
 IF (BUILD_BASE_TESTING)

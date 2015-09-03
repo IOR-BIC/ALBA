@@ -27,17 +27,6 @@
 #include "vtkRenderWindowInteractor.h"
 
 
-
-void vtkMAFGlobalAxisCoordinateTest::setUp()
-{
- 
-}
-
-void vtkMAFGlobalAxisCoordinateTest::tearDown()
-{
-
-}
-
 void vtkMAFGlobalAxisCoordinateTest::TestFixture()
 {
 

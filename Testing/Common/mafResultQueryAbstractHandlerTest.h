@@ -17,14 +17,7 @@
 #ifndef __CPP_UNIT_mafResultQueryAbstractHandlerTest_H__
 #define __CPP_UNIT_mafResultQueryAbstractHandlerTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
-#include <cppunit/TestFixture.h>
+#include "mafTest.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -35,15 +28,9 @@ class vtkPolyData;
 class name: mafResultQueryAbstractHandlerTest
   Test class for mafResultQueryAbstractHandler
 */
-class mafResultQueryAbstractHandlerTest : public CPPUNIT_NS::TestFixture
+class mafResultQueryAbstractHandlerTest : public mafTest
 {
 public:
-
-	/** CPPUNIT fixture: executed before each test */
-	void setUp();
-
-	/** CPPUNIT fixture: executed after each test */
-	void tearDown();
 
   /** Start test suite macro */
 	CPPUNIT_TEST_SUITE( mafResultQueryAbstractHandlerTest );

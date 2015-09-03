@@ -30,16 +30,6 @@
 #include "mafTransform.h"
 #include "vtkRenderer.h"
 
-void mafRefSysTest::setUp()
-{
-
-}
-
-void mafRefSysTest::tearDown()
-{
-
-}
-
 void mafRefSysTest::TestFixture()
 {
 

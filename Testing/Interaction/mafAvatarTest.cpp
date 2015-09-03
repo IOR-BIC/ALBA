@@ -34,42 +34,39 @@
 
 mafCxxTypeMacro(ConcreteMafAvatar);
 
+//----------------------------------------------------------------------------
 ConcreteMafAvatar::ConcreteMafAvatar()
 {
 	m_LastReceivedEventID = -1;
 }
 
+//----------------------------------------------------------------------------
 ConcreteMafAvatar::~ConcreteMafAvatar()
 {
 
 }
 
+//----------------------------------------------------------------------------
 void ConcreteMafAvatar::OnEvent(mafEventBase *maf_event)
 {
   m_LastReceivedEventID =  maf_event->GetId();
   Superclass::OnEvent(maf_event);
 }
 
+//----------------------------------------------------------------------------
 int ConcreteMafAvatar::GetLastReceivedEventID()
 {
   return m_LastReceivedEventID;
 }
 
-void mafAvatarTest::setUp()
-{
 
-}
-
-void mafAvatarTest::tearDown()
-{
-
-}
-
+//----------------------------------------------------------------------------
 void mafAvatarTest::TestFixture()
 {
 
 }
 
+//----------------------------------------------------------------------------
 void mafAvatarTest::TestConstructorDestructor()
 {
   ConcreteMafAvatar *dummyAvatar = NULL;
@@ -82,6 +79,7 @@ void mafAvatarTest::TestConstructorDestructor()
   mafSmartPointer<ConcreteMafAvatar> cmss;
 }
 
+//----------------------------------------------------------------------------
 void mafAvatarTest::TestSetGetView()
 {
   ConcreteMafAvatar *dummyAvatar = NULL;
@@ -106,6 +104,7 @@ void mafAvatarTest::TestSetGetView()
   dummyAvatar->Delete();
 }
 
+//----------------------------------------------------------------------------
 void mafAvatarTest::TestGetActor3D()
 {
   ConcreteMafAvatar *dummyAvatar = NULL;
@@ -121,6 +120,7 @@ void mafAvatarTest::TestGetActor3D()
   dummyAvatar->Delete();
 }
 
+//----------------------------------------------------------------------------
 void mafAvatarTest::TestPick()
 {
   ConcreteMafAvatar *dummyAvatar = NULL;
@@ -133,6 +133,7 @@ void mafAvatarTest::TestPick()
   dummyAvatar->Delete();
 }
 
+//----------------------------------------------------------------------------
 void mafAvatarTest::TestOnEvent()
 {
   ConcreteMafAvatar *dummyAvatar = NULL;
@@ -152,6 +153,7 @@ void mafAvatarTest::TestOnEvent()
   dummyAvatar->Delete();
 }
 
+//----------------------------------------------------------------------------
 void mafAvatarTest::TestSetGetTracker()
 {
   ConcreteMafAvatar *dummyAvatar = NULL;
@@ -177,6 +179,7 @@ void mafAvatarTest::TestSetGetTracker()
   dummyTracker->Delete();
 }
 
+//----------------------------------------------------------------------------
 void mafAvatarTest::TestSetGetMode()
 {
   ConcreteMafAvatar *dummyAvatar = NULL;
@@ -196,6 +199,7 @@ void mafAvatarTest::TestSetGetMode()
   dummyAvatar->Delete();
 }
 
+//----------------------------------------------------------------------------
 void mafAvatarTest::TestSetModeTo2D()
 {
   ConcreteMafAvatar *dummyAvatar = NULL;
@@ -212,9 +216,9 @@ void mafAvatarTest::TestSetModeTo2D()
   CPPUNIT_ASSERT(mode == mafAvatar::MODE_2D);
 
   dummyAvatar->Delete();
-
 }
 
+//----------------------------------------------------------------------------
 void mafAvatarTest::TestSetModeTo3D()
 {
   ConcreteMafAvatar *dummyAvatar = NULL;
@@ -236,6 +240,7 @@ mode = dummyAvatar->GetMode();
 
 }
 
+//----------------------------------------------------------------------------
 void mafAvatarTest::TestGetPicker()
 {
   ConcreteMafAvatar *dummyAvatar = NULL;

@@ -36,14 +36,13 @@ void mafSceneNodeTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafSceneNodeTest::setUp()
+void mafSceneNodeTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   m_Vme = mafVMESurface::New();
-  result = false;
 }
 //----------------------------------------------------------------------------
-void mafSceneNodeTest::tearDown()
+void mafSceneNodeTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   mafDEL(m_Vme);

@@ -17,14 +17,7 @@
 #ifndef __CPP_UNIT_vtkMAFGridActortest_H__
 #define __CPP_UNIT_vtkMAFGridActortest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
-#include <cppunit/TestFixture.h>
+#include "mafTest.h"
 
 //------------------------------------------------------------------------------
 // Forward Declaration:
@@ -37,7 +30,7 @@ class vtkActor;
   Class Name: vtkMAFGridActorTest.
   Test for vtkMAFGridActor.
 */
-class vtkMAFGridActorTest : public CPPUNIT_NS::TestFixture
+class vtkMAFGridActorTest : public mafTest
 {
   public:
     /** Test IDs*/
@@ -48,12 +41,6 @@ class vtkMAFGridActorTest : public CPPUNIT_NS::TestFixture
       ID_GRID_COLOR_TEST,
       ID_LABEL_ACTOR_TEST,
     };
-
-    /** CPPUNIT fixture: executed before each test.*/
-    void setUp();
-
-    /* CPPUNIT fixture: executed after each test.*/
-    void tearDown();
 
     /** Test suite begin. */
     CPPUNIT_TEST_SUITE( vtkMAFGridActorTest );

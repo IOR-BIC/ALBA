@@ -60,7 +60,7 @@ void mafVisualPipeVolumeRayCastingTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafVisualPipeVolumeRayCastingTest::setUp()
+void mafVisualPipeVolumeRayCastingTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   vtkNEW(m_Renderer);
@@ -68,7 +68,7 @@ void mafVisualPipeVolumeRayCastingTest::setUp()
   vtkNEW(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
-void mafVisualPipeVolumeRayCastingTest::tearDown()
+void mafVisualPipeVolumeRayCastingTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   vtkDEL(m_Renderer);

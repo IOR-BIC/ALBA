@@ -3,7 +3,7 @@ PROJECT (mafCore_TEST)
 IF(MAF_BUILD_MAFDLL)
   LINK_LIBRARIES(mafDLL)
 ELSE(MAF_BUILD_MAFDLL)
-  LINK_LIBRARIES(mafCore mafVME)
+  LINK_LIBRARIES(mafTests mafCore mafVME)
 ENDIF (MAF_BUILD_MAFDLL)
 
 # Set your list of sources here.

@@ -44,6 +44,12 @@
 #include "mafViewSliceGlobalTest.h"
 #include "mafViewCompoundWindowingTest.h"
 
+#include <cppunit/BriefTestProgressListener.h>
+#include <cppunit/CompilerOutputter.h>
+#include <cppunit/extensions/TestFactoryRegistry.h>
+#include <cppunit/TestResultCollector.h>
+#include <cppunit/TestRunner.h>
+
 
 //Main Test Executor
 int	main( int argc, char* argv[] )

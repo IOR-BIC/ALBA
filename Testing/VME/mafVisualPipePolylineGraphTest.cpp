@@ -73,7 +73,7 @@ void mafVisualPipePolylineGraphTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafVisualPipePolylineGraphTest::setUp()
+void mafVisualPipePolylineGraphTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   vtkNEW(m_Polydata);
@@ -82,7 +82,7 @@ void mafVisualPipePolylineGraphTest::setUp()
   vtkNEW(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
-void mafVisualPipePolylineGraphTest::tearDown()
+void mafVisualPipePolylineGraphTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   vtkDEL(m_Polydata);

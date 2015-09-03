@@ -46,14 +46,6 @@
 #include <iostream>
 
 
-void mafOpExporterMeshTest::setUp()
-{
-}
-
-void mafOpExporterMeshTest::tearDown()
-{
-}
-
 void mafOpExporterMeshTest::TestExporterMesh()
 {
   // Generate output files

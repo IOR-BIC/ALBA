@@ -59,7 +59,7 @@ void mafPipeVolumeMIPTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafPipeVolumeMIPTest::setUp()
+void mafPipeVolumeMIPTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   vtkNEW(m_Renderer);
@@ -67,7 +67,7 @@ void mafPipeVolumeMIPTest::setUp()
   vtkNEW(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
-void mafPipeVolumeMIPTest::tearDown()
+void mafPipeVolumeMIPTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   vtkDEL(m_Renderer);

@@ -42,7 +42,7 @@ void mafGUIGizmoScaleTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafGUIGizmoScaleTest::setUp()
+void mafGUIGizmoScaleTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   m_VMECube = mafVMESurface::New();
@@ -52,7 +52,7 @@ void mafGUIGizmoScaleTest::setUp()
   m_VMECube->SetData(m_VTKCube->GetOutput(), -1);  
 }
 //----------------------------------------------------------------------------
-void mafGUIGizmoScaleTest::tearDown()
+void mafGUIGizmoScaleTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   mafDEL(m_VMECube);

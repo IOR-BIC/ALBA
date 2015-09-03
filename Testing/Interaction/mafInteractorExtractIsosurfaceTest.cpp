@@ -28,16 +28,6 @@
 #include "mafDeviceButtonsPadMouse.h" 
 #include "mafEventInteraction.h"
 
-void mafInteractorExtractIsosurfaceTest::setUp()
-{
- 
-}
-
-void mafInteractorExtractIsosurfaceTest::tearDown()
-{
-
-}
-
 void mafInteractorExtractIsosurfaceTest::TestFixture()
 {
 

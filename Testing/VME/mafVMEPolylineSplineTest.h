@@ -17,17 +17,11 @@
 #ifndef __CPP_UNIT_mafVMEPolylineSplineTest_H__
 #define __CPP_UNIT_mafVMEPolylineSplineTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
 class vtkPolyData;
 
-class mafVMEPolylineSplineTest : public CPPUNIT_NS::TestFixture
+class mafVMEPolylineSplineTest : public mafTest
 {
 	CPPUNIT_TEST_SUITE( mafVMEPolylineSplineTest );
 	CPPUNIT_TEST( TestSetData );

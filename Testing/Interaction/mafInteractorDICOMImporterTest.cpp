@@ -30,16 +30,6 @@
 #include "mafEventInteraction.h"
 #include "mafDeviceButtonsPadMouse.h"
 
-void mafInteractorDICOMImporterTest::setUp()
-{
-  
-}
-
-void mafInteractorDICOMImporterTest::tearDown()
-{
-
-}
-
 void mafInteractorDICOMImporterTest::TestFixture()
 {
 	

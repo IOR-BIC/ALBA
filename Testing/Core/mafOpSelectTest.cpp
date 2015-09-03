@@ -36,13 +36,13 @@ void mafOpSelectTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafOpSelectTest::setUp()
+void mafOpSelectTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   m_OpSelect=new mafOpSelect("EDIT");
 }
 //----------------------------------------------------------------------------
-void mafOpSelectTest::tearDown()
+void mafOpSelectTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   mafDEL(m_OpSelect);

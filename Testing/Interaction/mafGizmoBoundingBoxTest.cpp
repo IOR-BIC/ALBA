@@ -54,14 +54,14 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkDataSetMapper.h"
 #include "vtkProperty.h"
-
-void mafGizmoBoundingBoxTest::setUp()
+//----------------------------------------------------------------------------
+void mafGizmoBoundingBoxTest::BeforeTest()
 {
   CreateRenderStuff();
 	CreateTestData();
 }
-
-void mafGizmoBoundingBoxTest::tearDown()
+//----------------------------------------------------------------------------
+void mafGizmoBoundingBoxTest::AfterTest()
 {
   m_Renderer->Delete();
   m_RenderWindow->Delete();
@@ -70,9 +70,8 @@ void mafGizmoBoundingBoxTest::tearDown()
   mafDEL(m_GizmoInputSurface);
   mafDEL(m_Root); 
 }
-
-void mafGizmoBoundingBoxTest::CreateTestData()
 //----------------------------------------------------------------------------
+void mafGizmoBoundingBoxTest::CreateTestData()
 {
   m_Root = NULL;
   m_GizmoInputSurface = NULL;
@@ -101,7 +100,7 @@ void mafGizmoBoundingBoxTest::CreateTestData()
 
   CPPUNIT_ASSERT(m_GizmoInputSurface->GetOutput()->GetVTKData() != NULL);
 }
-
+//----------------------------------------------------------------------------
 void mafGizmoBoundingBoxTest::TestConstructor()
 {
   mafGizmoBoundingBox *gizmoBoundingBox = new mafGizmoBoundingBox(m_GizmoInputSurface);
@@ -113,8 +112,7 @@ void mafGizmoBoundingBoxTest::TestConstructor()
   cppDEL(gizmoBoundingBox);
 
 }
-
-
+//----------------------------------------------------------------------------
 void mafGizmoBoundingBoxTest::TestSetListener()
 {
   mafGizmoBoundingBox *gizmoBoundingBox = new mafGizmoBoundingBox(m_GizmoInputSurface);
@@ -129,7 +127,7 @@ void mafGizmoBoundingBoxTest::TestSetListener()
 
   cppDEL(gizmoBoundingBox);
 }
-
+//----------------------------------------------------------------------------
 void mafGizmoBoundingBoxTest::TestSetInput()
 {
   mafGizmoBoundingBox *gizmoBoundingBox = new mafGizmoBoundingBox(m_GizmoInputSurface);
@@ -141,8 +139,7 @@ void mafGizmoBoundingBoxTest::TestSetInput()
 
   cppDEL(gizmoBoundingBox);
 }
-
-
+//----------------------------------------------------------------------------
 void mafGizmoBoundingBoxTest::TestShow()
 {
 
@@ -164,7 +161,7 @@ void mafGizmoBoundingBoxTest::TestShow()
 
   cppDEL(gizmoBoundingBox);
 }
-
+//----------------------------------------------------------------------------
 void mafGizmoBoundingBoxTest::TestSetGetAbsPose()
 {
   mafMatrix absPose;
@@ -178,7 +175,7 @@ void mafGizmoBoundingBoxTest::TestSetGetAbsPose()
  
   cppDEL(gizmoBoundingBox);
 }
-
+//----------------------------------------------------------------------------
 void mafGizmoBoundingBoxTest::TestSetGetPose()
 {
   mafMatrix pose;
@@ -192,12 +189,12 @@ void mafGizmoBoundingBoxTest::TestSetGetPose()
 
   cppDEL(gizmoBoundingBox);
 }
-
+//----------------------------------------------------------------------------
 void mafGizmoBoundingBoxTest::TestFixture()
 {
 	
 }
-
+//----------------------------------------------------------------------------
 void mafGizmoBoundingBoxTest::RenderData( vtkDataSet *data )
 {
   vtkDataSetMapper *mapper = vtkDataSetMapper::New();
@@ -215,8 +212,7 @@ void mafGizmoBoundingBoxTest::RenderData( vtkDataSet *data )
   actor->Delete();
 
 } 
-  
-
+//----------------------------------------------------------------------------
 void mafGizmoBoundingBoxTest::CreateRenderStuff()
 {
   m_Renderer = vtkRenderer::New();
@@ -231,12 +227,12 @@ void mafGizmoBoundingBoxTest::CreateRenderStuff()
 
   m_RenderWindowInteractor->SetRenderWindow(m_RenderWindow);
 }
-
+//----------------------------------------------------------------------------
 void mafGizmoBoundingBoxTest::RenderGizmo( mafGizmoBoundingBox *gizmoBoundingBox )
 {
   RenderData(gizmoBoundingBox->m_BoxGizmo->GetOutput()->GetVTKData());
 }
-
+//----------------------------------------------------------------------------
 void mafGizmoBoundingBoxTest::TestSetGetBounds()
 {
  

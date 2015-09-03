@@ -27,18 +27,6 @@
 #include "mafOp.h"
 
 
-// Helper class used to build a fake application needed by the wxConfig
-// to store settings into the registry with the same name of the application
-// ===============================================================================
-class TestApp : public wxApp
-	// ===============================================================================
-{
-public:
-	bool OnInit();
-	int  OnExit();
-};
-DECLARE_APP(TestApp)
-
 //-------------------------------------------------------------------------
 /** class for testing re-parenting. */
 //-------------------------------------------------------------------------

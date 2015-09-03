@@ -31,21 +31,13 @@
 #include "mafEventBase.h"
 #include "mafDecl.h"
 
-void mafDeviceButtonsPadMouseRemoteTest::setUp()
-{
-
-}
-
-void mafDeviceButtonsPadMouseRemoteTest::tearDown()
-{
-
-}
-
+//----------------------------------------------------------------------------
 void mafDeviceButtonsPadMouseRemoteTest::TestFixture()
 {
 
 }
 
+//----------------------------------------------------------------------------
 void mafDeviceButtonsPadMouseRemoteTest::TestConstructorDestructor()
 {
   mafDeviceButtonsPadMouseRemote *buttonsPadMouse = mafDeviceButtonsPadMouseRemote::New();
@@ -53,6 +45,7 @@ void mafDeviceButtonsPadMouseRemoteTest::TestConstructorDestructor()
   buttonsPadMouse->Delete();
 }
 
+//----------------------------------------------------------------------------
 void mafDeviceButtonsPadMouseRemoteTest::TestOnEventMouse2DMove()
 {
   mafDeviceButtonsPadMouseRemote *buttonsPadMouse = mafDeviceButtonsPadMouseRemote::New();
@@ -66,7 +59,7 @@ void mafDeviceButtonsPadMouseRemoteTest::TestOnEventMouse2DMove()
   buttonsPadMouse->Delete();
 }
 
-
+//----------------------------------------------------------------------------
 void mafDeviceButtonsPadMouseRemoteTest::TestOnEventButtonDown()
 {
   mafDeviceButtonsPadMouseRemote *buttonsPadMouse = mafDeviceButtonsPadMouseRemote::New();
@@ -81,6 +74,7 @@ void mafDeviceButtonsPadMouseRemoteTest::TestOnEventButtonDown()
   buttonsPadMouse->Delete();  
 }
 
+//----------------------------------------------------------------------------
 void mafDeviceButtonsPadMouseRemoteTest::TestOnEventMouseDClick()
 {
   mafDeviceButtonsPadMouseRemote *buttonsPadMouse = mafDeviceButtonsPadMouseRemote::New();
@@ -95,6 +89,7 @@ void mafDeviceButtonsPadMouseRemoteTest::TestOnEventMouseDClick()
 
 }
 
+//----------------------------------------------------------------------------
 void mafDeviceButtonsPadMouseRemoteTest::TestOnEventButtonUp()
 {
   mafDeviceButtonsPadMouseRemote *buttonsPadMouse = mafDeviceButtonsPadMouseRemote::New();
@@ -109,6 +104,7 @@ void mafDeviceButtonsPadMouseRemoteTest::TestOnEventButtonUp()
 
 }
 
+//----------------------------------------------------------------------------
 void mafDeviceButtonsPadMouseRemoteTest::TestOnEventViewSelect()
 {
   mafDeviceButtonsPadMouseRemote *buttonsPadMouse = mafDeviceButtonsPadMouseRemote::New();
@@ -123,6 +119,7 @@ void mafDeviceButtonsPadMouseRemoteTest::TestOnEventViewSelect()
   buttonsPadMouse->Delete();
 }
 
+//----------------------------------------------------------------------------
 void mafDeviceButtonsPadMouseRemoteTest::TestOnEventViewDelete()
 {
   mafDeviceButtonsPadMouseRemote *buttonsPadMouse = mafDeviceButtonsPadMouseRemote::New();
@@ -137,6 +134,7 @@ void mafDeviceButtonsPadMouseRemoteTest::TestOnEventViewDelete()
   buttonsPadMouse->Delete();
 }
 
+//----------------------------------------------------------------------------
 void mafDeviceButtonsPadMouseRemoteTest::TestOnEventMouseCharEvent()
 {
   mafDeviceButtonsPadMouseRemote *buttonsPadMouse = mafDeviceButtonsPadMouseRemote::New();

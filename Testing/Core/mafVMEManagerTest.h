@@ -17,33 +17,23 @@
 #ifndef __CPP_UNIT_mafVMEManager_H__
 #define __CPP_UNIT_mafVMEManager_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
 #include <wx/config.h>
 #include <wx/fileconf.h>
 
 class mafVMEManager;
-class TestApp;
 
 /** mafVMEManagerTest:
 Test class for mafVMEManager
 */
-class mafVMEManagerTest : public CPPUNIT_NS::TestFixture, public mafObserver
+class mafVMEManagerTest : public mafTest, public mafObserver
 {
 public: 
-  // CPPUNIT fixture: executed before each test
-  void setUp();
+  // Executed before each test
+  void BeforeTest();
 
-  // CPPUNIT fixture: executed after each test
-  void tearDown();
-
-  // CPPUNIT test suite
+	// CPPUNIT test suite
   CPPUNIT_TEST_SUITE( mafVMEManagerTest );
   CPPUNIT_TEST( TestFixture ); // just to test that the fixture has no leaks
   CPPUNIT_TEST( TestDynamicAllocation );
@@ -106,7 +96,6 @@ private:
   int m_TestId;
   bool m_Result;
   wxFileConfig *m_Config;
-  TestApp *m_App;
 };
 
 #endif

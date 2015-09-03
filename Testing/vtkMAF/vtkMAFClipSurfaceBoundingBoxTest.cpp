@@ -53,7 +53,7 @@ std::string vtkMAFClipSurfaceBoundingBoxTest::ConvertInt(int number)
   return stringStream.str();//return a string with the contents of the stream
 }
 //--------------------------------------------------
-void vtkMAFClipSurfaceBoundingBoxTest::setUp()
+void vtkMAFClipSurfaceBoundingBoxTest::BeforeTest()
 //--------------------------------------------------
 {
   m_SphereInput = vtkSphereSource::New();
@@ -61,7 +61,7 @@ void vtkMAFClipSurfaceBoundingBoxTest::setUp()
 }
 
 //--------------------------------------------------
-void vtkMAFClipSurfaceBoundingBoxTest::tearDown()
+void vtkMAFClipSurfaceBoundingBoxTest::AfterTest()
 //--------------------------------------------------
 {
   m_SphereInput->Delete();

@@ -17,28 +17,16 @@
 #ifndef __CPP_UNIT_vtkMAFAssemblyTest_H__
 #define __CPP_UNIT_vtkMAFAssemblyTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
 class vtkRenderer;
 class vtkRenderWindow;
 
-class vtkMAFAssemblyTest : public CPPUNIT_NS::TestFixture
+class vtkMAFAssemblyTest : public mafTest
 {
 public:
-  // CPPUNIT fixture: executed before each test
-  void setUp();
-
-  // CPPUNIT fixture: executed after each test
-  void tearDown();
 
   CPPUNIT_TEST_SUITE( vtkMAFAssemblyTest );
-
   CPPUNIT_TEST( TestFixture ); // just to test that the fixture has no leaks
   CPPUNIT_TEST( DynamicAllocationTest );
   CPPUNIT_TEST( PrintSelfTest );
@@ -55,8 +43,7 @@ public:
   CPPUNIT_TEST( GetBoundsTest );
   CPPUNIT_TEST( GetMTimeTest );
   CPPUNIT_TEST( ShallowCopyTest );
-
-  CPPUNIT_TEST_SUITE_END();
+	CPPUNIT_TEST_SUITE_END();
 
 protected:
   void TestFixture();

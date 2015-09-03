@@ -47,12 +47,12 @@
 #include "vtkAxes.h"
 #include "vtkTubeFilter.h"
 
-void mafGizmoScaleTest::setUp()
+void mafGizmoScaleTest::BeforeTest()
 {
   CreateTestData();
 }
 
-void mafGizmoScaleTest::tearDown()
+void mafGizmoScaleTest::AfterTest()
 {
    mafDEL(m_GizmoInputSurface);
    mafDEL(m_Root); 

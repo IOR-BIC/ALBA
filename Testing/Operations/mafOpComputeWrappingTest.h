@@ -17,16 +17,9 @@
 #ifndef CPP_UNIT_mafOpComputeWrappingTest_H
 #define CPP_UNIT_mafOpComputeWrappingTest_H
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
-
-class mafOpComputeWrappingTest : public CPPUNIT_NS::TestFixture
+class mafOpComputeWrappingTest : public mafTest
 {
   CPPUNIT_TEST_SUITE( mafOpComputeWrappingTest );
   CPPUNIT_TEST( TestDynamicAllocation );

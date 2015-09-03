@@ -1,4 +1,4 @@
-
+LINK_LIBRARIES(mafTests)
 #
 # Add all the executables that require rendering
 #

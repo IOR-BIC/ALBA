@@ -39,17 +39,13 @@
 #include "vtkUnstructuredGrid.h"
 
 //-----------------------------------------------------------
-void mafOpImporterVTKXMLTest::setUp() 
+void mafOpImporterVTKXMLTest::BeforeTest() 
 //-----------------------------------------------------------
 {
 	//required by the importer
 	vtkObject::GlobalWarningDisplayOn();
 }
-//-----------------------------------------------------------
-void mafOpImporterVTKXMLTest::tearDown() 
-//-----------------------------------------------------------
-{
-}
+
 //-----------------------------------------------------------
 void mafOpImporterVTKXMLTest::TestDynamicAllocation() 
 //-----------------------------------------------------------

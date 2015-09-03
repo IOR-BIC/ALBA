@@ -17,28 +17,15 @@
 #ifndef __CPP_UNIT_mafGUILandmarkTest_H__
 #define __CPP_UNIT_mafGUILandmarkTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
-
-class mafGUILandmarkTest : public CPPUNIT_NS::TestFixture
+class mafGUILandmarkTest : public mafTest
 {
 public: 
-  // CPPUNIT fixture: executed before each test
-  void setUp();
-
-  // CPPUNIT fixture: executed after each test
-  void tearDown();
 
   CPPUNIT_TEST_SUITE( mafGUILandmarkTest );
   CPPUNIT_TEST( TestDynamicAllocation );
   CPPUNIT_TEST( TestVmeAccept );
- 
   CPPUNIT_TEST_SUITE_END();
 
 protected:

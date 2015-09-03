@@ -39,7 +39,7 @@
 #define TEST_RESULT CPPUNIT_ASSERT(m_Result)
 
 //----------------------------------------------------------------------------
-void mafVMESegmentationVolumeTest::setUp()
+void mafVMESegmentationVolumeTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   m_Result = false;
@@ -90,7 +90,7 @@ void mafVMESegmentationVolumeTest::setUp()
   m_VolumeRefinementMask->Update();
 }
 //----------------------------------------------------------------------------
-void mafVMESegmentationVolumeTest::tearDown()
+void mafVMESegmentationVolumeTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   mafDEL(m_VolumeRefinementMask);

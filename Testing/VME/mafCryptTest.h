@@ -17,27 +17,14 @@
 #ifndef __CPP_UNIT_MAFCRYPTTEST_H__
 #define __CPP_UNIT_MAFCRYPTTEST_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
-class mafCryptTest : public CPPUNIT_NS::TestFixture
+class mafCryptTest : public mafTest
 {
 
 public:
- // CPPUNIT fixture: executed before each test
- void setUp();
-
- // CPPUNIT fixture: executed after each test
- void tearDown();
 
  CPPUNIT_TEST_SUITE( mafCryptTest );
- CPPUNIT_TEST(TestFixture); // just to test that the fixture has no leaks
-
  CPPUNIT_TEST(TestFixture);
  CPPUNIT_TEST(TestMafCalculateteChecksumFromString);
  CPPUNIT_TEST(TestMafCalculateteChecksumFromFile);
@@ -49,8 +36,6 @@ public:
  CPPUNIT_TEST(TestMafDefaultEncryptFileFromMemory);
  CPPUNIT_TEST(TestMafEncryptFromMemoryMafDecryptInMemory);
  CPPUNIT_TEST(TestMafDefaultEncryptFromMemoryMafDefaultDecryptInMemory);
-
-
  CPPUNIT_TEST_SUITE_END();
 
 protected:

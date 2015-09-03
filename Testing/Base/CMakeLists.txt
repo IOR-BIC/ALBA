@@ -3,7 +3,7 @@ PROJECT (mafBase_TEST)
 IF(MAF_BUILD_MAFDLL)
   LINK_LIBRARIES(mafDLL)
 ELSE(MAF_BUILD_MAFDLL)
-  LINK_LIBRARIES(mafBase vtkRendering vtkGraphics mafGui)
+  LINK_LIBRARIES(mafTests mafBase vtkRendering vtkGraphics mafGui)
 ENDIF (MAF_BUILD_MAFDLL)
 
 SET(PROJECT_SRCS 

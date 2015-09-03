@@ -17,27 +17,21 @@
 #ifndef __CPP_UNIT_mafPipePointSetTest_H__
 #define __CPP_UNIT_mafPipePointSetTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
 class vtkRenderer;
 class vtkRenderWindow;
 class vtkRenderWindowInteractor;
 class vtkRectilinearGrid;
 
-class mafPipePointSetTest : public CPPUNIT_NS::TestFixture
+class mafPipePointSetTest : public mafTest
 {
 public: 
-  // CPPUNIT fixture: executed before each test
-  void setUp();
+  // Executed before each test
+  void BeforeTest();
 
-  // CPPUNIT fixture: executed after each test
-  void tearDown();
+  // Executed after each test
+  void AfterTest();
 
   CPPUNIT_TEST_SUITE( mafPipePointSetTest );
   CPPUNIT_TEST( TestFixture ); // just to test that the fixture has no leaks

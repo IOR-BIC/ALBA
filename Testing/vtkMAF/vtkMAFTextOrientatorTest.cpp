@@ -34,15 +34,6 @@
 
 
 
-void vtkMAFTextOrientatorTest::setUp()
-{
-}
-
-void vtkMAFTextOrientatorTest::tearDown()
-{
-}
-
-
 void vtkMAFTextOrientatorTest::TestFixture()
 {
 }

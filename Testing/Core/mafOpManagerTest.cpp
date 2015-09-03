@@ -35,7 +35,7 @@ bool mafOpDummy::m_Undo = false;
 bool mafOpDummy::m_Stop = false;
 bool mafOpDummy::m_Executed = false;
 //------------------------------------------------------------------------------
-void mafOpManagerTest::setUp()
+void mafOpManagerTest::BeforeTest()
 //------------------------------------------------------------------------------
 {
   m_OpManager = new mafOpManager(); 
@@ -46,11 +46,10 @@ void mafOpManagerTest::setUp()
   mafOpDummy::m_Executed = false;
 }
 //------------------------------------------------------------------------------
-void mafOpManagerTest::tearDown()
+void mafOpManagerTest::AfterTest()
 //------------------------------------------------------------------------------
 {
   cppDEL(m_OpManager);
-
 }
 //------------------------------------------------------------------------------
 void mafOpManagerTest::TestDynamicAllocation()

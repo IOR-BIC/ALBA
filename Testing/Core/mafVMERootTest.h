@@ -17,23 +17,12 @@
 #ifndef __CPP_UNIT_mafVMERootTest_H__
 #define __CPP_UNIT_mafVMERootTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
 /** Test for mafVMERoot; Use this suite to trace memory problems */
-class mafVMERootTest : public CPPUNIT_NS::TestFixture
+class mafVMERootTest : public mafTest
 {
 public: 
-  // CPPUNIT fixture: executed before each test
-  void setUp();
-
-  // CPPUNIT fixture: executed after each test
-  void tearDown();
 
   // CPPUNIT test suite
   CPPUNIT_TEST_SUITE( mafVMERootTest );

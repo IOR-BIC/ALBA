@@ -35,16 +35,6 @@
 #include "mafString.h"
 
 
-void mafPolylineGraphBranchTest::setUp()
-{
-
-}
-
-void mafPolylineGraphBranchTest::tearDown()
-{
-
-}
-
 void mafPolylineGraphBranchTest::TestDynamicAllocation()
 {
   mafPolylineGraph::Branch *branch = new mafPolylineGraph::Branch();

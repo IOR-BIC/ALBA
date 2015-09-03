@@ -66,7 +66,7 @@ void mafPipeIsosurfaceGPUTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafPipeIsosurfaceGPUTest::setUp()
+void mafPipeIsosurfaceGPUTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   vtkNEW(m_Renderer);
@@ -74,7 +74,7 @@ void mafPipeIsosurfaceGPUTest::setUp()
   vtkNEW(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
-void mafPipeIsosurfaceGPUTest::tearDown()
+void mafPipeIsosurfaceGPUTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   vtkDEL(m_Renderer);

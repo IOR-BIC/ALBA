@@ -48,13 +48,6 @@ void mafOpImporterVMEDataSetAttributesTest::TestFixture()
 {
 }
 
-void mafOpImporterVMEDataSetAttributesTest::setUp()
-{
-}
-
-void mafOpImporterVMEDataSetAttributesTest::tearDown()
-{
-}
 
 void mafOpImporterVMEDataSetAttributesTest::TestImportAttributes()
 {

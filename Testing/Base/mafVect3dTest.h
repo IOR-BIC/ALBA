@@ -17,14 +17,7 @@
 #ifndef __CPP_UNIT_mafVect3dTest_H__
 #define __CPP_UNIT_mafVect3dTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
-#include <cppunit/TestFixture.h>
+#include "mafTest.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -35,7 +28,7 @@ class vtkPolyData;
 class name: mafVect3dTest
   Test class for medVect3d
 */
-class mafVect3dTest : public CPPUNIT_NS::TestFixture
+class mafVect3dTest : public mafTest
 {
 public:
 

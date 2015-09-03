@@ -17,18 +17,12 @@
 #ifndef __CPP_UNIT_mafEventTest_H__
 #define __CPP_UNIT_mafEventTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 #include "mafVME.h"
 #include "mafVMEGenericAbstract.h"
 
 
-class mafEventTest : public CPPUNIT_NS::TestFixture
+class mafEventTest : public mafTest
 {
   CPPUNIT_TEST_SUITE( mafEventTest );
   CPPUNIT_TEST( MafEventTestMainTest );
