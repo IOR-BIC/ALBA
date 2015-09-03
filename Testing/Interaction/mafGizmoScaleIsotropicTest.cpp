@@ -55,13 +55,13 @@
 #include "vtkDataSetMapper.h"
 
 
-void mafGizmoScaleIsotropicTest::setUp()
+void mafGizmoScaleIsotropicTest::BeforeTest()
 {
   CreateRenderStuff();
 	CreateTestData();
 }
 
-void mafGizmoScaleIsotropicTest::tearDown()
+void mafGizmoScaleIsotropicTest::AfterTest()
 {
   m_Renderer->Delete();
   m_RenderWindow->Delete();

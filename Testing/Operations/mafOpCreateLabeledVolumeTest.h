@@ -17,16 +17,9 @@
 #ifndef CPP_UNIT_mafOpCreateLabeledVolumeTest_H
 #define CPP_UNIT_mafOpCreateLabeledVolumeTest_H
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
-
-class mafOpCreateLabeledVolumeTest : public CPPUNIT_NS::TestFixture
+class mafOpCreateLabeledVolumeTest : public mafTest
 {
   CPPUNIT_TEST_SUITE( mafOpCreateLabeledVolumeTest );
   CPPUNIT_TEST( TestDynamicAllocation );

@@ -39,12 +39,12 @@
 #include "mafVMEGizmo.h"
 #include "mafAbsMatrixPipe.h"
 
-void mafGizmoPathTest::setUp()
+void mafGizmoPathTest::BeforeTest()
 {
 	CreateTestData();
 }
 
-void mafGizmoPathTest::tearDown()
+void mafGizmoPathTest::AfterTest()
 {
   mafDEL(m_TestPolyline);
   mafDEL(m_Root);

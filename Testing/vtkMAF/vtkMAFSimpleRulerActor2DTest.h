@@ -17,14 +17,7 @@
 #ifndef __CPP_UNIT_vtkMAFSimpleRulerActor2DTest_H__
 #define __CPP_UNIT_vtkMAFSimpleRulerActor2DTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
-#include <cppunit/TestFixture.h>
+#include "mafTest.h"
 
 //------------------------------------------------------------------------------
 // Forward Declaration:
@@ -38,7 +31,7 @@ vtkMAFSimpleRulerActor2DTest:
 Test for vtkMAFSimpleRulerActor2D.
 */
 //------------------------------------------------------------------------------
-class vtkMAFSimpleRulerActor2DTest : public CPPUNIT_NS::TestFixture
+class vtkMAFSimpleRulerActor2DTest : public mafTest
 //------------------------------------------------------------------------------
 {
   public:
@@ -60,10 +53,6 @@ class vtkMAFSimpleRulerActor2DTest : public CPPUNIT_NS::TestFixture
       ID_SET_TEXT_TEST,
     };
 
-    /** CPPUNIT fixture: executed before each test.*/
-    void setUp();
-    /* CPPUNIT fixture: executed after each test.*/
-    void tearDown();
     /** Test suite begin. */
     CPPUNIT_TEST_SUITE( vtkMAFSimpleRulerActor2DTest );
     /** Instance creation and deletion test. */

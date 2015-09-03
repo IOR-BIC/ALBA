@@ -178,7 +178,7 @@ void mafVMEGizmoTest::TestFixture()
 }
 
 //----------------------------------------------------------------------------
-void mafVMEGizmoTest::setUp()
+void mafVMEGizmoTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   m_VmeRoot = NULL;
@@ -189,7 +189,7 @@ void mafVMEGizmoTest::setUp()
 }
 
 //----------------------------------------------------------------------------
-void mafVMEGizmoTest::tearDown()
+void mafVMEGizmoTest::AfterTest()
 //----------------------------------------------------------------------------
 {
     mafDEL(m_FirstChild);

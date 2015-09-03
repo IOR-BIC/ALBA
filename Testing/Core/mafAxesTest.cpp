@@ -40,7 +40,7 @@
 #include "vtkSphereSource.h"
 #include "vtkCamera.h"
 
-void mafAxesTest::setUp()
+void mafAxesTest::BeforeTest()
 {
   m_VMESurfaceSphere = NULL;
   m_VMESurfaceSphere = mafVMESurface::New();
@@ -53,10 +53,9 @@ void mafAxesTest::setUp()
   m_VMESurfaceSphere->SetData(sphere->GetOutput(),0);
   vtkDataSet *sphereData = m_VMESurfaceSphere->GetOutput()->GetVTKData();
   CPPUNIT_ASSERT(sphereData);
-
 }
 
-void mafAxesTest::tearDown()
+void mafAxesTest::AfterTest()
 {
   mafDEL(m_VMESurfaceSphere);
   vtkDEL(m_Renderer);

@@ -106,7 +106,7 @@ void mafPipeTensorFieldTest::TestFixture()
 }
 
 //----------------------------------------------------------------------------
-void mafPipeTensorFieldTest::setUp()
+void mafPipeTensorFieldTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   vtkNEW(m_Renderer);
@@ -115,7 +115,7 @@ void mafPipeTensorFieldTest::setUp()
 }
 
 //----------------------------------------------------------------------------
-void mafPipeTensorFieldTest::tearDown()
+void mafPipeTensorFieldTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   vtkDEL(m_Renderer);

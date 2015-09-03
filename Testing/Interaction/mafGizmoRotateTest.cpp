@@ -50,12 +50,12 @@
 #include "vtkAxes.h"
 #include "vtkTubeFilter.h"
 
-void mafGizmoRotateTest::setUp()
+void mafGizmoRotateTest::BeforeTest()
 {
   CreateTestData();
 }
 
-void mafGizmoRotateTest::tearDown()
+void mafGizmoRotateTest::AfterTest()
 {
    mafDEL(m_GizmoInputSurface);
    mafDEL(m_Root); 

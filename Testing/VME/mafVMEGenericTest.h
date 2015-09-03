@@ -17,33 +17,22 @@
 #ifndef __CPP_UNIT_MAFVMEGENERICTEST_H__
 #define __CPP_UNIT_MAFVMEGENERICTEST_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
-
+#include "mafTest.h"
 #include "mafVMERoot.h"
 #include "mafVMEGeneric.h"
 
 
-class mafVMEGenericTest : public CPPUNIT_NS::TestFixture
+class mafVMEGenericTest : public mafTest
 {
 
   public:
-    // CPPUNIT fixture: executed before each test
-    void setUp();
 
-    // CPPUNIT fixture: executed after each test
-    void tearDown();
 
     CPPUNIT_TEST_SUITE( mafVMEGenericTest );
     CPPUNIT_TEST( TestDynamicAllocation );
     CPPUNIT_TEST( TestSetData );
     CPPUNIT_TEST( TestGetVisualPipe );
-      CPPUNIT_TEST_SUITE_END();
+    CPPUNIT_TEST_SUITE_END();
 
 protected:
     void TestDynamicAllocation();

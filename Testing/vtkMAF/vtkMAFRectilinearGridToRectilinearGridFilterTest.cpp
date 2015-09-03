@@ -30,16 +30,6 @@ void vtkMAFRectilinearGridToRectilinearGridFilterTest::TestFixture()
 //----------------------------------------------------------------------------
 {
 }
-//----------------------------------------------------------------------------
-void vtkMAFRectilinearGridToRectilinearGridFilterTest::setUp()
-//----------------------------------------------------------------------------
-{
-}
-//----------------------------------------------------------------------------
-void vtkMAFRectilinearGridToRectilinearGridFilterTest::tearDown()
-//----------------------------------------------------------------------------
-{
-}
 
 void vtkMAFRectilinearGridToRectilinearGridFilterTest::TestGetInput()
 {

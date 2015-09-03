@@ -17,14 +17,7 @@
 #ifndef __CPP_UNIT_vtkMAFHistogramtest_H__
 #define __CPP_UNIT_vtkMAFHistogramtest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
-#include <cppunit/TestFixture.h>
+#include "mafTest.h"
 
 //------------------------------------------------------------------------------
 // Forward Declaration:
@@ -36,7 +29,7 @@ class vtkImageData;
   Class Name: vtkMAFHistogramTest.
   Test for vtkMAFHistogram.
 */
-class vtkMAFHistogramTest : public CPPUNIT_NS::TestFixture
+class vtkMAFHistogramTest : public mafTest
 {
   public:
     /** Test IDs*/
@@ -49,12 +42,6 @@ class vtkMAFHistogramTest : public CPPUNIT_NS::TestFixture
       ID_HISTOGRAM_SCALE_COLOR_PROPERTIES,
       ID_HISTOGRAM_GET_ATTRIBUTES_AND_UPDATE_LINES,
     };
-
-    /** CPPUNIT fixture: executed before each test.*/
-    void setUp();
-
-    /* CPPUNIT fixture: executed after each test.*/
-    void tearDown();
 
     /** Test suite begin. */
     CPPUNIT_TEST_SUITE( vtkMAFHistogramTest );

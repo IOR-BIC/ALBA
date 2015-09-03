@@ -31,13 +31,13 @@
 #include "mafXMLStringTest.h"
 
 //----------------------------------------------------------------------------
-void mafXMLStringTest::setUp()
+void mafXMLStringTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   XERCES_CPP_NAMESPACE_QUALIFIER XMLPlatformUtils::Initialize();
 }
 //----------------------------------------------------------------------------
-void mafXMLStringTest::tearDown()
+void mafXMLStringTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   XERCES_CPP_NAMESPACE_QUALIFIER XMLPlatformUtils::Terminate();

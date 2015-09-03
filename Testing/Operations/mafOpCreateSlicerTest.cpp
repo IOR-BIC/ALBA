@@ -40,14 +40,13 @@ void mafOpCreateSlicerTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafOpCreateSlicerTest::setUp()
+void mafOpCreateSlicerTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  result = false;
   m_CreateSlicer = new mafOpCreateSlicer();
 }
 //----------------------------------------------------------------------------
-void mafOpCreateSlicerTest::tearDown()
+void mafOpCreateSlicerTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   cppDEL(m_CreateSlicer);

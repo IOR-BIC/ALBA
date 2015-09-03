@@ -39,7 +39,7 @@
 
 #define EPSILON 0.01
 //-------------------------------------------------------------------------
-void vtkMAFPolyDataMirrorTest::setUp()
+void vtkMAFPolyDataMirrorTest::BeforeTest()
 //-------------------------------------------------------------------------
 {
 	m_TestPolyData = vtkPolyData::New();
@@ -66,7 +66,7 @@ void vtkMAFPolyDataMirrorTest::setUp()
 	vtkDEL(cellArray);
 }
 //-------------------------------------------------------------------------
-void vtkMAFPolyDataMirrorTest::tearDown()
+void vtkMAFPolyDataMirrorTest::AfterTest()
 //-------------------------------------------------------------------------
 {
   m_TestPolyData->Delete();

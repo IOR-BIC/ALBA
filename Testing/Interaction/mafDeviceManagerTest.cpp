@@ -28,28 +28,19 @@
 #include "mafDeviceSet.h"
 #include "mafDevice.h"
 
-void mafDeviceManagerTest::setUp()
-{
-
-}
-
-void mafDeviceManagerTest::tearDown()
-{
-
-}
-
+//----------------------------------------------------------------------------
 void mafDeviceManagerTest::TestFixture()
 {
 
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceManagerTest::TestConstructorDestructor()
 {
   mafDeviceManager *deviceManager = mafDeviceManager::New();
   CPPUNIT_ASSERT(deviceManager);
   deviceManager->Delete();
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceManagerTest::TestAddDevice()
 {
   mafDeviceManager *deviceManager = mafDeviceManager::New();
@@ -66,7 +57,7 @@ void mafDeviceManagerTest::TestAddDevice()
 
   deviceManager->Delete();
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceManagerTest::TestRemoveDevice()
 {
   mafDeviceManager *deviceManager = mafDeviceManager::New();
@@ -88,7 +79,7 @@ void mafDeviceManagerTest::TestRemoveDevice()
 
   deviceManager->Delete();
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceManagerTest::TestGetDevice()
 {
   mafDeviceManager *deviceManager = mafDeviceManager::New();
@@ -112,7 +103,7 @@ void mafDeviceManagerTest::TestGetDevice()
 
   deviceManager->Delete();
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceManagerTest::TestGetNumberOfDevices()
 {
   mafDeviceManager *deviceManager = mafDeviceManager::New();
@@ -134,7 +125,7 @@ void mafDeviceManagerTest::TestGetNumberOfDevices()
 
   deviceManager->Delete();
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceManagerTest::TestRemoveAllDevices()
 {
 
@@ -161,7 +152,7 @@ void mafDeviceManagerTest::TestRemoveAllDevices()
 
   deviceManager->Delete();
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceManagerTest::TestGetDevices()
 {
   mafDeviceManager *deviceManager = mafDeviceManager::New();
@@ -195,7 +186,7 @@ void mafDeviceManagerTest::TestGetDevices()
   deviceManager->Delete();
 
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceManagerTest::TestGetDeviceSet()
 {
   mafDeviceManager *deviceManager = mafDeviceManager::New();

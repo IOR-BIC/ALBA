@@ -17,17 +17,10 @@
 #ifndef __CPP_UNIT_mafInteractionFactoryTEST_H__
 #define __CPP_UNIT_mafInteractionFactoryTEST_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
 
-
-class mafInteractionFactoryTest : public CPPUNIT_NS::TestFixture
+class mafInteractionFactoryTest : public mafTest
 {
   CPPUNIT_TEST_SUITE( mafInteractionFactoryTest );
   

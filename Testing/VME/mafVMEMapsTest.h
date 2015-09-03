@@ -17,13 +17,7 @@
 #ifndef __CPP_UNIT_mafVMEMapsTEST_H__
 #define __CPP_UNIT_mafVMEMapsTEST_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
 class mafVMESurface;
 class mafVMEVolumeGray;
@@ -36,14 +30,14 @@ class vtkFloatArray;
 class vtkPolyData;
 class vtkSphereSource;
 
-class mafVMEMapsTest : public CPPUNIT_NS::TestFixture
+class mafVMEMapsTest : public mafTest
 {
 public: 
-  // CPPUNIT fixture: executed before each test
-  void setUp();
+  // Executed before each test
+  void BeforeTest();
 
-  // CPPUNIT fixture: executed after each test
-  void tearDown();
+  // Executed after each test
+  void AfterTest();
 
   CPPUNIT_TEST_SUITE( mafVMEMapsTest );
   CPPUNIT_TEST( TestDynamicAllocation );

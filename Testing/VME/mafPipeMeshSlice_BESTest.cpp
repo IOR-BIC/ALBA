@@ -69,7 +69,7 @@ void mafPipeMeshSlice_BESTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafPipeMeshSlice_BESTest::setUp()
+void mafPipeMeshSlice_BESTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   vtkNEW(m_Renderer);
@@ -77,7 +77,7 @@ void mafPipeMeshSlice_BESTest::setUp()
   vtkNEW(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
-void mafPipeMeshSlice_BESTest::tearDown()
+void mafPipeMeshSlice_BESTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   vtkDEL(m_RenderWindowInteractor);

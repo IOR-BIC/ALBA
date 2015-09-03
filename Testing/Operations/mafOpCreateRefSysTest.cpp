@@ -40,14 +40,13 @@ void mafOpCreateRefSysTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafOpCreateRefSysTest::setUp()
+void mafOpCreateRefSysTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  result = false;
   m_CreateRefSys = new mafOpCreateRefSys();
 }
 //----------------------------------------------------------------------------
-void mafOpCreateRefSysTest::tearDown()
+void mafOpCreateRefSysTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   cppDEL(m_CreateRefSys);

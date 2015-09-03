@@ -17,13 +17,7 @@
 #ifndef __CPP_UNIT_VMEPoseTest_H__
 #define __CPP_UNIT_VMEPoseTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 #include "mafVME.h"
 #include "mafVMEGenericAbstract.h"
 
@@ -44,7 +38,7 @@ private:
 };
 
 
-class VMEPoseTest : public CPPUNIT_NS::TestFixture
+class VMEPoseTest : public mafTest
 {
   CPPUNIT_TEST_SUITE( VMEPoseTest );
   CPPUNIT_TEST( VmePoseMainTest );

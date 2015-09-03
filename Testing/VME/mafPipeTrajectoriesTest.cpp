@@ -64,7 +64,7 @@ void mafPipeTrajectoriesTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafPipeTrajectoriesTest::setUp()
+void mafPipeTrajectoriesTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   vtkNEW(m_Renderer);
@@ -72,7 +72,7 @@ void mafPipeTrajectoriesTest::setUp()
   vtkNEW(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
-void mafPipeTrajectoriesTest::tearDown()
+void mafPipeTrajectoriesTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   vtkDEL(m_Renderer);

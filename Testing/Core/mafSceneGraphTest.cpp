@@ -41,17 +41,15 @@ void mafSceneGraphTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafSceneGraphTest::setUp()
+void mafSceneGraphTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   m_View = new mafViewVTK();
   m_Ren = vtkRenderer::New();
   m_Vme = mafVMERoot::New();
-
-  result = false;
 }
 //----------------------------------------------------------------------------
-void mafSceneGraphTest::tearDown()
+void mafSceneGraphTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   cppDEL(m_View);

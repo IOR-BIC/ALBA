@@ -57,13 +57,13 @@
 
 
 
-void mafGizmoTranslateAxisTest::setUp()
+void mafGizmoTranslateAxisTest::BeforeTest()
 {
   CreateRenderStuff();
 	CreateTestData();
 }
 
-void mafGizmoTranslateAxisTest::tearDown()
+void mafGizmoTranslateAxisTest::AfterTest()
 {
   m_Renderer->Delete();
   m_RenderWindow->Delete();

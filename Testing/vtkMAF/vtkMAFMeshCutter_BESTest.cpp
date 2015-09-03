@@ -55,14 +55,6 @@
 
 static const bool renderingOn = false ;  // switch interactive rendering on
 
-void vtkMAFMeshCutter_BESTest::setUp()
-{
-}
-
-void vtkMAFMeshCutter_BESTest::tearDown()
-{
-}
-
 
 void vtkMAFMeshCutter_BESTest::TestFixture()
 {

@@ -47,7 +47,7 @@ void mafLUTLibraryTest::TestFixture()
 }
 
 //----------------------------------------------------------------------------
-void mafLUTLibraryTest::setUp()
+void mafLUTLibraryTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   m_LutDefault = vtkLookupTable::New();
@@ -58,10 +58,9 @@ void mafLUTLibraryTest::setUp()
 
   m_LutGlow = vtkLookupTable::New();
   lutPreset(3, m_LutGlow);
-
 }
 //----------------------------------------------------------------------------
-void mafLUTLibraryTest::tearDown()
+void mafLUTLibraryTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   vtkDEL(m_LutDefault);

@@ -32,13 +32,13 @@
 
 
 //----------------------------------------------------------------------------
-void mmuXMLDOMElementTest::setUp()
+void mmuXMLDOMElementTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   XERCES_CPP_NAMESPACE_QUALIFIER XMLPlatformUtils::Initialize();
 }
 //----------------------------------------------------------------------------
-void mmuXMLDOMElementTest::tearDown()
+void mmuXMLDOMElementTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   XERCES_CPP_NAMESPACE_QUALIFIER XMLPlatformUtils::Terminate();

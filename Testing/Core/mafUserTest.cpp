@@ -34,22 +34,7 @@ void mafUserTest::TestFixture()
 //----------------------------------------------------------------------------
 {
 }
-//----------------------------------------------------------------------------
-void mafUserTest::setUp()
-//----------------------------------------------------------------------------
-{
-  m_App = new TestApp();  // Instantiate the application class
-  m_App->argc = 0;        // set the number of input argument to 0
-  m_App->argv = NULL;     // set to NULL the input argument's parameters
-  wxTheApp->SetAppName("mafUserTest"); // Set the name for the application
-}
-//----------------------------------------------------------------------------
-void mafUserTest::tearDown()
-//----------------------------------------------------------------------------
-{
-  cppDEL(m_App);  // Destroy the application
-	wxAppConsole::SetInstance(NULL);
-}
+
 //----------------------------------------------------------------------------
 void mafUserTest::TestStaticAllocation()
 //----------------------------------------------------------------------------

@@ -17,24 +17,12 @@
 #ifndef __CPP_UNIT_mafDataPipeCustomProberTest_H__
 #define __CPP_UNIT_mafDataPipeCustomProberTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
 /** Test for mafDataPipeCustom; Use this suite to trace memory problems */
-class mafDataPipeCustomProberTest : public CPPUNIT_NS::TestFixture
+class mafDataPipeCustomProberTest : public mafTest
 {
 public: 
-  // CPPUNIT fixture: executed before each test
-  void setUp();
-
-  // CPPUNIT fixture: executed after each test
-  void tearDown();
-
   // CPPUNIT test suite
   CPPUNIT_TEST_SUITE( mafDataPipeCustomProberTest );
   CPPUNIT_TEST(TestFixture); // just to test that the fixture has no leaks
@@ -43,7 +31,6 @@ public:
   CPPUNIT_TEST(TestSetSurface);
   CPPUNIT_TEST(TestSetVolume);
   CPPUNIT_TEST(TestSetGet);  
-  
   CPPUNIT_TEST_SUITE_END();
 
 private:

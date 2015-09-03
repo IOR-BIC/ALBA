@@ -106,7 +106,7 @@ void mafPipeVectorFieldTest::TestFixture()
 }
 
 //----------------------------------------------------------------------------
-void mafPipeVectorFieldTest::setUp()
+void mafPipeVectorFieldTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   vtkNEW(m_Renderer);
@@ -115,7 +115,7 @@ void mafPipeVectorFieldTest::setUp()
 }
 
 //----------------------------------------------------------------------------
-void mafPipeVectorFieldTest::tearDown()
+void mafPipeVectorFieldTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   vtkDEL(m_Renderer);

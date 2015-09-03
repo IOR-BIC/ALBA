@@ -17,16 +17,9 @@
 #ifndef __CPP_UNIT_TriangulationTriangleTest_H__
 #define __CPP_UNIT_TriangulationTriangleTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
-
-class TriangulationTriangleTest : public CPPUNIT_NS::TestFixture
+class TriangulationTriangleTest : public mafTest
 {
   CPPUNIT_TEST_SUITE( TriangulationTriangleTest );
   CPPUNIT_TEST( TestDynamicAllocation );

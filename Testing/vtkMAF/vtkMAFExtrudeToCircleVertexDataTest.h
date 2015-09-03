@@ -17,45 +17,31 @@
 #ifndef __CPP_UNIT_vtkMAFExtrudeToCircleVertexDataTest_H__
 #define __CPP_UNIT_vtkMAFExtrudeToCircleVertexDataTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
-#include <cppunit/TestFixture.h>
-
+#include "mafTest.h"
 #include "vtkMAFExtrudeToCircle.h"
 
 //------------------------------------------------------------------------------
 // Test class for vtkMAFExtrudeToCircle::VertexData
 //------------------------------------------------------------------------------
-class vtkMAFExtrudeToCircleVertexDataTest : public CPPUNIT_NS::TestFixture
+class vtkMAFExtrudeToCircleVertexDataTest : public mafTest
 {
-  public:
-  
-    // CPPUNIT fixture: executed before each test
-    void setUp();
+public:
 
-    // CPPUNIT fixture: executed after each test
-    void tearDown();
-
-    CPPUNIT_TEST_SUITE( vtkMAFExtrudeToCircleVertexDataTest );
-    CPPUNIT_TEST( TestFixture );
-    CPPUNIT_TEST( TestConstructorDestructor );
+  CPPUNIT_TEST_SUITE( vtkMAFExtrudeToCircleVertexDataTest );
+  CPPUNIT_TEST( TestFixture );
+  CPPUNIT_TEST( TestConstructorDestructor );
 	CPPUNIT_TEST( TestSetGetCylCoords );
 	CPPUNIT_TEST( TestSetGetCylR );
 	CPPUNIT_TEST( TestSetGetCylPhi );
 	CPPUNIT_TEST( TestSetGetCylZ );
 	CPPUNIT_TEST( TestSetGetCartCoords );
 	CPPUNIT_TEST( TestSetGetId );
-    CPPUNIT_TEST_SUITE_END();
+  CPPUNIT_TEST_SUITE_END();
 
-  protected:
+protected:
 
-    void TestFixture();
-    void TestConstructorDestructor();
+  void TestFixture();
+  void TestConstructorDestructor();
 	void TestSetGetCylCoords();
 	void TestSetGetCylR();
 	void TestSetGetCylPhi();

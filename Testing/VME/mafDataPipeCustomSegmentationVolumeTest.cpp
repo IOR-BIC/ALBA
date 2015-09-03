@@ -35,7 +35,7 @@
 #include "mafVMESegmentationVolume.h"
 
 //----------------------------------------------------------------------------
-void mafDataPipeCustomSegmentationVolumeTest::setUp()
+void mafDataPipeCustomSegmentationVolumeTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   vtkStructuredPointsReader *readerSP;
@@ -68,7 +68,7 @@ void mafDataPipeCustomSegmentationVolumeTest::setUp()
   vtkDEL(readerRG);
 }
 //----------------------------------------------------------------------------
-void mafDataPipeCustomSegmentationVolumeTest::tearDown()
+void mafDataPipeCustomSegmentationVolumeTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   mafDEL(m_VolumeSP);

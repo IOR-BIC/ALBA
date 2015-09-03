@@ -21,16 +21,6 @@
 #include "vtkMAFDOFMatrix.h"
 #include "vtkDoubleArray.h"
 
-void vtkMAFDOFMatrixTest::setUp()
-{
- 
-}
-
-void vtkMAFDOFMatrixTest::tearDown()
-{
-
-}
-
 void vtkMAFDOFMatrixTest::TestFixture()
 {
 

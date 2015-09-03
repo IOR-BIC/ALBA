@@ -51,15 +51,6 @@
 #define VTK_IMG_PACK_DICOM 2
 #endif
 
-void vtkPackedImageTest::setUp()
-{
-}
-
-void vtkPackedImageTest::tearDown()
-{
-}
-
-
 //------------------------------------------------------------
 void vtkPackedImageTest::TestDynamicAllocation()
 //------------------------------------------------------------

@@ -40,14 +40,6 @@ void mafOpEditMetadataTest::TestFixture()
 {
 }
 
-void mafOpEditMetadataTest::setUp()
-{
-}
-
-void mafOpEditMetadataTest::tearDown()
-{
-}
-
 //-----------------------------------------------------------
 void mafOpEditMetadataTest::TestConstructor()
 //-----------------------------------------------------------

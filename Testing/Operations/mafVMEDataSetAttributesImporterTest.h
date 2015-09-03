@@ -17,14 +17,7 @@
 #ifndef __CPP_UNIT_mafVMEDataSetAttributesImporterTest_H__
 #define __CPP_UNIT_mafVMEDataSetAttributesImporterTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
-
+#include "mafTest.h"
 #include "mafString.h"
 
 class vtkFileOutputWindow;
@@ -33,7 +26,7 @@ class vtkUnstructuredGrid;
 class mafVMEMeshAnsysTextImporter;
 class mafVMEMesh;
 
-class mafVMEDataSetAttributesImporterTest : public CPPUNIT_NS::TestFixture
+class mafVMEDataSetAttributesImporterTest : public mafTest
 {
 
 public:
@@ -41,11 +34,11 @@ public:
   mafVMEDataSetAttributesImporterTest();
   ~mafVMEDataSetAttributesImporterTest();
 
-  // CPPUNIT fixture: executed before each test
-  void setUp();
+  // Executed before each test
+  void BeforeTest();
 
-  // CPPUNIT fixture: executed after each test
-  void tearDown();
+  // Executed after each test
+  void AfterTest();
 
   CPPUNIT_TEST_SUITE( mafVMEDataSetAttributesImporterTest );
   CPPUNIT_TEST( TestFixture ); // just to test that the fixture has no leaks

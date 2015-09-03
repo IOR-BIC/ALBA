@@ -77,7 +77,7 @@ void mafPipePolylineTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafPipePolylineTest::setUp()
+void mafPipePolylineTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   vtkNEW(m_Renderer);
@@ -85,7 +85,7 @@ void mafPipePolylineTest::setUp()
   vtkNEW(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
-void mafPipePolylineTest::tearDown()
+void mafPipePolylineTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   vtkDEL(m_Renderer);

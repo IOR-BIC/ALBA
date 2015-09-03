@@ -17,17 +17,10 @@
 #ifndef __CPP_UNIT_CustomDataPipeTest_H__
 #define __CPP_UNIT_CustomDataPipeTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 #include "mafVME.h"
 
-
-class CustomDataPipeTest : public CPPUNIT_NS::TestFixture
+class CustomDataPipeTest : public mafTest
 {
   CPPUNIT_TEST_SUITE( CustomDataPipeTest );
   CPPUNIT_TEST( CustomDataPipeMainTest );

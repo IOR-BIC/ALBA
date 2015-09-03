@@ -38,7 +38,7 @@ void mafVMEScalarMatrixTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafVMEScalarMatrixTest::setUp()
+void mafVMEScalarMatrixTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   in_data.set_size(10,20);
@@ -47,11 +47,7 @@ void mafVMEScalarMatrixTest::setUp()
   // initialized the VME factory
   mafVMEFactory::Initialize();
 }
-//----------------------------------------------------------------------------
-void mafVMEScalarMatrixTest::tearDown()
-//----------------------------------------------------------------------------
-{
-}
+
 //----------------------------------------------------------------------------
 void mafVMEScalarMatrixTest::TestVMEScalarFactory()
 //----------------------------------------------------------------------------

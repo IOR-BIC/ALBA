@@ -32,16 +32,6 @@
 
 #include <assert.h>
 
-void vtkMAFRemoveCellsFilterTest::setUp()
-{
- 
-}
-
-void vtkMAFRemoveCellsFilterTest::tearDown()
-{
-
-}
-
 void vtkMAFRemoveCellsFilterTest::TestFixture()
 {
 

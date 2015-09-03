@@ -59,13 +59,13 @@ void mafOpFilterSurfaceTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafOpFilterSurfaceTest::setUp()
+void mafOpFilterSurfaceTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   m_Result = false;
 }
 //----------------------------------------------------------------------------
-void mafOpFilterSurfaceTest::tearDown()
+void mafOpFilterSurfaceTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   delete wxLog::SetActiveTarget(NULL);

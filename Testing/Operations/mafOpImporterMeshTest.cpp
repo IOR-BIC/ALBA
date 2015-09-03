@@ -47,14 +47,6 @@ void mafOpImporterMeshTest::TestFixture()
 {
 }
 
-void mafOpImporterMeshTest::setUp()
-{
-}
-
-void mafOpImporterMeshTest::tearDown()
-{
-}
-
 void mafOpImporterMeshTest::TestImportMesh()
 {
 	mafVMEStorage *storage = mafVMEStorage::New();

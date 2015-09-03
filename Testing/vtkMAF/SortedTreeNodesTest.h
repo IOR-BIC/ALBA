@@ -17,17 +17,9 @@
 #ifndef __CPP_UNIT_SortedTreeNodesTEST_H__
 #define __CPP_UNIT_SortedTreeNodesTEST_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
-
-
-class SortedTreeNodesTest : public CPPUNIT_NS::TestFixture
+class SortedTreeNodesTest : public mafTest
 {
   CPPUNIT_TEST_SUITE( SortedTreeNodesTest );
   CPPUNIT_TEST( TestDynamicAllocation );

@@ -56,7 +56,7 @@
 static bool ExtractModel   = true;
 static bool CleanModel     = false;
 
-void vtkMAFContourVolumeMapperTest::setUp()
+void vtkMAFContourVolumeMapperTest::BeforeTest()
 {
   m_RGData = NULL;
   m_ImageData = NULL;
@@ -65,7 +65,7 @@ void vtkMAFContourVolumeMapperTest::setUp()
   CreateDataID();
 }
 
-void vtkMAFContourVolumeMapperTest::tearDown()
+void vtkMAFContourVolumeMapperTest::AfterTest()
 {
   m_RGData->Delete() ;
   m_ImageData->Delete() ;

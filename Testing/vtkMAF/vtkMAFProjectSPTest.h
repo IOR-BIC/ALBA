@@ -17,27 +17,14 @@
 #ifndef __CPP_UNIT_vtkMAFProjectSPTEST_H__
 #define __CPP_UNIT_vtkMAFProjectSPTEST_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
-
+#include "mafTest.h"
 /**
   Class Name: vtkMAFProjectSPTest.
   Test class for vtkMAFProjectSP.
 */
-class vtkMAFProjectSPTest : public CPPUNIT_NS::TestFixture
+class vtkMAFProjectSPTest : public mafTest
 {
   public:
-  
-    // CPPUNIT fixture: executed before each test
-    void setUp();
-
-    // CPPUNIT fixture: executed after each test
-    void tearDown();
 
     /** Start Test Suite */
     CPPUNIT_TEST_SUITE( vtkMAFProjectSPTest );

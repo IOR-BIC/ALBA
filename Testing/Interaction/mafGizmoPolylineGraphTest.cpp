@@ -55,13 +55,13 @@
 #include "vtkDataSetMapper.h"
 #include "vtkProperty.h"
 
-void mafGizmoPolylineGraphTest::setUp()
+void mafGizmoPolylineGraphTest::BeforeTest()
 {
   CreateRenderStuff();
 	CreateTestData();
 }
 
-void mafGizmoPolylineGraphTest::tearDown()
+void mafGizmoPolylineGraphTest::AfterTest()
 {
   m_Renderer->Delete();
   m_RenderWindow->Delete();

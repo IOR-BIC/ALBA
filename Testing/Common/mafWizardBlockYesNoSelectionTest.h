@@ -17,14 +17,7 @@
 #ifndef __CPP_UNIT_mafWizardBlockYesNoSelectionTest_H__
 #define __CPP_UNIT_mafWizardBlockYesNoSelectionTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
-#include <cppunit/TestFixture.h>
+#include "mafTest.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -35,7 +28,7 @@
 class name: mafWizardBlockYesNoSelectionTest
   Test class for mafWizardBlockYesNoSelection
 */
-class mafWizardBlockYesNoSelectionTest : public CPPUNIT_NS::TestFixture
+class mafWizardBlockYesNoSelectionTest : public mafTest
 {
 public:
 

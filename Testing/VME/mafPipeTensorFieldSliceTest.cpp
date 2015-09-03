@@ -61,7 +61,7 @@ void mafPipeTensorFieldSliceTest::TestFixture()
 }
 
 //----------------------------------------------------------------------------
-void mafPipeTensorFieldSliceTest::setUp()
+void mafPipeTensorFieldSliceTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   vtkNEW(m_Renderer);
@@ -70,7 +70,7 @@ void mafPipeTensorFieldSliceTest::setUp()
 }
 
 //----------------------------------------------------------------------------
-void mafPipeTensorFieldSliceTest::tearDown()
+void mafPipeTensorFieldSliceTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   vtkDEL(m_Renderer);

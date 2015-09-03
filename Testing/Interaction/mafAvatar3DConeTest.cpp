@@ -46,14 +46,14 @@
 #include "vtkPolyDataMapper.h"
 
 //----------------------------------------------------------------------------
-void mafAvatar3DConeTest::setUp()
+void mafAvatar3DConeTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   vtkNEW(m_Renderer);
   vtkNEW(m_RenderWindow);
 }
 //----------------------------------------------------------------------------
-void mafAvatar3DConeTest::tearDown()
+void mafAvatar3DConeTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   vtkDEL(m_Renderer);

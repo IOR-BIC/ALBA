@@ -40,14 +40,6 @@ void mafOpDecomposeTimeVarVMETest::TestFixture()
 {
 }
 
-void mafOpDecomposeTimeVarVMETest::setUp()
-{
-}
-
-void mafOpDecomposeTimeVarVMETest::tearDown()
-{
-}
-
 //-----------------------------------------------------------
 void mafOpDecomposeTimeVarVMETest::TestConstructor()
 //-----------------------------------------------------------

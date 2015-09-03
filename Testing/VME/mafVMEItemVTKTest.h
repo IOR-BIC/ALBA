@@ -17,29 +17,16 @@
 #ifndef __CPP_UNIT_mafVMEItemVTKTest_H__
 #define __CPP_UNIT_mafVMEItemVTKTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
 /** Test for mafVMEItemVTK; Use this suite to trace memory problems */
-class mafVMEItemVTKTest : public CPPUNIT_NS::TestFixture
+class mafVMEItemVTKTest : public mafTest
 {
 public: 
-  // CPPUNIT fixture: executed before each test
-  void setUp();
-
-  // CPPUNIT fixture: executed after each test
-  void tearDown();
 
   // CPPUNIT test suite
   CPPUNIT_TEST_SUITE( mafVMEItemVTKTest );
   CPPUNIT_TEST(TestFixture); // just to test that the fixture has no leaks
-  
-  //ToDo: add your test here...
   CPPUNIT_TEST( TestSetData );
   CPPUNIT_TEST( TestEquals );
   CPPUNIT_TEST( TestIsDataPresent );
@@ -49,13 +36,10 @@ public:
   CPPUNIT_TEST( TestReadData );
   CPPUNIT_TEST( TestInternalStoreData );
   CPPUNIT_TEST( TestStoreToArchive );
-
   CPPUNIT_TEST_SUITE_END();
 
 private:
   void TestFixture();
-  
-  // ToDo: add your test methods here...
   void TestSetData();
   void TestEquals();
   void TestIsDataPresent();

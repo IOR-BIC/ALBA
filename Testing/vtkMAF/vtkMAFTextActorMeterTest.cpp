@@ -32,14 +32,6 @@
 #include "vtkJPEGReader.h"
 #include "vtkPointData.h"
 
-void vtkMAFTextActorMeterTest::setUp()
-{
-}
-
-void vtkMAFTextActorMeterTest::tearDown()
-{
-}
-
 
 void vtkMAFTextActorMeterTest::TestFixture()
 {

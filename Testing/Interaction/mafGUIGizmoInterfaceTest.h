@@ -17,23 +17,12 @@
 #ifndef __CPP_UNITmafGUIGizmoInterfaceTest_H__
 #define __CPP_UNITmafGUIGizmoInterfaceTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
 /** mafGUIGizmoInterfaceTest */
-class mafGUIGizmoInterfaceTest : public CPPUNIT_NS::TestFixture
+class mafGUIGizmoInterfaceTest : public mafTest
 {
 public: 
-  /** CPPUNIT fixture: executed before each test */
-  void setUp();
-
-  /** CPPUNIT fixture: executed after each test */
-  void tearDown();
 
   CPPUNIT_TEST_SUITE( mafGUIGizmoInterfaceTest );
   CPPUNIT_TEST(TestFixture); // just to test that the fixture has no leaks

@@ -393,7 +393,7 @@ void mafCoreFactoryTest::TestCreateAllInstance()
   }
 }
 
-void mafCoreFactoryTest::tearDown()
+void mafCoreFactoryTest::AfterTest()
 {
 	 mafCoreFactory::UnRegisterAllFactories();
 }

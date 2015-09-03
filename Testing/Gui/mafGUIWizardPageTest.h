@@ -17,25 +17,18 @@
 #ifndef __CPP_UNIT_mafGUIWizardPageTest_H__
 #define __CPP_UNIT_mafGUIWizardPageTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
-class TestApp;
 class mafGUIFrame;
 
-class mafGUIWizardPageTest : public CPPUNIT_NS::TestFixture
+class mafGUIWizardPageTest : public mafTest
 {
 public: 
-  // CPPUNIT fixture: executed before each test
-  void setUp();
+  // Executed before each test
+  void BeforeTest();
 
-  // CPPUNIT fixture: executed after each test
-  void tearDown();
+  // Executed after each test
+  void AfterTest();
 
   CPPUNIT_TEST_SUITE( mafGUIWizardPageTest );
   CPPUNIT_TEST( TestDynamicAllocation );
@@ -63,7 +56,6 @@ protected:
 
   mafGUIFrame *m_Win;
 
-  TestApp *m_App;
 };
 
 #endif

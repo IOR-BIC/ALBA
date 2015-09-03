@@ -29,15 +29,6 @@
 #include <iostream>
 #include "mmiVTKPicker.h"
 
-void mmiVTKPickerTest::setUp()
-{
-  
-}
-
-void mmiVTKPickerTest::tearDown()
-{
-
-}
 
 void mmiVTKPickerTest::TestFixture()
 {

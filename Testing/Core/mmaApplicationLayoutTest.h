@@ -17,25 +17,15 @@
 #ifndef __CPP_UNIT_mmaApplicationLayoutTest_H__
 #define __CPP_UNIT_mmaApplicationLayoutTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
-class TestApp;
 
 /** Test for mafMatrix; Use this suite to trace memory problems */
-class mmaApplicationLayoutTest : public CPPUNIT_NS::TestFixture
+class mmaApplicationLayoutTest : public mafTest
 {
 public: 
-  // CPPUNIT fixture: executed before each test
-  void setUp();
-
-  // CPPUNIT fixture: executed after each test
-  void tearDown();
+  // Executed before each test
+  void BeforeTest();
 
   // CPPUNIT test suite
   CPPUNIT_TEST_SUITE( mmaApplicationLayoutTest );
@@ -56,9 +46,7 @@ private:
   void TestEquals();
   void TestDeepCopy();
   void TestClearLayout();
-
-
-	TestApp *m_App;
+	
   wxFrame *m_Toplevel;
   bool result;
 };

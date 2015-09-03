@@ -42,18 +42,17 @@ void mafGUISaveRestorePoseTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafGUISaveRestorePoseTest::setUp()
+void mafGUISaveRestorePoseTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   m_VMESphere = mafVMESurface::New();
   m_VMESphere->SetName("m_VMESphere");
   
   m_VTKSphere = vtkSphereSource::New();
-  m_VMESphere->SetData(m_VTKSphere->GetOutput(), -1);
-  
+  m_VMESphere->SetData(m_VTKSphere->GetOutput(), -1); 
 }
 //----------------------------------------------------------------------------
-void mafGUISaveRestorePoseTest::tearDown()
+void mafGUISaveRestorePoseTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   mafDEL(m_VMESphere);

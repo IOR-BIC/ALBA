@@ -36,13 +36,6 @@
 
 static const bool renderingOn = false ;  // switch interactive rendering on
 
-void vtkMAFPastValuesListTest::setUp()
-{
-}
-
-void vtkMAFPastValuesListTest::tearDown()
-{
-}
 
 
 void vtkMAFPastValuesListTest::TestFixture()

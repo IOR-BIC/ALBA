@@ -64,7 +64,7 @@ void mafPipeBoxTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafPipeBoxTest::setUp()
+void mafPipeBoxTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   vtkNEW(m_Renderer);
@@ -72,7 +72,7 @@ void mafPipeBoxTest::setUp()
   vtkNEW(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
-void mafPipeBoxTest::tearDown()
+void mafPipeBoxTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   vtkDEL(m_Renderer);

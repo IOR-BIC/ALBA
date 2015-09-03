@@ -57,7 +57,7 @@ void vtkXRayVolumeMapperTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void vtkXRayVolumeMapperTest::setUp()
+void vtkXRayVolumeMapperTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   vtkNEW(m_Renderer);
@@ -65,7 +65,7 @@ void vtkXRayVolumeMapperTest::setUp()
   vtkNEW(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
-void vtkXRayVolumeMapperTest::tearDown()
+void vtkXRayVolumeMapperTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   vtkDEL(m_Renderer);

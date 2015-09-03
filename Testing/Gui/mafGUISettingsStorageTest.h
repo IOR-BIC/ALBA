@@ -17,26 +17,14 @@
 #ifndef __CPP_UNITmafGUIStorageSettingsTest_H__
 #define __CPP_UNITmafGUIStorageSettingsTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
-
-
-class TestApp;
+#include "mafTest.h"
 
 /** Test for mafMatrix; Use this suite to trace memory problems */
-class mafGUISettingsStorageTest : public CPPUNIT_NS::TestFixture
+class mafGUISettingsStorageTest : public mafTest
 {
 public: 
-  // CPPUNIT fixture: executed before each test
-  void setUp();
-
-  // CPPUNIT fixture: executed after each test
-  void tearDown();
+  // Executed before each test
+  void BeforeTest();
 
   // CPPUNIT test suite
   CPPUNIT_TEST_SUITE( mafGUISettingsStorageTest );
@@ -91,7 +79,6 @@ private:
   // helper function used to check registry with string value
   bool CheckRegistryValue(char *key, const char *refVal);
 
-  TestApp *m_App;
   bool result;
 };
 

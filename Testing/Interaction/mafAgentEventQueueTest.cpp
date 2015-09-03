@@ -30,16 +30,6 @@
 #include "mafAgentEventQueue.h"
 
 
-void mafAgentEventQueueTest::setUp()
-{
-
-}
-
-void mafAgentEventQueueTest::tearDown()
-{
-
-}
-
 void mafAgentEventQueueTest::TestFixture()
 {
 

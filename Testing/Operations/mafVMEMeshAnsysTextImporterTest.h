@@ -17,30 +17,23 @@
 #ifndef __CPP_UNIT_mafVMEMeshAnsysTextImporterTest_H__
 #define __CPP_UNIT_mafVMEMeshAnsysTextImporterTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
-
+#include "mafTest.h"
 #include "mafString.h"
 #include "mafVMEMeshAnsysTextImporter.h"
 
 class vtkFileOutputWindow;
 class vtkUnstructuredGrid;
 
-class mafVMEMeshAnsysTextImporterTest : public CPPUNIT_NS::TestFixture
+class mafVMEMeshAnsysTextImporterTest : public mafTest
 {
 
 public:
 
-  // CPPUNIT fixture: executed before each test
-  void setUp();
+  // Executed before each test
+  void BeforeTest();
 
-  // CPPUNIT fixture: executed after each test
-  void tearDown();
+  // Executed after each test
+  void AfterTest();
 
 
   CPPUNIT_TEST_SUITE( mafVMEMeshAnsysTextImporterTest );

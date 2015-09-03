@@ -17,37 +17,22 @@
 #ifndef __CPP_UNIT_mmiInfoImageTest_H__
 #define __CPP_UNIT_mmiInfoImageTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
-class mmiInfoImageTest : public CPPUNIT_NS::TestFixture
+class mmiInfoImageTest : public mafTest
 {
   public:
-  
-  // CPPUNIT fixture: executed before each test
-  void setUp();
-
-  // CPPUNIT fixture: executed after each test
-  void tearDown();
 
   CPPUNIT_TEST_SUITE( mmiInfoImageTest );
   CPPUNIT_TEST( TestFixture );
   CPPUNIT_TEST( TestConstructorDestructor );
   CPPUNIT_TEST( TestOnEvent );
-
-
-
   CPPUNIT_TEST_SUITE_END();
   
   protected:
     
-    void TestFixture();
-    void TestConstructorDestructor();
+	void TestFixture();
+	void TestConstructorDestructor();
 	void TestOnEvent();
 
 };

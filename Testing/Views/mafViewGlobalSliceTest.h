@@ -17,15 +17,9 @@
 #ifndef __CPP_UNIT_mafViewGlobalSliceTEST_H__
 #define __CPP_UNIT_mafViewGlobalSliceTEST_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
-class mafViewGlobalSliceTest : public CPPUNIT_NS::TestFixture
+class mafViewGlobalSliceTest : public mafTest
 {
   CPPUNIT_TEST_SUITE( mafViewGlobalSliceTest );
   CPPUNIT_TEST( CreateDestroyTest );

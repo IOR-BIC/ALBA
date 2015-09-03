@@ -56,19 +56,13 @@ mafCxxTypeMacro(mafVMEScalarMatrixTestClass)
 //-------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-void mafDataPipeInterpolatorScalarMatrixTest::setUp()
+void mafDataPipeInterpolatorScalarMatrixTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  m_Result = false;
-
   m_DataMatrix.set_size(10,20);
   m_DataMatrix.fill(1.0);
 }
-//----------------------------------------------------------------------------
-void mafDataPipeInterpolatorScalarMatrixTest::tearDown()
-//----------------------------------------------------------------------------
-{
-}
+
 //----------------------------------------------------------------------------
 void mafDataPipeInterpolatorScalarMatrixTest::TestDynamicAllocation()
 //----------------------------------------------------------------------------

@@ -32,13 +32,13 @@
 #include "mafXMLString.h"
 
 //----------------------------------------------------------------------------
-void mmuDOMTreeErrorReporterTest::setUp()
+void mmuDOMTreeErrorReporterTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   XERCES_CPP_NAMESPACE_QUALIFIER XMLPlatformUtils::Initialize();
 }
 //----------------------------------------------------------------------------
-void mmuDOMTreeErrorReporterTest::tearDown()
+void mmuDOMTreeErrorReporterTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   XERCES_CPP_NAMESPACE_QUALIFIER XMLPlatformUtils::Terminate();

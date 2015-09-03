@@ -42,21 +42,12 @@
 #include "mafWizardWaitOpTest.h"
 #include "mafWizardTest.h"
 
-IMPLEMENT_APP(TestApp)
-//--------------------------------------------------------------------------------
-bool TestApp::OnInit()
-//--------------------------------------------------------------------------------
-{
-	return TRUE;
-}
+#include <cppunit/BriefTestProgressListener.h>
+#include <cppunit/CompilerOutputter.h>
+#include <cppunit/extensions/TestFactoryRegistry.h>
+#include <cppunit/TestResultCollector.h>
+#include <cppunit/TestRunner.h>
 
-//--------------------------------------------------------------------------------
-int TestApp::OnExit()
-//--------------------------------------------------------------------------------
-{
-	wxApp::CleanUp();
-	return 0;
-}
 
 //Main Test Executor
 int

@@ -17,30 +17,16 @@
 #ifndef __CPP_UNIT_mafOpExtractIsosurfaceTest_H__
 #define __CPP_UNIT_mafOpExtractIsosurfaceTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
-
+#include "mafTest.h"
 
 /** Test for mafOpApplyTrajectory; Use this suite to trace memory problems */
-class mafOpExtractIsosurfaceTest : public CPPUNIT_NS::TestFixture
+class mafOpExtractIsosurfaceTest : public mafTest
 {
 public: 
-  // CPPUNIT fixture: executed before each test
-  void setUp();
-
-  // CPPUNIT fixture: executed after each test
-  void tearDown();
 
   // CPPUNIT test suite
   CPPUNIT_TEST_SUITE( mafOpExtractIsosurfaceTest );
   CPPUNIT_TEST(TestFixture); // just to test that the fixture has no leaks
-  
-  //ToDo: add your test here...
   CPPUNIT_TEST(TestDynamicAllocation);
   CPPUNIT_TEST(TestExtractRG);
   CPPUNIT_TEST(TestExtractSP);
@@ -48,8 +34,6 @@ public:
 
 private:
   void TestFixture();
-  
-  // ToDo: add your test methods here...
   void TestDynamicAllocation();
   void TestExtractRG();
   void TestExtractSP();

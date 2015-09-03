@@ -61,16 +61,6 @@ class vtkMAFProfilingActorDummy : public vtkMAFProfilingActor
 };
 
 //------------------------------------------------------------
-void vtkMAFProfilingActorTest::setUp()
-//------------------------------------------------------------
-{
-}
-//------------------------------------------------------------
-void vtkMAFProfilingActorTest::tearDown()
-//------------------------------------------------------------
-{
-}
-//------------------------------------------------------------
 void vtkMAFProfilingActorTest::PrepareToRender(vtkRenderer *renderer, vtkRenderWindow *renderWindow)
 //------------------------------------------------------------
 {

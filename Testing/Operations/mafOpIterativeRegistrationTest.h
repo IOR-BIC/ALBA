@@ -17,24 +17,13 @@
 #ifndef CPP_UNIT_mafOpIterativeRegistrationTest_H
 #define CPP_UNIT_mafOpIterativeRegistrationTest_H
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 using namespace std;
  
-class mafOpIterativeRegistrationTest : public CPPUNIT_NS::TestFixture
+class mafOpIterativeRegistrationTest : public mafTest
 {
 
 public:
-  // CPPUNIT fixture: executed before each test
-  void setUp();
-
-  // CPPUNIT fixture: executed after each test
-  void tearDown();
 
   CPPUNIT_TEST_SUITE( mafOpIterativeRegistrationTest );
   CPPUNIT_TEST( TestDynamicAllocation );

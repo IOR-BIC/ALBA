@@ -17,28 +17,22 @@
 #ifndef __CPP_UNIT_mafOpRemoveCellsTest_H__
 #define __CPP_UNIT_mafOpRemoveCellsTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
-
-#include "vtkPolyData.h"
+#include "mafTest.h"
 #include "mafVMEStorage.h"
 #include "mafVMERoot.h"
 #include "mafVMESurface.h"
 
-class mafOpRemoveCellsTest : public CPPUNIT_NS::TestFixture
+#include "vtkPolyData.h"
+
+class mafOpRemoveCellsTest : public mafTest
 {
 public:
 
-  // CPPUNIT fixture: executed before each test
-  void setUp();
+  // Executed before each test
+  void BeforeTest();
 
-  // CPPUNIT fixture: executed after each test
-  void tearDown();
+  // Executed after each test
+  void AfterTest();
 
 	CPPUNIT_TEST_SUITE( mafOpRemoveCellsTest );
   CPPUNIT_TEST( TestFixture );

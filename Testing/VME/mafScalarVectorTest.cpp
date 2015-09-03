@@ -41,14 +41,13 @@ void mafScalarVectorTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafScalarVectorTest::setUp()
+void mafScalarVectorTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   m_ScalarVector = mafScalarVector::New();
-  result = false;
 }
 //----------------------------------------------------------------------------
-void mafScalarVectorTest::tearDown()
+void mafScalarVectorTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   mafDEL(m_ScalarVector);

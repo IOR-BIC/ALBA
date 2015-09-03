@@ -17,13 +17,7 @@
 #ifndef __CPP_UNIT_vtkImageUnPackerTest_H__
 #define __CPP_UNIT_vtkImageUnPackerTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
 //-----------------------------------------------------
 // forward references:
@@ -31,14 +25,11 @@
 
 class vtkImageUnPacker;
 
-class vtkImageUnPackerTest : public CPPUNIT_NS::TestFixture
+class vtkImageUnPackerTest : public mafTest
 {
 public:
-  // CPPUNIT fixture: executed before each test
-  void setUp();
-
-  // CPPUNIT fixture: executed after each test
-  void tearDown();
+  // Executed before each test
+  void BeforeTest();
 
   CPPUNIT_TEST_SUITE( vtkImageUnPackerTest );
   CPPUNIT_TEST( TestDynamicAllocation );

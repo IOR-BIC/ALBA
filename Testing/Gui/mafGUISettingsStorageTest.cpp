@@ -40,24 +40,12 @@ void mafGUISettingsStorageTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafGUISettingsStorageTest::setUp()
+void mafGUISettingsStorageTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  m_App = new TestApp();  // Instantiate the application class
-  m_App->argc = 0;        // set the number of input argument to 0
-  m_App->argv = NULL;     // set to NULL the input argument's parameters
-  wxTheApp->SetAppName("mafGUISettingsStorageTest"); // Set the name for the application
-
-  result = false;
-
-  RemoveRegistryKeys();
+	RemoveRegistryKeys();
 }
-//----------------------------------------------------------------------------
-void mafGUISettingsStorageTest::tearDown()
-//----------------------------------------------------------------------------
-{
-  cppDEL(m_App);  // Destroy the application
-}
+
 //----------------------------------------------------------------------------
 void mafGUISettingsStorageTest::TestDynamicAllocation()
 //----------------------------------------------------------------------------

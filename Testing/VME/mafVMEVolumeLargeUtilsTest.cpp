@@ -30,7 +30,7 @@
 #define TEST_RESULT CPPUNIT_ASSERT(m_Result)
 
 //----------------------------------------------------------------------------
-void mafVMEVolumeLargeUtilsTest::setUp()
+void mafVMEVolumeLargeUtilsTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   vtkObject::SetGlobalWarningDisplay(false);
@@ -39,11 +39,7 @@ void mafVMEVolumeLargeUtilsTest::setUp()
   m_TestFilePath << "/Test_VMEVolumeLargeUtils/";
   m_TestFilePath << "volume_1.vtk";
 }
-//----------------------------------------------------------------------------
-void mafVMEVolumeLargeUtilsTest::tearDown()
-//----------------------------------------------------------------------------
-{
-}
+
 //----------------------------------------------------------------------------
 void mafVMEVolumeLargeUtilsTest::GetFileLengthTest()
 //----------------------------------------------------------------------------

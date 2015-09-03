@@ -17,14 +17,7 @@
 #ifndef __CPP_UNIT_vtkMAFTextActorMetertest_H__
 #define __CPP_UNIT_vtkMAFTextActorMetertest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
-#include <cppunit/TestFixture.h>
+#include "mafTest.h"
 
 //------------------------------------------------------------------------------
 // Forward Declaration:
@@ -35,7 +28,7 @@ class vtkMAFTextActorMeter;
 //------------------------------------------------------------------------------
 // Test class for vtkMAFTextActorMeter
 //------------------------------------------------------------------------------
-class vtkMAFTextActorMeterTest : public CPPUNIT_NS::TestFixture
+class vtkMAFTextActorMeterTest : public mafTest
 {
   public:
     enum ID_TEST_LIST
@@ -44,12 +37,6 @@ class vtkMAFTextActorMeterTest : public CPPUNIT_NS::TestFixture
       ID_TEXT_TEST_POS2,
       ID_TEXT_COLOR_TEST,
     };
-
-    // CPPUNIT fixture: executed before each test
-    void setUp();
-
-    // CPPUNIT fixture: executed after each test
-    void tearDown();
 
     CPPUNIT_TEST_SUITE( vtkMAFTextActorMeterTest );
     CPPUNIT_TEST( TestFixture );

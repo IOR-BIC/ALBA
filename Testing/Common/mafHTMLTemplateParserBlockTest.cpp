@@ -25,22 +25,6 @@
 
 #include "mafHTMLTemplateParserBlockTest.h"
 #include "mafHTMLTemplateParserBlock.h"
-//#include "mafHTMLTemplateParser.h"
-
-
-
-//----------------------------------------------------------------------------
-void mafHTMLTemplateParserBlockTest::setUp()
-//----------------------------------------------------------------------------
-{
-
-}
-
-//----------------------------------------------------------------------------
-void mafHTMLTemplateParserBlockTest::tearDown()
-//----------------------------------------------------------------------------
-{
-}
 
 //----------------------------------------------------------------------------
 void mafHTMLTemplateParserBlockTest::TestConstructorDestuctor()

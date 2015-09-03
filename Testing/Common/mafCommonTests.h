@@ -23,19 +23,8 @@
 // forward declarations :
 //----------------------------------------------------------------------------
 #include "mafDefines.h"
+#include "mafTest.h"
 
-
-// Helper class used to build a fake application needed by the wxConfig
-// to store settings into the registry with the same name of the application
-// ===============================================================================
-class TestApp : public wxApp
-	// ===============================================================================
-{
-public:
-	bool OnInit();
-	int  OnExit();
-};
-DECLARE_APP(TestApp)
 
 
 #endif

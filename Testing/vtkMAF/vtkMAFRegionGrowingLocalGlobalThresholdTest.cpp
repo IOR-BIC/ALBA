@@ -37,7 +37,7 @@
 #define DELTA 0.1
 
 //-------------------------------------------------------------------------
-void vtkMAFRegionGrowingLocalGlobalThresholdTest::setUp()
+void vtkMAFRegionGrowingLocalGlobalThresholdTest::BeforeTest()
 //-------------------------------------------------------------------------
 {
   m_Image = vtkImageData::New();
@@ -62,7 +62,7 @@ void vtkMAFRegionGrowingLocalGlobalThresholdTest::setUp()
   scalars->Delete();
 }
 //-------------------------------------------------------------------------
-void vtkMAFRegionGrowingLocalGlobalThresholdTest::tearDown()
+void vtkMAFRegionGrowingLocalGlobalThresholdTest::AfterTest()
 //-------------------------------------------------------------------------
 {
   m_Image->Delete();

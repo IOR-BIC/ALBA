@@ -58,7 +58,7 @@ void vtkMAFVolumeRayCastMapperTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void vtkMAFVolumeRayCastMapperTest::setUp()
+void vtkMAFVolumeRayCastMapperTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   vtkNEW(m_Renderer);
@@ -66,7 +66,7 @@ void vtkMAFVolumeRayCastMapperTest::setUp()
   vtkNEW(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
-void vtkMAFVolumeRayCastMapperTest::tearDown()
+void vtkMAFVolumeRayCastMapperTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   vtkDEL(m_Renderer);

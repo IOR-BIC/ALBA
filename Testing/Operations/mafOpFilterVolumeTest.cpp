@@ -104,7 +104,7 @@ void mafOpFilterVolumeTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafOpFilterVolumeTest::setUp()
+void mafOpFilterVolumeTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   m_Result = false;
@@ -114,13 +114,11 @@ void mafOpFilterVolumeTest::setUp()
   CreateDataTest();
 }
 //----------------------------------------------------------------------------
-void mafOpFilterVolumeTest::tearDown()
+void mafOpFilterVolumeTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   vtkDEL(m_InputIM);
   vtkDEL(m_InputRG);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafOpFilterVolumeTest::TestStaticAllocation()

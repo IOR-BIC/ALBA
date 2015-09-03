@@ -34,7 +34,7 @@
 #define EPSILON 0.001
 
 //-----------------------------------------------------------
-void medInteractor2DDistanceTest::setUp()
+void medInteractor2DDistanceTest::BeforeTest()
 //-----------------------------------------------------------
 {
   m_Win = new mafGUIFrame("testGui", wxDefaultPosition, wxSize(800, 600));
@@ -42,14 +42,11 @@ void medInteractor2DDistanceTest::setUp()
   wxModule::InitializeModules();
 }
 //-----------------------------------------------------------
-void medInteractor2DDistanceTest::tearDown()
+void medInteractor2DDistanceTest::AfterTest()
 //-----------------------------------------------------------
 {
   wxModule::CleanUpModules();
-
   delete m_Win;
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //-----------------------------------------------------------
 void medInteractor2DDistanceTest::TestFixture()

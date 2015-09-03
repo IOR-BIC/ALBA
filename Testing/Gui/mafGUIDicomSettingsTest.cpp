@@ -34,28 +34,20 @@
 #define TEST_RESULT CPPUNIT_ASSERT(m_Result)
 
 //----------------------------------------------------------------------------
-void mafGUIDicomSettingsTest::setUp()
+void mafGUIDicomSettingsTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  m_App = new TestApp();  // Instantiate the application class
-  m_App->argc = 0;        // set the number of input argument to 0
-  m_App->argv = NULL;     // set to NULL the input argument's parameters
-  wxTheApp->SetAppName("mafGUIDicomSettingsTest"); // Set the name for the application
-
   wxConfig *config = new wxConfig(wxEmptyString);
   config->DeleteAll();
   cppDEL(config);
-
-  m_Result = false;
 }
 //----------------------------------------------------------------------------
-void mafGUIDicomSettingsTest::tearDown()
+void mafGUIDicomSettingsTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   wxConfig *config = new wxConfig(wxEmptyString);
   config->DeleteAll();
   cppDEL(config);
-  cppDEL(m_App);
 }
 //---------------------------------------------------------
 void mafGUIDicomSettingsTest::TestDynamicAllocation()

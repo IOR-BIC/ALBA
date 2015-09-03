@@ -32,15 +32,7 @@ void mafGUIGizmoInterfaceTest::TestFixture()
 {
 
 }
-void mafGUIGizmoInterfaceTest::setUp()
-{
-  
-}
 
-void mafGUIGizmoInterfaceTest::tearDown()
-{
- 
-}
 
 void mafGUIGizmoInterfaceTest::TestConstructorDestructor()
 {

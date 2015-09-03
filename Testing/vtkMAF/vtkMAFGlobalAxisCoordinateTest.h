@@ -17,24 +17,12 @@
 #ifndef __CPP_UNIT_vtkMAFGlobalAxisCoordinateTEST_H__
 #define __CPP_UNIT_vtkMAFGlobalAxisCoordinateTEST_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
 /*Test for  vtkMAFGlobalAxisCoordinate*/
-class vtkMAFGlobalAxisCoordinateTest : public CPPUNIT_NS::TestFixture
+class vtkMAFGlobalAxisCoordinateTest : public mafTest
 {
   public:
-  
-    // CPPUNIT fixture: executed before each test
-    void setUp();
-
-    // CPPUNIT fixture: executed after each test
-    void tearDown();
 
     CPPUNIT_TEST_SUITE( vtkMAFGlobalAxisCoordinateTest );
     CPPUNIT_TEST( TestFixture );

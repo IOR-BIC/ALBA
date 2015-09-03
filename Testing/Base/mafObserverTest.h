@@ -17,23 +17,12 @@
 #ifndef __CPP_UNIT_mafObserverTest_H__
 #define __CPP_UNIT_mafObserverTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
 /** Test for mafEventBase; Use this suite to trace memory problems */
-class mafObserverTest : public CPPUNIT_NS::TestFixture
+class mafObserverTest : public mafTest
 {
 public: 
-  // CPPUNIT fixture: executed before each test
-  void setUp();
-
-  // CPPUNIT fixture: executed after each test
-  void tearDown();
 
   // CPPUNIT test suite
   CPPUNIT_TEST_SUITE( mafObserverTest );
@@ -42,8 +31,7 @@ public:
   CPPUNIT_TEST(TestDynamicAllocation);
   CPPUNIT_TEST(TestObserver);
   CPPUNIT_TEST_SUITE_END();
-
-
+	
 private:
   void TestFixture();
   void TestStaticAllocation();

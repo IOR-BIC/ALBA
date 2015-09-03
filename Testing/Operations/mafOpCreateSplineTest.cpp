@@ -38,14 +38,13 @@ void mafOpCreateSplineTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafOpCreateSplineTest::setUp()
+void mafOpCreateSplineTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  result = false;
   m_CreateSpline = new mafOpCreateSpline();
 }
 //----------------------------------------------------------------------------
-void mafOpCreateSplineTest::tearDown()
+void mafOpCreateSplineTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   mafDEL(m_CreateSpline);

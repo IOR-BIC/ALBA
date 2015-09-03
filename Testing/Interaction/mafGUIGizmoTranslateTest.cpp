@@ -41,18 +41,17 @@ void mafGUIGizmoTranslateTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafGUIGizmoTranslateTest::setUp()
+void mafGUIGizmoTranslateTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   m_VMESphere = mafVMESurface::New();
   m_VMESphere->SetName("m_VMESphere");
   
   m_VTKSphere = vtkSphereSource::New();
-  m_VMESphere->SetData(m_VTKSphere->GetOutput(), -1);
-  
+  m_VMESphere->SetData(m_VTKSphere->GetOutput(), -1); 
 }
 //----------------------------------------------------------------------------
-void mafGUIGizmoTranslateTest::tearDown()
+void mafGUIGizmoTranslateTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   mafDEL(m_VMESphere);

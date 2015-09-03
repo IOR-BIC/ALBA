@@ -17,14 +17,7 @@
 #ifndef __CPP_UNIT_mafOpManagerTest_h__
 #define __CPP_UNIT_mafOpManagerTest_h__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
-#include <cppunit/TestFixture.h>
+#include "mafTest.h"
 
 #include <wx/config.h>
 #include <wx/fileconf.h>
@@ -35,16 +28,16 @@ class mafOpManager;
 Test class for mafOpManager
 */
 //------------------------------------------------------------------------------
-class mafOpManagerTest: public CPPUNIT_NS::TestFixture
+class mafOpManagerTest: public mafTest
   //------------------------------------------------------------------------------
 {
 
 public:
 
-  /** CPPUNIT fixture: executed before each test.*/
-  void setUp();
-  /* CPPUNIT fixture: executed after each test.*/
-  void tearDown();
+  /** Executed before each test.*/
+  void BeforeTest();
+  /* Executed after each test.*/
+  void AfterTest();
   /** Test suite begin. */
   CPPUNIT_TEST_SUITE( mafOpManagerTest );
 

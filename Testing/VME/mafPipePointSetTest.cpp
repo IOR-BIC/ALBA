@@ -62,7 +62,7 @@ void mafPipePointSetTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafPipePointSetTest::setUp()
+void mafPipePointSetTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   vtkNEW(m_Renderer);
@@ -70,7 +70,7 @@ void mafPipePointSetTest::setUp()
   vtkNEW(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
-void mafPipePointSetTest::tearDown()
+void mafPipePointSetTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   vtkDEL(m_Renderer);

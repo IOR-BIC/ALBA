@@ -17,25 +17,14 @@
 #ifndef __CPP_UNIT_mafDataVectorTest_H__
 #define __CPP_UNIT_mafDataVectorTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
 /** Test for mafMatrix; Use this suite to trace memory problems */
-class mafDataVectorTest : public CPPUNIT_NS::TestFixture
+class mafDataVectorTest : public mafTest
 {
 public: 
-  // CPPUNIT fixture: executed before each test
-  void setUp();
 
-  // CPPUNIT fixture: executed after each test
-  void tearDown();
-
-  // CPPUNIT test suite
+	// CPPUNIT test suite
   CPPUNIT_TEST_SUITE( mafDataVectorTest );
   CPPUNIT_TEST( TestFixture ); // just to test that the fixture has no leaks
   CPPUNIT_TEST( TestStaticAllocation );

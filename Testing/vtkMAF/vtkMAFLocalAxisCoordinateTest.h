@@ -17,25 +17,13 @@
 #ifndef __CPP_UNIT_vtkMAFLocalAxisCoordinateTEST_H__
 #define __CPP_UNIT_vtkMAFLocalAxisCoordinateTEST_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
 /*Test for  vtkMAFLocalAxisCoordinate*/
-class vtkMAFLocalAxisCoordinateTest : public CPPUNIT_NS::TestFixture
+class vtkMAFLocalAxisCoordinateTest : public mafTest
 {
   public:
   
-    // CPPUNIT fixture: executed before each test
-    void setUp();
-
-    // CPPUNIT fixture: executed after each test
-    void tearDown();
-
     CPPUNIT_TEST_SUITE( vtkMAFLocalAxisCoordinateTest );
     CPPUNIT_TEST( TestFixture );
     CPPUNIT_TEST( TestDynamicAllocation );

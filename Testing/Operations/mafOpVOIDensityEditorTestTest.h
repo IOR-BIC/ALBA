@@ -17,23 +17,12 @@
 #ifndef __CPP_UNIT_mafOpVOIDensityEditorTestTest_H__
 #define __CPP_UNIT_mafOpVOIDensityEditorTestTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
 /** Test for mafOpVOIDensityEditorTest; Use this suite to trace memory problems */
-class mafOpVOIDensityEditorTestTest : public CPPUNIT_NS::TestFixture
+class mafOpVOIDensityEditorTestTest : public mafTest
 {
 public: 
-  // CPPUNIT fixture: executed before each test
-  void setUp();
-
-  // CPPUNIT fixture: executed after each test
-  void tearDown();
 
   // CPPUNIT test suite
   CPPUNIT_TEST_SUITE( mafOpVOIDensityEditorTestTest );

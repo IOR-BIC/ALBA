@@ -52,7 +52,7 @@ void mafVMEMeshAnsysTextExporterTest::TestFixture()
 
 }
 
-void mafVMEMeshAnsysTextExporterTest::setUp()
+void mafVMEMeshAnsysTextExporterTest::BeforeTest()
 {
   // single test case log
   m_Log = vtkFileOutputWindow::New();
@@ -61,7 +61,7 @@ void mafVMEMeshAnsysTextExporterTest::setUp()
   m_Log->AppendOn();   
 }
 
-void mafVMEMeshAnsysTextExporterTest::tearDown()
+void mafVMEMeshAnsysTextExporterTest::AfterTest()
 {
   m_Log->Delete();
 }

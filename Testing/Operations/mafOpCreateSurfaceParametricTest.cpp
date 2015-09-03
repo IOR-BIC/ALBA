@@ -39,14 +39,13 @@ void mafOpCreateSurfaceParametricTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafOpCreateSurfaceParametricTest::setUp()
+void mafOpCreateSurfaceParametricTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  result = false;
   m_CreateSurfaceParametric = new mafOpCreateSurfaceParametric();
 }
 //----------------------------------------------------------------------------
-void mafOpCreateSurfaceParametricTest::tearDown()
+void mafOpCreateSurfaceParametricTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   mafDEL(m_CreateSurfaceParametric);

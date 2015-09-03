@@ -46,14 +46,6 @@ void mafOpExporterBMPTest::TestFixture()
 {
 }
 
-void mafOpExporterBMPTest::setUp()
-{
-}
-
-void mafOpExporterBMPTest::tearDown()
-{
-}
-
 //-----------------------------------------------------------
 void mafOpExporterBMPTest::TestConstructor()
 //-----------------------------------------------------------

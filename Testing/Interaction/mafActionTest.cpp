@@ -30,16 +30,6 @@
 
 typedef std::list<mafAutoPointer<mafDevice> > mmuDeviceList;
 
-void mafActionTest::setUp()
-{
-
-}
-
-void mafActionTest::tearDown()
-{
-
-}
-
 void mafActionTest::TestFixture()
 {
 

@@ -24,16 +24,17 @@
 //----------------------------------------------------------------------------
 
 #include <cppunit/config/SourcePrefix.h>
-#include "mafCoreTests.h"
 #include "mmaApplicationLayoutTest.h"
-
+#include "mafCoreTests.h"
 #include "mafSmartPointer.h"
 #include "mmaApplicationLayout.h"
-
 #include "mafView.h"
 #include "mafGUIMDIChild.h"
 
+#include "wx/module.h"
 #include <iostream>
+#include "wx/app.h"
+
 
 #define TEST_RESULT CPPUNIT_ASSERT(result);
 
@@ -43,22 +44,10 @@ void mmaApplicationLayoutTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mmaApplicationLayoutTest::setUp()
+void mmaApplicationLayoutTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-	m_App = new TestApp();  // Instantiate the application class
-	m_App->argc = 0;        // set the number of input argument to 0
-	m_App->argv = NULL;     // set to NULL the input argument's parameters
-
-  m_Toplevel = new wxFrame(m_App->GetTopWindow(),-1,"Title");
-  result = false;
-}
-//----------------------------------------------------------------------------
-void mmaApplicationLayoutTest::tearDown()
-//----------------------------------------------------------------------------
-{
-	cppDEL(m_App);  // Destroy the application
-	wxAppConsole::SetInstance(NULL);
+	m_Toplevel = new wxFrame(m_App->GetTopWindow(),-1,"Title");
 }
 //----------------------------------------------------------------------------
 void mmaApplicationLayoutTest::TestDynamicAllocation()

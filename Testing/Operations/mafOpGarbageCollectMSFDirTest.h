@@ -17,20 +17,13 @@
 #ifndef __CPP_UNIT_mafOpGarbageCollectMSFDirTest_H__
 #define __CPP_UNIT_mafOpGarbageCollectMSFDirTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
-
+#include "mafTest.h"
 
 /**
   Class Name: mafOpGarbageCollectMSFDirTest
   Test class for mafOpGarbageCollectMSFDir.
 */
-class mafOpGarbageCollectMSFDirTest : public CPPUNIT_NS::TestFixture
+class mafOpGarbageCollectMSFDirTest : public mafTest
 {
   /** test suite starting */
   CPPUNIT_TEST_SUITE( mafOpGarbageCollectMSFDirTest );
