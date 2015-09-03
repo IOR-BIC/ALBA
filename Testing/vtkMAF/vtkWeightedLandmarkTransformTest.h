@@ -30,12 +30,7 @@ class mafVMELandmarkCloud;
 class vtkWeightedLandmarkTransformTest : public mafTest
 {
   public:
-  // Executed before each test
-  void BeforeTest();
-
-  // Executed after each test
-  void AfterTest();
-
+  
   CPPUNIT_TEST_SUITE( vtkWeightedLandmarkTransformTest );
   CPPUNIT_TEST( TestDynamicAllocation );
   CPPUNIT_TEST( TestUpdate );

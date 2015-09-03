@@ -28,11 +28,6 @@ class mafCurvilinearAbscissaOnSkeletonHelperTest : public mafTest
 {
 public:
 
-	/** Executed before each test */
-	void BeforeTest();
-
-	/** Executed after each test */
-	void AfterTest();
 
 	CPPUNIT_TEST_SUITE( mafCurvilinearAbscissaOnSkeletonHelperTest );
 	CPPUNIT_TEST( TestDynamicAllocation );

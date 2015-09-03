@@ -51,7 +51,7 @@ public:
 	/** Test specific stuff executed after each test */
 	virtual void AfterTest() {};
 
-private:
+protected:
   TestApp *m_App;
 };
 

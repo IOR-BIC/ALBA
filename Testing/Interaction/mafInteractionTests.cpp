@@ -87,6 +87,12 @@
 #include "medInteractor2DAngleTest.h"
 #include "medInteractor2DIndicatorTest.h"
 
+#include <cppunit/BriefTestProgressListener.h>
+#include <cppunit/CompilerOutputter.h>
+#include <cppunit/extensions/TestFactoryRegistry.h>
+#include <cppunit/TestResultCollector.h>
+#include <cppunit/TestRunner.h>
+
 
 void	DummyObserver::OnEvent(mafEventBase *maf_event)
 {

@@ -26,11 +26,6 @@ class mafVMELandmarkTest : public mafTest
 {
 
   public:
-    // Executed before each test
-    void BeforeTest();
-
-    // Executed after each test
-    void AfterTest();
 
     CPPUNIT_TEST_SUITE( mafVMELandmarkTest );
     CPPUNIT_TEST( DynamicAllocationTest );

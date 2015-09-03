@@ -23,19 +23,11 @@ class mafOpOpenExternalFileTest : public mafTest
 {
 public:
 
-  // Executed before each test
-  void BeforeTest();
-
-  // Executed after each test
-  void AfterTest();
 
   CPPUNIT_TEST_SUITE( mafOpOpenExternalFileTest );
   CPPUNIT_TEST( TestFixture ); // just to test that the fixture has no leaks
   CPPUNIT_TEST( TestConstructor );
   CPPUNIT_TEST( TestImporter );
-
-
-  
   CPPUNIT_TEST_SUITE_END();
 
   protected:

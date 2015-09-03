@@ -22,11 +22,6 @@
 class mafPipeCompoundVolumeMIPTest : public mafTest
 {
 public: 
-  // Executed before each test
-  void BeforeTest();
-
-  // Executed after each test
-  void AfterTest();
 
   CPPUNIT_TEST_SUITE( mafPipeCompoundVolumeMIPTest );
   CPPUNIT_TEST(TestFixture); // just to test that the fixture has no leaks

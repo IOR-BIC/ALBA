@@ -24,9 +24,8 @@
 //----------------------------------------------------------------------------
 
 #include <cppunit/config/SourcePrefix.h>
-
-#include "mafCoreTests.h"
 #include "mmaApplicationLayoutTest.h"
+#include "mafCoreTests.h"
 #include "mafSmartPointer.h"
 #include "mmaApplicationLayout.h"
 #include "mafView.h"
@@ -35,7 +34,6 @@
 #include "wx/module.h"
 #include <iostream>
 #include "wx/app.h"
-#include "mafTest.h"
 
 
 #define TEST_RESULT CPPUNIT_ASSERT(result);
@@ -50,7 +48,6 @@ void mmaApplicationLayoutTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
 	m_Toplevel = new wxFrame(m_App->GetTopWindow(),-1,"Title");
-  result = false;
 }
 //----------------------------------------------------------------------------
 void mmaApplicationLayoutTest::TestDynamicAllocation()

@@ -24,11 +24,6 @@ class mafOpImporterDicomOffisTest : public mafTest
 {
 
 public:
-  // Executed before each test
-  void BeforeTest();
-
-  // Executed after each test
-  void AfterTest();
 
   CPPUNIT_TEST_SUITE( mafOpImporterDicomOffisTest );
     CPPUNIT_TEST( TestDynamicAllocation );

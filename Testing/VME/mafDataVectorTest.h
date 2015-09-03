@@ -23,13 +23,8 @@
 class mafDataVectorTest : public mafTest
 {
 public: 
-  // Executed before each test
-  void BeforeTest();
 
-  // Executed after each test
-  void AfterTest();
-
-  // CPPUNIT test suite
+	// CPPUNIT test suite
   CPPUNIT_TEST_SUITE( mafDataVectorTest );
   CPPUNIT_TEST( TestFixture ); // just to test that the fixture has no leaks
   CPPUNIT_TEST( TestStaticAllocation );

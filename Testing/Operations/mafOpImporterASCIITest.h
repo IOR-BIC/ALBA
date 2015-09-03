@@ -22,12 +22,6 @@
 class mafOpImporterASCIITest : public mafTest
 {
 public:
-
-  // Executed before each test
-  void BeforeTest();
-
-  // Executed after each test
-  void AfterTest();
   
   CPPUNIT_TEST_SUITE( mafOpImporterASCIITest );
   CPPUNIT_TEST( TestConstructor );
