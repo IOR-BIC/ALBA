@@ -24,13 +24,8 @@ class vtkRenderWindow;
 class mafPipeVectorFieldSliceTest : public mafTest
 {
 public: 
-  // Executed before each test
-  void BeforeTest();
 
-  // Executed after each test
-  void AfterTest();
-
-  CPPUNIT_TEST_SUITE( mafPipeVectorFieldSliceTest );
+	CPPUNIT_TEST_SUITE( mafPipeVectorFieldSliceTest );
   CPPUNIT_TEST( TestFixture ); // just to test that the fixture has no leaks
   CPPUNIT_TEST( TestCreate );
   CPPUNIT_TEST_SUITE_END();

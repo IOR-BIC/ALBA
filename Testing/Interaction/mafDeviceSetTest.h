@@ -22,15 +22,8 @@
 class mafDeviceSetTest : public mafTest
 {
   public:
-  
-  /** Executed before each test */
-  void BeforeTest();
-
-  /** Executed after each test */
-  void AfterTest();
 
   CPPUNIT_TEST_SUITE( mafDeviceSetTest );
-  
   CPPUNIT_TEST(TestFixture);
   CPPUNIT_TEST(TestConstructorDestructor);
   CPPUNIT_TEST(TestGetDeviceByIndex);
@@ -43,7 +36,6 @@ class mafDeviceSetTest : public mafTest
   CPPUNIT_TEST(TestRemoveDeviceByPointer);
   CPPUNIT_TEST(TestRemoveAllDevices);
   CPPUNIT_TEST(TestGetDevices);
-
   CPPUNIT_TEST_SUITE_END();
 
   protected:
@@ -60,8 +52,6 @@ class mafDeviceSetTest : public mafTest
     void TestRemoveDeviceByPointer();
     void TestRemoveAllDevices();
     void TestGetDevices();
-
-
 };
 
 #endif
