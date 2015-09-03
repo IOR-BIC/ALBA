@@ -27,7 +27,7 @@
 #include "mafVMESurfaceParametric.h"
 
 //------------------------------------------------------------------------------
-void mafNodeManagerTest::setUp()
+void mafNodeManagerTest::BeforeTest()
 //------------------------------------------------------------------------------
 {
   m_Node = NULL;
@@ -36,12 +36,7 @@ void mafNodeManagerTest::setUp()
   m_Config = new wxFileConfig("mafNodeManagerTest");
   wxConfigBase::Set(m_Config);
 }
-//------------------------------------------------------------------------------
-void mafNodeManagerTest::tearDown()
-//------------------------------------------------------------------------------
-{
-  //cppDEL( m_Config ); Already deleted by mafNodeManager
-}
+
 //------------------------------------------------------------------------------
 void mafNodeManagerTest::OnEvent(mafEventBase *maf_event)
 //------------------------------------------------------------------------------

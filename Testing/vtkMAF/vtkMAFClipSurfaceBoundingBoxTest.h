@@ -17,13 +17,7 @@
 #ifndef __CPP_UNIT_vtkMAFClipSurfaceBoundingBoxTEST_H__
 #define __CPP_UNIT_vtkMAFClipSurfaceBoundingBoxTEST_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
 //----------------------------------------------------------
 // Forward Classes:
@@ -37,15 +31,15 @@ class vtkRenderWindow;
   Class Name: vtkMAFClipSurfaceBoundingBoxTest.
   Test class for vtkMAFClipSurfaceBoundingBox.
 */
-class vtkMAFClipSurfaceBoundingBoxTest : public CPPUNIT_NS::TestFixture
+class vtkMAFClipSurfaceBoundingBoxTest : public mafTest
 {
   public:
   
-    // CPPUNIT fixture: executed before each test
-    void setUp();
+    // Executed before each test
+    void BeforeTest();
 
-    // CPPUNIT fixture: executed after each test
-    void tearDown();
+    // Executed after each test
+    void AfterTest();
 
     /** Start Test Suite */
     CPPUNIT_TEST_SUITE( vtkMAFClipSurfaceBoundingBoxTest );

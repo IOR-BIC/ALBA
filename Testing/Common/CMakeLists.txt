@@ -1,9 +1,9 @@
 PROJECT (mafCommon_TEST)
 
 IF(MAF_BUILD_MAFDLL)
-  LINK_LIBRARIES(mafVME mafCommon)
+  LINK_LIBRARIES(mafTests mafVME mafCommon)
 ELSE(MAF_BUILD_MAFDLL)
-  LINK_LIBRARIES(mafVME mafCommon)
+  LINK_LIBRARIES(mafTests mafVME mafCommon)
 ENDIF(MAF_BUILD_MAFDLL)
 
 # Set your list of sources here.

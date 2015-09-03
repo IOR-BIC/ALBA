@@ -17,16 +17,9 @@
 #ifndef __CPP_UNIT_AllocatorTest_H__
 #define __CPP_UNIT_AllocatorTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
-
-class AllocatorTest : public CPPUNIT_NS::TestFixture
+class AllocatorTest : public mafTest
 {
   CPPUNIT_TEST_SUITE( AllocatorTest );
   CPPUNIT_TEST( TestDynamicAllocation );

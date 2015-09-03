@@ -24,7 +24,6 @@
 
 #include "mafIOTests.h"
 
-#include "mafIOTests.h"
 #include "mafStorableTest.h"
 #include "mafStorageTest.h"
 #include "mmuDOMTreeErrorReporterTest.h"
@@ -32,6 +31,13 @@
 #include "mmuXMLDOMTest.h"
 #include "mmuXMLDOMElementTest.h"
 #include "mafCurlUtilityTest.h"
+
+#include <cppunit/BriefTestProgressListener.h>
+#include <cppunit/CompilerOutputter.h>
+#include <cppunit/extensions/TestFactoryRegistry.h>
+#include <cppunit/TestResultCollector.h>
+#include <cppunit/TestRunner.h>
+
 
 //Main Test Executor
 int

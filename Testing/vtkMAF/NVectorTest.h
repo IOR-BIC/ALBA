@@ -17,16 +17,9 @@
 #ifndef __CPP_UNIT_NVectorTest_H__
 #define __CPP_UNIT_NVectorTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
-
-class NVectorTest : public CPPUNIT_NS::TestFixture
+class NVectorTest : public mafTest
 {
   CPPUNIT_TEST_SUITE( NVectorTest );
   CPPUNIT_TEST( TestDynamicAllocation );

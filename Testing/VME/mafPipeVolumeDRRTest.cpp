@@ -74,7 +74,7 @@ void mafPipeVolumeDRRTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafPipeVolumeDRRTest::setUp()
+void mafPipeVolumeDRRTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   vtkNEW(m_Renderer);
@@ -82,7 +82,7 @@ void mafPipeVolumeDRRTest::setUp()
   vtkNEW(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
-void mafPipeVolumeDRRTest::tearDown()
+void mafPipeVolumeDRRTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   vtkDEL(m_Renderer);

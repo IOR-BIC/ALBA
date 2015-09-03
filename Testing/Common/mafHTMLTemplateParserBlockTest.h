@@ -17,25 +17,11 @@
 #ifndef __CPP_UNIT_mafHTMLTemplateParserBlockTest_H__
 #define __CPP_UNIT_mafHTMLTemplateParserBlockTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
-
-
-class mafHTMLTemplateParserBlockTest : public CPPUNIT_NS::TestFixture
+class mafHTMLTemplateParserBlockTest : public mafTest
 {
   public:
-  
-  // CPPUNIT fixture: executed before each test
-  void setUp();
-
-  // CPPUNIT fixture: executed after each test
-  void tearDown();
 
   CPPUNIT_TEST_SUITE( mafHTMLTemplateParserBlockTest );
   CPPUNIT_TEST( TestConstructorDestuctor );

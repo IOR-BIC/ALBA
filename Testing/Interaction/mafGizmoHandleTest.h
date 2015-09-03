@@ -17,26 +17,20 @@
 #ifndef __CPP_UNIT_mafGizmoHandleTest_H__
 #define __CPP_UNIT_mafGizmoHandleTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
 #include "mafVMESurface.h"
 #include "mafVMERoot.h"
 
-class mafGizmoHandleTest : public CPPUNIT_NS::TestFixture
+class mafGizmoHandleTest : public mafTest
 {
   public:
   
-  // CPPUNIT fixture: executed before each test
-  void setUp();
+  // Executed before each test
+  void BeforeTest();
 
-  // CPPUNIT fixture: executed after each test
-  void tearDown();
+  // Executed after each test
+  void AfterTest();
 
   CPPUNIT_TEST_SUITE( mafGizmoHandleTest );
   CPPUNIT_TEST(TestFixture);

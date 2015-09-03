@@ -33,15 +33,6 @@
 #include <fstream>
 
 
-void mafPolylineGraphEdgeTest::setUp()
-{
-
-}
-
-void mafPolylineGraphEdgeTest::tearDown()
-{
-
-}
 
 void mafPolylineGraphEdgeTest::TestDynamicAllocation()
 {

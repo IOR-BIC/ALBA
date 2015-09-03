@@ -17,16 +17,9 @@
 #ifndef CPP_UNIT_mafOpFlipNormalsTEST_H
 #define CPP_UNIT_mafOpFlipNormalsTEST_H
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
-
-class mafOpFlipNormalsTest : public CPPUNIT_NS::TestFixture
+class mafOpFlipNormalsTest : public mafTest
 {
   CPPUNIT_TEST_SUITE( mafOpFlipNormalsTest );
   CPPUNIT_TEST( TestDynamicAllocation );

@@ -3,7 +3,7 @@ PROJECT (Operations_TEST)
 IF(MAF_BUILD_MAFDLL)
   LINK_LIBRARIES(mafDLL)
 ELSE(MAF_BUILD_MAFDLL)
-  LINK_LIBRARIES(mafOperations mafVME mafCommon)
+  LINK_LIBRARIES(mafTests mafOperations mafVME mafCommon)
 ENDIF (MAF_BUILD_MAFDLL)
 
 #-----------------------------------------------------------------------------

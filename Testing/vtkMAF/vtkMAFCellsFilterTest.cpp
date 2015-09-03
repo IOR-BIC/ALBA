@@ -23,16 +23,6 @@
 
 #include <assert.h>
 
-void vtkMAFCellsFilterTest::setUp()
-{
- 
-}
-
-void vtkMAFCellsFilterTest::tearDown()
-{
-
-}
-
 void vtkMAFCellsFilterTest::TestFixture()
 {
 

@@ -45,23 +45,16 @@
 
 static const bool renderingOn = false ;  // switch interactive rendering on
 
-void vtkMAFExtrudeToCircleTest::setUp()
+void vtkMAFExtrudeToCircleTest::BeforeTest()
 {
   m_testData = NULL ;
   m_extrusion = NULL ;
 }
 
-void vtkMAFExtrudeToCircleTest::tearDown()
+void vtkMAFExtrudeToCircleTest::AfterTest()
 {
-  if (m_testData != NULL){
-    m_testData->Delete() ;
-    m_testData = NULL ;
-  }
-
-  if (m_extrusion != NULL){
-    m_extrusion->Delete() ;
-    m_extrusion = NULL ;
-  }
+  vtkDEL(m_testData);
+	vtkDEL(m_extrusion);
 }
 
 

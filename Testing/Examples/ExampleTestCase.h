@@ -2,7 +2,7 @@
 #ifndef CPP_UNIT_EXAMPLETESTCASE_H
 #define CPP_UNIT_EXAMPLETESTCASE_H
 
-#include <cppunit/extensions/HelperMacros.h>
+#include "mafTest.h"
 
 /* 
  * A test case that is designed to produce
@@ -10,7 +10,7 @@
  *
  */
 
-class ExampleTestCase : public CPPUNIT_NS::TestFixture
+class ExampleTestCase : public mafTest
 {
   CPPUNIT_TEST_SUITE( ExampleTestCase );
   CPPUNIT_TEST( example );
@@ -24,7 +24,7 @@ protected:
   double m_value2;
 
 public:
-  void setUp();
+  void BeforeTest();
 
 protected:
   void example();

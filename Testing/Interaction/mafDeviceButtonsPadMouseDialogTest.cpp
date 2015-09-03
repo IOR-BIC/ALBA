@@ -29,23 +29,14 @@
 
 #include "mafViewSlice.h" 
 
-void mafDeviceButtonsPadMouseDialogTest::setUp()
-{
-
-}
-
-void mafDeviceButtonsPadMouseDialogTest::tearDown()
-{
-
-}
-
-
+//----------------------------------------------------------------------------
 void mafDeviceButtonsPadMouseDialogTest::TestConstructorDestructor()
 {
  mafDeviceButtonsPadMouseDialog *bp = mafDeviceButtonsPadMouseDialog::New();
  bp->Delete();
 }
 
+//----------------------------------------------------------------------------
 void mafDeviceButtonsPadMouseDialogTest::TestSetView()
 {
   mafViewSlice *sliceView = new mafViewSlice();
@@ -57,6 +48,7 @@ void mafDeviceButtonsPadMouseDialogTest::TestSetView()
   buttonsPad->Delete();
 }
 
+//----------------------------------------------------------------------------
 void mafDeviceButtonsPadMouseDialogTest::TestFixture()
 {
 }

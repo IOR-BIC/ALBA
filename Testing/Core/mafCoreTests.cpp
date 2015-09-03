@@ -80,22 +80,11 @@
 #include "VMEPoseTest.h"
 #include <wx/dir.h>
 
-
-
-IMPLEMENT_APP(TestApp)
-//--------------------------------------------------------------------------------
-bool TestApp::OnInit()
-//--------------------------------------------------------------------------------
-{
-	return TRUE;
-}
-//--------------------------------------------------------------------------------
-int TestApp::OnExit()
-//--------------------------------------------------------------------------------
-{
-	wxApp::CleanUp();
-	return 0;
-}
+#include <cppunit/BriefTestProgressListener.h>
+#include <cppunit/CompilerOutputter.h>
+#include <cppunit/extensions/TestFactoryRegistry.h>
+#include <cppunit/TestResultCollector.h>
+#include <cppunit/TestRunner.h>
 
 //-------------------------------------------------------------------------
 mafCxxTypeMacro(mafNodeHelper);
@@ -104,7 +93,6 @@ mafCxxTypeMacro(mafNodeHelper);
 //-------------------------------------------------------------------------
 mafCxxTypeMacro(mafNodeBHelper)
 //-------------------------------------------------------------------------
-
 
 //----------------------------------------------------------------------------
 void DummyObserver::OnEvent(mafEventBase *maf_event)

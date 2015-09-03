@@ -158,21 +158,6 @@ bool mafResultQueryAbstractHandlerSampleForConnector::IsFailed()
   return false;
 }
 
-// TEST
-
-//----------------------------------------------------------------------------
-void mafRelationalDatabaseAbstractConnectorTest::setUp()
-//----------------------------------------------------------------------------
-{
-	
-}
-//----------------------------------------------------------------------------
-void mafRelationalDatabaseAbstractConnectorTest::tearDown()
-//----------------------------------------------------------------------------
-{
-	
-}
-
 //----------------------------------------------------------------------------
 void mafRelationalDatabaseAbstractConnectorTest::TestDynamicAllocation()
 //----------------------------------------------------------------------------

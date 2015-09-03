@@ -178,6 +178,10 @@ IF (MAF_CAN_BUILD)
               "${MAF_SOURCE_DIR}/VME/DataPipes" "${MAF_SOURCE_DIR}/vtkMAF" "${MAF_BINARY_DIR}/vtkMAF"  "${MAF_SOURCE_DIR}/GPUAPI" 
               "${MAF_SOURCE_DIR}/GPUAPI/GLEW" "${MAF_SOURCE_DIR}/GPUAPI/FBO")
   SET(INCLUDE_DIRS ${INCLUDE_DIRS} "${MAF_SOURCE_DIR}/mafDLL" "${MAF_BINARY_DIR}/Libraries/ITK/Sources/InsightToolkit-3.0.1/Wrapping/WrapITK/ExternalProjects/ItkVtkGlue/src")
+	
+	if(BUILD_TESTING)
+	  SET(INCLUDE_DIRS ${INCLUDE_DIRS} "${MAF_SOURCE_DIR}/Testing" )
+	endif(BUILD_TESTING)
   
   INCLUDE_DIRECTORIES(${INCLUDE_DIRS})
   

@@ -17,17 +17,9 @@
 #ifndef __CPP_UNIT_MMOVOIDENSITYTEST_H__
 #define __CPP_UNIT_MMOVOIDENSITYTEST_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
-
-
-class mafOpVOIDensityTest : public CPPUNIT_NS::TestFixture
+class mafOpVOIDensityTest : public mafTest
 {
   CPPUNIT_TEST_SUITE( mafOpVOIDensityTest );
   CPPUNIT_TEST( Test );

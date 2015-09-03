@@ -40,16 +40,11 @@ void mafVMEScalarTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafVMEScalarTest::setUp()
+void mafVMEScalarTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   // initialized the VME factory
   mafVMEFactory::Initialize();
-}
-//----------------------------------------------------------------------------
-void mafVMEScalarTest::tearDown()
-//----------------------------------------------------------------------------
-{
 }
 //----------------------------------------------------------------------------
 void mafVMEScalarTest::TestVMEScalarFactory()

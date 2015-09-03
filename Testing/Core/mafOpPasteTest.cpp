@@ -39,14 +39,14 @@ void mafOpPasteTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafOpPasteTest::setUp()
+void mafOpPasteTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   m_OpPaste=new mafOpPaste("PASTE");
   m_OpPaste->ClipboardClear(); //m_Clipboard is a static variable, so is necessary reinitialize before any test
 }
 //----------------------------------------------------------------------------
-void mafOpPasteTest::tearDown()
+void mafOpPasteTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   mafDEL(m_OpPaste);

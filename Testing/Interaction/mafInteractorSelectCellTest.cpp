@@ -26,16 +26,6 @@
 #include "mafInteractorSelectCellTest.h"
 #include "mafInteractorSelectCell.h"
 
-void mafInteractorSelectCellTest::setUp()
-{
- 
-}
-
-void mafInteractorSelectCellTest::tearDown()
-{
-
-}
-
 void mafInteractorSelectCellTest::TestFixture()
 {
 

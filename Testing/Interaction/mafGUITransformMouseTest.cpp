@@ -33,7 +33,7 @@
 #include "wx/module.h"
 
 //----------------------------------------------------------------------------
-void mafGUITransformMouseTest::setUp()
+void mafGUITransformMouseTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   m_Win = new mafGUIFrame("testGui", wxDefaultPosition, wxSize(800, 600));
@@ -41,14 +41,11 @@ void mafGUITransformMouseTest::setUp()
   wxModule::InitializeModules();
 }
 //----------------------------------------------------------------------------
-void mafGUITransformMouseTest::tearDown()
+void mafGUITransformMouseTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   wxModule::CleanUpModules();
-
   delete m_Win;
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafGUITransformMouseTest::TestFixture()

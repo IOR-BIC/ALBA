@@ -17,14 +17,7 @@
 #ifndef __CPP_UNIT_vtkMAFProfilingActorTest_H__
 #define __CPP_UNIT_vtkMAFProfilingActorTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
-#include <cppunit/TestFixture.h>
+#include "mafTest.h"
 
 //------------------------------------------------------------------------------
 // Forward Declaration:
@@ -38,14 +31,9 @@ class vtkRenderer;
   Class Name: vtkMAFProfilingActorTest.
   Test for vtkMAFProfilingActor.
 */
-class vtkMAFProfilingActorTest : public CPPUNIT_NS::TestFixture
+class vtkMAFProfilingActorTest : public mafTest
 {
   public:
-    /** CPPUNIT fixture: executed before each test.*/
-    void setUp();
-
-    /* CPPUNIT fixture: executed after each test.*/
-    void tearDown();
 
     /** Test suite begin. */
     CPPUNIT_TEST_SUITE( vtkMAFProfilingActorTest );

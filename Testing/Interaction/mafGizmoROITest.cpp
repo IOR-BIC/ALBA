@@ -56,13 +56,13 @@
 #include "vtkDataSetMapper.h"
 #include "vtkProperty.h"
 
-void mafGizmoROITest::setUp()
+void mafGizmoROITest::BeforeTest()
 {
   CreateRenderStuff();
 	CreateTestData();
 }
 
-void mafGizmoROITest::tearDown()
+void mafGizmoROITest::AfterTest()
 {
   m_Renderer->Delete();
   m_RenderWindow->Delete();

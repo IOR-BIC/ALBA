@@ -158,14 +158,14 @@ void mafViewManagerTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafViewManagerTest::setUp()
+void mafViewManagerTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   m_Manager = new mafViewManager();
   m_Manager->SetListener(this);
 }
 //----------------------------------------------------------------------------
-void mafViewManagerTest::tearDown()
+void mafViewManagerTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   cppDEL(m_Manager);

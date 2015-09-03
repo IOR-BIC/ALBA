@@ -60,7 +60,7 @@ bool RemoveDir(const char *dirName)
 }
 
 
-void mafVMEExternalDataTest::setUp()
+void mafVMEExternalDataTest::BeforeTest()
 {
   m_Storage1Root = 0;
 
@@ -83,7 +83,7 @@ void mafVMEExternalDataTest::setUp()
   CPPUNIT_ASSERT(m_Storage1.Store() == MAF_OK);	
 }
 
-void mafVMEExternalDataTest::tearDown()
+void mafVMEExternalDataTest::AfterTest()
 {
   m_Storage1Root->CleanTree();
 

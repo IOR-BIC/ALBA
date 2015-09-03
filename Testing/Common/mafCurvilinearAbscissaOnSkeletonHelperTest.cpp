@@ -35,19 +35,6 @@
 #include "mafCurvilinearAbscissaOnSkeletonHelper.h"
 
 //----------------------------------------------------------------------------
-void mafCurvilinearAbscissaOnSkeletonHelperTest::setUp()
-//----------------------------------------------------------------------------
-{
-	
-}
-//----------------------------------------------------------------------------
-void mafCurvilinearAbscissaOnSkeletonHelperTest::tearDown()
-//----------------------------------------------------------------------------
-{
-	delete wxLog::SetActiveTarget(NULL);
-}
-
-//----------------------------------------------------------------------------
 void mafCurvilinearAbscissaOnSkeletonHelperTest::TestDynamicAllocation()
 //----------------------------------------------------------------------------
 {

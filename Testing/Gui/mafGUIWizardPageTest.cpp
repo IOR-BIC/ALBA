@@ -35,30 +35,20 @@
 #define TEST_RESULT CPPUNIT_ASSERT(m_Result)
 
 //----------------------------------------------------------------------------
-void mafGUIWizardPageTest::setUp()
+void mafGUIWizardPageTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-//   m_App = new TestApp();  // Instantiate the application class
-//   m_App->OnInit();
-//   m_App->argc = 0;        // set the number of input argument to 0
-//   m_App->argv = NULL;     // set to NULL the input argument's parameters
-//   wxTheApp->SetAppName("mafGUIWizardTest"); // Set the name for the application
 	wxAppConsole::SetInstance(NULL);
   m_Win = new mafGUIFrame("testGui", wxDefaultPosition, wxSize(800, 600));
   wxModule::RegisterModules();
   wxModule::InitializeModules();
-
-  m_Result = false;
 }
 //----------------------------------------------------------------------------
-void mafGUIWizardPageTest::tearDown()
+void mafGUIWizardPageTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   wxModule::CleanUpModules();
-
-  delete m_Win;
-
-  delete wxLog::SetActiveTarget(NULL);
+	delete m_Win;
 }
 //----------------------------------------------------------------------------
 void mafGUIWizardPageTest::TestDynamicAllocation()

@@ -17,24 +17,11 @@
 #ifndef CPP_UNIT_mafOpExporterMetersTEST_H
 #define CPP_UNIT_mafOpExporterMetersTEST_H
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
-
-class mafOpExporterMetersTest : public CPPUNIT_NS::TestFixture
+class mafOpExporterMetersTest : public mafTest
 {
   public:
-  // CPPUNIT fixture: executed before each test
-  void setUp();
-
-  // CPPUNIT fixture: executed after each test
-  void tearDown();
-
   CPPUNIT_TEST_SUITE( mafOpExporterMetersTest );
   CPPUNIT_TEST(TestFixture); // just to test that the fixture has no leaks
   CPPUNIT_TEST( TestOnMetersImporter);

@@ -81,7 +81,7 @@ void mafPipeSurfaceTexturedTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafPipeSurfaceTexturedTest::setUp()
+void mafPipeSurfaceTexturedTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   vtkNEW(m_Renderer);
@@ -89,7 +89,7 @@ void mafPipeSurfaceTexturedTest::setUp()
   vtkNEW(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
-void mafPipeSurfaceTexturedTest::tearDown()
+void mafPipeSurfaceTexturedTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   vtkDEL(m_Renderer);

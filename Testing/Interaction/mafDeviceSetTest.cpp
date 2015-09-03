@@ -27,23 +27,14 @@
 #include "mafDeviceSetTest.h"
 #include "mafDeviceSet.h"
 
-void mafDeviceSetTest::setUp()
-{
-
-}
-
-void mafDeviceSetTest::tearDown()
-{
-
-}
-
+//----------------------------------------------------------------------------
 void mafDeviceSetTest::TestConstructorDestructor()
 {
   mafDeviceSet *deviceSet = mafDeviceSet::New();
   CPPUNIT_ASSERT(deviceSet);
   deviceSet->Delete();
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceSetTest::TestGetDeviceByIndex()
 { 
   mafDeviceSet *deviceSet = mafDeviceSet::New();
@@ -71,7 +62,7 @@ void mafDeviceSetTest::TestGetDeviceByIndex()
   // also destroy all devices so this is not needed
   // dummyDevice->Delete();
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceSetTest::TestGetDeviceByName()
 {
   mafDeviceSet *deviceSet = mafDeviceSet::New();
@@ -104,7 +95,7 @@ void mafDeviceSetTest::TestGetDeviceByName()
   // dummyDevice->Delete();
 
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceSetTest::TestFixture()
 {
   mafDeviceSet *deviceSet = mafDeviceSet::New();
@@ -112,7 +103,7 @@ void mafDeviceSetTest::TestFixture()
   deviceSet->Delete();
 
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceSetTest::TestGetNumberOfDevices()
 {
   mafDeviceSet *deviceSet = mafDeviceSet::New();
@@ -141,7 +132,7 @@ void mafDeviceSetTest::TestGetNumberOfDevices()
   // also destroy all devices so this is not needed
   // dummyDevice->Delete();
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceSetTest::TestGetDeviceByID()
 {
   mafDeviceSet *deviceSet = mafDeviceSet::New();
@@ -169,7 +160,7 @@ void mafDeviceSetTest::TestGetDeviceByID()
   // dummyDevice->Delete();
 
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceSetTest::TestRemoveDeviceByIndex()
 {
   mafDeviceSet *deviceSet = mafDeviceSet::New();
@@ -207,7 +198,7 @@ void mafDeviceSetTest::TestRemoveDeviceByIndex()
   // also destroy all devices so this is not needed
   // dummyDevice->Delete();
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceSetTest::TestRemoveDeviceByID()
 {
   mafDeviceSet *deviceSet = mafDeviceSet::New();
@@ -239,7 +230,7 @@ void mafDeviceSetTest::TestRemoveDeviceByID()
   // also destroy all devices so this is not needed
   // dummyDevice->Delete();
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceSetTest::TestRemoveDeviceByName()
 {
   mafDeviceSet *deviceSet = mafDeviceSet::New();
@@ -272,7 +263,7 @@ void mafDeviceSetTest::TestRemoveDeviceByName()
   // dummyDevice->Delete();
 
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceSetTest::TestRemoveDeviceByPointer()
 {
   mafDeviceSet *deviceSet = mafDeviceSet::New();
@@ -304,7 +295,7 @@ void mafDeviceSetTest::TestRemoveDeviceByPointer()
   // also destroy all devices so this is not needed
   // deviceOne->Delete();
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceSetTest::TestRemoveAllDevices()
 {
   mafDeviceSet *deviceSet = mafDeviceSet::New();
@@ -348,7 +339,7 @@ void mafDeviceSetTest::TestRemoveAllDevices()
   // deviceOne->Delete();
 
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceSetTest::TestGetDevices()
 {
   mafDeviceSet *deviceSet = mafDeviceSet::New();

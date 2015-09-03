@@ -59,18 +59,6 @@ void mafOpSegmentationRegionGrowingConnectedThresholdTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafOpSegmentationRegionGrowingConnectedThresholdTest::setUp()
-//----------------------------------------------------------------------------
-{
-  m_Result = false;
-}
-//----------------------------------------------------------------------------
-void mafOpSegmentationRegionGrowingConnectedThresholdTest::tearDown()
-//----------------------------------------------------------------------------
-{
-  delete wxLog::SetActiveTarget(NULL);
-}
-//----------------------------------------------------------------------------
 void mafOpSegmentationRegionGrowingConnectedThresholdTest::TestStaticAllocation()
 //----------------------------------------------------------------------------
 {

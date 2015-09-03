@@ -52,18 +52,7 @@ void mafOpExporterMetersTest::TestFixture()
   op = new mafOpExporterMetersTest();
   delete op;
 }
-//----------------------------------------------------------------------------
-void mafOpExporterMetersTest::setUp()
-//----------------------------------------------------------------------------
-{
-  result = false;
-}
-//----------------------------------------------------------------------------
-void mafOpExporterMetersTest::tearDown()
-//----------------------------------------------------------------------------
-{
 
-}
 
 //------------------------------------------------------------------------
 void mafOpExporterMetersTest::TestOnMetersImporter()

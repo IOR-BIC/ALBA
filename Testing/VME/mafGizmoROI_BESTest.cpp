@@ -57,13 +57,13 @@
 #include "vtkDataSetMapper.h"
 #include "vtkProperty.h"
 
-void mafGizmoROI_BESTest::setUp()
+void mafGizmoROI_BESTest::BeforeTest()
 {
   CreateRenderStuff();
 	CreateTestData();
 }
 
-void mafGizmoROI_BESTest::tearDown()
+void mafGizmoROI_BESTest::AfterTest()
 {
   m_Renderer->Delete();
   m_RenderWindow->Delete();

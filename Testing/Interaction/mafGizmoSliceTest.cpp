@@ -49,14 +49,14 @@
 #include "vtkTubeFilter.h"
 
 //----------------------------------------------------------------------------
-void mafGizmoSliceTest::setUp()
+void mafGizmoSliceTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   CreateTestData();
 }
 
 //----------------------------------------------------------------------------
-void mafGizmoSliceTest::tearDown()
+void mafGizmoSliceTest::AfterTest()
 //----------------------------------------------------------------------------
 {
    mafDEL(m_GizmoInputSurface);

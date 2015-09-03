@@ -39,17 +39,6 @@
 #include "vtkUnstructuredGrid.h"
 
 
-
-void mafVMEMeshTest::setUp()
-{
-  	
-}
-
-void mafVMEMeshTest::tearDown()
-{
-  
-}
-
 void mafVMEMeshTest::TestFixture()
 {
 

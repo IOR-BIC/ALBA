@@ -56,13 +56,13 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkDataSetMapper.h"
 
-void mafGizmoRotateCircleTest::setUp()
+void mafGizmoRotateCircleTest::BeforeTest()
 {
   CreateRenderStuff();
 	CreateTestData();
 }
 
-void mafGizmoRotateCircleTest::tearDown()
+void mafGizmoRotateCircleTest::AfterTest()
 {
   m_Renderer->Delete();
   m_RenderWindow->Delete();

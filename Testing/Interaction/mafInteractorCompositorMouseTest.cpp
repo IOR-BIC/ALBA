@@ -28,15 +28,6 @@
 #include "mafDeviceButtonsPadMouse.h"
 #include "mafEventInteraction.h"
 
-void mafInteractorCompositorMouseTest::setUp()
-{
-
-}
-
-void mafInteractorCompositorMouseTest::tearDown()
-{
-
-}
 
 void mafInteractorCompositorMouseTest::TestFixture()
 {

@@ -17,15 +17,9 @@
 #ifndef __CPP_UNIT_mafViewPlotTEST_H__
 #define __CPP_UNIT_mafViewPlotTEST_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
-class mafViewPlotTest : public CPPUNIT_NS::TestFixture
+class mafViewPlotTest : public mafTest
 {
   CPPUNIT_TEST_SUITE( mafViewPlotTest );
   CPPUNIT_TEST( CreateDestroyTest );

@@ -3,7 +3,7 @@ PROJECT (mafDataPipes)
 IF(MAF_BUILD_MAFDLL)
   LINK_LIBRARIES(mafDLL)
 ELSE(MAF_BUILD_MAFDLL)
-  LINK_LIBRARIES(mafCore vtkMAF)
+  LINK_LIBRARIES(mafTests mafCore vtkMAF)
 ENDIF (MAF_BUILD_MAFDLL)
 
 #-----------------------------------------------------------------------------

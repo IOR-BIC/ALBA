@@ -33,15 +33,6 @@
 #include "mafCrypt.h"
 using namespace std;
 
-void mafCryptTest::setUp()
-{
-
-}
-
-void mafCryptTest::tearDown()
-{
-
-}
 
 
 void mafCryptTest::TestFixture()

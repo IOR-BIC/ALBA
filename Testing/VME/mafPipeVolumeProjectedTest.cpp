@@ -57,7 +57,7 @@ void mafPipeVolumeProjectedTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafPipeVolumeProjectedTest::setUp()
+void mafPipeVolumeProjectedTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   vtkNEW(m_Renderer);
@@ -65,7 +65,7 @@ void mafPipeVolumeProjectedTest::setUp()
   vtkNEW(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
-void mafPipeVolumeProjectedTest::tearDown()
+void mafPipeVolumeProjectedTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   vtkDEL(m_Renderer);

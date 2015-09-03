@@ -17,27 +17,15 @@
 #ifndef __CPP_UNIT_vtkMAFFixedCutterTest_H__
 #define __CPP_UNIT_vtkMAFFixedCutterTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
 /**
 Class Name: vtkMAFFixedCutterTest.
 Test class for vtkMAFFixedCutter.
 */
-class vtkMAFFixedCutterTest : public CPPUNIT_NS::TestFixture
+class vtkMAFFixedCutterTest : public mafTest
 {
 public:
-
-  // CPPUNIT fixture: executed before each test
-  void setUp();
-
-  // CPPUNIT fixture: executed after each test
-  void tearDown();
 
   /** Start Test Suite */
   CPPUNIT_TEST_SUITE( vtkMAFFixedCutterTest );

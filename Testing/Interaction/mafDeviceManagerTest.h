@@ -17,26 +17,13 @@
 #ifndef __CPP_UNIT_mafDeviceManagerTest_H__
 #define __CPP_UNIT_mafDeviceManagerTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
-class mafDeviceManagerTest : public CPPUNIT_NS::TestFixture
+class mafDeviceManagerTest : public mafTest
 {
   public:
-  
-  /** CPPUNIT fixture: executed before each test */
-  void setUp();
-
-  /** CPPUNIT fixture: executed after each test */
-  void tearDown();
-
-  CPPUNIT_TEST_SUITE( mafDeviceManagerTest );
-  
+ 
+	CPPUNIT_TEST_SUITE( mafDeviceManagerTest );
   CPPUNIT_TEST(TestFixture);
   CPPUNIT_TEST(TestConstructorDestructor);
   CPPUNIT_TEST(TestAddDevice);
@@ -46,8 +33,7 @@ class mafDeviceManagerTest : public CPPUNIT_NS::TestFixture
   CPPUNIT_TEST(TestRemoveAllDevices);
   CPPUNIT_TEST(TestGetDevices);
   CPPUNIT_TEST(TestGetDeviceSet);
-
-  CPPUNIT_TEST_SUITE_END();
+	CPPUNIT_TEST_SUITE_END();
 
   protected:
     

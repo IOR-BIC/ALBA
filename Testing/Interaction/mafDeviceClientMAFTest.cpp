@@ -27,21 +27,12 @@
 #include "mafDeviceClientMAFTest.h"
 #include "mafDeviceClientMAF.h"
 
-void mafDeviceClientMAFTest::setUp()
-{
-
-}
-
-void mafDeviceClientMAFTest::tearDown()
-{
-
-}
-
+//----------------------------------------------------------------------------
 void mafDeviceClientMAFTest::TestFixture()
 {
 
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceClientMAFTest::TestConstructorDestructor()
 {
   mafDeviceClientMAF *dummyDevice = mafDeviceClientMAF::New();
@@ -49,7 +40,7 @@ void mafDeviceClientMAFTest::TestConstructorDestructor()
 
   dummyDevice->Delete();
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceClientMAFTest::TestConnectClient()
 {
   mafDeviceClientMAF *dummyDevice = mafDeviceClientMAF::New();
@@ -63,7 +54,7 @@ void mafDeviceClientMAFTest::TestConnectClient()
   
   dummyDevice->Delete();
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceClientMAFTest::TestDisconnectClient()
 {
   mafDeviceClientMAF *dummyDevice = mafDeviceClientMAF::New();
@@ -77,7 +68,7 @@ void mafDeviceClientMAFTest::TestDisconnectClient()
 
   dummyDevice->Delete();
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceClientMAFTest::TestSendMessageToServer()
 {
   // mostly a test for leaks...
@@ -91,7 +82,7 @@ void mafDeviceClientMAFTest::TestSendMessageToServer()
 
   dummyDevice->Delete();
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceClientMAFTest::TestIsConnected()
 {
   mafDeviceClientMAF *dummyDevice = mafDeviceClientMAF::New();
@@ -102,7 +93,7 @@ void mafDeviceClientMAFTest::TestIsConnected()
   
   dummyDevice->Delete();
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceClientMAFTest::TestStart()
 {
   mafDeviceClientMAF *dummyDevice = mafDeviceClientMAF::New();
@@ -114,7 +105,7 @@ void mafDeviceClientMAFTest::TestStart()
   
   dummyDevice->Delete();
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceClientMAFTest::TestStop()
 {
   // mostly a test for leaks...
@@ -127,7 +118,7 @@ void mafDeviceClientMAFTest::TestStop()
 
   dummyDevice->Delete();  
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceClientMAFTest::TestIsBusy()
 {
   mafDeviceClientMAF *dummyDevice = mafDeviceClientMAF::New();
@@ -138,7 +129,7 @@ void mafDeviceClientMAFTest::TestIsBusy()
 
   dummyDevice->Delete();
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceClientMAFTest::TestOnEvent()
 {
   // mostly a test for leaks...

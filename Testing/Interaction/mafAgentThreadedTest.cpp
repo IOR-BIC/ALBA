@@ -31,15 +31,6 @@
 
 #include "mafAgentThreaded.h"
 
-void mafAgentThreadedTest::setUp()
-{
-
-}
-
-void mafAgentThreadedTest::tearDown()
-{
-
-}
 
 void mafAgentThreadedTest::TestFixture()
 {

@@ -39,14 +39,13 @@ void mafOpCreateMeterTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafOpCreateMeterTest::setUp()
+void mafOpCreateMeterTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   m_CreateMeter = new mafOpCreateMeter();
-  result = false;
 }
 //----------------------------------------------------------------------------
-void mafOpCreateMeterTest::tearDown()
+void mafOpCreateMeterTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   cppDEL(m_CreateMeter);

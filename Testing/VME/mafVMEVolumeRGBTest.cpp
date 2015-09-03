@@ -37,14 +37,14 @@
 #include "vtkPolyData.h"
 
 //----------------------------------------------------------------------------
-void mafVMEVolumeRGBTest::setUp()
+void mafVMEVolumeRGBTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   // create vme volume
    mafNEW(m_VmeVolumeRGB);
 }
 //----------------------------------------------------------------------------
-void mafVMEVolumeRGBTest::tearDown()
+void mafVMEVolumeRGBTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   // destroy vme

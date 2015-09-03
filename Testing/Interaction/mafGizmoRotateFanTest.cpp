@@ -57,13 +57,13 @@
 #include "vtkProperty.h"
 
 
-void mafGizmoRotateFanTest::setUp()
+void mafGizmoRotateFanTest::BeforeTest()
 {
   CreateRenderStuff();
 	CreateTestData();
 }
 
-void mafGizmoRotateFanTest::tearDown()
+void mafGizmoRotateFanTest::AfterTest()
 {
   m_Renderer->Delete();
   m_RenderWindow->Delete();

@@ -17,29 +17,16 @@
 #ifndef __CPP_UNIT_MAFPOLYLINEGRAPHBranchTEST_H__
 #define __CPP_UNIT_MAFPOLYLINEGRAPHBranchTEST_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
-#include <cppunit/TestFixture.h>
+#include "mafTest.h"
 #include "vtkPolyData.h"
 
 
 //------------------------------------------------------------------------------
 // Test class for mafPolylineGraph
 //------------------------------------------------------------------------------
-class mafPolylineGraphBranchTest : public CPPUNIT_NS::TestFixture
+class mafPolylineGraphBranchTest : public mafTest
 {
 public:
-
-  // CPPUNIT fixture: executed before each test
-  void setUp();
-
-  // CPPUNIT fixture: executed after each test
-  void tearDown();
 
   CPPUNIT_TEST_SUITE( mafPolylineGraphBranchTest );
   CPPUNIT_TEST( TestDynamicAllocation );

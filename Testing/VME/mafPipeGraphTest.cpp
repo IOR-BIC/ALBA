@@ -77,7 +77,7 @@ void mafPipeGraphTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafPipeGraphTest::setUp()
+void mafPipeGraphTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   vtkNEW(m_Renderer);
@@ -86,7 +86,7 @@ void mafPipeGraphTest::setUp()
   vtkNEW(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
-void mafPipeGraphTest::tearDown()
+void mafPipeGraphTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   vtkDEL(m_Renderer);

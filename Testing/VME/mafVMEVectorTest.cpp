@@ -40,14 +40,13 @@ void mafVMEVectorTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafVMEVectorTest::setUp()
+void mafVMEVectorTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   mafNEW(m_VmeVector);
-  result = false;
 }
 //----------------------------------------------------------------------------
-void mafVMEVectorTest::tearDown()
+void mafVMEVectorTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   mafDEL(m_VmeVector);

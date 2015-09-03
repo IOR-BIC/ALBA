@@ -29,16 +29,6 @@
 #include "mmiSelectPoint.h"
 #include "mafEventInteraction.h"
 
-void mmiSelectPointTest::setUp()
-{
-  
-}
-
-void mmiSelectPointTest::tearDown()
-{
-
-}
-
 void mmiSelectPointTest::TestFixture()
 {
 	

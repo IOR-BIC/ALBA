@@ -72,7 +72,7 @@ void mafPipeSurfaceEditorTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafPipeSurfaceEditorTest::setUp()
+void mafPipeSurfaceEditorTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   vtkNEW(m_Renderer);
@@ -80,7 +80,7 @@ void mafPipeSurfaceEditorTest::setUp()
   vtkNEW(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
-void mafPipeSurfaceEditorTest::tearDown()
+void mafPipeSurfaceEditorTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   vtkDEL(m_Renderer);

@@ -52,13 +52,13 @@ void mafAttachCameraTest::TestFixture()
 }
 
 
-void mafAttachCameraTest::setUp()
+void mafAttachCameraTest::BeforeTest()
 {
   CreateRenderStuff();
   CreateTestData();
 }
 
-void mafAttachCameraTest::tearDown()
+void mafAttachCameraTest::AfterTest()
 {
   m_Renderer->Delete();
   m_RenderWindow->Delete();

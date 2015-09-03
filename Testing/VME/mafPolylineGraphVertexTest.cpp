@@ -32,17 +32,6 @@
 #include "wx/wx.h"
 #include <fstream>
 
-
-void mafPolylineGraphVertexTest::setUp()
-{
-
-}
-
-void mafPolylineGraphVertexTest::tearDown()
-{
-
-}
-
 void mafPolylineGraphVertexTest::TestDynamicAllocation()
 {
   mafPolylineGraph::Vertex *vertex = new mafPolylineGraph::Vertex();

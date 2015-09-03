@@ -17,17 +17,9 @@
 #ifndef __CPP_UNIT_vtkHoleConnectivityTEST_H__
 #define __CPP_UNIT_vtkHoleConnectivityTEST_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
-
-
-class vtkHoleConnectivityTest : public CPPUNIT_NS::TestFixture
+class vtkHoleConnectivityTest : public mafTest
 {
   CPPUNIT_TEST_SUITE( vtkHoleConnectivityTest );
   CPPUNIT_TEST( TestDynamicAllocation );

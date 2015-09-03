@@ -62,7 +62,7 @@ void mafPipeScalarTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafPipeScalarTest::setUp()
+void mafPipeScalarTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   vtkNEW(m_Renderer);
@@ -70,7 +70,7 @@ void mafPipeScalarTest::setUp()
   vtkNEW(m_RenderWindowInteractor);
 }
 //----------------------------------------------------------------------------
-void mafPipeScalarTest::tearDown()
+void mafPipeScalarTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   vtkDEL(m_Renderer);

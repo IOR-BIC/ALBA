@@ -47,19 +47,6 @@ void mafGUITransformInterfaceTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafGUITransformInterfaceTest::setUp()
-//----------------------------------------------------------------------------
-{
-  mafGUITransformInterfaceDummy *transform = new mafGUITransformInterfaceDummy();
-
-  cppDEL(transform);
-}
-//----------------------------------------------------------------------------
-void mafGUITransformInterfaceTest::tearDown()
-//----------------------------------------------------------------------------
-{
-}
-//----------------------------------------------------------------------------
 void mafGUITransformInterfaceTest::TestDynamicAllocation()
 //----------------------------------------------------------------------------
 {

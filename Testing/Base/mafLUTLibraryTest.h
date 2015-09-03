@@ -19,27 +19,21 @@ using namespace std;
 #ifndef __CPP_UNIT_mafLUTLibraryTest_H__
 #define __CPP_UNIT_mafLUTLibraryTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
 #include "mafLUTLibrary.h"
 #include "mafString.h"
 #include "vtkMAFSmartPointer.h"
 #include "vtkLookupTable.h"
 
-class mafLUTLibraryTest : public CPPUNIT_NS::TestFixture
+class mafLUTLibraryTest : public mafTest
 {
   public: 
-  // CPPUNIT fixture: executed before each test
-  void setUp();
+  // Executed before each test
+  void BeforeTest();
 
-  // CPPUNIT fixture: executed after each test
-  void tearDown();
+  // Executed after each test
+  void AfterTest();
 
 	CPPUNIT_TEST_SUITE( mafLUTLibraryTest );
   CPPUNIT_TEST(TestFixture); // just to test that the fixture has no leaks

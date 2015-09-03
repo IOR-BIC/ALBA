@@ -64,13 +64,13 @@ void mafVMEDataSetAttributesImporterTest::TestFixture()
   
 }
 
-void mafVMEDataSetAttributesImporterTest::setUp()
+void mafVMEDataSetAttributesImporterTest::BeforeTest()
 {
   CPPUNIT_ASSERT(m_AnsysTextReader == NULL);
   m_AnsysTextReader = new mafVMEMeshAnsysTextImporter;
 }
 
-void mafVMEDataSetAttributesImporterTest::tearDown()
+void mafVMEDataSetAttributesImporterTest::AfterTest()
 {
   cppDEL(m_AnsysTextReader);
 }

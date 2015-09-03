@@ -62,7 +62,7 @@ void mafVMEStorageTest2::TestFixture()
 }
 
 //----------------------------------------------------------------------------
-void mafVMEStorageTest2::setUp()
+void mafVMEStorageTest2::BeforeTest()
 //----------------------------------------------------------------------------
 {
   // member variables initialization
@@ -206,7 +206,7 @@ void mafVMEStorageTest2::setUp()
 }
 
 //----------------------------------------------------------------------------
-void mafVMEStorageTest2::tearDown()
+void mafVMEStorageTest2::AfterTest()
 //----------------------------------------------------------------------------
 {
   // clean up
@@ -221,6 +221,7 @@ void mafVMEStorageTest2::tearDown()
   // remove folder for test file
   removeSuccessful = RemoveDir(storage1Dir);
   CPPUNIT_ASSERT(removeSuccessful);
+
 }
 
 

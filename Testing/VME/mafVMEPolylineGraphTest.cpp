@@ -36,7 +36,7 @@ static bool ExtractModel   = true;
 static bool CleanModel     = false;
 
 //----------------------------------------------------------------------------
-void mafVMEPolylineGraphTest::setUp()
+void mafVMEPolylineGraphTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   m_Polydata = vtkPolyData::New() ;
@@ -44,7 +44,7 @@ void mafVMEPolylineGraphTest::setUp()
 }
 
 //----------------------------------------------------------------------------
-void mafVMEPolylineGraphTest::tearDown()
+void mafVMEPolylineGraphTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   m_Polydata->Delete() ;

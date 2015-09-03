@@ -17,24 +17,12 @@
 #ifndef __CPP_UNIT_mafRefSysTest_H__
 #define __CPP_UNIT_mafRefSysTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
-class mafRefSysTest : public CPPUNIT_NS::TestFixture
+class mafRefSysTest : public mafTest
 {
   public:
   
-  // CPPUNIT fixture: executed before each test
-  void setUp();
-
-  // CPPUNIT fixture: executed after each test
-  void tearDown();
-
   CPPUNIT_TEST_SUITE( mafRefSysTest );
   CPPUNIT_TEST(TestFixture);
   CPPUNIT_TEST(TestConstructorDestructor);
@@ -51,7 +39,6 @@ class mafRefSysTest : public CPPUNIT_NS::TestFixture
   CPPUNIT_TEST(TestSetGetVME);
   CPPUNIT_TEST(TestDeepCopy);
   CPPUNIT_TEST(TestReset);
-
   CPPUNIT_TEST_SUITE_END();
 
   protected:

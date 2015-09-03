@@ -17,14 +17,7 @@
 #ifndef __CPP_UNIT_mafVMEStorageTest2_H__
 #define __CPP_UNIT_mafVMEStorageTest2_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
-
+#include "mafTest.h"
 #include "mafVMEStorage.h"
 #include "mafVMERoot.h"
 #include "mafVMEGeneric.h"
@@ -34,15 +27,15 @@
 
 /** Test used to isolate leaks in storage related classes; see mafVMEStorageTest for a store/restore
 example with synthetic generated time varying data*/
-class mafVMEStorageTest2 : public CPPUNIT_NS::TestFixture
+class mafVMEStorageTest2 : public mafTest
 {
   public: 
 
-    // CPPUNIT fixture: executed before each test
-    void setUp();
+    // Executed before each test
+    void BeforeTest();
 
-    // CPPUNIT fixture: executed after each test
-    void tearDown();
+    // Executed after each test
+    void AfterTest();
 
     // CPPUNIT test suite
     CPPUNIT_TEST_SUITE( mafVMEStorageTest2 );

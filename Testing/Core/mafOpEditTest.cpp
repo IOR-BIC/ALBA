@@ -35,13 +35,13 @@ void mafOpEditTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafOpEditTest::setUp()
+void mafOpEditTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   m_OpEdit=new mafOpEdit("EDIT");
 }
 //----------------------------------------------------------------------------
-void mafOpEditTest::tearDown()
+void mafOpEditTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   mafDEL(m_OpEdit);

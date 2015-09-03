@@ -30,21 +30,12 @@
 #include "mafDevice.h"
 #include "mafGUI.h"
 
-void mafDeviceTest::setUp()
-{
-
-}
-
-void mafDeviceTest::tearDown()
-{
-
-}
-
+//----------------------------------------------------------------------------
 void mafDeviceTest::TestFixture()
 {
 
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceTest::TestConstructorDestructor()
 {
   mafDevice *dummyDevice = mafDevice::New();
@@ -52,7 +43,7 @@ void mafDeviceTest::TestConstructorDestructor()
 
   dummyDevice->Delete();
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceTest::TestSetGetID()
 {
   mafDevice *dummyDevice = mafDevice::New();
@@ -68,7 +59,7 @@ void mafDeviceTest::TestSetGetID()
 
   dummyDevice->Delete();
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceTest::TestSetName()
 {
   mafDevice *dummyDevice = mafDevice::New();
@@ -82,7 +73,7 @@ void mafDeviceTest::TestSetName()
   CPPUNIT_ASSERT(mafString::Compare(dummyDevice->GetName(), newName) == 0);
   dummyDevice->Delete();
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceTest::TestSetGetAutoStart()
 {
   mafDevice *dummyDevice = mafDevice::New();
@@ -97,7 +88,7 @@ void mafDeviceTest::TestSetGetAutoStart()
 
   dummyDevice->Delete();
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceTest::TestAutoStartOnOff()
 {
   mafDevice *dummyDevice = mafDevice::New();
@@ -116,7 +107,7 @@ void mafDeviceTest::TestAutoStartOnOff()
 
   dummyDevice->Delete();
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceTest::TestStart()
 {
   mafDevice *dummyDevice = mafDevice::New();
@@ -127,7 +118,7 @@ void mafDeviceTest::TestStart()
   CPPUNIT_ASSERT_EQUAL(returnValue,0);
   dummyDevice->Delete();
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceTest::TestStop()
 {
   mafDevice *dummyDevice = mafDevice::New();
@@ -142,7 +133,7 @@ void mafDeviceTest::TestStop()
 
   dummyDevice->Delete();
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceTest::TestStartUp()
 {
   mafDevice *dummyDevice = mafDevice::New();
@@ -153,7 +144,7 @@ void mafDeviceTest::TestStartUp()
 
   dummyDevice->Delete();
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceTest::TestLock()
 {
   mafDevice *dummyDevice = mafDevice::New();
@@ -165,7 +156,7 @@ void mafDeviceTest::TestLock()
 
   dummyDevice->Delete();
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceTest::TestUnlock()
 {
   mafDevice *dummyDevice = mafDevice::New();
@@ -184,7 +175,7 @@ void mafDeviceTest::TestUnlock()
 
   dummyDevice->Delete();
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceTest::TestIsLocked()
 {
   mafDevice *dummyDevice = mafDevice::New();
@@ -202,7 +193,7 @@ void mafDeviceTest::TestIsLocked()
 
   dummyDevice->Delete();
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceTest::TestSetGetPersistentFlag()
 {
   mafDevice *dummyDevice = mafDevice::New();
@@ -217,7 +208,7 @@ void mafDeviceTest::TestSetGetPersistentFlag()
 
   dummyDevice->Delete();
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceTest::TestIsPersistent()
 {
   mafDevice *dummyDevice = mafDevice::New();
@@ -236,7 +227,7 @@ void mafDeviceTest::TestIsPersistent()
 
   dummyDevice->Delete();
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceTest::TestGetGui()
 {
   mafDevice *dummyDevice = mafDevice::New();
@@ -251,12 +242,12 @@ void mafDeviceTest::TestGetGui()
 
   dummyDevice->Delete();
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceTest::TestUpdateGui()
 {
   std::cout << " (!) Cannot test by command line";
 }
-
+//----------------------------------------------------------------------------
 void mafDeviceTest::TestOnEvent()
 {
   mafDevice *dummyDevice = mafDevice::New();

@@ -196,7 +196,7 @@ void mafVMEStorageTest::TestFixture()
 }
 
 //----------------------------------------------------------------------------
-void mafVMEStorageTest::setUp()
+void mafVMEStorageTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
   mafVMEItem::GlobalCompareDataFlagOn();
@@ -224,7 +224,7 @@ void mafVMEStorageTest::setUp()
 }
 
 //----------------------------------------------------------------------------
-void mafVMEStorageTest::tearDown()
+void mafVMEStorageTest::AfterTest()
 //----------------------------------------------------------------------------
 {
   // cleanup created directories   

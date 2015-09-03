@@ -17,23 +17,12 @@
 #ifndef __CPP_UNIT_mmaVolumeMaterialTest_H__
 #define __CPP_UNIT_mmaVolumeMaterialTest_H__
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
 /** Test for mmaVolumeMaterial; Use this suite to trace memory problems */
-class mmaVolumeMaterialTest : public CPPUNIT_NS::TestFixture
+class mmaVolumeMaterialTest : public mafTest
 {
 public: 
-  // CPPUNIT fixture: executed before each test
-  void setUp();
-
-  // CPPUNIT fixture: executed after each test
-  void tearDown();
 
   // CPPUNIT test suite
   CPPUNIT_TEST_SUITE( mmaVolumeMaterialTest );
@@ -44,7 +33,6 @@ public:
   CPPUNIT_TEST(TestEquals);
   CPPUNIT_TEST(TestUpdateProp);
   CPPUNIT_TEST(TestUpdateFromTables);
-
   CPPUNIT_TEST_SUITE_END();
 
 private:

@@ -43,20 +43,16 @@ void mafVMEPointSetTest::TestFixture()
 {
 }
 //----------------------------------------------------------------------------
-void mafVMEPointSetTest::setUp()
+void mafVMEPointSetTest::BeforeTest()
 //----------------------------------------------------------------------------
 {
-  result = false;
-
   mafNEW(m_PointSetVme);
 }
 //----------------------------------------------------------------------------
-void mafVMEPointSetTest::tearDown()
+void mafVMEPointSetTest::AfterTest()
 //----------------------------------------------------------------------------
 {
-
   mafDEL(m_PointSetVme);
-
 }
 //----------------------------------------------------------------------------
 void mafVMEPointSetTest::TestDynamicAllocation()

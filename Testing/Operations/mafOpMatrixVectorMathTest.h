@@ -17,16 +17,9 @@
 #ifndef CPP_UNIT_mafOpMatrixVectorMathTest_H
 #define CPP_UNIT_mafOpMatrixVectorMathTest_H
 
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
+#include "mafTest.h"
 
-
-class mafOpMatrixVectorMathTest : public CPPUNIT_NS::TestFixture
+class mafOpMatrixVectorMathTest : public mafTest
 {
   CPPUNIT_TEST_SUITE( mafOpMatrixVectorMathTest );
   CPPUNIT_TEST( TestDynamicAllocation );
