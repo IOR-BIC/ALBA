@@ -13,6 +13,7 @@
  PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#include "mafDefines.h"
 
 #include "vtkMAFTextOrientator.h"
 #include "vtkMAFTextOrientatorTest.h"

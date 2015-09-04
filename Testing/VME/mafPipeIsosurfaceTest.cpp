@@ -155,8 +155,6 @@ void mafPipeIsosurfaceTest::TestPipeExecution()
   mafDEL(material);
   mafDEL(volumeInput);
   vtkDEL(Importer);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafPipeIsosurfaceTest::CompareImages(int imageIndex)

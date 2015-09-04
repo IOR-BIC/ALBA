@@ -80,8 +80,6 @@ void mafOpGarbageCollectMSFDirTest::TestOpRun()
   mafDEL(op);
   mafDEL(storageImport);
 
-  delete wxLog::SetActiveTarget(NULL);
-
   CPPUNIT_ASSERT(wxFileExists(sourceFile1));
   CPPUNIT_ASSERT(wxFileExists(sourceFile2));
   CPPUNIT_ASSERT(!wxFileExists(targetFakeFile1));
@@ -141,6 +139,4 @@ void mafOpGarbageCollectMSFDirTest::TestGarbageCollect()
 
   mafDEL(op);
   mafDEL(storageImport);
-
-  delete wxLog::SetActiveTarget(NULL);
 }

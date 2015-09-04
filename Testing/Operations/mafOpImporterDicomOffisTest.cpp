@@ -87,8 +87,6 @@ void mafOpImporterDicomOffisTest::TestAccept()
   
   mafDEL(group);
   mafDEL(importer);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //-----------------------------------------------------------
 void mafOpImporterDicomOffisTest::TestSetDirName() 
@@ -101,8 +99,6 @@ void mafOpImporterDicomOffisTest::TestSetDirName()
   CPPUNIT_ASSERT(strcmp(importer->GetDicomDirectoryABSFileName(),dirName)==0);
   
   mafDEL(importer);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 
 //-----------------------------------------------------------
@@ -158,8 +154,6 @@ void mafOpImporterDicomOffisTest::TestCreateVolume()
 
     cont = dir.GetNext(&dicomDir);
   }
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 
 //-----------------------------------------------------------
@@ -243,7 +237,5 @@ void mafOpImporterDicomOffisTest::TestCompareDicomImage()
 
     cont = dir.GetNext(&dicomDir);
   }
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 

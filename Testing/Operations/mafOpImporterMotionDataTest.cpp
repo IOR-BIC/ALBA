@@ -128,5 +128,4 @@ void mafOpImporterMotionDataTest::TestOnRawMotionData()
                  xyz[2] <= -289.79 && xyz[2] >= -289.81);
   
   cppDEL(importer);
-  delete wxLog::SetActiveTarget(NULL);
 }

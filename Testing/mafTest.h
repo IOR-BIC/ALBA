@@ -25,11 +25,12 @@
 // to store settings into the registry with the same name of the application
 // ===============================================================================
 class TestApp : public wxApp
-	// ===============================================================================
+// ===============================================================================
 {
 public:
 	bool OnInit();
 	int  OnExit();
+	bool Yield(bool onlyIfNeeded = false);
 };
 DECLARE_APP(TestApp)
 

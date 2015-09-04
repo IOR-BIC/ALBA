@@ -179,9 +179,6 @@ void mafPipeSurfaceSliceTest::TestCloudClosePipeExecution()
   delete pipeSlice;
   sceneNode->m_RenFront = NULL;
   delete sceneNode;
-
-  delete wxLog::SetActiveTarget(NULL);
-
 }
 //----------------------------------------------------------------------------
 void mafPipeSurfaceSliceTest::TestCloudOpenPipeExecution()
@@ -275,8 +272,6 @@ void mafPipeSurfaceSliceTest::TestCloudOpenPipeExecution()
   delete pipeSlice;
   sceneNode->m_RenFront = NULL;
   delete sceneNode;
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafPipeSurfaceSliceTest::TestSurfacePipeExecution()
@@ -367,8 +362,6 @@ void mafPipeSurfaceSliceTest::TestSurfacePipeExecution()
   delete pipeSlice;
   sceneNode->m_RenFront = NULL;
   delete sceneNode;
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafPipeSurfaceSliceTest::CompareImages(int testIndex)

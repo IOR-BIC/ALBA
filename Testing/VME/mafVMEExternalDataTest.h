@@ -58,7 +58,7 @@ protected:
   void TestEquals();
   
   //create a storage: this also creates a root
-  mafVMEStorage m_Storage1;
+  mafVMEStorage *m_Storage1;
   mafVMERoot *m_Storage1Root;
 
 };

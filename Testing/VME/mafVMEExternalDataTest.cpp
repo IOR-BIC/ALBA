@@ -72,15 +72,16 @@ void mafVMEExternalDataTest::BeforeTest()
   storageURL.Append("/");
   storageURL.Append(externalDataTestMSF);
 
-  m_Storage1.SetURL(storageURL.GetCStr());
+	m_Storage1=new mafVMEStorage();
+  m_Storage1->SetURL(storageURL.GetCStr());
 
-  m_Storage1Root = m_Storage1.GetRoot();
+  m_Storage1Root = m_Storage1->GetRoot();
   CPPUNIT_ASSERT(m_Storage1Root);
 
   // root register the storage so its reference count must be one 
   CPPUNIT_ASSERT(m_Storage1Root->GetReferenceCount() == 1);
 
-  CPPUNIT_ASSERT(m_Storage1.Store() == MAF_OK);	
+  CPPUNIT_ASSERT(m_Storage1->Store() == MAF_OK);	
 }
 
 void mafVMEExternalDataTest::AfterTest()
@@ -93,6 +94,8 @@ void mafVMEExternalDataTest::AfterTest()
   // remove folder for test file
   removeSuccessful = RemoveDir(externalDataTestDir);
   CPPUNIT_ASSERT(removeSuccessful);
+
+	mafDEL(m_Storage1);
 }
 
 

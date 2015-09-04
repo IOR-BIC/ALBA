@@ -180,9 +180,6 @@ void mafPipeWrappedMeterTest::TestPipeExecution()
   mafDEL(vmeParametricSurfaceEND1);
 
   mafDEL(storage);
-
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafPipeWrappedMeterTest::CompareImages(int testIndex)

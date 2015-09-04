@@ -87,8 +87,6 @@ void mafOpExtrusionHolesTest::TestExtractFreeEdge()
 	//In the cube there is an hole with 4 points
 	CPPUNIT_ASSERT(extrusion->GetExtractFreeEdgesNumeberOfPoints()==4);
 
-	delete wxLog::SetActiveTarget(NULL);
-
 	mafDEL(extrusion);
 	mafDEL(importer);
 	mafDEL(storage);
@@ -141,9 +139,6 @@ void mafOpExtrusionHolesTest::TestExtrude()
   double epsilon = 0.01;
 	CPPUNIT_ASSERT(bounds[1]-bounds[0] < 4+epsilon && bounds[1]-bounds[0] > 4-epsilon && bounds[3]-bounds[2] < 4+epsilon && bounds[3]-bounds[2] > 4-epsilon && bounds[5]-bounds[4] < 24.37+epsilon && bounds[5]-bounds[4] > 24.37-epsilon);
 	
-	cube = NULL;
-
-	delete wxLog::SetActiveTarget(NULL);
 	mafDEL(extrusion);
 	mafDEL(importer);
 	mafDEL(storage);

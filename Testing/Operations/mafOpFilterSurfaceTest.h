@@ -25,11 +25,6 @@ class vtkPolyData;
 class mafOpFilterSurfaceTest : public mafTest
 {
 public: 
-  // Executed before each test
-  void BeforeTest();
-
-  // Executed after each test
-  void AfterTest();
 
   // CPPUNIT test suite
   CPPUNIT_TEST_SUITE( mafOpFilterSurfaceTest );

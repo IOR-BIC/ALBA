@@ -158,8 +158,6 @@ void mafPipeImage3DTest::TestPipeRGBImageExecution()
 
   mafDEL(image);
 	vtkDEL(ImporterImage);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafPipeImage3DTest::TestPipeGrayImageExecution()
@@ -234,8 +232,6 @@ void mafPipeImage3DTest::TestPipeGrayImageExecution()
 
 	mafDEL(image);
 	vtkDEL(ImporterImage);
-
-	delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafPipeImage3DTest::CompareImages(int scalarIndex)

@@ -143,7 +143,6 @@ void mafVMEImageTest::TestVMEImageVisualization()
   mapper->SetScalarRange(scalars->GetRange());
 
   renWin->Render();
-  delete wxLog::SetActiveTarget(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -264,8 +263,7 @@ int mafVMEImageTest::PlayTree(mafVMERoot *root, bool ignoreVisibleToTraverse)
   // these pointers are not NULL but all of their members are not valid anymore... ? 
   CPPUNIT_ASSERT(m_VmeRoot);
 
-  delete wxLog::SetActiveTarget(NULL);
-  return MAF_OK;
+	return MAF_OK;
 }
 
 //----------------------------------------------------------------------------

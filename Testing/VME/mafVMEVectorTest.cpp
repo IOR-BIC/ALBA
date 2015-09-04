@@ -128,9 +128,6 @@ void mafVMEVectorTest::TestSetData()
   result = m_VmeVector->SetData(line_bad_2,0.0) == MAF_ERROR;
 
   TEST_RESULT;
-
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafVMEVectorTest::TestGetModule()
@@ -156,6 +153,4 @@ void mafVMEVectorTest::TestGetModule()
   result = m_VmeVector->GetModule() == 1.0;
 
   TEST_RESULT;
-
-  delete wxLog::SetActiveTarget(NULL);
 }

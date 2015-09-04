@@ -15,6 +15,7 @@
 =========================================================================*/
 
 #include <cppunit/config/SourcePrefix.h>
+#include "mafDefines.h"
 #include "vtkMAFTextActorMeter.h"
 #include "vtkMAFTextActorMeterTest.h"
 

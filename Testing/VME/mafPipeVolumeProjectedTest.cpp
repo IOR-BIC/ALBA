@@ -152,7 +152,6 @@ void mafPipeVolumeProjectedTest::TestPipeExecution()
   mafDEL(material);
   mafDEL(volumeInput);
   vtkDEL(Importer);
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafPipeVolumeProjectedTest::CompareImages(int imageIndex)

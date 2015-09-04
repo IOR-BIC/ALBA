@@ -125,8 +125,6 @@ void mafPipeScalarMatrixTest::TestPipeExecution()
 
   mafDEL(vme);
   mafDEL(root);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafPipeScalarMatrixTest::CompareImages()

@@ -76,8 +76,6 @@ void mafOpValidateTreeTest::TestOpRun()
 
   mafDEL(op);
   mafDEL(storageImport);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 
 //---------------------------------------------------------
@@ -111,8 +109,6 @@ void mafOpValidateTreeTest::TestValidateTree_ValidTree()
   
   mafDEL(op);
   mafDEL(storageImport);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 
 //---------------------------------------------------------
@@ -148,8 +144,6 @@ void mafOpValidateTreeTest::TestValidateTree_InvalidNode()
 
   mafDEL(op);
   mafDEL(storageImport);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 
 //---------------------------------------------------------
@@ -190,8 +184,6 @@ void mafOpValidateTreeTest::TestValidateTree_LinkNotPresent()
   mafDEL(external);
   mafDEL(op);
   mafDEL(storageImport);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //---------------------------------------------------------
 void mafOpValidateTreeTest::TestValidateTree_LinkNull()
@@ -230,8 +222,6 @@ void mafOpValidateTreeTest::TestValidateTree_LinkNull()
   
   mafDEL(op);
   mafDEL(storageImport);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //---------------------------------------------------------
 void mafOpValidateTreeTest::TestValidateTree_BinaryFileNotPresent()
@@ -265,8 +255,6 @@ void mafOpValidateTreeTest::TestValidateTree_BinaryFileNotPresent()
 
   mafDEL(op);
   mafDEL(storageImport);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //---------------------------------------------------------
 void mafOpValidateTreeTest::TestValidateTree_UrlEmpty()
@@ -300,8 +288,6 @@ void mafOpValidateTreeTest::TestValidateTree_UrlEmpty()
 
   mafDEL(op);
   mafDEL(storageImport);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //---------------------------------------------------------
 void mafOpValidateTreeTest::TestValidateTree_ItemNotPresent()
@@ -348,8 +334,6 @@ void mafOpValidateTreeTest::TestValidateTree_MaxItemIdPatched()
 
   mafDEL(op);
   mafDEL(storageImport);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //---------------------------------------------------------
 void mafOpValidateTreeTest::TestValidateTree_ArchiveFileNotPresent()
@@ -389,6 +373,4 @@ void mafOpValidateTreeTest::TestValidateTree_ArchiveFileNotPresent()
 
   mafDEL(op);
   mafDEL(storageImport);
-
-  delete wxLog::SetActiveTarget(NULL);
 }

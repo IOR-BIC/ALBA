@@ -180,8 +180,6 @@ void vtkMAFVolumeTextureMapper2DTest::TestPipeExecution()
   vtkDEL(piecewiseFunction);
   vtkDEL(volumeMapper);
   vtkDEL(Importer);
-  
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void vtkMAFVolumeTextureMapper2DTest::CompareImages(int scalarIndex)

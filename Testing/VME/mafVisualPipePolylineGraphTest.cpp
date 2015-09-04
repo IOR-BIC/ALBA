@@ -152,8 +152,6 @@ void mafVisualPipePolylineGraphTest::TestPipeExecution()
 
   delete pipe;
   delete sceneNode;
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafVisualPipePolylineGraphTest::CompareImages(int scalarIndex)

@@ -214,8 +214,6 @@ void mafPipeVolumeSlice_BESTest::TestPipeExecution()
   mafDEL(material);
   mafDEL(volumeInput);
   vtkDEL(importer);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafPipeVolumeSlice_BESTest::CompareImages(int imageIndex)
@@ -460,9 +458,6 @@ void mafPipeVolumeSlice_BESTest::TestPipeExecution_SetSliceOpacity()
   mafDEL(material);
   mafDEL(volumeInput);
   vtkDEL(importer);
-
-  delete wxLog::SetActiveTarget(NULL);
-
 }
 
 //----------------------------------------------------------------------------
@@ -594,9 +589,6 @@ void mafPipeVolumeSlice_BESTest::TestPipeExecution_SetLutRange()
   mafDEL(material);
   mafDEL(volumeInput);
   vtkDEL(importer);
-
-  delete wxLog::SetActiveTarget(NULL);
-
 }
 
 //----------------------------------------------------------------------------
@@ -726,9 +718,6 @@ void mafPipeVolumeSlice_BESTest::TestPipeExecution_SetColorLookupTable()
   mafDEL(material);
   mafDEL(volumeInput);
   vtkDEL(importer);
-
-  delete wxLog::SetActiveTarget(NULL);
-
 }
 
 //----------------------------------------------------------------------------
@@ -841,7 +830,4 @@ void mafPipeVolumeSlice_BESTest::TestPipeExecution_TicksOnOff()
   mafDEL(material);
   mafDEL(volumeInput);
   vtkDEL(importer);
-
-  delete wxLog::SetActiveTarget(NULL);
-
 }

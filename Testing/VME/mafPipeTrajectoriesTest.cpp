@@ -162,8 +162,6 @@ void mafPipeTrajectoriesTest::TestPipeExecution()
   delete pipeTrajecotries;
   sceneNode->m_RenFront = NULL;
   delete sceneNode;
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafPipeTrajectoriesTest::CompareImages(int testIndex)

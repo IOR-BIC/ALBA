@@ -61,8 +61,6 @@ void mafOpCreateEditSkeletonTest::TestAccept()
   mafDEL(graph);
   mafDEL(volume);
   mafDEL(op);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //-----------------------------------------------------------
 void mafOpCreateEditSkeletonTest::TestOpRun() 
