@@ -206,8 +206,6 @@ void mafPipeLandmarkCloudTest::TestPipeExecution()
   delete pipe;
   delete sceneNode;
   actorList->Delete();
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafPipeLandmarkCloudTest::CompareImages(int imageIndex)

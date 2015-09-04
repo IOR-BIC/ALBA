@@ -141,8 +141,6 @@ void mafPipeVolumeMIPTest::TestPipeExecution()
 
   mafDEL(volume);
   vtkDEL(Importer);
-  
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafPipeVolumeMIPTest::CompareImages(int scalarIndex)

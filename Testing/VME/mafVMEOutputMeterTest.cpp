@@ -129,7 +129,6 @@ void mafVMEOutputMeterTest::TestUpdate()
 	m_Result = (angle - 90) < TOLERANCE;
 	TEST_RESULT;
 
-	delete wxLog::SetActiveTarget(NULL);
 	meter->SetParent(NULL);
 	vmeParametricSurfaceSTART->SetParent(NULL);
 	vmeParametricSurfaceEND1->SetParent(NULL);

@@ -173,7 +173,6 @@ void mafPipeSurfaceEditorTest::TestPipeExecution()
   mafDEL(surface);
   vtkDEL(Importer);
 
-  delete wxLog::SetActiveTarget(NULL);
   vtkTimerLog::CleanupLog();
 }
 //----------------------------------------------------------------------------

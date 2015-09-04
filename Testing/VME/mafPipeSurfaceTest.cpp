@@ -244,8 +244,6 @@ void mafPipeSurfaceTest::TestPipeExecution()
 
   mafDEL(surface);
   vtkDEL(Importer);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafPipeSurfaceTest::CompareImages(int scalarIndex)

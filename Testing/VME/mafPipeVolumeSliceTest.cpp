@@ -190,8 +190,6 @@ void mafPipeVolumeSliceTest::TestPipeExecution()
   mafDEL(material);
   mafDEL(volumeInput);
   vtkDEL(importer);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafPipeVolumeSliceTest::CompareImages(int imageIndex)

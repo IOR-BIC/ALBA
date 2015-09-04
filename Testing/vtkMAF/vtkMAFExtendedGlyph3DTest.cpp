@@ -13,7 +13,7 @@
  PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-
+#include "mafDefines.h"
 #include <cppunit/config/SourcePrefix.h>
 
 #include "vtkMAFExtendedGlyph3DTest.h"

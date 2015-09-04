@@ -155,8 +155,6 @@ void mafPipeDensityDistanceTest::TestPipeExecution()
   mafDEL(surface);
   mafDEL(volume);
   vtkDEL(Importer);
-  
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafPipeDensityDistanceTest::CompareImages(int scalarIndex)

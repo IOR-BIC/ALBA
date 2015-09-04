@@ -136,6 +136,4 @@ void mafOpExporterLandmarkWSTest::TestOnLandmarkImporter()
 	exporter = NULL;
 	importer = NULL;
   importerWS = NULL;
-
-  delete wxLog::SetActiveTarget(NULL);
 }

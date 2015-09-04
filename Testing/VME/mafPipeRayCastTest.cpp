@@ -144,8 +144,6 @@ void mafPipeRayCastTest::TestPipeExecution()
 
   mafDEL(volume);
   vtkDEL(Importer);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -207,8 +205,6 @@ void mafPipeRayCastTest::TestPipeExecutionMR()
 
   mafDEL(volume);
   vtkDEL(Importer);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 
 

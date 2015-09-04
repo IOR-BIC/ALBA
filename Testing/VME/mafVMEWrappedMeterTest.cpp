@@ -104,8 +104,6 @@ void mafVMEWrappedMeterTest::TestWithGenericVME()
 	mafDEL(vmeParametricSurfaceEND1);
 
 	mafDEL(storage);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 
 //---------------------------------------------------------------
@@ -175,8 +173,6 @@ void mafVMEWrappedMeterTest::TestWithGenericVMEWithMiddlePoints()
 	mafDEL(vmeParametricSurfaceMiddlePoint);
 
 	mafDEL(storage);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 
 //---------------------------------------------------------------
@@ -233,8 +229,6 @@ void mafVMEWrappedMeterTest::TestWithGenericLandmark()
   mafDEL(importer);
 
   mafDEL(storage);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 
 //---------------------------------------------------------------
@@ -306,8 +300,6 @@ void mafVMEWrappedMeterTest::TestWithGenericLandmarkWithMiddlePoints()
 	mafDEL(importer);
 
 	mafDEL(storage);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 /*
 //---------------------------------------------------------------
@@ -663,7 +655,4 @@ void mafVMEWrappedMeterTest::TestWrappedGeometry()
   mafDEL(vmeParametricSurfaceWrapped);
 
   mafDEL(storage);
-
-  delete wxLog::SetActiveTarget(NULL);
-
 }

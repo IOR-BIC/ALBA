@@ -99,7 +99,6 @@ void mafVMESegmentationVolumeTest::AfterTest()
   mafDEL(m_VolumeRG);
 
   delete m_Storage;
-  delete wxLog::SetActiveTarget(NULL);
 }
 //---------------------------------------------------------
 void mafVMESegmentationVolumeTest::TestDynamicAllocation()

@@ -160,8 +160,6 @@ void mafVisualPipeSlicerSliceTest::TestPipeExecution()
   mafDEL(slicer);
   cppDEL(importer);
   mafDEL(storage);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafVisualPipeSlicerSliceTest::CompareImages(int scalarIndex)

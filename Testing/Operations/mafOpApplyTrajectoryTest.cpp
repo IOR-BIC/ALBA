@@ -85,7 +85,6 @@ void mafOpApplyTrajectoryTest::TestFromFile()
   vme = NULL;
   timeStamps.clear();
   mafDEL(trajectory);
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafOpApplyTrajectoryTest::TestFromVME()
@@ -134,6 +133,5 @@ void mafOpApplyTrajectoryTest::TestFromVME()
   timeStamps.clear();
   mafDEL(trajectory_variant);
   mafDEL(trajectory_static);
-  delete wxLog::SetActiveTarget(NULL);
 }
 

@@ -153,8 +153,6 @@ void mafVisualPipeVolumeRayCastingTest::TestPipeExecution()
   delete pipe;
   delete sceneNode;
 
-  delete wxLog::SetActiveTarget(NULL);
-
   mafDEL(material);
   mafDEL(volume);
 }

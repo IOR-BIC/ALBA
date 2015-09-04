@@ -166,9 +166,6 @@ void mafPipeGizmoTest::TestPipeExecution()
   vtkDEL(append);
   vtkDEL(cube);
   vtkDEL(handler);
-  
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafPipeGizmoTest::CompareImages(int scalarIndex)

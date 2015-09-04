@@ -162,8 +162,6 @@ void mafPipeIsosurfaceGPUTest::TestPipeExecutionCountour()
   mafDEL(material);
   mafDEL(volumeInput);
   vtkDEL(Importer);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafPipeIsosurfaceGPUTest::TestPipeExecutionOpacity()
@@ -248,8 +246,6 @@ void mafPipeIsosurfaceGPUTest::TestPipeExecutionOpacity()
   mafDEL(material);
   mafDEL(volumeInput);
   vtkDEL(Importer);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafPipeIsosurfaceGPUTest::TestExtractIsosurface()
@@ -338,8 +334,6 @@ void mafPipeIsosurfaceGPUTest::TestExtractIsosurface()
   mafDEL(material);
   mafDEL(volumeInput);
   vtkDEL(Importer);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafPipeIsosurfaceGPUTest::CompareImages(int imageIndex)

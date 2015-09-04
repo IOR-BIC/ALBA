@@ -104,9 +104,6 @@ void mafVMEPointSetTest::TestSetData()
   result = m_PointSetVme->SetData(sphere->GetOutput(),0.0) == MAF_ERROR;
 
   CPPUNIT_ASSERT(result);
-
-  delete wxLog::SetActiveTarget(NULL);
-
 }
 //----------------------------------------------------------------------------
 void mafVMEPointSetTest::TestAppendPoint()
@@ -166,8 +163,6 @@ void mafVMEPointSetTest::TestAppendPoint()
   result = newPolydata2->GetNumberOfPoints() == NUM_OF_POINTS;
 
   CPPUNIT_ASSERT(result);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafVMEPointSetTest::TestRemovePoint()
@@ -227,9 +222,6 @@ void mafVMEPointSetTest::TestRemovePoint()
   result = newPolydata2->GetNumberOfPoints() == NUM_OF_POINTS;
 
   CPPUNIT_ASSERT(result);
-
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafVMEPointSetTest::TestSetPoint()
@@ -290,9 +282,6 @@ void mafVMEPointSetTest::TestSetPoint()
   result = pointToCheck[0] == 0.0 && pointToCheck[1] == 0.0 && pointToCheck[2] == 2.0;
 
   CPPUNIT_ASSERT(result);
-
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafVMEPointSetTest::TestGetPoint()
@@ -342,9 +331,6 @@ void mafVMEPointSetTest::TestGetPoint()
   result = pointToCheck[0] == 0.0 && pointToCheck[1] == 0.0 && pointToCheck[2] == 2.0;
 
   CPPUNIT_ASSERT(result);
-
-  delete wxLog::SetActiveTarget(NULL);
-
 }
 //----------------------------------------------------------------------------
 void mafVMEPointSetTest::TestGetNumberOfPoints()
@@ -368,9 +354,6 @@ void mafVMEPointSetTest::TestGetNumberOfPoints()
   result = m_PointSetVme->GetNumberOfPoints(0.0) == NUM_OF_POINTS;
 
   CPPUNIT_ASSERT(result);
-
-  delete wxLog::SetActiveTarget(NULL);
-
 }
 //----------------------------------------------------------------------------
 void mafVMEPointSetTest::TestSetNumberOfPoints()
@@ -409,7 +392,4 @@ void mafVMEPointSetTest::TestSetNumberOfPoints()
   result = newPolydata->GetNumberOfPoints() == 1;
 
   CPPUNIT_ASSERT(result);
-
-  delete wxLog::SetActiveTarget(NULL);
-
 }

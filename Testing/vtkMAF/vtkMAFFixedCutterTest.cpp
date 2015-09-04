@@ -14,6 +14,7 @@
 
 =========================================================================*/
 
+#include "mafDefines.h"
 #include <cppunit/config/SourcePrefix.h>
 
 #include "vtkMAFFixedCutterTest.h"

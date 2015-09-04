@@ -100,8 +100,6 @@ void mafPipeCompoundVolumeIsosurfaceTest::TestCreateSceneNode()
   delete pipe;
   delete sceneNode;
   mafDEL(volume);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 
 //----------------------------------------------------------------------------
