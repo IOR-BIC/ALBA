@@ -97,8 +97,6 @@ void mafOpComputeInertialTensorTest::TestAddAttributes()
 
   mafDEL(op);
   mafDEL(importer);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //-----------------------------------------------------------
 void mafOpComputeInertialTensorTest::TestComputeInertialTensorFromDefaultValue() 
@@ -151,8 +149,6 @@ void mafOpComputeInertialTensorTest::TestComputeInertialTensorFromDefaultValue()
 
   mafDEL(op);
   mafDEL(importer);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //-----------------------------------------------------------
 void mafOpComputeInertialTensorTest::TestComputeInertialTensorFromGroupFromDefaultValue() 
@@ -251,8 +247,6 @@ void mafOpComputeInertialTensorTest::TestComputeInertialTensorFromGroupFromDefau
   mafDEL(group);
   mafDEL(copy);
   mafDEL(importer);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //-----------------------------------------------------------
 void mafOpComputeInertialTensorTest::TestOpDoUndo() 
@@ -292,8 +286,6 @@ void mafOpComputeInertialTensorTest::TestOpDoUndo()
 
   mafDEL(op);
   mafDEL(importer);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 
 //-----------------------------------------------------------
@@ -353,8 +345,6 @@ void mafOpComputeInertialTensorTest::TestComputeInertialTensorFromDENSITYTag()
 
 	mafDEL(op);
 	mafDEL(importer);
-
-	delete wxLog::SetActiveTarget(NULL);
 }
 
 //-----------------------------------------------------------
@@ -429,6 +419,4 @@ void mafOpComputeInertialTensorTest::TestComputeInertialTensorFromGroupFromDENSI
 	mafDEL(group);
 	mafDEL(copy);
 	mafDEL(importer);
-
-	delete wxLog::SetActiveTarget(NULL);
 }

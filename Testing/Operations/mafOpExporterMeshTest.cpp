@@ -185,7 +185,6 @@ void mafOpExporterMeshTest::TestExporterMesh()
   mafDEL(importerVTK);
 
   delete dummyVme;
-  delete wxLog::SetActiveTarget(NULL);
 }
 
 void mafOpExporterMeshTest::TestConstructor()

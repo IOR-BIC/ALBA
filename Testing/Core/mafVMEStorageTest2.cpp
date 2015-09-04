@@ -78,9 +78,10 @@ void mafVMEStorageTest2::BeforeTest()
   storageURL.Append("/");
   storageURL.Append(storage1MSF);
 
-  m_Storage1.SetURL(storageURL.GetCStr());
+	m_Storage1=new mafVMEStorage();
+  m_Storage1->SetURL(storageURL.GetCStr());
 
-  m_Storage1Root = m_Storage1.GetRoot();
+  m_Storage1Root = m_Storage1->GetRoot();
   CPPUNIT_ASSERT(m_Storage1Root);
 
   // root register the storage so its reference count must be one 
@@ -202,7 +203,7 @@ void mafVMEStorageTest2::BeforeTest()
 
   CPPUNIT_ASSERT(shouldBeTheVTKSphere->GetNumberOfCells() == m_SphereSource->GetOutput()->GetNumberOfCells());
 
-  CPPUNIT_ASSERT(m_Storage1.Store() == MAF_OK);	
+  CPPUNIT_ASSERT(m_Storage1->Store() == MAF_OK);	
 }
 
 //----------------------------------------------------------------------------
@@ -222,6 +223,7 @@ void mafVMEStorageTest2::AfterTest()
   removeSuccessful = RemoveDir(storage1Dir);
   CPPUNIT_ASSERT(removeSuccessful);
 
+	mafDEL(m_Storage1);
 }
 
 
@@ -301,7 +303,7 @@ void mafVMEStorageTest2::TestRestoreOnSameStorage()
   // root register the storage so its reference count must be one 
   CPPUNIT_ASSERT(m_Storage1Root->GetReferenceCount() == 1);
   
-  CPPUNIT_ASSERT(MAF_OK == m_Storage1.Restore());
+  CPPUNIT_ASSERT(MAF_OK == m_Storage1->Restore());
 
   CPPUNIT_ASSERT(m_Storage1Root->GetReferenceCount() == 1);
 

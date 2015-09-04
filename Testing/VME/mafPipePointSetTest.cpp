@@ -203,8 +203,6 @@ void mafPipePointSetTest::TestPipeExecution()
   vtkDEL(polyData);
   //vtkDEL(cellArray);
   vtkDEL(points);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafPipePointSetTest::CompareImages(int imageIndex)

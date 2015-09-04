@@ -14,6 +14,7 @@
 
 =========================================================================*/
 
+#include "mafDefines.h"
 #include <cppunit/config/SourcePrefix.h>
 #include "vtkMAFRulerActor2D.h"
 #include "vtkMAFRulerActor2DTest.h"

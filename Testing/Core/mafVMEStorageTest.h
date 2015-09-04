@@ -56,7 +56,7 @@ class mafVMEStorageTest : public mafTest
     void CreateVMETestTree();
 
     // storage to test
-    mafVMEStorage m_Storage;
+    mafVMEStorage *m_Storage;
 
     // helper variables 
     mafVMERoot *m_StorageRoot;

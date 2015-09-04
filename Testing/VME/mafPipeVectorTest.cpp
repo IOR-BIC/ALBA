@@ -160,9 +160,6 @@ void mafPipeVectorTest::TestPipeExecution()
   delete sceneNode;
 
   mafDEL(vector);
-
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafPipeVectorTest::CompareImages(int testIndex)

@@ -346,8 +346,6 @@ void mafPipeVolumeDRRTest::TestPipeExecution()
 
   mafDEL(volume);
   vtkDEL(Importer);
-  
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafPipeVolumeDRRTest::CompareImages(int scalarIndex)

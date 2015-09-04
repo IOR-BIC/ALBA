@@ -271,6 +271,4 @@ void mafOpExporterMetersTest::TestOnMetersImporter()
   cppDEL(importer);
 
   mafDEL(storage);
-
-  delete wxLog::SetActiveTarget(NULL);
 }

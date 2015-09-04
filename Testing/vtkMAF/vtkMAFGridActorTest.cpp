@@ -14,6 +14,7 @@
 
 =========================================================================*/
 
+#include "mafDefines.h"
 #include "vtkMAFGridActor.h"
 #include "vtkMAFGridActorTest.h"
 

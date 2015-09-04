@@ -288,9 +288,8 @@ void mafGeometryEditorPolylineGraphTest::TestDeletePoint()
 	vtkDEL(output);
 	cppDEL(PolylineGraph);
 	mafDEL(polyline);
-  
-  delete wxLog::SetActiveTarget(NULL);
-}
+ }
+
 //----------------------------------------------------------------------------
 void mafGeometryEditorPolylineGraphTest::TestSelectBranch()
 //----------------------------------------------------------------------------
@@ -309,8 +308,6 @@ void mafGeometryEditorPolylineGraphTest::TestSelectBranch()
 
 	cppDEL(PolylineGraph);
 	mafDEL(polyline);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafGeometryEditorPolylineGraphTest::TestInsertPoint()

@@ -151,5 +151,4 @@ void mafOpExporterBMPTest::TestExportBMP()
   mafDEL(exporter);
   vtkDEL(importerVTK);
   mafDEL(storage);
-  delete wxLog::SetActiveTarget(NULL);
 }

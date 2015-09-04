@@ -81,8 +81,6 @@ void mafVMEOutputLandmarkCloudTest::TestGetVTKData()
   m_Result = lcloud->GetOutput()->GetVTKData() == NULL;
 
   TEST_RESULT;
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafVMEOutputLandmarkCloudTest::TestGetNumberOfLandmarksSTR()

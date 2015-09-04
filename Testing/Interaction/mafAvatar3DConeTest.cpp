@@ -126,7 +126,6 @@ void mafAvatar3DConeTest::TestPick()
 
   CompareImages();
 
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafAvatar3DConeTest::CompareImages()

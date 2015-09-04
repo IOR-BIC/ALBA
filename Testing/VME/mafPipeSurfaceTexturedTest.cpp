@@ -223,8 +223,6 @@ void mafPipeSurfaceTexturedTest::TestPipeTextureExecution()
   vtkDEL(cylinder);
   vtkDEL(sphere);
 	vtkDEL(ImporterImage);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafPipeSurfaceTexturedTest::TestPipeClassicExecution()
@@ -331,8 +329,6 @@ void mafPipeSurfaceTexturedTest::TestPipeClassicExecution()
 
 	mafDEL(surface);
 	vtkDEL(Importer);
-
-	delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafPipeSurfaceTexturedTest::CompareImages(int scalarIndex)

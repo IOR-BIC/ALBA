@@ -119,6 +119,4 @@ void mafOpClassicICPRegistrationTest::TestOpDo()
   mafDEL(op);
   mafDEL(importer);
   mafDEL(importer2);
-
-  delete wxLog::SetActiveTarget(NULL);
 }

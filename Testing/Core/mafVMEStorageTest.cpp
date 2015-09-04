@@ -201,6 +201,7 @@ void mafVMEStorageTest::BeforeTest()
 {
   mafVMEItem::GlobalCompareDataFlagOn();
 
+	m_Storage=new mafVMEStorage();
   m_StorageRoot = NULL;
   m_RootVme = NULL;
   
@@ -245,6 +246,7 @@ void mafVMEStorageTest::AfterTest()
   std::cerr << "Test Completed Successfully!\n";
 
   mafDEL(m_RootVme);
+	mafDEL(m_Storage);
 }
 
 //----------------------------------------------------------------------------
@@ -252,11 +254,11 @@ void mafVMEStorageTest::TestSaveAs()
 //----------------------------------------------------------------------------
 {
   // save the tree to test to disk to default location
-  CPPUNIT_ASSERT(m_Storage.Store()==MAF_OK);
+  CPPUNIT_ASSERT(m_Storage->Store()==MAF_OK);
 
   // save the tree to another location with a different name 
-  m_Storage.SetURL("testMSF_saveAs/testMSF_saveAs.msf");
-  CPPUNIT_ASSERT(m_Storage.Store()==MAF_OK);
+  m_Storage->SetURL("testMSF_saveAs/testMSF_saveAs.msf");
+  CPPUNIT_ASSERT(m_Storage->Store()==MAF_OK);
 
   // test if the file has been saved and reloaded correctly
   
@@ -315,8 +317,8 @@ void mafVMEStorageTest::CreateVMETestTree()
 
   // create a Storage, extract the m_StorageRoot, create a tree
   // and save it to disk
-  m_Storage.SetURL("test_MSF/test_MSF.msf");
-  m_StorageRoot=m_Storage.GetRoot();
+  m_Storage->SetURL("test_MSF/test_MSF.msf");
+  m_StorageRoot=m_Storage->GetRoot();
 
   // this will be destroyed when the tree is destroyed: no need to call delete... 
   m_RootVme = mafVMEGeneric::New();
@@ -401,7 +403,7 @@ void mafVMEStorageTest::TestSave()
 //----------------------------------------------------------------------------
 {
   // save the tree to disk
-  int res = m_Storage.Store();
+  int res = m_Storage->Store();
   CPPUNIT_ASSERT(res == MAF_OK);
 }
 
@@ -410,7 +412,7 @@ void mafVMEStorageTest::TestSaveAndReload()
 //----------------------------------------------------------------------------
 {
   // save the tree to test to disk
-  CPPUNIT_ASSERT(m_Storage.Store()==MAF_OK);
+  CPPUNIT_ASSERT(m_Storage->Store()==MAF_OK);
 
   //
   // Test data reloading:
@@ -441,7 +443,7 @@ void mafVMEStorageTest::TestTreeEditAndGarbageCollection()
 //----------------------------------------------------------------------------
 {
   // save the tree to test to disk
-  CPPUNIT_ASSERT(m_Storage.Store()==MAF_OK);
+  CPPUNIT_ASSERT(m_Storage->Store()==MAF_OK);
 
   //
   // Test data reloading:
@@ -485,7 +487,7 @@ void mafVMEStorageTest::TestTreeEditAndGarbageCollection()
   } // make local objects reference to be removed
 
   // save changed data
-  m_Storage.Store();
+  m_Storage->Store();
 
   //
   // check if data files garbage collection works

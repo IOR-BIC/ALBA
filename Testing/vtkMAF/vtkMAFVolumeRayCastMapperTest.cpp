@@ -136,8 +136,6 @@ void vtkMAFVolumeRayCastMapperTest::TestPipeExecution()
   vtkDEL(volumeMapper);
   vtkDEL(MIPFunction);
   vtkDEL(Importer);
-  
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void vtkMAFVolumeRayCastMapperTest::CompareImages(int scalarIndex)

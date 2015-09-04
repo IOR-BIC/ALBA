@@ -119,6 +119,4 @@ void mafOpFillHolesTest::TestOpRun()
   mafDEL(fillOp);
   vtkDEL(fEdge);
   mafDEL(importerVTK);
-
-  delete wxLog::SetActiveTarget(NULL);
 }

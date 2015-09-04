@@ -207,8 +207,6 @@ void mafPipePolylineSlice_BESTest::TestPipeExecution()
   delete pipePolylineSlice;
   sceneNode->m_RenFront = NULL;
   delete sceneNode;
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafPipePolylineSlice_BESTest::CompareImages(int testIndex)

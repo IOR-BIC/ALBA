@@ -374,6 +374,4 @@ void mafOpExporterLandmarkTest::TestMultipleExports()
   importer2 = NULL;
   delete importer;
   importer = NULL;
-
-  delete wxLog::SetActiveTarget(NULL);
 }

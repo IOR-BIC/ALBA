@@ -133,8 +133,6 @@ void mafPipeCompoundVolumeTest::TestCreateSceneNode()
   delete pipe;
   delete sceneNode;
   mafDEL(volume);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafPipeCompoundVolumeTest::TestOnEvent()
@@ -147,8 +145,5 @@ void mafPipeCompoundVolumeTest::TestOnEvent()
   pipe->OnEvent(&mafEvent(this, pipe->GetEnumTABCTRL(), (long) mafGUIDynamicVP::ID_CREATE_VP));
   pipe->OnEvent(&mafEvent(this, pipe->GetEnumTABCTRL(), (long) mafGUIDynamicVP::ID_CLOSE_VP));
   
-
   delete pipe;
-  
-  delete wxLog::SetActiveTarget(NULL);
 }

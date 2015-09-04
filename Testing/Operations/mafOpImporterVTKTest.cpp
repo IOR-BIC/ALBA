@@ -89,7 +89,6 @@ void mafOpImporterVTKTest::TestImportVTKPolyline()
   TEST_RESULT;
 
   delete dummyVme;
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafOpImporterVTKTest::TestImportVTKSurface()
@@ -110,7 +109,6 @@ void mafOpImporterVTKTest::TestImportVTKSurface()
   TEST_RESULT;
 
   delete dummyVme;
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafOpImporterVTKTest::TestImportVTKVolume()
@@ -131,7 +129,6 @@ void mafOpImporterVTKTest::TestImportVTKVolume()
   TEST_RESULT;
 
   delete dummyVme;
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafOpImporterVTKTest::TestImportVTKMesh()
@@ -152,5 +149,4 @@ void mafOpImporterVTKTest::TestImportVTKMesh()
   TEST_RESULT;
 
   delete dummyVme;
-  delete wxLog::SetActiveTarget(NULL);
 }

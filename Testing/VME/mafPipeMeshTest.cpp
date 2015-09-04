@@ -205,8 +205,6 @@ void mafPipeMeshTest::TestPipeExecution()
 
   mafDEL(mesh);
   vtkDEL(Importer);
-
-  delete wxLog::SetActiveTarget(NULL);
 }
 //----------------------------------------------------------------------------
 void mafPipeMeshTest::CompareImages(int scalarIndex)

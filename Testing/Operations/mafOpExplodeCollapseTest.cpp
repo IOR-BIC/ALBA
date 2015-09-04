@@ -87,6 +87,5 @@ void mafOpExplodeCollapseTest::TestExplodeCollapse()
   TEST_RESULT;
 
   mafDEL(explode);
-  delete wxLog::SetActiveTarget(NULL);
 }
 
