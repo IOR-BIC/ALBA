@@ -91,7 +91,7 @@ SET(PROJECT_SRCS
   mafGUIVMEChooserTree.h
   mmuTimeSet.cpp
   mmuTimeSet.h
-
+	mafProgressBarHelper.cpp mafProgressBarHelper.h
 )
 
 IF (MAF_USE_VTK)
