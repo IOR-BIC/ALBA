@@ -183,11 +183,13 @@ void mafOp::ShowGui()
 void mafOp::HideGui()
 //----------------------------------------------------------------------------
 {
-  assert(m_Gui); 
-  mafEventMacro(mafEvent(this,OP_HIDE_GUI,(wxWindow *)m_Guih));
-  delete m_Guih;
-  m_Guih = NULL;
-  m_Gui = NULL;
+  if(m_Gui)
+	{
+		mafEventMacro(mafEvent(this,OP_HIDE_GUI,(wxWindow *)m_Guih));
+		delete m_Guih;
+		m_Guih = NULL;
+		m_Gui = NULL;
+	}
 }
 //----------------------------------------------------------------------------
 bool mafOp::OkEnabled()
