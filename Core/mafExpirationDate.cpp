@@ -25,6 +25,7 @@
 #include "wx/filefn.h"
 #include "wx/stdpaths.h"
 #include <wx/app.h>
+#include "mafDecl.h"
 
 #define ZERO 0x30 
 #define NINE 0x39
@@ -179,10 +180,11 @@ void mafExpirationDate::InitializePathFileName()
 	}
 	else
 	{
-		m_ControlFileName = wxGetCwd();
-		m_ControlFileName.append("/../");
+		m_ControlFileName = mafGetAppDataDirectory();
+
 		std::string dirConsole = "console";
 		Obfuscate(dirConsole);
+    m_ControlFileName.append("/");
 		m_ControlFileName.append(dirConsole);
 		m_ControlFileName.append("/");
 		if (!wxDirExists(m_ControlFileName.c_str()))

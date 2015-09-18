@@ -277,7 +277,7 @@ void mafGUIContextualMenu::OnContextualViewMenu(wxCommandEvent& event)
 		break;
     case CONTEXTUAL_MENU_EXPORT_AS_VRML:
     {
-      mafString file_dir  = mafGetApplicationDirectory().c_str();
+      mafString file_dir  = mafGetDocumentsDirectory().c_str();
       mafString wildc     = "VRML (*.wrl)|*.wrl";
       mafString file      = mafGetSaveFile(file_dir,wildc).c_str();
       if (!file.IsEmpty())

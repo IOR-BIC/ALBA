@@ -73,8 +73,7 @@ mafOp* mafOpExporterAnalogWS::Copy()
 void mafOpExporterAnalogWS::OpRun()   
 //----------------------------------------------------------------------------
 {
-	wxString proposed = mafGetApplicationDirectory().c_str();
-  proposed += "/Data/External/";
+	wxString proposed = mafGetDocumentsDirectory().c_str();
 	proposed += m_Input->GetName();
 	proposed += ".csv";
 	
