@@ -41,8 +41,8 @@ mafGUISettings(Listener, label)
   m_Password = "";
   m_Port = 21;
   m_RemoteStorageType = 0;
-  m_CacheFolder = wxGetCwd().c_str();
-  m_SaveFolder = mafGetApplicationDirectory().c_str();
+  m_CacheFolder = mafGetAppDataDirectory().c_str();
+  m_SaveFolder = mafGetDocumentsDirectory().c_str();
 
  /* m_SRBRemoteHostName = "";
   m_SRBDomain = "";

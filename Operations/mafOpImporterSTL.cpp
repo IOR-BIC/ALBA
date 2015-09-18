@@ -51,7 +51,7 @@ mafOp(label)
   m_Canundo = true;
   m_Files.clear();
   m_Swaps.clear();
-  m_FileDir = "";//mafGetApplicationDirectory().c_str();
+  m_FileDir = mafGetDocumentsDirectory().c_str();
 }
 //----------------------------------------------------------------------------
 mafOpImporterSTL::~mafOpImporterSTL()

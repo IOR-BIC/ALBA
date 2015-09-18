@@ -53,7 +53,7 @@ mafOp(label)
 	m_Binary        = 1;
 	m_ABSMatrixFlag = 1;
 
-	m_FileDir = "";//mafGetApplicationDirectory().c_str();
+	m_FileDir = mafGetDocumentsDirectory().c_str();
 }
 //----------------------------------------------------------------------------
 mafOpExporterSTL::~mafOpExporterSTL()

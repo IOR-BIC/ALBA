@@ -16,7 +16,7 @@
 
 #include "mafStorage.h"
 #include "mafStorable.h"
-#include "wx\stdpaths.h"
+#include "mafDecl.h"
 
 //------------------------------------------------------------------------------
 mafCxxAbstractTypeMacro(mafStorage);
@@ -31,14 +31,13 @@ mafStorage::mafStorage()
   m_TmpFileId       = 0;
   m_ErrorCode       = 0;
 	
-	//getting user app directory
-	wxStandardPaths std_paths;
-	wxString userPath=std_paths.GetUserDataDir();
-	//creating user app directory if does not exist
-	if(!wxDirExists(userPath))
-		wxMkdir(userPath);
-	m_TmpFolder=userPath+"\\tmp";
-	//creating user app tmp directory if does not exist
+  //Creating user app data directory if does not exist
+  if(!wxDirExists(mafGetAppDataDirectory().c_str()))
+    wxMkdir(mafGetAppDataDirectory().c_str());
+
+  //Creating user app tmp directory if does not exist
+	m_TmpFolder=(mafGetAppDataDirectory()+"\\tmp").c_str();
+
 	if(!wxDirExists(m_TmpFolder))
 		wxMkdir(m_TmpFolder.GetCStr());
   m_NeedsUpgrade    = false;

@@ -43,7 +43,7 @@ mafOp(label)
   m_Input = NULL; 
 
   m_Vme = NULL;
-	m_FileDir = "";//mafGetApplicationDirectory().c_str();
+	m_FileDir = mafGetDocumentsDirectory().c_str();
 }
 //----------------------------------------------------------------------------
 mafOpImporterExternalFile::~mafOpImporterExternalFile( ) 

@@ -826,7 +826,7 @@ void mafVMEVolumeLarge::OnEvent(mafEventBase *maf_event)
 		return;	//invalid state
 	}	
 
-	std::string fname = mafGetSaveFile(mafGetApplicationDirectory().c_str(), 
+	std::string fname = mafGetSaveFile(mafGetDocumentsDirectory().c_str(), 
 		_("RAW files (*.raw)|*.raw"), _("Save Volume File"));
 
 	if (fname.c_str() == NULL || *fname.c_str() == '\0')

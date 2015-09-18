@@ -70,9 +70,8 @@ mafOp* mafOpExporterLandmarkWS::Copy()
 void mafOpExporterLandmarkWS::OpRun()   
 //----------------------------------------------------------------------------
 {
-	wxString proposed = mafGetApplicationDirectory().c_str();
-  proposed += "/Data/External/";
-	proposed += m_Input->GetName();
+  wxString proposed = mafGetDocumentsDirectory().c_str();
+  proposed += m_Input->GetName();
   proposed += "_TRAJECTORIES";
 	proposed += ".csv";
 	

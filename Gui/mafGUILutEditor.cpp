@@ -95,7 +95,7 @@ mafGUILutEditor::mafGUILutEditor(wxWindow* parent, wxWindowID id, const wxPoint&
   m_NewUserLutName = "New User Preset";
   m_Info = "" ;
   
-  m_UserLutLibraryDir = (mafGetApplicationDirectory() + "\\UserDefinedLookupTables\\").c_str();
+  m_UserLutLibraryDir = mafGetAppDataDirectory().c_str();
 
   if (wxDirExists(m_UserLutLibraryDir.c_str()))
   {

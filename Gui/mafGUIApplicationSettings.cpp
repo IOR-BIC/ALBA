@@ -37,7 +37,7 @@ mafGUISettings(Listener, label)
   // Default values for the application.
   m_LogToFile   = 1; //logging enabled for correcting bug #820
   m_VerboseLog  = 0;
-  m_LogFolder = wxGetCwd().c_str();
+  m_LogFolder = (mafGetAppDataDirectory() + "\\Logs").c_str();
 
 	m_ImageTypeId = PNG;
 
@@ -45,6 +45,14 @@ mafGUISettings(Listener, label)
   
   m_UseDefaultPasPhrase = 1;
   m_PassPhrase = mafDefaultPassPhrase();
+
+  //creating user app directory if does not exist
+  if(!wxDirExists(mafGetAppDataDirectory().c_str()))
+    wxMkdir(mafGetAppDataDirectory().c_str());
+
+  //creating Logs directory if does not exist
+  if(!wxDirExists(m_LogFolder))
+    wxMkdir(m_LogFolder.GetCStr());
 
   InitializeSettings();
 
@@ -203,6 +211,7 @@ void mafGUIApplicationSettings::SetLogFolder(mafString log_folder)
   if (m_LogFolder != log_folder)
   {
     m_LogFolder = log_folder;
+
     m_Config->Write("LogFolder",m_LogFolder.GetCStr());
     m_Config->Flush();
   }

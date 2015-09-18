@@ -31,6 +31,7 @@
 #include "mafGUISettingsStorage.h"
 
 #include <iostream>
+#include "wx/stdpaths.h"
 
 #define TEST_RESULT CPPUNIT_ASSERT(result);
 
@@ -79,8 +80,15 @@ void mafGUISettingsStorageTest::TestUseRemoteStorage()
 void mafGUISettingsStorageTest::TestGetCacheFolder()
 //----------------------------------------------------------------------------
 {
+  //getting user app data directory
+  wxStandardPaths std_paths;
+  wxString appData_dir=std_paths.GetUserDataDir();
+
+  //getting CacheFolder from storageSettings
   mafGUISettingsStorage storageSettings(NULL);
-  result = storageSettings.GetCacheFolder().Equals(wxGetCwd().c_str());
+  mafString cache_dir = storageSettings.GetCacheFolder();
+
+  result = cache_dir.Equals(appData_dir.c_str());
   CPPUNIT_ASSERT(result);
 }
 //----------------------------------------------------------------------------

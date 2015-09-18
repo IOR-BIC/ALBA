@@ -49,7 +49,8 @@ mafOp(label)
   m_Canundo = true;
 
   m_MSFFile    = "";
-	m_MSFFileDir = "";//mafGetApplicationDirectory().c_str();
+  m_MSFFileDir = mafGetDocumentsDirectory().c_str();
+
 }
 //----------------------------------------------------------------------------
 mafOpExporterMSF::~mafOpExporterMSF()
