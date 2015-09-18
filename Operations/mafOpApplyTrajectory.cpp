@@ -59,7 +59,7 @@ mafOp(label)
 	m_OpType	= OPTYPE_OP;
 	m_Canundo	= true;
 	m_File		= "";
-	m_FileDir = (mafGetApplicationDirectory() + "/Data/").c_str();
+	m_FileDir = mafGetApplicationDirectory().c_str();
   m_OriginalMatrix = NULL;
   m_VME = NULL;
 }

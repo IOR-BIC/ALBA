@@ -60,9 +60,7 @@ mafVMEManager::mafVMEManager()
   m_LoadingFlag = false;
   m_FileHistoryIdx = -1;
 
-  mafString msfDir = mafGetApplicationDirectory().c_str();
-  msfDir.ParsePathName();
-	m_MSFDir   = msfDir;
+	m_MSFDir   = mafGetDocumentsDirectory().c_str();;
 	m_MSFFile  = "";
 	m_ZipFile  = "";
   m_TmpDir   = "";
@@ -182,7 +180,7 @@ void mafVMEManager::RemoveTempDirectory()
   if (m_TmpDir != "")
   {
     wxString working_dir;
-    working_dir = mafGetApplicationDirectory().c_str();
+    working_dir = mafGetAppDataDirectory().c_str();
     wxSetWorkingDirectory(working_dir);
     if(::wxDirExists(m_TmpDir)) //remove tmp directory due to zip extraction or compression
     {

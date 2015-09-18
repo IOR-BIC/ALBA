@@ -60,7 +60,7 @@ mafOp(label)
 	m_OpType	= OPTYPE_IMPORTER;
 	m_Canundo	= true;
 	m_File		= "";
-	m_FileDir = (mafGetApplicationDirectory() + "/Data/External/").c_str();
+	m_FileDir = mafGetDocumentsDirectory().c_str();
 	
 	m_VmeCloud		= NULL;
   m_Start = 1;

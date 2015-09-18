@@ -20,6 +20,7 @@
 #include "mafIncludeWX.h"
 #include "mmuIdFactory.h"
 #include <math.h>
+#include "wx\stdpaths.h"
 
 MAF_ID_IMP(REMOTE_COMMAND_CHANNEL)
 
@@ -139,15 +140,33 @@ std::string mafGetSaveFile(const char * initial, const char * wild, const char *
 std::string mafGetApplicationDirectory()
 //----------------------------------------------------------------------------
 {
-	static wxString app_dir = "";
-	if (app_dir == "")
-	{
-		wxString cd = wxGetCwd();
-		wxSetWorkingDirectory("..");
-		app_dir = wxGetCwd();
-		wxSetWorkingDirectory(cd);
-	}
-	return app_dir.c_str();
+  static wxString app_dir = "";
+
+  wxString cd = wxGetCwd();
+  wxSetWorkingDirectory("..");
+  app_dir = wxGetCwd();
+  wxSetWorkingDirectory(cd);
+
+  return app_dir.c_str();
+}
+//----------------------------------------------------------------------------
+std::string mafGetAppDataDirectory()
+//----------------------------------------------------------------------------
+{
+  //getting user app directory
+  wxStandardPaths std_paths;
+  wxString appData_dir=std_paths.GetUserDataDir();
+
+  return appData_dir.c_str();
+}
+//----------------------------------------------------------------------------
+std::string mafGetDocumentsDirectory()
+//----------------------------------------------------------------------------
+{
+  //getting the Documents directory
+  wxString home_dir =  wxGetHomeDir();
+
+  return home_dir+"\\Documents";
 }
 //----------------------------------------------------------------------------
 bool IsRemote(mafString filename, mafString &protocol_used)

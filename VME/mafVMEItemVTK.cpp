@@ -117,7 +117,7 @@ void mafVMEItemVTK::DeepCopyVmeLarge(mafVMEItem *a)
 
       vtk_item->ReleaseData();
 
-      mafString filename = wxGetCwd();
+      mafString filename = mafGetAppDataDirectory().c_str();
       filename<<"/TMP.vtk";
       mafLogMessage("<<<<<Creating temp file : %s",filename);
       this->ReadData(filename);

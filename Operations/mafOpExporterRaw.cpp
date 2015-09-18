@@ -62,7 +62,7 @@ mafOp(label)
 	m_SingleFile = 1;
 	m_Offset = 0;
 
-	m_ProposedDirectory = "";//mafGetApplicationDirectory().c_str();
+  m_ProposedDirectory = mafGetDocumentsDirectory().c_str();
 }
 //----------------------------------------------------------------------------
 mafOpExporterRAW::~mafOpExporterRAW()
@@ -275,8 +275,7 @@ void mafOpExporterRAW::SaveVolume()
 			if(!m_TestMode)
 			{
 				//saving the z coordinates in a file
-				wxString proposed = mafGetApplicationDirectory().c_str();
-				proposed += _("/Data/External/");
+        wxString proposed = mafGetDocumentsDirectory().c_str();
 				proposed += _("Z_coordinates_");
 				proposed += m_Input->GetName();
 				proposed += _(".txt");
@@ -364,8 +363,7 @@ void mafOpExporterRAW::SaveVolume()
 			if(!m_TestMode)
 			{
 				//saving the z coordinates in a file
-				wxString proposed = mafGetApplicationDirectory().c_str();
-				proposed += _("/Data/External/");
+        wxString proposed = mafGetDocumentsDirectory().c_str();
 				proposed += _("Z_coordinates_");
 				proposed += m_Input->GetName();
 				proposed += _(".txt");

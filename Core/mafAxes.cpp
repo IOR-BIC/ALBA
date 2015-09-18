@@ -126,7 +126,6 @@ mafAxes::mafAxes(vtkRenderer *ren, mafVME* vme, int axesType)
 
 		wxString headABSFileName = m_GlobalAxesHeadActor->GetHeadABSFileName().c_str();
 
-		wxString cwd = wxGetCwd().c_str();
 		std::ostringstream stringStream;
 		stringStream << "Head ABS file name: " << headABSFileName.c_str() << std::endl;          
 		
