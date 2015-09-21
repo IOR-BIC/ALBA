@@ -34,8 +34,6 @@ void mafViewCTTest::CreateDestroyTest()
 {
   mafViewCT *ctView = new mafViewCT();
   ctView->Delete();
-   
-  CPPUNIT_ASSERT(true);
 }
 
   

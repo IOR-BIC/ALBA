@@ -34,8 +34,6 @@ void mafView3DTest::CreateDestroyTest()
 {
   mafView3D *view3D = new mafView3D();
   view3D->Delete();
-   
-  CPPUNIT_ASSERT(true);
 }
 
   

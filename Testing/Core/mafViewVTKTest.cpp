@@ -29,9 +29,6 @@ void mafViewVTKTest::CreateDestroyTest()
 {
   mafViewVTK *View=new mafViewVTK();
   View->Delete();
-   
-  CPPUNIT_ASSERT(true);
- 
 }
 //-------------------------------------------------------------------------
 void mafViewVTKTest::Surface()
@@ -40,7 +37,4 @@ void mafViewVTKTest::Surface()
   mafViewVTK *View=new mafViewVTK();
 	View->PlugVisualPipe("mafVMESurface","mafPipeSurface");
   View->Delete();
-   
-  CPPUNIT_ASSERT(true);
- 
 }

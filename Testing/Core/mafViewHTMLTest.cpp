@@ -38,8 +38,6 @@ void mafViewHTMLTest::CreateDestroyTest()
   mafViewHTML *htmlView = new mafViewHTML();
   htmlView->Delete();
    
-  CPPUNIT_ASSERT(true);
- 
 }
 //-------------------------------------------------------------------------
 void mafViewHTMLTest::VmeShowTest()
@@ -49,10 +47,6 @@ void mafViewHTMLTest::VmeShowTest()
   htmlView->Create(); 
  
   htmlView->Delete();
-   
-
-  CPPUNIT_ASSERT(true);
- 
 }
 
   

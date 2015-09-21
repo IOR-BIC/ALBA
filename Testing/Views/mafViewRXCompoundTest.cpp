@@ -35,7 +35,4 @@ void mafViewRXCompoundTest::CreateDestroyTest()
   mafViewRXCompound *rxcView = new mafViewRXCompound();
   rxcView->PackageView();
   rxcView->Delete();
-   
-  CPPUNIT_ASSERT(true);
- 
 }

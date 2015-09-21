@@ -36,7 +36,4 @@ void mafViewSliceOnCurveCompoundTest::CreateDestroyTest()
 
   socView->PackageView();
   socView->Delete();;
-
-  CPPUNIT_ASSERT(true);
-
 }

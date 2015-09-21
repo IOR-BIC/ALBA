@@ -135,7 +135,6 @@ void mafInteractor6DOFTest::TestUpdateDeltaTransform()
 	// mostly a test for leaks...
 	interactor->UpdateDeltaTransform();
 	
-	CPPUNIT_ASSERT(true);
 	cppDEL(interactor);
 }
 
