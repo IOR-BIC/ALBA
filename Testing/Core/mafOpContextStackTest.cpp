@@ -26,10 +26,8 @@ void mafOpContextStackTest::TestDynamicAllocation()
 {
   mafOpContextStack *cs=new mafOpContextStack();
   delete cs;
-   
-  CPPUNIT_ASSERT(true);
- 
 }
+
 //-------------------------------------------------------------------------
 void mafOpContextStackTest::Test_Caller_Clear_Push_Pop()
 //-------------------------------------------------------------------------

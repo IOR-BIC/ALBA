@@ -55,7 +55,6 @@ void mafVMEScalarMatrixTest::TestVMEScalarFactory()
   mafVMEScalarMatrix *scalar = mafVMEScalarMatrix::SafeDownCast(mafVMEFactory::CreateInstance("mafVMEScalarMatrix"));
   scalar->SetData(in_data,0.0);
   scalar->Delete();
-  CPPUNIT_ASSERT(true);
 }
 //----------------------------------------------------------------------------
 void mafVMEScalarMatrixTest::TestCopyVMEScalar()

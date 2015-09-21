@@ -34,8 +34,6 @@ void mafViewSingleSliceTest::CreateDestroyTest()
 {
   mafViewSingleSlice *ssView = new mafViewSingleSlice();
   ssView->Delete();
-   
-  CPPUNIT_ASSERT(true);
 }
 
   

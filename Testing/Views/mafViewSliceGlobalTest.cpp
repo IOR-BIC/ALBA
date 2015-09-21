@@ -32,8 +32,4 @@ void mafViewSliceGlobalTest::CreateDestroyTest()
 {
   mafViewSliceGlobal *view = new mafViewSliceGlobal();  
   view->Delete();
-   
-  //check leaks
-  CPPUNIT_ASSERT(true);
- 
 }

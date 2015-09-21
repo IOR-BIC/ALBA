@@ -35,7 +35,4 @@ void mafViewSingleSliceCompoundTest::CreateDestroyTest()
   mafViewSingleSliceCompound *sscView = new mafViewSingleSliceCompound();
   sscView->PackageView();
   sscView->Delete();
-   
-  CPPUNIT_ASSERT(true);
- 
 }
