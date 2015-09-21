@@ -41,10 +41,8 @@ mafOp(label)
 	m_Vme			= NULL;
 	this->m_DictionaryAvailable = 0;
 
-	m_FileDir = mafGetApplicationDirectory().c_str(); 
-  m_FileDir +=  "/Data/External/";
-	m_DictDir = mafGetApplicationDirectory().c_str();
-  m_DictDir += "/Config/Dictionary/";
+	m_FileDir = mafGetDocumentsDirectory().c_str();
+	m_DictDir = mafGetDocumentsDirectory().c_str();
 }
 //----------------------------------------------------------------------------
 mafOpImporterC3D::~mafOpImporterC3D( ) 

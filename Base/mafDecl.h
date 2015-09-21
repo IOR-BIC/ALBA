@@ -479,6 +479,12 @@ MAF_EXPORT wxBitmap mafRedScale(wxBitmap bmp);
 /** return the application start-up directory */
 MAF_EXPORT std::string  mafGetApplicationDirectory();
 
+/** return the WorkingData directory */
+MAF_EXPORT std::string  mafGetAppDataDirectory();
+
+/** return the Documents directory */
+MAF_EXPORT std::string mafGetDocumentsDirectory();
+
 /** translate an event-id into a readable string */
 MAF_EXPORT std::string  mafIdString(int id);
 

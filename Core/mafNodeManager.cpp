@@ -50,8 +50,7 @@ mafNodeManager::mafNodeManager()
 //@@	m_storage   = NULL;
 	m_Root          = NULL;
 
-	m_MsfDir   = mafGetApplicationDirectory().c_str();
-  m_MsfDir   += "/Data/MSF/";
+  m_MsfDir   = mafGetDocumentsDirectory().c_str();
 	m_MsfFile   = "";
 	m_ZipFile   = "";
 	m_MergeFile = "";

@@ -2583,7 +2583,7 @@ void mafVMEWrappedMeter::SaveInFile()
 //-------------------------------------------------------------------------
 {
 	/*mafString initialFileName;
-	initialFileName = mafGetApplicationDirectory().c_str();
+	initialFileName = mafGetDocumentsDirectory().c_str();
 	initialFileName.Append("\\WrapperMeter.txt");
 
 	mafString wildc = "configuration file (*.txt)|*.txt";

@@ -96,7 +96,7 @@ void mafOpClassicICPRegistration::CreateGui()
 //----------------------------------------------------------------------------
 {
 	wxString wildcard = _("Report log (*.log)|*.log");
-	wxString dir = (mafGetApplicationDirectory() + _("/data/reports/")).c_str();
+	wxString dir = mafGetAppDataDirectory().c_str();
 	if(!wxDirExists(dir)) dir = "";
 	m_ReportFilename = dir + _("report.log");
 	

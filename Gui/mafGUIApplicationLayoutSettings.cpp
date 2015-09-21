@@ -236,7 +236,7 @@ void mafGUIApplicationLayoutSettings::InitializeSettings()
   }
   else
   {
-    wxString layout_dir  = mafGetApplicationDirectory().c_str();
+    wxString layout_dir  = mafGetAppDataDirectory().c_str();
     layout_dir << "\\Layout\\layout.mly";
     m_Config->Write("DefaultLayoutFile", layout_dir);
     m_Config->Flush();
