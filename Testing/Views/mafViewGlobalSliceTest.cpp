@@ -34,8 +34,6 @@ void mafViewGlobalSliceTest::CreateDestroyTest()
 {
   mafViewGlobalSlice *gsView = new mafViewGlobalSlice();
   gsView->Delete();
-   
-  CPPUNIT_ASSERT(true);
 }
 
   

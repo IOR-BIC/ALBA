@@ -35,8 +35,6 @@ void mafViewGlobalSliceCompoundTest::CreateDestroyTest()
   mafViewGlobalSliceCompound *gloView = new mafViewGlobalSliceCompound();
   gloView->PackageView();
   gloView->Delete();
-   
-  CPPUNIT_ASSERT(true);
 }
 
   

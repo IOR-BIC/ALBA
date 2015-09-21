@@ -125,7 +125,6 @@ void mafInteractorPERTest::TestOnEvent()
 
   mip->OnEvent(&dummyMouse2DMoveEvent);
   mip->Delete();
-  CPPUNIT_ASSERT(true); 
 }
 
 void mafInteractorPERTest::TestOnVmeSelected()
@@ -202,8 +201,6 @@ void mafInteractorPERTest::TestLinkCameraAdd()
   mip->LinkCameraAdd(dummyCamera);
   dummyCamera->Delete();
   mip->Delete();
-
-  CPPUNIT_ASSERT(true);
 }
 
 void mafInteractorPERTest::TestLinkCameraRemove()
@@ -217,7 +214,6 @@ void mafInteractorPERTest::TestLinkCameraRemove()
   dummyCamera->Delete();
   mip->Delete();
 
-  CPPUNIT_ASSERT(true);
 }
 
 void mafInteractorPERTest::TestLinkCameraRemoveAll()
@@ -235,9 +231,6 @@ void mafInteractorPERTest::TestLinkCameraRemoveAll()
   dummyCamera2->Delete();
   dummyCamera->Delete();
   mip->Delete();
-
-  CPPUNIT_ASSERT(true);
-
 }
 
 void mafInteractorPERTest::TestGetCameraMouseInteractor()
@@ -249,8 +242,6 @@ void mafInteractorPERTest::TestGetCameraMouseInteractor()
   CPPUNIT_ASSERT(interactor->GetDevice() == NULL);
 
   mip->Delete();
-
-  CPPUNIT_ASSERT(true);
 }
 
 void mafInteractorPERTest::TestGetCameraInteractor()

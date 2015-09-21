@@ -78,8 +78,6 @@ void mafDeviceClientMAFTest::TestSendMessageToServer()
   mafString dummyMessage = "dummy";
   dummyDevice->SendMessageToServer(dummyMessage);
 
-  CPPUNIT_ASSERT(true);
-
   dummyDevice->Delete();
 }
 //----------------------------------------------------------------------------
@@ -114,8 +112,6 @@ void mafDeviceClientMAFTest::TestStop()
   CPPUNIT_ASSERT(dummyDevice);
 
   dummyDevice->Stop();
-  CPPUNIT_ASSERT(true);
-
   dummyDevice->Delete();  
 }
 //----------------------------------------------------------------------------
@@ -140,8 +136,6 @@ void mafDeviceClientMAFTest::TestOnEvent()
   mafEventBase *dummyEvent = new mafEventBase(this, ID_NO_EVENT);
 
   dummyDevice->OnEvent(dummyEvent);
-
-  CPPUNIT_ASSERT(true);
 
   dummyDevice->Delete();
   cppDEL(dummyEvent);

@@ -209,8 +209,6 @@ void mafVMEGizmoTest::TestGizmoCreateAndDestroy()
   sphere->Delete();  // data is deleted by the gizmo.
   
   gizmo->Delete();
-
-  CPPUNIT_ASSERT(true);
 }
 //----------------------------------------------------------------------------
 void mafVMEGizmoTest::TestGizmoVisualizatioAlone()

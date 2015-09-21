@@ -35,8 +35,6 @@ void mafViewArbitrarySliceTest::CreateDestroyTest()
   mafViewArbitrarySlice *arbView = new mafViewArbitrarySlice();
   arbView->PackageView();
   arbView->Delete();
-   
-  CPPUNIT_ASSERT(true);
 }
 
   
