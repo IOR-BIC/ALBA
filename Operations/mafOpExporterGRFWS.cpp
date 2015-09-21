@@ -194,8 +194,7 @@ void mafOpExporterGRFWS::OpDo()
   // INPUT is a VECTOR:
   if (m_Input->IsA("mafVMEVector"))
   {
-    wxString proposed = mafGetApplicationDirectory().c_str();
-    proposed += "/Data/External/";
+    wxString proposed = mafGetDocumentsDirectory().c_str();
     proposed += m_Input->GetName();
     proposed += "_VECTOR";
     proposed += ".csv";
@@ -220,8 +219,7 @@ void mafOpExporterGRFWS::OpDo()
   // INPUT is a FORCE PLATE: Load and Execute 
   else if (m_ForceLeft && m_ForceRight && m_MomentLeft && m_MomentRight)
   {
-    wxString proposed = mafGetApplicationDirectory().c_str();
-    proposed += "/Data/External/";
+    wxString proposed = mafGetDocumentsDirectory().c_str();
     proposed += m_Input->GetName();
     proposed += "_FORCEPLATES";
     proposed += ".csv";

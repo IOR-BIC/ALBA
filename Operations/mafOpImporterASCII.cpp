@@ -53,7 +53,7 @@ mafOp(label)
 
   m_ScalarOrder = 1;
 
-  m_FileDir = "";//mafGetApplicationDirectory().c_str();
+  m_FileDir = mafGetDocumentsDirectory().c_str();
   m_ScalarData = NULL;
   m_ReadyToExecute = false;
 }

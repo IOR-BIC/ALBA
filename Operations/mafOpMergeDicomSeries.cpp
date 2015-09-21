@@ -94,7 +94,7 @@ void mafOpMergeDicomSeries::OpRun()
 
 			if (lastDicomDir == "UNEDFINED_m_LastDicomDir")
 			{
-				wxString defaultPath = (mafGetApplicationDirectory()+"/data/external/").c_str();
+				wxString defaultPath = mafGetDocumentsDirectory().c_str();
 				lastDicomDir = defaultPath;		
 			};
 			wxDirDialog dialog(NULL,"", lastDicomDir,wxRESIZE_BORDER,wxDefaultPosition);
