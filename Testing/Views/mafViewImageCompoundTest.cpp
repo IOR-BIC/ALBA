@@ -35,7 +35,4 @@ void mafViewImageCompoundTest::CreateDestroyTest()
   mafViewImageCompound *icView = new mafViewImageCompound();
   icView->PackageView();
   icView->Delete();
-   
-  CPPUNIT_ASSERT(true);
- 
 }

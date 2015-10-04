@@ -59,7 +59,7 @@ mafOpImporterRAWVolume::mafOpImporterRAWVolume(const wxString &label) : mafOp(la
 {
 	m_OpType			= OPTYPE_IMPORTER;
 	m_Canundo			= true;
-	m_RawFile			= mafGetApplicationDirectory().c_str();
+	m_RawFile			= mafGetDocumentsDirectory().c_str();
 	m_VolumeGray	= NULL;
   m_VolumeRGB   = NULL;
   m_GuiSlider   = NULL;
@@ -294,8 +294,7 @@ void mafOpImporterRAWVolume::	OnEvent(mafEventBase *maf_event)
       break;
 	    case ID_COORD:
 			{
-				wxString dir = mafGetApplicationDirectory().c_str();
-				dir += _("/Data/External");
+				wxString dir = mafGetDocumentsDirectory().c_str();
 				wxString wildc =_("Z_coordinates (*.txt)|*.txt");
 				wxString file = mafGetOpenFile(dir,wildc,_("Open Z coordinates file")).c_str();
 				if(!file.IsEmpty())
@@ -467,7 +466,6 @@ bool mafOpImporterRAWVolume::Import()
   reader->SetDataVOI(0, m_DataDimemsion[0] - 1, 0, m_DataDimemsion[1] - 1, m_SliceVOI[0], m_SliceVOI[1] - 1);
   if(!this->m_TestMode)
 	{
-		mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
 		mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,reader));
 	}
 //  reader->SetDataVOI(0, m_DataDimemsion[0] - 1, 0, m_DataDimemsion[1] - 1, 0, m_SliceVOI[1] - m_SliceVOI[0] - 1);
@@ -582,8 +580,6 @@ bool mafOpImporterRAWVolume::Import()
   m_Output->SetName(name.c_str());
   m_Output->GetTagArray()->SetTag(tag_Nature);
   m_Output->ReparentTo(m_Input);
-	if(!m_TestMode)
-		mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
 	return true;
 }
 //----------------------------------------------------------------------------

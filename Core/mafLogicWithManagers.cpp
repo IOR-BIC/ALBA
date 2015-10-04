@@ -1181,8 +1181,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 					mafString msfFilename = m_VMEManager->GetFileName();
 					if (msfFilename.IsEmpty())
 					{
-						mafString dirName = mafGetApplicationDirectory().c_str();
-						dirName << "\\data\\msf\\";
+						mafString dirName = mafGetDocumentsDirectory().c_str();
 
 						m_VMEManager->SetDirName(dirName);
 						this->OnFileSaveAs();

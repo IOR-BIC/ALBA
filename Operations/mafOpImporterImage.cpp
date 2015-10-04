@@ -40,6 +40,7 @@
 #include "vtkTIFFReader.h"
 
 #include <algorithm>
+#include "mafProgressBarHelper.h"
 
 //----------------------------------------------------------------------------
 // Global Function (locale to this file) to sort the filenames
@@ -84,7 +85,7 @@ mafOp(label)
   m_ImportedImage = NULL;
   m_ImportedImageAsVolume = NULL;
 
-  m_FileDirectory = "";//mafGetApplicationDirectory().c_str();
+  m_FileDirectory = mafGetDocumentsDirectory().c_str();
 }
 //----------------------------------------------------------------------------
 mafOpImporterImage::~mafOpImporterImage()
@@ -242,15 +243,14 @@ void mafOpImporterImage::BuildImageSequence()
     std::sort(m_Files.begin(),m_Files.end());
 
 	mafTimeStamp start_time = ((mafVME *)m_Input->GetRoot())->GetTimeStamp();
-  long progress_value = 0;
-  mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
+	
+	mafProgressBarHelper progressHelper(m_Listener);
+	progressHelper.SetTextMode(m_TestMode);
+	progressHelper.InitProgressBar();
+
   for(int i=0; i<m_NumFiles; i++)
 	{
-    if (mafFloatEquals(fmod(i,10.0f),0.0f))
-    {
-      progress_value = (i*100)/m_NumFiles;
-      mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress_value));
-    }
+    progressHelper.UpdateProgressBar((i*100)/m_NumFiles);
 
     wxSplitPath(m_Files[i].c_str(),&path,&name,&ext);
 		ext.MakeUpper();
@@ -295,8 +295,6 @@ void mafOpImporterImage::BuildImageSequence()
     m_ImportedImage->SetName("Imported Images");
   else
     m_ImportedImage->SetName(name);
-
-  mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
 
   m_ImportedImage->SetTimeStamp(start_time);
   m_ImportedImage->ReparentTo(m_Input);

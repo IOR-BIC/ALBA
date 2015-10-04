@@ -56,6 +56,7 @@ using namespace std;
 #include "mafVMESurface.h"
 #include "mafVMEOutput.h"
 #include "mafTagArray.h"
+#include "mafProgressBarHelper.h"
 
 
 //----------------------------------------------------------------------------
@@ -402,17 +403,13 @@ int mafOpComputeInertialTensor::ComputeLocalInertialTensor(mafNode* node, int cu
   }
 
   // wx stuff
-  wxBusyInfo *wait;
   wxString str("Computing inertial tensor: surface ");
   str << current_node << "/" << n_of_nodes;
-  mafString s(str.c_str());
-  if(!m_TestMode)
-  {
-    wxSetCursor(wxCursor(wxCURSOR_WAIT));
-    wait = new wxBusyInfo("Computing inertial tensor components...");
-    mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
-    mafEventMacro(mafEvent(this,PROGRESSBAR_SET_TEXT,&s));
-  }
+
+	mafProgressBarHelper progressHelper(m_Listener);
+	progressHelper.SetTextMode(m_TestMode);
+	progressHelper.InitProgressBar("Computing inertial tensor components...");
+	progressHelper.SetBarText(str);
 
   // initialize variables
   int pId, qId, rId;
@@ -495,11 +492,7 @@ int mafOpComputeInertialTensor::ComputeLocalInertialTensor(mafNode* node, int cu
       lit._zx += vol * (z1*x1 + z2*x2 + z3*x3 + z4*x4);
       lit._zy += vol * (z1*y1 + z2*y2 + z3*y3 + z4*y4);
 
-      if (!m_TestMode)
-      {
-        mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)(((double) i)/((double) ncells)*100.)));
-      }
-
+			progressHelper.UpdateProgressBar(((double) i)/((double) ncells)*100.);
     } // end foreach triangle
   }// end foreach cell
 
@@ -524,13 +517,6 @@ int mafOpComputeInertialTensor::ComputeLocalInertialTensor(mafNode* node, int cu
 
 	m_LocalInertiaTensors.push_back(lit);
 
-	if(!m_TestMode)
-	{
-		mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
-		wxSetCursor(wxCursor(wxCURSOR_DEFAULT));
-		cppDEL(wait);
-	}
-	
 	return OP_RUN_OK;
 }
 //----------------------------------------------------------------------------

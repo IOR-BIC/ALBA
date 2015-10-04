@@ -42,6 +42,7 @@
 #include "vtkStructuredPoints.h"
 #include "vtkPolyData.h"
 #include "mafVMEGroup.h"
+#include "mafProgressBarHelper.h"
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafOpExporterVTK);
 //----------------------------------------------------------------------------
@@ -59,7 +60,7 @@ mafOp(label)
 	m_Binary        = 1;
 	m_ABSMatrixFlag = 0;
 
-	m_FileDir = "";//mafGetApplicationDirectory().c_str();
+	m_FileDir = mafGetDocumentsDirectory().c_str();
   m_ForceUnsignedShortScalarOutputForStructuredPoints = FALSE;
 }
 //----------------------------------------------------------------------------
@@ -200,19 +201,10 @@ void mafOpExporterVTK::ExportVTK()
 void mafOpExporterVTK::SaveVTKData()
 //----------------------------------------------------------------------------
 {
-  wxBusyCursor *busyCursor = NULL;
-
-  if (m_TestMode == false)
-  {
-    busyCursor = new wxBusyCursor();
-  }
-  else 
-  {
-    std::ostringstream stringStream;
-    stringStream << "cannot render busy cursor..."  << std::endl;
-    mafLogMessage(stringStream.str().c_str());
-  }
-
+	mafProgressBarHelper progressHelper(m_Listener);
+	progressHelper.SetTextMode(m_TestMode);
+	progressHelper.InitProgressBar();
+ 
   vtkDataSet *inputData = ((mafVME *)m_Input)->GetOutput()->GetVTKData();
   assert(inputData);
 
@@ -251,21 +243,13 @@ void mafOpExporterVTK::SaveVTKData()
     writer->SetFileTypeToBinary();
   else
     writer->SetFileTypeToASCII();
-  mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
 
   // workaround code:  this is not working so I'm setting a dummy 50/100 progress value 
   // mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR, writer));
   long dummyProgressValue = 50;
   
-  mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,dummyProgressValue));
+  progressHelper.UpdateProgressBar(dummyProgressValue);
 
   writer->SetFileName(m_File.GetCStr());
   writer->Write();
-  
-  mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
-
-  if (busyCursor)
-  {
-    delete busyCursor;
-  }
 }

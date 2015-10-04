@@ -38,7 +38,4 @@ void mafViewOrthoSliceTest::CreateDestroyTest()
   mafViewOrthoSlice *rxctView = new mafViewOrthoSlice();
   rxctView->PackageView();
   rxctView->Delete();
-   
-  CPPUNIT_ASSERT(true);
- 
 }

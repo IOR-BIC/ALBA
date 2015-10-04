@@ -56,6 +56,7 @@ const bool DEBUG_MODE = true;
 #include "mafOpImporterDicomOffis.h"
 #include "vtkDirectory.h"
 #include "wx/busyinfo.h"
+#include "mafProgressBarHelper.h"
 
 mafDicomCardiacMRIHelper::mafDicomCardiacMRIHelper()
 {
@@ -179,31 +180,16 @@ int mafDicomCardiacMRIHelper::ParseDicomDirectory()
   vnl_matrix<double> imageSize(timeFrames*planesPerFrame, 2, 0.0);
   vnl_matrix<double> frame(timeFrames*planesPerFrame, 1, 0.0);
 
-  wxBusyInfo *busyInfo = NULL;
   wxString busyMessage = "Cardiac MRI Found, please wait for reader initialization...";
-  time_t start,end;
   
-  wxBusyCursor *busyCursor = NULL; 
-  if (!m_TestMode)
-  {
-    busyCursor = new wxBusyCursor();
-	mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
-  }
+	mafProgressBarHelper progressHelper(m_Listener);
+	progressHelper.SetTextMode(m_TestMode);
+	progressHelper.InitProgressBar(busyMessage);
 
   long progress = 0;
   
   for (int i = 0; i < timeFrames*planesPerFrame; i++) 
   {
-	  time(&start);	
-
-    if (!m_TestMode)
-    {
-      if (busyInfo == NULL)
-      {
-        busyInfo = new wxBusyInfo(busyMessage);
-      }
-    }
-  
     wxString currentSliceABSFileName = dicomABSFileNamesVector[i].c_str();
 
 	  std::ostringstream stringStream;
@@ -263,21 +249,10 @@ int mafDicomCardiacMRIHelper::ParseDicomDirectory()
 
     frame(i,0) = dcmInstanceNumber;
 
-    time(&end);
 
-    double elapsedTime = difftime(end, start);
-
-    // needed to refresh the busy info
-    if (elapsedTime > 0.5)
-    {
-      if (!m_TestMode)
-      {
-        cppDEL(busyInfo);
-        busyInfo = new wxBusyInfo(busyMessage);
-		    progress = i * 100 / (double) (timeFrames*planesPerFrame);
-		    mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
-      }
-    }
+    progress = i * 100 / (double) (timeFrames*planesPerFrame);
+		progressHelper.UpdateProgressBar(progress);
+    
   }
 
   
@@ -320,12 +295,6 @@ int mafDicomCardiacMRIHelper::ParseDicomDirectory()
     {
       wxMessageBox("ERROR during processing Cardiac MRI");
       vtkDEL(directoryReader);
-
-      mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
-
-      cppDEL(busyCursor);
-      cppDEL(busyInfo);
-
       return MAF_ERROR;
     }
 
@@ -525,11 +494,6 @@ int mafDicomCardiacMRIHelper::ParseDicomDirectory()
       {
         wxMessageBox("ERROR during processing Cardiac MRI");
         vtkDEL(directoryReader);
-
-        mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
-
-        cppDEL(busyCursor);
-        cppDEL(busyInfo);
 
         return MAF_ERROR;
       }
@@ -1146,15 +1110,7 @@ int mafDicomCardiacMRIHelper::ParseDicomDirectory()
   m_Spacing = tmpSpacing;
 
   vtkDEL(directoryReader);
-
-  if (!m_TestMode)
-  {
-	  mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
-
-	  cppDEL(busyCursor);
-	  cppDEL(busyInfo);
-  }
-
+	
   return MAF_OK;
 }
 

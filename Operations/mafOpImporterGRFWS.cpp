@@ -44,6 +44,7 @@
 #include <vtkPolyData.h>
 
 #include <iostream>
+#include "mafProgressBarHelper.h"
 
 #define DELTA 5.0
 
@@ -55,7 +56,7 @@ mafOp(label)
 	m_OpType       	= OPTYPE_IMPORTER;
 	m_Canundo	      = true;
 	m_File		      = "";
-	m_FileDir       = (mafGetApplicationDirectory() + "/Data/External/").c_str();
+	m_FileDir       = mafGetDocumentsDirectory().c_str();
   m_Output        = NULL;
   m_PlatformLeft  = NULL;
   m_PlatformRight = NULL;
@@ -143,11 +144,10 @@ void mafOpImporterGRFWS::Read()
 void mafOpImporterGRFWS::ReadForcePlates()   
 //----------------------------------------------------------------------------
 {
-  if (!m_TestMode)
-  {
-    wxSetCursor(wxCursor(wxCURSOR_WAIT));
-	  mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
-  }
+	mafProgressBarHelper progressHelper(m_Listener);
+	progressHelper.SetTextMode(m_TestMode);
+	progressHelper.InitProgressBar();
+
 
   wxString path, name, ext;
   wxSplitPath(m_File.c_str(),&path,&name,&ext);
@@ -449,10 +449,8 @@ void mafOpImporterGRFWS::ReadForcePlates()
     }
 
     count++;
-    if (!m_TestMode)
-    {
-      mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)(((double) count)/((double) totlines)*100.)));
-    }
+    progressHelper.UpdateProgressBar(((double) count)/((double) totlines)*100.);
+    
 
   }while (!inputFile.Eof());
 
@@ -474,12 +472,6 @@ void mafOpImporterGRFWS::ReadForcePlates()
     m_MomentRight->ReparentTo(m_PlatformRight);
   }
 
-  if (!m_TestMode)
-  {
-    mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
-    wxSetCursor(wxCursor(wxCURSOR_DEFAULT));
-  }
-
   m_Output = m_Group;
   m_Output->ReparentTo(m_Input);
 }
@@ -487,11 +479,9 @@ void mafOpImporterGRFWS::ReadForcePlates()
 void mafOpImporterGRFWS::ReadSingleVector()   
 //----------------------------------------------------------------------------
 {
-  if (!m_TestMode)
-  {
-    wxSetCursor(wxCursor(wxCURSOR_WAIT));
-	  mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
-  }
+	mafProgressBarHelper progressHelper(m_Listener);
+	progressHelper.SetTextMode(m_TestMode);
+	progressHelper.InitProgressBar();
 
   wxString path, name, ext;
   wxSplitPath(m_File.c_str(),&path,&name,&ext);
@@ -604,18 +594,10 @@ void mafOpImporterGRFWS::ReadSingleVector()
     }
 
     count++;
-    if (!m_TestMode)
-    {
-      mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)(((double) count)/((double) totlines)*100.)));
-    }
+    progressHelper.UpdateProgressBar(((double) count)/((double) totlines)*100.);
+    
 
   }while (!inputFile.Eof());
-
-  if (!m_TestMode)
-  {
-    mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
-    wxSetCursor(wxCursor(wxCURSOR_DEFAULT));
-  }
 
   m_Output = m_ForceLeft;
   m_Output->ReparentTo(m_Input);

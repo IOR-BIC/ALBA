@@ -72,7 +72,7 @@ void mafOpImporterMSF::OpRun()
 {
   if (!m_TestMode)
   {
-    mafString fileDir = "";//mafGetApplicationDirectory().c_str();
+    mafString fileDir = mafGetDocumentsDirectory().c_str();
     mafString wildc  = _("MAF Storage Format file (*.msf)|*.msf|Compressed file (*.zmsf)|*.zmsf");
     m_File = mafGetOpenFile(fileDir, wildc, _("Choose MSF file")).c_str();
   }
@@ -174,7 +174,7 @@ const char *mafOpImporterMSF::ZIPOpen(mafString m_File)
   mafString zip_cache = wxPathOnly(m_File.GetCStr());
   if (zip_cache.IsEmpty())
   {
-    zip_cache = ::wxGetCwd();
+    zip_cache = mafGetAppDataDirectory().c_str();
   }
   zip_cache = zip_cache + "\\~TmpData";
   if (!wxDirExists(zip_cache.GetCStr()))
@@ -294,7 +294,7 @@ void mafOpImporterMSF::RemoveTempDirectory()
   if (m_TmpDir != "")
   {
     wxString working_dir;
-    working_dir = mafGetApplicationDirectory().c_str();
+    working_dir = mafGetAppDataDirectory().c_str();
     wxSetWorkingDirectory(working_dir);
     //remove tmp directory due to zip extraction or compression
     if(::wxDirExists(m_TmpDir))

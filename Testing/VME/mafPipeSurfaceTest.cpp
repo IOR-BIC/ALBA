@@ -62,10 +62,11 @@ enum PIPE_SURFACE_ACTORS
 enum TESTS_PIPE_SURFACE
 {
   BASE_TEST,
-  EDGE_TEST,
-  NORMAL_TEST,
+	WIREFRAME_TEST,
+  CELL_NORMAL_TEST,
   SCALAR_TEST,
   VTK_PROPERTY_TEST,
+	EDGE_TEST,
   NUMBER_OF_TEST,
 };
 
@@ -140,73 +141,60 @@ void mafPipeSurfaceTest::TestPipeExecution()
   
   ////////// ACTORS List ///////////////
   vtkPropCollection *actorList = vtkPropCollection::New();
-  pipeSurface->GetAssemblyFront()->GetActors(actorList);
-  
-  actorList->InitTraversal();
-  vtkProp *actor = actorList->GetNextProp();
-  while(actor)
-  {   
-    m_Renderer->AddActor(actor);
-    m_RenderWindow->Render();
 
-    actor = actorList->GetNextProp();
-  }
-	
 	const char *strings[NUMBER_OF_TEST];
 	strings[0] = "BASE_TEST";
-	strings[1] = "EDGE_TEST";
-	strings[2] = "NORMAL_TEST";
+	strings[1] = "WIREFRAME_TEST";
+	strings[2] = "CELL_NORMAL_TEST";
 	strings[3] = "SCALAR_TEST";
 	strings[4] = "VTK_PRPOERTY_TEST";
-
+	strings[5] = "EDGE_TEST";
+	
   for(int i=0;i<NUMBER_OF_TEST;i++)
   {
-    if(i == EDGE_TEST)
-    {
-      pipeSurface->SetEdgeVisibilityOn();
-      pipeSurface->OnEvent(&mafEvent(this, mafPipeSurface::ID_EDGE_VISIBILITY));
+		switch ((TESTS_PIPE_SURFACE) i)
+		{
+		case BASE_TEST:
+			break;
+		case WIREFRAME_TEST:
+				pipeSurface->SetWireframeOn();
+				pipeSurface->OnEvent(&mafEvent(this, mafPipeSurface::ID_WIREFRAME));
+			break;
+		case CELL_NORMAL_TEST:
+				pipeSurface->SetNormalsTypeToCells();
+				pipeSurface->OnEvent(&mafEvent(this, mafPipeSurface::ID_NORMALS_TYPE));
+			break;
+		case SCALAR_TEST:
+				pipeSurface->SetScalarMapActive(true);
+				pipeSurface->OnEvent(&mafEvent(this, mafPipeSurface::ID_SCALAR_MAP_ACTIVE));
+			break;
+		case VTK_PROPERTY_TEST:
+				pipeSurface->SetUseVTKProperty(true);
+				pipeSurface->OnEvent(&mafEvent(this, mafPipeSurface::ID_USE_VTK_PROPERTY));
+			break;
+		case EDGE_TEST:
+				pipeSurface->SetEdgesVisibilityOn();
+				pipeSurface->OnEvent(&mafEvent(this, mafPipeSurface::ID_EDGE_VISIBILITY));
+			break;
+		default:
+			break;
+		}
+		
+		
+		//Updating Actor Lists
+		pipeSurface->GetAssemblyFront()->GetActors(actorList);
+   
+		actorList->InitTraversal();
+		vtkProp *actor = actorList->GetNextProp();
+		m_Renderer->RemoveAllProps();
+		while(actor)
+		{   
+			m_Renderer->AddActor(actor);
+			actor = actorList->GetNextProp();
+		}
 
-      pipeSurface->GetAssemblyFront()->GetActors(actorList);
-  
-      actorList->InitTraversal();
-      vtkProp *actor = actorList->GetNextProp();
-      while(actor)
-      {   
-        m_Renderer->AddActor(actor);
-        m_RenderWindow->Render();
 
-        actor = actorList->GetNextProp();
-      }
-
-    }
-    else if(i == NORMAL_TEST)
-    {
-      pipeSurface->SetNormalVisibilityOn();
-      pipeSurface->OnEvent(&mafEvent(this, mafPipeSurface::ID_NORMAL_VISIBILITY));
-      
-      pipeSurface->GetAssemblyFront()->GetActors(actorList);
-  
-      actorList->InitTraversal();
-      vtkProp *actor = actorList->GetNextProp();
-      while(actor)
-      {   
-        m_Renderer->AddActor(actor);
-        m_RenderWindow->Render();
-
-        actor = actorList->GetNextProp();
-      }
-    }
-    else if(i == SCALAR_TEST)
-    {
-      pipeSurface->SetScalarVisibilityOn();
-      pipeSurface->OnEvent(&mafEvent(this, mafPipeSurface::ID_SCALAR_VISIBILITY));
-    }
-    else if(i == VTK_PROPERTY_TEST)
-    {
-      pipeSurface->SetUseVtkPropertyOn();
-      pipeSurface->OnEvent(&mafEvent(this, mafPipeSurface::ID_USE_VTK_PROPERTY));
-    }
-
+		// Rendering - check images 
     vtkActor *surfaceActor;
     surfaceActor = (vtkActor *) SelectActorToControl(actorList, PIPE_SURFACE_ACTOR);
     CPPUNIT_ASSERT(surfaceActor != NULL);
@@ -215,26 +203,37 @@ void mafPipeSurfaceTest::TestPipeExecution()
 	  printf("\n Visualizzazione: %s \n", strings[i]);
     CompareImages(i);
 
-    if(i == EDGE_TEST)
-    {
-      pipeSurface->SetEdgeVisibilityOff();
-      pipeSurface->OnEvent(&mafEvent(this, mafPipeSurface::ID_EDGE_VISIBILITY));
-    }
-    else if(i == NORMAL_TEST)
-    {
-      pipeSurface->SetNormalVisibilityOff();
-      pipeSurface->OnEvent(&mafEvent(this, mafPipeSurface::ID_NORMAL_VISIBILITY));
-    }
-    else if(i == SCALAR_TEST)
-    {
-      pipeSurface->SetScalarVisibilityOff();
-      pipeSurface->OnEvent(&mafEvent(this, mafPipeSurface::ID_SCALAR_VISIBILITY));
-    }
-    else if(i == VTK_PROPERTY_TEST)
-    {
-      pipeSurface->SetUseVtkPropertyOff();
-      pipeSurface->OnEvent(&mafEvent(this, mafPipeSurface::ID_USE_VTK_PROPERTY));
-    }
+
+		//Reset Pipe
+		switch ((TESTS_PIPE_SURFACE) i)
+		{
+		case BASE_TEST:
+			break;
+		case WIREFRAME_TEST:
+			pipeSurface->SetWireframeOff();
+			pipeSurface->OnEvent(&mafEvent(this, mafPipeSurface::ID_WIREFRAME));
+			break;
+		case CELL_NORMAL_TEST:
+			pipeSurface->SetNormalsTypeToPoints();
+			pipeSurface->OnEvent(&mafEvent(this, mafPipeSurface::ID_NORMALS_TYPE));
+			break;
+		case SCALAR_TEST:
+			pipeSurface->SetScalarMapActive(false);
+			pipeSurface->OnEvent(&mafEvent(this, mafPipeSurface::ID_SCALAR_MAP_ACTIVE));
+			break;
+		case VTK_PROPERTY_TEST:
+			pipeSurface->SetUseVTKProperty(false);
+			pipeSurface->OnEvent(&mafEvent(this, mafPipeSurface::ID_USE_VTK_PROPERTY));
+			break;
+		case EDGE_TEST:
+			pipeSurface->SetEdgesVisibilityOff();
+			pipeSurface->OnEvent(&mafEvent(this, mafPipeSurface::ID_EDGE_VISIBILITY));
+			break;
+		default:
+			break;
+		}
+
+
   }
 
   vtkDEL(actorList);

@@ -43,6 +43,7 @@
 #include "itkVTKImageToImageFilter.h"
 #include "itkBinaryThresholdImageFilter.h"
 #include "itkConnectedThresholdImageFilter.h"
+#include "mafProgressBarHelper.h"
 
 #define round(x) (x<0?ceil((x)-0.5):floor((x)+0.5))
 
@@ -233,21 +234,12 @@ void mafDataPipeCustomSegmentationVolume::ApplyManualSegmentation()
   newScalars->SetName("SCALARS");
   newScalars->SetNumberOfTuples(maskScalar->GetNumberOfTuples());
 
-  long progress = 0;
+	mafProgressBarHelper progressHelper(this->GetVME());
+	progressHelper.InitProgressBar("",false);
 
-  mafEvent e(this,PROGRESSBAR_SHOW);
-  this->GetVME()->ForwardUpEvent(&e);
-
-  int step = ceil((double)maskScalar->GetNumberOfTuples()/100);
-  double invStep = (double)1/step;
   for (int i=0;i<maskScalar->GetNumberOfTuples();i++)
   {
-    if ((i%step) == 0)
-    {
-	    progress = (i*100/maskScalar->GetNumberOfTuples());
-	    mafEvent eUpdate(this,PROGRESSBAR_SET_VALUE,progress);
-	    this->GetVME()->ForwardUpEvent(&eUpdate);
-    }
+    progressHelper.UpdateProgressBar(i*100/maskScalar->GetNumberOfTuples());
 
     if (maskScalar->GetTuple1(i) == 0)
     {
@@ -291,10 +283,6 @@ void mafDataPipeCustomSegmentationVolume::ApplyManualSegmentation()
     m_RG->DeepCopy(newRG);
     m_RG->Update();
   }
-
-  mafEvent eHideProgress(this,PROGRESSBAR_HIDE);
-  this->GetVME()->ForwardUpEvent(&eHideProgress);  
-
 }
 //------------------------------------------------------------------------------
 void mafDataPipeCustomSegmentationVolume::ApplyAutomaticSegmentation()
@@ -315,10 +303,10 @@ void mafDataPipeCustomSegmentationVolume::ApplyAutomaticSegmentation()
     imageData->GetDimensions(volumeDimensions);
   }
 
-  long progress = 0;
+	mafProgressBarHelper progressHelper(this->GetVME());
+	progressHelper.SetTextMode(this->GetVME()->GetTestMode());
+	progressHelper.InitProgressBar("",false);
 
-  mafEvent e(this,PROGRESSBAR_SHOW);
-  this->GetVME()->ForwardUpEvent(&e);
 
   vtkMAFSmartPointer<vtkUnsignedCharArray> newScalars;
   newScalars->SetName("SCALARS");
@@ -329,14 +317,9 @@ void mafDataPipeCustomSegmentationVolume::ApplyAutomaticSegmentation()
 
   for (int i=0;i<volumeDimensions[2];i++)
   {
-    if (i%step == 0)
-    {
-	    progress = (i*100/volumeDimensions[2]);
-	    mafEvent eUpdate(this,PROGRESSBAR_SET_VALUE,progress);
-	    this->GetVME()->ForwardUpEvent(&eUpdate);
-    }
-
-    double localThreshold;
+	  progressHelper.UpdateProgressBar(i*100/volumeDimensions[2]);
+	    
+		double localThreshold;
     double localUpperTheshold;
     bool inRange = false;
     if(m_AutomaticSegmentationThresholdModality == mafVMESegmentationVolume::RANGE)
@@ -426,11 +409,6 @@ void mafDataPipeCustomSegmentationVolume::ApplyAutomaticSegmentation()
     m_RG->DeepCopy(newRG);
     m_RG->Update();
   }
-
-  mafEvent eHideProgress(this,PROGRESSBAR_HIDE);
-  this->GetVME()->ForwardUpEvent(&eHideProgress);
-
-
 }
 //------------------------------------------------------------------------------
 void mafDataPipeCustomSegmentationVolume::ApplyRefinementSegmentation()
@@ -499,21 +477,14 @@ void mafDataPipeCustomSegmentationVolume::ApplyRefinementSegmentation()
   newScalars->SetName("SCALARS");
   newScalars->SetNumberOfTuples(maskScalar->GetNumberOfTuples());
 
-  long progress = 0;
-
-  mafEvent e(this,PROGRESSBAR_SHOW);
-  this->GetVME()->ForwardUpEvent(&e);
+	mafProgressBarHelper progressHelper(this->GetVME());
+	progressHelper.InitProgressBar("",false);
 
   int step = ceil((double)maskScalar->GetNumberOfTuples()/100);
   double invStep = (double)1/step;
   for (int i=0;i<maskScalar->GetNumberOfTuples();i++)
   {
-    if ((i%step) == 0)
-    {
-      progress = (i*100/maskScalar->GetNumberOfTuples());
-      mafEvent eUpdate(this,PROGRESSBAR_SET_VALUE,progress);
-      this->GetVME()->ForwardUpEvent(&eUpdate);
-    }
+    progressHelper.UpdateProgressBar(i*100/maskScalar->GetNumberOfTuples());
 
     if (maskScalar->GetTuple1(i) == 0)
     {
@@ -557,15 +528,13 @@ void mafDataPipeCustomSegmentationVolume::ApplyRefinementSegmentation()
     m_RG->Update();
   }
 
-  mafEvent eHideProgress(this,PROGRESSBAR_HIDE);
-  this->GetVME()->ForwardUpEvent(&eHideProgress);  
 }
 //------------------------------------------------------------------------------
 void mafDataPipeCustomSegmentationVolume::ApplyRegionGrowingSegmentation()
 //------------------------------------------------------------------------------
 {
-  mafEvent e(this,PROGRESSBAR_SHOW);
-  this->GetVME()->ForwardUpEvent(&e);
+	mafProgressBarHelper progressHelper(this->GetVME());
+	progressHelper.InitProgressBar("",false);
 
   typedef itk::ConnectedThresholdImageFilter<RealImage, RealImage> ITKConnectedThresholdFilter;
   ITKConnectedThresholdFilter::Pointer connectedThreshold = ITKConnectedThresholdFilter::New();
@@ -591,14 +560,11 @@ void mafDataPipeCustomSegmentationVolume::ApplyRegionGrowingSegmentation()
       m_RG->DeepCopy(m_RegionGrowingRG);
       m_RG->Update();
     }
-
-    mafEvent eHideProgress(this,PROGRESSBAR_HIDE);
-    this->GetVME()->ForwardUpEvent(&eHideProgress);  
+     
     return;
   }
 
-  mafEvent eUpdate(this,PROGRESSBAR_SET_VALUE,(long)5);
-  this->GetVME()->ForwardUpEvent(&eUpdate);
+  progressHelper.UpdateProgressBar(5);
 
   vtkMAFSmartPointer<vtkStructuredPoints> spInputOfRegionGrowing;
   vtkDataSet *automaticData;
@@ -631,8 +597,7 @@ void mafDataPipeCustomSegmentationVolume::ApplyRegionGrowingSegmentation()
     
   }
 
-  eUpdate.SetArg(10);
-  this->GetVME()->ForwardUpEvent(&eUpdate);
+  progressHelper.UpdateProgressBar(10);
 
   vtkMAFSmartPointer<vtkImageCast> vtkImageToFloat;
   vtkImageToFloat->SetOutputScalarTypeToDouble();
@@ -661,8 +626,7 @@ void mafDataPipeCustomSegmentationVolume::ApplyRegionGrowingSegmentation()
 
   connectedThreshold->SetInput( ((RealImage*)vtkTOitk->GetOutput()) );
 
-  eUpdate.SetArg(15);
-  this->GetVME()->ForwardUpEvent(&eUpdate);
+  progressHelper.UpdateProgressBar(15);
 
   try
   {
@@ -682,8 +646,7 @@ void mafDataPipeCustomSegmentationVolume::ApplyRegionGrowingSegmentation()
   vtkStructuredPoints *spOutputRegionGrowing = ((vtkStructuredPoints*)itkTOvtk->GetOutput());
   spOutputRegionGrowing->Update();
 
-  eUpdate.SetArg(65);
-  this->GetVME()->ForwardUpEvent(&eUpdate);
+  progressHelper.UpdateProgressBar(65);
 
 
   //////////////////////////////////////////////////////////////////////////
@@ -753,8 +716,7 @@ void mafDataPipeCustomSegmentationVolume::ApplyRegionGrowingSegmentation()
   }*/
   //////////////////////////////////////////////////////////////////////////
 
-  eUpdate.SetArg(85);
-  this->GetVME()->ForwardUpEvent(&eUpdate);
+  progressHelper.UpdateProgressBar(85);
 
   if (volumeData->IsA("vtkStructuredPoints"))
   {
@@ -777,13 +739,6 @@ void mafDataPipeCustomSegmentationVolume::ApplyRegionGrowingSegmentation()
     m_RG->DeepCopy(m_RegionGrowingRG);
     m_RG->Update();
   }
-
-  eUpdate.SetArg(100);
-  this->GetVME()->ForwardUpEvent(&eUpdate);
-
-  mafEvent eHideProgress(this,PROGRESSBAR_HIDE);
-  this->GetVME()->ForwardUpEvent(&eHideProgress);  
-
 }
 //------------------------------------------------------------------------------
 void mafDataPipeCustomSegmentationVolume::PreExecute()

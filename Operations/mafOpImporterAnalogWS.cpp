@@ -33,6 +33,7 @@
 #include "mafVMEAnalog.h"
 
 #include <iostream>
+#include "mafProgressBarHelper.h"
 
 //----------------------------------------------------------------------------
 mafOpImporterAnalogWS::mafOpImporterAnalogWS(const wxString &label) :
@@ -42,7 +43,7 @@ mafOp(label)
 	m_OpType	= OPTYPE_IMPORTER;
 	m_Canundo	= true;
 	m_File		= "";
-	m_FileDir = (mafGetApplicationDirectory() + "/Data/External/").c_str();
+	m_FileDir = mafGetDocumentsDirectory().c_str();
 
   m_EmgScalar = NULL;
 }
@@ -83,11 +84,9 @@ void mafOpImporterAnalogWS::OpRun()
 void mafOpImporterAnalogWS::Read()   
 //----------------------------------------------------------------------------
 {
-  if (!m_TestMode)
-  {
-    wxSetCursor(wxCursor(wxCURSOR_WAIT));
-	  mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
-  }
+	mafProgressBarHelper progressHelper(m_Listener);
+	progressHelper.SetTextMode(m_TestMode);
+	progressHelper.InitProgressBar();
   
   mafNEW(m_EmgScalar);
   wxString path, name, ext;
@@ -183,10 +182,8 @@ void mafOpImporterAnalogWS::Read()
     }
     line = text1.ReadLine();
     line.Replace(","," ");
-    if (!m_TestMode)
-    {
-      mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)(((double) n)/((double) rowNumber-1)*100.)));
-    }
+    progressHelper.UpdateProgressBar(((double) n)/((double) rowNumber-1)*100.);
+    
   } 
 
   vnl_matrix<double> emgMatrixTranspose = emgMatrix.transpose();
@@ -202,12 +199,6 @@ void mafOpImporterAnalogWS::Read()
   for (int n = 0; n < stringVec.size(); n++)
   {
     tag_Signals->SetValue(stringVec[n], n);
-  }
-  
-  if (!m_TestMode)
-  {
-    mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
-    wxSetCursor(wxCursor(wxCURSOR_DEFAULT));
   }
 
   m_Output = m_EmgScalar;

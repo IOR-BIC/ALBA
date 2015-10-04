@@ -34,8 +34,6 @@ void mafViewRXTest::CreateDestroyTest()
 {
   mafViewRX *rxView = new mafViewRX();
   rxView->Delete();
-   
-  CPPUNIT_ASSERT(true);
 }
 
   

@@ -100,8 +100,6 @@ void mafLUTLibraryTest::TestSetGetDir()
 
   }
 
-  CPPUNIT_ASSERT(true);
-
   // store lookup table to file
   std::string dirPrefix = MAF_DATA_ROOT;
   dirPrefix  +=  "/Test_LUTStorage/";

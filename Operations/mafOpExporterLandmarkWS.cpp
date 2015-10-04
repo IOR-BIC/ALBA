@@ -30,6 +30,7 @@
 
 #include "mafVMELandmarkCloud.h"
 #include "mafVMELandmark.h"
+#include "mafProgressBarHelper.h"
 
 using namespace std;
 
@@ -70,9 +71,8 @@ mafOp* mafOpExporterLandmarkWS::Copy()
 void mafOpExporterLandmarkWS::OpRun()   
 //----------------------------------------------------------------------------
 {
-	wxString proposed = mafGetApplicationDirectory().c_str();
-  proposed += "/Data/External/";
-	proposed += m_Input->GetName();
+  wxString proposed = mafGetDocumentsDirectory().c_str();
+  proposed += m_Input->GetName();
   proposed += "_TRAJECTORIES";
 	proposed += ".csv";
 	
@@ -93,12 +93,10 @@ void mafOpExporterLandmarkWS::OpRun()
 void mafOpExporterLandmarkWS::Write()   
 //----------------------------------------------------------------------------
 {
-  if (!m_TestMode)
-  {
-    wxSetCursor(wxCursor(wxCURSOR_WAIT));
-	  mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
-  }
-  
+	mafProgressBarHelper progressHelper(m_Listener);
+	progressHelper.SetTextMode(m_TestMode);
+	progressHelper.InitProgressBar();
+	
   m_Cloud = mafVMELandmarkCloud::SafeDownCast(m_Input);
   bool statusOpen = m_Cloud->IsOpen();
   if (!statusOpen)
@@ -171,10 +169,7 @@ void mafOpExporterLandmarkWS::Write()
       }
       f_Out << "\n";
 
-      if (!m_TestMode)
-      {
-        mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)(((double) i)/((double) timeStamps.size())*100.)));
-      }
+      progressHelper.UpdateProgressBar(((double) i)/((double) timeStamps.size())*100.);
     }
 
     f_Out.close();
@@ -183,11 +178,5 @@ void mafOpExporterLandmarkWS::Write()
   if (statusOpen)
   {
     m_Cloud->Close();
-  }
-
-  if (!m_TestMode)
-  {
-    mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
-    wxSetCursor(wxCursor(wxCURSOR_DEFAULT));
   }
 }

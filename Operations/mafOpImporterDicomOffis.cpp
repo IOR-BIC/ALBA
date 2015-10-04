@@ -139,6 +139,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vnl/vnl_vector.h"
 #include "time.h"
 #include "vtkImageReslice.h"
+#include "mafProgressBarHelper.h"
 
 // copied from wx/list.h : needed to make Visual Assist X work correctly 
 // with this class (al least in version 10.5.1711)
@@ -412,7 +413,7 @@ void mafOpImporterDicomOffis::OpRun()
 			}
 			else if (lastDicomDir == "UNEDFINED_m_LastDicomDir")
 			{
-				wxString defaultPath = (mafGetApplicationDirectory()+"/data/external/").c_str();
+				wxString defaultPath = mafGetDocumentsDirectory().c_str();
 				lastDicomDir = defaultPath;		
 			};
 
@@ -512,26 +513,17 @@ int mafOpImporterDicomOffis::RunWizard()
 				{
 					int i=0, size = m_SelectedSeriesSlicesList->size();
 
-					wxBusyInfo *wait = NULL;
-					if(!this->m_TestMode)
-					{
-						wait = new wxBusyInfo("Conversion to Unsigned Short: please wait...");
-						mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
-					}
+					mafProgressBarHelper progressHelper(m_Listener);
+					progressHelper.SetTextMode(m_TestMode);
+					progressHelper.InitProgressBar("Conversion to Unsigned Short: please wait...");
 
-					long progress = 0;
 					for(int slice_num=0;slice_num<size;slice_num++)
 					{
-						RescaleTo16Bit(m_SelectedSeriesSlicesList->Item(slice_num)->GetData()\
-							->GetVTKImageData());
-						if(!this->m_TestMode)
-						{
-							progress = slice_num * 100 / (double)size;
-							mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
-						}
+						RescaleTo16Bit(m_SelectedSeriesSlicesList->Item(slice_num)->GetData()->GetVTKImageData());
+
+						progressHelper.UpdateProgressBar(slice_num * 100 / (double)size);	
 					}
-					mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
-					if(wait) delete wait;
+					progressHelper.CloseProgressBar();
 				}
 
 				if(m_DicomReaderModality != mafGUIDicomSettings::ID_CMRI_MODALITY)
@@ -725,14 +717,11 @@ int mafOpImporterDicomOffis::BuildOutputVMEImagesFromDicom()
 		n_slices+=1;
 	}
 
-	if(!this->m_TestMode)
-	{
-		wxBusyInfo wait_info("Building images: please wait");
-		mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
-	}
+	mafProgressBarHelper progressHelper(m_Listener);
+	progressHelper.SetTextMode(m_TestMode);
+	progressHelper.InitProgressBar("Building images: please wait...");
 
 	ImportDicomTags();
-	long progress = 0;
 	int count,s_count;
 	mafNEW(m_ImagesGroup);
 
@@ -807,15 +796,7 @@ int mafOpImporterDicomOffis::BuildOutputVMEImagesFromDicom()
 		m_ImagesGroup->AddChild(image);
 		s_count++;
 
-		if(!this->m_TestMode)
-		{
-			progress = count * 100 / m_DICOMDirectoryReader->GetNumberOfFiles();
-			mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
-		}
-	}
-	if(!this->m_TestMode)
-	{
-		mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
+		progressHelper.UpdateProgressBar(count * 100 / m_DICOMDirectoryReader->GetNumberOfFiles());
 	}
 
 	if(m_ImagesGroup != NULL)
@@ -847,11 +828,10 @@ int mafOpImporterDicomOffis::BuildOutputVMEImagesFromDicomCineMRI()
 		n_slices+=1;
 	}
 
-	if(!this->m_TestMode)
-	{
-		wxBusyInfo wait_info("Building images: please wait");
-		mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
-	}
+	mafProgressBarHelper progressHelper(m_Listener);
+	progressHelper.SetTextMode(m_TestMode);
+	progressHelper.InitProgressBar("Building images: please wait...");
+
 	ImportDicomTags();
 
 	mafNEW(m_ImagesGroup);
@@ -869,18 +849,13 @@ int mafOpImporterDicomOffis::BuildOutputVMEImagesFromDicomCineMRI()
 		m_ImagesGroup->AddChild(image);
 	}
 
-	long progress = 0;
 	int totalNumberOfImages = (m_ZCropBounds[1]+1)*m_NumberOfTimeFrames;
 	int progressCounter = 0;
 
 	// for every timestamp
 	for (int ts = 0; ts < m_NumberOfTimeFrames; ts++)
 	{
-		if(!this->m_TestMode)
-		{
-			progress = ts * 100 / m_NumberOfTimeFrames;
-			mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
-		}
+		progressHelper.UpdateProgressBar(ts * 100 / m_NumberOfTimeFrames);
 
 		// get the time stamp from the dicom tag;
 		// timestamp is in ms
@@ -898,11 +873,8 @@ int mafOpImporterDicomOffis::BuildOutputVMEImagesFromDicomCineMRI()
 
 		for (int sourceVolumeSliceId = m_ZCropBounds[0], targetVolumeSliceId = 0; sourceVolumeSliceId < m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
 		{
-			if(!this->m_TestMode)
-			{
-				progress = progressCounter * 100 / totalNumberOfImages;
-				mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
-			}
+			progressHelper.UpdateProgressBar(progressCounter * 100 / totalNumberOfImages);
+			
 
 			if (targetVolumeSliceId == n_slices) {break;}
 
@@ -1010,11 +982,6 @@ int mafOpImporterDicomOffis::BuildOutputVMEImagesFromDicomCineMRI()
 			targetVolumeSliceId++;
 			progressCounter++;
 		}
-	}
-
-	if(!this->m_TestMode)
-	{
-		mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
 	}
 
 	if(m_ImagesGroup != NULL)
@@ -1200,11 +1167,10 @@ int mafOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
 		}
 	}
 
-	if(!this->m_TestMode)
-	{
-		wxBusyInfo wait_info("Building volume: please wait");
-		mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
-	}
+
+	mafProgressBarHelper progressHelper(m_Listener);
+	progressHelper.SetTextMode(m_TestMode);
+	progressHelper.InitProgressBar("Building volume: please wait...");
 
 	n_slices -= numSliceToSkip;
 	vtkMAFSmartPointer<vtkMAFRGSliceAccumulate> accumulate;
@@ -1214,7 +1180,6 @@ int mafOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
 	double oldPosTrasformed = -1.0;
 	double oldOrigin[3];
 
-	long progress = 0;
 	for (count = m_ZCropBounds[0], s_count = 0; count < m_ZCropBounds[1]+1; count += step)
 	{
 		if (sliceToSkip[count-m_ZCropBounds[0]])
@@ -1289,19 +1254,10 @@ int mafOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
 		accumulate->SetSlice(s_count,m_SliceTexture->GetInput(), orientation);
 		s_count++;
 
-		if(!this->m_TestMode)
-		{
-			progress = count * 100 / (m_ZCropBounds[1]+1); //m_DICOMDirectoryReader->GetNumberOfFiles();
-			mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
-		}
+		progressHelper.UpdateProgressBar(count * 100 / (m_ZCropBounds[1]+1));
 	}
 
 	delete []sliceToSkip;
-
-	if(!this->m_TestMode)
-	{
-		mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
-	}
 
 	mafNEW(m_Volume);
 
@@ -1449,16 +1405,13 @@ int mafOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 		n_slices+=1;
 	}
 
-	if(!this->m_TestMode)
-	{
-		wxBusyInfo wait_info("Building volume: please wait");
-		mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
-	}
+	mafProgressBarHelper progressHelper(m_Listener);
+	progressHelper.SetTextMode(m_TestMode);
+	progressHelper.InitProgressBar("Building volume: please wait...");
 
 	// create the time varying vme
 	mafNEW(m_Volume);
 	int currImageId = 0;
-	long progress = 0;
 	int totalNumberOfImages = (m_ZCropBounds[1]+1)*m_NumberOfTimeFrames;
 	int progressCounter = 0;
 
@@ -1589,11 +1542,8 @@ int mafOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 
 		for (int sourceVolumeSliceId = m_ZCropBounds[0], targetVolumeSliceId = 0; sourceVolumeSliceId < m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
 		{
-			if(!this->m_TestMode)
-			{
-				progress = progressCounter * 100 / totalNumberOfImages;
-				mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
-			}
+			progressHelper.UpdateProgressBar(progressCounter * 100 / totalNumberOfImages);
+			
 			if (targetVolumeSliceId == n_slices) {break;}
 
 			// show the current slice
@@ -1813,11 +1763,6 @@ int mafOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 
 	delete []sliceToSkip;
 
-	if(!this->m_TestMode)
-	{
-		mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
-	}
-
 	// update m_tag_array ivar
 	ImportDicomTags();
 	m_Volume->GetTagArray()->DeepCopy(m_TagArray);
@@ -1862,7 +1807,6 @@ int mafOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 int mafOpImporterDicomOffis::BuildOutputVMEMeshFromDicom()
 	//----------------------------------------------------------------------------
 {
-	long progress = 0;
 	int step;
 
 	if(m_BuildStepValue == 0)
@@ -1876,12 +1820,10 @@ int mafOpImporterDicomOffis::BuildOutputVMEMeshFromDicom()
 	m_SliceTexture->GetInput()->GetDimensions(dim);
 	int cropInterval = (m_ZCropBounds[1]+1 - m_ZCropBounds[0]);
 
-	if(!this->m_TestMode)
-	{
-		wxBusyInfo wait_info("Building mesh: please wait");
-		mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
-	}
-
+	mafProgressBarHelper progressHelper(m_Listener);
+	progressHelper.SetTextMode(m_TestMode);
+	progressHelper.InitProgressBar("Building mesh: please wait...");
+		
 	mafNEW(m_Mesh);
 	vtkCellArray *Cells = vtkCellArray::New();
 	vtkUnstructuredGrid *grid = vtkUnstructuredGrid::New();
@@ -1919,12 +1861,8 @@ int mafOpImporterDicomOffis::BuildOutputVMEMeshFromDicom()
 
 	for ( ; sourceVolumeSliceId <m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
 	{ 
-		if(!this->m_TestMode)
-		{
-			progress = sourceVolumeSliceId * 100 / m_NumberOfSlices;
-			mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
-		}
-
+		progressHelper.UpdateProgressBar(sourceVolumeSliceId * 100 / m_NumberOfSlices);
+		
 		if (sourceVolumeSliceId+1>=m_NumberOfSlices)// compilation error: vs2005: sourceVolumeSliceId defined in the for loop
 			break;
 		int lineCounter = 1;
@@ -1954,11 +1892,6 @@ int mafOpImporterDicomOffis::BuildOutputVMEMeshFromDicom()
 			hexahedron->Delete();
 		}
 		counter++;
-	}
-
-	if(!this->m_TestMode)
-	{
-		mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
 	}
 
 	grid->SetCells(VTK_HEXAHEDRON,Cells);  
@@ -1996,14 +1929,12 @@ int mafOpImporterDicomOffis::BuildOutputVMEMeshFromDicomCineMRI()
 
 
 
-	if(!this->m_TestMode)
-	{
-		wxBusyInfo wait_info("Building mesh: please wait");
-		mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
-	}
+	mafProgressBarHelper progressHelper(m_Listener);
+	progressHelper.SetTextMode(m_TestMode);
+	progressHelper.InitProgressBar("Building mesh: please wait...");
+
 	mafNEW(m_Mesh);
 
-	long progress = 0;
 	int totalNumberOfImages = (m_ZCropBounds[1]+1)*m_NumberOfTimeFrames;
 	int progressCounter = 0;
 	for (int ts = 0; ts < m_NumberOfTimeFrames; ts++)
@@ -2043,11 +1974,7 @@ int mafOpImporterDicomOffis::BuildOutputVMEMeshFromDicomCineMRI()
 		int sourceVolumeSliceId = m_ZCropBounds[0];// ac: compilation error (vs2005)
 		for (; sourceVolumeSliceId <m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
 		{ 
-			if(!this->m_TestMode)
-			{
-				progress = progressCounter * 100 / totalNumberOfImages;
-				mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
-			}
+			progressHelper.UpdateProgressBar(progressCounter * 100 / totalNumberOfImages);
 
 			if (sourceVolumeSliceId+1>=m_NumberOfSlices)// ac: compilation error (vs2005): sourceVolumeSliceId defined in the for loop
 				break;
@@ -2090,10 +2017,6 @@ int mafOpImporterDicomOffis::BuildOutputVMEMeshFromDicomCineMRI()
 		m_Mesh->SetData(grid, tsDouble);
 		points->Delete();
 		grid->Delete();
-	}
-	if(!this->m_TestMode)
-	{
-		mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
 	}
 
 	m_Mesh->SetName(m_VolumeName);
@@ -3456,8 +3379,6 @@ void mafOpImporterDicomOffis::FillSeriesListBox()
 bool mafOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 	//----------------------------------------------------------------------------
 {   
-
-	long progress;
 	bool errorOccurred = false;
 	mafString currentSliceABSDirName = dicomDirABSPath;
 
@@ -3471,39 +3392,26 @@ bool mafOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 	}
 	// ------------------------------------------------------------
 
-	if (!this->m_TestMode)
-	{
-		mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
-		progress = START_PROGRESS_BAR;
-	}
+	mafProgressBarHelper progressHelper(m_Listener);
+	progressHelper.SetTextMode(m_TestMode);
+	progressHelper.InitProgressBar("Reading DICOM directory: please wait...");
 
-	wxBusyInfo *busyInfo = NULL;
-	wxString busyMessage = "Reading DICOM directory: please wait";
 
-	if (!m_TestMode)
-	{
-		busyInfo = new wxBusyInfo(busyMessage);
-	}
 
 	// foreach dicom directory file
 	int img_pos_result = wxNO; // added by Losi to avoid exiting series without image position
 
-	if(!ReadDicomFileList(currentSliceABSDirName)) {
+	if(!ReadDicomFileList(currentSliceABSDirName,&progressHelper)) {
 		return false;
 	}
 
-	if (!this->m_TestMode)
-	{
-		mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
-		cppDEL(busyInfo);
-	}
+	progressHelper.CloseProgressBar();
 
 	// start handling files
 	if(m_NumberOfStudies == 0)
 	{
 		if (!this->m_TestMode)
 		{
-			cppDEL(busyInfo);
 			wxString msg = "No study found!";
 			wxMessageBox(msg,"Confirm", wxOK , NULL);
 		}
@@ -3627,24 +3535,13 @@ bool mafOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 					int planesPerFrame = -1;
 					planesPerFrame = numSlicesInSeries / cardiacTimeFrames;
 
-					wxBusyInfo *wait = NULL;
-					progress = 0;
-
-					if(!this->m_TestMode)
-					{
-						wait = new wxBusyInfo("Applying Cardiac MRI correction, please wait...");
-						mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
-					}
+					progressHelper.InitProgressBar("Applying Cardiac MRI correction, please wait...");
 
 					for (int timeID = 0; timeID < cardiacTimeFrames; timeID++)
 					{
 						for (int planeID = 0; planeID < planesPerFrame ; planeID++)
 						{						
-							if(!this->m_TestMode)
-							{
-								progress = (timeID) * 100 / ((double)(cardiacTimeFrames ));
-								mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
-							}
+							progressHelper.UpdateProgressBar((timeID) * 100 / ((double)(cardiacTimeFrames )));
 
 							int itemID = fileNumberForPlaneIFrameJIdPlaneMatrix(planeID, timeID); 
 
@@ -3753,11 +3650,6 @@ bool mafOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 
 						}			
 					}
-
-					mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
-					cppDEL(wait);
-					cppDEL(busyInfo);
-
 				}
 			}
 		}
@@ -3772,24 +3664,21 @@ bool mafOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 
 			if (m_SeriesIDToSlicesListMap.size()==0)
 			{
-				cppDEL(busyInfo);
 				return false;
 			}
 
 		}
 
-		cppDEL(busyInfo);
 		return true;
 	}
 }
 
 
 //----------------------------------------------------------------------------
-bool mafOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirName) {
-	//----------------------------------------------------------------------------
+bool mafOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirName, mafProgressBarHelper *progressHelper) 
+{
 
 	int seriesIndex = 0;
-	long progress;
 	int sliceNum = -1;
 	double lastZPos = 0;
 	long int dcmInstanceNumber = -1;
@@ -3889,7 +3778,7 @@ bool mafOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 					return false;
 				}
 
-				ReadDicomFileList(currentSliceABSSubDirName); //recursive function
+				ReadDicomFileList(currentSliceABSSubDirName,progressHelper); //recursive function
 
 				//Re-Open the folder
 				if (m_DICOMDirectoryReader->Open(currentSliceABSDirName.GetCStr()) == 0)
@@ -4469,11 +4358,7 @@ bool mafOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 							int answer = wxMessageBox(wxString::Format("Found 2 slices under distance tolerance. Please check the log area for details. Continue?"),"Warning!!", wxYES_NO, NULL);
 							if (answer == wxNO)
 							{
-								if (!this->m_TestMode)
-								{
-									//							cppDEL(busyInfo);
-									mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
-								}
+								progressHelper->CloseProgressBar();
 								return false;
 							}
 
@@ -4718,12 +4603,8 @@ bool mafOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 			// REFACTORING TODO: Refactor toward strategy when regression will be available
 			//------------------------
 
-			if (!this->m_TestMode)
-			{
-				progress = i * 100 / m_DICOMDirectoryReader->GetNumberOfFiles();
-				mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
-			}
-
+			progressHelper->UpdateProgressBar(i * 100 / m_DICOMDirectoryReader->GetNumberOfFiles());
+				
 			dicomImg.clear();
 			seriesId.clear();
 		}

@@ -67,7 +67,7 @@
   mafString szStr;
   mafStorage* storage = e.GetStorage();
   if (storage == NULL)
-    szStr = mafGetDirName(mafGetApplicationDirectory().c_str(), 
+    szStr = mafGetDirName(mafGetDocumentsDirectory().c_str(), 
     _("Select a folder for optimized volume files")).c_str();
   else
   {

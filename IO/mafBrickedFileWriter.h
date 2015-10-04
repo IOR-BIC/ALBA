@@ -18,6 +18,8 @@ Writes the BBF file, using data from vtkMAFLargeImageDataSet
 #include "mafBrickedFile.h"
 #include "vtkMAFLargeImageData.h"
 
+class mafProgressBarHelper;
+
 class mafBrickedFileWriter : public mafBrickedFile
 {
 public:
@@ -40,6 +42,8 @@ protected:
 	double* m_PSumTuplesBuffer;
 
 	std::vector< BBF_IDX_EXITEM > m_ExtraBrckMAP;
+
+	mafProgressBarHelper *m_ProgressHelper;
 	
 public:
 	mafBrickedFileWriter();

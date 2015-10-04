@@ -34,8 +34,6 @@ void mafViewImageTest::CreateDestroyTest()
 {
   mafViewImage *imageView = new mafViewImage();
   imageView->Delete();
-   
-  CPPUNIT_ASSERT(true);
 }
 
   

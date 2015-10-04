@@ -63,6 +63,7 @@ mafCxxTypeMacro(mafOpImporterRAWVolume_BES);
 //----------------------------------------------------------------------------
 
 #include "mafMemDbg.h"
+#include "mafProgressBarHelper.h"
 //#define New() NewDbg(__FILE__, __LINE__)
 
 //----------------------------------------------------------------------------
@@ -71,7 +72,7 @@ mafOpImporterRAWVolume_BES::mafOpImporterRAWVolume_BES(const wxString &label) : 
 {
 	m_OpType			= OPTYPE_IMPORTER;
 	m_Canundo			= true;
-	m_RawFile			= mafGetApplicationDirectory().c_str();
+	m_RawFile			= mafGetDocumentsDirectory().c_str();
 #ifdef VME_VOLUME_LARGE
 	m_OutputFileName = m_RawFile;
 #endif // VME_VOLUME_LARGE
@@ -444,8 +445,7 @@ void mafOpImporterRAWVolume_BES::	OnEvent(mafEventBase *maf_event)
 
 		case ID_COORD:
 			{
-				wxString dir = mafGetApplicationDirectory().c_str();
-				dir += _("/Data/External");
+				wxString dir = mafGetDocumentsDirectory().c_str();
 				wxString wildc =_("Z_coordinates (*.txt)|*.txt");
 				wxString file = mafGetOpenFile(dir,wildc,_("Open Z coordinates file")).c_str();
 				if(!file.IsEmpty())
@@ -634,14 +634,11 @@ vtkDataObject* mafOpImporterRAWVolume_BES::ImportT(TR* reader)
 bool mafOpImporterRAWVolume_BES::Import()
 //----------------------------------------------------------------------------
 {
-	if(!this->m_TestMode) {
-		mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));			
-		mafEventMacro(mafEvent(this, PROGRESSBAR_SET_VALUE, (long)0));
-
-		mafString szText = _("Importing RAW data ...");
-		mafEventMacro(mafEvent(this, PROGRESSBAR_SET_TEXT, &szText));
-	}
-
+	mafProgressBarHelper progressHelper(m_Listener);
+	progressHelper.SetTextMode(m_TestMode);
+	progressHelper.InitProgressBar();
+	progressHelper.SetBarText("Importing RAW data ...");
+		
   vtkMAFSmartPointer<vtkDoubleArray> ZDoubleArray;	//Ref(ZDoubleArray) = 1
   if (m_BuildRectilinearGrid)
   {
@@ -874,11 +871,7 @@ bool mafOpImporterRAWVolume_BES::Import()
 	wxSplitPath(m_RawFile.GetCStr(),&path,&name,&ext);
 	m_Output->SetName(name.c_str());
 	m_Output->GetTagArray()->SetTag(tag_Nature);
-
-	if(!m_TestMode) {
-		mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
-	}
-
+		
 	return true;
 }
 

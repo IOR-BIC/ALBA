@@ -51,6 +51,7 @@ const bool DEBUG_MODE = false;
 #include <vector>
 
 #include <wx/busyinfo.h>
+#include "mafProgressBarHelper.h"
 //------------------------------------------------------------------------------
 // local defines
 //------------------------------------------------------------------------------
@@ -742,19 +743,6 @@ void mafVMELandmarkCloud::Close()
     return;
   }
 
-  wxBusyCursor *busyCursor = NULL;
-
-  if (m_TestMode == false)
-  {
-    busyCursor = new wxBusyCursor();
-  }
-  else if (m_TestMode == true)
-  {
-    std::ostringstream stringStream;
-    stringStream << "cannot render busy cursor..."  << std::endl;
-    mafLogMessage(stringStream.str().c_str());
-  }
-
   int num = GetNumberOfLandmarks();
   // change the state to closed to disable extra features
   SetState(CLOSED_CLOUD);
@@ -771,10 +759,10 @@ void mafVMELandmarkCloud::Close()
   std::vector<mafVMELandmark *> landmarks;
   int numberOfChildren = GetNumberOfChildren();
 
-  long progress = 0;
-
-  ForwardUpEvent(&mafEvent(this,PROGRESSBAR_SHOW));
-  ForwardUpEvent(&mafEvent(this,PROGRESSBAR_SET_TEXT, &mafString("Collapsing cloud")));
+	mafProgressBarHelper progressHelper(m_Parent);
+	progressHelper.SetTextMode(m_TestMode);
+	progressHelper.InitProgressBar();
+	progressHelper.SetBarText("Collapsing cloud");
 
   for (int c = 0; c < numberOfChildren;c++)
   {
@@ -873,9 +861,7 @@ void mafVMELandmarkCloud::Close()
 
       landmarks.push_back(lm); 
     }
-    progress = c * 100 / numberOfChildren;
-    ForwardUpEvent(&mafEvent(this,PROGRESSBAR_SET_VALUE, progress));
-
+    progressHelper.UpdateProgressBar(c * 100 / numberOfChildren);
   }
   
   // remove all child landmarks
@@ -892,12 +878,6 @@ void mafVMELandmarkCloud::Close()
     
   Modified();
   GetEventSource()->InvokeEvent(this, mafVMELandmarkCloud::CLOUD_OPEN_CLOSE);
-  ForwardUpEvent(&mafEvent(this,PROGRESSBAR_HIDE));
-
-  if (busyCursor)
-  {
-    delete busyCursor;
-  }
 }
 
 //-------------------------------------------------------------------------
@@ -910,22 +890,10 @@ void mafVMELandmarkCloud::Open()
     return;
   }
 
-  wxBusyCursor *busyCursor = NULL;
-
-  if (m_TestMode == false)
-  {
-    busyCursor = new wxBusyCursor();
-  }
-  else if (m_TestMode == true)
-  {
-    std::ostringstream stringStream;
-    stringStream << "cannot render busy cursor..."  << std::endl;
-    mafLogMessage(stringStream.str().c_str());
-  }
-
-  ForwardUpEvent(&mafEvent(this,PROGRESSBAR_SHOW));
-  ForwardUpEvent(&mafEvent(this,PROGRESSBAR_SET_TEXT, &mafString("Exploding cloud")));
-  long progress  = 0;
+ 	mafProgressBarHelper progressHelper(m_Parent);
+	progressHelper.SetTextMode(m_TestMode);
+	progressHelper.InitProgressBar();
+	progressHelper.SetBarText("Exploding cloud");
 
   int i,numlm = GetNumberOfLandmarks();
   for (i = 0; i < numlm; i++)
@@ -970,9 +938,7 @@ void mafVMELandmarkCloud::Open()
         mafErrorMacro("Open: problems retrieving polydata for timestamp: " << item->GetTimeStamp());
       }
 		}
-    progress = i * 100 / numlm;
-    ForwardUpEvent(&mafEvent(this,PROGRESSBAR_SET_VALUE, progress));
-
+    progressHelper.UpdateProgressBar(i * 100 / numlm);
 	}
   // remove all items and tags...
   m_DataVector->RemoveAllItems();
@@ -983,14 +949,6 @@ void mafVMELandmarkCloud::Open()
   SetState(OPEN_CLOUD);
   Modified();
   GetEventSource()->InvokeEvent(this, mafVMELandmarkCloud::CLOUD_OPEN_CLOSE);
-
-  
-  ForwardUpEvent(&mafEvent(this,PROGRESSBAR_HIDE));
-
-  if (busyCursor)
-  {
-    delete busyCursor;
-  }
 }
 
 //-------------------------------------------------------------------------

@@ -45,7 +45,6 @@ void mafGUIGizmoInterfaceTest::TestOnEvent()
 	mafGUIGizmoInterface *dummyGizmoInterface = new mafGUIGizmoInterface(NULL);
 	// simple call since this method is doing nothing...
 	dummyGizmoInterface->OnEvent(NULL);
-	CPPUNIT_ASSERT(true);
 	cppDEL(dummyGizmoInterface);	
 }
 
@@ -65,7 +64,6 @@ void mafGUIGizmoInterfaceTest::TestEnableWidgets()
 	// simple call since this method is doing nothing...
 	dummyGizmoInterface->EnableWidgets(true);
 	dummyGizmoInterface->EnableWidgets(false);
-	CPPUNIT_ASSERT(true);
 	cppDEL(dummyGizmoInterface);	
 }
 

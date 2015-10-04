@@ -41,6 +41,7 @@
 #include <mafTransformBase.h>
 #include <mafMatrix.h>
 #include <mafGUIRollOut.h>
+#include "mafProgressBarHelper.h"
 
 using namespace std;
 
@@ -194,8 +195,7 @@ void mafOpExporterGRFWS::OpDo()
   // INPUT is a VECTOR:
   if (m_Input->IsA("mafVMEVector"))
   {
-    wxString proposed = mafGetApplicationDirectory().c_str();
-    proposed += "/Data/External/";
+    wxString proposed = mafGetDocumentsDirectory().c_str();
     proposed += m_Input->GetName();
     proposed += "_VECTOR";
     proposed += ".csv";
@@ -220,8 +220,7 @@ void mafOpExporterGRFWS::OpDo()
   // INPUT is a FORCE PLATE: Load and Execute 
   else if (m_ForceLeft && m_ForceRight && m_MomentLeft && m_MomentRight)
   {
-    wxString proposed = mafGetApplicationDirectory().c_str();
-    proposed += "/Data/External/";
+    wxString proposed = mafGetDocumentsDirectory().c_str();
     proposed += m_Input->GetName();
     proposed += "_FORCEPLATES";
     proposed += ".csv";
@@ -367,13 +366,11 @@ void mafOpExporterGRFWS::Write()
 {
   wxBusyInfo *wait = NULL;
   mafString info = "Loading data from files";
-  if (!m_TestMode)
-  {
-    wxSetCursor(wxCursor(wxCURSOR_WAIT));
-    mafEventMacro(mafEvent(this,PROGRESSBAR_SET_TEXT,&info));
-	  mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
-    wait = new wxBusyInfo("This may take several minutes, please be patient...");
-  }
+	mafProgressBarHelper progressHelper(m_Listener);
+	progressHelper.SetTextMode(m_TestMode);
+	progressHelper.InitProgressBar("This may take several minutes, please be patient...");
+	progressHelper.SetBarText(info);
+	 
 
   // Must update VTK!
   m_PlatformLeft->Update();
@@ -445,10 +442,7 @@ void mafOpExporterGRFWS::Write()
     fL[2] = p[2];
     f_Out1 << fL[0]-copL[0][i] << "," << fL[1]-copL[1][i] << "," << fL[2]-copL[2][i] << "\n";
 
-    if (!m_TestMode)
-    {
-      mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)(((double) i)/((double) size)*25.)));
-    }
+		progressHelper.UpdateProgressBar(((double) i)/((double) size)*25.);
   }
   // ---------------------
   // MOMENT LEFT ---------
@@ -470,10 +464,7 @@ void mafOpExporterGRFWS::Write()
     mL[2] = p[2];
     f_Out2 << mL[0]-copL[0][i] << "," << mL[1]-copL[1][i] << "," << mL[2]-copL[2][i] << "\n";
 
-    if (!m_TestMode)
-    {
-      mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)(25+((double) i)/((double) size)*25.)));
-    }
+    progressHelper.UpdateProgressBar(25+((double) i)/((double) size)*25.);
   }  
   // ---------------------
   // FORCE RIGHT ---------
@@ -501,10 +492,7 @@ void mafOpExporterGRFWS::Write()
     fR[2] = p[2];
     f_Out3 << fR[0]-copR[0][i] << "," << fR[1]-copR[1][i] << "," << fR[2]-copR[2][i] << "\n";
       
-    if (!m_TestMode)
-    {
-      mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)(50+((double) i)/((double) size)*25.)));
-    }
+    progressHelper.UpdateProgressBar((50+((double) i)/((double) size)*25.));
   }
   // ---------------------
   // MOMENT RIGHT --------
@@ -526,10 +514,7 @@ void mafOpExporterGRFWS::Write()
     mR[2] = p[2];
     f_Out4 << mR[0]-copR[0][i] << "," << mR[1]-copR[1][i] << "," << mR[2]-copR[2][i] << "\n";
 
-    if (!m_TestMode)
-    {
-      mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)(75+((double) i)/((double) size)*25.)));
-    }
+    progressHelper.UpdateProgressBar((75+((double) i)/((double) size)*25.));
   }  
 
   f_Out1.close();
@@ -548,10 +533,7 @@ void mafOpExporterGRFWS::Write()
 
   wxString line;
 
-  if (!m_TestMode)
-  {
-    mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)0.0));
-  }
+  progressHelper.ResetProgress();
 
   // Write to final file
   if (!f_Out.bad())
@@ -627,36 +609,21 @@ void mafOpExporterGRFWS::Write()
       line = text4.ReadLine();
       f_Out << line << "\n";
 
-      if (!m_TestMode)
-      {
-        mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)(((double) i)/((double) size)*100.)));
-      }
-
+      progressHelper.UpdateProgressBar(((double) i)/((double) size)*100.);
     }
     
     f_Out.close();
   }  
 
-  info = "";
-  if (!m_TestMode)
-  {
-    mafEventMacro(mafEvent(this,PROGRESSBAR_SET_TEXT,&info));
-    mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
-    wxSetCursor(wxCursor(wxCURSOR_DEFAULT));
-    cppDEL(wait);
-  }
 }
 //----------------------------------------------------------------------------
 void mafOpExporterGRFWS::WriteFast()   
 //----------------------------------------------------------------------------
 {
-  wxBusyInfo *wait = NULL;
-  if (!m_TestMode)
-  {
-    wxSetCursor(wxCursor(wxCURSOR_WAIT));
-	  mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
-    wait = new wxBusyInfo("This may take several minutes, please be patient!");
-  }
+	mafProgressBarHelper progressHelper(m_Listener);
+	progressHelper.SetTextMode(m_TestMode);
+	progressHelper.InitProgressBar("This may take several minutes, please be patient...");
+	
 
   // Must update VTK!
   m_PlatformLeft->Update();
@@ -771,10 +738,7 @@ void mafOpExporterGRFWS::WriteFast()
     fL[2] =  vFL->m_Bounds[ind3];
     f_Out1 << fL[0]-copL[0][i] << "," << fL[1]-copL[1][i] << "," << fL[2]-copL[2][i] << "\n";
 
-    if (!m_TestMode)
-    {
-      mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)(((double) i)/((double) size)*25.)));
-    }
+    progressHelper.UpdateProgressBar(((double) i)/((double) size)*25.);
   }  
   // ---------------------
   // MOMENT LEFT ---------
@@ -809,10 +773,7 @@ void mafOpExporterGRFWS::WriteFast()
     mL[2] = vML->m_Bounds[ind3];
     f_Out2 << mL[0]-copL[0][i] << "," << mL[1]-copL[1][i] << "," << mL[2]-copL[2][i] << "\n";
 
-    if (!m_TestMode)
-    {
-      mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)(25+((double) i)/((double) size)*25.)));
-    }
+    progressHelper.UpdateProgressBar(25+((double) i)/((double) size)*25.);
   }  
   // ---------------------
   // FORCE RIGHT ---------
@@ -856,10 +817,7 @@ void mafOpExporterGRFWS::WriteFast()
     fR[2] = vFR->m_Bounds[ind3];
     f_Out3 << fR[0]-copR[0][i] << "," << fR[1]-copR[1][i] << "," << fR[2]-copR[2][i] << "\n";
       
-    if (!m_TestMode)
-    {
-      mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)(50+((double) i)/((double) size)*25.)));
-    }
+    progressHelper.UpdateProgressBar(50+((double) i)/((double) size)*25.);
   }  
   // ---------------------
   // MOMENT RIGHT --------
@@ -894,10 +852,7 @@ void mafOpExporterGRFWS::WriteFast()
     mR[2] = vMR->m_Bounds[ind3];
     f_Out4 << mR[0]-copR[0][i] << "," << mR[1]-copR[1][i] << "," << mR[2]-copR[2][i] << "\n";
 
-    if (!m_TestMode)
-    {
-      mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)(75+((double) i)/((double) size)*25.)));
-    }
+    progressHelper.UpdateProgressBar(75+((double) i)/((double) size)*25.);
   }  
 
   f_Out1.close();
@@ -916,10 +871,7 @@ void mafOpExporterGRFWS::WriteFast()
 
   wxString line;
 
-  if (!m_TestMode)
-  {
-    mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)0.0));
-  }
+  progressHelper.ResetProgress();
 
   // Write to final file
   if (!f_Out.bad())
@@ -995,11 +947,7 @@ void mafOpExporterGRFWS::WriteFast()
       line = text4.ReadLine();
       f_Out << line << "\n";
 
-      if (!m_TestMode)
-      {
-        mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)(((double) i)/((double) size)*100.)));
-      }
-
+      progressHelper.UpdateProgressBar(((double) i)/((double) size)*100.);
     }
 
     f_Out.close();
@@ -1009,25 +957,14 @@ void mafOpExporterGRFWS::WriteFast()
   delete vFR;
   delete vML;
   delete vMR;
-
-  if (!m_TestMode)
-  {
-    mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
-    wxSetCursor(wxCursor(wxCURSOR_DEFAULT));
-    cppDEL(wait);
-  }
 }
 //----------------------------------------------------------------------------
 void mafOpExporterGRFWS::WriteSingleVector()   
 //----------------------------------------------------------------------------
 {
-  wxBusyInfo *wait = NULL;
-  if (!m_TestMode)
-  {
-    wxSetCursor(wxCursor(wxCURSOR_WAIT));
-	  mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
-    wait = new wxBusyInfo("This may take several minutes, please be patient...");
-  }
+	mafProgressBarHelper progressHelper(m_Listener);
+	progressHelper.SetTextMode(m_TestMode);
+	progressHelper.InitProgressBar("This may take several minutes, please be patient...");
   
   std::ofstream f_Out(m_File);
 
@@ -1089,33 +1026,19 @@ void mafOpExporterGRFWS::WriteSingleVector()
       // FORCE
       f_Out << fL[0]-copL[0] << "," << fL[1]-copL[1] << "," << fL[2]-copL[2] << "\n";
 
-      if (!m_TestMode)
-      {
-        mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)(((double) i)/((double) size)*100.)));
-      }
+      progressHelper.UpdateProgressBar(((double) i)/((double) size)*100.);
     }
 
     f_Out.close();
-  }
-
-  if (!m_TestMode)
-  {
-    mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
-    wxSetCursor(wxCursor(wxCURSOR_DEFAULT));
-    cppDEL(wait);
   }
 }
 //----------------------------------------------------------------------------
 void mafOpExporterGRFWS::WriteSingleVectorFast()   
 //----------------------------------------------------------------------------
 {  
-  wxBusyInfo *wait = NULL;
-  if (!m_TestMode)
-  {
-    wxSetCursor(wxCursor(wxCURSOR_WAIT));
-    mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
-    wait = new wxBusyInfo("This may take several minutes, please be patient...");
-  }
+	mafProgressBarHelper progressHelper(m_Listener);
+	progressHelper.SetTextMode(m_TestMode);
+	progressHelper.InitProgressBar("This may take several minutes, please be patient...");
 
   std::ofstream f_Out(m_File);
 
@@ -1201,23 +1124,13 @@ void mafOpExporterGRFWS::WriteSingleVectorFast()
       fL[2] =  vFL->m_Bounds[ind3];
       f_Out << fL[0]-copL[0] << "," << fL[1]-copL[1] << "," << fL[2]-copL[2] << "\n";
 
-      if (!m_TestMode)
-      {
-        mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)(((double) i)/((double) size)*100.)));
-      }
+			progressHelper.UpdateProgressBar(((double) i)/((double) size)*100.);      
     }
 
     f_Out.close();
   }
 
   delete vFL;
-
-  if (!m_TestMode)
-  {
-    mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
-    wxSetCursor(wxCursor(wxCURSOR_DEFAULT));
-    cppDEL(wait);
-  }
 }
 //----------------------------------------------------------------------------
 void mafOpExporterGRFWS::CalculateTresholds()

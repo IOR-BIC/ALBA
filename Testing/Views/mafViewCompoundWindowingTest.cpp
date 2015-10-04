@@ -54,8 +54,4 @@ void mafViewCompoundWindowingTest::CreateDestroyTest()
   dummyView *sscView = new dummyView();
   sscView->PackageView();
   sscView->Delete();
-   
-  //check leaks
-  CPPUNIT_ASSERT(true);
- 
 }
