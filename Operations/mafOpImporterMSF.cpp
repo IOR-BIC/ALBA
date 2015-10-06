@@ -174,7 +174,7 @@ const char *mafOpImporterMSF::ZIPOpen(mafString m_File)
   mafString zip_cache = wxPathOnly(m_File.GetCStr());
   if (zip_cache.IsEmpty())
   {
-    zip_cache = mafGetDocumentsDirectory().c_str();
+    zip_cache = mafGetAppDataDirectory().c_str();
   }
   zip_cache = zip_cache + "\\~TmpData";
   if (!wxDirExists(zip_cache.GetCStr()))
