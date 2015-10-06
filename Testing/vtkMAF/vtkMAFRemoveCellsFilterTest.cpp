@@ -112,9 +112,6 @@ void vtkMAFRemoveCellsFilterTest::TestMarkCell()
   }
 
   rc->Update();
-
-  CPPUNIT_ASSERT(true);
-
 }
 
 
@@ -140,7 +137,4 @@ void vtkMAFRemoveCellsFilterTest::TestUndoMarks()
 
   rc->UndoMarks();
   rc->Update();
-
-  CPPUNIT_ASSERT(true);
-
 }

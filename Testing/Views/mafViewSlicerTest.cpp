@@ -35,7 +35,4 @@ void mafViewSlicerTest::CreateDestroyTest()
   mafViewSlicer *slicerView = new mafViewSlicer();
   slicerView->PackageView();
   slicerView->Delete();
-   
-  CPPUNIT_ASSERT(true);
- 
 }

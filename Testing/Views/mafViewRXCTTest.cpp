@@ -35,7 +35,4 @@ void mafViewRXCTTest::CreateDestroyTest()
   mafViewRXCT *rxctView = new mafViewRXCT();
   rxctView->PackageView();
   rxctView->Delete();
-   
-  CPPUNIT_ASSERT(true);
- 
 }

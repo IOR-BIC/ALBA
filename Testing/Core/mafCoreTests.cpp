@@ -76,6 +76,7 @@
 #include "mafAbsMatrixPipeTest.h"
 #include "vtkMAFAssemblyTest.h"
 #include "mafViewPlotTest.h"
+#include "mafProgressBarHelperTest.h"
 #include "TimeSetTest.h"
 #include "VMEPoseTest.h"
 #include <wx/dir.h>
@@ -224,6 +225,7 @@ int
   runner.addTest( mafAttributeTraceabilityTest::suite());
 	runner.addTest( mafAttributeTest::suite());
 	runner.addTest( mafViewPlotTest::suite());
+	runner.addTest( mafProgressBarHelperTest::suite());
 	
 	runner.run( controller );
 

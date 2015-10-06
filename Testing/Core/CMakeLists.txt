@@ -64,6 +64,7 @@ SET(PROJECT_SRCS
 	mafViewPlotTest.h mafViewPlotTest.cpp
 	TimeSetTest.h TimeSetTest.cpp
 	VMEPoseTest.h VMEPoseTest.cpp
+	mafProgressBarHelperTest.h mafProgressBarHelperTest.cpp
 )
 #-----------------------------------------------------------------------------
 # tests using cppunit testing framework

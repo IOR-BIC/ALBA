@@ -103,7 +103,6 @@ void mafRefSysTest::TestSetGetTransform()
   mafRefSys refSys;
   mafTransform *transform = mafTransform::New();
   refSys.SetTransform(transform);  
-  CPPUNIT_ASSERT(true);
 }
 
 void mafRefSysTest::TestSetGetMatrix()
@@ -112,7 +111,6 @@ void mafRefSysTest::TestSetGetMatrix()
   mafMatrix *matrix = mafMatrix::New();
   refSys.SetMatrix(matrix);
   refSys.GetMatrix();
-  CPPUNIT_ASSERT(true);
 }
 
 void mafRefSysTest::TestSetGetRenderer()
@@ -137,7 +135,6 @@ void mafRefSysTest::TestDeepCopy()
   mafRefSys refSysSource;
   mafRefSys refSysTarget;
   refSysTarget.DeepCopy(&refSysSource);
-  CPPUNIT_ASSERT(true);
 }
 
 void mafRefSysTest::TestReset()

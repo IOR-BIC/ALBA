@@ -33,9 +33,6 @@ void mafViewPlotTest::CreateDestroyTest()
   mafViewPlot *plotView = new mafViewPlot();
   plotView->Create();
   plotView->Delete();
-
-  CPPUNIT_ASSERT(true);
-
 }
 
 

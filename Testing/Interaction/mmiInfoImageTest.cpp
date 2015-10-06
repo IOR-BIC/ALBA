@@ -63,6 +63,5 @@ void mmiInfoImageTest::TestOnEvent()
   dummyDevice->Delete();
   dummy->Delete();
   info->Delete();
-  CPPUNIT_ASSERT(true);
 }
 

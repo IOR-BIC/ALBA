@@ -38,7 +38,4 @@ void mafViewVTKCompoundTest::CreateDestroyTest()
   icView->SetExternalView(vtkView);
   icView->PackageView();
   icView->Delete();
-
-  CPPUNIT_ASSERT(true);
-
 }

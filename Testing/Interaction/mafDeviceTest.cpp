@@ -129,8 +129,6 @@ void mafDeviceTest::TestStop()
 
   dummyDevice->Stop();
 
-  CPPUNIT_ASSERT(true);
-
   dummyDevice->Delete();
 }
 //----------------------------------------------------------------------------
@@ -259,7 +257,5 @@ void mafDeviceTest::TestOnEvent()
   dummyMouse2DMoveEvent.SetId(mafDeviceButtonsPadMouse::GetMouse2DMoveId());
 
   dummyDevice->OnEvent(&dummyMouse2DMoveEvent);
-  CPPUNIT_ASSERT(true); 
-
   dummyDevice->Delete();
 }
