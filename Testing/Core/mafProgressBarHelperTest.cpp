@@ -73,6 +73,14 @@ void mafProgressBarHelperTest::InitProgressBarTest()
 	CPPUNIT_ASSERT(m_InitEventNum==1);
 	CPPUNIT_ASSERT(m_UpdateEventNum==0);
 	CPPUNIT_ASSERT(m_CloseEventNum==0);
+
+	//Double Init
+	helper.InitProgressBar();
+
+	//Check event counters
+	CPPUNIT_ASSERT(m_InitEventNum==2);
+	CPPUNIT_ASSERT(m_UpdateEventNum==0);
+	CPPUNIT_ASSERT(m_CloseEventNum==1);
 }
 
 //----------------------------------------------------------------------------

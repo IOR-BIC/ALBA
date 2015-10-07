@@ -29,6 +29,7 @@ mafCxxTypeMacro(mafBrickedFileReader);
 
 #include "mafMemDbg.h"
 #include "vtkMAFIdType64.h"
+#include "mafProgressBarHelper.h"
 
 #define BBF_DATACACHE_MAXCOUNT	7	//central brick + bricks around (L1 resample only)
 
@@ -439,8 +440,7 @@ void mafBrickedFileReader::GetBricksExtent(int VOI[6], int inBExt[6], int bndBEx
 	for (xyzb[2] = bndBExt[4]; xyzb[2] <= bndBExt[5]; xyzb[2]++, nBrickLineZ += m_NBricksDim[1], 
 		nLRIdxZ += m_NBricksDimSize[1]*m_NVoxelSizeInB)
 	{
-		mafEventMacro(mafEvent(this, PROGRESSBAR_SET_VALUE, (long)(
-			100*(xyzb[2] - bndBExt[4]) / (bndBExt[5] - bndBExt[4] + 1))));
+		m_ProgressHelper->UpdateProgressBar(100*(xyzb[2] - bndBExt[4]) / (bndBExt[5] - bndBExt[4] + 1));
 
 		//planes from bndBExt[4] to inBExt[4] (exclusively)
 		//and planes from inBExt[5] (exclusively) to bndExt[5]
@@ -573,12 +573,10 @@ void mafBrickedFileReader::GetBricksExtent(int VOI[6], int inBExt[6], int bndBEx
 		return true; //no change
 	}
 
-	mafEventMacro(mafEvent(this, PROGRESSBAR_SHOW, this));
-
-	mafString szMsg = _("Retrieving data ...");
-	mafEventMacro(mafEvent(this, PROGRESSBAR_SET_TEXT, &szMsg));
-	mafEventMacro(mafEvent(this, PROGRESSBAR_SET_VALUE, (long)0));
-
+	m_ProgressHelper = new mafProgressBarHelper(m_Listener);
+	m_ProgressHelper->InitProgressBar();
+	m_ProgressHelper->SetBarText("Retrieving data ...");
+	
 	try
 	{
 		//check if we still work with the same file
@@ -608,7 +606,7 @@ void mafBrickedFileReader::GetBricksExtent(int VOI[6], int inBExt[6], int bndBEx
 		return false;
 	}
 
-	mafEventMacro(mafEvent(this, PROGRESSBAR_HIDE, this));
+	cppDEL(m_ProgressHelper);
 
 	m_LastUpdateTime.Modified();
 	return true;

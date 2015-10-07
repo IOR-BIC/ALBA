@@ -41,6 +41,7 @@
 #include "mafAttribute.h"
 
 #include <fstream>
+#include "mafProgressBarHelper.h"
 
 #define round(x) (x<0?ceil((x)-0.5):floor((x)+0.5))
 
@@ -278,8 +279,9 @@ int mafDataVector::InternalStore(mafStorageElement *parent)
 
         if (resolvedURL == MAF_OK && wxFileExists(filename.GetCStr()))//Only if exist an archive where it is possible read the vtk data
         {
-          mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
-          long progress = 0;
+          mafProgressBarHelper progressHelper(m_Listener);
+					progressHelper.InitProgressBar();
+
 
           std::vector<mafString> filesExtracted = ZIPOpen(filename);
 
@@ -290,11 +292,7 @@ int mafDataVector::InternalStore(mafStorageElement *parent)
           int step = round(this->GetNumberOfItems() / 100) + 1;
           for (itTmp = Begin(); itTmp != End(); itTmp++)
           {
-            if ((dataIndex % step == 0))
-            {
-              progress++;
-              mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
-            }
+						progressHelper.UpdateProgressBar(dataIndex*100/this->GetNumberOfItems());
             itemTmp = itTmp->second;
             int IOmode = itemTmp->GetIOMode();
             itemTmp->SetIOModeToDefault();
@@ -303,9 +301,8 @@ int mafDataVector::InternalStore(mafStorageElement *parent)
 
             dataIndex++;
           }
-          
-          mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)100));
-          mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
+        
+					progressHelper.CloseProgressBar();
 
           for (int i=0;i<filesExtracted.size();i++)
           {

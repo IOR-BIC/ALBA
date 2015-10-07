@@ -18,6 +18,7 @@
 #define __mafProgressBarHelper_h
 
 #include "mafDefines.h"
+#include "mafString.h"
 
 //----------------------------------------------------------------------------
 // forward declarations
@@ -34,13 +35,19 @@ public:
 	virtual ~mafProgressBarHelper();
 
 	/**Init the Progress Bar, if label is not an empty string a busy info is created*/
-	void InitProgressBar(wxString label="");
+	void InitProgressBar(wxString label="", bool showBusyCursor=true);
 	
 	/**Close the Progress Bar*/
 	void CloseProgressBar();
 	
 	/** Updates the progress bar */
 	void UpdateProgressBar(long progress);
+
+	/** Resets the progress to zero **/
+	void ResetProgress();
+
+	/** Sets the progress bar text */
+	void SetBarText(mafString text);
 
 	/** Get TextMode */
 	bool GetTextMode();
@@ -55,6 +62,7 @@ protected:
 	bool m_Inited;
 	long m_Progress;
 	wxBusyInfo *m_BusyInfo;
+	wxBusyCursor *m_BusyCursor;
 	mafObserver    *m_Listener;
 	
 private:
