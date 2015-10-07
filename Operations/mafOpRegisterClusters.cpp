@@ -46,6 +46,7 @@
 #include "vtkTransform.h"
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkDoubleArray.h"
+#include "mafProgressBarHelper.h"
 
 #if defined(_MSC_VER) && _MSC_VER >= 1600
 #define strcmpi _strcmpi
@@ -715,20 +716,14 @@ void mafOpRegisterClusters::OpDo()
 		target->GetLocalTimeStamps(timeStamps);
 		int numTimeStamps = target->GetNumberOfTimeStamps();
 
-		//mafProgressBarShowMacro();
-		if(!m_TestMode)
-			mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
-
-		//mafProgressBarSetTextMacro("Multi time registration...");
-
+		mafProgressBarHelper progressHelper(m_Listener);
+		progressHelper.SetTextMode(m_TestMode);
+		progressHelper.InitProgressBar();
+		
 		for (int t = 0; t < numTimeStamps; t++)
 		{
 			double currTime = timeStamps[t];						
-			if(!m_TestMode) 
-			{
-				long p = t * 100 / numTimeStamps;
-				mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,p));
-			}
+			progressHelper.UpdateProgressBar(t * 100 / numTimeStamps);
 			
 			if (RegisterSource(currTime))
 				bRegistrationOK = true;	//at least something has been registered
@@ -738,8 +733,6 @@ void mafOpRegisterClusters::OpDo()
 
 		timeStamps.clear();
 
-		if(!m_TestMode)
-			mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));			
 	} //end else
 		
 	if (!bRegistrationOK)
