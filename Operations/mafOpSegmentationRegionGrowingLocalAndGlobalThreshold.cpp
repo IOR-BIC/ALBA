@@ -526,7 +526,8 @@ void mafOpSegmentationRegionGrowingLocalAndGlobalThreshold::WriteHistogramFiles(
   accumulate->SetComponentSpacing(1,0,0); // bins maps all the Scalars Range
   accumulate->Update();
 
-  wxString newDir = mafGetAppDataDirectory().c_str();
+  wxString newDir = (mafGetApplicationDirectory()).c_str();
+  wxString oldDir = wxGetCwd();
   wxSetWorkingDirectory(newDir);
 
   double val = accumulate->GetOutput()->GetPointData()->GetScalars()->GetTuple1(178);
@@ -589,6 +590,8 @@ void mafOpSegmentationRegionGrowingLocalAndGlobalThreshold::WriteHistogramFiles(
 
   yFile<<"]";
   yFile.close();
+
+  wxSetWorkingDirectory(oldDir);
 }
 //----------------------------------------------------------------------------
 void mafOpSegmentationRegionGrowingLocalAndGlobalThreshold::FittingLM()
@@ -627,7 +630,8 @@ void mafOpSegmentationRegionGrowingLocalAndGlobalThreshold::FittingLM()
   accumulate->SetComponentSpacing(1,0,0); // bins maps all the Scalars Range
   accumulate->Update();
 
-  wxString newDir = mafGetAppDataDirectory().c_str();
+  wxString newDir = (mafGetApplicationDirectory()).c_str();
+  wxString oldDir = wxGetCwd();
   wxSetWorkingDirectory(newDir);
 
   wxString command = "python.exe lm.py";
@@ -653,6 +657,8 @@ void mafOpSegmentationRegionGrowingLocalAndGlobalThreshold::FittingLM()
 
   mafLogMessage(command.c_str());
   //wxExecute(command,wxEXEC_SYNC);
+
+  wxSetWorkingDirectory(oldDir);
 }
 //----------------------------------------------------------------------------
 void mafOpSegmentationRegionGrowingLocalAndGlobalThreshold::OnEvent(mafEventBase *maf_event)
