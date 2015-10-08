@@ -67,7 +67,7 @@ void mafProgressBarHelperTest::InitProgressBarTest()
 	//Init Test
 	mafProgressBarHelper helper(this);
 
-	helper.InitProgressBar();
+	helper.InitProgressBar("",false);
 
 	//Check event counters
 	CPPUNIT_ASSERT(m_InitEventNum==1);
@@ -75,7 +75,7 @@ void mafProgressBarHelperTest::InitProgressBarTest()
 	CPPUNIT_ASSERT(m_CloseEventNum==0);
 
 	//Double Init
-	helper.InitProgressBar();
+	helper.InitProgressBar("",false);
 
 	//Check event counters
 	CPPUNIT_ASSERT(m_InitEventNum==2);
@@ -88,7 +88,7 @@ void mafProgressBarHelperTest::UpdateProgressBarTest()
 {
 	mafProgressBarHelper helper(this);
 
-	helper.InitProgressBar();
+	helper.InitProgressBar("",false);
 
 	CPPUNIT_ASSERT(m_UpdateEventNum==0);
 	
@@ -117,7 +117,7 @@ void mafProgressBarHelperTest::CloseProgressBarTest()
 {
 	mafProgressBarHelper helper(this);
 
-	helper.InitProgressBar();
+	helper.InitProgressBar("",false);
 	helper.CloseProgressBar();
 
 	//Check event counters
@@ -128,7 +128,7 @@ void mafProgressBarHelperTest::CloseProgressBarTest()
 	//Auto close on destroy test
 	mafProgressBarHelper *helper2;
 	helper2 = new mafProgressBarHelper(this);
-	helper2->InitProgressBar();
+	helper2->InitProgressBar("",false);
 	delete helper2;
 
 	//Check event counters
@@ -161,7 +161,7 @@ void mafProgressBarHelperTest::TextModeTest()
 	mafProgressBarHelper helper(this);
 
 	helper.SetTextMode(true);
-	helper.InitProgressBar();
+	helper.InitProgressBar("",false);
 	helper.UpdateProgressBar(10);
 	helper.CloseProgressBar();
 
