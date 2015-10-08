@@ -235,8 +235,7 @@ void mafDataPipeCustomSegmentationVolume::ApplyManualSegmentation()
   newScalars->SetNumberOfTuples(maskScalar->GetNumberOfTuples());
 
 	mafProgressBarHelper progressHelper(this->GetVME());
-	progressHelper.SetTextMode(this->GetVME()->GetTestMode());
-	progressHelper.InitProgressBar();
+	progressHelper.InitProgressBar("",false);
 
   for (int i=0;i<maskScalar->GetNumberOfTuples();i++)
   {
@@ -306,7 +305,7 @@ void mafDataPipeCustomSegmentationVolume::ApplyAutomaticSegmentation()
 
 	mafProgressBarHelper progressHelper(this->GetVME());
 	progressHelper.SetTextMode(this->GetVME()->GetTestMode());
-	progressHelper.InitProgressBar();
+	progressHelper.InitProgressBar("",false);
 
 
   vtkMAFSmartPointer<vtkUnsignedCharArray> newScalars;
@@ -479,8 +478,7 @@ void mafDataPipeCustomSegmentationVolume::ApplyRefinementSegmentation()
   newScalars->SetNumberOfTuples(maskScalar->GetNumberOfTuples());
 
 	mafProgressBarHelper progressHelper(this->GetVME());
-	progressHelper.SetTextMode(this->GetVME()->GetTestMode());
-	progressHelper.InitProgressBar();
+	progressHelper.InitProgressBar("",false);
 
   int step = ceil((double)maskScalar->GetNumberOfTuples()/100);
   double invStep = (double)1/step;
@@ -536,8 +534,7 @@ void mafDataPipeCustomSegmentationVolume::ApplyRegionGrowingSegmentation()
 //------------------------------------------------------------------------------
 {
 	mafProgressBarHelper progressHelper(this->GetVME());
-	progressHelper.SetTextMode(this->GetVME()->GetTestMode());
-	progressHelper.InitProgressBar();
+	progressHelper.InitProgressBar("",false);
 
   typedef itk::ConnectedThresholdImageFilter<RealImage, RealImage> ITKConnectedThresholdFilter;
   ITKConnectedThresholdFilter::Pointer connectedThreshold = ITKConnectedThresholdFilter::New();

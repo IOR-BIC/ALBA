@@ -574,7 +574,7 @@ void mafBrickedFileReader::GetBricksExtent(int VOI[6], int inBExt[6], int bndBEx
 	}
 
 	m_ProgressHelper = new mafProgressBarHelper(m_Listener);
-	m_ProgressHelper->InitProgressBar();
+	m_ProgressHelper->InitProgressBar("",false);
 	m_ProgressHelper->SetBarText("Retrieving data ...");
 	
 	try

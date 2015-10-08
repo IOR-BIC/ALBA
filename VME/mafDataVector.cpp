@@ -280,7 +280,7 @@ int mafDataVector::InternalStore(mafStorageElement *parent)
         if (resolvedURL == MAF_OK && wxFileExists(filename.GetCStr()))//Only if exist an archive where it is possible read the vtk data
         {
           mafProgressBarHelper progressHelper(m_Listener);
-					progressHelper.InitProgressBar();
+					progressHelper.InitProgressBar("",false);
 
 
           std::vector<mafString> filesExtracted = ZIPOpen(filename);
