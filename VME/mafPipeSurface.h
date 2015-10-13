@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: mafPipeSurface
- Authors: Silvano Imboden - Paolo Quadrani
+ Authors: Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -25,134 +25,147 @@
 //----------------------------------------------------------------------------
 // forward refs :
 //----------------------------------------------------------------------------
-class vtkTexture;
-class vtkPolyDataMapper;
-class vtkPolyData;
-class mafLODActor;
-class mafAxes;
-class mafGUIMaterialButton;
 class mmaMaterial;
+class vtkDataSetMapper;
 class vtkActor;
-class vtkGlyph3D;
-class vtkPolyDataNormals;
-class vtkLineSource;
-class vtkCellCenters;
-class vtkArrowSource;
-class vtkFeatureEdges;
-class vtkDataSetAttributes;
+class mafAxes;
+class vtkLookupTable;
+class mafGUIMaterialButton;
+class mafGUILutSwatch;
+class vtkMAFPolyDataNormals;
 
 //----------------------------------------------------------------------------
 // mafPipeSurface :
 //----------------------------------------------------------------------------
-/** Visual pipe used to render VTK polydata and allowing to manage scalar visibility,
-lookup table and some polygonal features like edges and normals.
-
-Shared documentation:
-https://docs.google.com/a/scsitaly.com/document/d/1j_AtB2aB3cwph6Tpi4QzjQYysOxPMbXBCgE3ZyLiS3M/edit?hl=en#
-
-*/
 class MAF_EXPORT mafPipeSurface : public mafPipe
 {
 public:
-  mafTypeMacro(mafPipeSurface,mafPipe);
+	mafTypeMacro(mafPipeSurface,mafPipe);
 
-               mafPipeSurface();
-  virtual     ~mafPipeSurface();
+	mafPipeSurface();
+	virtual     ~mafPipeSurface();
 
-  /** process events coming from Gui */
-  virtual void OnEvent(mafEventBase *maf_event);
+	/** process events coming from Gui */
+	virtual void OnEvent(mafEventBase *maf_event);
 
   /** Create the VTK rendering pipeline*/
-  virtual void Create(mafSceneNode *n);
-  
+	virtual void Create(mafSceneNode *n);
+
   /** Manage the actor selection by showing the corner box around the actor when the corresponding VME is selected.*/
-  virtual void Select(bool select); 
+	virtual void Select(bool select); 
 
-  /** Let to enable/disable the Level Of Detail behavior.*/
-  void SetEnableActorLOD(bool value);
-
-  /** IDs for the GUI */
-  enum PIPE_SURFACE_WIDGET_ID
-  {
-    ID_SCALAR_VISIBILITY = Superclass::ID_LAST,
-    ID_RENDERING_DISPLAY_LIST,
-    ID_USE_VTK_PROPERTY,
-    ID_USE_LOOKUP_TABLE,
+	/** IDs for the GUI */
+	enum PIPE_SURFACE_WIDGET_ID
+	{
+		ID_LAST = Superclass::ID_LAST,
+    ID_WIREFRAME,
+		ID_NORMALS_TYPE,
+    ID_WIRED_ACTOR_VISIBILITY,
+		ID_BORDER_CHANGE,
+    ID_SCALARS,
     ID_LUT,
-    ID_ENABLE_LOD,
-		ID_NORMAL_VISIBILITY,
-		ID_EDGE_VISIBILITY,
-    ID_SCALARS_DATA_TYPE_SELECTION, // (added by Losi 2011/04/08 to allow scalars array selection)
-    ID_SCALARS_ARRAY_SELECTION,     // (added by Losi 2011/04/08 to allow scalars array selection)
-    ID_LAST
-  };
+    ID_SCALAR_MAP_ACTIVE,
+    ID_USE_VTK_PROPERTY,
+	};
 
-  /** Set the actor picking*/
-  void SetActorPicking(int enable = true);
+  enum PIPE_SURFACE_TYPE_SCALARS
+  {
+    POINT_TYPE = 0,
+    CELL_TYPE,
+  };
 
   /** Get assembly front/back */
   virtual vtkMAFAssembly *GetAssemblyFront(){return m_AssemblyFront;};
   virtual vtkMAFAssembly *GetAssemblyBack(){return m_AssemblyBack;};
+	
+  /** Core of the pipe */
+  virtual void ExecutePipe();
+  
+  /** Add/RemoveTo Assembly Front/back */
+  virtual void AddActorsToAssembly(vtkMAFAssembly *assembly);
+  virtual void RemoveActorsFromAssembly(vtkMAFAssembly *assembly);
+  
+  /** Set the actor picking*/
+	void SetActorPicking(int enable = true);
 
-  void SetEdgeVisibilityOn(){m_EdgeVisibility = TRUE;};
-  void SetEdgeVisibilityOff(){m_EdgeVisibility = FALSE;};
+  /** Set the actor wire frame*/
+  void SetWireframeOn();
+  void SetWireframeOff();
 
-  void SetNormalVisibilityOn(){m_NormalVisibility = TRUE;};
-  void SetNormalVisibilityOff(){m_NormalVisibility = FALSE;};
+	/** Set Normal type generation */
+	void SetNormalsTypeToPoints();
+	void SetNormalsTypeToCells();
+  
+  /** Set the actor border visible or not*/
+  void SetWiredActorVisibilityOn();
+  void SetWiredActorVisibilityOff();
 
-  void SetScalarVisibilityOn(){m_ScalarVisibility = TRUE;};
-  void SetScalarVisibilityOff(){m_ScalarVisibility = FALSE;};
+  /** Set/Get Active Scalar */
+  void SetActiveScalar(int index){m_ScalarIndex = index;};
+  int GetScalarIndex(){return m_ScalarIndex;};
 
-  void SetUseVtkPropertyOn(){m_UseVTKProperty = TRUE;};
-  void SetUseVtkPropertyOff(){m_UseVTKProperty = FALSE;};
+  /** Get Number of Scalars */
+  int GetNumberOfArrays(){return m_NumberOfArrays;};
+
+  /** Set scalar map active, so you can see scalar associated to points or cells*/
+  void SetScalarMapActive(int value){m_ScalarMapActive = value;};
+  
+  /** Set VTK Property to visualize the material of vme*/
+  void SetUseVTKProperty(int value){m_UseVTKProperty = value;};
+
+  /** Set the lookup table */
+	void SetLookupTable(vtkLookupTable *table);
+  
+  /** Gets the lookup table*/
+	vtkLookupTable *GetLookupTable(){return m_Table;};
+
+	/**Return the thickness of the border*/	
+	double GetThickness();
+
+	/**Set the thickness value*/
+	void SetThickness(double thickness);
 
 protected:
-  vtkPolyDataMapper	      *m_Mapper;
-	vtkLineSource						*m_Arrow;
-	vtkPolyDataNormals			*m_Normal;
-	vtkGlyph3D							*m_NormalGlyph;
-	vtkPolyDataMapper				*m_NormalMapper;
-	vtkActor								*m_NormalActor;
-	vtkCellCenters					*m_CenterPointsFilter;
-	vtkArrowSource					*m_NormalArrow;
-  vtkActor                *m_Actor; ///< Actor representing the polygonal surface
 
-  mafLODActor             *m_OutlineActor;
-  mafAxes                 *m_Axes;
-	vtkFeatureEdges					*m_ExtractEdges;
-	vtkPolyDataMapper				*m_EdgesMapper;
-	vtkActor								*m_EdgesActor;
+	mmaMaterial             *m_ObjectMaterial;
+	vtkDataSetMapper        *m_Mapper;
+  vtkDataSetMapper        *m_MapperWired;
+	vtkActor                *m_Actor;
+  vtkActor                *m_ActorWired;
+	vtkActor                *m_OutlineActor;
+	vtkMAFPolyDataNormals   *m_NormalsGenerator;
+	mafAxes                 *m_Axes;
+  vtkLookupTable          *m_Table;
 
-  int m_UseVTKProperty; ///< Flag to switch On/Off the VTK property usage to color the surface
-  int m_UseLookupTable; ///< Flag to switch On/Off the lookup table usage to color the surface
-  int m_EnableActorLOD; ///< Flag to switch On/Off the usage of the Level Of Detail
+	mafGUILutSwatch *m_LutSwatch;
 
-  int m_ScalarVisibility;         ///< Flag to switch On/Off the scalar visibility
-	int m_NormalVisibility;         ///< Flag to switch On/Off the visibility of normals on the surface
-	int m_EdgeVisibility;           ///< Flag to switch On/Off the visibility of edge feature on the surface
-  int m_RenderingDisplayListFlag; ///< Flag to switch On/Off the 
-  mmaMaterial *m_SurfaceMaterial;
-  mafGUIMaterialButton *m_MaterialButton;
+  void CreateFieldDataControlArrays();
+	
+  void UpdateProperty(bool fromTag = false);
+	
+  /** Update data value to selected scalar */
+  void UpdateActiveScalarsInVMEDataVectorItems();
+  
+  /** Update the visualization with changed scalar*/
+  void UpdateVisualizationWithNewSelectedScalars();
 
-  int m_SelectedScalarsArray;           ///< Contains the index of the visivle scalars array of the input surface (added by Losi 2011/04/08 to allow scalars array selection)
-  int m_SelectedDataAttribute;          ///< Determine the visible scalars data type (0 for point data, 1 for cell data) (added by Losi 2011/04/08 to allow scalars array selection)
-  wxComboBox *m_ScalarsArraySelection ; ///< GUI element for selecting the active scalars array (added by Losi 2011/04/08 to allow scalars array selection)
+  wxString                *m_ScalarsInComboBoxNames;
+  wxString                *m_ScalarsVTKName;
 
-  //void UpdateProperty(bool fromTag = false);
+  mafGUIMaterialButton       *m_MaterialButton;
 
-  /** Create the pipeline to show the edges information on surface.*/
-	void CreateEdgesPipe();
-
-  /** Create the pipeline to show the normals of the polydata as arrows centered into the center of the cells.*/
-	void CreateNormalsPipe();
+  int                      m_PointCellArraySeparation;
+  int                      m_ScalarIndex;
+  int                      m_NumberOfArrays;
+  int                      m_ActiveScalarType;
+  int                      m_Wireframe;
+	int											 m_ShowCellsNormals;
+  int                      m_BorderElementsWiredActor;
+  int                      m_ScalarMapActive;
+  int                      m_UseVTKProperty;
+	double				           m_Border;
 
   /** Create the Gui for the visual pipe that allow the user to change the pipe's parameters.*/
-  virtual mafGUI  *CreateGui();
-
-  /** Update the scalars array visualization (added by Losi 2011/04/08 to allow scalars array selection) */
-  void UpdateScalarsArrayVisualization(vtkDataSetAttributes *dataAttribute);
-
-  /** Return the selected data attribute (point or cell data) (added by Losi 2011/04/08 to allow scalars array selection) */
-  vtkDataSetAttributes *GetSelectedDataAttribute();
+	virtual mafGUI  *CreateGui();
 };  
 #endif // __mafPipeSurface_H__
