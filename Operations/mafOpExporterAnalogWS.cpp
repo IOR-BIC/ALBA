@@ -33,6 +33,7 @@
 #include <iostream>
 
 #include <vnl\vnl_matrix.h>
+#include "mafProgressBarHelper.h"
 
 using namespace std;
 
@@ -94,11 +95,8 @@ void mafOpExporterAnalogWS::OpRun()
 void mafOpExporterAnalogWS::Write()   
 //----------------------------------------------------------------------------
 {
-  if (!m_TestMode)
-  {
-    wxSetCursor(wxCursor(wxCURSOR_WAIT));
-	  mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
-  }
+	mafProgressBarHelper progressHelper(m_Listener);
+	progressHelper.SetTextMode(m_TestMode);
   
   m_Analog = mafVMEAnalog::SafeDownCast(m_Input);
   mafTagItem *tag_sig = m_Analog->GetTagArray()->GetTag("SIGNALS_NAME");
@@ -154,18 +152,9 @@ void mafOpExporterAnalogWS::Write()
           f_Out << emgMatrix.get(emgMatrix.rows()-1,i) << "\n";
         }
       }
-      if (!m_TestMode)
-      {
-        mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)(((double) i)/((double) emgMatrix.columns())*100.)));
-      }
+			progressHelper.UpdateProgressBar(((double) i)/((double) emgMatrix.columns())*100.);
     }
     
     f_Out.close();
   }  
-
-  if (!m_TestMode)
-  {
-    mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
-    wxSetCursor(wxCursor(wxCURSOR_DEFAULT));
-  }
 }

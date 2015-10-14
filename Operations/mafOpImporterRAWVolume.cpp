@@ -466,7 +466,6 @@ bool mafOpImporterRAWVolume::Import()
   reader->SetDataVOI(0, m_DataDimemsion[0] - 1, 0, m_DataDimemsion[1] - 1, m_SliceVOI[0], m_SliceVOI[1] - 1);
   if(!this->m_TestMode)
 	{
-		mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
 		mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,reader));
 	}
 //  reader->SetDataVOI(0, m_DataDimemsion[0] - 1, 0, m_DataDimemsion[1] - 1, 0, m_SliceVOI[1] - m_SliceVOI[0] - 1);
@@ -581,8 +580,6 @@ bool mafOpImporterRAWVolume::Import()
   m_Output->SetName(name.c_str());
   m_Output->GetTagArray()->SetTag(tag_Nature);
   m_Output->ReparentTo(m_Input);
-	if(!m_TestMode)
-		mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
 	return true;
 }
 //----------------------------------------------------------------------------

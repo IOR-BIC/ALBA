@@ -19,6 +19,8 @@ Reads the BBF file into vtkImageDataSet
 #include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"
 
+class mafProgressBarHelper;
+
 class mafBrickedFileReader : public mafBrickedFile
 {
 public:
@@ -44,6 +46,8 @@ protected:
 	//output data set
 	vtkImageData* m_DataSet;
   vtkRectilinearGrid* m_DataSetRLG;   //rectilinear data set
+
+	mafProgressBarHelper *m_ProgressHelper;
 
 	//requested VOI (in the highest resolution units)
 	int m_VOI[6];		

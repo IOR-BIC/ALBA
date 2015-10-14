@@ -104,6 +104,7 @@ const int BOUND_1=1;
 #include "vtkMAFSmartPointer.h"
 #include "vtkTextSource.h"
 #include "vtkCaptionActor2D.h"
+#include "mafProgressBarHelper.h"
 
 mafCxxTypeMacro(mafViewArbitraryOrthoSlice);
 
@@ -3214,11 +3215,11 @@ void mafViewArbitraryOrthoSlice::RestoreCameraParametersForAllSubviews()
 void mafViewArbitraryOrthoSlice::AccumulateTextures( mafVMESlicer *inSlicer, double inRXThickness , vtkImageData *outRXTexture /*= NULL */, bool showProgressBar /*= false*/ )
 {	
 
+	mafProgressBarHelper progressHelper(m_Listener);
+	
+
 	if (showProgressBar)
-	{
-		mafEvent e(this,PROGRESSBAR_SHOW);
-		mafEventMacro(e);
-	}
+		progressHelper.InitProgressBar("");
 
 	int direction = -1;
 
@@ -3297,17 +3298,14 @@ void mafViewArbitraryOrthoSlice::AccumulateTextures( mafVMESlicer *inSlicer, dou
 	// total number of slices I'm accumulating
 	int numberOfSlicesToAccumulate = additionalProfileNumber * 2 + 1;
 	int slicesAlreadyProcessed = 0;
-	long progress = -1;
+
 
 	// for each profile
 	for(int profileId = -additionalProfileNumber; profileId <= additionalProfileNumber; profileId++)
 	{
-		progress = (100 * ((double )slicesAlreadyProcessed) / ((double) numberOfSlicesToAccumulate));
-
 		if (showProgressBar)
 		{
-			mafEvent eUpdate(this,PROGRESSBAR_SET_VALUE,progress);
-			mafEventMacro(eUpdate);
+			progressHelper.UpdateProgressBar(100 * ((double )slicesAlreadyProcessed) / ((double) numberOfSlicesToAccumulate));
 		}
 
 		if (profileId == 0)
@@ -3373,12 +3371,6 @@ void mafViewArbitraryOrthoSlice::AccumulateTextures( mafVMESlicer *inSlicer, dou
 		assert(slicesAlreadyProcessed <= numberOfSlicesToAccumulate);
 
 	} // for each slice
-
-	if (showProgressBar)
-	{
-		mafEvent eHideProgress(this,PROGRESSBAR_HIDE);
-		mafEventMacro(eHideProgress);
-	}
 
 	for (int scalarId = 0; scalarId < numberOfTuples; scalarId++)
 	{
@@ -4055,10 +4047,9 @@ void mafViewArbitraryOrthoSlice::OnEventID_ENABLE_EXPORT_IMAGES(int axis)
 
 void mafViewArbitraryOrthoSlice::SaveSlicesTextureToFile(int choosedExportAxis)
 {
-	wxBusyInfo wait("please wait");
 
-	mafEvent e(this,PROGRESSBAR_SHOW);
-	mafEventMacro(e);
+	mafProgressBarHelper progressHelper(m_Listener);
+	progressHelper.InitProgressBar("please wait");
 
 	mafVMESlicer *currentSlicer = NULL;
 
@@ -4090,10 +4081,7 @@ void mafViewArbitraryOrthoSlice::SaveSlicesTextureToFile(int choosedExportAxis)
 
 	for (int i = 0; i < m_NumberOfAxialSections[choosedExportAxis]; i++)
 	{          
-		long progress = (100 * ((double )i) / ((double) m_NumberOfAxialSections[choosedExportAxis]));
-
-		mafEvent eUpdate(this,PROGRESSBAR_SET_VALUE,progress);
-		mafEventMacro(eUpdate);
+		progressHelper.UpdateProgressBar(100 * ((double )i) / ((double) m_NumberOfAxialSections[choosedExportAxis]));
 
 		// move the slicer in the target abs pose
 		vtkMAFSmartPointer<vtkTransform> tr;
@@ -4183,10 +4171,6 @@ void mafViewArbitraryOrthoSlice::SaveSlicesTextureToFile(int choosedExportAxis)
 
 	currentSlicer->GetSurfaceOutput()->GetVTKData()->Modified();
 	currentSlicer->GetSurfaceOutput()->GetVTKData()->Update();
-
-
-	mafEvent eHide(this,PROGRESSBAR_HIDE);
-	mafEventMacro(eHide);
 
 	UpdateSlicersLUT();
 }
@@ -4658,10 +4642,8 @@ void mafViewArbitraryOrthoSlice::SaveSlicesFromRenderWindowToFile(int chooseExpo
 
 	message.append(" View");
 
-	wxBusyInfo wait(message.c_str());
-
-	mafEvent e(this,PROGRESSBAR_SHOW);
-	mafEventMacro(e);
+	mafProgressBarHelper progressHelper(m_Listener);
+	progressHelper.InitProgressBar(message);
 
 	int viewToExport = -1;
 
@@ -4719,10 +4701,7 @@ void mafViewArbitraryOrthoSlice::SaveSlicesFromRenderWindowToFile(int chooseExpo
 
 	for (int i = 0; i < m_NumberOfAxialSections[chooseExportAxis]; i++)
 	{          
-		long progress = (100 * ((double )i) / ((double) m_NumberOfAxialSections[chooseExportAxis]));
-
-		mafEvent eUpdate(this,PROGRESSBAR_SET_VALUE,progress);
-		mafEventMacro(eUpdate);
+		progressHelper.UpdateProgressBar(100 * ((double )i) / ((double) m_NumberOfAxialSections[chooseExportAxis]));
 
 		// move the slicer in the target abs pose
 		vtkMAFSmartPointer<vtkTransform> tr;
@@ -4871,9 +4850,6 @@ void mafViewArbitraryOrthoSlice::SaveSlicesFromRenderWindowToFile(int chooseExpo
 
 	currentSlicer->GetSurfaceOutput()->GetVTKData()->Modified();
 	currentSlicer->GetSurfaceOutput()->GetVTKData()->Update();
-
-	mafEvent eHide(this,PROGRESSBAR_HIDE);
-	mafEventMacro(eHide);
 
 	ShowRuler(chooseExportAxis, false);
 

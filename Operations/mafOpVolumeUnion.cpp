@@ -45,6 +45,7 @@
 #include <vtkUnsignedShortArray.h>
 #include <vtkProbeFilter.h>
 #include <algorithm>
+#include "mafProgressBarHelper.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafOpVolumeUnion);
@@ -128,14 +129,9 @@ void mafOpVolumeUnion::OpRun()
 void mafOpVolumeUnion::BuildVolumeUnion()
 //----------------------------------------------------------------------------
 {
-	wxBusyInfo *wait = NULL;
-	long progress = 0;
-	if(!this->m_TestMode)
-	{
-		wait = new wxBusyInfo("Build Volume Union: please wait...");
-		mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
-		mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE, progress));
-	}
+	mafProgressBarHelper progressHelper(m_Listener);
+	progressHelper.SetTextMode(m_TestMode);
+	progressHelper.InitProgressBar("Build Volume Union: please wait...");
 
 	//Input data(first volume)
 	m_FirstVMEVolume->Update();
@@ -231,16 +227,7 @@ void mafOpVolumeUnion::BuildVolumeUnion()
 
 	rgrid_totvol->Update();
 
-	if(!this->m_TestMode)
-	{
-		for(int i=1; i<21; i++) 
-		{
-			progress++;
-			Sleep(150); // Workaround: I need this sleep function to update slowly the progress bar 
-			mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
-		}	
-	}
-	 
+	progressHelper.UpdateProgressBar(20);
 	 
 	if(m_FirstVMEVolume->GetOutput()->GetVTKData()->IsA("vtkRectilinearGrid"))
 	{
@@ -292,17 +279,8 @@ void mafOpVolumeUnion::BuildVolumeUnion()
 	sampleVolume1->Update();
 
 
-	if(!this->m_TestMode)
-	{
-		for(int i=21; i<61; i++) 
-		{
-			progress++;
-			Sleep(150);
-		    mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
-		}
-	}
+	progressHelper.UpdateProgressBar(60);
 	
-
 	//Translation of the coordinates
 	if(m_SecondVMEVolume->GetOutput()->GetVTKData()->IsA("vtkRectilinearGrid"))
 	{
@@ -353,15 +331,7 @@ void mafOpVolumeUnion::BuildVolumeUnion()
 	}
 	sampleVolume2->Update();
 
-	if(!this->m_TestMode)
-	{
-		for(int i=61; i<99; i++) 
-		{
-			progress++;
-			Sleep(150);
-			mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
-		}
-	}
+	progressHelper.UpdateProgressBar(98);
 	
 	//Output volume
 	//Coordinates
@@ -413,21 +383,7 @@ void mafOpVolumeUnion::BuildVolumeUnion()
 	  m_VolUnionRGstr->Update();
 	}
 
-	if(!this->m_TestMode)
-	{
-		for(int i=99; i<101; i++) 
-		{
-			progress++;
-			Sleep(150);
-			mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
-		}
-	}
-
-	if(!this->m_TestMode)
-	{
-	    mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
-	}
-	if(wait) delete wait;
+	progressHelper.UpdateProgressBar(100);
 
 	vtkDEL(rgarray_VolUnionRG);
 

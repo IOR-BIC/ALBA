@@ -25,6 +25,7 @@ mafProgressBarHelper::mafProgressBarHelper(mafObserver *listener)
 	m_Inited=m_TextMode=false;
 	m_Progress=0;
 	m_BusyInfo=NULL;
+	m_BusyCursor=NULL;
 	m_Listener=listener;
 }
 
@@ -37,7 +38,7 @@ mafProgressBarHelper::~mafProgressBarHelper()
 
 
 //----------------------------------------------------------------------------
-void mafProgressBarHelper::InitProgressBar(wxString label)
+void mafProgressBarHelper::InitProgressBar(wxString label,bool showBusyCursor)
 {
 	if(m_Inited)
 		CloseProgressBar();
@@ -49,6 +50,8 @@ void mafProgressBarHelper::InitProgressBar(wxString label)
 	{
 		if(!label.empty())
 			m_BusyInfo = new wxBusyInfo(label);
+		if(showBusyCursor)
+			m_BusyCursor = new wxBusyCursor(); //wxHOURGLASS_CURSOR
 		mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
 	}
 	else
@@ -64,6 +67,7 @@ void mafProgressBarHelper::CloseProgressBar()
 	if (m_TextMode == false)
 	{
 		cppDEL(m_BusyInfo);
+		cppDEL(m_BusyCursor);
 		mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
 	}
 	else
@@ -93,6 +97,25 @@ void mafProgressBarHelper::UpdateProgressBar(long progress)
 			m_Progress += 2;
 			printf("%c", 177);
 		}
+	}
+}
+
+//----------------------------------------------------------------------------
+void mafProgressBarHelper::ResetProgress()
+{
+	mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)0.0));
+}
+
+//----------------------------------------------------------------------------
+void mafProgressBarHelper::SetBarText(mafString text)
+{
+	if (m_TextMode == false)
+	{
+		mafEventMacro(mafEvent(this, PROGRESSBAR_SET_TEXT, &text));
+	}
+	else
+	{
+		printf("%s&c\n",text.GetCStr(), 179);
 	}
 }
 

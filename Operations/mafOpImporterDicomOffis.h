@@ -51,6 +51,7 @@ class vtkActor2D;
 class vtkPolyData;
 class vtkTextMapper;
 class mafVMEGroup;
+class mafProgressBarHelper;
 
 class mafDicomSlice;
 class medDicomSeriesSliceList;
@@ -212,7 +213,7 @@ protected:
 	bool BuildDicomFileList(const char *dicomDirABSPath);
 
 	/** Read the list of dicom files recognized. */
-	bool ReadDicomFileList(mafString& currentSliceABSDirName);
+	bool ReadDicomFileList(mafString& currentSliceABSDirName, mafProgressBarHelper *progressHelper);
 
 	/** Check if dicom dataset contains rotations */
 	bool IsRotated( double dcmImageOrientationPatient[6] );

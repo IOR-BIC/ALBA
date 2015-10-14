@@ -36,6 +36,7 @@
 #include "mafSmartPointer.h"
 
 #include <fstream>
+#include "mafProgressBarHelper.h"
 
 const bool DEBUG_MODE = true;
 
@@ -256,10 +257,11 @@ void mafOpImporterLandmark::Read()
     wxBusyInfo wait("Reading landmark cloud");
   }
 
-  mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
+	mafProgressBarHelper progressHelper(m_Listener);
+	progressHelper.SetTextMode(m_TestMode);
+	progressHelper.InitProgressBar();
 
   long counter = 0;
-  long progress = 0;
 
   while(!landmarkFileStream.fail())
   {
@@ -292,9 +294,7 @@ void mafOpImporterLandmark::Read()
         m_VmeCloud->SetLandmarkVisibility(counter, 0, t);
       counter++;
 
-      progress = counter * 100 / numberOfLines;
-      mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE, progress));
-
+      progressHelper.UpdateProgressBar(counter * 100 / numberOfLines);
     }
   }
   m_VmeCloud->Close();
@@ -304,8 +304,6 @@ void mafOpImporterLandmark::Read()
   landmarkFileStream.close();
 
   m_Output = m_VmeCloud;
-
-  mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
 }
 //----------------------------------------------------------------------------
 void mafOpImporterLandmark::ReadWithoutTag()   
@@ -351,7 +349,6 @@ void mafOpImporterLandmark::ReadWithoutTag()
 //  char tz[20];
   
   long counter = 0; 
-  long progress = 0;
 
   bool exception = FALSE;
   
@@ -379,7 +376,9 @@ void mafOpImporterLandmark::ReadWithoutTag()
     wxBusyInfo wait("Reading landmark cloud");
   }
 
-  mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
+	mafProgressBarHelper progressHelper(m_Listener);
+	progressHelper.SetTextMode(m_TestMode);
+	progressHelper.InitProgressBar();
 
   while(!landmarkFileStream.fail())
   {
@@ -408,9 +407,7 @@ void mafOpImporterLandmark::ReadWithoutTag()
     
     counter++;
 
-    progress = counter * 100 / numberOfLines;
-    mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE, progress));
-
+    progressHelper.UpdateProgressBar(counter * 100 / numberOfLines);
   }
 
   m_VmeCloud->Close();
@@ -419,6 +416,5 @@ void mafOpImporterLandmark::ReadWithoutTag()
 
   landmarkFileStream.close();
 
-  mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
   m_Output = m_VmeCloud;
 }
