@@ -626,15 +626,23 @@ int mafVMEMeshAnsysTextImporter::GetElementType()
     {
       // element is 4 nodes tetra
       m_ElementType = TETRA4; 
-      m_VtkCellType = 10;
+	    m_VtkCellType = VTK_TETRA;
       m_NodesPerElement = 4; 
       m_MeshType = LINEAR;
     }
+	else if (numConnectivityPoints == 6)
+	{
+		// element is 4 nodes tetra
+		m_ElementType = WEDGE6; 
+		m_VtkCellType = VTK_WEDGE;
+		m_NodesPerElement = 6; 
+		m_MeshType = LINEAR;
+	}
     else if (numConnectivityPoints == 8)
     {
       // element is 8 nodes hexa
       m_ElementType = HEXA8;
-      m_VtkCellType = 12;
+      m_VtkCellType = VTK_HEXAHEDRON;
       m_NodesPerElement = 8;
       m_MeshType = LINEAR;
     }
@@ -642,7 +650,7 @@ int mafVMEMeshAnsysTextImporter::GetElementType()
     {
       // element is 10 nodes tetra 
       m_ElementType = TETRA10;
-      m_VtkCellType = 24;
+      m_VtkCellType = VTK_QUADRATIC_TETRA;
       m_NodesPerElement = 10;
       m_MeshType = PARABOLIC;
     }
@@ -650,7 +658,7 @@ int mafVMEMeshAnsysTextImporter::GetElementType()
     {
       // element is 20 nodes hexa
       m_ElementType = HEXA20;
-      m_VtkCellType = 25;
+      m_VtkCellType = VTK_QUADRATIC_HEXAHEDRON;
       m_NodesPerElement = 20;
       m_MeshType = PARABOLIC;
     }
