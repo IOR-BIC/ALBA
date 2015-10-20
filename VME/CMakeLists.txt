@@ -34,8 +34,9 @@ SET(PROJECT_SRCS
   mafMSFImporter.h
   mafPipePolylineSlice.cpp
   mafPipePolylineSlice.h
-  mafPipeMesh.cpp
-  mafPipeMesh.h
+	mafPipeGenericPolydata.cpp mafPipeGenericPolydata.h
+  mafPipeMesh.cpp mafPipeMesh.h
+	mafPipeSurface.cpp mafPipeSurface.h
   mafPipeMeshSlice.cpp
   mafPipeMeshSlice.h
   mafPipeScalar.cpp
@@ -216,8 +217,6 @@ IF (MAF_USE_VTK)
   mafPipePointSet.h
   mafPipePolyline.cpp
   mafPipePolyline.h
-  mafPipeSurface.cpp
-  mafPipeSurface.h
   mafPipeSurfaceSlice.cpp
   mafPipeSurfaceSlice.h
   mafPipeSurfaceTextured.cpp
