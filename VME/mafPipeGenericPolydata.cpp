@@ -76,6 +76,7 @@ mafPipeGenericPolydata::mafPipeGenericPolydata()
 	m_ActorWired			= NULL;
 	m_MapperWired			= NULL;
 	m_Axes						= NULL;
+	m_InputAsPolydata = NULL;
 
   m_ScalarMapActive = 0;
   m_UseVTKProperty  = 1;
@@ -211,6 +212,7 @@ void mafPipeGenericPolydata::ExecutePipe()
   m_MapperWired->ScalarVisibilityOff();
 
 	vtkNEW(m_Actor);
+	m_Actor->GetProperty()->BackfaceCullingOn();
 	m_Actor->SetMapper(m_Mapper);
 
   if (m_ObjectMaterial->m_MaterialType == mmaMaterial::USE_LOOKUPTABLE)
@@ -234,7 +236,7 @@ void mafPipeGenericPolydata::ExecutePipe()
 		m_Wireframe=(material->m_Prop->GetRepresentation() == VTK_WIREFRAME);
 	
 	if(m_Wireframe)
-		SetWiredActorVisibilityOff();
+		SetEdgesVisibilityOff();
   
   // selection highlight
   vtkMAFSmartPointer<vtkOutlineCornerFilter> corner;
@@ -306,8 +308,8 @@ mafGUI *mafPipeGenericPolydata::CreateGui()
 	m_Gui->Combo(ID_NORMALS_TYPE,"",&m_ShowCellsNormals,2,normalSelector);	
 	m_Gui->Divider(2);
 
-	m_Gui->Bool(ID_WIRED_ACTOR_VISIBILITY,_("Element Edges"), &m_BorderElementsWiredActor, 1);
-	m_Gui->Enable(ID_WIRED_ACTOR_VISIBILITY,!m_Wireframe);
+	m_Gui->Bool(ID_EDGE_VISIBILITY,_("Element Edges"), &m_BorderElementsWiredActor, 1);
+	m_Gui->Enable(ID_EDGE_VISIBILITY,!m_Wireframe);
 
 	m_Gui->Divider(2);
   m_Gui->Bool(ID_USE_VTK_PROPERTY,"Property",&m_UseVTKProperty, 1);
@@ -358,12 +360,12 @@ void mafPipeGenericPolydata::OnEvent(mafEventBase *maf_event)
 						SetNormalsTypeToCells();
 				}
 				break;
-      case ID_WIRED_ACTOR_VISIBILITY:
+      case ID_EDGE_VISIBILITY:
         {
           if(m_BorderElementsWiredActor == 0) 
-            SetWiredActorVisibilityOff();
+            SetEdgesVisibilityOff();
           else
-            SetWiredActorVisibilityOn();
+            SetEdgesVisibilityOn();
         }
         break;
       case ID_SCALARS:
@@ -493,7 +495,7 @@ void mafPipeGenericPolydata::SetWireframeOn()
 	if(m_Gui)
 	{ 
 		m_Gui->Enable(ID_BORDER_CHANGE,true);
-		m_Gui->Enable(ID_WIRED_ACTOR_VISIBILITY,false);
+		m_Gui->Enable(ID_EDGE_VISIBILITY,false);
 		m_Gui->Update();
 	}
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
@@ -510,7 +512,7 @@ void mafPipeGenericPolydata::SetWireframeOff()
 	if(m_Gui)
 	{
 		m_Gui->Enable(ID_BORDER_CHANGE,false);
-		m_Gui->Enable(ID_WIRED_ACTOR_VISIBILITY,true);
+		m_Gui->Enable(ID_EDGE_VISIBILITY,true);
 		m_Gui->Update();
 	}
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
@@ -529,7 +531,7 @@ void mafPipeGenericPolydata::SetNormalsTypeToPoints()
 //----------------------------------------------------------------------------
 void mafPipeGenericPolydata::SetNormalsTypeToCells()
 {
-	m_ShowCellsNormals=0;
+	m_ShowCellsNormals=1 ;
 	m_NormalsFilter->ComputeCellNormalsOn();
 	m_NormalsFilter->ComputePointNormalsOff();
 	m_NormalsFilter->Update();
@@ -537,7 +539,7 @@ void mafPipeGenericPolydata::SetNormalsTypeToCells()
 }
 
 //----------------------------------------------------------------------------
-void mafPipeGenericPolydata::SetWiredActorVisibilityOn()
+void mafPipeGenericPolydata::SetEdgesVisibilityOn()
 {
 	m_BorderElementsWiredActor=1;
   m_ActorWired->SetVisibility(1);
@@ -545,7 +547,7 @@ void mafPipeGenericPolydata::SetWiredActorVisibilityOn()
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
-void mafPipeGenericPolydata::SetWiredActorVisibilityOff()
+void mafPipeGenericPolydata::SetEdgesVisibilityOff()
 {
 	m_BorderElementsWiredActor=0;
   m_ActorWired->SetVisibility(0);

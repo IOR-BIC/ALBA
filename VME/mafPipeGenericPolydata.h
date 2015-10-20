@@ -62,7 +62,7 @@ public:
 		ID_LAST = mafPipe::ID_LAST,
     ID_WIREFRAME,
 		ID_NORMALS_TYPE,
-    ID_WIRED_ACTOR_VISIBILITY,
+    ID_EDGE_VISIBILITY,
 		ID_BORDER_CHANGE,
     ID_SCALARS,
     ID_LUT,
@@ -97,10 +97,11 @@ public:
 	/** Set Normal type generation */
 	void SetNormalsTypeToPoints();
 	void SetNormalsTypeToCells();
+	int GetNormalsType() {return m_ShowCellsNormals;};
   
   /** Set the actor border visible or not*/
-  void SetWiredActorVisibilityOn();
-  void SetWiredActorVisibilityOff();
+  void SetEdgesVisibilityOn();
+  void SetEdgesVisibilityOff();
 
   /** Set/Get Active Scalar */
   void SetActiveScalar(int index){m_ScalarIndex = index;};
@@ -138,6 +139,7 @@ protected:
 	vtkMAFPolyDataNormals   *m_NormalsFilter;
 	mafAxes                 *m_Axes;
   vtkLookupTable          *m_Table;
+	vtkPolyData							*m_InputAsPolydata;
 
 	mafGUILutSwatch *m_LutSwatch;
 

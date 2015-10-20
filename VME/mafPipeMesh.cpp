@@ -56,23 +56,28 @@ mafPipeMesh::~mafPipeMesh()
 //----------------------------------------------------------------------------
 vtkPolyData * mafPipeMesh::GetInputAsPolyData()
 {
-	assert(m_Vme->GetOutput()->IsMAFType(mafVMEOutputMesh));
-	mafVMEOutputMesh *mesh_output = mafVMEOutputMesh::SafeDownCast(m_Vme->GetOutput());
-	assert(mesh_output);
-	mesh_output->Update();
-	vtkUnstructuredGrid *data = vtkUnstructuredGrid::SafeDownCast(mesh_output->GetVTKData());
-	assert(data);
-	data->Update();
+	if(!m_InputAsPolydata)
+	{
+		assert(m_Vme->GetOutput()->IsMAFType(mafVMEOutputMesh));
+		mafVMEOutputMesh *mesh_output = mafVMEOutputMesh::SafeDownCast(m_Vme->GetOutput());
+		assert(mesh_output);
+		mesh_output->Update();
+		vtkUnstructuredGrid *data = vtkUnstructuredGrid::SafeDownCast(mesh_output->GetVTKData());
+		assert(data);
+		data->Update();
 
-	// create the linearization filter
-	vtkNEW(m_LinearizationFilter);
-	m_LinearizationFilter->SetInput(data);
-	m_LinearizationFilter->Update();
+		// create the linearization filter
+		vtkNEW(m_LinearizationFilter);
+		m_LinearizationFilter->SetInput(data);
+		m_LinearizationFilter->Update();
 
-	vtkNEW(m_GeometryFilter);
-	m_GeometryFilter->SetInput(m_LinearizationFilter->GetOutput());
-	m_GeometryFilter->Update();
+		vtkNEW(m_GeometryFilter);
+		m_GeometryFilter->SetInput(m_LinearizationFilter->GetOutput());
+		m_GeometryFilter->Update();
 
-	return m_GeometryFilter->GetOutput();
+		m_InputAsPolydata = m_GeometryFilter->GetOutput();
+	}
+	
+	return 	m_InputAsPolydata;
 }
 

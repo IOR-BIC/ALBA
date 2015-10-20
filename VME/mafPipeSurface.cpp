@@ -48,13 +48,16 @@ mafPipeSurface::~mafPipeSurface()
 //----------------------------------------------------------------------------
 vtkPolyData *mafPipeSurface::GetInputAsPolyData()
 {
-	assert(m_Vme->GetOutput()->IsMAFType(mafVMEOutputSurface));
-	mafVMEOutputSurface *surface_output = mafVMEOutputSurface::SafeDownCast(m_Vme->GetOutput());
-	assert(surface_output);
-	surface_output->Update();
-	vtkPolyData *data = vtkPolyData::SafeDownCast(surface_output->GetVTKData());
-	assert(data);
-	data->Update();
+	if (!m_InputAsPolydata)
+	{
+		assert(m_Vme->GetOutput()->IsMAFType(mafVMEOutputSurface));
+		mafVMEOutputSurface *surface_output = mafVMEOutputSurface::SafeDownCast(m_Vme->GetOutput());
+		assert(surface_output);
+		surface_output->Update();
+		m_InputAsPolydata = vtkPolyData::SafeDownCast(surface_output->GetVTKData());
+		assert(m_InputAsPolydata);
+		m_InputAsPolydata->Update();
+	}
 
-	return data;
+	return m_InputAsPolydata;
 }
