@@ -74,6 +74,7 @@ public:
   enum
   {  
     TETRA4 = 0,
+	  WEDGE6,
     HEXA8,  
     TETRA10,
     HEXA20,
