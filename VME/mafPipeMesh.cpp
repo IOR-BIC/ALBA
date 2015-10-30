@@ -43,6 +43,8 @@ mafPipeMesh::mafPipeMesh()
 //----------------------------------------------------------------------------
 {
   m_BorderElementsWiredActor = 1;
+	m_LinearizationFilter = NULL;
+	m_GeometryFilter = NULL;
 }
 
 //----------------------------------------------------------------------------

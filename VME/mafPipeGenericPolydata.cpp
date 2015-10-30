@@ -77,6 +77,7 @@ mafPipeGenericPolydata::mafPipeGenericPolydata()
 	m_MapperWired			= NULL;
 	m_Axes						= NULL;
 	m_InputAsPolydata = NULL;
+	m_NormalsFilter   = NULL;
 
   m_ScalarMapActive = 0;
   m_UseVTKProperty  = 1;
