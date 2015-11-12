@@ -194,7 +194,7 @@ protected:
   int m_EnableGPU;
   int m_TrilinearInterpolationOn;
 
-  std::vector<mafNode*> m_VMElist; ///< selected VME
+  std::vector<mafNode*> m_VMElist; ///< VME List
 
 };
 #endif

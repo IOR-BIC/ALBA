@@ -551,14 +551,14 @@ protected:
 //--------------test another way----------
 	void WrapCylinderOnlyObstacleSet(int idx);
 	double GetQTsegment(double R,double *Q,double *T);
-	bool WrapCondition(double *Q,double *T,boolean reverseFlag);
+	bool WrapCondition(double *Q,double *T,bool reverseFlag);
 	void ComputeTangentXYQ(double *P,double R,double *rtn);
 	void ComputeTangentXYT(double *S,double R, double *rtn);
 	double ComputeQTLength(double *Q,double *T,double R);
 	void ComputeQz(double *P,double *S,double *Q,double *T,double QTlength);
 	void ComputeTz(double *P,double *S,double *Q,double *T,double QTlength);
 //	void WrapCylinderOnlyObstacleSetBasic(double *Sg,double *Pg,int idx,double &segLength,double *Tout,double *Qout);
-	void WrapCylinderOnlyObstacleSetBasic2(double *Sg,double *Pg,int idx,boolean reverseFlag,double &segLength,double *Tout,double *Qout);
+	void WrapCylinderOnlyObstacleSetBasic2(double *Sg,double *Pg,int idx,bool reverseFlag,double &segLength,double *Tout,double *Qout);
 	void WrapCylinderCylinderObstacleSet();
 //--------------test over----------------
 
