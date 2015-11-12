@@ -325,6 +325,7 @@ mafGUI *mafPipeGenericPolydata::CreateGui()
 
   m_Gui->Enable(ID_SCALARS, m_ScalarMapActive != 0);
   m_Gui->Enable(ID_LUT, m_ScalarMapActive != 0);
+	m_Gui->Enable(ID_SCALAR_MAP_ACTIVE,m_NumberOfArrays>0);
   
   m_Gui->Divider();
   m_Gui->Label("");
@@ -397,6 +398,7 @@ void mafPipeGenericPolydata::OnEvent(mafEventBase *maf_event)
 				
 					if(m_Gui)
 					{
+						m_Gui->Enable(ID_SCALAR_MAP_ACTIVE,m_NumberOfArrays>0);
 						m_Gui->Enable(ID_SCALARS, m_ScalarMapActive != 0);
 						m_Gui->Enable(ID_LUT, m_ScalarMapActive != 0);
 						m_Gui->Update();
