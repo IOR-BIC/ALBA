@@ -292,13 +292,6 @@ int mafVMEMeshAnsysTextImporter::ParseElementsFile(vtkUnstructuredGrid *grid)
 
   int FIRST_CONNECTIVITY_COLUMN = 6;
 
-  mafString ansysELEMENTIDArrayName("ANSYS_ELEMENT_ID");
-  mafString ansysTYPEIntArrayName("ANSYS_ELEMENT_TYPE"); // ET,50,187: Element Type = 50; this is used for grouping elements of the same element type
-  // this should be renamed ANSYS_ MATERIAL _TYPE:for the moment and possible backward compatibility issues 
-  // I leave the array name as material
-  mafString ansysMATERIALIntArrayName("material"); 
-  mafString ansysREALIntArrayName("ANSYS_ELEMENT_REAL");// this is another grouping ID but for the moment it is not used
-
   int ret = GetElementType();
   if (ret == -1 || ret == UNSUPPORTED_ELEMENT )
   
@@ -360,10 +353,10 @@ int mafVMEMeshAnsysTextImporter::ParseElementsFile(vtkUnstructuredGrid *grid)
       grid->InsertNextCell(m_VtkCellType, id_list);
   }
 
-  AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysELEMENTIDColumn, ansysELEMENTIDArrayName);
-  AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysTYPEColumn, ansysTYPEIntArrayName);
-  AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysMATERIALColumn, ansysMATERIALIntArrayName,true);
-  AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysREALColumn, ansysREALIntArrayName);  
+  AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysELEMENTIDColumn, "ELEMENT_ID");
+  AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysTYPEColumn, "ELEMENT_TYPE");
+  AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysMATERIALColumn, "material",true);
+  AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysREALColumn, "ELEMENT_REAL");  
   
   vtkDEL(id_list);
 
