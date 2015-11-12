@@ -935,7 +935,7 @@ void medVMEComputeWrapping::WrapCylinderCylinderObstacleSet(){
 	m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
 	GetWrappedMeterOutput()->Update(); 
 }
-void medVMEComputeWrapping::WrapCylinderOnlyObstacleSetBasic2(double *Sg,double *Pg,int idx,boolean reverseFlag,double &segLength,double *Tout,double *Qout){
+void medVMEComputeWrapping::WrapCylinderOnlyObstacleSetBasic2(double *Sg,double *Pg,int idx,bool reverseFlag,double &segLength,double *Tout,double *Qout){
 	double P[3],S[3],Q[3],T[3];
 	//express P and S in cylinder frame
 	GetWrapLocalTransform(Pg,P,idx);
@@ -1076,7 +1076,7 @@ double medVMEComputeWrapping::GetQTsegment(double R,double *Q,double *T){
 /* so det = Qx*Ty-Qy*Tx
 /************************************************************************/
 
-bool medVMEComputeWrapping::WrapCondition(double *Q,double *T,boolean reverseFlag){
+bool medVMEComputeWrapping::WrapCondition(double *Q,double *T,bool reverseFlag){
 	bool rtn = true;
 	double det = Q[0]*T[1]- Q[1]*T[0];
 	int flag = 1;
