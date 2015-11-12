@@ -132,7 +132,10 @@ public:
   /** Scan the string for the first occurrence of the character */
   int FindChr(const int c) const;
 
-  /** Scan the string for the first occurrence of the character */
+	/** Replace each caracter from with to */
+	void Replace(char from, char to);
+
+	/** Scan the string for the first occurrence of the character */
   int FindLastChr(const int c) const;
 
   /** Find first occurrence of a substring */
