@@ -99,6 +99,7 @@
 // local include
 #include <string>
 #include <ostream>
+#include "mafPipeRefSys.h"
 
 //mafPipeFactoryVME *mafPipeFactoryVME::m_Instance=NULL;
 
@@ -141,6 +142,7 @@ mafPipeFactoryVME::mafPipeFactoryVME()
   // Plug here Pipes in this factory
   //
   mafPlugPipeMacro(mafPipeSurface,"Pipe to render vtk polydata as surface rendering");
+	mafPlugPipeMacro(mafPipeRefSys,"Pipe for VME RefSys");
   mafPlugPipeMacro(mafPipeSurfaceSlice,"Pipe for render vtk surface as an arbitrary slice");
   mafPlugPipeMacro(mafPipeSurfaceTextured,"Pipe for render vtk polydata as textured surface rendering");
 	mafPlugPipeMacro(mafPipePolylineSlice,"Pipe for render vtk polyline as an arbitrary slice");

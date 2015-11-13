@@ -605,7 +605,7 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossTranslateZNormalView(mafEventB
 			mafNodeIterator *iter = root->NewIterator();
 			for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
 			{
-				if(node->IsA("mafVMESurface") || node->IsA("mafVMESurfaceParametric") || node->IsA("mafVMELandmark") || node->IsA("mafVMELandmarkCloud"))
+				if(node->IsA("mafVMESurface") || node->IsA("mafVMESurfaceParametric") || node->IsA("mafVMELandmark") || node->IsA("mafVMELandmarkCloud")|| node->IsA("mafVMERefSys"))
 				{
 					double surfaceOriginTranslated[3];
 					double normal[3];
