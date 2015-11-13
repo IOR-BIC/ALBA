@@ -809,7 +809,7 @@ void mafVMEDataSetAttributesImporterTest::TestTetra10ANSYS_ELEMENT_IDJumpingSing
 
   importer->SetUseTSFile(false);
   importer->UseIdArrayOn();
-  importer->SetIdArrayName("ELEMENT_ID");
+  importer->SetIdArrayName("ANSYS_ELEMENT_ID");
   importer->SetAttributeTypeToCellData();
   int result = importer->Read();
 
