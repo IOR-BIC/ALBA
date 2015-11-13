@@ -253,7 +253,7 @@ void mafVMERefSysTest::TestGetVisualPipe()
 //----------------------------------------------------------------------------
 {
   mafSmartPointer<mafVMERefSys> vme;
-  result = (vme->GetVisualPipe() == "mafPipeSurface");
+  result = (vme->GetVisualPipe() == "mafPipeRefSys");
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------

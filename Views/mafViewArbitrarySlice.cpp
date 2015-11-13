@@ -153,6 +153,7 @@ void mafViewArbitrarySlice::PackageView()
 	m_ViewSlice->PlugVisualPipe("mafVMEVolumeGray", "mafPipeBox", NON_VISIBLE);
 	m_ViewSlice->PlugVisualPipe("mafVMELandmark", "mafPipeSurfaceSlice");
 	m_ViewSlice->PlugVisualPipe("mafVMELandmarkCloud", "mafPipeSurfaceSlice");
+	m_ViewSlice->PlugVisualPipe("mafVMERefSys", "mafPipeSurfaceSlice");
 
 	PlugChildView(m_ViewArbitrary);
 	PlugChildView(m_ViewSlice);
