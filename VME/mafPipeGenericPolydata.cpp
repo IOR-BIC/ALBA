@@ -180,7 +180,6 @@ void mafPipeGenericPolydata::ExecutePipe()
 
 	vtkNEW(m_Mapper);
   m_Mapper->ImmediateModeRenderingOn();
-  m_Mapper->SetColorModeToMapScalars();
   m_Mapper->SetLookupTable(m_Table);
 	m_Mapper->SetScalarRange(sr);
 
@@ -578,55 +577,57 @@ void mafPipeGenericPolydata::UpdateActiveScalarsInVMEDataVectorItems()
   m_Vme->GetOutput()->GetVTKData()->Update();
   m_Vme->Update();
   
+	if(((mafVMEGeneric *)m_Vme)->GetDataVector())
+	{
+		for (mafDataVector::Iterator it = ((mafVMEGeneric *)m_Vme)->GetDataVector()->Begin(); it != ((mafVMEGeneric *)m_Vme)->GetDataVector()->End(); it++)
+		{
+			mafVMEItemVTK *item = mafVMEItemVTK::SafeDownCast(it->second);
+			assert(item);
 
-  for (mafDataVector::Iterator it = ((mafVMEGeneric *)m_Vme)->GetDataVector()->Begin(); it != ((mafVMEGeneric *)m_Vme)->GetDataVector()->End(); it++)
-  {
-    mafVMEItemVTK *item = mafVMEItemVTK::SafeDownCast(it->second);
-    assert(item);
+			vtkDataSet *outputVTK = vtkDataSet::SafeDownCast(item->GetData());
+			if(outputVTK)
+			{
+				if(m_ActiveScalarType == POINT_TYPE)
+				{
+					wxString scalarsToActivate = m_ScalarsVTKName[m_ScalarIndex].c_str();
+					vtkDataArray *scalarsArray = outputVTK->GetPointData()->GetArray(scalarsToActivate);
 
-    vtkDataSet *outputVTK = vtkDataSet::SafeDownCast(item->GetData());
-    if(outputVTK)
-    {
-      if(m_ActiveScalarType == POINT_TYPE)
-      {
-        wxString scalarsToActivate = m_ScalarsVTKName[m_ScalarIndex].c_str();
-        vtkDataArray *scalarsArray = outputVTK->GetPointData()->GetArray(scalarsToActivate);
+					if (scalarsArray == NULL)
+					{
+						std::ostringstream stringStream;
+						stringStream << scalarsToActivate.c_str() << " POINT_DATA array does not exist for timestamp " \
+							<< item->GetTimeStamp() << " . Skipping SetActiveScalars for this timestamp" << std::endl;
+						mafLogMessage(stringStream.str().c_str());
+						continue;
+					}
 
-        if (scalarsArray == NULL)
-        {
-          std::ostringstream stringStream;
-          stringStream << scalarsToActivate.c_str() << " POINT_DATA array does not exist for timestamp " \
-            << item->GetTimeStamp() << " . Skipping SetActiveScalars for this timestamp" << std::endl;
-          mafLogMessage(stringStream.str().c_str());
-          continue;
-        }
-
-        outputVTK->GetPointData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].c_str());
-        outputVTK->GetPointData()->GetScalars()->Modified();
-      }
-      else if(m_ActiveScalarType == CELL_TYPE)
-      {
-        wxString scalarsToActivate = m_ScalarsVTKName[m_ScalarIndex].c_str();
-        vtkDataArray *scalarsArray = outputVTK->GetCellData()->GetArray(scalarsToActivate);
+					outputVTK->GetPointData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].c_str());
+					outputVTK->GetPointData()->GetScalars()->Modified();
+				}
+				else if(m_ActiveScalarType == CELL_TYPE)
+				{
+					wxString scalarsToActivate = m_ScalarsVTKName[m_ScalarIndex].c_str();
+					vtkDataArray *scalarsArray = outputVTK->GetCellData()->GetArray(scalarsToActivate);
         
-        if (scalarsArray == NULL)
-        {
-          std::ostringstream stringStream;
-          stringStream << scalarsToActivate.c_str() << "  CELL_DATA array does not exist for timestamp " \
-          << item->GetTimeStamp() << " . Skipping SetActiveScalars for this timestamp" << std::endl;
-          mafLogMessage(stringStream.str().c_str());
-          continue;
-        }
+					if (scalarsArray == NULL)
+					{
+						std::ostringstream stringStream;
+						stringStream << scalarsToActivate.c_str() << "  CELL_DATA array does not exist for timestamp " \
+						<< item->GetTimeStamp() << " . Skipping SetActiveScalars for this timestamp" << std::endl;
+						mafLogMessage(stringStream.str().c_str());
+						continue;
+					}
         
 
-        outputVTK->GetCellData()->SetActiveScalars(scalarsToActivate.c_str());
-        outputVTK->GetCellData()->GetScalars()->Modified();
-      }
-      outputVTK->Modified();
-      outputVTK->Update();
+					outputVTK->GetCellData()->SetActiveScalars(scalarsToActivate.c_str());
+					outputVTK->GetCellData()->GetScalars()->Modified();
+				}
+				outputVTK->Modified();
+				outputVTK->Update();
       
-    }
-  }
+			}
+		}
+	}
   m_Vme->Modified();
   m_Vme->Update();
   

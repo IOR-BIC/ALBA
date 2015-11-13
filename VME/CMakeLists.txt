@@ -37,6 +37,7 @@ SET(PROJECT_SRCS
 	mafPipeGenericPolydata.cpp mafPipeGenericPolydata.h
   mafPipeMesh.cpp mafPipeMesh.h
 	mafPipeSurface.cpp mafPipeSurface.h
+	mafPipeRefSys.cpp mafPipeRefSys.h
   mafPipeMeshSlice.cpp
   mafPipeMeshSlice.h
   mafPipeScalar.cpp
