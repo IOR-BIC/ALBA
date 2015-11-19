@@ -36,7 +36,9 @@
 
 #include "vtkDataSet.h"
 #include "vtkUnstructuredGrid.h"
-#include "vtkCellArray.h"
+#include "vtkCellData.h"
+#include "vtkDataArray.h"
+#include "vtkPointData.h"
 
 //-------------------------------------------------------------------------
 mafCxxTypeMacro(mafVMEMesh)
@@ -142,4 +144,57 @@ mmaMaterial *mafVMEMesh::GetMaterial()
 		}
 	}
 	return material;
+}
+
+//------------------------------------------------------------------------
+vtkIntArray *mafVMEMesh::GetIntArray(const char *arrayName, const char *arrayName2)
+{
+  vtkUnstructuredGrid *inputUGrid = GetUnstructuredGridOutput()->GetUnstructuredGridData();
+ 
+  vtkIntArray *myArray = NULL;
+
+  // get the ELEMENT_ID array
+  myArray = vtkIntArray::SafeDownCast(inputUGrid->GetCellData()->GetArray(arrayName));
+  
+  if(myArray==NULL)
+    myArray = vtkIntArray::SafeDownCast(inputUGrid->GetPointData()->GetArray(arrayName2));  
+
+  return myArray;
+}
+
+//------------------------------------------------------------------------
+vtkIntArray *mafVMEMesh::GetNodesIDArray()
+{
+  mafString NodesIDArrayName("id");
+
+  vtkUnstructuredGrid *inputUGrid = GetUnstructuredGridOutput()->GetUnstructuredGridData();
+
+  // get the Nodes Id array
+  vtkIntArray *myArray = vtkIntArray::SafeDownCast(inputUGrid->GetPointData()->GetArray(NodesIDArrayName));  
+
+  return myArray;
+}
+
+//------------------------------------------------------------------------
+vtkIntArray *mafVMEMesh::GetMaterialsIDArray()
+{
+  return GetIntArray("Material", "material");
+}
+
+//------------------------------------------------------------------------
+vtkIntArray *mafVMEMesh::GetElementsIDArray()
+{
+  return GetIntArray("Id", "ANSYS_ELEMENT_ID");
+}
+
+//------------------------------------------------------------------------
+vtkIntArray *mafVMEMesh::GetElementsTypeArray()
+{
+  return GetIntArray("Type", "ANSYS_ELEMENT_TYPE");
+}
+
+//------------------------------------------------------------------------
+vtkIntArray *mafVMEMesh::GetElementsRealArray()
+{
+  return GetIntArray("Real", "ANSYS_ELEMENT_REAL");
 }
