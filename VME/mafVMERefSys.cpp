@@ -354,7 +354,7 @@ mafGUI* mafVMERefSys::CreateGui()
   m_Gui->Double(ID_SCALE_FACTOR,_("scale"),&m_ScaleFactor);
   m_Gui->Divider();
 
-	wxString choises[3]={"Normal","Select Origin","Select Plane"};
+	wxString choises[3]={"Normal (free to move)","Select Origin","Select Plane"};
 	m_Gui->Radio(ID_RADIO,"",&m_Modality,3,choises);
 
 	mafVME *origin_vme = GetOriginVME();
