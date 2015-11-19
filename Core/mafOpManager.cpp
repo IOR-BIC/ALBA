@@ -373,6 +373,14 @@ void mafOpManager::VmeSelected(mafNode* v)
   m_Selected = v;
   EnableOp();
 }
+
+//----------------------------------------------------------------------------
+void mafOpManager::VmeModified(mafNode* v)
+{
+	if(m_Selected == v)
+		EnableOp();
+}
+
 //----------------------------------------------------------------------------
 mafNode* mafOpManager::GetSelectedVme()
 //----------------------------------------------------------------------------
