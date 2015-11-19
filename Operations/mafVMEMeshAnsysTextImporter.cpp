@@ -353,10 +353,10 @@ int mafVMEMeshAnsysTextImporter::ParseElementsFile(vtkUnstructuredGrid *grid)
       grid->InsertNextCell(m_VtkCellType, id_list);
   }
 
-  AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysELEMENTIDColumn, "ELEMENT_ID");
-  AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysTYPEColumn, "ELEMENT_TYPE");
-  AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysMATERIALColumn, "material",true);
-  AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysREALColumn, "ELEMENT_REAL");  
+  AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysELEMENTIDColumn, "Id");
+  AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysTYPEColumn, "Type");
+  AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysMATERIALColumn, "Material",true);
+  AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysREALColumn, "Real");  
   
   vtkDEL(id_list);
 
