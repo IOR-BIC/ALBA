@@ -1738,6 +1738,13 @@ void mafLogicWithManagers::VmeModified(mafNode *vme)
   if(m_SideBar && vme_in_tree)
     m_SideBar->VmeModified(vme);
 	if(m_VMEManager) m_VMEManager->MSFModified(true);
+
+	//if a wizard manager was plugged we tell it about vme selection
+	if(m_WizardManager) 
+	{
+		m_WizardManager->VmeModified(vme);
+	}
+	if(m_OpManager)   m_OpManager->VmeModified(vme);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeAdd(mafNode *vme)
