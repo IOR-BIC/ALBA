@@ -74,7 +74,7 @@ mafVMERefSys::mafVMERefSys()
 
 	DependsOnLinkedNodeOn();
 
-	m_Radio = 0;
+	m_Modality = REFSYS_FREE;
   m_ScaleFactor = 1.0;
 
   vtkUnsignedCharArray *data;
@@ -299,8 +299,8 @@ int mafVMERefSys::InternalStore(mafStorageElement *parent)
   if (Superclass::InternalStore(parent)==MAF_OK)
   {
     parent->StoreMatrix("Transform",&m_Transform->GetMatrix());
-    parent->StoreDouble("m_ScaleFactor", m_ScaleFactor);
-//		parent->StoreInteger("Fixed", m_Fixed);
+    parent->StoreDouble("ScaleFactor", m_ScaleFactor);
+		parent->StoreInteger("Modality", m_Modality);
     return MAF_OK;
   }
   return MAF_ERROR;
@@ -316,8 +316,9 @@ int mafVMERefSys::InternalRestore(mafStorageElement *node)
     if (node->RestoreMatrix("Transform",&matrix)==MAF_OK)
     {
       m_Transform->SetMatrix(matrix);
-      node->RestoreDouble("m_ScaleFactor", m_ScaleFactor);
-//			node->RestoreInteger("Fixed", m_Fixed);
+      node->RestoreDouble("ScaleFactor", m_ScaleFactor);
+			node->RestoreInteger("Modality", m_Modality);
+			SetScaleFactor(m_ScaleFactor);
       return MAF_OK;
     }
   }
@@ -354,7 +355,7 @@ mafGUI* mafVMERefSys::CreateGui()
   m_Gui->Divider();
 
 	wxString choises[3]={"Normal","Select Origin","Select Plane"};
-	m_Gui->Radio(ID_RADIO,"",&m_Radio,3,choises);
+	m_Gui->Radio(ID_RADIO,"",&m_Modality,3,choises);
 
 	mafVME *origin_vme = GetOriginVME();
   if (origin_vme && origin_vme->IsMAFType(mafVMELandmarkCloud))
@@ -388,26 +389,8 @@ mafGUI* mafVMERefSys::CreateGui()
     m_Point2VmeName = point2_vme ? point2_vme->GetName() : _("none");
   m_Gui->Button(ID_POINT2,&m_Point2VmeName,_("Point 2"), _("Select the Point 2"));
 	m_Gui->Enable(ID_POINT2,point2_vme!=NULL);
-
-	if(point2_vme && origin_vme && point2_vme)
-		m_Radio=2;
-	else if(origin_vme)
-		m_Radio=1;
-	else
-		m_Radio=0;
-
-  // vme ref sys fixed
-//	m_Gui->Bool(ID_FIXED, _("Click for fix the refsys"), &m_Fixed, 1);
-
-	/*m_Gui->Enable(ID_SCALE_FACTOR, m_Fixed == 0);
-	m_Gui->Enable(ID_REF_SYS_ORIGIN, m_Fixed == 0);
-	m_Gui->Enable(ID_POINT1, m_Fixed == 0);
-	m_Gui->Enable(ID_POINT2, m_Fixed == 0);
-	m_Gui->Enable(ID_RADIO, m_Fixed == 0);
-	m_Gui->Enable(ID_FIXED, m_Fixed == 0);*/
-
-	m_Gui->Update();
-	//this->InternalUpdate();
+	
+ 	m_Gui->Update();
 
   return m_Gui;
 }
@@ -460,29 +443,21 @@ void mafVMERefSys::OnEvent(mafEventBase *maf_event)
       break;
 			case ID_RADIO:
 			{
-				if(m_Radio==0)
+				if(m_Modality==REFSYS_FREE)
 				{
           // Normal RefSys
-					this->RemoveAllLinks();
-          m_OriginVmeName = _("none");
-          m_Point1VmeName = _("none");
-          m_Point2VmeName = _("none");
 					m_Gui->Enable(ID_REF_SYS_ORIGIN,false);
 					m_Gui->Enable(ID_POINT1,false);
 					m_Gui->Enable(ID_POINT2,false);
 				}
-				else if(m_Radio==1)
+				else if(m_Modality==REFSYS_ORIGIN)
 				{
           // RefSys with Origin link
-					this->RemoveLink("Point1VME");
-					this->RemoveLink("Point2VME");
-          m_Point1VmeName = _("none");
-          m_Point2VmeName = _("none");
 					m_Gui->Enable(ID_REF_SYS_ORIGIN,true);
 					m_Gui->Enable(ID_POINT1,false);
 					m_Gui->Enable(ID_POINT2,false);
 				}
-				else if(m_Radio==2)
+				else if(m_Modality==REFSYS_PLANE)
 				{
           // RefSys with all the link enabled: originABSPosition, point1ABSPosition and point2ABSPosition
 					m_Gui->Enable(ID_REF_SYS_ORIGIN,true);
@@ -490,19 +465,10 @@ void mafVMERefSys::OnEvent(mafEventBase *maf_event)
 					m_Gui->Enable(ID_POINT2,true);
 				}
 				InternalUpdate();
+
+				//Workaround to update accept on move operations
+				ForwardUpEvent( mafEvent( this, VME_MODIFIED,this ) );
 				m_Gui->Update();
-			}
-			break;
-			case ID_FIXED:
-			{
-        /*m_Gui->Enable(ID_SCALE_FACTOR, m_Fixed == 0);
-				m_Gui->Enable(ID_REF_SYS_ORIGIN, m_Fixed == 0);
-
-				m_Gui->Enable(ID_POINT1, m_Fixed == 0);
-				m_Gui->Enable(ID_POINT2, m_Fixed == 0);
-				m_Gui->Enable(ID_RADIO, m_Fixed == 0);
-
-        m_Gui->Enable(ID_FIXED, m_Fixed == 0);*/
 			}
 			break;
       default:
@@ -550,7 +516,7 @@ void mafVMERefSys::InternalUpdate()
 	mafVME *point2VME = GetPoint2VME();
 	mafVME *originVME = GetOriginVME();
 
-	if(point1VME && point2VME && originVME)
+	if(m_Modality == REFSYS_PLANE && point1VME && point2VME && originVME)
 	{
 		double point1ABSPosition[3],point2ABSPosition[3],originABSPosition[3],useless[3];
 		mafSmartPointer<mafTransform> TmpTransform;
@@ -654,8 +620,9 @@ void mafVMERefSys::InternalUpdate()
     vtkDEL(matrix_translation);
 
     this->SetAbsMatrix(c);
+		this->Modified();
 	}
-	else if(originVME)
+	else if(m_Modality== REFSYS_ORIGIN && originVME)
 	{
 		double origin[3],orientation[3];
 
@@ -684,26 +651,10 @@ void mafVMERefSys::InternalUpdate()
     vtkDEL(matrix_translation);
 		
     this->SetAbsMatrix(b);
-	}
-	else
-	{
-		vtkMatrix4x4 *matrix_translation=vtkMatrix4x4::New();
-		matrix_translation->Identity();
-
-		mafMatrix b;
-		b.SetVTKMatrix(matrix_translation);
-    vtkDEL(matrix_translation);
-		
-		//this->SetMatrix(b);
-    this->SetAbsMatrix(b);
+		this->Modified();
 	}
 
-  SetScaleFactor(m_ScaleFactor);
 
-	mafEvent *e	= new mafEvent(this,CAMERA_UPDATE);
-  ForwardUpEvent(e);
-  delete e;
-	this->Modified();
 }
 //-------------------------------------------------------------------------
 void mafVMERefSys::SetRefSysLink(const char *link_name, mafNode *n)
@@ -730,6 +681,13 @@ mafVME *mafVMERefSys::GetPoint2VME()
 {
   return mafVME::SafeDownCast(GetLink("Point2VME"));
 }
+
+//----------------------------------------------------------------------------
+bool mafVMERefSys::IsMovable()
+{
+	return (m_Modality==REFSYS_FREE);
+}
+
 //-------------------------------------------------------------------------
 mafVME *mafVMERefSys::GetOriginVME()
 //-------------------------------------------------------------------------

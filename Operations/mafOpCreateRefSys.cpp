@@ -72,7 +72,7 @@ void mafOpCreateRefSys::OpRun()
 //----------------------------------------------------------------------------
 {
   mafNEW(m_RefSys);
-  m_RefSys->SetName("ref_sys");
+  m_RefSys->SetName("RefSys");
   m_Output = m_RefSys;
   mafEventMacro(mafEvent(this,OP_RUN_OK));
 }
@@ -83,8 +83,16 @@ void mafOpCreateRefSys::OpDo()
 {
   if (!m_Input->IsMAFType(mafVMERoot))
   {
+		double b[6], maxsize;
     m_RefSys->ReparentTo(m_Input);
     m_RefSys->SetAbsMatrix(*((mafVME *)m_Input)->GetOutput()->GetAbsMatrix());
+		((mafVME *)m_Input)->GetOutput()->GetBounds(b);
+		double diffX = fabs(b[1] - b[0]);
+		double diffY = fabs(b[3] - b[2]);
+		double diffZ = fabs(b[5] - b[4]);
+		double mainDiagonal = sqrt(diffX*diffX + diffY*diffY + diffZ*diffZ);
+		m_RefSys->SetScaleFactor(mainDiagonal/3.0);
+		mafEventMacro(mafEvent(this,VME_SHOW,m_RefSys,true));
   }
   else
     mafEventMacro(mafEvent(this, VME_ADD, m_RefSys));

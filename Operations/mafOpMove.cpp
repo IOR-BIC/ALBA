@@ -48,6 +48,7 @@
 
 #include "vtkTransform.h"
 #include "vtkDataSet.h"
+#include "mafVMERefSys.h"
 
 //----------------------------------------------------------------------------
 // widget id's
@@ -110,8 +111,8 @@ bool mafOpMove::Accept(mafNode* vme)
 {
 	/*mafEvent e(this,VIEW_SELECTED);
 	mafEventMacro(e);*/
-	return (vme!=NULL && vme->IsMAFType(mafVME) && !vme->IsA("mafVMERoot") 
-    && !vme->IsA("mafVMEExternalData") && !vme->IsA("mafVMERefSys") /*&& e.GetBool()*/);
+	return ( (vme!=NULL && vme->IsMAFType(mafVME) && !vme->IsA("mafVMERoot") && !vme->IsA("mafVMEExternalData") && !vme->IsA("mafVMERefSys")) || 
+					 (vme!=NULL && vme->IsMAFType(mafVMERefSys) && mafVMERefSys::SafeDownCast(vme)->IsMovable()) );
 }
 //----------------------------------------------------------------------------
 mafOp* mafOpMove::Copy()   

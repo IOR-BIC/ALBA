@@ -75,6 +75,9 @@ public:
 
 	/** Record the selected vme and enable the menu_entries relative to the compatible operations. */
 	virtual void VmeSelected(mafNode* v);
+
+	/** Record the modified vme and enable the menu_entries relative to the compatible operations. */
+	virtual void VmeModified(mafNode* v);
 	
 	/** Return the selected vme. */
 	virtual mafNode* GetSelectedVme();

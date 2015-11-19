@@ -78,6 +78,9 @@ private:
   /** Record the selected vme and enable the menu_entries relative to the compatible wizard. */
   virtual void VmeSelected(mafNode* node);
 
+	/** Record the modified vme and enable the menu_entries relative to the compatible wizard. */
+	virtual void VmeModified(mafNode* node);
+	
   /** Enable/Disable the men items operation. */
   virtual void EnableWizardMenus(bool CanEnable = true);
 
