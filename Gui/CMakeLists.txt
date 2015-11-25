@@ -140,8 +140,6 @@ SET(PROJECT_SRCS
   mafGUIWizardPageNew.h
   mafGUIDicomSettings.cpp
   mafGUIDicomSettings.h
-  mafGUIContextualMenu.cpp
-  mafGUIContextualMenu.h
   mafGUISettingsAdvanced.cpp
   mafGUISettingsAdvanced.h
   mafGUIDynamicVP.cpp
