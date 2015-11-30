@@ -23,8 +23,6 @@ SET(PROJECT_SRCS
   mafExpirationDate.h
   mafEventIO.cpp
   mafEventIO.h
-  mafLogicWithGUI.cpp
-  mafLogicWithGUI.h
   mafMatrixPipe.cpp
   mafMatrixPipe.h
   mafNode.cpp
