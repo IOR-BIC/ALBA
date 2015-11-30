@@ -124,10 +124,10 @@ mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
 
 	m_PlugMenu		  = true;
 	m_PlugToolbar	  = true;
-	m_PlugSidebar	  = true;
+	m_PlugControlPanel	  = true;
 	m_SidebarStyle  = mafSideBar::DOUBLE_NOTEBOOK;
-	m_PlugTimebar	  = true;
-	m_PlugLogbar	  = true;
+	m_PlugTimebar	  = false;
+	m_PlugLogPanel	  = true;
 
   m_SideBar     = NULL;
   m_UseVMEManager  = true;
@@ -200,15 +200,6 @@ mafLogicWithManagers::~mafLogicWithManagers()
 void mafLogicWithManagers::Configure()
 //----------------------------------------------------------------------------
 {
-	if(m_PlugMenu)		this->CreateMenu();
-	if(m_PlugToolbar) this->CreateToolbar();
-	if(m_PlugTimebar) this->CreateTimebar(); //SIL. 23-may-2006 : 
-	if(m_PlugLogbar)	this->CreateLogbar();	
-		else this->CreateNullLog();
-
-  if(this->m_PlugSidebar)
-		CreateSidebar();
-
 
   if(m_UseVMEManager)
   {
@@ -296,7 +287,9 @@ void mafLogicWithManagers::Configure()
     m_SettingsDialog->AddPage(m_TimeBarSettings->GetGui(), m_TimeBarSettings->GetLabel());
 
   ConfigureWizardManager();
+
 }
+
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::Plug(mafView* view, bool visibleInMenu)
 //----------------------------------------------------------------------------
@@ -346,48 +339,65 @@ void mafLogicWithManagers::Plug( mafWizard *wizard, wxString menuPath /*= ""*/ )
 void mafLogicWithManagers::Show()
 //----------------------------------------------------------------------------
 {
-  if(m_VMEManager && m_RecentFileMenu)
-  {
-    m_VMEManager->SetFileHistoryMenu(m_RecentFileMenu);
-  }
-
-  if(m_UseViewManager && m_ViewMenu)
-  {
-    wxMenu *view_list = new wxMenu;
-    m_ViewMenu->AppendSeparator();
-    m_ViewMenu->Append(0,_("Add View"),view_list);
-    m_ViewManager->FillMenu(view_list);
-  }
-
-  if(m_OpManager)
-  {
-    if(m_MenuBar && (m_ImportMenu || m_OpMenu || m_ExportMenu))
-    {
-      m_OpManager->FillMenu(m_ImportMenu, m_ExportMenu, m_OpMenu);
-      m_OpManager->SetMenubar(m_MenuBar);
-    }
-    if(m_ToolBar)
-      m_OpManager->SetToolbar(m_ToolBar);
-  }
+	if(m_PlugMenu)		
+		CreateMenu();
+	FillMenus();
+	CreateToolBarsAndPanels();
 
 	m_AppTitle = m_Win->GetTitle().c_str();
 	m_Win->Show(TRUE);
 
   // must be after the mafLogicWithGUI::Show(); because in that method is set the m_AppTitle var
   SetApplicationStamp(m_AppTitle);
-
-  //setting gui pointers to the Wizard Manager
-  if(m_WizardManager)
-  {
-	  if(m_MenuBar)
-	  {
-		  m_WizardManager->FillMenu(m_WizardMenu);
-		  m_WizardManager->SetMenubar(m_MenuBar);
-	  }
-	  if(m_ToolBar)
-		  m_WizardManager->SetToolbar(m_ToolBar);
-  }
 }
+
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::FillMenus()
+{
+	if(m_VMEManager && m_RecentFileMenu)
+	{
+		m_VMEManager->SetFileHistoryMenu(m_RecentFileMenu);
+	}
+
+	if(m_UseViewManager && m_ViewMenu)
+	{
+		m_ViewManager->FillMenu(m_ViewMenu);
+		m_ViewMenu->AppendSeparator();
+	}
+
+	if(m_OpManager && m_MenuBar && (m_ImportMenu || m_OpMenu || m_ExportMenu))
+	{
+		m_OpManager->FillMenu(m_ImportMenu, m_ExportMenu, m_OpMenu);
+		m_OpManager->SetMenubar(m_MenuBar);
+	}
+
+	//setting gui pointers to the Wizard Manager
+	if(m_WizardManager && m_MenuBar)
+	{
+		m_WizardManager->FillMenu(m_WizardMenu);
+		m_WizardManager->SetMenubar(m_MenuBar);
+	}
+		
+}
+
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::CreateToolBarsAndPanels()
+{
+
+	if(m_PlugToolbar) CreateToolbar();
+	if(m_PlugTimebar) CreateTimeBar(); //SIL. 23-may-2006 : 
+	if(m_PlugLogPanel)	CreateLogPanel();	
+	else this->CreateNullLog();
+	if(this->m_PlugControlPanel) CreateControlPanel();
+	if(m_PlugToolbar && m_WizardManager) CreateWizardToolbar();
+
+	if(m_OpManager && m_ToolBar)
+		m_OpManager->SetToolbar(m_ToolBar);
+
+	if(m_WizardManager && m_ToolBar)
+		m_WizardManager->SetToolbar(m_ToolBar);
+}
+
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::SetApplicationStamp(mafString &app_stamp)
 //----------------------------------------------------------------------------
@@ -506,6 +516,9 @@ void mafLogicWithManagers::CreateMenu()
   edit_menu->Append(OP_COPY,  _("Copy  \tCtrl+Shift+C"));
   edit_menu->Append(OP_PASTE, _("Paste \tCtrl+Shift+V"));
   edit_menu->Append(MENU_EDIT_FIND_VME, _("Find VME \tCtrl+F"));
+	edit_menu->AppendSeparator();
+	edit_menu->Append(ID_APP_SETTINGS, _("Settings..."));
+
   m_MenuBar->Append(edit_menu, _("&Edit"));
 
   m_ViewMenu = new wxMenu;
@@ -513,10 +526,6 @@ void mafLogicWithManagers::CreateMenu()
 
   m_OpMenu = new wxMenu;
   m_MenuBar->Append(m_OpMenu, _("&Operations"));
-
-  wxMenu    *option_menu = new wxMenu;
-  option_menu->Append(ID_APP_SETTINGS, _("Options..."));
-  m_MenuBar->Append(option_menu, _("Tools"));
 
 	wxMenu    *help_menu = new wxMenu;
 	help_menu->Append(ABOUT_APPLICATION,_("About"));
@@ -897,7 +906,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       case VIEW_DELETE:
       {
 
-        if(m_PlugSidebar)
+        if(m_PlugControlPanel)
 		   this->m_SideBar->ViewDeleted(e->GetView());
 
 #ifdef MAF_USE_VTK
@@ -1425,8 +1434,8 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 				break;
 			case MENU_VIEW_TOOLBAR:
 				m_Win->ShowDockPane("wizardgauge",!m_Win->DockPaneIsShown("wizardgauge") );
-				m_Win->ShowDockPane("tmpwithtest",!m_Win->DockPaneIsShown("tmpwithtest") );
-				m_Win->ShowDockPane("separator",!m_Win->DockPaneIsShown("separator") );
+				m_Win->ShowDockPane("wizardlabel",!m_Win->DockPaneIsShown("wizardlabel") );
+				m_Win->ShowDockPane("wizardseparator",!m_Win->DockPaneIsShown("wizardseparator") );
 				m_Win->ShowDockPane("toolbar",!m_Win->DockPaneIsShown("toolbar") );
 				break;
 			case PROGRESSBAR_SHOW:
@@ -1668,7 +1677,7 @@ void mafLogicWithManagers::OnQuit()
   cppDEL(m_SideBar);
 
 	mafYield();
-	if(m_PlugLogbar)
+	if(m_PlugLogPanel)
 	{
 		delete wxLog::SetActiveTarget(NULL);
 	}
@@ -1694,7 +1703,7 @@ void mafLogicWithManagers::VmeSelect(mafEvent& e)	//modified by Paolo 10-9-2003
 {
   mafNode *node = NULL;
 
-	if(m_PlugSidebar && (e.GetSender() == this->m_SideBar->GetTree()))
+	if(m_PlugControlPanel && (e.GetSender() == this->m_SideBar->GetTree()))
     node = (mafNode*)e.GetArg();//sender == tree => the node is in e.arg
   else
     node = e.GetVme();          //sender == PER  => the node is in e.node  
@@ -2194,16 +2203,15 @@ void mafLogicWithManagers::CreateWizardToolbar()
 	serparatorBar->Update();
 	serparatorBar->Realize();
 
-	m_WizardGauge;
 	m_WizardGauge = new wxGauge(m_Win,-1, 100,wxDefaultPosition,wxDefaultSize,wxGA_SMOOTH);
 	m_WizardGauge->SetForegroundColour( *wxBLUE );
 	m_WizardGauge->Disable();
 
 
 
-	wxWindow *tmp=new wxWindow(m_Win,-1, wxDefaultPosition,wxSize(50,20));
+	wxWindow *labelWin=new wxWindow(m_Win,-1, wxDefaultPosition,wxSize(50,20));
 
-	m_WizardLabel = new wxStaticText(tmp, -1, " Wizard\n Progress",wxDefaultPosition,wxDefaultSize,wxALIGN_LEFT);
+	m_WizardLabel = new wxStaticText(labelWin, -1, " Wizard\n Progress",wxDefaultPosition,wxDefaultSize,wxALIGN_LEFT);
 	//lab->Show(false);
 	m_WizardLabel->Disable();
 
@@ -2222,8 +2230,8 @@ void mafLogicWithManagers::CreateWizardToolbar()
 		);
 
 
-	m_Win->AddDockPane(tmp,  wxPaneInfo()
-		.Name("tmpwithtest")
+	m_Win->AddDockPane(labelWin,  wxPaneInfo()
+		.Name("wizardlabel")
 		//.Caption(wxT("ToolBar2"))
 		.Top()
 		.Layer(2)
@@ -2236,7 +2244,7 @@ void mafLogicWithManagers::CreateWizardToolbar()
 		);
 
 	m_Win->AddDockPane(serparatorBar,  wxPaneInfo()
-		.Name("separator")
+		.Name("wizardseparator")
 		//.Caption(wxT("ToolBar3"))
 		.Top()
 		.Layer(2)
@@ -2247,8 +2255,6 @@ void mafLogicWithManagers::CreateWizardToolbar()
 		.Movable(false)
 		.Gripper(false)
 		);
-
-	m_WizardGauge->Show(false);
 }
 
 //----------------------------------------------------------------------------
@@ -2258,7 +2264,6 @@ void mafLogicWithManagers::ConfigureWizardManager()
 	//Setting wizard specific data
 	if(m_UseWizardManager)
 	{
-		CreateWizardToolbar();
 		m_WizardManager = new mafWizardManager();
 		m_WizardManager->SetListener(this);
 		m_WizardManager->WarningIfCantUndo(m_ApplicationSettings->GetWarnUserFlag());
@@ -2301,13 +2306,13 @@ void mafLogicWithManagers::WizardRunTerminated()
 
 
 //----------------------------------------------------------------------------
-void mafLogicWithManagers::CreateSidebar()
+void mafLogicWithManagers::CreateControlPanel()
 {
 	{
 		m_SideBar = new mafSideBar(m_Win,MENU_VIEW_SIDEBAR,this,m_SidebarStyle);
 		m_Win->AddDockPane(m_SideBar->m_Notebook , wxPaneInfo()
 			.Name("sidebar")
-			.Caption(wxT("ControlBar"))
+			.Caption(wxT("Control Panel"))
 			.Right()
 			.Layer(2)
 			.MinSize(240,450)
@@ -2350,7 +2355,7 @@ void mafLogicWithManagers::CreateNullLog()
 }
 
 //----------------------------------------------------------------------------
-void mafLogicWithManagers::CreateLogbar()
+void mafLogicWithManagers::CreateLogPanel()
 {
 #ifdef MAF_USE_VTK
 	m_VtkLog = mafVTKLog::New();
@@ -2379,7 +2384,7 @@ void mafLogicWithManagers::CreateLogbar()
 
 	m_Win->AddDockPane(log, wxPaneInfo()
 		.Name("logbar")
-		.Caption(wxT("LogBar"))
+		.Caption(wxT("Log Panel"))
 		.Bottom()
 		.Layer(0)
 		.MinSize(100,10)
@@ -2431,7 +2436,7 @@ void mafLogicWithManagers::CreateToolbar()
 	//SIL. 23-may-2006 : 
 	m_Win->AddDockPane(m_ToolBar,  wxPaneInfo()
 		.Name("toolbar")
-		.Caption(wxT("ToolBar"))
+		.Caption(wxT("Toolbar"))
 		.Top()
 		.Layer(2)
 		.ToolbarPane()
@@ -2444,7 +2449,7 @@ void mafLogicWithManagers::CreateToolbar()
 }
 
 //----------------------------------------------------------------------------
-void mafLogicWithManagers::CreateTimebar()
+void mafLogicWithManagers::CreateTimeBar()
 {
 	m_TimePanel = new mafGUITimeBar(m_Win,MENU_VIEW_TIMEBAR,true);
 	m_TimePanel->SetListener(this);
@@ -2455,7 +2460,7 @@ void mafLogicWithManagers::CreateTimebar()
 
 	m_Win->AddDockPane(m_TimePanel, wxPaneInfo()
 		.Name("timebar")
-		.Caption(wxT("TimeBar"))
+		.Caption(wxT("Time Bar"))
 		.Bottom()
 		.Row(1)
 		.Layer(2)

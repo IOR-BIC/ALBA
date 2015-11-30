@@ -137,6 +137,9 @@ public:
   Are plugged also all the setting to the dialogs interface. */
   virtual void Configure();
 
+	/** Creates menu and tool bars*/
+	void CreateToolBarsAndPanels();
+
   /** Program Initialization */
 	virtual void Init(int argc, char **argv);
 
@@ -158,8 +161,11 @@ public:
   /**  Plug a new wizard */
   virtual void Plug(mafWizard *wizard, wxString menuPath = "");
 
-  /** Fill the View and operation menu's and set the application stamp to the VMEManager.*/
+	/**Set the application stamp to the VMEManager and Shows the application*/
   virtual void Show();
+
+  /** Fill the View and operation menu's  */
+	void FillMenus();
 
   /** Return the applications' user.*/
   mafUser *GetUser();
@@ -199,11 +205,11 @@ public:
 	/** Sets the flag to know if Toolbar should be built.*/
 	void PlugToolbar(bool plug) {m_PlugToolbar	= plug;};
 	/** Sets the flag to know if Side bar should be built.*/
-	void PlugSidebar(bool plug, long style = mafSideBar::DOUBLE_NOTEBOOK) {m_PlugSidebar	= plug; m_SidebarStyle = style;};
+	void PlugSidebar(bool plug, long style = mafSideBar::DOUBLE_NOTEBOOK) {m_PlugControlPanel	= plug; m_SidebarStyle = style;};
 	/** Sets the flag to know if Time bar should be built.*/
 	void PlugTimebar(bool plug) {m_PlugTimebar	= plug;};
 	/** Sets the flag to know if Log bar should be built.*/
-	void PlugLogbar(bool plug)	{m_PlugLogbar		= plug;};
+	void PlugLogbar(bool plug)	{m_PlugLogPanel		= plug;};
 
 	 /** 
   Show the splash screen for the application. To define your own splash screen image simply
@@ -234,11 +240,11 @@ protected:
   virtual void CreateToolbar();
 
 	/** Virtual method to create the side bar.*/
-	virtual void CreateSidebar();
+	virtual void CreateControlPanel();
 	/** Virtual method to create the time bar.*/
-	virtual void CreateTimebar();
+	virtual void CreateTimeBar();
 	/** Virtual method to create the log bar.*/
-	virtual void CreateLogbar();
+	virtual void CreateLogPanel();
 	/** Create a null logger. This is used when no log is due. */
 	void CreateNullLog();
 	
@@ -412,9 +418,9 @@ protected:
 	bool m_Quitting;    ///< Variable that allows to determine if the application is Quitting or not.
 	bool m_PlugMenu;    ///< Flag to plug or not the Menu into the application. Default is true.
 	bool m_PlugToolbar; ///< Flag to plug or not the Toolbar into the application. Default is true.
-	bool m_PlugSidebar; ///< Flag to plug or not the Side-bar into the application. Default is true.
+	bool m_PlugControlPanel; ///< Flag to plug or not the Side-bar into the application. Default is true.
 	long m_SidebarStyle;///< Store the style of the sidebar. Old style (MAF 1.x): SINGLE_NOTEBOOK or new style (MAF 2.x): DOUBLE_NOTEBOOK
 	bool m_PlugTimebar; ///< Flag to plug or not the Time-bar into the application. Default is true.
-	bool m_PlugLogbar;  ///< Flag to plug or not the Log area into the application. Default is true.
+	bool m_PlugLogPanel;  ///< Flag to plug or not the Log area into the application. Default is true.
 };
 #endif
