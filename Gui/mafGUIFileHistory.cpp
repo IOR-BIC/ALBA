@@ -42,11 +42,14 @@ void mafGUIFileHistory::AddFileToHistory(const wxString& file)
 //----------------------------------------------------------------------------
 {
   int i;
-  // Check we don't already have this file
+  // if we have already have this file we will remove it and reinsert in first position
   for(i = 0; i < m_fileHistoryN; i++)
   {
     if(m_fileHistory[i] && wxString(m_fileHistory[i]) == file)
-      return;
+		{
+			RemoveFileFromHistory(i);
+			break;
+		}
   }
 
   // Add to the project file history:
