@@ -210,7 +210,7 @@ void mafLogicWithManagers::Configure()
     m_VMEManager->SetPassword(m_StorageSettings->GetPassword());
     m_VMEManager->SetLocalCacheFolder(m_StorageSettings->GetCacheFolder());
     m_VMEManager->SetListener(this); 
-	m_VMEManager->SetFileExtension(m_Extension);
+		m_VMEManager->SetFileExtension(m_Extension);
     //m_VMEManager->SetSingleBinaryFile(m_StorageSettings->GetSingleFileStatus()!= 0);
   }
 
