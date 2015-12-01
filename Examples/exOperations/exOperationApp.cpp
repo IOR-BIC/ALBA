@@ -210,12 +210,7 @@ bool exOperationApp::OnInit()
 
   //m_Logic->ShowSplashScreen();
   m_Logic->Show();
-  mafString app_stamp;
-  app_stamp = "OPEN_ALL_DATA";
-  m_Logic->SetApplicationStamp(app_stamp);
-
-  //mafUser *user = m_Logic->GetUser();
-  //user->ShowLoginDialog();
+ 
 
   m_Logic->Init(argc,argv); // calls FileNew - which create the root
   return TRUE;
