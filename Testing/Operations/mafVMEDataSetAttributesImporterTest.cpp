@@ -140,7 +140,7 @@ void mafVMEDataSetAttributesImporterTest::SaveToDiskAndDisplay( mafVMEMesh *vmeM
     res = data->GetPointData()->SetActiveScalars(attributeLabel);
     assert(res != -1);
 
-    int ntuples = data->GetPointData()->GetArray("id")->GetNumberOfTuples();
+    int ntuples = vmeMesh->GetNodesIDArray()->GetNumberOfTuples();
     CPPUNIT_ASSERT(ntuples == data->GetNumberOfPoints());
   } 
   else if (dataType == CELL_DATA)
@@ -149,7 +149,7 @@ void mafVMEDataSetAttributesImporterTest::SaveToDiskAndDisplay( mafVMEMesh *vmeM
     res = data->GetCellData()->SetActiveScalars(attributeLabel);
     assert(res != -1);
 
-    int ntuples = data->GetCellData()->GetArray("material")->GetNumberOfTuples();
+    int ntuples = vmeMesh->GetMaterialsIDArray()->GetNumberOfTuples();
     CPPUNIT_ASSERT(ntuples == data->GetNumberOfCells());
   }
   else
@@ -234,11 +234,11 @@ void mafVMEDataSetAttributesImporterTest::RenderData( vtkUnstructuredGrid *data,
 
   if (dataType == POINT_DATA)
   {
-    data->GetPointData()->GetScalars("id")->GetRange(range);
+    data->GetPointData()->GetScalars("Id")->GetRange(range);
   } 
   else if (dataType == CELL_DATA)
   {
-    data->GetCellData()->GetScalars("material")->GetRange(range);
+    data->GetCellData()->GetScalars("Material")->GetRange(range);
   }
   else
   {
@@ -809,7 +809,7 @@ void mafVMEDataSetAttributesImporterTest::TestTetra10ANSYS_ELEMENT_IDJumpingSing
 
   importer->SetUseTSFile(false);
   importer->UseIdArrayOn();
-  importer->SetIdArrayName("ANSYS_ELEMENT_ID");
+  importer->SetIdArrayName("Id");
   importer->SetAttributeTypeToCellData();
   int result = importer->Read();
 

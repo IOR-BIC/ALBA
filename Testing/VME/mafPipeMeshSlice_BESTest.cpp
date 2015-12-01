@@ -175,9 +175,9 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution()
   }
 	
 	const char *strings[5];
-	strings[0] = "id"; //point 
+	strings[0] = "Id"; //point 
 
-	strings[1] = "material"; //cell 
+	strings[1] = "Material"; //cell 
 	strings[2] = "EX";
 	strings[3] = "NUXY";
 	strings[4] = "DENS";
@@ -321,9 +321,9 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_Wireframe()
   }
 
   const char *strings[5];
-  strings[0] = "id"; //point 
+  strings[0] = "Id"; //point 
 
-  strings[1] = "material"; //cell 
+  strings[1] = "Material"; //cell 
   strings[2] = "EX";
   strings[3] = "NUXY";
   strings[4] = "DENS";
@@ -468,9 +468,9 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_WiredActorVisibility()
   }
 
   const char *strings[5];
-  strings[0] = "id"; //point 
+  strings[0] = "Id"; //point 
 
-  strings[1] = "material"; //cell 
+  strings[1] = "Material"; //cell 
   strings[2] = "EX";
   strings[3] = "NUXY";
   strings[4] = "DENS";
@@ -615,9 +615,9 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_FlipNormal()
   }
 
   const char *strings[5];
-  strings[0] = "id"; //point 
+  strings[0] = "Id"; //point 
 
-  strings[1] = "material"; //cell 
+  strings[1] = "Material"; //cell 
   strings[2] = "EX";
   strings[3] = "NUXY";
   strings[4] = "DENS";
@@ -769,9 +769,9 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_UseVTKProperty()
   }
 
   const char *strings[5];
-  strings[0] = "id"; //point 
+  strings[0] = "Id"; //point 
 
-  strings[1] = "material"; //cell 
+  strings[1] = "Material"; //cell 
   strings[2] = "EX";
   strings[3] = "NUXY";
   strings[4] = "DENS";
@@ -920,9 +920,9 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_Thickness_PickActor()
   }
 
   const char *strings[5];
-  strings[0] = "id"; //point 
+  strings[0] = "Id"; //point 
 
-  strings[1] = "material"; //cell 
+  strings[1] = "Material"; //cell 
   strings[2] = "EX";
   strings[3] = "NUXY";
   strings[4] = "DENS";
