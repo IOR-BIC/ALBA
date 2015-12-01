@@ -53,12 +53,12 @@ DATA ARRAY NAMING
 
 NODES:
 --------------------------------
-id array name: "id"    type:  vtkIntArray
+id array name: "Id"    type:  vtkIntArray
 
 
 CELLS:  
 --------------------------------
-material array name: "material"   type: vtkIntArray
+material array name: "Material"   type: vtkIntArray
 
 */
 mafVMEMeshAnsysTextExporter::mafVMEMeshAnsysTextExporter()
@@ -249,7 +249,7 @@ int mafVMEMeshAnsysTextExporter::WriteElementsFile( vtkUnstructuredGrid *inputUG
   }
 
   // get the Ansys Nodes Id array
-  vtkIntArray *nodesIDArray = vtkIntArray::SafeDownCast(pointData->GetArray("id"));  
+  vtkIntArray *nodesIDArray = vtkIntArray::SafeDownCast(pointData->GetArray("Id"));  
   
   vtkIntArray *syntheticNodesIDArray = NULL;
 

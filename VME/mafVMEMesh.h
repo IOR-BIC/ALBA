@@ -87,7 +87,7 @@ protected:
   virtual ~mafVMEMesh();
 
   /** Return the array with the name given. Returns NULL is array not found */
-  vtkIntArray *GetIntArray(const char *arrayName, const char *arrayName2);
+  vtkIntArray *GetIntCellArray(const char *arrayName, const char *arrayName2);
 
 private:
   mafVMEMesh(const mafVMEMesh&); // Not implemented
