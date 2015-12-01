@@ -211,8 +211,8 @@ void mafVMEMeshAnsysTextExporterTest::ReadAndDisplay( mafString &dirPrefix, int 
 
   if (dataType == POINT_DATA)
   {
-    ugrid->GetPointData()->SetActiveScalars("id");
-    int ntuples = ugrid->GetPointData()->GetArray("id")->GetNumberOfTuples();
+    ugrid->GetPointData()->SetActiveScalars("Id");
+    int ntuples = ugrid->GetPointData()->GetArray("Id")->GetNumberOfTuples();
     CPPUNIT_ASSERT(ntuples == ugrid->GetNumberOfPoints());
 
     // always render point data
@@ -220,8 +220,8 @@ void mafVMEMeshAnsysTextExporterTest::ReadAndDisplay( mafString &dirPrefix, int 
   } 
   else if (dataType == CELL_DATA)
   {
-    ugrid->GetCellData()->SetActiveScalars("material");
-    int ntuples = ugrid->GetCellData()->GetArray("material")->GetNumberOfTuples();
+    ugrid->GetCellData()->SetActiveScalars("Material");
+    int ntuples = ugrid->GetCellData()->GetArray("Material")->GetNumberOfTuples();
     CPPUNIT_ASSERT(ntuples == ugrid->GetNumberOfCells());
 
     // render cell data for linear cells only (vtk 4.4 bug)
@@ -259,14 +259,14 @@ void mafVMEMeshAnsysTextExporterTest::RenderData(  vtkUnstructuredGrid *data, in
 
   if (dataType == POINT_DATA)
   {
-    data->GetPointData()->GetScalars("id")->GetRange(range);
+    data->GetPointData()->GetScalars("Id")->GetRange(range);
     cout << "point ID range: [" << range[0] <<":" << range[1] << "]" << std::endl ;
 
   } 
   else if (dataType == CELL_DATA)
   {
-    data->GetCellData()->GetScalars("material")->GetRange(range);
-    cout << "material range: [" << range[0] <<":" << range[1] << "]"<<  std::endl;
+    data->GetCellData()->GetScalars("Material")->GetRange(range);
+    cout << "Material range: [" << range[0] <<":" << range[1] << "]"<<  std::endl;
   }
   else
   {

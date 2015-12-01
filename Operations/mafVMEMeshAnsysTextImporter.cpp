@@ -61,12 +61,12 @@ DATA ARRAY NAMING
 
 NODES:
 --------------------------------
-id array name: "id"    type:  vtkIntArray
+id array name: "Id"    type:  vtkIntArray
 
 
 CELLS:  
 --------------------------------
-material array name: "material"   type: vtkIntArray
+material array name: "Material"   type: vtkIntArray
 
 */
 //----------------------------------------------------------------------------
@@ -223,7 +223,7 @@ int mafVMEMeshAnsysTextImporter::ParseNodesFile(vtkUnstructuredGrid *grid)
   248 45 32 27
   */
   vtkIntArray *node_id_array = vtkIntArray::New();
-  node_id_array->SetName("id");
+  node_id_array->SetName("Id");
   node_id_array->SetNumberOfTuples(M.rows());
 
   for (int i = 0; i < M.rows(); i++)
@@ -353,10 +353,10 @@ int mafVMEMeshAnsysTextImporter::ParseElementsFile(vtkUnstructuredGrid *grid)
       grid->InsertNextCell(m_VtkCellType, id_list);
   }
 
-  AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysELEMENTIDColumn, "ELEMENT_ID");
-  AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysTYPEColumn, "ELEMENT_TYPE");
-  AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysMATERIALColumn, "material",true);
-  AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysREALColumn, "ELEMENT_REAL");  
+  AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysELEMENTIDColumn, "Id");
+  AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysTYPEColumn, "Type");
+  AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysMATERIALColumn, "Material",true);
+  AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysREALColumn, "Real");  
   
   vtkDEL(id_list);
 
@@ -709,7 +709,7 @@ void mafVMEMeshAnsysTextImporter::FEMDataToCellData( vtkUnstructuredGrid *input,
   // materials id per cell
   vtkDoubleArray *materialIDArrayFD = NULL;
   int numCells = -1, numMatProp = -1, numMat = -1;
-  mafString matStr("material");
+  mafString matStr("Material");
   mafString matIdStr("material_id");
   vtkIntArray *materialArrayCD = NULL;
   vtkFieldData *inFD = NULL;

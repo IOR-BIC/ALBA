@@ -21,6 +21,7 @@
 //----------------------------------------------------------------------------
 #include "mafVMEGeneric.h"
 #include "mafVMEOutputMesh.h"
+#include "vtkIntArray.h"
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
@@ -51,6 +52,21 @@ public:
   /** return the output casted to mafVMEOutputMesh*/
   mafVMEOutputMesh *GetUnstructuredGridOutput() {return mafVMEOutputMesh::SafeDownCast(GetOutput());}
 
+  /** return the Node IDs Array*/
+  vtkIntArray *GetNodesIDArray();
+
+  /** return the Material IDs Array*/
+  vtkIntArray *GetMaterialsIDArray();
+
+  /** return the Element IDs Array*/
+  vtkIntArray *GetElementsIDArray();
+
+  /** return the Element Types Array*/
+  vtkIntArray *GetElementsTypeArray();
+
+  /** return the Element Reals Array*/
+  vtkIntArray *GetElementsRealArray();
+
   /** return the output */
   virtual mafVMEOutput *GetOutput();
 
@@ -69,6 +85,9 @@ public:
 protected:
   mafVMEMesh();
   virtual ~mafVMEMesh();
+
+  /** Return the array with the name given. Returns NULL is array not found */
+  vtkIntArray *GetIntCellArray(const char *arrayName, const char *arrayName2);
 
 private:
   mafVMEMesh(const mafVMEMesh&); // Not implemented
