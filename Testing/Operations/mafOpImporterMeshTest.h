@@ -26,15 +26,14 @@ class mafOpImporterMeshTest : public mafTest
   CPPUNIT_TEST_SUITE( mafOpImporterMeshTest );
   CPPUNIT_TEST( TestFixture ); // just to test that the fixture has no leaks
   CPPUNIT_TEST( TestConstructor );
-  CPPUNIT_TEST( TestImportMesh );
+  CPPUNIT_TEST( TestImportGenericMesh );
   CPPUNIT_TEST_SUITE_END();
 
   protected:
     
   void TestFixture();
   void TestConstructor();
-  void TestImportMesh();
-	  
+  void TestImportGenericMesh();	  
 };
 
 #endif

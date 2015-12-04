@@ -55,7 +55,6 @@ mafOp(label)
   m_ImportedVmeMesh = NULL;
   m_NodesFileName = "";
   m_ElementsFileName = "";
-  m_MaterialsFileName = "";
 }
 
 //----------------------------------------------------------------------------
@@ -96,7 +95,8 @@ int mafOpImporterMesh::Read()
   mafVMEMeshAnsysTextImporter *reader = new mafVMEMeshAnsysTextImporter;
 	reader->SetNodesFileName(m_NodesFileName.GetCStr());
   reader->SetElementsFileName(m_ElementsFileName.GetCStr());
-  reader->SetMaterialsFileName(m_MaterialsFileName.GetCStr());
+  reader->SetMode(mafVMEMeshAnsysTextImporter::GENERIC_MODE);
+
 	int returnValue = reader->Read();
 
   if (returnValue == MAF_ERROR)
@@ -132,7 +132,6 @@ enum Mesh_Importer_ID
   ID_Importer_Type,
   ID_NodesFileName,
   ID_ElementsFileName,
-  ID_MaterialsFileName,
   ID_OK,
   ID_CANCEL,
 };
@@ -145,24 +144,27 @@ void mafOpImporterMesh::CreateGui()
   m_Gui = new mafGUI(this);
   m_Gui->SetListener(this);
 
-  wxString TypeOfImporter[2]={"Ansys Text","ToDo"};
-  m_Gui->Label(_("Importer type"), true);
-  m_Gui->Combo(ID_Importer_Type,"",&m_ImporterType,1,TypeOfImporter);
-  m_Gui->Divider(2);
-  m_Gui->Label(_("nodes file:"), true);
+  m_Gui->Label("", true);
+
+  //////////////////////////////////////////////////////////////////////////
+
+  m_Gui->Label(_("Nodes file:"), true);
   m_Gui->FileOpen (ID_NodesFileName,	"",	&m_NodesFileName, wildcard);
   m_Gui->Divider();
  
-  m_Gui->Label(_("elements file:"), true);
+  m_Gui->Label(_("Elements file:"), true);
   m_Gui->FileOpen (ID_ElementsFileName,	"",	&m_ElementsFileName, wildcard);
   m_Gui->Divider();
 
-  m_Gui->Label(_("materials file (optional):"), true);
-  m_Gui->FileOpen (ID_MaterialsFileName,	"",	&m_MaterialsFileName, wildcard);
   m_Gui->Divider(2);
-  m_Gui->Divider();
-  m_Gui->OkCancel();
+  //////////////////////////////////////////////////////////////////////////
+  m_Gui->Label("");
 
+  m_Gui->OkCancel();
+  m_Gui->Label("");
+  m_Gui->Label("");
+
+  m_Gui->FitGui();
   m_Gui->Update();
 }
 //----------------------------------------------------------------------------
@@ -178,9 +180,6 @@ void mafOpImporterMesh::OnEvent(mafEventBase *maf_event)
       break;
       case ID_ElementsFileName:
         // this->SetElementsFileName(m_ElementsFileName.GetCStr());
-      break;
-      case ID_MaterialsFileName:
-        // this->SetMaterialsFileName(m_MaterialsFileName.GetCStr());
       break;
       case wxOK:
       {
