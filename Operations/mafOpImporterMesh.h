@@ -59,9 +59,7 @@ public:
   void SetElementsFileName(const char *name)   {this->m_ElementsFileName = name;};
   const char *GetElementsFileName() {return this->m_ElementsFileName;};
 
-  /** Set/Get materials file name*/
-  void SetMaterialsFileName(const char *name) {this->m_MaterialsFileName = name;};
-  const char *GetMaterialsFileName() {return this->m_MaterialsFileName;};
+  void SetMode(int mode){}
 
   /** Builds operation's interface. */
 	void OpRun();
@@ -82,8 +80,5 @@ protected:
 
   /** Elements file name*/
   mafString m_ElementsFileName;
-
-  /** Materials file name*/
-  mafString m_MaterialsFileName;
 };
 #endif

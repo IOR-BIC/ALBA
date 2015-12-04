@@ -74,7 +74,6 @@ material array name: "Material"   type: vtkIntArray
 //----------------------------------------------------------------------------
 
 const int CHAR_BUF_SIZE = 1000;
-const int FIRST_CONNECTIVITY_COLUMN = 6;
 
 mafVMEMeshAnsysTextImporter::mafVMEMeshAnsysTextImporter()
 {
@@ -84,7 +83,8 @@ mafVMEMeshAnsysTextImporter::mafVMEMeshAnsysTextImporter()
   m_ElementType = UNSUPPORTED_ELEMENT;
   m_NodesPerElement = -1;
   m_MeshType = UNKNOWN;
-  
+  m_ReaderMode = ANSYS_MODE;
+
   m_Output = NULL;
 }
 //----------------------------------------------------------------------------
@@ -290,11 +290,17 @@ int mafVMEMeshAnsysTextImporter::ParseElementsFile(vtkUnstructuredGrid *grid)
   int ansysTYPEColumn = 2;
   int ansysREALColumn = 3;
 
-  int FIRST_CONNECTIVITY_COLUMN = 6;
+  m_FirstConnectivityColumn = 6;
+
+  if(m_ReaderMode == GENERIC_MODE)
+  {
+    // elId  pointId...
+    // 37411 119324    6996    6994    4809   70910   70925   70920   84679 84682   84683
+    m_FirstConnectivityColumn = 1;
+  }
 
   int ret = GetElementType();
-  if (ret == -1 || ret == UNSUPPORTED_ELEMENT )
-  
+  if (ret == -1 || ret == UNSUPPORTED_ELEMENT )  
   {
     return -1;
   }
@@ -317,7 +323,7 @@ int mafVMEMeshAnsysTextImporter::ParseElementsFile(vtkUnstructuredGrid *grid)
   for (int i = 0; i < ElementsFileMatrix.rows(); i++)
   {
       int id_index = 0;
-      for (int j = FIRST_CONNECTIVITY_COLUMN; j < ElementsFileMatrix.columns(); j++ )
+      for (int j = m_FirstConnectivityColumn; j < ElementsFileMatrix.columns(); j++ )
       {
         /*
         // store info about node_id <-> node_index association 
@@ -354,9 +360,15 @@ int mafVMEMeshAnsysTextImporter::ParseElementsFile(vtkUnstructuredGrid *grid)
   }
 
   AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysELEMENTIDColumn, "Id");
-  AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysTYPEColumn, "Type");
-  AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysMATERIALColumn, "Material",true);
-  AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysREALColumn, "Real");  
+
+  if(m_ReaderMode == ANSYS_MODE)
+  {
+    AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysTYPEColumn, "Type");
+    AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysMATERIALColumn, "Material",true);
+    AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysREALColumn, "Real"); 
+  }
+
+ 
   
   vtkDEL(id_list);
 
@@ -613,7 +625,7 @@ int mafVMEMeshAnsysTextImporter::GetElementType()
       connectivityVector.push_back(tmpInt);
     }
 
-    numConnectivityPoints = connectivityVector.size() - FIRST_CONNECTIVITY_COLUMN;
+    numConnectivityPoints = connectivityVector.size() - m_FirstConnectivityColumn;
   
     if (numConnectivityPoints == 4)
     {
