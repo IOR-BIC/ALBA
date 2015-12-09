@@ -115,9 +115,9 @@ END_EVENT_TABLE()
 
 
 //----------------------------------------------------------------------------
-mafGUIMDIFrame::mafGUIMDIFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
+mafGUIMDIFrame::mafGUIMDIFrame(const wxString& title, const wxPoint& pos, const wxSize& size, long style)
 //----------------------------------------------------------------------------
-: wxMDIParentFrame((wxFrame *)NULL, -1, title, pos, size, wxDEFAULT_FRAME_STYLE|wxHSCROLL|wxVSCROLL)
+: wxMDIParentFrame((wxFrame *)NULL, -1, title, pos, size, wxDEFAULT_FRAME_STYLE|wxHSCROLL|wxVSCROLL|style)
 {
   mafSetFrame( this );
 

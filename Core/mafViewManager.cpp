@@ -41,6 +41,8 @@
 #include "mafEvent.h"
 #include "mafRWIBase.h"
 #include "mafDeviceButtonsPadMouse.h"
+#include "mafGUI.h"
+
 
 /*
 #include "typeinfo.h"
@@ -291,19 +293,22 @@ void mafViewManager::OnQuit()
 //----------------------------------------------------------------------------
 {
 }
+
+
 //----------------------------------------------------------------------------
 void mafViewManager::FillMenu(wxMenu* menu)
-//----------------------------------------------------------------------------
 {
-  wxString s;
 	for(int i=0; i<m_TemplateNum; i++)
 	{
     mafView* v = m_ViewTemplate[i];
-    s = wxString::Format("%s",v->GetLabel().c_str());
-    if(IsVisibleInMenu(v))
-	    menu->Append(v->m_Id, s, (wxMenu *)NULL, s ); // Fill the menu with the labels of the template views
+		if(IsVisibleInMenu(v))
+		{
+			mafGUI::AddMenuItem(menu,v->m_Id,v->GetLabel(),v->GetIcon());
+		}
   }
 }
+
+
 //----------------------------------------------------------------------------
 bool mafViewManager::IsVisibleInMenu(mafView* v)
 //----------------------------------------------------------------------------

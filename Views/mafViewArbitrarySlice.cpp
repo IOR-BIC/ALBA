@@ -948,6 +948,13 @@ void mafViewArbitrarySlice::UpdateSlicerBehavior()
 };
 
 //----------------------------------------------------------------------------
+char ** mafViewArbitrarySlice::GetIcon()
+{
+#include "pic/VIEW_ARBITRARY.xpm"
+	return VIEW_ARBITRARY_xpm;
+}
+
+//----------------------------------------------------------------------------
 void mafViewArbitrarySlice::VolumeWindowing(mafVME *volume)
 	//----------------------------------------------------------------------------
 {

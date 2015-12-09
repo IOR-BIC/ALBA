@@ -137,6 +137,9 @@ public:
   Note: This method will be called immediately after the call of PackageView */ 
   void PlugVisualPipeInSliceViews(mafString vme_type, mafString pipe_type, long visibility = VISIBLE);
 
+	/** return an xpm-icon that can be used to represent this view */
+	virtual char ** GetIcon();
+
 protected:
   /**
   Internally used to create a new instance of the GUI. This function should be
