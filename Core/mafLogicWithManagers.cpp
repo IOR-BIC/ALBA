@@ -2142,7 +2142,7 @@ void mafLogicWithManagers::CreateStorage(mafEvent *e)
     storage->SetUsername(m_StorageSettings->GetUserName());
     storage->SetPassword(m_StorageSettings->GetPassword());
     
-    storage->GetRoot()->SetName("root");
+    storage->GetRoot()->SetName("Root");
     storage->SetListener(m_VMEManager);
     storage->Initialize();
     storage->GetRoot()->Initialize();
@@ -2158,7 +2158,7 @@ void mafLogicWithManagers::CreateStorage(mafEvent *e)
       storage->Delete();
     }
     storage = mafVMEStorage::New();
-    storage->GetRoot()->SetName("root");
+    storage->GetRoot()->SetName("Root");
     storage->SetListener(m_VMEManager);
     storage->GetRoot()->Initialize();
     e->SetMafObject(storage);
@@ -2427,7 +2427,7 @@ void mafLogicWithManagers::CreateLogPanel()
 		.TopDockable(false) // prevent docking on top side - otherwise may dock also beside the toolbar -- and it's hugely
 		);
 
-	mafLogMessage(_("welcome"));
+	mafLogMessage(_("Welcome"));
 }
 
 //----------------------------------------------------------------------------
