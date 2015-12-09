@@ -91,6 +91,9 @@ public:
 	/* Update slicer settings according to m_CurrentVolume*/
 	void UpdateSlicerBehavior();
 
+	/** return an xpm-icon that can be used to represent this view */
+	char ** GetIcon();
+
 protected:
 
 	/** Internally used to create a new instance of the GUI. 

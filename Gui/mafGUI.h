@@ -307,6 +307,8 @@ public:
   /** place the GUI on a different parent, and perform the required Resize/Stretch/ and Show */
   void Reparent(wxWindow *parent);
 
+	static void AddMenuItem(wxMenu *menu,int id, wxString label, char **icon=NULL);
+
 protected:
   mafObserver  *m_Listener;     
   wxBoxSizer   *m_Sizer;

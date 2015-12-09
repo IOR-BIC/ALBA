@@ -451,6 +451,13 @@ void mafViewOrthoSlice::PlugVisualPipeInSliceViews(mafString vme_type, mafString
 }
 
 //----------------------------------------------------------------------------
+char ** mafViewOrthoSlice::GetIcon()
+{
+#include "pic/VIEW_ORTHO.xpm"
+	return VIEW_ORTHO_xpm;
+}
+
+//----------------------------------------------------------------------------
 void mafViewOrthoSlice::PlugVisualPipeInPerspective(mafString vme_type, mafString pipe_type, long visibility)
 //----------------------------------------------------------------------------
 {

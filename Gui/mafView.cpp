@@ -248,6 +248,13 @@ void mafView::Print(std::ostream& os, const int tabs)// const
   os << indent << "mafView" << '\t' << this << "\n";
 }
 
+//----------------------------------------------------------------------------
+char ** mafView::GetIcon()
+{
+#include "pic/VIEW.xpm"
+		return VIEW_xpm;
+}
+
 //-------------------------------------------------------------------------
 double *mafView::GetSlice()// const
 //-------------------------------------------------------------------------
