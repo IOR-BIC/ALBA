@@ -47,57 +47,53 @@ void mafOpImporterMeshTest::TestFixture()
 {
 }
 
-void mafOpImporterMeshTest::TestImportMesh()
+void mafOpImporterMeshTest::TestImportGenericMesh()
 {
-	mafVMEStorage *storage = mafVMEStorage::New();
+  mafVMEStorage *storage = mafVMEStorage::New();
   storage->GetRoot()->SetName("root");
   storage->GetRoot()->Initialize();
 
   mafString dirPrefix = MAF_DATA_ROOT;
-  dirPrefix << "/FEM/ANSYS/tet4/";
+  dirPrefix << "/FEM/GenericMesh/";
 
   mafString nodesFileName = dirPrefix;
-  nodesFileName << "NLIST.lis";
+  nodesFileName << "NLISTtet4.lis";
 
   mafString elementsFileName = dirPrefix;
-  elementsFileName << "ELIST.lis";
-
-  mafString materialsFileName = dirPrefix;
-  materialsFileName << "MPLIST.lis";
+  elementsFileName << "ELISTtet4.lis";
 
   mafOpImporterMesh *meshImporter=new mafOpImporterMesh("mesh importer");
-	meshImporter->TestModeOn();
+  meshImporter->TestModeOn();
 
   meshImporter->SetNodesFileName(nodesFileName.GetCStr());
   meshImporter->SetElementsFileName(elementsFileName.GetCStr());
-  meshImporter->SetMaterialsFileName(materialsFileName.GetCStr());
 
   meshImporter->Read();
 
-	mafNode *node=meshImporter->GetOutput();
-	
-	CPPUNIT_ASSERT(node->IsA("mafVMEMesh"));
+  mafNode *node=meshImporter->GetOutput();
+
+  CPPUNIT_ASSERT(node->IsA("mafVMEMesh"));
   vtkDataSet* data;
 
   data = mafVMEMesh::SafeDownCast(node)->GetUnstructuredGridOutput()->GetVTKData();
-	data->Update();
-	
+  data->Update();
+
   int cells=data->GetNumberOfCells();
-	CPPUNIT_ASSERT(cells==2);
+  CPPUNIT_ASSERT(cells==2);
 
-	int points=data->GetNumberOfPoints();
-	CPPUNIT_ASSERT(points==5);
+  int points=data->GetNumberOfPoints();
+  CPPUNIT_ASSERT(points==5);
 
-	node = NULL;
-	data = NULL;
-	
+  node = NULL;
+  data = NULL;
+
   mafDEL(meshImporter);
-	mafDEL(storage);
+  mafDEL(storage);
 }
+
 
 void mafOpImporterMeshTest::TestConstructor()
 {
-
   mafOpImporterMesh *meshImporter=new mafOpImporterMesh("mesh importer");
   meshImporter->TestModeOn();
   CPPUNIT_ASSERT(meshImporter->GetOutput() == NULL);

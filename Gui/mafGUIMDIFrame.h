@@ -43,7 +43,7 @@ class MAF_EXPORT mafGUIMDIFrame: public wxMDIParentFrame
 {
  public:
   /** constructor. */
-  mafGUIMDIFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
+  mafGUIMDIFrame(const wxString& title, const wxPoint& pos, const wxSize& size, long style=0);
   /** destructor. */
  ~mafGUIMDIFrame(); 
   

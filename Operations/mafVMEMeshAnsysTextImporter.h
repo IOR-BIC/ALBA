@@ -62,6 +62,8 @@ public:
   void SetMaterialsFileName(const char *name) {this->m_MaterialsFileName = name;};
   const char *GetMaterialsFileName() {return this->m_MaterialsFileName;};
 
+  void SetMode(int mode) { m_ReaderMode = mode;}
+
   /**
   // Read files information; returns MAF_OK if successful otherwise MAF_ERROR*/
   int Read();
@@ -70,6 +72,12 @@ public:
   Get the vme created by the reader*/
   mafVMEMesh *GetOutput() {return m_Output;};
   
+  enum
+  {
+    ANSYS_MODE = 0,
+    GENERIC_MODE,
+  };
+
   // supported elements 
   enum
   {  
@@ -115,6 +123,10 @@ protected:
   int ParseMaterialsFile(vtkUnstructuredGrid *grid, const char *filename);
 
   /**
+  Reader Mode 0-Ansys 1-Generic*/
+  int m_ReaderMode;
+
+  /**
   Element type*/
   int m_ElementType;
 
@@ -155,6 +167,8 @@ protected:
   mafVMEMesh *m_Output;
 
   std::map<int, int> m_NodeIdNodeNumberMap;
+
+  int m_FirstConnectivityColumn;
   
   /** 
   utility functions */

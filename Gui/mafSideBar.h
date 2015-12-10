@@ -120,16 +120,14 @@ protected:
   mafGUICheckTree  *m_Tree;
 
   mafGUIHolder  *m_VmePanel;
-  mafGUIHolder  *m_VmeOutputPanel;
   mafGUIHolder  *m_VmePipePanel;
 
   mafNode     *m_SelectedVme;
   mafView     *m_SelectedView;
   mafObserver *m_Listener;
 
-  mafGUI *m_NewAppendingGUI;
-  mafGUI *m_OldAppendingGUI;
-
+  mafGUI *m_AppendingGUI;
+  
   mafGUI *m_CurrentVmeGui;
   mafGUI *m_CurrentPipeGui;
 

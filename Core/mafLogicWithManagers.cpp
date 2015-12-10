@@ -91,13 +91,14 @@
 #include "vtkTimerLog.h"
 #include "mafWXLog.h"
 
-
+#define IDM_WINDOWNEXT 4004
+#define IDM_WINDOWPREV 4006
 
 //----------------------------------------------------------------------------
 mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
 {
 	if (mdiFrame==NULL)
-		m_Win = new mafGUIMDIFrame("maf", wxDefaultPosition, wxSize(800, 600));
+		m_Win = new mafGUIMDIFrame("maf", wxDefaultPosition, wxSize(800, 600),wxFRAME_NO_WINDOW_MENU);
 	else
 		m_Win = mdiFrame;
 
@@ -474,11 +475,34 @@ void mafLogicWithManagers::Init(int argc, char **argv)
 void mafLogicWithManagers::CreateMenu()
 //----------------------------------------------------------------------------
 {
+#include "pic/menu/EDIT_COPY.xpm"
+#include "pic/menu/EDIT_CUT.xpm"
+#include "pic/menu/EDIT_DELETE.xpm"
+#include "pic/menu/EDIT_PASTE.xpm"
+#include "pic/menu/EDIT_REDO.xpm"
+#include "pic/menu/EDIT_SETTINGS.xpm"
+#include "pic/menu/EDIT_UNDO.xpm"
+#include "pic/menu/FILE_EXIT.xpm"
+#include "pic/menu/FILE_NEW.xpm"
+#include "pic/menu/FILE_OPEN.xpm"
+#include "pic/menu/FILE_PRINT.xpm"
+#include "pic/menu/FILE_PRINT_PREVIEW.xpm"
+#include "pic/menu/FILE_SAVE.xpm"
+#include "pic/menu/HELP_ABOUT.xpm"
+#include "pic/menu/HELP_HELP.xpm"
+#include "pic/menu/WINDOW_CASCADE.xpm"
+#include "pic/menu/WINDOW_HORIZONTALLY.xpm"
+#include "pic/menu/WINDOW_PREV.xpm"
+#include "pic/menu/WINDOW_NEXT.xpm"
+#include "pic/menu/WINDOW_VERTICALLY.xpm"
+
+		
+
   m_MenuBar  = new wxMenuBar;
   wxMenu *file_menu = new wxMenu;
-  file_menu->Append(MENU_FILE_NEW,   _("&New  \tCtrl+N"));
-  file_menu->Append(MENU_FILE_OPEN,  _("&Open   \tCtrl+O"));
-  file_menu->Append(MENU_FILE_SAVE,  _("&Save  \tCtrl+S"));
+	mafGUI::AddMenuItem(file_menu,MENU_FILE_NEW,_("&New  \tCtrl+N"),FILE_NEW_xpm);
+	mafGUI::AddMenuItem(file_menu,MENU_FILE_OPEN,_("&Open   \tCtrl+O"),FILE_OPEN_xpm);
+	mafGUI::AddMenuItem(file_menu,MENU_FILE_SAVE,_("&Save  \tCtrl+S"),FILE_SAVE_xpm);
   file_menu->Append(MENU_FILE_SAVEAS,_("Save &As  \tCtrl+Shift+S"));
   if (m_StorageSettings->UseRemoteStorage())
   {
@@ -493,8 +517,8 @@ void mafLogicWithManagers::CreateMenu()
 
   // Print menu item
   file_menu->AppendSeparator();
-  file_menu->Append(MENU_FILE_PRINT, _("&Print  \tCtrl+P"));
-  file_menu->Append(MENU_FILE_PRINT_PREVIEW, _("Print Preview"));
+	mafGUI::AddMenuItem(file_menu,MENU_FILE_PRINT,_("&Print  \tCtrl+P"),FILE_PRINT_xpm);
+	mafGUI::AddMenuItem(file_menu,MENU_FILE_PRINT_PREVIEW,_("Print Preview"),FILE_PRINT_PREVIEW_xpm);
   file_menu->Append(MENU_FILE_PRINT_SETUP, _("Printer Setup"));
   file_menu->Append(MENU_FILE_PRINT_PAGE_SETUP, _("Page Setup"));
 
@@ -503,21 +527,23 @@ void mafLogicWithManagers::CreateMenu()
   file_menu->Append(0,_("Recent Files"),m_RecentFileMenu);
 
   file_menu->AppendSeparator();
-  file_menu->Append(MENU_FILE_QUIT,  _("&Quit  \tCtrl+Q"));
+	mafGUI::AddMenuItem(file_menu,MENU_FILE_QUIT,_("&Quit  \tCtrl+Q"),FILE_EXIT_xpm);
 
   m_MenuBar->Append(file_menu, _("&File"));
 
   wxMenu    *edit_menu = new wxMenu;
-  edit_menu->Append(OP_UNDO,   _("Undo  \tCtrl+Z"));
-  edit_menu->Append(OP_REDO,   _("Redo  \tCtrl+Shift+Z"));
+
+
+	mafGUI::AddMenuItem(edit_menu,OP_UNDO,_("Undo  \tCtrl+Z"),EDIT_UNDO_xpm);
+	mafGUI::AddMenuItem(edit_menu,OP_REDO,_("Redo  \tCtrl+Shift+Z"),EDIT_REDO_xpm);
   edit_menu->AppendSeparator();
-  edit_menu->Append(OP_DELETE, _("Delete  \tDel"));
-  edit_menu->Append(OP_CUT,   _("Cut   \tCtrl+Shift+X"));
-  edit_menu->Append(OP_COPY,  _("Copy  \tCtrl+Shift+C"));
-  edit_menu->Append(OP_PASTE, _("Paste \tCtrl+Shift+V"));
+	mafGUI::AddMenuItem(edit_menu,OP_DELETE,_("Delete  \tDel"),EDIT_DELETE_xpm);
+	mafGUI::AddMenuItem(edit_menu,OP_CUT,_("Cut   \tCtrl+Shift+X"),EDIT_CUT_xpm);
+	mafGUI::AddMenuItem(edit_menu,OP_COPY,_("Copy  \tCtrl+Shift+C"),EDIT_COPY_xpm);
+	mafGUI::AddMenuItem(edit_menu,OP_PASTE, _("Paste \tCtrl+Shift+V"),EDIT_PASTE_xpm);
   edit_menu->Append(MENU_EDIT_FIND_VME, _("Find VME \tCtrl+F"));
 	edit_menu->AppendSeparator();
-	edit_menu->Append(ID_APP_SETTINGS, _("Settings..."));
+	mafGUI::AddMenuItem(edit_menu,ID_APP_SETTINGS,_("Settings..."),EDIT_SETTINGS_xpm);
 
   m_MenuBar->Append(edit_menu, _("&Edit"));
 
@@ -527,9 +553,19 @@ void mafLogicWithManagers::CreateMenu()
   m_OpMenu = new wxMenu;
   m_MenuBar->Append(m_OpMenu, _("&Operations"));
 
+	wxMenu    *windowMenu = new wxMenu;
+	m_MenuBar->Append(windowMenu, _("Window"));
+	mafGUI::AddMenuItem(windowMenu,TILE_WINDOW_CASCADE,_("&Cascade"),WINDOW_CASCADE_xpm);
+	mafGUI::AddMenuItem(windowMenu,TILE_WINDOW_HORIZONTALLY,_("Tile &Horizontally"),WINDOW_HORIZONTALLY_xpm);
+	mafGUI::AddMenuItem(windowMenu,TILE_WINDOW_VERTICALLY,_("Tile &Vertically"),WINDOW_VERTICALLY_xpm);
+	windowMenu->AppendSeparator();
+	mafGUI::AddMenuItem(windowMenu,IDM_WINDOWNEXT,_("&Next"),WINDOW_NEXT_xpm);
+	mafGUI::AddMenuItem(windowMenu,IDM_WINDOWPREV,_("&Previous"),WINDOW_PREV_xpm);
+
 	wxMenu    *help_menu = new wxMenu;
-	help_menu->Append(ABOUT_APPLICATION,_("About"));
-	help_menu->Append(HELP_HOME, _("Help"));
+	mafGUI::AddMenuItem(help_menu,ABOUT_APPLICATION,_("About"),HELP_ABOUT_xpm);
+	mafGUI::AddMenuItem(help_menu,HELP_HOME,_("Help"),HELP_HELP_xpm);
+
 
 	m_MenuBar->Append(help_menu, _("&Help"));
 
@@ -2106,7 +2142,7 @@ void mafLogicWithManagers::CreateStorage(mafEvent *e)
     storage->SetUsername(m_StorageSettings->GetUserName());
     storage->SetPassword(m_StorageSettings->GetPassword());
     
-    storage->GetRoot()->SetName("root");
+    storage->GetRoot()->SetName("Root");
     storage->SetListener(m_VMEManager);
     storage->Initialize();
     storage->GetRoot()->Initialize();
@@ -2122,7 +2158,7 @@ void mafLogicWithManagers::CreateStorage(mafEvent *e)
       storage->Delete();
     }
     storage = mafVMEStorage::New();
-    storage->GetRoot()->SetName("root");
+    storage->GetRoot()->SetName("Root");
     storage->SetListener(m_VMEManager);
     storage->GetRoot()->Initialize();
     e->SetMafObject(storage);
@@ -2391,7 +2427,7 @@ void mafLogicWithManagers::CreateLogPanel()
 		.TopDockable(false) // prevent docking on top side - otherwise may dock also beside the toolbar -- and it's hugely
 		);
 
-	mafLogMessage(_("welcome"));
+	mafLogMessage(_("Welcome"));
 }
 
 //----------------------------------------------------------------------------

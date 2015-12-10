@@ -41,6 +41,7 @@
 #endif             //:::::::::::::::::::::::::::::::::
 
 #include "mafString.h"
+#include <wx/image.h>
 
 // ugly hack to make FindWindow Work
 // if you remove this line you will have a Compile-Error "FindWindowA is not defined for wxWindow"
@@ -1606,6 +1607,22 @@ void mafGUI::Reparent(wxWindow *parent)
   this->Update();
   this->Show(true);
 }
+
+//----------------------------------------------------------------------------
+void mafGUI::AddMenuItem(wxMenu *menu,int id, wxString label, char **icon/*=NULL*/)
+{
+	if(icon!=NULL)
+	{
+		wxMenuItem *menuItem=new wxMenuItem(menu,id,label,label,false);
+		menuItem->SetBitmap(wxImage(icon));
+		menu->Append(menuItem);
+	}
+	else
+	{
+		menu->Append(id, label, (wxMenu *)NULL, label );
+	}
+}
+
 //----------------------------------------------------------------------------
 void mafGUI::GetWidgetValue(long widget_id, WidgetDataType &widget_data)
 //----------------------------------------------------------------------------
