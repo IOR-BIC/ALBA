@@ -1611,11 +1611,16 @@ void mafGUI::Reparent(wxWindow *parent)
 //----------------------------------------------------------------------------
 void mafGUI::AddMenuItem(wxMenu *menu,int id, wxString label, char **icon/*=NULL*/)
 {
-	if(icon!=NULL)
+	int osVersion;
+	wxGetOsVersion(&osVersion);
+	
+	//menu icons does not work on this version of wxwindows under winxp
+	if(icon!=NULL && osVersion>5)
 	{
 		wxMenuItem *menuItem=new wxMenuItem(menu,id,label,label,false);
 		menuItem->SetBitmap(wxImage(icon));
 		menu->Append(menuItem);
+		menu->UpdateUI();
 	}
 	else
 	{
