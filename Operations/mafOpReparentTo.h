@@ -53,6 +53,8 @@ public:
 	/** Execute the operation. */
   void OpDo();
 
+	static int ReparentTo(mafVME * input, mafVME * targetVme, mafVME * oldParent);
+
 	/** Makes the undo for the operation. */
   void OpUndo();
 

@@ -27,7 +27,6 @@
 // forward references :
 //----------------------------------------------------------------------------
 class mafNode;
-class vtkMatrix4x4;
 
 template class MAF_EXPORT mafAutoPointer<mafNode>;
 
@@ -115,7 +114,7 @@ public:
     void LoadVTKData(mafNode *vme);
 
 protected:
-    mafAutoPointer<mafNode> m_SelectionParent;
+   
     /** Load all children in the tree (Added by Di Cosmo on 24.05.2012) */
     void LoadChild(mafNode *vme);
 };
@@ -159,27 +158,5 @@ public:
 protected:
     mafAutoPointer<mafNode> m_PastedVme;
 };
-/*
-//----------------------------------------------------------------------------
-// mafOpTransform :
-//----------------------------------------------------------------------------
 
-class mafOpTransform: public mafOp
-{
-public:
-    mafOpTransform(wxString label="Transform"); 
-   ~mafOpTransform(); 
-    bool Accept(mafNode* vme);
-    void SetInput(mafNode* vme);       
-    void SetOldMatrix(vtkMatrix4x4* matrix);
-    void SetNewMatrix(vtkMatrix4x4* matrix);
-    void OpDo();
-    void OpUndo();
-    mafOp* Copy();
-protected:
-  	mafNode*       m_vme; 
-  	vtkMatrix4x4* m_new_matrix; 
-  	vtkMatrix4x4* m_old_matrix; 
-};
-*/
 #endif
