@@ -160,6 +160,8 @@ void mafOpExporterVTK::OnEvent(mafEventBase *maf_event)
         mafEventMacro(mafEvent(this,VME_ADD,this->m_Input));
       }
       break;
+			case ID_ABS_MATRIX:
+				break;
       default:
         mafEventMacro(*e);
       break;
