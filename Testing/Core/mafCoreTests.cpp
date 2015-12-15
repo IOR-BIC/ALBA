@@ -47,7 +47,6 @@
 #include "mafOpEditTest.h"
 #include "mafOpContextStackTest.h"
 #include "mafNodeIteratorTest.h"
-#include "mafNodeLayoutTest.h"
 #include "mafPipeTest.h"
 #include "mafMatrixPipeTest.h"
 #include "mafPipeBoxTest.h"
@@ -211,8 +210,7 @@ int
   runner.addTest( mafNodeTest::suite());
 	runner.addTest( mafNodeRootTest::suite());
 	runner.addTest( mafNodeManagerTest::suite() );
-	runner.addTest( mafNodeLayoutTest::suite());
-  runner.addTest( mafNodeIteratorTest::suite());
+	runner.addTest( mafNodeIteratorTest::suite());
   runner.addTest( mafNodeGenericTest::suite());
   runner.addTest( mafNodeFactoryTest::suite());
   runner.addTest( mafMatrixPipeTest::suite());

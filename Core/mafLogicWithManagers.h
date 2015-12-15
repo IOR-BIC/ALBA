@@ -252,7 +252,13 @@ protected:
 	/** Enable/disable a Toolbar or Menu Item */
 	void EnableItem(int item, bool enable);
 
-  // EVENT HANDLERS
+	/** Stores application layout */
+	void StoreLayout();
+
+	/** Restores application layout */
+	virtual void RestoreLayout();
+
+	// EVENT HANDLERS
 
   /** FILE NEW evt. handler */
 	virtual void OnFileNew();
@@ -327,8 +333,6 @@ protected:
 	virtual void ViewCreated(mafView *v);
 	/** Select a view and update the display list for the tree. */
 	virtual void ViewSelect();
-
-  virtual void RestoreLayout();
 
   /** Called when user change the measure unit from menù Options.*/
   void UpdateMeasureUnit();
