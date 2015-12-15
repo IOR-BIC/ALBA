@@ -86,6 +86,8 @@ public:
     mafNode* GetClipboard();
     /** set the clipboard */
     void SetClipboard(mafNode *node);
+		/** set the parent of the selection */
+		void SetSelectionParent(mafNode *parent);
 protected:
   // static   mafAutoPointer<mafNode> m_Clipboard;
   mafAutoPointer<mafNode> m_Backup;
@@ -106,7 +108,8 @@ public:
     bool Accept(mafNode* vme);
     /** execute the operation.  */
     void OpDo();
-    /** undo the operation. */
+				
+		/** undo the operation. */
     void OpUndo();
     /** return a instance of current object. */
     mafOp* Copy(); 

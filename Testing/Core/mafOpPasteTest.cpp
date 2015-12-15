@@ -73,9 +73,12 @@ void mafOpPasteTest::TestOpDo()
 {
   mafVMEGroup *groupParent;
   mafNEW(groupParent);
-  mafVMEGroup *groupChild;
-  mafNEW(groupChild);
-  m_OpPaste->SetInput(groupParent);
+	mafVMEGroup *groupChild;
+	mafNEW(groupChild);
+	mafVMEGroup *groupOldParent;
+	mafNEW(groupOldParent);
+	m_OpPaste->SetSelectionParent(groupOldParent);
+	m_OpPaste->SetInput(groupParent);
   m_OpPaste->SetClipboard(groupChild);
 
   m_OpPaste->OpDo();

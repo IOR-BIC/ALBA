@@ -37,8 +37,8 @@
 //initialize the Clipboard
 // mafAutoPointer<mafNode>  mafOpEdit::m_Clipboard(NULL);
 
-static mafAutoPointer<mafNode> m_Clipboard = NULL;
-static	mafAutoPointer<mafNode> m_SelectionParent=NULL;
+static mafAutoPointer<mafNode> glo_Clipboard = NULL;
+static	mafAutoPointer<mafNode> glo_SelectionParent=NULL;
 
 //////////////////
 // mafOpSelect ://
@@ -148,14 +148,21 @@ void mafOpEdit::ClipboardRestore()
 mafNode* mafOpEdit::GetClipboard()
 //----------------------------------------------------------------------------
 {
-  return m_Clipboard;
+  return glo_Clipboard;
 }
 //----------------------------------------------------------------------------
 void mafOpEdit::SetClipboard(mafNode *node)
 //----------------------------------------------------------------------------
 {
-  m_Clipboard = node;
+  glo_Clipboard = node;
 }
+
+//----------------------------------------------------------------------------
+void mafOpEdit::SetSelectionParent(mafNode *parent)
+{
+	glo_SelectionParent = parent;
+}
+
 ///////////////
 // mafOpCut ://
 ///////////////
@@ -194,7 +201,8 @@ Select the vme parent
 */
 {
   ClipboardBackup();
-  m_SelectionParent = m_Selection->GetParent();
+	SetSelectionParent(m_Selection->GetParent());
+
   SetClipboard(m_Selection);
 
   //////////////////////////////////////////////////////////////////////////
@@ -212,10 +220,10 @@ Select the vme parent
   //////////////////////////////////////////////////////////////////////////
 
   mafEventMacro(mafEvent(this,VME_REMOVE,m_Selection));
-  mafEventMacro(mafEvent(this,VME_SELECTED,m_SelectionParent));
-  if (mafVME::SafeDownCast(m_SelectionParent.GetPointer()))
+  mafEventMacro(mafEvent(this,VME_SELECTED,glo_SelectionParent));
+  if (mafVME::SafeDownCast(glo_SelectionParent.GetPointer()))
   {
-    ((mafVME *)m_SelectionParent.GetPointer())->GetOutput()->Update();
+    ((mafVME *)glo_SelectionParent.GetPointer())->GetOutput()->Update();
   }
 }
 //----------------------------------------------------------------------------
@@ -268,23 +276,23 @@ Restore the Selection
   m_Selection = GetClipboard();
 
 #ifdef MAF_USE_VTK
-  if (m_SelectionParent->IsMAFType(mafVMELandmarkCloud) && !((mafVMELandmarkCloud *)m_SelectionParent.GetPointer())->IsOpen())
+  if (glo_SelectionParent->IsMAFType(mafVMELandmarkCloud) && !((mafVMELandmarkCloud *)glo_SelectionParent.GetPointer())->IsOpen())
   {
-    ((mafVMELandmarkCloud *)m_SelectionParent.GetPointer())->Open();
-    m_Selection->ReparentTo(m_SelectionParent);
-    ((mafVMELandmarkCloud *)m_SelectionParent.GetPointer())->Close();
+    ((mafVMELandmarkCloud *)glo_SelectionParent.GetPointer())->Open();
+    m_Selection->ReparentTo(glo_SelectionParent);
+    ((mafVMELandmarkCloud *)glo_SelectionParent.GetPointer())->Close();
   }
   else
   {
-    m_Selection->ReparentTo(m_SelectionParent);
+    m_Selection->ReparentTo(glo_SelectionParent);
   }
 #else
-    m_Selection->ReparentTo(m_SelectionParent);
+    m_Selection->ReparentTo(glo_SelectionParent);
 #endif
 
-  if (mafVME::SafeDownCast(m_SelectionParent.GetPointer()))
+  if (mafVME::SafeDownCast(glo_SelectionParent.GetPointer()))
   {
-    ((mafVME *)m_SelectionParent.GetPointer())->GetOutput()->Update();
+    ((mafVME *)glo_SelectionParent.GetPointer())->GetOutput()->Update();
   }
   mafEventMacro(mafEvent(this,VME_SELECTED,m_Selection));
   ClipboardRestore();
@@ -330,7 +338,7 @@ copy the selected VME and its subtree into the clipboard
 */
 {
   ClipboardBackup();
-	m_SelectionParent = m_Selection->GetParent();
+	SetSelectionParent(m_Selection->GetParent());
   SetClipboard(m_Selection->CopyTree());
   mafString copy_name;
   copy_name = "copy of ";
@@ -395,7 +403,7 @@ Them a VME_ADD is sent, selection is not changed
 */
 {
   m_PastedVme = GetClipboard();
-	mafOpReparentTo::ReparentTo((mafVME *)(mafNode *)m_PastedVme,(mafVME *)(mafNode *)m_Selection,(mafVME *)(mafNode *)m_SelectionParent);
+	mafOpReparentTo::ReparentTo((mafVME *)(mafNode *)m_PastedVme,(mafVME *)(mafNode *)m_Selection,(mafVME *)(mafNode *)glo_SelectionParent);
   SetClipboard(m_PastedVme->CopyTree());
 }
 //----------------------------------------------------------------------------
