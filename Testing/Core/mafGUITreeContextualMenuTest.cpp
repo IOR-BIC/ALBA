@@ -65,9 +65,7 @@ void mafGUITreeContextualMenuTest::TestCreateContextualMenu()
   mafGUITreeContextualMenu *menu1 = new mafGUITreeContextualMenu();
   menu1->CreateContextualMenu(NULL, view, vme, true);
 
-  result = menu1->FindItem("Save MSF Layout") != wxNOT_FOUND;
-  TEST_RESULT;
-
+ 
   // Exists one active view.
 //  result = menu1->FindItem("Hide/Show") != wxNOT_FOUND;
 //  TEST_RESULT;
@@ -77,15 +75,10 @@ void mafGUITreeContextualMenuTest::TestCreateContextualMenu()
   mafGUITreeContextualMenu *menu2 = new mafGUITreeContextualMenu();
   menu2->CreateContextualMenu(NULL, view, vme, false);
 
-  result = menu2->FindItem("Save MSF Layout") == wxNOT_FOUND;
-  TEST_RESULT;
 
   // Contextual menu for VME with no one view created.
   mafGUITreeContextualMenu *menu3 = new mafGUITreeContextualMenu();
   menu3->CreateContextualMenu(NULL, NULL, vme, true);
-
-  result = menu3->FindItem("Save MSF Layout") != wxNOT_FOUND;
-  TEST_RESULT;
 
   // No one view created.
   result = menu3->FindItem("Hide/Show") == wxNOT_FOUND;

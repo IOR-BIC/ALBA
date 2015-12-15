@@ -33,7 +33,6 @@ SET(PROJECT_SRCS
 	mafOpEditTest.h mafOpEditTest.cpp
 	mafOpContextStackTest.h mafOpContextStackTest.cpp
 	mafNodeIteratorTest.h mafNodeIteratorTest.cpp
-	mafNodeLayoutTest.h mafNodeLayoutTest.cpp
 	mafPipeTest.h mafPipeTest.cpp
 	mafMatrixPipeTest.h mafMatrixPipeTest.cpp
 	mafPipeBoxTest.h mafPipeBoxTest.cpp

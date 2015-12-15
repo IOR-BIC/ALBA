@@ -42,7 +42,6 @@
 #include "mafSceneNode.h"
 #include "mafSceneGraph.h"
 #include "mafGUICheckTree.h"
-#include "mafGUIApplicationLayoutSettings.h"
 
 //#include "mafGUIBitmaps.h"
 #include "mafGUILab.h"
@@ -59,7 +58,6 @@
 enum TREE_CONTEXTUAL_MENU_ID
 {
   CONTEXTUAL_TREE_MENU_START = MINID,
-    RMENU_ADD_TREE_LAYOUT,
 		RMENU_SHOW_VME,				
 		RMENU_SHOW_SUBTREE,
 		RMENU_SHOW_SAMETYPE,
@@ -111,9 +109,6 @@ void mafGUITreeContextualMenu::CreateContextualMenu(mafGUICheckTree *tree, mafVi
   if(vme_menu)
 	{
     bool enable;
-
-    this->Append(RMENU_ADD_TREE_LAYOUT,  "Save MSF Layout");
-    this->AppendSeparator();
 
     if(m_ViewActive != NULL && (mafViewVTK::SafeDownCast(m_ViewActive) || mafViewCompound::SafeDownCast(m_ViewActive)))
     {
@@ -237,9 +232,6 @@ void mafGUITreeContextualMenu::OnContextualMenu(wxCommandEvent &event)
 			mafEventMacro(mafEvent(this, VME_SHOW, m_VmeActive, show));
     }
 		break;
-    case RMENU_ADD_TREE_LAYOUT:
-      mafEventMacro(mafEvent(this, mafGUIApplicationLayoutSettings::SAVE_TREE_LAYOUT_ID));
-    break;
 		case RMENU_SHOW_SUBTREE:
 			m_SceneGraph->VmeShowSubTree(m_VmeActive, true);
 		break;

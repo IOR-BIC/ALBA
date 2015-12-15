@@ -31,21 +31,15 @@ public:
   CPPUNIT_TEST_SUITE( mmaApplicationLayoutTest );
   CPPUNIT_TEST(TestFixture); // just to test that the fixture has no leaks
   CPPUNIT_TEST(TestDynamicAllocation);
-  CPPUNIT_TEST(TestAddView);
-  CPPUNIT_TEST(TestRemoveView);
   CPPUNIT_TEST(TestEquals);
   CPPUNIT_TEST(TestDeepCopy);
-  CPPUNIT_TEST(TestClearLayout);
   CPPUNIT_TEST_SUITE_END();
 
 private:
   void TestFixture();
   void TestDynamicAllocation();
-  void TestAddView();
-  void TestRemoveView();
   void TestEquals();
   void TestDeepCopy();
-  void TestClearLayout();
 	
   wxFrame *m_Toplevel;
   bool result;

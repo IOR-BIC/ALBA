@@ -69,7 +69,6 @@
 #include "mafGUIMeasureUnitSettings.h"
 #include "mafGUIApplicationSettings.h"
 #include "mafGUISettingsStorage.h"
-#include "mafGUIApplicationLayoutSettings.h"
 #include "mafGUISettingsTimeBar.h"
 #include "mafRemoteLogic.h"
 #include "mafGUISettingsDialog.h"
@@ -90,9 +89,11 @@
 #include "mafVTKLog.h"
 #include "vtkTimerLog.h"
 #include "mafWXLog.h"
+#include "mafVMERoot.h"
 
 #define IDM_WINDOWNEXT 4004
 #define IDM_WINDOWPREV 4006
+#define max(a,b)            (((a) > (b)) ? (a) : (b))
 
 //----------------------------------------------------------------------------
 mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
@@ -259,15 +260,7 @@ void mafLogicWithManagers::Configure()
   // Fill the SettingsDialog
   m_SettingsDialog->AddPage( m_ApplicationSettings->GetGui(), m_ApplicationSettings->GetLabel());
   m_SettingsDialog->AddPage( m_StorageSettings->GetGui(), m_StorageSettings->GetLabel());
-
-  if (m_ViewManager)
-  {
-    m_ApplicationLayoutSettings = new mafGUIApplicationLayoutSettings(this);
-    m_ApplicationLayoutSettings->SetViewManager(m_ViewManager);
-    m_ApplicationLayoutSettings->SetApplicationFrame(m_Win);
-    m_SettingsDialog->AddPage( m_ApplicationLayoutSettings->GetGui(), m_ApplicationLayoutSettings->GetLabel());
-  }
-
+	
   m_SettingsDialog->AddPage( m_Win->GetDockSettingGui(), _("User Interface Preferences"));
 
   m_HelpSettings = new mafGUISettingsHelp(this);
@@ -346,6 +339,9 @@ void mafLogicWithManagers::Show()
 	CreateToolBarsAndPanels();
 
 	m_AppTitle = m_Win->GetTitle().c_str();
+
+	RestoreLayout();
+
 	m_Win->Show(TRUE);
 
   // must be after the mafLogicWithGUI::Show(); because in that method is set the m_AppTitle var
@@ -469,7 +465,6 @@ void mafLogicWithManagers::Init(int argc, char **argv)
     }
   }
 
-  m_ApplicationLayoutSettings->LoadLayout(true);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::CreateMenu()
@@ -495,8 +490,6 @@ void mafLogicWithManagers::CreateMenu()
 #include "pic/menu/WINDOW_PREV.xpm"
 #include "pic/menu/WINDOW_NEXT.xpm"
 #include "pic/menu/WINDOW_VERTICALLY.xpm"
-
-		
 
   m_MenuBar  = new wxMenuBar;
   wxMenu *file_menu = new wxMenu;
@@ -1659,18 +1652,6 @@ void mafLogicWithManagers::OnQuit()
     return;
   }
 
-	if(m_ApplicationLayoutSettings->GetModifiedLayouts())
-	{
-		int answer = wxMessageBox
-			(
-			_("would you like to save your layout list ?"),
-			_("Confirm"), 
-			wxYES_NO|wxCANCEL|wxICON_QUESTION , m_Win
-			);
-		if(answer == wxYES) 
-			m_ApplicationLayoutSettings->SaveApplicationLayout();
-	}
-
   if(m_VMEManager)
   {
     m_Quitting = false;
@@ -1694,6 +1675,8 @@ void mafLogicWithManagers::OnQuit()
     if(!m_Quitting) 
       return;
   }
+
+	StoreLayout();
 
   mafGUIViewFrame::OnQuit();
   mafGUIMDIChild::OnQuit(); 
@@ -1832,26 +1815,7 @@ void mafLogicWithManagers::VmeAdded(mafNode *vme)
   if(m_PlugTimebar)
     UpdateTimeBounds();
 }
-//----------------------------------------------------------------------------
-void mafLogicWithManagers::RestoreLayout()
-//----------------------------------------------------------------------------
-{
-  // Retrieve the saved layout.
-  mafNode *vme = m_VMEManager->GetRoot();
-  mmaApplicationLayout *app_layout = mmaApplicationLayout::SafeDownCast(vme->GetAttribute("ApplicationLayout"));
-  if (app_layout)
-  {
-    int answer = wxMessageBox(_("Do you want to load the layout?"), _("Warning"), wxYES_NO);
-    if (answer == wxNO)
-    {
-      return;
-    }
-    
-    m_ApplicationLayoutSettings->SetVisibilityVME(true);
-    m_ApplicationLayoutSettings->ApplyTreeLayout();
-    m_ApplicationLayoutSettings->SetVisibilityVME(false);
-  }
-}
+
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeRemove(mafNode *vme)
 //----------------------------------------------------------------------------
@@ -2092,7 +2056,7 @@ void mafLogicWithManagers::TreeContextualMenu(mafEvent &e)
 //----------------------------------------------------------------------------
 {
   mafGUITreeContextualMenu *contextMenu = new mafGUITreeContextualMenu();
-  contextMenu->SetListener(m_ApplicationLayoutSettings);
+  contextMenu->SetListener(this);
   mafView *v = m_ViewManager->GetSelectedView();
   mafVME  *vme = (mafVME *)e.GetVme();
   bool vme_menu = e.GetBool();
@@ -2521,4 +2485,93 @@ void mafLogicWithManagers::EnableItem(int item, bool enable)
 				m_MenuBar->Enable(item,enable );
 	if(m_ToolBar)
 		m_ToolBar->EnableTool(item,enable );
+}
+
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::StoreLayout()
+{
+	int pos[2], size[2];
+
+	mafXMLStorage *xmlStorage = mafXMLStorage::New();
+	xmlStorage->SetFileType("MLY");
+	xmlStorage->SetVersion("2.0");
+	mafVMERoot *root;
+	mafNEW(root);
+	root->Initialize();
+	xmlStorage->SetDocument(root);
+
+	wxString layout_file  = mafGetAppDataDirectory().c_str();
+	layout_file << "\\layout.mly";
+
+	wxFrame *frame = (wxFrame *)mafGetFrame();
+	wxRect rect;
+	rect = frame->GetRect();
+	pos[0] = rect.GetPosition().x;
+	pos[1] = rect.GetPosition().y;
+	size[0] = rect.GetSize().GetWidth();
+	size[1] = rect.GetSize().GetHeight();
+
+	mmaApplicationLayout  *layout;
+	mafNEW(layout);
+
+	layout->SetApplicationInfo(m_Win->IsMaximized(), pos, size);
+	bool toolbar_vis = m_Win->GetDockManager().GetPane("toolbar").IsShown();
+	layout->SetInterfaceElementVisibility("toolbar", toolbar_vis);
+	bool sidebar_vis = m_Win->GetDockManager().GetPane("sidebar").IsShown();
+	layout->SetInterfaceElementVisibility("sidebar", sidebar_vis);
+	bool logbar_vis = m_Win->GetDockManager().GetPane("logbar").IsShown();
+	layout->SetInterfaceElementVisibility("logbar", logbar_vis);
+
+	root->SetAttribute("ApplicationLayout", layout);
+
+	xmlStorage->SetURL(layout_file);
+	xmlStorage->Store();
+
+	cppDEL(xmlStorage);
+	mafDEL(root);
+	mafDEL(layout);
+} 
+
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::RestoreLayout()
+{
+
+	mafXMLStorage *xmlStorage = mafXMLStorage::New();
+	xmlStorage->SetFileType("MLY");
+	xmlStorage->SetVersion("2.0");
+
+	mafVMERoot *root;
+	mafNEW(root);
+	root->Initialize();
+	xmlStorage->SetDocument(root);
+
+	wxString layout_file  = mafGetAppDataDirectory().c_str();
+	layout_file << "\\layout.mly";
+	xmlStorage->SetURL(layout_file);
+	if(wxFileExists(layout_file) && xmlStorage->Restore()==MAF_OK)
+	{
+		mafNode *root = ((mafNode *)xmlStorage->GetDocument());
+
+		mmaApplicationLayout * app_layout = (mmaApplicationLayout *)root->GetAttribute("ApplicationLayout");
+
+		int maximized, pos[2], size[2];
+		app_layout->GetApplicationInfo(maximized, pos, size);
+
+		pos[0]=max(0,pos[0]);
+		pos[1]=max(0,pos[1]);
+
+		wxRect rect(pos[0],pos[1],size[0],size[1]);
+		m_Win->SetSize(rect);
+		
+		if (maximized != 0)
+			m_Win->Maximize();
+		
+		m_Win->ShowDockPane("toolbar", app_layout->GetToolBarVisibility());
+		m_Win->ShowDockPane("logbar", app_layout->GetLogBarVisibility());
+		m_Win->ShowDockPane("sidebar",  app_layout->GetSideBarVisibility());
+	}
+
+
+	cppDEL(xmlStorage);
+	mafDEL(root);
 }
