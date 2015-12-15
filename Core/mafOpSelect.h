@@ -27,7 +27,6 @@
 // forward references :
 //----------------------------------------------------------------------------
 class mafNode;
-class vtkMatrix4x4;
 
 template class MAF_EXPORT mafAutoPointer<mafNode>;
 
@@ -87,6 +86,8 @@ public:
     mafNode* GetClipboard();
     /** set the clipboard */
     void SetClipboard(mafNode *node);
+		/** set the parent of the selection */
+		void SetSelectionParent(mafNode *parent);
 protected:
   // static   mafAutoPointer<mafNode> m_Clipboard;
   mafAutoPointer<mafNode> m_Backup;
@@ -107,7 +108,8 @@ public:
     bool Accept(mafNode* vme);
     /** execute the operation.  */
     void OpDo();
-    /** undo the operation. */
+				
+		/** undo the operation. */
     void OpUndo();
     /** return a instance of current object. */
     mafOp* Copy(); 
@@ -115,7 +117,7 @@ public:
     void LoadVTKData(mafNode *vme);
 
 protected:
-    mafAutoPointer<mafNode> m_SelectionParent;
+   
     /** Load all children in the tree (Added by Di Cosmo on 24.05.2012) */
     void LoadChild(mafNode *vme);
 };
@@ -159,27 +161,5 @@ public:
 protected:
     mafAutoPointer<mafNode> m_PastedVme;
 };
-/*
-//----------------------------------------------------------------------------
-// mafOpTransform :
-//----------------------------------------------------------------------------
 
-class mafOpTransform: public mafOp
-{
-public:
-    mafOpTransform(wxString label="Transform"); 
-   ~mafOpTransform(); 
-    bool Accept(mafNode* vme);
-    void SetInput(mafNode* vme);       
-    void SetOldMatrix(vtkMatrix4x4* matrix);
-    void SetNewMatrix(vtkMatrix4x4* matrix);
-    void OpDo();
-    void OpUndo();
-    mafOp* Copy();
-protected:
-  	mafNode*       m_vme; 
-  	vtkMatrix4x4* m_new_matrix; 
-  	vtkMatrix4x4* m_old_matrix; 
-};
-*/
 #endif
