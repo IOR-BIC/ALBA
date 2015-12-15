@@ -31,14 +31,14 @@
 #ifdef MAF_USE_VTK
   #include "mafVMELandmarkCloud.h"
 #endif
-//#include "vtkMatrix4x4.h"
-//#include "vtkMath.h"
 #include "vtkDataSet.h"
+#include "mafOpReparentTo.h"
 
 //initialize the Clipboard
 // mafAutoPointer<mafNode>  mafOpEdit::m_Clipboard(NULL);
 
 static mafAutoPointer<mafNode> m_Clipboard = NULL;
+static	mafAutoPointer<mafNode> m_SelectionParent=NULL;
 
 //////////////////
 // mafOpSelect ://
@@ -164,7 +164,7 @@ mafOpCut::mafOpCut(wxString label)
 //----------------------------------------------------------------------------
 {
   m_Label=label;
-  m_SelectionParent = NULL; 
+  
 }
 //----------------------------------------------------------------------------
 mafOpCut::~mafOpCut() 
@@ -330,6 +330,7 @@ copy the selected VME and its subtree into the clipboard
 */
 {
   ClipboardBackup();
+	m_SelectionParent = m_Selection->GetParent();
   SetClipboard(m_Selection->CopyTree());
   mafString copy_name;
   copy_name = "copy of ";
@@ -393,8 +394,8 @@ but place in the scene the original and keep the copy in the clipboard.
 Them a VME_ADD is sent, selection is not changed
 */
 {
-  m_PastedVme = GetClipboard(); 
-  m_PastedVme->ReparentTo(m_Selection);
+  m_PastedVme = GetClipboard();
+	mafOpReparentTo::ReparentTo((mafVME *)(mafNode *)m_PastedVme,(mafVME *)(mafNode *)m_Selection,(mafVME *)(mafNode *)m_SelectionParent);
   SetClipboard(m_PastedVme->CopyTree());
 }
 //----------------------------------------------------------------------------
@@ -408,67 +409,3 @@ The copy in the clipboard will be automatically deleted
   SetClipboard(m_PastedVme);
   mafEventMacro(mafEvent(this,VME_REMOVE,m_PastedVme));
 }
-
-/*
-/////////////////////
-// mafOpTransform ://
-/////////////////////
-//----------------------------------------------------------------------------
-mafOpTransform::mafOpTransform(wxString label) 
-{
-  assert(false); //SIL. 9-4-2005: 
-  m_canundo = true; 
-  m_optype = OPTYPE_EDIT;       
-  m_label=label;
-  m_vme = NULL;
-  m_old_matrix = vtkMatrix4x4::New();
-  m_new_matrix = vtkMatrix4x4::New();
-}
-//----------------------------------------------------------------------------
-mafOpTransform::~mafOpTransform() 
-{
-  m_old_matrix->Delete();
-  m_new_matrix->Delete();
-}
-//----------------------------------------------------------------------------
-mafOp* mafOpTransform::Copy() 
-{                    
-  mafOpTransform *cp  = new mafOpTransform();
-  cp->m_Listener = m_Listener;
-  cp->m_new_matrix->DeepCopy(m_new_matrix);
-  cp->m_old_matrix->DeepCopy(m_old_matrix);
-  return cp;
-}
-//----------------------------------------------------------------------------
-bool mafOpTransform::Accept(mafNode* vme)       
-{
-  return vme!=NULL && !vme->IsA("mafNodeRoot");
-}
-//----------------------------------------------------------------------------
-void mafOpTransform::SetInput(mafNode* vme)       
-{
-  m_vme = vme;
-}
-//----------------------------------------------------------------------------
-void mafOpTransform::SetOldMatrix(vtkMatrix4x4* matrix)
-{
-  m_old_matrix->DeepCopy(matrix);
-}
-//----------------------------------------------------------------------------
-void mafOpTransform::SetNewMatrix(vtkMatrix4x4* matrix)
-{
-  m_new_matrix->DeepCopy(matrix);
-}
-//----------------------------------------------------------------------------
-void mafOpTransform::OpDo()                    
-{
-  assert(false); //temporary commented out - m_vme->SetPose(m_new_matrix,-1);
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-}
-//----------------------------------------------------------------------------
-void mafOpTransform::OpUndo()                  
-{
-  assert(false); //temporary commented out -m_vme->SetPose(m_old_matrix,-1);
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-}
-*/

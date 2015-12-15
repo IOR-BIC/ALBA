@@ -105,65 +105,11 @@ void mafOpReparentTo::SetTargetVme(mafVME *target)
 void mafOpReparentTo::OpDo()
 //----------------------------------------------------------------------------
 {
-  int num, t;
-  mmuTimeVector input_time;
-	mmuTimeVector target_time;
-	mmuTimeVector time;
-	mafTimeStamp cTime, startTime;
-	
-  m_OldParent = mafVME::SafeDownCast(m_Input->GetParent());
+	m_OldParent = mafVME::SafeDownCast(m_Input->GetParent());
 
-  ((mafVME *)m_Input)->GetAbsTimeStamps(input_time);
-	m_TargetVme->GetAbsTimeStamps(target_time);
-  mmuTimeSet::Merge(input_time,target_time,time);
-	num = time.size();
+	int reparentOK=ReparentTo((mafVME *)m_Input, m_TargetVme, m_OldParent);
 
-	startTime = m_TargetVme->GetTimeStamp();
-
-  std::vector< mafAutoPointer<mafMatrix> > new_input_pose;
-  new_input_pose.resize(num);
-
-  for (t = 0; t < num; t++)
-  {
-    new_input_pose[t] = mafMatrix::New();
-  }
-  
-  //change reference system
-  mafSmartPointer<mafTransformFrame> transform;
-  for (t = 0; t < num; t++)
-	{
-		cTime = time[t];
-		
-		((mafVME *)m_Input)->SetTimeStamp(cTime);
-		m_TargetVme->SetTimeStamp(cTime);
-    m_OldParent->SetTimeStamp(cTime);
-		
-    transform->SetTimeStamp(cTime);
-    mafMatrixPipe *mp = ((mafVME *)m_Input)->GetMatrixPipe();
-    if (mp == NULL)
-    {
-      transform->SetInput(((mafVME *)m_Input)->GetOutput()->GetMatrix());
-    }
-    else
-    {
-      transform->SetInput(mp);
-    }
-    transform->SetInputFrame(m_OldParent->GetAbsMatrixPipe());
-    transform->SetTargetFrame(m_TargetVme->GetAbsMatrixPipe());
-		transform->Update();
-
-    new_input_pose[t]->DeepCopy(transform->GetMatrixPointer());
-	}
-	
-  ((mafVME *)m_Input)->SetTimeStamp(startTime);
-  m_TargetVme->SetTimeStamp(startTime);
-  m_OldParent->SetTimeStamp(startTime);
-
-  for (t = 0; t < num; t++)
-  {
-    ((mafVME *)m_Input)->SetMatrix(*new_input_pose[t]);
-  }
-  if (m_Input->ReparentTo(m_TargetVme) == MAF_OK)
+  if (reparentOK == MAF_OK)
   {
     mafEventMacro(mafEvent(this,CAMERA_UPDATE));
   }
@@ -172,6 +118,70 @@ void mafOpReparentTo::OpDo()
     mafLogMessage(_("Something went wrong while re-parenting (bad pointer or memory errors)"));
   }
 }
+
+//----------------------------------------------------------------------------
+int mafOpReparentTo::ReparentTo(mafVME * input, mafVME * targetVme, mafVME * oldParent)
+{
+	int num, t;
+	mmuTimeVector input_time;
+	mmuTimeVector target_time;
+	mmuTimeVector time;
+	mafTimeStamp cTime, startTime;
+
+	input->GetAbsTimeStamps(input_time);
+	targetVme->GetAbsTimeStamps(target_time);
+	mmuTimeSet::Merge(input_time,target_time,time);
+	num = time.size();
+
+	startTime = targetVme->GetTimeStamp();
+
+	std::vector< mafAutoPointer<mafMatrix> > new_input_pose;
+	new_input_pose.resize(num);
+
+	for (t = 0; t < num; t++)
+	{
+		new_input_pose[t] = mafMatrix::New();
+	}
+
+	//change reference system
+	mafSmartPointer<mafTransformFrame> transform;
+	for (t = 0; t < num; t++)
+	{
+		cTime = time[t];
+
+		((mafVME *)input)->SetTimeStamp(cTime);
+		targetVme->SetTimeStamp(cTime);
+		oldParent->SetTimeStamp(cTime);
+
+		transform->SetTimeStamp(cTime);
+		mafMatrixPipe *mp = ((mafVME *)input)->GetMatrixPipe();
+		if (mp == NULL)
+		{
+			transform->SetInput(((mafVME *)input)->GetOutput()->GetMatrix());
+		}
+		else
+		{
+			transform->SetInput(mp);
+		}
+		transform->SetInputFrame(oldParent->GetAbsMatrixPipe());
+		transform->SetTargetFrame(targetVme->GetAbsMatrixPipe());
+		transform->Update();
+
+		new_input_pose[t]->DeepCopy(transform->GetMatrixPointer());
+	}
+
+	((mafVME *)input)->SetTimeStamp(startTime);
+	targetVme->SetTimeStamp(startTime);
+	oldParent->SetTimeStamp(startTime);
+
+	for (t = 0; t < num; t++)
+	{
+		((mafVME *)input)->SetMatrix(*new_input_pose[t]);
+	}
+	
+	return input->ReparentTo(targetVme);
+}
+
 //----------------------------------------------------------------------------
 void mafOpReparentTo::OpUndo()
 //----------------------------------------------------------------------------
