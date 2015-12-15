@@ -42,8 +42,6 @@ SET(PROJECT_SRCS
   mafPics.h
   mafWXLog.cpp
   mafWXLog.h
-  mafGUIApplicationLayoutSettings.cpp
-  mafGUIApplicationLayoutSettings.h
   mafGUIApplicationSettings.cpp
   mafGUIApplicationSettings.h
   mafGUIButton.cpp

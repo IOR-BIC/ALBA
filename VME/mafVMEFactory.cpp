@@ -25,7 +25,6 @@
 #include "mafVMEFactory.h"
 
 #include "mafVersion.h"
-#include "mafNodeLayout.h"
 #include "mafVMEExternalData.h"
 #include "mafVMEGeneric.h"
 #include "mafVMEGizmo.h"
@@ -125,9 +124,6 @@ mafVMEFactory::mafVMEFactory()
   //
   // Plug here Nodes in this factory
   //
-
-  mafPlugNodeMacro(mafNodeLayout,"node for layout list");
-
   mafPlugObjectMacro(mafTagArray,"a basic kind of attribute used to store key-value pairs");
   mafPlugObjectMacro(mafVMEItemVTK,"a VME item storing VTK datasets");
 #ifdef MAF_USE_ITK
