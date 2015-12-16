@@ -113,7 +113,7 @@ void mafOpExporterWrappedMeter::OnEvent(mafEventBase *maf_event)
       case wxOK:
 				{
 				  mafString initialFileName;
-          initialFileName = mafGetDocumentsDirectory().c_str();
+          initialFileName = mafGetLastUserFolder().c_str();
           initialFileName.Append("\\ActionLine.txt");
 
 				  mafString wildc = "configuration file (*.txt)|*.txt";

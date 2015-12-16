@@ -85,7 +85,7 @@ mafOp(label)
   m_ImportedImage = NULL;
   m_ImportedImageAsVolume = NULL;
 
-  m_FileDirectory = mafGetDocumentsDirectory().c_str();
+  m_FileDirectory = mafGetLastUserFolder().c_str();
 }
 //----------------------------------------------------------------------------
 mafOpImporterImage::~mafOpImporterImage()

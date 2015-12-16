@@ -99,7 +99,7 @@ mafInteractionManager::mafInteractionManager()
   m_CurrentRenderer   = NULL;
   m_ActionsList       = NULL;
   m_Bindings          = NULL;
-  m_SettingFileName = mafGetDocumentsDirectory().c_str();
+  m_SettingFileName = mafGetLastUserFolder().c_str();
   
   mafNEW(m_DeviceManager);
   m_DeviceManager->SetListener(this);

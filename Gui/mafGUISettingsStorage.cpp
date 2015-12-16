@@ -42,7 +42,7 @@ mafGUISettings(Listener, label)
   m_Port = 21;
   m_RemoteStorageType = 0;
   m_CacheFolder = mafGetAppDataDirectory().c_str();
-  m_SaveFolder = mafGetDocumentsDirectory().c_str();
+  m_SaveFolder = mafGetLastUserFolder().c_str();
 
  /* m_SRBRemoteHostName = "";
   m_SRBDomain = "";

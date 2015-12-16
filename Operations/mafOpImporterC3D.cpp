@@ -40,9 +40,8 @@ mafOp(label)
 	m_File		= "";
 	m_Vme			= NULL;
 	this->m_DictionaryAvailable = 0;
-
-	m_FileDir = mafGetDocumentsDirectory().c_str();
-	m_DictDir = mafGetDocumentsDirectory().c_str();
+  
+	m_DictDir = m_FileDir = mafGetLastUserFolder().c_str();
 }
 //----------------------------------------------------------------------------
 mafOpImporterC3D::~mafOpImporterC3D( ) 

@@ -405,15 +405,6 @@ void mafLogicWithManagers::SetApplicationStamp(mafString &app_stamp)
   }
 }
 //----------------------------------------------------------------------------
-void mafLogicWithManagers::SetApplicationStamp(std::vector<mafString> app_stamp)
-//----------------------------------------------------------------------------
-{
-  if (m_VMEManager)
-  {
-    m_VMEManager->SetApplicationStamp(app_stamp);
-  }
-}
-//----------------------------------------------------------------------------
 mafUser *mafLogicWithManagers::GetUser()
 //----------------------------------------------------------------------------
 {
@@ -1229,7 +1220,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 					mafString msfFilename = m_VMEManager->GetFileName();
 					if (msfFilename.IsEmpty())
 					{
-						mafString dirName = mafGetDocumentsDirectory().c_str();
+						mafString dirName = mafGetLastUserFolder().c_str();
 
 						m_VMEManager->SetDirName(dirName);
 						this->OnFileSaveAs();
@@ -1570,7 +1561,8 @@ void mafLogicWithManagers::OnFileOpen(const char *file_to_open)
 			  }
 			  else
 			  {
-				  file = mafGetOpenFile("", wildc).c_str();
+          wxString lastFolder = mafGetLastUserFolder().c_str();
+				  file = mafGetOpenFile(lastFolder, wildc).c_str();
 			  }
 		  }
 
