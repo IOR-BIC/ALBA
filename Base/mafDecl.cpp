@@ -21,6 +21,9 @@
 #include "mmuIdFactory.h"
 #include <math.h>
 #include "wx\stdpaths.h"
+#include "wx\msw\registry.h"
+#include "mafLogicWithManagers.h"
+#include "wx\confbase.h"
 
 MAF_ID_IMP(REMOTE_COMMAND_CHANNEL)
 
@@ -40,33 +43,6 @@ void mafYield()
    }
 }
 
-/* to be removed (Marco)
-//----------------------------------------------------------------------------
-mafVmeBaseTypes mafGetBaseType(mafVME* vme)
-//----------------------------------------------------------------------------
-{
-  assert(vme);
-	     if(vme->GetTagArray()->FindTag("MAF_TOOL_VME") != -1)  return VME_TOOL;
-			 if(vme->IsA("mflVMEPointSet")==1)                      return VME_POINTSET;
-	else if(vme->IsA("mflVMEWidgetLine") ==1)                       return VME_WIDGET; //SIL. 18-11-2004: 
-	else if(vme->IsA("mflVMESurface") ==1)                      return VME_SURFACE;
-	else if(vme->IsA("mflVMEImage")   ==1)                      return VME_IMAGE;
-
-  else if(vme->IsA("mflVMEExFieldScalar")     ==1)            return VME_EX_FIELD_SCALAR;//BEZ. 20-7-2004: 
-	else if(vme->IsA("mflVMEExFieldVector")     ==1)            return VME_EX_FIELD_VECTOR;//BEZ. 20-7-2004: 
-  else if(vme->IsA("mflVMEExFieldProfile")     ==1)           return VME_EX_FIELD_PROFILE;//BEZ. 20-7-2004:
-	else if(vme->IsA("mflVMEExField")     ==1)                  return VME_EX_FIELD;       //BEZ. 20-7-2004: 
-
-  else if(vme->IsA("mflVMEGrayVolume")  ==1)                  return VME_GRAY_VOLUME;
-	else if(vme->IsA("mflVMEVolume")  ==1)                      return VME_VOLUME;
-	else if(vme->IsA("mflVMEGizmo")   ==1)                      return VME_GIZMO;
-  else if(vme->IsA("mflVMEExternalData") ==1)                 return VME_EXTERNAL_DATA;
-	else if(vme->IsA("mflVMEfem")     ==1)                      return VME_FEM;
-	else if(vme->IsA("mflVMEScalar")     ==1)                   return VME_SCALAR;
-	else return VME_GENERIC;
-}
-*/
-
 //----------------------------------------------------------------------------
 std::string  mafGetDirName(const char * initial, const char * title, wxWindow *parent)
 //----------------------------------------------------------------------------
@@ -76,7 +52,10 @@ std::string  mafGetDirName(const char * initial, const char * title, wxWindow *p
   dialog.SetReturnCode(wxID_OK);
   int result = dialog.ShowModal();
   mafYield(); // wait for the dialog to disappear
-  return  (result == wxID_OK) ? dialog.GetPath().c_str() : "";
+
+  mafString newPath = (result == wxID_OK) ? dialog.GetPath().c_str() : "";
+  mafSetLastUserFolder(newPath);
+  return newPath;
 }
 
 //----------------------------------------------------------------------------
@@ -91,12 +70,15 @@ std::string mafGetOpenFile(const char *initial, const char * wild, const char * 
   wxString wildcard=wild;
   wildcard+="|All Files (*.*)|*.*";
  
-	wxFileDialog dialog(parent, title, path, name, wildcard, wxOPEN|wxFILE_MUST_EXIST|wxHIDE_READONLY);
+	wxFileDialog dialog(parent, title, path, "", wildcard, wxOPEN|wxFILE_MUST_EXIST|wxHIDE_READONLY);
 
   dialog.SetReturnCode(wxID_OK);
 	int result = dialog.ShowModal();
   mafYield(); // wait for the dialog to disappear
-  return  (result == wxID_OK) ? dialog.GetPath().c_str() : "";
+
+  mafString newPath = (result == wxID_OK) ? dialog.GetPath().c_str() : "";
+  mafSetLastUserFolder(newPath);
+  return newPath;
 }
 
 //----------------------------------------------------------------------------
@@ -109,7 +91,7 @@ void mafGetOpenMultiFiles(const char * initial, const char * wild, std::vector<s
   wxString wildcard = wild;
   wildcard += "|All Files (*.*)|*.*";
  
-	wxFileDialog dialog(parent, title, path, name, wildcard, wxOPEN|wxFILE_MUST_EXIST|wxHIDE_READONLY|wxMULTIPLE);
+	wxFileDialog dialog(parent, title, path, "", wildcard, wxOPEN|wxFILE_MUST_EXIST|wxHIDE_READONLY|wxMULTIPLE);
 
   dialog.SetReturnCode(wxID_OK);
 	int result = dialog.ShowModal();
@@ -134,7 +116,10 @@ std::string mafGetSaveFile(const char * initial, const char * wild, const char *
   dialog.SetReturnCode(wxID_OK);
 	int result = dialog.ShowModal();
   mafYield(); // wait for the dialog to disappear
-  return  (result == wxID_OK) ? dialog.GetPath().c_str() : "";
+
+  mafString newPath = (result == wxID_OK) ? dialog.GetPath().c_str() : "";
+  mafSetLastUserFolder(newPath);
+  return newPath;
 }
 //----------------------------------------------------------------------------
 std::string mafGetApplicationDirectory()
@@ -165,8 +150,41 @@ std::string mafGetDocumentsDirectory()
 {
   //getting the Documents directory
   wxString home_dir =  wxGetHomeDir();
+  home_dir=+"\\Documents";
 
-  return home_dir+"\\Documents";
+  return home_dir;
+}
+//----------------------------------------------------------------------------
+std::string mafGetLastUserFolder()
+//----------------------------------------------------------------------------
+{  
+  wxString lastUserFolder;
+
+  wxString appName = wxApp::GetInstance()->GetAppName();
+  wxConfig *config = new wxConfig(appName);
+
+  // Return last User Folder if exists, else Documents folder
+  if(!config->Read("LastUserFolder", &lastUserFolder))
+    lastUserFolder = mafGetDocumentsDirectory().c_str();
+
+  delete config;
+  return lastUserFolder.c_str();
+}
+//----------------------------------------------------------------------------
+void mafSetLastUserFolder(mafString folder)
+//----------------------------------------------------------------------------
+{
+  if(folder!="")
+  {
+    wxString appName = wxApp::GetInstance()->GetAppName();
+    wxConfig *config = new wxConfig(appName);
+
+    wxString path, name, ext;
+    wxSplitPath(folder,&path,&name,&ext);
+
+    config->Write("LastUserFolder", path);
+    delete config;
+  }
 }
 //----------------------------------------------------------------------------
 bool IsRemote(mafString filename, mafString &protocol_used)

@@ -485,6 +485,12 @@ MAF_EXPORT std::string  mafGetAppDataDirectory();
 /** return the Documents directory */
 MAF_EXPORT std::string mafGetDocumentsDirectory();
 
+/** return the Last User directory */
+MAF_EXPORT std::string mafGetLastUserFolder();
+
+/** Set the Last User directory */
+MAF_EXPORT void mafSetLastUserFolder(mafString folder);
+
 /** translate an event-id into a readable string */
 MAF_EXPORT std::string  mafIdString(int id);
 

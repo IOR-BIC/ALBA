@@ -85,7 +85,7 @@ mafOpImporterRAWImages::mafOpImporterRAWImages(wxString label) : mafOp(label)
 {
   m_OpType					= OPTYPE_IMPORTER;
   m_Canundo					= true;
-  m_RawDirectory		= mafGetDocumentsDirectory().c_str();
+  m_RawDirectory		= mafGetLastUserFolder().c_str();
 #ifdef VME_VOLUME_LARGE
   m_OutputFileName = m_RawDirectory;
 #endif // VME_VOLUME_LARGE
@@ -535,7 +535,7 @@ void mafOpImporterRAWImages::OnEvent(mafEventBase *maf_event)
     case ID_COORD:
       {	
         m_Gui->Enable(ID_SPC_Z, true);
-        wxString rect_dir = mafGetDocumentsDirectory().c_str();
+        wxString rect_dir = mafGetLastUserFolder().c_str();
         wxString rect_wildc = _("Z_coordinates (*.txt)|*.txt");
         wxString file = mafGetOpenFile(rect_dir,rect_wildc,_("Open Z coordinates file")).c_str();
         if (file != "")

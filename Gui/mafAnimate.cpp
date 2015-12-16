@@ -182,6 +182,8 @@ void mafAnimate::OnEvent(mafEventBase *maf_event)
   {
     wxString wildcard = "xml file (*.xml)|*.xml|all files (*.*)|*.*";
     mafString fileName = "";
+    wxString lastFolder = mafGetLastUserFolder().c_str();
+
     switch(e->GetId())
     {
       case ID_STORE:
@@ -209,7 +211,7 @@ void mafAnimate::OnEvent(mafEventBase *maf_event)
         EnableWidgets();
         break;
       case ID_IMPORT:
-        fileName = mafGetOpenFile("", wildcard).c_str();
+        fileName = mafGetOpenFile(lastFolder, wildcard).c_str();
         if (fileName != "")
         {
           LoadPoseFromFile(fileName);
@@ -217,7 +219,7 @@ void mafAnimate::OnEvent(mafEventBase *maf_event)
         }
       break;
       case ID_EXPORT:
-        fileName = mafGetSaveFile("", wildcard).c_str();
+        fileName = mafGetSaveFile(lastFolder, wildcard).c_str();
         if (fileName != "")
           StorePoseToFile(fileName);
       break;

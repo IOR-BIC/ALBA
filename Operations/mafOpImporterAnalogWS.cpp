@@ -43,7 +43,7 @@ mafOp(label)
 	m_OpType	= OPTYPE_IMPORTER;
 	m_Canundo	= true;
 	m_File		= "";
-	m_FileDir = mafGetDocumentsDirectory().c_str();
+	m_FileDir = mafGetLastUserFolder().c_str();
 
   m_EmgScalar = NULL;
 }
