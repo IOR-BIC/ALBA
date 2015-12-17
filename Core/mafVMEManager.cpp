@@ -60,7 +60,7 @@ mafVMEManager::mafVMEManager()
   m_LoadingFlag = false;
   m_FileHistoryIdx = -1;
 
-	m_MSFDir   = mafGetDocumentsDirectory().c_str();;
+	m_MSFDir   = mafGetLastUserFolder().c_str();;
 	m_MSFFile  = "";
 	m_ZipFile  = "";
   m_TmpDir   = "";

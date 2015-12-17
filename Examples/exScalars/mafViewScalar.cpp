@@ -131,8 +131,9 @@ void mafViewScalar::OnEvent(mafEventBase *maf_event)
       break;
       case ID_ASCII_FILE:
       {
+        wxString lastFolder = mafGetLastUserFolder().c_str();
         wxString wildc = "(*.*)|*.*";
-        mafGetOpenMultiFiles("",wildc.c_str(),m_Files);
+        mafGetOpenMultiFiles(lastFolder,wildc.c_str(),m_Files);
         m_Gui->Enable(ID_DATA_ORDER,m_Files.size()>0);
         m_Gui->Enable(ID_READ_DATA,m_Files.size()>0);
       }

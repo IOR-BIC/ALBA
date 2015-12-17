@@ -113,7 +113,7 @@ void mafOpExporterLandmark::OpRun()
   int result = OP_RUN_CANCEL;
   int errors = 0;
   wxString f;
-  wxString proposed = mafGetDocumentsDirectory().c_str();
+  wxString proposed = mafGetLastUserFolder().c_str();
 
   mafString info;
   info = "Exporting LC ";

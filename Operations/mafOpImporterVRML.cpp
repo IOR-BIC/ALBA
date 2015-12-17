@@ -139,7 +139,7 @@ mafCxxTypeMacro(mafOpImporterVRML);
 	m_Canundo	= true;
 	m_Group		= NULL;
 
- 	m_FileDir = mafGetDocumentsDirectory().c_str();
+ 	m_FileDir = mafGetLastUserFolder().c_str();
 }
 //----------------------------------------------------------------------------
  mafOpImporterVRML::~ mafOpImporterVRML()

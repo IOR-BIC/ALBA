@@ -47,7 +47,7 @@ mafOp(label)
 	m_Canundo = true;
 	m_File    = "";
   m_VmeLarge = NULL;
-  m_FileDir = mafGetDocumentsDirectory().c_str();
+  m_FileDir = mafGetLastUserFolder().c_str();
 }
 //----------------------------------------------------------------------------
 mafOpImporterBBF::~mafOpImporterBBF()

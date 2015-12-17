@@ -72,7 +72,7 @@ void mafOpImporterMSF::OpRun()
 {
   if (!m_TestMode)
   {
-    mafString fileDir = mafGetDocumentsDirectory().c_str();
+    mafString fileDir = mafGetLastUserFolder().c_str();
     mafString wildc  = _("MAF Storage Format file (*.msf)|*.msf|Compressed file (*.zmsf)|*.zmsf");
     m_File = mafGetOpenFile(fileDir, wildc, _("Choose MSF file")).c_str();
   }

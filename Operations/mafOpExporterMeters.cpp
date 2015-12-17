@@ -170,7 +170,7 @@ void mafOpExporterMeters::OpDo()
 //----------------------------------------------------------------------------
 {
   mafString initialFileName;
-  initialFileName = mafGetDocumentsDirectory().c_str();
+  initialFileName = mafGetLastUserFolder().c_str();
 
   initialFileName.Append("\\Meter.txt");
 
