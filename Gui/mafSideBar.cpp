@@ -280,7 +280,6 @@ void mafSideBar::UpdateVmePanel()
 	    m_AppendingGUI->Label(_("GUI Visual Pipes"),true);
 	    m_AppendingGUI->AddGui(vme_pipe_gui);
 	  }
-		else 
 
 		if (vme_out_gui)
 		{
