@@ -217,16 +217,8 @@ int mafVMEMeshAnsysTextExporter::WriteElementsFile( vtkUnstructuredGrid *inputUG
 
   // read all the elements with their attribute data in memory (vnl_matrix)
 
-  vtkCellData *cellData = inputUGrid->GetCellData();
-  vtkPointData *pointData = inputUGrid->GetPointData();
-
   // get the ELEMENT_ID array
-  vtkIntArray *elementIdArray = vtkIntArray::SafeDownCast(cellData->GetArray("Id"));
-  
-  if (elementIdArray == NULL)
-  {
-    elementIdArray = vtkIntArray::SafeDownCast(cellData->GetArray("ANSYS_ELEMENT_ID"));
-  }
+  vtkIntArray *elementIdArray = mafVMEMesh::GetElementsIDArray(inputUGrid);
 
   vtkIntArray *syntheticElementsIDArray = NULL;
 
@@ -249,7 +241,7 @@ int mafVMEMeshAnsysTextExporter::WriteElementsFile( vtkUnstructuredGrid *inputUG
   }
 
   // get the Ansys Nodes Id array
-  vtkIntArray *nodesIDArray = vtkIntArray::SafeDownCast(pointData->GetArray("Id"));  
+  vtkIntArray *nodesIDArray = mafVMEMesh::GetNodesIDArray(inputUGrid);
   
   vtkIntArray *syntheticNodesIDArray = NULL;
 
@@ -283,11 +275,7 @@ int mafVMEMeshAnsysTextExporter::WriteElementsFile( vtkUnstructuredGrid *inputUG
   }
   
   // get the MATERIAL array
-  vtkIntArray *materialArray = vtkIntArray::SafeDownCast(cellData->GetArray("Material"));
-  if (materialArray == NULL)
-  {
-    materialArray = vtkIntArray::SafeDownCast(cellData->GetArray("material"));
-  }
+  vtkIntArray *materialArray = mafVMEMesh::GetMaterialsIDArray(inputUGrid);
 
   vtkIntArray *syntheticMaterialArray = NULL;
 
@@ -310,12 +298,7 @@ int mafVMEMeshAnsysTextExporter::WriteElementsFile( vtkUnstructuredGrid *inputUG
   }
 
   // get the TYPE array
-  vtkIntArray *typeArray = vtkIntArray::SafeDownCast(cellData->GetArray("Type"));
-
-  if (typeArray == NULL)
-  {
-    typeArray = vtkIntArray::SafeDownCast(cellData->GetArray("Type"));
-  }
+  vtkIntArray *typeArray = mafVMEMesh::GetElementsTypeArray(inputUGrid);
 
   vtkIntArray *syntheticTypeArray = NULL;
 
@@ -338,11 +321,7 @@ int mafVMEMeshAnsysTextExporter::WriteElementsFile( vtkUnstructuredGrid *inputUG
   }
 
   // get the REAL array
-  vtkIntArray *realArray = vtkIntArray::SafeDownCast(cellData->GetArray("Real"));
-  if (realArray == NULL)
-  {
-    realArray = vtkIntArray::SafeDownCast(cellData->GetArray("ANSYS_ELEMENT_REAL"));
-  }
+  vtkIntArray *realArray = mafVMEMesh::GetElementsRealArray(inputUGrid);
 
   vtkIntArray *syntheticRealArray = NULL;
 
