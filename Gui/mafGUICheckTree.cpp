@@ -389,18 +389,25 @@ void mafGUICheckTree::InitializeImageList()
     int s;
     for( s=0; s<num_of_status; s++)
     {
-      wxBitmap vmeico = mafPictureFactory::GetPictureFactory()->GetVmePic(name);
-      if(s == 0)
-        vmeico = mafGrayScale(vmeico);
-      wxBitmap merged = MergeIcons(state_ico[s],vmeico);
-      imgs->Add(merged);
+			wxBitmap vmeico,missingData;
 
-      // Icons for missing data
-      if(s != 0)
-        vmeico = mafGrayScale(vmeico);
-      vmeico = mafRedScale(vmeico);
-      wxBitmap missingData = MergeIcons(state_ico[s],vmeico); // Same icon as above, but represent a 
-      imgs->Add(missingData);                                 // node with no data available.
+			if(s == 0)
+			{
+				vmeico = mafWhiteFade(mafPictureFactory::GetPictureFactory()->GetVmePic(name),0.75);
+				missingData = mafWhiteFade(mafPictureFactory::GetPictureFactory()->GetVmePic(name),0.4);
+			}
+			else
+			{
+				missingData = vmeico = mafPictureFactory::GetPictureFactory()->GetVmePic(name);
+				missingData=mafWhiteFade(missingData,0.75);
+			}
+
+			vmeico=mafBlueScale(vmeico);
+			vmeico = MergeIcons(state_ico[s],vmeico);
+			imgs->Add(vmeico);
+
+			missingData=MergeIcons(state_ico[s],missingData); // Same icon as above, but represent a 
+			imgs->Add(missingData);                                 // node with no data available.
     }
   }
   SetImageList(imgs);

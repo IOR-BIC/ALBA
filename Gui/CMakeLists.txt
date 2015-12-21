@@ -60,8 +60,6 @@ SET(PROJECT_SRCS
   mafGUIDialog.h
   mafGUIDockManager.cpp
   mafGUIDockManager.h
-  mafGUIDockSettings.cpp
-  mafGUIDockSettings.h
   mafGUIFileHistory.cpp
   mafGUIFileHistory.h
   mafGUIFlagSplitter.cpp

@@ -70,8 +70,6 @@
 #include "vtkMAFAdaptiveVolumeMapper.h"
 #include "vtkImageCast.h"
 
-#define min(x0, x1) (((x0) < (x1)) ? (x0) : (x1))
-#define max(x0, x1) (((x0) > (x1)) ? (x0) : (x1))
 template<typename type> static inline type clip(type x, type xmin, type xmax) { if (x < xmin) return xmin; if (x > xmax) return xmax; return x; }
 
 BEGIN_EVENT_TABLE(mafGUIDialogTransferFunction2D, wxDialog)
@@ -1015,7 +1013,7 @@ void mafGUIDialogTransferFunction2D::ResizePreviewWindow()
 	{
     int extent[6];
     this->m_Vme->GetOutput()->GetVTKData()->GetWholeExtent(extent);
-    double zoom = min(m_SliceRwi->GetClientSize().x / double(extent[1] - extent[0]), m_SliceRwi->GetClientSize().y / double(extent[3] - extent[2]));
+    double zoom = MIN(m_SliceRwi->GetClientSize().x / double(extent[1] - extent[0]), m_SliceRwi->GetClientSize().y / double(extent[3] - extent[2]));
     this->m_SliceResampler->SetAxisMagnificationFactor(0, zoom);
     this->m_SliceResampler->SetAxisMagnificationFactor(1, zoom);
 

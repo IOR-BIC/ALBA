@@ -43,8 +43,6 @@
 #include "vtkMAFImplicitPolyData.h"
 #include "vtkTransformPolyDataFilter.h"
 
-#define min(x0, x1) (((x0) < (x1)) ? (x0) : (x1))
-#define max(x0, x1) (((x0) > (x1)) ? (x0) : (x1))
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafOpVOIDensity);
@@ -286,8 +284,8 @@ void mafOpVOIDensity::ExtractVolumeScalars()
         PointId = VolumeData->FindPoint(Point);
         InsideScalar = VolumeData->GetPointData()->GetTuple(PointId)[0];
         SumScalars += InsideScalar;
-        m_MaxScalar = max(InsideScalar,m_MaxScalar);
-        m_MinScalar = min(InsideScalar,m_MinScalar);
+        m_MaxScalar = MAX(InsideScalar,m_MaxScalar);
+        m_MinScalar = MIN(InsideScalar,m_MinScalar);
         m_NumberOfScalars++;
         m_VOIScalars->InsertNextTuple(&InsideScalar);
       }

@@ -47,8 +47,6 @@
 #include "vtkMAFImplicitPolyData.h"
 #include "vtkTransformPolyDataFilter.h"
 
-#define min(x0, x1) (((x0) < (x1)) ? (x0) : (x1))
-#define max(x0, x1) (((x0) > (x1)) ? (x0) : (x1))
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafOpVOIDensityEditor);
