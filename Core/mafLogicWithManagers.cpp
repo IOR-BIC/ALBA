@@ -987,9 +987,6 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
         }
       }
       break;
-      case LAYOUT_LOAD:
-        RestoreLayout();
-      break;
       case CAMERA_RESET:
         if(m_ViewManager) m_ViewManager->CameraReset();
       break; 
