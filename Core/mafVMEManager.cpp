@@ -436,8 +436,6 @@ int mafVMEManager::MSFOpen(mafString filename)
 	m_FileHistory.Save(*m_Config); // save file history to registry
   m_FileHistoryIdx = -1;
 
-  mafEventMacro(mafEvent(this,LAYOUT_LOAD)); // ask logic to load the layout
-
   if(!m_TestMode) // Losi 02/16/2010 for test class
   {
     cppDEL(disableAll);
