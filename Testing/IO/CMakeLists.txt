@@ -3,7 +3,7 @@ PROJECT (mafIO_TEST)
 IF(MAF_BUILD_MAFDLL)
   LINK_LIBRARIES(XercesC mafDLL) #to solve linking problems XercesC libs must be added before mafDLL
 ELSE(MAF_BUILD_MAFDLL)
-  LINK_LIBRARIES(mafTests mafIO)
+  LINK_LIBRARIES(mafTests mafGui mafIO)
 ENDIF (MAF_BUILD_MAFDLL)
 
 #-----------------------------------------------------------------------------
