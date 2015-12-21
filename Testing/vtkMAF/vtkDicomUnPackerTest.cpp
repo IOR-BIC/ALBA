@@ -33,8 +33,6 @@
 #include "vtkImageData.h"
 #include "vtkPlaneSource.h"
 
-#define min(x0, x1) (((x0) < (x1)) ? (x0) : (x1))
-#define max(x0, x1) (((x0) > (x1)) ? (x0) : (x1))
 #define DELTA 0.01
 
 //-------------------------------------------------------------------------

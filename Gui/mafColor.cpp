@@ -149,7 +149,6 @@ void mafColor::RGBToHSV(int r, int g, int b, int *h, int *s, int *v)
 //----------------------------------------------------------------------------
 // rgb,sv in range [0..255], h in range [0..360]
 void mafColor::HSVToRGB(int h, int s, int v, int *r, int *g, int *b)
-//----------------------------------------------------------------------------
 {
   *r = *g = *b = v;
   if (s == 0) return;
@@ -183,6 +182,88 @@ void mafColor::HSVToRGB(int h, int s, int v, int *r, int *g, int *b)
     case 5: *r=v; *g=p; *b=q ; break;
   } 
 }
+
+//----------------------------------------------------------------------------
+void mafColor::RGBToHSL(int r, int g, int b, int *h, int *s, int *l)
+{
+	double themin,themax,delta;
+	double dr,dg,db,dh,ds,dl;
+
+	dr=r/255.0;
+	dg=g/255.0;
+	db=b/255.0;
+
+
+	themin = MIN(dr,MIN(dg,db));
+	themax = MAX(dr,MAX(dg,db));
+	delta = themax - themin;
+	dl = (themin + themax) / 2;
+	ds = 0;
+	if (dl > 0 && dl < 1)
+		ds = delta / (dl < 0.5 ? (2*dl) : (2-2*dl));
+	dh = 0;
+	if (delta > 0) {
+		if (themax == dr && themax != dg)
+			dh += (dg - db) / delta;
+		if (themax == dg && themax != db)
+			dh += (2 + (db - dr) / delta);
+		if (themax == db && themax != dr)
+			dh += (4 + (dr - dg) / delta);
+		dh *= 60;
+	}
+	
+	*h=dh;
+	*s=ds*255;
+	*l=dl*255;
+}
+
+//----------------------------------------------------------------------------
+void mafColor::HSLToRGB(int h, int s, int l, int *r, int *g, int *b)
+{
+	double dr,dg,db,satr,satg,satb,ctmpr,ctmpg,ctmpb;
+	double dh,ds,dl;
+	dh=h;
+	ds=s/255.0;
+	dl=l/255.0;
+	
+	if (dh < 120) {
+		satr = (120 - dh) / 60.0;
+		satg = dh / 60.0;
+		satb = 0;
+	} else if (dh < 240) {
+		satr = 0;
+		satg = (240 - dh) / 60.0;
+		satb = (dh - 120) / 60.0;
+	} else {
+		satr = (dh - 240) / 60.0;
+		satg = 0;
+		satb = (360 - dh) / 60.0;
+	}
+	satr = MIN(satr,1.0);
+	satg = MIN(satg,1.0);
+	satb = MIN(satb,1.0);
+
+	ctmpr = 2 * ds * satr + (1 - ds);
+	ctmpg = 2 * ds * satg + (1 - ds);
+	ctmpb = 2 * ds * satb + (1 - ds);
+
+	if (dl < 0.5) {
+		dr = dl * ctmpr;
+		dg = dl * ctmpg;
+		db = dl * ctmpb;
+	} else {
+		dr = (1 - dl) * ctmpr + 2 * dl - 1;
+		dg = (1 - dl) * ctmpg + 2 * dl - 1;
+		db = (1 - dl) * ctmpb + 2 * dl - 1;
+	}
+
+	*r=dr*255;
+	*g=dg*255;
+	*b=db*255;
+}
+
+
+
 //----------------------------------------------------------------------------
 void mafColor::HSVToRGB() 
 //----------------------------------------------------------------------------

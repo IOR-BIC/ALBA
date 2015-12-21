@@ -494,8 +494,8 @@ void mafVMERefSys::Print(std::ostream& os, const int tabs)
 char **mafVMERefSys::GetIcon()
 //-------------------------------------------------------------------------
 {
-  #include "mafVMEProcedural.xpm"
-  return mafVMEProcedural_xpm;
+  #include "mafVMERefSys.xpm"
+  return mafVMERefSys_xpm;
 }
 //-----------------------------------------------------------------------
 void mafVMERefSys::InternalPreUpdate()

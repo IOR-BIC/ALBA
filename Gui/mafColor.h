@@ -86,6 +86,12 @@ class MAF_EXPORT mafColor
   /** static function - conversion from HSV to RGB, all represented on Integer */ 
   static void HSVToRGB(int h, int s, int v, int *r, int *g, int *b);
 
+	/** static function - conversion from RGB to HSL, all represented on Integer */ 
+	static void RGBToHSL(int r, int g, int b, int *h, int *s, int *l);
+	/** static function - conversion from RGB to HSL, all represented on Integer */ 
+	static void HSLToRGB(int h, int s, int v, int *r, int *g, int *b);
+
+
   /** static function - Interpolate two color using a weight t in HSV space. t=0 return c1, t=1 return c2 */ 
   static mafColor InterpolateHSV(mafColor c1, mafColor c2, double t);
   /** static function - Interpolate two color using a weight t in RGB space. t=0 return c1, t=1 return c2 */ 
@@ -105,8 +111,7 @@ class MAF_EXPORT mafColor
     else
       return mafColor::InterpolateRGB(c,check1,c.m_Alpha/255.0);
   }  
-
-  // member variables 
+	// member variables 
   int m_Red,m_Green,m_Blue; ///<  rgb color representation
   int m_Hue,m_Saturation,m_Value; ///<  hsv color representation
   int m_Alpha;         ///<  alpha value

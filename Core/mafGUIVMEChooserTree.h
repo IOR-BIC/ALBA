@@ -60,12 +60,6 @@ protected:
 
   void InitializeImageList();
 
-  /** Initialize images for multi selection dialog. */
-  void InitializeImageListMulti();
-
-  /** Update the vme nodes icon. */
-  void VmeUpdateIcon(mafNode *n);
-
   /** clone in tree a subtree of source_item */
   void CloneSubTree(mafGUICheckTree *tree, wxTreeItemId *source_item, wxTreeItemId *dest_parent_item);
 

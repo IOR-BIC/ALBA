@@ -49,7 +49,6 @@ const int EW	= 45;											// entry width  - (was 48)
 const int FW	= LW+LM+EW+HM+EW+HM+EW;		// full width               (304)
 const int DW	= EW+HM+EW+HM+EW;					// Data Width - Full Width without the Label (184)
 
-#define max(a,b)  (((a) > (b)) ? (a) : (b))
 
 // ugly hack to make DrawText Work
 // if you remove this line you will have a Compile-Error "DrawTextA is not defined for wxPaintDC"
