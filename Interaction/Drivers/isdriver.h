@@ -83,12 +83,6 @@
 
 #define NELEM( array ) ( sizeof( array ) / sizeof( array[0] ) )
 
-#ifndef MIN 
-    #define MIN( x, y ) ( (x) < (y) ? (x) : (y) )
-#endif
-#ifndef MAX 
-    #define MAX( x, y ) ( (x) > (y) ? (x) : (y) )
-#endif
 #define MINMAX( lo, x, hi ) ( MAX( lo, MIN( x, hi ) ) )
 
 

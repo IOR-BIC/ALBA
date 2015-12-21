@@ -93,7 +93,6 @@
 
 #define IDM_WINDOWNEXT 4004
 #define IDM_WINDOWPREV 4006
-#define max(a,b)            (((a) > (b)) ? (a) : (b))
 
 //----------------------------------------------------------------------------
 mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
@@ -261,8 +260,6 @@ void mafLogicWithManagers::Configure()
   m_SettingsDialog->AddPage( m_ApplicationSettings->GetGui(), m_ApplicationSettings->GetLabel());
   m_SettingsDialog->AddPage( m_StorageSettings->GetGui(), m_StorageSettings->GetLabel());
 	
-  m_SettingsDialog->AddPage( m_Win->GetDockSettingGui(), _("User Interface Preferences"));
-
   m_HelpSettings = new mafGUISettingsHelp(this);
   m_SettingsDialog->AddPage(m_HelpSettings->GetGui(), m_HelpSettings->GetLabel());
 
@@ -2549,8 +2546,8 @@ void mafLogicWithManagers::RestoreLayout()
 		int maximized, pos[2], size[2];
 		app_layout->GetApplicationInfo(maximized, pos, size);
 
-		pos[0]=max(0,pos[0]);
-		pos[1]=max(0,pos[1]);
+		pos[0]=MAX(0,pos[0]);
+		pos[1]=MAX(0,pos[1]);
 
 		wxRect rect(pos[0],pos[1],size[0],size[1]);
 		m_Win->SetSize(rect);

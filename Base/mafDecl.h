@@ -26,6 +26,7 @@
 
 #include <vector>
 
+
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
@@ -471,10 +472,10 @@ MAF_EXPORT bool IsRemote(mafString filename, mafString &protocol_used);
 MAF_EXPORT wxColour  mafRandomColor();
 
 /** Used to generate gray scale bitmap given a colored one.*/
-MAF_EXPORT wxBitmap mafGrayScale(wxBitmap bmp);
+MAF_EXPORT wxBitmap mafWhiteFade(wxBitmap bmp,double level=0.5);
 
 /** Used to generate red scale bitmap to represent a VME with data not present.*/
-MAF_EXPORT wxBitmap mafRedScale(wxBitmap bmp);
+MAF_EXPORT wxBitmap mafBlueScale(wxBitmap bmp);
 
 /** return the application start-up directory */
 MAF_EXPORT std::string  mafGetApplicationDirectory();

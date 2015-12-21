@@ -24,6 +24,8 @@
 #include "wx\msw\registry.h"
 #include "mafLogicWithManagers.h"
 #include "wx\confbase.h"
+#include "wx\config.h"
+#include "mafColor.h"
 
 MAF_ID_IMP(REMOTE_COMMAND_CHANNEL)
 
@@ -242,7 +244,7 @@ void mafFormatDataSize( long long size, mafString& szOut )
   szOut = wxString::Format("%g %s", RoundValue(nsize), SZUN[idx]);
 }
 //----------------------------------------------------------------------------
-wxBitmap mafGrayScale(wxBitmap bmp)
+wxBitmap mafWhiteFade(wxBitmap bmp,double level)
 //----------------------------------------------------------------------------
 {
   wxImage img = bmp.ConvertToImage();
@@ -255,30 +257,39 @@ wxBitmap mafGrayScale(wxBitmap bmp)
     r = p++;
     g = p++;
     b = p++;
-    gray = *r + *g + *b;
-    *r = *g = *b = gray / 3;
+		*r = (255-(255-*r)*level);
+		*g = (255-(255-*g)*level);
+		*b = (255-(255-*b)*level);
   }
   return wxBitmap(img);
 }
 //----------------------------------------------------------------------------
-wxBitmap mafRedScale(wxBitmap bmp)
+wxBitmap mafBlueScale(wxBitmap bmp)
 //----------------------------------------------------------------------------
 {
   wxImage img = bmp.ConvertToImage();
   unsigned char *p = img.GetData();
   unsigned char *max = p + img.GetWidth() * img.GetHeight() * 3;
   unsigned char *r, *g, *b;
-  unsigned int red;
-  unsigned int gray;
+	int h,s,l;
+	int ir,ig,ib; 
   while( p < max )
   {
     r = p++;
     g = p++;
     b = p++;
-    gray = *r + *g + *b;
-    red = *r * 1.6;
-    *r = *g = *b = gray / 3;
-    *r = red > 255 ? 255 : red;
+
+		if(*r!=255 && *b!= 255 && *g!=255)
+		{
+			mafColor::RGBToHSL(*r, *g, *b, &h, &s, &l);
+			h=210;
+			s=255/2;
+			mafColor::HSLToRGB(h, s, l, &ir, &ig, &ib);
+
+			*r=ir;
+			*g=ig;
+			*b=ib;
+		}
   }
   return wxBitmap(img);
 }
