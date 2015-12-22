@@ -42,7 +42,7 @@ mafViewSliceBlend is a View that visualize two volume slice.
 class mafViewSliceBlend: public mafViewVTK
 {
 public:
-	mafViewSliceBlend(wxString label = "Slice Blend", int camera_position = CAMERA_OS_Z	, bool show_axes = false, bool show_grid = false, bool show_ruler = false, int stereo = 0);
+	mafViewSliceBlend(wxString label = "Slice Blend", int camera_position = CAMERA_OS_Z	, bool show_axes = false, bool show_grid = false, int stereo = 0);
 	virtual ~mafViewSliceBlend(); 
 
 	mafTypeMacro(mafViewSliceBlend, mafViewVTK);

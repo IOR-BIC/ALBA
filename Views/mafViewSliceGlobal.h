@@ -41,7 +41,7 @@ and visualization enabled.
 class MAF_EXPORT mafViewSliceGlobal: public mafViewSlice
 {
 public:
-  mafViewSliceGlobal(wxString label = "Slice", int camera_position = CAMERA_CT, bool show_axes = false, bool show_grid = false, bool show_ruler = false, int stereo = 0,bool showTICKs=false,bool textureInterpolate=true);
+  mafViewSliceGlobal(wxString label = "Slice", int camera_position = CAMERA_CT, bool show_axes = false, bool show_grid = false, int stereo = 0,bool showTICKs=false,bool textureInterpolate=true);
   virtual ~mafViewSliceGlobal(); 
 
   mafTypeMacro(mafViewSliceGlobal, mafViewSlice);

@@ -33,7 +33,6 @@
 #include "mafSceneNode.h"
 #include "mafSceneGraph.h"
 #include "mafGUIPicButton.h"
-#include "mafGUIMeasureUnitSettings.h"
 #include "mafGUICrossIncremental.h"
 
 #include "mafVME.h"
@@ -52,7 +51,6 @@
 #include "vtkActor.h"
 #include "vtkActor2D.h"
 #include "vtkDataSet.h"
-#include "vtkMAFSimpleRulerActor2D.h"
 #include "vtkMAFTextOrientator.h"
 #include "vtkMAFProfilingActor.h"
 
@@ -72,7 +70,6 @@ mafRWI::mafRWI()
 	m_Camera  = NULL;
 	m_RwiBase = NULL;
 	m_RenderWindow = NULL;
-	m_Ruler   = NULL;
 	m_Orientator = NULL;
 	m_Grid    = NULL;
 	m_Axes    = NULL;
@@ -100,7 +97,7 @@ mafRWI::mafRWI()
 
 }
 //----------------------------------------------------------------------------
-mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axes, bool show_ruler, int stereo, bool show_orientator, int axesType)
+mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axes, int stereo, bool show_orientator, int axesType)
 //----------------------------------------------------------------------------
 {
 	m_Listener= NULL;
@@ -113,7 +110,6 @@ mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axe
 	m_Camera  = NULL;
 	m_RwiBase = NULL;
 	m_RenderWindow = NULL;
-	m_Ruler   = NULL;
 	m_Grid    = NULL;
 	m_Axes    = NULL;
 	m_AxesType = axesType;
@@ -141,11 +137,11 @@ mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axe
 	m_TopBottomAccumulation = m_TopBottomAccumulationLast = 0.0;
 	m_LeftRigthAccumulation = m_LeftRigthAccumulationLast = 0.0;
 
-	CreateRenderingScene(parent, layers, use_grid, show_axes, show_ruler, stereo, show_orientator, m_AxesType);
+	CreateRenderingScene(parent, layers, use_grid, show_axes, stereo, show_orientator, m_AxesType);
 
 }
 //----------------------------------------------------------------------------
-void mafRWI::CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axes, bool show_ruler, int stereo, bool show_orientator, int axesType)
+void mafRWI::CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axes, int stereo, bool show_orientator, int axesType)
 //----------------------------------------------------------------------------
 {
 	if (m_Light != NULL)
@@ -225,25 +221,7 @@ void mafRWI::CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers, bool use_
 
   assert(m_AlwaysVisibleRenderer->Transparent()	== true);
 
-	m_ShowRuler = show_ruler;
 	m_ShowOrientator = show_orientator;
-
-	mafGUIMeasureUnitSettings *unit_settings = new mafGUIMeasureUnitSettings(this);
-	m_RulerScaleFactor = unit_settings->GetScaleFactor();
-	m_RulerLegend = unit_settings->GetUnitName();
-	cppDEL(unit_settings);
-	vtkNEW(m_Ruler);
-	m_Ruler->SetLabelAxesVisibility();
-	m_Ruler->SetLabelScaleVisibility(true);
-	m_Ruler->SetAxesVisibility(false);
-	m_Ruler->SetTickVisibility(true);
-	m_Ruler->CenterAxesOnScreen(false);
-	m_Ruler->UseGlobalAxesOff();
-	m_Ruler->SetLegend(m_RulerLegend.GetCStr());
-	m_Ruler->SetScaleFactor(m_RulerScaleFactor);
-	m_Ruler->SetColor(1,1,1);
-	m_RenFront->AddActor2D(m_Ruler);
-	m_Ruler->SetVisibility(m_ShowRuler);
 
 	vtkNEW(m_Orientator);
 	m_Orientator->SetTextUp("U");
@@ -286,9 +264,6 @@ mafRWI::~mafRWI()
 	if(m_Grid) m_RenFront->RemoveActor(m_Grid);
 	if(m_Grid) m_RenFront->RemoveActor2D(m_Grid->GetLabelActor());
 	vtkDEL(m_Grid);
-
-	if(m_Ruler) m_RenFront->RemoveActor2D(m_Ruler);
-	vtkDEL(m_Ruler);
 
 	if(m_Orientator) m_RenFront->RemoveActor2D(m_Orientator);
 	vtkDEL(m_Orientator);
@@ -543,20 +518,6 @@ void mafRWI::SetAxesVisibility(bool show)
 	}
 }
 //----------------------------------------------------------------------------
-void mafRWI::SetRuleVisibility(bool show)
-//----------------------------------------------------------------------------
-{
-	if(m_Ruler)
-	{
-		m_ShowRuler = show;
-		m_Ruler->SetVisibility(show);
-		if (m_Gui != NULL)
-		{
-			m_Gui->Update();
-		}
-	}
-}
-//----------------------------------------------------------------------------
 void mafRWI::SetOrientatorVisibility(bool show)
 //----------------------------------------------------------------------------
 {
@@ -575,28 +536,6 @@ void mafRWI::SetProfilingActorVisibility(bool show)
 //----------------------------------------------------------------------------
 {
 	m_ProfilingActor->SetVisibility(show);
-}
-//----------------------------------------------------------------------------
-void mafRWI::SetRulerScaleFactor(const double &scale_factor)
-//----------------------------------------------------------------------------
-{
-	m_RulerScaleFactor = scale_factor;
-	m_Ruler->SetScaleFactor(m_RulerScaleFactor);
-	if (m_Gui != NULL) 
-	{
-		m_Gui->Update();
-	}
-}
-//----------------------------------------------------------------------------
-void mafRWI::SetRulerLegend(const mafString &ruler_legend)
-//----------------------------------------------------------------------------
-{
-	m_RulerLegend = ruler_legend;
-	m_Ruler->SetLegend(m_RulerLegend.GetCStr());
-	if (m_Gui != NULL) 
-	{
-		m_Gui->Update();
-	}
 }
 //----------------------------------------------------------------------------
 void mafRWI::SetGridColor(const wxColor &col)
@@ -970,11 +909,8 @@ enum RWI_WIDGET_ID
 	ID_CAMERA_VIEW_UP,
 	ID_CAMERA_ORIENTATION,
 	ID_LINK_CAMERA,
-	ID_SHOW_RULER,
 	ID_SHOW_ORIENTATOR,
 	ID_SHOW_PROFILING_INFORMATION,
-	ID_RULER_SCALE_FACTOR,
-	ID_RULER_LEGEND
 };
 //-------------------------------------------------------------------------
 mafGUI *mafRWI::CreateGui()
@@ -1014,16 +950,7 @@ mafGUI *mafRWI::CreateGui()
 	m_Gui->Divider(2);
 	m_Gui->Bool(ID_SHOW_AXES,"show axes",&m_ShowAxes,0);
 	m_Gui->Color(ID_BG_COLOR,"back color",&m_BGColour);
-
-	//////// ruler gui
-	if (m_Camera->GetParallelProjection())
-	{
-		m_Gui->Divider(2);
-		m_Gui->Bool(ID_SHOW_RULER,"show ruler",&m_ShowRuler);
-		m_Gui->Double(ID_RULER_SCALE_FACTOR,"scale factor",&m_RulerScaleFactor,1.0e-299,MAXDOUBLE,-1);
-		m_Gui->String(ID_RULER_LEGEND,"legend",&m_RulerLegend);
-	}
-
+		
 	if (m_StereoType)
 	{
 		m_Gui->Divider(2);
@@ -1071,9 +998,6 @@ void mafRWI::OnEvent(mafEventBase *maf_event)
 				LinkCamera(m_LinkCamera != 0);
 			}
 			break;
-		case ID_SHOW_RULER:
-			SetRuleVisibility(m_ShowRuler!= 0);
-			break;
 		case ID_SHOW_ORIENTATOR:
 			SetOrientatorVisibility(m_ShowOrientator!= 0);
 			CameraUpdate();
@@ -1083,12 +1007,6 @@ void mafRWI::OnEvent(mafEventBase *maf_event)
 				SetProfilingActorVisibility(m_ShowProfilingInformation!=0);
 				CameraUpdate();
 			}
-			break;
-		case ID_RULER_SCALE_FACTOR:
-			SetRulerScaleFactor(m_RulerScaleFactor);
-			break;
-		case ID_RULER_LEGEND:
-			SetRulerLegend(m_RulerLegend);
 			break;
 		case ID_SHOW_AXES:
 			SetAxesVisibility(m_ShowAxes != 0); 
@@ -1184,22 +1102,6 @@ void mafRWI::LinkCamera(bool linc_camera)
 	e.SetVtkObj(m_Camera);
 	e.SetBool(m_LinkCamera != 0);
 	mafEventMacro(e);
-}
-//----------------------------------------------------------------------------
-void mafRWI::UpdateRulerUnit()
-//----------------------------------------------------------------------------
-{
-	mafGUIMeasureUnitSettings *unit_settings = new mafGUIMeasureUnitSettings(this);
-	m_RulerScaleFactor = unit_settings->GetScaleFactor();
-	m_RulerLegend = unit_settings->GetUnitName();
-	cppDEL(unit_settings);
-	m_Ruler->SetScaleFactor(m_RulerScaleFactor);
-	m_Ruler->SetLegend(m_RulerLegend);
-	if (m_Gui != NULL) 
-	{
-		m_Gui->Update();
-	}
-	CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void mafRWI::SetOrientatorProperties(double rgbText[3], double rgbBackground[3], double scale)

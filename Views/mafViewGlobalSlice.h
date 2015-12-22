@@ -51,7 +51,7 @@ class MAF_EXPORT mafViewGlobalSlice: public mafViewVTK
 {
 public:
   /** constructor. */
-  mafViewGlobalSlice(wxString label = "Global Slice", int camera_position = CAMERA_PERSPECTIVE, bool show_axes = false, bool show_grid = false, bool show_ruler = false, int stereo = 0);
+  mafViewGlobalSlice(wxString label = "Global Slice", int camera_position = CAMERA_PERSPECTIVE, bool show_axes = false, bool show_grid = false, int stereo = 0);
   /** destructor. */
   virtual ~mafViewGlobalSlice(); 
 

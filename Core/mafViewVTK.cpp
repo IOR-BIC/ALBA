@@ -61,7 +61,7 @@ mafCxxTypeMacro(mafViewVTK);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mafViewVTK::mafViewVTK(const wxString &label, int camera_position, bool show_axes, bool show_grid, bool show_ruler, int stereo, bool show_orientator, int axesType)
+mafViewVTK::mafViewVTK(const wxString &label, int camera_position, bool show_axes, bool show_grid,  int stereo, bool show_orientator, int axesType)
 :mafView(label)
 //----------------------------------------------------------------------------
 {
@@ -69,7 +69,6 @@ mafViewVTK::mafViewVTK(const wxString &label, int camera_position, bool show_axe
   m_ShowAxes        = show_axes;
   m_ShowGrid        = show_grid;
   m_StereoType      = stereo;
-  m_ShowRuler       = show_ruler;
   m_ShowOrientator  = show_orientator;
   m_AxesType = axesType;
 
@@ -109,7 +108,7 @@ mafView *mafViewVTK::Copy(mafObserver *Listener, bool lightCopyEnabled)
 //----------------------------------------------------------------------------
 {
   m_LightCopyEnabled = lightCopyEnabled;
-  mafViewVTK *v = new mafViewVTK(m_Label, m_CameraPositionId, m_ShowAxes, m_ShowGrid, m_ShowRuler, m_StereoType, m_ShowOrientator, m_AxesType);
+  mafViewVTK *v = new mafViewVTK(m_Label, m_CameraPositionId, m_ShowAxes, m_ShowGrid, m_StereoType, m_ShowOrientator, m_AxesType);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
   v->m_PipeMap = m_PipeMap;
@@ -121,7 +120,7 @@ void mafViewVTK::Create()
 //----------------------------------------------------------------------------
 {
   if(m_LightCopyEnabled == true) return;
-  m_Rwi = new mafRWI(mafGetFrame(), ONE_LAYER, m_ShowGrid, m_ShowAxes, m_ShowRuler, m_StereoType, m_ShowOrientator, m_AxesType);
+  m_Rwi = new mafRWI(mafGetFrame(), ONE_LAYER, m_ShowGrid, m_ShowAxes, m_StereoType, m_ShowOrientator, m_AxesType);
   m_Rwi->SetListener(this);
   m_Rwi->CameraSet(m_CameraPositionId);
   m_Win = m_Rwi->m_RwiBase;
@@ -496,12 +495,6 @@ void mafViewVTK::LinkView(bool link_camera)
 //----------------------------------------------------------------------------
 {
   m_Rwi->LinkCamera(link_camera);
-}
-//----------------------------------------------------------------------------
-void mafViewVTK::OptionsUpdate()
-//----------------------------------------------------------------------------
-{
-  m_Rwi->UpdateRulerUnit();
 }
 
 //-------------------------------------------------------------------------

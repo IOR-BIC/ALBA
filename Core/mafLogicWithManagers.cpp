@@ -66,7 +66,6 @@
 #include "mafGUIMaterialChooser.h"
 #include "mafGUIViewFrame.h"
 #include "mafGUILocaleSettings.h"
-#include "mafGUIMeasureUnitSettings.h"
 #include "mafGUIApplicationSettings.h"
 #include "mafGUISettingsStorage.h"
 #include "mafGUISettingsTimeBar.h"
@@ -106,7 +105,6 @@ mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
 
 	m_ChildFrameStyle = wxCAPTION | wxMAXIMIZE_BOX | wxMINIMIZE_BOX | wxRESIZE_BORDER; //wxTHICK_FRAME; // Default style
 	m_LocaleSettings = new mafGUILocaleSettings(this);
-	m_MeasureUnitSettings = new mafGUIMeasureUnitSettings(this);
 	m_ApplicationSettings = new mafGUIApplicationSettings(this);
 	m_StorageSettings = new mafGUISettingsStorage(this);
 	m_TimeBarSettings = new mafGUISettingsTimeBar(this);
@@ -154,10 +152,7 @@ mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
 
   m_MaterialChooser = NULL;
 
-  // this is needed to manage events coming from the widget
-  // when the user change the unit settings.
-  m_MeasureUnitSettings->SetListener(this);
-
+  
   m_PrintSupport = new mafPrintSupport();
   
   m_SettingsDialog = new mafGUISettingsDialog();
@@ -192,7 +187,6 @@ mafLogicWithManagers::~mafLogicWithManagers()
   cppDEL(m_PrintSupport);
   cppDEL(m_SettingsDialog);
 	cppDEL(m_LocaleSettings);
-	cppDEL(m_MeasureUnitSettings);
 	cppDEL(m_ApplicationSettings);
 	cppDEL(m_StorageSettings);
 	cppDEL(m_TimeBarSettings);
@@ -270,9 +264,6 @@ void mafLogicWithManagers::Configure()
 #endif    
   if(m_LocaleSettings)
     m_SettingsDialog->AddPage(m_LocaleSettings->GetGui(), m_LocaleSettings->GetLabel());
-
-  if (m_MeasureUnitSettings)
-    m_SettingsDialog->AddPage(m_MeasureUnitSettings->GetGui(), m_MeasureUnitSettings->GetLabel());
 
   if (m_TimeBarSettings)
     m_SettingsDialog->AddPage(m_TimeBarSettings->GetGui(), m_TimeBarSettings->GetLabel());
@@ -1041,9 +1032,6 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       // commands related to interaction manager
       case ID_APP_SETTINGS:
         m_SettingsDialog->ShowModal();
-      break;
-      case mafGUIMeasureUnitSettings::MEASURE_UNIT_UPDATED:
-        UpdateMeasureUnit();
       break;
       case CAMERA_PRE_RESET:
 // currently mafInteraction is strictly dependent on VTK (marco)

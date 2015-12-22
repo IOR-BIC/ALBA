@@ -50,7 +50,6 @@ class mafGUITimeBar;
 class mafWXLog;
 class mafVTKLog;
 class mafGUILocaleSettings;
-class mafGUIMeasureUnitSettings;
 class mafGUIApplicationSettings;
 class mafGUISettingsStorage;
 class mafGUISettingsTimeBar;
@@ -414,7 +413,6 @@ protected:
 	mafWXLog          *m_Logger;
 	mafVTKLog         *m_VtkLog;
 	mafGUILocaleSettings *m_LocaleSettings;
-	mafGUIMeasureUnitSettings *m_MeasureUnitSettings;
 	mafGUIApplicationSettings *m_ApplicationSettings;
 	mafGUISettingsStorage  *m_StorageSettings;
 	mafGUISettingsTimeBar  *m_TimeBarSettings;
