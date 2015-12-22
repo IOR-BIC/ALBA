@@ -64,16 +64,21 @@ void mafGUIApplicationSettings::CreateGui()
   m_Gui = new mafGUI(this);
   m_Gui->Label(_("Application General Settings"),true);
   m_Gui->Divider(2);
-  m_Gui->Bool(ID_LOG_TO_FILE,_("Log to file"),&m_LogToFile,1);
+  m_Gui->Bool(ID_LOG_TO_FILE,_("Log to file *"),&m_LogToFile,1);
   if (m_EnableLogDirChoices)
   {
-  	m_Gui->DirOpen(ID_LOG_DIR,_("Log dir"),&m_LogFolder);
+  	m_Gui->DirOpen(ID_LOG_DIR,_("Log Dir *"),&m_LogFolder);
   }
   m_Gui->Divider(2);
-  m_Gui->Bool(ID_WARN_UNDO, _("Warn on undoable Operations"), &m_WarnUserFlag, 1, _("If checked the use is warned when an operation \nthat not support the undo is executed."));
+  m_Gui->Bool(ID_WARN_UNDO, _("Warn on not undoable Operations"), &m_WarnUserFlag, 1, _("If checked the use is warned when an operation \nthat not support the undo is executed."));
   EnableItems();
-  m_Gui->Label(_("changes will take effect when the \napplication restart"),false,true);
-  m_Gui->Label("");
+	m_Gui->Divider(2);
+
+	m_Gui->Label("");
+	m_Gui->Label("");
+	m_Gui->Label("");
+  m_Gui->Label(_("* Changes will take effect on application \nrestart"),false,true);
+  
   m_Gui->Divider(2);
 }
 //----------------------------------------------------------------------------
