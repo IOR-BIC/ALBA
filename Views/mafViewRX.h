@@ -42,7 +42,7 @@ class MAF_EXPORT mafViewRX: public mafViewVTK
 {
 public:
   /** constructor */
-  mafViewRX(wxString label = "RX", int camera_position = CAMERA_RX_FRONT, bool show_axes = false, bool show_grid = false, bool show_ruler = false, int stereo = 0);
+  mafViewRX(wxString label = "RX", int camera_position = CAMERA_RX_FRONT, bool show_axes = false, bool show_grid = false, int stereo = 0);
   /** destructor*/
   virtual ~mafViewRX(); 
 

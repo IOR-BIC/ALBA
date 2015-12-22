@@ -78,10 +78,6 @@ SET(PROJECT_SRCS
   mafGUIListBox.h
   mafGUIListCtrl.cpp
   mafGUIListCtrl.h
-  mafGUILocaleSettings.cpp
-  mafGUILocaleSettings.h
-  mafGUIMeasureUnitSettings.cpp
-  mafGUIMeasureUnitSettings.h
   mafGUIMovieCtrl.cpp
   mafGUIMovieCtrl.h
   mafGUIMDIChild.cpp
@@ -124,8 +120,6 @@ SET(PROJECT_SRCS
   mafGUICrossIncremental.h
   mafGUIComboBox.cpp
   mafGUIComboBox.h
-  mafGUISettingsHelp.h
-  mafGUISettingsHelp.cpp
   mafGUILandmark.cpp
   mafGUILandmark.h
   mafGUIWizard.cpp

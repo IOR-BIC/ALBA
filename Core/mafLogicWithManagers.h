@@ -40,17 +40,13 @@ class mafPrintSupport;
 class mafRemoteLogic;
 class mafDeviceButtonsPadMouse;
 class mafGUISettingsDialog;
-class mafGUIApplicationLayoutSettings;
 class mafGUISettings;
-class mafGUISettingsHelp;
 class mafUser;
 class mafWizardManager;
 class mafWizard;
 class mafGUITimeBar;
 class mafWXLog;
 class mafVTKLog;
-class mafGUILocaleSettings;
-class mafGUIMeasureUnitSettings;
 class mafGUIApplicationSettings;
 class mafGUISettingsStorage;
 class mafGUISettingsTimeBar;
@@ -386,9 +382,7 @@ protected:
   bool m_UseOpManager;
   bool m_UseInteractionManager;
   mafGUISettingsDialog *m_SettingsDialog;
-  mafGUIApplicationLayoutSettings *m_ApplicationLayoutSettings;
-  mafGUISettingsHelp *m_HelpSettings;
-
+  
   mafString m_Revision;
   mafString m_Extension;
 
@@ -410,11 +404,8 @@ protected:
 	mafGUITimeBar      *m_TimePanel;
 	mafString					 m_AppTitle;
 	bool               m_LogToFile;
-	bool               m_LogAllEvents;
 	mafWXLog          *m_Logger;
 	mafVTKLog         *m_VtkLog;
-	mafGUILocaleSettings *m_LocaleSettings;
-	mafGUIMeasureUnitSettings *m_MeasureUnitSettings;
 	mafGUIApplicationSettings *m_ApplicationSettings;
 	mafGUISettingsStorage  *m_StorageSettings;
 	mafGUISettingsTimeBar  *m_TimeBarSettings;
@@ -426,5 +417,7 @@ protected:
 	long m_SidebarStyle;///< Store the style of the sidebar. Old style (MAF 1.x): SINGLE_NOTEBOOK or new style (MAF 2.x): DOUBLE_NOTEBOOK
 	bool m_PlugTimebar; ///< Flag to plug or not the Time-bar into the application. Default is true.
 	bool m_PlugLogPanel;  ///< Flag to plug or not the Log area into the application. Default is true.
+	bool m_ShowStorageSettings; ///<Flag to show storage setting default is false.
+	bool m_ShowInteractionSettings; ///<Flag to show storage setting default is false.
 };
 #endif

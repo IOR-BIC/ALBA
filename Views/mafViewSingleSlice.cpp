@@ -66,8 +66,8 @@ mafCxxTypeMacro(mafViewSingleSlice);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mafViewSingleSlice::mafViewSingleSlice(wxString label, int camera_position, bool show_axes, bool show_grid, bool show_ruler, int stereo, bool show_orientation)
-:mafViewVTK(label,camera_position,show_axes,show_grid, show_ruler, stereo, show_orientation)
+mafViewSingleSlice::mafViewSingleSlice(wxString label, int camera_position, bool show_axes, bool show_grid, int stereo, bool show_orientation)
+:mafViewVTK(label,camera_position,show_axes,show_grid, stereo, show_orientation)
 //----------------------------------------------------------------------------
 {
   m_CurrentVolume = NULL;
@@ -106,7 +106,7 @@ mafView *mafViewSingleSlice::Copy(mafObserver *Listener, bool lightCopyEnabled)
 //----------------------------------------------------------------------------
 {
   m_LightCopyEnabled = lightCopyEnabled;
-  mafViewSingleSlice *v = new mafViewSingleSlice(m_Label, m_CameraPositionId, m_ShowAxes,m_ShowGrid, m_ShowRuler, m_StereoType,m_ShowOrientator);
+  mafViewSingleSlice *v = new mafViewSingleSlice(m_Label, m_CameraPositionId, m_ShowAxes,m_ShowGrid, m_StereoType,m_ShowOrientator);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
   v->m_PipeMap = m_PipeMap;
@@ -122,7 +122,7 @@ void mafViewSingleSlice::Create()
 
   RWI_LAYERS num_layers = TWO_LAYER;
   
-  m_Rwi = new mafRWI(mafGetFrame(), num_layers, m_ShowGrid, m_ShowAxes, m_ShowRuler, m_StereoType, m_ShowOrientator);
+  m_Rwi = new mafRWI(mafGetFrame(), num_layers, m_ShowGrid, m_ShowAxes, m_StereoType, m_ShowOrientator);
   m_Rwi->SetListener(this);
   m_Rwi->CameraSet(m_CameraPositionId);
   m_Win = m_Rwi->m_RwiBase;
