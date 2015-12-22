@@ -107,8 +107,8 @@ mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
 	m_LocaleSettings = new mafGUILocaleSettings(this);
 	m_ApplicationSettings = new mafGUIApplicationSettings(this);
 	m_StorageSettings = new mafGUISettingsStorage(this);
-	m_TimeBarSettings = new mafGUISettingsTimeBar(this);
-
+	m_TimeBarSettings = NULL;
+		
 	m_ToolBar       = NULL;
 	m_MenuBar       = NULL;
 
@@ -156,8 +156,6 @@ mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
   
   m_SettingsDialog = new mafGUISettingsDialog();
 
-  m_ApplicationLayoutSettings = NULL;
-
   m_HelpSettings = NULL;
 
   m_Revision = _("0.1");
@@ -170,6 +168,9 @@ mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
 
   m_User = new mafUser();
 
+	m_ShowStorageSettings=false;
+	m_ShowInteractionSettings=false; 
+
 }
 //----------------------------------------------------------------------------
 mafLogicWithManagers::~mafLogicWithManagers()
@@ -181,7 +182,6 @@ mafLogicWithManagers::~mafLogicWithManagers()
 
   // Managers are destruct in the OnClose
   cppDEL(m_User);
-  cppDEL(m_ApplicationLayoutSettings);
   cppDEL(m_HelpSettings);
   cppDEL(m_PrintSupport);
   cppDEL(m_SettingsDialog);
@@ -194,6 +194,9 @@ mafLogicWithManagers::~mafLogicWithManagers()
 void mafLogicWithManagers::Configure()
 //----------------------------------------------------------------------------
 {
+
+	if(m_PlugTimebar)
+		m_TimeBarSettings = new mafGUISettingsTimeBar(this);
 
   if(m_UseVMEManager)
   {
@@ -251,17 +254,19 @@ void mafLogicWithManagers::Configure()
 
   // Fill the SettingsDialog
   m_SettingsDialog->AddPage( m_ApplicationSettings->GetGui(), m_ApplicationSettings->GetLabel());
-  m_SettingsDialog->AddPage( m_StorageSettings->GetGui(), m_StorageSettings->GetLabel());
+  
+	//Storage Settings disabled from GUI
+	if(m_ShowStorageSettings)
+		m_SettingsDialog->AddPage( m_StorageSettings->GetGui(), m_StorageSettings->GetLabel());
 	
   m_HelpSettings = new mafGUISettingsHelp(this);
   m_SettingsDialog->AddPage(m_HelpSettings->GetGui(), m_HelpSettings->GetLabel());
 
-// currently mafInteraction is strictly dependent on VTK (marco)
-#ifdef MAF_USE_VTK
-  if(m_InteractionManager)
-    m_SettingsDialog->AddPage(m_InteractionManager->GetGui(), _("Interaction Manager"));
-#endif    
-  if(m_LocaleSettings)
+
+	if(m_ShowInteractionSettings && m_InteractionManager)
+    //m_SettingsDialog->AddPage(m_InteractionManager->GetGui(), _("Interaction Manager"));
+
+	if(m_LocaleSettings)
     m_SettingsDialog->AddPage(m_LocaleSettings->GetGui(), m_LocaleSettings->GetLabel());
 
   if (m_TimeBarSettings)
@@ -1953,7 +1958,7 @@ void mafLogicWithManagers::TimeSet(double t)
   {
     m_VMEManager->TimeSet(t);
   }
-  if(m_ViewManager)
+  if(m_ViewManager && m_TimeBarSettings)
   {
     m_ViewManager->CameraUpdate(m_TimeBarSettings->GetPlayingInActiveViewport() != 0);
   }
