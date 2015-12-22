@@ -128,7 +128,8 @@ protected:
 
   mafGUI *m_AppendingGUI;
   
-  mafGUI *m_CurrentVmeGui;
+	mafGUI *m_CurrentVmeGui;
+	mafGUI *m_CurrentVmeOutputGui;
   mafGUI *m_CurrentPipeGui;
 
   int m_Style;

@@ -45,6 +45,7 @@ mafSideBar::mafSideBar(wxWindow* parent, int id, mafObserver *Listener, long sty
   m_SelectedVme  = NULL;
   m_SelectedView = NULL;
   m_CurrentVmeGui = NULL;
+	m_CurrentVmeOutputGui = NULL;
   m_CurrentPipeGui = NULL;
 	m_AppendingGUI = NULL;
   m_Listener = Listener;
@@ -234,7 +235,12 @@ void mafSideBar::UpdateVmePanel()
   mafGUI       *vme_pipe_gui = NULL;
 	if(m_AppendingGUI && m_CurrentVmeGui)
 		m_AppendingGUI->Remove(m_CurrentVmeGui);
+	
+	if(m_AppendingGUI && m_CurrentVmeOutputGui)
+		m_AppendingGUI->Remove(m_CurrentVmeOutputGui);
+	
 	m_AppendingGUI = NULL;
+
   
 	if(m_SelectedVme)
 	{
@@ -265,6 +271,7 @@ void mafSideBar::UpdateVmePanel()
 	
 	  m_CurrentPipeGui = vme_pipe_gui;
 	  m_CurrentVmeGui = vme_gui;
+		m_CurrentVmeOutputGui = vme_out_gui;
 	
 	  
 	  m_AppendingGUI = new mafGUI(NULL);
