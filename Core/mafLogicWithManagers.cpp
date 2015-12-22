@@ -65,7 +65,6 @@
 #include "mafGUITimeBar.h"
 #include "mafGUIMaterialChooser.h"
 #include "mafGUIViewFrame.h"
-#include "mafGUILocaleSettings.h"
 #include "mafGUIApplicationSettings.h"
 #include "mafGUISettingsStorage.h"
 #include "mafGUISettingsTimeBar.h"
@@ -104,7 +103,6 @@ mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
 	m_Win->SetListener(this);
 
 	m_ChildFrameStyle = wxCAPTION | wxMAXIMIZE_BOX | wxMINIMIZE_BOX | wxRESIZE_BORDER; //wxTHICK_FRAME; // Default style
-	m_LocaleSettings = new mafGUILocaleSettings(this);
 	m_ApplicationSettings = new mafGUIApplicationSettings(this);
 	m_StorageSettings = new mafGUISettingsStorage(this);
 	m_TimeBarSettings = NULL;
@@ -185,7 +183,6 @@ mafLogicWithManagers::~mafLogicWithManagers()
   cppDEL(m_HelpSettings);
   cppDEL(m_PrintSupport);
   cppDEL(m_SettingsDialog);
-	cppDEL(m_LocaleSettings);
 	cppDEL(m_ApplicationSettings);
 	cppDEL(m_StorageSettings);
 	cppDEL(m_TimeBarSettings);
@@ -266,10 +263,7 @@ void mafLogicWithManagers::Configure()
 	if(m_ShowInteractionSettings && m_InteractionManager)
     //m_SettingsDialog->AddPage(m_InteractionManager->GetGui(), _("Interaction Manager"));
 
-	if(m_LocaleSettings)
-    m_SettingsDialog->AddPage(m_LocaleSettings->GetGui(), m_LocaleSettings->GetLabel());
-
-  if (m_TimeBarSettings)
+	if (m_TimeBarSettings)
     m_SettingsDialog->AddPage(m_TimeBarSettings->GetGui(), m_TimeBarSettings->GetLabel());
 
   ConfigureWizardManager();

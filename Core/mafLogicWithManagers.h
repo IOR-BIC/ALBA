@@ -48,7 +48,6 @@ class mafWizard;
 class mafGUITimeBar;
 class mafWXLog;
 class mafVTKLog;
-class mafGUILocaleSettings;
 class mafGUIApplicationSettings;
 class mafGUISettingsStorage;
 class mafGUISettingsTimeBar;
@@ -409,7 +408,6 @@ protected:
 	bool               m_LogToFile;
 	mafWXLog          *m_Logger;
 	mafVTKLog         *m_VtkLog;
-	mafGUILocaleSettings *m_LocaleSettings;
 	mafGUIApplicationSettings *m_ApplicationSettings;
 	mafGUISettingsStorage  *m_StorageSettings;
 	mafGUISettingsTimeBar  *m_TimeBarSettings;

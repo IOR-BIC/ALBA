@@ -78,8 +78,6 @@ SET(PROJECT_SRCS
   mafGUIListBox.h
   mafGUIListCtrl.cpp
   mafGUIListCtrl.h
-  mafGUILocaleSettings.cpp
-  mafGUILocaleSettings.h
   mafGUIMovieCtrl.cpp
   mafGUIMovieCtrl.h
   mafGUIMDIChild.cpp
