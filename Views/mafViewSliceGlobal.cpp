@@ -73,8 +73,8 @@ enum TEXT_MODE
 };
 
 //----------------------------------------------------------------------------
-mafViewSliceGlobal::mafViewSliceGlobal(wxString label /* =  */, int camera_position /* = CAMERA_CT */, bool show_axes /* = false */, bool show_grid /* = false */, bool show_ruler /* = false */, int stereo /* = 0 */,bool showTICKs/* =false */,bool textureInterpolate/* =true */)
-:mafViewSlice(label,camera_position,show_axes,show_grid, show_ruler, stereo,showTICKs,textureInterpolate)
+mafViewSliceGlobal::mafViewSliceGlobal(wxString label /* =  */, int camera_position /* = CAMERA_CT */, bool show_axes /* = false */, bool show_grid /* = false */, int stereo /* = 0 */,bool showTICKs/* =false */,bool textureInterpolate/* =true */)
+:mafViewSlice(label,camera_position,show_axes,show_grid, stereo,showTICKs,textureInterpolate)
 //----------------------------------------------------------------------------
 {
   m_GlobalBounds[0] = m_GlobalBounds[2] = m_GlobalBounds[4] = -1000.0;
@@ -124,7 +124,7 @@ mafView *mafViewSliceGlobal::Copy(mafObserver *Listener, bool lightCopyEnabled)
 //----------------------------------------------------------------------------
 {
   m_LightCopyEnabled = lightCopyEnabled;
-  mafViewSliceGlobal *v = new mafViewSliceGlobal(m_Label, m_CameraPositionId, m_ShowAxes,m_ShowGrid, m_ShowRuler, m_StereoType,m_ShowVolumeTICKs,m_TextureInterpolate);
+  mafViewSliceGlobal *v = new mafViewSliceGlobal(m_Label, m_CameraPositionId, m_ShowAxes,m_ShowGrid, m_StereoType,m_ShowVolumeTICKs,m_TextureInterpolate);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
   v->m_PipeMap = m_PipeMap;

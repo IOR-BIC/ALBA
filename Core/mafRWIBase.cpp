@@ -703,7 +703,7 @@ wxBitmap *mafRWIBase::GetImage(int magnification)
   return bmp;
 }
 //----------------------------------------------------------------------------
-void mafRWIBase::SaveImage(mafString filename, int magnification , int forceExtension)
+void mafRWIBase::SaveImage(mafString filename, int magnification)
 //---------------------------------------------------------------------------
 {
   wxString path, name, ext;
@@ -711,28 +711,8 @@ void mafRWIBase::SaveImage(mafString filename, int magnification , int forceExte
   if (filename.IsEmpty() || ext.IsEmpty())
   {
     wxString wildc = "Image (*.bmp)|*.bmp|Image (*.jpg)|*.jpg|Image (*.png)|*.png|Image (*.ps)|*.ps|Image (*.tiff)|*.tiff";
-//    wxString file = wxString::Format("%s\\%sSnapshot", m_SaveDir.GetCStr(),filename.GetCStr());
     wxString file = "";
-    switch(forceExtension)
-    {
-      case mafGUIApplicationSettings::JPG :
-        wildc = "Image (*.jpg)|*.jpg";
-      break;
-      case mafGUIApplicationSettings::BMP:
-        wildc = "Image (*.bmp)|*.bmp";
-        break;
-      case mafGUIApplicationSettings::PNG:
-        wildc = "Image (*.png)|*.png";
-      break;
-    }
-/*
-    if(!wxDirExists(path))
-    {
-      file = m_SaveDir;
-      file +=  "\\";
-      filename = name.c_str();
-    }
-*/    
+
     file.Append(filename);
     file = mafGetSaveFile(file,wildc).c_str(); 
     if(file.IsEmpty()) 
@@ -743,21 +723,6 @@ void mafRWIBase::SaveImage(mafString filename, int magnification , int forceExte
   wxString temporary = filename.GetCStr();
   temporary = temporary.AfterLast('\\').AfterFirst('.');
 
-  switch(forceExtension)
-  {
-    case mafGUIApplicationSettings::JPG :
-    if(temporary != _("jpg"))
-      filename += _(".jpg");
-    break;
-    case mafGUIApplicationSettings::BMP:
-    if(temporary != _("bmp"))
-      filename += _(".bmp");
-    break;
-    case mafGUIApplicationSettings::PNG:
-      if(temporary != _("png"))
-        filename += _(".png");
-    break;
-  }
 
   mafString basename = filename.BaseName();
   if (basename.IsEmpty())
@@ -904,7 +869,7 @@ void mafRWIBase::SaveImage(mafString filename, int magnification , int forceExte
   ::wxEndBusyCursor();
 }
 //----------------------------------------------------------------------------
-void mafRWIBase::SaveImageRecursive(mafString filename, mafViewCompound *v,int magnification,int forceExtension)
+void mafRWIBase::SaveImageRecursive(mafString filename, mafViewCompound *v,int magnification)
 //----------------------------------------------------------------------------
 {
   if(v == NULL) return;
@@ -916,19 +881,8 @@ void mafRWIBase::SaveImageRecursive(mafString filename, mafViewCompound *v,int m
     //wxString wildc = "Image (*.bmp)|*.bmp|Image (*.jpg)|*.jpg";
     wxString wildc = "Image (*.bmp)|*.bmp|Image (*.jpg)|*.jpg|Image (*.png)|*.png|Image (*.ps)|*.ps|Image (*.tiff)|*.tiff";
     wxString file = wxString::Format("%s\\%sSnapshot", m_SaveDir.GetCStr(),filename.GetCStr());
-    switch(forceExtension)
-    {
-    case mafGUIApplicationSettings::JPG :
-      wildc = "Image (*.jpg)|*.jpg";
-      break;
-    case mafGUIApplicationSettings::BMP:
-      wildc = "Image (*.bmp)|*.bmp";
-      break;
-    case mafGUIApplicationSettings::PNG:
-      wildc = "Image (*.png)|*.png";
-      break;
-    }
-    //mafString file ;
+  
+		//mafString file ;
     if(!wxDirExists(path))
     {
       file = m_SaveDir;
@@ -946,22 +900,7 @@ void mafRWIBase::SaveImageRecursive(mafString filename, mafViewCompound *v,int m
   wxString temporary = filename.GetCStr();
   temporary = temporary.AfterLast('\\').AfterFirst('.');
 
-  switch(forceExtension)
-  {
-  case mafGUIApplicationSettings::JPG :
-    if(temporary != _("jpg"))
-      filename += _(".jpg");
-    break;
-  case mafGUIApplicationSettings::BMP:
-    if(temporary != _("bmp"))
-      filename += _(".bmp");
-    break;
-  case mafGUIApplicationSettings::PNG:
-    if(temporary != _("png"))
-      filename += _(".png");
-    break;
-  }
-
+ 
   mafString basename = filename.BaseName();
   if (basename.IsEmpty())
   {
@@ -1156,7 +1095,7 @@ void mafRWIBase::RecursiveSaving(mafString filename, mafViewCompound *v,int magn
   }
 }
 //----------------------------------------------------------------------------
-void mafRWIBase::SaveAllImages(mafString filename, mafViewCompound *v, int forceExtension)
+void mafRWIBase::SaveAllImages(mafString filename, mafViewCompound *v)
 //---------------------------------------------------------------------------
 {
   if(v == NULL) return;
@@ -1165,18 +1104,6 @@ void mafRWIBase::SaveAllImages(mafString filename, mafViewCompound *v, int force
   if (filename.IsEmpty() || ext.IsEmpty())
   {
     mafString wildc = "Image (*.jpg)|*.jpg|Image (*.bmp)|*.bmp|Image (*.png)|*.png";
-    switch(forceExtension)
-    {
-    case mafGUIApplicationSettings::JPG :
-      wildc = "Image (*.jpg)|*.jpg";
-      break;
-    case mafGUIApplicationSettings::BMP:
-      wildc = "Image (*.bmp)|*.bmp";
-      break;
-    case mafGUIApplicationSettings::PNG:
-      wildc = "Image (*.png)|*.png";
-      break;
-    }
     mafString file;
     if(!wxDirExists(path))
     {
@@ -1194,21 +1121,6 @@ void mafRWIBase::SaveAllImages(mafString filename, mafViewCompound *v, int force
   wxString temporary = filename.GetCStr();
   temporary = temporary.AfterLast('\\').AfterFirst('.');
 
-  switch(forceExtension)
-  {
-  case mafGUIApplicationSettings::JPG :
-    if(mafString(temporary) != _("jpg"))
-      filename += _(".jpg");
-    break;
-  case mafGUIApplicationSettings::BMP:
-    if(mafString(temporary) != _("bmp"))
-      filename += _(".bmp");
-    break;
-  case mafGUIApplicationSettings::PNG:
-    if(mafString(temporary) != _("png"))
-      filename += _(".png");
-    break;
-  }
 
   mafString basename = filename.BaseName();
   if (basename.IsEmpty())

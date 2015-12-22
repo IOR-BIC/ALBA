@@ -49,8 +49,8 @@ protected:
   /*virtual*/ bool CreatePageGroups(const char* szPageName, const mafGUIDynamicVP::SUPPORTED_VP_ENTRY* pPipes) {return true;}
   /*virtual*/ void    UpdateGUILayout(bool bForce){}
   /*virtual*/ void    OnChangeName(){printf("\nID_NAME\n");}
-  /*virtual*/ void    OnCreateVP(){printf("\ID_CREATE_VP\n");}
-  /*virtual*/ void    OnCloseVP(){printf("\ID_CLOSE_VP\n");}
+  /*virtual*/ void    OnCreateVP(){printf("\nID_CREATE_VP\n");}
+  /*virtual*/ void    OnCloseVP(){printf("\nID_CLOSE_VP\n");}
 };
 
 //----------------------------------------------------------------------------

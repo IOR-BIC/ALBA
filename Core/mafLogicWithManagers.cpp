@@ -65,14 +65,11 @@
 #include "mafGUITimeBar.h"
 #include "mafGUIMaterialChooser.h"
 #include "mafGUIViewFrame.h"
-#include "mafGUILocaleSettings.h"
-#include "mafGUIMeasureUnitSettings.h"
 #include "mafGUIApplicationSettings.h"
 #include "mafGUISettingsStorage.h"
 #include "mafGUISettingsTimeBar.h"
 #include "mafRemoteLogic.h"
 #include "mafGUISettingsDialog.h"
-#include "mafGUISettingsHelp.h"
 #ifdef WIN32
   #include "mafDeviceClientMAF.h"
 #endif
@@ -105,17 +102,14 @@ mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
 	m_Win->SetListener(this);
 
 	m_ChildFrameStyle = wxCAPTION | wxMAXIMIZE_BOX | wxMINIMIZE_BOX | wxRESIZE_BORDER; //wxTHICK_FRAME; // Default style
-	m_LocaleSettings = new mafGUILocaleSettings(this);
-	m_MeasureUnitSettings = new mafGUIMeasureUnitSettings(this);
 	m_ApplicationSettings = new mafGUIApplicationSettings(this);
 	m_StorageSettings = new mafGUISettingsStorage(this);
-	m_TimeBarSettings = new mafGUISettingsTimeBar(this);
-
+	m_TimeBarSettings = NULL;
+		
 	m_ToolBar       = NULL;
 	m_MenuBar       = NULL;
 
 	m_LogToFile			= m_ApplicationSettings->GetLogToFileStatus();
-	m_LogAllEvents	= m_ApplicationSettings->GetLogVerboseStatus();
 	m_Logger				= NULL;
 	m_VtkLog        = NULL;
 
@@ -154,17 +148,10 @@ mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
 
   m_MaterialChooser = NULL;
 
-  // this is needed to manage events coming from the widget
-  // when the user change the unit settings.
-  m_MeasureUnitSettings->SetListener(this);
-
+  
   m_PrintSupport = new mafPrintSupport();
   
   m_SettingsDialog = new mafGUISettingsDialog();
-
-  m_ApplicationLayoutSettings = NULL;
-
-  m_HelpSettings = NULL;
 
   m_Revision = _("0.1");
 
@@ -175,6 +162,9 @@ mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
   m_WizardManager = NULL;
 
   m_User = new mafUser();
+
+	m_ShowStorageSettings=false;
+	m_ShowInteractionSettings=false; 
 
 }
 //----------------------------------------------------------------------------
@@ -187,12 +177,8 @@ mafLogicWithManagers::~mafLogicWithManagers()
 
   // Managers are destruct in the OnClose
   cppDEL(m_User);
-  cppDEL(m_ApplicationLayoutSettings);
-  cppDEL(m_HelpSettings);
   cppDEL(m_PrintSupport);
   cppDEL(m_SettingsDialog);
-	cppDEL(m_LocaleSettings);
-	cppDEL(m_MeasureUnitSettings);
 	cppDEL(m_ApplicationSettings);
 	cppDEL(m_StorageSettings);
 	cppDEL(m_TimeBarSettings);
@@ -201,6 +187,9 @@ mafLogicWithManagers::~mafLogicWithManagers()
 void mafLogicWithManagers::Configure()
 //----------------------------------------------------------------------------
 {
+
+	if(m_PlugTimebar)
+		m_TimeBarSettings = new mafGUISettingsTimeBar(this);
 
   if(m_UseVMEManager)
   {
@@ -258,23 +247,15 @@ void mafLogicWithManagers::Configure()
 
   // Fill the SettingsDialog
   m_SettingsDialog->AddPage( m_ApplicationSettings->GetGui(), m_ApplicationSettings->GetLabel());
-  m_SettingsDialog->AddPage( m_StorageSettings->GetGui(), m_StorageSettings->GetLabel());
+  
+	//Storage Settings disabled from GUI
+	if(m_ShowStorageSettings)
+		m_SettingsDialog->AddPage( m_StorageSettings->GetGui(), m_StorageSettings->GetLabel());
 	
-  m_HelpSettings = new mafGUISettingsHelp(this);
-  m_SettingsDialog->AddPage(m_HelpSettings->GetGui(), m_HelpSettings->GetLabel());
+  if(m_ShowInteractionSettings && m_InteractionManager)
+    //m_SettingsDialog->AddPage(m_InteractionManager->GetGui(), _("Interaction Manager"));
 
-// currently mafInteraction is strictly dependent on VTK (marco)
-#ifdef MAF_USE_VTK
-  if(m_InteractionManager)
-    m_SettingsDialog->AddPage(m_InteractionManager->GetGui(), _("Interaction Manager"));
-#endif    
-  if(m_LocaleSettings)
-    m_SettingsDialog->AddPage(m_LocaleSettings->GetGui(), m_LocaleSettings->GetLabel());
-
-  if (m_MeasureUnitSettings)
-    m_SettingsDialog->AddPage(m_MeasureUnitSettings->GetGui(), m_MeasureUnitSettings->GetLabel());
-
-  if (m_TimeBarSettings)
+	if (m_TimeBarSettings)
     m_SettingsDialog->AddPage(m_TimeBarSettings->GetGui(), m_TimeBarSettings->GetLabel());
 
   ConfigureWizardManager();
@@ -975,7 +956,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 				mafViewCompound *v = mafViewCompound::SafeDownCast(m_ViewManager->GetSelectedView());
         if (v && e->GetBool())
         {
-          v->GetRWI()->SaveAllImages(v->GetLabel(),v, m_ApplicationSettings->GetImageTypeId());
+          v->GetRWI()->SaveAllImages(v->GetLabel(),v);
         }
         else
         {
@@ -1041,9 +1022,6 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       // commands related to interaction manager
       case ID_APP_SETTINGS:
         m_SettingsDialog->ShowModal();
-      break;
-      case mafGUIMeasureUnitSettings::MEASURE_UNIT_UPDATED:
-        UpdateMeasureUnit();
       break;
       case CAMERA_PRE_RESET:
 // currently mafInteraction is strictly dependent on VTK (marco)
@@ -1173,24 +1151,22 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 
 			case HELP_HOME:
 				{
-					if (m_HelpSettings)
-					{
-						m_HelpSettings->OpenHelpPage("HELP_HOME");
-					}	
+				
 				}
 				break;
 
 			case GET_BUILD_HELP_GUI:
 			{	
 				int buildGui = -1;
-				if (m_HelpSettings == NULL)
+				//Temporary solution - never build help until an help module is not ready
+				if (true)
 				{
 					buildGui = false;
 					e->SetArg(buildGui);
 				}
 				else
 				{
-					buildGui = m_HelpSettings->GetBuildHelpGui();
+					//Create code for help management here
 				}
 				e->SetArg(buildGui);
 			}
@@ -1200,7 +1176,8 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 			{
 				// open help for entity
 				wxString entity = e->GetString()->GetCStr();
-				m_HelpSettings->OpenHelpPage(entity);
+				
+				//Create code for help management/show here
 			}
 			break;
 			//-----from medLogic
@@ -1281,7 +1258,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 
 							imageFileName << tmpImageFile;
 
-							v->GetRWI()->SaveAllImages(imageFileName,v, m_ApplicationSettings->GetImageTypeId());
+							v->GetRWI()->SaveAllImages(imageFileName,v);
 
 							wxMessageBox(_("Snapshot saved!"));
 						}
@@ -1966,7 +1943,7 @@ void mafLogicWithManagers::TimeSet(double t)
   {
     m_VMEManager->TimeSet(t);
   }
-  if(m_ViewManager)
+  if(m_ViewManager && m_TimeBarSettings)
   {
     m_ViewManager->CameraUpdate(m_TimeBarSettings->GetPlayingInActiveViewport() != 0);
   }
@@ -2363,8 +2340,7 @@ void mafLogicWithManagers::CreateLogPanel()
 			wxMessageBox(wxString::Format("Unable to create log file %s!!",s),"Warning", wxOK|wxICON_WARNING);
 		}
 	}
-	m_Logger->SetVerbose(m_LogAllEvents);
-
+	
 	wxLog *old_log = wxLog::SetActiveTarget( m_Logger );
 	cppDEL(old_log);
 

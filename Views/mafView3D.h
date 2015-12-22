@@ -43,7 +43,7 @@ initialize the visual pipe according to the camera position that is passed throu
 class MAF_EXPORT mafView3D: public mafViewVTK
 {
 public:
-  mafView3D(wxString label = "3D", int camera_position = CAMERA_PERSPECTIVE, bool show_axes = false, bool show_grid = false, bool show_ruler = false, int stereo = 0);
+  mafView3D(wxString label = "3D", int camera_position = CAMERA_PERSPECTIVE, bool show_axes = false, bool show_grid = false, int stereo = 0);
   virtual ~mafView3D(); 
 
   mafTypeMacro(mafView3D, mafViewVTK);

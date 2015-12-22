@@ -50,7 +50,7 @@ class MAF_EXPORT mafViewVTK: public mafView
 public:
 
   /** constructor */
-  mafViewVTK(const wxString &label = "vtkView", int camera_position = CAMERA_PERSPECTIVE, bool show_axes = true, bool show_grid = false, bool show_ruler = false, int stereo = 0, bool show_orientator = false, int axesType = mafAxes::TRIAD);
+  mafViewVTK(const wxString &label = "vtkView", int camera_position = CAMERA_PERSPECTIVE, bool show_axes = true, bool show_grid = false, int stereo = 0, bool show_orientator = false, int axesType = mafAxes::TRIAD);
   /** constructor */
   virtual ~mafViewVTK(); 
   /** RTTI macro */
@@ -106,9 +106,6 @@ public:
   
   /** Delete vme's visual pipe. It is called when vme is removed from visualization.*/
   virtual void VmeDeletePipe(mafNode *vme);
-
-  /** Called to update all components that depends on Application Options.*/
-  virtual void OptionsUpdate();
 
 	virtual void CameraReset(mafNode *node = NULL);
   virtual void CameraSet(int camera_position);
@@ -178,7 +175,6 @@ protected:
   int   m_CameraPositionId; ///< Integer representing a preset for camera position, focal point and view up.
   bool  m_ShowAxes;  ///< Flag used to show/hide axes in low left corner of the view
   int   m_StereoType; ///< Indicate the stereo type to use with the view
-  bool  m_ShowRuler;
   bool  m_ShowGrid;
   bool m_ShowOrientator;
   int  m_AxesType;

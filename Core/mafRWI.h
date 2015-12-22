@@ -36,7 +36,6 @@ class mafSceneGraph;
 class mafAxes;
 class mafGUI;
 class mafGUIPicButton;
-class vtkMAFSimpleRulerActor2D;
 class vtkMAFTextOrientator;
 class vtkMAFProfilingActor;
 
@@ -55,7 +54,7 @@ class MAF_EXPORT mafRWI : public mafObserver
 {
 public:
 	mafRWI();
-	mafRWI(wxWindow *parent, RWI_LAYERS layers = ONE_LAYER, bool use_grid = false, bool show_axes = false, bool show_ruler = false, int stereo = 0, bool show_orientator = false, int axesType = mafAxes::TRIAD) ;
+	mafRWI(wxWindow *parent, RWI_LAYERS layers = ONE_LAYER, bool use_grid = false, bool show_axes = false, int stereo = 0, bool show_orientator = false, int axesType = mafAxes::TRIAD) ;
 	virtual	~mafRWI();
 
 	virtual void SetListener(mafObserver *Listener) {m_Listener = Listener;};
@@ -63,7 +62,7 @@ public:
 	virtual void OnEvent(mafEventBase *maf_event);
 
 	/** Create all the elements necessary to build the rendering scene.*/
-	void CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers = ONE_LAYER, bool use_grid = false, bool show_axes = false, bool show_ruler = false, int stereo = 0, bool show_orientator = false, int axesType = mafAxes::TRIAD);
+	void CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers = ONE_LAYER, bool use_grid = false, bool show_axes = false,  int stereo = 0, bool show_orientator = false, int axesType = mafAxes::TRIAD);
 
 	/** Reset the camera position. If vme is passed as parameter, the camera is resetted to fill the vme into the view. */
 	void CameraReset(mafNode *vme = NULL, double zoom = 1);
@@ -108,34 +107,20 @@ public:
 	/** Set the visibility for the axes actor. */
 	void SetAxesVisibility(bool show);
 
-	/** Set the visibility for the rule actor. */
-	void SetRuleVisibility(bool show = true);
-
-	/** Set the visibility for the rule actor. */
+	/** Set the visibility for the orientation actor. */
 	void SetOrientatorVisibility(bool show = true);
 
-	/** Set the visibility for the rule actor. */
+	/** Set the visibility for the orientation single actor. */
 	void SetOrientatorSingleActorVisibility(bool showLeft = true, bool showDown = true, bool showRight = true, bool showUp = true);
 
-	/** Set the text for the rule actor. */
+	/** Set the text for the orientator actor. */
 	void SetOrientatorSingleActorText(const char* textLeft, const char* textDown, const char* textRight, const char* textUp);
-
-	/** Set the scale factor to convert the data scale to the visualized scale of the rule. 
-	By default the ruler shows the same scale of the data. */
-	void SetRulerScaleFactor(const double &scale_factor);
-
-	/** Set the label of the ruler. Example the unit measure of the data. */
-	void SetRulerLegend(const mafString &ruler_legend);
 
 	/** Set Orientator Text Properties */
 	void SetOrientatorProperties(double rgbText[3], double rgbBackground[3], double scale = 1);
 
 	/** Set Profiling Information Text Visibility*/
 	void SetProfilingActorVisibility(bool show);
-
-	/** Update scale factor and legend.
-	This method is called from logic to update measure unit according to the application settings.*/
-	void UpdateRulerUnit();
 
 	virtual mafGUI *GetGui();
 
@@ -145,10 +130,7 @@ public:
 	/** Allow to add/remove current vtkCamera to the list of vtkCamera linked together*/
 	void LinkCamera(bool linc_camera = true);
 
-	/* Return active ruler for using its methods*/
-	vtkMAFSimpleRulerActor2D *GetRuler(){return m_Ruler;};
-
-  /* Reset camera clipping range using visualized actors */
+	/* Reset camera clipping range using visualized actors */
   void ResetCameraClippingRange();
 
 	mafSceneGraph    *m_Sg; 
@@ -191,10 +173,6 @@ protected:
 	int               m_ShowAxes;  ///< Flag used to show/hide axes in low left corner of the view
 	int               m_LinkCamera;///< Flag that enable to synchronize camera interaction to other camera
 
-	double        m_RulerScaleFactor;
-	mafString     m_RulerLegend;
-	vtkMAFSimpleRulerActor2D *m_Ruler;
-	int           m_ShowRuler; ///< Flag used to show/hide ruler actor into a parallel view
 	int           m_StereoType;
 	vtkMAFTextOrientator     *m_Orientator;
 	int          m_ShowProfilingInformation;

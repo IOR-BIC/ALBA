@@ -53,8 +53,8 @@ mafCxxTypeMacro(mafViewRX);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mafViewRX::mafViewRX(wxString label, int camera_position, bool show_axes, bool show_grid, bool show_ruler, int stereo)
-:mafViewVTK(label,camera_position,show_axes,show_grid,show_ruler,stereo)
+mafViewRX::mafViewRX(wxString label, int camera_position, bool show_axes, bool show_grid,  int stereo)
+:mafViewVTK(label,camera_position,show_axes,show_grid,stereo)
 //----------------------------------------------------------------------------
 {
   m_CurrentVolume = NULL;
@@ -69,7 +69,7 @@ mafView *mafViewRX::Copy(mafObserver *Listener, bool lightCopyEnabled)
 //----------------------------------------------------------------------------
 {
   m_LightCopyEnabled = lightCopyEnabled;
-  mafViewRX *v = new mafViewRX(m_Label, m_CameraPositionId, m_ShowAxes,m_ShowGrid, m_ShowRuler, m_StereoType);
+  mafViewRX *v = new mafViewRX(m_Label, m_CameraPositionId, m_ShowAxes,m_ShowGrid, m_StereoType);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
   v->m_PipeMap = m_PipeMap;
@@ -83,7 +83,7 @@ void mafViewRX::Create()
 {
   if(m_LightCopyEnabled) return; //COPY_LIGHT
 
-  m_Rwi = new mafRWI(mafGetFrame(), TWO_LAYER, m_ShowGrid, m_ShowAxes, m_ShowRuler, m_StereoType);
+  m_Rwi = new mafRWI(mafGetFrame(), TWO_LAYER, m_ShowGrid, m_ShowAxes, m_StereoType);
   m_Rwi->SetListener(this);
   m_Rwi->CameraSet(m_CameraPositionId);
   m_Win = m_Rwi->m_RwiBase;
