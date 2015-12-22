@@ -70,7 +70,6 @@
 #include "mafGUISettingsTimeBar.h"
 #include "mafRemoteLogic.h"
 #include "mafGUISettingsDialog.h"
-#include "mafGUISettingsHelp.h"
 #ifdef WIN32
   #include "mafDeviceClientMAF.h"
 #endif
@@ -154,8 +153,6 @@ mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
   
   m_SettingsDialog = new mafGUISettingsDialog();
 
-  m_HelpSettings = NULL;
-
   m_Revision = _("0.1");
 
   m_Extension = "msf";
@@ -180,7 +177,6 @@ mafLogicWithManagers::~mafLogicWithManagers()
 
   // Managers are destruct in the OnClose
   cppDEL(m_User);
-  cppDEL(m_HelpSettings);
   cppDEL(m_PrintSupport);
   cppDEL(m_SettingsDialog);
 	cppDEL(m_ApplicationSettings);
@@ -256,11 +252,7 @@ void mafLogicWithManagers::Configure()
 	if(m_ShowStorageSettings)
 		m_SettingsDialog->AddPage( m_StorageSettings->GetGui(), m_StorageSettings->GetLabel());
 	
-  m_HelpSettings = new mafGUISettingsHelp(this);
-  m_SettingsDialog->AddPage(m_HelpSettings->GetGui(), m_HelpSettings->GetLabel());
-
-
-	if(m_ShowInteractionSettings && m_InteractionManager)
+  if(m_ShowInteractionSettings && m_InteractionManager)
     //m_SettingsDialog->AddPage(m_InteractionManager->GetGui(), _("Interaction Manager"));
 
 	if (m_TimeBarSettings)
@@ -1159,24 +1151,22 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 
 			case HELP_HOME:
 				{
-					if (m_HelpSettings)
-					{
-						m_HelpSettings->OpenHelpPage("HELP_HOME");
-					}	
+				
 				}
 				break;
 
 			case GET_BUILD_HELP_GUI:
 			{	
 				int buildGui = -1;
-				if (m_HelpSettings == NULL)
+				//Temporary solution - never build help until an help module is not ready
+				if (true)
 				{
 					buildGui = false;
 					e->SetArg(buildGui);
 				}
 				else
 				{
-					buildGui = m_HelpSettings->GetBuildHelpGui();
+					//Create code for help management here
 				}
 				e->SetArg(buildGui);
 			}
@@ -1186,7 +1176,8 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 			{
 				// open help for entity
 				wxString entity = e->GetString()->GetCStr();
-				m_HelpSettings->OpenHelpPage(entity);
+				
+				//Create code for help management/show here
 			}
 			break;
 			//-----from medLogic

@@ -41,7 +41,6 @@ class mafRemoteLogic;
 class mafDeviceButtonsPadMouse;
 class mafGUISettingsDialog;
 class mafGUISettings;
-class mafGUISettingsHelp;
 class mafUser;
 class mafWizardManager;
 class mafWizard;
@@ -383,8 +382,7 @@ protected:
   bool m_UseOpManager;
   bool m_UseInteractionManager;
   mafGUISettingsDialog *m_SettingsDialog;
-  mafGUISettingsHelp *m_HelpSettings;
-
+  
   mafString m_Revision;
   mafString m_Extension;
 

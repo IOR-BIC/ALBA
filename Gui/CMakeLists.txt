@@ -120,8 +120,6 @@ SET(PROJECT_SRCS
   mafGUICrossIncremental.h
   mafGUIComboBox.cpp
   mafGUIComboBox.h
-  mafGUISettingsHelp.h
-  mafGUISettingsHelp.cpp
   mafGUILandmark.cpp
   mafGUILandmark.h
   mafGUIWizard.cpp
