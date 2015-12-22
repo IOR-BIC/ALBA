@@ -1199,7 +1199,7 @@ void mafGUI::DirOpen(int id,mafString label,mafString *var, mafString tooltip)
   {
     butt_w = EW;
   }
-  mafGUIButton    *butt = new mafGUIButton   (this, w_id, "browse",dp, wxSize(butt_w,BH));
+  mafGUIButton    *butt = new mafGUIButton   (this, w_id, "Browse",dp, wxSize(butt_w,BH));
   wxTextCtrl   *text = new wxTextCtrl  (this, GetWidgetId(id), "", dp, wxSize(text_w,BH),wxTE_READONLY|m_EntryStyle  );
   text->SetFont(m_Font);
 	butt->SetValidator( mafGUIValidator(this,w_id,butt,var,text) );

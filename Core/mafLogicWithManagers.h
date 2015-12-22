@@ -409,7 +409,6 @@ protected:
 	mafGUITimeBar      *m_TimePanel;
 	mafString					 m_AppTitle;
 	bool               m_LogToFile;
-	bool               m_LogAllEvents;
 	mafWXLog          *m_Logger;
 	mafVTKLog         *m_VtkLog;
 	mafGUILocaleSettings *m_LocaleSettings;

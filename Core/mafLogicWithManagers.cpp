@@ -113,7 +113,6 @@ mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
 	m_MenuBar       = NULL;
 
 	m_LogToFile			= m_ApplicationSettings->GetLogToFileStatus();
-	m_LogAllEvents	= m_ApplicationSettings->GetLogVerboseStatus();
 	m_Logger				= NULL;
 	m_VtkLog        = NULL;
 
@@ -966,7 +965,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 				mafViewCompound *v = mafViewCompound::SafeDownCast(m_ViewManager->GetSelectedView());
         if (v && e->GetBool())
         {
-          v->GetRWI()->SaveAllImages(v->GetLabel(),v, m_ApplicationSettings->GetImageTypeId());
+          v->GetRWI()->SaveAllImages(v->GetLabel(),v);
         }
         else
         {
@@ -1269,7 +1268,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 
 							imageFileName << tmpImageFile;
 
-							v->GetRWI()->SaveAllImages(imageFileName,v, m_ApplicationSettings->GetImageTypeId());
+							v->GetRWI()->SaveAllImages(imageFileName,v);
 
 							wxMessageBox(_("Snapshot saved!"));
 						}
@@ -2351,8 +2350,7 @@ void mafLogicWithManagers::CreateLogPanel()
 			wxMessageBox(wxString::Format("Unable to create log file %s!!",s),"Warning", wxOK|wxICON_WARNING);
 		}
 	}
-	m_Logger->SetVerbose(m_LogAllEvents);
-
+	
 	wxLog *old_log = wxLog::SetActiveTarget( m_Logger );
 	cppDEL(old_log);
 
