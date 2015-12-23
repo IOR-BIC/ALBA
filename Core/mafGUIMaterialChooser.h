@@ -86,9 +86,6 @@ protected:
   /** Store material library to file. */
   void StoreLibraryToFile();
 
-  void LoadMaterials_old();
-  void SaveMaterials_old();
-
   /** Store the current settings as a new material. */
 	void AddMaterial();
 
@@ -105,6 +102,7 @@ protected:
 
   std::vector<mmaMaterial	*> m_List;
 	mmaMaterial				*m_ChoosedMaterial;
+	long							 m_ChoosedMaterialId;
 	mmaMaterial       *m_VmeMaterial;
   mafVME            *m_Vme;
 	vtkSphereSource		*m_Sphere;

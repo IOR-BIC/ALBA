@@ -902,7 +902,7 @@ bool mafVMEManager::AskConfirmAndSave()
   bool go = true;
 	if (m_Modified) // check if the msf has been modified
 	{
-		int answer = wxMessageBox(_("your work is modified, would you like to save it?"),_("Confirm"),wxYES_NO|wxCANCEL|wxICON_QUESTION,mafGetFrame()); // ask user if will save msf before closing
+		int answer = wxMessageBox(_("Your work is modified, would you like to save it?"),_("Confirm"),wxYES_NO|wxCANCEL|wxICON_QUESTION,mafGetFrame()); // ask user if will save msf before closing
 		if(answer == wxCANCEL) go = false;
 		if(answer == wxYES)    MSFSave();
 	}

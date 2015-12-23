@@ -1622,7 +1622,7 @@ void mafLogicWithManagers::OnQuit()
     {
       int answer = wxMessageBox
           (
-          _("would you like to save your work before quitting ?"),
+          _("Would you like to save your work before quitting ?"),
           _("Confirm"), 
           wxYES_NO|wxCANCEL|wxICON_QUESTION , m_Win
           );
