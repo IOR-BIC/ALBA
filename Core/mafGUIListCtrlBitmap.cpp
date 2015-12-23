@@ -32,7 +32,7 @@
 const mafID ID_LIST = 200;
 
 BEGIN_EVENT_TABLE(mafGUIListCtrlBitmap,wxPanel)
-    EVT_LIST_ITEM_SELECTED(ID_LIST, mafGUIListCtrlBitmap::OnSelectionChanged)
+	EVT_LIST_ITEM_SELECTED(ID_LIST, mafGUIListCtrlBitmap::OnSelectionChanged)
 END_EVENT_TABLE()
 
 mafGUIListCtrlBitmap::mafGUIListCtrlBitmap( wxWindow* parent,wxWindowID id, bool CloseButton, bool HideTitle)
@@ -168,8 +168,8 @@ bool mafGUIListCtrlBitmap::SelectItem(long item_id)
     return false;
  
 	m_PreventNotify = true;
-  m_List->SetItemState(id, wxLIST_STATE_SELECTED, wxLIST_MASK_TEXT);
-  m_PreventNotify = false;
+	m_List->SetItemState(id, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+	m_PreventNotify = false;
   Refresh();
   
 	return true;
