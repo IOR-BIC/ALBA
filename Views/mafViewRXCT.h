@@ -96,6 +96,9 @@ public:
   /** catch on size event and modify layout*/
   virtual void			OnSize(wxSizeEvent &size_event);
 
+	/** return an xpm-icon that can be used to represent this view */
+	char ** GetIcon();
+
 protected:
   /**
   Internally used to create a new instance of the GUI. This function should be

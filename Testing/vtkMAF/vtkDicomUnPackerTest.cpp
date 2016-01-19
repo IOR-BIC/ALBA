@@ -33,8 +33,6 @@
 #include "vtkImageData.h"
 #include "vtkPlaneSource.h"
 
-#define min(x0, x1) (((x0) < (x1)) ? (x0) : (x1))
-#define max(x0, x1) (((x0) > (x1)) ? (x0) : (x1))
 #define DELTA 0.01
 
 //-------------------------------------------------------------------------
@@ -78,8 +76,8 @@ void vtkDicomUnPackerTest::ReadTest()
 			DicomReader->Update();
 			double DicomRange[2];
 			DicomReader->GetOutput()->GetScalarRange(DicomRange);
-			MinScalar = min(MinScalar,DicomRange[0]);
-			MaxScalar = max(MaxScalar,DicomRange[1]);
+			MinScalar = MIN(MinScalar,DicomRange[0]);
+			MaxScalar = MAX(MaxScalar,DicomRange[1]);
 			double Bounds[6];
 			DicomReader->GetOutput()->GetBounds(Bounds);
 			//Check dimensions XY
@@ -87,8 +85,8 @@ void vtkDicomUnPackerTest::ReadTest()
 			CPPUNIT_ASSERT(Bounds[1]+DELTA>379.26 && Bounds[1]-DELTA<379.26);
 			CPPUNIT_ASSERT(Bounds[2]+DELTA>0 && Bounds[2]-DELTA<0);
 			CPPUNIT_ASSERT(Bounds[3]+DELTA>379.26 && Bounds[3]-DELTA<379.26);
-			MaxZ=max(MaxZ,Bounds[5]);
-			MinZ=min(MinZ,Bounds[4]);
+			MaxZ=MAX(MaxZ,Bounds[5]);
+			MinZ=MIN(MinZ,Bounds[4]);
 
 			//Check modality
 			CPPUNIT_ASSERT(strcmp( DicomReader->GetModality(), "CT" ) == 0);

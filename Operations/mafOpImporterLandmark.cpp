@@ -48,7 +48,7 @@ mafOp(label)
 	m_OpType	= OPTYPE_IMPORTER;
 	m_Canundo	= false;
 	m_File		= "";
-	m_FileDir = mafGetDocumentsDirectory().c_str();
+	m_FileDir = mafGetLastUserFolder().c_str();
   m_TypeSeparation = 0;
   m_EnableString = 0;
   m_StringSeparation = mafString("");

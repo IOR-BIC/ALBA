@@ -62,7 +62,7 @@ mafOp(label)
   m_Input = NULL;
 
   m_UseIdArray = false;
-  m_IdArrayName = "ANSYS_ELEMENT_ID";
+  m_IdArrayName = "Id";
 }
 
 //----------------------------------------------------------------------------

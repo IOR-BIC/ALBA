@@ -413,8 +413,7 @@ void mafOpImporterDicomOffis::OpRun()
 			}
 			else if (lastDicomDir == "UNEDFINED_m_LastDicomDir")
 			{
-				wxString defaultPath = mafGetDocumentsDirectory().c_str();
-				lastDicomDir = defaultPath;		
+				lastDicomDir = mafGetLastUserFolder().c_str();		
 			};
 
 			//User should choice a folder

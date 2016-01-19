@@ -40,7 +40,7 @@ mafViewScalar is a View that got a RenderWindow and a SceneGraph
 class __declspec( dllexport ) mafViewScalar: public mafViewVTK
 {
 public:
-  mafViewScalar(wxString label = "Scalar", int camera_position = CAMERA_PERSPECTIVE, bool show_axes = true, bool show_grid = false, bool show_ruler = false, int stereo = 0);
+  mafViewScalar(wxString label = "Scalar", int camera_position = CAMERA_PERSPECTIVE, bool show_axes = true, bool show_grid = false, int stereo = 0);
   virtual ~mafViewScalar(); 
 
   mafTypeMacro(mafViewScalar, mafViewVTK);

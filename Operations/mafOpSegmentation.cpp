@@ -110,9 +110,6 @@
 #include "vtkImageClip.h"
 
 
-#define max(a,b)(((a) > (b)) ? (a) : (b))
-#define min(a,b)(((a) < (b)) ? (a) : (b))
-#define round(x) (x<0?ceil((x)-0.5):floor((x)+0.5))
 
 #define SPACING_PERCENTAGE_BOUNDS 0.1
 

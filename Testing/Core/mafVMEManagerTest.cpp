@@ -165,9 +165,8 @@ void mafVMEManagerTest::MSFOpenTest()
 {
   // test compatibility with other app stamps
   std::vector<mafString> stamps_v;
-  stamps_v.push_back("dummyAppStamp");
-  stamps_v.push_back("OPEN_ALL_DATA");
-  
+  stamps_v.push_back("mafVMEManagerTest");
+   
   m_Manager = new mafVMEManager();
   m_Manager->SetListener(this);
   m_Manager->SetApplicationStamp(stamps_v);

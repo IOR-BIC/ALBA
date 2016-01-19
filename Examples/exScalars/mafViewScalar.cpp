@@ -50,8 +50,8 @@ mafCxxTypeMacro(mafViewScalar);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mafViewScalar::mafViewScalar(wxString label, int camera_position, bool show_axes, bool show_grid, bool show_ruler, int stereo)
-:mafViewVTK(label,camera_position,show_axes,show_grid,show_ruler,stereo)
+mafViewScalar::mafViewScalar(wxString label, int camera_position, bool show_axes, bool show_grid, int stereo)
+:mafViewVTK(label,camera_position,show_axes,show_grid,stereo)
 //----------------------------------------------------------------------------
 {
   m_Files.clear();
@@ -79,7 +79,7 @@ mafViewScalar::~mafViewScalar()
 mafView *mafViewScalar::Copy(mafObserver *Listener)
 //----------------------------------------------------------------------------
 {
-  mafViewScalar *v = new mafViewScalar(m_Label, m_CameraPositionId, m_ShowAxes, m_ShowGrid, m_ShowRuler,m_StereoType);
+  mafViewScalar *v = new mafViewScalar(m_Label, m_CameraPositionId, m_ShowAxes, m_ShowGrid, m_StereoType);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
   v->m_PipeMap = m_PipeMap;
@@ -131,8 +131,9 @@ void mafViewScalar::OnEvent(mafEventBase *maf_event)
       break;
       case ID_ASCII_FILE:
       {
+        wxString lastFolder = mafGetLastUserFolder().c_str();
         wxString wildc = "(*.*)|*.*";
-        mafGetOpenMultiFiles("",wildc.c_str(),m_Files);
+        mafGetOpenMultiFiles(lastFolder,wildc.c_str(),m_Files);
         m_Gui->Enable(ID_DATA_ORDER,m_Files.size()>0);
         m_Gui->Enable(ID_READ_DATA,m_Files.size()>0);
       }

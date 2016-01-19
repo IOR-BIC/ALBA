@@ -29,7 +29,6 @@
 #include "mafDecl.h"
 #include "mafEvent.h"
 #include "mafPics.h"
-#include "mafGUIDockSettings.h"
 
 #ifdef __WIN32__
 #include <malloc.h>
@@ -115,21 +114,23 @@ END_EVENT_TABLE()
 
 
 //----------------------------------------------------------------------------
-mafGUIMDIFrame::mafGUIMDIFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
+mafGUIMDIFrame::mafGUIMDIFrame(const wxString& title, const wxPoint& pos, const wxSize& size, long style)
 //----------------------------------------------------------------------------
-: wxMDIParentFrame((wxFrame *)NULL, -1, title, pos, size, wxDEFAULT_FRAME_STYLE|wxHSCROLL|wxVSCROLL)
+: wxMDIParentFrame((wxFrame *)NULL, -1, title, pos, size, wxDEFAULT_FRAME_STYLE|wxHSCROLL|wxVSCROLL|style)
 {
   mafSetFrame( this );
 
   this->SetMinSize(wxSize(600,500)); // m_DockManager cant handle correctly the frame MinSize (yet)
   m_DockManager.SetFrame(this);
-  m_DockManager.GetArtProvider()->SetMetric(wxAUI_ART_PANE_BORDER_SIZE,0 );
-  m_DockManager.GetArtProvider()->SetColor(wxAUI_ART_INACTIVE_CAPTION_COLOUR, m_DockManager.GetArtProvider()->GetColor(wxAUI_ART_ACTIVE_CAPTION_COLOUR));
-  m_DockManager.GetArtProvider()->SetColor(wxAUI_ART_INACTIVE_CAPTION_GRADIENT_COLOUR, m_DockManager.GetArtProvider()->GetColor(wxAUI_ART_ACTIVE_CAPTION_GRADIENT_COLOUR));
-  m_DockManager.GetArtProvider()->SetColor(wxAUI_ART_INACTIVE_CAPTION_TEXT_COLOUR, m_DockManager.GetArtProvider()->GetColor(wxAUI_ART_ACTIVE_CAPTION_TEXT_COLOUR));
+	wxDockArt* artProvider = m_DockManager.GetArtProvider();
+  artProvider->SetMetric(wxAUI_ART_PANE_BORDER_SIZE,0 );
+	
+  artProvider->SetColor(wxAUI_ART_INACTIVE_CAPTION_COLOUR, artProvider->GetColor(wxAUI_ART_ACTIVE_CAPTION_GRADIENT_COLOUR));
+  artProvider->SetColor(wxAUI_ART_INACTIVE_CAPTION_GRADIENT_COLOUR, artProvider->GetColor(wxAUI_ART_ACTIVE_CAPTION_COLOUR));
+  artProvider->SetColor(wxAUI_ART_INACTIVE_CAPTION_TEXT_COLOUR, artProvider->GetColor(wxAUI_ART_ACTIVE_CAPTION_TEXT_COLOUR));
+	artProvider->SetMetric(wxAUI_ART_GRADIENT_TYPE, wxAUI_GRADIENT_HORIZONTAL);
   m_DockManager.Update();
-  m_DockSettings = new mafGUIDockSettings(m_DockManager);
-
+  
   m_ID_PBCall = 0;
   m_PBCalls.clear();
   m_MemoryLimitAlert = 50; // 50 MB is the default low limit to alert the user.
@@ -172,8 +173,6 @@ mafGUIMDIFrame::~mafGUIMDIFrame()
 #endif 
 
   m_PBCalls.clear();
-  //m_DockManager.UnInit(); - must be done in OnQuit
-  cppDEL(m_DockSettings);
 
   mafSetFrame(NULL);
 }
@@ -261,7 +260,7 @@ void mafGUIMDIFrame::CreateStatusbar()
   static const int widths[]={-1,60,60,60,210,100}; // enlarged the last tab for the "free mem watch" information
 	CreateStatusBar(6); 
   m_frameStatusBar->SetStatusWidths(6,widths);
-	SetStatusText( _("welcome"),0);
+	SetStatusText( _("Welcome"),0);
 	SetStatusText( " ",1);
 	SetStatusText( " ",2);
 	SetStatusText( " ",3);

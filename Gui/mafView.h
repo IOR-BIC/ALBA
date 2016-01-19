@@ -176,6 +176,9 @@ public:
   /** Return the picker used to pick the in the render window */
   vtkCellPicker *GetPicker2D() {return m_Picker2D;};
 
+	/** return an xpm-icon that can be used to represent this view */
+	virtual char ** GetIcon();
+
 protected:
   mafObserver   *m_Listener;
   wxString       m_Label;

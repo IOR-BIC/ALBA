@@ -117,7 +117,7 @@ void mafLUTLibrary::SaveLUT( vtkLookupTable *inLut, const char *outFileName)
   output << "NumberOfTableValues" << '\t' << numberOfTableValues << std::endl;
   output << std::endl;
 
-  output << "id"  << '\t' << "red" << '\t' << "green" << '\t' << "blue" << '\t'
+  output << "Id"  << '\t' << "red" << '\t' << "green" << '\t' << "blue" << '\t'
     << "alpha" << std::endl;
 
   for(int i=0; i<numberOfTableValues; i++)

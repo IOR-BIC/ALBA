@@ -64,7 +64,7 @@ mafGUIVMEChooserTree::mafGUIVMEChooserTree( wxWindow *parent, mafGUICheckTree *t
   if (!multiSelect)
     InitializeImageList();
   else
-    InitializeImageListMulti();
+    mafGUICheckTree::InitializeImageList();
   
 
   CloneSubTree(tree, &tree->GetTree()->GetRootItem(), (wxTreeItemId *)NULL);
@@ -183,77 +183,9 @@ void mafGUIVMEChooserTree::InitializeImageList()
     for( int s=0; s<num_of_status; s++)
     {
       wxBitmap vmeico = mafPictureFactory::GetPictureFactory()->GetVmePic(name);
-      if(s==0) vmeico = mafGrayScale(vmeico);
+      if(s==0) vmeico = mafWhiteFade(vmeico);
+			else vmeico = mafBlueScale(vmeico);
       imgs->Add(vmeico);
-    }
-  }
-  SetImageList(imgs);
-}
-//----------------------------------------------------------------------------
-void mafGUIVMEChooserTree::InitializeImageListMulti()
-//----------------------------------------------------------------------------
-{
-  // purpose:
-  // each vme-picture is combined with each state-picture,
-  // all the combined picture are inserted in the image-list.
-  // given a vme-class-name and a vme-state
-  // the corresponding icon index can be retrieved as 
-  // ClassNameToIcon(vme-class-name) + vme-state
-
-  std::vector<wxString>  v;
-  mafPictureFactory::GetPictureFactory()->GetVmeNames(v);
-
-  const int num_of_status = 5; 
-  int num_types = v.size();
-  int num_icons = num_types * (num_of_status * 2); // Added the status "Data not available"
-
-  if(num_types <= 0)
-  {
-    wxLogMessage("mafGUICheckTree:  Warning - no vme-icons defined");
-    return;
-  }
-  //retrieve state icons
-  //I assume all state-icon to have the same size
-  wxBitmap state_ico[num_of_status];
-  state_ico[NODE_NON_VISIBLE] = mafPictureFactory::GetPictureFactory()->GetBmp("DISABLED");
-  state_ico[NODE_VISIBLE_OFF] = mafPictureFactory::GetPictureFactory()->GetBmp("CHECK_OFF");
-  state_ico[NODE_VISIBLE_ON]  = mafPictureFactory::GetPictureFactory()->GetBmp("CHECK_ON");
-  state_ico[NODE_MUTEX_OFF]   = mafPictureFactory::GetPictureFactory()->GetBmp("RADIO_OFF");
-  state_ico[NODE_MUTEX_ON]    = mafPictureFactory::GetPictureFactory()->GetBmp("RADIO_ON");
-  int sw = state_ico[0].GetWidth();
-  int sh = state_ico[0].GetHeight();
-
-  //get icon size 
-  //I assume all vme-icon to have the same size
-  wxBitmap bmp = mafPictureFactory::GetPictureFactory()->GetVmePic(v[0]);
-  assert(bmp != wxNullBitmap);
-  int w = bmp.GetWidth();
-  int h = bmp.GetHeight();
-  assert(w>0 && h>0);
-
-  // create the ImageList 
-  int mw = sw+w; 
-  int mh = (sh>h) ? sh : h;
-  wxImageList *imgs = new wxImageList(mw,mh,FALSE,num_icons);
-
-  for(int i=0; i<num_types; i++)
-  {
-    wxString name = v[i];
-    m_MapClassNameToIcon[name]=i*(num_of_status * 2); // Paolo 18/12/2006
-
-    int s;
-    for( s=0; s<num_of_status; s++)
-    {
-      wxBitmap vmeico = mafPictureFactory::GetPictureFactory()->GetVmePic(name);
-      if(s==0) vmeico = mafGrayScale(vmeico);
-      wxBitmap merged = MergeIcons(state_ico[s],vmeico);
-      imgs->Add(merged);
-
-      // Icons for missing data
-      if(s!=0) vmeico = mafGrayScale(vmeico);
-      vmeico = mafRedScale(vmeico);
-      wxBitmap missingData = MergeIcons(state_ico[s],vmeico); // Same icon as above, but represent a 
-      imgs->Add(missingData);                                 // node with no data available.
     }
   }
   SetImageList(imgs);
@@ -296,11 +228,7 @@ void mafGUIVMEChooserTree::OnSelectionChanged(wxTreeEvent& event)
 void mafGUIVMEChooserTree::OnIconClick(wxTreeItemId item)
 //----------------------------------------------------------------------------
 {
-  mafNode* vme = (mafNode*) (NodeFromItem(item));
-  VmeUpdateIcon(vme);
-
-  bool enable_ok = GetChoosedNode().size() > 0;
-  mafEventMacro(mafEvent(this,VME_SELECTED, enable_ok));
+// overrided mafGUICheckTree this version must do nothing
 }
 //----------------------------------------------------------------------------
 void mafGUIVMEChooserTree::ShowContextualMenu(wxMouseEvent& event)
@@ -363,60 +291,4 @@ void mafGUIVMEChooserTree::CloneSubTree(mafGUICheckTree *source_tree, wxTreeItem
   }
   mafGUITreeTableElement *el = new mafGUITreeTableElement( current_item );  
   m_NodeTable->Put(node, el);
-}
-//----------------------------------------------------------------------------
-void mafGUIVMEChooserTree::VmeUpdateIcon(mafNode *vme)
-//----------------------------------------------------------------------------
-{
-  int dataStatus = 1;
-  int icon_index;
-  int nodeSatus;
-
-  //When root VME is checked, all the sub-tree will be checked.
-  if (vme->IsA("mafVMERoot"))
-  {
-    bool checked = IsIconChecked(ItemFromNode((long)vme));
-    mafNodeIterator *iter = vme->NewIterator();
-    for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
-    {
-      if (!checked)
-      {
-        nodeSatus = NODE_VISIBLE_ON*2;
-        icon_index = ClassNameToIcon(node->GetTypeName()) + nodeSatus;
-        m_CheckedNode.push_back(node);
-      }
-      else
-      {
-        nodeSatus = NODE_VISIBLE_ON;
-        icon_index = ClassNameToIcon(node->GetTypeName()) + nodeSatus;
-        std::vector<mafNode *>::iterator found = std::find(m_CheckedNode.begin(), m_CheckedNode.end(), node);
-        if (found != m_CheckedNode.end())
-        {
-          m_CheckedNode.erase(found);
-        }
-      }
-      SetNodeIcon( (long)node, icon_index );
-    }
-  }
-  else
-  {
-    bool checked = IsIconChecked(ItemFromNode((long)vme));
-    if (!checked)
-    {
-      nodeSatus = NODE_VISIBLE_ON*2;
-      icon_index = ClassNameToIcon(vme->GetTypeName()) + nodeSatus;
-      m_CheckedNode.push_back(vme);
-    }
-    else
-    {
-      nodeSatus = NODE_VISIBLE_ON;
-      icon_index = ClassNameToIcon(vme->GetTypeName()) + nodeSatus;
-      std::vector<mafNode *>::iterator found = std::find(m_CheckedNode.begin(), m_CheckedNode.end(), vme);
-      if (found != m_CheckedNode.end())
-      {
-        m_CheckedNode.erase(found);
-      }
-    }
-    SetNodeIcon( (long)vme, icon_index );
-  }
 }

@@ -53,7 +53,7 @@ Rotated volumes interaction and visualizationo is supported by this component.
 class MAF_EXPORT mafViewSlice: public mafViewVTK
 {
 public:
-  mafViewSlice(wxString label = "Slice", int camera_position = CAMERA_CT, bool show_axes = false, bool show_grid = false, bool show_ruler = false, int stereo = 0,bool showTICKs=false,bool textureInterpolate=true);
+  mafViewSlice(wxString label = "Slice", int camera_position = CAMERA_CT, bool show_axes = false, bool show_grid = false, int stereo = 0,bool showTICKs=false,bool textureInterpolate=true);
   virtual ~mafViewSlice(); 
 
   mafTypeMacro(mafViewSlice, mafViewVTK);

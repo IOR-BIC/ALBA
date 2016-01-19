@@ -20,9 +20,9 @@
 //----------------------------------------------------------------------------
 #include <wx/laywin.h>
 #include <wx/mdi.h>
+#include <vector>
 
 #include "mafGUIDockManager.h"
-#include "mafGUIDockSettings.h" // tmp //SIL. 05-jun-2006 : 
 
 //----------------------------------------------------------------------------
 // forward reference
@@ -34,6 +34,7 @@ class vtkObject;
 class mafGUIMDIFrameCallback; 
 //class mafGUIDockSettings;
 class mafGUI;
+
 /**
   Class Name: mafGUIMDIFrame.
   Represents the main frame of a MAF Application. On this frame  they'll be plugged  toolbars,  panels, progress bar etc...
@@ -43,15 +44,12 @@ class MAF_EXPORT mafGUIMDIFrame: public wxMDIParentFrame
 {
  public:
   /** constructor. */
-  mafGUIMDIFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
+  mafGUIMDIFrame(const wxString& title, const wxPoint& pos, const wxSize& size, long style=0);
   /** destructor. */
  ~mafGUIMDIFrame(); 
   
   /** Set the listener object, i.e. the object receiving events sent by this object */
   void SetListener(mafObserver *Listener) {m_Listener = Listener;};
-  
-  /** Show the Docking Settings Dialog */
-  mafGUI* GetDockSettingGui() {return m_DockSettings->GetGui();};  
 
   /** Retrieve the Docking Manager */
   mafGUIDockManager& GetDockManager()  {return m_DockManager;};
@@ -184,7 +182,6 @@ protected:
 
   // AUI Layout Manager -  //SIL. 23-may-2006 : 
   mafGUIDockManager    m_DockManager;
-  mafGUIDockSettings  *m_DockSettings;
 
   /** Event Table Declaration*/
   DECLARE_EVENT_TABLE()

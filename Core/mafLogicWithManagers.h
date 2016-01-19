@@ -23,16 +23,16 @@
 #include "mafGUIPanel.h"
 #include "mafDecl.h"
 #include "mafEvent.h"
-#include "mafLogicWithGUI.h"
 #include "mafGUIVMEChooser.h"
 #include "mafVMEManager.h"
+#include "mafGUIMDIFrame.h"
+#include "mafSideBar.h"
 
 //----------------------------------------------------------------------------
 // forward reference
 //----------------------------------------------------------------------------
 class mafViewManager;
 class mafOpManager;
-class mafSideBar;
 class mafGUIMaterialChooser;
 class mafVME;
 class mafInteractionManager;
@@ -40,24 +40,37 @@ class mafPrintSupport;
 class mafRemoteLogic;
 class mafDeviceButtonsPadMouse;
 class mafGUISettingsDialog;
-class mafGUIApplicationLayoutSettings;
 class mafGUISettings;
-class mafGUISettingsHelp;
 class mafUser;
-//
 class mafWizardManager;
 class mafWizard;
+class mafGUITimeBar;
+class mafWXLog;
+class mafVTKLog;
+class mafGUIApplicationSettings;
+class mafGUISettingsStorage;
+class mafGUISettingsTimeBar;
 
 //----------------------------------------------------------------------------
 // mafLogicWithManagers :
 //----------------------------------------------------------------------------
 /** 
 mafLogicWithManagers provide:
+- mdi main frame
+- menu    (can be avoided by calling plugmenu(false); )
+- toolbar (can be avoided by calling plugtoolbarbar(false); )
+- logbar  (can be avoided by calling pluglogbar(false); )
+- timebar (can be avoided by calling plugtimebar(false); )
+- sidebar (can be avoided by calling plugsidebar(false); )
 - the VMEManager
 - the OperationManager, and the support for plugging operations
 - the ViewManager, and the support for plugging views
 and manage all the Events related to Nodes,Operations and Views.
 Each Evt. will call a corresponding evt. handler.
+
+The PlugXXX functions must be called before the first Show().
+In derived classes it is recommended to pass to mafLogicWithGUI::OnEvent()
+the unhandled events.
 
 mafLogicWithManagers also provide the following standard operation:
 - Select,Cut,Copy,Paste,Delete,Undo,Redo
@@ -78,8 +91,17 @@ USAGE - member function MUST be called in this order:
   -- call Show              it is before Init, to eventually show the Progress-bar during a Load
   -- call Init(argc,argv)   will call MSFNew or MSFLoad
 
+Tech NOTE: 
+Proper Initialization must follow this order
+1- CTOR:
+2- Configure: (create the GUI el. - cant be in the CTOR because calls virtual functions)
+in sub classes also create the manager
+3- Plug Op, Plug View , ...
+4- Show:
+5- Init: Calls FileOpen or FileNew
+	
 */
-class MAF_EXPORT mafLogicWithManagers: public mafLogicWithGUI
+class MAF_EXPORT mafLogicWithManagers: public mafObserver
 {
 public:
                mafLogicWithManagers(mafGUIMDIFrame *mdiFrame=NULL);
@@ -111,6 +133,9 @@ public:
   Are plugged also all the setting to the dialogs interface. */
   virtual void Configure();
 
+	/** Creates menu and tool bars*/
+	void CreateToolBarsAndPanels();
+
   /** Program Initialization */
 	virtual void Init(int argc, char **argv);
 
@@ -132,8 +157,11 @@ public:
   /**  Plug a new wizard */
   virtual void Plug(mafWizard *wizard, wxString menuPath = "");
 
-  /** Fill the View and operation menu's and set the application stamp to the VMEManager.*/
+	/**Set the application stamp to the VMEManager and Shows the application*/
   virtual void Show();
+
+  /** Fill the View and operation menu's  */
+	void FillMenus();
 
   /** Return the applications' user.*/
   mafUser *GetUser();
@@ -167,6 +195,27 @@ public:
   /* Set the file extension */
   void SetFileExtension(mafString &extension) {m_Extension = extension;};
 
+	/** Returns the pointer to the main panel of the application.*/
+	virtual mafGUIMDIFrame *GetTopWin(){return m_Win;};
+
+	/** Sets the flag to know if Toolbar should be built.*/
+	void PlugToolbar(bool plug) {m_PlugToolbar	= plug;};
+	/** Sets the flag to know if Side bar should be built.*/
+	void PlugSidebar(bool plug, long style = mafSideBar::DOUBLE_NOTEBOOK) {m_PlugControlPanel	= plug; m_SidebarStyle = style;};
+	/** Sets the flag to know if Time bar should be built.*/
+	void PlugTimebar(bool plug) {m_PlugTimebar	= plug;};
+	/** Sets the flag to know if Log bar should be built.*/
+	void PlugLogbar(bool plug)	{m_PlugLogPanel		= plug;};
+
+	 /** 
+  Show the splash screen for the application. To define your own splash screen image simply
+  overwrite the SPLASH_SCREEN image into the picture factory by plugging your .xpm image. \sa mafPictureFactory*/
+  virtual void ShowSplashScreen();
+
+  /** 
+  Used to give a splash screen image directly from the bitmap without converting it in xpm.*/
+  virtual void ShowSplashScreen(wxBitmap &splashImage);
+
 protected:
   //---------------------------------------------------------
   // Description:
@@ -177,18 +226,35 @@ protected:
   // Description:
   // Set the time to update the time bar.
   virtual void TimeSet(double t);
-//---------------------------------------------------------
+	//---------------------------------------------------------
   
   /** Redefined to add View,Op,Import,Export menu */
   virtual void CreateMenu();
-
   /** create a new storage object */
   virtual void CreateStorage(mafEvent *e);
-
   /** Redefined to add Print buttons */
   virtual void CreateToolbar();
 
-  // EVENT HANDLERS
+	/** Virtual method to create the side bar.*/
+	virtual void CreateControlPanel();
+	/** Virtual method to create the time bar.*/
+	virtual void CreateTimeBar();
+	/** Virtual method to create the log bar.*/
+	virtual void CreateLogPanel();
+	/** Create a null logger. This is used when no log is due. */
+	void CreateNullLog();
+	
+	
+	/** Enable/disable a Toolbar or Menu Item */
+	void EnableItem(int item, bool enable);
+
+	/** Stores application layout */
+	void StoreLayout();
+
+	/** Restores application layout */
+	virtual void RestoreLayout();
+
+	// EVENT HANDLERS
 
   /** FILE NEW evt. handler */
 	virtual void OnFileNew();
@@ -264,8 +330,6 @@ protected:
 	/** Select a view and update the display list for the tree. */
 	virtual void ViewSelect();
 
-  virtual void RestoreLayout();
-
   /** Called when user change the measure unit from menù Options.*/
   void UpdateMeasureUnit();
 
@@ -318,9 +382,7 @@ protected:
   bool m_UseOpManager;
   bool m_UseInteractionManager;
   mafGUISettingsDialog *m_SettingsDialog;
-  mafGUIApplicationLayoutSettings *m_ApplicationLayoutSettings;
-  mafGUISettingsHelp *m_HelpSettings;
-
+  
   mafString m_Revision;
   mafString m_Extension;
 
@@ -333,5 +395,29 @@ protected:
   wxStaticText* m_WizardLabel;
   bool m_CancelledBeforeOpStarting;
   wxMenu *m_WizardMenu;
+
+	long               m_ChildFrameStyle;
+	mafGUIMDIFrame       *m_Win;
+	wxToolBar         *m_ToolBar;
+	wxMenuBar         *m_MenuBar;
+	wxString					 m_LastSelectedPanel;
+	mafGUITimeBar      *m_TimePanel;
+	mafString					 m_AppTitle;
+	bool               m_LogToFile;
+	mafWXLog          *m_Logger;
+	mafVTKLog         *m_VtkLog;
+	mafGUIApplicationSettings *m_ApplicationSettings;
+	mafGUISettingsStorage  *m_StorageSettings;
+	mafGUISettingsTimeBar  *m_TimeBarSettings;
+
+	bool m_Quitting;    ///< Variable that allows to determine if the application is Quitting or not.
+	bool m_PlugMenu;    ///< Flag to plug or not the Menu into the application. Default is true.
+	bool m_PlugToolbar; ///< Flag to plug or not the Toolbar into the application. Default is true.
+	bool m_PlugControlPanel; ///< Flag to plug or not the Side-bar into the application. Default is true.
+	long m_SidebarStyle;///< Store the style of the sidebar. Old style (MAF 1.x): SINGLE_NOTEBOOK or new style (MAF 2.x): DOUBLE_NOTEBOOK
+	bool m_PlugTimebar; ///< Flag to plug or not the Time-bar into the application. Default is true.
+	bool m_PlugLogPanel;  ///< Flag to plug or not the Log area into the application. Default is true.
+	bool m_ShowStorageSettings; ///<Flag to show storage setting default is false.
+	bool m_ShowInteractionSettings; ///<Flag to show storage setting default is false.
 };
 #endif

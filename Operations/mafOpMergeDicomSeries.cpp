@@ -94,8 +94,7 @@ void mafOpMergeDicomSeries::OpRun()
 
 			if (lastDicomDir == "UNEDFINED_m_LastDicomDir")
 			{
-				wxString defaultPath = mafGetDocumentsDirectory().c_str();
-				lastDicomDir = defaultPath;		
+				lastDicomDir = mafGetLastUserFolder().c_str();;		
 			};
 			wxDirDialog dialog(NULL,"", lastDicomDir,wxRESIZE_BORDER,wxDefaultPosition);
 			dialog.SetReturnCode(wxID_OK);

@@ -43,6 +43,13 @@ class MAF_EXPORT mafVMERefSys : public mafVME
 public:
   mafTypeMacro(mafVMERefSys,mafVME);
 
+	enum RefSysModalities
+	{
+		REFSYS_FREE,
+		REFSYS_ORIGIN,
+		REFSYS_PLANE,
+	};
+
   /** print a dump of this object */
   virtual void Print(std::ostream& os, const int tabs=0);
 
@@ -53,7 +60,6 @@ public:
 		ID_POINT1,
 		ID_POINT2,
 		ID_RADIO,
-		ID_FIXED,
     ID_LAST
   };
 
@@ -100,7 +106,7 @@ public:
   static char ** GetIcon();
 
   /** Return the suggested pipe-typename for the visualization of this vme */
-  virtual mafString GetVisualPipe() {return mafString("mafPipeSurface");};
+  virtual mafString GetVisualPipe() {return mafString("mafPipeRefSys");};
 
 	/** 
   Set links for the ref-sys*/
@@ -109,6 +115,9 @@ public:
 	mafVME *GetOriginVME();
   mafVME *GetPoint1VME();
   mafVME *GetPoint2VME();
+
+	/** Return true if you can use a move operation on this vme */
+	bool IsMovable();
 
 protected:
   mafVMERefSys();
@@ -153,9 +162,9 @@ protected:
 
   double m_ScaleFactor;
 
-  mafTransform *m_Transform; ///< pose matrix for the slicer plane
+	int m_Modality;
 
-	int m_Radio;
+  mafTransform *m_Transform; ///< pose matrix for the slicer plane
 
 private:
   mafVMERefSys(const mafVMERefSys&); // Not implemented

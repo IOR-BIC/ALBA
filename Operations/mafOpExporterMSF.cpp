@@ -49,7 +49,7 @@ mafOp(label)
   m_Canundo = true;
 
   m_MSFFile    = "";
-  m_MSFFileDir = mafGetDocumentsDirectory().c_str();
+  m_MSFFileDir = mafGetLastUserFolder().c_str();
 
 }
 //----------------------------------------------------------------------------

@@ -36,7 +36,9 @@
 
 #include "vtkDataSet.h"
 #include "vtkUnstructuredGrid.h"
-#include "vtkCellArray.h"
+#include "vtkCellData.h"
+#include "vtkDataArray.h"
+#include "vtkPointData.h"
 
 //-------------------------------------------------------------------------
 mafCxxTypeMacro(mafVMEMesh)
@@ -142,4 +144,101 @@ mmaMaterial *mafVMEMesh::GetMaterial()
 		}
 	}
 	return material;
+}
+
+//------------------------------------------------------------------------
+vtkIntArray *mafVMEMesh::GetIntCellArray(vtkUnstructuredGrid *inputUGrid, const char *arrayName, const char *arrayName2)
+{
+  vtkIntArray *myArray = NULL;
+
+  // get the ELEMENT_ID array
+  myArray = vtkIntArray::SafeDownCast(inputUGrid->GetCellData()->GetArray(arrayName));
+  
+  if(myArray==NULL)
+    myArray = vtkIntArray::SafeDownCast(inputUGrid->GetCellData()->GetArray(arrayName2));  
+
+  return myArray;
+}
+
+//------------------------------------------------------------------------
+vtkIntArray *mafVMEMesh::GetIntCellArray( const char *arrayName, const char *arrayName2)
+{
+	vtkUnstructuredGrid *inputUGrid = GetUnstructuredGridOutput()->GetUnstructuredGridData();
+
+	return GetIntCellArray(inputUGrid,arrayName,arrayName2);	
+}
+
+
+//------------------------------------------------------------------------
+vtkIntArray *mafVMEMesh::GetNodesIDArray()
+{
+  vtkUnstructuredGrid *inputUGrid = GetUnstructuredGridOutput()->GetUnstructuredGridData();
+
+  // get the Nodes Id array
+  vtkIntArray *myArray = vtkIntArray::SafeDownCast(inputUGrid->GetPointData()->GetArray("Id"));  
+
+  if(myArray==NULL)
+    myArray = vtkIntArray::SafeDownCast(inputUGrid->GetPointData()->GetArray("id"));  
+
+  return myArray;
+}
+
+//----------------------------------------------------------------------------
+vtkIntArray * mafVMEMesh::GetNodesIDArray(vtkUnstructuredGrid *inputUGrid)
+{
+	// get the Nodes Id array
+	vtkIntArray *myArray = vtkIntArray::SafeDownCast(inputUGrid->GetPointData()->GetArray("Id"));  
+
+	if(myArray==NULL)
+		myArray = vtkIntArray::SafeDownCast(inputUGrid->GetPointData()->GetArray("id"));  
+
+	return myArray;
+}
+
+//------------------------------------------------------------------------
+vtkIntArray *mafVMEMesh::GetMaterialsIDArray()
+{
+  return GetIntCellArray("Material", "material");
+}
+
+//----------------------------------------------------------------------------
+vtkIntArray * mafVMEMesh::GetMaterialsIDArray(vtkUnstructuredGrid *inputUGrid)
+{
+	 return GetIntCellArray(inputUGrid,"Material", "material");
+}
+
+//------------------------------------------------------------------------
+vtkIntArray *mafVMEMesh::GetElementsIDArray()
+{
+  return GetIntCellArray("Id", "ANSYS_ELEMENT_ID");
+}
+
+//----------------------------------------------------------------------------
+vtkIntArray * mafVMEMesh::GetElementsIDArray(vtkUnstructuredGrid *inputUGrid)
+{
+	 return GetIntCellArray(inputUGrid,"Id", "ANSYS_ELEMENT_ID");
+}
+
+//------------------------------------------------------------------------
+vtkIntArray *mafVMEMesh::GetElementsTypeArray()
+{
+  return GetIntCellArray("Type", "ANSYS_ELEMENT_TYPE");
+}
+
+//----------------------------------------------------------------------------
+vtkIntArray * mafVMEMesh::GetElementsTypeArray(vtkUnstructuredGrid *inputUGrid)
+{
+	return GetIntCellArray(inputUGrid,"Type", "ANSYS_ELEMENT_TYPE");
+}
+
+//------------------------------------------------------------------------
+vtkIntArray *mafVMEMesh::GetElementsRealArray()
+{
+  return GetIntCellArray("Real", "ANSYS_ELEMENT_REAL");
+}
+
+//----------------------------------------------------------------------------
+vtkIntArray * mafVMEMesh::GetElementsRealArray(vtkUnstructuredGrid *inputUGrid)
+{
+	return GetIntCellArray(inputUGrid,"Real", "ANSYS_ELEMENT_REAL");
 }

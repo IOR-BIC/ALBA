@@ -56,9 +56,7 @@
 #endif
 
 #include "mafSideBar.h"
-
 #include "mafUser.h"
-//#include "mafGUISRBBrowse.h"
 #include "mafGUIDialogRemoteFile.h"
 #include "mafGUIDialogFindVme.h"
 #include "mafGUIMDIFrame.h"
@@ -67,42 +65,65 @@
 #include "mafGUITimeBar.h"
 #include "mafGUIMaterialChooser.h"
 #include "mafGUIViewFrame.h"
-#include "mafGUILocaleSettings.h"
-#include "mafGUIMeasureUnitSettings.h"
 #include "mafGUIApplicationSettings.h"
 #include "mafGUISettingsStorage.h"
-#include "mafGUIApplicationLayoutSettings.h"
 #include "mafGUISettingsTimeBar.h"
 #include "mafRemoteLogic.h"
 #include "mafGUISettingsDialog.h"
-#include  "mafGUISettingsHelp.h"
-
 #ifdef WIN32
   #include "mafDeviceClientMAF.h"
 #endif
-
 #include "mmdRemoteFileManager.h"
-
 #include "mmaApplicationLayout.h"
-
 #include "mafEventSource.h"
 #include "mafDataVector.h"
 #include "mafVMEStorage.h"
 #include "mafRemoteStorage.h"
-
-
 #include "mafWizardManager.h"
-
 #include "mafRWIBase.h"
 #include <wx/dir.h>
+#include "wx/splash.h"
+#include "mafVTKLog.h"
+#include "vtkTimerLog.h"
+#include "mafWXLog.h"
+#include "mafVMERoot.h"
 
-
+#define IDM_WINDOWNEXT 4004
+#define IDM_WINDOWPREV 4006
 
 //----------------------------------------------------------------------------
 mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
-: mafLogicWithGUI(mdiFrame)
-//----------------------------------------------------------------------------
 {
+	if (mdiFrame==NULL)
+		m_Win = new mafGUIMDIFrame("maf", wxDefaultPosition, wxSize(800, 600),wxFRAME_NO_WINDOW_MENU);
+	else
+		m_Win = mdiFrame;
+
+	m_Win->SetListener(this);
+
+	m_ChildFrameStyle = wxCAPTION | wxMAXIMIZE_BOX | wxMINIMIZE_BOX | wxRESIZE_BORDER; //wxTHICK_FRAME; // Default style
+	m_ApplicationSettings = new mafGUIApplicationSettings(this);
+	m_StorageSettings = new mafGUISettingsStorage(this);
+	m_TimeBarSettings = NULL;
+		
+	m_ToolBar       = NULL;
+	m_MenuBar       = NULL;
+
+	m_LogToFile			= m_ApplicationSettings->GetLogToFileStatus();
+	m_Logger				= NULL;
+	m_VtkLog        = NULL;
+
+	m_AppTitle      = "";
+
+	m_Quitting = false;
+
+	m_PlugMenu		  = true;
+	m_PlugToolbar	  = true;
+	m_PlugControlPanel	  = true;
+	m_SidebarStyle  = mafSideBar::DOUBLE_NOTEBOOK;
+	m_PlugTimebar	  = false;
+	m_PlugLogPanel	  = true;
+
   m_SideBar     = NULL;
   m_UseVMEManager  = true;
   m_UseViewManager = true;
@@ -127,17 +148,10 @@ mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
 
   m_MaterialChooser = NULL;
 
-  // this is needed to manage events coming from the widget
-  // when the user change the unit settings.
-  m_MeasureUnitSettings->SetListener(this);
-
+  
   m_PrintSupport = new mafPrintSupport();
   
   m_SettingsDialog = new mafGUISettingsDialog();
-
-  m_ApplicationLayoutSettings = NULL;
-
-  m_HelpSettings = NULL;
 
   m_Revision = _("0.1");
 
@@ -148,6 +162,9 @@ mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
   m_WizardManager = NULL;
 
   m_User = new mafUser();
+
+	m_ShowStorageSettings=false;
+	m_ShowInteractionSettings=false; 
 
 }
 //----------------------------------------------------------------------------
@@ -160,30 +177,19 @@ mafLogicWithManagers::~mafLogicWithManagers()
 
   // Managers are destruct in the OnClose
   cppDEL(m_User);
-  cppDEL(m_ApplicationLayoutSettings);
-  cppDEL(m_HelpSettings);
   cppDEL(m_PrintSupport);
-  cppDEL(m_SettingsDialog); 
+  cppDEL(m_SettingsDialog);
+	cppDEL(m_ApplicationSettings);
+	cppDEL(m_StorageSettings);
+	cppDEL(m_TimeBarSettings);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::Configure()
 //----------------------------------------------------------------------------
 {
-  mafLogicWithGUI::Configure(); // create the GUI - and calls CreateMenu
 
-  if(this->m_PlugSidebar)
-  {
-    m_SideBar = new mafSideBar(m_Win,MENU_VIEW_SIDEBAR,this,m_SidebarStyle);
-    m_Win->AddDockPane(m_SideBar->m_Notebook , wxPaneInfo()
-      .Name("sidebar")
-      .Caption(wxT("ControlBar"))
-      .Right()
-      .Layer(2)
-      .MinSize(240,450)
-      .TopDockable(false)
-      .BottomDockable(false)
-      );
-  }
+	if(m_PlugTimebar)
+		m_TimeBarSettings = new mafGUISettingsTimeBar(this);
 
   if(m_UseVMEManager)
   {
@@ -194,7 +200,7 @@ void mafLogicWithManagers::Configure()
     m_VMEManager->SetPassword(m_StorageSettings->GetPassword());
     m_VMEManager->SetLocalCacheFolder(m_StorageSettings->GetCacheFolder());
     m_VMEManager->SetListener(this); 
-	m_VMEManager->SetFileExtension(m_Extension);
+		m_VMEManager->SetFileExtension(m_Extension);
     //m_VMEManager->SetSingleBinaryFile(m_StorageSettings->GetSingleFileStatus()!= 0);
   }
 
@@ -241,37 +247,21 @@ void mafLogicWithManagers::Configure()
 
   // Fill the SettingsDialog
   m_SettingsDialog->AddPage( m_ApplicationSettings->GetGui(), m_ApplicationSettings->GetLabel());
-  m_SettingsDialog->AddPage( m_StorageSettings->GetGui(), m_StorageSettings->GetLabel());
+  
+	//Storage Settings disabled from GUI
+	if(m_ShowStorageSettings)
+		m_SettingsDialog->AddPage( m_StorageSettings->GetGui(), m_StorageSettings->GetLabel());
+	
+  if(m_ShowInteractionSettings && m_InteractionManager)
+    //m_SettingsDialog->AddPage(m_InteractionManager->GetGui(), _("Interaction Manager"));
 
-  if (m_ViewManager)
-  {
-    m_ApplicationLayoutSettings = new mafGUIApplicationLayoutSettings(this);
-    m_ApplicationLayoutSettings->SetViewManager(m_ViewManager);
-    m_ApplicationLayoutSettings->SetApplicationFrame(m_Win);
-    m_SettingsDialog->AddPage( m_ApplicationLayoutSettings->GetGui(), m_ApplicationLayoutSettings->GetLabel());
-  }
-
-  m_SettingsDialog->AddPage( m_Win->GetDockSettingGui(), _("User Interface Preferences"));
-
-  m_HelpSettings = new mafGUISettingsHelp(this);
-  m_SettingsDialog->AddPage(m_HelpSettings->GetGui(), m_HelpSettings->GetLabel());
-
-// currently mafInteraction is strictly dependent on VTK (marco)
-#ifdef MAF_USE_VTK
-  if(m_InteractionManager)
-    m_SettingsDialog->AddPage(m_InteractionManager->GetGui(), _("Interaction Manager"));
-#endif    
-  if(m_LocaleSettings)
-    m_SettingsDialog->AddPage(m_LocaleSettings->GetGui(), m_LocaleSettings->GetLabel());
-
-  if (m_MeasureUnitSettings)
-    m_SettingsDialog->AddPage(m_MeasureUnitSettings->GetGui(), m_MeasureUnitSettings->GetLabel());
-
-  if (m_TimeBarSettings)
+	if (m_TimeBarSettings)
     m_SettingsDialog->AddPage(m_TimeBarSettings->GetGui(), m_TimeBarSettings->GetLabel());
 
   ConfigureWizardManager();
+
 }
+
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::Plug(mafView* view, bool visibleInMenu)
 //----------------------------------------------------------------------------
@@ -314,65 +304,77 @@ void mafLogicWithManagers::Plug( mafWizard *wizard, wxString menuPath /*= ""*/ )
 	}
 	else 
 	{
-		mafLogMessage("Enable wizard pluggin to plug wizards"); 
+		mafLogMessage("Enable wizard manager to plug wizards"); 
 	}
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::Show()
 //----------------------------------------------------------------------------
 {
-  if(m_VMEManager && m_RecentFileMenu)
-  {
-    m_VMEManager->SetFileHistoryMenu(m_RecentFileMenu);
-  }
+	if(m_PlugMenu)		
+		CreateMenu();
+	FillMenus();
+	CreateToolBarsAndPanels();
 
-  if(m_UseViewManager && m_ViewMenu)
-  {
-    wxMenu *view_list = new wxMenu;
-    m_ViewMenu->AppendSeparator();
-    m_ViewMenu->Append(0,_("Add View"),view_list);
-    m_ViewManager->FillMenu(view_list);
-  }
+	m_AppTitle = m_Win->GetTitle().c_str();
 
-  if(m_OpManager)
-  {
-    if(m_MenuBar && (m_ImportMenu || m_OpMenu || m_ExportMenu))
-    {
-      m_OpManager->FillMenu(m_ImportMenu, m_ExportMenu, m_OpMenu);
-      m_OpManager->SetMenubar(m_MenuBar);
-    }
-    if(m_ToolBar)
-      m_OpManager->SetToolbar(m_ToolBar);
-  }
+	RestoreLayout();
 
-  mafLogicWithGUI::Show();
+	m_Win->Show(TRUE);
 
   // must be after the mafLogicWithGUI::Show(); because in that method is set the m_AppTitle var
   SetApplicationStamp(m_AppTitle);
-
-  //setting gui pointers to the Wizard Manager
-  if(m_WizardManager)
-  {
-	  if(m_MenuBar)
-	  {
-		  m_WizardManager->FillMenu(m_WizardMenu);
-		  m_WizardManager->SetMenubar(m_MenuBar);
-	  }
-	  if(m_ToolBar)
-		  m_WizardManager->SetToolbar(m_ToolBar);
-  }
 }
+
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::FillMenus()
+{
+	if(m_VMEManager && m_RecentFileMenu)
+	{
+		m_VMEManager->SetFileHistoryMenu(m_RecentFileMenu);
+	}
+
+	if(m_UseViewManager && m_ViewMenu)
+	{
+		m_ViewManager->FillMenu(m_ViewMenu);
+		m_ViewMenu->AppendSeparator();
+	}
+
+	if(m_OpManager && m_MenuBar && (m_ImportMenu || m_OpMenu || m_ExportMenu))
+	{
+		m_OpManager->FillMenu(m_ImportMenu, m_ExportMenu, m_OpMenu);
+		m_OpManager->SetMenubar(m_MenuBar);
+	}
+
+	//setting gui pointers to the Wizard Manager
+	if(m_WizardManager && m_MenuBar)
+	{
+		m_WizardManager->FillMenu(m_WizardMenu);
+		m_WizardManager->SetMenubar(m_MenuBar);
+	}
+		
+}
+
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::CreateToolBarsAndPanels()
+{
+
+	if(m_PlugToolbar) CreateToolbar();
+	if(m_PlugTimebar) CreateTimeBar(); //SIL. 23-may-2006 : 
+	if(m_PlugLogPanel)	CreateLogPanel();	
+	else this->CreateNullLog();
+	if(this->m_PlugControlPanel) CreateControlPanel();
+	if(m_PlugToolbar && m_WizardManager) CreateWizardToolbar();
+
+	if(m_OpManager && m_ToolBar)
+		m_OpManager->SetToolbar(m_ToolBar);
+
+	if(m_WizardManager && m_ToolBar)
+		m_WizardManager->SetToolbar(m_ToolBar);
+}
+
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::SetApplicationStamp(mafString &app_stamp)
-//----------------------------------------------------------------------------
-{
-  if (m_VMEManager)
-  {
-    m_VMEManager->SetApplicationStamp(app_stamp);
-  }
-}
-//----------------------------------------------------------------------------
-void mafLogicWithManagers::SetApplicationStamp(std::vector<mafString> app_stamp)
 //----------------------------------------------------------------------------
 {
   if (m_VMEManager)
@@ -432,17 +434,37 @@ void mafLogicWithManagers::Init(int argc, char **argv)
     }
   }
 
-  m_ApplicationLayoutSettings->LoadLayout(true);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::CreateMenu()
 //----------------------------------------------------------------------------
 {
+#include "pic/menu/EDIT_COPY.xpm"
+#include "pic/menu/EDIT_CUT.xpm"
+#include "pic/menu/EDIT_DELETE.xpm"
+#include "pic/menu/EDIT_PASTE.xpm"
+#include "pic/menu/EDIT_REDO.xpm"
+#include "pic/menu/EDIT_SETTINGS.xpm"
+#include "pic/menu/EDIT_UNDO.xpm"
+#include "pic/menu/FILE_EXIT.xpm"
+#include "pic/menu/FILE_NEW.xpm"
+#include "pic/menu/FILE_OPEN.xpm"
+#include "pic/menu/FILE_PRINT.xpm"
+#include "pic/menu/FILE_PRINT_PREVIEW.xpm"
+#include "pic/menu/FILE_SAVE.xpm"
+#include "pic/menu/HELP_ABOUT.xpm"
+#include "pic/menu/HELP_HELP.xpm"
+#include "pic/menu/WINDOW_CASCADE.xpm"
+#include "pic/menu/WINDOW_HORIZONTALLY.xpm"
+#include "pic/menu/WINDOW_PREV.xpm"
+#include "pic/menu/WINDOW_NEXT.xpm"
+#include "pic/menu/WINDOW_VERTICALLY.xpm"
+
   m_MenuBar  = new wxMenuBar;
   wxMenu *file_menu = new wxMenu;
-  file_menu->Append(MENU_FILE_NEW,   _("&New  \tCtrl+N"));
-  file_menu->Append(MENU_FILE_OPEN,  _("&Open   \tCtrl+O"));
-  file_menu->Append(MENU_FILE_SAVE,  _("&Save  \tCtrl+S"));
+	mafGUI::AddMenuItem(file_menu,MENU_FILE_NEW,_("&New  \tCtrl+N"),FILE_NEW_xpm);
+	mafGUI::AddMenuItem(file_menu,MENU_FILE_OPEN,_("&Open   \tCtrl+O"),FILE_OPEN_xpm);
+	mafGUI::AddMenuItem(file_menu,MENU_FILE_SAVE,_("&Save  \tCtrl+S"),FILE_SAVE_xpm);
   file_menu->Append(MENU_FILE_SAVEAS,_("Save &As  \tCtrl+Shift+S"));
   if (m_StorageSettings->UseRemoteStorage())
   {
@@ -457,8 +479,8 @@ void mafLogicWithManagers::CreateMenu()
 
   // Print menu item
   file_menu->AppendSeparator();
-  file_menu->Append(MENU_FILE_PRINT, _("&Print  \tCtrl+P"));
-  file_menu->Append(MENU_FILE_PRINT_PREVIEW, _("Print Preview"));
+	mafGUI::AddMenuItem(file_menu,MENU_FILE_PRINT,_("&Print  \tCtrl+P"),FILE_PRINT_xpm);
+	mafGUI::AddMenuItem(file_menu,MENU_FILE_PRINT_PREVIEW,_("Print Preview"),FILE_PRINT_PREVIEW_xpm);
   file_menu->Append(MENU_FILE_PRINT_SETUP, _("Printer Setup"));
   file_menu->Append(MENU_FILE_PRINT_PAGE_SETUP, _("Page Setup"));
 
@@ -467,19 +489,24 @@ void mafLogicWithManagers::CreateMenu()
   file_menu->Append(0,_("Recent Files"),m_RecentFileMenu);
 
   file_menu->AppendSeparator();
-  file_menu->Append(MENU_FILE_QUIT,  _("&Quit  \tCtrl+Q"));
+	mafGUI::AddMenuItem(file_menu,MENU_FILE_QUIT,_("&Quit  \tCtrl+Q"),FILE_EXIT_xpm);
 
   m_MenuBar->Append(file_menu, _("&File"));
 
   wxMenu    *edit_menu = new wxMenu;
-  edit_menu->Append(OP_UNDO,   _("Undo  \tCtrl+Z"));
-  edit_menu->Append(OP_REDO,   _("Redo  \tCtrl+Shift+Z"));
+
+
+	mafGUI::AddMenuItem(edit_menu,OP_UNDO,_("Undo  \tCtrl+Z"),EDIT_UNDO_xpm);
+	mafGUI::AddMenuItem(edit_menu,OP_REDO,_("Redo  \tCtrl+Shift+Z"),EDIT_REDO_xpm);
   edit_menu->AppendSeparator();
-  edit_menu->Append(OP_DELETE, _("Delete  \tDel"));
-  edit_menu->Append(OP_CUT,   _("Cut   \tCtrl+Shift+X"));
-  edit_menu->Append(OP_COPY,  _("Copy  \tCtrl+Shift+C"));
-  edit_menu->Append(OP_PASTE, _("Paste \tCtrl+Shift+V"));
+	mafGUI::AddMenuItem(edit_menu,OP_DELETE,_("Delete  \tDel"),EDIT_DELETE_xpm);
+	mafGUI::AddMenuItem(edit_menu,OP_CUT,_("Cut   \tCtrl+Shift+X"),EDIT_CUT_xpm);
+	mafGUI::AddMenuItem(edit_menu,OP_COPY,_("Copy  \tCtrl+Shift+C"),EDIT_COPY_xpm);
+	mafGUI::AddMenuItem(edit_menu,OP_PASTE, _("Paste \tCtrl+Shift+V"),EDIT_PASTE_xpm);
   edit_menu->Append(MENU_EDIT_FIND_VME, _("Find VME \tCtrl+F"));
+	edit_menu->AppendSeparator();
+	mafGUI::AddMenuItem(edit_menu,ID_APP_SETTINGS,_("Settings..."),EDIT_SETTINGS_xpm);
+
   m_MenuBar->Append(edit_menu, _("&Edit"));
 
   m_ViewMenu = new wxMenu;
@@ -488,13 +515,19 @@ void mafLogicWithManagers::CreateMenu()
   m_OpMenu = new wxMenu;
   m_MenuBar->Append(m_OpMenu, _("&Operations"));
 
-  wxMenu    *option_menu = new wxMenu;
-  option_menu->Append(ID_APP_SETTINGS, _("Options..."));
-  m_MenuBar->Append(option_menu, _("Tools"));
+	wxMenu    *windowMenu = new wxMenu;
+	m_MenuBar->Append(windowMenu, _("Window"));
+	mafGUI::AddMenuItem(windowMenu,TILE_WINDOW_CASCADE,_("&Cascade"),WINDOW_CASCADE_xpm);
+	mafGUI::AddMenuItem(windowMenu,TILE_WINDOW_HORIZONTALLY,_("Tile &Horizontally"),WINDOW_HORIZONTALLY_xpm);
+	mafGUI::AddMenuItem(windowMenu,TILE_WINDOW_VERTICALLY,_("Tile &Vertically"),WINDOW_VERTICALLY_xpm);
+	windowMenu->AppendSeparator();
+	mafGUI::AddMenuItem(windowMenu,IDM_WINDOWNEXT,_("&Next"),WINDOW_NEXT_xpm);
+	mafGUI::AddMenuItem(windowMenu,IDM_WINDOWPREV,_("&Previous"),WINDOW_PREV_xpm);
 
 	wxMenu    *help_menu = new wxMenu;
-	help_menu->Append(ABOUT_APPLICATION,_("About"));
-	help_menu->Append(HELP_HOME, _("Help"));
+	mafGUI::AddMenuItem(help_menu,ABOUT_APPLICATION,_("About"),HELP_ABOUT_xpm);
+	mafGUI::AddMenuItem(help_menu,HELP_HOME,_("Help"),HELP_HELP_xpm);
+
 
 	m_MenuBar->Append(help_menu, _("&Help"));
 
@@ -512,60 +545,7 @@ void mafLogicWithManagers::CreateMenu()
 	  m_MenuBar->Insert(4,m_WizardMenu, _("&Wizard"));
   }
 }
-//----------------------------------------------------------------------------
-void mafLogicWithManagers::CreateToolbar()
-//----------------------------------------------------------------------------
-{
-  
-  //m_ToolBar = new wxToolBar(m_Win,-1,wxPoint(0,0),wxSize(-1,-1),wxHORIZONTAL|wxNO_BORDER|wxTB_FLAT  );
-  m_ToolBar = new wxToolBar(m_Win,MENU_VIEW_TOOLBAR,wxPoint(0,0),wxSize(-1,-1),wxTB_FLAT | wxTB_NODIVIDER );
-  m_ToolBar->SetMargins(0,0);
-  m_ToolBar->SetToolSeparation(2);
-  m_ToolBar->SetToolBitmapSize(wxSize(20,20));
-  m_ToolBar->AddTool(MENU_FILE_NEW,mafPictureFactory::GetPictureFactory()->GetBmp("FILE_NEW"),    _("new " + m_Extension + " storage file"));
-  m_ToolBar->AddTool(MENU_FILE_OPEN,mafPictureFactory::GetPictureFactory()->GetBmp("FILE_OPEN"),  _("open " + m_Extension + " storage file"));
-  m_ToolBar->AddTool(MENU_FILE_SAVE,mafPictureFactory::GetPictureFactory()->GetBmp("FILE_SAVE"),  _("save current " + m_Extension + " storage file"));
-  m_ToolBar->AddSeparator();
 
-  m_ToolBar->AddTool(MENU_FILE_PRINT,mafPictureFactory::GetPictureFactory()->GetBmp("PRINT"),  _("print the selected view"));
-  m_ToolBar->AddTool(MENU_FILE_PRINT_PREVIEW,mafPictureFactory::GetPictureFactory()->GetBmp("PRINT_PREVIEW"),  _("show the print preview for the selected view"));
-  m_ToolBar->AddSeparator();
-
-  m_ToolBar->AddTool(OP_UNDO,mafPictureFactory::GetPictureFactory()->GetBmp("OP_UNDO"),  _("undo (ctrl+z)"));
-  m_ToolBar->AddTool(OP_REDO,mafPictureFactory::GetPictureFactory()->GetBmp("OP_REDO"),  _("redo (ctrl+shift+z)"));
-  m_ToolBar->AddSeparator();
-
-  m_ToolBar->AddTool(OP_CUT,  mafPictureFactory::GetPictureFactory()->GetBmp("OP_CUT"),  _("cut selected vme (ctrl+x)"));
-  m_ToolBar->AddTool(OP_COPY, mafPictureFactory::GetPictureFactory()->GetBmp("OP_COPY"), _("copy selected vme (ctrl+c)"));
-  m_ToolBar->AddTool(OP_PASTE,mafPictureFactory::GetPictureFactory()->GetBmp("OP_PASTE"),_("paste vme (ctrl+v)"));
-  m_ToolBar->AddSeparator();
-  m_ToolBar->AddTool(CAMERA_RESET,mafPictureFactory::GetPictureFactory()->GetBmp("ZOOM_ALL"),_("reset camera to fit all (ctrl+f)"));
-  m_ToolBar->AddTool(CAMERA_FIT,  mafPictureFactory::GetPictureFactory()->GetBmp("ZOOM_SEL"),_("reset camera to fit selected object (ctrl+shift+f)"));
-  m_ToolBar->AddTool(CAMERA_FLYTO,mafPictureFactory::GetPictureFactory()->GetBmp("FLYTO"),_("fly to object under mouse"));
-
-
-  EnableItem(CAMERA_RESET, false);
-  EnableItem(CAMERA_FIT,   false);
-  EnableItem(CAMERA_FLYTO, false);
-  EnableItem(MENU_FILE_PRINT, false);
-  EnableItem(MENU_FILE_PRINT_PREVIEW, false);
-
-  m_ToolBar->Realize();
-
-  //SIL. 23-may-2006 : 
-  m_Win->AddDockPane(m_ToolBar,  wxPaneInfo()
-    .Name("toolbar")
-    .Caption(wxT("ToolBar"))
-    .Top()
-    .Layer(2)
-    .ToolbarPane()
-    .LeftDockable(false)
-    .RightDockable(false)
-    .Floatable(false)
-    .Movable(false)
-    .Gripper(false)
-    );
-}
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::UpdateFrameTitle()
 //----------------------------------------------------------------------------
@@ -597,6 +577,43 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
     }*/
     switch(e->GetId())
     {
+			//resize view
+			case TILE_WINDOW_CASCADE:
+				m_Win->Cascade();
+				break;
+			case TILE_WINDOW_HORIZONTALLY:
+				m_Win->Tile(wxHORIZONTAL);
+				break;
+			case TILE_WINDOW_VERTICALLY:
+				m_Win->Tile(wxVERTICAL);
+				break;
+			// ###############################################################
+			// commands related to the Dockable Panes
+			case MENU_VIEW_LOGBAR:
+				m_Win->ShowDockPane("logbar",!m_Win->DockPaneIsShown("logbar") );
+				break; 
+			case MENU_VIEW_SIDEBAR:
+				m_Win->ShowDockPane("sidebar",!m_Win->DockPaneIsShown("sidebar") );
+				break; 
+			case MENU_VIEW_TIMEBAR:
+				m_Win->ShowDockPane("timebar",!m_Win->DockPaneIsShown("timebar") );
+				break; 
+			// ###############################################################
+			// commands related to the STATUSBAR
+			case BIND_TO_PROGRESSBAR:
+#ifdef MAF_USE_VTK
+				m_Win->BindToProgressBar(e->GetVtkObj());
+#endif
+				break;
+			
+			
+			
+			case PROGRESSBAR_SET_TEXT:
+				m_Win->ProgressBarSetText(&wxString(e->GetString()->GetCStr()));
+				break;
+				// ###############################################################
+			case UPDATE_UI:
+				break; 
       // ###############################################################
       // commands related to FILE MENU  
       case MENU_FILE_NEW:
@@ -830,8 +847,8 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       break;
       case OP_RUN_STARTING:
       {
-		mafLogMessage("run starting");
-		m_CancelledBeforeOpStarting=false;
+				mafLogMessage("run starting");
+				m_CancelledBeforeOpStarting=false;
         mafGUIMDIChild *c = (mafGUIMDIChild *)m_Win->GetActiveChild();
         if (c != NULL)
           c->SetAllowCloseWindow(false);
@@ -887,7 +904,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       case VIEW_DELETE:
       {
 
-        if(m_PlugSidebar)
+        if(m_PlugControlPanel)
 		   this->m_SideBar->ViewDeleted(e->GetView());
 
 #ifdef MAF_USE_VTK
@@ -939,7 +956,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 				mafViewCompound *v = mafViewCompound::SafeDownCast(m_ViewManager->GetSelectedView());
         if (v && e->GetBool())
         {
-          v->GetRWI()->SaveAllImages(v->GetLabel(),v, m_ApplicationSettings->GetImageTypeId());
+          v->GetRWI()->SaveAllImages(v->GetLabel(),v);
         }
         else
         {
@@ -950,9 +967,6 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
           }
         }
       }
-      break;
-      case LAYOUT_LOAD:
-        RestoreLayout();
       break;
       case CAMERA_RESET:
         if(m_ViewManager) m_ViewManager->CameraReset();
@@ -1008,9 +1022,6 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       // commands related to interaction manager
       case ID_APP_SETTINGS:
         m_SettingsDialog->ShowModal();
-      break;
-      case mafGUIMeasureUnitSettings::MEASURE_UNIT_UPDATED:
-        UpdateMeasureUnit();
       break;
       case CAMERA_PRE_RESET:
 // currently mafInteraction is strictly dependent on VTK (marco)
@@ -1140,24 +1151,22 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 
 			case HELP_HOME:
 				{
-					if (m_HelpSettings)
-					{
-						m_HelpSettings->OpenHelpPage("HELP_HOME");
-					}	
+				
 				}
 				break;
 
 			case GET_BUILD_HELP_GUI:
 			{	
 				int buildGui = -1;
-				if (m_HelpSettings == NULL)
+				//Temporary solution - never build help until an help module is not ready
+				if (true)
 				{
 					buildGui = false;
 					e->SetArg(buildGui);
 				}
 				else
 				{
-					buildGui = m_HelpSettings->GetBuildHelpGui();
+					//Create code for help management here
 				}
 				e->SetArg(buildGui);
 			}
@@ -1167,7 +1176,8 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 			{
 				// open help for entity
 				wxString entity = e->GetString()->GetCStr();
-				m_HelpSettings->OpenHelpPage(entity);
+				
+				//Create code for help management/show here
 			}
 			break;
 			//-----from medLogic
@@ -1181,7 +1191,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 					mafString msfFilename = m_VMEManager->GetFileName();
 					if (msfFilename.IsEmpty())
 					{
-						mafString dirName = mafGetDocumentsDirectory().c_str();
+						mafString dirName = mafGetLastUserFolder().c_str();
 
 						m_VMEManager->SetDirName(dirName);
 						this->OnFileSaveAs();
@@ -1248,7 +1258,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 
 							imageFileName << tmpImageFile;
 
-							v->GetRWI()->SaveAllImages(imageFileName,v, m_ApplicationSettings->GetImageTypeId());
+							v->GetRWI()->SaveAllImages(imageFileName,v);
 
 							wxMessageBox(_("Snapshot saved!"));
 						}
@@ -1415,9 +1425,9 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 				break;
 			case MENU_VIEW_TOOLBAR:
 				m_Win->ShowDockPane("wizardgauge",!m_Win->DockPaneIsShown("wizardgauge") );
-				m_Win->ShowDockPane("tmpwithtest",!m_Win->DockPaneIsShown("tmpwithtest") );
-				m_Win->ShowDockPane("separator",!m_Win->DockPaneIsShown("separator") );
-				mafLogicWithGUI::OnEvent(maf_event);
+				m_Win->ShowDockPane("wizardlabel",!m_Win->DockPaneIsShown("wizardlabel") );
+				m_Win->ShowDockPane("wizardseparator",!m_Win->DockPaneIsShown("wizardseparator") );
+				m_Win->ShowDockPane("toolbar",!m_Win->DockPaneIsShown("toolbar") );
 				break;
 			case PROGRESSBAR_SHOW:
 				{
@@ -1427,7 +1437,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 						m_WizardGauge->Enable();
 					}
 					else
-						mafLogicWithGUI::OnEvent(maf_event);
+							m_Win->ProgressBarShow();
 				}
 				break;
 			case PROGRESSBAR_HIDE:
@@ -1439,7 +1449,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 						m_WizardLabel->Enable(false);
 					}
 					else
-						mafLogicWithGUI::OnEvent(maf_event);
+						m_Win->ProgressBarHide();
 				}
 				break;
 			case PROGRESSBAR_SET_VALUE:
@@ -1447,12 +1457,13 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 					if (e->GetSender()==m_WizardManager)
 						m_WizardGauge->SetValue(e->GetArg());
 					else
-						mafLogicWithGUI::OnEvent(maf_event);
+						m_Win->ProgressBarSetVal(e->GetArg());
 				}
 				break;
 
       default:
-        mafLogicWithGUI::OnEvent(maf_event);
+				e->Log();
+				break; 
       break; 
     } // end switch case
   } // end if SafeDowncast
@@ -1521,7 +1532,8 @@ void mafLogicWithManagers::OnFileOpen(const char *file_to_open)
 			  }
 			  else
 			  {
-				  file = mafGetOpenFile("", wildc).c_str();
+          wxString lastFolder = mafGetLastUserFolder().c_str();
+				  file = mafGetOpenFile(lastFolder, wildc).c_str();
 			  }
 		  }
 
@@ -1603,18 +1615,6 @@ void mafLogicWithManagers::OnQuit()
     return;
   }
 
-	if(m_ApplicationLayoutSettings->GetModifiedLayouts())
-	{
-		int answer = wxMessageBox
-			(
-			_("would you like to save your layout list ?"),
-			_("Confirm"), 
-			wxYES_NO|wxCANCEL|wxICON_QUESTION , m_Win
-			);
-		if(answer == wxYES) 
-			m_ApplicationLayoutSettings->SaveApplicationLayout();
-	}
-
   if(m_VMEManager)
   {
     m_Quitting = false;
@@ -1622,7 +1622,7 @@ void mafLogicWithManagers::OnQuit()
     {
       int answer = wxMessageBox
           (
-          _("would you like to save your work before quitting ?"),
+          _("Would you like to save your work before quitting ?"),
           _("Confirm"), 
           wxYES_NO|wxCANCEL|wxICON_QUESTION , m_Win
           );
@@ -1638,6 +1638,8 @@ void mafLogicWithManagers::OnQuit()
     if(!m_Quitting) 
       return;
   }
+
+	StoreLayout();
 
   mafGUIViewFrame::OnQuit();
   mafGUIMDIChild::OnQuit(); 
@@ -1656,7 +1658,16 @@ void mafLogicWithManagers::OnQuit()
   // must be deleted after m_VMEManager
   cppDEL(m_SideBar);
 
-  mafLogicWithGUI::OnQuit();
+	mafYield();
+	if(m_PlugLogPanel)
+	{
+		delete wxLog::SetActiveTarget(NULL);
+	}
+#ifdef MAF_USE_VTK 
+	vtkTimerLog::CleanupLog();
+	vtkDEL(m_VtkLog);
+#endif
+	m_Win->Destroy();
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeDoubleClicked(mafEvent &e)
@@ -1674,7 +1685,7 @@ void mafLogicWithManagers::VmeSelect(mafEvent& e)	//modified by Paolo 10-9-2003
 {
   mafNode *node = NULL;
 
-	if(m_PlugSidebar && (e.GetSender() == this->m_SideBar->GetTree()))
+	if(m_PlugControlPanel && (e.GetSender() == this->m_SideBar->GetTree()))
     node = (mafNode*)e.GetArg();//sender == tree => the node is in e.arg
   else
     node = e.GetVme();          //sender == PER  => the node is in e.node  
@@ -1738,6 +1749,13 @@ void mafLogicWithManagers::VmeModified(mafNode *vme)
   if(m_SideBar && vme_in_tree)
     m_SideBar->VmeModified(vme);
 	if(m_VMEManager) m_VMEManager->MSFModified(true);
+
+	//if a wizard manager was plugged we tell it about vme selection
+	if(m_WizardManager) 
+	{
+		m_WizardManager->VmeModified(vme);
+	}
+	if(m_OpManager)   m_OpManager->VmeModified(vme);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeAdd(mafNode *vme)
@@ -1760,26 +1778,7 @@ void mafLogicWithManagers::VmeAdded(mafNode *vme)
   if(m_PlugTimebar)
     UpdateTimeBounds();
 }
-//----------------------------------------------------------------------------
-void mafLogicWithManagers::RestoreLayout()
-//----------------------------------------------------------------------------
-{
-  // Retrieve the saved layout.
-  mafNode *vme = m_VMEManager->GetRoot();
-  mmaApplicationLayout *app_layout = mmaApplicationLayout::SafeDownCast(vme->GetAttribute("ApplicationLayout"));
-  if (app_layout)
-  {
-    int answer = wxMessageBox(_("Do you want to load the layout?"), _("Warning"), wxYES_NO);
-    if (answer == wxNO)
-    {
-      return;
-    }
-    
-    m_ApplicationLayoutSettings->SetVisibilityVME(true);
-    m_ApplicationLayoutSettings->ApplyTreeLayout();
-    m_ApplicationLayoutSettings->SetVisibilityVME(false);
-  }
-}
+
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeRemove(mafNode *vme)
 //----------------------------------------------------------------------------
@@ -1944,7 +1943,7 @@ void mafLogicWithManagers::TimeSet(double t)
   {
     m_VMEManager->TimeSet(t);
   }
-  if(m_ViewManager)
+  if(m_ViewManager && m_TimeBarSettings)
   {
     m_ViewManager->CameraUpdate(m_TimeBarSettings->GetPlayingInActiveViewport() != 0);
   }
@@ -2020,7 +2019,7 @@ void mafLogicWithManagers::TreeContextualMenu(mafEvent &e)
 //----------------------------------------------------------------------------
 {
   mafGUITreeContextualMenu *contextMenu = new mafGUITreeContextualMenu();
-  contextMenu->SetListener(m_ApplicationLayoutSettings);
+  contextMenu->SetListener(this);
   mafView *v = m_ViewManager->GetSelectedView();
   mafVME  *vme = (mafVME *)e.GetVme();
   bool vme_menu = e.GetBool();
@@ -2070,7 +2069,7 @@ void mafLogicWithManagers::CreateStorage(mafEvent *e)
     storage->SetUsername(m_StorageSettings->GetUserName());
     storage->SetPassword(m_StorageSettings->GetPassword());
     
-    storage->GetRoot()->SetName("root");
+    storage->GetRoot()->SetName("Root");
     storage->SetListener(m_VMEManager);
     storage->Initialize();
     storage->GetRoot()->Initialize();
@@ -2086,7 +2085,7 @@ void mafLogicWithManagers::CreateStorage(mafEvent *e)
       storage->Delete();
     }
     storage = mafVMEStorage::New();
-    storage->GetRoot()->SetName("root");
+    storage->GetRoot()->SetName("Root");
     storage->SetListener(m_VMEManager);
     storage->GetRoot()->Initialize();
     e->SetMafObject(storage);
@@ -2167,16 +2166,15 @@ void mafLogicWithManagers::CreateWizardToolbar()
 	serparatorBar->Update();
 	serparatorBar->Realize();
 
-	m_WizardGauge;
 	m_WizardGauge = new wxGauge(m_Win,-1, 100,wxDefaultPosition,wxDefaultSize,wxGA_SMOOTH);
 	m_WizardGauge->SetForegroundColour( *wxBLUE );
 	m_WizardGauge->Disable();
 
 
 
-	wxWindow *tmp=new wxWindow(m_Win,-1, wxDefaultPosition,wxSize(50,20));
+	wxWindow *labelWin=new wxWindow(m_Win,-1, wxDefaultPosition,wxSize(50,20));
 
-	m_WizardLabel = new wxStaticText(tmp, -1, " Wizard\n Progress",wxDefaultPosition,wxDefaultSize,wxALIGN_LEFT);
+	m_WizardLabel = new wxStaticText(labelWin, -1, " Wizard\n Progress",wxDefaultPosition,wxDefaultSize,wxALIGN_LEFT);
 	//lab->Show(false);
 	m_WizardLabel->Disable();
 
@@ -2195,8 +2193,8 @@ void mafLogicWithManagers::CreateWizardToolbar()
 		);
 
 
-	m_Win->AddDockPane(tmp,  wxPaneInfo()
-		.Name("tmpwithtest")
+	m_Win->AddDockPane(labelWin,  wxPaneInfo()
+		.Name("wizardlabel")
 		//.Caption(wxT("ToolBar2"))
 		.Top()
 		.Layer(2)
@@ -2209,7 +2207,7 @@ void mafLogicWithManagers::CreateWizardToolbar()
 		);
 
 	m_Win->AddDockPane(serparatorBar,  wxPaneInfo()
-		.Name("separator")
+		.Name("wizardseparator")
 		//.Caption(wxT("ToolBar3"))
 		.Top()
 		.Layer(2)
@@ -2220,8 +2218,6 @@ void mafLogicWithManagers::CreateWizardToolbar()
 		.Movable(false)
 		.Gripper(false)
 		);
-
-	m_WizardGauge->Show(false);
 }
 
 //----------------------------------------------------------------------------
@@ -2231,7 +2227,6 @@ void mafLogicWithManagers::ConfigureWizardManager()
 	//Setting wizard specific data
 	if(m_UseWizardManager)
 	{
-		CreateWizardToolbar();
 		m_WizardManager = new mafWizardManager();
 		m_WizardManager->SetListener(this);
 		m_WizardManager->WarningIfCantUndo(m_ApplicationSettings->GetWarnUserFlag());
@@ -2270,4 +2265,275 @@ void mafLogicWithManagers::WizardRunTerminated()
 	if(m_SideBar)
 		m_SideBar->EnableSelect(true);
 
+}
+
+
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::CreateControlPanel()
+{
+	{
+		m_SideBar = new mafSideBar(m_Win,MENU_VIEW_SIDEBAR,this,m_SidebarStyle);
+		m_Win->AddDockPane(m_SideBar->m_Notebook , wxPaneInfo()
+			.Name("sidebar")
+			.Caption(wxT("Control Panel"))
+			.Right()
+			.Layer(2)
+			.MinSize(240,450)
+			.TopDockable(false)
+			.BottomDockable(false)
+			);
+	}
+}
+
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::ShowSplashScreen()
+{
+	wxBitmap splashImage = mafPictureFactory::GetPictureFactory()->GetBmp("SPLASH_SCREEN");
+	ShowSplashScreen(splashImage);
+}
+
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::ShowSplashScreen(wxBitmap &splashImage)
+{
+	long splash_style = wxSIMPLE_BORDER | wxSTAY_ON_TOP;
+	wxSplashScreen* splash = new wxSplashScreen(splashImage,
+		wxSPLASH_CENTRE_ON_SCREEN|wxSPLASH_TIMEOUT,
+		2000, NULL, -1, wxDefaultPosition, wxDefaultSize,
+		splash_style);
+	mafYield();
+}
+
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::CreateNullLog()
+{
+#ifdef MAF_USE_VTK
+	m_VtkLog = mafVTKLog::New();
+	m_VtkLog->SetInstance(m_VtkLog);
+#endif  
+	wxTextCtrl *log  = new wxTextCtrl( m_Win, -1, "", wxPoint(0,0), wxSize(100,300), wxNO_BORDER | wxTE_MULTILINE );
+	m_Logger = new mafWXLog(log);
+	log->Show(false);
+	wxLog *old_log = wxLog::SetActiveTarget( m_Logger );
+	cppDEL(old_log);
+}
+
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::CreateLogPanel()
+{
+#ifdef MAF_USE_VTK
+	m_VtkLog = mafVTKLog::New();
+	m_VtkLog->SetInstance(m_VtkLog);
+#endif
+	wxTextCtrl *log  = new wxTextCtrl( m_Win, MENU_VIEW_LOGBAR, "", wxPoint(0,0), wxSize(100,300), /*wxNO_BORDER |*/ wxTE_MULTILINE );
+	m_Logger = new mafWXLog(log);
+	m_Logger->LogToFile(m_LogToFile);
+	if(m_LogToFile)
+	{
+		wxString s = m_ApplicationSettings->GetLogFolder().GetCStr();
+		wxDateTime log_time = wxDateTime::Now();
+		s += "\\";
+		s += m_Win->GetTitle();
+		s += wxString::Format("_%02d_%02d_%d_%02d_%2d",log_time.GetYear(),log_time.GetMonth() + 1,log_time.GetDay(),log_time.GetHour(),log_time.GetMinute());
+		s += ".log";
+		if (m_Logger->SetFileName(s) == MAF_ERROR)
+		{
+			wxMessageBox(wxString::Format("Unable to create log file %s!!",s),"Warning", wxOK|wxICON_WARNING);
+		}
+	}
+	
+	wxLog *old_log = wxLog::SetActiveTarget( m_Logger );
+	cppDEL(old_log);
+
+	m_Win->AddDockPane(log, wxPaneInfo()
+		.Name("logbar")
+		.Caption(wxT("Log Panel"))
+		.Bottom()
+		.Layer(0)
+		.MinSize(100,10)
+		.TopDockable(false) // prevent docking on top side - otherwise may dock also beside the toolbar -- and it's hugely
+		);
+
+	mafLogMessage(_("Welcome"));
+}
+
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::CreateToolbar()
+{
+
+	//m_ToolBar = new wxToolBar(m_Win,-1,wxPoint(0,0),wxSize(-1,-1),wxHORIZONTAL|wxNO_BORDER|wxTB_FLAT  );
+	m_ToolBar = new wxToolBar(m_Win,MENU_VIEW_TOOLBAR,wxPoint(0,0),wxSize(-1,-1),wxTB_FLAT | wxTB_NODIVIDER );
+	m_ToolBar->SetMargins(0,0);
+	m_ToolBar->SetToolSeparation(2);
+	m_ToolBar->SetToolBitmapSize(wxSize(20,20));
+	m_ToolBar->AddTool(MENU_FILE_NEW,mafPictureFactory::GetPictureFactory()->GetBmp("FILE_NEW"),    _("new " + m_Extension + " storage file"));
+	m_ToolBar->AddTool(MENU_FILE_OPEN,mafPictureFactory::GetPictureFactory()->GetBmp("FILE_OPEN"),  _("open " + m_Extension + " storage file"));
+	m_ToolBar->AddTool(MENU_FILE_SAVE,mafPictureFactory::GetPictureFactory()->GetBmp("FILE_SAVE"),  _("save current " + m_Extension + " storage file"));
+	m_ToolBar->AddSeparator();
+
+	m_ToolBar->AddTool(MENU_FILE_PRINT,mafPictureFactory::GetPictureFactory()->GetBmp("PRINT"),  _("print the selected view"));
+	m_ToolBar->AddTool(MENU_FILE_PRINT_PREVIEW,mafPictureFactory::GetPictureFactory()->GetBmp("PRINT_PREVIEW"),  _("show the print preview for the selected view"));
+	m_ToolBar->AddSeparator();
+
+	m_ToolBar->AddTool(OP_UNDO,mafPictureFactory::GetPictureFactory()->GetBmp("OP_UNDO"),  _("undo (ctrl+z)"));
+	m_ToolBar->AddTool(OP_REDO,mafPictureFactory::GetPictureFactory()->GetBmp("OP_REDO"),  _("redo (ctrl+shift+z)"));
+	m_ToolBar->AddSeparator();
+
+	m_ToolBar->AddTool(OP_CUT,  mafPictureFactory::GetPictureFactory()->GetBmp("OP_CUT"),  _("cut selected vme (ctrl+x)"));
+	m_ToolBar->AddTool(OP_COPY, mafPictureFactory::GetPictureFactory()->GetBmp("OP_COPY"), _("copy selected vme (ctrl+c)"));
+	m_ToolBar->AddTool(OP_PASTE,mafPictureFactory::GetPictureFactory()->GetBmp("OP_PASTE"),_("paste vme (ctrl+v)"));
+	m_ToolBar->AddSeparator();
+	m_ToolBar->AddTool(CAMERA_RESET,mafPictureFactory::GetPictureFactory()->GetBmp("ZOOM_ALL"),_("reset camera to fit all (ctrl+f)"));
+	m_ToolBar->AddTool(CAMERA_FIT,  mafPictureFactory::GetPictureFactory()->GetBmp("ZOOM_SEL"),_("reset camera to fit selected object (ctrl+shift+f)"));
+	m_ToolBar->AddTool(CAMERA_FLYTO,mafPictureFactory::GetPictureFactory()->GetBmp("FLYTO"),_("fly to object under mouse"));
+
+
+	EnableItem(CAMERA_RESET, false);
+	EnableItem(CAMERA_FIT,   false);
+	EnableItem(CAMERA_FLYTO, false);
+	EnableItem(MENU_FILE_PRINT, false);
+	EnableItem(MENU_FILE_PRINT_PREVIEW, false);
+
+	m_ToolBar->Realize();
+
+	//SIL. 23-may-2006 : 
+	m_Win->AddDockPane(m_ToolBar,  wxPaneInfo()
+		.Name("toolbar")
+		.Caption(wxT("Toolbar"))
+		.Top()
+		.Layer(2)
+		.ToolbarPane()
+		.LeftDockable(false)
+		.RightDockable(false)
+		.Floatable(false)
+		.Movable(false)
+		.Gripper(false)
+		);
+}
+
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::CreateTimeBar()
+{
+	m_TimePanel = new mafGUITimeBar(m_Win,MENU_VIEW_TIMEBAR,true);
+	m_TimePanel->SetListener(this);
+
+	// Events coming from settings are forwarded to the time bar.
+	m_TimePanel->SetTimeSettings(m_TimeBarSettings);
+	m_TimeBarSettings->SetListener(m_TimePanel);
+
+	m_Win->AddDockPane(m_TimePanel, wxPaneInfo()
+		.Name("timebar")
+		.Caption(wxT("Time Bar"))
+		.Bottom()
+		.Row(1)
+		.Layer(2)
+		.ToolbarPane()
+		.LeftDockable(false)
+		.RightDockable(false)
+		.MinSize(100,22)
+		.Floatable(false)
+		.Gripper(false)
+		.Resizable(false)
+		.Movable(false)
+		);
+}
+
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::EnableItem(int item, bool enable)
+{
+	if(m_MenuBar) 
+		// must always check if a menu item exist because
+		// during application shutdown it is not guaranteed
+			if(m_MenuBar->FindItem(item))	
+				m_MenuBar->Enable(item,enable );
+	if(m_ToolBar)
+		m_ToolBar->EnableTool(item,enable );
+}
+
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::StoreLayout()
+{
+	int pos[2], size[2];
+
+	mafXMLStorage *xmlStorage = mafXMLStorage::New();
+	xmlStorage->SetFileType("MLY");
+	xmlStorage->SetVersion("2.0");
+	mafVMERoot *root;
+	mafNEW(root);
+	root->Initialize();
+	xmlStorage->SetDocument(root);
+
+	wxString layout_file  = mafGetAppDataDirectory().c_str();
+	layout_file << "\\layout.mly";
+
+	wxFrame *frame = (wxFrame *)mafGetFrame();
+	wxRect rect;
+	rect = frame->GetRect();
+	pos[0] = rect.GetPosition().x;
+	pos[1] = rect.GetPosition().y;
+	size[0] = rect.GetSize().GetWidth();
+	size[1] = rect.GetSize().GetHeight();
+
+	mmaApplicationLayout  *layout;
+	mafNEW(layout);
+
+	layout->SetApplicationInfo(m_Win->IsMaximized(), pos, size);
+	bool toolbar_vis = m_Win->GetDockManager().GetPane("toolbar").IsShown();
+	layout->SetInterfaceElementVisibility("toolbar", toolbar_vis);
+	bool sidebar_vis = m_Win->GetDockManager().GetPane("sidebar").IsShown();
+	layout->SetInterfaceElementVisibility("sidebar", sidebar_vis);
+	bool logbar_vis = m_Win->GetDockManager().GetPane("logbar").IsShown();
+	layout->SetInterfaceElementVisibility("logbar", logbar_vis);
+
+	root->SetAttribute("ApplicationLayout", layout);
+
+	xmlStorage->SetURL(layout_file);
+	xmlStorage->Store();
+
+	cppDEL(xmlStorage);
+	mafDEL(root);
+	mafDEL(layout);
+} 
+
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::RestoreLayout()
+{
+
+	mafXMLStorage *xmlStorage = mafXMLStorage::New();
+	xmlStorage->SetFileType("MLY");
+	xmlStorage->SetVersion("2.0");
+
+	mafVMERoot *root;
+	mafNEW(root);
+	root->Initialize();
+	xmlStorage->SetDocument(root);
+
+	wxString layout_file  = mafGetAppDataDirectory().c_str();
+	layout_file << "\\layout.mly";
+	xmlStorage->SetURL(layout_file);
+	if(wxFileExists(layout_file) && xmlStorage->Restore()==MAF_OK)
+	{
+		mafNode *root = ((mafNode *)xmlStorage->GetDocument());
+
+		mmaApplicationLayout * app_layout = (mmaApplicationLayout *)root->GetAttribute("ApplicationLayout");
+
+		int maximized, pos[2], size[2];
+		app_layout->GetApplicationInfo(maximized, pos, size);
+
+		pos[0]=MAX(0,pos[0]);
+		pos[1]=MAX(0,pos[1]);
+
+		wxRect rect(pos[0],pos[1],size[0],size[1]);
+		m_Win->SetSize(rect);
+		
+		if (maximized != 0)
+			m_Win->Maximize();
+		
+		m_Win->ShowDockPane("toolbar", app_layout->GetToolBarVisibility());
+		m_Win->ShowDockPane("logbar", app_layout->GetLogBarVisibility());
+		m_Win->ShowDockPane("sidebar",  app_layout->GetSideBarVisibility());
+	}
+
+
+	cppDEL(xmlStorage);
+	mafDEL(root);
 }

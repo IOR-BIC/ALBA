@@ -56,23 +56,19 @@ void mafOpImporterVMEDataSetAttributesTest::TestImportAttributes()
   storage->GetRoot()->Initialize();
 
   mafString dirPrefix = MAF_DATA_ROOT;
-  dirPrefix << "/FEM/ANSYS/tet10/";
+  dirPrefix << "/FEM/GenericMesh/";
 
   mafString nodesFileName = dirPrefix;
-  nodesFileName << "NLIST.lis";
+  nodesFileName << "NLISTtet10.lis";
 
   mafString elementsFileName = dirPrefix;
-  elementsFileName << "ELIST.lis";
-
-  mafString materialsFileName = dirPrefix;
-  materialsFileName << "MPLIST.lis";
+  elementsFileName << "ELISTtet10.lis";
 
   mafOpImporterMesh *meshImporter=new mafOpImporterMesh("mesh importer");
 	meshImporter->TestModeOn();
 
   meshImporter->SetNodesFileName(nodesFileName.GetCStr());
   meshImporter->SetElementsFileName(elementsFileName.GetCStr());
-  meshImporter->SetMaterialsFileName(materialsFileName.GetCStr());
 
   meshImporter->Read();
 

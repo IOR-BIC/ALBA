@@ -1,8 +1,8 @@
 /*=========================================================================
 
  Program: MAF2
- Module: mafNodeLayoutTest
- Authors: Roberto Mucci
+ Module: mafPipeRefSys
+ Authors: Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -23,52 +23,20 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include <cppunit/config/SourcePrefix.h>
-#include "mafNodeLayoutTest.h"
-
-#include "mafNodeLayout.h"
-#include "mmaApplicationLayout.h"
-#include "mafVMERoot.h"
-
-#include <iostream>
-
-#define TEST_RESULT CPPUNIT_ASSERT(result);
-
+#include "mafPipeRefSys.h"
+#include "mafVMEOutputSurface.h"
+#include "mafVME.h"
+#include "vtkPolyData.h"
 
 //----------------------------------------------------------------------------
-void mafNodeLayoutTest::TestFixture()
+mafCxxTypeMacro(mafPipeRefSys);
+//----------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
+mafPipeRefSys::mafPipeRefSys():mafPipeSurface()
 //----------------------------------------------------------------------------
 {
+	m_ScalarMapActive=true;
 }
 
-//----------------------------------------------------------------------------
-void mafNodeLayoutTest::TestDynamicAllocation()
-//----------------------------------------------------------------------------
-{
-  mafSmartPointer<mafNodeLayout> layout;
-  mafNodeLayout *layout2 = mafNodeLayout::New();
-  layout2->Delete();
-}
 
-//----------------------------------------------------------------------------
-void mafNodeLayoutTest::GetLayoutTest()
-//----------------------------------------------------------------------------
-{
-  mafSmartPointer<mafVMERoot> root;
-  mafSmartPointer<mafNodeLayout> child;
-  root->AddChild(child);
-
-  mmaApplicationLayout *appLayout;
-  mafNEW(appLayout);
-  int pos[] = {5,6};
-  int size[] = {1,9};
-  appLayout->SetApplicationInfo(10, pos, size);
-  child->SetAttribute("ApplicationLayout", appLayout); 
-  
-  mmaApplicationLayout *appLayout2 = child->GetLayout();
-
-  //test if mmaApplicationLayout returned (appLayout2) equals the one set
-  result = (appLayout2->Equals(appLayout));
-  TEST_RESULT;
-  mafDEL(appLayout);
-}

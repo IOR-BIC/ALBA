@@ -42,8 +42,6 @@ SET(PROJECT_SRCS
   mafPics.h
   mafWXLog.cpp
   mafWXLog.h
-  mafGUIApplicationLayoutSettings.cpp
-  mafGUIApplicationLayoutSettings.h
   mafGUIApplicationSettings.cpp
   mafGUIApplicationSettings.h
   mafGUIButton.cpp
@@ -62,8 +60,6 @@ SET(PROJECT_SRCS
   mafGUIDialog.h
   mafGUIDockManager.cpp
   mafGUIDockManager.h
-  mafGUIDockSettings.cpp
-  mafGUIDockSettings.h
   mafGUIFileHistory.cpp
   mafGUIFileHistory.h
   mafGUIFlagSplitter.cpp
@@ -82,10 +78,6 @@ SET(PROJECT_SRCS
   mafGUIListBox.h
   mafGUIListCtrl.cpp
   mafGUIListCtrl.h
-  mafGUILocaleSettings.cpp
-  mafGUILocaleSettings.h
-  mafGUIMeasureUnitSettings.cpp
-  mafGUIMeasureUnitSettings.h
   mafGUIMovieCtrl.cpp
   mafGUIMovieCtrl.h
   mafGUIMDIChild.cpp
@@ -128,8 +120,6 @@ SET(PROJECT_SRCS
   mafGUICrossIncremental.h
   mafGUIComboBox.cpp
   mafGUIComboBox.h
-  mafGUISettingsHelp.h
-  mafGUISettingsHelp.cpp
   mafGUILandmark.cpp
   mafGUILandmark.h
   mafGUIWizard.cpp
@@ -140,8 +130,6 @@ SET(PROJECT_SRCS
   mafGUIWizardPageNew.h
   mafGUIDicomSettings.cpp
   mafGUIDicomSettings.h
-  mafGUIContextualMenu.cpp
-  mafGUIContextualMenu.h
   mafGUISettingsAdvanced.cpp
   mafGUISettingsAdvanced.h
   mafGUIDynamicVP.cpp

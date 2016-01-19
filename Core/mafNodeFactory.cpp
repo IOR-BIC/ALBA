@@ -27,7 +27,6 @@
 #include "mafNodeFactory.h"
 #include "mafVersion.h"
 #include "mafNodeRoot.h"
-#include "mafNodeLayout.h"
 #include "mafNodeGeneric.h"
 #include "mafTagArray.h"
 #include "mafIndent.h"
@@ -79,7 +78,6 @@ mafNodeFactory::mafNodeFactory()
   //mafPlugNodeMacro(mafNodeRoot,"root for generic nodes tree");
   //mafPlugNodeMacro(mafNodeGeneric,"a generic node with only basic features");
   //mafPlugObjectMacro(mafTagArray,"a basic kind of attribute used to store key-value pairs");
-  mafPlugNodeMacro(mafNodeLayout,"node for layout list");
 }
 
 //------------------------------------------------------------------------------

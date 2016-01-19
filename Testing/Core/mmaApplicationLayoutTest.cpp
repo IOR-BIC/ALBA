@@ -63,56 +63,8 @@ void mmaApplicationLayoutTest::TestDynamicAllocation()
   TEST_RESULT;
   appLayout->Delete();
 }
-//----------------------------------------------------------------------------
-void mmaApplicationLayoutTest::TestAddView()
-//----------------------------------------------------------------------------
-{
-  mafSmartPointer<mmaApplicationLayout> appLayout;
 
-  mafView *v1 = new mafView("v1");
-  mafView *v2 = new mafView("v2");
 
-  v1->SetFrame(m_Toplevel);
-  v2->SetFrame(m_Toplevel);
-
-  appLayout->AddView(v1);
-  result = appLayout->GetNumberOfViewsInLayout() == 1;
-  TEST_RESULT;
-
-  appLayout->AddView(v2);
-  result = appLayout->GetNumberOfViewsInLayout() == 2;
-  TEST_RESULT;
-
-  cppDEL(v1);
-  cppDEL(v2);
-}
-//----------------------------------------------------------------------------
-void mmaApplicationLayoutTest::TestRemoveView()
-//----------------------------------------------------------------------------
-{
-  mafSmartPointer<mmaApplicationLayout> appLayout;
-
-  mafView *v1 = new mafView("v1");
-  mafView *v2 = new mafView("v2");
-  v1->SetFrame(m_Toplevel);
-  v2->SetFrame(m_Toplevel);
-
-  appLayout->AddView(v1);
-  appLayout->AddView(v2);
-
-  appLayout->RemoveView(0);
-  result = appLayout->GetNumberOfViewsInLayout() == 1;
-  TEST_RESULT;
-
-  appLayout->AddView(v1);
-
-  appLayout->RemoveView(v1);
-  result = appLayout->GetNumberOfViewsInLayout() == 1;
-  TEST_RESULT;
-
-  cppDEL(v1);
-  cppDEL(v2);
-}
 //----------------------------------------------------------------------------
 void mmaApplicationLayoutTest::TestEquals()
 //----------------------------------------------------------------------------
@@ -124,12 +76,6 @@ void mmaApplicationLayoutTest::TestEquals()
   mafView *v2 = new mafView("v2");
   v1->SetFrame(m_Toplevel);
   v2->SetFrame(m_Toplevel);
-
-  appLayout1->AddView(v1);
-  appLayout1->AddView(v2);
-
-  appLayout2->AddView(v1);
-  appLayout2->AddView(v2);
 
   result = appLayout1->Equals(appLayout2);
   TEST_RESULT;
@@ -149,13 +95,10 @@ void mmaApplicationLayoutTest::TestDeepCopy()
   v1->SetFrame(m_Toplevel);
   v2->SetFrame(m_Toplevel);
 
-  appLayout1->AddView(v1);
-  appLayout1->AddView(v2);
 
   mafView *v3 = new mafView("v3");
   v3->SetFrame(m_Toplevel);
 
-  appLayout2->AddView(v3);
   appLayout2->DeepCopy(appLayout1);
 
   result = appLayout1->Equals(appLayout2);
@@ -165,29 +108,4 @@ void mmaApplicationLayoutTest::TestDeepCopy()
   cppDEL(v2);
   cppDEL(v3);
 }
-//----------------------------------------------------------------------------
-void mmaApplicationLayoutTest::TestClearLayout()
-//----------------------------------------------------------------------------
-{
-  mafSmartPointer<mmaApplicationLayout> appLayout;
-
-  mafView *v1 = new mafView("v1");
-  mafView *v2 = new mafView("v2");
-  v1->SetFrame(m_Toplevel);
-  v2->SetFrame(m_Toplevel);
-
-  appLayout->AddView(v1);
-  appLayout->AddView(v2);
-
-  appLayout->ClearLayout();
-  
-  result = appLayout->GetNumberOfViewsInLayout() == 0;
-  TEST_RESULT;
-
-  mafString default_name = "Null Layout";
-  result = default_name.Equals(appLayout->GetLayoutName());
-  TEST_RESULT;
-
-  cppDEL(v1);
-  cppDEL(v2);
-}
+ 

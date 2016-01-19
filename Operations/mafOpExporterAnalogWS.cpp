@@ -74,7 +74,7 @@ mafOp* mafOpExporterAnalogWS::Copy()
 void mafOpExporterAnalogWS::OpRun()   
 //----------------------------------------------------------------------------
 {
-	wxString proposed = mafGetDocumentsDirectory().c_str();
+	wxString proposed = mafGetLastUserFolder().c_str();
 	proposed += m_Input->GetName();
 	proposed += ".csv";
 	

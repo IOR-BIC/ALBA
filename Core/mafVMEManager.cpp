@@ -60,7 +60,7 @@ mafVMEManager::mafVMEManager()
   m_LoadingFlag = false;
   m_FileHistoryIdx = -1;
 
-	m_MSFDir   = mafGetDocumentsDirectory().c_str();;
+	m_MSFDir   = mafGetLastUserFolder().c_str();;
 	m_MSFFile  = "";
 	m_ZipFile  = "";
   m_TmpDir   = "";
@@ -273,7 +273,7 @@ int mafVMEManager::MSFOpen(mafString filename)
   bool remote_file = IsRemote(filename, protocol); // check if the specified path refers to a remote location
   
   // open a local msf
-  if(!remote_file && !::wxFileExists(filename.GetCStr()))
+  if(!remote_file && !wxFileExists(filename.GetCStr()))
 	{
 		mafString msg;
     msg = _("File ");
@@ -390,8 +390,6 @@ int mafVMEManager::MSFOpen(mafString filename)
   app_stamp << root_node->GetTagArray()->GetTag("APP_STAMP")->GetValue();
   // First check for compatibility with all stored App stamps
   bool stamp_found = false;
-  bool stamp_data_manager_found = false;
-  bool stamp_open_all_found = false;
   for (int k=0; k<m_AppStamp.size(); k++)
   {
     // Check with the Application name
@@ -399,32 +397,26 @@ int mafVMEManager::MSFOpen(mafString filename)
     {
       stamp_found = true;
     }
-    // Check with the "Data Manager" tag
-    if (m_AppStamp.at(k).Equals("DataManager"))
-    {
-      stamp_data_manager_found = true;
-    }
-    // Check with the "OPEN_ALL_DATA" tag
-    if (m_AppStamp.at(k).Equals("OPEN_ALL_DATA"))
-    {
-      stamp_open_all_found = true;
-    }
+   
   }
-	if(app_stamp.Equals("INVALID") || ((!stamp_found) && (!stamp_data_manager_found) && (!stamp_open_all_found))) 
+	if(app_stamp.Equals("INVALID") || !stamp_found) 
 	{
-		//Application stamp not valid
-		mafMessage(_("File not valid for this application!"), _("Warning"));
-		m_Modified = false;
-		m_Storage->Delete();
-		m_Storage = NULL;
+		int answer = wxMessageBox("This file was not created under this application\nYou can lose data.\n\nAre you sure to open this file?","Confirm", wxYES_NO|wxICON_QUESTION, mafGetFrame());
+		if(answer != wxYES)
+		{
+			//Application stamp not valid
+			m_Modified = false;
+			m_Storage->Delete();
+			m_Storage = NULL;
     
-		MSFNew();
-    if(!m_TestMode) // Losi 02/16/2010 for test class
-    {
-      cppDEL(disableAll);
-      cppDEL(wait_cursor);
-    }
-		return MAF_ERROR;
+			MSFNew();
+			if(!m_TestMode) // Losi 02/16/2010 for test class
+			{
+				cppDEL(disableAll);
+				cppDEL(wait_cursor);
+			}
+			return MAF_ERROR;
+		}
 	}
 	///////////////////////////////////////////////////////////////////////////////// 
   NotifyAdd(root_node); // add the storage root (the tree) with events notification
@@ -436,18 +428,13 @@ int mafVMEManager::MSFOpen(mafString filename)
 	{
     m_FileHistory.AddFileToHistory(m_ZipFile.GetCStr()); // add the zmsf file to the history
 	}
-  else if(/*!remote_file && */res == MAF_OK)
+  else
   {
     m_FileHistory.AddFileToHistory(m_MSFFile.GetCStr()); // add the msf file to the history
   }
-  else if(res != MAF_OK && m_FileHistoryIdx != -1)
-  {
-    m_FileHistory.RemoveFileFromHistory(m_FileHistoryIdx); // if something get wrong retoring the file remove it from istory
-  }
+
 	m_FileHistory.Save(*m_Config); // save file history to registry
   m_FileHistoryIdx = -1;
-
-  mafEventMacro(mafEvent(this,LAYOUT_LOAD)); // ask logic to load the layout
 
   if(!m_TestMode) // Losi 02/16/2010 for test class
   {
@@ -915,7 +902,7 @@ bool mafVMEManager::AskConfirmAndSave()
   bool go = true;
 	if (m_Modified) // check if the msf has been modified
 	{
-		int answer = wxMessageBox(_("your work is modified, would you like to save it?"),_("Confirm"),wxYES_NO|wxCANCEL|wxICON_QUESTION,mafGetFrame()); // ask user if will save msf before closing
+		int answer = wxMessageBox(_("Your work is modified, would you like to save it?"),_("Confirm"),wxYES_NO|wxCANCEL|wxICON_QUESTION,mafGetFrame()); // ask user if will save msf before closing
 		if(answer == wxCANCEL) go = false;
 		if(answer == wxYES)    MSFSave();
 	}

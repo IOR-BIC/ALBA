@@ -62,7 +62,7 @@ mafOp(label)
 	m_SingleFile = 1;
 	m_Offset = 0;
 
-  m_ProposedDirectory = mafGetDocumentsDirectory().c_str();
+  m_ProposedDirectory = mafGetLastUserFolder().c_str();
 }
 //----------------------------------------------------------------------------
 mafOpExporterRAW::~mafOpExporterRAW()
@@ -275,7 +275,7 @@ void mafOpExporterRAW::SaveVolume()
 			if(!m_TestMode)
 			{
 				//saving the z coordinates in a file
-        wxString proposed = mafGetDocumentsDirectory().c_str();
+        wxString proposed = mafGetLastUserFolder().c_str();
 				proposed += _("Z_coordinates_");
 				proposed += m_Input->GetName();
 				proposed += _(".txt");
@@ -363,7 +363,7 @@ void mafOpExporterRAW::SaveVolume()
 			if(!m_TestMode)
 			{
 				//saving the z coordinates in a file
-        wxString proposed = mafGetDocumentsDirectory().c_str();
+        wxString proposed = mafGetLastUserFolder().c_str();
 				proposed += _("Z_coordinates_");
 				proposed += m_Input->GetName();
 				proposed += _(".txt");

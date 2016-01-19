@@ -31,9 +31,6 @@
 #include "mafGUIPicButton.h"
 
 
-#define max(a,b)  (((a) > (b)) ? (a) : (b))
-
-
 
 //----------------------------------------------------------------------------
 mafWizardBlockInformation::mafWizardBlockInformation(const char *name):mafWizardBlock(name)
@@ -147,7 +144,7 @@ void mafWizardBlockInformation::ExcutionBegin()
         charPointer++;
         currentX+=x;
       }
-      xsize=max(xsize,currentX);
+      xsize=MAX(xsize,currentX);
       ysize+=y;
       charPointer++;
     }

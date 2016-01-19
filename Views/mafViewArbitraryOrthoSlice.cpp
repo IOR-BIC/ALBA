@@ -353,13 +353,13 @@ mafViewArbitraryOrthoSlice::~mafViewArbitraryOrthoSlice()
 
 void mafViewArbitraryOrthoSlice::PackageView()
 {
-	m_ViewArbitrary = new mafViewVTK("",CAMERA_PERSPECTIVE,true,false,false,0,false,mafAxes::HEAD);
+	m_ViewArbitrary = new mafViewVTK("",CAMERA_PERSPECTIVE,true,false,0,false,mafAxes::HEAD);
 	m_ViewArbitrary->PlugVisualPipe("mafVMEVolumeGray", "mafPipeBox", MUTEX);
 	//	m_ViewArbitrary->PlugVisualPipe("mafVMELabeledVolume", "mafPipeBox", MUTEX);
 
 	m_ViewArbitrary->PlugVisualPipe("mafVMEGizmo", "mafPipeGizmo", NON_VISIBLE);
 
-	m_ViewSliceX = new mafViewVTK("",CAMERA_OS_X,true,false,false,0,false,mafAxes::HEAD);
+	m_ViewSliceX = new mafViewVTK("",CAMERA_OS_X,true,false,0,false,mafAxes::HEAD);
 
 
 	// 	m_ViewSliceX->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice", NON_VISIBLE);
@@ -370,7 +370,7 @@ void mafViewArbitraryOrthoSlice::PackageView()
 	// 	m_ViewSliceX->PlugVisualPipe("mafVMELandmark", "mafPipeSurfaceSlice", NON_VISIBLE);
 	// 	m_ViewSliceX->PlugVisualPipe("mafVMELandmarkCloud", "mafPipeSurfaceSlice", NON_VISIBLE);
 
-	m_ViewSliceY = new mafViewVTK("",CAMERA_OS_Y,true,false,false,0,false,mafAxes::HEAD);
+	m_ViewSliceY = new mafViewVTK("",CAMERA_OS_Y,true,false,0,false,mafAxes::HEAD);
 
 
 	// 	m_ViewSliceY->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice", NON_VISIBLE);
@@ -381,7 +381,7 @@ void mafViewArbitraryOrthoSlice::PackageView()
 	// 	m_ViewSliceY->PlugVisualPipe("mafVMELandmark", "mafPipeSurfaceSlice", NON_VISIBLE);
 	// 	m_ViewSliceY->PlugVisualPipe("mafVMELandmarkCloud", "mafPipeSurfaceSlice", NON_VISIBLE);
 
-	m_ViewSliceZ = new mafViewVTK("",CAMERA_OS_Z,true,false,false,0,false,mafAxes::HEAD);
+	m_ViewSliceZ = new mafViewVTK("",CAMERA_OS_Z,true,false,0,false,mafAxes::HEAD);
 
 
 	// 	m_ViewSliceZ->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice", NON_VISIBLE);
@@ -605,7 +605,7 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossTranslateZNormalView(mafEventB
 			mafNodeIterator *iter = root->NewIterator();
 			for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
 			{
-				if(node->IsA("mafVMESurface") || node->IsA("mafVMESurfaceParametric") || node->IsA("mafVMELandmark") || node->IsA("mafVMELandmarkCloud"))
+				if(node->IsA("mafVMESurface") || node->IsA("mafVMESurfaceParametric") || node->IsA("mafVMELandmark") || node->IsA("mafVMELandmarkCloud")|| node->IsA("mafVMERefSys"))
 				{
 					double surfaceOriginTranslated[3];
 					double normal[3];

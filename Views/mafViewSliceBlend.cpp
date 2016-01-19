@@ -68,8 +68,8 @@ mafCxxTypeMacro(mafViewSliceBlend);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mafViewSliceBlend::mafViewSliceBlend(wxString label, int camera_position, bool show_axes, bool show_grid, bool show_ruler, int stereo)
-:mafViewVTK(label,camera_position,show_axes,show_grid, show_ruler, stereo)
+mafViewSliceBlend::mafViewSliceBlend(wxString label, int camera_position, bool show_axes, bool show_grid, int stereo)
+:mafViewVTK(label,camera_position,show_axes,show_grid, stereo)
 //----------------------------------------------------------------------------
 {
   // default values
@@ -98,7 +98,7 @@ mafViewSliceBlend::~mafViewSliceBlend()
 mafView *mafViewSliceBlend::Copy(mafObserver *Listener, bool lightCopyEnabled /* = false */)
 //----------------------------------------------------------------------------
 {
-  mafViewSliceBlend *v = new mafViewSliceBlend(m_Label, m_CameraPositionId, m_ShowAxes,m_ShowGrid, m_ShowRuler, m_StereoType);
+  mafViewSliceBlend *v = new mafViewSliceBlend(m_Label, m_CameraPositionId, m_ShowAxes,m_ShowGrid, m_StereoType);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
   v->m_PipeMap = m_PipeMap;
@@ -111,7 +111,7 @@ void mafViewSliceBlend::Create()
 {
   RWI_LAYERS num_layers = m_CameraPositionId != CAMERA_OS_P ? TWO_LAYER : ONE_LAYER;
 
-  m_Rwi = new mafRWI(mafGetFrame(), num_layers, m_ShowGrid, m_ShowAxes, m_ShowRuler, m_StereoType);
+  m_Rwi = new mafRWI(mafGetFrame(), num_layers, m_ShowGrid, m_ShowAxes, m_StereoType);
   m_Rwi->SetListener(this);
   m_Rwi->CameraSet(m_CameraPositionId);
   m_Win = m_Rwi->m_RwiBase;

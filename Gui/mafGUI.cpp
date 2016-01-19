@@ -41,6 +41,7 @@
 #endif             //:::::::::::::::::::::::::::::::::
 
 #include "mafString.h"
+#include <wx/image.h>
 
 // ugly hack to make FindWindow Work
 // if you remove this line you will have a Compile-Error "FindWindowA is not defined for wxWindow"
@@ -1198,7 +1199,7 @@ void mafGUI::DirOpen(int id,mafString label,mafString *var, mafString tooltip)
   {
     butt_w = EW;
   }
-  mafGUIButton    *butt = new mafGUIButton   (this, w_id, "browse",dp, wxSize(butt_w,BH));
+  mafGUIButton    *butt = new mafGUIButton   (this, w_id, "Browse",dp, wxSize(butt_w,BH));
   wxTextCtrl   *text = new wxTextCtrl  (this, GetWidgetId(id), "", dp, wxSize(text_w,BH),wxTE_READONLY|m_EntryStyle  );
   text->SetFont(m_Font);
 	butt->SetValidator( mafGUIValidator(this,w_id,butt,var,text) );
@@ -1606,6 +1607,27 @@ void mafGUI::Reparent(wxWindow *parent)
   this->Update();
   this->Show(true);
 }
+
+//----------------------------------------------------------------------------
+void mafGUI::AddMenuItem(wxMenu *menu,int id, wxString label, char **icon/*=NULL*/)
+{
+	int osVersion;
+	wxGetOsVersion(&osVersion);
+	
+	//menu icons does not work on this version of wxwindows under winxp
+	if(icon!=NULL && osVersion>5)
+	{
+		wxMenuItem *menuItem=new wxMenuItem(menu,id,label,label,false);
+		menuItem->SetBitmap(wxImage(icon));
+		menu->Append(menuItem);
+		menu->UpdateUI();
+	}
+	else
+	{
+		menu->Append(id, label, (wxMenu *)NULL, label );
+	}
+}
+
 //----------------------------------------------------------------------------
 void mafGUI::GetWidgetValue(long widget_id, WidgetDataType &widget_data)
 //----------------------------------------------------------------------------

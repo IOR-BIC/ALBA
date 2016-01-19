@@ -44,7 +44,7 @@ mafOp(label)
 	m_Canundo = true;
 	m_File    = "";
 
-  m_FileDir = mafGetDocumentsDirectory().c_str();
+  m_FileDir = mafGetLastUserFolder().c_str();
 }
 //----------------------------------------------------------------------------
 mafOpImporterMSF1x::~mafOpImporterMSF1x( ) 

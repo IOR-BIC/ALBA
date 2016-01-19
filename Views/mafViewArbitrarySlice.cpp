@@ -153,6 +153,7 @@ void mafViewArbitrarySlice::PackageView()
 	m_ViewSlice->PlugVisualPipe("mafVMEVolumeGray", "mafPipeBox", NON_VISIBLE);
 	m_ViewSlice->PlugVisualPipe("mafVMELandmark", "mafPipeSurfaceSlice");
 	m_ViewSlice->PlugVisualPipe("mafVMELandmarkCloud", "mafPipeSurfaceSlice");
+	m_ViewSlice->PlugVisualPipe("mafVMERefSys", "mafPipeSurfaceSlice");
 
 	PlugChildView(m_ViewArbitrary);
 	PlugChildView(m_ViewSlice);
@@ -945,6 +946,13 @@ void mafViewArbitrarySlice::UpdateSlicerBehavior()
 		pSli->SetActorPicking(false);
 	}
 };
+
+//----------------------------------------------------------------------------
+char ** mafViewArbitrarySlice::GetIcon()
+{
+#include "pic/VIEW_ARBITRARY.xpm"
+	return VIEW_ARBITRARY_xpm;
+}
 
 //----------------------------------------------------------------------------
 void mafViewArbitrarySlice::VolumeWindowing(mafVME *volume)

@@ -71,7 +71,7 @@ mafOp(label)
   m_VmeMesh     = NULL;
   m_VmeGeneric  = NULL;
 
-  m_FileDir = mafGetDocumentsDirectory().c_str();
+  m_FileDir = mafGetLastUserFolder().c_str();
 }
 //----------------------------------------------------------------------------
 mafOpImporterVTK::~mafOpImporterVTK()

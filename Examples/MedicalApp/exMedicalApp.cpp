@@ -340,12 +340,9 @@ bool exMedicalApp::OnInit()
 	// View Menu':
 	//------------------------------------------------------------
 	//View VTK
-	m_Logic->Plug(new mafViewVTK("VTK view"));
-
-#ifndef _DEBUG
 
 	//View VTK
-	m_Logic->Plug(new mafViewVTK("VTK view"));
+	m_Logic->Plug(new mafViewVTK("Surface"));
 	//View Arbitrary Slice
 	mafViewArbitrarySlice *varbitrary= new mafViewArbitrarySlice("Arbitrary Slice");
 	varbitrary->PackageView();
@@ -389,16 +386,11 @@ bool exMedicalApp::OnInit()
 	mafViewSliceOnCurveCompound *vsliceoncurve=new mafViewSliceOnCurveCompound("Slice On Curve");
 	vsliceoncurve->PackageView();
 	m_Logic->Plug(vsliceoncurve);
-#endif
-	//------------------------------------------------------------
 
 	//wxHandleFatalExceptions();
 
 	//m_Logic->ShowSplashScreen();
 	m_Logic->Show();
-	mafString app_stamp;
-	app_stamp = "OPEN_ALL_DATA";
-	m_Logic->SetApplicationStamp(app_stamp);
 	m_Logic->Init(0,NULL); // calls FileNew - which create the root
 	return TRUE;
 }

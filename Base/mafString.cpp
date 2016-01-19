@@ -803,6 +803,23 @@ int mafString::FindChr(const int c) const
   return result < 0 ? -1 : result;
 //  return (IsEmpty()?-1:(strchr(GetCStr(),c)-GetCStr()));
 }
+
+//----------------------------------------------------------------------------
+void mafString::Replace(char from, char to)
+{
+	char *str=(char *)GetCStr();
+	int count=0;
+
+	for (int i=0; str[i]!= '\0'; i++)
+	{
+		if (str[i] == from)
+		{
+			str[i]=to;
+			count++;
+		}
+	}
+}
+
 //----------------------------------------------------------------------------
 int mafString::FindLastChr(const int c) const
 //----------------------------------------------------------------------------

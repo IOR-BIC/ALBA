@@ -331,20 +331,18 @@ ENDIF(WIN32)
     FILE(GLOB template_file_list "${dirs}/*.txx")
     FILE(GLOB icons_file_list "${dirs}/*.xpm")
 		
-    FOREACH(file ${include_file_list})
-      FILE(RELATIVE_PATH file_name "${dirs}" "${file}")
-    	CONFIGURE_FILE("${file}" "${MAF_INSTALL_INCLUDE_DIRS}/${file_name}")
-    ENDFOREACH(file ${include_file_list})
+    FOREACH(include_file ${include_file_list})
+			file(COPY "${include_file}" DESTINATION "${MAF_INSTALL_INCLUDE_DIRS}")
+    ENDFOREACH(include_file ${include_file_list})
     
     FOREACH(template_file ${template_file_list})
-      FILE(RELATIVE_PATH template_file_name "${dirs}" "${template_file}")
-    	CONFIGURE_FILE("${template_file}" "${MAF_INSTALL_INCLUDE_DIRS}/${template_file_name}")
+			file(COPY "${template_file}" DESTINATION "${MAF_INSTALL_INCLUDE_DIRS}")
     ENDFOREACH(template_file ${template_file_list})
     
     FOREACH(icons_file ${icons_file_list})
-      FILE(RELATIVE_PATH icons_file_name "${dirs}" "${icons_file}")
-    	CONFIGURE_FILE("${icons_file}" "${MAF_INSTALL_INCLUDE_DIRS}/${icons_file_name}")
-    ENDFOREACH(icons_file ${icons_file_list})
+			file(COPY "${icons_file}" DESTINATION "${MAF_INSTALL_INCLUDE_DIRS}")
+		ENDFOREACH(icons_file ${icons_file_list})
+	
   ENDFOREACH(dirs ${MAF_INCLUDE_DIRS})
   
 	#NO MEDICAL REBUILD

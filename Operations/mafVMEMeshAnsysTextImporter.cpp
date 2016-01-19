@@ -51,9 +51,6 @@
 #include <vcl_algorithm.h>
 
 
-#define MIN( x, y ) ( (x) < (y) ? (x) : (y) )
-#define MAX( x, y ) ( (x) > (y) ? (x) : (y) )
-
 //----------------------------------------------------------------------------
 /*
 
@@ -61,12 +58,12 @@ DATA ARRAY NAMING
 
 NODES:
 --------------------------------
-id array name: "id"    type:  vtkIntArray
+id array name: "Id"    type:  vtkIntArray
 
 
 CELLS:  
 --------------------------------
-material array name: "material"   type: vtkIntArray
+material array name: "Material"   type: vtkIntArray
 
 */
 //----------------------------------------------------------------------------
@@ -74,7 +71,6 @@ material array name: "material"   type: vtkIntArray
 //----------------------------------------------------------------------------
 
 const int CHAR_BUF_SIZE = 1000;
-const int FIRST_CONNECTIVITY_COLUMN = 6;
 
 mafVMEMeshAnsysTextImporter::mafVMEMeshAnsysTextImporter()
 {
@@ -84,7 +80,8 @@ mafVMEMeshAnsysTextImporter::mafVMEMeshAnsysTextImporter()
   m_ElementType = UNSUPPORTED_ELEMENT;
   m_NodesPerElement = -1;
   m_MeshType = UNKNOWN;
-  
+  m_ReaderMode = ANSYS_MODE;
+
   m_Output = NULL;
 }
 //----------------------------------------------------------------------------
@@ -223,7 +220,7 @@ int mafVMEMeshAnsysTextImporter::ParseNodesFile(vtkUnstructuredGrid *grid)
   248 45 32 27
   */
   vtkIntArray *node_id_array = vtkIntArray::New();
-  node_id_array->SetName("id");
+  node_id_array->SetName("Id");
   node_id_array->SetNumberOfTuples(M.rows());
 
   for (int i = 0; i < M.rows(); i++)
@@ -290,18 +287,17 @@ int mafVMEMeshAnsysTextImporter::ParseElementsFile(vtkUnstructuredGrid *grid)
   int ansysTYPEColumn = 2;
   int ansysREALColumn = 3;
 
-  int FIRST_CONNECTIVITY_COLUMN = 6;
+  m_FirstConnectivityColumn = 6;
 
-  mafString ansysELEMENTIDArrayName("ANSYS_ELEMENT_ID");
-  mafString ansysTYPEIntArrayName("ANSYS_ELEMENT_TYPE"); // ET,50,187: Element Type = 50; this is used for grouping elements of the same element type
-  // this should be renamed ANSYS_ MATERIAL _TYPE:for the moment and possible backward compatibility issues 
-  // I leave the array name as material
-  mafString ansysMATERIALIntArrayName("material"); 
-  mafString ansysREALIntArrayName("ANSYS_ELEMENT_REAL");// this is another grouping ID but for the moment it is not used
+  if(m_ReaderMode == GENERIC_MODE)
+  {
+    // elId  pointId...
+    // 37411 119324    6996    6994    4809   70910   70925   70920   84679 84682   84683
+    m_FirstConnectivityColumn = 1;
+  }
 
   int ret = GetElementType();
-  if (ret == -1 || ret == UNSUPPORTED_ELEMENT )
-  
+  if (ret == -1 || ret == UNSUPPORTED_ELEMENT )  
   {
     return -1;
   }
@@ -324,7 +320,7 @@ int mafVMEMeshAnsysTextImporter::ParseElementsFile(vtkUnstructuredGrid *grid)
   for (int i = 0; i < ElementsFileMatrix.rows(); i++)
   {
       int id_index = 0;
-      for (int j = FIRST_CONNECTIVITY_COLUMN; j < ElementsFileMatrix.columns(); j++ )
+      for (int j = m_FirstConnectivityColumn; j < ElementsFileMatrix.columns(); j++ )
       {
         /*
         // store info about node_id <-> node_index association 
@@ -360,10 +356,16 @@ int mafVMEMeshAnsysTextImporter::ParseElementsFile(vtkUnstructuredGrid *grid)
       grid->InsertNextCell(m_VtkCellType, id_list);
   }
 
-  AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysELEMENTIDColumn, ansysELEMENTIDArrayName);
-  AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysTYPEColumn, ansysTYPEIntArrayName);
-  AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysMATERIALColumn, ansysMATERIALIntArrayName,true);
-  AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysREALColumn, ansysREALIntArrayName);  
+  AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysELEMENTIDColumn, "Id");
+
+  if(m_ReaderMode == ANSYS_MODE)
+  {
+    AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysTYPEColumn, "Type");
+    AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysMATERIALColumn, "Material",true);
+    AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysREALColumn, "Real"); 
+  }
+
+ 
   
   vtkDEL(id_list);
 
@@ -620,7 +622,7 @@ int mafVMEMeshAnsysTextImporter::GetElementType()
       connectivityVector.push_back(tmpInt);
     }
 
-    numConnectivityPoints = connectivityVector.size() - FIRST_CONNECTIVITY_COLUMN;
+    numConnectivityPoints = connectivityVector.size() - m_FirstConnectivityColumn;
   
     if (numConnectivityPoints == 4)
     {
@@ -716,7 +718,7 @@ void mafVMEMeshAnsysTextImporter::FEMDataToCellData( vtkUnstructuredGrid *input,
   // materials id per cell
   vtkDoubleArray *materialIDArrayFD = NULL;
   int numCells = -1, numMatProp = -1, numMat = -1;
-  mafString matStr("material");
+  mafString matStr("Material");
   mafString matIdStr("material_id");
   vtkIntArray *materialArrayCD = NULL;
   vtkFieldData *inFD = NULL;

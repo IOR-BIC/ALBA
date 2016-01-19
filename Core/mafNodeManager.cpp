@@ -50,7 +50,7 @@ mafNodeManager::mafNodeManager()
 //@@	m_storage   = NULL;
 	m_Root          = NULL;
 
-  m_MsfDir   = mafGetDocumentsDirectory().c_str();
+  m_MsfDir   = mafGetLastUserFolder().c_str();
 	m_MsfFile   = "";
 	m_ZipFile   = "";
 	m_MergeFile = "";
@@ -437,7 +437,7 @@ bool mafNodeManager::AskConfirmAndSave()
   bool go = true;
 	if (m_Modified)
 	{
-		int answer = wxMessageBox("your work is modified, would you like to save it?","Confirm",
+		int answer = wxMessageBox("Your work is modified, would you like to save it?","Confirm",
 			                     wxYES_NO|wxCANCEL|wxICON_QUESTION , mafGetFrame());
 		if(answer == wxCANCEL) go = false;
 		if(answer == wxYES)    MSFSave();

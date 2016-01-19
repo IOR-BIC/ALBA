@@ -48,6 +48,8 @@
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkVRMLExporter.h"
+#include "vtkRenderWindow.h"
+#include "vtkRenderer.h"
 
 //----------------------------------------------------------------------------
 // const
@@ -107,8 +109,8 @@ void mafGUIContextualMenu::ShowContextualMenu(wxFrame *child, mafView *view, boo
 		this->Append(CONTEXTUAL_MENU_HIDE_VME, "Hide");
 		this->Append(CONTEXTUAL_MENU_DELETE_VME, "Delete");
 		this->Append(CONTEXTUAL_MENU_TRANSFORM, "Transform  \tCtrl+T");
-   // this->AppendSeparator();
-    //this->Append(CONTEXTUAL_MENU_VME_PIPE,"visual props");
+    this->AppendSeparator();
+    this->Append(CONTEXTUAL_MENU_VME_PIPE,"Visual props");
     this->AppendSeparator();
   }
 	this->Append(CONTEXTUAL_MENU_RENAME_VIEW, "Rename View");
@@ -277,18 +279,36 @@ void mafGUIContextualMenu::OnContextualViewMenu(wxCommandEvent& event)
 		break;
     case CONTEXTUAL_MENU_EXPORT_AS_VRML:
     {
-      mafString file_dir  = mafGetDocumentsDirectory().c_str();
-      mafString wildc     = "VRML (*.wrl)|*.wrl";
-      mafString file      = mafGetSaveFile(file_dir,wildc).c_str();
-      if (!file.IsEmpty())
-      {
-        vtkRenderWindow *renwin = m_ViewActive->GetRWI()->GetRenderWindow();
-        vtkMAFSmartPointer<vtkVRMLExporter> vrml_exporter;
-        vrml_exporter->SetFileName(file);
-        vrml_exporter->SetInput(renwin);
-        vrml_exporter->Update();
-        vrml_exporter->Write();
-      }
+			mafString file_dir  = mafGetLastUserFolder().c_str();
+			mafString wildc     = "VRML (*.wrl)|*.wrl";
+			mafString file      = mafGetSaveFile(file_dir,wildc).c_str();
+			if (!file.IsEmpty())
+			{
+				vtkRenderWindow *renwin = m_ViewActive->GetRWI()->GetRenderWindow();
+				mafSceneGraph * sceneGraph = 	m_ViewActive->GetSceneGraph();
+
+				if(sceneGraph->m_RenBack)
+				{
+					renwin->RemoveRenderer(sceneGraph->m_AlwaysVisibleRenderer);
+				}
+
+				renwin->RemoveRenderer(sceneGraph->m_AlwaysVisibleRenderer);
+				
+				vtkMAFSmartPointer<vtkVRMLExporter> vrml_exporter;
+				vrml_exporter->SetFileName(file);
+				vrml_exporter->SetInput(renwin);
+				vrml_exporter->Update();
+				vrml_exporter->Write();
+
+
+				if(sceneGraph->m_RenBack)
+				{
+					renwin->AddRenderer(sceneGraph->m_RenBack);
+				}
+
+				renwin->AddRenderer(sceneGraph->m_AlwaysVisibleRenderer);
+				
+			}
     }
     break;
 		case CONTEXTUAL_MENU_RENAME_VIEW:

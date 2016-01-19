@@ -188,9 +188,19 @@ void mafWizardManager::VmeSelected( mafNode* node )
   }
   else
   {
-    //else we enable/disable menu depending on wizard accept funcition
+    //else we enable/disable menu depending on wizard accept function
     EnableWizardMenus();
   }
+}
+
+//----------------------------------------------------------------------------
+void mafWizardManager::VmeModified(mafNode* node)
+{
+	if (!m_RunningWizard && node == m_Selected)
+	{
+		//else we enable/disable menu depending on wizard accept function
+		EnableWizardMenus();
+	}
 }
 
 //----------------------------------------------------------------------------
