@@ -27,14 +27,14 @@
 #include "vtkDataSetToPolyDataFilter.h"
 
 #include <vector>
-#include <hash_map>
+#include <unordered_map>
 #include <algorithm>
 
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
 
-using stdext::hash_map;
+using std::unordered_map;
 
 /**
 class name: vtkMAFPoissonSurfaceReconstruction
@@ -1279,7 +1279,7 @@ public:
 
   /** insert new triangle in the structure */
 	int AddTriangle(const int& p1,const int& p2,const int& p3){
-		hash_map<long long,int>::iterator iter;
+		unordered_map<long long,int>::iterator iter;
 		int tIdx,eIdx,p[3];
 		p[0]=p1;
 		p[1]=p2;
@@ -1319,7 +1319,7 @@ public:
 	};
 
 protected:
-	hash_map<long long,int> edgeMap;
+	unordered_map<long long,int> edgeMap;
 	static long long EdgeIndex(const int& p1,const int& p2){
 		if(p1>p2)	{return ((long long)(p1)<<32) | ((long long)(p2));}
 		else		{return ((long long)(p2)<<32) | ((long long)(p1));}
@@ -2906,7 +2906,7 @@ class Octree{
 	public:
 		int fIndex,maxDepth;
 		std::vector<std::pair<long long,long long> >* edges;
-		hash_map<long long,std::pair<RootInfo,int> >* vertexCount;
+		unordered_map<long long,std::pair<RootInfo,int> >* vertexCount;
      /** update function*/
 		void Function(const TreeOctNode* node1,const TreeOctNode* node2);
 	};
@@ -2942,24 +2942,24 @@ class Octree{
 
   /** set boundary marching cubes position */
 	int SetBoundaryMCRootPositions(const int& sDepth,const Real& isoValue,
-		hash_map<long long,int>& boundaryRoots,hash_map<long long,std::pair<Real,Point3D<Real> > >& boundaryNormalHash,CoredMeshData* mesh,const int& nonLinearFit);
+		unordered_map<long long,int>& boundaryRoots,unordered_map<long long,std::pair<Real,Point3D<Real> > >& boundaryNormalHash,CoredMeshData* mesh,const int& nonLinearFit);
 	/** set marching cube root positions */
   int SetMCRootPositions(TreeOctNode* node,const int& sDepth,const Real& isoValue,
-		hash_map<long long,int>& boundaryRoots,hash_map<long long,int>* interiorRoots,
-		hash_map<long long,std::pair<Real,Point3D<Real> > >& boundaryNormalHash,hash_map<long long,std::pair<Real,Point3D<Real> > >* interiorNormalHash,
+		unordered_map<long long,int>& boundaryRoots,unordered_map<long long,int>* interiorRoots,
+		unordered_map<long long,std::pair<Real,Point3D<Real> > >& boundaryNormalHash,unordered_map<long long,std::pair<Real,Point3D<Real> > >* interiorNormalHash,
 		std::vector<Point3D<float> >* interiorPositions,
 		CoredMeshData* mesh,const int& nonLinearFit);
 
   /** get marching cubes triangles */
-	int GetMCIsoTriangles(TreeOctNode* node,CoredMeshData* mesh,hash_map<long long,int>& boundaryRoots,
-		hash_map<long long,int>* interiorRoots,std::vector<Point3D<float> >* interiorPositions,const int& offSet,const int& sDepth);
+	int GetMCIsoTriangles(TreeOctNode* node,CoredMeshData* mesh,unordered_map<long long,int>& boundaryRoots,
+		unordered_map<long long,int>* interiorRoots,std::vector<Point3D<float> >* interiorPositions,const int& offSet,const int& sDepth);
 
   /** add triangles to the mesh */
 	static int AddTriangles(CoredMeshData* mesh,std::vector<CoredPointIndex> edges[3],std::vector<Point3D<float> >* interiorPositions,const int& offSet);
   /** add triangles to the mesh */
 	static int AddTriangles(CoredMeshData* mesh,std::vector<CoredPointIndex>& edges,std::vector<Point3D<float> >* interiorPositions,const int& offSet);
   /** get marching cubes edges */
-	void GetMCIsoEdges(TreeOctNode* node,hash_map<long long,int>& boundaryRoots,hash_map<long long,int>* interiorRoots,const int& sDepth,
+	void GetMCIsoEdges(TreeOctNode* node,unordered_map<long long,int>& boundaryRoots,unordered_map<long long,int>* interiorRoots,const int& sDepth,
 		std::vector<std::pair<long long,long long> >& edges);
     /***/ 
 	static int GetEdgeLoops(std::vector<std::pair<long long,long long> >& edges,std::vector<std::vector<std::pair<long long,long long> > >& loops);
@@ -2968,16 +2968,16 @@ class Octree{
 	/** edge root count */
 	static int EdgeRootCount(const TreeOctNode* node,const int& edgeIndex,const int& maxDepth);
 	/** get octree root*/ 
-	int GetRoot(const RootInfo& ri,const Real& isoValue,const int& maxDepth,Point3D<Real> & position,hash_map<long long,std::pair<Real,Point3D<Real> > >& normalHash,
+	int GetRoot(const RootInfo& ri,const Real& isoValue,const int& maxDepth,Point3D<Real> & position,unordered_map<long long,std::pair<Real,Point3D<Real> > >& normalHash,
 		Point3D<Real>* normal,const int& nonLinearFit);
 	/** get octree root*/
-	int GetRoot(const RootInfo& ri,const Real& isoValue,Point3D<Real> & position,hash_map<long long,std::pair<Real,Point3D<Real> > >& normalHash,const int& nonLinearFit);
+	int GetRoot(const RootInfo& ri,const Real& isoValue,Point3D<Real> & position,unordered_map<long long,std::pair<Real,Point3D<Real> > >& normalHash,const int& nonLinearFit);
 	/** return root index*/
 	static int GetRootIndex(const TreeOctNode* node,const int& edgeIndex,const int& maxDepth,RootInfo& ri);
 	/** return root index*/
 	static int GetRootIndex(const TreeOctNode* node,const int& edgeIndex,const int& maxDepth,const int& sDepth,RootInfo& ri);
 	/** return root index*/
-	static int GetRootIndex(const long long& key,hash_map<long long,int>& boundaryRoots,hash_map<long long,int>* interiorRoots,CoredPointIndex& index);
+	static int GetRootIndex(const long long& key,unordered_map<long long,int>& boundaryRoots,unordered_map<long long,int>* interiorRoots,CoredPointIndex& index);
 	/** return root pair*/
 	static int GetRootPair(const RootInfo& root,const int& maxDepth,RootInfo& pair);
 
