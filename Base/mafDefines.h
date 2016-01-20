@@ -26,15 +26,7 @@
 #pragma warning( disable : 4018 )
 #pragma warning( disable : 4251 )
 
-#ifndef MIN 
-    #define MIN( x, y ) ( (x) < (y) ? (x) : (y) )
-#endif
-#ifndef MAX 
-    #define MAX( x, y ) ( (x) > (y) ? (x) : (y) )
-#endif
-#ifndef round
-	#define round(x) (x<0?ceil((x)-0.5):floor((x)+0.5))
-#endif
+
 
 //----------------------------------------------------------------------------
 // Includes: mafConfigure should be first, mafIncludeWX second
@@ -49,6 +41,15 @@
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
+#ifndef MIN 
+	#define MIN( x, y ) ( (x) < (y) ? (x) : (y) )
+#endif
+#ifndef MAX 
+	#define MAX( x, y ) ( (x) > (y) ? (x) : (y) )
+#endif
+#ifndef round
+	#define round(x) (x<0?ceil((x)-0.5):floor((x)+0.5))
+#endif
 
 //------------------------------------------------------------------------------
 // Typedefs

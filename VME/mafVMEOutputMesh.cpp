@@ -45,7 +45,8 @@ mafCxxTypeMacro(mafVMEOutputMesh)
 mafVMEOutputMesh::mafVMEOutputMesh()
 //-------------------------------------------------------------------------
 {
-  m_NumCells  = "0";
+  m_NumNodes = m_NumCells  = "0";
+
 	m_Material = NULL;
 }
 
@@ -71,10 +72,11 @@ mafGUI* mafVMEOutputMesh::CreateGui()
   if (GetUnstructuredGridData())
   {
     this->Update();
-    int num = GetUnstructuredGridData()->GetNumberOfCells();
-    m_NumCells = num;
+    m_NumCells = GetUnstructuredGridData()->GetNumberOfCells();
+    m_NumNodes = GetUnstructuredGridData()->GetNumberOfPoints();
   }
-  m_Gui->Label(_("cells: "), &m_NumCells, true);
+	m_Gui->Label(_("Elements: "), &m_NumCells, true);
+	m_Gui->Label(_("Nodes: "), &m_NumNodes, true);
   m_Gui->Divider();
 	return m_Gui;
 }
@@ -86,12 +88,12 @@ void mafVMEOutputMesh::Update()
   m_VME->Update();
   if (GetUnstructuredGridData())
   {
-    int num = GetUnstructuredGridData()->GetNumberOfCells();
-    m_NumCells = num;
+    m_NumCells = GetUnstructuredGridData()->GetNumberOfCells();
+    m_NumNodes = GetUnstructuredGridData()->GetNumberOfPoints();
   }
   else
   {
-    m_NumCells = _("0");
+    m_NumNodes=m_NumCells = _("0");
   }
   if (m_Gui)
   {

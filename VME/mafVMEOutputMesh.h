@@ -59,6 +59,7 @@ public:
 protected: 
 
   mafString  m_NumCells;
+	mafString  m_NumNodes;
   mafGUI *CreateGui();
 
 	mmaMaterial  *m_Material; ///< material object used to store shading propertied to render the surface

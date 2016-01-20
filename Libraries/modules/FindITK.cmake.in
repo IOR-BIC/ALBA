@@ -18,7 +18,8 @@
 # try to setup legacy search path for ITK
 FIND_PATH(ITK_DIR UseITK.cmake "${MFL_BINARY_DIR}/ITK/Build")
 
-INCLUDE ("${CMAKE_ROOT}/Modules/FindITK.cmake")
+#INCLUDE ("${CMAKE_ROOT}/Modules/FindITK.cmake")
+find_package(ITK)
 
 #MARK_AS_ADVANCED (
 #  ITK_DIR
