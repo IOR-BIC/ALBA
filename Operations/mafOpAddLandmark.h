@@ -26,6 +26,9 @@
 
 #include <vector>
 
+#include <xercesc/util/XercesDefs.hpp>
+#include <xercesc/dom/DOM.hpp>
+
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
@@ -37,10 +40,13 @@ class mafInteractorPicker;
 class mafGUINamedPanel;
 class mafGUIDictionaryWidget;
 
+typedef std::vector<wxString> StringVector;
+
 #ifdef MAF_EXPORTS
 #include "mafDllMacros.h"
 EXPORT_STL_VECTOR(MAF_EXPORT,mafVMELandmark*);
 #endif
+#include "mmaMaterial.h"
 //----------------------------------------------------------------------------
 // mafOpAddLandmark :
 //----------------------------------------------------------------------------
@@ -67,10 +73,16 @@ public:
 	/** Makes the undo for the operation. */
 	void OpUndo();
 
-  /** Used to add a landmark to the cloud */
+  /** Add landmark to the cloud */
   void AddLandmark(double pos[3]);
+	
+	/** Remove landmark from the cloud and tree */
+	void RemoveLandmark(mafString selection);
 
-  void SetPickingActiveFlag(bool picking){m_PickingActiveFlag = picking;}
+	/** Remove landmark to the cloud */
+	void SelectLandmark(mafString selection);
+
+	void SetPickingActiveFlag(bool picking) { m_PickingActiveFlag = picking; }
   bool GetPickingActiveFlag(){return m_PickingActiveFlag;}
 
   mafVME* GetPickedVme(){return m_PickedVme;};
@@ -89,29 +101,50 @@ protected:
 	void OpStop(int result);
 
   /** Used in redo to add the landmarks to the tree*/
-  void AddLandmark();
+  void AddLandmarksToTree();
 
-  /** Used in undo to remove the added landmarks*/
-  void RemoveLandmark();
+  /** Used in undo to remove the added landmarks from the tree*/
+  void RemoveLandmarksFromTree();
 
-  /** Show a message box to inform the user that the added landmark already exists in the tree.*/
+	/** Set the color property of the material*/
+	void SetMaterialRGBA(mmaMaterial *material, double r, double g, double b, double a);
+
+	int LoadLandmarksGroups(wxString fileName);
+
+	bool CheckNodeElement(XERCES_CPP_NAMESPACE_QUALIFIER DOMNode *node, const char *elementName);
+	mafString GetElementAttribute(XERCES_CPP_NAMESPACE_QUALIFIER DOMNode *node, const char *attributeName);
+
+	int LoadLocalLandmarks();
+	void ShowLandmarkGroup();
+
+	/** Show a message box to inform the user that the added landmark already exists in the tree.*/
   void ExistingLandmarkMessage();
 
 	int m_AddToCurrentTime;
 
   mafVMELandmarkCloud	*m_Cloud;
 	mafVME      				*m_PickedVme;
-  std::vector<mafVMELandmark *> m_LandmarkAdded;
-	 
-	bool                 m_CloudCreatedFlag;
-	bool                 m_PickingActiveFlag;
-	mafString						 m_LandmarkName;
-  mafInteractorPicker           *m_LandmarkPicker;
+
+  std::vector<mafVMELandmark *> m_LandmarkAdded;	 
+	std::vector<StringVector> m_LandmarkNameVect;
+	StringVector m_LocalLandmarkNameVect;
+
+	bool					m_CloudCreatedFlag;
+	bool					m_PickingActiveFlag;
+
+	mafString			m_LandmarkName;
+	mafString			m_LandmarkSelected;
+	mafString			m_PrevLandmarkSelected;
+
+	int						m_ShowMode;
+	wxComboBox		*m_ShowComboBox;
+
+  mafInteractorPicker	*m_LandmarkPicker;
   mafInteractor       *m_OldBehavior;
 
 	double							 m_LandmarkPosition[3];
 
-  mafGUINamedPanel			  *m_GuiPanel;
+  mafGUINamedPanel		*m_GuiPanel;
   mafGUIDictionaryWidget *m_Dict;
 };
 #endif

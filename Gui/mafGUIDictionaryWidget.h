@@ -24,6 +24,7 @@
 #include "mafObserver.h"
 #include "mafStorable.h"
 #include "mafDefines.h"
+#include "mafGUIListCtrl.h"
 //----------------------------------------------------------------------------
 // Forward Refs:
 //----------------------------------------------------------------------------
@@ -53,6 +54,22 @@ public:
   /** Set the reference cloud. */
   void SetCloud(mafVME *vme);
   
+	void AddItem(wxString item);
+
+	int RemoveItem(long itemId);
+
+	int RemoveItem(mafString itemName);
+
+	int UpdateItem(mafString oldItemName, mafString newItemName);
+
+	int SelectItem(mafString itemName);
+
+	int DeselectItem(mafString itemName);
+	
+	int GetSize() { return m_Items.size(); };
+
+	void SetTitle(wxString title){ m_List->SetColumnLabel(0, title); };
+
 	/** Return choosed item. */
   wxString ChooseItem();
   
@@ -62,6 +79,8 @@ public:
 	/** Load dictionary from file. */
   void LoadDictionary(wxString file);
   
+	void InitDictionary(std::vector<wxString> *strVect);
+
 	/** Return dictionary GUI. */
   wxWindow *GetWidget() {return (wxWindow *)m_List;};
 
@@ -77,8 +96,9 @@ protected:
 
   mafObserver *m_Listener;
 	wxString     m_File;
-  int          m_NumItem;
-	wxString   **m_Items;
+/*  int          m_NumItem;*/
+	//wxString   **m_Items;
+	std::vector<mafString> m_Items;
   mafGUIListCtrl *m_List;
   mafVME      *m_Vme;
 };
