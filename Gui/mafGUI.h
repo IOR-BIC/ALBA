@@ -226,7 +226,7 @@ public:
   void MultipleButtons(int numButtons, int numColumns, std::vector<int> &ids, std::vector<const char*> &labels, int alignment = wxALL );
 
   /** Ok-Cancel Button widget. */
-  void OkCancel(int alignment = wxALL);
+  void OkCancel();
 
   /** Integer slider widget. */
 	wxSlider *Slider(int id, wxString label, int *var,int min = MININT, int max = MAXINT, wxString tooltip = "",bool showText=true);
