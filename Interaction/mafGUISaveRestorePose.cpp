@@ -77,7 +77,7 @@ void mafGUISaveRestorePose::CreateGui()
     m_Gui->Button(ID_SAVE,"save pose");
     m_Gui->Button(ID_REMOVE,"remove pose");
     m_Gui->Label("");
-    m_PositionsList = m_Gui->ListBox(ID_APPLY,"apply pose");
+    m_PositionsList = m_Gui->ListBox(ID_APPLY,"Apply pose");
   }
   else if(m_TypeGui == ID_SCALE_GUI)
   {
@@ -85,7 +85,7 @@ void mafGUISaveRestorePose::CreateGui()
     m_Gui->Button(ID_SAVE,"save scaling");
     m_Gui->Button(ID_REMOVE,"remove scaling");
     m_Gui->Label("");
-    m_PositionsList = m_Gui->ListBox(ID_APPLY,"apply scaling");
+    m_PositionsList = m_Gui->ListBox(ID_APPLY,"Apply scaling");
   }
   
   m_PositionsList->Clear();

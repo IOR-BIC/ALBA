@@ -37,7 +37,9 @@ public:
   -the user is notified anyway
   -default = false
   */
-  void     SetEditable(bool b) {m_Editable = b;};  
+  void     SetEditable(bool b); 
+
+	virtual bool Enable(bool enable = true);
 
   virtual void SetListener(mafObserver *Listener) {m_Listener = Listener;};
 protected:
@@ -46,7 +48,8 @@ protected:
   wxBitmap m_Bmp;      
   void OnEraseBackground(wxEraseEvent& event) {};  // overrided to prevent flickering
   void OnPaint(wxPaintEvent &event);                
-  void Update();                
+  void Update();
+
 
   void OnLeftMouseButtonDown(wxMouseEvent &event);
   void OnLeftMouseButtonUp(wxMouseEvent &event);
@@ -60,6 +63,9 @@ protected:
   unsigned long   m_UpdateTime;
   bool            m_Editable;
   wxFont          m_Font;
+	int							m_oldW;
+	int							m_oldH;
+	bool						m_Enabled;
   DECLARE_EVENT_TABLE()
 };
 #endif

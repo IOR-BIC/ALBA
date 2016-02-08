@@ -302,7 +302,7 @@ mafGUI *mafPipeGenericPolydata::CreateGui()
 	m_Gui->Divider(2);
 	
 	wxString normalSelector[2];
-	m_Gui->Label("Show:");
+	m_Gui->Label("Lighting:");
 	normalSelector[0]="Points Normals";
 	normalSelector[1]="Cells Normals";
 	m_Gui->Combo(ID_NORMALS_TYPE,"",&m_ShowCellsNormals,2,normalSelector);	
