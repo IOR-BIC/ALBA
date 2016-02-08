@@ -54,24 +54,22 @@ enum DICTIONARY_WIDGET_ID
 mafGUIDictionaryWidget::mafGUIDictionaryWidget(wxWindow *parent, int id)
 //----------------------------------------------------------------------------
 {  
-  m_NumItem = 0;
-  m_Items = NULL;
   m_Vme   = NULL;
   m_File = "";
 
   m_List = new mafGUIListCtrl(parent,id,false,true);
   m_List->Show(false);
   m_List->SetListener(this);
-  m_List->SetSize(wxSize(450,400));
+  m_List->SetSize(wxSize(100,100));
 
-  if(m_File != "") LoadDictionary(m_File);
+  if(m_File != "") 
+		LoadDictionary(m_File);
 }
 //----------------------------------------------------------------------------
 mafGUIDictionaryWidget::~mafGUIDictionaryWidget()
 //----------------------------------------------------------------------------
 {
-  for(int i=0; i<m_NumItem; i++) delete m_Items[i];
-  delete [] m_Items; 
+	m_Items.clear();
   cppDEL(m_List);
 }
 //----------------------------------------------------------------------------
@@ -115,22 +113,41 @@ void mafGUIDictionaryWidget::LoadDictionary(wxString file)
   restore.SetDocument(storeDict);
   restore.Restore();
   
-	if(m_NumItem) delete [] m_Items;
-
-  m_NumItem = storeDict->m_StrVector.size();
-  m_Items = new wxString*[m_NumItem];
+	m_Items.clear();
 
   m_List->Reset();
-  m_List->SetColumnLabel(0, "names already in use are displayed with the red icon");
-  for(int i=0; i<m_NumItem; i++)
+  //m_List->SetColumnLabel(0, "names already in use are displayed with the red icon");
+
+  for(int i=0; i<storeDict->m_StrVector.size(); i++)
   {
-     m_Items[i] = new wxString(storeDict->m_StrVector[i]);
-     m_List->AddItem(i,*m_Items[i]);
+		wxString item = storeDict->m_StrVector[i];
+		m_Items.push_back(item);
+    m_List->AddItem(i,item);
   }
   
   storeDict->Delete();
   ValidateAllItem();
 }
+//----------------------------------------------------------------------------
+void mafGUIDictionaryWidget::InitDictionary(std::vector<wxString> *strVect)
+//----------------------------------------------------------------------------
+{
+	m_Items.clear();
+	m_List->Reset();
+
+	if(strVect!=NULL)
+	{ 
+		for (int i = 0; i < strVect->size(); i++)
+		{
+			wxString item = (*strVect)[i];
+			m_Items.push_back(item);
+			m_List->AddItem(i, item);
+		}
+	}
+
+	ValidateAllItem();
+}
+
 //----------------------------------------------------------------------------
 void mafGUIDictionaryWidget::SetCloud(mafVME *vme)
 //----------------------------------------------------------------------------
@@ -139,13 +156,111 @@ void mafGUIDictionaryWidget::SetCloud(mafVME *vme)
 	ValidateAllItem();
 }
 //----------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
+void mafGUIDictionaryWidget::AddItem(wxString item)
+//----------------------------------------------------------------------------
+{
+	m_Items.push_back(item);
+	m_List->AddItem(m_Items.size()-1, item);
+	
+	ValidateAllItem();
+}
+//----------------------------------------------------------------------------
+int mafGUIDictionaryWidget::RemoveItem(mafString itemName)
+//----------------------------------------------------------------------------
+{
+	for (int i = 0; i < m_Items.size(); i++)
+	{
+		if (m_Items[i] == itemName)
+		{
+			return RemoveItem(i);
+		}
+	}
+
+	return -1;
+}
+//----------------------------------------------------------------------------
+int mafGUIDictionaryWidget::RemoveItem(long itemId)
+//----------------------------------------------------------------------------
+{
+	bool res = m_List->DeleteItem(itemId);
+
+	if (res)
+	{
+		m_Items.erase(m_Items.begin() + itemId);
+		//ValidateAllItem();
+
+		return itemId;
+	}
+
+	return -1;
+}
+//----------------------------------------------------------------------------
+int mafGUIDictionaryWidget::UpdateItem(mafString oldItemName, mafString newItemName)
+//----------------------------------------------------------------------------
+{
+	for (int i = 0; i < m_Items.size(); i++)
+	{
+		if (m_Items[i] == oldItemName)
+		{
+			m_Items[i] = newItemName;
+			m_List->SetItemLabel(i, newItemName.GetCStr());
+			return i;
+		}
+	}
+
+	return -1;
+}
+//----------------------------------------------------------------------------
+int mafGUIDictionaryWidget::SelectItem(mafString itemName)
+//----------------------------------------------------------------------------
+{
+	if(itemName!="")
+	{
+		ValidateAllItem();
+
+		for (int i = 0; i < m_Items.size(); i++)
+		{
+			if (m_Items[i] == itemName)
+			{
+				m_List->SelectItem(i);
+				m_List->SetItemIcon(i, ITEM_BLUE);
+				return i;
+			}
+		}
+	}
+
+	return -1;
+}
+//----------------------------------------------------------------------------
+int mafGUIDictionaryWidget::DeselectItem(mafString itemName)
+//----------------------------------------------------------------------------
+{
+	if (itemName != "")
+	{
+		ValidateAllItem();
+
+		for (int i = 0; i < m_Items.size(); i++)
+		{
+			if (m_Items[i] == itemName)
+			{
+				m_List->SelectItem(i);
+				m_List->DeselectItem(i);
+				return i;
+			}
+		}
+	}
+
+	return -1;
+}
 // SIL - to be removed
 void mafGUIDictionaryWidget::ValidateItem(wxString item, bool valid)
 //----------------------------------------------------------------------------
 {
   ITEM_ICONS icon = (valid) ? ITEM_GRAY : ITEM_RED;
 
-  for(int i=0; i<m_NumItem; i++)
+  for(int i=0; i<m_Items.size(); i++)
   {
     if ( *m_Items[i] == item )
     {
@@ -160,7 +275,7 @@ void mafGUIDictionaryWidget::ValidateAllItem(bool valid)
 {
   if(!m_Vme)
   {
-		for(int i=0; i<m_NumItem; i++)
+		for(int i=0; i<m_Items.size(); i++)
 		{
       m_List->SetItemIcon(i,ITEM_GRAY);
 		}
@@ -168,13 +283,15 @@ void mafGUIDictionaryWidget::ValidateAllItem(bool valid)
   else
 	{
     mafVMELandmarkCloud* lc = (mafVMELandmarkCloud*)m_Vme;
-		for(int i=0; i<m_NumItem; i++)
+		for(int i=0; i<m_Items.size(); i++)
 		{
-			ITEM_ICONS icon = (lc->FindInTreeByName(*m_Items[i])) ? ITEM_RED : ITEM_GRAY ;
+			ITEM_ICONS icon = (lc->FindInTreeByName(m_Items[i])) ? ITEM_RED : ITEM_GRAY ;
 			m_List->SetItemIcon(i,icon);
 		}
 	}
 }
+
+// mafStorableDictionary ///////////////////////////////////////////////////////
 
 //------------------------------------------------------------------------------
 mafCxxTypeMacro(mafStorableDictionary);

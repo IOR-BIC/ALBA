@@ -21,6 +21,9 @@
 #include "mafString.h"
 
 #include <fstream>
+#include "wx/filesys.h"
+#include "wx/zstream.h"
+#include "wx/fs_zip.h"
 
 //----------------------------------------------------------------------------
 std::vector<mafString> ZIPOpen(mafString file)
@@ -42,35 +45,95 @@ std::vector<mafString> ZIPOpen(mafString file)
 
   wxString path, name, ext, complete_name, zfile, out_file;
   wxSplitPath(ZipFile.GetCStr(),&path,&name,&ext);
-  complete_name = name + "." + ext;
+	complete_name = name + "." + ext;
 
-  wxString pkg = "#zip:";
-  wxString header_name = complete_name + pkg;
-  int length_header_name = header_name.Length();
-  bool enable_mid = false;
+	wxFSFile *zfileStream;
+	wxZlibInputStream *zip_is;
+	wxString pkg = "#zip:";
+	wxString header_name = complete_name + pkg;
+	int length_header_name = header_name.Length();
+	bool enable_mid = false;
+	
+	wxFileSystem *fileSystem = new wxFileSystem();
+	wxZipFSHandler *zipHandler = new wxZipFSHandler();
 
-  std::auto_ptr<wxZipEntry> entry;
+	fileSystem->AddHandler(zipHandler); // add the handler that manage zip protocol
 
-  wxFFileInputStream in(file.GetCStr());
-  wxZipInputStream zip(in);
+	fileSystem->ChangePathTo(ZipFile.GetCStr());
+	// extract filename from the zip archive
+	zfile = fileSystem->FindFirst(complete_name + pkg + name + "\\*.*");
 
-  while (entry.reset(zip.GetNextEntry()), entry.get() != NULL)
-  {
-    mafString name = path;
-    name<<"\\";
-    name<< entry->GetName().c_str();
-    zip.OpenEntry(*(entry.get()));
-    std::ofstream out_file_stream;
-    out_file_stream.open(name, std::ios_base::binary);
-    int s_size = entry->GetSize();
-    char *buf = new char[s_size];
-    zip.Read(buf,s_size);
-    out_file_stream.write(buf, s_size);
+	if (zfile == "")
+	{
+		enable_mid = true;
+		// no files found: try to search inside the archive without filename
+		zfile = fileSystem->FindFirst(complete_name + pkg + "\\*.*");
+	}
+	if (zfile == "")
+	{
+		// no files found inside the archive
+		return filesCreated;
+	}
 
-    filesCreated.push_back(name);
+	wxSplitPath(zfile, &path, &name, &ext);
+	complete_name = name + "." + ext;
 
-    delete []buf;
-  }
+	if (enable_mid)
+		complete_name = complete_name.Mid(length_header_name);
+	
+	zfileStream = fileSystem->OpenFile(zfile);
+	if (zfileStream == NULL) // unable to open the file
+	{
+		return filesCreated;
+	}
+
+	zip_is = (wxZlibInputStream *)zfileStream->GetStream();
+	out_file = tmpDir + "\\" + complete_name;
+	char *buf;
+	int s_size;
+	std::ofstream out_file_stream;
+
+	out_file_stream.open(out_file, std::ios_base::binary);
+
+	s_size = zip_is->GetSize();
+	buf = new char[s_size];
+	zip_is->Read(buf, s_size);
+	out_file_stream.write(buf, s_size);
+
+	filesCreated.push_back(name);
+
+	out_file_stream.close();
+	delete[] buf;
+
+	zfileStream->UnRef();
+	delete zfileStream;
+
+	while ((zfile = fileSystem->FindNext()) != "")
+	{
+		zfileStream = fileSystem->OpenFile(zfile);
+
+		zip_is = (wxZlibInputStream *)zfileStream->GetStream();
+		wxSplitPath(zfile, &path, &name, &ext);
+		complete_name = name + "." + ext;
+		if (enable_mid)
+			complete_name = complete_name.Mid(length_header_name);
+		out_file = tmpDir + "\\" + complete_name;
+
+		out_file_stream.open(out_file, std::ios_base::binary); // The file to extract is a binary
+		s_size = zip_is->GetSize();
+		buf = new char[s_size];
+		zip_is->Read(buf, s_size);
+		out_file_stream.write(buf, s_size);
+
+		filesCreated.push_back(name);
+
+		out_file_stream.close();
+		delete[] buf;
+		zfileStream->UnRef();
+		delete zfileStream;
+	}
+
+	fileSystem->ChangePathTo(tmpDir.GetCStr(), TRUE);
 
   return filesCreated;
 }
