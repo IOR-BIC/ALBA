@@ -767,9 +767,11 @@ void mafViewArbitrarySlice::OnEventThis(mafEventBase *maf_event)
 			}
 		case ID_TRILINEAR_INTERPOLATION_ON:
 			{
-				m_Slicer->SetTrilinearInterpolation(m_TrilinearInterpolationOn == TRUE);
-				mafEventMacro(mafEvent(this, CAMERA_UPDATE));
-
+				if (m_Slicer)
+				{
+					m_Slicer->SetTrilinearInterpolation(m_TrilinearInterpolationOn == TRUE);
+					mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+				}
 			}
 			break;
 		default:
