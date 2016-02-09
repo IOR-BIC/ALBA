@@ -146,6 +146,8 @@ SET(PROJECT_SRCS
   ######################
   medInteractorPicker.cpp
   medInteractorPicker.h
+  mafInteractorPERPicker.cpp
+  mafInteractorPERPicker.h
   mafInteractorDICOMImporter.h
   mafInteractorDICOMImporter.cpp  
   medInteractor2DAngle.cpp
