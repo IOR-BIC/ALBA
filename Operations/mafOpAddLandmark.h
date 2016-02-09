@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: mafOpAddLandmark
- Authors: Paolo Quadrani
+ Authors: Paolo Quadrani, Nicola Vanella
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -20,14 +20,16 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "mafEvent.h"
 #include "mafOp.h"
+
+#include "mafEvent.h"
 #include "mafString.h"
 
 #include <vector>
 
 #include <xercesc/util/XercesDefs.hpp>
 #include <xercesc/dom/DOM.hpp>
+#include "mafInteractorPERPicker.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -36,7 +38,7 @@ class mafVME;
 class mafVMELandmark;
 class mafVMELandmarkCloud;
 class mafInteractor;
-class mafInteractorPicker;
+class mafInteractorPERPicker;
 class mafGUINamedPanel;
 class mafGUIDictionaryWidget;
 
@@ -47,6 +49,7 @@ typedef std::vector<wxString> StringVector;
 EXPORT_STL_VECTOR(MAF_EXPORT,mafVMELandmark*);
 #endif
 #include "mmaMaterial.h"
+#include "mafInteractorPERPicker.h"
 //----------------------------------------------------------------------------
 // mafOpAddLandmark :
 //----------------------------------------------------------------------------
@@ -82,6 +85,9 @@ public:
 	/** Remove landmark to the cloud */
 	void SelectLandmark(mafString selection);
 
+	/** Select next landmark */
+	void SelectNextLandmark();
+
 	void SetPickingActiveFlag(bool picking) { m_PickingActiveFlag = picking; }
   bool GetPickingActiveFlag(){return m_PickingActiveFlag;}
 
@@ -109,13 +115,15 @@ protected:
 	/** Set the color property of the material*/
 	void SetMaterialRGBA(mmaMaterial *material, double r, double g, double b, double a);
 
-	int LoadLandmarksGroups(wxString fileName);
+	int LoadLandmarksDefinitions(wxString fileName);
 
 	bool CheckNodeElement(XERCES_CPP_NAMESPACE_QUALIFIER DOMNode *node, const char *elementName);
 	mafString GetElementAttribute(XERCES_CPP_NAMESPACE_QUALIFIER DOMNode *node, const char *attributeName);
 
-	int LoadLocalLandmarks();
+	int LoadLandmarksFromVME();
 	void ShowLandmarkGroup();
+
+	void CheckEnableOkCondition();
 
 	/** Show a message box to inform the user that the added landmark already exists in the tree.*/
   void ExistingLandmarkMessage();
@@ -124,6 +132,9 @@ protected:
 
   mafVMELandmarkCloud	*m_Cloud;
 	mafVME      				*m_PickedVme;
+
+	mafVMELandmarkCloud	*m_SelectedLadmarkCloud;
+	mafVMELandmark *m_CurrentLandmark;
 
   std::vector<mafVMELandmark *> m_LandmarkAdded;	 
 	std::vector<StringVector> m_LandmarkNameVect;
@@ -139,10 +150,11 @@ protected:
 	int						m_ShowMode;
 	wxComboBox		*m_ShowComboBox;
 
-  mafInteractorPicker	*m_LandmarkPicker;
+  mafInteractorPERPicker	*m_LandmarkPicker;
   mafInteractor       *m_OldBehavior;
 
 	double							 m_LandmarkPosition[3];
+	double m_OldColorCloud[4];
 
   mafGUINamedPanel		*m_GuiPanel;
   mafGUIDictionaryWidget *m_Dict;
