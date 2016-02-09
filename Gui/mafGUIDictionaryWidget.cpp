@@ -222,6 +222,8 @@ int mafGUIDictionaryWidget::SelectItem(mafString itemName)
 
 		for (int i = 0; i < m_Items.size(); i++)
 		{
+			m_List->DeselectItem(i);
+
 			if (m_Items[i] == itemName)
 			{
 				m_List->SelectItem(i);
@@ -273,20 +275,34 @@ void mafGUIDictionaryWidget::ValidateItem(wxString item, bool valid)
 void mafGUIDictionaryWidget::ValidateAllItem(bool valid)
 //----------------------------------------------------------------------------
 {
-  if(!m_Vme)
-  {
-		for(int i=0; i<m_Items.size(); i++)
-		{
-      m_List->SetItemIcon(i,ITEM_GRAY);
-		}
-	}
-  else
+//   if(!m_Vme)
+//   {
+// 		for(int i=0; i<m_Items.size(); i++)
+// 		{
+//       m_List->SetItemIcon(i,ITEM_GRAY);
+// 		}
+// 	}
+//   else
+// 	{
+//     mafVMELandmarkCloud* lc = (mafVMELandmarkCloud*)m_Vme;
+// 		for(int i=0; i<m_Items.size(); i++)
+// 		{
+// 			ITEM_ICONS icon = (lc->FindInTreeByName(m_Items[i])) ? ITEM_RED : ITEM_GRAY ;
+// 			m_List->SetItemIcon(i,icon);
+// 		}
+// 	}
+
+	for (int i = 0; i < m_Items.size(); i++)
 	{
-    mafVMELandmarkCloud* lc = (mafVMELandmarkCloud*)m_Vme;
-		for(int i=0; i<m_Items.size(); i++)
+		if (!m_Vme)
 		{
-			ITEM_ICONS icon = (lc->FindInTreeByName(m_Items[i])) ? ITEM_RED : ITEM_GRAY ;
-			m_List->SetItemIcon(i,icon);
+			m_List->SetItemIcon(i, ITEM_GRAY);
+		}
+		else
+		{
+			mafVMELandmarkCloud* lc = (mafVMELandmarkCloud*)m_Vme;
+			ITEM_ICONS icon = (lc->FindInTreeByName(m_Items[i])) ? ITEM_RED : ITEM_GRAY;
+			m_List->SetItemIcon(i, icon);
 		}
 	}
 }
