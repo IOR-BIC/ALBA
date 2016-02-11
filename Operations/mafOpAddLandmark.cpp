@@ -219,6 +219,12 @@ void mafOpAddLandmark::OpRun()
 
 		// Create Selected LandmarkCloud
 		mafNEW(m_SelectedLadmarkCloud);
+
+		if (m_TestMode)
+		{
+			m_SelectedLadmarkCloud->TestModeOn();
+		}
+
 		m_SelectedLadmarkCloud->Open();
 		m_SelectedLadmarkCloud->SetName(_("Selected Landmark cloud"));
 
@@ -269,6 +275,8 @@ void mafOpAddLandmark::OpUndo()
 //----------------------------------------------------------------------------
 {
   RemoveLandmarksFromTree();
+
+	mafEventMacro(mafEvent(this, VME_REMOVE, m_SelectedLadmarkCloud));
 }
 
 //----------------------------------------------------------------------------
@@ -614,10 +622,11 @@ void mafOpAddLandmark::AddLandmarksToTree()
   int reparent_result = MAF_OK;
   if(m_CloudCreatedFlag)
   {
-		if(m_PickingActiveFlag == true)
+		if (m_PickingActiveFlag == true)
 			reparent_result = m_Cloud->ReparentTo(m_PickedVme);
 		else
 		  reparent_result = m_Cloud->ReparentTo(m_Input);
+
     if (reparent_result == MAF_OK)
     {
       mafEventMacro(mafEvent(this,VME_SHOW,m_Cloud,true));
@@ -872,12 +881,16 @@ void mafOpAddLandmark::ShowLandmarkGroup()
 		m_CurrentLandmark = NULL;
 	}
 
-	m_Dict->InitDictionary(&m_LandmarkNameVect[m_ShowMode]);
-	m_Dict->SetTitle("Select landmark");
-	m_Gui->Enable(ID_SHOW_GROUP, true);
-	m_Gui->Update();
+	if (!m_TestMode)
+	{
+		m_Dict->InitDictionary(&m_LandmarkNameVect[m_ShowMode]);
+		m_Dict->SetTitle("Select landmark");
+		
+		m_Gui->Enable(ID_SHOW_GROUP, true);
+		m_Gui->Update();
 
-	CheckEnableOkCondition();
+		CheckEnableOkCondition();
+	}
 }
 
 //---------------------------------------------------------------------------
