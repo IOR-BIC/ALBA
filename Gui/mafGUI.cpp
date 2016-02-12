@@ -271,12 +271,12 @@ void mafGUI::Divider (long style)
   if(style == 0) //simple empty space
   {
     wxStaticText* div = new wxStaticText(this, -1, "",dp, wxSize(FW, 2), 0);
-    Add(div, 0, wxEXPAND|wxALL, M);
+    Add(div, 0, wxALL, M);
   }
   else
   {
     wxStaticLine *div = new wxStaticLine(this, -1, dp, wxSize(FW, 1));
-    Add(div, 0, wxEXPAND|wxALL, 2 * M);
+    Add(div, 0, wxALL, 2 * M);
   }
 }
 //----------------------------------------------------------------------------
@@ -324,9 +324,9 @@ void mafGUI::Label(mafString label1, mafString label2, bool bold_label, bool bol
   if(m_UseBackgroundColor) lab1->SetBackgroundColour(m_BackgroundColor);
   if(m_UseBackgroundColor) lab2->SetBackgroundColour(m_BackgroundColor);	
   wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-	sizer->Add( lab1, 1, wxRIGHT, LM);
-	sizer->Add( lab2, 1, wxEXPAND);
-	Add(sizer,0,wxEXPAND|wxALL, M); 
+	sizer->Add( lab1, 0, wxRIGHT, LM);
+	sizer->Add( lab2, 0, wxEXPAND);
+	Add(sizer,0,wxALL, M); 
 }
 //----------------------------------------------------------------------------
 void mafGUI::Label(mafString label1,mafString *var, bool bold_label, bool bold_var)
@@ -349,9 +349,9 @@ void mafGUI::Label(mafString label1,mafString *var, bool bold_label, bool bold_v
     lab2->SetFont(m_Font);
 
 	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-	sizer->Add( lab1, 1, wxRIGHT, LM);
-	sizer->Add( lab2, 1, wxEXPAND);
-	Add(sizer,0,wxEXPAND|wxALL, M); 
+	sizer->Add( lab1, 0, wxRIGHT, LM);
+	sizer->Add( lab2, 0, wxEXPAND);
+	Add(sizer,0,wxALL, M); 
 }
 //----------------------------------------------------------------------------
 void mafGUI::Button(int id,mafString button_text,mafString label, mafString tooltip) 
@@ -365,7 +365,7 @@ void mafGUI::Button(int id,mafString button_text,mafString label, mafString tool
     butt->SetFont(m_Font);
     if(!tooltip.IsEmpty()) 
       butt->SetToolTip(tooltip.GetCStr());
-		Add(butt,0,wxEXPAND|wxALL, M);
+		Add(butt,0,wxALL, M);
 	}
   else
 	{
@@ -381,9 +381,9 @@ void mafGUI::Button(int id,mafString button_text,mafString label, mafString tool
       butt->SetToolTip(tooltip.GetCStr());
 
 		wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-		sizer->Add( lab, 1, wxALIGN_CENTRE|wxRIGHT, LM);
-		sizer->Add( butt,1);
-		Add(sizer,0,wxEXPAND|wxALL, M); 
+		sizer->Add( lab, 0, wxALIGN_CENTRE|wxRIGHT, LM);
+		sizer->Add( butt,0);
+		Add(sizer,0,wxALL, M); 
 	}
 }
 //----------------------------------------------------------------------------
@@ -404,9 +404,9 @@ void mafGUI::Button  (int id,mafString *label,mafString button_text, mafString t
     butt->SetToolTip(tooltip.GetCStr());
 
 	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-	sizer->Add( lab, 1, wxALIGN_CENTRE|wxRIGHT, LM);
-	sizer->Add( butt,1);
-	Add(sizer,0,wxEXPAND|wxALL, M); 
+	sizer->Add( lab, 0, wxALIGN_CENTRE|wxRIGHT, LM);
+	sizer->Add( butt,0);
+	Add(sizer,0,wxALL, M); 
 }
 //----------------------------------------------------------------------------
 mafGUICrossIncremental *mafGUI::CrossIncremental(int id,const char* label, double *stepVariable, double *topBottomVariable, double *leftRightVariable, int modality ,wxString tooltip /* ="" */, bool boldLabel /* = true */, bool comboStep /* = false */, int digits /* = -1 */, mafString *buttonUpDown_text /* = NULL */, mafString *buttonLeftRight_text /* = NULL */)
@@ -417,7 +417,7 @@ mafGUICrossIncremental *mafGUI::CrossIncremental(int id,const char* label, doubl
   mafGUICrossIncremental *cI =  new mafGUICrossIncremental(this, GetWidgetId(id), label, stepVariable, topBottomVariable, leftRightVariable, boldLabel, modality, dp, wxDefaultSize, MINFLOAT, MAXFLOAT, digits,wxTAB_TRAVERSAL|wxCLIP_CHILDREN, comboStep,buttonUpDown_text,buttonLeftRight_text);
   cI->SetListener(this);
   
-	Add(cI,0,wxEXPAND|wxALL, M); 
+	Add(cI,0,wxALL, M); 
   
   return cI;
 }
@@ -456,11 +456,11 @@ void mafGUI::Vector(int id,wxString label,int var[3],int min, int max, wxString 
     text3->SetBackgroundColour(bg_colour[2]);
   }
 	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-	sizer->Add( lab,  1, wxRIGHT, LM);
-	sizer->Add( text1,1, wxRIGHT, HM);
-	sizer->Add( text2,1, wxRIGHT, HM);
-	sizer->Add( text3,1, wxRIGHT, HM);
-	Add(sizer,0,wxEXPAND|wxALL, M); 
+	sizer->Add( lab,  0, wxRIGHT, LM);
+	sizer->Add( text1,0, wxRIGHT, HM);
+	sizer->Add( text2,0, wxRIGHT, HM);
+	sizer->Add( text3,0, wxRIGHT, HM);
+	Add(sizer,0,wxALL, M); 
 }
 // integer vector form 2
 //----------------------------------------------------------------------------
@@ -496,11 +496,11 @@ void mafGUI::Vector(int id,wxString label,int var[3],int minx,int maxx,int miny,
     text3->SetBackgroundColour(bg_colour[2]);
   }
 	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-	sizer->Add( lab,  1, wxRIGHT, LM);
-	sizer->Add( text1,1, wxRIGHT, HM);
-	sizer->Add( text2,1, wxRIGHT, HM);
-	sizer->Add( text3,1, wxRIGHT, HM);
-	Add(sizer,0,wxEXPAND|wxALL, M); 
+	sizer->Add( lab,  0, wxRIGHT, LM);
+	sizer->Add( text1,0, wxRIGHT, HM);
+	sizer->Add( text2,0, wxRIGHT, HM);
+	sizer->Add( text3,0, wxRIGHT, HM);
+	Add(sizer,0,wxALL, M); 
 }
 // float vector form 1
 //----------------------------------------------------------------------------
@@ -535,11 +535,11 @@ void mafGUI::Vector(int id,wxString label,float var[3],float min, float max, int
     text3->SetBackgroundColour(bg_colour[2]);
   }
   wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-	sizer->Add( lab,  1, wxRIGHT, LM);
-	sizer->Add( text1,1, wxRIGHT, HM);
-	sizer->Add( text2,1, wxRIGHT, HM);
-	sizer->Add( text3,1, wxRIGHT, HM);
-  Add(sizer,0,wxEXPAND|wxALL, M); 
+	sizer->Add( lab,  0, wxRIGHT, LM);
+	sizer->Add( text1,0, wxRIGHT, HM);
+	sizer->Add( text2,0, wxRIGHT, HM);
+	sizer->Add( text3,0, wxRIGHT, HM);
+  Add(sizer,0,wxALL, M); 
 }
 // float vector form 2
 //----------------------------------------------------------------------------
@@ -576,11 +576,11 @@ void mafGUI::Vector(int id,wxString label,float var[3],float minx,float maxx,flo
     text3->SetBackgroundColour(bg_colour[2]);
   }
   wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-	sizer->Add( lab,  1, wxRIGHT, LM);
-	sizer->Add( text1,1, wxRIGHT, HM);
-	sizer->Add( text2,1, wxRIGHT, HM);
-	sizer->Add( text3,1, wxRIGHT, HM);
-  Add(sizer,0,wxEXPAND|wxALL, M); 
+	sizer->Add( lab,  0, wxRIGHT, LM);
+	sizer->Add( text1,0, wxRIGHT, HM);
+	sizer->Add( text2,0, wxRIGHT, HM);
+	sizer->Add( text3,0, wxRIGHT, HM);
+  Add(sizer,0,wxALL, M); 
 }
 // double vector form 1
 //----------------------------------------------------------------------------
@@ -617,10 +617,10 @@ void mafGUI::Vector(int id,wxString label,double var[3],double min, double max, 
     text3->SetBackgroundColour(bg_colour[2]);
   }
   wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-  sizer->Add( lab,  1, wxRIGHT, LM);
-  sizer->Add( text1,1, wxRIGHT, HM);
-  sizer->Add( text2,1, wxRIGHT, HM);
-  sizer->Add( text3,1, wxRIGHT, HM);
+  sizer->Add( lab,  0, wxRIGHT, LM);
+  sizer->Add( text1,0, wxRIGHT, HM);
+  sizer->Add( text2,0, wxRIGHT, HM);
+  sizer->Add( text3,0, wxRIGHT, HM);
   Add(sizer,0,wxEXPAND, M); 
 }
 // double vector form 2
@@ -658,10 +658,10 @@ void mafGUI::Vector(int id,wxString label,double var[3],double minx,double maxx,
     text3->SetBackgroundColour(bg_colour[2]);
   }
   wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-	sizer->Add( lab,  1, wxRIGHT, LM);
-	sizer->Add( text1,1, wxRIGHT, HM);
-	sizer->Add( text2,1, wxRIGHT, HM);
-	sizer->Add( text3,1, wxRIGHT, HM);
+	sizer->Add( lab,  0, wxRIGHT, LM);
+	sizer->Add( text1,0, wxRIGHT, HM);
+	sizer->Add( text2,0, wxRIGHT, HM);
+	sizer->Add( text3,0, wxRIGHT, HM);
   Add(sizer,0,wxEXPAND, M); 
 }
 //----------------------------------------------------------------------------
@@ -688,7 +688,7 @@ void mafGUI::String(int id,wxString label,wxString* var, wxString tooltip, bool 
     text->SetFont(m_Font);
 		if(tooltip != "") 
       text->SetToolTip(tooltip);
-	  Add(text,0,wxEXPAND|wxALL, M);
+	  Add(text,0,wxALL, M);
 	}
 	else
 	{
@@ -706,9 +706,9 @@ void mafGUI::String(int id,wxString label,wxString* var, wxString tooltip, bool 
 		if(tooltip != "")
 			text->SetToolTip(tooltip);
 		wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-		sizer->Add( lab,  1, wxRIGHT, LM);
-		sizer->Add( text, 1, wxRIGHT, HM);
-		Add(sizer,0,wxEXPAND|wxALL, M);
+		sizer->Add( lab,  0, wxRIGHT, LM);
+		sizer->Add( text, 0, wxRIGHT, HM);
+		Add(sizer,0,wxALL, M);
 	}
 }
 //----------------------------------------------------------------------------
@@ -734,7 +734,7 @@ void mafGUI::String(int id,mafString label, mafString *var, mafString tooltip, b
     text->SetFont(m_Font);
 		if(!tooltip.IsEmpty())
       text->SetToolTip(tooltip.GetCStr());
-	  Add(text,0,wxEXPAND|wxALL, M);
+	  Add(text,0,wxALL, M);
 	}
 	else
 	{
@@ -750,9 +750,9 @@ void mafGUI::String(int id,mafString label, mafString *var, mafString tooltip, b
 		if(!tooltip.IsEmpty())
 			text->SetToolTip(tooltip.GetCStr());
 		wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-		sizer->Add( lab,  1, wxRIGHT, LM);
-		sizer->Add( text, 1, wxRIGHT, HM);
-		Add(sizer,0,wxEXPAND|wxALL, M);
+		sizer->Add( lab,  0, wxRIGHT, LM);
+		sizer->Add( text, 0, wxRIGHT, HM);
+		Add(sizer,0,wxALL, M);
 	}
 }
 //----------------------------------------------------------------------------
@@ -768,7 +768,7 @@ void mafGUI::Integer(int id,mafString label,int* var,int min, int max, mafString
     text->SetFont(m_Font);
 		if(!tooltip.IsEmpty()) 
       text->SetToolTip(tooltip.GetCStr());
-	  Add(text,0,wxEXPAND|wxALL, M);
+	  Add(text,0,wxALL, M);
 	}
 	else
 	{
@@ -783,9 +783,9 @@ void mafGUI::Integer(int id,mafString label,int* var,int min, int max, mafString
 		if(!tooltip.IsEmpty())
 			text->SetToolTip(tooltip.GetCStr());
 		wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-		sizer->Add( lab,  1, wxRIGHT, LM);
-		sizer->Add( text, 1, wxRIGHT, HM);
-		Add(sizer,0,wxEXPAND|wxALL, M);
+		sizer->Add( lab,  0, wxRIGHT, LM);
+		sizer->Add( text, 0, wxRIGHT, HM);
+		Add(sizer,0,wxALL, M);
 	}
 }
 //----------------------------------------------------------------------------
@@ -801,7 +801,7 @@ void mafGUI::Float(int id,mafString label,float* var,float min, float max, int f
     text->SetFont(m_Font);
 
 		if(!tooltip.IsEmpty()) text->SetToolTip(tooltip.GetCStr());
-	  Add(text,0,wxEXPAND|wxALL, M);
+	  Add(text,0,wxALL, M);
 	}
 	else
 	{
@@ -817,9 +817,9 @@ void mafGUI::Float(int id,mafString label,float* var,float min, float max, int f
 		if(!tooltip.IsEmpty())
 			text->SetToolTip(tooltip.GetCStr());
 		wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-		sizer->Add( lab,  1, wxRIGHT, LM);
-		sizer->Add( text, 1, wxRIGHT, HM);
-		Add(sizer,0,wxEXPAND|wxALL, M);
+		sizer->Add( lab,  0, wxRIGHT, LM);
+		sizer->Add( text, 0, wxRIGHT, HM);
+		Add(sizer,0,wxALL, M);
 	}
 }
 //----------------------------------------------------------------------------
@@ -835,7 +835,7 @@ void mafGUI::Double(int id,mafString label,double* var,double min, double max, i
     text->SetFont(m_Font);
 		if(!tooltip.IsEmpty()) 
       text->SetToolTip(tooltip.GetCStr());
-	  Add(text,0,wxEXPAND|wxALL, M);
+	  Add(text,0,wxALL, M);
 	}
 	else
 	{
@@ -850,9 +850,9 @@ void mafGUI::Double(int id,mafString label,double* var,double min, double max, i
 		if(!tooltip.IsEmpty())
 			text->SetToolTip(tooltip.GetCStr());
 		wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-		sizer->Add( lab,  1, wxRIGHT, LM);
-		sizer->Add( text, 1, wxRIGHT, HM);
-		Add(sizer,0,wxEXPAND|wxALL, M);
+		sizer->Add( lab,  0, wxRIGHT, LM);
+		sizer->Add( text, 0, wxRIGHT, HM);
+		Add(sizer,0,wxALL, M);
 	}
 }
 //----------------------------------------------------------------------------
@@ -870,7 +870,7 @@ void mafGUI::Bool(int id,mafString label,int* var, int flag, mafString tooltip) 
       check->SetBackgroundColour(m_BackgroundColor);
 		if(!tooltip.IsEmpty()) 
       check->SetToolTip(tooltip.GetCStr());
-		Add(check,0,wxEXPAND|wxALL, M);
+		Add(check,0,wxALL, M);
   } 
 	else      // text on right
 	{
@@ -888,9 +888,9 @@ void mafGUI::Bool(int id,mafString label,int* var, int flag, mafString tooltip) 
       check->SetToolTip(tooltip.GetCStr());
 
 		wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-		sizer->Add( lab,  1, wxRIGHT, LM);
-		sizer->Add( check,1, wxRIGHT, HM);
-		Add(sizer,0,wxEXPAND|wxALL, M); 
+		sizer->Add( lab,  0, wxRIGHT, LM);
+		sizer->Add( check,0, wxRIGHT, HM);
+		Add(sizer,0,wxALL, M); 
   }
 }
 //----------------------------------------------------------------------------
@@ -916,9 +916,9 @@ wxSlider *mafGUI::Slider(int id,wxString label,int* var,int min, int max, wxStri
       sli->SetBackgroundColour(m_BackgroundColor);
     
 		wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-		sizer->Add(text, 1);
-		sizer->Add(sli,  1);
-		Add(sizer,0,wxEXPAND|wxALL, M); 
+		sizer->Add(text, 0);
+		sizer->Add(sli,  0);
+		Add(sizer,0,wxALL, M); 
 	}
 	else if(showText)
 	{
@@ -937,10 +937,10 @@ wxSlider *mafGUI::Slider(int id,wxString label,int* var,int min, int max, wxStri
       sli->SetBackgroundColour(m_BackgroundColor);
 		
 		wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-		sizer->Add(lab,  1, wxRIGHT, LM);
-		sizer->Add(text, 1);
-		sizer->Add(sli,  1);
-		Add(sizer,0,wxEXPAND|wxALL, M); 
+		sizer->Add(lab,  0, wxRIGHT, LM);
+		sizer->Add(text, 0);
+		sizer->Add(sli,  0);
+		Add(sizer,0,wxALL, M); 
 	}
   else if(!showText)
   {
@@ -955,9 +955,9 @@ wxSlider *mafGUI::Slider(int id,wxString label,int* var,int min, int max, wxStri
       sli->SetBackgroundColour(m_BackgroundColor);
 
     wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-    sizer->Add(text, 1);
-    sizer->Add(sli,  1);
-    Add(sizer,0,wxEXPAND|wxALL, M); 
+    sizer->Add(text, 0);
+    sizer->Add(sli,  0);
+    Add(sizer,0,wxALL, M); 
     text->Show(showText);
   }
   sli->SetValidator(mafGUIValidator(this,w_id_sli,sli,var,text));
@@ -990,8 +990,8 @@ mafGUIFloatSlider *mafGUI::FloatSlider(int id,wxString label,double *var,double 
       sli->SetBackgroundColour(m_BackgroundColor);
 	  text->SetValidator(mafGUIValidator(this,w_id_text,text,var,sli,min,max));
     sli->SetValidator(mafGUIValidator(this,w_id_sli,sli,var,text));
-		sizer->Add(text, 1);
-		sizer->Add(sli,  1);
+		sizer->Add(text, 0);
+		sizer->Add(sli,  0);
 	}
 	else
 	{
@@ -1012,11 +1012,11 @@ mafGUIFloatSlider *mafGUI::FloatSlider(int id,wxString label,double *var,double 
 
 		text->SetValidator(mafGUIValidator(this,w_id_text,text,var,sli,min,max));
     sli->SetValidator(mafGUIValidator(this,w_id_sli,sli,var,text));
-		sizer->Add(lab,  1, wxRIGHT, LM);
-		sizer->Add(text, 1);
-		sizer->Add(sli,  1);
+		sizer->Add(lab,  0, wxRIGHT, LM);
+		sizer->Add(text, 0);
+		sizer->Add(sli,  0);
 	}
-	Add(sizer,0,wxEXPAND|wxALL, M); 
+	Add(sizer,0,wxALL, M); 
 	if(tooltip != "")	
     text->SetToolTip(tooltip);
 	return sli;
@@ -1057,11 +1057,11 @@ mafGUIFloatSlider *mafGUI::FloatSlider(int id,double *var, double min, double ma
   text->SetValidator(mafGUIValidator(this,w_id_text,text,var,sli,min,max));
   sli->SetValidator(mafGUIValidator(this,w_id_sli,sli,var,text));
 
-  sizer->Add(minText,  1, wxRIGHT, LM);
-  sizer->Add(sli,  1, 0, LM);
-  sizer->Add(maxText, 1);
+  sizer->Add(minText,  0, wxRIGHT, LM);
+  sizer->Add(sli,  0, 0, LM);
+  sizer->Add(maxText,  0);
 
-  Add(sizer,0,wxEXPAND|wxALL, M); 
+  Add(sizer,0,wxALL, M); 
 
   return sli;
 }
@@ -1090,8 +1090,8 @@ void mafGUI::Radio(int id,wxString label,int* var, int numchoices, const wxStrin
     radio = new wxRadioBox  (this, w_id, "",dp, wxSize(DW,-1), numchoices, choices,dim,style|m_EntryStyle|wxTAB_TRAVERSAL );
 
     sizer->Add( lab,  0, wxRIGHT, LM);
-    sizer->Add( radio,1, wxRIGHT, HM);
-    Add(sizer,0,wxEXPAND|wxALL, M); 
+    sizer->Add( radio,0, wxRIGHT, HM);
+    Add(sizer,0,wxALL, M); 
   }
   else
   {
@@ -1124,22 +1124,22 @@ wxComboBox *mafGUI::Combo(int id,mafString label,int* var,int numchoices, const 
     w_id = GetWidgetId(id);
 	  combo = new wxComboBox  (this, w_id, "", dp, wxSize(DW,-1), numchoices, choices,wxCB_READONLY);
 	  combo->SetFont(m_Font);
-    sizer->Add( lab,  1, wxRIGHT, LM);
-	  sizer->Add( combo,1, wxRIGHT, HM);
+    sizer->Add( lab,  0, wxRIGHT, LM);
+	  sizer->Add( combo,0, wxRIGHT, HM);
   }
   else
   {
     w_id = GetWidgetId(id);
 	  combo = new wxComboBox  (this, w_id, "", dp, wxSize(FW,-1), numchoices, choices,wxCB_READONLY);
 	  combo->SetFont(m_Font);
-    sizer->Add( combo,1, wxRIGHT, HM);
+    sizer->Add( combo,0, wxRIGHT, HM);
   }
   
   combo->SetValidator( mafGUIValidator(this,w_id,combo,var) );
 	if(!tooltip.IsEmpty()) 
     combo->SetToolTip(tooltip.GetCStr());
 
-	Add(sizer,0,wxEXPAND|wxALL, M);
+	Add(sizer,0,wxALL, M);
   return combo;
 }
 //----------------------------------------------------------------------------
@@ -1176,9 +1176,9 @@ void mafGUI::FileOpen(int id,mafString label,mafString* var, const mafString wil
 	{
     sizer->Add( lab,  0, wxRIGHT, LM);
 	}
-	sizer->Add( butt, 1, wxRIGHT, HM);
-	sizer->Add( text, 1);
-  Add(sizer,0,wxEXPAND|wxALL, M); 
+	sizer->Add( butt, 0, wxRIGHT, HM);
+	sizer->Add( text, 0);
+  Add(sizer,0,wxALL, M); 
 }
 //----------------------------------------------------------------------------
 void mafGUI::DirOpen(int id,mafString label,mafString *var, mafString tooltip)
@@ -1212,11 +1212,11 @@ void mafGUI::DirOpen(int id,mafString label,mafString *var, mafString tooltip)
 	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
   if (!label.IsEmpty())
   {
-    sizer->Add( lab,  1, wxRIGHT, LM);
+    sizer->Add( lab,  0, wxRIGHT, LM);
   }
-	sizer->Add( butt, 1, wxRIGHT, HM);
-	sizer->Add( text, 1);
-  Add(sizer,0,wxEXPAND|wxALL, M); 
+	sizer->Add( butt, 0, wxRIGHT, HM);
+	sizer->Add( text, 0);
+  Add(sizer,0,wxALL, M); 
 }
 //----------------------------------------------------------------------------
 void mafGUI::FileSave(int id,mafString label,mafString* var, const mafString wildcard, mafString tooltip, bool enableTextCtrl)
@@ -1251,11 +1251,11 @@ void mafGUI::FileSave(int id,mafString label,mafString* var, const mafString wil
 	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
 	if (!label.IsEmpty())
 	{
-    sizer->Add( lab,  1, wxRIGHT, LM);
+    sizer->Add( lab,  0, wxRIGHT, LM);
 	}
-	sizer->Add( butt, 1, wxRIGHT, HM);
-	sizer->Add( text, 1);
-  Add(sizer,0,wxEXPAND|wxALL, M); 
+	sizer->Add( butt, 0, wxRIGHT, HM);
+	sizer->Add( text, 0);
+  Add(sizer,0,wxALL, M); 
 }
 //----------------------------------------------------------------------------
 void mafGUI::Color(int id,wxString label,wxColour* var, wxString tooltip)
@@ -1275,10 +1275,10 @@ void mafGUI::Color(int id,wxString label,wxColour* var, wxString tooltip)
     butt->SetToolTip(tooltip);
 
   wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-	sizer->Add( lab,  1, wxRIGHT, LM);
-	sizer->Add( text, 1, wxRIGHT, HM);
-	sizer->Add( butt, 1);
-  Add(sizer,0,wxEXPAND|wxALL, M); 
+	sizer->Add( lab,  0, wxRIGHT, LM);
+	sizer->Add( text, 0, wxRIGHT, HM);
+	sizer->Add( butt, 0);
+  Add(sizer,0,wxALL, M); 
 }
 #ifdef MAF_USE_VTK //:::::::::::::::::::::::::::::::::
 //----------------------------------------------------------------------------
@@ -1297,13 +1297,13 @@ mafGUILutSwatch *mafGUI::Lut(int id,wxString label,vtkLookupTable *lut)
 
   wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
   sizer->Add( lab,  0, wxRIGHT, LM);
-  sizer->Add( luts, 1, wxEXPAND, HM);
-  Add(sizer,0,wxEXPAND|wxALL, 3*M); 
+  sizer->Add( luts, 0, wxEXPAND, HM);
+  Add(sizer,0,wxALL, M); 
   return luts;
 }
 #endif             //:::::::::::::::::::::::::::::::::
 //----------------------------------------------------------------------------
-void mafGUI::TwoButtons(int firstID, int secondID, const char* label1, const char* label2, int alignment /* = wxEXPAND|wxALL */,int width)
+void mafGUI::TwoButtons(int firstID, int secondID, const char* label1, const char* label2, int alignment /* = wxALL */,int width)
 //----------------------------------------------------------------------------
 {
   int w = width != -1 ? width : FW/2;
@@ -1317,9 +1317,9 @@ void mafGUI::TwoButtons(int firstID, int secondID, const char* label1, const cha
   b2->SetFont(m_Font);
 
   wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-  sizer->Add( b1, 1);
-  sizer->Add( b2, 1);
-  Add(sizer,0,wxEXPAND|wxALL|alignment, M);
+  sizer->Add( b1, 0);
+  sizer->Add( b2, 0);
+  Add(sizer,0,wxALL|alignment, M);
 }
 //----------------------------------------------------------------------------
 void mafGUI::MultipleButtons(int numButtons, int numColumns, std::vector<int> &ids, std::vector<const char*> &labels, int alignment)
@@ -1339,26 +1339,26 @@ void mafGUI::MultipleButtons(int numButtons, int numColumns, std::vector<int> &i
   wxFlexGridSizer *fgSizer=  new wxFlexGridSizer( rows, numColumns, 1, 1 );
   for(int i = 0; i < button_list.size(); i++)
   {
-    fgSizer->Add(button_list[i],1,0);
+    fgSizer->Add(button_list[i],0,0);
   }
 
-  Add(fgSizer,0,wxEXPAND|wxALL|alignment, M);
+  Add(fgSizer,0,wxALL|alignment, M);
 }
 //----------------------------------------------------------------------------
 void mafGUI::OkCancel()
 //----------------------------------------------------------------------------
 {
-  mafGUIButton    *b1 = new mafGUIButton(this, wxOK, "Ok",dp, wxSize(FW/2,BH) );
+  mafGUIButton    *b1 = new mafGUIButton(this, wxOK, "ok",dp, wxSize(FW/2,BH) );
   b1->SetValidator( mafGUIValidator(this,wxOK,b1) );
   b1->SetFont(m_Font);
-  mafGUIButton    *b2 = new mafGUIButton(this, wxCANCEL, "Cancel", dp, wxSize(FW/2,BH) );
+  mafGUIButton    *b2 = new mafGUIButton(this, wxCANCEL, "cancel", dp, wxSize(FW/2,BH) );
   b2->SetValidator( mafGUIValidator(this,wxCANCEL,b2) );
   b2->SetFont(m_Font);
 
   wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-  sizer->Add( b1, 1,wxEXPAND);
-  sizer->Add( b2, 1,wxEXPAND);
-	Add(sizer,0,wxEXPAND|wxALL, M);
+  sizer->Add( b1, 0);
+  sizer->Add( b2, 0);
+	Add(sizer,0,wxALL, M);
 }
 //----------------------------------------------------------------------------
 wxListBox *mafGUI::ListBox(int id,wxString label,int height, wxString tooltip, long lbox_style , int width) //<*> togliere direction
@@ -1373,7 +1373,7 @@ wxListBox *mafGUI::ListBox(int id,wxString label,int height, wxString tooltip, l
   if(tooltip != "") lb->SetToolTip(tooltip);
   if(label == "")
 	{
-		Add(lb,0,wxEXPAND|wxALL, M); 
+		Add(lb,0,wxALL, M); 
 	}
 	else
   {
@@ -1384,9 +1384,9 @@ wxListBox *mafGUI::ListBox(int id,wxString label,int height, wxString tooltip, l
 		if(tooltip != "")	
       lab->SetToolTip(tooltip);
 		wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-		sizer->Add( lab,  1, wxRIGHT, LM);
-		sizer->Add( lb	, 1, wxRIGHT, HM);
-		Add(sizer,0,wxEXPAND|wxALL, M);
+		sizer->Add( lab,  0, wxRIGHT, LM);
+		sizer->Add( lb	, 0, wxRIGHT, HM);
+		Add(sizer,0,wxALL, M);
   }
 	return lb;
 }
@@ -1403,7 +1403,7 @@ wxListCtrl *mafGUI::ListCtrl(int id,wxString label,int height, wxString tooltip,
 	if(tooltip != "") lb->SetToolTip(tooltip);
 	if(label == "")
 	{
-		Add(lb,0,wxEXPAND|wxALL, M); 
+		Add(lb,0,wxALL, M); 
 	}
 	else
 	{
@@ -1414,9 +1414,9 @@ wxListCtrl *mafGUI::ListCtrl(int id,wxString label,int height, wxString tooltip,
 		if(tooltip != "")	
 			lab->SetToolTip(tooltip);
 		wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-		sizer->Add( lab,  1, wxRIGHT, LM);
-		sizer->Add( lb	, 1, wxRIGHT, HM);
-		Add(sizer,0,wxEXPAND|wxALL, M);
+		sizer->Add( lab,  0, wxRIGHT, LM);
+		sizer->Add( lb	, 0, wxRIGHT, HM);
+		Add(sizer,0,wxALL, M);
 	}
 	return lb;
 }
@@ -1444,7 +1444,7 @@ wxGrid *mafGUI::Grid(int id, wxString label,int height, int row, int cols, wxStr
 	
   if(label == "")
 	{
-		Add(grid,0,wxEXPAND|wxALL, M); 
+		Add(grid,0,wxALL, M); 
 	}
 	else
   {
@@ -1455,9 +1455,9 @@ wxGrid *mafGUI::Grid(int id, wxString label,int height, int row, int cols, wxStr
 		if(tooltip != "")	
       lab->SetToolTip(tooltip);
 		wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-		sizer->Add( lab,  1, wxRIGHT, LM);
-		sizer->Add( grid	, 1, wxRIGHT, HM);
-		Add(sizer,0,wxEXPAND|wxALL, M);
+		sizer->Add( lab,  0, wxRIGHT, LM);
+		sizer->Add( grid	, 0, wxRIGHT, HM);
+		Add(sizer,0,wxALL, M);
   }
 	return grid;
 }
@@ -1475,7 +1475,7 @@ mafGUICheckListBox* mafGUI::CheckList(int id,wxString label,int height, wxString
 
   if(label == "")
 	{
-		Add(clb, 0, wxEXPAND|wxALL, LM);
+		Add(clb, 0, wxALL, LM);
 	}
 	else
   {
@@ -1486,9 +1486,9 @@ mafGUICheckListBox* mafGUI::CheckList(int id,wxString label,int height, wxString
 		if(tooltip != "")	
       lab->SetToolTip(tooltip);
 		wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-		sizer->Add( lab,  1, wxRIGHT, LM);
-		sizer->Add( clb	, 1, wxRIGHT, HM);
-		Add(sizer,0,wxEXPAND|wxALL, M);
+		sizer->Add( lab,  0, wxRIGHT, LM);
+		sizer->Add( clb	, 0, wxRIGHT, HM);
+		Add(sizer,0,wxALL, M);
   }
 	return clb;
 }
@@ -1522,7 +1522,7 @@ void mafGUI::VectorN(int id,wxString label, double *var,int num_elem,double min,
 		tex->SetValidator( mafGUIValidator(this,w_id,tex,&var[i],min,max,decimal_digit));
 		if(tooltip != "") 
       tex->SetToolTip(tooltip);
-  	sizer->Add(tex,1,wxRIGHT,HM);
+  	sizer->Add(tex,0,wxRIGHT,HM);
 	}
 	Add(sizer,0,wxEXPAND,M);
 }
@@ -1545,7 +1545,7 @@ void mafGUI::VectorN(int id,wxString label, int *var,int num_elem,int min, int m
     if(m_UseBackgroundColor) 
       lab->SetBackgroundColour(m_BackgroundColor);
     lab->SetFont(m_Font);
-  	sizer->Add(lab,1,wxRIGHT,LM);
+  	sizer->Add(lab,0,wxRIGHT,LM);
 	}
 	for(int i=0;i<num_elem;i++)
 	{
@@ -1555,7 +1555,7 @@ void mafGUI::VectorN(int id,wxString label, int *var,int num_elem,int min, int m
 		tex->SetValidator( mafGUIValidator(this,w_id,tex,&var[i],min,max));
 		if(tooltip != "") 
       tex->SetToolTip(tooltip);
-  	sizer->Add(tex,1,wxRIGHT,HM);
+  	sizer->Add(tex,0,wxRIGHT,HM);
 	}
 	Add(sizer,0,wxEXPAND,M);
 }
@@ -1725,5 +1725,5 @@ void mafGUI::BoolGrid(int numRows, int numColumns, std::vector<int> &ids, std::v
     }
   }
 
-  Add(fgSizer,0,wxEXPAND|wxALL, M);
+  Add(fgSizer,0,wxALL, M);
 }
