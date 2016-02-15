@@ -175,7 +175,7 @@ FunctionEnd
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;    
 !macro CreateInstaller
 	Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
-	OutFile "Setup_${PRODUCT_NAME}_Build_.exe"
+	OutFile "Setup_${PRODUCT_NAME}_${PRODUCT_VERSION}.exe"
 
 	InstallDir "$PROGRAMFILES\${PRODUCT_NAME}"
 	InstallDirRegKey HKCU "${PRODUCT_DIR_REGKEY}" ""
