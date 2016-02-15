@@ -499,7 +499,7 @@ void mafLogicWithManagers::CreateMenu()
 	mafGUI::AddMenuItem(edit_menu,OP_UNDO,_("Undo  \tCtrl+Z"),EDIT_UNDO_xpm);
 	mafGUI::AddMenuItem(edit_menu,OP_REDO,_("Redo  \tCtrl+Shift+Z"),EDIT_REDO_xpm);
   edit_menu->AppendSeparator();
-	mafGUI::AddMenuItem(edit_menu,OP_DELETE,_("Delete  \tDel"),EDIT_DELETE_xpm);
+	mafGUI::AddMenuItem(edit_menu,OP_DELETE,_("Delete  \tCtrl+Shift+Del"),EDIT_DELETE_xpm);
 	mafGUI::AddMenuItem(edit_menu,OP_CUT,_("Cut   \tCtrl+Shift+X"),EDIT_CUT_xpm);
 	mafGUI::AddMenuItem(edit_menu,OP_COPY,_("Copy  \tCtrl+Shift+C"),EDIT_COPY_xpm);
 	mafGUI::AddMenuItem(edit_menu,OP_PASTE, _("Paste \tCtrl+Shift+V"),EDIT_PASTE_xpm);
