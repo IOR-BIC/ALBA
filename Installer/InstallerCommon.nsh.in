@@ -219,11 +219,13 @@ FunctionEnd
 		File "${PRODUCT_INSTALLER_DIR_WIN}\${PRODUCT_NAME}Splash.bmp"
 		File "${PRODUCT_INSTALLER_DIR_WIN}\${PRODUCT_NAME}About.bmp"
 		
-		;Create Manual path	  
-		CreateDirectory "$INSTDIR\Help"
-		SetOutPath "$INSTDIR\Help"
-		File /r /x /nonfatal "${PRODUCT_MANUAL_DIR}\*.*"
-			  
+		;Create Manual path	 		
+		!ifdef ${PRODUCT_MANUAL_DIR}
+			CreateDirectory "$INSTDIR\Help"
+			SetOutPath "$INSTDIR\Help"
+			File /r /x /nonfatal "${PRODUCT_MANUAL_DIR}\*.*"
+		!endif
+ 			  
 		!insertmacro AddConfigPath ;Optional	  
 
 		; vme uploader downloader stuff: for the moment this is dependent on C:\LTM\Bonemat\Installer...
