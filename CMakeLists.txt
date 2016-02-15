@@ -119,7 +119,7 @@ OPTION(BUILD_EXAMPLES "Build examples." ON )
 OPTION(BUILD_TESTING "Build the testing tree." OFF)
 OPTION(MAF_BUILD_MAFDLL "Build mafDLL.dll." OFF)
 OPTION(MAF_QA "Generate QA" OFF)
-
+FIND_FILE( VISUAL_STUDIO_RUNTIME vcredist_x86.exe )
 # MARK_AS_ADVANCED (
   # BUILD_SHARED_LIBS
 # )
@@ -139,6 +139,13 @@ INCLUDE (${CMAKE_ROOT}/Modules/FindThreads.cmake)
 CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/mafConfigure.h.in
              ${PROJECT_BINARY_DIR}/mafConfigure.h
              @ONLY)
+
+
+#-----------------------------------------------------------------------------
+# Installer configuration
+#-----------------------------------------------------------------------------
+CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/Installer/EnumUsersReg.nsh ${PROJECT_BINARY_DIR}/Installer/EnumUsersReg.nsh @ONLY)
+CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/Installer/InstallerCommon.nsh.in ${PROJECT_BINARY_DIR}/Installer/InstallerCommon.nsh @ONLY)
 			 
 #-----------------------------------------------------------------------------
 # Check if MFL is inside the MAF tree.
