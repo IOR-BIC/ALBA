@@ -52,6 +52,7 @@ class vtkPolyData;
 class vtkTextMapper;
 class mafVMEGroup;
 class mafProgressBarHelper;
+class DcmDataset;
 
 class mafDicomSlice;
 class medDicomSeriesSliceList;
@@ -214,6 +215,10 @@ protected:
 
 	/** Read the list of dicom files recognized. */
 	bool ReadDicomFileList(mafString& currentSliceABSDirName, mafProgressBarHelper *progressHelper);
+
+	void FindAndGetDicomStrings(DcmDataset * dicomDataset, const char *&birthdate, const char *&date, const char *&description, const char *&patientName, const char *&photometricInterpretation);
+
+	void GetDicomSpacing(DcmDataset * dicomDataset, double * dcmPixelSpacing);
 
 	/** Check if dicom dataset contains rotations */
 	bool IsRotated( double dcmImageOrientationPatient[6] );
@@ -655,6 +660,13 @@ public:
 	/** Set the DCM modality */
 	void SetDcmModality(mafString dcmModality){m_DcmModality=dcmModality;};
 
+
+	/** Returns PhotometricInterpretation */
+	mafString GetPhotometricInterpretation() const { return m_PhotometricInterpretation; }
+
+	/** Sets PhotometricInterpretation */
+	void SetPhotometricInterpretation(mafString photometricInterpretation) { m_PhotometricInterpretation = photometricInterpretation; }
+
 protected:
 	double m_DcmImagePositionPatient[3];
 	double m_DcmImagePositionPatientOriginal[3];
@@ -665,6 +677,7 @@ protected:
 	mafString m_PatientName;
 	mafString m_PatientBirthdate;
 	mafString m_DcmModality;
+	mafString m_PhotometricInterpretation;
 
 	double m_DcmTriggerTime;
 	int m_DcmInstanceNumber;

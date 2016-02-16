@@ -104,8 +104,6 @@ PURPOSE.  See the above copyright notice for more information.
 
 
 
-#define round(x) (x<0?ceil((x)-0.5):floor((x)+0.5))
-
 //BES: 4.7.2009 - VS 2008 cannot compile it due to the following error
 //C:\MAF\Medical\Libraries\Offis\Sources\dcmtk-3.5.4\config\include\dcmtk/config/cfwin32.h(362) : error C2371: 'ssize_t' : redefinition; different basic types
 //  C:\MAF\openMAF\Libraries\wxWin\Sources\include\wx/defs.h(1018) : see declaration of 'ssize_t'
@@ -3894,16 +3892,9 @@ bool mafOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 			double dcmPixelSpacing[3];
 			dcmPixelSpacing[2] = 1;
 
-			if(dicomDataset->findAndGetFloat64(DCM_PixelSpacing,dcmPixelSpacing[0],0).bad())
-			{
-				//Unable to get element: DCM_PixelSpacing[0];
-				dcmPixelSpacing[0] = 1.0;// for RGB??
-			} 
-			if(dicomDataset->findAndGetFloat64(DCM_PixelSpacing,dcmPixelSpacing[1],1).bad())
-			{
-				//Unable to get element: DCM_PixelSpacing[0];
-				dcmPixelSpacing[1] = 1.0;// for RGB??
-			} 
+
+			GetDicomSpacing(dicomDataset, dcmPixelSpacing);
+
 
 			double dcmRescaleSlope;
 			if(dicomDataset->findAndGetFloat64(DCM_RescaleSlope,dcmRescaleSlope).bad())
@@ -4265,11 +4256,8 @@ bool mafOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 					dicomSliceVTKImageData->SetOrigin(dcmImagePositionPatient);
 					dicomSliceVTKImageData->Update();
 
-					const char *date,*description,*patientName,*birthdate;
-					dicomDataset->findAndGetString(DCM_PatientsBirthDate,birthdate);
-					dicomDataset->findAndGetString(DCM_StudyDate,date);
-					dicomDataset->findAndGetString(DCM_SeriesDescription,description);
-					dicomDataset->findAndGetString(DCM_PatientsName,patientName);
+					const char *date,*description,*patientName,*birthdate,*photometricInterpretation;
+					FindAndGetDicomStrings(dicomDataset, birthdate, date, description, patientName, photometricInterpretation);
 
 					if (!this->m_TestMode)
 					{
@@ -4303,6 +4291,8 @@ bool mafOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 						dicomSliceVTKImageData,description,date,patientName,birthdate));
 
 					((mafDicomSlice *)dicomSeries->Last()->GetData())->SetDcmModality(dcmModality);
+					((mafDicomSlice *)dicomSeries->Last()->GetData())->SetPhotometricInterpretation(photometricInterpretation);
+
 
 					m_SeriesIDToSlicesListMap.insert\
 						(std::pair<std::vector<mafString>,medDicomSeriesSliceList*>\
@@ -4370,18 +4360,15 @@ bool mafOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 
 					lastZPos = dcmImagePositionPatient[2];
 
-					const char *date,*description,*patientName,*birthdate;
-					dicomDataset->findAndGetString(DCM_PatientsBirthDate,birthdate);
-					dicomDataset->findAndGetString(DCM_StudyDate,date);
-					dicomDataset->findAndGetString(DCM_SeriesDescription,description);
-					dicomDataset->findAndGetString(DCM_PatientsName,patientName);
+					const char *date,*description,*patientName,*birthdate, *photometricInterpretation;
+					FindAndGetDicomStrings(dicomDataset, birthdate, date, description, patientName, photometricInterpretation);
 
 					m_SeriesIDToSlicesListMap[seriesId]->Append(\
 						new mafDicomSlice(m_CurrentSliceABSFileName,dcmImagePositionPatient, \
 						dcmImageOrientationPatient, dicomSliceVTKImageData,description,date,patientName,birthdate));
 
 					((mafDicomSlice *)m_SeriesIDToSlicesListMap[seriesId]->Last()->GetData())->SetDcmModality(dcmModality);
-
+					((mafDicomSlice *)m_SeriesIDToSlicesListMap[seriesId]->Last()->GetData())->SetPhotometricInterpretation(photometricInterpretation);
 
 					mafString dimname;
 					dimname.Append(wxString::Format("%ix%ix",dcmRows, dcmColumns));
@@ -4495,12 +4482,9 @@ bool mafOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 						}
 					}
 
-					const char *date,*description,*patientName,*birthdate;
-					dicomDataset->findAndGetString(DCM_PatientsBirthDate,birthdate);
-					dicomDataset->findAndGetString(DCM_StudyDate,date);
-					dicomDataset->findAndGetString(DCM_SeriesDescription,description);
-					dicomDataset->findAndGetString(DCM_PatientsName,patientName);
-
+					const char *date,*description,*patientName,*birthdate, *photometricInterpretation;
+					FindAndGetDicomStrings(dicomDataset, birthdate, date, description, patientName, photometricInterpretation);
+					
 					if(((mafGUIDicomSettings*)GetSetting())->GetOutputNameFormat() == mafGUIDicomSettings::TRADITIONAL)
 					{
 						seriesName.Append(wxString::Format("%i_%ix%i",seriesCounter, dcmRows, dcmColumns));
@@ -4525,6 +4509,8 @@ bool mafOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 						(m_CurrentSliceABSFileName,dcmImagePositionPatient, dcmImageOrientationPatient, \
 						dicomSliceVTKImageData,description,date,patientName,birthdate, dcmInstanceNumber, dcmCardiacNumberOfImages, dcmTriggerTime));
 					((mafDicomSlice *)dicomSeries->Last()->GetData())->SetDcmModality(dcmModality);
+					((mafDicomSlice *)dicomSeries->Last()->GetData())->SetPhotometricInterpretation(photometricInterpretation);
+
 
 					m_SeriesIDToSlicesListMap.insert\
 						(std::pair<std::vector<mafString>,medDicomSeriesSliceList*>\
@@ -4572,16 +4558,14 @@ bool mafOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 					dicomDataset->findAndGetLongInt(DCM_CardiacNumberOfImages,dcmCardiacNumberOfImages);
 					dicomDataset->findAndGetFloat64(DCM_TriggerTime,dcmTriggerTime);
 
-					const char *date,*description,*patientName,*birthdate;
-					dicomDataset->findAndGetString(DCM_PatientsBirthDate,birthdate);
-					dicomDataset->findAndGetString(DCM_StudyDate,date);
-					dicomDataset->findAndGetString(DCM_SeriesDescription,description);
-					dicomDataset->findAndGetString(DCM_PatientsName,patientName);
+					const char *date,*description,*patientName,*birthdate, *photometricInterpretation;
+					FindAndGetDicomStrings(dicomDataset, birthdate, date, description, patientName, photometricInterpretation);
 
 					m_SeriesIDToSlicesListMap[seriesId]->Append\
 						(new mafDicomSlice(m_CurrentSliceABSFileName,dcmImagePositionPatient,dcmImageOrientationPatient ,\
 						dicomSliceVTKImageData,description,date,patientName,birthdate,dcmInstanceNumber,dcmCardiacNumberOfImages,dcmTriggerTime));
 					((mafDicomSlice *)m_SeriesIDToSlicesListMap[seriesId]->Last()->GetData())->SetDcmModality(dcmModality);
+					((mafDicomSlice *)m_SeriesIDToSlicesListMap[seriesId]->Last()->GetData())->SetPhotometricInterpretation(photometricInterpretation);
 
 					mafString dimname;
 					dimname.Append(wxString::Format("%ix%ix",dcmRows, dcmColumns));
@@ -4635,6 +4619,43 @@ bool mafOpImporterDicomOffis::ReadDicomFileList(mafString& currentSliceABSDirNam
 }
 
 //----------------------------------------------------------------------------
+void mafOpImporterDicomOffis::FindAndGetDicomStrings(DcmDataset * dicomDataset, const char *&birthdate, const char *&date, const char *&description, const char *&patientName, const char *&photometricInterpretation)
+{
+	dicomDataset->findAndGetString(DCM_PatientsBirthDate, birthdate);
+	dicomDataset->findAndGetString(DCM_StudyDate, date);
+	dicomDataset->findAndGetString(DCM_SeriesDescription, description);
+	dicomDataset->findAndGetString(DCM_PatientsName, patientName);
+	dicomDataset->findAndGetString(DCM_PhotometricInterpretation, photometricInterpretation);
+}
+
+//----------------------------------------------------------------------------
+void mafOpImporterDicomOffis::GetDicomSpacing(DcmDataset * dicomDataset, double * dcmPixelSpacing)
+{
+	
+	for (int i = 0; i < 2; i++)
+	{
+		//Try to get pixel spacing as spacing used on MR/CT or on calibrated CR
+		if (!dicomDataset->findAndGetFloat64(DCM_PixelSpacing, dcmPixelSpacing[i], i).bad())
+			continue;
+
+		//Try to get Nominal Scanned pixel spacing as spacing used on SC
+		if (!dicomDataset->findAndGetFloat64(DCM_NominalScannedPixelSpacing, dcmPixelSpacing[i], i).bad())
+			continue;
+
+		//Try to get Imager pixel spacing as spacing used on CR/Xray/DX calculated on front plane of the detector
+		if (!dicomDataset->findAndGetFloat64(DCM_ImagerPixelSpacing, dcmPixelSpacing[i], i).bad())
+			continue;
+
+		//Try to get Detector Element spacing, this values should not be used for set image spacing, 
+		//but if we does not have any of the previous values this is better than a default value
+		if (!dicomDataset->findAndGetFloat64(DCM_DetectorElementSpacing, dcmPixelSpacing[i], i).bad())
+			continue;
+						
+		//Unable to get element: Setting default value
+		dcmPixelSpacing[i] = 1.0;
+	}
+	
+}
 
 
 //----------------------------------------------------------------------------
@@ -4920,11 +4941,12 @@ void mafOpImporterDicomOffis::GenerateSliceTexture(int imageID)
 	m_SliceTexture->Modified();
 	
 	
-	//Invert grayscale for CR images
-	if(!slice->GetDcmModality().Equals("CR"))
-		lutPreset(4,m_SliceLookupTable);
-	else
+	//Invert grayscale for Photometric Interpretation MONOCHROME1
+	if(wxString(slice->GetPhotometricInterpretation().GetCStr()).Contains("MONOCHROME1"))
 		lutPreset(20,m_SliceLookupTable);
+	else
+		lutPreset(4, m_SliceLookupTable);
+		
 
 	m_SliceLookupTable->SetTableRange(range);
 	m_SliceLookupTable->Build();
