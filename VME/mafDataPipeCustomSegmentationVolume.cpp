@@ -45,7 +45,6 @@
 #include "itkConnectedThresholdImageFilter.h"
 #include "mafProgressBarHelper.h"
 
-#define round(x) (x<0?ceil((x)-0.5):floor((x)+0.5))
 
 typedef  itk::Image< double, 3> RealImage;
 typedef  itk::Image< unsigned char, 3> UCharImage;

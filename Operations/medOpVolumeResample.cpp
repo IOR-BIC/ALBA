@@ -63,7 +63,6 @@
 #include <vector>
 #include <algorithm>
 
-#define round(x) (x<0?ceil((x)-0.5):floor((x)+0.5))
 
 #define SPACING_PERCENTAGE_BOUNDS 0.1
 
