@@ -374,7 +374,7 @@ void mafGUI::Button(int id,mafString button_text,mafString label, mafString tool
       lab->SetBackgroundColour(m_BackgroundColor);
     lab->SetFont(m_Font);
     int w_id = GetWidgetId(id);
-		mafGUIButton    *butt = new mafGUIButton   (this, w_id, button_text.GetCStr(),dp, wxSize(EW, BH) );
+		mafGUIButton    *butt = new mafGUIButton   (this, w_id, button_text.GetCStr(),dp, wxSize(DW, BH) );
 		butt->SetValidator( mafGUIValidator(this,w_id,butt) );
     butt->SetFont(m_Font);
 		if(!tooltip.IsEmpty()) 
