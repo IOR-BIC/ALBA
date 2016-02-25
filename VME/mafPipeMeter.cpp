@@ -45,7 +45,7 @@
 
 #include "vtkRenderer.h"
 #include "vtkOutlineCornerFilter.h"
-#include "vtkTubeFilter.h"
+#include "vtkMAFTubeFilter.h"
 #include "vtkLookupTable.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkPolyData.h"

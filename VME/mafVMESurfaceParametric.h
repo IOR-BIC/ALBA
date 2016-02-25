@@ -66,6 +66,9 @@ public:
   /** Return the radius of the parametric cylinder.*/
   double GetCylinderRadius() {return m_CylinderRadius;};
 
+	/** Return the height of the parametric cylinder.*/
+	double GetCylinderHeight() { return m_CylinderHeight; };
+
   /** Return the cylinder orientation axis.*/
   int GetCylinderAxis() {return m_CylinderOrientationAxis;};
 

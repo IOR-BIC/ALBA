@@ -46,7 +46,7 @@
 #include "vtkMAFFixedCutter.h"
 #include "vtkPlane.h"
 #include "vtkMAFToLinearTransform.h"
-#include "vtkTubeFilter.h"
+#include "vtkMAFTubeFilter.h"
 #include "vtkPolyData.h"
 #include "vtkCardinalSpline.h"
 #include "vtkMAFSmartPointer.h"

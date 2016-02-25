@@ -30,7 +30,7 @@ class vtkOutlineCornerFilter;
 class vtkPolyDataMapper;
 class vtkActor;
 class vtkProperty;
-class vtkTubeFilter;
+class vtkMAFTubeFilter;
 class mafVMEWrappedMeter;
 class vtkLookupTable;
 class vtkCaptionActor2D;
@@ -74,7 +74,7 @@ public:
   };
 
   vtkCaptionActor2D      *m_Caption;
-  vtkTubeFilter          *m_Tube;
+	vtkMAFTubeFilter       *m_Tube;
   vtkLookupTable         *m_Lut;
   vtkPolyDataMapper	     *m_DataMapper;
   vtkActor               *m_DataActor;
