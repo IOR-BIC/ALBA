@@ -278,7 +278,6 @@ void mafSideBar::UpdateVmePanel()
 	
 	  if (vme_gui)
 	  {
-			m_AppendingGUI->Label("test");
 	    m_AppendingGUI->AddGui(vme_gui);
 	  }
 
