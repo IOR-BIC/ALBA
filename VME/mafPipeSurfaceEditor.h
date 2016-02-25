@@ -28,7 +28,7 @@
 //----------------------------------------------------------------------------
 class vtkSphereSource;
 class vtkGlyph3D;
-class vtkTubeFilter;
+class vtkMAFTubeFilter;
 class vtkPolyDataMapper;
 class vtkAppendPolyData;
 class vtkActor;

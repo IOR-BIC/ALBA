@@ -54,7 +54,7 @@
 #include "vtkCellData.h"
 #include "vtkSphereSource.h"
 #include "vtkGlyph3D.h"
-#include "vtkTubeFilter.h"
+#include "vtkMAFTubeFilter.h"
 #include "vtkAppendPolyData.h"
 #include "vtkActor2D.h"
 

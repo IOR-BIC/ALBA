@@ -46,7 +46,7 @@
 #include "vtkMAFFixedCutter.h"
 #include "vtkPlane.h"
 #include "vtkMAFToLinearTransform.h"
-#include "vtkTubeFilter.h"
+#include "vtkMAFTubeFilter.h"
 #include "vtkPolyData.h"
 #include "vtkCardinalSpline.h"
 #include "vtkMAFSmartPointer.h"
@@ -441,8 +441,6 @@ void mafPipePolylineSlice::UpdateProperty()
   
   if(m_SplineMode)
     data = SplineProcess(data);
-  else 
-    data = LineProcess(data);
       
   data->Modified();
   data->Update();
@@ -527,83 +525,6 @@ vtkPolyData *mafPipePolylineSlice::SplineProcess(vtkPolyData *polyData)
         cellSize++;
       else 
         double tmp=0;
-      pts->GetPoint(linePoints[i],oldPoint);
-    }
-
-    if (cellSize>1)
-    {
-      cellArray->InsertNextCell(cellSize);
-      cellArray->InsertCellPoint(linePoints[0]);
-
-      pts->GetPoint(linePoints[0],oldPoint);
-      for(int i=1; i<linePointsNum; i++)
-      {
-        pts->GetPoint(linePoints[i],currPoint);
-        //adding points only if is not the same of the previsous;
-        if (currPoint[0]!=oldPoint[0] || currPoint[1]!=oldPoint[1] || currPoint[2]!=oldPoint[2]) 
-          cellArray->InsertCellPoint(linePoints[i]);
-
-        pts->GetPoint(linePoints[i],oldPoint);
-      }
-    }
-  }
-
-  m_PolyFilteredLine->SetPoints(polyData->GetPoints());
-  m_PolyFilteredLine->Update();
-
-  m_PolyFilteredLine->SetLines(cellArray);
-  m_PolyFilteredLine->Modified();
-  m_PolyFilteredLine->Update();
-
-  vtkDEL(cellArray);
-
-  return m_PolyFilteredLine;
-}
-
-
-
-vtkPolyData * mafPipePolylineSlice::LineProcess( vtkPolyData *polyData )
-{
-  //cleaned point list
-  vtkPoints *pts;
-
-  if (m_PolyFilteredLine==NULL)
-    vtkNEW(m_PolyFilteredLine);
-
-  vtkCellArray *cellArray;
-  vtkNEW(cellArray);
-
-  m_PolyFilteredLine->DeepCopy(polyData);
-
-  vtkCellArray *lines=polyData->GetLines();
-  vtkIdType *linePoints;
-  double oldPoint[3],currPoint[3];
-  vtkIdType linePointsNum;
-  int evaluedPoints=0;
-  int cellID=0;
-  polyData->Update();
-  pts=polyData->GetPoints();
-  vtkPointData *pointData=polyData->GetPointData();
-  int nArray=pointData->GetNumberOfArrays();
-
-
-  //generating one branch for each branch (cell) of input polyline
-  for(int lin=0;lin<polyData->GetNumberOfLines();lin++)
-  {
-
-    int branchStart=evaluedPoints;
-    int cellSize=1; //is 1 for the first point
-
-    lines->GetCell(cellID,linePointsNum,linePoints);
-    cellID+=linePointsNum+1;
-
-    pts->GetPoint(linePoints[0],oldPoint);
-    for(int i=1; i<linePointsNum; i++)
-    {
-      pts->GetPoint(linePoints[i],currPoint);
-      //adding points only if is not the same of the previsous;
-      if (currPoint[0]!=oldPoint[0] || currPoint[1]!=oldPoint[1] || currPoint[2]!=oldPoint[2]) 
-        cellSize++;
       pts->GetPoint(linePoints[i],oldPoint);
     }
 

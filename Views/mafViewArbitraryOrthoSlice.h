@@ -41,7 +41,7 @@
 #include "vtkCubeSource.h"
 #include "vtkPlane.h"
 #include "vtkCutter.h"
-#include "vtkTubeFilter.h"
+#include "vtkMAFTubeFilter.h"
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkLineSource.h"
 #include "mafPipeSurface.h"
