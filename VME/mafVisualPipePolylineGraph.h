@@ -35,7 +35,7 @@ class vtkProperty;
 class mafAxes;
 class vtkColorTransferFunction;
 class vtkSphereSource;
-class vtkTubeFilter;
+class vtkMAFTubeFilter;
 class vtkGlyph3D;
 class vtkActor2D;
 
@@ -128,7 +128,7 @@ protected:
 
   vtkSphereSource        *m_Sphere;
   vtkGlyph3D             *m_Glyph;
-  vtkTubeFilter          *m_Tube;
+	vtkMAFTubeFilter          *m_Tube;
 
   /** Initialize representation, capping, radius and resolution variables.*/
   void InitializeFromTag();

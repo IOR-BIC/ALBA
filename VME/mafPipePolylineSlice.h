@@ -33,12 +33,12 @@ class vtkProperty;
 class mafAxes;
 class vtkMAFFixedCutter;
 class vtkPlane;
-class vtkTubeFilter;
 class vtkPolyData;
 class vtkMAFPolyDataToSinglePolyLine;
 class vtkMAFToLinearTransform;
 class vtkClipPolyData;
 class vtkAppendPolyData;
+class vtkMAFTubeFilter;
 
 //----------------------------------------------------------------------------
 // mafPipePolylineSlice :
@@ -90,10 +90,6 @@ public:
   /** Function that retrieve a spline polyline when  input is a polyline */ 
   vtkPolyData *SplineProcess(vtkPolyData *polyData);
 
-  /** This Function prepares a polydata for vtktubefilter 
-      by removing consecutive points whit same coordinates */ 
-  vtkPolyData *LineProcess(vtkPolyData *polyData);
-
   /** Show actor of sliced polyline*/
   void ShowActorOn();
 
@@ -132,8 +128,8 @@ protected:
 
   vtkPolyDataMapper	      *m_Mapper;
   vtkActor                *m_Actor;
-	vtkTubeFilter           *m_Tube;
-	vtkTubeFilter           *m_TubeRadial;
+	vtkMAFTubeFilter        *m_Tube;
+	vtkMAFTubeFilter        *m_TubeRadial;
   vtkOutlineCornerFilter  *m_OutlineBox;
   vtkPolyDataMapper       *m_OutlineMapper;
   vtkProperty             *m_OutlineProperty;

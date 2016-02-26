@@ -25,7 +25,7 @@ class vtkOutlineCornerFilter;
 class vtkPolyDataMapper;
 class vtkActor;
 class vtkProperty;
-class vtkTubeFilter;
+class vtkMAFTubeFilter;
 class vtkGlyph3D;
 class vtkSphereSource;
 class vtkAppendPolyData;
@@ -111,11 +111,7 @@ public:
 
 	/** Calculate the cardinal spline over original polyline*/
   vtkPolyData *SplineProcess(vtkPolyData *polyData);
-
-   /** This Function prepares a polydata for vtktubefilter 
-      by removing consecutive points whit same coordinates */ 
-  vtkPolyData *LineProcess(vtkPolyData *polyData);
-
+	
   /** Set Border Distance*/
   void SetDistanceBorder(double value){m_DistanceBorder = value;};
   /** Get Border Distance*/
@@ -188,7 +184,7 @@ public:
 protected:
 	vtkSphereSource        *m_Sphere;
 	vtkGlyph3D             *m_Glyph;
-	vtkTubeFilter          *m_Tube;
+	vtkMAFTubeFilter       *m_Tube;
 	vtkPolyDataMapper	     *m_Mapper;
 	vtkActor               *m_Actor;
 	vtkOutlineCornerFilter *m_OutlineBox;

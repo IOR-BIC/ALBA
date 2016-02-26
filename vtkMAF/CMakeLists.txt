@@ -217,7 +217,8 @@ SET(vtkMAF_SRCS
   vtkMAFStentModelSource.h
   vtkMAFDeformableSimplexMeshFilter.h
   vtkMAFDeformableSimplexMeshFilter_Impl.h
-
+	
+	vtkMAFTubeFilter.cxx vtkMAFTubeFilter.h
 )
 
 IF(WIN32)

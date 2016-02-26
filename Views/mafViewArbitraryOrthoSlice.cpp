@@ -3689,7 +3689,7 @@ void mafViewArbitraryOrthoSlice::BuildSlicingPlane(mafVMESurface *inVME,
 		lineSource->SetPoint2(p2);
 		lineSource->Update();
 
-		vtkTubeFilter *tubeFilter = vtkTubeFilter::New();
+		vtkMAFTubeFilter *tubeFilter = vtkMAFTubeFilter::New();
 		tubeFilter->SetInput(lineSource->GetOutput());
 		tubeFilter->SetRadius(0.3); // to be adapted to input vme
 		tubeFilter->SetNumberOfSides(10);

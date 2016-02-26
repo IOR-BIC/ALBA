@@ -33,7 +33,7 @@ class vtkProperty;
 class mafAxes;
 class vtkMAFFixedCutter;
 class vtkPlane;
-class vtkTubeFilter;
+class vtkMAFTubeFilter;
 class vtkPolyData;
 class vtkMAFPolyDataToSinglePolyLine;
 class vtkMAFToLinearTransform;
@@ -144,8 +144,8 @@ protected:
 
   vtkPolyDataMapper	      *m_Mapper;
   vtkActor                *m_Actor;
-	vtkTubeFilter           *m_Tube;
-	vtkTubeFilter           *m_TubeRadial;
+	vtkMAFTubeFilter           *m_Tube;
+	vtkMAFTubeFilter           *m_TubeRadial;
   vtkOutlineCornerFilter  *m_OutlineBox;
   vtkPolyDataMapper       *m_OutlineMapper;
   vtkProperty             *m_OutlineProperty;

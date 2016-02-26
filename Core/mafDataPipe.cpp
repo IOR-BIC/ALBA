@@ -171,7 +171,7 @@ void mafDataPipe::OnEvent(mafEventBase *maf_event)
 {
   switch (maf_event->GetId())
   {
-  case VME_OUTPUT_DATA_PREUPDATE:
+  case VME_OUTPUT_DATA_PREUPDATE: 
     if (GetMTime()>m_PreExecuteTime.GetMTime())
     {
       m_PreExecuteTime.Modified();
