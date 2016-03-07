@@ -144,6 +144,8 @@ void mafViewArbitrarySlice::PackageView()
 	m_ViewArbitrary = new mafViewVTK("",CAMERA_PERSPECTIVE);
 	m_ViewArbitrary->PlugVisualPipe("mafVMEVolumeGray", "mafPipeBox", MUTEX);
 	m_ViewArbitrary->PlugVisualPipe("mafVMELabeledVolume", "mafPipeBox", MUTEX);
+	m_ViewArbitrary->PlugVisualPipe("mafVMEGizmo", "mafPipeGizmo");
+	m_ViewArbitrary->PlugVisualPipe("mafVMESlicer", "mafPipeSurfaceTextured", MUTEX);
 
 	m_ViewSlice = new mafViewVTK("",CAMERA_OS_Z);
 	m_ViewSlice->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice");
@@ -154,6 +156,7 @@ void mafViewArbitrarySlice::PackageView()
 	m_ViewSlice->PlugVisualPipe("mafVMELandmark", "mafPipeSurfaceSlice");
 	m_ViewSlice->PlugVisualPipe("mafVMELandmarkCloud", "mafPipeSurfaceSlice");
 	m_ViewSlice->PlugVisualPipe("mafVMERefSys", "mafPipeSurfaceSlice");
+	m_ViewSlice->PlugVisualPipe("mafVMESlicer", "mafPipeSurfaceTextured", MUTEX);
 
 	PlugChildView(m_ViewArbitrary);
 	PlugChildView(m_ViewSlice);
