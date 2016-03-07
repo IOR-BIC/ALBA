@@ -459,12 +459,12 @@ int mafViewSingleSlice::GetNodeStatus(mafNode *vme)
             ((mafVME *)vme)->GetOutput()->IsA("mafVMEAdvancedProber"))
     {
       if(n != NULL)
-        n->m_PipeCreatable = false;
+        n->SetPipeCreatable(false);
     }
 		else if (vme->IsMAFType(mafVMEGizmo))
 		{
       if(n != NULL)
-			  n->m_PipeCreatable = true;
+			  n->SetPipeCreatable(true);
 		}
   }
 

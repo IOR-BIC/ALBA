@@ -61,9 +61,6 @@ public:
   /** Function that clones instance of the object. */
   virtual mafView* Copy(mafObserver *Listener, bool lightCopyEnabled = false);
 
-  /** Create VME visual pipe */
-  virtual void VmeShow(mafNode *vme, bool show);
-
 protected:
 
   /** Create view Gui */

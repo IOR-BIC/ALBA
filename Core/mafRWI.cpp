@@ -329,11 +329,11 @@ void mafRWI::CameraSet(int cam_position, double zoom)
 	{
 	case CAMERA_FRONT:
 	case CAMERA_PERSPECTIVE_FRONT:
-		x=0; y=0; z=-1; vx=0; vy=1; vz=0;
+		x=0; y=0; z=-1; vx=0; vy=-1; vz=0;
 		break;
 	case CAMERA_BACK:
 	case CAMERA_PERSPECTIVE_BACK:
-		x=0; y=0; z=1;vx=0; vy=1; vz=0;
+		x=0; y=0; z=1;vx=0; vy=-1; vz=0;
 		break;
 	case CAMERA_LEFT:
 	case CAMERA_PERSPECTIVE_LEFT:
@@ -353,7 +353,7 @@ void mafRWI::CameraSet(int cam_position, double zoom)
 		break;
 	case CAMERA_PERSPECTIVE:
 		//x=1; y=1; z=1; vx=0; vy=1; vz=0; //SIL. 23-6-2003 modified
-		x=0; y=1; z=4; vx=0; vy=1; vz=0; 
+		x=0; y=-1; z=-4; vx=0; vy=-1; vz=0; 
 		break;
 	case CAMERA_RX_FRONT:
 		x=0; y=-1; z=0; vx=0; vy=0; vz=1;

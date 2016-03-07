@@ -85,11 +85,3 @@ mafGUI *mafViewSliceNotInterpolatedCompound::CreateGui()
   m_Gui->AddGui(m_ChildViewList[0]->GetGui());
   return m_Gui;
 }
-
-//----------------------------------------------------------------------------
-void mafViewSliceNotInterpolatedCompound::VmeShow(mafNode *node, bool show)
-//----------------------------------------------------------------------------
-{
-  // Call superclass vme show method
-  Superclass::VmeShow(node,show);
-}

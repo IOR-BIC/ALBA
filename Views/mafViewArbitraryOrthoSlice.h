@@ -201,7 +201,6 @@ public:
 
 	void OnLayoutInternal( wxSize &windowSize );
 
-	void VmeSelect(mafNode *node, bool select);
 
 protected:
 
