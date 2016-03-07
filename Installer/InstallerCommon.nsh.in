@@ -220,7 +220,7 @@ FunctionEnd
 		File "${PRODUCT_INSTALLER_DIR_WIN}\${PRODUCT_NAME}About.bmp"
 		
 		;Create Manual path	 		
-		!ifdef ${PRODUCT_MANUAL_DIR}
+		!ifdef PRODUCT_MANUAL_DIR
 			CreateDirectory "$INSTDIR\Help"
 			SetOutPath "$INSTDIR\Help"
 			File /r /x /nonfatal "${PRODUCT_MANUAL_DIR}\*.*"
