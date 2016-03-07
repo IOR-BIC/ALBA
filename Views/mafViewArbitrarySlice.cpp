@@ -144,8 +144,6 @@ void mafViewArbitrarySlice::PackageView()
 	m_ViewArbitrary = new mafViewVTK("",CAMERA_PERSPECTIVE);
 	m_ViewArbitrary->PlugVisualPipe("mafVMEVolumeGray", "mafPipeBox", MUTEX);
 	m_ViewArbitrary->PlugVisualPipe("mafVMELabeledVolume", "mafPipeBox", MUTEX);
-	m_ViewArbitrary->PlugVisualPipe("mafVMEGizmo", "mafPipeGizmo");
-	m_ViewArbitrary->PlugVisualPipe("mafVMESlicer", "mafPipeSurfaceTextured", MUTEX);
 
 	m_ViewSlice = new mafViewVTK("",CAMERA_OS_Z);
 	m_ViewSlice->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice");
@@ -156,7 +154,6 @@ void mafViewArbitrarySlice::PackageView()
 	m_ViewSlice->PlugVisualPipe("mafVMELandmark", "mafPipeSurfaceSlice");
 	m_ViewSlice->PlugVisualPipe("mafVMELandmarkCloud", "mafPipeSurfaceSlice");
 	m_ViewSlice->PlugVisualPipe("mafVMERefSys", "mafPipeSurfaceSlice");
-	m_ViewSlice->PlugVisualPipe("mafVMESlicer", "mafPipeSurfaceTextured", MUTEX);
 
 	PlugChildView(m_ViewArbitrary);
 	PlugChildView(m_ViewSlice);
@@ -401,10 +398,9 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 
 	}
 
-	if(GetSceneGraph()->GetSelectedVme()==node) 
-	{
-		UpdateWindowing( show && this->ActivateWindowing(node), node);
-	}
+	if (ActivateWindowing(node))
+		UpdateWindowing(show, node);
+	
 }
 //----------------------------------------------------------------------------
 void mafViewArbitrarySlice::OnEvent(mafEventBase *maf_event)
@@ -833,7 +829,7 @@ mafGUI* mafViewArbitrarySlice::CreateGui()
 	m_Gui->Divider();
 	m_Gui->Update();
 
-	EnableWidgets( (m_CurrentVolume != NULL) || (m_CurrentImage != NULL) );
+	EnableWidgets(m_CurrentVolume || m_CurrentImage);
 	return m_Gui;
 }
 //----------------------------------------------------------------------------
@@ -910,7 +906,7 @@ void mafViewArbitrarySlice::CreateGuiView()
 	m_LutSlider->SetListener(this);
 	m_LutSlider->SetSize(500,24);
 	m_LutSlider->SetMinSize(wxSize(500,24));
-	EnableWidgets( (m_CurrentVolume != NULL) || (m_CurrentImage!=NULL) );
+	EnableWidgets( m_CurrentVolume || m_CurrentImage );
 	m_GuiView->Add(m_LutSlider);
 	m_GuiView->Reparent(m_Win);
 }
@@ -920,15 +916,13 @@ void mafViewArbitrarySlice::EnableWidgets(bool enable)
 {
 	if (m_Gui)
 	{
-		bool tmp_enable = (m_CurrentVolume || m_CurrentImage);
-		m_Gui->Enable(ID_RESET, tmp_enable);
-		m_Gui->Enable(ID_COMBO_GIZMOS, tmp_enable);
-		m_Gui->Enable(ID_LUT_CHOOSER, tmp_enable);
+		m_Gui->Enable(ID_RESET, enable);
+		m_Gui->Enable(ID_COMBO_GIZMOS, enable);
+		m_Gui->Enable(ID_LUT_CHOOSER, enable);
+		m_LutSlider->Enable(enable);
 		m_Gui->FitGui();
 		m_Gui->Update();
 	}
-	m_LutSlider->Enable(enable);
-
 }
 //----------------------------------------------------------------------------
 void mafViewArbitrarySlice::UpdateSlicerBehavior()

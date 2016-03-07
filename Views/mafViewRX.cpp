@@ -290,7 +290,7 @@ int mafViewRX::GetNodeStatus(mafNode *vme)
       n = m_Sg->Vme2Node(vme);
       if (n != NULL)
       {
-        n->m_PipeCreatable = true;
+        n->SetPipeCreatable(true);
         n->m_Mutex = true;
       }
     }

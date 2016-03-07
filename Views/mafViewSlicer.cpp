@@ -218,9 +218,8 @@ void mafViewSlicer::VmeShow(mafNode *node, bool show)
     }
 	}
 
-  UpdateWindowing(  show && this->ActivateWindowing(GetSceneGraph()->GetSelectedVme()), 
-                    GetSceneGraph()->GetSelectedVme()
-    );
+	if (ActivateWindowing(node))
+		UpdateWindowing(show, node);
 
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 
@@ -456,14 +455,14 @@ int mafViewSlicer::GetNodeStatus(mafNode *vme)
     {
       if (n != NULL)
       {
-      	n->m_PipeCreatable = true;
+      	n->SetPipeCreatable(true);
       }
     }
     else if (vme->IsMAFType(mafVMESlicer))
     {
       if (n != NULL)
       {
-	      n->m_PipeCreatable = true;
+	      n->SetPipeCreatable(true);
 	      n->m_Mutex = true;
       }
     }

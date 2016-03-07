@@ -563,7 +563,7 @@ int mafViewSlice::GetNodeStatus(mafNode *vme)
       //n->m_Mutex = true;
 			if (n != NULL)
 			{
-				n->m_PipeCreatable = false;
+				n->SetPipeCreatable(false);
 			}
     }
   }

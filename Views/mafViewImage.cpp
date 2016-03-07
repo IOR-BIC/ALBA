@@ -124,7 +124,7 @@ int mafViewImage::GetNodeStatus(mafNode *vme)
     {
       if (n != NULL)
       {
-      	n->m_PipeCreatable = false;
+      	n->SetPipeCreatable(false);
       }
     }
   }

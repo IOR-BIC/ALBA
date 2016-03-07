@@ -183,16 +183,7 @@ void mafViewImageCompound::EnableWidgets(bool enable)
 		m_Gui->Enable(ID_LUT_CHOOSER,enable);
   m_LutSlider->Enable(enable);
 }
-//----------------------------------------------------------------------------
-void mafViewImageCompound::VmeSelect(mafNode *node, bool select)
-//----------------------------------------------------------------------------
-{
-  for(int i=0; i<m_NumOfChildView; i++)
-    m_ChildViewList[i]->VmeSelect(node, select);
 
-  mafPipeImage3D *pipe = (mafPipeImage3D *)m_ChildViewList[ID_VIEW_IMAGE]->GetNodePipe(node);
-
-}
 //----------------------------------------------------------------------------
 void mafViewImageCompound::UpdateWindowing(bool enable)
 //----------------------------------------------------------------------------
