@@ -218,13 +218,10 @@ void mafViewSliceOnCurveCompound::VmeShow(mafNode *node, bool show)
     }	
   }  
 
-  if(GetSceneGraph()->GetSelectedVme()==node)
-  {
-    UpdateWindowing( show && this->ActivateWindowing(node), node);
-  }
+	if (ActivateWindowing(node))
+		UpdateWindowing(show, node);
 
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-
 }
 
 //------------------------------------------------------------------------

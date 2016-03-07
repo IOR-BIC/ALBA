@@ -118,11 +118,9 @@ void mafViewCompoundWindowing::VmeShow(mafNode *node, bool show)
 	for(int i=0; i<this->GetNumberOfSubView(); i++)
     m_ChildViewList[i]->VmeShow(node, show);
   
-  if(GetSceneGraph()->GetSelectedVme()==node)
-	{
-    UpdateWindowing( show && this->ActivateWindowing(node), node);
-  }
-
+	if(ActivateWindowing(node))
+		UpdateWindowing(show, node);
+  
 	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
@@ -132,18 +130,6 @@ void mafViewCompoundWindowing::EnableWidgets(bool enable)
  	if(m_Gui)
 		m_Gui->Enable(ID_LUT_CHOOSER,enable);
   m_LutSlider->Enable(enable);
-}
-
-//----------------------------------------------------------------------------
-void mafViewCompoundWindowing::VmeSelect(mafNode *node, bool select)
-//----------------------------------------------------------------------------
-{
-  for(int i=0; i<m_NumOfChildView; i++)
-    m_ChildViewList[i]->VmeSelect(node, select);
-
-  //UpdateWindowing( select && ActivateWindowing(node), node);
-  //if(m_Gui)
-    UpdateWindowing( select && ActivateWindowing(GetSceneGraph()->GetSelectedVme()), GetSceneGraph()->GetSelectedVme());
 }
 
 //----------------------------------------------------------------------------

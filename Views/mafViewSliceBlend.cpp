@@ -261,14 +261,14 @@ int mafViewSliceBlend::GetNodeStatus(mafNode *vme)
     else if (vme->IsMAFType(mafVMESlicer))
     {
       n = m_Sg->Vme2Node(vme);
-      n->m_PipeCreatable = false;
+      n->SetPipeCreatable(false);
     }
     else if (vme->IsMAFType(mafVMEImage))
     {
       n = m_Sg->Vme2Node(vme);
       //n->m_Mutex = true;
       //It's impossible visualize vme image
-      n->m_PipeCreatable = false;
+      n->SetPipeCreatable(false);
     }
   }
 

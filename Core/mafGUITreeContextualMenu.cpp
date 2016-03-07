@@ -149,7 +149,7 @@ void mafGUITreeContextualMenu::CreateContextualMenu(mafGUICheckTree *tree, mafVi
         this->AppendSeparator();
 
         // check visibility 
-        this->FindItem(RMENU_SHOW_VME)->Enable(n->m_PipeCreatable);
+        this->FindItem(RMENU_SHOW_VME)->Enable(n->GetPipeCreatable());
 
         // enable show/hide subtree 
         enable = (m_VmeActive->GetNumberOfChildren() > 0 );
@@ -157,7 +157,7 @@ void mafGUITreeContextualMenu::CreateContextualMenu(mafGUICheckTree *tree, mafVi
         this->FindItem(RMENU_HIDE_SUBTREE)->Enable(enable);
 
         // enable show/hide same type - must be visualized and not mutex
-        enable = n->m_PipeCreatable && !n->m_Mutex;
+        enable = n->GetPipeCreatable() && !n->m_Mutex;
         this->FindItem(RMENU_SHOW_SAMETYPE)->Enable(enable);
         this->FindItem(RMENU_HIDE_SAMETYPE)->Enable(enable);
       }

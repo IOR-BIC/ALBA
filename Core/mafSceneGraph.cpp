@@ -89,7 +89,7 @@ void mafSceneGraph::VmeAdd(mafNode *vme)
 	
   // must be after NodeAdd
   int nodestatus = m_View->GetNodeStatus(vme);
-  node->m_PipeCreatable = ( nodestatus != NODE_NON_VISIBLE );
+  node->SetPipeCreatable( nodestatus != NODE_NON_VISIBLE );
   node->m_Mutex         = ( nodestatus == NODE_MUTEX_ON  || 
                             nodestatus == NODE_MUTEX_OFF );
 
@@ -261,7 +261,7 @@ void mafSceneGraph::VmeShow(mafNode *vme, bool show)
 	mafSceneNode *node = Vme2Node(vme);
 	if( node == NULL) return;
   
-  if(!node->m_PipeCreatable) return;
+  if(!node->GetPipeCreatable()) return;
   if( node->IsVisible() == show) return;
 
 	if(show)
@@ -384,7 +384,7 @@ void mafSceneGraph::VmeShowSubTree(mafNode *vme,  bool show)
 	for(mafNode *v = iter->GetFirstNode(); v; v = iter->GetNextNode())
 	{
     mafSceneNode *n = Vme2Node(v);
-		if(n && n->m_PipeCreatable && n->IsVisible() != show )
+		if(n && n->GetPipeCreatable() && n->IsVisible() != show )
 		{
 			// Mutex vme may be shown only is no other vme of the same type is currently shown.
 			// Mutex vme may always be hidden.
@@ -511,7 +511,7 @@ int mafSceneGraph::GetNodeStatus(mafNode *node)
     return NODE_NON_VISIBLE;
   }
   mafVME *vme = (mafVME *)node;
-  bool creatable = n->m_PipeCreatable && vme && !vme->GetVisualPipe().IsEmpty();
+  bool creatable = n->GetPipeCreatable() && vme && !vme->GetVisualPipe().IsEmpty();
 	//landmark are not creatable
 	//if(vme->IsA("mafNodeLandmark")) creatable = false;
   

@@ -56,10 +56,6 @@ public:
 
   /** Function that clones instance of the object. */
   virtual mafView *Copy(mafObserver *Listener, bool lightCopyEnabled = false);
- 
-
-  /** Function called when select a vme different from selected one.*/
-	//virtual void VmeSelect(mafNode *node, bool select);
 
   /** Calculate areas for child views in order to create a layout of the compound view.*/
   virtual void OnLayout();

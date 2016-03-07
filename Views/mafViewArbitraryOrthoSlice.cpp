@@ -479,10 +479,8 @@ void mafViewArbitraryOrthoSlice::VmeShow(mafNode *node, bool show)
 		}
 	}
 
-	if(GetSceneGraph()->GetSelectedVme()==node) {
-		UpdateWindowing(show , node);
-	}
-
+	if (ActivateWindowing(node))
+		UpdateWindowing(show, node);
 }
 
 void mafViewArbitraryOrthoSlice::OnEvent(mafEventBase *maf_event)
@@ -4511,15 +4509,6 @@ void mafViewArbitraryOrthoSlice::ThicknessComboAssignment( int axis )
 		break;
 
 	}
-}
-
-void mafViewArbitraryOrthoSlice::VmeSelect(mafNode *node, bool select)
-{
-	for(int i=0; i<m_NumOfChildView; i++)
-		m_ChildViewList[i]->VmeSelect(node, select);
-
-	UpdateWindowing( select && ActivateWindowing(GetSceneGraph()->GetSelectedVme()), GetSceneGraph()->GetSelectedVme());
-
 }
 
 void mafViewArbitraryOrthoSlice::UpdateWindowing(bool enable,mafNode *node)

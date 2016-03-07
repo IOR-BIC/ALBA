@@ -53,7 +53,6 @@ public:
   mafNode           *m_Vme;
   mafSceneNode      *m_Parent;
   mafPipe           *m_Pipe;
-  bool               m_PipeCreatable;
   bool               m_Mutex;
   vtkRenderer       *m_RenFront;
   vtkMAFAssembly    *m_AssemblyFront;
@@ -100,12 +99,20 @@ public:
 	Static function called by the scalar observer when the vector arrow diameter scaling factor change. */
 	//@@@ static void	OnDiameterModifiedEvent(void *arg);
 
-	/** 
+
+	/** Returns PipeCreatable */
+	bool GetPipeCreatable() const { return m_PipeCreatable; }
+
+	/** Sets PipeCreatable */
+	void SetPipeCreatable(bool pipeCreatable) { m_PipeCreatable = pipeCreatable; }
+
+	/**
 	Static function called by the scalar observer when the head arrow change. */
 	//@@@ static void OnHeadModifiedEvent(void *arg);
 
 protected:
   
+	bool               m_PipeCreatable;
   //bool m_visible;   // a SceneNode is visible if a pipe has been created
 };  
 #endif // __mafSceneNode_H__

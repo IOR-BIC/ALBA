@@ -72,9 +72,6 @@ public:
   Show/Hide VMEs into plugged sub-views*/
   virtual void VmeShow(mafNode *node, bool show);
 
-  /** Function called when select a vme different from selected one.*/
-	virtual void VmeSelect(mafNode *node, bool select);
-
   /** Calculate areas for child views in order to create a layout of the compound view.*/
   //virtual void OnLayout()=0;
 

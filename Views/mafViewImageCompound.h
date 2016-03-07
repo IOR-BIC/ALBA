@@ -72,9 +72,6 @@ public:
 
 	/** Show/Hide VMEs into plugged sub-views*/
   virtual void VmeShow(mafNode *node, bool show);
-  
-  /** Function called when select a vme different from selected one.*/
-	virtual void VmeSelect(mafNode *node, bool select);
 
 	/** Function called on VME remove */
 	virtual void VmeRemove(mafNode *node);
