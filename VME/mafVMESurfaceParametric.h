@@ -109,6 +109,27 @@ public:
   interpolates on the fly according to the matrix interpolator.*/
   virtual void SetMatrix(const mafMatrix &mat);
 
+
+	/** Returns EllipsoidXLenght */
+	double GetEllipsoidXLenght() const { return m_EllipsoidXLenght; }
+
+	/** Sets EllipsoidXLenght */
+	void SetEllipsoidXLenght(double ellipsoidXLenght) { m_EllipsoidXLenght = ellipsoidXLenght; }
+
+
+	/** Returns EllipsoidYLenght */
+	double GetEllipsoidYLenght() const { return m_EllipsoidYLenght; }
+
+	/** Sets EllipsoidYLenght */
+	void SetEllipsoidYLenght(double ellipsoidYLenght) { m_EllipsoidYLenght = ellipsoidYLenght; }
+
+
+	/** Returns EllipsoidZLenght */
+	double GetEllipsoidZLenght() const { return m_EllipsoidZLenght; }
+
+	/** Sets EllipsoidZLenght */
+	void SetEllipsoidZLenght(double ellipsoidZLenght) { m_EllipsoidZLenght = ellipsoidZLenght; }
+
 protected:
 
   mafVMESurfaceParametric();
