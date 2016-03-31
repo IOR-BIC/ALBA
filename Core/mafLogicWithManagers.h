@@ -300,7 +300,7 @@ protected:
   /** Respond to a VME_REMOVING evt. propagate evt. to SideBar,ViewManager,ecc.. */
 	virtual void VmeRemoving(mafNode *vme);
 	/** Respond to a VME_CHOOSE evt. Build a dialog containing the vme tree and return the vme choosed from the user. */
-	virtual std::vector<mafNode*> VmeChoose(long vme_accept_function = 0, long style = REPRESENTATION_AS_TREE, mafString title = "Choose Node", bool multiSelect = false);
+	virtual std::vector<mafNode*> VmeChoose(long vme_accept_function = 0, long style = REPRESENTATION_AS_TREE, mafString title = "Choose Node", bool multiSelect = false, mafNode *vme=NULL);
 
   /** Build a dialog to show all available materials. */	
   virtual void VmeChooseMaterial(mafVME *vme, bool updateProperty);

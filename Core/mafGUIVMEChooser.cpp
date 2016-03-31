@@ -35,7 +35,7 @@
 #include "mafNode.h"
 
 //----------------------------------------------------------------------------
-mafGUIVMEChooser::mafGUIVMEChooser(mafGUICheckTree *tree, wxString dialog_title, long vme_accept_function, long style, bool multiSelect)
+mafGUIVMEChooser::mafGUIVMEChooser(mafGUICheckTree *tree, wxString dialog_title, long vme_accept_function, long style, bool multiSelect, mafNode *subTree)
 : mafGUIDialog(dialog_title,mafCLOSEWINDOW | mafRESIZABLE | mafCLOSE | mafOK )
 //----------------------------------------------------------------------------
 {
@@ -44,7 +44,7 @@ mafGUIVMEChooser::mafGUIVMEChooser(mafGUICheckTree *tree, wxString dialog_title,
   else
     m_ValidateCallback = (ValidateCallBackType)vme_accept_function;
 
-  m_ChooserTree = new mafGUIVMEChooserTree(this,tree,m_ValidateCallback,-1,false,true,style, multiSelect);
+  m_ChooserTree = new mafGUIVMEChooserTree(this,tree,m_ValidateCallback,-1,false,true,style, multiSelect,subTree);
   m_ChooserTree->SetListener(this);
   m_ChooserTree->SetTitle("");
   m_ChooserTree->SetSize(wxSize(550,550));
