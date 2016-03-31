@@ -46,7 +46,7 @@ BEGIN_EVENT_TABLE(mafGUIVMEChooserTree,wxPanel)
 END_EVENT_TABLE()
 
 //----------------------------------------------------------------------------
-mafGUIVMEChooserTree::mafGUIVMEChooserTree( wxWindow *parent, mafGUICheckTree *tree, ValidateCallBackType vme_accept_function,wxWindowID id, bool CloseButton, bool HideTitle, long style, bool multiSelect)
+mafGUIVMEChooserTree::mafGUIVMEChooserTree( wxWindow *parent, mafGUICheckTree *tree, ValidateCallBackType vme_accept_function,wxWindowID id, bool CloseButton, bool HideTitle, long style, bool multiSelect, mafNode *subTree)
 :mafGUICheckTree(parent, id, CloseButton, HideTitle)
 //----------------------------------------------------------------------------
 {
@@ -65,9 +65,14 @@ mafGUIVMEChooserTree::mafGUIVMEChooserTree( wxWindow *parent, mafGUICheckTree *t
     InitializeImageList();
   else
     mafGUICheckTree::InitializeImageList();
-  
 
-  CloneSubTree(tree, &tree->GetTree()->GetRootItem(), (wxTreeItemId *)NULL);
+	if (subTree && tree->NodeExist((long)subTree) )
+	{
+		wxTreeItemId  item = tree->ItemFromNode((long)subTree);
+		CloneSubTree(tree, &item, (wxTreeItemId *)NULL);
+	}
+	else
+		CloneSubTree(tree, &tree->GetTree()->GetRootItem(), (wxTreeItemId *)NULL);
 }
 //----------------------------------------------------------------------------
 mafGUIVMEChooserTree::~mafGUIVMEChooserTree()
