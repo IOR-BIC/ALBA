@@ -171,15 +171,15 @@ public:
   void SetTreeStyle(long style) {m_NodeTree->SetWindowStyle(style);};
   long GetTreeStyle()           {return m_NodeTree->GetWindowStyle();};
 
+	/** Return true if node exist. */
+	bool NodeExist(long node_id);
+
 protected:
   /** Private function that notify the Listener of node selection and deselection. */
   virtual void OnSelectionChanged(wxTreeEvent& event);
   
 	/** When tree is used on a wxNotebook m_NodeTree must be called on Sizing . */
   void OnSize(wxSizeEvent& event);
-
-	/** Return true if node exist. */
-  bool NodeExist(long node_id);
   
 	/** Delete recursively a node and its subtree. */
 	void DeleteNode2(long node_id);

@@ -746,43 +746,28 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       case VME_CHOOSE:
       {
         mafString *s = e->GetString();
-        if(s != NULL)
+				mafString str;
+
+				if (s != NULL)
+					str = *s;
+				else
+					str = "Choose Node";
+
+        std::vector<mafNode*> nodeVector = VmeChoose(e->GetArg(), REPRESENTATION_AS_TREE, str, e->GetBool(),e->GetVme());
+        if (!e->GetBool())
         {
-          std::vector<mafNode*> nodeVector = VmeChoose(e->GetArg(), REPRESENTATION_AS_TREE, *s, e->GetBool());
-          if (!e->GetBool())
+          if (nodeVector.size() != 0)
           {
-            if (nodeVector.size() != 0)
-            {
-              e->SetVme(nodeVector[0]);
-            }
-            else
-            {
-              e->SetVme(NULL);
-            }
+            e->SetVme(nodeVector[0]);
           }
           else
           {
-            e->SetVmeVector(nodeVector);
+            e->SetVme(NULL);
           }
         }
         else
         {
-          std::vector<mafNode*> nodeVector = VmeChoose(e->GetArg(), REPRESENTATION_AS_TREE, "Choose Node", e->GetBool());
-          if (!e->GetBool())
-          {
-            if (nodeVector.size() != 0)
-            {
-              e->SetVme(nodeVector[0]);
-            }
-            else
-            {
-              e->SetVme(NULL);
-            }
-          }
-          else
-          {
-            e->SetVmeVector(nodeVector);
-          }
+          e->SetVmeVector(nodeVector);
         }
       }
       break;
@@ -1964,10 +1949,10 @@ void mafLogicWithManagers::UpdateTimeBounds()
   }
 }
 //----------------------------------------------------------------------------
-std::vector<mafNode*> mafLogicWithManagers::VmeChoose(long vme_accept_function, long style, mafString title, bool multiSelect)
+std::vector<mafNode*> mafLogicWithManagers::VmeChoose(long vme_accept_function, long style, mafString title, bool multiSelect, mafNode *vme)
 //----------------------------------------------------------------------------
 {
-  mafGUIVMEChooser vc(m_SideBar->GetTree(),title.GetCStr(), vme_accept_function, style, multiSelect);
+  mafGUIVMEChooser vc(m_SideBar->GetTree(),title.GetCStr(), vme_accept_function, style, multiSelect, vme);
   return vc.ShowChooserDialog();
 }
 //----------------------------------------------------------------------------
