@@ -197,7 +197,6 @@ void mafOpAddLandmark::OpRun()
 				m_Cloud->TestModeOn();
 			}
 
-			m_Cloud->Open();
 			m_Cloud->SetName(_("New landmark cloud"));
 
 			vtkDataSet * vtkData = m_PickedVme->GetOutput()->GetVTKData();
@@ -225,7 +224,6 @@ void mafOpAddLandmark::OpRun()
 			m_SelectedLadmarkCloud->TestModeOn();
 		}
 
-		m_SelectedLadmarkCloud->Open();
 		m_SelectedLadmarkCloud->SetName(_("Selected Landmark cloud"));
 
 		vtkDataSet * vtkData = m_PickedVme->GetOutput()->GetVTKData();
@@ -499,12 +497,6 @@ void mafOpAddLandmark::AddLandmark(double pos[3])
   m_LandmarkPosition[0] = pos[0];
   m_LandmarkPosition[1] = pos[1];
   m_LandmarkPosition[2] = pos[2];
-
-  bool cloud_was_open = m_Cloud->IsOpen();
-  if (!cloud_was_open)
-  {
-    m_Cloud->Open();
-  }
   
   mafSmartPointer<mafVMELandmark> landmark;
   landmark->SetName(m_LandmarkName.GetCStr());
@@ -522,11 +514,6 @@ void mafOpAddLandmark::AddLandmark(double pos[3])
 
   m_LandmarkAdded.push_back(landmark);
   m_LandmarkAdded[m_LandmarkAdded.size()-1]->Register(NULL);
-
-  if (!cloud_was_open)
-  {
-    m_Cloud->Close();
-  }
 
   if (m_Gui && !GetTestMode())
   {
@@ -634,11 +621,6 @@ void mafOpAddLandmark::AddLandmarksToTree()
   }
   else
   {
-    bool cloud_was_open = m_Cloud->IsOpen();
-    if (!cloud_was_open)
-    {
-      m_Cloud->Open();
-    }
     for (int l=0; l < m_LandmarkAdded.size(); l++)
     {
       reparent_result = m_LandmarkAdded[l]->ReparentTo(m_Cloud);
@@ -647,10 +629,6 @@ void mafOpAddLandmark::AddLandmarksToTree()
       {
         mafEventMacro(mafEvent(this,VME_SHOW,m_LandmarkAdded[l],true));
       }
-    }
-    if (!cloud_was_open)
-    {
-      m_Cloud->Close();
     }
   }
 

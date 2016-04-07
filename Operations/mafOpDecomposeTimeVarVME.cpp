@@ -94,12 +94,6 @@ mafOp* mafOpDecomposeTimeVarVME::Copy()
 bool mafOpDecomposeTimeVarVME::Accept(mafNode* node)
 //----------------------------------------------------------------------------
 {
-  if(mafVMELandmarkCloud::SafeDownCast(node) != NULL)
-  {
-    if(mafVMELandmarkCloud::SafeDownCast(node)->IsOpen())
-      return false;
-  }
-
   //Until VMEAnalog is non time varying
   if (node->IsA("mafVMEScalarMatrix"))
   {
@@ -490,7 +484,6 @@ void mafOpDecomposeTimeVarVME::CreateStaticVME(mafTimeStamp timeSt)
 	{
 		m_Cloud->TestModeOn();
 	}
-    m_Cloud->Open();
     m_VectorCloud.push_back(m_Cloud);
   }
   else

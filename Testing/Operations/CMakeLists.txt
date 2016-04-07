@@ -39,7 +39,6 @@ SET(PROJECT_SRCS
 	mafOpVOIDensityEditorTestTest.h mafOpVOIDensityEditorTestTest.cpp
 	mafOpAddLandmarkTest.h mafOpAddLandmarkTest.cpp
 	mafOpApplyTrajectoryTest.h mafOpApplyTrajectoryTest.cpp
-	mafOpExplodeCollapseTest.h mafOpExplodeCollapseTest.cpp
 	mafOpExtractIsosurfaceTest.h mafOpExtractIsosurfaceTest.cpp
 	mafOpImporterASCIITest.h mafOpImporterASCIITest.cpp
 	mafOpExporterMSFTest.h mafOpExporterMSFTest.cpp

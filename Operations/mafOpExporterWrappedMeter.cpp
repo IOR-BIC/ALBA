@@ -474,8 +474,6 @@ void mafOpExporterWrappedMeter::Test()
 	importer->Read();
 	
 	mafVMELandmarkCloud *cloud=(mafVMELandmarkCloud *)importer->GetOutput();
-	cloud->Open();
-
 
 	medVMEComputeWrapping *wrappedMeter;
 	mafNEW(wrappedMeter);

@@ -109,14 +109,7 @@ void mafViewRX::VmeCreatePipe(mafNode *vme)
 
   if (pipe_name != "")
   {
-    if((vme->IsMAFType(mafVMELandmarkCloud) && ((mafVMELandmarkCloud*)vme)->IsOpen()) || vme->IsMAFType(mafVMELandmark) && m_NumberOfVisibleVme == 1)
-    {
-      m_NumberOfVisibleVme = 1;
-    }
-    else
-    {
-      m_NumberOfVisibleVme++;
-    }
+    m_NumberOfVisibleVme++;
     mafPipeFactory *pipe_factory  = mafPipeFactory::GetInstance();
     assert(pipe_factory!=NULL);
     mafObject *obj= NULL;
@@ -255,11 +248,10 @@ void mafViewRX::VmeDeletePipe(mafNode *vme)
 //----------------------------------------------------------------------------
 {
   mafSceneNode *n = m_Sg->Vme2Node(vme);
-  if((vme->IsMAFType(mafVMELandmarkCloud) && ((mafVMELandmarkCloud*)vme)->IsOpen()) || vme->IsMAFType(mafVMELandmark) && m_NumberOfVisibleVme == 0)
-    m_NumberOfVisibleVme = 0;
-  else
-    m_NumberOfVisibleVme--;
-  if (((mafVME *)vme)->GetOutput()->IsA("mafVMEOutputVolume"))
+  
+	m_NumberOfVisibleVme--;
+
+	if (((mafVME *)vme)->GetOutput()->IsA("mafVMEOutputVolume"))
   {
     m_CurrentVolume = NULL;
     if (m_AttachCamera)

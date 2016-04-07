@@ -208,16 +208,6 @@ void mafOpExporterLandmark::ExportLandmark(mafVMELandmarkCloud* cloud)
   std::ofstream f_Out(m_File);
   if (!f_Out.bad())
   {
-    bool statusOpen = cloud->IsOpen();
-    if (!statusOpen)
-    {
-      if (m_TestMode == true)
-	  {
-		  cloud->TestModeOn();
-	  }
-
-      cloud->Open();
-    }
     int numberLandmark = cloud->GetNumberOfLandmarks();
     std::vector<mafTimeStamp> timeStamps;
     cloud->GetTimeStamps(timeStamps);
@@ -238,10 +228,7 @@ void mafOpExporterLandmark::ExportLandmark(mafVMELandmarkCloud* cloud)
         f_Out << lmName << "\t" << pos[0] << "\t" << pos[1] << "\t" << pos[2] <<"\n";
       }
     }
-    if (!statusOpen)
-    {
-      cloud->Close();
-    }
+
     f_Out.close();
   }
 }

@@ -188,18 +188,7 @@ void mafOpExporterVTKXML::ExportVTK()
 	{
     if(((mafVMELandmarkCloud *)m_Input)->GetNumberOfLandmarks() > 0)
 		{
-      bool oldstate = ((mafVMELandmarkCloud *)m_Input)->IsOpen();
-
-	    if (oldstate)
-      {
-        ((mafVMELandmarkCloud *)m_Input)->Close();
-      }
       SaveVTKData();
-		  
-      if (oldstate)
-      {
-        ((mafVMELandmarkCloud *)m_Input)->Open();
-      }
     }
 		else
 		{

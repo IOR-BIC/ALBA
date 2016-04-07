@@ -327,7 +327,6 @@ void mafGUILandmark::OnVmePicked(mafEvent& e)
   {
     //m_LMCloud = mafVMELandmarkCloud::New();//we have a reference on the vme (we can call vtkDEL in the UNDO)
     mafNEW(m_LMCloud);
-    m_LMCloud->Open();
 		m_LMCloud->SetName(m_LMCloudName);
     double b[6];
     mafVME::SafeDownCast(m_InputVME)->GetOutput()->GetVTKData()->GetBounds(b);

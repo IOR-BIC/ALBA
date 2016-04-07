@@ -193,7 +193,6 @@ void mafVMEWrappedMeterTest::TestWithGenericLandmark()
 	importer->SetFileName(filename.GetCStr());
 	importer->Read();
 	mafVMELandmarkCloud *cloud=(mafVMELandmarkCloud *)importer->GetOutput();
-	cloud->Open();
 	cloud->GetLandmark(0)->Update();
 	cloud->GetLandmark(1)->Update();
 
@@ -249,7 +248,6 @@ void mafVMEWrappedMeterTest::TestWithGenericLandmarkWithMiddlePoints()
 	importer->SetFileName(filename.GetCStr());
 	importer->Read();
 	mafVMELandmarkCloud *cloud=(mafVMELandmarkCloud *)importer->GetOutput();
-	cloud->Open();
 	cloud->GetLandmark(0)->Update();
 	cloud->GetLandmark(1)->Update();
 

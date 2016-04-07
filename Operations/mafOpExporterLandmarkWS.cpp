@@ -98,12 +98,6 @@ void mafOpExporterLandmarkWS::Write()
 	progressHelper.InitProgressBar();
 	
   m_Cloud = mafVMELandmarkCloud::SafeDownCast(m_Input);
-  bool statusOpen = m_Cloud->IsOpen();
-  if (!statusOpen)
-  {
-    m_Cloud->Open();
-    statusOpen = true;
-  }
 
   std::vector<mafString> points_name;
   int numberLandmark = m_Cloud->GetNumberOfLandmarks();
@@ -173,10 +167,5 @@ void mafOpExporterLandmarkWS::Write()
     }
 
     f_Out.close();
-  }
-
-  if (statusOpen)
-  {
-    m_Cloud->Close();
   }
 }

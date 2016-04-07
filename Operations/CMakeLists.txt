@@ -53,8 +53,6 @@ IF (MAF_USE_VTK)
     mafOpRemoveCells.h
     mafOpEditMetadata.cpp
     mafOpEditMetadata.h
-    mafOpExplodeCollapse.cpp
-    mafOpExplodeCollapse.h
     mafOpExtractIsosurface.cpp
     mafOpExtractIsosurface.h
     mafOpFilterSurface.cpp

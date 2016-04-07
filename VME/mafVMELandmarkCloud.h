@@ -41,7 +41,7 @@ and vice versa for each time stamp for which a visibility is defined also a posi
 eventually copying the position returned by interpolator if not. This is due to internal data 
 representation, and defines that time base for positions and visibility attributes are the same.
 Last but not least, this class has an explosion/collapsing mecchanism allowing to extract all landmarks
-from the cloud and represent them as mafVMELandmarks children (see Open() and Close()). The cloud has an internal state
+from the cloud and represent them as mafVMELandmarks children. The cloud has an internal state
 which determines whether all functions relative to edit and query landmarks acts on vtkPolydata points or
 on external mafVMELandmarks children.
 @sa
@@ -54,7 +54,6 @@ public:
   //------------------------------------------------------------------------------
   /** @ingroup Events */
   /** @{ */
-  MAF_ID_DEC(CLOUD_OPEN_CLOSE);      ///< Event rised by Open and Close functions
   MAF_ID_DEC(CLOUD_RADIUS_MODIFIED); ///< Event rised when the radius is changed with a SetRadius()
   MAF_ID_DEC(CLOUD_SPHERE_RES);      ///< Event rised when the sphere resolution is changed with a SetSphereResolution()
   /** @} */
@@ -97,10 +96,10 @@ public:
   int GetLandmark(int idx, double xyz[3],mafTimeStamp t=0);
   int GetLandmark(const char *name, double xyz[3],mafTimeStamp t=0) {return this->GetLandmark(this->FindLandmarkIndex(name), xyz,t);}
 
-  /** Find the index of a landmark given its name. This only works when cloud is OPEN*/
+  /** Find the index of a landmark given its name.*/
   mafVMELandmark *GetLandmark(const char *name);
 
-  /** Get the landmark by index. This only works when cloud is OPEN*/
+  /** Get the landmark by index.*/
   mafVMELandmark *GetLandmark(int idx);
 
   /** Return the position of the landmark number 'idx' at the timestamp t.*/
@@ -135,39 +134,13 @@ public:
   virtual void SetSphereResolution(int res, bool force_update = false);
   virtual int GetSphereResolution();
 
-  /** Cloud states: Open/Close*/
-  enum LANDMARK_CLOUDE_STATE
-  {
-    UNSET_CLOUD=0,
-    CLOSED_CLOUD,
-    OPEN_CLOUD
-  };
-
+  
   enum LANDMAERK_CLOUD_WIDGET_ID
   {
     ID_LM_RADIUS = Superclass::ID_LAST,
-    ID_OPEN_CLOSE_CLOUD,
     ID_LM_SPHERE_RESOLUTION,
-    ID_SINGLE_FILE,
     ID_LAST
   };
-
-  /** Return true if the cloud is Open/Exploded, false otherwise.*/
-  bool IsOpen() {return this->GetState() == OPEN_CLOUD;}
-
-  /**
-  This function opens the cloud by creating a number of of mafVMELandmark children
-  corresponding to the landmarks in the cloud. The cloud changes its state from close to open,
-  and some extra features are enabled. In particular the cloud keeps synchronized the children 
-  landmarks and the points in the cloud. It is also possible to retrieve the children by
-  landmark index or name. Notice that visibility is preserved while opening/closing.
-  This function rises a "OpenCloseEvent" event.*/
-  virtual void Open();
-
-  /**
-  This function closes the cloud, i.e. the children landmarks are collapsed in the cloud.
-  This function rises a "OpenCloseEvent" event.*/
-  virtual void Close();
 
   /**
   Set/Get the visibility property for a given landmark for a given 
@@ -227,9 +200,6 @@ protected:
   /** used to initialize and create the material attribute if not yet present */
   virtual int InternalInitialize();
 
-  /** Remove a landmark name from the TagArray*/
-  void RemoveLandmarkName(int idx);
-
   /** Internal function to instantiate a VMEItem with for timestamp t containing a new polydata*/
   virtual vtkPolyData *NewPolyData(mafTimeStamp t);
 
@@ -249,12 +219,10 @@ protected:
 
   int m_SingleFile;
   int m_NumberOfLandmarks;
-  int m_State;
   int m_DefaultVisibility;
   int m_SphereResolution;
   double m_Radius;
-  int m_CloudStateCheckbox;
-
+  
 private:
   mafVMELandmarkCloud(const mafVMELandmarkCloud&); // Not implemented
   void operator=(const mafVMELandmarkCloud&); // Not implemented

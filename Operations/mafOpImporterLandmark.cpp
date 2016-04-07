@@ -238,7 +238,6 @@ void mafOpImporterLandmark::Read()
   {
 	  m_VmeCloud->TestModeOn();
   }
-  m_VmeCloud->Open();
 
   std::ifstream  landmarkFileStream(m_File);
   char name[20];
@@ -297,7 +296,6 @@ void mafOpImporterLandmark::Read()
       progressHelper.UpdateProgressBar(counter * 100 / numberOfLines);
     }
   }
-  m_VmeCloud->Close();
   m_VmeCloud->Modified();
   m_VmeCloud->ReparentTo(m_Input);
 
@@ -315,8 +313,6 @@ void mafOpImporterLandmark::ReadWithoutTag()
   {
 	  m_VmeCloud->TestModeOn();
   }
-  
-  m_VmeCloud->Open();
 
   // need the number of landmarks for the progress bar
   std::ifstream  landmarkNumberPromptFileStream(m_File);
@@ -410,7 +406,6 @@ void mafOpImporterLandmark::ReadWithoutTag()
     progressHelper.UpdateProgressBar(counter * 100 / numberOfLines);
   }
 
-  m_VmeCloud->Close();
   m_VmeCloud->Modified();
   m_VmeCloud->ReparentTo(m_Input);
 

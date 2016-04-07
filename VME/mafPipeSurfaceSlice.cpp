@@ -130,8 +130,7 @@ void mafPipeSurfaceSlice::Create(mafSceneNode *n/*, bool use_axes*/)
   }
   else if(m_Vme->GetOutput()->IsMAFType(mafVMEOutputPointSet))
   {
-    
-    if (m_Vme->IsMAFType(mafVMELandmarkCloud) && !((mafVMELandmarkCloud *)m_Vme)->IsOpen())
+    if (m_Vme->IsMAFType(mafVMELandmarkCloud))
     {
       mafVMEOutputLandmarkCloud *landmark_cloud_output = mafVMEOutputLandmarkCloud::SafeDownCast(m_Vme->GetOutput());
       assert(landmark_cloud_output);
@@ -154,32 +153,6 @@ void mafPipeSurfaceSlice::Create(mafSceneNode *n/*, bool use_axes*/)
       data->Update();
 
       material = landmark_cloud_output->GetMaterial();
-    }
-    else if(m_Vme->IsMAFType(mafVMELandmarkCloud) && ((mafVMELandmarkCloud *)m_Vme)->IsOpen()){return;}
-    else if(m_Vme->IsMAFType(mafVMELandmark))
-    {
-      mafVMEOutputPointSet *pointset_output = mafVMEOutputPointSet::SafeDownCast(m_Vme->GetOutput());
-      assert(pointset_output);
-      pointset_output->Update();
-      
-      vtkNEW(m_SphereSource);
-      m_SphereSource->SetRadius(((mafVMELandmark *)m_Vme)->GetRadius());
-      m_SphereSource->SetThetaResolution(((mafVMELandmark *)m_Vme)->GetSphereResolution());
-      m_SphereSource->SetPhiResolution(((mafVMELandmark *)m_Vme)->GetSphereResolution());
-      m_SphereSource->Update();
-
-      //vtkMAFExtendedGlyph3D *glyph = vtkMAFExtendedGlyph3D::New();
-      glyph->SetSource(m_SphereSource->GetOutput());
-      glyph->SetInput(pointset_output->GetVTKData());
-      glyph->OrientOff();
-      glyph->ScalingOff();
-      glyph->ScalarVisibilityOn();
-      glyph->Update();
-
-      data = vtkPolyData::SafeDownCast(glyph->GetOutput());
-      data->Update();
-
-      material = pointset_output->GetMaterial();
     }
   }
   
@@ -365,33 +338,6 @@ void mafPipeSurfaceSlice::OnEvent(mafEventBase *maf_event)
         mafEventMacro(*e);
       break;
     }
-  }
-  else if (maf_event->GetId() == mafVMELandmarkCloud::CLOUD_OPEN_CLOSE)
-  {
-    if(((mafVMELandmarkCloud *)m_Vme)->IsOpen())
-    {
-      RemoveClosedCloudPipe();
-      int num_lm = ((mafVMELandmarkCloud *)m_Vme)->GetNumberOfLandmarks();
-      for (int i = 0; i < num_lm; i++)
-      {
-        mafVME *child_lm = ((mafVMELandmarkCloud *)m_Vme)->GetLandmark(i);
-        mafEvent e(this,VME_SHOW,child_lm,true);
-        //((mafVMELandmarkCloud *)m_Vme)->ForwardUpEvent(&e);
-        mafEventMacro(e);
-      }
-    }
-    else
-    {
-      /*int num_lm = m_Cloud->GetNumberOfLandmarks();
-      for (int i = 0; i < num_lm; i++)
-      {
-        mafVME *child_lm = m_Cloud->GetLandmark(i);
-        mafEvent e(this,VME_SHOW,child_lm,false);
-        m_Cloud->ForwardUpEvent(&e);
-      }*/
-      CreateClosedCloudPipe();
-    }
-    mafEventMacro(mafEvent(this,CAMERA_UPDATE));
   }
   else if (maf_event->GetId() == mafVMELandmarkCloud::CLOUD_RADIUS_MODIFIED)
   {

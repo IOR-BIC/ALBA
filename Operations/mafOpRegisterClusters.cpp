@@ -130,8 +130,7 @@ bool mafOpRegisterClusters::Accept(mafNode* node)
 /*static*/ bool mafOpRegisterClusters::ClosedCloudAccept(mafNode* node)
 	//----------------------------------------------------------------------------
 {
-	mafVMELandmarkCloud* cloud = mafVMELandmarkCloud::SafeDownCast(node);
-	return (cloud != NULL && !cloud->IsOpen());
+	return (mafVMELandmarkCloud::SafeDownCast(node));
 }
 
 //----------------------------------------------------------------------------
@@ -770,8 +769,6 @@ void mafOpRegisterClusters::OpUndo()
 /*virtual*/ void mafOpRegisterClusters::SetRegistrationMatrixForLandmarks()
 	//----------------------------------------------------------------------------
 {
-	if(!m_Registered->IsOpen())
-		m_Registered->Open();
 
 	std::vector<mafTimeStamp> timeStamps;
 	m_Target->GetLocalTimeStamps(timeStamps);
@@ -783,7 +780,6 @@ void mafOpRegisterClusters::OpUndo()
 	landmarkCloudWithTimeVariantLandmarks->ReparentTo(m_Result);
 
 	landmarkCloudWithTimeVariantLandmarks->SetName(m_Registered->GetName());
-	landmarkCloudWithTimeVariantLandmarks->Open();
 
 	for (int t = 0; t < numTimeStamps; t++)
 	{
@@ -824,9 +820,7 @@ void mafOpRegisterClusters::OpUndo()
 	}
 
 	landmarkCloudWithTimeVariantLandmarks->Update();
-	landmarkCloudWithTimeVariantLandmarks->Close();
 
-	m_Registered->Close();
 	mafEventMacro(mafEvent(this, VME_REMOVE, m_Registered));
 	mafDEL(m_Registered);
 
@@ -851,9 +845,6 @@ void mafOpRegisterClusters::OpUndo()
 	vtkMAFSmartPointer<vtkTransform> transform;
 	vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformData;
 	transformData->SetTransform(transform);
-
-	if(!m_Registered->IsOpen())
-		m_Registered->Open();
 
 	if(m_MultiTime)
 	{
@@ -933,7 +924,6 @@ void mafOpRegisterClusters::OpUndo()
 		//m_Registered->SetDataByDetaching((vtkPolyData *)transformData->GetOutput(), cTime);
 	}
 
-	m_Registered->Close();
 	time.clear();
 }
 

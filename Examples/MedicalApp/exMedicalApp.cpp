@@ -96,7 +96,6 @@
 #include "mafOpCreateSlicer.h"
 #include "mafOpCrop.h"
 #include "mafOpEditMetadata.h"
-#include "mafOpExplodeCollapse.h"
 #include "mafOpExtractIsosurface.h"
 #include "mafOpFilterSurface.h"
 #include "mafOpFilterVolume.h"
@@ -290,7 +289,6 @@ bool exMedicalApp::OnInit()
 	m_Logic->Plug(new mafOpConnectivitySurface("Connectivity Surface"),_("Modify"));
 	m_Logic->Plug(new mafOpEditNormals("Edit Normals"),_("Modify"));
 	m_Logic->Plug(new mafOpEditMetadata("Metadata Editor"),_("Modify"));
-	m_Logic->Plug(new mafOpExplodeCollapse("Explode/Collapse cloud"),_("Modify"));
 	m_Logic->Plug(new mafOpMAFTransform("Transform"),_("Modify"));
 	m_Logic->Plug(new mafOpReparentTo("Reparent to..."),_("Modify"));
 	m_Logic->Plug(new medOpVolumeResample("Resample Volume"),_("Modify"));

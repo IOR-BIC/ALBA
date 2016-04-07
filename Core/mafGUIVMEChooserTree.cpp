@@ -88,16 +88,8 @@ int mafGUIVMEChooserTree::GetVmeStatus(mafNode *node)
   {
     if (m_MultipleSelection)
     {
-      if (!node->IsMAFType(mafVMELandmarkCloud))
-      {
-        image_id = ClassNameToIcon(node->GetTypeName()) + NODE_VISIBLE_ON;
-        return image_id;
-      }
-      else if (!((mafVMELandmarkCloud*)node)->IsOpen())
-      {
-        image_id = ClassNameToIcon(node->GetTypeName()) + NODE_VISIBLE_ON;
-        return image_id;
-      }
+      image_id = ClassNameToIcon(node->GetTypeName()) + NODE_VISIBLE_ON;
+      return image_id;
     }
     else
     {

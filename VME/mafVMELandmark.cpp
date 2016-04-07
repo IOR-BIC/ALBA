@@ -152,7 +152,7 @@ bool mafVMELandmark::CanReparentTo(mafNode *parent)
 {
   if (mafVMELandmarkCloud *vlmc = mafVMELandmarkCloud::SafeDownCast(parent))
   {  
-    if ( vlmc->IsOpen() && vlmc->FindLandmarkIndex(this->GetName())<0  )
+    if ( vlmc->FindLandmarkIndex(this->GetName())<0  )
       return true;
   }
   else if (parent == NULL)

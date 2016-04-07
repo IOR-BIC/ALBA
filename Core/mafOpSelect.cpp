@@ -275,20 +275,7 @@ Restore the Selection
 {
   m_Selection = GetClipboard();
 
-#ifdef MAF_USE_VTK
-  if (glo_SelectionParent->IsMAFType(mafVMELandmarkCloud) && !((mafVMELandmarkCloud *)glo_SelectionParent.GetPointer())->IsOpen())
-  {
-    ((mafVMELandmarkCloud *)glo_SelectionParent.GetPointer())->Open();
-    m_Selection->ReparentTo(glo_SelectionParent);
-    ((mafVMELandmarkCloud *)glo_SelectionParent.GetPointer())->Close();
-  }
-  else
-  {
-    m_Selection->ReparentTo(glo_SelectionParent);
-  }
-#else
-    m_Selection->ReparentTo(glo_SelectionParent);
-#endif
+	m_Selection->ReparentTo(glo_SelectionParent);
 
   if (mafVME::SafeDownCast(glo_SelectionParent.GetPointer()))
   {
