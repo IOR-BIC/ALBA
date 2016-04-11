@@ -35,7 +35,6 @@ class mafOpSelect;
 class mafOpCut;
 class mafOpCopy;
 class mafOpPaste;
-class mafOpTransform;
 class vtkMatrix4x4;
 class mafDeviceButtonsPadMouse;
 class mafGUISettings;
@@ -203,7 +202,6 @@ protected:
   mafOpCut          *m_OpCut; ///< Pointer to the (always available) operation for cutting VMEs
   mafOpCopy         *m_OpCopy; ///< Pointer to the (always available) operation for copying VMEs
   mafOpPaste        *m_OpPaste; ///< Pointer to the (always available) operation for pasting VMEs
-  //mafOpTransform    *m_optransform;
 
   wxMenuBar         *m_MenuBar; ///< Pointer to the Application's main menù
 	wxToolBar         *m_ToolBar; ///< Pointer to the application's Toolbal

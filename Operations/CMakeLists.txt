@@ -175,6 +175,8 @@ IF (MAF_USE_VTK)
   mafOpCreateEditSkeleton.h
   mafOpCreateSurface.cpp
   mafOpCreateSurface.h
+  mafOpTransform.cpp 
+  mafOpTransform.h
   mafOpMove.cpp
   mafOpMove.h
   mafOpScaleDataset.cpp

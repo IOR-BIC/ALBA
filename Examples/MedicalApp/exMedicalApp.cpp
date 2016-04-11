@@ -110,6 +110,7 @@
 #include "mafOpCreateSurfaceParametric.h"
 #include "mafOpVOIDensity.h"
 #include "mafOpScaleDataset.h"
+#include "mafOpTransform.h"
 #include "mafOpMove.h"
 #ifdef MAF_USE_ITK
 #include "mafOpClassicICPRegistration.h"
@@ -302,6 +303,7 @@ bool exMedicalApp::OnInit()
 	m_Logic->Plug(new mafOpFlipNormals("Flip Normals"),_("Modify"));
 	m_Logic->Plug(new mafOpRemoveCells("Remove Cells"),_("Modify"));
 	m_Logic->Plug(new mafOpExtrusionHoles(),_("Modify"));
+	m_Logic->Plug(new mafOpTransform(), _("Modify"));
 	m_Logic->Plug(new mafOpScaleDataset("Scale Dataset"),_("Modify"));
 	m_Logic->Plug(new mafOpMove("Move"),_("Modify"));    
 	m_Logic->Plug(new mafOpSplitSurface(),_("Modify"));
