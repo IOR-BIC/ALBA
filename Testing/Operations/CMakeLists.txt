@@ -124,6 +124,7 @@ SET(PROJECT_SRCS
 	mafOpMML3ParameterViewTest.h mafOpMML3ParameterViewTest.cpp
 	mafOpInteractionDebuggerTest.h mafOpInteractionDebuggerTest.cpp
 	mafOpIterativeRegistrationTest.h mafOpIterativeRegistrationTest.cpp
+	mafOpTransformTest.h mafOpTransformTest.cpp
 )
 
 ADD_EXECUTABLE(mafOperationsTests ${PROJECT_SRCS})
