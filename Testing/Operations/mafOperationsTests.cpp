@@ -136,6 +136,7 @@
 #include "mafOpMML3ParameterViewTest.h"
 #include "mafOpInteractionDebuggerTest.h"
 #include "mafOpIterativeRegistrationTest.h"
+#include "mafOpTransformTest.h"
 
 #include <cppunit/BriefTestProgressListener.h>
 #include <cppunit/CompilerOutputter.h>
@@ -294,6 +295,7 @@ int	main( int argc, char* argv[] )
 	runner.addTest(mafOpCropDeformableROITest::suite());
 	runner.addTest(mafOpImporterRAWVolume_BESTest::suite());
 	runner.addTest(mafOpMoveTest::suite());
+	runner.addTest(mafOpTransformTest::suite());
 	runner.addTest(mafOpExporterAnalogWSTest::suite());
 	runner.addTest(mafOpExporterGRFWSTest::suite());
 	runner.addTest(mafOpExporterLandmarkWSTest::suite());
