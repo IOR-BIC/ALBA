@@ -228,7 +228,7 @@ void mafViewSingleSlice::VmeCreatePipe(mafNode *vme)
   GetVisualPipeName(vme, pipe_name);
 
   mafSceneNode *n = m_Sg->Vme2Node(vme);
-  assert(n && !n->m_Pipe);
+  assert(n && !n->GetPipe());
 
   if (pipe_name != "")
   {
@@ -394,7 +394,7 @@ void mafViewSingleSlice::VmeCreatePipe(mafNode *vme)
 			}
 			pipe->Create(n);
 
-      n->m_Pipe = (mafPipe*)pipe;
+      n->SetPipe(pipe);
       if (m_NumberOfVisibleVme == 1)
       {
         mafEventMacro(mafEvent(this,CAMERA_RESET));
@@ -424,8 +424,8 @@ void mafViewSingleSlice::VmeDeletePipe(mafNode *vme)
       m_AttachCamera->SetVme(NULL);
     }
   }
-  assert(n && n->m_Pipe);
-  cppDEL(n->m_Pipe);
+  assert(n && n->GetPipe());
+  n->DeletePipe();
 }
 //-------------------------------------------------------------------------
 int mafViewSingleSlice::GetNodeStatus(mafNode *vme)
@@ -493,7 +493,8 @@ void mafViewSingleSlice::OnEvent(mafEventBase *maf_event)
 			{
 				if (m_CurrentVolume)
 				{
-					((mafPipeVolumeSlice *)m_CurrentVolume->m_Pipe)->GetSliceOrigin(m_OriginVolume);
+					mafPipeVolumeSlice * pipe = (mafPipeVolumeSlice *)m_CurrentVolume->GetPipe();
+					pipe->GetSliceOrigin(m_OriginVolume);
 					if(m_PlaneSelect == XY)
 					{
 						m_OriginVolume[2] = m_Position;
@@ -510,7 +511,7 @@ void mafViewSingleSlice::OnEvent(mafEventBase *maf_event)
             m_Slice[1] = m_Position;
 					}
 					
-					((mafPipeVolumeSlice *)m_CurrentVolume->m_Pipe)->SetSlice(m_OriginVolume);
+					pipe->SetSlice(m_OriginVolume);
           
           this->UpdateText();
           CameraUpdate();
@@ -610,10 +611,11 @@ void mafViewSingleSlice::SetLutRange(double low_val, double high_val)
 {
   if(!m_CurrentVolume) 
     return;
-  mafString pipe_name = m_CurrentVolume->m_Pipe->GetTypeName();
+	mafPipe * pipe = m_CurrentVolume->GetPipe();
+  mafString pipe_name =pipe->GetTypeName();
   if (pipe_name.Equals("mafPipeVolumeSlice"))
   {
-    mafPipeVolumeSlice *pipe = (mafPipeVolumeSlice *)m_CurrentVolume->m_Pipe;
+    mafPipeVolumeSlice *pipe = (mafPipeVolumeSlice *)pipe;
     pipe->SetLutRange(low_val, high_val); 
   }
 }
@@ -625,10 +627,11 @@ void mafViewSingleSlice::SetSlice(double origin[3])
 	mafString pipe_name;
   if(m_CurrentVolume)
 	{
-		pipe_name = m_CurrentVolume->m_Pipe->GetTypeName();
+		mafPipe * pipe = m_CurrentVolume->GetPipe();
+		pipe_name = pipe->GetTypeName();
 		if (pipe_name.Equals("mafPipeVolumeSlice"))
 		{
-			mafPipeVolumeSlice *pipe = (mafPipeVolumeSlice *)m_CurrentVolume->m_Pipe;
+			mafPipeVolumeSlice *pipe = (mafPipeVolumeSlice *)pipe;
 			pipe->SetSlice(origin); 
 
 			// update text
@@ -641,10 +644,11 @@ void mafViewSingleSlice::SetSlice(double origin[3])
   //  return;
   for(int i=0;i<m_CurrentSurface.size();i++)
   {
-    pipe_name = m_CurrentSurface.at(i)->m_Pipe->GetTypeName();
+		mafPipe * pipe = m_CurrentSurface.at(i)->GetPipe();
+    pipe_name = pipe->GetTypeName();
     if (pipe_name.Equals("mafPipeSurfaceSlice"))
     {
-      mafPipeSurfaceSlice *pipe = (mafPipeSurfaceSlice *)m_CurrentSurface[i]->m_Pipe;
+      mafPipeSurfaceSlice *pipe = (mafPipeSurfaceSlice *)m_CurrentSurface[i]->GetPipe();
       pipe->SetSlice(origin); 
     }
   }
@@ -653,10 +657,11 @@ void mafViewSingleSlice::SetSlice(double origin[3])
 	//	return;
 	for(int i=0;i<m_CurrentPolyline.size();i++)
 	{
-		pipe_name = m_CurrentPolyline.at(i)->m_Pipe->GetTypeName();
+		mafPipe * pipe = m_CurrentPolyline.at(i)->GetPipe();
+		pipe_name = pipe->GetTypeName();
 		if (pipe_name.Equals("mafPipePolylineSlice"))
 		{
-			mafPipePolylineSlice *pipe = (mafPipePolylineSlice *)m_CurrentPolyline[i]->m_Pipe;
+			mafPipePolylineSlice *pipe = (mafPipePolylineSlice *)pipe;
 			pipe->SetSlice(origin); 
 		}
 	}
@@ -783,7 +788,7 @@ void mafViewSingleSlice::VmeShow(mafNode *node, bool show)
       data->GetCenter(center);
       data->GetScalarRange(sr);*/
 
-			((mafPipeVolumeSlice *)m_CurrentVolume->m_Pipe)->GetSliceOrigin(m_OriginVolume);
+			((mafPipeVolumeSlice *)m_CurrentVolume->GetPipe())->GetSliceOrigin(m_OriginVolume);
       double b[6];
 			((mafVME *)m_CurrentVolume->m_Vme)->GetOutput()->GetBounds(b);
 

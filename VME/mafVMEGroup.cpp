@@ -32,7 +32,7 @@
 #include "mafNode.h"
 #include "mafVMEOutputNULL.h"
 
-const int DEBUG_MODE = true;
+const int DEBUG_MODE = false;
 
 //-------------------------------------------------------------------------
 mafCxxTypeMacro(mafVMEGroup)

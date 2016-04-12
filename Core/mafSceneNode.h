@@ -52,8 +52,16 @@ public:
 
   mafNode           *m_Vme;
   mafSceneNode      *m_Parent;
-  mafPipe           *m_Pipe;
-  bool               m_Mutex;
+	/** Returns Pipe */
+	mafPipe * GetPipe() const;
+
+	/** Sets Pipe */
+	void SetPipe(mafPipe * pipe);
+
+	/** Deletes current Pipe*/
+	void DeletePipe();
+
+	bool               m_Mutex;
   vtkRenderer       *m_RenFront;
   vtkMAFAssembly    *m_AssemblyFront;
   vtkRenderer       *m_RenBack;
@@ -112,7 +120,10 @@ public:
 
 protected:
   
+	mafPipe           *m_Pipe;
 	bool               m_PipeCreatable;
   //bool m_visible;   // a SceneNode is visible if a pipe has been created
 };  
+
+
 #endif // __mafSceneNode_H__

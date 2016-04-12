@@ -304,4 +304,21 @@ void mafSceneNode::Print(std::ostream& os, const int tabs)// const
   os << std::endl;
 }
 
+//----------------------------------------------------------------------------
+mafPipe * mafSceneNode::GetPipe() const
+{
+	return m_Pipe;
+}
+
+//----------------------------------------------------------------------------
+void mafSceneNode::SetPipe(mafPipe * pipe)
+{
+	m_Pipe = pipe;
+}
+
+//----------------------------------------------------------------------------
+void mafSceneNode::DeletePipe()
+{
+	cppDEL(m_Pipe);
+}
 

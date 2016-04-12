@@ -248,7 +248,7 @@ mafPipe* mafViewVTK::GetNodePipe(mafNode *vme)
    assert(m_Sg);
    mafSceneNode *n = m_Sg->Vme2Node(vme);
    if(!n) return NULL;
-   return n->m_Pipe;
+   return n->GetPipe();
 }
 //----------------------------------------------------------------------------
 void mafViewVTK::GetVisualPipeName(mafNode *node, mafString &pipe_name)
@@ -302,9 +302,9 @@ void mafViewVTK::VmeCreatePipe(mafNode *vme)
     {
       pipe->SetListener(this);
       mafSceneNode *n = m_Sg->Vme2Node(vme);
-      assert(n && !n->m_Pipe);
+      assert(n && !n->GetPipe());
       pipe->Create(n);
-      n->m_Pipe = (mafPipe*)pipe;
+      n->SetPipe(pipe);
     }
     else
     {
@@ -318,8 +318,7 @@ void mafViewVTK::VmeDeletePipe(mafNode *vme)
 {
   m_NumberOfVisibleVme--;
   mafSceneNode *n = m_Sg->Vme2Node(vme);
-  assert(n && n->m_Pipe);
-  cppDEL(n->m_Pipe);
+	n->DeletePipe();
 }
 //-------------------------------------------------------------------------
 mafGUI *mafViewVTK::CreateGui()

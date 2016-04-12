@@ -260,8 +260,8 @@ void mafViewSliceGlobal::VmeDeletePipe(mafNode *vme)
       }
     }
   }
-  assert(n && n->m_Pipe);
-  cppDEL(n->m_Pipe);
+  assert(n && n->GetPipe());
+	n->DeletePipe();
 
   if(vme->IsMAFType(mafVMELandmark))
     UpdateSurfacesList(vme);
@@ -313,15 +313,15 @@ void mafViewSliceGlobal::OnEvent(mafEventBase *maf_event)
     { 
     case ID_OPACITY_SLIDER:
       {
-        if ( mafPipeVolumeSlice_BES::SafeDownCast(m_CurrentVolume->m_Pipe) )
+        if ( mafPipeVolumeSlice_BES::SafeDownCast(m_CurrentVolume->GetPipe()) )
         {
-          mafPipeVolumeSlice_BES::SafeDownCast(m_CurrentVolume->m_Pipe)->SetSliceOpacity(m_Opacity);
+          mafPipeVolumeSlice_BES::SafeDownCast(m_CurrentVolume->GetPipe())->SetSliceOpacity(m_Opacity);
           mafEventMacro(mafEvent(this, CAMERA_UPDATE));
           m_OpacitySlider->SetValue(m_Opacity);
         }
-        else if ( mafPipeVolumeSlice::SafeDownCast(m_CurrentVolume->m_Pipe) )
+        else if ( mafPipeVolumeSlice::SafeDownCast(m_CurrentVolume->GetPipe()) )
         {
-          mafPipeVolumeSlice::SafeDownCast(m_CurrentVolume->m_Pipe)->SetSliceOpacity(m_Opacity);
+          mafPipeVolumeSlice::SafeDownCast(m_CurrentVolume->GetPipe())->SetSliceOpacity(m_Opacity);
           mafEventMacro(mafEvent(this, CAMERA_UPDATE));
           m_OpacitySlider->SetValue(m_Opacity);
         }
@@ -544,15 +544,16 @@ void mafViewSliceGlobal::VmeShow(mafNode *node, bool show)
     m_NumberOfFrames = mafVME::SafeDownCast(m_CurrentVolume->m_Vme)->GetNumberOfLocalTimeStamps();
 
 
-    if (m_CurrentVolume->m_Pipe)
+		mafPipe * curVolPipe = m_CurrentVolume->GetPipe();
+    if (curVolPipe)
     {
       m_Gui->Enable(ID_POS_SLIDER,true);
       if (((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume"))
       {
-        if(mafPipeVolumeSlice::SafeDownCast(m_CurrentVolume->m_Pipe))
-          m_Opacity   = ((mafPipeVolumeSlice *)m_CurrentVolume->m_Pipe)->GetSliceOpacity();
-        if(mafPipeVolumeSlice_BES::SafeDownCast(m_CurrentVolume->m_Pipe))
-          m_Opacity   = mafPipeVolumeSlice_BES::SafeDownCast(m_CurrentVolume->m_Pipe)->GetSliceOpacity();
+        if(mafPipeVolumeSlice::SafeDownCast(curVolPipe))
+          m_Opacity   = ((mafPipeVolumeSlice *)curVolPipe)->GetSliceOpacity();
+        if(mafPipeVolumeSlice_BES::SafeDownCast(curVolPipe))
+          m_Opacity   = mafPipeVolumeSlice_BES::SafeDownCast(curVolPipe)->GetSliceOpacity();
         m_Gui->Enable(ID_OPACITY_SLIDER,true);
       }
       m_Gui->Update();
@@ -702,7 +703,7 @@ void mafViewSliceGlobal::UpdateBounds()
   mafOBB globalBounds;
   for(mafSceneNode *n = m_Sg->GetNodeList(); n; n = n->m_Next)
   {
-    if(n->m_Pipe)
+    if(n->GetPipe())
     {
       double b[6];
       ((mafVME *)n->m_Vme)->GetOutput()->GetVTKData()->GetBounds(b);
@@ -778,12 +779,13 @@ void mafViewSliceGlobal::SetSlice(double* Origin, double* Normal)
 
   for(mafSceneNode *node = m_Sg->GetNodeList(); node; node=node->m_Next)
   {
-    if(node->m_Pipe && (mafPipeVolumeSlice::SafeDownCast(node->m_Pipe) || (mafPipeVolumeSlice_BES::SafeDownCast(node->m_Pipe))))
+		mafPipe * pipe = node->GetPipe();
+    if(pipe && (mafPipeVolumeSlice::SafeDownCast(pipe) || (mafPipeVolumeSlice_BES::SafeDownCast(pipe))))
     {
-      if(mafPipeVolumeSlice::SafeDownCast(node->m_Pipe))
-        mafPipeVolumeSlice::SafeDownCast(node->m_Pipe)->SetSlice(Origin); 
-      else if(mafPipeVolumeSlice_BES::SafeDownCast(node->m_Pipe))
-        mafPipeVolumeSlice_BES::SafeDownCast(node->m_Pipe)->SetSlice(Origin, Normal); 
+      if(mafPipeVolumeSlice::SafeDownCast(pipe))
+        mafPipeVolumeSlice::SafeDownCast(pipe)->SetSlice(Origin); 
+      else if(mafPipeVolumeSlice_BES::SafeDownCast(pipe))
+        mafPipeVolumeSlice_BES::SafeDownCast(pipe)->SetSlice(Origin, Normal); 
     }
   }
 
@@ -801,15 +803,16 @@ void mafViewSliceGlobal::SetSlice(double* Origin, double* Normal)
 
   for(int i = 0; i < m_CurrentSurface.size(); i++)
   {
-    if (m_CurrentSurface.at(i) && m_CurrentSurface.at(i)->m_Pipe)
+		mafPipe * curSurfPipe = m_CurrentSurface.at(i)->GetPipe();
+    if (curSurfPipe)
     {
-      mafPipeSlice* pipe = mafPipeSlice::SafeDownCast(m_CurrentSurface.at(i)->m_Pipe);
+      mafPipeSlice* pipe = mafPipeSlice::SafeDownCast(curSurfPipe);
       if (pipe != NULL){
         pipe->SetSlice(coord, normal); 
       }
       else
       {
-        mafPipeSurfaceSlice* pipe = mafPipeSurfaceSlice::SafeDownCast(m_CurrentSurface.at(i)->m_Pipe);
+        mafPipeSurfaceSlice* pipe = mafPipeSurfaceSlice::SafeDownCast(curSurfPipe);
         if (pipe != NULL) 
         {
           pipe->SetSlice(coord); 
@@ -822,15 +825,16 @@ void mafViewSliceGlobal::SetSlice(double* Origin, double* Normal)
 
   for(int i = 0;i < m_CurrentPolyline.size();i++)
   {
-    if(m_CurrentPolyline.at(i) && m_CurrentPolyline.at(i)->m_Pipe)
+		mafPipe * curPolylinePipe = m_CurrentPolyline.at(i)->GetPipe();
+    if(curPolylinePipe)
     {
-      mafPipeSlice* pipe = mafPipeSlice::SafeDownCast(m_CurrentPolyline.at(i)->m_Pipe);
+      mafPipeSlice* pipe = mafPipeSlice::SafeDownCast(curPolylinePipe);
       if (pipe != NULL){
         pipe->SetSlice(coord, normal); 
       }
       else
       {
-        mafPipePolylineSlice* pipe = mafPipePolylineSlice::SafeDownCast(m_CurrentPolyline.at(i)->m_Pipe);
+        mafPipePolylineSlice* pipe = mafPipePolylineSlice::SafeDownCast(curPolylinePipe);
         if (pipe != NULL) 
         {
           pipe->SetSlice(coord); 
@@ -842,9 +846,10 @@ void mafViewSliceGlobal::SetSlice(double* Origin, double* Normal)
 
   for(int i = 0; i < m_CurrentPolylineGraphEditor.size();i++)
   {
-    if (m_CurrentPolylineGraphEditor.at(i) && m_CurrentPolylineGraphEditor.at(i)->m_Pipe)
+		mafPipe * curPGEPipe = m_CurrentPolylineGraphEditor.at(i)->GetPipe();
+    if (curPGEPipe)
     {
-      mafPipeSlice* pipe = mafPipeSlice::SafeDownCast(m_CurrentPolylineGraphEditor.at(i)->m_Pipe);
+      mafPipeSlice* pipe = mafPipeSlice::SafeDownCast(curPGEPipe);
       if (pipe != NULL){
         pipe->SetSlice(coord, normal); 
       }
@@ -853,15 +858,16 @@ void mafViewSliceGlobal::SetSlice(double* Origin, double* Normal)
 
   for(int i = 0; i < m_CurrentMesh.size();i++)
   {
-    if (m_CurrentMesh.at(i) && m_CurrentMesh.at(i)->m_Pipe)
+		mafPipe * curMeshPipe = m_CurrentMesh.at(i)->GetPipe();
+    if (curMeshPipe)
     {
-      mafPipeSlice* pipe = mafPipeSlice::SafeDownCast(m_CurrentMesh.at(i)->m_Pipe);
+      mafPipeSlice* pipe = mafPipeSlice::SafeDownCast(curMeshPipe);
       if (pipe != NULL){
         pipe->SetSlice(coord, normal); 
       }
       else
       {
-        mafPipeMeshSlice* pipe = mafPipeMeshSlice::SafeDownCast(m_CurrentMesh.at(i)->m_Pipe);
+        mafPipeMeshSlice* pipe = mafPipeMeshSlice::SafeDownCast(curMeshPipe);
         if (pipe != NULL) 
         {
           pipe->SetSlice(coord); 

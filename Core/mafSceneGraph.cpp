@@ -61,7 +61,6 @@ mafSceneGraph::mafSceneGraph(mafView *view, vtkRenderer *ren1, vtkRenderer *ren2
 	for(i = 0; i<NUM_OF_BASETYPE; i++) m_autoshow[i] = 0;
 	for(i = 0; i<NUM_OF_BASETYPE; i++) m_shown_mutex_vme[i] = NULL;
 */
-  m_InformationPipeModality = false;
 }
 //----------------------------------------------------------------------------
 mafSceneGraph::~mafSceneGraph( ) 
@@ -268,35 +267,23 @@ void mafSceneGraph::VmeShow(mafNode *vme, bool show)
 	{	
     if(node->m_Mutex)
 		{
-      if(!m_InformationPipeModality)
+      // Changed code below to allow all MUTEX VMEs to behave at the same manner also if 
+      // they are of different type: only one MUTEX VME per time is visible into the view.
+      for(mafSceneNode *n = m_List; n; n=n->m_Next)
       {
-        // Changed code below to allow all MUTEX VMEs to behave at the same manner also if 
-        // they are of different type: only one MUTEX VME per time is visible into the view.
-        for(mafSceneNode *n = m_List; n; n=n->m_Next)
+        //if(n->m_Pipe != NULL && n->m_Vme != vme && n->m_Mutex)
+		    mafVME *in_vme = mafVME::SafeDownCast(vme);
+		    mafVME *current_vme = mafVME::SafeDownCast(n->m_Vme);
+        bool vme_type_check = in_vme != NULL && current_vme != NULL;
+        if(n->GetPipe() != NULL && n->m_Vme != vme && vme_type_check && !current_vme->IsA("mafVMEGizmo") && in_vme->GetOutput()->GetTypeId() == current_vme->GetOutput()->GetTypeId())
         {
-          //if(n->m_Pipe != NULL && n->m_Vme != vme && n->m_Mutex)
-		      mafVME *in_vme = mafVME::SafeDownCast(vme);
-		      mafVME *current_vme = mafVME::SafeDownCast(n->m_Vme);
-          bool vme_type_check = in_vme != NULL && current_vme != NULL;
-          if(n->m_Pipe != NULL && n->m_Vme != vme && vme_type_check && !current_vme->IsA("mafVMEGizmo") && in_vme->GetOutput()->GetTypeId() == current_vme->GetOutput()->GetTypeId())
-          {
-            mafEventMacro(mafEvent(this,VME_SHOW,n->m_Vme,false));
-          }
+          mafEventMacro(mafEvent(this,VME_SHOW,n->m_Vme,false));
+					break;
         }
       }
-      else
-      {
-        // Changed code below to allow all MUTEX VMEs to behave at the same manner also if 
-        // they are of different type: only one MUTEX VME per time is visible into the view.
-        for(mafSceneNode *n = m_List; n; n=n->m_Next)
-          //if(n->m_Pipe != NULL && n->m_Vme != vme && n->m_Mutex)
-          if(n->m_Pipe != NULL && n->m_Vme != vme)
-            mafEventMacro(mafEvent(this,VME_SHOW,n->m_Vme,false));
-      }
-
 		}
     
-		if(!node->m_Pipe) 
+		if(!node->GetPipe()) 
 		{
 			m_View->VmeCreatePipe(vme);
       if (!vme->IsMAFType(mafVMEGizmo))
@@ -313,48 +300,12 @@ void mafSceneGraph::VmeShow(mafNode *vme, bool show)
 			VmeSelect(vme,vme == m_SelectedVme);
 		}
 	}
-	else
+	else //show == false
 	{
-		if(node->m_Pipe) m_View->VmeDeletePipe(vme);
+		if(node->GetPipe()) m_View->VmeDeletePipe(vme);
 	}
 
-  //node->Show(show);  //SIL. 21-4-2005: 
-  
-  /* @@@
-  // update m_shown_mutex_vme
-	if(node->m_Mutex)
-	{
-		mafNodeBaseTypes type = mafGetBaseType(vme);
-		m_shown_mutex_vme[type] = (show) ? vme : NULL;
-	}
-  @@@ */
 }
-/* @@@
-//----------------------------------------------------------------------------
-void mafSceneGraph::VmeShowByType(mafNode *vme,  bool show)
-//----------------------------------------------------------------------------
-{
-	VmeShowByType( mafGetBaseType(vme), show);
-}
-//----------------------------------------------------------------------------
-// Scan the tree and send a VME_SHOW event for each vme with the same type.
-// Type should be creatable and non mutex.
-// Changed behavoir.
-// Mutex vme may be shown only is no other vme of the same type is currently shown.
-// Mutex vme may always be hidden.
-void mafSceneGraph::VmeShowByType(mafNodeBaseTypes type,	bool show)
-//----------------------------------------------------------------------------
-{
-	if(!m_creatable[type] ) return;
-	
-	for( mafSceneNode *n = m_List; n; n=n->m_Next)
-	  if(type == mafGetBaseType(n->m_Vme) && n->IsVisible() != show )
-			//- mutex vme may be shown only is no other vme of the same type is currently shown.
-			//- mutex vme may always be hidden.
-			if(!show || m_shown_mutex_vme[type]==NULL) 
-				mafEventMacro(mafEvent(this,VME_SHOW,n->m_Vme,show));
-}
-@@@ */
 
 //----------------------------------------------------------------------------
 void mafSceneGraph::VmeShowByType(mafNode *vme,  bool show)
@@ -395,109 +346,12 @@ void mafSceneGraph::VmeShowSubTree(mafNode *vme,  bool show)
 	iter->Delete();
 }
 
-/* @@@
-//----------------------------------------------------------------------------
-// gui constants
-//----------------------------------------------------------------------------
-enum 
-{
-	ID_AUTOSHOW_SURFACE = MINID,
-	ID_AUTOSHOW_VOLUME,
-  ID_AUTOSHOW_GRAY_VOLUME,
-	ID_AUTOSHOW_IMAGE,
-	ID_AUTOSHOW_POINTSET,
-	ID_AUTOSHOW_SCALAR,
-
-};
-//----------------------------------------------------------------------------
-mafGUI *mafSceneGraph::GetGui()
-//----------------------------------------------------------------------------
-{
-	if(m_Gui == NULL)
-	{
-		m_Gui = new mafGUI(this);
-		
-		bool b1 = m_creatable[VME_SURFACE]	&& !m_Mutex[VME_SURFACE];
-		bool b2 = m_creatable[VME_VOLUME]		&& !m_Mutex[VME_VOLUME];
-		bool b3 = m_creatable[VME_GRAY_VOLUME]		&& !m_Mutex[VME_GRAY_VOLUME];
-		bool b4 = m_creatable[VME_IMAGE]		&& !m_Mutex[VME_IMAGE];
-		bool b5 = m_creatable[VME_POINTSET] && !m_Mutex[VME_POINTSET];
-
-		//modified by STEFY 30-4-2004(begin)
-		bool b6 = m_creatable[VME_SCALAR] && !m_Mutex[VME_SCALAR];
-		//modified by STEFY 30-4-2004(end)
-		
-		//if(b1 || b2 || b3 || b4 || b5) m_Gui->Label("display list",true);
-		if(b1 || b2 || b3 || b4 || b5 || b6) m_Gui->Label("display list",true);
-
-		if(b1) m_Gui->Bool(ID_AUTOSHOW_SURFACE,  "auto show all Surfaces",  &m_autoshow[VME_SURFACE], true);
-		if(b2) m_Gui->Bool(ID_AUTOSHOW_VOLUME,   "auto show all Volumes",   &m_autoshow[VME_VOLUME],  true);
-		if(b3) m_Gui->Bool(ID_AUTOSHOW_GRAY_VOLUME,   "auto show all Gray Volumes",   &m_autoshow[VME_GRAY_VOLUME],  true);
-		if(b4) m_Gui->Bool(ID_AUTOSHOW_IMAGE,    "auto show all Images",    &m_autoshow[VME_IMAGE],   true);
-		if(b5) m_Gui->Bool(ID_AUTOSHOW_POINTSET, "auto show all Landmarks", &m_autoshow[VME_POINTSET],true);
-		
-		//modified by STEFY 30-4-2004(begin)
-		if(b5) m_Gui->Bool(ID_AUTOSHOW_SCALAR, "auto show all Scalar", &m_autoshow[VME_SCALAR],true);
-		//modified by STEFY 30-4-2004(end)
-
-		m_Gui->Update();
-	}
-	return m_Gui;
-}
-//----------------------------------------------------------------------------
-void mafSceneGraph::OnEvent(mafEvent& e)
-//----------------------------------------------------------------------------
-{
-	switch(e.GetId())
-	{
-		case ID_AUTOSHOW_SURFACE:
-      VmeShowByType(VME_SURFACE,	m_autoshow[VME_SURFACE]!=0);
-		break;
-		case ID_AUTOSHOW_VOLUME:
-      VmeShowByType(VME_VOLUME,	m_autoshow[VME_VOLUME]!=0);
-    break;
-		case ID_AUTOSHOW_GRAY_VOLUME:
-      VmeShowByType(VME_GRAY_VOLUME,	m_autoshow[VME_GRAY_VOLUME]!=0);
-    break;
-		case ID_AUTOSHOW_IMAGE:
-      VmeShowByType(VME_IMAGE,		m_autoshow[VME_IMAGE]!=0);
-    break;
-		case ID_AUTOSHOW_POINTSET:
-      VmeShowByType(VME_POINTSET,m_autoshow[VME_POINTSET]!=0);
-    break;
-	//modified by STEFY 30-4-2004(begin)
-		case ID_AUTOSHOW_SCALAR:
-      VmeShowByType(VME_SCALAR,m_autoshow[VME_SCALAR]!=0);
-    break;
-	//modified by STEFY 30-4-2004(end)
-    default:
-      mafEventMacro(e);
-			return;
-    break;
-	}
-	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
-}
-@@@ */
-/* @@@
-//----------------------------------------------------------------------------
-void mafSceneGraph::OnOpenCloseEvent(mafSceneNode *node)
-//----------------------------------------------------------------------------
-{
-  assert(node->m_cloud);
-	if(node->m_cloud->IsOpen()  && node->m_Pipe)  m_View->VmeDeletePipe(node->m_cloud);
-	if(!node->m_cloud->IsOpen() && !node->m_Pipe && node->IsVisible())
-	{
-		m_View->VmeCreatePipe(node->m_cloud);
-		VmeSelect(node->m_cloud,node->m_cloud== m_SelectedVme);
-  }
-}
-@@@ */
 
 //----------------------------------------------------------------------------
 int mafSceneGraph::GetNodeStatus(mafNode *node)
 //----------------------------------------------------------------------------
 {
-  if (!m_InformationPipeModality && node->IsMAFType(mafVMERoot))
+  if (node->IsMAFType(mafVMERoot))
   {
     return NODE_NON_VISIBLE;
   }

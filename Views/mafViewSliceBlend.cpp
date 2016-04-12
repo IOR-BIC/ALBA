@@ -149,7 +149,7 @@ void mafViewSliceBlend::VmeCreatePipe(mafNode *vme)
   GetVisualPipeName(vme, pipe_name);
 
   mafSceneNode *n = m_Sg->Vme2Node(vme);
-  assert(n && !n->m_Pipe);
+  assert(n && !n->GetPipe());
 
   if (pipe_name != "")
   {
@@ -205,7 +205,7 @@ void mafViewSliceBlend::VmeCreatePipe(mafNode *vme)
         ((mafPipeVolumeSliceBlend *)pipe)->SetSliceOpacity(m_Opacity);
       }
       pipe->Create(n);
-      n->m_Pipe = (mafPipe*)pipe;
+      n->SetPipe(pipe);
     }
     else
       mafErrorMessage("Cannot create visual pipe object of type \"%s\"!",pipe_name.GetCStr());
@@ -228,8 +228,8 @@ void mafViewSliceBlend::VmeDeletePipe(mafNode *vme)
       m_AttachCamera->SetVme(NULL);
     }
   }
-  assert(n && n->m_Pipe);
-  cppDEL(n->m_Pipe);
+  assert(n && n->GetPipe());
+	n->DeletePipe();
 
   if(vme->IsMAFType(mafVMELandmark))
   {
@@ -305,7 +305,7 @@ void mafViewSliceBlend::OnEvent(mafEventBase *maf_event)
     {
     case ID_OPACITY:
       {
-        mafPipeVolumeSliceBlend *pipe = (mafPipeVolumeSliceBlend *)m_CurrentVolume->m_Pipe;
+        mafPipeVolumeSliceBlend *pipe = (mafPipeVolumeSliceBlend *)m_CurrentVolume->GetPipe();
         //Set new opacity for the pipe mafPipeVolumeSliceBlend
         pipe->SetSliceOpacity(m_Opacity);
         CameraUpdate();
@@ -329,10 +329,11 @@ void mafViewSliceBlend::SetLutRange(double low_val, double high_val)
   //If a volume is visualized set his lut range
   if(!m_CurrentVolume) 
     return;
-  mafString pipe_name = m_CurrentVolume->m_Pipe->GetTypeName();
+	mafPipe * pipe = m_CurrentVolume->GetPipe();
+  mafString pipe_name = pipe->GetTypeName();
   if (pipe_name.Equals("mafPipeVolumeSliceBlend"))
   {
-    mafPipeVolumeSliceBlend *pipe = (mafPipeVolumeSliceBlend *)m_CurrentVolume->m_Pipe;
+    mafPipeVolumeSliceBlend *pipe = (mafPipeVolumeSliceBlend *)pipe;
     pipe->SetLutRange(low_val, high_val); 
   }
 }
@@ -345,10 +346,11 @@ void mafViewSliceBlend::SetSliceLocalOrigin(double origin0[3],double origin1[3])
   {
     memcpy(m_Slice1,origin0,sizeof(origin0));
     memcpy(m_Slice2,origin1,sizeof(origin1));
-    mafString pipe_name = m_CurrentVolume->m_Pipe->GetTypeName();
+		mafPipe * pipe = m_CurrentVolume->GetPipe();
+    mafString pipe_name = pipe->GetTypeName();
     if (pipe_name.Equals("mafPipeVolumeSliceBlend"))
     {
-      mafPipeVolumeSliceBlend *pipe = (mafPipeVolumeSliceBlend *)m_CurrentVolume->m_Pipe;
+      mafPipeVolumeSliceBlend *pipe = (mafPipeVolumeSliceBlend *)pipe;
       //Set origin0 for slice 0
       pipe->SetSlice(0,origin0);
       //Set origin1 for slice 1
@@ -370,10 +372,11 @@ void mafViewSliceBlend::SetSlice(int nSlice,double pos[3])
       memcpy(m_Slice1,pos,sizeof(m_Slice1));
     else if(nSlice==1)
       memcpy(m_Slice2,pos,sizeof(m_Slice2));
-    mafString pipe_name = m_CurrentVolume->m_Pipe->GetTypeName();
+		mafPipe * pipe = m_CurrentVolume->GetPipe();
+    mafString pipe_name = pipe->GetTypeName();
     if (pipe_name.Equals("mafPipeVolumeSliceBlend"))
     {
-      mafPipeVolumeSliceBlend *pipe = (mafPipeVolumeSliceBlend *)m_CurrentVolume->m_Pipe;
+      mafPipeVolumeSliceBlend *pipe = (mafPipeVolumeSliceBlend *)pipe;
       pipe->SetSlice(nSlice,pos);
     }
   }
@@ -538,12 +541,13 @@ void mafViewSliceBlend::SetNormal(double normal[3])
   {
     for(int i=0;i<m_CurrentSurface.size();i++)
     {
-      if(m_CurrentSurface.at(i) && m_CurrentSurface.at(i)->m_Pipe)
+			mafPipe * curSurfPipe = m_CurrentSurface.at(i)->GetPipe();
+      if(curSurfPipe)
       {
-        mafString pipe_name = m_CurrentSurface.at(i)->m_Pipe->GetTypeName();
+        mafString pipe_name = curSurfPipe->GetTypeName();
         if (pipe_name.Equals("mafPipeSurfaceSlice"))
         {
-          mafPipeSurfaceSlice *pipe = (mafPipeSurfaceSlice *)m_CurrentSurface[i]->m_Pipe;
+          mafPipeSurfaceSlice *pipe = (mafPipeSurfaceSlice *)curSurfPipe;
           pipe->SetNormal(normal); 
         }
       }

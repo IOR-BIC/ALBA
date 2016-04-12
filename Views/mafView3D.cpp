@@ -311,7 +311,7 @@ void mafView3D::VmeCreatePipe(mafNode *vme)
     {
       pipe->SetListener(this);
       mafSceneNode *n = m_Sg->Vme2Node(vme);
-      assert(n && !n->m_Pipe);
+      assert(n && !n->GetPipe());
 			if(pipe_name == "mafPipeVolumeDRR")
 			{
 				((mafPipeVolumeDRR *)pipe)->SetResampleFactor(m_ResampleFactor);
@@ -329,7 +329,7 @@ void mafView3D::VmeCreatePipe(mafNode *vme)
 				((mafPipeVolumeMIP *)pipe)->SetResampleFactor(m_ResampleFactor);
 			}
       pipe->Create(n);
-      n->m_Pipe = (mafPipe*)pipe;
+      n->SetPipe(pipe);
       if (m_NumberOfVisibleVme == 1)
       {
         //CameraReset();

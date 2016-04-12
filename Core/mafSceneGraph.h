@@ -79,18 +79,6 @@ public:
 
   mafView		    *m_View;      ///< pointer to the view
 
-  // Set the flags for creatable vmes type.
-	//@@@ virtual void SetCreatableFlag	(mafNodeBaseTypes type,  bool flag = true);
-
-	// Set the flags for mutex vmes.
-  //@@@ virtual void SetMutexFlag			(mafNodeBaseTypes type,  bool flag = true);
-
-	// Set the flags for automatic show vme's type.
-  //@@@ virtual void SetAutoShowFlag	(mafNodeBaseTypes type,  bool flag = true);
-
-  // Return the gui with the autoshow widgets.
-	//@@@ virtual mafGUI *GetGui();
-
   /**
   Return the selected vme.*/
 	virtual mafNode *GetSelectedVme() {return m_SelectedVme;};
@@ -104,13 +92,6 @@ public:
 
   /** print a dump of this object */
   virtual void Print(std::ostream& os, const int tabs=0);// const;
-
-  /** Set information pipe  enable, if yes PipeVisibilityInformation must be used*/
-  void SetInformationPipeModalityEnable(bool enable){m_InformationPipeModality = enable;}
-
-  /** Get flag for information pipe modality. */
-  bool GetInformationPipeModalityEnable(){return m_InformationPipeModality;}
-
 
 protected:
   /** 
@@ -129,6 +110,6 @@ protected:
   mafObserver	 *m_Listener;
 	mafGUI			 *m_Gui;
 	mafNode      *m_SelectedVme;
-  bool         m_InformationPipeModality;
+ 
 };
 #endif

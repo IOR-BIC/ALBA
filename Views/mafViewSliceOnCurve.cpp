@@ -261,7 +261,7 @@ void mafViewSliceOnCurve::HideSameVMEs(mafView* pView, mafNode* pNode)
 
     if (pOutput != NULL && pOutput->IsA(typeId))
     {
-      if (pScNode->m_Pipe != NULL && pScNode->m_Vme != pNode)
+      if (pScNode->GetPipe() != NULL && pScNode->m_Vme != pNode)
       {            
         mafEventMacro(mafEvent(this, VME_SHOW, pScNode->m_Vme, false));
       }

@@ -137,7 +137,7 @@ mafPipe* mafViewPlot::GetNodePipe(mafNode *vme)
    assert(m_Sg);
    mafSceneNode *n = m_Sg->Vme2Node(vme);
    if(!n) return NULL;
-   return n->m_Pipe;
+   return n->GetPipe();
 }
 //----------------------------------------------------------------------------
 void mafViewPlot::GetVisualPipeName(mafNode *node, mafString &pipe_name)
@@ -176,9 +176,9 @@ void mafViewPlot::VmeCreatePipe(mafNode *vme)
     {
       pipe->SetListener(this);
       mafSceneNode *n = m_Sg->Vme2Node(vme);
-      assert(n && !n->m_Pipe);
+      assert(n && !n->GetPipe());
       pipe->Create(n);
-      n->m_Pipe = (mafPipe*)pipe;
+      n->SetPipe(pipe);
     }
     else
     {
@@ -191,8 +191,7 @@ void mafViewPlot::VmeDeletePipe(mafNode *vme)
 //----------------------------------------------------------------------------
 {
   mafSceneNode *n = m_Sg->Vme2Node(vme);
-  assert(n && n->m_Pipe);
-  cppDEL(n->m_Pipe);
+	n->DeletePipe();
 }
 //-------------------------------------------------------------------------
 mafGUI *mafViewPlot::CreateGui()

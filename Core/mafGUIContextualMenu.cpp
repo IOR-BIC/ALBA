@@ -180,7 +180,7 @@ void mafGUIContextualMenu::OnContextualViewMenu(wxCommandEvent& event)
           mafSceneNode *sn = sg->Vme2Node(vme);
           if(sn)
           {
-            pipe_created = (sn->m_Pipe != NULL);
+            pipe_created = (sn->IsVisible());
             mutex = sn->m_Mutex;
           }
         } 
@@ -200,7 +200,7 @@ void mafGUIContextualMenu::OnContextualViewMenu(wxCommandEvent& event)
         mafSceneNode *sn = sg->Vme2Node(vme);
         if (sn)
         {
-          mafPipe *p = sn->m_Pipe;
+          mafPipe *p = sn->GetPipe();
           if (p)
           {
             wxString t = vme->GetName();
