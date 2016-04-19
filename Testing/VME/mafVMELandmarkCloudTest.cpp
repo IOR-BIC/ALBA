@@ -58,7 +58,6 @@ void mafVMELandmarkCloudTest::AppendLandmarkTest()
   cloud->TestModeOn();
   cloud->AppendLandmark(x, y, z, name.GetCStr());
 
-  cloud->Open();
   landmark = cloud->GetLandmark(name);
 
   bool result = false;
@@ -74,7 +73,6 @@ void mafVMELandmarkCloudTest::AppendLandmarkTest()
 
   cloud1->TestModeOn();
   cloud1->AppendLandmark(name);
-  cloud1->Open();
 
   //Check if landmark has been appended
   result = false;
@@ -98,7 +96,6 @@ void mafVMELandmarkCloudTest::SetLandmarkTest()
 
   cloud->TestModeOn();
   cloud->SetLandmark(landmark);
-  cloud->Open();
 
   bool result = false;
   //Check if landmark has been set
@@ -111,7 +108,6 @@ void mafVMELandmarkCloudTest::SetLandmarkTest()
   cloud1->TestModeOn();
   cloud1->AppendLandmark(name);
   cloud1->SetLandmark(name,x,y,z);
-  cloud1->Open();
 
   double xyz[3];
   cloud1->GetLandmark(name, xyz);
@@ -127,7 +123,6 @@ void mafVMELandmarkCloudTest::SetLandmarkTest()
   cloud2->TestModeOn();
   cloud2->AppendLandmark(name);
   cloud2->SetLandmark(0,x,y,z);
-  cloud2->Open();
 
   double xyz1[3];
   cloud2->GetLandmarkPosition(0,xyz1);
@@ -153,7 +148,6 @@ void mafVMELandmarkCloudTest::FindLandmarkIndexTest()
   cloud2->TestModeOn();
   cloud2->AppendLandmark(name);
   cloud2->SetLandmark(0,x,y,z);
-  cloud2->Open();
 
   //FindLandmarkIndex
   bool result = false;
@@ -177,7 +171,6 @@ void mafVMELandmarkCloudTest::RemoveLandmarkTest()
   cloud->TestModeOn();
   cloud->AppendLandmark(name);
   cloud->SetLandmark(0,x,y,z);
-  cloud->Open();
 
   cloud->RemoveLandmark(0);
 
@@ -221,7 +214,6 @@ void mafVMELandmarkCloudTest::GetLandmarkNameTest()
   cloud->AppendLandmark("");
   cloud->SetLandmark(0,x,y,z);
   cloud->SetLandmarkName(0, name);
-  cloud->Open();
 
   mafString nameRet = cloud->GetLandmarkName(0);
 
@@ -248,7 +240,6 @@ void mafVMELandmarkCloudTest::SetRadiusTest()
   cloud->AppendLandmark(name);
   cloud->SetLandmark(0,x,y,z);
   cloud->SetRadius(radius);
-  cloud->Open();
 
   //Check if landmark radius has been set
   bool result = false;
@@ -273,7 +264,6 @@ void mafVMELandmarkCloudTest::SetSphereResolutionTest()
   cloud->AppendLandmark(name);
   cloud->SetLandmark(0,x,y,z);
   cloud->SetSphereResolution(res);
-  cloud->Open();
 
   //Check if landmark resolution has been set
   bool result = false;

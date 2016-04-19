@@ -24,7 +24,7 @@
 //----------------------------------------------------------------------------
 class mafDataVector;
 class mafMatrixVector;
-class mafNode;
+class mafVME;
 class mafGUI;
 
 /** mafVMEGenericAbstract - a VME featuring an internal array for matrices and data.
@@ -55,12 +55,12 @@ public:
     are not copied, i.e. copy is not recursive!
     Concrete class should reimplement this function to verify admitted
     conversion. */
-  virtual int DeepCopy(mafNode *a);
+  virtual int DeepCopy(mafVME *a);
 
   /**
     Allow to perform a DeepCopy with data very large.
-    Release memory of the input mafNode. */
-  virtual int DeepCopyVmeLarge(mafNode *a);
+    Release memory of the input mafVME. */
+  virtual int DeepCopyVmeLarge(mafVME *a);
 
   /** 
     perform a copy by simply referencing the copied VME's data array. 
@@ -82,7 +82,7 @@ public:
     In case of error during operation return NULL, otherwise return
     this node pointer: this is to be compatible with nodes that during
     reparenting make copy of the VME (mafVMEGenericAbstractRoot)*/
-  virtual int ReparentTo(mafNode *parent);
+  virtual int ReparentTo(mafVME *parent);
 
   /**  
     Return the matrix vector associated with this VME. Matrix vector is an array of

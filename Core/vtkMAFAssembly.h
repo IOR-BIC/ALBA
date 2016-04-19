@@ -26,7 +26,7 @@ class vtkAssemblyPaths;
 class vtkProp3DCollection;
 class vtkMapper;
 class vtkActor;
-class mafNode;
+class mafVME;
 
 /** create hierarchies of vtkProp3Ds (transformable props)
   vtkMAFAssembly same as vtkAssembly, but has an extra link 
@@ -43,11 +43,11 @@ public:
 
   /**
   Get the VME associated to this Assembly */
-  mafNode *  GetVme(){return m_Vme;};
+  mafVME *  GetVme(){return m_Vme;};
 
   /**
   Set the VME associated to this Assembly */
-  void      SetVme(mafNode *vme){m_Vme=vme;};
+  void      SetVme(mafVME *vme){m_Vme=vme;};
 
   /**
   Add a part to the list of parts.*/
@@ -127,7 +127,7 @@ protected:
   ~vtkMAFAssembly();
 
   // pointer to the VME that is represented by this Assembly
-  mafNode      *m_Vme;
+  mafVME      *m_Vme;
 
   // Keep a list of direct descendants of the assembly hierarchy
   vtkProp3DCollection *m_Parts;

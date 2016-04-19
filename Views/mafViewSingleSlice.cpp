@@ -42,7 +42,7 @@
 #include "mafSceneGraph.h"
 #include "mafAttachCamera.h"
 #include "mafGUIFloatSlider.h"
-#include "mafNodeIterator.h"
+#include "mafVMEIterator.h"
 #include "mafVMEGizmo.h"
 #include "mafPipeMeshSlice.h"
 #include "mafGUI.h"
@@ -221,7 +221,7 @@ void mafViewSingleSlice::InitializeSlice(double slice[3])
   m_SliceInitialized = true;
 }
 //----------------------------------------------------------------------------
-void mafViewSingleSlice::VmeCreatePipe(mafNode *vme)
+void mafViewSingleSlice::VmeCreatePipe(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   mafString pipe_name = "";
@@ -246,9 +246,9 @@ void mafViewSingleSlice::VmeCreatePipe(mafNode *vme)
       {
         m_CurrentVolume = n;
         if (m_AttachCamera)
-          m_AttachCamera->SetVme(m_CurrentVolume->m_Vme);
+          m_AttachCamera->SetVme(m_CurrentVolume->GetVme());
         int slice_mode;
-        vtkDataSet *data = ((mafVME *)vme)->GetOutput()->GetVTKData();
+        vtkDataSet *data = vme->GetOutput()->GetVTKData();
         assert(data);
         data->Update();
 				float v1[3] = {1,0,0};
@@ -409,14 +409,14 @@ void mafViewSingleSlice::VmeCreatePipe(mafNode *vme)
   }
 }
 //----------------------------------------------------------------------------
-void mafViewSingleSlice::VmeDeletePipe(mafNode *vme)
+void mafViewSingleSlice::VmeDeletePipe(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   mafSceneNode *n = m_Sg->Vme2Node(vme);
 
 	m_NumberOfVisibleVme--;
   
-	if (((mafVME *)vme)->GetOutput()->IsA("mafVMEOutputVolume"))
+	if (vme->GetOutput()->IsA("mafVMEOutputVolume"))
   {
     m_CurrentVolume = NULL;
     if (m_AttachCamera)
@@ -428,28 +428,24 @@ void mafViewSingleSlice::VmeDeletePipe(mafNode *vme)
   n->DeletePipe();
 }
 //-------------------------------------------------------------------------
-int mafViewSingleSlice::GetNodeStatus(mafNode *vme)
+int mafViewSingleSlice::GetNodeStatus(mafVME *vme)
 //-------------------------------------------------------------------------
 {
   mafSceneNode *n = NULL;
   if (m_Sg != NULL)
   {
     n = m_Sg->Vme2Node(vme);
-    if (((mafVME *)vme)->GetOutput()->IsA("mafVMEOutputVolume") ||
-        vme->IsMAFType(mafVMEImage) ||
-        vme->IsMAFType(mafVMEPolylineSpline))
+    if (vme->GetOutput()->IsA("mafVMEOutputVolume") || vme->IsMAFType(mafVMEImage) || vme->IsMAFType(mafVMEPolylineSpline))
     {
       if(n != NULL)
-        n->m_Mutex = true;
+        n->SetMutex(true);
     }
-    else if (vme->IsMAFType(mafVMEPolyline) ||
-             vme->IsMAFType(mafVMESurface))
+    else if (vme->IsMAFType(mafVMEPolyline) || vme->IsMAFType(mafVMESurface))
     {
       if(n != NULL)
-        n->m_Mutex = false;
+        n->SetMutex(false);
     }
-    else if (vme->IsMAFType(mafVMESlicer) ||
-            ((mafVME *)vme)->GetOutput()->IsA("mafVMEAdvancedProber"))
+    else if (vme->IsMAFType(mafVMESlicer) || vme->GetOutput()->IsA("mafVMEAdvancedProber"))
     {
       if(n != NULL)
         n->SetPipeCreatable(false);
@@ -518,8 +514,8 @@ void mafViewSingleSlice::OnEvent(mafEventBase *maf_event)
 				}
 				else
 					return;
-				mafNodeIterator *iter = m_CurrentVolume->m_Vme->GetRoot()->NewIterator();
-				for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+				mafVMEIterator *iter = m_CurrentVolume->GetVme()->GetRoot()->NewIterator();
+				for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
 				{
 					if(node->IsA("mafVMESurface"))
 					{
@@ -547,7 +543,7 @@ void mafViewSingleSlice::OnEvent(mafEventBase *maf_event)
 		case ID_PLANE_SELECT:
 		{
 			double b[6];
-			((mafVME *)m_CurrentVolume->m_Vme)->GetOutput()->GetBounds(b);
+			m_CurrentVolume->GetVme()->GetOutput()->GetBounds(b);
 
 
 			if(m_PlaneSelect == XY)
@@ -576,10 +572,10 @@ void mafViewSingleSlice::OnEvent(mafEventBase *maf_event)
 			m_Gui->Update();
 
 
-			mafNodeIterator *iter = m_CurrentVolume->m_Vme->GetRoot()->NewIterator();
-			for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+			mafVMEIterator *iter = m_CurrentVolume->GetVme()->GetRoot()->NewIterator();
+			for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
 			{
-			  if(node->IsA("mafVMESurface") || (((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume")) || node->IsA("mafVMEPolyline"))
+			  if(node->IsA("mafVMESurface") || node->GetOutput()->IsA("mafVMEOutputVolume") || node->IsA("mafVMEPolyline"))
 				{
 					mafSceneNode *n = m_Sg->Vme2Node(node);
 					if(n && n->IsVisible())
@@ -749,12 +745,12 @@ void mafViewSingleSlice::BorderDelete()
 }
 
 //----------------------------------------------------------------------------
-void mafViewSingleSlice::UpdateSurfacesList(mafNode *node)
+void mafViewSingleSlice::UpdateSurfacesList(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   for(int i=0;i<m_CurrentSurface.size();i++)
   {
-    if (m_CurrentSurface[i]==m_Sg->Vme2Node(node))
+    if (m_CurrentSurface[i]==m_Sg->Vme2Node(vme))
     {
       std::vector<mafSceneNode*>::iterator startIterator;
       m_CurrentSurface.erase(m_CurrentSurface.begin()+i);
@@ -763,7 +759,7 @@ void mafViewSingleSlice::UpdateSurfacesList(mafNode *node)
 
 	for(int i=0;i<m_CurrentPolyline.size();i++)
 	{
-		if (m_CurrentPolyline[i]==m_Sg->Vme2Node(node))
+		if (m_CurrentPolyline[i]==m_Sg->Vme2Node(vme))
 		{
 			std::vector<mafSceneNode*>::iterator startIterator;
 			m_CurrentPolyline.erase(m_CurrentPolyline.begin()+i);
@@ -772,69 +768,48 @@ void mafViewSingleSlice::UpdateSurfacesList(mafNode *node)
 }
 
 //----------------------------------------------------------------------------
-void mafViewSingleSlice::VmeShow(mafNode *node, bool show)
+void mafViewSingleSlice::VmeShow(mafVME *vme, bool show)
 //----------------------------------------------------------------------------
 {
-  Superclass::VmeShow(node, show);
+  Superclass::VmeShow(vme, show);
 
-  if (((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume"))
+  if (vme->GetOutput()->IsA("mafVMEOutputVolume"))
   {
     if (show)
     {
-      /*m_CurrentVolume = mafVMEVolume::SafeDownCast(node);
-      double sr[2],center[3];
-      vtkDataSet *data = m_CurrentVolume->GetOutput()->GetVTKData();
-      data->Update();
-      data->GetCenter(center);
-      data->GetScalarRange(sr);*/
-
 			((mafPipeVolumeSlice *)m_CurrentVolume->GetPipe())->GetSliceOrigin(m_OriginVolume);
       double b[6];
-			((mafVME *)m_CurrentVolume->m_Vme)->GetOutput()->GetBounds(b);
+			m_CurrentVolume->GetVme()->GetOutput()->GetBounds(b);
 
 			if(m_PlaneSelect == XY)
 			{
 				m_CameraPositionId = CAMERA_OS_Z;
 			  m_Position = (b[5] + b[4])/2;
-				//m_Slider->SetRange(b[4],b[5],m_Position);
 				m_Slice[2]=m_Position;
 			}
 			else if(m_PlaneSelect == YZ)
 			{
 				m_CameraPositionId = CAMERA_OS_X;
 				m_Position = (b[1] + b[0])/2;
-				//m_Slider->SetRange(b[0],b[1],m_Position);
 				m_Slice[0]=m_Position;
 			}
 			else if(m_PlaneSelect == ZX)
 			{
 				m_CameraPositionId = CAMERA_OS_Y;
 				m_Position = (b[3] + b[2])/2;
-				//m_Slider->SetRange(b[2],b[3],m_Position);
 				m_Slice[1]=m_Position;
 			}
 			
 			m_Gui->Enable(ID_POSITION,true);
 			m_Gui->Update();
 
-      /*m_Luts->SetRange((long)sr[0],(long)sr[1]);
-      m_Luts->SetSubRange((long)sr[0],(long)sr[1]);
-      vtkNEW(m_ColorLUT);
-      m_ColorLUT->SetRange(sr);
-      m_ColorLUT->Build();
-      lutPreset(4,m_ColorLUT);*/
       this->UpdateText();
 			CameraUpdate();
     }
     else
     {
-  /*    m_CurrentVolume->GetEventSource()->RemoveObserver(this);
-      m_CurrentVolume = NULL;
-      for(int i=0; i<m_NumOfChildView; i++)
-        ((mafViewSingleSliceLHPBuilder *)m_ChildViewList[i])->UpdateText(0);
-	*/  
-			mafNodeIterator *iter = node->GetRoot()->NewIterator();
-			for (mafNode *Inode = iter->GetFirstNode(); Inode; Inode = iter->GetNextNode())
+			mafVMEIterator *iter = vme->GetRoot()->NewIterator();
+			for (mafVME *Inode = iter->GetFirstNode(); Inode; Inode = iter->GetNextNode())
 			{
 				if(this->GetNodePipe(Inode))
 				{
@@ -852,14 +827,12 @@ void mafViewSingleSlice::VmeShow(mafNode *node, bool show)
       this->UpdateText(0);
 			m_Gui->Enable(ID_POSITION,false);
 			m_Gui->Update();
-
     }
   }
-
   else
   {
     if(!show)
-      UpdateSurfacesList(node);
+      UpdateSurfacesList(vme);
   }
 }
 //----------------------------------------------------------------------------

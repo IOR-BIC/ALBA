@@ -31,7 +31,7 @@ class mafGizmoScale;
 class mafGUITransformMouse;
 class mafGUISaveRestorePose;
 class mafGUITransformTextEntries;
-class mafNode;
+class mafVME;
 
 //----------------------------------------------------------------------------
 // mafOpMAFTransform :
@@ -52,7 +52,7 @@ public:
   mafOp* Copy();
 
   /** Return true for the acceptable vme type. */
-  bool Accept(mafNode* vme);
+  bool Accept(mafVME* vme);
 
   /** Builds operation's interface. */
   void OpRun();

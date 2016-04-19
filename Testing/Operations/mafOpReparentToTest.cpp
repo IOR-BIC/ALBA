@@ -86,8 +86,8 @@ void mafOpReparentToTest::Test()
 	root->AddChild(surface);
 
 	CPPUNIT_ASSERT(root->GetNumberOfChildren()==2);
-	CPPUNIT_ASSERT(surface->GetParent()==(mafVME*)root);
-	CPPUNIT_ASSERT(volume->GetParent()==(mafVME*)root);
+	CPPUNIT_ASSERT(surface->GetParent()==root);
+	CPPUNIT_ASSERT(volume->GetParent()==root);
 	CPPUNIT_ASSERT(surface->GetNumberOfChildren()==0);
 	CPPUNIT_ASSERT(volume->GetNumberOfChildren()==0);
 
@@ -155,8 +155,8 @@ void mafOpReparentToTest::Test()
 	volume->Update();
 	VolumeMatrixAfter=volume->GetOutput()->GetAbsMatrix();
 	CPPUNIT_ASSERT(root->GetNumberOfChildren()==2);
-	CPPUNIT_ASSERT(surface->GetParent()==(mafVME*)root);
-	CPPUNIT_ASSERT(volume->GetParent()==(mafVME*)root);
+	CPPUNIT_ASSERT(surface->GetParent()==root);
+	CPPUNIT_ASSERT(volume->GetParent()==root);
 	CPPUNIT_ASSERT(surface->GetNumberOfChildren()==0);
 	CPPUNIT_ASSERT(volume->GetNumberOfChildren()==0);
 	for(int i=0;i<3;i++)

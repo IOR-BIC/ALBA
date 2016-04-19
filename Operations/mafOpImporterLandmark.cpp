@@ -287,7 +287,7 @@ void mafOpImporterLandmark::Read()
       z = atof(tz);
       t = atof(time);
       if(mafString(time) == "0")
-        m_VmeCloud->AppendLandmark(name, false);
+        m_VmeCloud->AppendLandmark(x, y, z, name);
       m_VmeCloud->SetLandmark(counter,x,y,z,t);
       if(x == -9999 && y == -9999 && z == -9999 )
         m_VmeCloud->SetLandmarkVisibility(counter, 0, t);
@@ -396,8 +396,7 @@ void mafOpImporterLandmark::ReadWithoutTag()
     t4.ToDouble(&z);
 
     // todo: optimize this append
-    m_VmeCloud->AppendLandmark(mafString(counter), false);
-    m_VmeCloud->SetLandmark(counter,x,y,z,0);
+    m_VmeCloud->AppendLandmark(x, y, z, mafString(counter));
     if(x == -9999 && y == -9999 && z == -9999 )
       m_VmeCloud->SetLandmarkVisibility(counter, 0, 0);
     

@@ -43,13 +43,13 @@ public:
 	mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */
-	bool Accept(mafNode *node);
+	bool Accept(mafVME*node);
 
 	/** Build the interface of the operation, i.e the dialog that let choose the name of the output file. */
 	void OpRun();
 
   /** Look for landmarks in the sub-tree */
-  int FindLandmarkClouds(mafNode* node);  
+  int FindLandmarkClouds(mafVME* node);  
 
   /** Export landmarks contained into a mafVMELandmarkCloud.*/
   void ExportLandmark(mafVMELandmarkCloud* cloud = NULL);

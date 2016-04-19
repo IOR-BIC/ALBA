@@ -44,15 +44,14 @@ VME with input a surface and a volume, and producing a distance/density scalar s
 class MAF_EXPORT mafVMEMaps : public mafVME
 {
 public:
-  
-  /** IDs for the GUI */
-  enum VME_MAPS_WIDGET_ID
-  {
-    ID_DENSITY_DISTANCE = Superclass::ID_LAST,
-    ID_LAST
-  };
-
   mafTypeMacro(mafVMEMaps,mafVME);
+
+	/** IDs for the GUI */
+	enum VME_MAPS_WIDGET_ID
+	{
+		ID_DENSITY_DISTANCE = Superclass::ID_LAST,
+		ID_LAST
+	};
 
   mafVMEMaps();
   virtual ~mafVMEMaps();
@@ -61,7 +60,7 @@ public:
   virtual void Print(std::ostream& os, const int tabs=0);
 
   /** Copy the contents of another VME-Maps into this one. */
-  virtual int DeepCopy(mafNode *a);
+  virtual int DeepCopy(mafVME *a);
 
   /** Compare with another VME-Maps. */
   virtual bool Equals(mafVME *vme);
@@ -137,16 +136,16 @@ public:
   void SetMaxDistance(int maxDistance);
 
   /** Set the link to the maps.*/
-  void SetMappedVMELink(mafNode *node);
+  void SetMappedVMELink(mafVME *node);
 
   /** Get the link to the mapped vme.*/
-  mafNode *GetMappedVMELink();
+  mafVME *GetMappedVMELink();
 
   /** Set the volume link to the maps.*/
-  void SetSourceVMELink(mafNode *node);
+  void SetSourceVMELink(mafVME *node);
 
   /** Get the link to the source vme.*/
-  mafNode *GetSourceVMELink();
+  mafVME *GetSourceVMELink();
 
   /** Get the scalar range of the output vtkDataSet. */
   void GetScalarRange(double range[2]);

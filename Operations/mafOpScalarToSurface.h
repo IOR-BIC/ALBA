@@ -22,7 +22,7 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mafNode;
+class mafVME;
 class mafVMESurface;
 
 //----------------------------------------------------------------------------
@@ -45,7 +45,7 @@ public:
   mafOp* Copy();
 
   /** Return true for the acceptable vme type. */
-  bool Accept(mafNode *node);
+  bool Accept(mafVME*node);
 
   /** Builds the output surface. */
   void OpRun();

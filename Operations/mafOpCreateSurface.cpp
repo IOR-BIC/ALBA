@@ -26,7 +26,7 @@
 
 #include "mafGUI.h"
 
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafVMESurfaceParametric.h"
 #include "mafVMESurface.h"
 
@@ -61,7 +61,7 @@ mafOp* mafOpCreateSurface::Copy()
 	return new mafOpCreateSurface(m_Label);
 }
 //----------------------------------------------------------------------------
-bool mafOpCreateSurface::Accept(mafNode* vme)
+bool mafOpCreateSurface::Accept(mafVME* vme)
 //----------------------------------------------------------------------------
 {
 	return vme != NULL && vme->IsMAFType(mafVMESurfaceParametric);

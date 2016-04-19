@@ -27,7 +27,7 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mafNode;
+class mafVME;
 class mafVME;
 class mafSceneNode;
 class mafSceneGraph;

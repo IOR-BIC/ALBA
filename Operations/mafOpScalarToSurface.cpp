@@ -71,7 +71,7 @@ mafOp* mafOpScalarToSurface::Copy()
 }
 
 //----------------------------------------------------------------------------
-bool mafOpScalarToSurface::Accept(mafNode *node)
+bool mafOpScalarToSurface::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
   return (node && node->IsMAFType(mafVMEScalar) && ((mafVMEScalar*)node)->IsAnimated());

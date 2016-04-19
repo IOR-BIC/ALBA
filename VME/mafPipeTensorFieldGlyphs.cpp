@@ -460,11 +460,11 @@ void mafPipeTensorFieldGlyphs::InitFilterList(int nScalars){
 			m_RangeCtrl2->InsertColumn(i,cols[i]);
 		}
 	}
-	mafNode::mafLinksMap* pLinks =  m_Vme->GetLinks();
+	mafVME::mafLinksMap* pLinks =  m_Vme->GetLinks();
 	wxString itemName,itemValue1,itemValue2,displayValue;
 	double dValue1,dValue2;
 	int idx1 =0,idx2=0;
-	for (mafNode::mafLinksMap::iterator i = pLinks->begin(); i != pLinks->end(); i++)
+	for (mafVME::mafLinksMap::iterator i = pLinks->begin(); i != pLinks->end(); i++)
 	{
 		mafString linkName = i->first;
 		if (linkName.StartsWith(FILTER_LINK_NAME))
@@ -562,13 +562,13 @@ void mafPipeTensorFieldGlyphs::InitFilterList(int nScalars){
 void mafPipeTensorFieldGlyphs::StoreFilterLinks2(){
 	//-----------------------------------------------------------------------
 
-	mafNode::mafLinksMap* pLinks = m_Vme->GetLinks(); 
+	mafVME::mafLinksMap* pLinks = m_Vme->GetLinks(); 
 	//remove old filter of this link
 	bool bNeedRestart;  
 	do
 	{
 		bNeedRestart = false;
-		for (mafNode::mafLinksMap::iterator i = pLinks->begin(); i != pLinks->end(); i++)
+		for (mafVME::mafLinksMap::iterator i = pLinks->begin(); i != pLinks->end(); i++)
 		{
 			if (i->first.StartsWith(FILTER_LINK_NAME2))
 			{
@@ -607,13 +607,13 @@ void mafPipeTensorFieldGlyphs::StoreFilterLinks2(){
 void mafPipeTensorFieldGlyphs::StoreFilterLinks(){
 	//-----------------------------------------------------------------------
 
-	mafNode::mafLinksMap* pLinks = m_Vme->GetLinks(); 
+	mafVME::mafLinksMap* pLinks = m_Vme->GetLinks(); 
 	//remove old filter of this link
 	bool bNeedRestart;  
 	do
 	{
 		bNeedRestart = false;
-		for (mafNode::mafLinksMap::iterator i = pLinks->begin(); i != pLinks->end(); i++)
+		for (mafVME::mafLinksMap::iterator i = pLinks->begin(); i != pLinks->end(); i++)
 		{
 			if (i->first.StartsWith(FILTER_LINK_NAME))
 			{

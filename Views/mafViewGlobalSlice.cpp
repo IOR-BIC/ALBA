@@ -25,7 +25,7 @@
 
 #include "mafViewGlobalSlice.h"
 #include "mafObserver.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafSceneNode.h"
 #include "mafPipeFactory.h"
 #include "mafPipe.h"
@@ -41,6 +41,7 @@
 #include "mafVMELandmarkCloud.h"
 #include "mafVMELandmark.h"
 #include "mafVMEVolume.h"
+#include "mafVMEOutput.h"
 
 #include "vtkCellPicker.h"
 #include "vtkMAFRayCast3DPicker.h"
@@ -276,32 +277,21 @@ void mafViewGlobalSlice::InizializePlane()
 
 }
 //----------------------------------------------------------------------------
-void mafViewGlobalSlice::VmeSelect(mafNode *node,bool select)
+void mafViewGlobalSlice::VmeSelect(mafVME *vme,bool select)
 //----------------------------------------------------------------------------
 {
 	assert(m_Sg); 
-  m_Sg->VmeSelect(node,select);
+  m_Sg->VmeSelect(vme,select);
   if(select && m_Gui)
   {
-    /*if (!m_GlobalBoundsInitialized)
-    {
-      ((mafVME*)node->GetRoot())->GetOutput()->GetVME4DBounds(m_GlobalBounds);
-
-			double bounds[6];
-			((mafVME*)node->GetRoot())->GetOutput()->GetBounds(bounds);
-			UpdateSliceParameters();
-			InizializePlane();
-
-			CameraUpdate();
-    }*/
-
-    m_SelectedVolume = m_Sg->Vme2Node(node);
+    
+    m_SelectedVolume = m_Sg->Vme2Node(vme);
 		mafPipeVolumeSlice * volSlicePipe = (mafPipeVolumeSlice *)m_SelectedVolume->GetPipe();
     if (volSlicePipe)
     {
       //m_Gui->Enable(ID_LUT,true);
 			m_Gui->Enable(ID_POS_SLIDER,true);
-      if (((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume"))
+      if (vme->GetOutput()->IsA("mafVMEOutputVolume"))
       {
         m_Opacity = volSlicePipe->GetSliceOpacity();
         m_Gui->Enable(ID_OPACITY_SLIDER,true);
@@ -318,24 +308,24 @@ void mafViewGlobalSlice::VmeSelect(mafNode *node,bool select)
   }
 }
 //----------------------------------------------------------------------------
-void mafViewGlobalSlice::VmeCreatePipe(mafNode *node)
+void mafViewGlobalSlice::VmeCreatePipe(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   mafString pipe_name = "";
-  GetVisualPipeName(node, pipe_name);
+  GetVisualPipeName(vme, pipe_name);
 
-  std::pair<mafID,int> pair(node->GetId(),m_NumberOfVmeInstantiated);
+  std::pair<mafID,int> pair(vme->GetId(),m_NumberOfVmeInstantiated);
   m_MapID.insert(pair);
   
   m_NumberOfVmeInstantiated++;
 
-  mafSceneNode *n = m_Sg->Vme2Node(node);
+  mafSceneNode *n = m_Sg->Vme2Node(vme);
   assert(n && !n->GetPipe());
 
   m_GlobalBoundsValid = false; // new VME is shown into the view => Update the Global Bounds
 	if (!m_GlobalBoundsInitialized || !m_GlobalBoundsValid)
   {
-    ((mafVME*)node)->GetOutput()->GetVME4DBounds(m_GlobalBounds);
+    vme->GetOutput()->GetVME4DBounds(m_GlobalBounds);
     UpdateSliceParameters();
 		InizializePlane();
 		//CameraUpdate();
@@ -347,7 +337,6 @@ void mafViewGlobalSlice::VmeCreatePipe(mafNode *node)
   float applied_yVector[3];
   float applied_normal[3];
 	
-	mafVME *vme = mafVME::SafeDownCast(node);
 	vtkTransform *transform;
 	vtkNEW(transform);
 	transform->SetMatrix(vme->GetOutput()->GetMatrix()->GetVTKMatrix());
@@ -409,7 +398,7 @@ void mafViewGlobalSlice::VmeCreatePipe(mafNode *node)
 				((mafPipeVolumeSlice *)pipe)->HideSlider();
 			}
 
-			if (m_SelectedVolume == n && ((mafVME *)m_SelectedVolume->m_Vme)->GetOutput()->IsA("mafVMEOutputVolume"))
+			if (m_SelectedVolume == n && m_SelectedVolume->GetVme()->GetOutput()->IsA("mafVMEOutputVolume"))
 			{
 				m_Gui->Enable(ID_OPACITY_SLIDER,true);
 				mafPipeVolumeSlice * volPipe = (mafPipeVolumeSlice *)m_SelectedVolume->GetPipe();
@@ -437,7 +426,7 @@ void mafViewGlobalSlice::VmeCreatePipe(mafNode *node)
 	UpdateText();
 }
 //----------------------------------------------------------------------------
-void mafViewGlobalSlice::VmeDeletePipe(mafNode *vme)
+void mafViewGlobalSlice::VmeDeletePipe(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   m_GlobalBoundsValid = false;
@@ -445,7 +434,7 @@ void mafViewGlobalSlice::VmeDeletePipe(mafNode *vme)
 
 	m_NumberOfVisibleVme--;
 
-  if (((mafVME *)vme)->GetOutput()->IsA("mafVMEOutputVolume"))
+  if (vme->GetOutput()->IsA("mafVMEOutputVolume"))
   {
     if (m_AttachCamera)
     {
@@ -606,8 +595,8 @@ mafGUI* mafViewGlobalSlice::CreateGui()
 	m_OpacitySlider = m_Gui->FloatSlider(ID_OPACITY_SLIDER,"opacity",&m_Opacity,0.1,1.0);
 
 	bool Enable = false;
-  mafNode *selVME = m_Sg->GetSelectedVme();
-  if (selVME&&(((mafVME *)selVME)->GetOutput()->IsA("mafVMEOutputVolume")))
+  mafVME *selVME = m_Sg->GetSelectedVme();
+  if (selVME && selVME->GetOutput()->IsA("mafVMEOutputVolume") )
   {
 		m_SelectedVolume = m_Sg->Vme2Node(selVME);
 		//m_gui->Enable(ID_LUT,en);
@@ -649,7 +638,7 @@ void mafViewGlobalSlice::UpdateSlice()
 			m_SliceOrigin[2] = m_GlobalBounds[4];
 	}
 
-	for(mafSceneNode *node = m_Sg->GetNodeList(); node; node=node->m_Next)
+	for(mafSceneNode *node = m_Sg->GetNodeList(); node; node=node->GetNext())
 	{
     if(node->GetPipe())
     {
@@ -659,7 +648,7 @@ void mafViewGlobalSlice::UpdateSlice()
 			float applied_yVector[3];
 			float applied_normal[3];
 
-			mafVME *vme = mafVME::SafeDownCast(node->m_Vme);
+			mafVME *vme = node->GetVme();
 			vtkTransform *transform;
 			vtkNEW(transform);
 			transform->Identity();
@@ -674,7 +663,9 @@ void mafViewGlobalSlice::UpdateSlice()
 			transform->TransformNormal(m_SliceXVector, applied_xVector);
 			transform->TransformNormal(m_SliceYVector, applied_yVector);
 
-		  if(node->m_Vme->IsA("mafVMESurface")||node->m_Vme->IsA("mafVMESurfaceParametric")||node->m_Vme->IsA("mafVMELandmarkCloud")||node->m_Vme->IsA("mafVMELandmark"))
+			mafVMEOutput * output = vme->GetOutput();
+
+		  if(vme->IsA("mafVMESurface")||vme->IsA("mafVMESurfaceParametric")||vme->IsA("mafVMELandmarkCloud")||vme->IsA("mafVMELandmark"))
 		  {
 				mafPipeSurfaceSlice * pipe = (mafPipeSurfaceSlice *)node->GetPipe();
         pipe->SetSlice(m_SliceOrigin);
@@ -684,7 +675,7 @@ void mafViewGlobalSlice::UpdateSlice()
 				DoubleNormal[2]=(double)m_SliceNormal[2];
 				pipe->SetNormal(DoubleNormal);
       }
-      if(node->m_Vme->IsA("mafVMEMesh"))
+      if(vme->IsA("mafVMEMesh"))
       {
 				mafPipeMeshSlice * pipe = (mafPipeMeshSlice *)node->GetPipe();
         pipe->SetSlice(m_SliceOrigin);
@@ -694,14 +685,14 @@ void mafViewGlobalSlice::UpdateSlice()
         DoubleNormal[2]=(double)m_SliceNormal[2];
         pipe->SetNormal(DoubleNormal);
       }
-      else if(((mafVME *)node->m_Vme)->GetOutput()->IsA("mafVMEOutputVolume"))
-      {
+      else if (output->IsA("mafVMEOutputVolume"))
+			{
 				mafPipeVolumeSlice * pipe = (mafPipeVolumeSlice *)node->GetPipe();
-        pipe->SetSlice(applied_origin, applied_xVector, applied_yVector);
-        pipe->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
-      }
-      transform->Delete();
-      transform = NULL;
+				pipe->SetSlice(applied_origin, applied_xVector, applied_yVector);
+				pipe->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
+			}
+			transform->Delete();
+			transform = NULL;
     }
   }
 
@@ -815,12 +806,12 @@ void mafViewGlobalSlice::CameraUpdate()
   if (!m_GlobalBoundsValid)
   {
     mafOBB globalBounds;
-    for(mafSceneNode *n = m_Sg->GetNodeList(); n; n = n->m_Next)
+    for(mafSceneNode *n = m_Sg->GetNodeList(); n; n = n->GetNext())
     {
       if(n->GetPipe())
       {
         mafOBB b;
-        ((mafVME *)n->m_Vme)->GetOutput()->GetVME4DBounds(b);
+        n->GetVme()->GetOutput()->GetVME4DBounds(b);
         globalBounds.MergeBounds(b);
       }
     }
@@ -838,43 +829,20 @@ void mafViewGlobalSlice::CameraUpdate()
     m_GlobalBoundsValid = true;
   }
 
-  /*if (m_NumberOfVisibleVme > 0)
-	{
-    mafNode *node = m_Sg->GetSelectedVme();
-    mafOBB globalBounds;
-    ((mafVME*)node->GetRoot())->GetOutput()->Get4DBounds(globalBounds);
-    if(globalBounds.IsValid() && m_GlobalBoundsInitialized)
-    {
-      mafOBB b;
-      b.DeepCopy(m_GlobalBounds);
-      if(!b.Equals(&globalBounds))
-      {
-        ((mafVME*)node->GetRoot())->GetOutput()->Get4DBounds(b);
-        //m_GlobalBoundsInitialized = false;
-        if (b.IsValid())
-        {
-          b.CopyTo(m_GlobalBounds);
-          // there is at least one VME visualized
-          UpdateSliceParameters();
-          UpdateSlice();
-        }
-      }
-    }
-	}*/
 }
 //----------------------------------------------------------------------------
-void mafViewGlobalSlice::VmeShow(mafNode *node, bool show)
+void mafViewGlobalSlice::VmeShow(mafVME *vme, bool show)
 //----------------------------------------------------------------------------
 {
-	Superclass::VmeShow(node,show);
+	Superclass::VmeShow(vme,show);
 
-  mafSceneNode *sceneNode = m_Sg->Vme2Node(node);
+  mafSceneNode *sceneNode = m_Sg->Vme2Node(vme);
 	mafPipeVolumeSlice * selVolPipe = (mafPipeVolumeSlice *)m_SelectedVolume->GetPipe();
   if (sceneNode == m_SelectedVolume && selVolPipe)
   {
     //m_Gui->Enable(ID_LUT,true);
     m_Gui->Enable(ID_POS_SLIDER,true);
-    if (((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume"))
+    if (vme->GetOutput()->IsA("mafVMEOutputVolume"))
     {
       m_Opacity   = selVolPipe->GetSliceOpacity();
       selVolPipe->SetTrilinearInterpolation(m_TrilinearInterpolationOn);

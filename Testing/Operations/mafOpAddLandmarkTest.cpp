@@ -106,7 +106,6 @@ void mafOpAddLandmarkTest::TestOpUndo()
   mafSmartPointer<mafVMELandmarkCloud> landmarkCloud;
   landmarkCloud->TestModeOn();
   landmarkCloud->ReparentTo(surface);
-  landmarkCloud->Open();
   mafSmartPointer<mafVMELandmark> landmark;
   landmark->SetName("FIX");
   landmark->SetPoint(1.0,1.0,2.0);
@@ -211,7 +210,6 @@ void mafOpAddLandmarkTest::TestAddLandmark()
   landmark->SetPoint(5.0,5.0,0.0);
   mafSmartPointer<mafVMELandmarkCloud> landmarkCloud;
   landmarkCloud->TestModeOn();
-  landmarkCloud->Open();
 
   landmarkCloud->ReparentTo(surface);
   landmark->ReparentTo(landmarkCloud);
@@ -307,7 +305,6 @@ void mafOpAddLandmarkTest::TestOpRun()
   mafSmartPointer<mafVMELandmark> landmark;
   mafSmartPointer<mafVMELandmarkCloud> landmarkCloud;
   landmarkCloud->TestModeOn();
-  landmarkCloud->Open();
 
   landmarkCloud->ReparentTo(surface);
   landmark->ReparentTo(landmarkCloud);
@@ -402,7 +399,6 @@ void mafOpAddLandmarkTest::TestAccept()
   TEST_RESULT;
 
   landmarkCloud->ReparentTo(NULL);
-  landmarkCloud->Open();
 
   //A landmark without a landmarkcloud is a valid input
   mafSmartPointer<mafVMELandmark> landmark;

@@ -59,11 +59,9 @@ public:
   void Create();
 
   /** 
-  Set the visualization status for the node (visible, not visible, mutex, ...) 
+  Set the visualization status for the vme (visible, not visible, mutex, ...) 
   \sa mafSceneGraph mafView*/
-  virtual int GetNodeStatus(mafNode *vme);
-
-  //void VmeShow(mafNode *vme, bool show);
+  virtual int GetNodeStatus(mafVME *vme);
 
   /** IDs for the GUI */
   enum VIEW_RX_WIDGET_ID
@@ -73,14 +71,14 @@ public:
   };
 
   /** 
-  Create the visual pipe for the node passed as argument. 
+  Create the visual pipe for the vme passed as argument. 
   To create visual pipe first check in m_PipeMap if custom visual pipe is defined, 
   otherwise ask to vme which is its visual pipe. */
-  virtual void VmeCreatePipe(mafNode *vme);
+  virtual void VmeCreatePipe(mafVME *vme);
 
   /** 
   Delete vme's visual pipe. It is called when vme is removed from visualization.*/
-  virtual void VmeDeletePipe(mafNode *vme);
+  virtual void VmeDeletePipe(mafVME *vme);
 
   /** 
   Set the WindowLevel Lookup table values.*/

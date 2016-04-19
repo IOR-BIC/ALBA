@@ -80,7 +80,7 @@ mafOp* mafOpVOIDensityEditor::Copy()
 	return (new mafOpVOIDensityEditor(m_Label));
 }
 //----------------------------------------------------------------------------
-bool mafOpVOIDensityEditor::Accept(mafNode* Node)
+bool mafOpVOIDensityEditor::Accept(mafVME* Node)
 //----------------------------------------------------------------------------
 {
 	return (Node != NULL && Node->IsA("mafVMEVolumeGray"));
@@ -153,16 +153,9 @@ void mafOpVOIDensityEditor::OnEvent(mafEventBase *maf_event)
 				m_Surface = event.GetVme();
 				if(m_Surface == NULL)
 					return;
-				mafVME *VME = mafVME::SafeDownCast(m_Surface);
-        if (VME == NULL)
-        {
-          mafMessage(_("Not valid surface choosed!!"), _("Warning"));
-          m_Surface = NULL;
-          return;
-        }
-				VME->Update();
+				m_Surface->Update();
 				vtkMAFSmartPointer<vtkFeatureEdges> FE;
-				FE->SetInput((vtkPolyData *)(VME->GetOutput()->GetVTKData()));
+				FE->SetInput((vtkPolyData *)(m_Surface->GetOutput()->GetVTKData()));
 				FE->SetFeatureAngle(30);
 				FE->SetBoundaryEdges(1);
 				FE->SetColoring(0);
@@ -180,7 +173,6 @@ void mafOpVOIDensityEditor::OnEvent(mafEventBase *maf_event)
 				}
 				
         m_Gui->Enable(wxOK, m_Surface != NULL);
-				VME = NULL;
 			}
 			break;
 			case wxOK:
@@ -217,11 +209,10 @@ void mafOpVOIDensityEditor::EditVolumeScalars()
   
 	vtkAbstractTransform *transform;
 	vtkPolyData *polydata;
-	mafVME *VME = mafVME::SafeDownCast(m_Surface);
-	VME->GetOutput()->GetBounds(b);
-	VME->Update();
-	transform=(vtkAbstractTransform*)VME->GetAbsMatrixPipe()->GetVTKTransform();
-	polydata=(vtkPolyData *)VME->GetOutput()->GetVTKData();
+	m_Surface->GetOutput()->GetBounds(b);
+	m_Surface->Update();
+	transform=(vtkAbstractTransform*)m_Surface->GetAbsMatrixPipe()->GetVTKTransform();
+	polydata=(vtkPolyData *)m_Surface->GetOutput()->GetVTKData();
 
 	vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformDataClipper;
   transformDataClipper->SetTransform(transform);
@@ -235,7 +226,7 @@ void mafOpVOIDensityEditor::EditVolumeScalars()
   implicitBox->SetBounds(b);
 	implicitBox->Modified();
 
-  vtkDataSet *volumeData = ((mafVME*)m_Input)->GetOutput()->GetVTKData();
+  vtkDataSet *volumeData = m_Input->GetOutput()->GetVTKData();
   volumeData->Update();
   
   if (volumeData->IsA("vtkStructuredPoints"))
@@ -247,7 +238,7 @@ void mafOpVOIDensityEditor::EditVolumeScalars()
     m_OldData = vtkRectilinearGrid::New();
   }
   m_OldData->DeepCopy(volumeData);
-  m_CurrentTimestamp = ((mafVME *)m_Input)->GetTimeStamp();
+  m_CurrentTimestamp = m_Input->GetTimeStamp();
   
 	numberVoxels = volumeData->GetNumberOfPoints();
   
@@ -275,7 +266,7 @@ void mafOpVOIDensityEditor::EditVolumeScalars()
     cppDEL(wait);
   }
 
-  ((mafVME *)m_Input)->GetOutput()->Update();
+  m_Input->GetOutput()->Update();
   mafEventMacro(mafEvent(this, VME_MODIFIED, m_Input));
   mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 }

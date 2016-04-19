@@ -166,7 +166,7 @@ mafWizardBlock *mafWizard::GetBlockByName(const char *name )
 }
 
 //----------------------------------------------------------------------------
-bool mafWizard::Accept(mafNode* vme)
+bool mafWizard::Accept(mafVME* vme)
 //----------------------------------------------------------------------------
 {
   //by default accept function return always false
@@ -279,7 +279,7 @@ void mafWizard::OnEvent(mafEventBase *maf_event)
 
 
 //----------------------------------------------------------------------------  
-void mafWizard::SetSelectedVME( mafNode *node )
+void mafWizard::SetSelectedVME( mafVME *node )
 //----------------------------------------------------------------------------  
 {
   //Selecting VME an (if necessary) setting it to the current block

@@ -77,7 +77,7 @@ public:
   mmaVolumeMaterial *GetMaterial();
 
   /** Copy the contents of another mafVMESegmentationVolume into this one. */
-  /*virtual*/ int DeepCopy(mafNode *a);
+  /*virtual*/ int DeepCopy(mafVME *a);
 
   /** Compare with another mafVMESegmentationVolume. */
   /*virtual*/ bool Equals(mafVME *vme);
@@ -99,10 +99,10 @@ public:
   static char** GetIcon();
 
   /** Set the link to the volume.*/
-  int SetVolumeLink(mafNode *volume);
+  int SetVolumeLink(mafVME *volume);
 
   /** Get the link to the volume.*/
-  mafNode *GetVolumeLink();
+  mafVME *GetVolumeLink();
 
   /** Return the vtkDataSet of the automatic segmentation */
   vtkDataSet *GetAutomaticOutput();
@@ -117,16 +117,16 @@ public:
   vtkDataSet *GetRegionGrowingOutput();
 
   /** Set the volume mask for the manual segmentation */
-  void SetManualVolumeMask(mafNode *volume);
+  void SetManualVolumeMask(mafVME *volume);
 
   /** Get the volume mask for the manual segmentation */
-  mafNode *GetManualVolumeMask();
+  mafVME *GetManualVolumeMask();
 
   /** Set the volume mask for the refinement segmentation */
-  void SetRefinementVolumeMask(mafNode *volume);
+  void SetRefinementVolumeMask(mafVME *volume);
 
   /** Get the volume mask for the refinement segmentation */
-  mafNode *GetRefinementVolumeMask();
+  mafVME *GetRefinementVolumeMask();
 
   /** Add a new range with a particular threshold */
   int AddRange(int startSlice,int endSlice,double threshold, double upperThershold=0);
@@ -210,7 +210,7 @@ public:
   /*virtual*/ mafVMEOutput *GetOutput();
 
   /** Return true if node is of type mafVMEVolume. */
-  static bool VolumeAccept(mafNode *node) {return(node != NULL && node->IsA("mafVMEVolume"));}
+  static bool VolumeAccept(mafVME*node) {return(node != NULL && node->IsA("mafVMEVolume"));}
 
 protected:
   /** constructor. */

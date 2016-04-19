@@ -54,7 +54,7 @@ public:
   virtual void OnEvent(mafEventBase *maf_event);
   mafOp* Copy();
 
-  bool Accept(mafNode* vme);  
+  bool Accept(mafVME* vme);  
 
   void OpRun();
 

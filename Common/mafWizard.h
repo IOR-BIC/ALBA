@@ -30,7 +30,7 @@
 //----------------------------------------------------------------------------
 
 class mafObserver;
-class mafNode;
+class mafVME;
 
 #ifdef MAF_EXPORT
 #include "mafDllMacros.h"
@@ -79,7 +79,7 @@ public:
     
 protected:
   /** Return true for the acceptable vme type.*/
-  virtual bool Accept(mafNode* vme);
+  virtual bool Accept(mafVME* vme);
 
   /** Execute the wizard */
   void Execute();
@@ -107,7 +107,7 @@ protected:
   void ContinueExecution(int opSuccess);
 
   /** Set the selected VME, this function must be called before execution begin*/
-  void SetSelectedVME(mafNode *node);
+  void SetSelectedVME(mafVME *node);
 
   mafObserver    *m_Listener;
 
@@ -133,7 +133,7 @@ private:
   int							m_Id; ///< Index of the wizard referring to the wizard list.
   wxString				m_Label; ///< Label of the wizard that will appear on menu.
   wxString				m_Name; ///< Label of the wizard that will appear on menu.
-  mafNode        *m_SelectedVME;
+  mafVME	        *m_SelectedVME;
   bool            m_ShowProgressBar;
 
   friend class mafWizardManager; // class mafWizardManager can now access data directly

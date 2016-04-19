@@ -28,11 +28,11 @@
 #include "mafDecl.h"
 #include "mafEvent.h"
 
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafVME.h"
 #include "mafVMEStorage.h"
 #include "mafVMERoot.h"
-#include "mafNodeIterator.h"
+#include "mafVMEIterator.h"
 
 #include <vector>
 
@@ -80,7 +80,7 @@ void mafOpExporterMSF::OpRun()
 	mafEventMacro(mafEvent(this,result));
 }
 //----------------------------------------------------------------------------
-bool mafOpExporterMSF::Accept(mafNode *vme)
+bool mafOpExporterMSF::Accept(mafVME*vme)
 //----------------------------------------------------------------------------
 {
   return (vme != NULL) && (!vme->IsA("mafVMERoot"));
@@ -113,21 +113,20 @@ int mafOpExporterMSF::ExportMSF()
 
   std::vector<idValues> values;
 
-  mafNodeIterator *iter = m_Input->NewIterator();
-  for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+  mafVMEIterator *iter = m_Input->NewIterator();
+  for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
   {
     idValues value;
     value.oldID = node->GetId();
     values.push_back(value);
   }
   iter->Delete();
-//  mafVME *parent = (mafVME *)m_Input->GetParent();
-//  m_Input->ReparentTo(storage.GetRoot());
-  mafNode::CopyTree(m_Input,storage.GetRoot());
+
+	mafVME::CopyTree(m_Input,storage.GetRoot());
 
   iter = storage.GetRoot()->GetFirstChild()->NewIterator();
   int index = 0;
-  for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+  for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
   {
     idValues value;
     values[index].newID = node->GetId();
@@ -140,11 +139,11 @@ int mafOpExporterMSF::ExportMSF()
 
   std::vector<mafString> linkToEliminate;
   iter = storage.GetRoot()->GetFirstChild()->NewIterator();
-  for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+  for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
   {
     linkToEliminate.clear();
 
-    for (mafNode::mafLinksMap::iterator it=node->GetLinks()->begin();it!=node->GetLinks()->end();it++)
+    for (mafVME::mafLinksMap::iterator it=node->GetLinks()->begin();it!=node->GetLinks()->end();it++)
     {
       bool foundID = false;
       for (int i=0;i<values.size();i++)
@@ -170,11 +169,7 @@ int mafOpExporterMSF::ExportMSF()
   }
   iter->Delete();
 
-//   mafNode *n = m_Input->CopyTree();
-//   n->Register(NULL);
-//   n->ReparentTo(storage.GetRoot());
-	//mafNode::CopyTree(m_Input, storage.GetRoot());
-  ((mafVME *)storage.GetRoot()->GetFirstChild())->SetAbsMatrix(*((mafVME *)m_Input)->GetOutput()->GetAbsMatrix());  //Paolo 5-5-2004
+  storage.GetRoot()->GetFirstChild()->SetAbsMatrix(*m_Input->GetOutput()->GetAbsMatrix());  //Paolo 5-5-2004
   if (storage.Store()!=0)
   {
     if (!m_TestMode)
@@ -185,7 +180,6 @@ int mafOpExporterMSF::ExportMSF()
   }
 
   return MAF_OK;
-//  m_Input->ReparentTo(parent);
 }
 //----------------------------------------------------------------------------
 mafOp* mafOpExporterMSF::Copy()   

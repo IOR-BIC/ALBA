@@ -48,7 +48,7 @@ public:
     ID_LAST
   };
 
-  virtual int DeepCopy(mafNode *a);
+  virtual int DeepCopy(mafVME *a);
 
     /** 
     Return highest ItemId assigned for this tree. Return -1 if no one has
@@ -66,7 +66,7 @@ public:
 
   /** Clean the tree and all the data structures of this root*/
   void CleanTree() { \
-    mafNode::CleanTree(); \
+    mafVME::CleanTree(); \
     m_Attributes.clear(); \
   };
 
@@ -80,7 +80,7 @@ public:
   virtual void GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes);
 
   /** allow only a NULL parent */
-  virtual bool CanReparentTo(mafNode *parent) {return mafRoot::CanReparentTo(parent);}
+  virtual bool CanReparentTo(mafVME *parent) {return mafRoot::CanReparentTo(parent);}
 
   void OnEvent(mafEventBase *maf_event);
 

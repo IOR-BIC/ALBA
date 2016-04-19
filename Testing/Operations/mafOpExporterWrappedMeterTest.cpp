@@ -59,7 +59,7 @@ void mafOpExporterWrappedMeterTest::meterImplement(){
 	mafVMESurfaceParametric *vmeSphere;
 	mafNEW(vmeSphere);	
 	vmeSphere->GetOutput()->GetVTKData()->Update();
-	vmeSphere->SetParent(storage->GetRoot());
+	vmeSphere->ReparentTo(storage->GetRoot());
 	vmeSphere->SetGeometryType(mafVMESurfaceParametric::PARAMETRIC_SPHERE);
 	vmeSphere->SetSphereRadius(5.0);
 	vmeSphere->Update();
@@ -68,7 +68,7 @@ void mafOpExporterWrappedMeterTest::meterImplement(){
 	mafVMESurfaceParametric *vmeSTART;
 	mafNEW(vmeSTART);	
 	vmeSTART->GetOutput()->GetVTKData()->Update();
-	vmeSTART->SetParent(storage->GetRoot());
+	vmeSTART->ReparentTo(storage->GetRoot());
 	vmeSTART->Update();
 
 
@@ -80,7 +80,7 @@ void mafOpExporterWrappedMeterTest::meterImplement(){
 	mafVMESurfaceParametric *vmeEND;
 	mafNEW(vmeEND);	
 	vmeEND->GetOutput()->GetVTKData()->Update();
-	vmeEND->SetParent(storage->GetRoot());
+	vmeEND->ReparentTo(storage->GetRoot());
 	vmeEND->Update();
 
 	mafMatrix *matrix2 = vmeEND->GetOutput()->GetAbsMatrix();
@@ -98,7 +98,7 @@ void mafOpExporterWrappedMeterTest::meterImplement(){
 	wrappedMeter->SetWrappedMode1(medVMEComputeWrapping::SINGLE_SPHERE);
 
 
-	wrappedMeter->SetParent(storage->GetRoot());
+	wrappedMeter->ReparentTo(storage->GetRoot());
 
 	wrappedMeter->GetOutput()->GetVTKData()->Update();
 	wrappedMeter->Modified();
@@ -107,10 +107,10 @@ void mafOpExporterWrappedMeterTest::meterImplement(){
   double testValue = wrappedMeter->GetDistance();
 	CPPUNIT_ASSERT(wrappedMeter->GetDistance() > 17.4 && wrappedMeter->GetDistance() < 17.5);
 
-	wrappedMeter->SetParent(NULL);
-  vmeSphere->SetParent(NULL);
-  vmeSTART->SetParent(NULL);
-  vmeEND->SetParent(NULL);
+	wrappedMeter->ReparentTo(NULL);
+  vmeSphere->ReparentTo(NULL);
+  vmeSTART->ReparentTo(NULL);
+  vmeEND->ReparentTo(NULL);
   mafDEL(vmeSphere);
   mafDEL(vmeSTART);
   mafDEL(vmeEND);

@@ -71,13 +71,13 @@ mafDataPipeCustomProber::~mafDataPipeCustomProber()
   vtkDEL(m_Prober);
 }
 //------------------------------------------------------------------------------
-void mafDataPipeCustomProber::SetSurface(mafNode *surface)
+void mafDataPipeCustomProber::SetSurface(mafVME *surface)
 //------------------------------------------------------------------------------
 {
   m_Surface = surface;
   if (m_Surface)
   {
-    vtkDataSet *surf_data = ((mafVME *)m_Surface)->GetOutput()->GetVTKData();
+    vtkDataSet *surf_data = m_Surface->GetOutput()->GetVTKData();
     m_Normals->SetInput((vtkPolyData *)surf_data);
   }
   else
@@ -86,13 +86,13 @@ void mafDataPipeCustomProber::SetSurface(mafNode *surface)
   }
 }
 //------------------------------------------------------------------------------
-void mafDataPipeCustomProber::SetVolume(mafNode *volume)
+void mafDataPipeCustomProber::SetVolume(mafVME *volume)
 //------------------------------------------------------------------------------
 {
   m_Volume = volume;
   if (m_Volume)
   {
-    vtkDataSet *vol_data = ((mafVME *)m_Volume)->GetOutput()->GetVTKData();
+    vtkDataSet *vol_data = m_Volume->GetOutput()->GetVTKData();
     m_Prober->SetSource(vol_data);
   }
   else
@@ -127,15 +127,12 @@ int mafDataPipeCustomProber::DeepCopy(mafDataPipe *pipe)
 void mafDataPipeCustomProber::PreExecute()
 //------------------------------------------------------------------------------
 {
-  mafVME *vol = mafVME::SafeDownCast(m_Volume);
-  mafVME *surf = mafVME::SafeDownCast(m_Surface);
-
-  if(vol && surf)
+  if(m_Volume && m_Surface)
   {
-    vol->GetOutput()->Update();
-    surf->GetOutput()->Update();
-    vtkDataSet *vol_data = vol->GetOutput()->GetVTKData();
-    vtkDataSet *surf_data = surf->GetOutput()->GetVTKData();
+    m_Volume->GetOutput()->Update();
+    m_Surface->GetOutput()->Update();
+    vtkDataSet *vol_data = m_Volume->GetOutput()->GetVTKData();
+    vtkDataSet *surf_data = m_Surface->GetOutput()->GetVTKData();
     if(vol_data && surf_data)
     {
       m_Normals->SetInput((vtkPolyData *)surf_data);
@@ -159,7 +156,7 @@ void mafDataPipeCustomProber::PreExecute()
 
       mafSmartPointer<mafTransformFrame> maps_to_volume;
       maps_to_volume->SetInput(m_VME->GetAbsMatrixPipe()->GetMatrixPointer());
-      maps_to_volume->SetTargetFrame(vol->GetAbsMatrixPipe()->GetMatrixPointer());
+      maps_to_volume->SetTargetFrame(m_Volume->GetAbsMatrixPipe()->GetMatrixPointer());
 
       mafMatrix tmp_matrix = maps_to_volume->GetMatrix();
 

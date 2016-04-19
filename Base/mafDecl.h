@@ -368,12 +368,12 @@ MCH_START,
   MCH_VTK,    ///< channel used to as a bridge from VTK objects
 MCH_END,
 
-// ids issued/observed by mafNode and mafVME
+// ids issued/observed by mafVME and mafVME
 NODE_START,
   NODE_DETACHED_FROM_TREE,///< issued when the node is detachment from the tree
   NODE_ATTACHED_TO_TREE,  ///< issued when the node is attached to the tree
   NODE_DESTROYED,         ///< issued when the node is destroyed
-  NODE_GET_STORAGE,       ///< issued by tree elements to retrieve the storage (served by mafNodeRoot)
+  NODE_GET_STORAGE,       ///< issued by tree elements to retrieve the storage (served by mafVMERoot)
   NODE_GET_ROOT,          ///< issued by subnode components to extract ROOT node
   VME_TIME_SET,           ///< used either to set or to advise of time changes
   VME_MATRIX_CHANGED,     ///< issued when the matrix in the output has changed (e.g. when matrix pipe is changed at runtime)

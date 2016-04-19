@@ -98,7 +98,7 @@ void mafViewRX::Create()
   m_Picker2D->InitializePickList();
 }
 //----------------------------------------------------------------------------
-void mafViewRX::VmeCreatePipe(mafNode *vme)
+void mafViewRX::VmeCreatePipe(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   mafString pipe_name = "";
@@ -124,7 +124,7 @@ void mafViewRX::VmeCreatePipe(mafNode *vme)
         m_CurrentVolume = n;
         if (m_AttachCamera)
         {
-          m_AttachCamera->SetVme(m_CurrentVolume->m_Vme);
+          m_AttachCamera->SetVme(m_CurrentVolume->GetVme());
           CameraUpdate();
         }
       }
@@ -158,7 +158,7 @@ void mafViewRX::VmeCreatePipe(mafNode *vme)
         double positionSlice[3];
         double b[6];
 
-        mafVME::SafeDownCast(m_CurrentVolume->m_Vme)->GetOutput()->GetBounds(b);
+        m_CurrentVolume->GetVme()->GetOutput()->GetBounds(b);
         positionSlice[0] = (b[1]+b[0])/2;
         positionSlice[1] = (b[3]+b[2])/2;
         positionSlice[2] = (b[5]+b[4])/2;
@@ -199,7 +199,7 @@ void mafViewRX::VmeCreatePipe(mafNode *vme)
         //mafSmartPointer<mafVMEVolumeGray> volume;
         mafVME *volume;
 
-        volume = mafVME::SafeDownCast(m_CurrentVolume->m_Vme);
+        volume =m_CurrentVolume->GetVme();
         volume->GetOutput()->GetBounds(b);
  
         double value1; 
@@ -244,14 +244,14 @@ void mafViewRX::VmeCreatePipe(mafNode *vme)
   }
 }
 //----------------------------------------------------------------------------
-void mafViewRX::VmeDeletePipe(mafNode *vme)
+void mafViewRX::VmeDeletePipe(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   mafSceneNode *n = m_Sg->Vme2Node(vme);
   
 	m_NumberOfVisibleVme--;
 
-	if (((mafVME *)vme)->GetOutput()->IsA("mafVMEOutputVolume"))
+	if (vme->GetOutput()->IsA("mafVMEOutputVolume"))
   {
     m_CurrentVolume = NULL;
     if (m_AttachCamera)
@@ -263,18 +263,18 @@ void mafViewRX::VmeDeletePipe(mafNode *vme)
 	n->DeletePipe();
 }
 //-------------------------------------------------------------------------
-int mafViewRX::GetNodeStatus(mafNode *vme)
+int mafViewRX::GetNodeStatus(mafVME *vme)
 //-------------------------------------------------------------------------
 {
   mafSceneNode *n = NULL;
   if (m_Sg != NULL)
   {
-    if (((mafVME *)vme)->GetOutput()->IsA("mafVMEOutputVolume"))
+    if (vme->GetOutput()->IsA("mafVMEOutputVolume"))
     {
       n = m_Sg->Vme2Node(vme);
       if (n != NULL)
       {
-        n->m_Mutex = true;
+        n->SetMutex(true);
       }
     }
     else if (vme->IsMAFType(mafVMESlicer))
@@ -283,7 +283,7 @@ int mafViewRX::GetNodeStatus(mafNode *vme)
       if (n != NULL)
       {
         n->SetPipeCreatable(true);
-        n->m_Mutex = true;
+        n->SetMutex(true);
       }
     }
   }
@@ -301,7 +301,7 @@ mafGUI *mafViewRX::CreateGui()
   return m_Gui;
 }
 /*//----------------------------------------------------------------------------
-void mafViewRX::VmeShow(mafNode *vme, bool show)
+void mafViewRX::VmeShow(mafVME *vme, bool show)
 //----------------------------------------------------------------------------
 {
   mafViewVTK::VmeShow(vme,show);
@@ -358,7 +358,7 @@ void mafViewRX::CameraUpdate()
 {
   if (m_CurrentVolume)
   {
-    mafVME *volume = mafVME::SafeDownCast(m_CurrentVolume->m_Vme);
+    mafVME *volume = m_CurrentVolume->GetVme();
 
     std::ostringstream stringStream;
     stringStream << "VME " << volume->GetName() << " ABS matrix:" << std::endl;
@@ -407,7 +407,7 @@ void mafViewRX::SetCameraParallelToDataSetLocalAxis( int axis )
   this->GetRWI()->GetCamera()->GetPosition(oldCameraPosition);
   oldCameraOrientation = this->GetRWI()->GetCamera()->GetOrientation();
 
-  mafVME *currentVMEVolume = mafVME::SafeDownCast(m_CurrentVolume->m_Vme);
+  mafVME *currentVMEVolume = m_CurrentVolume->GetVme();
   assert(currentVMEVolume);
 
   assert(m_CurrentVolume);

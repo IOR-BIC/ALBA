@@ -28,9 +28,9 @@
 #include "mafAttributeTest.h"
 #include "mafTagItemTest.h"
 #include "mafTagArrayTest.h"
-#include "mafNodeTest.h"
+#include "mafVMETest.h"
 #include "mafTimeMapTest.h"
-#include "mafNodeFactoryTest.h"
+#include "mafVMEFactoryTest.h"
 #include "mmaApplicationLayoutTest.h"
 #include "mafVMETest.h"
 #include "mafOpTest.h"
@@ -46,13 +46,12 @@
 #include "mafOpPasteTest.h"
 #include "mafOpEditTest.h"
 #include "mafOpContextStackTest.h"
-#include "mafNodeIteratorTest.h"
+#include "mafVMEIteratorTest.h"
 #include "mafPipeTest.h"
 #include "mafMatrixPipeTest.h"
 #include "mafPipeBoxTest.h"
 #include "mafVMEOutputTest.h"
 #include "mafDataPipeTest.h"
-#include "mafNodeRootTest.h"
 #include "mafPipeFactoryTest.h"
 #include "mmaMaterialTest.h"
 #include "mmaVolumeMaterialTest.h"
@@ -66,9 +65,8 @@
 #include "mafAxesTest.h"
 #include "mafCoreFactoryTest.h"
 #include "mafOpStackTest.h"
-#include "mafNodeGenericTest.h"
 #include "mafExpirationDateTest.h"
-#include "mafNodeManagerTest.h"
+#include "mafVMEManagerTest.h"
 #include "mafOpManagerTest.h"
 #include "mafViewManagerTest.h"
 #include "mafVMEManagerTest.h"
@@ -87,11 +85,13 @@
 #include <cppunit/TestRunner.h>
 
 //-------------------------------------------------------------------------
-mafCxxTypeMacro(mafNodeHelper);
+mafCxxTypeMacro(mafVMEHelper);
+
+
 //-------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------
-mafCxxTypeMacro(mafNodeBHelper)
+mafCxxTypeMacro(mafVMEBHelper)
 //-------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
@@ -207,12 +207,10 @@ int
   runner.addTest( mafOpCutTest::suite());
 	runner.addTest( mafOpContextStackTest::suite());
 	runner.addTest( mafOpCopyTest::suite());
-  runner.addTest( mafNodeTest::suite());
-	runner.addTest( mafNodeRootTest::suite());
-	runner.addTest( mafNodeManagerTest::suite() );
-	runner.addTest( mafNodeIteratorTest::suite());
-  runner.addTest( mafNodeGenericTest::suite());
-  runner.addTest( mafNodeFactoryTest::suite());
+  runner.addTest( mafVMETest::suite());
+	runner.addTest( mafVMEManagerTest::suite() );
+	runner.addTest( mafVMEIteratorTest::suite());
+  runner.addTest( mafVMEFactoryTest::suite());
   runner.addTest( mafMatrixPipeTest::suite());
 	runner.addTest( mafLODActorTest::suite());
   runner.addTest( mafGUITreeContextualMenuTest::suite());

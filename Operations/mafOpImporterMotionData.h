@@ -89,7 +89,7 @@ public:
   }
 
 	/** Return true for the acceptable vme type. */
-	bool Accept(mafNode* node) {return true;};
+	bool Accept(mafVME* node) {return true;};
 
   //----------------------------------------------------------------------------
   /** Builds operation's interface. */
@@ -197,7 +197,7 @@ public:
   }
   //----------------------------------------------------------------------------
   /** Get output. */
-  mafNode* GetOutput()   
+  mafVME* GetOutput()   
     //----------------------------------------------------------------------------
   {
     return this->m_Vme;

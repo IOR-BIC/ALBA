@@ -92,8 +92,8 @@ mafGizmoScaleAxis::mafGizmoScaleAxis(mafVME *input, mafObserver *listener)
   // set come gizmo material property and initial color to red
   this->SetColor(1, 0, 0, 1, 0, 0);
 
-  m_CylGizmo->ReparentTo(mafVME::SafeDownCast(m_InputVme->GetRoot()));
-  m_CubeGizmo->ReparentTo(mafVME::SafeDownCast(m_InputVme->GetRoot()));
+  m_CylGizmo->ReparentTo(m_InputVme->GetRoot());
+  m_CubeGizmo->ReparentTo(m_InputVme->GetRoot());
 
   m_Highlight = false;
   m_Show = false;

@@ -74,7 +74,7 @@ public:
   virtual void Print(std::ostream& os, const int tabs=0);
 
   /** Copy the contents of another mafVMEScalarMatrix into this one. */
-  virtual int DeepCopy(mafNode *a);
+  virtual int DeepCopy(mafVME *a);
 
   /** Compare with another mafVMEScalarMatrix. */
   virtual bool Equals(mafVME *vme);

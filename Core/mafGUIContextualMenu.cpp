@@ -170,7 +170,7 @@ void mafGUIContextualMenu::OnContextualViewMenu(wxCommandEvent& event)
       {
         bool pipe_created = false;
         bool mutex = false;
-			  mafVME *vme = (mafVME *)((mafViewVTK *)m_ViewActive)->GetSceneGraph()->GetSelectedVme();
+			  mafVME *vme = ((mafViewVTK *)m_ViewActive)->GetSceneGraph()->GetSelectedVme();
 			  if(vme->IsMAFType(mafVMELandmark))
 				  vme = vme->GetParent();
 
@@ -181,7 +181,7 @@ void mafGUIContextualMenu::OnContextualViewMenu(wxCommandEvent& event)
           if(sn)
           {
             pipe_created = (sn->IsVisible());
-            mutex = sn->m_Mutex;
+            mutex = sn->GetMutex();
           }
         } 
         if(pipe_created && mutex) 
@@ -196,7 +196,7 @@ void mafGUIContextualMenu::OnContextualViewMenu(wxCommandEvent& event)
       mafVME *vme = NULL;
       if(sg)
       {
-        vme = (mafVME *)sg->GetSelectedVme();
+        vme = sg->GetSelectedVme();
         mafSceneNode *sn = sg->Vme2Node(vme);
         if (sn)
         {

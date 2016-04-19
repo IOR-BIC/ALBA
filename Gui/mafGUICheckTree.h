@@ -30,7 +30,7 @@ EXPORT_STL_MAP(MAF_EXPORT,wxString,int);
 //----------------------------------------------------------------------------
 // Forward refs:
 //----------------------------------------------------------------------------
-class mafNode;
+class mafVME;
 class mafView;
 
 //----------------------------------------------------------------------------
@@ -50,25 +50,25 @@ public:
   virtual       ~mafGUICheckTree();
 
   /** Add the vme to the checked tree and create the related icon. */
-	void VmeAdd(mafNode *n);
+	void VmeAdd(mafVME *vme);
 
   /** Remove the vme from the checked tree. */
-  void VmeRemove(mafNode *n);
+  void VmeRemove(mafVME *vme);
 
   /** Select the vme node of the checked tree. */
-  void VmeSelected(mafNode *n);
+  void VmeSelected(mafVME *vme);
 
   /** Return the current selected node.*/
-  mafNode *GetSelectedNode() {return m_SelectedNode;};
+  mafVME *GetSelectedNode() {return m_SelectedVME;};
 
   /** Return true if the icon associated to the tree item is checked.*/
   bool IsIconChecked(wxTreeItemId item);
 
   /** Update the vme node icon into the checked tree. */
-  void VmeShow(mafNode *n, bool show);
+  void VmeShow(mafVME *vme, bool show);
 
   /** Update the vme node label with the new vme name. */
-  void VmeModified(mafNode *n);
+  void VmeModified(mafVME *vme);
 
   /** Update the vme tree nodes with the new vme visibility for the selected view. */
   void ViewSelected(mafView *view);
@@ -89,13 +89,13 @@ public:
   
 protected:
   /** Update the vme nodes icon. */
-  void VmeUpdateIcon(mafNode *n);
+  void VmeUpdateIcon(mafVME *vme);
 
   /** Update all the vme nodes icon. */
   void TreeUpdateIcon();
   
   /** Return the status of the node according to the vme visibility. */
-  virtual int GetVmeStatus(mafNode *vme);
+  virtual int GetVmeStatus(mafVME *vme);
 
   /** retrieve the icon-index for a vme given the classname */
   int ClassNameToIcon(wxString classname);
@@ -129,7 +129,7 @@ public:
 
 protected:
   mafView *m_View;
-  mafNode *m_SelectedNode;
+  mafVME *m_SelectedVME;
   //bool      m_CheckCrypto;
   bool     m_CanSelect;
   wxMenu  *m_RMenu;	

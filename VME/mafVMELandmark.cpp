@@ -84,7 +84,7 @@ mafVMELandmark::~mafVMELandmark()
   vtkDEL(m_Polydata);
 }
 //-------------------------------------------------------------------------
-int mafVMELandmark::DeepCopy(mafNode *a)
+int mafVMELandmark::DeepCopy(mafVME *a)
 //-------------------------------------------------------------------------
 { 
   if (Superclass::DeepCopy(a)==MAF_OK)
@@ -147,7 +147,7 @@ void mafVMELandmark::InternalPreUpdate()
 }
 
 //-------------------------------------------------------------------------
-bool mafVMELandmark::CanReparentTo(mafNode *parent)
+bool mafVMELandmark::CanReparentTo(mafVME *parent)
 //-------------------------------------------------------------------------
 {
   if (mafVMELandmarkCloud *vlmc = mafVMELandmarkCloud::SafeDownCast(parent))
@@ -161,6 +161,24 @@ bool mafVMELandmark::CanReparentTo(mafNode *parent)
   }
 
   return false;
+}
+
+//----------------------------------------------------------------------------
+int mafVMELandmark::ReparentTo(mafVME *parent)
+{
+	mafVMELandmarkCloud *currentCloud=mafVMELandmarkCloud::SafeDownCast(m_Parent);
+
+	if (Superclass::ReparentTo(parent) == MAF_ERROR)
+		return MAF_ERROR;
+	
+	if (currentCloud)
+		currentCloud->RemoveLmFromChildrenList(this);
+		
+	mafVMELandmarkCloud *parentCloud = mafVMELandmarkCloud::SafeDownCast(parent);
+	if (parentCloud)
+		parentCloud->AddLMToChildernList(this);
+
+	return MAF_OK;
 }
 
 //-------------------------------------------------------------------------

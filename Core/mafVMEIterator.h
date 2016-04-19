@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: mafNodeIterator
+ Module: mafVMEIterator
  Authors: Marco Petrone
  
  Copyright (c) B3C
@@ -13,50 +13,50 @@
  PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#ifndef __mafNodeIterator_h
-#define __mafNodeIterator_h
+#ifndef __mafVMEIterator_h
+#define __mafVMEIterator_h
 //----------------------------------------------------------------------------
 // includes :
 //----------------------------------------------------------------------------
 #include "mafObject.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafVector.h"
 #include "mafEventSource.h"
 
 template class MAF_EXPORT mafVector<mafID>;
 
-/** mafNodeIterator - an m-way tree data structure iterator
-  mafNodeIterator is a class to traverse a tree data structure. It allows 
+/** mafVMEIterator - an m-way tree data structure iterator
+  mafVMEIterator is a class to traverse a tree data structure. It allows 
   to set the traverse modality. The iterator allows to set some callback to the 
   traverse by means of the MAF Subject/Observer mechanism.
   Issued events are: "PreTraversal","PostTraversal","Deeper","Upper","FirstNode",
   "LastNode", "Done".
   These can be overidden by adding an observer
   
-  @sa mafNode
+  @sa mafVME
   */
 
-class MAF_EXPORT mafNodeIterator : public mafObject
+class MAF_EXPORT mafVMEIterator : public mafObject
 {
 public:
-  mafTypeMacro(mafNodeIterator,mafObject);
+  mafTypeMacro(mafVMEIterator,mafObject);
   
   /** Retrieve the current node pointer data from the iterator. */
-  mafNode * GetCurrentNode() {return m_CurrentNode;}
+  mafVME * GetCurrentNode() {return m_CurrentNode;}
 
   /**  Shortcut to traverse the tree*/
-  mafNode * GetFirstNode() {this->GoToFirstNode(); return (m_TraversalDone)?NULL:this->GetCurrentNode();}
+  mafVME * GetFirstNode() {this->GoToFirstNode(); return (m_TraversalDone)?NULL:this->GetCurrentNode();}
   /**  Shortcut to traverse the tree*/
-  mafNode * GetLastNode() {this->GoToLastNode(); return (m_TraversalDone)?NULL:this->GetCurrentNode();}
+  mafVME * GetLastNode() {this->GoToLastNode(); return (m_TraversalDone)?NULL:this->GetCurrentNode();}
   /**  Shortcut to traverse the tree*/
-  mafNode * GetNextNode() {this->GoToNextNode(); return (m_TraversalDone)?NULL:this->GetCurrentNode();}
+  mafVME * GetNextNode() {this->GoToNextNode(); return (m_TraversalDone)?NULL:this->GetCurrentNode();}
   /**  Shortcut to traverse the tree*/
-  mafNode * GetPreviousNode() {this->GoToPreviousNode(); return (m_TraversalDone)?NULL:this->GetCurrentNode();}
+  mafVME * GetPreviousNode() {this->GoToPreviousNode(); return (m_TraversalDone)?NULL:this->GetCurrentNode();}
 
   /**
     Return true if the VME is visible. This function can be overridden to implement
     different visibility rules.*/
-  virtual bool IsVisible(mafNode *node) { return node->IsVisible();}
+  virtual bool IsVisible(mafVME *node) { return node->IsVisible();}
 
   /** Allow to ignore m_VisibleToTraverse flag for the iterator. */
   virtual void IgnoreVisibleToTraverse(bool ignore) {m_IgnoreVisibleToTraverse = ignore;};
@@ -64,7 +64,7 @@ public:
   /**
   Set the root node of the (sub)tree to be traversed. Used to set the start 
   point. */
-  void SetRootNode(mafNode *root);
+  void SetRootNode(mafVME *root);
   
   /**
     Initialize the traversal of the container. 
@@ -117,10 +117,10 @@ public:
 protected:
 
   /** Find the left most leaf of the tree*/
-  mafNode *FindLeftMostLeaf(mafNode *node);
+  mafVME *FindLeftMostLeaf(mafVME *node);
 
   /** Find the right most leaf of the tree*/
-  mafNode *FindRightMostLeaf(mafNode *node);
+  mafVME *FindRightMostLeaf(mafVME *node);
 
   mafEventSource &GetEventSource() {return m_EventSource;}
 
@@ -131,10 +131,10 @@ protected:
   virtual void PostExecute();  
 
   /** Callback function. By default send an event through the m_EventSource source. */
-  virtual void DeeperExecute(mafNode *); 
+  virtual void DeeperExecute(mafVME *); 
 
   /** Callback function. By default send an event through the m_EventSource source. */
-  virtual void UpperExecute(mafNode *);  
+  virtual void UpperExecute(mafVME *);  
 
   /** Callback function. By default send an event through the m_EventSource source. */
   virtual void FirstExecute(); 
@@ -145,11 +145,11 @@ protected:
   /** Callback function. By default send an event through the m_EventSource source. */
   virtual void DoneExecute();  
 
-  mafNodeIterator(mafNode *root=NULL);
-  virtual ~mafNodeIterator();
+  mafVMEIterator(mafVME *root=NULL);
+  virtual ~mafVMEIterator();
 
-  mafNode         *m_RootNode;
-  mafNode         *m_CurrentNode;
+  mafVME         *m_RootNode;
+  mafVME         *m_CurrentNode;
   int             m_TraversalMode;
   int             m_TraversalDone;
   bool            m_IgnoreVisibleToTraverse;
@@ -159,8 +159,8 @@ protected:
   mafEventSource  m_EventSource; ///< Source of events issued during traverse
 
 private:
-  mafNodeIterator(const mafNodeIterator&) {} // Not implemented
-  void operator=(const mafNodeIterator&) {} // Not implemented
+  mafVMEIterator(const mafVMEIterator&) {} // Not implemented
+  void operator=(const mafVMEIterator&) {} // Not implemented
 };
 
 #endif

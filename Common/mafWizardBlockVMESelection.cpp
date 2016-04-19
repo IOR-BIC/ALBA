@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include "mafDecl.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafWizardBlockVMESelection.h"
 
 wxString globalAccept;
@@ -55,7 +55,7 @@ void mafWizardBlockVMESelection::SetWindowTitle( const char *Title )
 void mafWizardBlockVMESelection::ExcutionBegin()
 //----------------------------------------------------------------------------
 {
-  mafNode *selVME;
+  mafVME *selVME;
   mafWizardBlock::ExcutionBegin();
 
   //Setting global variable witch can be referred by static function
@@ -81,7 +81,7 @@ void mafWizardBlockVMESelection::ExcutionBegin()
 }
 
 //----------------------------------------------------------------------------
-int mafWizardBlockVMESelection::VMEAccept(mafNode *node)
+int mafWizardBlockVMESelection::VMEAccept(mafVME*node)
 //----------------------------------------------------------------------------
 {
   return (node && node->IsA(globalAccept));

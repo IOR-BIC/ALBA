@@ -29,8 +29,6 @@
 #include "mafGUIMDIFrame.h"
 #include "mafPipeFactoryVME.h"
 #include "mafVMEFactory.h"
-#include "mafNodeGeneric.h"
-#include "mafNodeRoot.h"
 
 #include "mafOpCreateGenericVme.h"
 #include "mafOpTest.h"

@@ -198,7 +198,7 @@ mafVMERefSys::~mafVMERefSys()
   vtkDEL(m_ScaleAxis);
 }
 //-------------------------------------------------------------------------
-int mafVMERefSys::DeepCopy(mafNode *a)
+int mafVMERefSys::DeepCopy(mafVME *a)
 //-------------------------------------------------------------------------
 { 
   if (Superclass::DeepCopy(a)==MAF_OK)
@@ -347,7 +347,7 @@ mafGUI* mafVMERefSys::CreateGui()
 
 	mafID sub_id = -1;
 
-  m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
+  m_Gui = mafVME::CreateGui(); // Called to show info about vmes' type and name
   m_Gui->SetListener(this);
   m_Gui->Divider();
 
@@ -418,7 +418,7 @@ void mafVMERefSys::OnEvent(mafEventBase *maf_event)
         e->SetArg((long)&mafVMERefSys::LandmarkAccept);
         e->SetString(&title);
         ForwardUpEvent(e);
-        mafNode *n = e->GetVme();
+        mafVME *n = e->GetVme();
         if (n != NULL)
         {
           if (button_id == ID_REF_SYS_ORIGIN)
@@ -472,7 +472,7 @@ void mafVMERefSys::OnEvent(mafEventBase *maf_event)
 			}
 			break;
       default:
-        mafNode::OnEvent(maf_event);
+        mafVME::OnEvent(maf_event);
     }
   }
   else
@@ -657,7 +657,7 @@ void mafVMERefSys::InternalUpdate()
 
 }
 //-------------------------------------------------------------------------
-void mafVMERefSys::SetRefSysLink(const char *link_name, mafNode *n)
+void mafVMERefSys::SetRefSysLink(const char *link_name, mafVME *n)
 //-------------------------------------------------------------------------
 {
 	if (n->IsMAFType(mafVMELandmark))
@@ -673,13 +673,13 @@ void mafVMERefSys::SetRefSysLink(const char *link_name, mafNode *n)
 mafVME *mafVMERefSys::GetPoint1VME()
 //-------------------------------------------------------------------------
 {
-  return mafVME::SafeDownCast(GetLink("Point1VME"));
+  return GetLink("Point1VME");
 }
 //-------------------------------------------------------------------------
 mafVME *mafVMERefSys::GetPoint2VME()
 //-------------------------------------------------------------------------
 {
-  return mafVME::SafeDownCast(GetLink("Point2VME"));
+  return GetLink("Point2VME");
 }
 
 //----------------------------------------------------------------------------
@@ -692,7 +692,7 @@ bool mafVMERefSys::IsMovable()
 mafVME *mafVMERefSys::GetOriginVME()
 //-------------------------------------------------------------------------
 {
-  return mafVME::SafeDownCast(GetLink("OriginVME"));
+  return GetLink("OriginVME");
 }
 
 void mafVMERefSys::LogVector3( double *vector , const char *logMessage /*= NULL*/ )

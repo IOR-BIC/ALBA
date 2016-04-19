@@ -173,7 +173,7 @@ void mafViewSliceGlobal::UpdateText(int ID)
     if(m_ViewIndex == 2)
       numberOfSlices = m_NumberOfSlices[0];
 
-    mafVME *vme = mafVME::SafeDownCast(m_CurrentVolume->m_Vme);
+    mafVME *vme = m_CurrentVolume->GetVme();
     if(vme)
     {
       if(m_TextMode == SLICES_AND_FRAMES_LABEL)
@@ -222,7 +222,7 @@ void mafViewSliceGlobal::UpdateText(int ID)
 }
 
 //----------------------------------------------------------------------------
-void mafViewSliceGlobal::VmeCreatePipe(mafNode *vme)
+void mafViewSliceGlobal::VmeCreatePipe(mafVME *vme)
 //----------------------------------------------------------------------------
 { 
   Superclass::VmeCreatePipe(vme);
@@ -230,7 +230,6 @@ void mafViewSliceGlobal::VmeCreatePipe(mafNode *vme)
   m_GlobalBoundsValid = false; // new VME is shown into the view => Update the Global Bounds
   if (!m_GlobalBoundsInitialized)
   {
-    //((mafVME*)vme)->GetOutput()->GetVME4DBounds(m_GlobalBounds);
     UpdateBounds();
     UpdateSliceParameters();
   }
@@ -240,14 +239,14 @@ void mafViewSliceGlobal::VmeCreatePipe(mafNode *vme)
 }
 
 //----------------------------------------------------------------------------
-void mafViewSliceGlobal::VmeDeletePipe(mafNode *vme)
+void mafViewSliceGlobal::VmeDeletePipe(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   mafSceneNode *n = m_Sg->Vme2Node(vme);
 
 	m_NumberOfVisibleVme--;
 
-  if (((mafVME *)vme)->GetOutput()->IsA("mafVMEOutputVolume"))
+  if (vme->GetOutput()->IsA("mafVMEOutputVolume"))
   {
     if (m_CurrentVolume == n)
     {
@@ -286,7 +285,7 @@ mafGUI *mafViewSliceGlobal::CreateGui()
   m_Gui->Bool(ID_SHOW_TEXT, "Show text", &m_ShowText);
 
   bool Enable = false;
-  mafNode *selVME = m_Sg->GetSelectedVme();
+  mafVME *selVME = m_Sg->GetSelectedVme();
   if (m_CurrentVolume)
   {
     m_Gui->Enable(ID_OPACITY_SLIDER,true);
@@ -482,52 +481,22 @@ void mafViewSliceGlobal::ShowText(bool show)
 }
 
 //----------------------------------------------------------------------------
-void mafViewSliceGlobal::VmeSelect(mafNode *node,bool select)
+void mafViewSliceGlobal::VmeSelect(mafVME *vme,bool select)
 //----------------------------------------------------------------------------
 {
-  // Commented by Losi on 28/09/2010 to avoid wrong slice pose
-//   assert(m_Sg); 
-//   m_Sg->VmeSelect(node,select);
-//   if(select && m_Gui)
-//   {
-//     m_CurrentVolume = m_Sg->Vme2Node(node);
-//     if (m_CurrentVolume->m_Pipe)
-//     {
-//       m_Gui->Enable(ID_POS_SLIDER,true);
-//       if (mafVME::SafeDownCast(node)->GetOutput()->IsA("mafVMEOutputVolume"))
-//       {
-//         if(mafPipeVolumeSlice::SafeDownCast(m_CurrentVolume->m_Pipe))
-//         {
-//           m_Opacity = ((mafPipeVolumeSlice *)m_CurrentVolume->m_Pipe)->GetSliceOpacity();
-//           m_Gui->Enable(ID_OPACITY_SLIDER,true);
-//         }
-//         else if(mafPipeVolumeSlice_BES::SafeDownCast(m_CurrentVolume->m_Pipe))
-//         {
-//           m_Opacity = mafPipeVolumeSlice_BES::SafeDownCast(m_CurrentVolume->m_Pipe)->GetSliceOpacity();
-//           m_Gui->Enable(ID_OPACITY_SLIDER, true);
-//         }
-//       }
-//       m_Gui->Update();
-//     }
-//     else
-//     {
-//       m_Gui->Enable(ID_POS_SLIDER,false);
-//       m_Gui->Update();
-//     }
-//   }
 }
 
 //----------------------------------------------------------------------------
-void mafViewSliceGlobal::VmeShow(mafNode *node, bool show)
+void mafViewSliceGlobal::VmeShow(mafVME *vme, bool show)
 //----------------------------------------------------------------------------
 {
-  Superclass::VmeShow(node,show);
+  Superclass::VmeShow(vme,show);
 
-  m_CurrentVolume = m_Sg->Vme2Node(node);
+  m_CurrentVolume = m_Sg->Vme2Node(vme);
 
-  if(m_CurrentVolume && mafVME::SafeDownCast(m_CurrentVolume->m_Vme))
+  if(m_CurrentVolume && m_CurrentVolume->GetVme())
   {
-    vtkDataSet *dataSet = mafVME::SafeDownCast(m_CurrentVolume->m_Vme)->GetOutput()->GetVTKData();
+    vtkDataSet *dataSet =m_CurrentVolume->GetVme()->GetOutput()->GetVTKData();
 
     if(NULL!=dataSet)
     {
@@ -541,14 +510,14 @@ void mafViewSliceGlobal::VmeShow(mafNode *node, bool show)
       }
     }
 
-    m_NumberOfFrames = mafVME::SafeDownCast(m_CurrentVolume->m_Vme)->GetNumberOfLocalTimeStamps();
+    m_NumberOfFrames = m_CurrentVolume->GetVme()->GetNumberOfLocalTimeStamps();
 
 
 		mafPipe * curVolPipe = m_CurrentVolume->GetPipe();
     if (curVolPipe)
     {
       m_Gui->Enable(ID_POS_SLIDER,true);
-      if (((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume"))
+      if (vme->GetOutput()->IsA("mafVMEOutputVolume"))
       {
         if(mafPipeVolumeSlice::SafeDownCast(curVolPipe))
           m_Opacity   = ((mafPipeVolumeSlice *)curVolPipe)->GetSliceOpacity();
@@ -585,9 +554,9 @@ void mafViewSliceGlobal::Print(std::ostream& os, const int tabs)// const
 void mafViewSliceGlobal::CameraUpdate()
 //----------------------------------------------------------------------------
 {  
-  if (m_CurrentVolume &&  mafVMEVolumeGray::SafeDownCast(m_CurrentVolume->m_Vme))
+  if (m_CurrentVolume &&  mafVMEVolumeGray::SafeDownCast(m_CurrentVolume->GetVme()))
   {
-    mafVMEVolumeGray *volume = mafVMEVolumeGray::SafeDownCast(m_CurrentVolume->m_Vme);
+    mafVMEVolumeGray *volume = mafVMEVolumeGray::SafeDownCast(m_CurrentVolume->GetVme());
 
     std::ostringstream stringStream;
     stringStream << "VME " << volume->GetName() << " ABS matrix:" << std::endl;
@@ -701,12 +670,12 @@ void mafViewSliceGlobal::UpdateBounds()
 //----------------------------------------------------------------------------
 {
   mafOBB globalBounds;
-  for(mafSceneNode *n = m_Sg->GetNodeList(); n; n = n->m_Next)
+  for(mafSceneNode *n = m_Sg->GetNodeList(); n; n = n->GetNext())
   {
     if(n->GetPipe())
     {
       double b[6];
-      ((mafVME *)n->m_Vme)->GetOutput()->GetVTKData()->GetBounds(b);
+      n->GetVme()->GetOutput()->GetVTKData()->GetBounds(b);
       globalBounds.MergeBounds(mafOBB(b));
     }
   }
@@ -747,11 +716,10 @@ void mafViewSliceGlobal::SetSlice(double origin[3], float xVect[3], float yVect[
 }
 
 //-------------------------------------------------------------------------
-int mafViewSliceGlobal::GetNodeStatus(mafNode *vme)
+int mafViewSliceGlobal::GetNodeStatus(mafVME *vme)
 //-------------------------------------------------------------------------
 {
- 
-  return m_Sg ? m_Sg->GetNodeStatus(vme) : NODE_NON_VISIBLE;
+   return m_Sg ? m_Sg->GetNodeStatus(vme) : NODE_NON_VISIBLE;
 }
 
 //----------------------------------------------------------------------------
@@ -777,7 +745,7 @@ void mafViewSliceGlobal::SetSlice(double* Origin, double* Normal)
     m_LastSliceNormal[2] = m_SliceNormal[2];
   }
 
-  for(mafSceneNode *node = m_Sg->GetNodeList(); node; node=node->m_Next)
+  for(mafSceneNode *node = m_Sg->GetNodeList(); node; node=node->GetNext())
   {
 		mafPipe * pipe = node->GetPipe();
     if(pipe && (mafPipeVolumeSlice::SafeDownCast(pipe) || (mafPipeVolumeSlice_BES::SafeDownCast(pipe))))

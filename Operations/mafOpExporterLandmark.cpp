@@ -51,7 +51,7 @@ mafOpExporterLandmark::~mafOpExporterLandmark()
   m_LC_names.clear();
 }
 //----------------------------------------------------------------------------
-bool mafOpExporterLandmark::Accept(mafNode *node)   
+bool mafOpExporterLandmark::Accept(mafVME*node)   
 //----------------------------------------------------------------------------
 { 
   m_LC_vector.clear();
@@ -73,15 +73,15 @@ bool mafOpExporterLandmark::Accept(mafNode *node)
 	return result;
 }
 //----------------------------------------------------------------------------
-int mafOpExporterLandmark::FindLandmarkClouds(mafNode* node)   
+int mafOpExporterLandmark::FindLandmarkClouds(mafVME* node)   
 //----------------------------------------------------------------------------
 {
   int result = 0;
   // Get input and store all the landmark clouds in the sub-tree
-  const mafNode::mafChildrenVector* children = node->GetChildren();
+  const mafVME::mafChildrenVector* children = node->GetChildren();
   for(int i = 0; i < children->size(); i++)
   {
-    mafNode *child = children->at(i);
+    mafVME *child = children->at(i);
     if (child->IsA("mafVMELandmarkCloud"))
     {
       m_LC_vector.push_back((mafVMELandmarkCloud*)child);

@@ -32,7 +32,7 @@ class mafGUIHolder;
 class mafGUI;
 class mafGUIPanelStack;
 class mafGUIPanel;
-class mafNode;
+class mafVME;
 class mafView;
 class mafGUINamedPanel;
 class mafGUISplittedPanel;
@@ -55,23 +55,23 @@ public:
 
   // Description:
 	// Add a new vme into the tree.
-	void VmeAdd(mafNode *vme);
+	void VmeAdd(mafVME *vme);
 
 	// Description:
 	// Remove a vme from the tree.
-	void VmeRemove(mafNode *vme);
+	void VmeRemove(mafVME *vme);
 
 	// Description:
 	// Notify to the tree that a vme is modified.
-	void VmeModified(mafNode *vme);
+	void VmeModified(mafVME *vme);
 
 	// Description:
 	// Notify to the tree the visibility of the vme.
-	void VmeShow(mafNode *vme, bool visibility);
+	void VmeShow(mafVME *vme, bool visibility);
 
 	// Description:
 	// Notify to the tree that the vme has been selected.
-	void VmeSelected(mafNode *vme);
+	void VmeSelected(mafVME *vme);
 
 	// Description:
 	// Remove the vme property gui from the panel.
@@ -122,7 +122,7 @@ protected:
   mafGUIHolder  *m_VmePanel;
   mafGUIHolder  *m_VmePipePanel;
 
-  mafNode     *m_SelectedVme;
+  mafVME     *m_SelectedVme;
   mafView     *m_SelectedView;
   mafObserver *m_Listener;
 

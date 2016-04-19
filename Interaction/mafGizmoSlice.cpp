@@ -58,13 +58,13 @@
 
 
 //----------------------------------------------------------------------------
-mafGizmoSlice::mafGizmoSlice(mafNode* inputVme, mafObserver *Listener /* = NULL */, const char *name /* =  */, bool inverseHandle /* = false */, double centralClipfactor /* = 0 */)
+mafGizmoSlice::mafGizmoSlice(mafVME* inputVme, mafObserver *Listener /* = NULL */, const char *name /* =  */, bool inverseHandle /* = false */, double centralClipfactor /* = 0 */)
 //----------------------------------------------------------------------------
 {
   CreateGizmoSlice(inputVme, Listener, name, inverseHandle, centralClipfactor);
 }
 //----------------------------------------------------------------------------
-void mafGizmoSlice::CreateGizmoSlice(mafNode *imputVme, mafObserver *listener, const char *name, bool inverseHandle, double centralClipfactor)
+void mafGizmoSlice::CreateGizmoSlice(mafVME *imputVme, mafObserver *listener, const char *name, bool inverseHandle, double centralClipfactor)
 //----------------------------------------------------------------------------
 {
   m_Name = name;
@@ -74,7 +74,7 @@ void mafGizmoSlice::CreateGizmoSlice(mafNode *imputVme, mafObserver *listener, c
   m_Modality = G_LOCAL;
 
   // register the input vme
-  m_InputVME = mafVME::SafeDownCast(imputVme);
+  m_InputVME = imputVme;
 
   m_InverseHandle = inverseHandle;
 

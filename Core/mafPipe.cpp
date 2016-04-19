@@ -28,7 +28,7 @@
 #include "mafGUI.h"
 
 #include "mafPipe.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "vtkMAFAssembly.h"
 
 //----------------------------------------------------------------------------
@@ -57,15 +57,15 @@ void mafPipe::Create(mafSceneNode *n)
 {
   if (n != NULL)
   {
-	  m_Sg       = n->m_Sg;
-	  m_Vme			 = n->m_Vme->IsA("mafVME") ? ((mafVME*)n->m_Vme) : NULL;
+	  m_Sg       = n->GetSceneGraph();
+	  m_Vme			 = n->GetVme();
 	  
-	  m_AssemblyFront = n->m_AssemblyFront;
-	  m_AssemblyBack	= n->m_AssemblyBack;
-	  m_AlwaysVisibleAssembly = n->m_AlwaysVisibleAssembly;
-	  m_RenFront      = n->m_RenFront;
-	  m_RenBack       = n->m_RenBack;
-	  m_AlwaysVisibleRenderer = n->m_AlwaysVisibleRenderer;
+	  m_AssemblyFront = n->GetAssemblyFront();
+	  m_AssemblyBack	= n->GetAssemblyBack();
+	  m_AlwaysVisibleAssembly = n->GetAlwaysVisibleAssembly();
+	  m_RenFront      = n->GetRenFront();
+	  m_RenBack       = n->GetRenBack();
+	  m_AlwaysVisibleRenderer = n->GetAlwaysVisibleRenderer();
 	
 	  m_Selected = false;
   }

@@ -117,9 +117,8 @@ void mafPipeDensityDistanceTest::TestPipeExecution()
   
   //Assembly will be create when instancing mafSceneNode
   mafSceneNode *sceneNode;
-  sceneNode = new mafSceneNode(NULL,NULL,surface, NULL);
-  sceneNode->m_RenFront = m_Renderer;
-
+  sceneNode = new mafSceneNode(NULL,NULL,surface, m_Renderer);
+  
   /////////// Pipe Instance and Creation ///////////
   mafPipeDensityDistance *pipeDD = new mafPipeDensityDistance;
   pipeDD->SetVolume(volume);
@@ -149,7 +148,6 @@ void mafPipeDensityDistanceTest::TestPipeExecution()
   vtkDEL(actorList);
 
   delete pipeDD;
-  sceneNode->m_RenFront = NULL;
   delete sceneNode;
 
   mafDEL(surface);

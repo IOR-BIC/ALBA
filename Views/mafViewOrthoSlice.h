@@ -67,16 +67,16 @@ public:
 
   /** 
   Show/Hide VMEs into plugged sub-views*/
-  virtual void VmeShow(mafNode *node, bool show);
+  virtual void VmeShow(mafVME *vme, bool show);
 
   /** Remove Gizmos, Observers from the volume */
   void DestroyOrthoSlicesAndGizmos();
 
   /** generate gizmos and pose them in the right position*/
-  void CreateOrthoslicesAndGizmos( mafNode * node );
+  void CreateOrthoslicesAndGizmos(mafVME *vme);
 
   /** Remove VME into plugged sub-views*/
-  virtual void VmeRemove(mafNode *node);
+  virtual void VmeRemove(mafVME *vme);
 
   /** 
   Create visual pipe and initialize them to build an OrthoSlice visualization */
@@ -163,16 +163,16 @@ protected:
   void SetSlicePosition(long gizmoId, vtkPoints *p);
 
   /** Reset slice positions  */
-  void ResetSlicesPosition(mafNode *node);
+  void ResetSlicesPosition(mafVME *vme);
 
   /** process events regarding border thickness in the pipes*/
 	void OnEventSetThickness();
 
   /** set thickness value for all the pipes*/
-	void SetThicknessForAllSurfaceSlices(mafNode *root);
+	void SetThicknessForAllSurfaceSlices(mafVME *root);
 
   /** Apply View Setting in ChildViews*/
-  void ApplyViewSettings(mafNode *node);
+  void ApplyViewSettings(mafVME *vme);
 	
   int m_AllSurface;
 	double m_Border;
@@ -197,7 +197,7 @@ protected:
   int m_EnableGPU;
   int m_TrilinearInterpolationOn;
 
-  std::vector<mafNode*> m_VMElist; ///< VME List
+  std::vector<mafVME*> m_VMElist; ///< VME List
 
 };
 #endif

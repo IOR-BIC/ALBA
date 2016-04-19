@@ -30,9 +30,7 @@
 #include "mafPics.h"
 #include "mafGUIMDIFrame.h"
 
-#include "mafNodeFactory.h"
-#include "mafNodeGeneric.h"
-#include "mafNodeRoot.h"
+#include "mafVMEFactory.h"
 #include "mafVMERoot.h"
 #include "mafVMESurface.h"
 #include "mafPipeFactoryVME.h"

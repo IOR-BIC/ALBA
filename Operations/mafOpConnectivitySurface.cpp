@@ -74,7 +74,7 @@ mafOpConnectivitySurface::~mafOpConnectivitySurface()
 	m_ExtractedVmes.clear();
 }
 //----------------------------------------------------------------------------
-bool mafOpConnectivitySurface::Accept(mafNode *node)
+bool mafOpConnectivitySurface::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
   return (node && node->IsMAFType(mafVMESurface));
@@ -173,7 +173,7 @@ void mafOpConnectivitySurface::OpRun()
 //----------------------------------------------------------------------------
 {  	
 	vtkNEW(m_OriginalPolydata);
-	m_OriginalPolydata->DeepCopy((vtkPolyData*)((mafVME *)m_Input)->GetOutput()->GetVTKData());
+	m_OriginalPolydata->DeepCopy((vtkPolyData*)m_Input->GetOutput()->GetVTKData());
 	
 	// interface:
   if(!m_TestMode)

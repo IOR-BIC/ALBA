@@ -223,7 +223,6 @@ void mafPipeTensorFieldTest::TestCreate()
   }
 
   delete pipe;
-  sceneNode->m_RenFront = NULL;
   delete sceneNode;
   delete(rootscenenode);
 

@@ -87,24 +87,24 @@ public:
 
   /** 
   Add VME into plugged sub-views*/
-  virtual void VmeAdd(mafNode *node);
+  virtual void VmeAdd(mafVME *vme);
 
   /** 
   Remove VME into plugged sub-views*/
-  virtual void VmeRemove(mafNode *node);
-  virtual void VmeSelect(mafNode *node, bool select);
+  virtual void VmeRemove(mafVME *vme);
+  virtual void VmeSelect(mafVME *node, bool select);
   /** 
   Show/Hide VMEs into plugged sub-views*/
-  virtual void VmeShow(mafNode *node, bool show);
-	virtual void VmeUpdateProperty(mafNode *node, bool fromTag = false)		{};
+  virtual void VmeShow(mafVME *vme, bool show);
+	virtual void VmeUpdateProperty(mafVME *vme, bool fromTag = false)		{};
 
-  virtual void CameraReset(mafNode *node = NULL);
+  virtual void CameraReset(mafVME *vme = NULL);
   virtual void CameraUpdate();
 
   /** 
   return the status of the node within this view. es: NON_VISIBLE,VISIBLE_ON, ... 
   having mafViewCompound::GetNodeStatus allow mafGUICheckTree to not know about mafSceneGraph */
-  virtual int  GetNodeStatus(mafNode *vme);
+  virtual int  GetNodeStatus(mafVME *vme);
 
   virtual void OnSize(wxSizeEvent &event);
 
@@ -151,19 +151,7 @@ public:
   /** 
   Return the picked VME during the Pick method. Return NULL if VME is not found*/
   virtual mafVME *GetPickedVme();
-
-  /** 
-  Return the current pipe for the specified vme (if any exist at this moment) */
-//  virtual mafPipe*  GetNodePipe(mafNode *vme);
-
-  /** 
-  Return the GUI for the visual pipe corresponding to the default child view. */
-//  virtual mafGUI *GetNodePipeGUI(mafNode *vme);
-
-  /** 
-  Return the gui for the visual pipe corresponding to the n-th child view. */
-//  virtual mafGUI *GetNodePipeGUI(mafNode *vme, int view_idx);
-
+	  
   /** 
   Return the sub-view in which the mouse is interacting with.*/
   mafView *GetSubView();

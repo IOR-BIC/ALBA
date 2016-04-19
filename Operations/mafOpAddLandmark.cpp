@@ -134,7 +134,7 @@ mafOp* mafOpAddLandmark::Copy()
   return op;
 }
 //----------------------------------------------------------------------------
-bool mafOpAddLandmark::Accept(mafNode *node)
+bool mafOpAddLandmark::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
 	if (!node) return false;
@@ -177,18 +177,18 @@ void mafOpAddLandmark::OpRun()
 		{
 			// Add a new landmark to existent landmarkCloud
 			m_Cloud = (mafVMELandmarkCloud*)m_Input;
-			m_PickedVme = mafVME::SafeDownCast(m_Input->GetParent());
+			m_PickedVme = m_Input->GetParent();
 		}
 		else if (m_Input->IsMAFType(mafVMELandmark))
 		{
 			// Add a new landmark as brother of this one
 			m_Cloud = (mafVMELandmarkCloud *)m_Input->GetParent();
 			if (m_Cloud)
-				m_PickedVme = mafVME::SafeDownCast(m_Cloud->GetParent());
+				m_PickedVme = m_Cloud->GetParent();
 		}
 		else //if (m_Input->IsMAFType(mafVMESurface) || m_Input->IsMAFType(mafVMEVolumeGray) || m_Input->IsMAFType(mafVMESurfaceParametric))
 		{
-			m_PickedVme = mafVME::SafeDownCast(m_Input);
+			m_PickedVme = m_Input;
 
 			mafNEW(m_Cloud);
 
@@ -836,7 +836,7 @@ int mafOpAddLandmark::LoadLandmarksFromVME()
 
 	for (int i = 0; i < count; i++)
 	{
-		mafNode *node = m_Cloud->GetChild(i);
+		mafVME *node = m_Cloud->GetChild(i);
 
 		if (node->IsMAFType(mafVMELandmark) && !this->m_Cloud->FindInTreeByName(node->GetName()))
 		{

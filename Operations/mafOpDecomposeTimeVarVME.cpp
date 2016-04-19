@@ -30,7 +30,7 @@
 #include "mafGUIRollOut.h"
 #include "mafGUIListBox.h"
 
-#include "mafNodeIterator.h"
+#include "mafVMEIterator.h"
 #include "mafTagArray.h"
 
 #include "mafSmartPointer.h"
@@ -91,7 +91,7 @@ mafOp* mafOpDecomposeTimeVarVME::Copy()
 }
 
 //----------------------------------------------------------------------------
-bool mafOpDecomposeTimeVarVME::Accept(mafNode* node)
+bool mafOpDecomposeTimeVarVME::Accept(mafVME* node)
 //----------------------------------------------------------------------------
 {
   //Until VMEAnalog is non time varying
@@ -100,7 +100,7 @@ bool mafOpDecomposeTimeVarVME::Accept(mafNode* node)
     return false;
   }
 
-  return (node && ((mafVME *)node)->IsAnimated());
+  return (node && node->IsAnimated());
 }
 
 //----------------------------------------------------------------------------

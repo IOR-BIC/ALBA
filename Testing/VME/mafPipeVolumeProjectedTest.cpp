@@ -109,8 +109,7 @@ void mafPipeVolumeProjectedTest::TestPipeExecution()
   
   //Assembly will be create when instancing mafSceneNode
   mafSceneNode *sceneNode;
-  sceneNode = new mafSceneNode(NULL,NULL,volumeInput, NULL);
-  sceneNode->m_RenFront = m_Renderer;
+  sceneNode = new mafSceneNode(NULL,NULL,volumeInput, m_Renderer);
 
   for (int camera = CAMERA_RX_FRONT; camera <= CAMERA_RX_RIGHT; camera++)
   {
@@ -146,7 +145,6 @@ void mafPipeVolumeProjectedTest::TestPipeExecution()
     delete pipeProjected;
   }
    
-  sceneNode->m_RenFront = NULL;
   delete sceneNode;
 
   mafDEL(material);

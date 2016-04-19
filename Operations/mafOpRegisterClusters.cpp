@@ -115,10 +115,10 @@ mafOp* mafOpRegisterClusters::Copy()
 
 //----------------------------------------------------------------------------
 //Accept source landmark cloud (may not be time-variant).
-bool mafOpRegisterClusters::Accept(mafNode* node)
+bool mafOpRegisterClusters::Accept(mafVME* node)
 	//----------------------------------------------------------------------------
 {
-	if (!ClosedCloudAccept(node))
+	if (!LMCloudAccept(node))
 		return false;
 
 	//source may not be time-variant!
@@ -127,7 +127,7 @@ bool mafOpRegisterClusters::Accept(mafNode* node)
 
 //----------------------------------------------------------------------------
 //Callback for VME_CHOOSE that accepts Closed Landmarkclouds VMEs only.
-/*static*/ bool mafOpRegisterClusters::ClosedCloudAccept(mafNode* node)
+/*static*/ bool mafOpRegisterClusters::LMCloudAccept(mafVME* node)
 	//----------------------------------------------------------------------------
 {
 	return (mafVMELandmarkCloud::SafeDownCast(node));
@@ -135,7 +135,7 @@ bool mafOpRegisterClusters::Accept(mafNode* node)
 
 //----------------------------------------------------------------------------
 //Callback for VME_CHOOSE that accepts Surface VME only.
-/*static*/ bool mafOpRegisterClusters::SurfaceAccept(mafNode* node)
+/*static*/ bool mafOpRegisterClusters::SurfaceAccept(mafVME* node)
 	//----------------------------------------------------------------------------
 {
 	return (mafVMESurface::SafeDownCast(node) != NULL);
@@ -144,7 +144,7 @@ bool mafOpRegisterClusters::Accept(mafNode* node)
 //----------------------------------------------------------------------------
 //Set the input vme for the operation.
 //This method invalidates Weights, so specifying weights must be done after calling this method.
-/*virtual*/ void mafOpRegisterClusters::SetInput(mafNode* vme)
+/*virtual*/ void mafOpRegisterClusters::SetInput(mafVME* vme)
 	//----------------------------------------------------------------------------
 {
 	if (vme == m_Input || (vme != NULL && !Accept(vme)))
@@ -169,7 +169,7 @@ bool mafOpRegisterClusters::Accept(mafNode* node)
 /*virtual*/ void mafOpRegisterClusters::SetTarget(mafVMELandmarkCloud *target)
 	//----------------------------------------------------------------------------
 {
-	if (target == m_Target || (target != NULL && !ClosedCloudAccept(target)))
+	if (target == m_Target || (target != NULL && !LMCloudAccept(target)))
 		return;	//ignore this because it is either already specified input or it is not acceptable
 
 	if (NULL != (m_Target = target))
@@ -1007,10 +1007,10 @@ void mafOpRegisterClusters::OnChooseLandmarkCloud()
 	//----------------------------------------------------------------------------
 {
 	mafString s(_("Choose cloud"));
-	mafEvent e(this,VME_CHOOSE, &s, (long)&mafOpRegisterClusters::ClosedCloudAccept);
+	mafEvent e(this,VME_CHOOSE, &s, (long)&mafOpRegisterClusters::LMCloudAccept);
 	mafEventMacro(e);
 
-	mafNode *vme = e.GetVme();
+	mafVME *vme = e.GetVme();
 	OnChooseVme(vme);
 
 	if(vme != NULL) {
@@ -1027,12 +1027,12 @@ void mafOpRegisterClusters::OnChooseSurface()
 	mafEvent e(this,VME_CHOOSE, &s, (long)&mafOpRegisterClusters::SurfaceAccept);
 	mafEventMacro(e);
 
-	mafNode *vme = e.GetVme();
+	mafVME *vme = e.GetVme();
 	OnChooseVme(vme);
 }
 
 //----------------------------------------------------------------------------
-void mafOpRegisterClusters::OnChooseVme(mafNode *vme)
+void mafOpRegisterClusters::OnChooseVme(mafVME *vme)
 	//----------------------------------------------------------------------------
 {
 	if(vme == NULL) // user choose cancel - keep everything as before

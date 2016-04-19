@@ -60,7 +60,7 @@ mafOp* mafOpCreateLabeledVolume::Copy()
 	return new mafOpCreateLabeledVolume(m_Label);
 }
 //----------------------------------------------------------------------------
-bool mafOpCreateLabeledVolume::Accept(mafNode *node)
+bool mafOpCreateLabeledVolume::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
   return (node && node->IsMAFType(mafVMEVolumeGray));

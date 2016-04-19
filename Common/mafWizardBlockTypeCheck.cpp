@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include "mafDecl.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafWizardBlockTypeCheck.h"
 
 

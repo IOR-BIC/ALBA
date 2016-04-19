@@ -117,7 +117,7 @@ mafOp* mafOpFlipNormals::Copy()
 	return new mafOpFlipNormals(m_Label);
 }
 //----------------------------------------------------------------------------
-bool mafOpFlipNormals::Accept(mafNode* vme)
+bool mafOpFlipNormals::Accept(mafVME* vme)
 //----------------------------------------------------------------------------
 {
 	return vme != NULL && vme->IsMAFType(mafVMESurface);
@@ -127,10 +127,10 @@ void mafOpFlipNormals::OpRun()
 //----------------------------------------------------------------------------
 {
 
-	if(!((vtkPolyData*)((mafVME *)m_Input)->GetOutput()->GetVTKData()->GetCellData()->GetNormals()))
+	if(!((vtkPolyData*)m_Input->GetOutput()->GetVTKData()->GetCellData()->GetNormals()))
 	{
 		vtkMAFSmartPointer<vtkPolyDataNormals> normalFilter;
-		normalFilter->SetInput((vtkPolyData*)((mafVME *)m_Input)->GetOutput()->GetVTKData());
+		normalFilter->SetInput((vtkPolyData*)m_Input->GetOutput()->GetVTKData());
 
 		normalFilter->ComputeCellNormalsOn();
 		normalFilter->SplittingOff();
@@ -138,14 +138,14 @@ void mafOpFlipNormals::OpRun()
 		normalFilter->SetFeatureAngle(30);
 		normalFilter->Update();
 
-		((vtkPolyData*)((mafVME *)m_Input)->GetOutput()->GetVTKData())->DeepCopy(normalFilter->GetOutput());
+		((vtkPolyData*)m_Input->GetOutput()->GetVTKData())->DeepCopy(normalFilter->GetOutput());
 	}
 
 	vtkNEW(m_ResultPolydata);
-	m_ResultPolydata->DeepCopy((vtkPolyData*)((mafVME *)m_Input)->GetOutput()->GetVTKData());
+	m_ResultPolydata->DeepCopy((vtkPolyData*)m_Input->GetOutput()->GetVTKData());
 
 	vtkNEW(m_OriginalPolydata);
-	m_OriginalPolydata->DeepCopy((vtkPolyData*)((mafVME *)m_Input)->GetOutput()->GetVTKData());
+	m_OriginalPolydata->DeepCopy((vtkPolyData*)m_Input->GetOutput()->GetVTKData());
 
 	int result = OP_RUN_CANCEL;
 
@@ -177,14 +177,14 @@ void mafOpFlipNormals::OpRun()
 void mafOpFlipNormals::OpDo()
 //----------------------------------------------------------------------------
 {
-	((mafVMESurface *)m_Input)->SetData(m_ResultPolydata,((mafVME *)m_Input)->GetTimeStamp());
+	((mafVMESurface *)m_Input)->SetData(m_ResultPolydata,m_Input->GetTimeStamp());
 	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
 void mafOpFlipNormals::OpUndo()
 //----------------------------------------------------------------------------
 {
-	((mafVMESurface *)m_Input)->SetData(m_OriginalPolydata,((mafVME *)m_Input)->GetTimeStamp());
+	((mafVMESurface *)m_Input)->SetData(m_OriginalPolydata,m_Input->GetTimeStamp());
 	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
@@ -223,7 +223,7 @@ void mafOpFlipNormals::CreateOpDialog()
 	m_Rwi->m_RenFront->AddActor(m_PolydataActor);
 	m_Rwi->m_RenFront->AddActor(m_NormalActor);
 
-	vtkPolyData *polydata = vtkPolyData::SafeDownCast(((mafVME *)m_Input)->GetOutput()->GetVTKData());
+	vtkPolyData *polydata = vtkPolyData::SafeDownCast(m_Input->GetOutput()->GetVTKData());
 
 	double bounds[6] = {0,0,0,0,0,0};
 	polydata->GetBounds(bounds);
@@ -401,7 +401,7 @@ void mafOpFlipNormals::OnEvent(mafEventBase *maf_event)
 
 		case ID_FIT:
 			{
-				vtkPolyData *polydata = vtkPolyData::SafeDownCast(((mafVME *)m_Input)->GetOutput()->GetVTKData());
+				vtkPolyData *polydata = vtkPolyData::SafeDownCast(m_Input->GetOutput()->GetVTKData());
 
 				double bounds[6] = {0,0,0,0,0,0};
 				polydata->GetBounds(bounds);
@@ -637,7 +637,7 @@ void mafOpFlipNormals::MarkCellsInRadius(double radius)
 	vtkIdType i;
 	vtkIdType numPts, numCells;
 	vtkPoints *inPts;
-	vtkPolyData *polydata = vtkPolyData::SafeDownCast(((mafVME *)m_Input)->GetOutput()->GetVTKData());
+	vtkPolyData *polydata = vtkPolyData::SafeDownCast(m_Input->GetOutput()->GetVTKData());
 
 	//  Check input/allocate storage
 	//
@@ -742,7 +742,7 @@ void mafOpFlipNormals::InitializeMesh()
 	// Build cell structure
 	//
 	vtkNEW(m_Mesh);
-	vtkPolyData *polydata = vtkPolyData::SafeDownCast(((mafVME *)m_Input)->GetOutput()->GetVTKData());
+	vtkPolyData *polydata = vtkPolyData::SafeDownCast(m_Input->GetOutput()->GetVTKData());
 	assert(polydata);
 
 	this->m_Mesh->CopyStructure(polydata);

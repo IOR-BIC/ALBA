@@ -41,7 +41,7 @@ public:
   mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */
-  bool Accept(mafNode* node) {return true;};
+  bool Accept(mafVME* node) {return true;};
 
   /** Set the External filename to be imported. 
   This is used when the operation is executed not using user interface. */

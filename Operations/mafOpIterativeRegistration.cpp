@@ -92,7 +92,7 @@ mafOp* mafOpIterativeRegistration::Copy()
   return (new mafOpIterativeRegistration(m_Label));
 }
 //----------------------------------------------------------------------------
-bool mafOpIterativeRegistration::Accept(mafNode *node)
+bool mafOpIterativeRegistration::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
   if (!node) return false;
@@ -117,7 +117,7 @@ void mafOpIterativeRegistration::OpRun()
   m_UndoSourceAbsPose = vtkMatrix4x4::New();
   m_RegistrationMatrix = vtkMatrix4x4::New();
 
-  m_SourceVME = mafVME::SafeDownCast(m_Input);
+  m_SourceVME = m_Input;
   m_RegistrationMatrix->DeepCopy(m_SourceVME->GetAbsMatrixPipe()->GetMatrixPointer()->GetVTKMatrix());
 
   // store source abs pose for undo
@@ -125,7 +125,7 @@ void mafOpIterativeRegistration::OpRun()
 
   assert(m_Input);
 //  m_CurrentTime = m_Input->GetCurrentTime();
-  m_CurrentTime = mafVME::SafeDownCast(m_Input)->GetTimeStamp();
+  m_CurrentTime = m_Input->GetTimeStamp();
   
   
   m_SourceVmeName = m_Input->GetName();  
@@ -276,7 +276,7 @@ void mafOpIterativeRegistration::OnEventThis(mafEventBase *maf_event)
       mafString title = _("Choose target vme");
       mafEvent e(this,VME_CHOOSE,&title,(long)&mafGUILandmark::VmeAccept);
       mafEventMacro(e); 
-      m_TargetVME = mafVME::SafeDownCast(e.GetVme());
+      m_TargetVME = e.GetVme();
       if (m_TargetVME)
       {
         m_GuiLandmark[TARGET]->SetInputVME(m_TargetVME);

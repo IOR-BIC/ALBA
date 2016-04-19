@@ -181,7 +181,7 @@ void mafVMEMapsTest::TestGetMappedVMELink()
 
   CreateVMEMaps();
 
-  mafNode *mappedVME = m_Maps->GetMappedVMELink();
+  mafVME *mappedVME = m_Maps->GetMappedVMELink();
 
   CPPUNIT_ASSERT(mafVMESurface::SafeDownCast(mappedVME));
   CPPUNIT_ASSERT(mappedVME == m_SurfaceToMap);
@@ -194,7 +194,7 @@ void mafVMEMapsTest::TestGetSourceVMELink()
 {
   CreateVMEMaps();
 
-  mafNode *sourceVME = m_Maps->GetSourceVMELink();
+  mafVME *sourceVME = m_Maps->GetSourceVMELink();
 
   CPPUNIT_ASSERT(mafVMEVolume::SafeDownCast(sourceVME));
   CPPUNIT_ASSERT(sourceVME == m_Volume);

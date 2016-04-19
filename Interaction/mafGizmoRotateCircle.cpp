@@ -101,7 +101,7 @@ mafGizmoRotateCircle::mafGizmoRotateCircle(mafVME *input, mafObserver *listener,
   SetRefSysMatrix(m_AbsInputMatrix);
 
   // add the gizmo to the tree, this should increase reference count  
-  m_GizmoCircle->ReparentTo(mafVME::SafeDownCast(m_InputVme->GetRoot()));
+  m_GizmoCircle->ReparentTo(m_InputVme->GetRoot());
 
 }
 //----------------------------------------------------------------------------

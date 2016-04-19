@@ -44,7 +44,7 @@
 #include "mafDataVector.h"
 #include "mafTagArray.h"
 #include "mafTagItem.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafVMEGenericAbstract.h"
 
 //------------------------------------------------------------------------------
@@ -367,7 +367,7 @@ void mafOpManager::SetAccelerator(mafOp *op)
   }
 }
 //----------------------------------------------------------------------------
-void mafOpManager::VmeSelected(mafNode* v)   
+void mafOpManager::VmeSelected(mafVME* v)   
 //----------------------------------------------------------------------------
 {
   m_Selected = v;
@@ -375,20 +375,20 @@ void mafOpManager::VmeSelected(mafNode* v)
 }
 
 //----------------------------------------------------------------------------
-void mafOpManager::VmeModified(mafNode* v)
+void mafOpManager::VmeModified(mafVME* v)
 {
 	if(m_Selected == v)
 		EnableOp();
 }
 
 //----------------------------------------------------------------------------
-mafNode* mafOpManager::GetSelectedVme()
+mafVME* mafOpManager::GetSelectedVme()
 //----------------------------------------------------------------------------
 {
 	return m_Selected;
 }
 //----------------------------------------------------------------------------
-void mafOpManager::OpSelect(mafNode* vme)
+void mafOpManager::OpSelect(mafVME* vme)
 //----------------------------------------------------------------------------
 {
 	if(vme == m_Selected ) 
@@ -537,16 +537,16 @@ void mafOpManager::OpRun(int op_id)
     {
       if (WarnUser(NULL))
       {
-        mafNode *node_to_del = m_Selected;
+        mafVME *node_to_del = m_Selected;
         OpSelect(m_Selected->GetParent());
 
         // do not remove binary files but fill a list with files to be deleted on save by the storage.
         mafEventIO e(this,NODE_GET_STORAGE);
         node_to_del->ForwardUpEvent(e);
         mafStorage *storage = e.GetStorage();
-        mafNodeIterator *iter = node_to_del->NewIterator();
+        mafVMEIterator *iter = node_to_del->NewIterator();
         mafString data_filename;
-        for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+        for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
         {
           if(mafVMEGenericAbstract::SafeDownCast(node))
           {
@@ -626,7 +626,7 @@ void mafOpManager::OpRun(mafOp *op, void *op_param)
 		if(dialog.ShowModal() == wxID_YES)
     {
       wxString synthetic_name = "Copied ";
-      mafAutoPointer<mafNode> synthetic_vme = m_Selected->MakeCopy();
+      mafAutoPointer<mafVME> synthetic_vme = m_Selected->MakeCopy();
       synthetic_vme->ReparentTo(m_Selected->GetParent());
       synthetic_name.Append(m_Selected->GetName());
       synthetic_vme->SetName(synthetic_name);
@@ -728,8 +728,8 @@ void mafOpManager::OpDo(mafOp *op)
 {
   m_Context.Redo_Clear();
   op->OpDo();
-  mafNode *in_node = op->GetInput();
-  mafNode *out_node = op->GetOutput();
+  mafVME *in_node = op->GetInput();
+  mafVME *out_node = op->GetOutput();
 
   if (in_node != NULL)
   {
@@ -766,7 +766,7 @@ void mafOpManager::SetMafUser(mafUser *user)
 }
 
 //----------------------------------------------------------------------------
-void mafOpManager::FillTraceabilityAttribute(mafOp *op, mafNode *in_node, mafNode *out_node)
+void mafOpManager::FillTraceabilityAttribute(mafOp *op, mafVME *in_node, mafVME *out_node)
 //----------------------------------------------------------------------------
 {
   mafString trialEvent = "Modify";
@@ -830,8 +830,8 @@ void mafOpManager::FillTraceabilityAttribute(mafOp *op, mafNode *in_node, mafNod
   {
     int c = 0; //counter not to write single parameter on first VME which is a group
     wxString singleParameter = parameters.GetCStr();
-    mafNodeIterator *iter = out_node->NewIterator();
-    for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+    mafVMEIterator *iter = out_node->NewIterator();
+    for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
     {
       if (node != NULL)
       {
@@ -895,8 +895,8 @@ void mafOpManager::OpUndo()
 	EnableOp(false);
 
 	mafOp* op = m_Context.Undo_Pop();
-  mafNode *in_node = op->GetInput();
-  mafNode *out_node = op->GetOutput();
+  mafVME *in_node = op->GetInput();
+  mafVME *out_node = op->GetOutput();
   if (in_node != NULL)
   {
     mafLogMessage("undo = %s on input data: %s",op->m_Label.c_str(), in_node->GetName());
@@ -916,8 +916,8 @@ void mafOpManager::OpUndo()
 
   if (out_node != NULL)
   {
-    mafNodeIterator *iter = out_node->NewIterator();
-    for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+    mafVMEIterator *iter = out_node->NewIterator();
+    for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
     {
       if (node != NULL)
       {
@@ -948,8 +948,8 @@ void mafOpManager::OpRedo()
 	EnableOp(false);
 
 	mafOp* op = m_Context.Redo_Pop();
-  mafNode *in_node = op->GetInput();
-  mafNode *out_node = op->GetOutput();
+  mafVME *in_node = op->GetInput();
+  mafVME *out_node = op->GetOutput();
   mafString parameters = op->GetParameters();
   if (in_node != NULL)
   {

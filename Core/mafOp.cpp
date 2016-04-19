@@ -28,7 +28,7 @@
 #include "mafSmartPointer.h"
 #include "mafGUI.h"
 #include "mafGUIHolder.h"
-#include "mafNode.h"
+#include "mafVME.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafOp);
@@ -89,7 +89,7 @@ void mafOp::OnEvent(mafEventBase *maf_event)
 	mafEventMacro(*maf_event);
 }
 //----------------------------------------------------------------------------
-bool mafOp::Accept(mafNode* vme)
+bool mafOp::Accept(mafVME*vme)
 //----------------------------------------------------------------------------
 {
   return false;
@@ -106,7 +106,6 @@ void mafOp::OpDo()
   if (m_Output)
   {
     m_Output->ReparentTo(m_Input);
-    //mafEventMacro(mafEvent(this, VME_ADD, m_Output));
     mafEventMacro(mafEvent(this,CAMERA_UPDATE));
   }
 }

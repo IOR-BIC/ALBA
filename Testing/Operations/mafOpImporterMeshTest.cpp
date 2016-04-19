@@ -32,8 +32,8 @@
 #include "mafVMERoot.h"
 #include "mafVMEStorage.h"
 #include "mafVMEMesh.h"
-#include "mafNode.h"
-#include "mafNodeIterator.h"
+#include "mafVME.h"
+#include "mafVMEIterator.h"
 
 #include "mafSmartPointer.h"
 #include "vtkMAFSmartPointer.h"
@@ -70,7 +70,7 @@ void mafOpImporterMeshTest::TestImportGenericMesh()
 
   meshImporter->Read();
 
-  mafNode *node=meshImporter->GetOutput();
+  mafVME *node=meshImporter->GetOutput();
 
   CPPUNIT_ASSERT(node->IsA("mafVMEMesh"));
   vtkDataSet* data;

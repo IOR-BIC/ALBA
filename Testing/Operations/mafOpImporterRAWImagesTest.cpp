@@ -57,7 +57,7 @@ void mafOpImporterRAWImagesTest::Test()
 	Importer->OnStringPrefix();
 	Importer->CreateGui();
 
-	mafVME *VME=mafVME::SafeDownCast(Importer->GetOutput());
+	mafVME *VME=Importer->GetOutput();
 	VME->Update();
 
 	CPPUNIT_ASSERT(VME->IsA("mafVMEVolumeGray"));

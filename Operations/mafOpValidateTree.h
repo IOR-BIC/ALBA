@@ -25,7 +25,7 @@ using namespace std;
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mafNode;
+class mafVME;
 
 //----------------------------------------------------------------------------
 // mafOpValidateTree :
@@ -78,7 +78,7 @@ public:
   mafOp* Copy();
 
   /** This operation accept everything as input.*/
-  bool Accept(mafNode *node) {return true;};
+  bool Accept(mafVME*node) {return true;};
 
   /** Create the user interface and initialize variables.*/
   void OpRun();

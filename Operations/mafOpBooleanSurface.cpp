@@ -105,7 +105,7 @@ mafOpBooleanSurface::~mafOpBooleanSurface()
   mafDEL(m_ResultVME);
 }
 //----------------------------------------------------------------------------
-bool mafOpBooleanSurface::Accept(mafNode *node)
+bool mafOpBooleanSurface::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
 	return (node && (node->IsMAFType(mafVMESurface))); //|| node->IsMAFType(mafVMESurfaceParametric)));
@@ -139,11 +139,11 @@ void mafOpBooleanSurface::OpRun()
   //creation of vme result
   mafNEW(m_ResultVME);
 	vtkMAFSmartPointer<vtkPolyData> poly;
-	poly->DeepCopy((vtkPolyData*)((mafVME*)m_Input)->GetOutput()->GetVTKData());
-  m_ResultVME->SetData(poly,((mafVME*)m_Input)->GetTimeStamp());
+	poly->DeepCopy((vtkPolyData*)m_Input->GetOutput()->GetVTKData());
+  m_ResultVME->SetData(poly,m_Input->GetTimeStamp());
   mafString name = _("bool_");
   name << m_Input->GetName();
-  m_ResultVME->SetAbsMatrix(*((mafVME*)m_Input)->GetOutput()->GetAbsMatrix());
+  m_ResultVME->SetAbsMatrix(*m_Input->GetOutput()->GetAbsMatrix());
   m_ResultVME->SetName(name);
   m_ResultVME->Modified();
   m_ResultVME->Update();
@@ -315,7 +315,7 @@ void mafOpBooleanSurface::Clip()
 //----------------------------------------------------------------------------
 {
 	vtkMatrix4x4 *mat = vtkMatrix4x4::New();
-	mat->DeepCopy(((mafVME *)m_Input)->GetAbsMatrixPipe()->GetMatrixPointer()->GetVTKMatrix());
+	mat->DeepCopy(m_Input->GetAbsMatrixPipe()->GetMatrixPointer()->GetVTKMatrix());
 	mat->Invert();
 	mat->Modified();
 
@@ -376,7 +376,7 @@ void mafOpBooleanSurface::Undo()
 	{
 		vtkDEL(m_VTKResult[m_VTKResult.size()-1]);
 		m_VTKResult.pop_back();
-		m_FirstOperatorVME->SetData((vtkPolyData*)m_VTKResult[m_VTKResult.size()-1],((mafVME*)m_Input)->GetTimeStamp());
+		m_FirstOperatorVME->SetData((vtkPolyData*)m_VTKResult[m_VTKResult.size()-1],m_Input->GetTimeStamp());
 	}
 	m_Gui->Enable(ID_UNDO,m_VTKResult.size()>1);
 	m_Gui->Enable(wxOK,m_VTKResult.size()>1);
@@ -392,13 +392,13 @@ void mafOpBooleanSurface::Union()
 		if(dataFirstOperator && dataSecondOperator)
 		{
 			vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformFirstDataInput;
-			transformFirstDataInput->SetTransform((vtkAbstractTransform *)((mafVME *)m_FirstOperatorVME)->GetAbsMatrixPipe()->GetVTKTransform());
-			transformFirstDataInput->SetInput((vtkPolyData *)((mafVME *)m_FirstOperatorVME)->GetOutput()->GetVTKData());
+			transformFirstDataInput->SetTransform((vtkAbstractTransform *)m_FirstOperatorVME->GetAbsMatrixPipe()->GetVTKTransform());
+			transformFirstDataInput->SetInput((vtkPolyData *)m_FirstOperatorVME->GetOutput()->GetVTKData());
 			transformFirstDataInput->Update();
 
 			vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformSecondDataInput;
-			transformSecondDataInput->SetTransform((vtkAbstractTransform *)((mafVME *)m_SecondOperatorVME)->GetAbsMatrixPipe()->GetVTKTransform());
-			transformSecondDataInput->SetInput((vtkPolyData *)((mafVME *)m_SecondOperatorVME)->GetOutput()->GetVTKData());
+			transformSecondDataInput->SetTransform((vtkAbstractTransform *)m_SecondOperatorVME->GetAbsMatrixPipe()->GetVTKTransform());
+			transformSecondDataInput->SetInput((vtkPolyData *)m_SecondOperatorVME->GetOutput()->GetVTKData());
 			transformSecondDataInput->Update();
 
 			//Union
@@ -409,7 +409,7 @@ void mafOpBooleanSurface::Union()
 			//End Union
 
 			vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformResultDataInput;
-			transformResultDataInput->SetTransform((vtkAbstractTransform *)((mafVME *)m_FirstOperatorVME)->GetAbsMatrixPipe()->GetVTKTransform()->GetInverse());
+			transformResultDataInput->SetTransform((vtkAbstractTransform *)m_FirstOperatorVME->GetAbsMatrixPipe()->GetVTKTransform()->GetInverse());
 			transformResultDataInput->SetInput(append->GetOutput());
 			transformResultDataInput->Update();
 
@@ -423,7 +423,7 @@ void mafOpBooleanSurface::Union()
 		{
 			return;
 		}
-		m_FirstOperatorVME->SetData((vtkPolyData*)m_VTKResult[m_VTKResult.size()-1],((mafVME*)m_Input)->GetTimeStamp());
+		m_FirstOperatorVME->SetData((vtkPolyData*)m_VTKResult[m_VTKResult.size()-1],m_Input->GetTimeStamp());
 		if(!m_TestMode)
 		{
 			m_Gui->Enable(ID_UNDO,true);
@@ -444,14 +444,14 @@ void mafOpBooleanSurface::Intersection()
 		{
 			vtkTransformPolyDataFilter *transformFirstDataInput;
 			vtkNEW(transformFirstDataInput);
-			transformFirstDataInput->SetTransform((vtkAbstractTransform *)((mafVME *)m_FirstOperatorVME)->GetAbsMatrixPipe()->GetVTKTransform());
-			transformFirstDataInput->SetInput((vtkPolyData *)((mafVME *)m_FirstOperatorVME)->GetOutput()->GetVTKData());
+			transformFirstDataInput->SetTransform((vtkAbstractTransform *)m_FirstOperatorVME->GetAbsMatrixPipe()->GetVTKTransform());
+			transformFirstDataInput->SetInput((vtkPolyData *)m_FirstOperatorVME->GetOutput()->GetVTKData());
 			transformFirstDataInput->Update();
 
 			vtkTransformPolyDataFilter *transformSecondDataInput;
 			vtkNEW(transformSecondDataInput);
-			transformSecondDataInput->SetTransform((vtkAbstractTransform *)((mafVME *)m_SecondOperatorVME)->GetAbsMatrixPipe()->GetVTKTransform());
-			transformSecondDataInput->SetInput((vtkPolyData *)((mafVME *)m_SecondOperatorVME)->GetOutput()->GetVTKData());
+			transformSecondDataInput->SetTransform((vtkAbstractTransform *)m_SecondOperatorVME->GetAbsMatrixPipe()->GetVTKTransform());
+			transformSecondDataInput->SetInput((vtkPolyData *)m_SecondOperatorVME->GetOutput()->GetVTKData());
 			transformSecondDataInput->Update();
 
 			//Intersection
@@ -488,7 +488,7 @@ void mafOpBooleanSurface::Intersection()
 
 			vtkTransformPolyDataFilter *transformResultDataInput;
 			vtkNEW(transformResultDataInput);
-			transformResultDataInput->SetTransform((vtkAbstractTransform *)((mafVME *)m_FirstOperatorVME)->GetAbsMatrixPipe()->GetVTKTransform()->GetInverse());
+			transformResultDataInput->SetTransform((vtkAbstractTransform *)m_FirstOperatorVME->GetAbsMatrixPipe()->GetVTKTransform()->GetInverse());
 			transformResultDataInput->SetInput(clipper->GetOutput());
 			transformResultDataInput->Update();
 
@@ -497,7 +497,7 @@ void mafOpBooleanSurface::Intersection()
 			resultPolydata->DeepCopy(transformResultDataInput->GetOutput());
 			resultPolydata->Update();
 
-			int result=m_FirstOperatorVME->SetData(resultPolydata,((mafVME*)m_Input)->GetTimeStamp());
+			int result=m_FirstOperatorVME->SetData(resultPolydata,m_Input->GetTimeStamp());
 
 			if(result == MAF_ERROR)
 			{
@@ -541,8 +541,8 @@ void mafOpBooleanSurface::ShowClipPlane(bool show)
 			mafNEW(m_ImplicitPlaneGizmo);
 		}
 			double b[6];
-			((mafVME *)m_Input)->Update();
-			((mafVME *)m_Input)->GetOutput()->GetVMEBounds(b);
+			m_Input->Update();
+			m_Input->GetOutput()->GetVMEBounds(b);
 
 			// bounding box dim
 			double xdim = (b[1] - b[0])*3/2;
@@ -581,7 +581,7 @@ void mafOpBooleanSurface::ShowClipPlane(bool show)
 			//mafNEW(m_ImplicitPlaneGizmo);
 			m_ImplicitPlaneGizmo->SetData(gizmo->GetOutput());
 			m_ImplicitPlaneGizmo->SetName("implicit plane gizmo");
-			m_ImplicitPlaneGizmo->ReparentTo(mafVME::SafeDownCast(m_Input->GetRoot()));
+			m_ImplicitPlaneGizmo->ReparentTo(m_Input->GetRoot());
 
 			// position the plane
 			mafSmartPointer<mafTransform> currTr;
@@ -590,7 +590,7 @@ void mafOpBooleanSurface::ShowClipPlane(bool show)
 
 			mafMatrix mat;
 			mat.DeepCopy(&currTr->GetMatrix());
-			mat.SetTimeStamp(((mafVME *)m_Input)->GetTimeStamp());
+			mat.SetTimeStamp(m_Input->GetTimeStamp());
 
 			m_ImplicitPlaneGizmo->SetAbsMatrix(mat);
 			m_ImplicitPlaneGizmo->Modified();
@@ -664,14 +664,14 @@ void mafOpBooleanSurface::Difference()
 		{
 			vtkTransformPolyDataFilter *transformFirstDataInput;
 			vtkNEW(transformFirstDataInput);
-			transformFirstDataInput->SetTransform((vtkAbstractTransform *)((mafVME *)m_FirstOperatorVME)->GetAbsMatrixPipe()->GetVTKTransform());
-			transformFirstDataInput->SetInput((vtkPolyData *)((mafVME *)m_FirstOperatorVME)->GetOutput()->GetVTKData());
+			transformFirstDataInput->SetTransform((vtkAbstractTransform *)m_FirstOperatorVME->GetAbsMatrixPipe()->GetVTKTransform());
+			transformFirstDataInput->SetInput((vtkPolyData *)m_FirstOperatorVME->GetOutput()->GetVTKData());
 			transformFirstDataInput->Update();
 
 			vtkTransformPolyDataFilter *transformSecondDataInput;
 			vtkNEW(transformSecondDataInput);
-			transformSecondDataInput->SetTransform((vtkAbstractTransform *)((mafVME *)m_SecondOperatorVME)->GetAbsMatrixPipe()->GetVTKTransform());
-			transformSecondDataInput->SetInput((vtkPolyData *)((mafVME *)m_SecondOperatorVME)->GetOutput()->GetVTKData());
+			transformSecondDataInput->SetTransform((vtkAbstractTransform *)m_SecondOperatorVME->GetAbsMatrixPipe()->GetVTKTransform());
+			transformSecondDataInput->SetInput((vtkPolyData *)m_SecondOperatorVME->GetOutput()->GetVTKData());
 			transformSecondDataInput->Update();
 
 			//Intersection
@@ -708,7 +708,7 @@ void mafOpBooleanSurface::Difference()
 
 			vtkTransformPolyDataFilter *transformResultDataInput;
 			vtkNEW(transformResultDataInput);
-			transformResultDataInput->SetTransform((vtkAbstractTransform *)((mafVME *)m_FirstOperatorVME)->GetAbsMatrixPipe()->GetVTKTransform()->GetInverse());
+			transformResultDataInput->SetTransform((vtkAbstractTransform *)m_FirstOperatorVME->GetAbsMatrixPipe()->GetVTKTransform()->GetInverse());
 			transformResultDataInput->SetInput(clipper->GetOutput());
 			transformResultDataInput->Update();
 
@@ -716,7 +716,7 @@ void mafOpBooleanSurface::Difference()
 			vtkNEW(resultPolydata);
 			resultPolydata->DeepCopy(transformResultDataInput->GetOutput());
 
-			int result=m_FirstOperatorVME->SetData(resultPolydata,((mafVME*)m_Input)->GetTimeStamp());
+			int result=m_FirstOperatorVME->SetData(resultPolydata,m_Input->GetTimeStamp());
 			if(result == MAF_ERROR)
 			{
 				mafMessage(_("The result surface hasn't any points"),_("Warning"),wxICON_EXCLAMATION);
@@ -757,12 +757,12 @@ void mafOpBooleanSurface::VmeChoose(mafString title,mafEvent *e)
 	if(m_SecondOperatorVME == NULL && mafVMESurfaceParametric::SafeDownCast(e->GetVme()) != NULL)
   {
     vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformSecondDataInput;
-    transformSecondDataInput->SetTransform((vtkAbstractTransform *)((mafVME *)e->GetVme())->GetAbsMatrixPipe()->GetVTKTransform());
-    transformSecondDataInput->SetInput((vtkPolyData *)((mafVME *)e->GetVme())->GetOutput()->GetVTKData());
+    transformSecondDataInput->SetTransform((vtkAbstractTransform *)e->GetVme()->GetAbsMatrixPipe()->GetVTKTransform());
+    transformSecondDataInput->SetInput((vtkPolyData *)e->GetVme()->GetOutput()->GetVTKData());
     transformSecondDataInput->Update();
 
     mafNEW(m_SecondOperatorFromParametric);
-    m_SecondOperatorFromParametric->SetData(transformSecondDataInput->GetOutput(), ((mafVME*)m_Input)->GetTimeStamp());
+    m_SecondOperatorFromParametric->SetData(transformSecondDataInput->GetOutput(), m_Input->GetTimeStamp());
     m_SecondOperatorFromParametric->Update();
 
     m_SecondOperatorVME = m_SecondOperatorFromParametric;

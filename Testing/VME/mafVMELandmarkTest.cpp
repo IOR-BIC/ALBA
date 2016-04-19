@@ -118,7 +118,6 @@ void mafVMELandmarkTest::SetRadiusTest()
   mafSmartPointer<mafVMELandmark> landmark;
 
   landmarkCloud->TestModeOn();
-  landmarkCloud->Open();
   landmarkCloud->AddChild(landmark);
 
   double radius = 20;
@@ -138,7 +137,6 @@ void mafVMELandmarkTest::SetSphereResolutionTest()
   mafSmartPointer<mafVMELandmark> landmark;
 
   landmarkCloud->TestModeOn();
-  landmarkCloud->Open();
   landmarkCloud->AddChild(landmark);
 
   int res = 30;
@@ -176,14 +174,12 @@ void mafVMELandmarkTest::CanReparentToTest()
   mafSmartPointer<mafVMELandmark> landmark;
 
   landmarkCloud->TestModeOn();
-  landmarkCloud->Open();
 
   bool result = false;
   //Check if landmark can be reparent under an open landmark cloud
   result = landmark->CanReparentTo(landmarkCloud);
   CPPUNIT_ASSERT(result);
 
-  landmarkCloud->Close();
 
   //Check if landmark can be reparent under a closed landmark cloud
   result = landmark->CanReparentTo(landmarkCloud);
@@ -230,11 +226,9 @@ void mafVMELandmarkTest::DeepCopyTest()
   mafSmartPointer<mafVMELandmark> newLandmark;
 
   landmarkCloud->TestModeOn();
-  landmarkCloud->Open();
   landmarkCloud->AddChild(landmark);
 
   newLandmarkCloud->TestModeOn();
-  newLandmarkCloud->Open();
   newLandmarkCloud->AddChild(newLandmark);
 
   landmark->SetTimeStamp(3);

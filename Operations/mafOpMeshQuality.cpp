@@ -36,7 +36,7 @@
 #include "mafDecl.h"
 #include "mafEvent.h"
 #include "mafGUI.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafVME.h"
 
 #include "vtkCamera.h"
@@ -82,7 +82,7 @@ mafOpMeshQuality::~mafOpMeshQuality()
 	vtkDEL(m_CheckMeshQuality);
 }
 //----------------------------------------------------------------------------
-bool mafOpMeshQuality::Accept(mafNode *node)
+bool mafOpMeshQuality::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
 	return (node && node->IsA("mafVMESurface"));

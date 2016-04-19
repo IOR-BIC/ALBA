@@ -71,7 +71,7 @@ mafOpExporterVTK::~mafOpExporterVTK()
 {
 }
 //----------------------------------------------------------------------------
-bool mafOpExporterVTK::Accept(mafNode *node)
+bool mafOpExporterVTK::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 { 
   return (node->IsMAFType(mafVME) && !node->IsMAFType(mafVMERoot) && !node->IsMAFType(mafVMEGroup));
@@ -98,7 +98,7 @@ enum VTK_EXPORTER_ID
 void mafOpExporterVTK::OpRun()   
 //----------------------------------------------------------------------------
 {
-  vtkDataSet *inputData = ((mafVME *)m_Input)->GetOutput()->GetVTKData();
+  vtkDataSet *inputData = m_Input->GetOutput()->GetVTKData();
   assert(inputData);
 
   bool isStructuredPoints = inputData->IsA("vtkStructuredPoints");
@@ -168,7 +168,7 @@ void mafOpExporterVTK::OnEvent(mafEventBase *maf_event)
 void mafOpExporterVTK::ExportVTK()
 //----------------------------------------------------------------------------
 {					
-	((mafVME *)m_Input)->GetOutput()->Update();
+	m_Input->GetOutput()->Update();
 	if(this->m_Input->IsA("mafVMELandmarkCloud"))
 	{
     if(((mafVMELandmarkCloud *)m_Input)->GetNumberOfLandmarks() > 0)
@@ -193,7 +193,7 @@ void mafOpExporterVTK::SaveVTKData()
 	progressHelper.SetTextMode(m_TestMode);
 	progressHelper.InitProgressBar();
  
-  vtkDataSet *inputData = ((mafVME *)m_Input)->GetOutput()->GetVTKData();
+  vtkDataSet *inputData = m_Input->GetOutput()->GetVTKData();
   assert(inputData);
 
   vtkDataSet *writerInput = NULL;
@@ -219,16 +219,16 @@ void mafOpExporterVTK::SaveVTKData()
 		if(m_Input->IsA("mafVMEMesh"))
 		{
 			vtkMAFSmartPointer<vtkTransformFilter> v_tpdf;
-			v_tpdf->SetInput((vtkUnstructuredGrid *)((mafVME *)m_Input)->GetOutput()->GetVTKData());
-			v_tpdf->SetTransform(((mafVME *)m_Input)->GetOutput()->GetTransform()->GetVTKTransform());
+			v_tpdf->SetInput((vtkUnstructuredGrid *)m_Input->GetOutput()->GetVTKData());
+			v_tpdf->SetTransform(m_Input->GetOutput()->GetTransform()->GetVTKTransform());
 			v_tpdf->Update();
 			writer->SetInput(v_tpdf->GetOutput());
 		}
 		else
 		{
 			vtkMAFSmartPointer<vtkTransformPolyDataFilter> v_tpdf;
-			v_tpdf->SetInput((vtkPolyData *)((mafVME *)m_Input)->GetOutput()->GetVTKData());
-			v_tpdf->SetTransform(((mafVME *)m_Input)->GetOutput()->GetTransform()->GetVTKTransform());
+			v_tpdf->SetInput((vtkPolyData *)m_Input->GetOutput()->GetVTKData());
+			v_tpdf->SetTransform(m_Input->GetOutput()->GetTransform()->GetVTKTransform());
 			v_tpdf->Update();
 			writer->SetInput(v_tpdf->GetOutput());
 		}

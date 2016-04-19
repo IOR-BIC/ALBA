@@ -18,7 +18,7 @@
 #define __mafOpBooleanSurface_H__
 
 #include "mafOp.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafVMESurface.h"
 #include "mafVMESurfaceParametric.h"
 
@@ -53,7 +53,7 @@ public:
 
 	mafTypeMacro(mafOpBooleanSurface, mafOp);
 
-	static bool SurfaceAccept(mafNode *node) {return(node != NULL && (node->IsMAFType(mafVMESurface) || node->IsMAFType(mafVMESurfaceParametric)));};
+	static bool SurfaceAccept(mafVME*node) {return(node != NULL && (node->IsMAFType(mafVMESurface) || node->IsMAFType(mafVMESurfaceParametric)));};
 
 	enum SURFACE_MODALITY
 	{
@@ -64,7 +64,7 @@ public:
 	mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */
-	bool Accept(mafNode *node);
+	bool Accept(mafVME*node);
 
 	/** Builds operation's interface. */
 	void OpRun();

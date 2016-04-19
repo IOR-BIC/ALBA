@@ -184,7 +184,6 @@ void mafPipeLandmarkCloudTest::TestPipeExecution()
   pipe->SetScalarVisibility(FALSE);
   pipe->OnEvent(&mafEventBase(this,mafPipeLandmarkCloud::ID_SCALAR_VISIBILITY));
 
-  cloud->Open();
   actorList->RemoveAllItems();
   pipe->GetAssemblyFront()->GetActors(actorList);
 

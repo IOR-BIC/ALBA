@@ -79,7 +79,7 @@ void mafAbsMatrixPipeTest::TestSetVME()
 
   matrixPipe->SetVME(cubeVME);
 
-  result = mafVME::SafeDownCast(cubeVME) == matrixPipe->GetVME();
+  result = (mafVME *)cubeVME == matrixPipe->GetVME();
 
   TEST_RESULT;
   //////////////////////////////////////////////////////////////////////////

@@ -76,7 +76,7 @@ mafOp* mafOpExporterWrappedMeter::Copy()
 	return cp;
 }
 //----------------------------------------------------------------------------
-bool mafOpExporterWrappedMeter::Accept(mafNode *node)
+bool mafOpExporterWrappedMeter::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
   return (node && node->IsMAFType(medVMEComputeWrapping));
@@ -166,10 +166,10 @@ void mafOpExporterWrappedMeter::Export()
 	}
 
 	//must be a cicle in all vme of a msf
-	/*mafNodeIterator *iter = NULL;
+	/*mafVMEIterator *iter = NULL;
 	iter = m_Input->GetRoot()->NewIterator();
 
-	for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+	for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
 	{
 			m_Meters.push_back(node);
 	}
@@ -477,8 +477,6 @@ void mafOpExporterWrappedMeter::Test()
 
 	medVMEComputeWrapping *wrappedMeter;
 	mafNEW(wrappedMeter);
-	//mafNode *n = mafNode::SafeDownCast(cloud);
-//wrappedMeter->SetMeterLink(wrappedMeter,);
 
 	wrappedMeter->SetMeterLink("StartVME",cloud->GetLandmark(0));
 	wrappedMeter->SetMeterLink("EndVME1",cloud->GetLandmark(1));
@@ -490,7 +488,7 @@ void mafOpExporterWrappedMeter::Test()
 	//wrappedMeter->PushIdVector(2); //this is for the vector syncronized with the gui widget, that is not used in gui test
 
 
-	wrappedMeter->SetParent(cloud);
+	wrappedMeter->ReparentTo(cloud);
 	wrappedMeter->GetOutput()->GetVTKData()->Update();
 	wrappedMeter->Modified();
 	wrappedMeter->Update();
@@ -544,12 +542,9 @@ void mafOpExporterWrappedMeter::Test()
 	}
 	control.close();
 
-	wrappedMeter->SetParent(NULL);
+	wrappedMeter->ReparentTo(NULL);
 
 	mafDEL(exporter);
 	mafDEL(wrappedMeter);
 	cppDEL(importer);
-
-	//mafDEL(storage);
-
 }

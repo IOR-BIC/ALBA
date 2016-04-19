@@ -27,7 +27,7 @@
 
 #include "mafVMEOutput.h"
 #include "mafVME.h"
-#include "mafNodeIterator.h"
+#include "mafVMEIterator.h"
 #include "mafAbsMatrixPipe.h"
 #include "mafDataPipe.h"
 #include "mafSmartPointer.h"
@@ -123,7 +123,7 @@ void mafVMEOutput::GetTimeBounds(mafTimeStamp tbounds[2]) const
   {
     mafTimeStamp tmp[2];
     
-    if (mafVME *child_vme=mafVME::SafeDownCast(m_VME->GetChild(i)))
+    if (mafVME *child_vme=m_VME->GetChild(i))
     {
       child_vme->GetOutput()->GetTimeBounds(tmp);
       if (tmp[0]<0 || tmp[1]<0)
@@ -197,7 +197,7 @@ void mafVMEOutput::GetVMEBounds(double bounds[6]) const
 }
 
 //-------------------------------------------------------------------------
-void mafVMEOutput::GetVMEBounds(mafOBB &bounds,mafTimeStamp t, mafNodeIterator *iter) const
+void mafVMEOutput::GetVMEBounds(mafOBB &bounds,mafTimeStamp t, mafVMEIterator *iter) const
 //-------------------------------------------------------------------------
 {
   assert(m_VME);
@@ -223,7 +223,7 @@ void mafVMEOutput::GetVMELocalBounds(double bounds[6]) const
 }
 
 //-------------------------------------------------------------------------
-void mafVMEOutput::GetVMELocalBounds(mafOBB &bounds,mafTimeStamp t, mafNodeIterator *iter) const
+void mafVMEOutput::GetVMELocalBounds(mafOBB &bounds,mafTimeStamp t, mafVMEIterator *iter) const
 //-------------------------------------------------------------------------
 {
   if (t<0)
@@ -282,7 +282,7 @@ void mafVMEOutput::GetBounds(double bounds[6]) const
 }
 
 //-------------------------------------------------------------------------
-void mafVMEOutput::GetBounds(mafOBB &bounds,mafTimeStamp t, mafNodeIterator *iter) const
+void mafVMEOutput::GetBounds(mafOBB &bounds,mafTimeStamp t, mafVMEIterator *iter) const
 //-------------------------------------------------------------------------
 {
   assert(m_VME);
@@ -294,7 +294,7 @@ void mafVMEOutput::GetBounds(mafOBB &bounds,mafTimeStamp t, mafNodeIterator *ite
   
   for (int i=0;i<m_VME->GetNumberOfChildren();i++)
   {
-    mafVME *child=mafVME::SafeDownCast(m_VME->GetChild(i));
+    mafVME *child=m_VME->GetChild(i);
     if (child)
     {
       mafOBB childBounds;

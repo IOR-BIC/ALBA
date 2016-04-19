@@ -26,6 +26,7 @@
 //----------------------------------------------------------------------------
 class vtkMAFDistanceFilter;
 class vtkPolyDataNormals;
+class mafVME;
 
 /** a data pipe which calculate new data depending on parameters given by the VME.
   This data pipe creates an internal vtkSource objects and links to it to 
@@ -49,16 +50,16 @@ public:
   int DeepCopy(mafDataPipe *pipe);
 
   /** Set the surface to probe volume data*/
-  void SetSurface(mafNode *surface);
+  void SetSurface(mafVME *surface);
 
   /** Return the probing surface node*/
-  mafNode *GetSurface() {return m_Surface;};
+  mafVME *GetSurface() {return m_Surface;};
 
   /** Set the volume to probe*/
-  void SetVolume(mafNode *volume);
+  void SetVolume(mafVME *volume);
 
   /** Return the probed volume*/
-  mafNode *GetVolume() {return m_Volume;};
+  mafVME *GetVolume() {return m_Volume;};
 
   /** Set the mode to Density or Distance Map.*/
   void SetMode(int mode);
@@ -118,8 +119,8 @@ protected:
   /** function called to updated the data pipe output */
   virtual void Execute();
 
-  mafNode *m_Surface;
-  mafNode *m_Volume;
+  mafVME *m_Surface;
+  mafVME *m_Volume;
 
   vtkPolyDataNormals *m_Normals;
   vtkMAFDistanceFilter  *m_Prober;

@@ -29,7 +29,7 @@
 #include "mafViewSlice.h"
 #include "mafPipeVolumeSlice.h"
 #include "mafPipeSurfaceSlice.h"
-#include "mafNodeIterator.h"
+#include "mafVMEIterator.h"
 #include "mafGUILutPreset.h"
 #include "mafGUI.h"
 #include "mafGUILutSwatch.h"
@@ -109,13 +109,13 @@ mafView *mafViewRXCompound::Copy(mafObserver *Listener, bool lightCopyEnabled)
   return v;
 }
 //----------------------------------------------------------------------------
-void mafViewRXCompound::VmeShow(mafNode *node, bool show)
+void mafViewRXCompound::VmeShow(mafVME *vme, bool show)
 //----------------------------------------------------------------------------
 {
   for(int i=0; i<VIEWS_NUMBER; i++)
-    ((mafViewRX *)m_ChildViewList[i])->VmeShow(node, show);
+    ((mafViewRX *)m_ChildViewList[i])->VmeShow(vme, show);
 
-  if (((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume"))
+  if (vme->GetOutput()->IsA("mafVMEOutputVolume"))
   {
     if (show)
     {
@@ -142,7 +142,7 @@ void mafViewRXCompound::VmeShow(mafNode *node, bool show)
 
       }
       
-      m_CurrentVolume = mafVME::SafeDownCast(node);
+      m_CurrentVolume = vme;
 
     }
     else
@@ -156,15 +156,15 @@ void mafViewRXCompound::VmeShow(mafNode *node, bool show)
   EnableWidgets(m_CurrentVolume != NULL);
 }
 //----------------------------------------------------------------------------
-void mafViewRXCompound::VmeRemove(mafNode *node)
+void mafViewRXCompound::VmeRemove(mafVME *vme)
 //----------------------------------------------------------------------------
 {
-  if (m_CurrentVolume && node == m_CurrentVolume) 
+  if (m_CurrentVolume && vme == m_CurrentVolume) 
   {
     m_CurrentVolume = NULL;
     
   }
-  Superclass::VmeRemove(node);
+  Superclass::VmeRemove(vme);
 }
 //----------------------------------------------------------------------------
 void mafViewRXCompound::OnEvent(mafEventBase *maf_event)

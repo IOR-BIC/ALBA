@@ -48,7 +48,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "mafTagArray.h"
 #include "mmaMaterial.h"
 #include "mmaVolumeMaterial.h"
-#include "mafNodeIterator.h"
+#include "mafVMEIterator.h"
 #include "mafGUILutPreset.h"
 #include "mafVMEOutputSurface.h"
 #include "mafAttribute.h"
@@ -160,23 +160,22 @@ void mafViewArbitrarySlice::PackageView()
 
 }
 //----------------------------------------------------------------------------
-void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
+void mafViewArbitrarySlice::VmeShow(mafVME *vme, bool show)
 	//----------------------------------------------------------------------------
 {
-	m_ChildViewList[ARBITRARY_VIEW]->VmeShow(node, show);
-	m_ChildViewList[SLICE_VIEW]->VmeShow(node, show);
-	mafVME *Vme=mafVME::SafeDownCast(node);
-	Vme->Update();
+	m_ChildViewList[ARBITRARY_VIEW]->VmeShow(vme, show);
+	m_ChildViewList[SLICE_VIEW]->VmeShow(vme, show);
+	vme->Update();
 	if (show)
 	{
-		if(((mafVME *)Vme)->GetOutput()->IsA("mafVMEOutputVolume"))
+		if(vme->GetOutput()->IsA("mafVMEOutputVolume"))
 		{
 			double sr[2],SliceCenterVolumeReset[3];
-			mafVME *Volume=mafVME::SafeDownCast(Vme);
+			mafVME *Volume=vme;
 			m_CurrentVolume = Volume;
 
 			// get the VTK volume
-			vtkDataSet *data = ((mafVME *)node)->GetOutput()->GetVTKData();
+			vtkDataSet *data = vme->GetOutput()->GetVTKData();
 			data->Update();
 			//Get center of Volume to can the reset
 			data->GetCenter(SliceCenterVolumeReset);
@@ -184,7 +183,7 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 			data->GetScalarRange(sr);
 			data=NULL;
 
-			mafTransform::GetOrientation(Vme->GetAbsMatrixPipe()->GetMatrix(),m_SliceAngleReset);
+			mafTransform::GetOrientation(vme->GetAbsMatrixPipe()->GetMatrix(),m_SliceAngleReset);
 
 			//Compute the center of Volume in absolute coordinate, to center the surface and gizmo
 			vtkPoints *pts;
@@ -195,7 +194,7 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 			vtkTransform *transform;
 			vtkNEW(transform);
 			transform->Identity();
-			transform->SetMatrix(Vme->GetOutput()->GetMatrix()->GetVTKMatrix());
+			transform->SetMatrix(vme->GetOutput()->GetMatrix()->GetVTKMatrix());
 			transform->Update();
 			vtkTransformPolyDataFilter *filter;
 			vtkNEW(filter);
@@ -221,10 +220,10 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 			//Create VME slicer
 			mafNEW(m_Slicer);
 			m_Slicer->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 0.0));
-			m_Slicer->ReparentTo(mafVME::SafeDownCast(node));
+			m_Slicer->ReparentTo(vme);
 			m_Slicer->SetPose(m_SliceCenterSurfaceReset,m_SliceAngleReset,0);
 			m_Slicer->SetAbsMatrix(*m_MatrixReset);
-			m_Slicer->SetSlicedVMELink(mafVME::SafeDownCast(node));
+			m_Slicer->SetSlicedVMELink(vme);
 			m_Slicer->GetMaterial()->m_ColorLut->DeepCopy(mafVMEVolumeGray::SafeDownCast(m_CurrentVolume)->GetMaterial()->m_ColorLut);
 			m_Slicer->Update();
 
@@ -285,7 +284,7 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 			vtkDEL(filter);
 			vtkDEL(TransformReset);
 		}
-		else if(Vme->IsA("mafVMESurface") || Vme->IsA("mafVMESurfaceParametric") || Vme->IsA("mafVMELandmark") || Vme->IsA("mafVMELandmarkCloud"))
+		else if(vme->IsA("mafVMESurface") || vme->IsA("mafVMESurfaceParametric") || vme->IsA("mafVMELandmark") || vme->IsA("mafVMELandmarkCloud"))
 		{
 			//a surface is visible only if there is a volume in the view
 			if(m_CurrentVolume)
@@ -294,8 +293,8 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 				double normal[3];
 				((mafViewSlice*)m_ChildViewList[SLICE_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
 
-				mafPipeSurface *PipeArbitraryViewSurface = mafPipeSurface::SafeDownCast(((mafViewSlice *)m_ChildViewList[ARBITRARY_VIEW])->GetNodePipe(node));
-				mafPipeSurfaceSlice *PipeSliceViewSurface = mafPipeSurfaceSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe(node));
+				mafPipeSurface *PipeArbitraryViewSurface = mafPipeSurface::SafeDownCast(((mafViewSlice *)m_ChildViewList[ARBITRARY_VIEW])->GetNodePipe(vme));
+				mafPipeSurfaceSlice *PipeSliceViewSurface = mafPipeSurfaceSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe(vme));
 
 				double surfaceOriginTranslated[3];
 
@@ -307,17 +306,17 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 				PipeSliceViewSurface->SetNormal(normal);
 			}
 		}
-		else if(Vme->IsA("mafVMEPolylineEditor"))
+		else if(vme->IsA("mafVMEPolylineEditor"))
 		{
 			//a surface is visible only if there is a volume in the view
 			if(m_CurrentVolume)
 			{
-				m_CurrentPolylineGraphEditor = (mafVMEPolylineEditor*)node;
+				m_CurrentPolylineGraphEditor = (mafVMEPolylineEditor*)vme;
 
 				double normal[3];
 				((mafViewSlice*)m_ChildViewList[SLICE_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
 
-				mafPipePolylineGraphEditor *PipeSliceViewPolylineEditor = mafPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe(node));
+				mafPipePolylineGraphEditor *PipeSliceViewPolylineEditor = mafPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe(vme));
 				PipeSliceViewPolylineEditor->SetModalitySlice();
 
 				double surfaceOriginTranslated[3];
@@ -329,7 +328,7 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 				PipeSliceViewPolylineEditor->SetSlice(surfaceOriginTranslated, normal);        
 			}
 		}
-		else if(Vme->IsA("mafVMEMesh"))
+		else if(vme->IsA("mafVMEMesh"))
 		{
 			//a surface is visible only if there is a volume in the view
 			if(m_CurrentVolume)
@@ -338,8 +337,8 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 				double normal[3];
 				((mafViewSlice*)m_ChildViewList[SLICE_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
 
-				mafPipeMesh *PipeArbitraryViewMesh = mafPipeMesh::SafeDownCast(((mafViewSlice *)m_ChildViewList[ARBITRARY_VIEW])->GetNodePipe(node));
-				mafPipeMeshSlice *PipeSliceViewMesh = mafPipeMeshSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe(node));
+				mafPipeMesh *PipeArbitraryViewMesh = mafPipeMesh::SafeDownCast(((mafViewSlice *)m_ChildViewList[ARBITRARY_VIEW])->GetNodePipe(vme));
+				mafPipeMeshSlice *PipeSliceViewMesh = mafPipeMeshSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe(vme));
 
 				double surfaceOriginTranslated[3];
 
@@ -352,23 +351,19 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 				PipeSliceViewMesh->SetFlipNormalOff();
 			}
 		}
-
-		else if(Vme->IsA("mafVMEImage"))
+		else if(vme->IsA("mafVMEImage"))
 		{	
-			mafVME *Image  = mafVME::SafeDownCast(Vme);
-			m_CurrentImage = Image;
-
+			m_CurrentImage = vme;
 		}
-
 	}
 	else//if show=false
 	{
-		if(Vme->IsA("mafVMEPolylineGraphEditor"))
+		if(vme->IsA("mafVMEPolylineGraphEditor"))
 		{
 			m_CurrentPolylineGraphEditor = NULL;
 		}
 
-		if(((mafVME *)Vme)->GetOutput()->IsA("mafVMEOutputVolume"))
+		if(vme->GetOutput()->IsA("mafVMEOutputVolume"))
 		{
 			m_AttachCamera->SetVme(NULL);
 			m_Slicer->SetBehavior(NULL);
@@ -390,7 +385,7 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 			m_ColorLUT = NULL;
 			m_LutWidget->SetLut(m_ColorLUT);
 		}
-		else if(Vme->IsA("mafVMEImage")) {
+		else if(vme->IsA("mafVMEImage")) {
 			m_CurrentImage = NULL;
 			m_ColorLUT = NULL;
 			m_LutWidget->SetLut(m_ColorLUT);
@@ -398,8 +393,8 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 
 	}
 
-	if (ActivateWindowing(node))
-		UpdateWindowing(show, node);
+	if (ActivateWindowing(vme))
+		UpdateWindowing(show, vme);
 	
 }
 //----------------------------------------------------------------------------
@@ -468,9 +463,9 @@ void mafViewArbitrarySlice::OnEventGizmoTranslate(mafEventBase *maf_event)
 			matrix->SetVTKMatrix(TransformReset->GetMatrix());
 
 			//for each surface visualized change the center of the cut plane
-			mafNode *root=m_CurrentVolume->GetRoot();
-			mafNodeIterator *iter = root->NewIterator();
-			for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+			mafVME *root=m_CurrentVolume->GetRoot();
+			mafVMEIterator *iter = root->NewIterator();
+			for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
 			{
 				if(node->IsA("mafVMESurface") || node->IsA("mafVMESurfaceParametric") || node->IsA("mafVMELandmark") || node->IsA("mafVMELandmarkCloud"))
 				{
@@ -515,7 +510,7 @@ void mafViewArbitrarySlice::OnEventGizmoTranslate(mafEventBase *maf_event)
 					double normal[3];
 					((mafViewSlice*)m_ChildViewList[SLICE_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
 
-					mafPipePolylineGraphEditor *PipeSliceViewPolylineEditor = mafPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe((mafNode*)m_CurrentPolylineGraphEditor));
+					mafPipePolylineGraphEditor *PipeSliceViewPolylineEditor = mafPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe((mafVME*)m_CurrentPolylineGraphEditor));
 					PipeSliceViewPolylineEditor->SetModalitySlice();
 
 					double surfaceOriginTranslated[3];
@@ -555,9 +550,9 @@ void mafViewArbitrarySlice::OnEventGizmoRotate(mafEventBase *maf_event)
 			mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 
 			//update the normal of the cutter plane of the surface
-			mafNode *root=m_CurrentVolume->GetRoot();
-			mafNodeIterator *iter = root->NewIterator();
-			for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+			mafVME *root=m_CurrentVolume->GetRoot();
+			mafVMEIterator *iter = root->NewIterator();
+			for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
 			{
 				if(node->IsA("mafVMESurface") || node->IsA("mafVMESurfaceParametric") || node->IsA("mafVMELandmark") || node->IsA("mafVMELandmarkCloud"))
 				{
@@ -608,7 +603,7 @@ void mafViewArbitrarySlice::OnEventGizmoRotate(mafEventBase *maf_event)
 					double normal[3];
 					((mafViewSlice*)m_ChildViewList[SLICE_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
 
-					mafPipePolylineGraphEditor *PipeSliceViewPolylineEditor = mafPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe((mafNode*)m_CurrentPolylineGraphEditor));
+					mafPipePolylineGraphEditor *PipeSliceViewPolylineEditor = mafPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe((mafVME*)m_CurrentPolylineGraphEditor));
 					PipeSliceViewPolylineEditor->SetModalitySlice();
 
 					double surfaceOriginTranslated[3];
@@ -670,9 +665,9 @@ void mafViewArbitrarySlice::OnEventThis(mafEventBase *maf_event)
 
 		case ID_RANGE_MODIFIED:
 			{
-				mafVME *node = mafVME::SafeDownCast(GetSceneGraph()->GetSelectedVme());
+				mafVME *vme = GetSceneGraph()->GetSelectedVme();
 
-				if( (m_CurrentVolume || m_CurrentImage) && node)
+				if( (m_CurrentVolume || m_CurrentImage) && vme)
 				{
 					double low, hi;
 					m_LutSlider->GetSubRange(&low,&hi);
@@ -699,9 +694,9 @@ void mafViewArbitrarySlice::OnEventThis(mafEventBase *maf_event)
 				//update because I need to refresh the normal of the camera
 				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 				//update the normal of the cutter plane of the surface
-				mafNode *root=m_CurrentVolume->GetRoot();
-				mafNodeIterator *iter = root->NewIterator();
-				for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+				mafVME *root=m_CurrentVolume->GetRoot();
+				mafVMEIterator *iter = root->NewIterator();
+				for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
 				{
 					if(node->IsA("mafVMESurface") || node->IsA("mafVMESurfaceParametric") || node->IsA("mafVMELandmark") || node->IsA("mafVMELandmarkCloud"))
 					{
@@ -750,7 +745,7 @@ void mafViewArbitrarySlice::OnEventThis(mafEventBase *maf_event)
 						double normal[3];
 						((mafViewSlice*)m_ChildViewList[SLICE_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
 
-						mafPipePolylineGraphEditor *PipeSliceViewPolylineEditor = mafPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe((mafNode*)m_CurrentPolylineGraphEditor));
+						mafPipePolylineGraphEditor *PipeSliceViewPolylineEditor = mafPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe((mafVME*)m_CurrentPolylineGraphEditor));
 						PipeSliceViewPolylineEditor->SetModalitySlice();
 
 						double surfaceOriginTranslated[3];
@@ -833,10 +828,10 @@ mafGUI* mafViewArbitrarySlice::CreateGui()
 	return m_Gui;
 }
 //----------------------------------------------------------------------------
-void mafViewArbitrarySlice::VmeRemove(mafNode *node)
+void mafViewArbitrarySlice::VmeRemove(mafVME *vme)
 	//----------------------------------------------------------------------------
 {
-	if (m_CurrentVolume && node == m_CurrentVolume) 
+	if (m_CurrentVolume && vme == m_CurrentVolume) 
 	{
 		m_AttachCamera->SetVme(NULL);
 		m_CurrentVolume = NULL;
@@ -846,11 +841,11 @@ void mafViewArbitrarySlice::VmeRemove(mafNode *node)
 		cppDEL(m_GizmoRotate);
 	}
 
-	if (m_CurrentImage && node == m_CurrentImage){
+	if (m_CurrentImage && vme == m_CurrentImage){
 		m_CurrentImage = NULL;
 	}
 
-	Superclass::VmeRemove(node);
+	Superclass::VmeRemove(vme);
 }
 //----------------------------------------------------------------------------
 void mafViewArbitrarySlice::PostMultiplyEventMatrix(mafEventBase *maf_event)
@@ -863,7 +858,7 @@ void mafViewArbitrarySlice::PostMultiplyEventMatrix(mafEventBase *maf_event)
 		// handle incoming transform events
 		vtkTransform *tr = vtkTransform::New();
 		tr->PostMultiply();
-		tr->SetMatrix(((mafVME *)m_Slicer)->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
+		tr->SetMatrix(m_Slicer->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
 		tr->Concatenate(e->GetMatrix()->GetVTKMatrix());
 		tr->Update();
 
@@ -874,7 +869,7 @@ void mafViewArbitrarySlice::PostMultiplyEventMatrix(mafEventBase *maf_event)
 		if (arg == mafInteractorGenericMouse::MOUSE_MOVE)
 		{
 			// move vme
-			((mafVME *)m_Slicer)->SetAbsMatrix(absPose);
+			m_Slicer->SetAbsMatrix(absPose);
 		} 
 
 		// clean up
@@ -959,7 +954,7 @@ void mafViewArbitrarySlice::VolumeWindowing(mafVME *volume)
 {
 
 	double sr[2];
-	vtkDataSet *data = ((mafVME *)volume)->GetOutput()->GetVTKData();
+	vtkDataSet *data = volume->GetOutput()->GetVTKData();
 	data->Update();
 	data->GetScalarRange(sr);
 

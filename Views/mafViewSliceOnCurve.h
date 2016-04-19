@@ -109,9 +109,9 @@ protected:
   int m_ShowPolylineInMainView;       //<non-zero, if the polyline is to be displayed in the main view
   int m_ShowGizmoCoords;              //<non-zero, if the coordinates of gizmo (i.e., the slice origin) should be displayed
 	  
-  mafNode* m_CurrentVolume;           //<currently selected volume	
-	mafNode* m_CurrentPolyLine;         //<currently selected polyline
-  mafNode* m_CurrentPolyLineGizmo;    //<VME accepted by gizmo
+	mafVME* m_CurrentVolume;           //<currently selected volume	
+	mafVME* m_CurrentPolyLine;         //<currently selected polyline
+	mafVME* m_CurrentPolyLineGizmo;    //<VME accepted by gizmo
 
   double   m_OldPos[3];				//<Old Pose for 3D navigation
 
@@ -141,15 +141,15 @@ public:
 
 	/** 
 	Show/Hide VMEs into plugged sub-views*/
-	/*virtual*/ void VmeShow(mafNode *node, bool show);
+	/*virtual*/ void VmeShow(mafVME *vme, bool show);
   
   /** return the current pipe for the specified vme (if any exist at this moment) */
-  /*virtual*/ mafPipe* GetNodePipe(mafNode *vme);
+  /*virtual*/ mafPipe* GetNodePipe(mafVME *vme);
 
 	/** 
-	return the status of the node within this view. es: NON_VISIBLE,VISIBLE_ON, ... 
+	return the status of the vme within this view. es: NON_VISIBLE,VISIBLE_ON, ... 
 	having mafViewCompound::GetNodeStatus allow mafGUICheckTree to not know about mafSceneGraph */
-	/*virtual*/ int  GetNodeStatus(mafNode *vme);
+	/*virtual*/ int  GetNodeStatus(mafVME *vme);
 
 	/** 
 	Create visual pipe and initialize them to build an SliceOnCurve visualization */
@@ -206,7 +206,7 @@ public:
 protected:
   /** Hides VMEs of the same type as pNode that are currently displayed in pView
   The display status of pNode is not changed */
-  void HideSameVMEs(mafView* pView, mafNode* pNode);
+  void HideSameVMEs(mafView* view, mafVME* vme);
 
 protected:
   /** Creates views and text mappers */
@@ -236,8 +236,8 @@ protected:
   /** plugs a new polyline (graph) visualization pipe */
   virtual void PlugPolylinePipe();
 	
-	/** creates the gizmo path for the given node */
-	virtual void CreateGizmo(mafNode* node);
+	/** creates the gizmo path for the given vme */
+	virtual void CreateGizmo(mafVME *vme);
 
   /** destroys the gizmo */
   virtual void DestroyGizmo();	

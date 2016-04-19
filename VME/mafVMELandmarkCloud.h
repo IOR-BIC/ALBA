@@ -64,7 +64,7 @@ public:
   virtual void OnEvent(mafEventBase *maf_event);
 
   /** Copy the contents of another landmarkcloud into this one. */
-  virtual int DeepCopy(mafNode *a);
+  virtual int DeepCopy(mafVME *a);
 
   /** Compare with another landmarkcloud. */
   virtual bool Equals(mafVME *vme);
@@ -81,8 +81,8 @@ public:
   The check for duplicates flag is used to inhibit append if the cloud contains a landmark 
   with the same name already. Set this flag to false for faster appending. 
 */
-  int AppendLandmark(const char *name, bool checkForDuplicatedNames = true);
-  int AppendLandmark(double x,double y,double z,const char *name, bool checkForDuplicatedNames = true) {int idx=this->AppendLandmark(name, checkForDuplicatedNames); return this->SetLandmark(idx, x, y, z);}
+	int AppendLandmark(double x, double y, double z, const char *name);
+	int AppendLandmark(const char *name) { return AppendLandmark(0,0,0,name); }
 
   /** Insert the landmark into the cloud */
   int SetLandmark(mafVMELandmark *lm);
@@ -190,6 +190,10 @@ public:
   /** Return true if the data associated with the VME is present and updated at the current time.*/
   virtual bool IsDataAvailable();
 
+	void AddLMToChildernList(mafVMELandmark *lm);
+
+	void RemoveLmFromChildrenList(mafVMELandmark *lm);
+
 protected:
   mafVMELandmarkCloud();
   virtual ~mafVMELandmarkCloud();
@@ -209,11 +213,7 @@ protected:
   /** Internal functions used to set/get visibility for point idx of the given polydata*/
   virtual int SetLandmarkVisibility(vtkPolyData *polydata,int idx,bool a);
   virtual bool GetLandmarkVisibility(vtkPolyData *polydata,int idx);
-
-  /** Get set cloud set retrieving it from TAG if necessary*/
-  int GetState();
-  void SetState(int state);
-
+	 
   /** Internally used to create a new instance of the GUI.*/
   virtual mafGUI *CreateGui();
 
@@ -222,6 +222,8 @@ protected:
   int m_DefaultVisibility;
   int m_SphereResolution;
   double m_Radius;
+
+	std::vector<mafVMELandmark *> m_LMChildren;
   
 private:
   mafVMELandmarkCloud(const mafVMELandmarkCloud&); // Not implemented
@@ -238,5 +240,8 @@ private:
   virtual int RemovePoint(int idx,mafTimeStamp t=-1) {mafErrorMacro("Unsupported function, use RemoveLandmark instead!"); return MAF_ERROR;};
   virtual void SetNumberOfPoints(int num,mafTimeStamp t=-1) {mafErrorMacro("Unsupported function, use SetNumberOfLandmarks instead!");};
   virtual int RemovePoint(vtkPolyData *polydata,int idx) {return this->Superclass::RemovePoint(polydata,idx);}
+	
+	//Function for compatibility with old landmark cloud
+	void CreateLMVmeFromOldClosedCloud();
 };
 #endif

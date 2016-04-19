@@ -69,11 +69,6 @@ void mafOpExporterLandmarkTest::TestOnVmeRawMotionData()
   exporter->TestModeOn();
 	exporter->SetFileName(fileExp);
   exporter->ExportLandmark();
-
-  for(int i =0 ; i< 5 ; i++)
-  {
-    ((mafVMELandmarkCloud *)vmeRawMotionData->GetChild(i))->Open();
-  }
   
   int result = MAF_OK;
   std::vector<double *> coord;
@@ -165,8 +160,6 @@ void mafOpExporterLandmarkTest::TestOnLandmarkImporter()
 	exporter->TestModeOn();
 	exporter->SetFileName(fileExp);
 	exporter->ExportLandmark();
-
-	((mafVMELandmarkCloud *)node)->Open();
 
 	int result = MAF_OK;
 	std::vector<double *> coord;
@@ -292,7 +285,6 @@ void mafOpExporterLandmarkTest::TestMultipleExports()
   fileExp<<node2->GetName();
   fileExp<<".txt";
 
-	((mafVMELandmarkCloud *)node2)->Open();
 
 	int result = MAF_OK;
 	std::vector<double *> coord;

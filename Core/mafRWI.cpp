@@ -29,7 +29,7 @@
 #include "mafEvent.h"
 #include "mafAxes.h"
 #include "mafGUI.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafSceneNode.h"
 #include "mafSceneGraph.h"
 #include "mafGUIPicButton.h"
@@ -427,7 +427,7 @@ void mafRWI::CameraSet(int cam_position, double zoom)
 	m_Camera->SetViewUp(vx,vy,vz);
 	m_Camera->SetClippingRange(0.1,1000);
 
-	CameraReset((mafNode*)NULL, zoom);
+	CameraReset((mafVME*)NULL, zoom);
 }
 
 //----------------------------------------------------------------------------
@@ -444,7 +444,7 @@ void mafRWI::CameraSet( double pos[3],double viewUp[3], double zoom /*= 1.*/, bo
 	m_Camera->SetViewUp(viewUp[0],viewUp[1],viewUp[2]);
 	m_Camera->SetClippingRange(0.1,1000);
 
-	CameraReset((mafNode*)NULL, zoom);
+	CameraReset((mafVME*)NULL, zoom);
 }
 //----------------------------------------------------------------------------
 void mafRWI::SetSize(int x, int y, int w,int h)
@@ -713,7 +713,7 @@ void mafRWI::UpdateCameraParameters()
 	}
 }
 //----------------------------------------------------------------------------
-void mafRWI::CameraReset(mafNode *vme, double zoom)
+void mafRWI::CameraReset(mafVME *vme, double zoom)
 //----------------------------------------------------------------------------
 {
 	if (m_RenderWindow->GetGenericWindowId() == 0) 
@@ -733,82 +733,31 @@ void mafRWI::CameraReset(mafNode *vme, double zoom)
 	UpdateCameraParameters();
 }
 //----------------------------------------------------------------------------
-double *mafRWI::ComputeVisibleBounds(mafNode *node)
+double *mafRWI::ComputeVisibleBounds(mafVME *vme)
 //----------------------------------------------------------------------------
 {
 	static double b[6],b1[6],b2[6]; // static so it is possible to return it
-	mafVME *vme = NULL;
+	mafSceneNode *n;
 
-	if(node && (vme = mafVME::SafeDownCast(node)))
-		if(!vme->IsA("mafNodeRoot"))
-			if(vme->GetOutput()->GetVTKData())
-				if(m_Sg) 
-					if(mafSceneNode *n = m_Sg->Vme2Node(vme) )
-						if(n->IsVisible())
-						{
-							/** Modified by Marco 24-6-2005: this is not generic: do ask the VME for its bounds
-							vme->GetOutput()->GetVTKData()->GetBounds(b1);
-							float loc_p1[3],loc_p2[3],abs_p1[3], abs_p2[3];
-							loc_p1[0] = b1[0];
-							loc_p1[1] = b1[2];
-							loc_p1[2] = b1[4];
-							loc_p2[0] = b1[1];
-							loc_p2[1] = b1[3];
-							loc_p2[2] = b1[5];
-							*/
-
-							/* Modified by Marco 24-6-2005: this creates linking problems: do ask the VME for its bounds
-							float loc_p1[3],loc_p2[3],abs_p1[3], abs_p2[3];
-							loc_p1[0] = b1[0];
-							loc_p1[1] = b1[2];
-							loc_p1[2] = b1[4];
-							loc_p2[0] = b1[1];
-							loc_p2[1] = b1[3];
-							loc_p2[2] = b1[5];
-
-							double r=0;
-							if(vme->IsA("mafVMELandmark"))
-							r = ((mafVMELandmark *)vme)->GetRadius();
-							if(vme->IsA("mafVMELandmarkCloud"))
-							r = ((mafVMELandmarkCloud *)vme)->GetRadius();
-							loc_p1[0] -= r;
-							loc_p1[1] -= r;
-							loc_p1[2] -= r;
-							loc_p2[0] += r;
-							loc_p2[1] += r;
-							loc_p2[2] += r;
-							*/
-							/* Modified by Marco 24-6-2005: this is not generic: do ask the VME for its bounds
-							vtkLinearTransform *t = vme->GetAbsMatrixPipe()->GetVTKTransform();
-							t->TransformPoint(loc_p1,abs_p1);
-							t->TransformPoint(loc_p2,abs_p2);
-							// TODO: test the usage of vtkMatrix4x4::MultiplyPoint instead
-
-							b1[0] = abs_p1[0];
-							b1[1] = abs_p2[0];
-							b1[2] = abs_p1[1];
-							b1[3] = abs_p2[1];
-							b1[4] = abs_p1[2];
-							b1[5] = abs_p2[2];
-							*/
-
-							vme->GetOutput()->GetVMEBounds(b1);    
-							return b1;
-						}
-						m_RenFront->ComputeVisiblePropBounds(b1);
-						if (m_RenBack)
-						{
-							m_RenBack->ComputeVisiblePropBounds(b2);
-							b[0] = (b2[0] < b1[0]) ? b2[0] : b1[0];
-							b[2] = (b2[2] < b1[2]) ? b2[2] : b1[2];
-							b[4] = (b2[4] < b1[4]) ? b2[4] : b1[4];
-							b[1] = (b2[1] > b1[1]) ? b2[1] : b1[1];
-							b[3] = (b2[3] > b1[3]) ? b2[3] : b1[3];
-							b[5] = (b2[5] > b1[5]) ? b2[5] : b1[5];
-							return b;
-						}
-						else
-							return b1;
+	if (vme && !vme->IsA("mafVMERoot") && vme->GetOutput()->GetVTKData() && m_Sg && (n = m_Sg->Vme2Node(vme)) && n->IsVisible())
+	{
+		vme->GetOutput()->GetVMEBounds(b1);
+		return b1;
+	}
+	m_RenFront->ComputeVisiblePropBounds(b1);
+	if (m_RenBack)
+	{
+		m_RenBack->ComputeVisiblePropBounds(b2);
+		b[0] = (b2[0] < b1[0]) ? b2[0] : b1[0];
+		b[2] = (b2[2] < b1[2]) ? b2[2] : b1[2];
+		b[4] = (b2[4] < b1[4]) ? b2[4] : b1[4];
+		b[1] = (b2[1] > b1[1]) ? b2[1] : b1[1];
+		b[3] = (b2[3] > b1[3]) ? b2[3] : b1[3];
+		b[5] = (b2[5] > b1[5]) ? b2[5] : b1[5];
+		return b;
+	}
+	else
+		return b1;
 }
 //----------------------------------------------------------------------------
 void mafRWI::CameraReset(double bounds[6], double zoom)

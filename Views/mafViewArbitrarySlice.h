@@ -71,10 +71,10 @@ public:
 	virtual void PackageView();
 
 	/** Show/Hide VMEs into plugged sub-views*/
-	virtual void VmeShow(mafNode *node, bool show);
+	virtual void VmeShow(mafVME *vme, bool show);
 
 	/** Remove VME into plugged sub-views*/
-	virtual void VmeRemove(mafNode *node);
+	virtual void VmeRemove(mafVME *vme);
 
 	/** Create the GUI on the bottom of the compounded view. */
 	virtual void CreateGuiView();

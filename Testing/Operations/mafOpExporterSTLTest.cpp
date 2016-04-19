@@ -31,7 +31,7 @@
 #include "mafString.h"
 #include "mafVMEStorage.h"
 #include "mafVMERoot.h"
-#include "mafNode.h"
+#include "mafVME.h"
 
 #include "vtkCubeSource.h"
 #include "vtkDataSet.h"

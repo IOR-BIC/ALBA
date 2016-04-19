@@ -72,7 +72,7 @@ mafOpImporterVMEDataSetAttributes::~mafOpImporterVMEDataSetAttributes( )
 
 }
 //----------------------------------------------------------------------------
-bool mafOpImporterVMEDataSetAttributes::Accept(mafNode *node)
+bool mafOpImporterVMEDataSetAttributes::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
   return true;

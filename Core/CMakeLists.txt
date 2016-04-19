@@ -25,18 +25,8 @@ SET(PROJECT_SRCS
   mafEventIO.h
   mafMatrixPipe.cpp
   mafMatrixPipe.h
-  mafNode.cpp
-  mafNode.h
-  mafNodeFactory.cpp
-  mafNodeFactory.h
-  mafNodeGeneric.cpp
-  mafNodeGeneric.h
-  mafNodeIterator.cpp
-  mafNodeIterator.h
-  mafNodeManager.cpp
-  mafNodeManager.h
-  mafNodeRoot.cpp
-  mafNodeRoot.h
+  mafVMEIterator.cpp
+  mafVMEIterator.h
   mafOp.cpp
   mafOp.h
   mafOpContextStack.cpp

@@ -106,7 +106,7 @@ int mafVMEVolumeGray::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
 mafGUI* mafVMEVolumeGray::CreateGui()
 //-------------------------------------------------------------------------
 {
-  m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
+  m_Gui = mafVME::CreateGui(); // Called to show info about vmes' type and name
   m_Gui->SetListener(this);
   m_Gui->Divider();
   //m_Gui->Button(ID_VOLUME_TRANSFER_FUNCTION, "transfer function", "", "Visualize Transfer function dialog.");

@@ -78,8 +78,8 @@ public:
     ID_LAST
   };
 
-  static bool VMEAccept(mafNode *node) {return(node != NULL && node->IsMAFType(mafVME));};
-  static bool VolumeAccept(mafNode *node) {return(node != NULL && node->IsMAFType(mafVMEVolumeGray));};
+  static bool VMEAccept(mafVME*node) {return(node != NULL && node->IsMAFType(mafVME));};
+  static bool VolumeAccept(mafVME*node) {return(node != NULL && node->IsMAFType(mafVMEVolumeGray));};
 
   /** Precess events coming from other objects */ 
   virtual void OnEvent(mafEventBase *maf_event);
@@ -88,7 +88,7 @@ public:
   virtual void Print(std::ostream& os, const int tabs=0);
 
   /** Copy the contents of another VME-Meter into this one. */
-  virtual int DeepCopy(mafNode *a);
+  virtual int DeepCopy(mafVME *a);
 
   /** Compare with another VME-Meter. */
   virtual bool Equals(mafVME *vme);
@@ -206,7 +206,7 @@ public:
   mafVME *GetPlottedVME();
 
   /** Set links for the meter*/
-  virtual void SetMeterLink(const char *link_name, mafNode *n);
+  virtual void SetMeterLink(const char *link_name, mafVME *n);
 
   /** Return pointer to material attribute. */
   mmaMaterial *GetMaterial();

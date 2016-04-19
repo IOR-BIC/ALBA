@@ -54,7 +54,7 @@ mafOpExporterLandmarkWS::~mafOpExporterLandmarkWS()
 {
 }
 //----------------------------------------------------------------------------
-bool mafOpExporterLandmarkWS::Accept(mafNode *node)
+bool mafOpExporterLandmarkWS::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
   return (node && node->IsA("mafVMELandmarkCloud"));

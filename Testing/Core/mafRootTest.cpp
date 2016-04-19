@@ -29,7 +29,7 @@
 
 #include "mafSmartPointer.h"
 #include "mafRoot.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafVMEStorage.h"
 #include "mafEventIO.h"
 #include "mafVMERoot.h"
@@ -131,7 +131,7 @@ void mafRootTest::CanReparentToTest()
   //root parent can not be reparented
   TEST_RESULT(result);
 
-  mafNodeHelper *n =  mafNodeHelper::New();
+  mafVMEHelper *n =  mafVMEHelper::New();
   result = (false == r->CanReparentTo(n));
 
   TEST_RESULT(result);
@@ -156,7 +156,7 @@ void mafRootTest::SafeDownCastTest()
   //----------------- end test comment
 
   //bad cast
-  mafNodeHelper *n =  mafNodeHelper::New();
+  mafVMEHelper *n =  mafVMEHelper::New();
   rp = (mafRootA *)mafRoot::SafeDownCast((mafObject *)n);
   result = (rp == NULL);
  

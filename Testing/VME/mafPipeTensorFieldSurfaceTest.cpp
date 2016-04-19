@@ -121,7 +121,6 @@ void mafPipeTensorFieldSurfaceTest::TestCreate()
   //CompareImages(0);
 
   delete pipe;
-  sceneNode->m_RenFront = NULL;
   delete sceneNode;
   delete(rootscenenode);
 

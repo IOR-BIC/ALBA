@@ -224,7 +224,7 @@ void mafPipeSurfaceSlice::Create(mafSceneNode *n/*, bool use_axes*/)
     }
     else if (material->GetMaterialTextureID() != -1)
     {
-      mafVME *texture_vme = mafVME::SafeDownCast(m_Vme->GetRoot()->FindInTreeById(material->GetMaterialTextureID()));
+      mafVME *texture_vme = m_Vme->GetRoot()->FindInTreeById(material->GetMaterialTextureID());
       texture_vme->GetOutput()->GetVTKData()->Update();
       m_Texture->SetInput((vtkImageData *)texture_vme->GetOutput()->GetVTKData());
     }
@@ -534,7 +534,7 @@ void mafPipeSurfaceSlice::CreateClosedCloudPipe()
     }
     else if (material->GetMaterialTextureID() != -1)
     {
-      mafVME *texture_vme = mafVME::SafeDownCast(m_Vme->GetRoot()->FindInTreeById(material->GetMaterialTextureID()));
+      mafVME *texture_vme = m_Vme->GetRoot()->FindInTreeById(material->GetMaterialTextureID());
       texture_vme->GetOutput()->GetVTKData()->Update();
       m_Texture->SetInput((vtkImageData *)texture_vme->GetOutput()->GetVTKData());
     }

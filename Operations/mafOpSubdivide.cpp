@@ -60,7 +60,7 @@ mafOpSubdivide::~mafOpSubdivide()
   vtkDEL(m_ResultPolydata);
 }
 //----------------------------------------------------------------------------
-bool mafOpSubdivide::Accept(mafNode *node)
+bool mafOpSubdivide::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
   return ( node != NULL && node->IsA("mafVMESurface") );

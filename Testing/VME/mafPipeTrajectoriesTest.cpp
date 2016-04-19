@@ -118,7 +118,6 @@ void mafPipeTrajectoriesTest::TestPipeExecution()
   }
   cloud->Update();
   cloud->TestModeOn();
-  cloud->Open();
 
   mafSmartPointer<mafVMELandmark> landmark;
   landmark = cloud->GetLandmark("first");
@@ -126,8 +125,7 @@ void mafPipeTrajectoriesTest::TestPipeExecution()
   
   //Assembly will be create when instancing mafSceneNode
   mafSceneNode *sceneNode;
-  sceneNode = new mafSceneNode(NULL,NULL,landmark, NULL);
-  sceneNode->m_RenFront = m_Renderer;
+  sceneNode = new mafSceneNode(NULL,NULL,landmark, m_Renderer);
 
   /////////// Pipe Instance and Creation ///////////
   mafPipeTrajectories *pipeTrajecotries = new mafPipeTrajectories;
@@ -160,7 +158,6 @@ void mafPipeTrajectoriesTest::TestPipeExecution()
   vtkDEL(actorList);
 
   delete pipeTrajecotries;
-  sceneNode->m_RenFront = NULL;
   delete sceneNode;
 }
 //----------------------------------------------------------------------------

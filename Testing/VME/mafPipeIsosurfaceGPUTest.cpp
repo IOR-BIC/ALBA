@@ -319,7 +319,7 @@ void mafPipeIsosurfaceGPUTest::TestExtractIsosurface()
     printf("\n Visualization and Isosurface Extraction. \n");
     pipeIso->ExctractIsosurface();
 
-    vtkPolyData *isoSurface = vtkPolyData::SafeDownCast(mafVME::SafeDownCast(volumeInput->GetChild(0))->GetOutput()->GetVTKData());
+    vtkPolyData *isoSurface = vtkPolyData::SafeDownCast(volumeInput->GetChild(0)->GetOutput()->GetVTKData());
     isoSurface->Update();
 
     CPPUNIT_ASSERT(isoSurface && isoSurface->GetNumberOfPoints() != 0);

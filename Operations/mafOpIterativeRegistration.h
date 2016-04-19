@@ -62,7 +62,7 @@ class MAF_EXPORT mafOpIterativeRegistration : public mafOp
   	
     /** 
     Return true for the acceptable vme type. */
-    bool Accept(mafNode* node);
+    bool Accept(mafVME* node);
   
     /** 
     Builds operation's interface. */
@@ -76,7 +76,7 @@ class MAF_EXPORT mafOpIterativeRegistration : public mafOp
     Undo the operation. */
     void OpUndo();
 
-    static bool VmeAccept(mafNode* node) {return(node != NULL);};
+    static bool VmeAccept(mafVME* node) {return(node != NULL);};
   
   protected:
     //void OnRegister(mafEvent &e);

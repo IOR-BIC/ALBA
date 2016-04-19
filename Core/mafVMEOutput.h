@@ -34,7 +34,7 @@ class mafMatrix;
 class mafTransformBase;
 #endif
 class mafOBB;
-class mafNodeIterator;
+class mafVMEIterator;
 class mafGUI;
 #ifdef MAF_USE_VTK
 class vtkDataSet;
@@ -147,19 +147,19 @@ public:
     Return the space bound of the subtree for the current time, taking in consideration
     the current data bounds and the current pose matrix*/
   void GetBounds(double bounds[6]) const;
-  virtual void GetBounds(mafOBB &bounds,mafTimeStamp t=-1, mafNodeIterator *iter=NULL) const;
+  virtual void GetBounds(mafOBB &bounds,mafTimeStamp t=-1, mafVMEIterator *iter=NULL) const;
   
   /**
     Return the space bound of the VME (not the subtree) for the current time, taking in consideration 
     the current data bounds and the current pose matrix.*/
   void GetVMEBounds(double bounds[6]) const;
-  virtual void GetVMEBounds(mafOBB &bounds,mafTimeStamp t=-1, mafNodeIterator *iter=NULL) const;
+  virtual void GetVMEBounds(mafOBB &bounds,mafTimeStamp t=-1, mafVMEIterator *iter=NULL) const;
   
   /**
     Return the local space bound (in local coordinates) of the VME (not the whole subtree) for the 
     current time, taking in consideration the current data bounds and the current pose matrix.*/
   void GetVMELocalBounds(double bounds[6]) const;
-  virtual void GetVMELocalBounds(mafOBB &bounds,mafTimeStamp t=-1, mafNodeIterator *iter=NULL) const;
+  virtual void GetVMELocalBounds(mafOBB &bounds,mafTimeStamp t=-1, mafVMEIterator *iter=NULL) const;
 
   /** return the time for which this output was computed */
   mafTimeStamp GetTimeStamp() const;

@@ -50,7 +50,6 @@ void mafOpImporterLandmarkTest::Test()
 
   CPPUNIT_ASSERT(node->GetNumberOfLandmarks() == 38);
 
-  node->Open();
   double xyz[3], rot[3];
   node->GetLandmark(19)->GetOutput()->GetPose(xyz,rot,0);
 
@@ -79,7 +78,6 @@ void mafOpImporterLandmarkTest::TestTimeVariant()
 
   CPPUNIT_ASSERT(node->GetNumberOfLandmarks() == 22);
 
-  node->Open();
   double xyz[3], rot[3];
   node->GetLandmark(0)->GetOutput()->GetPose(xyz,rot,10);
   mafString name = node->GetLandmark(0)->GetName();
@@ -112,7 +110,6 @@ void mafOpImporterLandmarkTest::TestUnTag()
 
   CPPUNIT_ASSERT(node->GetNumberOfLandmarks() == 30);
 
-  node->Open();
   double xyz[3], rot[3];
   node->GetLandmark(0)->GetOutput()->GetPose(xyz,rot,0);
 

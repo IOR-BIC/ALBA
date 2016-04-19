@@ -49,8 +49,8 @@
 //#include "mafPipe.h"
 
 #include "mafVME.h"
-#include "mafNode.h"
-#include "mafNodeIterator.h"
+#include "mafVME.h"
+#include "mafVMEIterator.h"
 
 //----------------------------------------------------------------------------
 // const
@@ -99,12 +99,12 @@ mafGUITreeContextualMenu::~mafGUITreeContextualMenu()
 {
 }
 //----------------------------------------------------------------------------
-void mafGUITreeContextualMenu::CreateContextualMenu(mafGUICheckTree *tree, mafView *view, mafNode *vme, bool vme_menu)
+void mafGUITreeContextualMenu::CreateContextualMenu(mafGUICheckTree *tree, mafView *view, mafVME *vme, bool vme_menu)
 //----------------------------------------------------------------------------
 {
   m_ViewActive  = view;
   m_NodeActive  = vme;
-  m_VmeActive   = mafVME::SafeDownCast(vme);
+  m_VmeActive   = vme;
 
   if(vme_menu)
 	{
@@ -157,7 +157,7 @@ void mafGUITreeContextualMenu::CreateContextualMenu(mafGUICheckTree *tree, mafVi
         this->FindItem(RMENU_HIDE_SUBTREE)->Enable(enable);
 
         // enable show/hide same type - must be visualized and not mutex
-        enable = n->GetPipeCreatable() && !n->m_Mutex;
+        enable = n->GetPipeCreatable() && !n->GetMutex();
         this->FindItem(RMENU_SHOW_SAMETYPE)->Enable(enable);
         this->FindItem(RMENU_HIDE_SAMETYPE)->Enable(enable);
       }
@@ -277,13 +277,13 @@ void mafGUITreeContextualMenu::OnContextualMenu(wxCommandEvent &event)
 void mafGUITreeContextualMenu::CryptSubTree(bool crypt)
 //----------------------------------------------------------------------------
 {
-  mafNodeIterator *iter = m_NodeActive->NewIterator();
+  mafVMEIterator *iter = m_NodeActive->NewIterator();
 
-	for(mafNode *v=iter->GetFirstNode();v;v=iter->GetNextNode())
+	for(mafVME *v=iter->GetFirstNode();v;v=iter->GetNextNode())
 	{
     if(!v->IsA("mafVME"))
       continue;
-    ((mafVME *)v)->SetCrypting(crypt);
+    v->SetCrypting(crypt);
 	}
 	iter->Delete();
 }

@@ -49,7 +49,7 @@ public:
   void Print(std::ostream &os, const int tabs=0);
 
   /** Copy the contents of another landmark into this one. */
-  virtual int DeepCopy(mafNode *a);
+  virtual int DeepCopy(mafVME *a);
 
   /** Compare with another landmark. */
   virtual bool Equals(mafVME *vme);
@@ -113,7 +113,10 @@ public:
   virtual void SetTimeStamp(mafTimeStamp t);
 
   /** called to check if the vme can be re-parented under the new parent */
-  virtual bool CanReparentTo(mafNode *parent);
+  virtual bool CanReparentTo(mafVME *parent);
+
+
+	virtual int ReparentTo(mafVME *parent);
 
 protected:
   mafVMELandmark();

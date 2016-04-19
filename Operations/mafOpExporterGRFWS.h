@@ -65,7 +65,7 @@ public:
   void Clear();
 
 	/** Return true for the acceptable vme type. */
-	bool Accept(mafNode* node);
+	bool Accept(mafVME* node);
 
 	/** Builds operation's interface. */
 	void OpRun();
@@ -83,7 +83,7 @@ public:
   void CreateGui();
 
   /** Load VMEs. */
-	int LoadVMEs(mafNode* node);
+	int LoadVMEs(mafVME* node);
 
   /** Read the file.
   File format:

@@ -61,10 +61,10 @@ public:
 	mafOp* Copy();
 
   /** Return true for the vme to which the trajectories should be applied. */
-  bool Accept(mafNode* vme);
+  bool Accept(mafVME* vme);
 
   /** Returns true for the vme from which the trajectories should be red. (Callback function) */
-  static bool AcceptInputVME(mafNode* node);
+  static bool AcceptInputVME(mafVME* node);
 
 	/** Builds operation's interface. */
 	void OpRun();

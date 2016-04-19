@@ -113,7 +113,6 @@ void mafOpImporterMotionDataTest::TestOnRawMotionData()
      ((mafVMELandmarkCloud *)vme_raw->GetChild(0))->TestModeOn();
   }
 
-  ((mafVMELandmarkCloud *)vme_raw->GetChild(0))->Open();
   mafVMELandmark *landmark = ((mafVMELandmark *)((mafVMELandmarkCloud *)vme_raw->GetChild(0))->GetLandmark(0));
   
   mafString nameLand = landmark->GetName();

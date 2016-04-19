@@ -226,7 +226,7 @@ void mafView3D::OnEvent(mafEventBase *maf_event)
 			break;
 		case ID_COMBO_PIPE:
 			{
-				if(((mafVME*)m_CurrentVolume)->GetVisualPipe())
+				if(m_CurrentVolume->GetVisualPipe())
 				{
 					mafVME *TempVolume=m_CurrentVolume;
 					if(m_CurrentSurface)
@@ -293,7 +293,7 @@ void mafView3D::Create()
 	this->PlugVisualPipe("mafVMEVolumeGray","mafPipeIsosurface");
 }
 //----------------------------------------------------------------------------
-void mafView3D::VmeCreatePipe(mafNode *vme)
+void mafView3D::VmeCreatePipe(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   mafString pipe_name = "";
@@ -347,7 +347,7 @@ void mafView3D::VmeCreatePipe(mafNode *vme)
 }
 /*
 //----------------------------------------------------------------------------
-void mafView3D::VmeDeletePipe(mafNode *vme)
+void mafView3D::VmeDeletePipe(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   m_NumberOfVisibleVme--;
@@ -402,18 +402,18 @@ mafGUI *mafView3D::CreateGui()
   return m_Gui;
 }
 //-------------------------------------------------------------------------
-int mafView3D::GetNodeStatus(mafNode *vme)
+int mafView3D::GetNodeStatus(mafVME *vme)
 //-------------------------------------------------------------------------
 {
 	mafSceneNode *n = NULL;
 	if (m_Sg != NULL)
 	{
     n = m_Sg->Vme2Node(vme);
-		if (((mafVME *)vme)->GetOutput()->IsA("mafVMEOutputVolume"))
+		if (vme->GetOutput()->IsA("mafVMEOutputVolume"))
 		{
 			if (n != NULL)
 			{
-				n->m_Mutex = true;
+				n->SetMutex(true);
 			}
 		}
     else if(vme->IsMAFType(mafVMEPolyline) || 
@@ -422,7 +422,7 @@ int mafView3D::GetNodeStatus(mafNode *vme)
     {
       if (n != NULL)
       {
-      	n->m_Mutex = false;
+      	n->SetMutex(false);
       }
     }
 		else
@@ -537,16 +537,16 @@ void mafView3D::InizializeSubGui()
 	}
 }
 //-------------------------------------------------------------------------
-void mafView3D::VmeShow(mafNode *vme,bool show)
+void mafView3D::VmeShow(mafVME *vme,bool show)
 //-------------------------------------------------------------------------
 {
 	Superclass::VmeShow(vme,show);
 
-	if(((mafVME *)vme)->GetOutput()->IsA("mafVMEOutputVolume"))
+	if(vme->GetOutput()->IsA("mafVMEOutputVolume"))
 	{
 		if(show)
 		{
-			m_CurrentVolume = mafVME::SafeDownCast(vme);
+			m_CurrentVolume = vme;
 			InizializeSubGui();
 			EnableSubGui(m_Choose);
 			m_Gui->Enable(ID_COMBO_PIPE,m_CurrentVolume!=NULL);

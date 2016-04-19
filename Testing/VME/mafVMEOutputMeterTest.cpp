@@ -71,23 +71,23 @@ void mafVMEOutputMeterTest::TestUpdate()
 	//create a parametric surface
 	mafVMESurfaceParametric *vmeParametricSurfaceSTART;
 	mafNEW(vmeParametricSurfaceSTART);
-	vmeParametricSurfaceSTART->SetParent(root);
+	vmeParametricSurfaceSTART->ReparentTo(root);
 	vmeParametricSurfaceSTART->GetOutput()->GetVTKData()->Update();
-	vmeParametricSurfaceSTART->SetParent(storage->GetRoot());
+	vmeParametricSurfaceSTART->ReparentTo(storage->GetRoot());
 	vmeParametricSurfaceSTART->Update();
 
 	mafVMESurfaceParametric *vmeParametricSurfaceEND1;
 	mafNEW(vmeParametricSurfaceEND1);	
-	vmeParametricSurfaceEND1->SetParent(root);
+	vmeParametricSurfaceEND1->ReparentTo(root);
 	vmeParametricSurfaceEND1->GetOutput()->GetVTKData()->Update();
-	vmeParametricSurfaceEND1->SetParent(storage->GetRoot());
+	vmeParametricSurfaceEND1->ReparentTo(storage->GetRoot());
 	vmeParametricSurfaceEND1->Update();
 
 	mafVMESurfaceParametric *vmeParametricSurfaceEND2;
 	mafNEW(vmeParametricSurfaceEND2);	
-	vmeParametricSurfaceEND2->SetParent(root);
+	vmeParametricSurfaceEND2->ReparentTo(root);
 	vmeParametricSurfaceEND2->GetOutput()->GetVTKData()->Update();
-	vmeParametricSurfaceEND2->SetParent(storage->GetRoot());
+	vmeParametricSurfaceEND2->ReparentTo(storage->GetRoot());
 	vmeParametricSurfaceEND2->Update();
 
 	enum {X,Y,Z};
@@ -104,7 +104,7 @@ void mafVMEOutputMeterTest::TestUpdate()
 	meter->SetMeterLink("StartVME",vmeParametricSurfaceSTART);
 	meter->SetMeterLink("EndVME1",vmeParametricSurfaceEND1);
 	meter->SetMeterLink("EndVME2",vmeParametricSurfaceEND2);
-	meter->SetParent(storage->GetRoot());
+	meter->ReparentTo(storage->GetRoot());
 	meter->Modified();
 	meter->Update();
 
@@ -129,10 +129,10 @@ void mafVMEOutputMeterTest::TestUpdate()
 	m_Result = (angle - 90) < TOLERANCE;
 	TEST_RESULT;
 
-	meter->SetParent(NULL);
-	vmeParametricSurfaceSTART->SetParent(NULL);
-	vmeParametricSurfaceEND1->SetParent(NULL);
-	vmeParametricSurfaceEND2->SetParent(NULL);
+	meter->ReparentTo(NULL);
+	vmeParametricSurfaceSTART->ReparentTo(NULL);
+	vmeParametricSurfaceEND1->ReparentTo(NULL);
+	vmeParametricSurfaceEND2->ReparentTo(NULL);
 	
 	mafDEL(meter);
 	mafDEL(vmeParametricSurfaceSTART);

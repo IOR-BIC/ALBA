@@ -108,20 +108,20 @@ mafView *mafViewCT::Copy(mafObserver *Listener, bool lightCopyEnabled)
 	return v;
 }
 //----------------------------------------------------------------------------
-void mafViewCT::VmeShow(mafNode *node, bool show)
+void mafViewCT::VmeShow(mafVME *vme, bool show)
 //----------------------------------------------------------------------------
 {
 	for(int i=0; i<this->GetNumberOfSubView(); i++)
-		m_ChildViewList[i]->VmeShow(node, show);
+		m_ChildViewList[i]->VmeShow(vme, show);
 
 	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
-void mafViewCT::VmeRemove(mafNode *node)
+void mafViewCT::VmeRemove(mafVME *vme)
 //----------------------------------------------------------------------------
 {
 	for(int i=0; i<this->GetNumberOfSubView(); i++)
-		m_ChildViewList[i]->VmeRemove(node);
+		m_ChildViewList[i]->VmeRemove(vme);
 
 	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
@@ -216,9 +216,9 @@ void mafViewCT::LayoutSubViewCustom(int width, int height)
 	((mafViewCompound*)m_ChildViewList[i-1])->OnLayout();
 }*/
 //----------------------------------------------------------------------------
-void mafViewCT::VmeSelect(mafNode *node, bool select)
+void mafViewCT::VmeSelect(mafVME *vme, bool select)
 //----------------------------------------------------------------------------
 {
 	for(int i=0; i<m_NumOfChildView; i++)
-		m_ChildViewList[i]->VmeSelect(node, select);
+		m_ChildViewList[i]->VmeSelect(vme, select);
 }

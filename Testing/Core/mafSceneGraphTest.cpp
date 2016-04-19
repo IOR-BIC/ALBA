@@ -77,8 +77,8 @@ void mafSceneGraphTest::TestVmeAdd()
   sg->VmeAdd(m_Vme);
   mafSceneNode *nl = sg->GetNodeList();
   
-  for(mafSceneNode *n = nl; n; n=n->m_Next)
-    if(n->m_Vme == m_Vme)
+  for(mafSceneNode *n = nl; n; n=n->GetNext())
+    if(n->GetVme() == m_Vme)
       result = true;
   TEST_RESULT;
 
@@ -126,7 +126,7 @@ void mafSceneGraphTest::TestVme2Node()
 
   sg->VmeAdd(m_Vme);
   mafSceneNode *n = sg->Vme2Node(m_Vme);
-  result = n->m_Vme->Equals(m_Vme);
+  result = n->GetVme()->Equals(m_Vme);
   TEST_RESULT;
 
   delete sg;

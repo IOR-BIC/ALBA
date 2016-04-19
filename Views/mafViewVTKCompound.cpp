@@ -34,8 +34,8 @@
 #include "mafGUI.h"
 #include "mafGUILutSlider.h"
 #include "mafGUILutSwatch.h"
-#include "mafNode.h"
-#include "mafNodeIterator.h"
+#include "mafVME.h"
+#include "mafVMEIterator.h"
 #include "mafVMEImage.h"
 #include "mafVMEOutputVolume.h"
 #include "mafGUIFloatSlider.h"
@@ -124,19 +124,19 @@ void mafViewVTKCompound::PackageView()
 }
 
 //-------------------------------------------------------------------------
-bool mafViewVTKCompound::ActivateWindowing(mafNode *node)
+bool mafViewVTKCompound::ActivateWindowing(mafVME *vme)
 //-------------------------------------------------------------------------
 {
   bool conditions     = false;
   
-  if(((mafVME *)node)->IsA("mafVMEImage")){
+  if(vme->IsA("mafVMEImage")){
     
     conditions = true;
 
     for(int i=0; i<m_NumOfChildView; i++) {
       //m_ChildViewList[i]->VmeSelect(node, select);
 
-      mafPipeImage3D *pipe = (mafPipeImage3D *)m_ChildViewList[i]->GetNodePipe(node);
+      mafPipeImage3D *pipe = (mafPipeImage3D *)m_ChildViewList[i]->GetNodePipe(vme);
       conditions = (conditions && (pipe && pipe->IsGrayImage()));
     }
   }
@@ -161,12 +161,12 @@ void mafViewVTKCompound::CameraUpdate()
   mafSceneGraph* sg = GetSceneGraph();
 
   // Do it for each node attached to the view
-  for(mafSceneNode *node = sg->GetNodeList(); node; node=node->m_Next)
+  for(mafSceneNode *node = sg->GetNodeList(); node; node=node->GetNext())
 	{ 
-    if (node->m_Vme)
+    if (node->GetVme())
     {
   
-      mafVME* vme = (mafVME*) node->m_Vme;
+      mafVME* vme = node->GetVme();
 
       assert(vme);
       mafPipe* maf_pipe = (mafPipe*)GetNodePipe(vme);

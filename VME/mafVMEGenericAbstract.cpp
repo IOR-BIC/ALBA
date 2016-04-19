@@ -33,7 +33,7 @@
 #include "mafMatrixVector.h"
 #include "mafMatrixInterpolator.h"
 #include "mmuTimeSet.h"
-#include "mafNodeIterator.h"
+#include "mafVMEIterator.h"
 #include "mafVMEStorage.h"
 #include "mafDataPipeInterpolatorVTK.h"
 #include "mafVMEItemVTK.h"
@@ -69,7 +69,7 @@ mafVMEGenericAbstract::~mafVMEGenericAbstract()
 }
 
 //-------------------------------------------------------------------------
-int mafVMEGenericAbstract::DeepCopy(mafNode *a)
+int mafVMEGenericAbstract::DeepCopy(mafVME *a)
 //-------------------------------------------------------------------------
 { 
   if (Superclass::DeepCopy(a)==MAF_OK)
@@ -89,7 +89,7 @@ int mafVMEGenericAbstract::DeepCopy(mafNode *a)
   return MAF_ERROR;
 }
 //-------------------------------------------------------------------------
-int mafVMEGenericAbstract::DeepCopyVmeLarge(mafNode *a)
+int mafVMEGenericAbstract::DeepCopyVmeLarge(mafVME *a)
 //-------------------------------------------------------------------------
 { 
   if (Superclass::DeepCopy(a)==MAF_OK)
@@ -266,7 +266,7 @@ void mafVMEGenericAbstract::GetLocalTimeBounds(mafTimeStamp tbounds[2])
 }
 
 //-----------------------------------------------------------------------
-int mafVMEGenericAbstract::ReparentTo(mafNode *parent)
+int mafVMEGenericAbstract::ReparentTo(mafVME *parent)
 //-----------------------------------------------------------------------
 {
   if (CanReparentTo(parent) && !IsInTree(parent))
@@ -278,8 +278,8 @@ int mafVMEGenericAbstract::ReparentTo(mafNode *parent)
     // into the new place, this to be able to manage HUGE datasets.
     if (parent /*== NULL||*/ && this->GetRoot() != parent->GetRoot())
     {
-      mafNodeIterator *iter=this->NewIterator();
-      for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+      mafVMEIterator *iter=this->NewIterator();
+      for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
       {
         if (mafVMEGenericAbstract *vme = mafVMEGenericAbstract::SafeDownCast(node))
         {

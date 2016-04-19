@@ -35,7 +35,7 @@ class mafMatrix;
   
   Example usage to plug this component into an operation:
   
-  guiSaveRestorePose = new mafGUISaveRestorePose(mafVME::SafeDownCast(opInputVME), this);
+  guiSaveRestorePose = new mafGUISaveRestorePose(opInputVME, this);
   clientOpGUI->AddGui(guiSaveRestorePose->GetGui());
 
   @sa mafOpMAFTransform

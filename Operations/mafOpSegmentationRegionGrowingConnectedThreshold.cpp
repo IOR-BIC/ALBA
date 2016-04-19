@@ -26,7 +26,7 @@
 #include "wx/busyinfo.h"
 
 #include "mafGUI.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafVME.h"
 #include "mafVMEVolumeGray.h"
 #include "mafVMESurface.h"
@@ -110,11 +110,11 @@ mafOpSegmentationRegionGrowingConnectedThreshold::~mafOpSegmentationRegionGrowin
   vtkDEL(m_SphereVTK);
 }
 //----------------------------------------------------------------------------
-bool mafOpSegmentationRegionGrowingConnectedThreshold::Accept(mafNode *node)
+bool mafOpSegmentationRegionGrowingConnectedThreshold::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
   // accepts mafVMEVolumeGray data
-  return  (node->IsA("mafVMEVolumeGray")) && ((mafVME*)node)->GetOutput()->GetVTKData();
+  return  (node->IsA("mafVMEVolumeGray")) && node->GetOutput()->GetVTKData();
 }
 //----------------------------------------------------------------------------
 mafOp* mafOpSegmentationRegionGrowingConnectedThreshold::Copy()   
@@ -130,11 +130,11 @@ void mafOpSegmentationRegionGrowingConnectedThreshold::OpRun()
   if (CreateResample())
   {
     
-	  m_OldBehavior = mafVME::SafeDownCast(m_ResampleInput)->GetBehavior();
+	  m_OldBehavior = m_ResampleInput->GetBehavior();
 
 	  m_Picker = mafInteractorPicker::New();
 	  m_Picker->SetListener(this);
-	  mafVME::SafeDownCast(m_ResampleInput)->SetBehavior(m_Picker);
+	  m_ResampleInput->SetBehavior(m_Picker);
 
 	  mafNEW(m_Sphere);
 	  m_Sphere->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 0.0));
@@ -142,7 +142,7 @@ void mafOpSegmentationRegionGrowingConnectedThreshold::OpRun()
 	  m_Sphere->ReparentTo(m_ResampleInput->GetParent());
 
 	  vtkNEW(m_SphereVTK);
-    double bounds[6];mafVME::SafeDownCast(m_ResampleInput)->GetOutput()->GetBounds(bounds);
+    double bounds[6];m_ResampleInput->GetOutput()->GetBounds(bounds);
 	  m_SphereVTK->SetRadius((bounds[5]-bounds[4])/256);
     mafLogMessage("Sphere radius = %f",(bounds[5]-bounds[4])/256);
 	  m_SphereVTK->Update();
@@ -196,8 +196,8 @@ void mafOpSegmentationRegionGrowingConnectedThreshold::OpStop(int result)
     mafEventMacro(mafEvent(this,VME_SHOW,m_Sphere,false));
     m_Sphere->ReparentTo(NULL);
 
-    mafVME::SafeDownCast(m_ResampleInput)->SetBehavior(m_OldBehavior);
-    mafVME::SafeDownCast(m_ResampleInput)->Update();
+		m_ResampleInput->SetBehavior(m_OldBehavior);
+    m_ResampleInput->Update();
 
     HideGui();
     mafEventMacro(mafEvent(this,result));
@@ -209,8 +209,8 @@ void mafOpSegmentationRegionGrowingConnectedThreshold::OpStop(int result)
       mafEventMacro(mafEvent(this,VME_SHOW,m_Sphere,false));
       m_Sphere->ReparentTo(NULL);
   
-      mafVME::SafeDownCast(m_ResampleInput)->SetBehavior(m_OldBehavior);
-      mafVME::SafeDownCast(m_ResampleInput)->Update();
+			m_ResampleInput->SetBehavior(m_OldBehavior);
+      m_ResampleInput->Update();
     }
     
     if(m_ResampleInput!=NULL && m_ResampleInput!=m_Input)
@@ -313,7 +313,7 @@ void mafOpSegmentationRegionGrowingConnectedThreshold::Algorithm()
   vtkMAFSmartPointer<vtkImageToStructuredPoints> image_to_sp;
   image_to_sp->SetInput(image);
   image_to_sp->Update();
-  m_VolumeOut->SetData(image_to_sp->GetOutput(),mafVME::SafeDownCast(m_ResampleInput)->GetTimeStamp());
+  m_VolumeOut->SetData(image_to_sp->GetOutput(),m_ResampleInput->GetTimeStamp());
 
   mafTagItem tag_Nature;
   tag_Nature.SetName("VME_NATURE");
@@ -477,7 +477,7 @@ int mafOpSegmentationRegionGrowingConnectedThreshold::CreateResample()
 {
  
   // if the volume is a rectilinear grid we resample it 
-  if(((mafVME*)m_Input)->GetOutput()->GetVTKData()->IsA("vtkRectilinearGrid"))
+  if(m_Input->GetOutput()->GetVTKData()->IsA("vtkRectilinearGrid"))
   { 
     wxBusyInfo *info;
     wxBusyCursor *wait;
@@ -488,7 +488,7 @@ int mafOpSegmentationRegionGrowingConnectedThreshold::CreateResample()
     m_Resample->AutoSpacing();
     m_Resample->GetSpacing(m_VolumeSpacing);
       
-    ((mafVME*)m_Input)->GetOutput()->GetVMELocalBounds(m_VolumeBounds);
+    m_Input->GetOutput()->GetVMELocalBounds(m_VolumeBounds);
     m_Resample->SetBounds(m_VolumeBounds,medOpVolumeResample::CUSTOMBOUNDS);
           
     if (!CheckSpacing())
@@ -507,7 +507,7 @@ int mafOpSegmentationRegionGrowingConnectedThreshold::CreateResample()
     
     m_Resample->Resample();
      
-    mafVME *Output = mafVME::SafeDownCast(m_Resample->GetOutput());
+    mafVME *Output = m_Resample->GetOutput();
     Output->GetOutput()->GetVTKData()->Update();
     m_ResampleInput=mafVMEVolumeGray::SafeDownCast(Output);
     m_ResampleInput->Update();

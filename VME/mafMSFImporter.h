@@ -25,7 +25,7 @@
 //----------------------------------------------------------------------------
 class mafVMERoot;
 class mafVME;
-class mafNode;
+class mafVME;
 class mafTagArray;
 class mafMatrixVector;
 
@@ -72,7 +72,7 @@ protected:
 
   /** 
   Parse the path string to rebuild links*/
-  mafNode *ParsePath(mafVMERoot *root,const char *path);
+  mafVME *ParsePath(mafVMERoot *root,const char *path);
 
   /** Restore material attributes */
   void RestoreMaterial(mafVME *vme);

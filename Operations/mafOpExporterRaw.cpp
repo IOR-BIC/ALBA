@@ -31,7 +31,7 @@
 #include "mafEvent.h"
 #include "mafGUI.h"
 #include "mafOp.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafVMEVolumeGray.h"
 
 #include "vtkSmartPointer.h"
@@ -70,7 +70,7 @@ mafOpExporterRAW::~mafOpExporterRAW()
 {
 }
 //----------------------------------------------------------------------------
-bool mafOpExporterRAW::Accept(mafNode *node)
+bool mafOpExporterRAW::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
 	return (node != NULL) && node->IsA("mafVMEVolumeGray");

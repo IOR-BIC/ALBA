@@ -28,8 +28,8 @@
 #include <wx/config.h>
 #include "mafDecl.h"
 #include "mafView.h"
-#include "mafNode.h"
-#include "mafNodeIterator.h"
+#include "mafVME.h"
+#include "mafVMEIterator.h"
 #include "mafVMERoot.h"
 
 #include "mafGUIMDIFrame.h"
@@ -182,28 +182,28 @@ void mafViewManager::ViewSelected(mafView *view/*, mafRWIBase *rwi*/)
   }
 }
 //----------------------------------------------------------------------------
-void mafViewManager::VmeAdd(mafNode *n)   
+void mafViewManager::VmeAdd(mafVME *vme)   
 //----------------------------------------------------------------------------
 {
   for(mafView* v = m_ViewList; v; v=v->m_Next) 
-    v->VmeAdd(n); // Add the VME in all the views
+    v->VmeAdd(vme); // Add the VME in all the views
 
   wxString s;
-  s = n->GetTypeName();
+  s = vme->GetTypeName();
   if(s == "mafVMERoot") // Add a root means add a new tree
   {
-    m_RootVme     = (mafVMERoot*)n;
-    m_SelectedVme = n; // Adding new tree, selected vme must be initialized at the root.
+    m_RootVme     = (mafVMERoot*)vme;
+    m_SelectedVme = vme; // Adding new tree, selected vme must be initialized at the root.
   }
 }
 //----------------------------------------------------------------------------
-void mafViewManager::VmeRemove(mafNode *n)   
+void mafViewManager::VmeRemove(mafVME *vme)   
 //----------------------------------------------------------------------------
 {
   for(mafView* v = m_ViewList; v; v=v->m_Next) 
-    v->VmeRemove(n); // Remove the VME in all the views
+    v->VmeRemove(vme); // Remove the VME in all the views
 
-	wxString s(n->GetTypeName());
+	wxString s(vme->GetTypeName());
 	if(s == "mafVMERoot") // Remove the root means remove the tree
   {
     m_RootVme     = NULL;
@@ -211,42 +211,42 @@ void mafViewManager::VmeRemove(mafNode *n)
   }
 }
 //----------------------------------------------------------------------------
-void mafViewManager::VmeModified(mafNode *vme)
+void mafViewManager::VmeModified(mafVME *vme)
 //---------------------------------------------------------------------------
 {
  //@@@ for(mafView* v = m_ViewList; v; v=v->m_next) 
  //@@@   v->VmeModified(vme);  -- view::vmeModified not exist now -- is this required ?
 }
 //----------------------------------------------------------------------------
-void mafViewManager::VmeSelect(mafNode *n)   
+void mafViewManager::VmeSelect(mafVME *vme)   
 //----------------------------------------------------------------------------
 {
-	if(n != m_SelectedVme)
+	if(vme != m_SelectedVme)
 	{
 		if(m_SelectedVme)
 			for(mafView* v = m_ViewList; v; v=v->m_Next) 
 				v->VmeSelect(m_SelectedVme,false); //deselect the previous selected vme
-		m_SelectedVme = n; // set the new selected vme
+		m_SelectedVme = vme; // set the new selected vme
 	}
 	for(mafView* v = m_ViewList; v; v=v->m_Next) 
-    v->VmeSelect(n,true); // select the new one in the views
+    v->VmeSelect(vme,true); // select the new one in the views
 	CameraUpdate();
 }
 //----------------------------------------------------------------------------
-void mafViewManager::VmeShow(mafNode *n, bool show)   
+void mafViewManager::VmeShow(mafVME *vme, bool show)   
 //----------------------------------------------------------------------------
 {
  if(m_ViewBeingCreated) // Important - test m_ViewBeingCreated first
  {
    // show the vme in the view that has been created but
    // is not already inside the views' list (if exists)
-   m_ViewBeingCreated->VmeShow(n,show);
+   m_ViewBeingCreated->VmeShow(vme,show);
  }
  else
  {
 	 if(m_SelectedView)
 	 {
-     m_SelectedView->VmeShow(n,show); // show the vme in the selected view
+     m_SelectedView->VmeShow(vme,show); // show the vme in the selected view
 	 }
  }
 }
@@ -264,10 +264,9 @@ void mafViewManager::CameraReset(bool sel)
   if(m_SelectedView) m_SelectedView->CameraReset(sel ? m_SelectedVme : NULL); // reset the camera in the selected view
 }
 //----------------------------------------------------------------------------
-void mafViewManager::CameraReset(mafNode *vme)   
+void mafViewManager::CameraReset(mafVME *vme)   
 //----------------------------------------------------------------------------
 {
-  //@@@ if(m_SelectedView) m_SelectedView->CameraReset(vme);
   if(m_SelectedView) m_SelectedView->CameraReset(); // reset the camera in the selected view
 }
 //----------------------------------------------------------------------------
@@ -412,8 +411,8 @@ void mafViewManager::ViewInsert(mafView *view)
   view->SetMouse(m_Mouse); // set the mouse for the specified view
   if(m_RootVme != NULL)
   {
-    mafNodeIterator *iter = m_RootVme->NewIterator(); // iterate over inserted vme
-    for(mafNode *vme = iter->GetFirstNode(); vme; vme = iter->GetNextNode())
+    mafVMEIterator *iter = m_RootVme->NewIterator(); // iterate over inserted vme
+    for(mafVME *vme = iter->GetFirstNode(); vme; vme = iter->GetNextNode())
 			view->VmeAdd(vme); // Add them in the specified view
     iter->Delete();
   }
@@ -517,7 +516,6 @@ void mafViewManager::Activate(mafView *view)
   if(externalViewFlag)
     ((mafGUIViewFrame *)view->GetFrame())->SetFocus();
   else
-    //((mafGUIMDIChild *)view->GetFrame())->Activate();
     ((mafGUIMDIChild *)view->GetFrame())->SetFocus();
 }
 

@@ -24,7 +24,7 @@ class mafGUIMDIChild;
 class mafEvent;
 class mafObserver;
 class mafGUICheckTree;
-class mafNode;
+class mafVME;
 class mafSceneGraph;
 class mafVME;
 
@@ -42,7 +42,7 @@ public:
   void SetListener(mafObserver *Listener) {m_Listener = Listener;};
 
   /** Create a contextual menu*/
-  virtual void CreateContextualMenu(mafGUICheckTree *tree, mafView *view, mafNode *vme, bool vme_menu);
+  virtual void CreateContextualMenu(mafGUICheckTree *tree, mafView *view, mafVME *vme, bool vme_menu);
 
   /** Visualize contextual men for the MDI child and selected view. */
   void ShowContextualMenu();
@@ -50,7 +50,7 @@ public:
 protected:
   mafView       *m_ViewActive;
   mafVME        *m_VmeActive;
-  mafNode       *m_NodeActive;
+  mafVME       *m_NodeActive;
   mafGUICheckTree  *m_NodeTree;
   mafObserver   *m_Listener;
 

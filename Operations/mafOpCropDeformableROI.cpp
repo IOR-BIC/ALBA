@@ -26,7 +26,7 @@
 #include "mafDecl.h"
 #include "mafEvent.h"
 #include "mafGUI.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafVME.h"
 #include "mafVMEVolumeGray.h"
 #include "mafVMESurface.h"
@@ -70,7 +70,7 @@ mafOpCropDeformableROI::~mafOpCropDeformableROI()
 
 }
 //----------------------------------------------------------------------------
-bool mafOpCropDeformableROI::Accept(mafNode *node)
+bool mafOpCropDeformableROI::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
 	return (node && node->IsA("mafVMEVolumeGray"));
@@ -126,12 +126,12 @@ void mafOpCropDeformableROI::OnEvent(mafEventBase *maf_event)
 {
 	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
 	{
-		mafNode *n=NULL;
+		mafVME *n=NULL;
 		switch(e->GetId())
 		{	
 		case wxOK:
 			//Run algorithm and stop operation
-			Algorithm(mafVME::SafeDownCast(m_PNode));
+			Algorithm(m_PNode);
 			OpStop(OP_RUN_OK);        
 			break;
 		case wxCANCEL:
@@ -189,8 +189,8 @@ void mafOpCropDeformableROI::Algorithm(mafVME *vme)
 		vtkPolyData *Mask;
 
 		mafMatrix identityMatrix;
-		mafMatrix maskABSMatrix = mafVME::SafeDownCast(vme)->GetAbsMatrixPipe()->GetMatrix();
-		mafMatrix volumeABSMatrix = mafVME::SafeDownCast(m_Input)->GetAbsMatrixPipe()->GetMatrix();
+		mafMatrix maskABSMatrix = vme->GetAbsMatrixPipe()->GetMatrix();
+		mafMatrix volumeABSMatrix = m_Input->GetAbsMatrixPipe()->GetMatrix();
 
 		bool isMaskMatrixIdentity = maskABSMatrix.Equals(&identityMatrix);
 		bool isVolumeMatrixIdentity = volumeABSMatrix.Equals(&identityMatrix);
@@ -232,9 +232,9 @@ void mafOpCropDeformableROI::Algorithm(mafVME *vme)
 		m_MaskPolydataFilter->Update();
 
 		if(vtkRectilinearGrid::SafeDownCast(m_MaskPolydataFilter->GetOutput()))
-			m_ResultVme->SetData(((vtkRectilinearGrid*)m_MaskPolydataFilter->GetOutput()),((mafVME*)m_Input)->GetTimeStamp());
+			m_ResultVme->SetData(((vtkRectilinearGrid*)m_MaskPolydataFilter->GetOutput()),m_Input->GetTimeStamp());
 		else if(vtkImageData::SafeDownCast(m_MaskPolydataFilter->GetOutput()))
-			m_ResultVme->SetData(((vtkImageData*)m_MaskPolydataFilter->GetOutput()),((mafVME*)m_Input)->GetTimeStamp());
+			m_ResultVme->SetData(((vtkImageData*)m_MaskPolydataFilter->GetOutput()),m_Input->GetTimeStamp());
 	
 		m_ResultVme->Modified();
 		m_ResultVme->Update();

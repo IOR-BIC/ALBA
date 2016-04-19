@@ -38,34 +38,29 @@ mafView *testView::Copy(mafObserver *Listener)
   return v;
 }
 //----------------------------------------------------------------------------
-int testView::GetNodeStatus(mafNode *vme)
+int testView::GetNodeStatus(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   assert(m_Sg);
   mafSceneNode *n = m_Sg->Vme2Node(vme);
   assert(n);
 
-  if(!vme->IsA("mafVME"))
-    return NODE_NON_VISIBLE;
-
-  mafVME *v = ((mafVME*)vme);
-  if( v->GetVisualPipe() == "" )  
+  if( vme->GetVisualPipe() == "" )  
     return NODE_NON_VISIBLE;
   else
     return (n->IsVisible()) ? NODE_VISIBLE_ON :  NODE_VISIBLE_OFF;
 }
 //----------------------------------------------------------------------------
-void testView::VmeCreatePipe(mafNode *vme)
+void testView::VmeCreatePipe(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   mafSceneNode *n = m_Sg->Vme2Node(vme);
-  assert(n && !n->m_Pipe);
+  assert(n && !n->GetPipe());
   assert(vme->IsA("mafVME"));
-  mafVME *v = ((mafVME*)vme);
-
+  
   mafObject *obj= NULL;
   mafString pipe_name = "";
-  mafString vme_type = v->GetTypeName(); // Paolo 2005-04-23 Just to try PlugVisualPipe 
+  mafString vme_type = vme->GetTypeName(); // Paolo 2005-04-23 Just to try PlugVisualPipe 
                                         // (to be replaced with something that extract the type of the vme)
 
   mafPipeFactory *pipe_factory  = mafPipeFactory::GetInstance();
@@ -78,7 +73,7 @@ void testView::VmeCreatePipe(mafNode *vme)
   else
   {
     // keep the default visual pipe from the vme
-    pipe_name = v->GetVisualPipe();
+    pipe_name = vme->GetVisualPipe();
     assert( pipe_name != "" );
     obj = pipe_factory->CreateInstance(pipe_name);
     assert(obj);
@@ -87,14 +82,14 @@ void testView::VmeCreatePipe(mafNode *vme)
   
   pipe->Create(n);
 
-  n->m_Pipe = (mafPipe*)pipe;
+  n->SetPipe(pipe);
 }
 //----------------------------------------------------------------------------
-void testView::VmeDeletePipe(mafNode *vme)
+void testView::VmeDeletePipe(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   mafSceneNode *n = m_Sg->Vme2Node(vme);
-  assert(n && n->m_Pipe);
-  cppDEL(n->m_Pipe);
+  assert(n && n->GetPipe());
+	n->DeletePipe();
 }
 

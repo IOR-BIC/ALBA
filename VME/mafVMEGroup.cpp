@@ -29,7 +29,7 @@
 
 #include "mafTransform.h"
 #include "mafMatrixVector.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafVMEOutputNULL.h"
 
 const int DEBUG_MODE = false;
@@ -80,7 +80,7 @@ mafVMEOutput *mafVMEGroup::GetOutput()
 mafGUI* mafVMEGroup::CreateGui()
 //-------------------------------------------------------------------------
 {
-  m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
+  m_Gui = mafVME::CreateGui(); // Called to show info about vmes' type and name
   m_Gui->Divider();
 	return m_Gui;
 }
@@ -95,10 +95,10 @@ void mafVMEGroup::OnEvent(mafEventBase *maf_event)
     {
       case NODE_ATTACHED_TO_TREE:
       {
-        mafNode *n = mafNode::SafeDownCast((mafObject *)maf_event->GetSender());
+        mafVME *n = mafVME::SafeDownCast((mafObject *)maf_event->GetSender());
         if (n)
         {
-          mafNode *parent = n->GetParent();
+          mafVME *parent = n->GetParent();
           if (parent == this)
           {
             //mafMessage("Ask for shared GUI!!");
@@ -109,10 +109,10 @@ void mafVMEGroup::OnEvent(mafEventBase *maf_event)
       break;
       case NODE_DETACHED_FROM_TREE:
       {
-        mafNode *n = mafNode::SafeDownCast((mafObject *)maf_event->GetSender());
+        mafVME *n = mafVME::SafeDownCast((mafObject *)maf_event->GetSender());
         if (n)
         {
-          mafNode *parent = n->GetParent();
+          mafVME *parent = n->GetParent();
           if (parent == this)
           {
             //mafMessage("Remove shared GUI!!");
@@ -239,7 +239,7 @@ bool mafVMEGroup::Equals(mafVME *vme)
 }
 
 //-------------------------------------------------------------------------
-int mafVMEGroup::DeepCopy(mafNode *a)
+int mafVMEGroup::DeepCopy(mafVME *a)
 //-------------------------------------------------------------------------
 { 
   if (Superclass::DeepCopy(a)==MAF_OK)

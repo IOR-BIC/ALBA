@@ -728,7 +728,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       break;
       case VME_MODIFIED:
         VmeModified(e->GetVme());
-				if(!m_PlugTimebar && ((mafVME*)e->GetVme())->IsAnimated())
+				if(!m_PlugTimebar && e->GetVme()->IsAnimated())
 					m_Win->ShowDockPane("timebar",!m_Win->DockPaneIsShown("timebar") );
       break; 
       case VME_ADD:
@@ -753,7 +753,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 				else
 					str = "Choose Node";
 
-        std::vector<mafNode*> nodeVector = VmeChoose(e->GetArg(), REPRESENTATION_AS_TREE, str, e->GetBool(),e->GetVme());
+        std::vector<mafVME*> nodeVector = VmeChoose(e->GetArg(), REPRESENTATION_AS_TREE, str, e->GetBool(),e->GetVme());
         if (!e->GetBool())
         {
           if (nodeVector.size() != 0)
@@ -772,17 +772,17 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       }
       break;
       case VME_CHOOSE_MATERIAL:
-        VmeChooseMaterial((mafVME *)e->GetVme(), e->GetBool());
+        VmeChooseMaterial(e->GetVme(), e->GetBool());
       break;
       case VME_VISUAL_MODE_CHANGED:
       {
-        mafVME *vme = (mafVME *)e->GetVme();
+        mafVME *vme = e->GetVme();
         VmeShow(vme, false);
         VmeShow(vme, true);
       }
       break;
       case UPDATE_PROPERTY:
-        VmeUpdateProperties((mafVME *)e->GetVme(), e->GetBool());
+        VmeUpdateProperties(e->GetVme(), e->GetBool());
         break;
       case SHOW_CONTEXTUAL_MENU:
         if (e->GetSender() == m_SideBar->GetTree())
@@ -1658,7 +1658,7 @@ void mafLogicWithManagers::OnQuit()
 void mafLogicWithManagers::VmeDoubleClicked(mafEvent &e)
 //----------------------------------------------------------------------------
 {
-  mafNode *node = e.GetVme();
+  mafVME *node = e.GetVme();
   if (node)
   {
     mafLogMessage("Double click on %s", node->GetName());
@@ -1668,10 +1668,10 @@ void mafLogicWithManagers::VmeDoubleClicked(mafEvent &e)
 void mafLogicWithManagers::VmeSelect(mafEvent& e)	//modified by Paolo 10-9-2003
 //----------------------------------------------------------------------------
 {
-  mafNode *node = NULL;
+  mafVME *node = NULL;
 
 	if(m_PlugControlPanel && (e.GetSender() == this->m_SideBar->GetTree()))
-    node = (mafNode*)e.GetArg();//sender == tree => the node is in e.arg
+    node = (mafVME*)e.GetArg();//sender == tree => the node is in e.arg
   else
     node = e.GetVme();          //sender == PER  => the node is in e.node  
 
@@ -1704,7 +1704,7 @@ void mafLogicWithManagers::VmeSelect(mafEvent& e)	//modified by Paolo 10-9-2003
   }
 }
 //----------------------------------------------------------------------------
-void mafLogicWithManagers::VmeSelected(mafNode *vme)
+void mafLogicWithManagers::VmeSelected(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   //if a wizard manager was plugged we tell it about vme selection
@@ -1717,7 +1717,7 @@ void mafLogicWithManagers::VmeSelected(mafNode *vme)
 	if(m_SideBar)     m_SideBar->VmeSelected(vme);
 }
 //----------------------------------------------------------------------------
-void mafLogicWithManagers::VmeShow(mafNode *vme, bool visibility)
+void mafLogicWithManagers::VmeShow(mafVME *vme, bool visibility)
 //----------------------------------------------------------------------------
 {
 	if(m_ViewManager) m_ViewManager->VmeShow(vme, visibility);
@@ -1726,7 +1726,7 @@ void mafLogicWithManagers::VmeShow(mafNode *vme, bool visibility)
     m_SideBar->VmeShow(vme,visibility);
 }
 //----------------------------------------------------------------------------
-void mafLogicWithManagers::VmeModified(mafNode *vme)
+void mafLogicWithManagers::VmeModified(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   if(m_PlugTimebar) UpdateTimeBounds();
@@ -1743,14 +1743,14 @@ void mafLogicWithManagers::VmeModified(mafNode *vme)
 	if(m_OpManager)   m_OpManager->VmeModified(vme);
 }
 //----------------------------------------------------------------------------
-void mafLogicWithManagers::VmeAdd(mafNode *vme)
+void mafLogicWithManagers::VmeAdd(mafVME *vme)
 //----------------------------------------------------------------------------
 {
 	if(m_VMEManager) 
     m_VMEManager->VmeAdd(vme);
 }
 //----------------------------------------------------------------------------
-void mafLogicWithManagers::VmeAdded(mafNode *vme)
+void mafLogicWithManagers::VmeAdded(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   if(m_ViewManager)
@@ -1765,7 +1765,7 @@ void mafLogicWithManagers::VmeAdded(mafNode *vme)
 }
 
 //----------------------------------------------------------------------------
-void mafLogicWithManagers::VmeRemove(mafNode *vme)
+void mafLogicWithManagers::VmeRemove(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   if(m_VMEManager)
@@ -1776,7 +1776,7 @@ void mafLogicWithManagers::VmeRemove(mafNode *vme)
     m_ViewManager->CameraUpdate();
 }
 //----------------------------------------------------------------------------
-void mafLogicWithManagers::VmeRemoving(mafNode *vme)
+void mafLogicWithManagers::VmeRemoving(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   bool vme_in_tree = true;
@@ -1949,7 +1949,7 @@ void mafLogicWithManagers::UpdateTimeBounds()
   }
 }
 //----------------------------------------------------------------------------
-std::vector<mafNode*> mafLogicWithManagers::VmeChoose(long vme_accept_function, long style, mafString title, bool multiSelect, mafNode *vme)
+std::vector<mafVME*> mafLogicWithManagers::VmeChoose(long vme_accept_function, long style, mafString title, bool multiSelect, mafVME *vme)
 //----------------------------------------------------------------------------
 {
   mafGUIVMEChooser vc(m_SideBar->GetTree(),title.GetCStr(), vme_accept_function, style, multiSelect, vme);
@@ -2006,7 +2006,7 @@ void mafLogicWithManagers::TreeContextualMenu(mafEvent &e)
   mafGUITreeContextualMenu *contextMenu = new mafGUITreeContextualMenu();
   contextMenu->SetListener(this);
   mafView *v = m_ViewManager->GetSelectedView();
-  mafVME  *vme = (mafVME *)e.GetVme();
+  mafVME  *vme = e.GetVme();
   bool vme_menu = e.GetBool();
   bool autosort = e.GetArg() != 0;
   contextMenu->CreateContextualMenu((mafGUICheckTree *)e.GetSender(),v,vme,vme_menu);
@@ -2497,7 +2497,7 @@ void mafLogicWithManagers::RestoreLayout()
 	xmlStorage->SetURL(layout_file);
 	if(wxFileExists(layout_file) && xmlStorage->Restore()==MAF_OK)
 	{
-		mafNode *root = ((mafNode *)xmlStorage->GetDocument());
+		mafVME *root = (mafVME *)xmlStorage->GetDocument();
 
 		mmaApplicationLayout * app_layout = (mmaApplicationLayout *)root->GetAttribute("ApplicationLayout");
 

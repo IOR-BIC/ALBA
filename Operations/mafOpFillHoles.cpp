@@ -36,7 +36,7 @@
 #include "mafDecl.h"
 #include "mafEvent.h"
 #include "mafGUI.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafVME.h"
 
 #include "vtkCamera.h"
@@ -108,7 +108,7 @@ mafOpFillHoles::~mafOpFillHoles()
   }
 }
 //----------------------------------------------------------------------------
-bool mafOpFillHoles::Accept(mafNode *node)
+bool mafOpFillHoles::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
 	return (node && node->IsA("mafVMESurface"));
@@ -155,10 +155,7 @@ void mafOpFillHoles::OpRun()
 void mafOpFillHoles::OpDo()
 //----------------------------------------------------------------------------
 {
-	/*((mafVMESurface*)m_Input)->SetData(m_ResultPolydata,((mafVME*)m_Input)->GetTimeStamp());
-	((mafVMESurface*)m_Input)->Modified();*/
-
-  ((mafVMESurface*)m_Input)->SetData(m_VTKResult[m_VTKResult.size()-1],((mafVME*)m_Input)->GetTimeStamp());
+  ((mafVMESurface*)m_Input)->SetData(m_VTKResult[m_VTKResult.size()-1],m_Input->GetTimeStamp());
   ((mafVMESurface*)m_Input)->Modified();
 
 	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
@@ -167,7 +164,7 @@ void mafOpFillHoles::OpDo()
 void mafOpFillHoles::OpUndo()
 //----------------------------------------------------------------------------
 {
-	((mafVMESurface*)m_Input)->SetData(m_OriginalPolydata,((mafVME*)m_Input)->GetTimeStamp());
+	((mafVMESurface*)m_Input)->SetData(m_OriginalPolydata,m_Input->GetTimeStamp());
 	((mafVMESurface*)m_Input)->Modified();
 
 	mafEventMacro(mafEvent(this,CAMERA_UPDATE));

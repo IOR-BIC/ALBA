@@ -29,7 +29,7 @@
 
 #include "mafVMEFactory.h"
 #include "mafCoreFactory.h"
-#include "mafNodeIterator.h"
+#include "mafVMEIterator.h"
 #include "mafVMESurface.h"
 #include "mafVMEPolyline.h"
 #include "mafTransform.h"
@@ -98,59 +98,56 @@ int play_tree(mafVMERoot *m_StorageRoot)
   renWin->SetPosition(400,0);
   renWin->StereoCapableWindowOn();
 
-  mafNodeIterator *iter=m_StorageRoot->NewIterator();
+  mafVMEIterator *iter=m_StorageRoot->NewIterator();
 
   // connect VME to assemblies and put m_StorageRoot assembly into the renderer
-  for (mafNode *node=iter->GetFirstNode();node;node=iter->GetNextNode())
+  for (mafVME *node=iter->GetFirstNode();node;node=iter->GetNextNode())
   {
-    if (mafVME *vme=mafVME::SafeDownCast(node))
+    if (node->IsMAFType(mafVMERoot))
     {
-      if (vme->IsMAFType(mafVMERoot))
+      vtkMAFSmartPointer<vtkAssembly> vmeasm;
+      mafClientData *clientdata=mafClientData::SafeDownCast(node->GetAttribute("ClientData"));
+      if (!clientdata)
       {
-        vtkMAFSmartPointer<vtkAssembly> vmeasm;
-        mafClientData *clientdata=mafClientData::SafeDownCast(vme->GetAttribute("ClientData"));
-        if (!clientdata)
-        {
-          clientdata=mafClientData::New(); // note ref count already set to 0
-          clientdata->SetName("ClientData");
+        clientdata=mafClientData::New(); // note ref count already set to 0
+        clientdata->SetName("ClientData");
  
-          vme->SetAttribute("ClientData",clientdata);
-        }
-
-        CPPUNIT_ASSERT(clientdata!=NULL);
-        clientdata->m_Prop3D=vmeasm;
-
-        renderer->AddActor(vmeasm);
+        node->SetAttribute("ClientData",clientdata);
       }
-      else
+
+      CPPUNIT_ASSERT(clientdata!=NULL);
+      clientdata->m_Prop3D=vmeasm;
+
+      renderer->AddActor(vmeasm);
+    }
+    else
+    {
+      vtkDataSet *vmedata=node->GetOutput()->GetVTKData();
+      vtkMAFSmartPointer<vtkDataSetMapper> mapper;
+      mapper->SetInput((vtkPolyData *)vmedata);
+
+      vtkMAFSmartPointer<vtkActor> vmeact;
+      vmeact->SetMapper(mapper);
+
+      vtkMAFSmartPointer<vtkAssembly> vmeasm;
+      vmeasm->AddPart(vmeact);
+      vmeasm->SetUserTransform(node->GetOutput()->GetTransform()->GetVTKTransform());
+      mafClientData *clientdata=mafClientData::SafeDownCast(node->GetAttribute("ClientData"));
+      if (!clientdata)
       {
-        vtkDataSet *vmedata=vme->GetOutput()->GetVTKData();
-        vtkMAFSmartPointer<vtkDataSetMapper> mapper;
-        mapper->SetInput((vtkPolyData *)vmedata);
-
-        vtkMAFSmartPointer<vtkActor> vmeact;
-        vmeact->SetMapper(mapper);
-
-        vtkMAFSmartPointer<vtkAssembly> vmeasm;
-        vmeasm->AddPart(vmeact);
-        vmeasm->SetUserTransform(vme->GetOutput()->GetTransform()->GetVTKTransform());
-        mafClientData *clientdata=mafClientData::SafeDownCast(vme->GetAttribute("ClientData"));
-        if (!clientdata)
-        {
-          clientdata=mafClientData::New(); // note ref count initially set to 0
-          clientdata->SetName("ClientData");
-          vme->SetAttribute("ClientData",clientdata);
-        }
-
-        CPPUNIT_ASSERT(clientdata!=NULL);
-        clientdata->m_Prop3D=vmeasm;
-
-        mafClientData *pclientdata=mafClientData::SafeDownCast(vme->GetParent()->GetAttribute("ClientData"));
-        CPPUNIT_ASSERT(pclientdata);
-        vtkAssembly *pvmeasm=(vtkAssembly *)pclientdata->m_Prop3D;
-        pvmeasm->AddPart(vmeasm);
+        clientdata=mafClientData::New(); // note ref count initially set to 0
+        clientdata->SetName("ClientData");
+        node->SetAttribute("ClientData",clientdata);
       }
-    }    
+
+      CPPUNIT_ASSERT(clientdata!=NULL);
+      clientdata->m_Prop3D=vmeasm;
+
+      mafClientData *pclientdata=mafClientData::SafeDownCast(node->GetParent()->GetAttribute("ClientData"));
+      CPPUNIT_ASSERT(pclientdata);
+      vtkAssembly *pvmeasm=(vtkAssembly *)pclientdata->m_Prop3D;
+      pvmeasm->AddPart(vmeasm);
+    }
   }
 
   mafTimeStamp treeTimeBounds[2];

@@ -25,7 +25,7 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mafNode;
+class mafVME;
 class mafGUI;
 class mafView;
 class mafSceneNode;
@@ -43,32 +43,28 @@ public:
 	//virtual void	OnEvent(mafEvent& e);
 
 	/** Add a vme to the scene graph. */
-	virtual void VmeAdd(mafNode *vme);
+	virtual void VmeAdd(mafVME *vme);
 
 	/** Remove a vme from the scene graph. */
-	virtual void VmeRemove(mafNode *vme);
+	virtual void VmeRemove(mafVME *vme);
 
 	/** Select a vme and store a reference to it into m_SelectedVme variable. */
-	virtual void VmeSelect(mafNode *vme, bool select);
+	virtual void VmeSelect(mafVME *vme, bool select);
 
 	/** Change the visibility of the vme and if necessary create the vme related pipe. */
-	virtual void VmeShow(mafNode *vme, bool show);
+	virtual void VmeShow(mafVME *vme, bool show);
 
 	/** Show/Hide the Vme with the same type of the passed vme */
-	virtual void VmeShowByType(mafNode *vme, bool show);
-
-	/** 
-  Show all the same vme type. */
-	//@@@ virtual void					VmeShowByType			(mafNodeBaseTypes type,bool show);
-
+	virtual void VmeShowByType(mafVME *vme, bool show);
+		
 	/** Show all the vme subtree. */
-	virtual void VmeShowSubTree(mafNode *vme, bool show);
+	virtual void VmeShowSubTree(mafVME *vme, bool show);
 
 	/** Update the vme's properties. */
-	virtual void VmeUpdateProperty(mafNode *vme, bool fromTag = false);
+	virtual void VmeUpdateProperty(mafVME *vme, bool fromTag = false);
 
 	/** Find the corresponding vme's node. */
-	virtual mafSceneNode *Vme2Node(mafNode *vme);
+	virtual mafSceneNode *Vme2Node(mafVME *vme);
 
   /** Return the list of node that are added to the view.*/
   mafSceneNode *GetNodeList() {return m_List;};
@@ -81,14 +77,11 @@ public:
 
   /**
   Return the selected vme.*/
-	virtual mafNode *GetSelectedVme() {return m_SelectedVme;};
+	virtual mafVME *GetSelectedVme() {return m_SelectedVme;};
 
   /**
   Used by the mafGUICheckTree - return the status of a SceneNode*/
-	virtual int  GetNodeStatus (mafNode *node);
-
-	// Event to show/hide the LandmarkClouds
-	//@@@ virtual void	OnOpenCloseEvent( mafSceneNode *node );
+	virtual int  GetNodeStatus (mafVME *node);
 
   /** print a dump of this object */
   virtual void Print(std::ostream& os, const int tabs=0);// const;
@@ -97,19 +90,13 @@ protected:
   /** 
   recursively kill all node - starting from the tail of the list. */
   virtual void DeleteNodeList(mafSceneNode *n);
-/*	
-	bool m_creatable[NUM_OF_BASETYPE];
-	bool m_mutex		[NUM_OF_BASETYPE];
-	int  m_autoshow	[NUM_OF_BASETYPE];
-	mafNode  *m_shown_mutex_vme[NUM_OF_BASETYPE];
-*/
 
-	mafSceneNode *NodeAdd(mafNode *vme);
+	mafSceneNode *NodeAdd(mafVME *vme);
 
   mafSceneNode *m_List;      ///< list of visualized node
   mafObserver	 *m_Listener;
 	mafGUI			 *m_Gui;
-	mafNode      *m_SelectedVme;
+	mafVME			 *m_SelectedVme;
  
 };
 #endif

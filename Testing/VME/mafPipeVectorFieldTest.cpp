@@ -224,7 +224,6 @@ void mafPipeVectorFieldTest::TestCreate()
   }
 
   delete pipe;
-  sceneNode->m_RenFront = NULL;
   delete sceneNode;
   delete(rootscenenode);
 

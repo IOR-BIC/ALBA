@@ -68,7 +68,7 @@ public:
   mafOp* Copy();
 
   /** Return true for the acceptable vme type. */
-  bool Accept(mafNode *node);
+  bool Accept(mafVME*node);
 
   /** Builds operation's interface. */
   void OpRun();
@@ -89,7 +89,7 @@ public:
   double GetDefaultDensity();
 
 	/** Calculate inertial tensor components from a surface */
-	int ComputeInertialTensor(mafNode* node);
+	int ComputeInertialTensor(mafVME* node);
 
   /** Calculate inertial tensor components from a group of surfaces and store them in the input vme. */
   int ComputeInertialTensorFromGroup();
@@ -98,7 +98,7 @@ public:
   void AddAttributes();
 
   /** Get the VME mass from the "SURFACE_MASS" tag if existent otherwise returns: */  enum {SURFACE_MASS_NOT_FOUND = -1};
-  static double GetMass( mafNode* node);
+  static double GetMass( mafVME* node);
 
 protected:
 
@@ -108,17 +108,17 @@ protected:
 		double _Cx; double _Cy; double _Cz;
 		double _m; 
 		double _density;
-		mafNode *_node;
+		mafVME *_node;
 	} LocalInertiaTensor;
 
 	/** Computes Inertial tensor referred to a single node, and fill m_LocalInertiaTensors vector */
-	int ComputeLocalInertialTensor(mafNode* node, int current_node = 1, int n_of_nodes = 1);
+	int ComputeLocalInertialTensor(mafVME* node, int current_node = 1, int n_of_nodes = 1);
 
 	/** Uses m_LocalInertiaTensors partial data to calculate the inertia tensor of the total system */
 	void ComputeGlobalInertiaTensor();
 	
 	/** Get the VME density from the "DENSITY" tag if existent otherwise returns: */  enum {DENSITY_NOT_FOUND = -1};
-	double GetDensity( mafNode* node);
+	double GetDensity( mafVME* node);
 	
 	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
 	void OpStop(int result);
@@ -158,7 +158,7 @@ protected:
 
   int m_Accuracy;
 
-  vector<pair<mafNode * , double>> m_NodeMassPairVector;
+  vector<pair<mafVME * , double>> m_NodeMassPairVector;
 
 };
 #endif

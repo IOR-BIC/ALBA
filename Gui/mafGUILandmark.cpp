@@ -51,7 +51,7 @@
 #include "vtkMath.h"
 
 //----------------------------------------------------------------------------
-mafGUILandmark::mafGUILandmark(mafNode *inputVME, mafObserver *listener, bool testMode /* = false */)
+mafGUILandmark::mafGUILandmark(mafVME *inputVME, mafObserver *listener, bool testMode /* = false */)
 //----------------------------------------------------------------------------
 {
   m_Listener = listener;
@@ -59,7 +59,7 @@ mafGUILandmark::mafGUILandmark(mafNode *inputVME, mafObserver *listener, bool te
   m_LMCloud = NULL;
   m_LMCloudName = "lm_cloud";
 
-  m_InputVME = mafVME::SafeDownCast(inputVME);
+  m_InputVME = inputVME;
   m_RefSysVMEName = ""; 
   m_Landmark = NULL;
   
@@ -128,23 +128,17 @@ mafGUILandmark::~mafGUILandmark()
   {
     for (int i = 0; i < m_LMCloud->GetNumberOfLandmarks(); i++)
     {
-      mafNode *lm = m_LMCloud->GetChild(i);
+      mafVME *lm = m_LMCloud->GetChild(i);
       mafEventMacro(mafEvent(this, VME_SHOW, lm, false));
       mafEventMacro(mafEvent(this, VME_REMOVE, lm));
       mafDEL(lm);
-      //vtkDEL(lm);
+
     }
 
     mafEventMacro(mafEvent(this, VME_SHOW, m_LMCloud, false));
     mafEventMacro(mafEvent(this, VME_REMOVE, m_LMCloud));
     mafDEL(m_LMCloud);
-    //vtkDEL(m_LMCloud);
   }
-
-
-  // delete child landmarks 
-
-  // m_Gui already destroyed?
 } 
 
 //----------------------------------------------------------------------------
@@ -152,12 +146,6 @@ void mafGUILandmark::CreateGui()
 //----------------------------------------------------------------------------
 {
   m_Gui = new mafGUI(this); 
-  /*
-  m_Gui->Label("mouse interaction", true);
-  m_Gui->Label("left mouse: pick landmark");
-  m_Gui->Label("middle mouse: translate");
-  m_Gui->Label("ctrl: toggle snap on surface during translate");
-  */ 
 
   m_Gui->Double(ID_TRANSLATE_X, "Translate X", &m_Position[0]);
   m_Gui->Double(ID_TRANSLATE_Y, "Translate Y", &m_Position[1]);
@@ -201,12 +189,8 @@ void mafGUILandmark::OnEvent(mafEventBase *maf_event)
         mat.DeepCopy(tr->GetMatrix());
         mat.SetTimeStamp(m_CurrentTime);
 
-        //m_Landmark->SetAbsPose(mat);
         m_Landmark->SetAbsMatrix(mat);
-        //mafLogMessage("%.2f %.2f %.2f", e->GetMatrix()->GetVTKMatrix()->GetElement(0,3),e->GetMatrix()->GetVTKMatrix()->GetElement(1,3),e->GetMatrix()->GetVTKMatrix()->GetElement(2,3));
         SetGuiAbsPosition(mat.GetVTKMatrix(), -1);
-
-        //UpdateIsa();
 
         mafEventMacro(mafEvent(this, CAMERA_UPDATE));        
 
@@ -221,7 +205,7 @@ void mafGUILandmark::OnEvent(mafEventBase *maf_event)
         mafString title = _("Choose VME ref sys");
         mafEvent e(this,VME_CHOOSE,&title,(long)&mafGUILandmark::VmeAccept);
         mafEventMacro(e); 
-        SetRefSysVME(mafVME::SafeDownCast(e.GetVme())); 			
+        SetRefSysVME(e.GetVme());
       }
       break;
 
@@ -282,24 +266,22 @@ void mafGUILandmark::CreateTranslateISACompositor()
 }
  
 //----------------------------------------------------------------------------
-int mafGUILandmark::AttachInteractor(mafNode *vme, mafInteractor *newInteractor, mafInteractor *storeOldInteractor)
+int mafGUILandmark::AttachInteractor(mafVME *vme, mafInteractor *newInteractor, mafInteractor *storeOldInteractor)
 //----------------------------------------------------------------------------
 { 
   if (!vme) return -1;
-  mafVME *vmeLocal = mafVME::SafeDownCast(vme);
-  storeOldInteractor = vmeLocal->GetBehavior();  
-  vmeLocal->SetBehavior(newInteractor);
+  storeOldInteractor = vme->GetBehavior();
+	vme->SetBehavior(newInteractor);
 
   return 0;
 }
 
 //----------------------------------------------------------------------------
-int mafGUILandmark::AttachInteractor(mafNode *vme, mafInteractor *newInteractor)
+int mafGUILandmark::AttachInteractor(mafVME *vme, mafInteractor *newInteractor)
 //----------------------------------------------------------------------------
 { 
   if (!vme) return -1;
-  mafVME *vmeLocal = mafVME::SafeDownCast(vme);
-  vmeLocal->SetBehavior(newInteractor);
+	vme->SetBehavior(newInteractor);
 
   return 0;
 }
@@ -329,7 +311,7 @@ void mafGUILandmark::OnVmePicked(mafEvent& e)
     mafNEW(m_LMCloud);
 		m_LMCloud->SetName(m_LMCloudName);
     double b[6];
-    mafVME::SafeDownCast(m_InputVME)->GetOutput()->GetVTKData()->GetBounds(b);
+    m_InputVME->GetOutput()->GetVTKData()->GetBounds(b);
 
     double diffX = fabs(b[1] - b[0]);
     double diffY = fabs(b[3] - b[2]);
@@ -481,10 +463,10 @@ void mafGUILandmark::UpdateGuiInternal()
 }
 
 
-void mafGUILandmark::SetInputVME(mafNode *vme)
+void mafGUILandmark::SetInputVME(mafVME *vme)
 {
    assert(m_InputVME == NULL); 
-   m_InputVME = mafVME::SafeDownCast(vme);
+   m_InputVME = vme;
    m_CurrentTime = m_InputVME->GetTimeStamp();
    SetRefSysVME(m_InputVME);
    AttachInteractor(m_InputVME, m_PickerInteractor, m_OldInputVMEBehavior);        

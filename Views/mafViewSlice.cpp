@@ -267,7 +267,7 @@ void mafViewSlice::InitializeSlice(double* Origin, double* Normal)
   m_SliceInitialized = true;
 }
 //----------------------------------------------------------------------------
-void mafViewSlice::VmeCreatePipe(mafNode *vme)
+void mafViewSlice::VmeCreatePipe(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   
@@ -294,9 +294,9 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
         m_CurrentVolume = n;
 
         if (m_AttachCamera)
-          m_AttachCamera->SetVme(m_CurrentVolume->m_Vme);
+          m_AttachCamera->SetVme(m_CurrentVolume->GetVme());
         int slice_mode;
-        vtkDataSet *data = ((mafVME *)vme)->GetOutput()->GetVTKData();
+        vtkDataSet *data = vme->GetOutput()->GetVTKData();
         assert(data);
         data->Update();
         switch(m_CameraPositionId)
@@ -513,14 +513,14 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
 }
 
 //----------------------------------------------------------------------------
-void mafViewSlice::VmeDeletePipe(mafNode *vme)
+void mafViewSlice::VmeDeletePipe(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   mafSceneNode *n = m_Sg->Vme2Node(vme);
 
 	m_NumberOfVisibleVme--;
   
-  if (((mafVME *)vme)->GetOutput()->IsA("mafVMEOutputVolume"))
+  if (vme->GetOutput()->IsA("mafVMEOutputVolume"))
   {
     m_CurrentVolume = NULL;
     if (m_AttachCamera)
@@ -535,24 +535,23 @@ void mafViewSlice::VmeDeletePipe(mafNode *vme)
     UpdateSurfacesList(vme);
 }
 //-------------------------------------------------------------------------
-int mafViewSlice::GetNodeStatus(mafNode *vme)
+int mafViewSlice::GetNodeStatus(mafVME *vme)
 //-------------------------------------------------------------------------
 {
   mafSceneNode *n = NULL;
   if (m_Sg != NULL)
   {
     n = m_Sg->Vme2Node(vme);
-     if (((mafVME *)vme)->GetOutput()->IsA("mafVMEOutputVolume") || 
+     if (vme->GetOutput()->IsA("mafVMEOutputVolume") || 
          vme->IsMAFType(mafVMESlicer))
     {
       if (n != NULL)
       {
-      	n->m_Mutex = true;
+      	n->SetMutex(true);
       }
     }
     else if (vme->IsMAFType(mafVMEImage))
     {
-      //n->m_Mutex = true;
 			if (n != NULL)
 			{
 				n->SetPipeCreatable(false);
@@ -575,7 +574,7 @@ mafGUI *mafViewSlice::CreateGui()
   if (m_CurrentVolume)
   {
     mafPipeVolumeSlice_BES *p = NULL;
-    p = mafPipeVolumeSlice_BES::SafeDownCast(this->GetNodePipe(m_CurrentVolume->m_Vme)); // m_CurrentVolume->m_Pipe is better?
+    p = mafPipeVolumeSlice_BES::SafeDownCast(this->GetNodePipe(m_CurrentVolume->GetVme())); // m_CurrentVolume->m_Pipe is better?
     if (p) // Is this required?
     {
       p->SetEnableGPU(m_EnableGPU);
@@ -603,7 +602,7 @@ void mafViewSlice::OnEvent(mafEventBase *maf_event)
           if (m_CurrentVolume)
           {
             mafPipeVolumeSlice_BES *p = NULL;
-            p = mafPipeVolumeSlice_BES::SafeDownCast(this->GetNodePipe(m_CurrentVolume->m_Vme));
+            p = mafPipeVolumeSlice_BES::SafeDownCast(this->GetNodePipe(m_CurrentVolume->GetVme()));
             if(p)
             {
               p->SetEnableGPU(m_EnableGPU);
@@ -617,7 +616,7 @@ void mafViewSlice::OnEvent(mafEventBase *maf_event)
           if (m_CurrentVolume)
           {
             mafPipeVolumeSlice_BES *p = NULL;
-            p = mafPipeVolumeSlice_BES::SafeDownCast(this->GetNodePipe(m_CurrentVolume->m_Vme));
+            p = mafPipeVolumeSlice_BES::SafeDownCast(this->GetNodePipe(m_CurrentVolume->GetVme()));
             if(p)
             {
               p->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
@@ -858,10 +857,10 @@ void mafViewSlice::BorderDelete()
 }
 
 //----------------------------------------------------------------------------
-void mafViewSlice::UpdateSurfacesList(mafNode *node)
+void mafViewSlice::UpdateSurfacesList(mafVME *vme)
 //----------------------------------------------------------------------------
 {
-  mafSceneNode *sceneNode = m_Sg->Vme2Node(node);
+  mafSceneNode *sceneNode = m_Sg->Vme2Node(vme);
   for(int i=0;i<m_CurrentSurface.size();i++)
     if (sceneNode==m_CurrentSurface[i])
       m_CurrentSurface.erase(m_CurrentSurface.begin()+i);
@@ -880,55 +879,32 @@ void mafViewSlice::UpdateSurfacesList(mafNode *node)
 }
 
 //----------------------------------------------------------------------------
-void mafViewSlice::VmeShow(mafNode *node, bool show)
+void mafViewSlice::VmeShow(mafVME *vme, bool show)
 //----------------------------------------------------------------------------
 {
-  if (((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume"))
+  if (vme->GetOutput()->IsA("mafVMEOutputVolume"))
   {
     if (show)
     {
 			if(m_AttachCamera)
-				m_AttachCamera->SetVme(node);
-		/*m_CurrentVolume = mafVMEVolume::SafeDownCast(node);
-      double sr[2],center[3];
-      vtkDataSet *data = m_CurrentVolume->GetOutput()->GetVTKData();
-      data->Update();
-      data->GetCenter(center);
-      data->GetScalarRange(sr);
-      m_Luts->SetRange((long)sr[0],(long)sr[1]);
-      m_Luts->SetSubRange((long)sr[0],(long)sr[1]);
-      vtkNEW(m_ColorLUT);
-      m_ColorLUT->SetRange(sr);
-      m_ColorLUT->Build();
-      lutPreset(4,m_ColorLUT);*/
+				m_AttachCamera->SetVme(vme);
 	  }
     else
     {
-			/*  
-			m_CurrentVolume->GetEventSource()->RemoveObserver(this);
-      m_CurrentVolume = NULL;
-      for(int i=0; i<m_NumOfChildView; i++)
-      ((mafViewSliceLHPBuilder *)m_ChildViewList[i])->UpdateText(0);
-			*/
 			if(m_AttachCamera)
 				m_AttachCamera->SetVme(NULL);
       this->UpdateText(0);
     }
-		//CameraUpdate();
-    //CameraReset(node);
-    //m_Rwi->CameraUpdate();
   }
-  // bug #2761. New: Crash when a new msf is loaded
 	else 
-    this->UpdateSurfacesList(node);
+    this->UpdateSurfacesList(vme);
 
-	Superclass::VmeShow(node, show);
+	Superclass::VmeShow(vme, show);
 }
 //----------------------------------------------------------------------------
-void mafViewSlice::VmeRemove(mafNode *vme)
+void mafViewSlice::VmeRemove(mafVME *vme)
 //----------------------------------------------------------------------------
 {
-  // bug #2761. New: Crash when a new msf is loaded
   this->UpdateSurfacesList(vme);
   Superclass::VmeRemove(vme);
 }
@@ -949,9 +925,9 @@ void mafViewSlice::Print(std::ostream& os, const int tabs)// const
 void mafViewSlice::MultiplyPointByInputVolumeABSMatrix(double *point)
 //-------------------------------------------------------------------------
 {
-  if(m_CurrentVolume && m_CurrentVolume->m_Vme)
+  if(m_CurrentVolume && m_CurrentVolume->GetVme())
   {
-    mafMatrix *mat = ((mafVME *)m_CurrentVolume->m_Vme)->GetAbsMatrixPipe()->GetMatrixPointer();
+    mafMatrix *mat = m_CurrentVolume->GetVme()->GetAbsMatrixPipe()->GetMatrixPointer();
     double coord[4];
     coord[0] = point[0];
     coord[1] = point[1];
@@ -975,7 +951,7 @@ void mafViewSlice::CameraUpdate()
   
   if (m_CurrentVolume)
   {
-    mafVME *volume = mafVME::SafeDownCast(m_CurrentVolume->m_Vme);
+    mafVME *volume = m_CurrentVolume->GetVme();
     
     std::ostringstream stringStream;
     stringStream << "VME " << volume->GetName() << " ABS matrix:" << std::endl;
@@ -1031,7 +1007,7 @@ void mafViewSlice::SetCameraParallelToDataSetLocalAxis( int axis )
   this->GetRWI()->GetCamera()->GetPosition(oldCameraPosition);
   oldCameraOrientation = this->GetRWI()->GetCamera()->GetOrientation();
 
-  mafVME *currentVMEVolume = mafVME::SafeDownCast(m_CurrentVolume->m_Vme);
+  mafVME *currentVMEVolume = m_CurrentVolume->GetVme();
   assert(currentVMEVolume);
 
   vtkDataSet *vmeVTKData = currentVMEVolume->GetOutput()->GetVTKData();
@@ -1105,7 +1081,7 @@ void mafViewSlice::CameraUpdateForRotatedVolumes()
         SetSlice(m_LastSliceOrigin, NULL);    
       }
 
-      this->CameraReset(m_CurrentVolume->m_Vme);
+      this->CameraReset(m_CurrentVolume->GetVme());
     }    
   }
   else if (m_CameraPositionId == CAMERA_OS_Y)
@@ -1120,7 +1096,7 @@ void mafViewSlice::CameraUpdateForRotatedVolumes()
         SetSlice(m_LastSliceOrigin, NULL);    
       }
       
-      this->CameraReset(m_CurrentVolume->m_Vme);
+      this->CameraReset(m_CurrentVolume->GetVme());
     }    
   }
   else if (m_CameraPositionId == CAMERA_OS_Z  || m_CameraPositionId == CAMERA_CT)
@@ -1135,7 +1111,7 @@ void mafViewSlice::CameraUpdateForRotatedVolumes()
         SetSlice(m_LastSliceOrigin, NULL);    
       }
 
-      this->CameraReset(m_CurrentVolume->m_Vme);
+      this->CameraReset(m_CurrentVolume->GetVme());
     }    
   }
   

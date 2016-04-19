@@ -49,7 +49,7 @@
 #include "mafTagArray.h"
 #include "mmaMaterial.h"
 #include "mmaVolumeMaterial.h"
-#include "mafNodeIterator.h"
+#include "mafVMEIterator.h"
 #include "mafGUILutPreset.h"
 #include "mafVMEOutputSurface.h"
 #include "mafAttribute.h"
@@ -146,25 +146,22 @@ void mafViewSlicer::PackageView()
 
 }
 //----------------------------------------------------------------------------
-void mafViewSlicer::VmeShow(mafNode *node, bool show)
+void mafViewSlicer::VmeShow(mafVME *vme, bool show)
 //----------------------------------------------------------------------------
 {
-	m_ChildViewList[ARBITRARY_VIEW]->VmeShow(node, show);
-	m_ChildViewList[SLICE_VIEW]->VmeShow(node, show);
-	mafVME *Vme=mafVME::SafeDownCast(node);
-	Vme->Update();
+	m_ChildViewList[ARBITRARY_VIEW]->VmeShow(vme, show);
+	m_ChildViewList[SLICE_VIEW]->VmeShow(vme, show);
+	vme->Update();
 	if (show)
 	{
-		if(((mafVME *)Vme)->GetOutput()->IsA("mafVMEOutputVolume"))
+		if(vme->GetOutput()->IsA("mafVMEOutputVolume"))
 		{
-			mafVME *Volume=mafVME::SafeDownCast(Vme);
-			m_CurrentVolume = Volume;
+			m_CurrentVolume = vme;
 
-			// get the VTK volume
-      vtkDataSet *data = ((mafVME *)node)->GetOutput()->GetVTKData();
-      data->Update();	
+			// data update
+      vme->GetOutput()->GetVTKData()->Update();
 		}
-		else if(Vme->IsA("mafVMESurface") || Vme->IsA("mafVMESurfaceParametric"))
+		else if(vme->IsA("mafVMESurface") || vme->IsA("mafVMESurfaceParametric"))
 		{
 			//a surface is visible only if there is a volume in the view
 			if(m_CurrentVolume)
@@ -172,10 +169,10 @@ void mafViewSlicer::VmeShow(mafNode *node, bool show)
         CameraUpdate();
 			}
 		}
-    else if(Vme->IsA("mafVMESlicer"))
+    else if(vme->IsA("mafVMESlicer"))
     {
       //Show Slicer
-      m_CurrentSlicer = mafVMESlicer::SafeDownCast(node);
+      m_CurrentSlicer = mafVMESlicer::SafeDownCast(vme);
         
       //Set camera of slice view in way that it will follow the volume
       if(!m_AttachCamera)
@@ -184,20 +181,20 @@ void mafViewSlicer::VmeShow(mafNode *node, bool show)
       m_AttachCamera->SetVme(m_CurrentSlicer);
       ((mafViewVTK*)m_ChildViewList[SLICE_VIEW])->CameraReset(m_CurrentSlicer);
     }
-    else if(Vme->IsA("mafVMEImage")) {
-      m_CurrentImage = mafVMEImage::SafeDownCast(node);
+    else if(vme->IsA("mafVMEImage")) {
+      m_CurrentImage = mafVMEImage::SafeDownCast(vme);
 	  }
   }
 	else//if show=false
 	{
 		
-    if (((mafVME *)Vme)->GetOutput()->IsA("mafVMEOutputVolume"))
+    if (vme->GetOutput()->IsA("mafVMEOutputVolume"))
 		{		
 			m_CurrentVolume = NULL;
       m_ColorLUT = NULL;
 			m_LutWidget->SetLut(m_ColorLUT);
 		}
-    else if(Vme->IsA("mafVMESlicer"))
+    else if(vme->IsA("mafVMESlicer"))
     {
       m_AttachCamera->SetVme(NULL);
       m_CurrentSlicer = NULL;
@@ -207,7 +204,7 @@ void mafViewSlicer::VmeShow(mafNode *node, bool show)
       double normal[3] = {0,0,1};
       ((mafViewSlice*)m_ChildViewList[SLICE_VIEW])->CameraSet(CAMERA_CT);
     }
-    else if(Vme->IsA("mafVMEImage"))
+    else if(vme->IsA("mafVMEImage"))
     {
       m_CurrentImage = NULL;
       m_ColorLUT = NULL;
@@ -218,8 +215,8 @@ void mafViewSlicer::VmeShow(mafNode *node, bool show)
     }
 	}
 
-	if (ActivateWindowing(node))
-		UpdateWindowing(show, node);
+	if (ActivateWindowing(vme))
+		UpdateWindowing(show, vme);
 
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 
@@ -338,14 +335,14 @@ mafGUI* mafViewSlicer::CreateGui()
 	return m_Gui;
 }
 //----------------------------------------------------------------------------
-void mafViewSlicer::VmeRemove(mafNode *node)
+void mafViewSlicer::VmeRemove(mafVME *vme)
 //----------------------------------------------------------------------------
 {
-  if (m_CurrentVolume && node == m_CurrentVolume) 
+  if (m_CurrentVolume && vme == m_CurrentVolume) 
   {
     m_CurrentVolume = NULL;
   }
-  if(m_CurrentSlicer == node && node != NULL && m_AttachCamera)
+  if(m_CurrentSlicer == vme && vme != NULL && m_AttachCamera)
   {
     m_AttachCamera->SetVme(NULL);
     m_CurrentSlicer = NULL;
@@ -354,7 +351,7 @@ void mafViewSlicer::VmeRemove(mafNode *node)
     ((mafViewSlice*)m_ChildViewList[SLICE_VIEW])->CameraSet(CAMERA_CT);
   }
 
-  Superclass::VmeRemove(node);
+  Superclass::VmeRemove(vme);
 }
 //----------------------------------------------------------------------------
 void mafViewSlicer::CameraUpdate()
@@ -372,9 +369,9 @@ void mafViewSlicer::CameraUpdate()
     double normal[3];
     ((mafViewVTK*)m_ChildViewList[SLICE_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
 
-    mafNode *root=m_CurrentSlicer->GetRoot();
-    mafNodeIterator *iter = root->NewIterator();
-    for (mafNode *Inode = iter->GetFirstNode(); Inode; Inode = iter->GetNextNode())
+    mafVME *root=m_CurrentSlicer->GetRoot();
+    mafVMEIterator *iter = root->NewIterator();
+    for (mafVME *Inode = iter->GetFirstNode(); Inode; Inode = iter->GetNextNode())
     {
       if(Inode->IsA("mafVMESurface") || Inode->IsA("mafVMESurfaceParametric"))
       {
@@ -439,7 +436,7 @@ void mafViewSlicer::EnableWidgets(bool enable)
 
 }
 //-------------------------------------------------------------------------
-int mafViewSlicer::GetNodeStatus(mafNode *vme)
+int mafViewSlicer::GetNodeStatus(mafVME *vme)
 //-------------------------------------------------------------------------
 {
   mafSceneNode *n = NULL;
@@ -449,7 +446,7 @@ int mafViewSlicer::GetNodeStatus(mafNode *vme)
   if (sgArb != NULL)
   {
     n = sgArb->Vme2Node(vme);
-    if (((mafVME *)vme)->GetOutput()->IsA("mafVMEOutputVolume") ||
+    if (vme->GetOutput()->IsA("mafVMEOutputVolume") ||
         vme->IsMAFType(mafVMESurface) ||
         vme->IsMAFType(mafVMESurfaceParametric))
     {
@@ -463,7 +460,7 @@ int mafViewSlicer::GetNodeStatus(mafNode *vme)
       if (n != NULL)
       {
 	      n->SetPipeCreatable(true);
-	      n->m_Mutex = true;
+	      n->SetMutex( true);
       }
     }
   }
@@ -471,7 +468,7 @@ int mafViewSlicer::GetNodeStatus(mafNode *vme)
 }
 
 //-------------------------------------------------------------------------
-void mafViewSlicer::UpdateWindowing(bool enable,mafNode *node)
+void mafViewSlicer::UpdateWindowing(bool enable,mafVME *vme)
 //-------------------------------------------------------------------------
 {
   EnableWidgets(enable);
@@ -480,13 +477,12 @@ void mafViewSlicer::UpdateWindowing(bool enable,mafNode *node)
   mafVMESlicer  *Slicer		= NULL;
   mafVMEImage   *Image	  = NULL;
 
-  mafVME *Vme = mafVME::SafeDownCast(node);
-
-  if(Vme->IsA("mafVMESlicer")) {
-    Slicer = mafVMESlicer::SafeDownCast(node);
+  
+  if(vme->IsA("mafVMESlicer")) {
+    Slicer = mafVMESlicer::SafeDownCast(vme);
   }
-  else if(Vme->IsA("mafVMEImage")) {
-    Image = mafVMEImage::SafeDownCast(node);
+  else if(vme->IsA("mafVMEImage")) {
+    Image = mafVMEImage::SafeDownCast(vme);
   }
 
   if(Slicer) {
@@ -516,18 +512,17 @@ void mafViewSlicer::UpdateWindowing(bool enable,mafNode *node)
 
 
 //-------------------------------------------------------------------------
-bool mafViewSlicer::ActivateWindowing(mafNode *node) 
+bool mafViewSlicer::ActivateWindowing(mafVME *vme) 
 //-------------------------------------------------------------------------
 {
   bool conditions     = false;
   bool nodeHasPipe    = false;
+	  
+  vme->Update();
 
-  mafVME *Vme=mafVME::SafeDownCast(node);
-  Vme->Update();
+  if(vme->IsA("mafVMESlicer") && m_CurrentSlicer){
 
-  if(Vme->IsA("mafVMESlicer") && m_CurrentSlicer){
-
-    mafVMESlicer *slicer = mafVMESlicer::SafeDownCast(node);
+    mafVMESlicer *slicer = mafVMESlicer::SafeDownCast(vme);
     mafVMEVolumeGray *vol = mafVMEVolumeGray::SafeDownCast(m_CurrentSlicer->GetSlicedVMELink());
     if(vol) {
       conditions = true;
@@ -535,13 +530,13 @@ bool mafViewSlicer::ActivateWindowing(mafNode *node)
     conditions = conditions && m_CurrentVolume;
   }
 
-  else if(((mafVME *)node)->IsA("mafVMEImage")){
+  else if(vme->IsA("mafVMEImage")){
 
     conditions = true;
 
     for(int i=0; i<m_NumOfChildView; i++) {
 
-      mafPipeImage3D *pipe = (mafPipeImage3D *)m_ChildViewList[i]->GetNodePipe(node);
+      mafPipeImage3D *pipe = (mafPipeImage3D *)m_ChildViewList[i]->GetNodePipe(vme);
       conditions = (conditions && (pipe && pipe->IsGrayImage()));
     }
     //conditions = conditions & m_CurrentImage;

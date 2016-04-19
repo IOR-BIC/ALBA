@@ -30,7 +30,7 @@
 
 #include "mafStorageElement.h"
 #include "mafIndent.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafSceneGraph.h"
 #include "mafSceneNode.h"
 #include "mafRWIBase.h"

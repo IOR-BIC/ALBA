@@ -71,8 +71,6 @@ void mafOpExporterLandmarkWSTest::TestOnLandmarkImporter()
 	mafVMELandmarkCloud *node_WS=(mafVMELandmarkCloud *)importerWS->GetOutput();
 
 
-	((mafVMELandmarkCloud *)node)->Open();
-  ((mafVMELandmarkCloud *)node_WS)->Open();
 
 	int result = MAF_OK;
 	std::vector<double *> coord;

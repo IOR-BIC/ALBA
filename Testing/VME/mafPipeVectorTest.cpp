@@ -124,8 +124,7 @@ void mafPipeVectorTest::TestPipeExecution()
 
   //Assembly will be create when instancing mafSceneNode
   mafSceneNode *sceneNode;
-  sceneNode = new mafSceneNode(NULL,NULL,vector, NULL);
-  sceneNode->m_RenFront = m_Renderer;
+  sceneNode = new mafSceneNode(NULL,NULL,vector, m_Renderer);
 
   /////////// Pipe Instance and Creation ///////////
   mafPipeVector *pipeVector = new mafPipeVector;
@@ -156,7 +155,6 @@ void mafPipeVectorTest::TestPipeExecution()
   vtkDEL(actorList);
 
   delete pipeVector;
-  sceneNode->m_RenFront = NULL;
   delete sceneNode;
 
   mafDEL(vector);

@@ -25,7 +25,7 @@
 #include "mafOpVOIDensity.h"
 #include "mafGUI.h"
 
-#include "mafNode.h"
+#include "mafVME.h"
 
 #include "mafVMEOutputSurface.h"
 #include "mafAbsMatrixPipe.h"
@@ -85,7 +85,7 @@ mafOp* mafOpVOIDensity::Copy()
 	return (new mafOpVOIDensity(m_Label));
 }
 //----------------------------------------------------------------------------
-bool mafOpVOIDensity::Accept(mafNode* Node)
+bool mafOpVOIDensity::Accept(mafVME* Node)
 //----------------------------------------------------------------------------
 {
 	return (Node != NULL && Node->IsA("mafVMEVolumeGray"));
@@ -189,16 +189,9 @@ void mafOpVOIDensity::OnEvent(mafEventBase *maf_event)
 				m_Surface = event.GetVme();
 				if(m_Surface == NULL)
 					return;
-				mafVME *VME=mafVME::SafeDownCast(m_Surface);
-        if (VME == NULL)
-        {
-          mafMessage(_("Not valid surface choosed!!"), _("Warning"));
-          m_Surface = NULL;
-          return;
-        }
-				VME->Update();
+				m_Surface->Update();
 				vtkMAFSmartPointer<vtkFeatureEdges> FE;
-				FE->SetInput((vtkPolyData *)(VME->GetOutput()->GetVTKData()));
+				FE->SetInput((vtkPolyData *)(m_Surface->GetOutput()->GetVTKData()));
 				FE->SetFeatureAngle(30);
 				FE->SetBoundaryEdges(1);
 				FE->SetColoring(0);
@@ -217,7 +210,6 @@ void mafOpVOIDensity::OnEvent(mafEventBase *maf_event)
 				
 				m_Gui->Enable(ID_EVALUATE_DENSITY, true);
 				m_Gui->Enable(wxOK, true);
-				VME = NULL;
 			}
 			break;
 			case ID_EVALUATE_DENSITY:
@@ -249,11 +241,10 @@ void mafOpVOIDensity::ExtractVolumeScalars()
   m_NumberOfScalars = 0;
 	vtkAbstractTransform *transform;
 	vtkPolyData *polydata;
-	mafVME *VME = mafVME::SafeDownCast(m_Surface);
-	VME->GetOutput()->GetBounds(b);
-	VME->Update();
-	transform=(vtkAbstractTransform*)VME->GetAbsMatrixPipe()->GetVTKTransform();
-	polydata=(vtkPolyData *)VME->GetOutput()->GetVTKData();
+	m_Surface->GetOutput()->GetBounds(b);
+	m_Surface->Update();
+	transform=(vtkAbstractTransform*)m_Surface->GetAbsMatrixPipe()->GetVTKTransform();
+	polydata=(vtkPolyData *)m_Surface->GetOutput()->GetVTKData();
 
 	vtkMAFSmartPointer<vtkTransformPolyDataFilter> TransformDataClipper;
   TransformDataClipper->SetTransform(transform);
@@ -267,7 +258,7 @@ void mafOpVOIDensity::ExtractVolumeScalars()
   ImplicitBox->SetBounds(b);
 	ImplicitBox->Modified();
 
-  vtkMAFSmartPointer<vtkDataSet> VolumeData = ((mafVME*)m_Input)->GetOutput()->GetVTKData();
+  vtkMAFSmartPointer<vtkDataSet> VolumeData = m_Input->GetOutput()->GetVTKData();
   VolumeData->Update();
 	NumberVoxels = VolumeData->GetNumberOfPoints();
   

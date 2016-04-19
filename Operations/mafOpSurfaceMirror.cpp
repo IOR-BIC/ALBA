@@ -79,7 +79,7 @@ mafOp* mafOpSurfaceMirror::Copy()
   return cp;
 }
 //----------------------------------------------------------------------------
-bool mafOpSurfaceMirror::Accept(mafNode* node)   
+bool mafOpSurfaceMirror::Accept(mafVME* node)   
 //----------------------------------------------------------------------------
 { return  ( 
 		      node
@@ -163,7 +163,7 @@ void mafOpSurfaceMirror::OpDo()
 {
   assert(m_OutputPolydata);
 
-	((mafVMESurface *)m_Input)->SetData(m_OutputPolydata,((mafVME *)m_Input)->GetTimeStamp());
+	((mafVMESurface *)m_Input)->SetData(m_OutputPolydata,m_Input->GetTimeStamp());
 	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
@@ -172,7 +172,7 @@ void mafOpSurfaceMirror::OpUndo()
 {
   assert(m_InputPolydata);
 
-	((mafVMESurface *)m_Input)->SetData(m_InputPolydata,((mafVME *)m_Input)->GetTimeStamp());
+	((mafVMESurface *)m_Input)->SetData(m_InputPolydata,m_Input->GetTimeStamp());
 	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
@@ -244,7 +244,7 @@ void mafOpSurfaceMirror::Preview()
 
   m_OutputPolydata->DeepCopy(m_MirrorFilter->GetOutput());
   m_OutputPolydata->Update();
-  ((mafVMESurface *)m_Input)->SetData(m_OutputPolydata,((mafVME *)m_Input)->GetTimeStamp());
+  ((mafVMESurface *)m_Input)->SetData(m_OutputPolydata,m_Input->GetTimeStamp());
 
 
   mafEventMacro(mafEvent(this, CAMERA_UPDATE));

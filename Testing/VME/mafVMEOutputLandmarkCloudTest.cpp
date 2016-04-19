@@ -75,8 +75,6 @@ void mafVMEOutputLandmarkCloudTest::TestGetVTKData()
 
   TEST_RESULT;
 
-  lcloud->Open();
-
   outputLandmarkCloud = (mafVMEOutputLandmarkCloud*)lcloud->GetOutput();
   m_Result = lcloud->GetOutput()->GetVTKData() == NULL;
 

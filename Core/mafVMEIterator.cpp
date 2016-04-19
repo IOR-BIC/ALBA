@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: mafNodeIterator
+ Module: mafVMEIterator
  Authors: Marco Petrone
  
  Copyright (c) B3C
@@ -25,13 +25,13 @@
 
 
 
-#include "mafNodeIterator.h"
+#include "mafVMEIterator.h"
 #include "mafVector.h"
 
-mafCxxTypeMacro(mafNodeIterator)
+mafCxxTypeMacro(mafVMEIterator)
 
 //----------------------------------------------------------------------------
-mafNodeIterator::mafNodeIterator(mafNode *root)
+mafVMEIterator::mafVMEIterator(mafVME *root)
 //----------------------------------------------------------------------------
 { 
   m_CurrentNode = NULL;
@@ -45,7 +45,7 @@ mafNodeIterator::mafNodeIterator(mafNode *root)
 }
 
 //----------------------------------------------------------------------------
-mafNodeIterator::~mafNodeIterator()
+mafVMEIterator::~mafVMEIterator()
 //----------------------------------------------------------------------------
 {
   m_CurrentNode=NULL; // do not unregister since it was not registered!
@@ -53,14 +53,14 @@ mafNodeIterator::~mafNodeIterator()
 }
 
 //----------------------------------------------------------------------------
-void mafNodeIterator::InitTraversal()
+void mafVMEIterator::InitTraversal()
 //----------------------------------------------------------------------------
 {
   GoToFirstNode();
 }
 
 //----------------------------------------------------------------------------
-void mafNodeIterator::SetTraversalMode(int mode)
+void mafVMEIterator::SetTraversalMode(int mode)
 //----------------------------------------------------------------------------
 {
   if (mode!=PreOrder && mode!=PostOrder)
@@ -76,7 +76,7 @@ void mafNodeIterator::SetTraversalMode(int mode)
 
 
 //----------------------------------------------------------------------------
-int mafNodeIterator::GoToNextNode()
+int mafVMEIterator::GoToNextNode()
 //----------------------------------------------------------------------------
 {
   switch (m_TraversalMode)
@@ -111,7 +111,7 @@ int mafNodeIterator::GoToNextNode()
 						if (m_CurrentNode!=m_RootNode)
             {
 							mafID idx=0;
-							mafNode *parent=m_CurrentNode->GetParent();
+							mafVME *parent=m_CurrentNode->GetParent();
 							if (parent) 
 							{ 
 								m_CurrentIdx.Pop(idx);
@@ -163,7 +163,7 @@ int mafNodeIterator::GoToNextNode()
       {
         if ((m_CurrentNode)&&(m_CurrentNode!=m_RootNode))
         {
-          mafNode *parent=m_CurrentNode->GetParent();
+          mafVME *parent=m_CurrentNode->GetParent();
 
           if (parent)
           {
@@ -236,7 +236,7 @@ int mafNodeIterator::GoToNextNode()
 }
 
 //----------------------------------------------------------------------------
-int mafNodeIterator::GoToPreviousNode()
+int mafVMEIterator::GoToPreviousNode()
 //----------------------------------------------------------------------------
 {
   switch (m_TraversalMode)
@@ -245,7 +245,7 @@ int mafNodeIterator::GoToPreviousNode()
       {
         if ((m_CurrentNode)&&(m_CurrentNode!=m_RootNode))
         {
-          mafNode *parent=m_CurrentNode->GetParent();
+          mafVME *parent=m_CurrentNode->GetParent();
 
           if (parent)
           {
@@ -315,7 +315,7 @@ int mafNodeIterator::GoToPreviousNode()
           }
           else
           {
-            mafNode *parent=m_CurrentNode->GetParent();
+            mafVME *parent=m_CurrentNode->GetParent();
 
             mafID idx;
             if (m_CurrentIdx.Pop(idx))
@@ -396,7 +396,7 @@ int mafNodeIterator::GoToPreviousNode()
 }
 
 //----------------------------------------------------------------------------
-mafNode *mafNodeIterator::FindLeftMostLeaf(mafNode *node)
+mafVME *mafVMEIterator::FindLeftMostLeaf(mafVME *node)
 //----------------------------------------------------------------------------
 {
   if (node)
@@ -413,7 +413,7 @@ mafNode *mafNodeIterator::FindLeftMostLeaf(mafNode *node)
 }
 
 //----------------------------------------------------------------------------
-mafNode *mafNodeIterator::FindRightMostLeaf(mafNode *node)
+mafVME *mafVMEIterator::FindRightMostLeaf(mafVME *node)
 //----------------------------------------------------------------------------
 {
   if (node)
@@ -430,7 +430,7 @@ mafNode *mafNodeIterator::FindRightMostLeaf(mafNode *node)
 }
 
 //----------------------------------------------------------------------------
-int mafNodeIterator::GoToFirstNode()
+int mafVMEIterator::GoToFirstNode()
 //----------------------------------------------------------------------------
 {
   m_CurrentIdx.RemoveAllItems();
@@ -469,7 +469,7 @@ int mafNodeIterator::GoToFirstNode()
 }
 
 //----------------------------------------------------------------------------
-int mafNodeIterator::GoToLastNode()
+int mafVMEIterator::GoToLastNode()
 //----------------------------------------------------------------------------
 {
   m_CurrentIdx.RemoveAllItems();
@@ -505,7 +505,7 @@ int mafNodeIterator::GoToLastNode()
 }
 
 //----------------------------------------------------------------------------
-void mafNodeIterator::SetRootNode(mafNode *root)
+void mafVMEIterator::SetRootNode(mafVME *root)
 //----------------------------------------------------------------------------
 {
   if (m_RootNode==root)
@@ -524,49 +524,49 @@ void mafNodeIterator::SetRootNode(mafNode *root)
 
 //----------------------------------------------------------------------------
 // executed before traversing a node
-void mafNodeIterator::PreExecute()
+void mafVMEIterator::PreExecute()
 //----------------------------------------------------------------------------
 {
   m_EventSource.InvokeEvent(this,ID_PreTraversal,m_CurrentNode);
 }
 //----------------------------------------------------------------------------
 // executed after traversing a node
-void mafNodeIterator::PostExecute()
+void mafVMEIterator::PostExecute()
 //----------------------------------------------------------------------------
 {
   m_EventSource.InvokeEvent(this,ID_PostTraversal,m_CurrentNode);
 }
 //----------------------------------------------------------------------------
 // executed when going down in the tree
-void mafNodeIterator::DeeperExecute(mafNode *node)
+void mafVMEIterator::DeeperExecute(mafVME *node)
 //----------------------------------------------------------------------------
 {
   m_EventSource.InvokeEvent(this,ID_Deeper,m_CurrentNode);
 }
 //----------------------------------------------------------------------------
 // executed when going up in the tree
-void mafNodeIterator::UpperExecute(mafNode *node)
+void mafVMEIterator::UpperExecute(mafVME *node)
 //----------------------------------------------------------------------------
 {
   m_EventSource.InvokeEvent(this,ID_Upper,m_CurrentNode);
 }
 //----------------------------------------------------------------------------
 // executed when GoToFirstNode is executed
-void mafNodeIterator::FirstExecute()
+void mafVMEIterator::FirstExecute()
 //----------------------------------------------------------------------------
 {
   m_EventSource.InvokeEvent(this,ID_FirstNode,m_CurrentNode);
 }
 //----------------------------------------------------------------------------
 // executed when last node is traversed
-void mafNodeIterator::LastExecute()
+void mafVMEIterator::LastExecute()
 //----------------------------------------------------------------------------
 {
   m_EventSource.InvokeEvent(this,ID_LastNode,m_CurrentNode);
 }
 //----------------------------------------------------------------------------
 // executed when IsDoneWithTraversal return "true"
-void mafNodeIterator::DoneExecute()
+void mafVMEIterator::DoneExecute()
 //----------------------------------------------------------------------------
 {
   m_EventSource.InvokeEvent(this,ID_Done,m_CurrentNode);

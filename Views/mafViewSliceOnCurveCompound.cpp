@@ -29,7 +29,6 @@ See the COPYINGS file for license details
 #include "mafMatrix.h"
 #include "mafTransform.h"
 
-#include "mafNodeRoot.h"
 #include "mafSceneNode.h"
 #include "mafSceneGraph.h"
 #include "mafVMEPolyline.h"
@@ -158,39 +157,39 @@ mafView *mafViewSliceOnCurveCompound::Copy(mafObserver *Listener, bool lightCopy
 #pragma region VmeAdd, VmeRemove, VmeShow, GetNodeStatus
 
 //----------------------------------------------------------------------------
-void mafViewSliceOnCurveCompound::VmeShow(mafNode *node, bool show)
+void mafViewSliceOnCurveCompound::VmeShow(mafVME *vme, bool show)
 //----------------------------------------------------------------------------
 {
   wxWindowDisabler wait1;
   wxBusyCursor wait2;
 
-  if (((mafVME *)node)->GetOutput()->IsA("mafVMEOutputPolyline"))
+  if (vme->GetOutput()->IsA("mafVMEOutputPolyline"))
   {
     //some polyline curve, e.g., mafVMEPolyLine or mafVMEPolylineGraph
     if (show)
     {
       //we may have only one curve => we will need to hide them
-      HideSameVMEs(m_ChildViewList[POLYLINE_VIEW], node);     
+      HideSameVMEs(m_ChildViewList[POLYLINE_VIEW], vme);     
 
       if (m_ShowPolylineInMainView)
-        HideSameVMEs(m_ChildViewList[MAIN_VIEW], node);
+        HideSameVMEs(m_ChildViewList[MAIN_VIEW], vme);
     }
 
-    m_ChildViewList[POLYLINE_VIEW]->VmeShow(node, show);
+    m_ChildViewList[POLYLINE_VIEW]->VmeShow(vme, show);
 
     if (m_ShowPolylineInMainView)
-      m_ChildViewList[MAIN_VIEW]->VmeShow(node, show);
+      m_ChildViewList[MAIN_VIEW]->VmeShow(vme, show);
 
     //create or destroy gizmo
     if (show)
-      CreateGizmo(node);
+      CreateGizmo(vme);
     else
       DestroyGizmo();    
   }
   else
   {	
     //check if we have Volume on the output
-    if (((mafVME *)node)->GetOutput() != NULL && ((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume"))
+    if (vme->GetOutput() != NULL && vme->GetOutput()->IsA("mafVMEOutputVolume"))
     {
       if (show)
       {
@@ -198,14 +197,14 @@ void mafViewSliceOnCurveCompound::VmeShow(mafNode *node, bool show)
         for (int i = 0; i < m_NumOfChildView; i++) 
         {
           if (i != POLYLINE_VIEW)
-            HideSameVMEs(m_ChildViewList[i], node);
+            HideSameVMEs(m_ChildViewList[i], vme);
         }
 
-        m_CurrentVolume = node;
+        m_CurrentVolume = vme;
       }
       else
       {
-        assert(m_CurrentVolume == node);
+        assert(m_CurrentVolume == vme);
         m_CurrentVolume = NULL;
       }
     }
@@ -214,12 +213,12 @@ void mafViewSliceOnCurveCompound::VmeShow(mafNode *node, bool show)
     for (int i = 0; i < m_NumOfChildView; i++) 
     {
       if (i != POLYLINE_VIEW)
-        m_ChildViewList[i]->VmeShow(node, show);
+        m_ChildViewList[i]->VmeShow(vme, show);
     }	
   }  
 
-	if (ActivateWindowing(node))
-		UpdateWindowing(show, node);
+	if (ActivateWindowing(vme))
+		UpdateWindowing(show, vme);
 
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
@@ -227,59 +226,59 @@ void mafViewSliceOnCurveCompound::VmeShow(mafNode *node, bool show)
 //------------------------------------------------------------------------
 //Hides VMEs of the same type as pNode that are currently displayed in pView
 //The display status of pNode is not changed
-void mafViewSliceOnCurveCompound::HideSameVMEs(mafView* pView, mafNode* pNode)
+void mafViewSliceOnCurveCompound::HideSameVMEs(mafView *view, mafVME *vme)
 //------------------------------------------------------------------------
 {
-  if (pView == NULL || mafVME::SafeDownCast(pNode) == NULL ||
-    (((mafVME *)pNode)->GetOutput() == NULL))
+  if (view == NULL || vme == NULL || vme->GetOutput() == NULL)
     return; //invalid call
 
-  mafSceneGraph* pSc = pView->GetSceneGraph();
+  mafSceneGraph* pSc = view->GetSceneGraph();
   mafSceneNode* pScNode = pSc->GetNodeList();  
-  const mafTypeID& typeId = ((mafVME *)pNode)->GetOutput()->GetTypeId();
+  const mafTypeID& typeId = vme->GetOutput()->GetTypeId();
   while (pScNode != NULL)
   {
     mafVMEOutput* pOutput = NULL;
-    if (mafVME::SafeDownCast(pScNode->m_Vme) != NULL)
-      pOutput = ((mafVME *)pScNode->m_Vme)->GetOutput();
+		mafVME * otherVME = pScNode->GetVme();
+    if (otherVME != NULL)
+      pOutput = otherVME->GetOutput();
 
     if (pOutput != NULL && pOutput->IsA(typeId))
     {
-      if (pScNode->GetPipe() != NULL && pScNode->m_Vme != pNode)
+      if (pScNode->GetPipe() != NULL && otherVME != vme)
       {            
-        mafEventMacro(mafEvent(this, VME_SHOW, pScNode->m_Vme, false));
+        mafEventMacro(mafEvent(this, VME_SHOW, otherVME, false));
       }
     }
 
-    pScNode = pScNode->m_Next;
+    pScNode = pScNode->GetNext();
   }      
 }
 
 //----------------------------------------------------------------------------
 //return the status of the node within this view. es: NON_VISIBLE,VISIBLE_ON, ... 
 //having mafViewCompound::GetNodeStatus allow mafGUICheckTree to not know about mafSceneGraph
-int mafViewSliceOnCurveCompound::GetNodeStatus(mafNode *node)
+int mafViewSliceOnCurveCompound::GetNodeStatus(mafVME *vme)
 //----------------------------------------------------------------------------
 {
-  if (((mafVME*)node)->GetOutput()->IsA("mafVMEOutputPolyline"))
+  if (vme->GetOutput()->IsA("mafVMEOutputPolyline"))
   {
     mafSceneGraph* pSc = m_ChildViewList[POLYLINE_VIEW]->GetSceneGraph();
     if (pSc == NULL)
       return NODE_NON_VISIBLE;
 
-    mafSceneNode* pNode = pSc->Vme2Node(node);
+    mafSceneNode* pNode = pSc->Vme2Node(vme);
     if (pNode != NULL)          //it may be NULL during the termination
-      pNode->m_Mutex = true;    //force it as MUTEX
+      pNode->SetMutex(true);    //force it as MUTEX
 
-    return pSc->GetNodeStatus(node);
+    return pSc->GetNodeStatus(vme);
   }
 
-  return m_ChildViewList[MAIN_VIEW]->GetNodeStatus(node);
+  return m_ChildViewList[MAIN_VIEW]->GetNodeStatus(vme);
 }
 
 //------------------------------------------------------------------------
 //return the current pipe for the specified vme (if any exist at this moment) */
-/*virtual*/ mafPipe* mafViewSliceOnCurveCompound::GetNodePipe(mafNode *vme)
+/*virtual*/ mafPipe* mafViewSliceOnCurveCompound::GetNodePipe(mafVME *vme)
 //------------------------------------------------------------------------
 {
   return m_ChildViewList[MAIN_VIEW]->GetNodePipe(vme);
@@ -514,15 +513,15 @@ void mafViewSliceOnCurveCompound::OnEvent(mafEventBase *maf_event)
 #pragma region Gizmo stuff
 //------------------------------------------------------------------------
 //creates the gizmo path
-/*virtual*/ void mafViewSliceOnCurveCompound::CreateGizmo(mafNode* node)
+/*virtual*/ void mafViewSliceOnCurveCompound::CreateGizmo(mafVME *vme)
 //------------------------------------------------------------------------
 {
   assert(m_Gizmo == NULL);
   if (m_Gizmo != NULL)    
     return; //already constructed  
 
-  mafVMEPolyline* polyline = mafVMEPolyline::SafeDownCast(node);
-  mafVMEPolylineGraph* polyline_gr = mafVMEPolylineGraph::SafeDownCast(node);
+  mafVMEPolyline* polyline = mafVMEPolyline::SafeDownCast(vme);
+  mafVMEPolylineGraph* polyline_gr = mafVMEPolylineGraph::SafeDownCast(vme);
 
   if (polyline == NULL && polyline_gr == NULL)
   {
@@ -531,12 +530,12 @@ void mafViewSliceOnCurveCompound::OnEvent(mafEventBase *maf_event)
   }     
 
 #ifdef GIZMO_PATH
-  mafVMEOutputPolyline* outputLine = mafVMEOutputPolyline::SafeDownCast(((mafVME*)node)->GetOutput());
+  mafVMEOutputPolyline* outputLine = mafVMEOutputPolyline::SafeDownCast(vme->GetOutput());
   m_GizmoLength = (outputLine != NULL ? outputLine->CalculateLength() : 0);
   assert(outputLine != NULL);
 #endif // GIZMO_PATH
 
-  m_CurrentPolyLine = node;
+  m_CurrentPolyLine = vme;
 
   //construct new gizmo
 #ifdef GIZMO_PATH
@@ -577,34 +576,15 @@ void mafViewSliceOnCurveCompound::OnEvent(mafEventBase *maf_event)
 
   double clr[3] = {1, 0, 0};
   m_Gizmo->SetColor(clr);
-  m_Gizmo->SetConstraintPolyline((mafVME*)m_CurrentPolyLineGizmo);    
+  m_Gizmo->SetConstraintPolyline(m_CurrentPolyLineGizmo);    
 #else
-  m_Gizmo = mafGizmoPolylineGraph::New((mafVME*)m_CurrentPolyLine, this);
+  m_Gizmo = mafGizmoPolylineGraph::New(m_CurrentPolyLine, this);
   m_Gizmo->SetConstraintPolylineGraph((mafVMEPolylineGraph*)m_CurrentPolyLineGizmo);
 #endif
 
   m_ChildViewList[POLYLINE_VIEW]->VmeShow(m_Gizmo->GetOutput(), true);
   if (m_ShowPolylineInMainView)
     m_ChildViewList[MAIN_VIEW]->VmeShow(m_Gizmo->GetOutput(), true);
-
-  //////TODO: remove this
-  //m_SliceCameraAutoFocus = m_SliceCameraAutoRotate = 1;
-
-  //    LARGE_INTEGER liBegin;
-  //    ::QueryPerformanceCounter(&liBegin);
-  //
-  //    for (int x = 0; x <= 200; x++) {
-  //      SetSlicePosition(m_GizmoLength* x / 200.0);
-  //    }
-  //
-  //    LARGE_INTEGER liEnd, liFreq;
-  //    ::QueryPerformanceCounter(&liEnd);
-  //    ::QueryPerformanceFrequency(&liFreq);
-  //
-  //    wxMessageBox(wxString::Format("OnCurve in %d ms",
-  //      (int)(((liEnd.QuadPart - liBegin.QuadPart)*1000) / liFreq.QuadPart)));
-  //////END
-
 
   ResetSlicePosition();  
 }
@@ -652,7 +632,7 @@ void mafViewSliceOnCurveCompound::OnEvent(mafEventBase *maf_event)
 {
   double pos[3], normal[3];
 
-  mafVME* g = mafVME::SafeDownCast(m_Gizmo->GetOutput());
+  mafVME* g = m_Gizmo->GetOutput();
   const mafMatrix* gmat = g->GetOutput()->GetMatrix();
   mafTransform::GetPosition(*gmat, pos);    //get the position
 
@@ -931,7 +911,7 @@ void mafViewSliceOnCurveCompound::Print(std::ostream& os, const int tabs)// cons
   {
     double pos[3];
 
-    mafVME* g = mafVME::SafeDownCast(m_Gizmo->GetOutput());
+    mafVME* g = m_Gizmo->GetOutput();
     const mafMatrix* gmat = g->GetOutput()->GetMatrix();
     mafTransform::GetPosition(*gmat, pos);    //get the position
 

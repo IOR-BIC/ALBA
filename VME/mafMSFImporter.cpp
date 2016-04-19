@@ -45,7 +45,7 @@
 #include "mafVMEVolumeRGB.h"
 #include "mafVMEExternalData.h"
 
-#include "mafNodeIterator.h"
+#include "mafVMEIterator.h"
 
 #include <vector>
 
@@ -104,9 +104,9 @@ int mmuMSF1xDocument::InternalRestore(mafStorageElement *node)
       }
     }    
   }
-  mafNode *n = NULL;
-  std::vector<mafNode *> link_list;
-  mafNodeIterator *iter = m_Root->NewIterator();
+  mafVME *n = NULL;
+  std::vector<mafVME *> link_list;
+  mafVMEIterator *iter = m_Root->NewIterator();
   // iteration for updating VME's ID
   for (n = iter->GetFirstNode(); n; n=iter->GetNextNode())
   {
@@ -119,7 +119,7 @@ int mmuMSF1xDocument::InternalRestore(mafStorageElement *node)
     {
       link_list.push_back(n);
       mafTagItem *tag = n->GetTagArray()->GetTag("VME_ALIAS_PATH");
-      mafNode *linkedVME = this->ParsePath(m_Root, tag->GetValue());
+      mafVME *linkedVME = this->ParsePath(m_Root, tag->GetValue());
       if (linkedVME != NULL)
       {
         mafID sub_id = -1;
@@ -141,11 +141,11 @@ int mmuMSF1xDocument::InternalRestore(mafStorageElement *node)
   return m_Root->Initialize();
 }
 //------------------------------------------------------------------------------
-mafNode *mmuMSF1xDocument::ParsePath(mafVMERoot *root,const char *path)
+mafVME *mmuMSF1xDocument::ParsePath(mafVMERoot *root,const char *path)
 //------------------------------------------------------------------------------
 {
   const char *str=path;
-  mafNode *node=NULL;
+  mafVME *node=NULL;
 
   if (mafString::StartsWith(str,"/MSF"))
   {

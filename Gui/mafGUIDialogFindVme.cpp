@@ -109,7 +109,7 @@ bool mafGUIDialogFindVme::FindNextNode(const char *text)
     return false;
   }
   m_SearchString = text;
-  mafNode *nodeFound = FindInTreeByName(m_Root, m_SearchString, m_MatchCase != 0, m_WholeWord != 0);
+  mafVME *nodeFound = FindInTreeByName(m_Root, m_SearchString, m_MatchCase != 0, m_WholeWord != 0);
   if (nodeFound == NULL)
   {
     return false;
@@ -123,7 +123,7 @@ void mafGUIDialogFindVme::SetTree(mafGUICheckTree *tree)
   m_Tree = tree;
   if (m_Tree != NULL)
   {
-    mafNode *n = m_Tree->GetSelectedNode();
+    mafVME *n = m_Tree->GetSelectedNode();
     if (n != NULL)
     {
       m_Root = mafVMERoot::SafeDownCast(n->GetRoot());
@@ -131,7 +131,7 @@ void mafGUIDialogFindVme::SetTree(mafGUICheckTree *tree)
   }
 }
 //-------------------------------------------------------------------------
-mafNode *mafGUIDialogFindVme::FindInTreeByName(mafNode *node, const char *name, bool match_case, bool whole_word)
+mafVME *mafGUIDialogFindVme::FindInTreeByName(mafVME *node, const char *name, bool match_case, bool whole_word)
 //-------------------------------------------------------------------------
 {
   wxString word_to_search;
@@ -169,13 +169,13 @@ mafNode *mafGUIDialogFindVme::FindInTreeByName(mafNode *node, const char *name, 
 
   for (int i = 0; i < node->GetNumberOfChildren(); i++)
   {
-    if (mafNode *n = FindInTreeByName(node->GetChild(i), name, match_case, whole_word))
+    if (mafVME *n = FindInTreeByName(node->GetChild(i), name, match_case, whole_word))
       return n;
   }
   return NULL;
 }
 //-------------------------------------------------------------------------
-bool mafGUIDialogFindVme::AlreadyFound(mafNode *n)
+bool mafGUIDialogFindVme::AlreadyFound(mafVME *n)
 //-------------------------------------------------------------------------
 {
   int checkNode = 0;

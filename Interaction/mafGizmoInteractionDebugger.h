@@ -55,7 +55,7 @@ class MAF_EXPORT mafGizmoInteractionDebugger : public mafGizmoInterface
 public:
 
   /** inputVME is used just to put the gizmo on the vme tree: this gizmo is not moving anything but itself */
-  mafGizmoInteractionDebugger(mafNode* inputVme, mafObserver *Listener = NULL, const char *name = "GizmoPath", bool testMode = false);
+  mafGizmoInteractionDebugger(mafVME* inputVme, mafObserver *Listener = NULL, const char *name = "GizmoPath", bool testMode = false);
 
   virtual	~mafGizmoInteractionDebugger();
 
@@ -94,7 +94,7 @@ protected:
 
   
 
-  void Constructor(mafNode *imputVme, mafObserver *listener, const char *name, bool testMode = false);
+  void Constructor(mafVME *imputVme, mafObserver *listener, const char *name, bool testMode = false);
   void Destructor();
 
   void CreateVMEGizmo();

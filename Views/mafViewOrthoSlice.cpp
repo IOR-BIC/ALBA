@@ -33,7 +33,7 @@
 #include "mafGUILutSlider.h"
 #include "mafEventInteraction.h"
 #include "mafEventSource.h"
-#include "mafNodeIterator.h"
+#include "mafVMEIterator.h"
 
 #include "mmaVolumeMaterial.h"
 #include "mafVMESurface.h"
@@ -120,7 +120,7 @@ mafView *mafViewOrthoSlice::Copy(mafObserver *Listener, bool lightCopyEnabled)
   return v;
 }
 //----------------------------------------------------------------------------
-void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
+void mafViewOrthoSlice::VmeShow(mafVME *vme, bool show)
 //----------------------------------------------------------------------------
 {
 	wxWindowDisabler wait1;
@@ -132,12 +132,12 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
   // Detect selected vme pos
   int pos=-1;
   for (int i=0; i<m_VMElist.size(); i++)
-    if(node==m_VMElist[i])
+    if(vme==m_VMElist[i])
       pos=i;
 
   // if i want to show a vme that is not in list i add it to the list
   if (show && pos == -1)
-    m_VMElist.push_back(node);
+    m_VMElist.push_back(vme);
   // else if i want to un-show a vme i remove it only if is in the list
   else if (!show && pos>=0)
     m_VMElist.erase(m_VMElist.begin()+pos);
@@ -145,30 +145,30 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
 
 
   // Enable perspective View for every VME
-  m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(node, show);
+  m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(vme, show);
   // Disable ChildView XN, YN and ZN when no Volume is selected
   if (m_CurrentVolume != NULL)
  	  for(int j=1; j<m_NumOfChildView; j++) 
 		{
-      m_ChildViewList[j]->VmeShow(node, show);
-			if(show && j==YN_VIEW && mafPipeMeshSlice::SafeDownCast(m_ChildViewList[j]->GetNodePipe(node)))
-				mafPipeMeshSlice::SafeDownCast(m_ChildViewList[j]->GetNodePipe(node))->SetFlipNormalOff();
+      m_ChildViewList[j]->VmeShow(vme, show);
+			if(show && j==YN_VIEW && mafPipeMeshSlice::SafeDownCast(m_ChildViewList[j]->GetNodePipe(vme)))
+				mafPipeMeshSlice::SafeDownCast(m_ChildViewList[j]->GetNodePipe(vme))->SetFlipNormalOff();
 		}
   
-	if (((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume"))
+	if (vme->GetOutput()->IsA("mafVMEOutputVolume"))
 	{
     for(int j=1; j<m_NumOfChildView; j++)
-      m_ChildViewList[j]->VmeShow(node, show);
+      m_ChildViewList[j]->VmeShow(vme, show);
 
 		if (show)
 		{
       // Create Ortho Stuff
-      CreateOrthoslicesAndGizmos(node);
+      CreateOrthoslicesAndGizmos(vme);
       
       // Definig radius of polylines at the equivalent side of the medium voxel
       double bounds[6], edges[3], vol, nPoints;
       vtkDataSet *volOutput;
-      volOutput=((mafVME *)node)->GetOutput()->GetVTKData();
+      volOutput=vme->GetOutput()->GetVTKData();
       volOutput->GetBounds(bounds);
       nPoints=volOutput->GetNumberOfPoints();
       edges[0]=bounds[1]-bounds[0];
@@ -193,32 +193,32 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
       }
 	}
   else if (show)
-    ApplyViewSettings(node);
+    ApplyViewSettings(vme);
 
 	//CameraUpdate();
 	EnableWidgets(m_CurrentVolume != NULL);
 }
 //----------------------------------------------------------------------------
-void mafViewOrthoSlice::VmeRemove(mafNode *node)
+void mafViewOrthoSlice::VmeRemove(mafVME *vme)
 //----------------------------------------------------------------------------
 {
-  if (m_CurrentVolume && node == m_CurrentVolume) 
+  if (m_CurrentVolume && vme == m_CurrentVolume) 
   {
     // Disable ChildViews
     for(int j=1; j<m_NumOfChildView; j++) 
-      m_ChildViewList[j]->VmeShow(node, false);
+      m_ChildViewList[j]->VmeShow(vme, false);
     DestroyOrthoSlicesAndGizmos();
     EnableWidgets(false);
   }
   // Remove node from list
   int pos=-1;
   for (int i=0; i<m_VMElist.size(); i++)
-    if(node==m_VMElist[i])
+    if(vme==m_VMElist[i])
       pos=i;
   if (pos>=0)
     m_VMElist.erase(m_VMElist.begin()+pos);
 
-  Superclass::VmeRemove(node);
+  Superclass::VmeRemove(vme);
 }
 //----------------------------------------------------------------------------
 void mafViewOrthoSlice::CreateGuiView()
@@ -241,21 +241,7 @@ void mafViewOrthoSlice::OnEvent(mafEventBase *maf_event)
   {
     switch(e->GetId()) 
     {
-  /*    case ID_SIDE_ORTHO:
-      {          
-        if (m_Side == 1)
-        {
-          ((mafViewSlice *)m_ChildViewList[CHILD_XN_VIEW])->CameraSet(CAMERA_RX_RIGHT);
-          ((mafViewSlice*)m_ChildViewList[CHILD_XN_VIEW])->CameraUpdate();
-        }
-        else
-        {
-          ((mafViewSlice *)m_ChildViewList[CHILD_XN_VIEW])->CameraSet(CAMERA_RX_LEFT);
-          ((mafViewSlice*)m_ChildViewList[CHILD_XN_VIEW])->CameraUpdate();
-        }
-      }
-      break;*/
-			case ID_BORDER_CHANGE:
+  		case ID_BORDER_CHANGE:
 			{
 				OnEventSetThickness();
 			}
@@ -264,9 +250,8 @@ void mafViewOrthoSlice::OnEvent(mafEventBase *maf_event)
 			{
 				if(m_AllSurface)
 				{
-					mafNode* node=GetSceneGraph()->GetSelectedVme();
-					mafVME* vme=(mafVME*)node;
-					mafNode* root=vme->GetRoot();
+					mafVME* vme=GetSceneGraph()->GetSelectedVme();
+					mafVME* root=vme->GetRoot();
 					SetThicknessForAllSurfaceSlices(root);
 				}
 			}
@@ -669,14 +654,13 @@ void mafViewOrthoSlice::OnEventSetThickness()
 {
 	if(m_AllSurface)
 	{
-		mafNode* node=this->GetSceneGraph()->GetSelectedVme();
-		mafVME* vme=(mafVME*)node;
-		mafNode* root=vme->GetRoot();
+		mafVME* vme=this->GetSceneGraph()->GetSelectedVme();
+		mafVME* root=vme->GetRoot();
 		SetThicknessForAllSurfaceSlices(root);
 	}
 	else
 	{
-		mafNode *node=this->GetSceneGraph()->GetSelectedVme();
+		mafVME *node=this->GetSceneGraph()->GetSelectedVme();
 		mafSceneNode *SN = this->GetSceneGraph()->Vme2Node(node);
 
 		if(mafPipeSurfaceSlice *pipe = mafPipeSurfaceSlice::SafeDownCast(m_ChildViewList[CHILD_XN_VIEW]->GetNodePipe(node)))
@@ -722,16 +706,16 @@ void mafViewOrthoSlice::Print(std::ostream& os, const int tabs)// const
   }
 }
 //-------------------------------------------------------------------------
-void mafViewOrthoSlice::CreateOrthoslicesAndGizmos( mafNode * node )
+void mafViewOrthoSlice::CreateOrthoslicesAndGizmos(mafVME *vme)
 //-------------------------------------------------------------------------
 {
-  if (node == NULL)
+  if (vme == NULL)
   {
     mafLogMessage("node = NULL");
     return;
   }
 
-  m_CurrentVolume = mafVME::SafeDownCast(node);
+  m_CurrentVolume = vme;
   if (m_CurrentVolume == NULL)
   {
     mafLogMessage("current volume = NULL");
@@ -782,23 +766,23 @@ void mafViewOrthoSlice::DestroyOrthoSlicesAndGizmos()
 	GizmoDelete();
 }
 //-------------------------------------------------------------------------
-void mafViewOrthoSlice::ResetSlicesPosition( mafNode *node )
+void mafViewOrthoSlice::ResetSlicesPosition(mafVME *vme)
 //-------------------------------------------------------------------------
 {
   // workaround... :(
   // maybe we need some mechanism to execute view code from op?
-  this->VmeShow(node, false);
-  this->VmeShow(node, true);
+  this->VmeShow(vme, false);
+  this->VmeShow(vme, true);
   CameraUpdate();
 }
 //----------------------------------------------------------------------------
-void mafViewOrthoSlice::SetThicknessForAllSurfaceSlices(mafNode *root)
+void mafViewOrthoSlice::SetThicknessForAllSurfaceSlices(mafVME *root)
 //----------------------------------------------------------------------------
 {
-	mafNodeIterator *iter = root->NewIterator();
-	for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+	mafVMEIterator *iter = root->NewIterator();
+	for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
 	{
-		if (((mafVME *)node)->GetOutput()->IsA("mafVMEOutputSurface")) //if(node->IsA("mafVMESurface"))
+		if (node->GetOutput()->IsA("mafVMEOutputSurface")) //if(node->IsA("mafVMESurface"))
 		{
 			if(mafPipeSurfaceSlice *pipe = mafPipeSurfaceSlice::SafeDownCast(m_ChildViewList[CHILD_XN_VIEW]->GetNodePipe(node)))
 			{
@@ -845,17 +829,17 @@ bool mafViewOrthoSlice::IsPickedSliceView()
 }
 
 //----------------------------------------------------------------------------
-void mafViewOrthoSlice::ApplyViewSettings(mafNode *node)
+void mafViewOrthoSlice::ApplyViewSettings(mafVME *vme)
 //----------------------------------------------------------------------------
 {
-  if(((mafVME *)node)->GetOutput()->IsA("mafVMEOutputPolyline"))  
+  if(vme->GetOutput()->IsA("mafVMEOutputPolyline"))  
   {
     for (int i=CHILD_ZN_VIEW;i<=CHILD_YN_VIEW;i++)
     {
-      mafPipePolylineSlice *pipeSlice = mafPipePolylineSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[i]))->GetNodePipe(node));
+      mafPipePolylineSlice *pipeSlice = mafPipePolylineSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[i]))->GetNodePipe(vme));
       if(pipeSlice) 
       {
-        if(!node->IsA("mafVMEMeter"))
+        if(!vme->IsA("mafVMEMeter"))
           pipeSlice->SetRadius(m_PolylineRadiusSize);
         pipeSlice->FillOn(); 
       }

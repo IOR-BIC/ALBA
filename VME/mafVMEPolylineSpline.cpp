@@ -88,13 +88,13 @@ mafVMEPolylineSpline::~mafVMEPolylineSpline()
   SetOutput(NULL);
 }
 //-------------------------------------------------------------------------
-int mafVMEPolylineSpline::DeepCopy(mafNode *a)
+int mafVMEPolylineSpline::DeepCopy(mafVME *a)
 //-------------------------------------------------------------------------
 { 
   if (Superclass::DeepCopy(a)==MAF_OK)
   {
     mafVMEPolylineSpline *splinePolyline = mafVMEPolylineSpline::SafeDownCast(a);
-    mafNode *linked_node = splinePolyline->GetPolylineLink();
+    mafVME *linked_node = splinePolyline->GetPolylineLink();
     if (linked_node)
     {
       this->SetPolylineLink(linked_node);
@@ -259,7 +259,7 @@ char** mafVMEPolylineSpline::GetIcon()
   return mafVMEProcedural_xpm;
 }
 //-------------------------------------------------------------------------
-void mafVMEPolylineSpline::SetPolylineLink(mafNode *n)
+void mafVMEPolylineSpline::SetPolylineLink(mafVME *n)
 //-------------------------------------------------------------------------
 {
 	SetLink("PolylineSource", n);
@@ -268,7 +268,7 @@ void mafVMEPolylineSpline::SetPolylineLink(mafNode *n)
 mafVME *mafVMEPolylineSpline::GetPolylineLink()
 //-------------------------------------------------------------------------
 {
-  return mafVME::SafeDownCast(GetLink("PolylineSource"));
+  return GetLink("PolylineSource");
 }
 //-------------------------------------------------------------------------
 mafGUI* mafVMEPolylineSpline::CreateGui()
@@ -277,7 +277,7 @@ mafGUI* mafVMEPolylineSpline::CreateGui()
 
 	mafID sub_id = -1;
 
-  m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
+  m_Gui = mafVME::CreateGui(); // Called to show info about vmes' type and name
   m_Gui->SetListener(this);
   m_Gui->Divider();
 
@@ -309,7 +309,7 @@ void mafVMEPolylineSpline::OnEvent(mafEventBase *maf_event)
         e->SetArg((long)&mafVMEPolylineSpline::PolylineAccept);
         e->SetString(&title);
         ForwardUpEvent(e);
-        mafNode *n = e->GetVme();
+        mafVME *n = e->GetVme();
         if (n != NULL)
         {
 					SetPolylineLink(n);
@@ -327,7 +327,7 @@ void mafVMEPolylineSpline::OnEvent(mafEventBase *maf_event)
 				}
 				break;
       default:
-      mafNode::OnEvent(maf_event);
+      mafVME::OnEvent(maf_event);
     }
   }
   else

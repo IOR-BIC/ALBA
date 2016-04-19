@@ -41,7 +41,7 @@ public:
   };
 
   /** Copy the contents of another VME-RefSys into this one. */
-  virtual int DeepCopy(mafNode *a);
+  virtual int DeepCopy(mafVME *a);
 
   /** Compare with another VME-RefSys. */
   virtual bool Equals(mafVME *vme);

@@ -82,7 +82,7 @@ public:
   virtual void OnEvent(mafEventBase *maf_event);
 
   /** Copy the contents of another VMELabeled into this one. */
-  int DeepCopy(mafNode *a);
+  int DeepCopy(mafVME *a);
 
   /** Compare with another VMELabeled. */
   bool Equals(mafVME *vme);
@@ -103,10 +103,10 @@ public:
   virtual void GenerateLabeledVolume();
 
   /** Set the Link */
-  void SetVolumeLink(mafNode *n);
+  void SetVolumeLink(mafVME *n);
 
   /** Return the Link */
-  mafNode *GetVolumeLink();
+  mafVME *GetVolumeLink();
 
   /** return material attribute of this surface if present */
   mmaVolumeMaterial *GetMaterial();

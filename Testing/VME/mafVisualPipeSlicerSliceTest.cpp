@@ -90,7 +90,7 @@ void mafVisualPipeSlicerSliceTest::TestPipeExecution()
 
   mafVMEVolumeGray *volume = mafVMEVolumeGray::SafeDownCast(importer->GetOutput());
 	volume->GetOutput()->GetVTKData()->Update();
-	volume->SetParent(root);
+	volume->ReparentTo(root);
 	volume->Update();
 
 	double centerV[3], rotV[3];
@@ -150,7 +150,6 @@ void mafVisualPipeSlicerSliceTest::TestPipeExecution()
   vtkDEL(actorList);
 
   pipe->Delete();
-  sceneNode->m_RenFront = NULL;
   cppDEL(sceneNode);
   cppDEL(rootscenenode);
 

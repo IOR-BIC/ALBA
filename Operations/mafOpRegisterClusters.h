@@ -138,7 +138,7 @@ public:
 
 	/** Return true for the acceptable vme type. 
 	This method accepts source landmark cloud (may not be time-variant).*/
-  bool Accept(mafNode* node);   
+  bool Accept(mafVME* node);   
 
 	/** Builds operation's interface. */
   void OpRun();
@@ -151,7 +151,7 @@ public:
 
 	/** Set the input vme for the operation. 
 	This method invalidates Weights, so specifying weights must be done after calling this method. 
-	/*virtual*/ void SetInput(mafNode* vme);
+	/*virtual*/ void SetInput(mafVME* vme);
 
 	/** Helper method. Sets the source landmark cloud. 
 	N.B. This method invalidates Weights, so specifying weights must be done after calling this method. */
@@ -295,10 +295,10 @@ public:
 
 public:
 	/** Callback for VME_CHOOSE that accepts Closed Landmarkclouds VMEs only.*/
-	static bool ClosedCloudAccept(mafNode* node); 
+	static bool LMCloudAccept(mafVME* node); 
 
 	/** Callback for VME_CHOOSE that accepts Surface VME only. */
-	static bool SurfaceAccept(mafNode* node);
+	static bool SurfaceAccept(mafVME* node);
 
 protected:
   /** Extract matching points between source and target for the given time.
@@ -356,7 +356,7 @@ protected:
 #pragma region GUI
 
 	/** Check the correctness of the vme's type. */
-	void OnChooseVme(mafNode *vme);
+	void OnChooseVme(mafVME *vme);
 
 	/** Called when ID_WEIGHT event is raised. */
 	virtual void OnChangeWeights();

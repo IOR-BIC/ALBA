@@ -101,10 +101,10 @@ mafOp* mafOpLabelExtractor::Copy()
   return (new mafOpLabelExtractor(m_Label));
 }
 //----------------------------------------------------------------------------
-bool mafOpLabelExtractor::Accept(mafNode *vme)
+bool mafOpLabelExtractor::Accept(mafVME*vme)
 //----------------------------------------------------------------------------
 {
-	return (vme != NULL && ((mafVME *)vme)->GetOutput()->IsA("mafVMEOutputVolume") && !vme->IsA("mafVMEImage")); 
+	return (vme != NULL && vme->GetOutput()->IsA("mafVMEOutputVolume") && !vme->IsA("mafVMEImage")); 
 }
 //----------------------------------------------------------------------------
 // Constants :
@@ -258,7 +258,7 @@ void mafOpLabelExtractor::OnEvent(mafEventBase *maf_event)
 
 		  case wxOK:
 			  ExtractLabel();
-			  if(((mafVME *)m_Input)->GetOutput()->GetVTKData() != NULL)
+			  if(m_Input->GetOutput()->GetVTKData() != NULL)
 				  OpStop(OP_RUN_OK);
 			  else
 			  {
@@ -299,8 +299,8 @@ void mafOpLabelExtractor::OnEvent(mafEventBase *maf_event)
 void mafOpLabelExtractor::UpdateDataLabel()
 //----------------------------------------------------------------------------
 {
-  mafNode *linkedNode = m_Input->GetLink("VolumeLink");
-  mafSmartPointer<mafVME> linkedVolume = mafVME::SafeDownCast(linkedNode);
+  mafVME *linkedNode = m_Input->GetLink("VolumeLink");
+  mafSmartPointer<mafVME> linkedVolume = linkedNode;
 
   //Get dataset from volume linked to
   vtkDataSet *data = linkedVolume->GetOutput()->GetVTKData();
@@ -389,7 +389,7 @@ void mafOpLabelExtractor::ExtractLabel()
   }
   else
   {
-    mafSmartPointer<mafVME> vmeLabeled = (mafVME *)m_Input;
+    mafSmartPointer<mafVME> vmeLabeled = m_Input;
     m_Ds = vmeLabeled->GetOutput()->GetVTKData();
     m_Ds->Update();
   }

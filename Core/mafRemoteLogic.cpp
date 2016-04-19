@@ -39,7 +39,7 @@
 #include "mafDeviceButtonsPadMouseRemote.h"
 #include "mafDeviceClientMAF.h"
 
-#include "mafNodeIterator.h"
+#include "mafVMEIterator.h"
 #include "mafVME.h"
 #include "mafEventInteraction.h"
 #include "mafTransform.h"
@@ -375,9 +375,9 @@ void mafRemoteLogic::RemoteMessage(mafString &cmd, bool to_server)
     else if (command == "GetTreeVME")
     {
       m_RemoteMsg = "GetTreeVME";
-      mafNode *root = m_ViewManager->GetCurrentRoot();
-      mafNodeIterator *iter = root->NewIterator();
-      for(mafNode *vme = iter->GetFirstNode(); vme; vme = iter->GetNextNode())
+      mafVME *root = m_ViewManager->GetCurrentRoot();
+      mafVMEIterator *iter = root->NewIterator();
+      for(mafVME *vme = iter->GetFirstNode(); vme; vme = iter->GetNextNode())
       {
         m_RemoteMsg << m_CommandSeparator;
         m_RemoteMsg << vme->GetName();
@@ -399,8 +399,8 @@ void mafRemoteLogic::RemoteMessage(mafString &cmd, bool to_server)
       data_cmd.ToLong(&vme_id);
       data_cmd = tkz.GetNextToken();
       data_cmd.ToLong(&show_flag);
-      mafNode *root = m_ViewManager->GetCurrentRoot();
-      mafNode *vme_to_show = root->FindInTreeById(vme_id);
+      mafVME *root = m_ViewManager->GetCurrentRoot();
+      mafVME *vme_to_show = root->FindInTreeById(vme_id);
       mafView *v = m_ViewManager->GetSelectedView();
       mafEventMacro(mafEvent(this,VME_SHOW, vme_to_show, show_flag != 0));
       mafEventMacro(mafEvent(this,CAMERA_UPDATE));
@@ -559,7 +559,7 @@ bool mafRemoteLogic::IsSocketConnected()
   return m_ClientUnit->IsConnected();
 }
 //----------------------------------------------------------------------------
-void mafRemoteLogic::VmeSelected(mafNode *vme)
+void mafRemoteLogic::VmeSelected(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   mafString cmd = "VME_SELECT";
@@ -568,7 +568,7 @@ void mafRemoteLogic::VmeSelected(mafNode *vme)
   RemoteMessage(cmd);
 }
 //----------------------------------------------------------------------------
-void mafRemoteLogic::VmeShow(mafNode *vme, bool show_vme)
+void mafRemoteLogic::VmeShow(mafVME *vme, bool show_vme)
 //----------------------------------------------------------------------------
 {
   mafString cmd = "VME_SHOW";
