@@ -1,3 +1,4 @@
+#include "mafOpManager.h"
 /*=========================================================================
 
  Program: MAF2
@@ -27,6 +28,34 @@ class mafGUICheckTree;
 class mafNode;
 class mafSceneGraph;
 class mafVME;
+class mafOpManager;
+
+//----------------------------------------------------------------------------
+// const
+//----------------------------------------------------------------------------
+enum TREE_CONTEXTUAL_MENU_ID
+{
+	CONTEXTUAL_TREE_MENU_START = MINID,
+	RMENU_DISPLAY_SUBMENU,
+	RMENU_CRYPT_SUBMENU,
+	RMENU_SHOW_VME,
+	RMENU_SHOW_SUBTREE,
+	RMENU_SHOW_SAMETYPE,
+	RMENU_HIDE_SUBTREE,
+	RMENU_HIDE_SAMETYPE,
+	RMENU_ADD_GROUP,
+	RMENU_CUT,
+	RMENU_COPY,
+	RMENU_PASTE,
+	RMENU_DELETE,
+	RMENU_REPARENT,
+	RMENU_SORT_TREE,
+	RMENU_AUTO_SORT,
+	RMENU_CRYPT_VME,
+	RMENU_ENABLE_CRYPT_SUBTREE,
+	RMENU_DISABLE_CRYPT_SUBTREE,
+	CONTEXTUAL_TREE_MENU_STOP
+};
 
 //----------------------------------------------------------------------------
 // mafGUITreeContextualMenu :
@@ -36,6 +65,7 @@ class mafVME;
 */
 class MAF_EXPORT mafGUITreeContextualMenu : public wxMenu
 {
+
 public:
   mafGUITreeContextualMenu();
   virtual ~mafGUITreeContextualMenu();
@@ -47,6 +77,8 @@ public:
   /** Visualize contextual men for the MDI child and selected view. */
   void ShowContextualMenu();
 
+	void SetOpManager(mafOpManager *opManager);
+
 protected:
   mafView       *m_ViewActive;
   mafVME        *m_VmeActive;
@@ -54,8 +86,12 @@ protected:
   mafGUICheckTree  *m_NodeTree;
   mafObserver   *m_Listener;
 
+	mafOpManager	*m_OpManager;
+
   mafSceneGraph *m_SceneGraph;
-  
+
+	wxMenu *m_DisplaySubMenu;
+
   bool m_Autosort;
   bool m_CryptoCheck;
 

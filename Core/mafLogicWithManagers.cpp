@@ -443,6 +443,8 @@ void mafLogicWithManagers::CreateMenu()
 #include "pic/menu/EDIT_CUT.xpm"
 #include "pic/menu/EDIT_DELETE.xpm"
 #include "pic/menu/EDIT_PASTE.xpm"
+#include "pic/menu/EDIT_REPARENT.xpm"
+#include "pic/menu/EDIT_FIND.xpm"
 #include "pic/menu/EDIT_REDO.xpm"
 #include "pic/menu/EDIT_SETTINGS.xpm"
 #include "pic/menu/EDIT_UNDO.xpm"
@@ -494,16 +496,20 @@ void mafLogicWithManagers::CreateMenu()
   m_MenuBar->Append(file_menu, _("&File"));
 
   wxMenu    *edit_menu = new wxMenu;
-
-
+	
 	mafGUI::AddMenuItem(edit_menu,OP_UNDO,_("Undo  \tCtrl+Z"),EDIT_UNDO_xpm);
 	mafGUI::AddMenuItem(edit_menu,OP_REDO,_("Redo  \tCtrl+Shift+Z"),EDIT_REDO_xpm);
+
   edit_menu->AppendSeparator();
-	mafGUI::AddMenuItem(edit_menu,OP_DELETE,_("Delete  \tCtrl+Shift+Del"),EDIT_DELETE_xpm);
 	mafGUI::AddMenuItem(edit_menu,OP_CUT,_("Cut   \tCtrl+Shift+X"),EDIT_CUT_xpm);
 	mafGUI::AddMenuItem(edit_menu,OP_COPY,_("Copy  \tCtrl+Shift+C"),EDIT_COPY_xpm);
 	mafGUI::AddMenuItem(edit_menu,OP_PASTE, _("Paste \tCtrl+Shift+V"),EDIT_PASTE_xpm);
-  edit_menu->Append(MENU_EDIT_FIND_VME, _("Find VME \tCtrl+F"));
+	mafGUI::AddMenuItem(edit_menu, OP_DELETE, _("Delete  \tCtrl+Shift+Del"), EDIT_DELETE_xpm);
+
+	edit_menu->AppendSeparator();
+	mafGUI::AddMenuItem(edit_menu, OP_REPARENT, _("Reparent to... \tCtrl+Shift+R"), EDIT_REPARENT_xpm);
+	mafGUI::AddMenuItem(edit_menu, MENU_EDIT_FIND_VME, _("Find VME \tCtrl+F"), EDIT_FIND_xpm);
+	
 	edit_menu->AppendSeparator();
 	mafGUI::AddMenuItem(edit_menu,ID_APP_SETTINGS,_("Settings..."),EDIT_SETTINGS_xpm);
 
@@ -520,6 +526,7 @@ void mafLogicWithManagers::CreateMenu()
 	mafGUI::AddMenuItem(windowMenu,TILE_WINDOW_CASCADE,_("&Cascade"),WINDOW_CASCADE_xpm);
 	mafGUI::AddMenuItem(windowMenu,TILE_WINDOW_HORIZONTALLY,_("Tile &Horizontally"),WINDOW_HORIZONTALLY_xpm);
 	mafGUI::AddMenuItem(windowMenu,TILE_WINDOW_VERTICALLY,_("Tile &Vertically"),WINDOW_VERTICALLY_xpm);
+	
 	windowMenu->AppendSeparator();
 	mafGUI::AddMenuItem(windowMenu,IDM_WINDOWNEXT,_("&Next"),WINDOW_NEXT_xpm);
 	mafGUI::AddMenuItem(windowMenu,IDM_WINDOWPREV,_("&Previous"),WINDOW_PREV_xpm);
@@ -1446,7 +1453,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 				}
 				break;
 
-      default:
+			default:
 				e->Log();
 				break; 
       break; 
@@ -2005,6 +2012,7 @@ void mafLogicWithManagers::TreeContextualMenu(mafEvent &e)
 {
   mafGUITreeContextualMenu *contextMenu = new mafGUITreeContextualMenu();
   contextMenu->SetListener(this);
+	contextMenu->SetOpManager(m_OpManager);
   mafView *v = m_ViewManager->GetSelectedView();
   mafVME  *vme = (mafVME *)e.GetVme();
   bool vme_menu = e.GetBool();
