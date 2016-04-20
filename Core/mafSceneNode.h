@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: mafSceneNode
- Authors: Silvano Imboden
+ Authors: Silvano Imboden, Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -98,11 +98,16 @@ public:
 	void SetPipeCreatable(bool pipeCreatable) { m_PipeCreatable = pipeCreatable; }
 
 protected:
+
+	void ChildShow();
+	void ChildHide();
+	void UpdateVisibility();
   
 	mafPipe           *m_Pipe;
 	bool               m_PipeCreatable;
 	vtkRenderer       *m_RenFront;
 	int								 m_VisibleChildren;
+	bool							 m_CurrentVisibility;
 	bool               m_Mutex;
 
 	vtkMAFAssembly    *m_AssemblyFront;
