@@ -30,6 +30,7 @@
 #include "mafViewVTK.h"
 
 #include "mafVMESurface.h"
+#include "mafOpManager.h"
 
 #define TEST_RESULT CPPUNIT_ASSERT(result);
 
@@ -61,8 +62,11 @@ void mafGUITreeContextualMenuTest::TestCreateContextualMenu()
   mafViewVTK *view = new mafViewVTK();
   mafVMESurface *vme = mafVMESurface::New();
 
+	mafOpManager *opManager = new mafOpManager();
+
   // create contextual menu for VME with one existing view.
   mafGUITreeContextualMenu *menu1 = new mafGUITreeContextualMenu();
+	menu1->SetOpManager(opManager);
   menu1->CreateContextualMenu(NULL, view, vme, true);
 
  
@@ -73,12 +77,15 @@ void mafGUITreeContextualMenuTest::TestCreateContextualMenu()
   // Contextual menu with view active, but no one VME selected.
   // Should contain only the "Keep tree nodes sorted" menu item.
   mafGUITreeContextualMenu *menu2 = new mafGUITreeContextualMenu();
+	menu2->SetOpManager(opManager);
   menu2->CreateContextualMenu(NULL, view, vme, false);
-
+	
 
   // Contextual menu for VME with no one view created.
   mafGUITreeContextualMenu *menu3 = new mafGUITreeContextualMenu();
+	menu3->SetOpManager(opManager);
   menu3->CreateContextualMenu(NULL, NULL, vme, true);
+	
 
   // No one view created.
   result = menu3->FindItem("Hide/Show") == wxNOT_FOUND;
@@ -90,4 +97,6 @@ void mafGUITreeContextualMenuTest::TestCreateContextualMenu()
   delete menu1;
   delete menu2;
   delete menu3;
+
+	cppDEL(opManager);
 }

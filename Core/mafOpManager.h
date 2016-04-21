@@ -134,7 +134,7 @@ public:
 	/** Stop the current operation in any case - to be used as last resort. */
   virtual bool StopCurrentOperation();
 
-	void EnableContextualMenu(mafGUITreeContextualMenu *contextualMenu, bool CanEnable = true);
+	void EnableContextualMenu(mafGUITreeContextualMenu *contextualMenu, mafNode *node, bool CanEnable = true);
 
   /** Return the current running operation. Return NULL if no operation is running.*/
   mafOp *GetRunningOperation();

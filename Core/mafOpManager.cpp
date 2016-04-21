@@ -496,28 +496,31 @@ void mafOpManager::EnableOp(bool CanEnable)
 	if(m_ToolBar) EnableToolbar(CanEnable);
 }
 //----------------------------------------------------------------------------
-void mafOpManager::EnableContextualMenu(mafGUITreeContextualMenu *contextualMenu, bool CanEnable)
+void mafOpManager::EnableContextualMenu(mafGUITreeContextualMenu *contextualMenu, mafNode *node, bool CanEnable)
 //----------------------------------------------------------------------------
 {
-	if (!CanEnable)
+	if(contextualMenu)
 	{
-		contextualMenu->FindItem(RMENU_ADD_GROUP)->Enable(false);
+		if (!CanEnable)
+		{
+			contextualMenu->FindItem(RMENU_ADD_GROUP)->Enable(false);
 
-		contextualMenu->FindItem(RMENU_CUT)->Enable(false);
-		contextualMenu->FindItem(RMENU_COPY)->Enable(false);
-		contextualMenu->FindItem(RMENU_PASTE)->Enable(false);
-		contextualMenu->FindItem(RMENU_DELETE)->Enable(false);
-		contextualMenu->FindItem(RMENU_REPARENT)->Enable(false);
-	}
-	else
-	{
-		contextualMenu->FindItem(RMENU_ADD_GROUP)->Enable(m_OpAddGroup->Accept(m_Selected));
+			contextualMenu->FindItem(RMENU_CUT)->Enable(false);
+			contextualMenu->FindItem(RMENU_COPY)->Enable(false);
+			contextualMenu->FindItem(RMENU_PASTE)->Enable(false);
+			contextualMenu->FindItem(RMENU_DELETE)->Enable(false);
+			contextualMenu->FindItem(RMENU_REPARENT)->Enable(false);
+		}
+		else
+		{
+			contextualMenu->FindItem(RMENU_ADD_GROUP)->Enable(m_OpAddGroup->Accept(node));
 
-		contextualMenu->FindItem(RMENU_CUT)->Enable(m_OpCut->Accept(m_Selected));
-		contextualMenu->FindItem(RMENU_COPY)->Enable(m_OpCopy->Accept(m_Selected));
-		contextualMenu->FindItem(RMENU_PASTE)->Enable(m_OpPaste->Accept(m_Selected));
-		contextualMenu->FindItem(RMENU_DELETE)->Enable(m_OpCut->Accept(m_Selected));
-		contextualMenu->FindItem(RMENU_REPARENT)->Enable(m_OpReparent->Accept(m_Selected));
+			contextualMenu->FindItem(RMENU_CUT)->Enable(m_OpCut->Accept(node));
+			contextualMenu->FindItem(RMENU_COPY)->Enable(m_OpCopy->Accept(node));
+			contextualMenu->FindItem(RMENU_PASTE)->Enable(m_OpPaste->Accept(node));
+			contextualMenu->FindItem(RMENU_DELETE)->Enable(m_OpCut->Accept(node));
+			contextualMenu->FindItem(RMENU_REPARENT)->Enable(m_OpReparent->Accept(node));
+		}
 	}
 }
 //----------------------------------------------------------------------------

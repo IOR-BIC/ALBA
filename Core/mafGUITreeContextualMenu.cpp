@@ -179,7 +179,7 @@ void mafGUITreeContextualMenu::CreateContextualMenu(mafGUICheckTree *tree, mafVi
 		mafGUI::AddMenuItem(this, RMENU_DELETE, "Delete", EDIT_DELETE_xpm);
 		mafGUI::AddMenuItem(this, RMENU_REPARENT, "Reparent to...", EDIT_REPARENT_xpm);
 
-		m_OpManager->EnableContextualMenu(this);
+		m_OpManager->EnableContextualMenu(this, m_NodeActive);
 
 		//////////////////////////////////////////////////////////////////////////
 		this->AppendSeparator();
