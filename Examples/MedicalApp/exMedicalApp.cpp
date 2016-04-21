@@ -101,7 +101,6 @@
 #include "mafOpFilterSurface.h"
 #include "mafOpFilterVolume.h"
 #include "mafOpMAFTransform.h"
-#include "mafOpReparentTo.h"
 #include "medOpVolumeResample.h"
 #include "mafOpDecimateSurface.h"
 #include "mafOpConnectivitySurface.h"
@@ -293,7 +292,6 @@ bool exMedicalApp::OnInit()
 	m_Logic->Plug(new mafOpEditMetadata("Metadata Editor"),_("Modify"));
 	m_Logic->Plug(new mafOpExplodeCollapse("Explode/Collapse cloud"),_("Modify"));
 	m_Logic->Plug(new mafOpMAFTransform("Transform"),_("Modify"));
-	m_Logic->Plug(new mafOpReparentTo("Reparent to..."),_("Modify"));
 	m_Logic->Plug(new medOpVolumeResample("Resample Volume"),_("Modify"));
 	m_Logic->Plug(new mafOpCrop("Crop Volume"),_("Modify"));
 	m_Logic->Plug(new mafOpBooleanSurface("Boolean Surface"),_("Modify"));
