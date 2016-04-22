@@ -54,7 +54,8 @@ void mafTest::setUp()
 	m_App->argv = NULL;     // set to NULL the input argument's parameters
 	wxTheApp->SetAppName("mafUserTest"); // Set the name for the application
 	
-	wxLog::EnableLogging();
+	//NOTE, wxLog produces some memory leaks, set false during test
+	wxLog::EnableLogging(true);
 
 	//Run Test Specific Stuff
 	BeforeTest();
@@ -65,6 +66,8 @@ void mafTest::tearDown()
 	//Clean Test Spefic Stuff
 	AfterTest();
 
+	
 	cppDEL(m_App);  // Destroy the application
 	wxAppConsole::SetInstance(NULL);
+	
 }

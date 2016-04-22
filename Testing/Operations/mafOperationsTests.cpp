@@ -137,12 +137,19 @@
 #include "mafOpInteractionDebuggerTest.h"
 #include "mafOpIterativeRegistrationTest.h"
 #include "mafOpTransformTest.h"
+#include "mafOpImporterAnsysCDBFileTest.h"
+#include "mafOpImporterAnsysInputFileTest.h"
+#include "mafOpExporterAnsysCDBFileTest.h"
+#include "mafOpExporterAnsysInputFileTest.h"
 
 #include <cppunit/BriefTestProgressListener.h>
 #include <cppunit/CompilerOutputter.h>
 #include <cppunit/extensions/TestFactoryRegistry.h>
 #include <cppunit/TestResultCollector.h>
 #include <cppunit/TestRunner.h>
+
+// Visual Leak Detector
+//#include <vld.h>
 
 //-------------------------------------------------------------------------
 mafCxxTypeMacro(DummyVme);
@@ -311,7 +318,11 @@ int	main( int argc, char* argv[] )
 	runner.addTest(mafOpMML3ParameterViewTest::suite());
 	runner.addTest(mafOpInteractionDebuggerTest::suite());
 	runner.addTest(mafOpIterativeRegistrationTest::suite());
-	
+	runner.addTest(mafOpImporterAnsysCDBFileTest::suite());
+ 	runner.addTest(mafOpImporterAnsysInputFileTest::suite());
+ 	runner.addTest(mafOpExporterAnsysCDBFileTest::suite());
+ 	runner.addTest(mafOpExporterAnsysInputFileTest::suite());
+
 	runner.run( controller );
 
 	// Print test in a compiler compatible format.
