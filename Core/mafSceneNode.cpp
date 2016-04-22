@@ -114,7 +114,7 @@ mafSceneNode::~mafSceneNode()
 	{
     if(m_Parent) 
 			m_Parent->m_AssemblyFront->RemovePart(m_AssemblyFront);
-		else if (m_AssemblyFront)
+		else
 			m_RenFront->RemoveActor(m_AssemblyFront);
 		
 		vtkDEL(m_AssemblyFront);
@@ -134,7 +134,7 @@ mafSceneNode::~mafSceneNode()
 	{
 		if(m_Parent)
 			m_Parent->m_AlwaysVisibleAssembly->RemovePart(m_AlwaysVisibleAssembly);
-		else if (m_Parent)
+		else
 			m_AlwaysVisibleRenderer->RemoveActor(m_AlwaysVisibleAssembly);
 		
 		vtkDEL(m_AlwaysVisibleAssembly);
