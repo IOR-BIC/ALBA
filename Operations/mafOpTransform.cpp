@@ -46,6 +46,7 @@
 #include "mafVMESurface.h"
 #include "mafVMEPolyline.h"
 #include "mafTagItem.h"
+#include "mafVMERefSys.h"
 
 #include "vtkTransform.h"
 #include "vtkDataSet.h"
@@ -140,7 +141,8 @@ bool mafOpTransform::Accept(mafNode *node)
 	else
 	{
 		return (node != NULL && node->IsMAFType(mafVME) && !node->IsA("mafVMERoot")
-			&& !node->IsA("mafVMEExternalData") && !node->IsA("mafVMERefSys"));
+			&& !node->IsA("mafVMEExternalData") && !node->IsA("mafVMERefSys")) ||
+			(node != NULL && node->IsMAFType(mafVMERefSys) && mafVMERefSys::SafeDownCast(node)->IsMovable());
 	}
 }
 //----------------------------------------------------------------------------
