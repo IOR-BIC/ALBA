@@ -72,6 +72,8 @@
 #include "mafOpImporterBBF.h"
 #include "mafOpImporterRAWVolume_BES.h"
 #include "medOpImporterVTK.h"
+#include "mafOpImporterAnsysCDBFile.h"
+#include "mafOpImporterAnsysInputFile.h"
 #endif
 #ifndef _DEBUG
 //EXPORTERS
@@ -83,6 +85,8 @@
 #include "mafOpExporterWrappedMeter.h"
 #include "mafOpExporterGRFWS.h"
 #include "mafOpExporterMeters.h"
+#include "mafOpExporterAnsysCDBFile.h"
+#include "mafOpExporterAnsysInputFile.h"
 #endif
 #ifndef _DEBUG
 //OPERATIONS
@@ -222,6 +226,8 @@ bool exMedicalApp::OnInit()
 	m_Logic->Plug(new medOpImporterVTK("VTK (MED)"));
 	m_Logic->Plug(new mafOpImporterMSF1x("MSF 1.x"));
 	m_Logic->Plug(new mafOpImporterMesh("Mesh"));
+	m_Logic->Plug(new mafOpImporterAnsysCDBFile("Ansys CDB File"), "Finite Element");
+	m_Logic->Plug(new mafOpImporterAnsysInputFile("Ansys Input File"), "Finite Element");
 #ifdef MAF_USE_ITK
 	m_Logic->Plug(new mafOpImporterASCII("ASCII"));
 #endif
@@ -253,6 +259,8 @@ bool exMedicalApp::OnInit()
 	m_Logic->Plug(new mafOpExporterWrappedMeter());
 	m_Logic->Plug(new mafOpExporterGRFWS());
 	m_Logic->Plug(new mafOpExporterMeters());
+	m_Logic->Plug(new mafOpExporterAnsysCDBFile("Ansys CDB File"), "Finite Element");
+	m_Logic->Plug(new mafOpExporterAnsysInputFile("Ansys Input File"), "Finite Element");
 #endif
 	//------------------------------------------------------------
 
