@@ -753,7 +753,6 @@ void mafOpRegisterClusters::OpDo()
 		}		
 	}
 
-	mafEventMacro(mafEvent(this,TIME_SET,-1.0));
 }
 
 //----------------------------------------------------------------------------

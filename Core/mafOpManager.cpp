@@ -46,6 +46,8 @@
 #include "mafTagItem.h"
 #include "mafVME.h"
 #include "mafVMEGenericAbstract.h"
+#include "mafOpReparentTo.h"
+#include "mafOpCreateGroup.h"
 
 //------------------------------------------------------------------------------
 // Events
@@ -104,6 +106,8 @@ mafOpManager::mafOpManager()
   m_OpCut       = new mafOpCut();
   m_OpCopy      = new mafOpCopy();
   m_OpPaste     = new mafOpPaste();
+	m_OpReparent  = new mafOpReparentTo();
+	m_OpAddGroup = new mafOpCreateGroup();
   //m_optransform = new mafOpTransform();
 
 	m_ToolBar = NULL;
@@ -138,6 +142,8 @@ mafOpManager::~mafOpManager()
   cppDEL(m_OpCut);
   cppDEL(m_OpCopy);
   cppDEL(m_OpPaste);
+	cppDEL(m_OpReparent);
+	cppDEL(m_OpAddGroup);
   cppDEL(m_User);
 }
 //----------------------------------------------------------------------------
@@ -208,51 +214,6 @@ void mafOpManager::OpAdd(mafOp *op, wxString menuPath, bool can_undo, mafGUISett
   }
   m_NumOp++;
 }
-//----------------------------------------------------------------------------
-/*void mafOpManager::FillMenu (wxMenu* import, wxMenu* mexport, wxMenu* operations)
-//----------------------------------------------------------------------------
-{
-  int submenu_id = 1;
-  
-  m_Menu[OPTYPE_IMPORTER] = import;
-  m_Menu[OPTYPE_EXPORTER] = mexport;
-  m_Menu[OPTYPE_OP] = operations;
-   
-	for(int i=0; i<m_NumOp; i++)
-  {
-    mafOp *o = m_OpList[i];
-    if (o->m_OpMenuPath != "")
-    {
-      wxMenu *sub_menu = NULL;
-
-      int item = m_Menu[o->GetType()]->FindItem(o->m_OpMenuPath);
-      if (item != wxNOT_FOUND)
-      {
-         wxMenuItem *menu_item = m_Menu[o->GetType()]->FindItem(item);
-         if (menu_item)
-           sub_menu = menu_item->GetSubMenu();
-      }
-      else
-      {
-        sub_menu = new wxMenu;
-        m_Menu[o->GetType()]->Append(submenu_id++,o->m_OpMenuPath,sub_menu);
-      }
-      
-      if(sub_menu)
-        sub_menu->Append(o->m_Id, o->m_Label, o->m_Label);
-      else
-        mafLogMessage("error in FillMenu");
-    }
-    else
-    {
-      m_Menu[o->GetType()]->Append(o->m_Id, o->m_Label, o->m_Label);
-    }
-    SetAccelerator(o);
-  }
-  wxAcceleratorTable accel(MAXOP, m_OpAccelEntries);
-  if (accel.Ok())
-    mafGetFrame()->SetAcceleratorTable(accel);
-}*/
 //----------------------------------------------------------------------------
 void mafOpManager::FillSettingDialog(mafGUISettingsDialog *settingDialog)
 //----------------------------------------------------------------------------
@@ -397,16 +358,6 @@ void mafOpManager::OpSelect(mafVME* vme)
 	OpExec(m_OpSelect);
   mafLogMessage("node selected: %s", vme->GetName());
 }
-/*
-//----------------------------------------------------------------------------
-void mafOpManager::OpTransform(vtkMatrix4x4* new_matrix,vtkMatrix4x4* old_matrix)
-//----------------------------------------------------------------------------
-{
-	m_optransform->SetNewMatrix(new_matrix);
-	m_optransform->SetOldMatrix(old_matrix);
-	OpExec(m_optransform); 
-}
-*/
 //----------------------------------------------------------------------------
 void mafOpManager::ClearUndoStack()
 //----------------------------------------------------------------------------
@@ -421,9 +372,6 @@ void mafOpManager::EnableToolbar(bool CanEnable)
 {
 	if(!CanEnable)
 	{
-/*		m_ToolBar->EnableTool(MENU_FILE_NEW,false);	//Removed by Paolo 15-9-2003: HAL men
-		m_ToolBar->EnableTool(MENU_FILE_OPEN,false);
-		m_ToolBar->EnableTool(MENU_FILE_SAVE,false);*/
 		m_ToolBar->EnableTool(OP_UNDO,false);
 		m_ToolBar->EnableTool(OP_REDO,false);
 		m_ToolBar->EnableTool(OP_CUT,false);
@@ -432,9 +380,6 @@ void mafOpManager::EnableToolbar(bool CanEnable)
 	}
 	else
 	{
-/*		m_ToolBar->EnableTool(MENU_FILE_NEW,true);
-		m_ToolBar->EnableTool(MENU_FILE_OPEN,true);
-		m_ToolBar->EnableTool(MENU_FILE_SAVE,true);*/
 		m_ToolBar->EnableTool(OP_UNDO,	!m_Context.Undo_IsEmpty());
 		m_ToolBar->EnableTool(OP_REDO,	!m_Context.Redo_IsEmpty());
 		m_ToolBar->EnableTool(OP_CUT,		m_OpCut->Accept(m_Selected) );
@@ -455,6 +400,7 @@ void mafOpManager::EnableOp(bool CanEnable)
 		  if(m_MenuBar->FindItem(OP_CUT))			m_MenuBar->Enable(OP_CUT,false);
 		  if(m_MenuBar->FindItem(OP_COPY))		m_MenuBar->Enable(OP_COPY,false);
 		  if(m_MenuBar->FindItem(OP_PASTE))		m_MenuBar->Enable(OP_PASTE,false);
+			if(m_MenuBar->FindItem(OP_REPARENT))		m_MenuBar->Enable(OP_REPARENT, false);
 		  if(m_MenuBar->FindItem(OP_UNDO))		m_MenuBar->Enable(OP_UNDO,false); 
 		  if(m_MenuBar->FindItem(OP_REDO))		m_MenuBar->Enable(OP_REDO,false); 
 
@@ -473,6 +419,7 @@ void mafOpManager::EnableOp(bool CanEnable)
 		  if(m_MenuBar->FindItem(OP_CUT))			m_MenuBar->Enable(OP_CUT,     m_OpCut->Accept(m_Selected));
 		  if(m_MenuBar->FindItem(OP_COPY))		m_MenuBar->Enable(OP_COPY,    m_OpCopy->Accept(m_Selected));
 		  if(m_MenuBar->FindItem(OP_PASTE))		m_MenuBar->Enable(OP_PASTE,   m_OpPaste->Accept(m_Selected)); 
+			if(m_MenuBar->FindItem(OP_REPARENT))		m_MenuBar->Enable(OP_REPARENT, m_OpReparent->Accept(m_Selected));
 
 		  for(int i=0; i<m_NumOp; i++)
 		  {
@@ -483,6 +430,34 @@ void mafOpManager::EnableOp(bool CanEnable)
 	  }
   }
 	if(m_ToolBar) EnableToolbar(CanEnable);
+}
+//----------------------------------------------------------------------------
+void mafOpManager::EnableContextualMenu(mafGUITreeContextualMenu *contextualMenu, mafVME *node, bool CanEnable)
+//----------------------------------------------------------------------------
+{
+	if(contextualMenu)
+	{
+		if (!CanEnable)
+		{
+			contextualMenu->FindItem(RMENU_ADD_GROUP)->Enable(false);
+
+			contextualMenu->FindItem(RMENU_CUT)->Enable(false);
+			contextualMenu->FindItem(RMENU_COPY)->Enable(false);
+			contextualMenu->FindItem(RMENU_PASTE)->Enable(false);
+			contextualMenu->FindItem(RMENU_DELETE)->Enable(false);
+			contextualMenu->FindItem(RMENU_REPARENT)->Enable(false);
+		}
+		else
+		{
+			contextualMenu->FindItem(RMENU_ADD_GROUP)->Enable(m_OpAddGroup->Accept(node));
+
+			contextualMenu->FindItem(RMENU_CUT)->Enable(m_OpCut->Accept(node));
+			contextualMenu->FindItem(RMENU_COPY)->Enable(m_OpCopy->Accept(node));
+			contextualMenu->FindItem(RMENU_PASTE)->Enable(m_OpPaste->Accept(node));
+			contextualMenu->FindItem(RMENU_DELETE)->Enable(m_OpCut->Accept(node));
+			contextualMenu->FindItem(RMENU_REPARENT)->Enable(m_OpReparent->Accept(node));
+		}
+	}
 }
 //----------------------------------------------------------------------------
 bool mafOpManager::WarnUser(mafOp *op)
@@ -533,65 +508,26 @@ void mafOpManager::OpRun(int op_id)
 	  case OP_REDO:
 			OpRedo();
 	  break;
-	  case OP_DELETE:
-    {
-      if (WarnUser(NULL))
-      {
-        mafVME *node_to_del = m_Selected;
-        OpSelect(m_Selected->GetParent());
 
-        // do not remove binary files but fill a list with files to be deleted on save by the storage.
-        mafEventIO e(this,NODE_GET_STORAGE);
-        node_to_del->ForwardUpEvent(e);
-        mafStorage *storage = e.GetStorage();
-        mafVMEIterator *iter = node_to_del->NewIterator();
-        mafString data_filename;
-        for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
-        {
-          if(mafVMEGenericAbstract::SafeDownCast(node))
-          {
-            mafVMEGenericAbstract *vme = mafVMEGenericAbstract::SafeDownCast(node);
-            mafDataVector *dv = vme->GetDataVector();
-            if (dv != NULL)
-            {
-              if (dv->GetSingleFileMode())
-              {
-                mafString archive_filename = dv->GetArchiveName();
-                if (archive_filename != "")
-                {
-                  storage->ReleaseURL(archive_filename);
-                }
-              }
-              else
-              {
-                mafVMEItem *item;
-                int i;
-                for (i = 0; i < dv->GetNumberOfItems(); i++)
-                {
-                  item = dv->GetItemByIndex(i);
-                  data_filename = item->GetURL();
-                  storage->ReleaseURL(data_filename);
-                }
-              }
-            }
-          }
-        }
-        iter->Delete();
-        node_to_del->ReparentTo(NULL);
-        ClearUndoStack();
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-      }
-    }
+		case OP_ADD_GROUP:
+			RunOpAddGroup();
+		break;
+	  case OP_DELETE:
+			RunOpDelete();
     break;
 	  case OP_CUT:
-			OpExec(m_OpCut);
+			RunOpCut();
 	  break;
 	  case OP_COPY:
-			OpExec(m_OpCopy);
+			RunOpCopy();
 	  break;
 	  case OP_PASTE:
-			OpExec(m_OpPaste);
+			RunOpPaste();
 	  break;
+		case OP_REPARENT:
+			RunOpReparentTo();
+			break;
+
 	  default:
 		{
       int index = op_id - OP_USER;
@@ -668,6 +604,84 @@ void mafOpManager::OpRun(mafOp *op, void *op_param)
   m_Context.Push(m_RunningOp);
   m_RunningOp->OpRun();
 }
+
+//----------------------------------------------------------------------------
+void mafOpManager::RunOpAddGroup()
+{
+	OpRun(m_OpAddGroup);
+}
+
+//----------------------------------------------------------------------------
+void mafOpManager::RunOpCut()
+{
+	OpExec(m_OpCut);
+}
+//----------------------------------------------------------------------------
+void mafOpManager::RunOpCopy()
+{
+	OpExec(m_OpCopy);
+}
+//----------------------------------------------------------------------------
+void mafOpManager::RunOpPaste()
+{
+	OpExec(m_OpPaste);
+}
+//----------------------------------------------------------------------------
+void mafOpManager::RunOpDelete()
+{
+  if (WarnUser(NULL))
+  {
+    mafVME *node_to_del = m_Selected;
+    OpSelect(m_Selected->GetParent());
+
+    // do not remove binary files but fill a list with files to be deleted on save by the storage.
+    mafEventIO e(this, NODE_GET_STORAGE);
+    node_to_del->ForwardUpEvent(e);
+    mafStorage *storage = e.GetStorage();
+    mafVMEIterator *iter = node_to_del->NewIterator();
+    mafString data_filename;
+    for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+    {
+      if(mafVMEGenericAbstract::SafeDownCast(node))
+      {
+        mafVMEGenericAbstract *vme = mafVMEGenericAbstract::SafeDownCast(node);
+        mafDataVector *dv = vme->GetDataVector();
+        if (dv != NULL)
+        {
+          if (dv->GetSingleFileMode())
+          {
+            mafString archive_filename = dv->GetArchiveName();
+            if (archive_filename != "")
+            {
+              storage->ReleaseURL(archive_filename);
+            }
+          }
+          else
+          {
+            mafVMEItem *item;
+            int i;
+            for (i = 0; i < dv->GetNumberOfItems(); i++)
+            {
+              item = dv->GetItemByIndex(i);
+              data_filename = item->GetURL();
+              storage->ReleaseURL(data_filename);
+            }
+          }
+        }
+      }
+    }
+    iter->Delete();
+    node_to_del->ReparentTo(NULL);
+    ClearUndoStack();
+    mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+  }
+}
+//----------------------------------------------------------------------------
+void mafOpManager::RunOpReparentTo()
+{
+	OpRun(m_OpReparent);
+}
+
 //----------------------------------------------------------------------------
 void mafOpManager::OpRunOk(mafOp *op)
 //----------------------------------------------------------------------------

@@ -90,6 +90,8 @@ void mafPictureFactory::Initialize()
     mafADDPIC(OP_CUT);
     #include <pic/OP_PASTE.xpm>
     mafADDPIC(OP_PASTE);
+		#include <pic/OP_FIND.xpm>
+		mafADDPIC(OP_FIND);
     #include <pic/OP_REDO.xpm>
     mafADDPIC(OP_REDO);
     #include <pic/OP_UNDO.xpm>

@@ -11,7 +11,7 @@ ENDIF (MAF_BUILD_MAFDLL)
 #-----------------------------------------------------------------------------
 SET(PROJECT_SRCS 
 	mafOperationsTests.h mafOperationsTests.cpp
-  mafOpImporterMSF1xTest.h mafOpImporterMSF1xTest.cpp
+	mafOpImporterMSF1xTest.h mafOpImporterMSF1xTest.cpp
 	mafOpImporterSTLTest.h mafOpImporterSTLTest.cpp
 	mafOpExporterSTLTest.h mafOpExporterSTLTest.cpp
 	mafOpCropTest.h mafOpCropTest.cpp
@@ -123,6 +123,11 @@ SET(PROJECT_SRCS
 	mafOpMML3ParameterViewTest.h mafOpMML3ParameterViewTest.cpp
 	mafOpInteractionDebuggerTest.h mafOpInteractionDebuggerTest.cpp
 	mafOpIterativeRegistrationTest.h mafOpIterativeRegistrationTest.cpp
+	mafOpTransformTest.h mafOpTransformTest.cpp
+	mafOpImporterAnsysCDBFileTest.h mafOpImporterAnsysCDBFileTest.cpp
+	mafOpExporterAnsysCDBFileTest.h mafOpExporterAnsysCDBFileTest.cpp
+	mafOpImporterAnsysInputFileTest.h mafOpImporterAnsysInputFileTest.cpp
+	mafOpExporterAnsysInputFileTest.h mafOpExporterAnsysInputFileTest.cpp
 )
 
 ADD_EXECUTABLE(mafOperationsTests ${PROJECT_SRCS})

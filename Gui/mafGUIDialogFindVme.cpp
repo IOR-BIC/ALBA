@@ -49,14 +49,14 @@ mafGUIDialogFindVme::mafGUIDialogFindVme(const wxString& title, long style)
   m_NodeFoundList.clear();
 
   m_Gui = new mafGUI(this);
-  m_Gui->String(FIND_STRING,_("find vme: "), &m_SearchString);
-  m_Gui->Bool(MATCH_CASE_ID, _("match case"), &m_MatchCase, 1);
-  m_Gui->Bool(WHOLE_WORD_ID, _("match whole word"), &m_WholeWord, 1);
+  m_Gui->String(FIND_STRING,_("Find vme: "), &m_SearchString);
+  m_Gui->Bool(MATCH_CASE_ID, _("Match case"), &m_MatchCase, 1);
+  m_Gui->Bool(WHOLE_WORD_ID, _("Match whole word"), &m_WholeWord, 1);
 
   wxBoxSizer *buttons_sizer = new wxBoxSizer(wxHORIZONTAL);
-  wxButton *findNextButton = new wxButton(this,FIND_NEXT,_("find next"));
+  wxButton *findNextButton = new wxButton(this,FIND_NEXT,_("Find next"));
   findNextButton->SetValidator(mafGUIValidator(this, FIND_NEXT, findNextButton));
-  wxButton *cancelButton = new wxButton(this,wxID_CANCEL,_("cancel"));
+  wxButton *cancelButton = new wxButton(this,wxID_CANCEL,_("Cancel"));
   buttons_sizer->Add(findNextButton);
   buttons_sizer->Add(cancelButton);
   

@@ -71,7 +71,7 @@ mafOpExporterVTK::~mafOpExporterVTK()
 {
 }
 //----------------------------------------------------------------------------
-bool mafOpExporterVTK::Accept(mafVME*node)
+bool mafOpExporterVTK::Accept(mafVME *node)
 //----------------------------------------------------------------------------
 { 
   return (node->IsMAFType(mafVME) && !node->IsMAFType(mafVMERoot) && !node->IsMAFType(mafVMEGroup));
@@ -216,11 +216,14 @@ void mafOpExporterVTK::SaveVTKData()
 
   if (m_ABSMatrixFlag)
   {
+		vtkMAFSmartPointer <vtkTransform> tra;
+		tra->SetMatrix(m_Input->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
+
 		if(m_Input->IsA("mafVMEMesh"))
 		{
 			vtkMAFSmartPointer<vtkTransformFilter> v_tpdf;
 			v_tpdf->SetInput((vtkUnstructuredGrid *)m_Input->GetOutput()->GetVTKData());
-			v_tpdf->SetTransform(m_Input->GetOutput()->GetTransform()->GetVTKTransform());
+			v_tpdf->SetTransform(tra);
 			v_tpdf->Update();
 			writer->SetInput(v_tpdf->GetOutput());
 		}
@@ -228,7 +231,7 @@ void mafOpExporterVTK::SaveVTKData()
 		{
 			vtkMAFSmartPointer<vtkTransformPolyDataFilter> v_tpdf;
 			v_tpdf->SetInput((vtkPolyData *)m_Input->GetOutput()->GetVTKData());
-			v_tpdf->SetTransform(m_Input->GetOutput()->GetTransform()->GetVTKTransform());
+			v_tpdf->SetTransform(tra);
 			v_tpdf->Update();
 			writer->SetInput(v_tpdf->GetOutput());
 		}

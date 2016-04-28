@@ -36,7 +36,8 @@ class mafOpSelect;
 class mafOpCut;
 class mafOpCopy;
 class mafOpPaste;
-class mafOpTransform;
+class mafOpReparentTo;
+class mafOpCreateGroup;
 class vtkMatrix4x4;
 class mafDeviceButtonsPadMouse;
 class mafGUISettings;
@@ -47,6 +48,7 @@ class mafUser;
 #include "mafDllMacros.h"
 EXPORT_STL_VECTOR(MAF_EXPORT,mafOp*);
 #endif
+#include "mafGUITreeContextualMenu.h"
 
 //----------------------------------------------------------------------------
 // mafOpManager :
@@ -92,6 +94,14 @@ public:
   /** Run the operation by searching it from its type name.*/
   virtual void OpRun(mafString &op_type, void *op_param = NULL);
 
+	void RunOpAddGroup();
+
+	void RunOpCut();
+	void RunOpCopy();
+	void RunOpPaste();
+	void RunOpDelete();
+	void RunOpReparentTo();
+
 	/** Execute the operation 'op' and warn the user if the operation is undoable. */
   virtual void OpExec		(mafOp *op);
 
@@ -124,6 +134,8 @@ public:
 
 	/** Stop the current operation in any case - to be used as last resort. */
   virtual bool StopCurrentOperation();
+
+	void EnableContextualMenu(mafGUITreeContextualMenu *contextualMenu, mafVME *node, bool CanEnable = true);
 
   /** Return the current running operation. Return NULL if no operation is running.*/
   mafOp *GetRunningOperation();
@@ -204,8 +216,8 @@ protected:
   mafOpCut          *m_OpCut; ///< Pointer to the (always available) operation for cutting VMEs
   mafOpCopy         *m_OpCopy; ///< Pointer to the (always available) operation for copying VMEs
   mafOpPaste        *m_OpPaste; ///< Pointer to the (always available) operation for pasting VMEs
-  //mafOpTransform    *m_optransform;
-
+	mafOpReparentTo		*m_OpReparent; ///< Pointer to the (always available) operation for reparenting VMEs
+	mafOpCreateGroup	*m_OpAddGroup; ///< Pointer to the (always available) operation for Adding Group VMEs
   wxMenuBar         *m_MenuBar; ///< Pointer to the Application's main menù
 	wxToolBar         *m_ToolBar; ///< Pointer to the application's Toolbal
 

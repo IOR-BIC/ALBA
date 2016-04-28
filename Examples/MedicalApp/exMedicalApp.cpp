@@ -70,6 +70,8 @@
 #include "mafOpImporterBBF.h"
 #include "mafOpImporterRAWVolume_BES.h"
 #include "medOpImporterVTK.h"
+#include "mafOpImporterAnsysCDBFile.h"
+#include "mafOpImporterAnsysInputFile.h"
 #endif
 #ifndef _DEBUG
 //EXPORTERS
@@ -81,6 +83,8 @@
 #include "mafOpExporterWrappedMeter.h"
 #include "mafOpExporterGRFWS.h"
 #include "mafOpExporterMeters.h"
+#include "mafOpExporterAnsysCDBFile.h"
+#include "mafOpExporterAnsysInputFile.h"
 #endif
 #ifndef _DEBUG
 //OPERATIONS
@@ -98,7 +102,6 @@
 #include "mafOpFilterSurface.h"
 #include "mafOpFilterVolume.h"
 #include "mafOpMAFTransform.h"
-#include "mafOpReparentTo.h"
 #include "medOpVolumeResample.h"
 #include "mafOpDecimateSurface.h"
 #include "mafOpConnectivitySurface.h"
@@ -107,6 +110,7 @@
 #include "mafOpCreateSurfaceParametric.h"
 #include "mafOpVOIDensity.h"
 #include "mafOpScaleDataset.h"
+#include "mafOpTransform.h"
 #include "mafOpMove.h"
 #ifdef MAF_USE_ITK
 #include "mafOpClassicICPRegistration.h"
@@ -219,6 +223,8 @@ bool exMedicalApp::OnInit()
 	m_Logic->Plug(new medOpImporterVTK("VTK (MED)"));
 	m_Logic->Plug(new mafOpImporterMSF1x("MSF 1.x"));
 	m_Logic->Plug(new mafOpImporterMesh("Mesh"));
+	m_Logic->Plug(new mafOpImporterAnsysCDBFile("Ansys CDB File"), "Finite Element");
+	m_Logic->Plug(new mafOpImporterAnsysInputFile("Ansys Input File"), "Finite Element");
 #ifdef MAF_USE_ITK
 	m_Logic->Plug(new mafOpImporterASCII("ASCII"));
 #endif
@@ -250,6 +256,8 @@ bool exMedicalApp::OnInit()
 	m_Logic->Plug(new mafOpExporterWrappedMeter());
 	m_Logic->Plug(new mafOpExporterGRFWS());
 	m_Logic->Plug(new mafOpExporterMeters());
+	m_Logic->Plug(new mafOpExporterAnsysCDBFile("Ansys CDB File"), "Finite Element");
+	m_Logic->Plug(new mafOpExporterAnsysInputFile("Ansys Input File"), "Finite Element");
 #endif
 	//------------------------------------------------------------
 
@@ -288,7 +296,6 @@ bool exMedicalApp::OnInit()
 	m_Logic->Plug(new mafOpEditNormals("Edit Normals"),_("Modify"));
 	m_Logic->Plug(new mafOpEditMetadata("Metadata Editor"),_("Modify"));
 	m_Logic->Plug(new mafOpMAFTransform("Transform"),_("Modify"));
-	m_Logic->Plug(new mafOpReparentTo("Reparent to..."),_("Modify"));
 	m_Logic->Plug(new medOpVolumeResample("Resample Volume"),_("Modify"));
 	m_Logic->Plug(new mafOpCrop("Crop Volume"),_("Modify"));
 	m_Logic->Plug(new mafOpBooleanSurface("Boolean Surface"),_("Modify"));
@@ -298,6 +305,7 @@ bool exMedicalApp::OnInit()
 	m_Logic->Plug(new mafOpFlipNormals("Flip Normals"),_("Modify"));
 	m_Logic->Plug(new mafOpRemoveCells("Remove Cells"),_("Modify"));
 	m_Logic->Plug(new mafOpExtrusionHoles(),_("Modify"));
+	m_Logic->Plug(new mafOpTransform(), _("Modify"));
 	m_Logic->Plug(new mafOpScaleDataset("Scale Dataset"),_("Modify"));
 	m_Logic->Plug(new mafOpMove("Move"),_("Modify"));    
 	m_Logic->Plug(new mafOpSplitSurface(),_("Modify"));

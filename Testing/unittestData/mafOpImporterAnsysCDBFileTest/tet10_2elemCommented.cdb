@@ -1,0 +1,105 @@
+/COM,ANSYS RELEASE 11.0SP1 UP20070830       19:44:11    10/20/2008		
+/PREP7										
+/NOPR										
+/TITLE,									                                                                        
+ANTYPE, 0								
+EQSLV,PCG , 1.000000000E-07						
+*IF,_CDRDOFF,EQ,1,THEN     !if solid model was read in				
+_CDRDOFF=             !reset flag, numoffs already performed		
+*ELSE              !offset database for the following FE model			
+NUMOFF,NODE,      14								
+NUMOFF,ELEM,       2							
+NUMOFF,MAT ,       3							
+NUMOFF,TYPE,       3
+*ENDIF
+*SET,_BUTTON ,  0.000000000000    
+*SET,_RETURN ,  0.000000000000    
+*SET,_STATUS ,  0.000000000000    
+*SET,_UIQR   ,  0.000000000000    
+DOF,DELETE
+!!Enrico:fin qua non c'è nulla di utile da interpretare conla grammatica
+ET,       2,187		!Enrico: definisce ET (Element Type), uno dei parametri da considerare e salvare per ogni elemento, in funzione "raggruppamenti" ed export
+ET,       3,187		!Enrico:idem
+MAT ,        3		!Enrico:
+TYPE,        3		!Enrico:
+REAL,        3		!Enrico:
+!!
+!!
+NBLOCK,6,SOLID		!Enrico: "NBLOCK" specifica che sotto c'è una dichiarazione di un "blocco" di nodi, "6" indica quanti campi (colonne) si trovano nel sottostante blocco, SOLID (puoi ignorare) indica che è parte di un modello solido
+(3i8,6e16.9)		!Enrico: definisce il formato dei dati, puoi ignorare 
+       1       0       0  0.00000000    				!Enrico: le colonne vanno così interpretate: numero nodo, ID della "solid model entity di cui fa parte il nodo"(ignora), ID della "linea" su cui è posto il nodo(ignora), coordinata x, y, z. NB ci potrebbero essere altre tre colonne (da ignorare comunque, per il momento)
+       2       0       0  1.00000000    				!Enrico: dove manca la coordinata y o z si intende che è 0.00000000
+       3       0       0  0.00000000      1.00000000    
+       4       0       0  0.00000000      0.00000000      1.00000000    
+       5       0       0  1.00000000      1.00000000      1.00000000    
+       6       0       0 0.500000000    
+       7       0       0  0.00000000     0.500000000    
+       8       0       0  0.00000000      0.00000000     0.500000000    
+       9       0       0 0.500000000     0.500000000    
+      10       0       0 0.500000000      0.00000000     0.500000000    
+      11       0       0  1.00000000     0.500000000     0.500000000    
+      12       0       0  0.00000000     0.500000000     0.500000000    
+      13       0       0 0.500000000      1.00000000     0.500000000    
+      14       0       0 0.500000000     0.500000000      1.00000000    
+N,R5.3,LOC,     -1,		!Enrico: il comando "N,R5.3,LOC, -1" dichiara la fine del blocco di nodi (se ti dovessi spiegare perchè ci vorrebbe un tema del liceo, fidati che è sempre così). NB ci può essere più di un blocco di nodi, anche non consecutivo, all'interno dello stesso cdb
+!!				
+EBLOCK,19,SOLID,       2	!Enrico: "EBLOCK" specifica che sotto c'è la dichiarazione di un blocco di elementi, "19" indica quanti campi ci sono nella prima riga della dichiarazione di ogni elemento (anche se ce ne può essere una seconda, come vedremo, ma questa è metafisica e quindi non si descrive a parole), SOLID è il tipico campo da ignorare 
+(19i8)				!Enrico: definisce il formato dei dati, puoi ignorare
+       3       3       3       1       0       0       0       0      10       0       1       5       2       4       3      11      10      14      13   !Enrico: le colonne vanno così interpretate: ID materiale associato all'elemento, ID tipo di elemento, ID set di costanti associate all'elemento, colonne da 4 a 8 IGNORA, colonna 9 numero di nodi che definisce l'elemento, colonna 11 numero dell'elemento (perchè qui e non all'inizio...aaaaah), colonne 12 e seguenti nodi che definiscono la connettività dellì'elemento. NB dopo otto nodi si va comunque a capo, quindi ci può essere, come in questo caso di tetraedri a 10 nodi, una seconda riga
+       9      12																	   !Enrico: dichiarazione degli ultimi nodi (dopo l'ottavo) che formano l'elemento
+       2       2       3       1       0       0       0       0      10       0       2       3       1       2       4       7       6       9      12
+       8      10
+      -1			!Enrico: il comando "-1" dichiara che è finito il blocco di dichiarazione degli elementi. NB ci può essere più di un blocco, anche non consecutivo, all'interno di un file cdb
+CMBLOCK,TET     ,ELEM,       2  !Enrico: "CMBLOCK" definisce un "component" ovvero un raggruppamento (può essere sia di nodi che di elementi), "TET" è il nome del component, "ELEM" chiarisce che è un component di elementi (se no sarebbe "NODE"), "2" indica che ci sono due elementi dentro questo component
+(8i10)				!Enrico: !Enrico: definisce il formato dei dati, puoi ignorare
+         1        -2		!Enrico: dichiarazione della lista di elementi che compongono il...component. Se sono molti, ne trovi dieci per riga. Il segno meno "-" davanti all'ultimo elemento della lista indica che la dichiarazione del component è terminata (attenzione, "-2" va letto come: "nel component ci sta anche l'elemento 2, e con questo la dichiarazione è terminata...bello cervellotico, no?)
+!!
+MPTEMP,R5.0, 1, 1,  0.00000000    ,			!Enrico: ignora tutti i comandi "MPTEMP"
+MPDATA,R5.0, 1,EX  ,       2, 1,  1000.00000    ,	!Enrico: "MPDATA" definisce le proprietà di un dato "materiale" (la cui ID è poi associata ad uno o più elementi), "R5.0" ignora, terza colonna ignora, quarta colonna "EX" è l'identificativo della proprietà dichiarata, quinta colonna "2" è l'ID del materiale (quello che poi viene dichiarato in ciascun elemento), sesta colonna ignora, settima colonna valore della proprietà ("1000" in questo caso)
+MPTEMP,R5.0, 1, 1,  0.00000000    ,
+MPDATA,R5.0, 1,NUXY,       2, 1, 0.300000000    ,	!Enrico: uguale al precedente comando "MPDATA", stavolta definisce che la proprietà "NUXY" del materiale con ID "2" è uguale a "0.3"
+MPTEMP,R5.0, 1, 1,  0.00000000    ,
+MPDATA,R5.0, 1,EX  ,       3, 1,  200000.000    ,	!Enrico: uguale al precedente, per la proprietà "EX" del materiale con ID "3", che assume valore "200000" 
+MPTEMP,R5.0, 1, 1,  0.00000000    ,
+MPDATA,R5.0, 1,NUXY,       3, 1, 0.330000000    ,
+!!
+!! Enrico: da qui in poi ignora tutto a parte il comando "FINISH" nell'ultima riga
+EXTOPT,ATTR,      0,      0,      0
+EXTOPT,ESIZE,  0,  0.0000    
+EXTOPT,ACLEAR,      0
+BFUNIF,TEMP,_TINY
+
+KUSE,     0
+TIME,  0.00000000
+TREF,  0.00000000
+ALPHAD,  0.00000000
+BETAD,  0.00000000
+DMPRAT,  0.00000000
+
+
+
+
+
+CRPLIM, 0.100000000    ,   0
+CRPLIM,  0.00000000    ,   1
+NCNV,     1,  0.00000000    ,     0,  0.00000000    ,  0.00000000
+
+NEQIT,     0
+
+ERESX,DEFA
+ACEL,  0.00000000    ,  0.00000000    ,  0.00000000
+OMEGA,  0.00000000    ,  0.00000000    ,  0.00000000,     0
+DOMEGA,  0.00000000    ,  0.00000000    ,  0.00000000
+CGLOC,  0.00000000    ,  0.00000000    ,  0.00000000
+CGOMEGA,  0.00000000    ,  0.00000000    ,  0.00000000
+DCGOMG,  0.00000000    ,  0.00000000    ,  0.00000000
+IRLF,  0
+
+D,      5,UX  ,  0.00000000    ,  0.00000000    
+D,      5,UY  ,  0.00000000    ,  0.00000000    
+D,      5,UZ  ,  0.00000000    ,  0.00000000    
+F,      1,FX  , -1.00000000    ,  0.00000000    
+F,      1,FY  , -1.00000000    ,  0.00000000    
+F,      1,FZ  , -1.00000000    ,  0.00000000    
+/GO
+FINISH
