@@ -84,13 +84,12 @@ public:
 	int AppendLandmark(double x, double y, double z, const char *name);
 	int AppendLandmark(const char *name) { return AppendLandmark(0,0,0,name); }
 
-  /** Insert the landmark into the cloud */
-  int SetLandmark(mafVMELandmark *lm);
   
   /** Set/Get a landmark. In case the specified idx is invalid return MAF_ERROR*/
   int SetLandmark(int idx,double x,double y,double z,mafTimeStamp t=0);
   int SetLandmark(const char *name,double x,double y,double z,mafTimeStamp t=0) {return this->SetLandmark(this->FindLandmarkIndex(name),x,y,z,t);}
-  //int SetLandmarkForTimeFrame(int idx,double x,double y,double z,unsigned long tid,mafTimeStamp t);
+
+	//int SetLandmarkForTimeFrame(int idx,double x,double y,double z,unsigned long tid,mafTimeStamp t);
   int GetLandmark(int idx, double &x,double &y,double &z,mafTimeStamp t=0);
   int GetLandmark(const char *name, double &x,double &y,double &z,mafTimeStamp t=0) {return this->GetLandmark(this->FindLandmarkIndex(name),x,y,z,t);} 
   int GetLandmark(int idx, double xyz[3],mafTimeStamp t=0);
@@ -101,6 +100,9 @@ public:
 
   /** Get the landmark by index.*/
   mafVMELandmark *GetLandmark(int idx);
+
+	/** Get index for specified LM*/
+	int GetLandmarkIndex(mafVMELandmark *lm);
 
   /** Return the position of the landmark number 'idx' at the timestamp t.*/
   void GetLandmarkPosition(int idx, double pos[3], mafTimeStamp t=-1);
@@ -190,6 +192,13 @@ public:
   /** Return true if the data associated with the VME is present and updated at the current time.*/
   virtual bool IsDataAvailable();
 
+
+	virtual int AddChild(mafVME *node);
+
+	/** Remove a child node*/
+	virtual void RemoveChild(mafVME *node);
+
+
 	void AddLMToChildernList(mafVMELandmark *lm);
 
 	void RemoveLmFromChildrenList(mafVMELandmark *lm);
@@ -213,6 +222,9 @@ protected:
   /** Internal functions used to set/get visibility for point idx of the given polydata*/
   virtual int SetLandmarkVisibility(vtkPolyData *polydata,int idx,bool a);
   virtual bool GetLandmarkVisibility(vtkPolyData *polydata,int idx);
+
+	int SetLandmarkToPolydata(int idx, double x, double y, double z, bool visibility, mafTimeStamp &t);
+
 	 
   /** Internally used to create a new instance of the GUI.*/
   virtual mafGUI *CreateGui();

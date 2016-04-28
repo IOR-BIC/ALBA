@@ -132,8 +132,14 @@ int mafVMELandmark::InternalInitialize()
   {
     // force material allocation
     GetMaterial();
+
+		mafVMELandmarkCloud *parentCloud = mafVMELandmarkCloud::SafeDownCast(m_Parent);
+		if (parentCloud)
+			parentCloud->AddLMToChildernList(this);
+
     return MAF_OK;
   }
+
   return MAF_ERROR;
 }
 
@@ -161,24 +167,6 @@ bool mafVMELandmark::CanReparentTo(mafVME *parent)
   }
 
   return false;
-}
-
-//----------------------------------------------------------------------------
-int mafVMELandmark::ReparentTo(mafVME *parent)
-{
-	mafVMELandmarkCloud *currentCloud=mafVMELandmarkCloud::SafeDownCast(m_Parent);
-
-	if (Superclass::ReparentTo(parent) == MAF_ERROR)
-		return MAF_ERROR;
-	
-	if (currentCloud)
-		currentCloud->RemoveLmFromChildrenList(this);
-		
-	mafVMELandmarkCloud *parentCloud = mafVMELandmarkCloud::SafeDownCast(parent);
-	if (parentCloud)
-		parentCloud->AddLMToChildernList(this);
-
-	return MAF_OK;
 }
 
 //-------------------------------------------------------------------------

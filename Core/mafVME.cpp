@@ -916,7 +916,7 @@ int mafVME::InternalRestore(mafStorageElement *node)
 						return MAF_ERROR;
 					// error messaged issued by failing node
 				}
-				m_Children.resize(children.size());
+				
 
 				for (i = 0; i < children.size(); i++)
 				{
@@ -925,7 +925,7 @@ int mafVME::InternalRestore(mafStorageElement *node)
 					if (node)
 					{
 						node->m_Parent = this;
-						m_Children[i] = node;
+						AddChild(node);
 					}
 				}
 

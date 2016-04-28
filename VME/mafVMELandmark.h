@@ -115,9 +115,6 @@ public:
   /** called to check if the vme can be re-parented under the new parent */
   virtual bool CanReparentTo(mafVME *parent);
 
-
-	virtual int ReparentTo(mafVME *parent);
-
 protected:
   mafVMELandmark();
   virtual ~mafVMELandmark();

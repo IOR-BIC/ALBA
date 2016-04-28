@@ -56,6 +56,7 @@ mafVMEGenericAbstract::mafVMEGenericAbstract()
 {
 	m_MatrixVector = new mafMatrixVector();
   m_DataVector   = NULL;
+	m_StoreDataVector = true;
   SetMatrixPipe(mafMatrixInterpolator::New()); // matrix interpolator pipe  
 }
 
@@ -329,7 +330,7 @@ int mafVMEGenericAbstract::InternalStore(mafStorageElement *parent)
   Superclass::InternalStore(parent);
 
   // sub-element for storing the data vector
-  if (m_DataVector)
+  if (m_StoreDataVector && m_DataVector)
   {
     m_DataVector->SetCrypting(this->m_Crypting != 0);
     mafStorageElement *data_vector = parent->AppendChild("DataVector");
@@ -352,7 +353,10 @@ int mafVMEGenericAbstract::InternalRestore(mafStorageElement *node)
   int ret_val = MAF_OK;
   Superclass::InternalRestore(node);
   
-  // restore Data Vector
+  // Restore Data Vector
+	// Warning old LandmarkClouds have a data vector wich is required and must be loaded.
+	// but LMC does not have to store DataVector so the m_StoreDataVector check is used
+	// only on InternalStore
   if (m_DataVector)
   {
     mafStorageElement *data_vector=node->FindNestedElement("DataVector");
