@@ -492,7 +492,7 @@ Name<->components, where components are an array of mafStrings. It's a
   /** Set the global pose of this VME for the given time "t". This function usually modifies the MatrixVector. */
   void SetAbsMatrix(const mafMatrix &matrix,mafTimeStamp t);
   /** Set the global pose of this VME for the current time. This function usually modifies the MatrixVector. */
-  void SetAbsMatrix(const mafMatrix &matrix);
+  virtual void SetAbsMatrix(const mafMatrix &matrix);
 
   /** apply a matrix to the VME abs pose matrix */
   void ApplyAbsMatrix(const mafMatrix &matrix,int premultiply,mafTimeStamp t=-1);

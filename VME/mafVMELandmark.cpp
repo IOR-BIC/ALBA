@@ -236,6 +236,21 @@ void mafVMELandmark::SetMatrix(mafMatrix &mat)
   this->Superclass::SetMatrix(mat);
 }
 
+//----------------------------------------------------------------------------
+void mafVMELandmark::SetAbsMatrix(const mafMatrix &matrix)
+{
+	Superclass::SetAbsMatrix(matrix);
+
+	mafVMELandmarkCloud *parentCloud = mafVMELandmarkCloud::SafeDownCast(m_Parent);
+	if (parentCloud)
+	{
+		double pose[3];
+		GetPoint(pose);
+		parentCloud->SetLandmark(this, pose[0], pose[1], pose[2], m_CurrentTime);
+	}
+	
+}
+
 //-------------------------------------------------------------------------
 int mafVMELandmark::SetPoint(double x,double y,double z,mafTimeStamp t)
 //-------------------------------------------------------------------------

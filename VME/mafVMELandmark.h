@@ -100,6 +100,9 @@ public:
   Redefined to avoid chaning landmark scale (i.e. the scale is forced to the visibility value)*/
   virtual void SetMatrix(mafMatrix &mat);
 
+	/** Set the global pose of this VME for the current time. This function usually modifies the MatrixVector. */
+	virtual void SetAbsMatrix(const mafMatrix &matrix);
+
   /** return icon */
   static char** GetIcon();
 

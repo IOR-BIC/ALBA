@@ -87,7 +87,8 @@ public:
   
   /** Set/Get a landmark. In case the specified idx is invalid return MAF_ERROR*/
   int SetLandmark(int idx,double x,double y,double z,mafTimeStamp t=0);
-  int SetLandmark(const char *name,double x,double y,double z,mafTimeStamp t=0) {return this->SetLandmark(this->FindLandmarkIndex(name),x,y,z,t);}
+	int SetLandmark(const char *name, double x, double y, double z, mafTimeStamp t = 0) { return this->SetLandmark(this->FindLandmarkIndex(name), x, y, z, t); }
+	int SetLandmark(mafVMELandmark *lm, double x, double y, double z, mafTimeStamp t = 0) { return this->SetLandmark(this->GetLandmarkIndex(lm), x, y, z, t); }
 
 	//int SetLandmarkForTimeFrame(int idx,double x,double y,double z,unsigned long tid,mafTimeStamp t);
   int GetLandmark(int idx, double &x,double &y,double &z,mafTimeStamp t=0);
