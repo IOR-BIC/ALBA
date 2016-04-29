@@ -1259,7 +1259,7 @@ bool mafOpSegmentation::Refinement()
       newRG->GetPointData()->SetActiveScalars("SCALARS");
       newRG->Update();
 
-      m_RefinementVolumeMask->SetData(newRG,mafVME::SafeDownCast(m_Volume)->GetTimeStamp());
+      m_RefinementVolumeMask->SetData(newRG,m_Volume->GetTimeStamp());
       vtkRectilinearGrid *rgVME = vtkRectilinearGrid::SafeDownCast(mafVMEVolumeGray::SafeDownCast(m_RefinementVolumeMask)->GetOutput()->GetVTKData());
       rgVME->Update();
     }

@@ -338,13 +338,12 @@ int mafVMELandmarkCloud::GetLandmark(int idx, double xyz[3],mafTimeStamp t)
 //----------------------------------------------------------------------------
 int mafVMELandmarkCloud::GetLandmarkIndex(mafVMELandmark *lm)
 {
-	for (int i = 0; i < m_NumberOfLandmarks; i++)
-	{
-		if (lm == m_LMChildren[i])
-			return i;
-	}
-
-	return -1;
+	std::map<mafVMELandmark *, int>::iterator it = m_LMIndexesMap.find(lm);
+	
+	if (it != m_LMIndexesMap.end())
+		return it->second;
+	else
+		return -1;
 }
 
 //-------------------------------------------------------------------------
@@ -562,11 +561,11 @@ int mafVMELandmarkCloud::GetSphereResolution()
 mafVMELandmark *mafVMELandmarkCloud::GetLandmark(const char *name)
 //-------------------------------------------------------------------------
 {
-  for (int i = 0; i < GetNumberOfChildren(); i++)
+  for (int i = 0; i < m_NumberOfLandmarks; i++)
   {
-    mafVMELandmark *vme = mafVMELandmark::SafeDownCast(GetChild(i));
-    if (vme && mafCString(vme->GetName()) == name)
-      return vme;
+    mafVMELandmark *lm = m_LMChildren[i];
+    if (lm && mafCString(lm->GetName()) == name)
+      return lm;
   }
   
 	mafLogMessage("Landmark %s not found", name);
@@ -577,20 +576,10 @@ mafVMELandmark *mafVMELandmarkCloud::GetLandmark(const char *name)
 mafVMELandmark *mafVMELandmarkCloud::GetLandmark(int idx)
 //-------------------------------------------------------------------------
 {
-	int num = 0;
-	for (int i = 0; i < GetNumberOfChildren(); i++)
-	{
-		mafVMELandmark *vme = mafVMELandmark::SafeDownCast(GetChild(i));
-		if (vme)
-		{
-			if (num == idx)
-			{
-				return vme;
-			}
-			num++;
-		}
-	}
-	return NULL;
+	if (idx < 0 || idx >= m_NumberOfLandmarks)
+		return NULL;
+	else
+		return m_LMChildren[idx];
 }
 //-------------------------------------------------------------------------
 void mafVMELandmarkCloud::GetLandmarkPosition(int idx, double pos[3], mafTimeStamp t)
@@ -935,6 +924,7 @@ int mafVMELandmarkCloud::AddChild(mafVME *node)
 	{
 		double lmPos[3];
 		m_LMChildren.push_back(lm);
+		m_LMIndexesMap[lm] = m_NumberOfLandmarks;
 		SetNumberOfLandmarks(m_NumberOfLandmarks + 1);
 		
 		mafMatrixVector * lmMatrixVector = lm->GetMatrixVector();
@@ -967,6 +957,9 @@ void mafVMELandmarkCloud::RemoveChild(mafVME *node)
 			return;
 		}
 
+		m_LMChildren.erase(m_LMChildren.begin() + pos);
+		m_LMIndexesMap.erase(lm);
+
 		// remove the point to all data items
 		for (mafDataVector::Iterator it = m_DataVector->Begin(); it != m_DataVector->End(); it++)
 		{
@@ -980,16 +973,4 @@ void mafVMELandmarkCloud::RemoveChild(mafVME *node)
 
 		m_NumberOfLandmarks--;
 	}
-}
-
-//----------------------------------------------------------------------------
-void mafVMELandmarkCloud::AddLMToChildernList(mafVMELandmark *lm)
-{
-	
-}
-
-//----------------------------------------------------------------------------
-void mafVMELandmarkCloud::RemoveLmFromChildrenList(mafVMELandmark *lm)
-{
-
 }

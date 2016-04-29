@@ -199,11 +199,6 @@ public:
 	/** Remove a child node*/
 	virtual void RemoveChild(mafVME *node);
 
-
-	void AddLMToChildernList(mafVMELandmark *lm);
-
-	void RemoveLmFromChildrenList(mafVMELandmark *lm);
-
 protected:
   mafVMELandmarkCloud();
   virtual ~mafVMELandmarkCloud();
@@ -237,6 +232,7 @@ protected:
   double m_Radius;
 
 	std::vector<mafVMELandmark *> m_LMChildren;
+	std::map<mafVMELandmark *, int> m_LMIndexesMap;
   
 private:
   mafVMELandmarkCloud(const mafVMELandmarkCloud&); // Not implemented

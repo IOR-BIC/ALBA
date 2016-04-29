@@ -93,9 +93,6 @@ int mafVMELandmark::DeepCopy(mafVME *a)
     SetRadius(lm->GetRadius());
     SetSphereResolution(lm->GetSphereResolution());
     SetLandmarkVisibility(lm->GetLandmarkVisibility());
-    //double p[3];
-    //lm->GetPoint(p);
-    //SetPoint(p);
 
     mafDataPipeCustom *dpipe = mafDataPipeCustom::SafeDownCast(GetDataPipe());
     if (dpipe)
@@ -132,10 +129,6 @@ int mafVMELandmark::InternalInitialize()
   {
     // force material allocation
     GetMaterial();
-
-		mafVMELandmarkCloud *parentCloud = mafVMELandmarkCloud::SafeDownCast(m_Parent);
-		if (parentCloud)
-			parentCloud->AddLMToChildernList(this);
 
     return MAF_OK;
   }
