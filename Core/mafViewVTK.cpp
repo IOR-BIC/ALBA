@@ -182,6 +182,17 @@ int  mafViewVTK::GetNodeStatus(mafVME *vme)
 {
   int status = m_Sg ? m_Sg->GetNodeStatus(vme) : NODE_NON_VISIBLE;
 
+	mafVMELandmark *lm = mafVMELandmark::SafeDownCast(vme);
+	if (lm)
+	{
+		mafVMELandmarkCloud *lmc=mafVMELandmarkCloud::SafeDownCast(lm->GetParent());
+		if (lmc)
+		{
+			if ( (m_Sg->GetNodeStatus(lmc) == NODE_VISIBLE_ON) && lmc->IsLandmarkShow(lm))
+				return NODE_VISIBLE_ON;
+		}
+	}
+
   mafString vme_type = vme->GetTypeName();
 	if (m_PipeMap.count(vme_type))
 	{

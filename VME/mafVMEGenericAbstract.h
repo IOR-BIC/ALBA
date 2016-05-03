@@ -130,6 +130,10 @@ public:
 
   void OnEvent(mafEventBase *maf_event);
 
+
+	/** Returns StoreDataVector */
+	bool GetStoreDataVector() const { return m_StoreDataVector; }
+
 protected:
   mafVMEGenericAbstract();
   virtual ~mafVMEGenericAbstract();

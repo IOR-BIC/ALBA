@@ -35,6 +35,8 @@ class mafViewManager;
 class mafOpManager;
 class mafGUIMaterialChooser;
 class mafVME;
+class mafVMELandmark;
+class mafVMELandmarkCloud;
 class mafInteractionManager;
 class mafPrintSupport;
 class mafRemoteLogic;
@@ -285,11 +287,25 @@ protected:
 	virtual void VmeSelect(mafEvent &e);
   /** Respond to a VME_SELECTED evt. Update the selection on the tree and view representation. */
 	virtual void VmeSelected(mafVME *vme);
-  /** Respond to a VME_DCLICKED evt. Manage the 'Double click' on Selected VME. */
+
+	/** Called from VmeSelect to select a LM */
+	void SelectLandmark(mafVMELandmark *lm, bool select);
+
+	/** Respond to a VME_DCLICKED evt. Manage the 'Double click' on Selected VME. */
   virtual void VmeDoubleClicked(mafEvent &e);
 	/** Respond to a VME_SHOW evt. Show/Hide the vme. */
 	virtual void VmeShow(mafVME *vme, bool visibility);
-  /** Respond to a VME_Modified evt.*/
+
+	/** Called from VmeShow to show a LM cloud */
+	void ShowLandmarkCloud(mafVMELandmarkCloud * lmc, bool visibility);
+
+	/** Show VME in the side bar */
+	void ShowInSideBar(mafVME * vme, bool visibility);
+
+	/* Called from VmeShow to show landmarks*/
+	void ShowLandmark(mafVMELandmark * lm, bool visibility);
+
+	/** Respond to a VME_Modified evt.*/
 	virtual void VmeModified(mafVME *vme);
   /** Respond to a VME_ADD evt. Add a new vme to the tree. */
 	virtual void VmeAdd(mafVME *vme);
@@ -362,6 +378,8 @@ protected:
   mafOpManager           *m_OpManager;
   mafInteractionManager  *m_InteractionManager;
   mafRemoteLogic         *m_RemoteLogic;
+
+	mafVMELandmark				 *m_SelectedLandmark;
   
   mafGUIMaterialChooser  *m_MaterialChooser;
   mafPrintSupport     *m_PrintSupport;

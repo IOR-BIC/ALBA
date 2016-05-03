@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: mafVMELandmarkCloud
- Authors: Marco Petrone, Paolo Quadrani
+ Authors: Marco Petrone, Paolo Quadrani, Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -54,23 +54,22 @@ const bool DEBUG_MODE = false;
 #include "mafProgressBarHelper.h"
 //------------------------------------------------------------------------------
 // local defines
-//------------------------------------------------------------------------------
+
 #define MAF_LMC_ITEMS_NUMBER_TAG "MFL_VME_NUMBER_OF_LANDMARKS"
 #define MAF_LMC_VERSION "MAF_LMC_VERSION"
 
 //------------------------------------------------------------------------------
 // Events
-//------------------------------------------------------------------------------
+
 MAF_ID_IMP(mafVMELandmarkCloud::CLOUD_RADIUS_MODIFIED); // Event rised when the radius is changed with a SetRadius()
 MAF_ID_IMP(mafVMELandmarkCloud::CLOUD_SPHERE_RES); // Event rised when the sphere resolution is changed with a SetSphereResolution()
 
 //------------------------------------------------------------------------------
 mafCxxTypeMacro(mafVMELandmarkCloud);
-//------------------------------------------------------------------------------
+
 
 //-------------------------------------------------------------------------
 mafVMELandmarkCloud::mafVMELandmarkCloud()
-//-------------------------------------------------------------------------
 {
   SetOutput(mafVMEOutputLandmarkCloud::New()); // create the output
 
@@ -82,25 +81,38 @@ mafVMELandmarkCloud::mafVMELandmarkCloud()
   m_SphereResolution  = 15;
 
   m_SingleFile = 0;
+	m_LanfmarkShowNumber = 0;
 }
 
 //-------------------------------------------------------------------------
 mafVMELandmarkCloud::~mafVMELandmarkCloud()
-//-------------------------------------------------------------------------
 {
+	m_LMChildren.clear();
+	m_LMChildrenShow.clear();
+	m_LMIndexesMap.clear();
 }
 
 //-------------------------------------------------------------------------
 int mafVMELandmarkCloud::DeepCopy(mafVME *a)
 //-------------------------------------------------------------------------
 { 
-  if (Superclass::DeepCopy(a)==MAF_OK)
-  {
-    mafVMELandmarkCloud *lc = mafVMELandmarkCloud::SafeDownCast(a);
-    m_Radius            = lc->GetRadius();
-    m_NumberOfLandmarks = lc->GetNumberOfLandmarks();
-    m_DefaultVisibility = lc->GetDefaultVisibility();
-    m_SphereResolution  = lc->GetSphereResolution();
+	if (Superclass::DeepCopy(a) == MAF_OK)
+	{
+		mafVMELandmarkCloud *lc = mafVMELandmarkCloud::SafeDownCast(a);
+		m_Radius = lc->GetRadius();
+		m_DefaultVisibility = lc->GetDefaultVisibility();
+		m_SphereResolution = lc->GetSphereResolution();
+
+		//Removing current Data Vector
+		m_DataVector->RemoveAllItems();
+		//Reconstruct structure by coping also all landmarks
+		for (int i = 0; i < lc->GetNumberOfLandmarks(); i++)
+		{
+			mafVMELandmark *lm;
+			mafNEW(lm);
+			lm->DeepCopy(lc->GetLandmark(i));
+			lm->ReparentTo(this);
+		}
 
     return MAF_OK;
   }  
@@ -109,7 +121,6 @@ int mafVMELandmarkCloud::DeepCopy(mafVME *a)
 
 //-------------------------------------------------------------------------
 bool mafVMELandmarkCloud::Equals(mafVME *vme)
-//-------------------------------------------------------------------------
 {
   bool ret = false;
   if (Superclass::Equals(vme))
@@ -125,7 +136,6 @@ bool mafVMELandmarkCloud::Equals(mafVME *vme)
 
 //-------------------------------------------------------------------------
 int mafVMELandmarkCloud::InternalInitialize()
-//-------------------------------------------------------------------------
 {
 	const int closed_cloud_state = 1;
 	const int open_cloud_state = 1;
@@ -139,7 +149,7 @@ int mafVMELandmarkCloud::InternalInitialize()
 		mafTagArray * tagArray = GetTagArray();
 
 		if ((!tagArray->IsTagPresent(MAF_LMC_VERSION)) && (tag = tagArray->GetTag("MFL_VME_LANDMARK_CLOUD_STATE")) && (tag->GetValueAsDouble() == closed_cloud_state))
-			CreateLMVmeFromOldClosedCloud();
+			CreateLMStructureFromDataVector();
 
 		//Setting state tag to Open Cloud in order to maintain backward compatibility
 		GetTagArray()->SetTag(mafTagItem("MFL_VME_LANDMARK_CLOUD_STATE", open_cloud_state));
@@ -152,23 +162,21 @@ int mafVMELandmarkCloud::InternalInitialize()
 
 //-------------------------------------------------------------------------
 int mafVMELandmarkCloud::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
-//-------------------------------------------------------------------------
 {
   assert(data);
   vtkPolyData *polydata = vtkPolyData::SafeDownCast(data);
 
+	//Remove all landmarks
+	//SetNumberOfLandmarks(0);
+
   if (polydata != NULL && Superclass::SetData(polydata,t,mode)==MAF_OK)
   {
-    int oldnum = GetNumberOfLandmarks();
-    if (polydata->GetNumberOfPoints() != oldnum)
-      SetNumberOfLandmarks(oldnum > polydata->GetNumberOfPoints() ? oldnum : polydata->GetNumberOfPoints());
     return MAF_OK;
   }
   return MAF_ERROR;
 }
 //-------------------------------------------------------------------------
 unsigned long mafVMELandmarkCloud::GetMTime()
-//-------------------------------------------------------------------------
 {
   unsigned long mtime = Superclass::GetMTime();
   unsigned long mtimelm;
@@ -185,7 +193,6 @@ unsigned long mafVMELandmarkCloud::GetMTime()
 }
 //-------------------------------------------------------------------------
 int mafVMELandmarkCloud::GetNumberOfLandmarks()
-//-------------------------------------------------------------------------
 {
 	return m_NumberOfLandmarks;
 }
@@ -193,7 +200,6 @@ int mafVMELandmarkCloud::GetNumberOfLandmarks()
 
 //-------------------------------------------------------------------------
 int mafVMELandmarkCloud::SetNumberOfLandmarks(int num)
-//-------------------------------------------------------------------------
 {  
   int oldnum = GetNumberOfLandmarks();
 
@@ -201,6 +207,9 @@ int mafVMELandmarkCloud::SetNumberOfLandmarks(int num)
     return MAF_OK;
   else if (num > oldnum)
   {
+		if(m_DataVector->GetNumberOfItems()==0)
+			NewPolyData(m_CurrentTime);
+
     // add a new point and a new vertex to all items
     for (mafDataVector::Iterator it = m_DataVector->Begin(); it != m_DataVector->End(); it++)
     {
@@ -266,13 +275,11 @@ int mafVMELandmarkCloud::AppendLandmark(double x, double y, double z, const char
 	newLM->SetPoint(x, y, z);
 	newLM->ReparentTo(this);
 	
-	return MAF_OK;
+	return m_NumberOfLandmarks-1;
 }
-
 
 //-------------------------------------------------------------------------
 int mafVMELandmarkCloud::SetLandmark(int idx, double x, double y, double z, mafTimeStamp t)
-//-------------------------------------------------------------------------
 {
 	if (idx < 0)
 	{
@@ -309,13 +316,12 @@ int mafVMELandmarkCloud::SetLandmarkToPolydata(int idx, double x, double y, doub
 
 //-------------------------------------------------------------------------
 int mafVMELandmarkCloud::FindLandmarkIndex(const char *name)
-//-------------------------------------------------------------------------
 {
   int numberOfLandmarks = GetNumberOfLandmarks();
 
   for (int i = 0; i < numberOfLandmarks; i++)
   {
-    if (GetLandmarkName(i) == name)
+    if (!strcmp(GetLandmarkName(i),name))
       return i;
   }
 
@@ -324,13 +330,11 @@ int mafVMELandmarkCloud::FindLandmarkIndex(const char *name)
 
 //-------------------------------------------------------------------------
 int mafVMELandmarkCloud::GetLandmark(int idx, double &x,double &y,double &z,mafTimeStamp t)
-//-------------------------------------------------------------------------
 {
   return Superclass::GetPoint(idx,x,y,z,t);
 }
 //-------------------------------------------------------------------------
 int mafVMELandmarkCloud::GetLandmark(int idx, double xyz[3],mafTimeStamp t)
-//-------------------------------------------------------------------------
 {
   return Superclass::GetPoint(idx,xyz,t);
 }
@@ -348,7 +352,6 @@ int mafVMELandmarkCloud::GetLandmarkIndex(mafVMELandmark *lm)
 
 //-------------------------------------------------------------------------
 int mafVMELandmarkCloud::RemoveLandmark(int idx)
-//-------------------------------------------------------------------------
 {
 	int num_landmarks = GetNumberOfLandmarks();
 
@@ -372,7 +375,6 @@ int mafVMELandmarkCloud::RemoveLandmark(int idx)
 }
 //-------------------------------------------------------------------------
 const char *mafVMELandmarkCloud::GetLandmarkName(int idx)
-//-------------------------------------------------------------------------
 {
   mafVME *vme = GetLandmark(idx);
   return vme ? vme->GetName() : NULL;
@@ -380,14 +382,12 @@ const char *mafVMELandmarkCloud::GetLandmarkName(int idx)
 
 //-------------------------------------------------------------------------
 void mafVMELandmarkCloud::SetLandmarkName(int idx,const char *name)
-//-------------------------------------------------------------------------
 {
 	GetLandmark(idx)->SetName(name);
 }
 
 //-------------------------------------------------------------------------
 int mafVMELandmarkCloud::AppendPoint(vtkPolyData *polydata,double x,double y,double z,int num)
-//-------------------------------------------------------------------------
 {
   int oldnum = polydata->GetNumberOfPoints();
   int idx = Superclass::AppendPoint(polydata,x,y,z,num);
@@ -417,6 +417,7 @@ int mafVMELandmarkCloud::AppendPoint(vtkPolyData *polydata,double x,double y,dou
         }
       }
       cells->Modified();
+//			polydata->SetVerts(cells);
       polydata->Modified();
     }
     else
@@ -432,21 +433,18 @@ int mafVMELandmarkCloud::AppendPoint(vtkPolyData *polydata,double x,double y,dou
 }
 
 //----------------------------------------------------------------------------
-void mafVMELandmarkCloud::CreateLMVmeFromOldClosedCloud()
+void mafVMELandmarkCloud::CreateLMStructureFromDataVector()
 {
 	mafTimeStamp currentTime = GetTimeStamp();
 	mafTagArray *tarray = GetTagArray();
-	
-	m_NumberOfLandmarks = 0;
-	int nLandMarks=0;
 	double x, y, z;
-	
 	std::vector <mafVMELandmark*> landmarks;
 
+	
 	std::vector<std::string> tag_list;
 	tarray->GetTagList(tag_list);
 	
-	//Creating landmarks
+	//Creating landmarks from Tags --USED TO RESTORE OLD LMC--
 	for (int i = 0; i < tag_list.size(); i++)
 	{
 		mafString tagName = tag_list[i].c_str();
@@ -454,6 +452,25 @@ void mafVMELandmarkCloud::CreateLMVmeFromOldClosedCloud()
 		{
 			mafTagItem *tag = tarray->GetTag(tagName);
 			const char *name = tag->GetValue();
+
+			mafVMELandmark *newLM;
+			mafNEW(newLM);
+			newLM->SetName(name);
+			landmarks.push_back(newLM);
+		}
+	}
+
+	//if no tags were stored we read create landmarks from data vector
+	if (landmarks.size() == 0)
+	{
+		mafDataVector::Iterator it = m_DataVector->Begin();
+		mafVMEItemVTK *item = mafVMEItemVTK::SafeDownCast(it->second);
+		int nPoints=item->GetData()->GetNumberOfPoints();
+		for (int i = 0; i < nPoints; i++)
+		{
+			mafString name;
+			name = "Landmark ";
+			name << i;
 
 			mafVMELandmark *newLM;
 			mafNEW(newLM);
@@ -471,6 +488,7 @@ void mafVMELandmarkCloud::CreateLMVmeFromOldClosedCloud()
 		assert(item);
 
 		vtkPolyData *polydata = (vtkPolyData *)item->GetData();
+		//polydata->Update();
 		mafTimeStamp timeStamp = item->GetTimeStamp();
 		
 		if (!polydata)
@@ -490,6 +508,7 @@ void mafVMELandmarkCloud::CreateLMVmeFromOldClosedCloud()
 
 	//Clean current data vector
 	m_DataVector->RemoveAllItems();
+	SetNumberOfLandmarks(0);
 
 	//Reparent created landmark
 	for (int i = 0; i < landmarks.size(); i++)
@@ -500,7 +519,6 @@ void mafVMELandmarkCloud::CreateLMVmeFromOldClosedCloud()
 
 //-------------------------------------------------------------------------
 vtkPolyData *mafVMELandmarkCloud::NewPolyData(mafTimeStamp t)
-//-------------------------------------------------------------------------
 {
   vtkPolyData *polydata = Superclass::NewPolyData(t);
   if (polydata)
@@ -520,7 +538,6 @@ vtkPolyData *mafVMELandmarkCloud::NewPolyData(mafTimeStamp t)
 
 //-------------------------------------------------------------------------
 void mafVMELandmarkCloud::SetRadius(double rad, bool force_update)
-//-------------------------------------------------------------------------
 {
   if (mafEquals(rad, m_Radius) && !force_update)
     return;
@@ -532,14 +549,12 @@ void mafVMELandmarkCloud::SetRadius(double rad, bool force_update)
 
 //-------------------------------------------------------------------------
 double mafVMELandmarkCloud::GetRadius()
-//-------------------------------------------------------------------------
 {
   return m_Radius;
 }
 
 //-------------------------------------------------------------------------
 void mafVMELandmarkCloud::SetSphereResolution(int res, bool force_update)
-//-------------------------------------------------------------------------
 {
   if (mafEquals(res, m_SphereResolution) && !force_update)
     return;
@@ -552,14 +567,12 @@ void mafVMELandmarkCloud::SetSphereResolution(int res, bool force_update)
 
 //-------------------------------------------------------------------------
 int mafVMELandmarkCloud::GetSphereResolution()
-//-------------------------------------------------------------------------
 {
   return m_SphereResolution;
 }
 
 //-------------------------------------------------------------------------
 mafVMELandmark *mafVMELandmarkCloud::GetLandmark(const char *name)
-//-------------------------------------------------------------------------
 {
   for (int i = 0; i < m_NumberOfLandmarks; i++)
   {
@@ -571,10 +584,8 @@ mafVMELandmark *mafVMELandmarkCloud::GetLandmark(const char *name)
 	mafLogMessage("Landmark %s not found", name);
   return NULL;
 }
-
 //-------------------------------------------------------------------------
 mafVMELandmark *mafVMELandmarkCloud::GetLandmark(int idx)
-//-------------------------------------------------------------------------
 {
 	if (idx < 0 || idx >= m_NumberOfLandmarks)
 		return NULL;
@@ -583,11 +594,9 @@ mafVMELandmark *mafVMELandmarkCloud::GetLandmark(int idx)
 }
 //-------------------------------------------------------------------------
 void mafVMELandmarkCloud::GetLandmarkPosition(int idx, double pos[3], mafTimeStamp t)
-//-------------------------------------------------------------------------
 {
     GetPoint(idx,pos,t);
 }
-
 
 //-------------------------------------------------------------------------
 int mafVMELandmarkCloud::SetLandmarkVisibility(int idx,bool a,mafTimeStamp t)
@@ -627,7 +636,6 @@ int mafVMELandmarkCloud::SetLandmarkVisibility(int idx,bool a,mafTimeStamp t)
 
 //-------------------------------------------------------------------------
 bool mafVMELandmarkCloud::GetLandmarkVisibility(int idx,mafTimeStamp t)
-//-------------------------------------------------------------------------
 {
 	//Getting Visibility from the LM
   if (mafVMELandmark *lm = GetLandmark(idx))
@@ -643,7 +651,6 @@ bool mafVMELandmarkCloud::GetLandmarkVisibility(int idx,mafTimeStamp t)
 
 //-------------------------------------------------------------------------
 int mafVMELandmarkCloud::SetLandmarkVisibility(vtkPolyData *polydata,int idx,bool a)
-//-------------------------------------------------------------------------
 {
   if (idx >= polydata->GetNumberOfPoints())
   {
@@ -712,7 +719,6 @@ int mafVMELandmarkCloud::SetLandmarkVisibility(vtkPolyData *polydata,int idx,boo
 
 //-------------------------------------------------------------------------
 bool mafVMELandmarkCloud::GetLandmarkVisibility(vtkPolyData *polydata,int idx)
-//-------------------------------------------------------------------------
 {
   vtkPointData* pdata = polydata->GetPointData();
   vtkBitArray *scalars = NULL;
@@ -734,7 +740,6 @@ bool mafVMELandmarkCloud::GetLandmarkVisibility(vtkPolyData *polydata,int idx)
 
 //-------------------------------------------------------------------------
 int mafVMELandmarkCloud::GetNumberOfVisibleLandmarks(mafTimeStamp t)
-//-------------------------------------------------------------------------
 {
   int num = GetNumberOfLandmarks();
   int numvis = 0;
@@ -748,13 +753,11 @@ int mafVMELandmarkCloud::GetNumberOfVisibleLandmarks(mafTimeStamp t)
 
 //-------------------------------------------------------------------------
 bool mafVMELandmarkCloud::IsRigid()
-//-------------------------------------------------------------------------
 {
   return m_DataVector->GetNumberOfItems() == 1;
 }
 //-------------------------------------------------------------------------
 void mafVMELandmarkCloud::Print(std::ostream &os, const int tabs)
-//-------------------------------------------------------------------------
 {
   mafIndent indent(tabs);
   Superclass::Print(os,indent);
@@ -771,7 +774,6 @@ void mafVMELandmarkCloud::Print(std::ostream &os, const int tabs)
 }
 //-------------------------------------------------------------------------
 mafGUI* mafVMELandmarkCloud::CreateGui()
-//-------------------------------------------------------------------------
 {
   m_Gui = mafVME::CreateGui(); // Called to show info about vmes' type and name
   m_Gui->SetListener(this);
@@ -787,7 +789,6 @@ mafGUI* mafVMELandmarkCloud::CreateGui()
 }
 //-------------------------------------------------------------------------
 void mafVMELandmarkCloud::OnEvent(mafEventBase *maf_event)
-//-------------------------------------------------------------------------
 {
   // events to be sent up or down in the tree are simply forwarded
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
@@ -809,9 +810,8 @@ void mafVMELandmarkCloud::OnEvent(mafEventBase *maf_event)
     Superclass::OnEvent(maf_event);
   }
 }
-//-----------------------------------------------------------------------
+//-------------------------------------------------------------------------
 int mafVMELandmarkCloud::InternalStore(mafStorageElement *parent)
-//-----------------------------------------------------------------------
 {
 	GetTagArray()->SetTag(mafTagItem(MAF_LMC_VERSION, 2));
 
@@ -826,9 +826,8 @@ int mafVMELandmarkCloud::InternalStore(mafStorageElement *parent)
  
   return MAF_ERROR;
 }
-//-----------------------------------------------------------------------
+//-------------------------------------------------------------------------
 int mafVMELandmarkCloud::InternalRestore(mafStorageElement *node)
-//-----------------------------------------------------------------------
 {
   if (Superclass::InternalRestore(node) == MAF_OK)
   {
@@ -842,7 +841,6 @@ int mafVMELandmarkCloud::InternalRestore(mafStorageElement *node)
 }
 //-------------------------------------------------------------------------
 mmaMaterial *mafVMELandmarkCloud::GetMaterial()
-//-------------------------------------------------------------------------
 {
   mmaMaterial *material = (mmaMaterial *)GetAttribute("MaterialAttributes");
   if (material == NULL)
@@ -858,7 +856,6 @@ mmaMaterial *mafVMELandmarkCloud::GetMaterial()
 }
 //-------------------------------------------------------------------------
 char** mafVMELandmarkCloud::GetIcon() 
-//-------------------------------------------------------------------------
 {
 #include "mafVMELandmarkCloud.xpm"
   return mafVMELandmarkCloud_xpm;
@@ -867,19 +864,13 @@ char** mafVMELandmarkCloud::GetIcon()
 
 //-------------------------------------------------------------------------
 bool mafVMELandmarkCloud::IsDataAvailable()
-//-------------------------------------------------------------------------
 {
   if (m_DataVector)
   {
     mafTimeStamp t = this->GetTimeStamp();
     mafVMEItem *item = m_DataVector->GetItem(t);
-    // WORKAROUND CODE:
-    // needed by closed landmark cloud to update data
     if (item)
-    {
       item->UpdateData();
-    }
-    // END WORKAROUND CODE
 
     if (IsAnimated() && item == NULL)
     {
@@ -924,6 +915,7 @@ int mafVMELandmarkCloud::AddChild(mafVME *node)
 	{
 		double lmPos[3];
 		m_LMChildren.push_back(lm);
+		m_LMChildrenShow.push_back(false);
 		m_LMIndexesMap[lm] = m_NumberOfLandmarks;
 		SetNumberOfLandmarks(m_NumberOfLandmarks + 1);
 		
@@ -935,9 +927,9 @@ int mafVMELandmarkCloud::AddChild(mafVME *node)
 
 			double pos[3];
 			lm->GetPoint(pos, timeStamp);
-			bool landmarkVisibility = lm->GetLandmarkVisibility(timeStamp);
-
-			SetLandmarkToPolydata(m_NumberOfLandmarks - 1, pos[0], pos[1], pos[2], landmarkVisibility, timeStamp);
+			
+			//On reparent the node is not showed, so visibility is set to false.
+			SetLandmarkToPolydata(m_NumberOfLandmarks - 1, pos[0], pos[1], pos[2], false, timeStamp);
 		}
 		GetOutput()->Update();
 	}
@@ -957,7 +949,12 @@ void mafVMELandmarkCloud::RemoveChild(mafVME *node)
 			return;
 		}
 
+		//Reassign maps for children with higer index
+		for (int i = pos + 1; i < m_NumberOfLandmarks; i++)
+			m_LMIndexesMap[m_LMChildren[i]]--;
+
 		m_LMChildren.erase(m_LMChildren.begin() + pos);
+		m_LMChildrenShow.erase(m_LMChildrenShow.begin() + pos);
 		m_LMIndexesMap.erase(lm);
 
 		// remove the point to all data items
@@ -974,3 +971,67 @@ void mafVMELandmarkCloud::RemoveChild(mafVME *node)
 		m_NumberOfLandmarks--;
 	}
 }
+
+//----------------------------------------------------------------------------
+void mafVMELandmarkCloud::ShowLandmark(mafVMELandmark *lm, bool show)
+{
+	int idx = GetLandmarkIndex(lm);
+	if (idx < 0 || idx >= m_NumberOfLandmarks)
+	{
+		mafErrorMacro("Error: try to show a wrong landmark");
+	}
+	
+	//No status change, return
+	if (show == m_LMChildrenShow[idx])
+		return;
+
+	m_LMChildrenShow[idx] = show;
+
+	//Show the landmark over the data vector
+	for (mafDataVector::Iterator it = m_DataVector->Begin(); it != m_DataVector->End(); it++)
+	{
+		mafVMEItemVTK *item = mafVMEItemVTK::SafeDownCast(it->second);
+		assert(item);
+		vtkPolyData *polydata = vtkPolyData::SafeDownCast(item->GetData());
+		
+		//The landmark is visible if show is true and is visibility is true at the specific time.
+		bool lmVisbility = show && lm->GetLandmarkVisibility(item->GetTimeStamp());
+		
+		SetLandmarkVisibility(polydata, idx, lmVisbility);
+	}
+
+	if (show)
+		m_LanfmarkShowNumber++;
+	else
+		m_LanfmarkShowNumber--;
+
+	GetOutput()->Update();
+}
+
+//----------------------------------------------------------------------------
+void mafVMELandmarkCloud::ShowAllLandmarks()
+{
+	for (int i = 0; i < m_NumberOfLandmarks; i++)
+	{
+		ShowLandmark(m_LMChildren[i], true);
+	}
+}
+
+//----------------------------------------------------------------------------
+bool mafVMELandmarkCloud::IsLandmarkShow(mafVMELandmark *lm)
+{
+	int idx = GetLandmarkIndex(lm);
+	if (idx < 0 || idx >= m_NumberOfLandmarks)
+	{
+		mafErrorMacro("Error: required show status for a wrong landmark");
+		return false;
+	}
+	return m_LMChildrenShow[idx];
+}
+
+//----------------------------------------------------------------------------
+int mafVMELandmarkCloud::GetLandmarkShowNumber()
+{
+	return m_LanfmarkShowNumber;
+}
+

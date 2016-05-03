@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: mafVMELandmarkCloud
- Authors: Marco Petrone, Paolo Quadrani
+ Authors: Marco Petrone, Paolo Quadrani, Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -158,11 +158,6 @@ public:
   bool GetLandmarkVisibility(const char *name,mafTimeStamp t=0) {return this->GetLandmarkVisibility(this->FindLandmarkIndex(name),t);}
 
   /**
-  Return true if the landmark is visible for the given time (CurrentTime is the default)*/
-  bool IsVisible(int idx,mafTimeStamp t=-1) {return this->GetLandmarkVisibility(idx,t);}
-  bool IsVisible(const char *name,mafTimeStamp t=-1) {return this->GetLandmarkVisibility(this->FindLandmarkIndex(name),t);}
-
-  /**
   Set/Get the default visibility attribute. When default visibility is set to true, the creation 
   of a new time frame (by setting a landmark position for a given timestamp), makes all the other
   landmarks to be also visible at the same timestamp. If false, the visibility of the others landmark is
@@ -193,11 +188,22 @@ public:
   /** Return true if the data associated with the VME is present and updated at the current time.*/
   virtual bool IsDataAvailable();
 
-
+	/** Remove a child node*/
 	virtual int AddChild(mafVME *node);
 
 	/** Remove a child node*/
 	virtual void RemoveChild(mafVME *node);
+
+	void ShowLandmark(mafVMELandmark *lm, bool show);
+
+	void ShowAllLandmarks();
+
+	bool IsLandmarkShow(mafVMELandmark *lm);
+
+	int GetLandmarkShowNumber();
+
+	/** */
+	void CreateLMStructureFromDataVector();
 
 protected:
   mafVMELandmarkCloud();
@@ -231,8 +237,12 @@ protected:
   int m_SphereResolution;
   double m_Radius;
 
+	int m_LanfmarkShowNumber;
 	std::vector<mafVMELandmark *> m_LMChildren;
+	std::vector<bool> m_LMChildrenShow;
 	std::map<mafVMELandmark *, int> m_LMIndexesMap;
+
+
   
 private:
   mafVMELandmarkCloud(const mafVMELandmarkCloud&); // Not implemented
@@ -250,7 +260,5 @@ private:
   virtual void SetNumberOfPoints(int num,mafTimeStamp t=-1) {mafErrorMacro("Unsupported function, use SetNumberOfLandmarks instead!");};
   virtual int RemovePoint(vtkPolyData *polydata,int idx) {return this->Superclass::RemovePoint(polydata,idx);}
 	
-	//Function for compatibility with old landmark cloud
-	void CreateLMVmeFromOldClosedCloud();
 };
 #endif

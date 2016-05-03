@@ -65,12 +65,13 @@ mafSceneNode::mafSceneNode(mafSceneGraph *sg,mafSceneNode *parent, mafVME *vme, 
   assert(m_Vme->GetOutput()->GetTransform()->GetVTKTransform());
   transform = m_Vme->GetOutput()->GetTransform()->GetVTKTransform();
 
+	//The creation of the Assembly Front is required in tests enven if m_RenFront is NULL
+	m_AssemblyFront = vtkMAFAssembly::New();
+	m_AssemblyFront->SetVme(m_Vme);
+	m_AssemblyFront->SetUserTransform(transform);
 
   if(m_RenFront != NULL)
 	{
-		m_AssemblyFront = vtkMAFAssembly::New();
-		m_AssemblyFront->SetVme(m_Vme);
-		m_AssemblyFront->SetUserTransform(transform);
 		m_AssemblyFront->SetVisibility(m_CurrentVisibility);
 
 	  if (m_Parent) 

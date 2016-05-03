@@ -87,6 +87,8 @@
 #include "vtkTimerLog.h"
 #include "mafWXLog.h"
 #include "mafVMERoot.h"
+#include "mafVMELandmarkCloud.h"
+#include "mafVMELandmark.h"
 
 #define IDM_WINDOWNEXT 4004
 #define IDM_WINDOWPREV 4006
@@ -164,8 +166,8 @@ mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
   m_User = new mafUser();
 
 	m_ShowStorageSettings=false;
-	m_ShowInteractionSettings=false; 
-
+	m_ShowInteractionSettings=false;
+	m_SelectedLandmark = NULL;
 }
 //----------------------------------------------------------------------------
 mafLogicWithManagers::~mafLogicWithManagers()
@@ -1719,19 +1721,120 @@ void mafLogicWithManagers::VmeSelected(mafVME *vme)
   {
     m_WizardManager->VmeSelected(vme);
   }
-  if(m_ViewManager) m_ViewManager->VmeSelect(vme);
+	if (m_ViewManager)
+	{
+		if (m_SelectedLandmark)
+		{
+			SelectLandmark(m_SelectedLandmark, false);
+			m_SideBar->VmeShow(m_SelectedLandmark, false);
+		}
+
+		if (mafVMELandmark::SafeDownCast(vme))
+		{
+			SelectLandmark((mafVMELandmark *)vme, true);
+			m_SelectedLandmark = (mafVMELandmark *)vme;
+		}
+		else
+			m_SelectedLandmark = NULL;
+
+		m_ViewManager->VmeSelect(vme);
+	}
   if(m_OpManager)   m_OpManager->VmeSelected(vme);
 	if(m_SideBar)     m_SideBar->VmeSelected(vme);
+
+	
 }
+
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::SelectLandmark(mafVMELandmark *lm, bool select)
+{
+
+	if(!select)
+		for (mafView * view = m_ViewManager->GetList(); view; view = view->m_Next)
+			view->VmeShow(lm, false);
+	else
+	{
+		mafVMELandmarkCloud *lmParent = mafVMELandmarkCloud::SafeDownCast(lm->GetParent());
+		
+		if (lmParent && lmParent->IsLandmarkShow((mafVMELandmark *)lm))
+
+			for (mafView * view = m_ViewManager->GetList(); view; view = view->m_Next)
+				if (view->GetNodeStatus(lmParent) == NODE_VISIBLE_ON)
+					view->VmeShow(lm, true);
+				else
+					view->VmeShow(lm, false);
+	}
+}
+
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeShow(mafVME *vme, bool visibility)
 //----------------------------------------------------------------------------
 {
-	if(m_ViewManager) m_ViewManager->VmeShow(vme, visibility);
-  bool vme_in_tree = vme->IsVisible(); //check VisibleToTraverse flag.
-  if(m_SideBar && vme_in_tree)
-    m_SideBar->VmeShow(vme,visibility);
+	if (m_ViewManager)
+	{
+		mafVMELandmarkCloud *lmc = mafVMELandmarkCloud::SafeDownCast(vme);
+		mafVMELandmark *lm = mafVMELandmark::SafeDownCast(vme);
+		if (lmc)
+		{
+			ShowLandmarkCloud(lmc,visibility);
+		}
+		else if (lm)
+		{
+			ShowLandmark(lm,visibility);
+		}
+		else
+			m_ViewManager->VmeShow(vme, visibility);
+	}
+
+	ShowInSideBar(vme,visibility);
+
 }
+
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::ShowLandmarkCloud(mafVMELandmarkCloud * lmc, bool visibility)
+{
+	if (visibility)
+		lmc->ShowAllLandmarks();
+
+	for (int i = 0; i < lmc->GetNumberOfLandmarks(); i++)
+	{
+		ShowInSideBar(lmc->GetLandmark(i), visibility);
+	}
+
+	m_ViewManager->VmeShow(lmc, visibility);
+	
+	if(m_SelectedLandmark && m_SelectedLandmark->GetParent() == lmc)
+		SelectLandmark(m_SelectedLandmark, true);
+}
+
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::ShowInSideBar(mafVME * vme, bool visibility)
+{
+	bool vme_in_tree = vme->IsVisible(); //check VisibleToTraverse flag.
+	if (m_SideBar && vme_in_tree)
+		m_SideBar->VmeShow(vme, visibility);
+}
+
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::ShowLandmark(mafVMELandmark * lm, bool visibility)
+{
+	mafVMELandmarkCloud *lmParent = mafVMELandmarkCloud::SafeDownCast(lm->GetParent());
+	if (!lmParent)
+		return;
+	lmParent->ShowLandmark(lm, visibility);
+
+	if (m_SelectedLandmark == lm)
+		SelectLandmark(lm, visibility);
+
+	//show of lm shows also the lmc
+	//hide of last lm hides also the lmc
+	if (visibility || (!visibility && lmParent->GetLandmarkShowNumber() == 0))
+	{
+		m_ViewManager->VmeShow(lmParent, visibility);
+		ShowInSideBar(lmParent,visibility);
+	}
+}
+
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeModified(mafVME *vme)
 //----------------------------------------------------------------------------
@@ -1781,6 +1884,9 @@ void mafLogicWithManagers::VmeRemove(mafVME *vme)
     UpdateTimeBounds();
   if (m_ViewManager)
     m_ViewManager->CameraUpdate();
+
+	if (m_SelectedLandmark == vme)
+		m_SelectedLandmark = NULL;
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeRemoving(mafVME *vme)
