@@ -22,7 +22,7 @@
 //----------------------------------------------------------------------------
 
 #include "mafOpExtrusionHoles.h"
-#include "mafNode.h"
+#include "mafVME.h"
 
 #include "mafGUIDialog.h"
 #include "mafGUIButton.h"
@@ -100,7 +100,7 @@ mafOpExtrusionHoles::~mafOpExtrusionHoles()
 	vtkDEL(m_OriginalPolydata);
 }
 //----------------------------------------------------------------------------
-bool mafOpExtrusionHoles::Accept(mafNode *node)
+bool mafOpExtrusionHoles::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
 	return (node && node->IsA("mafVMESurface"));
@@ -174,7 +174,7 @@ void mafOpExtrusionHoles::OpDo()
 //----------------------------------------------------------------------------
 {
 	if(m_ResultPolydata)
-		((mafVMESurface*)m_Input)->SetData(m_ResultPolydata,((mafVME*)m_Input)->GetTimeStamp());
+		((mafVMESurface*)m_Input)->SetData(m_ResultPolydata,m_Input->GetTimeStamp());
 
 	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
@@ -183,7 +183,7 @@ void mafOpExtrusionHoles::OpUndo()
 //----------------------------------------------------------------------------
 {
 	if(m_OriginalPolydata)
-		((mafVMESurface*)m_Input)->SetData(m_OriginalPolydata,((mafVME*)m_Input)->GetTimeStamp());
+		((mafVMESurface*)m_Input)->SetData(m_OriginalPolydata,m_Input->GetTimeStamp());
 
 	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }

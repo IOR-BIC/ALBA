@@ -104,15 +104,15 @@ mafView *mafViewSliceBlendRX::Copy(mafObserver *Listener, bool lightCopyEnabled)
   return v;
 }
 //----------------------------------------------------------------------------
-void mafViewSliceBlendRX::VmeShow(mafNode *node, bool show)
+void mafViewSliceBlendRX::VmeShow(mafVME *vme, bool show)
 //----------------------------------------------------------------------------
 {
   for(int i=0; i<m_NumOfChildView; i++)
   {
-    m_ChildViewList[i]->VmeShow(node, show);
+    m_ChildViewList[i]->VmeShow(vme, show);
   }
 
-  if (((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume"))
+  if (vme->GetOutput()->IsA("mafVMEOutputVolume"))
   {
     if (show)
     {
@@ -132,7 +132,7 @@ void mafViewSliceBlendRX::VmeShow(mafNode *node, bool show)
 
       ((mafViewRX*)m_ChildViewList[RX_VIEW])->SetLutRange(minMax[0],minMax[1]);
       
-      m_CurrentVolume = mafVME::SafeDownCast(node);
+      m_CurrentVolume = vme;
 
       //Create Gizmos for the volume visualized
       GizmoCreate();
@@ -148,16 +148,16 @@ void mafViewSliceBlendRX::VmeShow(mafNode *node, bool show)
   EnableWidgets(m_CurrentVolume != NULL);
 }
 //----------------------------------------------------------------------------
-void mafViewSliceBlendRX::VmeRemove(mafNode *node)
+void mafViewSliceBlendRX::VmeRemove(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   //If node is a volume delete gizmos
-  if (m_CurrentVolume && node == m_CurrentVolume) 
+  if (m_CurrentVolume && vme == m_CurrentVolume) 
   {
     m_CurrentVolume = NULL;
     GizmoDelete();
   }
-  Superclass::VmeRemove(node);
+  Superclass::VmeRemove(vme);
 }
 //----------------------------------------------------------------------------
 void mafViewSliceBlendRX::OnEvent(mafEventBase *maf_event)

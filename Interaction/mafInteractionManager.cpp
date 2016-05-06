@@ -383,10 +383,9 @@ void mafInteractionManager::PostResetCamera(vtkRenderer *ren)
 }
 
 //------------------------------------------------------------------------------
-void mafInteractionManager::VmeSelected(mafNode *node)
+void mafInteractionManager::VmeSelected(mafVME *vme)
 //------------------------------------------------------------------------------
 {
-  mafVME *vme=mafVME::SafeDownCast(node);
   if (vme)
     m_PositionalEventRouter->OnVmeSelected(vme);
 }

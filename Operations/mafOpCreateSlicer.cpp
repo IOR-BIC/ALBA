@@ -61,7 +61,7 @@ mafOp* mafOpCreateSlicer::Copy()
 	return new mafOpCreateSlicer(m_Label);
 }
 //----------------------------------------------------------------------------
-bool mafOpCreateSlicer::Accept(mafNode *node)
+bool mafOpCreateSlicer::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
   return (node != NULL);
@@ -79,7 +79,7 @@ void mafOpCreateSlicer::OpRun()
 
   int result = OP_RUN_CANCEL;
 
-  mafNode *n = e.GetVme();
+  mafVME *n = e.GetVme();
   if (n != NULL)
   {
 		mafNEW(m_Slicer);
@@ -98,9 +98,9 @@ void mafOpCreateSlicer::OpDo()
 {
   double center[3] = {0.0,0.0,0.0}, rot[3] = {0.0,0.0,0.0};
   mafOBB b;
-  m_Slicer->ReparentTo(mafVME::SafeDownCast(m_Input));
+  m_Slicer->ReparentTo(m_Input);
   rot[0] = rot[1] = rot[2] = 0;
-  ((mafVME *)m_SlicedVME)->GetOutput()->GetVMELocalBounds(b);
+  m_SlicedVME->GetOutput()->GetVMELocalBounds(b);
   if (b.IsValid())
   {
     b.GetCenter(center);

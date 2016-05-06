@@ -74,7 +74,7 @@ bool mafVMERoot::Equals(mafVME *vme)
 }
 
 //-------------------------------------------------------------------------
-int mafVMERoot::DeepCopy(mafNode *a)
+int mafVMERoot::DeepCopy(mafVME *a)
 //-------------------------------------------------------------------------
 { 
   if (Superclass::DeepCopy(a)==MAF_OK)
@@ -169,7 +169,7 @@ void mafVMERoot::OnEvent(mafEventBase *maf_event)
 void mafVMERoot::Print(std::ostream& os, const int tabs)// const
 //-------------------------------------------------------------------------
 {
-  mafNode::Print(os,tabs);
+  mafVME::Print(os,tabs);
   mafRoot::Print(os,tabs);
   os << mafIndent(tabs) << "MaxItemId: " << m_MaxItemId << "\n";
 }
@@ -235,7 +235,7 @@ mafGUI *mafVMERoot::CreateGui()
 //-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
-  mafNode::CreateGui();
+  mafVME::CreateGui();
 
   if(GetTagArray()->IsTagPresent("APP_STAMP"))
   {

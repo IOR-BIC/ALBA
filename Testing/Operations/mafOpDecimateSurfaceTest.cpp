@@ -30,7 +30,7 @@
 #include "mafOpDecimateSurface.h"
 
 #include "mafString.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafVMERoot.h"
 #include "mafVMEStorage.h"
 #include "mafVMESurface.h"

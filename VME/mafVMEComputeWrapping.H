@@ -167,8 +167,8 @@ public:
 		double  m_Z;
 	};
 
-	static bool VMEAccept(mafNode *node) {return(node != NULL && node->IsMAFType(mafVME));};
-	static bool VMESurfaceParametricAccept(mafNode *node) {return(node != NULL && node->IsMAFType(mafVMESurfaceParametric));};
+	static bool VMEAccept(mafVME*node) {return(node != NULL && node->IsMAFType(mafVME));};
+	static bool VMESurfaceParametricAccept(mafVME*node) {return(node != NULL && node->IsMAFType(mafVMESurfaceParametric));};
 
 	/** Precess events coming from other objects */ 
 	virtual void OnEvent(mafEventBase *maf_event);
@@ -177,7 +177,7 @@ public:
 	virtual void Print(std::ostream& os, const int tabs=0);
 
 	/** Copy the contents of another VME-Meter into this one. */
-	virtual int DeepCopy(mafNode *a);
+	virtual int DeepCopy(mafVME *a);
 
 	/** Compare with another VME-Meter. */
 	virtual bool Equals(mafVME *vme);
@@ -327,11 +327,11 @@ public:
 
 
 	/** Get the link to the surface.*/
-	mafNode::mafLinksMap *GetMidPointsLinks();
+	mafVME::mafLinksMap *GetMidPointsLinks();
 
 	/** 
 	Set links for the meter*/
-	void SetMeterLink(const char *link_name, mafNode *n);
+	void SetMeterLink(const char *link_name, mafVME *n);
 
 	void RemoveLink(const char *link_name);
 
@@ -370,7 +370,7 @@ public:
 	int GetWrapReverse(){return m_WrapReverse;};
 	void SetWrapReverse(int value){m_WrapReverse = value;};
 
-	void AddMidPoint(mafNode *node);
+	void AddMidPoint(mafVME *node);
 	double *GetExportPointCoordinate(int index);
 	/**Return Number of export points*/
 	int GetNumberExportPoints(){return m_ExportPointList.size();};
@@ -416,7 +416,7 @@ protected:
 	bool MiddlePointsControl();
 
 	/*Return mafVME pointer given a index representing index in ordered list*/
-	mafNode* IndexToMiddlePointVME(int index);
+	mafVME* IndexToMiddlePointVME(int index);
 
 	/*Save in file all points*/
 	void SaveInFile();

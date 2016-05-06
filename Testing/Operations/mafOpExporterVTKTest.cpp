@@ -66,7 +66,7 @@ void mafOpExporterVTKTest::TestAccept()
 //----------------------------------------------------------------------------
 {
   DummyVme *dummyVme = new DummyVme();
-  result = m_ExporterVTK->Accept((mafNode*)dummyVme);
+  result = m_ExporterVTK->Accept(dummyVme);
 
   CPPUNIT_ASSERT(result);
 

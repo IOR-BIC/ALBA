@@ -94,10 +94,10 @@ void mafVMEOutputWrappedMeterTest::TestGetPolylineData_Update()
   mafNEW(surface2);
   mafNEW(surface3);
 
-  surface->SetParent(storage->GetRoot());
-  surface2->SetParent(storage->GetRoot());
-  surface3->SetParent(storage->GetRoot());
-  vmeWrappedMeter->SetParent(storage->GetRoot());
+  surface->ReparentTo(storage->GetRoot());
+  surface2->ReparentTo(storage->GetRoot());
+  surface3->ReparentTo(storage->GetRoot());
+  vmeWrappedMeter->ReparentTo(storage->GetRoot());
 
   double pos[3];
   double rot[3];
@@ -123,9 +123,9 @@ void mafVMEOutputWrappedMeterTest::TestGetPolylineData_Update()
   rot3[0] = rot3[1] = rot3[2] = 0.0;
   surface3->SetPose(pos3, rot3, 0.0);
 
-  vmeWrappedMeter->SetMeterLink("StartVME", mafNode::SafeDownCast(surface));
-  vmeWrappedMeter->SetMeterLink("EndVME1", mafNode::SafeDownCast(surface2));
-  vmeWrappedMeter->SetMeterLink("WrappedVME", mafNode::SafeDownCast(surface3));
+  vmeWrappedMeter->SetMeterLink("StartVME", surface);
+  vmeWrappedMeter->SetMeterLink("EndVME1", surface2);
+  vmeWrappedMeter->SetMeterLink("WrappedVME", surface3);
 
   vmeWrappedMeter->GetOutput()->GetVTKData()->Update();
 
@@ -139,11 +139,11 @@ void mafVMEOutputWrappedMeterTest::TestGetPolylineData_Update()
 
   TEST_RESULT;
 
-  vmeWrappedMeter->SetParent(NULL);
+  vmeWrappedMeter->ReparentTo(NULL);
 
-  surface->SetParent(NULL);
-  surface2->SetParent(NULL);
-  surface3->SetParent(NULL);
+  surface->ReparentTo(NULL);
+  surface2->ReparentTo(NULL);
+  surface3->ReparentTo(NULL);
 
   mafDEL(surface);
   mafDEL(surface2);

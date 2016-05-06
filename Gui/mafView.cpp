@@ -189,7 +189,7 @@ bool mafView::FindPickedVme(vtkAssemblyPath *ap)
         if(p && p->IsA("vtkMAFAssembly"))
         {
           as = (vtkMAFAssembly*)p;
-          m_PickedVME = mafVME::SafeDownCast(as->GetVme());
+          m_PickedVME = as->GetVme();
           m_PickedProp = vtkProp3D::SafeDownCast(p);
           return true;
           break;

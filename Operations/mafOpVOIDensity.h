@@ -41,7 +41,7 @@ public:
 	mafOp* Copy();
 	
 	/** Return true for the acceptable vme type. */
-	bool Accept(mafNode* Node);
+	bool Accept(mafVME* Node);
 
 	/** Set the input vme for the operation. */
 	void OpRun();
@@ -53,7 +53,7 @@ public:
 	void OpUndo();
 
 	/**	Set surface of input in test mode*/
-	void SetSurface(mafNode *Surface){m_Surface=Surface;};
+	void SetSurface(mafVME *Surface){m_Surface=Surface;};
 
 	/**	Return the min scalar*/
 	double GetMinScalar(){return m_MinScalar;};
@@ -73,10 +73,10 @@ public:
 	/** Extract scalars from input volume that are inside the choosed surface. */
 	void ExtractVolumeScalars();
 
- 	static bool OutputSurfaceAccept(mafNode* Node) {return(Node != NULL && (((mafVME *)Node)->GetOutput()->IsA("mafVMEOutputSurface")));};
+ 	static bool OutputSurfaceAccept(mafVME* Node) {return(Node != NULL && (Node->GetOutput()->IsA("mafVMEOutputSurface")));};
 
 protected:
-  mafNode        *m_Surface;
+  mafVME        *m_Surface;
   vtkDoubleArray *m_VOIScalars;
   mafString       m_NumberOfScalarsString;
   int             m_NumberOfScalars;

@@ -237,7 +237,7 @@ void mafGizmoPathRuler::SetConstraintPolyline( mafVME* constraintPolyline )
 void mafGizmoPathRuler::SetInput( mafVME *vme )
 {
   // register the input vme
-  m_InputVME = mafVME::SafeDownCast(vme);
+  m_InputVME = vme;
 }
 
 void mafGizmoPathRuler::SetColor( double col[3] )

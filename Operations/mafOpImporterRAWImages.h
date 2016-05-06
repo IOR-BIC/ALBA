@@ -37,7 +37,7 @@
 // forward references :
 //----------------------------------------------------------------------------
 class mafOp;
-class mafNode;
+class mafVME;
 class vtkImageReader;
 class vtkImageImport;
 class vtkImageAppendComponents;
@@ -75,7 +75,7 @@ public:
   mafOp* Copy();
 
   /** Return true for the acceptable vme type. */
-  bool Accept(mafNode *node) {return true;};
+  bool Accept(mafVME*node) {return true;};
 
   /** Build the interface of the operation and the preview pipeline. */
   void OpRun();
@@ -151,7 +151,7 @@ protected:
 #endif // VME_VOLUME_LARGE
 
 
-  mafNode			 *m_Vme; 
+  mafVME			 *m_Vme; 
 
   mafString			m_RawDirectory;
   vtkDirectory *m_VtkRawDirectory;

@@ -70,7 +70,7 @@ public:
 
 	/** 
   Show/Hide VMEs into plugged sub-views*/
-  virtual void VmeShow(mafNode *node, bool show);
+  virtual void VmeShow(mafVME *vme, bool show);
 
   /** Calculate areas for child views in order to create a layout of the compound view.*/
   //virtual void OnLayout()=0;
@@ -89,10 +89,10 @@ protected:
   virtual void EnableWidgets(bool enable);
 
   /** A function with windowing activate/deactivate conditions*/
-  virtual bool ActivateWindowing(mafNode *node);
+  virtual bool ActivateWindowing(mafVME *vme);
 
   /** Update lutslider with correct values in case of bool variable is true, otherwise disable the widget. */
-	virtual void UpdateWindowing(bool enable,mafNode *node);
+	virtual void UpdateWindowing(bool enable,mafVME *vme);
 
   /** Update windowing for image data*/
   virtual void ImageWindowing(mafVMEImage *image);
@@ -104,8 +104,8 @@ protected:
 	mafGUILutSlider		*m_LutSlider;
 	vtkLookupTable	        *m_ColorLUT;
 	
-	/** Function that get node pipe of first child     */
-	virtual mafPipe* GetNodePipe(mafNode *vme);
+	/** Function that get vme pipe of first child     */
+	virtual mafPipe* GetNodePipe(mafVME *vme);
 
 };
 #endif

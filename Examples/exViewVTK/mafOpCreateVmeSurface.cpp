@@ -74,7 +74,7 @@ void mafOpCreateVmeSurface::OpDo()
   static int counter = 0;
   wxString name = wxString::Format("vme surface %d",counter++);
   m_vme->SetName(name);
-  m_vme->ReparentTo( (mafVME*)m_Input);
+  m_vme->ReparentTo(m_Input);
 
   vtkConeSource *cs = vtkConeSource::New();
   cs->SetResolution(20);

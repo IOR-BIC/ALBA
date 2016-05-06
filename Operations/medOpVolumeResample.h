@@ -51,7 +51,7 @@ public:
 
   mafOp* Copy();
 
-  bool Accept(mafNode* vme);
+  bool Accept(mafVME* vme);
   void OpRun();	
   void OpDo();
   void OpUndo();  
@@ -171,7 +171,7 @@ protected:
   bool    m_ViewSelectedMessage;
   bool    m_ShowShadingPlane;
   
-  void PrintVolume( ostream& os , mafNode *volume , const char *logMessage = NULL );
+  void PrintVolume( ostream& os , mafVME *volume , const char *logMessage = NULL );
   static void PrintDouble6(ostream& os, double array[6], const char *logMessage = NULL );
   static void PrintDouble3(ostream& os, double array[3], const char *logMessage = NULL);
   static void PrintInt3(ostream& os, int array[3], const char *logMessage = NULL);

@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: mafNodeTest
+ Module: mafVMETest
  Authors: Paolo Quadrani, Gianluigi Crimi
  
  Copyright (c) B3C
@@ -25,14 +25,14 @@
 
 #include <cppunit/config/SourcePrefix.h>
 #include "mafCoreTests.h"
-#include "mafNodeTest.h"
+#include "mafVMETest.h"
 
 #include "mafSmartPointer.h"
 #include "mafTagArray.h"
 #include "mafTagItem.h"
-#include "mafNodeRoot.h"
-#include "mafNode.h"
-#include "mafNodeIterator.h"
+#include "mafVME.h"
+#include "mafVMERoot.h"
+#include "mafVMEIterator.h"
 
 #include <iostream>
 
@@ -40,95 +40,95 @@
 
 
 //----------------------------------------------------------------------------
-void mafNodeTest::TestFixture()
+void mafVMETest::TestFixture()
 //----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestDynamicAllocation()
+void mafVMETest::TestDynamicAllocation()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeHelper> na;
+  mafSmartPointer<mafVMEHelper> na;
 
-  mafNodeHelper *na2;
+  mafVMEHelper *na2;
   mafNEW(na2);
   na2->Delete();
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestAllConstructor()
+void mafVMETest::TestAllConstructor()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeHelper> na;
+  mafSmartPointer<mafVMEHelper> na;
   result = na->GetReferenceCount() == 1; // mafSmartPointer increase the reference count
   TEST_RESULT;
 
-  mafNodeHelper *na2 = NULL;
-  na2 = mafNodeHelper::New();
+  mafVMEHelper *na2 = NULL;
+  na2 = mafVMEHelper::New();
   result = na2->GetReferenceCount() == 0; // default reference count on New
   TEST_RESULT;
   mafDEL(na2);
 
-  mafNodeHelper *na3 = NULL;
+  mafVMEHelper *na3 = NULL;
   mafNEW(na3);
   result = na3->GetReferenceCount() == 1; // mafNEW macro increase the reference count
   TEST_RESULT;
   mafDEL(na3);
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestSetName()
+void mafVMETest::TestSetName()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeHelper> na;
+  mafSmartPointer<mafVMEHelper> na;
   na->SetName("node a");
   result = mafString::Equals(na->GetName(),"node a");
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestEquals()
+void mafVMETest::TestEquals()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeHelper> na;
+  mafSmartPointer<mafVMEHelper> na;
   na->SetName("node");
-  mafSmartPointer<mafNodeHelper> nb;
+  mafSmartPointer<mafVMEHelper> nb;
   nb->SetName("node");
   result = na->Equals(nb);
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestCanCopy()
+void mafVMETest::TestCanCopy()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeHelper> na;
+  mafSmartPointer<mafVMEHelper> na;
   na->SetName("node a");
 
-  mafSmartPointer<mafNodeHelper> na2;
+  mafSmartPointer<mafVMEHelper> na2;
   result = na2->CanCopy(na);
   TEST_RESULT;
 
-  mafSmartPointer<mafNodeBHelper> nb; // True because also mafNodeB is a mafNode!!
+  mafSmartPointer<mafVMEBHelper> nb; // True because also mafVMEB is a mafVME!!
   result = nb->CanCopy(na);
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestDeepCopy()
+void mafVMETest::TestDeepCopy()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeHelper> na;
+  mafSmartPointer<mafVMEHelper> na;
   na->SetName("node a");
 
-  mafSmartPointer<mafNodeHelper> na2;
+  mafSmartPointer<mafVMEHelper> na2;
   na2->DeepCopy(na);
 
   result = na2->Equals(na);
   TEST_RESULT;
 
-  mafSmartPointer<mafNodeHelper> nl;
+  mafSmartPointer<mafVMEHelper> nl;
   nl->SetName("node linked");
   nl->SetId(1); // Needed to be linked
 
   na2->SetLink("LinkName", nl);
 
-  mafSmartPointer<mafNodeHelper> na3;
+  mafSmartPointer<mafVMEHelper> na3;
   na3->DeepCopy(na2);
   result = na3->GetNumberOfLinks() == 1;
   TEST_RESULT;
@@ -137,38 +137,35 @@ void mafNodeTest::TestDeepCopy()
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestFindInTreeById()
+void mafVMETest::TestFindInTreeById()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeRoot> na;
-  mafSmartPointer<mafNodeHelper> na2;
-  mafSmartPointer<mafNodeHelper> na3;
+  mafSmartPointer<mafVMERoot> na;
+  mafSmartPointer<mafVMEHelper> na2;
+  mafSmartPointer<mafVMEHelper> na3;
 
   int i = na->GetMaxNodeId();
 
   na2->ReparentTo(na);
   na3->ReparentTo(na2);
 
-  /*na2->UpdateId();
-  na3->UpdateId();*/
-
-  mafNode *n = na->FindInTreeById(2);
+  mafVME *n = na->FindInTreeById(2);
   result = n != NULL;
   TEST_RESULT;
   result = n->Equals(na3);
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestFindInTreeByName()
+void mafVMETest::TestFindInTreeByName()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeHelper> na;
+  mafSmartPointer<mafVMEHelper> na;
   na->SetName("root node");
-  mafSmartPointer<mafNodeHelper> na2;
+  mafSmartPointer<mafVMEHelper> na2;
   na2->SetName("child 1");
-  mafSmartPointer<mafNodeHelper> na3;
+  mafSmartPointer<mafVMEHelper> na3;
   na3->SetName("child 2");
-  mafSmartPointer<mafNodeHelper> na4;
+  mafSmartPointer<mafVMEHelper> na4;
   na4->SetName("child 3");
 
   na->AddChild(na2);
@@ -176,7 +173,7 @@ void mafNodeTest::TestFindInTreeByName()
   na3->AddChild(na4);
 
   // by default 'match case' and 'whole word' are active
-  mafNode *n = na->FindInTreeByName("child 2");
+  mafVME *n = na->FindInTreeByName("child 2");
   result = n != NULL;
   TEST_RESULT;
   result = n->Equals(na3);
@@ -194,12 +191,12 @@ void mafNodeTest::TestFindInTreeByName()
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestFindInTreeByTag()
+void mafVMETest::TestFindInTreeByTag()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeHelper> na;
-  mafSmartPointer<mafNodeHelper> na2;
-  mafSmartPointer<mafNodeHelper> na3;
+  mafSmartPointer<mafVMEHelper> na;
+  mafSmartPointer<mafVMEHelper> na2;
+  mafSmartPointer<mafVMEHelper> na3;
   
   mafTagItem ti;
   ti.SetName("test");
@@ -209,21 +206,21 @@ void mafNodeTest::TestFindInTreeByTag()
   na->AddChild(na2);
   na->AddChild(na3);
 
-  mafNode *n = na->FindInTreeByTag("test");
+  mafVME *n = na->FindInTreeByTag("test");
   result = n != NULL;
   TEST_RESULT;
   result = n->Equals(na3);
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestFindNodeIdx()
+void mafVMETest::TestFindNodeIdx()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeHelper> na;
+  mafSmartPointer<mafVMEHelper> na;
   na->SetName("root");
-  mafSmartPointer<mafNodeHelper> nb;
+  mafSmartPointer<mafVMEHelper> nb;
   nb->SetName("node nb");
-  mafSmartPointer<mafNodeHelper> nc;
+  mafSmartPointer<mafVMEHelper> nc;
   nc->SetName("node nc");
   na->AddChild(nb);
   na->AddChild(nc);
@@ -258,22 +255,22 @@ void mafNodeTest::TestFindNodeIdx()
 
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestGetAttribute()
+void mafVMETest::TestGetAttribute()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeHelper> na;
+  mafSmartPointer<mafVMEHelper> na;
   result = na->GetAttribute("Not Exists") == NULL;
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestGetChild()
+void mafVMETest::TestGetChild()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeHelper> na;
+  mafSmartPointer<mafVMEHelper> na;
   na->SetName("node na");
-  mafSmartPointer<mafNodeHelper> nb;
+  mafSmartPointer<mafVMEHelper> nb;
   nb->SetName("node nb");
-  mafSmartPointer<mafNodeHelper> nc;
+  mafSmartPointer<mafVMEHelper> nc;
   nc->SetName("node nc");
   
   na->AddChild(nb);
@@ -291,64 +288,64 @@ void mafNodeTest::TestGetChild()
 
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestGetFirstChild()
+void mafVMETest::TestGetFirstChild()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeHelper> na;
+  mafSmartPointer<mafVMEHelper> na;
   na->SetName("node na");
-  mafSmartPointer<mafNodeHelper> nb;
+  mafSmartPointer<mafVMEHelper> nb;
   nb->SetName("node nb");
-  mafSmartPointer<mafNodeHelper> nc;
+  mafSmartPointer<mafVMEHelper> nc;
   nc->SetName("node nc");
   
   na->AddChild(nb);
   na->AddChild(nc);
-  mafNode *n = na->GetFirstChild();
+  mafVME *n = na->GetFirstChild();
   result = n->Equals(nb);
   TEST_RESULT;
 
   //testing by visibility
   nb->SetVisibleToTraverse(false);
-  mafNode *nInv = na->GetFirstChild(true);
+  mafVME *nInv = na->GetFirstChild(true);
   result = nInv->Equals(nc);
   TEST_RESULT;
 
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestGetLastChild()
+void mafVMETest::TestGetLastChild()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeHelper> na;
+  mafSmartPointer<mafVMEHelper> na;
   na->SetName("node na");
-  mafSmartPointer<mafNodeHelper> nb;
+  mafSmartPointer<mafVMEHelper> nb;
   nb->SetName("node nb");
-  mafSmartPointer<mafNodeHelper> nc;
+  mafSmartPointer<mafVMEHelper> nc;
   nc->SetName("node nc");
 
   na->AddChild(nb);
   na->AddChild(nc);
-  mafNode *n = na->GetLastChild();
+  mafVME *n = na->GetLastChild();
   result = n->Equals(nc);
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestGetLink()
+void mafVMETest::TestGetLink()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeHelper> na;
-  mafNode *nl = na->GetLink("Not Existing Link");
+  mafSmartPointer<mafVMEHelper> na;
+  mafVME *nl = na->GetLink("Not Existing Link");
   result = nl == NULL;
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestSetLink()
+void mafVMETest::TestSetLink()
 //----------------------------------------------------------------------------
 {
   // To link a node it have to be into a tree with Id != -1 (invalid Id)
-  mafSmartPointer<mafNodeRoot> root;
-  mafSmartPointer<mafNodeHelper> na;
+  mafSmartPointer<mafVMERoot> root;
+  mafSmartPointer<mafVMEHelper> na;
   na->SetName("node na");
-  mafSmartPointer<mafNodeHelper> nb;
+  mafSmartPointer<mafVMEHelper> nb;
   nb->SetName("node nb");
   root->AddChild(na);
   root->AddChild(nb);
@@ -360,7 +357,7 @@ void mafNodeTest::TestSetLink()
   TEST_RESULT;
 
   // Overwrite old link
-  mafSmartPointer<mafNodeHelper> nc;
+  mafSmartPointer<mafVMEHelper> nc;
   nc->SetName("node nc");
   root->AddChild(nc);
   nc->UpdateId();
@@ -373,13 +370,13 @@ void mafNodeTest::TestSetLink()
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestGetLinkSubId()
+void mafVMETest::TestGetLinkSubId()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeRoot> root;
-  mafSmartPointer<mafNodeHelper> na;
-  mafSmartPointer<mafNodeHelper> nb;
-  mafSmartPointer<mafNodeHelper> nc;
+  mafSmartPointer<mafVMERoot> root;
+  mafSmartPointer<mafVMEHelper> na;
+  mafSmartPointer<mafVMEHelper> nb;
+  mafSmartPointer<mafVMEHelper> nc;
   root->AddChild(na);
   root->AddChild(nb);
   root->AddChild(nc);
@@ -396,13 +393,13 @@ void mafNodeTest::TestGetLinkSubId()
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestGetNumberOfLinks()
+void mafVMETest::TestGetNumberOfLinks()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeRoot> root;
-  mafSmartPointer<mafNodeHelper> na;
-  mafSmartPointer<mafNodeHelper> nb;
-  mafSmartPointer<mafNodeHelper> nc;
+  mafSmartPointer<mafVMERoot> root;
+  mafSmartPointer<mafVMEHelper> na;
+  mafSmartPointer<mafVMEHelper> nb;
+  mafSmartPointer<mafVMEHelper> nc;
   root->AddChild(na);
   root->AddChild(nb);
   root->AddChild(nc);
@@ -416,13 +413,13 @@ void mafNodeTest::TestGetNumberOfLinks()
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestRemoveLink()
+void mafVMETest::TestRemoveLink()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeRoot> root;
-  mafSmartPointer<mafNodeHelper> na;
-  mafSmartPointer<mafNodeHelper> nb;
-  mafSmartPointer<mafNodeHelper> nc;
+  mafSmartPointer<mafVMERoot> root;
+  mafSmartPointer<mafVMEHelper> na;
+  mafSmartPointer<mafVMEHelper> nb;
+  mafSmartPointer<mafVMEHelper> nc;
   root->AddChild(na);
   root->AddChild(nb);
   root->AddChild(nc);
@@ -438,13 +435,13 @@ void mafNodeTest::TestRemoveLink()
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestRemoveAllLinks()
+void mafVMETest::TestRemoveAllLinks()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeRoot> root;
-  mafSmartPointer<mafNodeHelper> na;
-  mafSmartPointer<mafNodeHelper> nb;
-  mafSmartPointer<mafNodeHelper> nc;
+  mafSmartPointer<mafVMERoot> root;
+  mafSmartPointer<mafVMEHelper> na;
+  mafSmartPointer<mafVMEHelper> nb;
+  mafSmartPointer<mafVMEHelper> nc;
   root->AddChild(na);
   root->AddChild(nb);
   root->AddChild(nc);
@@ -460,15 +457,15 @@ void mafNodeTest::TestRemoveAllLinks()
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestDependsOnLinkedNode()
+void mafVMETest::TestDependsOnLinkedNode()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeRoot> root;
-  mafSmartPointer<mafNodeHelper> na;
+  mafSmartPointer<mafVMERoot> root;
+  mafSmartPointer<mafVMEHelper> na;
   na->SetName("node na");
-  mafSmartPointer<mafNodeHelper> nb;
+  mafSmartPointer<mafVMEHelper> nb;
   nb->SetName("node nb");
-  mafSmartPointer<mafNodeHelper> nc;
+  mafSmartPointer<mafVMEHelper> nc;
   nc->SetName("node nc");
   root->AddChild(na);
   root->AddChild(nb);
@@ -492,10 +489,10 @@ void mafNodeTest::TestDependsOnLinkedNode()
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestSetAttribute()
+void mafVMETest::TestSetAttribute()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeHelper> na;
+  mafSmartPointer<mafVMEHelper> na;
 
   mafSmartPointer<mafTagArray> ta;
   ta->SetName("My Attribute");
@@ -508,10 +505,10 @@ void mafNodeTest::TestSetAttribute()
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestRemoveAttribute()
+void mafVMETest::TestRemoveAttribute()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeHelper> na;
+  mafSmartPointer<mafVMEHelper> na;
 
   mafSmartPointer<mafTagArray> ta;
   ta->SetName("My Attribute");
@@ -524,10 +521,10 @@ void mafNodeTest::TestRemoveAttribute()
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestRemoveAllAttributes()
+void mafVMETest::TestRemoveAllAttributes()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeHelper> na;
+  mafSmartPointer<mafVMEHelper> na;
 
   mafSmartPointer<mafTagArray> ta;
   ta->SetName("My Attribute");
@@ -540,16 +537,16 @@ void mafNodeTest::TestRemoveAllAttributes()
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestMakeCopy()
+void mafVMETest::TestMakeCopy()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeHelper> na;
+  mafSmartPointer<mafVMEHelper> na;
   na->SetName("node a");
 
   result = na->GetReferenceCount() == 1;
   TEST_RESULT;
 
-  mafNodeHelper *na2 = (mafNodeHelper *)na->MakeCopy();
+  mafVMEHelper *na2 = (mafVMEHelper *)na->MakeCopy();
   result = na2->Equals(na);
   TEST_RESULT;
 
@@ -558,12 +555,12 @@ void mafNodeTest::TestMakeCopy()
   mafDEL(na2);
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestReparentTo()
+void mafVMETest::TestReparentTo()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeHelper> na;
+  mafSmartPointer<mafVMEHelper> na;
   na->SetName("root");
-  mafSmartPointer<mafNodeHelper> na2;
+  mafSmartPointer<mafVMEHelper> na2;
   na2->SetName("node na2");
 
   result = na2->ReparentTo(na) == MAF_OK;
@@ -573,12 +570,12 @@ void mafNodeTest::TestReparentTo()
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestGetParent()
+void mafVMETest::TestGetParent()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeHelper> na;
+  mafSmartPointer<mafVMEHelper> na;
   na->SetName("root");
-  mafSmartPointer<mafNodeHelper> na2;
+  mafSmartPointer<mafVMEHelper> na2;
   na2->SetName("node na2");
   na->AddChild(na2);
 
@@ -586,16 +583,16 @@ void mafNodeTest::TestGetParent()
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestGetRoot()
+void mafVMETest::TestGetRoot()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeHelper> na;
+  mafSmartPointer<mafVMEHelper> na;
   na->SetName("root");
-  mafSmartPointer<mafNodeHelper> na2;
+  mafSmartPointer<mafVMEHelper> na2;
   na2->SetName("node na2");
-  mafSmartPointer<mafNodeHelper> na3;
+  mafSmartPointer<mafVMEHelper> na3;
   na3->SetName("node na3");
-  mafSmartPointer<mafNodeHelper> na4;
+  mafSmartPointer<mafVMEHelper> na4;
   na4->SetName("node na4");
 
   na->AddChild(na2);
@@ -605,10 +602,10 @@ void mafNodeTest::TestGetRoot()
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestGetTagArray()
+void mafVMETest::TestGetTagArray()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeHelper> na;
+  mafSmartPointer<mafVMEHelper> na;
   mafTagArray *ta = na->GetTagArray();
   result = ta != NULL;
   TEST_RESULT;
@@ -617,11 +614,11 @@ void mafNodeTest::TestGetTagArray()
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestIsValid()
+void mafVMETest::TestIsValid()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeRoot> root;
-  mafNodeHelper *na = NULL;
+  mafSmartPointer<mafVMERoot> root;
+  mafVMEHelper *na = NULL;
   mafNEW(na);
 
   root->AddChild(na);
@@ -637,26 +634,26 @@ void mafNodeTest::TestIsValid()
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestIsVisible()
+void mafVMETest::TestIsVisible()
 //----------------------------------------------------------------------------
 {
   // By default a node can be traversed by iterator, so it is called 'visible'
-  mafSmartPointer<mafNodeHelper> na;
+  mafSmartPointer<mafVMEHelper> na;
   result = na->IsVisible();
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestIsInTree()
+void mafVMETest::TestIsInTree()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeHelper> na;
+  mafSmartPointer<mafVMEHelper> na;
   na->SetName("root");
   result = !na->IsInTree(NULL);
   TEST_RESULT;
 
-  mafSmartPointer<mafNodeHelper> na1;
+  mafSmartPointer<mafVMEHelper> na1;
   na1->SetName("node na1");
-  mafSmartPointer<mafNodeHelper> na2;
+  mafSmartPointer<mafVMEHelper> na2;
   na2->SetName("node na2");
 
   na2->ReparentTo(na1);
@@ -668,12 +665,12 @@ void mafNodeTest::TestIsInTree()
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestIsAChild()
+void mafVMETest::TestIsAChild()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeHelper> na;
+  mafSmartPointer<mafVMEHelper> na;
   na->SetName("root");
-  mafSmartPointer<mafNodeHelper> na2;
+  mafSmartPointer<mafVMEHelper> na2;
   na2->SetName("node na2");
 
   result = !na->IsAChild(na2);
@@ -684,12 +681,12 @@ void mafNodeTest::TestIsAChild()
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestGetNumberOfChildren()
+void mafVMETest::TestGetNumberOfChildren()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeHelper> na;
+  mafSmartPointer<mafVMEHelper> na;
   na->SetName("root");
-  mafSmartPointer<mafNodeHelper> na2;
+  mafSmartPointer<mafVMEHelper> na2;
   na2->SetName("node na2");
   
   result = na->GetNumberOfChildren() == 0;
@@ -705,12 +702,12 @@ void mafNodeTest::TestGetNumberOfChildren()
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestIsEmpty()
+void mafVMETest::TestIsEmpty()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeHelper> na;
+  mafSmartPointer<mafVMEHelper> na;
   na->SetName("root");
-  mafSmartPointer<mafNodeHelper> na2;
+  mafSmartPointer<mafVMEHelper> na2;
   na2->SetName("node na2");
 
   result = na->IsEmpty();
@@ -721,14 +718,14 @@ void mafNodeTest::TestIsEmpty()
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestRemoveChild()
+void mafVMETest::TestRemoveChild()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeHelper> na;
+  mafSmartPointer<mafVMEHelper> na;
   na->SetName("root");
-  mafSmartPointer<mafNodeHelper> na2;
+  mafSmartPointer<mafVMEHelper> na2;
   na2->SetName("node na2");
-  mafSmartPointer<mafNodeHelper> na3;
+  mafSmartPointer<mafVMEHelper> na3;
   na3->SetName("node na3");
 
   na->AddChild(na2);
@@ -744,11 +741,11 @@ void mafNodeTest::TestRemoveChild()
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestRemoveAllChildren()
+void mafVMETest::TestRemoveAllChildren()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeHelper> na;
-  mafSmartPointer<mafNodeHelper> na2;
+  mafSmartPointer<mafVMEHelper> na;
+  mafSmartPointer<mafVMEHelper> na2;
 
   na2->ReparentTo(na);
   na->RemoveAllChildren();
@@ -756,11 +753,11 @@ void mafNodeTest::TestRemoveAllChildren()
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestCleanTree()
+void mafVMETest::TestCleanTree()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeHelper> na;
-  mafSmartPointer<mafNodeHelper> na2;
+  mafSmartPointer<mafVMEHelper> na;
+  mafSmartPointer<mafVMEHelper> na2;
 
   na2->ReparentTo(na);
   na->CleanTree();
@@ -768,11 +765,11 @@ void mafNodeTest::TestCleanTree()
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestNewIterator()
+void mafVMETest::TestNewIterator()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeHelper> na;
-  mafNodeIterator *iter = NULL;
+  mafSmartPointer<mafVMEHelper> na;
+  mafVMEIterator *iter = NULL;
   iter = na->NewIterator();
   result = na->GetReferenceCount() == 2; // Iterator increase the reference count of the node!!
   TEST_RESULT;
@@ -785,23 +782,23 @@ void mafNodeTest::TestNewIterator()
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestCanReparentTo()
+void mafVMETest::TestCanReparentTo()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeHelper> na;
+  mafSmartPointer<mafVMEHelper> na;
   result = na->CanReparentTo(NULL);
   TEST_RESULT;
 
-  mafSmartPointer<mafNodeHelper> na2;
+  mafSmartPointer<mafVMEHelper> na2;
   result = na2->CanReparentTo(na);
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestGetChildren()
+void mafVMETest::TestGetChildren()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeHelper> na;
-  mafSmartPointer<mafNodeHelper> na2;
+  mafSmartPointer<mafVMEHelper> na;
+  mafSmartPointer<mafVMEHelper> na2;
 
   result = na->GetChildren()->size() == 0;
   TEST_RESULT;
@@ -811,11 +808,11 @@ void mafNodeTest::TestGetChildren()
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestAddChild()
+void mafVMETest::TestAddChild()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeHelper> na;
-  mafSmartPointer<mafNodeHelper> na2;
+  mafSmartPointer<mafVMEHelper> na;
+  mafSmartPointer<mafVMEHelper> na2;
 
   na->AddChild(na2);
   result = na->GetChildren()->size() == 1;
@@ -828,17 +825,17 @@ void mafNodeTest::TestAddChild()
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestCompareTree()
+void mafVMETest::TestCompareTree()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeBHelper> na;
+  mafSmartPointer<mafVMEBHelper> na;
   na->SetName("NodeB");
-  mafSmartPointer<mafNodeHelper> na2;
+  mafSmartPointer<mafVMEHelper> na2;
   na2->SetName("NodeB_Child");
 
-  mafSmartPointer<mafNodeBHelper> na3;
+  mafSmartPointer<mafVMEBHelper> na3;
   na3->SetName("NodeB");
-  mafSmartPointer<mafNodeHelper> na4;
+  mafSmartPointer<mafVMEHelper> na4;
   na4->SetName("NodeB_Child");
 
   na->AddChild(na2);
@@ -848,27 +845,27 @@ void mafNodeTest::TestCompareTree()
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestCopyTree()
+void mafVMETest::TestCopyTree()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeHelper> na;
-  mafSmartPointer<mafNodeHelper> na2;
+  mafSmartPointer<mafVMEHelper> na;
+  mafSmartPointer<mafVMEHelper> na2;
   na->AddChild(na2);
 
-  mafNodeHelper *na3 = (mafNodeHelper *)na->CopyTree();
+  mafVMEHelper *na3 = (mafVMEHelper *)na->CopyTree();
   result = na->CompareTree(na3);
   TEST_RESULT;
   mafDEL(na3);
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestImport()
+void mafVMETest::TestImport()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeHelper> na;
-  mafSmartPointer<mafNodeHelper> na2;
+  mafSmartPointer<mafVMEHelper> na;
+  mafSmartPointer<mafVMEHelper> na2;
   na->AddChild(na2);
 
-  mafSmartPointer<mafNodeHelper> na3;
+  mafSmartPointer<mafVMEHelper> na3;
   na3->Import(na);
 
   result = na3->GetChild(0)->Equals(na2);
@@ -878,16 +875,16 @@ void mafNodeTest::TestImport()
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
-void mafNodeTest::TestBuildAndDestroyATree()
+void mafVMETest::TestBuildAndDestroyATree()
 //----------------------------------------------------------------------------
 {
-  mafNodeHelper *na = NULL;
+  mafVMEHelper *na = NULL;
   mafNEW(na);
 
   result = na->GetReferenceCount() == 1;
   TEST_RESULT;
 
-  mafNodeHelper *na2 = NULL;
+  mafVMEHelper *na2 = NULL;
   mafNEW(na2);
 
   result = na2->GetReferenceCount() == 1;
@@ -907,18 +904,18 @@ void mafNodeTest::TestBuildAndDestroyATree()
 }
 
 //----------------------------------------------------------------------------
-void mafNodeTest::TestGetByPath()
+void mafVMETest::TestGetByPath()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafNodeHelper> root ;
-  mafSmartPointer<mafNodeHelper> sideA ;
-  mafSmartPointer<mafNodeHelper> sideB ;
-  mafSmartPointer<mafNodeHelper> a1 ;
-  mafSmartPointer<mafNodeHelper> a2 ;
-  mafSmartPointer<mafNodeHelper> a3 ;
-  mafSmartPointer<mafNodeHelper> b1 ;
-  mafSmartPointer<mafNodeHelper> b2 ;
-  mafSmartPointer<mafNodeHelper> b3 ;
+  mafSmartPointer<mafVMEHelper> root ;
+  mafSmartPointer<mafVMEHelper> sideA ;
+  mafSmartPointer<mafVMEHelper> sideB ;
+  mafSmartPointer<mafVMEHelper> a1 ;
+  mafSmartPointer<mafVMEHelper> a2 ;
+  mafSmartPointer<mafVMEHelper> a3 ;
+  mafSmartPointer<mafVMEHelper> b1 ;
+  mafSmartPointer<mafVMEHelper> b2 ;
+  mafSmartPointer<mafVMEHelper> b3 ;
 
 
   //setting names
@@ -961,7 +958,7 @@ void mafNodeTest::TestGetByPath()
   TEST_RESULT;
   result= (sideB->GetByPath("next") == NULL);
   TEST_RESULT;
-  result= ((mafNodeHelper *)sideA->GetByPath("next") == (mafNodeHelper *)(sideB));
+  result= ((mafVMEHelper *)sideA->GetByPath("next") == (mafVMEHelper *)(sideB));
   TEST_RESULT;
 
   //Testing Prev
@@ -969,106 +966,106 @@ void mafNodeTest::TestGetByPath()
   TEST_RESULT;
   result= (sideA->GetByPath("prev") == NULL);
   TEST_RESULT;
-  result= ((mafNodeHelper *)sideB->GetByPath("prev") == (mafNodeHelper *)(sideA));
+  result= ((mafVMEHelper *)sideB->GetByPath("prev") == (mafVMEHelper *)(sideA));
   TEST_RESULT;
 
   //Testing FirstPair
   result= (root->GetByPath("firstPair") == NULL);
   TEST_RESULT;
-  result= ((mafNodeHelper *)a2->GetByPath("firstPair") == (mafNodeHelper *)(a1));
+  result= ((mafVMEHelper *)a2->GetByPath("firstPair") == (mafVMEHelper *)(a1));
   TEST_RESULT;
 
   //Testing LastChild
   result= (root->GetByPath("lastPair") == NULL);
   TEST_RESULT;
-  result= ((mafNodeHelper *)a2->GetByPath("lastPair") == (mafNodeHelper *)(a3));
+  result= ((mafVMEHelper *)a2->GetByPath("lastPair") == (mafVMEHelper *)(a3));
   TEST_RESULT;
 
 
   //Testing FirstChild
   result= (a1->GetByPath("firstChild") == NULL);
   TEST_RESULT;
-  result= ((mafNodeHelper *)sideA->GetByPath("firstChild") == (mafNodeHelper *)(a1));
+  result= ((mafVMEHelper *)sideA->GetByPath("firstChild") == (mafVMEHelper *)(a1));
   TEST_RESULT;
 
   //Testing LastChild
   result= (a1->GetByPath("lastChild") == NULL);
   TEST_RESULT;
-  result= ((mafNodeHelper *)sideA->GetByPath("lastChild") == (mafNodeHelper *)(a3));
+  result= ((mafVMEHelper *)sideA->GetByPath("lastChild") == (mafVMEHelper *)(a3));
   TEST_RESULT;
 
   //Testing Pair[]
-  result= ((mafNodeHelper *)root->GetByPath("pair[2]") == NULL);
+  result= ((mafVMEHelper *)root->GetByPath("pair[2]") == NULL);
   TEST_RESULT;
-  result= ((mafNodeHelper *)a1->GetByPath("pair[2") == NULL);
+  result= ((mafVMEHelper *)a1->GetByPath("pair[2") == NULL);
   TEST_RESULT;
-  result= ((mafNodeHelper *)a1->GetByPath("pair[two]") == NULL);
+  result= ((mafVMEHelper *)a1->GetByPath("pair[two]") == NULL);
   TEST_RESULT;
-  result= ((mafNodeHelper *)a1->GetByPath("pair[3]") == NULL);
+  result= ((mafVMEHelper *)a1->GetByPath("pair[3]") == NULL);
   TEST_RESULT;
-  result= ((mafNodeHelper *)a1->GetByPath("pair[2]") == (mafNodeHelper *)(a3));
+  result= ((mafVMEHelper *)a1->GetByPath("pair[2]") == (mafVMEHelper *)(a3));
   TEST_RESULT;
 
   //Testing Pair{}
-  result= ((mafNodeHelper *)root->GetByPath("pair{a2}") == NULL);
+  result= ((mafVMEHelper *)root->GetByPath("pair{a2}") == NULL);
   TEST_RESULT;
-  result= ((mafNodeHelper *)a1->GetByPath("pair{a2") == NULL);
+  result= ((mafVMEHelper *)a1->GetByPath("pair{a2") == NULL);
   TEST_RESULT;
-  result= ((mafNodeHelper *)a1->GetByPath("pair{a4}") == NULL);
+  result= ((mafVMEHelper *)a1->GetByPath("pair{a4}") == NULL);
   TEST_RESULT;
-  result= ((mafNodeHelper *)a1->GetByPath("pair{a2}") == (mafNodeHelper *)(a2));
+  result= ((mafVMEHelper *)a1->GetByPath("pair{a2}") == (mafVMEHelper *)(a2));
   TEST_RESULT;
 
 
   //Testing Child[]
-  result= ((mafNodeHelper *)sideA->GetByPath("child[2") == NULL);
+  result= ((mafVMEHelper *)sideA->GetByPath("child[2") == NULL);
   TEST_RESULT;
-  result= ((mafNodeHelper *)sideA->GetByPath("child[two]") == NULL);
+  result= ((mafVMEHelper *)sideA->GetByPath("child[two]") == NULL);
   TEST_RESULT;
-  result= ((mafNodeHelper *)sideA->GetByPath("child[3]") == NULL);
+  result= ((mafVMEHelper *)sideA->GetByPath("child[3]") == NULL);
   TEST_RESULT;
-  result= ((mafNodeHelper *)sideA->GetByPath("child[2]") == (mafNodeHelper *)(a3));
+  result= ((mafVMEHelper *)sideA->GetByPath("child[2]") == (mafVMEHelper *)(a3));
   TEST_RESULT;
 
   //Testing Child{}
-  result= ((mafNodeHelper *)sideA->GetByPath("child{a2") == NULL);
+  result= ((mafVMEHelper *)sideA->GetByPath("child{a2") == NULL);
   TEST_RESULT;
-  result= ((mafNodeHelper *)sideA->GetByPath("child{a4}") == NULL);
+  result= ((mafVMEHelper *)sideA->GetByPath("child{a4}") == NULL);
   TEST_RESULT;
-  result= ((mafNodeHelper *)sideA->GetByPath("child{a2}") == (mafNodeHelper *)(a2));
+  result= ((mafVMEHelper *)sideA->GetByPath("child{a2}") == (mafVMEHelper *)(a2));
   TEST_RESULT;
 
 
   //Testing ".."
-  result= ((mafNodeHelper *)root->GetByPath("..") == NULL);
+  result= ((mafVMEHelper *)root->GetByPath("..") == NULL);
   TEST_RESULT;
-  result= ((mafNodeHelper *)a1->GetByPath("..") == (mafNodeHelper *)(sideA));
+  result= ((mafVMEHelper *)a1->GetByPath("..") == (mafVMEHelper *)(sideA));
   TEST_RESULT;
 
   //Testing "."
-  result= ((mafNodeHelper *)a1->GetByPath(".") == (mafNodeHelper *)(a1));
+  result= ((mafVMEHelper *)a1->GetByPath(".") == (mafVMEHelper *)(a1));
   TEST_RESULT;
 
   //Testing complex paths
 
   //a1->b3 (b2 is not visible)
-  result= ((mafNodeHelper *)a1->GetByPath("../../child{sideB}/child[1]") == (mafNodeHelper *)(b3));
+  result= ((mafVMEHelper *)a1->GetByPath("../../child{sideB}/child[1]") == (mafVMEHelper *)(b3));
   TEST_RESULT;
 
   //a1->b2 (b2 is not visible)
-  result= ((mafNodeHelper *)a1->GetByPath("../../child{sideB}/child[1]",false) == (mafNodeHelper *)(b2));
+  result= ((mafVMEHelper *)a1->GetByPath("../../child{sideB}/child[1]",false) == (mafVMEHelper *)(b2));
   TEST_RESULT;
 
 
   //sideB->a2
-  result= ((mafNodeHelper *)sideB->GetByPath("prev/child{a2}") == (mafNodeHelper *)(a2));
+  result= ((mafVMEHelper *)sideB->GetByPath("prev/child{a2}") == (mafVMEHelper *)(a2));
   TEST_RESULT;
 
   //sideA->b1
-  result= ((mafNodeHelper *)sideA->GetByPath("lastPair/firstChild") == (mafNodeHelper *)(b1));
+  result= ((mafVMEHelper *)sideA->GetByPath("lastPair/firstChild") == (mafVMEHelper *)(b1));
   TEST_RESULT;
   
   //wrong
-  result= ((mafNodeHelper *)sideA->GetByPath("../../lastChild") == NULL);
+  result= ((mafVMEHelper *)sideA->GetByPath("../../lastChild") == NULL);
   TEST_RESULT;
 }

@@ -23,7 +23,6 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mafNode;
 class mafPipe;
 class mafSceneGraph;
 class mafVME;
@@ -87,16 +86,16 @@ public:
   virtual mafView*  Copy(mafObserver *Listener, bool lightCopyEnabled = false) {m_LightCopyEnabled = lightCopyEnabled; return NULL;};
   virtual void      Create() {};
 
-  virtual void			VmeAdd(mafNode *vme)															{};
-  virtual void			VmeRemove(mafNode *vme)														{};
-  virtual void			VmeSelect(mafNode *vme, bool select)							{};
-  virtual void			VmeShow(mafNode *vme, bool show)									{};
-	virtual void      VmeUpdateProperty(mafNode *vme, bool fromTag = false)		{};
+  virtual void			VmeAdd(mafVME *vme)															{};
+  virtual void			VmeRemove(mafVME *vme)														{};
+  virtual void			VmeSelect(mafVME *vme, bool select)							{};
+  virtual void			VmeShow(mafVME *vme, bool show)									{};
+	virtual void      VmeUpdateProperty(mafVME *vme, bool fromTag = false)		{};
 
-  virtual void	    VmeCreatePipe(mafNode *vme)										    {};
-  virtual void	    VmeDeletePipe(mafNode *vme)										    {};
+  virtual void	    VmeCreatePipe(mafVME *vme)										    {};
+  virtual void	    VmeDeletePipe(mafVME *vme)										    {};
 
-  virtual void			CameraReset(mafNode *node = NULL)  											{};
+  virtual void			CameraReset(mafVME *node = NULL)  											{};
   virtual void			CameraUpdate()																					{};
   virtual void      SetMouse(mafDeviceButtonsPadMouse *mouse)                               {};
   virtual mafRWIBase *GetRWI()                                              {return NULL;};
@@ -114,10 +113,10 @@ public:
 
   /** return the status of the node within this view. es: NON_VISIBLE,VISIBLE_ON, ... */
   //having mafView::GetNodeStatus allow mafGUICheckTree to not know about mafSceneGraph
-  virtual int GetNodeStatus(mafNode *vme) {return NODE_NON_VISIBLE;};
+  virtual int GetNodeStatus(mafVME *vme) {return NODE_NON_VISIBLE;};
   
   /** return the current pipe for the specified vme (if any exist at this moment) */
-  virtual mafPipe* GetNodePipe(mafNode *vme) {return NULL;};
+  virtual mafPipe* GetNodePipe(mafVME *vme) {return NULL;};
 
   wxString  GetLabel() {return m_Label;};
   wxString  GetName()  {return m_Name;};

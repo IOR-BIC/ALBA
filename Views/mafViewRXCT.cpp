@@ -29,7 +29,7 @@
 #include "mafViewSlice.h"
 #include "mafPipeVolumeSlice_BES.h"
 #include "mafPipeSurfaceSlice.h"
-#include "mafNodeIterator.h"
+#include "mafVMEIterator.h"
 #include "mafGUILutPreset.h"
 #include "mafGUI.h"
 #include "mafGUILutSwatch.h"
@@ -138,22 +138,21 @@ mafView *mafViewRXCT::Copy(mafObserver *Listener, bool lightCopyEnabled)
   return v;
 }
 //----------------------------------------------------------------------------
-void mafViewRXCT::VmeShow(mafNode *node, bool show)
+void mafViewRXCT::VmeShow(mafVME *vme, bool show)
 //----------------------------------------------------------------------------
 {
   for(int i=0; i<CT_COMPOUND_VIEW; i++)
-    m_ChildViewList[i]->VmeShow(node, show);
+    m_ChildViewList[i]->VmeShow(vme, show);
 
   //if (node->IsMAFType(mafVMEVolume))
-  if (((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume"))
+  if (vme->GetOutput()->IsA("mafVMEOutputVolume"))
   {
     if (show)
     {
       double center[3],b[CT_CHILD_VIEWS_NUMBER],step;
     
       // set the range for every slider widget
-      mafVME *volumeVme = mafVME::SafeDownCast(node);
-      mafVMEOutputVolume *volumeOutput = mafVMEOutputVolume::SafeDownCast(volumeVme->GetOutput());
+      mafVMEOutputVolume *volumeOutput = mafVMEOutputVolume::SafeDownCast(vme->GetOutput());
       for (int childID = RX_FRONT_VIEW; childID < CT_COMPOUND_VIEW; childID++)
       {
         double advLow,advHigh;
@@ -178,9 +177,6 @@ void mafViewRXCT::VmeShow(mafNode *node, bool show)
             volTableRange[0] = volumeOutput->GetMaterial()->m_TableRange[0];
             volTableRange[1] = volumeOutput->GetMaterial()->m_TableRange[1];
           }
-          
-
-          
 
           double proportionalConstant = ((range[1] - range[0])/(volRange[1] - volRange[0]));
           double inverseProportionalConstant = 1.0 / proportionalConstant;
@@ -201,32 +197,14 @@ void mafViewRXCT::VmeShow(mafNode *node, bool show)
 
         m_LutSliders[childID]->SetRange(range[0],range[1]);
         m_LutSliders[childID]->SetSubRange(advLow,advHigh);
-      
-        // create a lookup table for each RX view
-        /*vtkNEW(m_vtkLUT[childID]);
-        if(volumeOutput->GetMaterial()->m_ColorLut)
-        {
-          m_vtkLUT[childID]->DeepCopy(volumeOutput->GetMaterial()->m_ColorLut);
-          m_vtkLUT[childID]->SetRange(advLow,advHigh);
-          m_vtkLUT[childID]->Build();
-        }
-        else
-        {
-          m_vtkLUT[childID]->SetRange(advLow,advHigh);
-          m_vtkLUT[childID]->Build();
-          lutPreset(4,m_vtkLUT[childID]);
-        }*/
-        
-        
-       
-        ((mafViewRX *)m_ChildViewList[childID])->SetLutRange(advLow,advHigh);
 
+				((mafViewRX *)m_ChildViewList[childID])->SetLutRange(advLow,advHigh);
       }
 
       double sr[CT_COMPOUND_VIEW];
 
       // get the VTK volume
-      vtkDataSet *data = ((mafVME *)node)->GetOutput()->GetVTKData();
+      vtkDataSet *data = vme->GetOutput()->GetVTKData();
       data->Update();
       data->GetCenter(center);
       data->GetScalarRange(sr);
@@ -234,15 +212,12 @@ void mafViewRXCT::VmeShow(mafNode *node, bool show)
       totalSR[0] = sr[0];
       totalSR[1] = sr[1];
 
-      if(volumeVme)
-      { 
-        if(volumeOutput->GetMaterial())
+      if(volumeOutput->GetMaterial())
+      {
+        if (volumeOutput->GetMaterial()->m_TableRange[1] > volumeOutput->GetMaterial()->m_TableRange[0]) 
         {
-          if (volumeOutput->GetMaterial()->m_TableRange[1] > volumeOutput->GetMaterial()->m_TableRange[0]) 
-          {
-            sr[0] = volumeOutput->GetMaterial()->m_TableRange[0];
-            sr[1] = volumeOutput->GetMaterial()->m_TableRange[1];
-          }
+          sr[0] = volumeOutput->GetMaterial()->m_TableRange[0];
+          sr[1] = volumeOutput->GetMaterial()->m_TableRange[1];
         }
       }
       
@@ -272,11 +247,11 @@ void mafViewRXCT::VmeShow(mafNode *node, bool show)
         center[2] = b[5]-step*(i+1);
         ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->InitializeSlice(center);
         ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->SetTextColor(m_BorderColor[i]);
-        ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->VmeShow(node,show);
+        ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->VmeShow(vme,show);
 
         mafPipeVolumeSlice_BES *p = NULL;
         // set pipe lookup table
-        p = mafPipeVolumeSlice_BES::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->GetNodePipe(node));
+        p = mafPipeVolumeSlice_BES::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->GetNodePipe(vme));
 
         p->SetEnableGPU(m_EnableGPU);
         p->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
@@ -285,21 +260,22 @@ void mafViewRXCT::VmeShow(mafNode *node, bool show)
         p->SetColorLookupTable(m_Lut);
         m_Pos[i] = b[5]-step*(i+1);
       }
-      m_CurrentVolume = mafVME::SafeDownCast(node);
+      m_CurrentVolume = vme;
       GizmoCreate();
 
       //BEGIN cycle for remove old surface and redraw the right slice
       
-      mafNodeIterator *iter = node->GetRoot()->NewIterator();
-      for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+      mafVMEIterator *iter = vme->GetRoot()->NewIterator();
+      for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
       {
-        if(node->IsA("mafVMESurface"))
+				mafVMESurface *surface = mafVMESurface::SafeDownCast(vme);
+        if(surface)
         {
           mafPipe *p=(m_ChildViewList[RX_FRONT_VIEW])->GetNodePipe(node);
           if(p)
           {
-            this->VmeShow(node,false);
-            this->VmeShow(node,true);
+            this->VmeShow(surface,false);
+            this->VmeShow(surface,true);
           }
         } 
       }
@@ -308,20 +284,20 @@ void mafViewRXCT::VmeShow(mafNode *node, bool show)
     }
     else
     {
-      m_ChildViewList[CT_COMPOUND_VIEW]->VmeShow(node, show);
+      m_ChildViewList[CT_COMPOUND_VIEW]->VmeShow(vme, show);
       m_CurrentVolume = NULL;
       GizmoDelete();
     }
 
   }
-  else if (node->IsMAFType(mafVMESurface)||node->IsMAFType(mafVMESurfaceParametric))
+  else if (vme->IsMAFType(mafVMESurface)||vme->IsMAFType(mafVMESurfaceParametric))
   {
     // showing a surface with the volume present already
     if (show && m_CurrentVolume)
     {
       // create the slice in every CT views
-      mafNode *node_selected = this->GetSceneGraph()->GetSelectedVme();
-      ((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->VmeShow(node,show);
+      mafVME *vmeSelected = this->GetSceneGraph()->GetSelectedVme();
+      ((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->VmeShow(vme,show);
       for(int j=0;j<CT_CHILD_VIEWS_NUMBER;j++)
       {
         int i=0;
@@ -330,9 +306,9 @@ void mafViewRXCT::VmeShow(mafNode *node, bool show)
         ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->SetSliceLocalOrigin(pos);
         ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->CameraUpdate();
       }
-      mafPipe *p=((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(0))->GetNodePipe(node);
+      mafPipe *p=((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(0))->GetNodePipe(vme);
   
-      if (node_selected==node)
+      if (vmeSelected==vme)
       {
         m_Gui->Enable(ID_ALL_SURFACE,true);
         m_Gui->Enable(ID_BORDER_CHANGE,true);
@@ -351,9 +327,9 @@ void mafViewRXCT::VmeShow(mafNode *node, bool show)
     else if (!show)
     {
       // hide the surface
-      m_ChildViewList[CT_COMPOUND_VIEW]->VmeShow(node, show);
-      mafNode *node_selected = this->GetSceneGraph()->GetSelectedVme();
-      if (node_selected==node)
+      m_ChildViewList[CT_COMPOUND_VIEW]->VmeShow(vme, show);
+      mafVME *vmeSelected= this->GetSceneGraph()->GetSelectedVme();
+      if (vmeSelected ==vme)
       {
         m_Gui->Enable(ID_ALL_SURFACE,false);
         m_Gui->Enable(ID_BORDER_CHANGE,false);
@@ -361,27 +337,27 @@ void mafViewRXCT::VmeShow(mafNode *node, bool show)
       }
       for(int i=0; i<CT_CHILD_VIEWS_NUMBER; i++)
       {
-        ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->UpdateSurfacesList(node);
+        ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->UpdateSurfacesList(vme);
       }
     }//else if(show)
   }
   else
   {
-    m_ChildViewList[CT_COMPOUND_VIEW]->VmeShow(node, show);
+    m_ChildViewList[CT_COMPOUND_VIEW]->VmeShow(vme, show);
   }
 
   EnableWidgets(m_CurrentVolume != NULL);
 }
 //----------------------------------------------------------------------------
-void mafViewRXCT::VmeRemove(mafNode *node)
+void mafViewRXCT::VmeRemove(mafVME *vme)
 //----------------------------------------------------------------------------
 {
-  if (m_CurrentVolume && node == m_CurrentVolume) 
+  if (m_CurrentVolume && vme == m_CurrentVolume) 
   {
     m_CurrentVolume = NULL;
     GizmoDelete();
   }
-  Superclass::VmeRemove(node);
+  Superclass::VmeRemove(vme);
 }
 //----------------------------------------------------------------------------
 void mafViewRXCT::OnEventRangeModified(mafEventBase *maf_event)
@@ -445,9 +421,9 @@ void mafViewRXCT::OnEventSnapModality()
 void mafViewRXCT::OnEventSortSlices()
 //----------------------------------------------------------------------------
 {
-  mafNode* node=GetSceneGraph()->GetSelectedVme();
+  mafVME* node=GetSceneGraph()->GetSelectedVme();
   mafPipe *p=((mafViewRX *)m_ChildViewList[0])->GetNodePipe(node);
-  if(((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume"))
+  if(node->GetOutput()->IsA("mafVMEOutputVolume"))
     mafLogMessage("SURFACE NOT SELECTED");
   else  if (node->IsMAFType(mafVMESurface))
   {
@@ -512,14 +488,13 @@ void mafViewRXCT::OnEventSetThickness()
 {
   if(m_AllSurface)
   {
-    mafNode* node=this->GetSceneGraph()->GetSelectedVme();
-    mafVME* vme=(mafVME*)node;
-    mafNode* root=vme->GetRoot();
+    mafVME *vme=this->GetSceneGraph()->GetSelectedVme();
+		mafVME *root=vme->GetRoot();
     SetThicknessForAllSurfaceSlices(root);
   }
   else
   {
-    mafNode *node=this->GetSceneGraph()->GetSelectedVme();
+    mafVME *node=this->GetSceneGraph()->GetSelectedVme();
     mafSceneNode *SN = this->GetSceneGraph()->Vme2Node(node);
     mafPipe *p=((mafViewSlice *)((mafViewCompound *)m_ChildViewList[2])->GetSubView(0))->GetNodePipe(node);
     ((mafPipeSurfaceSlice *)p)->SetThickness(m_Border);
@@ -718,9 +693,8 @@ void mafViewRXCT::OnEvent(mafEventBase *maf_event)
       {
         if(m_AllSurface)
         {
-          mafNode* node=GetSceneGraph()->GetSelectedVme();
-          mafVME* vme=(mafVME*)node;
-          mafNode* root=vme->GetRoot();
+          mafVME *vme=GetSceneGraph()->GetSelectedVme();
+          mafVME* root=vme->GetRoot();
           SetThicknessForAllSurfaceSlices(root);
         }
       }
@@ -767,7 +741,7 @@ mafGUI* mafViewRXCT::CreateGui()
   m_Gui->Bool(ID_ALL_SURFACE,"All Surface",&m_AllSurface);
   m_Gui->FloatSlider(ID_BORDER_CHANGE,"Border",&m_Border,1.0,5.0);
 
-  mafNode* node=this->GetSceneGraph()->GetSelectedVme();
+  mafVME* node=this->GetSceneGraph()->GetSelectedVme();
   if (node->IsA("mafVMESurface")||node->IsA("mafVMESurfaceParametric")||node->IsA("mafVMESlicer"))
   {
     m_Gui->Enable(ID_ALL_SURFACE,true);
@@ -1003,11 +977,11 @@ void mafViewRXCT::SortSlices()
 }
 
 //----------------------------------------------------------------------------
-void mafViewRXCT::SetThicknessForAllSurfaceSlices(mafNode *root)
+void mafViewRXCT::SetThicknessForAllSurfaceSlices(mafVME *root)
 //----------------------------------------------------------------------------
 {
-  mafNodeIterator *iter = root->NewIterator();
-  for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+  mafVMEIterator *iter = root->NewIterator();
+  for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
   {
     if(node->IsA("mafVMESurface"))
     {
@@ -1019,16 +993,16 @@ void mafViewRXCT::SetThicknessForAllSurfaceSlices(mafNode *root)
   iter->Delete();
 }
 //----------------------------------------------------------------------------
-void mafViewRXCT::VmeSelect(mafNode *node, bool select)
+void mafViewRXCT::VmeSelect(mafVME *vme, bool select)
 //----------------------------------------------------------------------------
 {
 	for(int i=0; i<m_NumOfChildView; i++)
-		m_ChildViewList[i]->VmeSelect(node, select);
+		m_ChildViewList[i]->VmeSelect(vme, select);
 
 	if(m_Gui)
 	{
-		mafPipe *p=((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(0))->GetNodePipe(node);
-		if((node->IsA("mafVMESurface")||node->IsA("mafVMESurfaceParametric")||node->IsA("mafVMESlicer"))&&select&&p)
+		mafPipe *p=((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(0))->GetNodePipe(vme);
+		if((vme->IsA("mafVMESurface")||vme->IsA("mafVMESurfaceParametric")||vme->IsA("mafVMESlicer"))&&select&&p)
 		{
 			m_Gui->Enable(ID_ALL_SURFACE,true);
 			m_Gui->Enable(ID_BORDER_CHANGE,true);
@@ -1061,13 +1035,13 @@ void mafViewRXCT::BoundsValidate(double *pos)
 	}
 }
 //----------------------------------------------------------------------------
-void mafViewRXCT::ResetSlicesPosition( mafNode *node )
+void mafViewRXCT::ResetSlicesPosition(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   // workaround... :(
   // maybe we need some mechanism to execute view code from op?
-  this->VmeShow(node, false);
-  this->VmeShow(node, true);
+  this->VmeShow(vme, false);
+  this->VmeShow(vme, true);
   CameraUpdate();
 }
 //----------------------------------------------------------------------------

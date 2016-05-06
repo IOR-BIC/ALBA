@@ -96,7 +96,7 @@ mafOp *mafOpVolumeUnion::Copy()
 	return new mafOpVolumeUnion(m_Label);
 }
 //----------------------------------------------------------------------------
-bool mafOpVolumeUnion::Accept(mafNode* node)
+bool mafOpVolumeUnion::Accept(mafVME* node)
 //----------------------------------------------------------------------------
 {
 	mafEvent e(this,VIEW_SELECTED);
@@ -398,11 +398,11 @@ void mafOpVolumeUnion::OpDo()
 
 		if(m_FirstVMEVolume->GetOutput()->GetVTKData()->IsA("vtkRectilinearGrid"))
 		{
-		  ((mafVMEVolume*)m_Input)->SetData(m_VolUnionRG,((mafVME*)m_Input)->GetTimeStamp());
+		  ((mafVMEVolume*)m_Input)->SetData(m_VolUnionRG,m_Input->GetTimeStamp());
 		}
 		else
 		{
-          ((mafVMEVolume*)m_Input)->SetData(m_VolUnionRGstr,((mafVME*)m_Input)->GetTimeStamp());
+          ((mafVMEVolume*)m_Input)->SetData(m_VolUnionRGstr,m_Input->GetTimeStamp());
 		}
 	}
 
@@ -415,7 +415,7 @@ void mafOpVolumeUnion::OpUndo()
 //----------------------------------------------------------------------------
 {
 	if(m_FirstVMEVolume->GetOutput()->GetVTKData())
-		((mafVMEVolume*)m_Input)->SetData(m_FirstVMEVolume->GetOutput()->GetVTKData(),((mafVME*)m_Input)->GetTimeStamp());
+		((mafVMEVolume*)m_Input)->SetData(m_FirstVMEVolume->GetOutput()->GetVTKData(),m_Input->GetTimeStamp());
 
 	((mafVMEVolume*)m_Input)->GetOutput()->Update();
 	((mafVMEVolume*)m_Input)->Update();

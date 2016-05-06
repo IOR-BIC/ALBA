@@ -106,7 +106,7 @@ public:
   ~mafOpMML3(); ///< destructor
 
   mafOp* Copy();
-  bool Accept(mafNode* vme);
+  bool Accept(mafVME* vme);
   void OpRun();
   void OpStop(int result);
   void OpDo();
@@ -114,17 +114,15 @@ public:
 
 
   /// static callback which allows vme selector to select only this type
-  static bool AcceptVMELandmark(mafNode *node)
+  static bool AcceptVMELandmark(mafVME *node)
   {
-    mafVME* vme = mafVME::SafeDownCast(node);
-    return ((vme != NULL) && vme->IsA("mafVMELandmark")) ;
+    return ((node != NULL) && node->IsA("mafVMELandmark")) ;
   }
 
   /// static callback which allows vme selector to select only this type
-  static bool AcceptVMESurface(mafNode *node)
+  static bool AcceptVMESurface(mafVME *node)
   {
-    mafVME* vme = mafVME::SafeDownCast(node);
-    return ((vme != NULL) && vme->IsA("mafVMESurface")) ;
+    return ((node != NULL) && node->IsA("mafVMESurface")) ;
   }
 
   /// static constant: number of non-uniform sections

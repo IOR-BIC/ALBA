@@ -59,7 +59,7 @@ const bool DEBUG_MODE = true;
 const double defaultLineLength = 50;
  
 
-mafGizmoInteractionDebugger::mafGizmoInteractionDebugger(mafNode* imputVme, mafObserver *listener, const char* name, bool testMode) 
+mafGizmoInteractionDebugger::mafGizmoInteractionDebugger(mafVME* imputVme, mafObserver *listener, const char* name, bool testMode) 
 {
   Constructor(imputVme, listener, name, testMode);
 }
@@ -85,7 +85,7 @@ void mafGizmoInteractionDebugger::CreateInteractor()
   m_VmeGizmo->SetBehavior(m_GizmoInteractor);
 }
 
-void mafGizmoInteractionDebugger::Constructor(mafNode *imputVme, mafObserver *listener, const char* name, bool testMode)
+void mafGizmoInteractionDebugger::Constructor(mafVME *imputVme, mafObserver *listener, const char* name, bool testMode)
 {
   m_CurvilinearAbscissaHelper = NULL;
   m_VmeGizmo = NULL;
@@ -93,7 +93,7 @@ void mafGizmoInteractionDebugger::Constructor(mafNode *imputVme, mafObserver *li
   m_Name = name;
   m_Listener = listener;
 
-  m_InputVME = mafVME::SafeDownCast(imputVme);
+  m_InputVME = imputVme;
 
   CreateVMEGizmo();
 

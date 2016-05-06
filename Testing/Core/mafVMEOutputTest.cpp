@@ -64,7 +64,7 @@ void mafVMEOutputTest::TestSetVME()
   surface->SetName("surface");
   surface1->SetName("surface1");
   mafVMEOutput *vme_out = surface->GetOutput();
-  vme_out->SetVME((mafVME*)surface1);
+  vme_out->SetVME(surface1);
 
   mafVME *vme = vme_out->GetVME();
 
@@ -264,8 +264,8 @@ void mafVMEOutputTest::TestGetTimeBounds()
   int res = storage->Restore();
   CPPUNIT_ASSERT(res == MAF_OK);
 
-  mafNode *node = storage->GetRoot();
-  mafNode *rootNode = node->FindInTreeByName("root");
+  mafVME *node = storage->GetRoot();
+  mafVME *rootNode = node->FindInTreeByName("root");
 
   mafVMERoot *root = mafVMERoot::SafeDownCast(rootNode);
 
@@ -297,8 +297,8 @@ void mafVMEOutputTest::TestGetlocalTimeBounds()
   int res = storage->Restore();
   CPPUNIT_ASSERT(res == MAF_OK);
 
-  mafNode *node = storage->GetRoot();
-  mafNode *vectorNode = node->FindInTreeByName("test_vector_GRFtimevar");
+  mafVME *node = storage->GetRoot();
+  mafVME *vectorNode = node->FindInTreeByName("test_vector_GRFtimevar");
 
   mafVMEVector *vector = mafVMEVector::SafeDownCast(vectorNode);
 
@@ -329,8 +329,8 @@ void mafVMEOutputTest::TestGetBounds()
   int res = storage->Restore();
   CPPUNIT_ASSERT(res == MAF_OK);
 
-  mafNode *node = storage->GetRoot();
-  mafNode *rootNode = node->FindInTreeByName("root");
+  mafVME *node = storage->GetRoot();
+  mafVME *rootNode = node->FindInTreeByName("root");
 
   mafVMERoot *surface = mafVMERoot::SafeDownCast(rootNode);
 
@@ -365,8 +365,8 @@ void mafVMEOutputTest::TestGetVMEBounds()
   int res = storage->Restore();
   CPPUNIT_ASSERT(res == MAF_OK);
 
-  mafNode *node = storage->GetRoot();
-  mafNode *vectorNode = node->FindInTreeByName("test_vector_GRFtimevar");
+  mafVME *node = storage->GetRoot();
+  mafVME *vectorNode = node->FindInTreeByName("test_vector_GRFtimevar");
 
   mafVMEVector *vector = mafVMEVector::SafeDownCast(vectorNode);
 
@@ -401,8 +401,8 @@ void mafVMEOutputTest::TestGetVMELocalBounds()
   int res = storage->Restore();
   CPPUNIT_ASSERT(res == MAF_OK);
 
-  mafNode *node = storage->GetRoot();
-  mafNode *vectorNode = node->FindInTreeByName("test_vector_GRFtimevar");
+  mafVME *node = storage->GetRoot();
+  mafVME *vectorNode = node->FindInTreeByName("test_vector_GRFtimevar");
 
   mafVMEVector *vector = mafVMEVector::SafeDownCast(vectorNode);
 

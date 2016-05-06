@@ -25,7 +25,7 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mafNode;
+class mafVME;
 class mafVMELandmarkCloud;
 //class mafVMEPointSet;
 class mafVMEPolyline;
@@ -53,7 +53,7 @@ public:
   mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */
-  bool Accept(mafNode* node) {return true;};
+  bool Accept(mafVME* node) {return true;};
 
 	/** Builds operation's interface. */
   void OpRun();

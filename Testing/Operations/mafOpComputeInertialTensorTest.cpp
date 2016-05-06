@@ -215,7 +215,7 @@ void mafOpComputeInertialTensorTest::TestComputeInertialTensorFromGroupFromDefau
 
   CPPUNIT_ASSERT(60.806545388924100 == tagValue);
 
-  mafNode *child0 = NULL;
+  mafVME *child0 = NULL;
   child0 = group->GetChild(0);
   CPPUNIT_ASSERT(child0 != NULL);
 
@@ -226,7 +226,7 @@ void mafOpComputeInertialTensorTest::TestComputeInertialTensorFromGroupFromDefau
 
   CPPUNIT_ASSERT( child0->GetTagArray()->GetTag("PRINCIPAL_INERTIAL_TENSOR_COMPONENTS") == NULL);
 
-  mafNode *child1 = NULL;
+  mafVME *child1 = NULL;
   child1 = group->GetChild(1);
   CPPUNIT_ASSERT(child1 != NULL);
 

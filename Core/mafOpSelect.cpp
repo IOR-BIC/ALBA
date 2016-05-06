@@ -25,7 +25,7 @@
 
 
 #include "mafOpSelect.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafVMERoot.h"
 #include "mafString.h"
 #ifdef MAF_USE_VTK
@@ -34,11 +34,8 @@
 #include "vtkDataSet.h"
 #include "mafOpReparentTo.h"
 
-//initialize the Clipboard
-// mafAutoPointer<mafNode>  mafOpEdit::m_Clipboard(NULL);
-
-static mafAutoPointer<mafNode> glo_Clipboard = NULL;
-static	mafAutoPointer<mafNode> glo_SelectionParent=NULL;
+static mafAutoPointer<mafVME> glo_Clipboard = NULL;
+static	mafAutoPointer<mafVME> glo_SelectionParent=NULL;
 
 //////////////////
 // mafOpSelect ://
@@ -68,19 +65,19 @@ mafOp* mafOpSelect::Copy()
   return cp;
 }
 //----------------------------------------------------------------------------
-bool mafOpSelect::Accept(mafNode* vme)     
+bool mafOpSelect::Accept(mafVME* vme)     
 //----------------------------------------------------------------------------
 {
   return true;
 }
 //----------------------------------------------------------------------------
-void mafOpSelect::SetInput(mafNode* vme)   
+void mafOpSelect::SetInput(mafVME* vme)   
 //----------------------------------------------------------------------------
 {
   m_OldNodeSelected = vme;
 }
 //----------------------------------------------------------------------------
-void mafOpSelect::SetNewSel(mafNode* vme)  
+void mafOpSelect::SetNewSel(mafVME* vme)  
 //----------------------------------------------------------------------------
 {
   m_NewNodeSelected = vme;
@@ -145,20 +142,20 @@ void mafOpEdit::ClipboardRestore()
   m_Backup = NULL;
 }
 //----------------------------------------------------------------------------
-mafNode* mafOpEdit::GetClipboard()
+mafVME* mafOpEdit::GetClipboard()
 //----------------------------------------------------------------------------
 {
   return glo_Clipboard;
 }
 //----------------------------------------------------------------------------
-void mafOpEdit::SetClipboard(mafNode *node)
+void mafOpEdit::SetClipboard(mafVME *node)
 //----------------------------------------------------------------------------
 {
   glo_Clipboard = node;
 }
 
 //----------------------------------------------------------------------------
-void mafOpEdit::SetSelectionParent(mafNode *parent)
+void mafOpEdit::SetSelectionParent(mafVME *parent)
 {
 	glo_SelectionParent = parent;
 }
@@ -185,7 +182,7 @@ mafOp* mafOpCut::Copy()
   return new mafOpCut(m_Label);
 }
 //----------------------------------------------------------------------------
-bool mafOpCut::Accept(mafNode* vme)
+bool mafOpCut::Accept(mafVME* vme)
 //----------------------------------------------------------------------------
 {
   return ((vme!=NULL) && (!vme->IsMAFType(mafVMERoot)));
@@ -214,50 +211,48 @@ Select the vme parent
   // Added by Losi on 03.06.2010, modify by Di Cosmo
   // It is necessary to load all vtk data of children vme otherwise paste or undo cause an application crash
   //////////////////////////////////////////////////////////////////////////
-  mafVME *m_SelectionVme = mafVME::SafeDownCast(m_Selection);
+  mafVME *m_SelectionVme = m_Selection;
   if(m_SelectionVme)
     LoadChild(m_SelectionVme);
   //////////////////////////////////////////////////////////////////////////
 
   mafEventMacro(mafEvent(this,VME_REMOVE,m_Selection));
   mafEventMacro(mafEvent(this,VME_SELECTED,glo_SelectionParent));
-  if (mafVME::SafeDownCast(glo_SelectionParent.GetPointer()))
-  {
-    ((mafVME *)glo_SelectionParent.GetPointer())->GetOutput()->Update();
-  }
+
+	glo_SelectionParent.GetPointer()->GetOutput()->Update();
 }
 //----------------------------------------------------------------------------
-void mafOpCut::LoadVTKData(mafNode *vme)
+void mafOpCut::LoadVTKData(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   // Added by Losi on 03.06.2010
-  if (mafVME::SafeDownCast(vme))
+  if (vme)
   {
-    mafTimeStamp oldTime = mafVME::SafeDownCast(vme)->GetTimeStamp();
+    mafTimeStamp oldTime = vme->GetTimeStamp();
 
     std::vector<mafTimeStamp> subKFrames;
-    mafVME::SafeDownCast(vme)->GetTimeStamps(subKFrames);
+    vme->GetTimeStamps(subKFrames);
     for (int i=0;i<subKFrames.size();i++)
     {
-      mafVME::SafeDownCast(vme)->SetTimeStamp(subKFrames[i]);
-      mafVME::SafeDownCast(vme)->GetOutput()->GetVTKData();
+      vme->SetTimeStamp(subKFrames[i]);
+      vme->GetOutput()->GetVTKData();
     }
 
-    mafVME::SafeDownCast(vme)->SetTimeStamp(oldTime);
+    vme->SetTimeStamp(oldTime);
   }
 }
 //----------------------------------------------------------------------------
-void mafOpCut::LoadChild(mafNode *vme)
+void mafOpCut::LoadChild(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   // Added by Di Cosmo on 24.05.2012
   // it needs load vtk data for all objects in the tree
-  const mafNode::mafChildrenVector *children = vme->GetChildren();
+  const mafVME::mafChildrenVector *children = vme->GetChildren();
   if (children)
   {
     for(int c = 0; c < children->size(); c++)
     {
-      mafNode *child = children->at(c);
+      mafVME *child = children->at(c);
       LoadVTKData(child);
       LoadChild(child);
     }
@@ -275,25 +270,10 @@ Restore the Selection
 {
   m_Selection = GetClipboard();
 
-#ifdef MAF_USE_VTK
-  if (glo_SelectionParent->IsMAFType(mafVMELandmarkCloud) && !((mafVMELandmarkCloud *)glo_SelectionParent.GetPointer())->IsOpen())
-  {
-    ((mafVMELandmarkCloud *)glo_SelectionParent.GetPointer())->Open();
-    m_Selection->ReparentTo(glo_SelectionParent);
-    ((mafVMELandmarkCloud *)glo_SelectionParent.GetPointer())->Close();
-  }
-  else
-  {
-    m_Selection->ReparentTo(glo_SelectionParent);
-  }
-#else
-    m_Selection->ReparentTo(glo_SelectionParent);
-#endif
+	m_Selection->ReparentTo(glo_SelectionParent);
 
-  if (mafVME::SafeDownCast(glo_SelectionParent.GetPointer()))
-  {
-    ((mafVME *)glo_SelectionParent.GetPointer())->GetOutput()->Update();
-  }
+  glo_SelectionParent.GetPointer()->GetOutput()->Update();
+
   mafEventMacro(mafEvent(this,VME_SELECTED,m_Selection));
   ClipboardRestore();
 }
@@ -321,7 +301,7 @@ mafOp* mafOpCopy::Copy()
   return new mafOpCopy(m_Label);
 }
 //----------------------------------------------------------------------------
-bool mafOpCopy::Accept(mafNode* vme)
+bool mafOpCopy::Accept(mafVME* vme)
 //----------------------------------------------------------------------------
 {
   bool res = (vme!=NULL) && (!vme->IsMAFType(mafVMERoot));
@@ -375,7 +355,7 @@ mafOp* mafOpPaste::Copy()
   return new mafOpPaste(m_Label);
 }
 //----------------------------------------------------------------------------
-bool mafOpPaste::Accept(mafNode* vme)       
+bool mafOpPaste::Accept(mafVME* vme)       
 //----------------------------------------------------------------------------
 {
   //paste may be executed if
@@ -386,7 +366,7 @@ bool mafOpPaste::Accept(mafNode* vme)
 
   if(ClipboardIsEmpty()) return false;
   if(vme == NULL) return false;
-  mafNode *cv = GetClipboard();
+  mafVME *cv = GetClipboard();
   return cv->CanReparentTo(vme);
 };
 //----------------------------------------------------------------------------
@@ -403,7 +383,7 @@ Them a VME_ADD is sent, selection is not changed
 */
 {
   m_PastedVme = GetClipboard();
-	mafOpReparentTo::ReparentTo((mafVME *)(mafNode *)m_PastedVme,(mafVME *)(mafNode *)m_Selection,(mafVME *)(mafNode *)glo_SelectionParent);
+	mafOpReparentTo::ReparentTo(m_PastedVme,m_Selection,glo_SelectionParent);
   SetClipboard(m_PastedVme->CopyTree());
 }
 //----------------------------------------------------------------------------

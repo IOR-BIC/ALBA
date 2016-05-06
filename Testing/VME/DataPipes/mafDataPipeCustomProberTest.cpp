@@ -124,7 +124,7 @@ void mafDataPipeCustomProberTest::TestSetSurface()
 //----------------------------------------------------------------------------
 {
   mafSmartPointer<mafVMESurface> surfaceIN;
-  mafNode *node;
+  mafVME *node;
   mafSmartPointer<mafDataPipeCustomProber>  probingDataPipe;
   probingDataPipe->SetSurface(surfaceIN);
 
@@ -140,7 +140,7 @@ void mafDataPipeCustomProberTest::TestSetVolume()
 //----------------------------------------------------------------------------
 {
   mafSmartPointer<mafVMEVolumeGray> volumeIN;
-  mafNode *node;
+  mafVME *node;
   mafSmartPointer<mafDataPipeCustomProber>  probingDataPipe;
   probingDataPipe->SetSurface(volumeIN);
 

@@ -135,7 +135,7 @@ mafOp* mafOpComputeInertialTensor::Copy()
    return op_copy;
 }
 //----------------------------------------------------------------------------
-bool mafOpComputeInertialTensor::Accept(mafNode *node)
+bool mafOpComputeInertialTensor::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
   return ( (node && node->IsMAFType(mafVMESurface)) || (node && node->IsMAFType(mafVMEGroup)) );
@@ -151,38 +151,35 @@ void mafOpComputeInertialTensor::OpRun()
 void mafOpComputeInertialTensor::OpDo()
 //----------------------------------------------------------------------------
 {
-  mafVME* vme = (mafVME*) m_Input;
-
-
-  if (!vme->GetTagArray()->IsTagPresent("LOCAL_CENTER_OF_MASS_COMPONENTS"))
+  if (!m_Input->GetTagArray()->IsTagPresent("LOCAL_CENTER_OF_MASS_COMPONENTS"))
   {
 	  if (m_LocalCenterOfMassTag.GetNumberOfComponents()>0)
 	  {
-		  vme->GetTagArray()->SetTag(m_LocalCenterOfMassTag);
+		  m_Input->GetTagArray()->SetTag(m_LocalCenterOfMassTag);
 	  }
   }
 
-  if (!vme->GetTagArray()->IsTagPresent("PRINCIPAL_INERTIAL_TENSOR_COMPONENTS"))
+  if (!m_Input->GetTagArray()->IsTagPresent("PRINCIPAL_INERTIAL_TENSOR_COMPONENTS"))
   {
     if (m_PrincipalInertialTensorTag.GetNumberOfComponents()>0)
     {
-      vme->GetTagArray()->SetTag(m_PrincipalInertialTensorTag);
+      m_Input->GetTagArray()->SetTag(m_PrincipalInertialTensorTag);
     }
   }
 
-  if (!vme->GetTagArray()->IsTagPresent("INERTIAL_TENSOR_COMPONENTS"))
+  if (!m_Input->GetTagArray()->IsTagPresent("INERTIAL_TENSOR_COMPONENTS"))
   {
 	  if (m_InertialTensorTag.GetNumberOfComponents()>0)
 	  {
-		  vme->GetTagArray()->SetTag(m_InertialTensorTag);
+		  m_Input->GetTagArray()->SetTag(m_InertialTensorTag);
 	  }
   }
   
-  if (!vme->GetTagArray()->IsTagPresent("SURFACE_MASS"))
+  if (!m_Input->GetTagArray()->IsTagPresent("SURFACE_MASS"))
   {
     if (m_TagMass.GetNumberOfComponents()>0)
     {
-      vme->GetTagArray()->SetTag(m_TagMass);
+      m_Input->GetTagArray()->SetTag(m_TagMass);
     }
   }
 
@@ -191,16 +188,15 @@ void mafOpComputeInertialTensor::OpDo()
 void mafOpComputeInertialTensor::OpUndo()
 //----------------------------------------------------------------------------
 {
-  mafVME* vme = (mafVME*) m_Input;
-  vme->GetTagArray()->GetTag("LOCAL_CENTER_OF_MASS_COMPONENTS",m_LocalCenterOfMassTag);
-  vme->GetTagArray()->GetTag("PRINCIPAL_INERTIAL_TENSOR_COMPONENTS",m_PrincipalInertialTensorTag);
-  vme->GetTagArray()->GetTag("INERTIAL_TENSOR_COMPONENTS",m_InertialTensorTag);
-  vme->GetTagArray()->GetTag("SURFACE_MASS",m_TagMass);
+  m_Input->GetTagArray()->GetTag("LOCAL_CENTER_OF_MASS_COMPONENTS",m_LocalCenterOfMassTag);
+  m_Input->GetTagArray()->GetTag("PRINCIPAL_INERTIAL_TENSOR_COMPONENTS",m_PrincipalInertialTensorTag);
+  m_Input->GetTagArray()->GetTag("INERTIAL_TENSOR_COMPONENTS",m_InertialTensorTag);
+  m_Input->GetTagArray()->GetTag("SURFACE_MASS",m_TagMass);
 
-  vme->GetTagArray()->DeleteTag("LOCAL_CENTER_OF_MASS_COMPONENTS");
-  vme->GetTagArray()->DeleteTag("PRINCIPAL_INERTIAL_TENSOR_COMPONENTS");
-  vme->GetTagArray()->DeleteTag("INERTIAL_TENSOR_COMPONENTS");
-  vme->GetTagArray()->DeleteTag("SURFACE_MASS");
+  m_Input->GetTagArray()->DeleteTag("LOCAL_CENTER_OF_MASS_COMPONENTS");
+  m_Input->GetTagArray()->DeleteTag("PRINCIPAL_INERTIAL_TENSOR_COMPONENTS");
+  m_Input->GetTagArray()->DeleteTag("INERTIAL_TENSOR_COMPONENTS");
+  m_Input->GetTagArray()->DeleteTag("SURFACE_MASS");
 }
 //----------------------------------------------------------------------------
 void mafOpComputeInertialTensor::OnEvent(mafEventBase *maf_event)
@@ -300,11 +296,11 @@ void mafOpComputeInertialTensor::AddAttributes()
 
 	if (m_Input->IsA("mafVMEGroup")) 
 	{
-		vector<pair<mafNode * , double>>::iterator iter;
+		vector<pair<mafVME * , double>>::iterator iter;
 
 		for (iter = m_NodeMassPairVector.begin() ; iter != m_NodeMassPairVector.end() ; ++iter)
 		{
-			mafNode *node = iter->first;
+			mafVME *node = iter->first;
 			double mass = iter->second;
 
 			mafTagItem ti;
@@ -355,7 +351,7 @@ void mafOpComputeInertialTensor::CreateGui()
 
 
 //----------------------------------------------------------------------------
-int mafOpComputeInertialTensor::ComputeLocalInertialTensor(mafNode* node, int current_node, int n_of_nodes)
+int mafOpComputeInertialTensor::ComputeLocalInertialTensor(mafVME* node, int current_node, int n_of_nodes)
 //----------------------------------------------------------------------------
 {
   //tensor components
@@ -552,7 +548,7 @@ void mafOpComputeInertialTensor::ComputeGlobalInertiaTensor()
 		m_CenterOfMass[1] += Cy * mass;
 		m_CenterOfMass[2] += Cz * mass;
 
-		pair<mafNode* , double> nodeMassPair(lit._node , mass);
+		pair<mafVME* , double> nodeMassPair(lit._node , mass);
 		m_NodeMassPairVector.push_back(nodeMassPair);
 
 		m_Mass += mass;
@@ -682,7 +678,7 @@ int mafOpComputeInertialTensor::ComputeInertialTensorFromGroup()
 }
 
 //----------------------------------------------------------------------------
-double mafOpComputeInertialTensor::GetDensity( mafNode* node)
+double mafOpComputeInertialTensor::GetDensity( mafVME* node)
 //----------------------------------------------------------------------------
 {
 	double density = DENSITY_NOT_FOUND;
@@ -702,7 +698,7 @@ double mafOpComputeInertialTensor::GetDensity( mafNode* node)
 }
 
 //----------------------------------------------------------------------------
-double mafOpComputeInertialTensor::GetMass( mafNode* node)
+double mafOpComputeInertialTensor::GetMass( mafVME* node)
 //----------------------------------------------------------------------------
 {
 	double mass = SURFACE_MASS_NOT_FOUND;
@@ -738,7 +734,7 @@ void mafOpComputeInertialTensor::SetDefaultDensity( double val )
 }
 
 //----------------------------------------------------------------------------
-int mafOpComputeInertialTensor::ComputeInertialTensor(mafNode* node)
+int mafOpComputeInertialTensor::ComputeInertialTensor(mafVME* node)
 //----------------------------------------------------------------------------
 {
 	 int result = ComputeLocalInertialTensor(node);

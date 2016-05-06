@@ -69,7 +69,7 @@ public:
   virtual void OnEvent(mafEventBase *maf_event);
 
   /** Return true for the acceptable vme type. */
-  bool Accept(mafNode *node);
+  bool Accept(mafVME *node);
 
   /** Builds operation's interface. */
 	void OpRun();

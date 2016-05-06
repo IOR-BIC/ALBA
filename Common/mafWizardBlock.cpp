@@ -140,7 +140,7 @@ wxString mafWizardBlock::GetRequiredOperation()
 }
 
 //----------------------------------------------------------------------------
-void mafWizardBlock::SetSelectedVME( mafNode *node )
+void mafWizardBlock::SetSelectedVME( mafVME *node )
 //----------------------------------------------------------------------------
 {
   //setting the selected vme

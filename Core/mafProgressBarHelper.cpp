@@ -64,6 +64,8 @@ void mafProgressBarHelper::InitProgressBar(wxString label,bool showBusyCursor)
 //----------------------------------------------------------------------------
 void mafProgressBarHelper::CloseProgressBar()
 {
+	UpdateProgressBar(100);
+
 	if (m_TextMode == false)
 	{
 		cppDEL(m_BusyInfo);

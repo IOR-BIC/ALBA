@@ -134,7 +134,7 @@ void mafViewSliceBlend::InitializeSlice(double slice1[3],double slice2[3])
   m_SliceInitialized = true;
 }
 //----------------------------------------------------------------------------
-void mafViewSliceBlend::VmeCreatePipe(mafNode *vme)
+void mafViewSliceBlend::VmeCreatePipe(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   int result = GetNodeStatus(vme);
@@ -149,19 +149,13 @@ void mafViewSliceBlend::VmeCreatePipe(mafNode *vme)
   GetVisualPipeName(vme, pipe_name);
 
   mafSceneNode *n = m_Sg->Vme2Node(vme);
-  assert(n && !n->m_Pipe);
+  assert(n && !n->GetPipe());
 
   if (pipe_name != "")
   {
-    if((vme->IsMAFType(mafVMELandmarkCloud) && ((mafVMELandmarkCloud*)vme)->IsOpen()) || vme->IsMAFType(mafVMELandmark) && m_NumberOfVisibleVme == 1)
-    {
-      m_NumberOfVisibleVme = 1;
-    }
-    else
-    {
-      m_NumberOfVisibleVme++;
-    }
-    mafPipeFactory *pipe_factory  = mafPipeFactory::GetInstance();
+    m_NumberOfVisibleVme++;
+
+		mafPipeFactory *pipe_factory  = mafPipeFactory::GetInstance();
     assert(pipe_factory!=NULL);
     mafObject *obj= NULL;
     obj = pipe_factory->CreateInstance(pipe_name);
@@ -174,9 +168,9 @@ void mafViewSliceBlend::VmeCreatePipe(mafNode *vme)
       {
         m_CurrentVolume = n;
         if (m_AttachCamera)
-          m_AttachCamera->SetVme(m_CurrentVolume->m_Vme);
+          m_AttachCamera->SetVme(m_CurrentVolume->GetVme());
         int slice_mode;
-        vtkDataSet *data = ((mafVME *)vme)->GetOutput()->GetVTKData();
+        vtkDataSet *data = vme->GetOutput()->GetVTKData();
         assert(data);
         data->Update();
         // check the type of camera
@@ -211,21 +205,18 @@ void mafViewSliceBlend::VmeCreatePipe(mafNode *vme)
         ((mafPipeVolumeSliceBlend *)pipe)->SetSliceOpacity(m_Opacity);
       }
       pipe->Create(n);
-      n->m_Pipe = (mafPipe*)pipe;
     }
     else
       mafErrorMessage("Cannot create visual pipe object of type \"%s\"!",pipe_name.GetCStr());
   }
 }
 //----------------------------------------------------------------------------
-void mafViewSliceBlend::VmeDeletePipe(mafNode *vme)
+void mafViewSliceBlend::VmeDeletePipe(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   mafSceneNode *n = m_Sg->Vme2Node(vme);
-  if((vme->IsMAFType(mafVMELandmarkCloud) && ((mafVMELandmarkCloud*)vme)->IsOpen()) || vme->IsMAFType(mafVMELandmark) && m_NumberOfVisibleVme == 0)
-    m_NumberOfVisibleVme = 0;
-  else
-    m_NumberOfVisibleVme--;
+
+	m_NumberOfVisibleVme--;
 
   //if vme is a volume detach camera
   if (vme->IsMAFType(mafVMEVolume))
@@ -236,8 +227,8 @@ void mafViewSliceBlend::VmeDeletePipe(mafNode *vme)
       m_AttachCamera->SetVme(NULL);
     }
   }
-  assert(n && n->m_Pipe);
-  cppDEL(n->m_Pipe);
+  assert(n && n->GetPipe());
+	n->DeletePipe();
 
   if(vme->IsMAFType(mafVMELandmark))
   {
@@ -246,7 +237,7 @@ void mafViewSliceBlend::VmeDeletePipe(mafNode *vme)
   }
 }
 //-------------------------------------------------------------------------
-int mafViewSliceBlend::GetNodeStatus(mafNode *vme)
+int mafViewSliceBlend::GetNodeStatus(mafVME *vme)
 //-------------------------------------------------------------------------
 {
   mafSceneNode *n = NULL;
@@ -256,7 +247,7 @@ int mafViewSliceBlend::GetNodeStatus(mafNode *vme)
     {
       n = m_Sg->Vme2Node(vme);
       //Only a volume can be visualized
-      n->m_Mutex = true;
+      n->SetMutex(true);
     }
     else if (vme->IsMAFType(mafVMESlicer))
     {
@@ -285,7 +276,7 @@ mafGUI *mafViewSliceBlend::CreateGui()
   {
     // if a Volume is present use his bounds
     double b[6];
-    mafVMEVolumeGray::SafeDownCast(m_CurrentVolume->m_Vme)->GetOutput()->GetBounds(b);
+    mafVMEVolumeGray::SafeDownCast(m_CurrentVolume->GetVme())->GetOutput()->GetBounds(b);
     m_Slice1Position = b[4];
     m_Slice2Position = b[5];
   }
@@ -313,7 +304,7 @@ void mafViewSliceBlend::OnEvent(mafEventBase *maf_event)
     {
     case ID_OPACITY:
       {
-        mafPipeVolumeSliceBlend *pipe = (mafPipeVolumeSliceBlend *)m_CurrentVolume->m_Pipe;
+        mafPipeVolumeSliceBlend *pipe = (mafPipeVolumeSliceBlend *)m_CurrentVolume->GetPipe();
         //Set new opacity for the pipe mafPipeVolumeSliceBlend
         pipe->SetSliceOpacity(m_Opacity);
         CameraUpdate();
@@ -337,10 +328,11 @@ void mafViewSliceBlend::SetLutRange(double low_val, double high_val)
   //If a volume is visualized set his lut range
   if(!m_CurrentVolume) 
     return;
-  mafString pipe_name = m_CurrentVolume->m_Pipe->GetTypeName();
+	mafPipe * pipe = m_CurrentVolume->GetPipe();
+  mafString pipe_name = pipe->GetTypeName();
   if (pipe_name.Equals("mafPipeVolumeSliceBlend"))
   {
-    mafPipeVolumeSliceBlend *pipe = (mafPipeVolumeSliceBlend *)m_CurrentVolume->m_Pipe;
+    mafPipeVolumeSliceBlend *pipe = (mafPipeVolumeSliceBlend *)pipe;
     pipe->SetLutRange(low_val, high_val); 
   }
 }
@@ -353,10 +345,11 @@ void mafViewSliceBlend::SetSliceLocalOrigin(double origin0[3],double origin1[3])
   {
     memcpy(m_Slice1,origin0,sizeof(origin0));
     memcpy(m_Slice2,origin1,sizeof(origin1));
-    mafString pipe_name = m_CurrentVolume->m_Pipe->GetTypeName();
+		mafPipe * pipe = m_CurrentVolume->GetPipe();
+    mafString pipe_name = pipe->GetTypeName();
     if (pipe_name.Equals("mafPipeVolumeSliceBlend"))
     {
-      mafPipeVolumeSliceBlend *pipe = (mafPipeVolumeSliceBlend *)m_CurrentVolume->m_Pipe;
+      mafPipeVolumeSliceBlend *pipe = (mafPipeVolumeSliceBlend *)pipe;
       //Set origin0 for slice 0
       pipe->SetSlice(0,origin0);
       //Set origin1 for slice 1
@@ -378,10 +371,11 @@ void mafViewSliceBlend::SetSlice(int nSlice,double pos[3])
       memcpy(m_Slice1,pos,sizeof(m_Slice1));
     else if(nSlice==1)
       memcpy(m_Slice2,pos,sizeof(m_Slice2));
-    mafString pipe_name = m_CurrentVolume->m_Pipe->GetTypeName();
+		mafPipe * pipe = m_CurrentVolume->GetPipe();
+    mafString pipe_name = pipe->GetTypeName();
     if (pipe_name.Equals("mafPipeVolumeSliceBlend"))
     {
-      mafPipeVolumeSliceBlend *pipe = (mafPipeVolumeSliceBlend *)m_CurrentVolume->m_Pipe;
+      mafPipeVolumeSliceBlend *pipe = (mafPipeVolumeSliceBlend *)pipe;
       pipe->SetSlice(nSlice,pos);
     }
   }
@@ -444,13 +438,13 @@ void mafViewSliceBlend::BorderDelete()
 }
 
 //----------------------------------------------------------------------------
-void mafViewSliceBlend::UpdateSurfacesList(mafNode *node)
+void mafViewSliceBlend::UpdateSurfacesList(mafVME *vme)
   //----------------------------------------------------------------------------
 {
   // Remove node form surface list
   for(int i=0;i<m_CurrentSurface.size();i++)
   {
-    if (m_CurrentSurface[i]==m_Sg->Vme2Node(node))
+    if (m_CurrentSurface[i]==m_Sg->Vme2Node(vme))
     {
       std::vector<mafSceneNode*>::iterator startIterator;
       m_CurrentSurface.erase(m_CurrentSurface.begin()+i);
@@ -459,16 +453,16 @@ void mafViewSliceBlend::UpdateSurfacesList(mafNode *node)
 }
 
 //----------------------------------------------------------------------------
-void mafViewSliceBlend::VmeShow(mafNode *node, bool show)
+void mafViewSliceBlend::VmeShow(mafVME *vme, bool show)
   //----------------------------------------------------------------------------
 {
-  if (node->IsMAFType(mafVMEVolume))
+  if (vme->IsMAFType(mafVMEVolume))
   {
     if (show)
     {
       // Attach the camera to the volume visualized
       if(m_AttachCamera)
-        m_AttachCamera->SetVme(node);
+        m_AttachCamera->SetVme(vme);
     }
     else
     {
@@ -476,22 +470,16 @@ void mafViewSliceBlend::VmeShow(mafNode *node, bool show)
       if(m_AttachCamera)
         m_AttachCamera->SetVme(NULL);
     }
-    // CameraUpdate();
-    // CameraReset(node);
-    // m_Rwi->CameraUpdate();
   }
 
-  Superclass::VmeShow(node, show);
-
-  //m_Rwi->CameraReset(node);
-  //m_Rwi->CameraUpdate();
+  Superclass::VmeShow(vme, show);
 
   if (m_CurrentVolume!=NULL)
   {
     // if a Volume is present use his bounds for slices positions
 
     double b[6];
-    mafVMEVolumeGray::SafeDownCast(m_CurrentVolume->m_Vme)->GetOutput()->GetBounds(b);
+    mafVMEVolumeGray::SafeDownCast(m_CurrentVolume->GetVme())->GetOutput()->GetBounds(b);
     m_Slice1Position = b[4];
     m_Slice2Position = b[5];
 
@@ -515,7 +503,7 @@ void mafViewSliceBlend::VmeShow(mafNode *node, bool show)
   m_Gui->Enable(ID_OPACITY,m_CurrentVolume!=NULL);
 }
 //----------------------------------------------------------------------------
-void mafViewSliceBlend::VmeRemove(mafNode *vme)
+void mafViewSliceBlend::VmeRemove(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   if(vme->IsA("mafVMEPolyline")||vme->IsA("mafVMESurface")||vme->IsA("mafVMEPolylineEditor"))
@@ -546,12 +534,13 @@ void mafViewSliceBlend::SetNormal(double normal[3])
   {
     for(int i=0;i<m_CurrentSurface.size();i++)
     {
-      if(m_CurrentSurface.at(i) && m_CurrentSurface.at(i)->m_Pipe)
+			mafPipe * curSurfPipe = m_CurrentSurface.at(i)->GetPipe();
+      if(curSurfPipe)
       {
-        mafString pipe_name = m_CurrentSurface.at(i)->m_Pipe->GetTypeName();
+        mafString pipe_name = curSurfPipe->GetTypeName();
         if (pipe_name.Equals("mafPipeSurfaceSlice"))
         {
-          mafPipeSurfaceSlice *pipe = (mafPipeSurfaceSlice *)m_CurrentSurface[i]->m_Pipe;
+          mafPipeSurfaceSlice *pipe = (mafPipeSurfaceSlice *)curSurfPipe;
           pipe->SetNormal(normal); 
         }
       }
@@ -562,9 +551,9 @@ void mafViewSliceBlend::SetNormal(double normal[3])
 void mafViewSliceBlend::MultiplyPointByInputVolumeABSMatrix(double *point)
 //-------------------------------------------------------------------------
 {
-  if(m_CurrentVolume && m_CurrentVolume->m_Vme)
+  if(m_CurrentVolume && m_CurrentVolume->GetVme())
   {
-    mafMatrix *mat = ((mafVME *)m_CurrentVolume->m_Vme)->GetOutput()->GetMatrix();
+    mafMatrix *mat = m_CurrentVolume->GetVme()->GetOutput()->GetMatrix();
     double coord[4];
     coord[0] = point[0];
     coord[1] = point[1];

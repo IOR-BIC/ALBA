@@ -23,7 +23,7 @@
 // forward references :
 //----------------------------------------------------------------------------
 class mafView;
-class mafNode;
+class mafVME;
 class mafObserver;
 
 //----------------------------------------------------------------------------
@@ -38,9 +38,9 @@ public:
   testView(wxString label) : mafViewVTK(label) {};
 
   virtual mafView*  Copy(mafObserver *Listener);
-  virtual int 	    GetNodeStatus(mafNode *vme);
-  virtual void	    VmeCreatePipe(mafNode *vme);
-  virtual void	    VmeDeletePipe(mafNode *vme);
+  virtual int 	    GetNodeStatus(mafVME *vme);
+  virtual void	    VmeCreatePipe(mafVME *vme);
+  virtual void	    VmeDeletePipe(mafVME *vme);
 
 protected:
 };

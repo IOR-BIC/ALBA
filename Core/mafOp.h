@@ -26,7 +26,7 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mafNode;
+class mafVME;
 class mafGUI;
 class mafGUIHolder;
 class mafDeviceButtonsPadMouse;
@@ -83,27 +83,18 @@ public:
 	virtual mafGUI *GetGui()	{return m_Gui;};
 
 	/** Set/Get the input vme for the operation. */
-	virtual void SetInput(mafNode* vme)	{m_Input = vme;};
-  virtual mafNode	*GetInput()	{return m_Input;};
+	virtual void SetInput(mafVME* vme)	{m_Input = vme;};
+  virtual mafVME	*GetInput()	{return m_Input;};
 
-  /** Return the mafNode result of the operation.*/
-  virtual mafNode *GetOutput() {return m_Output;};
-  virtual void SetOutput(mafNode *output) {m_Output = output;};
+  /** Return the mafVME result of the operation.*/
+  virtual mafVME *GetOutput() {return m_Output;};
+  virtual void SetOutput(mafVME *output) {m_Output = output;};
 
 	/** Return true for the acceptable vme type. */
-	virtual bool Accept(mafNode* vme);
+	virtual bool Accept(mafVME* vme);
 
 	/** Return true if the operation is undoable. */
 	virtual bool CanUndo();
-
-	/** Return true if the operation is an importer. */
-	//bool IsImporter();
-
-	/** Return true if the operation is an exporter. */
-	//bool IsExporter();
-
-	/** Return true if the operation is a normal operation. */
-	//bool IsOp();
 
 	/** Return true if the operation preserve the input vme. */
 	bool IsInputPreserving() {return m_InputPreserving;};
@@ -172,8 +163,8 @@ protected:
   /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
   virtual void OpStop(int result);
 
-	mafNode				 *m_Input; ///< Pointer to the Input VME.
-  mafNode        *m_Output; ///< Pointer to the Output VME
+	mafVME				 *m_Input; ///< Pointer to the Input VME.
+  mafVME         *m_Output; ///< Pointer to the Output VME
 	mafGUI      	 *m_Gui; ///< Pointer to the operation's GUI.
 	mafGUIHolder	 *m_Guih;
 	bool 						m_Canundo; ///< Flag to establish if the operation define the UnDo method or not.

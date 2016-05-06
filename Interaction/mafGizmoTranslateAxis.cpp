@@ -104,8 +104,8 @@ mafGizmoTranslateAxis::mafGizmoTranslateAxis(mafVME *input, mafObserver *listene
   //-----------------
   // ReparentTo will add also the gizmos to the tree!!
   // add the gizmo to the tree, this should increase reference count 
-  m_CylGizmo->ReparentTo(mafVME::SafeDownCast(m_InputVme->GetRoot()));
-  m_ConeGizmo->ReparentTo(mafVME::SafeDownCast(m_InputVme->GetRoot()));
+  m_CylGizmo->ReparentTo(m_InputVme->GetRoot());
+  m_ConeGizmo->ReparentTo(m_InputVme->GetRoot());
 }
 //----------------------------------------------------------------------------
 mafGizmoTranslateAxis::~mafGizmoTranslateAxis() 

@@ -104,17 +104,15 @@ void mafPipeSurfaceSlice_BESTest::TestCloudClosePipeExecution()
   third->SetPoint(0.0,0.0,5.0);
   third->SetName("third");
   mafSmartPointer<mafVMELandmarkCloud> ldm;
-  ldm->SetLandmark(first);
-  ldm->SetLandmark(second);
-  ldm->SetLandmark(third);
+	first->ReparentTo(ldm);
+	second->ReparentTo(ldm);
+	third->ReparentTo(ldm);
   ldm->GetMaterial();
   ldm->GetMaterial()->m_MaterialType = mmaMaterial::USE_LOOKUPTABLE;
 
   ldm->GetOutput()->GetVTKData()->Update();
   ldm->GetOutput()->Update();
   ldm->Update();
-
-  ldm->Close();
 
   ldm->GetOutput()->GetVTKData()->Update();
   ldm->GetOutput()->Update();
@@ -125,8 +123,7 @@ void mafPipeSurfaceSlice_BESTest::TestCloudClosePipeExecution()
 
   //Assembly will be create when instancing mafSceneNode
   mafSceneNode *sceneNode;
-  sceneNode = new mafSceneNode(NULL,NULL,ldm, NULL);
-  sceneNode->m_RenFront = m_Renderer;
+  sceneNode = new mafSceneNode(NULL,NULL,ldm, m_Renderer);
 
   /////////// Pipe Instance and Creation ///////////
   mafPipeSurfaceSlice_BES *pipeSlice = new mafPipeSurfaceSlice_BES;
@@ -175,8 +172,6 @@ void mafPipeSurfaceSlice_BESTest::TestCloudClosePipeExecution()
 
   vtkDEL(actorList);
 
-  delete pipeSlice;
-  sceneNode->m_RenFront = NULL;
   delete sceneNode;
 }
 //----------------------------------------------------------------------------
@@ -206,8 +201,6 @@ void mafPipeSurfaceSlice_BESTest::TestCloudOpenPipeExecution()
   ldm->GetOutput()->Update();
   ldm->Update();
 
-  ldm->Open();
-
   ldm->GetOutput()->Update();
   ldm->Update();
 
@@ -216,8 +209,7 @@ void mafPipeSurfaceSlice_BESTest::TestCloudOpenPipeExecution()
 
   //Assembly will be create when instancing mafSceneNode
   mafSceneNode *sceneNode;
-  sceneNode = new mafSceneNode(NULL,NULL,ldm, NULL);
-  sceneNode->m_RenFront = m_Renderer;
+  sceneNode = new mafSceneNode(NULL,NULL,ldm, m_Renderer);
 
   /////////// Pipe Instance and Creation ///////////
   mafPipeSurfaceSlice_BES *pipeSlice = new mafPipeSurfaceSlice_BES;
@@ -267,8 +259,6 @@ void mafPipeSurfaceSlice_BESTest::TestCloudOpenPipeExecution()
 
   vtkDEL(actorList);
 
-  delete pipeSlice;
-  sceneNode->m_RenFront = NULL;
   delete sceneNode;
 }
 //----------------------------------------------------------------------------
@@ -307,8 +297,7 @@ void mafPipeSurfaceSlice_BESTest::TestSurfacePipeExecution()
 
   //Assembly will be create when instancing mafSceneNode
   mafSceneNode *sceneNode;
-  sceneNode = new mafSceneNode(NULL,NULL,surface, NULL);
-  sceneNode->m_RenFront = m_Renderer;
+  sceneNode = new mafSceneNode(NULL,NULL,surface, m_Renderer);
 
   /////////// Pipe Instance and Creation ///////////
   mafPipeSurfaceSlice_BES *pipeSlice = new mafPipeSurfaceSlice_BES;
@@ -357,8 +346,6 @@ void mafPipeSurfaceSlice_BESTest::TestSurfacePipeExecution()
 
   vtkDEL(actorList);
 
-  delete pipeSlice;
-  sceneNode->m_RenFront = NULL;
   delete sceneNode;
 }
 //----------------------------------------------------------------------------
@@ -508,8 +495,7 @@ void mafPipeSurfaceSlice_BESTest::TestSurfacePipeCreation()
 
   //Assembly will be create when instancing mafSceneNode
   mafSceneNode *sceneNode;
-  sceneNode = new mafSceneNode(NULL,NULL,surface, NULL);
-  sceneNode->m_RenFront = m_Renderer;
+  sceneNode = new mafSceneNode(NULL,NULL,surface, m_Renderer);
 
   /////////// Pipe Instance and Creation ///////////
   mafPipeSurfaceSlice_BES *pipeSlice = new mafPipeSurfaceSlice_BES;
@@ -517,10 +503,7 @@ void mafPipeSurfaceSlice_BESTest::TestSurfacePipeCreation()
 
   CPPUNIT_ASSERT(pipeSlice);
 
-  delete pipeSlice;
-  sceneNode->m_RenFront = NULL;
   delete sceneNode;
-
 }
 
 //----------------------------------------------------------------------------
@@ -559,8 +542,7 @@ void mafPipeSurfaceSlice_BESTest::TestSetGetThickness()
 
   //Assembly will be create when instancing mafSceneNode
   mafSceneNode *sceneNode;
-  sceneNode = new mafSceneNode(NULL,NULL,surface, NULL);
-  sceneNode->m_RenFront = m_Renderer;
+  sceneNode = new mafSceneNode(NULL,NULL,surface, m_Renderer);
 
   /////////// Pipe Instance and Creation ///////////
   mafPipeSurfaceSlice_BES *pipeSlice = new mafPipeSurfaceSlice_BES;
@@ -593,7 +575,5 @@ void mafPipeSurfaceSlice_BESTest::TestSetGetThickness()
 
   vtkDEL(actorList);
 
-  delete pipeSlice;
-  sceneNode->m_RenFront = NULL;
   delete sceneNode;
 }

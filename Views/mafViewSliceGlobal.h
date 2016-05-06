@@ -52,8 +52,8 @@ public:
   //void Create();
 
   /** 
-  Set the visualization status for the node (visible, not visible, mutex, ...) \sa mafSceneGraph mafView*/
-  virtual int GetNodeStatus(mafNode *vme);
+  Set the visualization status for the vme (visible, not visible, mutex, ...) \sa mafSceneGraph mafView*/
+  virtual int GetNodeStatus(mafVME *vme);
 
   /** IDs for the view GUI */
   enum VIEW_NEW_GLOBAL_SLICE_WIDGET_ID
@@ -67,14 +67,14 @@ public:
   };
 
   /** 
-  Create the visual pipe for the node passed as argument. 
+  Create the visual pipe for the vme passed as argument. 
   To create visual pipe first check in m_PipeMap if custom visual pipe is defined, 
   otherwise ask to vme which is its visual pipe. */
-  virtual void VmeCreatePipe(mafNode *vme);
+  virtual void VmeCreatePipe(mafVME *vme);
 
   /** 
   Delete vme's visual pipe. It is called when vme is removed from visualization.*/
-  virtual void VmeDeletePipe(mafNode *vme);
+  virtual void VmeDeletePipe(mafVME *vme);
 
   /** Set slicer parameter to generate the slice. */
   virtual void SetSlice(double origin[3], float xVect[3], float yVect[3]);
@@ -102,10 +102,10 @@ public:
   virtual void SetTextMode(int textMode);
 
   /** Function called when select a vme different from selected one.*/
-  virtual void VmeSelect(mafNode *node, bool select);
+  virtual void VmeSelect(mafVME *vme, bool select);
 
   /** Override superclass. */
-  virtual void VmeShow(mafNode *node, bool show);
+  virtual void VmeShow(mafVME *vme, bool show);
 
   /** pPrint a dump of this object */
   virtual void Print(std::ostream& os, const int tabs=0);// const;

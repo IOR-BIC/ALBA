@@ -31,7 +31,7 @@
 #include "mafAttachCamera.h"
 #include "mafVMESurface.h"
 #include "mafVMERoot.h"
-#include "mafNode.h"
+#include "mafVME.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkMapper.h"

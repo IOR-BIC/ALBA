@@ -81,7 +81,7 @@ exWizardSample::exWizardSample( const wxString &label ):mafWizard(label)
 }
 
 //--------------------------------------------------------------------------------
-bool exWizardSample::Accept(mafNode* vme)
+bool exWizardSample::Accept(mafVME* vme)
 //--------------------------------------------------------------------------------
 {
   return true;

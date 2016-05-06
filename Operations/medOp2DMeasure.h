@@ -49,7 +49,7 @@ public:
 	/*virtual*/ mafOp* Copy();
 	
 	/** Return true for the acceptable vme type. */
-  /*virtual*/ bool Accept(mafNode *node);
+  /*virtual*/ bool Accept(mafVME *node);
 
 	/** Set the input vme for the operation. */
 	/*virtual*/ void OpRun();

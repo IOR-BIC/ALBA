@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: mafNodeFactoryTest
+ Module: mafVMEFactoryTest
  Authors: Stefano Perticoni, Marco Petrone
  
  Copyright (c) B3C
@@ -14,14 +14,14 @@
 
 =========================================================================*/
 
-#ifndef __CPP_UNIT_MAFNODEFACTORYTEST_H__
-#define __CPP_UNIT_MAFNODEFACTORYTEST_H__
+#ifndef __CPP_UNIT_mafVMEFACTORYTEST_H__
+#define __CPP_UNIT_mafVMEFACTORYTEST_H__
 
 #include "mafTest.h"
 
-class mafNodeFactoryTest : public mafTest
+class mafVMEFactoryTest : public mafTest
 {
-  CPPUNIT_TEST_SUITE( mafNodeFactoryTest );
+  CPPUNIT_TEST_SUITE( mafVMEFactoryTest );
   CPPUNIT_TEST( TestCreateNodeInstance );
   CPPUNIT_TEST_SUITE_END();
 

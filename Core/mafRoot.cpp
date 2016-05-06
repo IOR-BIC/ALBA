@@ -15,7 +15,7 @@
 =========================================================================*/
 
 #include "mafRoot.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafStorageElement.h"
 #include "mafStorage.h"
 #include "mafEventIO.h"

@@ -45,7 +45,7 @@ public:
 	virtual void OpRun();
 
   /** turn true for the acceptable vme type. */
-  virtual bool Accept(mafNode *node){return true;};
+  virtual bool Accept(mafVME*node){return true;};
 
 protected:
 

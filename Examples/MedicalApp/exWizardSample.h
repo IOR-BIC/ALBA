@@ -35,7 +35,7 @@ public:
   exWizardSample(const wxString &label);
   
   /** Accept function*/
-  virtual bool Accept(mafNode* vme);
+  virtual bool Accept(mafVME* vme);
 
 };
 #endif // __exWizardSample_H__

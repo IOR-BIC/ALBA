@@ -73,7 +73,7 @@ mafVMEGizmo::~mafVMEGizmo()
   vtkDEL(m_GizmoData);
 }
 //-------------------------------------------------------------------------
-int mafVMEGizmo::DeepCopy(mafNode *a)
+int mafVMEGizmo::DeepCopy(mafVME *a)
 //-------------------------------------------------------------------------
 { 
   if (Superclass::DeepCopy(a)==MAF_OK)

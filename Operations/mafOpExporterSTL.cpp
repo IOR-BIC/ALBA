@@ -61,10 +61,10 @@ mafOpExporterSTL::~mafOpExporterSTL()
 {
 }
 //----------------------------------------------------------------------------
-bool mafOpExporterSTL::Accept(mafNode *node)
+bool mafOpExporterSTL::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
-  return (node && ((mafVME *)node)->GetOutput()->IsMAFType(mafVMEOutputSurface));
+  return (node && node->GetOutput()->IsMAFType(mafVMEOutputSurface));
 }
 //----------------------------------------------------------------------------
 // constants
@@ -158,7 +158,7 @@ void mafOpExporterSTL::OpStop(int result)
 void mafOpExporterSTL::ExportSurface()
 //----------------------------------------------------------------------------
 {
-  mafVMEOutputSurface *out_surface = mafVMEOutputSurface::SafeDownCast(((mafVME *)m_Input)->GetOutput());
+  mafVMEOutputSurface *out_surface = mafVMEOutputSurface::SafeDownCast(m_Input->GetOutput());
   out_surface->Update();
 
   vtkMAFSmartPointer<vtkTriangleFilter>triangles;

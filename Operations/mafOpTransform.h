@@ -25,7 +25,7 @@
 // forward references :
 //----------------------------------------------------------------------------
 
-class mafNode;
+class mafVME;
 class mafGui;
 class mafEvent;
 class mafGizmoTranslate;
@@ -52,7 +52,7 @@ public:
   mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */
-	bool Accept(mafNode* vme);
+	bool Accept(mafVME* vme);
 
 	/** Builds operation's interface. */
 	void OpRun();

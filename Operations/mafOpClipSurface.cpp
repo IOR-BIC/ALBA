@@ -126,7 +126,7 @@ mafOp* mafOpClipSurface::Copy()
 }
 
 //----------------------------------------------------------------------------
-bool mafOpClipSurface::Accept(mafNode *node)
+bool mafOpClipSurface::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
 	return (node != NULL && node->IsMAFType(mafVMESurface));
@@ -155,7 +155,7 @@ void mafOpClipSurface::OpRun()
 	vtkNEW(m_ClipperBoundingBox);
   vtkNEW(m_OldSurface);
 
-  m_OldSurface->DeepCopy((vtkPolyData*)((mafVME *)m_Input)->GetOutput()->GetVTKData());
+  m_OldSurface->DeepCopy((vtkPolyData*)m_Input->GetOutput()->GetVTKData());
  
 	vtkNEW(m_ClippedPolyData);
 	vtkNEW(m_ResultPolyData);
@@ -180,13 +180,13 @@ void mafOpClipSurface::CreateGizmos()
 	m_ImplicitPlaneGizmo->Modified();
 	m_ImplicitPlaneGizmo->Update();
 
-	m_GizmoTranslate = new mafGizmoTranslate(mafVME::SafeDownCast(m_ImplicitPlaneGizmo), this);
+	m_GizmoTranslate = new mafGizmoTranslate(m_ImplicitPlaneGizmo, this);
 	m_GizmoTranslate->SetRefSys(m_ImplicitPlaneGizmo);
 	m_GizmoTranslate->Show(false);
-	m_GizmoRotate = new mafGizmoRotate(mafVME::SafeDownCast(m_ImplicitPlaneGizmo), this);
+	m_GizmoRotate = new mafGizmoRotate(m_ImplicitPlaneGizmo, this);
 	m_GizmoRotate->SetRefSys(m_ImplicitPlaneGizmo);
 	m_GizmoRotate->Show(false);
-	m_GizmoScale = new mafGizmoScale(mafVME::SafeDownCast(m_ImplicitPlaneGizmo), this);
+	m_GizmoScale = new mafGizmoScale(m_ImplicitPlaneGizmo, this);
 	m_GizmoScale->SetRefSys(m_ImplicitPlaneGizmo);
 	m_GizmoScale->Show(false);
 }
@@ -204,7 +204,7 @@ void mafOpClipSurface::CreateGui()
 	m_Gui->Button(ID_CHOOSE_SURFACE,_("clipper surface"));
 	m_Gui->Bool(ID_CLIP_INSIDE,_("reverse clipping"),&m_ClipInside,1);
 	double b[6];
-	((mafVME *)m_Input)->GetOutput()->GetVMEBounds(b);
+	m_Input->GetOutput()->GetVMEBounds(b);
 	// bounding box dim
 	m_PlaneWidth = b[1] - b[0];
 	m_PlaneHeight = b[3] - b[2];
@@ -323,7 +323,7 @@ void mafOpClipSurface::ClipBoundingBox()
 	transform_plane->Update();
 
 	vtkMAFSmartPointer<vtkTransformPolyDataFilter> transform_data_input;
-	transform_data_input->SetTransform(((mafVME*)m_Input)->GetAbsMatrixPipe()->GetVTKTransform());
+	transform_data_input->SetTransform(m_Input->GetAbsMatrixPipe()->GetVTKTransform());
 	transform_data_input->SetInput(m_OldSurface);
 	transform_data_input->Update();
 
@@ -335,7 +335,7 @@ void mafOpClipSurface::ClipBoundingBox()
 	m_ResultPolyData->DeepCopy(m_ClipperBoundingBox->GetOutput());
 	m_ResultPolyData->Update();
 
-	int result=((mafVMESurface*)m_Input)->SetData(m_ResultPolyData,((mafVME*)m_Input)->GetTimeStamp());
+	int result=((mafVMESurface*)m_Input)->SetData(m_ResultPolyData,m_Input->GetTimeStamp());
 
 	if(m_GenerateClippedOutput)
 	{
@@ -530,21 +530,21 @@ void mafOpClipSurface::OpDo()
 //----------------------------------------------------------------------------
 {
 	vtkMAFSmartPointer<vtkTransformPolyDataFilter> transform_output;
-	transform_output->SetTransform((vtkAbstractTransform *)((mafVME *)m_Input)->GetAbsMatrixPipe()->GetVTKTransform()->GetInverse());
+	transform_output->SetTransform((vtkAbstractTransform *)m_Input->GetAbsMatrixPipe()->GetVTKTransform()->GetInverse());
 	transform_output->SetInput(m_ResultPolyData);
 	transform_output->Update();
 
-	((mafVMESurface *)m_Input)->SetData(transform_output->GetOutput(),((mafVME *)m_Input)->GetTimeStamp());
+	((mafVMESurface *)m_Input)->SetData(transform_output->GetOutput(),m_Input->GetTimeStamp());
 	if(m_GenerateClippedOutput)
 	{
 		vtkMAFSmartPointer<vtkTransformPolyDataFilter> transform_clipped_output;
-		transform_clipped_output->SetTransform((vtkAbstractTransform *)((mafVME *)m_Input)->GetAbsMatrixPipe()->GetVTKTransform()->GetInverse());
+		transform_clipped_output->SetTransform((vtkAbstractTransform *)m_Input->GetAbsMatrixPipe()->GetVTKTransform()->GetInverse());
 		transform_clipped_output->SetInput(m_ClippedPolyData);
 		transform_clipped_output->Update();
 
 		mafNEW(m_ClippedVME);
 		m_ClippedVME->DeepCopy(m_Input);
-		m_ClippedVME->SetData(transform_clipped_output->GetOutput(),((mafVME *)m_Input)->GetTimeStamp());
+		m_ClippedVME->SetData(transform_clipped_output->GetOutput(),m_Input->GetTimeStamp());
 		m_ClippedVME->SetName("clipped");
 		m_ClippedVME->Update();
 
@@ -556,7 +556,7 @@ void mafOpClipSurface::OpDo()
 void mafOpClipSurface::OpUndo()
 //----------------------------------------------------------------------------
 {
-  ((mafVMESurface *)m_Input)->SetData(m_OldSurface,((mafVME *)m_Input)->GetTimeStamp());
+  ((mafVMESurface *)m_Input)->SetData(m_OldSurface,m_Input->GetTimeStamp());
 	if(m_GenerateClippedOutput)
 	{
 		m_ClippedVME->ReparentTo(NULL);
@@ -579,8 +579,8 @@ int mafOpClipSurface::Clip()
       return MAF_ERROR;
 
     vtkMAFSmartPointer<vtkTransformPolyDataFilter> transform_data_input;
-    transform_data_input->SetTransform((vtkAbstractTransform *)((mafVME *)m_Input)->GetAbsMatrixPipe()->GetVTKTransform());
-    transform_data_input->SetInput((vtkPolyData *)((mafVME *)m_Input)->GetOutput()->GetVTKData());
+    transform_data_input->SetTransform((vtkAbstractTransform *)m_Input->GetAbsMatrixPipe()->GetVTKTransform());
+    transform_data_input->SetInput((vtkPolyData *)m_Input->GetOutput()->GetVTKData());
     transform_data_input->Update();
 
     // clip input surface by another surface
@@ -616,7 +616,7 @@ int mafOpClipSurface::Clip()
 		else
 		{
 			vtkMatrix4x4 *mat = vtkMatrix4x4::New();
-			mat->DeepCopy(((mafVME *)m_Input)->GetAbsMatrixPipe()->GetMatrixPointer()->GetVTKMatrix());
+			mat->DeepCopy(m_Input->GetAbsMatrixPipe()->GetMatrixPointer()->GetVTKMatrix());
 			mat->Invert();
 			mat->Modified();
 
@@ -628,7 +628,7 @@ int mafOpClipSurface::Clip()
 			tr->Update();
 
 			m_ClipperPlane->SetTransform(tr);
-			m_Clipper->SetInput(vtkPolyData::SafeDownCast(((mafVME *)m_Input)->GetOutput()->GetVTKData()));
+			m_Clipper->SetInput(vtkPolyData::SafeDownCast(m_Input->GetOutput()->GetVTKData()));
 			m_Clipper->SetClipFunction(m_ClipperPlane);
 			tr->Delete();
 			mat->Delete();
@@ -670,7 +670,7 @@ void mafOpClipSurface::PostMultiplyEventMatrix(mafEventBase *maf_event)
 		// handle incoming transform events
 		vtkTransform *tr = vtkTransform::New();
 		tr->PostMultiply();
-		tr->SetMatrix(((mafVME *)m_ImplicitPlaneGizmo)->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
+		tr->SetMatrix(m_ImplicitPlaneGizmo->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
 		tr->Concatenate(e->GetMatrix()->GetVTKMatrix());
 		tr->Update();
 
@@ -681,7 +681,7 @@ void mafOpClipSurface::PostMultiplyEventMatrix(mafEventBase *maf_event)
 		if (arg == mafInteractorGenericMouse::MOUSE_MOVE)
 		{
 			// move vme
-			((mafVME *)m_ImplicitPlaneGizmo)->SetAbsMatrix(absPose);
+			m_ImplicitPlaneGizmo->SetAbsMatrix(absPose);
 			// update matrix for OpDo()
 			//m_NewAbsMatrix = absPose;
 		} 
@@ -700,7 +700,7 @@ void mafOpClipSurface::ShowClipPlane(bool show)
     if(m_ClipperPlane == NULL)
     {
       double b[6];
-      ((mafVME *)m_Input)->GetOutput()->GetVMEBounds(b);
+      m_Input->GetOutput()->GetVMEBounds(b);
 
       // bounding box dim
       double xdim = b[1] - b[0];
@@ -739,7 +739,7 @@ void mafOpClipSurface::ShowClipPlane(bool show)
       mafNEW(m_ImplicitPlaneGizmo);
       m_ImplicitPlaneGizmo->SetData(m_Gizmo->GetOutput());
       m_ImplicitPlaneGizmo->SetName("implicit plane gizmo");
-      m_ImplicitPlaneGizmo->ReparentTo(mafVME::SafeDownCast(m_Input->GetRoot()));
+      m_ImplicitPlaneGizmo->ReparentTo(m_Input->GetRoot());
 
       // position the plane
       mafSmartPointer<mafTransform> currTr;
@@ -748,7 +748,7 @@ void mafOpClipSurface::ShowClipPlane(bool show)
 
       mafMatrix mat;
       mat.DeepCopy(&currTr->GetMatrix());
-      mat.SetTimeStamp(((mafVME *)m_Input)->GetTimeStamp());
+      mat.SetTimeStamp(m_Input->GetTimeStamp());
 
       m_ImplicitPlaneGizmo->SetAbsMatrix(mat);
 

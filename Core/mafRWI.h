@@ -25,7 +25,7 @@
 //----------------------------------------------------------------------------
 // Forward References :
 //----------------------------------------------------------------------------
-class mafNode;
+class mafVME;
 class vtkMAFGridActor;
 class vtkLight;
 class vtkCamera;
@@ -65,7 +65,7 @@ public:
 	void CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers = ONE_LAYER, bool use_grid = false, bool show_axes = false,  int stereo = 0, bool show_orientator = false, int axesType = mafAxes::TRIAD);
 
 	/** Reset the camera position. If vme is passed as parameter, the camera is resetted to fill the vme into the view. */
-	void CameraReset(mafNode *vme = NULL, double zoom = 1);
+	void CameraReset(mafVME *vme = NULL, double zoom = 1);
 
 	/** Reset the camera position according to the bounds. */
 	void CameraReset(double bounds[6], double zoom = 1);
@@ -156,7 +156,7 @@ public:
 
 protected:
 	/** Compute the bounds for the visible actors; if vme is passed, the bounds of vme are calculated. */
-	double *ComputeVisibleBounds(mafNode *node = NULL);
+	double *ComputeVisibleBounds(mafVME *vme = NULL);
 	mafGUI *CreateGui();
 
 	mafGUI       *m_Gui;

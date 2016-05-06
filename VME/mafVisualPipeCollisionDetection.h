@@ -61,7 +61,7 @@ public:
   void UpdatePipeline(bool force = false);
 
   /** static function to select a surface in the tree */
-  static bool SurfaceAccept(mafNode *node);
+  static bool SurfaceAccept(mafVME*node);
 
   /** set the surface to compute collision - remove all old surfaces */
   void SetSurfaceToCollide(mafVME *surface);

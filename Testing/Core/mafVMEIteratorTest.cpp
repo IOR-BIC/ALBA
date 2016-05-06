@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: mafNodeIteratorTest
+ Module: mafVMEIteratorTest
  Authors: Roberto Mucci
  
  Copyright (c) B3C
@@ -24,12 +24,11 @@
 //----------------------------------------------------------------------------
 
 #include <cppunit/config/SourcePrefix.h>
-#include "mafNodeIteratorTest.h"
+#include "mafVMEIteratorTest.h"
 #include "mafCoreTests.h"
 #include "mafSmartPointer.h"
-#include "mafNodeRoot.h"
-#include "mafNode.h"
-#include "mafNodeIterator.h"
+#include "mafVME.h"
+#include "mafVMEIterator.h"
 #include "mafVMERoot.h"
 #include "mafVMEFactory.h"
 #include "mafVMEStorage.h"
@@ -41,21 +40,21 @@
 
 
 //----------------------------------------------------------------------------
-void mafNodeIteratorTest::TestFixture()
+void mafVMEIteratorTest::TestFixture()
 //----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
-void mafNodeIteratorTest::TestDynamicAllocation()
+void mafVMEIteratorTest::TestDynamicAllocation()
 //----------------------------------------------------------------------------
 {
   mafSmartPointer<mafVMERoot> root;
-  mafNodeIterator *iter = root->NewIterator();
+  mafVMEIterator *iter = root->NewIterator();
   iter->Delete();
 }
 
 //----------------------------------------------------------------------------
-void mafNodeIteratorTest::GetFirstNodeTest()
+void mafVMEIteratorTest::GetFirstNodeTest()
 //----------------------------------------------------------------------------
 {
   // in order to create VME from storage we need the factory to initialize 
@@ -74,8 +73,8 @@ void mafNodeIteratorTest::GetFirstNodeTest()
   CPPUNIT_ASSERT(res == MAF_OK);
 
 
-  mafNodeIterator *iter = storage->GetRoot()->NewIterator();
-  mafNode* first = iter->GetFirstNode();
+  mafVMEIterator *iter = storage->GetRoot()->NewIterator();
+  mafVME* first = iter->GetFirstNode();
 
   //First node is Root
   CPPUNIT_ASSERT(first->GetId() == -1);
@@ -85,7 +84,7 @@ void mafNodeIteratorTest::GetFirstNodeTest()
   mafDEL(storage);
 }
 //----------------------------------------------------------------------------
-void mafNodeIteratorTest::GetLastNodeTest()
+void mafVMEIteratorTest::GetLastNodeTest()
 //----------------------------------------------------------------------------
 {
   // in order to create VME from storage we need the factory to initialize 
@@ -104,8 +103,8 @@ void mafNodeIteratorTest::GetLastNodeTest()
   CPPUNIT_ASSERT(res == MAF_OK);
 
 
-  mafNodeIterator *iter = storage->GetRoot()->NewIterator();
-  mafNode* last = iter->GetLastNode();
+  mafVMEIterator *iter = storage->GetRoot()->NewIterator();
+  mafVME* last = iter->GetLastNode();
 
   //Last node is a landmark
   CPPUNIT_ASSERT(last->GetId() == 3);
@@ -116,7 +115,7 @@ void mafNodeIteratorTest::GetLastNodeTest()
 }
 
 //----------------------------------------------------------------------------
-void mafNodeIteratorTest::GetNextNodeTest()
+void mafVMEIteratorTest::GetNextNodeTest()
 //----------------------------------------------------------------------------
 {
   // in order to create VME from storage we need the factory to initialize 
@@ -135,9 +134,9 @@ void mafNodeIteratorTest::GetNextNodeTest()
   CPPUNIT_ASSERT(res == MAF_OK);
 
 
-  mafNodeIterator *iter = storage->GetRoot()->NewIterator();
-  mafNode* first = iter->GetFirstNode();
-  mafNode* next = iter->GetNextNode();
+  mafVMEIterator *iter = storage->GetRoot()->NewIterator();
+  mafVME* first = iter->GetFirstNode();
+  mafVME* next = iter->GetNextNode();
 
   //next node is a volumeGray
   CPPUNIT_ASSERT(next->GetId() == 1);
@@ -148,7 +147,7 @@ void mafNodeIteratorTest::GetNextNodeTest()
 }
 
 //----------------------------------------------------------------------------
-void mafNodeIteratorTest::GetPreviousNodeTest()
+void mafVMEIteratorTest::GetPreviousNodeTest()
 //----------------------------------------------------------------------------
 {
   // in order to create VME from storage we need the factory to initialize 
@@ -167,9 +166,9 @@ void mafNodeIteratorTest::GetPreviousNodeTest()
   CPPUNIT_ASSERT(res == MAF_OK);
 
 
-  mafNodeIterator *iter = storage->GetRoot()->NewIterator();
-  mafNode* last = iter->GetLastNode();
-  mafNode* next = iter->GetPreviousNode();
+  mafVMEIterator *iter = storage->GetRoot()->NewIterator();
+  mafVME* last = iter->GetLastNode();
+  mafVME* next = iter->GetPreviousNode();
 
   //previous node is a mafVMELandmarkCloud
   CPPUNIT_ASSERT(next->GetId() == 12);
@@ -180,7 +179,7 @@ void mafNodeIteratorTest::GetPreviousNodeTest()
 }
 
 //----------------------------------------------------------------------------
-void mafNodeIteratorTest::IsVisibleTest()
+void mafVMEIteratorTest::IsVisibleTest()
 //----------------------------------------------------------------------------
 {
   // in order to create VME from storage we need the factory to initialize 
@@ -199,8 +198,8 @@ void mafNodeIteratorTest::IsVisibleTest()
   CPPUNIT_ASSERT(res == MAF_OK);
 
 
-  mafNodeIterator *iter = storage->GetRoot()->NewIterator();
-  mafNode* last = iter->GetLastNode();
+  mafVMEIterator *iter = storage->GetRoot()->NewIterator();
+  mafVME* last = iter->GetLastNode();
   
  
   //last node is visible
@@ -211,7 +210,7 @@ void mafNodeIteratorTest::IsVisibleTest()
 }
 
 //----------------------------------------------------------------------------
-void mafNodeIteratorTest::SetRootNodeTest()
+void mafVMEIteratorTest::SetRootNodeTest()
 //----------------------------------------------------------------------------
 {
   // in order to create VME from storage we need the factory to initialize 
@@ -230,13 +229,13 @@ void mafNodeIteratorTest::SetRootNodeTest()
   CPPUNIT_ASSERT(res == MAF_OK);
 
 
-  mafNodeIterator *iter = storage->GetRoot()->NewIterator();
-  mafNode* first = iter->GetFirstNode();
-  mafNode* next = iter->GetNextNode();
+  mafVMEIterator *iter = storage->GetRoot()->NewIterator();
+  mafVME* first = iter->GetFirstNode();
+  mafVME* next = iter->GetNextNode();
   iter->SetRootNode(next);
 
   iter->InitTraversal();
-  mafNode* newRoot = iter->GetFirstNode();
+  mafVME* newRoot = iter->GetFirstNode();
 
 
   //new root node is a mafVMEVolumeGray
@@ -248,7 +247,7 @@ void mafNodeIteratorTest::SetRootNodeTest()
 }
 
 //----------------------------------------------------------------------------
-void mafNodeIteratorTest::GetTraversalModeTest()
+void mafVMEIteratorTest::GetTraversalModeTest()
 //----------------------------------------------------------------------------
 {
   // in order to create VME from storage we need the factory to initialize 
@@ -266,8 +265,8 @@ void mafNodeIteratorTest::GetTraversalModeTest()
   int res = storage->Restore();
   CPPUNIT_ASSERT(res == MAF_OK);
 
-  mafNodeIterator *iter = storage->GetRoot()->NewIterator();
-  mafNode* first = iter->GetFirstNode();
+  mafVMEIterator *iter = storage->GetRoot()->NewIterator();
+  mafVME* first = iter->GetFirstNode();
 
   bool traversal = (iter->GetTraversalMode() == 0);
 
@@ -286,11 +285,11 @@ void mafNodeIteratorTest::GetTraversalModeTest()
 }
 
 //----------------------------------------------------------------------------
-void mafNodeIteratorTest::SetTraversalModeToPreOrderTest()
+void mafVMEIteratorTest::SetTraversalModeToPreOrderTest()
 //----------------------------------------------------------------------------
 {
   mafSmartPointer<mafVMERoot> root;
-  mafNodeIterator *iter = root->NewIterator();
+  mafVMEIterator *iter = root->NewIterator();
   iter->SetTraversalModeToPreOrder();
   bool traversal = (iter->GetTraversalMode() == 0);
 
@@ -300,11 +299,11 @@ void mafNodeIteratorTest::SetTraversalModeToPreOrderTest()
   iter->Delete();
 }
 //----------------------------------------------------------------------------
-void mafNodeIteratorTest::SetTraversalModeToPostOrderTest()
+void mafVMEIteratorTest::SetTraversalModeToPostOrderTest()
 //----------------------------------------------------------------------------
 {
   mafSmartPointer<mafVMERoot> root;
-  mafNodeIterator *iter = root->NewIterator();
+  mafVMEIterator *iter = root->NewIterator();
   iter->SetTraversalModeToPostOrder();
   bool traversal = (iter->GetTraversalMode() == 1);
 

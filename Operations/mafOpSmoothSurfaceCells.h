@@ -29,7 +29,7 @@
 //----------------------------------------------------------------------------
 
 class mafRWI;
-class mafNode;
+class mafVME;
 class mafGUIDialog;
 class mafInteractorSelectCell;
 
@@ -65,7 +65,7 @@ public:
 	void OnEvent(mafEventBase *maf_event);
 
 	/** Return true for the acceptable vme type. */
-	bool Accept(mafNode* vme);
+	bool Accept(mafVME* vme);
 
 	/** Builds operation's interface by calling CreateOpDialog() method. */
 	void OpRun();

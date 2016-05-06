@@ -49,7 +49,7 @@ public:
   void Print(std::ostream &os, const int tabs=0);
 
   /** Copy the contents of another landmark into this one. */
-  virtual int DeepCopy(mafNode *a);
+  virtual int DeepCopy(mafVME *a);
 
   /** Compare with another landmark. */
   virtual bool Equals(mafVME *vme);
@@ -100,6 +100,9 @@ public:
   Redefined to avoid chaning landmark scale (i.e. the scale is forced to the visibility value)*/
   virtual void SetMatrix(mafMatrix &mat);
 
+	/** Set the global pose of this VME for the current time. This function usually modifies the MatrixVector. */
+	virtual void SetAbsMatrix(const mafMatrix &matrix);
+
   /** return icon */
   static char** GetIcon();
 
@@ -113,7 +116,7 @@ public:
   virtual void SetTimeStamp(mafTimeStamp t);
 
   /** called to check if the vme can be re-parented under the new parent */
-  virtual bool CanReparentTo(mafNode *parent);
+  virtual bool CanReparentTo(mafVME *parent);
 
 protected:
   mafVMELandmark();

@@ -58,7 +58,7 @@ public:
   /*virtual*/ void OpRun();
 
   /** Return true for the acceptable vme type. */
-  /*virtual*/ bool Accept(mafNode* node);
+  /*virtual*/ bool Accept(mafVME* node);
 
   /** Import VTK XML data. */
   virtual int ImportVTKXML();

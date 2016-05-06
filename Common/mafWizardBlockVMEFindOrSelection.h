@@ -65,7 +65,7 @@ protected:
   virtual void ExcutionBegin();
 
   //** VME Accept function */
-  static int VMEAccept(mafNode *node);
+  static int VMEAccept(mafVME*node);
 
   wxString m_AcceptedVME;
   wxString m_Title;

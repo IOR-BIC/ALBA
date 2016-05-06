@@ -22,7 +22,7 @@
 //----------------------------------------------------------------------------
 #include "mafDefines.h"
 #include "mafOp.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafVMESurface.h"
 
 //----------------------------------------------------------------------------
@@ -62,7 +62,7 @@ public:
 
   mafOp* Copy();
 
-  bool Accept(mafNode *node);   
+  bool Accept(mafVME*node);   
   void OpRun();
   void OpDo();
   void OpUndo();
@@ -80,7 +80,7 @@ public:
 		GIZMO_SCALE,
 	};
   
-  static bool SurfaceAccept(mafNode *node) {return(node != NULL && node->IsMAFType(mafVMESurface));};
+  static bool SurfaceAccept(mafVME*node) {return(node != NULL && node->IsMAFType(mafVMESurface));};
 
   /** Set the modality to clip input surface. Available modality are MODE_SURFACE or MODE_IMPLICIT_FUNCTION*/
   void SetClippingModality(int mode = mafOpSplitSurface::MODE_IMPLICIT_FUNCTION);

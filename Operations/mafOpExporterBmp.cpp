@@ -63,7 +63,7 @@ mafOpExporterBmp::~mafOpExporterBmp()
 {
 }
 //----------------------------------------------------------------------------
-bool mafOpExporterBmp::Accept(mafNode *node)
+bool mafOpExporterBmp::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
 	return (node != NULL) && node->IsA("mafVMEVolumeGray");

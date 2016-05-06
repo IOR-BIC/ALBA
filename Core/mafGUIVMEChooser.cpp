@@ -32,10 +32,10 @@
 #include "mafGUIVMEChooser.h"
 #include "mafDecl.h"
 
-#include "mafNode.h"
+#include "mafVME.h"
 
 //----------------------------------------------------------------------------
-mafGUIVMEChooser::mafGUIVMEChooser(mafGUICheckTree *tree, wxString dialog_title, long vme_accept_function, long style, bool multiSelect, mafNode *subTree)
+mafGUIVMEChooser::mafGUIVMEChooser(mafGUICheckTree *tree, wxString dialog_title, long vme_accept_function, long style, bool multiSelect, mafVME *subTree)
 : mafGUIDialog(dialog_title,mafCLOSEWINDOW | mafRESIZABLE | mafCLOSE | mafOK )
 //----------------------------------------------------------------------------
 {
@@ -60,7 +60,7 @@ mafGUIVMEChooser::~mafGUIVMEChooser()
   delete m_ChooserTree;
 }
 //----------------------------------------------------------------------------
-std::vector<mafNode*> mafGUIVMEChooser::ShowChooserDialog()
+std::vector<mafVME*> mafGUIVMEChooser::ShowChooserDialog()
 //----------------------------------------------------------------------------
 {
   if(ShowModal() == wxID_OK)
@@ -69,7 +69,7 @@ std::vector<mafNode*> mafGUIVMEChooser::ShowChooserDialog()
   }
 	else
   {
-     std::vector<mafNode*> nodeVector;
+     std::vector<mafVME*> nodeVector;
      nodeVector.clear();
      return nodeVector;
   }

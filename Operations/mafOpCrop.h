@@ -17,7 +17,7 @@
 #ifndef __mafOpCrop_H__
 #define __mafOpCrop_H__
 
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafOp.h"
 //----------------------------------------------------------------------------
 // forward references :
@@ -54,7 +54,7 @@ public:
 
   mafOp* Copy();
 
-	/*virtual*/ bool Accept(mafNode* node);
+	/*virtual*/ bool Accept(mafVME* node);
 	/*virtual*/ void OpRun();	
 	
   /**	Extract the volume cropped*/

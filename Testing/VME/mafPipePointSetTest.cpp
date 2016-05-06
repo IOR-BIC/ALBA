@@ -196,7 +196,6 @@ void mafPipePointSetTest::TestPipeExecution()
 
   m_Renderer->RemoveAllProps();
 
-  delete pipePointSet;
   delete sceneNode;
   mafDEL(pointsetInput);
   vtkDEL(delaunay);

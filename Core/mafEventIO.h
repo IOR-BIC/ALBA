@@ -23,7 +23,7 @@
 // Forward declarations
 //------------------------------------------------------------------------------
 class mafStorage;
-class mafNode;
+class mafVME;
 class mafRoot;
 //------------------------------------------------------------------------------
 // mafEventIO
@@ -55,15 +55,15 @@ public:
   void SetStorage(mafStorage *storage);
   mafStorage *GetStorage();
 
-  void SetRoot(mafNode *root);
+  void SetRoot(mafVME *root);
   
   /** return the pointer to the tree root node */
-  mafNode *GetRoot();
+  mafVME *GetRoot();
 
 protected:
   mafID           m_ItemId;
   mafStorage*     m_Storage;
-  mafNode*        m_Root;
+  mafVME*        m_Root;
 };
 
 #endif /* __mafEventIO_h */

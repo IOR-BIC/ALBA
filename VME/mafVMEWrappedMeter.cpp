@@ -142,7 +142,7 @@ mafVMEWrappedMeter::~mafVMEWrappedMeter()
 
 
 //-------------------------------------------------------------------------
-int mafVMEWrappedMeter::DeepCopy(mafNode *a)
+int mafVMEWrappedMeter::DeepCopy(mafVME *a)
 //-------------------------------------------------------------------------
 {
 	if (Superclass::DeepCopy(a)==MAF_OK)
@@ -363,8 +363,8 @@ void mafVMEWrappedMeter::InternalUpdateAutomatedIOR()
 
     // create ordered list of tangent point (2) real algorithm
     vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformFirstDataInput;
-    transformFirstDataInput->SetTransform((vtkAbstractTransform *)((mafVME *)wrapped_vme)->GetAbsMatrixPipe()->GetVTKTransform());
-    transformFirstDataInput->SetInput((vtkPolyData *)((mafVME *)wrapped_vme)->GetOutput()->GetVTKData());
+    transformFirstDataInput->SetTransform((vtkAbstractTransform *)wrapped_vme->GetAbsMatrixPipe()->GetVTKTransform());
+    transformFirstDataInput->SetInput((vtkPolyData *)wrapped_vme->GetOutput()->GetVTKData());
     transformFirstDataInput->Update();
 
     vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformFirstData;
@@ -408,7 +408,7 @@ void mafVMEWrappedMeter::InternalUpdateAutomatedIOR()
     //local_wrapped_center -> center of wrapped surface
     //need a vector that is the normal of the plane
 
-    vtkMatrix4x4 *mat = ((mafVME *)wrapped_vme)->GetAbsMatrixPipe()->GetVTKTransform()->GetMatrix();
+    vtkMatrix4x4 *mat = wrapped_vme->GetAbsMatrixPipe()->GetVTKTransform()->GetMatrix();
     mafMatrix matrix;
     matrix.SetVTKMatrix(mat);
     double versorX[3], versorY[3], versorZ[3];
@@ -906,8 +906,8 @@ void mafVMEWrappedMeter::InternalUpdateAutomated()
     
     // create ordered list of tangent point (2) real algorithm
     vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformFirstDataInput;
-    transformFirstDataInput->SetTransform((vtkAbstractTransform *)((mafVME *)wrapped_vme)->GetAbsMatrixPipe()->GetVTKTransform());
-    transformFirstDataInput->SetInput((vtkPolyData *)((mafVME *)wrapped_vme)->GetOutput()->GetVTKData());
+    transformFirstDataInput->SetTransform((vtkAbstractTransform *)wrapped_vme->GetAbsMatrixPipe()->GetVTKTransform());
+    transformFirstDataInput->SetInput((vtkPolyData *)wrapped_vme->GetOutput()->GetVTKData());
     transformFirstDataInput->Update();
 
     vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformFirstData;
@@ -985,7 +985,7 @@ void mafVMEWrappedMeter::InternalUpdateAutomated()
      //local_wrapped_center -> center of wrapped surface
      //need a vector that is the normal of the plane
 
-     vtkMatrix4x4 *mat = ((mafVME *)wrapped_vme)->GetAbsMatrixPipe()->GetVTKTransform()->GetMatrix();
+     vtkMatrix4x4 *mat = wrapped_vme->GetAbsMatrixPipe()->GetVTKTransform()->GetMatrix();
      mafMatrix matrix;
      matrix.SetVTKMatrix(mat);
      double versorX[3], versorY[3], versorZ[3];
@@ -1257,17 +1257,17 @@ void mafVMEWrappedMeter::InternalUpdateManual()
     { 
       for(int j=0; j<m_OrderMiddlePointsNameVMEList.size(); j++)
       {
-        mafNode *middleVME = IndexToMiddlePointVME(j);
+        mafVME *middleVME = IndexToMiddlePointVME(j);
         m_MiddlePointList.push_back(new double[3]);
         if(middleVME->IsMAFType(mafVMELandmarkCloud))
         {
           ((mafVMELandmarkCloud *)middleVME)->GetLandmark(m_OrderMiddlePointsNameVMEList[j],m_MiddlePointList[m_MiddlePointList.size()-1],-1);
-          m_TmpTransform->SetMatrix(*((mafVME *)middleVME)->GetOutput()->GetAbsMatrix());
+          m_TmpTransform->SetMatrix(*middleVME->GetOutput()->GetAbsMatrix());
           m_TmpTransform->TransformPoint(m_MiddlePointList[m_MiddlePointList.size()-1],m_MiddlePointList[m_MiddlePointList.size()-1]);
         }
         else
         {
-          ((mafVME *)middleVME)->GetOutput()->GetAbsPose(m_MiddlePointList[m_MiddlePointList.size()-1], orientation);
+          middleVME->GetOutput()->GetAbsPose(m_MiddlePointList[m_MiddlePointList.size()-1], orientation);
         }
         
       }
@@ -1722,7 +1722,7 @@ int mafVMEWrappedMeter::InternalStore(mafStorageElement *parent)
 
 		for(int i=0; i<m_MiddlePointList.size(); i++)
 		{
-			mafNode *node;
+			mafVME *node;
 			node = IndexToMiddlePointVME(i);
 			if(node == NULL) continue;
 			int vmeId = node->GetId();
@@ -1952,7 +1952,7 @@ mafGUI* mafVMEWrappedMeter::CreateGui()
 //	const wxString mode_choices_string[] = {_("point distance"), _("line distance"), _("line angle")};;
   const wxString wrap_choices_string[] = {_("manual"), _("automated"), _("IOR_automated")};
 
-  m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
+  m_Gui = mafVME::CreateGui(); // Called to show info about vmes' type and name
   m_Gui->SetListener(this);
   m_Gui->Divider();
   m_Gui->Combo(ID_WRAPPED_METER_MODE,_("wrap"),&m_WrappedMode,num_wrap,wrap_choices_string,_("Choose the meter mode"));
@@ -2076,7 +2076,7 @@ void mafVMEWrappedMeter::OnEvent(mafEventBase *maf_event)
           e->SetArg((long)&mafVMEWrappedMeter::VMEAccept);
         e->SetString(&title);
         ForwardUpEvent(e);
-        mafNode *n = e->GetVme();
+        mafVME *n = e->GetVme();
         if (n != NULL)
         {
           if (button_id == ID_START_METER_LINK)
@@ -2160,7 +2160,7 @@ void mafVMEWrappedMeter::OnEvent(mafEventBase *maf_event)
         e->SetArg((long)&mafVMEWrappedMeter::VMEAccept);
         e->SetString(&title);
         ForwardUpEvent(e);
-        mafNode *n = e->GetVme();
+        mafVME *n = e->GetVme();
 
         if (n == NULL) return;
 
@@ -2349,7 +2349,7 @@ void mafVMEWrappedMeter::OnEvent(mafEventBase *maf_event)
 			}
 			break;*/
       default:
-        mafNode::OnEvent(maf_event);
+        mafVME::OnEvent(maf_event);
     }
   }
   else
@@ -2358,7 +2358,7 @@ void mafVMEWrappedMeter::OnEvent(mafEventBase *maf_event)
   }
 }
 //-------------------------------------------------------------------------
-void mafVMEWrappedMeter::SetMeterLink(const char *link_name, mafNode *n)
+void mafVMEWrappedMeter::SetMeterLink(const char *link_name, mafVME *n)
 //-------------------------------------------------------------------------
 {
   if (n->IsMAFType(mafVMELandmark))
@@ -2380,7 +2380,7 @@ void mafVMEWrappedMeter::SetMeterLink(const char *link_name, mafNode *n)
 }
 
 //-------------------------------------------------------------------------
-void mafVMEWrappedMeter::AddMidPoint(mafNode *node)
+void mafVMEWrappedMeter::AddMidPoint(mafVME *node)
 //-------------------------------------------------------------------------
 {
   m_OrderMiddlePointsVMEList.push_back(node->GetId());
@@ -2416,28 +2416,28 @@ void mafVMEWrappedMeter::RemoveLink(const char *link_name)
 mafVME *mafVMEWrappedMeter::GetStartVME()
 //-------------------------------------------------------------------------
 {
-  return mafVME::SafeDownCast(GetLink("StartVME"));
+  return GetLink("StartVME");
 }
 //-------------------------------------------------------------------------
 mafVME *mafVMEWrappedMeter::GetEnd1VME()
 //-------------------------------------------------------------------------
 {
-  return mafVME::SafeDownCast(GetLink("EndVME1"));
+  return GetLink("EndVME1");
 }
 //-------------------------------------------------------------------------
 mafVME *mafVMEWrappedMeter::GetEnd2VME()
 //-------------------------------------------------------------------------
 {
-  return mafVME::SafeDownCast(GetLink("EndVME2"));
+  return GetLink("EndVME2");
 }
 //-------------------------------------------------------------------------
 mafVME *mafVMEWrappedMeter::GetWrappedVME()
 //-------------------------------------------------------------------------
 {
-  return mafVME::SafeDownCast(GetLink("WrappedVME"));
+  return GetLink("WrappedVME");
 }
 //-----------------------------------------------------------------------
-mafNode::mafLinksMap *mafVMEWrappedMeter::GetMidPointsLinks()
+mafVME::mafLinksMap *mafVMEWrappedMeter::GetMidPointsLinks()
 //-----------------------------------------------------------------------
 {
   //da ritornare la link maps
@@ -2512,12 +2512,12 @@ bool mafVMEWrappedMeter::MiddlePointsControl()
   return true;
 }
 //-------------------------------------------------------------------------
-mafNode* mafVMEWrappedMeter::IndexToMiddlePointVME(int index)
+mafVME* mafVMEWrappedMeter::IndexToMiddlePointVME(int index)
 //-------------------------------------------------------------------------
 {
   mafString name = m_OrderMiddlePointsNameVMEList[index];
 
-	mafNode *returnNode = NULL;
+	mafVME *returnNode = NULL;
   for (mafLinksMap::iterator i = GetLinks()->begin(); i != GetLinks()->end(); i++)
   {
     if(i->first.Equals(name)) returnNode =  i->second.m_Node;

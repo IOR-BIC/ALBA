@@ -110,11 +110,11 @@ mafSceneGraph *mafViewHTML::GetSceneGraph()									  {return m_Sg;}
 //----------------------------------------------------------------------------
 mafRWIBase *mafViewHTML::GetDefaultRWI()											{ return m_Rwi->m_RwiBase;}
 //----------------------------------------------------------------------------
-void mafViewHTML::VmeSelect(mafNode *vme, bool select)					{ m_Sg->VmeSelect(vme, select);}
+void mafViewHTML::VmeSelect(mafVME *vme, bool select)					{ m_Sg->VmeSelect(vme, select);}
 //----------------------------------------------------------------------------
-void mafViewHTML::VmeAdd(mafNode *vme)													{ m_Sg->VmeAdd(vme);} 
+void mafViewHTML::VmeAdd(mafVME *vme)													{ m_Sg->VmeAdd(vme);} 
 //----------------------------------------------------------------------------
-void mafViewHTML::VmeRemove(mafNode *vme)
+void mafViewHTML::VmeRemove(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   if(vme == m_ActiveNote)
@@ -126,13 +126,13 @@ void mafViewHTML::VmeRemove(mafNode *vme)
   m_Sg->VmeRemove(vme); 
 }
 //----------------------------------------------------------------------------
-void mafViewHTML::VmeShow  (mafNode *vme, bool show)
+void mafViewHTML::VmeShow  (mafVME *vme, bool show)
 //----------------------------------------------------------------------------
 { 
   if(show)
   {
-    for(mafSceneNode *node = m_Sg->GetNodeList(); node; node=node->m_Next)
-      mafEventMacro(mafEvent(this,VME_SHOW,node->m_Vme,false));    
+    for(mafSceneNode *node = m_Sg->GetNodeList(); node; node=node->GetNext())
+      mafEventMacro(mafEvent(this,VME_SHOW,node->GetVme(),false));    
   }
   else
     m_Html->SetPage("");
@@ -140,11 +140,11 @@ void mafViewHTML::VmeShow  (mafNode *vme, bool show)
   m_Sg->VmeShow(vme, show); 
 }
 //----------------------------------------------------------------------------
-void mafViewHTML::VmeCreatePipe(mafNode *vme) 
+void mafViewHTML::VmeCreatePipe(mafVME *vme) 
 //----------------------------------------------------------------------------
 {
   wxString body;
-  mafNode *ExternalNote = NULL;
+  mafVME *ExternalNote = NULL;
   bool found = false;
   if(vme->GetTagArray()->IsTagPresent("HTML_INFO"))
     body = vme->GetTagArray()->GetTag("HTML_INFO")->GetValue();

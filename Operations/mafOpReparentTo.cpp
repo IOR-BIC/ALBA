@@ -57,7 +57,7 @@ mafOpReparentTo::~mafOpReparentTo( )
 {
 }
 //----------------------------------------------------------------------------
-bool mafOpReparentTo::Accept(mafNode *node)
+bool mafOpReparentTo::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
   return (node != NULL && node->IsMAFType(mafVME) && !node->IsMAFType(mafVMERoot) /*&& !node->IsMAFType(mafVMEExternalData)*/);
@@ -78,7 +78,7 @@ void mafOpReparentTo::OpRun()
   {
     mafEvent e(this,VME_CHOOSE);
     mafEventMacro(e);
-    m_TargetVme = mafVME::SafeDownCast(e.GetVme());
+    m_TargetVme = e.GetVme();
   }
 	
 	int result = OP_RUN_CANCEL;
@@ -105,9 +105,9 @@ void mafOpReparentTo::SetTargetVme(mafVME *target)
 void mafOpReparentTo::OpDo()
 //----------------------------------------------------------------------------
 {
-	m_OldParent = mafVME::SafeDownCast(m_Input->GetParent());
+	m_OldParent = m_Input->GetParent();
 
-	int reparentOK=ReparentTo((mafVME *)m_Input, m_TargetVme, m_OldParent);
+	int reparentOK=ReparentTo(m_Input, m_TargetVme, m_OldParent);
 
   if (reparentOK == MAF_OK)
   {
@@ -149,15 +149,15 @@ int mafOpReparentTo::ReparentTo(mafVME * input, mafVME * targetVme, mafVME * old
 	{
 		cTime = time[t];
 
-		((mafVME *)input)->SetTimeStamp(cTime);
+		input->SetTimeStamp(cTime);
 		targetVme->SetTimeStamp(cTime);
 		oldParent->SetTimeStamp(cTime);
 
 		transform->SetTimeStamp(cTime);
-		mafMatrixPipe *mp = ((mafVME *)input)->GetMatrixPipe();
+		mafMatrixPipe *mp = input->GetMatrixPipe();
 		if (mp == NULL)
 		{
-			transform->SetInput(((mafVME *)input)->GetOutput()->GetMatrix());
+			transform->SetInput(input->GetOutput()->GetMatrix());
 		}
 		else
 		{
@@ -170,13 +170,13 @@ int mafOpReparentTo::ReparentTo(mafVME * input, mafVME * targetVme, mafVME * old
 		new_input_pose[t]->DeepCopy(transform->GetMatrixPointer());
 	}
 
-	((mafVME *)input)->SetTimeStamp(startTime);
+	input->SetTimeStamp(startTime);
 	targetVme->SetTimeStamp(startTime);
 	oldParent->SetTimeStamp(startTime);
 
 	for (t = 0; t < num; t++)
 	{
-		((mafVME *)input)->SetMatrix(*new_input_pose[t]);
+		input->SetMatrix(*new_input_pose[t]);
 	}
 	
 	return input->ReparentTo(targetVme);

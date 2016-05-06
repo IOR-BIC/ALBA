@@ -23,7 +23,7 @@
 #include "mafVMELandmarkCloud.h"
 #include "mafVME.h"
 #include "vtkDataSet.h"
-#include "mafNodeIterator.h"
+#include "mafVMEIterator.h"
 #include "mafAbsMatrixPipe.h"
 #include "mafMatrix.h"
 #include "mafVMELandmark.h"
@@ -46,7 +46,7 @@ void mafOpImporterMSF1xTest::Test()
 	CPPUNIT_ASSERT(i==2);
 	for(int j=0;j<i;j++)
 	{
-		mafNode *node = storage->GetRoot()->GetChild(j);
+		mafVME *node = storage->GetRoot()->GetChild(j);
 		switch (j)
 		{
 		case 0:
@@ -62,7 +62,7 @@ void mafOpImporterMSF1xTest::Test()
 
 		if(node->IsA("mafVMESurface"))
 		{
-			vtkDataSet *data=((mafVME *)node)->GetOutput()->GetVTKData();
+			vtkDataSet *data=node->GetOutput()->GetVTKData();
 			data->Update();
 			int cells=data->GetNumberOfCells();
 			CPPUNIT_ASSERT(cells==12);
@@ -71,7 +71,7 @@ void mafOpImporterMSF1xTest::Test()
 		}
 		if(node->IsA("mafVMEVolume"))
 		{
-			vtkDataSet *data=((mafVME *)node)->GetOutput()->GetVTKData();
+			vtkDataSet *data=node->GetOutput()->GetVTKData();
 			data->Update();
 			double range[2];
 			data->GetScalarRange(range);

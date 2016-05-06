@@ -143,7 +143,7 @@ int mafOpImporterMSF::ImportMSF()
   m_Group->SetName(group_name);
   m_Group->ReparentTo(m_Input);
   
-  while (mafNode *node = root->GetFirstChild())
+  while (mafVME *node = root->GetFirstChild())
   {
     node->ReparentTo(m_Group);
 

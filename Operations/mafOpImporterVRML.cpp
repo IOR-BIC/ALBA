@@ -228,7 +228,7 @@ void  mafOpImporterVRML::ImportVRML()
       name.Printf("surface_%d", i);
 
       mafTimeStamp t;
-      t = ((mafVME *)m_Input)->GetTimeStamp();
+      t = m_Input->GetTimeStamp();
       mafSmartPointer<mafVMESurface> surface;
       surface->SetName(name.c_str());
       vtkPolyData *data = (vtkPolyData *)actor->GetMapper()->GetInput();

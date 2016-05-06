@@ -28,7 +28,7 @@
 //----------------------------------------------------------------------------
 class vtkRectilinearGrid;
 class vtkStructuredPoints;
-
+class mafVME;
 /** */
 class MAF_EXPORT mafDataPipeCustomSegmentationVolume : public mafDataPipeCustom
 {
@@ -39,10 +39,10 @@ public:
   int DeepCopy(mafDataPipe *pipe);
 
   /** Set the volume to segment*/
-  int SetVolume(mafNode *volume);
+  int SetVolume(mafVME *volume);
 
   /** Return the segmented volume*/
-  mafNode *GetVolume() {return m_Volume;};
+	mafVME *GetVolume() {return m_Volume;};
 
   /** Set the threshold modality for automatic segmentation: GLOBAL or RANGE */
   void SetAutomaticSegmentationThresholdModality(int modality);
@@ -90,16 +90,16 @@ public:
   bool CheckNumberOfThresholds();
 
   /** Set the volume mask for the manual segmentation */
-  void SetManualVolumeMask(mafNode *volume);
+  void SetManualVolumeMask(mafVME *volume);
 
   /** Get the volume mask for the manual segmentation */
-  mafNode *GetManualVolumeMask(){return m_ManualVolumeMask;};
+  mafVME *GetManualVolumeMask(){return m_ManualVolumeMask;};
 
   /** Set the volume mask for the refinement segmentation */
-  void SetRefinementVolumeMask(mafNode *volume);
+  void SetRefinementVolumeMask(mafVME *volume);
 
   /** Get the volume mask for the refinement segmentation */
-  mafNode *GetRefinementVolumeMask();
+  mafVME *GetRefinementVolumeMask();
 
   /** Return the vtkDataSet of the automatic segmentation */
   vtkDataSet *GetAutomaticOutput();
@@ -190,9 +190,9 @@ protected:
   bool m_ChangedRefinementData;
   bool m_ChangedRegionGrowingData;
 
-  mafNode *m_Volume;
-  mafNode *m_ManualVolumeMask;
-  mafNode *m_RefinementVolumeMask;
+	mafVME *m_Volume;
+	mafVME *m_ManualVolumeMask;
+	mafVME *m_RefinementVolumeMask;
 
   //Stuff for automatic threshold
   int m_UseDoubleThreshold;

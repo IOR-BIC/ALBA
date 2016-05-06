@@ -37,7 +37,7 @@
 #include "mafDecl.h"
 #include "mafEvent.h"
 #include "mafGUI.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafVME.h"
 #include "mafVMEPolyLine.h"
 #include "mafVMEPolylineGraph.h"
@@ -154,7 +154,7 @@ mafOpMeshDeformation::~mafOpMeshDeformation()
   mafDEL(m_Output);
 }
 //----------------------------------------------------------------------------
-bool mafOpMeshDeformation::Accept(mafNode *node)
+bool mafOpMeshDeformation::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
   return (node && node->IsA("mafVMESurface"));
@@ -882,16 +882,15 @@ void mafOpMeshDeformation::OnEvent(mafEventBase *maf_event)
   ev.SetArg((long)&mafOpMeshDeformation::SelectCurveVMECallback);
 
   mafEventMacro(ev);
-  return mafVME::SafeDownCast(ev.GetVme());
+  return ev.GetVme();
 }
 
 //------------------------------------------------------------------------
 //Callback for VME_CHOOSE that accepts polylines only
-/*static*/ bool mafOpMeshDeformation::SelectCurveVMECallback(mafNode *node) 
+/*static*/ bool mafOpMeshDeformation::SelectCurveVMECallback(mafVME *vme) 
 //------------------------------------------------------------------------
 {
-  mafVME* vme = mafVME::SafeDownCast(node);
-  return vme != NULL && vme->GetOutput()->IsA("mafVMEOutputPolyline");  
+  return vme != NULL && vme->GetOutput() && vme->GetOutput()->IsA("mafVMEOutputPolyline");
 }
 
 //------------------------------------------------------------------------
@@ -2864,40 +2863,3 @@ void mafOpMeshDeformation::RemoveAllActors()
   } 
 }
 #pragma endregion //Input Control Curves
-
-////TODO: to be removed
-//void mafOpMeshDeformation::TestCode()
-//{
-//  {
-//  mafEvent ev(this, VME_SELECT, (long)24/*14*//*5*//*12*/);
-//  mafEventMacro(ev);
-//  m_DCToAdd = mafVME::SafeDownCast(ev.GetVme());
-//  }
-//  
-//  {
-//    mafEvent ev(this, VME_SELECT, (long)23/*15*//*7*//*13*/);
-//    mafEventMacro(ev);
-//    m_OCToAdd = mafVME::SafeDownCast(ev.GetVme());
-//  }
-//  
-//  //m_CCCtrl->SetValue("7,5;15,14;");
-//
-//  /*OnSelectOC();
-//  OnSelectDC();*/  
-//  OnAddCurve();
-//#ifdef DEBUG_mafOpMeshDeformation
-//  m_EditMode = EDM_SELECT_MESH_VERTEX;
-//  m_Dialog->Update();
-//  OnEditMode();
-//#endif
-//
-//  m_MeshesVisibility[0] = 0;
-//  m_MeshesVisibility[1] = 1;
-//  m_CurvesVisibility[1] = 0;
-//  m_CurvesVisibility[2] = 0;  
-//  m_Dialog->Update();
-//  UpdateVisibility();
-//
-//  OnPreview();
-//
-//}

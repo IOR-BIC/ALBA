@@ -35,7 +35,7 @@ public:
   mafOp* Copy();
   mafTypeMacro(mafOpCreateVmeSurface, mafOp);
 
-  bool Accept(mafNode* vme) {return vme && vme->IsMAFType(mafVME);};
+  bool Accept(mafVME* vme) {return vme && vme->IsMAFType(mafVME);};
   void OpRun();
   void OpDo();
   void OpUndo();

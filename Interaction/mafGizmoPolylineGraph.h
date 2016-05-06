@@ -54,7 +54,7 @@ class MAF_EXPORT mafGizmoPolylineGraph : public mafGizmoInterface
 {
 public:
   /** The only way to construct correctly the instance */
-  inline static mafGizmoPolylineGraph* New(mafNode* inputVme, 
+  inline static mafGizmoPolylineGraph* New(mafVME* inputVme, 
     mafObserver *Listener = NULL, const char *name = "GizmoPath", bool showOnlyDirectionAxis = false, bool testMode = false)
   {
     mafGizmoPolylineGraph* pThis = new mafGizmoPolylineGraph(inputVme,Listener, name, showOnlyDirectionAxis, testMode);
@@ -73,7 +73,7 @@ public:
   }
 
 protected:
-  mafGizmoPolylineGraph(mafNode* inputVme, mafObserver *Listener = NULL, const char *name = "GizmoPath", bool showOnlyDirectionAxis = false, bool testMode = false);
+  mafGizmoPolylineGraph(mafVME* inputVme, mafObserver *Listener = NULL, const char *name = "GizmoPath", bool showOnlyDirectionAxis = false, bool testMode = false);
   
   /** Initializes the object. May not be called twice (unless Done method was called).  */
   virtual void InternalInitInstance();

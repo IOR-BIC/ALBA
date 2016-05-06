@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: mafSceneNode
- Authors: Silvano Imboden
+ Authors: Silvano Imboden, Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -27,61 +27,57 @@
 #include "mafPipe.h"
 #include "mafSceneGraph.h"
 #include "mafSceneNode.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafVME.h"
 #include "mafMatrixPipe.h"
 #include "vtkMAFAssembly.h"
-#include "mafNodeIterator.h" 
+#include "mafVMEIterator.h" 
 #include "vtkRenderer.h"
-//#include "vtkTransform.h"
 #include "vtkLinearTransform.h"
 #include "vtkCommand.h"
-//@@@ #include "mafNodeLandmarkCloud.h"
-//@@@ #include "mafNodeScalar.h"
-//@@@ #include "mflMatrixPipe.h"
-//@@@ #include "mflAgent.h"
 
 //----------------------------------------------------------------------------
-mafSceneNode::mafSceneNode(mafSceneGraph *sg,mafSceneNode *parent, const mafNode* vme, vtkRenderer *ren, vtkRenderer *ren2, vtkRenderer *ren3)
-//----------------------------------------------------------------------------
+mafSceneNode::mafSceneNode(mafSceneGraph *sg,mafSceneNode *parent, mafVME *vme, vtkRenderer *renderFront, vtkRenderer *renderBack, vtkRenderer *alwaysVisibleRender)
 {
 	m_Sg            = sg;
 	m_Parent				= parent;
-	m_Vme						= (mafNode *)vme;
-	m_RenFront			= ren;
-	m_RenBack				= ren2;
-  m_AlwaysVisibleRenderer = ren3;
+	m_Vme						= vme;
+	m_RenFront			= renderFront;
+	m_RenBack				= renderBack;
+  m_AlwaysVisibleRenderer = alwaysVisibleRender;
   
   m_Next					= NULL;
   m_Pipe					= NULL;
   m_PipeCreatable = true;
   m_Mutex         = false;
-  //m_visible      = false;
   m_AssemblyFront = NULL;
   m_AssemblyBack  = NULL;
   m_AlwaysVisibleAssembly = NULL;
+	m_VisibleChildren = 0;
+	
+	m_CurrentVisibility = false;
 
   assert(m_Vme);
   vtkLinearTransform *transform = NULL;
-  if(m_Vme->IsA("mafVME"))
-  {
-    mafVME* v = ((mafVME*)m_Vme);
-    assert(v->GetOutput());
-    assert(v->GetOutput()->GetTransform());
-    assert(v->GetOutput()->GetTransform()->GetVTKTransform());
-    transform = v->GetOutput()->GetTransform()->GetVTKTransform();
-  }
 
-  m_AssemblyFront = vtkMAFAssembly::New();
-  m_AssemblyFront->SetVme(m_Vme);
-  m_AssemblyFront->SetUserTransform(transform);
+	assert(m_Vme->GetOutput());
+  assert(m_Vme->GetOutput()->GetTransform());
+  assert(m_Vme->GetOutput()->GetTransform()->GetVTKTransform());
+  transform = m_Vme->GetOutput()->GetTransform()->GetVTKTransform();
 
-  if(m_RenFront != NULL) //modified by Vladik. 03-03-2004
-  {
-	  if(m_Vme->IsA("mafNodeRoot") || m_Vme->IsA("mafVMERoot")) 
-		  m_RenFront->AddActor(m_AssemblyFront); 
-	  else if (m_AssemblyFront)  //modified by Marco. 20-7-2004
-		  m_Parent->m_AssemblyFront->AddPart(m_AssemblyFront);
+	//The creation of the Assembly Front is required in tests enven if m_RenFront is NULL
+	m_AssemblyFront = vtkMAFAssembly::New();
+	m_AssemblyFront->SetVme(m_Vme);
+	m_AssemblyFront->SetUserTransform(transform);
+
+  if(m_RenFront != NULL)
+	{
+		m_AssemblyFront->SetVisibility(m_CurrentVisibility);
+
+	  if (m_Parent) 
+			m_Parent->m_AssemblyFront->AddPart(m_AssemblyFront);
+	  else
+			m_RenFront->AddActor(m_AssemblyFront);
   }
 
 	if(m_RenBack != NULL)
@@ -89,208 +85,74 @@ mafSceneNode::mafSceneNode(mafSceneGraph *sg,mafSceneNode *parent, const mafNode
 		m_AssemblyBack = vtkMAFAssembly::New();
     m_AssemblyBack->SetVme(m_Vme);
     m_AssemblyBack->SetUserTransform(transform);
-    if(m_Vme->IsA("mafNodeRoot") || m_Vme->IsA("mafVMERoot")) 
-			m_RenBack->AddActor(m_AssemblyBack); 
-		else
+		m_AssemblyBack->SetVisibility(m_CurrentVisibility);
+
+    if(m_Parent) 
 			m_Parent->m_AssemblyBack->AddPart(m_AssemblyBack);
+		else
+			m_RenBack->AddActor(m_AssemblyBack);
 	}
-
-	m_AlwaysVisibleAssembly = vtkMAFAssembly::New();
-	m_AlwaysVisibleAssembly->SetVme(m_Vme);
-	m_AlwaysVisibleAssembly->SetUserTransform(transform);
-
+	
 	if(m_AlwaysVisibleRenderer != NULL)
 	{
-		if(m_Vme->IsA("mafNodeRoot") || m_Vme->IsA("mafVMERoot")) 
-			m_AlwaysVisibleRenderer->AddActor(m_AlwaysVisibleAssembly); 
-		else
+		m_AlwaysVisibleAssembly = vtkMAFAssembly::New();
+		m_AlwaysVisibleAssembly->SetVme(m_Vme);
+		m_AlwaysVisibleAssembly->SetUserTransform(transform);
+		m_AlwaysVisibleAssembly->SetVisibility(m_CurrentVisibility);
+
+		if(m_Parent) 
 			m_Parent->m_AlwaysVisibleAssembly->AddPart(m_AlwaysVisibleAssembly);
-
+		else
+			m_AlwaysVisibleRenderer->AddActor(m_AlwaysVisibleAssembly);
 	}
-
-
-  /* @@@ 
-	
-//@@@   m_cloud					 = NULL;
-  m_CloudOpenClose_observer = 0;
-	m_CloudRadiusModified_observer = 0;
-  m_CloudSphereResolutionModified_observer = 0;
-	if( m_Vme->IsA("mafNodeLandmarkCloud") )
-	{
-		m_cloud = (mafNodeLandmarkCloud *)m_Vme;
-		m_CloudOpenClose_observer = mflAgent::PlugEventSource(m_Vme,OnOpenCloseEvent,this,mafNodeLandmarkCloud::OpenCloseEvent); 
-		m_CloudRadiusModified_observer = mflAgent::PlugEventSource(m_Vme,OnRadiusModifiedEvent,this,mafNodeLandmarkCloud::RadiusModifiedEvent); 
-		m_CloudSphereResolutionModified_observer = mflAgent::PlugEventSource(m_Vme,OnSphereResolutionModifiedEvent,this,mafNodeLandmarkCloud::SphereResolutionModifiedEvent); 
-	}
-	m_scalar							= NULL;
-	m_Scalar_ScalingModified_observer	= 0;
-	m_Scalar_DiameterModified_observer	= 0;
-	m_Scalar_HeadModified_observer		= 0;
- 
-	if( m_Vme->IsA("mafNodeScalar") )
-	{
-		m_scalar = (mafNodeScalar *)m_Vme;
-		m_Scalar_ScalingModified_observer = mflAgent::PlugEventSource(m_Vme,OnScalingModifiedEvent,this,mafNodeScalar::ScalingModifiedEvent); 
-		m_Scalar_DiameterModified_observer = mflAgent::PlugEventSource(m_Vme,OnDiameterModifiedEvent,this,mafNodeScalar::DiameterModifiedEvent);
-		m_Scalar_HeadModified_observer = mflAgent::PlugEventSource(m_Vme,OnHeadModifiedEvent,this,mafNodeScalar::HeadModifiedEvent); 
-	}
-@@@ */
-
 }
 //----------------------------------------------------------------------------
 mafSceneNode::~mafSceneNode()
-//----------------------------------------------------------------------------
 {
 	cppDEL(m_Pipe);
 	
-	if(m_RenFront != NULL)  //modified by Vladik. 03-03-2004
-  {
-    if(m_Vme->IsA("mafNodeRoot") || m_Vme->IsA("mafVMERoot")) 
-		  m_RenFront->RemoveActor(m_AssemblyFront);
-    else if (m_AssemblyFront)  //modified by Marco. 20-7-2004
-	   	m_Parent->m_AssemblyFront->RemovePart(m_AssemblyFront); 
+	if(m_RenFront != NULL) 
+	{
+    if(m_Parent) 
+			m_Parent->m_AssemblyFront->RemovePart(m_AssemblyFront);
+		else
+			m_RenFront->RemoveActor(m_AssemblyFront);
+		
+		vtkDEL(m_AssemblyFront);
   }
-
-  vtkDEL(m_AssemblyFront); 
-
+	
 	if(m_RenBack != NULL)
 	{
-    if(m_Vme->IsA("mafNodeRoot") || m_Vme->IsA("mafVMERoot")) 
-			m_RenBack->RemoveActor(m_AssemblyBack);
+    if(m_Parent) 
+			m_Parent->m_AssemblyBack->RemovePart(m_AssemblyBack);
 		else
-			m_Parent->m_AssemblyBack->RemovePart(m_AssemblyBack); 
+			m_RenBack->RemoveActor(m_AssemblyBack);
 
     vtkDEL(m_AssemblyBack);  
 	}
 
 	if(m_AlwaysVisibleRenderer != NULL)
 	{
-		if(m_Vme->IsA("mafNodeRoot") || m_Vme->IsA("mafVMERoot")) 
-			m_AlwaysVisibleRenderer->RemoveActor(m_AlwaysVisibleAssembly);
+		if(m_Parent)
+			m_Parent->m_AlwaysVisibleAssembly->RemovePart(m_AlwaysVisibleAssembly);
 		else
-			m_Parent->m_AlwaysVisibleAssembly->RemovePart(m_AlwaysVisibleAssembly); 
-
+			m_AlwaysVisibleRenderer->RemoveActor(m_AlwaysVisibleAssembly);
+		
+		vtkDEL(m_AlwaysVisibleAssembly);
 	}
-
-	vtkDEL(m_AlwaysVisibleAssembly);  
-	
-
- /* @@@
-	if (m_cloud && m_CloudOpenClose_observer > 0 )
-	{
-		m_cloud->RemoveObserver(m_CloudOpenClose_observer);
-		m_cloud->RemoveObserver(m_CloudRadiusModified_observer);
-		m_cloud->RemoveObserver(m_CloudSphereResolutionModified_observer);
-	}
-
-	if (m_scalar )
-	{
-		m_scalar->RemoveObserver(m_Scalar_ScalingModified_observer);
-		m_scalar->RemoveObserver(m_Scalar_DiameterModified_observer);
-		m_scalar->RemoveObserver(m_Scalar_HeadModified_observer);
-	}
-  @@@ */
 }
 //----------------------------------------------------------------------------
 void mafSceneNode::Select(bool select)   
-//----------------------------------------------------------------------------
 {
   if(m_Pipe) m_Pipe->Select(select);
 }
-/*
-//----------------------------------------------------------------------------
-void mafSceneNode::Show(bool show)   
-//----------------------------------------------------------------------------
-{
-	m_visible = show;
-  if(m_Pipe) m_Pipe->Show(show);
-}
-*/
 //----------------------------------------------------------------------------
 void mafSceneNode::UpdateProperty(bool fromTag)
-//----------------------------------------------------------------------------
 {
   if(m_Pipe) m_Pipe->UpdateProperty(fromTag);
 }
-/* @@@
-//----------------------------------------------------------------------------
-void mafSceneNode::OnOpenCloseEvent(void *arg)
-//----------------------------------------------------------------------------
-{
-  mafSceneNode *self=(mafSceneNode *)arg;
-  if(self)
-    self->m_Sg->OnOpenCloseEvent(self);
-}
-//----------------------------------------------------------------------------
-void mafSceneNode::OnRadiusModifiedEvent(void *arg)
-//----------------------------------------------------------------------------
-{
-  mafSceneNode *self=(mafSceneNode *)arg;
-  if(self && self->m_Sg && self->m_cloud)
-	{
-    if(self->m_cloud->IsOpen())
-    {
-      mafNodeIterator *iter=self->m_cloud->NewIterator();
-      for (mafNode *vme=iter->GetFirstNode();vme;vme=iter->GetNextNode())
-	      if(vme->IsA("mafNodeLandmark"))
-				  self->m_Sg->VmeUpdateProperty(vme);
-      iter->Delete();
-    }
-    else
-      self->m_Sg->VmeUpdateProperty(self->m_cloud);
-	}
-}
-@@@ */
-/* @@@
-//----------------------------------------------------------------------------
-void mafSceneNode::OnSphereResolutionModifiedEvent(void *arg)
-//----------------------------------------------------------------------------
-{
-  mafSceneNode *self=(mafSceneNode *)arg;
-  if(self && self->m_Sg && self->m_cloud)
-	{
-    if(self->m_cloud->IsOpen())
-    {
-      mafNodeIterator *iter=self->m_cloud->NewIterator();
-      for (mafNode *vme=iter->GetFirstNode();vme;vme=iter->GetNextNode())
-	      if(vme->IsA("mafNodeLandmark"))
-				  self->m_Sg->VmeUpdateProperty(vme);
-      iter->Delete();
-    }
-    else
-      self->m_Sg->VmeUpdateProperty(self->m_cloud);
-  } 
-}
-//----------------------------------------------------------------------------
-void mafSceneNode::OnScalingModifiedEvent(void *arg)
-//----------------------------------------------------------------------------
-{
-  mafSceneNode *self=(mafSceneNode *)arg;
-  if(self && self->m_Sg && self->m_scalar)
-      self->m_Sg->VmeUpdateProperty(self->m_scalar);
-	  
- }
-//----------------------------------------------------------------------------
-void mafSceneNode::OnDiameterModifiedEvent(void *arg)
-//----------------------------------------------------------------------------
-{
-  mafSceneNode *self=(mafSceneNode *)arg;
-  if(self && self->m_Sg && self->m_scalar)
-	  self->m_Sg->VmeUpdateProperty(self->m_scalar);
-}
-//----------------------------------------------------------------------------
-void mafSceneNode::OnHeadModifiedEvent(void *arg)
-//----------------------------------------------------------------------------
-{
-  mafSceneNode *self=(mafSceneNode *)arg;
-  if(self && self->m_Sg && self->m_scalar)
-	  self->m_Sg->VmeUpdateProperty(self->m_scalar);
-}
-@@@ */
-
 //-------------------------------------------------------------------------
 void mafSceneNode::Print(std::ostream& os, const int tabs)// const
-//-------------------------------------------------------------------------
 {
   mafIndent indent(tabs);
 
@@ -304,4 +166,86 @@ void mafSceneNode::Print(std::ostream& os, const int tabs)// const
   os << std::endl;
 }
 
+//----------------------------------------------------------------------------
+mafPipe * mafSceneNode::GetPipe() const
+{
+	return m_Pipe;
+}
+
+//----------------------------------------------------------------------------
+void mafSceneNode::SetPipe(mafPipe * pipe)
+{
+	m_Pipe = pipe;
+	UpdateVisibility();
+}
+
+//----------------------------------------------------------------------------
+void mafSceneNode::DeletePipe()
+{
+	cppDEL(m_Pipe);
+	UpdateVisibility();
+}
+
+//----------------------------------------------------------------------------
+void mafSceneNode::ChildShow()
+{
+	m_VisibleChildren++;
+	UpdateVisibility();
+}
+
+//----------------------------------------------------------------------------
+void mafSceneNode::ChildHide()
+{
+	m_VisibleChildren--;
+	UpdateVisibility();
+}
+
+//----------------------------------------------------------------------------
+void mafSceneNode::UpdateVisibility()
+{
+	//Nodes are visible if has a pipe or at least a children is visible
+	int visible = m_Pipe || m_VisibleChildren > 0;
+
+	//updates visibility only on changes
+	if (visible != m_CurrentVisibility)
+	{
+		if (m_Parent)
+		{
+			if (visible)
+				m_Parent->ChildShow();
+			else
+				m_Parent->ChildHide();
+		}
+
+		if (m_AssemblyFront)
+			m_AssemblyFront->SetVisibility(visible);
+		if (m_AssemblyBack)
+			m_AssemblyBack->SetVisibility(visible);
+		if (m_AlwaysVisibleAssembly)
+			m_AlwaysVisibleAssembly->SetVisibility(visible);
+
+		m_CurrentVisibility = visible;
+
+		ModifyRootAssembly();
+	}
+}
+
+//----------------------------------------------------------------------------
+void mafSceneNode::ModifyRootAssembly()
+{
+	mafSceneNode *rootNode = this;
+
+	while (rootNode->m_Parent)
+		rootNode = rootNode->m_Parent;
+
+	if (rootNode->m_AssemblyFront)
+		rootNode->m_AssemblyFront->Modified();
+
+	if (rootNode->m_AssemblyBack)
+		rootNode->m_AssemblyBack->Modified();
+
+	if (rootNode->m_AlwaysVisibleAssembly)
+		rootNode->m_AlwaysVisibleAssembly->Modified();
+
+}
 

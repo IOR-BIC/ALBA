@@ -96,7 +96,6 @@ void mafPipeLandmarkCloudTest::TestPipeExecution()
   cloud->AppendLandmark(20.0,0.0,0.0,"second");
   cloud->AppendLandmark(30.0,0.0,0.0,"third");
   cloud->AppendLandmark(40.0,0.0,0.0,"fourth");
-  //cloud->Close();
 
   cloud->GetOutput()->GetVTKData()->Update();
   cloud->GetOutput()->Update();
@@ -184,7 +183,6 @@ void mafPipeLandmarkCloudTest::TestPipeExecution()
   pipe->SetScalarVisibility(FALSE);
   pipe->OnEvent(&mafEventBase(this,mafPipeLandmarkCloud::ID_SCALAR_VISIBILITY));
 
-  cloud->Open();
   actorList->RemoveAllItems();
   pipe->GetAssemblyFront()->GetActors(actorList);
 
@@ -203,7 +201,6 @@ void mafPipeLandmarkCloudTest::TestPipeExecution()
 
   CompareImages(2);
 
-  delete pipe;
   delete sceneNode;
   actorList->Delete();
 }

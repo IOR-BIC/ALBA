@@ -102,7 +102,7 @@
 #include "medOpVolumeResample.h"
 #include "mafViewSliceNotInterpolated.h"
 #include "mafTagItem.h"
-#include "mafNode.h"
+#include "mafVME.h"
 
 
 #include "vtkMAFVolumeToClosedSmoothSurface.h"
@@ -294,7 +294,7 @@ mafOpSegmentation::~mafOpSegmentation()
   Superclass;
 }
 //----------------------------------------------------------------------------
-bool mafOpSegmentation::Accept(mafNode *node)
+bool mafOpSegmentation::Accept(mafVME *node)
 //----------------------------------------------------------------------------
 {
   return (node && node->IsA("mafVMEVolumeGray") );
@@ -351,7 +351,7 @@ void mafOpSegmentation::OpRun()
   InitGui();
 
   m_OldVolumeParent = m_Volume->GetParent();
-  m_Volume->SetParent(m_Volume->GetRoot());
+  m_Volume->ReparentTo(m_Volume->GetRoot());
 
   m_View->VmeAdd(m_Volume);
   m_View->VmeShow(m_Volume, true);
@@ -424,7 +424,7 @@ void mafOpSegmentation::OpDo()
   //Replace the loaded output
   if(m_LoadedVolume != NULL)
   {
-    mafNode *previousSurface = m_LoadedVolume->GetParent();
+    mafVME *previousSurface = m_LoadedVolume->GetParent();
     m_LoadedVolume->ReparentTo(NULL);
     m_LoadedVolume = NULL;
 
@@ -509,13 +509,13 @@ void mafOpSegmentation::OpDo()
 }
 
 //----------------------------------------------------------------------------
-void mafOpSegmentation::DeleteOutputs(mafNode* vme)
+void mafOpSegmentation::DeleteOutputs(mafVME* vme)
   //----------------------------------------------------------------------------
 {
-  const  mafNode::mafChildrenVector *children = vme->GetChildren();
+  const  mafVME::mafChildrenVector *children = vme->GetChildren();
   for(int i = 0; i < children->size(); i++)
   {
-    mafNode *child = children->at(i);
+    mafVME *child = children->at(i);
     DeleteOutputs(child);
     if(IsOutput(child))
     {
@@ -524,7 +524,7 @@ void mafOpSegmentation::DeleteOutputs(mafNode* vme)
   }
 }
 //----------------------------------------------------------------------------
-bool mafOpSegmentation::IsOutput(mafNode* vme)
+bool mafOpSegmentation::IsOutput(mafVME* vme)
   //----------------------------------------------------------------------------
 {
   if(vme->GetTagArray() && vme->GetTagArray()->IsTagPresent("SEGMENTATION_PARENT")==true)
@@ -863,7 +863,7 @@ void mafOpSegmentation::DeleteOpDialog()
   }
   if(m_LoadedVolume)
   {
-    mafNode *parent = m_LoadedVolume;
+    mafVME *parent = m_LoadedVolume;
 
     while(parent != m_Volume)
     {
@@ -1244,8 +1244,8 @@ bool mafOpSegmentation::Refinement()
       newSP->SetScalarTypeToUnsignedChar();
       newSP->Update();
 
-      m_RefinementVolumeMask->SetData(newSP,mafVME::SafeDownCast(m_Volume)->GetTimeStamp());
-      vtkStructuredPoints *spVME = vtkStructuredPoints::SafeDownCast(mafVMEVolumeGray::SafeDownCast(m_RefinementVolumeMask)->GetOutput()->GetVTKData());
+      m_RefinementVolumeMask->SetData(newSP,m_Volume->GetTimeStamp());
+      vtkStructuredPoints *spVME = vtkStructuredPoints::SafeDownCast(m_RefinementVolumeMask->GetOutput()->GetVTKData());
       spVME->Update();
 
     }
@@ -1259,7 +1259,7 @@ bool mafOpSegmentation::Refinement()
       newRG->GetPointData()->SetActiveScalars("SCALARS");
       newRG->Update();
 
-      m_RefinementVolumeMask->SetData(newRG,mafVME::SafeDownCast(m_Volume)->GetTimeStamp());
+      m_RefinementVolumeMask->SetData(newRG,m_Volume->GetTimeStamp());
       vtkRectilinearGrid *rgVME = vtkRectilinearGrid::SafeDownCast(mafVMEVolumeGray::SafeDownCast(m_RefinementVolumeMask)->GetOutput()->GetVTKData());
       rgVME->Update();
     }
@@ -1929,16 +1929,16 @@ void mafOpSegmentation::OnAutomaticStep()
     if (vtkStructuredPoints::SafeDownCast(m_LoadedVolume->GetOutput()->GetVTKData()))
     {
       vtkStructuredPoints *newData = vtkStructuredPoints::SafeDownCast(m_LoadedVolume->GetOutput()->GetVTKData());
-      m_ThresholdVolume->SetData(newData,mafVME::SafeDownCast(m_Volume)->GetTimeStamp());
-      vtkStructuredPoints *spVME = vtkStructuredPoints::SafeDownCast(mafVMEVolumeGray::SafeDownCast(m_ThresholdVolume)->GetOutput()->GetVTKData());
+      m_ThresholdVolume->SetData(newData,m_Volume->GetTimeStamp());
+      vtkStructuredPoints *spVME = vtkStructuredPoints::SafeDownCast(m_ThresholdVolume->GetOutput()->GetVTKData());
       spVME->Update();
 
     }
     else
     {
       vtkRectilinearGrid *newData = vtkRectilinearGrid::SafeDownCast(m_LoadedVolume->GetOutput()->GetVTKData());
-      m_ThresholdVolume->SetData(newData,mafVME::SafeDownCast(m_Volume)->GetTimeStamp());
-      vtkRectilinearGrid *rgVME = vtkRectilinearGrid::SafeDownCast(mafVMEVolumeGray::SafeDownCast(m_ThresholdVolume)->GetOutput()->GetVTKData());
+      m_ThresholdVolume->SetData(newData,m_Volume->GetTimeStamp());
+      vtkRectilinearGrid *rgVME = vtkRectilinearGrid::SafeDownCast(m_ThresholdVolume->GetOutput()->GetVTKData());
       rgVME->Update();
     }
 
@@ -3064,16 +3064,16 @@ void mafOpSegmentation::UpdateThresholdVolumeData()
   if (vtkStructuredPoints::SafeDownCast(m_SegmentatedVolume->GetOutput()->GetVTKData()))
   {
     vtkStructuredPoints *newData = vtkStructuredPoints::SafeDownCast(m_SegmentatedVolume->GetAutomaticOutput());
-    m_ThresholdVolume->SetData(newData,mafVME::SafeDownCast(m_Volume)->GetTimeStamp());
-    vtkStructuredPoints *spVME = vtkStructuredPoints::SafeDownCast(mafVMEVolumeGray::SafeDownCast(m_ThresholdVolume)->GetOutput()->GetVTKData());
+    m_ThresholdVolume->SetData(newData,m_Volume->GetTimeStamp());
+    vtkStructuredPoints *spVME = vtkStructuredPoints::SafeDownCast(m_ThresholdVolume->GetOutput()->GetVTKData());
     spVME->Update();
 
   }
   else
   {
     vtkRectilinearGrid *newData = vtkRectilinearGrid::SafeDownCast(m_SegmentatedVolume->GetAutomaticOutput());
-    m_ThresholdVolume->SetData(newData,mafVME::SafeDownCast(m_Volume)->GetTimeStamp());
-    vtkRectilinearGrid *rgVME = vtkRectilinearGrid::SafeDownCast(mafVMEVolumeGray::SafeDownCast(m_ThresholdVolume)->GetOutput()->GetVTKData());
+    m_ThresholdVolume->SetData(newData,m_Volume->GetTimeStamp());
+    vtkRectilinearGrid *rgVME = vtkRectilinearGrid::SafeDownCast(m_ThresholdVolume->GetOutput()->GetVTKData());
     rgVME->Update();
   }
 
@@ -3597,7 +3597,7 @@ void mafOpSegmentation::OnLoadSegmentationEvent(mafEvent *e)
       e.SetString(&title);
       e.SetArg((long)(&mafOpSegmentation::SegmentedVolumeAccept));
       mafEventMacro(e);
-      mafVME *vme = (mafVME *)e.GetVme();
+      mafVME *vme = e.GetVme();
       mafVMEVolumeGray *newVolume = mafVMEVolumeGray::SafeDownCast(vme);
 
       if(newVolume)
@@ -3784,7 +3784,7 @@ void mafOpSegmentation::InitializeViewSlice()
 //  m_View->SetTextureInterpolate(true);
 
   // slicing the volume
-  vtkDataSet *dataSet = ((mafVME *)m_Volume)->GetOutput()->GetVTKData();
+  vtkDataSet *dataSet = m_Volume->GetOutput()->GetVTKData();
   m_View->PlugVisualPipe("mafVMEVolumeGray","mafPipeVolumeSliceNotInterpolated");
   m_View->PlugVisualPipe("mafVMESegmentationVolume","mafPipeVolumeSliceNotInterpolated");
   m_View->PlugVisualPipe("mafVMEImage","mafPipeImage3D");
@@ -3849,7 +3849,7 @@ void mafOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
     break;
   }
   
-  vtkDataSet *dataset = ((mafVME *)m_ManualVolumeSlice)->GetOutput()->GetVTKData();
+  vtkDataSet *dataset = m_ManualVolumeSlice->GetOutput()->GetVTKData();
 
   if(!dataset || !(dataset->GetPointData()->GetScalars()))
     return;
@@ -4006,7 +4006,7 @@ void mafOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
   vtkMAFSmartPointer<vtkStructuredPoints> newImage;
   newImage->DeepCopy(dataset);
   newImage->Update();
-  m_ManualVolumeSlice->SetData(newImage,mafVME::SafeDownCast(m_ThresholdVolume)->GetTimeStamp(), 2);
+  m_ManualVolumeSlice->SetData(newImage,m_ThresholdVolume->GetTimeStamp(), 2);
   m_ManualVolumeSlice->GetEventSource()->InvokeEvent(m_ManualVolumeSlice, VME_OUTPUT_DATA_UPDATE);
   m_ManualVolumeSlice->GetOutput()->GetVTKData()->Update();
   m_ManualVolumeSlice->GetOutput()->Update();
@@ -4015,139 +4015,7 @@ void mafOpSegmentation::SelectBrushImage(double x, double y, double z, bool sele
   
   m_ManualBrushSize = oldBrushSize;
 }
-/**
-//----------------------------------------------------------------------------
-void mafOpSegmentation::SelectBrushImage(double x, double y, double z, bool selection)
-//----------------------------------------------------------------------------
-{
-  vtkDataSet *dataset = ((mafVME *)m_ManualVolumeSlice)->GetOutput()->GetVTKData();
 
-  if(!dataset)
-    return;
-
-  double origin[3];
-  dataset->GetPoint(0,origin);
-
-  int xID = round((x - origin[0])/m_VolumeSpacing[0]);
-  int yID = round((y - origin[1])/m_VolumeSpacing[1]);
-
-  int nPointXY = m_VolumeDimensions[0]*m_VolumeDimensions[1];
-
-  double centerOfPick[3]={x,y,z};
-
-  double spacing = max(m_VolumeSpacing[0] , m_VolumeSpacing[1]);
-
-  double ray = ((m_ManualBrushSize/2.) * spacing);
-
-  unsigned char scalar = 0;
-  if(selection)
-    scalar=255;
-  double pointToCheckRadius[3];
-
-  //////////////////////////////////////////////////////////////////////////
-  if(m_ManualBrushShape == 0) // circle
-  {
-
-    if (m_CurrentSlicePlane == XY)
-    {
-      for (int i=0;i<nPointXY;i++)
-      {
-        dataset->GetPoint(i,pointToCheckRadius);
-
-		if (sqrt(vtkMath::Distance2BetweenPoints(centerOfPick,pointToCheckRadius))<=ray)
-        {
-          dataset->GetPointData()->GetScalars()->SetTuple1(i, scalar);
-        }
-      }
-    } 
-    else if (m_CurrentSlicePlane == XZ)
-    {
-      for (int i=0;i<dataset->GetNumberOfPoints();i++)
-      {
-        dataset->GetPoint(i,pointToCheckRadius);
-
-        int yIDToCheck = round((pointToCheckRadius[1] - origin[1])/m_VolumeSpacing[1]);
-
-        if (yID == yIDToCheck && sqrt(vtkMath::Distance2BetweenPoints(centerOfPick,pointToCheckRadius))<=ray)
-            dataset->GetPointData()->GetScalars()->SetTuple1(i, scalar);
-      }
-    }
-    else if (m_CurrentSlicePlane == YZ)
-    {
-      for (int i=0;i<dataset->GetNumberOfPoints();i++)
-      {
-        dataset->GetPoint(i,pointToCheckRadius);
-
-        int xIDToCheck = round((pointToCheckRadius[0] - origin[0])/m_VolumeSpacing[0]);
-
-        if (xID == xIDToCheck && sqrt(vtkMath::Distance2BetweenPoints(centerOfPick,pointToCheckRadius))<=ray)
-            dataset->GetPointData()->GetScalars()->SetTuple1(i, scalar);
-      }
-    }
-  }
-  //////////////////////////////////////////////////////////////////////////
-  else // square
-  {
-
-    if (m_CurrentSlicePlane == XY)
-    {
-
-      for (int i=0;i<nPointXY;i++)
-      {
-        dataset->GetPoint(i,pointToCheckRadius);
-
-        if (centerOfPick[0]-ray <= pointToCheckRadius[0] && centerOfPick[0]+ray >= pointToCheckRadius[0] &&
-            centerOfPick[1]-ray <= pointToCheckRadius[1] && centerOfPick[1]+ray >= pointToCheckRadius[1])
-          dataset->GetPointData()->GetScalars()->SetTuple1(i, scalar);
-      }
-    }
-    else if (m_CurrentSlicePlane == XZ)
-    {
-      for (int i=0;i<dataset->GetNumberOfPoints();i++)
-      {
-        dataset->GetPoint(i,pointToCheckRadius);
-
-        int yIDToCheck = round((pointToCheckRadius[1] - origin[1])/m_VolumeSpacing[1]);
-
-        if (yID == yIDToCheck &&
-            centerOfPick[0]-ray <= pointToCheckRadius[0] && centerOfPick[0]+ray >= pointToCheckRadius[0] &&
-            centerOfPick[2]-ray <= pointToCheckRadius[2] && centerOfPick[2]+ray >= pointToCheckRadius[2])
-          dataset->GetPointData()->GetScalars()->SetTuple1(i, scalar);
-      }
-    }
-    else if (m_CurrentSlicePlane == YZ)
-    {
-      for (int i=0;i<dataset->GetNumberOfPoints();i++)
-      {
-        dataset->GetPoint(i,pointToCheckRadius);
-
-        int xIDToCheck = round((pointToCheckRadius[0] - origin[0])/m_VolumeSpacing[0]);
-
-        if (xID == xIDToCheck &&
-            centerOfPick[1]-ray <= pointToCheckRadius[1] && centerOfPick[1]+ray >= pointToCheckRadius[1] &&
-            centerOfPick[2]-ray <= pointToCheckRadius[2] && centerOfPick[2]+ray >= pointToCheckRadius[2])
-          dataset->GetPointData()->GetScalars()->SetTuple1(i, scalar);
-      }
-    }
-  }
-
-  dataset->GetPointData()->Update();
-  dataset->Update();
-  vtkMAFSmartPointer<vtkStructuredPoints> newImage;
-  newImage->DeepCopy(dataset);
-  newImage->Update();
-
-  //m_View->VmeShow(m_ManualVolumeSlice, false);
-  m_ManualVolumeSlice->SetData(newImage,mafVME::SafeDownCast(m_ThresholdVolume)->GetTimeStamp(), 2);
-  m_ManualVolumeSlice->GetEventSource()->InvokeEvent(m_ManualVolumeSlice, VME_OUTPUT_DATA_UPDATE);
-  m_ManualVolumeSlice->GetOutput()->GetVTKData()->Update();
-  m_ManualVolumeSlice->GetOutput()->Update();
-  m_ManualVolumeSlice->Update();
-
-  //m_View->VmeShow(m_ManualVolumeSlice, true);
-
-}
-*/
 //------------------------------------------------------------------------
 void mafOpSegmentation::InitializeInteractors()
 //------------------------------------------------------------------------
@@ -4377,7 +4245,7 @@ void mafOpSegmentation::InitVolumeDimensions()
 void mafOpSegmentation::InitVolumeSpacing()
 //----------------------------------------------------------------------------
 {
-  vtkDataSet *vme_data = ((mafVME *)m_Volume)->GetOutput()->GetVTKData();
+  vtkDataSet *vme_data = m_Volume->GetOutput()->GetVTKData();
 
   m_VolumeSpacing[0] = 0;
   m_VolumeSpacing[1] = 0;
@@ -5071,7 +4939,7 @@ void mafOpSegmentation::UndoBrushPreview()
     vtkImageData* dataSet = (vtkImageData*) m_ManualVolumeSlice->GetOutput()->GetVTKData();
     dataSet->GetPointData()->SetScalars(m_RealDrawnImage);
     dataSet->Update();
-    m_ManualVolumeSlice->SetData(dataSet,mafVME::SafeDownCast(m_Volume)->GetTimeStamp());
+    m_ManualVolumeSlice->SetData(dataSet,m_Volume->GetTimeStamp());
     m_ManualVolumeSlice->Update();
     ApplyVolumeSliceChanges();
   }
@@ -5129,7 +4997,7 @@ void mafOpSegmentation::UpdateThresholdRealTimePreview()
   if (vtkStructuredPoints::SafeDownCast(tVol->GetOutput()->GetVTKData()))
   {
     vtkStructuredPoints *newData = vtkStructuredPoints::SafeDownCast(tVol->GetAutomaticOutput());
-    m_ThresholdVolumeSlice->SetData(newData,mafVME::SafeDownCast(m_Volume)->GetTimeStamp());
+    m_ThresholdVolumeSlice->SetData(newData,m_Volume->GetTimeStamp());
     vtkStructuredPoints *spVME = vtkStructuredPoints::SafeDownCast(mafVMEVolumeGray::SafeDownCast(m_ThresholdVolumeSlice)->GetOutput()->GetVTKData());
     spVME->Update();
 
@@ -5137,7 +5005,7 @@ void mafOpSegmentation::UpdateThresholdRealTimePreview()
   else if(vtkRectilinearGrid::SafeDownCast(tVol->GetOutput()->GetVTKData()))
   {
     vtkRectilinearGrid *newData = vtkRectilinearGrid::SafeDownCast(tVol->GetAutomaticOutput());
-    m_ThresholdVolumeSlice->SetData(newData,mafVME::SafeDownCast(m_Volume)->GetTimeStamp());
+    m_ThresholdVolumeSlice->SetData(newData,m_Volume->GetTimeStamp());
     vtkRectilinearGrid *rgVME = vtkRectilinearGrid::SafeDownCast(mafVMEVolumeGray::SafeDownCast(m_ThresholdVolumeSlice)->GetOutput()->GetVTKData());
     rgVME->Update();
   }
@@ -5161,7 +5029,7 @@ void mafOpSegmentation::UpdateThresholdRealTimePreview()
 }
 
 //----------------------------------------------------------------------------
-bool mafOpSegmentation::SegmentedVolumeAccept(mafNode* node)
+bool mafOpSegmentation::SegmentedVolumeAccept(mafVME*node)
 //----------------------------------------------------------------------------
 {
   if(node != NULL  \

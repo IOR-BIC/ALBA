@@ -52,7 +52,7 @@ const int BOUND_1=1;
 #include "mafTagArray.h"
 #include "mmaMaterial.h"
 #include "mmaVolumeMaterial.h"
-#include "mafNodeIterator.h"
+#include "mafVMEIterator.h"
 #include "mafGUILutPreset.h"
 #include "mafVMEOutputSurface.h"
 #include "mafAttribute.h"
@@ -132,9 +132,8 @@ enum AXIS_ID
 	Z_AXIS,
 };
 
-mafViewArbitraryOrthoSlice::mafViewArbitraryOrthoSlice(wxString label, bool show_ruler)
-: mafViewCompoundWindowing(label, 2, 2)
-
+//----------------------------------------------------------------------------
+mafViewArbitraryOrthoSlice::mafViewArbitraryOrthoSlice(wxString label, bool show_ruler) : mafViewCompoundWindowing(label, 2, 2)
 {
 
 	m_ThicknessText[RED] = "UNDEFINED_THICKNESS_RED_TEXT";
@@ -294,7 +293,7 @@ mafViewArbitraryOrthoSlice::mafViewArbitraryOrthoSlice(wxString label, bool show
 	m_ZnSliceHeightTextActor->SetMapper(m_ZnSliceHeightTextMapper);
 
 }
-
+//----------------------------------------------------------------------------
 mafViewArbitraryOrthoSlice::~mafViewArbitraryOrthoSlice()
 {
 	mafDEL(m_XSlicerPicker);
@@ -350,76 +349,47 @@ mafViewArbitraryOrthoSlice::~mafViewArbitraryOrthoSlice()
 	vtkDEL(m_ZnSliceHeightTextMapper);
 
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::PackageView()
 {
 	m_ViewArbitrary = new mafViewVTK("",CAMERA_PERSPECTIVE,true,false,0,false,mafAxes::HEAD);
 	m_ViewArbitrary->PlugVisualPipe("mafVMEVolumeGray", "mafPipeBox", MUTEX);
-	//	m_ViewArbitrary->PlugVisualPipe("mafVMELabeledVolume", "mafPipeBox", MUTEX);
-
+	
 	m_ViewArbitrary->PlugVisualPipe("mafVMEGizmo", "mafPipeGizmo", NON_VISIBLE);
 
 	m_ViewSliceX = new mafViewVTK("",CAMERA_OS_X,true,false,0,false,mafAxes::HEAD);
-
-
-	// 	m_ViewSliceX->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice", NON_VISIBLE);
-	// 	m_ViewSliceX->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice", NON_VISIBLE);
-	// 	m_ViewSliceX->PlugVisualPipe("mafVMEMesh", "mafPipeMeshSlice", NON_VISIBLE);
-
 	m_ViewSliceX->PlugVisualPipe("mafVMEVolumeGray", "mafPipeBox", NON_VISIBLE);
-	// 	m_ViewSliceX->PlugVisualPipe("mafVMELandmark", "mafPipeSurfaceSlice", NON_VISIBLE);
-	// 	m_ViewSliceX->PlugVisualPipe("mafVMELandmarkCloud", "mafPipeSurfaceSlice", NON_VISIBLE);
 
 	m_ViewSliceY = new mafViewVTK("",CAMERA_OS_Y,true,false,0,false,mafAxes::HEAD);
-
-
-	// 	m_ViewSliceY->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice", NON_VISIBLE);
-	// 	m_ViewSliceY->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice", NON_VISIBLE);
-	// 	m_ViewSliceY->PlugVisualPipe("mafVMEMesh", "mafPipeMeshSlice", NON_VISIBLE);
-	//m_ViewSliceY->PlugVisualPipe("mafVMEGizmo", "mafPipeGizmo");
 	m_ViewSliceY->PlugVisualPipe("mafVMEVolumeGray", "mafPipeBox", NON_VISIBLE);
-	// 	m_ViewSliceY->PlugVisualPipe("mafVMELandmark", "mafPipeSurfaceSlice", NON_VISIBLE);
-	// 	m_ViewSliceY->PlugVisualPipe("mafVMELandmarkCloud", "mafPipeSurfaceSlice", NON_VISIBLE);
 
 	m_ViewSliceZ = new mafViewVTK("",CAMERA_OS_Z,true,false,0,false,mafAxes::HEAD);
-
-
-	// 	m_ViewSliceZ->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice", NON_VISIBLE);
-	// 	m_ViewSliceZ->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice", NON_VISIBLE);
-	// 	m_ViewSliceZ->PlugVisualPipe("mafVMEMesh", "mafPipeMeshSlice", NON_VISIBLE);
-	//m_ViewSliceZ->PlugVisualPipe("mafVMEGizmo", "mafPipeGizmo");
 	m_ViewSliceZ->PlugVisualPipe("mafVMEVolumeGray", "mafPipeBox", NON_VISIBLE);
-	// 	m_ViewSliceZ->PlugVisualPipe("mafVMELandmark", "mafPipeSurfaceSlice", NON_VISIBLE);
-	// 	m_ViewSliceZ->PlugVisualPipe("mafVMELandmarkCloud", "mafPipeSurfaceSlice", NON_VISIBLE);
 
 	PlugChildView(m_ViewArbitrary);
 	PlugChildView(m_ViewSliceZ);
 	PlugChildView(m_ViewSliceX);
 	PlugChildView(m_ViewSliceY);
-
 }
-
-void mafViewArbitraryOrthoSlice::VmeShow(mafNode *node, bool show)
-
+//----------------------------------------------------------------------------
+void mafViewArbitraryOrthoSlice::VmeShow(mafVME *vme, bool show)
 {
-	mafVME *vme=mafVME::SafeDownCast(node);
-
 	if (vme->IsA("mafVMEGizmo"))
 	{
 		if (BelongsToZNormalGizmo(vme))
 		{
-			m_ChildViewList[Z_VIEW]->VmeShow(node, show);
-			m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(node, show);
+			m_ChildViewList[Z_VIEW]->VmeShow(vme, show);
+			m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(vme, show);
 		}
 		else if (BelongsToXNormalGizmo(vme))
 		{
-			m_ChildViewList[X_VIEW]->VmeShow(node, show);
-			m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(node, show);
+			m_ChildViewList[X_VIEW]->VmeShow(vme, show);
+			m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(vme, show);
 		}
 		else if (BelongsToYNormalGizmo(vme))
 		{
-			m_ChildViewList[Y_VIEW]->VmeShow(node, show);
-			m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(node, show);
+			m_ChildViewList[Y_VIEW]->VmeShow(vme, show);
+			m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(vme, show);
 		}
 		else
 		{
@@ -429,16 +399,16 @@ void mafViewArbitraryOrthoSlice::VmeShow(mafNode *node, bool show)
 
 	else
 	{
-		m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(node, show);
-		m_ChildViewList[Z_VIEW]->VmeShow(node, show);
-		m_ChildViewList[X_VIEW]->VmeShow(node, show);
-		m_ChildViewList[Y_VIEW]->VmeShow(node, show);
+		m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(vme, show);
+		m_ChildViewList[Z_VIEW]->VmeShow(vme, show);
+		m_ChildViewList[X_VIEW]->VmeShow(vme, show);
+		m_ChildViewList[Y_VIEW]->VmeShow(vme, show);
 	}
 
 	vme->Update();
 	if (show)
 	{
-		if(((mafVME *)vme)->GetOutput()->IsA("mafVMEOutputVolume"))
+		if(vme->GetOutput()->IsA("mafVMEOutputVolume"))
 		{
 			ShowMafVMEVolume(vme, show);
 			StoreCameraParametersForAllSubviews();
@@ -451,11 +421,11 @@ void mafViewArbitraryOrthoSlice::VmeShow(mafNode *node, bool show)
 		}
 		else if(vme->IsA("mafVMEPolylineEditor"))
 		{
-			ShowmafVMEPolylineEditor(node);
+			ShowmafVMEPolylineEditor(vme);
 		}
 		else if(vme->IsA("mafVMEMesh"))
 		{
-			ShowMafVMEMesh(node);
+			ShowMafVMEMesh(vme);
 
 		}
 		else if(vme->IsA("mafVMEImage"))
@@ -470,7 +440,7 @@ void mafViewArbitraryOrthoSlice::VmeShow(mafNode *node, bool show)
 			m_CurrentPolylineGraphEditor = NULL;
 		}
 
-		if(((mafVME *)vme)->GetOutput()->IsA("mafVMEOutputVolume"))
+		if(vme->GetOutput()->IsA("mafVMEOutputVolume"))
 		{
 			HideMafVMEVolume();
 		}
@@ -479,10 +449,10 @@ void mafViewArbitraryOrthoSlice::VmeShow(mafNode *node, bool show)
 		}
 	}
 
-	if (ActivateWindowing(node))
-		UpdateWindowing(show, node);
+	if (ActivateWindowing(vme))
+		UpdateWindowing(show, vme);
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::OnEvent(mafEventBase *maf_event)
 {
 	assert(maf_event);
@@ -565,7 +535,7 @@ void mafViewArbitraryOrthoSlice::OnEvent(mafEventBase *maf_event)
 		mafEventMacro(*maf_event);
 	}
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::OnEventGizmoCrossTranslateZNormalView(mafEventBase *maf_event)
 {
 	switch(maf_event->GetId())
@@ -599,9 +569,9 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossTranslateZNormalView(mafEventB
 
 			//for each surface visualized change the center of the cut plane
 			assert(m_CurrentVolume);
-			mafNode *root=m_CurrentVolume->GetRoot();
-			mafNodeIterator *iter = root->NewIterator();
-			for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+			mafVME *root=m_CurrentVolume->GetRoot();
+			mafVMEIterator *iter = root->NewIterator();
+			for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
 			{
 				if(node->IsA("mafVMESurface") || node->IsA("mafVMESurfaceParametric") || node->IsA("mafVMELandmark") || node->IsA("mafVMELandmarkCloud")|| node->IsA("mafVMERefSys"))
 				{
@@ -646,7 +616,7 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossTranslateZNormalView(mafEventB
 					double normal[3];
 					((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
 
-					mafPipePolylineGraphEditor *PipeSliceViewPolylineEditor = mafPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe((mafNode*)m_CurrentPolylineGraphEditor));
+					mafPipePolylineGraphEditor *PipeSliceViewPolylineEditor = mafPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe((mafVME*)m_CurrentPolylineGraphEditor));
 					PipeSliceViewPolylineEditor->SetModalitySlice();
 
 					double surfaceOriginTranslated[3];
@@ -671,7 +641,7 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossTranslateZNormalView(mafEventB
 		}
 	}
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::OnEventGizmoCrossRotateZNormalView(mafEventBase *maf_event)
 {
 	switch(maf_event->GetId())
@@ -699,24 +669,12 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossRotateZNormalView(mafEventBase
 			m_ChildViewList[X_VIEW]->GetRWI()->GetCamera()->ApplyTransform(tr);
 			m_ChildViewList[Y_VIEW]->GetRWI()->GetCamera()->ApplyTransform(tr);
 
-
-			// 			}
-			// 			else if (activeGizmoAxis.Equals("Y"))
-			// 			{
-			// 				UpdateCameraYViewOnEventGizmoCrossRotateZNormal(event);
-			// 			}
-			// 			else if (activeGizmoAxis.Equals("X"))
-			// 			{
-			// 				UpdateCameraXViewOnEventGizmoCrossRotateZNormal(event);
-			// 			}
-
-
 			mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 
 			//update the normal of the cutter plane of the surface
-			mafNode *root=m_CurrentVolume->GetRoot();
-			mafNodeIterator *iter = root->NewIterator();
-			for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+			mafVME *root=m_CurrentVolume->GetRoot();
+			mafVMEIterator *iter = root->NewIterator();
+			for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
 			{
 				if(node->IsA("mafVMESurface") || node->IsA("mafVMESurfaceParametric") || node->IsA("mafVMELandmark") || node->IsA("mafVMELandmarkCloud"))
 				{
@@ -771,7 +729,7 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossRotateZNormalView(mafEventBase
 					double normal[3];
 					((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
 
-					mafPipePolylineGraphEditor *PipeSliceViewPolylineEditor = mafPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe((mafNode*)m_CurrentPolylineGraphEditor));
+					mafPipePolylineGraphEditor *PipeSliceViewPolylineEditor = mafPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe((mafVME*)m_CurrentPolylineGraphEditor));
 					PipeSliceViewPolylineEditor->SetModalitySlice();
 
 					double surfaceOriginTranslated[3];
@@ -799,7 +757,7 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossRotateZNormalView(mafEventBase
 		}
 	}
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::OnEventGizmoCrossRotateYNormalView(mafEventBase *maf_event)
 {
 	switch(maf_event->GetId())
@@ -825,9 +783,9 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossRotateYNormalView(mafEventBase
 
 
 			//update the normal of the cutter plane of the surface
-			mafNode *root=m_CurrentVolume->GetRoot();
-			mafNodeIterator *iter = root->NewIterator();
-			for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+			mafVME *root=m_CurrentVolume->GetRoot();
+			mafVMEIterator *iter = root->NewIterator();
+			for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
 			{
 				if(node->IsA("mafVMESurface") || node->IsA("mafVMESurfaceParametric") || node->IsA("mafVMELandmark") || node->IsA("mafVMELandmarkCloud"))
 				{
@@ -863,11 +821,7 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossRotateYNormalView(mafEventBase
 					mafPipeMeshSlice *PipeSliceViewMesh = mafPipeMeshSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe(node));
 					if(PipeSliceViewMesh)
 					{
-
-						//PipeArbitraryViewSurface->SetNormal(normal);
 						PipeSliceViewMesh->SetNormal(normal);
-
-						//PipeArbitraryViewSurface->SetSlice(m_SliceCenterSurface);
 						PipeSliceViewMesh->SetSlice(surfaceOriginTranslated);
 					}
 				}
@@ -882,7 +836,7 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossRotateYNormalView(mafEventBase
 					double normal[3];
 					((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
 
-					mafPipePolylineGraphEditor *PipeSliceViewPolylineEditor = mafPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe((mafNode*)m_CurrentPolylineGraphEditor));
+					mafPipePolylineGraphEditor *PipeSliceViewPolylineEditor = mafPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe((mafVME*)m_CurrentPolylineGraphEditor));
 					PipeSliceViewPolylineEditor->SetModalitySlice();
 
 					double surfaceOriginTranslated[3];
@@ -912,8 +866,7 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossRotateYNormalView(mafEventBase
 		}
 	}
 }
-
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::OnEventGizmoCrossTranslateYNormalView(mafEventBase *maf_event)
 {
 	switch(maf_event->GetId())
@@ -946,9 +899,9 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossTranslateYNormalView(mafEventB
 
 			//for each surface visualized change the center of the cut plane
 			assert(m_CurrentVolume);
-			mafNode *root=m_CurrentVolume->GetRoot();
-			mafNodeIterator *iter = root->NewIterator();
-			for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+			mafVME *root=m_CurrentVolume->GetRoot();
+			mafVMEIterator *iter = root->NewIterator();
+			for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
 			{
 				if(node->IsA("mafVMESurface") || node->IsA("mafVMESurfaceParametric") || node->IsA("mafVMELandmark") || node->IsA("mafVMELandmarkCloud"))
 				{
@@ -993,7 +946,7 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossTranslateYNormalView(mafEventB
 					double normal[3];
 					((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
 
-					mafPipePolylineGraphEditor *PipeSliceViewPolylineEditor = mafPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe((mafNode*)m_CurrentPolylineGraphEditor));
+					mafPipePolylineGraphEditor *PipeSliceViewPolylineEditor = mafPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe((mafVME*)m_CurrentPolylineGraphEditor));
 					PipeSliceViewPolylineEditor->SetModalitySlice();
 
 					double surfaceOriginTranslated[3];
@@ -1019,7 +972,7 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossTranslateYNormalView(mafEventB
 		}
 	}
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::OnEventGizmoCrossRotateXNormalView(mafEventBase *maf_event)
 {
 	switch(maf_event->GetId())
@@ -1049,9 +1002,9 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossRotateXNormalView(mafEventBase
 			mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 
 			//update the normal of the cutter plane of the surface
-			mafNode *root=m_CurrentVolume->GetRoot();
-			mafNodeIterator *iter = root->NewIterator();
-			for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+			mafVME *root=m_CurrentVolume->GetRoot();
+			mafVMEIterator *iter = root->NewIterator();
+			for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
 			{
 				if(node->IsA("mafVMESurface") || node->IsA("mafVMESurfaceParametric") || node->IsA("mafVMELandmark") || node->IsA("mafVMELandmarkCloud"))
 				{
@@ -1086,11 +1039,7 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossRotateXNormalView(mafEventBase
 					mafPipeMeshSlice *PipeSliceViewMesh = mafPipeMeshSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe(node));
 					if(PipeSliceViewMesh)
 					{
-
-						//PipeArbitraryViewSurface->SetNormal(normal);
 						PipeSliceViewMesh->SetNormal(normal);
-
-						//PipeArbitraryViewSurface->SetSlice(m_SliceCenterSurface);
 						PipeSliceViewMesh->SetSlice(surfaceOriginTranslated);
 					}
 				}
@@ -1105,7 +1054,7 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossRotateXNormalView(mafEventBase
 					double normal[3];
 					((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
 
-					mafPipePolylineGraphEditor *PipeSliceViewPolylineEditor = mafPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe((mafNode*)m_CurrentPolylineGraphEditor));
+					mafPipePolylineGraphEditor *PipeSliceViewPolylineEditor = mafPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe((mafVME*)m_CurrentPolylineGraphEditor));
 					PipeSliceViewPolylineEditor->SetModalitySlice();
 
 					double surfaceOriginTranslated[3];
@@ -1132,8 +1081,7 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossRotateXNormalView(mafEventBase
 		}
 	}
 }
-
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::OnEventGizmoCrossTranslateXNormalView(mafEventBase *maf_event)
 {
 	switch(maf_event->GetId())
@@ -1165,9 +1113,9 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossTranslateXNormalView(mafEventB
 
 			//for each surface visualized change the center of the cut plane
 			assert(m_CurrentVolume);
-			mafNode *root=m_CurrentVolume->GetRoot();
-			mafNodeIterator *iter = root->NewIterator();
-			for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+			mafVME *root=m_CurrentVolume->GetRoot();
+			mafVMEIterator *iter = root->NewIterator();
+			for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
 			{
 				if(node->IsA("mafVMESurface") || node->IsA("mafVMESurfaceParametric") || node->IsA("mafVMELandmark") || node->IsA("mafVMELandmarkCloud"))
 				{
@@ -1212,7 +1160,7 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossTranslateXNormalView(mafEventB
 					double normal[3];
 					((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
 
-					mafPipePolylineGraphEditor *PipeSliceViewPolylineEditor = mafPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe((mafNode*)m_CurrentPolylineGraphEditor));
+					mafPipePolylineGraphEditor *PipeSliceViewPolylineEditor = mafPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe((mafVME*)m_CurrentPolylineGraphEditor));
 					PipeSliceViewPolylineEditor->SetModalitySlice();
 
 					double surfaceOriginTranslated[3];
@@ -1238,7 +1186,7 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossTranslateXNormalView(mafEventB
 		}
 	}
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::OnEventThis(mafEventBase *maf_event)
 {
 	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
@@ -1404,7 +1352,7 @@ void mafViewArbitraryOrthoSlice::OnEventThis(mafEventBase *maf_event)
 		}
 	}
 }
-
+//----------------------------------------------------------------------------
 mafView *mafViewArbitraryOrthoSlice::Copy(mafObserver *Listener, bool lightCopyEnabled)
 {
 	m_LightCopyEnabled = lightCopyEnabled;
@@ -1419,9 +1367,8 @@ mafView *mafViewArbitraryOrthoSlice::Copy(mafObserver *Listener, bool lightCopyE
 	v->Create();
 	return v;
 }
-
+//----------------------------------------------------------------------------
 mafGUI* mafViewArbitraryOrthoSlice::CreateGui()
-
 {
 	assert(m_Gui == NULL);
 	m_Gui = new mafGUI(this);
@@ -1567,11 +1514,10 @@ mafGUI* mafViewArbitraryOrthoSlice::CreateGui()
 	EnableWidgets( (m_CurrentVolume != NULL) );
 	return m_Gui;
 }
-
-void mafViewArbitraryOrthoSlice::VmeRemove(mafNode *node)
-
+//----------------------------------------------------------------------------
+void mafViewArbitraryOrthoSlice::VmeRemove(mafVME *vme)
 {
-	if (m_CurrentVolume && node == m_CurrentVolume) 
+	if (m_CurrentVolume && vme == m_CurrentVolume) 
 	{
 		m_AttachCameraToSlicerZInZView->SetVme(NULL);
 		m_CurrentVolume = NULL;
@@ -1586,13 +1532,13 @@ void mafViewArbitraryOrthoSlice::VmeRemove(mafNode *node)
 		cppDEL(m_GizmoXView);
 	}
 
-	if (m_CurrentImage && node == m_CurrentImage){
+	if (m_CurrentImage && vme == m_CurrentImage){
 		m_CurrentImage = NULL;
 	}
 
-	Superclass::VmeRemove(node);
+	Superclass::VmeRemove(vme);
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::PostMultiplyEventMatrixToSlicers(mafEventBase *maf_event)
 {  
 	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
@@ -1610,24 +1556,11 @@ void mafViewArbitraryOrthoSlice::PostMultiplyEventMatrixToSlicers(mafEventBase *
 			// print matrix
 			vtkTransform *tr = vtkTransform::New();
 
-			// 			std::ostringstream stringStream;
-			// 			stringStream << "Concatenating to slicer: " << std::endl;          
-			// 			tr->GetMatrix()->PrintSelf(stringStream, NULL);
-			// 			mafLogMessage(stringStream.str().c_str());
 
 			tr->PostMultiply();
 			tr->SetMatrix(slicers[i]->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
 			tr->Concatenate(e->GetMatrix()->GetVTKMatrix());
 			tr->Update();
-
-			// _DEBUG_
-			if (i == 0) // Xn slicer
-			{
-				// 				 					std::ostringstream stringStream;
-				// 				 					stringStream << "Concatenating to slicer: " << std::endl;          
-				// 				 					e->GetMatrix()->GetVTKMatrix()->PrintSelf(stringStream, NULL);
-				// 				 					mafLogMessage(stringStream.str().c_str());
-			}
 
 			mafMatrix absPose;
 			absPose.DeepCopy(tr->GetMatrix());
@@ -1650,18 +1583,15 @@ void mafViewArbitraryOrthoSlice::PostMultiplyEventMatrixToSlicers(mafEventBase *
 			if (m_EnableThickness[RED])
 			{
 				// update thickness stuff on MOUSE_UP only
-
 				// called 3 times (WRONG!)
 				UpdateAllViewsThickness();
-
 			}
-
 		}
 
 		UpdateSlicersLUT();
 	}
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::PostMultiplyEventMatrixToSlicer(mafEventBase *maf_event, int slicerAxis)
 {  
 	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
@@ -1729,10 +1659,8 @@ void mafViewArbitraryOrthoSlice::PostMultiplyEventMatrixToSlicer(mafEventBase *m
 		tr->Delete();
 	}
 }
-
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::UpdateSubviewsCamerasToFaceSlices()
-
 {
 	const int numCameras = 3;
 	mafAttachCamera *attachCameras[numCameras] = {m_AttachCameraToSlicerXInXView, m_AttachCameraToSlicerYInYView, m_AttachCameraToSlicerZInZView};
@@ -1750,9 +1678,8 @@ void mafViewArbitraryOrthoSlice::UpdateSubviewsCamerasToFaceSlices()
 		m_ChildViewList[i]->CameraUpdate();
 	}
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::CreateGuiView()
-
 {
 	m_GuiView = new mafGUI(this);
 
@@ -1765,7 +1692,7 @@ void mafViewArbitraryOrthoSlice::CreateGuiView()
 	m_GuiView->Add(m_LutSlider);
 	m_GuiView->Reparent(m_Win);
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::EnableWidgets(bool enable)
 {
 	if (m_Gui)
@@ -1805,9 +1732,8 @@ void mafViewArbitraryOrthoSlice::EnableWidgets(bool enable)
 	m_LutSlider->Enable(enable);
 
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::UpdateSlicerZBehavior()
-
 {	
 	if(m_CurrentVolume->GetBehavior())
 	{
@@ -1856,13 +1782,11 @@ void mafViewArbitraryOrthoSlice::UpdateSlicerZBehavior()
 		pipeZViewSlicerZ->SetActorPicking(false);
 	}
 };
-
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::VolumeWindowing(mafVME *volume)
-
 {
 	double sr[2];
-	vtkDataSet *data = ((mafVME *)volume)->GetOutput()->GetVTKData();
+	vtkDataSet *data = volume->GetOutput()->GetVTKData();
 	data->Update();
 	data->GetScalarRange(sr);
 
@@ -1877,7 +1801,7 @@ void mafViewArbitraryOrthoSlice::VolumeWindowing(mafVME *volume)
 	m_SlicerY->GetMaterial()->m_ColorLut->SetRange((long)sr[0],(long)sr[1]);
 	m_SlicerZ->GetMaterial()->m_ColorLut->SetRange((long)sr[0],(long)sr[1]);
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::ShowMafVMEVolume( mafVME * vme, bool show )
 {
 	wxBusyInfo wait("please wait");
@@ -1928,12 +1852,11 @@ void mafViewArbitraryOrthoSlice::ShowMafVMEVolume( mafVME * vme, bool show )
 	ShowSliceHeight2DTextActors(false, BLUE);
 
 	double sr[2],volumeVTKDataCenterLocalCoords[3];
-	mafVME *vmeVolume=mafVME::SafeDownCast(vme);
-	m_CurrentVolume = vmeVolume;
+	m_CurrentVolume = vme;
 
 	EnableWidgets(true);
 
-	vtkDataSet *volumeVTKData = vmeVolume->GetOutput()->GetVTKData();
+	vtkDataSet *volumeVTKData = vme->GetOutput()->GetVTKData();
 	volumeVTKData->Update();
 
 	volumeVTKData->GetCenter(volumeVTKDataCenterLocalCoords);
@@ -1941,7 +1864,7 @@ void mafViewArbitraryOrthoSlice::ShowMafVMEVolume( mafVME * vme, bool show )
 	volumeVTKData->GetScalarRange(sr);
 	volumeVTKData=NULL;
 
-	mafTransform::GetOrientation(vmeVolume->GetAbsMatrixPipe()->GetMatrix(),m_VolumeVTKDataABSOrientation);
+	mafTransform::GetOrientation(vme->GetAbsMatrixPipe()->GetMatrix(),m_VolumeVTKDataABSOrientation);
 
 	// Compute the center of Volume in absolute coordinates
 	// Needed to position the surface and the gizmo
@@ -1955,7 +1878,7 @@ void mafViewArbitraryOrthoSlice::ShowMafVMEVolume( mafVME * vme, bool show )
 	vtkTransform *sliceCenterLocalCoordsToABSCoordsTransform;
 	vtkNEW(sliceCenterLocalCoordsToABSCoordsTransform);
 	sliceCenterLocalCoordsToABSCoordsTransform->Identity();
-	sliceCenterLocalCoordsToABSCoordsTransform->SetMatrix(vmeVolume->GetOutput()->GetMatrix()->GetVTKMatrix());
+	sliceCenterLocalCoordsToABSCoordsTransform->SetMatrix(vme->GetOutput()->GetMatrix()->GetVTKMatrix());
 	sliceCenterLocalCoordsToABSCoordsTransform->Update();
 
 	vtkTransformPolyDataFilter *localToABSTPDF;
@@ -1979,7 +1902,7 @@ void mafViewArbitraryOrthoSlice::ShowMafVMEVolume( mafVME * vme, bool show )
 	m_SlicerZResetMatrix->Identity();
 	m_SlicerZResetMatrix->SetVTKMatrix(transformReset->GetMatrix());
 
-	ShowSlicers(vmeVolume, show);
+	ShowSlicers(vme, show);
 
 	vtkDEL(points);
 	vtkDEL(sliceCenterLocalCoordsPolydata);
@@ -1987,20 +1910,20 @@ void mafViewArbitraryOrthoSlice::ShowMafVMEVolume( mafVME * vme, bool show )
 	vtkDEL(localToABSTPDF);
 	vtkDEL(transformReset);
 
-	VolumeWindowing(vmeVolume);
+	VolumeWindowing(vme);
 }
-
-void mafViewArbitraryOrthoSlice::ShowmafVMEPolylineEditor( mafNode * node )
+//----------------------------------------------------------------------------
+void mafViewArbitraryOrthoSlice::ShowmafVMEPolylineEditor(mafVME *vme)
 {
 	//a surface is visible only if there is a volume in the view
 	if(m_CurrentVolume)
 	{
-		m_CurrentPolylineGraphEditor = (mafVMEPolylineEditor*)node;
+		m_CurrentPolylineGraphEditor = (mafVMEPolylineEditor*)vme;
 
 		double normal[3];
 		((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
 
-		mafPipePolylineGraphEditor *PipeSliceViewPolylineEditor = mafPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe(node));
+		mafPipePolylineGraphEditor *PipeSliceViewPolylineEditor = mafPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe(vme));
 		PipeSliceViewPolylineEditor->SetModalitySlice();
 
 		double surfaceOriginTranslated[3];
@@ -2013,8 +1936,8 @@ void mafViewArbitraryOrthoSlice::ShowmafVMEPolylineEditor( mafNode * node )
 
 	}
 }
-
-void mafViewArbitraryOrthoSlice::ShowMafVMEMesh( mafNode * node )
+//----------------------------------------------------------------------------
+void mafViewArbitraryOrthoSlice::ShowMafVMEMesh(mafVME *vme)
 {
 	//a surface is visible only if there is a volume in the view
 	if(m_CurrentVolume)
@@ -2023,10 +1946,10 @@ void mafViewArbitraryOrthoSlice::ShowMafVMEMesh( mafNode * node )
 		double normal[3];
 		((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
 
-		mafPipeMesh *PipeArbitraryViewMesh = mafPipeMesh::SafeDownCast(((mafViewSlice *)m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(node));
+		mafPipeMesh *PipeArbitraryViewMesh = mafPipeMesh::SafeDownCast(((mafViewSlice *)m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(vme));
 		//PipeArbitraryViewSurface->SetSlice(m_SliceCenterSurface);
 		//PipeArbitraryViewSurface->SetNormal(normal);
-		mafPipeMeshSlice *PipeSliceViewMesh = mafPipeMeshSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe(node));
+		mafPipeMeshSlice *PipeSliceViewMesh = mafPipeMeshSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe(vme));
 
 		double surfaceOriginTranslated[3];
 
@@ -2039,13 +1962,12 @@ void mafViewArbitraryOrthoSlice::ShowMafVMEMesh( mafNode * node )
 		//mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 	}
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::ShowMafVMEImage( mafVME * vme )
 {
-	mafVME *Image  = mafVME::SafeDownCast(vme);
-	m_CurrentImage = Image;
+	m_CurrentImage = vme;
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::HideMafVMEVolume()
 {
 
@@ -2112,15 +2034,15 @@ void mafViewArbitraryOrthoSlice::HideMafVMEVolume()
 	m_ColorLUT = NULL;
 	m_LutWidget->SetLut(m_ColorLUT);
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::HideMafVmeImage()
 {
 	m_CurrentImage = NULL;
 	m_ColorLUT = NULL;
 	m_LutWidget->SetLut(m_ColorLUT);
 }
-
-void mafViewArbitraryOrthoSlice::ShowVMESurfacesAndLandmarks( mafNode * node )
+//----------------------------------------------------------------------------
+void mafViewArbitraryOrthoSlice::ShowVMESurfacesAndLandmarks(mafVME *vme)
 {
 	//a surface is visible only if there is a volume in the view
 	if(m_CurrentVolume)
@@ -2129,8 +2051,8 @@ void mafViewArbitraryOrthoSlice::ShowVMESurfacesAndLandmarks( mafNode * node )
 		double normal[3];
 		((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
 
-		mafPipeSurface *PipeArbitraryViewSurface = mafPipeSurface::SafeDownCast(((mafViewSlice *)m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(node));
-		mafPipeSurfaceSlice *PipeSliceViewSurface = mafPipeSurfaceSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe(node));
+		mafPipeSurface *PipeArbitraryViewSurface = mafPipeSurface::SafeDownCast(((mafViewSlice *)m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(vme));
+		mafPipeSurfaceSlice *PipeSliceViewSurface = mafPipeSurfaceSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe(vme));
 
 		double surfaceOriginTranslated[3];
 
@@ -2142,7 +2064,7 @@ void mafViewArbitraryOrthoSlice::ShowVMESurfacesAndLandmarks( mafNode * node )
 		PipeSliceViewSurface->SetNormal(normal);
 	}
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::OnReset()
 {
 	{
@@ -2154,16 +2076,11 @@ void mafViewArbitraryOrthoSlice::OnReset()
 		m_SlicerY->SetAbsMatrix(*m_SlicerYResetMatrix);
 		m_SlicerZ->SetAbsMatrix(*m_SlicerZResetMatrix);
 
-		//update because I need to refresh the normal of the camera
-		//mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-
 		RestoreCameraParametersForAllSubviews();
 
 		UpdateXView2DActors();
 		UpdateYView2DActors();
 		UpdateZView2DActors();
-
-		//    UpdateCutPlanes();
 
 		if (m_EnableThickness[RED])
 		{
@@ -2173,23 +2090,19 @@ void mafViewArbitraryOrthoSlice::OnReset()
 		UpdateExportImagesBoundsLineActors();
 
 		UpdateSlicersLUT();
-
-		// mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-
 	}
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::OnLUTRangeModified()
 {
-	mafVME *node = mafVME::SafeDownCast(GetSceneGraph()->GetSelectedVme());
+	mafVME *vme = GetSceneGraph()->GetSelectedVme();
 
-	if( (m_CurrentVolume || m_CurrentImage) && node)
+	if( (m_CurrentVolume || m_CurrentImage) && vme)
 	{
 		UpdateSlicersLUT();
-
 	}
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::OnLUTChooser()
 {
 	double *sr;
@@ -2208,12 +2121,11 @@ void mafViewArbitraryOrthoSlice::OnLUTChooser()
 
 	}
 }
-
-
-void mafViewArbitraryOrthoSlice::OnResetSurfaceAndLandmark( mafNode * node )
+//----------------------------------------------------------------------------
+void mafViewArbitraryOrthoSlice::OnResetSurfaceAndLandmark(mafVME *vme)
 {
-	mafPipeSurface *PipeArbitraryViewSurface = mafPipeSurface::SafeDownCast(((mafViewSlice *)m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(node));
-	mafPipeSurfaceSlice *PipeSliceViewSurface = mafPipeSurfaceSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe(node));
+	mafPipeSurface *PipeArbitraryViewSurface = mafPipeSurface::SafeDownCast(((mafViewSlice *)m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(vme));
+	mafPipeSurfaceSlice *PipeSliceViewSurface = mafPipeSurfaceSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe(vme));
 	if(PipeArbitraryViewSurface)
 	{
 		double normal[3];
@@ -2228,16 +2140,15 @@ void mafViewArbitraryOrthoSlice::OnResetSurfaceAndLandmark( mafNode * node )
 		PipeSliceViewSurface->SetSlice(surfaceOriginTranslated);
 	}
 }
-
-void mafViewArbitraryOrthoSlice::OnResetMafVMEMesh( mafNode * node )
+//----------------------------------------------------------------------------
+void mafViewArbitraryOrthoSlice::OnResetMafVMEMesh(mafVME *vme)
 {
-	mafPipeMesh *PipeArbitraryViewMesh = mafPipeMesh::SafeDownCast(((mafViewSlice *)m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(node));
-	mafPipeMeshSlice *PipeSliceViewMesh = mafPipeMeshSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe(node));
+	mafPipeMesh *PipeArbitraryViewMesh = mafPipeMesh::SafeDownCast(((mafViewSlice *)m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(vme));
+	mafPipeMeshSlice *PipeSliceViewMesh = mafPipeMeshSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe(vme));
 	if(PipeSliceViewMesh && PipeArbitraryViewMesh)
 	{
 		double normal[3];
 		((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
-		//PipeArbitraryViewSurface->SetNormal(normal);
 		PipeSliceViewMesh->SetNormal(normal);
 
 		double surfaceOriginTranslated[3];
@@ -2245,11 +2156,10 @@ void mafViewArbitraryOrthoSlice::OnResetMafVMEMesh( mafNode * node )
 		surfaceOriginTranslated[1] = m_VolumeVTKDataCenterABSCoordinatesReset[1] + normal[1] * 0.1;
 		surfaceOriginTranslated[2] = m_VolumeVTKDataCenterABSCoordinatesReset[2] + normal[2] * 0.1;
 
-		//PipeArbitraryViewSurface->SetSlice(surfaceOriginTranslated);
 		PipeSliceViewMesh->SetSlice(surfaceOriginTranslated);
 	}
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::OnResetmafVMEPolylineEditor()
 {
 	//a surface is visible only if there is a volume in the view
@@ -2259,7 +2169,7 @@ void mafViewArbitraryOrthoSlice::OnResetmafVMEPolylineEditor()
 		double normal[3];
 		((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
 
-		mafPipePolylineGraphEditor *PipeSliceViewPolylineEditor = mafPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe((mafNode*)m_CurrentPolylineGraphEditor));
+		mafPipePolylineGraphEditor *PipeSliceViewPolylineEditor = mafPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[Z_VIEW])->GetNodePipe((mafVME*)m_CurrentPolylineGraphEditor));
 		PipeSliceViewPolylineEditor->SetModalitySlice();
 
 		double surfaceOriginTranslated[3];
@@ -2271,7 +2181,7 @@ void mafViewArbitraryOrthoSlice::OnResetmafVMEPolylineEditor()
 		PipeSliceViewPolylineEditor->SetSlice(surfaceOriginTranslated, normal);            
 	}
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::ShowSlicers( mafVME * vmeVolume, bool show )
 {
 	EnableWidgets( (m_CurrentVolume != NULL) );
@@ -2513,7 +2423,7 @@ void mafViewArbitraryOrthoSlice::ShowSlicers( mafVME * vmeVolume, bool show )
 
 	EnableSlicersPicking(true);
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::BuildXCameraConeVME()
 {
 	double b[6] = {0,0,0,0,0,0};
@@ -2563,22 +2473,14 @@ void mafViewArbitraryOrthoSlice::BuildXCameraConeVME()
 	// default slicer matrix rotation component is identity when the input volume has identity pose matrix
 	m_XCameraConeVME->ReparentTo(m_SlicerX);
 
-
-	// DEBUG
 	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_XCameraConeVME, true);
-	//m_ChildViewList[Y_VIEW]->VmeShow(m_XCameraConeVME, true);
-	//m_ChildViewList[Z_VIEW]->VmeShow(m_XCameraConeVME, true);
-	//m_ChildViewList[Z_VIEW]->VmeShow(m_ConeVME, true);
 
 	mafPipeSurface *pipeY=(mafPipeSurface *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_XCameraConeVME);
 	pipeY->SetActorPicking(false);
 
-	//mafPipeSurface *pipeZ=(mafPipeSurface *)(m_ChildViewList[Z_VIEW])->GetNodePipe(m_XCameraConeVME);
-	//pipeZ->SetActorPicking(false);
-
 	XCameraConeSource->Delete();
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::BuildYCameraConeVME()
 {
 	double b[6] = {0,0,0,0,0,0};
@@ -2636,21 +2538,14 @@ void mafViewArbitraryOrthoSlice::BuildYCameraConeVME()
 
 	m_YCameraConeVME->ReparentTo(m_SlicerY);
 
-	// DEBUG
 	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_YCameraConeVME, true);
-	//m_ChildViewList[X_VIEW]->VmeShow(m_YCameraConeVME, true);
-	//m_ChildViewList[Y_VIEW]->VmeShow(m_YCameraConeVME, true);
-	//m_ChildViewList[Z_VIEW]->VmeShow(m_YCameraConeVME, true);
 
 	mafPipeSurface *pipeX=(mafPipeSurface *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_YCameraConeVME);
 	pipeX->SetActorPicking(false);
 
-	//mafPipeSurface *pipeZ=(mafPipeSurface *)(m_ChildViewList[Z_VIEW])->GetNodePipe(m_YCameraConeVME);
-	//pipeZ->SetActorPicking(false);
-
 	YCameraConeSource->Delete();
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::BuildZCameraConeVME()
 {
 	double b[6] = {0,0,0,0,0,0};
@@ -2698,22 +2593,15 @@ void mafViewArbitraryOrthoSlice::BuildZCameraConeVME()
 	assert(m_SlicerY);
 	m_ZCameraConeVME->ReparentTo(m_SlicerZ);
 
-	// DEBUG
 	m_ChildViewList[PERSPECTIVE_VIEW]->VmeShow(m_ZCameraConeVME, true);
-	//m_ChildViewList[X_VIEW]->VmeShow(m_ZCameraConeVME, true);
-	//m_ChildViewList[Y_VIEW]->VmeShow(m_ZCameraConeVME, true);
-	//m_ChildViewList[Y_VIEW]->VmeShow(m_ZCameraConeVME, true);
 
 	mafPipeSurface *pipeX=(mafPipeSurface *)(m_ChildViewList[PERSPECTIVE_VIEW])->GetNodePipe(m_ZCameraConeVME);
 	pipeX->SetActorPicking(false);
 
-	// 	mafPipeSurface *pipeY=(mafPipeSurface *)(m_ChildViewList[Y_VIEW])->GetNodePipe(m_ZCameraConeVME);
-	// 	pipeY->SetActorPicking(false);
-
 	ZCameraConeSource->Delete();
 	CameraReset();
 }
-
+//----------------------------------------------------------------------------
 bool mafViewArbitraryOrthoSlice::BelongsToZNormalGizmo( mafVME * vme )
 {
 
@@ -2744,13 +2632,9 @@ bool mafViewArbitraryOrthoSlice::BelongsToZNormalGizmo( mafVME * vme )
 		mafLogMessage(stringStream.str().c_str());
 		return true;
 	}
-
 	return false;
-
-
-
 }
-
+//----------------------------------------------------------------------------
 bool mafViewArbitraryOrthoSlice::BelongsToXNormalGizmo( mafVME * vme )
 {
 	mafVMEGizmo *gizmo = mafVMEGizmo::SafeDownCast(vme);
@@ -2783,7 +2667,7 @@ bool mafViewArbitraryOrthoSlice::BelongsToXNormalGizmo( mafVME * vme )
 
 	return false;
 }
-
+//----------------------------------------------------------------------------
 bool mafViewArbitraryOrthoSlice::BelongsToYNormalGizmo( mafVME * vme )
 {
 	mafVMEGizmo *gizmo = mafVMEGizmo::SafeDownCast(vme);
@@ -2816,8 +2700,7 @@ bool mafViewArbitraryOrthoSlice::BelongsToYNormalGizmo( mafVME * vme )
 
 	return false;
 }
-
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::OnEventGizmoCrossRTZNormalView( mafEventBase * maf_event )
 {
 	if (maf_event->GetSender() == m_GizmoZView->m_GizmoCrossTranslate)
@@ -2829,7 +2712,7 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossRTZNormalView( mafEventBase * 
 		OnEventGizmoCrossRotateZNormalView(maf_event);
 	}
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::OnEventGizmoCrossRTYNormalView( mafEventBase * maf_event )
 {
 	if (maf_event->GetSender() == m_GizmoYView->m_GizmoCrossTranslate)
@@ -2841,7 +2724,7 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossRTYNormalView( mafEventBase * 
 		OnEventGizmoCrossRotateYNormalView(maf_event);
 	}
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::OnEventGizmoCrossRTXNormalView( mafEventBase * maf_event )
 {
 	if (maf_event->GetSender() == m_GizmoXView->m_GizmoCrossTranslate)
@@ -2853,7 +2736,7 @@ void mafViewArbitraryOrthoSlice::OnEventGizmoCrossRTXNormalView( mafEventBase * 
 		OnEventGizmoCrossRotateXNormalView(maf_event);
 	}
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::PostMultiplyEventMatrixToGizmoCross( mafEventBase * inputEvent , mafGizmoCrossRotateTranslate *targetGizmo )
 {
 	mafEvent *e = mafEvent::SafeDownCast(inputEvent);
@@ -2872,7 +2755,7 @@ void mafViewArbitraryOrthoSlice::PostMultiplyEventMatrixToGizmoCross( mafEventBa
 
 	vtkDEL(tr1);
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::ChildViewsCameraUpdate()
 {
 	//UpdateSlicersLUT();
@@ -2882,7 +2765,7 @@ void mafViewArbitraryOrthoSlice::ChildViewsCameraUpdate()
 		m_ChildViewList[i]->CameraUpdate();
 	}
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::GetLeftRightLettersFromCamera( double viewUp[3], double viewPlaneNormal[3], wxString &leftLetter, wxString &rightLetter)
 {
 	std::ostringstream stringStream;
@@ -2972,8 +2855,7 @@ void mafViewArbitraryOrthoSlice::GetLeftRightLettersFromCamera( double viewUp[3]
 	mafLogMessage(stringStream.str().c_str());
 
 }
-
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::OnLayout()
 {
 	mafViewCompound::OnLayout();
@@ -2983,7 +2865,7 @@ void mafViewArbitraryOrthoSlice::OnLayout()
 	OnLayoutInternal(size);
 
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::OnLayoutInternal( wxSize &windowSize )
 {
 	int		defaultTextWidth		= 127;
@@ -3045,7 +2927,7 @@ void mafViewArbitraryOrthoSlice::OnLayoutInternal( wxSize &windowSize )
 	m_ZnSliceHeightTextActor->SetPosition(textShiftXLeft, textHeigth - textFontSize * 4);
 
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::UpdateZView2DActors()
 {
 	vtkCamera *zViewCamera = NULL;
@@ -3080,7 +2962,7 @@ void mafViewArbitraryOrthoSlice::UpdateZView2DActors()
 	m_ZnThicknessTextMapper->SetInput(thicknessStringStream.str().c_str());
 
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::UpdateXView2DActors()
 {
 	vtkCamera *xViewCamera = NULL;
@@ -3115,7 +2997,7 @@ void mafViewArbitraryOrthoSlice::UpdateXView2DActors()
 	m_XnThicknessTextMapper->SetInput(thicknessStringStream.str().c_str());
 
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::UpdateYView2DActors()
 {
 	vtkCamera *yViewCamera = NULL;
@@ -3152,19 +3034,19 @@ void mafViewArbitraryOrthoSlice::UpdateYView2DActors()
 	m_YnThicknessTextMapper->SetInput(thicknessStringStream.str().c_str());
 
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::Update2DActors()
 {
 	UpdateXView2DActors();
 	UpdateYView2DActors();
 	UpdateZView2DActors();
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::CameraUpdate()
 {
 	Superclass::CameraUpdate();
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::ResetCameraToSlices()
 {
 	assert(m_ChildViewList[X_VIEW]);
@@ -3175,7 +3057,7 @@ void mafViewArbitraryOrthoSlice::ResetCameraToSlices()
 	((mafViewVTK*)m_ChildViewList[X_VIEW])->CameraReset(m_SlicerX);
 	((mafViewVTK*)m_ChildViewList[Z_VIEW])->CameraReset(m_SlicerZ);
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::StoreCameraParametersForAllSubviews()
 {
 	((mafViewSlice*)m_ChildViewList[X_VIEW])->GetRWI()->GetCamera()->GetPosition(m_XCameraPositionForReset);
@@ -3190,7 +3072,7 @@ void mafViewArbitraryOrthoSlice::StoreCameraParametersForAllSubviews()
 	((mafViewSlice*)m_ChildViewList[Y_VIEW])->GetRWI()->GetCamera()->GetViewUp(m_YCameraViewUpForReset);
 	((mafViewSlice*)m_ChildViewList[Z_VIEW])->GetRWI()->GetCamera()->GetViewUp(m_ZCameraViewUpForReset);
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::RestoreCameraParametersForAllSubviews()
 {
 	vtkCamera *xViewCamera = ((mafViewSlice*)m_ChildViewList[X_VIEW])->GetRWI()->GetCamera();
@@ -3209,7 +3091,7 @@ void mafViewArbitraryOrthoSlice::RestoreCameraParametersForAllSubviews()
 	zViewCamera->SetViewUp(m_ZCameraViewUpForReset);
 }
 
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::AccumulateTextures( mafVMESlicer *inSlicer, double inRXThickness , vtkImageData *outRXTexture /*= NULL */, bool showProgressBar /*= false*/ )
 {	
 
@@ -3393,13 +3275,7 @@ void mafViewArbitraryOrthoSlice::AccumulateTextures( mafVMESlicer *inSlicer, dou
 		outRXTexture->DeepCopy(scalarsAccumulationTargetTexture);
 	}
 }
-
-void mafViewArbitraryOrthoSlice::ShowPlaneFeedbackLine( int fromDirection , 
-														vtkMatrix4x4 *outputMatrix)
-{	
-
-}
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::ShowVTKDataAsVMESurface( vtkPolyData *vmeVTKData, mafVMESurface *vmeSurface, vtkMatrix4x4 *inputABSMatrix )
 {
 	assert(vmeVTKData->GetNumberOfPoints());
@@ -3419,7 +3295,7 @@ void mafViewArbitraryOrthoSlice::ShowVTKDataAsVMESurface( vtkPolyData *vmeVTKDat
 	vmeSurface->GetOutput()->GetVTKData()->Modified();
 	vmeSurface->GetOutput()->GetVTKData()->Update();
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::BuildSlicingPlane(mafVMESurface *inVME, 
 													int fromDirection, int guestView, double sliceHeight, mafVMESlicer * outputSlicer,
 													vtkMatrix4x4 * outputMatrix , bool showHeightText, vtkCaptionActor2D *captionActor)
@@ -3713,6 +3589,7 @@ void mafViewArbitraryOrthoSlice::BuildSlicingPlane(mafVMESurface *inVME,
 	plane2->Delete();
 
 }
+//----------------------------------------------------------------------------
 
 void mafViewArbitraryOrthoSlice::AddVMEToMSFTree(mafVMESurface *vme)
 {
@@ -3723,40 +3600,34 @@ void mafViewArbitraryOrthoSlice::AddVMEToMSFTree(mafVMESurface *vme)
 }
 
 ////////////// Z cut planes
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::UpdateYnViewZPlanes()
 {
 
 	assert(m_FeedbackLineHeight > 0);
 
 	assert(m_ViewYnSliceZBoundsVMEVector[BOUND_0]);
-	BuildSlicingPlane(m_ViewYnSliceZBoundsVMEVector[BOUND_0], 
-		FROM_Z, Y_VIEW,  m_FeedbackLineHeight[BLUE]);
+	BuildSlicingPlane(m_ViewYnSliceZBoundsVMEVector[BOUND_0], FROM_Z, Y_VIEW,  m_FeedbackLineHeight[BLUE]);
 
 	// build ruler
 
 	// for every axial section
 
 	assert(m_ViewYnSliceZBoundsVMEVector[BOUND_1]);
-	BuildSlicingPlane(m_ViewYnSliceZBoundsVMEVector[BOUND_1], 
-		FROM_Z, Y_VIEW,  -m_FeedbackLineHeight[BLUE]);
+	BuildSlicingPlane(m_ViewYnSliceZBoundsVMEVector[BOUND_1], FROM_Z, Y_VIEW,  -m_FeedbackLineHeight[BLUE]);
 }
-
-
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::UpdateXnViewZPlanes()
 {
 	assert(m_ViewXnSliceZBoundsVMEVector[BOUND_0]);
 
-	BuildSlicingPlane(m_ViewXnSliceZBoundsVMEVector[BOUND_0], 
-		FROM_Z, X_VIEW,  m_FeedbackLineHeight[BLUE]);
+	BuildSlicingPlane(m_ViewXnSliceZBoundsVMEVector[BOUND_0], FROM_Z, X_VIEW,  m_FeedbackLineHeight[BLUE]);
 
 	assert(m_ViewXnSliceZBoundsVMEVector[BOUND_1]);
 
-	BuildSlicingPlane(m_ViewXnSliceZBoundsVMEVector[BOUND_1], 
-		FROM_Z, X_VIEW,  -m_FeedbackLineHeight[BLUE]);
+	BuildSlicingPlane(m_ViewXnSliceZBoundsVMEVector[BOUND_1], FROM_Z, X_VIEW,  -m_FeedbackLineHeight[BLUE]);
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::UpdateZCutPlanes()
 {
 	// build Yn view images export gizmos
@@ -3766,7 +3637,7 @@ void mafViewArbitraryOrthoSlice::UpdateZCutPlanes()
 		UpdateXnViewZPlanes();
 	}
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::ShowZCutPlanes( bool show )
 {
 	ShowVMESurfacesVector(m_ViewXnSliceZBoundsVMEVector, X_VIEW, show);
@@ -3776,29 +3647,25 @@ void mafViewArbitraryOrthoSlice::ShowZCutPlanes( bool show )
 }
 
 ////////////// X cut planes
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::UpdateYnViewXPlanes()
 {
-	BuildSlicingPlane(m_ViewYnSliceXBoundsVMEVector[BOUND_0], 
-		FROM_X, Y_VIEW,  m_FeedbackLineHeight[RED]);
+	BuildSlicingPlane(m_ViewYnSliceXBoundsVMEVector[BOUND_0], FROM_X, Y_VIEW,  m_FeedbackLineHeight[RED]);
 
 	assert(m_FeedbackLineHeight > 0);
 
-	BuildSlicingPlane(m_ViewYnSliceXBoundsVMEVector[BOUND_1], 
-		FROM_X, Y_VIEW,  -m_FeedbackLineHeight[RED]);
+	BuildSlicingPlane(m_ViewYnSliceXBoundsVMEVector[BOUND_1], FROM_X, Y_VIEW,  -m_FeedbackLineHeight[RED]);
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::UpdateZnViewXPlanes()
 {
-	BuildSlicingPlane(m_ViewZnSliceXBoundsVMEVector[BOUND_0], 
-		FROM_X, Z_VIEW,  m_FeedbackLineHeight[RED]);
+	BuildSlicingPlane(m_ViewZnSliceXBoundsVMEVector[BOUND_0], FROM_X, Z_VIEW,  m_FeedbackLineHeight[RED]);
 
 	assert(m_FeedbackLineHeight > 0);
 
-	BuildSlicingPlane(m_ViewZnSliceXBoundsVMEVector[BOUND_1], 
-		FROM_X, Z_VIEW,  -m_FeedbackLineHeight[RED]);
+	BuildSlicingPlane(m_ViewZnSliceXBoundsVMEVector[BOUND_1], FROM_X, Z_VIEW,  -m_FeedbackLineHeight[RED]);
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::UpdateXCutPlanes()
 {
 	// build Yn view images export gizmos
@@ -3808,7 +3675,7 @@ void mafViewArbitraryOrthoSlice::UpdateXCutPlanes()
 		UpdateZnViewXPlanes();
 	}
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::ShowXCutPlanes( bool show )
 {
 	ShowVMESurfacesVector(m_ViewYnSliceXBoundsVMEVector, Y_VIEW, show);
@@ -3817,25 +3684,21 @@ void mafViewArbitraryOrthoSlice::ShowXCutPlanes( bool show )
 	ShowVMESurfacesVector(m_ViewYnSliceXBoundsVMEVector, PERSPECTIVE_VIEW, show);
 	ShowVMESurfacesVector(m_ViewZnSliceXBoundsVMEVector, PERSPECTIVE_VIEW, show);
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::UpdateXnViewYPlanes()
 {
-	BuildSlicingPlane(m_ViewXnSliceYBoundsVMEVector[BOUND_0], 
-		FROM_Y, X_VIEW,  m_FeedbackLineHeight[GREEN]);
+	BuildSlicingPlane(m_ViewXnSliceYBoundsVMEVector[BOUND_0], FROM_Y, X_VIEW,  m_FeedbackLineHeight[GREEN]);
 
-	BuildSlicingPlane(m_ViewXnSliceYBoundsVMEVector[BOUND_1], 
-		FROM_Y, X_VIEW,  -m_FeedbackLineHeight[GREEN]);
+	BuildSlicingPlane(m_ViewXnSliceYBoundsVMEVector[BOUND_1], FROM_Y, X_VIEW,  -m_FeedbackLineHeight[GREEN]);
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::UpdateZnViewYPlanes()
 {
-	BuildSlicingPlane(m_ViewZnSliceYBoundsVMEVector[BOUND_0], 
-		FROM_Y, Z_VIEW,  m_FeedbackLineHeight[GREEN]);
+	BuildSlicingPlane(m_ViewZnSliceYBoundsVMEVector[BOUND_0], FROM_Y, Z_VIEW,  m_FeedbackLineHeight[GREEN]);
 
-	BuildSlicingPlane(m_ViewZnSliceYBoundsVMEVector[BOUND_1], 
-		FROM_Y, Z_VIEW,  -m_FeedbackLineHeight[GREEN]);
+	BuildSlicingPlane(m_ViewZnSliceYBoundsVMEVector[BOUND_1], FROM_Y, Z_VIEW,  -m_FeedbackLineHeight[GREEN]);
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::UpdateYCutPlanes()
 {
 	// build Yn view images export gizmos
@@ -3845,7 +3708,7 @@ void mafViewArbitraryOrthoSlice::UpdateYCutPlanes()
 		UpdateXnViewYPlanes();
 	}
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::ShowYCutPlanes( bool show )
 {
 	ShowVMESurfacesVector(m_ViewXnSliceYBoundsVMEVector, X_VIEW, show);
@@ -3853,11 +3716,9 @@ void mafViewArbitraryOrthoSlice::ShowYCutPlanes( bool show )
 	ShowVMESurfacesVector(m_ViewXnSliceYBoundsVMEVector, PERSPECTIVE_VIEW, show);
 	ShowVMESurfacesVector(m_ViewZnSliceYBoundsVMEVector, PERSPECTIVE_VIEW, show);
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::BuildSliceHeightFeedbackLinesVMEs()
 {
-
-
 	// view Xn
 
 	/*
@@ -3951,7 +3812,7 @@ void mafViewArbitraryOrthoSlice::BuildSliceHeightFeedbackLinesVMEs()
 	mafNEW(m_ViewZnSliceYBoundsVMEVector[BOUND_1]);
 	AddVMEToMSFTree(m_ViewZnSliceYBoundsVMEVector[BOUND_1]);
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::UpdateExportImagesBoundsLineActors()
 {
 	// prevent cpu time waste :P
@@ -3965,8 +3826,7 @@ void mafViewArbitraryOrthoSlice::UpdateExportImagesBoundsLineActors()
 		UpdateZCutPlanes();
 	}
 }
-
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::HideAllCutPlanes()
 {
 	ShowXCutPlanes(false);
@@ -3975,7 +3835,7 @@ void mafViewArbitraryOrthoSlice::HideAllCutPlanes()
 
 	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::OnID_CHOOSE_DIR()
 {
 	wxDirDialog dialog(NULL);
@@ -3984,7 +3844,7 @@ void mafViewArbitraryOrthoSlice::OnID_CHOOSE_DIR()
 	m_PathFromDialog = dialog.GetPath();
 
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::EnableExportImages( bool enable , int color )
 {
 	if (color == RED)
@@ -4022,7 +3882,7 @@ void mafViewArbitraryOrthoSlice::EnableThicknessGUI( bool enable , int color )
 		m_Gui->Enable(ID_ENABLE_THICKNESS_ACTORS_BLUE, enable);
 	}
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::OnEventID_ENABLE_EXPORT_IMAGES(int axis)
 {
 	wxBusyInfo wait("please wait");
@@ -4042,7 +3902,7 @@ void mafViewArbitraryOrthoSlice::OnEventID_ENABLE_EXPORT_IMAGES(int axis)
 
 	ChildViewsCameraUpdate();
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::SaveSlicesTextureToFile(int choosedExportAxis)
 {
 
@@ -4172,7 +4032,7 @@ void mafViewArbitraryOrthoSlice::SaveSlicesTextureToFile(int choosedExportAxis)
 
 	UpdateSlicersLUT();
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::OnEventID_ENABLE_THICKNESS( int color )
 {
 	assert(m_InputVolume);
@@ -4197,8 +4057,7 @@ void mafViewArbitraryOrthoSlice::OnEventID_ENABLE_THICKNESS( int color )
 	ShowThickness2DTextActors(m_EnableThickness[color], color);
 	UpdateSlicersLUT();
 }
-
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::UpdateAllViewsThickness()
 {
 	wxBusyInfo wait_info("please wait");
@@ -4218,8 +4077,7 @@ void mafViewArbitraryOrthoSlice::UpdateAllViewsThickness()
 		AccumulateTextures(m_SlicerZ, m_ThicknessValue[BLUE], NULL, true);
 	}
 }
-
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::UpdateSlicers(int axis)
 {
 	const int numSlicers = 3;
@@ -4229,7 +4087,7 @@ void mafViewArbitraryOrthoSlice::UpdateSlicers(int axis)
 	slicers[axis]->GetSurfaceOutput()->GetVTKData()->Modified();
 	slicers[axis]->GetSurfaceOutput()->GetVTKData()->Update();
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::OnEventID_THICKNESS_VALUE_CHANGED( int color )
 {
 	ThicknessComboAssignment(color);
@@ -4256,20 +4114,20 @@ void mafViewArbitraryOrthoSlice::EnableThickness( bool enable, int color )
 	ChildViewsCameraUpdate();
 
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::OnEventID_EXPORT_PLANES_HEIGHT( int color )
 {
 	m_FeedbackLineHeight[color] = m_ExportPlanesHeight[color];
 	UpdateExportImagesBoundsLineActors();
 	ChildViewsCameraUpdate();
 }
-
+//----------------------------------------------------------------------------
 mafPipeSurface * mafViewArbitraryOrthoSlice::GetPipe(int inView, mafVMESurface *inSurface)
 {
 	mafPipeSurface *pipe = (mafPipeSurface *)((m_ChildViewList[inView])->GetNodePipe(inSurface));
 	return pipe;
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::CreateViewCameraNormalFeedbackActor(double col[3], int view)
 {
 	double m_BorderColor[3];
@@ -4316,7 +4174,7 @@ void mafViewArbitraryOrthoSlice::CreateViewCameraNormalFeedbackActor(double col[
 	vtkDEL(pd);
 	vtkDEL(m_Border);
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::DestroyViewCameraNormalFeedbackActor(int view)
 {
 
@@ -4325,7 +4183,7 @@ void mafViewArbitraryOrthoSlice::DestroyViewCameraNormalFeedbackActor(int view)
 		//((mafViewVTK*)(m_ChildViewList[view]))->m_Rwi->m_RenFront->RemoveActor(m_Border);
 	} 
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::EnableSlicersPicking(bool enable)
 {
 	// x view
@@ -4365,7 +4223,7 @@ void mafViewArbitraryOrthoSlice::EnableSlicersPicking(bool enable)
 	pipePerspectiveViewSlicerZ->SelectionActorOff();
 
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::ShowThickness2DTextActors( bool show , int color)
 {
 	if (color == RED)
@@ -4383,7 +4241,7 @@ void mafViewArbitraryOrthoSlice::ShowThickness2DTextActors( bool show , int colo
 	
 	ChildViewsCameraUpdate();
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::ShowSliceHeight2DTextActors( bool show , int color)
 {
 	if (color == RED)
@@ -4401,8 +4259,7 @@ void mafViewArbitraryOrthoSlice::ShowSliceHeight2DTextActors( bool show , int co
 
 	ChildViewsCameraUpdate();
 }
-
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::UpdateSlicersLUT()
 {
 	double low, hi;
@@ -4426,7 +4283,6 @@ void mafViewArbitraryOrthoSlice::UpdateSlicersLUT()
 
 	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
-
 //----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::ThicknessComboAssignment( int axis )
 {
@@ -4510,25 +4366,15 @@ void mafViewArbitraryOrthoSlice::ThicknessComboAssignment( int axis )
 
 	}
 }
-
-void mafViewArbitraryOrthoSlice::UpdateWindowing(bool enable,mafNode *node)
+//----------------------------------------------------------------------------
+void mafViewArbitraryOrthoSlice::UpdateWindowing(bool enable,mafVME *vme)
 {
-	mafVME      *Volume		= NULL;
-
-	mafVME *Vme = mafVME::SafeDownCast(node);
-
-	if((mafVME *)(Vme->GetOutput()->IsA("mafVMEOutputVolume"))) {
-		Volume = mafVME::SafeDownCast(node);
-	}
-
-	if(Volume) {
-		if(enable && (mafVMEOutputVolume::SafeDownCast(Volume->GetOutput())))
-		{
-			VolumeWindowing(Volume);
-		}
+	if(vme->GetOutput() && vme->GetOutput()->IsA("mafVMEOutputVolume") && enable)
+	{
+		VolumeWindowing(vme);
 	}
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::MyMethod( medInteractorPicker * picker, double * pickedPointCoordinates )
 {
 	mafGizmoCrossRotateTranslate *gizmo = NULL;
@@ -4594,7 +4440,7 @@ void mafViewArbitraryOrthoSlice::MyMethod( medInteractorPicker * picker, double 
 
 	UpdateAllViewsThickness();
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::ShowVMESurfacesVector( vector<mafVMESurface *> &inVector, int view, bool show )
 {
 	int size = inVector.size();
@@ -4610,7 +4456,7 @@ void mafViewArbitraryOrthoSlice::ShowVMESurfacesVector( vector<mafVMESurface *> 
 
 	}
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::SaveSlicesFromRenderWindowToFile(int chooseExportAxis)
 {
 	wxString message;
@@ -4850,7 +4696,7 @@ void mafViewArbitraryOrthoSlice::SaveSlicesFromRenderWindowToFile(int chooseExpo
 
 	UpdateSlicersLUT();
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::ShowRulerVMEVector(vector<mafVMESurface *> &rulerVector, 
 													 vector<vtkCaptionActor2D *> &captionActorVector , int fromDirection , int guestView)
 {
@@ -4899,7 +4745,7 @@ void mafViewArbitraryOrthoSlice::ShowRulerVMEVector(vector<mafVMESurface *> &rul
 	ShowVMESurfacesVector(rulerVector, guestView, true);
 
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::ShowRuler( int ruler , bool show)
 {
 	if (ruler == X_RULER)
@@ -4980,7 +4826,7 @@ void mafViewArbitraryOrthoSlice::ShowRuler( int ruler , bool show)
 		}
 	}
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::HideRulerVMEVector(vector<mafVMESurface *> &rulerVector, 
 													 vector<vtkCaptionActor2D *> &captionActorVector , int guestView)
 {
@@ -5004,8 +4850,7 @@ void mafViewArbitraryOrthoSlice::HideRulerVMEVector(vector<mafVMESurface *> &rul
 	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 
 }
-
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::ShowCaptionActor(vtkCaptionActor2D *actor, 
 												   int guestView, wxString text, double x, double y ,double z)
 {
@@ -5026,7 +4871,7 @@ void mafViewArbitraryOrthoSlice::ShowCaptionActor(vtkCaptionActor2D *actor,
 
 	currentRenderer->AddActor2D(actor);
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::ShowCutPlanes( int axis , bool show)
 {
 	if (axis == RED)
@@ -5042,8 +4887,7 @@ void mafViewArbitraryOrthoSlice::ShowCutPlanes( int axis , bool show)
 		ShowZCutPlanes(show);
 	}
 }
-
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::UpdateThickness( int axis)
 {
 	if (axis == RED) // prevent cpu waste
@@ -5061,7 +4905,7 @@ void mafViewArbitraryOrthoSlice::UpdateThickness( int axis)
 		AccumulateTextures(m_SlicerZ, m_ThicknessValue[BLUE], NULL, true);
 	}
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::ExportREDView()
 {
 	if (m_EnableExportImages[GREEN])
@@ -5091,7 +4935,7 @@ void mafViewArbitraryOrthoSlice::ExportREDView()
 		ShowZCutPlanes(true);
 	}
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::ExportGREENView()
 {
 	if (m_EnableExportImages[RED])
@@ -5121,7 +4965,7 @@ void mafViewArbitraryOrthoSlice::ExportGREENView()
 		ShowZCutPlanes(true);
 	}
 }
-
+//----------------------------------------------------------------------------
 void mafViewArbitraryOrthoSlice::ExportBLUEView()
 {
 	if (m_EnableExportImages[RED])

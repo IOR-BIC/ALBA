@@ -94,7 +94,7 @@ void mafOpImporterAnsysInputFileTest::TestFileName()
 void mafOpImporterAnsysInputFileTest::ImportInputFile(mafString fileName, int numPntsExpected, int numMatsExpected, int numElemsExpected)
 {
 	mafVMEStorage *storage = mafVMEStorage::New();
-	mafNode *root = (mafNode *)storage->GetRoot();
+	mafVME *root = (mafVME *)storage->GetRoot();
 
   mafOpImporterAnsysInputFile *importer=new mafOpImporterAnsysInputFile("importer");
   importer->TestModeOn();

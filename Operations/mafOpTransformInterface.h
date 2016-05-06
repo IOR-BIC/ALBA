@@ -34,7 +34,7 @@ class mafInteractor;
 class mafInteractorCompositorMouse;
 class mafInteractorGenericMouse;
 class mafVME;
-class mafNode;
+class mafVME;
 
 //----------------------------------------------------------------------------
 // mafOpTransformInterface :
@@ -61,7 +61,7 @@ public:
   virtual ~mafOpTransformInterface(); 
  
   /** Return true for the acceptable vme type. */
-  bool Accept(mafNode* vme) {return true;};
+  bool Accept(mafVME* vme) {return true;};
 
   mafTypeMacro(mafOpTransformInterface, mafOp);
 

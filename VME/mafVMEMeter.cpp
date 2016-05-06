@@ -157,7 +157,7 @@ mafVMEMeter::~mafVMEMeter()
   cppDEL(m_HistogramDialog);
 }
 //-------------------------------------------------------------------------
-int mafVMEMeter::DeepCopy(mafNode *a)
+int mafVMEMeter::DeepCopy(mafVME *a)
 //-------------------------------------------------------------------------
 {
 	if (Superclass::DeepCopy(a)==MAF_OK)
@@ -813,7 +813,7 @@ mafGUI* mafVMEMeter::CreateGui()
   int num_mode = 3;
   const wxString mode_choices_string[] = {_("point distance"), _("line distance"), _("line angle")};
 
-  m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
+  m_Gui = mafVME::CreateGui(); // Called to show info about vmes' type and name
   m_Gui->SetListener(this);
   m_Gui->Divider();
   m_Gui->Combo(ID_METER_MODE,_("mode"),&(GetMeterAttributes()->m_MeterMode),num_mode,mode_choices_string,_("Choose the meter mode"));
@@ -897,7 +897,7 @@ void mafVMEMeter::OnEvent(mafEventBase *maf_event)
         e->SetArg((long)&mafVMEMeter::VMEAccept);
         e->SetString(&title);
         ForwardUpEvent(e);
-        mafNode *n = e->GetVme();
+        mafVME *n = e->GetVme();
         if (n != NULL)
         {
           if (button_id == ID_START_METER_LINK)
@@ -928,7 +928,7 @@ void mafVMEMeter::OnEvent(mafEventBase *maf_event)
           e->SetArg((long)&mafVMEMeter::VolumeAccept);
           e->SetString(&title);
           ForwardUpEvent(e);
-          mafNode *n = e->GetVme();
+          mafVME *n = e->GetVme();
           if (n != NULL)
           {
             SetMeterLink("PlottedVME",n);
@@ -988,7 +988,7 @@ void mafVMEMeter::OnEvent(mafEventBase *maf_event)
       }
       break;
       default:
-        mafNode::OnEvent(maf_event);
+        mafVME::OnEvent(maf_event);
     }
   }
   else
@@ -997,7 +997,7 @@ void mafVMEMeter::OnEvent(mafEventBase *maf_event)
   }
 }
 //-------------------------------------------------------------------------
-void mafVMEMeter::SetMeterLink(const char *link_name, mafNode *n)
+void mafVMEMeter::SetMeterLink(const char *link_name, mafVME *n)
 //-------------------------------------------------------------------------
 {
   if (n->IsMAFType(mafVMELandmark))
@@ -1011,25 +1011,25 @@ void mafVMEMeter::SetMeterLink(const char *link_name, mafNode *n)
 mafVME *mafVMEMeter::GetStartVME()
 //-------------------------------------------------------------------------
 {
-  return mafVME::SafeDownCast(GetLink("StartVME"));
+  return GetLink("StartVME");
 }
 //-------------------------------------------------------------------------
 mafVME *mafVMEMeter::GetEnd1VME()
 //-------------------------------------------------------------------------
 {
-  return mafVME::SafeDownCast(GetLink("EndVME1"));
+  return GetLink("EndVME1");
 }
 //-------------------------------------------------------------------------
 mafVME *mafVMEMeter::GetEnd2VME()
 //-------------------------------------------------------------------------
 {
-  return mafVME::SafeDownCast(GetLink("EndVME2"));
+  return GetLink("EndVME2");
 }
 //-------------------------------------------------------------------------
 mafVME *mafVMEMeter::GetPlottedVME()
 //-------------------------------------------------------------------------
 {
-  return mafVME::SafeDownCast(GetLink("PlottedVME"));
+  return GetLink("PlottedVME");
 }
 //----------------------------------------------------------------------------
 void mafVMEMeter::GenerateHistogram(int generate)

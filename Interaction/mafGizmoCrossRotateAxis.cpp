@@ -137,7 +137,7 @@ mafGizmoCrossRotateAxis::mafGizmoCrossRotateAxis(mafVME *input, mafObserver *lis
 	SetRefSysMatrix(m_AbsInputMatrix);
 
 	// add the gizmo to the tree, this should increase reference count  
-	m_GizmoCross->ReparentTo(mafVME::SafeDownCast(m_InputVme->GetRoot()));
+	m_GizmoCross->ReparentTo(m_InputVme->GetRoot());
 
 	CreateFeedbackGizmoPipeline();
 }

@@ -22,7 +22,7 @@
 //----------------------------------------------------------------------------
 #include "mafDefines.h"
 #include "mafOp.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafVMESurface.h"
 
 #include "mafVMEPolylineGraph.h"
@@ -67,7 +67,7 @@ public:
 
   mafOp* Copy();
 
-  bool Accept(mafNode *node);   
+  bool Accept(mafVME*node);   
   void OpRun();
 
   /** Execute the operation. */
@@ -88,7 +88,7 @@ public:
 		GIZMO_SCALE,
 	};
   
- 	static bool SurfaceAccept(mafNode *node) {return(node != NULL && node->IsMAFType(mafVMESurface));};
+ 	static bool SurfaceAccept(mafVME*node) {return(node != NULL && node->IsMAFType(mafVMESurface));};
 
   /** Set the modality to clip input surface. Available modality are MODE_SURFACE or MODE_IMPLICIT_FUNCTION*/
   void SetClippingModality(int mode = mafOpInteractiveClipSurface::MODE_IMPLICIT_FUNCTION);
@@ -106,7 +106,7 @@ public:
 	/** Function that returns polydata results of clipping operation*/
 	vtkPolyData *GetResultPolyData(){return m_ResultPolyData[m_ResultPolyData.size()-1];};
 
-  static bool ConstrainAccept(mafNode* node) {return (node != NULL && \
+  static bool ConstrainAccept(mafVME* node) {return (node != NULL && \
     (node->IsMAFType(mafVMEPolylineGraph))) ;};
 
 protected: 
@@ -145,7 +145,7 @@ protected:
 	void OnEventGizmoScale(mafEventBase *maf_event);
 	void OnEventGizmoPlane(mafEventBase *maf_event);
 
-  void OnChooseConstrainVme( mafNode *vme );
+  void OnChooseConstrainVme( mafVME *vme );
 
 	void PostMultiplyEventMatrix(mafEventBase *maf_event);
 

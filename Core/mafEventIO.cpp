@@ -26,7 +26,7 @@
 
 
 #include "mafEventIO.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafRoot.h"
 
 //------------------------------------------------------------------------------
@@ -84,7 +84,7 @@ mafStorage *mafEventIO::GetStorage()
 }
 
 //------------------------------------------------------------------------------
-void mafEventIO::SetRoot(mafNode *root)
+void mafEventIO::SetRoot(mafVME *root)
 //------------------------------------------------------------------------------
 {
   try 
@@ -99,8 +99,8 @@ void mafEventIO::SetRoot(mafNode *root)
   
 }
 //------------------------------------------------------------------------------
-mafNode *mafEventIO::GetRoot()
+mafVME *mafEventIO::GetRoot()
 //------------------------------------------------------------------------------
 {
-  return (mafNode *)m_Root;  
+  return m_Root;  
 }

@@ -116,8 +116,8 @@ int mafVMEProber::InternalInitialize()
 void mafVMEProber::InternalPreUpdate()
 //-----------------------------------------------------------------------
 {
-  mafVME *surf = mafVME::SafeDownCast(GetSurfaceLink());
-  mafVME *vol = mafVME::SafeDownCast(GetVolumeLink());
+  mafVME *surf = GetSurfaceLink();
+  mafVME *vol = GetVolumeLink();
   
   m_ProbingDataPipe->SetSurface(surf);
   m_ProbingDataPipe->SetVolume(vol);
@@ -132,18 +132,18 @@ void mafVMEProber::InternalPreUpdate()
 }
 
 //-------------------------------------------------------------------------
-int mafVMEProber::DeepCopy(mafNode *a)
+int mafVMEProber::DeepCopy(mafVME *a)
 //-------------------------------------------------------------------------
 { 
   if (Superclass::DeepCopy(a)==MAF_OK)
   {
     mafVMEProber *prober = mafVMEProber::SafeDownCast(a);
-    mafNode *volume_linked_node = prober->GetLink("Volume");
+    mafVME *volume_linked_node = prober->GetLink("Volume");
     if (volume_linked_node)
     {
       SetVolumeLink(volume_linked_node);
     }
-    mafNode *surface_linked_node = prober->GetLink("Surface");
+    mafVME *surface_linked_node = prober->GetLink("Surface");
     if (surface_linked_node)
     {
       SetSurfaceLink(surface_linked_node);
@@ -209,25 +209,25 @@ bool mafVMEProber::IsAnimated()
 bool mafVMEProber::IsDataAvailable()
 //-------------------------------------------------------------------------
 {
-  mafVME *vol = mafVME::SafeDownCast(GetVolumeLink());
-  mafVME *surf = mafVME::SafeDownCast(GetSurfaceLink());
+  mafVME *vol = GetVolumeLink();
+  mafVME *surf = GetSurfaceLink();
   return (vol && surf && vol->IsDataAvailable() && surf->IsDataAvailable());
 }
 
 //-----------------------------------------------------------------------
-mafNode *mafVMEProber::GetVolumeLink()
+mafVME *mafVMEProber::GetVolumeLink()
 //-----------------------------------------------------------------------
 {
   return GetLink("Volume");
 }
 //-----------------------------------------------------------------------
-mafNode *mafVMEProber::GetSurfaceLink()
+mafVME *mafVMEProber::GetSurfaceLink()
 //-----------------------------------------------------------------------
 {
   return GetLink("Surface");
 }
 //-----------------------------------------------------------------------
-void mafVMEProber::SetVolumeLink(mafNode *volume)
+void mafVMEProber::SetVolumeLink(mafVME *volume)
 //-----------------------------------------------------------------------
 {
   SetLink("Volume", volume);
@@ -235,7 +235,7 @@ void mafVMEProber::SetVolumeLink(mafNode *volume)
   Modified();
 }
 //-----------------------------------------------------------------------
-void mafVMEProber::SetSurfaceLink(mafNode *surface)
+void mafVMEProber::SetSurfaceLink(mafVME *surface)
 //-----------------------------------------------------------------------
 {
   SetLink("Surface", surface);
@@ -414,14 +414,14 @@ float mafVMEProber::GetLowDensity()
 mafGUI* mafVMEProber::CreateGui()
 //-------------------------------------------------------------------------
 {
-  m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
+  m_Gui = mafVME::CreateGui(); // Called to show info about vmes' type and name
   m_Gui->SetListener(this);
   m_Gui->Divider();
-  mafVME *vol = mafVME::SafeDownCast(GetVolumeLink());
+  mafVME *vol = GetVolumeLink();
   m_VolumeName = vol ? vol->GetName() : _("none");
   m_Gui->Button(ID_VOLUME_LINK,&m_VolumeName,_("Volume"), _("Select the volume to be probed"));
 
-  mafVME *surf = mafVME::SafeDownCast(GetSurfaceLink());
+  mafVME *surf = GetSurfaceLink();
   m_SurfaceName = surf ? surf->GetName() : _("none");
   m_Gui->Button(ID_SURFACE_LINK,&m_SurfaceName,_("Surface"), _("Select the polydata to probe the volume"));
 
@@ -447,7 +447,7 @@ void mafVMEProber::OnEvent(mafEventBase *maf_event)
         e->SetArg((long)&mafVMEProber::VolumeAccept);
         e->SetString(&title);
         ForwardUpEvent(e);
-        mafNode *n = e->GetVme();
+        mafVME *n = e->GetVme();
         if (n != NULL)
         {
           SetVolumeLink(n);
@@ -463,7 +463,7 @@ void mafVMEProber::OnEvent(mafEventBase *maf_event)
         e->SetArg((long)&mafVMEProber::OutputSurfaceAccept);
         e->SetString(&title);
         ForwardUpEvent(e);
-        mafNode *n = e->GetVme();
+        mafVME *n = e->GetVme();
         if (n != NULL)
         {
           SetSurfaceLink(n);
@@ -476,7 +476,7 @@ void mafVMEProber::OnEvent(mafEventBase *maf_event)
         SetMode(m_ProberMode);
       break;
       default:
-      mafNode::OnEvent(maf_event);
+      mafVME::OnEvent(maf_event);
     }
   }
   else

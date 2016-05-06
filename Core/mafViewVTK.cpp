@@ -163,7 +163,7 @@ vtkRenderer *mafViewVTK::GetBackRenderer()
 }
 
 //----------------------------------------------------------------------------
-void mafViewVTK::VmeAdd(mafNode *vme)
+void mafViewVTK::VmeAdd(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   assert(m_Sg); 
@@ -174,13 +174,24 @@ void mafViewVTK::VmeAdd(mafNode *vme)
   }
 }
 //----------------------------------------------------------------------------
-void mafViewVTK::VmeShow(mafNode *vme, bool show)												{assert(m_Sg); m_Sg->VmeShow(vme,show);}
-void mafViewVTK::VmeUpdateProperty(mafNode *vme, bool fromTag)	        {assert(m_Sg); m_Sg->VmeUpdateProperty(vme,fromTag);}
+void mafViewVTK::VmeShow(mafVME *vme, bool show)												{assert(m_Sg); m_Sg->VmeShow(vme,show);}
+void mafViewVTK::VmeUpdateProperty(mafVME *vme, bool fromTag)	        {assert(m_Sg); m_Sg->VmeUpdateProperty(vme,fromTag);}
 //----------------------------------------------------------------------------
-int  mafViewVTK::GetNodeStatus(mafNode *vme)
+int  mafViewVTK::GetNodeStatus(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   int status = m_Sg ? m_Sg->GetNodeStatus(vme) : NODE_NON_VISIBLE;
+
+	mafVMELandmark *lm = mafVMELandmark::SafeDownCast(vme);
+	if (lm)
+	{
+		mafVMELandmarkCloud *lmc=mafVMELandmarkCloud::SafeDownCast(lm->GetParent());
+		if (lmc)
+		{
+			if ( (m_Sg->GetNodeStatus(lmc) == NODE_VISIBLE_ON) && lmc->IsLandmarkShow(lm))
+				return NODE_VISIBLE_ON;
+		}
+	}
 
   mafString vme_type = vme->GetTypeName();
 	if (m_PipeMap.count(vme_type))
@@ -194,7 +205,7 @@ int  mafViewVTK::GetNodeStatus(mafNode *vme)
 			mafSceneNode *n = m_Sg->Vme2Node(vme);
 			if (n != NULL)
 			{
-				n->m_Mutex = true;
+				n->SetMutex(true);
 			}
 			status = m_Sg->GetNodeStatus(vme);
 		}
@@ -202,7 +213,7 @@ int  mafViewVTK::GetNodeStatus(mafNode *vme)
   return status;
 }
 //----------------------------------------------------------------------------
-void mafViewVTK::VmeRemove(mafNode *vme)
+void mafViewVTK::VmeRemove(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   assert(m_Sg); 
@@ -213,7 +224,7 @@ void mafViewVTK::VmeRemove(mafNode *vme)
   }
 }
 //----------------------------------------------------------------------------
-void mafViewVTK::VmeSelect(mafNode *vme, bool select)
+void mafViewVTK::VmeSelect(mafVME *vme, bool select)
 //----------------------------------------------------------------------------
 {
   assert(m_Sg); 
@@ -228,11 +239,11 @@ void mafViewVTK::CameraSet(int camera_position)
   m_Rwi->CameraSet(camera_position);
 }
 //----------------------------------------------------------------------------
-void mafViewVTK::CameraReset(mafNode *node)
+void mafViewVTK::CameraReset(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   assert(m_Rwi); 
-  m_Rwi->CameraReset(node);
+  m_Rwi->CameraReset(vme);
 }
 //----------------------------------------------------------------------------
 void mafViewVTK::CameraUpdate() 
@@ -242,25 +253,24 @@ void mafViewVTK::CameraUpdate()
   m_Rwi->CameraUpdate();
 }
 //----------------------------------------------------------------------------
-mafPipe* mafViewVTK::GetNodePipe(mafNode *vme)
+mafPipe* mafViewVTK::GetNodePipe(mafVME *vme)
 //----------------------------------------------------------------------------
 {
    assert(m_Sg);
    mafSceneNode *n = m_Sg->Vme2Node(vme);
    if(!n) return NULL;
-   return n->m_Pipe;
+   return n->GetPipe();
 }
 //----------------------------------------------------------------------------
-void mafViewVTK::GetVisualPipeName(mafNode *node, mafString &pipe_name)
+void mafViewVTK::GetVisualPipeName(mafVME *node, mafString &pipe_name)
 //----------------------------------------------------------------------------
 {
-  mafVME *v = mafVME::SafeDownCast(node);
-  assert(v);
+  assert(node);
 
-  v->Modified();
-  vtkDataSet *data = v->GetOutput()->GetVTKData();
-  mafVMELandmarkCloud *lmc = mafVMELandmarkCloud::SafeDownCast(v);
-  mafVMELandmark *lm = mafVMELandmark::SafeDownCast(v);
+  node->Modified();
+  vtkDataSet *data = node->GetOutput()->GetVTKData();
+  mafVMELandmarkCloud *lmc = mafVMELandmarkCloud::SafeDownCast(node);
+  mafVMELandmark *lm = mafVMELandmark::SafeDownCast(node);
   if (lmc == NULL && data == NULL && lm == NULL)
   {
     pipe_name = "mafPipeBox";
@@ -269,7 +279,7 @@ void mafViewVTK::GetVisualPipeName(mafNode *node, mafString &pipe_name)
   {
     // custom visualization for the view should be considered only
     // if we are not in editing mode.
-    mafString vme_type = v->GetTypeName();
+    mafString vme_type = node->GetTypeName();
     if (m_PipeMap.count(vme_type))
     {
       // pick up the visual pipe from the view's visual pipe map
@@ -280,11 +290,11 @@ void mafViewVTK::GetVisualPipeName(mafNode *node, mafString &pipe_name)
   if(pipe_name.IsEmpty())
   {
     // pick up the default visual pipe from the vme
-    pipe_name = v->GetVisualPipe();
+    pipe_name = node->GetVisualPipe();
   }
 }
 //----------------------------------------------------------------------------
-void mafViewVTK::VmeCreatePipe(mafNode *vme)
+void mafViewVTK::VmeCreatePipe(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   mafString pipe_name = "";
@@ -302,9 +312,8 @@ void mafViewVTK::VmeCreatePipe(mafNode *vme)
     {
       pipe->SetListener(this);
       mafSceneNode *n = m_Sg->Vme2Node(vme);
-      assert(n && !n->m_Pipe);
+      assert(n && !n->GetPipe());
       pipe->Create(n);
-      n->m_Pipe = (mafPipe*)pipe;
     }
     else
     {
@@ -313,13 +322,12 @@ void mafViewVTK::VmeCreatePipe(mafNode *vme)
   }
 }
 //----------------------------------------------------------------------------
-void mafViewVTK::VmeDeletePipe(mafNode *vme)
+void mafViewVTK::VmeDeletePipe(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   m_NumberOfVisibleVme--;
   mafSceneNode *n = m_Sg->Vme2Node(vme);
-  assert(n && n->m_Pipe);
-  cppDEL(n->m_Pipe);
+	n->DeletePipe();
 }
 //-------------------------------------------------------------------------
 mafGUI *mafViewVTK::CreateGui()

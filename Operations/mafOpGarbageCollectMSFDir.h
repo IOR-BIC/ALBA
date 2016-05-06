@@ -25,7 +25,7 @@ using namespace std;
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mafNode;
+class mafVME;
 
 //----------------------------------------------------------------------------
 // mafOpGarbageCollectMSFDir :
@@ -66,7 +66,7 @@ public:
   mafOp* Copy();
 
   /** This operation accept everything as input.*/
-  bool Accept(mafNode *node) {return true;};
+  bool Accept(mafVME*node) {return true;};
 
   /** Create the user interface and initialize variables.*/
   void OpRun();
@@ -86,9 +86,9 @@ protected:
   /** Log errors into the log area according to the error number reported.*/
   void ErrorLog(int error_num, const char *node_name, const char *description = NULL);
  
-  mafString GetMSFDirAbsPath(mafNode *anyTreeNode);
+  mafString GetMSFDirAbsPath(mafVME *anyTreeNode);
  
-  mafString GetMSFXMLFileAbsFileName(mafNode *anyTreeNode);
+  mafString GetMSFXMLFileAbsFileName(mafVME *anyTreeNode);
  
   /** files linked to vme in trees */
   set<string> m_MSFTreeBinaryFilesSet;

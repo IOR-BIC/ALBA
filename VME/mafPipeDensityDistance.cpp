@@ -32,7 +32,7 @@
 #include "mafAxes.h"
 #include "mafDataVector.h"
 #include "mafVMEGenericAbstract.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafVME.h"
 #include "mafGUIValidator.h"
 #include "mafEventSource.h"
@@ -131,7 +131,7 @@ void mafPipeDensityDistance::Create(mafSceneNode *n/*, bool use_axes*/)
 
   if (m_Volume)
   {
-	  m_DistanceFilter->SetSource(((mafVME*)m_Volume)->GetOutput()->GetVTKData());
+	  m_DistanceFilter->SetSource(m_Volume->GetOutput()->GetVTKData());
 	  m_DistanceFilter->SetInput((vtkDataSet *)m_Normals->GetOutput());
 	  m_DistanceFilter->SetMaxDistance(m_MaxDistance);
 	  m_DistanceFilter->SetThreshold(m_FirstThreshold);
@@ -344,7 +344,7 @@ mafGUI *mafPipeDensityDistance::CreateGui()
   range[0]=m_SecondThreshold;
   range[1]=m_FirstThreshold;
   if (m_Volume)
-    ((mafVME*)m_Volume)->GetOutput()->GetVTKData()->GetScalarRange(range);
+    m_Volume->GetOutput()->GetVTKData()->GetScalarRange(range);
 
 	m_Gui->Divider(1);
   m_Gui->Integer(ID_FIRST_THRESHOLD,"1° Threshold",&m_FirstThreshold,range[0],range[1]);
@@ -495,7 +495,7 @@ void mafPipeDensityDistance::OnEvent(mafEventBase *maf_event)
         e->SetString(&title);
         e->SetId(VME_CHOOSE);
         mafEventMacro(*e);
-        mafNode *NewVolume = e->GetVme();
+        mafVME *NewVolume = e->GetVme();
         if(NewVolume == NULL)
           return;
         else
@@ -504,7 +504,7 @@ void mafPipeDensityDistance::OnEvent(mafEventBase *maf_event)
 
           mafVMEOutputSurface *surface_output = mafVMEOutputSurface::SafeDownCast(m_Vme->GetOutput());
 
-          m_DistanceFilter->SetSource(((mafVME*)m_Volume)->GetOutput()->GetVTKData());
+          m_DistanceFilter->SetSource(m_Volume->GetOutput()->GetVTKData());
 	        m_DistanceFilter->SetInput((vtkDataSet *)m_Normals->GetOutput());
           m_DistanceFilter->SetMaxDistance(m_MaxDistance);
 	        m_DistanceFilter->SetThreshold(m_FirstThreshold);
@@ -597,7 +597,7 @@ void mafPipeDensityDistance::OnEvent(mafEventBase *maf_event)
   }
 }
 //----------------------------------------------------------------------------
-void mafPipeDensityDistance::SetVolume(mafNode *volume)
+void mafPipeDensityDistance::SetVolume(mafVME *volume)
 //----------------------------------------------------------------------------
 {
   m_Volume=volume;
@@ -765,7 +765,7 @@ void mafPipeDensityDistance::UpdatePipeline()
 		  m_DistanceFilter->Update();
 
 		  double range[2];
-		  ((mafVME*)m_Volume)->GetOutput()->GetVTKData()->GetScalarRange(range);
+		  m_Volume->GetOutput()->GetVTKData()->GetScalarRange(range);
 
 		  if(m_BarTipology==0)
 		  {

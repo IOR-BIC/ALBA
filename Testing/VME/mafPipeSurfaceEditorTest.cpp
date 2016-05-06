@@ -167,7 +167,6 @@ void mafPipeSurfaceEditorTest::TestPipeExecution()
 
   vtkDEL(actorList);
 
-  delete pipeSurface;
   delete sceneNode;
 
   mafDEL(surface);

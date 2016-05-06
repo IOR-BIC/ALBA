@@ -26,7 +26,7 @@
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
-class mafNode;
+class mafVME;
 class mmaMaterial;
 class mafVMEOutputSurface;
 class vtkPolyData;
@@ -73,7 +73,7 @@ public:
   int GetCylinderAxis() {return m_CylinderOrientationAxis;};
 
   /** Copy the contents of another mafVMESurfaceParametric into this one. */
-  virtual int DeepCopy(mafNode *a);
+  virtual int DeepCopy(mafVME *a);
 
   /** Compare with another mafVMESurfaceParametric. */
   virtual bool Equals(mafVME *vme);

@@ -63,7 +63,7 @@ void PrintSelf(std::ostream& os,const int indent);
   void SetCurrentPath(const char *path) {this->m_TmpPath=path;};
 
   /** Copy the contents of another VMEExternalData into this one. */
-  virtual int DeepCopy(mafNode *a);
+  virtual int DeepCopy(mafVME *a);
 
   /** Compare with another VMEExternalData. */
   virtual bool Equals(mafVME *vme);

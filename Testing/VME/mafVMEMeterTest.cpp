@@ -84,10 +84,10 @@ void mafVMEMeterTest::VMEAcceptTest()
   mafNEW(volume);
   mafNEW(surface);
 
-  CPPUNIT_ASSERT(meter->VolumeAccept(mafNode::SafeDownCast(image))!=NULL);
-  CPPUNIT_ASSERT(meter->VolumeAccept(mafNode::SafeDownCast(surface))!=NULL);
-  CPPUNIT_ASSERT(meter->VolumeAccept(mafNode::SafeDownCast(volume))!=NULL);
-  CPPUNIT_ASSERT(meter->VolumeAccept(mafNode::SafeDownCast(NULL))==NULL);
+  CPPUNIT_ASSERT(meter->VolumeAccept(image)!=NULL);
+  CPPUNIT_ASSERT(meter->VolumeAccept(surface)!=NULL);
+  CPPUNIT_ASSERT(meter->VolumeAccept(volume)!=NULL);
+  CPPUNIT_ASSERT(meter->VolumeAccept(NULL)==NULL);
 
   mafDEL(image);
   mafDEL(volume);
@@ -112,9 +112,9 @@ void mafVMEMeterTest::VolumeAcceptTest()
   mafNEW(volume);
   mafNEW(surface);
 
-  CPPUNIT_ASSERT(meter->VolumeAccept(mafNode::SafeDownCast(image))==NULL);
-  CPPUNIT_ASSERT(meter->VolumeAccept(mafNode::SafeDownCast(surface))==NULL);
-  CPPUNIT_ASSERT(meter->VolumeAccept(mafNode::SafeDownCast(volume))!=NULL);
+  CPPUNIT_ASSERT(meter->VolumeAccept(image)==NULL);
+  CPPUNIT_ASSERT(meter->VolumeAccept(surface)==NULL);
+  CPPUNIT_ASSERT(meter->VolumeAccept(volume)!=NULL);
 
   mafDEL(image);
   mafDEL(volume);
@@ -175,25 +175,25 @@ void mafVMEMeterTest::EqualsTest()
   mafVMESurface *surface;
   mafNEW(surface);
 
-  surface->SetParent(storage->GetRoot());
-  meter->SetParent(storage->GetRoot());
-  newMeter->SetParent(storage->GetRoot());
+  surface->ReparentTo(storage->GetRoot());
+  meter->ReparentTo(storage->GetRoot());
+  newMeter->ReparentTo(storage->GetRoot());
 
-  meter->SetMeterLink("StartVME", mafNode::SafeDownCast(surface));
-  newMeter->SetMeterLink("StartVME", mafNode::SafeDownCast(surface));
+  meter->SetMeterLink("StartVME", surface);
+  newMeter->SetMeterLink("StartVME", surface);
   CPPUNIT_ASSERT(newMeter->Equals(meter));
 
   mafVMESurface *surface2;
   mafNEW(surface2);
 
-  surface2->SetParent(storage->GetRoot());
-  meter->SetMeterLink("StartVME", mafNode::SafeDownCast(surface2));
+  surface2->ReparentTo(storage->GetRoot());
+  meter->SetMeterLink("StartVME", surface2);
   CPPUNIT_ASSERT(!newMeter->Equals(meter));
 
-  meter->SetParent(NULL);
-  newMeter->SetParent(NULL);
-  surface->SetParent(NULL);
-  surface2->SetParent(NULL);
+  meter->ReparentTo(NULL);
+  newMeter->ReparentTo(NULL);
+  surface->ReparentTo(NULL);
+  surface2->ReparentTo(NULL);
 
   mafDEL(surface);
   mafDEL(surface2);
@@ -229,40 +229,42 @@ void mafVMEMeterTest::GetAngleTest()
   //create a parametric surface
   mafVMESurfaceParametric *vmeParametricSurfaceSTART;
   mafNEW(vmeParametricSurfaceSTART);
-  vmeParametricSurfaceSTART->SetParent(root);
+  vmeParametricSurfaceSTART->ReparentTo(root);
   vmeParametricSurfaceSTART->GetOutput()->GetVTKData()->Update();
-  vmeParametricSurfaceSTART->SetParent(storage->GetRoot());
+  vmeParametricSurfaceSTART->ReparentTo(storage->GetRoot());
   vmeParametricSurfaceSTART->Update();
 
   mafVMESurfaceParametric *vmeParametricSurfaceEND1;
   mafNEW(vmeParametricSurfaceEND1);	
-  vmeParametricSurfaceEND1->SetParent(root);
+  vmeParametricSurfaceEND1->ReparentTo(root);
   vmeParametricSurfaceEND1->GetOutput()->GetVTKData()->Update();
-  vmeParametricSurfaceEND1->SetParent(storage->GetRoot());
+  vmeParametricSurfaceEND1->ReparentTo(storage->GetRoot());
   vmeParametricSurfaceEND1->Update();
 
   mafVMESurfaceParametric *vmeParametricSurfaceEND2;
   mafNEW(vmeParametricSurfaceEND2);	
-  vmeParametricSurfaceEND2->SetParent(root);
+  vmeParametricSurfaceEND2->ReparentTo(root);
   vmeParametricSurfaceEND2->GetOutput()->GetVTKData()->Update();
-  vmeParametricSurfaceEND2->SetParent(storage->GetRoot());
+  vmeParametricSurfaceEND2->ReparentTo(storage->GetRoot());
   vmeParametricSurfaceEND2->Update();
 
   enum {X,Y,Z};
-  mafMatrix *matrix1 = vmeParametricSurfaceEND1->GetOutput()->GetAbsMatrix();
-  matrix1->SetElement(X,3,4); //set a translation value on x axis of 4.0
-  matrix1->SetElement(Y,3,3); //set a translation value on x axis of 3.0
+  mafMatrix matrix1;
+  matrix1.SetElement(X,3,4); //set a translation value on x axis of 4.0
+  matrix1.SetElement(Y,3,3); //set a translation value on x axis of 3.0
+	vmeParametricSurfaceEND1->SetAbsMatrix(matrix1);
 
-  mafMatrix *matrix2 = vmeParametricSurfaceEND2->GetOutput()->GetAbsMatrix();
-  matrix2->SetElement(X,3,3); //set a translation value on x axis of 4.0
-  matrix2->SetElement(Y,3,-4); //set a translation value on x axis of 3.0
+  mafMatrix matrix2;
+  matrix2.SetElement(X,3,3); //set a translation value on x axis of 4.0
+  matrix2.SetElement(Y,3,-4); //set a translation value on x axis of 3.0
+	vmeParametricSurfaceEND2->SetAbsMatrix(matrix2);
 
   mafVMEMeter *meter;
   mafNEW(meter);
   meter->SetMeterLink("StartVME",vmeParametricSurfaceSTART);
   meter->SetMeterLink("EndVME1",vmeParametricSurfaceEND1);
   meter->SetMeterLink("EndVME2",vmeParametricSurfaceEND2);
-  meter->SetParent(storage->GetRoot());
+  meter->ReparentTo(storage->GetRoot());
   meter->Modified();
   meter->Update();
 
@@ -275,10 +277,10 @@ void mafVMEMeterTest::GetAngleTest()
   double angle = meter->GetAngle();
   CPPUNIT_ASSERT((angle - 90) < TOLERANCE);
 
-  meter->SetParent(NULL);
-  vmeParametricSurfaceSTART->SetParent(NULL);
-  vmeParametricSurfaceEND1->SetParent(NULL);
-  vmeParametricSurfaceEND2->SetParent(NULL);
+  meter->ReparentTo(NULL);
+  vmeParametricSurfaceSTART->ReparentTo(NULL);
+  vmeParametricSurfaceEND1->ReparentTo(NULL);
+  vmeParametricSurfaceEND2->ReparentTo(NULL);
 
   mafDEL(meter);
   mafDEL(vmeParametricSurfaceSTART);
@@ -303,40 +305,40 @@ void mafVMEMeterTest::GetDistanceTest()
   //create a parametric surface
   mafVMESurfaceParametric *vmeParametricSurfaceSTART;
   mafNEW(vmeParametricSurfaceSTART);
-  vmeParametricSurfaceSTART->SetParent(root);
+	vmeParametricSurfaceSTART->ReparentTo(root);
   vmeParametricSurfaceSTART->GetOutput()->GetVTKData()->Update();
-  vmeParametricSurfaceSTART->SetParent(storage->GetRoot());
   vmeParametricSurfaceSTART->Update();
 
   mafVMESurfaceParametric *vmeParametricSurfaceEND1;
   mafNEW(vmeParametricSurfaceEND1);	
-  vmeParametricSurfaceEND1->SetParent(root);
+  vmeParametricSurfaceEND1->ReparentTo(root);
   vmeParametricSurfaceEND1->GetOutput()->GetVTKData()->Update();
-  vmeParametricSurfaceEND1->SetParent(storage->GetRoot());
   vmeParametricSurfaceEND1->Update();
 
   mafVMESurfaceParametric *vmeParametricSurfaceEND2;
   mafNEW(vmeParametricSurfaceEND2);	
-  vmeParametricSurfaceEND2->SetParent(root);
+  vmeParametricSurfaceEND2->ReparentTo(root);
   vmeParametricSurfaceEND2->GetOutput()->GetVTKData()->Update();
-  vmeParametricSurfaceEND2->SetParent(storage->GetRoot());
   vmeParametricSurfaceEND2->Update();
 
   enum {X,Y,Z};
-  mafMatrix *matrix1 = vmeParametricSurfaceEND1->GetOutput()->GetAbsMatrix();
-  matrix1->SetElement(X,3,4); //set a translation value on x axis of 4.0
-  matrix1->SetElement(Y,3,3); //set a translation value on x axis of 3.0
+  mafMatrix matrix1;
+  matrix1.SetElement(X,3,4); //set a translation value on x axis of 4.0
+  matrix1.SetElement(Y,3,3); //set a translation value on x axis of 3.0
+	vmeParametricSurfaceEND1->SetAbsMatrix(matrix1);
 
-  mafMatrix *matrix2 = vmeParametricSurfaceEND2->GetOutput()->GetAbsMatrix();
-  matrix2->SetElement(X,3,3); //set a translation value on x axis of 4.0
-  matrix2->SetElement(Y,3,-4); //set a translation value on x axis of 3.0
+  mafMatrix matrix2;
+  matrix2.SetElement(X,3,3); //set a translation value on x axis of 4.0
+  matrix2.SetElement(Y,3,-4); //set a translation value on x axis of 3.0
+	vmeParametricSurfaceEND2->SetAbsMatrix(matrix2);
 
+	
   mafVMEMeter *meter;
   mafNEW(meter);
   meter->SetMeterLink("StartVME",vmeParametricSurfaceSTART);
   meter->SetMeterLink("EndVME1",vmeParametricSurfaceEND1);
   meter->SetMeterLink("EndVME2",vmeParametricSurfaceEND2);
-  meter->SetParent(storage->GetRoot());
+  meter->ReparentTo(storage->GetRoot());
   meter->Modified();
   meter->Update();
 
@@ -348,10 +350,10 @@ void mafVMEMeterTest::GetDistanceTest()
   //test here
   CPPUNIT_ASSERT(distance == 5);
 
-  meter->SetParent(NULL);
-  vmeParametricSurfaceSTART->SetParent(NULL);
-  vmeParametricSurfaceEND1->SetParent(NULL);
-  vmeParametricSurfaceEND2->SetParent(NULL);
+  meter->ReparentTo(NULL);
+  vmeParametricSurfaceSTART->ReparentTo(NULL);
+  vmeParametricSurfaceEND1->ReparentTo(NULL);
+  vmeParametricSurfaceEND2->ReparentTo(NULL);
 
   mafDEL(meter);
   mafDEL(vmeParametricSurfaceSTART);
@@ -376,33 +378,34 @@ void mafVMEMeterTest::GetEndPoint2CoordinateTest()
   //create a parametric surface
   mafVMESurfaceParametric *vmeParametricSurfaceSTART;
   mafNEW(vmeParametricSurfaceSTART);
-  vmeParametricSurfaceSTART->SetParent(root);
+  vmeParametricSurfaceSTART->ReparentTo(root);
   vmeParametricSurfaceSTART->GetOutput()->GetVTKData()->Update();
-  vmeParametricSurfaceSTART->SetParent(storage->GetRoot());
+  vmeParametricSurfaceSTART->ReparentTo(storage->GetRoot());
   vmeParametricSurfaceSTART->Update();
 
   mafVMESurfaceParametric *vmeParametricSurfaceEND1;
   mafNEW(vmeParametricSurfaceEND1);	
-  vmeParametricSurfaceEND1->SetParent(root);
+  vmeParametricSurfaceEND1->ReparentTo(root);
   vmeParametricSurfaceEND1->GetOutput()->GetVTKData()->Update();
-  vmeParametricSurfaceEND1->SetParent(storage->GetRoot());
+  vmeParametricSurfaceEND1->ReparentTo(storage->GetRoot());
   vmeParametricSurfaceEND1->Update();
 
   mafVMESurfaceParametric *vmeParametricSurfaceEND2;
   mafNEW(vmeParametricSurfaceEND2);	
-  vmeParametricSurfaceEND2->SetParent(root);
+  vmeParametricSurfaceEND2->ReparentTo(root);
   vmeParametricSurfaceEND2->GetOutput()->GetVTKData()->Update();
-  vmeParametricSurfaceEND2->SetParent(storage->GetRoot());
+  vmeParametricSurfaceEND2->ReparentTo(storage->GetRoot());
   vmeParametricSurfaceEND2->Update();
 
   double pos[3];
   pos[0] = 4;
   pos[1] = 3;
   pos[2] = 0;
-  mafMatrix *matrix = vmeParametricSurfaceEND2->GetOutput()->GetAbsMatrix();
-  matrix->SetElement(0,3,pos[0]); //set a translation value on x axis of 4.0
-  matrix->SetElement(1,3,pos[1]); //set a translation value on y axis of 3.0
-  matrix->SetElement(2,3,pos[2]); //set a translation value on z axis of 3.0
+  mafMatrix matrix;
+  matrix.SetElement(0,3,pos[0]); //set a translation value on x axis of 4.0
+  matrix.SetElement(1,3,pos[1]); //set a translation value on y axis of 3.0
+  matrix.SetElement(2,3,pos[2]); //set a translation value on z axis of 3.0
+	vmeParametricSurfaceEND2->SetAbsMatrix(matrix);
 
   mafVMEMeter *meter;
   mafNEW(meter);
@@ -410,7 +413,7 @@ void mafVMEMeterTest::GetEndPoint2CoordinateTest()
   meter->SetMeterLink("StartVME",vmeParametricSurfaceSTART);
   meter->SetMeterLink("EndVME1",vmeParametricSurfaceEND1);
   meter->SetMeterLink("EndVME2",vmeParametricSurfaceEND2);
-  meter->SetParent(storage->GetRoot());
+  meter->ReparentTo(storage->GetRoot());
   meter->Modified();
   meter->Update();
 
@@ -421,10 +424,10 @@ void mafVMEMeterTest::GetEndPoint2CoordinateTest()
   outPos = meter->GetEndPoint2Coordinate();
   CPPUNIT_ASSERT(outPos[0] == pos[0] && outPos[1] == pos[1] && outPos[2] == pos[2]);
 
-  meter->SetParent(NULL);
-  vmeParametricSurfaceSTART->SetParent(NULL);
-  vmeParametricSurfaceEND1->SetParent(NULL);
-  vmeParametricSurfaceEND2->SetParent(NULL);
+  meter->ReparentTo(NULL);
+  vmeParametricSurfaceSTART->ReparentTo(NULL);
+  vmeParametricSurfaceEND1->ReparentTo(NULL);
+  vmeParametricSurfaceEND2->ReparentTo(NULL);
 
   mafDEL(meter);
   mafDEL(vmeParametricSurfaceSTART);
@@ -448,32 +451,33 @@ void mafVMEMeterTest::GetEndPointCoordinateTest()
   //create a parametric surface
   mafVMESurfaceParametric *vmeParametricSurfaceSTART;
   mafNEW(vmeParametricSurfaceSTART);
-  vmeParametricSurfaceSTART->SetParent(root);
+  vmeParametricSurfaceSTART->ReparentTo(root);
   vmeParametricSurfaceSTART->GetOutput()->GetVTKData()->Update();
-  vmeParametricSurfaceSTART->SetParent(storage->GetRoot());
+  vmeParametricSurfaceSTART->ReparentTo(storage->GetRoot());
   vmeParametricSurfaceSTART->Update();
 
   mafVMESurfaceParametric *vmeParametricSurfaceEND1;
   mafNEW(vmeParametricSurfaceEND1);	
-  vmeParametricSurfaceEND1->SetParent(root);
+  vmeParametricSurfaceEND1->ReparentTo(root);
   vmeParametricSurfaceEND1->GetOutput()->GetVTKData()->Update();
-  vmeParametricSurfaceEND1->SetParent(storage->GetRoot());
+  vmeParametricSurfaceEND1->ReparentTo(storage->GetRoot());
   vmeParametricSurfaceEND1->Update();
 
   double pos[3];
   pos[0] = 4;
   pos[1] = 3;
   pos[2] = 0;
-  mafMatrix *matrix = vmeParametricSurfaceEND1->GetOutput()->GetAbsMatrix();
-  matrix->SetElement(0,3,pos[0]); //set a translation value on x axis of 4.0
-  matrix->SetElement(1,3,pos[1]); //set a translation value on y axis of 3.0
-  matrix->SetElement(2,3,pos[2]); //set a translation value on z axis of 3.0
+	mafMatrix matrix;
+  matrix.SetElement(0,3,pos[0]); //set a translation value on x axis of 4.0
+  matrix.SetElement(1,3,pos[1]); //set a translation value on y axis of 3.0
+  matrix.SetElement(2,3,pos[2]); //set a translation value on z axis of 3.0
+	vmeParametricSurfaceEND1->SetAbsMatrix(matrix);
 
   mafVMEMeter *meter;
   mafNEW(meter);
   meter->SetMeterLink("StartVME",vmeParametricSurfaceSTART);
   meter->SetMeterLink("EndVME1",vmeParametricSurfaceEND1);
-  meter->SetParent(storage->GetRoot());
+  meter->ReparentTo(storage->GetRoot());
   meter->Modified();
   meter->Update();
 
@@ -484,9 +488,9 @@ void mafVMEMeterTest::GetEndPointCoordinateTest()
   outPos = meter->GetEndPointCoordinate();
   CPPUNIT_ASSERT(outPos[0] == pos[0] && outPos[1] == pos[1] && outPos[2] == pos[2]);
 
-  meter->SetParent(NULL);
-  vmeParametricSurfaceSTART->SetParent(NULL);
-  vmeParametricSurfaceEND1->SetParent(NULL);
+  meter->ReparentTo(NULL);
+  vmeParametricSurfaceSTART->ReparentTo(NULL);
+  vmeParametricSurfaceEND1->ReparentTo(NULL);
 
   mafDEL(meter);
   mafDEL(vmeParametricSurfaceSTART);
@@ -538,40 +542,42 @@ void mafVMEMeterTest::GetPolylineOutputTest()
   //create a parametric surface
   mafVMESurfaceParametric *vmeParametricSurfaceSTART;
   mafNEW(vmeParametricSurfaceSTART);
-  vmeParametricSurfaceSTART->SetParent(root);
+  vmeParametricSurfaceSTART->ReparentTo(root);
   vmeParametricSurfaceSTART->GetOutput()->GetVTKData()->Update();
-  vmeParametricSurfaceSTART->SetParent(storage->GetRoot());
+  vmeParametricSurfaceSTART->ReparentTo(storage->GetRoot());
   vmeParametricSurfaceSTART->Update();
 
   mafVMESurfaceParametric *vmeParametricSurfaceEND1;
   mafNEW(vmeParametricSurfaceEND1);	
-  vmeParametricSurfaceEND1->SetParent(root);
+  vmeParametricSurfaceEND1->ReparentTo(root);
   vmeParametricSurfaceEND1->GetOutput()->GetVTKData()->Update();
-  vmeParametricSurfaceEND1->SetParent(storage->GetRoot());
+  vmeParametricSurfaceEND1->ReparentTo(storage->GetRoot());
   vmeParametricSurfaceEND1->Update();
 
   mafVMESurfaceParametric *vmeParametricSurfaceEND2;
   mafNEW(vmeParametricSurfaceEND2);	
-  vmeParametricSurfaceEND2->SetParent(root);
+  vmeParametricSurfaceEND2->ReparentTo(root);
   vmeParametricSurfaceEND2->GetOutput()->GetVTKData()->Update();
-  vmeParametricSurfaceEND2->SetParent(storage->GetRoot());
+  vmeParametricSurfaceEND2->ReparentTo(storage->GetRoot());
   vmeParametricSurfaceEND2->Update();
 
   enum {X,Y,Z};
-  mafMatrix *matrix1 = vmeParametricSurfaceEND1->GetOutput()->GetAbsMatrix();
-  matrix1->SetElement(X,3,4); //set a translation value on x axis of 4.0
-  matrix1->SetElement(Y,3,3); //set a translation value on x axis of 3.0
+  mafMatrix matrix1;
+  matrix1.SetElement(X,3,4); //set a translation value on x axis of 4.0
+  matrix1.SetElement(Y,3,3); //set a translation value on x axis of 3.0
+	vmeParametricSurfaceEND1->SetAbsMatrix(matrix1);
 
-  mafMatrix *matrix2 = vmeParametricSurfaceEND2->GetOutput()->GetAbsMatrix();
-  matrix2->SetElement(X,3,3); //set a translation value on x axis of 4.0
-  matrix2->SetElement(Y,3,-4); //set a translation value on x axis of 3.0
+  mafMatrix matrix2;
+  matrix1.SetElement(X,3,3); //set a translation value on x axis of 4.0
+  matrix2.SetElement(Y,3,-4); //set a translation value on x axis of 3.0
+	vmeParametricSurfaceEND2->SetAbsMatrix(matrix2);
 
   mafVMEMeter *meter;
   mafNEW(meter);
   meter->SetMeterLink("StartVME",vmeParametricSurfaceSTART);
   meter->SetMeterLink("EndVME1",vmeParametricSurfaceEND1);
   meter->SetMeterLink("EndVME2",vmeParametricSurfaceEND2);
-  meter->SetParent(storage->GetRoot());
+  meter->ReparentTo(storage->GetRoot());
   meter->Modified();
   meter->Update();
 
@@ -581,10 +587,10 @@ void mafVMEMeterTest::GetPolylineOutputTest()
 
   CPPUNIT_ASSERT(mafVMEOutputPolyline::SafeDownCast(meter->GetPolylineOutput()));
 
-  meter->SetParent(NULL);
-  vmeParametricSurfaceSTART->SetParent(NULL);
-  vmeParametricSurfaceEND1->SetParent(NULL);
-  vmeParametricSurfaceEND2->SetParent(NULL);
+  meter->ReparentTo(NULL);
+  vmeParametricSurfaceSTART->ReparentTo(NULL);
+  vmeParametricSurfaceEND1->ReparentTo(NULL);
+  vmeParametricSurfaceEND2->ReparentTo(NULL);
 
   mafDEL(meter);
   mafDEL(vmeParametricSurfaceSTART);
@@ -720,28 +726,28 @@ void mafVMEMeterTest::GetSetMeterLinkTest()
   mafNEW(surface2);
   mafNEW(surface3);
 
-  surface->SetParent(storage->GetRoot());
-  surface2->SetParent(storage->GetRoot());
-  surface3->SetParent(storage->GetRoot());
-  meter->SetParent(storage->GetRoot());
+  surface->ReparentTo(storage->GetRoot());
+  surface2->ReparentTo(storage->GetRoot());
+  surface3->ReparentTo(storage->GetRoot());
+  meter->ReparentTo(storage->GetRoot());
 
-  meter->SetMeterLink("StartVME", mafNode::SafeDownCast(surface));
-  CPPUNIT_ASSERT(meter->GetLink("StartVME") == mafNode::SafeDownCast(surface));
-  CPPUNIT_ASSERT(meter->GetStartVME() == mafNode::SafeDownCast(surface));
+  meter->SetMeterLink("StartVME", surface);
+  CPPUNIT_ASSERT(meter->GetLink("StartVME") == surface);
+  CPPUNIT_ASSERT(meter->GetStartVME() == surface);
  
-  meter->SetMeterLink("EndVME1", mafNode::SafeDownCast(surface2));
-  CPPUNIT_ASSERT(meter->GetLink("EndVME1") == mafNode::SafeDownCast(surface2));
-  CPPUNIT_ASSERT(meter->GetEnd1VME() == mafNode::SafeDownCast(surface2));
+  meter->SetMeterLink("EndVME1", surface2);
+  CPPUNIT_ASSERT(meter->GetLink("EndVME1") == surface2);
+  CPPUNIT_ASSERT(meter->GetEnd1VME() == surface2);
 
-  meter->SetMeterLink("EndVME2", mafNode::SafeDownCast(surface3));
-  CPPUNIT_ASSERT(meter->GetLink("EndVME2") == mafNode::SafeDownCast(surface3));
-  CPPUNIT_ASSERT(meter->GetEnd2VME() == mafNode::SafeDownCast(surface3));
+  meter->SetMeterLink("EndVME2", surface3);
+  CPPUNIT_ASSERT(meter->GetLink("EndVME2") == surface3);
+  CPPUNIT_ASSERT(meter->GetEnd2VME() == surface3);
 
-  meter->SetParent(NULL);
+  meter->ReparentTo(NULL);
   
-  surface->SetParent(NULL);
-  surface2->SetParent(NULL);
-  surface3->SetParent(NULL);
+  surface->ReparentTo(NULL);
+  surface2->ReparentTo(NULL);
+  surface3->ReparentTo(NULL);
   
   mafDEL(surface);
   mafDEL(surface2);
@@ -832,33 +838,34 @@ void mafVMEMeterTest::GetStartPointCoordinateTest()
   //create a parametric surface
   mafVMESurfaceParametric *vmeParametricSurfaceSTART;
   mafNEW(vmeParametricSurfaceSTART);
-  vmeParametricSurfaceSTART->SetParent(root);
+  vmeParametricSurfaceSTART->ReparentTo(root);
   vmeParametricSurfaceSTART->GetOutput()->GetVTKData()->Update();
-  vmeParametricSurfaceSTART->SetParent(storage->GetRoot());
+  vmeParametricSurfaceSTART->ReparentTo(storage->GetRoot());
   vmeParametricSurfaceSTART->Update();
 
   mafVMESurfaceParametric *vmeParametricSurfaceEND1;
   mafNEW(vmeParametricSurfaceEND1);	
-  vmeParametricSurfaceEND1->SetParent(root);
+  vmeParametricSurfaceEND1->ReparentTo(root);
   vmeParametricSurfaceEND1->GetOutput()->GetVTKData()->Update();
-  vmeParametricSurfaceEND1->SetParent(storage->GetRoot());
+  vmeParametricSurfaceEND1->ReparentTo(storage->GetRoot());
   vmeParametricSurfaceEND1->Update();
 
   double pos[3];
   pos[0] = 4;
   pos[1] = 3;
   pos[2] = 0;
-  mafMatrix *matrix = vmeParametricSurfaceSTART->GetOutput()->GetAbsMatrix();
-  matrix->SetElement(0,3,pos[0]); //set a translation value on x axis of 4.0
-  matrix->SetElement(1,3,pos[1]); //set a translation value on y axis of 3.0
-  matrix->SetElement(2,3,pos[2]); //set a translation value on z axis of 3.0
+  mafMatrix matrix;
+  matrix.SetElement(0,3,pos[0]); //set a translation value on x axis of 4.0
+  matrix.SetElement(1,3,pos[1]); //set a translation value on y axis of 3.0
+  matrix.SetElement(2,3,pos[2]); //set a translation value on z axis of 3.0
+	vmeParametricSurfaceSTART->SetAbsMatrix(matrix);
 
   mafVMEMeter *meter;
   mafNEW(meter);
 
   meter->SetMeterLink("StartVME",vmeParametricSurfaceSTART);
   meter->SetMeterLink("EndVME1",vmeParametricSurfaceEND1);
-  meter->SetParent(storage->GetRoot());
+  meter->ReparentTo(storage->GetRoot());
   meter->Modified();
   meter->Update();
 
@@ -869,9 +876,9 @@ void mafVMEMeterTest::GetStartPointCoordinateTest()
   outPos = meter->GetStartPointCoordinate();
   CPPUNIT_ASSERT(outPos[0] == pos[0] && outPos[1] == pos[1] && outPos[2] == pos[2]);
 
-  meter->SetParent(NULL);
-  vmeParametricSurfaceSTART->SetParent(NULL);
-  vmeParametricSurfaceEND1->SetParent(NULL);
+  meter->ReparentTo(NULL);
+  vmeParametricSurfaceSTART->ReparentTo(NULL);
+  vmeParametricSurfaceEND1->ReparentTo(NULL);
 
   mafDEL(meter);
   mafDEL(vmeParametricSurfaceSTART);

@@ -36,7 +36,7 @@
 #include "mafEventSource.h"
 
 #include "mafMatrix.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafVMESurface.h"
 #include "mafVMEGizmo.h"
 #include "mafVMESurfaceEditor.h"
@@ -124,7 +124,7 @@ mafOp* mafOpLabelizeSurface::Copy()
 }
 
 //----------------------------------------------------------------------------
-bool mafOpLabelizeSurface::Accept(mafNode *node)
+bool mafOpLabelizeSurface::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
 	return (node != NULL && node->IsMAFType(mafVMESurface));
@@ -142,7 +142,7 @@ void mafOpLabelizeSurface::OpRun()
 	m_VmeEditor->SetData(inputOriginalPolydata,0.0);
 	m_VmeEditor->Modified();
 	m_VmeEditor->Update();
-	m_VmeEditor->ReparentTo(mafVME::SafeDownCast(m_Input));
+	m_VmeEditor->ReparentTo(m_Input);
 
 	m_PlaneCreated = false;
 
@@ -234,7 +234,7 @@ void mafOpLabelizeSurface::CreateGui()
 	m_Gui->Double(ID_LABEL_VALUE,_("Label"),&m_LabelValue);
 	m_Gui->Lut(ID_LUT,"lut",m_VmeEditor->GetMaterial()->m_ColorLut);
 	double b[6];
-	((mafVME *)m_Input)->GetOutput()->GetVMEBounds(b);
+	m_Input->GetOutput()->GetVMEBounds(b);
 	// bounding box dim
 	m_PlaneWidth = b[1] - b[0];
 	m_PlaneHeight = b[3] - b[2];
@@ -256,13 +256,13 @@ void mafOpLabelizeSurface::CreateGizmos()
 	m_ImplicitPlaneGizmo->Modified();
 	m_ImplicitPlaneGizmo->Update();
 
-	m_GizmoTranslate = new mafGizmoTranslate(mafVME::SafeDownCast(m_ImplicitPlaneGizmo), this);
+	m_GizmoTranslate = new mafGizmoTranslate(m_ImplicitPlaneGizmo, this);
 	m_GizmoTranslate->SetRefSys(m_ImplicitPlaneGizmo);
 	m_GizmoTranslate->Show(false);
-	m_GizmoRotate = new mafGizmoRotate(mafVME::SafeDownCast(m_ImplicitPlaneGizmo), this);
+	m_GizmoRotate = new mafGizmoRotate(m_ImplicitPlaneGizmo, this);
 	m_GizmoRotate->SetRefSys(m_ImplicitPlaneGizmo);
 	m_GizmoRotate->Show(false);
-	m_GizmoScale = new mafGizmoScale(mafVME::SafeDownCast(m_ImplicitPlaneGizmo), this);
+	m_GizmoScale = new mafGizmoScale(m_ImplicitPlaneGizmo, this);
 	m_GizmoScale->SetRefSys(m_ImplicitPlaneGizmo);
 	m_GizmoScale->Show(false);
 }
@@ -324,7 +324,7 @@ void mafOpLabelizeSurface::ShowClipPlane(bool show)
 		if(m_ClipperPlane == NULL)
 		{
 			double b[6];
-			((mafVME *)m_Input)->GetOutput()->GetBounds(b);
+			m_Input->GetOutput()->GetBounds(b);
 
 			// bounding box dim
 			double xdim = b[1] - b[0];
@@ -334,7 +334,7 @@ void mafOpLabelizeSurface::ShowClipPlane(bool show)
 			//m_PlaneWidth = xdim;
 			//m_PlaneHeight = ydim;
 
-			((mafVME *)m_Input)->GetOutput()->GetBounds(b);
+			m_Input->GetOutput()->GetBounds(b);
 			// bounding box dim
 			m_PlaneWidth = b[1] - b[0];
 			m_PlaneHeight = b[3] - b[2];
@@ -371,7 +371,7 @@ void mafOpLabelizeSurface::ShowClipPlane(bool show)
 			mafNEW(m_ImplicitPlaneGizmo);
 			m_ImplicitPlaneGizmo->SetData(m_Gizmo->GetOutput());
 			m_ImplicitPlaneGizmo->SetName("implicit plane gizmo");
-			m_ImplicitPlaneGizmo->ReparentTo(mafVME::SafeDownCast(m_Input->GetRoot()));
+			m_ImplicitPlaneGizmo->ReparentTo(m_Input->GetRoot());
 
 			// position the plane
 			mafSmartPointer<mafTransform> currTr;
@@ -380,7 +380,7 @@ void mafOpLabelizeSurface::ShowClipPlane(bool show)
 
 			mafMatrix mat;
 			mat.DeepCopy(&currTr->GetMatrix());
-			mat.SetTimeStamp(((mafVME *)m_Input)->GetTimeStamp());
+			mat.SetTimeStamp(m_Input->GetTimeStamp());
 
 			m_ImplicitPlaneGizmo->SetAbsMatrix(mat);
 
@@ -575,7 +575,7 @@ void mafOpLabelizeSurface::Undo()
 	{
 		vtkDEL(m_ResultPolyData[m_ResultPolyData.size()-1]);
 		m_ResultPolyData.pop_back();
-		((mafVMESurface*)m_VmeEditor)->SetData((vtkPolyData*)m_ResultPolyData[m_ResultPolyData.size()-1],((mafVME*)m_Input)->GetTimeStamp());
+		((mafVMESurface*)m_VmeEditor)->SetData((vtkPolyData*)m_ResultPolyData[m_ResultPolyData.size()-1],m_Input->GetTimeStamp());
 		
 		((mafVMESurface*)m_VmeEditor)->GetEventSource()->InvokeEvent(m_VmeEditor,VME_OUTPUT_DATA_UPDATE);
 	}
@@ -680,8 +680,8 @@ void mafOpLabelizeSurface::Labelize()
 	transform_plane->Update();
 
 	vtkMAFSmartPointer<vtkTransformPolyDataFilter> transform_data_input;
-	transform_data_input->SetTransform(((mafVME*)m_VmeEditor)->GetAbsMatrixPipe()->GetVTKTransform());
-	transform_data_input->SetInput((vtkPolyData *)((mafVME *)m_VmeEditor)->GetOutput()->GetVTKData());
+	transform_data_input->SetTransform(m_VmeEditor->GetAbsMatrixPipe()->GetVTKTransform());
+	transform_data_input->SetInput((vtkPolyData *)m_VmeEditor->GetOutput()->GetVTKData());
 	transform_data_input->Update();
 
 	m_ClipperBoundingBox->SetInput(transform_data_input->GetOutput());
@@ -725,7 +725,7 @@ void mafOpLabelizeSurface::Labelize()
 	clean->Update();
 
 	vtkMAFSmartPointer<vtkTransformPolyDataFilter> transform_data_output;
-	transform_data_output->SetTransform(((mafVME*)m_VmeEditor)->GetAbsMatrixPipe()->GetVTKTransform()->GetInverse());
+	transform_data_output->SetTransform(m_VmeEditor->GetAbsMatrixPipe()->GetVTKTransform()->GetInverse());
 	transform_data_output->SetInput(clean->GetOutput());
 	transform_data_output->Update();
 
@@ -784,7 +784,7 @@ void mafOpLabelizeSurface::PostMultiplyEventMatrix(mafEventBase *maf_event)
 		// handle incoming transform events
 		vtkTransform *tr = vtkTransform::New();
 		tr->PostMultiply();
-		tr->SetMatrix(((mafVME *)m_ImplicitPlaneGizmo)->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
+		tr->SetMatrix(m_ImplicitPlaneGizmo->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
 		tr->Concatenate(e->GetMatrix()->GetVTKMatrix());
 		tr->Update();
 
@@ -795,7 +795,7 @@ void mafOpLabelizeSurface::PostMultiplyEventMatrix(mafEventBase *maf_event)
 		if (arg == mafInteractorGenericMouse::MOUSE_MOVE)
 		{
 			// move vme
-			((mafVME *)m_ImplicitPlaneGizmo)->SetAbsMatrix(absPose);
+			m_ImplicitPlaneGizmo->SetAbsMatrix(absPose);
 			// update matrix for OpDo()
 			//m_NewAbsMatrix = absPose;
 		} 

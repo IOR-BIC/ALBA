@@ -118,7 +118,7 @@ void mafPipeTrajectories::Create(mafSceneNode *n)
   if (material)
     m_Actor->SetProperty(material->m_Prop);
  
- m_AssemblyFront->AddPart(m_Actor);
+	m_AssemblyFront->AddPart(m_Actor);
 
   // selection highlight
   m_OutlineBox = vtkOutlineCornerFilter::New();
@@ -147,7 +147,7 @@ mafPipeTrajectories::~mafPipeTrajectories()
 {
   m_Landmark->GetEventSource()->RemoveObserver(this);
   m_AssemblyFront->RemovePart(m_Actor);
-  m_AssemblyFront->AddPart(m_OutlineActor);
+  m_AssemblyFront->RemovePart(m_OutlineActor);
 
   vtkDEL(m_Traj);
   vtkDEL(m_Sphere);

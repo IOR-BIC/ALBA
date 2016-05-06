@@ -83,7 +83,7 @@ void mafOpImporterAnsysCDBFileTest::TestFileName()
 void mafOpImporterAnsysCDBFileTest::ImportCDBFile(mafString fileName, int numPntsExpected, int numMatsExpected, int numElemsExpected)
 {
 	mafVMEStorage *storage = mafVMEStorage::New();
-	mafNode *root = (mafNode *)storage->GetRoot();
+	mafVME *root = (mafVME *)storage->GetRoot();
 
   mafOpImporterAnsysCDBFile *importer=new mafOpImporterAnsysCDBFile("importer");
   importer->TestModeOn();

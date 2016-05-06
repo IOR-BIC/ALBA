@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: vtkMAFAssembly
- Authors: Silvano Imboden
+ Authors: Silvano Imboden, Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -95,84 +95,6 @@ void vtkMAFAssembly::ShallowCopy(vtkProp *prop)
   // Now do superclass
   this->vtkProp3D::ShallowCopy(prop);
 }
-/*
-// Render this assembly and all its Parts. The rendering process is recursive.
-// Note that a mapper need not be defined. If not defined, then no geometry 
-// will be drawn for this assembly. This allows you to create "logical"
-// assemblies; that is, assemblies that only serve to group and transform
-// its Parts.
-int vtkMAFAssembly::RenderTranslucentGeometry(vtkViewport *ren)
-{
-  vtkProp3D *prop3D;
-  vtkAssemblyPath *path;
-  float fraction;
-  int renderedSomething = 0;
-
-  this->UpdatePaths();
-
-  // for allocating render time between components
-  // simple equal allocation
-  fraction = this->AllocatedRenderTime 
-    / (float)(this->Paths->GetNumberOfItems());
-  
-  // render the Paths
-  for ( this->Paths->InitTraversal(); (path = this->Paths->GetNextItem()); )
-    {
-    prop3D = (vtkProp3D *)path->GetLastNode()->GetProp();
-    if ( prop3D->GetVisibility() )
-      {
-      prop3D->SetAllocatedRenderTime(fraction, ren);
-      prop3D->PokeMatrix(path->GetLastNode()->GetMatrix());
-      renderedSomething += prop3D->RenderTranslucentGeometry(ren);
-      prop3D->PokeMatrix(NULL);
-      }
-    }
-
-  renderedSomething = (renderedSomething > 0)?(1):(0);
-
-  return renderedSomething;
-}
-*/
-
-
-/*
-// Render this assembly and all its Parts. The rendering process is recursive.
-// Note that a mapper need not be defined. If not defined, then no geometry 
-// will be drawn for this assembly. This allows you to create "logical"
-// assemblies; that is, assemblies that only serve to group and transform
-// its Parts.
-int vtkMAFAssembly::RenderOpaqueGeometry(vtkViewport *ren)
-{
-  vtkProp3D *prop3D;
-  vtkAssemblyPath *path;
-  float fraction;
-  int   renderedSomething = 0;
-
-  this->UpdatePaths();
-
-  // for allocating render time between components
-  // simple equal allocation
-  fraction = this->AllocatedRenderTime 
-    / (float)(this->Paths->GetNumberOfItems());
-  
-  // render the Paths
-  for ( this->Paths->InitTraversal(); (path = this->Paths->GetNextItem()); )
-    {
-    prop3D = (vtkProp3D *)path->GetLastNode()->GetProp();
-    if ( prop3D->GetVisibility() )
-      {
-      prop3D->PokeMatrix(path->GetLastNode()->GetMatrix());
-      prop3D->SetAllocatedRenderTime(fraction, ren);
-      renderedSomething += prop3D->RenderOpaqueGeometry(ren);
-      prop3D->PokeMatrix(NULL);
-      }
-    }
-
-  renderedSomething = (renderedSomething > 0)?(1):(0);
-
-  return renderedSomething;
-}
-*/
 
 //----------------------------------------------------------------------------
 void vtkMAFAssembly::ReleaseGraphicsResources(vtkWindow *renWin)
@@ -255,70 +177,6 @@ int vtkMAFAssembly::GetNumberOfPaths()
   return this->Paths->GetNumberOfItems();
 }
 
-/*
-// Build the assembly paths if necessary. UpdatePaths()
-// is only called when the assembly is at the root
-// of the hierarchy; otherwise UpdatePaths() is called.
-void vtkMAFAssembly::UpdatePaths()
-{
-  if ( this->GetMTime() > this->PathTime ||
-    (this->Paths != NULL && this->Paths->GetMTime() > this->PathTime) )
-    {
-    if ( this->Paths != NULL )
-      {
-      this->Paths->Delete();
-      this->Paths = NULL;
-      }
-
-    // Create the list to hold all the paths
-    this->Paths = vtkAssemblyPaths::New();
-    vtkAssemblyPath *path = vtkAssemblyPath::New();
-
-    //add ourselves to the path to start things off
-    path->AddNode(this,this->GetMatrix());
-    
-    // Add nodes as we proceed down the hierarchy
-    vtkProp3D *prop3D;
-    for ( this->Parts->InitTraversal(); 
-          (prop3D = this->Parts->GetNextProp3D()); )
-      {
-      path->AddNode(prop3D,prop3D->GetMatrix());
-
-      // dive into the hierarchy
-      prop3D->BuildPaths(this->Paths,path);
-      
-      // when returned, pop the last node off of the
-      // current path
-      path->DeleteLastNode();
-      }
-
-    path->Delete();
-    this->PathTime.Modified();
-    }
-}
-*/
-
-/*
-// Build assembly paths from this current assembly. A path consists of
-// an ordered sequence of props, with transformations properly concatenated.
-void vtkMAFAssembly::BuildPaths(vtkAssemblyPaths *paths, vtkAssemblyPath *path)
-{
-  vtkProp3D *prop3D;
-
-  for ( this->Parts->InitTraversal(); 
-        (prop3D = this->Parts->GetNextProp3D()); )
-    {
-    path->AddNode(prop3D,prop3D->GetMatrix());
-
-    // dive into the hierarchy
-    prop3D->BuildPaths(paths,path);
-
-    // when returned, pop the last node off of the
-    // current path
-    path->DeleteLastNode();
-    }
-}
-*/
 
 // Get the bounds for the assembly as (Xmin,Xmax,Ymin,Ymax,Zmin,Zmax).
 //----------------------------------------------------------------------------
@@ -401,8 +259,11 @@ unsigned long int vtkMAFAssembly::GetMTime()
 
   for (this->m_Parts->InitTraversal(); (prop = this->m_Parts->GetNextProp3D()); )
   {
-    time = prop->GetMTime();
-    mTime = ( time > mTime ? time : mTime );
+		if (prop->GetVisibility())
+		{
+			time = prop->GetMTime();
+			mTime = (time > mTime ? time : mTime);
+		}
   }
 
   return mTime;
@@ -418,75 +279,66 @@ void vtkMAFAssembly::PrintSelf(ostream& os, vtkIndent indent)
      << " parts in this assembly\n";
 }
 
-
-
-//-----------------------------------------------------------------------------
-// the following code was written by Sasha in vtkMAFAssembly
-//-----------------------------------------------------------------------------
-
-
-
-
-
-//-----------------------------------------------------------------------------
-// this method was reimplemented from vtkAssembly to correct div-by-zero bug
 //-----------------------------------------------------------------------------
 int vtkMAFAssembly::RenderTranslucentGeometry(vtkViewport *ren) 
-//----------------------------------------------------------------------------
 {
-  vtkAssemblyPath *path;
-  int renderedSomething = 0;
-  
-  this->UpdatePaths();
-  
-  // for allocating render time between components
-  const float fraction = this->AllocatedRenderTime 
-    / (float)(this->Paths->GetNumberOfItems() > 0 ? this->Paths->GetNumberOfItems() : 1);
-  
-  // render the Paths
-  for ( this->Paths->InitTraversal(); (path = this->Paths->GetNextItem()); ) 
-  {
-    vtkProp3D *prop3D = (vtkProp3D *)path->GetLastNode()->GetProp();
-    if ( prop3D->GetVisibility()) 
-    {
-      prop3D->SetAllocatedRenderTime(fraction, ren);
-      prop3D->PokeMatrix(path->GetLastNode()->GetMatrix());
-      renderedSomething += prop3D->RenderTranslucentGeometry(ren);
-      prop3D->PokeMatrix(NULL);
-    }
-  }
-  
+	int renderedSomething = 0;
+
+	if (GetVisibility())
+	{
+		vtkAssemblyPath *path;
+
+		// for allocating render time between components
+		const float fraction = this->AllocatedRenderTime
+			/ (float)(this->Paths->GetNumberOfItems() > 0 ? this->Paths->GetNumberOfItems() : 1);
+
+		// render the Paths
+		for (this->Paths->InitTraversal(); (path = this->Paths->GetNextItem()); )
+		{
+			vtkProp3D *prop3D = (vtkProp3D *)path->GetLastNode()->GetProp();
+			if (prop3D->GetVisibility())
+			{
+				prop3D->SetAllocatedRenderTime(fraction, ren);
+				prop3D->PokeMatrix(path->GetLastNode()->GetMatrix());
+				renderedSomething += prop3D->RenderTranslucentGeometry(ren);
+				prop3D->PokeMatrix(NULL);
+			}
+		}
+	}
+
   return renderedSomething > 0;
 }
 
 //-----------------------------------------------------------------------------
 // this method was reimplemented from vtkAssembly to correct div-by-zero bug
 //-----------------------------------------------------------------------------
-int vtkMAFAssembly::RenderOpaqueGeometry(vtkViewport *ren) 
+int vtkMAFAssembly::RenderOpaqueGeometry(vtkViewport *ren)
 //----------------------------------------------------------------------------
 {
-  vtkAssemblyPath *path;
-  int renderedSomething = 0;
-  
-  this->UpdatePaths();
-  
-  // for allocating render time between components
-  const float fraction = this->AllocatedRenderTime 
-    / (float)(this->Paths->GetNumberOfItems() > 0 ? this->Paths->GetNumberOfItems() : 1);
-  
-  // render the Paths
-  for ( this->Paths->InitTraversal(); (path = this->Paths->GetNextItem()); ) 
-  {
-    vtkProp3D *prop3D = (vtkProp3D *)path->GetLastNode()->GetProp();
-    if ( prop3D->GetVisibility()) 
-    {
-      prop3D->SetAllocatedRenderTime(fraction, ren);
-      prop3D->PokeMatrix(path->GetLastNode()->GetMatrix());
-      renderedSomething += prop3D->RenderOpaqueGeometry(ren);
-      prop3D->PokeMatrix(NULL);
-    }
-  }
-  
+	int renderedSomething = 0;
+
+	if (GetVisibility())
+	{
+		vtkAssemblyPath *path;
+
+		// for allocating render time between components
+		const float fraction = this->AllocatedRenderTime
+			/ (float)(this->Paths->GetNumberOfItems() > 0 ? this->Paths->GetNumberOfItems() : 1);
+
+		// render the Paths
+		for (this->Paths->InitTraversal(); (path = this->Paths->GetNextItem()); )
+		{
+			vtkProp3D *prop3D = (vtkProp3D *)path->GetLastNode()->GetProp();
+			if (prop3D->GetVisibility())
+			{
+				prop3D->SetAllocatedRenderTime(fraction, ren);
+				prop3D->PokeMatrix(path->GetLastNode()->GetMatrix());
+				renderedSomething += prop3D->RenderOpaqueGeometry(ren);
+				prop3D->PokeMatrix(NULL);
+			}
+		}
+	}
+
   return renderedSomething > 0;
 }
 
@@ -499,8 +351,7 @@ int vtkMAFAssembly::RenderOpaqueGeometry(vtkViewport *ren)
 void vtkMAFAssembly::UpdatePaths()
 //----------------------------------------------------------------------------
 {
-  if ( this->GetMTime() > this->PathTime ||
-    (this->Paths != NULL && this->Paths->GetMTime() > this->PathTime) )
+  if (this->GetMTime() > this->PathTime || (this->Paths != NULL && this->Paths->GetMTime() > this->PathTime) )
   {
     if ( this->Paths != NULL )
     {
@@ -519,8 +370,7 @@ void vtkMAFAssembly::UpdatePaths()
     vtkProp3D *prop3D;
     if (this->GetVisibility())
     {
-      for ( this->m_Parts->InitTraversal(); 
-            (prop3D = this->m_Parts->GetNextProp3D()); )
+      for ( this->m_Parts->InitTraversal(); prop3D = this->m_Parts->GetNextProp3D(); )
       {
         if (prop3D->GetVisibility())
         {
@@ -548,21 +398,22 @@ void vtkMAFAssembly::UpdatePaths()
 void vtkMAFAssembly::BuildPaths(vtkAssemblyPaths *paths, vtkAssemblyPath *path)
 //----------------------------------------------------------------------------
 {
-  vtkProp3D *prop3D;
+	if (GetVisibility())
+	{
+		vtkProp3D *prop3D;
+		for (this->m_Parts->InitTraversal(); prop3D = this->m_Parts->GetNextProp3D(); )
+		{
+			if (prop3D->GetVisibility())
+			{
+				path->AddNode(prop3D, prop3D->GetMatrix());
 
-  for ( this->m_Parts->InitTraversal(); 
-        (prop3D = this->m_Parts->GetNextProp3D()); )
-  {
-    if (prop3D->GetVisibility())
-    {
-      path->AddNode(prop3D,prop3D->GetMatrix());
+				// dive into the hierarchy
+				prop3D->BuildPaths(paths, path);
 
-      // dive into the hierarchy
-      prop3D->BuildPaths(paths,path);
-
-      // when returned, pop the last node off of the
-      // current path
-      path->DeleteLastNode();
-    }
-  }
+				// when returned, pop the last node off of the
+				// current path
+				path->DeleteLastNode();
+			}
+		}
+	}
 }

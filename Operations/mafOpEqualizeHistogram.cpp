@@ -24,7 +24,7 @@
 
 #include "mafOpEqualizeHistogram.h"
 #include "wx/busyinfo.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafGUI.h"
 #include "mafGUIDialog.h"
 #include "mafGUIHistogramWidget.h"
@@ -79,7 +79,7 @@ mafOpEqualizeHistogram::~mafOpEqualizeHistogram()
   mafDEL(m_VolumeOutput);
 }
 //----------------------------------------------------------------------------
-bool mafOpEqualizeHistogram::Accept(mafNode *node)
+bool mafOpEqualizeHistogram::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
   return ( node != NULL && node->IsA("mafVMEVolumeGray") );

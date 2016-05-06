@@ -28,7 +28,7 @@
 
 #include "mafVMEStorage.h"
 #include "mafVMERoot.h"
-#include "mafNode.h"
+#include "mafVME.h"
 
 #include "vtkImageData.h"
 
@@ -66,7 +66,7 @@ void mafOpImporterRAWVolume_BESTest::TestImport()
   bool ok=Importer->Import();
   CPPUNIT_ASSERT(ok);
 
-  mafVME *VME=mafVME::SafeDownCast(Importer->GetOutput());
+  mafVME *VME=Importer->GetOutput();
   vtkImageData *Data=vtkImageData::SafeDownCast(VME->GetOutput()->GetVTKData());
   Data->UpdateData();
   Data->ComputeBounds();

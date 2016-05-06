@@ -91,8 +91,8 @@ public:
   void Create();
 
   /** 
-  Set the visualization status for the node (visible, not visible, mutex, ...) \sa mafSceneGraph mafView*/
-  virtual int GetNodeStatus(mafNode *vme);
+  Set the visualization status for the vme (visible, not visible, mutex, ...) \sa mafSceneGraph mafView*/
+  virtual int GetNodeStatus(mafVME *vme);
 
   /** IDs for the view GUI */
   enum VIEW_SLICE_WIDGET_ID
@@ -104,14 +104,14 @@ public:
   };
 
   /** 
-  Create the visual pipe for the node passed as argument. 
+  Create the visual pipe for the vme passed as argument. 
   To create visual pipe first check in m_PipeMap if custom visual pipe is defined, 
   otherwise ask to vme which is its visual pipe. */
-  virtual void VmeCreatePipe(mafNode *vme);
+  virtual void VmeCreatePipe(mafVME *vme);
 
   /** 
   Delete vme's visual pipe. It is called when vme is removed from visualization.*/
-  virtual void VmeDeletePipe(mafNode *vme);
+  virtual void VmeDeletePipe(mafVME *vme);
 
   /** 
   Change the range of the WindowLevel Lookup table.*/
@@ -138,11 +138,11 @@ public:
   virtual void UpdateText(int ID = 1);
   
   /** Update list of surfaces vme */
-  void UpdateSurfacesList(mafNode *node);
+  void UpdateSurfacesList(mafVME *vme);
 
-  virtual void VmeShow(mafNode *node, bool show);
+  virtual void VmeShow(mafVME *vme, bool show);
 
-  void VmeRemove(mafNode *vme);
+  void VmeRemove(mafVME *vme);
 
   /** print a dump of this object */
   virtual void Print(std::ostream& os, const int tabs=0);// const;

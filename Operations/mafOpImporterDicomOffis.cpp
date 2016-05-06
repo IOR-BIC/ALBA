@@ -5147,11 +5147,11 @@ void mafOpImporterDicomOffis::ResampleVolume()
 				// set at each iteration since I'm using the SetMatrix, which doesn't support
 				// transform pipelines.
 				mafSmartPointer<mafMatrix> output_parent_abs_pose;
-				mafVME::SafeDownCast(m_Input)->GetOutput()->GetAbsMatrix(*output_parent_abs_pose.GetPointer(),input_item->GetTimeStamp());
+				m_Input->GetOutput()->GetAbsMatrix(*output_parent_abs_pose.GetPointer(),input_item->GetTimeStamp());
 				local_pose->SetInputFrame(output_parent_abs_pose);
 
 				mafSmartPointer<mafMatrix> input_parent_abs_pose;
-				mafVME::SafeDownCast(m_Input)->GetOutput()->GetAbsMatrix(*input_parent_abs_pose.GetPointer(),input_item->GetTimeStamp());
+				m_Input->GetOutput()->GetAbsMatrix(*input_parent_abs_pose.GetPointer(),input_item->GetTimeStamp());
 				local_pose->SetTargetFrame(input_parent_abs_pose);
 				local_pose->Update();
 
@@ -5160,7 +5160,7 @@ void mafOpImporterDicomOffis::ResampleVolume()
 				output_to_input->SetInputFrame(box_pose->GetMatrixPointer());
 
 				mafSmartPointer<mafMatrix> input_abs_pose;
-				mafVME::SafeDownCast(m_Input)->GetOutput()->GetAbsMatrix(*input_abs_pose.GetPointer(),input_item->GetTimeStamp());
+				m_Input->GetOutput()->GetAbsMatrix(*input_abs_pose.GetPointer(),input_item->GetTimeStamp());
 				output_to_input->SetTargetFrame(input_abs_pose);
 				output_to_input->Update();
 

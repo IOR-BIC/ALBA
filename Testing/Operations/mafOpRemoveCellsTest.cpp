@@ -28,7 +28,7 @@
 
 #include "mafOpRemoveCells.h"
 #include "mafString.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafVMESurface.h"
 
 #include "vtkRenderer.h"

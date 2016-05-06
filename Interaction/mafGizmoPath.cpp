@@ -47,7 +47,7 @@
 const double defaultLineLength = 50;
 
 //----------------------------------------------------------------------------
-mafGizmoPath::mafGizmoPath(mafNode* imputVme, mafObserver *listener, const char* name, int textVisibility) 
+mafGizmoPath::mafGizmoPath(mafVME* imputVme, mafObserver *listener, const char* name, int textVisibility) 
 //----------------------------------------------------------------------------
 {
   m_TextVisibility = textVisibility;
@@ -64,7 +64,7 @@ void mafGizmoPath::CreateInteractor()
   m_LeftMouseInteractor->EnableTranslation(true);
   m_LeftMouseInteractor->ResultMatrixConcatenationOn();
 }
-void mafGizmoPath::Constructor(mafNode *imputVme, mafObserver *listener, const char* name)
+void mafGizmoPath::Constructor(mafVME *imputVme, mafObserver *listener, const char* name)
 //----------------------------------------------------------------------------
 {
 
@@ -78,7 +78,7 @@ void mafGizmoPath::Constructor(mafNode *imputVme, mafObserver *listener, const c
   SetLineLength(defaultLineLength);
 
   // register the input vme
-  m_InputVME = mafVME::SafeDownCast(imputVme);
+  m_InputVME = imputVme;
 
   m_ConstraintModality = FREE;
 

@@ -149,7 +149,7 @@ public:
 	/*virtual*/ mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */
-	/*virtual*/ bool Accept(mafNode *node);
+	/*virtual*/ bool Accept(mafVME*node);
 
 	/** Builds operation's interface. */
 	/*virtual*/ void OpRun();
@@ -384,7 +384,7 @@ protected:
   virtual mafVME* SelectCurveVME();
 
   /** Callback for VME_CHOOSE that accepts polylines only */
-  static bool SelectCurveVMECallback(mafNode *node);
+  static bool SelectCurveVMECallback(mafVME *vme);
 
   /** Creates mafPolyLineGraph for the given vme */
   mafPolylineGraph* CreatePolylineGraph(mafVME* vme);

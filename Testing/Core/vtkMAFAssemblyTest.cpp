@@ -260,7 +260,8 @@ void vtkMAFAssemblyTest::RenderOpaqueGeometryTest()
   assembly->AddPart(sphere1);
   assembly->AddPart(sphere2);
 
-  renderer->AddActor(assembly);
+	renderer->AddActor(assembly);
+	assembly->GetBounds();
 
   CPPUNIT_ASSERT(assembly->RenderOpaqueGeometry((vtkViewport*)renderer) == 1);
   render_window->Render();
@@ -343,6 +344,7 @@ void vtkMAFAssemblyTest::RenderTranslucentGeometry()
   assembly->AddPart(sphere2);
 
   renderer->AddActor(assembly);
+	assembly->GetBounds();
 
   CPPUNIT_ASSERT(assembly->RenderTranslucentGeometry((vtkViewport*)renderer) == 1);
   render_window->Render();

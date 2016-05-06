@@ -65,8 +65,8 @@ public:
 
   /** Set the vme to follow with camera. 
   This method is optional; in alternative the vme to follow is set on the attach camera activation keeping the selected vme.*/
-  void SetVme(mafNode *node);
-  mafNode *GetVme();
+  void SetVme(mafVME *node);
+  mafVME *GetVme();
 
   /**Set an initial transform matrix before attaching camera. 
   this method must be called before SetVme*/

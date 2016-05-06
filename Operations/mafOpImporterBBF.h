@@ -10,7 +10,7 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mafNode;
+class mafVME;
 class mafVMEVolumeLarge;
 
 /** 
@@ -35,7 +35,7 @@ public:
   /*virtual*/ mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */
-  /*virtual*/ bool Accept(mafNode* node) {return true;};
+  /*virtual*/ bool Accept(mafVME* node) {return true;};
 
 	/** Builds operation's interface. */
   /*virtual*/ void OpRun();

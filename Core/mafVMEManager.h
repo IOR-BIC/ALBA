@@ -19,8 +19,7 @@
 // includes :
 //----------------------------------------------------------------------------
 #include "mafObserver.h"
-#include "mafNode.h"
-#include "mafNodeRoot.h"
+#include "mafVME.h"
 #include "mafVMERoot.h"
 #include "mafGUIFileHistory.h"
 
@@ -86,10 +85,10 @@ public:
   void MSFModified(bool modified) {m_Modified = modified;};
 
 	/** Add the vme to the tree. */
-  void VmeAdd(mafNode *n);
+  void VmeAdd(mafVME *n);
 
 	/** Remove the vme from the tree. */
-  void VmeRemove(mafNode *n);
+  void VmeRemove(mafVME *n);
 
 	/** Get the time bounds of the tree. */
   void TimeGetBounds(double *min, double *max);
@@ -98,10 +97,10 @@ public:
   void TimeSet(double time);
 
 	/** Send the event VME_REMOVING to inform logic that the vme and its subtree are removed from the tree. */
-  void NotifyRemove(mafNode *n);
+  void NotifyRemove(mafVME *n);
 
 	/** Send the event VME_ADDED to inform logic that the vme and its subtree are added to the tree. */
-  void NotifyAdd(mafNode *n);
+  void NotifyAdd(mafVME *n);
   
 	/** Show the dialog to confirm the save of the current tree. */
 	bool AskConfirmAndSave();
@@ -135,10 +134,7 @@ public:
 
 	/** Set the flag for bak file generation on saving MSF file. */
 	void MakeBakFileOnSave(bool bakfile = true) {m_MakeBakFile = bakfile;}
-
-  /** Update vme client data interface from tag. if vme == NULL, the update is propagated from root vme to all the tree. */
-  void UpdateFromTag(mafNode *n = NULL);
-
+	  
   /** Set the host-name for the remote host.*/
   void SetHost(mafString host) {m_Host = host;};
 
@@ -168,7 +164,7 @@ protected:
   bool MakeZip(const mafString &zipname, wxArrayString *files);
 
   /** Set tag with creation date for the node passed as argument.*/
-  void AddCreationDate(mafNode *vme);
+  void AddCreationDate(mafVME *vme);
 
   bool                m_Modified;         ///< Used to known when the tree has been modified...
 

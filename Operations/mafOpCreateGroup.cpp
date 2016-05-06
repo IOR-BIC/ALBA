@@ -56,7 +56,7 @@ mafOp* mafOpCreateGroup::Copy()
 	return new mafOpCreateGroup(m_Label);
 }
 //----------------------------------------------------------------------------
-bool mafOpCreateGroup::Accept(mafNode *node)
+bool mafOpCreateGroup::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
   return (node && node->IsMAFType(mafVME));
@@ -75,7 +75,7 @@ void mafOpCreateGroup::OpDo()
 //----------------------------------------------------------------------------
 {
   if (!m_Input->IsMAFType(mafVMERoot))
-    m_Group->ReparentTo(mafVME::SafeDownCast(m_Input));
+    m_Group->ReparentTo(m_Input);
   else
     mafEventMacro(mafEvent(this, VME_ADD, m_Group));
 }

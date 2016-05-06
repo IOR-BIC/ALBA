@@ -306,13 +306,13 @@ void mafVMETest::TestSetParent()
   result = vme2->GetParent() == NULL;
   TEST_RESULT;
 
-  vme2->SetParent(vme1);
+  vme2->ReparentTo(vme1);
   result = vme2->GetParent() == vme1.GetPointer();
   TEST_RESULT;
 
   // SetParent doesn't manage the reference count of VMEs.
   // ReparenTo doesn't need the line of code below.
-  vme2->SetParent(NULL);
+  vme2->ReparentTo(NULL);
 }
 //----------------------------------------------------------------------------
 void mafVMETest::TestSetMatrix()

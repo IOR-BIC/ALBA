@@ -51,7 +51,7 @@ mafOpExporterLandmark::~mafOpExporterLandmark()
   m_LC_names.clear();
 }
 //----------------------------------------------------------------------------
-bool mafOpExporterLandmark::Accept(mafNode *node)   
+bool mafOpExporterLandmark::Accept(mafVME*node)   
 //----------------------------------------------------------------------------
 { 
   m_LC_vector.clear();
@@ -73,15 +73,15 @@ bool mafOpExporterLandmark::Accept(mafNode *node)
 	return result;
 }
 //----------------------------------------------------------------------------
-int mafOpExporterLandmark::FindLandmarkClouds(mafNode* node)   
+int mafOpExporterLandmark::FindLandmarkClouds(mafVME* node)   
 //----------------------------------------------------------------------------
 {
   int result = 0;
   // Get input and store all the landmark clouds in the sub-tree
-  const mafNode::mafChildrenVector* children = node->GetChildren();
+  const mafVME::mafChildrenVector* children = node->GetChildren();
   for(int i = 0; i < children->size(); i++)
   {
-    mafNode *child = children->at(i);
+    mafVME *child = children->at(i);
     if (child->IsA("mafVMELandmarkCloud"))
     {
       m_LC_vector.push_back((mafVMELandmarkCloud*)child);
@@ -208,16 +208,6 @@ void mafOpExporterLandmark::ExportLandmark(mafVMELandmarkCloud* cloud)
   std::ofstream f_Out(m_File);
   if (!f_Out.bad())
   {
-    bool statusOpen = cloud->IsOpen();
-    if (!statusOpen)
-    {
-      if (m_TestMode == true)
-	  {
-		  cloud->TestModeOn();
-	  }
-
-      cloud->Open();
-    }
     int numberLandmark = cloud->GetNumberOfLandmarks();
     std::vector<mafTimeStamp> timeStamps;
     cloud->GetTimeStamps(timeStamps);
@@ -238,10 +228,7 @@ void mafOpExporterLandmark::ExportLandmark(mafVMELandmarkCloud* cloud)
         f_Out << lmName << "\t" << pos[0] << "\t" << pos[1] << "\t" << pos[2] <<"\n";
       }
     }
-    if (!statusOpen)
-    {
-      cloud->Close();
-    }
+
     f_Out.close();
   }
 }

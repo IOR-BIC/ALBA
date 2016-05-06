@@ -35,7 +35,7 @@
 //#include "mafGUIPicButton.h"  //SIL. 7-4-2005: -- seems not required
 //#include "mafPipe.h"
 
-//#include "mafNode.h"
+//#include "mafVME.h"
 #include "mafPics.h" // frame icon
 //----------------------------------------------------------------------------
 // const

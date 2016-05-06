@@ -82,9 +82,9 @@ void mafVMEProberTest::OutputSurfaceAcceptTest()
   mafNEW(volume);
   mafNEW(surface);
 
-  CPPUNIT_ASSERT(prober->OutputSurfaceAccept(mafNode::SafeDownCast(image))==NULL);
-  CPPUNIT_ASSERT(prober->OutputSurfaceAccept(mafNode::SafeDownCast(volume))==NULL);
-  CPPUNIT_ASSERT(prober->OutputSurfaceAccept(mafNode::SafeDownCast(surface))!=NULL);
+  CPPUNIT_ASSERT(prober->OutputSurfaceAccept(image)==NULL);
+  CPPUNIT_ASSERT(prober->OutputSurfaceAccept(volume)==NULL);
+  CPPUNIT_ASSERT(prober->OutputSurfaceAccept(surface)!=NULL);
 
   mafDEL(image);
   mafDEL(volume);
@@ -108,9 +108,9 @@ void mafVMEProberTest::VolumeAcceptTest()
   mafNEW(volume);
   mafNEW(surface);
 
-  CPPUNIT_ASSERT(prober->VolumeAccept(mafNode::SafeDownCast(image))==NULL);
-  CPPUNIT_ASSERT(prober->VolumeAccept(mafNode::SafeDownCast(surface))==NULL);
-  CPPUNIT_ASSERT(prober->VolumeAccept(mafNode::SafeDownCast(volume))!=NULL);
+  CPPUNIT_ASSERT(prober->VolumeAccept(image)==NULL);
+  CPPUNIT_ASSERT(prober->VolumeAccept(surface)==NULL);
+  CPPUNIT_ASSERT(prober->VolumeAccept(volume)!=NULL);
 
   mafDEL(image);
   mafDEL(volume);
@@ -278,14 +278,14 @@ void mafVMEProberTest::GetSetSurfaceLinkTest()
   mafNEW(prober);
   mafNEW(surface);
 
-  surface->SetParent(storage->GetRoot());
-  prober->SetParent(storage->GetRoot());
+  surface->ReparentTo(storage->GetRoot());
+  prober->ReparentTo(storage->GetRoot());
 
-  prober->SetSurfaceLink(mafNode::SafeDownCast(surface));
+  prober->SetSurfaceLink(surface);
   CPPUNIT_ASSERT(prober->GetSurfaceLink() == surface);
 
-  prober->SetParent(NULL);
-  surface->SetParent(NULL);
+  prober->ReparentTo(NULL);
+  surface->ReparentTo(NULL);
 
   mafDEL(surface);
   mafDEL(prober);
@@ -307,15 +307,15 @@ void mafVMEProberTest::GetSetVolumeLinkTest()
   mafNEW(prober);
   mafNEW(volume);
 
-  volume->SetParent(storage->GetRoot());
-  prober->SetParent(storage->GetRoot());
+  volume->ReparentTo(storage->GetRoot());
+  prober->ReparentTo(storage->GetRoot());
 
-  prober->SetVolumeLink(mafNode::SafeDownCast(volume));
+  prober->SetVolumeLink(volume);
   mafVMEVolumeGray *linkedVolume = mafVMEVolumeGray::SafeDownCast(prober->GetVolumeLink());
   CPPUNIT_ASSERT(linkedVolume == volume);
 
-  prober->SetParent(NULL);
-  volume->SetParent(NULL);
+  prober->ReparentTo(NULL);
+  volume->ReparentTo(NULL);
 
   mafDEL(volume);
   mafDEL(prober);
@@ -368,18 +368,18 @@ void mafVMEProberTest::IsDataAvailableTest()
   mafNEW(volume);
   mafNEW(surface);
 
-  volume->SetParent(storage->GetRoot());
-  surface->SetParent(storage->GetRoot());
-  prober->SetParent(storage->GetRoot());
+  volume->ReparentTo(storage->GetRoot());
+  surface->ReparentTo(storage->GetRoot());
+  prober->ReparentTo(storage->GetRoot());
 
-  prober->SetVolumeLink(mafNode::SafeDownCast(volume));
-  prober->SetSurfaceLink(mafNode::SafeDownCast(surface));
+  prober->SetVolumeLink(volume);
+  prober->SetSurfaceLink(surface);
 
   CPPUNIT_ASSERT(prober->IsDataAvailable());
 
-  prober->SetParent(NULL);
-  volume->SetParent(NULL);
-  surface->SetParent(NULL);
+  prober->ReparentTo(NULL);
+  volume->ReparentTo(NULL);
+  surface->ReparentTo(NULL);
 
   mafDEL(volume);
   mafDEL(surface);

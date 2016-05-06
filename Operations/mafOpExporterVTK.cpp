@@ -71,7 +71,7 @@ mafOpExporterVTK::~mafOpExporterVTK()
 {
 }
 //----------------------------------------------------------------------------
-bool mafOpExporterVTK::Accept(mafNode *node)
+bool mafOpExporterVTK::Accept(mafVME *node)
 //----------------------------------------------------------------------------
 { 
   return (node->IsMAFType(mafVME) && !node->IsMAFType(mafVMERoot) && !node->IsMAFType(mafVMEGroup));
@@ -98,12 +98,7 @@ enum VTK_EXPORTER_ID
 void mafOpExporterVTK::OpRun()   
 //----------------------------------------------------------------------------
 {
-// bug #2880 export LM in VTK 
-  if(m_Input->IsA("mafVMELandmarkCloud")) 
-  {
-    ((mafVMELandmarkCloud *)m_Input)->Close();
-  }
-  vtkDataSet *inputData = ((mafVME *)m_Input)->GetOutput()->GetVTKData();
+  vtkDataSet *inputData = m_Input->GetOutput()->GetVTKData();
   assert(inputData);
 
   bool isStructuredPoints = inputData->IsA("vtkStructuredPoints");
@@ -173,23 +168,12 @@ void mafOpExporterVTK::OnEvent(mafEventBase *maf_event)
 void mafOpExporterVTK::ExportVTK()
 //----------------------------------------------------------------------------
 {					
-	((mafVME *)m_Input)->GetOutput()->Update();
+	m_Input->GetOutput()->Update();
 	if(this->m_Input->IsA("mafVMELandmarkCloud"))
 	{
     if(((mafVMELandmarkCloud *)m_Input)->GetNumberOfLandmarks() > 0)
 		{
-      bool oldstate = ((mafVMELandmarkCloud *)m_Input)->IsOpen();
-
-	    if (oldstate)
-      {
-        ((mafVMELandmarkCloud *)m_Input)->Close();
-      }
       SaveVTKData();
-		  
-      if (oldstate)
-      {
-        ((mafVMELandmarkCloud *)m_Input)->Open();
-      }
     }
 		else
 		{
@@ -209,7 +193,7 @@ void mafOpExporterVTK::SaveVTKData()
 	progressHelper.SetTextMode(m_TestMode);
 	progressHelper.InitProgressBar();
  
-  vtkDataSet *inputData = ((mafVME *)m_Input)->GetOutput()->GetVTKData();
+  vtkDataSet *inputData = m_Input->GetOutput()->GetVTKData();
   assert(inputData);
 
   vtkDataSet *writerInput = NULL;
@@ -233,12 +217,12 @@ void mafOpExporterVTK::SaveVTKData()
   if (m_ABSMatrixFlag)
   {
 		vtkMAFSmartPointer <vtkTransform> tra;
-		tra->SetMatrix(((mafVME *)m_Input)->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
+		tra->SetMatrix(m_Input->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
 
 		if(m_Input->IsA("mafVMEMesh"))
 		{
 			vtkMAFSmartPointer<vtkTransformFilter> v_tpdf;
-			v_tpdf->SetInput((vtkUnstructuredGrid *)((mafVME *)m_Input)->GetOutput()->GetVTKData());
+			v_tpdf->SetInput((vtkUnstructuredGrid *)m_Input->GetOutput()->GetVTKData());
 			v_tpdf->SetTransform(tra);
 			v_tpdf->Update();
 			writer->SetInput(v_tpdf->GetOutput());
@@ -246,7 +230,7 @@ void mafOpExporterVTK::SaveVTKData()
 		else
 		{
 			vtkMAFSmartPointer<vtkTransformPolyDataFilter> v_tpdf;
-			v_tpdf->SetInput((vtkPolyData *)((mafVME *)m_Input)->GetOutput()->GetVTKData());
+			v_tpdf->SetInput((vtkPolyData *)m_Input->GetOutput()->GetVTKData());
 			v_tpdf->SetTransform(tra);
 			v_tpdf->Update();
 			writer->SetInput(v_tpdf->GetOutput());
