@@ -40,12 +40,12 @@ time stamp for which is defined a position is also defined a default visibility 
 and vice versa for each time stamp for which a visibility is defined also a position is automatically set
 eventually copying the position returned by interpolator if not. This is due to internal data 
 representation, and defines that time base for positions and visibility attributes are the same.
-Last but not least, this class has an explosion/collapsing mecchanism allowing to extract all landmarks
-from the cloud and represent them as mafVMELandmarks children. The cloud has an internal state
-which determines whether all functions relative to edit and query landmarks acts on vtkPolydata points or
-on external mafVMELandmarks children.
+The cloud manage also children VMELandmarks, when a landmark is reparent to the cloud the landmark is added
+to the out but is visibility is set to false. On the show operations the visibility of the landmark is changed.
+The landmarks vme communicate with this cloud through parent variable, and some special management is defined 
+on  mafLogicWithManagers
 @sa
-mafVME mafPointSet.*/
+mafVME mafPointSet mafLandmark mafLogicWithManagers.*/
 class MAF_EXPORT mafVMELandmarkCloud : public mafVMEPointSet
 {
 public:

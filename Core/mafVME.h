@@ -67,12 +67,18 @@ template class MAF_EXPORT mafAutoPointer<mafAbsMatrixPipe>;
 #endif
 
 /** mafVME -
-	This class implements a m-way tree. You can add/remove nodes by means of AddChild
-	and RemoveChild. To access the tree you can use GetChild(). You can also obtain an iterator
-	to iterate through the tree with a simple for (;;) loop. This node implementation take
-	advantage of the MAF reference counting mechanism. To avoid confusion constructor
-	and destructor have been protected. To allocate a node use New() and to deallocate use Delete()
-	or UnRegister().
+
+	mafVME is a node for sciViz purposes. It features a procedural core generating an output
+	data structure storing a pose matrix and a VTK dataset. The mafVME generates also an absolute
+	pose matrix, a matrix representing the pose of the VME in the world reference system.
+	mafVME has an output with a pose matrix and a VTK dataset.
+	
+	This class also implements a m-way tree. A VME can be seen as a tree node.
+	You can add/remove nodes by means of AddChild	and RemoveChild. To access the tree you can use GetChild(). 
+	You can also obtain an iterator	to iterate through the tree with a simple for (;;) loop. 
+	This node implementation take	advantage of the MAF reference counting mechanism. 
+	To avoid confusion constructor and destructor have been protected. 
+	To allocate a node use New() and to deallocate use Delete()	or UnRegister().
 	To create a copy of the node you can use MakeCopy(). To copy node content use DeepCopy(). Any
 	node has a CanCopy() to test if copying from a different node type i possible.
 	A number of functions allow to query the tree, like IsEmpty(), IsInTree(), GetRoot(), GetNumberOfChildren(),
@@ -97,12 +103,8 @@ template class MAF_EXPORT mafAutoPointer<mafAbsMatrixPipe>;
 	- test FindInTree functions
 	- test node events (attach/detach from tree, destroy)
 	- test DeepCopy()
-
-	a tree node implementation with an output with a pose matrix and a VTK dataset.
-  mafVME is a node for sciViz purposes. It features a procedural core generating an output 
-  data structure storing a pose matrix and a VTK dataset. The mafVME generates also an absolute
-  pose matrix, a matrix representing the pose of the VME in the world reference system.
-  @sa mafVME mafVMEIterator
+		
+  @sa mafVMEIterator
 
   @todo
   - implement the GetMTime() function: it's used by pipeline to trigger the update
@@ -657,7 +659,7 @@ protected:
 	same pannel GUI, each CreateGUI() function should first call the superclass' one.*/
 	virtual mafGUI  *CreateGui();
 
-	/** Precess old mafVME Events */
+	/** Precess Tree management events */
 	void NodeOnEvent(mafEventBase *e);
 
 
