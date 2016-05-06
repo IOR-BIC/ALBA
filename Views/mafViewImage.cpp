@@ -106,7 +106,7 @@ void mafViewImage::Create()
 
 }
 //-------------------------------------------------------------------------
-int mafViewImage::GetNodeStatus(mafNode *vme)
+int mafViewImage::GetNodeStatus(mafVME *vme)
 //-------------------------------------------------------------------------
 {
   mafSceneNode *n = NULL;
@@ -117,7 +117,7 @@ int mafViewImage::GetNodeStatus(mafNode *vme)
     {
       if (n != NULL)
       {
-      	n->m_Mutex = true;
+      	n->SetMutex(true);
       }
     }
     else
@@ -162,23 +162,23 @@ void mafViewImage::OnEvent(mafEventBase *maf_event)
   mafEventMacro(*maf_event);
 }
 //----------------------------------------------------------------------------
-void mafViewImage::VmeShow(mafNode *node, bool show)
+void mafViewImage::VmeShow(mafVME *vme, bool show)
 //----------------------------------------------------------------------------
 {
-  if (node->IsMAFType(mafVMEImage) || node->IsA("mafVMEAdvancedProber") || node->IsMAFType(mafVMESurface))
+  if (vme->IsMAFType(mafVMEImage) || vme->IsA("mafVMEAdvancedProber") || vme->IsMAFType(mafVMESurface))
   {
     if (show)
     {
-      m_AttachCamera->SetVme(node);
-      Superclass::VmeShow(node, show);
+      m_AttachCamera->SetVme(vme);
+      Superclass::VmeShow(vme, show);
     }
     else
     {
       m_AttachCamera->SetVme(NULL);
-      Superclass::VmeShow(node, show);
+      Superclass::VmeShow(vme, show);
     }
     CameraUpdate();
-    m_Rwi->CameraReset(node);
+    m_Rwi->CameraReset(vme);
     m_Rwi->CameraUpdate();
   }
   else
@@ -188,7 +188,7 @@ void mafViewImage::VmeShow(mafNode *node, bool show)
   
 }
 //----------------------------------------------------------------------------
-void mafViewImage::VmeDeletePipe(mafNode *vme)
+void mafViewImage::VmeDeletePipe(mafVME *vme)
 //----------------------------------------------------------------------------
 {
 	mafViewVTK::VmeDeletePipe(vme);

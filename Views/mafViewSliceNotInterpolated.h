@@ -61,7 +61,7 @@ public:
   virtual mafView* Copy(mafObserver *Listener, bool lightCopyEnabled = false);
 
   /** Create VME visual pipe */
-  virtual void VmeShow(mafNode *vme, bool show);
+  virtual void VmeShow(mafVME *vme, bool show);
 
   /** Process events coming from gui */
   virtual void OnEvent(mafEventBase * event);
@@ -76,7 +76,7 @@ public:
   void SetSlice(double origin[3]);
 
   /** update pipes lut */
-  void SetLut(mafNode *volume, vtkLookupTable *lut);
+  void SetLut(mafVME *volume, vtkLookupTable *lut);
 
 protected:
 
@@ -91,7 +91,7 @@ protected:
   double m_CurrentSlice;                          //> Current slice coordinate
   mafGUIFloatSlider *m_SliceSlider;               //> Slice coordinate slider
   mafGUILutSwatch *m_LutSwatch;                   //> Lut swatch widget
-  std::map<mafNode*,mafPipeVolumeSliceNotInterpolated*> m_PipesSlice; //> Slice visual pipe
+  std::map<mafVME*,mafPipeVolumeSliceNotInterpolated*> m_PipesSlice; //> Slice visual pipe
   vtkLookupTable *m_ColorLUT;
 
 private:

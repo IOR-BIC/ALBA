@@ -23,7 +23,7 @@
 #include "mafVMEOutput.h"
 //#include "mafDataVector.h"
 //#include "mafMatrixVector.h"
-#include "mafNodeIterator.h"
+#include "mafVMEIterator.h"
 //#include "mafTagArray.h"
 //#include "mafTagItem.h"
 #include "mafOBB.h"
@@ -296,7 +296,7 @@ void VMEGenericBoundsTest::VMEGenericBoundsMainTest()
   cerr << "Testing VME time dynamic behavior\n";
 
   // Test display of generic VME tree of surfaces
-  mafNodeIterator *iter=root->NewIterator();
+  mafVMEIterator *iter=root->NewIterator();
 
   root->SetTreeTime(0);
   //renderer->GetActiveCamera()->Zoom(.5);
@@ -304,7 +304,7 @@ void VMEGenericBoundsTest::VMEGenericBoundsMainTest()
   renderer->ResetCamera();
   renderer->GetActiveCamera()->SetViewAngle(0);
 
-  mafNode *node;
+  mafVME *node;
 
   // connect VME to assemblies and put root assembly into the renderer
   for (node=iter->GetFirstNode();node;node=iter->GetNextNode())

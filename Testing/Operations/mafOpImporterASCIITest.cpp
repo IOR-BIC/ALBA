@@ -38,7 +38,7 @@ public:
   mafOpImporterASCIIDummy(const wxString &label = "ASCIIImporter"){Superclass;};
   ~mafOpImporterASCIIDummy(){Superclass;}; 
   mafTypeMacro(mafOpImporterASCIIDummy,mafOpImporterASCII);
-  mafNode *GetOutput(){return m_ScalarData;}; // Redefined to directly get m_ScalarData without use OpRun that creates a GUI
+  mafVME *GetOutput(){return m_ScalarData;}; // Redefined to directly get m_ScalarData without use OpRun that creates a GUI
 };
 
 mafCxxTypeMacro(mafOpImporterASCIIDummy);

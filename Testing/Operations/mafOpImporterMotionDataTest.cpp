@@ -83,11 +83,7 @@ void mafOpImporterMotionDataTest::TestOnRawMotionData()
   for(int i = 0; i < vme_raw->GetNumberOfChildren(); i++)
   {
     mafString name = vme_raw->GetChild(i)->GetName();
-    if(name == "IPE" ||
-        name == "LSH" ||
-         name == "LTH" ||
-          name == "RSH" ||
-           name == "RTH")
+    if(name == "IPE" || name == "LSH" || name == "LTH" || name == "RSH" || name == "RTH")
       resultNameChild++;
   }
   CPPUNIT_ASSERT(resultNameChild == 0);
@@ -113,8 +109,7 @@ void mafOpImporterMotionDataTest::TestOnRawMotionData()
      ((mafVMELandmarkCloud *)vme_raw->GetChild(0))->TestModeOn();
   }
 
-  ((mafVMELandmarkCloud *)vme_raw->GetChild(0))->Open();
-  mafVMELandmark *landmark = ((mafVMELandmark *)((mafVMELandmarkCloud *)vme_raw->GetChild(0))->GetLandmark(0));
+  mafVMELandmark *landmark = ((mafVMELandmarkCloud *)vme_raw->GetChild(0))->GetLandmark(0);
   
   mafString nameLand = landmark->GetName();
   CPPUNIT_ASSERT(nameLand == "IASR");

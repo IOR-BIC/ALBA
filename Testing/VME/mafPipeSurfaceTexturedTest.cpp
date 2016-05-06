@@ -215,7 +215,6 @@ void mafPipeSurfaceTexturedTest::TestPipeTextureExecution()
 
   vtkDEL(actorList);
 
-  delete pipeSurface;
   delete sceneNode;
 
   mafDEL(surface);
@@ -324,7 +323,6 @@ void mafPipeSurfaceTexturedTest::TestPipeClassicExecution()
 
 	vtkDEL(actorList);
 
-	delete pipeSurface;
 	delete sceneNode;
 
 	mafDEL(surface);

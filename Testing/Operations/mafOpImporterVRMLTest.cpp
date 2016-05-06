@@ -30,7 +30,7 @@
 #include "mafString.h"
 #include "mafVMEStorage.h"
 #include "mafVMERoot.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafVMESurface.h"
 #include "mmaMaterial.h"
 
@@ -55,7 +55,7 @@ void mafOpImporterVRMLTest::Test()
 	//Check the output of the importer
 	CPPUNIT_ASSERT(importer->GetOutput() != NULL);
 
-	mafNode *node=importer->GetOutput();
+	mafVME *node=importer->GetOutput();
 
 	CPPUNIT_ASSERT(node->IsA("mafVMEGroup"));
 	CPPUNIT_ASSERT(node->GetNumberOfChildren()==2);

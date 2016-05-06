@@ -242,7 +242,7 @@ void mafOpImporterImage::BuildImageSequence()
   else
     std::sort(m_Files.begin(),m_Files.end());
 
-	mafTimeStamp start_time = ((mafVME *)m_Input->GetRoot())->GetTimeStamp();
+	mafTimeStamp start_time = m_Input->GetRoot()->GetTimeStamp();
 	
 	mafProgressBarHelper progressHelper(m_Listener);
 	progressHelper.SetTextMode(m_TestMode);
@@ -332,7 +332,7 @@ void mafOpImporterImage::BuildVolume()
     r->SetDataSpacing(1.0,1.0,m_ImageZSpacing);
     r->Update();
     
-    m_ImportedImageAsVolume->SetData(r->GetOutput(),((mafVME *)m_Input)->GetTimeStamp());
+    m_ImportedImageAsVolume->SetData(r->GetOutput(),m_Input->GetTimeStamp());
     
     r->Delete();
 	} 
@@ -355,7 +355,7 @@ void mafOpImporterImage::BuildVolume()
     r->SetDataSpacing(1.0,1.0,m_ImageZSpacing);
     r->Update();
     
-    m_ImportedImageAsVolume->SetData(r->GetOutput(),((mafVME *)m_Input)->GetTimeStamp());
+    m_ImportedImageAsVolume->SetData(r->GetOutput(),m_Input->GetTimeStamp());
     
     r->Delete();
 	}
@@ -378,7 +378,7 @@ void mafOpImporterImage::BuildVolume()
     r->SetDataSpacing(1.0,1.0,m_ImageZSpacing);
     r->Update();
 
-    m_ImportedImageAsVolume->SetData(r->GetOutput(),((mafVME *)m_Input)->GetTimeStamp());
+    m_ImportedImageAsVolume->SetData(r->GetOutput(),m_Input->GetTimeStamp());
     
     r->Delete();
 	}
@@ -401,7 +401,7 @@ void mafOpImporterImage::BuildVolume()
     r->SetDataSpacing(1.0,1.0,m_ImageZSpacing);
     r->Update();
     
-    m_ImportedImageAsVolume->SetData(r->GetOutput(),((mafVME *)m_Input)->GetTimeStamp());
+    m_ImportedImageAsVolume->SetData(r->GetOutput(),m_Input->GetTimeStamp());
 
     r->Delete();
 	}

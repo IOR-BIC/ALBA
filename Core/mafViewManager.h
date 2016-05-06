@@ -26,7 +26,7 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mafNode;
+class mafVME;
 class mafVMERoot;
 class mafView;
 class mafGUIViewPanel;
@@ -59,19 +59,19 @@ public:
   bool IsVisibleInMenu(mafView* v);
 
   /** Add the vme to all views. */
-  void VmeAdd(mafNode *n);
+  void VmeAdd(mafVME *n);
 
   /** Remove the vme from all views. */
-  void VmeRemove(mafNode *n);
+  void VmeRemove(mafVME *n);
 
   /** Show the selection of the vme in all views. */
-  void VmeSelect(mafNode *n);
+  void VmeSelect(mafVME *vme);
 
   /** Show/Hide the vme in the selected view. */
-  void VmeShow(mafNode *n, bool show);
+  void VmeShow(mafVME *vme, bool show);
 
   /** inform the views that a vme was modified */
-  void VmeModified(mafNode *vme); //SIL. 9-3-2005: 
+  void VmeModified(mafVME *vme); //SIL. 9-3-2005: 
 
   /** Add the View to the view-list. */
 	virtual void ViewAdd(mafView *view, bool visibleInMenu = true);
@@ -101,7 +101,7 @@ public:
   void CameraReset(bool sel = false);
 
 	/** Reset the camera to fit the specified vme. apply to the selected view only. */
-  void CameraReset(mafNode *vme);   
+  void CameraReset(mafVME *vme);   
 
 	/** Update the camera for all opened views; optionally the Update can be limited for the selected view. */
   void CameraUpdate(bool only_selected = false);
@@ -116,7 +116,7 @@ public:
 	mafView *GetSelectedView();
 
   /** Return the root of the vme tree. */
-  mafNode *GetCurrentRoot() {return (mafNode*)m_RootVme;};
+  mafVME *GetCurrentRoot() {return (mafVME*)m_RootVme;};
 
   /** Return the created view-list. */
   mafView *GetList() {return m_ViewList;};
@@ -151,7 +151,7 @@ protected:
   mafObserver   *m_Listener;
   mafObserver   *m_RemoteListener;
   mafVMERoot    *m_RootVme;
-  mafNode       *m_SelectedVme;
+  mafVME       *m_SelectedVme;
   mafView       *m_SelectedView;
   mafRWIBase    *m_SelectedRWI;
 	mafView       *m_ViewBeingCreated;

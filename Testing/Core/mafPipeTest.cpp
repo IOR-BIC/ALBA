@@ -86,26 +86,24 @@ void mafPipeTest::CreateTest()
   pipe = new mafPipe();
   pipe->Create(node);
 
-  result = node->m_AssemblyBack == pipe->m_AssemblyBack;
+  result = node->GetAssemblyBack() == pipe->m_AssemblyBack;
   TEST_RESULT;
-  result = node->m_AssemblyFront == pipe->m_AssemblyFront;
+  result = node->GetAssemblyFront() == pipe->m_AssemblyFront;
   TEST_RESULT;
-  result = node->m_Sg == pipe->m_Sg;
+  result = node->GetSceneGraph() == pipe->m_Sg;
   TEST_RESULT;
-  result = node->m_RenBack== pipe->m_RenBack;
+  result = node->GetRenBack()== pipe->m_RenBack;
   TEST_RESULT;
-  result = node->m_RenFront== pipe->m_RenFront;
+  result = node->GetRenFront()== pipe->m_RenFront;
   TEST_RESULT;
-  result = node->m_Vme == pipe->m_Vme;
+  result = node->GetVme() == pipe->m_Vme;
   TEST_RESULT;
   result = pipe->m_Selected == false;
   TEST_RESULT;
 
   mafDEL(vme);
-  delete pipe;
   delete node;
   delete sg;
-
 }
 //----------------------------------------------------------------------------
 void mafPipeTest::GetSetListenerTest()

@@ -23,7 +23,7 @@
 //------------------------------------------------------------------------------
 
 #include "mafOp.h"
-#include "mafNode.h"
+#include "mafVME.h"
 
 //-------------------------------------------------------------------------
 /** class for testing */
@@ -36,7 +36,7 @@ public:
   mafTypeMacro(mafOpDummy,mafOp);
 
   /** Return true for the acceptable vme type. */
-  /*virtual*/ bool Accept(mafNode* vme);
+  /*virtual*/ bool Accept(mafVME* vme);
   /*virtual*/ mafOp* Copy();
   /** Builds operation's interface. */
   /*virtual*/ void OpRun();
@@ -68,7 +68,7 @@ mafOpDummy::mafOpDummy(wxString label,  bool canundo, int opType, bool inputPres
   m_InputPreserving = inputPreserving;
 }
 //----------------------------------------------------------------------------
-bool mafOpDummy::Accept(mafNode* vme)
+bool mafOpDummy::Accept(mafVME* vme)
 //----------------------------------------------------------------------------
 {
   return vme->IsA("mafVMEDummy");

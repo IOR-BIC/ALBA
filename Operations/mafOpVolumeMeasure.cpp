@@ -32,7 +32,7 @@
 #include "mafVMESurface.h"
 #include "mafTagItem.h"
 #include "mafTagArray.h"
-#include "mafNodeIterator.h"
+#include "mafVMEIterator.h"
 
 #include "vtkTriangleFilter.h"
 #include "vtkMassProperties.h"
@@ -72,7 +72,7 @@ mafOp *mafOpVolumeMeasure::Copy()
 	return new mafOpVolumeMeasure(m_Label);
 }
 //----------------------------------------------------------------------------
-bool mafOpVolumeMeasure::Accept(mafNode *node)
+bool mafOpVolumeMeasure::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
   if(node->IsA("mafVMESurface") || node->IsA("mafVMESurfaceParametric"))
@@ -98,7 +98,7 @@ enum ID_VOLUME_MEASURE
 void mafOpVolumeMeasure::OpRun()   
 //----------------------------------------------------------------------------
 {
-  m_VmeSurface = (mafVME*)m_Input;
+  m_VmeSurface = m_Input;
 
 	wxString measure[3] = {_("points"), _("lines"), _("angle")};
 
@@ -122,7 +122,7 @@ void mafOpVolumeMeasure::OpRun()
   m_MeasureList = m_Gui->ListBox(ID_MEASURE_LIST);
 	m_Gui->Button(ID_CLOSE_OP,_("Close"));
 
-  mafVME *root = (mafVME *)m_Input->GetRoot();
+  mafVME *root = m_Input->GetRoot();
   if(root->GetTagArray()->IsTagPresent("VOLUME_MEASURE"))
   {
     mafTagItem *measure_item = root->GetTagArray()->GetTag("VOLUME_MEASURE");
@@ -182,25 +182,9 @@ void mafOpVolumeMeasure::OnEvent(mafEventBase *maf_event)
       if(m_MeasureList->GetCount() == 0)
       {
         m_Gui->Enable(ID_REMOVE_MEASURE,false);
-        //m_gui->Enable(ID_ADD_TO_VME_TREE,false);
       }
     }
     break;
-/*    case ID_ADD_TO_VME_TREE:
-    {
-      int c = m_MeasureList->Number();
-      vtkTagItem measure_item;
-      measure_item.SetName("VOLUME_MEASURE");
-      measure_item.SetNumberOfComponents(c);
-      for(int i = 0; i < c; i++)
-        measure_item.SetComponent(m_MeasureList->GetString(i).c_str(),i);
-      mafVME *root = (mafVME *)m_Input->GetRoot();
-      if(root->GetTagArray()->FindTag("VOLUME_MEASURE") != -1)
-        root->GetTagArray()->DeleteTag("VOLUME_MEASURE");
-      root->GetTagArray()->AddTag(measure_item);
-      mafEventMacro(mafEvent(this,VME_MODIFIED,root));
-    }
-    break;*/
     case ID_CLOSE_OP:
 			OpStop(OP_RUN_CANCEL);
 		break;
@@ -223,7 +207,7 @@ void mafOpVolumeMeasure::OpStop(int result)
     measure_item.SetNumberOfComponents(c);
     for(int i = 0; i < c; i++)
       measure_item.SetComponent(m_MeasureList->GetString(i).c_str(),i);
-    mafVME *root = (mafVME *)m_Input->GetRoot();
+    mafVME *root = m_Input->GetRoot();
     if(root->GetTagArray()->IsTagPresent("VOLUME_MEASURE"))
       root->GetTagArray()->DeleteTag("VOLUME_MEASURE");
     root->GetTagArray()->SetTag(measure_item);

@@ -73,9 +73,9 @@ void mafOpFreezeVMETest::TestFreezeVMESurfaceParametric()
   //create a parametric surface
   mafVMESurfaceParametric *vmeParametricSurfaceSTART;
   mafNEW(vmeParametricSurfaceSTART);
-  vmeParametricSurfaceSTART->SetParent(root);
+  vmeParametricSurfaceSTART->ReparentTo(root);
   vmeParametricSurfaceSTART->GetOutput()->GetVTKData()->Update();
-  vmeParametricSurfaceSTART->SetParent(storage->GetRoot());
+  vmeParametricSurfaceSTART->ReparentTo(storage->GetRoot());
   vmeParametricSurfaceSTART->Update();
 
   /* test surface parametric *//////////////////////////////////////////////////////////////////////////
@@ -85,15 +85,15 @@ void mafOpFreezeVMETest::TestFreezeVMESurfaceParametric()
   freezeOp->OpRun();
 
   mafVMESurface *surface=(mafVMESurface *)(freezeOp->GetOutput());
-  surface->SetParent(root);
+  surface->ReparentTo(root);
   surface->GetOutput()->GetVTKData()->Update();
   surface->Update();
 
   CPPUNIT_ASSERT(surface && surface->GetOutput()->GetVTKData()->GetNumberOfPoints() == vmeParametricSurfaceSTART->GetOutput()->GetVTKData()->GetNumberOfPoints());
 
-  vmeParametricSurfaceSTART->SetParent(NULL);
+  vmeParametricSurfaceSTART->ReparentTo(NULL);
   
-  surface->SetParent(NULL); 
+  surface->ReparentTo(NULL);
   mafDEL(vmeParametricSurfaceSTART);
   cppDEL(freezeOp);
   mafDEL(storage);
@@ -111,16 +111,16 @@ void mafOpFreezeVMETest::TestFreezeVMEMeter()
 	//create a parametric surface
 	mafVMESurfaceParametric *vmeParametricSurfaceSTART;
 	mafNEW(vmeParametricSurfaceSTART);
-	vmeParametricSurfaceSTART->SetParent(root);
+	vmeParametricSurfaceSTART->ReparentTo(root);
 	vmeParametricSurfaceSTART->GetOutput()->GetVTKData()->Update();
-	vmeParametricSurfaceSTART->SetParent(storage->GetRoot());
+	vmeParametricSurfaceSTART->ReparentTo(storage->GetRoot());
 	vmeParametricSurfaceSTART->Update();
 
 	mafVMESurfaceParametric *vmeParametricSurfaceEND1;
 	mafNEW(vmeParametricSurfaceEND1);	
-	vmeParametricSurfaceEND1->SetParent(root);
+	vmeParametricSurfaceEND1->ReparentTo(root);
 	vmeParametricSurfaceEND1->GetOutput()->GetVTKData()->Update();
-	vmeParametricSurfaceEND1->SetParent(storage->GetRoot());
+	vmeParametricSurfaceEND1->ReparentTo(storage->GetRoot());
 	vmeParametricSurfaceEND1->Update();
 
 	mafMatrix *matrix = vmeParametricSurfaceEND1->GetOutput()->GetAbsMatrix();
@@ -137,7 +137,7 @@ void mafOpFreezeVMETest::TestFreezeVMEMeter()
 	mafNEW(meter);
 	meter->SetMeterLink("StartVME",vmeParametricSurfaceSTART);
 	meter->SetMeterLink("EndVME1",vmeParametricSurfaceEND1);
-	meter->SetParent(storage->GetRoot());
+	meter->ReparentTo(storage->GetRoot());
 	//meter->GetOutput()->GetVTKData()->Update();
 	meter->Modified();
 	meter->Update();
@@ -148,16 +148,16 @@ void mafOpFreezeVMETest::TestFreezeVMEMeter()
 	freezeOp->OpRun();
 
 	mafVMEPolyline *polyline2=(mafVMEPolyline *)(freezeOp->GetOutput());
-	polyline2->SetParent(root);
+	polyline2->ReparentTo(root);
 	polyline2->GetOutput()->GetVTKData()->Update();
 	polyline2->Update();
 	CPPUNIT_ASSERT(polyline2 && polyline2->GetOutput()->GetVTKData()->GetNumberOfPoints() == meter->GetOutput()->GetVTKData()->GetNumberOfPoints());
 
-	meter->SetParent(NULL);
+	meter->ReparentTo(NULL);
 	
-	vmeParametricSurfaceSTART->SetParent(NULL);
-	vmeParametricSurfaceEND1->SetParent(NULL);
-	polyline2->SetParent(NULL);
+	vmeParametricSurfaceSTART->ReparentTo(NULL);
+	vmeParametricSurfaceEND1->ReparentTo(NULL);
+	polyline2->ReparentTo(NULL);
 
   mafDEL(vmeParametricSurfaceSTART);
   mafDEL(vmeParametricSurfaceEND1);
@@ -179,16 +179,16 @@ void mafOpFreezeVMETest::TestFreezeVMEWrappedMeter()
 	//create a parametric surface
 	mafVMESurfaceParametric *vmeParametricSurfaceSTART;
 	mafNEW(vmeParametricSurfaceSTART);
-	vmeParametricSurfaceSTART->SetParent(root);
+	vmeParametricSurfaceSTART->ReparentTo(root);
 	vmeParametricSurfaceSTART->GetOutput()->GetVTKData()->Update();
-	vmeParametricSurfaceSTART->SetParent(storage->GetRoot());
+	vmeParametricSurfaceSTART->ReparentTo(storage->GetRoot());
 	vmeParametricSurfaceSTART->Update();
 
 	mafVMESurfaceParametric *vmeParametricSurfaceEND1;
 	mafNEW(vmeParametricSurfaceEND1);	
-	vmeParametricSurfaceEND1->SetParent(root);
+	vmeParametricSurfaceEND1->ReparentTo(root);
 	vmeParametricSurfaceEND1->GetOutput()->GetVTKData()->Update();
-	vmeParametricSurfaceEND1->SetParent(storage->GetRoot());
+	vmeParametricSurfaceEND1->ReparentTo(storage->GetRoot());
 	vmeParametricSurfaceEND1->Update();
 
 	mafMatrix *matrix = vmeParametricSurfaceEND1->GetOutput()->GetAbsMatrix();
@@ -204,7 +204,7 @@ void mafOpFreezeVMETest::TestFreezeVMEWrappedMeter()
 
 	wrappedMeter->SetMeterLink("StartVME",vmeParametricSurfaceSTART);
 	wrappedMeter->SetMeterLink("EndVME1",vmeParametricSurfaceEND1);
-	wrappedMeter->SetParent(storage->GetRoot());
+	wrappedMeter->ReparentTo(storage->GetRoot());
 	wrappedMeter->GetOutput()->GetVTKData()->Update();
 	wrappedMeter->Modified();
 	wrappedMeter->Update();
@@ -214,17 +214,17 @@ void mafOpFreezeVMETest::TestFreezeVMEWrappedMeter()
 	freezeOp->OpRun();
 
 	mafVMEPolyline *polyline1=(mafVMEPolyline *)(freezeOp->GetOutput());
-	polyline1->SetParent(root);
+	polyline1->ReparentTo(root);
 	polyline1->GetOutput()->GetVTKData()->Update();
 	polyline1->Update();
 	CPPUNIT_ASSERT(polyline1 && polyline1->GetOutput()->GetVTKData()->GetNumberOfPoints() == wrappedMeter->GetOutput()->GetVTKData()->GetNumberOfPoints());
 	
-	wrappedMeter->SetParent(NULL);
+	wrappedMeter->ReparentTo(NULL);
 	
-	vmeParametricSurfaceSTART->SetParent(NULL);
-	vmeParametricSurfaceEND1->SetParent(NULL);
+	vmeParametricSurfaceSTART->ReparentTo(NULL);
+	vmeParametricSurfaceEND1->ReparentTo(NULL);
 	
-	polyline1->SetParent(NULL);
+	polyline1->ReparentTo(NULL);
 	mafDEL(wrappedMeter);
 	mafDEL(vmeParametricSurfaceSTART);
 	mafDEL(vmeParametricSurfaceEND1);
@@ -254,7 +254,7 @@ void mafOpFreezeVMETest::TestFreezeVMESlicer()
 
 	mafVMEVolumeGray *volume=mafVMEVolumeGray::SafeDownCast(importer->GetOutput());
 	volume->GetOutput()->GetVTKData()->Update();
-	volume->SetParent(root);
+	volume->ReparentTo(root);
 	volume->Update();
 
 	double centerV[3], rotV[3];
@@ -275,7 +275,7 @@ void mafOpFreezeVMETest::TestFreezeVMESlicer()
 	freezeOp->OpRun();
 
 	mafVMESurface *sliceSurface=(mafVMESurface *)(freezeOp->GetOutput());
-	sliceSurface->SetParent(volume);
+	sliceSurface->ReparentTo(volume);
 	sliceSurface->GetOutput()->GetVTKData()->Update();
 	sliceSurface->Update();
 	int numSrc = sliceSurface->GetOutput()->GetVTKData()->GetNumberOfPoints();
@@ -301,10 +301,10 @@ void mafOpFreezeVMETest::TestFreezeVMESlicer()
 
 	CPPUNIT_ASSERT(sameValues);
 
-	volume->SetParent(NULL);
+	volume->ReparentTo(NULL);
 
-	slicer->SetParent(NULL);
-	sliceSurface->SetParent(NULL);
+	slicer->ReparentTo(NULL);
+	sliceSurface->ReparentTo(NULL);
 	
 
 	cppDEL(importer);	
@@ -336,14 +336,14 @@ void mafOpFreezeVMETest::TestFreezeVMEProber()
 	//create a parametric surface
 	mafVMESurfaceParametric *vmeParametricSurfaceSTART;
 	mafNEW(vmeParametricSurfaceSTART);
-	vmeParametricSurfaceSTART->SetParent(root);
+	vmeParametricSurfaceSTART->ReparentTo(root);
 	vmeParametricSurfaceSTART->GetOutput()->GetVTKData()->Update();
-	vmeParametricSurfaceSTART->SetParent(storage->GetRoot());
+	vmeParametricSurfaceSTART->ReparentTo(storage->GetRoot());
 	vmeParametricSurfaceSTART->Update();
 
 	mafVMEVolumeGray *volume=mafVMEVolumeGray::SafeDownCast(importer->GetOutput());
 	volume->GetOutput()->GetVTKData()->Update();
-	volume->SetParent(root);
+	volume->ReparentTo(root);
 	volume->Update();
 
 	double centerV[3], rotV[3];
@@ -358,7 +358,7 @@ void mafOpFreezeVMETest::TestFreezeVMEProber()
 	prober->SetPose(centerV,rotV,0);
 	prober->SetVolumeLink(volume);
 	prober->SetSurfaceLink(vmeParametricSurfaceSTART);
-	prober->SetParent(storage->GetRoot());
+	prober->ReparentTo(storage->GetRoot());
 	prober->GetOutput()->GetVTKData()->Update();
 	prober->Modified();
 	prober->Update();
@@ -367,7 +367,7 @@ void mafOpFreezeVMETest::TestFreezeVMEProber()
 	freezeOp->OpRun();
 
 	mafVMESurface *probSurface=(mafVMESurface *)(freezeOp->GetOutput());
-	probSurface->SetParent(root);
+	probSurface->ReparentTo(root);
 	probSurface->GetOutput()->GetVTKData()->Update();
 	probSurface->Update();
 	int numSrc = probSurface->GetOutput()->GetVTKData()->GetNumberOfPoints();
@@ -386,11 +386,11 @@ void mafOpFreezeVMETest::TestFreezeVMEProber()
 	probSurface->GetOutput()->GetVTKData()->GetPointData()->GetScalars()->GetRange(range2);
 	CPPUNIT_ASSERT(fabs(range1[0] - range2[0])<0.1 && fabs(range1[1] - range2[1])<0.1);
 
-	volume->SetParent(NULL);	
-	prober->SetParent(NULL);
-	probSurface->SetParent(NULL);
+	volume->ReparentTo(NULL);	
+	prober->ReparentTo(NULL);
+	probSurface->ReparentTo(NULL);
 
-  vmeParametricSurfaceSTART->SetParent(NULL);
+  vmeParametricSurfaceSTART->ReparentTo(NULL);
   mafDEL(vmeParametricSurfaceSTART);
 	cppDEL(importer);	
 	mafDEL(prober);
@@ -438,7 +438,7 @@ void mafOpFreezeVMETest::TestFreezeVMEProfileSpline()
   polydata->SetLines(cells);
   polydata->Update();
   vmePolyline->SetData(polydata, 0.0);
-  vmePolyline->SetParent(root);
+  vmePolyline->ReparentTo(root);
   vmePolyline->Update();
 
   mafOpFreezeVME *freezeOp=new mafOpFreezeVME("freeze");
@@ -447,7 +447,7 @@ void mafOpFreezeVMETest::TestFreezeVMEProfileSpline()
   mafVMEPolylineSpline *spline;
   mafNEW(spline);
   spline->SetPolylineLink(vmePolyline);
-  spline->SetParent(root);
+  spline->ReparentTo(root);
   spline->GetOutput()->GetVTKData()->Update();
   spline->Modified();
   spline->Update();
@@ -456,16 +456,16 @@ void mafOpFreezeVMETest::TestFreezeVMEProfileSpline()
   freezeOp->OpRun();
 
   mafVMEPolyline *polyline2=(mafVMEPolyline *)(freezeOp->GetOutput());
-  polyline2->SetParent(root);
+  polyline2->ReparentTo(root);
   polyline2->GetOutput()->GetVTKData()->Update();
   polyline2->Update();
   int value1 = spline->GetOutput()->GetVTKData()->GetNumberOfPoints();
   int value2 = polyline2->GetOutput()->GetVTKData()->GetNumberOfPoints();
   CPPUNIT_ASSERT(polyline2 && value1 == value2);
 
-  spline->SetParent(NULL);
-  vmePolyline->SetParent(NULL);
-  polyline2->SetParent(NULL);
+  spline->ReparentTo(NULL);
+  vmePolyline->ReparentTo(NULL);
+  polyline2->ReparentTo(NULL);
 
   vtkDEL(polydata);
   vtkDEL(points);
@@ -490,9 +490,9 @@ void mafOpFreezeVMETest::TestFreezeVMERefSys()
   //create a parametric surface
   mafVMERefSys *vmeRefSys;
   mafNEW(vmeRefSys);
-  vmeRefSys->SetParent(root);
+  vmeRefSys->ReparentTo(root);
   vmeRefSys->GetOutput()->GetVTKData()->Update();
-  vmeRefSys->SetParent(storage->GetRoot());
+  vmeRefSys->ReparentTo(storage->GetRoot());
   vmeRefSys->Update();
 
   // test surface parametric //////////////////////////////////////////////////////////////////////////
@@ -502,7 +502,7 @@ void mafOpFreezeVMETest::TestFreezeVMERefSys()
   freezeOp->OpRun();
 
   mafVMESurface *surface=(mafVMESurface *)(freezeOp->GetOutput());
-  surface->SetParent(root);
+  surface->ReparentTo(root);
   surface->GetOutput()->GetVTKData()->Update();
   surface->Update();
 
@@ -510,9 +510,9 @@ void mafOpFreezeVMETest::TestFreezeVMERefSys()
   int num2 = vmeRefSys->GetOutput()->GetVTKData()->GetNumberOfPoints();
   CPPUNIT_ASSERT(surface &&  num1 == num2);
 
-  vmeRefSys->SetParent(NULL);
+  vmeRefSys->ReparentTo(NULL);
 
-  surface->SetParent(NULL); 
+  surface->ReparentTo(NULL); 
   mafDEL(vmeRefSys);
   cppDEL(freezeOp);
   mafDEL(storage);

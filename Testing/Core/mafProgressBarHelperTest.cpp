@@ -79,7 +79,7 @@ void mafProgressBarHelperTest::InitProgressBarTest()
 
 	//Check event counters
 	CPPUNIT_ASSERT(m_InitEventNum==2);
-	CPPUNIT_ASSERT(m_UpdateEventNum==0);
+	CPPUNIT_ASSERT(m_UpdateEventNum==1);
 	CPPUNIT_ASSERT(m_CloseEventNum==1);
 }
 
@@ -122,7 +122,7 @@ void mafProgressBarHelperTest::CloseProgressBarTest()
 
 	//Check event counters
 	CPPUNIT_ASSERT(m_InitEventNum==1);
-	CPPUNIT_ASSERT(m_UpdateEventNum==0);
+	CPPUNIT_ASSERT(m_UpdateEventNum==1);
 	CPPUNIT_ASSERT(m_CloseEventNum==1);
 
 	//Auto close on destroy test
@@ -133,7 +133,7 @@ void mafProgressBarHelperTest::CloseProgressBarTest()
 
 	//Check event counters
 	CPPUNIT_ASSERT(m_InitEventNum==2);
-	CPPUNIT_ASSERT(m_UpdateEventNum==0);
+	CPPUNIT_ASSERT(m_UpdateEventNum=2);
 	CPPUNIT_ASSERT(m_CloseEventNum==2);
 }
 

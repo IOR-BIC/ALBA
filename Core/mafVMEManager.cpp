@@ -36,14 +36,14 @@
 #include <wx/filename.h>
 
 #include "mafDecl.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafVMEStorage.h"
 #include "mafRemoteStorage.h"
 #include "mmdRemoteFileManager.h"
 #include "mafVMEGenericAbstract.h"
 #include "mafDataVector.h"
 
-#include "mafNodeIterator.h"
+#include "mafVMEIterator.h"
 #include "mafTagArray.h"
 
 #include <fstream>
@@ -113,7 +113,7 @@ void mafVMEManager::OnEvent(mafEventBase *maf_event)
       {
         if (!m_LoadingFlag)
         {
-          NotifyAdd((mafNode *)maf_event->GetSender());
+          NotifyAdd((mafVME *)maf_event->GetSender());
           MSFModified(true);
         }
       }
@@ -122,7 +122,7 @@ void mafVMEManager::OnEvent(mafEventBase *maf_event)
       {
         if (!m_LoadingFlag)
         {
-          NotifyRemove((mafNode *)maf_event->GetSender());
+          NotifyRemove((mafVME *)maf_event->GetSender());
           MSFModified(true);
         }
       }
@@ -235,7 +235,7 @@ void mafVMEManager::MSFNew(bool notify_root_creation)
 }
 
 //----------------------------------------------------------------------------
-void mafVMEManager::AddCreationDate(mafNode *vme)
+void mafVMEManager::AddCreationDate(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   wxString dateAndTime;
@@ -786,28 +786,28 @@ void mafVMEManager::Upload(mafString local_file, mafString remote_file)
   }*/
 }
 //----------------------------------------------------------------------------
-void mafVMEManager::VmeAdd(mafNode *n)
+void mafVMEManager::VmeAdd(mafVME *vme)
 //----------------------------------------------------------------------------
 {
-  if(n != NULL)
+  if(vme != NULL)
   {
     // check the node's parent
-    mafNode *vp = n->GetParent();  
+    mafVME *vp = vme->GetParent();  
     assert( vp == NULL || m_Storage->GetRoot()->IsInTree(vp) );
     if(vp == NULL) 
-			n->ReparentTo(m_Storage->GetRoot()); // reparent the node to the root
+			vme->ReparentTo(m_Storage->GetRoot()); // reparent the node to the root
 
     m_Modified = true;
   }
 }
 //----------------------------------------------------------------------------
-void mafVMEManager::VmeRemove(mafNode *n)
+void mafVMEManager::VmeRemove(mafVME *vme)
 //----------------------------------------------------------------------------
 {
-  if(n != NULL && m_Storage->GetRoot() /*&& m_Storage->GetRoot()->IsInTree(n)*/) 
+  if(vme != NULL && m_Storage->GetRoot() /*&& m_Storage->GetRoot()->IsInTree(n)*/) 
   {
-    assert(m_Storage->GetRoot()->IsInTree(n));
-    n->ReparentTo(NULL);
+    assert(m_Storage->GetRoot()->IsInTree(vme));
+    vme->ReparentTo(NULL);
     m_Modified = true;
   }
 }
@@ -836,35 +836,34 @@ void mafVMEManager::TimeGetBounds(double *min, double *max)
   }
 }
 //----------------------------------------------------------------------------
-void mafVMEManager::NotifyRemove(mafNode *n)
+void mafVMEManager::NotifyRemove(mafVME *vme)
 //----------------------------------------------------------------------------
 {
-  mafNodeIterator *iter = n->NewIterator();
+  mafVMEIterator *iter = vme->NewIterator();
   iter->IgnoreVisibleToTraverse(true); // ignore visible to traverse flag and visits all nodes
   iter->SetTraversalModeToPostOrder(); // traverse is: first the subtree left to right, then the root
-  for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+  for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
 		mafEventMacro(mafEvent(this,VME_REMOVING,node)); // raise notification event (to logic)
   iter->Delete();
 }
 //----------------------------------------------------------------------------
-void mafVMEManager::NotifyAdd(mafNode *n)
+void mafVMEManager::NotifyAdd(mafVME *vme)
 //----------------------------------------------------------------------------
 {
-  bool checkSingleFile = n->IsMAFType(mafVMERoot);
+  bool checkSingleFile = vme->IsMAFType(mafVMERoot);
   
-  mafNodeIterator *iter = n->NewIterator();
+  mafVMEIterator *iter = vme->NewIterator();
   iter->IgnoreVisibleToTraverse(true); // ignore visible to traverse flag and visits all nodes
-  for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+  for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
   {
     mafVMERoot *root = GetRoot();
     if (root != NULL)
     {
-      mafVME *vme = mafVME::SafeDownCast(node);
-      if (vme != NULL)
+      if (node)
       {
         // Update the new VME added to the tree with the current time-stamp
         // present in the tree.
-        vme->SetTimeStamp(root->GetTimeStamp());
+        node->SetTimeStamp(root->GetTimeStamp());
       }
     }
 
@@ -908,27 +907,4 @@ bool mafVMEManager::AskConfirmAndSave()
 	}
 	return go;
 }
-//----------------------------------------------------------------------------
-void mafVMEManager::UpdateFromTag(mafNode *n)
-//----------------------------------------------------------------------------
-{
-  /*
-  if (n)
-  {
-    mafVmeData *vd = (mafVmeData *)n->GetClientData();
-    if (vd)
-      vd->UpdateFromTag();
-  }
-  else
-  {
-    mafNodeIterator *iter = m_Storage->GetRoot()->NewIterator();
-    for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
-    {
-      mafVmeData *vd = (mafVmeData *)node->GetClientData();
-      if (vd)
-        vd->UpdateFromTag();
-    }
-    iter->Delete();
-  }
-  */
-}
+

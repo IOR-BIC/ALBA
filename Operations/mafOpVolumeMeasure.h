@@ -60,7 +60,7 @@ public:
 
   mafOp* Copy();
 
-	bool Accept(mafNode* Node);
+	bool Accept(mafVME* Node);
 	void OpRun();	
 	
   /**
@@ -72,7 +72,7 @@ public:
   void OpDo();
   void OpStop(int result);	
 
-  static bool SurfaceAccept(mafNode* node) {return(node != NULL && (node->IsMAFType(mafVMESurface) || node->IsMAFType(mafVMESurfaceParametric) ));};
+  static bool SurfaceAccept(mafVME* node) {return(node != NULL && (node->IsMAFType(mafVMESurface) || node->IsMAFType(mafVMESurfaceParametric) ));};
 
 protected:
 

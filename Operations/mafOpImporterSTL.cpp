@@ -61,7 +61,7 @@ mafOpImporterSTL::~mafOpImporterSTL()
     mafDEL(m_ImportedSTLs[i]);
 }
 //----------------------------------------------------------------------------
-bool mafOpImporterSTL::Accept(mafNode *node)
+bool mafOpImporterSTL::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
   return true;

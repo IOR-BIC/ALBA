@@ -27,7 +27,7 @@
 #include "mafMSFImporterTest.h"
 #include "mafMSFImporter.h"
 #include "mafVMERoot.h"
-#include "mafNode.h"
+#include "mafVME.h"
 
 #define TEST_RESULT CPPUNIT_ASSERT(m_Result)
 
@@ -90,7 +90,7 @@ void mafMSFImporterTest::TestRestore() // test the utility class InternalRestore
   m_Result = (importer->GetRoot()->GetNumberOfChildren() == 2);
   TEST_RESULT;
 
-  mafNode *node1 = importer->GetRoot()->GetChild(0);
+  mafVME *node1 = importer->GetRoot()->GetChild(0);
 
   m_Result = (node1->IsA("mafVMEImage"));
   TEST_RESULT;
@@ -98,7 +98,7 @@ void mafMSFImporterTest::TestRestore() // test the utility class InternalRestore
   m_Result = (mafString(node1->GetName()).Compare("FemurFront") == 0);
   TEST_RESULT;
 
-  mafNode *node2 = importer->GetRoot()->GetChild(1);
+  mafVME *node2 = importer->GetRoot()->GetChild(1);
 
   m_Result = (node2->IsA("mafVMEImage"));
   TEST_RESULT;

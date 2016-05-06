@@ -24,7 +24,7 @@
 
 #include "mafDecl.h"
 #include "mafWizardBlockOperation.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafEvent.h"
 
 //----------------------------------------------------------------------------
@@ -203,7 +203,7 @@ void mafWizardBlockOperation::ExcutionBegin()
     for(int i=0;i<m_VmeShow.size();i++)
     {
       //detecting all other vme starting on selected vme and show it
-      mafNode *toShow=m_SelectedVME->GetByPath(m_VmeShow[i].c_str());
+      mafVME *toShow=m_SelectedVME->GetByPath(m_VmeShow[i].c_str());
       if (toShow != NULL)
         mafEventMacro(mafEvent(this,VME_SHOW,toShow,true));
     }
@@ -228,7 +228,7 @@ void mafWizardBlockOperation::ExcutionEnd()
   //Hide the required VMEs
   for(int i=0;i<m_VmeHide.size();i++)
   {
-    mafNode *toHide=m_SelectedVME->GetByPath(m_VmeHide[i]);
+    mafVME *toHide=m_SelectedVME->GetByPath(m_VmeHide[i]);
     mafEventMacro(mafEvent(this,VME_SHOW,toHide,false));
   }
 

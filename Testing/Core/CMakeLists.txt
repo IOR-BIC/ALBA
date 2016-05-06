@@ -14,9 +14,9 @@ SET(PROJECT_SRCS
 	mafAttributeTest.h mafAttributeTest.cpp
 	mafTagItemTest.h mafTagItemTest.cpp
 	mafTagArrayTest.h mafTagArrayTest.cpp
-	mafNodeTest.h mafNodeTest.cpp
+	mafVMETest.h mafVMETest.cpp
 	mafTimeMapTest.h mafTimeMapTest.cpp
-	mafNodeFactoryTest.h mafNodeFactoryTest.cpp
+	mafVMEFactoryTest.h mafVMEFactoryTest.cpp
 	mmaApplicationLayoutTest.h mmaApplicationLayoutTest.cpp
 	mafVMETest.h mafVMETest.cpp
 	mafOpTest.h mafOpTest.cpp
@@ -32,13 +32,12 @@ SET(PROJECT_SRCS
 	mafOpPasteTest.h mafOpPasteTest.cpp
 	mafOpEditTest.h mafOpEditTest.cpp
 	mafOpContextStackTest.h mafOpContextStackTest.cpp
-	mafNodeIteratorTest.h mafNodeIteratorTest.cpp
+	mafVMEIteratorTest.h mafVMEIteratorTest.cpp
 	mafPipeTest.h mafPipeTest.cpp
 	mafMatrixPipeTest.h mafMatrixPipeTest.cpp
 	mafPipeBoxTest.h mafPipeBoxTest.cpp
 	mafVMEOutputTest.h mafVMEOutputTest.cpp
 	mafDataPipeTest.h mafDataPipeTest.cpp
-	mafNodeRootTest.h mafNodeRootTest.cpp
 	mafPipeFactoryTest.h mafPipeFactoryTest.cpp
 	mmaMaterialTest.h mmaMaterialTest.cpp
 	mmaVolumeMaterialTest.h mmaVolumeMaterialTest.cpp
@@ -52,9 +51,7 @@ SET(PROJECT_SRCS
 	mafAxesTest.h mafAxesTest.cpp
 	mafCoreFactoryTest.h mafCoreFactoryTest.cpp
 	mafOpStackTest.h mafOpStackTest.cpp
-	mafNodeGenericTest.h mafNodeGenericTest.cpp
 	mafExpirationDateTest.h mafExpirationDateTest.cpp
-	mafNodeManagerTest.h mafNodeManagerTest.cpp
 	mafOpManagerTest.h mafOpManagerTest.cpp
 	mafViewManagerTest.h mafViewManagerTest.cpp
 	mafVMEManagerTest.h mafVMEManagerTest.cpp

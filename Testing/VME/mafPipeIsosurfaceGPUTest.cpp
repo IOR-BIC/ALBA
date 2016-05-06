@@ -153,8 +153,7 @@ void mafPipeIsosurfaceGPUTest::TestPipeExecutionCountour()
     CompareImages(v + ID_CONTOUR_COMPARING);
 
     m_Renderer->RemoveAllProps();
-    //vtkDEL(actorList);
-    delete pipeIso;
+		sceneNode->DeletePipe();
   }
 
   delete sceneNode;
@@ -237,8 +236,7 @@ void mafPipeIsosurfaceGPUTest::TestPipeExecutionOpacity()
     CompareImages(v + ID_OPACITY_COMPARING);
 
     m_Renderer->RemoveAllProps();
-    //vtkDEL(actorList);
-    delete pipeIso;
+		sceneNode->DeletePipe();
   }
 
   delete sceneNode;
@@ -319,14 +317,13 @@ void mafPipeIsosurfaceGPUTest::TestExtractIsosurface()
     printf("\n Visualization and Isosurface Extraction. \n");
     pipeIso->ExctractIsosurface();
 
-    vtkPolyData *isoSurface = vtkPolyData::SafeDownCast(mafVME::SafeDownCast(volumeInput->GetChild(0))->GetOutput()->GetVTKData());
+    vtkPolyData *isoSurface = vtkPolyData::SafeDownCast(volumeInput->GetChild(0)->GetOutput()->GetVTKData());
     isoSurface->Update();
 
     CPPUNIT_ASSERT(isoSurface && isoSurface->GetNumberOfPoints() != 0);
 
     m_Renderer->RemoveAllProps();
-    //vtkDEL(actorList);
-    delete pipeIso;
+		sceneNode->DeletePipe();
   }
 
   delete sceneNode;

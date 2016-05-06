@@ -42,7 +42,7 @@
 class OpCropDeformableROIDummy: public mafOpCropDeformableROI
 {
 public:
-  void SetMask(mafNode *mask);
+  void SetMask(mafVME *mask);
   
   void SetDistance(double d);
   void SetInsideOut(int i);
@@ -53,7 +53,7 @@ public:
   mafVMEVolumeGray *GetResult();
 };
 //----------------------------------------------------------------------------
-void OpCropDeformableROIDummy::SetMask(mafNode *mask)
+void OpCropDeformableROIDummy::SetMask(mafVME *mask)
 //----------------------------------------------------------------------------
 {
   if(OutputSurfaceAccept(mask))
@@ -101,7 +101,7 @@ void OpCropDeformableROIDummy::OpExecute()
   vtkNEW(m_MaskPolydataFilter);
 
   //assert(m_PNode);
-  Algorithm(mafVME::SafeDownCast(m_PNode));
+  Algorithm(m_PNode);
 
   m_Output = m_ResultVme;
 
@@ -179,7 +179,7 @@ void mafOpCropDeformableROITest::TestOpExecute()
   op->SetInsideOut(insideOut);
 
   //set mask
-  op->SetMask(mafNode::SafeDownCast(surface));
+  op->SetMask(surface);
   //set input
   op->SetInput(volume);
 

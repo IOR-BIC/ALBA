@@ -53,7 +53,7 @@ public:
   mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */
-	bool Accept(mafNode *node);
+	bool Accept(mafVME *node);
 
 	/** Set the filename for the .stl to import */
   void SetFileName(const char *file_name);

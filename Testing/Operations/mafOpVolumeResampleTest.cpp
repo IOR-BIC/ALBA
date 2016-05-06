@@ -87,7 +87,7 @@ void mafOpVolumeResampleTest::TestBase()
 	VolumeResample->SetBounds(Bounds,ID_PERSONALBOUNDS);
 	VolumeResample->Resample();
 	//Check output 
-	mafVME *Output = mafVME::SafeDownCast(VolumeResample->GetOutput());
+	mafVME *Output = VolumeResample->GetOutput();
 	vtkStructuredPoints *VTKData=vtkStructuredPoints::SafeDownCast(Output->GetOutput()->GetVTKData());
 	VTKData->UpdateData();
 	//Check if the output volume is a vtkStructuredPoints
@@ -142,7 +142,7 @@ void mafOpVolumeResampleTest::TestVMELocalBounds()
 	VolumeResample->SetBounds(Bounds,ID_VMELOCALBOUNDS);
 	VolumeResample->Resample();
 	//Check output
-	mafVME *Output = mafVME::SafeDownCast(VolumeResample->GetOutput());
+	mafVME *Output = VolumeResample->GetOutput();
 	vtkStructuredPoints *VTKData=vtkStructuredPoints::SafeDownCast(Output->GetOutput()->GetVTKData());
 	VTKData->UpdateData();
 	//Check if the output volume is a vtkStructuredPoints
@@ -212,7 +212,7 @@ void mafOpVolumeResampleTest::TestVME4DBounds()
 	VolumeResample->SetBounds(Bounds,ID_VME4DBOUNDS);
 	VolumeResample->Resample();
 	//Check output
-	mafVME *Output = mafVME::SafeDownCast(VolumeResample->GetOutput());
+	mafVME *Output = VolumeResample->GetOutput();
 	vtkStructuredPoints *VTKData=vtkStructuredPoints::SafeDownCast(Output->GetOutput()->GetVTKData());
 	VTKData->UpdateData();
 	//Check if the output volume is a vtkStructuredPoints
@@ -282,7 +282,7 @@ void mafOpVolumeResampleTest::TestVMEBounds()
 	VolumeResample->SetBounds(Bounds,ID_VMEBOUNDS);
 	VolumeResample->Resample();
 	//Check output
-	mafVME *Output = mafVME::SafeDownCast(VolumeResample->GetOutput());
+	mafVME *Output = VolumeResample->GetOutput();
 	vtkStructuredPoints *VTKData=vtkStructuredPoints::SafeDownCast(Output->GetOutput()->GetVTKData());
 	VTKData->UpdateData();
 	//Check if the output volume is a vtkStructuredPoints
@@ -344,7 +344,7 @@ void mafOpVolumeResampleTest::TestScalarRange()
 	VolumeResample->SetBounds(Bounds,ID_PERSONALBOUNDS);
 	VolumeResample->Resample();
 	//Check output
-	mafVME *Output = mafVME::SafeDownCast(VolumeResample->GetOutput());
+	mafVME *Output = VolumeResample->GetOutput();
 	vtkStructuredPoints *VTKData=vtkStructuredPoints::SafeDownCast(Output->GetOutput()->GetVTKData());
 	VTKData->UpdateData();
 	//Check if the output volume is a vtkStructuredPoints

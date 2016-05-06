@@ -25,7 +25,7 @@
 
 #include "mafOp2DMeasure.h"
 
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafTagItem.h"
 #include "mafTagArray.h"
 #include "mafInteractor2DDistance.h"
@@ -71,7 +71,7 @@ mafOp2DMeasure::~mafOp2DMeasure()
 {
 }
 //----------------------------------------------------------------------------
-bool mafOp2DMeasure::Accept(mafNode *node)
+bool mafOp2DMeasure::Accept(mafVME *node)
 //----------------------------------------------------------------------------
 {
   mafEvent e(this,VIEW_SELECTED);
@@ -147,7 +147,7 @@ void mafOp2DMeasure::OpRun()
 	m_Gui->OkCancel();
 
   // storing
-  mafNode *root = (mafNode *)m_Input->GetRoot();
+  mafVME *root = m_Input->GetRoot();
   if(root->GetTagArray()->IsTagPresent("2D_MEASURE"))
   {
     mafTagItem *measure_item = root->GetTagArray()->GetTag("2D_MEASURE");
@@ -588,7 +588,7 @@ void mafOp2DMeasure::OpStop(int result)
   measure_item.SetNumberOfComponents(c);
   for(int i = 0; i < c; i++)
     measure_item.SetComponent(mafString(m_MeasureList->GetString(i)),i);
-  mafNode *root = (mafNode *)m_Input->GetRoot();
+  mafVME *root = m_Input->GetRoot();
   if(root->GetTagArray()->IsTagPresent("2D_MEASURE"))
   root->GetTagArray()->DeleteTag("2D_MEASURE");
   root->GetTagArray()->SetTag(measure_item);

@@ -115,7 +115,6 @@ void mafOpImporterLandmarkWS::Read()
 	m_VmeCloud->TestModeOn();
   }
 
-  m_VmeCloud->Open();
   m_VmeCloud->SetRadius(10);
 
   wxString skipc, line;

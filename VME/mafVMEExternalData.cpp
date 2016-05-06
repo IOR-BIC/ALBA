@@ -47,7 +47,7 @@ mafVMEExternalData::~mafVMEExternalData()
 }
 
 //-------------------------------------------------------------------------
-int mafVMEExternalData::DeepCopy(mafNode *a)
+int mafVMEExternalData::DeepCopy(mafVME *a)
 //-------------------------------------------------------------------------
 {
   if (Superclass::DeepCopy(a)==MAF_OK)

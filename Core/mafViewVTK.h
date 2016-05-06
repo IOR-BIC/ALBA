@@ -74,40 +74,40 @@ public:
   };
 
   /** Add the vme to the view's scene-graph*/
-  virtual void VmeAdd(mafNode *vme);
+  virtual void VmeAdd(mafVME *vme);
   
   /** Remove the vme from the view's scene-graph*/
-  virtual void VmeRemove(mafNode *vme);
+  virtual void VmeRemove(mafVME *vme);
 
-  virtual void VmeSelect(mafNode *vme, bool select);
+  virtual void VmeSelect(mafVME *vme, bool select);
 
   /** Called to show/hide vme*/
-  virtual void VmeShow(mafNode *vme, bool show);
+  virtual void VmeShow(mafVME *vme, bool show);
 
   /** 
   Called to update visual pipe properties of the vme passed as argument. If the 'fromTag' flag is true,
   the update is done by reading the visual parameters from tags.*/
-  virtual void VmeUpdateProperty(mafNode *vme, bool fromTag = false);
+  virtual void VmeUpdateProperty(mafVME *vme, bool fromTag = false);
 
   /** 
   Set the visualization status for the node (visible, not visible, mutex, ...) \sa mafSceneGraph*/
-  virtual int GetNodeStatus(mafNode *vme);
+  virtual int GetNodeStatus(mafVME *vme);
   
   /** 
   Return a pointer to the visual pipe of the node passed as argument. 
   It is used in mafSideBar to plug the visual pipe's GUI in the tabbed vme panel. \sa mafSideBar*/
-  virtual mafPipe* GetNodePipe(mafNode *vme);
+  virtual mafPipe* GetNodePipe(mafVME *vme);
   
   /** 
   Create the visual pipe for the node passed as argument. 
   To create visual pipe first check in m_PipeMap if custom visual pipe is defined, 
   otherwise ask to vme which is its visual pipe. */
-  virtual void VmeCreatePipe(mafNode *vme);
+  virtual void VmeCreatePipe(mafVME *vme);
   
   /** Delete vme's visual pipe. It is called when vme is removed from visualization.*/
-  virtual void VmeDeletePipe(mafNode *vme);
+  virtual void VmeDeletePipe(mafVME *vme);
 
-	virtual void CameraReset(mafNode *node = NULL);
+	virtual void CameraReset(mafVME *vme = NULL);
   virtual void CameraSet(int camera_position);
   virtual void CameraUpdate();
   virtual int GetCameraPosition();
@@ -185,6 +185,6 @@ protected:
   virtual void OnPostResetCamera();
 
   /** Return the visual pipe's name.*/
-  void GetVisualPipeName(mafNode *node, mafString &pipe_name);
+  void GetVisualPipeName(mafVME *node, mafString &pipe_name);
 };
 #endif

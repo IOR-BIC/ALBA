@@ -51,7 +51,6 @@
 #include "mafOpVOIDensityEditorTestTest.h"
 #include "mafOpAddLandmarkTest.h"
 #include "mafOpApplyTrajectoryTest.h"
-#include "mafOpExplodeCollapseTest.h"
 #include "mafOpExtractIsosurfaceTest.h"
 #include "mafOpImporterASCIITest.h"
 #include "mafOpExporterMSFTest.h"
@@ -232,7 +231,6 @@ int	main( int argc, char* argv[] )
 	runner.addTest(mafOpVOIDensityEditorTestTest::suite());
 	runner.addTest(mafOpAddLandmarkTest::suite());
 	runner.addTest(mafOpApplyTrajectoryTest::suite());
-	runner.addTest(mafOpExplodeCollapseTest::suite());
 	runner.addTest(mafOpExtractIsosurfaceTest::suite());
 	runner.addTest(mafOpImporterASCIITest::suite());
 	runner.addTest(mafOpExporterMSFTest::suite());

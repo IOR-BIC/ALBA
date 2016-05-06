@@ -102,7 +102,7 @@ void mafAttachCamera::OnEvent(mafEventBase *maf_event)
       case ID_CAMERA_ATTACH:
         if(m_EnableAttachCamera)
         {
-          mafVME *sel_vme = mafVME::SafeDownCast(m_RenderWindow->m_Sg->GetSelectedVme());
+          mafVME *sel_vme = m_RenderWindow->m_Sg->GetSelectedVme();
           if(sel_vme == NULL) 
           {
             m_EnableAttachCamera = 0;
@@ -139,10 +139,10 @@ void mafAttachCamera::OnEvent(mafEventBase *maf_event)
   }
 }
 //----------------------------------------------------------------------------
-void mafAttachCamera::SetVme(mafNode *node)
+void mafAttachCamera::SetVme(mafVME *node)
 //----------------------------------------------------------------------------
 {
-  if (mafVME::SafeDownCast(node) == NULL)
+  if (node == NULL)
   {
     if (m_AttachedVme && m_AttachedVme->GetEventSource()->IsObserver(this))
     {
@@ -157,7 +157,7 @@ void mafAttachCamera::SetVme(mafNode *node)
     }
     return;
   }
-  if (m_AttachedVme && m_AttachedVme->Equals(mafVME::SafeDownCast(node)))
+  if (m_AttachedVme && m_AttachedVme->Equals(node))
   {
     return;
   }
@@ -165,7 +165,7 @@ void mafAttachCamera::SetVme(mafNode *node)
   {
     vtkNEW(m_AttachedVmeMatrix);
   }
-  m_AttachedVme = mafVME::SafeDownCast(node);
+  m_AttachedVme = node;
   m_AttachedVmeMatrix->DeepCopy(m_StartingMatrix);
 
   vtkMAFSmartPointer<vtkTransform> delta;
@@ -275,7 +275,7 @@ void mafAttachCamera::SetEnableAttachCamera( int enable )
   m_EnableAttachCamera = enable;
 }
 
-mafNode * mafAttachCamera::GetVme()
+mafVME * mafAttachCamera::GetVme()
 {
   return m_AttachedVme;
 }

@@ -18,7 +18,7 @@
 
 #include "mafViewSliceNotInterpolated.h"
 #include "mafPipeVolumeSliceNotInterpolated.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafViewVTK.h"
 #include "mafGUI.h"
 #include "mafGUIFloatSlider.h"
@@ -89,34 +89,34 @@ mafGUI *mafViewSliceNotInterpolated::CreateGui()
 }
 
 //----------------------------------------------------------------------------
-void mafViewSliceNotInterpolated::VmeShow(mafNode *node, bool show)
+void mafViewSliceNotInterpolated::VmeShow(mafVME *vme, bool show)
 //----------------------------------------------------------------------------
 {
   // Call superclass vme show method
-  Superclass::VmeShow(node,show);
-  mafVMEVolumeGray *volume = mafVMEVolumeGray::SafeDownCast(node);
+  Superclass::VmeShow(vme,show);
+  mafVMEVolumeGray *volume = mafVMEVolumeGray::SafeDownCast(vme);
   if(volume)
   {
     if(show)
     {
       // Get the volume visual pipe
-      m_PipesSlice[node] = mafPipeVolumeSliceNotInterpolated::SafeDownCast(this->GetNodePipe(node));
-      assert(m_PipesSlice[node]);
+      m_PipesSlice[vme] = mafPipeVolumeSliceNotInterpolated::SafeDownCast(this->GetNodePipe(vme));
+      assert(m_PipesSlice[vme]);
       // Get the vme parameters (bounds and lut)
       GetVolumeParameters(volume);
       // Update gui
       m_LutSwatch->SetLut(m_ColorLUT);
       m_SliceSlider->SetRange(m_Bounds[m_SliceAxis * 2], m_Bounds[(m_SliceAxis * 2) + 1]);
       // Set the pipe lut
-      m_PipesSlice[node]->SetLut(m_ColorLUT);
-      m_PipesSlice[node]->SetSlice(m_CurrentSlice,m_SliceAxis);
+      m_PipesSlice[vme]->SetLut(m_ColorLUT);
+      m_PipesSlice[vme]->SetSlice(m_CurrentSlice,m_SliceAxis);
 //       CameraReset();
 //       CameraUpdate();
     }
     else
     {
       // De-reference the pipe
-      m_PipesSlice.erase(node);
+      m_PipesSlice.erase(vme);
     }
     EnableGuiWidgets(show);
   }
@@ -170,7 +170,7 @@ void mafViewSliceNotInterpolated::OnEvent(mafEventBase * event)
     case ID_LUT:
       {
         // Set the pipe lut
-        for(std::map<mafNode*,mafPipeVolumeSliceNotInterpolated*>::iterator it = m_PipesSlice.begin(); it != m_PipesSlice.end(); it++)
+        for(std::map<mafVME*,mafPipeVolumeSliceNotInterpolated*>::iterator it = m_PipesSlice.begin(); it != m_PipesSlice.end(); it++)
         {
           it->second->SetLut(m_ColorLUT);
         }
@@ -185,7 +185,7 @@ void mafViewSliceNotInterpolated::OnEvent(mafEventBase * event)
     case ID_SLICE:
       {
         // Update the pipe
-        for(std::map<mafNode*,mafPipeVolumeSliceNotInterpolated*>::iterator it = m_PipesSlice.begin(); it != m_PipesSlice.end(); it++)
+        for(std::map<mafVME*,mafPipeVolumeSliceNotInterpolated*>::iterator it = m_PipesSlice.begin(); it != m_PipesSlice.end(); it++)
         {
           it->second->SetSlice(m_CurrentSlice,m_SliceAxis);
         }
@@ -195,7 +195,7 @@ void mafViewSliceNotInterpolated::OnEvent(mafEventBase * event)
       {
         Superclass::OnEvent(event);
         // Set the pipe lut
-        for(std::map<mafNode*,mafPipeVolumeSliceNotInterpolated*>::iterator it = m_PipesSlice.begin(); it != m_PipesSlice.end(); it++)
+        for(std::map<mafVME*,mafPipeVolumeSliceNotInterpolated*>::iterator it = m_PipesSlice.begin(); it != m_PipesSlice.end(); it++)
         {
           it->second->SetLut(m_ColorLUT);
         }
@@ -277,14 +277,14 @@ void mafViewSliceNotInterpolated::UpdateSlice()
 //----------------------------------------------------------------------------
 {
   // Update the pipe
-  for(std::map<mafNode*,mafPipeVolumeSliceNotInterpolated*>::iterator it = m_PipesSlice.begin(); it != m_PipesSlice.end(); it++)
+  for(std::map<mafVME*,mafPipeVolumeSliceNotInterpolated*>::iterator it = m_PipesSlice.begin(); it != m_PipesSlice.end(); it++)
   {
     it->second->SetSlice(m_CurrentSlice,m_SliceAxis);
   }
 }
 
 //----------------------------------------------------------------------------
-void mafViewSliceNotInterpolated::SetLut(mafNode *volume, vtkLookupTable *lut)
+void mafViewSliceNotInterpolated::SetLut(mafVME *volume, vtkLookupTable *lut)
 //----------------------------------------------------------------------------
 {
   m_PipesSlice[volume]->SetLut(lut);

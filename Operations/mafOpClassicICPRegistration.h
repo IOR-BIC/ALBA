@@ -28,7 +28,7 @@
 //----------------------------------------------------------------------------
 class mafGUI;
 class mafEvent;
-class mafNode;
+class mafVME;
 class mafVME;
 class mafVMESurface;
 class mafString;
@@ -53,7 +53,7 @@ public:
 	mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */
-	bool Accept(mafNode* vme);
+	bool Accept(mafVME* vme);
 
 	/** Builds operation's interface. */
 	void OpRun();
@@ -62,7 +62,7 @@ public:
 	void OpDo();
 
 	/** Set target. */
-	void SetTarget(mafNode* node);
+	void SetTarget(mafVME* node);
 
 protected:
 	/** Create the gui */

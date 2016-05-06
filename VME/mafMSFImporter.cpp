@@ -45,7 +45,7 @@
 #include "mafVMEVolumeRGB.h"
 #include "mafVMEExternalData.h"
 
-#include "mafNodeIterator.h"
+#include "mafVMEIterator.h"
 
 #include <vector>
 
@@ -104,9 +104,9 @@ int mmuMSF1xDocument::InternalRestore(mafStorageElement *node)
       }
     }    
   }
-  mafNode *n = NULL;
-  std::vector<mafNode *> link_list;
-  mafNodeIterator *iter = m_Root->NewIterator();
+  mafVME *n = NULL;
+  std::vector<mafVME *> link_list;
+  mafVMEIterator *iter = m_Root->NewIterator();
   // iteration for updating VME's ID
   for (n = iter->GetFirstNode(); n; n=iter->GetNextNode())
   {
@@ -119,7 +119,7 @@ int mmuMSF1xDocument::InternalRestore(mafStorageElement *node)
     {
       link_list.push_back(n);
       mafTagItem *tag = n->GetTagArray()->GetTag("VME_ALIAS_PATH");
-      mafNode *linkedVME = this->ParsePath(m_Root, tag->GetValue());
+      mafVME *linkedVME = this->ParsePath(m_Root, tag->GetValue());
       if (linkedVME != NULL)
       {
         mafID sub_id = -1;
@@ -141,11 +141,11 @@ int mmuMSF1xDocument::InternalRestore(mafStorageElement *node)
   return m_Root->Initialize();
 }
 //------------------------------------------------------------------------------
-mafNode *mmuMSF1xDocument::ParsePath(mafVMERoot *root,const char *path)
+mafVME *mmuMSF1xDocument::ParsePath(mafVMERoot *root,const char *path)
 //------------------------------------------------------------------------------
 {
   const char *str=path;
-  mafNode *node=NULL;
+  mafVME *node=NULL;
 
   if (mafString::StartsWith(str,"/MSF"))
   {
@@ -287,19 +287,7 @@ mafVME *mmuMSF1xDocument::RestoreVME(mafStorageElement *node, mafVME *parent)
           // add the new VME as a child of the given parent node
           if (vme_type == "mflVMELandmarkCloud" || vme_type == "mflVMERigidLandmarkCloud" || vme_type == "mflVMEDynamicLandmarkCloud" && child_vme->IsMAFType(mafVMELandmark))
           {
-            if(mafVMELandmark::SafeDownCast(child_vme))
-            {
-              ((mafVMELandmarkCloud *)vme)->SetLandmark((mafVMELandmark *)child_vme);
-              child_vme->Delete();
-              child_vme = NULL;
-            }
-            else
-            {
-              //mafErrorMacro("MSFImporter: error restoring child VME in landmark cloud:(parent=\""<<vme->GetName()<<"\")");
-              //mafErrorMacro("MSFImporter: Child must be a landmark");
               vme->AddChild(child_vme);
-            }
-            
           }
           else if ((vme->IsMAFType(mafVMEMeter) || vme->IsMAFType(mafVMEProber)) && child_vme->GetTagArray()->IsTagPresent("mflVMELink"))
           {

@@ -30,7 +30,7 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mafNode;
+class mafVME;
 class mafGui;
 class mafEvent;
 
@@ -65,7 +65,7 @@ public:
 	void OnEvent(mafEventBase *maf_event);
 
  	/** Return true for the acceptable vme type. */
-  bool Accept(mafNode *node);
+  bool Accept(mafVME*node);
 
 	/** Builds operation's interface. */
   void OpRun();
@@ -117,8 +117,8 @@ protected:
   mafTimeStamp       m_CurrentTime;
   std::vector<mafTimeStamp> m_Times;
 
-  mafNode            *m_CurrentVme;
-  std::vector<mafNode *> m_Meters;
+  mafVME            *m_CurrentVme;
+  std::vector<mafVME *> m_Meters;
   std::vector< vnl_matrix<double> > m_MetersCoordinatesList;
 
   int m_SubTreeExportMeter;

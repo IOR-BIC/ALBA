@@ -21,7 +21,7 @@
 #include "mafOp.h"
 #include <vnl/vnl_matrix.h>
 #include "wx/busyinfo.h"
-#include "mafNodeIterator.h"
+#include "mafVMEIterator.h"
 #include <fstream>
 //----------------------------------------------------------------------------
 // forward references :
@@ -44,11 +44,11 @@ public:
   /** object destructor */  
   ~mafOpExporterWrappedMeter(); 
 
-  std::vector<mafNode *> m_Meters;
+  std::vector<mafVME *> m_Meters;
   std::vector< vnl_matrix<double> > m_MetersCoordinatesList ;
   mafTimeStamp       m_CurrentTime;
   std::vector<mafTimeStamp> m_Times ;
-  mafNode            *m_CurrentVme ;
+  mafVME            *m_CurrentVme ;
   std::ofstream      m_OutputFile;
   std::vector<int>  m_KeyNumList;
 
@@ -60,7 +60,7 @@ public:
 	void OnEvent(mafEventBase *maf_event);
 
  	/** Return true for the acceptable vme type. */
-  bool Accept(mafNode *node);
+  bool Accept(mafVME*node);
 
 	/** Builds operation's interface. */
   void OpRun();

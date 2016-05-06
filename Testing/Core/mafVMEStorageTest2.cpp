@@ -29,7 +29,7 @@
 
 #include "mafVMEFactory.h"
 #include "mafCoreFactory.h"
-#include "mafNodeIterator.h"
+#include "mafVMEIterator.h"
 #include "mafVMESurface.h"
 #include "mafVMEItem.h"
 #include "mafVMEOutput.h"

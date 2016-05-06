@@ -27,7 +27,7 @@
 
 #include "mafDecl.h"
 #include "mafGUI.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafVMEVolumeGray.h"
 #include "mafVMESurface.h"
 #include "mafGUILutSlider.h"
@@ -144,7 +144,7 @@ mafOp* mafOpSegmentationRegionGrowingLocalAndGlobalThreshold::Copy()
   return new mafOpSegmentationRegionGrowingLocalAndGlobalThreshold(m_Label);
 }
 //----------------------------------------------------------------------------
-bool mafOpSegmentationRegionGrowingLocalAndGlobalThreshold::Accept(mafNode* vme)
+bool mafOpSegmentationRegionGrowingLocalAndGlobalThreshold::Accept(mafVME* vme)
 //----------------------------------------------------------------------------
 {
   return vme && vme->IsA("mafVMEVolumeGray");

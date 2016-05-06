@@ -33,7 +33,7 @@
 #include "mafVMEOutputMeter.h"
 #include "mafVMEWrappedMeter.h"
 #include "mafVMEOutputWrappedMeter.h"
-#include "mafNodeIterator.h"
+#include "mafVMEIterator.h"
 
 #include "vtkDataSet.h"
 
@@ -78,7 +78,7 @@ mafOp* mafOpExporterMeters::Copy()
 	return cp;
 }
 //----------------------------------------------------------------------------
-bool mafOpExporterMeters::Accept(mafNode *node)
+bool mafOpExporterMeters::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 { 
   bool inputVMEAccepted = false;
@@ -217,7 +217,7 @@ void mafOpExporterMeters::ExportTypeOfMeters()
 //----------------------------------------------------------------------------
 {
   //must be a cicle in all vme of a msf
-  mafNodeIterator *iter = NULL;
+  mafVMEIterator *iter = NULL;
   if(m_SubTreeExportMeter == TRUE)
   {
     iter = m_Input->NewIterator();
@@ -227,7 +227,7 @@ void mafOpExporterMeters::ExportTypeOfMeters()
     iter = m_Input->GetRoot()->NewIterator();
   }
   
-  for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+  for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
   {
     m_CurrentVme = node;
     if((m_ExportRadio == VME_CLASSIC_METERS || m_ExportRadio == VME_ALL_METERS) && node->IsA("mafVMEMeter"))

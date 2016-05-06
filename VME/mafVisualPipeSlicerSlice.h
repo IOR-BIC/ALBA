@@ -84,7 +84,7 @@ public:
 	ID_BORDER_CHANGE
   };
 
-  //bool ImageAccept(mafNode *node) {return(node != NULL && node->IsMAFType(mafVMEImage));};
+  //bool ImageAccept(mafVME*node) {return(node != NULL && node->IsMAFType(mafVMEImage));};
 
   virtual mafGUI  *CreateGui();
 protected:

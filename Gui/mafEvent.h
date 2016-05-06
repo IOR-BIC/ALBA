@@ -28,7 +28,7 @@
 //----------------------------------------------------------------------------
 class mafView;
 class mafOp;
-class mafNode;
+class mafVME;
 class mafMatrix;
 class mafString;
 
@@ -39,7 +39,7 @@ class mafString;
 
 #ifdef MAF_EXPORTS
 #include "mafDllMacros.h"
-  EXPORT_STL_VECTOR(MAF_EXPORT,mafNode *);
+  EXPORT_STL_VECTOR(MAF_EXPORT,mafVME *);
 #endif
 //----------------------------------------------------------------------------
 // mafEvent :
@@ -60,7 +60,7 @@ public:
   mafEvent(void *sender, int id, double           f,       long arg=0);
   mafEvent(void *sender, int id, mafString       *s,       long arg=0);
   mafEvent(void *sender, int id, mafString       *s, int x, int y, int width, int height,  long arg=0);
-  mafEvent(void *sender, int id, mafNode         *vme,     bool b=false, long arg=0);
+  mafEvent(void *sender, int id, mafVME         *vme,     bool b=false, long arg=0);
   mafEvent(void *sender, int id, mafView         *view,    wxWindow *win=NULL);
   mafEvent(void *sender, int id, mafOp					 *op,      long arg=0);
   mafEvent(void *sender, int id, mafObject       *mafobj,  long arg=0);
@@ -75,7 +75,7 @@ public:
   double            GetDouble()   {return m_Double;};
   mafString*        GetString();
   mafView*          GetView()    {return m_View;};
-  mafNode*          GetVme()     {return m_Vme;};
+  mafVME*						GetVme()     {return m_Vme;};
   mafOp*					  GetOp()      {return m_Op;};
   mafMatrix*        GetMatrix()    {return m_Matrix;};
   mafMatrix*        GetOldMatrix() {return m_OldMatrix;};
@@ -88,10 +88,10 @@ public:
 
   /** set call data, data sent by sender (event's invoker) to all observers. 
   Be aware that the vmeVector argument will be empty after the Set */
-  void SetVmeVector(std::vector<mafNode*> vmeVector);
+  void SetVmeVector(std::vector<mafVME*> vmeVector);
 
   /** return call data, data sent by sender (event's invoker) to all observers */
-  std::vector<mafNode*> GetVmeVector();
+  std::vector<mafVME*> GetVmeVector();
 
   void GetWidgetData(WidgetDataType &widget_data);
 
@@ -100,7 +100,7 @@ public:
   void SetDouble(double f)      { m_Double = f;};
   void SetString(mafString *s);
   void SetView(mafView* view)   { m_View = view;};
-  void SetVme(mafNode* vme)     { m_Vme = vme;};
+  void SetVme(mafVME* vme)     { m_Vme = vme;};
   void SetOp(mafOp* op)         { m_Op = op;};
   void SetMatrix(mafMatrix* mat)       { m_Matrix = mat;};
   void SetOldMatrix(mafMatrix* mat2)   { m_OldMatrix =mat2;};
@@ -113,13 +113,13 @@ protected:
   double           m_Double;
   mafString       *m_MAFString;
 
-  mafNode         *m_Vme;
+  mafVME					*m_Vme;
   mafView         *m_View;
   mafOp						*m_Op;
   mafMatrix       *m_Matrix;
   mafMatrix       *m_OldMatrix;
   mafObject       *m_MafObject;
-  std::vector<mafNode*> m_VmeVector;
+  std::vector<mafVME*> m_VmeVector;
   WidgetDataType   m_WidgetData;
 
   int m_x;
@@ -151,7 +151,7 @@ protected:
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #ifdef MAF_USE_VTK
 public:
-  mafEvent(void *sender, int id, vtkProp         *prop,   mafNode *vme=NULL);
+  mafEvent(void *sender, int id, vtkProp         *prop,   mafVME *vme=NULL);
   mafEvent(void *sender, int id, vtkObject       *vtkobj, long arg=0);
   mafEvent(void *sender, int id, vtkObject       *vtkobj, mafString *s);
 

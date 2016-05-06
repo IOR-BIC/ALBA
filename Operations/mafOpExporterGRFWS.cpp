@@ -94,7 +94,7 @@ void mafOpExporterGRFWS::Clear()
   m_Treshold.clear();
 }
 //----------------------------------------------------------------------------
-bool mafOpExporterGRFWS::Accept(mafNode *node)
+bool mafOpExporterGRFWS::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
   Clear();
@@ -310,15 +310,15 @@ void mafOpExporterGRFWS::OnEvent(mafEventBase *maf_event)
   }
 }
 //----------------------------------------------------------------------------
-int mafOpExporterGRFWS::LoadVMEs(mafNode* node)   
+int mafOpExporterGRFWS::LoadVMEs(mafVME* node)   
 //----------------------------------------------------------------------------
 {
   int result = 0;
   // Get input
-  const mafNode::mafChildrenVector* children = node->GetChildren();
+  const mafVME::mafChildrenVector* children = node->GetChildren();
   for(int i = 0; i < children->size(); i++)
   {
-    mafNode *child = children->at(i);
+    mafVME *child = children->at(i);
     if (child->IsA("mafVMESurface"))
     {
       if (m_PlatformLeft==NULL)

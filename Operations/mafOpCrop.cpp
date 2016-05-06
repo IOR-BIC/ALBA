@@ -82,7 +82,7 @@ mafOp *mafOpCrop::Copy()
 	return new mafOpCrop(m_Label,m_ShowShadingPlane);
 }
 //----------------------------------------------------------------------------
-bool mafOpCrop::Accept(mafNode* node)
+bool mafOpCrop::Accept(mafVME* node)
 //----------------------------------------------------------------------------
 {
 	mafEvent e(this,VIEW_SELECTED);
@@ -97,7 +97,7 @@ void mafOpCrop::OpRun()
   mafEvent e(this,VIEW_SELECTED);
   mafEventMacro(e);
 
-	mafVME* volume = mafVME::SafeDownCast(m_Input);
+	mafVME* volume = m_Input;
 	volume->Update();
 	// create gizmo roi
 	if(!m_TestMode)
@@ -141,11 +141,8 @@ void mafOpCrop::Crop()
 {
 	if(!m_TestMode)
 		m_GizmoROI->GetBounds(m_CroppingBoxBounds);
-
-	//m_Input->Modified();
-	mafVME *volume = mafVME::SafeDownCast(m_Input);
-
-  mafVMEOutput *output = volume->GetOutput();
+		
+  mafVMEOutput *output = m_Input->GetOutput();
 	if (output->GetVTKData()->IsA("vtkRectilinearGrid"))	
 	{
 		vtkRectilinearGrid *rgData = vtkRectilinearGrid::SafeDownCast(output->GetVTKData());
@@ -303,9 +300,9 @@ void mafOpCrop::OpDo()
 //----------------------------------------------------------------------------
 {
 	if(m_OutputSP)
-		((mafVMEVolume*)m_Input)->SetData(m_OutputSP,((mafVME*)m_Input)->GetTimeStamp());
+		((mafVMEVolume*)m_Input)->SetData(m_OutputSP,m_Input->GetTimeStamp());
 	else if(m_OutputRG)
-		((mafVMEVolume*)m_Input)->SetData(m_OutputRG,((mafVME*)m_Input)->GetTimeStamp());
+		((mafVMEVolume*)m_Input)->SetData(m_OutputRG,m_Input->GetTimeStamp());
 
 	((mafVMEVolume*)m_Input)->GetOutput()->Update();
 	((mafVMEVolume*)m_Input)->Update();
@@ -322,9 +319,9 @@ void mafOpCrop::OpUndo()
 //----------------------------------------------------------------------------
 {
 	if(m_InputSP)
-		((mafVMEVolume*)m_Input)->SetData(m_InputSP,((mafVME*)m_Input)->GetTimeStamp());
+		((mafVMEVolume*)m_Input)->SetData(m_InputSP,m_Input->GetTimeStamp());
 	else if(m_InputRG)
-		((mafVMEVolume*)m_Input)->SetData(m_InputRG,((mafVME*)m_Input)->GetTimeStamp());
+		((mafVMEVolume*)m_Input)->SetData(m_InputRG,m_Input->GetTimeStamp());
 
 	((mafVMEVolume*)m_Input)->GetOutput()->Update();
 	((mafVMEVolume*)m_Input)->Update();
@@ -371,8 +368,7 @@ void mafOpCrop::CreateGui()
 //----------------------------------------------------------------------------
 {
 	double bounds[6];
-	mafVME *volume = mafVME::SafeDownCast(m_Input);
-	volume->GetOutput()->GetVTKData()->GetBounds(bounds);
+	m_Input->GetOutput()->GetVTKData()->GetBounds(bounds);
 	m_XminXmax[0] = bounds[0];
 	m_XminXmax[1] = bounds[1];
 	m_YminYmax[0] = bounds[2];

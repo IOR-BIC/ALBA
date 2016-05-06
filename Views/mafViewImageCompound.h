@@ -71,10 +71,10 @@ public:
   virtual void     OnEvent(mafEventBase *maf_event);
 
 	/** Show/Hide VMEs into plugged sub-views*/
-  virtual void VmeShow(mafNode *node, bool show);
+  virtual void VmeShow(mafVME *vme, bool show);
 
 	/** Function called on VME remove */
-	virtual void VmeRemove(mafNode *node);
+	virtual void VmeRemove(mafVME *vme);
 
 protected:
   /**

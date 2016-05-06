@@ -56,7 +56,7 @@ mafVMEInfoText::~mafVMEInfoText()
 {
 }
 //-------------------------------------------------------------------------
-int mafVMEInfoText::DeepCopy(mafNode *a)
+int mafVMEInfoText::DeepCopy(mafVME *a)
 //-------------------------------------------------------------------------
 { 
   if (Superclass::DeepCopy(a) == MAF_OK)
@@ -176,7 +176,7 @@ mafGUI* mafVMEInfoText::CreateGui()
 
   mafID sub_id = -1;
 
-  m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
+  m_Gui = mafVME::CreateGui(); // Called to show info about vmes' type and name
   m_Gui->SetListener(this);
   m_Gui->Divider();
   for(int i = 0; i < m_Strings.size(); i++)

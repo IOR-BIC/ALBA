@@ -87,7 +87,7 @@ mafOpImporterAnsysCommon::~mafOpImporterAnsysCommon()
   m_Components.clear();
 }
 //----------------------------------------------------------------------------
-bool mafOpImporterAnsysCommon::Accept(mafNode *node)
+bool mafOpImporterAnsysCommon::Accept(mafVME *node)
 {
   return true;
 }

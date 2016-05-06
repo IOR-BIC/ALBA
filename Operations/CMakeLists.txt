@@ -32,7 +32,6 @@ IF (MAF_USE_VTK)
 	mafOpVolumeUnion.cpp	    		mafOpVolumeUnion.h
     mafOpRemoveCells.cpp	    		mafOpRemoveCells.h
     mafOpEditMetadata.cpp	    		mafOpEditMetadata.h
-    mafOpExplodeCollapse.cpp	    	mafOpExplodeCollapse.h
     mafOpExtractIsosurface.cpp	    	mafOpExtractIsosurface.h
     mafOpFilterSurface.cpp	    		mafOpFilterSurface.h
     mafOpDecimateSurface.cpp	    	mafOpDecimateSurface.h

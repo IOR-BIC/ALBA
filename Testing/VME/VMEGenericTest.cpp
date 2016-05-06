@@ -24,7 +24,7 @@
 #include "mafVMEOutput.h"
 #include "mafDataVector.h"
 #include "mafMatrixVector.h"
-#include "mafNodeIterator.h"
+#include "mafVMEIterator.h"
 #include "mafTagArray.h"
 #include "mafTagItem.h"
 #include "mafStorageElement.h"
@@ -285,29 +285,29 @@ void VMEGenericTest::VMEGenericMainTest()
   cerr << "Testing VME time dynamic behavior\n";
 
   // Test display of generic VME tree of surfaces
-  mafNodeIterator *iter=root->NewIterator();
+  mafVMEIterator *iter=root->NewIterator();
 
   root->SetTreeTime(0);
 
-  mafNode *node;
+  mafVME *node;
 
   // connect VME to assemblies and put root assembly into the renderer
   for (node=iter->GetFirstNode();node;node=iter->GetNextNode())
   {
-    if (mafVME *vme=mafVME::SafeDownCast(node))
+    if (node)
     {
     
-      if (vme->IsA("mafVMERoot")) 
+      if (node->IsA("mafVMERoot")) 
       {
         vtkMAFSmartPointer<vtkAssembly> vmeasm;
         mafSmartPointer<mafClientData> attr;
         attr->m_Prop3D=vmeasm;
-        vme->SetAttribute("ClientData",attr);
+        node->SetAttribute("ClientData",attr);
         renderer->AddActor(vmeasm);
       }
-      else if (vme->IsA("mafVMEPointSet"))
+      else if (node->IsA("mafVMEPointSet"))
       {
-        vtkDataSet *data=vme->GetOutput()->GetVTKData();
+        vtkDataSet *data=node->GetOutput()->GetVTKData();
         CPPUNIT_ASSERT(data!=NULL);
 
         CPPUNIT_ASSERT(data->IsA("vtkPolyData")!=0);
@@ -335,13 +335,13 @@ void VMEGenericTest::VMEGenericMainTest()
         vmeasm->AddPart(vmeact);
         mafSmartPointer<mafClientData> attr;
         attr->m_Prop3D=vmeasm;
-        vme->SetAttribute("ClientData",attr);
+        node->SetAttribute("ClientData",attr);
 
-        vmeasm->SetUserTransform(vme->GetOutput()->GetTransform()->GetVTKTransform());
+        vmeasm->SetUserTransform(node->GetOutput()->GetTransform()->GetVTKTransform());
 
-        CPPUNIT_ASSERT(vme->GetAttribute("ClientData")==attr.GetPointer());
+        CPPUNIT_ASSERT(node->GetAttribute("ClientData")==attr.GetPointer());
       
-        mafClientData *pattr=mafClientData::SafeDownCast(vme->GetParent()->GetAttribute("ClientData"));
+        mafClientData *pattr=mafClientData::SafeDownCast(node->GetParent()->GetAttribute("ClientData"));
         vtkAssembly *pvmeasm=pattr->m_Prop3D;
       
         CPPUNIT_ASSERT(pvmeasm!=NULL);
@@ -350,7 +350,7 @@ void VMEGenericTest::VMEGenericMainTest()
       }
       else
       {
-        vtkDataSet *data=vme->GetOutput()->GetVTKData();
+        vtkDataSet *data=node->GetOutput()->GetVTKData();
         CPPUNIT_ASSERT(data!=NULL);
 
         CPPUNIT_ASSERT(data->IsA("vtkPolyData")!=0);
@@ -368,15 +368,15 @@ void VMEGenericTest::VMEGenericMainTest()
         vtkMAFSmartPointer<vtkAssembly> vmeasm;
         vmeasm->AddPart(vmeact);
 
-        vmeasm->SetUserTransform(vme->GetOutput()->GetTransform()->GetVTKTransform());
+        vmeasm->SetUserTransform(node->GetOutput()->GetTransform()->GetVTKTransform());
 
         mafSmartPointer<mafClientData> attr;
         attr->m_Prop3D=vmeasm;
-        vme->SetAttribute("ClientData",attr);
+        node->SetAttribute("ClientData",attr);
 
-        CPPUNIT_ASSERT(vme->GetAttribute("ClientData")==attr.GetPointer());
+        CPPUNIT_ASSERT(node->GetAttribute("ClientData")==attr.GetPointer());
 
-        mafClientData *pattr=mafClientData::SafeDownCast(vme->GetParent()->GetAttribute("ClientData"));
+        mafClientData *pattr=mafClientData::SafeDownCast(node->GetParent()->GetAttribute("ClientData"));
         vtkAssembly *pvmeasm=pattr->m_Prop3D;
       
         CPPUNIT_ASSERT(pvmeasm!=NULL);
@@ -594,9 +594,8 @@ void VMEGenericTest::VMEGenericMainTest()
   
   for (node=iter->GetFirstNode();node;node=iter->GetNextNode())
   {
-    mafVME *vme=mafVME::SafeDownCast(node);
-    CPPUNIT_ASSERT(vme);
-    vme->RemoveAttribute("ClientData");
+    CPPUNIT_ASSERT(node);
+    node->RemoveAttribute("ClientData");
   }
 
   iter->Delete();
@@ -744,7 +743,7 @@ void VMEGenericTest::VMEGenericMainTest()
   //------------------------------
   // compare test that should fail
   //------------------------------
-  mafAutoPointer<mafVME> badVME=mafVME::SafeDownCast(vmorph->MakeCopy());
+  mafAutoPointer<mafVME> badVME=vmorph->MakeCopy();
 
   mafMatrix mat;
   mat.SetTimeStamp(23.4455667788);
@@ -753,7 +752,7 @@ void VMEGenericTest::VMEGenericMainTest()
   CPPUNIT_ASSERT(!vmorph->Equals(badVME));
 
 
-  mafAutoPointer<mafVME> badTree=mafVME::SafeDownCast(root->GetFirstChild()->CopyTree());
+  mafAutoPointer<mafVME> badTree=root->GetFirstChild()->CopyTree();
   badTree->AddChild(badVME);
   
   CPPUNIT_ASSERT(!root->GetFirstChild()->CompareTree(badTree));

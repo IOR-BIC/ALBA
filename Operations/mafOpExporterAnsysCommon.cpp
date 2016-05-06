@@ -80,7 +80,7 @@ mafOpExporterAnsysCommon::~mafOpExporterAnsysCommon()
 }
 
 //----------------------------------------------------------------------------
-bool mafOpExporterAnsysCommon::Accept(mafNode *node)
+bool mafOpExporterAnsysCommon::Accept(mafVME *node)
 {
   return (node->IsA("mafVMEMesh"));
 }

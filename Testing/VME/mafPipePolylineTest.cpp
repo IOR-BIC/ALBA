@@ -352,7 +352,6 @@ void mafPipePolylineTest::TestPipeExecution()
 
   vtkDEL(actorList);
 
-  delete pipePolyline;
   delete sceneNode;
 }
 //----------------------------------------------------------------------------

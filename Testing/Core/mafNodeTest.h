@@ -1,7 +1,7 @@
 /*=========================================================================
 
  Program: MAF2
- Module: mafNodeTest
+ Module: mafVMETest
  Authors: Paolo Quadrani, Gianluigi Crimi
  
  Copyright (c) B3C
@@ -14,18 +14,18 @@
 
 =========================================================================*/
 
-#ifndef __CPP_UNIT_mafNodeTest_H__
-#define __CPP_UNIT_mafNodeTest_H__
+#ifndef __CPP_UNIT_mafVMETest_H__
+#define __CPP_UNIT_mafVMETest_H__
 
 #include "mafTest.h"
 
 /** Test for mafMatrix; Use this suite to trace memory problems */
-class mafNodeTest : public mafTest
+class mafVMETest : public mafTest
 {
 public: 
 
   // CPPUNIT test suite
-  CPPUNIT_TEST_SUITE( mafNodeTest );
+  CPPUNIT_TEST_SUITE( mafVMETest );
   CPPUNIT_TEST(TestFixture); // just to test that the fixture has no leaks
   CPPUNIT_TEST(TestDynamicAllocation);
   CPPUNIT_TEST(TestAllConstructor);

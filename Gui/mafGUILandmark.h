@@ -50,7 +50,7 @@ class MAF_EXPORT mafGUILandmark : public mafObserver
 {
 public:
   /** constructor */
-  mafGUILandmark(mafNode *InputVME, mafObserver *listener = NULL, bool testMode  = false);
+  mafGUILandmark(mafVME *InputVME, mafObserver *listener = NULL, bool testMode  = false);
 	/** destructor */
   ~mafGUILandmark(); 
 
@@ -88,7 +88,7 @@ public:
 
   mafVMELandmarkCloud *GetLandmarkCLoud() {return m_LMCloud;};
  
-  void SetInputVME(mafNode *vme); 
+  void SetInputVME(mafVME *vme); 
     
   mafGUI *GetGui() {return m_Gui;};
 
@@ -99,7 +99,7 @@ public:
   void SpawnLMOff() {m_SpawnLM = 0;};
   int GetSpawnLM() {return m_SpawnLM;};
 
-  static bool VmeAccept(mafNode* node) {return(node != NULL);};
+  static bool VmeAccept(mafVME* node) {return(node != NULL);};
 
   void SetRadiusFromBoundsFraction(int fraction){m_BoundsFraction = fraction;}
 
@@ -111,10 +111,10 @@ protected:
   void CreateGui();
 
   /** Attach interactor to vme; return 0 on success, -1 otherwise  */
-  int AttachInteractor(mafNode *vme, mafInteractor *newInteractor,
+  int AttachInteractor(mafVME *vme, mafInteractor *newInteractor,
   mafInteractor *storeOldInteractor);
 
-  int AttachInteractor(mafNode *vme, mafInteractor *newInteractor);
+  int AttachInteractor(mafVME *vme, mafInteractor *newInteractor);
 
   void UpdateGuiInternal();
 

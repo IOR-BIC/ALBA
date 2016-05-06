@@ -59,7 +59,7 @@ mafOp* mafOpCreateProber::Copy()
 	return new mafOpCreateProber(m_Label);
 }
 //----------------------------------------------------------------------------
-bool mafOpCreateProber::Accept(mafNode *node)
+bool mafOpCreateProber::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
   return (node != NULL);
@@ -77,5 +77,5 @@ void mafOpCreateProber::OpRun()
 void mafOpCreateProber::OpDo()
 //----------------------------------------------------------------------------
 {
-  m_Prober->ReparentTo(mafVME::SafeDownCast(m_Input));
+  m_Prober->ReparentTo(m_Input);
 }

@@ -59,13 +59,13 @@ public:
   virtual void OnEvent(mafEventBase *maf_event);
   
   /** Show/Hide VMEs into plugged sub-views */
-  virtual void VmeShow(mafNode *node, bool show);
+  virtual void VmeShow(mafVME *vme, bool show);
 
   /** Remove VME into plugged sub-views */
-  virtual void VmeRemove(mafNode *node);
+  virtual void VmeRemove(mafVME *vme);
 
   /** Operations to be performed on vme selection */
-	virtual void VmeSelect(mafNode *node, bool select);
+	virtual void VmeSelect(mafVME *vme, bool select);
 
   /** Create visual pipe and initialize them to build a RXCT view */
   void PackageView();
@@ -129,14 +129,14 @@ protected:
   double m_BorderColor[6][3];
 
   /** set thickness value for all the pipes*/
-  void SetThicknessForAllSurfaceSlices(mafNode *root);
+  void SetThicknessForAllSurfaceSlices(mafVME *root);
 
   /**
   Sort the slice */
   void SortSlices();
 
   /** Reset slice positions  */
-  void ResetSlicesPosition(mafNode *node);
+  void ResetSlicesPosition(mafVME *vme);
 
 	/**
 	Check if the gizmo posiztion is inside the bounding box*/

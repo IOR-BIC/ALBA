@@ -44,7 +44,7 @@ public:
 
   mafOp* Copy();
 
-	bool Accept(mafNode* vme);
+	bool Accept(mafVME* vme);
 	void OpRun();	
 	void OpDo();
 	void OpUndo();  

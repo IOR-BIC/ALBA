@@ -108,25 +108,25 @@ void mafPipeMeterTest::TestPipeExecution()
   mafVMESurfaceParametric *vmeParametricSurfaceSTART;
   mafNEW(vmeParametricSurfaceSTART);	
   vmeParametricSurfaceSTART->GetOutput()->GetVTKData()->Update();
-  vmeParametricSurfaceSTART->SetParent(storage->GetRoot());
+  vmeParametricSurfaceSTART->ReparentTo(storage->GetRoot());
   vmeParametricSurfaceSTART->Update();
 
   mafVMESurfaceParametric *vmeParametricSurfaceEND1;
   mafNEW(vmeParametricSurfaceEND1);	
   vmeParametricSurfaceEND1->GetOutput()->GetVTKData()->Update();
-  vmeParametricSurfaceEND1->SetParent(storage->GetRoot());
+  vmeParametricSurfaceEND1->ReparentTo(storage->GetRoot());
   vmeParametricSurfaceEND1->Update();
 
 
-  mafMatrix *matrix = vmeParametricSurfaceEND1->GetOutput()->GetAbsMatrix();
-  matrix->SetElement(0,3,4); //set a translation value on x axis of 4.0
-  matrix->SetElement(1,3,3); //set a translation value on x axis of 3.0
-
+	mafMatrix matrix;
+  matrix.SetElement(0,3,4); //set a translation value on x axis of 4.0
+  matrix.SetElement(1,3,3); //set a translation value on x axis of 3.0
+	vmeParametricSurfaceEND1->SetAbsMatrix(matrix);
 
   mafSmartPointer<mafVMEMeter> meter;
   meter->SetMeterLink("StartVME",vmeParametricSurfaceSTART);
   meter->SetMeterLink("EndVME1",vmeParametricSurfaceEND1);
-  meter->SetParent(storage->GetRoot());
+  meter->ReparentTo(storage->GetRoot());
   meter->GetOutput()->GetVTKData()->Update();
   meter->Modified();
   meter->Update();
@@ -139,9 +139,8 @@ void mafPipeMeterTest::TestPipeExecution()
 
   //Assembly will be create when instancing mafSceneNode
   mafSceneNode *sceneNode;
-  sceneNode = new mafSceneNode(NULL,NULL,meter, NULL);
-  sceneNode->m_RenFront = m_Renderer;
-
+  sceneNode = new mafSceneNode(NULL,NULL,meter, m_Renderer);
+  
   /////////// Pipe Instance and Creation ///////////
   mafPipeMeter *pipeMeter = new mafPipeMeter;
   pipeMeter->Create(sceneNode);
@@ -170,13 +169,11 @@ void mafPipeMeterTest::TestPipeExecution()
 
   vtkDEL(actorList);
 
-  delete pipeMeter;
-  sceneNode->m_RenFront = NULL;
   delete sceneNode;
 
-  meter->SetParent(NULL);
-  vmeParametricSurfaceSTART->SetParent(NULL);
-  vmeParametricSurfaceEND1->SetParent(NULL);
+  meter->ReparentTo(NULL);
+  vmeParametricSurfaceSTART->ReparentTo(NULL);
+  vmeParametricSurfaceEND1->ReparentTo(NULL);
   mafDEL(vmeParametricSurfaceSTART);
   mafDEL(vmeParametricSurfaceEND1);
 

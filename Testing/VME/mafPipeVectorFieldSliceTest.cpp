@@ -163,8 +163,6 @@ void mafPipeVectorFieldSliceTest::TestCreate()
   //m_RenderWindow->Render();
   CompareImage();
 
-  delete pipe;
-  sceneNode->m_RenFront = NULL;
   delete sceneNode;
   delete(rootscenenode);
 

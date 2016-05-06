@@ -37,6 +37,7 @@
 #include "vtkStructuredPoints.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkUnstructuredGrid.h"
+#include "mafVMELandmarkCloud.h"
 
 
 //-----------------------------------------------------------
@@ -223,12 +224,13 @@ void medOpImporterVTKTest::TestImportVTKPointSet()
   fileName<<"/PointSet/pointset.vtk";
   importer->SetFileName(fileName);
   importer->ImportVTK();
-  mafVMEPointSet *surface=mafVMEPointSet::SafeDownCast(importer->GetOutput());
+	mafVMELandmarkCloud *surface=mafVMELandmarkCloud::SafeDownCast(importer->GetOutput());
 
   CPPUNIT_ASSERT(surface!=NULL);
   surface->Modified();
   surface->Update();
 
+	surface->GetOutput()->Update();
   vtkPolyData *pts=vtkPolyData::SafeDownCast(surface->GetOutput()->GetVTKData());
 
   CPPUNIT_ASSERT(pts!=NULL);
@@ -237,7 +239,9 @@ void medOpImporterVTKTest::TestImportVTKPointSet()
   pts->Update();
 
   CPPUNIT_ASSERT(pts->GetNumberOfPoints()==2);
-  CPPUNIT_ASSERT(pts->GetNumberOfCells()==2);
+
+	//On import the point visibility is set to false
+  CPPUNIT_ASSERT(pts->GetNumberOfCells()==0);
 
   mafDEL(importer);
 }

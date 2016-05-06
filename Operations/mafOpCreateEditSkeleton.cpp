@@ -68,7 +68,7 @@ mafOp* mafOpCreateEditSkeleton::Copy()
 	return new mafOpCreateEditSkeleton(m_Label);
 }
 //----------------------------------------------------------------------------
-bool mafOpCreateEditSkeleton::Accept(mafNode* vme)
+bool mafOpCreateEditSkeleton::Accept(mafVME* vme)
 //----------------------------------------------------------------------------
 {
 	return (vme != NULL && (vme->IsMAFType(mafVMEVolumeGray)||(vme->IsMAFType(mafVMEPolylineGraph)&&vme->GetParent()->IsMAFType(mafVMEVolumeGray))));
@@ -80,9 +80,9 @@ void mafOpCreateEditSkeleton::OpRun()
 	mafNEW(m_Skeleton);
 
 	if(m_Input->IsMAFType(mafVMEVolumeGray))
-    m_Editor = new mafGeometryEditorPolylineGraph(mafVME::SafeDownCast(m_Input), this, 0, this->m_TestMode);
+    m_Editor = new mafGeometryEditorPolylineGraph(m_Input, this, 0, this->m_TestMode);
 	else if(m_Input->IsMAFType(mafVMEPolylineGraph) && m_Input->GetParent()->IsMAFType(mafVMEVolumeGray))
-    m_Editor = new mafGeometryEditorPolylineGraph(mafVME::SafeDownCast(m_Input->GetParent()), this,mafVMEPolylineGraph::SafeDownCast(m_Input),this->m_TestMode);
+    m_Editor = new mafGeometryEditorPolylineGraph(m_Input->GetParent(), this,mafVMEPolylineGraph::SafeDownCast(m_Input),this->m_TestMode);
 	else
     OpStop(OP_RUN_CANCEL);
 
@@ -107,7 +107,7 @@ void mafOpCreateEditSkeleton::OpDo()
 {
 	if(m_Input->IsMAFType(mafVMEVolumeGray))
 	{
-		m_Skeleton->SetData(m_ResultPolydata,((mafVME*)m_Input)->GetTimeStamp());
+		m_Skeleton->SetData(m_ResultPolydata,m_Input->GetTimeStamp());
 		m_Skeleton->SetName("VME Skeleton");
 
     mafTagItem tag_Nature;
@@ -120,7 +120,7 @@ void mafOpCreateEditSkeleton::OpDo()
 	}
 	else if(m_Input->IsMAFType(mafVMEPolylineGraph))
 	{
-		mafVMEPolylineGraph::SafeDownCast(m_Input)->SetData(m_ResultPolydata,((mafVME*)m_Input)->GetTimeStamp());
+		mafVMEPolylineGraph::SafeDownCast(m_Input)->SetData(m_ResultPolydata,m_Input->GetTimeStamp());
 	}
 	
 	mafEventMacro(mafEvent(this,CAMERA_UPDATE));

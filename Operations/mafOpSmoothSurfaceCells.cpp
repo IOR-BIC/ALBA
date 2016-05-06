@@ -129,7 +129,7 @@ mafOp* mafOpSmoothSurfaceCells::Copy()
 	return new mafOpSmoothSurfaceCells(m_Label);
 }
 //----------------------------------------------------------------------------
-bool mafOpSmoothSurfaceCells::Accept(mafNode* vme)
+bool mafOpSmoothSurfaceCells::Accept(mafVME* vme)
 //----------------------------------------------------------------------------
 {
 	return vme != NULL && vme->IsMAFType(mafVMESurface);
@@ -139,15 +139,15 @@ void mafOpSmoothSurfaceCells::OpRun()
 //----------------------------------------------------------------------------
 {
 	vtkNEW(m_ResultPolydata);
-	m_ResultPolydata->DeepCopy((vtkPolyData*)((mafVME *)m_Input)->GetOutput()->GetVTKData());
+	m_ResultPolydata->DeepCopy((vtkPolyData*)m_Input->GetOutput()->GetVTKData());
 
 	vtkNEW(m_OriginalPolydata);
-	m_OriginalPolydata->DeepCopy((vtkPolyData*)((mafVME *)m_Input)->GetOutput()->GetVTKData());
+	m_OriginalPolydata->DeepCopy((vtkPolyData*)m_Input->GetOutput()->GetVTKData());
  
 	int result = OP_RUN_CANCEL;
      // default size for the brush (depends on the input dimensions)
    double bounds[6]= {0.,0.,0.,0.,0.,0.};
-   ((mafVME *)m_Input)->GetOutput()->GetVTKData()->GetBounds(bounds);
+   m_Input->GetOutput()->GetVTKData()->GetBounds(bounds);
    // bounds x0 x1 y0 y1 z0 z1
    m_Diameter = sqrt((bounds[1]-bounds[0])*(bounds[1]-bounds[0])+(bounds[3]-bounds[2])*(bounds[3]-bounds[2])+(bounds[5]-bounds[4])*(bounds[5]-bounds[4]))/10.0;
 	CreateSurfacePipeline();
@@ -184,14 +184,14 @@ void mafOpSmoothSurfaceCells::OpRun()
 void mafOpSmoothSurfaceCells::OpDo()
 //----------------------------------------------------------------------------
 {
-	((mafVMESurface *)m_Input)->SetData(m_ResultPolydata,((mafVME *)m_Input)->GetTimeStamp());
+	((mafVMESurface *)m_Input)->SetData(m_ResultPolydata,m_Input->GetTimeStamp());
 	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
 void mafOpSmoothSurfaceCells::OpUndo()
 //----------------------------------------------------------------------------
 {
-	((mafVMESurface *)m_Input)->SetData(m_OriginalPolydata,((mafVME *)m_Input)->GetTimeStamp());
+	((mafVMESurface *)m_Input)->SetData(m_OriginalPolydata,m_Input->GetTimeStamp());
 	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------

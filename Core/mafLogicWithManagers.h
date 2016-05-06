@@ -35,6 +35,8 @@ class mafViewManager;
 class mafOpManager;
 class mafGUIMaterialChooser;
 class mafVME;
+class mafVMELandmark;
+class mafVMELandmarkCloud;
 class mafInteractionManager;
 class mafPrintSupport;
 class mafRemoteLogic;
@@ -284,23 +286,37 @@ protected:
   /** Respond to a VME_SELECT evt. Instantiate the 'Select' operation. */
 	virtual void VmeSelect(mafEvent &e);
   /** Respond to a VME_SELECTED evt. Update the selection on the tree and view representation. */
-	virtual void VmeSelected(mafNode *vme);
-  /** Respond to a VME_DCLICKED evt. Manage the 'Double click' on Selected VME. */
+	virtual void VmeSelected(mafVME *vme);
+
+	/** Called from VmeSelect to select a LM */
+	void SelectLandmark(mafVMELandmark *lm, bool select);
+
+	/** Respond to a VME_DCLICKED evt. Manage the 'Double click' on Selected VME. */
   virtual void VmeDoubleClicked(mafEvent &e);
 	/** Respond to a VME_SHOW evt. Show/Hide the vme. */
-	virtual void VmeShow(mafNode *vme, bool visibility);
-  /** Respond to a VME_Modified evt.*/
-	virtual void VmeModified(mafNode *vme);
+	virtual void VmeShow(mafVME *vme, bool visibility);
+
+	/** Called from VmeShow to show a LM cloud */
+	void ShowLandmarkCloud(mafVMELandmarkCloud * lmc, bool visibility);
+
+	/** Show VME in the side bar */
+	void ShowInSideBar(mafVME * vme, bool visibility);
+
+	/* Called from VmeShow to show landmarks*/
+	void ShowLandmark(mafVMELandmark * lm, bool visibility);
+
+	/** Respond to a VME_Modified evt.*/
+	virtual void VmeModified(mafVME *vme);
   /** Respond to a VME_ADD evt. Add a new vme to the tree. */
-	virtual void VmeAdd(mafNode *vme);
+	virtual void VmeAdd(mafVME *vme);
   /** Respond to a VME_ADDED evt. propagate evt. to SideBar,ViewManager,ecc.. */
-	virtual void VmeAdded(mafNode *vme);
+	virtual void VmeAdded(mafVME *vme);
   /** Respond to a VME_REMOVE evt. Remove a vme from the tree. */
-	virtual void VmeRemove(mafNode *vme);
+	virtual void VmeRemove(mafVME *vme);
   /** Respond to a VME_REMOVING evt. propagate evt. to SideBar,ViewManager,ecc.. */
-	virtual void VmeRemoving(mafNode *vme);
+	virtual void VmeRemoving(mafVME *vme);
 	/** Respond to a VME_CHOOSE evt. Build a dialog containing the vme tree and return the vme choosed from the user. */
-	virtual std::vector<mafNode*> VmeChoose(long vme_accept_function = 0, long style = REPRESENTATION_AS_TREE, mafString title = "Choose Node", bool multiSelect = false, mafNode *vme=NULL);
+	virtual std::vector<mafVME*> VmeChoose(long vme_accept_function = 0, long style = REPRESENTATION_AS_TREE, mafString title = "Choose Node", bool multiSelect = false, mafVME *vme=NULL);
 
   /** Build a dialog to show all available materials. */	
   virtual void VmeChooseMaterial(mafVME *vme, bool updateProperty);
@@ -362,6 +378,8 @@ protected:
   mafOpManager           *m_OpManager;
   mafInteractionManager  *m_InteractionManager;
   mafRemoteLogic         *m_RemoteLogic;
+
+	mafVMELandmark				 *m_SelectedLandmark;
   
   mafGUIMaterialChooser  *m_MaterialChooser;
   mafPrintSupport     *m_PrintSupport;

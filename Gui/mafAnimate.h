@@ -19,7 +19,6 @@
 
 #include "mafObserver.h"
 
-class mafNode;
 class mafVME;
 class mafTagArray;
 class mafGUIButton;
@@ -38,7 +37,7 @@ class mafAnimate : public mafObserver
 {
 public:
 
-	mafAnimate(vtkRenderer *renderer, mafNode *vme, mafObserver *listener = NULL);
+	mafAnimate(vtkRenderer *renderer, mafVME *vme, mafObserver *listener = NULL);
 	~mafAnimate(); 
 	void OnEvent(mafEventBase *maf_event);
 	void SetListener(mafObserver *listener);
@@ -47,7 +46,7 @@ public:
 	mafGUI *GetGui();
 
   /** set the vme that hold the tag-array where the ViewPoint are stored */
-	void SetInputVME(mafNode *vme);
+	void SetInputVME(mafVME *vme);
 
   /** delete All entries in listbox.*/
   void ResetKit();
@@ -97,7 +96,7 @@ protected:
 
 	mafObserver	*m_Listener;
 
-  mafNode *m_Vme;
+  mafVME *m_Vme;
   mafVME *m_Root;
 
 	mafTagArray		*m_Tags;

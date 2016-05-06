@@ -76,10 +76,10 @@ private:
   virtual void WizardContinue(int opSuccess);
 
   /** Record the selected vme and enable the menu_entries relative to the compatible wizard. */
-  virtual void VmeSelected(mafNode* node);
+  virtual void VmeSelected(mafVME* node);
 
 	/** Record the modified vme and enable the menu_entries relative to the compatible wizard. */
-	virtual void VmeModified(mafNode* node);
+	virtual void VmeModified(mafVME* node);
 	
   /** Enable/Disable the men items operation. */
   virtual void EnableWizardMenus(bool CanEnable = true);
@@ -125,7 +125,7 @@ private:
   wxMenuBar         *m_MenuBar; ///< Pointer to the Application's main menù
   wxToolBar         *m_ToolBar; ///< Pointer to the application's Toolbal
   mafObserver       *m_Listener; 
-  mafNode						*m_Selected; ///< Pointer to the current selected node.
+  mafVME						*m_Selected; ///< Pointer to the current selected node.
   bool               m_Warn; ///< Flag to warn the user when an operation that can not undo is starting.
   mafWizardWaitOp   *m_WaitOp;
 

@@ -98,7 +98,7 @@ mafOpImporterVTKXML::~mafOpImporterVTKXML()
   vtkDEL(m_EventRouter);
 }
 //----------------------------------------------------------------------------
-bool mafOpImporterVTKXML::Accept(mafNode* node)   
+bool mafOpImporterVTKXML::Accept(mafVME* node)   
 //----------------------------------------------------------------------------
 {
   return true;

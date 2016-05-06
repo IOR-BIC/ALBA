@@ -126,109 +126,110 @@ void mafOpImporterVTK::OpRun()
 int mafOpImporterVTK::ImportVTK()
 //----------------------------------------------------------------------------
 {
-  bool success = false;
-	if(!this->m_TestMode)
+	bool success = false;
+	if (!this->m_TestMode)
 		wxBusyInfo wait(_("Loading file: ..."));
-  
-  vtkMAFSmartPointer<vtkDataSetReader> reader;
-  reader->SetFileName(m_File);
 
-  vtkDataReader *preader = NULL;
-  // workaround to avoid double reading
-  switch (reader->ReadOutputType())
-  {
-    case VTK_POLY_DATA:
-      preader = vtkPolyDataReader::New();
-    break;
-    case VTK_STRUCTURED_POINTS:
-      preader = vtkStructuredPointsReader::New();
-    break;
-    case VTK_STRUCTURED_GRID:
-      preader = vtkStructuredGridReader::New();
-    break;
-    case VTK_RECTILINEAR_GRID:
-      preader = vtkRectilinearGridReader::New();
-    break;
-    case VTK_UNSTRUCTURED_GRID:
-      preader = vtkUnstructuredGridReader::New();
-    break;
-    default:
-      return MAF_ERROR;
-  }
-  mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,preader));
-  preader->SetFileName(m_File);
-  preader->Update();
-  
-  if (preader->GetNumberOfOutputs()>0)
-  {
-    wxString path, name, ext;
-    wxSplitPath(m_File.c_str(),&path,&name,&ext);
+	vtkMAFSmartPointer<vtkDataSetReader> reader;
+	reader->SetFileName(m_File);
 
-    vtkDataSet *data = vtkDataSet::SafeDownCast(preader->GetOutputs()[0]);
-    if (data)
-    {
-	  mafNEW(m_VmeLandmarkCloud);
-      //mafNEW(m_VmePointSet);
-      mafNEW(m_VmePolyLine);
-      mafNEW(m_VmeSurface);
-	  mafNEW(m_VmeImage);
-      mafNEW(m_VmeGrayVol);
-      mafNEW(m_VmeRGBVol);
-      mafNEW(m_VmeMesh);
-      mafNEW(m_VmeGeneric);
-      //if (m_VmePointSet->SetDataByDetaching(data,0) == MAF_OK)
-      //{
-      //  m_Output = m_VmePointSet;
-      //}
-	  if (m_VmeLandmarkCloud->SetDataByDetaching(data,0) == MAF_OK)
-      {
-        m_Output = m_VmeLandmarkCloud;
-      }
-      else if (m_VmePolyLine->SetDataByDetaching(data,0) == MAF_OK)
-      {
-        m_Output = m_VmePolyLine;
-      }
-      else if (m_VmeSurface->SetDataByDetaching(data,0) == MAF_OK)
-      {
-        m_Output = m_VmeSurface;
-      }
-	  else if (m_VmeImage->SetDataByDetaching(data,0) == MAF_OK)
-	  {
-		  m_Output = m_VmeImage;
-	  }
-      else if (m_VmeGrayVol->SetDataByDetaching(data,0) == MAF_OK)
-      {
-        m_Output = m_VmeGrayVol;
-      }
-      else if (m_VmeRGBVol->SetDataByDetaching(data,0) == MAF_OK)
-      {
-        m_Output = m_VmeRGBVol;
-      }
-      else if (m_VmeMesh->SetDataByDetaching(data,0) == MAF_OK)
-      {
-        m_Output = m_VmeMesh;
-      }
-      else
-      {
-        m_VmeGeneric->SetDataByDetaching(data,0);
-        m_Output = m_VmeGeneric;
-      }
+	vtkDataReader *preader = NULL;
+	// workaround to avoid double reading
+	switch (reader->ReadOutputType())
+	{
+	case VTK_POLY_DATA:
+		preader = vtkPolyDataReader::New();
+		break;
+	case VTK_STRUCTURED_POINTS:
+		preader = vtkStructuredPointsReader::New();
+		break;
+	case VTK_STRUCTURED_GRID:
+		preader = vtkStructuredGridReader::New();
+		break;
+	case VTK_RECTILINEAR_GRID:
+		preader = vtkRectilinearGridReader::New();
+		break;
+	case VTK_UNSTRUCTURED_GRID:
+		preader = vtkUnstructuredGridReader::New();
+		break;
+	default:
+		return MAF_ERROR;
+	}
+	mafEventMacro(mafEvent(this, BIND_TO_PROGRESSBAR, preader));
+	preader->SetFileName(m_File);
+	preader->Update();
 
-      mafTagItem tag_Nature;
-      tag_Nature.SetName("VME_NATURE");
-      tag_Nature.SetValue("NATURAL");
-      m_Output->GetTagArray()->SetTag(tag_Nature);
-      m_Output->ReparentTo(m_Input);
-      m_Output->SetName(name.c_str());
+	if (preader->GetNumberOfOutputs() > 0)
+	{
+		wxString path, name, ext;
+		wxSplitPath(m_File.c_str(), &path, &name, &ext);
 
-      success = true;
-    }
-  }
-  vtkDEL(preader);
-  if(!success && !this->m_TestMode)
-  {
-    mafMessage(_("Error reading VTK file."), _("I/O Error"), wxICON_ERROR );
-    return MAF_ERROR;
-  }
-  return MAF_OK;
+		vtkDataSet *data = vtkDataSet::SafeDownCast(preader->GetOutputs()[0]);
+		if (data)
+		{
+			mafNEW(m_VmeLandmarkCloud);
+			//mafNEW(m_VmePointSet);
+			mafNEW(m_VmePolyLine);
+			mafNEW(m_VmeSurface);
+			mafNEW(m_VmeImage);
+			mafNEW(m_VmeGrayVol);
+			mafNEW(m_VmeRGBVol);
+			mafNEW(m_VmeMesh);
+			mafNEW(m_VmeGeneric);
+			//if (m_VmePointSet->SetDataByDetaching(data,0) == MAF_OK)
+			//{
+			//  m_Output = m_VmePointSet;
+			//}
+			if (m_VmeLandmarkCloud->SetDataByDetaching(data, 0) == MAF_OK)
+			{
+				m_VmeLandmarkCloud->CreateLMStructureFromDataVector();
+				m_Output = m_VmeLandmarkCloud;
+			}
+			else if (m_VmePolyLine->SetDataByDetaching(data, 0) == MAF_OK)
+			{
+				m_Output = m_VmePolyLine;
+			}
+			else if (m_VmeSurface->SetDataByDetaching(data, 0) == MAF_OK)
+			{
+				m_Output = m_VmeSurface;
+			}
+			else if (m_VmeImage->SetDataByDetaching(data, 0) == MAF_OK)
+			{
+				m_Output = m_VmeImage;
+			}
+			else if (m_VmeGrayVol->SetDataByDetaching(data, 0) == MAF_OK)
+			{
+				m_Output = m_VmeGrayVol;
+			}
+			else if (m_VmeRGBVol->SetDataByDetaching(data, 0) == MAF_OK)
+			{
+				m_Output = m_VmeRGBVol;
+			}
+			else if (m_VmeMesh->SetDataByDetaching(data, 0) == MAF_OK)
+			{
+				m_Output = m_VmeMesh;
+			}
+			else
+			{
+				m_VmeGeneric->SetDataByDetaching(data, 0);
+				m_Output = m_VmeGeneric;
+			}
+
+			mafTagItem tag_Nature;
+			tag_Nature.SetName("VME_NATURE");
+			tag_Nature.SetValue("NATURAL");
+			m_Output->GetTagArray()->SetTag(tag_Nature);
+			m_Output->ReparentTo(m_Input);
+			m_Output->SetName(name.c_str());
+
+			success = true;
+		}
+	}
+	vtkDEL(preader);
+	if (!success && !this->m_TestMode)
+	{
+		mafMessage(_("Error reading VTK file."), _("I/O Error"), wxICON_ERROR);
+		return MAF_ERROR;
+	}
+	return MAF_OK;
 }

@@ -32,8 +32,8 @@
 #include "mafGUI.h"
 #include "mafGUILutSlider.h"
 #include "mafGUILutSwatch.h"
-#include "mafNode.h"
-#include "mafNodeIterator.h"
+#include "mafVME.h"
+#include "mafVMEIterator.h"
 #include "mafPipeImage3D.h"
 #include "mafPipeVolumeSlice.h"
 #include "mafPipeSurfaceSlice.h"
@@ -90,7 +90,7 @@ void mafViewCompoundWindowing::OnEvent(mafEventBase *maf_event)
 		case ID_RANGE_MODIFIED:
 			{
 				//Windowing
-				if(mafVME::SafeDownCast(GetSceneGraph()->GetSelectedVme()))
+				if(GetSceneGraph()->GetSelectedVme())
 				{
 					double low, hi;
 					m_LutSlider->GetSubRange(&low,&hi);
@@ -112,14 +112,14 @@ void mafViewCompoundWindowing::OnEvent(mafEventBase *maf_event)
 }
 
 //----------------------------------------------------------------------------
-void mafViewCompoundWindowing::VmeShow(mafNode *node, bool show)
+void mafViewCompoundWindowing::VmeShow(mafVME *vme, bool show)
 //----------------------------------------------------------------------------
 {
 	for(int i=0; i<this->GetNumberOfSubView(); i++)
-    m_ChildViewList[i]->VmeShow(node, show);
+    m_ChildViewList[i]->VmeShow(vme, show);
   
-	if(ActivateWindowing(node))
-		UpdateWindowing(show, node);
+	if(ActivateWindowing(vme))
+		UpdateWindowing(show, vme);
   
 	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
@@ -133,7 +133,7 @@ void mafViewCompoundWindowing::EnableWidgets(bool enable)
 }
 
 //----------------------------------------------------------------------------
-void mafViewCompoundWindowing::UpdateWindowing(bool enable,mafNode *node)
+void mafViewCompoundWindowing::UpdateWindowing(bool enable,mafVME *vme)
 //----------------------------------------------------------------------------
 {
   EnableWidgets(enable);
@@ -142,13 +142,12 @@ void mafViewCompoundWindowing::UpdateWindowing(bool enable,mafNode *node)
   mafVME      *Volume		= NULL;
 	mafVMEImage *Image	  = NULL;
 	
-  mafVME *Vme = mafVME::SafeDownCast(node);
 	
-  if((mafVME *)(Vme->GetOutput()->IsA("mafVMEOutputVolume"))) {
-		Volume = mafVME::SafeDownCast(node);
+  if(vme->GetOutput()->IsA("mafVMEOutputVolume")) {
+		Volume = vme;
 	}
-	else if(Vme->IsA("mafVMEImage")) {
-		Image = mafVMEImage::SafeDownCast(node);
+	else if(vme->IsA("mafVMEImage")) {
+		Image = mafVMEImage::SafeDownCast(vme);
 	}
 
   if(Volume) {
@@ -182,32 +181,32 @@ void mafViewCompoundWindowing::UpdateWindowing(bool enable,mafNode *node)
 }
 
 //----------------------------------------------------------------------------
-bool mafViewCompoundWindowing::ActivateWindowing(mafNode *node)
+bool mafViewCompoundWindowing::ActivateWindowing(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   bool conditions     = false;
   bool nodeHasPipe    = false;
   
-  if(((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume")){
+  if(vme->GetOutput()->IsA("mafVMEOutputVolume")){
     
     conditions = true;
 
     for(int i=0; i<m_NumOfChildView; i++) {
       
-      if(m_ChildViewList[i]->GetNodePipe(node)) {
+      if(m_ChildViewList[i]->GetNodePipe(vme)) {
         nodeHasPipe = true;
       }
       conditions = (conditions && nodeHasPipe);
     }
   }
 
-  else if(((mafVME *)node)->IsA("mafVMEImage")){
+  else if(vme->IsA("mafVMEImage")){
     
     conditions = true;
 
     for(int i=0; i<m_NumOfChildView; i++) {
 
-      mafPipeImage3D *pipe = (mafPipeImage3D *)m_ChildViewList[i]->GetNodePipe(node);
+      mafPipeImage3D *pipe = (mafPipeImage3D *)m_ChildViewList[i]->GetNodePipe(vme);
       conditions = (conditions && (pipe && pipe->IsGrayImage()));
     }
   }
@@ -251,7 +250,7 @@ void mafViewCompoundWindowing::VolumeWindowing(mafVME *volume)
 }
 
 //-------------------------------------------------------------------------
-mafPipe* mafViewCompoundWindowing::GetNodePipe(mafNode *vme)
+mafPipe* mafViewCompoundWindowing::GetNodePipe(mafVME *vme)
 //-------------------------------------------------------------------------
 {
 	mafPipe* rtn = NULL;

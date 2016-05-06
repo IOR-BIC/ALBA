@@ -41,7 +41,7 @@ class vtkScalarBarActor;
 
 class mafAxes;
 class mafGUIMaterialButton;
-class mafNode;
+class mafVME;
 class mafVMEVolume;
 
 //----------------------------------------------------------------------------
@@ -61,7 +61,7 @@ public:
   virtual void Create(mafSceneNode *n /*,bool use_axes = true*/ ); //Can't add parameters - is Virtual
   virtual void Select(bool select); 
 
-  void SetVolume(mafNode* volume);
+  void SetVolume(mafVME* volume);
 
   void SetDistanceMode(){m_DensityDistance=0;UpdatePipeline();};
   void SetDiscreteDensityMode(){m_BarTipology=0;m_DensityDistance=1;UpdatePipeline();};
@@ -95,7 +95,7 @@ public:
     ID_LAST
   };
 
-  static bool VolumeAccept(mafNode *node) {return(node != NULL && node->IsMAFType(mafVMEVolume));};
+  static bool VolumeAccept(mafVME*node) {return(node != NULL && node->IsMAFType(mafVMEVolume));};
 
   /**
   Update the visual pipeline of the surface*/
@@ -110,7 +110,7 @@ protected:
   vtkMAFDistanceFilter       *m_DistanceFilter;
   vtkColorTransferFunction *m_Table;
   vtkScalarBarActor       *m_ScalarBar;
-  mafNode                 *m_Volume;
+  mafVME                 *m_Volume;
 
   int m_DensityDistance;
   int m_NumSections;

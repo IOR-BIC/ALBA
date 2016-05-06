@@ -57,7 +57,7 @@ mafOpExporterAnalogWS::~mafOpExporterAnalogWS()
 {
 }
 //----------------------------------------------------------------------------
-bool mafOpExporterAnalogWS::Accept(mafNode *node)
+bool mafOpExporterAnalogWS::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
   return (node && node->IsA("mafVMEAnalog"));

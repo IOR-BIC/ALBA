@@ -229,7 +229,7 @@ void mafVisualPipeCollisionDetection::OnEvent(mafEventBase *maf_event)
         e->SetString(&title);
         e->SetId(VME_CHOOSE);
         mafEventMacro(*e);
-        mafVME *surfaceTMP = mafVME::SafeDownCast(e->GetVme());
+        mafVME *surfaceTMP = e->GetVme();
         //if not surface has been selected
         if (surfaceTMP == NULL)
         {
@@ -247,7 +247,7 @@ void mafVisualPipeCollisionDetection::OnEvent(mafEventBase *maf_event)
         e->SetString(&title);
         e->SetId(VME_CHOOSE);
         mafEventMacro(*e);
-        mafVME *surfaceTMP = mafVME::SafeDownCast(e->GetVme());
+        mafVME *surfaceTMP = e->GetVme();
         //if not surface has been selected
         if (surfaceTMP == NULL)
         {
@@ -280,7 +280,7 @@ void mafVisualPipeCollisionDetection::UpdatePipeline(bool force /* = false */)
   {
     vtkMAFSmartPointer<vtkDoubleArray> contactScalars0;
     contactScalars0->SetName("CONTACT");
-    contactScalars0->SetNumberOfTuples(mafVME::SafeDownCast(m_Vme)->GetOutput()->GetVTKData()->GetNumberOfCells());
+    contactScalars0->SetNumberOfTuples(m_Vme->GetOutput()->GetVTKData()->GetNumberOfCells());
     //Create scalars array to visualize contacts cells
     for (int i=0;i<contactScalars0->GetNumberOfTuples();i++)
     {
@@ -440,7 +440,7 @@ void mafVisualPipeCollisionDetection::UpdatePipeline(bool force /* = false */)
     }
     // Store scalars to the output data
     vtkMAFSmartPointer<vtkPolyData> output0;
-    output0->DeepCopy(mafVME::SafeDownCast(m_Vme)->GetOutput()->GetVTKData());
+    output0->DeepCopy(m_Vme->GetOutput()->GetVTKData());
     output0->Update();
     output0->GetCellData()->AddArray(contactScalars0);
     output0->GetCellData()->SetActiveScalars("CONTACT");
@@ -451,10 +451,10 @@ void mafVisualPipeCollisionDetection::UpdatePipeline(bool force /* = false */)
   }
 }
 //----------------------------------------------------------------------------
-bool mafVisualPipeCollisionDetection::SurfaceAccept(mafNode *node)
+bool mafVisualPipeCollisionDetection::SurfaceAccept(mafVME*node)
 //----------------------------------------------------------------------------
 {
-  return(node != NULL && mafVME::SafeDownCast(node)->GetOutput()->IsA("mafVMEOutputSurface"));
+  return(node != NULL && node->GetOutput()->IsA("mafVMEOutputSurface"));
 }
 //----------------------------------------------------------------------------
 void mafVisualPipeCollisionDetection::SetSurfaceToCollide( mafVME *surface )

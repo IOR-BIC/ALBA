@@ -59,10 +59,10 @@ public:
   void SetRemoteMouse(mafDeviceButtonsPadMouseRemote *rMouse);
 
   /** Prepare VME_SELECTED message to be sent to remote clients.*/
-  void VmeSelected(mafNode *vme);
+  void VmeSelected(mafVME *vme);
 
   /** Prepare VME_SHOW message to be sent to remote clients.*/
-  void VmeShow(mafNode *vme, bool show_vme);
+  void VmeShow(mafVME *vme, bool show_vme);
 
   void SetClientUnit(mafDeviceClientMAF *clientUnit);
 

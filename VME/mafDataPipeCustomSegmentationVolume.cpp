@@ -185,12 +185,11 @@ void mafDataPipeCustomSegmentationVolume::ApplyManualSegmentation()
     return;
   }
 
-  mafVME *vol = mafVME::SafeDownCast(m_Volume);
-  vol->GetOutput()->Update();
-  vtkDataSet *volumeData = vol->GetOutput()->GetVTKData();
+  m_Volume->GetOutput()->Update();
+  vtkDataSet *volumeData = m_Volume->GetOutput()->GetVTKData();
   volumeData->Update();
 
-  vtkDataSet *maskVolumeData = mafVME::SafeDownCast(m_ManualVolumeMask)->GetOutput()->GetVTKData();
+  vtkDataSet *maskVolumeData = m_ManualVolumeMask->GetOutput()->GetVTKData();
   maskVolumeData->Update();
 
   if (maskVolumeData==NULL || maskVolumeData->GetNumberOfPoints() != volumeData->GetNumberOfPoints() || maskVolumeData->GetPointData()->GetScalars()==NULL)
@@ -287,9 +286,8 @@ void mafDataPipeCustomSegmentationVolume::ApplyManualSegmentation()
 void mafDataPipeCustomSegmentationVolume::ApplyAutomaticSegmentation()
 //------------------------------------------------------------------------------
 {
-  mafVME *vol = mafVME::SafeDownCast(m_Volume);
-  vol->GetOutput()->Update();
-  vtkDataSet *volumeData = vol->GetOutput()->GetVTKData();
+  m_Volume->GetOutput()->Update();
+  vtkDataSet *volumeData = m_Volume->GetOutput()->GetVTKData();
   volumeData->Update();
 
   int volumeDimensions[3];
@@ -418,12 +416,11 @@ void mafDataPipeCustomSegmentationVolume::ApplyRefinementSegmentation()
     return;
   }
 
-  mafVME *vol = mafVME::SafeDownCast(m_Volume);
-  vol->GetOutput()->Update();
-  vtkDataSet *volumeData = vol->GetOutput()->GetVTKData();
+  m_Volume->GetOutput()->Update();
+  vtkDataSet *volumeData = m_Volume->GetOutput()->GetVTKData();
   volumeData->Update();
 
-  vtkDataSet *maskVolumeData = mafVME::SafeDownCast(m_RefinementVolumeMask)->GetOutput()->GetVTKData();
+  vtkDataSet *maskVolumeData = m_RefinementVolumeMask->GetOutput()->GetVTKData();
   maskVolumeData->Update();
 
   if (maskVolumeData==NULL || maskVolumeData->GetNumberOfPoints() != volumeData->GetNumberOfPoints() || maskVolumeData->GetPointData()->GetScalars()==NULL)
@@ -538,9 +535,8 @@ void mafDataPipeCustomSegmentationVolume::ApplyRegionGrowingSegmentation()
   typedef itk::ConnectedThresholdImageFilter<RealImage, RealImage> ITKConnectedThresholdFilter;
   ITKConnectedThresholdFilter::Pointer connectedThreshold = ITKConnectedThresholdFilter::New();
 
-  mafVME *vol = mafVME::SafeDownCast(m_Volume);
-  vol->GetOutput()->Update();
-  vtkDataSet *volumeData = vol->GetOutput()->GetVTKData();
+  m_Volume->GetOutput()->Update();
+  vtkDataSet *volumeData = m_Volume->GetOutput()->GetVTKData();
   volumeData->Update();
 
   if (m_RegionGrowingSeeds.size()==0)
@@ -743,12 +739,10 @@ void mafDataPipeCustomSegmentationVolume::ApplyRegionGrowingSegmentation()
 void mafDataPipeCustomSegmentationVolume::PreExecute()
 //------------------------------------------------------------------------------
 {
-  mafVME *vol = mafVME::SafeDownCast(m_Volume);
-
-  if(vol)
+  if(m_Volume)
   {
-    vol->GetOutput()->Update();
-    vtkDataSet *volumeData = vol->GetOutput()->GetVTKData();
+    m_Volume->GetOutput()->Update();
+    vtkDataSet *volumeData = m_Volume->GetOutput()->GetVTKData();
     if(volumeData)
     {
       if (m_ChangedAutomaticData)
@@ -844,25 +838,25 @@ int mafDataPipeCustomSegmentationVolume::GetRange(int index,int &startSlice, int
 
 
 //------------------------------------------------------------------------------
-int mafDataPipeCustomSegmentationVolume::SetVolume(mafNode *volume)
+int mafDataPipeCustomSegmentationVolume::SetVolume(mafVME *volume)
 //------------------------------------------------------------------------------
 {
   m_Volume = volume;
   
-  if (m_Volume == NULL || !mafVME::SafeDownCast(m_Volume)->GetOutput()->GetVTKData() || 
-    ( !mafVME::SafeDownCast(m_Volume)->GetOutput()->GetVTKData()->IsA("vtkStructuredPoints")
-    && !mafVME::SafeDownCast(m_Volume)->GetOutput()->GetVTKData()->IsA("vtkRectilinearGrid") )
+  if (m_Volume == NULL || !m_Volume->GetOutput()->GetVTKData() || 
+    ( !m_Volume->GetOutput()->GetVTKData()->IsA("vtkStructuredPoints")
+    && !m_Volume->GetOutput()->GetVTKData()->IsA("vtkRectilinearGrid") )
     )
   {
     return MAF_ERROR;
   }
 
-  if (mafVME::SafeDownCast(m_Volume)->GetOutput()->GetVTKData() && mafVME::SafeDownCast(m_Volume)->GetOutput()->GetVTKData()->IsA("vtkRectilinearGrid"))
+  if (m_Volume->GetOutput()->GetVTKData() && m_Volume->GetOutput()->GetVTKData()->IsA("vtkRectilinearGrid"))
   {
     SetInput(m_RG);
     Modified();
   }
-  else if (mafVME::SafeDownCast(m_Volume)->GetOutput()->GetVTKData() && mafVME::SafeDownCast(m_Volume)->GetOutput()->GetVTKData()->IsA("vtkStructuredPoints"))
+  else if (m_Volume->GetOutput()->GetVTKData() && m_Volume->GetOutput()->GetVTKData()->IsA("vtkStructuredPoints"))
   {
     SetInput(m_SP);
     Modified();
@@ -873,7 +867,7 @@ int mafDataPipeCustomSegmentationVolume::SetVolume(mafNode *volume)
   return MAF_OK;
 }
 //------------------------------------------------------------------------------
-void mafDataPipeCustomSegmentationVolume::SetManualVolumeMask(mafNode *volume)
+void mafDataPipeCustomSegmentationVolume::SetManualVolumeMask(mafVME *volume)
 //------------------------------------------------------------------------------
 {
   m_ManualVolumeMask = volume;
@@ -882,7 +876,7 @@ void mafDataPipeCustomSegmentationVolume::SetManualVolumeMask(mafNode *volume)
   Modified();
 }
 //------------------------------------------------------------------------------
-void mafDataPipeCustomSegmentationVolume::SetRefinementVolumeMask(mafNode *volume)
+void mafDataPipeCustomSegmentationVolume::SetRefinementVolumeMask(mafVME *volume)
 //------------------------------------------------------------------------------
 {
   m_RefinementVolumeMask = volume;
@@ -894,11 +888,10 @@ void mafDataPipeCustomSegmentationVolume::SetRefinementVolumeMask(mafNode *volum
 vtkDataSet *mafDataPipeCustomSegmentationVolume::GetAutomaticOutput()
 //------------------------------------------------------------------------------
 {
-  mafVME *vol = mafVME::SafeDownCast(m_Volume);
-  if(vol)
+  if(m_Volume)
   {
-    vol->GetOutput()->Update();
-    vtkDataSet *volumeData = vol->GetOutput()->GetVTKData();
+    m_Volume->GetOutput()->Update();
+    vtkDataSet *volumeData = m_Volume->GetOutput()->GetVTKData();
     if(volumeData)
     {
       volumeData->Update();
@@ -919,11 +912,10 @@ vtkDataSet *mafDataPipeCustomSegmentationVolume::GetAutomaticOutput()
 vtkDataSet *mafDataPipeCustomSegmentationVolume::GetManualOutput()
 //------------------------------------------------------------------------------
 {
-  mafVME *vol = mafVME::SafeDownCast(m_Volume);
-  if(vol)
+  if(m_Volume)
   {
-    vol->GetOutput()->Update();
-    vtkDataSet *volumeData = vol->GetOutput()->GetVTKData();
+    m_Volume->GetOutput()->Update();
+    vtkDataSet *volumeData = m_Volume->GetOutput()->GetVTKData();
     if(volumeData)
     {
       volumeData->Update();
@@ -944,11 +936,10 @@ vtkDataSet *mafDataPipeCustomSegmentationVolume::GetManualOutput()
 vtkDataSet *mafDataPipeCustomSegmentationVolume::GetRefinementOutput()
 //------------------------------------------------------------------------------
 {
-  mafVME *vol = mafVME::SafeDownCast(m_Volume);
-  if(vol)
+  if(m_Volume)
   {
-    vol->GetOutput()->Update();
-    vtkDataSet *volumeData = vol->GetOutput()->GetVTKData();
+    m_Volume->GetOutput()->Update();
+    vtkDataSet *volumeData = m_Volume->GetOutput()->GetVTKData();
     if(volumeData)
     {
       volumeData->Update();
@@ -969,11 +960,10 @@ vtkDataSet *mafDataPipeCustomSegmentationVolume::GetRefinementOutput()
 vtkDataSet *mafDataPipeCustomSegmentationVolume::GetRegionGrowingOutput()
 //------------------------------------------------------------------------------
 {
-  mafVME *vol = mafVME::SafeDownCast(m_Volume);
-  if(vol)
+  if(m_Volume)
   {
-    vol->GetOutput()->Update();
-    vtkDataSet *volumeData = vol->GetOutput()->GetVTKData();
+    m_Volume->GetOutput()->Update();
+    vtkDataSet *volumeData = m_Volume->GetOutput()->GetVTKData();
     if(volumeData)
     {
       volumeData->Update();
@@ -1002,12 +992,10 @@ bool mafDataPipeCustomSegmentationVolume::CheckNumberOfThresholds()
     return true;
   }
 
-  mafVME *vol = mafVME::SafeDownCast(m_Volume);
-
-  if(vol)
+  if(m_Volume)
   {
-    vol->GetOutput()->Update();
-    vtkDataSet *volumeData = vol->GetOutput()->GetVTKData();
+    m_Volume->GetOutput()->Update();
+    vtkDataSet *volumeData = m_Volume->GetOutput()->GetVTKData();
     if(volumeData)
     {
       volumeData->Update();

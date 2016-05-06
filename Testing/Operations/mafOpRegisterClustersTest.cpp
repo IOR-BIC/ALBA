@@ -66,16 +66,15 @@ void mafOpRegisterClustersTest::AcceptTest()
   mafVMELandmarkCloud *lmc;
   mafNEW(lmc);
 
-  lmc->AppendLandmark(0,0,0,"0",false);
-  lmc->AppendLandmark(1,1,1,"1",false);
-  int id = lmc->AppendLandmark(2,2,2,"2",false);
+  lmc->AppendLandmark(0,0,0,"0");
+  lmc->AppendLandmark(1,1,1,"1");
+  int id = lmc->AppendLandmark(2,2,2,"2");
 
 //   lmc->Open();
 // 
 //   // Do not accept opened landmark clouds
 //   CPPUNIT_ASSERT(op->Accept(lmc) == false);
 
-  lmc->Close();
 
   // Accept closed not time varying landmark clouds
   CPPUNIT_ASSERT(op->Accept(lmc) == true);
@@ -99,11 +98,9 @@ void mafOpRegisterClustersTest::OpRunTest()
   mafVMELandmarkCloud *lmc;
   mafNEW(lmc);
 
-  lmc->AppendLandmark(0,0,0,"0",false);
-  lmc->AppendLandmark(1,1,1,"1",false);
-  lmc->AppendLandmark(2,2,2,"2",false);
-
-  lmc->Close();
+  lmc->AppendLandmark(0,0,0,"0");
+  lmc->AppendLandmark(1,1,1,"1");
+  lmc->AppendLandmark(2,2,2,"2");
 
   op->TestModeOn();
   op->SetInput(lmc);
@@ -122,11 +119,9 @@ void mafOpRegisterClustersTest::OpDoUndoTest()
   mafVMELandmarkCloud *lmc;
   mafNEW(lmc);
 
-  lmc->AppendLandmark(0,0,0,"0",false);
-  lmc->AppendLandmark(1,1,1,"1",false);
-  lmc->AppendLandmark(2,2,2,"2",false);
-
-  lmc->Close();
+  lmc->AppendLandmark(0,0,0,"0");
+  lmc->AppendLandmark(1,1,1,"1");
+  lmc->AppendLandmark(2,2,2,"2");
 
   op->TestModeOn();
   op->SetInput(lmc);
@@ -160,19 +155,12 @@ void mafOpRegisterClustersTest::ClosedCloudAcceptTest()
   mafVMELandmarkCloud *lmc;
   mafNEW(lmc);
 
-  lmc->AppendLandmark(0,0,0,"0",false);
-  lmc->AppendLandmark(1,1,1,"1",false);
-  lmc->AppendLandmark(2,2,2,"2",false);
-
-//   lmc->Open();
-// 
-//   // Do not accept opened landmark clouds
-//   CPPUNIT_ASSERT(mafOpRegisterClusters::ClosedCloudAccept(lmc) == false);
-
-  lmc->Close();
+  lmc->AppendLandmark(0,0,0,"0");
+  lmc->AppendLandmark(1,1,1,"1");
+  lmc->AppendLandmark(2,2,2,"2");
 
   // Accept closed not time varying landmark clouds
-  CPPUNIT_ASSERT(mafOpRegisterClusters::ClosedCloudAccept(lmc) == true);
+  CPPUNIT_ASSERT(mafOpRegisterClusters::LMCloudAccept(lmc) == true);
 
   mafDEL(lmc);
 }

@@ -24,7 +24,7 @@
 
 
 #include "mafOpCreateGenericVme.h"
-#include "mafNodeGeneric.h"
+#include "mafVMEGeneric.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafOpCreateGenericVme);

@@ -46,8 +46,8 @@ protected:
   /*virtual*/ void    CreatePageGroups(){}
   /*virtual*/ void    UpdateGUILayout(bool bForce){}
   /*virtual*/ void    OnChangeName(){printf("\nID_NAME\n");}
-  /*virtual*/ void    OnCreateVP(){printf("\ID_CREATE_VP\n");}
-  /*virtual*/ void    OnCloseVP(){printf("\ID_CLOSE_VP\n");}
+  /*virtual*/ void    OnCreateVP(){printf("\nID_CREATE_VP\n");}
+  /*virtual*/ void    OnCloseVP(){printf("\nID_CLOSE_VP\n");}
 };
 
 //----------------------------------------------------------------------------
@@ -102,7 +102,6 @@ void mafPipeCompoundTest::TestCreateSceneNode()
   DummyPipeCompound *pipe = new DummyPipeCompound;
   pipe->Create(sceneNode);
   
-  delete pipe;
   delete sceneNode;
   mafDEL(volume);
 }

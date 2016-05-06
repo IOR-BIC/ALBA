@@ -157,7 +157,6 @@ void mafPipeGizmoTest::TestPipeExecution()
 
   vtkDEL(actorList);
 
-  delete pipeGizmo;
   delete sceneNode;
 
   mafDEL(gizmo);

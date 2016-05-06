@@ -32,7 +32,7 @@
 
 #include "mafOpClassicICPRegistration.h"
 
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafVMELandmarkCloud.h"
 
 #include "mafAbsMatrixPipe.h"
@@ -73,7 +73,7 @@ mafOp* mafOpClassicICPRegistration::Copy()
 	return new mafOpClassicICPRegistration(m_Label);
 }
 //----------------------------------------------------------------------------
-bool mafOpClassicICPRegistration::Accept(mafNode* vme)
+bool mafOpClassicICPRegistration::Accept(mafVME* vme)
 //----------------------------------------------------------------------------
 {
 	if(!vme) return false;
@@ -193,7 +193,7 @@ void mafOpClassicICPRegistration::OpDo()
   assert( m_Target);
 	assert(!m_Registered);
 
-	((mafVME*)m_Input)->GetOutput()->Update();
+	m_Input->GetOutput()->Update();
   
 
 	mafSmartPointer<mafMatrix> icp_matrix;  
@@ -205,7 +205,7 @@ void mafOpClassicICPRegistration::OpDo()
 	vtkMAFSmartPointer<mafClassicICPRegistration> icp; //to be deleted 
 	//mafProgressMacro(icp,"classic ICP - registering");
 	icp->SetConvergence(m_Convergence);
-	icp->SetSource(((mafVME*)m_Input)->GetOutput()->GetVTKData());
+	icp->SetSource(m_Input->GetOutput()->GetVTKData());
 	icp->SetTarget(m_Target->GetOutput()->GetVTKData());
 	icp->SetResultsFileName(m_ReportFilename.GetCStr());
 	icp->SaveResultsOn();
@@ -229,7 +229,7 @@ void mafOpClassicICPRegistration::OpDo()
    }
   else
    {
-     m_Registered->SetData((vtkPolyData*)(((mafVME*)m_Input)->GetOutput()->GetVTKData()),0.0);
+     m_Registered->SetData((vtkPolyData*)(m_Input->GetOutput()->GetVTKData()),0.0);
      m_Registered->Update();
    }
   m_Registered->SetName(name);
@@ -240,7 +240,7 @@ void mafOpClassicICPRegistration::OpDo()
 
 	m_Registered->ReparentTo(m_Input);
 
-  mafVME *sourceVME = mafVME::SafeDownCast(m_Input);
+  mafVME *sourceVME = m_Input;
 
   vtkMAFSmartPointer<vtkTransform> sourceABSPoseInverseTr;
   sourceABSPoseInverseTr->PostMultiply();
@@ -274,7 +274,7 @@ void mafOpClassicICPRegistration::OnChooseTarget()
 {
 	mafEvent e(this,VME_CHOOSE);
 	mafEventMacro(e);
-	mafNode *vme = e.GetVme();
+	mafVME *vme = e.GetVme();
 
 	if(!vme) return; // the user choosed cancel - keep previous target
   if(!Accept(vme)) // the user choosed ok     - check if it is a valid vme
@@ -293,9 +293,9 @@ void mafOpClassicICPRegistration::OnChooseTarget()
 	m_Gui->Update();
 }
 //----------------------------------------------------------------------------
-void mafOpClassicICPRegistration::SetTarget(mafNode* node)   
+void mafOpClassicICPRegistration::SetTarget(mafVME* node)   
 //----------------------------------------------------------------------------
 {
-  m_Target			= mafVME::SafeDownCast(node);
+  m_Target			= node;
 	m_TargetName = m_Target->GetName();
 }

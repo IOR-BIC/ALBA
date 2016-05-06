@@ -56,7 +56,7 @@ public:
 	virtual void OnEvent(mafEventBase *maf_event);
   mafOp* Copy();
 
-  bool Accept(mafNode *vme);
+  bool Accept(mafVME *vme);
   void OpRun();
 
   /** If labels tags are present retrieve them. */

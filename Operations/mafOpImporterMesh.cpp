@@ -64,7 +64,7 @@ mafOpImporterMesh::~mafOpImporterMesh()
   mafDEL(m_ImportedVmeMesh);
 }
 //----------------------------------------------------------------------------
-bool mafOpImporterMesh::Accept(mafNode *node)
+bool mafOpImporterMesh::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
   return true;

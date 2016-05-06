@@ -90,7 +90,7 @@ mafOpVolumeResample::~mafOpVolumeResample()
 	vtkDEL(m_ResampleBox);
 }
 //----------------------------------------------------------------------------
-bool mafOpVolumeResample::Accept(mafNode* vme) 
+bool mafOpVolumeResample::Accept(mafVME* vme) 
 //----------------------------------------------------------------------------
 {
 	mafEvent e(this,VIEW_SELECTED);
@@ -135,7 +135,7 @@ void mafOpVolumeResample::InternalUpdateBounds(double bounds[6], bool center)
 void mafOpVolumeResample::AutoSpacing()
 //----------------------------------------------------------------------------
 {
-  vtkDataSet *vme_data = ((mafVME *)m_Input)->GetOutput()->GetVTKData();
+  vtkDataSet *vme_data = m_Input->GetOutput()->GetVTKData();
 
   m_VolumeSpacing[0] = VTK_DOUBLE_MAX;
   m_VolumeSpacing[1] = VTK_DOUBLE_MAX;
@@ -173,7 +173,7 @@ void mafOpVolumeResample::AutoSpacing()
   // Note: TransformVector ignores the translation column!
   mafSmartPointer<mafTransformFrame> input_to_output;
   input_to_output->SetInputFrame(m_ResampleBoxVme->GetOutput()->GetAbsMatrix());
-  input_to_output->SetTargetFrame(((mafVME *)m_Input)->GetOutput()->GetAbsMatrix());
+  input_to_output->SetTargetFrame(m_Input->GetOutput()->GetAbsMatrix());
   input_to_output->Update();
   input_to_output->TransformPoint(m_VolumeSpacing,m_VolumeSpacing);
 
@@ -220,7 +220,7 @@ void mafOpVolumeResample::CreateGizmoCube()
   m_ResampleBoxVme->GetMaterial()->m_Diffuse[1] = 0;
   m_ResampleBoxVme->GetMaterial()->m_Diffuse[2] = 0;
   m_ResampleBoxVme->GetMaterial()->UpdateProp();
-  m_ResampleBoxVme->ReparentTo((mafVME *)m_Input->GetRoot());
+  m_ResampleBoxVme->ReparentTo(m_Input->GetRoot());
 	mafEventMacro(mafEvent(this,VME_SHOW,m_ResampleBoxVme,true));
   
   UpdateGizmoData();
@@ -232,7 +232,7 @@ void mafOpVolumeResample::SetBoundsToVMEBounds()
 //----------------------------------------------------------------------------
 {
   double bounds[6];
-  ((mafVME *)m_Input)->GetOutput()->GetVMEBounds(bounds);
+  m_Input->GetOutput()->GetVMEBounds(bounds);
 
   InternalUpdateBounds(bounds,true);
   m_VolumeOrientation[0] = m_VolumeOrientation[1] = m_VolumeOrientation[2] = 0;
@@ -242,7 +242,7 @@ void mafOpVolumeResample::SetBoundsToVME4DBounds()
 //----------------------------------------------------------------------------
 {
   double bounds[6];
-  ((mafVME *)m_Input)->GetOutput()->GetVME4DBounds(bounds);
+  m_Input->GetOutput()->GetVME4DBounds(bounds);
 
   InternalUpdateBounds(bounds,true);
   m_VolumeOrientation[0]=m_VolumeOrientation[1]=m_VolumeOrientation[2]=0;
@@ -252,10 +252,10 @@ void mafOpVolumeResample::SetBoundsToVMELocalBounds()
 //----------------------------------------------------------------------------
 {
   double bounds[6];
-  ((mafVME *)m_Input)->GetOutput()->GetVMELocalBounds(bounds);
+  m_Input->GetOutput()->GetVMELocalBounds(bounds);
 
   InternalUpdateBounds(bounds,false);
-  ((mafVME *)m_Input)->GetOutput()->GetAbsPose(m_VolumePosition,m_VolumeOrientation);
+  m_Input->GetOutput()->GetAbsPose(m_VolumePosition,m_VolumeOrientation);
 
 	m_OldVolumePosition[0] = m_VolumePosition[0];
 	m_OldVolumePosition[1] = m_VolumePosition[1];
@@ -311,11 +311,6 @@ void mafOpVolumeResample::Resample()
 	mafString new_vme_name = "resampled_";
 	new_vme_name += m_Input->GetName();
 
-	/*mafNEW(m_ResampledVme);
-	m_ResampledVme->SetName(new_vme_name);
-
-	m_Input->Modified();
-	mafVME *Node = mafVME::SafeDownCast(m_Input);*/
   m_ResampledVme = (mafVMEVolumeGray *)m_Input->NewInstance();
   m_ResampledVme->Register(m_ResampledVme);
   m_ResampledVme->GetTagArray()->DeepCopy(m_Input->GetTagArray()); // copy tags
@@ -351,7 +346,7 @@ void mafOpVolumeResample::Resample()
         local_pose->SetInputFrame(output_parent_abs_pose);
 
         mafSmartPointer<mafMatrix> input_parent_abs_pose;
-        ((mafVME *)m_Input->GetParent())->GetOutput()->GetAbsMatrix(*input_parent_abs_pose.GetPointer(),input_item->GetTimeStamp());
+        m_Input->GetParent()->GetOutput()->GetAbsMatrix(*input_parent_abs_pose.GetPointer(),input_item->GetTimeStamp());
         local_pose->SetTargetFrame(input_parent_abs_pose);
         local_pose->Update();
 
@@ -360,7 +355,7 @@ void mafOpVolumeResample::Resample()
         output_to_input->SetInputFrame(output_abs_pose);
 
         mafSmartPointer<mafMatrix> input_abs_pose;
-        ((mafVME *)m_Input)->GetOutput()->GetAbsMatrix(*input_abs_pose.GetPointer(),input_item->GetTimeStamp());
+        m_Input->GetOutput()->GetAbsMatrix(*input_abs_pose.GetPointer(),input_item->GetTimeStamp());
         output_to_input->SetTargetFrame(input_abs_pose);
         output_to_input->Update();
 
@@ -496,7 +491,7 @@ void mafOpVolumeResample::CreateGui()
   
   /*double range[2];
   wxString str_range;
-  ((mafVME *)m_Input)->GetOutput()->GetVTKData()->GetScalarRange(range);
+  m_Input->GetOutput()->GetVTKData()->GetScalarRange(range);
   str_range.Printf("[ %.3f , %.3f ]",range[0],range[1]);
   
   m_Gui->Label("Scalar Range:");
@@ -644,7 +639,7 @@ void mafOpVolumeResample::ShiftCenterResampled()
 
 	double centerVolume[3];
 
-	((mafVME *)m_Input)->GetOutput()->GetVTKData()->GetCenter(centerVolume);
+	m_Input->GetOutput()->GetVTKData()->GetCenter(centerVolume);
 
 	vtkMAFSmartPointer<vtkPoints> points;
 	points->InsertNextPoint(centerVolume);

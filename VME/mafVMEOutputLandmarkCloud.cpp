@@ -58,14 +58,8 @@ vtkDataSet *mafVMEOutputLandmarkCloud::GetVTKData()
 {
   assert(m_VME);
   assert(mafVMELandmarkCloud::SafeDownCast(m_VME));
-  if (mafVMELandmarkCloud::SafeDownCast(m_VME)->IsOpen())
-  {
-    return NULL;
-  }
-  else
-  {
-    return Superclass::GetVTKData();
-  }
+	
+	return Superclass::GetVTKData();
 }
 
 //-------------------------------------------------------------------------

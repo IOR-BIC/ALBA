@@ -42,7 +42,7 @@
 #include "mafTagArray.h"
 #include "mafVMEVolumeGray.h"
 #include "mafVMEVolumeRGB.h"
-#include "mafNode.h"
+#include "mafVME.h"
 
 #include "vtkRenderer.h"
 #include "vtkImageReader.h"

@@ -29,7 +29,7 @@
 #include "mafEvent.h"
 #include "mafGUI.h"
 
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafTagArray.h"
 #include "mafTagItem.h"
 

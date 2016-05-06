@@ -14,19 +14,6 @@
 
 =========================================================================*/
 
-
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-//======================== WORK IN PROGRESS !!!!! ======================== 
-
-
 #ifndef __mafViewArbitraryOrthoSlice_H__
 #define __mafViewArbitraryOrthoSlice_H__
 
@@ -172,11 +159,10 @@ public:
 	virtual void PackageView();
 
 	/** Show/Hide VMEs into plugged sub-views*/
-	virtual void VmeShow(mafNode *node, bool show);
-
+	virtual void VmeShow(mafVME *vme, bool show);
 
 	/** Remove VME into plugged sub-views*/
-	virtual void VmeRemove(mafNode *node);
+	virtual void VmeRemove(mafVME *vme);
 
 	/** Create the GUI at the bottom of the compounded view. */
 	virtual void CreateGuiView();
@@ -244,7 +230,7 @@ protected:
 	bool BelongsToYNormalGizmo( mafVME * vme );
 	bool BelongsToZNormalGizmo( mafVME * vme );
 
-	void ShowVMESurfacesAndLandmarks( mafNode * node );
+	void ShowVMESurfacesAndLandmarks( mafVME * vme );
 
 	void ShowMafVMEImage( mafVME * vme );
 	void HideMafVmeImage();
@@ -263,8 +249,7 @@ protected:
 	void AddVMEToMSFTree(mafVMESurface *vme);
 
 	enum VIEW_DIRECTION {FROM_X = 0, FROM_Y = 1, FROM_Z = 2};
-	void ShowPlaneFeedbackLine(int viewDirection, vtkMatrix4x4 *outputMatrix);
-
+	
 	void BuildSlicingPlane( mafVMESurface *inVME, int fromDirection, int guestView,  
 		double sliceHeight, mafVMESlicer* targetSlicer = NULL,
     vtkMatrix4x4 * outputMatrix = NULL , bool showHeightText = false, vtkCaptionActor2D *captionActor = NULL);
@@ -285,9 +270,9 @@ protected:
 
 	void HideMafVMEVolume();
 
-	void ShowMafVMEMesh( mafNode * node );
+	void ShowMafVMEMesh(mafVME *vme);
 
-	void ShowmafVMEPolylineEditor( mafNode * node );
+	void ShowmafVMEPolylineEditor(mafVME *vme);
 
 	/* Update slicer settings according to m_CurrentVolume*/
 	void UpdateSlicerZBehavior();
@@ -333,8 +318,8 @@ protected:
 	void RestoreCameraParametersForAllSubviews();
 
 	void OnResetmafVMEPolylineEditor();
-	void OnResetMafVMEMesh( mafNode * node );
-	void OnResetSurfaceAndLandmark( mafNode * node );
+	void OnResetMafVMEMesh(mafVME *vme);
+	void OnResetSurfaceAndLandmark(mafVME *vme);
 
 	/** This function is called when a rotate gizmo is moved*/
 	void OnEventGizmoCrossRotateZNormalView(mafEventBase *maf_event);
@@ -436,7 +421,7 @@ protected:
 	void CreateViewCameraNormalFeedbackActor(double col[3], int view);
 	void DestroyViewCameraNormalFeedbackActor(int view);
 	void ThicknessComboAssignment(int axis);
-	void UpdateWindowing(bool enable,mafNode *node);
+	void UpdateWindowing(bool enable,mafVME *vme);
 	void UpdateThickness( int axis);
 	void ShowSliceHeight2DTextActors( bool show , int color);
   

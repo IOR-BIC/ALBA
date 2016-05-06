@@ -110,7 +110,7 @@ void mafOpCutTest::TestOpUndo()
   m_OpCut->SetInput(groupChild);
   m_OpCut->OpDo();
 
-  groupChild->SetParent(NULL); //OpDo send only a message.
+  groupChild->ReparentTo(NULL); //OpDo send only a message.
 
   CPPUNIT_ASSERT(groupChild->GetParent()==NULL);
 
@@ -181,7 +181,7 @@ void mafOpCutTest::TestOpUndoVMETimeVarying()
   m_OpCut->SetInput(surfaceTimeVarying);
   m_OpCut->OpDo();
 
-  surfaceTimeVarying->SetParent(NULL); //OpDo send only a message.
+  surfaceTimeVarying->ReparentTo(NULL); //OpDo send only a message.
 
   CPPUNIT_ASSERT(surfaceTimeVarying->GetParent()==NULL);
 
@@ -212,7 +212,7 @@ void mafOpCutTest::TestOpUndoVMEWithChildren()
   m_OpCut->SetInput(volume_parent);
   m_OpCut->OpDo();
 
-  volume_parent->SetParent(NULL); //OpDo send only a message.
+  volume_parent->ReparentTo(NULL); //OpDo send only a message.
 
   CPPUNIT_ASSERT(volume_parent->GetParent()==NULL);
 

@@ -23,27 +23,34 @@
 // forward declarations :
 //----------------------------------------------------------------------------
 #include "mafDefines.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafOp.h"
 
 
 //-------------------------------------------------------------------------
 /** class for testing re-parenting. */
 //-------------------------------------------------------------------------
-class mafNodeHelper: public mafNode
+class mafVMEHelper : public mafVME
 {
 public:
-	mafTypeMacro(mafNodeHelper,mafNode);
-	void SetId(mafID id) {m_Id = id;};
+	mafTypeMacro(mafVMEHelper, mafVME);
+	void SetId(mafID id) { m_Id = id; };
+
+	virtual void SetMatrix(const mafMatrix &mat) {};
+	virtual void GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes) {};
+
 };
 
 //-------------------------------------------------------------------------
 /** class for testing re-parenting. */
-class mafNodeBHelper: public mafNode
+class mafVMEBHelper: public mafVME
 	//-------------------------------------------------------------------------
 {
 public:
-	mafTypeMacro(mafNodeBHelper,mafNode);
+	mafTypeMacro(mafVMEBHelper,mafVME);
+
+	virtual void SetMatrix(const mafMatrix &mat) {};
+	virtual void GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes) {};
 };
 
 //----------------------------------------------------------------------------

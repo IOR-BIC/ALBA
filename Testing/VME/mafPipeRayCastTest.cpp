@@ -139,7 +139,6 @@ void mafPipeRayCastTest::TestPipeExecution()
 
   vtkDEL(actorList);
 
-  delete pipeRayCast;
   delete sceneNode;
 
   mafDEL(volume);
@@ -200,7 +199,6 @@ void mafPipeRayCastTest::TestPipeExecutionMR()
 
   vtkDEL(actorList);
 
-  delete pipeRayCast;
   delete sceneNode;
 
   mafDEL(volume);

@@ -61,7 +61,7 @@ mafOp* mafOpCreateRefSys::Copy()
 }
 
 //----------------------------------------------------------------------------
-bool mafOpCreateRefSys::Accept(mafNode *node)
+bool mafOpCreateRefSys::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
   return (node && node->IsMAFType(mafVME));
@@ -85,8 +85,8 @@ void mafOpCreateRefSys::OpDo()
   {
 		double b[6], maxsize;
     m_RefSys->ReparentTo(m_Input);
-    m_RefSys->SetAbsMatrix(*((mafVME *)m_Input)->GetOutput()->GetAbsMatrix());
-		((mafVME *)m_Input)->GetOutput()->GetBounds(b);
+    m_RefSys->SetAbsMatrix(*m_Input->GetOutput()->GetAbsMatrix());
+		m_Input->GetOutput()->GetBounds(b);
 		double diffX = fabs(b[1] - b[0]);
 		double diffY = fabs(b[3] - b[2]);
 		double diffZ = fabs(b[5] - b[4]);

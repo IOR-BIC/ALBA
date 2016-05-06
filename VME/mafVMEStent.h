@@ -15,7 +15,7 @@ University of Bedfordshire, UK
 
 #include "mafDefines.h"  //very important for MAF_EXPORT
 
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafVME.h"
 #include "mafVMEGeneric.h"
 #include "mafVMESurface.h"
@@ -76,7 +76,7 @@ public:
   mafVMEStent(); ///< Constructor
   ~mafVMEStent(); ///< Destructor
 
-  int DeepCopy(mafNode *a) ; ///< Deep copy
+  int DeepCopy(mafVME *a) ; ///< Deep copy
 
   mafString GetVisualPipe() {return mafString("mafPipePolyline");}; ///< Get pipe name
   mafVMEOutputPolyline *GetPolylineOutput(); ///< return the right type of output 
@@ -109,7 +109,7 @@ public:
   mafVME* GetCenterLineVME() {return m_CenterLineVME ;}
 
   /// Set the deployed polydata vme.
-  void SetDeployedPolydataVME(mafNode* inputNode) ;
+  void SetDeployedPolydataVME(mafVME* inputNode) ;
 
   /// Set the start position of the stent. \n
   /// The position is the id along the centerline.
@@ -117,7 +117,7 @@ public:
 
   int GetStentStartPos() { return m_StentStartPosId; };
 
-  void SetStentLink(const char *link_name, mafNode *ns);
+  void SetStentLink(const char *link_name, mafVME *ns);
 
   void SetStentCompanyName(wxString CompanyName) {m_CompanyName = CompanyName;}
   void SetStentModelName(wxString ModelName) {m_ModelName = ModelName;}
@@ -316,24 +316,24 @@ private:
   /// Adds tag if not already present. \n
   /// Does nothing and returns true if vme already found. \n
   /// Returns NULL if failed.
-  mafNode* FindOrSelectCenterLineVME(mafNode* inputNode) ;
+  mafVME* FindOrSelectCenterLineVME(mafVME* inputNode) ;
 
   /// Find or select the associated vessel surface vme. \n
   /// Adds tag if not already present. \n
   /// Does nothing and returns true if vme already found. \n
   /// Returns NULL if failed.
-  mafNode* FindOrSelectVesselVME(mafNode* inputNode) ;
+  mafVME* FindOrSelectVesselVME(mafVME* inputNode) ;
 
   /// Find the tagged center line vme. \n
   /// Returns NULL if failed.
-  mafNode* FindTaggedCenterLineVME(mafNode* inputNode) ;
+  mafVME* FindTaggedCenterLineVME(mafVME* inputNode) ;
 
   /// Find the tagged vessel surface vme. \n
   /// Returns NULL if failed.
-  mafNode* FindTaggedVesselVME(mafNode* inputNode) ;
+  mafVME* FindTaggedVesselVME(mafVME* inputNode) ;
 
-  void SetVesselCenterLine(mafNode *node);
-  void SetVesselSurface(mafNode *node);
+  void SetVesselCenterLine(mafVME *node);
+  void SetVesselSurface(mafVME *node);
 
   /// update stent after a change in the parameters.
   void InternalUpdate();
@@ -387,7 +387,7 @@ private:
 
   /// Search parent and siblings for node with given id. \n
   /// Returns NULL if failed.
-  mafNode* FindNodeWithId(mafID id) ;
+  mafVME* FindNodeWithId(mafID id) ;
 
 
   // basic stent parameters */

@@ -89,7 +89,7 @@ protected:
   virtual void ExcutionEnd();
 
   /** Set the selected VME, this function must be called before execution begin*/
-  void SetSelectedVME(mafNode *node);
+  void SetSelectedVME(mafVME *node);
 
   /** Sets The event listener */
   void SetListener(mafObserver *Listener);
@@ -105,8 +105,8 @@ protected:
   wxString m_BlockType;
   wxString m_AbortBlock;
   wxString m_NextBlock;
-  mafNode	*m_SelectedVME; ///< Pointer to the current selected node.
-  mafNode *m_InputVME; ///< The vme selected on operation start.
+  mafVME	*m_SelectedVME; ///< Pointer to the current selected node.
+  mafVME *m_InputVME; ///< The vme selected on operation start.
   int m_Success;
   int m_Running;
   mafObserver    *m_Listener;

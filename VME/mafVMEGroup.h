@@ -59,7 +59,7 @@ public:
   bool Equals(mafVME *vme);
 
   /** return icon */
-  int DeepCopy(mafNode *a);
+  int DeepCopy(mafVME *a);
 
 protected:
   mafVMEGroup();

@@ -82,14 +82,14 @@ public:
   Create the visual pipe for the node passed as argument. 
   To create visual pipe first check in m_PipeMap if custom visual pipe is defined, 
   otherwise ask to vme which is its visual pipe. */
-  virtual void VmeCreatePipe(mafNode *vme);
+  virtual void VmeCreatePipe(mafVME *vme);
 
 	/** Show/Hide VMEs into plugged sub-views */
-	virtual void VmeShow(mafNode *node, bool show);
+	virtual void VmeShow(mafVME *vme, bool show);
 
 	/** 
 	Set the visualization status for the node (visible, not visible, mutex, ...) \sa mafSceneGraph mafView*/
-	virtual int GetNodeStatus(mafNode *vme);
+	virtual int GetNodeStatus(mafVME *vme);
 
   double GetContourValue(){return m_ContourValueIso;};
   void SetContourValue(double value){m_ContourValueIso = value; OnEvent(&mafEvent(this,ID_CONTOUR_VALUE_ISO));};

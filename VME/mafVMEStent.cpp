@@ -28,7 +28,7 @@ University of Bedfordshire, UK
 #include "mafDataPipeCustom.h"
 #include "mafGUI.h"
 #include "mafVME.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "vtkMAFDeformableSimplexMeshFilter.h"
 #include "vtkMAFMatrixVectorMath.h"
 #include "vtkMAFPolyDataNavigator.h"
@@ -240,9 +240,8 @@ void mafVMEStent::OnEvent(mafEventBase *maf_event)
       break;
     case ID_CONSTRAINT_SURFACE:
       {
-        mafNode *node = FindOrSelectVesselVME(this) ;
-        m_VesselVME = mafVME::SafeDownCast(node) ;
-        SetVesselSurface(node);
+        m_VesselVME = FindOrSelectVesselVME(this);
+        SetVesselSurface(m_VesselVME);
 
         InternalUpdate();
         m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
@@ -252,9 +251,8 @@ void mafVMEStent::OnEvent(mafEventBase *maf_event)
       break ;
     case ID_CENTERLINE:
       {
-        mafNode *node = FindOrSelectCenterLineVME(this) ;
-        m_VesselVME = mafVME::SafeDownCast(node) ;
-        SetVesselCenterLine(node);
+				m_VesselVME = FindOrSelectCenterLineVME(this);
+        SetVesselCenterLine(m_VesselVME);
 
         InternalUpdate();
         m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
@@ -281,17 +279,14 @@ void mafVMEStent::OnEvent(mafEventBase *maf_event)
 //-----------------------------------------------------------------------
 void mafVMEStent::Initialize()
 {
-  mafNode *node ;
+  
+  m_VesselVME = FindOrSelectVesselVME(this);
+	assert(m_VesselVME != NULL);
+  SetVesselSurface(m_VesselVME);
 
-  node = FindOrSelectVesselVME(this) ;
-  assert(node != NULL) ;
-  m_VesselVME = mafVME::SafeDownCast(node) ;
-  SetVesselSurface(node);
-
-  node = FindOrSelectCenterLineVME(this) ;
-  assert(node != NULL) ;
-  m_CenterLineVME = mafVME::SafeDownCast(node) ;
-  SetVesselCenterLine(node);
+	m_CenterLineVME = FindOrSelectCenterLineVME(this) ;
+	assert(m_CenterLineVME != NULL);
+  SetVesselCenterLine(m_CenterLineVME);
 
   InternalUpdate();
   m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
@@ -305,7 +300,7 @@ void mafVMEStent::Initialize()
 //-------------------------------------------------------------------------
 // Deep Copy
 //-------------------------------------------------------------------------
-int mafVMEStent::DeepCopy(mafNode *a)
+int mafVMEStent::DeepCopy(mafVME *a)
 { 
   // NB: this does not do a base class copy -
   // it is unnecessary and causes conflict.
@@ -524,17 +519,15 @@ int mafVMEStent::InternalRestore(mafStorageElement *node)
 void mafVMEStent::InternalUpdate()
 {
   if (!m_VesselVMEDefined || !m_VesselSurfaceDefined){
-    mafNode* node = FindOrSelectVesselVME(this) ;
-    assert(node != NULL) ;
-    m_VesselVME = mafVME::SafeDownCast(node) ;
-    SetVesselSurface(node);
+		m_VesselVME = FindOrSelectVesselVME(this) ;
+    assert(m_VesselVME != NULL) ;
+    SetVesselSurface(m_VesselVME);
   }
 
   if (!m_CenterLineVMEDefined || !m_CenterLineDefined){
-    mafNode* node = FindOrSelectCenterLineVME(this) ;
-    assert(node != NULL) ;
-    m_CenterLineVME = mafVME::SafeDownCast(node) ;
-    SetVesselCenterLine(node);
+		m_CenterLineVME = FindOrSelectCenterLineVME(this) ;
+    assert(m_CenterLineVME != NULL) ;
+    SetVesselCenterLine(m_CenterLineVME);
   }
 
   if(m_StentParamsModified || m_StentCenterLineModified){	
@@ -608,7 +601,7 @@ void mafVMEStent::InternalUpdate()
 
 
   if (m_DeployedPolydataStatus != DEPLOYED_PD_NONE){
-    mafNode* node = FindNodeWithId(m_DeployedPolydataNodeID) ;
+    mafVME* node = FindNodeWithId(m_DeployedPolydataNodeID) ;
     assert(node != NULL) ;
     m_DeployedPolydataVME = mafVMEPolyline::SafeDownCast(node) ;
     this->SetDeployedPolydataVME(node) ;
@@ -1207,13 +1200,12 @@ void mafVMEStent::SetVesselCenterLine(vtkPolyData *line){
 //-------------------------------------------------------------------------
 // Set the centerline
 //-------------------------------------------------------------------------
-void mafVMEStent::SetVesselCenterLine(mafNode* node)
+void mafVMEStent::SetVesselCenterLine(mafVME* node)
 {
   if(node){
-    mafVME *vme = mafVME::SafeDownCast(node);
-    m_CenterLineNodeID = vme->GetId() ;
+    m_CenterLineNodeID = node->GetId() ;
     m_CenterLineVMEDefined = true ;
-    vtkPolyData *polyLine =vtkPolyData::SafeDownCast( vme->GetOutput()->GetVTKData());
+    vtkPolyData *polyLine =vtkPolyData::SafeDownCast(node->GetOutput()->GetVTKData());
     polyLine->Update();
     SetVesselCenterLine(polyLine);
   }
@@ -1233,13 +1225,12 @@ void mafVMEStent::SetVesselSurface(vtkPolyData *surface){
 //-------------------------------------------------------------------------
 // Set the vessel surface
 //-------------------------------------------------------------------------
-void mafVMEStent::SetVesselSurface(mafNode* node)
+void mafVMEStent::SetVesselSurface(mafVME* node)
 {
   if(node){
-    mafVME *vme = mafVME::SafeDownCast(node);
-    m_VesselNodeID = vme->GetId() ;
+    m_VesselNodeID = node->GetId() ;
     m_VesselVMEDefined = true ;
-    vtkPolyData *polySurface = vtkPolyData::SafeDownCast(vme->GetOutput()->GetVTKData());
+    vtkPolyData *polySurface = vtkPolyData::SafeDownCast(node->GetOutput()->GetVTKData());
     polySurface->Update();
     SetVesselSurface(polySurface) ;
   }
@@ -1296,22 +1287,22 @@ vtkPolyData* mafVMEStent::GetSimplexPolyData()
 // Find the tagged center line vme.
 // Returns NULL if failed.
 //-------------------------------------------------------------------------
-mafNode* mafVMEStent::FindTaggedCenterLineVME(mafNode* inputNode)
+mafVME* mafVMEStent::FindTaggedCenterLineVME(mafVME* inputNode)
 {
   // Go up one level in the tree
-  mafNode* parentNode = inputNode->GetParent() ;
+  mafVME* parentNode = inputNode->GetParent() ;
 
   // search tree for tagged item
   if (parentNode->GetTagArray()->IsTagPresent("RT3S_CENTER_LINE"))
     return parentNode ;
 
   for (int i = 0 ;  i < parentNode->GetNumberOfChildren() ;  i++){
-    mafNode* childNode = parentNode->GetChild(i) ;
+    mafVME* childNode = parentNode->GetChild(i) ;
     if (childNode->GetTagArray()->IsTagPresent("RT3S_CENTER_LINE"))
       return childNode ;
 
     for (int j = 0 ;  j < childNode->GetNumberOfChildren() ;  j++){
-      mafNode* grandChildNode = childNode->GetChild(j) ;
+      mafVME* grandChildNode = childNode->GetChild(j) ;
       if (grandChildNode->GetTagArray()->IsTagPresent("RT3S_CENTER_LINE"))
         return grandChildNode ;
     }
@@ -1325,22 +1316,22 @@ mafNode* mafVMEStent::FindTaggedCenterLineVME(mafNode* inputNode)
 // Find the tagged vessel surface vme.
 // Returns NULL if failed.
 //-------------------------------------------------------------------------
-mafNode* mafVMEStent::FindTaggedVesselVME(mafNode* inputNode)
+mafVME* mafVMEStent::FindTaggedVesselVME(mafVME* inputNode)
 {
   // Go up one level in the tree
-  mafNode* parentNode = inputNode->GetParent() ;
+  mafVME* parentNode = inputNode->GetParent() ;
 
   // search tree for tagged item
   if (parentNode->GetTagArray()->IsTagPresent("RT3S_VESSEL"))
     return parentNode ;
 
   for (int i = 0 ;  i < parentNode->GetNumberOfChildren() ;  i++){
-    mafNode* childNode = parentNode->GetChild(i) ;
+    mafVME* childNode = parentNode->GetChild(i) ;
     if (childNode->GetTagArray()->IsTagPresent("RT3S_VESSEL"))
       return childNode ;
 
     for (int j = 0 ;  j < childNode->GetNumberOfChildren() ;  j++){
-      mafNode* grandChildNode = childNode->GetChild(j) ;
+      mafVME* grandChildNode = childNode->GetChild(j) ;
       if (grandChildNode->GetTagArray()->IsTagPresent("RT3S_VESSEL"))
         return grandChildNode ;
     }
@@ -1357,17 +1348,17 @@ mafNode* mafVMEStent::FindTaggedVesselVME(mafNode* inputNode)
 // Find or select center line vme.
 // Returns NULL if failed.
 //-------------------------------------------------------------------------
-mafNode* mafVMEStent::FindOrSelectCenterLineVME(mafNode* inputNode)
+mafVME* mafVMEStent::FindOrSelectCenterLineVME(mafVME* inputNode)
 {
   // search for id
   if (m_CenterLineNodeID != -1){
-    mafNode *node = FindNodeWithId(m_CenterLineNodeID) ;
+    mafVME *node = FindNodeWithId(m_CenterLineNodeID) ;
     if (node != NULL)
       return node ;
   }
 
   // search for tagged vme
-  mafNode *node = FindTaggedCenterLineVME(inputNode) ;
+  mafVME *node = FindTaggedCenterLineVME(inputNode) ;
   if (node != NULL)
     return node ;
 
@@ -1380,8 +1371,7 @@ mafNode* mafVMEStent::FindOrSelectCenterLineVME(mafNode* inputNode)
 
   if (node != NULL){
     mafLogMessage("Adding tag to centerline vme...\n") ;
-    mafVME* vme = mafVME::SafeDownCast(node) ;
-    vme->GetTagArray()->SetTag("RT3S_CENTER_LINE","Polyline");
+		node->GetTagArray()->SetTag("RT3S_CENTER_LINE","Polyline");
   }
 
   if (node == NULL){
@@ -1400,17 +1390,17 @@ mafNode* mafVMEStent::FindOrSelectCenterLineVME(mafNode* inputNode)
 // Find or select the vessel surface vme.
 // Returns NULL if failed.
 //-------------------------------------------------------------------------
-mafNode* mafVMEStent::FindOrSelectVesselVME(mafNode* inputNode)
+mafVME* mafVMEStent::FindOrSelectVesselVME(mafVME* inputNode)
 {
   // search for id
   if (m_VesselNodeID != -1){
-    mafNode *node = FindNodeWithId(m_VesselNodeID) ;
+    mafVME *node = FindNodeWithId(m_VesselNodeID) ;
     if (node != NULL)
       return node ;
   }
 
   // search for tagged vme
-  mafNode *node = FindTaggedVesselVME(inputNode) ;
+  mafVME *node = FindTaggedVesselVME(inputNode) ;
   if (node != NULL)
     return node ;
 
@@ -1423,8 +1413,7 @@ mafNode* mafVMEStent::FindOrSelectVesselVME(mafNode* inputNode)
 
   if (node != NULL){
     mafLogMessage("Adding tag to vessel vme...\n") ;
-    mafVME* vme = mafVME::SafeDownCast(node) ;
-    vme->GetTagArray()->SetTag("RT3S_VESSEL","Surface");
+		node->GetTagArray()->SetTag("RT3S_VESSEL","Surface");
   }
 
   if (node == NULL){
@@ -2041,22 +2030,22 @@ void mafVMEStent::CrimpStent(double crimpedDiameter)
 //-------------------------------------------------------------------------
 // Search parent and siblings for node with given id
 //-------------------------------------------------------------------------
-mafNode* mafVMEStent::FindNodeWithId(mafID id)
+mafVME* mafVMEStent::FindNodeWithId(mafID id)
 {
   if (id == -1)
     return NULL ;
 
-  mafNode* parent = this->GetParent() ;
+  mafVME* parent = this->GetParent() ;
   if (parent->GetId() == id)
     return parent ;
 
   for (int i = 0 ;  i < parent->GetNumberOfChildren() ;  i++){
-    mafNode* child = parent->GetChild(i) ;
+    mafVME* child = parent->GetChild(i) ;
     if (child->GetId() == id)
       return child ;
 
     for (int j = 0 ;  j < child->GetNumberOfChildren() ;  j++){
-      mafNode* grChild = child->GetChild(j) ;
+      mafVME* grChild = child->GetChild(j) ;
       if (grChild->GetId() == id)
         return grChild ;
     }
@@ -2090,7 +2079,7 @@ void mafVMEStent::SetStentPolyData(vtkPolyData* pd)
 //-------------------------------------------------------------------------
 // Set the deployed polydata vme.
 //-------------------------------------------------------------------------
-void mafVMEStent::SetDeployedPolydataVME(mafNode* inputNode)
+void mafVMEStent::SetDeployedPolydataVME(mafVME* inputNode)
 {
   m_DeployedPolydataVME = mafVMEPolyline::SafeDownCast(inputNode) ;
   m_DeployedPolydataNodeID = inputNode->GetId() ;

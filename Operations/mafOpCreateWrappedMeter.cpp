@@ -59,7 +59,7 @@ mafOp* mafOpCreateWrappedMeter::Copy()
 	return new mafOpCreateWrappedMeter(m_Label);
 }
 //----------------------------------------------------------------------------
-bool mafOpCreateWrappedMeter::Accept(mafNode *node)
+bool mafOpCreateWrappedMeter::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
   return (node && node->IsMAFType(mafVME));

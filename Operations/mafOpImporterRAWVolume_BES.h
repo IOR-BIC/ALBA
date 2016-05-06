@@ -34,7 +34,7 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mafNode;
+class mafVME;
 class vtkImageReader;
 #ifdef VME_VOLUME_LARGE
 class vtkMAFLargeImageReader;
@@ -75,7 +75,7 @@ public:
     //N.B. when modified, GetVTKDataType must be updated
   };
 
-  bool Accept(mafNode *node) {return true;};
+  bool Accept(mafVME*node) {return true;};
 
   void OpRun();
 

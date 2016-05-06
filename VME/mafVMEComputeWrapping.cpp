@@ -179,7 +179,7 @@ medVMEComputeWrapping::~medVMEComputeWrapping()
 }
 
 //-------------------------------------------------------------------------
-int medVMEComputeWrapping::DeepCopy(mafNode *a)
+int medVMEComputeWrapping::DeepCopy(mafVME *a)
 //-------------------------------------------------------------------------
 {
 	if (Superclass::DeepCopy(a)==MAF_OK)
@@ -1479,8 +1479,8 @@ void medVMEComputeWrapping::WrapSingleCylinder(double vId){
 
 	// create ordered list of tangent point (2) real algorithm
 	vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformFirstDataInput;
-	transformFirstDataInput->SetTransform((vtkAbstractTransform *)((mafVME *)wrapped_vme1)->GetAbsMatrixPipe()->GetVTKTransform());
-	transformFirstDataInput->SetInput((vtkPolyData *)((mafVME *)wrapped_vme1)->GetOutput()->GetVTKData());
+	transformFirstDataInput->SetTransform((vtkAbstractTransform *)wrapped_vme1->GetAbsMatrixPipe()->GetVTKTransform());
+	transformFirstDataInput->SetInput((vtkPolyData *)wrapped_vme1->GetOutput()->GetVTKData());
 	transformFirstDataInput->Update();
 
 	vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformFirstData;
@@ -3116,8 +3116,8 @@ bool medVMEComputeWrapping::IsLineInterSectObject(mafVME *wrapVME,double *point1
 	vtkMAFSmartPointer<vtkOBBTree> locator;
 	vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformFirstData;
 
-	transformFirstDataInput->SetTransform((vtkAbstractTransform *)((mafVME *)wrapVME)->GetAbsMatrixPipe()->GetVTKTransform());
-	transformFirstDataInput->SetInput((vtkPolyData *)((mafVME *)wrapVME)->GetOutput()->GetVTKData());
+	transformFirstDataInput->SetTransform((vtkAbstractTransform *)wrapVME->GetAbsMatrixPipe()->GetVTKTransform());
+	transformFirstDataInput->SetInput((vtkPolyData *)wrapVME->GetOutput()->GetVTKData());
 	transformFirstDataInput->Update();
 
 	transformFirstData->SetTransform((vtkAbstractTransform *)m_TmpTransform->GetVTKTransform());
@@ -3302,8 +3302,8 @@ int medVMEComputeWrapping::GetViaPoint(double *viaPoint,bool isNearEndflag){
 
 	if (wrapped_vme1)
 	{
-		transformFirstDataInput->SetTransform((vtkAbstractTransform *)((mafVME *)GetWrappedVME1())->GetAbsMatrixPipe()->GetVTKTransform());
-		transformFirstDataInput->SetInput((vtkPolyData *)((mafVME *)GetWrappedVME1())->GetOutput()->GetVTKData());
+		transformFirstDataInput->SetTransform((vtkAbstractTransform *)GetWrappedVME1()->GetAbsMatrixPipe()->GetVTKTransform());
+		transformFirstDataInput->SetInput((vtkPolyData *)GetWrappedVME1()->GetOutput()->GetVTKData());
 		transformFirstDataInput->Update();
 
 		transformFirstData->SetTransform((vtkAbstractTransform *)m_TmpTransform->GetVTKTransform());
@@ -3336,8 +3336,8 @@ int medVMEComputeWrapping::GetViaPoint(double *viaPoint,bool isNearEndflag){
 
 	if (wrapped_vme2)
 	{
-		transformFirstDataInput->SetTransform((vtkAbstractTransform *)((mafVME *)GetWrappedVME2())->GetAbsMatrixPipe()->GetVTKTransform());
-		transformFirstDataInput->SetInput((vtkPolyData *)((mafVME *)GetWrappedVME2())->GetOutput()->GetVTKData());
+		transformFirstDataInput->SetTransform((vtkAbstractTransform *)GetWrappedVME2()->GetAbsMatrixPipe()->GetVTKTransform());
+		transformFirstDataInput->SetInput((vtkPolyData *)GetWrappedVME2()->GetOutput()->GetVTKData());
 		transformFirstDataInput->Update();
 
 		transformFirstData->SetTransform((vtkAbstractTransform *)m_TmpTransform->GetVTKTransform());
@@ -3553,7 +3553,7 @@ double medVMEComputeWrapping::GetCutPlaneForCylinder(double *center,double *t1,d
 
 	vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformFirstData;
 	transformFirstData->SetTransform((vtkAbstractTransform *)m_TmpTransform->GetVTKTransform());
-	transformFirstData->SetInput((vtkPolyData *)((mafVME *)wrapped_vme)->GetOutput()->GetVTKData());
+	transformFirstData->SetInput((vtkPolyData *)wrapped_vme->GetOutput()->GetVTKData());
 
 	transformFirstData->Update(); 
 
@@ -3622,7 +3622,7 @@ double medVMEComputeWrapping::GetCutPlaneForCI(double *bCoord,double *cCoord,vtk
 
 	vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformFirstData;
 	transformFirstData->SetTransform((vtkAbstractTransform *)m_TmpTransform->GetVTKTransform());
-	transformFirstData->SetInput((vtkPolyData *)((mafVME *)GetWrappedVME2())->GetOutput()->GetVTKData());
+	transformFirstData->SetInput((vtkPolyData *)GetWrappedVME2()->GetOutput()->GetVTKData());
 	transformFirstData->Update(); 
 
 	vtkPlaneSource *planeSource;
@@ -3689,7 +3689,7 @@ double medVMEComputeWrapping::GetCutPlane2(double *aPoint,double *bPoint,double 
 
 	vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformFirstData;
 	transformFirstData->SetTransform((vtkAbstractTransform *)m_TmpTransform2->GetVTKTransform());
-	transformFirstData->SetInput((vtkPolyData *)((mafVME *)GetWrappedVME1())->GetOutput()->GetVTKData());
+	transformFirstData->SetInput((vtkPolyData *)GetWrappedVME1()->GetOutput()->GetVTKData());
 	transformFirstData->Update(); 
 	vtkPlaneSource *planeSource;
 	vtkPlane *planeCutter;
@@ -4738,8 +4738,8 @@ int medVMEComputeWrapping::PrepareData(int wrappedFlag,double *local_start,doubl
 		}	
 		// create ordered list of tangent point (2) real algorithm
 		vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformFirstDataInput;
-		transformFirstDataInput->SetTransform((vtkAbstractTransform *)((mafVME *)wrapped_vme)->GetAbsMatrixPipe()->GetVTKTransform());
-		transformFirstDataInput->SetInput((vtkPolyData *)((mafVME *)wrapped_vme)->GetOutput()->GetVTKData());
+		transformFirstDataInput->SetTransform((vtkAbstractTransform *)wrapped_vme->GetAbsMatrixPipe()->GetVTKTransform());
+		transformFirstDataInput->SetInput((vtkPolyData *)wrapped_vme->GetOutput()->GetVTKData());
 		transformFirstDataInput->Update();
 
 		vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformFirstData;
@@ -4847,8 +4847,8 @@ void medVMEComputeWrapping::GetTwoTangentPoint(mafVME * wrapped_vme,double *loca
 
 	// create ordered list of tangent point (2) real algorithm
 	vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformFirstDataInput;
-	transformFirstDataInput->SetTransform((vtkAbstractTransform *)((mafVME *)wrapped_vme)->GetAbsMatrixPipe()->GetVTKTransform());
-	transformFirstDataInput->SetInput((vtkPolyData *)((mafVME *)wrapped_vme)->GetOutput()->GetVTKData());
+	transformFirstDataInput->SetTransform((vtkAbstractTransform *)wrapped_vme->GetAbsMatrixPipe()->GetVTKTransform());
+	transformFirstDataInput->SetInput((vtkPolyData *)wrapped_vme->GetOutput()->GetVTKData());
 	transformFirstDataInput->Update();
 
 	//vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformFirstData;
@@ -4857,7 +4857,7 @@ void medVMEComputeWrapping::GetTwoTangentPoint(mafVME * wrapped_vme,double *loca
 	transformFirstData->Update(); 
 
 
-	vtkMatrix4x4 *mat = ((mafVME *)wrapped_vme)->GetAbsMatrixPipe()->GetVTKTransform()->GetMatrix();
+	vtkMatrix4x4 *mat = wrapped_vme->GetAbsMatrixPipe()->GetVTKTransform()->GetMatrix();
 	mafMatrix matrix;
 	matrix.SetVTKMatrix(mat);
 	double versorX[3], versorY[3], versorZ[3];
@@ -4960,7 +4960,7 @@ int medVMEComputeWrapping::InternalStore(mafStorageElement *parent)
 
 		for(int i=0; i<m_MiddlePointList.size(); i++)
 		{
-			mafNode *node;
+			mafVME *node;
 			node = IndexToMiddlePointVME(i);
 			if(node == NULL) continue;
 			int vmeId = node->GetId();
@@ -5351,7 +5351,7 @@ mafGUI* medVMEComputeWrapping::CreateGuiForOldMeter( mafGUI *gui ){
 
 mafGUI* medVMEComputeWrapping::CreateGui(){
 	m_Gui = NULL;
-	m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
+	m_Gui = mafVME::CreateGui(); // Called to show info about vmes' type and name
 	m_Gui->SetListener(this);
 	m_Gui->Divider();
 
@@ -5402,7 +5402,7 @@ void medVMEComputeWrapping::EventWraped(mafEvent *e){
 
 	ForwardUpEvent(e);
 
-	mafNode *n = e->GetVme();
+	mafVME *n = e->GetVme();
 	if (n != NULL)
 	{
 		if (button_id == ID_START_METER_LINK)
@@ -5607,7 +5607,7 @@ void medVMEComputeWrapping::OnEvent(mafEventBase *maf_event)
 				e->SetArg((long)&medVMEComputeWrapping::VMEAccept);
 				e->SetString(&title);
 				ForwardUpEvent(e);
-				mafNode *n = e->GetVme();
+				mafVME *n = e->GetVme();
 
 				if (n == NULL) return;
 
@@ -5734,7 +5734,7 @@ void medVMEComputeWrapping::OnEvent(mafEventBase *maf_event)
 			break;
 
 		default:
-			mafNode::OnEvent(maf_event);
+			mafVME::OnEvent(maf_event);
 		}
 	}
 	else
@@ -5743,7 +5743,7 @@ void medVMEComputeWrapping::OnEvent(mafEventBase *maf_event)
 	}
 }
 //-------------------------------------------------------------------------
-void medVMEComputeWrapping::SetMeterLink(const char *link_name, mafNode *n)
+void medVMEComputeWrapping::SetMeterLink(const char *link_name, mafVME *n)
 //-------------------------------------------------------------------------
 {
 	if (n->IsMAFType(mafVMELandmark))
@@ -5768,7 +5768,7 @@ void medVMEComputeWrapping::SetMeterLink(const char *link_name, mafNode *n)
 }
 
 //-------------------------------------------------------------------------
-void medVMEComputeWrapping::AddMidPoint(mafNode *node)
+void medVMEComputeWrapping::AddMidPoint(mafVME *node)
 //-------------------------------------------------------------------------
 {
 	m_OrderMiddlePointsVMEList.push_back(node->GetId());
@@ -5806,55 +5806,55 @@ void medVMEComputeWrapping::RemoveLink(const char *link_name)
 mafVME *medVMEComputeWrapping::GetStartVME()
 //-------------------------------------------------------------------------
 {
-	return mafVME::SafeDownCast(GetLink("StartVME"));
+	return GetLink("StartVME");
 }
 //-------------------------------------------------------------------------
 mafVME *medVMEComputeWrapping::GetEnd1VME()
 //-------------------------------------------------------------------------
 {
-	return mafVME::SafeDownCast(GetLink("EndVME1"));
+	return GetLink("EndVME1");
 }
 //-------------------------------------------------------------------------
 mafVME *medVMEComputeWrapping::GetEnd2VME()
 //-------------------------------------------------------------------------
 {
-	return mafVME::SafeDownCast(GetLink("EndVME2"));
+	return GetLink("EndVME2");
 }
 //-------------------------------------------------------------------------
 mafVME  *medVMEComputeWrapping::GetWrappedVME1()
 //-------------------------------------------------------------------------
 {
-	return mafVME::SafeDownCast(GetLink("WrappedVME1"));
+	return GetLink("WrappedVME1");
 }
 mafVME  *medVMEComputeWrapping::GetWrappedVME2()
 //-------------------------------------------------------------------------
 {
-	return mafVME::SafeDownCast(GetLink("WrappedVME2"));
+	return GetLink("WrappedVME2");
 }
 mafVME *medVMEComputeWrapping::GetWrappedVME()
 //-------------------------------------------------------------------------
 {
-	return mafVME::SafeDownCast(GetLink("WrappedVME"));
+	return GetLink("WrappedVME");
 }
 mafVME  *medVMEComputeWrapping::GetViaPointVME()
 //-------------------------------------------------------------------------
 {
-	return mafVME::SafeDownCast(GetLink("viaPoint"));
+	return GetLink("viaPoint");
 }
 
 std::vector<mafVME *> medVMEComputeWrapping::GetWrappedVMEList(){
 	//-------------------------------------------------------------------------
 	std::vector<mafVME *> wrappedVmeList;
-	mafVME * tmp = mafVME::SafeDownCast(GetLink("WrappedVME1"));
+	mafVME * tmp = GetLink("WrappedVME1");
 	wrappedVmeList.push_back(tmp);
-	tmp = mafVME::SafeDownCast(GetLink("WrappedVME2"));
+	tmp = GetLink("WrappedVME2");
 	wrappedVmeList.push_back(tmp);
 	return wrappedVmeList;
 
 }
 
 //-----------------------------------------------------------------------
-mafNode::mafLinksMap *medVMEComputeWrapping::GetMidPointsLinks()
+mafVME::mafLinksMap *medVMEComputeWrapping::GetMidPointsLinks()
 //-----------------------------------------------------------------------
 {
 	//da ritornare la link maps
@@ -6025,17 +6025,17 @@ void medVMEComputeWrapping::InternalUpdateManual()//first
 		{ 
 			for(int j=0; j<m_OrderMiddlePointsNameVMEList.size(); j++)
 			{
-				mafNode *middleVME = IndexToMiddlePointVME(j);
+				mafVME *middleVME = IndexToMiddlePointVME(j);
 				m_MiddlePointList.push_back(new double[3]);
 				if(middleVME->IsMAFType(mafVMELandmarkCloud))
 				{
 					((mafVMELandmarkCloud *)middleVME)->GetLandmark(m_OrderMiddlePointsNameVMEList[j],m_MiddlePointList[m_MiddlePointList.size()-1],-1);
-					m_TmpTransform->SetMatrix(*((mafVME *)middleVME)->GetOutput()->GetAbsMatrix());
+					m_TmpTransform->SetMatrix(*middleVME->GetOutput()->GetAbsMatrix());
 					m_TmpTransform->TransformPoint(m_MiddlePointList[m_MiddlePointList.size()-1],m_MiddlePointList[m_MiddlePointList.size()-1]);
 				}
 				else
 				{
-					((mafVME *)middleVME)->GetOutput()->GetAbsPose(m_MiddlePointList[m_MiddlePointList.size()-1], orientation);
+					middleVME->GetOutput()->GetAbsPose(m_MiddlePointList[m_MiddlePointList.size()-1], orientation);
 				}
 
 			}
@@ -6318,8 +6318,8 @@ void medVMEComputeWrapping::InternalUpdateAutomated()//second
 
 		// create ordered list of tangent point (2) real algorithm
 		vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformFirstDataInput;
-		transformFirstDataInput->SetTransform((vtkAbstractTransform *)((mafVME *)wrapped_vme)->GetAbsMatrixPipe()->GetVTKTransform());
-		transformFirstDataInput->SetInput((vtkPolyData *)((mafVME *)wrapped_vme)->GetOutput()->GetVTKData());
+		transformFirstDataInput->SetTransform((vtkAbstractTransform *)wrapped_vme->GetAbsMatrixPipe()->GetVTKTransform());
+		transformFirstDataInput->SetInput((vtkPolyData *)wrapped_vme->GetOutput()->GetVTKData());
 		transformFirstDataInput->Update();
 
 		vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformFirstData;
@@ -6397,7 +6397,7 @@ void medVMEComputeWrapping::InternalUpdateAutomated()//second
 		//local_wrapped_center -> center of wrapped surface
 		//need a vector that is the normal of the plane
 
-		vtkMatrix4x4 *mat = ((mafVME *)wrapped_vme)->GetAbsMatrixPipe()->GetVTKTransform()->GetMatrix();
+		vtkMatrix4x4 *mat = wrapped_vme->GetAbsMatrixPipe()->GetVTKTransform()->GetMatrix();
 		mafMatrix matrix;
 		matrix.SetVTKMatrix(mat);
 		double versorX[3], versorY[3], versorZ[3];
@@ -6747,8 +6747,8 @@ void medVMEComputeWrapping::InternalUpdateAutomatedIOR()//third
 
 		// create ordered list of tangent point (2) real algorithm
 		vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformFirstDataInput;
-		transformFirstDataInput->SetTransform((vtkAbstractTransform *)((mafVME *)wrapped_vme)->GetAbsMatrixPipe()->GetVTKTransform());
-		transformFirstDataInput->SetInput((vtkPolyData *)((mafVME *)wrapped_vme)->GetOutput()->GetVTKData());
+		transformFirstDataInput->SetTransform((vtkAbstractTransform *)wrapped_vme->GetAbsMatrixPipe()->GetVTKTransform());
+		transformFirstDataInput->SetInput((vtkPolyData *)wrapped_vme->GetOutput()->GetVTKData());
 		transformFirstDataInput->Update();
 
 		vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformFirstData;
@@ -6792,7 +6792,7 @@ void medVMEComputeWrapping::InternalUpdateAutomatedIOR()//third
 		//local_wrapped_center -> center of wrapped surface
 		//need a vector that is the normal of the plane
 
-		vtkMatrix4x4 *mat = ((mafVME *)wrapped_vme)->GetAbsMatrixPipe()->GetVTKTransform()->GetMatrix();
+		vtkMatrix4x4 *mat = wrapped_vme->GetAbsMatrixPipe()->GetVTKTransform()->GetMatrix();
 		mafMatrix matrix;
 		matrix.SetVTKMatrix(mat);
 		double versorX[3], versorY[3], versorZ[3];
@@ -7225,12 +7225,12 @@ bool medVMEComputeWrapping::MiddlePointsControl()
 	return true;
 }
 //-------------------------------------------------------------------------
-mafNode* medVMEComputeWrapping::IndexToMiddlePointVME(int index)
+mafVME* medVMEComputeWrapping::IndexToMiddlePointVME(int index)
 //-------------------------------------------------------------------------
 {
 	mafString name = m_OrderMiddlePointsNameVMEList[index];
 
-	mafNode *returnNode = NULL;
+	mafVME *returnNode = NULL;
 	for (mafLinksMap::iterator i = GetLinks()->begin(); i != GetLinks()->end(); i++)
 	{
 		if(i->first.Equals(name)) returnNode =  i->second.m_Node;

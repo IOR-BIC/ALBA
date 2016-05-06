@@ -34,8 +34,8 @@
 #include "mafGUI.h"
 #include "mafGUILutSlider.h"
 #include "mafGUILutSwatch.h"
-#include "mafNode.h"
-#include "mafNodeIterator.h"
+#include "mafVME.h"
+#include "mafVMEIterator.h"
 #include "mafVMEImage.h"
 #include "mafGUIFloatSlider.h"
 #include "mafVMEOutputImage.h"
@@ -159,16 +159,16 @@ void mafViewImageCompound::PackageView()
 	PlugChildView(m_ViewImage);
 }
 //----------------------------------------------------------------------------
-void mafViewImageCompound::VmeShow(mafNode *node, bool show)
+void mafViewImageCompound::VmeShow(mafVME *vme, bool show)
 //----------------------------------------------------------------------------
 {
 	for(int i=0; i<this->GetNumberOfSubView(); i++)
-    m_ChildViewList[i]->VmeShow(node, show);
+    m_ChildViewList[i]->VmeShow(vme, show);
 
-	if (node->IsA("mafVMEImage"))
+	if (vme->IsA("mafVMEImage"))
 	{
-		m_CurrentImage=mafVMEImage::SafeDownCast(node);
-		mafPipeImage3D *pipe = (mafPipeImage3D *)m_ChildViewList[ID_VIEW_IMAGE]->GetNodePipe(node);
+		m_CurrentImage=mafVMEImage::SafeDownCast(vme);
+		mafPipeImage3D *pipe = (mafPipeImage3D *)m_ChildViewList[ID_VIEW_IMAGE]->GetNodePipe(vme);
 		UpdateWindowing(show && pipe && pipe->IsGrayImage());
 	}
 	
@@ -212,11 +212,11 @@ void mafViewImageCompound::UpdateWindowing(bool enable)
 	}
 }
 
-void mafViewImageCompound::VmeRemove(mafNode *node)
+void mafViewImageCompound::VmeRemove(mafVME *vme)
 {
-	Superclass::VmeRemove(node);
+	Superclass::VmeRemove(vme);
 		
-	if (m_CurrentImage == node)
+	if (m_CurrentImage == vme)
 	{
 		m_CurrentImage = NULL;
 		UpdateWindowing(false);

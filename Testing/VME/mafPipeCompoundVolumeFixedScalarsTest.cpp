@@ -97,7 +97,6 @@ void mafPipeCompoundVolumeFixedScalarsTest::TestCreateSceneNode()
   DummyPipeCompoundVolumeFixedScalars *pipe = new DummyPipeCompoundVolumeFixedScalars;
   pipe->Create(sceneNode);
 
-  delete pipe;
   delete sceneNode;
   mafDEL(volume);
 }
@@ -120,7 +119,6 @@ void mafPipeCompoundVolumeFixedScalarsTest::TestGetCurrentScalarVisualPipe()
 
   pipe->GetCurrentScalarVisualPipe();
 
-  delete pipe;
   delete sceneNode;
   mafDEL(volume);
 

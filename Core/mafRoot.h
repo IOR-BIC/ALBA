@@ -26,7 +26,7 @@
 //----------------------------------------------------------------------------
 // forward declarations
 //----------------------------------------------------------------------------
-class mafNode;
+class mafVME;
 class mafObject;
 class mafObserver;
 class mafStorageElement;
@@ -38,7 +38,7 @@ class mafStorage;
   the tree. The listener is typically the object responsible for creating the tree.
   The root node is also responible for generating Ids for new nodes attached to the
   tree.
-  @sa  mafNode
+  @sa  mafVME
 */
 class MAF_EXPORT mafRoot: public mafEventSender
 {
@@ -64,7 +64,7 @@ public:
   /** 
     root node cannot be reparented. Root nodes should redefine CanReparent
     to call this function. */
-  virtual bool CanReparentTo(mafNode *parent) {return parent==NULL;}
+  virtual bool CanReparentTo(mafVME *parent) {return parent==NULL;}
 
   static mafRoot* SafeDownCast(mafObject *o);
 

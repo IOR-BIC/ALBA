@@ -30,8 +30,6 @@
 #include "mafPics.h"
 #include "mafGUIMDIFrame.h"
 
-#include "mafNodeGeneric.h"
-#include "mafNodeRoot.h"
 #include "mafVMERoot.h"
 #include "mafVMESurface.h"
 #include "mafPipeFactoryVME.h"
@@ -48,7 +46,6 @@
 #include "mafOpCreateVolume.h"
 #include "mafOpCrop.h"
 #include "mafOpEditMetadata.h"
-#include "mafOpExplodeCollapse.h"
 #include "mafOpExtractIsosurface.h"
 #include "mafOpFilterSurface.h"
 #include "mafOpFilterVolume.h"
@@ -169,7 +166,6 @@ bool exOperationApp::OnInit()
   m_Logic->Plug(new mafOpCreateSlicer("Slicer"),"Create");
   m_Logic->Plug(new mafOpCreateVolume("Constant Volume"),"Create");
   m_Logic->Plug(new mafOpEditMetadata("Metadata Editor"));
-  m_Logic->Plug(new mafOpExplodeCollapse("Explode/Collapse cloud"));
   m_Logic->Plug(new mafOpExtractIsosurface("Extract Isosurface"));
   m_Logic->Plug(new mafOpFilterSurface("Surface"),"Filter");
   m_Logic->Plug(new mafOpFilterVolume("Volume"),"Filter/Volume");

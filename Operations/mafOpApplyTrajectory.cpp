@@ -86,19 +86,18 @@ mafOp* mafOpApplyTrajectory::Copy()
 	return cp;
 }
 //----------------------------------------------------------------------------
-bool mafOpApplyTrajectory::Accept(mafNode* vme)
+bool mafOpApplyTrajectory::Accept(mafVME* vme)
 //----------------------------------------------------------------------------
 {  
-  return !((mafVME *)vme)->IsAnimated() && !vme->IsA("mafVMERoot") 
+  return !vme->IsAnimated() && !vme->IsA("mafVMERoot") 
     && !vme->IsA("mafVMEExternalData") && !vme->IsA("mafVMERefSys");
 }
 //----------------------------------------------------------------------------
-bool mafOpApplyTrajectory::AcceptInputVME(mafNode* node)
+bool mafOpApplyTrajectory::AcceptInputVME(mafVME* node)
 //----------------------------------------------------------------------------
 {
-  mafVME *vme = mafVME::SafeDownCast(node);
-  if ( ((mafVME *)vme)->IsAnimated() && !vme->IsA("mafVMERoot") 
-    && !vme->IsA("mafVMEExternalData") && !vme->IsA("mafVMERefSys") )
+  if ( (node)->IsAnimated() && !node->IsA("mafVMERoot") 
+    && !node->IsA("mafVMEExternalData") && !node->IsA("mafVMERefSys") )
   {
     return true;
   }
@@ -260,7 +259,7 @@ void mafOpApplyTrajectory::OnEvent(mafEventBase *maf_event)
         mafEventMacro(e);
         if (e.GetVme())
         {
-          m_VME = (mafVME*)e.GetVme();
+          m_VME = e.GetVme();
         }
 
         if (!m_TestMode)
@@ -287,7 +286,7 @@ int mafOpApplyTrajectory::Read()
   }
 
   mafNEW(m_OriginalMatrix);
-  m_OriginalMatrix->DeepCopy(((mafVME *)m_Input)->GetOutput()->GetAbsMatrix());
+  m_OriginalMatrix->DeepCopy(m_Input->GetOutput()->GetAbsMatrix());
 
   wxString path, name, ext;
   wxSplitPath(m_File.GetCStr(),&path,&name,&ext);
@@ -330,7 +329,7 @@ int mafOpApplyTrajectory::Read()
     boxPose->RotateZ(newOrientation[2], POST_MULTIPLY);
     boxPose->SetPosition(newPosition);
 
-    ((mafVME *)m_Input)->SetAbsMatrix(boxPose->GetMatrix(), time);
+    m_Input->SetAbsMatrix(boxPose->GetMatrix(), time);
 
   } while (!inputFile.Eof());
 
@@ -351,7 +350,7 @@ int mafOpApplyTrajectory::ApplyTrajectoriesFromVME()
   }
 
   mafNEW(m_OriginalMatrix);
-  m_OriginalMatrix->DeepCopy(((mafVME *)m_Input)->GetOutput()->GetAbsMatrix());
+  m_OriginalMatrix->DeepCopy(m_Input->GetOutput()->GetAbsMatrix());
 
   std::vector<mafTimeStamp> time_stamps;
   m_VME->GetTimeStamps(time_stamps);
@@ -364,7 +363,7 @@ int mafOpApplyTrajectory::ApplyTrajectoriesFromVME()
 
     mafMatrix boxPose;
     m_VME->GetOutput()->GetAbsMatrix(boxPose,time);
-    ((mafVME *)m_Input)->SetAbsMatrix(boxPose, time);
+    m_Input->SetAbsMatrix(boxPose, time);
   }
 
   mafEventMacro(mafEvent(this, VME_MODIFIED, m_Input));
