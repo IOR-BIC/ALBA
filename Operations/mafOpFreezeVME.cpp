@@ -77,7 +77,7 @@ mafOpFreezeVME::~mafOpFreezeVME( )
 
 }
 //----------------------------------------------------------------------------
-bool mafOpFreezeVME::Accept(mafNode *node)
+bool mafOpFreezeVME::Accept(mafVME*node)
 	//----------------------------------------------------------------------------
 {
 	return (node->IsMAFType(mafVME) && 
@@ -104,14 +104,13 @@ void mafOpFreezeVME::OpRun()
 	}
 
 	//control the output and create the right vme
-	mafVME *vme = mafVME::SafeDownCast(m_Input);
-	vme->Update();
-	mafVMEOutput *output = vme->GetOutput();
+	m_Input->Update();
+	mafVMEOutput *output = m_Input->GetOutput();
 	output->Update();
 
 	if(vtkImageData *imageData = vtkImageData::SafeDownCast(output->GetVTKData()))
 	{
-		if(mafVMELabeledVolume *labeledVolume = mafVMELabeledVolume::SafeDownCast(vme))
+		if(mafVMELabeledVolume *labeledVolume = mafVMELabeledVolume::SafeDownCast(m_Input))
 		{
 			mmaMaterial *material = (mmaMaterial *)labeledVolume->GetAttribute("MaterialAttributes");
 
@@ -139,7 +138,7 @@ void mafOpFreezeVME::OpRun()
 	else
 		if(vtkRectilinearGrid *rectilinearGrid = vtkRectilinearGrid::SafeDownCast(output->GetVTKData()))
 		{
-			if(mafVMELabeledVolume *labeledVolume = mafVMELabeledVolume::SafeDownCast(vme))
+			if(mafVMELabeledVolume *labeledVolume = mafVMELabeledVolume::SafeDownCast(m_Input))
 			{
 				mmaMaterial *material = (mmaMaterial *)labeledVolume->GetAttribute("MaterialAttributes");
 
@@ -167,7 +166,7 @@ void mafOpFreezeVME::OpRun()
 		else
 			if(vtkPolyData *polyData = vtkPolyData::SafeDownCast(output->GetVTKData()))
 			{
-				if(mafVMEPolylineSpline *vmeSpline = mafVMEPolylineSpline::SafeDownCast(vme))
+				if(mafVMEPolylineSpline *vmeSpline = mafVMEPolylineSpline::SafeDownCast(m_Input))
 				{
 					mmaMaterial *material = vmeSpline->GetMaterial();
 
@@ -190,7 +189,7 @@ void mafOpFreezeVME::OpRun()
 							OpStop(OP_RUN_OK);
 					}
 				}
-				else if(mafVMESurfaceParametric *vmeSurface = mafVMESurfaceParametric::SafeDownCast(vme))
+				else if(mafVMESurfaceParametric *vmeSurface = mafVMESurfaceParametric::SafeDownCast(m_Input))
 				{
 					mmaMaterial *material = vmeSurface->GetMaterial();
 
@@ -214,7 +213,7 @@ void mafOpFreezeVME::OpRun()
 							OpStop(OP_RUN_OK);
 					}
 				}
-				else if(mafVMEMeter *meter = mafVMEMeter::SafeDownCast(vme))
+				else if(mafVMEMeter *meter = mafVMEMeter::SafeDownCast(m_Input))
 				{
 					mmaMaterial *material = meter->GetMaterial();
 
@@ -238,7 +237,7 @@ void mafOpFreezeVME::OpRun()
 							OpStop(OP_RUN_OK);
 					}
 				}
-				else if(mafVMERefSys *refsys = mafVMERefSys::SafeDownCast(vme))
+				else if(mafVMERefSys *refsys = mafVMERefSys::SafeDownCast(m_Input))
 				{
 					mmaMaterial *material = refsys->GetMaterial();
 
@@ -262,7 +261,7 @@ void mafOpFreezeVME::OpRun()
 							OpStop(OP_RUN_OK);
 					}
 				}
-				else if(mafVMESlicer *slicer = mafVMESlicer::SafeDownCast(vme))
+				else if(mafVMESlicer *slicer = mafVMESlicer::SafeDownCast(m_Input))
 				{
 					mmaMaterial *material = slicer->GetMaterial();
 
@@ -291,7 +290,7 @@ void mafOpFreezeVME::OpRun()
 					}
 
 				}
-				else if(mafVMEProber *prober = mafVMEProber::SafeDownCast(vme))
+				else if(mafVMEProber *prober = mafVMEProber::SafeDownCast(m_Input))
 				{
 					mmaMaterial *material = prober->GetMaterial();
 
@@ -315,7 +314,7 @@ void mafOpFreezeVME::OpRun()
 							OpStop(OP_RUN_OK);
 					}
 				}
-				else if(mafVMEWrappedMeter *wrappedMeter = mafVMEWrappedMeter::SafeDownCast(vme))
+				else if(mafVMEWrappedMeter *wrappedMeter = mafVMEWrappedMeter::SafeDownCast(m_Input))
 				{
 					mmaMaterial *material = wrappedMeter->GetMaterial();
 
@@ -339,7 +338,7 @@ void mafOpFreezeVME::OpRun()
 							OpStop(OP_RUN_OK);
 					}
 				}
-				else if(medVMEComputeWrapping *wrappedMeter = medVMEComputeWrapping::SafeDownCast(vme))
+				else if(medVMEComputeWrapping *wrappedMeter = medVMEComputeWrapping::SafeDownCast(m_Input))
 				{
 					mmaMaterial *material = wrappedMeter->GetMaterial();
 

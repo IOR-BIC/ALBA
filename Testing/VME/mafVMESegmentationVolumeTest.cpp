@@ -242,11 +242,11 @@ void mafVMESegmentationVolumeTest::TestSetVolumeLink()
   mafSmartPointer<mafVMESegmentationVolume> vme;
   vme->ReparentTo(m_Storage->GetRoot());
   //////////////////////////////////////////////////////////////////////////
-  int result = vme->SetVolumeLink((mafNode*)m_VolumeRG);
-  CPPUNIT_ASSERT( result == MAF_OK && vme->GetVolumeLink() == (mafNode*)m_VolumeRG );
+  int result = vme->SetVolumeLink(m_VolumeRG);
+  CPPUNIT_ASSERT( result == MAF_OK && vme->GetVolumeLink() == m_VolumeRG );
   //////////////////////////////////////////////////////////////////////////
-  result = vme->SetVolumeLink((mafNode*)m_Volume);
-  CPPUNIT_ASSERT( result == MAF_OK  && vme->GetVolumeLink() == (mafNode*)m_Volume );
+  result = vme->SetVolumeLink(m_Volume);
+  CPPUNIT_ASSERT( result == MAF_OK  && vme->GetVolumeLink() == m_Volume );
   //////////////////////////////////////////////////////////////////////////
 }
 //---------------------------------------------------------
@@ -257,7 +257,7 @@ void mafVMESegmentationVolumeTest::TestAutomaticSegmentation()
   vme->ReparentTo(m_Storage->GetRoot());
   //////////////////////////////////////////////////////////////////////////
   vme->SetVolumeLink(m_Volume);
-  CPPUNIT_ASSERT( vme->GetVolumeLink() == (mafNode*)m_Volume );
+  CPPUNIT_ASSERT( vme->GetVolumeLink() == m_Volume );
   //////////////////////////////////////////////////////////////////////////
   vme->SetAutomaticSegmentationThresholdModality(mafVMESegmentationVolume::RANGE);
   vme->AddRange(0,50,10.0);
@@ -287,7 +287,7 @@ void mafVMESegmentationVolumeTest::TestManualSegmentation()
   vme->ReparentTo(m_Storage->GetRoot());
   //////////////////////////////////////////////////////////////////////////
   vme->SetVolumeLink(m_Volume);
-  CPPUNIT_ASSERT( vme->GetVolumeLink() == (mafNode*)m_Volume );
+  CPPUNIT_ASSERT( vme->GetVolumeLink() == m_Volume );
   //////////////////////////////////////////////////////////////////////////
   vme->SetAutomaticSegmentationThresholdModality(mafVMESegmentationVolume::GLOBAL);
   vme->SetAutomaticSegmentationGlobalThreshold(5.0);
@@ -326,7 +326,7 @@ void mafVMESegmentationVolumeTest::TestRefinementSegmentation()
   vme->ReparentTo(m_Storage->GetRoot());
   //////////////////////////////////////////////////////////////////////////
   vme->SetVolumeLink(m_Volume);
-  CPPUNIT_ASSERT( vme->GetVolumeLink() == (mafNode*)m_Volume );
+  CPPUNIT_ASSERT( vme->GetVolumeLink() == m_Volume );
   //////////////////////////////////////////////////////////////////////////
   vme->SetAutomaticSegmentationThresholdModality(mafVMESegmentationVolume::GLOBAL);
   vme->SetAutomaticSegmentationGlobalThreshold(5.0);
@@ -362,7 +362,7 @@ void mafVMESegmentationVolumeTest::TestSetManualVolumeMask()
   vme->SetVolumeLink(m_Volume);
   //////////////////////////////////////////////////////////////////////////
   vme->SetManualVolumeMask(m_VolumeManualMask);
-  CPPUNIT_ASSERT( vme->GetManualVolumeMask() == (mafNode*)m_VolumeManualMask );
+  CPPUNIT_ASSERT( vme->GetManualVolumeMask() == m_VolumeManualMask );
   //////////////////////////////////////////////////////////////////////////
 }
 //---------------------------------------------------------
@@ -374,7 +374,7 @@ void mafVMESegmentationVolumeTest::TestSetRefinementVolumeMask()
   vme->SetVolumeLink(m_Volume);
   //////////////////////////////////////////////////////////////////////////
   vme->SetRefinementVolumeMask(m_VolumeRefinementMask);
-  CPPUNIT_ASSERT( vme->GetRefinementVolumeMask() == (mafNode*)m_VolumeRefinementMask );
+  CPPUNIT_ASSERT( vme->GetRefinementVolumeMask() == m_VolumeRefinementMask );
   //////////////////////////////////////////////////////////////////////////
 }
 //---------------------------------------------------------

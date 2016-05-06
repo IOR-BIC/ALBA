@@ -102,7 +102,7 @@ void mafGizmoPolylineGraphTest::CreateTestData()
 
 void mafGizmoPolylineGraphTest::TestConstructor()
 {
-  mafGizmoPolylineGraph *gizmoPolylineGraph = mafGizmoPolylineGraph::New((mafVME*)m_GizmoInputSurface, NULL,"",false,true);
+  mafGizmoPolylineGraph *gizmoPolylineGraph = mafGizmoPolylineGraph::New(m_GizmoInputSurface, NULL,"",false,true);
   RenderData(m_GizmoInputSurface->GetOutput()->GetVTKData());
   RenderGizmo(gizmoPolylineGraph);
 
@@ -113,7 +113,7 @@ void mafGizmoPolylineGraphTest::TestConstructor()
 
 void mafGizmoPolylineGraphTest::TestSetInput()
 {
-  mafGizmoPolylineGraph *gizmoPolylineGraph = mafGizmoPolylineGraph::New((mafVME*)m_GizmoInputSurface, NULL,"",false,true);
+  mafGizmoPolylineGraph *gizmoPolylineGraph = mafGizmoPolylineGraph::New(m_GizmoInputSurface, NULL,"",false,true);
   gizmoPolylineGraph->SetInput(m_GizmoInputSurface);
 
   // using friend mafGizmoPolylineGraph
@@ -124,7 +124,7 @@ void mafGizmoPolylineGraphTest::TestSetInput()
 
 void mafGizmoPolylineGraphTest::TestSetGizmoLength()
 {
-  mafGizmoPolylineGraph *gizmoPolylineGraph = mafGizmoPolylineGraph::New((mafVME*)m_GizmoInputSurface, NULL,"",false,true);
+  mafGizmoPolylineGraph *gizmoPolylineGraph = mafGizmoPolylineGraph::New(m_GizmoInputSurface, NULL,"",false,true);
   gizmoPolylineGraph->SetGizmoLength(20);
 
   RenderData(m_GizmoInputSurface->GetOutput()->GetVTKData());
@@ -177,7 +177,7 @@ void mafGizmoPolylineGraphTest::RenderGizmo( mafGizmoPolylineGraph *gizmoPolylin
 
 void mafGizmoPolylineGraphTest::TestShow()
 {
-  mafGizmoPolylineGraph *gizmoPolylineGraph = mafGizmoPolylineGraph::New((mafVME*)m_GizmoInputSurface, NULL,"",false,true);
+  mafGizmoPolylineGraph *gizmoPolylineGraph = mafGizmoPolylineGraph::New(m_GizmoInputSurface, NULL,"",false,true);
 
   gizmoPolylineGraph->Show(true);
   gizmoPolylineGraph->Delete();

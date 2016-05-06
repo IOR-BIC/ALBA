@@ -67,7 +67,7 @@ mafGeometryEditorPolylineGraph::mafGeometryEditorPolylineGraph(mafVME *input, ma
 	mafNEW(m_VMEPolylineEditor);
 	m_VMEPolylineEditor->SetName("VME Editor");
 	if(input)
-		m_VMEPolylineEditor->ReparentTo(mafVME::SafeDownCast(input->GetRoot()));
+		m_VMEPolylineEditor->ReparentTo(input->GetRoot());
 
 	m_InputVME	=	input;
 	m_Listener	= listener;
@@ -100,7 +100,7 @@ mafGeometryEditorPolylineGraph::mafGeometryEditorPolylineGraph(mafVME *input, ma
 
 	mafNEW(m_VMEPolylineSelection);
 	if(input)
-		m_VMEPolylineSelection->ReparentTo(mafVME::SafeDownCast(input->GetRoot()));
+		m_VMEPolylineSelection->ReparentTo(input->GetRoot());
 
 	m_SelectedPoint1ForInserting = UNDEFINED_POINT_ID;
 	m_SelectedPoint2ForInserting = UNDEFINED_POINT_ID; 

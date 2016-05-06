@@ -26,7 +26,7 @@
 //----------------------------------------------------------------------------
 class vtkMAFVolumeSlicer;
 class vtkTransformPolyDataFilter;
-class mafNode;
+class mafVME;
 class mmaMaterial;
 class mafVMEOutputSurface;
 
@@ -58,7 +58,7 @@ public:
   virtual void Print(std::ostream& os, const int tabs=0);
 
   /** Copy the contents of another VME-Slicer into this one. */
-  virtual int DeepCopy(mafNode *a);
+  virtual int DeepCopy(mafVME *a);
 
   /** Compare with another VME-Slicer. */
   virtual bool Equals(mafVME *vme);
@@ -98,12 +98,12 @@ public:
   static char ** GetIcon();
 
   /** Set the link to the slicer.*/
-  void SetSlicedVMELink(mafNode *node);
+  void SetSlicedVMELink(mafVME *node);
 
   /** Get the link to the slicing vme.*/
-  mafNode *GetSlicedVMELink();
+  mafVME *GetSlicedVMELink();
 
-  static bool VolumeAccept(mafNode* node) {return(node != NULL  && node->IsMAFType(mafVMEVolume));};
+  static bool VolumeAccept(mafVME* node) {return(node != NULL  && node->IsMAFType(mafVMEVolume));};
 
 
   /** Set tri-linear interpolation to on */

@@ -26,7 +26,7 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mafNode;
+class mafVME;
 class mafInteractorPicker;
 class mafInteractor;
 class mafVMESurface;
@@ -47,7 +47,7 @@ public:
   mafTypeMacro(mafOpSegmentationRegionGrowingConnectedThreshold, mafOp);
 
   /** Return true for the acceptable vme type. */
-  /*virtual*/ bool Accept(mafNode *node);
+  /*virtual*/ bool Accept(mafVME*node);
 
   /*virtual*/ mafOp* Copy();
 

@@ -53,8 +53,8 @@ public:
   void Create();
 
   /** 
-  Set the visualization status for the node (visible, not visible, mutex, ...) \sa mafSceneGraph mafView*/
-  virtual int GetNodeStatus(mafNode *vme);
+  Set the visualization status for the vme (visible, not visible, mutex, ...) \sa mafSceneGraph mafView*/
+  virtual int GetNodeStatus(mafVME *vme);
 
   /** IDs for the view GUI */
   enum VIEW_SLICE_WIDGET_ID
@@ -62,26 +62,16 @@ public:
     ID_NONE = Superclass::ID_LAST,
     ID_LAST
   };
-
-  /** 
-  Create the visual pipe for the node passed as argument. 
-  To create visual pipe first check in m_PipeMap if custom visual pipe is defined, 
-  otherwise ask to vme which is its visual pipe. */
-  //virtual void VmeCreatePipe(mafNode *vme);
-
-  /** 
-  Delete vme's visual pipe. It is called when vme is removed from visualization.*/
-  //virtual void VmeDeletePipe(mafNode *vme);
-
+	  
   /** Create the background for the slice. */
   void BorderCreate(double col[3]);
 
   /** Delete the background of the slice. */
   void BorderDelete();
 
-  void VmeShow(mafNode *node, bool show);
+  void VmeShow(mafVME *vme, bool show);
 
-  void VmeDeletePipe(mafNode *vme);
+  void VmeDeletePipe(mafVME *vme);
 
 protected:
   virtual mafGUI *CreateGui();

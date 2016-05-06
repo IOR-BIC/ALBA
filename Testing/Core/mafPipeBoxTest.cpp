@@ -158,7 +158,6 @@ void mafPipeBoxTest::TestPipe3DExecution()
 
   vtkDEL(actorList);
   
-  delete pipeBox;
   delete sceneNode;
 
   mafDEL(surfaceChild);
@@ -244,7 +243,6 @@ void mafPipeBoxTest::TestPipe3DSubtreeExecution()
 
   vtkDEL(actorList);
 
-  delete pipeBox;
   delete sceneNode;
 
   mafDEL(surfaceChild);
@@ -323,7 +321,6 @@ void mafPipeBoxTest::TestPipe4DExecution()
 
   vtkDEL(actorList);
 
-  delete pipeBox;
   delete sceneNode;
 
   mafDEL(surfaceParent);
@@ -422,7 +419,6 @@ void mafPipeBoxTest::TestPipe4DSubtreeExecution()
 
   vtkDEL(actorList);
 
-  delete pipeBox;
   delete sceneNode;
 
   mafDEL(surfaceChild);

@@ -74,7 +74,7 @@ mafOpEditNormals::~mafOpEditNormals()
 	vtkDEL(m_OriginalPolydata);
 }
 //----------------------------------------------------------------------------
-bool mafOpEditNormals::Accept(mafNode *node)
+bool mafOpEditNormals::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
 	return (node && node->IsMAFType(mafVMESurface));
@@ -103,10 +103,10 @@ void mafOpEditNormals::OpRun()
 //----------------------------------------------------------------------------
 {  
 	vtkNEW(m_ResultPolydata);
-	m_ResultPolydata->DeepCopy((vtkPolyData*)((mafVME *)m_Input)->GetOutput()->GetVTKData());
+	m_ResultPolydata->DeepCopy((vtkPolyData*)m_Input->GetOutput()->GetVTKData());
 
 	vtkNEW(m_OriginalPolydata);
-	m_OriginalPolydata->DeepCopy((vtkPolyData*)((mafVME *)m_Input)->GetOutput()->GetVTKData());
+	m_OriginalPolydata->DeepCopy((vtkPolyData*)m_Input->GetOutput()->GetVTKData());
 
 	if(!m_TestMode)
 	{
@@ -140,7 +140,7 @@ void mafOpEditNormals::OpRun()
 void mafOpEditNormals::OpDo()
 //----------------------------------------------------------------------------
 {
-	((mafVMESurface *)m_Input)->SetData(m_ResultPolydata,((mafVME *)m_Input)->GetTimeStamp());
+	((mafVMESurface *)m_Input)->SetData(m_ResultPolydata,m_Input->GetTimeStamp());
 	if(!m_TestMode)
 		mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 }
@@ -148,7 +148,7 @@ void mafOpEditNormals::OpDo()
 void mafOpEditNormals::OpUndo()
 //----------------------------------------------------------------------------
 {
-	((mafVMESurface *)m_Input)->SetData(m_OriginalPolydata,((mafVME *)m_Input)->GetTimeStamp());
+	((mafVMESurface *)m_Input)->SetData(m_OriginalPolydata,m_Input->GetTimeStamp());
 	if(!m_TestMode)
 		mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 }
@@ -268,7 +268,7 @@ void mafOpEditNormals::OnPreview()
 {
 	wxBusyCursor wait;
 
-	((mafVMESurface *)m_Input)->SetData(m_ResultPolydata,((mafVME *)m_Input)->GetTimeStamp());
+	((mafVMESurface *)m_Input)->SetData(m_ResultPolydata,m_Input->GetTimeStamp());
 
 	m_Gui->Enable(ID_PREVIEW,false);
 	m_Gui->Enable(ID_CLEAR,true);
@@ -285,7 +285,7 @@ void mafOpEditNormals::OnClear()
 {
 	wxBusyCursor wait;
 
-	((mafVMESurface *)m_Input)->SetData(m_OriginalPolydata,((mafVME *)m_Input)->GetTimeStamp());
+	((mafVMESurface *)m_Input)->SetData(m_OriginalPolydata,m_Input->GetTimeStamp());
 
 	m_ResultPolydata->DeepCopy(m_OriginalPolydata);
 

@@ -64,8 +64,8 @@ void mafOpLabelExtractorTest::TestLabelRG()
   int res = storage->Restore();
   CPPUNIT_ASSERT(res == MAF_OK);
 
-  mafNode *node = storage->GetRoot();
-  mafNode *volume = node->FindInTreeByName("CropTestVolumeRG");
+  mafVME *node = storage->GetRoot();
+  mafVME *volume = node->FindInTreeByName("CropTestVolumeRG");
 
   mafOpLabelExtractor *extractor = new mafOpLabelExtractor("label extractor");
   extractor->SetInput(volume);
@@ -74,12 +74,12 @@ void mafOpLabelExtractorTest::TestLabelRG()
   extractor->ExtractLabel();
   extractor->OpDo();
  
-  mafNode *surfaceExtracted = extractor->GetOutput();
+  mafVME *surfaceExtracted = extractor->GetOutput();
   mafString name = surfaceExtracted->GetName();
-  mafNode *surfaceNode = surfaceExtracted->FindInTreeByName(name.GetCStr());
+  mafVME *surfaceNode = surfaceExtracted->FindInTreeByName(name.GetCStr());
   mafVMESurface *surfaceLabeled = mafVMESurface::SafeDownCast(surfaceNode);
 
-  mafNode *surface = node->FindInTreeByName("label100RG");
+  mafVME *surface = node->FindInTreeByName("label100RG");
 
   mafVMESurface *surfaceOriginal = mafVMESurface::SafeDownCast(surface);
 
@@ -139,8 +139,8 @@ void mafOpLabelExtractorTest::TestLabelSP()
   int res = storage->Restore();
   CPPUNIT_ASSERT(res == MAF_OK);
 
-  mafNode *node = storage->GetRoot();
-  mafNode *volume = node->FindInTreeByName("CropTestVolumeSP");
+  mafVME *node = storage->GetRoot();
+  mafVME *volume = node->FindInTreeByName("CropTestVolumeSP");
 
   mafOpLabelExtractor *extractor = new mafOpLabelExtractor("label extractor");
   extractor->SetInput(volume);
@@ -149,12 +149,12 @@ void mafOpLabelExtractorTest::TestLabelSP()
   extractor->ExtractLabel();
   extractor->OpDo();
 
-  mafNode *surfaceExtracted = extractor->GetOutput();
+  mafVME *surfaceExtracted = extractor->GetOutput();
   mafString name = surfaceExtracted->GetName();
-  mafNode *surfaceNode = surfaceExtracted->FindInTreeByName(name.GetCStr());
+  mafVME *surfaceNode = surfaceExtracted->FindInTreeByName(name.GetCStr());
   mafVMESurface *surfaceLabeled = mafVMESurface::SafeDownCast(surfaceNode);
 
-  mafNode *surface = node->FindInTreeByName("label100SP");
+  mafVME *surface = node->FindInTreeByName("label100SP");
 
   mafVMESurface *surfaceOriginal = mafVMESurface::SafeDownCast(surface);
 
@@ -214,8 +214,8 @@ void mafOpLabelExtractorTest::TestLabelSmoothRG()
   int res = storage->Restore();
   CPPUNIT_ASSERT(res == MAF_OK);
 
-  mafNode *node = storage->GetRoot();
-  mafNode *volume = node->FindInTreeByName("CropTestVolumeRG");
+  mafVME *node = storage->GetRoot();
+  mafVME *volume = node->FindInTreeByName("CropTestVolumeRG");
 
   mafOpLabelExtractor *extractor = new mafOpLabelExtractor("label extractor");
   extractor->SetInput(volume);
@@ -225,12 +225,12 @@ void mafOpLabelExtractorTest::TestLabelSmoothRG()
   extractor->ExtractLabel();
   extractor->OpDo();
 
-  mafNode *surfaceExtracted = extractor->GetOutput();
+  mafVME *surfaceExtracted = extractor->GetOutput();
   mafString name = surfaceExtracted->GetName();
-  mafNode *surfaceNode = surfaceExtracted->FindInTreeByName(name.GetCStr());
+  mafVME *surfaceNode = surfaceExtracted->FindInTreeByName(name.GetCStr());
   mafVMESurface *surfaceLabeled = mafVMESurface::SafeDownCast(surfaceNode);
 
-  mafNode *surface = node->FindInTreeByName("label100smoothRG");
+  mafVME *surface = node->FindInTreeByName("label100smoothRG");
 
   mafVMESurface *surfaceOriginal = mafVMESurface::SafeDownCast(surface);
 
@@ -290,8 +290,8 @@ void mafOpLabelExtractorTest::TestLabelSmoothSP()
   int res = storage->Restore();
   CPPUNIT_ASSERT(res == MAF_OK);
 
-  mafNode *node = storage->GetRoot();
-  mafNode *volume = node->FindInTreeByName("CropTestVolumeSP");
+  mafVME *node = storage->GetRoot();
+  mafVME *volume = node->FindInTreeByName("CropTestVolumeSP");
 
   mafOpLabelExtractor *extractor = new mafOpLabelExtractor("label extractor");
   extractor->SetInput(volume);
@@ -301,12 +301,12 @@ void mafOpLabelExtractorTest::TestLabelSmoothSP()
   extractor->ExtractLabel();
   extractor->OpDo();
 
-  mafNode *surfaceExtracted = extractor->GetOutput();
+  mafVME *surfaceExtracted = extractor->GetOutput();
   mafString name = surfaceExtracted->GetName();
-  mafNode *surfaceNode = surfaceExtracted->FindInTreeByName(name.GetCStr());
+  mafVME *surfaceNode = surfaceExtracted->FindInTreeByName(name.GetCStr());
   mafVMESurface *surfaceLabeled = mafVMESurface::SafeDownCast(surfaceNode);
 
-  mafNode *surface = node->FindInTreeByName("label100smoothSP");
+  mafVME *surface = node->FindInTreeByName("label100smoothSP");
 
   mafVMESurface *surfaceOriginal = mafVMESurface::SafeDownCast(surface);
 

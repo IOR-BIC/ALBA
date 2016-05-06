@@ -82,7 +82,7 @@ void mafVMEFactoryTest::Initialize_CreateVMEInstance()
 {
   // this custom factory needs only to be initialized
   CPPUNIT_ASSERT(mafVMEFactory::Initialize()==MAF_OK);
-  mafNodeFactory *vmeFactory=mafVMEFactory::GetInstance();
+  mafVMEFactory *vmeFactory=mafVMEFactory::GetInstance();
 
   std::list<mafObjectFactory *> list=mafObjectFactory::GetRegisteredFactories();
 
@@ -97,7 +97,7 @@ void mafVMEFactoryTest::Initialize_CreateVMEInstance()
   mafVMEFactory *vme_factory = NULL;
   vme_factory = (mafVMEFactory*) mafVMEFactory::GetInstance();
 
-  mafPlugNode<mafVMECustom>("a custom vme"); // plug a vme in the main node factory
+  mafPlugVME<mafVMECustom>("a custom vme"); // plug a vme in the main node factory
 
   mafVME *vme0 = vme_factory->CreateVMEInstance("mafVMENotExisting");
   mafVME *vme1 = vme_factory->CreateVMEInstance("mafVMECustom");
@@ -114,7 +114,7 @@ void mafVMEFactoryTest::Initialize_CreateVMEInstance()
            
   // test factory contents
   //poor proof to register again an already registered vme
-  mafPlugNode<mafVMECustom>("a custom vme"); // plug a vme in the main node factory again
+  mafPlugVME<mafVMECustom>("a custom vme"); // plug a vme in the main node factory again
   vmes = vme_factory->GetNodeNames();
   s1 = vmes.size();
   CPPUNIT_ASSERT(s1 == 35);

@@ -135,100 +135,94 @@ mafVMEFactory::mafVMEFactory()
   mafPlugObjectMacro(mmaApplicationLayout,"Applycation layout attributes");
   mafPlugObjectMacro(mafAttributeTraceability,"Trial event attributes");
   
-  mafPlugNodeMacro(mafVMERoot,"root for VME tree");
-  mafPlugNodeMacro(mafVMEExternalData,"VME used for referencing MAF external data.");
-  mafPlugNodeMacro(mafVMEGroup,"VME used for composing assemblies");
-  mafPlugNodeMacro(mafVMEGeneric,"Generic VME storing VTK datasets");
-  mafPlugNodeMacro(mafVMEImage,"Generic VME storing vtkImageData datasets");
-  mafPlugNodeMacro(mafVMEMesh,"Generic VME storing vtkUnstructuredGrid datasets");
-  mafPlugNodeMacro(mafVMESurface,"Generic VME storing vtkPolyData surfaces datasets");
-  mafPlugNodeMacro(mafVMESurfaceParametric,"Generic VME storing vtkPolyData parametric surfaces");
-  mafPlugNodeMacro(mafVMEVolumeGray,"Generic VME storing vtk volume datasets with one scalar component");
-  mafPlugNodeMacro(mafVMEVolumeRGB,"Generic VME storing vtk volume datasets with 3 RGB scalar components");
-  mafPlugNodeMacro(mafVMEPolyline,"Generic VME storing polyline datasets");
-  mafPlugNodeMacro(mafVMEPolylineSpline,"Generic VME outputting a spline");
-  mafPlugNodeMacro(mafVMEMeter,"Generic VME generating meter");
-  mafPlugNodeMacro(mafVMEInfoText,"Generic VME for text information in gui");
-  mafPlugNodeMacro(mafVMELandmark,"VME representing a marker");
-  mafPlugNodeMacro(mafVMELandmarkCloud,"VME representing a cloud of mafVMELandmark");
-  mafPlugNodeMacro(mafVMEProber,"VME representing a prober");
-  //mafPlugNodeMacro(mafVMEGizmo,"VME representing a tool");
-  mafPlugNodeMacro(mafVMEPointSet,"VME representing a set of points");
-  mafPlugNodeMacro(mafVMERefSys,"VME representing a reference system");
-  mafPlugNodeMacro(mafVMEScalar,"VME representing time varying scalar values");
+  mafPlugVMEMacro(mafVMERoot,"root for VME tree");
+  mafPlugVMEMacro(mafVMEExternalData,"VME used for referencing MAF external data.");
+  mafPlugVMEMacro(mafVMEGroup,"VME used for composing assemblies");
+  mafPlugVMEMacro(mafVMEGeneric,"Generic VME storing VTK datasets");
+  mafPlugVMEMacro(mafVMEImage,"Generic VME storing vtkImageData datasets");
+  mafPlugVMEMacro(mafVMEMesh,"Generic VME storing vtkUnstructuredGrid datasets");
+  mafPlugVMEMacro(mafVMESurface,"Generic VME storing vtkPolyData surfaces datasets");
+  mafPlugVMEMacro(mafVMESurfaceParametric,"Generic VME storing vtkPolyData parametric surfaces");
+  mafPlugVMEMacro(mafVMEVolumeGray,"Generic VME storing vtk volume datasets with one scalar component");
+  mafPlugVMEMacro(mafVMEVolumeRGB,"Generic VME storing vtk volume datasets with 3 RGB scalar components");
+  mafPlugVMEMacro(mafVMEPolyline,"Generic VME storing polyline datasets");
+  mafPlugVMEMacro(mafVMEPolylineSpline,"Generic VME outputting a spline");
+  mafPlugVMEMacro(mafVMEMeter,"Generic VME generating meter");
+  mafPlugVMEMacro(mafVMEInfoText,"Generic VME for text information in gui");
+  mafPlugVMEMacro(mafVMELandmark,"VME representing a marker");
+  mafPlugVMEMacro(mafVMELandmarkCloud,"VME representing a cloud of mafVMELandmark");
+  mafPlugVMEMacro(mafVMEProber,"VME representing a prober");
+  //mafPlugVMEMacro(mafVMEGizmo,"VME representing a tool");
+  mafPlugVMEMacro(mafVMEPointSet,"VME representing a set of points");
+  mafPlugVMEMacro(mafVMERefSys,"VME representing a reference system");
+  mafPlugVMEMacro(mafVMEScalar,"VME representing time varying scalar values");
 #ifdef MAF_USE_ITK
-  mafPlugNodeMacro(mafVMEScalarMatrix,"VME representing time varying scalar values");
+  mafPlugVMEMacro(mafVMEScalarMatrix,"VME representing time varying scalar values");
 #endif
-  mafPlugNodeMacro(mafVMESlicer,"VME representing a slice of a volume");
-  mafPlugNodeMacro(mafVMEVector,"VME representing aa applyed vector");
+  mafPlugVMEMacro(mafVMESlicer,"VME representing a slice of a volume");
+  mafPlugVMEMacro(mafVMEVector,"VME representing aa applyed vector");
 
 
   //mafPlugObjectMacro(mmaObject,"Object attributes");
   mafPlugObjectMacro(mafAttributeSegmentationVolume,"Segmentation Volume attributes");
 
-  mafPlugNodeMacro(mafVMEWrappedMeter,"Generalized VME Meter with wrapping geometry");
-  mafPlugNodeMacro(mafVMEPolylineGraph,"VME for Graph and Polyline");
-  mafPlugNodeMacro(mafVMEPolylineEditor,"VME for Editing Graph and Polyline");
-  mafPlugNodeMacro(mafVMESurfaceEditor,"VME for Editing Surface");
-  mafPlugNodeMacro(mafVMELabeledVolume,"VME representing a label put on a volume");
-  mafPlugNodeMacro(mafVMEMaps, "VME representing density-distace surface scalars");
-  mafPlugNodeMacro(mafVMESegmentationVolume, "VME for Segmented Volume");
+  mafPlugVMEMacro(mafVMEWrappedMeter,"Generalized VME Meter with wrapping geometry");
+  mafPlugVMEMacro(mafVMEPolylineGraph,"VME for Graph and Polyline");
+  mafPlugVMEMacro(mafVMEPolylineEditor,"VME for Editing Graph and Polyline");
+  mafPlugVMEMacro(mafVMESurfaceEditor,"VME for Editing Surface");
+  mafPlugVMEMacro(mafVMELabeledVolume,"VME representing a label put on a volume");
+  mafPlugVMEMacro(mafVMEMaps, "VME representing density-distace surface scalars");
+  mafPlugVMEMacro(mafVMESegmentationVolume, "VME for Segmented Volume");
 
 #ifdef MAF_USE_ITK
-  mafPlugNodeMacro(mafVMERawMotionData,"VME that is a group for RawMotionData");
-  mafPlugNodeMacro(mafVMEAnalog,"VME rapresenting EMG scalar data");
-  mafPlugNodeMacro(mafVMEStent,"VME representing stent structure");
+  mafPlugVMEMacro(mafVMERawMotionData,"VME that is a group for RawMotionData");
+  mafPlugVMEMacro(mafVMEAnalog,"VME rapresenting EMG scalar data");
+  mafPlugVMEMacro(mafVMEStent,"VME representing stent structure");
 #endif
-  //mafPlugNodeMacro(mafVMEthing,"VME representing a thing");
+  //mafPlugVMEMacro(mafVMEthing,"VME representing a thing");
 
   //TODO: to be committed down
-  mafPlugNodeMacro(mafVMEVolumeLarge, "VME storing large volume datasets with one scalar component");
+  mafPlugVMEMacro(mafVMEVolumeLarge, "VME storing large volume datasets with one scalar component");
 }
 
 //------------------------------------------------------------------------------
 const char* mafVMEFactory::GetMAFSourceVersion() const
-//------------------------------------------------------------------------------
 {
   return MAF_SOURCE_VERSION;
 }
 
 //------------------------------------------------------------------------------
 const char* mafVMEFactory::GetDescription() const
-//------------------------------------------------------------------------------
 {
   return "Factory for MAF VMEs";
 }
 
 //------------------------------------------------------------------------------
 mafVME *mafVMEFactory::CreateVMEInstance(const char *type_name)
-//------------------------------------------------------------------------------
 {
   return mafVME::SafeDownCast(Superclass::CreateInstance(type_name));
 }
 //------------------------------------------------------------------------------
-mafVMEFactory* mafVMEFactory::GetInstance()
-//------------------------------------------------------------------------------
+void mafVMEFactory::RegisterNewVME(const char* node_name, const char* description, mafCreateObjectFunction createFunction)
 {
-  static mafVMEFactory &istance = *(mafVMEFactory::New());
-  Initialize();
-  return &istance;
+	std::vector<std::string, std::allocator<std::string> >::const_iterator it = std::find(GetNodeNames().begin(), GetNodeNames().end(), std::string(node_name));
+	if (it != GetNodeNames().end())
+	{
+		return;
+	}
+	GetNodeNames().push_back(node_name);
+	RegisterNewObject(node_name, description, createFunction);
 }
-// //------------------------------------------------------------------------------
-// void mafVMEFactory::RegisterNewNode(const char* node_name, const char* description, mafCreateObjectFunction createFunction)
-// //------------------------------------------------------------------------------
-// {
-//   std::vector<std::string, std::allocator<std::string> >::const_iterator it = std::find(GetNodeNames().begin (), GetNodeNames().end (), std::string(node_name));
-//   if(it != GetNodeNames().end() )
-//   {
-//     return;
-//   }
-//   GetNodeNames().push_back(node_name);
-//   RegisterNewObject(node_name,description,createFunction);
-// }
-// //------------------------------------------------------------------------------
-// std::vector<std::string> & mafVMEFactory::GetNodeNames()
-// //------------------------------------------------------------------------------
-// {
-//   static std::vector<std::string> nodeNames;
-//   return nodeNames;
-// }
+//------------------------------------------------------------------------------
+mafVMEFactory* mafVMEFactory::GetInstance()
+{
+	static mafVMEFactory &istance = *(mafVMEFactory::New());
+	Initialize();
+	return &istance;
+}
+//------------------------------------------------------------------------------
+std::vector<std::string> & mafVMEFactory::GetNodeNames()
+{
+	static std::vector<std::string> nodeNames;
+	return nodeNames;
+}

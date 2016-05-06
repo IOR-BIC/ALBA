@@ -41,7 +41,7 @@ void mafOpGarbageCollectMSFDirTest::TestOpRun()
 //---------------------------------------------------------
 {
   // Create useless files to be removed by the garbage collector
-  wxString sourceFile1 = wxString(MAF_DATA_ROOT) + "\\Test_GarbageCollectMSFDir\\TestMSF\\TestMSF.50.vtk";
+  wxString sourceFile1 = wxString(MAF_DATA_ROOT) + "\\Test_GarbageCollectMSFDir\\TestMSF\\TestMSF.6.vtk";
   CPPUNIT_ASSERT(wxFileExists(sourceFile1));
 
   wxString targetFakeFile1 = wxString(MAF_DATA_ROOT) + "\\Test_GarbageCollectMSFDir\\TestMSF\\Alien.vtk";
@@ -91,7 +91,7 @@ void mafOpGarbageCollectMSFDirTest::TestGarbageCollect()
 //---------------------------------------------------------
 {
   // Create useless files to be removed by the garbage collector
-  wxString sourceFile1 = wxString(MAF_DATA_ROOT) + "\\Test_GarbageCollectMSFDir\\TestMSF\\TestMSF.50.vtk";
+  wxString sourceFile1 = wxString(MAF_DATA_ROOT) + "\\Test_GarbageCollectMSFDir\\TestMSF\\TestMSF.6.vtk";
   CPPUNIT_ASSERT(wxFileExists(sourceFile1));
 
   wxString targetFakeFile1 = wxString(MAF_DATA_ROOT) + "\\Test_GarbageCollectMSFDir\\TestMSF\\Alien.vtk";

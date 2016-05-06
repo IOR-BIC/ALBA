@@ -84,7 +84,7 @@ mafGizmoScaleIsotropic::mafGizmoScaleIsotropic(mafVME *input, mafObserver *liste
   this->SetColor(0, 1, 1);
 
   //-----------------
-  m_CubeGizmo->ReparentTo(mafVME::SafeDownCast(m_InputVme->GetRoot()));
+  m_CubeGizmo->ReparentTo(m_InputVme->GetRoot());
 }
 //----------------------------------------------------------------------------
 mafGizmoScaleIsotropic::~mafGizmoScaleIsotropic() 

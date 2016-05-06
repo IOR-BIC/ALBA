@@ -19,7 +19,7 @@
 
 #include "mafOp.h"
 #include "mafMatrix.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafVMESegmentationVolume.h"
 #include "mafDefines.h"
 #include "vtkSystemIncludes.h"
@@ -50,7 +50,7 @@ class mafMatrix;
 class mafVMEVolumeGray;
 class mafVME;
 class mafVMEImage;
-class mafNode;
+class mafVME;
 
 class mmiSelectPoint;
 
@@ -201,7 +201,7 @@ public:
   mafOp* Copy();
 
   /** Return true for the acceptable vme type. */
-  bool Accept(mafNode *node);
+  bool Accept(mafVME*node);
 
   /** Builds operation's interface. */
   void OpRun();
@@ -213,10 +213,10 @@ public:
   void OpUndo();
 
   /** Return true if node is of type mafVMESegmentationVolume. */
-  static bool SegmentationVolumeAccept(mafNode* node) {return(node != NULL  && node->IsMAFType(mafVMESegmentationVolume));};
+  static bool SegmentationVolumeAccept(mafVME* node) {return(node != NULL  && node->IsMAFType(mafVMESegmentationVolume));};
 
   /** Return true if node is of type mafVMEVolume. */
-  static bool SegmentedVolumeAccept(mafNode* node);
+  static bool SegmentedVolumeAccept(mafVME* node);
 
   /** Returns the output Volume*/
   mafVMEVolumeGray *GetOutputVolume(){return m_OutputVolume;};
@@ -375,7 +375,7 @@ protected:
   mafGUI *m_SegmentationOperationsGui[5]; //<Steps gui
   wxComboBox *m_OperationsList;         //<List if operations (not used)
   mafInteractor *m_OldBehavior;         //<Old volume behavior
-  mafNode *m_OldVolumeParent;           //<Old volume parent
+  mafVME *m_OldVolumeParent;           //<Old volume parent
   mafDeviceButtonsPadMouseDialog* m_DialogMouse; //<Dialog mouse
   mafDeviceManager *m_DeviceManager;    //<Device manager
   mafInteractorSER *m_SER;              //<Static event router                        
@@ -602,10 +602,10 @@ protected:
   wxGauge *m_ProgressBar; //< display progress
 
   /** Delete children of input vme if they are output of the input volume  */
-  void DeleteOutputs(mafNode* vme);
+  void DeleteOutputs(mafVME* vme);
 
   /** Determine if the specified vme is an output of the input volume */
-  bool IsOutput(mafNode* vme);
+  bool IsOutput(mafVME* vme);
 
   /** flood fill algorithm */
   void FloodFill(vtkIdType seed);

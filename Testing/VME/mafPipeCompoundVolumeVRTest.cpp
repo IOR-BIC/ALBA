@@ -97,7 +97,6 @@ void mafPipeCompoundVolumeVRTest::TestCreateSceneNode()
   DummyPipeCompoundVolumeVR *pipe = new DummyPipeCompoundVolumeVR;
   pipe->Create(sceneNode);
 
-  delete pipe;
   delete sceneNode;
   mafDEL(volume);
 }
@@ -120,7 +119,6 @@ void mafPipeCompoundVolumeVRTest::TestGetCurrentScalarVisualPipe()
   //smoke test
   CPPUNIT_ASSERT(pipe->GetCurrentScalarVisualPipe() == NULL);
 
-  delete pipe;
   delete sceneNode;
   mafDEL(volume);
 

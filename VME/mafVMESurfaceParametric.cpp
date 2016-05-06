@@ -139,7 +139,7 @@ mmaMaterial *mafVMESurfaceParametric::GetMaterial()
 }
 
 //-------------------------------------------------------------------------
-int mafVMESurfaceParametric::DeepCopy(mafNode *a)
+int mafVMESurfaceParametric::DeepCopy(mafVME *a)
 //-------------------------------------------------------------------------
 { 
   if (Superclass::DeepCopy(a)==MAF_OK)

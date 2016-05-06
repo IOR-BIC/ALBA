@@ -67,8 +67,8 @@ void mafOpDecomposeTimeVarVMETest::TestModeTimeStampsVME()
   int res = storage->Restore();
   CPPUNIT_ASSERT(res == MAF_OK);
  
-  mafNode *node = storage->GetRoot();
-  mafNode *oldNode = node->FindInTreeByName("C7");
+  mafVME *node = storage->GetRoot();
+  mafVME *oldNode = node->FindInTreeByName("C7");
 
   mafOpDecomposeTimeVarVME *decompose = new mafOpDecomposeTimeVarVME("decompose vme");
   decompose->TestModeOn();
@@ -79,8 +79,8 @@ void mafOpDecomposeTimeVarVMETest::TestModeTimeStampsVME()
   decompose->SelectMode(mafOpDecomposeTimeVarVME::MODE_FRAMES);
   decompose->UpdateFrames();
 
-  mafNode *decomposedNode = decompose->GetOutput();
-  mafNode *newNode = decomposedNode->FindInTreeByName("C7_2.500");
+  mafVME *decomposedNode = decompose->GetOutput();
+  mafVME *newNode = decomposedNode->FindInTreeByName("C7_2.500");
 
   CPPUNIT_ASSERT(newNode->IsA("mafVMELandmark"));
 
@@ -130,8 +130,8 @@ void mafOpDecomposeTimeVarVMETest::TestModeIntervalVME()
   int res = storage->Restore();
   CPPUNIT_ASSERT(res == MAF_OK);
 
-  mafNode *node = storage->GetRoot();
-  mafNode *oldNode = node->FindInTreeByName("C7");
+  mafVME *node = storage->GetRoot();
+  mafVME *oldNode = node->FindInTreeByName("C7");
 
   mafOpDecomposeTimeVarVME *decompose = new mafOpDecomposeTimeVarVME("decompose vme");
   decompose->TestModeOn();
@@ -143,10 +143,10 @@ void mafOpDecomposeTimeVarVMETest::TestModeIntervalVME()
   decompose->SetInterval(from, to);
   decompose->UpdateFrames();
 
-  mafNode *decomposedNode = decompose->GetOutput();
-  mafNode *newNode0 = decomposedNode->FindInTreeByName("C7_2.500");
-  mafNode *newNode1= decomposedNode->FindInTreeByName("C7_2.510");
-  mafNode *newNode2 = decomposedNode->FindInTreeByName("C7_2.520");
+  mafVME *decomposedNode = decompose->GetOutput();
+  mafVME *newNode0 = decomposedNode->FindInTreeByName("C7_2.500");
+  mafVME *newNode1= decomposedNode->FindInTreeByName("C7_2.510");
+  mafVME *newNode2 = decomposedNode->FindInTreeByName("C7_2.520");
 
   CPPUNIT_ASSERT(newNode0->IsA("mafVMELandmark"));
   CPPUNIT_ASSERT(newNode1->IsA("mafVMELandmark"));
@@ -198,8 +198,8 @@ void mafOpDecomposeTimeVarVMETest::TestModePeriodicityVME()
   int res = storage->Restore();
   CPPUNIT_ASSERT(res == MAF_OK);
 
-  mafNode *node = storage->GetRoot();
-  mafNode *oldNode = node->FindInTreeByName("C7");
+  mafVME *node = storage->GetRoot();
+  mafVME *oldNode = node->FindInTreeByName("C7");
 
   mafOpDecomposeTimeVarVME *decompose = new mafOpDecomposeTimeVarVME("decompose vme");
   decompose->TestModeOn();
@@ -209,7 +209,7 @@ void mafOpDecomposeTimeVarVMETest::TestModePeriodicityVME()
   decompose->SetPeriodicity(50);
   decompose->UpdateFrames();
 
-  mafNode *decomposedNode = decompose->GetOutput();
+  mafVME *decomposedNode = decompose->GetOutput();
   mafVMELandmark *oldLandmark = mafVMELandmark::SafeDownCast(oldNode);
 
   int timeNumber = oldLandmark->GetNumberOfTimeStamps();

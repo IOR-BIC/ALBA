@@ -208,7 +208,7 @@ void mafOpValidateTreeTest::TestValidateTree_LinkNull()
   CPPUNIT_ASSERT ( storageImport->Restore() == MAF_OK );
 
  
-  mafNode::mafLinksMap *linksmap = storageImport->GetRoot()->GetChild(0)->GetChild(1)->GetChild(0)->GetLinks();
+  mafVME::mafLinksMap *linksmap = storageImport->GetRoot()->GetChild(0)->GetChild(1)->GetChild(0)->GetLinks();
   (*linksmap)["SlicedVME"] = mmuNodeLink(1000,NULL,-1);
   
   

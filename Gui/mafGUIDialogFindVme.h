@@ -52,10 +52,10 @@ public:
 
 protected:
   /** Find a node in all the subtrees matching the given VME Name.*/
-  mafNode *FindInTreeByName(mafNode *node, const char *name, bool match_case = true, bool whole_word = true);
+  mafVME *FindInTreeByName(mafVME *node, const char *name, bool match_case = true, bool whole_word = true);
 
   /** Check if a node has been found yet.*/
-  bool AlreadyFound(mafNode *n);
+  bool AlreadyFound(mafVME *n);
 
   mafGUI *m_Gui; ///< Gui variable used to plug custom widgets
   mafString m_SearchString; ///< The string to find into the VME tree.
@@ -63,6 +63,6 @@ protected:
   int m_WholeWord; ///< Enable the find only for exact matching VME names.
   mafGUICheckTree *m_Tree; ///< The VME tree.
   mafVMERoot *m_Root;
-  std::vector<mafNode*> m_NodeFoundList;
+  std::vector<mafVME*> m_NodeFoundList;
 };
 #endif

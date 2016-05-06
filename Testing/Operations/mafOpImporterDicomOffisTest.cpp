@@ -127,7 +127,7 @@ void mafOpImporterDicomOffisTest::TestCreateVolume()
 	    importer->GenerateSliceTexture(0);
 	    importer->BuildOutputVMEGrayVolumeFromDicom();
 	
-	    mafVME *VME=mafVME::SafeDownCast(importer->GetOutput());
+	    mafVME *VME=importer->GetOutput();
 	    VME->Update();
 	    CPPUNIT_ASSERT(VME!=NULL);
 	

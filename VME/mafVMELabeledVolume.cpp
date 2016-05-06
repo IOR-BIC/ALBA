@@ -30,7 +30,7 @@
 #include "mafGUIDialogPreview.h"
 #include "mmaMaterial.h"
 #include "mmaVolumeMaterial.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafTransform.h"
 #include "mafEventSource.h"
 #include "mafGUIButton.h"
@@ -138,13 +138,13 @@ mafVMELabeledVolume::~mafVMELabeledVolume()
 }
 
 //-------------------------------------------------------------------------
-int mafVMELabeledVolume::DeepCopy(mafNode *a)
+int mafVMELabeledVolume::DeepCopy(mafVME *a)
 //-------------------------------------------------------------------------
 { 
   if (Superclass::DeepCopy(a) == MAF_OK)
   {
     mafVMELabeledVolume *lab_volume = mafVMELabeledVolume::SafeDownCast(a);
-    mafNode *linked_node = lab_volume->GetLink("VolumeLink");
+    mafVME *linked_node = lab_volume->GetLink("VolumeLink");
     if (linked_node)
     {
       SetVolumeLink(linked_node);
@@ -184,7 +184,7 @@ void mafVMELabeledVolume::DeleteOpDialog()
 }
 
 //-------------------------------------------------------------------------
-void mafVMELabeledVolume::SetVolumeLink(mafNode *n)
+void mafVMELabeledVolume::SetVolumeLink(mafVME *n)
 //-------------------------------------------------------------------------
 {
   SetLink("VolumeLink", n);
@@ -196,7 +196,7 @@ void mafVMELabeledVolume::SetVolumeLink(mafNode *n)
 void mafVMELabeledVolume::InternalPreUpdate()
 //-------------------------------------------------------------------------
 {
-  m_VolumeLink = mafVME::SafeDownCast(GetVolumeLink());
+  m_VolumeLink = GetVolumeLink();
   EnableWidgets(m_VolumeLink != NULL);
 
   if (m_VolumeLink == NULL)
@@ -214,7 +214,7 @@ void mafVMELabeledVolume::InternalPreUpdate()
 void mafVMELabeledVolume::CopyDataset()
 //-------------------------------------------------------------------------
 {
-  m_VolumeLink = mafVME::SafeDownCast(GetVolumeLink());
+  m_VolumeLink = GetVolumeLink();
   if (m_VolumeLink)
   {
     vtkDataSet *data = m_VolumeLink->GetOutput()->GetVTKData();
@@ -272,7 +272,7 @@ void mafVMELabeledVolume::GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes)
   kframes.clear(); // no timestamps
 }
 //-------------------------------------------------------------------------
-mafNode *mafVMELabeledVolume::GetVolumeLink()
+mafVME *mafVMELabeledVolume::GetVolumeLink()
 //-------------------------------------------------------------------------
 {
   return GetLink("VolumeLink");
@@ -282,7 +282,7 @@ mafNode *mafVMELabeledVolume::GetVolumeLink()
 void mafVMELabeledVolume::UpdateScalars()
 //-------------------------------------------------------------------------
 {
-  m_VolumeLink = mafVME::SafeDownCast(GetVolumeLink());
+  m_VolumeLink = GetVolumeLink();
   EnableWidgets(m_VolumeLink != NULL);
   if (m_VolumeLink)
   {
@@ -469,14 +469,14 @@ int mafVMELabeledVolume::InternalRestore(mafStorageElement *node)
 mafGUI* mafVMELabeledVolume::CreateGui()
 //----------------------------------------------------------------------------
 {
-  m_VolumeLink = mafVME::SafeDownCast(GetVolumeLink());
+  m_VolumeLink = GetVolumeLink();
   if (m_VolumeLink)
   {
     CopyDataset();
   }
  
   // GUI
-  m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
+  m_Gui = mafVME::CreateGui(); // Called to show info about vmes' type and name
   m_Gui->SetListener(this); 
 
   // Settings for the buttons that will control the list box
@@ -1013,7 +1013,7 @@ void mafVMELabeledVolume::OnEvent(mafEventBase *maf_event)
       }
       break;
       default:
-        mafNode::OnEvent(maf_event);
+        mafVME::OnEvent(maf_event);
     }
   }
   else
@@ -1246,7 +1246,7 @@ char** mafVMELabeledVolume::GetIcon()
 bool mafVMELabeledVolume::IsDataAvailable()
 //-------------------------------------------------------------------------
 {
-  mafVME *volume = mafVME::SafeDownCast(GetVolumeLink());
+  mafVME *volume = GetVolumeLink();
   if (volume != NULL)
   {
     return volume->IsDataAvailable();

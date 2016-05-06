@@ -45,13 +45,13 @@ public:
 	mafSceneGraph *GetSceneGraph();
   mafRWIBase    *GetDefaultRWI();
 
-  void VmeAdd   (mafNode *vme);
-	void VmeRemove(mafNode *vme);
-	void VmeSelect(mafNode *vme, bool select);
-	void VmeShow  (mafNode *vme, bool show);
-	void VmeUpdateProperty(mafNode*n, bool fromTag = false) 	{};
-  void VmeCreatePipe(mafNode *vme);
-  void VmeDeletePipe(mafNode *vme)                           {};
+  void VmeAdd   (mafVME *vme);
+	void VmeRemove(mafVME *vme);
+	void VmeSelect(mafVME *vme, bool select);
+	void VmeShow  (mafVME *vme, bool show);
+	void VmeUpdateProperty(mafVME *vme, bool fromTag = false) 	{};
+  void VmeCreatePipe(mafVME *vme);
+  void VmeDeletePipe(mafVME *vme)                           {};
 
 	void OnEvent(mafEventBase *maf_event);
 
@@ -67,7 +67,7 @@ public:
 protected:
   mafRWI	      *m_Rwi;
   mafSceneGraph *m_Sg;
-  mafNode        *m_ActiveNote;
+  mafVME        *m_ActiveNote;
 
   void  OnLoad();
   void  OnForward();

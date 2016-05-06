@@ -120,7 +120,7 @@ mafOpMakeVMETimevarying::~mafOpMakeVMETimevarying()
   mafDEL(m_VMETimevarying);
 }
 //----------------------------------------------------------------------------
-bool mafOpMakeVMETimevarying::Accept(mafNode* vme) 
+bool mafOpMakeVMETimevarying::Accept(mafVME* vme) 
 //----------------------------------------------------------------------------
 {
 	mafEvent e(this,VIEW_SELECTED);
@@ -245,7 +245,7 @@ void mafOpMakeVMETimevarying::OnEvent(mafEventBase *maf_event)
         mafEventMacro(e);
         
         //mafNEW(m_CurrentVME);
-        m_CurrentVME = mafVME::SafeDownCast(e.GetVme());
+        m_CurrentVME = e.GetVme();
         bool VMEOk = AcceptVME(m_CurrentVME);
         if(m_CurrentVME)
         {

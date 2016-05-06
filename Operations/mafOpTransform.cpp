@@ -124,7 +124,7 @@ mafOp* mafOpTransform::Copy()
 	return new mafOpTransform(m_Label);
 }
 //----------------------------------------------------------------------------
-bool mafOpTransform::Accept(mafNode *node)
+bool mafOpTransform::Accept(mafVME *node)
 //----------------------------------------------------------------------------
 {
 	bool accepted = false;
@@ -151,15 +151,15 @@ void mafOpTransform::OpRun()
 {
 	assert(m_Input);
 
-	m_CurrentTime = ((mafVME *)m_Input)->GetTimeStamp();
-	m_NewAbsMatrix = *((mafVME *)m_Input)->GetOutput()->GetAbsMatrix();
-	m_OldAbsMatrix = *((mafVME *)m_Input)->GetOutput()->GetAbsMatrix();
+	m_CurrentTime = m_Input->GetTimeStamp();
+	m_NewAbsMatrix = *m_Input->GetOutput()->GetAbsMatrix();
+	m_OldAbsMatrix = *m_Input->GetOutput()->GetAbsMatrix();
 
 	// Create aux transform VME
 	mafNEW(m_TransformVME);
 
 	vtkMAFSmartPointer<vtkOutlineCornerFilter> corner;
-	corner->SetInput(((mafVME *)m_Input)->GetOutput()->GetVTKData());
+	corner->SetInput(m_Input->GetOutput()->GetVTKData());
 	corner->Update();
 
 	// Set default gray color
@@ -193,7 +193,7 @@ void mafOpTransform::OpRun()
 		ShowGui();
 	}
 
-	SetRefSysVME(mafVME::SafeDownCast(m_Input->GetRoot()));
+	SetRefSysVME(m_Input->GetRoot());
 	UpdateTransformTextEntries();
 }
 
@@ -208,7 +208,7 @@ void mafOpTransform::OpDo()
 void mafOpTransform::OpUndo()
 //----------------------------------------------------------------------------
 {
-	((mafVME *)m_Input)->SetAbsMatrix(m_OldAbsMatrix);
+	m_Input->SetAbsMatrix(m_OldAbsMatrix);
 
 	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 }
@@ -280,15 +280,15 @@ void mafOpTransform::CreateGui()
 	//---------------------------------
 
 	// Translation Gizmo Gui
-	m_GizmoTranslate = new mafGizmoTranslate(mafVME::SafeDownCast(m_TransformVME), this);
+	m_GizmoTranslate = new mafGizmoTranslate(m_TransformVME, this);
 	m_GizmoTranslate->Show(true);
 
 	// Rotation Gizmo Gui
-	m_GizmoRotate = new mafGizmoRotate(mafVME::SafeDownCast(m_TransformVME), this);
+	m_GizmoRotate = new mafGizmoRotate(m_TransformVME, this);
 	m_GizmoRotate->Show(false);
 
 	// Scale Gizmo Gui
-	m_GizmoScale = new mafGizmoScale(mafVME::SafeDownCast(m_TransformVME), this);
+	m_GizmoScale = new mafGizmoScale(m_TransformVME, this);
 	m_GizmoScale->Show(false);
 
 	m_Gui->Divider(2);
@@ -410,7 +410,7 @@ void mafOpTransform::OnEvent(mafEventBase *maf_event)
 		else if (m_RefSystemMode == REF_ARBITRARY)
 		{
 			m_ArbitraryRefSysVME->SetAbsPose(m_OriginRefSysPosition[0], m_OriginRefSysPosition[1], m_OriginRefSysPosition[2], 0, 0, 0, m_CurrentTime);
-			SetRefSysVME(mafVME::SafeDownCast(m_ArbitraryRefSysVME));
+			SetRefSysVME(m_ArbitraryRefSysVME);
 			UpdateTransformTextEntries();
 			mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 		}
@@ -463,7 +463,7 @@ void mafOpTransform::SelectRefSys()
 	{
 	case REF_ABSOLUTE:
 	{
-		SetRefSysVME(mafVME::SafeDownCast(m_Input->GetRoot()));
+		SetRefSysVME(m_Input->GetRoot());
 	}
 	break;
 
@@ -477,7 +477,7 @@ void mafOpTransform::SelectRefSys()
 	{
 		// Calculate centroid of VME using bounds 
 		double bounds[6];
-		((mafVME *)m_TransformVME)->GetOutput()->GetVMEBounds(bounds);
+		m_TransformVME->GetOutput()->GetVMEBounds(bounds);
 		m_LocalCenterRefSysVME->SetAbsPose((bounds[0] + bounds[1]) / 2.0, (bounds[2] + bounds[3]) / 2.0, (bounds[4] + bounds[5]) / 2.0, 0, 0, 0, m_CurrentTime);
 		SetRefSysVME(m_LocalCenterRefSysVME);
 	}
@@ -503,7 +503,7 @@ void mafOpTransform::SelectRefSys()
 
 		// Calculate centroid of VME using bounds 
 		double bounds[6];
-		((mafVME *)m_RelativeRefSysVME)->GetOutput()->GetVMEBounds(bounds);
+		m_RelativeRefSysVME->GetOutput()->GetVMEBounds(bounds);
 		m_RelativeCenterRefSysVME->SetAbsPose((bounds[0] + bounds[1]) / 2.0, (bounds[2] + bounds[3]) / 2.0, (bounds[4] + bounds[5]) / 2.0, 0, 0, 0, m_CurrentTime);
 
 		SetRefSysVME(m_RelativeCenterRefSysVME);
@@ -534,7 +534,7 @@ void mafOpTransform::ChooseRelativeRefSys()
 	mafEvent e(this, VME_CHOOSE, &s);
 	mafEventMacro(e);
 
-	SetRefSysVME(mafVME::SafeDownCast(e.GetVme()));
+	SetRefSysVME(e.GetVme());
 
 	m_RelativeRefSysVME = (mafVMEPolyline *)m_RefSysVME;
 	m_RefSysVMEName = m_RefSysVME->GetName();
@@ -568,7 +568,7 @@ void mafOpTransform::OnEventTransformGizmo(mafEventBase *maf_event)
 
 	if (!m_UpdateAfterRelease || arg == mafInteractorGenericMouse::MOUSE_UP)
 	{
-		((mafVME *)m_Input)->SetAbsMatrix(*m_TransformVME->GetOutput()->GetAbsMatrix());
+		m_Input->SetAbsMatrix(*m_TransformVME->GetOutput()->GetAbsMatrix());
 	}
 
 	if (arg == mafInteractorGenericMouse::MOUSE_UP)
@@ -576,7 +576,7 @@ void mafOpTransform::OnEventTransformGizmo(mafEventBase *maf_event)
 		if (m_RefSystemMode == REF_RELATIVE_CENTER)
 		{
 			double bounds[6];
-			((mafVME *)m_RelativeRefSysVME)->GetOutput()->GetVMEBounds(bounds);
+			m_RelativeRefSysVME->GetOutput()->GetVMEBounds(bounds);
 			m_RelativeCenterRefSysVME->SetAbsPose((bounds[0] + bounds[1]) / 2.0, (bounds[2] + bounds[3]) / 2.0, (bounds[4] + bounds[5]) / 2.0, 0, 0, 0, m_CurrentTime);
 
 			SetRefSysVME(m_RelativeCenterRefSysVME);
@@ -585,7 +585,7 @@ void mafOpTransform::OnEventTransformGizmo(mafEventBase *maf_event)
 		if (m_RefSystemMode == REF_CENTER)
 		{
 			double bounds[6];
-			((mafVME *)m_TransformVME)->GetOutput()->GetVMEBounds(bounds);
+			m_TransformVME->GetOutput()->GetVMEBounds(bounds);
 			m_LocalCenterRefSysVME->SetAbsPose((bounds[0] + bounds[1]) / 2.0, (bounds[2] + bounds[3]) / 2.0, (bounds[4] + bounds[5]) / 2.0, 0, 0, 0, m_CurrentTime);
 
 			SetRefSysVME(m_LocalCenterRefSysVME);
@@ -607,7 +607,7 @@ void mafOpTransform::PostMultiplyEventMatrix(mafEventBase *maf_event)
 		// handle incoming transform events
 		vtkTransform *tr = vtkTransform::New();
 		tr->PostMultiply();
-		tr->SetMatrix(((mafVME *)m_TransformVME)->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
+		tr->SetMatrix(m_TransformVME->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
 		tr->Concatenate(e->GetMatrix()->GetVTKMatrix());
 		tr->Update();
 
@@ -618,7 +618,7 @@ void mafOpTransform::PostMultiplyEventMatrix(mafEventBase *maf_event)
 		if (arg == mafInteractorGenericMouse::MOUSE_MOVE)
 		{
 			// move vme
-			((mafVME *)m_TransformVME)->SetAbsMatrix(absPose);
+			m_TransformVME->SetAbsMatrix(absPose);
 			// update matrix for OpDo()
 			m_NewAbsMatrix = absPose;
 		}
@@ -650,7 +650,7 @@ void mafOpTransform::OnEventTransformTextEntries(mafEventBase *maf_event)
 
 	m_NewAbsMatrix = absPose;
 
-	((mafVME *)m_Input)->SetAbsMatrix(m_NewAbsMatrix, m_CurrentTime);
+	m_Input->SetAbsMatrix(m_NewAbsMatrix, m_CurrentTime);
 	m_TransformVME->SetAbsMatrix(m_NewAbsMatrix, m_CurrentTime);
 
 	// Notify the listener about the new abs pose
@@ -665,7 +665,7 @@ void mafOpTransform::OnEventTransformTextEntries(mafEventBase *maf_event)
 void mafOpTransform::Reset()
 //----------------------------------------------------------------------------
 {
-	((mafVME *)m_Input)->SetAbsMatrix(m_OldAbsMatrix, m_CurrentTime);
+	m_Input->SetAbsMatrix(m_OldAbsMatrix, m_CurrentTime);
 	m_TransformVME->SetAbsMatrix(m_OldAbsMatrix, m_CurrentTime);
 
 	SelectRefSys();

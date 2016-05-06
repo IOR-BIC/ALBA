@@ -76,7 +76,7 @@ public:
   };
 
   /** Callback used to choose a node type mafVMEImage to be used as a texture to apply on the polydata.*/
-  static bool ImageAccept(mafNode *node) {return(node != NULL && node->IsMAFType(mafVMEImage));};
+  static bool ImageAccept(mafVME*node) {return(node != NULL && node->IsMAFType(mafVMEImage));};
 
   /** Set the actor picking*/
   void SetActorPicking(int enable = true);

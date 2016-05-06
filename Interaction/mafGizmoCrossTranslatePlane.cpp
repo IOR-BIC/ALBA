@@ -150,7 +150,7 @@ mafGizmoCrossTranslatePlane::mafGizmoCrossTranslatePlane(mafVME *input, mafObser
 	// add the gizmo to the tree, this should increase reference count 
 	for (i = 0; i < NUM_GIZMO_PARTS; i++)
 	{
-		m_Gizmo[i]->ReparentTo(mafVME::SafeDownCast(m_InputVme->GetRoot()));
+		m_Gizmo[i]->ReparentTo(m_InputVme->GetRoot());
 	}
 
 	CreateFeedbackGizmoPipeline();

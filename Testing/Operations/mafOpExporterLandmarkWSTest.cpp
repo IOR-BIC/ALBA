@@ -71,8 +71,6 @@ void mafOpExporterLandmarkWSTest::TestOnLandmarkImporter()
 	mafVMELandmarkCloud *node_WS=(mafVMELandmarkCloud *)importerWS->GetOutput();
 
 
-	((mafVMELandmarkCloud *)node)->Open();
-  ((mafVMELandmarkCloud *)node_WS)->Open();
 
 	int result = MAF_OK;
 	std::vector<double *> coord;
@@ -81,14 +79,11 @@ void mafOpExporterLandmarkWSTest::TestOnLandmarkImporter()
   int numberOfLandmarks = ((mafVMELandmarkCloud *)node)->GetNumberOfLandmarks();
 	for(int j=0 ; j < numberOfLandmarks; j++)
 	{
-		mafVMELandmark *landmark = ((mafVMELandmark *)((mafVMELandmarkCloud *)node)->GetLandmark(j));
+		mafVMELandmark *landmark = ((mafVMELandmarkCloud *)node)->GetLandmark(j);
 		double *xyz = new double[3];
 		double rot[3];
 		landmark->GetOutput()->GetPose(xyz , rot , 0);
 		coord.push_back(xyz);
-		coord[coord.size()-1][0] = xyz[0];
-		coord[coord.size()-1][1] = xyz[1];
-		coord[coord.size()-1][2] = xyz[2];
 	}
 
   numberOfLandmarks = ((mafVMELandmarkCloud *)node_WS)->GetNumberOfLandmarks();
@@ -99,9 +94,6 @@ void mafOpExporterLandmarkWSTest::TestOnLandmarkImporter()
 		double rot[3];
 		landmark->GetOutput()->GetPose(xyz , rot , 0);
 		coord_WS.push_back(xyz);
-		coord_WS[coord_WS.size()-1][0] = xyz[0];
-		coord_WS[coord_WS.size()-1][1] = xyz[1];
-		coord_WS[coord_WS.size()-1][2] = xyz[2];
 	}
 
   CPPUNIT_ASSERT(coord.size()==coord_WS.size());

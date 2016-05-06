@@ -129,7 +129,7 @@ mafGizmoCrossTranslateAxis::mafGizmoCrossTranslateAxis(mafVME *input, mafObserve
 
 	// ReparentTo will add the gizmos to the tree
 	// and increse reference count
-	m_TranslationCylinderGizmo->ReparentTo(mafVME::SafeDownCast(m_InputVme->GetRoot()));
+	m_TranslationCylinderGizmo->ReparentTo(m_InputVme->GetRoot());
 
 	// build translation feedback gizmo stuff
 	CreateFeedbackGizmoPipeline();

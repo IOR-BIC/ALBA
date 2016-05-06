@@ -26,7 +26,7 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mafNode;
+class mafVME;
 class vtkImageReader;
 class vtkActor;
 class mafGUIDialogPreview;
@@ -58,7 +58,7 @@ public:
     DOUBLE_SCALAR
   };
 
-	bool Accept(mafNode *node) {return true;};
+	bool Accept(mafVME*node) {return true;};
 
 	void OpRun();
 

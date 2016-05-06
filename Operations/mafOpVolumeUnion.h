@@ -17,7 +17,7 @@
 #ifndef __mafOpVolumeUnion_H__
 #define __mafOpVolumeUnion_H__
 
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafOp.h"
 #include "mafVMEVolume.h"
 //----------------------------------------------------------------------------
@@ -54,11 +54,11 @@ public:
 
   mafTypeMacro(mafOpVolumeUnion, mafOp);
 
-  static bool VmeUnionAccept(mafNode *node) {return(node != NULL && (node->IsMAFType(mafVMEVolume)));};
+  static bool VmeUnionAccept(mafVME*node) {return(node != NULL && (node->IsMAFType(mafVMEVolume)));};
 
   mafOp* Copy();
 
-  /*virtual*/ bool Accept(mafNode* node);
+  /*virtual*/ bool Accept(mafVME* node);
   /*virtual*/ void OpRun();	
 	
   /** Makes the undo for the operation. */

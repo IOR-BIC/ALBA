@@ -65,7 +65,7 @@ public:
 	virtual void OnEvent(mafEventBase *maf_event);
 
 	/** Return true for the acceptable vme type. */
-	bool Accept(mafNode *node);
+	bool Accept(mafVME *node);
 
 	/** Set the input Ansys file */
 	void SetFileName(const char *ansysInputFileNameFullPath) {m_AnsysInputFileNameFullPath = ansysInputFileNameFullPath;};

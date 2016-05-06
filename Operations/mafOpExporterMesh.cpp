@@ -58,11 +58,11 @@ mafOpExporterMesh::~mafOpExporterMesh()
 {
 }
 //----------------------------------------------------------------------------
-bool mafOpExporterMesh::Accept(mafNode *node)
+bool mafOpExporterMesh::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
   // Accept a mafVMEMesh as input
-  return (node && ((mafVME *)node)->GetOutput()->IsMAFType(mafVMEOutputMesh));;
+  return (node && node->GetOutput()->IsMAFType(mafVMEOutputMesh));;
 }
 //----------------------------------------------------------------------------
 mafOp* mafOpExporterMesh::Copy()   
@@ -126,7 +126,7 @@ int mafOpExporterMesh::Write()
 	
   // Create the writer and pass the file name
   mafVMEMeshAnsysTextExporter *writer = new mafVMEMeshAnsysTextExporter;
-  writer->SetInput((vtkUnstructuredGrid*)((mafVME*)(m_Input))->GetOutput()->GetVTKData());
+  writer->SetInput((vtkUnstructuredGrid*)m_Input->GetOutput()->GetVTKData());
   writer->SetOutputNodesFileName(m_NodesFileName.GetCStr());
   writer->SetOutputElementsFileName(m_ElementsFileName.GetCStr());
   writer->SetOutputMaterialsFileName(m_MaterialsFileName.GetCStr());

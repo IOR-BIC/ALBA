@@ -81,7 +81,7 @@ mafOpScaleDataset::~mafOpScaleDataset()
   cppDEL(m_GuiSaveRestorePose);
 }
 //----------------------------------------------------------------------------
-bool mafOpScaleDataset::Accept(mafNode* vme)
+bool mafOpScaleDataset::Accept(mafVME* vme)
 //----------------------------------------------------------------------------
 {
 	return (vme!=NULL && vme->IsMAFType(mafVME) && !vme->IsA("mafVMERoot") && !vme->IsA("mafVMEExternalData"));
@@ -103,10 +103,10 @@ void mafOpScaleDataset::OpRun()
   }
 
   assert(m_Input);
-  m_CurrentTime = ((mafVME *)m_Input)->GetTimeStamp();
+  m_CurrentTime = m_Input->GetTimeStamp();
 
-  m_NewAbsMatrix = *((mafVME *)m_Input)->GetOutput()->GetAbsMatrix();
-  m_OldAbsMatrix = *((mafVME *)m_Input)->GetOutput()->GetAbsMatrix();
+  m_NewAbsMatrix = *m_Input->GetOutput()->GetAbsMatrix();
+  m_OldAbsMatrix = *m_Input->GetOutput()->GetAbsMatrix();
 
   if (!m_TestMode)
   {
@@ -148,7 +148,7 @@ void mafOpScaleDataset::OpDo()
 void mafOpScaleDataset::OpUndo()
 //----------------------------------------------------------------------------
 {  
-	((mafVME *)m_Input)->SetAbsMatrix(m_OldAbsMatrix);
+	m_Input->SetAbsMatrix(m_OldAbsMatrix);
   mafEventMacro(mafEvent(this,CAMERA_UPDATE)); 
 }
 //----------------------------------------------------------------------------
@@ -210,7 +210,7 @@ void mafOpScaleDataset::OnEventThis(mafEventBase *maf_event)
 		s << "Choose VME ref sys";
 		mafEvent e(this,VME_CHOOSE, &s);
 		mafEventMacro(e);
-		SetRefSysVME(mafVME::SafeDownCast(e.GetVme()));
+		SetRefSysVME(e.GetVme());
 	}
 	break;
 
@@ -229,7 +229,7 @@ void mafOpScaleDataset::OnEventGizmoScale(mafEventBase *maf_event)
 	{
     case ID_TRANSFORM:
   	{ 
-      m_NewAbsMatrix = *((mafVME *)m_Input)->GetOutput()->GetAbsMatrix();
+      m_NewAbsMatrix = *m_Input->GetOutput()->GetAbsMatrix();
       mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 	  }
     break;
@@ -283,7 +283,7 @@ void mafOpScaleDataset::CreateGui()
   //---------------------------------
   // Scaling Gizmo Gui
   //---------------------------------
-  m_GizmoScale = new mafGizmoScale(mafVME::SafeDownCast(m_Input), this);
+  m_GizmoScale = new mafGizmoScale(m_Input, this);
   m_GizmoScale->Show(false);
 
   // add scaling gizmo gui to operation
@@ -292,7 +292,7 @@ void mafOpScaleDataset::CreateGui()
   //---------------------------------
   // Store/Restore position Gui
   //---------------------------------
-  m_GuiSaveRestorePose = new mafGUISaveRestorePose(mafVME::SafeDownCast(m_Input), this);
+  m_GuiSaveRestorePose = new mafGUISaveRestorePose(m_Input, this);
   
   // add Gui to operation
   m_Gui->AddGui(m_GuiSaveRestorePose->GetGui());
@@ -304,7 +304,7 @@ void mafOpScaleDataset::CreateGui()
 
   if(this->m_RefSysVME == NULL)
   {
-    SetRefSysVME(mafVME::SafeDownCast(m_Input));
+    SetRefSysVME(m_Input);
     m_RefSysVMEName = m_Input->GetName();
   }
   m_Gui->Label("refsys name: ",&m_RefSysVMEName);
@@ -329,8 +329,8 @@ void mafOpScaleDataset::CreateGui()
 void mafOpScaleDataset::Reset()
 //----------------------------------------------------------------------------
 {
-  ((mafVME *)m_Input)->SetAbsMatrix(m_OldAbsMatrix);  
-  SetRefSysVME(mafVME::SafeDownCast(m_Input)); 
+  m_Input->SetAbsMatrix(m_OldAbsMatrix);  
+  SetRefSysVME(m_Input); 
   mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 }
 

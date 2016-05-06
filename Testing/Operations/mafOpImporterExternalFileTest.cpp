@@ -65,7 +65,7 @@ void mafOpImporterExternalFileTest::TestImporter()
   importer->SetFileName(filename.GetCStr());
   importer->OpRun();
 
-  mafNode *node = importer->GetOutput();
+  mafVME *node = importer->GetOutput();
   //Check if the VME is of the right kinnd
   bool type = node->IsA("mafVMEExternalData");
   CPPUNIT_ASSERT(type);

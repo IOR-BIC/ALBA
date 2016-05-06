@@ -140,46 +140,46 @@ void mafViewCompound::CreateGuiView()
   m_GuiView->Reparent(m_Win);*/
 }
 //----------------------------------------------------------------------------
-void mafViewCompound::VmeAdd(mafNode *node)
+void mafViewCompound::VmeAdd(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   for(int i=0; i<m_NumOfChildView; i++)
-    m_ChildViewList[i]->VmeAdd(node);
+    m_ChildViewList[i]->VmeAdd(vme);
 }
 //----------------------------------------------------------------------------
-void mafViewCompound::VmeRemove(mafNode *node)
+void mafViewCompound::VmeRemove(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   for(int i=0; i<m_NumOfChildView; i++)
-    m_ChildViewList[i]->VmeRemove(node);
+    m_ChildViewList[i]->VmeRemove(vme);
 }
 //----------------------------------------------------------------------------
-void mafViewCompound::VmeSelect(mafNode *node, bool select)
+void mafViewCompound::VmeSelect(mafVME *vme, bool select)
 //----------------------------------------------------------------------------
 {
   for(int i=0; i<m_NumOfChildView; i++)
-    m_ChildViewList[i]->VmeSelect(node, select);
+    m_ChildViewList[i]->VmeSelect(vme, select);
 }
 //----------------------------------------------------------------------------
-void mafViewCompound::VmeShow(mafNode *node, bool show)
+void mafViewCompound::VmeShow(mafVME *vme, bool show)
 //----------------------------------------------------------------------------
 {
   for(int i=0; i<m_NumOfChildView; i++)
-    m_ChildViewList[i]->VmeShow(node, show);
+    m_ChildViewList[i]->VmeShow(vme, show);
 }
 //----------------------------------------------------------------------------
-int mafViewCompound::GetNodeStatus(mafNode *node)
+int mafViewCompound::GetNodeStatus(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   // should be redefined for compounded views
-  return m_ChildViewList[m_DefauldChildView]->GetNodeStatus(node);
+  return m_ChildViewList[m_DefauldChildView]->GetNodeStatus(vme);
 }
 //----------------------------------------------------------------------------
-void mafViewCompound::CameraReset(mafNode *node)
+void mafViewCompound::CameraReset(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   for(int i=0; i<m_NumOfChildView; i++)
-    m_ChildViewList[i]->CameraReset(node);
+    m_ChildViewList[i]->CameraReset(vme);
 }
 //----------------------------------------------------------------------------
 void mafViewCompound::CameraUpdate()
@@ -212,38 +212,6 @@ bool mafViewCompound::FindPokedVme(mafDevice *device,mafMatrix &point_pose,vtkPr
   else
     return false;
 }
-/*//----------------------------------------------------------------------------
-mafPipe *mafViewCompound::GetNodePipe(mafNode *vme)
-//----------------------------------------------------------------------------
-{
-  mafSceneGraph *sg = ((mafViewVTK *)m_ChildViewList[m_DefauldChildView])->GetSceneGraph();
-  assert(sg);
-  mafSceneNode *n = sg->Vme2Node(vme);
-  if(!n) 
-    return NULL;
-  return n->m_Pipe;
-}
-//----------------------------------------------------------------------------
-mafGUI *mafViewCompound::GetNodePipeGUI(mafNode *vme)
-//----------------------------------------------------------------------------
-{
-  return GetNodePipeGUI(vme, m_DefauldChildView);
-}
-//----------------------------------------------------------------------------
-mafGUI *mafViewCompound::GetNodePipeGUI(mafNode *vme, int view_idx)
-//----------------------------------------------------------------------------
-{
-  mafSceneGraph *sg = ((mafViewVTK *)m_ChildViewList[view_idx])->GetSceneGraph();
-  assert(sg);
-  mafSceneNode *n = sg->Vme2Node(vme);
-  if(!n) 
-    return NULL;
-  if(n->m_Pipe)
-  {
-    return n->m_Pipe->GetGui();
-  }
-  return NULL;
-}*/
 //----------------------------------------------------------------------------
 void mafViewCompound::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
@@ -255,7 +223,7 @@ void mafViewCompound::OnEvent(mafEventBase *maf_event)
       mafSceneGraph *sg = GetSceneGraph();
       if(sg)
       {
-        mafNode *vme = sg->GetSelectedVme();
+        mafVME *vme = sg->GetSelectedVme();
         if (vme)
         {
           mafEventMacro(mafEvent(this,VME_MODIFIED,vme));

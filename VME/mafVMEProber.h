@@ -45,9 +45,9 @@ public:
     ID_LAST
   };
 
-  static bool VolumeAccept(mafNode *node) {return(node != NULL && node->IsMAFType(mafVMEVolume));};
+  static bool VolumeAccept(mafVME*node) {return(node != NULL && node->IsMAFType(mafVMEVolume));};
 
-  static bool OutputSurfaceAccept(mafNode *node) {return(node != NULL && ((mafVME *)node)->GetOutput()->IsMAFType(mafVMEOutputSurface));};
+  static bool OutputSurfaceAccept(mafVME*node) {return(node != NULL && node->GetOutput()->IsMAFType(mafVMEOutputSurface));};
 
   /** Precess events coming from other objects */ 
   virtual void OnEvent(mafEventBase *maf_event);
@@ -59,22 +59,22 @@ public:
   mmaMaterial *GetMaterial();
 
   /** Copy the contents of another mafVMEProber into this one. */
-  virtual int DeepCopy(mafNode *a);
+  virtual int DeepCopy(mafVME *a);
 
   /** Compare with another mafVMEProber. */
   virtual bool Equals(mafVME *vme);
 
   /** Get the link to the volume.*/
-  mafNode *GetVolumeLink();
+  mafVME *GetVolumeLink();
 
   /** Get the link to the surface.*/
-  mafNode *GetSurfaceLink();
+  mafVME *GetSurfaceLink();
 
   /** Set the link to the volume.*/
-  void SetVolumeLink(mafNode *volume);
+  void SetVolumeLink(mafVME *volume);
 
   /** Set the link to the surface.*/
-  void SetSurfaceLink(mafNode *surface);
+  void SetSurfaceLink(mafVME *surface);
 
   /** Set the mode to Density or Distance Map.*/
   void SetMode(int mode);

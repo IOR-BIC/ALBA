@@ -54,7 +54,7 @@ public:
   vtkPolyData *GetData() {return m_GizmoData;}
   
   /** Copy the contents of another VME-Gizmo into this one. */
-  virtual int DeepCopy(mafNode *a);
+  virtual int DeepCopy(mafVME *a);
   
   /** 
   Set the orchestrator object: mafVMEGizmo's are used togetheter in more complex objects 

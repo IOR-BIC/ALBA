@@ -34,7 +34,7 @@
 #include "mafVMEItem.h"
 #include "mafVMEGenericAbstract.h"
 #include "mafVMERoot.h"
-#include "mafNodeIterator.h"
+#include "mafVMEIterator.h"
 #include "mafVMEExternalData.h"
 #include "vtkDirectory.h"
 
@@ -97,13 +97,13 @@ int mafOpValidateTree::ValidateTree()
 
   int result = mafOpValidateTree::VALIDATE_SUCCESS;
 
-  mafNode *node;
+  mafVME *node;
   mafVMERoot *root = mafVMERoot::SafeDownCast(m_Input->GetRoot());
   assert(root != NULL);
   int max_item_id = root->GetMaxItemId();
   int max_node_id = root->GetMaxNodeId();
 
-  mafNodeIterator *iter = root->NewIterator();
+  mafVMEIterator *iter = root->NewIterator();
   try
   {
     for (node = iter->GetFirstNode(); node; node = iter->GetNextNode())
@@ -123,7 +123,7 @@ int mafOpValidateTree::ValidateTree()
       if (numLinks > 0)
       {
         // check node links
-        mafNode::mafLinksMap::iterator lnk_it;
+        mafVME::mafLinksMap::iterator lnk_it;
         for (lnk_it = node->GetLinks()->begin(); lnk_it != node->GetLinks()->end(); lnk_it++)
         {
           if (lnk_it->second.m_Node == NULL)
@@ -190,10 +190,12 @@ int mafOpValidateTree::ValidateTree()
           m_MSFTreeAbsFileNamesSet.insert(absFilename.c_str());
         }
       }
-      else if (vme != NULL) // any other vme type
+      else if (vme != NULL ) // any other vme type
       {         
+				mafVMEGenericAbstract *absVME = mafVMEGenericAbstract::SafeDownCast(vme);
+				
         mafDataVector *dv = vme->GetDataVector();
-        if (dv)
+        if (dv && (!absVME || absVME->GetStoreDataVector()) )
         {
           for (int t = 0; t < dv->GetNumberOfItems(); t++)
           {

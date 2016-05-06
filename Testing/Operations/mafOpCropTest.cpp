@@ -29,7 +29,7 @@
 #include "mafVMEStorage.h"
 #include "mafVMERoot.h"
 #include "mafVMEVolumeGray.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafOpImporterVTK.h"
 #include "mafSmartPointer.h"
 #include "vtkMAFSmartPointer.h"

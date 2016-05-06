@@ -28,7 +28,6 @@
 
 #include "mafSceneNode.h"
 #include "mafVMEScalarMatrix.h"
-#include "mafNodeRoot.h"
 #include "mafVMERoot.h"
 #include "vtkMAFAssembly.h"
 
@@ -119,7 +118,6 @@ void mafPipeScalarMatrixTest::TestPipeExecution()
 
   CompareImages();
 
-  delete pipe;
   delete sceneNode;
   delete sceneRootNode;
 

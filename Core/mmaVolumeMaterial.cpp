@@ -31,7 +31,7 @@
 #include "mafStorageElement.h"
 #include "mafIndent.h"
 
-#include "mafNode.h"
+#include "mafVME.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkLookupTable.h"

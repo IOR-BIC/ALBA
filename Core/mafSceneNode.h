@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: mafSceneNode
- Authors: Silvano Imboden
+ Authors: Silvano Imboden, Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -18,13 +18,12 @@
 //----------------------------------------------------------------------------
 // forward declarations:
 //----------------------------------------------------------------------------
-class mafNode;
+class mafVME;
 class vtkMAFAssembly;
 class mafPipe;
 class vtkRenderer;
 class mafSceneGraph;
-//@@@ class mafNodeLandmarkCloud;
-//@@@ class mafNodeScalar;
+
 //----------------------------------------------------------------------------
 // mafSceneNode :
 //----------------------------------------------------------------------------
@@ -32,14 +31,11 @@ class mafSceneGraph;
 class MAF_EXPORT mafSceneNode
 {
 public:
-								mafSceneNode(mafSceneGraph *sg, mafSceneNode *parent, const mafNode* vme, vtkRenderer *ren1, vtkRenderer *ren2=NULL, vtkRenderer *ren3 = NULL);
+								mafSceneNode(mafSceneGraph *sg, mafSceneNode *parent, mafVME *vme, vtkRenderer *renderFront, vtkRenderer *renderBack=NULL, vtkRenderer *alwaysVisibleRender = NULL);
   virtual      ~mafSceneNode    ();
 
   /** Call Select method for the vme's pipe. */
 	void Select(bool select);
-
-  /** Call Show method for the vme's pipe. */
-	//void Show(bool show);  --  //SIL. 21-4-2005: removed unused function Show from mafScenenNode and mafPipe
 
   /** Call UpdateProperty method for the vme's pipe. */
 	void UpdateProperty(bool fromTag = false);
@@ -50,55 +46,50 @@ public:
   /** print a dump of this object */
   virtual void Print(std::ostream& os, const int tabs=0);// const;
 
-  mafNode           *m_Vme;
-  mafSceneNode      *m_Parent;
-  mafPipe           *m_Pipe;
-  bool               m_Mutex;
-  vtkRenderer       *m_RenFront;
-  vtkMAFAssembly    *m_AssemblyFront;
-  vtkRenderer       *m_RenBack;
-  vtkMAFAssembly    *m_AssemblyBack;
-  vtkRenderer       *m_AlwaysVisibleRenderer;
-  vtkMAFAssembly    *m_AlwaysVisibleAssembly;
-  mafSceneNode      *m_Next;
-  mafSceneGraph     *m_Sg;
+	/** Returns Vme */
+	mafVME * GetVme() const { return m_Vme; }
 
+	/** Returns Pipe */
+	mafPipe * GetPipe() const;
 
-  //observer to Listen to Clouds Open/CloseEvent
-	//@@@ mafNodeLandmarkCloud	*m_cloud;
+	/** Sets Pipe */
+	void SetPipe(mafPipe * pipe);
+
+	/** Deletes current Pipe*/
+	void DeletePipe();
+
+	/** Returns RenFront */
+	vtkRenderer * GetRenFront() const { return m_RenFront; }
+
+	/** Returns Mutex */
+	bool GetMutex() const { return m_Mutex; }
+
+	/** Sets Mutex */
+	void SetMutex(bool mutex) { m_Mutex = mutex; }
+
+	/** Returns AssemblyFront */
+	vtkMAFAssembly * GetAssemblyFront() const { return m_AssemblyFront; }
 	
-	//@@@ unsigned long m_CloudOpenClose_observer;
-	//@@@ unsigned long	m_CloudRadiusModified_observer;
-	//@@@ unsigned long	m_CloudSphereResolutionModified_observer;
-
-  /** 
-  Static function called by the landmark cloud open/close observer. */
-	//@@@ static void	OnOpenCloseEvent(void *arg);
-
-  /** 
-  Static function called by the landmark observer when the landmark's radius change. */
-	//@@@ static void	OnRadiusModifiedEvent(void *arg);
-
-  /** 
-  Static function called by the landmark observer when the landmark's sphere resolution change. */
-	//@@@ static void	OnSphereResolutionModifiedEvent(void *arg);
-
-	//modified by STEFY 16-6-2004(begin)
-	//observer to Listen to Vector Arrow Modified Scaling Factor and Diameter Event
-	//@@@ mafNodeScalar	*m_scalar;
+	/** Returns RenBack */
+	vtkRenderer * GetRenBack() const { return m_RenBack; }
 	
-	//@@@ unsigned long	m_Scalar_ScalingModified_observer;
-	//@@@ unsigned long	m_Scalar_DiameterModified_observer;
-	//@@@ unsigned long	m_Scalar_HeadModified_observer;
-	 
-	/** 
-	Static function called by the scalar observer when the vector arrow scaling factor change. */
-	//@@@ static void	OnScalingModifiedEvent(void *arg);
+	/** Returns AssemblyBack */
+	vtkMAFAssembly * GetAssemblyBack() const { return m_AssemblyBack; }
+	
+	/** Returns AlwaysVisibleRenderer */
+	vtkRenderer * GetAlwaysVisibleRenderer() const { return m_AlwaysVisibleRenderer; }
+		
+	/** Returns AlwaysVisibleAssembly */
+	vtkMAFAssembly * GetAlwaysVisibleAssembly() const { return m_AlwaysVisibleAssembly; }
+		
+	/** Returns Next */
+	mafSceneNode * GetNext() const { return m_Next; }
 
-	/** 
-	Static function called by the scalar observer when the vector arrow diameter scaling factor change. */
-	//@@@ static void	OnDiameterModifiedEvent(void *arg);
+	/** Sets Next */
+	void SetNext(mafSceneNode * next) { m_Next = next; }
 
+	/** Returns Sg */
+	mafSceneGraph * GetSceneGraph() const { return m_Sg; }
 
 	/** Returns PipeCreatable */
 	bool GetPipeCreatable() const { return m_PipeCreatable; }
@@ -106,13 +97,41 @@ public:
 	/** Sets PipeCreatable */
 	void SetPipeCreatable(bool pipeCreatable) { m_PipeCreatable = pipeCreatable; }
 
-	/**
-	Static function called by the scalar observer when the head arrow change. */
-	//@@@ static void OnHeadModifiedEvent(void *arg);
+	/** Sets RenFront */
+	void SetRenFront(vtkRenderer * renFront) { m_RenFront = renFront; }
 
 protected:
+
+	/** Called from child on show, if the visibility is updated ChildShow is called on parent */
+	void ChildShow();
+		
+	/** Called from child on hide, if the visibility is updated ChildHide is called on parent */
+	void ChildHide();
+	
+	/** callen onhow/hide childShow/childHide to update local visibility and forward up the changes*/
+	void UpdateVisibility();
+
+	/** Called on changes when a node is show/hided to notify assemby to recreate internal structures */
+	void ModifyRootAssembly();
   
+	mafPipe           *m_Pipe;
 	bool               m_PipeCreatable;
-  //bool m_visible;   // a SceneNode is visible if a pipe has been created
+	vtkRenderer       *m_RenFront;
+	int								 m_VisibleChildren;
+	bool							 m_CurrentVisibility;
+	bool               m_Mutex;
+
+	vtkMAFAssembly    *m_AssemblyFront;
+	vtkRenderer       *m_RenBack;
+	vtkMAFAssembly    *m_AssemblyBack;
+	vtkRenderer       *m_AlwaysVisibleRenderer;
+	vtkMAFAssembly    *m_AlwaysVisibleAssembly;
+	mafSceneNode      *m_Next;
+
+	mafSceneGraph     *m_Sg;
+	mafVME            *m_Vme;
+	mafSceneNode      *m_Parent;
 };  
+
+
 #endif // __mafSceneNode_H__

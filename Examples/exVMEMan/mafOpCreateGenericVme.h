@@ -22,7 +22,7 @@
 //----------------------------------------------------------------------------
 // Forward Refs:
 //----------------------------------------------------------------------------
-class mafNodeGeneric;
+class mafVMEGeneric;
 // ============================================================================
 class __declspec( dllexport ) mafOpCreateGenericVme : public mafOp
 // ============================================================================
@@ -34,12 +34,12 @@ public:
   mafOp* Copy();
   mafTypeMacro(mafOpCreateGenericVme, mafOp);
 
-  bool Accept(mafNode* vme) {return vme != NULL;};
+  bool Accept(mafVME* vme) {return vme != NULL;};
   void OpRun();
   void OpDo();
   void OpUndo();
 
 protected:
-  mafNodeGeneric  *m_vme; 
+  mafVMEGeneric  *m_vme; 
 };
 #endif // __mafOpCreateGenericVme_H__

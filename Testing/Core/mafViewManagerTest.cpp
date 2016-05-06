@@ -45,27 +45,27 @@ public:
   mafViewDummy(wxString label="viewDummy");
   ~mafViewDummy(){m_NodeVector.clear();};
   mafView *Copy(mafObserver *Listener,bool enableLightCopy = false);
-  void VmeAdd(mafNode *vme){m_NodeVector.push_back(vme);};
-  void VmeRemove(mafNode *vme);
-  void VmeSelect(mafNode *vme, bool select);
-  void VmeShow(mafNode *vme, bool show);
-  void CameraReset(mafNode *node = NULL){m_CameraReset=true;};
+  void VmeAdd(mafVME *vme){m_NodeVector.push_back(vme);};
+  void VmeRemove(mafVME *vme);
+  void VmeSelect(mafVME *vme, bool select);
+  void VmeShow(mafVME *vme, bool show);
+  void CameraReset(mafVME *node = NULL){m_CameraReset=true;};
   void CameraUpdate(){m_CameraUpdate=true;};
-  void VmeUpdateProperty(mafNode *vme, bool fromTag = false){m_UpdatedVme=vme;};
+  void VmeUpdateProperty(mafVME *vme, bool fromTag = false){m_UpdatedVme=vme;};
 
   // The following methods are added for test mafViewManager automation
-  mafNode *GetVME(mafID vmeID); // Not a mafView method!
-  mafNode *GetSelectedVME(){return m_SelectedVme;}; // Not a mafView method!
-  mafNode *GetShownVME(){return m_ShownVme;}; // Not a mafView method!
+  mafVME *GetVME(mafID vmeID); // Not a mafView method!
+  mafVME *GetSelectedVME(){return m_SelectedVme;}; // Not a mafView method!
+  mafVME *GetShownVME(){return m_ShownVme;}; // Not a mafView method!
   bool GetCameraReset(){return m_CameraReset;}; // Not a mafView method!
   bool GetCameraUpdate(){return m_CameraUpdate;}; // Not a mafView method!
-  mafNode *GetUpdatedVME(){return m_UpdatedVme;}; // Not a mafView method!
+  mafVME *GetUpdatedVME(){return m_UpdatedVme;}; // Not a mafView method!
 
 protected:
-  std::vector<mafNode*> m_NodeVector; // This vector contain the added vme
-  mafNode *m_SelectedVme; // Selected VME
-  mafNode *m_ShownVme;  // Shown VME
-  mafNode *m_UpdatedVme; // Updated VME
+  std::vector<mafVME*> m_NodeVector; // This vector contain the added vme
+  mafVME *m_SelectedVme; // Selected VME
+  mafVME *m_ShownVme;  // Shown VME
+  mafVME *m_UpdatedVme; // Updated VME
   bool m_CameraReset; // true if has been performed a camera reset on this view
   bool m_CameraUpdate; // true if has been performed a camera update on this view
 };
@@ -85,10 +85,10 @@ mafView *mafViewDummy::Copy(mafObserver *Listener, bool enableLightCopy)
   v->Create();
   return v;
 }
-void mafViewDummy::VmeRemove(mafNode *vme)
+void mafViewDummy::VmeRemove(mafVME *vme)
 {
-  std::vector<mafNode*>::iterator itVME;
-  for(std::vector<mafNode*>::iterator it = m_NodeVector.begin(); it != m_NodeVector.end(); it++)
+  std::vector<mafVME*>::iterator itVME;
+  for(std::vector<mafVME*>::iterator it = m_NodeVector.begin(); it != m_NodeVector.end(); it++)
     if((*it)==vme)
     {
       itVME = it;
@@ -96,7 +96,7 @@ void mafViewDummy::VmeRemove(mafNode *vme)
     }
     m_NodeVector.erase(itVME);
 }
-void mafViewDummy::VmeSelect(mafNode *vme, bool select) // Beware only test stuff! (It doesn't work like a normal view)
+void mafViewDummy::VmeSelect(mafVME *vme, bool select) // Beware only test stuff! (It doesn't work like a normal view)
 {
   if(select)
   {
@@ -107,7 +107,7 @@ void mafViewDummy::VmeSelect(mafNode *vme, bool select) // Beware only test stuf
     m_SelectedVme = NULL;
   }
 }
-void mafViewDummy::VmeShow(mafNode *vme, bool show) // Beware only test stuff! (It doesn't work like a normal view)
+void mafViewDummy::VmeShow(mafVME *vme, bool show) // Beware only test stuff! (It doesn't work like a normal view)
 {
   if(show)
   {
@@ -118,7 +118,7 @@ void mafViewDummy::VmeShow(mafNode *vme, bool show) // Beware only test stuff! (
     m_ShownVme = NULL;
   }
 }
-mafNode *mafViewDummy::GetVME(mafID vmeID) // New method for test stuff
+mafVME *mafViewDummy::GetVME(mafID vmeID) // New method for test stuff
 {
   if(vmeID < m_NodeVector.size())
   {

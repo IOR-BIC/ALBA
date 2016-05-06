@@ -31,9 +31,9 @@ enum VME_CHOOSER_STYLES
 //----------------------------------------------------------------------------
 // Forward refs:
 //----------------------------------------------------------------------------
-class mafNode;
+class mafVME;
 
-typedef bool (*ValidateCallBackType) (mafNode *);
+typedef bool (*ValidateCallBackType) (mafVME *);
 
 //----------------------------------------------------------------------------
 // mafGUIVMEChooserTree :
@@ -45,18 +45,18 @@ Another feature of the widget is to show also a checkbox near the VME's icon to 
 class mafGUIVMEChooserTree: public mafGUICheckTree
 {
 public:
-                 mafGUIVMEChooserTree (wxWindow *parent, mafGUICheckTree *tree, ValidateCallBackType vme_accept_function = 0, wxWindowID id=-1, bool CloseButton = false, bool HideTitle = false, long style = REPRESENTATION_AS_TREE, bool multiSelect = false, mafNode *subTree=NULL); 
+                 mafGUIVMEChooserTree (wxWindow *parent, mafGUICheckTree *tree, ValidateCallBackType vme_accept_function = 0, wxWindowID id=-1, bool CloseButton = false, bool HideTitle = false, long style = REPRESENTATION_AS_TREE, bool multiSelect = false, mafVME *subTree=NULL); 
   virtual       ~mafGUIVMEChooserTree();
 
   /** Return the choosed node*/
-  std::vector<mafNode*> GetChoosedNode();
+  std::vector<mafVME*> GetChoosedNode();
 
   /** Called by the Custom-Tree-Event-Handler - via OnMouseDown*/
   virtual void OnIconClick(wxTreeItemId item);
 
 protected:
   /** Return the status of the node according to the vme visibility. */
-  int GetVmeStatus(mafNode *node);
+  int GetVmeStatus(mafVME *node);
 
   void InitializeImageList();
 
@@ -71,9 +71,9 @@ protected:
 
   ValidateCallBackType m_ValidateFunction;
 
-  mafNode   *m_ChoosedNode; ///< Pointer to the selected node in single selection.
+  mafVME   *m_ChoosedNode; ///< Pointer to the selected node in single selection.
   long       m_ChooserTreeStyle;
-  std::vector<mafNode*> m_CheckedNode; ///< Vector of checked node (used in multi-selection)
+  std::vector<mafVME*> m_CheckedNode; ///< Vector of checked node (used in multi-selection)
   bool m_MultipleSelection; ///< Flag that manage the single or multi selection of the nodes inside the tree.
 
   DECLARE_EVENT_TABLE()

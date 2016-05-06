@@ -33,7 +33,7 @@
 #include "mafMatrixVector.h"
 #include "mafMatrixInterpolator.h"
 #include "mmuTimeSet.h"
-#include "mafNodeIterator.h"
+#include "mafVMEIterator.h"
 #include "mafVMEStorage.h"
 #include "mafDataPipeInterpolatorVTK.h"
 #include "mafVMEItemVTK.h"
@@ -56,6 +56,7 @@ mafVMEGenericAbstract::mafVMEGenericAbstract()
 {
 	m_MatrixVector = new mafMatrixVector();
   m_DataVector   = NULL;
+	m_StoreDataVector = true;
   SetMatrixPipe(mafMatrixInterpolator::New()); // matrix interpolator pipe  
 }
 
@@ -69,7 +70,7 @@ mafVMEGenericAbstract::~mafVMEGenericAbstract()
 }
 
 //-------------------------------------------------------------------------
-int mafVMEGenericAbstract::DeepCopy(mafNode *a)
+int mafVMEGenericAbstract::DeepCopy(mafVME *a)
 //-------------------------------------------------------------------------
 { 
   if (Superclass::DeepCopy(a)==MAF_OK)
@@ -89,7 +90,7 @@ int mafVMEGenericAbstract::DeepCopy(mafNode *a)
   return MAF_ERROR;
 }
 //-------------------------------------------------------------------------
-int mafVMEGenericAbstract::DeepCopyVmeLarge(mafNode *a)
+int mafVMEGenericAbstract::DeepCopyVmeLarge(mafVME *a)
 //-------------------------------------------------------------------------
 { 
   if (Superclass::DeepCopy(a)==MAF_OK)
@@ -266,7 +267,7 @@ void mafVMEGenericAbstract::GetLocalTimeBounds(mafTimeStamp tbounds[2])
 }
 
 //-----------------------------------------------------------------------
-int mafVMEGenericAbstract::ReparentTo(mafNode *parent)
+int mafVMEGenericAbstract::ReparentTo(mafVME *parent)
 //-----------------------------------------------------------------------
 {
   if (CanReparentTo(parent) && !IsInTree(parent))
@@ -278,8 +279,8 @@ int mafVMEGenericAbstract::ReparentTo(mafNode *parent)
     // into the new place, this to be able to manage HUGE datasets.
     if (parent /*== NULL||*/ && this->GetRoot() != parent->GetRoot())
     {
-      mafNodeIterator *iter=this->NewIterator();
-      for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+      mafVMEIterator *iter=this->NewIterator();
+      for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
       {
         if (mafVMEGenericAbstract *vme = mafVMEGenericAbstract::SafeDownCast(node))
         {
@@ -329,7 +330,7 @@ int mafVMEGenericAbstract::InternalStore(mafStorageElement *parent)
   Superclass::InternalStore(parent);
 
   // sub-element for storing the data vector
-  if (m_DataVector)
+  if (m_StoreDataVector && m_DataVector)
   {
     m_DataVector->SetCrypting(this->m_Crypting != 0);
     mafStorageElement *data_vector = parent->AppendChild("DataVector");
@@ -352,7 +353,10 @@ int mafVMEGenericAbstract::InternalRestore(mafStorageElement *node)
   int ret_val = MAF_OK;
   Superclass::InternalRestore(node);
   
-  // restore Data Vector
+  // Restore Data Vector
+	// Warning old LandmarkClouds have a data vector wich is required and must be loaded.
+	// but LMC does not have to store DataVector so the m_StoreDataVector check is used
+	// only on InternalStore
   if (m_DataVector)
   {
     mafStorageElement *data_vector=node->FindNestedElement("DataVector");

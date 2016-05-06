@@ -389,10 +389,10 @@ void mafGUIDynamicVP::SetName(const char* szNewName)
 
     //if the view associated with this pipe contains only one VME
     //and one pipe, we will need to reset camera, so it is visible
-    mafView* view = m_SceneNode->m_Sg->m_View;
+    mafView* view = m_SceneNode->GetSceneGraph()->m_View;
     int nRefCount = medPipeRegister::RegisterPipe(pipe, view);
     if (nRefCount == 1 && view->GetNumberOfVisibleVME() == 1)
-      view->CameraReset(m_SceneNode->m_Vme);    
+      view->CameraReset(m_SceneNode->GetVme());    
     else
       view->CameraUpdate();
   }

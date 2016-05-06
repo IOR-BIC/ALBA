@@ -26,7 +26,7 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mafNode;
+class mafVME;
 class vtkDataSet;
 
 //----------------------------------------------------------------------------
@@ -52,7 +52,7 @@ public:
 	mafOp* Copy();
 	
 	/** Return true for the acceptable vme type. */
-	bool Accept(mafNode* Node);
+	bool Accept(mafVME* Node);
 
 	/** Set the input vme for the operation. */
 	void OpRun();
@@ -64,7 +64,7 @@ public:
 	void OpUndo();
 
 	/**	Set surface of input in test mode*/
-	void SetSurface(mafNode *Surface){m_Surface=Surface;};
+	void SetSurface(mafVME *Surface){m_Surface=Surface;};
 
   /** Scalar value used to fill volume region defined by the surface.*/
   void SetScalarValue(double fillScalar) {m_ScalarValue = fillScalar;};
@@ -75,10 +75,10 @@ public:
   /** Change scalar density of the input volume that are inside the chosen surface with the given m_ScalarValue.*/
 	void EditVolumeScalars();
 
- 	static bool OutputSurfaceAccept(mafNode* Node) {return(Node != NULL && (((mafVME *)Node)->GetOutput()->IsA("mafVMEOutputSurface")));};
+ 	static bool OutputSurfaceAccept(mafVME* Node) {return(Node != NULL && (Node->GetOutput()->IsA("mafVMEOutputSurface")));};
 
 protected:
-  mafNode *m_Surface; ///< Surface used to define the VOI in which write the constant density value.
+  mafVME *m_Surface; ///< Surface used to define the VOI in which write the constant density value.
   double   m_ScalarValue; ///< Scalar value that will fill the volume's voxel.
   double   m_CurrentTimestamp; ///< Timestamp of the input VME.
   vtkDataSet *m_OldData; ///< Volume data before the editing (used by the Undo mechanism).

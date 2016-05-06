@@ -44,7 +44,7 @@
 
 
 //----------------------------------------------------------------------------
-mafAnimate::mafAnimate(vtkRenderer *renderer, mafNode *vme, mafObserver *listener)
+mafAnimate::mafAnimate(vtkRenderer *renderer, mafVME *vme, mafObserver *listener)
 //----------------------------------------------------------------------------
 {
 	m_Listener	= listener;
@@ -71,7 +71,7 @@ mafAnimate::~mafAnimate()
   mafDEL(m_StoredPositions);
 }
 //----------------------------------------------------------------------------
-void mafAnimate::SetInputVME(mafNode *vme) 
+void mafAnimate::SetInputVME(mafVME *vme) 
 //----------------------------------------------------------------------------
 {
   assert(m_Gui && m_PositionList && m_StorePositionButton && m_RenamePositionButton && m_DeletePositionButton);
@@ -79,7 +79,7 @@ void mafAnimate::SetInputVME(mafNode *vme)
   //ResetKit();
 
   if(!vme) return;
-  m_Root = mafVME::SafeDownCast(vme->GetRoot());
+  m_Root = vme->GetRoot();
 	if(!m_Root) return;
   m_Tags = m_Root->GetTagArray();
 	

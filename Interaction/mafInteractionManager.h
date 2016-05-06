@@ -53,7 +53,7 @@ class vtkXMLDataElement;
 class vtkXMLDataParser;
 class mafInteractorSER;
 class mafInteractorPER;
-class mafNode;
+class mafVME;
 class mafGUIDialog;
 class mafGUI;
 class mafGUITree;
@@ -165,7 +165,7 @@ public:
   void PostResetCamera(vtkRenderer *ren);
 
   /** propagate VME_SELECTED event */
-  void  VmeSelected(mafNode *node);
+  void  VmeSelected(mafVME *vme);
 
   /** store all interaction settings to an XML file (Multimod Interaction Settings - MIS - format) */
   int Store(const char *filename);

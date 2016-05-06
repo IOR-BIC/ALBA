@@ -150,7 +150,6 @@ void mafVisualPipeVolumeRayCastingTest::TestPipeExecution()
 	
   vtkDEL(actorList);
 
-  delete pipe;
   delete sceneNode;
 
   mafDEL(material);

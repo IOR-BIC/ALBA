@@ -64,7 +64,7 @@ mafVMEScalarMatrix::~mafVMEScalarMatrix()
 {
 }
 //-------------------------------------------------------------------------
-int mafVMEScalarMatrix::DeepCopy(mafNode *a)
+int mafVMEScalarMatrix::DeepCopy(mafVME *a)
 //-------------------------------------------------------------------------
 {
   if (Superclass::DeepCopy(a)==MAF_OK)
@@ -130,7 +130,7 @@ mafGUI* mafVMEScalarMatrix::CreateGui()
 {
   wxString type_array[3] = {_("time"), _("progress number"), _("scalar ID")};
   
-  m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
+  m_Gui = mafVME::CreateGui(); // Called to show info about vmes' type and name
   m_Gui->SetListener(this);
   m_Gui->Divider();
   m_Gui->Label(_("Parameters used for"));
@@ -181,7 +181,7 @@ void mafVMEScalarMatrix::OnEvent(mafEventBase *maf_event)
         EnableWidgets();
       break;
       default:
-        mafNode::OnEvent(maf_event);
+        mafVME::OnEvent(maf_event);
     }
   }
   else

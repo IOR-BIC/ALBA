@@ -59,7 +59,7 @@ mafOp* mafOpCreateSurfaceParametric::Copy()
 	return new mafOpCreateSurfaceParametric(m_Label);
 }
 //----------------------------------------------------------------------------
-bool mafOpCreateSurfaceParametric::Accept(mafNode *node)
+bool mafOpCreateSurfaceParametric::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
   return (node && node->IsMAFType(mafVME));

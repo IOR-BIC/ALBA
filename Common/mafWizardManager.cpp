@@ -176,7 +176,7 @@ void mafWizardManager::WizardRun( mafWizard *wizard, void *wizard_param /*= NULL
 }
 
 //----------------------------------------------------------------------------
-void mafWizardManager::VmeSelected( mafNode* node )
+void mafWizardManager::VmeSelected( mafVME* node )
 //----------------------------------------------------------------------------
 {
   //update selected vme
@@ -194,7 +194,7 @@ void mafWizardManager::VmeSelected( mafNode* node )
 }
 
 //----------------------------------------------------------------------------
-void mafWizardManager::VmeModified(mafNode* node)
+void mafWizardManager::VmeModified(mafVME* node)
 {
 	if (!m_RunningWizard && node == m_Selected)
 	{

@@ -98,7 +98,6 @@ void mafVMERawMotionDataTest::Test()
   z = -289.80;
   
   ((mafVMELandmarkCloud *)vmeRawMotionData->GetChild(0))->TestModeOn();
-  ((mafVMELandmarkCloud *)vmeRawMotionData->GetChild(0))->Open();
   mafVMELandmark *landmark = ((mafVMELandmark *)((mafVMELandmarkCloud *)vmeRawMotionData->GetChild(0))->GetLandmark(0));
   
 

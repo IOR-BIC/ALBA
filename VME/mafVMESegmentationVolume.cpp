@@ -134,7 +134,7 @@ int mafVMESegmentationVolume::InternalInitialize()
 void mafVMESegmentationVolume::InternalPreUpdate()
 //-----------------------------------------------------------------------
 {
-  mafVME *vol = mafVME::SafeDownCast(GetVolumeLink());
+  mafVME *vol = GetVolumeLink();
   if (m_SegmentingDataPipe->GetVolume() != vol)
   {
     m_SegmentingDataPipe->SetVolume(vol);
@@ -147,7 +147,7 @@ void mafVMESegmentationVolume::InternalPreUpdate()
 }
 
 //-------------------------------------------------------------------------
-int mafVMESegmentationVolume::DeepCopy(mafNode *a)
+int mafVMESegmentationVolume::DeepCopy(mafVME *a)
 //-------------------------------------------------------------------------
 { 
   if (Superclass::DeepCopy(a)==MAF_OK)
@@ -205,7 +205,7 @@ bool mafVMESegmentationVolume::IsAnimated()
 bool mafVMESegmentationVolume::IsDataAvailable()
 //-------------------------------------------------------------------------
 {
-  mafVME *vol = mafVME::SafeDownCast(GetVolumeLink());
+  mafVME *vol = GetVolumeLink();
   return (vol && vol->IsDataAvailable());
 }
 //-----------------------------------------------------------------------
@@ -239,9 +239,9 @@ int mafVMESegmentationVolume::InternalRestore(mafStorageElement *node)
 mafGUI* mafVMESegmentationVolume::CreateGui()
 //-------------------------------------------------------------------------
 {
-  m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
+  m_Gui = mafVME::CreateGui(); // Called to show info about vmes' type and name
   m_Gui->Divider();
-  mafVME *vol = mafVME::SafeDownCast(GetVolumeLink());
+  mafVME *vol = GetVolumeLink();
   m_VolumeName = vol ? vol->GetName() : _("none");
   m_Gui->Button(ID_VOLUME_LINK,&m_VolumeName,_("Volume"), _("Select the volume to be segmented"));
 
@@ -263,7 +263,7 @@ void mafVMESegmentationVolume::OnEvent(mafEventBase *maf_event)
         e->SetArg((long)&mafVMESegmentationVolume::VolumeAccept);
         e->SetString(&title);
         ForwardUpEvent(e);
-        mafNode *n = e->GetVme();
+        mafVME *n = e->GetVme();
         if (n != NULL)
         {
           SetVolumeLink(n);
@@ -273,7 +273,7 @@ void mafVMESegmentationVolume::OnEvent(mafEventBase *maf_event)
       }
       break;
     default:
-      mafNode::OnEvent(maf_event);
+      mafVME::OnEvent(maf_event);
     }
   }
   else
@@ -405,7 +405,7 @@ int mafVMESegmentationVolume::DeleteRange(int index)
   return MAF_ERROR;
 }
 //-----------------------------------------------------------------------
-int mafVMESegmentationVolume::SetVolumeLink(mafNode *volume)
+int mafVMESegmentationVolume::SetVolumeLink(mafVME *volume)
 //-----------------------------------------------------------------------
 {
   int result = m_SegmentingDataPipe->SetVolume(volume);
@@ -421,7 +421,7 @@ int mafVMESegmentationVolume::SetVolumeLink(mafNode *volume)
   return MAF_OK;
 }
 //-----------------------------------------------------------------------
-void mafVMESegmentationVolume::SetManualVolumeMask(mafNode *volume)
+void mafVMESegmentationVolume::SetManualVolumeMask(mafVME *volume)
 //-----------------------------------------------------------------------
 {
   SetLink("ManualVolumeMask", volume);
@@ -429,13 +429,13 @@ void mafVMESegmentationVolume::SetManualVolumeMask(mafNode *volume)
   Modified();
 }
 //-----------------------------------------------------------------------
-mafNode *mafVMESegmentationVolume::GetManualVolumeMask()
+mafVME *mafVMESegmentationVolume::GetManualVolumeMask()
 //-----------------------------------------------------------------------
 {
   return GetLink("ManualVolumeMask");
 }
 //-----------------------------------------------------------------------
-void mafVMESegmentationVolume::SetRefinementVolumeMask(mafNode *volume)
+void mafVMESegmentationVolume::SetRefinementVolumeMask(mafVME *volume)
 //-----------------------------------------------------------------------
 {
   SetLink("RefinementVolumeMask", volume);
@@ -443,7 +443,7 @@ void mafVMESegmentationVolume::SetRefinementVolumeMask(mafNode *volume)
   Modified();
 }
 //-----------------------------------------------------------------------
-mafNode *mafVMESegmentationVolume::GetRefinementVolumeMask()
+mafVME *mafVMESegmentationVolume::GetRefinementVolumeMask()
 //-----------------------------------------------------------------------
 {
   return GetLink("RefinementVolumeMask");
@@ -473,7 +473,7 @@ vtkDataSet *mafVMESegmentationVolume::GetManualOutput()
   return m_SegmentingDataPipe->GetManualOutput();
 }
 //-----------------------------------------------------------------------
-mafNode *mafVMESegmentationVolume::GetVolumeLink()
+mafVME *mafVMESegmentationVolume::GetVolumeLink()
 //-----------------------------------------------------------------------
 {
   return GetLink("Volume");

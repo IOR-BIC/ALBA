@@ -51,7 +51,7 @@ void mafOpExporterAnsysInputFileTest::TestAnsysINPFile_ReadData()
 void mafOpExporterAnsysInputFileTest::Check_INPFile(mafString fileName)
 {
 	mafVMEStorage *storage = mafVMEStorage::New();
-	mafNode *root = (mafNode *)storage->GetRoot();
+	mafVME *root = (mafVME *)storage->GetRoot();
 
   mafString filePath= MAF_DATA_ROOT;
   filePath<<"/mafOpExporterAnsysInputFileTest/";
@@ -100,7 +100,7 @@ void mafOpExporterAnsysInputFileTest::Check_INPFile(mafString fileName)
 void mafOpExporterAnsysInputFileTest::CompareINPFilesData(mafString fileName)
 {
 	mafVMEStorage *storage = mafVMEStorage::New();
-	mafNode *root = (mafNode *)storage->GetRoot();
+	mafVME *root = (mafVME *)storage->GetRoot();
 
   mafString filePath= MAF_DATA_ROOT;
   filePath<<"/mafOpExporterAnsysInputFileTest/";

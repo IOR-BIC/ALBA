@@ -25,7 +25,7 @@
 
 #include "mafOpTest.h"
 #include "mafGUI.h"
-#include "mafNode.h"
+#include "mafVME.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafOpTest);

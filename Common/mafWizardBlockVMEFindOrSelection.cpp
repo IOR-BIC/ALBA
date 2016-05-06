@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 
 #include "mafDecl.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafWizardBlockVMEFindOrSelection.h"
 
 wxString globalVMEAccept;
@@ -55,7 +55,7 @@ void mafWizardBlockVMEFindOrSelection::SetWindowTitle( const char *Title )
 void mafWizardBlockVMEFindOrSelection::ExcutionBegin()
 //----------------------------------------------------------------------------
 {
-  mafNode *selVME;
+  mafVME *selVME;
   mafWizardBlock::ExcutionBegin();
 
   //Setting global variable witch can be referred by static function
@@ -66,7 +66,7 @@ void mafWizardBlockVMEFindOrSelection::ExcutionBegin()
 
   if (m_SelectedVME)
   {
-	  const mafNode::mafChildrenVector *childs;
+	  const mafVME::mafChildrenVector *childs;
 	  childs=m_SelectedVME->GetChildren();
 	  int nnodes=m_SelectedVME->GetNumberOfChildren();
 	  int VMENumber=0;
@@ -74,7 +74,7 @@ void mafWizardBlockVMEFindOrSelection::ExcutionBegin()
 
 	  for (int i=0;i<nnodes;i++)
 	  {
-		  mafNode *child=(*childs)[i];
+		  mafVME *child=(*childs)[i];
 		  if (VMEAccept(child))
 		  {
 			  VMENumber++;
@@ -129,7 +129,7 @@ void mafWizardBlockVMEFindOrSelection::VmeParentSelect( const char *path )
 }
 
 //----------------------------------------------------------------------------
-int mafWizardBlockVMEFindOrSelection::VMEAccept(mafNode *node)
+int mafWizardBlockVMEFindOrSelection::VMEAccept(mafVME *node)
 //----------------------------------------------------------------------------
 {
   return (node && node->IsA(globalVMEAccept));

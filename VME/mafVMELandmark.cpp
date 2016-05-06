@@ -84,7 +84,7 @@ mafVMELandmark::~mafVMELandmark()
   vtkDEL(m_Polydata);
 }
 //-------------------------------------------------------------------------
-int mafVMELandmark::DeepCopy(mafNode *a)
+int mafVMELandmark::DeepCopy(mafVME *a)
 //-------------------------------------------------------------------------
 { 
   if (Superclass::DeepCopy(a)==MAF_OK)
@@ -93,9 +93,6 @@ int mafVMELandmark::DeepCopy(mafNode *a)
     SetRadius(lm->GetRadius());
     SetSphereResolution(lm->GetSphereResolution());
     SetLandmarkVisibility(lm->GetLandmarkVisibility());
-    //double p[3];
-    //lm->GetPoint(p);
-    //SetPoint(p);
 
     mafDataPipeCustom *dpipe = mafDataPipeCustom::SafeDownCast(GetDataPipe());
     if (dpipe)
@@ -132,8 +129,10 @@ int mafVMELandmark::InternalInitialize()
   {
     // force material allocation
     GetMaterial();
+
     return MAF_OK;
   }
+
   return MAF_ERROR;
 }
 
@@ -147,12 +146,12 @@ void mafVMELandmark::InternalPreUpdate()
 }
 
 //-------------------------------------------------------------------------
-bool mafVMELandmark::CanReparentTo(mafNode *parent)
+bool mafVMELandmark::CanReparentTo(mafVME *parent)
 //-------------------------------------------------------------------------
 {
   if (mafVMELandmarkCloud *vlmc = mafVMELandmarkCloud::SafeDownCast(parent))
   {  
-    if ( vlmc->IsOpen() && vlmc->FindLandmarkIndex(this->GetName())<0  )
+    if ( vlmc->FindLandmarkIndex(this->GetName())<0  )
       return true;
   }
   else if (parent == NULL)
@@ -228,6 +227,21 @@ void mafVMELandmark::SetMatrix(mafMatrix &mat)
   mat.GetElements()[2][2]=a;
   mafTransform::SetPosition(mat,pos);
   this->Superclass::SetMatrix(mat);
+}
+
+//----------------------------------------------------------------------------
+void mafVMELandmark::SetAbsMatrix(const mafMatrix &matrix)
+{
+	Superclass::SetAbsMatrix(matrix);
+
+	mafVMELandmarkCloud *parentCloud = mafVMELandmarkCloud::SafeDownCast(m_Parent);
+	if (parentCloud)
+	{
+		double pose[3];
+		GetPoint(pose);
+		parentCloud->SetLandmark(this, pose[0], pose[1], pose[2], m_CurrentTime);
+	}
+	
 }
 
 //-------------------------------------------------------------------------

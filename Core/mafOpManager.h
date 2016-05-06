@@ -29,7 +29,8 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mafNode;
+class mafVME;
+class mafVME;
 class mafOp;
 class mafOpSelect;
 class mafOpCut;
@@ -76,13 +77,13 @@ public:
   void FillSettingDialog(mafGUISettingsDialog *settingDialog);
 
 	/** Record the selected vme and enable the menu_entries relative to the compatible operations. */
-	virtual void VmeSelected(mafNode* v);
+	virtual void VmeSelected(mafVME* v);
 
 	/** Record the modified vme and enable the menu_entries relative to the compatible operations. */
-	virtual void VmeModified(mafNode* v);
+	virtual void VmeModified(mafVME* v);
 	
 	/** Return the selected vme. */
-	virtual mafNode* GetSelectedVme();
+	virtual mafVME* GetSelectedVme();
 
 	/** Run the operation by id. */
   virtual void OpRun(int op_id);
@@ -105,7 +106,7 @@ public:
   virtual void OpExec		(mafOp *op);
 
 	/** Execute the select operation. */
-  virtual void OpSelect(mafNode* v);
+  virtual void OpSelect(mafVME* v);
 
 	/** Execute the transform operation. */
 	//virtual void OpTransform(vtkMatrix4x4* new_matrix,vtkMatrix4x4* old_matrix);
@@ -134,7 +135,7 @@ public:
 	/** Stop the current operation in any case - to be used as last resort. */
   virtual bool StopCurrentOperation();
 
-	void EnableContextualMenu(mafGUITreeContextualMenu *contextualMenu, mafNode *node, bool CanEnable = true);
+	void EnableContextualMenu(mafGUITreeContextualMenu *contextualMenu, mafVME *node, bool CanEnable = true);
 
   /** Return the current running operation. Return NULL if no operation is running.*/
   mafOp *GetRunningOperation();
@@ -190,7 +191,7 @@ protected:
 	virtual void EnableToolbar(bool CanEnable = true);
 
   /** Fill the attribute for traceability events*/
-  void FillTraceabilityAttribute(mafOp *op, mafNode *in_node, mafNode *out_node);
+  void FillTraceabilityAttribute(mafOp *op, mafVME *in_node, mafVME *out_node);
 
   void SetAccelerator(mafOp *op);
 
@@ -199,8 +200,8 @@ protected:
 	mafOpContextStack  m_Context;
   mafOp             *m_RunningOp; ///< Pointer to the current running operation.
 	wxMenu            *m_Menu[3]; ///< Array of pointers to the menu 'Operations', 'Importer' and 'Exporter'
-  mafNode						*m_Selected; ///< Pointer to the current selected node.
-  mafNode           *m_NaturalNode; ///< Pointer to the NATURAL node on which is running a non-input preserving operation.
+  mafVME						*m_Selected; ///< Pointer to the current selected node.
+  mafVME           	*m_NaturalNode; ///< Pointer to the NATURAL node on which is running a non-input preserving operation.
 
   mafUser           *m_User; ///<User credentials
 

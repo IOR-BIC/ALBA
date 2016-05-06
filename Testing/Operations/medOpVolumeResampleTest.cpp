@@ -123,7 +123,7 @@ void medOpVolumeResampleTest::TestResampleInternal( const char *inFileName, cons
 
   opVolumeResample->Resample();
 
-  mafVME *Output = mafVME::SafeDownCast(opVolumeResample->GetOutput());
+  mafVME *Output = opVolumeResample->GetOutput();
   Output->GetOutput()->GetVTKData()->Update();
   vtkStructuredPoints *outputVTKData=vtkStructuredPoints::SafeDownCast(Output->GetOutput()->GetVTKData());
 

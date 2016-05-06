@@ -140,16 +140,16 @@ void mafOpExporterMSFTest::TestExportMSF1()
   CPPUNIT_ASSERT ( storageImport->Restore() == MAF_OK );
 
   //Check of the vme type inside the tree
-  mafVME *group = mafVME::SafeDownCast(storageImport->GetRoot()->GetFirstChild());
+  mafVME *group = storageImport->GetRoot()->GetFirstChild();
   group->Update();
   CPPUNIT_ASSERT( group->IsA("mafVMEGroup") );
-  mafVME *surfaceParametric = mafVME::SafeDownCast(group->GetChild(0));
+  mafVME *surfaceParametric =group->GetChild(0);
   surfaceParametric->Update();
   CPPUNIT_ASSERT( surfaceParametric->IsA("mafVMESurfaceParametric") );
-  mafVME *volume = mafVME::SafeDownCast(group->GetChild(1));
+  mafVME *volume = group->GetChild(1);
   volume->Update();
   CPPUNIT_ASSERT( volume->IsA("mafVMEVolumeGray") );
-  mafVME *slicer = mafVME::SafeDownCast(volume->GetChild(0));
+  mafVME *slicer = volume->GetChild(0);
   slicer->Update();
   CPPUNIT_ASSERT( slicer->IsA("mafVMESlicer") );
 
@@ -157,16 +157,16 @@ void mafOpExporterMSFTest::TestExportMSF1()
   CPPUNIT_ASSERT( mafVMESlicer::SafeDownCast(slicer)->GetSlicedVMELink() == volume );
 
   //Check if the ABS matrix are equals
-  mafVME *groupExported = mafVME::SafeDownCast(storageExport->GetRoot()->GetFirstChild());
+  mafVME *groupExported = storageExport->GetRoot()->GetFirstChild();
   groupExported->Update();
   CPPUNIT_ASSERT( groupExported->GetOutput()->GetAbsMatrix()->Equals(group->GetOutput()->GetAbsMatrix()) );
-  mafVME *surfaceParametricExported = mafVME::SafeDownCast(groupExported->GetChild(0));
+  mafVME *surfaceParametricExported =groupExported->GetChild(0);
   surfaceParametricExported->Update();
   CPPUNIT_ASSERT( surfaceParametricExported->GetOutput()->GetAbsMatrix()->Equals(surfaceParametric->GetOutput()->GetAbsMatrix()) );
-  mafVME *volumeExported = mafVME::SafeDownCast(groupExported->GetChild(1));
+  mafVME *volumeExported = groupExported->GetChild(1);
   volumeExported->Update();
   CPPUNIT_ASSERT( volumeExported->GetOutput()->GetAbsMatrix()->Equals(volume->GetOutput()->GetAbsMatrix()) );
-  mafVME *slicerExported = mafVME::SafeDownCast(volume->GetChild(0));
+  mafVME *slicerExported = volume->GetChild(0);
   slicerExported->Update();
   CPPUNIT_ASSERT( slicerExported->GetOutput()->GetAbsMatrix()->Equals(slicer->GetOutput()->GetAbsMatrix()) );
 
@@ -229,10 +229,10 @@ void mafOpExporterMSFTest::TestExportMSF2()
   CPPUNIT_ASSERT ( storageImport->Restore() == MAF_OK );
 
   //Check of the vme type inside the tree
-  mafVME *volume = mafVME::SafeDownCast(storageImport->GetRoot()->GetFirstChild());
+  mafVME *volume = storageImport->GetRoot()->GetFirstChild();
   volume->Update();
   CPPUNIT_ASSERT( volume->IsA("mafVMEVolumeGray") );
-  mafVME *slicer = mafVME::SafeDownCast(volume->GetChild(0));
+  mafVME *slicer = volume->GetChild(0);
   slicer->Update();
   CPPUNIT_ASSERT( slicer->IsA("mafVMESlicer") );
 
@@ -240,10 +240,10 @@ void mafOpExporterMSFTest::TestExportMSF2()
   CPPUNIT_ASSERT( mafVMESlicer::SafeDownCast(slicer)->GetSlicedVMELink() == volume );
 
   //Check if the ABS matrix are equals
-  mafVME *volumeExported = mafVME::SafeDownCast(storageExport->GetRoot()->GetFirstChild()->GetChild(1));
+  mafVME *volumeExported = storageExport->GetRoot()->GetFirstChild()->GetChild(1);
   volumeExported->Update();
   CPPUNIT_ASSERT( volumeExported->GetOutput()->GetAbsMatrix()->Equals(volume->GetOutput()->GetAbsMatrix()) );
-  mafVME *slicerExported = mafVME::SafeDownCast(volume->GetChild(0));
+  mafVME *slicerExported = volume->GetChild(0);
   slicerExported->Update();
   CPPUNIT_ASSERT( slicerExported->GetOutput()->GetAbsMatrix()->Equals(slicer->GetOutput()->GetAbsMatrix()) );
 

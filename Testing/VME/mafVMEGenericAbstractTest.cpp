@@ -34,7 +34,6 @@
 #include "mafVMEItemVTK.h"
 #include "mafMatrixVector.h"
 #include "mafDataVector.h"
-#include "mafNodeGeneric.h"
 #include "mafVMEOutputNULL.h"
 #include "stdio.h"
 

@@ -57,7 +57,7 @@ mafOp* mafOpOpenExternalFile::Copy()
 }
 
 //----------------------------------------------------------------------------
-bool mafOpOpenExternalFile::Accept(mafNode *node)
+bool mafOpOpenExternalFile::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
   return (node != NULL && node->IsMAFType(mafVMEExternalData));

@@ -59,7 +59,7 @@ mafOp* mafOpComputeWrapping::Copy()
 	return new mafOpComputeWrapping(m_Label);
 }
 //----------------------------------------------------------------------------
-bool mafOpComputeWrapping::Accept(mafNode *node)
+bool mafOpComputeWrapping::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
   return (node && node->IsMAFType(mafVME));

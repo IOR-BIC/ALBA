@@ -113,8 +113,7 @@ void mafPipeScalarTest::TestPipeExecution()
   
   //Assembly will be create when instancing mafSceneNode
   mafSceneNode *sceneNode;
-  sceneNode = new mafSceneNode(NULL,NULL,surface, NULL);
-  sceneNode->m_RenFront = m_Renderer;
+  sceneNode = new mafSceneNode(NULL,NULL,surface, m_Renderer);
 
   /////////// Pipe Instance and Creation ///////////
   mafPipeScalar *pipeScalar = new mafPipeScalar;
@@ -155,8 +154,6 @@ void mafPipeScalarTest::TestPipeExecution()
   
   vtkDEL(actorList);
 
-  delete pipeScalar;
-  sceneNode->m_RenFront = NULL;
   delete sceneNode;
 
   mafDEL(surface);

@@ -34,7 +34,7 @@
 #include "mafVMEItem.h"
 #include "mafVMEGenericAbstract.h"
 #include "mafVMERoot.h"
-#include "mafNodeIterator.h"
+#include "mafVMEIterator.h"
 #include "mafVMEExternalData.h"
 #include "vtkDirectory.h"
 #include <algorithm>
@@ -223,7 +223,7 @@ set<string> mafOpGarbageCollectMSFDir::SetDifference( set<string> &s1, set<strin
   return result;
 }
 
-mafString mafOpGarbageCollectMSFDir::GetMSFDirAbsPath(mafNode *anyTreeNode)
+mafString mafOpGarbageCollectMSFDir::GetMSFDirAbsPath(mafVME *anyTreeNode)
 {
   mafVMERoot* root = mafVMERoot::SafeDownCast(anyTreeNode->GetRoot());
   assert(root);
@@ -245,7 +245,7 @@ mafString mafOpGarbageCollectMSFDir::GetMSFDirAbsPath(mafNode *anyTreeNode)
   return tmp;
 }
 
-mafString mafOpGarbageCollectMSFDir::GetMSFXMLFileAbsFileName(mafNode *anyTreeNode)
+mafString mafOpGarbageCollectMSFDir::GetMSFXMLFileAbsFileName(mafVME *anyTreeNode)
 {
   mafVMERoot* root = mafVMERoot::SafeDownCast(anyTreeNode->GetRoot());
   assert(root);

@@ -51,7 +51,7 @@ void mafAttributeSegmentationVolumeTest::TestSetAutomaticSegmentationThresholdMo
   storage->GetRoot()->Initialize();
   mafSmartPointer<mafVMESegmentationVolume> volume;
   storage->GetRoot()->AddChild(volume);
-  volume->SetParent(storage->GetRoot());
+  volume->ReparentTo(storage->GetRoot());
   mafSmartPointer<mafAttributeSegmentationVolume> attribute;
   volume->SetAttribute("SegmentationVolumeData",attribute);
   mafString fileName = MAF_DATA_ROOT;
@@ -95,7 +95,7 @@ void mafAttributeSegmentationVolumeTest::TestSetAutomaticSegmentationGlobalThres
   storage->GetRoot()->Initialize();
   mafSmartPointer<mafVMESegmentationVolume> volume;
   storage->GetRoot()->AddChild(volume);
-  volume->SetParent(storage->GetRoot());
+  volume->ReparentTo(storage->GetRoot());
   mafSmartPointer<mafAttributeSegmentationVolume> attribute;
   volume->SetAttribute("SegmentationVolumeData",attribute);
   mafString fileName = MAF_DATA_ROOT;
@@ -137,7 +137,7 @@ void mafAttributeSegmentationVolumeTest::TestAddRange()
   storage->GetRoot()->Initialize();
   mafSmartPointer<mafVMESegmentationVolume> volume;
   storage->GetRoot()->AddChild(volume);
-  volume->SetParent(storage->GetRoot());
+  volume->ReparentTo(storage->GetRoot());
   mafSmartPointer<mafAttributeSegmentationVolume> attribute;
   volume->SetAttribute("SegmentationVolumeData",attribute);
   mafString fileName = MAF_DATA_ROOT;
@@ -188,7 +188,7 @@ void mafAttributeSegmentationVolumeTest::TestUpdateRange()
   storage->GetRoot()->Initialize();
   mafSmartPointer<mafVMESegmentationVolume> volume;
   storage->GetRoot()->AddChild(volume);
-  volume->SetParent(storage->GetRoot());
+  volume->ReparentTo(storage->GetRoot());
   mafSmartPointer<mafAttributeSegmentationVolume> attribute;
   volume->SetAttribute("SegmentationVolumeData",attribute);
   mafString fileName = MAF_DATA_ROOT;
@@ -239,7 +239,7 @@ void mafAttributeSegmentationVolumeTest::TestDeleteRange()
   storage->GetRoot()->Initialize();
   mafSmartPointer<mafVMESegmentationVolume> volume;
   storage->GetRoot()->AddChild(volume);
-  volume->SetParent(storage->GetRoot());
+  volume->ReparentTo(storage->GetRoot());
   mafSmartPointer<mafAttributeSegmentationVolume> attribute;
   volume->SetAttribute("SegmentationVolumeData",attribute);
   mafString fileName = MAF_DATA_ROOT;
@@ -286,7 +286,7 @@ void mafAttributeSegmentationVolumeTest::TestRemoveAllRanges()
   storage->GetRoot()->Initialize();
   mafSmartPointer<mafVMESegmentationVolume> volume;
   storage->GetRoot()->AddChild(volume);
-  volume->SetParent(storage->GetRoot());
+  volume->ReparentTo(storage->GetRoot());
   mafSmartPointer<mafAttributeSegmentationVolume> attribute;
   volume->SetAttribute("SegmentationVolumeData",attribute);
   mafString fileName = MAF_DATA_ROOT;
@@ -332,7 +332,7 @@ void mafAttributeSegmentationVolumeTest::TestGetNumberOfRanges()
   storage->GetRoot()->Initialize();
   mafSmartPointer<mafVMESegmentationVolume> volume;
   storage->GetRoot()->AddChild(volume);
-  volume->SetParent(storage->GetRoot());
+  volume->ReparentTo(storage->GetRoot());
   mafSmartPointer<mafAttributeSegmentationVolume> attribute;
   volume->SetAttribute("SegmentationVolumeData",attribute);
   mafString fileName = MAF_DATA_ROOT;
@@ -372,7 +372,7 @@ void mafAttributeSegmentationVolumeTest::TestSetRegionGrowingUpperThreshold()
   storage->GetRoot()->Initialize();
   mafSmartPointer<mafVMESegmentationVolume> volume;
   storage->GetRoot()->AddChild(volume);
-  volume->SetParent(storage->GetRoot());
+  volume->ReparentTo(storage->GetRoot());
   mafSmartPointer<mafAttributeSegmentationVolume> attribute;
   volume->SetAttribute("SegmentationVolumeData",attribute);
   mafString fileName = MAF_DATA_ROOT;
@@ -414,7 +414,7 @@ void mafAttributeSegmentationVolumeTest::TestSetRegionGrowingLowerThreshold()
   storage->GetRoot()->Initialize();
   mafSmartPointer<mafVMESegmentationVolume> volume;
   storage->GetRoot()->AddChild(volume);
-  volume->SetParent(storage->GetRoot());
+  volume->ReparentTo(storage->GetRoot());
   mafSmartPointer<mafAttributeSegmentationVolume> attribute;
   volume->SetAttribute("SegmentationVolumeData",attribute);
   mafString fileName = MAF_DATA_ROOT;
@@ -456,7 +456,7 @@ void mafAttributeSegmentationVolumeTest::TestAddSeed()
   storage->GetRoot()->Initialize();
   mafSmartPointer<mafVMESegmentationVolume> volume;
   storage->GetRoot()->AddChild(volume);
-  volume->SetParent(storage->GetRoot());
+  volume->ReparentTo(storage->GetRoot());
   mafSmartPointer<mafAttributeSegmentationVolume> attribute;
   volume->SetAttribute("SegmentationVolumeData",attribute);
   mafString fileName = MAF_DATA_ROOT;
@@ -515,7 +515,7 @@ void mafAttributeSegmentationVolumeTest::TestDeleteSeed()
   storage->GetRoot()->Initialize();
   mafSmartPointer<mafVMESegmentationVolume> volume;
   storage->GetRoot()->AddChild(volume);
-  volume->SetParent(storage->GetRoot());
+  volume->ReparentTo(storage->GetRoot());
   mafSmartPointer<mafAttributeSegmentationVolume> attribute;
   volume->SetAttribute("SegmentationVolumeData",attribute);
   mafString fileName = MAF_DATA_ROOT;
@@ -570,7 +570,7 @@ void mafAttributeSegmentationVolumeTest::TestGetNumberOfSeeds()
   storage->GetRoot()->Initialize();
   mafSmartPointer<mafVMESegmentationVolume> volume;
   storage->GetRoot()->AddChild(volume);
-  volume->SetParent(storage->GetRoot());
+  volume->ReparentTo(storage->GetRoot());
   mafSmartPointer<mafAttributeSegmentationVolume> attribute;
   volume->SetAttribute("SegmentationVolumeData",attribute);
   mafString fileName = MAF_DATA_ROOT;
@@ -615,7 +615,7 @@ void mafAttributeSegmentationVolumeTest::TestRemoveAllSeeds()
   storage->GetRoot()->Initialize();
   mafSmartPointer<mafVMESegmentationVolume> volume;
   storage->GetRoot()->AddChild(volume);
-  volume->SetParent(storage->GetRoot());
+  volume->ReparentTo(storage->GetRoot());
   mafSmartPointer<mafAttributeSegmentationVolume> attribute;
   volume->SetAttribute("SegmentationVolumeData",attribute);
   mafString fileName = MAF_DATA_ROOT;

@@ -32,7 +32,7 @@
 #include "mafVMEStorage.h"
 #include "mafVMELandmarkCloud.h"
 #include "mafVMELandmark.h"
-#include "mafNodeIterator.h"
+#include "mafVMEIterator.h"
 #include <iostream>
 
 //----------------------------------------------------------------------------
@@ -68,7 +68,7 @@ void mafOpImporterMSFTest::TestImporter()
 	importer->SetFileName(filename.GetCStr());
 	importer->OpRun();
 
-  mafNode *node = importer->GetOutput();
+  mafVME *node = importer->GetOutput();
 
   //check the name of the Group imported by the importerMSF
   mafString name = node->GetName();
@@ -80,7 +80,7 @@ void mafOpImporterMSFTest::TestImporter()
 
 	for(int j=0;j<i;j++)
 	{
-		mafNode *child = node->GetChild(j);
+		mafVME *child = node->GetChild(j);
 		switch (j)
 		{
 		case 0:
@@ -108,7 +108,7 @@ void mafOpImporterMSFTest::TestImporter()
       //check the name of the node
       name = child->GetName();
       CPPUNIT_ASSERT(name.Compare("test_volume") == 0);
-			vtkDataSet *data=((mafVME *)child)->GetOutput()->GetVTKData();
+			vtkDataSet *data=child->GetOutput()->GetVTKData();
 			data->Update();
 			double range[2];
 
@@ -125,7 +125,7 @@ void mafOpImporterMSFTest::TestImporter()
       //check the name of the node
       name = child->GetName();
       CPPUNIT_ASSERT(name.Compare("test_mesh_tetra10") == 0);
-      vtkDataSet *data=((mafVME *)child)->GetOutput()->GetVTKData();
+      vtkDataSet *data=child->GetOutput()->GetVTKData();
       data->Update();
 
       //check the number of cells
@@ -139,7 +139,7 @@ void mafOpImporterMSFTest::TestImporter()
       //check the name of the node
       name = child->GetName();
       CPPUNIT_ASSERT(name.Compare("test_surface") == 0);
-			vtkDataSet *data=((mafVME *)child)->GetOutput()->GetVTKData();
+			vtkDataSet *data=child->GetOutput()->GetVTKData();
 			data->Update();
 
       //check the number of triangles of the surface
@@ -153,7 +153,7 @@ void mafOpImporterMSFTest::TestImporter()
       //check the name of the node
       name = child->GetName();
       CPPUNIT_ASSERT(name.Compare("test_vector_GRFtimevar") == 0);
-      vtkDataSet *data=((mafVME *)child)->GetOutput()->GetVTKData();
+      vtkDataSet *data=child->GetOutput()->GetVTKData();
       data->Update();
 
       //check the length of the vector
@@ -208,7 +208,7 @@ void mafOpImporterMSFTest::TestImporterZMSF()
   importer->SetFileName(filename.GetCStr());
   importer->OpRun();
 
-  mafNode *node = importer->GetOutput();
+  mafVME *node = importer->GetOutput();
 
   mafString name = node->GetName();
   CPPUNIT_ASSERT(name.Compare("imported from Test_MSFImporterZMSF.zmsf") == 0);
@@ -218,7 +218,7 @@ void mafOpImporterMSFTest::TestImporterZMSF()
 
   for(int j=0;j<i;j++)
   {
-    mafNode *child = node->GetChild(j);
+    mafVME *child = node->GetChild(j);
     switch (j)
     {
     case 0:
@@ -245,7 +245,7 @@ void mafOpImporterMSFTest::TestImporterZMSF()
     {
       name = child->GetName();
       CPPUNIT_ASSERT(name.Compare("test_volume") == 0);
-      vtkDataSet *data=((mafVME *)child)->GetOutput()->GetVTKData();
+      vtkDataSet *data=child->GetOutput()->GetVTKData();
       data->Update();
       double range[2];
       data->GetScalarRange(range);
@@ -257,7 +257,7 @@ void mafOpImporterMSFTest::TestImporterZMSF()
     {
       name = child->GetName();
       CPPUNIT_ASSERT(name.Compare("test_mesh_tetra10") == 0);
-      vtkDataSet *data=((mafVME *)child)->GetOutput()->GetVTKData();
+      vtkDataSet *data=child->GetOutput()->GetVTKData();
       data->Update();
       int cells=data->GetNumberOfCells();
       CPPUNIT_ASSERT(cells==2);
@@ -268,7 +268,7 @@ void mafOpImporterMSFTest::TestImporterZMSF()
     {
       name = child->GetName();
       CPPUNIT_ASSERT(name.Compare("test_surface") == 0);
-      vtkDataSet *data=((mafVME *)child)->GetOutput()->GetVTKData();
+      vtkDataSet *data=child->GetOutput()->GetVTKData();
       data->Update();
       int cells=data->GetNumberOfCells();
       CPPUNIT_ASSERT(cells==12);
@@ -279,7 +279,7 @@ void mafOpImporterMSFTest::TestImporterZMSF()
     {
       name = child->GetName();
       CPPUNIT_ASSERT(name.Compare("test_vector_GRFtimevar") == 0);
-      vtkDataSet *data=((mafVME *)child)->GetOutput()->GetVTKData();
+      vtkDataSet *data=child->GetOutput()->GetVTKData();
       data->Update();
       double length = data->GetLength();
       CPPUNIT_ASSERT(fabs(length - 824.56) < 0.01);
@@ -336,8 +336,8 @@ void mafOpImporterMSFTest::TestImportedVmeId()
 
   std::vector<mafID> vectorID;
 
-  mafNodeIterator *iter = root->NewIterator();
-  for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+  mafVMEIterator *iter = root->NewIterator();
+  for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
   {
     mafID lastId = node->GetId();
     for (int i = 0; i < vectorID.size(); i++)

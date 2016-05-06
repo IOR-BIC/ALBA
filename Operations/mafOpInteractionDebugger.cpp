@@ -79,7 +79,7 @@ mafOpInteractionDebugger::~mafOpInteractionDebugger()
   cppDEL(m_GizmoDebugger);
 }
 
-bool mafOpInteractionDebugger::Accept(mafNode *node)
+bool mafOpInteractionDebugger::Accept(mafVME*node)
 {
   return true;
 }
@@ -145,7 +145,7 @@ void mafOpInteractionDebugger::OnEvent(mafEventBase *maf_event)
         mafString s(_("Choose Constrain"));
         mafEvent e(this,VME_CHOOSE, &s, (long)&mafOpInteractionDebugger::ConstrainAccept);
         mafEventMacro(e);
-        mafNode *vme = e.GetVme();
+        mafVME *vme = e.GetVme();
         if(vme != NULL)
         {
           OnChooseConstrainVme(vme);
@@ -355,9 +355,9 @@ void mafOpInteractionDebugger::AddmafVMEPolylineGraphTestConstrain1ToTree()
 void mafOpInteractionDebugger::RemoveTestConstraintGraph1FromTree()
 {
 
-  mafVME *vmeRoot = mafVME::SafeDownCast(m_Input->GetRoot());
+  mafVME *vmeRoot = m_Input->GetRoot();
 
-  mafVME *constraint = mafVME::SafeDownCast(vmeRoot->FindInTreeByName("test graph"));
+  mafVME *constraint = vmeRoot->FindInTreeByName("test graph");
   assert(constraint != NULL);
   
   constraint->ReparentTo(NULL);
@@ -397,9 +397,9 @@ void mafOpInteractionDebugger::AddMAFVMEPolylineTestConstrain3ToTree()
 void mafOpInteractionDebugger::AddMEDGizmoDebuggerToTree()
 {
 
-  mafVME *vmeRoot = mafVME::SafeDownCast(m_Input->GetRoot());
+  mafVME *vmeRoot = m_Input->GetRoot();
 
-  mafVME *constraint = mafVME::SafeDownCast(vmeRoot->FindInTreeByName("test graph"));
+  mafVME *constraint = vmeRoot->FindInTreeByName("test graph");
   assert(constraint != NULL);
   
   // Create the output vtk data...
@@ -428,9 +428,9 @@ void mafOpInteractionDebugger::AddMEDGizmoDebuggerToTree()
 
 }
 
-void mafOpInteractionDebugger::OnChooseConstrainVme( mafNode *vme )
+void mafOpInteractionDebugger::OnChooseConstrainVme( mafVME *vme )
 {
-  m_Constrain = mafVME::SafeDownCast(vme);
+  m_Constrain = vme;
   assert(m_Constrain);
 
   mafEventMacro(mafEvent(this,VME_SHOW, m_Constrain, true));

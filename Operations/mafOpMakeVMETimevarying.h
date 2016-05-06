@@ -57,7 +57,7 @@ public:
 
   mafOp* Copy();
 
-  bool Accept(mafNode* vme);
+  bool Accept(mafVME* vme);
   void OpRun();
   void OpDo();
   void OpUndo();
@@ -77,7 +77,7 @@ protected:
   /** Update the added VMEs ListBox */
   void UpdateAddedVMEsListBox();//GUI
   /** Implements the condition for accepting node in the dialog */
-  static bool DialogAcceptVME(mafNode* node) {return(node != NULL)&&(!node->IsA("mafVMERoot"));};
+  static bool DialogAcceptVME(mafVME* node) {return(node != NULL)&&(!node->IsA("mafVMERoot"));};
 
   /** Return true if the specified VME represent the same object of previously added VMEs */
   bool AcceptVME(mafVME * vme);

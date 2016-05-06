@@ -86,17 +86,18 @@ void mafViewPlot::SetMouse(mafDeviceButtonsPadMouse *mouse)
 }
 
 //----------------------------------------------------------------------------
-void mafViewPlot::VmeAdd(mafNode *vme)
+void mafViewPlot::VmeAdd(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   assert(m_Sg); 
   m_Sg->VmeAdd(vme);
 }
 //----------------------------------------------------------------------------
-void mafViewPlot::VmeShow(mafNode *vme, bool show)												{assert(m_Sg); m_Sg->VmeShow(vme,show);}
-void mafViewPlot::VmeUpdateProperty(mafNode *vme, bool fromTag)	        {assert(m_Sg); m_Sg->VmeUpdateProperty(vme,fromTag);}
+void mafViewPlot::VmeShow(mafVME *vme, bool show)												{assert(m_Sg); m_Sg->VmeShow(vme,show);}
 //----------------------------------------------------------------------------
-int  mafViewPlot::GetNodeStatus(mafNode *vme)
+void mafViewPlot::VmeUpdateProperty(mafVME *vme, bool fromTag)	        {assert(m_Sg); m_Sg->VmeUpdateProperty(vme,fromTag);}
+//----------------------------------------------------------------------------
+int  mafViewPlot::GetNodeStatus(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   int status = m_Sg ? m_Sg->GetNodeStatus(vme) : NODE_NON_VISIBLE;
@@ -110,43 +111,40 @@ int  mafViewPlot::GetNodeStatus(mafNode *vme)
     else if (m_PipeMap[vme_type].m_Visibility == MUTEX)
     {
       mafSceneNode *n = m_Sg->Vme2Node(vme);
-      n->m_Mutex = true;
+      n->SetMutex(true);
       status = m_Sg->GetNodeStatus(vme);
     }
   }
   return status;
 }
 //----------------------------------------------------------------------------
-void mafViewPlot::VmeRemove(mafNode *vme)
+void mafViewPlot::VmeRemove(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   assert(m_Sg); 
   m_Sg->VmeRemove(vme);
 }
 //----------------------------------------------------------------------------
-void mafViewPlot::VmeSelect(mafNode *vme, bool select)
+void mafViewPlot::VmeSelect(mafVME *vme, bool select)
 //----------------------------------------------------------------------------
 {
   assert(m_Sg); 
   m_Sg->VmeSelect(vme,select);
 }
 //----------------------------------------------------------------------------
-mafPipe* mafViewPlot::GetNodePipe(mafNode *vme)
+mafPipe* mafViewPlot::GetNodePipe(mafVME *vme)
 //----------------------------------------------------------------------------
 {
    assert(m_Sg);
    mafSceneNode *n = m_Sg->Vme2Node(vme);
    if(!n) return NULL;
-   return n->m_Pipe;
+   return n->GetPipe();
 }
 //----------------------------------------------------------------------------
-void mafViewPlot::GetVisualPipeName(mafNode *node, mafString &pipe_name)
+void mafViewPlot::GetVisualPipeName(mafVME *vme, mafString &pipe_name)
 //----------------------------------------------------------------------------
 {
-  assert(node->IsA("mafVME"));
-  mafVME *v = ((mafVME*)node);
-
-  mafString vme_type = v->GetTypeName();
+  mafString vme_type = vme->GetTypeName();
   if (!m_PipeMap.empty())
   {
     // pick up the visual pipe from the view's visual pipe map
@@ -155,11 +153,11 @@ void mafViewPlot::GetVisualPipeName(mafNode *node, mafString &pipe_name)
   if(pipe_name.IsEmpty())
   {
     // pick up the default visual pipe from the vme
-    pipe_name = v->GetVisualPipe();
+    pipe_name = vme->GetVisualPipe();
   }
 }
 //----------------------------------------------------------------------------
-void mafViewPlot::VmeCreatePipe(mafNode *vme)
+void mafViewPlot::VmeCreatePipe(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   mafString pipe_name = "";
@@ -176,9 +174,8 @@ void mafViewPlot::VmeCreatePipe(mafNode *vme)
     {
       pipe->SetListener(this);
       mafSceneNode *n = m_Sg->Vme2Node(vme);
-      assert(n && !n->m_Pipe);
+      assert(n && !n->GetPipe());
       pipe->Create(n);
-      n->m_Pipe = (mafPipe*)pipe;
     }
     else
     {
@@ -187,12 +184,11 @@ void mafViewPlot::VmeCreatePipe(mafNode *vme)
   }
 }
 //----------------------------------------------------------------------------
-void mafViewPlot::VmeDeletePipe(mafNode *vme)
+void mafViewPlot::VmeDeletePipe(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   mafSceneNode *n = m_Sg->Vme2Node(vme);
-  assert(n && n->m_Pipe);
-  cppDEL(n->m_Pipe);
+	n->DeletePipe();
 }
 //-------------------------------------------------------------------------
 mafGUI *mafViewPlot::CreateGui()

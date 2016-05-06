@@ -156,7 +156,7 @@ void mafPipeSurfaceTextured::Create(mafSceneNode *n/*, bool use_axes*/)
     }
     else if (m_SurfaceMaterial->GetMaterialTextureID() != -1)
     {
-      mafVME *texture_vme = mafVME::SafeDownCast(m_Vme->GetRoot()->FindInTreeById(m_SurfaceMaterial->GetMaterialTextureID()));
+      mafVME *texture_vme = m_Vme->GetRoot()->FindInTreeById(m_SurfaceMaterial->GetMaterialTextureID());
       texture_vme->GetOutput()->GetVTKData()->Update();
       vtkImageData *image = (vtkImageData *)texture_vme->GetOutput()->GetVTKData();
       m_Texture->SetInput(image);
@@ -442,10 +442,10 @@ void mafPipeSurfaceTextured::OnEvent(mafEventBase *maf_event)
         e->SetArg((long)&mafPipeSurfaceTextured::ImageAccept);
         e->SetString(&title);
         mafEventMacro(*e);
-        mafNode *n = e->GetVme();
+        mafVME *n = e->GetVme();
         if (n != NULL)
         {
-          vtkImageData *image = vtkImageData::SafeDownCast(((mafVME *)n)->GetOutput()->GetVTKData());
+          vtkImageData *image = vtkImageData::SafeDownCast(n->GetOutput()->GetVTKData());
           m_Gui->Enable(ID_USE_TEXTURE,image != NULL);
           if (image)
           {

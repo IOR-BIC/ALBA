@@ -54,7 +54,7 @@ mafVMEScalar::~mafVMEScalar()
   cppDEL(m_ScalarVector);
 }
 //-------------------------------------------------------------------------
-int mafVMEScalar::DeepCopy(mafNode *a)
+int mafVMEScalar::DeepCopy(mafVME *a)
 //-------------------------------------------------------------------------
 {
   if (Superclass::DeepCopy(a) == MAF_OK)

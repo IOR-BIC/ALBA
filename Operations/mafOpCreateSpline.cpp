@@ -59,7 +59,7 @@ mafOp* mafOpCreateSpline::Copy()
 	return new mafOpCreateSpline(m_Label);
 }
 //----------------------------------------------------------------------------
-bool mafOpCreateSpline::Accept(mafNode *node)
+bool mafOpCreateSpline::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
   return (node && node->IsMAFType(mafVME));

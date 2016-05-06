@@ -26,7 +26,7 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mafNode;
+class mafVME;
 class mafMSFImporter;
 
 //----------------------------------------------------------------------------
@@ -44,7 +44,7 @@ public:
   mafOp* Copy();
 
 	/** this operation does not depend on the selected node */
-  bool Accept(mafNode* node) {return true;};
+  bool Accept(mafVME* node) {return true;};
 
 	/** Builds operation's interface. */
   void OpRun();

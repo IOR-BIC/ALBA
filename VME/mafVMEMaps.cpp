@@ -106,7 +106,7 @@ mafVMEMaps::~mafVMEMaps()
 }
 
 //-------------------------------------------------------------------------
-int mafVMEMaps::DeepCopy(mafNode *a)
+int mafVMEMaps::DeepCopy(mafVME *a)
 //-------------------------------------------------------------------------
 { 
   if (Superclass::DeepCopy(a)==MAF_OK)
@@ -160,7 +160,7 @@ mafGUI* mafVMEMaps::CreateGui()
 //-------------------------------------------------------------------------
 {
   //return Superclass::CreateGui();
-  m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
+  m_Gui = mafVME::CreateGui(); // Called to show info about vmes' type and name
   m_Gui->SetListener(this);
   m_Gui->Divider();
 
@@ -242,7 +242,7 @@ void mafVMEMaps::Print(std::ostream& os, const int tabs)
 void mafVMEMaps::InternalPreUpdate()
 //-------------------------------------------------------------------------
 {
-  mafVME *vme = mafVME::SafeDownCast(GetMappedVMELink());
+  mafVME *vme = GetMappedVMELink();
   if(!vme)
     return;
   vtkPolyData *data = (vtkPolyData *)vme->GetOutput()->GetVTKData();
@@ -269,7 +269,7 @@ void mafVMEMaps::InternalPreUpdate()
       m_DistanceFilter->SetFilterModeToDensity();
     }
 
-    vtkDataSet *datasetvol = ((mafVME*)m_Volume)->GetOutput()->GetVTKData();
+    vtkDataSet *datasetvol = m_Volume->GetOutput()->GetVTKData();
     datasetvol->Update();
     m_DistanceFilter->SetDistanceModeToScalar();
     m_DistanceFilter->SetSource(datasetvol);
@@ -322,7 +322,7 @@ void mafVMEMaps::InternalPreUpdate()
 //     }
   }
 
-  mafVME *vol = mafVME::SafeDownCast(GetMappedVMELink());
+  mafVME *vol = GetMappedVMELink();
   m_MappedName = vol ? vol->GetName() : _("none");
 }
 
@@ -489,13 +489,13 @@ void mafVMEMaps::SetMaxDistance(int maxDistance)
 }
 
 //-----------------------------------------------------------------------
-mafNode *mafVMEMaps::GetMappedVMELink()
+mafVME *mafVMEMaps::GetMappedVMELink()
 //-----------------------------------------------------------------------
 {
-  return mafNode::SafeDownCast(GetLink("MappedVME"));
+  return GetLink("MappedVME");
 }
 //-----------------------------------------------------------------------
-void mafVMEMaps::SetMappedVMELink(mafNode *node)
+void mafVMEMaps::SetMappedVMELink(mafVME *node)
 //-----------------------------------------------------------------------
 {
   SetLink("MappedVME", node);
@@ -503,14 +503,14 @@ void mafVMEMaps::SetMappedVMELink(mafNode *node)
 }
 
 //-----------------------------------------------------------------------
-mafNode *mafVMEMaps::GetSourceVMELink()
+mafVME *mafVMEMaps::GetSourceVMELink()
 //-----------------------------------------------------------------------
 {
-  return mafNode::SafeDownCast(GetLink("SourceVME"));
+  return GetLink("SourceVME");
 }
 
 //-----------------------------------------------------------------------
-void mafVMEMaps::SetSourceVMELink(mafNode *node)
+void mafVMEMaps::SetSourceVMELink(mafVME *node)
 //-----------------------------------------------------------------------
 {
   SetLink("SourceVME", node);
@@ -549,7 +549,7 @@ vtkLookupTable *mafVMEMaps::CreateTable()
   {
 
     double range[2];
-    ((mafVME*)m_Volume)->GetOutput()->GetVTKData()->GetScalarRange(range);
+    m_Volume->GetOutput()->GetVTKData()->GetScalarRange(range);
 
     m_Table->SetTableValue(range[0],m_LowColour.Red()/255.0, m_LowColour.Green()/255.0,	m_LowColour.Blue()/255.0);
     m_Table->SetTableValue(m_SecondThreshold,m_MidColour1.Red()/255.0, m_MidColour1.Green()/255.0,	m_MidColour1.Blue()/255.0);
@@ -579,7 +579,7 @@ void mafVMEMaps::UpdateFilter()
 //-----------------------------------------------------------------------
 {
 
-  mafVME *vme = mafVME::SafeDownCast(GetMappedVMELink());
+  mafVME *vme = GetMappedVMELink();
   if(!vme)
     return;
   vtkPolyData *data = (vtkPolyData *)vme->GetOutput()->GetVTKData();
@@ -606,7 +606,7 @@ void mafVMEMaps::UpdateFilter()
       m_DistanceFilter->SetFilterModeToDensity();
     }
 
-    vtkDataSet *datasetvol = ((mafVME*)m_Volume)->GetOutput()->GetVTKData();
+    vtkDataSet *datasetvol = m_Volume->GetOutput()->GetVTKData();
     datasetvol->Update();
     m_DistanceFilter->SetDistanceModeToScalar();
     m_DistanceFilter->SetSource(datasetvol);
@@ -636,8 +636,4 @@ void mafVMEMaps::UpdateFilter()
       m_PolyData->Update();
     }
   }
-
-  //mafVME *vol = mafVME::SafeDownCast(GetMappedVMELink());
-  //m_MappedName = vol ? vol->GetName() : _("none");
-
 }

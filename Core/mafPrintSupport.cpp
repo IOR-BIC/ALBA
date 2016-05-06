@@ -144,20 +144,10 @@ void mafPrintSupport::OnPrintPreview(mafView *v)
   wxRect margins(tl,br);
 
   wxPrintout *printout, *printOutForPrinting;
-  if(v->GetSceneGraph()->GetInformationPipeModalityEnable())
-  {
-    printout = new wxHtmlPrintout();
-    ((wxHtmlPrintout *)printout)->SetHtmlText(v->GetHTMLText());
-
-    printOutForPrinting= new wxHtmlPrintout();
-    ((wxHtmlPrintout *)printOutForPrinting)->SetHtmlText(v->GetHTMLText());
-  }
-  else
-  {
-    printout = new mafPrintout(v,margins);
-    printOutForPrinting= new mafPrintout(v,margins);
-  }
-
+ 
+  printout = new mafPrintout(v,margins);
+  printOutForPrinting= new mafPrintout(v,margins);
+ 
   wxPrintPreview *preview = new wxPrintPreview(printout, printOutForPrinting, & printDialogData);
   preview->SetZoom(20);
   if (!preview->Ok())
@@ -184,38 +174,19 @@ void mafPrintSupport::OnPrint(mafView *v)
   wxPoint br = m_PageSetupData->GetMarginBottomRight();
   wxRect margins(tl,br);
 
-  if(v->GetSceneGraph()->GetInformationPipeModalityEnable())
+  
+  mafPrintout printout(v,margins);
+  if (!printer.Print( mafGetFrame(), &printout, TRUE))
   {
-    wxHtmlPrintout printout;
-    printout.SetHtmlText(v->GetHTMLText());
-    if (!printer.Print( mafGetFrame(), &printout, TRUE))
-    {
-      if (wxPrinter::GetLastError() == wxPRINTER_ERROR)
-        wxMessageBox("There was a problem printing.\nPerhaps your current printer is not set correctly?", "Printing", wxOK);
-      else
-        wxMessageBox("You canceled printing", "Printing", wxOK);
-    }
+    if (wxPrinter::GetLastError() == wxPRINTER_ERROR)
+      wxMessageBox("There was a problem printing.\nPerhaps your current printer is not set correctly?", "Printing", wxOK);
     else
-    {
-      (*m_PrintData) = printer.GetPrintDialogData().GetPrintData();
-    }
+      wxMessageBox("You canceled printing", "Printing", wxOK);
   }
   else
   {
-    mafPrintout printout(v,margins);
-    if (!printer.Print( mafGetFrame(), &printout, TRUE))
-    {
-      if (wxPrinter::GetLastError() == wxPRINTER_ERROR)
-        wxMessageBox("There was a problem printing.\nPerhaps your current printer is not set correctly?", "Printing", wxOK);
-      else
-        wxMessageBox("You canceled printing", "Printing", wxOK);
-    }
-    else
-    {
-      (*m_PrintData) = printer.GetPrintDialogData().GetPrintData();
-    }
+    (*m_PrintData) = printer.GetPrintDialogData().GetPrintData();
   }
-  
 }
 //----------------------------------------------------------------------------
 void mafPrintSupport::OnPrintSetup()

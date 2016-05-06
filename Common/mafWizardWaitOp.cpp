@@ -57,7 +57,7 @@ mafOp* mafWizardWaitOp::Copy()
 	return new mafWizardWaitOp(m_Label);
 }
 //----------------------------------------------------------------------------
-bool mafWizardWaitOp::Accept(mafNode *node)
+bool mafWizardWaitOp::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
   //can accept everytime

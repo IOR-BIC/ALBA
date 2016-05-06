@@ -213,9 +213,9 @@ void mafPipePolylineSlice::Create(mafSceneNode *n)
   m_Actor = vtkActor::New();
   m_Actor->SetMapper(m_Mapper);
 
-  if(((mafVMEOutputPolyline *)((mafVME *)m_Vme)->GetOutput())->GetMaterial()!=NULL)
+  if(((mafVMEOutputPolyline *)m_Vme->GetOutput())->GetMaterial()!=NULL)
   {
-	  m_Actor->GetProperty()->SetColor(((mafVMEOutputPolyline *)((mafVME *)m_Vme)->GetOutput())->GetMaterial()->m_Diffuse);
+	  m_Actor->GetProperty()->SetColor(((mafVMEOutputPolyline *)m_Vme->GetOutput())->GetMaterial()->m_Diffuse);
   }
   
   m_Actor->GetProperty()->SetLineWidth (1);
@@ -365,8 +365,8 @@ void mafPipePolylineSlice::SetSlice(double *Origin)
 		m_Cutter->Update();
         UpdateProperty();
 	}
-  if(m_Vme != NULL && ((mafVMEOutputPolyline *)((mafVME *)m_Vme)->GetOutput())->GetMaterial()!=NULL)
-    m_Actor->GetProperty()->SetColor(((mafVMEOutputPolyline *)((mafVME *)m_Vme)->GetOutput())->GetMaterial()->m_Diffuse);
+  if(m_Vme != NULL && ((mafVMEOutputPolyline *)m_Vme->GetOutput())->GetMaterial()!=NULL)
+    m_Actor->GetProperty()->SetColor(((mafVMEOutputPolyline *)m_Vme->GetOutput())->GetMaterial()->m_Diffuse);
 }
 //----------------------------------------------------------------------------
 void mafPipePolylineSlice::SetNormal(double *Normal)
@@ -399,8 +399,8 @@ void mafPipePolylineSlice::SetThickness(double thickness)
 	m_Actor->GetProperty()->SetLineWidth(m_Border);
   m_Actor->GetProperty()->SetPointSize(m_Border);
 
-  if (((mafVMEOutputPolyline *)((mafVME *)m_Vme)->GetOutput())->GetMaterial()!=NULL)
-    m_Actor->GetProperty()->SetColor(((mafVMEOutputPolyline *)((mafVME *)m_Vme)->GetOutput())->GetMaterial()->m_Diffuse);
+  if (((mafVMEOutputPolyline *)m_Vme->GetOutput())->GetMaterial()!=NULL)
+    m_Actor->GetProperty()->SetColor(((mafVMEOutputPolyline *)m_Vme->GetOutput())->GetMaterial()->m_Diffuse);
   
   m_Actor->Modified();
 	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
@@ -420,8 +420,8 @@ void mafPipePolylineSlice::SetRadius(double radius)
   {
     m_Tube->SetRadius(m_Radius);
     m_Tube->Update();
-    if (((mafVMEOutputPolyline *)((mafVME *)m_Vme)->GetOutput())->GetMaterial()!=NULL)
-      m_Actor->GetProperty()->SetColor(((mafVMEOutputPolyline *)((mafVME *)m_Vme)->GetOutput())->GetMaterial()->m_Diffuse);
+    if (((mafVMEOutputPolyline *)m_Vme->GetOutput())->GetMaterial()!=NULL)
+      m_Actor->GetProperty()->SetColor(((mafVMEOutputPolyline *)m_Vme->GetOutput())->GetMaterial()->m_Diffuse);
     m_Actor->Modified();
   }
 	//mafEventMacro(mafEvent(this,CAMERA_UPDATE));
@@ -470,9 +470,9 @@ void mafPipePolylineSlice::UpdateProperty()
 
   if(m_Actor)
   {
-    if(((mafVMEOutputPolyline *)((mafVME *)m_Vme)->GetOutput())->GetMaterial()!=NULL)
+    if(((mafVMEOutputPolyline *)m_Vme->GetOutput())->GetMaterial()!=NULL)
     {
-      m_Actor->GetProperty()->SetColor(((mafVMEOutputPolyline *)((mafVME *)m_Vme)->GetOutput())->GetMaterial()->m_Diffuse);
+      m_Actor->GetProperty()->SetColor(((mafVMEOutputPolyline *)m_Vme->GetOutput())->GetMaterial()->m_Diffuse);
     }
 
     m_Actor->Modified();

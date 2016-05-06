@@ -120,8 +120,7 @@ void mafPipePolylineSlice_BESTest::TestPipeExecution()
 
   //Assembly will be create when instancing mafSceneNode
   mafSceneNode *sceneNode;
-  sceneNode = new mafSceneNode(NULL,NULL,polyline, NULL);
-  sceneNode->m_RenFront = m_Renderer;
+  sceneNode = new mafSceneNode(NULL,NULL,polyline, m_Renderer);
 
   /////////// Pipe Instance and Creation ///////////
   mafPipePolylineSlice_BES *pipePolylineSlice = new mafPipePolylineSlice_BES;
@@ -204,8 +203,6 @@ void mafPipePolylineSlice_BESTest::TestPipeExecution()
 
   vtkDEL(actorList);
 
-  delete pipePolylineSlice;
-  sceneNode->m_RenFront = NULL;
   delete sceneNode;
 }
 //----------------------------------------------------------------------------

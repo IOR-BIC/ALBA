@@ -44,7 +44,7 @@
 #include "mafDataVector.h"
 #include "mafTagArray.h"
 #include "mafTagItem.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafVMEGenericAbstract.h"
 #include "mafOpReparentTo.h"
 #include "mafOpCreateGroup.h"
@@ -215,51 +215,6 @@ void mafOpManager::OpAdd(mafOp *op, wxString menuPath, bool can_undo, mafGUISett
   m_NumOp++;
 }
 //----------------------------------------------------------------------------
-/*void mafOpManager::FillMenu (wxMenu* import, wxMenu* mexport, wxMenu* operations)
-//----------------------------------------------------------------------------
-{
-  int submenu_id = 1;
-  
-  m_Menu[OPTYPE_IMPORTER] = import;
-  m_Menu[OPTYPE_EXPORTER] = mexport;
-  m_Menu[OPTYPE_OP] = operations;
-   
-	for(int i=0; i<m_NumOp; i++)
-  {
-    mafOp *o = m_OpList[i];
-    if (o->m_OpMenuPath != "")
-    {
-      wxMenu *sub_menu = NULL;
-
-      int item = m_Menu[o->GetType()]->FindItem(o->m_OpMenuPath);
-      if (item != wxNOT_FOUND)
-      {
-         wxMenuItem *menu_item = m_Menu[o->GetType()]->FindItem(item);
-         if (menu_item)
-           sub_menu = menu_item->GetSubMenu();
-      }
-      else
-      {
-        sub_menu = new wxMenu;
-        m_Menu[o->GetType()]->Append(submenu_id++,o->m_OpMenuPath,sub_menu);
-      }
-      
-      if(sub_menu)
-        sub_menu->Append(o->m_Id, o->m_Label, o->m_Label);
-      else
-        mafLogMessage("error in FillMenu");
-    }
-    else
-    {
-      m_Menu[o->GetType()]->Append(o->m_Id, o->m_Label, o->m_Label);
-    }
-    SetAccelerator(o);
-  }
-  wxAcceleratorTable accel(MAXOP, m_OpAccelEntries);
-  if (accel.Ok())
-    mafGetFrame()->SetAcceleratorTable(accel);
-}*/
-//----------------------------------------------------------------------------
 void mafOpManager::FillSettingDialog(mafGUISettingsDialog *settingDialog)
 //----------------------------------------------------------------------------
 {
@@ -373,7 +328,7 @@ void mafOpManager::SetAccelerator(mafOp *op)
   }
 }
 //----------------------------------------------------------------------------
-void mafOpManager::VmeSelected(mafNode* v)   
+void mafOpManager::VmeSelected(mafVME* v)   
 //----------------------------------------------------------------------------
 {
   m_Selected = v;
@@ -381,20 +336,20 @@ void mafOpManager::VmeSelected(mafNode* v)
 }
 
 //----------------------------------------------------------------------------
-void mafOpManager::VmeModified(mafNode* v)
+void mafOpManager::VmeModified(mafVME* v)
 {
 	if(m_Selected == v)
 		EnableOp();
 }
 
 //----------------------------------------------------------------------------
-mafNode* mafOpManager::GetSelectedVme()
+mafVME* mafOpManager::GetSelectedVme()
 //----------------------------------------------------------------------------
 {
 	return m_Selected;
 }
 //----------------------------------------------------------------------------
-void mafOpManager::OpSelect(mafNode* vme)
+void mafOpManager::OpSelect(mafVME* vme)
 //----------------------------------------------------------------------------
 {
 	if(vme == m_Selected ) 
@@ -403,16 +358,6 @@ void mafOpManager::OpSelect(mafNode* vme)
 	OpExec(m_OpSelect);
   mafLogMessage("node selected: %s", vme->GetName());
 }
-/*
-//----------------------------------------------------------------------------
-void mafOpManager::OpTransform(vtkMatrix4x4* new_matrix,vtkMatrix4x4* old_matrix)
-//----------------------------------------------------------------------------
-{
-	m_optransform->SetNewMatrix(new_matrix);
-	m_optransform->SetOldMatrix(old_matrix);
-	OpExec(m_optransform); 
-}
-*/
 //----------------------------------------------------------------------------
 void mafOpManager::ClearUndoStack()
 //----------------------------------------------------------------------------
@@ -427,27 +372,19 @@ void mafOpManager::EnableToolbar(bool CanEnable)
 {
 	if(!CanEnable)
 	{
-/*		m_ToolBar->EnableTool(MENU_FILE_NEW,false);	//Removed by Paolo 15-9-2003: HAL men
-		m_ToolBar->EnableTool(MENU_FILE_OPEN,false);
-		m_ToolBar->EnableTool(MENU_FILE_SAVE,false);*/
 		m_ToolBar->EnableTool(OP_UNDO,false);
 		m_ToolBar->EnableTool(OP_REDO,false);
 		m_ToolBar->EnableTool(OP_CUT,false);
 		m_ToolBar->EnableTool(OP_COPY,false);
 		m_ToolBar->EnableTool(OP_PASTE,false);
-		//m_ToolBar->EnableTool(OP_REPARENT, false);
 	}
 	else
 	{
-/*		m_ToolBar->EnableTool(MENU_FILE_NEW,true);
-		m_ToolBar->EnableTool(MENU_FILE_OPEN,true);
-		m_ToolBar->EnableTool(MENU_FILE_SAVE,true);*/
 		m_ToolBar->EnableTool(OP_UNDO,	!m_Context.Undo_IsEmpty());
 		m_ToolBar->EnableTool(OP_REDO,	!m_Context.Redo_IsEmpty());
 		m_ToolBar->EnableTool(OP_CUT,		m_OpCut->Accept(m_Selected) );
 		m_ToolBar->EnableTool(OP_COPY,	m_OpCopy->Accept(m_Selected) );
 		m_ToolBar->EnableTool(OP_PASTE,	m_OpPaste->Accept(m_Selected) );
-		//m_ToolBar->EnableTool(OP_REPARENT, m_OpReparent->Accept(m_Selected));
 	}
 }
 //----------------------------------------------------------------------------
@@ -492,11 +429,10 @@ void mafOpManager::EnableOp(bool CanEnable)
       }
 	  }
   }
-
 	if(m_ToolBar) EnableToolbar(CanEnable);
 }
 //----------------------------------------------------------------------------
-void mafOpManager::EnableContextualMenu(mafGUITreeContextualMenu *contextualMenu, mafNode *node, bool CanEnable)
+void mafOpManager::EnableContextualMenu(mafGUITreeContextualMenu *contextualMenu, mafVME *node, bool CanEnable)
 //----------------------------------------------------------------------------
 {
 	if(contextualMenu)
@@ -626,7 +562,7 @@ void mafOpManager::OpRun(mafOp *op, void *op_param)
 		if(dialog.ShowModal() == wxID_YES)
     {
       wxString synthetic_name = "Copied ";
-      mafAutoPointer<mafNode> synthetic_vme = m_Selected->MakeCopy();
+      mafAutoPointer<mafVME> synthetic_vme = m_Selected->MakeCopy();
       synthetic_vme->ReparentTo(m_Selected->GetParent());
       synthetic_name.Append(m_Selected->GetName());
       synthetic_vme->SetName(synthetic_name);
@@ -693,52 +629,52 @@ void mafOpManager::RunOpPaste()
 //----------------------------------------------------------------------------
 void mafOpManager::RunOpDelete()
 {
-	if (WarnUser(NULL))
-	{
-		mafNode *node_to_del = m_Selected;
-		OpSelect(m_Selected->GetParent());
+  if (WarnUser(NULL))
+  {
+    mafVME *node_to_del = m_Selected;
+    OpSelect(m_Selected->GetParent());
 
-		// do not remove binary files but fill a list with files to be deleted on save by the storage.
-		mafEventIO e(this, NODE_GET_STORAGE);
-		node_to_del->ForwardUpEvent(e);
-		mafStorage *storage = e.GetStorage();
-		mafNodeIterator *iter = node_to_del->NewIterator();
-		mafString data_filename;
-		for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
-		{
-			if (mafVMEGenericAbstract::SafeDownCast(node))
-			{
-				mafVMEGenericAbstract *vme = mafVMEGenericAbstract::SafeDownCast(node);
-				mafDataVector *dv = vme->GetDataVector();
-				if (dv != NULL)
-				{
-					if (dv->GetSingleFileMode())
-					{
-						mafString archive_filename = dv->GetArchiveName();
-						if (archive_filename != "")
-						{
-							storage->ReleaseURL(archive_filename);
-						}
-					}
-					else
-					{
-						mafVMEItem *item;
-						int i;
-						for (i = 0; i < dv->GetNumberOfItems(); i++)
-						{
-							item = dv->GetItemByIndex(i);
-							data_filename = item->GetURL();
-							storage->ReleaseURL(data_filename);
-						}
-					}
-				}
-			}
-		}
-		iter->Delete();
-		node_to_del->ReparentTo(NULL);
-		ClearUndoStack();
-		mafEventMacro(mafEvent(this, CAMERA_UPDATE));
-	}
+    // do not remove binary files but fill a list with files to be deleted on save by the storage.
+    mafEventIO e(this, NODE_GET_STORAGE);
+    node_to_del->ForwardUpEvent(e);
+    mafStorage *storage = e.GetStorage();
+    mafVMEIterator *iter = node_to_del->NewIterator();
+    mafString data_filename;
+    for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+    {
+      if(mafVMEGenericAbstract::SafeDownCast(node))
+      {
+        mafVMEGenericAbstract *vme = mafVMEGenericAbstract::SafeDownCast(node);
+        mafDataVector *dv = vme->GetDataVector();
+        if (dv != NULL)
+        {
+          if (dv->GetSingleFileMode())
+          {
+            mafString archive_filename = dv->GetArchiveName();
+            if (archive_filename != "")
+            {
+              storage->ReleaseURL(archive_filename);
+            }
+          }
+          else
+          {
+            mafVMEItem *item;
+            int i;
+            for (i = 0; i < dv->GetNumberOfItems(); i++)
+            {
+              item = dv->GetItemByIndex(i);
+              data_filename = item->GetURL();
+              storage->ReleaseURL(data_filename);
+            }
+          }
+        }
+      }
+    }
+    iter->Delete();
+    node_to_del->ReparentTo(NULL);
+    ClearUndoStack();
+    mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+  }
 }
 //----------------------------------------------------------------------------
 void mafOpManager::RunOpReparentTo()
@@ -806,8 +742,8 @@ void mafOpManager::OpDo(mafOp *op)
 {
   m_Context.Redo_Clear();
   op->OpDo();
-  mafNode *in_node = op->GetInput();
-  mafNode *out_node = op->GetOutput();
+  mafVME *in_node = op->GetInput();
+  mafVME *out_node = op->GetOutput();
 
   if (in_node != NULL)
   {
@@ -844,7 +780,7 @@ void mafOpManager::SetMafUser(mafUser *user)
 }
 
 //----------------------------------------------------------------------------
-void mafOpManager::FillTraceabilityAttribute(mafOp *op, mafNode *in_node, mafNode *out_node)
+void mafOpManager::FillTraceabilityAttribute(mafOp *op, mafVME *in_node, mafVME *out_node)
 //----------------------------------------------------------------------------
 {
   mafString trialEvent = "Modify";
@@ -908,8 +844,8 @@ void mafOpManager::FillTraceabilityAttribute(mafOp *op, mafNode *in_node, mafNod
   {
     int c = 0; //counter not to write single parameter on first VME which is a group
     wxString singleParameter = parameters.GetCStr();
-    mafNodeIterator *iter = out_node->NewIterator();
-    for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+    mafVMEIterator *iter = out_node->NewIterator();
+    for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
     {
       if (node != NULL)
       {
@@ -973,8 +909,8 @@ void mafOpManager::OpUndo()
 	EnableOp(false);
 
 	mafOp* op = m_Context.Undo_Pop();
-  mafNode *in_node = op->GetInput();
-  mafNode *out_node = op->GetOutput();
+  mafVME *in_node = op->GetInput();
+  mafVME *out_node = op->GetOutput();
   if (in_node != NULL)
   {
     mafLogMessage("undo = %s on input data: %s",op->m_Label.c_str(), in_node->GetName());
@@ -994,8 +930,8 @@ void mafOpManager::OpUndo()
 
   if (out_node != NULL)
   {
-    mafNodeIterator *iter = out_node->NewIterator();
-    for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+    mafVMEIterator *iter = out_node->NewIterator();
+    for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
     {
       if (node != NULL)
       {
@@ -1026,8 +962,8 @@ void mafOpManager::OpRedo()
 	EnableOp(false);
 
 	mafOp* op = m_Context.Redo_Pop();
-  mafNode *in_node = op->GetInput();
-  mafNode *out_node = op->GetOutput();
+  mafVME *in_node = op->GetInput();
+  mafVME *out_node = op->GetOutput();
   mafString parameters = op->GetParameters();
   if (in_node != NULL)
   {

@@ -30,7 +30,7 @@
 #include "mafGUIRollOut.h"
 #include "mafGUIListBox.h"
 
-#include "mafNodeIterator.h"
+#include "mafVMEIterator.h"
 #include "mafTagArray.h"
 
 #include "mafSmartPointer.h"
@@ -43,6 +43,8 @@
 #include "mafVME.h"
 #include "mafVMEGroup.h"
 #include "mafVMELandmarkCloud.h"
+#include "mafVMELandmark.h"
+#include "mafVMESurface.h"
 
 //----------------------------------------------------------------------------
 mafOpDecomposeTimeVarVME::mafOpDecomposeTimeVarVME(const wxString& label) :
@@ -68,16 +70,17 @@ mafOpDecomposeTimeVarVME::~mafOpDecomposeTimeVarVME()
 {
   if (m_Group != NULL) 
   {
-    for (int i = 0; i < m_VectorCloud.size(); i++)
-    {
-      m_VectorCloud[i]->RemoveLandmark(0);
-      mafDEL(m_VectorCloud[i]);
-    }
+   
 
     for (int i = 0; i < m_VectorVME.size(); i++)
     {
       mafDEL(m_VectorVME[i]);
     }
+
+		for (int i = 0; i < m_VectorCloud.size(); i++)
+		{
+			mafDEL(m_VectorCloud[i]);
+		}
     m_Group->ReparentTo(NULL);
     mafDEL(m_Group);
   }
@@ -91,22 +94,16 @@ mafOp* mafOpDecomposeTimeVarVME::Copy()
 }
 
 //----------------------------------------------------------------------------
-bool mafOpDecomposeTimeVarVME::Accept(mafNode* node)
+bool mafOpDecomposeTimeVarVME::Accept(mafVME* node)
 //----------------------------------------------------------------------------
 {
-  if(mafVMELandmarkCloud::SafeDownCast(node) != NULL)
-  {
-    if(mafVMELandmarkCloud::SafeDownCast(node)->IsOpen())
-      return false;
-  }
-
   //Until VMEAnalog is non time varying
   if (node->IsA("mafVMEScalarMatrix"))
   {
     return false;
   }
 
-  return (node && ((mafVME *)node)->IsAnimated());
+  return (node && node->IsAnimated());
 }
 
 //----------------------------------------------------------------------------
@@ -482,6 +479,8 @@ void mafOpDecomposeTimeVarVME::CreateStaticVME(mafTimeStamp timeSt)
   if (!newVme)
     return;
 
+	newVme->Register(this);
+
   //If VME is a landmark, a landmark cloud must be created
   if (typeVme.Equals("mafVMELandmark"))
   {
@@ -490,7 +489,6 @@ void mafOpDecomposeTimeVarVME::CreateStaticVME(mafTimeStamp timeSt)
 	{
 		m_Cloud->TestModeOn();
 	}
-    m_Cloud->Open();
     m_VectorCloud.push_back(m_Cloud);
   }
   else
@@ -546,15 +544,16 @@ void mafOpDecomposeTimeVarVME::CreateStaticVME(mafTimeStamp timeSt)
     mafString cloudName = "cloud_";
     cloudName << newName;
     m_Cloud->SetName(cloudName.GetCStr());
-    m_Cloud->AddChild(newVme);
+    newVme->ReparentTo(m_Cloud);
     m_Cloud->ReparentTo(m_Group);
     m_Group->Update();
   }
   else
   {
-    m_Group->AddChild(newVme);
+    newVme->ReparentTo(m_Group);
     m_Group->Update();
   }
+
 }
 //----------------------------------------------------------------------------
 void mafOpDecomposeTimeVarVME::EnableWidget(bool enable)

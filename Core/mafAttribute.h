@@ -22,13 +22,13 @@
 #include "mafStorable.h"
 #include "mafString.h"
 
-/** An abstract class for objects representing an attribute for mafNodes.
-  This abstract class represent the interface of an attribute for mafNodes. An attribute
+/** An abstract class for objects representing an attribute for mafVMEs.
+  This abstract class represent the interface of an attribute for mafVMEs. An attribute
   is a bunch of data that can be attached to a node. Attributes can be specialized classes
   providing any kind of information and functionality. The minimal required features are
   RTTI, object factory registration and Storability. Any attribute can be serialized and 
   then recreated from the factory and unserialized.
-  @sa mafNode mafStorable mafObject
+  @sa mafVME mafStorable mafObject
 */
 class MAF_EXPORT mafAttribute : public mafReferenceCounted, public mafStorable
 {
@@ -51,7 +51,7 @@ public:
 
   /** 
     Set the name of this attribute. this is typically used to identify it
-    inside the Attributes associative map stored inside a mafNode */
+    inside the Attributes associative map stored inside a mafVME */
   void SetName(const char *name);
   const char *GetName() const;
 

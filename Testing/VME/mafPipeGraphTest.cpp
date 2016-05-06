@@ -136,10 +136,8 @@ void mafPipeGraphTest::TestPipeExecution()
 
   //Assembly will be create when instancing mafSceneNode
   mafSceneNode *sceneNode;
-  sceneNode = new mafSceneNode(NULL,NULL,analog, NULL);
-  sceneNode->m_RenFront = m_Renderer;
-  sceneNode->m_AlwaysVisibleRenderer = m_AlwaysVisibleRenderer;
-
+  sceneNode = new mafSceneNode(NULL,NULL,analog, m_Renderer,NULL,m_AlwaysVisibleRenderer);
+  
   /////////// Pipe Instance and Creation ///////////
   mafPipeGraph *pipe = new mafPipeGraph;
   pipe->Create(sceneNode);
@@ -169,10 +167,6 @@ void mafPipeGraphTest::TestPipeExecution()
   m_RenderWindow->Render();
   CompareImages(0);
  
-  delete pipe;
-  
-  sceneNode->m_RenFront = NULL;
-  sceneNode->m_AlwaysVisibleRenderer = NULL;
   delete sceneNode;
   mafDEL(analog);
 }

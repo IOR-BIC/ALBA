@@ -28,7 +28,7 @@
 
 #include "mafView.h"
 #include "mafOp.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafString.h"
 #include "mafMatrix.h"
 
@@ -58,7 +58,7 @@ enum HIGHEST_EVENT_ID
   mafEvent::mafEvent(void *sender, int id, mafString        *s,       long arg)							{ Init(sender, id, arg); m_MAFString =s;                        Initialized();}
   mafEvent::mafEvent(void *sender, int id, mafString       *s, int x, int y, int width, int height,  long arg)  { Init(sender, id, arg); m_MAFString =s; m_x = x; m_y = y; m_width = width; m_height = height;   Initialized();}
   mafEvent::mafEvent(void *sender, int id, mafView          *view,    wxWindow *win)				{ Init(sender, id, 0);   m_View =view; m_Win  =win;             Initialized();}
-  mafEvent::mafEvent(void *sender, int id, mafNode          *vme,     bool b,long arg)			{ Init(sender, id, arg); m_Vme  =vme; m_Bool = b;               Initialized();}
+  mafEvent::mafEvent(void *sender, int id, mafVME          *vme,     bool b,long arg)			{ Init(sender, id, arg); m_Vme  =vme; m_Bool = b;               Initialized();}
   mafEvent::mafEvent(void *sender, int id, mafOp            *op,      long arg)							{ Init(sender, id, arg);   m_Op   =op;                          Initialized();}
   mafEvent::mafEvent(void *sender, int id, mafMatrix        *m1,mafMatrix  *m2)					    { Init(sender, id, 0);   m_Matrix =m1; m_OldMatrix =m2;         Initialized();}
   mafEvent::mafEvent(void *sender, int id, mafObject        *mafobj,  long arg)						  { Init(sender, id, arg); m_MafObject = mafobj;                  Initialized();}
@@ -81,7 +81,7 @@ enum HIGHEST_EVENT_ID
 #ifdef MAF_USE_VTK
   mafEvent::mafEvent(void *sender, int id, vtkObject       *vtkobj, long arg)							{ Init(sender, id, arg); m_VtkObj = vtkobj;							Initialized();}
   mafEvent::mafEvent(void *sender, int id, vtkObject       *vtkobj, mafString *s)         { Init(sender, id, 0);   m_VtkObj = vtkobj;m_MAFString =s; Initialized();}
-  mafEvent::mafEvent(void *sender, int id, vtkProp         *prop,   mafNode *vme)   			{ Init(sender, id, 0);   m_VtkProp= prop; m_Vme = vme;  Initialized();}
+  mafEvent::mafEvent(void *sender, int id, vtkProp         *prop,   mafVME *vme)   			{ Init(sender, id, 0);   m_VtkProp= prop; m_Vme = vme;  Initialized();}
 #endif
 		
 //----------------------------------------------------------------------------
@@ -264,14 +264,14 @@ void mafEvent::SetWidgetData(WidgetDataType &widget_data)
   m_WidgetData.sValue= widget_data.sValue;
 }
 //------------------------------------------------------------------------------
-void mafEvent::SetVmeVector(std::vector<mafNode*> vmeVector)
+void mafEvent::SetVmeVector(std::vector<mafVME*> vmeVector)
 //------------------------------------------------------------------------------
 {
   m_VmeVector.swap(vmeVector);
 }
 
 //------------------------------------------------------------------------------
-std::vector<mafNode*> mafEvent::GetVmeVector()
+std::vector<mafVME*> mafEvent::GetVmeVector()
 //------------------------------------------------------------------------------
 {
   return m_VmeVector;

@@ -32,7 +32,7 @@
 #include "mafVMEStorage.h"
 #include "mafVME.h"
 #include "mafVMEImage.h"
-#include "mafNodeIterator.h"
+#include "mafVMEIterator.h"
 
 
 #include "vtkDataSet.h"
@@ -52,10 +52,10 @@ void mafOpImporterImageTest::Test_Single()
   filename<<"/Image/imageTest.jpg";
 	importer->SetFileName(filename.GetCStr());
 	importer->OpRun();
-	mafNode *node=importer->GetOutput();
+	mafVME *node=importer->GetOutput();
 	
 	CPPUNIT_ASSERT(node->IsA("mafVMEImage"));
-	vtkDataSet *data=((mafVME *)node)->GetOutput()->GetVTKData();
+	vtkDataSet *data=node->GetOutput()->GetVTKData();
 	data->Update();
   mafString name = node->GetName();
   CPPUNIT_ASSERT(!name.Compare("imageTest")); //compare returns 0 if equal
@@ -88,10 +88,10 @@ void mafOpImporterImageTest::Test_Multi_No_Volume()
 
   importer->OpRun();
   importer->ImportImage();
-	mafNode *node=importer->GetOutput();
+	mafVME *node=importer->GetOutput();
 	
 	CPPUNIT_ASSERT(node->IsA("mafVMEImage"));
-	vtkDataSet *data=((mafVME *)node)->GetOutput()->GetVTKData();
+	vtkDataSet *data=node->GetOutput()->GetVTKData();
 	data->Update();
   mafString name = node->GetName();
   CPPUNIT_ASSERT(!name.Compare("Imported Images")); //compare returns 0 if equal*/
@@ -136,10 +136,10 @@ void mafOpImporterImageTest::Test_Multi_Volume()
 
   
   importer->ImportImage();
-	mafNode *node=importer->GetOutput();
+	mafVME *node=importer->GetOutput();
 	
 	CPPUNIT_ASSERT(node->IsA("mafVMEVolumeRGB"));
-	vtkDataSet *data=((mafVME *)node)->GetOutput()->GetVTKData();
+	vtkDataSet *data=node->GetOutput()->GetVTKData();
 	data->Update();
   mafString name = node->GetName();
   CPPUNIT_ASSERT(!name.Compare("Imported Volume")); //compare returns 0 if equal

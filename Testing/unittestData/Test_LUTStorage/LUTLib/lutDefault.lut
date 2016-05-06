@@ -2,7 +2,7 @@ TableRange	0	1
 
 NumberOfTableValues	256
 
-id	red	green	blue	alpha
+Id	red	green	blue	alpha
 0	1	0	0	1
 1	1	0	0	1
 2	1	0.0156863	0	1

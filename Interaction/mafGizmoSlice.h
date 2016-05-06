@@ -42,7 +42,7 @@ class MAF_EXPORT mafGizmoSlice : public mafGizmoInterface
 {
 public:
 
-	mafGizmoSlice(mafNode* inputVme, mafObserver *Listener = NULL, const char *name = "GizmoSlice", bool inverseHandle = false, double centralClipfactor = 0);
+	mafGizmoSlice(mafVME* inputVme, mafObserver *Listener = NULL, const char *name = "GizmoSlice", bool inverseHandle = false, double centralClipfactor = 0);
 
   virtual	~mafGizmoSlice();
 
@@ -96,7 +96,7 @@ public:
 
 protected:
 
-  void CreateGizmoSlice(mafNode *imputVme, mafObserver *listener, const char *name, bool inverseHandle, double centralClipfactor);
+  void CreateGizmoSlice(mafVME *imputVme, mafObserver *listener, const char *name, bool inverseHandle, double centralClipfactor);
 
   void DestroyGizmoSlice();
 

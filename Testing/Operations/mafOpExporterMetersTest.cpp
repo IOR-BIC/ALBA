@@ -72,7 +72,6 @@ void mafOpExporterMetersTest::TestOnMetersImporter()
   importer->SetFileName(filename.GetCStr());
   importer->Read();
   mafVMELandmarkCloud *cloud=(mafVMELandmarkCloud *)importer->GetOutput();
-  cloud->Open();
 
   storage->GetRoot()->AddChild(cloud);
   //cloud->SetParent(storage->GetRoot());
@@ -257,10 +256,10 @@ void mafOpExporterMetersTest::TestOnMetersImporter()
   result = res == MAF_OK;
   TEST_RESULT;
 
-  wrappedMeterManual->SetParent(NULL);
-  vmeParametricSurfaceWrapped->SetParent(NULL);
-  meter->SetParent(NULL);
-  wrappedMeterAutomatic->SetParent(NULL);
+  wrappedMeterManual->ReparentTo(NULL);
+  vmeParametricSurfaceWrapped->ReparentTo(NULL);
+  meter->ReparentTo(NULL);
+  wrappedMeterAutomatic->ReparentTo(NULL);
 
   mafDEL(exporter);
   mafDEL(wrappedMeterManual);

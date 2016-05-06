@@ -61,18 +61,18 @@ public:
 	};
 
   /** 
-  Set the visualization status for the node (visible, not visible, mutex, ...) 
+  Set the visualization status for the vme (visible, not visible, mutex, ...) 
   \sa mafSceneGraph mafView*/
-  int GetNodeStatus(mafNode *vme);
+  int GetNodeStatus(mafVME *vme);
 
 	/** Create visual pipe and initialize them to build an OrthoSlice visualization */
   virtual void PackageView();
 
 	/** Show/Hide VMEs into plugged sub-views*/
-  virtual void VmeShow(mafNode *node, bool show);
+  virtual void VmeShow(mafVME *vme, bool show);
 
 	/** Remove VME into plugged sub-views*/
-  virtual void VmeRemove(mafNode *node);
+  virtual void VmeRemove(mafVME *vme);
 
 	/** Create the GUI on the bottom of the compounded view. */
   virtual void CreateGuiView();
@@ -85,10 +85,7 @@ public:
 
   /** Force the updating of the camera. */
 	virtual void CameraUpdate();
-
-  //virtual void VmeSelect(mafNode *node, bool select);
-
-
+	  
 protected:
 
 	/** Internally used to create a new instance of the GUI. 
@@ -107,10 +104,10 @@ protected:
 
   /**Protected method returning true if windowing can be enabled.
   It overrides superclass method.*/
-  bool ActivateWindowing(mafNode *node);
+  bool ActivateWindowing(mafVME *vme);
 
   /**Update lutslider with correct values in case of bool variable is true, otherwise disable the widget. */
-  void UpdateWindowing(bool enable, mafNode *node);
+  void UpdateWindowing(bool enable, mafVME *vme);
 
   /** Update windowing on slicer visualization. */
   void SlicerWindowing(mafVMESlicer *slicer);

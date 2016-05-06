@@ -57,7 +57,7 @@ void mafOpExporterAnsysCDBFileTest::TestAnsysCDBFile_AutoFillData()
 void mafOpExporterAnsysCDBFileTest::Check_CDBFile(mafString fileName)
 {
 	mafVMEStorage *storage = mafVMEStorage::New();
-	mafNode *root = (mafNode *)storage->GetRoot();
+	mafVME *root = (mafVME *)storage->GetRoot();
 
   mafString filePath= MAF_DATA_ROOT;
   filePath<<"/mafOpExporterAnsysCDBFileTest/";
@@ -106,7 +106,7 @@ void mafOpExporterAnsysCDBFileTest::Check_CDBFile(mafString fileName)
 void mafOpExporterAnsysCDBFileTest::CompareCDBFilesData(mafString fileName)
 {
 	mafVMEStorage *storage = mafVMEStorage::New();
-	mafNode *root = (mafNode *)storage->GetRoot();
+	mafVME *root = (mafVME *)storage->GetRoot();
 
   mafString filePath= MAF_DATA_ROOT;
   filePath<<"/mafOpExporterAnsysCDBFileTest/";

@@ -80,7 +80,7 @@ protected:
   virtual mafGUI  *CreateGui();
 
    /** A function with windowing activate/deactivate conditions*/
-  virtual bool ActivateWindowing(mafNode *node);
+  virtual bool ActivateWindowing(mafVME *vme);
 
 	mafViewVTK *m_ViewVTK;
 

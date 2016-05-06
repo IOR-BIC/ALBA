@@ -38,14 +38,14 @@ public:
 
   mafOp* Copy();
 
-  bool Accept(mafNode *node);
+  bool Accept(mafVME *node);
   void OpRun();
   void OpDo();
 
-  static bool VolumeAccept(mafNode* node) {return(node != NULL  && node->IsMAFType(mafVMEVolume));};
+  static bool VolumeAccept(mafVME* node) {return(node != NULL  && node->IsMAFType(mafVMEVolume));};
 
 protected: 
   mafVMESlicer *m_Slicer;
-  mafNode      *m_SlicedVME;
+  mafVME      *m_SlicedVME;
 };
 #endif

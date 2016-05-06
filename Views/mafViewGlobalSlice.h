@@ -76,19 +76,19 @@ public:
 	virtual void Create();
 
 	/** 
-  Create the visual pipe for the node passed as argument. 
+  Create the visual pipe for the vme passed as argument. 
   To create visual pipe first check in m_PipeMap if custom visual pipe is defined, 
   otherwise ask to vme which is its visual pipe. */
-  virtual void VmeCreatePipe(mafNode *vme);
+  virtual void VmeCreatePipe(mafVME *vme);
 
 	/** Delete vme's visual pipe. It is called when vme is removed from visualization.*/
-  virtual void VmeDeletePipe(mafNode *vme);
+  virtual void VmeDeletePipe(mafVME *vme);
 
   /** Function that handles events sent from other objects. */
 	virtual void OnEvent(mafEventBase *maf_event);
 
   /** Function called when select a vme different from selected one.*/
-	virtual void VmeSelect(mafNode *node, bool select);
+	virtual void VmeSelect(mafVME *vme, bool select);
 
 	/** Set slicer parameter to generate the slice. */
   virtual void SetSlice(double origin[3], float xVect[3], float yVect[3]);
@@ -97,7 +97,7 @@ public:
 	virtual void SetSlice(double origin[3], double dn = 0.0);
 
 	/** Show/Hide VMEs into plugged sub-views*/
-  virtual void VmeShow(mafNode *node, bool show);
+  virtual void VmeShow(mafVME *vme, bool show);
 
   /** Force the updating of the camera. */
 	virtual void CameraUpdate();

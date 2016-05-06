@@ -29,7 +29,7 @@
 class mafGUIDialog;
 class mafGUIFloatSlider;
 class mafVMESurface;
-class mafNode;
+class mafVME;
 class mafRWI;
 
 class vtkActor;
@@ -70,7 +70,7 @@ public:
   void OnEvent(mafEventBase *maf_event);
 
 	/** Return true for the acceptable vme type. */
-  bool Accept(mafNode* vme);
+  bool Accept(mafVME* vme);
 
 	/** Builds operation's interface by calling CreateOpDialog() method. */
   void OpRun();

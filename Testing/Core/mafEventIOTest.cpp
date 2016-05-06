@@ -124,7 +124,7 @@ void mafEventIOTest::TestSetRoot()
   mafEventIO *eventA = new mafEventIO();
   eventA->SetRoot(rootSet);
 
-  mafNode *rootReturned = eventA->GetRoot();
+  mafVME *rootReturned = eventA->GetRoot();
  
   //Check if node returned is a mafVEMRoot
   CPPUNIT_ASSERT(rootReturned->IsA("mafVMERoot"));

@@ -182,7 +182,7 @@ void mafPipeVolumeSliceTest::TestPipeExecution()
 
     m_Renderer->RemoveAllProps();
     vtkDEL(actorList);
-    delete pipeSlice;
+		sceneNode->DeletePipe();
   }
 
   delete sceneNode;

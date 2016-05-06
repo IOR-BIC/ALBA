@@ -53,13 +53,13 @@ public:
 	mafTypeMacro(mafOpCropDeformableROI, mafOp);
 
   /** acceptance static function */
-	static bool OutputSurfaceAccept(mafNode *node) {return(node != NULL && ((mafVME*)node)->GetOutput()->IsA("mafVMEOutputSurface"));};
+	static bool OutputSurfaceAccept(mafVME*node) {return(node != NULL && node->GetOutput()->IsA("mafVMEOutputSurface"));};
 
   /** Return a copy of the operation.*/
 	mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */
-	bool Accept(mafNode *node);
+	bool Accept(mafVME*node);
 
 	/** Builds operation's interface. */
 	void OpRun();
@@ -88,7 +88,7 @@ protected:
 	double m_Distance;
 	double m_FillValue;
 	int		m_InsideOut;
-	mafNode *m_PNode;
+	mafVME *m_PNode;
 
 	mafVMEVolumeGray *m_ResultVme;
 

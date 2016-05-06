@@ -106,7 +106,7 @@ public:
 
   /**
   Allow to perform a DeepCopy with data very large.
-  Release memory of the input mafNode. */
+  Release memory of the input mafVME. */
   void DeepCopyVmeLarge(mafDataVector *o);
 
   static mafID GetSingleFileDataId();

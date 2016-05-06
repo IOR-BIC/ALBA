@@ -48,13 +48,13 @@ public:
   mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */
-	bool Accept(mafNode *node);
+	bool Accept(mafVME*node);
 
   /** Builds operation's interface. */
 	void OpRun();
 
 	
-  static bool ConstrainAccept(mafNode* node) {return (node != NULL && \
+  static bool ConstrainAccept(mafVME* node) {return (node != NULL && \
     (node->IsMAFType(mafVMEPolylineGraph))) ;};
 
   void OpDo();
@@ -65,7 +65,7 @@ protected:
 
 private:
 
-  void OnChooseConstrainVme(mafNode *vme);
+  void OnChooseConstrainVme(mafVME *vme);
   void BuildVMEPolyline( vtkPoints * in_points, mafVMEPolyline *polyline );
 	void BuildPolyline3(vtkPoints *in_points);
 	void BuildPolyline2(vtkPoints *in_points);

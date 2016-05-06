@@ -30,7 +30,7 @@
 #include "mafGUIDialog.h"
 #include "mafGUIFloatSlider.h"
 #include "mafGUIValidator.h"
-#include "mafNode.h"
+#include "mafVME.h"
 #include "mafTagArray.h"
 #include "mafVMESurface.h"
 #include "mafVMEVolumeGray.h"
@@ -117,7 +117,7 @@ mafOpExtractGeometry::~mafOpExtractGeometry()
   vtkDEL(m_SurfaceExtractor);
 }
 //----------------------------------------------------------------------------
-bool mafOpExtractGeometry::Accept(mafNode *node)
+bool mafOpExtractGeometry::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
   return ( node != NULL && node->IsA("mafVMEVolumeGray") );
@@ -493,7 +493,7 @@ void mafOpExtractGeometry::VolumeSmoothing()
   newImageData->SetScalarTypeToUnsignedChar();
   newImageData->Update();
 
-  m_ResampledVolume->SetData(newImageData,mafVME::SafeDownCast(m_ResampledVolume)->GetTimeStamp());
+  m_ResampledVolume->SetData(newImageData,m_ResampledVolume->GetTimeStamp());
 }
 
 //----------------------------------------------------------------------------
@@ -726,7 +726,7 @@ int mafOpExtractGeometry::Resample()
   bool checkSpacing = true;
   double m_VolumeBounds[6];
 
-  vtkDataSet *vme_data = ((mafVME *)m_VolumeInput)->GetOutput()->GetVTKData();
+  vtkDataSet *vme_data = m_VolumeInput->GetOutput()->GetVTKData();
   m_VolumeInput->GetOutput()->GetBounds(m_VolumeBounds);
 
   m_VolumeSpacing[0] = VTK_DOUBLE_MAX;

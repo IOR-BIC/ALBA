@@ -30,9 +30,7 @@
 #include "mafPics.h"
 #include "mafGUIMDIFrame.h"
 
-#include "mafNodeFactory.h"
-#include "mafNodeGeneric.h"
-#include "mafNodeRoot.h"
+#include "mafVMEFactory.h"
 #include "mafVMERoot.h"
 #include "mafVMESurface.h"
 #include "mafPipeFactoryVME.h"
@@ -100,7 +98,6 @@
 #include "mafOpCreateSlicer.h"
 #include "mafOpCrop.h"
 #include "mafOpEditMetadata.h"
-#include "mafOpExplodeCollapse.h"
 #include "mafOpExtractIsosurface.h"
 #include "mafOpFilterSurface.h"
 #include "mafOpFilterVolume.h"
@@ -298,7 +295,6 @@ bool exMedicalApp::OnInit()
 	m_Logic->Plug(new mafOpConnectivitySurface("Connectivity Surface"),_("Modify"));
 	m_Logic->Plug(new mafOpEditNormals("Edit Normals"),_("Modify"));
 	m_Logic->Plug(new mafOpEditMetadata("Metadata Editor"),_("Modify"));
-	m_Logic->Plug(new mafOpExplodeCollapse("Explode/Collapse cloud"),_("Modify"));
 	m_Logic->Plug(new mafOpMAFTransform("Transform"),_("Modify"));
 	m_Logic->Plug(new medOpVolumeResample("Resample Volume"),_("Modify"));
 	m_Logic->Plug(new mafOpCrop("Crop Volume"),_("Modify"));

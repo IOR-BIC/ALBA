@@ -153,7 +153,6 @@ void mafPipeImage3DTest::TestPipeRGBImageExecution()
 
   vtkDEL(actorList);
 
-  delete pipeImage3D;
   delete sceneNode;
 
   mafDEL(image);
@@ -227,7 +226,6 @@ void mafPipeImage3DTest::TestPipeGrayImageExecution()
 
 	vtkDEL(actorList);
 
-	delete pipeImage3D;
 	delete sceneNode;
 
 	mafDEL(image);

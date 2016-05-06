@@ -21,14 +21,14 @@
 #include "mafDecl.h"
 #include "mafEvent.h"
 #include "mafOp.h"
-#include "mafNodeIterator.h"
+#include "mafVMEIterator.h"
 #include "mafSmartPointer.h" //for mafAutoPointer
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mafNode;
+class mafVME;
 
-template class MAF_EXPORT mafAutoPointer<mafNode>;
+template class MAF_EXPORT mafAutoPointer<mafVME>;
 
 /**
     class name: mafOpSelect
@@ -42,15 +42,15 @@ public:
     /** Destructor. */
    ~mafOpSelect(); 
     /** check if node can be input of the operation. */
-    bool Accept(mafNode* vme);
+    bool Accept(mafVME* vme);
     /** set input node to the operation. */
-    void SetInput(mafNode* vme);
+    void SetInput(mafVME* vme);
     /** retrieve the input node. */
-    mafNode* GetInput(){return m_OldNodeSelected;};
+    mafVME* GetInput(){return m_OldNodeSelected;};
     /** selection of another node. */
-    void SetNewSel(mafNode* vme);
+    void SetNewSel(mafVME* vme);
     /** retrieve new selected node. */
-    mafNode* GetNewSel(){return m_NewNodeSelected;};
+    mafVME* GetNewSel(){return m_NewNodeSelected;};
     /** execute the operation.  */
     void OpDo();
     /** undo the operation. */
@@ -58,8 +58,8 @@ public:
     /** return a instance of current object. */
     mafOp* Copy();
 protected:
-    mafAutoPointer<mafNode> m_OldNodeSelected;
-    mafAutoPointer<mafNode> m_NewNodeSelected;
+    mafAutoPointer<mafVME> m_OldNodeSelected;
+    mafAutoPointer<mafVME> m_NewNodeSelected;
 };
 /**
     class name: mafOpEdit
@@ -73,7 +73,7 @@ public:
     /** Destructor. */
     ~mafOpEdit(); 
     /** set input node to the operation. */
-    void     SetInput(mafNode* vme) {m_Selection = vme;};
+    void     SetInput(mafVME* vme) {m_Selection = vme;};
     /** check if the clipboard is empty.*/
     bool     ClipboardIsEmpty();
     /** clear the clipboard. */
@@ -82,16 +82,16 @@ public:
 		void     ClipboardBackup();
     /** restore clipboard from backup */
 		void     ClipboardRestore();
-    /** return the mafNode that is in the clipboard */
-    mafNode* GetClipboard();
+    /** return the mafVME that is in the clipboard */
+    mafVME* GetClipboard();
     /** set the clipboard */
-    void SetClipboard(mafNode *node);
+    void SetClipboard(mafVME *node);
 		/** set the parent of the selection */
-		void SetSelectionParent(mafNode *parent);
+		void SetSelectionParent(mafVME *parent);
 protected:
-  // static   mafAutoPointer<mafNode> m_Clipboard;
-  mafAutoPointer<mafNode> m_Backup;
-  mafAutoPointer<mafNode> m_Selection;
+  // static   mafAutoPointer<mafVME> m_Clipboard;
+  mafAutoPointer<mafVME> m_Backup;
+  mafAutoPointer<mafVME> m_Selection;
 };
 /**
     class name: mafOpCut
@@ -105,7 +105,7 @@ public:
     /** Destructor. */
     ~mafOpCut();
     /** check if node can be input of the operation. */
-    bool Accept(mafNode* vme);
+    bool Accept(mafVME* vme);
     /** execute the operation.  */
     void OpDo();
 				
@@ -114,12 +114,12 @@ public:
     /** return a instance of current object. */
     mafOp* Copy(); 
     /** Load VTK data for the specified VME (Added by Losi on 03.06.2010) */
-    void LoadVTKData(mafNode *vme);
+    void LoadVTKData(mafVME *vme);
 
 protected:
    
     /** Load all children in the tree (Added by Di Cosmo on 24.05.2012) */
-    void LoadChild(mafNode *vme);
+    void LoadChild(mafVME *vme);
 };
 /**
     class name: mafOpCopy
@@ -133,7 +133,7 @@ public:
     /** Destructor. */
     ~mafOpCopy();
     /** check if node can be input of the operation. */
-    bool Accept(mafNode* vme);
+    bool Accept(mafVME* vme);
     /** execute the operation.  */
     void OpDo();
     /** undo the operation. */
@@ -151,7 +151,7 @@ public:
     /** Constructor. */
     mafOpPaste(wxString label=_("Paste"));
     /** check if node can be input of the operation. */
-    bool Accept(mafNode* vme);
+    bool Accept(mafVME* vme);
     /** execute the operation.  */    
     void OpDo();
     /** undo the operation. */
@@ -159,7 +159,7 @@ public:
     /** return a instance of current object. */
     mafOp* Copy(); 
 protected:
-    mafAutoPointer<mafNode> m_PastedVme;
+    mafAutoPointer<mafVME> m_PastedVme;
 };
 
 #endif

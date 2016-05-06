@@ -29,8 +29,8 @@
 #include "mafGUIDialog.h"
 #include "mafPics.h" 
 #include "mafEvent.h"
-#include "mafNode.h"
-#include "mafNodeIterator.h"
+#include "mafVME.h"
+#include "mafVMEIterator.h"
 #include "mafView.h"
 #include "mafVMERoot.h"
 #include "mafVMELandmarkCloud.h"
@@ -46,7 +46,7 @@ BEGIN_EVENT_TABLE(mafGUIVMEChooserTree,wxPanel)
 END_EVENT_TABLE()
 
 //----------------------------------------------------------------------------
-mafGUIVMEChooserTree::mafGUIVMEChooserTree( wxWindow *parent, mafGUICheckTree *tree, ValidateCallBackType vme_accept_function,wxWindowID id, bool CloseButton, bool HideTitle, long style, bool multiSelect, mafNode *subTree)
+mafGUIVMEChooserTree::mafGUIVMEChooserTree( wxWindow *parent, mafGUICheckTree *tree, ValidateCallBackType vme_accept_function,wxWindowID id, bool CloseButton, bool HideTitle, long style, bool multiSelect, mafVME *subTree)
 :mafGUICheckTree(parent, id, CloseButton, HideTitle)
 //----------------------------------------------------------------------------
 {
@@ -80,7 +80,7 @@ mafGUIVMEChooserTree::~mafGUIVMEChooserTree()
 {
 }
 //----------------------------------------------------------------------------
-int mafGUIVMEChooserTree::GetVmeStatus(mafNode *node)
+int mafGUIVMEChooserTree::GetVmeStatus(mafVME *node)
 //----------------------------------------------------------------------------
 {
   int image_id;
@@ -88,16 +88,8 @@ int mafGUIVMEChooserTree::GetVmeStatus(mafNode *node)
   {
     if (m_MultipleSelection)
     {
-      if (!node->IsMAFType(mafVMELandmarkCloud))
-      {
-        image_id = ClassNameToIcon(node->GetTypeName()) + NODE_VISIBLE_ON;
-        return image_id;
-      }
-      else if (!((mafVMELandmarkCloud*)node)->IsOpen())
-      {
-        image_id = ClassNameToIcon(node->GetTypeName()) + NODE_VISIBLE_ON;
-        return image_id;
-      }
+      image_id = ClassNameToIcon(node->GetTypeName()) + NODE_VISIBLE_ON;
+      return image_id;
     }
     else
     {
@@ -122,7 +114,7 @@ int mafGUIVMEChooserTree::GetVmeStatus(mafNode *node)
 }
 
 //----------------------------------------------------------------------------
-std::vector<mafNode*> mafGUIVMEChooserTree::GetChoosedNode()
+std::vector<mafVME*> mafGUIVMEChooserTree::GetChoosedNode()
 //----------------------------------------------------------------------------
 {
   if (!m_MultipleSelection)
@@ -206,7 +198,7 @@ void mafGUIVMEChooserTree::OnSelectionChanged(wxTreeEvent& event)
   i = event.GetItem();
   if(i.IsOk())
   {
-    m_ChoosedNode = (mafNode *)NodeFromItem(i);
+    m_ChoosedNode = (mafVME *)NodeFromItem(i);
   }
   event.Skip();
 
@@ -246,7 +238,7 @@ void mafGUIVMEChooserTree::CloneSubTree(mafGUICheckTree *source_tree, wxTreeItem
 {
   wxString  text  = source_tree->GetTree()->GetItemText(*source_item);
   long      node  = source_tree->NodeFromItem(*source_item);
-  int       image = GetVmeStatus((mafNode *)node);
+  int       image = GetVmeStatus((mafVME *)node);
 
   wxTreeItemId current_item;
   bool         expanded = source_tree->GetTree()->IsExpanded(*source_item);

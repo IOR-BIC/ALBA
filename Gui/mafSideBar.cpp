@@ -174,13 +174,13 @@ void mafSideBar::EnableSelect(bool enable)
 	m_Tree->EnableSelect(enable);
 }
 //----------------------------------------------------------------------------
-void mafSideBar::VmeAdd(mafNode *vme)
+void mafSideBar::VmeAdd(mafVME *vme)
 //----------------------------------------------------------------------------
 {
 	m_Tree->VmeAdd(vme);
 }
 //----------------------------------------------------------------------------
-void mafSideBar::VmeRemove(mafNode *vme)
+void mafSideBar::VmeRemove(mafVME *vme)
 //----------------------------------------------------------------------------
 {
 	m_Tree->VmeRemove(vme);
@@ -191,21 +191,21 @@ void mafSideBar::VmeRemove(mafNode *vme)
   }  
 }
 //----------------------------------------------------------------------------
-void mafSideBar::VmeModified(mafNode *vme)
+void mafSideBar::VmeModified(mafVME *vme)
 //----------------------------------------------------------------------------
 {
 	m_Tree->VmeModified(vme);
   UpdateVmePanel();
 }
 //----------------------------------------------------------------------------
-void mafSideBar::VmeShow(mafNode *vme, bool visibility)
+void mafSideBar::VmeShow(mafVME *vme, bool visibility)
 //----------------------------------------------------------------------------
 {
 	m_Tree->VmeShow(vme,visibility);
   UpdateVmePanel();
 }
 //----------------------------------------------------------------------------
-void mafSideBar::VmeSelected(mafNode *vme)
+void mafSideBar::VmeSelected(mafVME *vme)
 //----------------------------------------------------------------------------
 {
   m_SelectedVme = vme;
@@ -248,7 +248,7 @@ void mafSideBar::UpdateVmePanel()
 	
 	  if(m_SelectedVme->IsMAFType(mafVME))
 	  {
-	    mafVME *v = (mafVME*) m_SelectedVme;
+	    mafVME *v = m_SelectedVme;
 	    vme_out = v->GetOutput();
 	    if(!vme_out->IsA("mafVMEOutputNULL")) // Paolo 2005-05-05
 	    {

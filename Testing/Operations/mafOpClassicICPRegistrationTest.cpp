@@ -100,7 +100,7 @@ void mafOpClassicICPRegistrationTest::TestOpDo()
   importer2->SetFileName(fileName2);
   importer2->ImportVTK();
   
-  mafVME *vme = mafVME::SafeDownCast(importer2->GetOutput());
+  mafVME *vme = importer2->GetOutput();
   
   CPPUNIT_ASSERT(vme!=NULL);
   CPPUNIT_ASSERT(vme->GetOutput()->GetVTKData()!=NULL);
@@ -113,7 +113,7 @@ void mafOpClassicICPRegistrationTest::TestOpDo()
 
   // test attributes
   CPPUNIT_ASSERT(surface->GetNumberOfChildren()==1);
-  mafVME* registered = mafVME::SafeDownCast(surface->GetChild(0));
+  mafVME* registered = surface->GetChild(0);
   CPPUNIT_ASSERT(registered->GetAbsMatrixPipe()->GetMatrix().GetVTKMatrix()!=NULL);
 
   mafDEL(op);

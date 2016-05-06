@@ -63,13 +63,13 @@ public:
     ID_LAST
   };
 
-	static bool LandmarkAccept(mafNode *node) {return(node != NULL && node->IsMAFType(mafVMELandmark));};
+	static bool LandmarkAccept(mafVME*node) {return(node != NULL && node->IsMAFType(mafVMELandmark));};
 
   /** Precess events coming from other objects */ 
   virtual void OnEvent(mafEventBase *maf_event);
 
   /** Copy the contents of another VME-RefSys into this one. */
-  virtual int DeepCopy(mafNode *a);
+  virtual int DeepCopy(mafVME *a);
 
   /** Compare with another VME-RefSys. */
   virtual bool Equals(mafVME *vme);
@@ -110,7 +110,7 @@ public:
 
 	/** 
   Set links for the ref-sys*/
-  void SetRefSysLink(const char *link_name, mafNode *n);
+  void SetRefSysLink(const char *link_name, mafVME *n);
 
 	mafVME *GetOriginVME();
   mafVME *GetPoint1VME();

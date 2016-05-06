@@ -44,7 +44,7 @@ public:
 	mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */
-	bool Accept(mafNode* vme);
+	bool Accept(mafVME* vme);
 
 	/** Builds operation's interface by calling CreateOpDialog() method. */
 	void OpRun();

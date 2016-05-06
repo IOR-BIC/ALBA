@@ -22,7 +22,6 @@
 //----------------------------------------------------------------------------
 // Forward Refs:
 //----------------------------------------------------------------------------
-class mafNodeGeneric;
 // ============================================================================
 class __declspec( dllexport ) mafOpTest : public mafOp
 // ============================================================================
@@ -34,7 +33,7 @@ public:
   mafOp* Copy();
   mafTypeMacro(mafOpTest, mafOp);
 
-  bool Accept(mafNode* vme) {return true;};
+  bool Accept(mafVME* vme) {return true;};
   void OpRun();
   void OpDo();
   void OpUndo();

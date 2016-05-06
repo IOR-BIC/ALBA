@@ -46,7 +46,7 @@ class MAF_EXPORT mafGizmoPath : public mafGizmoInterface
 {
 public:
 
-	mafGizmoPath(mafNode* inputVme, mafObserver *Listener = NULL, const char *name = "GizmoPath", int textVisibility = 0);
+	mafGizmoPath(mafVME* inputVme, mafObserver *Listener = NULL, const char *name = "GizmoPath", int textVisibility = 0);
 
   virtual	~mafGizmoPath();
   
@@ -119,7 +119,7 @@ protected:
 
   static void AddVectors(double p0[3],double p1[3],double sum[3]);
 
-  void Constructor(mafNode *imputVme, mafObserver *listener, const char *name);
+  void Constructor(mafVME *imputVme, mafObserver *listener, const char *name);
   void Destructor();
 
   void CreateInteractor();

@@ -150,7 +150,6 @@ void mafVisualPipePolylineGraphTest::TestPipeExecution()
 	  
   vtkDEL(actorList);
 
-  delete pipe;
   delete sceneNode;
 }
 //----------------------------------------------------------------------------
