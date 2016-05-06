@@ -249,13 +249,15 @@ void mafVMEMeterTest::GetAngleTest()
   vmeParametricSurfaceEND2->Update();
 
   enum {X,Y,Z};
-  mafMatrix *matrix1 = vmeParametricSurfaceEND1->GetOutput()->GetAbsMatrix();
-  matrix1->SetElement(X,3,4); //set a translation value on x axis of 4.0
-  matrix1->SetElement(Y,3,3); //set a translation value on x axis of 3.0
+  mafMatrix matrix1;
+  matrix1.SetElement(X,3,4); //set a translation value on x axis of 4.0
+  matrix1.SetElement(Y,3,3); //set a translation value on x axis of 3.0
+	vmeParametricSurfaceEND1->SetAbsMatrix(matrix1);
 
-  mafMatrix *matrix2 = vmeParametricSurfaceEND2->GetOutput()->GetAbsMatrix();
-  matrix2->SetElement(X,3,3); //set a translation value on x axis of 4.0
-  matrix2->SetElement(Y,3,-4); //set a translation value on x axis of 3.0
+  mafMatrix matrix2;
+  matrix2.SetElement(X,3,3); //set a translation value on x axis of 4.0
+  matrix2.SetElement(Y,3,-4); //set a translation value on x axis of 3.0
+	vmeParametricSurfaceEND2->SetAbsMatrix(matrix2);
 
   mafVMEMeter *meter;
   mafNEW(meter);
@@ -303,34 +305,34 @@ void mafVMEMeterTest::GetDistanceTest()
   //create a parametric surface
   mafVMESurfaceParametric *vmeParametricSurfaceSTART;
   mafNEW(vmeParametricSurfaceSTART);
-  vmeParametricSurfaceSTART->ReparentTo(root);
+	vmeParametricSurfaceSTART->ReparentTo(root);
   vmeParametricSurfaceSTART->GetOutput()->GetVTKData()->Update();
-  vmeParametricSurfaceSTART->ReparentTo(storage->GetRoot());
   vmeParametricSurfaceSTART->Update();
 
   mafVMESurfaceParametric *vmeParametricSurfaceEND1;
   mafNEW(vmeParametricSurfaceEND1);	
   vmeParametricSurfaceEND1->ReparentTo(root);
   vmeParametricSurfaceEND1->GetOutput()->GetVTKData()->Update();
-  vmeParametricSurfaceEND1->ReparentTo(storage->GetRoot());
   vmeParametricSurfaceEND1->Update();
 
   mafVMESurfaceParametric *vmeParametricSurfaceEND2;
   mafNEW(vmeParametricSurfaceEND2);	
   vmeParametricSurfaceEND2->ReparentTo(root);
   vmeParametricSurfaceEND2->GetOutput()->GetVTKData()->Update();
-  vmeParametricSurfaceEND2->ReparentTo(storage->GetRoot());
   vmeParametricSurfaceEND2->Update();
 
   enum {X,Y,Z};
-  mafMatrix *matrix1 = vmeParametricSurfaceEND1->GetOutput()->GetAbsMatrix();
-  matrix1->SetElement(X,3,4); //set a translation value on x axis of 4.0
-  matrix1->SetElement(Y,3,3); //set a translation value on x axis of 3.0
+  mafMatrix matrix1;
+  matrix1.SetElement(X,3,4); //set a translation value on x axis of 4.0
+  matrix1.SetElement(Y,3,3); //set a translation value on x axis of 3.0
+	vmeParametricSurfaceEND1->SetAbsMatrix(matrix1);
 
-  mafMatrix *matrix2 = vmeParametricSurfaceEND2->GetOutput()->GetAbsMatrix();
-  matrix2->SetElement(X,3,3); //set a translation value on x axis of 4.0
-  matrix2->SetElement(Y,3,-4); //set a translation value on x axis of 3.0
+  mafMatrix matrix2;
+  matrix2.SetElement(X,3,3); //set a translation value on x axis of 4.0
+  matrix2.SetElement(Y,3,-4); //set a translation value on x axis of 3.0
+	vmeParametricSurfaceEND2->SetAbsMatrix(matrix2);
 
+	
   mafVMEMeter *meter;
   mafNEW(meter);
   meter->SetMeterLink("StartVME",vmeParametricSurfaceSTART);
@@ -399,10 +401,11 @@ void mafVMEMeterTest::GetEndPoint2CoordinateTest()
   pos[0] = 4;
   pos[1] = 3;
   pos[2] = 0;
-  mafMatrix *matrix = vmeParametricSurfaceEND2->GetOutput()->GetAbsMatrix();
-  matrix->SetElement(0,3,pos[0]); //set a translation value on x axis of 4.0
-  matrix->SetElement(1,3,pos[1]); //set a translation value on y axis of 3.0
-  matrix->SetElement(2,3,pos[2]); //set a translation value on z axis of 3.0
+  mafMatrix matrix;
+  matrix.SetElement(0,3,pos[0]); //set a translation value on x axis of 4.0
+  matrix.SetElement(1,3,pos[1]); //set a translation value on y axis of 3.0
+  matrix.SetElement(2,3,pos[2]); //set a translation value on z axis of 3.0
+	vmeParametricSurfaceEND2->SetAbsMatrix(matrix);
 
   mafVMEMeter *meter;
   mafNEW(meter);
@@ -464,10 +467,11 @@ void mafVMEMeterTest::GetEndPointCoordinateTest()
   pos[0] = 4;
   pos[1] = 3;
   pos[2] = 0;
-  mafMatrix *matrix = vmeParametricSurfaceEND1->GetOutput()->GetAbsMatrix();
-  matrix->SetElement(0,3,pos[0]); //set a translation value on x axis of 4.0
-  matrix->SetElement(1,3,pos[1]); //set a translation value on y axis of 3.0
-  matrix->SetElement(2,3,pos[2]); //set a translation value on z axis of 3.0
+	mafMatrix matrix;
+  matrix.SetElement(0,3,pos[0]); //set a translation value on x axis of 4.0
+  matrix.SetElement(1,3,pos[1]); //set a translation value on y axis of 3.0
+  matrix.SetElement(2,3,pos[2]); //set a translation value on z axis of 3.0
+	vmeParametricSurfaceEND1->SetAbsMatrix(matrix);
 
   mafVMEMeter *meter;
   mafNEW(meter);
@@ -558,13 +562,15 @@ void mafVMEMeterTest::GetPolylineOutputTest()
   vmeParametricSurfaceEND2->Update();
 
   enum {X,Y,Z};
-  mafMatrix *matrix1 = vmeParametricSurfaceEND1->GetOutput()->GetAbsMatrix();
-  matrix1->SetElement(X,3,4); //set a translation value on x axis of 4.0
-  matrix1->SetElement(Y,3,3); //set a translation value on x axis of 3.0
+  mafMatrix matrix1;
+  matrix1.SetElement(X,3,4); //set a translation value on x axis of 4.0
+  matrix1.SetElement(Y,3,3); //set a translation value on x axis of 3.0
+	vmeParametricSurfaceEND1->SetAbsMatrix(matrix1);
 
-  mafMatrix *matrix2 = vmeParametricSurfaceEND2->GetOutput()->GetAbsMatrix();
-  matrix2->SetElement(X,3,3); //set a translation value on x axis of 4.0
-  matrix2->SetElement(Y,3,-4); //set a translation value on x axis of 3.0
+  mafMatrix matrix2;
+  matrix1.SetElement(X,3,3); //set a translation value on x axis of 4.0
+  matrix2.SetElement(Y,3,-4); //set a translation value on x axis of 3.0
+	vmeParametricSurfaceEND2->SetAbsMatrix(matrix2);
 
   mafVMEMeter *meter;
   mafNEW(meter);
@@ -848,10 +854,11 @@ void mafVMEMeterTest::GetStartPointCoordinateTest()
   pos[0] = 4;
   pos[1] = 3;
   pos[2] = 0;
-  mafMatrix *matrix = vmeParametricSurfaceSTART->GetOutput()->GetAbsMatrix();
-  matrix->SetElement(0,3,pos[0]); //set a translation value on x axis of 4.0
-  matrix->SetElement(1,3,pos[1]); //set a translation value on y axis of 3.0
-  matrix->SetElement(2,3,pos[2]); //set a translation value on z axis of 3.0
+  mafMatrix matrix;
+  matrix.SetElement(0,3,pos[0]); //set a translation value on x axis of 4.0
+  matrix.SetElement(1,3,pos[1]); //set a translation value on y axis of 3.0
+  matrix.SetElement(2,3,pos[2]); //set a translation value on z axis of 3.0
+	vmeParametricSurfaceSTART->SetAbsMatrix(matrix);
 
   mafVMEMeter *meter;
   mafNEW(meter);

@@ -179,7 +179,6 @@ void mafPipeTensorFieldSliceTest::TestCreate()
 
    CompareImages(0);
 
-  delete pipe;
   delete sceneNode;
   delete(rootscenenode);
 

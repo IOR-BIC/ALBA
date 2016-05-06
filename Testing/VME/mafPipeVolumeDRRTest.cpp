@@ -341,7 +341,6 @@ void mafPipeVolumeDRRTest::TestPipeExecution()
 
   vtkDEL(actorList);
 
-  delete pipeDRR;
   delete sceneNode;
 
   mafDEL(volume);

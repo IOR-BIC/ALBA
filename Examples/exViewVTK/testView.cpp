@@ -81,8 +81,6 @@ void testView::VmeCreatePipe(mafVME *vme)
   mafPipe *pipe = (mafPipe*)obj;
   
   pipe->Create(n);
-
-  n->SetPipe(pipe);
 }
 //----------------------------------------------------------------------------
 void testView::VmeDeletePipe(mafVME *vme)

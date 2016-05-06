@@ -394,8 +394,7 @@ void mafViewSingleSlice::VmeCreatePipe(mafVME *vme)
 			}
 			pipe->Create(n);
 
-      n->SetPipe(pipe);
-      if (m_NumberOfVisibleVme == 1)
+			if (m_NumberOfVisibleVme == 1)
       {
         mafEventMacro(mafEvent(this,CAMERA_RESET));
       }

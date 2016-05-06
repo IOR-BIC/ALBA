@@ -142,7 +142,7 @@ void mafPipeVolumeProjectedTest::TestPipeExecution()
 
     m_Renderer->RemoveAllProps();
     vtkDEL(actorList);
-    delete pipeProjected;
+		sceneNode->DeletePipe();
   }
    
   delete sceneNode;

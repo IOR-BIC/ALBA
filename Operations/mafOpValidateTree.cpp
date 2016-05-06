@@ -190,10 +190,12 @@ int mafOpValidateTree::ValidateTree()
           m_MSFTreeAbsFileNamesSet.insert(absFilename.c_str());
         }
       }
-      else if (vme != NULL) // any other vme type
+      else if (vme != NULL ) // any other vme type
       {         
+				mafVMEGenericAbstract *absVME = mafVMEGenericAbstract::SafeDownCast(vme);
+				
         mafDataVector *dv = vme->GetDataVector();
-        if (dv)
+        if (dv && (!absVME || absVME->GetStoreDataVector()) )
         {
           for (int t = 0; t < dv->GetNumberOfItems(); t++)
           {

@@ -329,7 +329,6 @@ void mafView3D::VmeCreatePipe(mafVME *vme)
 				((mafPipeVolumeMIP *)pipe)->SetResampleFactor(m_ResampleFactor);
 			}
       pipe->Create(n);
-      n->SetPipe(pipe);
       if (m_NumberOfVisibleVme == 1)
       {
         //CameraReset();

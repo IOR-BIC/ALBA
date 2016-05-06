@@ -148,7 +148,6 @@ void mafPipeVectorFieldGlyphsTest::TestCreate()
 
   vtkDEL(actorList);
 
-  pipe->Delete();
   delete sceneNode;
   delete(rootscenenode);
 

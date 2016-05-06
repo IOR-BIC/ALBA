@@ -219,14 +219,12 @@ void mafPipeMeshSliceTest::TestPipeExecution()
     CompareImages(arrayIndex);
   }
 
+	delete sceneNode;
+
   vtkDEL(actorList);
-
-  delete pipeMeshSlice;
-
   cppDEL(Importer);
   mafDEL(storage);
 
-  delete sceneNode;
 }
 //----------------------------------------------------------------------------
 void mafPipeMeshSliceTest::CompareImages(int scalarIndex)

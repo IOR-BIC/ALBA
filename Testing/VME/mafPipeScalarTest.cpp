@@ -154,7 +154,6 @@ void mafPipeScalarTest::TestPipeExecution()
   
   vtkDEL(actorList);
 
-  delete pipeScalar;
   delete sceneNode;
 
   mafDEL(surface);

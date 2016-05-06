@@ -143,17 +143,11 @@ int mafVMERawMotionData::Read()
 
 				for (int i = 0; i < M.rows(); i++)
 				{ 
-				  currentDlc->SetLandmark(v_lmname.c_str(),
-					                          M(i, v_current_col),						
-					                          M(i, v_current_col + 1),
-					                          M(i, v_current_col + 2), 
-					                            i);
+				  currentDlc->SetLandmark(v_lmname.c_str(), M(i, v_current_col), M(i, v_current_col + 1), M(i, v_current_col + 2), i);
 						
 					//check if the landmark is visible for the given timestamp;
 					//if not i set his visibility to 0;
-					if (M(i, v_current_col) == not_used_identifier || 
-							M(i, v_current_col + 1) == not_used_identifier ||
-							M(i, v_current_col + 2) == not_used_identifier)
+					if (M(i, v_current_col) == not_used_identifier || M(i, v_current_col + 1) == not_used_identifier || M(i, v_current_col + 2) == not_used_identifier)
 					{
 						//double value = M(i, v_current_col + 2);
 						currentDlc->SetLandmarkVisibility(v_lmname.c_str(), 0, i);

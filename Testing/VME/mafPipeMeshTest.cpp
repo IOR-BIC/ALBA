@@ -199,12 +199,11 @@ void mafPipeMeshTest::TestPipeExecution()
   }
 
   vtkDEL(actorList);
-
-  delete pipeMesh;
-  delete sceneNode;
-
   mafDEL(mesh);
   vtkDEL(Importer);
+
+	delete sceneNode;
+
 }
 //----------------------------------------------------------------------------
 void mafPipeMeshTest::CompareImages(int scalarIndex)

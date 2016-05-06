@@ -206,7 +206,7 @@ void mafPipeVolumeSlice_BESTest::TestPipeExecution()
 
     m_Renderer->RemoveAllProps();
     vtkDEL(actorList);
-    delete pipeSlice;
+		sceneNode->DeletePipe();
   }
 
   delete sceneNode;
@@ -450,7 +450,7 @@ void mafPipeVolumeSlice_BESTest::TestPipeExecution_SetSliceOpacity()
 
     m_Renderer->RemoveAllProps();
     vtkDEL(actorList);
-    delete pipeSlice;
+		sceneNode->DeletePipe();
   }
 
   delete sceneNode;
@@ -581,7 +581,7 @@ void mafPipeVolumeSlice_BESTest::TestPipeExecution_SetLutRange()
 
     m_Renderer->RemoveAllProps();
     vtkDEL(actorList);
-    delete pipeSlice;
+		sceneNode->DeletePipe();
   }
 
   delete sceneNode;
@@ -710,7 +710,7 @@ void mafPipeVolumeSlice_BESTest::TestPipeExecution_SetColorLookupTable()
     m_Renderer->RemoveAllProps();
     vtkDEL(actorList);
     vtkDEL(lut);
-    delete pipeSlice;
+		sceneNode->DeletePipe();
   }
 
   delete sceneNode;
@@ -821,7 +821,7 @@ void mafPipeVolumeSlice_BESTest::TestPipeExecution_TicksOnOff()
 
     m_Renderer->RemoveAllProps();
     vtkDEL(actorList);
-    delete pipeSlice;
+		sceneNode->DeletePipe();
   }
   
 

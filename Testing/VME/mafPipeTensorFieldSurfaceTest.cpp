@@ -120,7 +120,6 @@ void mafPipeTensorFieldSurfaceTest::TestCreate()
   //renderWindow->Render();
   //CompareImages(0);
 
-  delete pipe;
   delete sceneNode;
   delete(rootscenenode);
 

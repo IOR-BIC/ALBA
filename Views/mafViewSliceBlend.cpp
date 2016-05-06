@@ -205,7 +205,6 @@ void mafViewSliceBlend::VmeCreatePipe(mafVME *vme)
         ((mafPipeVolumeSliceBlend *)pipe)->SetSliceOpacity(m_Opacity);
       }
       pipe->Create(n);
-      n->SetPipe(pipe);
     }
     else
       mafErrorMessage("Cannot create visual pipe object of type \"%s\"!",pipe_name.GetCStr());

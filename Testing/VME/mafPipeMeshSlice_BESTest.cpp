@@ -227,18 +227,16 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution()
 
     ProceduralControl(controlValues, meshActor);
     m_RenderWindow->Render();
-		printf("\n Visualizzazione: %s \n", strings[arrayIndex]);
+		printf("\n Visualization: %s \n", strings[arrayIndex]);
     CompareImages(ID_TEST_PIPEEXECUTION+arrayIndex);
   }
 
   vtkDEL(actorList);
 
-  delete pipeMeshSlice;
+  delete sceneNode;
 
   cppDEL(Importer);
   mafDEL(storage);
-
-  delete sceneNode;
 }
 //----------------------------------------------------------------------------
 void mafPipeMeshSlice_BESTest::TestPipeExecution_Wireframe()
@@ -379,12 +377,11 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_Wireframe()
 
   vtkDEL(actorList);
 
-  delete pipeMeshSlice;
+  delete sceneNode;
 
   cppDEL(Importer);
   mafDEL(storage);
 
-  delete sceneNode;
 }
 //----------------------------------------------------------------------------
 void mafPipeMeshSlice_BESTest::TestPipeExecution_WiredActorVisibility()
@@ -526,12 +523,11 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_WiredActorVisibility()
 
   vtkDEL(actorList);
 
-  delete pipeMeshSlice;
+  delete sceneNode;
 
   cppDEL(Importer);
   mafDEL(storage);
 
-  delete sceneNode;
 }
 //----------------------------------------------------------------------------
 void mafPipeMeshSlice_BESTest::TestPipeExecution_FlipNormal()
@@ -673,12 +669,11 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_FlipNormal()
 
   vtkDEL(actorList);
 
-  delete pipeMeshSlice;
+  delete sceneNode;
 
   cppDEL(Importer);
   mafDEL(storage);
 
-  delete sceneNode;
 }
 //----------------------------------------------------------------------------
 void mafPipeMeshSlice_BESTest::TestPipeExecution_UseVTKProperty()
@@ -827,12 +822,11 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_UseVTKProperty()
 
   vtkDEL(actorList);
 
-  delete pipeMeshSlice;
+  delete sceneNode;
 
   cppDEL(Importer);
   mafDEL(storage);
 
-  delete sceneNode;
 }
 //----------------------------------------------------------------------------
 void mafPipeMeshSlice_BESTest::TestPipeExecution_Thickness_PickActor()
@@ -979,12 +973,10 @@ void mafPipeMeshSlice_BESTest::TestPipeExecution_Thickness_PickActor()
 
   vtkDEL(actorList);
 
-  delete pipeMeshSlice;
+  delete sceneNode;
 
   cppDEL(Importer);
   mafDEL(storage);
-
-  delete sceneNode;
 }
 //----------------------------------------------------------------------------
 void mafPipeMeshSlice_BESTest::CompareImages(int scalarIndex)

@@ -391,7 +391,6 @@ void mafViewGlobalSlice::VmeCreatePipe(mafVME *vme)
         ((mafPipeMeshSlice *)pipe)->SetNormal(DoubleNormal);
       }
       pipe->Create(n);
-			n->SetPipe(pipe);
 
 			if (pipe_name.Equals("mafPipeVolumeSlice"))
 			{

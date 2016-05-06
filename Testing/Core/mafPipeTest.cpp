@@ -102,10 +102,8 @@ void mafPipeTest::CreateTest()
   TEST_RESULT;
 
   mafDEL(vme);
-  delete pipe;
   delete node;
   delete sg;
-
 }
 //----------------------------------------------------------------------------
 void mafPipeTest::GetSetListenerTest()

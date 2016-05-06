@@ -66,6 +66,8 @@ void mafPipe::Create(mafSceneNode *n)
 	  m_RenFront      = n->GetRenFront();
 	  m_RenBack       = n->GetRenBack();
 	  m_AlwaysVisibleRenderer = n->GetAlwaysVisibleRenderer();
+
+		n->SetPipe(this);
 	
 	  m_Selected = false;
   }

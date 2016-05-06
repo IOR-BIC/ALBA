@@ -179,12 +179,7 @@ void mafVMELandmarkTest::CanReparentToTest()
   //Check if landmark can be reparent under an open landmark cloud
   result = landmark->CanReparentTo(landmarkCloud);
   CPPUNIT_ASSERT(result);
-
-
-  //Check if landmark can be reparent under a closed landmark cloud
-  result = landmark->CanReparentTo(landmarkCloud);
-  CPPUNIT_ASSERT(!result);
-
+	
   mafSmartPointer<mafVMELandmark> newLandmark;
 
   //Check if landmark can be reparent under a landmark

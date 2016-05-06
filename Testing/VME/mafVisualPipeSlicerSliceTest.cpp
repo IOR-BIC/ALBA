@@ -149,7 +149,6 @@ void mafVisualPipeSlicerSliceTest::TestPipeExecution()
 
   vtkDEL(actorList);
 
-  pipe->Delete();
   cppDEL(sceneNode);
   cppDEL(rootscenenode);
 

@@ -146,8 +146,7 @@ void mafPipeIsosurfaceTest::TestPipeExecution()
     CompareImages(v);
 
     m_Renderer->RemoveAllProps();
-    //vtkDEL(actorList);
-    delete pipeIso;
+		sceneNode->DeletePipe();
   }
 
   delete sceneNode;

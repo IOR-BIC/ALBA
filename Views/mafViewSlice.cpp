@@ -505,7 +505,6 @@ void mafViewSlice::VmeCreatePipe(mafVME *vme)
       } //end else [it is not volume slicing]                     
 
       pipe->Create(n);
-      n->SetPipe(pipe);
     }
     else
       mafErrorMessage("Cannot create visual pipe object of type \"%s\"!",pipe_name.GetCStr());

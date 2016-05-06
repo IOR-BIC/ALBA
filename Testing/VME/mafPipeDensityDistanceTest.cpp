@@ -147,7 +147,6 @@ void mafPipeDensityDistanceTest::TestPipeExecution()
   CompareImages(0);
   vtkDEL(actorList);
 
-  delete pipeDD;
   delete sceneNode;
 
   mafDEL(surface);

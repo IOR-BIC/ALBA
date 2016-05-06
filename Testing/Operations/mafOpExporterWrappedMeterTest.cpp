@@ -72,9 +72,10 @@ void mafOpExporterWrappedMeterTest::meterImplement(){
 	vmeSTART->Update();
 
 
-	mafMatrix *matrix1 = vmeSTART->GetOutput()->GetAbsMatrix();
-	matrix1->SetElement(X,3,-10); //set a translation value on x axis of -10.0
-	matrix1->SetElement(Y,3,1.5); //set a translation value on y axis of 1.5
+	mafMatrix matrix1;
+	matrix1.SetElement(X,3,-10); //set a translation value on x axis of -10.0
+	matrix1.SetElement(Y,3,1.5); //set a translation value on y axis of 1.5
+	vmeSTART->SetAbsMatrix(matrix1);
 
 	//create a end vme 
 	mafVMESurfaceParametric *vmeEND;
@@ -83,9 +84,10 @@ void mafOpExporterWrappedMeterTest::meterImplement(){
 	vmeEND->ReparentTo(storage->GetRoot());
 	vmeEND->Update();
 
-	mafMatrix *matrix2 = vmeEND->GetOutput()->GetAbsMatrix();
-	matrix2->SetElement(X,3,10); //set a translation value on x axis of 10.0
-	matrix2->SetElement(Y,3,1.5); //set a translation value on y axis of 1.5
+	mafMatrix matrix2;
+	matrix2.SetElement(X,3,10); //set a translation value on x axis of 10.0
+	matrix2.SetElement(Y,3,1.5); //set a translation value on y axis of 1.5
+	vmeEND->SetAbsMatrix(matrix2);
 
 	//------------create meter--------------------- 
 	medVMEComputeWrapping  *wrappedMeter;

@@ -97,11 +97,22 @@ public:
 	/** Sets PipeCreatable */
 	void SetPipeCreatable(bool pipeCreatable) { m_PipeCreatable = pipeCreatable; }
 
+	/** Sets RenFront */
+	void SetRenFront(vtkRenderer * renFront) { m_RenFront = renFront; }
+
 protected:
 
+	/** Called from child on show, if the visibility is updated ChildShow is called on parent */
 	void ChildShow();
+		
+	/** Called from child on hide, if the visibility is updated ChildHide is called on parent */
 	void ChildHide();
+	
+	/** callen onhow/hide childShow/childHide to update local visibility and forward up the changes*/
 	void UpdateVisibility();
+
+	/** Called on changes when a node is show/hided to notify assemby to recreate internal structures */
+	void ModifyRootAssembly();
   
 	mafPipe           *m_Pipe;
 	bool               m_PipeCreatable;

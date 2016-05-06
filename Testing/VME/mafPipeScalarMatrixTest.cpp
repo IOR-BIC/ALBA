@@ -118,7 +118,6 @@ void mafPipeScalarMatrixTest::TestPipeExecution()
 
   CompareImages();
 
-  delete pipe;
   delete sceneNode;
   delete sceneRootNode;
 

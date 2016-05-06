@@ -91,13 +91,15 @@ void mafVMEOutputMeterTest::TestUpdate()
 	vmeParametricSurfaceEND2->Update();
 
 	enum {X,Y,Z};
-	mafMatrix *matrix1 = vmeParametricSurfaceEND1->GetOutput()->GetAbsMatrix();
-	matrix1->SetElement(X,3,4); //set a translation value on x axis of 4.0
-	matrix1->SetElement(Y,3,3); //set a translation value on x axis of 3.0
+	mafMatrix matrix1;
+	matrix1.SetElement(X,3,4); //set a translation value on x axis of 4.0
+	matrix1.SetElement(Y,3,3); //set a translation value on x axis of 3.0
+	vmeParametricSurfaceEND1->SetAbsMatrix(matrix1);
 
-	mafMatrix *matrix2 = vmeParametricSurfaceEND2->GetOutput()->GetAbsMatrix();
-	matrix2->SetElement(X,3,3); //set a translation value on x axis of 4.0
-	matrix2->SetElement(Y,3,-4); //set a translation value on x axis of 3.0
+	mafMatrix matrix2;
+	matrix2.SetElement(X,3,3); //set a translation value on x axis of 4.0
+	matrix2.SetElement(Y,3,-4); //set a translation value on x axis of 3.0
+	vmeParametricSurfaceEND2->SetAbsMatrix(matrix2);
 
 	mafVMEMeter *meter;
 	mafNEW(meter);

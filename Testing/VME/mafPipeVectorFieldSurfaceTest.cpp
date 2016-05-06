@@ -152,7 +152,6 @@ void mafPipeVectorFieldSurfaceTest::TestCreate()
 
   vtkDEL(actorList);
 
-  pipe->Delete();
   delete sceneNode;
   delete(rootscenenode);
 

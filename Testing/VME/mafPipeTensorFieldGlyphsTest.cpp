@@ -179,7 +179,6 @@ void mafPipeTensorFieldGlyphsTest::TestCreate()
 
   CompareImage();
 
-  delete pipe;
   delete sceneNode;
   delete(rootscenenode);
 

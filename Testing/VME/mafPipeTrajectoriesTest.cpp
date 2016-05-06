@@ -125,7 +125,7 @@ void mafPipeTrajectoriesTest::TestPipeExecution()
   
   //Assembly will be create when instancing mafSceneNode
   mafSceneNode *sceneNode;
-  sceneNode = new mafSceneNode(NULL,NULL,landmark, m_Renderer);
+  sceneNode = new mafSceneNode(NULL,NULL,landmark, NULL);
 
   /////////// Pipe Instance and Creation ///////////
   mafPipeTrajectories *pipeTrajecotries = new mafPipeTrajectories;
@@ -145,7 +145,6 @@ void mafPipeTrajectoriesTest::TestPipeExecution()
     m_RenderWindow->Render();
 
     actor = actorList->GetNextProp();
-    break;
   }
 
   vtkActor *cloudActor;
@@ -157,7 +156,6 @@ void mafPipeTrajectoriesTest::TestPipeExecution()
 
   vtkDEL(actorList);
 
-  delete pipeTrajecotries;
   delete sceneNode;
 }
 //----------------------------------------------------------------------------

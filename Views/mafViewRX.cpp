@@ -237,7 +237,6 @@ void mafViewRX::VmeCreatePipe(mafVME *vme)
 
       }
       pipe->Create(n);
-      n->SetPipe(pipe);
     }
     else
       mafErrorMessage("Cannot create visual pipe object of type \"%s\"!",pipe_name.GetCStr());

@@ -118,10 +118,10 @@ void mafPipeWrappedMeterTest::TestPipeExecution()
   vmeParametricSurfaceEND1->Update();
 
 
-  mafMatrix *matrix = vmeParametricSurfaceEND1->GetOutput()->GetAbsMatrix();
-  matrix->SetElement(0,3,4); //set a translation value on x axis of 4.0
-  matrix->SetElement(1,3,3); //set a translation value on x axis of 3.0
-
+  mafMatrix matrix;
+  matrix.SetElement(0,3,4); //set a translation value on x axis of 4.0
+  matrix.SetElement(1,3,3); //set a translation value on x axis of 3.0
+	vmeParametricSurfaceEND1->SetAbsMatrix(matrix);
 
 	////// Create VME meter ////////////////////
   mafSmartPointer<mafVMEWrappedMeter> meter;
@@ -168,7 +168,6 @@ void mafPipeWrappedMeterTest::TestPipeExecution()
 
   vtkDEL(actorList);
 
-  delete pipeMeter;
   delete sceneNode;
 
   meter->ReparentTo(NULL);

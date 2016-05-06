@@ -130,7 +130,6 @@ void mafPipeCompoundVolumeTest::TestCreateSceneNode()
   DummyPipeCompoundVolume *pipe = new DummyPipeCompoundVolume;
   pipe->Create(sceneNode);
   
-  delete pipe;
   delete sceneNode;
   mafDEL(volume);
 }

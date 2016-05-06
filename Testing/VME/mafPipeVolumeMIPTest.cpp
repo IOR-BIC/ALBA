@@ -136,7 +136,6 @@ void mafPipeVolumeMIPTest::TestPipeExecution()
 
   vtkDEL(actorList);
 
-  delete pipeGizmo;
   delete sceneNode;
 
   mafDEL(volume);

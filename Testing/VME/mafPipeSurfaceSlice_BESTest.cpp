@@ -104,9 +104,9 @@ void mafPipeSurfaceSlice_BESTest::TestCloudClosePipeExecution()
   third->SetPoint(0.0,0.0,5.0);
   third->SetName("third");
   mafSmartPointer<mafVMELandmarkCloud> ldm;
-  ldm->SetLandmark(first);
-  ldm->SetLandmark(second);
-  ldm->SetLandmark(third);
+	first->ReparentTo(ldm);
+	second->ReparentTo(ldm);
+	third->ReparentTo(ldm);
   ldm->GetMaterial();
   ldm->GetMaterial()->m_MaterialType = mmaMaterial::USE_LOOKUPTABLE;
 
@@ -172,7 +172,6 @@ void mafPipeSurfaceSlice_BESTest::TestCloudClosePipeExecution()
 
   vtkDEL(actorList);
 
-  delete pipeSlice;
   delete sceneNode;
 }
 //----------------------------------------------------------------------------
@@ -260,7 +259,6 @@ void mafPipeSurfaceSlice_BESTest::TestCloudOpenPipeExecution()
 
   vtkDEL(actorList);
 
-  delete pipeSlice;
   delete sceneNode;
 }
 //----------------------------------------------------------------------------
@@ -348,7 +346,6 @@ void mafPipeSurfaceSlice_BESTest::TestSurfacePipeExecution()
 
   vtkDEL(actorList);
 
-  delete pipeSlice;
   delete sceneNode;
 }
 //----------------------------------------------------------------------------
@@ -506,7 +503,6 @@ void mafPipeSurfaceSlice_BESTest::TestSurfacePipeCreation()
 
   CPPUNIT_ASSERT(pipeSlice);
 
-  delete pipeSlice;
   delete sceneNode;
 }
 
@@ -579,6 +575,5 @@ void mafPipeSurfaceSlice_BESTest::TestSetGetThickness()
 
   vtkDEL(actorList);
 
-  delete pipeSlice;
   delete sceneNode;
 }

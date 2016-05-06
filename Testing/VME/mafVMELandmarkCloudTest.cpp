@@ -95,7 +95,7 @@ void mafVMELandmarkCloudTest::SetLandmarkTest()
   landmark->SetPoint(z,y,z);
 
   cloud->TestModeOn();
-  cloud->SetLandmark(landmark);
+	landmark->ReparentTo(cloud);
 
   bool result = false;
   //Check if landmark has been set
@@ -275,18 +275,24 @@ void mafVMELandmarkCloudTest::SetSphereResolutionTest()
 void mafVMELandmarkCloudTest::DeepCopyTest()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafVMELandmarkCloud> landmarkCloud;
+	mafSmartPointer<mafVMELandmarkCloud> landmarkCloud;
+	mafSmartPointer<mafVMELandmark> landmark1;
+	mafSmartPointer<mafVMELandmark> landmark2;
+
   mafSmartPointer<mafVMELandmarkCloud> newLandmarkCloud;
  
   double rad = 10;
   double res = 30;
-  int number = 5;
-  
+
+	landmark1->SetName("1");
+	landmark2->SetName("2");
+
   landmarkCloud->TestModeOn();
-  landmarkCloud->SetNumberOfLandmarks(number);
   landmarkCloud->SetRadius(rad);
   landmarkCloud->SetSphereResolution(res);
-  
+	landmark1->ReparentTo(landmarkCloud);
+	landmark2->ReparentTo(landmarkCloud);
+
 
   newLandmarkCloud->DeepCopy(landmarkCloud);
   
@@ -306,6 +312,6 @@ void mafVMELandmarkCloudTest::DeepCopyTest()
   CPPUNIT_ASSERT(result);
 
   result = false;
-  result = mafEquals(newLandmarkCloud->GetNumberOfLandmarks(),number);
+  result = mafEquals(newLandmarkCloud->GetNumberOfLandmarks(),2);
   CPPUNIT_ASSERT(result);
 }

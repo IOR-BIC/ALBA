@@ -203,7 +203,6 @@ void mafPipePolylineSlice_BESTest::TestPipeExecution()
 
   vtkDEL(actorList);
 
-  delete pipePolylineSlice;
   delete sceneNode;
 }
 //----------------------------------------------------------------------------

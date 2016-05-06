@@ -154,7 +154,6 @@ void mafPipeVectorTest::TestPipeExecution()
 
   vtkDEL(actorList);
 
-  delete pipeVector;
   delete sceneNode;
 
   mafDEL(vector);

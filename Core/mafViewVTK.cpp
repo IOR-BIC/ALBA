@@ -314,7 +314,6 @@ void mafViewVTK::VmeCreatePipe(mafVME *vme)
       mafSceneNode *n = m_Sg->Vme2Node(vme);
       assert(n && !n->GetPipe());
       pipe->Create(n);
-      n->SetPipe(pipe);
     }
     else
     {

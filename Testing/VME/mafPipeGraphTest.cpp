@@ -167,7 +167,6 @@ void mafPipeGraphTest::TestPipeExecution()
   m_RenderWindow->Render();
   CompareImages(0);
  
-  delete pipe;
   delete sceneNode;
   mafDEL(analog);
 }

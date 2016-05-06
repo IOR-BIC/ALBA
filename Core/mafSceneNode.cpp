@@ -225,6 +225,27 @@ void mafSceneNode::UpdateVisibility()
 			m_AlwaysVisibleAssembly->SetVisibility(visible);
 
 		m_CurrentVisibility = visible;
+
+		ModifyRootAssembly();
 	}
+}
+
+//----------------------------------------------------------------------------
+void mafSceneNode::ModifyRootAssembly()
+{
+	mafSceneNode *rootNode = this;
+
+	while (rootNode->m_Parent)
+		rootNode = rootNode->m_Parent;
+
+	if (rootNode->m_AssemblyFront)
+		rootNode->m_AssemblyFront->Modified();
+
+	if (rootNode->m_AssemblyBack)
+		rootNode->m_AssemblyBack->Modified();
+
+	if (rootNode->m_AlwaysVisibleAssembly)
+		rootNode->m_AlwaysVisibleAssembly->Modified();
+
 }
 
