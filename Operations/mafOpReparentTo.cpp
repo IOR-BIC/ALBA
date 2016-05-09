@@ -50,6 +50,8 @@ mafOpReparentTo::mafOpReparentTo(const wxString &label) : mafOp(label)
   m_Canundo   = true;
   m_OldParent = NULL;
   m_TargetVme = NULL;
+
+	glo_VmeForReparent = NULL;
 }
 //----------------------------------------------------------------------------
 mafOpReparentTo::~mafOpReparentTo( ) 
@@ -70,13 +72,23 @@ mafOp* mafOpReparentTo::Copy()
 	cp->m_OldParent = m_OldParent;
   return cp;
 }
+
+//----------------------------------------------------------------------------
+bool mafOpReparentTo::VMEAcceptForReparent(mafVME *vme)
+{
+	return (glo_VmeForReparent->GetParent() != vme && glo_VmeForReparent->CanReparentTo(vme));
+}
+
 //----------------------------------------------------------------------------
 void mafOpReparentTo::OpRun()   
 //----------------------------------------------------------------------------
 {
+	glo_VmeForReparent = m_Input;
+
   if (m_TargetVme == NULL)
   {
     mafEvent e(this,VME_CHOOSE);
+		e.SetArg((long)&VMEAcceptForReparent);
     mafEventMacro(e);
     m_TargetVme = e.GetVme();
   }
@@ -84,8 +96,6 @@ void mafOpReparentTo::OpRun()
 	int result = OP_RUN_CANCEL;
 	if((m_TargetVme != NULL) && (m_Input->CanReparentTo(m_TargetVme)))
 		result = OP_RUN_OK;
-  else
-    mafMessage(_("Cannot re-parent to specified node"), _("Error"), wxICON_ERROR);
 
 	mafEventMacro(mafEvent(this,result));
 }
