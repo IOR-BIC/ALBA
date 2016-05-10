@@ -296,14 +296,8 @@ void mafVMELandmarkCloudTest::DeepCopyTest()
 
   newLandmarkCloud->DeepCopy(landmarkCloud);
   
-
-  bool result = false;
-  result = newLandmarkCloud->Equals(landmarkCloud);
-  CPPUNIT_ASSERT(result);
-
-
   //Check if landmark cloud has been copied
-  result = false;
+  bool result = false;
   result = mafEquals(newLandmarkCloud->GetRadius(),rad);
   CPPUNIT_ASSERT(result);
 
@@ -312,6 +306,41 @@ void mafVMELandmarkCloudTest::DeepCopyTest()
   CPPUNIT_ASSERT(result);
 
   result = false;
-  result = mafEquals(newLandmarkCloud->GetNumberOfLandmarks(),2);
+  result = mafEquals(newLandmarkCloud->GetNumberOfLandmarks(),0);
   CPPUNIT_ASSERT(result);
+}
+
+//----------------------------------------------------------------------------
+void mafVMELandmarkCloudTest::CopyTreeTest()
+{
+	mafSmartPointer<mafVMELandmarkCloud> landmarkCloud;
+	mafSmartPointer<mafVMELandmark> landmark1;
+	mafSmartPointer<mafVMELandmark> landmark2;
+
+	double rad = 10;
+	double res = 30;
+
+	landmark1->SetName("1");
+	landmark2->SetName("2");
+
+	landmarkCloud->TestModeOn();
+	landmarkCloud->SetRadius(rad);
+	landmarkCloud->SetSphereResolution(res);
+	landmark1->ReparentTo(landmarkCloud);
+	landmark2->ReparentTo(landmarkCloud);
+
+	mafVMELandmarkCloud *newLandmarkCloud = (mafVMELandmarkCloud *)landmarkCloud->CopyTree();
+
+	//Check if landmark cloud has been copied
+	bool result = false;
+	result = mafEquals(newLandmarkCloud->GetRadius(), rad);
+	CPPUNIT_ASSERT(result);
+
+	result = false;
+	result = mafEquals(newLandmarkCloud->GetSphereResolution(), res);
+	CPPUNIT_ASSERT(result);
+
+	result = false;
+	result = mafEquals(newLandmarkCloud->GetNumberOfLandmarks(), landmarkCloud->GetNumberOfLandmarks());
+	CPPUNIT_ASSERT(result);
 }
