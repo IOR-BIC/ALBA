@@ -1739,9 +1739,12 @@ void mafLogicWithManagers::VmeSelected(mafVME *vme)
 
 		m_ViewManager->VmeSelect(vme);
 	}
-  if(m_OpManager)   m_OpManager->VmeSelected(vme);
-	if(m_SideBar)     m_SideBar->VmeSelected(vme);
-
+  if(m_OpManager)	m_OpManager->VmeSelected(vme);
+	if(m_SideBar) 
+	{
+		m_SideBar->VmeSelected(vme);
+		m_SideBar->GetTree()->SetFocus();
+	}
 	
 }
 
