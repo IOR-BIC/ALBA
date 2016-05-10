@@ -66,6 +66,9 @@ public:
   /** retrieve the file name*/
   mafString GetFileName(){return m_File;};
 
+	/** retrieve the wildCard*/
+	virtual mafString GetWildCard();
+
   /** Set the file name*/
   void SetFileName(mafString filename);
 

@@ -80,6 +80,7 @@ mafOp(label)
 
   m_File    = "";
   m_FileDir = "";
+	m_WildCard = "";
 
   ResetErrorCount();
 }
@@ -115,16 +116,10 @@ mafOp* mafOpImporterVTKXML::Copy()
 void mafOpImporterVTKXML::OpRun()   
 //----------------------------------------------------------------------------
 {
-  mafString wildc = "vtk xml ImageData (*.vti)|*.vti ";
-  wildc += "|vtk xml PolyData (*.vtp)|*.vtp";
-  wildc += "|vtk xml StructuredGrid (*.vts)|*.vts";
-  wildc += "|vtk xml RectilinearGrid (*.vtr)|*.vtr";
-  wildc += "|vtk xml UnstructuredGrid (*.vtu)|*.vtu";
-
   mafString f;
   if (m_File.IsEmpty())
   {
-    f = mafGetOpenFile(m_FileDir, wildc, _("Choose VTK XML file")).c_str();
+    f = mafGetOpenFile(m_FileDir, GetWildCard(), _("Choose VTK XML file")).c_str();
     m_File = f;
   }
 
@@ -157,6 +152,18 @@ void mafOpImporterVTKXML::SetFileName(mafString filename)
 //----------------------------------------------------------------------------
 {
   m_File = filename;
+}
+//----------------------------------------------------------------------------
+mafString mafOpImporterVTKXML::GetWildCard()
+//----------------------------------------------------------------------------
+{
+	mafString wildc = "vtk xml ImageData (*.vti)|*.vti ";
+	wildc += "|vtk xml PolyData (*.vtp)|*.vtp";
+	wildc += "|vtk xml StructuredGrid (*.vts)|*.vts";
+	wildc += "|vtk xml RectilinearGrid (*.vtr)|*.vtr";
+	wildc += "|vtk xml UnstructuredGrid (*.vtu)|*.vtu";
+
+	return wildc;
 }
 //----------------------------------------------------------------------------
 void mafOpImporterVTKXML::ErrorProcessEvents(vtkObject* sender, unsigned long channel, void* clientdata, void* calldata)
