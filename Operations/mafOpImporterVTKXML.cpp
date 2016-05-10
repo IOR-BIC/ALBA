@@ -80,7 +80,6 @@ mafOp(label)
 
   m_File    = "";
   m_FileDir = "";
-	m_WildCard = "";
 
   ResetErrorCount();
 }
