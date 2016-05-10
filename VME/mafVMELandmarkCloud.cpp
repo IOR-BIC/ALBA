@@ -105,14 +105,8 @@ int mafVMELandmarkCloud::DeepCopy(mafVME *a)
 
 		//Removing current Data Vector
 		m_DataVector->RemoveAllItems();
-		//Reconstruct structure by coping also all landmarks
-		for (int i = 0; i < lc->GetNumberOfLandmarks(); i++)
-		{
-			mafVMELandmark *lm;
-			mafNEW(lm);
-			lm->DeepCopy(lc->GetLandmark(i));
-			lm->ReparentTo(this);
-		}
+
+		GetTagArray()->SetTag(mafTagItem(MAF_LMC_VERSION, 2));
 
     return MAF_OK;
   }  
