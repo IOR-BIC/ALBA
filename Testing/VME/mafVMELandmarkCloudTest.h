@@ -37,8 +37,9 @@ class mafVMELandmarkCloudTest : public mafTest
     CPPUNIT_TEST( GetLandmarkNameTest );
     CPPUNIT_TEST( SetRadiusTest );
     CPPUNIT_TEST( SetSphereResolutionTest );
-    CPPUNIT_TEST( DeepCopyTest );
-    CPPUNIT_TEST_SUITE_END();
+		CPPUNIT_TEST(DeepCopyTest);
+		CPPUNIT_TEST(CopyTreeTest);
+		CPPUNIT_TEST_SUITE_END();
 
   protected:
     void DynamicAllocationTest();
@@ -50,7 +51,8 @@ class mafVMELandmarkCloudTest : public mafTest
     void GetLandmarkNameTest();
     void SetRadiusTest();
     void SetSphereResolutionTest();
-    void DeepCopyTest();
+		void DeepCopyTest();
+		void CopyTreeTest();
 
 };
 
