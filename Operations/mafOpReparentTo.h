@@ -34,6 +34,9 @@ class mafGUI;
 // mafOpReparentTo :
 //----------------------------------------------------------------------------
 /** */
+
+static mafVME *glo_VmeForReparent;
+
 class MAF_EXPORT mafOpReparentTo: public mafOp
 {
 public:
@@ -44,8 +47,11 @@ public:
 
   mafOp* Copy();
 
+	/** Perform validation on the vme chooser */
+	static bool VMEAcceptForReparent(mafVME *vme);
+
 	/** Return true for the acceptable vme type. */
-  bool Accept(mafVME*node);
+  bool Accept(mafVME *node);
 
 	/** Builds operation's interface. */
   void OpRun();
