@@ -52,7 +52,7 @@ mafOp(label)
 	m_OpType	= OPTYPE_OP;
 	m_Canundo	= true;
 
-	m_InputPreserving = false;
+	m_InputPreserving = true;
 
   m_PreviewResultFlag	 = false;
 	m_ClearInterfaceFlag = false;
@@ -98,7 +98,7 @@ enum FILTER_SURFACE_ID
 	ID_CLEAN = MINID,
 	ID_VTK_CONNECT,
 	ID_SMOOTH,
-	ID_ITERACTION,
+	ID_ITERATION,
 	ID_DECIMATE,
 	ID_PRESERVE_TOPOLOGY,
 	ID_REDUCTION,
@@ -108,9 +108,7 @@ enum FILTER_SURFACE_ID
 	ID_NORMALS_ANGLE,
 	ID_EDGE_SPLITTING,
 	ID_FLIP_NORMALS,
-	ID_PREVIEW,
-	ID_CLEAR,
-	ID_RESET_NORMALS,
+	ID_RESET_ALL,
 	ID_HELP,
 };
 //----------------------------------------------------------------------------
@@ -126,8 +124,7 @@ void mafOpFilterSurface::OpRun()
   if (!m_TestMode)
   {
   	CreateGui();
-  }
-	
+  }	
 }
 //----------------------------------------------------------------------------
 void mafOpFilterSurface::CreateGui()
@@ -147,40 +144,38 @@ void mafOpFilterSurface::CreateGui()
   }
 
   m_Gui->Label("");
-  m_Gui->Label("smooth",true);
-  m_Gui->Slider(ID_ITERACTION,"n.iteraction: ",&m_Iterations,0,500);
-  m_Gui->Button(ID_SMOOTH,"apply smooth");
+  m_Gui->Label("Smooth",true);
+  m_Gui->Slider(ID_ITERATION,"Iterations:",&m_Iterations,0,500);
+  m_Gui->Button(ID_SMOOTH,"Apply Smooth");
 
   m_Gui->Divider(2);
-  m_Gui->Label("decimate",true);
-  m_Gui->Bool(ID_PRESERVE_TOPOLOGY,"preserve topology",&m_TopologyFlag, 1);
-  m_Gui->Slider(ID_REDUCTION,"reduc. to %: ",&m_Reduction,1, 100);
-  m_Gui->Button(ID_DECIMATE,"apply decimate");
+  m_Gui->Label("Decimate",true);
+  m_Gui->Bool(ID_PRESERVE_TOPOLOGY,"Preserve topology",&m_TopologyFlag, 1);
+  m_Gui->Slider(ID_REDUCTION,"Reduction:",&m_Reduction,1, 100);
+  m_Gui->Button(ID_DECIMATE,"Apply Decimate");
 
   m_Gui->Divider(2);
-  m_Gui->Label("normals",true);
-  m_Gui->Slider(ID_NORMALS_ANGLE,"angle",&m_Angle, 0, 90);
-  m_Gui->Bool(ID_EDGE_SPLITTING,"edge splitting",&m_EdgeSplit, 1);
-  m_Gui->Bool(ID_FLIP_NORMALS,"flip normals",&m_FlipNormals, 1);
-  m_Gui->Button(ID_NORMALS,"apply normals");
-  m_Gui->Button(ID_RESET_NORMALS,"reset normals");
+  m_Gui->Label("Normals",true);
+  m_Gui->Slider(ID_NORMALS_ANGLE,"Angle",&m_Angle, 0, 90);
+  m_Gui->Bool(ID_EDGE_SPLITTING,"Edge splitting",&m_EdgeSplit, 1);
+  m_Gui->Bool(ID_FLIP_NORMALS,"Flip normals",&m_FlipNormals, 1);
+  m_Gui->Button(ID_NORMALS,"Apply Normals");
 
   m_Gui->Divider(2);
-  m_Gui->Label("other filters",true);
-  m_Gui->Button(ID_STRIPPER,"strip");
-  m_Gui->Button(ID_TRIANGLE,"triangulate");
-  m_Gui->Button(ID_CLEAN,"clean");
-  m_Gui->Button(ID_VTK_CONNECT,"connectivity");
+  m_Gui->Label("Other filters",true);
+  m_Gui->Button(ID_STRIPPER,"Apply Strip");
+  m_Gui->Button(ID_TRIANGLE,"Apply Triangulate");
+  m_Gui->Button(ID_CLEAN,"Apply Clean");
+  m_Gui->Button(ID_VTK_CONNECT,"Apply Connectivity");
 
   m_Gui->Divider(2);
   m_Gui->Label("");
-  m_Gui->Button(ID_PREVIEW,"preview");
-  m_Gui->Button(ID_CLEAR,"clear");
+  m_Gui->Button(ID_RESET_ALL,"Reset");
+
   m_Gui->OkCancel();
   m_Gui->Enable(wxOK,false);
 
-  m_Gui->Enable(ID_PREVIEW,false);
-  m_Gui->Enable(ID_CLEAR,false);
+  m_Gui->Enable(ID_RESET_ALL,false);
 
   m_Gui->Divider();
 
@@ -240,14 +235,9 @@ void mafOpFilterSurface::OnEvent(mafEventBase *maf_event)
       case ID_NORMALS:
         OnGenerateNormals();
       break;
-      case ID_PREVIEW:
-        OnPreview(); 
       break;
-      case ID_CLEAR:
+      case ID_RESET_ALL:
         OnClear(); 
-      break;
-      case ID_RESET_NORMALS:
-        OnResetNormals();
       break;
       case wxOK:
         if(m_PreviewResultFlag)
@@ -276,25 +266,19 @@ void mafOpFilterSurface::OnClean()
 	if (!m_TestMode)
 	{
 		wxBusyCursor wait;
-    m_Gui->Enable(ID_CLEAN,false);
-    m_Gui->Update();
 	}
 
 	vtkMAFSmartPointer<vtkCleanPolyData> cleanPolydata;
   cleanPolydata->SetTolerance(0.0);
 	cleanPolydata->SetInput(m_ResultPolydata);
-// 	cleanPolydata->PointMergingOff(); 
-// 	cleanPolydata->ConvertLinesToPointsOn();  
-// 	cleanPolydata->ConvertPolysToLinesOn();
-// 	cleanPolydata->ConvertStripsToPolysOn();     
 	cleanPolydata->Update();
 
 	m_ResultPolydata->DeepCopy(cleanPolydata->GetOutput());
 
 	if (!m_TestMode)
 	{
-		m_Gui->Enable(ID_PREVIEW,true);
-		m_Gui->Enable(ID_CLEAR,true);
+		OnPreview();
+		m_Gui->Enable(ID_RESET_ALL,true);
 		m_Gui->Enable(wxOK,true);
 	}
 
@@ -308,8 +292,6 @@ void mafOpFilterSurface::OnVtkConnect()
 	if (!m_TestMode)
 	{
 		wxBusyCursor wait;
-		m_Gui->Enable(ID_VTK_CONNECT,false);
-		m_Gui->Update();
 	}
 
 	vtkMAFSmartPointer<vtkPolyDataConnectivityFilter> connectivityFilter;
@@ -320,8 +302,8 @@ void mafOpFilterSurface::OnVtkConnect()
 
 	if (!m_TestMode)
 	{
-		m_Gui->Enable(ID_PREVIEW,true);
-		m_Gui->Enable(ID_CLEAR,true);
+		OnPreview();
+		m_Gui->Enable(ID_RESET_ALL,true);
 		m_Gui->Enable(wxOK,true);
 	}
 
@@ -336,7 +318,7 @@ void mafOpFilterSurface::OnSmooth()
 	{
 		wxBusyCursor wait;
 		m_Gui->Enable(ID_SMOOTH,false);
-		m_Gui->Enable(ID_ITERACTION,false);
+		m_Gui->Enable(ID_ITERATION,false);
 		m_Gui->Update();
 	}
 
@@ -351,10 +333,10 @@ void mafOpFilterSurface::OnSmooth()
 	if (!m_TestMode)
 	{
 		m_Gui->Enable(ID_SMOOTH,true);
-		m_Gui->Enable(ID_ITERACTION,true);
+		m_Gui->Enable(ID_ITERATION,true);
 	
-		m_Gui->Enable(ID_PREVIEW,true);
-		m_Gui->Enable(ID_CLEAR,true);
+		OnPreview();
+		m_Gui->Enable(ID_RESET_ALL,true);
 		m_Gui->Enable(wxOK,true);
 	}
 
@@ -387,8 +369,8 @@ void mafOpFilterSurface::OnDecimate()
 		m_Gui->Enable(ID_PRESERVE_TOPOLOGY,true);
 		m_Gui->Enable(ID_REDUCTION,true);
 	
-		m_Gui->Enable(ID_PREVIEW,true);
-		m_Gui->Enable(ID_CLEAR,true);
+		OnPreview();
+		m_Gui->Enable(ID_RESET_ALL,true);
 		m_Gui->Enable(wxOK,true);
 		m_Gui->Update();
 	}
@@ -402,8 +384,6 @@ void mafOpFilterSurface::OnStripper()
 	if (!m_TestMode)
 	{
 		wxBusyCursor wait;
-		m_Gui->Enable(ID_STRIPPER,false);
-		m_Gui->Update();
 	}
 
   vtkMAFSmartPointer<vtkStripper> stripper;
@@ -414,8 +394,8 @@ void mafOpFilterSurface::OnStripper()
 
 	if (!m_TestMode)
 	{
-		m_Gui->Enable(ID_PREVIEW,true);
-		m_Gui->Enable(ID_CLEAR,true);
+		OnPreview();
+		m_Gui->Enable(ID_RESET_ALL,true);
 		m_Gui->Enable(wxOK,true);
 	}
 
@@ -429,8 +409,6 @@ void mafOpFilterSurface::OnTriangulate()
 	if (!m_TestMode)
 	{
 		wxBusyCursor wait;
-		m_Gui->Enable(ID_TRIANGLE,false);
-		m_Gui->Update();
 	}
 
 	vtkMAFSmartPointer<vtkTriangleFilter> triangleFilter;
@@ -441,8 +419,8 @@ void mafOpFilterSurface::OnTriangulate()
 
 	if (!m_TestMode)
 	{
-		m_Gui->Enable(ID_PREVIEW,true);
-		m_Gui->Enable(ID_CLEAR,true);
+		OnPreview();
+		m_Gui->Enable(ID_RESET_ALL,true);
 		m_Gui->Enable(wxOK,true);
 	}
 
@@ -487,35 +465,12 @@ void mafOpFilterSurface::OnGenerateNormals()
 		m_Gui->Enable(ID_FLIP_NORMALS,true);
 		m_Gui->Enable(ID_NORMALS,true);
 	
-		m_Gui->Enable(ID_PREVIEW,true);
-		m_Gui->Enable(ID_CLEAR,true);
+		OnPreview();
+		m_Gui->Enable(ID_RESET_ALL,true);
 		m_Gui->Enable(wxOK,true);
 	}
 
 	m_PreviewResultFlag = true;
-}
-//----------------------------------------------------------------------------
-void mafOpFilterSurface::OnResetNormals()
-//----------------------------------------------------------------------------
-{
-	m_Gui->Enable(ID_RESET_NORMALS,false);
-
-	vtkDataArray *normals = m_ResultPolydata->GetPointData()->GetNormals();
-
-	vtkIdType number_tuple;
-
-	if(normals)
-		number_tuple = normals->GetNumberOfTuples();
-	
-	if(number_tuple > 0)
-		normals->Reset();
-
-					
-	m_Gui->Enable(ID_RESET_NORMALS,true);
-
-	m_Gui->Enable(ID_PREVIEW,true);
-	m_Gui->Enable(ID_CLEAR,true);
-	m_Gui->Enable(wxOK,true);
 }
 //----------------------------------------------------------------------------
 void mafOpFilterSurface::OnPreview()
@@ -524,9 +479,8 @@ void mafOpFilterSurface::OnPreview()
 	wxBusyCursor wait;
 	
   ((mafVMESurface *)m_Input)->SetData(m_ResultPolydata,m_Input->GetTimeStamp());
-
-	m_Gui->Enable(ID_PREVIEW,false);
-	m_Gui->Enable(ID_CLEAR,true);
+	
+	m_Gui->Enable(ID_RESET_ALL,true);
 	m_Gui->Enable(wxOK,true);
 
 	m_PreviewResultFlag   = false;
@@ -554,7 +508,7 @@ void mafOpFilterSurface::OnClear()
 	m_Gui->Enable(ID_CLEAN,true);
 	m_Gui->Enable(ID_VTK_CONNECT,true);
 	m_Gui->Enable(ID_SMOOTH,true);
-	m_Gui->Enable(ID_ITERACTION,true);
+	m_Gui->Enable(ID_ITERATION,true);
 	m_Gui->Enable(ID_DECIMATE,true);
 	m_Gui->Enable(ID_PRESERVE_TOPOLOGY,true);
 	m_Gui->Enable(ID_REDUCTION,true);
@@ -568,8 +522,7 @@ void mafOpFilterSurface::OnClear()
 	m_Gui->Enable(ID_EDGE_SPLITTING,true);
 	m_Gui->Enable(ID_FLIP_NORMALS,true);
 
-	m_Gui->Enable(ID_PREVIEW,false);
-	m_Gui->Enable(ID_CLEAR,false);
+	m_Gui->Enable(ID_RESET_ALL,false);
 	m_Gui->Enable(wxOK,false);
 	m_Gui->Update();
 
