@@ -94,7 +94,7 @@ enum FILTER_SURFACE_ID
   ID_MEDIAN,
   ID_KERNEL_SIZE,
 	ID_PREVIEW,
-	ID_CLEAR,
+	ID_RESET_ALL,
   ID_APPLY_ON_INPUT,
 };
 //----------------------------------------------------------------------------
@@ -138,12 +138,12 @@ void mafOpFilterVolume::CreateGui()
 
   m_Gui->Divider(2);
   m_Gui->Button(ID_PREVIEW,_("preview"));
-  m_Gui->Button(ID_CLEAR,_("clear"));
+  m_Gui->Button(ID_RESET_ALL,_("clear"));
   m_Gui->OkCancel();
   m_Gui->Enable(wxOK,false);
 
   m_Gui->Enable(ID_PREVIEW,false);
-  m_Gui->Enable(ID_CLEAR,false);
+  m_Gui->Enable(ID_RESET_ALL,false);
 
   m_Gui->Divider();
 }
@@ -201,7 +201,7 @@ void mafOpFilterVolume::OnEvent(mafEventBase *maf_event)
       case ID_PREVIEW:
         OnPreview(); 
       break;
-      case ID_CLEAR:
+      case ID_RESET_ALL:
         OnClear(); 
       break;
       case wxOK:
@@ -264,7 +264,7 @@ void mafOpFilterVolume::OnSmooth()
 	  m_Gui->Enable(ID_RADIUS_FACTOR,true);
 	
 		m_Gui->Enable(ID_PREVIEW,m_PreviewResultFlag);
-		m_Gui->Enable(ID_CLEAR,m_PreviewResultFlag);
+		m_Gui->Enable(ID_RESET_ALL,m_PreviewResultFlag);
 		m_Gui->Enable(wxOK,true);
 	  m_Gui->Enable(wxCANCEL,m_PreviewResultFlag);
   }
@@ -305,7 +305,7 @@ void mafOpFilterVolume::OnMedian()
 	  m_Gui->Enable(ID_KERNEL_SIZE,true);
 	
 	  m_Gui->Enable(ID_PREVIEW,m_PreviewResultFlag);
-	  m_Gui->Enable(ID_CLEAR,m_PreviewResultFlag);
+	  m_Gui->Enable(ID_RESET_ALL,m_PreviewResultFlag);
 	  m_Gui->Enable(wxOK,true);
 	  m_Gui->Enable(wxCANCEL,m_PreviewResultFlag);
   }
@@ -319,7 +319,7 @@ void mafOpFilterVolume::OnPreview()
   ((mafVMEVolumeGray *)m_Input)->SetData(m_ResultImageData,m_Input->GetTimeStamp());
 
 	m_Gui->Enable(ID_PREVIEW,false);
-	m_Gui->Enable(ID_CLEAR,true);
+	m_Gui->Enable(ID_RESET_ALL,true);
 	m_Gui->Enable(wxOK,true);
 
 	m_PreviewResultFlag   = false;
@@ -350,7 +350,7 @@ void mafOpFilterVolume::OnClear()
 	  m_Gui->Enable(ID_STANDARD_DEVIATION,true);
 	
 		m_Gui->Enable(ID_PREVIEW,false);
-		m_Gui->Enable(ID_CLEAR,false);
+		m_Gui->Enable(ID_RESET_ALL,false);
 		m_Gui->Enable(wxOK,false);
 		m_Gui->Update();
 	}

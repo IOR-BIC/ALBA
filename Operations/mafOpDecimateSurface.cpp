@@ -97,7 +97,7 @@ enum FILTER_SURFACE_ID
 	ID_PRESERVE_TOPOLOGY,
 	ID_REDUCTION,
 	ID_PREVIEW,
-	ID_CLEAR,
+	ID_RESET_ALL,
 };
 //----------------------------------------------------------------------------
 void mafOpDecimateSurface::OpRun()   
@@ -128,12 +128,12 @@ void mafOpDecimateSurface::OpRun()
 		m_Gui->Divider(2);
 		m_Gui->Label("");
 		m_Gui->Button(ID_PREVIEW,"preview");
-		m_Gui->Button(ID_CLEAR,"undo");
+		m_Gui->Button(ID_RESET_ALL,"undo");
 		m_Gui->OkCancel();
 		m_Gui->Enable(wxOK,false);
 
 		m_Gui->Enable(ID_PREVIEW,false);
-		m_Gui->Enable(ID_CLEAR,false);
+		m_Gui->Enable(ID_RESET_ALL,false);
 
 		m_Gui->Divider();
 
@@ -184,7 +184,7 @@ void mafOpDecimateSurface::OnEvent(mafEventBase *maf_event)
       case ID_PREVIEW:
         OnPreview(); 
       break;
-      case ID_CLEAR:
+      case ID_RESET_ALL:
         OnClear(); 
       break;    
       case wxOK:
@@ -240,7 +240,7 @@ void mafOpDecimateSurface::OnDecimate()
 		m_Gui->Enable(ID_REDUCTION,true);
 
 		m_Gui->Enable(ID_PREVIEW,true);
-		m_Gui->Enable(ID_CLEAR,true);
+		m_Gui->Enable(ID_RESET_ALL,true);
 		m_Gui->Enable(wxOK,true);
 		m_Gui->Update();
 	}
@@ -259,7 +259,7 @@ void mafOpDecimateSurface::OnPreview()
 	if(!m_TestMode)
 	{
 		m_Gui->Enable(ID_PREVIEW,false);
-		m_Gui->Enable(ID_CLEAR,true);
+		m_Gui->Enable(ID_RESET_ALL,true);
 		m_Gui->Enable(wxOK,true);
 		m_Gui->Update();
 	}
@@ -293,7 +293,7 @@ void mafOpDecimateSurface::OnClear()
 
 
 	m_Gui->Enable(ID_PREVIEW,false);
-	m_Gui->Enable(ID_CLEAR,false);
+	m_Gui->Enable(ID_RESET_ALL,false);
 	m_Gui->Enable(wxOK,false);
 	
 

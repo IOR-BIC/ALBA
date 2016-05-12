@@ -95,7 +95,7 @@ enum FILTER_SURFACE_ID
 	ID_EDGE_SPLITTING,
 	ID_FLIP_NORMALS,
 	ID_PREVIEW,
-	ID_CLEAR,
+	ID_RESET_ALL,
 	ID_RESET_NORMALS,
 };
 //----------------------------------------------------------------------------
@@ -124,12 +124,12 @@ void mafOpEditNormals::OpRun()
 		m_Gui->Divider(2);
 		m_Gui->Label("");
 		m_Gui->Button(ID_PREVIEW,"preview");
-		m_Gui->Button(ID_CLEAR,"clear");
+		m_Gui->Button(ID_RESET_ALL,"clear");
 		m_Gui->OkCancel();
 		m_Gui->Enable(wxOK,false);
 
 		m_Gui->Enable(ID_PREVIEW,false);
-		m_Gui->Enable(ID_CLEAR,false);
+		m_Gui->Enable(ID_RESET_ALL,false);
 
 		m_Gui->Divider();
 
@@ -166,7 +166,7 @@ void mafOpEditNormals::OnEvent(mafEventBase *maf_event)
 		case ID_PREVIEW:
 			OnPreview(); 
 			break;
-		case ID_CLEAR:
+		case ID_RESET_ALL:
 			OnClear(); 
 			break;
 		case ID_RESET_NORMALS:
@@ -233,7 +233,7 @@ void mafOpEditNormals::OnGenerateNormals()
 		m_Gui->Enable(ID_NORMALS,true);
 
 		m_Gui->Enable(ID_PREVIEW,true);
-		m_Gui->Enable(ID_CLEAR,true);
+		m_Gui->Enable(ID_RESET_ALL,true);
 		m_Gui->Enable(wxOK,true);
 	}
 
@@ -259,7 +259,7 @@ void mafOpEditNormals::OnResetNormals()
 	m_Gui->Enable(ID_RESET_NORMALS,true);
 
 	m_Gui->Enable(ID_PREVIEW,true);
-	m_Gui->Enable(ID_CLEAR,true);
+	m_Gui->Enable(ID_RESET_ALL,true);
 	m_Gui->Enable(wxOK,true);
 }
 //----------------------------------------------------------------------------
@@ -271,7 +271,7 @@ void mafOpEditNormals::OnPreview()
 	((mafVMESurface *)m_Input)->SetData(m_ResultPolydata,m_Input->GetTimeStamp());
 
 	m_Gui->Enable(ID_PREVIEW,false);
-	m_Gui->Enable(ID_CLEAR,true);
+	m_Gui->Enable(ID_RESET_ALL,true);
 	m_Gui->Enable(wxOK,true);
 
 	m_PreviewResultFlag   = false;
@@ -299,7 +299,7 @@ void mafOpEditNormals::OnClear()
 	m_Gui->Enable(ID_FLIP_NORMALS,true);
 
 	m_Gui->Enable(ID_PREVIEW,false);
-	m_Gui->Enable(ID_CLEAR,false);
+	m_Gui->Enable(ID_RESET_ALL,false);
 	m_Gui->Enable(wxOK,false);
 	m_Gui->Update();
 
