@@ -118,6 +118,9 @@ public:
   /** called to check if the vme can be re-parented under the new parent */
   virtual bool CanReparentTo(mafVME *parent);
 
+	/** Redefinition of Setname  in one lmcloud landmark name is unique */
+	virtual void SetName(const char *name);
+
 protected:
   mafVMELandmark();
   virtual ~mafVMELandmark();

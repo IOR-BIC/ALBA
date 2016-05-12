@@ -1821,18 +1821,32 @@ void mafLogicWithManagers::ShowLandmark(mafVMELandmark * lm, bool visibility)
 	mafVMELandmarkCloud *lmParent = mafVMELandmarkCloud::SafeDownCast(lm->GetParent());
 	if (!lmParent)
 		return;
-	lmParent->ShowLandmark(lm, visibility);
-
-	if (m_SelectedLandmark == lm)
-		SelectLandmark(lm, visibility);
-
+	
 	//show of lm shows also the lmc
 	//hide of last lm hides also the lmc
 	if (visibility || (!visibility && lmParent->GetLandmarkShowNumber() == 0))
 	{
+		mafPipe* lmPipe = m_ViewManager->GetSelectedView()->GetNodePipe(lmParent);
+		
+		//if the lmc is not show and we want to show a lm we show only this landmark
+		if (!lmPipe && visibility)
+			lmParent->ShowAllLandmarks(false);
+		
 		m_ViewManager->VmeShow(lmParent, visibility);
 		ShowInSideBar(lmParent,visibility);
+
+		//If the selected landmark is part of lmParent and is different than current lm
+		//the landmark is hided in all views and we need to deselect it
+		if (m_SelectedLandmark && m_SelectedLandmark != lm && lmParent->GetLandmarkIndex(m_SelectedLandmark) >= 0)
+		{
+			SelectLandmark(m_SelectedLandmark, false);
+		}
 	}
+
+	lmParent->ShowLandmark(lm, visibility);
+
+	if (m_SelectedLandmark == lm)
+		SelectLandmark(lm, visibility);
 }
 
 //----------------------------------------------------------------------------

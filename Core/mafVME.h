@@ -158,7 +158,7 @@ public:
 	const char *GetName() { return m_Name; }
 
 	/** set node name */
-	void SetName(const char *name);
+	virtual void SetName(const char *name);
 
 	
 	/** TODO: to be moved to mafVME
@@ -673,6 +673,7 @@ protected:
 	mafLinksMap       m_Links;        ///< links to other nodes in the tree
 
 	mafString         m_Name;         ///< name of this node
+	mafString         m_GuiName;      ///< name showed on gui
 	mafID             m_Id;           ///< ID of this node
 
 	bool m_VisibleToTraverse;         ///< enable/disable traversing visit of this node

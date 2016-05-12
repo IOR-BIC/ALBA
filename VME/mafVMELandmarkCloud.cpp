@@ -1008,11 +1008,11 @@ void mafVMELandmarkCloud::ShowLandmark(mafVMELandmark *lm, bool show)
 }
 
 //----------------------------------------------------------------------------
-void mafVMELandmarkCloud::ShowAllLandmarks()
+void mafVMELandmarkCloud::ShowAllLandmarks(bool show)
 {
 	for (int i = 0; i < m_NumberOfLandmarks; i++)
 	{
-		ShowLandmark(m_LMChildren[i], true);
+		ShowLandmark(m_LMChildren[i], show);
 	}
 }
 
