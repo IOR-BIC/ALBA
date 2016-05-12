@@ -131,6 +131,8 @@ bool mafVMELandmarkCloud::Equals(mafVME *vme)
 //-------------------------------------------------------------------------
 int mafVMELandmarkCloud::InternalInitialize()
 {
+
+
 	const int closed_cloud_state = 1;
 	const int open_cloud_state = 1;
 
@@ -144,11 +146,15 @@ int mafVMELandmarkCloud::InternalInitialize()
 
 		if ((!tagArray->IsTagPresent(MAF_LMC_VERSION)) && (tag = tagArray->GetTag("MFL_VME_LANDMARK_CLOUD_STATE")) && (tag->GetValueAsDouble() == closed_cloud_state))
 			CreateLMStructureFromDataVector();
+		else if (!m_DataVector->GetItem(m_CurrentTime))
+			NewPolyData(m_CurrentTime);
 
 		//Setting state tag to Open Cloud in order to maintain backward compatibility
 		GetTagArray()->SetTag(mafTagItem("MFL_VME_LANDMARK_CLOUD_STATE", open_cloud_state));
 
     GetMaterial();
+
+
     return MAF_OK;
   }
   return MAF_ERROR;
@@ -201,8 +207,8 @@ int mafVMELandmarkCloud::SetNumberOfLandmarks(int num)
     return MAF_OK;
   else if (num > oldnum)
   {
-		if(m_DataVector->GetNumberOfItems()==0)
-			NewPolyData(m_CurrentTime);
+		//if(m_DataVector->GetNumberOfItems()==0)
+		//	NewPolyData(m_CurrentTime);
 
     // add a new point and a new vertex to all items
     for (mafDataVector::Iterator it = m_DataVector->Begin(); it != m_DataVector->End(); it++)
@@ -411,7 +417,6 @@ int mafVMELandmarkCloud::AppendPoint(vtkPolyData *polydata,double x,double y,dou
         }
       }
       cells->Modified();
-//			polydata->SetVerts(cells);
       polydata->Modified();
     }
     else
