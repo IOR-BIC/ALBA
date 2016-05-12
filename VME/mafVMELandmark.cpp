@@ -162,6 +162,20 @@ bool mafVMELandmark::CanReparentTo(mafVME *parent)
   return false;
 }
 
+//----------------------------------------------------------------------------
+void mafVMELandmark::SetName(const char *name)
+{
+	mafVMELandmarkCloud *parent = mafVMELandmarkCloud::SafeDownCast(this->GetParent());
+	
+	if (!m_Name.Equals(name) && parent && parent->FindLandmarkIndex(name) >= 0)
+	{
+		mafWarningMessageMacro("There is already a landmatk with this name in the cloud\nOld name will be restored");
+		Superclass::SetName(GetName());
+	}
+	else
+		Superclass::SetName(name);
+}
+
 //-------------------------------------------------------------------------
 void mafVMELandmark::SetRadius(double rad)
 //-------------------------------------------------------------------------

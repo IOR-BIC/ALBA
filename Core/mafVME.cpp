@@ -856,6 +856,8 @@ int mafVME::InternalRestore(mafStorageElement *node)
 	// first restore node Name
 	if (node->GetAttribute("Name", m_Name))
 	{
+		m_GuiName = m_Name;
+
 		// restore Id
 		mafString id;
 		if (node->GetAttribute("Id", id))
@@ -965,7 +967,7 @@ mafGUI *mafVME::CreateGui()
 	if ((*GetMAFExpertMode()) == TRUE)
 		m_Gui->Button(ID_PRINT_INFO, type_name, "", "Print node debug information");
 
-	m_Gui->String(ID_NAME, "name :", &m_Name);
+	m_Gui->String(ID_NAME, "name :", &m_GuiName);
 
 	mafEvent buildHelpGui;
 	buildHelpGui.SetSender(this);
@@ -1088,7 +1090,7 @@ void mafVME::ForwardDownEvent(mafEventBase *maf_event)
 void mafVME::SetName(const char *name)
 //-------------------------------------------------------------------------
 {
-	m_Name = name; // force string copy
+	m_GuiName=m_Name=name; // force string copy
 	Modified();
 	mafEvent ev(this, VME_MODIFIED, this);
 	ForwardUpEvent(ev);
@@ -1780,9 +1782,7 @@ void mafVME::NodeOnEvent(mafEventBase *e)
 				{
 				case ID_NAME:
 				{
-					SetName(m_Name.GetCStr());
-					mafEvent ev(this, VME_MODIFIED, this);
-					ForwardUpEvent(&ev);
+					SetName(m_GuiName.GetCStr());
 				}
 				break;
 
