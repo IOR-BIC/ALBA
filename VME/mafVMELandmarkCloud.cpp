@@ -82,6 +82,7 @@ mafVMELandmarkCloud::mafVMELandmarkCloud()
 
   m_SingleFile = 0;
 	m_LanfmarkShowNumber = 0;
+	NewPolyData(m_CurrentTime);
 }
 
 //-------------------------------------------------------------------------
