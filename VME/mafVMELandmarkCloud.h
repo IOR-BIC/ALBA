@@ -196,7 +196,7 @@ public:
 
 	void ShowLandmark(mafVMELandmark *lm, bool show);
 
-	void ShowAllLandmarks();
+	void ShowAllLandmarks(bool show=true);
 
 	bool IsLandmarkShow(mafVMELandmark *lm);
 
