@@ -41,7 +41,6 @@ public:
   CPPUNIT_TEST( TestGetMaterial );
   CPPUNIT_TEST( TestGetIcon );
   CPPUNIT_TEST( TestGetVisualPipe );
-  //CPPUNIT_TEST( TestSetRefSysLink );
   CPPUNIT_TEST( TestGetOriginVME );
   CPPUNIT_TEST( TestGetPoint1VME );
   CPPUNIT_TEST( TestGetPoint2VME );
