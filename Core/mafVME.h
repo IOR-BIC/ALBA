@@ -48,14 +48,26 @@ class mafTagArray;
 class mafGUI;
 
 /** data structure used to store a link VME and its Id */
-class MAF_EXPORT mmuNodeLink :public mafUtility
+class MAF_EXPORT mafOldSubIdLink :public mafUtility
 {
 public:
-	mmuNodeLink(mafID id = -1, mafVME *node = NULL, mafID sub_id = -1) :m_NodeId(id), m_Node(node), m_NodeSubId(sub_id) {}
-	mafVME *m_Node;
+	mafOldSubIdLink(mafString name,mafID id = -1, mafID sub_id = -1):m_Name(name), m_NodeId(id), m_NodeSubId(sub_id) {}
+	mafString m_Name;
 	mafID   m_NodeId;
 	mafID   m_NodeSubId;
 };
+
+/** data structure used to store a link VME and its Id */
+struct MAF_EXPORT mafVMELink :public mafUtility
+{
+public:
+	mafVMELink(mafID id = -1, mafVME *node = NULL) :m_NodeId(id), m_Node(node) {}
+	mafVME *m_Node;
+	mafID   m_NodeId;
+};
+
+
+
 #ifdef MAF_EXPORTS
 EXPORT_STL_MAP(MAF_EXPORT, mafString, mmuNodeLink);
 #endif
@@ -353,20 +365,20 @@ Name<->components, where components are an array of mafStrings. It's a
 	customized classes should be created, inheriting from mafAttribute
 	(e.g. @sa mmaMaterial). */
 	mafTagArray  *GetTagArray();
-
-	typedef std::map<mafString, mmuNodeLink> mafLinksMap;
+			
+	typedef std::map<mafString, mafVMELink> mafLinksMap;
 
 	/**
 	return the value of a link to another node in the tree. If no link with
 	such a name exists return NULL. */
 	mafVME *GetLink(const char *name);
 
-	/**
-	Return the subId associated with the link (used for mafVMELandmark)*/
-	mafID GetLinkSubId(const char *name);
-
 	/** set a link to another node in the tree */
-	void SetLink(const char *name, mafVME *node, mafID sub_id = -1);
+	void SetLink(const char *name, mafVME *node);
+
+	/** This method manage olds links with subid and is here only for retro compatibility issues
+			please do not use this */
+	void SetOldSubIdLink(mafString link_name, mafID link_node_id, mafID link_node_subid);
 
 	/** remove a link */
 	void RemoveLink(const char *name);
@@ -608,7 +620,7 @@ protected:
 
 	virtual int InternalStore(mafStorageElement *parent);
 	virtual int InternalRestore(mafStorageElement *node);
-
+		
 	
 	/** to be redefined by subclasses to define the shutdown actions */
 	virtual void InternalShutdown() {};
@@ -671,6 +683,7 @@ protected:
 	mafAttributesMap  m_Attributes;   ///< attributes attached to this node
 
 	mafLinksMap       m_Links;        ///< links to other nodes in the tree
+	std::vector<mafOldSubIdLink> m_OldSubIdLinks;
 
 	mafString         m_Name;         ///< name of this node
 	mafString         m_GuiName;      ///< name showed on gui

@@ -108,10 +108,7 @@ public:
   /** Return the suggested pipe-typename for the visualization of this vme */
   virtual mafString GetVisualPipe() {return mafString("mafPipeRefSys");};
 
-	/** 
-  Set links for the ref-sys*/
-  void SetRefSysLink(const char *link_name, mafVME *n);
-
+	
 	mafVME *GetOriginVME();
   mafVME *GetPoint1VME();
   mafVME *GetPoint2VME();
