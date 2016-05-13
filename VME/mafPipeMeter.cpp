@@ -191,15 +191,10 @@ void mafPipeMeter::Create(mafSceneNode *n/*, bool use_axes*/)
     double pos[3], rot[3];
     mafVME *linked_vme = m_MeterVME->GetStartVME();
     mafSmartPointer<mafTransform> TmpTransform;
-    if(linked_vme && linked_vme->IsMAFType(mafVMELandmarkCloud) && m_MeterVME->GetLinkSubId("StartVME") != -1)
-    {
-      ((mafVMELandmarkCloud *)linked_vme)->GetLandmark(m_MeterVME->GetLinkSubId("StartVME"),pos,-1);
-      TmpTransform->SetMatrix(*linked_vme->GetOutput()->GetAbsMatrix());
-      TmpTransform->TransformPoint(pos,pos);
-    }
-    else
-      m_MeterVME->GetStartVME()->GetOutput()->GetAbsPose(pos,rot);
-    m_Caption->SetAttachmentPoint(pos[0],pos[1],pos[2]);
+
+		m_MeterVME->GetStartVME()->GetOutput()->GetAbsPose(pos,rot);
+    
+		m_Caption->SetAttachmentPoint(pos[0],pos[1],pos[2]);
   } 
 
   m_RenFront->AddActor2D(m_Caption);
@@ -426,42 +421,11 @@ void mafPipeMeter::UpdateProperty(bool fromTag)
   double rot[3] = {0,0,0};
   mafVME *linked_vme = m_MeterVME->GetStartVME();
   mafSmartPointer<mafTransform> TmpTransform;
-  if(linked_vme && linked_vme->IsMAFType(mafVMELandmarkCloud) && m_MeterVME->GetLinkSubId("StartVME") != -1)
-  {
-    ((mafVMELandmarkCloud *)linked_vme)->GetLandmark(m_MeterVME->GetLinkSubId("StartVME"),pos,-1);
-    TmpTransform->SetMatrix(*linked_vme->GetOutput()->GetAbsMatrix());
-    TmpTransform->TransformPoint(pos,pos);
-  }
-  else if(linked_vme)
-  {
-    linked_vme->GetOutput()->GetAbsPose(pos,rot);
-  }
-  m_Caption->SetAttachmentPoint(pos[0],pos[1],pos[2]);
+  
+	linked_vme->GetOutput()->GetAbsPose(pos,rot);
+
+	m_Caption->SetAttachmentPoint(pos[0],pos[1],pos[2]);
 
   GetGui()->Update();
   
-  /*
-	if(fromTag)
-  {
-		((mafVmeData *)m_Vme->GetClientData())->UpdateFromTag();
-    int idx = m_Vme->GetTagArray()->FindTag("VME_CENTER_ROTATION_POSE");
-    vtkTagItem *item = NULL;
-    double vec[16];
-    if (idx != -1)
-    {
-      item = m_Vme->GetTagArray()->GetTag(idx);
-      mflSmartPointer<vtkMatrix4x4> pose;
-      for (int el=0;el<16;el++)
-      {
-        vec[el] = item->GetValueAsDouble(el);
-      }
-      pose->DeepCopy(vec);
-      m_axes->SetPose(pose);
-    }
-    else
-      m_axes->SetPose();
-  }
-  else
-	  m_DataMapper->SetScalarVisibility(((mafVmeData *)m_Vme->GetClientData())->GetColorByScalar());
-	*/
 }

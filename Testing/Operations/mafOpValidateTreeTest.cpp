@@ -209,7 +209,7 @@ void mafOpValidateTreeTest::TestValidateTree_LinkNull()
 
  
   mafVME::mafLinksMap *linksmap = storageImport->GetRoot()->GetChild(0)->GetChild(1)->GetChild(0)->GetLinks();
-  (*linksmap)["SlicedVME"] = mmuNodeLink(1000,NULL,-1);
+  (*linksmap)["SlicedVME"] = mafVMELink(1000,NULL);
   
   
   mafOpValidateTree *op = new mafOpValidateTree();

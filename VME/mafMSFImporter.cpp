@@ -124,10 +124,12 @@ int mmuMSF1xDocument::InternalRestore(mafStorageElement *node)
       {
         mafID sub_id = -1;
         if (n->GetTagArray()->IsTagPresent("SUBLINK_ID"))
-        {
           sub_id = (mafID)n->GetTagArray()->GetTag("SUBLINK_ID")->GetValueAsDouble();
-        }
-        n->GetParent()->SetLink(n->GetName(), linkedVME, sub_id);
+
+				if(sub_id == -1)
+					n->GetParent()->SetLink(n->GetName(), linkedVME);
+				else
+					n->GetParent()->SetOldSubIdLink(n->GetName(), linkedVME->GetId(), sub_id);
       }
     }
   }
