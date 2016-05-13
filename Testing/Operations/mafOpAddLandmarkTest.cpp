@@ -262,7 +262,7 @@ void mafOpAddLandmarkTest::TestAddLandmark()
 
   op->GetCloud()->Update();
 
-  m_Result = op->GetCloud()->GetNumberOfChildren() == 3;
+  m_Result = op->GetCloud()->GetNumberOfChildren() == 5;
   TEST_RESULT;
   mafVMELandmark::SafeDownCast(op->GetCloud()->GetChild(1))->GetPoint(lnd1Out);
   m_Result = lnd1[0] == lnd1Out[0] && lnd1[1] == lnd1Out[1] && lnd1[2] == lnd1Out[2];
