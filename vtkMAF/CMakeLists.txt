@@ -219,6 +219,8 @@ SET(vtkMAF_SRCS
   vtkMAFDeformableSimplexMeshFilter_Impl.h
 	
 	vtkMAFTubeFilter.cxx vtkMAFTubeFilter.h
+	
+	vtkMAFLandmarkCloudOutlineCornerFilter.cxx vtkMAFLandmarkCloudOutlineCornerFilter.h
 )
 
 IF(WIN32)
