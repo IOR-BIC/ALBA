@@ -30,6 +30,7 @@ class mafVMELandmarkCloud;
 class mafVMELandmark;
 class vtkDataSet;
 class mafGUIMaterialButton;
+class vtkMAFLandmarkCloudOutlineCornerFilter;
 
 //----------------------------------------------------------------------------
 // mafPipeLandmarkCloud :
@@ -73,6 +74,8 @@ protected:
   vtkMAFExtendedGlyph3D     *m_Glyph;
   vtkPolyDataMapper			 *m_CloudMapper;
   vtkActor               *m_CloudActor;
+
+	vtkMAFLandmarkCloudOutlineCornerFilter *m_CloundCornerFilter;
 
   vtkActor               *m_CloudSelectionActor;
 
