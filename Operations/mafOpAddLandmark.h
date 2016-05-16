@@ -60,6 +60,8 @@ public:
 	~mafOpAddLandmark(); 
 	virtual void OnEvent(mafEventBase *maf_event);
 
+	void LoadDictionary();
+
   mafTypeMacro(mafOpAddLandmark, mafOp);
 
 	mafOp* Copy();
@@ -85,8 +87,9 @@ public:
 	/** Remove landmark to the cloud */
 	void SelectLandmark(mafString selection);
 
-	/** Select next landmark */
-	void SelectNextLandmark();
+	void EditLandmark();
+
+	void DeselectLandmark(mafString selection);
 
 	void SetPickingActiveFlag(bool picking) { m_PickingActiveFlag = picking; }
   bool GetPickingActiveFlag(){return m_PickingActiveFlag;}
@@ -125,9 +128,6 @@ protected:
 
 	void CheckEnableOkCondition();
 
-	/** Show a message box to inform the user that the added landmark already exists in the tree.*/
-  void ExistingLandmarkMessage();
-
 	int m_AddToCurrentTime;
 
   mafVMELandmarkCloud	*m_Cloud;
@@ -142,10 +142,14 @@ protected:
 
 	bool					m_CloudCreatedFlag;
 	bool					m_PickingActiveFlag;
+	
+	bool					m_AddLandmarkMode;
+	bool					m_hasSelection;
 
 	mafString			m_LandmarkName;
 	mafString			m_LandmarkSelected;
-	mafString			m_PrevLandmarkSelected;
+
+	int						m_LandmarkNameCount;
 
 	int						m_ShowMode;
 	wxComboBox		*m_ShowComboBox;
