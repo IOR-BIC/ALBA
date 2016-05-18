@@ -90,7 +90,7 @@ void mafOpAddLandmarkTest::TestOpUndo()
   op->AddLandmark(lnd1);
   op->SetLandmarkName("two");
   op->AddLandmark(lnd2);
-  op->OpDo();
+	op->OpStop(MAF_OK);
 
   op->GetCloud()->Update();
 
@@ -122,7 +122,7 @@ void mafOpAddLandmarkTest::TestOpUndo()
   op->AddLandmark(lnd1);
   op->SetLandmarkName("two");
   op->AddLandmark(lnd2);
-  op->OpDo();
+	op->OpStop(MAF_OK);
 
   op->GetCloud()->Update();
 
@@ -148,7 +148,7 @@ void mafOpAddLandmarkTest::TestOpUndo()
   op->AddLandmark(lnd1);
   op->SetLandmarkName("two");
   op->AddLandmark(lnd2);
-  op->OpDo();
+  op->OpStop(MAF_OK);
 
   op->GetCloud()->Update();
 
@@ -179,6 +179,9 @@ void mafOpAddLandmarkTest::TestAddLandmark()
   surface->GetOutput()->GetVTKData()->Update();
   surface->GetOutput()->Update();
   surface->Update();
+
+	DummyObserver *observer = new DummyObserver();
+	op->SetListener(observer);
 
   //Input Surface
   op->TestModeOn();
@@ -221,6 +224,8 @@ void mafOpAddLandmarkTest::TestAddLandmark()
 
   op = new mafOpAddLandmark();
 
+	op->SetListener(observer);
+
   //Input Landmark
   op->TestModeOn();
   op->Accept(landmark);
@@ -248,7 +253,9 @@ void mafOpAddLandmarkTest::TestAddLandmark()
 
   op = new mafOpAddLandmark();
 
-  //Input LandmarkCloud
+	op->SetListener(observer);
+
+	//Input LandmarkCloud
   op->TestModeOn();
   op->Accept(landmarkCloud);
   op->SetInput(landmarkCloud);
@@ -271,6 +278,7 @@ void mafOpAddLandmarkTest::TestAddLandmark()
   m_Result = lnd2[0] == lnd2Out[0] && lnd2[1] == lnd2Out[1] && lnd2[2] == lnd2Out[2];
   TEST_RESULT;
 
+	cppDEL(observer);
   cppDEL(op);
 }
 //----------------------------------------------------------------------------
@@ -287,6 +295,9 @@ void mafOpAddLandmarkTest::TestOpRun()
   surface->GetOutput()->GetVTKData()->Update();
   surface->GetOutput()->Update();
   surface->Update();
+
+	DummyObserver *observer = new DummyObserver();
+	op->SetListener(observer);
 
   //Input Surface
   op->TestModeOn();
@@ -316,6 +327,8 @@ void mafOpAddLandmarkTest::TestOpRun()
 
   op = new mafOpAddLandmark();
 
+	op->SetListener(observer);
+
   //Input Landmark
   op->TestModeOn();
   op->Accept(landmark);
@@ -335,6 +348,8 @@ void mafOpAddLandmarkTest::TestOpRun()
 
   op = new mafOpAddLandmark();
 
+	op->SetListener(observer);
+
   //Input LandmarkCloud
   op->TestModeOn();
   op->Accept(landmarkCloud);
@@ -348,6 +363,7 @@ void mafOpAddLandmarkTest::TestOpRun()
   m_Result = op->GetCloud() == landmarkCloud.GetPointer();
   TEST_RESULT;
 
+	cppDEL(observer);
   cppDEL(op);
 }
 //----------------------------------------------------------------------------
@@ -360,21 +376,15 @@ void mafOpAddLandmarkTest::TestAccept()
   mafSmartPointer<mafVMESurface> surface;
   m_Result = op->Accept(surface);
   TEST_RESULT;
-  m_Result = op->GetPickingActiveFlag();
-  TEST_RESULT;
-
+	
   //Volume is accepted as input
   mafSmartPointer<mafVMEVolumeGray> volume;
   m_Result = op->Accept(volume);
-  TEST_RESULT;
-  m_Result = op->GetPickingActiveFlag();
   TEST_RESULT;
 
   //Surface Parametric is accepted as input
   mafSmartPointer<mafVMESurfaceParametric> surfaceParametric;
   m_Result = op->Accept(surfaceParametric);
-  TEST_RESULT;
-  m_Result = op->GetPickingActiveFlag();
   TEST_RESULT;
 
   //LandmarkCloud isn't accepted as input

@@ -82,19 +82,18 @@ public:
   void AddLandmark(double pos[3]);
 	
 	/** Remove landmark from the cloud and tree */
-	void RemoveLandmark(mafString selection);
+	void RemoveLandmark();
 
-	/** Remove landmark to the cloud */
-	void SelectLandmark(mafString selection);
-
+	/** Change name and position of selected landmark  */
 	void EditLandmark();
 
-	void DeselectLandmark(mafString selection);
+	/** Select landmark to the cloud */
+	void SelectLandmark(mafString selection);
 
-	void SetPickingActiveFlag(bool picking) { m_PickingActiveFlag = picking; }
-  bool GetPickingActiveFlag(){return m_PickingActiveFlag;}
+	/** Deselect landmark to the cloud */
+	void DeselectLandmark();
 
-  mafVME* GetPickedVme(){return m_PickedVme;};
+	mafVME* GetPickedVme(){return m_PickedVme;};
   mafVMELandmarkCloud* GetCloud(){return m_Cloud;};
 
   void SetLandmarkName(mafString name){m_LandmarkName = name;};
@@ -109,11 +108,8 @@ protected:
 	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
 	void OpStop(int result);
 
-  /** Used in redo to add the landmarks to the tree*/
-  void AddLandmarksToTree();
-
-  /** Used in undo to remove the added landmarks from the tree*/
-  void RemoveLandmarksFromTree();
+	/** Restore landmarks from vector. */
+	void RestoreLandmarkVect(std::vector<mafVMELandmark*> &landmarkVect);
 
 	/** Set the color property of the material*/
 	void SetMaterialRGBA(mmaMaterial *material, double r, double g, double b, double a);
@@ -133,21 +129,25 @@ protected:
   mafVMELandmarkCloud	*m_Cloud;
 	mafVME      				*m_PickedVme;
 
-	mafVMELandmarkCloud	*m_SelectedLadmarkCloud;
+	mafVMELandmarkCloud	*m_SelectedLandmarkCloud;
 	mafVMELandmark *m_CurrentLandmark;
+	mafVMELandmark *m_SelectedLandmark;
 
-  std::vector<mafVMELandmark *> m_LandmarkAdded;	 
+	std::vector<mafVMELandmark *> m_LandmarkUndoVetc;
+	std::vector<mafVMELandmark *> m_LandmarkRedoVect;
+
 	std::vector<StringVector> m_LandmarkNameVect;
 	StringVector m_LocalLandmarkNameVect;
 
 	bool					m_CloudCreatedFlag;
-	bool					m_PickingActiveFlag;
 	
 	bool					m_AddLandmarkMode;
-	bool					m_hasSelection;
+	bool					m_HasSelection;
+
+	bool					m_FirstOpDo;
 
 	mafString			m_LandmarkName;
-	mafString			m_LandmarkSelected;
+	mafString			m_SelectedLandmarkName;
 
 	int						m_LandmarkNameCount;
 
@@ -162,5 +162,7 @@ protected:
 
   mafGUINamedPanel		*m_GuiPanel;
   mafGUIDictionaryWidget *m_Dict;
+
+	friend class mafOpAddLandmarkTest;
 };
 #endif
