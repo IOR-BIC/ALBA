@@ -40,7 +40,7 @@
 #include "vtkSphereSource.h"
 #include "vtkPolyDataNormals.h"
 #include "vtkMAFExtendedGlyph3D.h"
-#include "vtkOutlineCornerFilter.h"
+#include "vtkMAFLandmarkCloudOutlineCornerFilter.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkActor.h"
 #include "vtkProperty.h"
@@ -67,6 +67,7 @@ mafPipeLandmarkCloud::mafPipeLandmarkCloud()
   m_CloudMapper   = NULL;
   m_CloudActor    = NULL;
   m_CloudSelectionActor     = NULL;
+	m_CloundCornerFilter = NULL;
 
   m_Radius = 1.0;
   m_ScalarVisibility = FALSE;
@@ -149,25 +150,6 @@ mafGUI *mafPipeLandmarkCloud::CreateGui()
 void mafPipeLandmarkCloud::UpdateProperty(bool fromTag)
 //----------------------------------------------------------------------------
 {
-/*	double r = 10;
-  double resolution = 15;
-
-  if(m_Cloud)
-  {
-    r = m_Cloud->GetRadius();
-    resolution = m_Cloud->GetSphereResolution();
-  }
-	else if(m_Landmark)
-  {
-    r = m_Landmark->GetRadius();
-    resolution = ((mafVMELandmarkCloud *)m_Landmark->GetParent())->GetSphereResolution();
-  }
-
-	m_SphereSource->SetRadius(r);
-	m_SphereSource->SetThetaResolution(resolution);
-	m_SphereSource->SetPhiResolution(resolution);
-	m_SphereSource->Update();
-	m_Glyph->Update();*/
 }
 //----------------------------------------------------------------------------
 void mafPipeLandmarkCloud::OnEvent(mafEventBase *maf_event)
@@ -204,7 +186,9 @@ void mafPipeLandmarkCloud::OnEvent(mafEventBase *maf_event)
   {
     if (m_SphereSource)
     {
-      m_SphereSource->SetRadius(m_Cloud->GetRadius());
+			double radius = m_Cloud->GetRadius();
+      m_SphereSource->SetRadius(radius);
+			m_CloundCornerFilter->SetCloudRadius(radius);
       mafEventMacro(mafEvent(this,CAMERA_UPDATE));
     }
   }
@@ -271,11 +255,12 @@ void mafPipeLandmarkCloud::CreateCloudPipe(vtkDataSet *data, double radius, doub
   }
 
   // selection highlight
-  vtkMAFSmartPointer<vtkOutlineCornerFilter> corner;
-  corner->SetInput(m_Glyph->GetOutput());  
+  vtkNEW(m_CloundCornerFilter);
+  m_CloundCornerFilter->SetInput(data);
+	m_CloundCornerFilter->SetCloudRadius(radius);
 
   vtkMAFSmartPointer<vtkPolyDataMapper> corner_mapper;
-  corner_mapper->SetInput(corner->GetOutput());
+  corner_mapper->SetInput(m_CloundCornerFilter->GetOutput());
 
   vtkMAFSmartPointer<vtkProperty> corner_props;
   corner_props->SetColor(1,1,1);
@@ -331,6 +316,6 @@ void mafPipeLandmarkCloud::RemoveClosedCloudPipe()
   vtkDEL(m_Glyph);
   vtkDEL(m_CloudMapper);
   vtkDEL(m_CloudActor);
-
-  vtkDEL(m_CloudSelectionActor);
+	vtkDEL(m_CloudSelectionActor);
+	vtkDEL(m_CloundCornerFilter);
 }

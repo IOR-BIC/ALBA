@@ -257,12 +257,6 @@ void mafVMERefSysTest::TestGetVisualPipe()
   TEST_RESULT;
 }
 //----------------------------------------------------------------------------
-//void mafVMERefSysTest::TestSetRefSysLink()
-//----------------------------------------------------------------------------
-// {
-// 
-// }
-//----------------------------------------------------------------------------
 void mafVMERefSysTest::TestGetOriginVME()
 //----------------------------------------------------------------------------
 {
@@ -274,7 +268,7 @@ void mafVMERefSysTest::TestGetOriginVME()
   vme->ReparentTo(root);
   vmeorigin->ReparentTo(root);
 
-  vme->SetRefSysLink("OriginVME",vmeorigin);
+  vme->SetLink("OriginVME",vmeorigin);
 
   result = (vme->GetOriginVME() == mafVME::SafeDownCast(vmeorigin));
   TEST_RESULT;
@@ -291,7 +285,7 @@ void mafVMERefSysTest::TestGetPoint1VME()
   vme->ReparentTo(root);
   vmepoint1->ReparentTo(root);
 
-  vme->SetRefSysLink("Point1VME",vmepoint1);
+  vme->SetLink("Point1VME",vmepoint1);
 
   result = (vme->GetPoint1VME() == mafVME::SafeDownCast(vmepoint1));
   TEST_RESULT;
@@ -308,7 +302,7 @@ void mafVMERefSysTest::TestGetPoint2VME()
   vme->ReparentTo(root);
   vmepoint2->ReparentTo(root);
 
-  vme->SetRefSysLink("Point2VME",vmepoint2);
+  vme->SetLink("Point2VME",vmepoint2);
 
   result = (vme->GetPoint2VME() == mafVME::SafeDownCast(vmepoint2));
   TEST_RESULT;

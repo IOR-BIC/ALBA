@@ -235,13 +235,13 @@ bool mafXMLElement::GetAttribute(const char *name, mafString &value)
 //------------------------------------------------------------------------------
 {
   assert(name);
+
+	if (!m_DOMElement->m_XMLElement->hasAttribute(mafXMLString(name)))
+		return false;
+
   const XMLCh *xml_value=m_DOMElement->m_XMLElement->getAttribute(mafXMLString(name));
-  if (xml_value)
-  {
-    value=mafXMLString(xml_value);
-    return true;
-  }
-  return false; 
+	value=mafXMLString(xml_value);
+  return true;
 }
 
 //------------------------------------------------------------------------------

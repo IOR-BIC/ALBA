@@ -47,6 +47,7 @@
 #include "mafStorage.h"
 #include "mafRoot.h"
 #include "wx\tokenzr.h"
+#include "mafVMELandmarkCloud.h"
 
 //-------------------------------------------------------------------------
 mafCxxAbstractTypeMacro(mafVME)
@@ -117,10 +118,12 @@ int mafVME::InternalInitialize()
 //-------------------------------------------------------------------------
 {
 	mafVME *root = GetRoot();
+
+	//Setting pointers to links
 	for (mafLinksMap::iterator it = m_Links.begin(); it != m_Links.end(); it++)
 	{
-		mmuNodeLink &link = it->second;
-		if (link.m_Node == NULL&&link.m_NodeId >= 0)
+		mafVMELink &link = it->second;
+		if (link.m_Node == NULL && link.m_NodeId >= 0)
 		{
 			mafVME *node = root->FindInTreeById(link.m_NodeId);
 			assert(node);
@@ -132,6 +135,24 @@ int mafVME::InternalInitialize()
 			}
 		}
 	}
+
+	//Back compatibility code for landmark clouds
+	//We reassign the link sub id to the a new link
+	for (int i = 0; i < m_OldSubIdLinks.size(); i++)
+	{
+		mafOldSubIdLink oldLink = m_OldSubIdLinks[i];
+
+		mafVMELandmarkCloud *cloud = mafVMELandmarkCloud::SafeDownCast(root->FindInTreeById(oldLink.m_NodeId));
+		if (cloud)
+		{
+			//If we are opening an old closed landmark cloud we need to call initialize to create the children landmark VMEs
+			cloud->Initialize();
+			mafVME *lm = (mafVME*) cloud->GetLandmark(oldLink.m_NodeSubId);
+			SetLink(oldLink.m_Name, lm);
+		}
+	}
+	m_OldSubIdLinks.clear();
+
 
 	// initialize children
 	for (int i = 0; i < GetNumberOfChildren(); i++)
@@ -171,7 +192,7 @@ int mafVME::DeepCopy(mafVME *a)
 		mafLinksMap::iterator lnk_it;
 		for (lnk_it = a->GetLinks()->begin(); lnk_it != a->GetLinks()->end(); lnk_it++)
 		{
-			SetLink(lnk_it->first, lnk_it->second.m_Node, lnk_it->second.m_NodeSubId);
+			SetLink(lnk_it->first, lnk_it->second.m_Node);
 		}
 
 		SetMatrixPipe(a->GetMatrixPipe() ? a->GetMatrixPipe()->MakeACopy() : NULL);
@@ -825,11 +846,10 @@ int mafVME::InternalStore(mafStorageElement *parent)
 	links_element->SetAttribute("NumberOfLinks", mafString(GetNumberOfLinks()));
 	for (mafLinksMap::iterator links_it = m_Links.begin(); links_it != m_Links.end(); links_it++)
 	{
-		mmuNodeLink &link = links_it->second;
+		mafVMELink &link = links_it->second;
 		mafStorageElement *link_item_element = links_element->AppendChild("Link");
 		link_item_element->SetAttribute("Name", links_it->first);
 		link_item_element->SetAttribute("NodeId", link.m_NodeId);
-		link_item_element->SetAttribute("NodeSubId", link.m_NodeSubId);
 	}
 
 	// store the visible children into a tmp array
@@ -902,10 +922,17 @@ int mafVME::InternalRestore(mafStorageElement *node)
 					links_vector[i]->GetAttribute("Name", link_name);
 					mafID link_node_id, link_node_subid;
 					links_vector[i]->GetAttributeAsInteger("NodeId", link_node_id);
-					links_vector[i]->GetAttributeAsInteger("NodeSubId", link_node_subid);
-					if (!(link_node_id == -1 && link_node_subid == -1))
+					int hasSubId=links_vector[i]->GetAttributeAsInteger("NodeSubId", link_node_subid);
+
+					hasSubId = hasSubId && (link_node_subid != -1);
+
+					if ((link_node_id != -1) && hasSubId)
 					{
-						m_Links[link_name] = mmuNodeLink(link_node_id, NULL, link_node_subid);
+						SetOldSubIdLink(link_name, link_node_id, link_node_subid);
+					}
+					else if (link_node_id != -1)
+					{
+						m_Links[link_name] = mafVMELink(link_node_id, NULL);
 					}
 				}
 
@@ -953,6 +980,12 @@ int mafVME::InternalRestore(mafStorageElement *node)
 	}
 
 	return MAF_ERROR;
+}
+
+//----------------------------------------------------------------------------
+void mafVME::SetOldSubIdLink(mafString link_name, mafID link_node_id, mafID link_node_subid)
+{
+	m_OldSubIdLinks.push_back(mafOldSubIdLink(link_name, link_node_id, link_node_subid));
 }
 
 //-------------------------------------------------------------------------
@@ -1027,14 +1060,16 @@ int mafVME::Initialize()
 	if (m_Initialized)
 		return MAF_OK;
 
-	if (this->InternalInitialize() == MAF_OK)
+	//Setting m_Initialized to true before internalInitialize to avoid loops
+	m_Initialized = true;
+
+	if (this->InternalInitialize() != MAF_OK)
 	{
-		m_Initialized = 1;
-		return MAF_OK;
+		m_Initialized = false;
+		return MAF_ERROR;
 	}
-
-	return MAF_ERROR;
-
+	
+	return MAF_OK;
 }
 
 //------------------------------------------------------------------------------
@@ -1044,7 +1079,7 @@ void mafVME::Shutdown()
 	if (m_Initialized)
 	{
 		InternalShutdown();
-		m_Initialized = 0;
+		m_Initialized = false;
 	}
 }
 
@@ -1620,20 +1655,9 @@ mafVME *mafVME::GetLink(const char *name)
 
 	return NULL;
 }
+
 //-------------------------------------------------------------------------
-mafID mafVME::GetLinkSubId(const char *name)
-//-------------------------------------------------------------------------
-{
-	assert(name);
-	mafLinksMap::iterator it = m_Links.find(mafCString(name));
-	if (it != m_Links.end())
-	{
-		return it->second.m_NodeSubId;
-	}
-	return -1;
-}
-//-------------------------------------------------------------------------
-void mafVME::SetLink(const char *name, mafVME *node, mafID sub_id)
+void mafVME::SetLink(const char *name, mafVME *node)
 //-------------------------------------------------------------------------
 {
 	assert(name);
@@ -1645,7 +1669,7 @@ void mafVME::SetLink(const char *name, mafVME *node, mafID sub_id)
 		return;
 	}
 
-	mmuNodeLink newlink;
+	mafVMELink newlink;
 	if (node->GetRoot() == GetRoot())
 	{
 		newlink.m_NodeId = node->GetId();
@@ -1656,7 +1680,7 @@ void mafVME::SetLink(const char *name, mafVME *node, mafID sub_id)
 	if (it != m_Links.end())
 	{
 		// if already linked simply return
-		if (it->second.m_Node == node && it->second.m_NodeSubId == sub_id)
+		if (it->second.m_Node == node)
 			return;
 
 		// detach old linked node, if present
@@ -1665,7 +1689,7 @@ void mafVME::SetLink(const char *name, mafVME *node, mafID sub_id)
 	}
 
 	// set the link to the new node
-	m_Links[name] = mmuNodeLink(node->GetId(), node, sub_id);
+	m_Links[name] = mafVMELink(node->GetId(), node);
 
 	// attach as observer of the linked node to catch events
 	// of de/attachment to the tree and destroy event.
@@ -1892,8 +1916,7 @@ void mafVME::Print(std::ostream& os, const int tabs)// const
 	os << indent << "Number of links:" << m_Links.size() << std::endl;
 	for (mafLinksMap::const_iterator lnk_it = m_Links.begin(); lnk_it != m_Links.end(); lnk_it++)
 	{
-		os << next_indent << "Name: " << lnk_it->first.GetCStr() << "\tNodeId: " << lnk_it->second.m_NodeId;
-		os << "\tNodeSubId: " << lnk_it->second.m_NodeSubId << std::endl;
+		os << next_indent << "Name: " << lnk_it->first.GetCStr() << "\tNodeId: " << lnk_it->second.m_NodeId << std::endl;
 	}
 
 	os << indent << "Current Time: " << m_CurrentTime << "\n";

@@ -56,28 +56,28 @@ public:
 	void Reset();
 
   /** Add one item to the list. */
-  bool AddItem(long item_id, wxString label, ITEM_ICONS icon = ITEM_GRAY);
+  bool AddItem(wxString label, ITEM_ICONS icon = ITEM_GRAY);
 
   /** Remove the item from the list. */
-  bool DeleteItem(long item_id);
+  bool DeleteItem(long index);
 
   /**Deselect an item from the list. */
-  void DeselectItem(long item_id); 
+  void DeselectItem(long index);
 
   /** Set the item's label. */
-  bool SetItemLabel(long item_id, wxString label);
+  bool SetItemLabel(long index, wxString label);
 
   /** Get the item's label. */
-  wxString GetItemLabel  (long item_id);
+  wxString GetItemLabel  (long index);
 
   /** Set the item's icon, return true on success. */
-  bool SetItemIcon(long item_id, ITEM_ICONS icon);
+  bool SetItemIcon(long index, ITEM_ICONS icon);
 
   /** Get the item's icon. */
-  ITEM_ICONS GetItemIcon   (long item_id);
+  ITEM_ICONS GetItemIcon   (long index);
 
   /** Select the item 'id'. */
-  bool SelectItem(long item_id);
+  bool SelectItem(long index);
 
   /** Set the label for the list's column. */
   void SetColumnLabel(int col, wxString label);

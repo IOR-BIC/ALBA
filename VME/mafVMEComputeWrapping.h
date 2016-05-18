@@ -136,7 +136,6 @@ public:
 	{
 		ID_START_METER_LINK = Superclass::ID_LAST,
 		ID_END1_METER_LINK,
-		ID_END2_METER_LINK,
 		ID_WRAPPED_METER_LINK1,
 		ID_WRAPPED_METER_LINK2,
 		ID_WRAPPED_METER_LINK,
@@ -315,8 +314,7 @@ public:
 
 	mafVME *GetStartVME();
 	mafVME *GetEnd1VME();
-	mafVME *GetEnd2VME();
-
+	
 	mafVME *GetWrappedVME1();
 	mafVME *GetWrappedVME2();
 	mafVME *GetWrappedVME();
@@ -625,7 +623,6 @@ protected:
 
 	mafString m_StartVmeName;
 	mafString m_EndVme1Name;
-	mafString m_EndVme2Name;
 	mafString m_WrappedVmeName1;
 	mafString m_WrappedVmeName2;
 	mafString m_WrappedVmeName;

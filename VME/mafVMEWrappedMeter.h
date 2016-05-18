@@ -80,7 +80,6 @@ public:
   {
     ID_START_METER_LINK = Superclass::ID_LAST,
     ID_END1_METER_LINK,
-    ID_END2_METER_LINK,
     ID_WRAPPED_METER_LINK,
 		ID_METER_MODE,
 	  ID_WRAPPED_METER_MODE,
@@ -243,7 +242,6 @@ public:
 
   mafVME *GetStartVME();
   mafVME *GetEnd1VME();
-  mafVME *GetEnd2VME();
   mafVME *GetWrappedVME();
 
   /** Get the link to the surface.*/
@@ -369,7 +367,6 @@ protected:
 
   mafString m_StartVmeName;
   mafString m_EndVme1Name;
-  mafString m_EndVme2Name;
   mafString m_WrappedVmeName;
 
   vtkMAFSmartPointer<vtkPlaneSource> m_PlaneSource;

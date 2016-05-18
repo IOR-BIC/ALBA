@@ -360,21 +360,15 @@ void mafOpAddLandmarkTest::TestAccept()
   mafSmartPointer<mafVMESurface> surface;
   m_Result = op->Accept(surface);
   TEST_RESULT;
-  m_Result = op->GetPickingActiveFlag();
-  TEST_RESULT;
-
+	
   //Volume is accepted as input
   mafSmartPointer<mafVMEVolumeGray> volume;
   m_Result = op->Accept(volume);
-  TEST_RESULT;
-  m_Result = op->GetPickingActiveFlag();
   TEST_RESULT;
 
   //Surface Parametric is accepted as input
   mafSmartPointer<mafVMESurfaceParametric> surfaceParametric;
   m_Result = op->Accept(surfaceParametric);
-  TEST_RESULT;
-  m_Result = op->GetPickingActiveFlag();
   TEST_RESULT;
 
   //LandmarkCloud isn't accepted as input
