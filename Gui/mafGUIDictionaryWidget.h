@@ -62,7 +62,7 @@ public:
 
 	int UpdateItem(mafString oldItemName, mafString newItemName);
 
-	int SelectItem(mafString itemName);
+	int SelectItem(mafString itemName, bool select=true);
 
 	int DeselectItem(mafString itemName);
 	
@@ -88,17 +88,13 @@ public:
   const char* GetDictionaryFileName(){return m_File;};
 
 protected:
-	/** Set the icon of the item to red or gray according to valid. */
-  void ValidateItem(wxString item, bool valid = true);
-  
 	/** Set the icon of all the items present into the cloud to red or gray according to valid. */
   void ValidateAllItem(bool valid = true);
 
   mafObserver *m_Listener;
 	wxString     m_File;
-/*  int          m_NumItem;*/
-	//wxString   **m_Items;
 	std::vector<mafString> m_Items;
+	std::vector<bool> m_Selections;
   mafGUIListCtrl *m_List;
   mafVME      *m_Vme;
 };

@@ -76,68 +76,73 @@ void mafGUIListCtrl::Reset ()
   m_List->SetColumnWidth( 0,1000 );
 }
 //----------------------------------------------------------------------------
-bool mafGUIListCtrl::AddItem (long item_id, wxString label, ITEM_ICONS icon)
+bool mafGUIListCtrl::AddItem (wxString label, ITEM_ICONS icon)
 //----------------------------------------------------------------------------
 {
-  long id =  m_List->FindItem(-1, item_id);
-  if(id != -1)
-    return false;
-  long tmp = m_List->InsertItem(item_id,label,icon); 
-  m_List->SetItemData(tmp, item_id);
+	int itemCount = m_List->GetItemCount();
+  long tmp = m_List->InsertItem(itemCount,label,icon);
+  //m_List->SetItemData(tmp, itemCount);
   return true;
 }
 //----------------------------------------------------------------------------
-bool mafGUIListCtrl::DeleteItem  (long item_id)
+bool mafGUIListCtrl::DeleteItem  (long index)
 //----------------------------------------------------------------------------
 {
-  long id =  m_List->FindItem(-1, item_id);
-  if (id == -1) return false;
-  m_List->DeleteItem(id);
+	int itemCount = m_List->GetItemCount();
+	if (index < 0 || index > itemCount)
+		return false;
+
+  m_List->DeleteItem(index);
   return true;
 }
 //----------------------------------------------------------------------------
-void mafGUIListCtrl::DeselectItem(long item_id)
+void mafGUIListCtrl::DeselectItem(long index)
 //----------------------------------------------------------------------------
 {
-   m_List->SetItemState(item_id,0,wxLIST_STATE_SELECTED);
+   m_List->SetItemState(index,0,wxLIST_STATE_SELECTED);
 }
 //----------------------------------------------------------------------------
-bool mafGUIListCtrl::SetItemLabel (long item_id, wxString label)
+bool mafGUIListCtrl::SetItemLabel (long index, wxString label)
 //----------------------------------------------------------------------------
 {
-  long id =  m_List->FindItem(-1, item_id);
-  if (id == -1) return false;
-  m_List->SetItemText(id,label);
+	int itemCount = m_List->GetItemCount();
+  if (index < 0 || index > itemCount) 
+		return false;
+
+	m_List->SetItemText(index,label);
   return true;
 }
 //----------------------------------------------------------------------------
-bool mafGUIListCtrl::SetItemIcon (long item_id, ITEM_ICONS icon)
+bool mafGUIListCtrl::SetItemIcon (long index, ITEM_ICONS icon)
 //----------------------------------------------------------------------------
 {
-  long id =  m_List->FindItem(-1, item_id);
-  if(id == -1) 
-    return false;
-  m_List->SetItemImage(id,icon,icon);
+	int itemCount = m_List->GetItemCount();
+	if (index < 0 || index > itemCount) 
+		return false;
+
+  m_List->SetItemImage(index,icon,icon);
   return true;
 }
 //----------------------------------------------------------------------------
-wxString mafGUIListCtrl::GetItemLabel (long item_id)
+wxString mafGUIListCtrl::GetItemLabel (long index)
 //----------------------------------------------------------------------------
 {
-  long id =  m_List->FindItem(-1, item_id);
-  if (id == -1) return "";
-  return m_List->GetItemText(id);
+	int itemCount = m_List->GetItemCount();
+	if (index < 0 || index > itemCount)  
+		return "";
+
+  return m_List->GetItemText(index);
 }
 //----------------------------------------------------------------------------
-ITEM_ICONS mafGUIListCtrl::GetItemIcon (long item_id)
+ITEM_ICONS mafGUIListCtrl::GetItemIcon (long index)
 //----------------------------------------------------------------------------
 {
-  long id =  m_List->FindItem(-1, item_id);
-  if (id == -1) 
-    return ITEM_ERROR;
+	int itemCount = m_List->GetItemCount();
+	if (index < 0 || index > itemCount) 
+		return  ITEM_ERROR;
 
   wxListItem li;
-  li.SetId(id);
+  li.SetId(index);
   li.m_mask = wxLIST_MASK_IMAGE;
   m_List->GetItem(li);
   int icon = -1;
@@ -148,14 +153,15 @@ ITEM_ICONS mafGUIListCtrl::GetItemIcon (long item_id)
   return (ITEM_ICONS) icon;
 }
 //----------------------------------------------------------------------------
-bool mafGUIListCtrl::SelectItem(long item_id)
+bool mafGUIListCtrl::SelectItem(long index)
 //----------------------------------------------------------------------------
 {
-  long id =  m_List->FindItem(-1, item_id);
-  if (id == -1) return false;
- 
+	int itemCount = m_List->GetItemCount();
+	if (index < 0 || index > itemCount) 
+		return false;
+
 	m_PreventNotify = true;
-  m_List->SetItemState(id,wxLIST_MASK_IMAGE,wxLIST_MASK_IMAGE) ;
+  m_List->SetItemState(index,wxLIST_MASK_IMAGE,wxLIST_MASK_IMAGE) ;
   m_PreventNotify = false;
   
 	return true;

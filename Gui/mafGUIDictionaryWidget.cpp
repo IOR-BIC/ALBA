@@ -70,6 +70,7 @@ mafGUIDictionaryWidget::~mafGUIDictionaryWidget()
 //----------------------------------------------------------------------------
 {
 	m_Items.clear();
+	m_Selections.clear();
   cppDEL(m_List);
 }
 //----------------------------------------------------------------------------
@@ -114,6 +115,7 @@ void mafGUIDictionaryWidget::LoadDictionary(wxString file)
   restore.Restore();
   
 	m_Items.clear();
+	m_Selections.clear();
 
   m_List->Reset();
   //m_List->SetColumnLabel(0, "names already in use are displayed with the red icon");
@@ -122,7 +124,8 @@ void mafGUIDictionaryWidget::LoadDictionary(wxString file)
   {
 		wxString item = storeDict->m_StrVector[i];
 		m_Items.push_back(item);
-    m_List->AddItem(i,item);
+		m_Selections.push_back(false);
+    m_List->AddItem(item);
   }
   
   storeDict->Delete();
@@ -133,6 +136,7 @@ void mafGUIDictionaryWidget::InitDictionary(std::vector<wxString> *strVect)
 //----------------------------------------------------------------------------
 {
 	m_Items.clear();
+	m_Selections.clear();
 	m_List->Reset();
 
 	if(strVect!=NULL)
@@ -141,7 +145,8 @@ void mafGUIDictionaryWidget::InitDictionary(std::vector<wxString> *strVect)
 		{
 			wxString item = (*strVect)[i];
 			m_Items.push_back(item);
-			m_List->AddItem(i, item);
+			m_Selections.push_back(false);
+			m_List->AddItem(item);
 		}
 	}
 
@@ -162,7 +167,8 @@ void mafGUIDictionaryWidget::AddItem(wxString item)
 //----------------------------------------------------------------------------
 {
 	m_Items.push_back(item);
-	m_List->AddItem(m_Items.size()-1, item);
+	m_Selections.push_back(false);
+	m_List->AddItem(item);
 	
 	ValidateAllItem();
 }
@@ -189,8 +195,8 @@ int mafGUIDictionaryWidget::RemoveItem(long itemId)
 	if (res)
 	{
 		m_Items.erase(m_Items.begin() + itemId);
-		//ValidateAllItem();
-
+		m_Selections.erase(m_Selections.begin() + itemId);
+		
 		return itemId;
 	}
 
@@ -213,13 +219,12 @@ int mafGUIDictionaryWidget::UpdateItem(mafString oldItemName, mafString newItemN
 	return -1;
 }
 //----------------------------------------------------------------------------
-int mafGUIDictionaryWidget::SelectItem(mafString itemName)
+int mafGUIDictionaryWidget::SelectItem(mafString itemName,bool select)
 //----------------------------------------------------------------------------
 {
+	int retVal = -1;
 	if(itemName!="")
 	{
-		ValidateAllItem();
-
 		for (int i = 0; i < m_Items.size(); i++)
 		{
 			m_List->DeselectItem(i);
@@ -227,70 +232,26 @@ int mafGUIDictionaryWidget::SelectItem(mafString itemName)
 			if (m_Items[i] == itemName)
 			{
 				m_List->SelectItem(i);
-				m_List->SetItemIcon(i, ITEM_BLUE);
-				return i;
+				m_Selections[i] = select;
+				retVal=i;
 			}
 		}
+
+		ValidateAllItem();
 	}
 
-	return -1;
+	return retVal;
 }
 //----------------------------------------------------------------------------
 int mafGUIDictionaryWidget::DeselectItem(mafString itemName)
 //----------------------------------------------------------------------------
 {
-	if (itemName != "")
-	{
-		ValidateAllItem();
-
-		for (int i = 0; i < m_Items.size(); i++)
-		{
-			if (m_Items[i] == itemName)
-			{
-				m_List->SelectItem(i);
-				m_List->DeselectItem(i);
-				return i;
-			}
-		}
-	}
-
-	return -1;
-}
-// SIL - to be removed
-void mafGUIDictionaryWidget::ValidateItem(wxString item, bool valid)
-//----------------------------------------------------------------------------
-{
-  ITEM_ICONS icon = (valid) ? ITEM_GRAY : ITEM_RED;
-
-  for(int i=0; i<m_Items.size(); i++)
-  {
-    if ( *m_Items[i] == item )
-    {
-      m_List->SetItemIcon(i,icon);
-      break;
-    }
-  }
+	return SelectItem(itemName, false);
 }
 //----------------------------------------------------------------------------
 void mafGUIDictionaryWidget::ValidateAllItem(bool valid)
 //----------------------------------------------------------------------------
 {
-//   if(!m_Vme)
-//   {
-// 		for(int i=0; i<m_Items.size(); i++)
-// 		{
-//       m_List->SetItemIcon(i,ITEM_GRAY);
-// 		}
-// 	}
-//   else
-// 	{
-//     mafVMELandmarkCloud* lc = (mafVMELandmarkCloud*)m_Vme;
-// 		for(int i=0; i<m_Items.size(); i++)
-// 		{
-// 			ITEM_ICONS icon = (lc->FindInTreeByName(m_Items[i])) ? ITEM_RED : ITEM_GRAY ;
-// 			m_List->SetItemIcon(i,icon);
-// 		}
-// 	}
 
 	for (int i = 0; i < m_Items.size(); i++)
 	{
@@ -300,8 +261,17 @@ void mafGUIDictionaryWidget::ValidateAllItem(bool valid)
 		}
 		else
 		{
+			
 			mafVMELandmarkCloud* lc = (mafVMELandmarkCloud*)m_Vme;
-			ITEM_ICONS icon = (lc->FindInTreeByName(m_Items[i])) ? ITEM_RED : ITEM_GRAY;
+			ITEM_ICONS icon = ITEM_GRAY;
+			if (lc->FindInTreeByName(m_Items[i]))
+			{
+				if (m_Selections[i])
+					icon = ITEM_BLUE;
+				else
+					icon = ITEM_RED;
+
+			}
 			m_List->SetItemIcon(i, icon);
 		}
 	}
