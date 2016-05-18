@@ -134,7 +134,7 @@ int mafVMELandmarkCloud::InternalInitialize()
 
 
 	const int closed_cloud_state = 1;
-	const int open_cloud_state = 1;
+	const int open_cloud_state = 2;
 
   if (Superclass::InternalInitialize()==MAF_OK)
   {
