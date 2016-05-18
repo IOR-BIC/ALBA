@@ -86,22 +86,23 @@ mafOp(label)
 	m_LandmarkPicker = NULL;
 	m_OldBehavior = NULL;
 
-	m_LandmarkAdded.clear();
+	m_LandmarkUndoVetc.clear();
+	m_LandmarkRedoVect.clear();
 	m_LandmarkNameVect.clear();
-	m_LocalLandmarkNameVect;
+	m_LocalLandmarkNameVect.clear();
 
 	m_CurrentLandmark = NULL;
-	m_SelectedLadmarkCloud = NULL;
+	m_SelectedLandmark = NULL;
+	m_SelectedLandmarkCloud = NULL;
 
 	m_LandmarkName = "";
-	m_LandmarkSelected = "";
+	m_SelectedLandmarkName = "";
 	m_LandmarkNameCount = 1;
 
 	m_ShowMode = 0;
 
 	m_CloudCreatedFlag = false;
-	m_PickingActiveFlag = false;
-	m_hasSelection = false;
+	m_HasSelection = false;
 	m_AddLandmarkMode = true;
 
 	m_LandmarkPosition[0] = m_LandmarkPosition[1] = m_LandmarkPosition[2] = 0;
@@ -109,18 +110,24 @@ mafOp(label)
 //----------------------------------------------------------------------------
 mafOpAddLandmark::~mafOpAddLandmark()
 {
-	for (int i = 0; i < m_LandmarkAdded.size(); i++)
-	{
-		mafDEL(m_LandmarkAdded[i]);
-	}
-
 	m_LandmarkNameVect.clear();
 	m_LocalLandmarkNameVect.clear();
-	m_LandmarkAdded.clear();
+
+	for (int i=0; i< m_LandmarkUndoVetc.size(); i++)
+	{
+		mafDEL(m_LandmarkUndoVetc[i]);
+	}
+
+	m_LandmarkUndoVetc.clear();
+
+	for (int i = 0; i < m_LandmarkRedoVect.size(); i++)
+	{
+		mafDEL(m_LandmarkRedoVect[i]);
+	}
+
+	m_LandmarkRedoVect.clear();
 
 	mafDEL(m_LandmarkPicker);
-
-	mafDEL(m_SelectedLadmarkCloud);
 
 	if (m_CloudCreatedFlag)
 		mafDEL(m_Cloud);
@@ -131,41 +138,13 @@ mafOp* mafOpAddLandmark::Copy()
 	mafOpAddLandmark *op = new mafOpAddLandmark(m_Label);
   op->m_OpType = m_OpType;
 	op->m_Canundo = m_Canundo;
-	op->m_PickingActiveFlag = m_PickingActiveFlag;
-  return op;
+	return op;
 }
 //----------------------------------------------------------------------------
 bool mafOpAddLandmark::Accept(mafVME*node)
 //----------------------------------------------------------------------------
 {
-	if (!node) return false;
-	
-  if( node->IsMAFType(mafVMESurface) || node->IsMAFType(mafVMEVolumeGray) || node->IsMAFType(mafVMESurfaceParametric)) 
-	{
-		m_PickingActiveFlag = true;
-    return true;
-	}
-
-  if( node->IsMAFType(mafVMELandmarkCloud) && 
-		  node->GetParent() && 
-		  (node->GetParent()->IsMAFType(mafVMESurface) || node->GetParent()->IsMAFType(mafVMEVolumeGray) || node->GetParent()->IsMAFType(mafVMESurfaceParametric))) 
-	{
-		  m_PickingActiveFlag = true;
-			return true;
-	}
-
-  if( node->IsMAFType(mafVMELandmark) && 
-		  node->GetParent() && 
-			node->GetParent()->IsMAFType(mafVMELandmarkCloud) &&
-			node->GetParent()->GetParent() && 
-			(node->GetParent()->GetParent()->IsMAFType(mafVMESurface) || node->GetParent()->GetParent()->IsMAFType(mafVMEVolumeGray) || node->GetParent()->GetParent()->IsMAFType(mafVMESurfaceParametric))) 
-	{
-		m_PickingActiveFlag = true;
-		return true;
-	}
-
-	m_PickingActiveFlag = false;
-  return true; //accept all other vmes
+	return (node != NULL); //accept all other vmes
 }
 
 //----------------------------------------------------------------------------
@@ -186,7 +165,7 @@ void mafOpAddLandmark::OpRun()
 			if (m_Cloud)
 				m_PickedVme = m_Cloud->GetParent();
 		}
-		else //if (m_Input->IsMAFType(mafVMESurface) || m_Input->IsMAFType(mafVMEVolumeGray) || m_Input->IsMAFType(mafVMESurfaceParametric))
+		else
 		{
 			m_PickedVme = m_Input;
 
@@ -206,9 +185,12 @@ void mafOpAddLandmark::OpRun()
 				m_Cloud->SetRadius(7.0);
 
 			m_Cloud->ReparentTo(m_PickedVme);
-			mafEventMacro(mafEvent(this, VME_SHOW, m_Cloud, true));
+
 			m_CloudCreatedFlag = true;
 		}
+
+		mafEventMacro(mafEvent(this, VME_SHOW, m_Cloud, true));
+		mafEventMacro(mafEvent(this, VME_SHOW, m_PickedVme, true));
 
 		// Customize m_PickedVme behavior
 		m_LandmarkPicker = mafInteractorPERPicker::New();
@@ -217,26 +199,24 @@ void mafOpAddLandmark::OpRun()
 		m_LandmarkPicker->SetListener(this);
 
 		// Create Selected LandmarkCloud
-		mafNEW(m_SelectedLadmarkCloud);
+		mafNEW(m_SelectedLandmarkCloud);
+		mafNEW(m_SelectedLandmark);
+		m_SelectedLandmarkCloud->ReparentTo(m_PickedVme); 
+		m_SelectedLandmark->ReparentTo(m_SelectedLandmarkCloud);
 
 		if (m_TestMode)
 		{
-			m_SelectedLadmarkCloud->TestModeOn();
+			m_SelectedLandmarkCloud->TestModeOn();
 		}
 
-		m_SelectedLadmarkCloud->SetName(_("Selected Landmark cloud"));
+		m_SelectedLandmarkCloud->SetName(_("Selected Landmark cloud"));
+		m_SelectedLandmark->SetName(_("Selected Landmark"));
 
-		vtkDataSet * vtkData = m_PickedVme->GetOutput()->GetVTKData();
-		if (vtkData)
-			m_SelectedLadmarkCloud->SetRadius(vtkData->GetLength() / 60.0);
-		else
-			m_SelectedLadmarkCloud->SetRadius(7.0);
-
-		m_SelectedLadmarkCloud->ReparentTo(m_PickedVme);
+		m_SelectedLandmarkCloud->SetRadius(m_Cloud->GetRadius());		
 	}
 
 	// Set Selection color 
-	mmaMaterial *select_material = m_SelectedLadmarkCloud->GetMaterial();
+	mmaMaterial *select_material = m_SelectedLandmarkCloud->GetMaterial();
 	SetMaterialRGBA(select_material, 0.1, 0.1, 1.0, 0.8);
 
 	mmaMaterial *material = m_Cloud->GetMaterial();
@@ -250,29 +230,69 @@ void mafOpAddLandmark::OpRun()
 	// Set Landmarks color 
 	SetMaterialRGBA(material, 1.0, 0.1, 0.1, 0.8);
 
-	///
 	LoadLandmarksFromVME();
 
 	if (!GetTestMode())
+	{ 
 		CreateGui();
-
+	}
+	
 	m_LandmarkNameVect.push_back(m_LocalLandmarkNameVect);
 	ShowLandmarkGroup();
 
-// 	if (m_LandmarkNameVect[m_ShowMode].size() > 0)
-// 		SelectLandmark(m_LandmarkNameVect[m_ShowMode][0]);
+	if (!GetTestMode())
+	{
+		m_Dict->AddItem("Add_New_Landmark");
+		m_Dict->SelectItem("Add_New_Landmark");
+	}
 }
 //----------------------------------------------------------------------------
 void mafOpAddLandmark::OpDo()
 {
-  AddLandmarksToTree();
+	int reparent_result = MAF_OK;
+
+	if (m_CloudCreatedFlag)
+	{
+		reparent_result = m_Cloud->ReparentTo(m_PickedVme);
+	}
+	else 
+	{
+		mafEventMacro(mafEvent(this, VME_SHOW, m_Cloud, true));
+		RestoreLandmarkVect(m_LandmarkRedoVect);
+	}
 }
 //----------------------------------------------------------------------------
 void mafOpAddLandmark::OpUndo()
 {
-  RemoveLandmarksFromTree();
+	if (m_CloudCreatedFlag)
+	{
+		mafEventMacro(mafEvent(this, VME_REMOVE, m_Cloud));
+	}
+	else
+	{
+		RestoreLandmarkVect(m_LandmarkUndoVetc);
+	}
+}
 
-	mafEventMacro(mafEvent(this, VME_REMOVE, m_SelectedLadmarkCloud));
+//----------------------------------------------------------------------------
+void mafOpAddLandmark::RestoreLandmarkVect(std::vector<mafVMELandmark*> &landmarkVect)
+{
+	while (m_Cloud->GetNumberOfLandmarks())
+	{
+		mafEventMacro(mafEvent(this, VME_REMOVE, m_Cloud->GetLandmark(0)));
+	}
+
+	for (int i = 0; i < landmarkVect.size(); i++)
+	{
+		mafSmartPointer<mafVMELandmark> newLandmark;
+		
+		newLandmark->DeepCopy(landmarkVect[i]);
+		newLandmark->ReparentTo(m_Cloud);
+
+		mafEventMacro(mafEvent(this, VME_SHOW, newLandmark, true));
+	}
+
+	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 }
 
 //----------------------------------------------------------------------------
@@ -311,7 +331,7 @@ void mafOpAddLandmark::CreateGui()
 	m_Gui->Bool(ID_CHANGE_TIME, _("Current time"), &m_AddToCurrentTime, 1, tooltip);
 	m_Gui->Divider(2);
 
-	m_Gui->Enable(ID_CHANGE_TIME, false);
+	m_Gui->Enable(ID_REMOVE_LANDMARK, false);
 	m_Gui->Enable(ID_CHANGE_NAME, false);
 	m_Gui->Enable(ID_CHANGE_POSITION, false);
 
@@ -349,14 +369,7 @@ void mafOpAddLandmark::OnEvent(mafEventBase *maf_event)
       
 			case ITEM_SELECTED:
 			{
-				if (!m_hasSelection)
-				{
-					SelectLandmark(*(e->GetString()));
-				}
-				else
-				{
-					DeselectLandmark(*(e->GetString()));
-				}
+				SelectLandmark(*(e->GetString()));
 			}
 			break;
 
@@ -368,7 +381,7 @@ void mafOpAddLandmark::OnEvent(mafEventBase *maf_event)
 				{
 					pts->GetPoint(0, m_LandmarkPosition);
 
-					if (this->m_Cloud && m_AddLandmarkMode)
+					if (m_AddLandmarkMode)
 					{
 							AddLandmark(m_LandmarkPosition);
 							if (m_Gui && !GetTestMode())
@@ -378,10 +391,8 @@ void mafOpAddLandmark::OnEvent(mafEventBase *maf_event)
 					}
 					else
 					{
+						m_SelectedLandmark->SetAbsPose(m_LandmarkPosition[0], m_LandmarkPosition[1], m_LandmarkPosition[2], 0, 0, 0);
 						m_CurrentLandmark->SetAbsPose(m_LandmarkPosition[0], m_LandmarkPosition[1], m_LandmarkPosition[2], 0, 0, 0);
-						
-						if(m_hasSelection)
-							DeselectLandmark(m_LandmarkSelected);
 					}
 				}
 
@@ -392,7 +403,7 @@ void mafOpAddLandmark::OnEvent(mafEventBase *maf_event)
 
 			case ID_REMOVE_LANDMARK:
 			{
-				RemoveLandmark(m_LandmarkSelected);
+				RemoveLandmark();
 			}
 			break;
 
@@ -411,7 +422,6 @@ void mafOpAddLandmark::OnEvent(mafEventBase *maf_event)
 
       case wxCANCEL:
 			{
-				RemoveLandmarksFromTree();
 				OpStop(OP_RUN_CANCEL);
 			}
       break;
@@ -430,11 +440,32 @@ void mafOpAddLandmark::OpStop(int result)
 	mmaMaterial *material = m_Cloud->GetMaterial();
 	SetMaterialRGBA(material, m_OldColorCloud[0], m_OldColorCloud[1], m_OldColorCloud[2], m_OldColorCloud[3]);
 
-	if (m_CurrentLandmark && result == OP_RUN_OK)
+	if (m_CurrentLandmark)
 	{
-		m_CurrentLandmark->ReparentTo(m_Cloud);
-		mafEventMacro(mafEvent(this, VME_SHOW, m_CurrentLandmark, true));
+		DeselectLandmark();
 	}
+
+	if (result == OP_RUN_OK)
+	{
+		int nLandmarks = m_Cloud->GetNumberOfLandmarks();
+
+		for (int i = 0; i < nLandmarks; i++)
+		{
+			mafVMELandmark *lm = m_Cloud->GetLandmark(i);
+
+			// Create Redo Vector
+			mafVMELandmark* newLandmark = NULL;
+			mafNEW(newLandmark);
+			newLandmark->DeepCopy(lm);
+			m_LandmarkRedoVect.push_back(newLandmark);
+		}
+	}
+	else
+	{
+		OpUndo();
+	}
+
+	m_LocalLandmarkNameVect.clear();
 
 	mafEventMacro(mafEvent(this, PER_POP));
 	mafDEL(m_LandmarkPicker);
@@ -446,7 +477,9 @@ void mafOpAddLandmark::OpStop(int result)
 		HideGui();
 	}
 
-	m_SelectedLadmarkCloud->ReparentTo(NULL);
+	m_SelectedLandmarkCloud->ReparentTo(NULL);
+	mafDEL(m_SelectedLandmarkCloud);
+
 	mafEventMacro(mafEvent(this, result));
 }
 
@@ -456,17 +489,9 @@ void mafOpAddLandmark::AddLandmark(double pos[3])
 {
 	if (m_Gui && !GetTestMode())
 	{
-		m_Gui->Enable(ID_CHANGE_TIME, false);
-		m_Gui->Enable(ID_REMOVE_LANDMARK, false);
-	}
-
-	if (m_CurrentLandmark)
-	{
-		m_CurrentLandmark->ReparentTo(m_Cloud);
-		m_SelectedLadmarkCloud->CleanTree();
-
-		mafEventMacro(mafEvent(this, VME_SHOW, m_CurrentLandmark, true));
-		m_CurrentLandmark = NULL;
+		m_Dict->RemoveItem("Add_New_Landmark");
+// 		m_Gui->Enable(ID_CHANGE_TIME, false);
+// 		m_Gui->Enable(ID_REMOVE_LANDMARK, false);
 	}
 
 	// Create New Landmark
@@ -474,7 +499,7 @@ void mafOpAddLandmark::AddLandmark(double pos[3])
 	sprintf(printStr, "New_Landmark_%d", m_LandmarkNameCount);
 
 	m_LandmarkName = printStr;
-	m_LandmarkSelected = m_LandmarkName;
+	m_SelectedLandmarkName = m_LandmarkName;
 	
 	if (m_Gui && !GetTestMode())
 	{
@@ -493,72 +518,46 @@ void mafOpAddLandmark::AddLandmark(double pos[3])
   landmark->ReparentTo(m_Cloud);
 
   if(NULL != m_PickedVme)
-     landmark->SetTimeStamp(m_PickedVme->GetTimeStamp());
-  if(m_AddToCurrentTime)
-    landmark->SetAbsPose(m_LandmarkPosition[0],m_LandmarkPosition[1],m_LandmarkPosition[2],0,0,0);
-  else
-    landmark->SetAbsPose(m_LandmarkPosition[0],m_LandmarkPosition[1],m_LandmarkPosition[2],0,0,0,0);
+		landmark->SetTimeStamp(m_PickedVme->GetTimeStamp());
+
+	if (m_AddToCurrentTime)
+		landmark->SetAbsPose(m_LandmarkPosition[0], m_LandmarkPosition[1], m_LandmarkPosition[2], 0, 0, 0);
+	else
+		landmark->SetAbsPose(m_LandmarkPosition[0], m_LandmarkPosition[1], m_LandmarkPosition[2], 0, 0, 0, 0);
 
 	landmark->Update();
 
   mafEventMacro(mafEvent(this,VME_SHOW,landmark.GetPointer(),true));
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 
-  m_LandmarkAdded.push_back(landmark);
-  m_LandmarkAdded[m_LandmarkAdded.size()-1]->Register(NULL);
-
   if (m_Gui && !GetTestMode())
   {
-  	m_Gui->Enable(wxOK, true);
+		m_Dict->AddItem("Add_New_Landmark");
+		m_Dict->SelectItem("Add_New_Landmark");
+
+		m_Gui->Enable(wxOK, true);
 		m_Gui->Update();
   }
 }
 //----------------------------------------------------------------------------
-void mafOpAddLandmark::RemoveLandmark(mafString selection)
-{
-	if (m_Gui && !GetTestMode())
-	{
-		m_Gui->Enable(ID_CHANGE_NAME, false);
-		m_Gui->Enable(ID_CHANGE_POSITION, false);
-		m_Gui->Enable(ID_REMOVE_LANDMARK, false);
-		m_Gui->Enable(ID_CHANGE_TIME, false);
-	}
-
+void mafOpAddLandmark::RemoveLandmark()
+{	
 	if (m_CurrentLandmark)
 	{
-		m_CurrentLandmark->ReparentTo(m_Cloud);
-		m_SelectedLadmarkCloud->CleanTree();
+		mafVME* item = m_CurrentLandmark;
+		mafString itemName = item->GetName();
 
-		mafEventMacro(mafEvent(this, VME_SHOW, m_CurrentLandmark, true));
-		m_CurrentLandmark = NULL;
-	}
+		DeselectLandmark();
 
-	if (m_Gui && !GetTestMode())
-	{
-		m_Dict->RemoveItem(selection);
-	}
+		mafEventMacro(mafEvent(this, VME_REMOVE, item));
 
-	if (this->m_Cloud && this->m_Cloud->FindInTreeByName(selection))
-	{
-		for (int i=0; i< m_LandmarkAdded.size(); i++)
+		if (m_Gui && !GetTestMode())
 		{
-			mafString vmeName = (m_LandmarkAdded[i])->GetName();
-
-			if (vmeName == selection)
-			{
-				mafEventMacro(mafEvent(this, VME_REMOVE, m_LandmarkAdded[i]));
-				mafDEL(m_LandmarkAdded[i]);
-				m_LandmarkAdded.erase(m_LandmarkAdded.begin() + i);
-				break;
-			}
+			m_Dict->RemoveItem(itemName);
+			SelectLandmark("Add_New_Landmark");
 		}
 
 		mafEventMacro(mafEvent(this, CAMERA_UPDATE));
-	}
-
-	if (m_Gui && !GetTestMode())
-	{
-		m_Gui->Update();
 	}
 }
 //----------------------------------------------------------------------------
@@ -566,79 +565,74 @@ void mafOpAddLandmark::SelectLandmark(mafString selection)
 {
 	if (m_CurrentLandmark)
 	{
-		m_CurrentLandmark->ReparentTo(m_Cloud);
-		m_SelectedLadmarkCloud->CleanTree();
-
 		mafEventMacro(mafEvent(this, VME_SHOW, m_CurrentLandmark, true));
+		mafEventMacro(mafEvent(this, VME_SHOW, m_SelectedLandmarkCloud->GetLandmark(0), false));
+
 		m_CurrentLandmark = NULL;
 	}
 
-	m_LandmarkSelected = m_LandmarkName = selection;
-
+	
 	if (m_Gui && !GetTestMode())
 	{
-		m_Dict->SetTitle("Edit landmark");
-		m_Dict->SelectItem(m_LandmarkSelected);
+		m_Dict->DeselectItem(m_SelectedLandmarkName);
+		int pos=m_Dict->SelectItem(selection);
+
+		m_AddLandmarkMode = (pos == m_Dict->GetSize() - 1);
+		
+		if(m_AddLandmarkMode)
+			m_Dict->SetTitle("Add landmark");
+		else
+			m_Dict->SetTitle("Edit landmark");
+		
+		m_Gui->Enable(ID_CHANGE_NAME, !m_AddLandmarkMode);
+		m_Gui->Enable(ID_CHANGE_POSITION, !m_AddLandmarkMode);
+		m_Gui->Enable(ID_REMOVE_LANDMARK, !m_AddLandmarkMode);
+
+		m_Gui->Update();
 	}
 
-	mafVMELandmark *landmark = mafVMELandmark::SafeDownCast(this->m_Cloud->FindInTreeByName(m_LandmarkSelected.GetCStr()));
+	m_SelectedLandmarkName = m_LandmarkName = selection;
+
+	mafVMELandmark *landmark = mafVMELandmark::SafeDownCast(this->m_Cloud->FindInTreeByName(m_SelectedLandmarkName.GetCStr()));
 
 	if (this->m_Cloud && landmark)
 	{
 		m_CurrentLandmark = landmark;
-		m_CurrentLandmark->ReparentTo(m_SelectedLadmarkCloud);
 		m_CurrentLandmark->GetPoint(m_LandmarkPosition);
+		m_SelectedLandmark->SetAbsPose(m_LandmarkPosition[0], m_LandmarkPosition[1], m_LandmarkPosition[2], 0, 0, 0);
+		m_SelectedLandmark->Update();
 
-		mafEventMacro(mafEvent(this, VME_SHOW, landmark, true));
-		mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		mafEventMacro(mafEvent(this, VME_SHOW, m_CurrentLandmark, false));
+		mafEventMacro(mafEvent(this, VME_SHOW, m_SelectedLandmarkCloud->GetLandmark(0), true));
 
-		// EDIT MODE
-		m_Gui->Enable(ID_CHANGE_TIME, true);
-		m_Gui->Enable(ID_CHANGE_NAME, true);
-		m_Gui->Enable(ID_CHANGE_POSITION, true);
-		m_Gui->Enable(ID_REMOVE_LANDMARK, true);
-
-		m_hasSelection = true;
-		m_AddLandmarkMode = false;
+		m_HasSelection = true;
 	}
 
 	if (m_Gui && !GetTestMode())
 	{
 		m_Gui->Update();
 	}
+
+	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
-void mafOpAddLandmark::DeselectLandmark(mafString selection)
+void mafOpAddLandmark::DeselectLandmark()
 {
 	if (m_CurrentLandmark)
 	{
-		m_CurrentLandmark->ReparentTo(m_Cloud);
-		m_SelectedLadmarkCloud->CleanTree();
-
 		mafEventMacro(mafEvent(this, VME_SHOW, m_CurrentLandmark, true));
+		mafEventMacro(mafEvent(this, VME_SHOW, m_SelectedLandmarkCloud->GetLandmark(0), false));
 		m_CurrentLandmark = NULL;
 	}
 
 	if (m_Gui && !GetTestMode())
 	{
-		m_Dict->SetTitle("Add landmark");
-		m_Dict->DeselectItem(m_LandmarkSelected);
+		m_Dict->DeselectItem(m_SelectedLandmarkName);
 	}
 
 	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 
-	if (m_Gui && !GetTestMode())
-	{
-		m_Gui->Enable(ID_CHANGE_TIME, false);
-		m_Gui->Enable(ID_CHANGE_NAME, false);
-		m_Gui->Enable(ID_CHANGE_POSITION, false);
-		m_Gui->Enable(ID_REMOVE_LANDMARK, false);
-
-		m_Gui->Update();
-	}
-
-	m_hasSelection = false;
-	m_AddLandmarkMode = true;
+	m_HasSelection = false;
 }
 
 //----------------------------------------------------------------------------
@@ -648,6 +642,7 @@ void mafOpAddLandmark::EditLandmark()
 	{
 		// Edit Position
 		m_CurrentLandmark->SetAbsPose(m_LandmarkPosition[0], m_LandmarkPosition[1], m_LandmarkPosition[2], 0, 0, 0);
+		m_SelectedLandmark->SetAbsPose(m_LandmarkPosition[0], m_LandmarkPosition[1], m_LandmarkPosition[2], 0, 0, 0);
 
 		// Edit Name
 		if (!this->m_Cloud->FindInTreeByName(m_LandmarkName))
@@ -655,7 +650,7 @@ void mafOpAddLandmark::EditLandmark()
 			m_CurrentLandmark->SetName(m_LandmarkName);
 			if (m_Gui && !GetTestMode())
 			{
-				m_Dict->UpdateItem(m_LandmarkSelected, m_LandmarkName);
+				m_Dict->UpdateItem(m_SelectedLandmarkName, m_LandmarkName);
 			}
 		}
 		else
@@ -673,52 +668,6 @@ void mafOpAddLandmark::EditLandmark()
 	}
 }
 //----------------------------------------------------------------------------
-void mafOpAddLandmark::AddLandmarksToTree()
-{
-  int reparent_result = MAF_OK;
-  if(m_CloudCreatedFlag)
-  {
-		if (m_PickingActiveFlag == true)
-			reparent_result = m_Cloud->ReparentTo(m_PickedVme);
-		else
-		  reparent_result = m_Cloud->ReparentTo(m_Input);
-
-    if (reparent_result == MAF_OK)
-    {
-      mafEventMacro(mafEvent(this,VME_SHOW,m_Cloud,true));
-    }
-  }
-  else
-  {
-    for (int l=0; l < m_LandmarkAdded.size(); l++)
-    {
-      reparent_result = m_LandmarkAdded[l]->ReparentTo(m_Cloud);
-
-      if (reparent_result == MAF_OK)
-      {
-        mafEventMacro(mafEvent(this,VME_SHOW,m_LandmarkAdded[l],true));
-      }
-    }
-  }
-
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-}
-//----------------------------------------------------------------------------
-void mafOpAddLandmark::RemoveLandmarksFromTree()
-{
-  if(m_CloudCreatedFlag)
-  {
-    mafEventMacro(mafEvent(this,VME_REMOVE,m_Cloud));
-  }
-  else
-  {
-    for (int l=0; l < m_LandmarkAdded.size(); l++)
-    {
-      mafEventMacro(mafEvent(this,VME_REMOVE,m_LandmarkAdded[l]));
-    }
-  }
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-}
 
 //----------------------------------------------------------------------------
 void mafOpAddLandmark::SetMaterialRGBA(mmaMaterial *material, double r, double g, double b, double a)
@@ -735,9 +684,9 @@ void mafOpAddLandmark::SetMaterialRGBA(mmaMaterial *material, double r, double g
 void mafOpAddLandmark::LoadDictionary()
 {
 	wxString wild_dict = "Dictionary file (*.dic)|*.dic|All files (*.*)|*.*";
-	wxString m_dict = mafGetApplicationDirectory().c_str();
-	m_dict = m_dict + "\\Config\\Dictionary\\";
-	wxString file = mafGetOpenFile(m_dict, wild_dict, "Choose Dictionary File").c_str();
+	wxString dict = mafGetApplicationDirectory().c_str();
+	dict = dict + "\\Config\\Dictionary\\";
+	wxString file = mafGetOpenFile(dict, wild_dict, "Choose Dictionary File").c_str();
 	if (file != "") LoadLandmarksDefinitions(file);
 
 	m_ShowMode = 0;
@@ -910,27 +859,30 @@ mafString mafOpAddLandmark::GetElementAttribute(XERCES_CPP_NAMESPACE_QUALIFIER D
 int mafOpAddLandmark::LoadLandmarksFromVME()
 {
 	m_LocalLandmarkNameVect.clear();
-	int count = m_Cloud->GetNumberOfChildren();
+	int nLandmarks = m_Cloud->GetNumberOfLandmarks();
 
-	for (int i = 0; i < count; i++)
+	for (int i = 0; i < nLandmarks; i++)
 	{
-		mafVME *node = m_Cloud->GetChild(i);
+		mafVMELandmark *lm = m_Cloud->GetLandmark(i);
 
-		if (node->IsMAFType(mafVMELandmark) && this->m_Cloud->FindInTreeByName(node->GetName()))
+		m_LocalLandmarkNameVect.push_back(lm->GetName());
+
+		// Create Undo Vector
+		mafVMELandmark* newLandmark = NULL;
+		mafNEW(newLandmark);
+		newLandmark->DeepCopy(lm);
+		m_LandmarkUndoVetc.push_back(newLandmark);
+
+		wxString name = lm->GetName();
+		int pos = name.Find("New_Landmark_");
+		if (pos>=0)
 		{
-			m_LocalLandmarkNameVect.push_back(node->GetName());
-
-			wxString name = node->GetName();
-			int pos = name.Find("New_Landmark_");
-			if (pos>=0)
-			{
-				wxString subName = name.SubString(pos+13, name.Length());
+			wxString subName = name.SubString(pos+13, name.Length());
 				
-				int val = atoi(subName);
+			int val = atoi(subName);
 
-				if(m_LandmarkNameCount < val)
-					m_LandmarkNameCount = val + 1;
-			}
+			if(m_LandmarkNameCount < val)
+				m_LandmarkNameCount = val + 1;
 		}
 	}
 
@@ -941,10 +893,8 @@ void mafOpAddLandmark::ShowLandmarkGroup()
 {
 	if (m_CurrentLandmark)
 	{
-		m_CurrentLandmark->ReparentTo(m_Cloud);
-		m_SelectedLadmarkCloud->CleanTree();
-
 		mafEventMacro(mafEvent(this, VME_SHOW, m_CurrentLandmark, true));
+		mafEventMacro(mafEvent(this, VME_SHOW, m_SelectedLandmarkCloud->GetLandmark(0), false));
 		m_CurrentLandmark = NULL;
 	}
 
