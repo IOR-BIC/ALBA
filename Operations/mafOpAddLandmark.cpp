@@ -94,6 +94,7 @@ mafOp(label)
 	m_CurrentLandmark = NULL;
 	m_SelectedLandmark = NULL;
 	m_SelectedLandmarkCloud = NULL;
+	m_Dict = NULL;
 
 	m_LandmarkName = "";
 	m_SelectedLandmarkName = "";
@@ -104,6 +105,7 @@ mafOp(label)
 	m_CloudCreatedFlag = false;
 	m_HasSelection = false;
 	m_AddLandmarkMode = true;
+	m_FirstOpDo = true;
 
 	m_LandmarkPosition[0] = m_LandmarkPosition[1] = m_LandmarkPosition[2] = 0;
 }
@@ -161,7 +163,7 @@ void mafOpAddLandmark::OpRun()
 		else if (m_Input->IsMAFType(mafVMELandmark))
 		{
 			// Add a new landmark as brother of this one
-			m_Cloud = (mafVMELandmarkCloud *)m_Input->GetParent();
+			m_Cloud = mafVMELandmarkCloud::SafeDownCast(m_Input->GetParent());
 			if (m_Cloud)
 				m_PickedVme = m_Cloud->GetParent();
 		}
@@ -251,15 +253,21 @@ void mafOpAddLandmark::OpDo()
 {
 	int reparent_result = MAF_OK;
 
-	if (m_CloudCreatedFlag)
+	//On opstop we run the first opdo and the lmc is already ok
+	if (!m_FirstOpDo)
 	{
-		reparent_result = m_Cloud->ReparentTo(m_PickedVme);
+		if (m_CloudCreatedFlag)
+		{
+			reparent_result = m_Cloud->ReparentTo(m_PickedVme);
+		}
+		else
+		{
+			mafEventMacro(mafEvent(this, VME_SHOW, m_Cloud, true));
+			RestoreLandmarkVect(m_LandmarkRedoVect);
+		}
 	}
-	else 
-	{
-		mafEventMacro(mafEvent(this, VME_SHOW, m_Cloud, true));
-		RestoreLandmarkVect(m_LandmarkRedoVect);
-	}
+
+	m_FirstOpDo = false;
 }
 //----------------------------------------------------------------------------
 void mafOpAddLandmark::OpUndo()
