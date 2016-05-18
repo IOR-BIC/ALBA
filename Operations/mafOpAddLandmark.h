@@ -144,6 +144,8 @@ protected:
 	bool					m_AddLandmarkMode;
 	bool					m_HasSelection;
 
+	bool					m_FirstOpDo;
+
 	mafString			m_LandmarkName;
 	mafString			m_SelectedLandmarkName;
 
@@ -160,5 +162,7 @@ protected:
 
   mafGUINamedPanel		*m_GuiPanel;
   mafGUIDictionaryWidget *m_Dict;
+
+	friend class mafOpAddLandmarkTest;
 };
 #endif
