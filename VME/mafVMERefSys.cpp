@@ -402,17 +402,17 @@ void mafVMERefSys::OnEvent(mafEventBase *maf_event)
         {
           if (button_id == ID_REF_SYS_ORIGIN)
           {
-						SetLink("OriginVME", n);
+						SetMandatoryLink("OriginVME", n);
 						m_OriginVmeName = n->GetName();
           }
           else if (button_id == ID_POINT1)
           {
-            SetLink("Point1VME", n);
+            SetMandatoryLink("Point1VME", n);
 						m_Point1VmeName = n->GetName();
           }
           else
           {
-            SetLink("Point2VME", n);
+            SetMandatoryLink("Point2VME", n);
 						m_Point2VmeName = n->GetName();
           }
 					InternalUpdate();
@@ -422,9 +422,19 @@ void mafVMERefSys::OnEvent(mafEventBase *maf_event)
       break;
 			case ID_RADIO:
 			{
+				mafVME *linkedVME;
 				if(m_Modality==REFSYS_FREE)
 				{
           // Normal RefSys
+
+					//Make all link not mandatory
+					linkedVME = GetLink("OriginVME");
+					SetLink("OriginVME", linkedVME);
+					linkedVME = GetLink("Point1VME");
+					SetLink("Point1VME", linkedVME);
+					linkedVME = GetLink("Point2VME");
+					SetLink("Point2VME", linkedVME);
+					
 					m_Gui->Enable(ID_REF_SYS_ORIGIN,false);
 					m_Gui->Enable(ID_POINT1,false);
 					m_Gui->Enable(ID_POINT2,false);
@@ -432,6 +442,16 @@ void mafVMERefSys::OnEvent(mafEventBase *maf_event)
 				else if(m_Modality==REFSYS_ORIGIN)
 				{
           // RefSys with Origin link
+
+					//Make origin link mandatory and orther link not mandatory
+					linkedVME = GetLink("OriginVME");
+					SetMandatoryLink("OriginVME", linkedVME);
+					linkedVME = GetLink("Point1VME");
+					SetLink("Point1VME", linkedVME);
+					linkedVME = GetLink("Point2VME");
+					SetLink("Point2VME", linkedVME);
+
+
 					m_Gui->Enable(ID_REF_SYS_ORIGIN,true);
 					m_Gui->Enable(ID_POINT1,false);
 					m_Gui->Enable(ID_POINT2,false);
@@ -439,6 +459,15 @@ void mafVMERefSys::OnEvent(mafEventBase *maf_event)
 				else if(m_Modality==REFSYS_PLANE)
 				{
           // RefSys with all the link enabled: originABSPosition, point1ABSPosition and point2ABSPosition
+
+					//Make all link mandatory
+					linkedVME = GetLink("OriginVME");
+					SetMandatoryLink("OriginVME", linkedVME);
+					linkedVME = GetLink("Point1VME");
+					SetMandatoryLink("Point1VME", linkedVME);
+					linkedVME = GetLink("Point2VME");
+					SetMandatoryLink("Point2VME", linkedVME);
+
 					m_Gui->Enable(ID_REF_SYS_ORIGIN,true);
 					m_Gui->Enable(ID_POINT1,true);
 					m_Gui->Enable(ID_POINT2,true);
