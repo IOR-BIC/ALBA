@@ -1161,7 +1161,7 @@ void mafGUI::FileOpen(int id,mafString label,mafString* var, const mafString wil
   {
     butt_w = EW;
   }
-  mafGUIButton  *butt = new mafGUIButton(this, w_id, "open",dp, wxSize(butt_w,BH));
+  mafGUIButton  *butt = new mafGUIButton(this, w_id, "Open",dp, wxSize(butt_w,BH));
   wxTextCtrl *text = new wxTextCtrl  (this, GetWidgetId(id), ""   , dp, wxSize(text_w,BH),wxTE_READONLY|m_EntryStyle);
   text->SetFont(m_Font);
   butt->SetValidator( mafGUIValidator(this,w_id,butt,var,text,true,wildcard) );
@@ -1348,10 +1348,10 @@ void mafGUI::MultipleButtons(int numButtons, int numColumns, std::vector<int> &i
 void mafGUI::OkCancel()
 //----------------------------------------------------------------------------
 {
-  mafGUIButton    *b1 = new mafGUIButton(this, wxOK, "ok",dp, wxSize(FW/2,BH) );
+  mafGUIButton    *b1 = new mafGUIButton(this, wxOK, "Ok",dp, wxSize(FW/2,BH) );
   b1->SetValidator( mafGUIValidator(this,wxOK,b1) );
   b1->SetFont(m_Font);
-  mafGUIButton    *b2 = new mafGUIButton(this, wxCANCEL, "cancel", dp, wxSize(FW/2,BH) );
+  mafGUIButton    *b2 = new mafGUIButton(this, wxCANCEL, "Cancel", dp, wxSize(FW/2,BH) );
   b2->SetValidator( mafGUIValidator(this,wxCANCEL,b2) );
   b2->SetFont(m_Font);
 
