@@ -262,6 +262,7 @@ Select the vme parent
 		m_Cutted = true;
 
 		ClipboardBackup();
+		m_SelectionParentBackup = glo_SelectionParent;
 		SetSelectionParent(m_Selection->GetParent());
 
 		SetClipboard(m_Selection);
@@ -349,9 +350,12 @@ Restore the Selection
 		m_Selection = GetClipboard();
 
 		m_Selection->ReparentTo(glo_SelectionParent);
+
 		RestoreBackLinksForTheSubTree(m_Selection);
 
 		glo_SelectionParent.GetPointer()->GetOutput()->Update();
+
+		SetSelectionParent(m_SelectionParentBackup);
 
 		mafEventMacro(mafEvent(this, VME_SELECTED, m_Selection));
 		ClipboardRestore();
