@@ -192,10 +192,13 @@ void mafOpAddLandmarkTest::TestAddLandmark()
   op->SetLandmarkName("one");
   op->AddLandmark(lnd1);
   op->SetLandmarkName("two");
+	op->SelectLandmark("Add_New_Landmark");
   op->AddLandmark(lnd2);
   op->OpDo();
 
   op->GetCloud()->Update();
+
+	CPPUNIT_ASSERT(op->GetCloud()->GetNumberOfLandmarks() == 2);
 
   m_Result = op->GetCloud()->GetChild(0)->IsA("mafVMELandmark");
   TEST_RESULT;
@@ -235,6 +238,7 @@ void mafOpAddLandmarkTest::TestAddLandmark()
   op->SetLandmarkName("one");
   op->AddLandmark(lnd1);
   op->SetLandmarkName("two");
+	op->SelectLandmark("Add_New_Landmark");
   op->AddLandmark(lnd2);
   op->OpDo();
  
@@ -264,6 +268,7 @@ void mafOpAddLandmarkTest::TestAddLandmark()
   op->SetLandmarkName("one");
   op->AddLandmark(lnd1);
   op->SetLandmarkName("two");
+	op->SelectLandmark("Add_New_Landmark");
   op->AddLandmark(lnd2);
   op->OpDo();
 

@@ -202,6 +202,30 @@ int mafGUIDictionaryWidget::RemoveItem(long itemId)
 
 	return -1;
 }
+
+//----------------------------------------------------------------------------
+int mafGUIDictionaryWidget::GetItemIndex(mafString itemName)
+//----------------------------------------------------------------------------
+{
+	for (int i = 0; i < m_Items.size(); i++)
+	{
+		if (m_Items[i] == itemName)
+		{
+			return i;
+		}
+	}
+
+	return -1;
+}
+
+mafString mafGUIDictionaryWidget::GetItemByIndex(int index)
+{
+	if (index >= 0 < m_Items.size())
+		return m_Items[index];
+	else
+		return "";
+}
+
 //----------------------------------------------------------------------------
 int mafGUIDictionaryWidget::UpdateItem(mafString oldItemName, mafString newItemName)
 //----------------------------------------------------------------------------
