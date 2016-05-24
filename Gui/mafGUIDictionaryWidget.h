@@ -60,6 +60,10 @@ public:
 
 	int RemoveItem(mafString itemName);
 
+	int GetItemIndex(mafString itemName);
+
+	mafString GetItemByIndex(int index);
+
 	int UpdateItem(mafString oldItemName, mafString newItemName);
 
 	int SelectItem(mafString itemName, bool select=true);
