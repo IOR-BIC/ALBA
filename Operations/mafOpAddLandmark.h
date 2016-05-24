@@ -56,21 +56,36 @@ EXPORT_STL_VECTOR(MAF_EXPORT,mafVMELandmark*);
 class MAF_EXPORT mafOpAddLandmark: public mafOp
 {
 public:
+
+	//----------------------------------------------------------------------------
+	//Widgets ID's
+	//----------------------------------------------------------------------------
+	enum ADD_LANDMARK_ID
+	{
+		ID_LOAD = MINID,
+		ID_SAVE,
+		ID_ADD_TO_CURRENT_TIME,
+		ID_CHANGE_POSITION,
+		ID_CHANGE_NAME,
+		ID_ADD_LANDMARK,
+		ID_REMOVE_LANDMARK,
+		ID_CHANGE_TIME,
+		ID_SHOW_GROUP,
+	};
+
 	mafOpAddLandmark(const wxString &label = "AddLandmark");
 	~mafOpAddLandmark(); 
 	virtual void OnEvent(mafEventBase *maf_event);
+		
+	mafTypeMacro(mafOpAddLandmark, mafOp);
 
-	void LoadDictionary();
-
-  mafTypeMacro(mafOpAddLandmark, mafOp);
-
-	mafOp* Copy();
+	virtual mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */
 	bool Accept(mafVME*node);
 
 	/** Builds operation's interface. */
-	void OpRun();
+	virtual void OpRun();
 
 	/** Execute the operation. */
 	void OpDo();
@@ -84,23 +99,25 @@ public:
 	/** Remove landmark from the cloud and tree */
 	void RemoveLandmark();
 
-	/** Change name and position of selected landmark  */
-	void EditLandmark();
-
 	/** Select landmark to the cloud */
 	void SelectLandmark(mafString selection);
 
 	/** Deselect landmark to the cloud */
 	void DeselectLandmark();
 
+	void LoadDictionary(wxString fileName = "");
+	int SaveDictionary(wxString fileName ="");
+
 	mafVME* GetPickedVme(){return m_PickedVme;};
   mafVMELandmarkCloud* GetCloud(){return m_Cloud;};
 
   void SetLandmarkName(mafString name){m_LandmarkName = name;};
 
+	void EnableAddMode(bool mode) { m_AddModeActive = mode; };
+
 protected:
 	/** Create the AddLandmarks interface. */
-	void CreateGui();
+	virtual void CreateGui();
 
 	/** Delete the AddLandmarks interface. */
 	void DeleteGui();
@@ -115,6 +132,7 @@ protected:
 	void SetMaterialRGBA(mmaMaterial *material, double r, double g, double b, double a);
 
 	int LoadLandmarksDefinitions(wxString fileName);
+	int SaveLandmarksDefinitions(const char *landmarksFileName);
 
 	bool CheckNodeElement(XERCES_CPP_NAMESPACE_QUALIFIER DOMNode *node, const char *elementName);
 	mafString GetElementAttribute(XERCES_CPP_NAMESPACE_QUALIFIER DOMNode *node, const char *attributeName);
@@ -140,19 +158,20 @@ protected:
 	StringVector m_LocalLandmarkNameVect;
 
 	bool					m_CloudCreatedFlag;
-	
+	bool					m_AddModeActive;
 	bool					m_AddLandmarkMode;
 	bool					m_HasSelection;
-
 	bool					m_FirstOpDo;
+	bool					m_DictionaryLoaded;
 
 	mafString			m_LandmarkName;
 	mafString			m_SelectedLandmarkName;
 
 	int						m_LandmarkNameCount;
-
 	int						m_ShowMode;
 	wxComboBox		*m_ShowComboBox;
+
+	mafString			m_RemoveMessage;
 
   mafInteractorPERPicker	*m_LandmarkPicker;
   mafInteractor       *m_OldBehavior;
