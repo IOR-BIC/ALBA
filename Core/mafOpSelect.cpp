@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: mafOpSelect
- Authors: Silvano Imboden
+ Authors: Silvano Imboden, Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -137,7 +137,7 @@ void mafOpEdit::ClipboardBackup()
 void mafOpEdit::ClipboardRestore()
 //----------------------------------------------------------------------------
 {
-  //assert(m_Backup.GetPointer() ); - //SIL. 6-11-2003: assert removed, I may make a backup of an empy clipboard
+  //no assert here, I may make a backup of an empty clipboard
   SetClipboard(m_Backup);
   m_Backup = NULL;
 }
@@ -158,6 +158,62 @@ void mafOpEdit::SetClipboard(mafVME *node)
 void mafOpEdit::SetSelectionParent(mafVME *parent)
 {
 	glo_SelectionParent = parent;
+}
+
+//----------------------------------------------------------------------------
+void mafOpEdit::RemoveBackLinksForTheSubTree(mafVME *vme)
+{
+	mafVMEIterator *iter = vme->NewIterator();
+	for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+	{
+		mafVME::mafLinksMap *links = node->GetLinks();
+		for (mafVME::mafLinksMap::iterator it = links->begin(); it != links->end(); it++)
+		{
+			mafVMELink &link = it->second;
+			if (link.m_Type == MANDATORY_LINK)
+			{
+				link.m_Node->RemoveBackLink(it->first, node);
+			}
+		}
+	}
+}
+
+//----------------------------------------------------------------------------
+void mafOpEdit::RestoreBackLinksForTheSubTree(mafVME *vme)
+{
+	mafVMEIterator *iter = vme->NewIterator();
+	for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+	{
+		mafVME::mafLinksMap *links = node->GetLinks();
+		for (mafVME::mafLinksMap::iterator it = links->begin(); it != links->end(); it++)
+		{
+			mafVMELink &link = it->second;
+			if (link.m_Type == MANDATORY_LINK)
+			{
+				link.m_Node->AddBackLink(it->first, node);
+			}
+		}
+	}
+}
+
+//----------------------------------------------------------------------------
+bool mafOpEdit::CanRestoreBackLinksForTheSubTree(mafVME *vme, mafVME *root)
+{
+	mafVMEIterator *iter = vme->NewIterator();
+	for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+	{
+		mafVME::mafLinksMap *links = node->GetLinks();
+		for (mafVME::mafLinksMap::iterator it = links->begin(); it != links->end(); it++)
+		{
+			mafVMELink &link = it->second;
+			if (link.m_Type == MANDATORY_LINK && root->FindInTreeById(link.m_NodeId) == NULL)
+			{
+				return false;
+			}
+		}
+	}
+
+	return true;
 }
 
 ///////////////
@@ -197,29 +253,48 @@ Move (doesn't make a copy) the selected vme (and it's subtree) in the Clipboard
 Select the vme parent
 */
 {
-  ClipboardBackup();
-	SetSelectionParent(m_Selection->GetParent());
 
-  SetClipboard(m_Selection);
+	mafVME::mafVMESet dependenciesVMEs = m_Selection->GetDependenciesVMEs();
 
-  //////////////////////////////////////////////////////////////////////////
-  // It is necessary load all vtk data of the vme time varying otherwise paste or undo cause an application crash
-  //////////////////////////////////////////////////////////////////////////
-  LoadVTKData(m_Selection);
+	//Assure there is no VME depending on this
+	if (dependenciesVMEs.empty())
+	{
+		m_Cutted = true;
 
-  //////////////////////////////////////////////////////////////////////////
-  // Added by Losi on 03.06.2010, modify by Di Cosmo
-  // It is necessary to load all vtk data of children vme otherwise paste or undo cause an application crash
-  //////////////////////////////////////////////////////////////////////////
-  mafVME *m_SelectionVme = m_Selection;
-  if(m_SelectionVme)
-    LoadChild(m_SelectionVme);
-  //////////////////////////////////////////////////////////////////////////
+		ClipboardBackup();
+		SetSelectionParent(m_Selection->GetParent());
 
-  mafEventMacro(mafEvent(this,VME_REMOVE,m_Selection));
-  mafEventMacro(mafEvent(this,VME_SELECTED,glo_SelectionParent));
+		SetClipboard(m_Selection);
 
-	glo_SelectionParent.GetPointer()->GetOutput()->Update();
+		//////////////////////////////////////////////////////////////////////////
+		// It is necessary load all vtk data of the vme time varying otherwise paste or undo cause an application crash
+		//////////////////////////////////////////////////////////////////////////
+		LoadVTKData(m_Selection);
+
+		//////////////////////////////////////////////////////////////////////////
+		// It is necessary to load all vtk data of children vme otherwise paste or undo cause an application crash
+		//////////////////////////////////////////////////////////////////////////
+		mafVME *m_SelectionVme = m_Selection;
+		if (m_SelectionVme)
+			LoadChild(m_SelectionVme);
+		//////////////////////////////////////////////////////////////////////////
+
+		mafEventMacro(mafEvent(this, VME_REMOVE, m_Selection));
+		mafEventMacro(mafEvent(this, VME_SELECTED, glo_SelectionParent));
+
+		glo_SelectionParent.GetPointer()->GetOutput()->Update();
+
+		RemoveBackLinksForTheSubTree(m_Selection);
+	}
+	else
+	{
+		wxString message;
+		message << "You cannot cut this VME. There are some VMEs depending on this.\n";
+		message << "\n\n You can delete or reparent this VME.";
+		wxMessageBox(message, "Cannot Cut", wxOK | wxICON_WARNING | wxCENTRE | wxSTAY_ON_TOP);
+
+		m_Cutted = false;
+	}
 }
 //----------------------------------------------------------------------------
 void mafOpCut::LoadVTKData(mafVME *vme)
@@ -258,6 +333,7 @@ void mafOpCut::LoadChild(mafVME *vme)
     }
   }
 }
+
 //----------------------------------------------------------------------------
 void mafOpCut::OpUndo()
 //----------------------------------------------------------------------------
@@ -268,14 +344,18 @@ Restore the Clipboard
 Restore the Selection
 */
 {
-  m_Selection = GetClipboard();
+	if (m_Cutted)
+	{
+		m_Selection = GetClipboard();
 
-	m_Selection->ReparentTo(glo_SelectionParent);
+		m_Selection->ReparentTo(glo_SelectionParent);
+		RestoreBackLinksForTheSubTree(m_Selection);
 
-  glo_SelectionParent.GetPointer()->GetOutput()->Update();
+		glo_SelectionParent.GetPointer()->GetOutput()->Update();
 
-  mafEventMacro(mafEvent(this,VME_SELECTED,m_Selection));
-  ClipboardRestore();
+		mafEventMacro(mafEvent(this, VME_SELECTED, m_Selection));
+		ClipboardRestore();
+	}
 }
 
 
@@ -324,6 +404,7 @@ copy the selected VME and its subtree into the clipboard
   copy_name = "copy of ";
   copy_name += GetClipboard()->GetName();
   GetClipboard()->SetName(copy_name.GetCStr());
+	RemoveBackLinksForTheSubTree(GetClipboard());
 }
 //----------------------------------------------------------------------------
 void mafOpCopy::OpUndo()
@@ -382,9 +463,24 @@ but place in the scene the original and keep the copy in the clipboard.
 Them a VME_ADD is sent, selection is not changed
 */
 {
-  m_PastedVme = GetClipboard();
-	mafOpReparentTo::ReparentTo(m_PastedVme,m_Selection,glo_SelectionParent);
-  SetClipboard(m_PastedVme->CopyTree());
+	m_PastedVme = GetClipboard();
+	if (CanRestoreBackLinksForTheSubTree(m_PastedVme, m_Selection->GetRoot()))
+	{
+		mafOpReparentTo::ReparentTo(m_PastedVme, m_Selection, glo_SelectionParent);
+		RestoreBackLinksForTheSubTree(m_PastedVme);
+		SetClipboard(m_PastedVme->CopyTree());
+		RemoveBackLinksForTheSubTree(GetClipboard());
+		m_Pasted = true;
+	}
+	else
+	{
+		wxString message;
+		message << "The clipporad contains some VME that depends on deleted VME\n";
+		message << "Paste Operation cannot be executed.";
+		wxMessageBox(message, "Cannot Paste", wxOK | wxICON_WARNING | wxCENTRE | wxSTAY_ON_TOP);
+
+		m_Pasted = false;
+	}
 }
 //----------------------------------------------------------------------------
 void mafOpPaste::OpUndo()                  
@@ -394,6 +490,9 @@ Remove the pasted vme from the scene and place it in the clipboard.
 The copy in the clipboard will be automatically deleted
 */
 {
-  SetClipboard(m_PastedVme);
-  mafEventMacro(mafEvent(this,VME_REMOVE,m_PastedVme));
+	if (m_Pasted)
+	{
+		SetClipboard(m_PastedVme);
+		mafEventMacro(mafEvent(this, VME_REMOVE, m_PastedVme));
+	}
 }
