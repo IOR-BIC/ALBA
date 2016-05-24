@@ -301,5 +301,8 @@ void mafSideBar::UpdateVmePanel()
 	{
 		m_VmePipePanel->Put(vme_pipe_gui);
 	}
-	m_VmePanel->Put(m_AppendingGUI);
+	if (m_AppendingGUI)
+		m_VmePanel->Put(m_AppendingGUI);
+	else
+		m_VmePanel->Put(new mafGUI(NULL));
 }

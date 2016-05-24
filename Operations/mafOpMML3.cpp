@@ -239,9 +239,9 @@ mafOpMML3::mafOpMML3(const wxString &label) : mafOp(label)
   m_VolName     = "none";
   m_InputsOk = NULL;
 
-  m_Muscle = vtkPolyData::New() ;
-  m_MuscleGlobalReg = vtkPolyData::New() ;
-  m_MuscleOutput = vtkPolyData::New() ;
+	vtkNEW(m_Muscle);
+	vtkNEW(m_MuscleGlobalReg);
+	vtkNEW(m_MuscleOutput);
 }
 
 
@@ -249,9 +249,9 @@ mafOpMML3::mafOpMML3(const wxString &label) : mafOp(label)
 mafOpMML3::~mafOpMML3( ) 
 //------------------------------------------------------------------------------
 {
-  m_Muscle->Delete() ;
-  m_MuscleGlobalReg->Delete() ;
-  m_MuscleOutput->Delete() ;
+	vtkDEL(m_Muscle);
+	vtkDEL(m_MuscleGlobalReg);
+	vtkDEL(m_MuscleOutput);
 }
 
 

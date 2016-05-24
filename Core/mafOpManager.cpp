@@ -631,48 +631,52 @@ void mafOpManager::RunOpDelete()
 {
   if (WarnUser(NULL))
   {
-    mafVME *node_to_del = m_Selected;
-    OpSelect(m_Selected->GetParent());
+		mafVME::mafVMESet dependenciesVMEs = m_Selected->GetDependenciesVMEs();
 
-    // do not remove binary files but fill a list with files to be deleted on save by the storage.
-    mafEventIO e(this, NODE_GET_STORAGE);
-    node_to_del->ForwardUpEvent(e);
-    mafStorage *storage = e.GetStorage();
-    mafVMEIterator *iter = node_to_del->NewIterator();
-    mafString data_filename;
-    for (mafVME *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
-    {
-      if(mafVMEGenericAbstract::SafeDownCast(node))
-      {
-        mafVMEGenericAbstract *vme = mafVMEGenericAbstract::SafeDownCast(node);
-        mafDataVector *dv = vme->GetDataVector();
-        if (dv != NULL)
-        {
-          if (dv->GetSingleFileMode())
-          {
-            mafString archive_filename = dv->GetArchiveName();
-            if (archive_filename != "")
-            {
-              storage->ReleaseURL(archive_filename);
-            }
-          }
-          else
-          {
-            mafVMEItem *item;
-            int i;
-            for (i = 0; i < dv->GetNumberOfItems(); i++)
-            {
-              item = dv->GetItemByIndex(i);
-              data_filename = item->GetURL();
-              storage->ReleaseURL(data_filename);
-            }
-          }
-        }
-      }
-    }
-    iter->Delete();
-    node_to_del->ReparentTo(NULL);
-    ClearUndoStack();
+
+		//Calculating selection VME, if we delete a ancestor due to dependencies we need to select 
+		//the parent of the ancestor because the ancestor and is sub-tree will be deleted
+		mafVME *root = m_Selected->GetRoot();
+		mafVME *newSelection = m_Selected->GetParent();
+		mafVME *vme=newSelection;
+		while (vme != root)
+		{
+			vme = vme->GetParent();
+			
+			if (dependenciesVMEs.find(vme) != dependenciesVMEs.end())
+				newSelection = vme;
+		}
+
+
+		//Ask user for Removing 
+		if (!dependenciesVMEs.empty())
+		{
+			wxString message;
+			message << "There are some VME dependent on the current VME. \n";
+			message << "The following VME (and relative sub-tree) will be PERMANENTLY removed:\n";
+
+			mafVME::mafVMESet::iterator it;
+			for (it = dependenciesVMEs.begin(); it != dependenciesVMEs.end(); ++it)
+			{
+				message << " " << (*it)->GetName() << "\n";
+			}
+
+			message << "\nDo you want to continue?";
+
+			int answer = wxMessageBox(message, "alert", wxYES_NO | wxICON_WARNING| wxCENTRE | wxSTAY_ON_TOP);
+
+			if (answer == wxNO)
+				return;
+			else 
+				m_Selected->RemoveDependenciesVMEs();
+		}
+		
+    mafVME *node_to_del = m_Selected;
+    OpSelect(newSelection);
+
+		node_to_del->ReparentTo(NULL);
+		
+		ClearUndoStack();
     mafEventMacro(mafEvent(this, CAMERA_UPDATE));
   }
 }

@@ -29,6 +29,7 @@
 #include "mafDecl.h"
 #include <vector>
 #include <map>
+#include <set>
 #include <string>
 
 #include "mafVMEOutput.h"
@@ -47,8 +48,15 @@ class mafVMEIterator;
 class mafTagArray;
 class mafGUI;
 
+
+typedef enum LinkType
+{
+	NORMAL_LINK,
+	MANDATORY_LINK,
+} LinkType;
+
 /** data structure used to store a link VME and its Id */
-class MAF_EXPORT mafOldSubIdLink :public mafUtility
+struct MAF_EXPORT mafOldSubIdLink :public mafUtility
 {
 public:
 	mafOldSubIdLink(mafString name,mafID id = -1, mafID sub_id = -1):m_Name(name), m_NodeId(id), m_NodeSubId(sub_id) {}
@@ -61,11 +69,21 @@ public:
 struct MAF_EXPORT mafVMELink :public mafUtility
 {
 public:
-	mafVMELink(mafID id = -1, mafVME *node = NULL) :m_NodeId(id), m_Node(node) {}
-	mafVME *m_Node;
+	mafVMELink(mafID id = -1, mafVME *node = NULL, LinkType type = NORMAL_LINK) :m_NodeId(id), m_Node(node), m_Type(type) {}
 	mafID   m_NodeId;
+	mafVME *m_Node;
+	LinkType m_Type;
 };
 
+/** data structure used to store a link VME and its Id */
+struct MAF_EXPORT mafVMEBackLink :public mafUtility
+{
+public:
+	mafVMEBackLink(mafString name, mafVME *node = NULL, mafID id = -1):m_Name(name), m_NodeId(id), m_Node(node) {}
+	mafString m_Name;
+	mafID   m_NodeId;
+	mafVME *m_Node;
+};
 
 
 #ifdef MAF_EXPORTS
@@ -360,21 +378,35 @@ public:
 	/**
 	return a pointer to the tag array attribute. If this attribute doesn't
 	exist yet, create a new one. TagArray is a map storing pairs of
-Name<->components, where components are an array of mafStrings. It's a
+	Name<->components, where components are an array of mafStrings. It's a
 	simple way to attach persistent attributes. For more complex attributes
 	customized classes should be created, inheriting from mafAttribute
 	(e.g. @sa mmaMaterial). */
 	mafTagArray  *GetTagArray();
 			
 	typedef std::map<mafString, mafVMELink> mafLinksMap;
+	typedef std::set<mafVME *> mafVMESet;
 
 	/**
 	return the value of a link to another node in the tree. If no link with
-	such a name exists return NULL. */
+	such a name exists return NULL. this function returns both links and mandatory links */
 	mafVME *GetLink(const char *name);
 
 	/** set a link to another node in the tree */
 	void SetLink(const char *name, mafVME *node);
+
+	/** set a mandatory link to another node in the tree */
+	void SetMandatoryLink(const char *name, mafVME *node);
+
+	/** set a link or a mandatory link to another node in the tree */
+	void SetLink(const char *name, mafVME *node, LinkType type);
+
+
+	/** set a mandatory link to another node in the tree */
+	void AddBackLink(const char *name, mafVME *node);
+
+	/** set a mandatory link to another node in the tree */
+	void RemoveBackLink(const char *name, mafVME *node);
 
 	/** This method manage olds links with subid and is here only for retro compatibility issues
 			please do not use this */
@@ -386,8 +418,25 @@ Name<->components, where components are an array of mafStrings. It's a
 	/** return the number of links stored in this Node */
 	mafID GetNumberOfLinks() { return m_Links.size(); }
 
+	/** return the number of links stored in this Node */
+	mafID GetNumberOfBackLinks() { return m_BackLinks.size(); }
+
 	/** remove all links */
 	void RemoveAllLinks();
+
+	/** remove all back links */
+	void RemoveAllBackLinks() { m_BackLinks.clear(); }
+
+	/** Return a set of all VME depending on this vme or is subtree*/
+	mafVMESet GetDependenciesVMEs();
+	
+	/** Removes all the VME that are depending on the current VME */
+	void RemoveDependenciesVMEs();
+
+	/** Return true if vme will be removed on Remove Dependencies
+			A VME will be removed if is contained on dependencies list or 
+			if is contained in a sub-tree of the dependencies */
+	bool WillBeRemovedWithDependencies(mafVME *vme);
 
 	/** return links array: links from this node to other arrays */
 	mafLinksMap *GetLinks() { return &m_Links; }
@@ -634,6 +683,8 @@ protected:
 	void OnNodeAttachedToTree(mafEventBase *e);
 	void OnNodeDestroyed(mafEventBase *e);
 
+	/** Get the dependecies for the specified VME */
+	void GetDependenciesVMEs(mafVMESet &dependencies,mafVME *vme);
 
   /** used to initialize the AbsMatrixPipe */
   virtual int InternalInitialize();
@@ -682,7 +733,8 @@ protected:
 
 	mafAttributesMap  m_Attributes;   ///< attributes attached to this node
 
-	mafLinksMap       m_Links;        ///< links to other nodes in the tree
+	mafLinksMap       m_Links;					///< links to other nodes in the tree
+	std::vector<mafVMEBackLink> m_BackLinks;      ///< links to other nodes in the tree
 	std::vector<mafOldSubIdLink> m_OldSubIdLinks;
 
 	mafString         m_Name;         ///< name of this node

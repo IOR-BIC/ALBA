@@ -101,6 +101,7 @@ mafVME::~mafVME()
   m_MatrixPipe=NULL; // smart pointer
 
 	RemoveAllLinks();
+	RemoveAllBackLinks();
 
 	// advise observers this is being destroyed
 	m_EventSource->InvokeEvent(this, NODE_DESTROYED);
@@ -119,7 +120,7 @@ int mafVME::InternalInitialize()
 {
 	mafVME *root = GetRoot();
 
-	//Setting pointers to links
+	//Setting pointers to links 
 	for (mafLinksMap::iterator it = m_Links.begin(); it != m_Links.end(); it++)
 	{
 		mafVMELink &link = it->second;
@@ -153,7 +154,18 @@ int mafVME::InternalInitialize()
 	}
 	m_OldSubIdLinks.clear();
 
-
+	//Setting pointers to BackLinks
+	for (int i = 0; i < m_BackLinks.size(); i++)
+	{
+		mafVMEBackLink *backLink = &m_BackLinks[i];
+		if (backLink->m_Node == NULL && backLink->m_NodeId >= 0)
+		{
+			mafVME *node = root->FindInTreeById(backLink->m_NodeId);
+			assert(node);
+			backLink->m_Node = node;
+		}
+	}
+	
 	// initialize children
 	for (int i = 0; i < GetNumberOfChildren(); i++)
 	{
@@ -192,18 +204,16 @@ int mafVME::DeepCopy(mafVME *a)
 		mafLinksMap::iterator lnk_it;
 		for (lnk_it = a->GetLinks()->begin(); lnk_it != a->GetLinks()->end(); lnk_it++)
 		{
-			SetLink(lnk_it->first, lnk_it->second.m_Node);
+			SetLink(lnk_it->first, lnk_it->second.m_Node, lnk_it->second.m_Type);
 		}
 
 		SetMatrixPipe(a->GetMatrixPipe() ? a->GetMatrixPipe()->MakeACopy() : NULL);
 		SetDataPipe(a->GetDataPipe() ? a->GetDataPipe()->MakeACopy() : NULL);
 
 		// Runtime properties
-		//AutoUpdateAbsMatrix=vme->GetAutoUpdateAbsMatrix();
 		SetTimeStamp(a->GetTimeStamp());
 
 		SetMatrix(*a->GetOutput()->GetMatrix());
-		//SetAbsMatrix(*vme->GetOutput()->GetAbsMatrix());
 
 		return MAF_OK;
 	}
@@ -841,7 +851,7 @@ int mafVME::InternalStore(mafStorageElement *parent)
 	}
 	parent->StoreObjectVector("Attributes", attrs);
 
-	// store Links
+	//Store Links
 	mafStorageElement *links_element = parent->AppendChild("Links");
 	links_element->SetAttribute("NumberOfLinks", mafString(GetNumberOfLinks()));
 	for (mafLinksMap::iterator links_it = m_Links.begin(); links_it != m_Links.end(); links_it++)
@@ -850,6 +860,18 @@ int mafVME::InternalStore(mafStorageElement *parent)
 		mafStorageElement *link_item_element = links_element->AppendChild("Link");
 		link_item_element->SetAttribute("Name", links_it->first);
 		link_item_element->SetAttribute("NodeId", link.m_NodeId);
+		link_item_element->SetAttribute("linkType", (mafID)link.m_Type);
+	}
+
+	//Store BackLinks
+	mafStorageElement *backLinksElement = parent->AppendChild("BackLinks");
+	backLinksElement->SetAttribute("NumberOfLinks", mafString(GetNumberOfBackLinks()));
+	for (int i=0;i<m_BackLinks.size();i++)
+	{
+		mafVMEBackLink *backLink = &m_BackLinks[i];
+		mafStorageElement *link_item_element = backLinksElement->AppendChild("BackLink");
+		link_item_element->SetAttribute("Name", backLink->m_Name);
+		link_item_element->SetAttribute("NodeId", backLink->m_NodeId);
 	}
 
 	// store the visible children into a tmp array
@@ -872,114 +894,127 @@ int mafVME::InternalStore(mafStorageElement *parent)
 int mafVME::InternalRestore(mafStorageElement *node)
 //-------------------------------------------------------------------------
 {
-
-	// first restore node Name
-	if (node->GetAttribute("Name", m_Name))
-	{
-		m_GuiName = m_Name;
-
-		// restore Id
-		mafString id;
-		if (node->GetAttribute("Id", id))
-		{
-			SetId((mafID)atof(id));
-
-			// restore attributes
-			RemoveAllAttributes();
-			std::vector<mafObject *> attrs;
-			if (node->RestoreObjectVector("Attributes", attrs) != MAF_OK)
-			{
-				mafErrorMacro("Problems restoring attributes for node " << GetName());
-
-				// do not return MAF_ERROR when cannot restore an attribute due to missing object type
-				if (node->GetStorage()->GetErrorCode() != mafStorage::IO_WRONG_OBJECT_TYPE)
-					return MAF_ERROR;
-			}
-
-			for (unsigned int i = 0; i < attrs.size(); i++)
-			{
-				mafAttribute *item = mafAttribute::SafeDownCast(attrs[i]);
-				assert(item);
-				if (item)
-				{
-					m_Attributes[item->GetName()] = item;
-				}
-			}
-
-			// restore Links
-			RemoveAllLinks();
-			if (mafStorageElement *links_element = node->FindNestedElement("Links"))
-			{
-				mafString num_links;
-				links_element->GetAttribute("NumberOfLinks", num_links);
-				int n = (int)atof(num_links);
-				mafStorageElement::ChildrenVector links_vector = links_element->GetChildren();
-				assert(links_vector.size() == n);
-				unsigned int i;
-				for (i = 0; i < n; i++)
-				{
-					mafString link_name;
-					links_vector[i]->GetAttribute("Name", link_name);
-					mafID link_node_id, link_node_subid;
-					links_vector[i]->GetAttributeAsInteger("NodeId", link_node_id);
-					int hasSubId=links_vector[i]->GetAttributeAsInteger("NodeSubId", link_node_subid);
-
-					hasSubId = hasSubId && (link_node_subid != -1);
-
-					if ((link_node_id != -1) && hasSubId)
-					{
-						SetOldSubIdLink(link_name, link_node_id, link_node_subid);
-					}
-					else if (link_node_id != -1)
-					{
-						m_Links[link_name] = mafVMELink(link_node_id, NULL);
-					}
-				}
-
-				// restore children
-				RemoveAllChildren();
-				std::vector<mafObject *> children;
-				if (node->RestoreObjectVector("Children", children, "Node") != MAF_OK)
-				{
-					if (node->GetStorage()->GetErrorCode() != mafStorage::IO_WRONG_OBJECT_TYPE)
-						return MAF_ERROR;
-					// error messaged issued by failing node
-				}
-				
-
-				for (i = 0; i < children.size(); i++)
-				{
-					mafVME *node = mafVME::SafeDownCast(children[i]);
-					assert(node);
-					if (node)
-					{
-						node->m_Parent = this;
-						AddChild(node);
-					}
-				}
-
-				mafID crypt;
-				node->GetAttributeAsInteger("Crypting", crypt);
-				SetCrypting(crypt);
-
-				return MAF_OK;
-			}
-			else
-			{
-				mafErrorMacro("I/O error restoring node " << GetName() << " of type " << GetTypeName() << " : problems restoring links.");
-			}
-		}
-		else
-		{
-			mafErrorMacro("I/O error restoring node " << GetName() << " of type " << GetTypeName() << " : cannot found Id attribute.");
-		}
-	}
-	else
+	//First restore node Name
+	if (!node->GetAttribute("Name", m_Name))
 	{
 		mafErrorMacro("I/O error restoring node of type " << GetTypeName() << " : cannot found Name attribute.");
+		return MAF_ERROR;
+	}
+	m_GuiName = m_Name;
+
+	//Restore Id
+	mafString id;
+	if (!node->GetAttribute("Id", id))
+	{
+		mafErrorMacro("I/O error restoring node " << GetName() << " of type " << GetTypeName() << " : cannot found Id attribute.");
+		return MAF_ERROR;
+	}
+	SetId((mafID)atof(id));
+
+	//Restore attributes
+	RemoveAllAttributes();
+	std::vector<mafObject *> attrs;
+	if (node->RestoreObjectVector("Attributes", attrs) != MAF_OK)
+	{
+		mafErrorMacro("Problems restoring attributes for node " << GetName());
+		// do not return MAF_ERROR when cannot restore an attribute due to missing object type
+		if (node->GetStorage()->GetErrorCode() != mafStorage::IO_WRONG_OBJECT_TYPE)
+			return MAF_ERROR;
+	}
+	for (unsigned int i = 0; i < attrs.size(); i++)
+	{
+		mafAttribute *item = mafAttribute::SafeDownCast(attrs[i]);
+		assert(item);
+		if (item)
+		{
+			m_Attributes[item->GetName()] = item;
+		}
 	}
 
-	return MAF_ERROR;
+	//Restore Links
+	RemoveAllLinks();
+	if (mafStorageElement *links_element = node->FindNestedElement("Links"))
+	{
+		mafString num_links;
+		links_element->GetAttribute("NumberOfLinks", num_links);
+		int n = (int)atof(num_links);
+		mafStorageElement::ChildrenVector links_vector = links_element->GetChildren();
+		assert(links_vector.size() == n);
+		unsigned int i;
+		for (i = 0; i < n; i++)
+		{
+			mafString link_name;
+			links_vector[i]->GetAttribute("Name", link_name);
+			mafID link_node_id, link_node_subid,link_type;
+			links_vector[i]->GetAttributeAsInteger("NodeId", link_node_id);
+			
+			//Restoring link type old links without link type are treated as normal links
+			int hasLinkType = links_vector[i]->GetAttributeAsInteger("linkType", link_type);
+			if (!hasLinkType)
+				link_type = NORMAL_LINK;
+
+			int hasSubId=links_vector[i]->GetAttributeAsInteger("NodeSubId", link_node_subid);
+
+			hasSubId = hasSubId && (link_node_subid != -1);
+
+			if ((link_node_id != -1) && hasSubId)
+			{
+				SetOldSubIdLink(link_name, link_node_id, link_node_subid);
+			}
+			else if (link_node_id != -1)
+			{
+				//Adding link, node pointer now is set to NULL and will be updated on InternalInitialize()
+				m_Links[link_name] = mafVMELink(link_node_id, NULL,(LinkType)link_type);
+			}
+		}
+	}
+
+	//Restore BackLinks
+	RemoveAllBackLinks();
+	if (mafStorageElement *links_element = node->FindNestedElement("BackLinks"))
+	{
+		mafString num_links;
+		links_element->GetAttribute("NumberOfLinks", num_links);
+		int n = (int)atof(num_links);
+		mafStorageElement::ChildrenVector links_vector = links_element->GetChildren();
+		assert(links_vector.size() == n);
+		unsigned int i;
+		for (i = 0; i < n; i++)
+		{
+			mafString link_name;
+			links_vector[i]->GetAttribute("Name", link_name);
+			mafID link_node_id, link_node_subid;
+			links_vector[i]->GetAttributeAsInteger("NodeId", link_node_id);
+
+			m_BackLinks.push_back(mafVMEBackLink(link_name, NULL, link_node_id));
+		}
+	}
+	
+	//Restore children
+	RemoveAllChildren();
+	std::vector<mafObject *> children;
+	if (node->RestoreObjectVector("Children", children, "Node") != MAF_OK && node->GetStorage()->GetErrorCode() != mafStorage::IO_WRONG_OBJECT_TYPE)
+	{
+		mafErrorMacro("Problems restoring children for node " << GetName());
+		return MAF_ERROR;
+	}
+	for (int i = 0; i < children.size(); i++)
+	{
+		mafVME *node = mafVME::SafeDownCast(children[i]);
+		assert(node);
+		if (node)
+		{
+			node->m_Parent = this;
+			AddChild(node);
+		}
+	}
+
+	//Restore crypt value
+	mafID crypt;
+	node->GetAttributeAsInteger("Crypting", crypt);
+	SetCrypting(crypt);
+
+	return MAF_OK;
 }
 
 //----------------------------------------------------------------------------
@@ -1679,6 +1714,10 @@ void mafVME::SetLink(const char *name, mafVME *node)
 
 	if (it != m_Links.end())
 	{
+		//if exist a mandatory link we need to remove the backlink
+		if (it->second.m_Type == MANDATORY_LINK && it->second.m_Node)
+			it->second.m_Node->RemoveBackLink(name, this);
+		
 		// if already linked simply return
 		if (it->second.m_Node == node)
 			return;
@@ -1696,6 +1735,59 @@ void mafVME::SetLink(const char *name, mafVME *node)
 	node->GetEventSource()->AddObserver(this);
 	Modified();
 }
+
+//----------------------------------------------------------------------------
+void mafVME::SetLink(const char *name, mafVME *node, LinkType type)
+{
+	if (type == MANDATORY_LINK)
+		SetMandatoryLink(name, node);
+	else
+		SetLink(name, node);
+}
+
+//----------------------------------------------------------------------------
+void mafVME::SetMandatoryLink(const char *name, mafVME *node)
+{
+		
+	SetLink(name, node);
+	m_Links[name].m_Type = MANDATORY_LINK;
+	node->AddBackLink(name, this);
+}
+
+//----------------------------------------------------------------------------
+void mafVME::AddBackLink(const char *name, mafVME *node)
+{
+	for (int i = 0; i < m_BackLinks.size(); i++)
+	{
+		//if back link already exist we only update the node id
+		if (m_BackLinks[i].m_Node == node && m_BackLinks[i].m_Name.Equals(name))
+		{
+			m_BackLinks[i].m_NodeId = node->GetId();
+			return;
+		}
+	}
+
+	mafVMEBackLink backLink(mafString(name), node, node->GetId());
+
+	m_BackLinks.push_back(backLink);
+}
+
+//----------------------------------------------------------------------------
+void mafVME::RemoveBackLink(const char *name, mafVME *node)
+{
+	for (int i = 0; i < m_BackLinks.size(); i++)
+	{
+		//if back link already exist we only update the node id
+		if (m_BackLinks[i].m_Node == node && m_BackLinks[i].m_Name.Equals(name))
+		{
+			m_BackLinks.erase(m_BackLinks.begin() + i);
+			return;
+		}
+	}
+
+	mafLogMessage("Error Cannot delete backlink from %s to %s, the link does not exist", this->GetName(), node->GetName());
+}
+
 //-------------------------------------------------------------------------
 void mafVME::RemoveLink(const char *name)
 //-------------------------------------------------------------------------
@@ -1722,6 +1814,9 @@ void mafVME::RemoveAllLinks()
 {
 	for (mafLinksMap::iterator it = m_Links.begin(); it != m_Links.end(); it++)
 	{
+		if (it->second.m_Node && it->second.m_Type == MANDATORY_LINK)
+			it->second.m_Node->RemoveBackLink(it->first, this);
+
 		// detach as observer from the linked node
 		if (it->second.m_Node)
 			it->second.m_Node->GetEventSource()->RemoveObserver(this);
@@ -1729,6 +1824,83 @@ void mafVME::RemoveAllLinks()
 	m_Links.clear();
 	Modified();
 }
+
+//----------------------------------------------------------------------------
+mafVME::mafVMESet mafVME::GetDependenciesVMEs()
+{
+	mafVMESet dependencies;
+	//use protected recursive function to calculate dependencies
+	GetDependenciesVMEs(dependencies, this);
+	return dependencies;
+}
+
+//----------------------------------------------------------------------------
+void mafVME::GetDependenciesVMEs(mafVMESet &dependencies, mafVME *vme)
+{
+	//Search dependencies in children
+	mafVMEIterator *iter = vme->NewIterator();
+	iter->GetFirstNode(); //Skip current node to avoid infinite recursion
+	for (mafVME *node = iter->GetNextNode(); node; node = iter->GetNextNode())
+	{
+		if (dependencies.find(node) == dependencies.end())
+			GetDependenciesVMEs(dependencies, node);
+	}
+	mafDEL(iter);
+
+	//Adding dependencies and sub-dependencies
+	for (int i = 0; i < m_BackLinks.size(); i++)
+	{
+		mafVME *node = m_BackLinks[i].m_Node;
+	
+		if (dependencies.find(node) == dependencies.end())
+		{
+			//Calculating dependencies only if the vme is not already in the dependencies list
+			dependencies.insert(node);
+			GetDependenciesVMEs(dependencies, node);
+		}
+	}
+}
+
+
+
+//----------------------------------------------------------------------------
+void mafVME::RemoveDependenciesVMEs()
+{
+	mafVME *root = GetRoot();
+	mafVMESet dependencies = GetDependenciesVMEs();
+	mafVMESet::iterator it;
+
+	//Remove all the VMEs in the dependencies list
+	for (it = dependencies.begin(); it != dependencies.end(); ++it)
+	{
+		mafVME *vme = *it;
+		//Check if the VME is in tree because it can be already removed if is a descendant of another dependence 
+		if (root->IsInTree(vme))
+			vme->ReparentTo(NULL);
+	}
+}
+
+//----------------------------------------------------------------------------
+bool mafVME::WillBeRemovedWithDependencies(mafVME *vme)
+{
+	//Getting dependencies	
+	mafVMESet dependenciesVMEs = GetDependenciesVMEs();
+
+	
+	//The vme will be removed if is a dependence of this VME or if is contained in a sub-tree of a dependent vme
+	//search if the vme 
+	while (!vme->IsA("mafVMERoot"))
+	{
+		if (dependenciesVMEs.find(vme) != dependenciesVMEs.end())
+		{
+			return true;
+		}
+		vme = vme->GetParent();
+	}
+
+	return false;
+}
+
 //-------------------------------------------------------------------------
 unsigned long mafVME::GetMTime()
 //-------------------------------------------------------------------------

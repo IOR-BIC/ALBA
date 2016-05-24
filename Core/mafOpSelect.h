@@ -2,7 +2,7 @@
 
  Program: MAF2
  Module: mafOpSelect
- Authors: Silvano Imboden
+ Authors: Silvano Imboden, Gianluigi Crimi
  
  Copyright (c) B3C
  All rights reserved. See Copyright.txt or
@@ -89,8 +89,12 @@ public:
 		/** set the parent of the selection */
 		void SetSelectionParent(mafVME *parent);
 protected:
-  // static   mafAutoPointer<mafVME> m_Clipboard;
-  mafAutoPointer<mafVME> m_Backup;
+
+	void RemoveBackLinksForTheSubTree(mafVME *vme);
+	void RestoreBackLinksForTheSubTree(mafVME *vme);
+	bool CanRestoreBackLinksForTheSubTree(mafVME *vme, mafVME *root);
+  
+	mafAutoPointer<mafVME> m_Backup;
   mafAutoPointer<mafVME> m_Selection;
 };
 /**
@@ -100,26 +104,27 @@ protected:
 class MAF_EXPORT mafOpCut: public mafOpEdit
 {
 public:
-    /** Constructor. */
-    mafOpCut(wxString label=_("Cut"));
-    /** Destructor. */
-    ~mafOpCut();
-    /** check if node can be input of the operation. */
-    bool Accept(mafVME* vme);
-    /** execute the operation.  */
-    void OpDo();
+  /** Constructor. */
+  mafOpCut(wxString label=_("Cut"));
+  /** Destructor. */
+  ~mafOpCut();
+  /** check if node can be input of the operation. */
+  bool Accept(mafVME* vme);
+  /** execute the operation.  */
+  void OpDo();
 				
-		/** undo the operation. */
-    void OpUndo();
-    /** return a instance of current object. */
-    mafOp* Copy(); 
-    /** Load VTK data for the specified VME (Added by Losi on 03.06.2010) */
-    void LoadVTKData(mafVME *vme);
+	/** undo the operation. */
+  void OpUndo();
+  /** return a instance of current object. */
+  mafOp* Copy(); 
+  /** Load VTK data for the specified VME (Added by Losi on 03.06.2010) */
+  void LoadVTKData(mafVME *vme);
 
-protected:
-   
-    /** Load all children in the tree (Added by Di Cosmo on 24.05.2012) */
-    void LoadChild(mafVME *vme);
+protected: 
+	/** Load all children in the tree (Added by Di Cosmo on 24.05.2012) */
+	void LoadChild(mafVME *vme);
+
+	bool m_Cutted;
 };
 /**
     class name: mafOpCopy
@@ -160,6 +165,7 @@ public:
     mafOp* Copy(); 
 protected:
     mafAutoPointer<mafVME> m_PastedVme;
+		bool m_Pasted;
 };
 
 #endif
