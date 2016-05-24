@@ -386,6 +386,7 @@ public:
 			
 	typedef std::map<mafString, mafVMELink> mafLinksMap;
 	typedef std::set<mafVME *> mafVMESet;
+	typedef std::vector<mafVMEBackLink> mafVMEBackLinks;
 
 	/**
 	return the value of a link to another node in the tree. If no link with
@@ -418,8 +419,11 @@ public:
 	/** return the number of links stored in this Node */
 	mafID GetNumberOfLinks() { return m_Links.size(); }
 
-	/** return the number of links stored in this Node */
+	/** return the number of back links of this Node */
 	mafID GetNumberOfBackLinks() { return m_BackLinks.size(); }
+
+	/** return a copy of the vector of back links of this Node */
+	mafVMEBackLinks GetBackLinks() { return m_BackLinks; }
 
 	/** remove all links */
 	void RemoveAllLinks();
@@ -664,7 +668,7 @@ protected:
   virtual ~mafVME(); // to be deleted with Delete()
 
 
-										 /** internally used to set the node ID */
+	/** internally used to set the node ID */
 	void SetId(mafID id);
 
 	virtual int InternalStore(mafStorageElement *parent);
@@ -734,7 +738,7 @@ protected:
 	mafAttributesMap  m_Attributes;   ///< attributes attached to this node
 
 	mafLinksMap       m_Links;					///< links to other nodes in the tree
-	std::vector<mafVMEBackLink> m_BackLinks;      ///< links to other nodes in the tree
+	mafVMEBackLinks m_BackLinks;      ///< links to other nodes in the tree
 	std::vector<mafOldSubIdLink> m_OldSubIdLinks;
 
 	mafString         m_Name;         ///< name of this node
