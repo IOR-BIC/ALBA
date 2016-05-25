@@ -17,7 +17,7 @@ ENDIF (MAF_BUILD_MAFDLL)
 #-----------------------------------------------------------------------------
 SET(PROJECT_SRCS 
 	vtkMAFTests.h vtkMAFTests.cpp
-  vtkMAFContourVolumeMapperTest.h vtkMAFContourVolumeMapperTest.cpp
+	vtkMAFContourVolumeMapperTest.h vtkMAFContourVolumeMapperTest.cpp
 	vtkMAFRemoveCellsFilterTest.h vtkMAFRemoveCellsFilterTest.cpp
 	vtkMAFMeshCutterTest.h vtkMAFMeshCutterTest.cpp
 	vtkMAFPolyDataToSinglePolyLineTest.h vtkMAFPolyDataToSinglePolyLineTest.cpp
@@ -101,6 +101,7 @@ SET(PROJECT_SRCS
 	vtkMAFCollisionDetectionFilterTest.h vtkMAFCollisionDetectionFilterTest.cpp
 	vtkMAFImageFillHolesRemoveIslandsTest.h vtkMAFImageFillHolesRemoveIslandsTest.cpp
 	vtkMAFRayCastCleanerTest.h vtkMAFRayCastCleanerTest.cpp
+	vtkMAFLineStripSourceTest.h vtkMAFLineStripSourceTest.cpp
 )
 
 ADD_EXECUTABLE(vtkMAFTests ${PROJECT_SRCS})
