@@ -116,6 +116,9 @@ FunctionEnd
 	!insertmacro MUI_PAGE_WELCOME
 	!insertmacro MUI_PAGE_LICENSE "${PRODUCT_INSTALLER_DIR_WIN}\${PRODUCT_NAME}Licence.txt"
 	!insertmacro MUI_PAGE_DIRECTORY
+	
+	!insertmacro  CheckOlderVersion
+	
 	!insertmacro MUI_PAGE_INSTFILES
 	!define MUI_FINISHPAGE_NOAUTOCLOSE
 
@@ -266,6 +269,22 @@ FunctionEnd
 	WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayVersion" "${PRODUCT_VERSION}"
 	WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "URLInfoAbout" "${PRODUCT_WEB_SITE}"
 	WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
+!macroend
+
+!macro CheckOlderVersion
+	Section
+	IfFileExists "$INSTDIR\bin\${PRODUCT_EXE_NAME}" Ask_Question
+	Goto INSTALL
+
+	Ask_Question:
+	MessageBox MB_YESNO "Another copy of this software is already installed.$\nWould you like to to overwrite it?" \
+	IDYES INSTALL IDNO EXIT
+
+	EXIT:
+	Quit
+
+	INSTALL:	
+	SectionEnd
 !macroend
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
