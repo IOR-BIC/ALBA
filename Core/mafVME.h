@@ -79,9 +79,8 @@ public:
 struct MAF_EXPORT mafVMEBackLink :public mafUtility
 {
 public:
-	mafVMEBackLink(mafString name, mafVME *node = NULL, mafID id = -1):m_Name(name), m_NodeId(id), m_Node(node) {}
+	mafVMEBackLink(mafString name, mafVME *node = NULL):m_Name(name), m_Node(node) {}
 	mafString m_Name;
-	mafID   m_NodeId;
 	mafVME *m_Node;
 };
 
