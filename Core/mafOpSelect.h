@@ -123,7 +123,7 @@ public:
 protected: 
 	/** Load all children in the tree (Added by Di Cosmo on 24.05.2012) */
 	void LoadChild(mafVME *vme);
-
+	mafAutoPointer<mafVME> m_SelectionParentBackup;
 	bool m_Cutted;
 };
 /**
