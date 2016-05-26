@@ -133,6 +133,10 @@ int mafVME::InternalInitialize()
 				// attach linked node to this one
 				link.m_Node = node;
 				node->GetEventSource()->AddObserver(this);
+				
+				// if this is a mandatory link we need to recreate the back link on target VME
+				if (link.m_Type == MANDATORY_LINK)
+					node->AddBackLink(it->first, this);
 			}
 		}
 	}
@@ -153,18 +157,6 @@ int mafVME::InternalInitialize()
 		}
 	}
 	m_OldSubIdLinks.clear();
-
-	//Setting pointers to BackLinks
-	for (int i = 0; i < m_BackLinks.size(); i++)
-	{
-		mafVMEBackLink *backLink = &m_BackLinks[i];
-		if (backLink->m_Node == NULL && backLink->m_NodeId >= 0)
-		{
-			mafVME *node = root->FindInTreeById(backLink->m_NodeId);
-			assert(node);
-			backLink->m_Node = node;
-		}
-	}
 	
 	// initialize children
 	for (int i = 0; i < GetNumberOfChildren(); i++)
@@ -863,17 +855,6 @@ int mafVME::InternalStore(mafStorageElement *parent)
 		link_item_element->SetAttribute("linkType", (mafID)link.m_Type);
 	}
 
-	//Store BackLinks
-	mafStorageElement *backLinksElement = parent->AppendChild("BackLinks");
-	backLinksElement->SetAttribute("NumberOfLinks", mafString(GetNumberOfBackLinks()));
-	for (int i=0;i<m_BackLinks.size();i++)
-	{
-		mafVMEBackLink *backLink = &m_BackLinks[i];
-		mafStorageElement *link_item_element = backLinksElement->AppendChild("BackLink");
-		link_item_element->SetAttribute("Name", backLink->m_Name);
-		link_item_element->SetAttribute("NodeId", backLink->m_NodeId);
-	}
-
 	// store the visible children into a tmp array
 	std::vector<mafObject *> nodes_to_store;
 	for (unsigned int i = 0; i < GetNumberOfChildren(); i++)
@@ -969,27 +950,9 @@ int mafVME::InternalRestore(mafStorageElement *node)
 		}
 	}
 
-	//Restore BackLinks
+	//Clear BackLinks, Backlinks are restored from linker vme.
 	RemoveAllBackLinks();
-	if (mafStorageElement *links_element = node->FindNestedElement("BackLinks"))
-	{
-		mafString num_links;
-		links_element->GetAttribute("NumberOfLinks", num_links);
-		int n = (int)atof(num_links);
-		mafStorageElement::ChildrenVector links_vector = links_element->GetChildren();
-		assert(links_vector.size() == n);
-		unsigned int i;
-		for (i = 0; i < n; i++)
-		{
-			mafString link_name;
-			links_vector[i]->GetAttribute("Name", link_name);
-			mafID link_node_id, link_node_subid;
-			links_vector[i]->GetAttributeAsInteger("NodeId", link_node_id);
 
-			m_BackLinks.push_back(mafVMEBackLink(link_name, NULL, link_node_id));
-		}
-	}
-	
 	//Restore children
 	RemoveAllChildren();
 	std::vector<mafObject *> children;
@@ -1762,12 +1725,11 @@ void mafVME::AddBackLink(const char *name, mafVME *node)
 		//if back link already exist we only update the node id
 		if (m_BackLinks[i].m_Node == node && m_BackLinks[i].m_Name.Equals(name))
 		{
-			m_BackLinks[i].m_NodeId = node->GetId();
 			return;
 		}
 	}
 
-	mafVMEBackLink backLink(mafString(name), node, node->GetId());
+	mafVMEBackLink backLink(mafString(name), node);
 
 	m_BackLinks.push_back(backLink);
 }
@@ -1848,9 +1810,9 @@ void mafVME::GetDependenciesVMEs(mafVMESet &dependencies, mafVME *vme)
 	mafDEL(iter);
 
 	//Adding dependencies and sub-dependencies
-	for (int i = 0; i < m_BackLinks.size(); i++)
+	for (int i = 0; i < vme->m_BackLinks.size(); i++)
 	{
-		mafVME *node = m_BackLinks[i].m_Node;
+		mafVME *node = vme->m_BackLinks[i].m_Node;
 	
 		if (dependencies.find(node) == dependencies.end())
 		{
