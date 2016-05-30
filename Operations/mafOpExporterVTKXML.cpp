@@ -42,6 +42,8 @@
 #include "vtkStructuredPoints.h"
 #include "vtkPolyData.h"
 #include "mafVMEGroup.h"
+#include "vtkTransformFilter.h"
+#include "vtkUnstructuredGrid.h"
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafOpExporterVTKXML);
 //----------------------------------------------------------------------------
@@ -222,54 +224,46 @@ void mafOpExporterVTKXML::SaveVTKData()
 
   vtkDataSet *writerInput = inputData;
 
-  /*vtkMAFSmartPointer<vtkImageCast> imageCast;
-  
-  if (m_ForceUnsignedShortScalarOutputForStructuredPoints)
-  {    
-    imageCast->SetInput(vtkStructuredPoints::SafeDownCast(inputData));
-    imageCast->SetOutputScalarTypeToUnsignedShort();
-    imageCast->Update();
-    writerInput = imageCast->GetOutput();
-  }
-  else
-  {
-    writerInput = inputData;
-  }*/
 
   vtkMAFSmartPointer<vtkXMLDataSetWriter> writer;
 
-  if (m_ABSMatrixFlag)
-  {
-    vtkMAFSmartPointer<vtkTransformPolyDataFilter> v_tpdf;
-    v_tpdf->SetInput((vtkPolyData *)m_Input->GetOutput()->GetVTKData());
-    v_tpdf->SetTransform(m_Input->GetOutput()->GetTransform()->GetVTKTransform());
-    v_tpdf->Update();
-    writer->SetInput(v_tpdf->GetOutput());
-  }
-  else
-  {
-    writer->SetInput(writerInput);
-  }
+	if (m_ABSMatrixFlag)
+	{
+		vtkMAFSmartPointer <vtkTransform> tra;
+		tra->SetMatrix(m_Input->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
+
+		if (m_Input->IsA("mafVMEMesh"))
+		{
+			vtkMAFSmartPointer<vtkTransformFilter> v_tpdf;
+			v_tpdf->SetInput((vtkUnstructuredGrid *)m_Input->GetOutput()->GetVTKData());
+			v_tpdf->SetTransform(tra);
+			v_tpdf->Update();
+			writer->SetInput(v_tpdf->GetOutput());
+		}
+		else
+		{
+			vtkMAFSmartPointer<vtkTransformPolyDataFilter> v_tpdf;
+			v_tpdf->SetInput((vtkPolyData *)m_Input->GetOutput()->GetVTKData());
+			v_tpdf->SetTransform(tra);
+			v_tpdf->Update();
+			writer->SetInput(v_tpdf->GetOutput());
+		}
+	}
+	else
+	{
+		writer->SetInput(writerInput);
+	}
 
   if (this->m_Binary)
     writer->SetDataModeToBinary();
   else
     writer->SetDataModeToAscii();
-  //mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
 
   mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,writer));
-
-  // workaround code:  this is not working so I'm setting a dummy 50/100 progress value 
-  // mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR, writer));
-  //long dummyProgressValue = 50;
-  
-  //mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,dummyProgressValue));
 
   writer->SetFileName(m_File.GetCStr());
   writer->Write();
   
-  //mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
-
   if (busyCursor)
   {
     delete busyCursor;
