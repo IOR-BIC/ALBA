@@ -1659,11 +1659,9 @@ void mafVME::SetLink(const char *name, mafVME *node)
 //-------------------------------------------------------------------------
 {
 	assert(name);
-		
-	//Remove current link if exist
-	mafLinksMap::iterator it = m_Links.find(mafString().Set(name));
-	if (it != m_Links.end())
-		RemoveLink(name);
+	
+	//Remove current link if exist	
+	RemoveLink(name);
 
 	if (node)
 	{
@@ -1739,12 +1737,12 @@ void mafVME::RemoveLink(const char *name)
 	mafLinksMap::iterator it = m_Links.find(mafCString(name));
 	if (it != m_Links.end())
 	{
-		// assert(it->second.m_Node);
+		if (it->second.m_Node && it->second.m_Type == MANDATORY_LINK)
+			it->second.m_Node->RemoveBackLink(it->first, this);
+
 		// detach as observer from the linked node
-		if (it->second.m_Node != NULL)
-		{
+		if (it->second.m_Node)
 			it->second.m_Node->GetEventSource()->RemoveObserver(this);
-		}
 
 		m_Links.erase(it); // remove linked node from links container
 		Modified();
