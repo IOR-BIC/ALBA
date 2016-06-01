@@ -392,13 +392,13 @@ public:
 	such a name exists return NULL. this function returns both links and mandatory links */
 	mafVME *GetLink(const char *name);
 
-	/** set a link to another node in the tree */
+	/** set a link to another node in the tree, if node is NULL current link is removed */
 	void SetLink(const char *name, mafVME *node);
 
-	/** set a mandatory link to another node in the tree */
+	/** set a mandatory link to another node in the tree, if node is NULL current link is removed */
 	void SetMandatoryLink(const char *name, mafVME *node);
 
-	/** set a link or a mandatory link to another node in the tree */
+	/** set a link or a mandatory link to another node in the tree, if node is NULL current link is removed */
 	void SetLink(const char *name, mafVME *node, LinkType type);
 
 

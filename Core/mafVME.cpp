@@ -1659,43 +1659,21 @@ void mafVME::SetLink(const char *name, mafVME *node)
 //-------------------------------------------------------------------------
 {
 	assert(name);
-	assert(node);
-
-	if (node == NULL)
-	{
-		mafLogMessage(_("Warning!! NULL node can not be set as link."));
-		return;
-	}
-
-	mafVMELink newlink;
-	if (node->GetRoot() == GetRoot())
-	{
-		newlink.m_NodeId = node->GetId();
-	}
-
-	mafLinksMap::iterator it = m_Links.find(mafString().Set(name));
-
-	if (it != m_Links.end())
-	{
-		//if exist a mandatory link we need to remove the backlink
-		if (it->second.m_Type == MANDATORY_LINK && it->second.m_Node)
-			it->second.m_Node->RemoveBackLink(name, this);
 		
-		// if already linked simply return
-		if (it->second.m_Node == node)
-			return;
+	//Remove current link if exist
+	mafLinksMap::iterator it = m_Links.find(mafString().Set(name));
+	if (it != m_Links.end())
+		RemoveLink(name);
 
-		// detach old linked node, if present
-		if (it->second.m_Node)
-			it->second.m_Node->GetEventSource()->RemoveObserver(this);
+	if (node)
+	{
+		// set the link to the new node
+		m_Links[name] = mafVMELink(node->GetId(), node);
+
+		// attach as observer of the linked node to catch events
+		// of de/attachment to the tree and destroy event.
+		node->GetEventSource()->AddObserver(this);
 	}
-
-	// set the link to the new node
-	m_Links[name] = mafVMELink(node->GetId(), node);
-
-	// attach as observer of the linked node to catch events
-	// of de/attachment to the tree and destroy event.
-	node->GetEventSource()->AddObserver(this);
 	Modified();
 }
 
@@ -1713,8 +1691,11 @@ void mafVME::SetMandatoryLink(const char *name, mafVME *node)
 {
 		
 	SetLink(name, node);
-	m_Links[name].m_Type = MANDATORY_LINK;
-	node->AddBackLink(name, this);
+	if (node)
+	{
+		m_Links[name].m_Type = MANDATORY_LINK;
+		node->AddBackLink(name, this);
+	}
 }
 
 //----------------------------------------------------------------------------
