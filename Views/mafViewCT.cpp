@@ -141,14 +141,14 @@ void mafViewCT::OnEvent(mafEventBase *maf_event)
 		}
 	}
 	else
-		mafEventMacro(*maf_event);
+		Superclass::OnEvent(maf_event);
 }
 //-------------------------------------------------------------------------
 mafGUI* mafViewCT::CreateGui()
 //-------------------------------------------------------------------------
 {
 	assert(m_Gui == NULL);
-	m_Gui = new mafGUI(this);
+	m_Gui = mafView::CreateGui();
 
 	m_Gui->Integer(ID_LAYOUT_WIDTH,"Layout Width",&m_LayoutWidth);
 	m_Gui->Integer(ID_LAYOUT_HEIGHT,"Layout Height",&m_LayoutHeight);

@@ -133,7 +133,6 @@ protected:
 	  ID_ACCURACY = MINID,
 	  ID_VTKCOMP,
     MINID,
-		ID_HELP,
   };	
 
    

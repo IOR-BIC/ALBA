@@ -149,6 +149,12 @@ void mafPictureFactory::Initialize()
     mafADDPIC(CHECK_ON);
     #include <pic/CHECK_OFF.xpm>
     mafADDPIC(CHECK_OFF);
+
+		#include <pic/OP_HELP.xpm>
+		mafADDPIC(OP_HELP);
+
+		#include <pic/BUTTON_HELP.xpm>
+		mafADDPIC(BUTTON_HELP);
 }
 //----------------------------------------------------------------------------
 mafPictureFactory::~mafPictureFactory()

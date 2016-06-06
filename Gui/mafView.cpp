@@ -101,12 +101,12 @@ void mafView::OnEvent(mafEventBase *maf_event)
 		
 	  case ID_HELP:
 	  {
-		mafEvent helpEvent;
-		helpEvent.SetSender(this);
-		mafString viewLabel = this->m_Label;
-		helpEvent.SetString(&viewLabel);
-		helpEvent.SetId(OPEN_HELP_PAGE);
-		mafEventMacro(helpEvent);
+			mafEvent helpEvent;
+			helpEvent.SetSender(this);
+			mafString viewTypeName = this->GetTypeName();
+			helpEvent.SetString(&viewTypeName);
+			helpEvent.SetId(OPEN_HELP_PAGE);
+			mafEventMacro(helpEvent);
 	  }
 	  break;
 
@@ -131,21 +131,22 @@ mafGUI* mafView::CreateGui()
 {
   assert(m_Gui == NULL);
   m_Gui = new mafGUI(this);
+	m_Gui->SetListener(this);
 
   mafString type_name = GetTypeName();
-  
-  if((*GetMAFExpertMode()) == TRUE) 
-    m_Gui->Button(ID_PRINT_INFO, type_name, "", "Print view debug information");
 
   mafEvent buildHelpGui;
   buildHelpGui.SetSender(this);
+	buildHelpGui.SetString(&type_name);
   buildHelpGui.SetId(GET_BUILD_HELP_GUI);
   mafEventMacro(buildHelpGui);
 
-  if (buildHelpGui.GetArg() == true)
-  {
-	  m_Gui->Button(ID_HELP, "Help","");	
-  }
+	if (buildHelpGui.GetArg() == true)
+		m_Gui->ButtonAndHelp(ID_PRINT_INFO, ID_HELP, type_name, "Print view debug information");
+	else
+		m_Gui->Button(ID_PRINT_INFO, type_name, "", "Print view debug information");
+
+	m_Gui->Divider(1);
 
   return m_Gui;
 }

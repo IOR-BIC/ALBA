@@ -64,7 +64,7 @@ mafGUINamedPanel::mafGUINamedPanel( wxWindow* parent,wxWindowID id,bool CloseBut
 
 	  wxFont font = wxFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
 #if WIN32
-	  font.SetPointSize(9);
+	  font.SetPointSize(10);
 #endif
 	  font.SetWeight(wxBOLD);
 	  m_Label->SetFont(font);

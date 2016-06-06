@@ -77,7 +77,6 @@ protected:
     ID_ANGLE_TYPE,
     ID_INDICATOR_TYPE,
     MINID,
-	ID_HELP,
   };
 
   /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */

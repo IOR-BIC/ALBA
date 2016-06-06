@@ -57,7 +57,6 @@ enum SUBVIEW_ID
 enum VIEW_WIDGET_ID
 {
 	ID_FIRST = MINID,
-	ID_HELP,
 	ID_LAST
 };
 //----------------------------------------------------------------------------
@@ -103,16 +102,7 @@ mafGUI* mafViewGlobalSliceCompound::CreateGui()
 //-------------------------------------------------------------------------
 {
 	assert(m_Gui == NULL);
-  m_Gui = new mafGUI(this);
-  mafEvent buildHelpGui;
-  buildHelpGui.SetSender(this);
-  buildHelpGui.SetId(GET_BUILD_HELP_GUI);
-  mafEventMacro(buildHelpGui);
-
-  if (buildHelpGui.GetArg() == true)
-  {
-	  m_Gui->Button(ID_HELP, "Help","");	
-  }
+  m_Gui = mafView::CreateGui();
 
 	m_Gui->AddGui(((mafViewGlobalSlice*)m_ChildViewList[ID_VIEW_GLOBAL_SLICE])->GetGui());
 	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
@@ -139,32 +129,3 @@ void mafViewGlobalSliceCompound::PackageView()
 	PlugChildView(m_ViewGlobalSlice);
 }
 
-//----------------------------------------------------------------------------
-void mafViewGlobalSliceCompound::OnEvent(mafEventBase *maf_event)
-//----------------------------------------------------------------------------
-{
-	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
-	{
-		switch(e->GetId()) 
-		{
-
-		case ID_HELP:
-			{
-				mafEvent helpEvent;
-				helpEvent.SetSender(this);
-				mafString viewLabel = this->m_Label;
-				helpEvent.SetString(&viewLabel);
-				helpEvent.SetId(OPEN_HELP_PAGE);
-				mafEventMacro(helpEvent);
-			}
-			break;
-
-		default:
-			mafEventMacro(*maf_event);
-		}
-	}
-	else
-	{
-		mafEventMacro(*maf_event);
-	}
-}

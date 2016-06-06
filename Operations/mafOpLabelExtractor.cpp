@@ -120,7 +120,6 @@ enum LABEL_EXTRACTOR_WIDGET_ID
   ID_STD_DEVIATION_AFTER,
   ID_LABELS,
 	ID_NAME,
-	ID_HELP,
 };
 
 //-----------------------------------------------------------------------
@@ -144,16 +143,6 @@ void mafOpLabelExtractor::OpRun()
 {
 	m_Gui = new mafGUI(this);
 	m_Gui->SetListener(this);
-
-	mafEvent buildHelpGui;
-	buildHelpGui.SetSender(this);
-	buildHelpGui.SetId(GET_BUILD_HELP_GUI);
-	mafEventMacro(buildHelpGui);
-
-	if (buildHelpGui.GetArg() == true)
-	{
-		m_Gui->Button(ID_HELP, "Help","");	
-	}
 
   m_Gui->Bool(ID_SMOOTH,_("smooth"),&m_SmoothVolume,0,_("gaussian smooth for extracting big surface"));
   m_Gui->Divider(2);
@@ -244,18 +233,6 @@ void mafOpLabelExtractor::OnEvent(mafEventBase *maf_event)
   {
     switch(e->GetId())
     {
-
-	    case ID_HELP:
-		{
-			mafEvent helpEvent;
-			helpEvent.SetSender(this);
-			mafString operationLabel = this->m_Label;
-			helpEvent.SetString(&operationLabel);
-			helpEvent.SetId(OPEN_HELP_PAGE);
-			mafEventMacro(helpEvent);
-		}
-		break;
-
 		  case wxOK:
 			  ExtractLabel();
 			  if(m_Input->GetOutput()->GetVTKData() != NULL)
