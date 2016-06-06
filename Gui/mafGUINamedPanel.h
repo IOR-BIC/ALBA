@@ -58,6 +58,12 @@ public:
   /** Change the background color of the title. */
   void SetTitleColor(wxColour *color = NULL);
 
+	/** Returns TopSizer */
+	wxBoxSizer * GetTopSizer() { return m_TopSizer; }
+
+	/** Returns Top Panel */
+	wxPanel * GetTopPanel()  { return m_Top; }
+
 protected:
   wxPanel         *m_Top;
   mafGUILab          *m_Label;

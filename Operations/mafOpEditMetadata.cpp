@@ -88,7 +88,6 @@ enum METADATA_EDIT_ID
   ID_TAG_COMPONENT,
   ID_TAG_DOUBLE_VALUE,
   ID_TAG_STRING_VALUE,
-  ID_HELP,
 };
 
 //----------------------------------------------------------------------------
@@ -104,16 +103,6 @@ void mafOpEditMetadata::OpRun()
   if(!m_TestMode)
   {
     m_Gui = new mafGUI(this);
-
-	mafEvent buildHelpGui;
-	buildHelpGui.SetSender(this);
-	buildHelpGui.SetId(GET_BUILD_HELP_GUI);
-	mafEventMacro(buildHelpGui);
-
-	if (buildHelpGui.GetArg() == true)
-	{
-		m_Gui->Button(ID_HELP, "Help","");	
-	}
 
     m_MetadataList = m_Gui->ListBox(ID_METADATA_LIST,"",120);
     for (int t=0; t<tag_list.size();t++)
@@ -186,17 +175,6 @@ void mafOpEditMetadata::OnEvent(mafEventBase *maf_event)
   {
     switch(e->GetId())
     {
-		case ID_HELP:
-		{
-			mafEvent helpEvent;
-			helpEvent.SetSender(this);
-			mafString operationLabel = this->m_Label;
-			helpEvent.SetString(&operationLabel);
-			helpEvent.SetId(OPEN_HELP_PAGE);
-			mafEventMacro(helpEvent);
-		}
-		break;
-
       case ID_METADATA_LIST:
       {
         int sel = m_MetadataList->GetSelection();

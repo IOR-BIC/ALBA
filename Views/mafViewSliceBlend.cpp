@@ -270,7 +270,7 @@ mafGUI *mafViewSliceBlend::CreateGui()
 //-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
-  m_Gui = new mafGUI(this);
+  m_Gui = mafView::CreateGui();
 
   if (m_CurrentVolume)
   {
@@ -312,13 +312,13 @@ void mafViewSliceBlend::OnEvent(mafEventBase *maf_event)
       break;
     default:
       //Other events
-      mafEventMacro(*maf_event);
+			Superclass::OnEvent(maf_event);
       break;
     }
   }
   else
   {
-    mafEventMacro(*maf_event);
+		Superclass::OnEvent(maf_event);
   }
 }
 //----------------------------------------------------------------------------

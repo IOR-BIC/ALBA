@@ -107,7 +107,7 @@ void mafViewCompoundWindowing::OnEvent(mafEventBase *maf_event)
 			}
 			break;
     default:
-      mafEventMacro(*maf_event);
+			Superclass::OnEvent(maf_event);
   }
 }
 

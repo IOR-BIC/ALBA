@@ -222,6 +222,9 @@ public:
   /** two generic Buttons widget. */
   void TwoButtons(int firstID, int secondID, const char* label1, const char* label2, int alignment = wxALL, int width = -1);
 
+	/** two generic Buttons widget. */
+	void ButtonAndHelp(int firstID, int secondID, const char* label1, mafString tooltip = "", int alignment = wxALL, int width = -1);
+
   /** Multiple Generic Buttons widget. */
   void MultipleButtons(int numButtons, int numColumns, std::vector<int> &ids, std::vector<const char*> &labels, int alignment = wxALL );
 

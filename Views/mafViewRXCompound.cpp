@@ -223,7 +223,7 @@ mafGUI* mafViewRXCompound::CreateGui()
 //-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
-  m_Gui = new mafGUI(this);
+  m_Gui = mafView::CreateGui();
   
   wxString m_Choices[2];
   m_Choices[0]="Right";

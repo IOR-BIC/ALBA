@@ -416,7 +416,7 @@ void mafViewArbitrarySlice::OnEvent(mafEventBase *maf_event)
 	else
 	{
 		// if no one can handle this event send it to the operation listener
-		mafEventMacro(*maf_event); 
+		Superclass::OnEvent(maf_event);
 	}	
 }
 //----------------------------------------------------------------------------
@@ -652,17 +652,6 @@ void mafViewArbitrarySlice::OnEventThis(mafEventBase *maf_event)
 			CameraUpdate();
 			break;
 
-		case ID_HELP:
-			{
-				mafEvent helpEvent;
-				helpEvent.SetSender(this);
-				mafString viewLabel = this->m_Label;
-				helpEvent.SetString(&viewLabel);
-				helpEvent.SetId(OPEN_HELP_PAGE);
-				mafEventMacro(helpEvent);
-			}
-			break;
-
 		case ID_RANGE_MODIFIED:
 			{
 				mafVME *vme = GetSceneGraph()->GetSelectedVme();
@@ -794,17 +783,7 @@ mafGUI* mafViewArbitrarySlice::CreateGui()
 	//----------------------------------------------------------------------------
 {
 	assert(m_Gui == NULL);
-	m_Gui = new mafGUI(this);
-
-	mafEvent buildHelpGui;
-	buildHelpGui.SetSender(this);
-	buildHelpGui.SetId(GET_BUILD_HELP_GUI);
-	mafEventMacro(buildHelpGui);
-
-	if (buildHelpGui.GetArg() == true)
-	{
-		m_Gui->Button(ID_HELP, "Help","");	
-	}
+	m_Gui = mafView::CreateGui();
 
 	//combo box to choose the type of gizmo
 	m_Gui->Label("");

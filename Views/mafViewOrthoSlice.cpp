@@ -225,6 +225,7 @@ void mafViewOrthoSlice::CreateGuiView()
 //----------------------------------------------------------------------------
 {
   m_GuiView = new mafGUI(this);
+
   m_LutSlider = new mafGUILutSlider(m_GuiView,-1,wxPoint(0,0),wxSize(500,24));
   m_LutSlider->SetListener(this);
   m_LutSlider->SetSize(500,24);
@@ -369,8 +370,7 @@ mafGUI* mafViewOrthoSlice::CreateGui()
   wxString layout_choices[3] = {"default","layout 1","layout 2"};
 
   assert(m_Gui == NULL);
-
-  mafView::CreateGui();
+	m_Gui = mafView::CreateGui();
 
   m_Gui->Combo(ID_LAYOUT_CHOOSER,"layout",&m_LayoutConfiguration,3,layout_choices);
   m_Gui->Divider();

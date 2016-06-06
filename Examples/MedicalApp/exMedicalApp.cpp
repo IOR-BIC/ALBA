@@ -167,6 +167,25 @@
 #include "mafView3D.h"
 #include "mafViewArbitraryOrthoSlice.h"
 #include "mafViewSliceOnCurveCompound.h"
+
+#include "mafViewCompoundWindowing.h"
+#include "mafViewImage.h"
+#include "mafViewCT.h"
+#include "mafViewGlobalSlice.h"
+#include "mafViewRX.h"
+#include "mafViewSingleSlice.h"
+#include "mafViewSlice.h"
+#include "mafViewSliceBlend.h"
+#include "mafViewSliceBlendRX.h"
+#include "mafViewSliceGlobal.h"
+#include "mafViewSliceNotInterpolated.h"
+#include "mafViewSliceNotInterpolatedCompound.h"
+#include "mafViewSliceOnCurve.h"
+#include "mafViewSlicer.h"
+#include "mafViewVTKCompound.h"
+#include "mafViewPlot.h"
+#include "mafViewHTML.h"
+
 #endif
 //--------------------------------------------------------------------------------
 // Create the Application
@@ -184,6 +203,7 @@ bool exMedicalApp::OnInit()
 #include "Examples/MedicalIcons/FRAME_ICON32x32.xpm"
 	mafADDPIC(FRAME_ICON32x32);
 #include "Examples/MedicalIcons/MDICHILD_ICON.xpm"
+
 	mafADDPIC(MDICHILD_ICON);
 
 	int result;
@@ -348,50 +368,152 @@ bool exMedicalApp::OnInit()
 	//View VTK
 
 	//View VTK
-	m_Logic->Plug(new mafViewVTK("Surface"));
+	m_Logic->Plug(new mafViewVTK("Surface (mafViewVTK)"));
+
 	//View Arbitrary Slice
-	mafViewArbitrarySlice *varbitrary= new mafViewArbitrarySlice("Arbitrary Slice");
+	mafViewArbitrarySlice *varbitrary= new mafViewArbitrarySlice("Arbitrary Slice (mafViewArbitrarySlice)");
 	varbitrary->PackageView();
 	m_Logic->Plug(varbitrary);
-	//View Orthoslice
-	mafViewOrthoSlice *vortho= new mafViewOrthoSlice("Orthoslice");
+
+ 	//View Orthoslice
+	mafViewOrthoSlice *vortho= new mafViewOrthoSlice("Orthoslice (mafViewOrthoSlice)");
 	vortho->PackageView();
 	m_Logic->Plug(vortho);
-	//View RX
-	mafViewRXCompound *vrx=new mafViewRXCompound("RX");
+
+ 	//View RX Compound
+	mafViewRXCompound *vrx=new mafViewRXCompound("RX (mafViewRXCompound)");
 	vrx->PackageView();
 	m_Logic->Plug(vrx);
-	//View Isosurface
-	mafViewVTK *viso = new mafViewVTK("Isosurface");
+
+ 	//View Isosurface
+	mafViewVTK *viso = new mafViewVTK("Isosurface (mafViewVTK)");
 	viso->PlugVisualPipe("mafVMEVolumeGray", "mafPipeIsosurface",MUTEX);
 	m_Logic->Plug(viso);
-	//View RXCT
-	mafViewRXCT *vrxct=new mafViewRXCT("RX-CT");
+
+ 	//View RXCT
+	mafViewRXCT *vrxct=new mafViewRXCT("RX-CT (mafViewRXCT)");
 	vrxct->PackageView();
 	m_Logic->Plug(vrxct);
-	//View Global Slice
-	mafViewGlobalSliceCompound *vglobal=new mafViewGlobalSliceCompound("Global Slice");
+
+ 	//View Global Slice Compound
+	mafViewGlobalSliceCompound *vglobal=new mafViewGlobalSliceCompound("Global Slice (mafViewGlobalSliceCompound)");
 	vglobal->PackageView();
 	m_Logic->Plug(vglobal);
-	//View Image
-	mafViewImageCompound *vimage=new mafViewImageCompound("Image");
-	vimage->PackageView();
-	m_Logic->Plug(vimage);
-	//View Single Slice
-	mafViewSingleSliceCompound *vsingleslice=new mafViewSingleSliceCompound("Single Slice");
-	vsingleslice->PackageView();
-	m_Logic->Plug(vsingleslice);
+
+  //View Image Compound
+	mafViewImageCompound *vimageC=new mafViewImageCompound("Image (mafViewImageCompound)");
+	vimageC->PackageView();
+	m_Logic->Plug(vimageC);
+
+	//View Single Slice Compound
+	mafViewSingleSliceCompound *vsinglesliceC=new mafViewSingleSliceCompound("Single Slice (mafViewSingleSliceCompound)");
+	vsinglesliceC->PackageView();
+	m_Logic->Plug(vsinglesliceC);
+
 	//View 3D
-	mafView3D *v3d=new mafView3D("3D");
-	m_Logic->Plug(v3d);
+	m_Logic->Plug(new mafView3D("3D (mafView3D)"));
+
 	//View Arbitrary Orthoslice
-	mafViewArbitraryOrthoSlice *varbitraryortho=new mafViewArbitraryOrthoSlice("Arbitrary Orthoslice");
+	mafViewArbitraryOrthoSlice *varbitraryortho=new mafViewArbitraryOrthoSlice("Arbitrary Orthoslice (mafViewArbitraryOrthoSlice)");
 	varbitraryortho->PackageView();
 	m_Logic->Plug(varbitraryortho);
+
+	//View Slice On Curve Compound
+	mafViewSliceOnCurveCompound *vsliceoncurveC=new mafViewSliceOnCurveCompound("Slice On Curve (mafViewSliceOnCurveCompound)");
+	vsliceoncurveC->PackageView();
+	m_Logic->Plug(vsliceoncurveC);
+
+	//
+
+	//View Image
+	mafViewImage *vimage = new mafViewImage("Image (mafViewImage)");
+	//vimage->PackageView();
+	m_Logic->Plug(vimage);
+
+// 	//View Compound Windowing 
+// 	mafViewCompoundWindowing *vCompWind = new mafViewCompoundWindowing("Compound Windowing (mafViewCompoundWindowing)");
+// 	vCompWind->PackageView();
+// 	m_Logic->Plug(vCompWind);
+
+	//View CT 
+	mafViewCT *vCT = new mafViewCT("CT (mafViewCT)");
+	vCT->PackageView();
+	m_Logic->Plug(vCT);
+
+	//View Global Slice 
+	mafViewGlobalSlice *vGlobalS = new mafViewGlobalSlice("Global Slice (mafViewGlobalSlice)");
+	//vGlobalS->PackageView();
+	m_Logic->Plug(vGlobalS);
+
+	//View RX 
+	mafViewRX *vRX = new mafViewRX("RX (mafViewRX)");
+	//vRX->PackageView();
+	m_Logic->Plug(vRX);
+
+	//View Single Slice
+	mafViewSingleSlice*vsingleslice = new mafViewSingleSlice("Single Slice (mafViewSingleSlice)");
+	//vsingleslice->PackageView();
+	m_Logic->Plug(vsingleslice);
+
+	//View Slice
+	mafViewSlice *vslice = new mafViewSlice("Slice (mafViewSlice)");
+	//vslice->PackageView();
+	m_Logic->Plug(vslice);
+
+	//View Slice Blend
+	mafViewSliceBlend *vSliceBlend = new mafViewSliceBlend("Slice Blend (mafViewSliceBlend)");
+	//vSliceBlend->PackageView();
+	m_Logic->Plug(vSliceBlend);
+
+	//View Slice Blend RX
+	mafViewSliceBlendRX *vSliceBlendRX = new mafViewSliceBlendRX("Slice Blend RX (mafViewSliceBlendRX)");
+	vSliceBlendRX->PackageView();
+	m_Logic->Plug(vSliceBlendRX);
+
+	//View Slice Global
+	mafViewSliceGlobal *vSliceGlobal = new mafViewSliceGlobal("Slice Slice Global (mafViewSliceGlobal)");
+	//vSliceGlobal->PackageView();
+	m_Logic->Plug(vSliceGlobal);
+
+	//View Slice Not Interpolated
+	mafViewSliceNotInterpolated *vSliceNoInterp = new mafViewSliceNotInterpolated("Slice Not Interpolated (mafViewSliceNotInterpolated)");
+	vSliceNoInterp->PackageView();
+	m_Logic->Plug(vSliceNoInterp);
+
+	//View Slice Not Interpolated Compound
+	mafViewSliceNotInterpolatedCompound *vSliceNoInterpC = new mafViewSliceNotInterpolatedCompound("Slice Not Interpolated (mafViewSliceNotInterpolatedCompound)");
+	vSliceNoInterpC->PackageView();
+	m_Logic->Plug(vSliceNoInterpC);
+
 	//View Slice On Curve
-	mafViewSliceOnCurveCompound *vsliceoncurve=new mafViewSliceOnCurveCompound("Slice On Curve");
+	mafViewSliceOnCurve *vsliceoncurve = new mafViewSliceOnCurve("Slice On Curve (mafViewSliceOnCurve)");
 	vsliceoncurve->PackageView();
 	m_Logic->Plug(vsliceoncurve);
+
+	//View Slicer
+	mafViewSlicer *vslicer = new mafViewSlicer("Slicer (mafViewSlicer)");
+	vslicer->PackageView();
+	m_Logic->Plug(vslicer);
+
+	//View VTK Compound
+// 	mafViewVTKCompound *vVTKC = new mafViewVTKCompound("VTK (mafViewVTKCompound)");
+// 	vVTKC->PackageView();
+// 	m_Logic->Plug(vVTKC);
+
+	//View Plot
+	mafViewPlot *vplot = new mafViewPlot("Plot (mafViewPlot)");
+	//vplot->PackageView();
+	m_Logic->Plug(vplot);
+
+	//View HTML
+	mafViewHTML *vHtml = new mafViewHTML("HTML (mafViewHTML)");
+	//vHtml->PackageView();
+	m_Logic->Plug(vHtml);
+
+	//View Compound
+	mafViewCompound *vComp = new mafViewCompound("Compound (mafViewCompound)");
+	vComp->PackageView();
+	m_Logic->Plug(vComp);
 
 	//wxHandleFatalExceptions();
 

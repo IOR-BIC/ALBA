@@ -334,7 +334,8 @@ mafGUI *mafViewVTK::CreateGui()
 //-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
-  m_Gui = mafView::CreateGui(); //new mafGUI(this);
+  m_Gui = mafView::CreateGui();
+
   m_Gui->AddGui(m_Rwi->GetGui());
   
   /////////////////////////////////////////Attach Camera GUI
@@ -385,7 +386,8 @@ void mafViewVTK::OnEvent(mafEventBase *maf_event)
   }
   else
   {
-    mafEventMacro(*maf_event);
+    //mafEventMacro(*maf_event);
+		Superclass::OnEvent(maf_event);
   }
 }
 //----------------------------------------------------------------------------

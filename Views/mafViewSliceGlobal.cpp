@@ -276,7 +276,7 @@ mafGUI *mafViewSliceGlobal::CreateGui()
   wxString Views[3] = {"Z","Y","X"};
 
   assert(m_Gui == NULL);
-  m_Gui = new mafGUI(this);
+  m_Gui = mafView::CreateGui();
 
   m_GlobalSlider = m_Gui->FloatSlider(ID_POS_SLIDER,"pos.",&m_SliderOrigin,m_GlobalBounds[4],m_GlobalBounds[5]);
   m_Gui->Combo(ID_CHANGE_VIEW,"view",&m_ViewIndex,3,Views);

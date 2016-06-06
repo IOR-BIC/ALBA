@@ -52,6 +52,7 @@ class mafVTKLog;
 class mafGUIApplicationSettings;
 class mafGUISettingsStorage;
 class mafGUISettingsTimeBar;
+class mafHelpManager;
 
 //----------------------------------------------------------------------------
 // mafLogicWithManagers :
@@ -218,6 +219,8 @@ public:
   Used to give a splash screen image directly from the bitmap without converting it in xpm.*/
   virtual void ShowSplashScreen(wxBitmap &splashImage);
 
+	static void ShowWebSite(wxString url);
+
 protected:
   //---------------------------------------------------------
   // Description:
@@ -377,6 +380,7 @@ protected:
   mafViewManager         *m_ViewManager;
   mafOpManager           *m_OpManager;
   mafInteractionManager  *m_InteractionManager;
+	mafHelpManager				 *m_HelpManager;
   mafRemoteLogic         *m_RemoteLogic;
 
 	mafVMELandmark				 *m_SelectedLandmark;
@@ -399,6 +403,7 @@ protected:
   bool m_UseViewManager;
   bool m_UseOpManager;
   bool m_UseInteractionManager;
+	bool m_UseHelpManager;
   mafGUISettingsDialog *m_SettingsDialog;
   
   mafString m_Revision;

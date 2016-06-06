@@ -52,12 +52,6 @@
 //-------------------------------------------------------------------------
 mafCxxAbstractTypeMacro(mafVME)
 //-------------------------------------------------------------------------
-/** IDs for the GUI */
-enum NODE_WIDGET_ID
-{
-	ID_HELP = MINID,
-	ID_LAST
-};
 
 //-------------------------------------------------------------------------
 mafVME::mafVME()
@@ -995,21 +989,22 @@ mafGUI *mafVME::CreateGui()
 	m_Gui->SetListener(this);
 
 	mafString type_name = GetTypeName();
-	if ((*GetMAFExpertMode()) == TRUE)
-		m_Gui->Button(ID_PRINT_INFO, type_name, "", "Print node debug information");
-
-	m_Gui->String(ID_NAME, "name :", &m_GuiName);
-
 	mafEvent buildHelpGui;
 	buildHelpGui.SetSender(this);
+	buildHelpGui.SetString(&type_name);
 	buildHelpGui.SetId(GET_BUILD_HELP_GUI);
 	ForwardUpEvent(buildHelpGui);
 
 	if (buildHelpGui.GetArg() == true)
-	{
-		m_Gui->Button(ID_HELP, "Help", "");
-	}
+		m_Gui->ButtonAndHelp(ID_PRINT_INFO, ID_HELP, type_name, "Print node debug information");
+	else
+		m_Gui->Button(ID_PRINT_INFO, type_name, "", "Print node debug information");
 
+	m_Gui->Divider(1);
+
+	m_Gui->String(ID_NAME, "name :", &m_GuiName);
+
+	
 	m_Gui->Divider();
 
   mafString anim_text;
@@ -1925,7 +1920,6 @@ void mafVME::NodeOnEvent(mafEventBase *e)
 
 				case ID_HELP:
 				{
-
 					mafEvent helpEvent;
 					helpEvent.SetSender(this);
 					mafString vmeTypeName = this->GetTypeName();

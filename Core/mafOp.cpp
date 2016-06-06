@@ -29,6 +29,7 @@
 #include "mafGUI.h"
 #include "mafGUIHolder.h"
 #include "mafVME.h"
+#include "mafGUIPicButton.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafOp);
@@ -86,7 +87,18 @@ mafOp::~mafOp()
 void mafOp::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
-	mafEventMacro(*maf_event);
+	mafEvent *event = mafEvent::SafeDownCast(maf_event);
+	if (event	&& event->GetId() == ID_HELP)
+	{
+		mafEvent helpEvent;
+		helpEvent.SetSender(this);
+		mafString opTypeName = this->GetTypeName();
+		helpEvent.SetString(&opTypeName);
+		helpEvent.SetId(OPEN_HELP_PAGE);
+		mafEventMacro(helpEvent);
+	}
+	else
+		mafEventMacro(*maf_event);
 }
 //----------------------------------------------------------------------------
 bool mafOp::Accept(mafVME*vme)
@@ -171,6 +183,25 @@ void mafOp::ShowGui()
   assert(m_Gui); 
   m_Gui->Collaborate(m_CollaborateStatus);
   m_Guih = new mafGUIHolder(mafGetFrame(),-1);
+	wxBoxSizer * topSizer = m_Guih->GetTopSizer();
+	wxPanel * topPanel = m_Guih->GetTopPanel();
+
+	mafString type_name = GetTypeName();
+	mafEvent buildHelpGui;
+	buildHelpGui.SetSender(this);
+	buildHelpGui.SetString(&type_name);
+	buildHelpGui.SetId(GET_BUILD_HELP_GUI);
+	mafEventMacro(buildHelpGui);
+
+	if (buildHelpGui.GetArg() == true)
+	{
+		mafGUIPicButton *b = new mafGUIPicButton(topPanel, "OP_HELP", ID_HELP);
+		b->SetEventId(ID_HELP);  //SIL. 7-4-2005: 
+		b->SetMinSize(wxSize(16, 16));
+		b->SetListener(this);
+		topSizer->Add(b, 0, wxRIGHT| wxADJUST_MINSIZE, 2);
+	}
+
   m_Guih->Put(m_Gui);
 	
   wxString menu_codes=wxStripMenuCodes(m_Label);

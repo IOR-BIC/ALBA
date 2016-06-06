@@ -1322,6 +1322,27 @@ void mafGUI::TwoButtons(int firstID, int secondID, const char* label1, const cha
   Add(sizer,0,wxALL|alignment, M);
 }
 //----------------------------------------------------------------------------
+void mafGUI::ButtonAndHelp(int firstID, int secondID, const char* label1, mafString tooltip, int alignment /* = wxALL */, int width)
+//----------------------------------------------------------------------------
+{
+	int w = width != -1 ? width : FW -20;
+	int w_idFirst = GetWidgetId(firstID);
+	int w_idSecond = GetWidgetId(secondID);
+	mafGUIButton    *b1 = new mafGUIButton(this, w_idFirst, label1, dp, wxSize(w, BH));
+	b1->SetValidator(mafGUIValidator(this, w_idFirst, b1));
+	b1->SetFont(m_Font);
+	if (!tooltip.IsEmpty())
+		b1->SetToolTip(tooltip.GetCStr());
+	mafGUIPicButton    *b2 = new mafGUIPicButton(this, "BUTTON_HELP", secondID, this,4);
+	b2->SetValidator(mafGUIValidator(this, w_idSecond, b2));
+	b2->SetFont(m_Font);
+
+	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
+	sizer->Add(b1, 0);
+	sizer->Add(b2, 0);
+	Add(sizer, 0, wxALL | alignment, M);
+}
+//----------------------------------------------------------------------------
 void mafGUI::MultipleButtons(int numButtons, int numColumns, std::vector<int> &ids, std::vector<const char*> &labels, int alignment)
 //----------------------------------------------------------------------------
 {
