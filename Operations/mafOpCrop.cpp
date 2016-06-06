@@ -360,7 +360,6 @@ enum CROP_WIDGET_ID
   ID_CROP_DIR_Y,
   ID_CROP_DIR_Z,
   ID_RESET_CROPPING_AREA,
-  ID_HELP,
 };
 
 //----------------------------------------------------------------------------
@@ -377,15 +376,6 @@ void mafOpCrop::CreateGui()
 	m_ZminZmax[1] = bounds[5];
 
 	m_Gui = new mafGUI(this);
-	mafEvent buildHelpGui;
-	buildHelpGui.SetSender(this);
-	buildHelpGui.SetId(GET_BUILD_HELP_GUI);
-	mafEventMacro(buildHelpGui);
-
-	if (buildHelpGui.GetArg() == true)
-	{
-		m_Gui->Button(ID_HELP, "Help","");	
-	}
 
   m_Gui->Label("");
   m_Gui->Bool(ID_SHOW_HANDLES, _("handles"), &m_ShowHandles, 0, _("toggle gizmo handles visibility"));
@@ -413,18 +403,6 @@ void mafOpCrop::OnEvent(mafEventBase *maf_event)
 	{
 		switch(e->GetId())
 		{
-
-			case ID_HELP:
-			{
-				mafEvent helpEvent;
-				helpEvent.SetSender(this);
-				mafString operationLabel = this->m_Label;
-				helpEvent.SetString(&operationLabel);
-				helpEvent.SetId(OPEN_HELP_PAGE);
-				mafEventMacro(helpEvent);
-			}
-			break;
-
 			case ID_SHOW_HANDLES:
 			{
 				m_GizmoROI->ShowHandles(m_ShowHandles != 0);

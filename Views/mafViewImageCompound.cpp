@@ -101,7 +101,7 @@ void mafViewImageCompound::CreateGuiView()
   m_LutSlider->SetListener(this);
   m_LutSlider->SetSize(500,24);
   m_LutSlider->SetMinSize(wxSize(500,24));
-  EnableWidgets(false);
+	EnableWidgets(false);
   m_GuiView->Add(m_LutSlider);
   m_GuiView->Reparent(m_Win);
 }
@@ -131,7 +131,7 @@ void mafViewImageCompound::OnEvent(mafEventBase *maf_event)
 			}
 			break;
     default:
-      mafEventMacro(*maf_event);
+      Superclass::OnEvent(maf_event);
   }
 }
 //-------------------------------------------------------------------------
@@ -139,7 +139,8 @@ mafGUI* mafViewImageCompound::CreateGui()
 //-------------------------------------------------------------------------
 {
 	assert(m_Gui == NULL);
-  m_Gui = new mafGUI(this);
+  m_Gui = mafView::CreateGui();
+
 	m_Gui->AddGui(((mafViewImage*)m_ChildViewList[ID_VIEW_IMAGE])->GetGui());
 	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
 	m_LutWidget->Enable(false);

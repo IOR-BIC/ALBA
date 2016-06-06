@@ -109,7 +109,6 @@ enum SURFACE_MIRROR_ID
 	ID_MIRRORY,
 	ID_MIRRORZ,
 	ID_FLIPNORMALS,
-	ID_HELP,
 };
 //----------------------------------------------------------------------------
 void mafOpSurfaceMirror::OpRun()   
@@ -128,16 +127,6 @@ void mafOpSurfaceMirror::OpRun()
 		// interface:
 		m_Gui = new mafGUI(this);
 		m_Gui->SetListener(this);
-		
-		mafEvent buildHelpGui;
-		buildHelpGui.SetSender(this);
-		buildHelpGui.SetId(GET_BUILD_HELP_GUI);
-		mafEventMacro(buildHelpGui);
-
-		if (buildHelpGui.GetArg() == true)
-		{
-			m_Gui->Button(ID_HELP, "Help","");	
-		}
 
 		m_Gui->Label("this doesn't work on animated vme");
 		m_Gui->Label("");
@@ -183,17 +172,6 @@ void mafOpSurfaceMirror::OnEvent(mafEventBase *maf_event)
 	{
 	  switch(e->GetId())
 	  {
-			case ID_HELP:
-			{
-				mafEvent helpEvent;
-				helpEvent.SetSender(this);
-				mafString operationLabel = this->m_Label;
-				helpEvent.SetString(&operationLabel);
-				helpEvent.SetId(OPEN_HELP_PAGE);
-				mafEventMacro(helpEvent);
-			}
-			break;
-
 			case ID_MIRRORX:
 			case ID_MIRRORY:
 			case ID_MIRRORZ:

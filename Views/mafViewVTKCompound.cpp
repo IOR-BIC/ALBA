@@ -103,7 +103,8 @@ mafGUI* mafViewVTKCompound::CreateGui()
 //-------------------------------------------------------------------------
 {
 	assert(m_Gui == NULL);
-	m_Gui = new mafGUI(this);
+	m_Gui = mafView::CreateGui();
+
   if( mafViewVTK::SafeDownCast(m_ChildViewList[ID_VIEW_VTK]) && mafViewVTK::SafeDownCast(m_ChildViewList[ID_VIEW_VTK])->GetGui())
   {
      m_Gui->AddGui(((mafViewVTK*)m_ChildViewList[ID_VIEW_VTK])->GetGui());

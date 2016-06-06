@@ -69,7 +69,6 @@ enum MAF_TRANSFORM_ID
   ID_ROLLOUT_GIZMO_ROTATE,
   ID_ROLLOUT_GIZMO_SCALE,
   ID_ROLLOUT_SAVE_POS,
-  ID_HELP,
 };
 
 //----------------------------------------------------------------------------
@@ -235,17 +234,7 @@ void mafOpMove::OnEventThis(mafEventBase *maf_event)
 {
   switch(maf_event->GetId())
 	{
-	  case ID_HELP:
-	  {
-		  mafEvent helpEvent;
-		  helpEvent.SetSender(this);
-		  mafString operationLabel = this->m_Label;
-		  helpEvent.SetString(&operationLabel);
-		  helpEvent.SetId(OPEN_HELP_PAGE);
-		  mafEventMacro(helpEvent);
-	  }
-	  break;
-    
+  
 	case ID_SHOW_GIZMO:
     {
       // update gizmo choose gui
@@ -525,16 +514,6 @@ void mafOpMove::CreateGui()
 //----------------------------------------------------------------------------
 {
   m_Gui = new mafGUI(this);
-
-  mafEvent buildHelpGui;
-  buildHelpGui.SetSender(this);
-  buildHelpGui.SetId(GET_BUILD_HELP_GUI);
-  mafEventMacro(buildHelpGui);
-
-  if (buildHelpGui.GetArg() == true)
-  {
-	  m_Gui->Button(ID_HELP, "Help","");	
-  }
 
   // enable/disable gizmo interaction
   m_Gui->Label("interaction modality", true);

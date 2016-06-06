@@ -463,7 +463,7 @@ mafGUI *mafViewSingleSlice::CreateGui()
 //-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
-  m_Gui = new mafGUI(this);
+  m_Gui = mafView::CreateGui();
   m_AttachCamera = new mafAttachCamera(m_Gui, m_Rwi, this);
   //m_Gui->AddGui(m_AttachCamera->GetGui());
 
@@ -590,13 +590,13 @@ void mafViewSingleSlice::OnEvent(mafEventBase *maf_event)
 		}
 		break;
     default:
-      mafEventMacro(*maf_event);
+      Superclass::OnEvent(maf_event);
     break;
     }
   }
   else
   {
-    mafEventMacro(*maf_event);
+		Superclass::OnEvent(maf_event);
   }
   
 }

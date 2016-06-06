@@ -251,7 +251,8 @@ mafGUI* mafViewCompound::CreateGui()
   wxString layout_choices[4] = {"default","layout 1","layout 2", "custom"};
 
   assert(m_Gui == NULL);
-  m_Gui = new mafGUI(this);
+	m_Gui = mafView::CreateGui();
+
   m_Gui->Integer(ID_DEFAULT_CHILD_VIEW,"default child", &m_DefauldChildView, 0, m_NumOfChildView, childview_tooltip);
   m_Gui->Combo(ID_LAYOUT_CHOOSER,"layout",&m_LayoutConfiguration,4,layout_choices);
   m_Gui->Bool(ID_LINK_SUBVIEW,"link camera",&m_LinkSubView);

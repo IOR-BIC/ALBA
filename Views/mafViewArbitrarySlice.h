@@ -63,7 +63,6 @@ public:
 		ID_COMBO_GIZMOS = Superclass::ID_LAST,
 		ID_RESET,
 		ID_TRILINEAR_INTERPOLATION_ON,
-		ID_HELP,
 		ID_LAST,
 	};
 

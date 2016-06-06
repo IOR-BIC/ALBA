@@ -51,6 +51,12 @@ enum OPERATIONS_TYPE_ID
 class MAF_EXPORT mafOp: public mafObserver, public mafObject
 {
 public:
+	enum MAFOP_ID
+	{
+		ID_HELP = MINID,
+		MINID,
+	};
+
   mafTypeMacro(mafOp, mafObject);
 
 					mafOp();

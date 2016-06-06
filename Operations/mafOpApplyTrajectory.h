@@ -45,7 +45,6 @@ public:
   {
     ID_OPEN_FILE = MINID,
     ID_SELECT_VME,
-	ID_HELP,
   };
 
   /** Contructor. */

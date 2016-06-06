@@ -54,8 +54,6 @@ public:
   /** Function that clones instance of the object. */
   virtual mafView *Copy(mafObserver *Listener, bool lightCopyEnabled = false);
 
-  void	OnEvent(mafEventBase *maf_event);
-
 protected:
   /**
   Internally used to create a new instance of the GUI. This function should be

@@ -261,13 +261,13 @@ void mafView3D::OnEvent(mafEventBase *maf_event)
 			}
 			break;
     default:
-      mafEventMacro(*maf_event);
+			Superclass::OnEvent(maf_event);
     break;
     }
   }
   else
   {
-    mafEventMacro(*maf_event);
+		Superclass::OnEvent(maf_event);
   }
 }
 //----------------------------------------------------------------------------
@@ -359,7 +359,8 @@ mafGUI *mafView3D::CreateGui()
 //-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
-  m_Gui = new mafGUI(this);
+  m_Gui = mafView::CreateGui();
+
 	wxString choices[4] = {_("ISO"),_("MIP"),_("DRR"),_("VR")};
 	m_Gui->Combo(ID_COMBO_PIPE,_("Choose pipe"),&m_Choose,4,choices);
 	m_Gui->Enable(ID_COMBO_PIPE,m_CurrentVolume!=NULL);
