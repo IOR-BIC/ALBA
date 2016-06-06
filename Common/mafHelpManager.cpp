@@ -36,8 +36,9 @@ mafHelpManager::mafHelpManager()
 //----------------------------------------------------------------------------
 {
 	wxString appName = wxApp::GetInstance()->GetAppName();
-
-	m_HelpFileName = (mafGetApplicationDirectory()).c_str();
+	
+	m_HelpFileName = "file://";
+	m_HelpFileName += (mafGetApplicationDirectory()).c_str();
 	m_HelpFileName += "\\Help\\";
 	m_HelpFileName += appName;
 	m_HelpFileName += "_help.html";
@@ -67,12 +68,12 @@ int mafHelpManager::ParseHelpFile()
 			int findPos;
 			while ((findPos = line.find("<a class=\"Label\" name=\"", pos)) != std::string::npos)
 			{
-				pos += findPos + 23;
+				pos = findPos + 23;
 				size_t tagEnd = line.find("\"", pos);
 				std::string tag = line.substr(pos, tagEnd - pos);
 				m_HelpEntry.insert(tag.c_str());
 
-				pos += tagEnd + 1;
+				pos = tagEnd + 1;
 			}
 		}
 
