@@ -89,6 +89,7 @@
 #include "mafVMERoot.h"
 #include "mafVMELandmarkCloud.h"
 #include "mafVMELandmark.h"
+#include "mafHelpManager.h"
 
 #define IDM_WINDOWNEXT 4004
 #define IDM_WINDOWPREV 4006
@@ -131,6 +132,7 @@ mafLogicWithManagers::mafLogicWithManagers(mafGUIMDIFrame *mdiFrame/*=NULL*/)
   m_UseViewManager = true;
   m_UseOpManager   = true;
   m_UseInteractionManager = true;
+	m_UseHelpManager = true;
   
   m_ExternalViewFlag  = false;
 
@@ -233,6 +235,12 @@ void mafLogicWithManagers::Configure()
     m_OpManager->SetMouse(m_Mouse);
     m_OpManager->WarningIfCantUndo(m_ApplicationSettings->GetWarnUserFlag());
   }
+
+	if (m_UseHelpManager)
+	{
+		m_HelpManager = new mafHelpManager();
+		//m_HelpManager->SetListener(this);
+	}
   
 // currently mafInteraction is strictly dependent on VTK (marco)
 #ifdef MAF_USE_VTK
@@ -1144,34 +1152,36 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 				break;
 
 			case HELP_HOME:
-				{
-				
-				}
-				break;
+			{
+				m_HelpManager->ShowHelp();
+			}
+			break;
+
 
 			case GET_BUILD_HELP_GUI:
 			{	
-				int buildGui = -1;
-				//Temporary solution - never build help until an help module is not ready
-				if (true)
-				{
-					buildGui = false;
-					e->SetArg(buildGui);
+				if(e->GetString())
+				{ 
+					mafString typeName = e->GetString()->GetCStr();
+					bool res = m_HelpManager && m_HelpManager->HasHelpEntry(typeName);
+					e->SetArg(m_HelpManager && m_HelpManager->HasHelpEntry(typeName));
 				}
 				else
 				{
-					//Create code for help management here
+					e->SetArg(false);
 				}
-				e->SetArg(buildGui);
+
 			}
 			break;
 
 			case OPEN_HELP_PAGE:
 			{
 				// open help for entity
-				wxString entity = e->GetString()->GetCStr();
-				
-				//Create code for help management/show here
+				if (e->GetString())
+				{
+					wxString typeName = e->GetString()->GetCStr();
+					m_HelpManager->ShowHelpEntry(typeName);
+				}
 			}
 			break;
 			//-----from medLogic
@@ -1642,6 +1652,8 @@ void mafLogicWithManagers::OnQuit()
   cppDEL(m_RemoteLogic);
   cppDEL(m_VMEManager);
   cppDEL(m_MaterialChooser);
+	cppDEL(m_HelpManager);
+
 // currently mafInteraction is strictly dependent on VTK (marco)
 #ifdef MAF_USE_VTK
   cppDEL(m_InteractionManager);
@@ -2652,4 +2664,38 @@ void mafLogicWithManagers::RestoreLayout()
 
 	cppDEL(xmlStorage);
 	mafDEL(root);
+}
+
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::ShowWebSite(wxString url)
+{
+	mafLogMessage("Opening %s", url.c_str());
+
+	//WXwidget does not manage urls that contains anchor
+	//in this case we need to create a temp file which redirect to the correct url 
+	//and open this file
+	if (url.Contains("#"))
+	{
+		wxString tmpHtmlFileName = mafGetAppDataDirectory().c_str();
+		tmpHtmlFileName += "/loadPage.html";
+
+		FILE *tmpHtmlFile = fopen(tmpHtmlFileName.c_str(), "w");
+
+		fprintf(tmpHtmlFile, "<html>\n");
+		fprintf(tmpHtmlFile, "<head>\n");
+		fprintf(tmpHtmlFile, "	<meta http-equiv=\"Content-Type\" content=\"text/html; charset=ISO-8859-1\" />\n");
+		fprintf(tmpHtmlFile, "	<meta http-equiv=\"refresh\" content=\"1;url=%s\" />\n", url.c_str());
+		fprintf(tmpHtmlFile, "<title></title>\n");
+		fprintf(tmpHtmlFile, "</head>\n");
+		fprintf(tmpHtmlFile, "<body/>\n");
+		fprintf(tmpHtmlFile, "</html>\n");
+		fclose(tmpHtmlFile);
+
+		url = tmpHtmlFileName;
+	}
+
+	wxString command = "rundll32.exe url.dll,FileProtocolHandler ";
+	command = command + "\"" + url.c_str() + "/\"";
+	wxExecute(command);
+
 }

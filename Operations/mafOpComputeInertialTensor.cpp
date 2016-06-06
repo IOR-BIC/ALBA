@@ -207,17 +207,6 @@ void mafOpComputeInertialTensor::OnEvent(mafEventBase *maf_event)
 		switch(e->GetId())
 		{
 
-		case ID_HELP:
-		{
-			mafEvent helpEvent;
-			helpEvent.SetSender(this);
-			mafString operationLabel = this->m_Label;
-			helpEvent.SetString(&operationLabel);
-			helpEvent.SetId(OPEN_HELP_PAGE);
-			mafEventMacro(helpEvent);
-		}
-		break;
-
 		case wxOK:
       {
         int result = OP_RUN_CANCEL;
@@ -323,15 +312,6 @@ void mafOpComputeInertialTensor::CreateGui()
 //----------------------------------------------------------------------------
 {
   m_Gui = new mafGUI(this);
-  mafEvent buildHelpGui;
-  buildHelpGui.SetSender(this);
-  buildHelpGui.SetId(GET_BUILD_HELP_GUI);
-  mafEventMacro(buildHelpGui);
-
-  if (buildHelpGui.GetArg() == true)
-  {
-	  m_Gui->Button(ID_HELP, "Help","");	
-  }
 
   m_Gui->Divider(0);
   m_Gui->Label("Default Density is the density");

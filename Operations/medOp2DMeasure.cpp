@@ -571,7 +571,7 @@ void medOp2DMeasure::OnEvent(mafEventBase *maf_event)
         }
         break;
         default:
-          mafEventMacro(*e);
+					Superclass::OnEvent(e);
         break; 
       }
     }

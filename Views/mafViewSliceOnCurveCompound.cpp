@@ -320,7 +320,7 @@ mafGUI* mafViewSliceOnCurveCompound::CreateGui()
 //-------------------------------------------------------------------------
 {	
   assert(m_Gui == NULL);
-  mafView::CreateGui();  
+  m_Gui = mafView::CreateGui();  
 
   wxComboBox* combo = m_Gui->Combo(ID_LAYOUT_CHOOSER,_("Layout"), &m_LayoutConfiguration);
   const char** layouts = GetLayoutsNames();

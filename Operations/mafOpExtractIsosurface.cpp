@@ -193,7 +193,6 @@ void mafOpExtractIsosurface::OpRun()
 enum EXTRACT_ISOSURFACE_ID
 {
   ID_ISO_SLIDER = MINID,
-  ID_HELP_BUTTON,
   ID_INCREASE_ISO,
   ID_DECREASE_ISO,
   ID_ISO,
@@ -267,20 +266,6 @@ void mafOpExtractIsosurface::CreateOpDialog()
   m_PIPRen->GetActiveCamera()->ParallelProjectionOn();
 
   wxPoint p = wxDefaultPosition;
-
-  mafEvent buildHelpGui;
-  buildHelpGui.SetSender(this);
-  buildHelpGui.SetId(GET_BUILD_HELP_GUI);
-  mafEventMacro(buildHelpGui);
-
-  mafGUIButton *b_help = NULL;
-
-  if (buildHelpGui.GetArg() == true)
-  {
-	  b_help = new mafGUIButton(m_Dialog, ID_HELP_BUTTON, "Help", p, wxSize(80, 20));
-	  // help validator
-	  b_help->SetValidator( mafGUIValidator(this, ID_HELP_BUTTON,b_help));
-  }
 
   // iso interface
   wxStaticText *lab  = new wxStaticText(m_Dialog,-1, "contour value: ");
@@ -357,12 +342,6 @@ void mafOpExtractIsosurface::CreateOpDialog()
   text_max_range->SetValidator(mafGUIValidator(this, ID_MAX_RANGE,text_max_range, &m_MaxRange, m_MinDensity, m_MaxDensity));
 
   wxBoxSizer *h_sizer0 = NULL;
-
-  if (b_help != NULL)
-  {
-	  h_sizer0 = new wxBoxSizer(wxHORIZONTAL);
-	  h_sizer0->Add(b_help,     0,wxCENTER);	
-  }
   
   wxBoxSizer *h_sizer1 = new wxBoxSizer(wxHORIZONTAL);
   h_sizer1->Add(lab,     0,wxLEFT);	
@@ -663,17 +642,6 @@ void mafOpExtractIsosurface::OnEvent(mafEventBase *maf_event)
   {
     switch(e->GetId())
     {	
-	case ID_HELP_BUTTON:
-		{
-			mafEvent helpEvent;
-			helpEvent.SetSender(this);
-			mafString operationLabel = this->m_Label;
-			helpEvent.SetString(&operationLabel);
-			helpEvent.SetId(OPEN_HELP_PAGE);
-			mafEventMacro(helpEvent);
-		}
-		break;
-
     case ID_OK:
       m_Dialog->EndModal(wxID_OK);
       break;

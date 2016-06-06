@@ -171,7 +171,8 @@ mafGUI *mafViewHTML::CreateGui()
 //----------------------------------------------------------------------------
 {
 	assert(m_Gui == NULL);
-	m_Gui = new mafGUI(this);
+	m_Gui = mafView::CreateGui();
+
   m_Gui->SetListener(this);
 	m_Gui->Label("");
 	m_Gui->Button(ID_LOAD,"load html file");
@@ -203,7 +204,7 @@ void mafViewHTML::OnEvent(mafEventBase *maf_event)
 	      m_Html->LoadPage(m_Url);
     break;
     default:
-      mafEventMacro(*maf_event);
+      Superclass::OnEvent(maf_event);
     break;
 	}
 }

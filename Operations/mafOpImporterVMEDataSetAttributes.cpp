@@ -159,7 +159,6 @@ enum Mesh_Importer_ID
   ID_IdArrayName,
   ID_OK,
   ID_CANCEL,
-  ID_HELP,
 };
 
 void mafOpImporterVMEDataSetAttributes::CreateGui()
@@ -168,16 +167,6 @@ void mafOpImporterVMEDataSetAttributes::CreateGui()
 
   m_Gui = new mafGUI(this);
   m_Gui->SetListener(this);
- 
-  mafEvent buildHelpGui;
-  buildHelpGui.SetSender(this);
-  buildHelpGui.SetId(GET_BUILD_HELP_GUI);
-  mafEventMacro(buildHelpGui);
-
-  if (buildHelpGui.GetArg() == true)
-  {
-	  m_Gui->Button(ID_HELP, "Help","");	
-  }
 
   m_Gui->Label(" ");
   m_Gui->Label("attributes file:",true);
@@ -232,18 +221,6 @@ void mafOpImporterVMEDataSetAttributes::OnEvent(mafEventBase *maf_event)
   {
     switch(e->GetId())
     {
-
-	case ID_HELP:
-	{
-		mafEvent helpEvent;
-		helpEvent.SetSender(this);
-		mafString operationLabel = this->m_Label;
-		helpEvent.SetString(&operationLabel);
-		helpEvent.SetId(OPEN_HELP_PAGE);
-		mafEventMacro(helpEvent);
-	}
-	break;
-
     case ID_FileName:
     break;
 

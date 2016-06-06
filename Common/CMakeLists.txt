@@ -69,6 +69,8 @@ SET(PROJECT_SRCS
   mafWizardSettings.cpp
   mafWizardSettings.h
   
+  mafHelpManager.cpp
+  mafHelpManager.h  
 )
 
 # List libraries that are needed by this project.

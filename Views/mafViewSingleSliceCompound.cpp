@@ -97,7 +97,8 @@ mafGUI* mafViewSingleSliceCompound::CreateGui()
 //-------------------------------------------------------------------------
 {
 	assert(m_Gui == NULL);
-  m_Gui = new mafGUI(this);
+  m_Gui = mafView::CreateGui();
+
 	m_Gui->AddGui(((mafViewSingleSlice*)m_ChildViewList[ID_VIEW_SINGLE_SLICE])->GetGui());
 	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
 	m_LutWidget->Enable(false);

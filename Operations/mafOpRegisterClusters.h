@@ -83,7 +83,6 @@ protected:
 		ID_APPLY_REGISTRATION,
 		ID_REGTYPE,
 		ID_WEIGHT,
-		ID_HELP,
 		ID_LAST
 	};
 

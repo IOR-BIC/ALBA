@@ -195,8 +195,8 @@ mafGUI *mafViewPlot::CreateGui()
 //-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
-  m_Gui = new mafGUI(this);
-	m_Gui->Divider();
+	m_Gui = mafView::CreateGui();
+
   return m_Gui;
 }
 //----------------------------------------------------------------------------
@@ -216,7 +216,7 @@ void mafViewPlot::OnEvent(mafEventBase *maf_event)
   {
     mafEventMacro(*maf_event);
   }*/
-  mafEventMacro(*maf_event);
+  Superclass::OnEvent(maf_event);
 }
 //----------------------------------------------------------------------------
 void mafViewPlot::Print(wxDC *dc, wxRect margins)

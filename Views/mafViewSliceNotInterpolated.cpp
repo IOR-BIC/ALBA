@@ -78,7 +78,7 @@ mafGUI *mafViewSliceNotInterpolated::CreateGui()
 //----------------------------------------------------------------------------
 {
   // Create the view gui
-  m_Gui = new mafGUI(this);
+  m_Gui = mafView::CreateGui();
   m_LutSwatch = m_Gui->Lut(ID_LUT,"LUT",m_ColorLUT); // Lut widget
   wxString choices[3] = {"X","Y","Z"};
   m_Gui->Combo(ID_AXIS,"Axis",&m_SliceAxis,3,choices); // Slice Axis
@@ -206,7 +206,7 @@ void mafViewSliceNotInterpolated::OnEvent(mafEventBase * event)
       }
     }
   }
-  mafEventMacro(*event);
+	Superclass::OnEvent(event);
 }
 
 //----------------------------------------------------------------------------
