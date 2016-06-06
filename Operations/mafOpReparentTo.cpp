@@ -121,6 +121,8 @@ void mafOpReparentTo::OpDo()
 
   if (reparentOK == MAF_OK)
   {
+		mafEventMacro(mafEvent(this, VME_SELECT, m_Input));
+		
     mafEventMacro(mafEvent(this,CAMERA_UPDATE));
   }
   else
