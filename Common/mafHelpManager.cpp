@@ -36,12 +36,14 @@ mafHelpManager::mafHelpManager()
 //----------------------------------------------------------------------------
 {
 	wxString appName = wxApp::GetInstance()->GetAppName();
-	
-	m_HelpFileName = "file://";
-	m_HelpFileName += (mafGetApplicationDirectory()).c_str();
+		
+	m_HelpFileName = (mafGetApplicationDirectory()).c_str();
 	m_HelpFileName += "\\Help\\";
 	m_HelpFileName += appName;
 	m_HelpFileName += "_help.html";
+
+	m_HelpUrl = "file://";
+	m_HelpUrl += m_HelpFileName;
 
 	ParseHelpFile();
 }
@@ -96,7 +98,7 @@ void mafHelpManager::ShowHelpEntry(mafString typeName)
 	{
 		wxString appName = wxApp::GetInstance()->GetAppName();
 
-		wxString url = m_HelpFileName + "#";
+		wxString url = m_HelpUrl + "#";
 		url += typeName;
 
 		mafLogicWithManagers::ShowWebSite(url);
@@ -107,7 +109,15 @@ void mafHelpManager::ShowHelpEntry(mafString typeName)
 void mafHelpManager::ShowHelp()
 {
 	if(wxFileExists(m_HelpFileName.GetCStr()))
-		mafLogicWithManagers::ShowWebSite(m_HelpFileName.GetCStr());
+		mafLogicWithManagers::ShowWebSite(m_HelpUrl.GetCStr());
+}
+
+//----------------------------------------------------------------------------
+void mafHelpManager::SetHelpFile(mafString fileName)
+{
+	m_HelpFileName = fileName; ParseHelpFile();
+	m_HelpUrl = "file://";
+	m_HelpUrl += m_HelpFileName;
 }
 
 //----------------------------------------------------------------------------
