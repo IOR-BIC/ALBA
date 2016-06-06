@@ -532,7 +532,7 @@ void mafViewArbitraryOrthoSlice::OnEvent(mafEventBase *maf_event)
 	}
 	else
 	{
-		mafEventMacro(*maf_event);
+		Superclass::OnEvent(maf_event);
 	}
 }
 //----------------------------------------------------------------------------
@@ -1371,7 +1371,7 @@ mafView *mafViewArbitraryOrthoSlice::Copy(mafObserver *Listener, bool lightCopyE
 mafGUI* mafViewArbitraryOrthoSlice::CreateGui()
 {
 	assert(m_Gui == NULL);
-	m_Gui = new mafGUI(this);
+	m_Gui = mafView::CreateGui();
 
 	//	m_Gui->Divider(2);
 

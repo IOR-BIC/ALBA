@@ -293,7 +293,8 @@ mafGUI *mafViewRX::CreateGui()
 //-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
-  m_Gui = new mafGUI(this);
+  m_Gui = mafView::CreateGui();
+
   m_AttachCamera = new mafAttachCamera(m_Gui, m_Rwi, this);
   m_Gui->AddGui(m_AttachCamera->GetGui());
 	m_Gui->Divider();
@@ -322,7 +323,7 @@ void mafViewRX::VmeShow(mafVME *vme, bool show)
 void mafViewRX::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
-  mafEventMacro(*maf_event);
+  Superclass::OnEvent(maf_event);
 }
 //----------------------------------------------------------------------------
 void mafViewRX::SetLutRange(double low_val, double high_val)

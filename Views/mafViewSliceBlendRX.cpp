@@ -206,7 +206,7 @@ mafGUI* mafViewSliceBlendRX::CreateGui()
 //-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
-  m_Gui = new mafGUI(this);
+  m_Gui = mafView::CreateGui();
 
   m_Gui->Label(_("Blend View"),true);
   m_BlendGui = m_ChildViewList[BLEND_VIEW]->GetGui();
