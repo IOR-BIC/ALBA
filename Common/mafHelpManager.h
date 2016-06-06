@@ -45,7 +45,7 @@ public:
 	bool HasHelpEntry(mafString typeName);
 	void ShowHelpEntry(mafString typeName);
 	void ShowHelp();
-	void SetHelpFile(mafString fileName) { m_HelpFileName = fileName; ParseHelpFile(); };
+	void SetHelpFile(mafString fileName);;
 	
 private:
 	int ParseHelpFile();
@@ -54,6 +54,7 @@ private:
 	void ReadFinalize();
 
 	mafString m_HelpFileName;
+	mafString m_HelpUrl;
 	std::set<mafString> m_HelpEntry;
 
 	FILE * m_FilePointer;
