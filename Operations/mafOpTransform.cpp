@@ -443,7 +443,7 @@ void mafOpTransform::OnEvent(mafEventBase *maf_event)
 
 	default:
 	{
-		mafEventMacro(*maf_event);
+		Superclass::OnEvent(maf_event);
 	}
 	break;
 	}
