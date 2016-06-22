@@ -150,7 +150,15 @@ void mafGUICheckTree::OnMouseDown( wxMouseEvent& event )
 	{
     OnIconClick(i); 
 		return;//eat message
-	} 
+	}
+	if (i.IsOk() && flag & wxTREE_HITTEST_ONITEMINDENT)
+	{
+		if (m_NodeTree->IsExpanded(i))
+			m_NodeTree->Collapse(i);
+		else
+			m_NodeTree->Expand(i);
+		return;//eat message
+	}
 	if(!this->m_CanSelect)	
 	  return; //also eat message if selection is disabled
 	event.Skip();//process event as usual
