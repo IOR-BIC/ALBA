@@ -196,7 +196,7 @@ int mafOpImporterVTKXML::ImportVTKXML()
 	if (ext == "vti")
 	{
 		vtkMAFSmartPointer<vtkXMLImageDataReader> imageReader;
-		imageReader->AddObserver(vtkCommand::AnyEvent, m_EventRouter);
+		imageReader->AddObserver(vtkCommand::ErrorEvent, m_EventRouter);
 		imageReader->SetFileName(m_File.GetCStr());
 		imageReader->Update();
 
