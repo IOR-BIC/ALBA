@@ -190,135 +190,152 @@ int mafOpImporterVTKXML::ImportVTKXML()
   mafNEW(m_VmeMesh);
   mafNEW(m_VmeGeneric);
 
-  vtkMAFSmartPointer<vtkXMLImageDataReader> imageReader;
-  imageReader->AddObserver(vtkCommand::ErrorEvent,m_EventRouter);
-  imageReader->SetFileName(m_File.GetCStr());
-  imageReader->Update();
+	wxString path, name, ext;
+	wxSplitPath(m_File, &path, &name, &ext);
 
-  if (m_ErrorCount == 0)
-  {
-    data = imageReader->GetOutput();
-
-    if (m_VmeGrayVol->SetDataByDetaching(data,0) == MAF_OK)
-    {
-      m_Output = m_VmeGrayVol;
-    }
-    else if (m_VmeRGBVol->SetDataByDetaching(data,0) == MAF_OK)
-    {
-      m_Output = m_VmeRGBVol;
-    }
-    else
-    {
-      m_VmeGeneric->SetDataByDetaching(data,0);
-      m_Output = m_VmeGeneric;
-    }
-
-    return MAF_OK;   
-  }
-
-  ResetErrorCount();
-
-	vtkMAFSmartPointer<vtkXMLPolyDataReader> polydataReader;
-	polydataReader->AddObserver(vtkCommand::ErrorEvent,m_EventRouter);
-	polydataReader->SetFileName(m_File.GetCStr());
-	polydataReader->Update();
-
-	if (m_ErrorCount == 0)
+	if (ext == "vti")
 	{
-	  data = polydataReader->GetOutput();
+		vtkMAFSmartPointer<vtkXMLImageDataReader> imageReader;
+		imageReader->AddObserver(vtkCommand::AnyEvent, m_EventRouter);
+		imageReader->SetFileName(m_File.GetCStr());
+		imageReader->Update();
 
-    if (m_VmePointSet->SetDataByDetaching(data,0) == MAF_OK)
-    {
-      m_Output = m_VmePointSet;
-    }
-    else if (m_VmePolyLine->SetDataByDetaching(data,0) == MAF_OK)
-    {
-      m_Output = m_VmePolyLine;
-    }
-    else if (m_VmeSurface->SetDataByDetaching(data,0) == MAF_OK)
-    {
-      m_Output = m_VmeSurface;
-    }
-    else
-    {
-      m_VmeGeneric->SetDataByDetaching(data,0);
-      m_Output = m_VmeGeneric;
-    }
+		if (m_ErrorCount == 0)
+		{
+			data = imageReader->GetOutput();
 
-    return MAF_OK;
+			if (m_VmeGrayVol->SetDataByDetaching(data, 0) == MAF_OK)
+			{
+				m_Output = m_VmeGrayVol;
+			}
+			else if (m_VmeRGBVol->SetDataByDetaching(data, 0) == MAF_OK)
+			{
+				m_Output = m_VmeRGBVol;
+			}
+			else if (m_VmeSurface->SetDataByDetaching(data, 0) == MAF_OK)
+			{
+				m_Output = m_VmeSurface;
+			}
+			else
+			{
+				m_VmeGeneric->SetDataByDetaching(data, 0);
+				m_Output = m_VmeGeneric;
+			}
+
+			return MAF_OK;
+		}
+
+		ResetErrorCount();
 	}
+	else if (ext == "vtp")
+	{
+		vtkMAFSmartPointer<vtkXMLPolyDataReader> polydataReader;
+		polydataReader->AddObserver(vtkCommand::ErrorEvent, m_EventRouter);
+		polydataReader->SetFileName(m_File.GetCStr());
+		polydataReader->Update();
 
-	ResetErrorCount();
+		if (m_ErrorCount == 0)
+		{
+			data = polydataReader->GetOutput();
 
-  vtkMAFSmartPointer<vtkXMLRectilinearGridReader> rgReader;
-  rgReader->AddObserver(vtkCommand::ErrorEvent,m_EventRouter);
-  rgReader->SetFileName(m_File.GetCStr());
-  rgReader->Update();
+			if (m_VmePolyLine->SetDataByDetaching(data, 0) == MAF_OK)
+			{
+				m_Output = m_VmePolyLine;
+			}
+			else if (m_VmeSurface->SetDataByDetaching(data, 0) == MAF_OK)
+			{
+				m_Output = m_VmeSurface;
+			}
+			else if (m_VmePointSet->SetDataByDetaching(data, 0) == MAF_OK)
+			{
+				m_Output = m_VmePointSet;
+			}
+			else
+			{
+				m_VmeGeneric->SetDataByDetaching(data, 0);
+				m_Output = m_VmeGeneric;
+			}
 
-  if (m_ErrorCount == 0)
-  {
-    data = rgReader->GetOutput();
+			return MAF_OK;
+		}
 
-    if (m_VmeGrayVol->SetDataByDetaching(data,0) == MAF_OK)
-    {
-      m_Output = m_VmeGrayVol;
-    }
-    else if (m_VmeRGBVol->SetDataByDetaching(data,0) == MAF_OK)
-    {
-      m_Output = m_VmeRGBVol;
-    }
-    else
-    {
-      m_VmeGeneric->SetDataByDetaching(data,0);
-      m_Output = m_VmeGeneric;
-    }
+		ResetErrorCount();
+	}
+	else if (ext == "vtr")
+	{
+		vtkMAFSmartPointer<vtkXMLRectilinearGridReader> rgReader;
+		rgReader->AddObserver(vtkCommand::ErrorEvent, m_EventRouter);
+		rgReader->SetFileName(m_File.GetCStr());
+		rgReader->Update();
 
-    return MAF_OK;   
-  }
+		if (m_ErrorCount == 0)
+		{
+			data = rgReader->GetOutput();
 
-  ResetErrorCount();
+			if (m_VmeGrayVol->SetDataByDetaching(data, 0) == MAF_OK)
+			{
+				m_Output = m_VmeGrayVol;
+			}
+			else if (m_VmeRGBVol->SetDataByDetaching(data, 0) == MAF_OK)
+			{
+				m_Output = m_VmeRGBVol;
+			}
+			else
+			{
+				m_VmeGeneric->SetDataByDetaching(data, 0);
+				m_Output = m_VmeGeneric;
+			}
 
-  vtkMAFSmartPointer<vtkXMLUnstructuredGridReader> ugReader;
-  ugReader->AddObserver(vtkCommand::ErrorEvent,m_EventRouter);
-  ugReader->SetFileName(m_File.GetCStr());
-  ugReader->Update();
+			return MAF_OK;
+		}
 
-  if (m_ErrorCount == 0)
-  {
-    data = ugReader->GetOutput();
+		ResetErrorCount();
+	}
+	else if (ext == "vtu")
+	{
+		vtkMAFSmartPointer<vtkXMLUnstructuredGridReader> ugReader;
+		ugReader->AddObserver(vtkCommand::ErrorEvent, m_EventRouter);
+		ugReader->SetFileName(m_File.GetCStr());
+		ugReader->Update();
 
-    if (m_VmeMesh->SetDataByDetaching(data,0) == MAF_OK)
-    {
-      m_Output = m_VmeMesh;
-    }
-    else
-    {
-      m_VmeGeneric->SetDataByDetaching(data,0);
-      m_Output = m_VmeGeneric;
-    }
+		if (m_ErrorCount == 0)
+		{
+			data = ugReader->GetOutput();
 
-    return MAF_OK;   
-  }
+			if (m_VmeMesh->SetDataByDetaching(data, 0) == MAF_OK)
+			{
+				m_Output = m_VmeMesh;
+			}
+			else
+			{
+				m_VmeGeneric->SetDataByDetaching(data, 0);
+				m_Output = m_VmeGeneric;
+			}
 
-  ResetErrorCount();
+			return MAF_OK;
+		}
 
-  vtkMAFSmartPointer<vtkXMLStructuredGridReader> sgReader;
-  sgReader->AddObserver(vtkCommand::ErrorEvent,m_EventRouter);
-  sgReader->SetFileName(m_File.GetCStr());
-  sgReader->Update();
+		ResetErrorCount();
+	}
+	else if (ext == "vts")
+	{
+		vtkMAFSmartPointer<vtkXMLStructuredGridReader> sgReader;
+		sgReader->AddObserver(vtkCommand::ErrorEvent, m_EventRouter);
+		sgReader->SetFileName(m_File.GetCStr());
+		sgReader->Update();
 
-  if (m_ErrorCount == 0)
-  {
-    data = sgReader->GetOutput();
+		if (m_ErrorCount == 0)
+		{
+			data = sgReader->GetOutput();
 
-    m_VmeGeneric->SetDataByDetaching(data,0);
-    m_Output = m_VmeGeneric;
+			m_VmeGeneric->SetDataByDetaching(data, 0);
+			m_Output = m_VmeGeneric;
 
-    return MAF_OK;   
-  }
+			return MAF_OK;
+		}
 
-  ResetErrorCount();
-
+		ResetErrorCount();
+	}
 
   return MAF_ERROR;
 }
