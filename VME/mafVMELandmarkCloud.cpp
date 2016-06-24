@@ -516,6 +516,18 @@ void mafVMELandmarkCloud::CreateLMStructureFromDataVector()
 	landmarks.clear();
 }
 
+//----------------------------------------------------------------------------
+mafVMELandmark * mafVMELandmarkCloud::GetNearestLandmark(double pos[3])
+{
+	vtkPolyData *polyData = GetPolyData(m_CurrentTime);
+	int lmIndex=polyData->FindPoint(pos);
+
+	if (lmIndex >= 0 && lmIndex < m_NumberOfLandmarks)
+		return m_LMChildren[lmIndex];
+	else
+		return NULL;
+}
+
 //-------------------------------------------------------------------------
 vtkPolyData *mafVMELandmarkCloud::NewPolyData(mafTimeStamp t)
 {
