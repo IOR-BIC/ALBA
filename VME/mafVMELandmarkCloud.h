@@ -205,6 +205,8 @@ public:
 	/** */
 	void CreateLMStructureFromDataVector();
 
+	mafVMELandmark *GetNearestLandmark(double pos[3]);
+
 protected:
   mafVMELandmarkCloud();
   virtual ~mafVMELandmarkCloud();
