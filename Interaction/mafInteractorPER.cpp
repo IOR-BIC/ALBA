@@ -47,6 +47,7 @@
 #include "vtkMath.h"
 #include <map>
 #include <assert.h>
+#include "mafVMELandmarkCloud.h"
 
 //------------------------------------------------------------------------------
 mafCxxTypeMacro(mafInteractorPER)
@@ -335,6 +336,13 @@ void mafInteractorPER::OnButtonDown(mafEventInteraction *e)
     }
     else if(m_CanSelect && !picked_vme->IsA("mafVMEGizmo"))
     {
+			if (picked_vme->IsA("mafVMELandmarkCloud"))
+			{
+				double pos[3];
+				v->GetPickedPosition(pos);
+				picked_vme = (mafVME *)((mafVMELandmarkCloud *)picked_vme)->GetNearestLandmark(pos);
+
+			}
       // Send a VME select event to Logic
       InvokeEvent(VME_SELECT,MCH_UP,picked_vme);
     }
