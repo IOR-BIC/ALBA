@@ -187,8 +187,11 @@ public:
   /** Checkbutton grid widget. */
   void BoolGrid(int numRows, int numColumns, std::vector<int> &ids, std::vector<const char*> &labelsRows,std::vector<const char*> &labelsColumns, int *var, mafString tooltip = ""	);
 
-  /** Radiobutton widget. */
+  /** RadioBox widget. */
   void Radio(int id,wxString label, int *var, int numchoices = 0, const wxString choices[] = NULL, int dim = 1, wxString tooltip = "", int style = wxRA_SPECIFY_COLS);
+
+	/** Radiobutton widget. */
+	void RadioButton(int id, wxString label, int selected=true, wxString tooltip = "");
 
   /** Combo widget. */
   wxComboBox *Combo(int id,mafString label, int *var, int numchoices = 0, const wxString choices[] = NULL, mafString tooltip = "");
@@ -344,6 +347,7 @@ protected:
   void OnListBox      (wxCommandEvent &event);
   void OnListCtrl      (wxCommandEvent &event);
   void OnCheckListBox (wxCommandEvent &event);
+	void OnRadioButton	(wxCommandEvent &event);
   void OnMouseWheel   (wxMouseEvent &event);
 
   bool m_CollaborateStatus;  ///< Flag set to know if the application is in collaborative mode or no.
