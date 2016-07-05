@@ -60,6 +60,8 @@
 #include "pic/menu/EDIT_DELETE.xpm"
 #include "pic/menu/EDIT_REPARENT.xpm"
 #include "pic/menu/EDIT_ADD_GROUP.xpm"
+#include "pic/menu/SHOW.xpm"
+#include "pic/menu/HIDE.xpm"
 
 
 //----------------------------------------------------------------------------
@@ -136,11 +138,15 @@ void mafGUITreeContextualMenu::CreateContextualMenu(mafGUICheckTree *tree, mafVi
 				{
 					show = !m_SceneGraph->Vme2Node(m_VmeActive)->IsVisible();
 				}
-				wxString text = "Show";
-				if (!show) text = "Hide";
 
 				m_DisplaySubMenu = new wxMenu();
-				m_DisplaySubMenu->Append(RMENU_SHOW_VME, text, "");
+
+				if (show)
+					mafGUI::AddMenuItem(m_DisplaySubMenu, RMENU_SHOW_VME, "Show", SHOW_xpm);
+				else
+					mafGUI::AddMenuItem(m_DisplaySubMenu, RMENU_SHOW_VME, "Hide", HIDE_xpm);
+
+				//m_DisplaySubMenu->Append(RMENU_SHOW_VME, text, "");
 				m_DisplaySubMenu->AppendSeparator();
 				m_DisplaySubMenu->Append(RMENU_SHOW_SUBTREE, "Show sub-tree");
 				m_DisplaySubMenu->Append(RMENU_SHOW_SAMETYPE, "Show same type");
