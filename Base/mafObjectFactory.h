@@ -124,6 +124,10 @@ public:
   /** This returns the path to a dynamically loaded factory. */
   const char* GetLibraryPath();
 
+	/** Returns the Object Description */
+	std::string GetObjectDescription(const char* classname);
+
+
   /**
     This function can be used by Application code to register new Objects's to the mafCoreFactory */
   void RegisterNewObject(const char* ObjectName, const char* description, mafCreateObjectFunction createFunction,mafReferenceCounted *args=NULL);
@@ -163,8 +167,8 @@ protected:
    * It should create the named maf object or return 0 if that object
    * is not supported by the factory implementation. */
   virtual mafObject *CreateObject(const char* classname );
-
-  /** internally used to retrieve args for this factory */
+		
+	/** internally used to retrieve args for this factory */
   mafReferenceCounted *GetFactoryArgs(const char *type_name);
 
   //------------------------------------------------------------------------------

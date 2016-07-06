@@ -153,7 +153,6 @@ void mafGUITreeContextualMenu::CreateContextualMenu(mafGUICheckTree *tree, mafVi
 				m_DisplaySubMenu->AppendSeparator();
 				m_DisplaySubMenu->Append(RMENU_HIDE_SUBTREE, "Hide sub-tree");
 				m_DisplaySubMenu->Append(RMENU_HIDE_SAMETYPE, "Hide same type");
-				m_DisplaySubMenu->AppendSeparator();
 
 				// check visibility 
 				m_DisplaySubMenu->FindItem(RMENU_SHOW_VME)->Enable(n->GetPipeCreatable());

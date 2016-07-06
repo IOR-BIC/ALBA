@@ -459,6 +459,18 @@ mafObject *mafObjectFactory::CreateObject(const char* classname)
 
 
 //------------------------------------------------------------------------------
+std::string mafObjectFactory::GetObjectDescription(const char* classname)
+{
+	mmuOverRideMap::iterator pos = m_OverrideMap->find(classname);
+	if (pos != m_OverrideMap->end())
+	{
+		return (*pos).second.m_Description;
+	}
+	return NULL;
+}
+
+
+//------------------------------------------------------------------------------
 void mafObjectFactory::SetEnableFlag(bool flag,
                 const char* className,
                 const char* subclassName)
