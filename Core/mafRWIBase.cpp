@@ -343,8 +343,8 @@ void mafRWIBase::OnLeftMouseButtonDown(wxMouseEvent &event)
   {
     mafEventInteraction e(this,mafDeviceButtonsPad::GetButtonDownId());
     e.Set2DPosition(event.GetX(),m_Height - event.GetY() - 1);
-    e.SetButton(MAF_LEFT_BUTTON);
-    e.SetModifier(MAF_SHIFT_KEY,event.ShiftDown());
+		e.SetButton(MAF_LEFT_BUTTON);
+		e.SetModifier(MAF_SHIFT_KEY, event.ShiftDown());
     e.SetModifier(MAF_CTRL_KEY,event.ControlDown());
     e.SetModifier(MAF_ALT_KEY,event.AltDown());
     e.SetChannel(MCH_OUTPUT);
