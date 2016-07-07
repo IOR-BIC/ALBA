@@ -564,33 +564,21 @@ void mafRWIBase::OnMouseWheel(wxMouseEvent &event)
 
 	bool rotateUp = event.GetWheelRotation() > 0;
 
-	if (m_CustomInteractorStyle)
-	{
-		SetEventInformation(event.GetX(), m_Height - event.GetY() - 1, event.ControlDown(), event.ShiftDown());
+	double delta;
+	delta = event.GetWheelRotation();
+	mafEventInteraction e(this, mafDeviceButtonsPadMouse::GetWheelId());
+	e.Set2DPosition(event.GetX(), m_Height - event.GetY() - 1);
+	e.SetData(&delta);
 
-		if (rotateUp)
-			InvokeEvent(vtkCommand::WheelUpEvent, NULL);
-		else
-			InvokeEvent(vtkCommand::WheelDownEvent, NULL);
-	}
-	else
+	e.SetModifier(MAF_SHIFT_KEY, event.ShiftDown());
+	e.SetModifier(MAF_CTRL_KEY, event.ControlDown());
+	e.SetModifier(MAF_ALT_KEY, event.AltDown());
+	e.SetChannel(MCH_OUTPUT);
+	if (m_Mouse)
+		m_Mouse->OnEvent(&e);
+	else if (m_Listener)
 	{
-		double delta;
-		delta = event.GetWheelRotation();
-		mafEventInteraction e(this, mafDeviceButtonsPadMouse::GetWheelId());
-		e.Set2DPosition(event.GetX(), m_Height - event.GetY() - 1);
-		e.SetData(&delta);
-
-		e.SetModifier(MAF_SHIFT_KEY, event.ShiftDown());
-		e.SetModifier(MAF_CTRL_KEY, event.ControlDown());
-		e.SetModifier(MAF_ALT_KEY, event.AltDown());
-		e.SetChannel(MCH_OUTPUT);
-		if (m_Mouse)
-			m_Mouse->OnEvent(&e);
-		else if (m_Listener)
-		{
-			m_Listener->OnEvent(&e);
-		}
+		m_Listener->OnEvent(&e);
 	}
 }
 
