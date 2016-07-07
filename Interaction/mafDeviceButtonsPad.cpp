@@ -145,3 +145,11 @@ mafID mafDeviceButtonsPad::GetButtonUpId()
   static const mafID buttonUpId = mmuIdFactory::GetNextId("BUTTON_UP");
   return buttonUpId;
 }
+
+//------------------------------------------------------------------------------
+mafID mafDeviceButtonsPad::GetWheelId()
+//------------------------------------------------------------------------------
+{
+	static const mafID buttonUpId = mmuIdFactory::GetNextId("MOUSE_WHEEL");
+	return buttonUpId;
+}
