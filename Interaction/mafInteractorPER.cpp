@@ -229,7 +229,9 @@ void mafInteractorPER::OnLeftButtonDown(mafEventInteraction *e)
     FlyTo(e); 
 
   OnButtonDown(e);
-  m_DraggingLeft = true;
+
+	if (!e->GetModifier(MAF_SHIFT_KEY))
+		m_DraggingLeft = true;
 }
 
 //----------------------------------------------------------------------------
