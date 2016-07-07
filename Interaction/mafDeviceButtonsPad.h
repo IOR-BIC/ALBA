@@ -66,6 +66,9 @@ public:
   /** return the button up id */
   static mafID GetButtonUpId();
 
+	/** return the Wheel id */
+	static mafID GetWheelId();
+
 protected:
   mafDeviceButtonsPad();
   virtual ~mafDeviceButtonsPad();
