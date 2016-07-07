@@ -89,6 +89,14 @@ void mafDeviceButtonsPadMouse::OnEvent(mafEventBase *event)
     }
     SetLastPosition(pos[0],pos[1],e->GetModifiers());
   }
+	else if (id == GetWheelId())
+	{
+		double pos[2];
+		e->Get2DPosition(m_LastPosition);
+		m_SelectedRWI = (mafRWIBase *)event->GetSender();
+		e->SetSender(this);
+		InvokeEvent(e, MCH_INPUT);
+	}
   else if (id == GetButtonDownId() || id == GetMouseDClickId())
   {
     // store the Selected RWI is needed for compounded view

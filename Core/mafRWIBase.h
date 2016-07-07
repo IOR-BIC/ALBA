@@ -155,7 +155,9 @@ public:
 	/** Release the mouse and send an event with mouse position. */
   virtual void OnRightMouseButtonUp(wxMouseEvent &event);
 	/** Send an event with mouse position. */
-  virtual void OnMouseMotion(wxMouseEvent &event);
+	virtual void OnMouseMotion(wxMouseEvent &event);
+	/** Send an event with mouse wheel. */
+	virtual void OnMouseWheel(wxMouseEvent &event);
 	/** Send an event with timer information. */
   virtual void OnTimer(wxTimerEvent &event);
 	/** Send an event with key code information. */
