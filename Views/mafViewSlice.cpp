@@ -377,35 +377,6 @@ void mafViewSlice::VmeCreatePipe(mafVME *vme)
 
           if(pipe_name.Equals("mafPipeSurfaceSlice"))
           {
-            double normal[3];
-            switch(m_CameraPositionId)
-            {
-            case CAMERA_OS_X:
-              normal[0] = 1;
-              normal[1] = 0;
-              normal[2] = 0;
-              break;
-            case CAMERA_OS_Y:
-              normal[0] = 0;
-              normal[1] = 1;
-              normal[2] = 0;
-              break;
-            case CAMERA_OS_Z:
-              normal[0] = 0;
-              normal[1] = 0;
-              normal[2] = 1;
-              break;
-            case CAMERA_OS_P:
-              break;
-              //case CAMERA_OS_REP:
-              //	this->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
-            case CAMERA_PERSPECTIVE:
-              break;
-            default:
-              normal[0] = 0;
-              normal[1] = 0;
-              normal[2] = 1;
-            }
             m_CurrentSurface.push_back(n);
 
             double positionSlice[3];
@@ -414,42 +385,11 @@ void mafViewSlice::VmeCreatePipe(mafVME *vme)
             positionSlice[2] = m_Slice[2];
             MultiplyPointByInputVolumeABSMatrix(positionSlice);
             ((mafPipeSurfaceSlice *)pipe)->SetSlice(positionSlice);
-            ((mafPipeSurfaceSlice *)pipe)->SetNormal(normal);
+            ((mafPipeSurfaceSlice *)pipe)->SetNormal(m_SliceNormal);
 
           }
           else if(pipe_name.Equals("mafPipePolylineSlice"))
           {
-            double normal[3];
-            switch(m_CameraPositionId)
-            {
-            case CAMERA_OS_X:
-              normal[0] = 1;
-              normal[1] = 0;
-              normal[2] = 0;
-              break;
-            case CAMERA_OS_Y:
-              normal[0] = 0;
-              normal[1] = 1;
-              normal[2] = 0;
-              break;
-            case CAMERA_OS_Z:
-              normal[0] = 0;
-              normal[1] = 0;
-              normal[2] = 1;
-              break;
-            case CAMERA_OS_P:
-              break;
-            case CAMERA_ARB:
-              this->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
-              break;
-            case CAMERA_PERSPECTIVE:
-              //this->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
-              break;
-            default:
-              normal[0] = 0;
-              normal[1] = 0;
-              normal[2] = 1;
-            }
             m_CurrentPolyline.push_back(n);
             double positionSlice[3];
             positionSlice[0] = m_Slice[0];
@@ -457,41 +397,10 @@ void mafViewSlice::VmeCreatePipe(mafVME *vme)
             positionSlice[2] = m_Slice[2];
             MultiplyPointByInputVolumeABSMatrix(positionSlice);
             ((mafPipePolylineSlice *)pipe)->SetSlice(positionSlice);
-            ((mafPipePolylineSlice *)pipe)->SetNormal(normal);
+            ((mafPipePolylineSlice *)pipe)->SetNormal(m_SliceNormal);
           }          
           else if(pipe_name.Equals("mafPipeMeshSlice"))
           {
-            double normal[3];
-            switch(m_CameraPositionId)
-            {
-            case CAMERA_OS_X:
-              normal[0] = 1;
-              normal[1] = 0;
-              normal[2] = 0;
-              break;
-            case CAMERA_OS_Y:
-              normal[0] = 0;
-              normal[1] = 1;
-              normal[2] = 0;
-              break;
-            case CAMERA_OS_Z:
-              normal[0] = 0;
-              normal[1] = 0;
-              normal[2] = 1;
-              break;
-            case CAMERA_OS_P:
-              break;
-            case CAMERA_ARB:
-              this->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
-              break;
-            case CAMERA_PERSPECTIVE:
-              //this->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
-              break;
-            default:
-              normal[0] = 0;
-              normal[1] = 0;
-              normal[2] = 1;
-            }
             m_CurrentMesh.push_back(n);
             double positionSlice[3];
             positionSlice[0] = m_Slice[0];
@@ -499,7 +408,7 @@ void mafViewSlice::VmeCreatePipe(mafVME *vme)
             positionSlice[2] = m_Slice[2];
             MultiplyPointByInputVolumeABSMatrix(positionSlice);
             ((mafPipeMeshSlice *)pipe)->SetSlice(positionSlice);
-            ((mafPipeMeshSlice *)pipe)->SetNormal(normal);
+            ((mafPipeMeshSlice *)pipe)->SetNormal(m_SliceNormal);
           }
         }
       } //end else [it is not volume slicing]                     
@@ -672,7 +581,7 @@ void mafViewSlice::SetSlice(double* Origin, double* Normal)
     mafPipeSlice* pipe = mafPipeSlice::SafeDownCast(m_CurrentVolume->GetPipe());
 		if (pipe != NULL)
 		{
-			pipe->SetSlice(Origin, Normal); 
+			pipe->SetSlice(Origin, NULL);
 
 			// update text
 			this->UpdateText();

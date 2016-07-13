@@ -53,6 +53,7 @@
 #include "vtkPoints.h"
 #include "vtkCamera.h"
 #include "mafPipeMeshSlice.h"
+#include "mafTransform.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafViewOrthoSlice);
@@ -743,11 +744,26 @@ void mafViewOrthoSlice::CreateOrthoslicesAndGizmos(mafVME *vme)
     p->SetTrilinearInterpolation(m_TrilinearInterpolationOn);
 		p->SetColorLookupTable(m_ColorLUT);
 	}
-	((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->SetSliceLocalOrigin(m_GizmoHandlePosition);
+
+	mafMatrix rot;
+
+	mafTransform::CopyRotation(*m_CurrentVolume->GetOutput()->GetAbsMatrix(), rot);
+
+	double xNormal[4] = { 1, 0, 0, 1 };
+	double yNormal[4] = { 0, 1, 0, 1 };
+	double zNormal[4] = { 0, 0, 1, 1 };
+	double normal[4];
+
+	rot.MultiplyPoint(xNormal,normal);
+	((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->SetSlice(m_GizmoHandlePosition,normal);
   ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->SetTextColor(colorsX);
-	((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->SetSliceLocalOrigin(m_GizmoHandlePosition);
+
+	rot.MultiplyPoint(yNormal, normal);
+	((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->SetSlice(m_GizmoHandlePosition, normal);
   ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->SetTextColor(colorsY);
-	((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->SetSliceLocalOrigin(m_GizmoHandlePosition);
+
+	rot.MultiplyPoint(zNormal, normal);
+	((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->SetSlice(m_GizmoHandlePosition, normal);
   ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->SetTextColor(colorsZ);
 	GizmoCreate();
 }
