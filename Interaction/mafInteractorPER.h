@@ -105,6 +105,7 @@ protected:
   virtual void OnMiddleButtonUp   (mafEventInteraction *e);
   virtual void OnRightButtonDown  (mafEventInteraction *e);
   virtual void OnRightButtonUp    (mafEventInteraction *e);
+	virtual void OnMouseWheel				(mafEventInteraction *e);
   virtual void OnMove             (mafEventInteraction *e);
   virtual void OnChar             (mafEventInteraction *e);
 

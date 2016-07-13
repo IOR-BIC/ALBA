@@ -995,10 +995,23 @@ mafGUI *mafVME::CreateGui()
 	buildHelpGui.SetId(GET_BUILD_HELP_GUI);
 	ForwardUpEvent(buildHelpGui);
 
+	char vmeTypeName[100];
+	int typeNamePos=0;
+	for (int i = 6; i < type_name.GetSize(); i++)
+	{
+		if (type_name[i] >= 'A' && type_name[i] <= 'Z')
+		{
+			vmeTypeName[typeNamePos] = ' ';
+			typeNamePos++;
+		}
+		vmeTypeName[typeNamePos] = type_name[i];
+		typeNamePos++;
+	}
+
 	if (buildHelpGui.GetArg() == true)
-		m_Gui->ButtonAndHelp(ID_PRINT_INFO, ID_HELP, type_name, "Print node debug information");
+		m_Gui->ButtonAndHelp(ID_PRINT_INFO, ID_HELP, vmeTypeName, "Print node debug information");
 	else
-		m_Gui->Button(ID_PRINT_INFO, type_name, "", "Print node debug information");
+		m_Gui->Button(ID_PRINT_INFO, vmeTypeName, "", "Print node debug information");
 
 	m_Gui->Divider(1);
 
@@ -1091,6 +1104,11 @@ void mafVME::ForwardUpEvent(mafEventBase *maf_event)
 	{
 		maf_event->SetChannel(MCH_UP);
 		m_Parent->OnEvent(maf_event);
+	}
+	else if (this->IsA("mafVMERoot"))
+	{
+		maf_event->SetChannel(MCH_UP);
+		OnEvent(maf_event);
 	}
 }
 //-------------------------------------------------------------------------

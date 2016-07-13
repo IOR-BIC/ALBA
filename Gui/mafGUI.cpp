@@ -110,6 +110,7 @@ BEGIN_EVENT_TABLE(mafGUI,mafGUIPanel)
     EVT_COMMAND_RANGE( MINID,MAXID,wxEVT_COMMAND_LISTBOX_SELECTED,      mafGUI::OnListBox)
 	EVT_COMMAND_RANGE( MINID,MAXID,wxEVT_COMMAND_LIST_ITEM_SELECTED,    mafGUI::OnListCtrl)
     EVT_COMMAND_RANGE( MINID,MAXID,wxEVT_COMMAND_CHECKLISTBOX_TOGGLED , mafGUI::OnCheckListBox)
+		EVT_COMMAND_RANGE(MINID, MAXID, wxEVT_COMMAND_RADIOBUTTON_SELECTED, mafGUI::OnRadioButton)
 	  EVT_COMMAND_RANGE( MINID,MAXID,wxEVT_COMMAND_SLIDER_UPDATED,				mafGUI::OnSlider)
     EVT_MOUSEWHEEL(mafGUI::OnMouseWheel)
 END_EVENT_TABLE()
@@ -1107,6 +1108,21 @@ void mafGUI::Radio(int id,wxString label,int* var, int numchoices, const wxStrin
   if(tooltip != "") 
     radio->SetToolTip(tooltip);
 }
+
+//----------------------------------------------------------------------------
+void mafGUI::RadioButton(int id, wxString label, int selected, wxString tooltip /*= ""*/)
+{
+	wxRadioButton *radioButton = NULL;
+	int w_id = GetWidgetId(id);
+	radioButton = new wxRadioButton(this, w_id, label);
+
+	radioButton->SetValue(selected);
+	
+	this->Add(radioButton);
+ 	if (tooltip != "")
+ 		radioButton->SetToolTip(tooltip);
+}
+
 //----------------------------------------------------------------------------
 wxComboBox *mafGUI::Combo(int id,mafString label,int* var,int numchoices, const wxString choices[], mafString tooltip)
 //----------------------------------------------------------------------------
@@ -1612,12 +1628,17 @@ void mafGUI::OnListCtrl (wxCommandEvent &event)
 	OnEvent(&mafEvent(this, event.GetId(),(long) event.GetInt()));
 }
 //----------------------------------------------------------------------------
-//----------------------------------------------------------------------------
 void mafGUI::OnCheckListBox (wxCommandEvent &event)
-//----------------------------------------------------------------------------
 {
   OnEvent(&mafEvent(this, event.GetId(),(long) event.GetInt()));
 }
+
+//----------------------------------------------------------------------------
+void mafGUI::OnRadioButton(wxCommandEvent &event)
+{
+	OnEvent(&mafEvent(this, event.GetId()));
+}
+
 //----------------------------------------------------------------------------
 void mafGUI::Reparent(wxWindow *parent)
 //----------------------------------------------------------------------------

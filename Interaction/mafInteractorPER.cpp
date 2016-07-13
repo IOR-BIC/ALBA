@@ -229,7 +229,9 @@ void mafInteractorPER::OnLeftButtonDown(mafEventInteraction *e)
     FlyTo(e); 
 
   OnButtonDown(e);
-  m_DraggingLeft = true;
+
+	if (!e->GetModifier(MAF_SHIFT_KEY))
+		m_DraggingLeft = true;
 }
 
 //----------------------------------------------------------------------------
@@ -283,6 +285,38 @@ void mafInteractorPER::OnRightButtonUp(mafEventInteraction *e)
 
   OnButtonUp(e);
 }
+
+//----------------------------------------------------------------------------
+void mafInteractorPER::OnMouseWheel(mafEventInteraction *e)
+{
+	m_ShowContextMenu = false;
+	
+	mafDevice *device = mafDevice::SafeDownCast((mafDevice*)e->GetSender());
+	mafDeviceButtonsPadMouse *mouse = mafDeviceButtonsPadMouse::SafeDownCast(device);
+
+	if (mouse)
+	{
+		vtkRenderer *ren = mouse->GetRenderer();
+		mafView *view = mouse->GetView();
+
+		if (!ren) return; // no renderer no fly to!
+
+		vtkCamera *cam = ren->GetActiveCamera();
+		
+		double rotation = *(double *)e->GetData();
+		//mafLogMessage("delta=%f", rotation);
+
+		double zoom = 1.0 + (rotation / 1200.0);
+
+		cam->Zoom(zoom);
+		
+		ren->ResetCameraClippingRange();
+
+		InvokeEvent(CAMERA_UPDATE, MCH_UP, view);
+		cam->OrthogonalizeViewUp();		
+	}
+}
+
 //----------------------------------------------------------------------------
 void mafInteractorPER::OnMove(mafEventInteraction *e) 
 //----------------------------------------------------------------------------
@@ -439,18 +473,18 @@ int mafInteractorPER::OnStartInteraction(mafEventInteraction *e)
     // standard action keys
     switch (button)
     {
-      case MAF_LEFT_BUTTON:
-        OnLeftButtonDown(e);
-      break;
-      case MAF_MIDDLE_BUTTON:
-        OnMiddleButtonDown(e);
-      break;
-      case MAF_RIGHT_BUTTON:
-        OnRightButtonDown(e);
-      break;
-      default:
-        StopInteraction(device,button); // stop immediately and return false
-        return 0;
+		case MAF_LEFT_BUTTON:
+			OnLeftButtonDown(e);
+			break;
+		case MAF_MIDDLE_BUTTON:
+			OnMiddleButtonDown(e);
+			break;
+		case MAF_RIGHT_BUTTON:
+			OnRightButtonDown(e);
+			break;
+		default:
+			StopInteraction(device, button); // stop immediately and return false
+			return 0;
     }
     return 1;
   }
@@ -469,17 +503,17 @@ int mafInteractorPER::OnStopInteraction(mafEventInteraction *e)
     // standard action keys
     switch (button)
     {
-      case MAF_LEFT_BUTTON:
-        OnLeftButtonUp(e);
-      break;
-      case MAF_MIDDLE_BUTTON:
-        OnMiddleButtonUp(e);
-      break;
-      case MAF_RIGHT_BUTTON:
-        OnRightButtonUp(e);
-      break;
-      default:
-        return -1;
+		case MAF_LEFT_BUTTON:
+			OnLeftButtonUp(e);
+			break;
+		case MAF_MIDDLE_BUTTON:
+			OnMiddleButtonUp(e);
+			break;
+		case MAF_RIGHT_BUTTON:
+			OnRightButtonUp(e);
+			break;
+		default:
+			return -1;
     }
     StopInteraction(device, button);
     return 1;
@@ -498,6 +532,12 @@ void mafInteractorPER::OnEvent(mafEventBase *event)
     mafID id = event->GetId();
     mafDevice *device = (mafDevice *)event->GetSender();
     assert(device);
+
+		if (id == mafDeviceButtonsPadMouse::GetWheelId() && !IsInteracting(device))
+		{
+			OnMouseWheel((mafEventInteraction *)event);
+			return;
+		}
 
     if (id == mafDeviceButtonsPadMouse::GetMouseCharEventId() && !IsInteracting(device))
     {

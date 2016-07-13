@@ -89,6 +89,7 @@ BEGIN_EVENT_TABLE(mafRWIBase, wxWindow)
   EVT_LEFT_UP(mafRWIBase::OnLeftMouseButtonUp)
   EVT_MIDDLE_DOWN(mafRWIBase::OnMiddleMouseButtonDown)
   EVT_MIDDLE_UP(mafRWIBase::OnMiddleMouseButtonUp)
+	EVT_MOUSEWHEEL(mafRWIBase::OnMouseWheel)
   EVT_RIGHT_DOWN(mafRWIBase::OnRightMouseButtonDown)
   EVT_RIGHT_UP(mafRWIBase::OnRightMouseButtonUp)
   EVT_MOTION(mafRWIBase::OnMouseMotion)
@@ -342,8 +343,8 @@ void mafRWIBase::OnLeftMouseButtonDown(wxMouseEvent &event)
   {
     mafEventInteraction e(this,mafDeviceButtonsPad::GetButtonDownId());
     e.Set2DPosition(event.GetX(),m_Height - event.GetY() - 1);
-    e.SetButton(MAF_LEFT_BUTTON);
-    e.SetModifier(MAF_SHIFT_KEY,event.ShiftDown());
+		e.SetButton(MAF_LEFT_BUTTON);
+		e.SetModifier(MAF_SHIFT_KEY, event.ShiftDown());
     e.SetModifier(MAF_CTRL_KEY,event.ControlDown());
     e.SetModifier(MAF_ALT_KEY,event.AltDown());
     e.SetChannel(MCH_OUTPUT);
@@ -555,6 +556,32 @@ void mafRWIBase::OnMouseMotion(wxMouseEvent &event)
     }
   }
 }
+
+//----------------------------------------------------------------------------
+void mafRWIBase::OnMouseWheel(wxMouseEvent &event)
+{
+	if (!Enabled) return;
+
+	bool rotateUp = event.GetWheelRotation() > 0;
+
+	double delta;
+	delta = event.GetWheelRotation();
+	mafEventInteraction e(this, mafDeviceButtonsPadMouse::GetWheelId());
+	e.Set2DPosition(event.GetX(), m_Height - event.GetY() - 1);
+	e.SetData(&delta);
+
+	e.SetModifier(MAF_SHIFT_KEY, event.ShiftDown());
+	e.SetModifier(MAF_CTRL_KEY, event.ControlDown());
+	e.SetModifier(MAF_ALT_KEY, event.AltDown());
+	e.SetChannel(MCH_OUTPUT);
+	if (m_Mouse)
+		m_Mouse->OnEvent(&e);
+	else if (m_Listener)
+	{
+		m_Listener->OnEvent(&e);
+	}
+}
+
 //----------------------------------------------------------------------------
 void mafRWIBase::OnTimer(wxTimerEvent &event)
 //----------------------------------------------------------------------------
